@@ -453,6 +453,7 @@ void update_class(char_data *ch) {
 	if (GET_CLASS(ch) != old_class || GET_SKILL_LEVEL(ch) != old_level) {
 		affect_total(ch);
 		qt_change_level(ch, GET_COMPUTED_LEVEL(ch));
+		update_MSDP_level(ch, UPDATE_SOON);
 	}
 }
 

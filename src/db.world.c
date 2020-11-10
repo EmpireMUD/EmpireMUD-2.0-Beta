@@ -41,8 +41,8 @@
 *   Evolutions
 *   Island Descriptions
 *   Helpers
-*   Map Output
 *   World Map System
+*   World Map Saving
 */
 
 // external funcs
@@ -687,11 +687,14 @@ void delete_room(room_data *room, bool check_exits) {
 		free_shared_room_data(SHARED_DATA(room));
 	}
 	
+	// break the association with the world_map tile
+	if (GET_MAP_LOC(room) && GET_MAP_LOC(room)->room == room) {
+		GET_MAP_LOC(room)->room = NULL;
+	}
+	
 	// free the room
 	free(room);
 	
-	// maybe
-	// world_is_sorted = FALSE;
 	need_world_index = TRUE;
 }
 
@@ -977,79 +980,12 @@ void set_crop_type(room_data *room, crop_data *cp) {
 	ROOM_CROP(room) = cp;
 	if (GET_ROOM_VNUM(room) < MAP_SIZE) {
 		world_map[FLAT_X_COORD(room)][FLAT_Y_COORD(room)].crop_type = cp;
-		world_map_needs_save = TRUE;
 	}
 }
 
 
  //////////////////////////////////////////////////////////////////////////////
 //// MANAGEMENT //////////////////////////////////////////////////////////////
-
-/**
-* Executes a full-world save.
-*/
-void save_whole_world(void) {
-	FILE *fl = NULL, *index = NULL;
-	room_data *iter, *next_iter;
-	room_vnum vnum;
-	int block, last;
-	
-	if (block_all_saves_due_to_shutdown) {
-		return;
-	}
-	
-	last = -1;
-	
-	// must sort first
-	sort_world_table();
-	
-	// open index file
-	if (need_world_index) {
-		if (!(index = fopen(WLD_PREFIX INDEX_FILE TEMP_SUFFIX, "w"))) {
-			syslog(SYS_ERROR, LVL_START_IMM, TRUE, "SYSERR: Unable to write index file '%s': %s", WLD_PREFIX INDEX_FILE TEMP_SUFFIX, strerror(errno));
-			return;
-		}
-	}
-	
-	HASH_ITER(hh, world_table, iter, next_iter) {
-		vnum = GET_ROOM_VNUM(iter);
-		block = GET_WORLD_BLOCK(vnum);
-		
-		if (block != last || !fl) {
-			if (index) {
-				fprintf(index, "%d%s\n", block, WLD_SUFFIX);
-			}
-			
-			if (fl) {
-				save_and_close_world_file(fl, last);
-				fl = NULL;
-			}
-			fl = open_world_file(block);
-			last = block;
-		}
-		
-		// only save a room at all if it couldn't be unloaded
-		if (!CAN_UNLOAD_MAP_ROOM(iter)) {
-			write_room_to_file(fl, iter);
-		}
-	}
-	
-	// cleanup
-	if (fl) {
-		save_and_close_world_file(fl, last);
-	}
-	if (index) {
-		fprintf(index, "$\n");
-		fclose(index);
-		rename(WLD_PREFIX INDEX_FILE TEMP_SUFFIX, WLD_PREFIX INDEX_FILE);
-		need_world_index = FALSE;
-	}
-	
-	// ensure this
-	save_instances();
-	save_world_map_to_file();
-}
-
 
 /**
 * Frees up any map rooms that are no longer needed, and schedules the rest
@@ -1114,7 +1050,7 @@ void annual_update_map_tile(struct map_data *tile) {
 	double dmg;
 	
 	// actual room is optional
-	room = real_real_room(tile->vnum);
+	room = tile->room;
 	
 	// updates that only matter if there's a room:
 	if (room) {
@@ -1323,14 +1259,13 @@ void annual_world_update(void) {
 	
 	// rename islands
 	update_island_names();
-	save_whole_world();
+	write_world_to_files();
 	
 	// store the time now
 	data_set_long(DATA_LAST_NEW_YEAR, time(0));
 	
 	if (newb_count) {
 		log("New year: naturalized %d tile%s on newbie islands.", newb_count, PLURAL(newb_count));
-		world_map_needs_save = TRUE;
 	}
 }
 
@@ -1359,7 +1294,7 @@ int naturalize_newbie_island(struct map_data *tile, bool do_unclaim) {
 	}
 	
 	// checks needed if the room exists
-	if ((room = real_real_room(tile->vnum))) {
+	if ((room = tile->room)) {
 		if (ROOM_OWNER(room)) {
 			return 0;	// owned rooms don't naturalize
 		}
@@ -1936,14 +1871,13 @@ void perform_change_base_sect(room_data *loc, struct map_data *map, sector_data 
 	old_sect = (loc ? BASE_SECT(loc) : map->base_sector);
 	
 	// update room
-	if (loc || (loc = real_real_room(map->vnum))) {
+	if (loc || (loc = map->room)) {
 		BASE_SECT(loc) = sect;
 	}
 	
 	// update the world map
 	if (map || (GET_ROOM_VNUM(loc) < MAP_SIZE && (map = &(world_map[FLAT_X_COORD(loc)][FLAT_Y_COORD(loc)])))) {
 		map->base_sector = sect;
-		world_map_needs_save = TRUE;
 	}
 	
 	// old index
@@ -1991,7 +1925,7 @@ void perform_change_sect(room_data *loc, struct map_data *map, sector_data *sect
 	
 	// ensure we have loc if possible
 	if (!loc) {
-		loc = real_real_room(map->vnum);
+		loc = map->room;
 	}
 	
 	// for updating territory counts
@@ -2009,7 +1943,6 @@ void perform_change_sect(room_data *loc, struct map_data *map, sector_data *sect
 	// update the world map
 	if (map || (GET_ROOM_VNUM(loc) < MAP_SIZE && (map = &(world_map[FLAT_X_COORD(loc)][FLAT_Y_COORD(loc)])))) {
 		map->sector_type = sect;
-		world_map_needs_save = TRUE;
 	}
 	
 	if (old_sect && GET_SECT_VNUM(old_sect) == BASIC_OCEAN && GET_SECT_VNUM(sect) != BASIC_OCEAN && map->shared == &ocean_shared_data) {
@@ -2214,6 +2147,9 @@ void adjust_building_tech(empire_data *emp, room_data *room, bool add) {
 	// other traits from buildings?
 	EMPIRE_MILITARY(emp) += GET_BLD_MILITARY(GET_BUILDING(room)) * amt;
 	EMPIRE_FAME(emp) += GET_BLD_FAME(GET_BUILDING(room)) * amt;
+	
+	// re-send claim info in case it changed
+	update_MSDP_empire_data_all(emp, TRUE, TRUE);
 }
 
 
@@ -2257,6 +2193,9 @@ void adjust_vehicle_tech(vehicle_data *veh, bool add) {
 	// other traits from buildings?
 	EMPIRE_MILITARY(emp) += VEH_MILITARY(veh) * amt;
 	EMPIRE_FAME(emp) += VEH_FAME(veh) * amt;
+	
+	// re-send claim info in case it changed
+	update_MSDP_empire_data_all(emp, TRUE, TRUE);
 }
 
 
@@ -2505,6 +2444,9 @@ void reread_empire_tech(empire_data *emp) {
 	
 	// trigger a re-sort now
 	resort_empires(FALSE);
+	
+	// re-send MSDP claim data
+	update_MSDP_empire_data_all(emp, TRUE, TRUE);
 }
 
 
@@ -3008,6 +2950,7 @@ room_data *load_map_room(room_vnum vnum) {
 	room->vnum = vnum;
 	SHARED_DATA(room) = map->shared;	// point to map
 	GET_MAP_LOC(room) = map;
+	map->room = room;
 	add_room_to_world_tables(room);
 	
 	// do not use perform_change_sect here because we're only loading from the existing data -- this already has height data
@@ -3653,114 +3596,9 @@ int sort_empire_islands(struct empire_island *a, struct empire_island *b) {
 }
 
 
- //////////////////////////////////////////////////////////////////////////////
-//// MAP OUTPUT //////////////////////////////////////////////////////////////
-
-/**
-* Writes the data files used to generate graphical maps.
-*/
-void output_map_to_file(void) {
-	FILE *out, *pol, *cit;
-	int num, color = 0, x, y;
-	struct empire_city_data *city;
-	room_data *room;
-	empire_data *emp, *next_emp;
-	sector_data *ocean = sector_proto(BASIC_OCEAN);
-	sector_data *sect;
-	
-	// basic ocean sector is required
-	if (!ocean) {
-		log("SYSERR: Basic ocean sector %d is missing", BASIC_OCEAN);
-		return;
-	}
-	
-	sort_world_table();
-
-	// NORMAL MAP
-	if (!(out = fopen(GEOGRAPHIC_MAP_FILE TEMP_SUFFIX, "w"))) {
-		log("SYSERR: Unable to open file '%s' for writing", GEOGRAPHIC_MAP_FILE TEMP_SUFFIX);
-		return;
-	}
-	
-	// POLITICAL MAP
-	if (!(pol = fopen(POLITICAL_MAP_FILE TEMP_SUFFIX, "w"))) {
-		log("SYSERR: Unable to open file '%s' for writing", POLITICAL_MAP_FILE TEMP_SUFFIX);
-		return;
-	}
-	
-	fprintf(out, "%dx%d\n", MAP_WIDTH, MAP_HEIGHT);
-	fprintf(pol, "%dx%d\n", MAP_WIDTH, MAP_HEIGHT);
-	
-	for (y = 0; y < MAP_HEIGHT; ++y) {
-		for (x = 0; x < MAP_WIDTH; ++x) {
-			// load room only if in memory
-			room = real_real_room(world_map[x][y].vnum);
-			sect = world_map[x][y].sector_type;
-			if (room && ROOM_AFF_FLAGGED(room, ROOM_AFF_CHAMELEON) && IS_COMPLETE(room)) {
-				sect = world_map[x][y].base_sector;
-			}
-			
-			// normal map output
-			if (SECT_FLAGGED(sect, SECTF_HAS_CROP_DATA) && world_map[x][y].crop_type) {
-				fprintf(out, "%c", mapout_color_tokens[GET_CROP_MAPOUT(world_map[x][y].crop_type)]);
-			}
-			else {
-				fprintf(out, "%c", mapout_color_tokens[GET_SECT_MAPOUT(sect)]);
-			}
-		
-			// political output
-			if (room && (emp = ROOM_OWNER(room)) && (!ROOM_AFF_FLAGGED(room, ROOM_AFF_CHAMELEON) || !IS_COMPLETE(room))) {
-				// find the first color in banner_to_mapout_token that is in the banner
-				color = -1;
-				for (num = 0; banner_to_mapout_token[0][0] != '\n'; ++num) {
-					if (strchr(EMPIRE_BANNER(emp), banner_to_mapout_token[num][0])) {
-						color = num;
-						break;
-					}
-				}
-			
-				fprintf(pol, "%c", color != -1 ? banner_to_mapout_token[color][1] : '?');
-			}
-			else {
-				// no owner -- only some sects get printed
-				if (SECT_FLAGGED(sect, SECTF_SHOW_ON_POLITICAL_MAPOUT)) {
-					fprintf(pol, "%c", mapout_color_tokens[GET_SECT_MAPOUT(sect)]);
-				}
-				else {
-					fprintf(pol, "?");
-				}
-			}
-		}
-		
-		// end of row
-		fprintf(out, "\n");
-		fprintf(pol, "\n");	
-	}
-
-	fclose(out);
-	rename(GEOGRAPHIC_MAP_FILE TEMP_SUFFIX, GEOGRAPHIC_MAP_FILE);
-	fclose(pol);
-	rename(POLITICAL_MAP_FILE TEMP_SUFFIX, POLITICAL_MAP_FILE);
-	
-	// and city data
-	if (!(cit = fopen(CITY_DATA_FILE TEMP_SUFFIX, "w"))) {
-		log("SYSERR: Unable to open file '%s' for writing", CITY_DATA_FILE TEMP_SUFFIX);
-		return;
-	}
-	
-	HASH_ITER(hh, empire_table, emp, next_emp) {
-		if (EMPIRE_IMM_ONLY(emp)) {
-			continue;
-		}
-		
-		for (city = EMPIRE_CITY_LIST(emp); city; city = city->next) {
-			fprintf(cit, "%d %d %d \"%s\" \"%s\"\n", X_COORD(city->location), Y_COORD(city->location), city_type[city->type].radius, city->name, EMPIRE_NAME(emp));
-		}
-	}
-	
-	fprintf(cit, "$\n");
-	fclose(cit);
-	rename(CITY_DATA_FILE TEMP_SUFFIX, CITY_DATA_FILE);
+// Simple sorter for the world_table hash
+int sort_world_table_func(room_data *a, room_data *b) {
+	return a->vnum - b->vnum;
 }
 
 
@@ -3904,6 +3742,7 @@ void load_world_map_from_file(void) {
 	for (x = 0; x < MAP_WIDTH; ++x) {
 		for (y = 0; y < MAP_HEIGHT; ++y) {
 			world_map[x][y].vnum = (y * MAP_WIDTH) + x;
+			world_map[x][y].room = NULL;
 			world_map[x][y].shared = &ocean_shared_data;
 			world_map[x][y].shared->island_id = NO_ISLAND;
 			world_map[x][y].shared->island_ptr = NULL;
@@ -4074,58 +3913,6 @@ void load_world_map_from_file(void) {
 
 
 /**
-* Outputs the land portion of the world map to the map file. This function also
-* does a small amount of updating (e.g. removes stale tracks) since it is
-* iterating the whole world anyway.
-*/
-void save_world_map_to_file(void) {
-	struct track_data *track, *next_track;
-	struct map_data *iter;
-	long now = time(0);
-	room_data *room;
-	FILE *fl;
-	int misc;
-	
-	int tracks_lifespan = config_get_int("tracks_lifespan");
-	
-	// shortcut
-	if (!world_map_needs_save || block_all_saves_due_to_shutdown) {
-		return;
-	}
-	
-	if (!(fl = fopen(WORLD_MAP_FILE TEMP_SUFFIX, "w"))) {
-		log("Unable to open %s for writing", WORLD_MAP_FILE TEMP_SUFFIX);
-		return;
-	}
-	
-	// only bother with ones that aren't base ocean
-	for (iter = land_map; iter; iter = iter->next) {
-		// free some junk while we're here anyway
-		HASH_ITER(hh, iter->shared->tracks, track, next_track) {
-			if (now - track->timestamp > tracks_lifespan * SECS_PER_REAL_MIN) {
-				HASH_DEL(iter->shared->tracks, track);
-				free(track);
-			}
-		}
-		
-		// misc is some extra flags we pass to the evolver here, and is not really read back in by the MUD
-		misc = 0;
-		if ((room = real_real_room(iter->vnum)) && ROOM_OWNER(room)) {
-			misc |= EVOLVER_OWNED;
-		}
-		
-		// SAVE: x y island sect base natural crop misc
-		fprintf(fl, "%d %d %d %d %d %d %d %d\n", MAP_X_COORD(iter->vnum), MAP_Y_COORD(iter->vnum), iter->shared->island_id, (iter->sector_type ? GET_SECT_VNUM(iter->sector_type) : -1), (iter->base_sector ? GET_SECT_VNUM(iter->base_sector) : -1), (iter->natural_sector ? GET_SECT_VNUM(iter->natural_sector) : -1), (iter->crop_type ? GET_CROP_VNUM(iter->crop_type) : -1), misc);
-		write_shared_room_data(fl, iter->shared);
-	}
-	
-	fclose(fl);
-	rename(WORLD_MAP_FILE TEMP_SUFFIX, WORLD_MAP_FILE);
-	world_map_needs_save = FALSE;
-}
-
-
-/**
 * Parses any 'other data' for the 'shared room data' of a map tile or room.
 *
 * Note: This currently only includes 'height' but is expandable to handle other
@@ -4155,4 +3942,246 @@ void parse_other_shared_data(struct shared_room_data *shared, char *line, char *
 			break;
 		}
 	}
+}
+
+
+ //////////////////////////////////////////////////////////////////////////////
+//// WORLD MAP SAVING ////////////////////////////////////////////////////////
+
+/**
+* Writes the city data used by the graphical map.
+*/
+void write_city_data_file(void) {
+	struct empire_city_data *city;
+	empire_data *emp, *next_emp;
+	FILE *cit_fl;
+
+	if (!(cit_fl = fopen(CITY_DATA_FILE TEMP_SUFFIX, "w"))) {
+		log("SYSERR: Unable to open file '%s' for writing", CITY_DATA_FILE TEMP_SUFFIX);
+		return;
+	}
+	
+	HASH_ITER(hh, empire_table, emp, next_emp) {
+		if (EMPIRE_IMM_ONLY(emp)) {
+			continue;
+		}
+		
+		for (city = EMPIRE_CITY_LIST(emp); city; city = city->next) {
+			fprintf(cit_fl, "%d %d %d \"%s\" \"%s\"\n", X_COORD(city->location), Y_COORD(city->location), city_type[city->type].radius, city->name, EMPIRE_NAME(emp));
+		}
+	}
+	
+	fprintf(cit_fl, "$\n");
+	fclose(cit_fl);
+	rename(CITY_DATA_FILE TEMP_SUFFIX, CITY_DATA_FILE);
+}
+
+
+/**
+* Writes one tile entry to the graphical map data files.
+*
+* @param struct map_data *map The tile to write.
+* @param FILE *map_fl The geographical map file, open for writing.
+* @param FILE *pol_fl The political map file, open for writing.
+*/
+void write_graphical_map_data(struct map_data *map, FILE *map_fl, FILE *pol_fl) {
+	sector_data *sect = map->sector_type;
+	empire_data *emp;
+	
+	if (map->room && ROOM_AFF_FLAGGED(map->room, ROOM_AFF_CHAMELEON) && IS_COMPLETE(map->room)) {
+		sect = map->base_sector;
+	}
+	
+	// normal map output
+	if (map_fl) {
+		if (SECT_FLAGGED(sect, SECTF_HAS_CROP_DATA) && map->crop_type) {
+			fprintf(map_fl, "%c", mapout_color_tokens[GET_CROP_MAPOUT(map->crop_type)]);
+		}
+		else {
+			fprintf(map_fl, "%c", mapout_color_tokens[GET_SECT_MAPOUT(sect)]);
+		}
+	}
+
+	// political output
+	if (pol_fl && map->room && (emp = ROOM_OWNER(map->room)) && (!ROOM_AFF_FLAGGED(map->room, ROOM_AFF_CHAMELEON) || !IS_COMPLETE(map->room)) && EMPIRE_MAPOUT_TOKEN(emp) != 0) {
+		fprintf(pol_fl, "%c", EMPIRE_MAPOUT_TOKEN(emp));
+	}
+	else if (pol_fl) {
+		// no owner -- only some sects get printed
+		if (SECT_FLAGGED(sect, SECTF_SHOW_ON_POLITICAL_MAPOUT)) {
+			fprintf(pol_fl, "%c", mapout_color_tokens[GET_SECT_MAPOUT(sect)]);
+		}
+		else {
+			fprintf(pol_fl, "?");
+		}
+	}
+}
+
+
+/**
+* New function (as of b5.115) to combine the writing of the world_table and
+* world_map data, which are written out as base_map, the .wld files, and the
+* various text files that are used to build the graphical maps. Performing all
+* this at once is meant to reduce iterations over the various world tables and
+* lists.
+*/
+void write_world_to_files(void) {
+	FILE *world_fl = NULL, *index_fl = NULL, *base_fl = NULL, *map_fl = NULL, *pol_fl = NULL;
+	struct track_data *track, *next_track;
+	room_data *iter, *next_iter;
+	room_vnum vnum;
+	int block, last_block, misc, x, y;
+	struct map_data *map;
+	time_t now = time(0);
+	
+	int tracks_lifespan = config_get_int("tracks_lifespan");
+	
+	if (block_all_saves_due_to_shutdown) {
+		return;
+	}
+	
+	// prepare to write
+	last_block = -1;
+	
+	// open base map
+	if (!(base_fl = fopen(WORLD_MAP_FILE TEMP_SUFFIX, "w"))) {
+		log("Unable to open %s for writing", WORLD_MAP_FILE TEMP_SUFFIX);
+		return;
+	}
+	
+	// open index file
+	if (need_world_index) {
+		if (!(index_fl = fopen(WLD_PREFIX INDEX_FILE TEMP_SUFFIX, "w"))) {
+			syslog(SYS_ERROR, LVL_START_IMM, TRUE, "SYSERR: Unable to write index file '%s': %s", WLD_PREFIX INDEX_FILE TEMP_SUFFIX, strerror(errno));
+			return;
+		}
+	}
+
+	// open geographical map data file
+	if (!(map_fl = fopen(GEOGRAPHIC_MAP_FILE TEMP_SUFFIX, "w"))) {
+		log("SYSERR: Unable to open file '%s' for writing", GEOGRAPHIC_MAP_FILE TEMP_SUFFIX);
+		return;
+	}
+	
+	// open political map data file
+	if (!(pol_fl = fopen(POLITICAL_MAP_FILE TEMP_SUFFIX, "w"))) {
+		log("SYSERR: Unable to open file '%s' for writing", POLITICAL_MAP_FILE TEMP_SUFFIX);
+		return;
+	}
+	
+	// write preliminary data
+	fprintf(map_fl, "%dx%d\n", MAP_WIDTH, MAP_HEIGHT);
+	fprintf(pol_fl, "%dx%d\n", MAP_WIDTH, MAP_HEIGHT);
+	
+	// write world_map:
+	for (y = 0; y < MAP_HEIGHT; ++y) {
+		// iterating x inside of y will ensure we're in vnum-order here
+		for (x = 0; x < MAP_WIDTH; ++x) {
+			map = &world_map[x][y];
+			write_graphical_map_data(map, map_fl, pol_fl);
+			
+			// save base map only if not blank ocean
+			if (map->shared != &ocean_shared_data) {
+				// free some junk while we're here anyway
+				HASH_ITER(hh, map->shared->tracks, track, next_track) {
+					if (now - track->timestamp > tracks_lifespan * SECS_PER_REAL_MIN) {
+						HASH_DEL(map->shared->tracks, track);
+						free(track);
+					}
+				}
+				
+				// misc is some extra flags we pass to the evolver here, and is not really read back in by the MUD
+				misc = 0;
+				if (map->room && ROOM_OWNER(map->room)) {
+					misc |= EVOLVER_OWNED;
+				}
+				
+				// SAVE: x y island sect base natural crop misc
+				fprintf(base_fl, "%d %d %d %d %d %d %d %d\n", MAP_X_COORD(map->vnum), MAP_Y_COORD(map->vnum), map->shared->island_id, (map->sector_type ? GET_SECT_VNUM(map->sector_type) : -1), (map->base_sector ? GET_SECT_VNUM(map->base_sector) : -1), (map->natural_sector ? GET_SECT_VNUM(map->natural_sector) : -1), (map->crop_type ? GET_CROP_VNUM(map->crop_type) : -1), misc);
+				write_shared_room_data(base_fl, map->shared);
+			}
+			
+			// world file portion (duplicated below)
+			if (map->room) {
+				vnum = GET_ROOM_VNUM(map->room);
+				block = GET_WORLD_BLOCK(vnum);
+				
+				if (block != last_block || !world_fl) {
+					if (index_fl) {
+						fprintf(index_fl, "%d%s\n", block, WLD_SUFFIX);
+					}
+					
+					if (world_fl) {
+						save_and_close_world_file(world_fl, last_block);
+						world_fl = NULL;
+					}
+					world_fl = open_world_file(block);
+					last_block = block;
+				}
+				
+				// only save a room at all if it couldn't be unloaded
+				if (!CAN_UNLOAD_MAP_ROOM(map->room)) {
+					write_room_to_file(world_fl, map->room);
+				}
+			}
+		}	// end X
+		
+		// end of row
+		fprintf(map_fl, "\n");
+		fprintf(pol_fl, "\n");	
+	}	// end Y
+	
+	// sort interior
+	DL_SORT2(interior_room_list, sort_world_table_func, prev_interior, next_interior);
+	
+	// interior portion (duplicated from above)
+	DL_FOREACH_SAFE2(interior_room_list, iter, next_iter, next_interior) {
+		vnum = GET_ROOM_VNUM(iter);
+		block = GET_WORLD_BLOCK(vnum);
+		
+		if (block != last_block || !world_fl) {
+			if (index_fl) {
+				fprintf(index_fl, "%d%s\n", block, WLD_SUFFIX);
+			}
+			
+			if (world_fl) {
+				save_and_close_world_file(world_fl, last_block);
+				world_fl = NULL;
+			}
+			world_fl = open_world_file(block);
+			last_block = block;
+		}
+		
+		// only save a room at all if it couldn't be unloaded
+		if (!CAN_UNLOAD_MAP_ROOM(iter)) {
+			write_room_to_file(world_fl, iter);
+		}
+	}
+	
+	// save/close files
+	if (world_fl) {
+		save_and_close_world_file(world_fl, last_block);
+	}
+	if (base_fl) {
+		fclose(base_fl);
+		rename(WORLD_MAP_FILE TEMP_SUFFIX, WORLD_MAP_FILE);
+	}
+	if (index_fl) {
+		fprintf(index_fl, "$\n");
+		fclose(index_fl);
+		rename(WLD_PREFIX INDEX_FILE TEMP_SUFFIX, WLD_PREFIX INDEX_FILE);
+		need_world_index = FALSE;
+	}
+	if (map_fl) {
+		fclose(map_fl);
+		rename(GEOGRAPHIC_MAP_FILE TEMP_SUFFIX, GEOGRAPHIC_MAP_FILE);
+	}
+	if (pol_fl) {
+		fclose(pol_fl);
+		rename(POLITICAL_MAP_FILE TEMP_SUFFIX, POLITICAL_MAP_FILE);
+	}
+	
+	// additional work
+	save_instances();
+	write_city_data_file();
 }

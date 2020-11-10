@@ -32,7 +32,7 @@
 */
 
 // external vars
-extern unsigned long pulse;
+extern unsigned long main_game_pulse;
 
 // local prototypes
 void another_hour();
@@ -327,9 +327,8 @@ void another_hour(void) {
 			process_shipping();
 			break;
 		}
-		case 7: {	// 7am shipment and world save
+		case 7: {	// 7am shipment
 			process_shipping();
-			save_whole_world();
 			break;
 		}
 		case 12: {	// noon
@@ -423,7 +422,7 @@ double get_hours_of_sun(room_data *room) {
 * @return struct time_info_data The local time data.
 */
 struct time_info_data get_local_time(room_data *room) {
-	double longitude, percent, minutes_dec;
+	double longitude, percent;
 	struct time_info_data tinfo;
 	int x_coord;
 	
@@ -439,8 +438,7 @@ struct time_info_data get_local_time(room_data *room) {
 	tinfo = main_time_info;	// copy
 	
 	// adjust hours backward for distance from east end
-	minutes_dec = ((pulse / PASSES_PER_SEC) % SECS_PER_MUD_HOUR) / (double)SECS_PER_MUD_HOUR;
-	tinfo.hours -= ceil(24.0 * percent - minutes_dec);
+	tinfo.hours -= ceil(24.0 * percent - PERCENT_THROUGH_CURRENT_HOUR);
 	
 	// adjust back days/months/years if needed
 	if (tinfo.hours < 0) {
@@ -468,13 +466,13 @@ int get_sun_status(room_data *room) {
 	
 	if ((x_coord = X_COORD(room)) == -1) {
 		// no x-coord (not in a mappable spot)
-		hour = main_time_info.hours + (((pulse / PASSES_PER_SEC) % SECS_PER_MUD_HOUR) / (double)SECS_PER_MUD_HOUR);
+		hour = main_time_info.hours + PERCENT_THROUGH_CURRENT_HOUR;
 	}
 	else {
 		// determine exact time
 		longitude = X_TO_LONGITUDE(x_coord) + 180.0;	// longitude from 0-360 instead of -/+180
 		percent = 1.0 - (longitude / 360.0);	// percentage of the way west
-		hour = main_time_info.hours - (24.0 * percent - ((pulse / PASSES_PER_SEC) % SECS_PER_MUD_HOUR) / (double)SECS_PER_MUD_HOUR);
+		hour = main_time_info.hours - (24.0 * percent - PERCENT_THROUGH_CURRENT_HOUR);
 		if (hour < 0.0) {
 			hour += 24.0;
 		}
@@ -602,7 +600,7 @@ void send_hourly_sun_messages(void) {
 					break;
 				}
 				case SUN_LIGHT: {
-					msg_to_char(desc->character, "The sun rises over the horizon.\r\n");
+					msg_to_char(desc->character, "The day has begun.\r\n");
 					break;
 				}
 				case SUN_SET: {

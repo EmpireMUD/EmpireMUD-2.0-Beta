@@ -246,7 +246,6 @@ OLC_MODULE(mapedit_height) {
 	else {
 		ROOM_HEIGHT(IN_ROOM(ch)) = atoi(argument);
 		msg_to_char(ch, "This tile now has a height of %d.\r\n", ROOM_HEIGHT(IN_ROOM(ch)));
-		world_map_needs_save = TRUE;
 	}
 }
 
@@ -326,7 +325,6 @@ OLC_MODULE(mapedit_pass_walls) {
 OLC_MODULE(mapedit_decustomize) {
 	decustomize_room(IN_ROOM(ch));
 	msg_to_char(ch, "All customizations removed on this room/acre.\r\n");
-	world_map_needs_save = TRUE;
 }
 
 
@@ -339,7 +337,6 @@ OLC_MODULE(mapedit_room_name) {
 			ROOM_CUSTOM_NAME(IN_ROOM(ch)) = NULL;
 		}
 		msg_to_char(ch, "This room/tile no longer has a specialized name.\r\n");
-		world_map_needs_save = TRUE;
 	}
 	else {
 		if (ROOM_CUSTOM_NAME(IN_ROOM(ch))) {
@@ -347,7 +344,6 @@ OLC_MODULE(mapedit_room_name) {
 		}
 		ROOM_CUSTOM_NAME(IN_ROOM(ch)) = str_dup(argument);
 		msg_to_char(ch, "This room/tile is now called \"%s\".\r\n", argument);
-		world_map_needs_save = TRUE;
 	}
 }
 
@@ -363,7 +359,6 @@ OLC_MODULE(mapedit_icon) {
 			ROOM_CUSTOM_ICON(IN_ROOM(ch)) = NULL;
 		}
 		msg_to_char(ch, "This area no longer has a specialized icon.\r\n");
-		world_map_needs_save = TRUE;
 	}
 	else if (!*argument)
 		msg_to_char(ch, "What would you like to set the icon to (or \"none\")?\r\n");
@@ -377,7 +372,6 @@ OLC_MODULE(mapedit_icon) {
 		}
 		ROOM_CUSTOM_ICON(IN_ROOM(ch)) = str_dup(argument);
 		msg_to_char(ch, "This area now has the icon \"%s&0\".\r\n", argument);
-		world_map_needs_save = TRUE;
 	}
 }
 
@@ -421,7 +415,6 @@ OLC_MODULE(mapedit_room_description) {
 			ROOM_CUSTOM_DESCRIPTION(IN_ROOM(ch)) = NULL;
 		}
 		msg_to_char(ch, "This area no longer has a specialized description.\r\n");
-		world_map_needs_save = TRUE;
 	}
 	else if (is_abbrev(argument, "set")) {
 		if (ch->desc->str) {
@@ -575,7 +568,7 @@ OLC_MODULE(mapedit_naturalize) {
 		
 		// check all land tiles
 		LL_FOREACH(land_map, map) {
-			room = real_real_room(map->vnum);	// may or may not exist
+			room = map->room;	// may or may not exist
 			
 			if (island && map->shared->island_id != island_id) {
 				continue;
@@ -635,8 +628,6 @@ OLC_MODULE(mapedit_naturalize) {
 		}
 		
 		if (count > 0) {
-			world_map_needs_save = TRUE;
-			
 			if (island) {
 				isle = get_island(island_id, TRUE);
 				syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: %s has naturalized %d tile%s on island %d %s", GET_NAME(ch), count, PLURAL(count), island_id, isle->name);
@@ -668,7 +659,6 @@ OLC_MODULE(mapedit_naturalize) {
 		// syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: %s has naturalized the sector at %s", GET_NAME(ch), room_log_identifier(IN_ROOM(ch)));
 		msg_to_char(ch, "You have naturalized the sector for this tile.\r\n");
 		act("$n has naturalized the area!", FALSE, ch, NULL, NULL, TO_ROOM);
-		world_map_needs_save = TRUE;
 	}
 }
 
@@ -741,7 +731,6 @@ OLC_MODULE(mapedit_remember) {
 		if (count > 0) {
 			isle = get_island(island_id, TRUE);
 			syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: %s has set 'remember' for %d tile%s on island %d %s", GET_NAME(ch), count, PLURAL(count), island_id, isle->name);
-			world_map_needs_save = TRUE;
 		}
 		msg_to_char(ch, "You have set the map to remember sectors for %d tile%s on this island.\r\n", count, PLURAL(count));
 	}
@@ -751,7 +740,6 @@ OLC_MODULE(mapedit_remember) {
 		
 		syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: %s has set 'remember' for %s", GET_NAME(ch), room_log_identifier(IN_ROOM(ch)));
 		msg_to_char(ch, "You have set the map to remember the sector for this tile.\r\n");
-		world_map_needs_save = TRUE;
 	}
 }
 

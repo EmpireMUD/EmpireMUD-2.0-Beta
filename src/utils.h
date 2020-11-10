@@ -571,6 +571,7 @@ int GET_MAX_BLOOD(char_data *ch);	// this one is different than the other max po
 #define EMPIRE_WEALTH(emp)  ((emp)->wealth)
 #define EMPIRE_POPULATION(emp)  ((emp)->population)
 #define EMPIRE_LEARNED_CRAFTS(emp)  ((emp)->learned_crafts)
+#define EMPIRE_MAPOUT_TOKEN(emp)  ((emp)->mapout_token)
 #define EMPIRE_MEMBER_ACCOUNTS(emp)  ((emp)->member_accounts)
 #define EMPIRE_MILITARY(emp)  ((emp)->military)
 #define EMPIRE_MAX_LEVEL(emp)  ((emp)->max_level)
@@ -789,16 +790,16 @@ int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_COORD(ge
  //////////////////////////////////////////////////////////////////////////////
 //// MEMORY UTILS ////////////////////////////////////////////////////////////
 
-#define CREATE(result, type, number)  {\
+#define CREATE(result, type, number)  do {\
 	if ((number) * sizeof(type) <= 0)	\
 		log("SYSERR: Zero bytes or less requested at %s:%d.", __FILE__, __LINE__);	\
 	if (!((result) = (type *) calloc ((number), sizeof(type))))	\
-		{ log("SYSERR: malloc failure: %s: %d", __FILE__, __LINE__); abort(); } }
+		{ log("SYSERR: malloc failure: %s: %d", __FILE__, __LINE__); abort(); } } while(0)
 
 
-#define RECREATE(result, type, number) {\
+#define RECREATE(result, type, number) do {\
   if (!((result) = (type *) realloc ((result), sizeof(type) * (number))))\
-		{ log("SYSERR: realloc failure: %s: %d", __FILE__, __LINE__); abort(); } }
+		{ log("SYSERR: realloc failure: %s: %d", __FILE__, __LINE__); abort(); } } while (0)
 
 
 // b5.110 replaced this with LL_DELETE everywhere in the code, for consistency, but it is provided here for compatibility
@@ -2093,6 +2094,7 @@ int get_room_scale_level(room_data *room, char_data *targ);
 // eedit.c
 bool check_banner_color_string(char *str);
 bool check_unique_empire_name(empire_data *for_emp, char *name);
+char empire_banner_to_mapout_token(const char *banner);
 bool valid_rank_name(char_data *ch, char *newname);
 
 // event.c
@@ -2205,6 +2207,7 @@ void end_pursuit(char_data *ch, char_data *target);
 struct generic_name_data *get_generic_name_list(int name_set, int sex);
 int mob_coins(char_data *mob);
 void random_encounter(char_data *ch);
+void run_mobile_activity(char_data *ch);
 void scale_mob_as_companion(char_data *mob, char_data *master, int use_level);
 void scale_mob_for_character(char_data *mob, char_data *ch);
 void scale_mob_to_level(char_data *mob, int level);
@@ -2461,8 +2464,9 @@ void set_workforce_production_limit(empire_data *emp, any_vnum vnum, int amount)
 #define TIME_TO_12H(time)  ((time) > 12 ? (time) - 12 : ((time) == 0 ? 12 : (time)))
 #define AM_PM(time)  (time < 12 ? "am" : "pm")
 
-// time: gets day of year
+// time helpers
 #define DAY_OF_YEAR(timeinfo)  ((timeinfo).month * 30 + (timeinfo).day + 1)
+#define PERCENT_THROUGH_CURRENT_HOUR  (((main_game_pulse / PASSES_PER_SEC) % SECS_PER_MUD_HOUR) / (double)SECS_PER_MUD_HOUR)
 
 
 /* undefine MAX and MIN so that our macros are used instead */

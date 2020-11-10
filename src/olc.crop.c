@@ -201,7 +201,7 @@ void olc_delete_crop(char_data *ch, crop_vnum vnum) {
 	// update world
 	count = 0;
 	LL_FOREACH(land_map, map) {
-		room = real_real_room(map->vnum);
+		room = map->room;
 		
 		if (map->crop_type == crop || (room && ROOM_CROP(room) == crop)) {
 			if (!room) {

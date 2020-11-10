@@ -64,19 +64,17 @@ extern const char *slow_nameserver_ips[];
 void boot_world();
 void empire_srandom(unsigned long initial_seed);
 void free_whole_library();
-void mobile_activity();
 int perform_alias(descriptor_data *d, char *orig);
 char *prompt_olc_info(char_data *ch);
 
 // heartbeat functions
-void check_death_respawn();
 void check_expired_cooldowns();
 void check_idle_passwords();
 void check_newbie_islands();
 void check_wars();
 void chore_update();
 void display_automessages();
-void frequent_combat(int pulse);
+void frequent_combat(unsigned long pulse);
 void process_import_evolutions();
 void process_theft_logs();
 void prune_instances();
@@ -134,7 +132,7 @@ struct timeval null_time;				/* zero-valued time structure		*/
 FILE *logfile = NULL;					/* Where to send the log messages	*/
 bool gain_cond_message = FALSE;		/* gain cond send messages			*/
 int dg_act_check;	/* toggle for act_trigger */
-unsigned long pulse = 0;	/* number of pulses since game start */
+unsigned long main_game_pulse = 0;	/* number of pulses since game start */
 static bool reboot_recovery = FALSE;
 int mother_desc;
 ush_int port;
@@ -144,7 +142,8 @@ bool block_all_saves_due_to_shutdown = FALSE;	// if TRUE, nothing can be saved t
 // vars to prevent running multiple cycles during a missed-pulse catch-up cycle
 bool catch_up_combat = FALSE;	// frequent_combat()
 bool catch_up_actions = FALSE;	// update_actions()
-bool catch_up_mobs = FALSE;	// mobile_activity()
+bool catch_up_mobs = FALSE;		// prevents mobile activity from running repeatedly
+bool caught_up_mobs = FALSE;	// used to ensure mobile activity ran
 
 // vars for detecting slow IPs and preventing repeat-lag
 char **detected_slow_ips = NULL;
@@ -306,6 +305,9 @@ void msdp_update_room(char_data *ch) {
 	MSDPSetString(desc, eMSDP_ROOM_NAME, get_room_name(IN_ROOM(ch), FALSE));
 	MSDPSetTable(desc, eMSDP_ROOM_EXITS, exits);
 	
+	// other stuff that's room-based
+	MSDPSetString(desc, eMSDP_WORLD_SEASON, seasons[GET_SEASON(IN_ROOM(ch))]);
+	
 	MSDPUpdate(desc);
 }
 
@@ -314,28 +316,23 @@ void msdp_update_room(char_data *ch) {
 * From KaVir's protocol snippet (see protocol.c)
 */
 static void msdp_update(void) {
-	struct player_skill_data *skill, *next_skill;
-	struct over_time_effect_type *dot;
-	char buf[MAX_STRING_LENGTH], part[MAX_STRING_LENGTH];
 	struct time_info_data tinfo;
-	struct cooldown_data *cool;
 	char_data *ch, *pOpponent, *focus;
 	bool is_ally;
-	struct affected_type *aff;
 	descriptor_data *d;
 	int hit_points, PlayerCount = 0;
-	size_t buf_size;
 
 	for (d = descriptor_list; d; d = d->next) {
 		if ((ch = d->character) && !IS_NPC(ch) && STATE(d) == CON_PLAYING) {
-			++PlayerCount;
+			// update count for MSSP
+			if (GET_INVIS_LEV(ch) <= LVL_MORTAL && !PRF_FLAGGED(ch, PRF_INCOGNITO)) {
+				++PlayerCount;
+			}
 			
-			// TODO: Most of this could be moved to set only when it is changed
-
-			MSDPSetString(d, eMSDP_ACCOUNT_NAME, GET_NAME(ch));
-			MSDPSetString(d, eMSDP_CHARACTER_NAME, PERS(ch, ch, FALSE));
+			// The folllowing items are updated every second for connected players:
+			// (everything else is updated less often or only when it changes)
 			
-			MSDPSetString(d, eMSDP_GENDER, genders[GET_SEX(ch)]);
+			// current h/m/v/b and regens
 			MSDPSetNumber(d, eMSDP_HEALTH, GET_HEALTH(ch));
 			MSDPSetNumber(d, eMSDP_HEALTH_MAX, GET_MAX_HEALTH(ch));
 			MSDPSetNumber(d, eMSDP_HEALTH_REGEN, health_gain(ch, TRUE));
@@ -349,125 +346,17 @@ static void msdp_update(void) {
 			MSDPSetNumber(d, eMSDP_BLOOD_MAX, GET_MAX_BLOOD(ch));
 			MSDPSetNumber(d, eMSDP_BLOOD_UPKEEP, MAX(0, GET_BLOOD_UPKEEP(ch)));
 			
-			// affects
-			*buf = '\0';
-			buf_size = 0;
-			for (aff = ch->affected; aff; aff = aff->next) {
-				buf_size += snprintf(buf + buf_size, sizeof(buf) - buf_size, "%c%s%c%ld", (char)MSDP_VAR, get_generic_name_by_vnum(aff->type), (char)MSDP_VAL, (aff->duration == UNLIMITED ? -1 : (aff->duration * SECS_PER_REAL_UPDATE)));
-			}
-			MSDPSetTable(d, eMSDP_AFFECTS, buf);
-			
-			// dots
-			*buf = '\0';
-			buf_size = 0;
-			for (dot = ch->over_time_effects; dot; dot = dot->next) {
-				// each dot has a sub-table
-				buf_size += snprintf(buf + buf_size, sizeof(buf) - buf_size, "%c%s%c%c", (char)MSDP_VAR, get_generic_name_by_vnum(dot->type), (char)MSDP_VAL, (char)MSDP_TABLE_OPEN);
-				
-				
-				buf_size += snprintf(buf + buf_size, sizeof(buf) - buf_size, "%cDURATION%c%ld", (char)MSDP_VAR, (char)MSDP_VAL, (dot->duration == UNLIMITED ? -1 : (dot->duration * SECS_PER_REAL_UPDATE)));
-				buf_size += snprintf(buf + buf_size, sizeof(buf) - buf_size, "%cTYPE%c%s", (char)MSDP_VAR, (char)MSDP_VAL, damage_types[dot->damage_type]);
-				buf_size += snprintf(buf + buf_size, sizeof(buf) - buf_size, "%cDAMAGE%c%d", (char)MSDP_VAR, (char)MSDP_VAL, dot->damage * dot->stack);
-				buf_size += snprintf(buf + buf_size, sizeof(buf) - buf_size, "%cSTACKS%c%d", (char)MSDP_VAR, (char)MSDP_VAL, dot->stack);
-				
-				// end table
-				buf_size += snprintf(buf + buf_size, sizeof(buf) - buf_size, "%c", (char)MSDP_TABLE_CLOSE);
-			}
-			MSDPSetTable(d, eMSDP_DOTS, buf);
-			
-			// cooldowns
-			*buf = '\0';
-			buf_size = 0;
-			for (cool = ch->cooldowns; cool; cool = cool->next) {
-				if (cool->expire_time > time(0)) {
-					buf_size += snprintf(buf + buf_size, sizeof(buf) - buf_size, "%c%s%c%ld", (char)MSDP_VAR, get_generic_name_by_vnum(cool->type), (char)MSDP_VAL, cool->expire_time - time(0));
-				}
-			}
-			MSDPSetTable(d, eMSDP_COOLDOWNS, buf);
-			
-			MSDPSetNumber(d, eMSDP_LEVEL, get_approximate_level(ch));
-			MSDPSetNumber(d, eMSDP_SKILL_LEVEL, IS_NPC(ch) ? 0 : GET_SKILL_LEVEL(ch));
-			MSDPSetNumber(d, eMSDP_GEAR_LEVEL, IS_NPC(ch) ? 0 : GET_GEAR_LEVEL(ch));
-			MSDPSetNumber(d, eMSDP_CRAFTING_LEVEL, get_crafting_level(ch));
-
-			get_player_skill_string(ch, part, FALSE);
-			snprintf(buf, sizeof(buf), "%s", part);
-			MSDPSetString(d, eMSDP_CLASS, buf);
-			
-			// skills
-			*buf = '\0';
-			buf_size = 0;
-			HASH_ITER(hh, GET_SKILL_HASH(ch), skill, next_skill) {
-				buf_size += snprintf(buf + buf_size, sizeof(buf) - buf_size, "%c%s%c%c", (char)MSDP_VAR, SKILL_NAME(skill->ptr), (char)MSDP_VAL, (char)MSDP_TABLE_OPEN);
-				
-				buf_size += snprintf(buf + buf_size, sizeof(buf) - buf_size, "%cLEVEL%c%d", (char)MSDP_VAR, (char)MSDP_VAL, skill->level);
-				buf_size += snprintf(buf + buf_size, sizeof(buf) - buf_size, "%cEXP%c%.2f", (char)MSDP_VAR, (char)MSDP_VAL, skill->exp);
-				buf_size += snprintf(buf + buf_size, sizeof(buf) - buf_size, "%cRESETS%c%d", (char)MSDP_VAR, (char)MSDP_VAL, skill->resets);
-				buf_size += snprintf(buf + buf_size, sizeof(buf) - buf_size, "%cNOSKILL%c%d", (char)MSDP_VAR, (char)MSDP_VAL, skill->noskill ? 1 : 0);
-				
-				// end table
-				buf_size += snprintf(buf + buf_size, sizeof(buf) - buf_size, "%c", (char)MSDP_TABLE_CLOSE);
-			}
-			MSDPSetTable(d, eMSDP_SKILLS, buf);
-
-			MSDPSetNumber(d, eMSDP_MONEY, total_coins(ch));
-			MSDPSetNumber(d, eMSDP_BONUS_EXP, IS_NPC(ch) ? 0 : GET_DAILY_BONUS_EXPERIENCE(ch));
-			MSDPSetNumber(d, eMSDP_INVENTORY, IS_CARRYING_N(ch));
-			MSDPSetNumber(d, eMSDP_INVENTORY_MAX, CAN_CARRY_N(ch));
-			
-			MSDPSetNumber(d, eMSDP_STR, GET_STRENGTH(ch));
-			MSDPSetNumber(d, eMSDP_DEX, GET_DEXTERITY(ch));
-			MSDPSetNumber(d, eMSDP_CHA, GET_CHARISMA(ch));
-			MSDPSetNumber(d, eMSDP_GRT, GET_GREATNESS(ch));
-			MSDPSetNumber(d, eMSDP_INT, GET_INTELLIGENCE(ch));
-			MSDPSetNumber(d, eMSDP_WIT, GET_WITS(ch));
-			MSDPSetNumber(d, eMSDP_STR_PERM, GET_REAL_ATT(ch, STRENGTH));
-			MSDPSetNumber(d, eMSDP_DEX_PERM, GET_REAL_ATT(ch, DEXTERITY));
-			MSDPSetNumber(d, eMSDP_CHA_PERM, GET_REAL_ATT(ch, CHARISMA));
-			MSDPSetNumber(d, eMSDP_GRT_PERM, GET_REAL_ATT(ch, GREATNESS));
-			MSDPSetNumber(d, eMSDP_INT_PERM, GET_REAL_ATT(ch, INTELLIGENCE));
-			MSDPSetNumber(d, eMSDP_WIT_PERM, GET_REAL_ATT(ch, WITS));
-			
-			MSDPSetNumber(d, eMSDP_BLOCK, get_block_rating(ch, FALSE));
-			MSDPSetNumber(d, eMSDP_DODGE, get_dodge_modifier(ch, NULL, FALSE) - (hit_per_dex * GET_DEXTERITY(ch)));	// same change made to it in score
-			MSDPSetNumber(d, eMSDP_TO_HIT, get_to_hit(ch, NULL, FALSE, FALSE) - (hit_per_dex * GET_DEXTERITY(ch)));	// same change as in score
-			snprintf(buf, sizeof(buf), "%.2f", get_combat_speed(ch, WEAR_WIELD));
-			MSDPSetString(d, eMSDP_SPEED, buf);
-			MSDPSetNumber(d, eMSDP_RESIST_PHYSICAL, GET_RESIST_PHYSICAL(ch));
-			MSDPSetNumber(d, eMSDP_RESIST_MAGICAL, GET_RESIST_MAGICAL(ch));
-			MSDPSetNumber(d, eMSDP_BONUS_PHYSICAL, GET_BONUS_PHYSICAL(ch));
-			MSDPSetNumber(d, eMSDP_BONUS_MAGICAL, GET_BONUS_MAGICAL(ch));
-			MSDPSetNumber(d, eMSDP_BONUS_HEALING, total_bonus_healing(ch));
-			
-			// empire
+			// partial empire data (the rest is updated less often)
 			if (GET_LOYALTY(ch) && !IS_NPC(ch)) {
-				MSDPSetString(d, eMSDP_EMPIRE_NAME, EMPIRE_NAME(GET_LOYALTY(ch)));
-				MSDPSetString(d, eMSDP_EMPIRE_ADJECTIVE, EMPIRE_ADJECTIVE(GET_LOYALTY(ch)));
-				MSDPSetString(d, eMSDP_EMPIRE_RANK, strip_color(EMPIRE_RANK(GET_LOYALTY(ch), GET_RANK(ch)-1)));
-				MSDPSetNumber(d, eMSDP_EMPIRE_TERRITORY, EMPIRE_TERRITORY(GET_LOYALTY(ch), TER_TOTAL));
-				MSDPSetNumber(d, eMSDP_EMPIRE_TERRITORY_MAX, land_can_claim(GET_LOYALTY(ch), TER_TOTAL));
-				MSDPSetNumber(d, eMSDP_EMPIRE_TERRITORY_OUTSIDE, EMPIRE_TERRITORY(GET_LOYALTY(ch), TER_OUTSKIRTS));
-				MSDPSetNumber(d, eMSDP_EMPIRE_TERRITORY_OUTSIDE_MAX, land_can_claim(GET_LOYALTY(ch), TER_OUTSKIRTS));
-				MSDPSetNumber(d, eMSDP_EMPIRE_TERRITORY_FRONTIER, EMPIRE_TERRITORY(GET_LOYALTY(ch), TER_FRONTIER));
-				MSDPSetNumber(d, eMSDP_EMPIRE_TERRITORY_FRONTIER_MAX, land_can_claim(GET_LOYALTY(ch), TER_FRONTIER));
 				MSDPSetNumber(d, eMSDP_EMPIRE_WEALTH, GET_TOTAL_WEALTH(GET_LOYALTY(ch)));
 				MSDPSetNumber(d, eMSDP_EMPIRE_SCORE, get_total_score(GET_LOYALTY(ch)));
 			}
 			else {
-				MSDPSetString(d, eMSDP_EMPIRE_NAME, "");
-				MSDPSetString(d, eMSDP_EMPIRE_ADJECTIVE, "");
-				MSDPSetString(d, eMSDP_EMPIRE_RANK, "");
-				MSDPSetNumber(d, eMSDP_EMPIRE_TERRITORY, 0);
-				MSDPSetNumber(d, eMSDP_EMPIRE_TERRITORY_MAX, 0);
-				MSDPSetNumber(d, eMSDP_EMPIRE_TERRITORY_OUTSIDE, 0);
-				MSDPSetNumber(d, eMSDP_EMPIRE_TERRITORY_OUTSIDE_MAX, 0);
-				MSDPSetNumber(d, eMSDP_EMPIRE_TERRITORY_FRONTIER, 0);
-				MSDPSetNumber(d, eMSDP_EMPIRE_TERRITORY_FRONTIER_MAX, 0);
 				MSDPSetNumber(d, eMSDP_EMPIRE_WEALTH, 0);
 				MSDPSetNumber(d, eMSDP_EMPIRE_SCORE, 0);
 			}
-
-			/* This would be better moved elsewhere */
+			
+			// combat info if fighting
 			if ((pOpponent = FIGHTING(ch))) {
 				hit_points = (GET_HEALTH(pOpponent) * 100) / GET_MAX_HEALTH(pOpponent);
 				MSDPSetNumber(d, eMSDP_OPPONENT_HEALTH, hit_points);
@@ -480,13 +369,14 @@ static void msdp_update(void) {
 					MSDPSetNumber(d, eMSDP_OPPONENT_FOCUS_HEALTH, hit_points);
 					MSDPSetNumber(d, eMSDP_OPPONENT_FOCUS_HEALTH_MAX, is_ally ? GET_MAX_HEALTH(focus) : 100);
 					MSDPSetString(d, eMSDP_OPPONENT_FOCUS_NAME, PERS(focus, ch, FALSE));
-				} else {
+				}
+				else {
 					MSDPSetString(d, eMSDP_OPPONENT_FOCUS_NAME, "");
 					MSDPSetNumber(d, eMSDP_OPPONENT_FOCUS_HEALTH, 0);
 					MSDPSetNumber(d, eMSDP_OPPONENT_FOCUS_HEALTH_MAX, 0);
 				}
 			}
-			else { // Clear the values
+			else { // Clear the values if not fighting
 				MSDPSetNumber(d, eMSDP_OPPONENT_HEALTH, 0);
 				MSDPSetNumber(d, eMSDP_OPPONENT_LEVEL, 0);
 				MSDPSetString(d, eMSDP_OPPONENT_NAME, "");
@@ -495,13 +385,12 @@ static void msdp_update(void) {
 				MSDPSetNumber(d, eMSDP_OPPONENT_FOCUS_HEALTH_MAX, 0);
 			}
 			
+			// time (changes as the player moves, in addition to over-time)
 			tinfo = get_local_time(IN_ROOM(ch));
-			
 			MSDPSetNumber(d, eMSDP_WORLD_TIME, tinfo.hours);
 			MSDPSetNumber(d, eMSDP_WORLD_DAY_OF_MONTH, tinfo.day + 1);
 			MSDPSetString(d, eMSDP_WORLD_MONTH, month_name[(int)tinfo.month]);
 			MSDPSetNumber(d, eMSDP_WORLD_YEAR, tinfo.year);
-			MSDPSetString(d, eMSDP_WORLD_SEASON, seasons[GET_SEASON(IN_ROOM(ch))]);
 			
 			// done -- send it
 			MSDPUpdate(d);
@@ -511,7 +400,7 @@ static void msdp_update(void) {
 		* someone leaves or joins the mud.  But this works, and it keeps the
 		* snippet simple.  Optimise as you see fit.
 		*/
-	MSSPSetPlayers(PlayerCount);
+		MSSPSetPlayers(PlayerCount);
 	}
 }
 
@@ -744,7 +633,7 @@ void perform_reboot(void) {
 
 	// prepare for the end!
 	save_all_empires();
-	save_whole_world();
+	write_world_to_files();
 
 	if (reboot_control.type == SCMD_REBOOT) {
 		sprintf(buf, "\r\n[0;0;31m *** Rebooting ***[0;0;37m\r\nPlease be patient, this will take a second.\r\n\r\n");
@@ -899,7 +788,7 @@ void update_reboot(void) {
  //////////////////////////////////////////////////////////////////////////////
 //// MAIN GAME LOOP //////////////////////////////////////////////////////////
 
-void heartbeat(int heart_pulse) {
+void heartbeat(unsigned long heart_pulse) {
 	static int mins_since_crashsave = 0;
 	
 	#define HEARTBEAT(x)  !(heart_pulse % (int)((x) * PASSES_PER_SEC))
@@ -908,7 +797,7 @@ void heartbeat(int heart_pulse) {
 	// #define HEARTBEAT_LOG(id_str)  if (HEARTBEAT(15)) { log("debug %s:\t%lld", id_str, microtime()); }
 	#define HEARTBEAT_LOG(id_str)
 	
-	// TODO go through this, arrange it better, combine anything combinable
+	// TODO go through this, arrange it better, --combine-anything-combinable(done)--
 
 	// only get a gain condition message on the hour
 	if (HEARTBEAT(SECS_PER_MUD_HOUR)) {
@@ -917,7 +806,7 @@ void heartbeat(int heart_pulse) {
 	
 	dg_event_process();
 
-	// this is meant to be slightly longer than the mobile_activity pulse, and is mentioned in help files
+	// this is meant to be slightly longer than the mobile_activity pulse (10), and is mentioned in help files
 	if (HEARTBEAT(13)) {
 		script_trigger_check();
 		HEARTBEAT_LOG("1")
@@ -946,150 +835,142 @@ void heartbeat(int heart_pulse) {
 		check_idle_passwords();
 		HEARTBEAT_LOG("6")
 		
-		check_death_respawn();
-		HEARTBEAT_LOG("7")
-		
 		run_mob_echoes();
-		HEARTBEAT_LOG("8")
+		HEARTBEAT_LOG("7")
 	}
 
 	if (HEARTBEAT(30)) {
 		update_players_online_stats();
-		HEARTBEAT_LOG("9")
-	}
-
-	if (HEARTBEAT(10)) {
-		mobile_activity();
-		HEARTBEAT_LOG("10")
+		HEARTBEAT_LOG("8")
 	}
 
 	if (HEARTBEAT(0.1)) {
 		frequent_combat(heart_pulse);
-		HEARTBEAT_LOG("11")
+		HEARTBEAT_LOG("9")
 	}
 	
 	if (HEARTBEAT(SECS_PER_MUD_HOUR)) {
 		process_theft_logs();
-		HEARTBEAT_LOG("12")
+		HEARTBEAT_LOG("10")
 	}
 	if (HEARTBEAT(SECS_PER_REAL_UPDATE)) {
 		real_update();
-		HEARTBEAT_LOG("13")
+		HEARTBEAT_LOG("11")
 	}
 
 	if (HEARTBEAT(SECS_PER_MUD_HOUR)) {
 		weather_and_time();
-		HEARTBEAT_LOG("14")
+		HEARTBEAT_LOG("12")
 		
 		chore_update();
-		HEARTBEAT_LOG("15")
+		HEARTBEAT_LOG("13")
 	}
 	
 	// slightly off the hour to prevent yet another thing on the tick
 	if (HEARTBEAT(SECS_PER_MUD_HOUR+1)) {
 		update_empire_npc_data();
-		HEARTBEAT_LOG("16")
+		HEARTBEAT_LOG("14")
 	}
 	
 	if (HEARTBEAT(SECS_PER_REAL_MIN)) {
 		check_wars();
-		HEARTBEAT_LOG("17")
+		HEARTBEAT_LOG("15")
 		
 		reset_instances();
-		HEARTBEAT_LOG("18")
-	}
-	
-	if (HEARTBEAT(15 * SECS_PER_REAL_MIN)) {
-		output_map_to_file();
-		HEARTBEAT_LOG("19")
+		HEARTBEAT_LOG("16")
 	}
 
 	if (HEARTBEAT(SECS_PER_REAL_MIN)) {
 		update_reboot();
-		HEARTBEAT_LOG("20")
+		HEARTBEAT_LOG("17")
 		
 		if (++mins_since_crashsave >= 5) {
 			mins_since_crashsave = 0;
 			save_all_players(TRUE);
-			HEARTBEAT_LOG("21")
+			HEARTBEAT_LOG("17")
 		}
 		
 		display_automessages();
-		HEARTBEAT_LOG("22")
+		HEARTBEAT_LOG("19")
 	}
 	
 	if (HEARTBEAT(12 * SECS_PER_REAL_HOUR)) {
 		reduce_city_overages();
-		HEARTBEAT_LOG("23")
+		HEARTBEAT_LOG("20")
 		
 		check_newbie_islands();
-		HEARTBEAT_LOG("24")
+		HEARTBEAT_LOG("21")
 	}
 	
 	if (HEARTBEAT(SECS_PER_REAL_HOUR)) {
 		reduce_stale_empires();
-		HEARTBEAT_LOG("25")
+		HEARTBEAT_LOG("22")
 	}
 	
 	if (HEARTBEAT(30 * SECS_PER_REAL_MIN)) {
 		reduce_outside_territory();
-		HEARTBEAT_LOG("26")
+		HEARTBEAT_LOG("23")
 	}
 	
 	if (HEARTBEAT(3 * SECS_PER_REAL_MIN)) {
 		generate_adventure_instances();
-		HEARTBEAT_LOG("27")
+		HEARTBEAT_LOG("24")
 	}
 	
 	if (HEARTBEAT(5 * SECS_PER_REAL_MIN)) {
 		prune_instances();
-		HEARTBEAT_LOG("28")
+		HEARTBEAT_LOG("25")
 		
 		update_trading_post();
-		HEARTBEAT_LOG("29")
+		HEARTBEAT_LOG("26")
 	}
 	
 	if (HEARTBEAT(1)) {
 		if (data_table_needs_save) {
 			save_data_table(FALSE);
-			HEARTBEAT_LOG("30")
+			HEARTBEAT_LOG("27")
 		}
 		if (events_need_save) {
 			write_running_events_file();
-			HEARTBEAT_LOG("31")
+			HEARTBEAT_LOG("28")
 		}
 		save_marked_empires();
-		HEARTBEAT_LOG("32")
+		HEARTBEAT_LOG("29")
 	}
 	
 	if (HEARTBEAT(SECS_PER_REAL_DAY)) {
 		clean_empire_offenses();
-		HEARTBEAT_LOG("33")
+		HEARTBEAT_LOG("30")
 		
 		update_instance_world_size();
-		HEARTBEAT_LOG("34")
+		HEARTBEAT_LOG("31")
 	}
 	
 	// check if we've been asked to import new evolutions
 	if (do_evo_import) {
 		do_evo_import = FALSE;
 		process_import_evolutions();
-		HEARTBEAT_LOG("35")
+		HEARTBEAT_LOG("32")
+	}
+	
+	if (HEARTBEAT(30 * SECS_PER_REAL_MIN)) {
+		write_world_to_files();
+		HEARTBEAT_LOG("33")
 	}
 	
 	// this goes roughly last -- update MSDP users
 	if (HEARTBEAT(1)) {
 		msdp_update();
-		HEARTBEAT_LOG("36")
+		HEARTBEAT_LOG("34")
 		
 		check_progress_refresh();
-		HEARTBEAT_LOG("37")
+		HEARTBEAT_LOG("35")
 		
 		run_delayed_refresh();
-		HEARTBEAT_LOG("38")
+		HEARTBEAT_LOG("36")
 		
 		free_loaded_players();	// ensure this comes AFTER run_delayed_refresh
-		HEARTBEAT_LOG("39")
+		HEARTBEAT_LOG("37")
 	}
 
 	/* Every pulse! Don't want them to stink the place up... */
@@ -2961,7 +2842,7 @@ void write_to_output(const char *txt, descriptor_data *t) {
 		bufpool = bufpool->next;
 	}
 	else {			/* else create a new one */
-   		CREATE(t->large_outbuf, struct txt_block, 1);	// saw this line memory-leak
+   		CREATE(t->large_outbuf, struct txt_block, 1);	// TODO: saw this line memory-leak
 		CREATE(t->large_outbuf->text, char, LARGE_BUFSIZE);
 		buf_largecount++;
 	}
@@ -3628,7 +3509,7 @@ void signal_setup(void) {
  * cycles once every 0.10 seconds and is responsible for accepting new
  * new connections, polling existing connections for input, dequeueing
  * output and sending it out to players, and calling "heartbeat" functions
- * such as mobile_activity().
+ * such as real_update().
  */
 void game_loop(socket_t mother_desc) {
 	fd_set input_set, output_set, exc_set, null_set;
@@ -3869,8 +3750,15 @@ void game_loop(socket_t mother_desc) {
 		catch_up_combat = TRUE;
 		catch_up_actions = TRUE;
 		catch_up_mobs = TRUE;
+		caught_up_mobs = FALSE;
+		
 		while (missed_pulses--) {
-			heartbeat(++pulse);
+			heartbeat(++main_game_pulse);
+			
+			// check this and mark mobs as caught up now: this prevents too much mobile_activity when the mud is stalled
+			if (caught_up_mobs) {
+				catch_up_mobs = FALSE;
+			}
 		}
 
 		/* Update tics_passed for deadlock protection */

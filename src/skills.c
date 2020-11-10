@@ -932,7 +932,7 @@ bool gain_skill(char_data *ch, skill_data *skill, int amount) {
 		update_class(ch);
 		assign_class_abilities(ch, NULL, NOTHING);
 		
-		queue_delayed_update(ch, CDU_PASSIVE_BUFFS | CDU_SAVE);
+		queue_delayed_update(ch, CDU_PASSIVE_BUFFS | CDU_SAVE | CDU_MSDP_SKILLS);
 	}
 	
 	return any;
@@ -987,8 +987,10 @@ bool gain_skill_exp(char_data *ch, any_vnum skill_vnum, double amount) {
 	if (gained) {
 		GET_DAILY_BONUS_EXPERIENCE(ch) = MAX(0, GET_DAILY_BONUS_EXPERIENCE(ch) - 1);
 		gained = gain_skill(ch, skill, 1);
+		update_MSDP_bonus_exp(ch, UPDATE_SOON);
 	}
 	
+	queue_delayed_update(ch, CDU_MSDP_SKILLS);
 	return gained;
 }
 
@@ -1565,6 +1567,8 @@ void set_skill(char_data *ch, any_vnum skill, int level) {
 		if (!was_vampire && IS_VAMPIRE(ch)) {
 			make_vampire(ch, TRUE, NOTHING);
 		}
+		
+		queue_delayed_update(ch, CDU_MSDP_SKILLS);
 	}
 }
 
@@ -1665,6 +1669,7 @@ ACMD(do_noskill) {
 		}
 		
 		qt_change_skill_level(ch, skdata->vnum);
+		queue_delayed_update(ch, CDU_MSDP_SKILLS);
 	}
 }
 
@@ -1816,7 +1821,7 @@ ACMD(do_skills) {
 			clear_char_abilities(ch, SKILL_VNUM(skill));
 			
 			msg_to_char(ch, "You have reset your %s abilities.\r\n", SKILL_NAME(skill));
-			queue_delayed_update(ch, CDU_SAVE);
+			queue_delayed_update(ch, CDU_SAVE | CDU_MSDP_SKILLS);
 		}
 		
 		// end "reset"
@@ -1865,7 +1870,7 @@ ACMD(do_skills) {
 			check_ability_levels(ch, SKILL_VNUM(skill));
 			assign_class_abilities(ch, NULL, NOTHING);
 			
-			queue_delayed_update(ch, CDU_SAVE);
+			queue_delayed_update(ch, CDU_SAVE | CDU_MSDP_SKILLS);
 		}
 	}
 	else if (!str_cmp(arg, "swap")) {

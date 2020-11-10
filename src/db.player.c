@@ -3088,6 +3088,9 @@ void change_personal_lastname(char_data *ch, char *name) {
 	}
 	
 	queue_delayed_update(ch, CDU_SAVE);
+	
+	// update msdp
+	update_MSDP_name(ch, UPDATE_SOON);
 }
 
 
@@ -4263,6 +4266,10 @@ void enter_player_game(descriptor_data *d, int dolog, bool fresh) {
 		update_member_data(ch);
 		update_empire_members_and_greatness(GET_LOYALTY(ch));
 	}
+	
+	if (ch->desc) {
+		send_initial_MSDP(ch->desc);
+	}
 }
 
 
@@ -4970,6 +4977,7 @@ void update_empire_members_and_greatness(empire_data *emp) {
 	
 	if (greatness != old) {
 		et_change_greatness(emp);
+		update_MSDP_empire_data_all(emp, TRUE, TRUE);
 	}
 }
 

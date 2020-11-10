@@ -71,7 +71,7 @@ PATHFIND_VALIDATOR(pathfind_ocean) {
 		if (SECT_FLAGGED(map->sector_type, SECTF_FRESH_WATER | SECTF_OCEAN)) {
 			return TRUE;	// true ocean
 		}
-		else if ((find = real_real_room(map->vnum)) && ROOM_BLD_FLAGGED(find, BLD_SAIL)) {
+		else if ((find = map->room) && ROOM_BLD_FLAGGED(find, BLD_SAIL)) {
 			if (!ROOM_IS_CLOSED(find)) {
 				return TRUE;	// open
 			}
@@ -101,7 +101,7 @@ PATHFIND_VALIDATOR(pathfind_pilot) {
 		if (IS_SET(map->shared->affects, ROOM_AFF_NO_FLY)) {
 			return FALSE;	// can't fly there
 		}
-		if (!(find = real_real_room(map->vnum))) {
+		if (!(find = map->room)) {
 			return TRUE;	// no real-real-room means not a building so we're ok now
 		}
 		if (!ROOM_IS_CLOSED(find) || (ROOM_BLD_FLAGGED(find, BLD_ATTACH_ROAD) && CHAR_OR_VEH_ROOM_PERMISSION(ch, veh, find, GUESTS_ALLOWED))) {
@@ -132,7 +132,7 @@ PATHFIND_VALIDATOR(pathfind_road) {
 		if (SECT_FLAGGED(map->sector_type, SECTF_IS_ROAD) || map->vnum == GET_ROOM_VNUM(controller->end)) {
 			return TRUE;	// true road
 		}
-		else if (!(find = real_real_room(map->vnum)) || !ROOM_BLD_FLAGGED(find, BLD_ATTACH_ROAD)) {
+		else if (!(find = map->room) || !ROOM_BLD_FLAGGED(find, BLD_ATTACH_ROAD)) {
 			return FALSE;	// not a building that we can use
 		}
 		else if (!ROOM_IS_CLOSED(find) || CHAR_OR_VEH_ROOM_PERMISSION(ch, veh, find, GUESTS_ALLOWED)) {

@@ -29,7 +29,7 @@
 #include "constants.h"
 
 // external vars
-extern unsigned long pulse;
+extern unsigned long main_game_pulse;
 
 // local functions
 int eval_lhs_op_rhs(char *expr, char *result, void *go, struct script_data *sc, trig_data *trig, int type);
@@ -2959,8 +2959,9 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					else if (!str_cmp(field, "bonus_exp")) {
 						if (!IS_NPC(c)) {
 							int amt;
-							if (subfield && *subfield && (amt = atoi(subfield)) != 0) {
+							if (subfield && *subfield && (amt = atoi(subfield)) != 0 && !IS_NPC(c)) {
 								SAFE_ADD(GET_DAILY_BONUS_EXPERIENCE(c), amt, 0, UCHAR_MAX, FALSE);
+								update_MSDP_bonus_exp(c, UPDATE_SOON);
 							}
 							snprintf(str, slen, "%d", GET_DAILY_BONUS_EXPERIENCE(c));
 						}
@@ -3455,6 +3456,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						
 						if (sk && (skdata = get_skill_data(c, SKILL_VNUM(sk), TRUE))) {
 							skdata->resets = MIN(skdata->resets + 1, MAX_SKILL_RESETS);
+							queue_delayed_update(c, CDU_MSDP_SKILLS);
 						}
 						*str = '\0';
 					}
@@ -6509,7 +6511,7 @@ void process_wait(void *go, trig_data *trig, int type, char *cmd, struct cmdlist
 		ntime = (min * SECS_PER_MUD_HOUR * PASSES_PER_SEC) / 60;
 
 		/* calculate pulse of day of current time */
-		when = (pulse % (SECS_PER_MUD_HOUR * PASSES_PER_SEC)) + (tinfo.hours * SECS_PER_MUD_HOUR * PASSES_PER_SEC);
+		when = (main_game_pulse % (SECS_PER_MUD_HOUR * PASSES_PER_SEC)) + (tinfo.hours * SECS_PER_MUD_HOUR * PASSES_PER_SEC);
 
 		if (when >= ntime) /* adjust for next day */
 			when = (SECS_PER_MUD_DAY * PASSES_PER_SEC) - when + ntime;

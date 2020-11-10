@@ -257,7 +257,6 @@ ACMD(do_maintain);
 ACMD(do_manage);
 ACMD(do_manashield);
 ACMD(do_map);
-ACMD(do_mapout);
 ACMD(do_mapscan);
 ACMD(do_mapsize);
 ACMD(do_mark);
@@ -564,9 +563,7 @@ cpp_extern const struct command_info cmd_info[] = {
 	
 	SIMPLE_CMD( "at", POS_DEAD, do_at, LVL_START_IMM, CTYPE_IMMORTAL ),
 	SIMPLE_CMD( "abandon", POS_RESTING, do_abandon, NO_MIN, CTYPE_EMPIRE ),
-	STANDARD_CMD( "ablate", POS_FIGHTING, do_damage_spell, NO_MIN, NO_GRANTS, ABIL_ABLATE, CTYPE_COMBAT, NOBITS, ABIL_ABLATE ),
 	SCMD_CMD( "accept", POS_DEAD, do_accept, NO_MIN, CTYPE_UTIL, SCMD_ACCEPT ),
-	STANDARD_CMD( "acidblast", POS_FIGHTING, do_damage_spell, NO_MIN, NO_GRANTS, ABIL_ACIDBLAST, CTYPE_COMBAT, NOBITS, ABIL_ACIDBLAST ),
 	SIMPLE_CMD( "adventure", POS_RESTING, do_adventure, NO_MIN, CTYPE_UTIL ),
 	GRANT_CMD( "addnotes", POS_STANDING, do_addnotes, LVL_CIMPL, CTYPE_IMMORTAL, GRANT_EDITNOTES ),
 	GRANT_CMD( "advance", POS_DEAD, do_advance, LVL_CIMPL, CTYPE_IMMORTAL, GRANT_ADVANCE ),
@@ -575,10 +572,8 @@ cpp_extern const struct command_info cmd_info[] = {
 	SIMPLE_CMD( "affects", POS_DEAD, do_affects, NO_MIN, CTYPE_UTIL ),
 	SIMPLE_CMD( "approach", POS_FIGHTING, do_approach, NO_MIN, CTYPE_COMBAT ),
 	STANDARD_CMD( "approve", POS_DEAD, do_approve, LVL_CIMPL, GRANT_APPROVE, SCMD_APPROVE, CTYPE_IMMORTAL, NOBITS, NO_ABIL ),
-	STANDARD_CMD( "arclight", POS_FIGHTING, do_damage_spell, NO_MIN, NO_GRANTS, ABIL_ARCLIGHT, CTYPE_COMBAT, NOBITS, ABIL_ARCLIGHT ),
 	SIMPLE_CMD( "assist", POS_FIGHTING, do_assist, NO_MIN, CTYPE_COMBAT ),
 	SCMD_CMD( "ask", POS_RESTING, do_spec_comm, NO_MIN, CTYPE_COMM, SCMD_ASK ),
-	STANDARD_CMD( "astralclaw", POS_FIGHTING, do_damage_spell, NO_MIN, NO_GRANTS, ABIL_ASTRALCLAW, CTYPE_COMBAT, NOBITS, ABIL_ASTRALCLAW ),
 	SIMPLE_CMD( "autostore", POS_RESTING, do_autostore, LVL_CIMPL, CTYPE_IMMORTAL ),
 	GRANT_CMD( "automessage", POS_DEAD, do_automessage, LVL_CIMPL, CTYPE_IMMORTAL, GRANT_AUTOMESSAGE),
 	GRANT_CMD( "automsg", POS_DEAD, do_automessage, LVL_CIMPL, CTYPE_IMMORTAL, GRANT_AUTOMESSAGE),
@@ -614,7 +609,6 @@ cpp_extern const struct command_info cmd_info[] = {
 	SIMPLE_CMD( "changepass", POS_DEAD, do_changepass, NO_MIN, CTYPE_UTIL ),
 	ABILITY_CMD( "charge", POS_FIGHTING, do_charge, NO_MIN, CTYPE_COMBAT, ABIL_CHARGE ),
 	STANDARD_CMD( "chip", POS_STANDING, do_chip, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_BUILD, CMD_NO_ANIMALS, NO_ABIL ),
-	STANDARD_CMD( "chronoblast", POS_FIGHTING, do_damage_spell, NO_MIN, NO_GRANTS, ABIL_CHRONOBLAST, CTYPE_COMBAT, NOBITS, ABIL_CHRONOBLAST ),
 	SIMPLE_CMD( "circle", POS_STANDING, do_circle, NO_MIN, CTYPE_MOVE ),
 	SIMPLE_CMD( "cities", POS_DEAD, do_city, NO_MIN, CTYPE_UTIL ),
 	SIMPLE_CMD( "city", POS_DEAD, do_city, NO_MIN, CTYPE_UTIL ),
@@ -656,7 +650,6 @@ cpp_extern const struct command_info cmd_info[] = {
 	GRANT_CMD( "dc", POS_DEAD, do_dc, LVL_CIMPL, CTYPE_IMMORTAL, GRANT_DC ),
 	SCMD_CMD( "drink", POS_RESTING, do_drink, NO_MIN, CTYPE_UTIL, SCMD_DRINK ),
 	ABILITY_CMD( "deathshroud", POS_STUNNED, do_deathshroud, NO_MIN, CTYPE_SKILL, ABIL_DEATHSHROUD ),
-	STANDARD_CMD( "deathtouch", POS_FIGHTING, do_damage_spell, NO_MIN, NO_GRANTS, ABIL_DEATHTOUCH, CTYPE_COMBAT, NOBITS, ABIL_DEATHTOUCH ),
 	SIMPLE_CMD( "dedicate", POS_STANDING, do_dedicate, NO_MIN, CTYPE_UTIL ),
 	SIMPLE_CMD( "demote", POS_DEAD, do_demote, NO_MIN, CTYPE_EMPIRE ),
 	SIMPLE_CMD( "deposit", POS_STANDING, do_deposit, NO_MIN, CTYPE_EMPIRE ),
@@ -672,7 +665,6 @@ cpp_extern const struct command_info cmd_info[] = {
 	STANDARD_CMD( "dismantle", POS_STANDING, do_dismantle, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_BUILD, CMD_NO_ANIMALS, NO_ABIL ),
 	SIMPLE_CMD( "dismiss", POS_STANDING, do_dismiss, NO_MIN, CTYPE_UTIL ),
 	SIMPLE_CMD( "disembark", POS_STANDING, do_disembark, NO_MIN, CTYPE_MOVE ),
-	STANDARD_CMD( "dispirit", POS_FIGHTING, do_damage_spell, NO_MIN, NO_GRANTS, ABIL_DISPIRIT, CTYPE_COMBAT, NOBITS, ABIL_DISPIRIT ),
 	SIMPLE_CMD( "distance", POS_DEAD, do_distance, NO_MIN, CTYPE_IMMORTAL ),
 	STANDARD_CMD( "dig", POS_STANDING, do_dig, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_BUILD, CMD_NO_ANIMALS, NO_ABIL ),
 	SIMPLE_CMD( "display", POS_DEAD, do_display, NO_MIN, CTYPE_UTIL ),
@@ -816,7 +808,6 @@ cpp_extern const struct command_info cmd_info[] = {
 	SIMPLE_CMD( "leave", POS_STANDING, do_exit, NO_MIN, CTYPE_UTIL ),
 	SCMD_CMD( "light", POS_SITTING, do_light, NO_MIN, CTYPE_UTIL, SCMD_LIGHT ),
 	SIMPLE_CMD( "list", POS_SITTING, do_list, NO_MIN, CTYPE_UTIL ),
-	STANDARD_CMD( "lightningbolt", POS_FIGHTING, do_damage_spell, NO_MIN, NO_GRANTS, ABIL_LIGHTNINGBOLT, CTYPE_COMBAT, NOBITS, ABIL_LIGHTNINGBOLT ),
 	SCMD_CMD( "library", POS_STANDING, do_library, NO_MIN, CTYPE_UTIL, SCMD_LIBRARY ),
 	GRANT_CMD( "load", POS_DEAD, do_load, LVL_CIMPL, CTYPE_IMMORTAL, GRANT_LOAD ),
 	STANDARD_CMD( "load", POS_STANDING, do_load_vehicle, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_MOVE, CMD_NO_ANIMALS, NO_ABIL ),
@@ -832,7 +823,6 @@ cpp_extern const struct command_info cmd_info[] = {
 	SIMPLE_CMD( "map", POS_RESTING, do_map, NO_MIN, CTYPE_UTIL ),
 	SIMPLE_CMD( "mapscan", POS_RESTING, do_mapscan, NO_MIN, CTYPE_UTIL ),
 	SIMPLE_CMD( "mapsize", POS_DEAD, do_mapsize, NO_MIN, CTYPE_UTIL ),
-	SIMPLE_CMD( "mapout", POS_DEAD, do_mapout, LVL_CIMPL, CTYPE_IMMORTAL ),
 	SIMPLE_CMD( "mark", POS_RESTING, do_mark, NO_MIN, CTYPE_UTIL ),
 	SIMPLE_CMD( "meters", POS_DEAD, do_meters, NO_MIN, CTYPE_UTIL ),
 	STANDARD_CMD( "melt", POS_DEAD, do_gen_craft, NO_MIN, NO_GRANTS, CRAFT_TYPE_SMELT, CTYPE_BUILD, CMD_NO_ANIMALS, NO_ABIL ),
@@ -992,12 +982,10 @@ cpp_extern const struct command_info cmd_info[] = {
 	STANDARD_CMD( "sneak", POS_STANDING, do_sneak, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_MOVE, CMD_STAY_HIDDEN, ABIL_SNEAK ),
 	GRANT_CMD( "snoop", POS_DEAD, do_snoop, LVL_CIMPL, CTYPE_IMMORTAL, GRANT_SNOOP ),
 	SIMPLE_CMD( "socials", POS_DEAD, do_socials, NO_MIN, CTYPE_UTIL ),
-	STANDARD_CMD( "soulchain", POS_FIGHTING, do_damage_spell, NO_MIN, NO_GRANTS, ABIL_SOULCHAIN, CTYPE_COMBAT, NOBITS, ABIL_SOULCHAIN ),
 	ABILITY_CMD( "soulsight", POS_RESTING, do_soulsight, NO_MIN, CTYPE_SKILL, ABIL_SOULSIGHT ),
 	SIMPLE_CMD( "specialize", POS_STANDING, do_specialize, NO_MIN, CTYPE_UTIL ),
 	SIMPLE_CMD( "split", POS_RESTING, do_split, NO_MIN, CTYPE_UTIL ),
 	SIMPLE_CMD( "stand", POS_RESTING, do_stand, NO_MIN, CTYPE_MOVE ),
-	STANDARD_CMD( "starstrike", POS_FIGHTING, do_damage_spell, NO_MIN, NO_GRANTS, ABIL_STARSTRIKE, CTYPE_COMBAT, NOBITS, ABIL_STARSTRIKE ),
 	SCMD_CMD( "stake", POS_FIGHTING, do_stake, NO_MIN, CTYPE_COMBAT, FALSE ),
 	SIMPLE_CMD( "stat", POS_DEAD, do_stat, LVL_START_IMM, CTYPE_IMMORTAL ),
 	ABILITY_CMD( "steal", POS_STANDING, do_steal, NO_MIN, CTYPE_COMBAT, ABIL_STEAL ),
@@ -1006,7 +994,6 @@ cpp_extern const struct command_info cmd_info[] = {
 	SIMPLE_CMD( "struggle", POS_STUNNED, do_struggle, NO_MIN, CTYPE_COMBAT ),
 	SIMPLE_CMD( "summary", POS_DEAD, do_summary, NO_MIN, CTYPE_UTIL ),
 	SIMPLE_CMD( "summon", POS_DEAD, do_summon, NO_MIN, CTYPE_SKILL ),
-	STANDARD_CMD( "sunshock", POS_FIGHTING, do_damage_spell, NO_MIN, NO_GRANTS, ABIL_SUNSHOCK, CTYPE_COMBAT, NOBITS, ABIL_SUNSHOCK ),
 	SIMPLE_CMD( "survey", POS_STANDING, do_survey, NO_MIN, CTYPE_UTIL ),
 	SIMPLE_CMD( "swap", POS_RESTING, do_swap, NO_MIN, CTYPE_UTIL ),
 	SIMPLE_CMD( "swim", POS_STANDING, do_swim, NO_MIN, CTYPE_MOVE ),
@@ -1025,7 +1012,6 @@ cpp_extern const struct command_info cmd_info[] = {
 	SCMD_CMD( "teleport", POS_STANDING, do_goto, LVL_GOD, CTYPE_IMMORTAL, SCMD_TELEPORT ),
 	SCMD_CMD( "tellhistory", POS_DEAD, do_history, NO_MIN, CTYPE_COMM, SCMD_TELL_HISTORY ),
 	SIMPLE_CMD( "territory", POS_DEAD, do_territory, NO_MIN, CTYPE_EMPIRE ),
-	STANDARD_CMD( "thornlash", POS_FIGHTING, do_damage_spell, NO_MIN, NO_GRANTS, ABIL_THORNLASH, CTYPE_COMBAT, NOBITS, ABIL_THORNLASH ),
 	STANDARD_CMD( "throw", POS_FIGHTING, do_throw, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_COMBAT, CMD_NO_ANIMALS, NO_ABIL ),
 	STANDARD_CMD( "thaw", POS_DEAD, do_wizutil, LVL_CIMPL, GRANT_FREEZE, SCMD_THAW, CTYPE_IMMORTAL, CMD_NO_ANIMALS, NO_ABIL ),
 	SCMD_CMD( "tie", POS_STANDING, do_tie, NO_MIN, CTYPE_COMBAT, FALSE ),
@@ -2281,6 +2267,7 @@ int perform_dupe_check(descriptor_data *d) {
 	
 	refresh_all_quests(d->character);
 	MXPSendTag(d, "<VERSION>");
+	send_initial_MSDP(d);
 	
 	return (1);
 }

@@ -241,6 +241,9 @@ void finish_morphing(char_data *ch, morph_data *morph) {
 	if (morph && MORPH_ABILITY(morph) != NO_ABIL) {
 		gain_ability_exp(ch, MORPH_ABILITY(morph), 33.4);
 	}
+
+	// update msdp
+	update_MSDP_name(ch, UPDATE_SOON);
 }
 
 

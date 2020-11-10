@@ -22,7 +22,9 @@
 #ifndef PROTOCOL_H
 #define PROTOCOL_H
 
+typedef struct char_data char_data_t;
 typedef struct descriptor_data descriptor_t;
+typedef struct empire_data empire_t;
 
 
 /******************************************************************************
@@ -609,6 +611,28 @@ void UnicodeAdd(char **apString, int aValue);
 
 // helps ensure unnecessary color codes aren't sent
 char *flush_reduced_color_codes(descriptor_t *desc);
+
+// MSDP updaters
+void send_initial_MSDP(descriptor_t *desc);
+void update_MSDP_affects(char_data_t *ch, int send_update);
+void update_MSDP_attributes(char_data_t *ch, int send_update);
+void update_MSDP_bonus_exp(char_data_t *ch, int send_update);
+void update_MSDP_cooldowns(char_data_t *ch, int send_update);
+void update_MSDP_dots(char_data_t *ch, int send_update);
+void update_MSDP_empire_data(char_data_t *ch, int send_update);
+void update_MSDP_empire_claims(char_data_t *ch, int send_update);
+void update_MSDP_empire_data_all(empire_t *emp, int claims_only, int delay);
+void update_MSDP_gender(char_data_t *ch, int send_update);
+void update_MSDP_inventory(char_data_t *ch, int send_update);
+void update_MSDP_level(char_data_t *ch, int send_update);
+void update_MSDP_money(char_data_t *ch, int send_update);
+void update_MSDP_name(char_data_t *ch, int send_update);
+void update_MSDP_skills(char_data_t *ch, int send_update);
+
+// for the updaters
+#define NO_UPDATE  0
+#define UPDATE_NOW  1
+#define UPDATE_SOON  2
 
 
 #endif /* PROTOCOL_H */

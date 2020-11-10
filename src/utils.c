@@ -111,6 +111,7 @@ void apply_bonus_trait(char_data *ch, bitvector_t trait, bool add) {
 	
 	if (IS_SET(trait, BONUS_EXTRA_DAILY_SKILLS)) {
 		GET_DAILY_BONUS_EXPERIENCE(ch) = MAX(0, GET_DAILY_BONUS_EXPERIENCE(ch) + (config_get_int("num_bonus_trait_daily_skills") * amt));
+		update_MSDP_bonus_exp(ch, UPDATE_SOON);
 	}
 	if (IS_SET(trait, BONUS_STRENGTH)) {
 		ch->real_attributes[STRENGTH] = MAX(1, MIN(att_max(ch), ch->real_attributes[STRENGTH] + amt));
@@ -408,15 +409,58 @@ void run_delayed_refresh(void) {
 		// CDU_x: functionality for delayed update types
 		if (IS_SET(cdu->type, CDU_PASSIVE_BUFFS)) {
 			refresh_passive_buffs(cdu->ch);
+			REMOVE_BIT(cdu->type, CDU_PASSIVE_BUFFS);
+		}
+		
+		// MSDP sections
+		if (IS_SET(cdu->type, CDU_MSDP_AFFECTS)) {
+			update_MSDP_affects(cdu->ch, UPDATE_SOON);
+			REMOVE_BIT(cdu->type, CDU_MSDP_AFFECTS);
+		}
+		if (IS_SET(cdu->type, CDU_MSDP_ATTRIBUTES)) {
+			update_MSDP_attributes(cdu->ch, UPDATE_SOON);
+			REMOVE_BIT(cdu->type, CDU_MSDP_ATTRIBUTES);
+		}
+		if (IS_SET(cdu->type, CDU_MSDP_COOLDOWNS)) {
+			update_MSDP_cooldowns(cdu->ch, UPDATE_SOON);
+			REMOVE_BIT(cdu->type, CDU_MSDP_COOLDOWNS);
+		}
+		if (IS_SET(cdu->type, CDU_MSDP_DOTS)) {
+			update_MSDP_dots(cdu->ch, UPDATE_SOON);
+			REMOVE_BIT(cdu->type, CDU_MSDP_DOTS);
+		}
+		if (IS_SET(cdu->type, CDU_MSDP_EMPIRE_ALL)) {
+			update_MSDP_empire_data(cdu->ch, UPDATE_SOON);
+			REMOVE_BIT(cdu->type, CDU_MSDP_EMPIRE_ALL);
+		}
+		if (IS_SET(cdu->type, CDU_MSDP_EMPIRE_CLAIMS)) {
+			update_MSDP_empire_claims(cdu->ch, UPDATE_SOON);
+			REMOVE_BIT(cdu->type, CDU_MSDP_EMPIRE_CLAIMS);
+		}
+		if (IS_SET(cdu->type, CDU_MSDP_SKILLS)) {
+			update_MSDP_skills(cdu->ch, UPDATE_SOON);
+			REMOVE_BIT(cdu->type, CDU_MSDP_SKILLS);
+		}
+		
+		// do this after the MSDP section
+		if (IS_SET(cdu->type, CDU_MSDP_SEND_UPDATES)) {
+			if (cdu->ch->desc) {
+				MSDPUpdate(cdu->ch->desc);
+			}
+			REMOVE_BIT(cdu->type, CDU_MSDP_SEND_UPDATES);
 		}
 		
 		// do this one last (anything above may be save-able)
 		if (IS_SET(cdu->type, CDU_SAVE)) {
 			SAVE_CHAR(cdu->ch);
+			REMOVE_BIT(cdu->type, CDU_SAVE);
 		}
 		
-		HASH_DEL(char_delayed_update_list, cdu);
-		free(cdu);
+		// remove only if no bits remain (sometimes more bits get added while running)
+		if (!cdu->type) {
+			HASH_DEL(char_delayed_update_list, cdu);
+			free(cdu);
+		}
 	}
 
 	
@@ -2544,6 +2588,9 @@ void change_sex(char_data *ch, int sex) {
 		add_companion_mod(cd, CMOD_SEX, sex, NULL);
 		queue_delayed_update(GET_COMPANION(ch), CDU_SAVE);
 	}
+	
+	// update msdp
+	update_MSDP_gender(ch, UPDATE_SOON);
 }
 
 
@@ -3005,6 +3052,7 @@ void determine_gear_level(char_data *ch) {
 	GET_GEAR_LEVEL(ch) = MAX(level, 0);
 	
 	if (old != GET_GEAR_LEVEL(ch)) {
+		update_MSDP_level(ch, UPDATE_SOON);
 		queue_delayed_update(ch, CDU_PASSIVE_BUFFS);
 	}
 }

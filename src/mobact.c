@@ -38,6 +38,7 @@
 
 // external vars
 extern bool catch_up_mobs;
+extern bool caught_up_mobs;
 
 // external funcs
 ACMD(do_exit);
@@ -438,6 +439,135 @@ void setup_generic_npc(char_data *mob, empire_data *emp, int name, int sex) {
 //// MOB MOVEMENT ////////////////////////////////////////////////////////////
 
 /**
+* Runs a mob's pursuit. 
+*
+* @param char_data *ch The mob who's pursuing someone.
+* @return bool TRUE if we took action/moved, FALSE if not
+*/
+bool check_mob_pursuit(char_data *ch) {
+	struct pursuit_data *purs, *next_purs;
+	struct track_data *track, *next_track;
+	room_vnum track_to_room = NOWHERE;
+	char_data *vict;
+	int dir = NO_DIR;
+	bool found = FALSE, moved = FALSE;
+	
+	// break out early if not pursuing
+	if (!MOB_PURSUIT(ch)) {
+		return FALSE;
+	}
+	
+	// store location to return to, if none is already set
+	if (MOB_PURSUIT_LEASH_LOC(ch) == NOWHERE) {
+		MOB_PURSUIT_LEASH_LOC(ch) = GET_ROOM_VNUM(IN_ROOM(ch));
+	}
+	
+	LL_FOREACH_SAFE(MOB_PURSUIT(ch), purs, next_purs) {
+		// check pursuit timeout and distance
+		if (time(0) - purs->last_seen > config_get_int("mob_pursuit_timeout") * SECS_PER_REAL_MIN || compute_distance(IN_ROOM(ch), real_room(purs->location)) > config_get_int("mob_pursuit_distance")) {
+			LL_DELETE(MOB_PURSUIT(ch), purs);
+			free(purs);
+			continue;
+		}
+		
+		// now see if we can track from here
+		found = FALSE;
+
+		// look in this room
+		DL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), vict, next_in_room) {
+			if (!IS_NPC(vict) && GET_IDNUM(vict) == purs->idnum && CAN_SEE(ch, vict) && CAN_RECOGNIZE(ch, vict) && can_fight(ch, vict)) {
+				found = TRUE;
+				engage_combat(ch, vict, FALSE);
+				
+				// exit early: we're now in combat
+				return TRUE;
+			}
+		}
+		
+		// track to next room
+		HASH_ITER(hh, ROOM_TRACKS(IN_ROOM(ch)), track, next_track) {
+			// don't bother checking track lifespan here -- just let mobs follow it till it gets removed
+			if ((-1 * track->id) == purs->idnum) {
+				found = TRUE;
+				dir = track->dir;
+				track_to_room = track->to_room;
+				break;
+			}
+		}
+		
+		// try line-of-sight tracking
+		if (!found && IS_OUTDOORS(ch)) {
+			// first see if they're playing
+			if (!(vict = is_playing(purs->idnum))) {
+				LL_DELETE(MOB_PURSUIT(ch), purs);
+				free(purs);
+				continue;
+			}
+			
+			// check distance: TODO this is magic-numbered to 7, similar to how far you can see players in mapview.c
+			if (IS_OUTDOORS(vict) && compute_distance(IN_ROOM(ch), IN_ROOM(vict)) <= 7) {
+				dir = get_direction_to(IN_ROOM(ch), IN_ROOM(vict));
+				if (dir != NO_DIR) {
+					// found one
+					found = TRUE;
+				}
+			}
+		}
+		
+		// break out if we found anything to do
+		if (found) {
+			break;
+		}
+	}	// end iteration
+	
+	if (found && (dir != NO_DIR || track_to_room != NOWHERE) && !AFF_FLAGGED(ch, AFF_CHARM | AFF_ENTANGLED)) {
+		if (track_to_room && find_portal_in_room_targetting(IN_ROOM(ch), track_to_room)) {
+			perform_move(ch, NO_DIR, real_room(track_to_room), MOVE_ENTER_PORTAL | MOVE_WANDER);
+			moved = TRUE;
+		}
+		else if (track_to_room != NOWHERE && find_vehicle_in_room_with_interior(IN_ROOM(ch), track_to_room)) {
+			perform_move(ch, NO_DIR, real_room(track_to_room), MOVE_ENTER_VEH | MOVE_WANDER);
+			moved = TRUE;
+		}
+		else if (GET_ROOM_VEHICLE(IN_ROOM(ch)) && IN_ROOM(GET_ROOM_VEHICLE(IN_ROOM(ch))) && GET_ROOM_VNUM(IN_ROOM(GET_ROOM_VEHICLE(IN_ROOM(ch)))) == track_to_room) {
+			perform_move(ch, NO_DIR, real_room(track_to_room), MOVE_EXIT | MOVE_WANDER);
+			moved = TRUE;
+		}
+		else if (dir != NO_DIR) {
+			perform_move(ch, dir, NULL, MOVE_WANDER);
+			moved = TRUE;
+		}
+	}
+	
+	// look for target again
+	if (moved) {
+		found = FALSE;
+
+		for (purs = MOB_PURSUIT(ch); !found && purs; purs = next_purs) {
+			next_purs = purs->next;
+			
+			DL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), vict, next_in_room) {
+				if (!IS_NPC(vict) && GET_IDNUM(vict) == purs->idnum && can_fight(ch, vict)) {
+					found = TRUE;
+					engage_combat(ch, vict, FALSE);
+					
+					// exit now: we are in combat
+					return TRUE;
+				}
+			}
+		}
+	}
+	
+	// try to go back if unable to move from pursuit
+	if (!moved) {
+		moved = return_to_pursuit_location(ch);
+	}
+	
+	return moved;
+}
+
+
+/**
 * This checks if a mob is willing to move onto a given sect.
 *
 * @param char_data *mob The mob.
@@ -628,270 +758,150 @@ bool try_mobile_movement(char_data *ch) {
 //// MOB ACTIVITY ////////////////////////////////////////////////////////////
 
 /**
-* Main cycle of mob activity (iterates over character list).
+* Main cycle of mob activity: runs on 1 mob at a time as of b5.115. Previously,
+* this was mobile_activity() and iterated over the character list. Now it runs
+* inside of real_update().
+*
+* @param char_data *ch The mob.
 */
-void mobile_activity(void) {
-	register char_data *ch, *next_ch, *vict, *targ, *m;
-	struct track_data *track, *next_track;
-	struct pursuit_data *purs, *next_purs;
-	room_vnum track_to_room = NOWHERE;
+void run_mobile_activity(char_data *ch) {
+	register char_data *ally, *vict, *targ;
+	bool acted = FALSE, moved = FALSE;
 	obj_data *obj;
-	int found, dir = NO_DIR;
-	empire_data *chemp, *victemp;
-	bool moved;
 
-	#define CAN_AGGRO(mob, vict)  (!IS_DEAD(vict) && !NOHASSLE(vict) && (IS_NPC(vict) || !PRF_FLAGGED(vict, PRF_WIZHIDE)) && !IS_GOD(vict) && CAN_SEE(mob, vict) && vict != mob->master && !AFF_FLAGGED(vict, AFF_IMMUNE_PHYSICAL | AFF_NO_TARGET_IN_ROOM | AFF_NO_SEE_IN_ROOM | AFF_NO_ATTACK))
+	#define CAN_AGGRO(mob, vict)  (!IS_DEAD(vict) && !NOHASSLE(vict) && (IS_NPC(vict) || !PRF_FLAGGED(vict, PRF_WIZHIDE)) && !IS_GOD(vict) && vict != mob->master && !AFF_FLAGGED(vict, AFF_IMMUNE_PHYSICAL | AFF_NO_TARGET_IN_ROOM | AFF_NO_SEE_IN_ROOM | AFF_NO_ATTACK) && CAN_SEE(mob, vict) && can_fight((mob), (vict)))
 	
 	// prevent running multiple mob moves during a catch-up cycle
 	if (!catch_up_mobs) {
 		return;
 	}
-	catch_up_mobs = FALSE;
+	caught_up_mobs = TRUE;	// indicate we have run at least 1 mob
 	
-	DL_FOREACH_SAFE(character_list, ch, next_ch) {
-		moved = FALSE;
+	// things that prevent activity:
+	if (!IS_MOB(ch) || GET_FED_ON_BY(ch) || EXTRACTED(ch) || IS_DEAD(ch) || AFF_FLAGGED(ch, AFF_STUNNED | AFF_HARD_STUNNED)) {
+		return;	// not a mob or is disabled
+	}
+	if (FIGHTING(ch) || !AWAKE(ch) || AFF_FLAGGED(ch, AFF_CHARM) || MOB_FLAGGED(ch, MOB_TIED) || IS_INJURED(ch, INJ_TIED) || GET_LED_BY(ch)) {
+		return;	// already busy
+	}
+	
+	// 1. pursuit
+	if (!moved && MOB_FLAGGED(ch, MOB_PURSUE) && MOB_PURSUIT(ch) && !moved) {
+		moved = check_mob_pursuit(ch);
+	}
+	
+	// 2. try a basic move
+	if (!moved && !MOB_FLAGGED(ch, MOB_SENTINEL | MOB_TIED) && !AFF_FLAGGED(ch, AFF_CHARM | AFF_ENTANGLED) && GET_POS(ch) == POS_STANDING && (!ch->master || IN_ROOM(ch) != IN_ROOM(ch->master)) && (!MOB_FLAGGED(ch, MOB_PURSUE) || !MOB_PURSUIT(ch))) {
+		moved = try_mobile_movement(ch);
+	}
 
-		if (!IS_MOB(ch) || GET_FED_ON_BY(ch) || EXTRACTED(ch) || IS_DEAD(ch) || AFF_FLAGGED(ch, AFF_STUNNED | AFF_HARD_STUNNED))
-			continue;
-		if (FIGHTING(ch) || !AWAKE(ch) || AFF_FLAGGED(ch, AFF_CHARM) || MOB_FLAGGED(ch, MOB_TIED) || IS_INJURED(ch, INJ_TIED) || GET_LED_BY(ch))
-			continue;
-		
-		// found stops further execution
-		found = FALSE;
-		
-		// pursuit mobs
-		if (MOB_FLAGGED(ch, MOB_PURSUE) && MOB_PURSUIT(ch) && !moved) {
-			// store location to return to, if none is already set
-			if (MOB_PURSUIT_LEASH_LOC(ch) == NOWHERE) {
-				MOB_PURSUIT_LEASH_LOC(ch) = GET_ROOM_VNUM(IN_ROOM(ch));
+	// 3. Aggressive Mobs (even if we moved)
+	if (!acted && MOB_FLAGGED(ch, MOB_AGGRESSIVE) && (IS_ADVENTURE_ROOM(IN_ROOM(ch)) || !ISLAND_FLAGGED(IN_ROOM(ch), ISLE_NO_AGGRO))) {
+		DL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), vict, next_in_room) {
+			if (vict == ch) {
+				continue;	// ignore: self
+			}
+			if (!IS_NPC(vict) && !vict->desc) {
+				continue;	// ignore: linkdead player
+			}
+			if (IS_NPC(vict) && (IS_ADVENTURE_ROOM(IN_ROOM(vict)) || MOB_FLAGGED(vict, MOB_AGGRESSIVE) || !MOB_FLAGGED(vict, MOB_HUMAN))) {
+				continue;	// they will attack humans but not aggro-humans, and not inadventures
+			}
+			if (MOB_FACTION(ch) && has_reputation(vict, FCT_VNUM(MOB_FACTION(ch)), REP_LIKED)) {
+				continue;	// ignore: don't aggro people we like
+			}
+			if (!CAN_AGGRO(ch, vict)) {
+				continue;	// ignore: invalid target
 			}
 			
-			for (purs = MOB_PURSUIT(ch); !found && purs; purs = next_purs) {
-				next_purs = purs->next;
-				
-				// check pursuit timeout and distance
-				if (time(0) - purs->last_seen > config_get_int("mob_pursuit_timeout") * SECS_PER_REAL_MIN || compute_distance(IN_ROOM(ch), real_room(purs->location)) > config_get_int("mob_pursuit_distance")) {
-					LL_DELETE(MOB_PURSUIT(ch), purs);
-					free(purs);
-					continue;
-				}
-				else {
-					// now see if we can track from here
-					found = FALSE;
-
-					// look in this room
-					DL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), vict, next_in_room) {
-						if (!IS_NPC(vict) && GET_IDNUM(vict) == purs->idnum && CAN_SEE(ch, vict) && CAN_RECOGNIZE(ch, vict) && can_fight(ch, vict)) {
-							found = TRUE;
-							engage_combat(ch, vict, FALSE);
-							break;
-						}
-					}
-
-					// track to next room
-					HASH_ITER(hh, ROOM_TRACKS(IN_ROOM(ch)), track, next_track) {
-						// don't bother checking track lifespan here -- just let mobs follow it till it gets removed
-						if ((-1 * track->id) == purs->idnum) {
-							found = TRUE;
-							dir = track->dir;
-							track_to_room = track->to_room;
-							break;
-						}
-					}
-					
-					// try line-of-sight tracking
-					if (!found && IS_OUTDOORS(ch)) {
-						// first see if they're playing
-						if (!(vict = is_playing(purs->idnum))) {
-							LL_DELETE(MOB_PURSUIT(ch), purs);
-							free(purs);
-							continue;
-						}
-						
-						// check distance: TODO this is magic-numbered to 7, similar to how far you can see players in mapview.c
-						if (IS_OUTDOORS(vict) && compute_distance(IN_ROOM(ch), IN_ROOM(vict)) <= 7) {
-							dir = get_direction_to(IN_ROOM(ch), IN_ROOM(vict));
-							if (dir != NO_DIR) {
-								// found one
-								found = TRUE;
-							}
-						}
-					}
-				}
-			}
-			
-			if ((dir != NO_DIR || track_to_room != NOWHERE) && found == TRUE && !AFF_FLAGGED(ch, AFF_CHARM | AFF_ENTANGLED)) {
-				if (track_to_room && find_portal_in_room_targetting(IN_ROOM(ch), track_to_room)) {
-					perform_move(ch, NO_DIR, real_room(track_to_room), MOVE_ENTER_PORTAL | MOVE_WANDER);
-					moved = TRUE;
-				}
-				else if (track_to_room != NOWHERE && find_vehicle_in_room_with_interior(IN_ROOM(ch), track_to_room)) {
-					perform_move(ch, NO_DIR, real_room(track_to_room), MOVE_ENTER_VEH | MOVE_WANDER);
-					moved = TRUE;
-				}
-				else if (GET_ROOM_VEHICLE(IN_ROOM(ch)) && IN_ROOM(GET_ROOM_VEHICLE(IN_ROOM(ch))) && GET_ROOM_VNUM(IN_ROOM(GET_ROOM_VEHICLE(IN_ROOM(ch)))) == track_to_room) {
-					perform_move(ch, NO_DIR, real_room(track_to_room), MOVE_EXIT | MOVE_WANDER);
-					moved = TRUE;
-				}
-				else if (dir != NO_DIR) {
-					perform_move(ch, dir, NULL, MOVE_WANDER);
-					moved = TRUE;
-				}
-			}
-			
-			// look for target again
-			if (moved) {
-				found = FALSE;
-
-				for (purs = MOB_PURSUIT(ch); !found && purs; purs = next_purs) {
-					next_purs = purs->next;
-					
-					DL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), vict, next_in_room) {
-						if (!IS_NPC(vict) && GET_IDNUM(vict) == purs->idnum && can_fight(ch, vict)) {
-							found = TRUE;
-							engage_combat(ch, vict, FALSE);
-							break;
-						}
-					}
-				}
-			}
-			
-			// try to go back if unable to move from pursuit
-			if (!moved) {
-				moved = return_to_pursuit_location(ch);
-			}
-		}	// end pursuit
-		
-		if (!moved && !MOB_FLAGGED(ch, MOB_SENTINEL | MOB_TIED) && !AFF_FLAGGED(ch, AFF_CHARM | AFF_ENTANGLED) && GET_POS(ch) == POS_STANDING && (!ch->master || IN_ROOM(ch) != IN_ROOM(ch->master)) && (!MOB_FLAGGED(ch, MOB_PURSUE) || !MOB_PURSUIT(ch))) {
-			moved = try_mobile_movement(ch);
+			// ok good to go
+			hit(ch, vict, GET_EQ(ch, WEAR_WIELD), TRUE);
+			acted = TRUE;
+			break;
 		}
+	}	// end aggro
+	
+	// 4. Cityguards
+	if (!acted && MOB_FLAGGED(ch, MOB_CITYGUARD) && GET_LOYALTY(ch)) {
+		// 4.1: look for people to assist
+		DL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), ally, next_in_room) {
+			if (ally == ch || GET_LOYALTY(ally) != GET_LOYALTY(ch)) {
+				continue;	// ignore: is self or is wrong empire
+			}
+			if (!(targ = FIGHTING(ally)) || targ == ch || targ == ch->master) {
+				continue;	// ignore: fighting us!
+			}
+			if (!IS_NPC(targ) && GET_LOYALTY(targ) == GET_LOYALTY(ch)) {
+				continue;	// ignore: player in own empire
+			}
+			if (!IS_NPC(targ) && !IS_NPC(ally) && IS_PVP_FLAGGED(ally)) {
+				continue;	// ignore: pvp fight
+			}
+			if (!CAN_AGGRO(ch, targ)) {
+				continue;	// invalid target
+			}
+					
+			// assist ally
+			engage_combat(ch, targ, FALSE);
+			acted = TRUE;
+			break;
+		}	// end cityguard assist
 		
-		// from here, found stops multiple attacks
-		found = FALSE;
-
-		/* Aggressive Mobs */
-		if (!found && MOB_FLAGGED(ch, MOB_AGGRESSIVE) && (IS_ADVENTURE_ROOM(IN_ROOM(ch)) || !ISLAND_FLAGGED(IN_ROOM(ch), ISLE_NO_AGGRO))) {
+		// 4.2: look for intruders to aggro
+		if (!acted && !ISLAND_FLAGGED(IN_ROOM(ch), ISLE_NO_AGGRO)) {
 			DL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), vict, next_in_room) {
-				if (vict == ch) {
-					continue;
+				if (GET_LOYALTY(vict) == GET_LOYALTY(ch)) {
+					continue;	// ignore: self or same empire
 				}
 				if (!IS_NPC(vict) && !vict->desc) {
-					// linkdead player
-					continue;
+					continue;	// ignore: linkdead player
 				}
-				if (IS_NPC(vict) && (IS_ADVENTURE_ROOM(IN_ROOM(vict)) || MOB_FLAGGED(vict, MOB_AGGRESSIVE) || !MOB_FLAGGED(vict, MOB_HUMAN))) {
-					// they will attack humans but not aggro-humans, and not inadventures
-					continue;
+				if (GET_LOYALTY(vict) && empire_is_friendly(GET_LOYALTY(ch), GET_LOYALTY(vict))) {
+					continue;	// ignore: friendly empire
 				}
-				if (!CAN_AGGRO(ch, vict) || !can_fight(ch, vict)) {
-					continue;
+				if (vict->master && !IS_NPC(vict->master) && in_same_group(vict, vict->master) && GET_LOYALTY(vict->master) == GET_LOYALTY(ch)) {
+					continue;	// ignore: grouped leader is in my empire
 				}
-				if (MOB_FACTION(ch) && has_reputation(vict, FCT_VNUM(MOB_FACTION(ch)), REP_LIKED)) {
-					continue;	// don't aggro people we like
+				if (!CAN_AGGRO(ch, vict)) {
+					continue;	// ignore: invalid target
 				}
 				
-				// ok good to go
-				if (!CHECK_MAJESTY(vict) || AFF_FLAGGED(ch, AFF_IMMUNE_VAMPIRE)) {
+				// ok it's someone we CAN hit: now see why we should
+				if (MOB_FLAGGED(vict, MOB_AGGRESSIVE)) {
+					// attack: aggro mobs
 					hit(ch, vict, GET_EQ(ch, WEAR_WIELD), TRUE);
-					found = TRUE;
+					acted = TRUE;
+					break;
+				}
+				else if (IS_HOSTILE(vict) || (!IS_DISGUISED(vict) && !IS_NPC(vict) && empire_is_hostile(GET_LOYALTY(ch), GET_LOYALTY(vict), IN_ROOM(ch)))) {
+					// attack: hostile to empire
+					hit(ch, vict, GET_EQ(ch, WEAR_WIELD), TRUE);
+					acted = TRUE;
+					break;
+				}
+				else if (IS_NPC(vict) && GET_LOYALTY(vict) && empire_is_hostile(GET_LOYALTY(ch), GET_LOYALTY(vict), IN_ROOM(ch))) {
+					// attack: hostility against empire mobs
+					hit(ch, vict, GET_EQ(ch, WEAR_WIELD), TRUE);
+					acted = TRUE;
 					break;
 				}
 			}
-		}
-		
-		// Empire Mobs
-		if (!found && MOB_FLAGGED(ch, MOB_CITYGUARD) && GET_LOYALTY(ch)) {
-			// look for people to assist
-			DL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), vict, next_in_room) {
-				// in a fight?
-				if (vict != ch && (targ = FIGHTING(vict)) && targ != ch && ch->master != targ && (IS_NPC(targ) || GET_ACCESS_LEVEL(targ) < LVL_GOD) && CAN_SEE(ch, targ)) {
-					// matching empire to rescue?
-					if (CAN_AGGRO(ch, vict) && GET_LOYALTY(vict) == GET_LOYALTY(ch)) {
-						// make sure it's not a PVP-flagged fight
-						if (IS_NPC(targ) || IS_NPC(vict) || !IS_PVP_FLAGGED(vict)) {
-							// make sure targ (vict's fighting) isn't a pc in my empire
-							if (IS_NPC(targ) || GET_LOYALTY(targ) != GET_LOYALTY(ch)) {
-								if (can_fight(ch, targ)) {
-									// assist vict
-									engage_combat(ch, targ, FALSE);
-									found = TRUE;
-									break;
-								}
-							}
-						}
-					}
-				}
-			}
-			
-			// look for people to aggro
-			if (!ISLAND_FLAGGED(IN_ROOM(ch), ISLE_NO_AGGRO)) {
-				chemp = NULL;
-				DL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), vict, next_in_room) {
-					if (vict == ch) {
-						continue;
-					}
-				
-					// aggro players
-					if (!IS_NPC(vict) && vict->desc) {
-						if (GET_LOYALTY(vict) != GET_LOYALTY(ch) && CAN_AGGRO(ch, vict)) {
-							if (!chemp) {
-								chemp = GET_LOYALTY(ch);
-							}
-
-							// check character OR their leader for permission to be here, actually
-							if (!((m = vict->master) && in_same_group(vict, m))) {
-								m = vict;
-							}
-							if (GET_LOYALTY(m) != GET_LOYALTY(ch)) {
-								victemp = GET_LOYALTY(vict);
-							
-								// check friendly first -- so we don't attack someone who's friendly
-								if (!empire_is_friendly(chemp, victemp) && can_fight(ch, vict)) {
-									if (IS_HOSTILE(vict) || (!IS_DISGUISED(vict) && empire_is_hostile(chemp, victemp, IN_ROOM(ch)))) {
-										if (!CHECK_MAJESTY(vict) || AFF_FLAGGED(ch, AFF_IMMUNE_VAMPIRE)) {
-											hit(ch, vict, GET_EQ(ch, WEAR_WIELD), TRUE);
-											found = TRUE;
-											break;
-										}
-									}
-								}
-							}
-						}
-					}
-					// aggro mobs
-					else if (IS_NPC(vict) && MOB_FLAGGED(vict, MOB_AGGRESSIVE) && GET_LOYALTY(ch) != GET_LOYALTY(vict) && can_fight(ch, vict)) {
-						hit(ch, vict, GET_EQ(ch, WEAR_WIELD), TRUE);
-						found = TRUE;
-						break;
-					}
-					// hostility against empire mobs
-					else if (IS_NPC(vict) && GET_LOYALTY(vict) && GET_LOYALTY(vict) != GET_LOYALTY(ch) && empire_is_hostile(GET_LOYALTY(ch), GET_LOYALTY(vict), IN_ROOM(ch))) {
-						hit(ch, vict, GET_EQ(ch, WEAR_WIELD), TRUE);
-						found = TRUE;
-						break;
-					}
-				}
+		}	// end cityguard aggro
+	}	// end cityguard
+	
+	// 5. scavenging
+	if (!acted && MOB_FLAGGED(ch, MOB_SCAVENGER)) {
+		DL_FOREACH2(ROOM_CONTENTS(IN_ROOM(ch)), obj, next_content) {
+			if (GET_OBJ_TYPE(obj) == ITEM_CORPSE && GET_CORPSE_SIZE(obj) <= GET_SIZE(ch) && !number(0, 10)) {
+				act("$n eats $p.", FALSE, ch, obj, NULL, TO_ROOM);
+				empty_obj_before_extract(obj);
+				extract_obj(obj);
+				break;
 			}
 		}
-
-		if (MOB_FLAGGED(ch, MOB_SCAVENGER) && !FIGHTING(ch)) {
-			DL_FOREACH2(ROOM_CONTENTS(IN_ROOM(ch)), obj, next_content) {
-				if (GET_OBJ_TYPE(obj) == ITEM_CORPSE && GET_CORPSE_SIZE(obj) <= GET_SIZE(ch) && !number(0, 10)) {
-					act("$n eats $p.", FALSE, ch, obj, NULL, TO_ROOM);
-					empty_obj_before_extract(obj);
-					extract_obj(obj);
-					break;
-				}
-			}
-		}
-		
-		// attempt to return to leash point
-		if (!moved) {
-			moved = return_to_pursuit_location(ch);
-		}
-
-		/* Add new mobile actions here */
 	}
+
+	/* Add new mobile actions here */
 }
 
 

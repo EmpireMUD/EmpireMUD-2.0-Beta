@@ -441,7 +441,7 @@ void update_world_count(void) {
 		}
 		
 		// any further data?
-		if (!(room = real_real_room(map->vnum))) {
+		if (!(room = map->room)) {
 			continue;
 		}
 		

@@ -60,9 +60,6 @@ room_data *do_dg_add_room_dir(room_data *from, int dir, bld_data *bld) {
 		perform_claim_room(new, ROOM_OWNER(home));
 	}
 	
-	// sort now just in case
-	sort_world_table();
-	
 	return new;
 }
 
@@ -1282,10 +1279,6 @@ void script_modify(char *argument) {
 	}
 	// ROOM MODE
 	else if ((room = get_room(NULL, targ_arg))) {
-		if (GET_ROOM_VNUM(room) < MAP_SIZE) {
-			world_map_needs_save = TRUE;
-		}
-		
 		if (SHARED_DATA(room) == &ocean_shared_data) {
 			script_log("%%mod%% cannot be used on Ocean rooms");
 		}

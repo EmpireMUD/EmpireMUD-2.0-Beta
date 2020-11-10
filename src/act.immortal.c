@@ -2322,6 +2322,8 @@ int perform_set(char_data *ch, char_data *vict, int mode, char *val_arg) {
 			}
     		sprintf(output, "%s's last name is now: %s", GET_NAME(vict), GET_PERSONAL_LASTNAME(vict));
 		}
+		
+		update_MSDP_name(vict, UPDATE_NOW);
 	}
 	else if SET_CASE("bonustrait") {
 		bitvector_t diff, new, old = GET_BONUS_TRAITS(vict);
@@ -2348,6 +2350,7 @@ int perform_set(char_data *ch, char_data *vict, int mode, char *val_arg) {
 	}
 	else if SET_CASE("bonusexp") {
 		GET_DAILY_BONUS_EXPERIENCE(vict) = RANGE(0, 255);
+		update_MSDP_bonus_exp(vict, UPDATE_SOON);
 	}
 	else if SET_CASE("dailyquestscompleted") {
 		GET_DAILY_QUESTS(vict) = RANGE(0, config_get_int("dailies_per_day"));
@@ -2774,6 +2777,9 @@ int perform_set(char_data *ch, char_data *vict, int mode, char *val_arg) {
 		get_filename(oldname, buf1, DELAYED_FILE);
 		get_filename(GET_NAME(vict), buf2, DELAYED_FILE);
 		rename(buf1, buf2);
+		
+		// update msdp
+		update_MSDP_name(vict, UPDATE_NOW);
 		
 		SAVE_CHAR(vict);
 		save_library_file_for_vnum(DB_BOOT_ACCT, GET_ACCOUNT(vict)->id);
@@ -3948,7 +3954,6 @@ SHOW(show_crops) {
 	int count, total, this;
 	struct map_data *map;
 	size_t size, l_size;
-	room_data *room;
 	bool any;
 	
 	// fresh numbers
@@ -3984,17 +3989,14 @@ SHOW(show_crops) {
 				continue;
 			}
 			
-			// load room if possible (but not if it's not in RAM)
-			room = real_real_room(map->vnum);
-			
-			// found
-			if (room && ROOM_OWNER(room)) {
-				snprintf(part, sizeof(part), " - %s%s\t0", EMPIRE_BANNER(ROOM_OWNER(room)), EMPIRE_ADJECTIVE(ROOM_OWNER(room)));
+			// room info if possible
+			if (map->room && ROOM_OWNER(map->room)) {
+				snprintf(part, sizeof(part), " - %s%s\t0", EMPIRE_BANNER(ROOM_OWNER(map->room)), EMPIRE_ADJECTIVE(ROOM_OWNER(map->room)));
 			}
 			else {
 				*part = '\0';
 			}
-			l_size = snprintf(line, sizeof(line), "(%*d, %*d) %s%s\r\n", X_PRECISION, MAP_X_COORD(map->vnum), Y_PRECISION, MAP_Y_COORD(map->vnum), room ? get_room_name(room, FALSE) : GET_CROP_TITLE(crop), part);
+			l_size = snprintf(line, sizeof(line), "(%*d, %*d) %s%s\r\n", X_PRECISION, MAP_X_COORD(map->vnum), Y_PRECISION, MAP_Y_COORD(map->vnum), map->room ? get_room_name(map->room, FALSE) : GET_CROP_TITLE(crop), part);
 			any = TRUE;
 			
 			if (size + l_size < sizeof(buf) + 40) {	// reserve a little extra space
@@ -4211,7 +4213,6 @@ SHOW(show_terrain) {
 	int count, total, this;
 	struct map_data *map;
 	size_t size, l_size;
-	room_data *room;
 	bool any;
 	
 	// fresh numbers
@@ -4247,17 +4248,14 @@ SHOW(show_terrain) {
 				continue;
 			}
 			
-			// load room if possible (but not if it's not in RAM)
-			room = real_real_room(map->vnum);
-			
 			// found
-			if (room && ROOM_OWNER(room)) {
-				snprintf(part, sizeof(part), " - %s%s\t0", EMPIRE_BANNER(ROOM_OWNER(room)), EMPIRE_ADJECTIVE(ROOM_OWNER(room)));
+			if (map->room && ROOM_OWNER(map->room)) {
+				snprintf(part, sizeof(part), " - %s%s\t0", EMPIRE_BANNER(ROOM_OWNER(map->room)), EMPIRE_ADJECTIVE(ROOM_OWNER(map->room)));
 			}
 			else {
 				*part = '\0';
 			}
-			l_size = snprintf(line, sizeof(line), "(%*d, %*d) %s%s\r\n", X_PRECISION, MAP_X_COORD(map->vnum), Y_PRECISION, MAP_Y_COORD(map->vnum), room ? get_room_name(room, FALSE) : GET_SECT_TITLE(sect), part);
+			l_size = snprintf(line, sizeof(line), "(%*d, %*d) %s%s\r\n", X_PRECISION, MAP_X_COORD(map->vnum), Y_PRECISION, MAP_Y_COORD(map->vnum), map->room ? get_room_name(map->room, FALSE) : GET_SECT_TITLE(sect), part);
 			any = TRUE;
 			
 			if (size + l_size < sizeof(buf) + 40) {	// reserve a little extra space
@@ -8453,11 +8451,18 @@ ACMD(do_forgive) {
 
 
 ACMD(do_fullsave) {
+	unsigned long long time;
+	
 	syslog(SYS_GC, GET_INVIS_LEV(ch), TRUE, "GC: %s has triggered a full map save", GET_REAL_NAME(ch));
 	syslog(SYS_INFO, 0, FALSE, "Updating zone files...");
-
-	save_whole_world();
+	
+	time = microtime();
+	write_world_to_files();
 	send_config_msg(ch, "ok_string");
+	
+	if (ch->desc) {
+		stack_msg_to_desc(ch->desc, "World save time: %.2f seconds\r\n", (microtime() - time) / 1000000.0);
+	}
 }
 
 
@@ -8865,13 +8870,6 @@ ACMD(do_load) {
 	else {
 		send_to_char("That'll have to be either 'obj', 'mob', or 'vehicle'.\r\n", ch);
 	}
-}
-
-
-ACMD(do_mapout) {
-	msg_to_char(ch, "Writing map output file...\r\n");
-	output_map_to_file();
-	msg_to_char(ch, "Done.\r\n");
 }
 
 
@@ -9725,7 +9723,9 @@ ACMD(do_restore) {
 
 
 ACMD(do_return) {
-	if (ch->desc && ch->desc->original) {
+	char_data *orig;
+	
+	if (ch->desc && (orig = ch->desc->original)) {
 		syslog(SYS_GC, GET_INVIS_LEV(ch->desc->original), TRUE, "GC: %s has returned to %s original body", GET_REAL_NAME(ch->desc->original), REAL_HSHR(ch->desc->original));
 		send_to_char("You return to your original body.\r\n", ch);
 
@@ -9739,18 +9739,20 @@ ACMD(do_return) {
 		 * (which is assigned below in this function). 12/17/99
 		 */
 
-		if (ch->desc->original->desc) {
-			ch->desc->original->desc->character = NULL;
-			STATE(ch->desc->original->desc) = CON_DISCONNECT;
+		if (orig->desc) {
+			orig->desc->character = NULL;
+			STATE(orig->desc) = CON_DISCONNECT;
 		}
 
 		/* Now our descriptor points to our original body. */
-		ch->desc->character = ch->desc->original;
+		ch->desc->character = orig;
 		ch->desc->original = NULL;
 
 		/* And our body's pointer to descriptor now points to our descriptor. */
-		ch->desc->character->desc = ch->desc;
+		orig->desc = ch->desc;
 		ch->desc = NULL;
+		
+		send_initial_MSDP(orig->desc);
 	}
 }
 
@@ -10229,8 +10231,11 @@ ACMD(do_switch) {
 	char_data *victim;
 
 	one_argument(argument, arg);
-
-	if (ch->desc->original)
+	
+	if (!ch->desc) {
+		msg_to_char(ch, "You can't do that now.\r\n");
+	}
+	else if (ch->desc->original)
 		send_to_char("You're already switched.\r\n", ch);
 	else if (!*arg)
 		send_to_char("Switch with whom?\r\n", ch);
@@ -10251,6 +10256,8 @@ ACMD(do_switch) {
 
 		victim->desc = ch->desc;
 		ch->desc = NULL;
+		
+		send_initial_MSDP(victim->desc);
 	}
 }
 

@@ -47,6 +47,7 @@ ACMD(do_respawn);
 
 // local vars
 int point_update_cycle = 0;	// helps spread out point updates
+int mobile_activity_cycle = 0;	// alternates groups of mobs
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -119,25 +120,6 @@ void check_attribute_gear(char_data *ch) {
 	
 	if (found) {
 		determine_gear_level(ch);
-	}
-}
-
-
-/**
-* Called periodically to force players to respawn from death.
-*/
-void check_death_respawn(void) {
-	descriptor_data *desc;
-	char_data *ch;
-	
-	for (desc = descriptor_list; desc; desc = desc->next) {
-		if (STATE(desc) != CON_PLAYING || !(ch = desc->character)) {
-			continue;
-		}
-		
-		if (IS_DEAD(ch) && get_cooldown_time(ch, COOLDOWN_DEATH_RESPAWN) == 0) {
-			do_respawn(ch, "", 0, 0);
-		}
 	}
 }
 
@@ -385,13 +367,13 @@ int limit_crowd_control(char_data *victim, int atype) {
 
 
 /**
-* This runs a point update (every tick) on a character. It runs on both players
-* and NPCS, but players have also had their "real update" run already this
-* tick.
+* This runs a point update (every hour tick) on a character. It runs on both
+* players and NPCS, right after their "real update" runs.
 *
 * @param char_data *ch The character to update.
+* @return bool TRUE if the character survives the update, FALSE if not.
 */
-void point_update_char(char_data *ch) {
+bool point_update_char(char_data *ch) {
 	struct cooldown_data *cool, *next_cool;
 	struct instance_data *inst;
 	obj_data *obj, *next_obj;
@@ -403,13 +385,13 @@ void point_update_char(char_data *ch) {
 	if (!IS_NPC(ch)) {
 		clean_offers(ch);
 		if (!check_idling(ch)) {
-			return;
+			return FALSE;
 		}
 	}
 	
 	// everything beyond here only matters if still alive
 	if (IS_DEAD(ch)) {
-		return;
+		return FALSE;
 	}
 	
 	if (IS_NPC(ch) && FIGHTING(ch)) {
@@ -428,7 +410,7 @@ void point_update_char(char_data *ch) {
 		if (count > config_get_int("num_duplicates_in_stable")) {
 			act("$n is feeling overcrowded, and leaves.", TRUE, ch, NULL, NULL, TO_ROOM);
 			extract_char(ch);
-			return;
+			return FALSE;
 		}
 	}
 	
@@ -478,7 +460,7 @@ void point_update_char(char_data *ch) {
 		if (!GET_LED_BY(ch) && !GET_LEADING_MOB(ch) && !GET_LEADING_VEHICLE(ch) && !MOB_FLAGGED(ch, MOB_TIED)) {
 			if (distance_to_nearest_player(IN_ROOM(ch)) > config_get_int("mob_despawn_radius")) {
 				despawn_mob(ch);
-				return;
+				return FALSE;
 			}
 		}
 	}
@@ -489,7 +471,7 @@ void point_update_char(char_data *ch) {
 		
 		if (GET_BLOOD(ch) < 0) {
 			out_of_blood(ch);
-			return;
+			return FALSE;
 		}
 	}
 	else {	// not a vampire (or is imm/npc)
@@ -539,7 +521,7 @@ void point_update_char(char_data *ch) {
 			update_pos(ch);
 			if (GET_POS(ch) == POS_DEAD) {
 				die(ch, ch);
-				return;
+				return FALSE;
 			}
 		}
 	}
@@ -567,6 +549,8 @@ void point_update_char(char_data *ch) {
 			}
 		}
 	}
+	
+	return TRUE;	// we lived!
 }
 
 
@@ -755,6 +739,7 @@ void real_update_char(char_data *ch) {
 			gain = compute_bonus_exp_per_day(ch);
 			if (GET_DAILY_BONUS_EXPERIENCE(ch) < gain) {
 				GET_DAILY_BONUS_EXPERIENCE(ch) = gain;
+				update_MSDP_bonus_exp(ch, UPDATE_SOON);
 			}
 			GET_DAILY_QUESTS(ch) = 0;
 		
@@ -919,12 +904,28 @@ void real_update_char(char_data *ch) {
 		random_encounter(ch);
 	}	// end npc-only
 	
-	// LAST: call point-update if it's our turn
+	// DO THESE LAST:
+	
+	// call point-update if it's our turn
 	if (IS_NPC(ch) && (GET_MOB_VNUM(ch) % REAL_UPDATES_PER_MUD_HOUR) == point_update_cycle) {
-		point_update_char(ch);
+		if (!point_update_char(ch)) {
+			return;
+		}
 	}
 	else if (!IS_NPC(ch) && (GET_IDNUM(ch) % REAL_UPDATES_PER_MUD_HOUR) == point_update_cycle) {
-		point_update_char(ch);
+		if (!point_update_char(ch)) {
+			return;
+		}
+	}
+	
+	// mob activity: if we're still here, run half the mobs each time
+	if (IS_NPC(ch) && (GET_MOB_VNUM(ch) % 2) == mobile_activity_cycle) {
+		run_mobile_activity(ch);
+	}
+	
+	// players: check for auto-respawn
+	if (ch->desc && IS_DEAD(ch) && get_cooldown_time(ch, COOLDOWN_DEATH_RESPAWN) == 0) {
+		do_respawn(ch, "", 0, 0);
 	}
 }
 
@@ -2222,7 +2223,7 @@ int move_gain(char_data *ch, bool info_only) {
 */
 void real_update(void) {
 	obj_data *obj;
-	char_data *ch, *next_ch;
+	char_data *ch;
 	vehicle_data *veh;
 	
 	long daily_cycle = data_get_long(DATA_DAILY_CYCLE);
@@ -2242,13 +2243,14 @@ void real_update(void) {
 		setup_daily_quest_cycles(NOTHING);
 	}
 	
-	// advance the cycle
+	// advance the cycles
 	if (++point_update_cycle >= REAL_UPDATES_PER_MUD_HOUR) {
 		point_update_cycle = 0;
 	}
+	mobile_activity_cycle = (mobile_activity_cycle ? 0 : 1);
 
 	// characters
-	DL_FOREACH_SAFE(character_list, ch, next_ch) {
+	DL_FOREACH_SAFE(character_list, ch, global_next_char) {
 		if (!EXTRACTED(ch)) {
 			real_update_char(ch);
 		}

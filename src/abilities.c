@@ -1542,7 +1542,8 @@ void call_ability(char_data *ch, ability_data *abil, char *argument, char_data *
 			if (abil_has_custom_message(abil, ABIL_CUSTOM_SELF_TO_CHAR)) {
 				act(abil_get_custom_message(abil, ABIL_CUSTOM_SELF_TO_CHAR), FALSE, ch, NULL, cvict, TO_CHAR);
 			}
-			else {
+			else if (!IS_SET(ABIL_TYPES(abil), ABILT_DAMAGE) || ABIL_ATTACK_TYPE(abil) <= 0) {
+				// don't message if it's damage + there's an attack type
 				snprintf(buf, sizeof(buf), "You use %s!", SAFE_ABIL_COMMAND(abil));
 				act(buf, FALSE, ch, NULL, cvict, TO_CHAR);
 			}
@@ -1551,7 +1552,8 @@ void call_ability(char_data *ch, ability_data *abil, char *argument, char_data *
 			if (abil_has_custom_message(abil, ABIL_CUSTOM_SELF_TO_ROOM)) {
 				act(abil_get_custom_message(abil, ABIL_CUSTOM_SELF_TO_ROOM), invis, ch, NULL, cvict, TO_ROOM);
 			}
-			else {
+			else if (!IS_SET(ABIL_TYPES(abil), ABILT_DAMAGE) || ABIL_ATTACK_TYPE(abil) <= 0) {
+				// don't message if it's damage + there's an attack type
 				snprintf(buf, sizeof(buf), "$n uses %s!", SAFE_ABIL_COMMAND(abil));
 				act(buf, invis, ch, NULL, cvict, TO_ROOM);
 			}
@@ -1561,7 +1563,8 @@ void call_ability(char_data *ch, ability_data *abil, char *argument, char_data *
 			if (abil_has_custom_message(abil, ABIL_CUSTOM_TARGETED_TO_CHAR)) {
 				act(abil_get_custom_message(abil, ABIL_CUSTOM_TARGETED_TO_CHAR), FALSE, ch, NULL, cvict, TO_CHAR);
 			}
-			else {
+			else if (!IS_SET(ABIL_TYPES(abil), ABILT_DAMAGE) || ABIL_ATTACK_TYPE(abil) <= 0) {
+				// don't message if it's damage + there's an attack type
 				snprintf(buf, sizeof(buf), "You use %s on $N!", SAFE_ABIL_COMMAND(abil));
 				act(buf, FALSE, ch, NULL, cvict, TO_CHAR);
 			}
@@ -1570,7 +1573,8 @@ void call_ability(char_data *ch, ability_data *abil, char *argument, char_data *
 			if (abil_has_custom_message(abil, ABIL_CUSTOM_TARGETED_TO_VICT)) {
 				act(abil_get_custom_message(abil, ABIL_CUSTOM_TARGETED_TO_VICT), invis, ch, NULL, cvict, TO_VICT);
 			}
-			else {
+			else if (!IS_SET(ABIL_TYPES(abil), ABILT_DAMAGE) || ABIL_ATTACK_TYPE(abil) <= 0) {
+				// don't message if it's damage + there's an attack type
 				snprintf(buf, sizeof(buf), "$n uses %s on you!", SAFE_ABIL_COMMAND(abil));
 				act(buf, invis, ch, NULL, cvict, TO_VICT);
 			}
@@ -1579,7 +1583,8 @@ void call_ability(char_data *ch, ability_data *abil, char *argument, char_data *
 			if (abil_has_custom_message(abil, ABIL_CUSTOM_TARGETED_TO_ROOM)) {
 				act(abil_get_custom_message(abil, ABIL_CUSTOM_TARGETED_TO_ROOM), invis, ch, NULL, cvict, TO_NOTVICT);
 			}
-			else {
+			else if (!IS_SET(ABIL_TYPES(abil), ABILT_DAMAGE) || ABIL_ATTACK_TYPE(abil) <= 0) {
+				// don't message if it's damage + there's an attack type
 				snprintf(buf, sizeof(buf), "$n uses %s on $N!", SAFE_ABIL_COMMAND(abil));
 				act(buf, invis, ch, NULL, cvict, TO_NOTVICT);
 			}

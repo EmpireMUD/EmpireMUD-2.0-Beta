@@ -1997,6 +1997,14 @@ typedef enum {
 // CDU_x: delayed update types
 #define CDU_PASSIVE_BUFFS  BIT(0)	// refresh passive buffs
 #define CDU_SAVE  BIT(1)	// saves the character
+#define CDU_MSDP_SEND_UPDATES  BIT(2)	// sends any pending MSDP updates
+#define CDU_MSDP_AFFECTS  BIT(3)	// runs update_MSDP_affects()
+#define CDU_MSDP_ATTRIBUTES  BIT(4)	// runs update_MSDP_attributes()
+#define CDU_MSDP_COOLDOWNS  BIT(5)	// runs update_MSDP_cooldowns()
+#define CDU_MSDP_DOTS  BIT(6)	// runs update_MSDP_dots()
+#define CDU_MSDP_EMPIRE_ALL  BIT(7)	// runs update_MSDP_empire_data()
+#define CDU_MSDP_EMPIRE_CLAIMS  BIT(8)	// runs update_MSDP_empire_claims()
+#define CDU_MSDP_SKILLS  BIT(9)	// runs update_MSDP_skills()
 
 
 // types of channel histories -- act.comm.c
@@ -5069,6 +5077,7 @@ struct empire_data {
 	bitvector_t delayed_refresh;	// things that are requesting an update
 	struct empire_member_account *member_accounts;	// tracks greatness/etc
 	struct empire_dropped_item *dropped_items;	// hash (by vnum) of items dropped in the empire
+	char mapout_token;	// displayed for this empire on the graphical political map
 	
 	bool storage_loaded;	// record whether or not storage has been loaded, to prevent saving over it
 	bool logs_loaded;	// record whether or not logs have been loaded, to prevent saving over them
@@ -6003,6 +6012,7 @@ struct track_data {
 // data for the world map (world_map, land_map)
 struct map_data {
 	room_vnum vnum;	// corresponding room vnum (coordinates can be derived from here)
+	room_data *room;	// pointer is set IF it exists in the world_table right now (otherwise load with real_room)
 	
 	// three basic sector types
 	sector_data *sector_type;	// current sector

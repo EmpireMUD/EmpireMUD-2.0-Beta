@@ -1612,6 +1612,8 @@ obj_data *make_corpse(char_data *ch) {
 		IS_CARRYING_N(ch) = 0;
 		ch->carrying = NULL;
 		
+		update_MSDP_inventory(ch, UPDATE_SOON);
+		
 		if (MOB_TAGGED_BY(ch)) {
 			DL_FOREACH2(corpse->contains, o, next_content) {
 				add_production_total_for_tag_list(MOB_TAGGED_BY(ch), GET_OBJ_VNUM(o), 1);
@@ -4191,9 +4193,9 @@ void fight_wait_run(char_data *ch, double speed) {
 * based on their speed. This runs much much more often than actual
 * hits.
 *
-* @param int pulse the current game pulse, for determining whose turn it is
+* @param unsigned long pulse the current game pulse, for determining whose turn it is
 */
-void frequent_combat(int pulse) {
+void frequent_combat(unsigned long pulse) {
 	char_data *ch, *vict;
 	double speed;
 	

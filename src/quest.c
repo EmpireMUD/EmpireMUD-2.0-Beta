@@ -687,6 +687,7 @@ void give_quest_rewards(char_data *ch, struct quest_reward *list, int reward_lev
 			case QR_BONUS_EXP: {
 				msg_to_char(ch, "\tyYou gain %d bonus experience point%s!\t0\r\n", reward->amount, PLURAL(reward->amount));
 				SAFE_ADD(GET_DAILY_BONUS_EXPERIENCE(ch), reward->amount, 0, UCHAR_MAX, FALSE);
+				update_MSDP_bonus_exp(ch, UPDATE_SOON);
 				break;
 			}
 			case QR_COINS: {

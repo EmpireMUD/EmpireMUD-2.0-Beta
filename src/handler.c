@@ -616,6 +616,8 @@ void affect_remove(char_data *ch, struct affected_type *af) {
 	affect_modify(ch, af->location, af->modifier, af->bitvector, FALSE);
 	LL_DELETE(ch->affected, af);
 	free(af);
+	
+	queue_delayed_update(ch, CDU_MSDP_AFFECTS);
 }
 
 
@@ -668,6 +670,8 @@ void affect_to_char_silent(char_data *ch, struct affected_type *af) {
 
 	affect_modify(ch, af->location, af->modifier, af->bitvector, TRUE);
 	affect_total(ch);
+	
+	queue_delayed_update(ch, CDU_MSDP_AFFECTS);
 }
 
 
@@ -859,6 +863,11 @@ void affect_total(char_data *ch) {
 	if (!IS_NPC(ch) && GET_GREATNESS(ch) != greatness && GET_LOYALTY(ch) && IN_ROOM(ch)) {
 		update_member_data(ch);
 		TRIGGER_DELAYED_REFRESH(GET_LOYALTY(ch), DELAY_REFRESH_GREATNESS);
+	}
+	
+	// delayed re-send of msdp affects
+	if (ch->desc) {
+		queue_delayed_update(ch, CDU_MSDP_AFFECTS);
 	}
 }
 
@@ -1054,6 +1063,8 @@ void apply_dot_effect(char_data *ch, any_vnum type, sh_int duration, sh_int dama
 		dot->stack = 1;
 		dot->max_stack = max_stack;
 	}
+	
+	queue_delayed_update(ch, CDU_MSDP_DOTS);
 }
 
 
@@ -1066,6 +1077,8 @@ void apply_dot_effect(char_data *ch, any_vnum type, sh_int duration, sh_int dama
 void dot_remove(char_data *ch, struct over_time_effect_type *dot) {
 	LL_DELETE(ch->over_time_effects, dot);
 	free(dot);
+	
+	queue_delayed_update(ch, CDU_MSDP_DOTS);
 }
 
 
@@ -1155,6 +1168,11 @@ void extract_char_final(char_data *ch) {
 	
 	// shut this off -- no need to total during an extract
 	pause_affect_total = TRUE;
+	
+	// update iterators
+	if (ch == global_next_char) {
+		global_next_char = global_next_char->next;
+	}
 	
 	check_dg_owner_purged_char(ch);
 
@@ -1305,6 +1323,11 @@ void extract_char_final(char_data *ch) {
 * @param char_data *ch The character to mark for extraction.
 */
 void extract_char(char_data *ch) {
+	// update iterators
+	if (ch == global_next_char) {
+		global_next_char = global_next_char->next;
+	}
+	
 	if (!EXTRACTED(ch)) {
 		check_dg_owner_purged_char(ch);
 		
@@ -2429,6 +2452,7 @@ int increase_coins(char_data *ch, empire_data *emp, int amount) {
 	
 	if (amount != 0) {
 		qt_change_coins(ch);
+		update_MSDP_money(ch, UPDATE_SOON);
 	}
 	
 	return value;
@@ -2573,6 +2597,10 @@ void add_cooldown(char_data *ch, any_vnum type, int seconds_duration) {
 		cool->expire_time = time(0) + seconds_duration;
 		LL_PREPEND(ch->cooldowns, cool);
 	}
+	
+	if (ch->desc) {
+		queue_delayed_update(ch, CDU_MSDP_COOLDOWNS);
+	}
 }
 
 
@@ -2607,6 +2635,10 @@ int get_cooldown_time(char_data *ch, any_vnum type) {
 void remove_cooldown(char_data *ch, struct cooldown_data *cool) {
 	LL_DELETE(ch->cooldowns, cool);
 	free(cool);
+	
+	if (ch->desc) {
+		queue_delayed_update(ch, CDU_MSDP_COOLDOWNS);
+	}
 }
 
 
@@ -2940,6 +2972,7 @@ void perform_abandon_room(room_data *room) {
 	}
 	
 	affect_total_room(room);
+	update_MSDP_empire_data_all(emp, TRUE, TRUE);
 }
 
 
@@ -3037,6 +3070,7 @@ void perform_claim_room(room_data *room, empire_data *emp) {
 	}
 	
 	add_dropped_item_list(emp, ROOM_CONTENTS(room));
+	update_MSDP_empire_data_all(emp, TRUE, TRUE);
 }
 
 
@@ -6245,8 +6279,10 @@ void equip_char(char_data *ch, obj_data *obj, int pos) {
 			}
 		}
 		
+		// TODO this seems like a huge error: why is it adding to is-carrying when equipping a container
 		if (IS_CONTAINER(obj)) {
 			IS_CARRYING_N(ch) += obj_carry_size(obj);
+			update_MSDP_inventory(ch, UPDATE_SOON);
 		}
 
 		if (wear_data[pos].count_stats) {
@@ -6281,6 +6317,7 @@ void obj_from_char(obj_data *object) {
 		object->next_content = object->prev_content = NULL;
 
 		IS_CARRYING_N(object->carried_by) -= obj_carry_size(object);
+		update_MSDP_inventory(object->carried_by, UPDATE_SOON);
 
 		// check lights
 		if (OBJ_FLAGGED(object, OBJ_LIGHT)) {
@@ -6317,9 +6354,11 @@ void obj_from_obj(obj_data *obj) {
 		GET_OBJ_CARRYING_N(obj_from) -= obj_carry_size(obj);
 		if (obj_from->carried_by) {
 			IS_CARRYING_N(obj_from->carried_by) -= obj_carry_size(obj);
+			update_MSDP_inventory(obj_from->carried_by, UPDATE_SOON);
 		}
 		if (obj_from->worn_by && IS_CONTAINER(obj_from)) {
 			IS_CARRYING_N(obj_from->worn_by) -= obj_carry_size(obj);
+			update_MSDP_inventory(obj_from->worn_by, UPDATE_SOON);
 		}
 
 		obj->in_obj = NULL;
@@ -6400,6 +6439,8 @@ void obj_to_char(obj_data *object, char_data *ch) {
 		DL_PREPEND2(ch->carrying, object, prev_content, next_content);
 		object->carried_by = ch;
 		IS_CARRYING_N(ch) += obj_carry_size(object);
+		
+		update_MSDP_inventory(ch, UPDATE_SOON);
 		
 		// binding
 		if (OBJ_FLAGGED(object, OBJ_BIND_ON_PICKUP)) {
@@ -6547,9 +6588,11 @@ void obj_to_obj(obj_data *obj, obj_data *obj_to) {
 		GET_OBJ_CARRYING_N(obj_to) += obj_carry_size(obj);
 		if (obj_to->carried_by) {
 			IS_CARRYING_N(obj_to->carried_by) += obj_carry_size(obj);
+			update_MSDP_inventory(obj_to->carried_by, UPDATE_SOON);
 		}
 		if (obj_to->worn_by && IS_CONTAINER(obj_to)) {
 			IS_CARRYING_N(obj_to->worn_by) += obj_carry_size(obj);
+			update_MSDP_inventory(obj_to->worn_by, UPDATE_SOON);
 		}
 		
 		// set the timer here; actual rules for it are in limits.c
@@ -6702,6 +6745,7 @@ obj_data *unequip_char(char_data *ch, int pos) {
 		
 		if (IS_CONTAINER(obj)) {
 			IS_CARRYING_N(ch) -= obj_carry_size(obj);
+			update_MSDP_inventory(ch, UPDATE_SOON);
 		}
 
 		// actual remove
