@@ -1530,13 +1530,14 @@ void check_newbie_islands(void) {
 *
 * @param struct map_data *map A map location.
 * @param int island The island id.
+* @param struct island_info *ptr Optional: Prevent having to look up the island pointer if it's already available. (NULL to detect here)
 */
-void number_island(struct map_data *map, int island) {
+void number_island(struct map_data *map, int island, struct island_info *isle_ptr) {
 	int x, y, new_x, new_y;
 	struct map_data *tile;
 	
 	map->shared->island_id = island;
-	map->shared->island_ptr = get_island(island, TRUE);
+	map->shared->island_ptr = isle_ptr ? isle_ptr : get_island(island, TRUE);
 	
 	// check neighboring tiles
 	for (x = -1; x <= 1; ++x) {
@@ -1581,7 +1582,7 @@ void number_and_count_islands(bool reset) {
 	struct island_read_data *data, *next_data, *list = NULL;
 	bool re_empire = (top_island_num != -1);
 	struct island_num_data_t *item;
-	struct island_info *isle;
+	struct island_info *isle, *use_isle;
 	room_data *room, *next_room, *maploc;
 	struct map_data *map;
 	int iter, use_id;
@@ -1607,10 +1608,14 @@ void number_and_count_islands(bool reset) {
 			}
 			
 			use_id = map->shared->island_id;
+			use_isle = map->shared->island_ptr;
 			push_island(map);
 			
 			while ((item = pop_island())) {
-				number_island(item->loc, use_id);
+				// sometimes it gains an island_id before it gets here
+				if (item->loc->shared->island_id <= 0) {
+					number_island(item->loc, use_id, use_isle);
+				}
 				free(item);
 			}
 		}
@@ -1620,10 +1625,11 @@ void number_and_count_islands(bool reset) {
 	for (map = land_map; map; map = map->next) {
 		if (map->shared->island_id == NO_ISLAND && !SECT_FLAGGED(map->sector_type, SECTF_NON_ISLAND)) {
 			use_id = ++top_island_num;
+			use_isle = get_island(use_id, TRUE);
 			push_island(map);
 			
 			while ((item = pop_island())) {
-				number_island(item->loc, use_id);
+				number_island(item->loc, use_id, use_isle);
 				free(item);
 			}
 		}
