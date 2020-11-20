@@ -4596,7 +4596,7 @@ void write_whole_binary_map_file(void) {
 	fseek(binary_map_fl, 0L, SEEK_SET);
 	
 	// binary map file is now open at the start: write header...
-	header.version = 1;
+	header.version = CURRENT_BINARY_MAP_VERSION;
 	header.width = MAP_WIDTH;
 	header.height = MAP_HEIGHT;
 	fwrite(&header, sizeof(struct map_file_header), 1, binary_map_fl);
@@ -4667,7 +4667,6 @@ void write_whole_binary_world_index(void) {
 void load_binary_map_file(void) {
 	int x, y, height, width;
 	struct map_file_header header;
-	map_file_data store;
 	long size;
 	bool eof = FALSE;
 	
@@ -4698,14 +4697,6 @@ void load_binary_map_file(void) {
 		}
 	}
 	
-	// determine file size
-	fseek(binary_map_fl, 0L, SEEK_END);
-	size = ftell(binary_map_fl);
-	rewind(binary_map_fl);
-	if ((size - sizeof(struct map_file_header)) % sizeof(map_file_data)) {
-		log("SYSERR: WARNING: binary map file may be corrupt");
-	}
-	
 	// load header
 	fread(&header, sizeof(struct map_file_header), 1, binary_map_fl);
 	if (feof(binary_map_fl)) {
@@ -4727,10 +4718,15 @@ void load_binary_map_file(void) {
 		
 		for (x = 0; x < width && !eof; ++x) {
 			switch (header.version) {
-				/* example backwards-compatible case:
+				/* notes on adding backwards-compatibility here:
+				*  - create a new map_file_data_v# struct and new store_to_map_v# function
+				*  - update #define store_to_map to use your new one
+				*  - update the map_file_data typedef to use your new one
+				*  - use this example to allow the game to load the last version:
+				* example:
 				case 1: {
-					map_file_data_v1 store;
-					fread(&store, sizeof(map_file_data_v1), 1, binary_map_fl);
+					struct map_file_data_v1 store;
+					fread(&store, sizeof(struct map_file_data_v1), 1, binary_map_fl);
 					if (feof(binary_map_fl)) {
 						eof = TRUE;
 						break;
@@ -4743,8 +4739,9 @@ void load_binary_map_file(void) {
 					break;
 				}
 				*/
-				case 1:	// current version
+				case CURRENT_BINARY_MAP_VERSION:
 				default: {
+					map_file_data store;
 					fread(&store, sizeof(map_file_data), 1, binary_map_fl);
 					if (feof(binary_map_fl)) {
 						eof = TRUE;
@@ -4835,7 +4832,10 @@ void load_one_room_from_wld_file(room_vnum vnum, char index_data) {
 						if (map) {
 							GET_MAP_LOC(room) = map;
 							SHARED_DATA(room) = map->shared;
-							GET_MAP_LOC(room)->room = room;
+							map->room = room;
+							SECT(room) = map->sector_type;
+							BASE_SECT(room) = map->base_sector;
+							ROOM_CROP(room) = map->crop_type;
 						}
 						else {
 							CREATE(SHARED_DATA(room), struct shared_room_data, 1);
@@ -5222,12 +5222,15 @@ void load_world_from_binary_index(void) {
 
 
 /**
-* Applies a loaded map_file_data struct to a map tile in-game.
+* Applies a loaded map_file_data struct to a map tile in-game. Copy this
+* function when you need to make changes to map_file_data, but keep the v1
+* structure and function so your EmpireMUD can still load your existing binary
+* map file.
 *
-* @param map_file_data *store The data loaded from file.
+* @param struct map_file_data_v1 *store The data loaded from file.
 * @param struct map_data *map The tile to apply to.
 */
-void store_to_map_v1(map_file_data *store, struct map_data *map) {
+void store_to_map_v1(struct map_file_data_v1 *store, struct map_data *map) {
 	map->shared->island_id = store->island_id;
 	map->shared->island_ptr = (store->island_id == NO_ISLAND) ? NULL : get_island(store->island_id, TRUE);
 	

@@ -3824,6 +3824,7 @@ struct map_file_header {
 
 // fixed-sized version of the map data for writing to binary files
 // WARNING: you cannot change the size of this struct without corrupting the binary_map file
+// to add to this struct, add a new version and leave this one so your game can still load your existing world file
 struct map_file_data_v1 {
 	int island_id;	// from shared data
 		
@@ -3839,9 +3840,6 @@ struct map_file_data_v1 {
 	
 	int misc;	// used by the evolver
 };
-
-
-typedef struct map_file_data_v1  map_file_data;	// for when version number changes
 
 
  //////////////////////////////////////////////////////////////////////////////

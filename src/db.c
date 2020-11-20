@@ -1610,7 +1610,7 @@ void number_and_count_islands(bool reset) {
 	if (!reset) {
 		pathfind_key = get_pathfind_key();
 		for (map = land_map; map; map = map->next) {
-			if (map->shared->island_id == NO_ISLAND) {
+			if (map->shared->island_id == NO_ISLAND || map->shared->island_id == 0) {
 				continue;
 			}
 			

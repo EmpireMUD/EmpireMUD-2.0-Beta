@@ -10,6 +10,12 @@
 *  CircleMUD is based on DikuMUD, Copyright (C) 1990, 1991.               *
 ************************************************************************ */
 
+// versioning for the binary map file to allow updates and still be backwards-compatible
+#define CURRENT_BINARY_MAP_VERSION  1	// used in write_whole_binary_map_file()
+typedef struct map_file_data_v1  map_file_data;	// the current version of the structure, for map_to_store()
+#define store_to_map  store_to_map_v1	// used in load_binary_map_file()
+
+
 // DB_BOOT_x: arbitrary constants used by index_boot() (must be unique) -- these correspond to an array in discrete_load() too
 #define DB_BOOT_WLD  0	// not used as of b5.116, except to convert old copies
 #define DB_BOOT_MOB  1
@@ -920,8 +926,7 @@ void write_whole_binary_map_file();
 void write_whole_binary_world_index();
 
 // binary map readers
-void store_to_map_v1(map_file_data *store, struct map_data *map);
-#define store_to_map  store_to_map_v1	// which unstore function is current
+void store_to_map_v1(struct map_file_data_v1 *store, struct map_data *map);
 
 
 // misc
