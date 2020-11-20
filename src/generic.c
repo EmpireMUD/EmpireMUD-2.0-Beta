@@ -1074,12 +1074,16 @@ void olc_delete_generic(char_data *ch, any_vnum vnum) {
 		}
 		
 		if (GET_BUILT_WITH(room)) {
-			remove_thing_from_resource_list(&GET_BUILT_WITH(room), res_type, vnum);
+			if (remove_thing_from_resource_list(&GET_BUILT_WITH(room), res_type, vnum)) {
+				request_world_save(GET_ROOM_VNUM(room), WSAVE_ROOM);
+			}
 		}
-		if (GET_BUILDING_RESOURCES(room)) {
-			remove_thing_from_resource_list(&GET_BUILDING_RESOURCES(room), res_type, vnum);
+		if (BUILDING_RESOURCES(room)) {
+			if (remove_thing_from_resource_list(&GET_BUILDING_RESOURCES(room), res_type, vnum)) {
+				request_world_save(GET_ROOM_VNUM(room), WSAVE_ROOM);
+			}
 			
-			if (!GET_BUILDING_RESOURCES(room)) {
+			if (!BUILDING_RESOURCES(room)) {
 				// removing this resource finished the building
 				if (IS_DISMANTLING(room)) {
 					disassociate_building(room);

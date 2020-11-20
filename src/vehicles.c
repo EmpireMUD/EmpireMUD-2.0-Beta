@@ -476,7 +476,7 @@ void finish_dismantle_vehicle(char_data *ch, vehicle_data *veh) {
 				cancel_action(iter);
 			}
 			else if (IS_NPC(iter) && GET_MOB_VNUM(iter) == chore_data[CHORE_BUILDING].mob) {
-				SET_BIT(MOB_FLAGS(iter), MOB_SPAWNED);
+				set_mob_flags(iter, MOB_SPAWNED);
 			}
 		}
 	}
@@ -1176,13 +1176,16 @@ void update_vehicle_island_and_loc(vehicle_data *veh, room_data *loc) {
 	}
 	
 	LL_FOREACH(VEH_ROOM_LIST(veh), vrl) {
-		GET_ISLAND_ID(vrl->room) = GET_ISLAND_ID(loc);
-		GET_ISLAND(vrl->room) = GET_ISLAND(loc);
-		GET_MAP_LOC(vrl->room) = GET_MAP_LOC(loc);
+		if (GET_ISLAND_ID(vrl->room) != GET_ISLAND_ID(loc)) {
+			GET_ISLAND_ID(vrl->room) = GET_ISLAND_ID(loc);
+			GET_ISLAND(vrl->room) = GET_ISLAND(loc);
+			GET_MAP_LOC(vrl->room) = GET_MAP_LOC(loc);
+			request_world_save(GET_ROOM_VNUM(vrl->room), WSAVE_ROOM);
 		
-		// check vehicles inside and cascade
-		DL_FOREACH2(ROOM_VEHICLES(vrl->room), iter, next_in_room) {
-			update_vehicle_island_and_loc(iter, loc);
+			// check vehicles inside and cascade
+			DL_FOREACH2(ROOM_VEHICLES(vrl->room), iter, next_in_room) {
+				update_vehicle_island_and_loc(iter, loc);
+			}
 		}
 	}
 }

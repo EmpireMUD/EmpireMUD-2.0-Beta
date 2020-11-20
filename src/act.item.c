@@ -6638,10 +6638,9 @@ ACMD(do_roadsign) {
 	}
 	else {
 		if (ROOM_CUSTOM_DESCRIPTION(IN_ROOM(ch))) {
-			free(ROOM_CUSTOM_DESCRIPTION(IN_ROOM(ch)));
 			old_sign = TRUE;
 		}
-		ROOM_CUSTOM_DESCRIPTION(IN_ROOM(ch)) = str_dup(argument);
+		change_room_custom_description(IN_ROOM(ch), argument);
 
 		act("You engrave your message and plant $p in the ground by the road.", FALSE, ch, sign, NULL, TO_CHAR);
 		act("$n engraves a message on $p and plants it in the ground by the road.", FALSE, ch, sign, NULL, TO_ROOM);

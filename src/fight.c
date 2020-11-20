@@ -2623,7 +2623,7 @@ void besiege_room(char_data *attacker, room_data *to_room, int damage, vehicle_d
 	}
 	
 	if (IS_MAP_BUILDING(to_room)) {
-		COMPLEX_DATA(to_room)->damage += damage;
+		set_room_damage(to_room, BUILDING_DAMAGE(to_room) + damage);
 		
 		// maximum damage
 		max_dam = GET_BLD_MAX_DAMAGE(building_proto(BUILDING_VNUM(to_room)));

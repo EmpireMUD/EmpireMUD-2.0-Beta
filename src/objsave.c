@@ -821,17 +821,34 @@ void loaded_obj_to_char(obj_data *obj, char_data *ch, int location, obj_data ***
 * update commands don't support loading objects other than prototypes.
 *
 * @param room_data *room The world location whose objects we are saving.
+* @return bool TRUE if it saved a pack, FALSE if it did not.
 */
 bool objpack_save_room(room_data *room) {
 	char filename[MAX_INPUT_LENGTH], tempname[MAX_INPUT_LENGTH];
 	FILE *fp;
-
-	if (!ROOM_CONTENTS(room) && !ROOM_VEHICLES(room)) {
+	
+	if (!room) {
+		return FALSE;	// shortcut out
+	}
+	
+	get_world_filename(filename, GET_ROOM_VNUM(room), SUF_PACK);
+	
+	if (!ROOM_NEEDS_PACK_SAVE(room)) {
+		if (IS_SET(room->save_info, SAVE_INFO_PACK_SAVED)) {
+			REMOVE_BIT(room->save_info, SAVE_INFO_PACK_SAVED);
+			request_world_save(GET_ROOM_VNUM(room), WSAVE_ROOM);
+		}
+		
+		if (!block_all_saves_due_to_shutdown && access(filename, F_OK) == 0) {
+			unlink(filename);
+		}
+		
 		return FALSE;
 	}
-
-	// TODO split into dirs?
-	sprintf(filename, "%s%d.%s", LIB_OBJPACK, GET_ROOM_VNUM(room), SUF_PACK);
+	
+	// otherwise save the pack file
+	
+	// temp file
 	strcpy(tempname, filename);
 	strcat(tempname, TEMP_SUFFIX);
 
@@ -846,6 +863,11 @@ bool objpack_save_room(room_data *room) {
 
 	fclose(fp);
 	rename(tempname, filename);
+	
+	if (!IS_SET(room->save_info, SAVE_INFO_PACK_SAVED)) {
+		SET_BIT(room->save_info, SAVE_INFO_PACK_SAVED);
+		request_world_save(GET_ROOM_VNUM(room), WSAVE_ROOM);
+	}
 
 	return TRUE;
 }
@@ -855,8 +877,9 @@ bool objpack_save_room(room_data *room) {
 * Loads an object pack for a room. This is done at startup.
 *
 * @param room_data *room The room.
+* @param bool use_pre_b5_116_dir If TRUE, loads from the old 'packs' directory
 */
-void objpack_load_room(room_data *room) {
+void objpack_load_room(room_data *room, bool use_pre_b5_116_dir) {
 	obj_data *obj, *o, *next_o, *cont_row[MAX_BAG_ROWS];
 	char fname[MAX_STRING_LENGTH], line[MAX_INPUT_LENGTH];
 	int iter, location;
@@ -869,8 +892,15 @@ void objpack_load_room(room_data *room) {
 	for (iter = 0; iter < MAX_BAG_ROWS; iter++) {
 		cont_row[iter] = NULL;
 	}
-
-	sprintf(fname, "%s%d.%s", LIB_OBJPACK, GET_ROOM_VNUM(room), SUF_PACK);
+	
+	// determine file location based on version
+	if (use_pre_b5_116_dir) {
+		// only for backwards-compatibility
+		sprintf(fname, "%s%d%s", LIB_OBJPACK, GET_ROOM_VNUM(room), SUF_PACK);
+	}
+	else {
+		get_world_filename(fname, GET_ROOM_VNUM(room), SUF_PACK);
+	}
 
 	if (!(fl = fopen(fname, "r"))) {
 		if (errno != ENOENT) {
@@ -991,6 +1021,13 @@ void objpack_load_room(room_data *room) {
 	}
 
 	fclose(fl);
+	
+	if (use_pre_b5_116_dir) {
+		// if up-converting, delete the old file
+		if (access(fname, F_OK) == 0) {
+			unlink(fname);
+		}
+	}
 }
 
 

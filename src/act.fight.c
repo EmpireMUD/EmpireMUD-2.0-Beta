@@ -713,6 +713,7 @@ ACMD(do_tie) {
 			act("You receive $p.", FALSE, ch, rope, NULL, TO_CHAR);
 		}
 		GET_ROPE_VNUM(victim) = NOTHING;
+		mark_mob_for_room_save(victim);
 	}
 	else if (GET_POS(victim) >= POS_SLEEPING)
 		act("You need to knock $M out first.", FALSE, ch, 0, victim, TO_CHAR);
@@ -730,6 +731,7 @@ ACMD(do_tie) {
 		}
 		GET_ROPE_VNUM(victim) = GET_OBJ_VNUM(rope);
 		extract_obj(rope);
+		mark_mob_for_room_save(victim);
 	}
 }
 

@@ -1458,7 +1458,7 @@ ACMD(do_dispatch) {
 		}
 		
 		// ensure a despawn
-		SET_BIT(MOB_FLAGS(worker), MOB_SPAWNED);
+		set_mob_flags(worker, MOB_SPAWNED);
 		
 		// create shipment
 		CREATE(shipd, struct shipping_data, 1);

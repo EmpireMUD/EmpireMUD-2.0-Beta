@@ -372,6 +372,8 @@ void do_dg_build(room_data *target, char *argument) {
 			COMPLEX_DATA(target)->entrance = rev_dir[dir];
 		}
 	}
+	
+	request_world_save(GET_ROOM_VNUM(target), WSAVE_ROOM);
 }
 
 
@@ -394,6 +396,7 @@ void do_dg_own(empire_data *emp, char_data *vict, obj_data *obj, room_data *room
 		}
 		GET_LOYALTY(vict) = emp;
 		setup_generic_npc(vict, emp, MOB_DYNAMIC_NAME(vict), MOB_DYNAMIC_SEX(vict));
+		mark_mob_for_room_save(vict);
 	}
 	if (obj) {
 		obj->last_empire_id = emp ? EMPIRE_VNUM(emp) : NOTHING;
@@ -1287,24 +1290,15 @@ void script_modify(char *argument) {
 				script_log("%%mod%% called with invalid room icon '%s'", value);
 			}
 			else {
-				if (ROOM_CUSTOM_ICON(room)) {
-					free(ROOM_CUSTOM_ICON(room));
-				}
-				ROOM_CUSTOM_ICON(room) = (clear || !str_cmp(value, "none")) ? NULL : str_dup(value);
+				change_room_custom_icon(room, (clear || !str_cmp(value, "none")) ? NULL : value);
 			}
 		}
 		else if (is_abbrev(field_arg, "name") || is_abbrev(field_arg, "title")) {
-			if (ROOM_CUSTOM_NAME(room)) {
-				free(ROOM_CUSTOM_NAME(room));
-			}
-			ROOM_CUSTOM_NAME(room) = clear ? NULL : str_dup(value);
+			change_room_custom_name(room, (clear || !str_cmp(value, "none")) ? NULL : value);
 		}
 		else if (is_abbrev(field_arg, "description")) {	// SETS the description
-			if (ROOM_CUSTOM_DESCRIPTION(room)) {
-				free(ROOM_CUSTOM_DESCRIPTION(room));
-			}
 			strcat(value, "\r\n");
-			ROOM_CUSTOM_DESCRIPTION(room) = clear ? NULL : str_dup(value);
+			change_room_custom_description(room, (clear ? NULL : value));
 			if (ROOM_CUSTOM_DESCRIPTION(room)) {
 				format_text(&ROOM_CUSTOM_DESCRIPTION(room), (strlen(ROOM_CUSTOM_DESCRIPTION(room)) > 80 ? FORMAT_INDENT : 0), NULL, MAX_STRING_LENGTH);
 			}
@@ -1315,10 +1309,7 @@ void script_modify(char *argument) {
 			}
 			else {
 				snprintf(temp, sizeof(temp), "%s%s\r\n", ROOM_CUSTOM_DESCRIPTION(room) ? ROOM_CUSTOM_DESCRIPTION(room) : get_room_description(room), value);
-				if (ROOM_CUSTOM_DESCRIPTION(room)) {
-					free(ROOM_CUSTOM_DESCRIPTION(room));
-				}
-				ROOM_CUSTOM_DESCRIPTION(room) = str_dup(temp);
+				change_room_custom_description(room, temp);
 				format_text(&ROOM_CUSTOM_DESCRIPTION(room), (strlen(ROOM_CUSTOM_DESCRIPTION(room)) > 80 ? FORMAT_INDENT : 0), NULL, MAX_STRING_LENGTH);
 			}
 		}
@@ -1328,10 +1319,7 @@ void script_modify(char *argument) {
 			}
 			else {
 				snprintf(temp, sizeof(temp), "%s%s\r\n", ROOM_CUSTOM_DESCRIPTION(room) ? ROOM_CUSTOM_DESCRIPTION(room) : get_room_description(room), value);
-				if (ROOM_CUSTOM_DESCRIPTION(room)) {
-					free(ROOM_CUSTOM_DESCRIPTION(room));
-				}
-				ROOM_CUSTOM_DESCRIPTION(room) = str_dup(temp);
+				change_room_custom_description(room, temp);
 			}
 		}
 		else {

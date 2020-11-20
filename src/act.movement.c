@@ -115,6 +115,8 @@ void add_tracks(char_data *ch, room_data *room, byte dir, room_data *to_room) {
 			track->timestamp = time(0);
 			track->dir = dir;
 			track->to_room = to_room ? GET_ROOM_VNUM(to_room) : NOWHERE;
+			
+			request_world_save(GET_ROOM_VNUM(room), WSAVE_ROOM);
 		}
 	}
 }

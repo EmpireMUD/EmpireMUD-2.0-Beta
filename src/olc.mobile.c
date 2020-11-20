@@ -1067,6 +1067,7 @@ void save_olc_mobile(descriptor_data *desc) {
 			// attach new scripts
 			mob_iter->proto_script = copy_trig_protos(mob->proto_script);
 			assign_triggers(mob_iter, MOB_TRIGGER);
+			mark_mob_for_room_save(mob_iter);
 		}
 	}
 	

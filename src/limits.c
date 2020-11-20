@@ -927,6 +927,11 @@ void real_update_char(char_data *ch) {
 	if (ch->desc && IS_DEAD(ch) && get_cooldown_time(ch, COOLDOWN_DEATH_RESPAWN) == 0) {
 		do_respawn(ch, "", 0, 0);
 	}
+	
+	// for mobs that need a save: request it
+	if (MOB_SAVES_TO_ROOM(ch) && MOB_MARKED_FOR_SAVE(ch) && (time(0) - MOB_MARKED_FOR_SAVE(ch)) >= (5 * SECS_PER_REAL_MIN)) {
+		request_world_save(GET_ROOM_VNUM(IN_ROOM(ch)), WSAVE_ROOM);
+	}
 }
 
 

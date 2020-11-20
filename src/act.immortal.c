@@ -2791,7 +2791,7 @@ int perform_set(char_data *ch, char_data *vict, int mode, char *val_arg) {
 		value = MAX(GET_MIN_SCALE_LEVEL(vict), value);
 		value = MIN(GET_MAX_SCALE_LEVEL(vict), value);
 		scale_mob_to_level(vict, value);
-		SET_BIT(MOB_FLAGS(vict), MOB_NO_RESCALE);
+		set_mob_flags(vict, MOB_NO_RESCALE);
 	}
 	
 	// this goes last, after all SET_CASE statements
@@ -8457,7 +8457,9 @@ ACMD(do_fullsave) {
 	syslog(SYS_INFO, 0, FALSE, "Updating zone files...");
 	
 	time = microtime();
-	write_world_to_files();
+	write_whole_binary_map_file();
+	write_whole_binary_world_index();
+	write_all_wld_files();
 	send_config_msg(ch, "ok_string");
 	
 	if (ch->desc) {
@@ -9451,7 +9453,7 @@ ACMD(do_rescale) {
 		}
 		else {
 			scale_mob_to_level(vict, level);
-			SET_BIT(MOB_FLAGS(vict), MOB_NO_RESCALE);
+			set_mob_flags(vict, MOB_NO_RESCALE);
 			
 			syslog(SYS_GC, GET_ACCESS_LEVEL(ch), TRUE, "ABUSE: %s has rescaled mob %s to level %d at %s", GET_NAME(ch), PERS(vict, vict, FALSE), GET_CURRENT_SCALE_LEVEL(vict), room_log_identifier(IN_ROOM(vict)));
 			

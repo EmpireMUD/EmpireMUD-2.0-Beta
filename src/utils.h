@@ -786,6 +786,7 @@ int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_COORD(ge
 #define WRAP_X_COORD(x)  (WRAP_X ? (((x) < 0) ? ((x) + MAP_WIDTH) : (((x) >= MAP_WIDTH) ? ((x) - MAP_WIDTH) : (x))) : MAX(0, MIN(MAP_WIDTH-1, (x))))
 #define WRAP_Y_COORD(y)  (WRAP_Y ? (((y) < 0) ? ((y) + MAP_HEIGHT) : (((y) >= MAP_HEIGHT) ? ((y) - MAP_HEIGHT) : (y))) : MAX(0, MIN(MAP_HEIGHT-1, (y))))
 
+#define HAS_SHARED_DATA_TO_SAVE(map)  ((map)->shared->icon || (map)->shared->name || (map)->shared->description || (map)->shared->depletion || (map)->shared->tracks || (map)->shared->extra_data)
 #define request_mapout_update(vnum)  add_vnum_hash(&mapout_update_requests, (vnum), 1)
 
 
@@ -827,6 +828,7 @@ int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_COORD(ge
 #define MOB_DYNAMIC_SEX(ch)  ((ch)->mob_specials.dynamic_sex)
 #define MOB_FACTION(ch)  ((ch)->mob_specials.faction)
 #define MOB_INSTANCE_ID(ch)  ((ch)->mob_specials.instance_id)
+#define MOB_MARKED_FOR_SAVE(ch)  ((ch)->mob_specials.marked_for_save)
 #define MOB_MOVE_TYPE(ch)  ((ch)->mob_specials.move_type)
 #define MOB_PURSUIT(ch)  ((ch)->mob_specials.pursuit)
 #define MOB_PURSUIT_LEASH_LOC(ch)  ((ch)->mob_specials.pursuit_leash_loc)
@@ -841,6 +843,7 @@ int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_COORD(ge
 #define IS_MOB(ch)  (IS_NPC(ch) && GET_MOB_VNUM(ch) != NOTHING)
 #define IS_TAGGED_BY(mob, player)  (IS_NPC(mob) && !IS_NPC(player) && find_id_in_tag_list(GET_IDNUM(player), MOB_TAGGED_BY(mob)))
 #define MOB_FLAGGED(ch, flag)  (IS_NPC(ch) && IS_SET(MOB_FLAGS(ch), (flag)))
+#define MOB_SAVES_TO_ROOM(mob)  (IS_NPC(mob) && GET_MOB_VNUM(mob) != NOTHING && !MOB_FLAGGED((mob), MOB_EMPIRE) && !GET_COMPANION(mob))
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -1377,6 +1380,7 @@ int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_COORD(ge
 #define ROOM_CAN_MINE(room)  (ROOM_SECT_FLAGGED((room), SECTF_CAN_MINE) || room_has_function_and_city_ok(ROOM_OWNER(room), (room), FNC_MINE) || (IS_ROAD(room) && SECT_FLAGGED(BASE_SECT(room), SECTF_CAN_MINE)))
 #define ROOM_IS_CLOSED(room)  (IS_INSIDE(room) || IS_ADVENTURE_ROOM(room) || (IS_ANY_BUILDING(room) && !ROOM_BLD_FLAGGED(room, BLD_OPEN) && (IS_COMPLETE(room) || ROOM_BLD_FLAGGED(room, BLD_CLOSED))))
 #define ROOM_IS_UPGRADED(room)  ((IS_COMPLETE(room) && HAS_FUNCTION((room), FNC_UPGRADED)) || (IS_COMPLETE(HOME_ROOM(room)) && HAS_FUNCTION(HOME_ROOM(room), FNC_UPGRADED)) || (GET_ROOM_VEHICLE(room) && IS_SET(VEH_FUNCTIONS(GET_ROOM_VEHICLE(room)), FNC_UPGRADED)))
+#define ROOM_NEEDS_PACK_SAVE(room)  (ROOM_CONTENTS(room) || ROOM_VEHICLES(room))
 #define SHOW_PEOPLE_IN_ROOM(room)  (!ROOM_IS_CLOSED(room) && !ROOM_SECT_FLAGGED(room, SECTF_OBSCURE_VISION))
 
 // interaction checks (by type)
@@ -1654,8 +1658,10 @@ extern struct weather_data weather_info;	// db.c
 #define log  basic_mud_log
 
 // string/vnum hash tools from utils.c
+void add_pair_hash(struct pair_hash **hash, int id, int value);
 void add_string_hash(struct string_hash **hash, const char *string, int count);
 void add_vnum_hash(struct vnum_hash **hash, any_vnum vnum, int count);
+void free_pair_hash(struct pair_hash **hash);
 void free_string_hash(struct string_hash **hash);
 void free_vnum_hash(struct vnum_hash **hash);
 int sort_string_hash(struct string_hash *a, struct string_hash *b);

@@ -243,6 +243,9 @@ void assign_triggers(void *i, int type) {
 				trg_proto = trg_proto->next;
 			}
 			reread_companion_trigs(mob);
+			if (IN_ROOM(mob)) {
+				request_world_save(GET_ROOM_VNUM(IN_ROOM(mob)), WSAVE_ROOM);
+			}
 			break;
 		case OBJ_TRIGGER:
 			obj = (obj_data*)i;
@@ -259,6 +262,9 @@ void assign_triggers(void *i, int type) {
 					add_trigger(SCRIPT(obj), read_trigger(trg_proto->vnum), -1);
 				}
 				trg_proto = trg_proto->next;
+			}
+			if ((room = find_room_obj_saves_in(obj))) {
+				request_world_save(GET_ROOM_VNUM(IN_ROOM(mob)), WSAVE_OBJS_AND_VEHS);
 			}
 			break;
 		case WLD_TRIGGER:
@@ -281,6 +287,7 @@ void assign_triggers(void *i, int type) {
 				}
 				trg_proto = trg_proto->next;
 			}
+			request_world_save(GET_ROOM_VNUM(room), WSAVE_ROOM);
 			break;
 		case VEH_TRIGGER: {
 			veh = (vehicle_data*)i;
@@ -297,6 +304,9 @@ void assign_triggers(void *i, int type) {
 					add_trigger(SCRIPT(veh), read_trigger(trg_proto->vnum), -1);
 				}
 				trg_proto = trg_proto->next;
+			}
+			if (IN_ROOM(veh)) {
+				request_world_save(GET_ROOM_VNUM(IN_ROOM(veh)), WSAVE_OBJS_AND_VEHS);
 			}
 			break;
 		}

@@ -490,8 +490,9 @@ OCMD(do_orestore) {
 		if (COMPLEX_DATA(room)) {
 			free_resource_list(GET_BUILDING_RESOURCES(room));
 			GET_BUILDING_RESOURCES(room) = NULL;
-			COMPLEX_DATA(room)->damage = 0;
-			COMPLEX_DATA(room)->burn_down_time = 0;
+			set_room_damage(room, 0);
+			set_burn_down_time(room, 0, FALSE);
+			request_world_save(GET_ROOM_VNUM(room), WSAVE_ROOM);
 		}
 	}
 }
@@ -1183,7 +1184,7 @@ OCMD(do_oload) {
 		if (target && *target && isdigit(*target)) {
 			// target is scale level
 			scale_mob_to_level(mob, atoi(target));
-			SET_BIT(MOB_FLAGS(mob), MOB_NO_RESCALE);
+			set_mob_flags(mob, MOB_NO_RESCALE);
 		}
 		
 		load_mtrigger(mob);
@@ -1676,7 +1677,7 @@ OCMD(do_oscale) {
 		}
 
 		scale_mob_to_level(victim, level);
-		SET_BIT(MOB_FLAGS(victim), MOB_NO_RESCALE);
+		set_mob_flags(victim, MOB_NO_RESCALE);
 	}
 	// scale vehicle
 	else if ((veh = get_vehicle_by_obj(obj, arg))) {

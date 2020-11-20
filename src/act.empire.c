@@ -4639,6 +4639,7 @@ ACMD(do_enroll) {
 			DL_FOREACH(character_list, mob) {
 				if (GET_LOYALTY(mob) == old) {
 					GET_LOYALTY(mob) = e;
+					mark_mob_for_room_save(mob);
 				}
 			}
 			
@@ -5327,7 +5328,7 @@ ACMD(do_home) {
 				}
 			}
 			
-			COMPLEX_DATA(real)->private_owner = GET_IDNUM(ch);
+			change_private_owner(real, GET_IDNUM(ch));
 
 			// interior only
 			DL_FOREACH_SAFE2(interior_room_list, iter, next_iter, next_interior) {

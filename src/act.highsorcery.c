@@ -1099,7 +1099,7 @@ ACMD(do_mirrorimage) {
 	mob->real_attributes[WITS] = GET_WITS(ch);
 
 	SET_BIT(AFF_FLAGS(mob), AFF_CHARM);
-	SET_BIT(MOB_FLAGS(mob), MOB_NO_RESCALE);
+	set_mob_flags(mob, MOB_NO_RESCALE);
 	affect_total(mob);
 	
 	act("You create a mirror image to distract your foes!", FALSE, ch, NULL, NULL, TO_CHAR);

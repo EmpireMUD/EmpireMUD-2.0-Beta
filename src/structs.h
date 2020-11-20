@@ -55,6 +55,7 @@
 *     Book Structs
 *     Building Structs
 *     Class Structs
+*     Map Structs
 *     Mobile Structs
 *     Player Structs
 *     Character Structs
@@ -2776,6 +2777,10 @@ typedef enum {
 #define ROOM_EXTRA_SECTOR_TIME  21	// when it became this sector type (for types with a timed evo)
 
 
+// SAVE_INFO_x: flags related to saving (this is a ubyte: only holds 8 bits)
+#define SAVE_INFO_PACK_SAVED  BIT(0)	// indicates an obj/veh pack is already saved
+
+
  //////////////////////////////////////////////////////////////////////////////
 //// MAXIMA AND LIMITS ///////////////////////////////////////////////////////
 
@@ -3174,6 +3179,14 @@ struct offer_data {
 	time_t time;	// when the offer happened
 	int data;	// misc data
 	struct offer_data *next;
+};
+
+
+// simple structure for passing around a hash of number pairs { id, value }
+struct pair_hash {
+	int id;
+	int value;
+	UT_hash_handle hh;
 };
 
 
@@ -3798,6 +3811,40 @@ struct class_ability {
 
 
  //////////////////////////////////////////////////////////////////////////////
+//// MAP STRUCTS /////////////////////////////////////////////////////////////
+
+// header data for the binary map file
+// WARNING: you cannot change the size of this struct without corrupting the binary_map file
+struct map_file_header {
+	int version;	// for versioning the map file to support changes to structure
+	int width;	// tiles wide
+	int height;	// tiles tall
+};
+
+
+// fixed-sized version of the map data for writing to binary files
+// WARNING: you cannot change the size of this struct without corrupting the binary_map file
+struct map_file_data_v1 {
+	int island_id;	// from shared data
+		
+	any_vnum sector_type;	// from map data
+	any_vnum base_sector;
+	any_vnum natural_sector;
+	any_vnum crop_type;
+	
+	bitvector_t affects;	// from shared data
+	bitvector_t base_affects;
+	int height;
+	long sector_time;
+	
+	int misc;	// used by the evolver
+};
+
+
+typedef struct map_file_data_v1  map_file_data;	// for when version number changes
+
+
+ //////////////////////////////////////////////////////////////////////////////
 //// MOBILE STRUCTS //////////////////////////////////////////////////////////
 
 
@@ -3824,6 +3871,8 @@ struct mob_special_data {
 
 	time_t spawn_time;	// used for despawning
 	any_vnum instance_id;	// instance the mob belongs to, or NOTHING if none
+	
+	time_t marked_for_save;	// if non-zero, guarantees the mob will be saved within ~5 minutes
 	
 	// for #n-named mobs
 	int dynamic_sex;
@@ -4035,6 +4084,7 @@ struct descriptor_data {
 	int mail_to;	// name for mail system
 	int notes_id;	// idnum of player for notes-editing
 	int island_desc_id;	// editing an island desc
+	room_vnum save_room_id;	// editing a room desc
 	any_vnum save_empire;	// for the text editor to know which empire to save
 	struct config_type *save_config;	// saves the config file when done editing text
 	bool allow_null;	// string editor can be empty/null
@@ -5869,8 +5919,9 @@ struct room_data {
 	char_data *people;  // start of people doubly-linked list (ch->next_in_room, prev_in_room)
 	vehicle_data *vehicles;	// start of doubly-linked vehicle list (veh->next_in_room, prev_in_room)
 	
-	struct reset_com *reset_commands;	// used only during startup
+	struct reset_com *reset_commands;	// doubly-linked list used only during startup
 	struct dg_event *unload_event;	// used for un-loading of live rooms
+	ubyte save_info;	// SAVE_INFO_ flags
 	
 	UT_hash_handle hh;	// hash handle for world_table
 	room_data *prev_interior, *next_interior;	// doubly linked list: interior_room_list
@@ -5902,14 +5953,19 @@ struct complex_room_data {
 	int private_owner;	// for privately-owned houses
 	
 	time_t burn_down_time;	// if >0, the timestamp when this building will burn down
-							// NOTE: burn_down_time could be moved to extra data if you
-							// needed its spot in the .wld file.
 	
 	double damage;  // for catapulting
 };
 
 
 // data that could be from the map tile (for map rooms) or local (non-map rooms)
+// NOTE: if you add something here where the default is not 0, add to init_map() too
+// NOTE: if you add anything here, it MUST also be added to:
+//			- if it's flat data (int, etc), create a new map_to_store function and write a converter to update the binary map file, and update write_whole_binary_map_file() to write a new version number
+//			- if it's variable data (lists, strings), add to these 3 places:
+//				- HAS_SHARED_DATA_TO_SAVE() macro
+//				- write_map_and_room_to_file() for saving it (in the shared section)
+//				- load_one_room_from_wld_file() for loading it
 struct shared_room_data {
 	int island_id;	// the island id (may be NO_ISLAND)
 	struct island_info *island_ptr;	// pointer to the island (may be NULL)
@@ -5964,14 +6020,14 @@ struct island_info {
 struct reset_com {
 	char command;	// current command
 
-	int arg1;
-	int arg2;	// Arguments to the command
-	int arg3;
+	long long arg1;
+	long long arg2;	// Arguments to the command
+	long long arg3;
 
 	char *sarg1;	// string argument
 	char *sarg2;	// string argument
 	
-	struct reset_com *next;
+	struct reset_com *prev, *next;	// DLL
 };
 
 

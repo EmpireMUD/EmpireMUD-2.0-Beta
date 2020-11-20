@@ -1658,6 +1658,7 @@ void do_gen_craft_building(char_data *ch, craft_data *type, int dir) {
 	
 	// do a build action now
 	process_build(ch, IN_ROOM(ch), ACT_BUILDING);
+	request_world_save(GET_ROOM_VNUM(IN_ROOM(ch)), WSAVE_ROOM);
 }
 
 

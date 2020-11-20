@@ -1050,7 +1050,7 @@ WCMD(do_wload) {
 		
 		if (*target && isdigit(*target)) {
 			scale_mob_to_level(mob, atoi(target));
-			SET_BIT(MOB_FLAGS(mob), MOB_NO_RESCALE);
+			set_mob_flags(mob, MOB_NO_RESCALE);
 		}
 		else if (inst && INST_LEVEL(inst) > 0) {
 			// instance level-locked
@@ -1459,8 +1459,9 @@ WCMD(do_wrestore) {
 		if (COMPLEX_DATA(rtarg)) {
 			free_resource_list(GET_BUILDING_RESOURCES(rtarg));
 			GET_BUILDING_RESOURCES(rtarg) = NULL;
-			COMPLEX_DATA(rtarg)->damage = 0;
-			COMPLEX_DATA(rtarg)->burn_down_time = 0;
+			set_room_damage(rtarg, 0);
+			set_burn_down_time(rtarg, 0, FALSE);
+			request_world_save(GET_ROOM_VNUM(rtarg), WSAVE_ROOM);
 		}
 	}
 }
@@ -1514,7 +1515,7 @@ WCMD(do_wscale) {
 		}
 
 		scale_mob_to_level(victim, level);
-		SET_BIT(MOB_FLAGS(victim), MOB_NO_RESCALE);
+		set_mob_flags(victim, MOB_NO_RESCALE);
 	}
 	// scale vehicle
 	else if ((*arg == UID_CHAR && (veh = get_vehicle(arg))) || (veh = get_vehicle_room(room, arg, NULL))) {

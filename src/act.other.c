@@ -239,11 +239,7 @@ void do_customize_road(char_data *ch, char *argument) {
 			msg_to_char(ch, "What would you like to name this road (or \"none\")?\r\n");
 		}
 		else if (!str_cmp(arg2, "none")) {
-			if (ROOM_CUSTOM_NAME(IN_ROOM(ch))) {
-				free(ROOM_CUSTOM_NAME(IN_ROOM(ch)));
-				ROOM_CUSTOM_NAME(IN_ROOM(ch)) = NULL;
-			}
-			
+			change_room_custom_name(IN_ROOM(ch), NULL);
 			msg_to_char(ch, "This road no longer has a custom name.\r\n");
 			command_lag(ch, WAIT_ABILITY);
 		}
@@ -267,11 +263,7 @@ void do_customize_road(char_data *ch, char *argument) {
 				return;
 			}
 			
-			if (ROOM_CUSTOM_NAME(IN_ROOM(ch))) {
-				free(ROOM_CUSTOM_NAME(IN_ROOM(ch)));
-			}
-			ROOM_CUSTOM_NAME(IN_ROOM(ch)) = str_dup(arg2);
-			
+			change_room_custom_name(IN_ROOM(ch), arg2);
 			msg_to_char(ch, "This road tile is now called \"%s\".\r\n", arg2);
 			command_lag(ch, WAIT_ABILITY);
 		}
@@ -652,7 +644,7 @@ bool perform_summon(char_data *ch, ability_data *abil, any_vnum vnum, bool check
 	// load/update mob:
 	mob = read_mobile(vnum, TRUE);
 	
-	SET_BIT(MOB_FLAGS(mob), MOB_NO_EXPERIENCE | MOB_SPAWNED | MOB_NO_LOOT);
+	set_mob_flags(mob, MOB_NO_EXPERIENCE | MOB_SPAWNED | MOB_NO_LOOT);
 	setup_generic_npc(mob, MOB_FLAGGED(mob, MOB_EMPIRE) ? GET_LOYALTY(ch) : NULL, NOTHING, NOTHING);
 	scale_mob_as_companion(mob, ch, level);
 	char_to_room(mob, IN_ROOM(ch));
@@ -2956,7 +2948,7 @@ ACMD(do_minipets) {
 			dismiss_any_minipet(ch);	// out with the old...
 			
 			mob = read_mobile(GET_MOB_VNUM(to_summon), TRUE);
-			SET_BIT(MOB_FLAGS(mob), default_minipet_flags);
+			set_mob_flags(mob, default_minipet_flags);
 			SET_BIT(AFF_FLAGS(mob), default_minipet_affs);	// will this work?
 			
 			// try to scale mob to the summoner (most minipets have level caps of 1 tho)

@@ -260,6 +260,7 @@ struct obj_binding *copy_obj_bindings(struct obj_binding *from);
 obj_data *copy_warehouse_obj(obj_data *input);
 void empty_obj_before_extract(obj_data *obj);
 void extract_obj(obj_data *obj);
+room_data *find_room_obj_saves_in(obj_data *obj);
 obj_data *fresh_copy_obj(obj_data *obj, int scale_level);
 bool identical_bindings(obj_data *obj_a, obj_data *obj_b);
 bool objs_are_identical(obj_data *obj_a, obj_data *obj_b);
@@ -363,7 +364,7 @@ int get_depletion_amount(struct depletion_data *list, int type, bool only_type);
 #define get_depletion(room, type, only_type)  get_depletion_amount(ROOM_DEPLETION(room), (type), (only_type))
 #define get_vehicle_depletion(veh, type, only_type)  get_depletion_amount(VEH_DEPLETION(veh), (type), (only_type))
 void perform_add_depletion(struct depletion_data **list, int type, bool multiple);
-void remove_depletion_from_list(struct depletion_data **list, int type);
+bool remove_depletion_from_list(struct depletion_data **list, int type);
 void remove_depletion(room_data *room, int type);
 void set_depletion(room_data *room, int type, int value);
 
@@ -383,12 +384,12 @@ void remove_extra_data(struct room_extra_data **list, int type);
 void set_extra_data(struct room_extra_data **list, int type, int value);
 
 // room extra data helpers (backwards-compatibility and shortcuts)
-#define add_to_room_extra_data(room, type, add_value)  add_to_extra_data(&ROOM_EXTRA_DATA(room), type, add_value)
+#define add_to_room_extra_data(room, type, add_value)  do { add_to_extra_data(&ROOM_EXTRA_DATA(room), (type), (add_value)); request_world_save(GET_ROOM_VNUM(room), WSAVE_ROOM); } while (0)
 #define find_room_extra_data(room, type)  find_extra_data(ROOM_EXTRA_DATA(room), type)
 #define get_room_extra_data(room, type)  get_extra_data(ROOM_EXTRA_DATA(room), type)
-#define multiply_room_extra_data(room, type, multiplier)  multiply_extra_data(&ROOM_EXTRA_DATA(room), type, multiplier);
-#define remove_room_extra_data(room, type)  remove_extra_data(&ROOM_EXTRA_DATA(room), type)
-#define set_room_extra_data(room, type, value)  set_extra_data(&ROOM_EXTRA_DATA(room), type, value)
+#define multiply_room_extra_data(room, type, multiplier)  do { multiply_extra_data(&ROOM_EXTRA_DATA(room), (type), (multiplier)); request_world_save(GET_ROOM_VNUM(room), WSAVE_ROOM); } while (0)
+#define remove_room_extra_data(room, type)  do { remove_extra_data(&ROOM_EXTRA_DATA(room), (type)); request_world_save(GET_ROOM_VNUM(room), WSAVE_ROOM); } while (0)
+#define set_room_extra_data(room, type, value)  do { set_extra_data(&ROOM_EXTRA_DATA(room), (type), (value)); request_world_save(GET_ROOM_VNUM(room), WSAVE_ROOM); } while (0)
 
 // vehicle extra data helpers
 #define add_to_vehicle_extra_data(veh, type, add_value)  add_to_extra_data(&VEH_EXTRA_DATA(veh), type, add_value)

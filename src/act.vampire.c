@@ -618,7 +618,7 @@ void un_deathshroud(char_data *ch) {
 void check_un_vampire(char_data *ch, bool remove_vampire_skills) {
 	if (IS_NPC(ch)) {
 		if (remove_vampire_skills) {
-			REMOVE_BIT(MOB_FLAGS(ch), MOB_VAMPIRE);
+			remove_mob_flags(ch, MOB_VAMPIRE);
 		}
 		return;	// no further work
 	}

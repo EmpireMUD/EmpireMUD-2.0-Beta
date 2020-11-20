@@ -191,7 +191,7 @@ INTERACTION_FUNC(run_one_encounter) {
 			}
 		}
 		char_to_room(aggr, IN_ROOM(ch));
-		SET_BIT(MOB_FLAGS(aggr), MOB_SPAWNED);
+		set_mob_flags(aggr, MOB_SPAWNED);
 		act("$N appears!", FALSE, ch, 0, aggr, TO_CHAR | TO_ROOM);
 		hit(aggr, ch, GET_EQ(aggr, WEAR_WIELD), TRUE);
 		load_mtrigger(aggr);
@@ -432,6 +432,8 @@ void setup_generic_npc(char_data *mob, empire_data *emp, int name, int sex) {
 			free(free_look);
 		}
 	}
+	
+	mark_mob_for_room_save(mob);
 }
 
 
@@ -1089,7 +1091,7 @@ static int spawn_one_list(room_data *room, struct spawn_info *list) {
 		setup_generic_npc(mob, ROOM_OWNER(home), NOTHING, NOTHING);
 		
 		// enforce spawn data
-		SET_BIT(MOB_FLAGS(mob), MOB_SPAWNED);
+		set_mob_flags(mob, MOB_SPAWNED);
 		
 		// put in the room
 		char_to_room(mob, room);
@@ -1487,7 +1489,7 @@ void scale_mob_as_companion(char_data *mob, char_data *master, int use_level) {
 		scale_level = MAX(CLASS_SKILL_CAP, scale_level - 25);
 	}
 	scale_mob_to_level(mob, scale_level);
-	SET_BIT(MOB_FLAGS(mob), MOB_NO_RESCALE);	// ensure it doesn't rescale itself
+	set_mob_flags(mob, MOB_NO_RESCALE);	// ensure it doesn't rescale itself
 }
 
 

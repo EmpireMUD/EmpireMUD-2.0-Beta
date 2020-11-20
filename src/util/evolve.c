@@ -50,8 +50,8 @@ struct map_t {
 	int island_id;
 	sector_vnum sector_type, base_sector, natural_sector;
 	bitvector_t affects;
-	struct room_extra_data *extra;
 	bitvector_t flags;	// EVOLVER_ flags
+	long sector_time;	// when it became this sector
 	
 	struct map_t *next;	// next in land
 };
@@ -88,7 +88,6 @@ const int shift_dir[][2] = {
 int count_adjacent(struct map_t *tile, sector_vnum sect, bool count_original_sect);
 void empire_srandom(unsigned long initial_seed);
 struct evolution_data *get_evo_by_type(sector_vnum sect, int type);
-time_t get_sector_time(struct map_t *tile);
 void index_boot_sectors();
 void load_base_map();
 int map_distance(struct map_t *start, struct map_t *end);
@@ -136,7 +135,7 @@ void evolve_one(struct map_t *tile) {
 	if (become == NOTHING && !IS_SET(tile->flags, EVOLVER_OWNED) && (evo = get_evo_by_type(tile->sector_type, EVO_UNOWNED))) {
 		become = evo->becomes;
 	}
-	if (become == NOTHING && (evo = get_evo_by_type(tile->sector_type, EVO_TIMED)) && time(0) > get_sector_time(tile) + evo->value * SECS_PER_REAL_MIN) {
+	if (become == NOTHING && (evo = get_evo_by_type(tile->sector_type, EVO_TIMED)) && time(0) > tile->sector_time + evo->value * SECS_PER_REAL_MIN) {
 		become = evo->becomes;
 	}
 	
@@ -695,10 +694,11 @@ void index_boot_sectors(void) {
 * This loads the world array from file. This is optional.
 */
 void load_base_map(void) {
-	char line[256], line2[256], str1[256], str2[256], error_buf[MAX_STRING_LENGTH], *tmp;
-	struct map_t *map, *last = NULL, *last_land = NULL;
-	struct room_extra_data *red;
-	int var[8], x, y, type;
+	char sys[256];
+	struct map_t *last_land = NULL;
+	struct map_file_header header;
+	map_file_data store;
+	int x, y;
 	FILE *fl;
 	
 	// init
@@ -710,121 +710,55 @@ void load_base_map(void) {
 			world[x][y].sector_type = BASIC_OCEAN;
 			world[x][y].base_sector = BASIC_OCEAN;
 			world[x][y].natural_sector = BASIC_OCEAN;
+			world[x][y].affects = NOBITS;
 			world[x][y].flags = NOBITS;
+			world[x][y].sector_time = 0;
 			world[x][y].next = NULL;
 		}
 	}
 	
-	if (!(fl = fopen(WORLD_MAP_FILE, "r"))) {
-		printf("ERROR: No world map file '%s' to evolve\n", WORLD_MAP_FILE);
+	// first create a duplicate...
+	sprintf(sys, "cp %s %s.copy", BINARY_MAP_FILE, BINARY_MAP_FILE);
+	system(sys);
+	if (!(fl = fopen(BINARY_MAP_FILE ".copy", "r+b"))) {
+		printf("ERROR: No binary map file '%s.copy' to evolve\n", BINARY_MAP_FILE);
 		exit(0);
 	}
 	
-	strcpy(error_buf, "map file");
+	// read header
+	fread(&header, sizeof(struct map_file_header), 1, fl);
 	
-	// optionals
-	while (get_line(fl, line)) {
-		if (*line == '$') {
-			break;
-		}
-		
-		// new room
-		if (isdigit(*line)) {
-			// x y island sect base natural crop evolver-flags
-			if (sscanf(line, "%d %d %d %d %d %d %d %d", &var[0], &var[1], &var[2], &var[3], &var[4], &var[5], &var[6], &var[7]) != 8) {
-				var[7] = NOBITS;	// backwards-compatible without misc evolver-flags
-				if (sscanf(line, "%d %d %d %d %d %d %d", &var[0], &var[1], &var[2], &var[3], &var[4], &var[5], &var[6]) != 7) {
-					log("Encountered bad line in world map file: %s", line);
-					continue;
-				}
-			}
-			if (var[0] < 0 || var[0] >= MAP_WIDTH || var[1] < 0 || var[1] >= MAP_HEIGHT) {
-				log("Encountered bad location in world map file: (%d, %d)", var[0], var[1]);
-				continue;
-			}
-		
-			map = &(world[var[0]][var[1]]);
-			sprintf(error_buf, "map tile %d", map->vnum);
+	// read in
+	for (y = 0; y < header.height && !feof(fl); ++y) {
+		for (x = 0; x < header.width && !feof(fl); ++x) {
+			// read no matter what
+			fread(&store, sizeof(map_file_data), 1, fl);
 			
-			map->island_id = var[2];
-			map->sector_type = var[3];
-			map->base_sector = var[4];
-			map->natural_sector = var[5];
-			// map->crop_type = var[6];
-			map->flags = var[7];
-			
-			// add to land map?
-			if (map->sector_type != BASIC_OCEAN) {
-				if (last_land) {
-					last_land->next = map;
-				}
-				else {
-					land = map;
-				}
-				last_land = map;
-			}
-			
-			last = map;	// store in case of more data
-		}
-		else if (last) {
-			switch (*line) {
-				case 'E': {	// affects
-					if (!get_line(fl, line2)) {
-						printf("ERROR: Unable to get E line for map tile #%d\n", last->vnum);
-						break;
-					}
-					if (sscanf(line2, "%s %s", str1, str2) != 2) {
-						if (sscanf(line2, "%s %s", str1, str2) != 1) {
-							printf("ERROR: Invalid E line for map tile #%d\n", last->vnum);
-							break;
-						}
-						// otherwise backwards-compatible:
-						strcpy(str2, str1);
-					}
-					// ignore str1 (base affects)
-					last->affects = asciiflag_conv(str2);
-					break;
-				}
+			// only apply if it's within the map size
+			if (y < MAP_HEIGHT && x < MAP_WIDTH) {
+				world[x][y].island_id = store.island_id;
+				world[x][y].sector_type = store.sector_type;
+				world[x][y].base_sector = store.base_sector;
+				world[x][y].natural_sector = store.natural_sector;
+				world[x][y].affects = store.affects;
+				world[x][y].flags = store.misc;
+				world[x][y].sector_time = store.sector_time;
 				
-				// unneeded junk:
-				case 'M':	// description
-				case 'N':	// name
-				case 'I': {	// icon
-					tmp = fread_string(fl, error_buf);
-					free(tmp);
-					break;
-				}
-				case 'X':	// resource depletion
-				case 'Y': {	// tracks
-					get_line(fl, line2);
-					break;
-				}
-				case 'Z': {	// extra data
-					if (!get_line(fl, line2) || sscanf(line2, "%d %d", &var[0], &var[1]) != 2) {
-						printf("ERROR: Bad formatting in Z section of room #%d", last->vnum);
-						break;
+				if (world[x][y].sector_type != BASIC_OCEAN) {
+					if (last_land) {
+						last_land->next = &world[x][y];
 					}
-					
-					type = var[0];
-					red = NULL;
-					HASH_FIND_INT(last->extra, &type, red);
-					if (!red) {
-						CREATE(red, struct room_extra_data, 1);
-						red->type = var[0];
-						HASH_ADD_INT(last->extra, type, red);
+					else {
+						land = &world[x][y];
 					}
-					red->value = var[1];
-					break;
+					last_land = &world[x][y];
 				}
 			}
-		}
-		else {
-			printf("ERROR: Junk data found in base_map file: %s\n", line);
-			exit(0);
 		}
 	}
 	
 	fclose(fl);
+	unlink(BINARY_MAP_FILE ".copy");
 }
 
 
@@ -966,21 +900,6 @@ struct evolution_data *get_evo_by_type(sector_vnum sect, int type) {
 	}
 	
 	return found;
-}
-
-
-/**
-* If the sector has a stored timestamp, this fetches it. This is used for
-* TIMED evos.
-*
-* @param struct map_t *tile The map tile.
-* @return time_t The timestamp from the tile, or 0 if none.
-*/
-time_t get_sector_time(struct map_t *tile) {
-	struct room_extra_data *red;
-	int type = ROOM_EXTRA_SECTOR_TIME;
-	HASH_FIND_INT(tile->extra, &type, red);
-	return red ? red->value : 0;
 }
 
 

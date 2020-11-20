@@ -81,6 +81,7 @@ void init_text_file_strings();
 void link_and_check_vehicles();
 void load_automessages();
 void load_banned();
+void load_binary_map_file();
 void load_daily_quest_file();
 void load_empire_storage();
 void load_fight_messages();
@@ -90,7 +91,7 @@ void load_running_events_file();
 void load_slash_channels();
 void load_tips_of_the_day();
 void load_trading_post();
-void load_world_map_from_file();
+void load_world_from_binary_index();
 void renum_world();
 void run_reboot_triggers();
 void schedule_map_unloads();
@@ -291,19 +292,24 @@ vehicle_data *next_pending_vehicle = NULL;	// used in handler.c
 // world / rooms
 room_data *world_table = NULL;	// hash table of the whole world
 room_data *interior_room_list = NULL;	// doubly-linked list of interior rooms: room->prev_interior, room->next_interior
-bool need_world_index = TRUE;	// used to trigger world index saving (always save at least once)
 struct island_info *island_table = NULL; // hash table for all the islands
 struct map_data world_map[MAP_WIDTH][MAP_HEIGHT];	// master world map
 struct map_data *land_map = NULL;	// linked list of non-ocean
 int size_of_world = 1;	// used by the instancer to adjust instance counts
 struct shared_room_data ocean_shared_data;	// for BASIC_OCEAN tiles
 struct vnum_hash *mapout_update_requests = NULL;	// hash table of requests for mapout updates, by room vnum
+struct world_save_request_data *world_save_requests = NULL;	// hash table of save requests
+struct vnum_hash *binary_world_index_updates = NULL;	// hash of updates to write to the binary world index
+FILE *binary_map_fl = NULL;	// call ensure_binary_map_file_is_open() before using this, and leave it open
+char *world_index_data = NULL;	// for managing the binary world file
+int top_of_world_index = -1;	// current max entry index
+bool save_world_after_startup = FALSE;	// if TRUE, will trigger a world save at the end of startup
 
 
 // DB_BOOT_x
 struct db_boot_info_type db_boot_info[NUM_DB_BOOT_TYPES] = {
 	// prefix, suffix, allow-zero-of-it
-	{ WLD_PREFIX, WLD_SUFFIX, TRUE },	// DB_BOOT_WLD
+	{ WLD_PREFIX, WLD_SUFFIX, TRUE },	// DB_BOOT_WLD	-- this is no longer used as of b5.116, other than in the converter
 	{ MOB_PREFIX, MOB_SUFFIX, FALSE },	// DB_BOOT_MOB
 	{ OBJ_PREFIX, OBJ_SUFFIX, FALSE },	// DB_BOOT_OBJ
 	{ NAMES_PREFIX, NULL, FALSE },	// DB_BOOT_NAMES
@@ -458,6 +464,11 @@ void boot_db(void) {
 	
 	log("Final startup...");
 	write_whole_mapout();
+	if (save_world_after_startup) {
+		write_whole_binary_map_file();
+		write_whole_binary_world_index();
+		write_all_wld_files();
+	}
 	// put things here
 	
 	// END
@@ -514,8 +525,8 @@ void boot_world(void) {
 	
 	// requires sectors, buildings, and room templates -- order matters here
 	log("Loading the world.");
-	load_world_map_from_file();	// get base data
-	index_boot(DB_BOOT_WLD);	// override with live rooms
+	load_binary_map_file();	// get base data
+	load_world_from_binary_index();	// override with live rooms
 	build_world_map();	// ensure full world map
 	build_land_map();	// determine which parts are land
 	
@@ -932,7 +943,10 @@ void process_temporary_room_data(void) {
 	HASH_ITER(hh, temporary_room_data, trd, next_trd) {
 		if ((room = real_room(trd->vnum))) {
 			// home room
-			if (trd->home_room != NOWHERE && COMPLEX_DATA(room) && (home = real_room(trd->home_room))) {
+			if (trd->home_room != NOWHERE && (home = real_room(trd->home_room))) {
+				if (!COMPLEX_DATA(room)) {
+					COMPLEX_DATA(room) = init_complex_data();
+				}
 				COMPLEX_DATA(room)->home_room = home;
 			}
 			// owner
@@ -1810,6 +1824,9 @@ char_data *read_mobile(mob_vnum nr, bool with_triggers) {
 	
 	// note this may lead to slight over-spawning after reboots -pc 5/20/16
 	MOB_SPAWN_TIME(mob) = time(0);
+	
+	// ensure it's not marked for save
+	MOB_MARKED_FOR_SAVE(mob) = 0;
 
 	return (mob);
 }

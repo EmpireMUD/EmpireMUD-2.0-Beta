@@ -91,6 +91,8 @@ OLC_MODULE(mapedit_build) {
 		msg_to_char(ch, "You create %s %s!\r\n", AN(GET_BLD_NAME(bld)), GET_BLD_NAME(bld));
 		sprintf(buf, "$n creates %s %s!", AN(GET_BLD_NAME(bld)), GET_BLD_NAME(bld));
 		act(buf, FALSE, ch, NULL, NULL, TO_ROOM);
+		
+		request_world_save(GET_ROOM_VNUM(IN_ROOM(ch)), WSAVE_ROOM);
 	}
 }
 
@@ -244,7 +246,7 @@ OLC_MODULE(mapedit_height) {
 		msg_to_char(ch, "You must specify the height as a number.\r\n");
 	}
 	else {
-		ROOM_HEIGHT(IN_ROOM(ch)) = atoi(argument);
+		change_room_height(IN_ROOM(ch), atoi(argument));
 		msg_to_char(ch, "This tile now has a height of %d.\r\n", ROOM_HEIGHT(IN_ROOM(ch)));
 	}
 }
@@ -332,17 +334,11 @@ OLC_MODULE(mapedit_room_name) {
 	if (!*argument)
 		msg_to_char(ch, "What would you like to name this room/tile (or \"none\")?\r\n");
 	else if (!str_cmp(argument, "none")) {
-		if (ROOM_CUSTOM_NAME(IN_ROOM(ch))) {
-			free(ROOM_CUSTOM_NAME(IN_ROOM(ch)));
-			ROOM_CUSTOM_NAME(IN_ROOM(ch)) = NULL;
-		}
+		change_room_custom_name(IN_ROOM(ch), NULL);
 		msg_to_char(ch, "This room/tile no longer has a specialized name.\r\n");
 	}
 	else {
-		if (ROOM_CUSTOM_NAME(IN_ROOM(ch))) {
-			free(ROOM_CUSTOM_NAME(IN_ROOM(ch)));
-		}
-		ROOM_CUSTOM_NAME(IN_ROOM(ch)) = str_dup(argument);
+		change_room_custom_name(IN_ROOM(ch), argument);
 		msg_to_char(ch, "This room/tile is now called \"%s\".\r\n", argument);
 	}
 }
@@ -354,10 +350,7 @@ OLC_MODULE(mapedit_icon) {
 	if (IS_INSIDE(IN_ROOM(ch)) || IS_ADVENTURE_ROOM(IN_ROOM(ch)))
 		msg_to_char(ch, "You may not do that here.\r\n");
 	else if (!str_cmp(argument, "none")) {
-		if (ROOM_CUSTOM_ICON(IN_ROOM(ch))) {
-			free(ROOM_CUSTOM_ICON(IN_ROOM(ch)));
-			ROOM_CUSTOM_ICON(IN_ROOM(ch)) = NULL;
-		}
+		change_room_custom_icon(IN_ROOM(ch), NULL);
 		msg_to_char(ch, "This area no longer has a specialized icon.\r\n");
 	}
 	else if (!*argument)
@@ -367,10 +360,7 @@ OLC_MODULE(mapedit_icon) {
 	else if (argument[0] != '&')
 		msg_to_char(ch, "Icons must begin with a color code.\r\n");
 	else {
-		if (ROOM_CUSTOM_ICON(IN_ROOM(ch))) {
-			free(ROOM_CUSTOM_ICON(IN_ROOM(ch)));
-		}
-		ROOM_CUSTOM_ICON(IN_ROOM(ch)) = str_dup(argument);
+		change_room_custom_icon(IN_ROOM(ch), argument);
 		msg_to_char(ch, "This area now has the icon \"%s&0\".\r\n", argument);
 	}
 }
@@ -410,10 +400,7 @@ OLC_MODULE(mapedit_room_description) {
 		msg_to_char(ch, "To remove a description, use \".map description none\".\r\n");
 	}
 	else if (is_abbrev(argument, "none")) {
-		if (ROOM_CUSTOM_DESCRIPTION(IN_ROOM(ch))) {
-			free(ROOM_CUSTOM_DESCRIPTION(IN_ROOM(ch)));
-			ROOM_CUSTOM_DESCRIPTION(IN_ROOM(ch)) = NULL;
-		}
+		change_room_custom_description(IN_ROOM(ch), NULL);
 		msg_to_char(ch, "This area no longer has a specialized description.\r\n");
 	}
 	else if (is_abbrev(argument, "set")) {
@@ -422,6 +409,7 @@ OLC_MODULE(mapedit_room_description) {
 		}
 		else {
 			start_string_editor(ch->desc, "room description", &(ROOM_CUSTOM_DESCRIPTION(IN_ROOM(ch))), MAX_ROOM_DESCRIPTION, TRUE);
+			ch->desc->save_room_id = GET_ROOM_VNUM(IN_ROOM(ch));
 			// warning: doesn't necessarily trigger a save
 		}
 	}
@@ -624,6 +612,7 @@ OLC_MODULE(mapedit_naturalize) {
 				// no longer need this
 				remove_extra_data(&map->shared->extra_data, ROOM_EXTRA_TRENCH_ORIGINAL_SECTOR);
 			}
+			request_world_save(map->vnum, WSAVE_ROOM | WSAVE_MAP);
 			++count;
 		}
 		
@@ -659,6 +648,8 @@ OLC_MODULE(mapedit_naturalize) {
 		// syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: %s has naturalized the sector at %s", GET_NAME(ch), room_log_identifier(IN_ROOM(ch)));
 		msg_to_char(ch, "You have naturalized the sector for this tile.\r\n");
 		act("$n has naturalized the area!", FALSE, ch, NULL, NULL, TO_ROOM);
+		
+		request_world_save(GET_ROOM_VNUM(IN_ROOM(ch)), WSAVE_MAP | WSAVE_ROOM);
 	}
 }
 
@@ -724,7 +715,7 @@ OLC_MODULE(mapedit_remember) {
 			}
 			
 			// looks good
-			map->natural_sector = map->sector_type;
+			change_natural_sector(map, map->sector_type);
 			++count;
 		}
 		
@@ -736,7 +727,7 @@ OLC_MODULE(mapedit_remember) {
 	}
 	else {	// normal processing for 1 room
 		map = &(world_map[FLAT_X_COORD(IN_ROOM(ch))][FLAT_Y_COORD(IN_ROOM(ch))]);
-		map->natural_sector = map->sector_type;
+		change_natural_sector(map, map->sector_type);
 		
 		syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: %s has set 'remember' for %s", GET_NAME(ch), room_log_identifier(IN_ROOM(ch)));
 		msg_to_char(ch, "You have set the map to remember the sector for this tile.\r\n");

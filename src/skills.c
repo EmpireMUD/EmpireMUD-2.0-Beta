@@ -2500,7 +2500,7 @@ void perform_npc_tie(char_data *ch, char_data *victim, int subcmd) {
 		act("You untie $N.", FALSE, ch, 0, victim, TO_CHAR);
 		act("$n unties you!", FALSE, ch, 0, victim, TO_VICT | TO_SLEEP);
 		act("$n unties $N.", FALSE, ch, 0, victim, TO_NOTVICT);
-		REMOVE_BIT(MOB_FLAGS(victim), MOB_TIED);
+		remove_mob_flags(victim, MOB_TIED);
 		
 		if (GET_ROPE_VNUM(victim) != NOTHING && (rope = read_object(GET_ROPE_VNUM(victim), TRUE))) {
 			obj_to_char(rope, ch);
@@ -2509,6 +2509,7 @@ void perform_npc_tie(char_data *ch, char_data *victim, int subcmd) {
 			act("You receive $p.", FALSE, ch, rope, NULL, TO_CHAR);
 		}
 		GET_ROPE_VNUM(victim) = NOTHING;
+		mark_mob_for_room_save(victim);
 	}
 	else if (!MOB_FLAGGED(victim, MOB_ANIMAL)) {
 		msg_to_char(ch, "You can only tie animals.\r\n");
@@ -2522,9 +2523,10 @@ void perform_npc_tie(char_data *ch, char_data *victim, int subcmd) {
 		act("You tie $N up.", FALSE, ch, 0, victim, TO_CHAR);
 		act("$n ties you up.", FALSE, ch, 0, victim, TO_VICT | TO_SLEEP);
 		act("$n ties $N up.", FALSE, ch, 0, victim, TO_NOTVICT);
-		SET_BIT(MOB_FLAGS(victim), MOB_TIED);
+		set_mob_flags(victim, MOB_TIED);
 		GET_ROPE_VNUM(victim) = GET_OBJ_VNUM(rope);
 		extract_obj(rope);
+		mark_mob_for_room_save(victim);
 	}
 }
 

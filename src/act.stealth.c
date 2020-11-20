@@ -1164,7 +1164,7 @@ ACMD(do_pickpocket) {
 		
 		if (!low_level && (!CAN_SEE(vict, ch) || !AWAKE(vict) || AFF_FLAGGED(vict, AFF_STUNNED | AFF_HARD_STUNNED) || player_tech_skill_check(ch, PTECH_PICKPOCKET, DIFF_EASY))) {
 			// success!
-			SET_BIT(MOB_FLAGS(vict), MOB_PICKPOCKETED);
+			set_mob_flags(vict, MOB_PICKPOCKETED);
 			act("You pick $N's pocket...", FALSE, ch, NULL, vict, TO_CHAR);
 
 			// any will tell us if we got at least 1 item (also sends messages)

@@ -109,6 +109,8 @@ void build_instance_exterior(struct instance_data *inst) {
 		SET_BIT(ROOM_BASE_FLAGS(HOME_ROOM(INST_LOCATION(inst))), ROOM_AFF_HAS_INSTANCE);
 		affect_total_room(HOME_ROOM(INST_LOCATION(inst)));
 	}
+	
+	request_world_save(GET_ROOM_VNUM(INST_LOCATION(inst)), WSAVE_ROOM);
 }
 
 
@@ -1055,11 +1057,12 @@ void delete_instance(struct instance_data *inst, bool run_cleanup) {
 			if (ADVENTURE_FLAGGED(INST_ADVENTURE(inst), ADV_NO_MOB_CLEANUP)) {
 				// just disassociate
 				MOB_INSTANCE_ID(mob) = NOTHING;
+				mark_mob_for_room_save(mob);
 				// shouldn't need this: subtract_instance_mob(inst, GET_MOB_VNUM(mob));
 			}
 			else if ((FIGHTING(mob) || GET_POS(mob) == POS_FIGHTING) && (!ROOM_INSTANCE(IN_ROOM(mob)) || ROOM_INSTANCE(IN_ROOM(mob)) == inst)) {
 				// delayed-despawn if fighting -- we don't want to interrupt a fight
-				SET_BIT(MOB_FLAGS(mob), MOB_SPAWNED);
+				set_mob_flags(mob, MOB_SPAWNED);
 			}
 			else {
 				act("$n leaves.", TRUE, mob, NULL, NULL, TO_ROOM);
@@ -2089,7 +2092,7 @@ struct instance_data *real_instance(any_vnum instance_id) {
 */
 void remove_instance_fake_loc(struct instance_data *inst) {
 	struct instance_data *i_iter;
-	int iter;
+	int iter, id;
 	
 	if (!inst) {
 		return;	// no work
@@ -2112,13 +2115,17 @@ void remove_instance_fake_loc(struct instance_data *inst) {
 	
 	// reset fake loc to real loc
 	INST_FAKE_LOC(inst) = INST_LOCATION(inst);
+	id = INST_FAKE_LOC(inst) ? GET_ISLAND_ID(INST_FAKE_LOC(inst)) : NO_ISLAND;
 	
 	// update interior
 	for (iter = 0; iter < INST_SIZE(inst); ++iter) {
 		if (INST_ROOM(inst, iter) && COMPLEX_DATA(INST_ROOM(inst, iter))) {
-			GET_ISLAND_ID(INST_ROOM(inst, iter)) = INST_FAKE_LOC(inst) ? GET_ISLAND_ID(INST_FAKE_LOC(inst)) : NO_ISLAND;
-			GET_ISLAND(INST_ROOM(inst, iter)) = INST_FAKE_LOC(inst) ? GET_ISLAND(INST_FAKE_LOC(inst)) : NULL;
-			GET_MAP_LOC(INST_ROOM(inst, iter)) = INST_FAKE_LOC(inst) ? GET_MAP_LOC(INST_FAKE_LOC(inst)) : NULL;
+			if (GET_ISLAND_ID(INST_ROOM(inst, iter)) != id) {
+				GET_ISLAND_ID(INST_ROOM(inst, iter)) = id;
+				GET_ISLAND(INST_ROOM(inst, iter)) = INST_FAKE_LOC(inst) ? GET_ISLAND(INST_FAKE_LOC(inst)) : NULL;
+				GET_MAP_LOC(INST_ROOM(inst, iter)) = INST_FAKE_LOC(inst) ? GET_MAP_LOC(INST_FAKE_LOC(inst)) : NULL;
+				request_world_save(GET_ROOM_VNUM(INST_ROOM(inst, iter)), WSAVE_ROOM);
+			}
 		}
 	}
 }
@@ -2132,7 +2139,7 @@ void remove_instance_fake_loc(struct instance_data *inst) {
 * @param room_data *loc The location where it now "is".
 */
 void set_instance_fake_loc(struct instance_data *inst, room_data *loc) {
-	int iter;
+	int iter, id;
 	
 	if (!inst || !loc) {
 		return;	// no work / error?
@@ -2145,6 +2152,7 @@ void set_instance_fake_loc(struct instance_data *inst, room_data *loc) {
 	
 	// actually change it
 	INST_FAKE_LOC(inst) = loc ? loc : INST_LOCATION(inst);	// may be NULL anyway, but try to avoid that
+	id = INST_FAKE_LOC(inst) ? GET_ISLAND_ID(INST_FAKE_LOC(inst)) : NO_ISLAND;
 	
 	if (INST_FAKE_LOC(inst) != INST_LOCATION(inst)) {
 		// add fake-instance flag if needed
@@ -2154,10 +2162,11 @@ void set_instance_fake_loc(struct instance_data *inst, room_data *loc) {
 	
 	// update interior
 	for (iter = 0; iter < INST_SIZE(inst); ++iter) {
-		if (INST_ROOM(inst, iter) && COMPLEX_DATA(INST_ROOM(inst, iter))) {
-			GET_ISLAND_ID(INST_ROOM(inst, iter)) = INST_FAKE_LOC(inst) ? GET_ISLAND_ID(INST_FAKE_LOC(inst)) : NO_ISLAND;
+		if (INST_ROOM(inst, iter) && COMPLEX_DATA(INST_ROOM(inst, iter)) && GET_ISLAND_ID(INST_ROOM(inst, iter)) != id) {
+			GET_ISLAND_ID(INST_ROOM(inst, iter)) = id;
 			GET_ISLAND(INST_ROOM(inst, iter)) = INST_FAKE_LOC(inst) ? GET_ISLAND(INST_FAKE_LOC(inst)) : NULL;
 			GET_MAP_LOC(INST_ROOM(inst, iter)) = INST_FAKE_LOC(inst) ? GET_MAP_LOC(INST_FAKE_LOC(inst)) : NULL;
+			request_world_save(GET_ROOM_VNUM(INST_ROOM(inst, iter)), WSAVE_ROOM);
 		}
 	}
 }
@@ -2472,10 +2481,11 @@ static void renum_instances(void) {
 			if (INST_ROOM(inst, iter) && COMPLEX_DATA(INST_ROOM(inst, iter))) {
 				COMPLEX_DATA(INST_ROOM(inst, iter))->instance = inst;
 				
-				if (INST_FAKE_LOC(inst)) {
+				if (INST_FAKE_LOC(inst) && GET_ISLAND_ID(INST_ROOM(inst, iter)) != GET_ISLAND_ID(INST_FAKE_LOC(inst))) {
 					GET_ISLAND_ID(INST_ROOM(inst, iter)) = GET_ISLAND_ID(INST_FAKE_LOC(inst));
 					GET_ISLAND(INST_ROOM(inst, iter)) = GET_ISLAND(INST_FAKE_LOC(inst));
 					GET_MAP_LOC(INST_ROOM(inst, iter)) = GET_MAP_LOC(INST_FAKE_LOC(inst));
+					request_world_save(GET_ROOM_VNUM(INST_ROOM(inst, iter)), WSAVE_ROOM);
 				}
 			}
 		}

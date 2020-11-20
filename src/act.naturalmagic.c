@@ -924,7 +924,7 @@ ACMD(do_purify) {
 		// clear skills if applicable
 		if (IS_NPC(vict)) {
 			any = IS_VAMPIRE(vict);
-			REMOVE_BIT(MOB_FLAGS(vict), MOB_VAMPIRE);
+			remove_mob_flags(vict, MOB_VAMPIRE);
 		}
 		else {
 			any = remove_skills_by_flag(vict, SKILLF_REMOVED_BY_PURIFY);

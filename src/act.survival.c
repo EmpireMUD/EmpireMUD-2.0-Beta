@@ -409,7 +409,7 @@ void do_mount_release(char_data *ch, char *argument) {
 		char_to_room(mob, IN_ROOM(ch));
 		setup_generic_npc(mob, GET_LOYALTY(ch), NOTHING, NOTHING);
 		SET_BIT(AFF_FLAGS(mob), AFF_NO_DRINK_BLOOD);
-		SET_BIT(MOB_FLAGS(mob), MOB_NO_EXPERIENCE);
+		set_mob_flags(mob, MOB_NO_EXPERIENCE);
 		
 		act("You drop $N's lead and release $M.", FALSE, ch, NULL, mob, TO_CHAR);
 		act("$n drops $N's lead and releases $M.", TRUE, ch, NULL, mob, TO_NOTVICT);
