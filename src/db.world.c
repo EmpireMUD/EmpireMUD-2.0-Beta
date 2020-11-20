@@ -5145,6 +5145,8 @@ void load_world_from_binary_index(void) {
 		log("Booting with no world files (binary index file %s does not exist)", BINARY_WORLD_INDEX);
 		log("Attempting to load pre-b5.116 world files...");
 		index_boot(DB_BOOT_WLD);
+		save_world_after_startup = TRUE;
+		// TODO: delete old wld files
 		return;
 	}
 	
@@ -5152,7 +5154,7 @@ void load_world_from_binary_index(void) {
 	fread(&top_vnum, sizeof(int), 1, index_fl);
 	
 	// make space
-	if (top_vnum > top_of_world_index) {
+	if (top_vnum > top_of_world_index || !world_index_data) {
 		if (world_index_data) {
 			// reallocate and clear the new space
 			RECREATE(world_index_data, char, top_vnum+1);
