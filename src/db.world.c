@@ -4754,7 +4754,7 @@ void load_one_room_from_wld_file(room_vnum vnum, char index_data) {
 	struct reset_com *reset;
 	struct map_data *map = NULL;
 	room_data *room;
-	bool end, fail;
+	bool end;
 	bitvector_t bit_in[2];
 	long long_in;
 	int int_in[4];
@@ -4986,7 +4986,6 @@ void load_one_room_from_wld_file(room_vnum vnum, char index_data) {
 					}
 					
 					reset_read = line + 6;
-					fail = FALSE;
 					
 					CREATE(reset, struct reset_com, 1);
 					DL_APPEND(room->reset_commands, reset);
