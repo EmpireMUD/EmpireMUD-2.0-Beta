@@ -4011,6 +4011,7 @@ void ensure_binary_map_file_is_open(void) {
 * @param map_file_data *store A pointer to the data to write to.
 */
 void map_to_store(struct map_data *map, map_file_data *store) {
+	memset((char *) store, 0, sizeof(map_file_data));
 	store->island_id = map->shared->island_id;
 	
 	store->sector_type = map->sector_type ? GET_SECT_VNUM(map->sector_type) : NOTHING;
@@ -4792,7 +4793,7 @@ void load_one_room_from_wld_file(room_vnum vnum, char index_data) {
 	FILE *fl;
 	
 	map = (vnum < MAP_SIZE) ? &world_map[MAP_X_COORD(vnum)][MAP_Y_COORD(vnum)] : NULL;
-	room = real_real_room(vnum);	// if loaded already somehow
+	room = real_room(vnum);	// if loaded already or can be loaded from the map
 	shared = map ? map->shared : (room ? SHARED_DATA(room) : NULL);
 	
 	get_world_filename(fname, vnum, WLD_SUFFIX);
@@ -4827,9 +4828,10 @@ void load_one_room_from_wld_file(room_vnum vnum, char index_data) {
 				}
 				// #code may be M or R -- NEED room if it's R
 				if (char_in == 'R' && !room) {
+					// note that for map rooms this was actually handled by real_room() above calling load_map_room()
 					CREATE(room, room_data, 1);
 					room->vnum = vnum;
-				
+					
 					if (map) {
 						GET_MAP_LOC(room) = map;
 						SHARED_DATA(room) = map->shared;
