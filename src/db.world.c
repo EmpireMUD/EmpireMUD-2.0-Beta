@@ -149,7 +149,7 @@ void change_room_custom_description(room_data *room, char *desc) {
 	if (ROOM_CUSTOM_DESCRIPTION(room)) {
 		free(ROOM_CUSTOM_DESCRIPTION(room));
 	}
-	ROOM_CUSTOM_DESCRIPTION(room) = str_dup(desc);
+	ROOM_CUSTOM_DESCRIPTION(room) = desc ? str_dup(desc) : NULL;
 	request_world_save(GET_ROOM_VNUM(room), WSAVE_ROOM);
 }
 
@@ -165,7 +165,7 @@ void change_room_custom_icon(room_data *room, char *icon) {
 	if (ROOM_CUSTOM_ICON(room)) {
 		free(ROOM_CUSTOM_ICON(room));
 	}
-	ROOM_CUSTOM_ICON(room) = str_dup(icon);
+	ROOM_CUSTOM_ICON(room) = icon ? str_dup(icon) : NULL;
 	request_world_save(GET_ROOM_VNUM(room), WSAVE_ROOM);
 }
 
@@ -181,7 +181,7 @@ void change_room_custom_name(room_data *room, char *name) {
 	if (ROOM_CUSTOM_NAME(room)) {
 		free(ROOM_CUSTOM_NAME(room));
 	}
-	ROOM_CUSTOM_NAME(room) = str_dup(name);
+	ROOM_CUSTOM_NAME(room) = name ? str_dup(name) : NULL;
 	request_world_save(GET_ROOM_VNUM(room), WSAVE_ROOM);
 }
 
@@ -5168,7 +5168,7 @@ void load_world_from_binary_index(void) {
 		top_of_world_index = top_vnum;
 	}
 	
-	fread(&world_index_data, sizeof(char), top_of_world_index+1, index_fl);
+	fread(world_index_data, sizeof(char), top_of_world_index+1, index_fl);
 	fclose(index_fl);
 	
 	// and load rooms...
