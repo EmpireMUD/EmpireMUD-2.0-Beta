@@ -4838,6 +4838,7 @@ void load_one_room_from_wld_file(room_vnum vnum, char index_data) {
 						}
 						else {
 							CREATE(SHARED_DATA(room), struct shared_room_data, 1);
+							shared->island_id = NO_ISLAND;
 						}
 					
 						shared = SHARED_DATA(room);
