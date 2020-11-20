@@ -3928,6 +3928,19 @@ void parse_other_shared_data(struct shared_room_data *shared, char *line, char *
 //// WORLD MAP SAVING ////////////////////////////////////////////////////////
 
 /**
+* To be called after saving everything, to prevent anything currently
+* requesting a save from re-saving.
+*/
+void cancel_all_world_save_requests(void) {
+	struct world_save_request_data *iter, *next_iter;
+	HASH_ITER(hh, world_save_requests, iter, next_iter) {
+		HASH_DEL(world_save_requests, iter);
+		free(iter);
+	}
+}
+
+
+/**
 * Cancels any open world-save-requests for a given room.
 *
 * @param room_vnum room The room to cancel requests for.
