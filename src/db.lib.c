@@ -7824,7 +7824,7 @@ room_data *real_room(room_vnum vnum) {
 	
 	// we guarantee map rooms exist
 	if (!room && vnum < MAP_SIZE) {
-		room = load_map_room(vnum);
+		room = load_map_room(vnum, TRUE);
 	}
 	
 	return room;

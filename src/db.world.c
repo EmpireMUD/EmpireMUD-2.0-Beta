@@ -3097,9 +3097,10 @@ room_data *get_extraction_room(void) {
 * rooms as-needed.
 *
 * @param room_vnum vnum The vnum of the map room to load.
+* @param bool schedule_unload If TRUE, runs schedule_check_unload().
 * @return room_data* A fresh map room.
 */
-room_data *load_map_room(room_vnum vnum) {
+room_data *load_map_room(room_vnum vnum, bool schedule_unload) {
 	struct map_data *map;
 	room_data *room;
 	
@@ -3125,7 +3126,9 @@ room_data *load_map_room(room_vnum vnum) {
 	ROOM_CROP(room) = map->crop_type;
 	
 	// checks if it's unloadable, and unloads it
-	schedule_check_unload(room, FALSE);
+	if (schedule_unload) {
+		schedule_check_unload(room, FALSE);
+	}
 	
 	return room;
 }
@@ -4800,7 +4803,7 @@ void load_one_room_from_wld_file(room_vnum vnum, char index_data) {
 	FILE *fl;
 	
 	map = (vnum < MAP_SIZE) ? &world_map[MAP_X_COORD(vnum)][MAP_Y_COORD(vnum)] : NULL;
-	room = real_room(vnum);	// if loaded already or can be loaded from the map
+	room = real_real_room(vnum);	// if loaded already for some reason
 	shared = map ? map->shared : (room ? SHARED_DATA(room) : NULL);
 	
 	get_world_filename(fname, vnum, WLD_SUFFIX);
@@ -4835,23 +4838,25 @@ void load_one_room_from_wld_file(room_vnum vnum, char index_data) {
 				}
 				// #code may be M or R -- NEED room if it's R
 				if (char_in == 'R' && !room) {
-					// note that for map rooms this was actually handled by real_room() above calling load_map_room()
-					CREATE(room, room_data, 1);
-					room->vnum = vnum;
+					if (vnum >= MAP_SIZE || !(room = load_map_room(vnum, FALSE))) {
+						// note that for map rooms this was actually handled by real_room() above calling load_map_room()
+						CREATE(room, room_data, 1);
+						room->vnum = vnum;
 					
-					if (map) {
-						GET_MAP_LOC(room) = map;
-						SHARED_DATA(room) = map->shared;
-						GET_MAP_LOC(room)->room = room;
+						if (map) {
+							GET_MAP_LOC(room) = map;
+							SHARED_DATA(room) = map->shared;
+							GET_MAP_LOC(room)->room = room;
+						}
+						else {
+							CREATE(SHARED_DATA(room), struct shared_room_data, 1);
+						}
+					
+						shared = SHARED_DATA(room);
+					
+						// put it in the hash table -- do not need to update_world_index as this is a startup load
+						add_room_to_world_tables(room);
 					}
-					else {
-						CREATE(SHARED_DATA(room), struct shared_room_data, 1);
-					}
-					
-					shared = SHARED_DATA(room);
-					
-					// put it in the hash table -- do not need to update_world_index as this is a startup load
-					add_room_to_world_tables(room);
 				}
 				break;
 			}

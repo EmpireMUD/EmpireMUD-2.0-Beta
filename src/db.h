@@ -891,7 +891,7 @@ crop_data *get_potential_crop_for_location(room_data *location, bool must_have_f
 #define get_world_filename(str, vnum, suffix)  sprintf(str, "%s%02d/%d%s", WLD_PREFIX, ((vnum) % 100), (vnum), NULLSAFE(suffix))
 struct complex_room_data *init_complex_data();
 void init_mine(room_data *room, char_data *ch, empire_data *emp);
-room_data *load_map_room(room_vnum vnum);
+room_data *load_map_room(room_vnum vnum, bool schedule_unload);
 FILE *open_world_file(int block);
 void parse_other_shared_data(struct shared_room_data *shared, char *line, char *error_part);
 void perform_burn_room(room_data *room);

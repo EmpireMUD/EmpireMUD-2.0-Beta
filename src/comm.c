@@ -816,7 +816,10 @@ void heartbeat(unsigned long heart_pulse) {
 		gain_cond_message = TRUE;
 	}
 	
+	HEARTBEAT_LOG("start")
+	
 	dg_event_process();
+	HEARTBEAT_LOG("0")
 
 	// this is meant to be slightly longer than the mobile_activity pulse (10), and is mentioned in help files
 	if (HEARTBEAT(13)) {
