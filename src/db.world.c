@@ -55,6 +55,7 @@ EVENT_CANCEL_FUNC(cancel_room_event);
 EVENT_CANCEL_FUNC(cancel_room_expire_event);
 bool load_pre_b5_116_world_map_from_file();
 bool objpack_save_room(room_data *room);
+void save_instances();
 
 // locals
 void cancel_all_world_save_requests(int only_save_type);
@@ -4085,6 +4086,12 @@ void perform_requested_world_saves(void) {
 	// check for map saves
 	if (any_map && binary_map_fl) {
 		fflush(binary_map_fl);
+	}
+	
+	// check for instance saves
+	if (need_instance_save) {
+		save_instances();
+		need_instance_save = FALSE;
 	}
 	
 	// compute time
