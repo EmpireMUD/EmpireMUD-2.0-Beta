@@ -4833,7 +4833,7 @@ void load_one_room_from_wld_file(room_vnum vnum, char index_data) {
 					
 					LL_PREPEND(ROOM_AFFECTS(room), af);
 				}
-				if (!strn_cmp(line, "Aff-flags: ", 11)) {
+				else if (!strn_cmp(line, "Aff-flags: ", 11)) {
 					if (sscanf(line + 11, "%llu %llu", &bit_in[0], &bit_in[1]) != 2) {
 						log("SYSERR: Invalid aff-flags line: %s", error);
 						exit(1);
