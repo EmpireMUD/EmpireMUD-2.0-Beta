@@ -4042,16 +4042,11 @@ void map_to_store(struct map_data *map, map_file_data *store) {
 */
 void perform_requested_world_saves(void) {
 	struct world_save_request_data *iter, *next_iter;
-	unsigned long long timer = 0;
 	struct map_data *map;
 	bool any_map = FALSE;
 	
 	if (block_all_saves_due_to_shutdown) {
 		return;
-	}
-	
-	if (world_save_requests) {
-		timer = microtime();
 	}
 	
 	HASH_ITER(hh, world_save_requests, iter, next_iter) {
@@ -4095,12 +4090,6 @@ void perform_requested_world_saves(void) {
 	if (need_instance_save) {
 		save_instances();
 		need_instance_save = FALSE;
-	}
-	
-	// compute time
-	if (timer) {
-		timer = microtime() - timer;
-		log("perform_requested_world_saves: save took %.2f seconds", timer / 1000000.0);
 	}
 }
 
