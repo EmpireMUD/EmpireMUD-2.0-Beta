@@ -2250,6 +2250,7 @@ char *get_bld_name_by_proto(bld_vnum vnum);
 bool rmt_has_exit(room_template *rmt, int dir);
 
 // pathfind.c
+ubyte get_pathfind_key(void);
 char *get_pathfind_string(room_data *start, room_data *end, char_data *ch, vehicle_data *veh, PATHFIND_VALIDATOR(*validator));
 PATHFIND_VALIDATOR(pathfind_ocean);
 PATHFIND_VALIDATOR(pathfind_pilot);

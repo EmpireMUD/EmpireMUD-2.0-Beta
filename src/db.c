@@ -1531,11 +1531,17 @@ void check_newbie_islands(void) {
 * @param struct map_data *map A map location.
 * @param int island The island id.
 * @param struct island_info *ptr Optional: Prevent having to look up the island pointer if it's already available. (NULL to detect here)
+* @param ubyte pathfind_key Uses this to prevent re-working the same tile.
 */
-void number_island(struct map_data *map, int island, struct island_info *isle_ptr) {
+void number_island(struct map_data *map, int island, struct island_info *isle_ptr, ubyte pathfind_key) {
 	int x, y, new_x, new_y;
 	struct map_data *tile;
 	
+	if (map->pathfind_key == pathfind_key) {
+		return;	// no work
+	}
+	
+	map->pathfind_key = pathfind_key;
 	map->shared->island_id = island;
 	map->shared->island_ptr = isle_ptr ? isle_ptr : get_island(island, TRUE);
 	
@@ -1550,7 +1556,7 @@ void number_island(struct map_data *map, int island, struct island_info *isle_pt
 			if (get_coord_shift(MAP_X_COORD(map->vnum), MAP_Y_COORD(map->vnum), x, y, &new_x, &new_y)) {
 				tile = &(world_map[new_x][new_y]);
 				
-				if (!SECT_FLAGGED(tile->sector_type, SECTF_NON_ISLAND) && tile->shared->island_id <= 0) {
+				if (tile->pathfind_key != pathfind_key && !SECT_FLAGGED(tile->sector_type, SECTF_NON_ISLAND) && tile->shared->island_id <= 0) {
 					// add to stack
 					push_island(tile);
 				}
@@ -1586,6 +1592,7 @@ void number_and_count_islands(bool reset) {
 	room_data *room, *next_room, *maploc;
 	struct map_data *map;
 	int iter, use_id;
+	ubyte pathfind_key;
 	
 	// find top island id (and reset if requested)
 	top_island_num = 0;	// this ensures any new island ID has a minimum of 1
@@ -1602,6 +1609,7 @@ void number_and_count_islands(bool reset) {
 	
 	// 1. expand EXISTING islands
 	if (!reset) {
+		pathfind_key = get_pathfind_key();
 		for (map = land_map; map; map = map->next) {
 			if (map->shared->island_id == NO_ISLAND) {
 				continue;
@@ -1612,16 +1620,14 @@ void number_and_count_islands(bool reset) {
 			push_island(map);
 			
 			while ((item = pop_island())) {
-				// sometimes it gains an island_id before it gets here
-				if (item->loc->shared->island_id <= 0) {
-					number_island(item->loc, use_id, use_isle);
-				}
+				number_island(item->loc, use_id, use_isle, pathfind_key);
 				free(item);
 			}
 		}
 	}
 	
 	// 2. look for places that have no island id but need one -- and also measure islands while we're here
+	pathfind_key = get_pathfind_key();
 	for (map = land_map; map; map = map->next) {
 		if (map->shared->island_id == NO_ISLAND && !SECT_FLAGGED(map->sector_type, SECTF_NON_ISLAND)) {
 			use_id = ++top_island_num;
@@ -1629,7 +1635,7 @@ void number_and_count_islands(bool reset) {
 			push_island(map);
 			
 			while ((item = pop_island())) {
-				number_island(item->loc, use_id, use_isle);
+				number_island(item->loc, use_id, use_isle, pathfind_key);
 				free(item);
 			}
 		}
