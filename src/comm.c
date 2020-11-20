@@ -88,6 +88,7 @@ void reset_instances();
 void run_mob_echoes();
 void sanity_check();
 void save_data_table(bool force);
+void save_instances();
 void update_actions();
 void update_empire_npc_data();
 void update_guard_towers();
@@ -987,6 +988,11 @@ void heartbeat(unsigned long heart_pulse) {
 		
 		write_binary_world_index_updates();
 		HEARTBEAT_LOG("40")
+		
+		if (need_instance_save) {
+			save_instances();
+			HEARTBEAT_LOG("41")
+		}
 	}
 
 	/* Every pulse! Don't want them to stink the place up... */

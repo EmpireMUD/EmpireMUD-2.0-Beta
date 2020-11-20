@@ -194,6 +194,7 @@ int top_of_helpt = 0;	// top of help index table
 struct instance_data *instance_list = NULL;	// doubly-linked global instance list
 bool instance_save_wait = FALSE;	// prevents repeated instance saving
 struct instance_data *quest_instance_global = NULL;	// passes instances through to some quest triggers
+bool need_instance_save = FALSE;	// triggers full instance saves
 
 // map
 room_vnum *start_locs = NULL;	// array of start locations

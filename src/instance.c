@@ -198,6 +198,7 @@ struct instance_data *build_instance_loc(adv_data *adv, struct adventure_link_ru
 		reset_instance(inst);
 	}
 	
+	need_instance_save = TRUE;
 	return inst;
 }
 
@@ -1097,6 +1098,7 @@ void delete_instance(struct instance_data *inst, bool run_cleanup) {
 	
 	// re-enable instance saving
 	instance_save_wait = FALSE;
+	need_instance_save = TRUE;
 }
 
 
@@ -1353,6 +1355,7 @@ void reset_instance(struct instance_data *inst) {
 	}
 	
 	INST_LAST_RESET(inst) = time(0);
+	need_instance_save = TRUE;
 }
 
 
@@ -1499,6 +1502,8 @@ void unlink_instance_entrance(room_data *room, struct instance_data *inst, bool 
 		// and remove the building
 		disassociate_building(room);
 	}
+	
+	need_instance_save = TRUE;
 }
 
 
@@ -2128,6 +2133,8 @@ void remove_instance_fake_loc(struct instance_data *inst) {
 			}
 		}
 	}
+	
+	need_instance_save = TRUE;
 }
 
 
@@ -2169,6 +2176,8 @@ void set_instance_fake_loc(struct instance_data *inst, room_data *loc) {
 			request_world_save(GET_ROOM_VNUM(INST_ROOM(inst, iter)), WSAVE_ROOM);
 		}
 	}
+	
+	need_instance_save = TRUE;
 }
 
 
@@ -2551,7 +2560,7 @@ void save_instances(void) {
 
 	DL_FOREACH(instance_list, inst) {
 		fprintf(fl, "#%d\n", INST_ID(inst));
-		fprintf(fl, "%d %d %d %s %d\n", GET_ADV_VNUM(INST_ADVENTURE(inst)), INST_LOCATION(inst) ? GET_ROOM_VNUM(INST_LOCATION(inst)) : NOWHERE, INST_START(inst) ? GET_ROOM_VNUM(INST_START(inst)) : NOWHERE, bitv_to_alpha(INST_FLAGS(inst)), INST_FAKE_LOC(inst) ? GET_ROOM_VNUM(INST_FAKE_LOC(inst)) : NOWHERE);
+		fprintf(fl, "%d %d %d %lld %d\n", GET_ADV_VNUM(INST_ADVENTURE(inst)), INST_LOCATION(inst) ? GET_ROOM_VNUM(INST_LOCATION(inst)) : NOWHERE, INST_START(inst) ? GET_ROOM_VNUM(INST_START(inst)) : NOWHERE, INST_FLAGS(inst), INST_FAKE_LOC(inst) ? GET_ROOM_VNUM(INST_FAKE_LOC(inst)) : NOWHERE);
 		fprintf(fl, "%d %ld %ld\n", INST_LEVEL(inst), INST_CREATED(inst), INST_LAST_RESET(inst));
 		
 		// 'D' direction data
@@ -2623,4 +2632,6 @@ void scale_instance_to_level(struct instance_data *inst, int level) {
 			scale_vehicle_to_level(veh, level);
 		}
 	}
+	
+	need_instance_save = TRUE;
 }

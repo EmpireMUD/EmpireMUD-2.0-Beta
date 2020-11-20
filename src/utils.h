@@ -2171,7 +2171,6 @@ int lock_instance_level(room_data *room, int level);
 void mark_instance_completed(struct instance_data *inst);
 void remove_instance_fake_loc(struct instance_data *inst);
 void reset_instance(struct instance_data *inst);
-void save_instances();
 void scale_instance_to_level(struct instance_data *inst, int level);
 void set_instance_fake_loc(struct instance_data *inst, room_data *loc);
 void unlink_instance_entrance(room_data *room, struct instance_data *inst, bool run_cleanup);
