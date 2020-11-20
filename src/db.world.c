@@ -4667,7 +4667,6 @@ void write_whole_binary_world_index(void) {
 void load_binary_map_file(void) {
 	int x, y, height, width;
 	struct map_file_header header;
-	long size;
 	bool eof = FALSE;
 	
 	// run this ONLY if this is the first step in booting the map
