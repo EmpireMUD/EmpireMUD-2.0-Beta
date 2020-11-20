@@ -433,7 +433,7 @@ void setup_generic_npc(char_data *mob, empire_data *emp, int name, int sex) {
 		}
 	}
 	
-	mark_mob_for_room_save(mob);
+	request_mob_save_in_room(mob);
 }
 
 

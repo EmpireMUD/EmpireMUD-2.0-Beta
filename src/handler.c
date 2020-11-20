@@ -2620,7 +2620,7 @@ void add_cooldown(char_data *ch, any_vnum type, int seconds_duration) {
 	if (ch->desc) {
 		queue_delayed_update(ch, CDU_MSDP_COOLDOWNS);
 	}
-	mark_mob_for_room_save(ch);
+	request_mob_save_in_room(ch);
 }
 
 
@@ -2659,7 +2659,7 @@ void remove_cooldown(char_data *ch, struct cooldown_data *cool) {
 	if (ch->desc) {
 		queue_delayed_update(ch, CDU_MSDP_COOLDOWNS);
 	}
-	mark_mob_for_room_save(ch);
+	request_mob_save_in_room(ch);
 }
 
 

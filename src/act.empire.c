@@ -4639,7 +4639,7 @@ ACMD(do_enroll) {
 			DL_FOREACH(character_list, mob) {
 				if (GET_LOYALTY(mob) == old) {
 					GET_LOYALTY(mob) = e;
-					mark_mob_for_room_save(mob);
+					request_mob_save_in_room(mob);
 				}
 			}
 			

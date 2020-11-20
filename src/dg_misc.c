@@ -396,7 +396,7 @@ void do_dg_own(empire_data *emp, char_data *vict, obj_data *obj, room_data *room
 		}
 		GET_LOYALTY(vict) = emp;
 		setup_generic_npc(vict, emp, MOB_DYNAMIC_NAME(vict), MOB_DYNAMIC_SEX(vict));
-		mark_mob_for_room_save(vict);
+		request_mob_save_in_room(vict);
 	}
 	if (obj) {
 		obj->last_empire_id = emp ? EMPIRE_VNUM(emp) : NOTHING;

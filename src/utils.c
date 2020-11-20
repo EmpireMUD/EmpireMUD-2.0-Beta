@@ -2415,7 +2415,7 @@ void change_keywords(char_data *ch, char *str) {
 		}
 	}
 	
-	mark_mob_for_room_save(ch);
+	request_mob_save_in_room(ch);
 }
 
 
@@ -2463,7 +2463,7 @@ void change_long_desc(char_data *ch, char *str) {
 		}
 	}
 	
-	mark_mob_for_room_save(ch);
+	request_mob_save_in_room(ch);
 }
 
 
@@ -2525,7 +2525,7 @@ void change_look_desc(char_data *ch, char *str, bool format) {
 		}
 	}
 	
-	mark_mob_for_room_save(ch);
+	request_mob_save_in_room(ch);
 }
 
 
@@ -2570,7 +2570,7 @@ void change_look_desc_append(char_data *ch, char *str, bool format) {
 		}
 	}
 	
-	mark_mob_for_room_save(ch);
+	request_mob_save_in_room(ch);
 }
 
 
@@ -2599,7 +2599,7 @@ void change_sex(char_data *ch, int sex) {
 	
 	// update msdp
 	update_MSDP_gender(ch, UPDATE_SOON);
-	mark_mob_for_room_save(ch);
+	request_mob_save_in_room(ch);
 }
 
 
@@ -2647,7 +2647,7 @@ void change_short_desc(char_data *ch, char *str) {
 		}
 	}
 	
-	mark_mob_for_room_save(ch);
+	request_mob_save_in_room(ch);
 }
 
 

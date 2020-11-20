@@ -1774,7 +1774,7 @@ void delete_empire(empire_data *emp) {
 		// this is "theoretically" just NPCs since we did players already
 		if (GET_LOYALTY(ch) == emp) {
 			GET_LOYALTY(ch) = NULL;
-			mark_mob_for_room_save(ch);
+			request_mob_save_in_room(ch);
 			
 			if (IS_NPC(ch)) {
 				set_mob_flags(ch, MOB_SPAWNED);	// trigger a de-spawn

@@ -979,7 +979,7 @@ extern struct empire_territory_data *global_next_territory_entry;
 // quick setter functions
 
 // triggers a room save (savable mob traits changed)
-#define mark_mob_for_room_save(mob)  do {	\
+#define request_mob_save_in_room(mob)  do {	\
 	if (IN_ROOM(mob) && MOB_SAVES_TO_ROOM(mob)) {	\
 		request_world_save(GET_ROOM_VNUM(IN_ROOM(mob)), WSAVE_ROOM);	\
 	}	\
@@ -988,11 +988,11 @@ extern struct empire_territory_data *global_next_territory_entry;
 // combine setting these with saving
 #define set_mob_flags(mob, to_set)  do { \
 	SET_BIT(MOB_FLAGS(mob), (to_set));	\
-	mark_mob_for_room_save(mob);	\
+	request_mob_save_in_room(mob);	\
 } while (0)
 
 // combine removing these with saving
 #define remove_mob_flags(mob, to_set)  do { \
 	REMOVE_BIT(MOB_FLAGS(mob), (to_set));	\
-	mark_mob_for_room_save(mob);	\
+	request_mob_save_in_room(mob);	\
 } while (0)

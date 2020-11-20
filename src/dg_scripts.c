@@ -3755,7 +3755,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 								add_instance_mob(inst, GET_MOB_VNUM(c));
 							}
 							
-							mark_mob_for_room_save(c);
+							request_mob_save_in_room(c);
 						}
 						*str = '\0';
 					}
@@ -4234,7 +4234,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						if (IS_NPC(c) && MOB_INSTANCE_ID(c) != NOTHING) {
 							subtract_instance_mob(real_instance(MOB_INSTANCE_ID(c)), GET_MOB_VNUM(c));
 							MOB_INSTANCE_ID(c) = NOTHING;
-							mark_mob_for_room_save(c);
+							request_mob_save_in_room(c);
 						}
 						*str = '\0';
 					}
