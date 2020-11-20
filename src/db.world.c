@@ -4827,22 +4827,12 @@ void load_one_room_from_wld_file(room_vnum vnum, char index_data) {
 						// note that for map rooms this was actually handled by real_room() above calling load_map_room()
 						CREATE(room, room_data, 1);
 						room->vnum = vnum;
-					
-						if (map) {
-							GET_MAP_LOC(room) = map;
-							SHARED_DATA(room) = map->shared;
-							map->room = room;
-							SECT(room) = map->sector_type;
-							BASE_SECT(room) = map->base_sector;
-							ROOM_CROP(room) = map->crop_type;
-						}
-						else {
-							CREATE(SHARED_DATA(room), struct shared_room_data, 1);
-							shared->island_id = NO_ISLAND;
-						}
-					
+						
+						CREATE(SHARED_DATA(room), struct shared_room_data, 1);
+						SHARED_DATA(room)->island_id = NO_ISLAND;
+						
 						shared = SHARED_DATA(room);
-					
+						
 						// put it in the hash table -- do not need to update_world_index as this is a startup load
 						add_room_to_world_tables(room);
 					}
