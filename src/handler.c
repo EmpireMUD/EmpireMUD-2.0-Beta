@@ -1564,7 +1564,9 @@ void char_from_room(char_data *ch) {
 		stop_fighting(ch);
 	}
 	
-	request_world_save(GET_ROOM_VNUM(IN_ROOM(ch)), WSAVE_ROOM);
+	if (IS_NPC(ch)) {
+		request_world_save(GET_ROOM_VNUM(IN_ROOM(ch)), WSAVE_ROOM);
+	}
 
 	// update lights
 	ROOM_LIGHTS(IN_ROOM(ch)) -= GET_LIGHTS(ch);
@@ -1621,12 +1623,13 @@ void char_to_room(char_data *ch, room_data *room) {
 			}
 		}
 		
-		// store last room to player
 		if (!IS_NPC(ch)) {
+			// store last room to player
 			GET_LAST_ROOM(ch) = GET_ROOM_VNUM(room);
 		}
-		
-		request_world_save(GET_ROOM_VNUM(room), WSAVE_ROOM);
+		else {	// is NPC
+			request_world_save(GET_ROOM_VNUM(room), WSAVE_ROOM);
+		}
 	}
 }
 
