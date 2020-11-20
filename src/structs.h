@@ -3872,8 +3872,6 @@ struct mob_special_data {
 	time_t spawn_time;	// used for despawning
 	any_vnum instance_id;	// instance the mob belongs to, or NOTHING if none
 	
-	time_t marked_for_save;	// if non-zero, guarantees the mob will be saved within ~5 minutes
-	
 	// for #n-named mobs
 	int dynamic_sex;
 	int dynamic_name;

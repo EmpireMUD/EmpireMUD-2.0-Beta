@@ -57,11 +57,12 @@ bool load_pre_b5_116_world_map_from_file();
 bool objpack_save_room(room_data *room);
 
 // locals
+void cancel_all_world_save_requests(int only_save_type);
 void grow_crop(struct map_data *map);
 void init_room(room_data *room, room_vnum vnum);
 int naturalize_newbie_island(struct map_data *tile, bool do_unclaim);
 int sort_empire_islands(struct empire_island *a, struct empire_island *b);
-bool write_map_and_room_to_file(room_data *room, struct map_data *map);
+bool write_map_and_room_to_file(room_data *room, struct map_data *map, bool force_obj_pack);
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -1973,6 +1974,9 @@ void startup_room_reset(void) {
 			reset_one_room(room);
 		}
 	}
+	
+	// cancel any world saves triggered by resets
+	cancel_all_world_save_requests(WSAVE_ROOM | WSAVE_OBJS_AND_VEHS);
 }
 
 
@@ -3931,11 +3935,17 @@ void parse_other_shared_data(struct shared_room_data *shared, char *line, char *
 * To be called after saving everything, to prevent anything currently
 * requesting a save from re-saving.
 */
-void cancel_all_world_save_requests(void) {
+void cancel_all_world_save_requests(int only_save_type) {
 	struct world_save_request_data *iter, *next_iter;
 	HASH_ITER(hh, world_save_requests, iter, next_iter) {
-		HASH_DEL(world_save_requests, iter);
-		free(iter);
+		if (only_save_type != NOBITS) {
+			REMOVE_BIT(iter->save_type, only_save_type);
+		}
+		
+		if (!iter->save_type || only_save_type == NOBITS) {
+			HASH_DEL(world_save_requests, iter);
+			free(iter);
+		}
 	}
 }
 
@@ -4060,7 +4070,7 @@ void perform_requested_world_saves(void) {
 			REMOVE_BIT(iter->save_type, WSAVE_MAP);
 		}
 		if (IS_SET(iter->save_type, WSAVE_ROOM)) {
-			write_map_and_room_to_file(real_real_room(iter->vnum), NULL);
+			write_map_and_room_to_file(real_real_room(iter->vnum), NULL, FALSE);
 			REMOVE_BIT(iter->save_type, WSAVE_ROOM);
 		}
 		
@@ -4196,8 +4206,11 @@ void write_all_wld_files(void) {
 	room_data *room, *next_room;
 	
 	HASH_ITER(hh, world_table, room, next_room) {
-		write_map_and_room_to_file(room, NULL);
+		write_map_and_room_to_file(room, NULL, TRUE);
 	}
+	
+	// no need to save any more room updates
+	cancel_all_world_save_requests(WSAVE_ROOM | WSAVE_OBJS_AND_VEHS);
 }
 
 
@@ -4269,9 +4282,10 @@ void write_binary_world_index_updates(void) {
 *
 * @param room_data *room Optional: The full room to write (may be NULL).
 * @param struct map_data *map Optional: The map tile to save (may be NULL).
+* @param bool force_obj_pack If TRUE, will always write the obj/veh pack, if one exists, rather than skipping it if already written.
 * @return bool TRUE if it wrote a file, FALSE if it did not.
 */
-bool write_map_and_room_to_file(room_data *room, struct map_data *map) {
+bool write_map_and_room_to_file(room_data *room, struct map_data *map, bool force_obj_pack) {
 	room_vnum vnum = (map ? map->vnum : (room ? GET_ROOM_VNUM(room) : NOTHING));
 	struct shared_room_data *shared = (map ? map->shared : (room ? SHARED_DATA(room) : NULL));
 	struct room_extra_data *red, *next_red;
@@ -4449,7 +4463,7 @@ bool write_map_and_room_to_file(room_data *room, struct map_data *map) {
 	// each reset (except 'S') has 4 digits. The first 3 are variable; the last 1 indicates 2 more lines of strings.
 	if (room) {
 		// must save obj pack instruction BEFORE mob instruction
-		if (IS_SET(room->save_info, SAVE_INFO_PACK_SAVED) || objpack_save_room(room)) {
+		if ((!force_obj_pack && IS_SET(room->save_info, SAVE_INFO_PACK_SAVED)) || objpack_save_room(room)) {
 			// the "1" in the arg1 slot indicates it will use the new objpack location, see objpack_load_room()
 			fprintf(fl, "Load: O 1 0 0 0\n");
 		}
@@ -4472,9 +4486,6 @@ bool write_map_and_room_to_file(room_data *room, struct map_data *map) {
 		// people
 		DL_FOREACH2(ROOM_PEOPLE(room), mob, next_in_room) {
 			if (mob && MOB_SAVES_TO_ROOM(mob)) {
-				// clear save-mark
-				MOB_MARKED_FOR_SAVE(mob) = 0;
-				
 				// basic mob data
 				fprintf(fl, "Load: M %d %llu %d 0\n", GET_MOB_VNUM(mob), MOB_FLAGS(mob), GET_ROPE_VNUM(mob));
 				
@@ -4597,6 +4608,9 @@ void write_whole_binary_map_file(void) {
 			fwrite(&store, sizeof(map_file_data), 1, binary_map_fl);
 		}
 	}
+	
+	// no need to save any map updates
+	cancel_all_world_save_requests(WSAVE_MAP);
 	
 	fflush(binary_map_fl);
 	// leave map file open
@@ -4746,6 +4760,9 @@ void load_binary_map_file(void) {
 			}
 		}
 	}
+	
+	// cancel any save requests triggered by loading
+	cancel_all_world_save_requests(WSAVE_MAP);
 }
 
 
@@ -5195,6 +5212,9 @@ void load_world_from_binary_index(void) {
 	}
 	
 	log("Loaded %d room%s from wld files", count, PLURAL(count));
+	
+	// cancel any saves triggered by this
+	cancel_all_world_save_requests(WSAVE_ROOM);
 }
 
 

@@ -53,7 +53,6 @@ void build_all_shop_lookups();
 void build_land_map();
 void build_player_index();
 void build_world_map();
-void cancel_all_world_save_requests();
 void check_abilities();
 void check_and_link_faction_relations();
 void check_archetypes();
@@ -467,9 +466,8 @@ void boot_db(void) {
 	write_whole_mapout();
 	if (save_world_after_startup) {
 		write_whole_binary_map_file();
-		write_whole_binary_world_index();
 		write_all_wld_files();
-		cancel_all_world_save_requests();
+		write_whole_binary_world_index();
 	}
 	// put things here
 	
@@ -1838,9 +1836,6 @@ char_data *read_mobile(mob_vnum nr, bool with_triggers) {
 	
 	// note this may lead to slight over-spawning after reboots -pc 5/20/16
 	MOB_SPAWN_TIME(mob) = time(0);
-	
-	// ensure it's not marked for save
-	MOB_MARKED_FOR_SAVE(mob) = 0;
 
 	return (mob);
 }

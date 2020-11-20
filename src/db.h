@@ -978,12 +978,12 @@ extern struct empire_territory_data *global_next_territory_entry;
 
 // quick setter functions
 
-// triggers a delayed room save (savable mob traits changed)
+// triggers a room save (savable mob traits changed)
 #define mark_mob_for_room_save(mob)  do {	\
-	if (!MOB_MARKED_FOR_SAVE(mob)) {	\
-		MOB_MARKED_FOR_SAVE(mob) = time(0);	\
+	if (IN_ROOM(mob) && MOB_SAVES_TO_ROOM(mob)) {	\
+		request_world_save(GET_ROOM_VNUM(IN_ROOM(mob)), WSAVE_ROOM);	\
 	}	\
-} while (0)
+} while(0)
 
 // combine setting these with saving
 #define set_mob_flags(mob, to_set)  do { \
