@@ -37,6 +37,7 @@
 #include <stdlib.h>
 #include <time.h>
 #include <math.h>
+#include <glob.h>
 
 #include "../conf.h"
 #include "../sysdep.h"
@@ -678,6 +679,41 @@ inline int compute_distance(int x1, int y1, int x2, int y2) {
 	dist = (int) sqrt(dist);
 	
 	return dist;
+}
+
+
+// deletes old map files
+void delete_old_files(void) {
+	int wld_count = 0, pack_count = 0;
+	char fname[256];
+	glob_t globbuf;
+	int iter, sub;
+	
+	if (access(LIB_PATH LIB_WORLD "base_map", F_OK) == 0) {
+		printf("Deleting: %s\n", LIB_PATH LIB_WORLD "base_map");
+		unlink(LIB_PATH LIB_WORLD "base_map");
+	}
+	if (access(LIB_PATH BINARY_MAP_FILE, F_OK) == 0) {
+		printf("Deleting: %s\n", LIB_PATH BINARY_MAP_FILE);
+		unlink(LIB_PATH BINARY_MAP_FILE);
+	}
+	if (access(LIB_PATH BINARY_WORLD_INDEX, F_OK) == 0) {
+		printf("Deleting: %s\n", LIB_PATH BINARY_WORLD_INDEX);
+		unlink(LIB_PATH BINARY_WORLD_INDEX);
+	}
+	
+	for (iter = 0; iter < 100; ++iter) {
+		sprintf(fname, "%s%02d/*%s", LIB_PATH WLD_PREFIX, iter, WLD_SUFFIX);
+		glob(fname, 0, NULL, &globbuf);
+		
+		for (sub = 0; sub < globbuf.gl_pathc; ++sub) {
+			++wld_count;
+			printf("test: '%s'\n", globbuf.gl_pathv[sub]);
+		}
+		
+		globfree(&globbuf);
+		break;
+	}
 }
 
 
@@ -1885,6 +1921,7 @@ void load_and_shift_map(int dist) {
 	
 	shift_map_x(dist);
 	
+	delete_old_files();
 	print_map_graphic();
 	print_map_to_files();
 	print_island_file();
