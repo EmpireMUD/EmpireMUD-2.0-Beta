@@ -1540,6 +1540,8 @@ void check_for_new_map(void) {
 			real_room(map->vnum);
 		}
 	}
+	
+	setup_start_locations();
 }
 
 
