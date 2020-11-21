@@ -182,10 +182,16 @@ struct q_element *queue_enq(struct queue *q, void *data, unsigned long key) {
 		q->head[bucket] = qe;
 		q->tail[bucket] = qe;
 	}
-
+	else if (key < q->head[bucket]->key) {
+		// shortcut to newest: insert at the front
+		qe->next = q->head[bucket];
+		q->head[bucket] = qe;
+		qe->next->prev = qe;
+	}
 	else {
 		for (i = q->tail[bucket]; i; i = i->prev) {
-			if (i->key < key) { /* found insertion point */
+			// changed < to <= here because queueing a bunch for the same time is laggy otherwise -pc
+			if (i->key <= key) { /* found insertion point */
 				if (i == q->tail[bucket])
 					q->tail[bucket] = qe;
 				else {
