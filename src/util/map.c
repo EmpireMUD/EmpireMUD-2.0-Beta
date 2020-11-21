@@ -489,6 +489,7 @@ int main(int argc, char **argv) {
 
 	create_map();
 
+	delete_old_files();
 	print_map_graphic();
 	print_map_to_files();
 	print_island_file();
