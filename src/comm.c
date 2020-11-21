@@ -79,7 +79,6 @@ void frequent_combat(unsigned long pulse);
 void perform_requested_world_saves();
 void process_import_evolutions();
 void process_theft_logs();
-void prune_instances();
 void real_update();
 void reduce_city_overages();
 void reduce_outside_territory();
@@ -639,7 +638,7 @@ void perform_reboot(void) {
 	save_all_empires();
 	
 	// TODO: uncomment these (they are turned off for testing)
-	// write_whole_binary_map_file();
+	// write_fresh_binary_map_file();
 	// write_whole_binary_world_index();
 	// write_all_wld_files();
 	

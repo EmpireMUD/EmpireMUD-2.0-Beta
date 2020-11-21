@@ -11,7 +11,7 @@
 ************************************************************************ */
 
 // versioning for the binary map file to allow updates and still be backwards-compatible
-#define CURRENT_BINARY_MAP_VERSION  1	// used in write_whole_binary_map_file()
+#define CURRENT_BINARY_MAP_VERSION  1	// used in write_fresh_binary_map_file()
 typedef struct map_file_data_v1  map_file_data;	// the current version of the structure, for map_to_store()
 #define store_to_map  store_to_map_v1	// used in load_binary_map_file()
 
@@ -921,8 +921,8 @@ void stop_burning(room_data *room);
 void update_world_index(room_vnum vnum, char value);
 void untrench_room(room_data *room);
 void write_all_wld_files();
+void write_fresh_binary_map_file();
 void write_one_tile_to_binary_map_file(struct map_data *map);
-void write_whole_binary_map_file();
 void write_whole_binary_world_index();
 
 // binary map readers

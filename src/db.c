@@ -466,7 +466,7 @@ void boot_db(void) {
 	log("Final startup...");
 	write_whole_mapout();
 	if (save_world_after_startup) {
-		write_whole_binary_map_file();
+		write_fresh_binary_map_file();
 		write_all_wld_files();
 		write_whole_binary_world_index();
 	}
@@ -719,11 +719,13 @@ void check_for_bad_buildings(void) {
 			// map building
 			log(" removing building at %d for bad building type", GET_ROOM_VNUM(room));
 			disassociate_building(room);
+			save_world_after_startup = TRUE;
 		}
 		else if (IS_CITY_CENTER(room) && (!ROOM_OWNER(room) || !find_city_entry(ROOM_OWNER(room), room))) {
 			// city center with no matching city
 			log(" removing city center at %d for lack of city entry", GET_ROOM_VNUM(room));
 			disassociate_building(room);
+			save_world_after_startup = TRUE;
 		}
 		else if (GET_ROOM_VNUM(room) >= MAP_SIZE && ROOM_SECT_FLAGGED(room, SECTF_INSIDE) && !GET_BUILDING(room)) {
 			// designated room
@@ -741,6 +743,8 @@ void check_for_bad_buildings(void) {
 			// room is marked as an instance entrance, but no instance is associated with it
 			log(" unlinking instance entrance room %d for no association with an instance", GET_ROOM_VNUM(room));
 			unlink_instance_entrance(room, NULL, FALSE);
+			prune_instances();	// cleans up rooms too
+			save_world_after_startup = TRUE;
 		}
 		/* This probably isn't necessary and having it here will cause roads to be pulled up as of b3.17 -paul
 		else if (COMPLEX_DATA(room) && !GET_BUILDING(room) && !GET_ROOM_TEMPLATE(room)) {
@@ -751,6 +755,7 @@ void check_for_bad_buildings(void) {
 	}
 	if (deleted) {
 		check_all_exits();
+		save_world_after_startup = TRUE;
 	}
 	
 	// check craft "build" recipes: disable

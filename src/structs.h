@@ -5957,7 +5957,9 @@ struct complex_room_data {
 // data that could be from the map tile (for map rooms) or local (non-map rooms)
 // NOTE: if you add something here where the default is not 0, add to init_map() too
 // NOTE: if you add anything here, it MUST also be added to:
-//			- if it's flat data (int, etc), create a new map_to_store function and write a converter to update the binary map file, and update write_whole_binary_map_file() to write a new version number
+//			- if it's flat data (int, etc), create a new map_to_store function
+//				- and update the version stuff at the top of db.h
+//				- and update write_fresh_binary_map_file()
 //			- if it's variable data (lists, strings), add to these 3 places:
 //				- HAS_SHARED_DATA_TO_SAVE() macro
 //				- write_map_and_room_to_file() for saving it (in the shared section)

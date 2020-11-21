@@ -2169,6 +2169,7 @@ void get_scale_constraints(room_data *room, char_data *mob, int *scale_level, in
 void instance_obj_setup(struct instance_data *inst, obj_data *obj);
 int lock_instance_level(room_data *room, int level);
 void mark_instance_completed(struct instance_data *inst);
+void prune_instances();
 void remove_instance_fake_loc(struct instance_data *inst);
 void reset_instance(struct instance_data *inst);
 void scale_instance_to_level(struct instance_data *inst, int level);

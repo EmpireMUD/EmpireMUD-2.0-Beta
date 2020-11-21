@@ -8457,7 +8457,7 @@ ACMD(do_fullsave) {
 	syslog(SYS_INFO, 0, FALSE, "Updating zone files...");
 	
 	time = microtime();
-	write_whole_binary_map_file();
+	write_fresh_binary_map_file();
 	write_whole_binary_world_index();
 	write_all_wld_files();
 	send_config_msg(ch, "ok_string");

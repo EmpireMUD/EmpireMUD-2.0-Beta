@@ -4585,35 +4585,41 @@ void write_one_tile_to_binary_map_file(struct map_data *map) {
 /**
 * Saves a full fresh binary map file.
 */
-void write_whole_binary_map_file(void) {
+void write_fresh_binary_map_file(void) {
 	struct map_file_header header;
 	map_file_data store;
+	FILE *fl;
 	int x, y;
 	
-	ensure_binary_map_file_is_open();
+	if (binary_map_fl) {
+		// it will re-open itself when it needs to later
+		fclose(binary_map_fl);
+	}
 	
-	// just seek to start
-	fseek(binary_map_fl, 0L, SEEK_SET);
+	if (!(fl = fopen(BINARY_MAP_FILE TEMP_SUFFIX, "w+b"))) {
+		log("SYSERR: Unable to open binary map file '%s' for writing.", BINARY_MAP_FILE TEMP_SUFFIX);
+		exit(1);
+	}
 	
 	// binary map file is now open at the start: write header...
 	header.version = CURRENT_BINARY_MAP_VERSION;
 	header.width = MAP_WIDTH;
 	header.height = MAP_HEIGHT;
-	fwrite(&header, sizeof(struct map_file_header), 1, binary_map_fl);
+	fwrite(&header, sizeof(struct map_file_header), 1, fl);
 	
 	// write all entries sequentially
 	for (y = 0; y < MAP_HEIGHT; ++y) {
 		for (x = 0; x < MAP_WIDTH; ++x) {
 			map_to_store(&world_map[x][y], &store);
-			fwrite(&store, sizeof(map_file_data), 1, binary_map_fl);
+			fwrite(&store, sizeof(map_file_data), 1, fl);
 		}
 	}
 	
+	fclose(fl);
+	rename(BINARY_MAP_FILE TEMP_SUFFIX, BINARY_MAP_FILE);
+	
 	// no need to save any map updates
 	cancel_all_world_save_requests(WSAVE_MAP);
-	
-	fflush(binary_map_fl);
-	// leave map file open
 }
 
 
@@ -4669,6 +4675,11 @@ void load_binary_map_file(void) {
 	struct map_file_header header;
 	bool eof = FALSE;
 	
+	if (binary_map_fl) {
+		// this shouldln't be open, but just in case...
+		fclose(binary_map_fl);
+	}
+	
 	// run this ONLY if this is the first step in booting the map
 	init_map();
 	
@@ -4685,14 +4696,9 @@ void load_binary_map_file(void) {
 				log("- successfully loaded old base_map file (deleting it now)");
 			}
 			
-			touch(BINARY_MAP_FILE);
-			if (!(binary_map_fl = fopen(BINARY_MAP_FILE, "r+b"))) {
-				perror("SYSERR: fatal error opening binary map file");
-				exit(1);
-			}
-			
 			// need a full file now
-			write_whole_binary_map_file();
+			write_fresh_binary_map_file();
+			ensure_binary_map_file_is_open();
 		}
 	}
 	
@@ -4759,6 +4765,11 @@ void load_binary_map_file(void) {
 	
 	// cancel any save requests triggered by loading
 	cancel_all_world_save_requests(WSAVE_MAP);
+	
+	// but ensure a full save if the version has changed
+	if (header.version != CURRENT_BINARY_MAP_VERSION) {
+		save_world_after_startup = TRUE;
+	}
 }
 
 
@@ -4796,6 +4807,7 @@ void load_one_room_from_wld_file(room_vnum vnum, char index_data) {
 		if (errno == ENOENT) {
 			log("Warning: Unable to find wld file %s: removing from world index", fname);
 			update_world_index(vnum, 0);
+			save_world_after_startup = TRUE;
 		}
 		else {
 			log("SYSERR: Unable to open wld file %s", fname);
