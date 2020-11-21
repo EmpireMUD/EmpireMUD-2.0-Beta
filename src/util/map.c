@@ -149,6 +149,7 @@ void cleanup_mud_files();
 void clear_pass(void);
 struct island_data *closest_island(int x, int y);
 inline int compute_distance(int x1, int y1, int x2, int y2);
+void delete_old_files(void);
 void empire_srandom(unsigned long initial_seed);
 int find_border(struct island_data *isle, int x_dir, int y_dir);
 int get_line(FILE *fl, char *buf);
@@ -704,17 +705,27 @@ void delete_old_files(void) {
 	}
 	
 	for (iter = 0; iter < 100; ++iter) {
+		// wld files
 		sprintf(fname, "%s%02d/*%s", LIB_PATH WLD_PREFIX, iter, WLD_SUFFIX);
-		printf("trying: '%s'\n", fname);
 		glob(fname, 0, NULL, &globbuf);
 		for (sub = 0; sub < globbuf.gl_pathc; ++sub) {
 			++wld_count;
-			// unlink(globbuf.gl_pathv[sub]);
-			printf("test: '%s'\n", globbuf.gl_pathv[sub]);
+			unlink(globbuf.gl_pathv[sub]);
+		}
+		
+		// pack files
+		sprintf(fname, "%s%02d/*%s", LIB_PATH WLD_PREFIX, iter, SUF_PACK);
+		glob(fname, 0, NULL, &globbuf);
+		for (sub = 0; sub < globbuf.gl_pathc; ++sub) {
+			++pack_count;
+			unlink(globbuf.gl_pathv[sub]);
 		}
 		
 		globfree(&globbuf);
 		break;
+	}
+	if (wld_count > 0 || pack_count > 0) {
+		printf("Deleted %d wld and %d pack files", wld_count, pack_count);
 	}
 }
 
