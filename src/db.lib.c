@@ -1528,10 +1528,16 @@ void check_for_new_map(void) {
 	// rescan all empires
 	reread_empire_tech(NULL);
 
-	// check icon-locking:
+	// map checks:
 	LL_FOREACH(land_map, map) {
+		// check icon-locking:
 		if (!map->shared->icon && SECT_FLAGGED(map->sector_type, SECTF_LOCK_ICON)) {
 			lock_icon(real_room(map->vnum), NULL);
+		}
+		
+		// check that rooms that need to stay in memory are in memory
+		if (SECT_FLAGGED(map->sector_type, TILE_KEEP_FLAGS)) {
+			real_room(map->vnum);
 		}
 	}
 }
