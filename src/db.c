@@ -71,6 +71,7 @@ void clean_empire_logs();
 void compute_generic_relations();
 void delete_old_players();
 void delete_orphaned_rooms();
+void delete_pre_b5_116_world_files();
 void expire_old_politics();
 void generate_island_descriptions();
 void index_boot_world();
@@ -305,6 +306,7 @@ FILE *binary_map_fl = NULL;	// call ensure_binary_map_file_is_open() before usin
 char *world_index_data = NULL;	// for managing the binary world file
 int top_of_world_index = -1;	// current max entry index
 bool save_world_after_startup = FALSE;	// if TRUE, will trigger a world save at the end of startup
+bool converted_to_b5_116 = FALSE;	// triggers old world file deletes, only if it converted at startup
 
 
 // DB_BOOT_x
@@ -469,6 +471,9 @@ void boot_db(void) {
 		write_fresh_binary_map_file();
 		write_all_wld_files();
 		write_whole_binary_world_index();
+	}
+	if (converted_to_b5_116) {
+		delete_pre_b5_116_world_files();
 	}
 	// put things here
 	

@@ -4700,7 +4700,6 @@ void load_binary_map_file(void) {
 			
 			// need a full file now
 			write_fresh_binary_map_file();
-			ensure_binary_map_file_is_open();
 		}
 	}
 	
@@ -5183,7 +5182,7 @@ void load_world_from_binary_index(void) {
 		log("Attempting to load pre-b5.116 world files...");
 		index_boot(DB_BOOT_WLD);
 		save_world_after_startup = TRUE;
-		// TODO: delete old wld files
+		converted_to_b5_116 = TRUE;
 		return;
 	}
 	

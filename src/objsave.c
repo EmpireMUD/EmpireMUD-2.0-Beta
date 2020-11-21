@@ -1021,13 +1021,6 @@ void objpack_load_room(room_data *room, bool use_pre_b5_116_dir) {
 	}
 
 	fclose(fl);
-	
-	if (use_pre_b5_116_dir) {
-		// if up-converting, delete the old file
-		if (access(fname, F_OK) == 0) {
-			unlink(fname);
-		}
-	}
 }
 
 

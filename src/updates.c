@@ -25,6 +25,8 @@
 #include "skills.h"
 #include "vnums.h"
 
+#include <glob.h>
+
 /**
 * Contents:
 *   Update Functions -- Write a function to be run once at startup
@@ -2039,6 +2041,54 @@ void check_version(void) {
 
 
 /**
+* After successfully starting up and saving the new version, this will clean
+* up old files including: base_map, world index, world files, obj packs.
+*/
+void delete_pre_b5_116_world_files(void) {
+	int wld_count = 0, pack_count = 0;
+	char fname[256];
+	glob_t globbuf;
+	int iter;
+	FILE *fl;
+	
+	if (access(LIB_WORLD "base_map", F_OK) == 0) {
+		log("Deleting: %s\n", LIB_WORLD "base_map");
+		unlink(LIB_WORLD "base_map");
+	}
+	sprintf(fname, "%s%s", WLD_PREFIX, INDEX_FILE);
+	if ((fl = fopen(fname, "w"))) {
+		log("Overwriting: %s", fname);
+		fprintf(fl, "$\n");
+		fclose(fl);
+	}
+	
+	// old world files:
+	sprintf(fname, "%s*%s", WLD_PREFIX, WLD_SUFFIX);
+	glob(fname, 0, NULL, &globbuf);
+	for (iter = 0; iter < globbuf.gl_pathc; ++iter) {
+		++wld_count;
+		unlink(globbuf.gl_pathv[iter]);
+	}
+	if (wld_count > 0) {
+		log("Deleting: %d world file%s", wld_count, PLURAL(wld_count));
+	}
+	globfree(&globbuf);
+	
+	// old pack files:
+	sprintf(fname, "%s*%s", LIB_OBJPACK, SUF_PACK);
+	glob(fname, 0, NULL, &globbuf);
+	for (iter = 0; iter < globbuf.gl_pathc; ++iter) {
+		++pack_count;
+		unlink(globbuf.gl_pathv[iter]);
+	}
+	if (pack_count > 0) {
+		log("Deleting: %d pack file%s", pack_count, PLURAL(pack_count));
+	}
+	globfree(&globbuf);
+}
+
+
+/**
 * This function helps upgrade EmpireMUDs to b5.116+:
 *
 * This loads the world_map array from file. This is optional, and this data
@@ -2213,7 +2263,7 @@ bool load_pre_b5_116_world_map_from_file(void) {
 	}
 	
 	fclose(fl);
-	unlink(PRE_B5_116_WORLD_MAP_FILE);
+	converted_to_b5_116 = TRUE;
 	return TRUE;
 }
 
