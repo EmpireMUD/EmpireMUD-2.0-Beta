@@ -5221,15 +5221,14 @@ void load_world_from_binary_index(void) {
 * @param struct map_data *map The tile to apply to.
 */
 void store_to_map_v1(struct map_file_data_v1 *store, struct map_data *map) {
-	map->shared->island_id = store->island_id;
-	map->shared->island_ptr = (store->island_id == NO_ISLAND) ? NULL : get_island(store->island_id, TRUE);
+	// warning: do not assign any 'shared' data until after the SHARED assignment
 	
 	map->sector_type = sector_proto(store->sector_type);
 	map->base_sector = sector_proto(store->base_sector);
 	map->natural_sector = sector_proto(store->natural_sector);
 	map->crop_type = crop_proto(store->crop_type);
 	
-	// add/remove shared ocean pointer?
+	// SHARED: add/remove shared ocean pointer?
 	if (store->sector_type != BASIC_OCEAN && map->shared == &ocean_shared_data) {
 		map->shared = NULL;	// unlink basic ocean
 		CREATE(map->shared, struct shared_room_data, 1);
@@ -5243,6 +5242,8 @@ void store_to_map_v1(struct map_file_data_v1 *store, struct map_data *map) {
 	
 	// only grab these if it's not basic-ocean
 	if (map->shared != &ocean_shared_data) {
+		map->shared->island_id = store->island_id;
+		map->shared->island_ptr = (store->island_id == NO_ISLAND) ? NULL : get_island(store->island_id, TRUE);
 		map->shared->affects = store->affects;
 		map->shared->base_affects = store->base_affects;
 		map->shared->height = store->height;
