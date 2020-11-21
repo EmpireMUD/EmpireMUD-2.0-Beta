@@ -725,7 +725,7 @@ void delete_old_files(void) {
 		break;
 	}
 	if (wld_count > 0 || pack_count > 0) {
-		printf("Deleted %d wld and %d pack files", wld_count, pack_count);
+		printf("Deleted %d wld and %d pack files\n", wld_count, pack_count);
 	}
 }
 
@@ -1879,9 +1879,11 @@ void splotch(int room, int type, struct island_data *isle) {
 //// BONUS FEATURES //////////////////////////////////////////////////////////
 
 void load_and_shift_map(int dist) {
-	char fname[256], line[1024];
-	FILE *index, *wld;
-	int block, vnum, island, type, junk;
+	struct map_file_header header;
+	struct grid_type *tile;
+	map_file_data store;
+	FILE *binary_map_fl;
+	int x, y;
 	
 	// nowork
 	if (dist == 0) {
@@ -1893,44 +1895,27 @@ void load_and_shift_map(int dist) {
 	printf("Loaded existing map...\n");
 	
 	// load in existing map
-	if (!(index = fopen(INDEX_FILE, "r"))) {
-		printf("ERROR: Unable to load index file.\n");
+	if (!(binary_map_fl = fopen(LIB_PATH BINARY_MAP_FILE, "r+b"))) {
+		printf("ERROR: Unable to load %s\n", LIB_PATH BINARY_MAP_FILE);
 		exit(1);
 	}
 	
-	while (fscanf(index, "%d.wld\n", &block) == 1) {
-		sprintf(fname, "%d.wld", block);
-		printf("Loading file %s ...\n", fname);
-		if (!(wld = fopen(fname, "r"))) {
-			printf("ERROR: Unable to open world file %s.\n", fname);
-			exit(1);
-		}
-		
-		while (get_line(wld, line)) {
-			if (*line == '$') {
-				break;
-			}
-			else if (*line == '#') {
-				// found entry
-				vnum = atoi(line + 1);
-				
-				if (!get_line(wld, line) || sscanf(line, "%d %d %d", &island, &type, &junk) != 3) {
-					printf("Error reading room #%d\n", vnum);
-					exit(1);
-				}
-				
-				change_grid(vnum, sect_to_terrain(type));
-				grid[vnum].island_id = island;
-				
-				// trailing 'S' line
-				get_line(wld, line);
-			}
-			else {
-				printf("Unknown line in %s: %s\n", fname, line);
-				exit(1);
-			}
+	fread(&header, sizeof(struct map_file_header), 1, binary_map_fl);
+	if (header.version != CURRENT_BINARY_MAP_VERSION) {
+		printf("Unable to load existing map: version is too old\n");
+		exit(1);
+	}
+	
+	// read in order
+	for (y = 0; y < header.height; ++y) {
+		for (x = 0; x < header.width; ++x) {
+			fread(&store, sizeof(map_file_data), 1, binary_map_fl);
+			tile = &grid[MAP(x,y)];
+			tile->island_id = store.island_id;
+			tile->type = sect_to_terrain(store.sector_type);
 		}
 	}
+	fclose(binary_map_fl);
 	
 	shift_map_x(dist);
 	
