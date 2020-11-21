@@ -722,7 +722,6 @@ void delete_old_files(void) {
 		}
 		
 		globfree(&globbuf);
-		break;
 	}
 	if (wld_count > 0 || pack_count > 0) {
 		printf("Deleted %d wld and %d pack files\n", wld_count, pack_count);
