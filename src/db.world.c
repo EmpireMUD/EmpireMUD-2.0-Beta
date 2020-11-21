@@ -4594,6 +4594,7 @@ void write_fresh_binary_map_file(void) {
 	if (binary_map_fl) {
 		// it will re-open itself when it needs to later
 		fclose(binary_map_fl);
+		binary_map_fl = NULL;
 	}
 	
 	if (!(fl = fopen(BINARY_MAP_FILE TEMP_SUFFIX, "w+b"))) {
@@ -4678,6 +4679,7 @@ void load_binary_map_file(void) {
 	if (binary_map_fl) {
 		// this shouldln't be open, but just in case...
 		fclose(binary_map_fl);
+		binary_map_fl = NULL;
 	}
 	
 	// run this ONLY if this is the first step in booting the map

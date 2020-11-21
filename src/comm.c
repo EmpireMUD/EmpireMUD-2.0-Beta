@@ -644,6 +644,7 @@ void perform_reboot(void) {
 	
 	if (binary_map_fl) {
 		fclose(binary_map_fl);
+		binary_map_fl = NULL;
 	}
 
 	if (reboot_control.type == SCMD_REBOOT) {
