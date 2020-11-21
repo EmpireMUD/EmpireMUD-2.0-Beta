@@ -704,10 +704,11 @@ void delete_old_files(void) {
 	
 	for (iter = 0; iter < 100; ++iter) {
 		sprintf(fname, "%s%02d/*%s", LIB_PATH WLD_PREFIX, iter, WLD_SUFFIX);
+		printf("trying: '%s'\n", fname);
 		glob(fname, 0, NULL, &globbuf);
-		
 		for (sub = 0; sub < globbuf.gl_pathc; ++sub) {
 			++wld_count;
+			// unlink(globbuf.gl_pathv[sub]);
 			printf("test: '%s'\n", globbuf.gl_pathv[sub]);
 		}
 		
