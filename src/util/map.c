@@ -851,63 +851,36 @@ void print_map_graphic(void) {
 
 // outputs the .wld data files
 void print_map_to_files(void) {
-	FILE *out = NULL, *index_fl, *base_fl;
-	bool first = TRUE;
-	int i, j, pos;
-	char fname[256];
+	FILE *binary_map_fl;
+	struct map_file_header header;
+	map_file_data store;
+	int pos;
 	
-	if (!(index_fl = fopen(INDEX_FILE, "w"))) {
-		printf("Unable to write index file!\n");
+	if (!(binary_map_fl = fopen(LIB_PATH BINARY_MAP_FILE, "w+b"))) {
+		printf("Unable to write %s file!\n", BINARY_MAP_FILE);
 		exit(0);
 	}
 	
-	if (!(base_fl = fopen(LIB_PATH WORLD_MAP_FILE, "w"))) {
-		printf("Unable to write base_map file!\n");
-		exit(0);
-	}
-
-	for (i = 0; i < NUM_BLOCKS; i++) {
-		sprintf(fname, "%d%s", i, WLD_SUFFIX);
-		if (!(out = fopen(fname, "w"))) {
-			printf("Unable to write file %s!\n", fname);
-			exit(0);
-		}
-		first = TRUE;
+	// write header
+	header.version = CURRENT_BINARY_MAP_VERSION;
+	header.width = USE_WIDTH;
+	header.height = USE_HEIGHT;
+	fwrite(&header, sizeof(struct map_file_header), 1, binary_map_fl);
+	
+	for (pos = 0; pos < USE_SIZE; ++pos) {
+		memset((char *) &store, 0, sizeof(map_file_data));
+		store.island_id = grid[pos].island_id;
 		
-		// add to index
-		fprintf(index_fl, "%s\n", fname);
-
-		for (j = 0; j < USE_BLOCK_SIZE; j++) {
-			pos = i * USE_BLOCK_SIZE + j;
-			
-			if (grid[pos].type != OCEAN || first) {
-				// .wld file
-				fprintf(out, "#%d\n", pos);
-				fprintf(out, "%d %d %d\n", grid[pos].island_id, terrains[grid[pos].type].sector_vnum, terrains[grid[pos].type].sector_vnum);
-				fprintf(out, "S\n");
-				first = FALSE;	// guarantee at least 1 entry per file (even if ocean)
-			}
-			
-			if (grid[pos].type != OCEAN) {
-				// base_map file
-				fprintf(base_fl, "%d %d %d %d %d %d %d\n", X_COORD(pos), Y_COORD(pos), grid[pos].island_id, terrains[grid[pos].type].sector_vnum, terrains[grid[pos].type].sector_vnum, terrains[grid[pos].type].sector_vnum, NOTHING);
-			}
-		}
+		store.sector_type = terrains[grid[pos].type].sector_vnum;
+		store.base_sector = terrains[grid[pos].type].sector_vnum;
+		store.natural_sector = terrains[grid[pos].type].sector_vnum;
+		store.crop_type = NOTHING;
 		
-		// end wld file
-		fprintf(out, "$~\n");
-		fclose(out);
+		// and write it
+		fwrite(&store, sizeof(map_file_data), 1, binary_map_fl);
 	}
 	
-	// end index file
-	fprintf(index_fl, "$\n");
-	fclose(index_fl);
-	
-	// end base_map file
-	fprintf(base_fl, "$\n");
-	fclose(base_fl);
-
-	return;
+	fclose(binary_map_fl);
 }
 
 
