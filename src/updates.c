@@ -2052,7 +2052,7 @@ void delete_pre_b5_116_world_files(void) {
 	FILE *fl;
 	
 	if (access(LIB_WORLD "base_map", F_OK) == 0) {
-		log("Deleting: %s\n", LIB_WORLD "base_map");
+		log("Deleting: %s", LIB_WORLD "base_map");
 		unlink(LIB_WORLD "base_map");
 	}
 	sprintf(fname, "%s%s", WLD_PREFIX, INDEX_FILE);

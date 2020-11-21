@@ -17,8 +17,6 @@ PROFILE =
 
 # binary destination directory
 BINDIR = ../../bin
-# location of world directory
-WORLDDIR = ../../lib/world
 # location of world files
 WLDDIR = ../../lib/world/wld
 # location of Empire include files
@@ -32,7 +30,7 @@ default: all
 
 all: $(BINDIR)/cryptpasswd $(BINDIR)/evolve $(WLDDIR)/map $(BINDIR)/sign \
 	$(BINDIR)/plrconv-20b1-to-20b2 $(BINDIR)/plrconv-20b2-to-20b3 \
-	$(BINDIR)/plrconv-20b3-to-ascii $(WORLDDIR)/read_map
+	$(BINDIR)/plrconv-20b3-to-ascii $(WLDDIR)/read_map
 
 cryptpasswd: $(BINDIR)/cryptpasswd
 
@@ -46,7 +44,7 @@ plrconv-20b2-to-20b3: $(BINDIR)/plrconv-20b2-to-20b3
 
 plrconv-20b3-to-ascii: $(BINDIR)/plrconv-20b3-to-ascii
 
-read_map: $(WORLDDIR)/read_map
+read_map: $(WLDDIR)/read_map
 
 sign: $(BINDIR)/sign
 
@@ -73,8 +71,8 @@ $(BINDIR)/plrconv-20b3-to-ascii: plrconv-20b3-to-ascii.c $(INCDIR)/conf.h \
 	$(INCDIR)/sysdep.h $(INCDIR)/structs.h $(INCDIR)/utils.h
 	$(CC) $(CFLAGS) -o $(BINDIR)/plrconv-20b3-to-ascii plrconv-20b3-to-ascii.c $(LIBS)
 
-$(WORLDDIR)/read_map: read_map.c $(INCDIR)/conf.h $(INCDIR)/sysdep.h $(INCDIR)/structs.h
-	$(CC) $(CFLAGS) -o $(WORLDDIR)/read_map read_map.c $(LIBS)
+$(WLDDIR)/read_map: read_map.c $(INCDIR)/conf.h $(INCDIR)/sysdep.h $(INCDIR)/structs.h
+	$(CC) $(CFLAGS) -o $(WLDDIR)/read_map read_map.c $(LIBS)
 
 $(BINDIR)/sign: sign.c $(INCDIR)/conf.h $(INCDIR)/sysdep.h
 	$(CC) $(CFLAGS) -o $(BINDIR)/sign sign.c $(LIBS)
