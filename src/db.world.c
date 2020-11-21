@@ -4701,6 +4701,7 @@ void load_binary_map_file(void) {
 			// need a full file now
 			write_fresh_binary_map_file();
 		}
+		ensure_binary_map_file_is_open();
 	}
 	
 	// load header
