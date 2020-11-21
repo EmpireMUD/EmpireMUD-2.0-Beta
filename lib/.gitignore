@@ -11,3 +11,4 @@ plrobjs/*/*.objs
 plrvars/*/*.mem
 world/binary_map
 world/binary_world_index
+world/read_map
