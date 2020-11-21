@@ -140,4 +140,6 @@ int main(int argc, char *argv[]) {
 	else {
 		show_map_stats();
 	}
+	
+	return 0;
 }
