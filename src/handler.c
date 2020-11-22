@@ -1564,7 +1564,7 @@ void char_from_room(char_data *ch) {
 		stop_fighting(ch);
 	}
 	
-	request_mob_save_in_room(ch);
+	request_char_save_in_world(ch);
 
 	// update lights
 	ROOM_LIGHTS(IN_ROOM(ch)) -= GET_LIGHTS(ch);
@@ -1625,7 +1625,7 @@ void char_to_room(char_data *ch, room_data *room) {
 			// store last room to player
 			GET_LAST_ROOM(ch) = GET_ROOM_VNUM(room);
 		}
-		request_mob_save_in_room(ch);
+		request_char_save_in_world(ch);
 	}
 }
 
@@ -2616,7 +2616,7 @@ void add_cooldown(char_data *ch, any_vnum type, int seconds_duration) {
 	if (ch->desc) {
 		queue_delayed_update(ch, CDU_MSDP_COOLDOWNS);
 	}
-	request_mob_save_in_room(ch);
+	request_char_save_in_world(ch);
 }
 
 
@@ -2655,7 +2655,7 @@ void remove_cooldown(char_data *ch, struct cooldown_data *cool) {
 	if (ch->desc) {
 		queue_delayed_update(ch, CDU_MSDP_COOLDOWNS);
 	}
-	request_mob_save_in_room(ch);
+	request_char_save_in_world(ch);
 }
 
 
@@ -3032,7 +3032,7 @@ void perform_abandon_vehicle(vehicle_data *veh) {
 			}
 		}
 		
-		request_vehicle_save_in_room(veh);
+		request_vehicle_save_in_world(veh);
 	}
 }
 
@@ -3142,7 +3142,7 @@ void perform_claim_vehicle(vehicle_data *veh, empire_data *emp) {
 			}
 		}
 		
-		request_vehicle_save_in_room(veh);
+		request_vehicle_save_in_world(veh);
 	}
 }
 
@@ -10188,7 +10188,7 @@ void vehicle_from_room(vehicle_data *veh) {
 	
 	// yank empire tech (which may be island-based)
 	adjust_vehicle_tech(veh, FALSE);
-	request_vehicle_save_in_room(veh);
+	request_vehicle_save_in_world(veh);
 	
 	// check lights
 	if (VEH_PROVIDES_LIGHT(veh)) {
@@ -10243,7 +10243,7 @@ void vehicle_to_room(vehicle_data *veh, room_data *room) {
 		request_mapout_update(GET_ROOM_VNUM(room));
 	}
 	
-	request_vehicle_save_in_room(veh);
+	request_vehicle_save_in_world(veh);
 }
 
 

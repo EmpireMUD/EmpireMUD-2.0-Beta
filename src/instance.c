@@ -1058,7 +1058,7 @@ void delete_instance(struct instance_data *inst, bool run_cleanup) {
 			if (ADVENTURE_FLAGGED(INST_ADVENTURE(inst), ADV_NO_MOB_CLEANUP)) {
 				// just disassociate
 				MOB_INSTANCE_ID(mob) = NOTHING;
-				request_mob_save_in_room(mob);
+				request_char_save_in_world(mob);
 				// shouldn't need this: subtract_instance_mob(inst, GET_MOB_VNUM(mob));
 			}
 			else if ((FIGHTING(mob) || GET_POS(mob) == POS_FIGHTING) && (!ROOM_INSTANCE(IN_ROOM(mob)) || ROOM_INSTANCE(IN_ROOM(mob)) == inst)) {

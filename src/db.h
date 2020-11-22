@@ -988,10 +988,15 @@ extern struct empire_territory_data *global_next_territory_entry;
 
 // quick setter functions
 
-// triggers a room save (savable mob traits changed)
-#define request_mob_save_in_room(mob)  do {	\
-	if (IN_ROOM(mob) && MOB_SAVES_TO_ROOM(mob)) {	\
-		request_world_save(GET_ROOM_VNUM(IN_ROOM(mob)), WSAVE_ROOM);	\
+// triggers a player or room save (savable character traits changed)
+#define request_char_save_in_world(ch)  do {	\
+	if (IN_ROOM(ch)) {	\
+		if (MOB_SAVES_TO_ROOM(ch)) {	\
+			request_world_save(GET_ROOM_VNUM(IN_ROOM(ch)), WSAVE_ROOM);	\
+		}	\
+		else if (!IS_NPC(ch)) {	\
+			queue_delayed_update(ch, CDU_SAVE);	\
+		}	\
 	}	\
 } while(0)
 
@@ -1010,7 +1015,7 @@ extern struct empire_territory_data *global_next_territory_entry;
 } while(0)
 
 // triggers a room-pack save (savable vehicle traits changed)
-#define request_vehicle_save_in_room(veh)  do {	\
+#define request_vehicle_save_in_world(veh)  do {	\
 	if (IN_ROOM(veh)) {	\
 		request_world_save(GET_ROOM_VNUM(IN_ROOM(veh)), WSAVE_OBJS_AND_VEHS);	\
 	}	\
@@ -1019,11 +1024,11 @@ extern struct empire_territory_data *global_next_territory_entry;
 // combine setting these with saving
 #define set_mob_flags(mob, to_set)  do { \
 	SET_BIT(MOB_FLAGS(mob), (to_set));	\
-	request_mob_save_in_room(mob);	\
+	request_char_save_in_world(mob);	\
 } while (0)
 
 // combine removing these with saving
 #define remove_mob_flags(mob, to_set)  do { \
 	REMOVE_BIT(MOB_FLAGS(mob), (to_set));	\
-	request_mob_save_in_room(mob);	\
+	request_char_save_in_world(mob);	\
 } while (0)

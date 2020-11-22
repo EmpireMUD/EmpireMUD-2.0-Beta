@@ -2509,7 +2509,7 @@ void perform_npc_tie(char_data *ch, char_data *victim, int subcmd) {
 			act("You receive $p.", FALSE, ch, rope, NULL, TO_CHAR);
 		}
 		GET_ROPE_VNUM(victim) = NOTHING;
-		request_mob_save_in_room(victim);
+		request_char_save_in_world(victim);
 	}
 	else if (!MOB_FLAGGED(victim, MOB_ANIMAL)) {
 		msg_to_char(ch, "You can only tie animals.\r\n");
@@ -2526,7 +2526,7 @@ void perform_npc_tie(char_data *ch, char_data *victim, int subcmd) {
 		set_mob_flags(victim, MOB_TIED);
 		GET_ROPE_VNUM(victim) = GET_OBJ_VNUM(rope);
 		extract_obj(rope);
-		request_mob_save_in_room(victim);
+		request_char_save_in_world(victim);
 	}
 }
 

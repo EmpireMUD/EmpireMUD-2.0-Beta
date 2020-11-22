@@ -92,7 +92,7 @@ OLC_MODULE(mapedit_build) {
 		sprintf(buf, "$n creates %s %s!", AN(GET_BLD_NAME(bld)), GET_BLD_NAME(bld));
 		act(buf, FALSE, ch, NULL, NULL, TO_ROOM);
 		
-		request_mob_save_in_room(ch);
+		request_char_save_in_world(ch);
 	}
 }
 

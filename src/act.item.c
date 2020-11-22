@@ -3190,7 +3190,7 @@ void load_shipment(struct empire_data *emp, struct shipping_data *shipd, vehicle
 	// mark it as attached to this boat
 	if (VEH_SHIPPING_ID(boat) == -1) {
 		VEH_SHIPPING_ID(boat) = find_free_shipping_id(emp);
-		request_vehicle_save_in_room(boat);
+		request_vehicle_save_in_world(boat);
 	}
 	shipd->shipping_id = VEH_SHIPPING_ID(boat);
 }
@@ -3236,7 +3236,7 @@ void move_ship_to_destination(empire_data *emp, struct shipping_data *shipd, roo
 	}
 	
 	VEH_SHIPPING_ID(boat) = -1;
-	request_vehicle_save_in_room(boat);
+	request_vehicle_save_in_world(boat);
 	
 	// remove the shipping id from all shipments that were on this ship (including this one)
 	old = shipd->shipping_id;

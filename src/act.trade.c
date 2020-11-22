@@ -1747,7 +1747,7 @@ void do_gen_craft_vehicle(char_data *ch, craft_data *type, int dir) {
 	act(buf, FALSE, ch, NULL, veh, TO_ROOM);
 	
 	process_gen_craft_vehicle(ch, type);
-	request_vehicle_save_in_room(veh);
+	request_vehicle_save_in_world(veh);
 }
 
 

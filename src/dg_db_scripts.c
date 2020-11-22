@@ -243,7 +243,7 @@ void assign_triggers(void *i, int type) {
 				trg_proto = trg_proto->next;
 			}
 			reread_companion_trigs(mob);
-			request_mob_save_in_room(mob);
+			request_char_save_in_world(mob);
 			break;
 		case OBJ_TRIGGER:
 			obj = (obj_data*)i;
@@ -301,7 +301,7 @@ void assign_triggers(void *i, int type) {
 				}
 				trg_proto = trg_proto->next;
 			}
-			request_vehicle_save_in_room(veh);
+			request_vehicle_save_in_world(veh);
 			break;
 		}
 		case EMP_TRIGGER: {

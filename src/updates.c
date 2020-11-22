@@ -953,7 +953,7 @@ void b5_82_snowman_fix(void) {
 				create_script_data(ch, MOB_TRIGGER);
 			}
 			add_trigger(SCRIPT(ch), trig, -1);
-			request_mob_save_in_room(ch);
+			request_char_save_in_world(ch);
 		}
 	}
 }

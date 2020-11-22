@@ -1402,7 +1402,7 @@ ACMD(do_tattach) {
 		}
 		add_trigger(SCRIPT(victim), trig, loc);
 		reread_companion_trigs(victim);
-		request_mob_save_in_room(victim);
+		request_char_save_in_world(victim);
 
 		syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: Trigger %d (%s) attached to %s [%d] by %s", tn, GET_TRIG_NAME(trig), GET_SHORT(victim), GET_MOB_VNUM(victim), GET_NAME(ch));
 		msg_to_char(ch, "Trigger %d (%s) attached to %s [%d].\r\n", tn, GET_TRIG_NAME(trig), GET_SHORT(victim), GET_MOB_VNUM(victim));
@@ -1484,7 +1484,7 @@ ACMD(do_tattach) {
 			create_script_data(veh, VEH_TRIGGER);
 		}
 		add_trigger(SCRIPT(veh), trig, loc);
-		request_vehicle_save_in_room(veh);
+		request_vehicle_save_in_world(veh);
 
 		syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: Trigger %d (%s) attached to %s [%d] by %s", tn, GET_TRIG_NAME(trig), VEH_SHORT_DESC(veh), VEH_VNUM(veh), GET_NAME(ch));
 		msg_to_char(ch, "Trigger %d (%s) attached to %s [%d].\r\n", tn, GET_TRIG_NAME(trig), VEH_SHORT_DESC(veh), VEH_VNUM(veh));
@@ -3753,7 +3753,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 								add_instance_mob(inst, GET_MOB_VNUM(c));
 							}
 							
-							request_mob_save_in_room(c);
+							request_char_save_in_world(c);
 						}
 						*str = '\0';
 					}
@@ -4232,7 +4232,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						if (IS_NPC(c) && MOB_INSTANCE_ID(c) != NOTHING) {
 							subtract_instance_mob(real_instance(MOB_INSTANCE_ID(c)), GET_MOB_VNUM(c));
 							MOB_INSTANCE_ID(c) = NOTHING;
-							request_mob_save_in_room(c);
+							request_char_save_in_world(c);
 						}
 						*str = '\0';
 					}
@@ -5560,7 +5560,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						if ((inst = find_instance_by_room(IN_ROOM(v), FALSE, TRUE))) {
 							VEH_INSTANCE_ID(v) = inst->id;
 						}
-						request_vehicle_save_in_room(v);
+						request_vehicle_save_in_world(v);
 						*str = '\0';
 					}
 					else if (!str_cmp(field, "longdesc")) {
@@ -5654,7 +5654,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					}
 					else if (!str_cmp(field, "unlink_instance")) {
 						VEH_INSTANCE_ID(v) = NOTHING;
-						request_vehicle_save_in_room(v);
+						request_vehicle_save_in_world(v);
 						*str = '\0';
 					}
 					break;
@@ -6638,7 +6638,7 @@ void process_attach(void *go, struct script_data *sc, trig_data *trig, int type,
 		}
 		add_trigger(SCRIPT(c), newtrig, -1);
 		reread_companion_trigs(c);
-		request_mob_save_in_room(c);
+		request_char_save_in_world(c);
 		return;
 	}
 
@@ -6647,7 +6647,7 @@ void process_attach(void *go, struct script_data *sc, trig_data *trig, int type,
 			create_script_data(v, VEH_TRIGGER);
 		}
 		add_trigger(SCRIPT(v), newtrig, -1);
-		request_vehicle_save_in_room(v);
+		request_vehicle_save_in_world(v);
 		return;
 	}
 
@@ -7069,7 +7069,7 @@ void process_remote(struct script_data *sc, trig_data *trig, char *cmd) {
 		if (!IS_NPC(mob))
 			context = 0;
 		add_companion_var(mob, vd->name, vd->value, context);
-		request_mob_save_in_room(mob);
+		request_char_save_in_world(mob);
 	}
 	else if ((obj = find_obj(uid))) {
 		sc_remote = SCRIPT(obj) ? SCRIPT(obj) : create_script_data(obj, OBJ_TRIGGER);
@@ -7077,7 +7077,7 @@ void process_remote(struct script_data *sc, trig_data *trig, char *cmd) {
 	}
 	else if ((veh = find_vehicle(uid))) {
 		sc_remote = SCRIPT(veh) ? SCRIPT(veh) : create_script_data(veh, VEH_TRIGGER);
-		request_vehicle_save_in_room(veh);
+		request_vehicle_save_in_world(veh);
 	}
 	else if ((emp = find_empire_by_uid(uid))) {
 		sc_remote = SCRIPT(emp) ? SCRIPT(emp) : create_script_data(emp, EMP_TRIGGER);
@@ -7238,7 +7238,7 @@ void process_rdelete(struct script_data *sc, trig_data *trig, char *cmd) {
 	else if ((mob = find_char(uid))) {
 		sc_remote = SCRIPT(mob);
 		remove_companion_var(mob, var, sc->context);
-		request_mob_save_in_room(mob);
+		request_char_save_in_world(mob);
 		/*
 		// this was set but never used
 		if (!IS_NPC(mob))
@@ -7251,7 +7251,7 @@ void process_rdelete(struct script_data *sc, trig_data *trig, char *cmd) {
 	}
 	else if ((veh = find_vehicle(uid))) {
 		sc_remote = SCRIPT(veh);
-		request_vehicle_save_in_room(veh);
+		request_vehicle_save_in_world(veh);
 	}
 	else if ((emp = find_empire_by_uid(uid))) {
 		sc_remote = SCRIPT(emp);

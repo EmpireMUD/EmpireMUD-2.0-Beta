@@ -343,7 +343,7 @@ void check_extract_script(void *go, int type) {
 			if (SCRIPT(mob) && !TRIGGERS(SCRIPT(mob)) && !SCRIPT(mob)->global_vars) {
 				extract_script(mob, MOB_TRIGGER);
 			}
-			request_mob_save_in_room(mob);
+			request_char_save_in_world(mob);
 			break;
 		}
 		case OBJ_TRIGGER: {
@@ -371,7 +371,7 @@ void check_extract_script(void *go, int type) {
 			if (SCRIPT(veh) && !TRIGGERS(SCRIPT(veh)) && !SCRIPT(veh)->global_vars) {
 				extract_script(veh, VEH_TRIGGER);
 			}
-			request_vehicle_save_in_room(veh);
+			request_vehicle_save_in_world(veh);
 			break;
 		}
 		case EMP_TRIGGER: {
