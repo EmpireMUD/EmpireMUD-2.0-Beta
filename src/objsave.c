@@ -78,9 +78,10 @@ void ensure_safe_obj(obj_data *obj) {
 * @param obj_vnum vnum The vnum of the item being loaded, or NOTHING for non-prototyped item.
 * @param int *location A place to bind the current WEAR_ position of the item; also used to track container contents.
 * @param char_data *notify Optional: A person to notify if an item is updated (NULL for none).
+* @param char *error_str Used in logging errors.
 * @return obj_data* The loaded item, or NULL if it's not available.
 */
-obj_data *Obj_load_from_file(FILE *fl, obj_vnum vnum, int *location, char_data *notify) {
+obj_data *Obj_load_from_file(FILE *fl, obj_vnum vnum, int *location, char_data *notify, char *error_str) {
 	char line[MAX_INPUT_LENGTH], error[MAX_STRING_LENGTH], s_in[MAX_INPUT_LENGTH], *tmp;
 	obj_data *proto = obj_proto(vnum);
 	struct extra_descr_data *ex;
@@ -89,6 +90,11 @@ obj_data *Obj_load_from_file(FILE *fl, obj_vnum vnum, int *location, char_data *
 	bool end = FALSE;
 	int i_in[3];
 	bool seek_end = FALSE;
+	
+	#define LOG_BAD_TAG_WARNINGS  TRUE	// triggers syslogs for invalid objfile tags
+	#define BAD_TAG_WARNING(src)  else if (LOG_BAD_TAG_WARNINGS) { \
+		log("SYSERR: Bad tag in object %d for %s: %s", vnum, NULLSAFE(error_str), (src));	\
+	}
 	
 	// up-front
 	*location = 0;
@@ -124,7 +130,7 @@ obj_data *Obj_load_from_file(FILE *fl, obj_vnum vnum, int *location, char_data *
 
 	while (!end) {
 		if (!get_line(fl, line)) {
-			log("SYSERR: Unexpected end of obj file in Obj_load_from_file");
+			log("SYSERR: Unexpected end of obj file in Obj_load_from_file for %s", NULLSAFE(error_str));
 			exit(1);
 		}
 		
@@ -191,6 +197,7 @@ obj_data *Obj_load_from_file(FILE *fl, obj_vnum vnum, int *location, char_data *
 						GET_AUTOSTORE_TIMER(obj) = i_in[0];
 					}
 				}
+				BAD_TAG_WARNING(line)
 				break;
 			}
 			case 'B': {
@@ -202,6 +209,7 @@ obj_data *Obj_load_from_file(FILE *fl, obj_vnum vnum, int *location, char_data *
 						LL_PREPEND(OBJ_BOUND_TO(obj), bind);
 					}
 				}
+				BAD_TAG_WARNING(line)
 				break;
 			}
 			case 'C': {
@@ -224,6 +232,7 @@ obj_data *Obj_load_from_file(FILE *fl, obj_vnum vnum, int *location, char_data *
 						GET_OBJ_CURRENT_SCALE_LEVEL(obj) = i_in[0];
 					}
 				}
+				BAD_TAG_WARNING(line)
 				break;
 			}
 			case 'E': {
@@ -254,6 +263,7 @@ obj_data *Obj_load_from_file(FILE *fl, obj_vnum vnum, int *location, char_data *
 				else if (!strn_cmp(line, "End", 3)) {
 					end = TRUE;
 				}
+				BAD_TAG_WARNING(line)
 				break;
 			}
 			case 'F': {
@@ -262,6 +272,7 @@ obj_data *Obj_load_from_file(FILE *fl, obj_vnum vnum, int *location, char_data *
 						GET_OBJ_EXTRA(obj) = asciiflag_conv(s_in);
 					}
 				}
+				BAD_TAG_WARNING(line)
 				break;
 			}
 			case 'K': {
@@ -271,6 +282,7 @@ obj_data *Obj_load_from_file(FILE *fl, obj_vnum vnum, int *location, char_data *
 					}
 					GET_OBJ_KEYWORDS(obj) = fread_string(fl, error);
 				}
+				BAD_TAG_WARNING(line)
 				break;
 			}
 			case 'L': {
@@ -295,6 +307,7 @@ obj_data *Obj_load_from_file(FILE *fl, obj_vnum vnum, int *location, char_data *
 					}
 					GET_OBJ_LONG_DESC(obj) = fread_string(fl, error);
 				}
+				BAD_TAG_WARNING(line)
 				break;
 			}
 			case 'M': {
@@ -322,6 +335,7 @@ obj_data *Obj_load_from_file(FILE *fl, obj_vnum vnum, int *location, char_data *
 						}
 					}
 				}
+				BAD_TAG_WARNING(line)
 				break;
 			}
 			case 'Q': {
@@ -333,6 +347,7 @@ obj_data *Obj_load_from_file(FILE *fl, obj_vnum vnum, int *location, char_data *
 						}
 					}
 				}
+				BAD_TAG_WARNING(line)
 				break;
 			}
 			case 'S': {
@@ -352,6 +367,7 @@ obj_data *Obj_load_from_file(FILE *fl, obj_vnum vnum, int *location, char_data *
 						obj->stolen_timer = i_in[0];
 					}
 				}
+				BAD_TAG_WARNING(line)
 				break;
 			}
 			case 'T': {
@@ -384,6 +400,7 @@ obj_data *Obj_load_from_file(FILE *fl, obj_vnum vnum, int *location, char_data *
 						}
 					}
 				}
+				BAD_TAG_WARNING(line)
 				break;
 			}
 			case 'V': {
@@ -404,7 +421,7 @@ obj_data *Obj_load_from_file(FILE *fl, obj_vnum vnum, int *location, char_data *
 				}
 				else if (!strn_cmp(line, "Variable: ", 10)) {
 					if (sscanf(line + 10, "%s %d", s_in, &i_in[0]) != 2 || !get_line(fl, line)) {
-						log("SYSERR: Bad variable format in Obj_load_from_file: #%d", GET_OBJ_VNUM(obj));
+						log("SYSERR: Bad variable format in Obj_load_from_file for %s: #%d", NULLSAFE(error_str), GET_OBJ_VNUM(obj));
 						exit(1);
 					}
 					if (!SCRIPT(obj)) {
@@ -417,6 +434,7 @@ obj_data *Obj_load_from_file(FILE *fl, obj_vnum vnum, int *location, char_data *
 						OBJ_VERSION(obj) = i_in[0];
 					}
 				}
+				BAD_TAG_WARNING(line)
 				break;
 			}
 			case 'W': {
@@ -425,6 +443,7 @@ obj_data *Obj_load_from_file(FILE *fl, obj_vnum vnum, int *location, char_data *
 						GET_OBJ_WEAR(obj) = asciiflag_conv(s_in);
 					}
 				}
+				BAD_TAG_WARNING(line)
 				break;
 			}
 			
@@ -877,7 +896,7 @@ bool objpack_save_room(room_data *room) {
 */
 void objpack_load_room(room_data *room, bool use_pre_b5_116_dir) {
 	obj_data *obj, *o, *next_o, *cont_row[MAX_BAG_ROWS];
-	char fname[MAX_STRING_LENGTH], line[MAX_INPUT_LENGTH];
+	char fname[MAX_STRING_LENGTH], line[MAX_INPUT_LENGTH], err_str[256];
 	int iter, location;
 	vehicle_data *veh;
 	obj_vnum vnum;
@@ -905,6 +924,8 @@ void objpack_load_room(room_data *room, bool use_pre_b5_116_dir) {
 		return;
 	}
 	
+	sprintf(err_str, "vehicle in pack file for room %d", GET_ROOM_VNUM(room));
+	
 	// iterate over file
 	for (;;) {
 		if (!get_line(fl, line)) {
@@ -923,7 +944,7 @@ void objpack_load_room(room_data *room, bool use_pre_b5_116_dir) {
 				return;
 			}
 			
-			if ((obj = Obj_load_from_file(fl, vnum, &location, NULL))) {
+			if ((obj = Obj_load_from_file(fl, vnum, &location, NULL, err_str))) {
 				// Obj_load_from_file may return a NULL for deleted objs
 				
 				// Not really an inventory, but same idea.
@@ -999,7 +1020,7 @@ void objpack_load_room(room_data *room, bool use_pre_b5_116_dir) {
 				return;
 			}
 			
-			if ((veh = unstore_vehicle_from_file(fl, vnum))) {
+			if ((veh = unstore_vehicle_from_file(fl, vnum, err_str))) {
 				vehicle_to_room(veh, room);
 			}
 		}

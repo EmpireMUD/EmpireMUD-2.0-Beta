@@ -2414,7 +2414,7 @@ void start_vehicle_burning(vehicle_data *veh);
 int total_small_vehicles_in_room(room_data *room);
 int total_vehicle_size_in_room(room_data *room);
 char_data *unharness_mob_from_vehicle(struct vehicle_attached_mob *vam, vehicle_data *veh);
-vehicle_data *unstore_vehicle_from_file(FILE *fl, any_vnum vnum);
+vehicle_data *unstore_vehicle_from_file(FILE *fl, any_vnum vnum, char *error_str);
 void update_vehicle_island_and_loc(vehicle_data *veh, room_data *loc);
 bool vehicle_allows_climate(vehicle_data *veh, room_data *room, bool *allow_slow_ruin);
 bool vehicle_is_chameleon(vehicle_data *veh, room_data *from);

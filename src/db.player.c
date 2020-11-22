@@ -593,12 +593,6 @@ void write_account_to_file(FILE *fl, account_data *acct) {
  //////////////////////////////////////////////////////////////////////////////
 //// CORE PLAYER DB //////////////////////////////////////////////////////////
 
-// for more readable if/else chain
-#define BAD_TAG_WARNING(src)  else if (LOG_BAD_TAG_WARNINGS) { \
-	log("SYSERR: Bad tag in player '%s': %s", NULLSAFE(GET_PC_NAME(ch)), (src));	\
-}
-
-
 /**
 * Adds a player to the player tables (by_name and by_idnum), and sorts both
 * tables.
@@ -1246,7 +1240,9 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *c
 	sprintf(error, "read_player_from_file: %s", name);
 	
 	// for more readable if/else chain
-	#define BAD_TAG_WARNING(src)  else if (LOG_BAD_TAG_WARNINGS) { log("SYSERR: Bad tag in player '%s': %s", NULLSAFE(GET_PC_NAME(ch)), (src)); }
+	#define BAD_TAG_WARNING(src)  else if (LOG_BAD_TAG_WARNINGS) { \
+		log("SYSERR: Bad tag in player '%s': %s", NULLSAFE(name), (src));	\
+	}
 
 	while (!end) {
 		if (!get_line(fl, line)) {
@@ -1258,7 +1254,7 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *c
 		switch (UPPER(*line)) {
 			case '#': {	// an item
 				sscanf(line, "#%d", &i_in[0]);
-				if ((obj = Obj_load_from_file(fl, i_in[0], &i_in[1], ch->desc ? ch : NULL))) {
+				if ((obj = Obj_load_from_file(fl, i_in[0], &i_in[1], ch->desc ? ch : NULL, error))) {
 					loaded_obj_to_char(obj, ch, i_in[1], &cont_row);
 				}
 				break;
@@ -1685,7 +1681,7 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *c
 						continue;
 					}
 					
-					obj = Obj_load_from_file(fl, i_in[3], &junk, NULL);
+					obj = Obj_load_from_file(fl, i_in[3], &junk, NULL, error);
 					if (obj) {
 						remove_from_object_list(obj);	// doesn't really go here right now
 					

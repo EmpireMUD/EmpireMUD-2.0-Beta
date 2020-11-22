@@ -2170,7 +2170,7 @@ void load_empire_logs_one(FILE *fl, empire_data *emp) {
 void load_empire_storage_one(FILE *fl, empire_data *emp) {	
 	int t[10], junk;
 	long l_in;
-	char line[1024], str_in[256], buf[MAX_STRING_LENGTH];
+	char line[1024], str_in[256], buf[MAX_STRING_LENGTH], err_str[256];
 	struct empire_unique_storage *eus;
 	struct shipping_data *shipd;
 	struct empire_production_total *egt;
@@ -2186,6 +2186,7 @@ void load_empire_storage_one(FILE *fl, empire_data *emp) {
 	
 	// error for later
 	sprintf(buf,"SYSERR: Format error in empire storage for #%d (expecting letter)", EMPIRE_VNUM(emp));
+	sprintf(err_str, "empire %d", EMPIRE_VNUM(emp));
 
 	while (!done) {
 		if (!get_line(fl, line)) {
@@ -2271,7 +2272,7 @@ void load_empire_storage_one(FILE *fl, empire_data *emp) {
 					continue;
 				}
 				
-				obj = Obj_load_from_file(fl, t[2], &junk, NULL);
+				obj = Obj_load_from_file(fl, t[2], &junk, NULL, err_str);
 				if (obj) {
 					remove_from_object_list(obj);	// doesn't really go here right now
 					

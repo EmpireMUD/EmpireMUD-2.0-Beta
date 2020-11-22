@@ -2250,7 +2250,7 @@ void load_trading_post(void) {
 				break;
 			}
 			case '#': { // load object into last T
-				obj = Obj_load_from_file(fl, atoi(line+1), &int_in[0], NULL);	// last val is junk
+				obj = Obj_load_from_file(fl, atoi(line+1), &int_in[0], NULL, "the trading post");
 				
 				if (obj && tpd) {
 					remove_from_object_list(obj);	// doesn't really go here right now

@@ -655,7 +655,7 @@ int sort_objects(obj_data *a, obj_data *b);
 void Crash_save(obj_data *obj, FILE *fp, int location);
 void Crash_save_one_obj_to_file(FILE *fl, obj_data *obj, int location);
 void loaded_obj_to_char(obj_data *obj, char_data *ch, int location, obj_data ***cont_row);
-obj_data *Obj_load_from_file(FILE *fl, obj_vnum vnum, int *location, char_data *notify);
+obj_data *Obj_load_from_file(FILE *fl, obj_vnum vnum, int *location, char_data *notify, char *error_str);
 void objpack_load_room(room_data *room, bool use_pre_b5_116_dir);
 
 // players

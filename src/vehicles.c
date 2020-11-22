@@ -2154,13 +2154,14 @@ void store_one_vehicle_to_file(vehicle_data *veh, FILE *fl) {
 *
 * @param FILE *fl The file open for reading, just after the %VNUM line.
 * @param any_vnum vnum The vnum already read from the file.
+* @param char *error_str Used in logging errors, to indicate where they come from.
 * @return vehicle_data* The loaded vehicle, if possible.
 */
-vehicle_data *unstore_vehicle_from_file(FILE *fl, any_vnum vnum) {
+vehicle_data *unstore_vehicle_from_file(FILE *fl, any_vnum vnum, char *error_str) {
 	char line[MAX_INPUT_LENGTH], error[MAX_STRING_LENGTH], s_in[MAX_INPUT_LENGTH];
 	obj_data *load_obj, *obj, *next_obj, *cont_row[MAX_BAG_ROWS];
 	struct vehicle_attached_mob *vam;
-	int length, iter, i_in[4], location = 0, timer;
+	int iter, i_in[4], location = 0, timer;
 	struct resource_data *res;
 	vehicle_data *proto = vehicle_proto(vnum);
 	bool end = FALSE, seek_end = FALSE;
@@ -2168,6 +2169,11 @@ vehicle_data *unstore_vehicle_from_file(FILE *fl, any_vnum vnum) {
 	vehicle_data *veh;
 	long long_in[2];
 	double dbl_in;
+	
+	#define LOG_BAD_TAG_WARNINGS  TRUE	// triggers syslogs for invalid vehicle tags
+	#define BAD_TAG_WARNING(src)  else if (LOG_BAD_TAG_WARNINGS) { \
+		log("SYSERR: Bad tag in vehicle %d for %s: %s", vnum, NULLSAFE(error_str), (src));	\
+	}
 	
 	// load based on vnum or, if NOTHING, create anonymous object
 	if (proto) {
@@ -2180,21 +2186,14 @@ vehicle_data *unstore_vehicle_from_file(FILE *fl, any_vnum vnum) {
 		
 	// for fread_string
 	sprintf(error, "unstore_vehicle_from_file %d", vnum);
-	
-	// for more readable if/else chain	
-	#define OBJ_FILE_TAG(src, tag, len)  (!strn_cmp((src), (tag), ((len) = strlen(tag))))
 
 	while (!end) {
 		if (!get_line(fl, line)) {
-			log("SYSERR: Unexpected end of pack file in unstore_vehicle_from_file");
+			log("SYSERR: Unexpected end of pack file in unstore_vehicle_from_file for %s", NULLSAFE(error_str));
 			exit(1);
 		}
 		
-		if (OBJ_FILE_TAG(line, "Vehicle-end", length)) {
-			end = TRUE;
-			continue;
-		}
-		else if (seek_end) {
+		if (seek_end) {
 			// are we looking for the end of the vehicle? ignore this line
 			// WARNING: don't put any ifs that require "veh" above seek_end; obj is not guaranteed
 			continue;
@@ -2203,8 +2202,8 @@ vehicle_data *unstore_vehicle_from_file(FILE *fl, any_vnum vnum) {
 		// normal tags by letter
 		switch (UPPER(*line)) {
 			case 'A': {
-				if (OBJ_FILE_TAG(line, "Animal:", length)) {
-					if (sscanf(line + length + 1, "%d %d %s %d", &i_in[0], &i_in[1], s_in, &i_in[2]) == 4) {
+				if (!strn_cmp(line, "Animal: ", 8)) {
+					if (sscanf(line + 8, "%d %d %s %d", &i_in[0], &i_in[1], s_in, &i_in[2]) == 4) {
 						CREATE(vam, struct vehicle_attached_mob, 1);
 						vam->mob = i_in[0];
 						vam->scale_level = i_in[1];
@@ -2213,11 +2212,12 @@ vehicle_data *unstore_vehicle_from_file(FILE *fl, any_vnum vnum) {
 						LL_APPEND(VEH_ANIMALS(veh), vam);
 					}
 				}
+				BAD_TAG_WARNING(line)
 				break;
 			}
 			case 'B': {
-				if (OBJ_FILE_TAG(line, "Built-with:", length)) {
-					if (sscanf(line + length + 1, "%d %d %d %d", &i_in[0], &i_in[1], &i_in[2], &i_in[3]) != 4) {
+				if (!strn_cmp(line, "Built-with: ", 12)) {
+					if (sscanf(line + 12, "%d %d %d %d", &i_in[0], &i_in[1], &i_in[2], &i_in[3]) != 4) {
 						// unknown number of args?
 						break;
 					}
@@ -2229,15 +2229,16 @@ vehicle_data *unstore_vehicle_from_file(FILE *fl, any_vnum vnum) {
 					res->misc = i_in[3];
 					LL_APPEND(VEH_BUILT_WITH(veh), res);
 				}
+				BAD_TAG_WARNING(line)
 				break;
 			}
 			case 'C': {
-				if (OBJ_FILE_TAG(line, "Construction-id:", length)) {
-					if (sscanf(line + length + 1, "%d", &i_in[0])) {
+				if (!strn_cmp(line, "Construction-id: ", 17)) {
+					if (sscanf(line + 17, "%d", &i_in[0])) {
 						VEH_CONSTRUCTION_ID(veh) = i_in[0];
 					}
 				}
-				else if (OBJ_FILE_TAG(line, "Contents:", length)) {
+				else if (!strn_cmp(line, "Contents:", 9)) {
 					// empty container lists
 					for (iter = 0; iter < MAX_BAG_ROWS; iter++) {
 						cont_row[iter] = NULL;
@@ -2257,7 +2258,7 @@ vehicle_data *unstore_vehicle_from_file(FILE *fl, any_vnum vnum) {
 								extract_vehicle(veh);
 								return NULL;
 							}
-							if ((load_obj = Obj_load_from_file(fl, load_vnum, &location, NULL))) {
+							if ((load_obj = Obj_load_from_file(fl, load_vnum, &location, NULL, error))) {
 								// Obj_load_from_file may return a NULL for deleted objs
 				
 								// Not really an inventory, but same idea.
@@ -2318,11 +2319,12 @@ vehicle_data *unstore_vehicle_from_file(FILE *fl, any_vnum vnum) {
 						}
 					}
 				}
+				BAD_TAG_WARNING(line)
 				break;
 			}
 			case 'D': {
-				if (OBJ_FILE_TAG(line, "Depletion:", length)) {
-					if (sscanf(line + length + 1, "%d %d", &i_in[0], &i_in[1]) == 2) {
+				if (!strn_cmp(line, "Depletion: ", 11)) {
+					if (sscanf(line + 11, "%d %d", &i_in[0], &i_in[1]) == 2) {
 						struct depletion_data *dep;
 						CREATE(dep, struct depletion_data, 1);
 						dep->type = i_in[0];
@@ -2330,19 +2332,21 @@ vehicle_data *unstore_vehicle_from_file(FILE *fl, any_vnum vnum) {
 						LL_PREPEND(VEH_DEPLETION(veh), dep);
 					}
 				}
+				BAD_TAG_WARNING(line)
 				break;
 			}
 			case 'E': {
-				if (OBJ_FILE_TAG(line, "Extra-data:", length)) {
-					if (sscanf(line + length + 1, "%d %d", &i_in[0], &i_in[1]) == 2) {
+				if (!strn_cmp(line, "Extra-data: ", 12)) {
+					if (sscanf(line + 12, "%d %d", &i_in[0], &i_in[1]) == 2) {
 						set_extra_data(&VEH_EXTRA_DATA(veh), i_in[0], i_in[1]);
 					}
 				}
+				BAD_TAG_WARNING(line)
 				break;
 			}
 			case 'F': {
-				if (OBJ_FILE_TAG(line, "Flags:", length)) {
-					if (sscanf(line + length + 1, "%s", s_in)) {
+				if (!strn_cmp(line, "Flags: ", 7)) {
+					if (sscanf(line + 7, "%s", s_in)) {
 						if (proto) {	// prefer to keep flags from the proto
 							VEH_FLAGS(veh) = VEH_FLAGS(proto) & ~SAVABLE_VEH_FLAGS;
 							VEH_FLAGS(veh) |= asciiflag_conv(s_in) & SAVABLE_VEH_FLAGS;
@@ -2352,75 +2356,80 @@ vehicle_data *unstore_vehicle_from_file(FILE *fl, any_vnum vnum) {
 						}
 					}
 				}
+				BAD_TAG_WARNING(line)
 				break;
 			}
 			case 'H': {
-				if (OBJ_FILE_TAG(line, "Health:", length)) {
-					if (sscanf(line + length + 1, "%lf", &dbl_in)) {
+				if (!strn_cmp(line, "Health: ", 8)) {
+					if (sscanf(line + 8, "%lf", &dbl_in)) {
 						VEH_HEALTH(veh) = MIN(dbl_in, VEH_MAX_HEALTH(veh));
 					}
 				}
+				BAD_TAG_WARNING(line)
 				break;
 			}
 			case 'I': {
-				if (OBJ_FILE_TAG(line, "Icon:", length)) {
+				if (!strn_cmp(line, "Icon:", 5)) {
 					if (VEH_ICON(veh) && (!proto || VEH_ICON(veh) != VEH_ICON(proto))) {
 						free(VEH_ICON(veh));
 					}
 					VEH_ICON(veh) = fread_string(fl, error);
 				}
-				else if (OBJ_FILE_TAG(line, "Instance-id:", length)) {
-					if (sscanf(line + length + 1, "%d", &i_in[0])) {
+				else if (!strn_cmp(line, "Instance-id: ", 13)) {
+					if (sscanf(line + 13, "%d", &i_in[0])) {
 						VEH_INSTANCE_ID(veh) = i_in[0];
 					}
 				}
-				else if (OBJ_FILE_TAG(line, "Interior-home:", length)) {
-					if (sscanf(line + length + 1, "%d", &i_in[0])) {
+				else if (!strn_cmp(line, "Interior-home: ", 15)) {
+					if (sscanf(line + 15, "%d", &i_in[0])) {
 						VEH_INTERIOR_HOME_ROOM(veh) = real_room(i_in[0]);
 					}
 				}
+				BAD_TAG_WARNING(line)
 				break;
 			}
 			case 'K': {
-				if (OBJ_FILE_TAG(line, "Keywords:", length)) {
+				if (!strn_cmp(line, "Keywords:", 9)) {
 					if (VEH_KEYWORDS(veh) && (!proto || VEH_KEYWORDS(veh) != VEH_KEYWORDS(proto))) {
 						free(VEH_KEYWORDS(veh));
 					}
 					VEH_KEYWORDS(veh) = fread_string(fl, error);
 				}
+				BAD_TAG_WARNING(line)
 				break;
 			}
 			case 'L': {
-				if (OBJ_FILE_TAG(line, "Last-fired:", length)) {
-					if (sscanf(line + length + 1, "%ld", &long_in[0])) {
+				if (!strn_cmp(line, "Last-fired: ", 12)) {
+					if (sscanf(line + 12, "%ld", &long_in[0])) {
 						VEH_LAST_FIRE_TIME(veh) = long_in[0];
 					}
 				}
-				else if (OBJ_FILE_TAG(line, "Last-moved:", length)) {
-					if (sscanf(line + length + 1, "%ld", &long_in[0])) {
+				else if (!strn_cmp(line, "Last-moved: ", 12)) {
+					if (sscanf(line + 12, "%ld", &long_in[0])) {
 						VEH_LAST_MOVE_TIME(veh) = long_in[0];
 					}
 				}
-				else if (OBJ_FILE_TAG(line, "Long-desc:", length)) {
+				else if (!strn_cmp(line, "Long-desc:", 10)) {
 					if (VEH_LONG_DESC(veh) && (!proto || VEH_LONG_DESC(veh) != VEH_LONG_DESC(proto))) {
 						free(VEH_LONG_DESC(veh));
 					}
 					VEH_LONG_DESC(veh) = fread_string(fl, error);
 				}
-				else if (OBJ_FILE_TAG(line, "Look-desc:", length)) {
+				else if (!strn_cmp(line, "Look-desc:", 10)) {
 					if (VEH_LOOK_DESC(veh) && (!proto || VEH_LOOK_DESC(veh) != VEH_LOOK_DESC(proto))) {
 						free(VEH_LOOK_DESC(veh));
 					}
 					VEH_LOOK_DESC(veh) = fread_string(fl, error);
 				}
+				BAD_TAG_WARNING(line)
 				break;
 			}
 			case 'N': {
-				if (OBJ_FILE_TAG(line, "Needs-res:", length)) {
-					if (sscanf(line + length + 1, "%d %d %d %d", &i_in[0], &i_in[1], &i_in[2], &i_in[3]) == 4) {
+				if (!strn_cmp(line, "Needs-res: ", 11)) {
+					if (sscanf(line + 11, "%d %d %d %d", &i_in[0], &i_in[1], &i_in[2], &i_in[3]) == 4) {
 						// all args present
 					}
-					else if (sscanf(line + length + 1, "%d %d", &i_in[0], &i_in[1]) == 2) {
+					else if (sscanf(line + 11, "%d %d", &i_in[0], &i_in[1]) == 2) {
 						// backwards-compatible to pre-2.0b3.17
 						i_in[2] = RES_OBJECT;
 						i_in[3] = 0;
@@ -2437,57 +2446,62 @@ vehicle_data *unstore_vehicle_from_file(FILE *fl, any_vnum vnum) {
 					res->misc = i_in[3];
 					LL_APPEND(VEH_NEEDS_RESOURCES(veh), res);
 				}
+				BAD_TAG_WARNING(line)
 				break;
 			}
 			case 'O': {
-				if (OBJ_FILE_TAG(line, "Owner:", length)) {
-					if (sscanf(line + length + 1, "%d", &i_in[0])) {
+				if (!strn_cmp(line, "Owner: ", 7)) {
+					if (sscanf(line + 7, "%d", &i_in[0])) {
 						// VEH_OWNER(veh) = real_empire(i_in[0]);
 						perform_claim_vehicle(veh, real_empire(i_in[0]));
 					}
 				}
+				BAD_TAG_WARNING(line)
 				break;
 			}
 			case 'R': {
-				if (OBJ_FILE_TAG(line, "Room-affects:", length)) {
-					VEH_ROOM_AFFECTS(veh) = strtoull(line + length + 1, NULL, 10);
+				if (!strn_cmp(line, "Room-affects: ", 14)) {
+					VEH_ROOM_AFFECTS(veh) = strtoull(line + 14, NULL, 10);
 				}
+				BAD_TAG_WARNING(line)
 				break;
 			}
 			case 'S': {
-				if (OBJ_FILE_TAG(line, "Scale:", length)) {
-					if (sscanf(line + length + 1, "%d", &i_in[0])) {
+				if (!strn_cmp(line, "Scale: ", 7)) {
+					if (sscanf(line + 7, "%d", &i_in[0])) {
 						VEH_SCALE_LEVEL(veh) = i_in[0];
 					}
 				}
-				else if (OBJ_FILE_TAG(line, "Shipping-id:", length)) {
-					if (sscanf(line + length + 1, "%d", &i_in[0])) {
+				else if (!strn_cmp(line, "Shipping-id: ", 13)) {
+					if (sscanf(line + 13, "%d", &i_in[0])) {
 						VEH_SHIPPING_ID(veh) = i_in[0];
 					}
 				}
-				else if (OBJ_FILE_TAG(line, "Short-desc:", length)) {
+				else if (!strn_cmp(line, "Short-desc:", 11)) {
 					if (VEH_SHORT_DESC(veh) && (!proto || VEH_SHORT_DESC(veh) != VEH_SHORT_DESC(proto))) {
 						free(VEH_SHORT_DESC(veh));
 					}
 					VEH_SHORT_DESC(veh) = fread_string(fl, error);
 				}
+				BAD_TAG_WARNING(line)
 				break;
 			}
 			case 'T': {
-				if (OBJ_FILE_TAG(line, "Trigger:", length)) {
-					if (sscanf(line + length + 1, "%d", &i_in[0]) && real_trigger(i_in[0])) {
+				if (!strn_cmp(line, "Trigger: ", 9)) {
+					if (sscanf(line + 9, "%d", &i_in[0]) && real_trigger(i_in[0])) {
 						if (!SCRIPT(veh)) {
 							create_script_data(veh, VEH_TRIGGER);
 						}
 						add_trigger(SCRIPT(veh), read_trigger(i_in[0]), -1);
 					}
 				}
+				BAD_TAG_WARNING(line)
 				break;
 			}
 			case 'V': {
-				if (OBJ_FILE_TAG(line, "Variable:", length)) {
-					if (sscanf(line + length + 1, "%s %d", s_in, &i_in[0]) != 2 || !get_line(fl, line)) {
-						log("SYSERR: Bad variable format in unstore_vehicle_from_file: #%d", VEH_VNUM(veh));
+				if (!strn_cmp(line, "Variable: ", 10)) {
+					if (sscanf(line + 10, "%s %d", s_in, &i_in[0]) != 2 || !get_line(fl, line)) {
+						log("SYSERR: Bad variable format in unstore_vehicle_from_file for %s: #%d", NULLSAFE(error_str), VEH_VNUM(veh));
 						exit(1);
 					}
 					if (!SCRIPT(veh)) {
@@ -2495,6 +2509,11 @@ vehicle_data *unstore_vehicle_from_file(FILE *fl, any_vnum vnum) {
 					}
 					add_var(&(SCRIPT(veh)->global_vars), s_in, line, i_in[0]);
 				}
+				else if (!strn_cmp(line, "Vehicle-end", 11)) {
+					end = TRUE;
+				}
+				BAD_TAG_WARNING(line)
+				break;
 			}
 		}
 	}
