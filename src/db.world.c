@@ -648,6 +648,7 @@ void delete_room(room_data *room, bool check_exits) {
 	// check if it was part of the interior of a vehicle
 	if (GET_ROOM_VEHICLE(room) && VEH_INTERIOR_HOME_ROOM(GET_ROOM_VEHICLE(room)) == room) {
 		VEH_INTERIOR_HOME_ROOM(GET_ROOM_VEHICLE(room)) = NULL;
+		request_vehicle_save_in_room(GET_ROOM_VEHICLE(room));
 	}
 	
 	// shrink home
@@ -4133,7 +4134,7 @@ void request_world_save_by_script(void *go, int type) {
 			break;
 		}
 		case OBJ_TRIGGER: {
-			request_obj_save_in_room((obj_data*)go);
+			request_obj_save_in_world((obj_data*)go);
 			break;
 		}
 		case WLD_TRIGGER:

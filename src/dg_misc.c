@@ -400,6 +400,7 @@ void do_dg_own(empire_data *emp, char_data *vict, obj_data *obj, room_data *room
 	}
 	if (obj) {
 		obj->last_empire_id = emp ? EMPIRE_VNUM(emp) : NOTHING;
+		request_obj_save_in_world(obj);
 	}
 	if (veh) {
 		if ((owner = VEH_OWNER(veh)) && emp != owner) {
@@ -417,7 +418,7 @@ void do_dg_own(empire_data *emp, char_data *vict, obj_data *obj, room_data *room
 			claim_room(room, emp);
 		}
 		if (GET_ROOM_VEHICLE(room)) {
-			VEH_OWNER(GET_ROOM_VEHICLE(room)) = emp;
+			perform_claim_vehicle(GET_ROOM_VEHICLE(room), emp);
 		}
 	}
 }

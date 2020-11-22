@@ -1858,7 +1858,7 @@ int set_obj_val(obj_data *obj, int pos, int value) {
 	
 	// will it need to save?
 	if (GET_OBJ_VAL(obj, pos) != value) {
-		request_obj_save_in_room(obj);
+		request_obj_save_in_world(obj);
 	}
 	
 	// and set it

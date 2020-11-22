@@ -1446,7 +1446,7 @@ ACMD(do_tattach) {
 			create_script_data(object, OBJ_TRIGGER);
 		}
 		add_trigger(SCRIPT(object), trig, loc);
-		request_obj_save_in_room(object);
+		request_obj_save_in_world(object);
 
 		syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: Trigger %d (%s) attached to %s [%d] by %s", tn, GET_TRIG_NAME(trig), (GET_OBJ_SHORT_DESC(object) ? GET_OBJ_SHORT_DESC(object) : object->name), GET_OBJ_VNUM(object), GET_NAME(ch));
 		msg_to_char(ch, "Trigger %d (%s) attached to %s [%d].\r\n", tn, GET_TRIG_NAME(trig), (GET_OBJ_SHORT_DESC(object) ? GET_OBJ_SHORT_DESC(object) : object->name), GET_OBJ_VNUM(object));
@@ -5560,6 +5560,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						if ((inst = find_instance_by_room(IN_ROOM(v), FALSE, TRUE))) {
 							VEH_INSTANCE_ID(v) = inst->id;
 						}
+						request_vehicle_save_in_room(v);
 						*str = '\0';
 					}
 					else if (!str_cmp(field, "longdesc")) {
@@ -5653,6 +5654,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					}
 					else if (!str_cmp(field, "unlink_instance")) {
 						VEH_INSTANCE_ID(v) = NOTHING;
+						request_vehicle_save_in_room(v);
 						*str = '\0';
 					}
 					break;
@@ -6654,7 +6656,7 @@ void process_attach(void *go, struct script_data *sc, trig_data *trig, int type,
 			create_script_data(o, OBJ_TRIGGER);
 		}
 		add_trigger(SCRIPT(o), newtrig, -1);
-		request_obj_save_in_room(o);
+		request_obj_save_in_world(o);
 		return;
 	}
 
@@ -7071,7 +7073,7 @@ void process_remote(struct script_data *sc, trig_data *trig, char *cmd) {
 	}
 	else if ((obj = find_obj(uid))) {
 		sc_remote = SCRIPT(obj) ? SCRIPT(obj) : create_script_data(obj, OBJ_TRIGGER);
-		request_obj_save_in_room(obj);
+		request_obj_save_in_world(obj);
 	}
 	else if ((veh = find_vehicle(uid))) {
 		sc_remote = SCRIPT(veh) ? SCRIPT(veh) : create_script_data(veh, VEH_TRIGGER);
@@ -7245,7 +7247,7 @@ void process_rdelete(struct script_data *sc, trig_data *trig, char *cmd) {
 	}
 	else if ((obj = find_obj(uid))) {
 		sc_remote = SCRIPT(obj);
-		request_obj_save_in_room(obj);
+		request_obj_save_in_world(obj);
 	}
 	else if ((veh = find_vehicle(uid))) {
 		sc_remote = SCRIPT(veh);

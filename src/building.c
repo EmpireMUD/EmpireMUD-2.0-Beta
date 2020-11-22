@@ -3143,6 +3143,8 @@ ACMD(do_upgrade) {
 			complete_vehicle(to_veh);
 			cancel_action(ch);
 		}
+		
+		request_vehicle_save_in_room(to_veh);
 	} // end upgrade-to-vehicle
 	
 	affect_total_room(in_room);

@@ -538,8 +538,10 @@ OCMD(do_otimer) {
 		obj_log(obj, "otimer: missing argument");
 	else if (!isdigit(*arg)) 
 		obj_log(obj, "otimer: bad argument");
-	else
+	else {
 		GET_OBJ_TIMER(obj) = atoi(arg);
+		request_obj_save_in_world(obj);
+	}
 }
 
 

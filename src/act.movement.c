@@ -470,7 +470,7 @@ void do_doorcmd(char_data *ch, obj_data *obj, int door, int scmd) {
 	
 	// check for more saves
 	if (obj) {
-		request_obj_save_in_room(obj);
+		request_obj_save_in_world(obj);
 	}
 	else {
 		request_world_save(GET_ROOM_VNUM(IN_ROOM(ch)), WSAVE_ROOM);

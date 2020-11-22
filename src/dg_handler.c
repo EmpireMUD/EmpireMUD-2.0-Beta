@@ -351,7 +351,7 @@ void check_extract_script(void *go, int type) {
 			if (SCRIPT(obj) && !TRIGGERS(SCRIPT(obj)) && !SCRIPT(obj)->global_vars) {
 				extract_script(obj, OBJ_TRIGGER);
 			}
-			request_obj_save_in_room(obj);
+			request_obj_save_in_world(obj);
 			break;
 		}
 		case WLD_TRIGGER:

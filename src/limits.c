@@ -1700,6 +1700,7 @@ void point_update_obj(obj_data *obj) {
 			set_obj_val(obj, VAL_DRINK_CONTAINER_TYPE, 0);
 			
 			GET_OBJ_TIMER(obj) = UNLIMITED;
+			request_obj_save_in_world(obj);
 			
 			// do not extract
 		}

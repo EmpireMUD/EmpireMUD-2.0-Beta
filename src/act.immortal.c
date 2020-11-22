@@ -9016,6 +9016,7 @@ ACMD(do_oset) {
 		}
 		else {
 			GET_OBJ_TIMER(obj) = atoi(argument);
+			request_obj_save_in_world(obj);
 			msg_to_char(ch, "You change its timer to %d.\r\n", GET_OBJ_TIMER(obj));
 		}
 	}
@@ -9221,6 +9222,7 @@ ACMD(do_purge) {
 					}
 				}
 				VEH_SHIPPING_ID(veh) = -1;
+				request_vehicle_save_in_room(veh);
 			}
 			
 			act("$n destroys $V.", FALSE, ch, NULL, veh, TO_ROOM | DG_NO_TRIG);
@@ -10432,6 +10434,7 @@ ACMD(do_trans) {
 				}
 			}
 			VEH_SHIPPING_ID(veh) = -1;
+			request_vehicle_save_in_room(veh);
 		}
 		
 		if (ROOM_PEOPLE(IN_ROOM(veh))) {

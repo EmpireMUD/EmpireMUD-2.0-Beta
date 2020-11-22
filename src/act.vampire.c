@@ -1598,6 +1598,7 @@ ACMD(do_veintap) {
 		set_obj_val(container, VAL_DRINK_CONTAINER_CONTENTS, GET_DRINK_CONTAINER_CONTENTS(container) + amt);
 		set_obj_val(container, VAL_DRINK_CONTAINER_TYPE, LIQ_BLOOD);
 		GET_OBJ_TIMER(container) = UNLIMITED;
+		request_obj_save_in_world(container);
 		
 		gain_ability_exp(ch, ABIL_VEINTAP, 33.4);
 	}

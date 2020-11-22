@@ -996,10 +996,16 @@ extern struct empire_territory_data *global_next_territory_entry;
 } while(0)
 
 // triggers a room-pack save (savable obj traits changed)
-#define request_obj_save_in_room(obj)  do {	\
+#define request_obj_save_in_world(obj)  do {	\
 	room_data *_room;	\
 	if ((_room = find_room_obj_saves_in(obj))) {	\
 		request_world_save(GET_ROOM_VNUM(_room), WSAVE_OBJS_AND_VEHS);	\
+	}	\
+	if ((obj)->carried_by && !IS_NPC((obj)->carried_by)) {	\
+		queue_delayed_update((obj)->carried_by, CDU_SAVE);	\
+	}	\
+	else if ((obj)->worn_by && !IS_NPC((obj)->worn_by)) {	\
+		queue_delayed_update((obj)->worn_by, CDU_SAVE);	\
 	}	\
 } while(0)
 

@@ -99,6 +99,7 @@ void convert_empire_shipping(empire_data *old_emp, empire_data *new_emp) {
 		}
 		
 		VEH_SHIPPING_ID(veh) = new_id;
+		request_vehicle_save_in_room(veh);
 	}
 	
 	// move all shipping entries over
@@ -4647,6 +4648,7 @@ ACMD(do_enroll) {
 			DL_FOREACH(object_list, obj) {
 				if (obj->last_empire_id == EMPIRE_VNUM(old)) {
 					obj->last_empire_id = EMPIRE_VNUM(e);
+					request_obj_save_in_world(obj);
 				}
 			}
 			

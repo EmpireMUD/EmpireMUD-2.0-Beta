@@ -2842,6 +2842,7 @@ ACMD(do_milk) {
 		set_obj_val(cont, VAL_DRINK_CONTAINER_TYPE, LIQ_MILK);
 		GET_OBJ_TIMER(cont) = 72;	// mud hours
 		gain_player_tech_exp(ch, PTECH_MILK, 33);
+		request_obj_save_in_world(cont);
 	}
 }
 

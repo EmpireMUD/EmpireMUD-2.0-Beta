@@ -290,6 +290,7 @@ bool decay_one_vehicle(vehicle_data *veh, char *message) {
 	
 	// update health
 	VEH_HEALTH(veh) -= MAX(1.0, ((double) VEH_MAX_HEALTH(veh) / 10.0));
+	request_vehicle_save_in_room(veh);
 	
 	// check very low health
 	if (VEH_HEALTH(veh) <= 0) {
@@ -618,7 +619,8 @@ room_data *get_vehicle_interior(vehicle_data *veh) {
 	}
 	
 	complete_wtrigger(room);
-		
+	
+	request_vehicle_save_in_room(veh);
 	return room;
 }
 
@@ -982,6 +984,7 @@ void scale_vehicle_to_level(vehicle_data *veh, int level) {
 	
 	// set the level
 	VEH_SCALE_LEVEL(veh) = level;
+	request_vehicle_save_in_room(veh);
 }
 
 
@@ -1055,6 +1058,7 @@ void start_dismantle_vehicle(vehicle_data *veh) {
 	}
 	
 	affect_total_room(IN_ROOM(veh));
+	request_vehicle_save_in_room(veh);
 	if (VEH_IS_VISIBLE_ON_MAPOUT(veh)) {
 		request_mapout_update(GET_ROOM_VNUM(IN_ROOM(veh)));
 	}
@@ -1553,6 +1557,7 @@ void complete_vehicle(vehicle_data *veh) {
 	
 	if (room) {
 		affect_total_room(room);
+		request_vehicle_save_in_room(veh);
 		if (VEH_IS_VISIBLE_ON_MAPOUT(veh)) {
 			request_mapout_update(GET_ROOM_VNUM(room));	// in case
 		}

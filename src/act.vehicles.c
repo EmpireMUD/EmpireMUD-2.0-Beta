@@ -1471,6 +1471,7 @@ ACMD(do_dispatch) {
 		shipd->ship_origin = GET_ROOM_VNUM(IN_ROOM(veh));
 		
 		VEH_SHIPPING_ID(veh) = find_free_shipping_id(GET_LOYALTY(ch));
+		request_vehicle_save_in_room(veh);
 		shipd->shipping_id = VEH_SHIPPING_ID(veh);
 		
 		DL_APPEND(EMPIRE_SHIPPING_LIST(GET_LOYALTY(ch)), shipd);
@@ -1997,6 +1998,7 @@ ACMD(do_fire) {
 		// delays
 		VEH_LAST_FIRE_TIME(veh) = time(0);
 		GET_WAIT_STATE(ch) = 5 RL_SEC;
+		request_vehicle_save_in_room(veh);
 	}
 }
 

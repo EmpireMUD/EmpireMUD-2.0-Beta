@@ -261,7 +261,7 @@ void assign_triggers(void *i, int type) {
 				}
 				trg_proto = trg_proto->next;
 			}
-			request_obj_save_in_room(obj);
+			request_obj_save_in_world(obj);
 			break;
 		case WLD_TRIGGER:
 		case ADV_TRIGGER:

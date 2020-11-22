@@ -2726,6 +2726,9 @@ bool besiege_vehicle(char_data *attacker, vehicle_data *veh, int damage, int sie
 	// deal damage
 	VEH_HEALTH(veh) -= damage;
 	
+	// will need a save no matter what
+	request_vehicle_save_in_room(veh);
+	
 	// not dead yet
 	if (VEH_HEALTH(veh) > 0) {
 		// apply needed maintenance if we did more than 10% damage

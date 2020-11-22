@@ -3031,6 +3031,8 @@ void perform_abandon_vehicle(vehicle_data *veh) {
 				++ROOM_LIGHTS(IN_ROOM(veh));
 			}
 		}
+		
+		request_vehicle_save_in_room(veh);
 	}
 }
 
@@ -3139,6 +3141,8 @@ void perform_claim_vehicle(vehicle_data *veh, empire_data *emp) {
 				--ROOM_LIGHTS(IN_ROOM(veh));
 			}
 		}
+		
+		request_vehicle_save_in_room(veh);
 	}
 }
 
@@ -5756,7 +5760,7 @@ void extract_obj(obj_data *obj) {
 /**
 * Finds the room whose .pack file this object should be saved in, if any.
 *
-* This is mainly called by: request_obj_save_in_room(obj)
+* This is mainly called by: request_obj_save_in_world(obj)
 *
 * @param obj_data *obj The object.
 * @return room_data* A room that this object should save in.
@@ -6360,6 +6364,8 @@ void obj_from_char(obj_data *object) {
 		log("SYSERR: NULL object passed to obj_from_char.");
 	}
 	else {
+		request_obj_save_in_world(object);
+		
 		DL_DELETE2(object->carried_by->carrying, object, prev_content, next_content);
 		object->next_content = object->prev_content = NULL;
 
@@ -6394,7 +6400,7 @@ void obj_from_obj(obj_data *obj) {
 	}
 	else {
 		remove_dropped_item_anywhere(obj);
-		request_obj_save_in_room(obj);
+		request_obj_save_in_world(obj);
 		
 		obj_from = obj->in_obj;
 		DL_DELETE2(obj_from->contains, obj, prev_content, next_content);
@@ -6425,7 +6431,7 @@ void obj_from_room(obj_data *object) {
 		log("SYSERR: NULL object (%p) or obj not in a room (%p) passed to obj_from_room", object, IN_ROOM(object));
 	}
 	else {
-		request_obj_save_in_room(object);
+		request_obj_save_in_world(object);
 		
 		// update lights
 		if (OBJ_FLAGGED(object, OBJ_LIGHT)) {
@@ -6450,7 +6456,7 @@ void obj_from_vehicle(obj_data *object) {
 		log("SYSERR: NULL object (%p) or obj not in a vehicle (%p) passed to obj_from_vehicle", object, object->in_vehicle);
 	}
 	else {
-		request_obj_save_in_room(object);
+		request_obj_save_in_world(object);
 		if (VEH_OWNER(object->in_vehicle)) {
 			remove_dropped_item(VEH_OWNER(object->in_vehicle), object);
 		}
@@ -6534,6 +6540,7 @@ void obj_to_char(obj_data *object, char_data *ch) {
 		}
 		
 		qt_get_obj(ch, object);
+		request_obj_save_in_world(object);
 	}
 	else {
 		log("SYSERR: NULL obj (%p) or char (%p) passed to obj_to_char.", object, ch);
@@ -6657,7 +6664,7 @@ void obj_to_obj(obj_data *obj, obj_data *obj_to) {
 		obj->in_obj = obj_to;
 		
 		add_dropped_item_anywhere(obj, NULL);
-		request_obj_save_in_room(obj);
+		request_obj_save_in_world(obj);
 	}
 }
 
@@ -6693,7 +6700,7 @@ void obj_to_room(obj_data *object, room_data *room) {
 			add_dropped_item(ROOM_OWNER(room), object);
 		}
 		
-		request_obj_save_in_room(object);
+		request_obj_save_in_world(object);
 	}
 }
 
@@ -6726,7 +6733,7 @@ void obj_to_vehicle(obj_data *object, vehicle_data *veh) {
 			add_dropped_item(VEH_OWNER(veh), object);
 		}
 		
-		request_obj_save_in_room(object);
+		request_obj_save_in_world(object);
 	}
 }
 

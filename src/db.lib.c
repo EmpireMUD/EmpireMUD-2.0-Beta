@@ -1794,6 +1794,7 @@ void delete_empire(empire_data *emp) {
 	DL_FOREACH(object_list, obj) {
 		if (obj->last_empire_id == vnum) {
 			obj->last_empire_id = NOTHING;
+			request_obj_save_in_world(obj);
 		}
 	}
 	

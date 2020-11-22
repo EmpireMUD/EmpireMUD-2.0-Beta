@@ -2426,6 +2426,7 @@ void fill_from_room(char_data *ch, obj_data *obj) {
 	GET_OBJ_TIMER(obj) = timer;
 
 	set_obj_val(obj, VAL_DRINK_CONTAINER_CONTENTS, GET_DRINK_CONTAINER_CAPACITY(obj));
+	request_obj_save_in_world(obj);
 }
 
 
@@ -2457,6 +2458,9 @@ void scale_item_to_level(obj_data *obj, int level) {
 	
 	// WEAR_POS_x: modifier based on best wear type
 	const double wear_pos_modifier[] = { 0.75, 1.0 };
+	
+	// it will save no matter what else happens
+	request_obj_save_in_world(obj);
 	
 	// gather info from the item
 	switch (GET_OBJ_TYPE(obj)) {
@@ -3186,6 +3190,7 @@ void load_shipment(struct empire_data *emp, struct shipping_data *shipd, vehicle
 	// mark it as attached to this boat
 	if (VEH_SHIPPING_ID(boat) == -1) {
 		VEH_SHIPPING_ID(boat) = find_free_shipping_id(emp);
+		request_vehicle_save_in_room(boat);
 	}
 	shipd->shipping_id = VEH_SHIPPING_ID(boat);
 }
@@ -3231,6 +3236,7 @@ void move_ship_to_destination(empire_data *emp, struct shipping_data *shipd, roo
 	}
 	
 	VEH_SHIPPING_ID(boat) = -1;
+	request_vehicle_save_in_room(boat);
 	
 	// remove the shipping id from all shipments that were on this ship (including this one)
 	old = shipd->shipping_id;
@@ -4878,6 +4884,7 @@ ACMD(do_drink) {
 		if (GET_DRINK_CONTAINER_CONTENTS(obj) <= 0) {	/* The last bit */
 			set_obj_val(obj, VAL_DRINK_CONTAINER_TYPE, 0);
 			GET_OBJ_TIMER(obj) = UNLIMITED;
+			request_obj_save_in_world(obj);
 		}
 		
 		// ensure binding
@@ -6260,6 +6267,7 @@ ACMD(do_pour) {
 	
 	// check max
 	set_obj_val(to_obj, VAL_DRINK_CONTAINER_CONTENTS, MIN(GET_DRINK_CONTAINER_CONTENTS(to_obj), GET_DRINK_CONTAINER_CAPACITY(to_obj)));
+	request_obj_save_in_world(to_obj);
 }
 
 
