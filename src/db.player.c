@@ -1557,7 +1557,8 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *c
 						GET_DEFICIT(ch, num) = i_in[0];
 					}
 				}
-				else if (!strn_cmp(line, "Description: ", 13)) {
+				else if (!strn_cmp(line, "Description:", 12)) {
+					// note no trailing space here
 					if (GET_LOOK_DESC(ch)) {
 						free(GET_LOOK_DESC(ch));
 					}
@@ -2585,7 +2586,7 @@ void write_player_primary_data_to_file(FILE *fl, char_data *ch) {
 	if (GET_LOOK_DESC(ch)) {
 		strcpy(temp, NULLSAFE(GET_LOOK_DESC(ch)));
 		strip_crlf(temp);
-		fprintf(fl, "Description: \n%s~\n", temp);
+		fprintf(fl, "Description:\n%s~\n", temp);
 	}
 	if (GET_DISGUISED_NAME(ch)) {
 		fprintf(fl, "Disguised Name: %s\n", GET_DISGUISED_NAME(ch));
