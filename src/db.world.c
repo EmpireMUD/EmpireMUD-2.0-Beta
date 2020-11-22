@@ -1336,6 +1336,9 @@ void annual_update_vehicle(vehicle_data *veh) {
 		add_to_resource_list(&default_res, RES_COMPONENT, COMP_NAILS, 1, 0);
 	}
 	
+	// ensure a save
+	request_vehicle_save_in_world(veh);
+	
 	// non-damage stuff:
 	annual_update_depletions(&VEH_DEPLETION(veh));
 	

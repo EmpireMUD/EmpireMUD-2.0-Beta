@@ -359,7 +359,7 @@ bool remove_thing_from_resource_list(struct resource_data **list, int type, any_
 
 // resource depletion handlers
 void add_depletion(room_data *room, int type, bool multiple);
-#define add_vehicle_depletion(veh, type, multiple)  perform_add_depletion(&VEH_DEPLETION(veh), (type), (multiple))
+#define add_vehicle_depletion(veh, type, multiple)  do { perform_add_depletion(&VEH_DEPLETION(veh), (type), (multiple)); request_vehicle_save_in_world(veh); } while (0)
 int get_depletion_amount(struct depletion_data *list, int type, bool only_type);
 #define get_depletion(room, type, only_type)  get_depletion_amount(ROOM_DEPLETION(room), (type), (only_type))
 #define get_vehicle_depletion(veh, type, only_type)  get_depletion_amount(VEH_DEPLETION(veh), (type), (only_type))
@@ -392,12 +392,12 @@ void set_extra_data(struct room_extra_data **list, int type, int value);
 #define set_room_extra_data(room, type, value)  do { set_extra_data(&ROOM_EXTRA_DATA(room), (type), (value)); request_world_save(GET_ROOM_VNUM(room), WSAVE_ROOM); } while (0)
 
 // vehicle extra data helpers
-#define add_to_vehicle_extra_data(veh, type, add_value)  add_to_extra_data(&VEH_EXTRA_DATA(veh), type, add_value)
+#define add_to_vehicle_extra_data(veh, type, add_value)  do { add_to_extra_data(&VEH_EXTRA_DATA(veh), type, add_value); request_vehicle_save_in_world(veh); } while (0)
 #define find_vehicle_extra_data(veh, type)  find_extra_data(VEH_EXTRA_DATA(veh), type)
 #define get_vehicle_extra_data(veh, type)  get_extra_data(VEH_EXTRA_DATA(veh), type)
-#define multiply_vehicle_extra_data(veh, type, multiplier)  multiply_extra_data(&VEH_EXTRA_DATA(veh), type, multiplier);
-#define remove_vehicle_extra_data(veh, type)  remove_extra_data(&VEH_EXTRA_DATA(veh), type)
-#define set_vehicle_extra_data(veh, type, value)  set_extra_data(&VEH_EXTRA_DATA(veh), type, value)
+#define multiply_vehicle_extra_data(veh, type, multiplier)  do { multiply_extra_data(&VEH_EXTRA_DATA(veh), type, multiplier); request_vehicle_save_in_world(veh); } while (0)
+#define remove_vehicle_extra_data(veh, type)  do { remove_extra_data(&VEH_EXTRA_DATA(veh), type); request_vehicle_save_in_world(veh); } while (0)
+#define set_vehicle_extra_data(veh, type, value)  do { set_extra_data(&VEH_EXTRA_DATA(veh), type, value); request_vehicle_save_in_world(veh); } while (0)
 
 // room targeting handlers
 room_data *find_target_room(char_data *ch, char *rawroomstr);
