@@ -87,7 +87,7 @@ obj_data *Obj_load_from_file(FILE *fl, obj_vnum vnum, int *location, char_data *
 	struct obj_apply *apply, *last_apply = NULL;
 	obj_data *obj, *new;
 	bool end = FALSE;
-	int length, i_in[3];
+	int i_in[3];
 	bool seek_end = FALSE;
 	
 	// up-front
@@ -121,9 +121,6 @@ obj_data *Obj_load_from_file(FILE *fl, obj_vnum vnum, int *location, char_data *
 	
 	// for fread_string
 	sprintf(error, "Obj_load_from_file %d", vnum);
-	
-	// for more readable if/else chain	
-	#define OBJ_FILE_TAG(src, tag, len)  (!strn_cmp((src), (tag), ((len) = strlen(tag))))
 
 	while (!end) {
 		if (!get_line(fl, line)) {
@@ -131,11 +128,7 @@ obj_data *Obj_load_from_file(FILE *fl, obj_vnum vnum, int *location, char_data *
 			exit(1);
 		}
 		
-		if (OBJ_FILE_TAG(line, "End", length)) {
-			end = TRUE;
-			continue;
-		}
-		else if (seek_end) {
+		if (seek_end) {
 			// are we looking for the end of the object? ignore this line
 			// WARNING: don't put any ifs that require "obj" above seek_end; obj is not guaranteed
 			continue;
@@ -144,20 +137,20 @@ obj_data *Obj_load_from_file(FILE *fl, obj_vnum vnum, int *location, char_data *
 		// normal tags by letter
 		switch (UPPER(*line)) {
 			case 'A': {
-				if (OBJ_FILE_TAG(line, "Action-desc:", length)) {
+				if (!strn_cmp(line, "Action-desc:", 12)) {
 					if (GET_OBJ_ACTION_DESC(obj) && (!proto || GET_OBJ_ACTION_DESC(obj) != GET_OBJ_ACTION_DESC(proto))) {
 						free(GET_OBJ_ACTION_DESC(obj));
 					}
 					GET_OBJ_ACTION_DESC(obj) = fread_string(fl, error);
 				}
-				else if (OBJ_FILE_TAG(line, "Affects:", length)) {
-					if (sscanf(line + length + 1, "%s", s_in)) {
+				else if (!strn_cmp(line, "Affects: ", 9)) {
+					if (sscanf(line + 9, "%s", s_in)) {
 						obj->obj_flags.bitvector = asciiflag_conv(s_in);
 					}
 				}
-				else if (OBJ_FILE_TAG(line, "Applies:", length)) {
+				else if (!strn_cmp(line, "Applies: ", 9)) {
 					// this is the CURRENT version of the "Apply" tag
-					if (sscanf(line + length + 1, "%d %d %d", &i_in[0], &i_in[1], &i_in[2])) {
+					if (sscanf(line + 9, "%d %d %d", &i_in[0], &i_in[1], &i_in[2])) {
 						CREATE(apply, struct obj_apply, 1);
 						apply->location = i_in[0];
 						apply->modifier = i_in[1];
@@ -173,9 +166,9 @@ obj_data *Obj_load_from_file(FILE *fl, obj_vnum vnum, int *location, char_data *
 						last_apply = apply;
 					}
 				}
-				else if (OBJ_FILE_TAG(line, "Apply:", length)) {
+				else if (!strn_cmp(line, "Apply: ", 7)) {
 					// this is an OLD version of the tag that has a different set of params
-					if (sscanf(line + length + 1, "%d %d %d", &i_in[0], &i_in[1], &i_in[2])) {
+					if (sscanf(line + 7, "%d %d %d", &i_in[0], &i_in[1], &i_in[2])) {
 						if (i_in[1] != APPLY_NONE && i_in[2] != 0) {
 							CREATE(apply, struct obj_apply, 1);
 							apply->location = i_in[1];
@@ -193,16 +186,16 @@ obj_data *Obj_load_from_file(FILE *fl, obj_vnum vnum, int *location, char_data *
 						}
 					}
 				}
-				else if (OBJ_FILE_TAG(line, "Autostore-timer:", length)) {
-					if (sscanf(line + length + 1, "%d", &i_in[0])) {
+				else if (!strn_cmp(line, "Autostore-timer: ", 17)) {
+					if (sscanf(line + 17, "%d", &i_in[0])) {
 						GET_AUTOSTORE_TIMER(obj) = i_in[0];
 					}
 				}
 				break;
 			}
 			case 'B': {
-				if (OBJ_FILE_TAG(line, "Bound-to:", length)) {
-					if (sscanf(line + length + 1, "%d", &i_in[0])) {
+				if (!strn_cmp(line, "Bound-to: ", 10)) {
+					if (sscanf(line + 10, "%d", &i_in[0])) {
 						struct obj_binding *bind;
 						CREATE(bind, struct obj_binding, 1);
 						bind->idnum = i_in[0];
@@ -212,13 +205,13 @@ obj_data *Obj_load_from_file(FILE *fl, obj_vnum vnum, int *location, char_data *
 				break;
 			}
 			case 'C': {
-				if (OBJ_FILE_TAG(line, "Component:", length)) {
-					if (sscanf(line + length + 1, "%d %s", &i_in[0], s_in) == 2) {
+				if (!strn_cmp(line, "Component: ", 11)) {
+					if (sscanf(line + 11, "%d %s", &i_in[0], s_in) == 2) {
 						// old pre-b5.88 version: ignore
 						// GET_OBJ_CMP_TYPE(obj) = i_in[0];
 						// GET_OBJ_CMP_FLAGS(obj) = asciiflag_conv(s_in);
 					}
-					else if (sscanf(line + length + 1, "%d", &i_in[0]) == 1) {
+					else if (sscanf(line + 11, "%d", &i_in[0]) == 1) {
 						// newer version
 						if (GET_OBJ_VNUM(obj) == NOTHING) {
 							// only allowed for 'anonymous' objs
@@ -226,15 +219,15 @@ obj_data *Obj_load_from_file(FILE *fl, obj_vnum vnum, int *location, char_data *
 						}
 					}
 				}
-				else if (OBJ_FILE_TAG(line, "Current-scale:", length)) {
-					if (sscanf(line + length + 1, "%d", &i_in[0])) {
+				else if (!strn_cmp(line, "Current-scale: ", 15)) {
+					if (sscanf(line + 15, "%d", &i_in[0])) {
 						GET_OBJ_CURRENT_SCALE_LEVEL(obj) = i_in[0];
 					}
 				}
 				break;
 			}
 			case 'E': {
-				if (OBJ_FILE_TAG(line, "Extra-desc:", length)) {
+				if (!strn_cmp(line, "Extra-desc:", 11)) {
 					if (GET_OBJ_VNUM(obj) == NOTHING) {
 						// only allowed on 'anonymous' objs
 						CREATE(ex, struct extra_descr_data, 1);
@@ -253,23 +246,26 @@ obj_data *Obj_load_from_file(FILE *fl, obj_vnum vnum, int *location, char_data *
 						}
 					}
 				}
-				else if (OBJ_FILE_TAG(line, "Eq-set:", length)) {
-					if (sscanf(line + length + 1, "%d %d", &i_in[0], &i_in[1]) == 2) {
+				else if (!strn_cmp(line, "Eq-set: ", 8)) {
+					if (sscanf(line + 8, "%d %d", &i_in[0], &i_in[1]) == 2) {
 						add_obj_to_eq_set(obj, i_in[0], i_in[1]);
 					}
+				}
+				else if (!strn_cmp(line, "End", 3)) {
+					end = TRUE;
 				}
 				break;
 			}
 			case 'F': {
-				if (OBJ_FILE_TAG(line, "Flags:", length)) {
-					if (sscanf(line + length + 1, "%s", s_in)) {
+				if (!strn_cmp(line, "Flags: ", 7)) {
+					if (sscanf(line + 7, "%s", s_in)) {
 						GET_OBJ_EXTRA(obj) = asciiflag_conv(s_in);
 					}
 				}
 				break;
 			}
 			case 'K': {
-				if (OBJ_FILE_TAG(line, "Keywords:", length)) {
+				if (!strn_cmp(line, "Keywords:", 9)) {
 					if (GET_OBJ_KEYWORDS(obj) && (!proto || GET_OBJ_KEYWORDS(obj) != GET_OBJ_KEYWORDS(proto))) {
 						free(GET_OBJ_KEYWORDS(obj));
 					}
@@ -278,22 +274,22 @@ obj_data *Obj_load_from_file(FILE *fl, obj_vnum vnum, int *location, char_data *
 				break;
 			}
 			case 'L': {
-				if (OBJ_FILE_TAG(line, "Last-empire:", length)) {
-					if (sscanf(line + length + 1, "%d", &i_in[0])) {
+				if (!strn_cmp(line, "Last-empire: ", 13)) {
+					if (sscanf(line + 13, "%d", &i_in[0])) {
 						obj->last_empire_id = i_in[0];
 					}
 				}
-				else if (OBJ_FILE_TAG(line, "Last-owner:", length)) {
-					if (sscanf(line + length + 1, "%d", &i_in[0])) {
+				else if (!strn_cmp(line, "Last-owner: ", 12)) {
+					if (sscanf(line + 12, "%d", &i_in[0])) {
 						obj->last_owner_id = i_in[0];
 					}
 				}
-				else if (OBJ_FILE_TAG(line, "Location:", length)) {
-					if (sscanf(line + length + 1, "%d", &i_in[0]) == 1) {
+				else if (!strn_cmp(line, "Location: ", 10)) {
+					if (sscanf(line + 10, "%d", &i_in[0]) == 1) {
 						*location = i_in[0];
 					}
 				}
-				else if (OBJ_FILE_TAG(line, "Long-desc:", length)) {
+				else if (!strn_cmp(line, "Long-desc:", 10)) {
 					if (GET_OBJ_LONG_DESC(obj) && (!proto || GET_OBJ_LONG_DESC(obj) != GET_OBJ_LONG_DESC(proto))) {
 						free(GET_OBJ_LONG_DESC(obj));
 					}
@@ -302,24 +298,24 @@ obj_data *Obj_load_from_file(FILE *fl, obj_vnum vnum, int *location, char_data *
 				break;
 			}
 			case 'M': {
-				if (OBJ_FILE_TAG(line, "Max-scale:", length)) {
-					if (sscanf(line + length + 1, "%d", &i_in[0])) {
+				if (!strn_cmp(line, "Max-scale: ", 11)) {
+					if (sscanf(line + 11, "%d", &i_in[0])) {
 						if (GET_OBJ_VNUM(obj) == NOTHING) {
 							// only allowed for 'anonymous' objs
 							obj->proto_data->max_scale_level = i_in[0];
 						}
 					}
 				}
-				else if (OBJ_FILE_TAG(line, "Material:", length)) {
-					if (sscanf(line + length + 1, "%d", &i_in[0])) {
+				else if (!strn_cmp(line, "Material: ", 10)) {
+					if (sscanf(line + 10, "%d", &i_in[0])) {
 						if (GET_OBJ_VNUM(obj) == NOTHING) {
 							// only allowed for 'anonymous' objs
 							obj->proto_data->material = i_in[0];
 						}
 					}
 				}
-				else if (OBJ_FILE_TAG(line, "Min-scale:", length)) {
-					if (sscanf(line + length + 1, "%d", &i_in[0])) {
+				else if (!strn_cmp(line, "Min-scale: ", 11)) {
+					if (sscanf(line + 11, "%d", &i_in[0])) {
 						if (GET_OBJ_VNUM(obj) == NOTHING) {
 							// only allowed for 'anonymous' objs
 							obj->proto_data->min_scale_level = i_in[0];
@@ -329,8 +325,8 @@ obj_data *Obj_load_from_file(FILE *fl, obj_vnum vnum, int *location, char_data *
 				break;
 			}
 			case 'Q': {
-				if (OBJ_FILE_TAG(line, "Quest:", length)) {
-					if (sscanf(line + length + 1, "%d", &i_in[0])) {
+				if (!strn_cmp(line, "Quest: ", 7)) {
+					if (sscanf(line + 7, "%d", &i_in[0])) {
 						if (GET_OBJ_VNUM(obj) == NOTHING) {
 							// only allowed for 'anonymous' objs
 							obj->proto_data->requires_quest = i_in[0];
@@ -340,48 +336,48 @@ obj_data *Obj_load_from_file(FILE *fl, obj_vnum vnum, int *location, char_data *
 				break;
 			}
 			case 'S': {
-				if (OBJ_FILE_TAG(line, "Short-desc:", length)) {
+				if (!strn_cmp(line, "Short-desc:", 11)) {
 					if (GET_OBJ_SHORT_DESC(obj) && (!proto || GET_OBJ_SHORT_DESC(obj) != GET_OBJ_SHORT_DESC(proto))) {
 						free(GET_OBJ_SHORT_DESC(obj));
 					}
 					GET_OBJ_SHORT_DESC(obj) = fread_string(fl, error);
 				}
-				else if (OBJ_FILE_TAG(line, "Stolen-from:", length)) {
-					if (sscanf(line + length + 1, "%d", &i_in[0])) {
+				else if (!strn_cmp(line, "Stolen-from: ", 13)) {
+					if (sscanf(line + 13, "%d", &i_in[0])) {
 						obj->stolen_from = i_in[0];
 					}
 				}
-				else if (OBJ_FILE_TAG(line, "Stolen-timer:", length)) {
-					if (sscanf(line + length + 1, "%d", &i_in[0])) {
+				else if (!strn_cmp(line, "Stolen-timer: ", 14)) {
+					if (sscanf(line + 14, "%d", &i_in[0])) {
 						obj->stolen_timer = i_in[0];
 					}
 				}
 				break;
 			}
 			case 'T': {
-				if (OBJ_FILE_TAG(line, "Timer:", length)) {
-					if (sscanf(line + length + 1, "%d", &i_in[0])) {
+				if (!strn_cmp(line, "Timer: ", 7)) {
+					if (sscanf(line + 7, "%d", &i_in[0])) {
 						GET_OBJ_TIMER(obj) = i_in[0];
 					}
 				}
-				else if (OBJ_FILE_TAG(line, "Tool:", length)) {
-					if (sscanf(line + length + 1, "%s", s_in)) {
+				else if (!strn_cmp(line, "Tool: ", 6)) {
+					if (sscanf(line + 6, "%s", s_in)) {
 						if (GET_OBJ_VNUM(obj) == NOTHING) {
 							// only allowed for 'anonymous' objs
 							obj->proto_data->tool_flags = asciiflag_conv(s_in);
 						}
 					}
 				}
-				else if (OBJ_FILE_TAG(line, "Trigger:", length)) {
-					if (sscanf(line + length + 1, "%d", &i_in[0]) && real_trigger(i_in[0])) {
+				else if (!strn_cmp(line, "Trigger: ", 9)) {
+					if (sscanf(line + 9, "%d", &i_in[0]) && real_trigger(i_in[0])) {
 						if (!SCRIPT(obj)) {
 							create_script_data(obj, OBJ_TRIGGER);
 						}
 						add_trigger(SCRIPT(obj), read_trigger(i_in[0]), -1);
 					}
 				}
-				else if (OBJ_FILE_TAG(line, "Type:", length)) {
-					if (sscanf(line + length + 1, "%d", &i_in[0])) {
+				else if (!strn_cmp(line, "Type: ", 6)) {
+					if (sscanf(line + 6, "%d", &i_in[0])) {
 						if (GET_OBJ_VNUM(obj) == NOTHING) {
 							// only allowed for 'anonymous' objs
 							obj->proto_data->type_flag = i_in[0];
@@ -391,23 +387,23 @@ obj_data *Obj_load_from_file(FILE *fl, obj_vnum vnum, int *location, char_data *
 				break;
 			}
 			case 'V': {
-				if (OBJ_FILE_TAG(line, "Val-0:", length)) {
-					if (sscanf(line + length + 1, "%d", &i_in[0])) {
+				if (!strn_cmp(line, "Val-0: ", 7)) {
+					if (sscanf(line + 7, "%d", &i_in[0])) {
 						GET_OBJ_VAL(obj, 0) = i_in[0];
 					}
 				}
-				else if (OBJ_FILE_TAG(line, "Val-1:", length)) {
-					if (sscanf(line + length + 1, "%d", &i_in[0])) {
+				else if (!strn_cmp(line, "Val-1: ", 7)) {
+					if (sscanf(line + 7, "%d", &i_in[0])) {
 						GET_OBJ_VAL(obj, 1) = i_in[0];
 					}
 				}
-				else if (OBJ_FILE_TAG(line, "Val-2:", length)) {
-					if (sscanf(line + length + 1, "%d", &i_in[0])) {
+				else if (!strn_cmp(line, "Val-2: ", 7)) {
+					if (sscanf(line + 7, "%d", &i_in[0])) {
 						GET_OBJ_VAL(obj, 2) = i_in[0];
 					}
 				}
-				else if (OBJ_FILE_TAG(line, "Variable:", length)) {
-					if (sscanf(line + length + 1, "%s %d", s_in, &i_in[0]) != 2 || !get_line(fl, line)) {
+				else if (!strn_cmp(line, "Variable: ", 10)) {
+					if (sscanf(line + 10, "%s %d", s_in, &i_in[0]) != 2 || !get_line(fl, line)) {
 						log("SYSERR: Bad variable format in Obj_load_from_file: #%d", GET_OBJ_VNUM(obj));
 						exit(1);
 					}
@@ -416,16 +412,16 @@ obj_data *Obj_load_from_file(FILE *fl, obj_vnum vnum, int *location, char_data *
 					}
 					add_var(&(SCRIPT(obj)->global_vars), s_in, line, i_in[0]);
 				}
-				else if (OBJ_FILE_TAG(line, "Version:", length)) {
-					if (sscanf(line + length + 1, "%d", &i_in[0])) {
+				else if (!strn_cmp(line, "Version: ", 9)) {
+					if (sscanf(line + 9, "%d", &i_in[0])) {
 						OBJ_VERSION(obj) = i_in[0];
 					}
 				}
 				break;
 			}
 			case 'W': {
-				if (OBJ_FILE_TAG(line, "Wear:", length)) {
-					if (sscanf(line + length + 1, "%s", s_in)) {
+				if (!strn_cmp(line, "Wear: ", 6)) {
+					if (sscanf(line + 6, "%s", s_in)) {
 						GET_OBJ_WEAR(obj) = asciiflag_conv(s_in);
 					}
 				}
