@@ -13,4 +13,4 @@ bin/cryptpasswd.dSYM/Contents/Resources/DWARF/cryptpasswd
 
 bin/evolve.dSYM/Contents/Resources/DWARF/evolve
 
-lib/world/read_map.dSYM/Contents/Resources/DWARF/read_map
+lib/world/wld/read_map.dSYM/Contents/Resources/DWARF/read_map
