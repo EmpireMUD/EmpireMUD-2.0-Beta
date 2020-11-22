@@ -3039,6 +3039,11 @@ ACMD(do_messages) {
 	int id, count = 0;
 	size_t size;
 	
+	if (IS_NPC(ch) || !ch->desc) {
+		msg_to_char(ch, "You can't do that.\r\n");
+		return;
+	}
+	
 	size = snprintf(buf, sizeof(buf), "Recent messages:\r\n");
 	
 	HASH_ITER(hh, automessages_table, msg, next_msg) {
