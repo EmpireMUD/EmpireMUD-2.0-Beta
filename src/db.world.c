@@ -4129,18 +4129,11 @@ void request_world_save_by_script(void *go, int type) {
 	// X_TRIGGER:
 	switch (type) {
 		case MOB_TRIGGER: {
-			char_data *save_mob = (char_data*)go;
-			if (IN_ROOM(save_mob)) {
-				request_world_save(GET_ROOM_VNUM(IN_ROOM(save_mob)), WSAVE_ROOM);
-			}
+			request_mob_save_in_room((char_data*)go);
 			break;
 		}
 		case OBJ_TRIGGER: {
-			obj_data *save_obj = (obj_data*)go;
-			room_data *save_room = find_room_obj_saves_in(save_obj);
-			if (save_room) {
-				request_world_save(GET_ROOM_VNUM(save_room), WSAVE_OBJS_AND_VEHS);
-			}
+			request_obj_save_in_room((obj_data*)go);
 			break;
 		}
 		case WLD_TRIGGER:
@@ -4151,10 +4144,7 @@ void request_world_save_by_script(void *go, int type) {
 			break;
 		}
 		case VEH_TRIGGER: {
-			vehicle_data *save_veh = (vehicle_data*)go;
-			if (IN_ROOM(save_veh)) {
-				request_world_save(GET_ROOM_VNUM(IN_ROOM(save_veh)), WSAVE_OBJS_AND_VEHS);
-			}
+			request_vehicle_save_in_room((vehicle_data*)go);
 			break;
 		}
 		// default: no work

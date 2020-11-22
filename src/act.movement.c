@@ -401,7 +401,7 @@ int determine_move_type(char_data *ch, room_data *to_room) {
 
 void do_doorcmd(char_data *ch, obj_data *obj, int door, int scmd) {
 	char lbuf[MAX_STRING_LENGTH];
-	room_data *other_room = NULL, *save_room;
+	room_data *other_room = NULL;
 	struct room_direction_data *ex = !obj ? find_exit(IN_ROOM(ch), door) : NULL, *back = NULL;
 	
 	#define TOGGLE_DOOR(ex, obj)	((obj) ? \
@@ -469,8 +469,8 @@ void do_doorcmd(char_data *ch, obj_data *obj, int door, int scmd) {
 	}
 	
 	// check for more saves
-	if (obj && (save_room = find_room_obj_saves_in(obj))) {
-		request_world_save(GET_ROOM_VNUM(save_room), WSAVE_OBJS_AND_VEHS);
+	if (obj) {
+		request_obj_save_in_room(obj);
 	}
 	else {
 		request_world_save(GET_ROOM_VNUM(IN_ROOM(ch)), WSAVE_ROOM);

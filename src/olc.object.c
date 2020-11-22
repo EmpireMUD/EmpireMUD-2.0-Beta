@@ -1850,8 +1850,6 @@ obj_data *setup_olc_object(obj_data *input) {
 * @return int Passes back 'value' so this can be used like a regular '=' assignment.
 */
 int set_obj_val(obj_data *obj, int pos, int value) {
-	room_data *room;
-	
 	// safety
 	if (pos < 0 || pos >= NUM_OBJ_VAL_POSITIONS) {
 		log("SYSERR: set_obj_val called with invalid position %d", pos);
@@ -1859,8 +1857,8 @@ int set_obj_val(obj_data *obj, int pos, int value) {
 	}
 	
 	// will it need to save?
-	if (GET_OBJ_VAL(obj, pos) != value && (room = find_room_obj_saves_in(obj))) {
-		request_world_save(GET_ROOM_VNUM(room), WSAVE_OBJS_AND_VEHS);
+	if (GET_OBJ_VAL(obj, pos) != value) {
+		request_obj_save_in_room(obj);
 	}
 	
 	// and set it

@@ -343,20 +343,15 @@ void check_extract_script(void *go, int type) {
 			if (SCRIPT(mob) && !TRIGGERS(SCRIPT(mob)) && !SCRIPT(mob)->global_vars) {
 				extract_script(mob, MOB_TRIGGER);
 			}
-			if (IN_ROOM(mob)) {
-				request_world_save(GET_ROOM_VNUM(IN_ROOM(mob)), WSAVE_ROOM);
-			}
+			request_mob_save_in_room(mob);
 			break;
 		}
 		case OBJ_TRIGGER: {
 			obj_data *obj = (obj_data*)go;
-			room_data *save_room = find_room_obj_saves_in(obj);
 			if (SCRIPT(obj) && !TRIGGERS(SCRIPT(obj)) && !SCRIPT(obj)->global_vars) {
 				extract_script(obj, OBJ_TRIGGER);
 			}
-			if (save_room) {
-				request_world_save(GET_ROOM_VNUM(save_room), WSAVE_OBJS_AND_VEHS);
-			}
+			request_obj_save_in_room(obj);
 			break;
 		}
 		case WLD_TRIGGER:
@@ -376,9 +371,7 @@ void check_extract_script(void *go, int type) {
 			if (SCRIPT(veh) && !TRIGGERS(SCRIPT(veh)) && !SCRIPT(veh)->global_vars) {
 				extract_script(veh, VEH_TRIGGER);
 			}
-			if (IN_ROOM(veh)) {
-				request_world_save(GET_ROOM_VNUM(IN_ROOM(veh)), WSAVE_OBJS_AND_VEHS);
-			}
+			request_vehicle_save_in_room(veh);
 			break;
 		}
 		case EMP_TRIGGER: {

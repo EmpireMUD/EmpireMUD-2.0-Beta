@@ -995,6 +995,21 @@ extern struct empire_territory_data *global_next_territory_entry;
 	}	\
 } while(0)
 
+// triggers a room-pack save (savable obj traits changed)
+#define request_obj_save_in_room(obj)  do {	\
+	room_data *_room;	\
+	if ((_room = find_room_obj_saves_in(obj))) {	\
+		request_world_save(GET_ROOM_VNUM(_room), WSAVE_OBJS_AND_VEHS);	\
+	}	\
+} while(0)
+
+// triggers a room-pack save (savable vehicle traits changed)
+#define request_vehicle_save_in_room(veh)  do {	\
+	if (IN_ROOM(veh)) {	\
+		request_world_save(GET_ROOM_VNUM(IN_ROOM(veh)), WSAVE_OBJS_AND_VEHS);	\
+	}	\
+} while(0)
+
 // combine setting these with saving
 #define set_mob_flags(mob, to_set)  do { \
 	SET_BIT(MOB_FLAGS(mob), (to_set));	\

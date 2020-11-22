@@ -5756,6 +5756,8 @@ void extract_obj(obj_data *obj) {
 /**
 * Finds the room whose .pack file this object should be saved in, if any.
 *
+* This is mainly called by: request_obj_save_in_room(obj)
+*
 * @param obj_data *obj The object.
 * @return room_data* A room that this object should save in.
 */
@@ -6386,16 +6388,13 @@ void obj_from_char(obj_data *object) {
 */
 void obj_from_obj(obj_data *obj) {
 	obj_data *obj_from;
-	room_data *find_room;
 
 	if (obj->in_obj == NULL) {
 		log("SYSERR: (%s): trying to illegally extract obj from obj.", __FILE__);
 	}
 	else {
 		remove_dropped_item_anywhere(obj);
-		if ((find_room = find_room_obj_saves_in(obj))) {
-			request_world_save(GET_ROOM_VNUM(find_room), WSAVE_OBJS_AND_VEHS);
-		}
+		request_obj_save_in_room(obj);
 		
 		obj_from = obj->in_obj;
 		DL_DELETE2(obj_from->contains, obj, prev_content, next_content);
@@ -6426,7 +6425,7 @@ void obj_from_room(obj_data *object) {
 		log("SYSERR: NULL object (%p) or obj not in a room (%p) passed to obj_from_room", object, IN_ROOM(object));
 	}
 	else {
-		request_world_save(GET_ROOM_VNUM(IN_ROOM(object)), WSAVE_OBJS_AND_VEHS);
+		request_obj_save_in_room(object);
 		
 		// update lights
 		if (OBJ_FLAGGED(object, OBJ_LIGHT)) {
@@ -6447,15 +6446,11 @@ void obj_from_room(obj_data *object) {
 * @param obj_data *object The item to remove from whatever vehicle it's in.
 */
 void obj_from_vehicle(obj_data *object) {
-	room_data *find_room;
-	
 	if (!object || !object->in_vehicle) {
 		log("SYSERR: NULL object (%p) or obj not in a vehicle (%p) passed to obj_from_vehicle", object, object->in_vehicle);
 	}
 	else {
-		if ((find_room = find_room_obj_saves_in(object))) {
-			request_world_save(GET_ROOM_VNUM(find_room), WSAVE_OBJS_AND_VEHS);
-		}
+		request_obj_save_in_room(object);
 		if (VEH_OWNER(object->in_vehicle)) {
 			remove_dropped_item(VEH_OWNER(object->in_vehicle), object);
 		}
@@ -6635,8 +6630,6 @@ void obj_to_char_or_room(obj_data *obj, char_data *ch) {
 * @param obj_data *obj_to What to put it into
 */
 void obj_to_obj(obj_data *obj, obj_data *obj_to) {
-	room_data *find_room;
-	
 	if (!obj || !obj_to || obj == obj_to) {
 		log("SYSERR: NULL object (%p) or same source (%p) and target (%p) obj passed to obj_to_obj.", obj, obj, obj_to);
 	}
@@ -6664,10 +6657,7 @@ void obj_to_obj(obj_data *obj, obj_data *obj_to) {
 		obj->in_obj = obj_to;
 		
 		add_dropped_item_anywhere(obj, NULL);
-		
-		if ((find_room = find_room_obj_saves_in(obj))) {
-			request_world_save(GET_ROOM_VNUM(find_room), WSAVE_OBJS_AND_VEHS);
-		}
+		request_obj_save_in_room(obj);
 	}
 }
 
@@ -6703,7 +6693,7 @@ void obj_to_room(obj_data *object, room_data *room) {
 			add_dropped_item(ROOM_OWNER(room), object);
 		}
 		
-		request_world_save(GET_ROOM_VNUM(room), WSAVE_OBJS_AND_VEHS);
+		request_obj_save_in_room(object);
 	}
 }
 
@@ -6715,8 +6705,6 @@ void obj_to_room(obj_data *object, room_data *room) {
 * @param vehicle_data *veh The vehicle to put it in.
 */
 void obj_to_vehicle(obj_data *object, vehicle_data *veh) {
-	room_data *find_room;
-	
 	if (!object || !veh) {
 		log("SYSERR: Illegal value(s) passed to obj_to_vehicle. (Vehicle %p, obj %p)", veh, object);
 	}
@@ -6738,9 +6726,7 @@ void obj_to_vehicle(obj_data *object, vehicle_data *veh) {
 			add_dropped_item(VEH_OWNER(veh), object);
 		}
 		
-		if ((find_room = find_room_obj_saves_in(object))) {
-			request_world_save(GET_ROOM_VNUM(find_room), WSAVE_OBJS_AND_VEHS);
-		}
+		request_obj_save_in_room(object);
 	}
 }
 
@@ -10195,6 +10181,7 @@ void vehicle_from_room(vehicle_data *veh) {
 	
 	// yank empire tech (which may be island-based)
 	adjust_vehicle_tech(veh, FALSE);
+	request_vehicle_save_in_room(veh);
 	
 	// check lights
 	if (VEH_PROVIDES_LIGHT(veh)) {
@@ -10211,8 +10198,6 @@ void vehicle_from_room(vehicle_data *veh) {
 	if (VEH_IS_VISIBLE_ON_MAPOUT(veh)) {
 		request_mapout_update(GET_ROOM_VNUM(was_in));
 	}
-	
-	request_world_save(GET_ROOM_VNUM(was_in), WSAVE_OBJS_AND_VEHS);
 }
 
 
@@ -10251,7 +10236,7 @@ void vehicle_to_room(vehicle_data *veh, room_data *room) {
 		request_mapout_update(GET_ROOM_VNUM(room));
 	}
 	
-	request_world_save(GET_ROOM_VNUM(room), WSAVE_OBJS_AND_VEHS);
+	request_vehicle_save_in_room(veh);
 }
 
 

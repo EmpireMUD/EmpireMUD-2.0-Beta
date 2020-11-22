@@ -1402,7 +1402,7 @@ ACMD(do_tattach) {
 		}
 		add_trigger(SCRIPT(victim), trig, loc);
 		reread_companion_trigs(victim);
-		request_world_save(GET_ROOM_VNUM(IN_ROOM(victim)), WSAVE_ROOM);
+		request_mob_save_in_room(victim);
 
 		syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: Trigger %d (%s) attached to %s [%d] by %s", tn, GET_TRIG_NAME(trig), GET_SHORT(victim), GET_MOB_VNUM(victim), GET_NAME(ch));
 		msg_to_char(ch, "Trigger %d (%s) attached to %s [%d].\r\n", tn, GET_TRIG_NAME(trig), GET_SHORT(victim), GET_MOB_VNUM(victim));
@@ -1446,9 +1446,7 @@ ACMD(do_tattach) {
 			create_script_data(object, OBJ_TRIGGER);
 		}
 		add_trigger(SCRIPT(object), trig, loc);
-		if ((room = find_room_obj_saves_in(object))) {
-			request_world_save(GET_ROOM_VNUM(room), WSAVE_OBJS_AND_VEHS);
-		}
+		request_obj_save_in_room(object);
 
 		syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: Trigger %d (%s) attached to %s [%d] by %s", tn, GET_TRIG_NAME(trig), (GET_OBJ_SHORT_DESC(object) ? GET_OBJ_SHORT_DESC(object) : object->name), GET_OBJ_VNUM(object), GET_NAME(ch));
 		msg_to_char(ch, "Trigger %d (%s) attached to %s [%d].\r\n", tn, GET_TRIG_NAME(trig), (GET_OBJ_SHORT_DESC(object) ? GET_OBJ_SHORT_DESC(object) : object->name), GET_OBJ_VNUM(object));
@@ -1486,7 +1484,7 @@ ACMD(do_tattach) {
 			create_script_data(veh, VEH_TRIGGER);
 		}
 		add_trigger(SCRIPT(veh), trig, loc);
-		request_world_save(GET_ROOM_VNUM(IN_ROOM(veh)), WSAVE_OBJS_AND_VEHS);
+		request_vehicle_save_in_room(veh);
 
 		syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: Trigger %d (%s) attached to %s [%d] by %s", tn, GET_TRIG_NAME(trig), VEH_SHORT_DESC(veh), VEH_VNUM(veh), GET_NAME(ch));
 		msg_to_char(ch, "Trigger %d (%s) attached to %s [%d].\r\n", tn, GET_TRIG_NAME(trig), VEH_SHORT_DESC(veh), VEH_VNUM(veh));
@@ -6594,7 +6592,6 @@ void process_attach(void *go, struct script_data *sc, trig_data *trig, int type,
 	char_data *c=NULL;
 	obj_data *o=NULL;
 	room_data *r=NULL;
-	room_data *found_room;
 	int id;
 
 	id_p = two_arguments(cmd, arg, trignum_s);
@@ -6639,7 +6636,7 @@ void process_attach(void *go, struct script_data *sc, trig_data *trig, int type,
 		}
 		add_trigger(SCRIPT(c), newtrig, -1);
 		reread_companion_trigs(c);
-		request_world_save(GET_ROOM_VNUM(IN_ROOM(c)), WSAVE_ROOM);
+		request_mob_save_in_room(c);
 		return;
 	}
 
@@ -6648,7 +6645,7 @@ void process_attach(void *go, struct script_data *sc, trig_data *trig, int type,
 			create_script_data(v, VEH_TRIGGER);
 		}
 		add_trigger(SCRIPT(v), newtrig, -1);
-		request_world_save(GET_ROOM_VNUM(IN_ROOM(v)), WSAVE_OBJS_AND_VEHS);
+		request_vehicle_save_in_room(v);
 		return;
 	}
 
@@ -6657,9 +6654,7 @@ void process_attach(void *go, struct script_data *sc, trig_data *trig, int type,
 			create_script_data(o, OBJ_TRIGGER);
 		}
 		add_trigger(SCRIPT(o), newtrig, -1);
-		if ((found_room = find_room_obj_saves_in(o))) {
-			request_world_save(GET_ROOM_VNUM(found_room), WSAVE_OBJS_AND_VEHS);
-		}
+		request_obj_save_in_room(o);
 		return;
 	}
 
@@ -7072,21 +7067,15 @@ void process_remote(struct script_data *sc, trig_data *trig, char *cmd) {
 		if (!IS_NPC(mob))
 			context = 0;
 		add_companion_var(mob, vd->name, vd->value, context);
-		if (IN_ROOM(mob)) {
-			request_world_save(GET_ROOM_VNUM(IN_ROOM(mob)), WSAVE_ROOM);
-		}
+		request_mob_save_in_room(mob);
 	}
 	else if ((obj = find_obj(uid))) {
 		sc_remote = SCRIPT(obj) ? SCRIPT(obj) : create_script_data(obj, OBJ_TRIGGER);
-		if ((room = find_room_obj_saves_in(obj))) {
-			request_world_save(GET_ROOM_VNUM(room), WSAVE_OBJS_AND_VEHS);
-		}
+		request_obj_save_in_room(obj);
 	}
 	else if ((veh = find_vehicle(uid))) {
 		sc_remote = SCRIPT(veh) ? SCRIPT(veh) : create_script_data(veh, VEH_TRIGGER);
-		if (IN_ROOM(veh)) {
-			request_world_save(GET_ROOM_VNUM(IN_ROOM(veh)), WSAVE_OBJS_AND_VEHS);
-		}
+		request_vehicle_save_in_room(veh);
 	}
 	else if ((emp = find_empire_by_uid(uid))) {
 		sc_remote = SCRIPT(emp) ? SCRIPT(emp) : create_script_data(emp, EMP_TRIGGER);
@@ -7247,9 +7236,7 @@ void process_rdelete(struct script_data *sc, trig_data *trig, char *cmd) {
 	else if ((mob = find_char(uid))) {
 		sc_remote = SCRIPT(mob);
 		remove_companion_var(mob, var, sc->context);
-		if (IN_ROOM(mob)) {
-			request_world_save(GET_ROOM_VNUM(IN_ROOM(mob)), WSAVE_ROOM);
-		}
+		request_mob_save_in_room(mob);
 		/*
 		// this was set but never used
 		if (!IS_NPC(mob))
@@ -7258,15 +7245,11 @@ void process_rdelete(struct script_data *sc, trig_data *trig, char *cmd) {
 	}
 	else if ((obj = find_obj(uid))) {
 		sc_remote = SCRIPT(obj);
-		if ((room = find_room_obj_saves_in(obj))) {
-			request_world_save(GET_ROOM_VNUM(room), WSAVE_OBJS_AND_VEHS);
-		}
+		request_obj_save_in_room(obj);
 	}
 	else if ((veh = find_vehicle(uid))) {
 		sc_remote = SCRIPT(veh);
-		if (IN_ROOM(veh)) {
-			request_world_save(GET_ROOM_VNUM(IN_ROOM(veh)), WSAVE_OBJS_AND_VEHS);
-		}
+		request_vehicle_save_in_room(veh);
 	}
 	else if ((emp = find_empire_by_uid(uid))) {
 		sc_remote = SCRIPT(emp);
