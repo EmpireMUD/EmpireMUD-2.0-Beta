@@ -594,8 +594,9 @@ void write_account_to_file(FILE *fl, account_data *acct) {
 //// CORE PLAYER DB //////////////////////////////////////////////////////////
 
 // for more readable if/else chain
-#define PFILE_TAG(src, tag, len)  (!strn_cmp((src), (tag), ((len) = strlen(tag))))
-#define BAD_TAG_WARNING(src)  else if (LOG_BAD_TAG_WARNINGS) { log("SYSERR: Bad tag in player '%s': %s", NULLSAFE(GET_PC_NAME(ch)), (src)); }
+#define BAD_TAG_WARNING(src)  else if (LOG_BAD_TAG_WARNINGS) { \
+	log("SYSERR: Bad tag in player '%s': %s", NULLSAFE(GET_PC_NAME(ch)), (src));	\
+}
 
 
 /**
@@ -1176,7 +1177,7 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *c
 	struct player_ability_data *abildata;
 	struct player_automessage *automsg;
 	struct player_skill_data *skdata;
-	int length, i_in[7], iter, num, val;
+	int i_in[7], iter, num, val;
 	struct player_event_data *ped;
 	struct player_lastname *lastn;
 	struct slash_channel *slash;
@@ -1263,8 +1264,8 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *c
 				break;
 			}
 			case 'A': {
-				if (PFILE_TAG(line, "Ability:", length)) {
-					if (sscanf(line + length + 1, "%d %d %d %d", &i_in[0], &i_in[1], &i_in[2], &i_in[3]) == 4) {
+				if (!strn_cmp(line, "Ability: ", 9)) {
+					if (sscanf(line + 9, "%d %d %d %d", &i_in[0], &i_in[1], &i_in[2], &i_in[3]) == 4) {
 						// post-b4.5 version
 						if ((abildata = get_ability_data(ch, i_in[0], TRUE))) {
 							abildata->levels_gained = i_in[1];
@@ -1273,7 +1274,7 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *c
 							abildata->purchased[1] = i_in[3] ? TRUE : FALSE;
 						}
 					}
-					else if (sscanf(line + length + 1, "%d %d %d", &i_in[0], &i_in[1], &i_in[2]) == 3) {
+					else if (sscanf(line + 9, "%d %d %d", &i_in[0], &i_in[1], &i_in[2]) == 3) {
 						// backwards-compatibility
 						if ((abildata = get_ability_data(ch, i_in[0], TRUE))) {
 							abildata->purchased[0] = i_in[1] ? TRUE : FALSE;
@@ -1281,22 +1282,22 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *c
 						}
 					}
 				}
-				else if (PFILE_TAG(line, "Access Level:", length)) {
-					GET_ACCESS_LEVEL(ch) = atoi(line + length + 1);
+				else if (!strn_cmp(line, "Access Level: ", 14)) {
+					GET_ACCESS_LEVEL(ch) = atoi(line + 14);
 				}
-				else if (PFILE_TAG(line, "Account:", length)) {
-					account_id = atoi(line + length + 1);
+				else if (!strn_cmp(line, "Account: ", 9)) {
+					account_id = atoi(line + 9);
 				}
-				else if (PFILE_TAG(line, "Action:", length)) {
-					if (sscanf(line + length + 1, "%d %lf %d %d", &i_in[0], &dbl_in, &i_in[2], &i_in[3]) == 4) {
+				else if (!strn_cmp(line, "Action: ", 8)) {
+					if (sscanf(line + 8, "%d %lf %d %d", &i_in[0], &dbl_in, &i_in[2], &i_in[3]) == 4) {
 						GET_ACTION(ch) = i_in[0];
 						GET_ACTION_CYCLE(ch) = dbl_in;
 						GET_ACTION_TIMER(ch) = i_in[2];
 						GET_ACTION_ROOM(ch) = i_in[3];
 					}
 				}
-				else if (PFILE_TAG(line, "Action-res:", length)) {
-					if (sscanf(line + length + 1, "%d %d %d %d", &i_in[0], &i_in[1], &i_in[2], &i_in[3]) == 4) {
+				else if (!strn_cmp(line, "Action-res: ", 12)) {
+					if (sscanf(line + 12, "%d %d %d %d", &i_in[0], &i_in[1], &i_in[2], &i_in[3]) == 4) {
 						// argument order is for consistency with other resource lists
 						CREATE(res, struct resource_data, 1);
 						res->vnum = i_in[0];
@@ -1313,24 +1314,24 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *c
 						last_res = res;
 					}
 				}
-				else if (PFILE_TAG(line, "Action-vnum:", length)) {
-					if (sscanf(line + length + 1, "%d %d", &i_in[0], &i_in[1]) == 2) {
+				else if (!strn_cmp(line, "Action-vnum: ", 13)) {
+					if (sscanf(line + 13, "%d %d", &i_in[0], &i_in[1]) == 2) {
 						if (i_in[0] < NUM_ACTION_VNUMS) {
 							GET_ACTION_VNUM(ch, i_in[0]) = i_in[1];
 						}
 					}
 				}
-				else if (PFILE_TAG(line, "Adventure Summon Instance:", length)) {
-					GET_ADVENTURE_SUMMON_INSTANCE_ID(ch) = atoi(line + length + 1);
+				else if (!strn_cmp(line, "Adventure Summon Instance: ", 27)) {
+					GET_ADVENTURE_SUMMON_INSTANCE_ID(ch) = atoi(line + 27);
 				}
-				else if (PFILE_TAG(line, "Adventure Summon Loc:", length)) {
-					GET_ADVENTURE_SUMMON_RETURN_LOCATION(ch) = atoi(line + length + 1);
+				else if (!strn_cmp(line, "Adventure Summon Loc: ", 22)) {
+					GET_ADVENTURE_SUMMON_RETURN_LOCATION(ch) = atoi(line + 22);
 				}
-				else if (PFILE_TAG(line, "Adventure Summon Map:", length)) {
-					GET_ADVENTURE_SUMMON_RETURN_MAP(ch) = atoi(line + length + 1);
+				else if (!strn_cmp(line, "Adventure Summon Map: ", 22)) {
+					GET_ADVENTURE_SUMMON_RETURN_MAP(ch) = atoi(line + 22);
 				}
-				else if (PFILE_TAG(line, "Affect:", length)) {
-					sscanf(line + length + 1, "%d %d %ld %d %d %s", &i_in[0], &i_in[1], &l_in[2], &i_in[3], &i_in[4], str_in);
+				else if (!strn_cmp(line, "Affect: ", 8)) {
+					sscanf(line + 8, "%d %d %ld %d %d %s", &i_in[0], &i_in[1], &l_in[2], &i_in[3], &i_in[4], str_in);
 					CREATE(af, struct affected_type, 1);
 					af->type = i_in[0];
 					af->cast_by = i_in[1];
@@ -1342,11 +1343,11 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *c
 					// store for later
 					LL_APPEND(af_list, af);
 				}
-				else if (PFILE_TAG(line, "Affect Flags:", length)) {
-					AFF_FLAGS(ch) = asciiflag_conv(line + length + 1);
+				else if (!strn_cmp(line, "Affect Flags: ", 14)) {
+					AFF_FLAGS(ch) = asciiflag_conv(line + 14);
 				}
-				else if (PFILE_TAG(line, "Alias:", length)) {
-					sscanf(line + length + 1, "%d %ld %ld", &i_in[0], &l_in[0], &l_in[1]);
+				else if (!strn_cmp(line, "Alias: ", 7)) {
+					sscanf(line + 7, "%d %ld %ld", &i_in[0], &l_in[0], &l_in[1]);
 					CREATE(alias, struct alias_data, 1);
 					alias->type = i_in[0];
 					
@@ -1368,15 +1369,15 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *c
 					}
 					last_alias = alias;
 				}
-				else if (PFILE_TAG(line, "Apparent Age:", length)) {
-					GET_APPARENT_AGE(ch) = atoi(line + length + 1);
+				else if (!strn_cmp(line, "Apparent Age: ", 14)) {
+					GET_APPARENT_AGE(ch) = atoi(line + 14);
 				}
-				else if (PFILE_TAG(line, "Archetype:", length)) {
+				else if (!strn_cmp(line, "Archetype: ", 11)) {
 					// NOTE: This tag is outdated and these are now stored as 'Creation Archetype'
-					CREATION_ARCHETYPE(ch, ARCHT_ORIGIN) = atoi(line + length + 1);
+					CREATION_ARCHETYPE(ch, ARCHT_ORIGIN) = atoi(line + 11);
 				}
-				else if (PFILE_TAG(line, "Attribute:", length)) {
-					sscanf(line + length + 1, "%s %d", str_in, &i_in[0]);
+				else if (!strn_cmp(line, "Attribute: ", 11)) {
+					sscanf(line + 11, "%s %d", str_in, &i_in[0]);
 					for (iter = 0; iter < NUM_ATTRIBUTES; ++iter) {
 						if (!str_cmp(str_in, attributes[iter].name)) {
 							GET_REAL_ATT(ch, iter) = i_in[0];
@@ -1385,8 +1386,8 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *c
 						}
 					}
 				}
-				else if (PFILE_TAG(line, "Automessage:", length)) {
-					sscanf(line + length + 1, "%d %ld", &i_in[0], &l_in[0]);
+				else if (!strn_cmp(line, "Automessage: ", 13)) {
+					sscanf(line + 13, "%d %ld", &i_in[0], &l_in[0]);
 					CREATE(automsg, struct player_automessage, 1);
 					automsg->id = i_in[0];
 					automsg->timestamp = l_in[0];
@@ -1396,45 +1397,45 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *c
 				break;
 			}
 			case 'B': {
-				if (PFILE_TAG(line, "Bad passwords:", length)) {
-					GET_BAD_PWS(ch) = atoi(line + length + 1);
+				if (!strn_cmp(line, "Bad passwords: ", 15)) {
+					GET_BAD_PWS(ch) = atoi(line + 15);
 				}
-				else if (PFILE_TAG(line, "Birth:", length)) {
-					ch->player.time.birth = atol(line + length + 1);
+				else if (!strn_cmp(line, "Birth: ", 7)) {
+					ch->player.time.birth = atol(line + 7);
 				}
-				else if (PFILE_TAG(line, "Bonus Exp:", length)) {
-					GET_DAILY_BONUS_EXPERIENCE(ch) = atoi(line + length + 1);
+				else if (!strn_cmp(line, "Bonus Exp: ", 11)) {
+					GET_DAILY_BONUS_EXPERIENCE(ch) = atoi(line + 11);
 				}
-				else if (PFILE_TAG(line, "Bonus Traits:", length)) {
-					GET_BONUS_TRAITS(ch) = asciiflag_conv(line + length + 1);
+				else if (!strn_cmp(line, "Bonus Traits: ", 14)) {
+					GET_BONUS_TRAITS(ch) = asciiflag_conv(line + 14);
 				}
 				BAD_TAG_WARNING(line);
 				break;
 			}
 			case 'C': {
-				if (PFILE_TAG(line, "Can Gain New Skills:", length)) {
-					CAN_GAIN_NEW_SKILLS(ch) = atoi(line + length + 1) ? TRUE : FALSE;
+				if (!strn_cmp(line, "Can Gain New Skills: ", 21)) {
+					CAN_GAIN_NEW_SKILLS(ch) = atoi(line + 21) ? TRUE : FALSE;
 				}
-				else if (PFILE_TAG(line, "Can Get Bonus Skills:", length)) {
-					CAN_GET_BONUS_SKILLS(ch) = atoi(line + length + 1) ? TRUE : FALSE;
+				else if (!strn_cmp(line, "Can Get Bonus Skills: ", 22)) {
+					CAN_GET_BONUS_SKILLS(ch) = atoi(line + 22) ? TRUE : FALSE;
 				}
-				else if (PFILE_TAG(line, "Class:", length)) {
-					GET_CLASS(ch) = find_class_by_vnum(atoi(line + length + 1));
+				else if (!strn_cmp(line, "Class: ", 7)) {
+					GET_CLASS(ch) = find_class_by_vnum(atoi(line + 7));
 				}
-				else if (PFILE_TAG(line, "Class Progression:", length)) {
-					GET_CLASS_PROGRESSION(ch) = atoi(line + length + 1);
+				else if (!strn_cmp(line, "Class Progression: ", 19)) {
+					GET_CLASS_PROGRESSION(ch) = atoi(line + 19);
 				}
-				else if (PFILE_TAG(line, "Class Role:", length)) {
-					GET_CLASS_ROLE(ch) = atoi(line + length + 1);
+				else if (!strn_cmp(line, "Class Role: ", 12)) {
+					GET_CLASS_ROLE(ch) = atoi(line + 12);
 				}
-				else if (PFILE_TAG(line, "Condition:", length)) {
-					sscanf(line + length + 1, "%s %d", str_in, &i_in[0]);
+				else if (!strn_cmp(line, "Condition: ", 11)) {
+					sscanf(line + 11, "%s %d", str_in, &i_in[0]);
 					if ((num = search_block(str_in, condition_types, TRUE)) != NOTHING) {
 						GET_COND(ch, num) = i_in[0];
 					}
 				}
-				else if (PFILE_TAG(line, "Coin:", length)) {
-					sscanf(line + length + 1, "%d %d %ld", &i_in[0], &i_in[1], &l_in[0]);
+				else if (!strn_cmp(line, "Coin: ", 6)) {
+					sscanf(line + 6, "%d %d %ld", &i_in[0], &i_in[1], &l_in[0]);
 					
 					CREATE(coin, struct coin_data, 1);
 					coin->amount = i_in[0];
@@ -1450,13 +1451,13 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *c
 					}
 					last_coin = coin;
 				}
-				else if (PFILE_TAG(line, "Companion:", length)) {
-					sscanf(line + length + 1, "%d %d %d", &i_in[0], &i_in[1], &i_in[2]);
+				else if (!strn_cmp(line, "Companion: ", 11)) {
+					sscanf(line + 11, "%d %d %d", &i_in[0], &i_in[1], &i_in[2]);
 					last_companion = add_companion(ch, i_in[0], i_in[1]);
 					last_companion->instantiated = i_in[2] ? TRUE : FALSE;
 				}
-				else if (PFILE_TAG(line, "Compan-mod:", length)) {
-					sscanf(line + length + 1, "%d %d", &i_in[0], &i_in[1]);
+				else if (!strn_cmp(line, "Compan-mod: ", 12)) {
+					sscanf(line + 12, "%d %d", &i_in[0], &i_in[1]);
 					read = fread_string(fl, error);
 					
 					if (last_companion) {
@@ -1472,8 +1473,8 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *c
 						free(read);
 					}
 				}
-				else if (PFILE_TAG(line, "Compan-trg:", length)) {
-					sscanf(line + length + 1, "%d", &i_in[0]);
+				else if (!strn_cmp(line, "Compan-trg: ", 12)) {
+					sscanf(line + 12, "%d", &i_in[0]);
 					if (last_companion) {
 						struct trig_proto_list *tpl;
 						CREATE(tpl, struct trig_proto_list, 1);
@@ -1481,8 +1482,8 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *c
 						LL_APPEND(last_companion->scripts, tpl);
 					}
 				}
-				else if (PFILE_TAG(line, "Compan-var:", length)) {
-					if (sscanf(line + length + 1, "%s %ld", str_in, &l_in[0]) != 2 || !get_line(fl, line)) {
+				else if (!strn_cmp(line, "Compan-var: ", 12)) {
+					if (sscanf(line + 12, "%s %ld", str_in, &l_in[0]) != 2 || !get_line(fl, line)) {
 						log("SYSERR: Bad compan-var format in read_player_delayed_data: %s", GET_NAME(ch));
 						exit(1);
 					}
@@ -1490,46 +1491,46 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *c
 						add_var(&(last_companion->vars), str_in, line, l_in[0]);
 					}
 				}
-				else if (PFILE_TAG(line, "Confused Direction:", length)) {
-					GET_CONFUSED_DIR(ch) = atoi(line + length + 1);
+				else if (!strn_cmp(line, "Confused Direction: ", 20)) {
+					GET_CONFUSED_DIR(ch) = atoi(line + 20);
 				}
-				else if (PFILE_TAG(line, "Cooldown:", length)) {
-					sscanf(line + length + 1, "%d %ld", &i_in[0], &l_in[0]);
+				else if (!strn_cmp(line, "Cooldown: ", 10)) {
+					sscanf(line + 10, "%d %ld", &i_in[0], &l_in[0]);
 					add_cooldown(ch, i_in[0], l_in[0] - time(0));
 				}
-				else if (PFILE_TAG(line, "Creation Archetype:", length)) {
-					sscanf(line + length + 1, "%d %d", &i_in[0], &i_in[1]);
+				else if (!strn_cmp(line, "Creation Archetype: ", 20)) {
+					sscanf(line + 20, "%d %d", &i_in[0], &i_in[1]);
 					if (i_in[0] >= 0 && i_in[0] < NUM_ARCHETYPE_TYPES) {
 						CREATION_ARCHETYPE(ch, i_in[0]) = i_in[1];
 					}
 				}
-				else if (PFILE_TAG(line, "Creation Host:", length)) {
+				else if (!strn_cmp(line, "Creation Host: ", 15)) {
 					if (GET_CREATION_HOST(ch)) {
 						free(GET_CREATION_HOST(ch));
 					}
-					GET_CREATION_HOST(ch) = str_dup(trim(line + length + 1));
+					GET_CREATION_HOST(ch) = str_dup(trim(line + 15));
 				}
-				else if (PFILE_TAG(line, "Current Lastname:", length)) {
+				else if (!strn_cmp(line, "Current Lastname: ", 18)) {
 					if (GET_CURRENT_LASTNAME(ch)) {
 						free(GET_CURRENT_LASTNAME(ch));
 					}
-					GET_CURRENT_LASTNAME(ch) = str_dup(trim(line + length + 1));
+					GET_CURRENT_LASTNAME(ch) = str_dup(trim(line + 18));
 				}
-				else if (PFILE_TAG(line, "Current Pool:", length)) {
-					sscanf(line + length + 1, "%s %d", str_in, &i_in[0]);
+				else if (!strn_cmp(line, "Current Pool: ", 14)) {
+					sscanf(line + 14, "%s %d", str_in, &i_in[0]);
 					if ((num = search_block(str_in, pool_types, TRUE)) != NOTHING) {
 						GET_CURRENT_POOL(ch, num) = i_in[0];
 					}
 				}
-				else if (PFILE_TAG(line, "Color:", length)) {
-					sscanf(line + length + 1, "%s %c", str_in, &c_in);
+				else if (!strn_cmp(line, "Color: ", 7)) {
+					sscanf(line + 7, "%s %c", str_in, &c_in);
 					if ((num = search_block(str_in, custom_color_types, TRUE)) != NOTHING) {
 						GET_CUSTOM_COLOR(ch, num) = c_in;
 					}
 				}
-				else if (PFILE_TAG(line, "Currency:", length)) {
+				else if (!strn_cmp(line, "Currency: ", 10)) {
 					struct player_currency *cur;
-					sscanf(line + length + 1, "%d %d", &i_in[0], &i_in[1]);
+					sscanf(line + 10, "%d %d", &i_in[0], &i_in[1]);
 					
 					// ensure no duplicates
 					HASH_FIND_INT(GET_CURRENCIES(ch), &i_in[0], cur);
@@ -1544,37 +1545,37 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *c
 				break;
 			}
 			case 'D': {
-				if (PFILE_TAG(line, "Daily Cycle:", length)) {
-					GET_DAILY_CYCLE(ch) = atoi(line + length + 1);
+				if (!strn_cmp(line, "Daily Cycle: ", 13)) {
+					GET_DAILY_CYCLE(ch) = atoi(line + 13);
 				}
-				else if (PFILE_TAG(line, "Daily Quests:", length)) {
-					GET_DAILY_QUESTS(ch) = atoi(line + length + 1);
+				else if (!strn_cmp(line, "Daily Quests: ", 14)) {
+					GET_DAILY_QUESTS(ch) = atoi(line + 14);
 				}
-				else if (PFILE_TAG(line, "Deficit:", length)) {
-					sscanf(line + length + 1, "%s %d", str_in, &i_in[0]);
+				else if (!strn_cmp(line, "Deficit: ", 9)) {
+					sscanf(line + 9, "%s %d", str_in, &i_in[0]);
 					if ((num = search_block(str_in, pool_types, TRUE)) != NOTHING) {
 						GET_DEFICIT(ch, num) = i_in[0];
 					}
 				}
-				else if (PFILE_TAG(line, "Description:", length)) {
+				else if (!strn_cmp(line, "Description: ", 13)) {
 					if (GET_LOOK_DESC(ch)) {
 						free(GET_LOOK_DESC(ch));
 					}
 					GET_LOOK_DESC(ch) = fread_string(fl, error);
 				}
-				else if (PFILE_TAG(line, "Disguised Name:", length)) {
+				else if (!strn_cmp(line, "Disguised Name: ", 16)) {
 					if (GET_DISGUISED_NAME(ch)) {
 						free(GET_DISGUISED_NAME(ch));
 					}
-					GET_DISGUISED_NAME(ch) = str_dup(trim(line + length + 1));
+					GET_DISGUISED_NAME(ch) = str_dup(trim(line + 16));
 				}
-				else if (PFILE_TAG(line, "Disguised Sex:", length)) {
-					if ((num = search_block(trim(line + length + 1), genders, TRUE)) != NOTHING) {
+				else if (!strn_cmp(line, "Disguised Sex: ", 15)) {
+					if ((num = search_block(trim(line + 15), genders, TRUE)) != NOTHING) {
 						GET_DISGUISED_SEX(ch) = num;
 					}
 				}
-				else if (PFILE_TAG(line, "DoT Effect:", length)) {
-					sscanf(line + length + 1, "%d %d %ld %d %d %d %d", &i_in[0], &i_in[1], &l_in[2], &i_in[3], &i_in[4], &i_in[5], &i_in[6]);
+				else if (!strn_cmp(line, "DoT Effect: ", 12)) {
+					sscanf(line + 12, "%d %d %ld %d %d %d %d", &i_in[0], &i_in[1], &l_in[2], &i_in[3], &i_in[4], &i_in[5], &i_in[6]);
 					CREATE(dot, struct over_time_effect_type, 1);
 					dot->type = i_in[0];
 					dot->cast_by = i_in[1];
@@ -1597,24 +1598,24 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *c
 				break;
 			}
 			case 'E': {
-				if (PFILE_TAG(line, "Empire:", length)) {
-					GET_LOYALTY(ch) = real_empire(atoi(line + length + 1));
+				if (!strn_cmp(line, "Empire: ", 8)) {
+					GET_LOYALTY(ch) = real_empire(atoi(line + 8));
 				}
-				else if (PFILE_TAG(line, "End Player File", length)) {
+				else if (!strn_cmp(line, "End Player File", 15)) {
 					// actual end
 					end = TRUE;
 				}
-				else if (PFILE_TAG(line, "End Primary Data", length)) {
+				else if (!strn_cmp(line, "End Primary Data", 16)) {
 					// this tag is no longer used; ignore it
 				}
-				else if (PFILE_TAG(line, "Eq-set:", length)) {
-					if (sscanf(line + length + 1, "%d", &i_in[0]) == 1) {
+				else if (!strn_cmp(line, "Eq-set: ", 8)) {
+					if (sscanf(line + 8, "%d", &i_in[0]) == 1) {
 						add_eq_set_to_char(ch, i_in[0], fread_string(fl, error));
 					}
 				}
-				else if (PFILE_TAG(line, "Event:", length)) {
+				else if (!strn_cmp(line, "Event: ", 7)) {
 					// last arg (level) is optional, for backwards-compatibility
-					if ((val = sscanf(line + length + 1, "%d %d %ld %d %d %d %d %d", &i_in[0], &i_in[1], &l_in[0], &i_in[2], &i_in[3], &i_in[4], &i_in[5], &i_in[6])) >= 7) {
+					if ((val = sscanf(line + 7, "%d %d %ld %d %d %d %d %d", &i_in[0], &i_in[1], &l_in[0], &i_in[2], &i_in[3], &i_in[4], &i_in[5], &i_in[6])) >= 7) {
 						if ((ped = create_event_data(ch, i_in[0], i_in[1]))) {
 							ped->timestamp = l_in[0];
 							ped->points = i_in[2];
@@ -1625,8 +1626,8 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *c
 						}
 					}
 				}
-				else if (PFILE_TAG(line, "Extra Attribute:", length)) {
-					sscanf(line + length + 1, "%s %d", str_in, &i_in[0]);
+				else if (!strn_cmp(line, "Extra Attribute: ", 17)) {
+					sscanf(line + 17, "%s %d", str_in, &i_in[0]);
 					if ((num = search_block(str_in, extra_attribute_types, TRUE)) != NOTHING) {
 						GET_EXTRA_ATT(ch, num) = i_in[0];
 					}
@@ -1635,38 +1636,38 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *c
 				break;
 			}
 			case 'F': {
-				if (PFILE_TAG(line, "Faction:", length)) {
+				if (!strn_cmp(line, "Faction: ", 9)) {
 					struct player_faction_data *pfd;
-					sscanf(line + length + 1, "%d %d", &i_in[0], &i_in[1]);
+					sscanf(line + 9, "%d %d", &i_in[0], &i_in[1]);
 					if ((pfd = get_reputation(ch, i_in[0], TRUE))) {
 						pfd->value = i_in[1];
 					}
 				}
-				else if (PFILE_TAG(line, "Fight Messages:", length)) {
-					GET_FIGHT_MESSAGES(ch) = asciiflag_conv(line + length + 1);
+				else if (!strn_cmp(line, "Fight Messages: ", 16)) {
+					GET_FIGHT_MESSAGES(ch) = asciiflag_conv(line + 16);
 				}
-				else if (PFILE_TAG(line, "Fight Prompt:", length)) {
+				else if (!strn_cmp(line, "Fight Prompt: ", 14)) {
 					if (GET_FIGHT_PROMPT(ch)) {
 						free(GET_FIGHT_PROMPT(ch));
 					}
-					GET_FIGHT_PROMPT(ch) = str_dup(line + length + 1);	// do not trim
+					GET_FIGHT_PROMPT(ch) = str_dup(line + 14);	// do not trim
 				}
 				BAD_TAG_WARNING(line);
 				break;
 			}
 			case 'G': {
-				if (PFILE_TAG(line, "Grants:", length)) {
-					GET_GRANT_FLAGS(ch) = asciiflag_conv(line + length + 1);
+				if (!strn_cmp(line, "Grants: ", 8)) {
+					GET_GRANT_FLAGS(ch) = asciiflag_conv(line + 8);
 				}
 				BAD_TAG_WARNING(line);
 				break;
 			}
 			case 'H': {
-				if (PFILE_TAG(line, "Highest Known Level:", length)) {
-					GET_HIGHEST_KNOWN_LEVEL(ch) = atoi(line + length + 1);
+				if (!strn_cmp(line, "Highest Known Level: ", 21)) {
+					GET_HIGHEST_KNOWN_LEVEL(ch) = atoi(line + 21);
 				}
-				else if (PFILE_TAG(line, "History:", length)) {
-					sscanf(line + length + 1, "%d %ld", &i_in[0], &l_in[1]);
+				else if (!strn_cmp(line, "History: ", 9)) {
+					sscanf(line + 9, "%d %ld", &i_in[0], &l_in[1]);
 					if (i_in[0] >= 0 && i_in[0] < NUM_CHANNEL_HISTORY_TYPES) {
 						struct channel_history_data *hist;
 						CREATE(hist, struct channel_history_data, 1);
@@ -1675,8 +1676,8 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *c
 						DL_APPEND(GET_HISTORY(ch, i_in[0]), hist);
 					}
 				}
-				else if (PFILE_TAG(line, "Home Storage:", length)) {
-					sscanf(line + length + 1, "%d %d %d", &i_in[0], &i_in[1], &i_in[2]);
+				else if (!strn_cmp(line, "Home Storage: ", 14)) {
+					sscanf(line + 14, "%d %d %d", &i_in[0], &i_in[1], &i_in[2]);
 					if (!get_line(fl, line) || sscanf(line, "#%d", &i_in[3]) != 1) {
 						log("SYSERR: Invalid Home Storage section of player %s: no obj", name);
 						// possibly just not fatal, if next line gives no problems
@@ -1700,104 +1701,104 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *c
 				break;
 			}
 			case 'I': {
-				if (PFILE_TAG(line, "Idnum:", length)) {
-					GET_IDNUM(ch) = atoi(line + length + 1);
+				if (!strn_cmp(line, "Idnum: ", 7)) {
+					GET_IDNUM(ch) = atoi(line + 7);
 					
 					// assign this immediately
 					ch->script_id = GET_IDNUM(ch);
 				}
-				else if (PFILE_TAG(line, "Ignore:", length)) {
+				else if (!strn_cmp(line, "Ignore: ", 8)) {
 					if (ignore_pos < MAX_IGNORES) {
-						GET_IGNORE_LIST(ch, ignore_pos++) = atoi(line + length + 1);
+						GET_IGNORE_LIST(ch, ignore_pos++) = atoi(line + 8);
 					}
 				}
-				else if (PFILE_TAG(line, "Immortal Level:", length)) {
-					GET_IMMORTAL_LEVEL(ch) = atoi(line + length + 1);
+				else if (!strn_cmp(line, "Immortal Level: ", 16)) {
+					GET_IMMORTAL_LEVEL(ch) = atoi(line + 16);
 				}
-				else if (PFILE_TAG(line, "Injuries:", length)) {
-					INJURY_FLAGS(ch) = asciiflag_conv(line + length + 1);
+				else if (!strn_cmp(line, "Injuries: ", 10)) {
+					INJURY_FLAGS(ch) = asciiflag_conv(line + 10);
 				}
-				else if (PFILE_TAG(line, "Invis Level:", length)) {
-					GET_INVIS_LEV(ch) = atoi(line + length + 1);
+				else if (!strn_cmp(line, "Invis Level: ", 13)) {
+					GET_INVIS_LEV(ch) = atoi(line + 13);
 				}
 				BAD_TAG_WARNING(line);
 				break;
 			}
 			case 'L': {
-				if (PFILE_TAG(line, "Largest Inventory:", length)) {
-					GET_LARGEST_INVENTORY(ch) = atoi(line + length + 1);
+				if (!strn_cmp(line, "Largest Inventory: ", 19)) {
+					GET_LARGEST_INVENTORY(ch) = atoi(line + 19);
 				}
-				else if (PFILE_TAG(line, "Lastname:", length)) {
+				else if (!strn_cmp(line, "Lastname: ", 10)) {
 					if (GET_PERSONAL_LASTNAME(ch)) {
 						free(GET_PERSONAL_LASTNAME(ch));
 					}
-					GET_PERSONAL_LASTNAME(ch) = str_dup(trim(line + length + 1));
+					GET_PERSONAL_LASTNAME(ch) = str_dup(trim(line + 10));
 				}
-				else if (PFILE_TAG(line, "Last Host:", length)) {
+				else if (!strn_cmp(line, "Last Host: ", 11)) {
 					if (ch->prev_host) {
 						free(ch->prev_host);
 					}
-					ch->prev_host = str_dup(trim(line + length + 1));
+					ch->prev_host = str_dup(trim(line + 11));
 				}
-				else if (PFILE_TAG(line, "Last Known Level:", length)) {
-					GET_LAST_KNOWN_LEVEL(ch) = atoi(line + length + 1);
+				else if (!strn_cmp(line, "Last Known Level: ", 18)) {
+					GET_LAST_KNOWN_LEVEL(ch) = atoi(line + 18);
 				}
-				else if (PFILE_TAG(line, "Last Logon:", length)) {
-					ch->prev_logon = atol(line + length + 1);
+				else if (!strn_cmp(line, "Last Logon: ", 12)) {
+					ch->prev_logon = atol(line + 12);
 				}
-				else if (PFILE_TAG(line, "Last Tell:", length)) {
-					GET_LAST_TELL(ch) = atoi(line + length + 1);
+				else if (!strn_cmp(line, "Last Tell: ", 11)) {
+					GET_LAST_TELL(ch) = atoi(line + 11);
 				}
-				else if (PFILE_TAG(line, "Last Tip:", length)) {
-					GET_LAST_TIP(ch) = atoi(line + length + 1);
+				else if (!strn_cmp(line, "Last Tip: ", 10)) {
+					GET_LAST_TIP(ch) = atoi(line + 10);
 				}
-				else if (PFILE_TAG(line, "Last Vehicle:", length)) {
-					GET_LAST_VEHICLE(ch) = atoi(line + length + 1);
+				else if (!strn_cmp(line, "Last Vehicle: ", 14)) {
+					GET_LAST_VEHICLE(ch) = atoi(line + 14);
 				}
-				else if (PFILE_TAG(line, "Last Room:", length)) {
-					GET_LAST_ROOM(ch) = atoi(line + length + 1);
+				else if (!strn_cmp(line, "Last Room: ", 11)) {
+					GET_LAST_ROOM(ch) = atoi(line + 11);
 				}
-				else if (PFILE_TAG(line, "Last Companion:", length)) {
-					GET_LAST_COMPANION(ch) = atoi(line + length + 1);
+				else if (!strn_cmp(line, "Last Companion: ", 16)) {
+					GET_LAST_COMPANION(ch) = atoi(line + 16);
 				}
-				else if (PFILE_TAG(line, "Last Direction:", length)) {
-					GET_LAST_DIR(ch) = atoi(line + length + 1);
+				else if (!strn_cmp(line, "Last Direction: ", 16)) {
+					GET_LAST_DIR(ch) = atoi(line + 16);
 				}
-				else if (PFILE_TAG(line, "Last Death:", length)) {
-					GET_LAST_DEATH_TIME(ch) = atol(line + length + 1);
+				else if (!strn_cmp(line, "Last Death: ", 12)) {
+					GET_LAST_DEATH_TIME(ch) = atol(line + 12);
 				}
-				else if (PFILE_TAG(line, "Last Corpse Id:", length)) {
-					GET_LAST_CORPSE_ID(ch) = atoi(line + length + 1);
+				else if (!strn_cmp(line, "Last Corpse Id: ", 16)) {
+					GET_LAST_CORPSE_ID(ch) = atoi(line + 16);
 				}
-				else if (PFILE_TAG(line, "Last Goal Check:", length)) {
-					GET_LAST_GOAL_CHECK(ch) = atol(line + length + 1);
+				else if (!strn_cmp(line, "Last Goal Check: ", 17)) {
+					GET_LAST_GOAL_CHECK(ch) = atol(line + 17);
 				}
-				else if (PFILE_TAG(line, "Last Home Set:", length)) {
-					GET_LAST_HOME_SET_TIME(ch) = atol(line + length + 1);
+				else if (!strn_cmp(line, "Last Home Set: ", 15)) {
+					GET_LAST_HOME_SET_TIME(ch) = atol(line + 15);
 				}
-				else if (PFILE_TAG(line, "Last Offense:", length)) {
-					GET_LAST_OFFENSE_SEEN(ch) = atol(line + length + 1);
+				else if (!strn_cmp(line, "Last Offense: ", 14)) {
+					GET_LAST_OFFENSE_SEEN(ch) = atol(line + 14);
 				}
-				else if (PFILE_TAG(line, "Lastname List:", length)) {
-					if (*(line + length + 1)) {
+				else if (!strn_cmp(line, "Lastname List: ", 15)) {
+					if (*(line + 15)) {
 						CREATE(lastn, struct player_lastname, 1);
-						lastn->name = str_dup(line + length + 1);
+						lastn->name = str_dup(line + 15);
 						LL_APPEND(GET_LASTNAME_LIST(ch), lastn);
 					}
 				}
-				else if (PFILE_TAG(line, "Learned Craft:", length)) {
-					if (sscanf(line + length + 1, "%d", &i_in[0]) == 1) {
+				else if (!strn_cmp(line, "Learned Craft: ", 15)) {
+					if (sscanf(line + 15, "%d", &i_in[0]) == 1) {
 						add_learned_craft(ch, i_in[0]);
 					}
 				}
-				else if (PFILE_TAG(line, "Load Room:", length)) {
-					GET_LOADROOM(ch) = atoi(line + length + 1);
+				else if (!strn_cmp(line, "Load Room: ", 11)) {
+					GET_LOADROOM(ch) = atoi(line + 11);
 				}
-				else if (PFILE_TAG(line, "Load Room Check:", length)) {
-					GET_LOAD_ROOM_CHECK(ch) = atoi(line + length + 1);
+				else if (!strn_cmp(line, "Load Room Check: ", 17)) {
+					GET_LOAD_ROOM_CHECK(ch) = atoi(line + 17);
 				}
-				else if (PFILE_TAG(line, "Lore:", length)) {
-					sscanf(line + length + 1, "%d %ld", &i_in[0], &l_in[0]);
+				else if (!strn_cmp(line, "Lore: ", 6)) {
+					sscanf(line + 6, "%d %ld", &i_in[0], &l_in[0]);
 					CREATE(lore, struct lore_data, 1);
 					lore->type = i_in[0];
 					lore->date = l_in[0];
@@ -1820,7 +1821,7 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *c
 				break;
 			}
 			case 'M': {
-				if (PFILE_TAG(line, "Mail", length)) {
+				if (!strn_cmp(line, "Mail: ", 6)) {
 					if ((mail = parse_mail(fl, line))) {
 						if (last_mail) {
 							last_mail->next = mail;
@@ -1831,61 +1832,61 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *c
 						last_mail = mail;
 					}
 				}
-				else if (PFILE_TAG(line, "Map Mark:", length)) {
-					GET_MARK_LOCATION(ch) = atoi(line + length + 1);
+				else if (!strn_cmp(line, "Map Mark: ", 10)) {
+					GET_MARK_LOCATION(ch) = atoi(line + 10);
 				}
-				else if (PFILE_TAG(line, "Mapsize:", length)) {
-					GET_MAPSIZE(ch) = atoi(line + length + 1);
+				else if (!strn_cmp(line, "Mapsize: ", 9)) {
+					GET_MAPSIZE(ch) = atoi(line + 9);
 				}
-				else if (PFILE_TAG(line, "Max Pool:", length)) {
-					sscanf(line + length + 1, "%s %d", str_in, &i_in[0]);
+				else if (!strn_cmp(line, "Max Pool: ", 10)) {
+					sscanf(line + 10, "%s %d", str_in, &i_in[0]);
 					if ((num = search_block(str_in, pool_types, TRUE)) != NOTHING) {
 						GET_MAX_POOL(ch, num) = i_in[0];
 					}
 				}
-				else if (PFILE_TAG(line, "Mini-pet:", length)) {
-					if (sscanf(line + length + 1, "%d", &i_in[0]) == 1) {
+				else if (!strn_cmp(line, "Mini-pet: ", 10)) {
+					if (sscanf(line + 10, "%d", &i_in[0]) == 1) {
 						add_minipet(ch, i_in[0]);
 					}
 				}
-				else if (PFILE_TAG(line, "Morph:", length)) {
-					GET_MORPH(ch) = morph_proto(atoi(line + length + 1));
+				else if (!strn_cmp(line, "Morph: ", 7)) {
+					GET_MORPH(ch) = morph_proto(atoi(line + 7));
 				}
-				else if (PFILE_TAG(line, "Mount:", length)) {
-					sscanf(line + length + 1, "%d %s", &i_in[0], str_in);
+				else if (!strn_cmp(line, "Mount: ", 7)) {
+					sscanf(line + 7, "%d %s", &i_in[0], str_in);
 					// only if mob exists
 					if (mob_proto(i_in[0])) {
 						add_mount(ch, i_in[0], asciiflag_conv(str_in));
 					}
 				}
-				else if (PFILE_TAG(line, "Mount Flags:", length)) {
-					GET_MOUNT_FLAGS(ch) = asciiflag_conv(line + length + 1);
+				else if (!strn_cmp(line, "Mount Flags: ", 13)) {
+					GET_MOUNT_FLAGS(ch) = asciiflag_conv(line + 13);
 				}
-				else if (PFILE_TAG(line, "Mount Vnum:", length)) {
-					GET_MOUNT_VNUM(ch) = atoi(line + length + 1);
+				else if (!strn_cmp(line, "Mount Vnum: ", 12)) {
+					GET_MOUNT_VNUM(ch) = atoi(line + 12);
 				}
-				else if (PFILE_TAG(line, "Mvstring:", length)) {
+				else if (!strn_cmp(line, "Mvstring: ", 10)) {
 					if (GET_MOVEMENT_STRING(ch)) {
 						free(GET_MOVEMENT_STRING(ch));
 					}
-					GET_MOVEMENT_STRING(ch) = str_dup(trim(line + length + 1));
+					GET_MOVEMENT_STRING(ch) = str_dup(trim(line + 10));
 				}
 				BAD_TAG_WARNING(line);
 				break;
 			}
 			case 'N': {
-				if (PFILE_TAG(line, "Name:", length)) {
+				if (!strn_cmp(line, "Name: ", 6)) {
 					if (GET_PC_NAME(ch)) {
 						free(GET_PC_NAME(ch));
 					}
-					GET_PC_NAME(ch) = str_dup(trim(line + length + 1));
+					GET_PC_NAME(ch) = str_dup(trim(line + 6));
 				}
 				BAD_TAG_WARNING(line);
 				break;
 			}
 			case 'O': {
-				if (PFILE_TAG(line, "Offer:", length)) {
-					sscanf(line + length + 1, "%d %d %d %ld %d", &i_in[0], &i_in[1], &i_in[2], &l_in[0], &i_in[3]);
+				if (!strn_cmp(line, "Offer: ", 7)) {
+					sscanf(line + 7, "%d %d %d %ld %d", &i_in[0], &i_in[1], &i_in[2], &l_in[0], &i_in[3]);
 					CREATE(offer, struct offer_data, 1);
 					offer->from = i_in[0];
 					offer->type = i_in[1];
@@ -1902,8 +1903,8 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *c
 					}
 					last_offer = offer;
 				}
-				else if (PFILE_TAG(line, "OLC:", length)) {
-					sscanf(line + length + 1, "%d %d %s", &i_in[0], &i_in[1], str_in);
+				else if (!strn_cmp(line, "OLC: ", 5)) {
+					sscanf(line + 5, "%d %d %s", &i_in[0], &i_in[1], str_in);
 					GET_OLC_MIN_VNUM(ch) = i_in[0];
 					GET_OLC_MAX_VNUM(ch) = i_in[1];
 					GET_OLC_FLAGS(ch) = asciiflag_conv(str_in);
@@ -1912,51 +1913,51 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *c
 				break;
 			}
 			case 'P': {
-				if (PFILE_TAG(line, "Password:", length)) {
+				if (!strn_cmp(line, "Password: ", 10)) {
 					if (GET_PASSWD(ch)) {
 						free(GET_PASSWD(ch));
 					}
-					GET_PASSWD(ch) = str_dup(line + length + 1);
+					GET_PASSWD(ch) = str_dup(line + 10);
 				}
-				else if (PFILE_TAG(line, "Played:", length)) {
-					ch->player.time.played = atoi(line + length + 1);
+				else if (!strn_cmp(line, "Played: ", 8)) {
+					ch->player.time.played = atoi(line + 8);
 				}
-				else if (PFILE_TAG(line, "Player Flags:", length)) {
-					PLR_FLAGS(ch) = asciiflag_conv(line + length + 1);
+				else if (!strn_cmp(line, "Player Flags: ", 14)) {
+					PLR_FLAGS(ch) = asciiflag_conv(line + 14);
 				}
-				else if (PFILE_TAG(line, "Pledge Empire:", length)) {
-					GET_PLEDGE(ch) = atoi(line + length + 1);
+				else if (!strn_cmp(line, "Pledge Empire: ", 15)) {
+					GET_PLEDGE(ch) = atoi(line + 15);
 				}
-				else if (PFILE_TAG(line, "Poofin:", length)) {
+				else if (!strn_cmp(line, "Poofin: ", 8)) {
 					if (POOFIN(ch)) {
 						free(POOFIN(ch));
 					}
-					POOFIN(ch) = str_dup(line + length + 1);	// do not trim
+					POOFIN(ch) = str_dup(line + 8);	// do not trim
 				}
-				else if (PFILE_TAG(line, "Poofout:", length)) {
+				else if (!strn_cmp(line, "Poofout: ", 9)) {
 					if (POOFOUT(ch)) {
 						free(POOFOUT(ch));
 					}
-					POOFOUT(ch) = str_dup(line + length + 1);	// do not trim
+					POOFOUT(ch) = str_dup(line + 9);	// do not trim
 				}
-				else if (PFILE_TAG(line, "Preferences:", length)) {
-					PRF_FLAGS(ch) = asciiflag_conv(line + length + 1);
+				else if (!strn_cmp(line, "Preferences: ", 13)) {
+					PRF_FLAGS(ch) = asciiflag_conv(line + 13);
 				}
-				else if (PFILE_TAG(line, "Promo ID:", length)) {
-					GET_PROMO_ID(ch) = atoi(line + length + 1);
+				else if (!strn_cmp(line, "Promo ID: ", 10)) {
+					GET_PROMO_ID(ch) = atoi(line + 10);
 				}
-				else if (PFILE_TAG(line, "Prompt:", length)) {
+				else if (!strn_cmp(line, "Prompt: ", 8)) {
 					if (GET_PROMPT(ch)) {
 						free(GET_PROMPT(ch));
 					}
-					GET_PROMPT(ch) = str_dup(line + length + 1);	// do not trim
+					GET_PROMPT(ch) = str_dup(line + 8);	// do not trim
 				}
 				BAD_TAG_WARNING(line);
 				break;
 			}
 			case 'Q': {
-				if (PFILE_TAG(line, "Quest:", length)) {
-					if (sscanf(line + length + 1, "%d %d %ld %d %d", &i_in[0], &i_in[1], &l_in[0], &i_in[2], &i_in[3]) == 5) {
+				if (!strn_cmp(line, "Quest: ", 7)) {
+					if (sscanf(line + 7, "%d %d %ld %d %d", &i_in[0], &i_in[1], &l_in[0], &i_in[2], &i_in[3]) == 5) {
 						CREATE(plrq, struct player_quest, 1);
 						plrq->vnum = i_in[0];
 						plrq->version = i_in[1];
@@ -1973,8 +1974,8 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *c
 						last_plrq = plrq;
 					}
 				}
-				else if (PFILE_TAG(line, "Quest-cmp:", length)) {
-					if (sscanf(line + length + 1, "%d %ld %d %d", &i_in[0], &l_in[0], &i_in[1], &i_in[2]) == 4) {
+				else if (!strn_cmp(line, "Quest-cmp: ", 11)) {
+					if (sscanf(line + 11, "%d %ld %d %d", &i_in[0], &l_in[0], &i_in[1], &i_in[2]) == 4) {
 						HASH_FIND_INT(GET_COMPLETED_QUESTS(ch), &i_in[0], plrcom);
 						// ensure not already in table
 						if (!plrcom) {
@@ -1988,11 +1989,11 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *c
 						}
 					}
 				}
-				else if (PFILE_TAG(line, "Quest-task:", length)) {
-					if (last_plrq && sscanf(line + length + 1, "%d %d %lld %d %d %c", &i_in[0], &i_in[1], &bit_in, &i_in[2], &i_in[3], &c_in) == 6) {
+				else if (!strn_cmp(line, "Quest-task: ", 12)) {
+					if (last_plrq && sscanf(line + 12, "%d %d %lld %d %d %c", &i_in[0], &i_in[1], &bit_in, &i_in[2], &i_in[3], &c_in) == 6) {
 						// found group
 					}
-					else if (last_plrq && sscanf(line + length + 1, "%d %d %lld %d %d", &i_in[0], &i_in[1], &bit_in, &i_in[2], &i_in[3]) == 5) {
+					else if (last_plrq && sscanf(line + 12, "%d %d %lld %d %d", &i_in[0], &i_in[1], &bit_in, &i_in[2], &i_in[3]) == 5) {
 						c_in = 0;	// no group given
 					}
 					else {
@@ -2014,26 +2015,26 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *c
 				break;
 			}
 			case 'R': {
-				if (PFILE_TAG(line, "Rank:", length)) {
-					GET_RANK(ch) = atoi(line + length + 1);
+				if (!strn_cmp(line, "Rank: ", 6)) {
+					GET_RANK(ch) = atoi(line + 6);
 				}
-				else if (PFILE_TAG(line, "Recent Deaths:", length)) {
-					GET_RECENT_DEATH_COUNT(ch) = atoi(line + length + 1);
+				else if (!strn_cmp(line, "Recent Deaths: ", 15)) {
+					GET_RECENT_DEATH_COUNT(ch) = atoi(line + 15);
 				}
-				else if (PFILE_TAG(line, "Referred by:", length)) {
+				else if (!strn_cmp(line, "Referred by: ", 13)) {
 					if (GET_REFERRED_BY(ch)) {
 						free(GET_REFERRED_BY(ch));
 					}
-					GET_REFERRED_BY(ch) = str_dup(trim(line + length + 1));
+					GET_REFERRED_BY(ch) = str_dup(trim(line + 13));
 				}
-				else if (PFILE_TAG(line, "Rent-code:", length)) {
+				else if (!strn_cmp(line, "Rent-code: ", 11)) {
 					// old data; ignore
 				}
-				else if (PFILE_TAG(line, "Rent-time:", length)) {
+				else if (!strn_cmp(line, "Rent-time: ", 11)) {
 					// old data; ignore
 				}
-				else if (PFILE_TAG(line, "Resource:", length)) {
-					sscanf(line + length + 1, "%d %s", &i_in[0], str_in);
+				else if (!strn_cmp(line, "Resource: ", 10)) {
+					sscanf(line + 10, "%d %s", &i_in[0], str_in);
 					for (iter = 0; iter < NUM_MATERIALS; ++iter) {
 						if (!str_cmp(str_in, materials[iter].name)) {
 							GET_RESOURCE(ch, iter) = i_in[0];
@@ -2041,23 +2042,23 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *c
 						}
 					}
 				}
-				else if (PFILE_TAG(line, "Rewarded:", length)) {
+				else if (!strn_cmp(line, "Rewarded: ", 10)) {
 					// old data; ignore
 				}
-				else if (PFILE_TAG(line, "Rope vnum:", length)) {
-					GET_ROPE_VNUM(ch) = atoi(line + length + 1);
+				else if (!strn_cmp(line, "Rope vnum: ", 11)) {
+					GET_ROPE_VNUM(ch) = atoi(line + 11);
 				}
 				BAD_TAG_WARNING(line);
 				break;
 			}
 			case 'S': {
-				if (PFILE_TAG(line, "Sex:", length)) {
-					if ((num = search_block(trim(line + length + 1), genders, TRUE)) != NOTHING) {
+				if (!strn_cmp(line, "Sex: ", 5)) {
+					if ((num = search_block(trim(line + 5), genders, TRUE)) != NOTHING) {
 						GET_REAL_SEX(ch) = num;
 					}
 				}
-				else if (PFILE_TAG(line, "Skill:", length)) {
-					sscanf(line + length + 1, "%d %d %lf %d %d", &i_in[0], &i_in[1], &dbl_in, &i_in[2], &i_in[3]);
+				else if (!strn_cmp(line, "Skill: ", 7)) {
+					sscanf(line + 7, "%d %d %lf %d %d", &i_in[0], &i_in[1], &dbl_in, &i_in[2], &i_in[3]);
 					
 					if ((skdata = get_skill_data(ch, i_in[0], TRUE))) {
 						skdata->level = i_in[1];
@@ -2066,63 +2067,63 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *c
 						skdata->noskill = i_in[3];
 					}
 				}
-				else if (PFILE_TAG(line, "Skill Level:", length)) {
-					GET_SKILL_LEVEL(ch) = atoi(line + length + 1);
+				else if (!strn_cmp(line, "Skill Level: ", 13)) {
+					GET_SKILL_LEVEL(ch) = atoi(line + 13);
 				}
-				else if (PFILE_TAG(line, "Skill Set:", length)) {
-					GET_CURRENT_SKILL_SET(ch) = atoi(line + length + 1);
+				else if (!strn_cmp(line, "Skill Set: ", 11)) {
+					GET_CURRENT_SKILL_SET(ch) = atoi(line + 11);
 					GET_CURRENT_SKILL_SET(ch) = MAX(0, GET_CURRENT_SKILL_SET(ch));
 					GET_CURRENT_SKILL_SET(ch) = MIN(NUM_SKILL_SETS-1, GET_CURRENT_SKILL_SET(ch));
 				}
-				else if (PFILE_TAG(line, "Slash-channel:", length)) {
+				else if (!strn_cmp(line, "Slash-channel: ", 15)) {
 					CREATE(slash, struct slash_channel, 1);
-					slash->name = str_dup(trim(line + length + 1));
+					slash->name = str_dup(trim(line + 15));
 					
 					// append to start (it reverses them on-join anyway)
 					LL_PREPEND(LOAD_SLASH_CHANNELS(ch), slash);
 				}
-				else if (PFILE_TAG(line, "Slash-History:", length)) {
+				else if (!strn_cmp(line, "Slash-History: ", 15)) {
 					// this line is ignored after b5.88 -- slash histories are now global
 					char *junk = fread_string(fl, error);
 					if (junk) {
 						free(junk);
 					}
 				}
-				else if (PFILE_TAG(line, "Syslog Flags:", length)) {
-					SYSLOG_FLAGS(ch) = asciiflag_conv(line + length + 1);
+				else if (!strn_cmp(line, "Syslog Flags: ", 14)) {
+					SYSLOG_FLAGS(ch) = asciiflag_conv(line + 14);
 				}
 				BAD_TAG_WARNING(line);
 				break;
 			}
 			case 'T': {
-				if (PFILE_TAG(line, "Temporary Account:", length)) {
-					GET_TEMPORARY_ACCOUNT_ID(ch) = atoi(line + length + 1);
+				if (!strn_cmp(line, "Temporary Account: ", 19)) {
+					GET_TEMPORARY_ACCOUNT_ID(ch) = atoi(line + 19);
 				}
-				else if (PFILE_TAG(line, "Title:", length)) {
+				else if (!strn_cmp(line, "Title: ", 7)) {
 					if (GET_TITLE(ch)) {
 						free(GET_TITLE(ch));
 					}
-					GET_TITLE(ch) = str_dup(line + length + 1);	// do not trim
+					GET_TITLE(ch) = str_dup(line + 7);	// do not trim
 				}
-				else if (PFILE_TAG(line, "Tomb Room:", length)) {
-					GET_TOMB_ROOM(ch) = atoi(line + length + 1);
+				else if (!strn_cmp(line, "Tomb Room: ", 11)) {
+					GET_TOMB_ROOM(ch) = atoi(line + 11);
 				}
 				BAD_TAG_WARNING(line);
 				break;
 			}
 			case 'U': {
-				if (PFILE_TAG(line, "Using Ammo:", length)) {
-					USING_AMMO(ch) = atoi(line + length + 1);
+				if (!strn_cmp(line, "Using Ammo: ", 12)) {
+					USING_AMMO(ch) = atoi(line + 12);
 				}
-				else if (PFILE_TAG(line, "Using Poison:", length)) {
-					USING_POISON(ch) = atoi(line + length + 1);
+				else if (!strn_cmp(line, "Using Poison: ", 14)) {
+					USING_POISON(ch) = atoi(line + 14);
 				}
 				BAD_TAG_WARNING(line);
 				break;
 			}
 			case 'V': {
-				if (PFILE_TAG(line, "Variable:", length)) {
-					if (sscanf(line + length + 1, "%s %ld", str_in, &l_in[0]) != 2 || !get_line(fl, line)) {
+				if (!strn_cmp(line, "Variable: ", 10)) {
+					if (sscanf(line + 10, "%s %ld", str_in, &l_in[0]) != 2 || !get_line(fl, line)) {
 						log("SYSERR: Bad variable format in read_player_delayed_data: %s", GET_NAME(ch));
 						exit(1);
 					}
@@ -2584,7 +2585,7 @@ void write_player_primary_data_to_file(FILE *fl, char_data *ch) {
 	if (GET_LOOK_DESC(ch)) {
 		strcpy(temp, NULLSAFE(GET_LOOK_DESC(ch)));
 		strip_crlf(temp);
-		fprintf(fl, "Description:\n%s~\n", temp);
+		fprintf(fl, "Description: \n%s~\n", temp);
 	}
 	if (GET_DISGUISED_NAME(ch)) {
 		fprintf(fl, "Disguised Name: %s\n", GET_DISGUISED_NAME(ch));
