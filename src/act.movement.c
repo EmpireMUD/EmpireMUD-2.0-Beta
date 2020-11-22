@@ -401,7 +401,7 @@ int determine_move_type(char_data *ch, room_data *to_room) {
 
 void do_doorcmd(char_data *ch, obj_data *obj, int door, int scmd) {
 	char lbuf[MAX_STRING_LENGTH];
-	room_data *other_room = NULL;
+	room_data *other_room = NULL, *save_room;
 	struct room_direction_data *ex = !obj ? find_exit(IN_ROOM(ch), door) : NULL, *back = NULL;
 	
 	#define TOGGLE_DOOR(ex, obj)	((obj) ? \
@@ -464,6 +464,16 @@ void do_doorcmd(char_data *ch, obj_data *obj, int door, int scmd) {
 			act(buf, FALSE, ROOM_PEOPLE(other_room), 0, 0, TO_ROOM);
 			act(buf, FALSE, ROOM_PEOPLE(other_room), 0, 0, TO_CHAR);
 		}
+		
+		request_world_save(GET_ROOM_VNUM(other_room), WSAVE_ROOM);
+	}
+	
+	// check for more saves
+	if (obj && (save_room = find_room_obj_saves_in(obj))) {
+		request_world_save(GET_ROOM_VNUM(save_room), WSAVE_OBJS_AND_VEHS);
+	}
+	else {
+		request_world_save(GET_ROOM_VNUM(IN_ROOM(ch)), WSAVE_ROOM);
 	}
 }
 
@@ -2543,7 +2553,7 @@ ACMD(do_portal) {
 	
 	// portal this side
 	portal = read_object(o_PORTAL, TRUE);
-	GET_OBJ_VAL(portal, VAL_PORTAL_TARGET_VNUM) = GET_ROOM_VNUM(target);
+	set_obj_val(portal, VAL_PORTAL_TARGET_VNUM, GET_ROOM_VNUM(target));
 	GET_OBJ_TIMER(portal) = 5;
 	obj_to_room(portal, IN_ROOM(ch));
 	
@@ -2560,7 +2570,7 @@ ACMD(do_portal) {
 	
 	// portal other side
 	end = read_object(o_PORTAL, TRUE);
-	GET_OBJ_VAL(end, VAL_PORTAL_TARGET_VNUM) = GET_ROOM_VNUM(IN_ROOM(ch));
+	set_obj_val(end, VAL_PORTAL_TARGET_VNUM, GET_ROOM_VNUM(IN_ROOM(ch)));
 	GET_OBJ_TIMER(end) = 5;
 	obj_to_room(end, target);
 	if (GET_ROOM_VNUM(IN_ROOM(end))) {

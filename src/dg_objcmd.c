@@ -1588,7 +1588,7 @@ OCMD(do_osetval) {
 	position = atoi(arg1);
 	new_value = atoi(arg2);
 	if (position >= 0 && position < NUM_OBJ_VAL_POSITIONS)
-		GET_OBJ_VAL(obj, position) = new_value;
+		set_obj_val(obj, position, new_value);
 	else
 		obj_log(obj, "osetval: position out of bounds!");
 }

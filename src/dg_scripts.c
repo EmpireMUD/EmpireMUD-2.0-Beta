@@ -4685,19 +4685,19 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						snprintf(str, slen, "%d", GET_OBJ_VNUM(o));
 					else if (!str_cmp(field, "val0")) {
 						if (subfield && is_number(subfield)) {
-							GET_OBJ_VAL(o, 0) = atoi(subfield);
+							set_obj_val(o, 0, atoi(subfield));
 						}
 						snprintf(str, slen, "%d", GET_OBJ_VAL(o, 0));
 					}
 					else if (!str_cmp(field, "val1")) {
 						if (subfield && is_number(subfield)) {
-							GET_OBJ_VAL(o, 1) = atoi(subfield);
+							set_obj_val(o, 1, atoi(subfield));
 						}
 						snprintf(str, slen, "%d", GET_OBJ_VAL(o, 1));
 					}
 					else if (!str_cmp(field, "val2")) {
 						if (subfield && is_number(subfield)) {
-							GET_OBJ_VAL(o, 2) = atoi(subfield);
+							set_obj_val(o, 2, atoi(subfield));
 						}
 						snprintf(str, slen, "%d", GET_OBJ_VAL(o, 2));
 					}

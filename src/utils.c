@@ -3316,9 +3316,9 @@ void apply_resource(char_data *ch, struct resource_data *res, struct resource_da
 				amt = MIN(res->amount, amt);
 				
 				res->amount -= amt;	// possible partial payment
-				GET_OBJ_VAL(use_obj, VAL_DRINK_CONTAINER_CONTENTS) -= amt;
+				set_obj_val(use_obj, VAL_DRINK_CONTAINER_CONTENTS, GET_DRINK_CONTAINER_CONTENTS(use_obj) - amt);
 				if (GET_DRINK_CONTAINER_CONTENTS(use_obj) == 0) {
-					GET_OBJ_VAL(use_obj, VAL_DRINK_CONTAINER_TYPE) = LIQ_WATER;
+					set_obj_val(use_obj, VAL_DRINK_CONTAINER_TYPE, LIQ_WATER);
 				}
 				
 				if (build_used_list) {
@@ -3521,10 +3521,10 @@ void extract_resources(char_data *ch, struct resource_data *list, bool ground, s
 									if (IS_DRINK_CONTAINER(obj) && GET_DRINK_CONTAINER_TYPE(obj) == res->vnum) {
 										diff = MIN(res->amount, GET_DRINK_CONTAINER_CONTENTS(obj));
 										res->amount -= diff;
-										GET_OBJ_VAL(obj, VAL_DRINK_CONTAINER_CONTENTS) -= diff;
+										set_obj_val(obj, VAL_DRINK_CONTAINER_CONTENTS, GET_DRINK_CONTAINER_CONTENTS(obj) - diff);
 									
 										if (GET_OBJ_VAL(obj, VAL_DRINK_CONTAINER_CONTENTS) == 0) {
-											GET_OBJ_VAL(obj, VAL_DRINK_CONTAINER_TYPE) = LIQ_WATER;
+											set_obj_val(obj, VAL_DRINK_CONTAINER_TYPE, LIQ_WATER);
 										}
 									
 										if (build_used_list) {
@@ -3857,11 +3857,11 @@ void give_resources(char_data *ch, struct resource_data *list, bool split) {
 							diff = GET_DRINK_CONTAINER_CAPACITY(obj) - GET_DRINK_CONTAINER_CONTENTS(obj);
 							diff = MIN(remaining, diff);
 							remaining -= diff;
-							GET_OBJ_VAL(obj, VAL_DRINK_CONTAINER_CONTENTS) += diff;
+							set_obj_val(obj, VAL_DRINK_CONTAINER_CONTENTS, GET_DRINK_CONTAINER_CONTENTS(obj) + diff);
 							
 							// set type in case container was empty
 							if (GET_DRINK_CONTAINER_CONTENTS(obj) > 0) {
-								GET_OBJ_VAL(obj, VAL_DRINK_CONTAINER_TYPE) = res->vnum;
+								set_obj_val(obj, VAL_DRINK_CONTAINER_TYPE, res->vnum);
 							}
 						}
 						

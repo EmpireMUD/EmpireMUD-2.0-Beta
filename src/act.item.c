@@ -926,7 +926,7 @@ INTERACTION_FUNC(light_obj_interact) {
 	}
 	
 	if (inter_item && IS_AMMO(inter_item) && IS_AMMO(new)) {
-		GET_OBJ_VAL(new, VAL_AMMO_QUANTITY) = GET_AMMO_QUANTITY(inter_item);
+		set_obj_val(new, VAL_AMMO_QUANTITY, GET_AMMO_QUANTITY(inter_item));
 	}
 	
 	return TRUE;
@@ -1439,7 +1439,7 @@ bool used_lighter(char_data *ch, obj_data *obj) {
 	}
 	
 	if (GET_LIGHTER_USES(obj) != UNLIMITED) {
-		GET_OBJ_VAL(obj, VAL_LIGHTER_USES) -= 1;	// use 1 charge
+		set_obj_val(obj, VAL_LIGHTER_USES, GET_LIGHTER_USES(obj) - 1);	// use 1 charge
 		SET_BIT(GET_OBJ_EXTRA(obj), OBJ_NO_STORE);	// no longer storable
 		
 		if (GET_LIGHTER_USES(obj) <= 0) {
@@ -2422,10 +2422,10 @@ void fill_from_room(char_data *ch, obj_data *obj) {
 	}
 
 	/* First same type liq. */
-	GET_OBJ_VAL(obj, VAL_DRINK_CONTAINER_TYPE) = liquid;
+	set_obj_val(obj, VAL_DRINK_CONTAINER_TYPE, liquid);
 	GET_OBJ_TIMER(obj) = timer;
 
-	GET_OBJ_VAL(obj, VAL_DRINK_CONTAINER_CONTENTS) = GET_DRINK_CONTAINER_CAPACITY(obj);
+	set_obj_val(obj, VAL_DRINK_CONTAINER_CONTENTS, GET_DRINK_CONTAINER_CAPACITY(obj));
 }
 
 
@@ -2644,7 +2644,7 @@ void scale_item_to_level(obj_data *obj, int level) {
 				if (amt > 0) {
 					points_to_give -= (this_share * GET_WEAPON_DAMAGE_BONUS(obj));
 				}
-				GET_OBJ_VAL(obj, VAL_WEAPON_DAMAGE_BONUS) = amt;
+				set_obj_val(obj, VAL_WEAPON_DAMAGE_BONUS, amt);
 			}
 			// leave negatives alone
 			break;
@@ -2654,8 +2654,8 @@ void scale_item_to_level(obj_data *obj, int level) {
 			if (amt > 0) {
 				points_to_give -= (this_share * GET_DRINK_CONTAINER_CAPACITY(obj));
 			}
-			GET_OBJ_VAL(obj, VAL_DRINK_CONTAINER_CAPACITY) = amt;
-			GET_OBJ_VAL(obj, VAL_DRINK_CONTAINER_CONTENTS) = amt;
+			set_obj_val(obj, VAL_DRINK_CONTAINER_CAPACITY, amt);
+			set_obj_val(obj, VAL_DRINK_CONTAINER_CONTENTS, amt);
 			// negatives aren't even possible here
 			break;
 		}
@@ -2664,7 +2664,7 @@ void scale_item_to_level(obj_data *obj, int level) {
 			if (amt > 0) {
 				points_to_give -= (this_share * GET_COINS_AMOUNT(obj));
 			}
-			GET_OBJ_VAL(obj, VAL_COINS_AMOUNT) = amt;
+			set_obj_val(obj, VAL_COINS_AMOUNT, amt);
 			// this can't realistically be negative
 			break;
 		}
@@ -2675,7 +2675,7 @@ void scale_item_to_level(obj_data *obj, int level) {
 				if (amt > 0) {
 					points_to_give -= (this_share * GET_MISSILE_WEAPON_DAMAGE(obj));
 				}
-				GET_OBJ_VAL(obj, VAL_MISSILE_WEAPON_DAMAGE) = amt;
+				set_obj_val(obj, VAL_MISSILE_WEAPON_DAMAGE, amt);
 			}
 			// leave negatives alone
 			break;
@@ -2686,7 +2686,7 @@ void scale_item_to_level(obj_data *obj, int level) {
 				if (amt > 0) {
 					points_to_give -= (this_share * GET_AMMO_DAMAGE_BONUS(obj));
 				}
-				GET_OBJ_VAL(obj, VAL_AMMO_DAMAGE_BONUS) = amt;
+				set_obj_val(obj, VAL_AMMO_DAMAGE_BONUS, amt);
 			}
 			// leave negatives alone
 			break;
@@ -2696,7 +2696,7 @@ void scale_item_to_level(obj_data *obj, int level) {
 			if (amt > 0) {
 				points_to_give -= (this_share * GET_PACK_CAPACITY(obj));
 			}
-			GET_OBJ_VAL(obj, VAL_PACK_CAPACITY) = amt;
+			set_obj_val(obj, VAL_PACK_CAPACITY, amt);
 			// negatives aren't really possible here
 			break;
 		}
@@ -4874,9 +4874,9 @@ ACMD(do_drink) {
 	}
 
 	if (obj) {
-		GET_OBJ_VAL(obj, VAL_DRINK_CONTAINER_CONTENTS) -= amount;
+		set_obj_val(obj, VAL_DRINK_CONTAINER_CONTENTS, GET_DRINK_CONTAINER_CONTENTS(obj) - amount);
 		if (GET_DRINK_CONTAINER_CONTENTS(obj) <= 0) {	/* The last bit */
-			GET_OBJ_VAL(obj, VAL_DRINK_CONTAINER_TYPE) = 0;
+			set_obj_val(obj, VAL_DRINK_CONTAINER_TYPE, 0);
 			GET_OBJ_TIMER(obj) = UNLIMITED;
 		}
 		
@@ -5121,7 +5121,7 @@ ACMD(do_eat) {
 	// 4. ready to eat
 	gain_condition(ch, FULL, -1 * eat_hours * REAL_UPDATES_PER_MUD_HOUR);
 	if (IS_FOOD(food)) {
-		GET_OBJ_VAL(food, VAL_FOOD_HOURS_OF_FULLNESS) -= eat_hours;
+		set_obj_val(food, VAL_FOOD_HOURS_OF_FULLNESS, GET_FOOD_HOURS_OF_FULLNESS(food) - eat_hours);
 		extract = (GET_FOOD_HOURS_OF_FULLNESS(food) <= 0);
 		SET_BIT(GET_OBJ_EXTRA(food), OBJ_NO_STORE);	// no longer storable
 	}
@@ -6138,14 +6138,14 @@ ACMD(do_pour) {
 			}
 			else if (IS_IMMORTAL(ch)) {
 				// empty before message
-				GET_OBJ_VAL(to_obj, VAL_DRINK_CONTAINER_CONTENTS) = 0;
+				set_obj_val(to_obj, VAL_DRINK_CONTAINER_CONTENTS, 0);
 				
 				// message before filling
 				act("You fill $p with water from thin air!", FALSE, ch, to_obj, NULL, TO_CHAR);
 				act("$n fills $p with water from thin air!", TRUE, ch, to_obj, NULL, TO_ROOM);
 				
-				GET_OBJ_VAL(to_obj, VAL_DRINK_CONTAINER_TYPE) = LIQ_WATER;
-				GET_OBJ_VAL(to_obj, VAL_DRINK_CONTAINER_CONTENTS) = GET_DRINK_CONTAINER_CAPACITY(to_obj);
+				set_obj_val(to_obj, VAL_DRINK_CONTAINER_TYPE, LIQ_WATER);
+				set_obj_val(to_obj, VAL_DRINK_CONTAINER_CONTENTS, GET_DRINK_CONTAINER_CAPACITY(to_obj));
 
 				return;
 			}
@@ -6198,8 +6198,8 @@ ACMD(do_pour) {
 				}
 			}
 
-			GET_OBJ_VAL(from_obj, VAL_DRINK_CONTAINER_CONTENTS) = 0;
-			GET_OBJ_VAL(from_obj, VAL_DRINK_CONTAINER_TYPE) = 0;
+			set_obj_val(from_obj, VAL_DRINK_CONTAINER_CONTENTS, 0);
+			set_obj_val(from_obj, VAL_DRINK_CONTAINER_TYPE, 0);
 
 			return;
 		}
@@ -6237,13 +6237,13 @@ ACMD(do_pour) {
 	}
 
 	/* First same type liq. */
-	GET_OBJ_VAL(to_obj, VAL_DRINK_CONTAINER_TYPE) = GET_DRINK_CONTAINER_TYPE(from_obj);
+	set_obj_val(to_obj, VAL_DRINK_CONTAINER_TYPE, GET_DRINK_CONTAINER_TYPE(from_obj));
 
 	// Then how much to pour -- this CAN make the original container go negative
 	amount = GET_DRINK_CONTAINER_CAPACITY(to_obj) - GET_DRINK_CONTAINER_CONTENTS(to_obj);
-	GET_OBJ_VAL(from_obj, VAL_DRINK_CONTAINER_CONTENTS) -= amount;
+	set_obj_val(from_obj, VAL_DRINK_CONTAINER_CONTENTS, GET_DRINK_CONTAINER_CONTENTS(from_obj) - amount);
 
-	GET_OBJ_VAL(to_obj, VAL_DRINK_CONTAINER_CONTENTS) += amount;
+	set_obj_val(to_obj, VAL_DRINK_CONTAINER_CONTENTS, GET_DRINK_CONTAINER_CONTENTS(to_obj) + amount);
 	
 	// copy the timer on the liquid, even if UNLIMITED
 	GET_OBJ_TIMER(to_obj) = GET_OBJ_TIMER(from_obj);
@@ -6251,15 +6251,15 @@ ACMD(do_pour) {
 	// check if there was too little to pour, and adjust
 	if (GET_DRINK_CONTAINER_CONTENTS(from_obj) <= 0) {
 		// add the negative amount to subtract it back
-		GET_OBJ_VAL(to_obj, VAL_DRINK_CONTAINER_CONTENTS) += GET_DRINK_CONTAINER_CONTENTS(from_obj);
+		set_obj_val(to_obj, VAL_DRINK_CONTAINER_CONTENTS, GET_DRINK_CONTAINER_CONTENTS(to_obj) + GET_DRINK_CONTAINER_CONTENTS(from_obj));
 		amount += GET_DRINK_CONTAINER_CONTENTS(from_obj);
-		GET_OBJ_VAL(from_obj, VAL_DRINK_CONTAINER_CONTENTS) = 0;
-		GET_OBJ_VAL(from_obj, VAL_DRINK_CONTAINER_TYPE) = 0;
+		set_obj_val(from_obj, VAL_DRINK_CONTAINER_CONTENTS, 0);
+		set_obj_val(from_obj, VAL_DRINK_CONTAINER_TYPE, 0);
 		GET_OBJ_TIMER(from_obj) = UNLIMITED;
 	}
 	
 	// check max
-	GET_OBJ_VAL(to_obj, VAL_DRINK_CONTAINER_CONTENTS) = MIN(GET_DRINK_CONTAINER_CONTENTS(to_obj), GET_DRINK_CONTAINER_CAPACITY(to_obj));
+	set_obj_val(to_obj, VAL_DRINK_CONTAINER_CONTENTS, MIN(GET_DRINK_CONTAINER_CONTENTS(to_obj), GET_DRINK_CONTAINER_CAPACITY(to_obj)));
 }
 
 

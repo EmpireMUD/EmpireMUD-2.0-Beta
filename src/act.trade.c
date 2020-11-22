@@ -921,7 +921,7 @@ void cancel_gen_craft(char_data *ch) {
 			obj = read_object(GET_ACTION_VNUM(ch, 1), TRUE);
 
 			// just empty it
-			GET_OBJ_VAL(obj, VAL_DRINK_CONTAINER_CONTENTS) = 0;
+			set_obj_val(obj, VAL_DRINK_CONTAINER_CONTENTS, 0);
 			if (CAN_WEAR(obj, ITEM_WEAR_TAKE)) {
 				obj_to_char(obj, ch);
 			}
@@ -1002,8 +1002,8 @@ void finish_gen_craft(char_data *ch) {
 		// load the drink container back
 		obj = read_object(GET_ACTION_VNUM(ch, 1), TRUE);
 	
-		GET_OBJ_VAL(obj, VAL_DRINK_CONTAINER_CONTENTS) = MIN(GET_CRAFT_QUANTITY(type), GET_DRINK_CONTAINER_CAPACITY(obj));
-		GET_OBJ_VAL(obj, VAL_DRINK_CONTAINER_TYPE) = GET_CRAFT_OBJECT(type);
+		set_obj_val(obj, VAL_DRINK_CONTAINER_CONTENTS, MIN(GET_CRAFT_QUANTITY(type), GET_DRINK_CONTAINER_CAPACITY(obj)));
+		set_obj_val(obj, VAL_DRINK_CONTAINER_TYPE, GET_CRAFT_OBJECT(type));
 	
 		// set it to go bad... very bad
 		GET_OBJ_TIMER(obj) = SOUP_TIMER;

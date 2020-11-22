@@ -99,7 +99,7 @@ obj_data *create_book_obj(book_data *book) {
 	obj->proto_data->type_flag = ITEM_BOOK;
 	GET_OBJ_WEAR(obj) = ITEM_WEAR_TAKE;
 	GET_OBJ_TIMER(obj) = UNLIMITED;
-	GET_OBJ_VAL(obj, VAL_BOOK_ID) = book->vnum;
+	set_obj_val(obj, VAL_BOOK_ID, book->vnum);
 	
 	return obj;
 }

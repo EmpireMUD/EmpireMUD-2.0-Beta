@@ -292,7 +292,7 @@ void do_douse_obj(char_data *ch, obj_data *obj, obj_data *cont) {
 		msg_to_char(ch, "You can't douse anything here.\r\n");
 	}
 	else {
-		GET_OBJ_VAL(cont, VAL_DRINK_CONTAINER_CONTENTS) = 0;
+		set_obj_val(cont, VAL_DRINK_CONTAINER_CONTENTS, 0);
 		
 		act("You douse $p with $P.", FALSE, ch, obj, cont, TO_CHAR);
 		act("$n douses $p with $P.", FALSE, ch, obj, cont, TO_ROOM);
@@ -2175,7 +2175,7 @@ ACMD(do_douse) {
 		msg_to_char(ch, "There's no fire here!\r\n");
 	else {
 		amount = GET_DRINK_CONTAINER_CONTENTS(obj);
-		GET_OBJ_VAL(obj, VAL_DRINK_CONTAINER_CONTENTS) = 0;
+		set_obj_val(obj, VAL_DRINK_CONTAINER_CONTENTS, 0);
 		
 		add_to_room_extra_data(room, ROOM_EXTRA_FIRE_REMAINING, -amount);
 		act("You throw some water from $p onto the flames!", FALSE, ch, obj, 0, TO_CHAR);
@@ -2838,8 +2838,8 @@ ACMD(do_milk) {
 		act("$n milks $N into $p.", FALSE, ch, cont, mob, TO_ROOM);
 		add_cooldown(mob, COOLDOWN_MILK, 2 * SECS_PER_MUD_DAY);
 		amount = GET_DRINK_CONTAINER_CAPACITY(cont) - GET_DRINK_CONTAINER_CONTENTS(cont);
-		GET_OBJ_VAL(cont, VAL_DRINK_CONTAINER_CONTENTS) += amount;
-		GET_OBJ_VAL(cont, VAL_DRINK_CONTAINER_TYPE) = LIQ_MILK;
+		set_obj_val(cont, VAL_DRINK_CONTAINER_CONTENTS, GET_DRINK_CONTAINER_CONTENTS(cont) + amount);
+		set_obj_val(cont, VAL_DRINK_CONTAINER_TYPE, LIQ_MILK);
 		GET_OBJ_TIMER(cont) = 72;	// mud hours
 		gain_player_tech_exp(ch, PTECH_MILK, 33);
 	}
@@ -3517,7 +3517,7 @@ ACMD(do_skin) {
 			gain_player_tech_exp(ch, PTECH_SKINNING_UPGRADE, 15);
 		}
 		
-		SET_BIT(GET_OBJ_VAL(obj, VAL_CORPSE_FLAGS), CORPSE_SKINNED);
+		set_obj_val(obj, VAL_CORPSE_FLAGS, GET_CORPSE_FLAGS(obj) | CORPSE_SKINNED);
 		command_lag(ch, WAIT_OTHER);
 	}
 }

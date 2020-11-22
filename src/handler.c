@@ -2227,8 +2227,8 @@ obj_data *create_money(empire_data *type, int amount) {
 	obj->proto_data->material = MAT_GOLD;
 	SET_BIT(GET_OBJ_WEAR(obj), ITEM_WEAR_TAKE);
 
-	GET_OBJ_VAL(obj, VAL_COINS_AMOUNT) = amount;
-	GET_OBJ_VAL(obj, VAL_COINS_EMPIRE_ID) = (!type ? OTHER_COIN : EMPIRE_VNUM(type));
+	set_obj_val(obj, VAL_COINS_AMOUNT, amount);
+	set_obj_val(obj, VAL_COINS_EMPIRE_ID, (!type ? OTHER_COIN : EMPIRE_VNUM(type)));
 
 	return (obj);
 }
@@ -5671,7 +5671,7 @@ obj_data *copy_warehouse_obj(obj_data *input) {
 	GET_STOLEN_FROM(obj) = GET_STOLEN_FROM(input);
 	
 	for (iter = 0; iter < NUM_OBJ_VAL_POSITIONS; ++iter) {
-		GET_OBJ_VAL(obj, iter) = GET_OBJ_VAL(input, iter);
+		set_obj_val(obj, iter, GET_OBJ_VAL(input, iter));
 	}
 	GET_OBJ_APPLIES(obj) = copy_obj_apply_list(GET_OBJ_APPLIES(input));
 	OBJ_BOUND_TO(obj) = copy_obj_bindings(OBJ_BOUND_TO(input));
@@ -5844,30 +5844,30 @@ obj_data *fresh_copy_obj(obj_data *obj, int scale_level) {
 	// certain things that must always copy over
 	switch (GET_OBJ_TYPE(new)) {
 		case ITEM_AMMO: {
-			GET_OBJ_VAL(new, VAL_AMMO_QUANTITY) = GET_OBJ_VAL(obj, VAL_AMMO_QUANTITY);
+			set_obj_val(new, VAL_AMMO_QUANTITY, GET_OBJ_VAL(obj, VAL_AMMO_QUANTITY));
 			break;
 		}
 		case ITEM_BOOK: {
-			GET_OBJ_VAL(new, VAL_BOOK_ID) = GET_OBJ_VAL(obj, VAL_BOOK_ID);
+			set_obj_val(new, VAL_BOOK_ID, GET_OBJ_VAL(obj, VAL_BOOK_ID));
 			break;
 		}
 		case ITEM_DRINKCON: {
-			GET_OBJ_VAL(new, VAL_DRINK_CONTAINER_CONTENTS) = GET_OBJ_VAL(obj, VAL_DRINK_CONTAINER_CONTENTS);
-			GET_OBJ_VAL(new, VAL_DRINK_CONTAINER_TYPE) = GET_OBJ_VAL(obj, VAL_DRINK_CONTAINER_TYPE);
+			set_obj_val(new, VAL_DRINK_CONTAINER_CONTENTS, GET_OBJ_VAL(obj, VAL_DRINK_CONTAINER_CONTENTS));
+			set_obj_val(new, VAL_DRINK_CONTAINER_TYPE, GET_OBJ_VAL(obj, VAL_DRINK_CONTAINER_TYPE));
 			break;
 		}
 		case ITEM_PORTAL: {
-			GET_OBJ_VAL(new, VAL_PORTAL_TARGET_VNUM) = GET_OBJ_VAL(obj, VAL_PORTAL_TARGET_VNUM);
+			set_obj_val(new, VAL_PORTAL_TARGET_VNUM, GET_OBJ_VAL(obj, VAL_PORTAL_TARGET_VNUM));
 			break;
 		}
 		case ITEM_POISON: {
-			GET_OBJ_VAL(new, VAL_POISON_CHARGES) = GET_OBJ_VAL(obj, VAL_POISON_CHARGES);
+			set_obj_val(new, VAL_POISON_CHARGES, GET_OBJ_VAL(obj, VAL_POISON_CHARGES));
 			break;
 		}
 		case ITEM_SHIP: {
 			// copy these blind
 			for (iter = 0; iter < NUM_OBJ_VAL_POSITIONS; ++iter) {
-				GET_OBJ_VAL(new, iter) = GET_OBJ_VAL(obj, iter);
+				set_obj_val(new, iter, GET_OBJ_VAL(obj, iter));
 			}
 			break;
 		}
@@ -9789,8 +9789,8 @@ void store_unique_item(char_data *ch, struct empire_unique_storage **to_list, ob
 	obj->last_empire_id = NOTHING;
 	empty_obj_before_extract(obj);
 	if (IS_DRINK_CONTAINER(obj)) {
-		GET_OBJ_VAL(obj, VAL_DRINK_CONTAINER_CONTENTS) = 0;
-		GET_OBJ_VAL(obj, VAL_DRINK_CONTAINER_TYPE) = LIQ_WATER;
+		set_obj_val(obj, VAL_DRINK_CONTAINER_CONTENTS, 0);
+		set_obj_val(obj, VAL_DRINK_CONTAINER_TYPE, LIQ_WATER);
 	}
 	
 	// existing eus entry or new one? only passes 'room' if it's an empire; player storage is global

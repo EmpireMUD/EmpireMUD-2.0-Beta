@@ -958,6 +958,9 @@ void free_exit_template(struct exit_template *ex);
 // act.comm.c
 extern bool global_mute_slash_channel_joins;
 
+// olc.object.c
+int set_obj_val(obj_data *obj, int pos, int value);
+
 // statistics.c
 extern int max_players_this_uptime;
 

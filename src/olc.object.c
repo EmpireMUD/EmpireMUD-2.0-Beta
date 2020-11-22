@@ -26,6 +26,7 @@
 /**
 * Contents:
 *   Helpers
+*   Object Setters
 *   Displays
 *   Edit Modules
 */
@@ -1837,6 +1838,38 @@ obj_data *setup_olc_object(obj_data *input) {
 
 
  //////////////////////////////////////////////////////////////////////////////
+//// OBJECT SETTERS //////////////////////////////////////////////////////////
+
+/**
+* Sets one of an object's generic numeric values and ensures the object gets
+* saved if necessary.
+*
+* @param obj_data *obj The object.
+* @param int pos Which value position (generally 0-2).
+* @param int value What to set it to.
+* @return int Passes back 'value' so this can be used like a regular '=' assignment.
+*/
+int set_obj_val(obj_data *obj, int pos, int value) {
+	room_data *room;
+	
+	// safety
+	if (pos < 0 || pos >= NUM_OBJ_VAL_POSITIONS) {
+		log("SYSERR: set_obj_val called with invalid position %d", pos);
+		return value;
+	}
+	
+	// will it need to save?
+	if (GET_OBJ_VAL(obj, pos) != value && (room = find_room_obj_saves_in(obj))) {
+		request_world_save(GET_ROOM_VNUM(room), WSAVE_OBJS_AND_VEHS);
+	}
+	
+	// and set it
+	GET_OBJ_VAL(obj, pos) = value;
+	return value;
+}
+
+
+ //////////////////////////////////////////////////////////////////////////////
 //// DISPLAYS ////////////////////////////////////////////////////////////////
 
 /**
@@ -2170,16 +2203,16 @@ OLC_MODULE(oedit_affecttype) {
 	}
 	
 	if (!str_cmp(argument, "none")) {
-		GET_OBJ_VAL(obj, pos) = NOTHING;
+		set_obj_val(obj, pos, NOTHING);
 		msg_to_char(ch, "It now has no custom affect type.\r\n");
 	}
 	else {
 		old = GET_OBJ_VAL(obj, pos);
-		GET_OBJ_VAL(obj, pos) = olc_process_number(ch, argument, "affect vnum", "affecttype", 0, MAX_VNUM, GET_OBJ_VAL(obj, pos));
+		set_obj_val(obj, pos, olc_process_number(ch, argument, "affect vnum", "affecttype", 0, MAX_VNUM, GET_OBJ_VAL(obj, pos)));
 
 		if (!find_generic(GET_OBJ_VAL(obj, pos), GENERIC_AFFECT)) {
 			msg_to_char(ch, "Invalid affect generic vnum %d. Old value restored.\r\n", GET_OBJ_VAL(obj, pos));
-			GET_OBJ_VAL(obj, pos) = old;
+			set_obj_val(obj, pos, old);
 		}
 		else {
 			msg_to_char(ch, "Affect type set to [%d] %s.\r\n", GET_OBJ_VAL(obj, pos), get_generic_name_by_vnum(GET_OBJ_VAL(obj, pos)));
@@ -2342,7 +2375,7 @@ OLC_MODULE(oedit_armortype) {
 		msg_to_char(ch, "You can only set armor on an armor object.\r\n");
 	}
 	else {
-		GET_OBJ_VAL(obj, VAL_ARMOR_TYPE) = olc_process_type(ch, argument, "armor type", "armortype", armor_types, GET_OBJ_VAL(obj, VAL_ARMOR_TYPE));
+		set_obj_val(obj, VAL_ARMOR_TYPE, olc_process_type(ch, argument, "armor type", "armortype", armor_types, GET_OBJ_VAL(obj, VAL_ARMOR_TYPE)));
 	}
 }
 
@@ -2371,7 +2404,7 @@ OLC_MODULE(oedit_ammotype) {
 		msg_to_char(ch, "Ammotype must by a letter from A to Z.\r\n");
 	}
 	else {
-		GET_OBJ_VAL(obj, slot) = val - 'A';
+		set_obj_val(obj, slot, val - 'A');
 		msg_to_char(ch, "You set the ammotype to %c.\r\n", val);
 	}
 }
@@ -2384,7 +2417,7 @@ OLC_MODULE(oedit_automint) {
 		msg_to_char(ch, "You can only set the automint value on a wealth item.\r\n");
 	}
 	else {
-		GET_OBJ_VAL(obj, VAL_WEALTH_AUTOMINT) = olc_process_type(ch, argument, "automint value", "automint", offon_types, GET_OBJ_VAL(obj, VAL_WEALTH_AUTOMINT));
+		set_obj_val(obj, VAL_WEALTH_AUTOMINT, olc_process_type(ch, argument, "automint value", "automint", offon_types, GET_OBJ_VAL(obj, VAL_WEALTH_AUTOMINT)));
 	}
 }
 
@@ -2399,12 +2432,12 @@ OLC_MODULE(oedit_text) {
 		msg_to_char(ch, "You can only set text id on a book.\r\n");
 	}
 	else {
-		GET_OBJ_VAL(obj, VAL_BOOK_ID) = olc_process_number(ch, argument, "text id", "text", 0, MAX_INT, GET_OBJ_VAL(obj, VAL_BOOK_ID));
+		set_obj_val(obj, VAL_BOOK_ID, olc_process_number(ch, argument, "text id", "text", 0, MAX_INT, GET_OBJ_VAL(obj, VAL_BOOK_ID)));
 		book = book_proto(GET_BOOK_ID(obj));
 		
 		if (!book) {
 			msg_to_char(ch, "Invalid text book vnum. Old vnum %d restored.\r\n", old);
-			GET_OBJ_VAL(obj, VAL_BOOK_ID) = old;
+			set_obj_val(obj, VAL_BOOK_ID, old);
 		}
 	}
 }
@@ -2434,7 +2467,7 @@ OLC_MODULE(oedit_capacity) {
 		msg_to_char(ch, "You can't set capacity on this type of object.\r\n");
 	}
 	else {
-		GET_OBJ_VAL(obj, slot) = olc_process_number(ch, argument, "capacity", "capacity", 0, MAX_INT, GET_OBJ_VAL(obj, slot));
+		set_obj_val(obj, slot, olc_process_number(ch, argument, "capacity", "capacity", 0, MAX_INT, GET_OBJ_VAL(obj, slot)));
 	}
 }
 
@@ -2442,7 +2475,7 @@ OLC_MODULE(oedit_capacity) {
 OLC_MODULE(oedit_cdtime) {
 	obj_data *obj = GET_OLC_OBJECT(ch->desc);
 	
-	GET_OBJ_VAL(obj, VAL_POTION_COOLDOWN_TIME) = olc_process_number(ch, argument, "cooldown time", "cdtime", 0, MAX_INT, GET_OBJ_VAL(obj, VAL_POTION_COOLDOWN_TIME));
+	set_obj_val(obj, VAL_POTION_COOLDOWN_TIME, olc_process_number(ch, argument, "cooldown time", "cdtime", 0, MAX_INT, GET_OBJ_VAL(obj, VAL_POTION_COOLDOWN_TIME)));
 }
 
 
@@ -2453,7 +2486,7 @@ OLC_MODULE(oedit_charges) {
 		msg_to_char(ch, "You can only set charges on a poison.\r\n");
 	}
 	else {
-		GET_OBJ_VAL(obj, VAL_POISON_CHARGES) = olc_process_number(ch, argument, "charges", "charges", 0, MAX_INT, GET_OBJ_VAL(obj, VAL_POISON_CHARGES));
+		set_obj_val(obj, VAL_POISON_CHARGES, olc_process_number(ch, argument, "charges", "charges", 0, MAX_INT, GET_OBJ_VAL(obj, VAL_POISON_CHARGES)));
 	}
 }
 
@@ -2477,7 +2510,7 @@ OLC_MODULE(oedit_coinamount) {
 		}
 	}
 	
-	GET_OBJ_VAL(obj, pos) = olc_process_number(ch, argument, "coin amount", "coinamount", 0, MAX_COIN, GET_OBJ_VAL(obj, pos));
+	set_obj_val(obj, pos, olc_process_number(ch, argument, "coin amount", "coinamount", 0, MAX_COIN, GET_OBJ_VAL(obj, pos)));
 }
 
 
@@ -2515,7 +2548,7 @@ OLC_MODULE(oedit_containerflags) {
 		msg_to_char(ch, "You can only set containerflags on a container.\r\n");
 	}
 	else {
-		GET_OBJ_VAL(obj, VAL_CONTAINER_FLAGS) = olc_process_flag(ch, argument, "container", "containerflags", container_bits, GET_OBJ_VAL(obj, VAL_CONTAINER_FLAGS));
+		set_obj_val(obj, VAL_CONTAINER_FLAGS, olc_process_flag(ch, argument, "container", "containerflags", container_bits, GET_OBJ_VAL(obj, VAL_CONTAINER_FLAGS)));
 	}
 }
 
@@ -2527,7 +2560,7 @@ OLC_MODULE(oedit_contents) {
 		msg_to_char(ch, "You can only set contents on a drink container.\r\n");
 	}
 	else {
-		GET_OBJ_VAL(obj, VAL_DRINK_CONTAINER_CONTENTS) = olc_process_number(ch, argument, "contents", "contents", 0, GET_DRINK_CONTAINER_CAPACITY(obj), GET_OBJ_VAL(obj, VAL_DRINK_CONTAINER_CONTENTS));
+		set_obj_val(obj, VAL_DRINK_CONTAINER_CONTENTS, olc_process_number(ch, argument, "contents", "contents", 0, GET_DRINK_CONTAINER_CAPACITY(obj), GET_OBJ_VAL(obj, VAL_DRINK_CONTAINER_CONTENTS)));
 	}
 }
 
@@ -2540,16 +2573,16 @@ OLC_MODULE(oedit_cooldown) {
 		msg_to_char(ch, "You can only set cooldown type on a potion.\r\n");
 	}
 	else if (!str_cmp(argument, "none")) {
-		GET_OBJ_VAL(obj, VAL_POTION_COOLDOWN_TYPE) = NOTHING;
+		set_obj_val(obj, VAL_POTION_COOLDOWN_TYPE, NOTHING);
 		msg_to_char(ch, "It now has no cooldown type.\r\n");
 	}
 	else {
 		old = GET_OBJ_VAL(obj, VAL_POTION_COOLDOWN_TYPE);
-		GET_OBJ_VAL(obj, VAL_POTION_COOLDOWN_TYPE) = olc_process_number(ch, argument, "cooldown vnum", "cooldown", 0, MAX_VNUM, GET_OBJ_VAL(obj, VAL_POTION_COOLDOWN_TYPE));
+		set_obj_val(obj, VAL_POTION_COOLDOWN_TYPE, olc_process_number(ch, argument, "cooldown vnum", "cooldown", 0, MAX_VNUM, GET_OBJ_VAL(obj, VAL_POTION_COOLDOWN_TYPE)));
 
 		if (!find_generic(GET_OBJ_VAL(obj, VAL_POTION_COOLDOWN_TYPE), GENERIC_COOLDOWN)) {
 			msg_to_char(ch, "Invalid cooldown generic vnum %d. Old value restored.\r\n", GET_OBJ_VAL(obj, VAL_POTION_COOLDOWN_TYPE));
-			GET_OBJ_VAL(obj, VAL_POTION_COOLDOWN_TYPE) = old;
+			set_obj_val(obj, VAL_POTION_COOLDOWN_TYPE, old);
 		}
 		else {
 			msg_to_char(ch, "Cooldown type set to [%d] %s.\r\n", GET_OBJ_VAL(obj, VAL_POTION_COOLDOWN_TYPE), get_generic_name_by_vnum(GET_OBJ_VAL(obj, VAL_POTION_COOLDOWN_TYPE)));
@@ -2566,9 +2599,9 @@ OLC_MODULE(oedit_corpseof) {
 		msg_to_char(ch, "You can only set this on a corpse.\r\n");
 	}
 	else {
-		GET_OBJ_VAL(obj, VAL_CORPSE_IDNUM) = olc_process_number(ch, argument, "corpse of", "corpseof", 0, MAX_VNUM, GET_OBJ_VAL(obj, VAL_CORPSE_IDNUM));
+		set_obj_val(obj, VAL_CORPSE_IDNUM, olc_process_number(ch, argument, "corpse of", "corpseof", 0, MAX_VNUM, GET_OBJ_VAL(obj, VAL_CORPSE_IDNUM)));
 		if (!mob_proto(GET_CORPSE_NPC_VNUM(obj))) {
-			GET_OBJ_VAL(obj, VAL_CORPSE_IDNUM) = old;
+			set_obj_val(obj, VAL_CORPSE_IDNUM, old);
 			msg_to_char(ch, "There is no mobile with that vnum. Old value restored.\r\n");
 		}
 		else if (!PRF_FLAGGED(ch, PRF_NOREPEAT)) {
@@ -2589,10 +2622,10 @@ OLC_MODULE(oedit_currency) {
 		msg_to_char(ch, "You can only set that on a currency object.\r\n");
 	}
 	else {
-		GET_OBJ_VAL(obj, VAL_CURRENCY_VNUM) = olc_process_number(ch, argument, "currency vnum", "currency", 0, MAX_VNUM, GET_OBJ_VAL(obj, VAL_CURRENCY_VNUM));
+		set_obj_val(obj, VAL_CURRENCY_VNUM, olc_process_number(ch, argument, "currency vnum", "currency", 0, MAX_VNUM, GET_OBJ_VAL(obj, VAL_CURRENCY_VNUM)));
 		if (GET_CURRENCY_VNUM(obj) != old && !find_generic(GET_CURRENCY_VNUM(obj), GENERIC_CURRENCY)) {
 			msg_to_char(ch, "%d is not a currency generic. Old value restored.\r\n", GET_CURRENCY_VNUM(obj));
-			GET_OBJ_VAL(obj, VAL_CURRENCY_VNUM) = old;
+			set_obj_val(obj, VAL_CURRENCY_VNUM, old);
 		}
 	}
 }
@@ -2631,7 +2664,7 @@ OLC_MODULE(oedit_damage) {
 		msg_to_char(ch, "You can't set damage on this type of object.\r\n");
 	}
 	else {
-		GET_OBJ_VAL(obj, slot) = olc_process_number(ch, argument, "damage", "damage", -10000, 10000, GET_OBJ_VAL(obj, slot));
+		set_obj_val(obj, slot, olc_process_number(ch, argument, "damage", "damage", -10000, 10000, GET_OBJ_VAL(obj, slot)));
 		if (showdps) {
 			msg_to_char(ch, "It now has %.2f base dps.\r\n", get_base_dps(obj));
 		}
@@ -2658,7 +2691,7 @@ OLC_MODULE(oedit_fullness) {
 		msg_to_char(ch, "You can only set fullness on food.\r\n");
 	}
 	else {
-		GET_OBJ_VAL(obj, VAL_FOOD_HOURS_OF_FULLNESS) = olc_process_number(ch, argument, "fullness", "fullness", -(MAX_CONDITION / REAL_UPDATES_PER_MUD_HOUR), 10 * (MAX_CONDITION / REAL_UPDATES_PER_MUD_HOUR), GET_OBJ_VAL(obj, VAL_FOOD_HOURS_OF_FULLNESS));
+		set_obj_val(obj, VAL_FOOD_HOURS_OF_FULLNESS, olc_process_number(ch, argument, "fullness", "fullness", -(MAX_CONDITION / REAL_UPDATES_PER_MUD_HOUR), 10 * (MAX_CONDITION / REAL_UPDATES_PER_MUD_HOUR), GET_OBJ_VAL(obj, VAL_FOOD_HOURS_OF_FULLNESS)));
 	}
 }
 
@@ -2684,11 +2717,11 @@ OLC_MODULE(oedit_liquid) {
 	}
 	else {
 		old = GET_OBJ_VAL(obj, VAL_DRINK_CONTAINER_TYPE);
-		GET_OBJ_VAL(obj, VAL_DRINK_CONTAINER_TYPE) = olc_process_number(ch, argument, "liquid vnum", "liquid", 0, MAX_VNUM, GET_OBJ_VAL(obj, VAL_DRINK_CONTAINER_TYPE));
+		set_obj_val(obj, VAL_DRINK_CONTAINER_TYPE, olc_process_number(ch, argument, "liquid vnum", "liquid", 0, MAX_VNUM, GET_OBJ_VAL(obj, VAL_DRINK_CONTAINER_TYPE)));
 
 		if (!find_generic(GET_OBJ_VAL(obj, VAL_DRINK_CONTAINER_TYPE), GENERIC_LIQUID)) {
 			msg_to_char(ch, "Invalid liquid generic vnum %d. Old value restored.\r\n", GET_OBJ_VAL(obj, VAL_DRINK_CONTAINER_TYPE));
-			GET_OBJ_VAL(obj, VAL_DRINK_CONTAINER_TYPE) = old;
+			set_obj_val(obj, VAL_DRINK_CONTAINER_TYPE, old);
 		}
 		else {
 			msg_to_char(ch, "It now contains %s.\r\n", get_generic_name_by_vnum(GET_OBJ_VAL(obj, VAL_DRINK_CONTAINER_TYPE)));
@@ -2727,9 +2760,9 @@ OLC_MODULE(oedit_minipet) {
 		msg_to_char(ch, "You can only set this on a MINIPET item.\r\n");
 	}
 	else {
-		GET_OBJ_VAL(obj, VAL_MINIPET_VNUM) = olc_process_number(ch, argument, "mini-pet", "minipet", 0, MAX_VNUM, GET_OBJ_VAL(obj, VAL_MINIPET_VNUM));
+		set_obj_val(obj, VAL_MINIPET_VNUM, olc_process_number(ch, argument, "mini-pet", "minipet", 0, MAX_VNUM, GET_OBJ_VAL(obj, VAL_MINIPET_VNUM)));
 		if (!(mob = mob_proto(GET_MINIPET_VNUM(obj)))) {
-			GET_OBJ_VAL(obj, VAL_MINIPET_VNUM) = old;
+			set_obj_val(obj, VAL_MINIPET_VNUM, old);
 			msg_to_char(ch, "There is no mobile with that vnum. Old value restored.\r\n");
 			return;
 		}
@@ -2766,7 +2799,7 @@ OLC_MODULE(oedit_paint) {
 		msg_to_char(ch, "You can only set paint color on a paint object.\r\n");
 	}
 	else {
-		GET_OBJ_VAL(obj, VAL_PAINT_COLOR) = olc_process_type(ch, argument, "paint color", "paint", paint_names, GET_OBJ_VAL(obj, VAL_PAINT_COLOR));
+		set_obj_val(obj, VAL_PAINT_COLOR, olc_process_type(ch, argument, "paint color", "paint", paint_names, GET_OBJ_VAL(obj, VAL_PAINT_COLOR)));
 	}
 }
 
@@ -2780,13 +2813,13 @@ OLC_MODULE(oedit_plants) {
 		msg_to_char(ch, "You can only set plants on a plantable item.\r\n");
 	}
 	else {
-		GET_OBJ_VAL(obj, VAL_FOOD_CROP_TYPE) = olc_process_number(ch, argument, "plant", "plants", 0, MAX_VNUM, GET_OBJ_VAL(obj, VAL_FOOD_CROP_TYPE));
+		set_obj_val(obj, VAL_FOOD_CROP_TYPE, olc_process_number(ch, argument, "plant", "plants", 0, MAX_VNUM, GET_OBJ_VAL(obj, VAL_FOOD_CROP_TYPE)));
 		if ((cp = crop_proto(GET_OBJ_VAL(obj, VAL_FOOD_CROP_TYPE)))) {
 			msg_to_char(ch, "It will plant %s.\r\n", GET_CROP_NAME(cp));
 		}
 		else {
 			msg_to_char(ch, "No such crop vnum. Old value restored.\r\n");
-			GET_OBJ_VAL(obj, VAL_FOOD_CROP_TYPE) = old;
+			set_obj_val(obj, VAL_FOOD_CROP_TYPE, old);
 		}
 	}
 }
@@ -2799,7 +2832,7 @@ OLC_MODULE(oedit_quantity) {
 		msg_to_char(ch, "You can't set quantity on this type of item.\r\n");
 	}
 	else {
-		GET_OBJ_VAL(obj, VAL_AMMO_QUANTITY) = olc_process_number(ch, argument, "quantity", "quantity", 0, 100, GET_OBJ_VAL(obj, VAL_AMMO_QUANTITY));
+		set_obj_val(obj, VAL_AMMO_QUANTITY, olc_process_number(ch, argument, "quantity", "quantity", 0, 100, GET_OBJ_VAL(obj, VAL_AMMO_QUANTITY)));
 	}
 }
 
@@ -2845,7 +2878,7 @@ OLC_MODULE(oedit_quick_recipe) {
 	// create it
 	obj = GET_OLC_OBJECT(ch->desc) = setup_olc_object(NULL);
 	obj->proto_data->type_flag = ITEM_RECIPE;
-	GET_OBJ_VAL(obj, VAL_RECIPE_VNUM) = GET_CRAFT_VNUM(cft);
+	set_obj_val(obj, VAL_RECIPE_VNUM, GET_CRAFT_VNUM(cft));
 	
 	// keywords
 	snprintf(buf, sizeof(buf), "%s %s", (*argument ? argument : "recipe"), GET_CRAFT_NAME(cft));
@@ -2896,10 +2929,10 @@ OLC_MODULE(oedit_recipe) {
 		msg_to_char(ch, "You can only set that on a recipe object.\r\n");
 	}
 	else {
-		GET_OBJ_VAL(obj, VAL_RECIPE_VNUM) = olc_process_number(ch, argument, "recipe vnum", "recipe", 0, MAX_VNUM, GET_OBJ_VAL(obj, VAL_RECIPE_VNUM));
+		set_obj_val(obj, VAL_RECIPE_VNUM, olc_process_number(ch, argument, "recipe vnum", "recipe", 0, MAX_VNUM, GET_OBJ_VAL(obj, VAL_RECIPE_VNUM)));
 		if (GET_RECIPE_VNUM(obj) != old && (!(cft = craft_proto(GET_RECIPE_VNUM(obj))) || !CRAFT_FLAGGED(cft, CRAFT_LEARNED))) {
 			msg_to_char(ch, "%d is not a learned recipe. Old value restored.\r\n", GET_RECIPE_VNUM(obj));
-			GET_OBJ_VAL(obj, VAL_RECIPE_VNUM) = old;
+			set_obj_val(obj, VAL_RECIPE_VNUM, old);
 		}
 	}
 }
@@ -2938,7 +2971,7 @@ OLC_MODULE(oedit_roomvnum) {
 		msg_to_char(ch, "You can only set roomvnum on a portal.\r\n");
 	}
 	else {
-		GET_OBJ_VAL(obj, VAL_PORTAL_TARGET_VNUM) = olc_process_number(ch, argument, "room vnum", "roomvnum", 0, MAX_INT, GET_OBJ_VAL(obj, VAL_PORTAL_TARGET_VNUM));
+		set_obj_val(obj, VAL_PORTAL_TARGET_VNUM, olc_process_number(ch, argument, "room vnum", "roomvnum", 0, MAX_INT, GET_OBJ_VAL(obj, VAL_PORTAL_TARGET_VNUM)));
 	}
 }
 
@@ -2962,7 +2995,7 @@ OLC_MODULE(oedit_size) {
 		msg_to_char(ch, "You can only set the size on a corpse.\r\n");
 	}
 	else {
-		GET_OBJ_VAL(obj, VAL_CORPSE_SIZE) = olc_process_type(ch, argument, "size", "size", size_types, GET_CORPSE_SIZE(obj));
+		set_obj_val(obj, VAL_CORPSE_SIZE, olc_process_type(ch, argument, "size", "size", size_types, GET_CORPSE_SIZE(obj)));
 	}
 }
 
@@ -3137,40 +3170,40 @@ OLC_MODULE(oedit_type) {
 	
 	// reset values to defaults now
 	if (old != GET_OBJ_TYPE(obj)) {
-		GET_OBJ_VAL(obj, 0) = 0;
-		GET_OBJ_VAL(obj, 1) = 0;
-		GET_OBJ_VAL(obj, 2) = 0;
+		set_obj_val(obj, 0, 0);
+		set_obj_val(obj, 1, 0);
+		set_obj_val(obj, 2, 0);
 	
 		switch (GET_OBJ_TYPE(obj)) {
 			case ITEM_COINS: {
-				GET_OBJ_VAL(obj, VAL_COINS_AMOUNT) = 0;
-				GET_OBJ_VAL(obj, VAL_COINS_EMPIRE_ID) = OTHER_COIN;
+				set_obj_val(obj, VAL_COINS_AMOUNT, 0);
+				set_obj_val(obj, VAL_COINS_EMPIRE_ID, OTHER_COIN);
 				break;
 			}
 			case ITEM_CURRENCY: {
-				GET_OBJ_VAL(obj, VAL_CURRENCY_VNUM) = NOTHING;
+				set_obj_val(obj, VAL_CURRENCY_VNUM, NOTHING);
 				break;
 			}
 			case ITEM_PORTAL: {
-				GET_OBJ_VAL(obj, VAL_PORTAL_TARGET_VNUM) = NOTHING;
+				set_obj_val(obj, VAL_PORTAL_TARGET_VNUM, NOTHING);
 				break;
 			}
 			case ITEM_WEAPON: {
 				// do not set a default, or it shows as 'changed' in the editor/auditor even if it was missed
-				// GET_OBJ_VAL(obj, VAL_WEAPON_TYPE) = TYPE_SLASH;
+				// set_obj_val(obj, VAL_WEAPON_TYPE, TYPE_SLASH);
 				break;
 			}
 			case ITEM_POTION: {
-				GET_OBJ_VAL(obj, VAL_POTION_COOLDOWN_TYPE) = NOTHING;
-				GET_OBJ_VAL(obj, VAL_POTION_AFFECT) = NOTHING;
+				set_obj_val(obj, VAL_POTION_COOLDOWN_TYPE, NOTHING);
+				set_obj_val(obj, VAL_POTION_AFFECT, NOTHING);
 				break;
 			}
 			case ITEM_POISON: {
-				GET_OBJ_VAL(obj, VAL_POISON_AFFECT) = NOTHING;
+				set_obj_val(obj, VAL_POISON_AFFECT, NOTHING);
 				break;
 			}
 			case ITEM_MINIPET: {
-				GET_OBJ_VAL(obj, VAL_MINIPET_VNUM) = NOTHING;
+				set_obj_val(obj, VAL_MINIPET_VNUM, NOTHING);
 				break;
 			}
 			default: {
@@ -3188,7 +3221,7 @@ OLC_MODULE(oedit_uses) {
 		msg_to_char(ch, "You can only set uses on a LIGHTER object.\r\n");
 	}
 	else if (is_abbrev(argument, "unlimited")) {
-		GET_OBJ_VAL(obj, VAL_LIGHTER_USES) = UNLIMITED;
+		set_obj_val(obj, VAL_LIGHTER_USES, UNLIMITED);
 		
 		if (PRF_FLAGGED(ch, PRF_NOREPEAT)) {
 			send_config_msg(ch, "ok_string");
@@ -3198,7 +3231,7 @@ OLC_MODULE(oedit_uses) {
 		}
 	}
 	else {
-		GET_OBJ_VAL(obj, VAL_LIGHTER_USES) = olc_process_number(ch, argument, "lighter uses", "uses", 0, MAX_INT, GET_OBJ_VAL(obj, VAL_LIGHTER_USES));
+		set_obj_val(obj, VAL_LIGHTER_USES, olc_process_number(ch, argument, "lighter uses", "uses", 0, MAX_INT, GET_OBJ_VAL(obj, VAL_LIGHTER_USES)));
 	}
 }
 
@@ -3210,7 +3243,7 @@ OLC_MODULE(oedit_value0) {
 		msg_to_char(ch, "You can only manually set values on OTHER-type objects.\r\n");
 	}
 	else {
-		GET_OBJ_VAL(obj, 0) = olc_process_number(ch, argument, "value 0", "value0", -MAX_INT, MAX_INT, GET_OBJ_VAL(obj, 0));
+		set_obj_val(obj, 0, olc_process_number(ch, argument, "value 0", "value0", -MAX_INT, MAX_INT, GET_OBJ_VAL(obj, 0)));
 	}
 }
 
@@ -3222,7 +3255,7 @@ OLC_MODULE(oedit_value1) {
 		msg_to_char(ch, "You can only manually set values on OTHER-type objects.\r\n");
 	}
 	else {
-		GET_OBJ_VAL(obj, 1) = olc_process_number(ch, argument, "value 1", "value1", -MAX_INT, MAX_INT, GET_OBJ_VAL(obj, 1));
+		set_obj_val(obj, 1, olc_process_number(ch, argument, "value 1", "value1", -MAX_INT, MAX_INT, GET_OBJ_VAL(obj, 1)));
 	}
 }
 
@@ -3234,7 +3267,7 @@ OLC_MODULE(oedit_value2) {
 		msg_to_char(ch, "You can only manually set values on OTHER-type objects.\r\n");
 	}
 	else {
-		GET_OBJ_VAL(obj, 2) = olc_process_number(ch, argument, "value 2", "value2", -MAX_INT, MAX_INT, GET_OBJ_VAL(obj, 2));
+		set_obj_val(obj, 2, olc_process_number(ch, argument, "value 2", "value2", -MAX_INT, MAX_INT, GET_OBJ_VAL(obj, 2)));
 	}
 }
 
@@ -3246,7 +3279,7 @@ OLC_MODULE(oedit_wealth) {
 		msg_to_char(ch, "You can only set the wealth value on a wealth item.\r\n");
 	}
 	else {
-		GET_OBJ_VAL(obj, VAL_WEALTH_VALUE) = olc_process_number(ch, argument, "wealth value", "wealth", 0, 1000, GET_OBJ_VAL(obj, VAL_WEALTH_VALUE));
+		set_obj_val(obj, VAL_WEALTH_VALUE, olc_process_number(ch, argument, "wealth value", "wealth", 0, 1000, GET_OBJ_VAL(obj, VAL_WEALTH_VALUE)));
 	}
 }
 
@@ -3270,7 +3303,7 @@ OLC_MODULE(oedit_weapontype) {
 		}
 	}
 	
-	GET_OBJ_VAL(obj, pos) = olc_process_type(ch, argument, "weapon type", "weapontype", (const char**)get_weapon_types_string(), GET_OBJ_VAL(obj, pos));
+	set_obj_val(obj, pos, olc_process_type(ch, argument, "weapon type", "weapontype", (const char**)get_weapon_types_string(), GET_OBJ_VAL(obj, pos)));
 }
 
 

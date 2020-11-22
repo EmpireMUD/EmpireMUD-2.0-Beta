@@ -1595,8 +1595,8 @@ ACMD(do_veintap) {
 		amt = MIN(amt, GET_DRINK_CONTAINER_CAPACITY(container) - GET_DRINK_CONTAINER_CONTENTS(container));
 
 		charge_ability_cost(ch, BLOOD, amt, NOTHING, 0, WAIT_ABILITY);
-		GET_OBJ_VAL(container, VAL_DRINK_CONTAINER_CONTENTS) += amt;
-		GET_OBJ_VAL(container, VAL_DRINK_CONTAINER_TYPE) = LIQ_BLOOD;
+		set_obj_val(container, VAL_DRINK_CONTAINER_CONTENTS, GET_DRINK_CONTAINER_CONTENTS(container) + amt);
+		set_obj_val(container, VAL_DRINK_CONTAINER_TYPE, LIQ_BLOOD);
 		GET_OBJ_TIMER(container) = UNLIMITED;
 		
 		gain_ability_exp(ch, ABIL_VEINTAP, 33.4);

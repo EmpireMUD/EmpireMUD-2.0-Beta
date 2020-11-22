@@ -1029,7 +1029,7 @@ void olc_delete_generic(char_data *ch, any_vnum vnum) {
 				continue;
 			}
 			if (GEN_TYPE(gen) == GENERIC_LIQUID && IS_DRINK_CONTAINER(eus->obj) && GET_DRINK_CONTAINER_TYPE(eus->obj) == vnum) {
-				GET_OBJ_VAL(eus->obj, VAL_DRINK_CONTAINER_TYPE) = LIQ_WATER;
+				set_obj_val(eus->obj, VAL_DRINK_CONTAINER_TYPE, LIQ_WATER);
 				queue_delayed_update(chiter, CDU_SAVE);
 			}
 		}
@@ -1039,7 +1039,7 @@ void olc_delete_generic(char_data *ch, any_vnum vnum) {
 	// remove from live lists: drink containers
 	DL_FOREACH(object_list, obj) {
 		if (GEN_TYPE(gen) == GENERIC_LIQUID && IS_DRINK_CONTAINER(obj) && GET_DRINK_CONTAINER_TYPE(obj) == vnum) {
-			GET_OBJ_VAL(obj, VAL_DRINK_CONTAINER_TYPE) = LIQ_WATER;
+			set_obj_val(obj, VAL_DRINK_CONTAINER_TYPE, LIQ_WATER);
 		}
 	}
 	
@@ -1050,7 +1050,7 @@ void olc_delete_generic(char_data *ch, any_vnum vnum) {
 		}
 		
 		if (GEN_TYPE(gen) == GENERIC_LIQUID && IS_DRINK_CONTAINER(tpd->obj) && GET_DRINK_CONTAINER_TYPE(tpd->obj) == vnum) {
-			GET_OBJ_VAL(tpd->obj, VAL_DRINK_CONTAINER_TYPE) = LIQ_WATER;
+			set_obj_val(tpd->obj, VAL_DRINK_CONTAINER_TYPE, LIQ_WATER);
 		}
 	}
 	
@@ -1061,7 +1061,7 @@ void olc_delete_generic(char_data *ch, any_vnum vnum) {
 				continue;
 			}
 			if (GEN_TYPE(gen) == GENERIC_LIQUID && IS_DRINK_CONTAINER(eus->obj) && GET_DRINK_CONTAINER_TYPE(eus->obj) == vnum) {
-				GET_OBJ_VAL(eus->obj, VAL_DRINK_CONTAINER_TYPE) = LIQ_WATER;
+				set_obj_val(eus->obj, VAL_DRINK_CONTAINER_TYPE, LIQ_WATER);
 				EMPIRE_NEEDS_STORAGE_SAVE(emp) = TRUE;
 			}
 		}
@@ -1190,11 +1190,11 @@ void olc_delete_generic(char_data *ch, any_vnum vnum) {
 		found = FALSE;
 		if (GEN_TYPE(gen) == GENERIC_LIQUID && IS_DRINK_CONTAINER(obj) && GET_DRINK_CONTAINER_TYPE(obj) == vnum) {
 			found = TRUE;
-			GET_OBJ_VAL(obj, VAL_DRINK_CONTAINER_TYPE) = LIQ_WATER;
+			set_obj_val(obj, VAL_DRINK_CONTAINER_TYPE, LIQ_WATER);
 		}
 		if (GEN_TYPE(gen) == GENERIC_CURRENCY && IS_CURRENCY(obj) && GET_CURRENCY_VNUM(obj) == vnum) {
 			found = TRUE;
-			GET_OBJ_VAL(obj, VAL_CURRENCY_VNUM) = NOTHING;
+			set_obj_val(obj, VAL_CURRENCY_VNUM, NOTHING);
 		}
 		if (GEN_TYPE(gen) == GENERIC_COMPONENT && GET_OBJ_COMPONENT(obj) == vnum) {
 			found = TRUE;
@@ -1329,12 +1329,12 @@ void olc_delete_generic(char_data *ch, any_vnum vnum) {
 			found = FALSE;
 			if (GEN_TYPE(gen) == GENERIC_LIQUID && IS_DRINK_CONTAINER(GET_OLC_OBJECT(desc)) && GET_DRINK_CONTAINER_TYPE(GET_OLC_OBJECT(desc)) == vnum) {
 				found = TRUE;
-				GET_OBJ_VAL(GET_OLC_OBJECT(desc), VAL_DRINK_CONTAINER_TYPE) = LIQ_WATER;
+				set_obj_val(GET_OLC_OBJECT(desc), VAL_DRINK_CONTAINER_TYPE, LIQ_WATER);
 				msg_to_char(desc->character, "The generic liquid used by the object you're editing was deleted.\r\n");
 			}
 			if (GEN_TYPE(gen) == GENERIC_CURRENCY && IS_CURRENCY(GET_OLC_OBJECT(desc)) && GET_CURRENCY_VNUM(GET_OLC_OBJECT(desc)) == vnum) {
 				found = TRUE;
-				GET_OBJ_VAL(GET_OLC_OBJECT(desc), VAL_CURRENCY_VNUM) = NOTHING;
+				set_obj_val(GET_OLC_OBJECT(desc), VAL_CURRENCY_VNUM, NOTHING);
 				msg_to_char(desc->character, "The generic currency used by the object you're editing was deleted.\r\n");
 			}
 			if (GEN_TYPE(gen) == GENERIC_COMPONENT && GET_OBJ_COMPONENT(GET_OLC_OBJECT(desc)) == vnum) {

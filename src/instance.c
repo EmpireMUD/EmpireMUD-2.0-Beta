@@ -555,7 +555,7 @@ void link_instance_entrance(struct instance_data *inst) {
 		case ADV_LINK_PORTAL_CROP: {
 			if (obj_proto(INST_RULE(inst)->portal_in)) {
 				portal = read_object(INST_RULE(inst)->portal_in, TRUE);
-				GET_OBJ_VAL(portal, VAL_PORTAL_TARGET_VNUM) = GET_ROOM_VNUM(INST_START(inst));
+				set_obj_val(portal, VAL_PORTAL_TARGET_VNUM, GET_ROOM_VNUM(INST_START(inst)));
 				obj_to_room(portal, INST_LOCATION(inst));
 				if (ROOM_PEOPLE(IN_ROOM(portal))) {
 					act("$p spins open!", FALSE, ROOM_PEOPLE(IN_ROOM(portal)), portal, NULL, TO_CHAR | TO_ROOM);
@@ -564,7 +564,7 @@ void link_instance_entrance(struct instance_data *inst) {
 			}
 			if (obj_proto(INST_RULE(inst)->portal_out)) {
 				portal = read_object(INST_RULE(inst)->portal_out, TRUE);
-				GET_OBJ_VAL(portal, VAL_PORTAL_TARGET_VNUM) = GET_ROOM_VNUM(INST_LOCATION(inst));
+				set_obj_val(portal, VAL_PORTAL_TARGET_VNUM, GET_ROOM_VNUM(INST_LOCATION(inst)));
 				obj_to_room(portal, INST_START(inst));
 				if (ROOM_PEOPLE(IN_ROOM(portal))) {
 					act("$p spins open!", FALSE, ROOM_PEOPLE(IN_ROOM(portal)), portal, NULL, TO_CHAR | TO_ROOM);
@@ -1255,11 +1255,11 @@ void instance_obj_setup(struct instance_data *inst, obj_data *obj) {
 		case ITEM_PORTAL: {
 			// resolve room template number
 			if ((room = find_room_template_in_instance(inst, GET_PORTAL_TARGET_VNUM(obj)))) {
-				GET_OBJ_VAL(obj, VAL_PORTAL_TARGET_VNUM) = GET_ROOM_VNUM(room);
+				set_obj_val(obj, VAL_PORTAL_TARGET_VNUM, GET_ROOM_VNUM(room));
 			}
 			else {
 				// portals can't currently link out
-				GET_OBJ_VAL(obj, VAL_PORTAL_TARGET_VNUM) = NOWHERE;
+				set_obj_val(obj, VAL_PORTAL_TARGET_VNUM, NOWHERE);
 			}
 			break;
 		}

@@ -221,7 +221,7 @@ void b5_3_missile_update(void) {
 		// ALL bows are TYPE_BOW before this update
 		if (GET_MISSILE_WEAPON_TYPE(obj) != TYPE_BOW) {
 			log(" - updating %d %s from %d to %d (bow)", GET_OBJ_VNUM(obj), skip_filler(GET_OBJ_SHORT_DESC(obj)), GET_MISSILE_WEAPON_TYPE(obj), TYPE_BOW);
-			GET_OBJ_VAL(obj, VAL_MISSILE_WEAPON_TYPE) = TYPE_BOW;
+			set_obj_val(obj, VAL_MISSILE_WEAPON_TYPE, TYPE_BOW);
 			save_library_file_for_vnum(DB_BOOT_OBJ, GET_OBJ_VNUM(obj));
 		}
 	}

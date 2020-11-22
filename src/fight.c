@@ -1575,12 +1575,12 @@ obj_data *make_corpse(char_data *ch) {
 	GET_OBJ_SHORT_DESC(corpse) = str_dup(shortdesc);
 	GET_OBJ_LONG_DESC(corpse) = str_dup(longdesc);
 
-	GET_OBJ_VAL(corpse, VAL_CORPSE_IDNUM) = IS_NPC(ch) ? GET_MOB_VNUM(ch) : (-1 * GET_IDNUM(ch));
-	GET_OBJ_VAL(corpse, VAL_CORPSE_SIZE) = size;
-	GET_OBJ_VAL(corpse, VAL_CORPSE_FLAGS) = (MOB_FLAGGED(ch, MOB_NO_LOOT) ? CORPSE_NO_LOOT : NOBITS);
+	set_obj_val(corpse, VAL_CORPSE_IDNUM, IS_NPC(ch) ? GET_MOB_VNUM(ch) : (-1 * GET_IDNUM(ch)));
+	set_obj_val(corpse, VAL_CORPSE_SIZE, size);
+	set_obj_val(corpse, VAL_CORPSE_FLAGS, (MOB_FLAGGED(ch, MOB_NO_LOOT) ? CORPSE_NO_LOOT : NOBITS));
 		
 	if (human) {
-		SET_BIT(GET_OBJ_VAL(corpse, VAL_CORPSE_FLAGS), CORPSE_HUMAN);
+		set_obj_val(corpse, VAL_CORPSE_FLAGS, GET_CORPSE_FLAGS(corpse) | CORPSE_HUMAN);
 	}
 
 	/* transfer character's inventory to the corpse -- ONLY FOR NPCs */
@@ -3924,7 +3924,7 @@ void perform_violence_missile(char_data *ch, obj_data *weapon) {
 	
 	// update ammo
 	if (best) {
-		GET_OBJ_VAL(best, VAL_AMMO_QUANTITY) -= 1;
+		set_obj_val(best, VAL_AMMO_QUANTITY, GET_AMMO_QUANTITY(best) - 1);
 		SET_BIT(GET_OBJ_EXTRA(best), OBJ_NO_STORE);	// can no longer be stored
 	}
 	
