@@ -1704,7 +1704,7 @@ void do_customize_room(char_data *ch, char *argument) {
 
 ACMD(do_dedicate) {
 	char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH];
-	vehicle_data *ded_veh = NULL, *proto;
+	vehicle_data *ded_veh = NULL;
 	room_data *ded_room = NULL;
 	player_index_data *index;
 	

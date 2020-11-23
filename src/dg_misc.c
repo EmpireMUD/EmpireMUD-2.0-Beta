@@ -1132,7 +1132,7 @@ void script_heal(void *thing, int type, char *argument) {
 */
 void script_modify(char *argument) {
 	char targ_arg[MAX_INPUT_LENGTH], field_arg[MAX_INPUT_LENGTH], value[MAX_INPUT_LENGTH], temp[MAX_STRING_LENGTH];
-	vehicle_data *veh = NULL, *v_proto;
+	vehicle_data *veh = NULL;
 	struct companion_data *cd;
 	char_data *mob = NULL;
 	obj_data *obj = NULL, *o_proto;
