@@ -1829,6 +1829,7 @@ void delete_empire(empire_data *emp) {
 	cleanup_all_coins();
 	
 	free_empire(emp);
+	write_city_data_file();
 }
 
 

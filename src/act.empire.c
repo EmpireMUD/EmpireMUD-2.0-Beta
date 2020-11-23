@@ -4766,7 +4766,6 @@ ACMD(do_enroll) {
 			
 			// Delete the old empire
 			delete_empire(old);
-			write_city_data_file();
 		}
 		
 		// targ still around when we got this far?
