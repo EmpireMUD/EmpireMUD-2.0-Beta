@@ -634,17 +634,6 @@ void perform_reboot(void) {
 		return;
 	}
 
-	// prepare for the end!
-	save_all_empires();
-	write_fresh_binary_map_file();
-	write_whole_binary_world_index();
-	write_all_wld_files();
-	
-	if (binary_map_fl) {
-		fclose(binary_map_fl);
-		binary_map_fl = NULL;
-	}
-
 	if (reboot_control.type == SCMD_REBOOT) {
 		sprintf(buf, "\r\n[0;0;31m *** Rebooting ***[0;0;37m\r\nPlease be patient, this will take a second.\r\n\r\n");
 	}
@@ -682,6 +671,17 @@ void perform_reboot(void) {
 		// extract is not actually necessary since we're rebooting, right?
 		// extract_all_items(och);
 		// extract_char(och);
+	}
+	
+	// prepare for the end!
+	save_all_empires();
+	write_fresh_binary_map_file();
+	write_whole_binary_world_index();
+	write_all_wld_files();
+	
+	if (binary_map_fl) {
+		fclose(binary_map_fl);
+		binary_map_fl = NULL;
 	}
 
 	if (reboot_control.type == SCMD_REBOOT && fl) {
