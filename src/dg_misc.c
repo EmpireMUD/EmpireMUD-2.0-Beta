@@ -1308,8 +1308,6 @@ void script_modify(char *argument) {
 	}
 	// VEHICLE MODE
 	else if ((veh = get_vehicle(targ_arg))) {
-		v_proto = vehicle_proto(VEH_VNUM(veh));
-		
 		if (is_abbrev(field_arg, "icon")) {
 			if (!clear && str_cmp(value, "none") && !validate_icon(value)) {
 				script_log("%%mod%% called with invalid vehicle icon '%s'", value);

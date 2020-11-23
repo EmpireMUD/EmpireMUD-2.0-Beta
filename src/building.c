@@ -1802,8 +1802,7 @@ ACMD(do_dedicate) {
 		act(buf, FALSE, ch, NULL, ded_veh, TO_ROOM);
 		set_vehicle_extra_data(ded_veh, ROOM_EXTRA_DEDICATE_ID, index->idnum);
 		
-		// update strs
-		proto = vehicle_proto(VEH_VNUM(ded_veh));
+		// update strs:
 		
 		// keywords
 		snprintf(buf, sizeof(buf), "%s %s", VEH_KEYWORDS(ded_veh), index->fullname);
