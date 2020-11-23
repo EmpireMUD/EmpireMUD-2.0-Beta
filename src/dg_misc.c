@@ -1270,15 +1270,15 @@ void script_modify(char *argument) {
 				script_log("%%mod%% called with invalid room icon '%s'", value);
 			}
 			else {
-				change_room_custom_icon(room, (clear || !str_cmp(value, "none")) ? NULL : value);
+				set_room_custom_icon(room, (clear || !str_cmp(value, "none")) ? NULL : value);
 			}
 		}
 		else if (is_abbrev(field_arg, "name") || is_abbrev(field_arg, "title")) {
-			change_room_custom_name(room, (clear || !str_cmp(value, "none")) ? NULL : value);
+			set_room_custom_name(room, (clear || !str_cmp(value, "none")) ? NULL : value);
 		}
 		else if (is_abbrev(field_arg, "description")) {	// SETS the description
 			strcat(value, "\r\n");
-			change_room_custom_description(room, (clear ? NULL : value));
+			set_room_custom_description(room, (clear ? NULL : value));
 			if (ROOM_CUSTOM_DESCRIPTION(room)) {
 				format_text(&ROOM_CUSTOM_DESCRIPTION(room), (strlen(ROOM_CUSTOM_DESCRIPTION(room)) > 80 ? FORMAT_INDENT : 0), NULL, MAX_STRING_LENGTH);
 			}
@@ -1289,7 +1289,7 @@ void script_modify(char *argument) {
 			}
 			else {
 				snprintf(temp, sizeof(temp), "%s%s\r\n", ROOM_CUSTOM_DESCRIPTION(room) ? ROOM_CUSTOM_DESCRIPTION(room) : get_room_description(room), value);
-				change_room_custom_description(room, temp);
+				set_room_custom_description(room, temp);
 				format_text(&ROOM_CUSTOM_DESCRIPTION(room), (strlen(ROOM_CUSTOM_DESCRIPTION(room)) > 80 ? FORMAT_INDENT : 0), NULL, MAX_STRING_LENGTH);
 			}
 		}
@@ -1299,7 +1299,7 @@ void script_modify(char *argument) {
 			}
 			else {
 				snprintf(temp, sizeof(temp), "%s%s\r\n", ROOM_CUSTOM_DESCRIPTION(room) ? ROOM_CUSTOM_DESCRIPTION(room) : get_room_description(room), value);
-				change_room_custom_description(room, temp);
+				set_room_custom_description(room, temp);
 			}
 		}
 		else {

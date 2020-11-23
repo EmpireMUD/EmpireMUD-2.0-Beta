@@ -113,95 +113,6 @@ void change_chop_territory(room_data *room) {
 
 
 /**
-* Updates the natural sector of a map tile (interiors do not have this
-* property).
-*
-* @param struct map_data *map The location.
-* @param sector_data *sect The new natural sector.
-*/
-void change_natural_sector(struct map_data *map, sector_data *sect) {
-	map->natural_sector = sect;
-	request_world_save(map->vnum, WSAVE_MAP);
-}
-
-
-/**
-* Updates the natural sector of a map tile (interiors do not have this
-* property).
-*
-* @param room_data *room The room to change.
-* @param int idnum The new owner id (NOBODY to clear it).
-*/
-void change_private_owner(room_data *room, int idnum) {
-	if (COMPLEX_DATA(room) && COMPLEX_DATA(room)->private_owner != idnum) {
-		COMPLEX_DATA(room)->private_owner = idnum;
-		request_world_save(GET_ROOM_VNUM(room), WSAVE_ROOM);
-	}
-}
-
-
-/**
-* Updates the room's custom description. It does no validation, so you must
-* pre-validate the description.
-*
-* @param room_data *room The room to change.
-* @param char *desc The new description (will be copied).
-*/
-void change_room_custom_description(room_data *room, char *desc) {
-	if (ROOM_CUSTOM_DESCRIPTION(room)) {
-		free(ROOM_CUSTOM_DESCRIPTION(room));
-	}
-	ROOM_CUSTOM_DESCRIPTION(room) = desc ? str_dup(desc) : NULL;
-	request_world_save(GET_ROOM_VNUM(room), WSAVE_ROOM);
-}
-
-
-/**
-* Updates the room's custom icon. It does no validation, so you must
-* pre-validate the icon.
-*
-* @param room_data *room The room to change.
-* @param char *icon The new icon (will be copied).
-*/
-void change_room_custom_icon(room_data *room, char *icon) {
-	if (ROOM_CUSTOM_ICON(room)) {
-		free(ROOM_CUSTOM_ICON(room));
-	}
-	ROOM_CUSTOM_ICON(room) = icon ? str_dup(icon) : NULL;
-	request_world_save(GET_ROOM_VNUM(room), WSAVE_ROOM);
-}
-
-
-/**
-* Updates the room's custom name. It does no validation, so you must
-* pre-validate the name.
-*
-* @param room_data *room The room to change.
-* @param char *name The new name (will be copied).
-*/
-void change_room_custom_name(room_data *room, char *name) {
-	if (ROOM_CUSTOM_NAME(room)) {
-		free(ROOM_CUSTOM_NAME(room));
-	}
-	ROOM_CUSTOM_NAME(room) = name ? str_dup(name) : NULL;
-	request_world_save(GET_ROOM_VNUM(room), WSAVE_ROOM);
-}
-
-
-/**
-* Updates the height of a map tile/room. Technically interiors have this
-* property, too, but it has no function.
-*
-* @param room_data *room The room to change height on.
-* @param int height The new height.
-*/
-void change_room_height(room_data *room, int height) {
-	ROOM_HEIGHT(room) = height;
-	request_world_save(GET_ROOM_VNUM(room), WSAVE_MAP | WSAVE_ROOM);
-}
-
-
-/**
 * This function safely changes terrain by disassociating any old data, and
 * also storing a new original sect if necessary.
 *
@@ -419,7 +330,7 @@ void check_terrain_height(room_data *room) {
 			// ok, it has a height we can borrow... let's see if it's a good match
 			if (GET_SECT_CLIMATE(BASE_SECT(to_room)) == GET_SECT_CLIMATE(BASE_SECT(room))) {
 				// perfect match: just copy it
-				change_room_height(room, ROOM_HEIGHT(to_room));
+				set_room_height(room, ROOM_HEIGHT(to_room));
 				return;
 			}
 			else if (GET_SECT_CLIMATE(BASE_SECT(to_room)) & GET_SECT_CLIMATE(BASE_SECT(room)) && good_match != 0) {
@@ -432,11 +343,11 @@ void check_terrain_height(room_data *room) {
 			}
 		}
 		
-		change_room_height(room, good_match ? good_match : bad_match);
+		set_room_height(room, good_match ? good_match : bad_match);
 	}
 	else if (!ROOM_SECT_FLAGGED(room, SECTF_NEEDS_HEIGHT) && !SECT_FLAGGED(BASE_SECT(room), SECTF_NEEDS_HEIGHT)) {
 		// clear it
-		change_room_height(room, 0);
+		set_room_height(room, 0);
 	}
 }
 
@@ -951,6 +862,95 @@ void perform_burn_room(room_data *room) {
 		stop_room_action(room, ACT_HARVESTING);
 		stop_room_action(room, ACT_PLANTING);
 	}
+}
+
+
+/**
+* Updates the natural sector of a map tile (interiors do not have this
+* property).
+*
+* @param struct map_data *map The location.
+* @param sector_data *sect The new natural sector.
+*/
+void set_natural_sector(struct map_data *map, sector_data *sect) {
+	map->natural_sector = sect;
+	request_world_save(map->vnum, WSAVE_MAP);
+}
+
+
+/**
+* Updates the natural sector of a map tile (interiors do not have this
+* property).
+*
+* @param room_data *room The room to change.
+* @param int idnum The new owner id (NOBODY to clear it).
+*/
+void set_private_owner(room_data *room, int idnum) {
+	if (COMPLEX_DATA(room) && COMPLEX_DATA(room)->private_owner != idnum) {
+		COMPLEX_DATA(room)->private_owner = idnum;
+		request_world_save(GET_ROOM_VNUM(room), WSAVE_ROOM);
+	}
+}
+
+
+/**
+* Updates the room's custom description. It does no validation, so you must
+* pre-validate the description.
+*
+* @param room_data *room The room to change.
+* @param char *desc The new description (will be copied).
+*/
+void set_room_custom_description(room_data *room, char *desc) {
+	if (ROOM_CUSTOM_DESCRIPTION(room)) {
+		free(ROOM_CUSTOM_DESCRIPTION(room));
+	}
+	ROOM_CUSTOM_DESCRIPTION(room) = desc ? str_dup(desc) : NULL;
+	request_world_save(GET_ROOM_VNUM(room), WSAVE_ROOM);
+}
+
+
+/**
+* Updates the room's custom icon. It does no validation, so you must
+* pre-validate the icon.
+*
+* @param room_data *room The room to change.
+* @param char *icon The new icon (will be copied).
+*/
+void set_room_custom_icon(room_data *room, char *icon) {
+	if (ROOM_CUSTOM_ICON(room)) {
+		free(ROOM_CUSTOM_ICON(room));
+	}
+	ROOM_CUSTOM_ICON(room) = icon ? str_dup(icon) : NULL;
+	request_world_save(GET_ROOM_VNUM(room), WSAVE_ROOM);
+}
+
+
+/**
+* Updates the room's custom name. It does no validation, so you must
+* pre-validate the name.
+*
+* @param room_data *room The room to change.
+* @param char *name The new name (will be copied).
+*/
+void set_room_custom_name(room_data *room, char *name) {
+	if (ROOM_CUSTOM_NAME(room)) {
+		free(ROOM_CUSTOM_NAME(room));
+	}
+	ROOM_CUSTOM_NAME(room) = name ? str_dup(name) : NULL;
+	request_world_save(GET_ROOM_VNUM(room), WSAVE_ROOM);
+}
+
+
+/**
+* Updates the height of a map tile/room. Technically interiors have this
+* property, too, but it has no function.
+*
+* @param room_data *room The room to change height on.
+* @param int height The new height.
+*/
+void set_room_height(room_data *room, int height) {
+	ROOM_HEIGHT(room) = height;
+	request_world_save(GET_ROOM_VNUM(room), WSAVE_MAP | WSAVE_ROOM);
 }
 
 
@@ -3016,7 +3016,7 @@ void clear_private_owner(int id) {
 	// now actually clear it from any remaining rooms
 	HASH_ITER(hh, world_table, iter, next_iter) {
 		if (COMPLEX_DATA(iter) && ROOM_PRIVATE_OWNER(iter) == id) {
-			change_private_owner(iter, NOBODY);
+			set_private_owner(iter, NOBODY);
 			
 			// reset autostore timer
 			DL_FOREACH2(ROOM_CONTENTS(iter), obj, next_content) {
@@ -3471,7 +3471,7 @@ INTERACTION_FUNC(ruin_building_to_building_interaction) {
 	
 	// custom naming if #n is present (before complete_building)
 	if (strstr(GET_BLD_TITLE(proto), "#n")) {
-		change_room_custom_name(inter_room, NULL);
+		set_room_custom_name(inter_room, NULL);
 		ROOM_CUSTOM_NAME(inter_room) = str_replace("#n", old_bld ? GET_BLD_NAME(old_bld) : "a Building", GET_BLD_TITLE(proto));
 	}
 	
@@ -5389,6 +5389,9 @@ void write_whole_mapout(void) {
 	
 	fclose(pol_fl);
 	rename(POLITICAL_MAP_FILE TEMP_SUFFIX, POLITICAL_MAP_FILE);
+	
+	// also write a city data file
+	write_city_data_file();
 }
 
 

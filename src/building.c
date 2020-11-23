@@ -1312,7 +1312,7 @@ void start_dismantle_building(room_data *loc) {
 	
 	// unset private owner
 	if (ROOM_PRIVATE_OWNER(loc) != NOBODY) {
-		change_private_owner(loc, NOBODY);
+		set_private_owner(loc, NOBODY);
 	}
 	
 	// remove any existing resources remaining
@@ -1643,7 +1643,7 @@ void do_customize_room(char_data *ch, char *argument) {
 			msg_to_char(ch, "What would you like to name this room (or \"none\")?\r\n");
 		}
 		else if (!str_cmp(arg2, "none")) {
-			change_room_custom_name(IN_ROOM(ch), NULL);
+			set_room_custom_name(IN_ROOM(ch), NULL);
 			
 			// they lose hide-real-name if they rename it themselves
 			REMOVE_BIT(ROOM_BASE_FLAGS(IN_ROOM(ch)), ROOM_AFF_HIDE_REAL_NAME);
@@ -1662,7 +1662,7 @@ void do_customize_room(char_data *ch, char *argument) {
 			if (!ROOM_CUSTOM_NAME(IN_ROOM(ch))) {
 				gain_player_tech_exp(ch, PTECH_CUSTOMIZE_BUILDING, 33.4);
 			}
-			change_room_custom_name(IN_ROOM(ch), arg2);
+			set_room_custom_name(IN_ROOM(ch), arg2);
 			
 			// they lose hide-real-name if they rename it themselves
 			REMOVE_BIT(ROOM_BASE_FLAGS(IN_ROOM(ch)), ROOM_AFF_HIDE_REAL_NAME);
@@ -1681,7 +1681,7 @@ void do_customize_room(char_data *ch, char *argument) {
 			msg_to_char(ch, "You are already editing something else.\r\n");
 		}
 		else if (is_abbrev(arg2, "none")) {
-			change_room_custom_description(IN_ROOM(ch), NULL);
+			set_room_custom_description(IN_ROOM(ch), NULL);
 			msg_to_char(ch, "This room no longer has a custom description.\r\n");
 		}
 		else if (is_abbrev(arg2, "set")) {
@@ -1792,7 +1792,7 @@ ACMD(do_dedicate) {
 
 		// grant them hide-real-name for this
 		SET_BIT(ROOM_BASE_FLAGS(ded_room), ROOM_AFF_HIDE_REAL_NAME);
-		change_room_custom_name(ded_room, buf);
+		set_room_custom_name(ded_room, buf);
 		affect_total_room(ded_room);
 	}
 	if (ded_veh) {
@@ -2811,7 +2811,7 @@ ACMD(do_upgrade) {
 		
 		private_owner = ROOM_PRIVATE_OWNER(from_room);
 		if (COMPLEX_DATA(from_room)) {
-			change_private_owner(from_room, NOBODY);
+			set_private_owner(from_room, NOBODY);
 		}
 		
 		// store dedication and remove it
@@ -2847,7 +2847,7 @@ ACMD(do_upgrade) {
 		
 		if (VEH_INTERIOR_HOME_ROOM(from_veh) && COMPLEX_DATA(VEH_INTERIOR_HOME_ROOM(from_veh))) {
 			private_owner = ROOM_PRIVATE_OWNER(VEH_INTERIOR_HOME_ROOM(from_veh));
-			change_private_owner(VEH_INTERIOR_HOME_ROOM(from_veh), NOBODY);
+			set_private_owner(VEH_INTERIOR_HOME_ROOM(from_veh), NOBODY);
 		}
 		
 		// store dedication and remove it
@@ -2942,7 +2942,7 @@ ACMD(do_upgrade) {
 		}
 		
 		// transfer old data
-		change_private_owner(in_room, private_owner);
+		set_private_owner(in_room, private_owner);
 		GET_BUILT_WITH(in_room) = built_with;
 		ROOM_DEPLETION(in_room) = depletion;
 		
@@ -3017,7 +3017,7 @@ ACMD(do_upgrade) {
 				}
 				
 				// apply data inside
-				change_private_owner(interior, private_owner);
+				set_private_owner(interior, private_owner);
 				
 				// need to run this early because it won't run on completion
 				complete_wtrigger(interior);
@@ -3087,7 +3087,7 @@ ACMD(do_upgrade) {
 				}
 				
 				// apply data
-				change_private_owner(interior, private_owner);
+				set_private_owner(interior, private_owner);
 				
 				// need to run this early because it won't run on completion
 				complete_wtrigger(interior);

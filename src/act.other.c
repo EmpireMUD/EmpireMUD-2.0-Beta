@@ -239,7 +239,7 @@ void do_customize_road(char_data *ch, char *argument) {
 			msg_to_char(ch, "What would you like to name this road (or \"none\")?\r\n");
 		}
 		else if (!str_cmp(arg2, "none")) {
-			change_room_custom_name(IN_ROOM(ch), NULL);
+			set_room_custom_name(IN_ROOM(ch), NULL);
 			msg_to_char(ch, "This road no longer has a custom name.\r\n");
 			command_lag(ch, WAIT_ABILITY);
 		}
@@ -263,7 +263,7 @@ void do_customize_road(char_data *ch, char *argument) {
 				return;
 			}
 			
-			change_room_custom_name(IN_ROOM(ch), arg2);
+			set_room_custom_name(IN_ROOM(ch), arg2);
 			msg_to_char(ch, "This road tile is now called \"%s\".\r\n", arg2);
 			command_lag(ch, WAIT_ABILITY);
 		}

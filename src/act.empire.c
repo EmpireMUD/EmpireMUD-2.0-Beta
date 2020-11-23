@@ -1516,6 +1516,7 @@ void abandon_city(char_data *ch, empire_data *emp, char *argument) {
 	EMPIRE_NEEDS_SAVE(emp) = TRUE;
 	
 	et_change_cities(emp);
+	write_city_data_file();
 }
 
 
@@ -1727,6 +1728,7 @@ void downgrade_city(char_data *ch, empire_data *emp, char *argument) {
 	send_config_msg(ch, "ok_string");
 	read_empire_territory(emp, FALSE);
 	EMPIRE_NEEDS_SAVE(emp) = TRUE;
+	write_city_data_file();
 }
 
 
@@ -1865,6 +1867,7 @@ void found_city(char_data *ch, empire_data *emp, char *argument) {
 	EMPIRE_NEEDS_SAVE(emp) = TRUE;
 	
 	et_change_cities(emp);
+	write_city_data_file();
 }
 
 
@@ -2074,6 +2077,7 @@ void perform_abandon_city(empire_data *emp, struct empire_city_data *city, bool 
 		abandon_room(cityloc);
 	}
 	
+	EMPIRE_NEEDS_SAVE(emp) = TRUE;
 	et_change_cities(emp);
 }
 
@@ -2116,6 +2120,7 @@ void rename_city(char_data *ch, empire_data *emp, char *argument) {
 	free(city->name);
 	city->name = str_dup(newname);
 	EMPIRE_NEEDS_SAVE(emp) = TRUE;
+	write_city_data_file();
 }
 
 
@@ -2157,6 +2162,7 @@ void upgrade_city(char_data *ch, empire_data *emp, char *argument) {
 	read_empire_territory(emp, FALSE);
 	et_change_cities(emp);
 	EMPIRE_NEEDS_SAVE(emp) = TRUE;
+	write_city_data_file();
 }
 
 
@@ -5330,7 +5336,7 @@ ACMD(do_home) {
 				}
 			}
 			
-			change_private_owner(real, GET_IDNUM(ch));
+			set_private_owner(real, GET_IDNUM(ch));
 
 			// interior only
 			DL_FOREACH_SAFE2(interior_room_list, iter, next_iter, next_interior) {

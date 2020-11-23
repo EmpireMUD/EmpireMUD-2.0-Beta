@@ -246,7 +246,7 @@ OLC_MODULE(mapedit_height) {
 		msg_to_char(ch, "You must specify the height as a number.\r\n");
 	}
 	else {
-		change_room_height(IN_ROOM(ch), atoi(argument));
+		set_room_height(IN_ROOM(ch), atoi(argument));
 		msg_to_char(ch, "This tile now has a height of %d.\r\n", ROOM_HEIGHT(IN_ROOM(ch)));
 	}
 }
@@ -334,11 +334,11 @@ OLC_MODULE(mapedit_room_name) {
 	if (!*argument)
 		msg_to_char(ch, "What would you like to name this room/tile (or \"none\")?\r\n");
 	else if (!str_cmp(argument, "none")) {
-		change_room_custom_name(IN_ROOM(ch), NULL);
+		set_room_custom_name(IN_ROOM(ch), NULL);
 		msg_to_char(ch, "This room/tile no longer has a specialized name.\r\n");
 	}
 	else {
-		change_room_custom_name(IN_ROOM(ch), argument);
+		set_room_custom_name(IN_ROOM(ch), argument);
 		msg_to_char(ch, "This room/tile is now called \"%s\".\r\n", argument);
 	}
 }
@@ -350,7 +350,7 @@ OLC_MODULE(mapedit_icon) {
 	if (IS_INSIDE(IN_ROOM(ch)) || IS_ADVENTURE_ROOM(IN_ROOM(ch)))
 		msg_to_char(ch, "You may not do that here.\r\n");
 	else if (!str_cmp(argument, "none")) {
-		change_room_custom_icon(IN_ROOM(ch), NULL);
+		set_room_custom_icon(IN_ROOM(ch), NULL);
 		msg_to_char(ch, "This area no longer has a specialized icon.\r\n");
 	}
 	else if (!*argument)
@@ -360,7 +360,7 @@ OLC_MODULE(mapedit_icon) {
 	else if (argument[0] != '&')
 		msg_to_char(ch, "Icons must begin with a color code.\r\n");
 	else {
-		change_room_custom_icon(IN_ROOM(ch), argument);
+		set_room_custom_icon(IN_ROOM(ch), argument);
 		msg_to_char(ch, "This area now has the icon \"%s&0\".\r\n", argument);
 	}
 }
@@ -400,7 +400,7 @@ OLC_MODULE(mapedit_room_description) {
 		msg_to_char(ch, "To remove a description, use \".map description none\".\r\n");
 	}
 	else if (is_abbrev(argument, "none")) {
-		change_room_custom_description(IN_ROOM(ch), NULL);
+		set_room_custom_description(IN_ROOM(ch), NULL);
 		msg_to_char(ch, "This area no longer has a specialized description.\r\n");
 	}
 	else if (is_abbrev(argument, "set")) {
@@ -715,7 +715,7 @@ OLC_MODULE(mapedit_remember) {
 			}
 			
 			// looks good
-			change_natural_sector(map, map->sector_type);
+			set_natural_sector(map, map->sector_type);
 			++count;
 		}
 		
@@ -727,7 +727,7 @@ OLC_MODULE(mapedit_remember) {
 	}
 	else {	// normal processing for 1 room
 		map = &(world_map[FLAT_X_COORD(IN_ROOM(ch))][FLAT_Y_COORD(IN_ROOM(ch))]);
-		change_natural_sector(map, map->sector_type);
+		set_natural_sector(map, map->sector_type);
 		
 		syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: %s has set 'remember' for %s", GET_NAME(ch), room_log_identifier(IN_ROOM(ch)));
 		msg_to_char(ch, "You have set the map to remember the sector for this tile.\r\n");

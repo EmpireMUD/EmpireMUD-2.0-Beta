@@ -1138,15 +1138,15 @@ void b5_86_update(void) {
 	// update all map tiles
 	LL_FOREACH(land_map, map) {
 		if (!map->natural_sector || GET_SECT_VNUM(map->natural_sector) == temperate_crop) {
-			change_natural_sector(map, temperate_sect);
+			set_natural_sector(map, temperate_sect);
 			++temp;
 		}
 		else if (GET_SECT_VNUM(map->natural_sector) == desert_crop) {
-			change_natural_sector(map, desert_sect);
+			set_natural_sector(map, desert_sect);
 			++des;
 		}
 		else if (GET_SECT_VNUM(map->natural_sector) == jungle_crop) {
-			change_natural_sector(map, jungle_sect);
+			set_natural_sector(map, jungle_sect);
 			++jung;
 		}
 	}

@@ -5982,7 +5982,7 @@ void lock_icon(room_data *room, struct icon_data *use_icon) {
 	if (!(icon = use_icon)) {
 		icon = get_icon_from_set(GET_SECT_ICONS(SECT(room)), GET_SEASON(room));
 	}
-	change_room_custom_icon(room, icon->icon);
+	set_room_custom_icon(room, icon->icon);
 }
 
 

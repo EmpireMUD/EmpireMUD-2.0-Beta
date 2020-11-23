@@ -2965,7 +2965,7 @@ void perform_abandon_room(room_data *room) {
 	REMOVE_BIT(ROOM_BASE_FLAGS(room), ROOM_AFF_PUBLIC | ROOM_AFF_NO_WORK | ROOM_AFF_NO_ABANDON | ROOM_AFF_NO_DISMANTLE);
 
 	if (ROOM_PRIVATE_OWNER(room) != NOBODY) {
-		change_private_owner(room, NOBODY);
+		set_private_owner(room, NOBODY);
 	}
 	
 	// reschedule unload check now that it's unowned

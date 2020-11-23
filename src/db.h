@@ -376,6 +376,7 @@ int city_points_available(empire_data *emp);
 int count_cities(empire_data *emp);
 int count_city_points_used(empire_data *emp);
 struct empire_city_data *create_city_entry(empire_data *emp, char *name, room_data *location, int type);
+void write_city_data_file();
 
 // classes
 extern class_data *class_table;
@@ -885,12 +886,12 @@ void annual_update_map_tile(struct map_data *tile);
 void annual_world_update();
 void cancel_world_save_request(room_vnum room, int only_save_type);
 void change_chop_territory(room_data *room);
-void change_natural_sector(struct map_data *map, sector_data *sect);
-void change_private_owner(room_data *room, int idnum);
-void change_room_custom_description(room_data *room, char *desc);
-void change_room_custom_icon(room_data *room, char *icon);
-void change_room_custom_name(room_data *room, char *name);
-void change_room_height(room_data *room, int height);
+void set_natural_sector(struct map_data *map, sector_data *sect);
+void set_private_owner(room_data *room, int idnum);
+void set_room_custom_description(room_data *room, char *desc);
+void set_room_custom_icon(room_data *room, char *icon);
+void set_room_custom_name(room_data *room, char *name);
+void set_room_height(room_data *room, int height);
 void check_all_exits();
 void check_terrain_height(room_data *room);
 void clear_private_owner(int id);

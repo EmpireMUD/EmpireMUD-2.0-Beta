@@ -5017,7 +5017,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					}
 					else if (!str_cmp(field, "height")) {
 						if (subfield && *subfield && isdigit(*subfield)) {
-							change_room_height(r, atoi(subfield));
+							set_room_height(r, atoi(subfield));
 						}
 						snprintf(str, slen, "%d", ROOM_HEIGHT(r));
 					}
