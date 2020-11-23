@@ -159,6 +159,7 @@ OLC_MODULE(mapedit_terrain) {
 			free(city);
 			rescan_emp = emp;
 			EMPIRE_NEEDS_SAVE(emp) = TRUE;
+			write_city_data_file();
 		}
 		
 		if (sect) {
@@ -437,6 +438,7 @@ OLC_MODULE(mapedit_ruin) {
 		msg_to_char(ch, "Ok.\r\n");
 		if (IS_CITY_CENTER(room)) {
 			disassociate_building(room);
+			write_city_data_file();
 		}
 		else {
 			ruin_one_building(room);
