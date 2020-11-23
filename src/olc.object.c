@@ -1914,25 +1914,6 @@ void set_obj_look_desc(obj_data *obj, const char *str, bool format) {
 
 
 /**
-* Updates the object's short desc. It does no validation, so you must
-* pre-validate the text.
-*
-* @param obj_data *obj The object to change.
-* @param const char *str The new short desc (will be copied). Or, NULL to set it back to the prototype.
-*/
-void set_obj_short_desc(obj_data *obj, const char *str) {
-	obj_data *proto = obj_proto(GET_OBJ_VNUM(obj));
-	const char *default_val = "an unknown object";
-	
-	if (GET_OBJ_SHORT_DESC(obj) && (!proto || GET_OBJ_SHORT_DESC(obj) != GET_OBJ_SHORT_DESC(proto))) {
-		free(GET_OBJ_SHORT_DESC(obj));
-	}
-	GET_OBJ_SHORT_DESC(obj) = (str ? str_dup(str) : (proto ? GET_OBJ_SHORT_DESC(proto) : str_dup(default_val)));
-	request_obj_save_in_world(obj);
-}
-
-
-/**
 * Updates the object's look desc by adding to the end. It does no validation,
 * so you must pre-validate the text.
 *
@@ -1961,6 +1942,25 @@ void set_obj_look_desc_append(obj_data *obj, const char *str, bool format) {
 		
 		request_obj_save_in_world(obj);
 	}
+}
+
+
+/**
+* Updates the object's short desc. It does no validation, so you must
+* pre-validate the text.
+*
+* @param obj_data *obj The object to change.
+* @param const char *str The new short desc (will be copied). Or, NULL to set it back to the prototype.
+*/
+void set_obj_short_desc(obj_data *obj, const char *str) {
+	obj_data *proto = obj_proto(GET_OBJ_VNUM(obj));
+	const char *default_val = "an unknown object";
+	
+	if (GET_OBJ_SHORT_DESC(obj) && (!proto || GET_OBJ_SHORT_DESC(obj) != GET_OBJ_SHORT_DESC(proto))) {
+		free(GET_OBJ_SHORT_DESC(obj));
+	}
+	GET_OBJ_SHORT_DESC(obj) = (str ? str_dup(str) : (proto ? GET_OBJ_SHORT_DESC(proto) : str_dup(default_val)));
+	request_obj_save_in_world(obj);
 }
 
 

@@ -863,16 +863,13 @@ void do_customize_vehicle(char_data *ch, char *argument) {
 			proto = vehicle_proto(VEH_VNUM(veh));
 			
 			if (proto && VEH_SHORT_DESC(veh) != VEH_SHORT_DESC(proto)) {
-				free(VEH_SHORT_DESC(veh));
-				VEH_SHORT_DESC(veh) = VEH_SHORT_DESC(proto);
+				set_vehicle_short_desc(veh, NULL);
 			}
 			if (proto && VEH_KEYWORDS(veh) != VEH_KEYWORDS(proto)) {
-				free(VEH_KEYWORDS(veh));
-				VEH_KEYWORDS(veh) = VEH_KEYWORDS(proto);
+				set_vehicle_keywords(veh, NULL);
 			}
 			if (proto && VEH_LONG_DESC(veh) != VEH_LONG_DESC(proto) && strstr(VEH_LONG_DESC(veh), VEH_LONG_DESC(proto))) {
-				free(VEH_LONG_DESC(veh));
-				VEH_LONG_DESC(veh) = VEH_LONG_DESC(proto);
+				set_vehicle_long_desc(veh, NULL);
 			}
 			
 			msg_to_char(ch, "The %s no longer has a custom name.\r\n", VEH_OR_BLD(veh));
@@ -887,20 +884,14 @@ void do_customize_vehicle(char_data *ch, char *argument) {
 			proto = vehicle_proto(VEH_VNUM(veh));
 			
 			// change short desc
-			if (!proto || VEH_SHORT_DESC(veh) != VEH_SHORT_DESC(proto)) {
-				free(VEH_SHORT_DESC(veh));
-			}
-			else {
+			if (proto && VEH_SHORT_DESC(veh) == VEH_SHORT_DESC(proto)) {
 				gain_player_tech_exp(ch, PTECH_CUSTOMIZE_VEHICLE, 33.4);
 			}
-			VEH_SHORT_DESC(veh) = str_dup(argument);
+			set_vehicle_short_desc(veh, argument);
 			
 			// change keywords
 			sprintf(buf, "%s %s", fname(VEH_KEYWORDS(veh)), skip_filler(argument));
-			if (!proto || VEH_KEYWORDS(veh) != VEH_KEYWORDS(proto)) {
-				free(VEH_KEYWORDS(veh));
-			}
-			VEH_KEYWORDS(veh) = str_dup(buf);
+			set_vehicle_keywords(veh, buf);
 			
 			// optionally, change the longdesc too
 			if (proto && (VEH_LONG_DESC(veh) == VEH_LONG_DESC(proto) || strstr(VEH_LONG_DESC(veh), VEH_LONG_DESC(proto)))) {
@@ -908,7 +899,7 @@ void do_customize_vehicle(char_data *ch, char *argument) {
 					free(VEH_LONG_DESC(veh));
 				}
 				sprintf(buf, "%s (%s)", VEH_LONG_DESC(proto), VEH_SHORT_DESC(veh));
-				VEH_LONG_DESC(veh) = str_dup(buf);
+				set_vehicle_long_desc(veh, buf);
 			}
 			
 			msg_to_char(ch, "It is now called \"%s\".\r\n", argument);
@@ -919,13 +910,7 @@ void do_customize_vehicle(char_data *ch, char *argument) {
 			msg_to_char(ch, "What would you like to make the long description of this %s (or \"none\")?\r\n", VEH_OR_BLD(veh));
 		}
 		else if (!str_cmp(argument, "none")) {
-			proto = vehicle_proto(VEH_VNUM(veh));
-			
-			if (!proto || VEH_LONG_DESC(veh) != VEH_LONG_DESC(proto)) {
-				free(VEH_LONG_DESC(veh));
-				VEH_LONG_DESC(veh) = VEH_LONG_DESC(proto);
-			}
-			
+			set_vehicle_long_desc(veh, NULL);
 			msg_to_char(ch, "It no longer has a custom long description.\r\n");
 		}
 		else if (color_code_length(argument) > 0) {
@@ -937,15 +922,11 @@ void do_customize_vehicle(char_data *ch, char *argument) {
 		else {
 			proto = vehicle_proto(VEH_VNUM(veh));
 			
-			if (!proto || VEH_LONG_DESC(veh) != VEH_LONG_DESC(proto)) {
-				free(VEH_LONG_DESC(veh));
-			}
-			else {
+			if (proto && VEH_LONG_DESC(veh) == VEH_LONG_DESC(proto)) {
 				gain_player_tech_exp(ch, PTECH_CUSTOMIZE_VEHICLE, 33.4);
 			}
 			
-			VEH_LONG_DESC(veh) = str_dup(argument);
-			
+			set_vehicle_long_desc(veh, argument);
 			msg_to_char(ch, "It now has the long description:\r\n%s\r\n", argument);
 		}
 	}
@@ -958,14 +939,7 @@ void do_customize_vehicle(char_data *ch, char *argument) {
 			msg_to_char(ch, "You are already editing something else.\r\n");
 		}
 		else if (is_abbrev(argument, "none")) {
-			proto = vehicle_proto(VEH_VNUM(veh));
-			
-			if (!proto || VEH_LOOK_DESC(veh) != VEH_LOOK_DESC(proto)) {
-				if (VEH_LOOK_DESC(veh)) {
-					free(VEH_LOOK_DESC(veh));
-				}
-				VEH_LOOK_DESC(veh) = VEH_LOOK_DESC(proto);
-			}
+			set_vehicle_look_desc(veh, NULL, FALSE);
 			msg_to_char(ch, "It no longer has a custom description.\r\n");
 		}
 		else if (is_abbrev(argument, "set")) {
@@ -974,12 +948,14 @@ void do_customize_vehicle(char_data *ch, char *argument) {
 			if (!proto || VEH_LOOK_DESC(veh) != VEH_LOOK_DESC(proto)) {
 				// differs from proto
 				start_string_editor(ch->desc, "description", &VEH_LOOK_DESC(veh), MAX_ITEM_DESCRIPTION, TRUE);
+				ch->desc->save_room_id = GET_ROOM_VNUM(IN_ROOM(ch));
 			}
 			else {
 				// has proto's desc
 				VEH_LOOK_DESC(veh) = VEH_LOOK_DESC(proto) ? str_dup(VEH_LOOK_DESC(proto)) : NULL;
 				start_string_editor(ch->desc, "description", &VEH_LOOK_DESC(veh), MAX_ITEM_DESCRIPTION, TRUE);
 				ch->desc->str_on_abort = VEH_LOOK_DESC(proto);
+				ch->desc->save_room_id = GET_ROOM_VNUM(IN_ROOM(ch));
 				
 				gain_player_tech_exp(ch, PTECH_CUSTOMIZE_VEHICLE, 33.4);
 			}

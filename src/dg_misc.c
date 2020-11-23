@@ -1315,41 +1315,18 @@ void script_modify(char *argument) {
 				script_log("%%mod%% called with invalid vehicle icon '%s'", value);
 			}
 			else {
-				if (VEH_ICON(veh) && (!v_proto || VEH_ICON(veh) != VEH_ICON(v_proto))) {
-					free(VEH_ICON(veh));
-				}
-				if (clear) {
-					VEH_ICON(veh) = VEH_ICON(v_proto);
-				}
-				else if (!str_cmp(value, "none")) {
-					VEH_ICON(veh) = NULL;
-				}
-				else {
-					VEH_ICON(veh) = str_dup(value);
-				}
+				set_vehicle_icon(veh, (clear || !str_cmp(value, "none")) ? NULL : value);
 			}
 		}
 		else if (is_abbrev(field_arg, "keywords")) {
-			if (VEH_KEYWORDS(veh) && (!v_proto || VEH_KEYWORDS(veh) != VEH_KEYWORDS(v_proto))) {
-				free(VEH_KEYWORDS(veh));
-			}
-			VEH_KEYWORDS(veh) = clear ? (v_proto ? VEH_KEYWORDS(v_proto) : str_dup("ERROR")) : str_dup(value);
+			set_vehicle_keywords(veh, clear ? NULL : value);
 		}
 		else if (is_abbrev(field_arg, "longdescription")) {
-			if (VEH_LONG_DESC(veh) && (!v_proto || VEH_LONG_DESC(veh) != VEH_LONG_DESC(v_proto))) {
-				free(VEH_LONG_DESC(veh));
-			}
-			VEH_LONG_DESC(veh) = clear ? (v_proto ? VEH_LONG_DESC(v_proto) : str_dup("ERROR")) : str_dup(value);
+			set_vehicle_long_desc(veh, clear ? NULL : value);
 		}
 		else if (is_abbrev(field_arg, "lookdescription")) {	// SETS the lookdescription
-			if (VEH_LOOK_DESC(veh) && (!v_proto || VEH_LOOK_DESC(veh) != VEH_LOOK_DESC(v_proto))) {
-				free(VEH_LOOK_DESC(veh));
-			}
 			strcat(value, "\r\n");
-			VEH_LOOK_DESC(veh) = clear ? (v_proto ? VEH_LOOK_DESC(v_proto) : str_dup("")) : str_dup(value);
-			if (VEH_LOOK_DESC(veh) && (!v_proto || VEH_LOOK_DESC(veh) != VEH_LOOK_DESC(v_proto))) {
-				format_text(&VEH_LOOK_DESC(veh), (strlen(VEH_LOOK_DESC(veh)) > 80 ? FORMAT_INDENT : 0), NULL, MAX_STRING_LENGTH);
-			}
+			set_vehicle_look_desc(veh, clear ? NULL : value, TRUE);
 		}
 		else if (is_abbrev(field_arg, "append-lookdescription")) {	// ADDS TO THE END OF the lookdescription
 			if (strlen(NULLSAFE(VEH_LOOK_DESC(veh))) + strlen(value) + 2 > MAX_ITEM_DESCRIPTION) {
@@ -1357,13 +1334,7 @@ void script_modify(char *argument) {
 			}
 			else {
 				snprintf(temp, sizeof(temp), "%s%s\r\n", NULLSAFE(VEH_LOOK_DESC(veh)), value);
-				if (VEH_LOOK_DESC(veh) && (!v_proto || VEH_LOOK_DESC(veh) != VEH_LOOK_DESC(v_proto))) {
-					free(VEH_LOOK_DESC(veh));
-				}
-				VEH_LOOK_DESC(veh) = str_dup(temp);
-				if (VEH_LOOK_DESC(veh) && (!v_proto || VEH_LOOK_DESC(veh) != VEH_LOOK_DESC(v_proto))) {
-					format_text(&VEH_LOOK_DESC(veh), (strlen(VEH_LOOK_DESC(veh)) > 80 ? FORMAT_INDENT : 0), NULL, MAX_STRING_LENGTH);
-				}
+				set_vehicle_look_desc_append(veh, temp, TRUE);
 			}
 		}
 		else if (is_abbrev(field_arg, "append-lookdesc-noformat")) {	// ADDS TO THE END OF the lookdescription
@@ -1372,17 +1343,11 @@ void script_modify(char *argument) {
 			}
 			else {
 				snprintf(temp, sizeof(temp), "%s%s\r\n", NULLSAFE(VEH_LOOK_DESC(veh)), value);
-				if (VEH_LOOK_DESC(veh) && (!v_proto || VEH_LOOK_DESC(veh) != VEH_LOOK_DESC(v_proto))) {
-					free(VEH_LOOK_DESC(veh));
-				}
-				VEH_LOOK_DESC(veh) = str_dup(temp);
+				set_vehicle_look_desc_append(veh, temp, FALSE);
 			}
 		}
 		else if (is_abbrev(field_arg, "shortdescription")) {
-			if (VEH_SHORT_DESC(veh) && (!v_proto || VEH_SHORT_DESC(veh) != VEH_SHORT_DESC(v_proto))) {
-				free(VEH_SHORT_DESC(veh));
-			}
-			VEH_SHORT_DESC(veh) = clear ? (v_proto ? VEH_SHORT_DESC(v_proto) : str_dup("ERROR")) : str_dup(value);
+			set_vehicle_short_desc(veh, clear ? NULL : value);
 		}
 		else {
 			script_log("%%mod%% called with invalid vehicle field '%s'", field_arg);

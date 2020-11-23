@@ -625,7 +625,7 @@ ADMIN_UTIL(util_bldconvert) {
 	}
 	else {
 		// open building: copy portions of it for the vehicle but don't create a new bld
-		icon = GET_BLD_ICON(from_bld) ? str_dup(GET_BLD_ICON(from_bld)) : NULL;
+		icon = GET_BLD_ICON(from_bld) ? GET_BLD_ICON(from_bld) : NULL;
 		fame = GET_BLD_FAME(from_bld);
 		military = GET_BLD_MILITARY(from_bld);
 		functions = GET_BLD_FUNCTIONS(from_bld);
@@ -676,10 +676,7 @@ ADMIN_UTIL(util_bldconvert) {
 		VEH_VNUM(to_veh) = to_vnum;
 		
 		// copy kws
-		if (VEH_KEYWORDS(to_veh)) {
-			free(VEH_KEYWORDS(to_veh));
-		}
-		VEH_KEYWORDS(to_veh) = str_dup(GET_BLD_NAME(from_bld));
+		set_vehicle_keywords(to_veh, GET_BLD_NAME(from_bld));
 		strtolower(VEH_KEYWORDS(to_veh));
 		
 		// build short desc
@@ -688,7 +685,7 @@ ADMIN_UTIL(util_bldconvert) {
 		}
 		snprintf(buf, sizeof(buf), "%s %s", AN(GET_BLD_NAME(from_bld)), GET_BLD_NAME(from_bld));
 		strtolower(buf);
-		VEH_SHORT_DESC(to_veh) = str_dup(buf);
+		set_vehicle_short_desc(to_veh, buf);
 		
 		// build long desc
 		if (VEH_LONG_DESC(to_veh)) {
@@ -696,19 +693,13 @@ ADMIN_UTIL(util_bldconvert) {
 		}
 		snprintf(buf, sizeof(buf), "%s %s is here.", AN(GET_BLD_NAME(from_bld)), GET_BLD_NAME(from_bld));
 		strtolower(buf);
-		VEH_LONG_DESC(to_veh) = str_dup(CAP(buf));
+		set_vehicle_long_desc(to_veh, CAP(buf));
 		
 		// look desc?
-		if (VEH_LOOK_DESC(to_veh)) {
-			free(VEH_LOOK_DESC(to_veh));
-		}
-		VEH_LOOK_DESC(to_veh) = GET_BLD_DESC(from_bld) ? str_dup(GET_BLD_DESC(from_bld)) : NULL;
+		set_vehicle_look_desc(to_veh, GET_BLD_DESC(from_bld), FALSE);
 		
 		// icon?
-		if (VEH_ICON(to_veh)) {
-			free(VEH_ICON(to_veh));
-		}
-		VEH_ICON(to_veh) = icon;
+		set_vehicle_icon(to_veh, icon);
 		
 		// basic traits
 		VEH_SIZE(to_veh) = 1;

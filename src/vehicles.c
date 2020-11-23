@@ -878,7 +878,7 @@ INTERACTION_FUNC(ruin_vehicle_to_vehicle_interaction) {
 		}
 	}
 	
-	// custom naming if #n is present
+	// custom naming if #n is present: note does not use set_vehicle_keywords etc because of special handling
 	if (strstr(VEH_KEYWORDS(ruin), "#n")) {
 		to_free = (!proto || VEH_KEYWORDS(ruin) != VEH_KEYWORDS(proto)) ? VEH_KEYWORDS(ruin) : NULL;
 		VEH_KEYWORDS(ruin) = str_replace("#n", VEH_SHORT_DESC(inter_veh), VEH_KEYWORDS(ruin));
@@ -905,6 +905,7 @@ INTERACTION_FUNC(ruin_vehicle_to_vehicle_interaction) {
 		set_vehicle_extra_data(ruin, ROOM_EXTRA_PAINT_COLOR, VEH_PAINT_COLOR(inter_veh));
 	}
 	
+	request_vehicle_save_in_world(ruin);
 	load_vtrigger(ruin);
 	return TRUE;
 }
@@ -986,6 +987,148 @@ void scale_vehicle_to_level(vehicle_data *veh, int level) {
 	// set the level
 	VEH_SCALE_LEVEL(veh) = level;
 	request_vehicle_save_in_world(veh);
+}
+
+
+/**
+* Updates the vehicle's icon. It does no validation, so you must
+* pre-validate the text as 4 visible characters wide.
+*
+* @param vehicle_data *veh The vehicle to change.
+* @param const char *str The new icon (will be copied). Or, NULL to set it back to the prototype.
+*/
+void set_vehicle_icon(vehicle_data *veh, const char *str) {
+	vehicle_data *proto = vehicle_proto(VEH_VNUM(veh));
+	
+	if (VEH_ICON(veh) && (!proto || VEH_ICON(veh) != VEH_ICON(proto))) {
+		free(VEH_ICON(veh));
+	}
+	VEH_ICON(veh) = (str ? str_dup(str) : (proto ? VEH_ICON(proto) : NULL));
+	request_vehicle_save_in_world(veh);
+}
+
+
+/**
+* Updates the vehicle's keywords. It does no validation, so you must
+* pre-validate the text.
+*
+* @param vehicle_data *veh The vehicle to change.
+* @param const char *str The new keywords (will be copied). Or, NULL to set it back to the prototype.
+*/
+void set_vehicle_keywords(vehicle_data *veh, const char *str) {
+	vehicle_data *proto = vehicle_proto(VEH_VNUM(veh));
+	const char *default_val = "vehicle unknown";
+	
+	if (VEH_KEYWORDS(veh) && (!proto || VEH_KEYWORDS(veh) != VEH_KEYWORDS(proto))) {
+		free(VEH_KEYWORDS(veh));
+	}
+	VEH_KEYWORDS(veh) = (str ? str_dup(str) : (proto ? VEH_KEYWORDS(proto) : str_dup(default_val)));
+	request_vehicle_save_in_world(veh);
+}
+
+
+/**
+* Updates the vehicle's long desc. It does no validation, so you must
+* pre-validate the text.
+*
+* @param vehicle_data *veh The vehicle to change.
+* @param const char *str The new long desc (will be copied). Or, NULL to set it back to the prototype.
+*/
+void set_vehicle_long_desc(vehicle_data *veh, const char *str) {
+	vehicle_data *proto = vehicle_proto(VEH_VNUM(veh));
+	const char *default_val = "An unknown vehicle is here.";
+	
+	if (VEH_LONG_DESC(veh) && (!proto || VEH_LONG_DESC(veh) != VEH_LONG_DESC(proto))) {
+		free(VEH_LONG_DESC(veh));
+	}
+	VEH_LONG_DESC(veh) = (str ? str_dup(str) : (proto ? VEH_LONG_DESC(proto) : str_dup(default_val)));
+	request_vehicle_save_in_world(veh);
+}
+
+
+/**
+* Updates the vehicle's look desc. It does no validation, so you must
+* pre-validate the text.
+*
+* @param vehicle_data *veh The vehicle to change.
+* @param const char *str The new look desc (will be copied). Or, NULL to set it back to the prototype.
+* @param bool format If TRUE, will format it as a paragraph (IF str was not-null).
+*/
+void set_vehicle_look_desc(vehicle_data *veh, const char *str, bool format) {
+	vehicle_data *proto = vehicle_proto(VEH_VNUM(veh));
+	const char *default_val = "An unknown vehicle is here.\r\n";
+	char temp[MAX_STRING_LENGTH];
+	const char *val = str;
+	
+	if (VEH_LOOK_DESC(veh) && (!proto || VEH_LOOK_DESC(veh) != VEH_LOOK_DESC(proto))) {
+		free(VEH_LOOK_DESC(veh));
+	}
+	
+	// check trailing crlf
+	if (str && *str && str[strlen(str)-1] != '\r' && str[strlen(str)-1] != '\n') {
+		strcpy(temp, str);
+		strcat(temp, "\r\n");	// I think there's always room for this
+		val = temp;
+	}
+	VEH_LOOK_DESC(veh) = (val ? str_dup(val) : (proto ? VEH_LOOK_DESC(proto) : str_dup(default_val)));
+	
+	// format if requested
+	if (val && format) {
+		format_text(&VEH_LOOK_DESC(veh), (strlen(VEH_LOOK_DESC(veh)) > 80 ? FORMAT_INDENT : 0), NULL, MAX_STRING_LENGTH);
+	}
+	
+	request_vehicle_save_in_world(veh);
+}
+
+
+/**
+* Updates the vehicle's short desc. It does no validation, so you must
+* pre-validate the text.
+*
+* @param vehicle_data *veh The vehicle to change.
+* @param const char *str The new short desc (will be copied). Or, NULL to set it back to the prototype.
+*/
+void set_vehicle_short_desc(vehicle_data *veh, const char *str) {
+	vehicle_data *proto = vehicle_proto(VEH_VNUM(veh));
+	const char *default_val = "an unknown vehicle";
+	
+	if (VEH_SHORT_DESC(veh) && (!proto || VEH_SHORT_DESC(veh) != VEH_SHORT_DESC(proto))) {
+		free(VEH_SHORT_DESC(veh));
+	}
+	VEH_SHORT_DESC(veh) = (str ? str_dup(str) : (proto ? VEH_SHORT_DESC(proto) : str_dup(default_val)));
+	request_vehicle_save_in_world(veh);
+}
+
+
+/**
+* Updates the vehicle's look desc by adding to the end. It does no validation,
+* so you must pre-validate the text.
+*
+* @param vehicle_data *veh The vehicle to change.
+* @param const char *str The text to append to the look desc (will be copied).
+* @param bool format If TRUE, will format it as a paragraph.
+*/
+void set_vehicle_look_desc_append(vehicle_data *veh, const char *str, bool format) {
+	vehicle_data *proto = vehicle_proto(VEH_VNUM(veh));
+	char temp[MAX_STRING_LENGTH];
+	
+	if (str && *str) {
+		snprintf(temp, sizeof(temp), "%s%s", NULLSAFE(VEH_LOOK_DESC(veh)), str);
+		
+		// check trailing crlf
+		if (str[strlen(str)-1] != '\r' && str[strlen(str)-1] != '\n') {
+			strcat(temp, "\r\n");
+		}
+		if (VEH_LOOK_DESC(veh) && (!proto || VEH_LOOK_DESC(veh) != VEH_LOOK_DESC(proto))) {
+			free(VEH_LOOK_DESC(veh));
+		}
+		VEH_LOOK_DESC(veh) = str_dup(temp);
+		if (format) {
+			format_text(&VEH_LOOK_DESC(veh), (strlen(VEH_LOOK_DESC(veh)) > 80 ? FORMAT_INDENT : 0), NULL, MAX_STRING_LENGTH);
+		}
+		
+		request_vehicle_save_in_world(veh);
+	}
 }
 
 

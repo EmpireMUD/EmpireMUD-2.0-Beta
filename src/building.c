@@ -1807,17 +1807,11 @@ ACMD(do_dedicate) {
 		
 		// keywords
 		snprintf(buf, sizeof(buf), "%s %s", VEH_KEYWORDS(ded_veh), index->fullname);
-		if (!proto || VEH_KEYWORDS(ded_veh) != VEH_KEYWORDS(proto)) {
-			free(VEH_KEYWORDS(ded_veh));
-		}
-		VEH_KEYWORDS(ded_veh) = str_dup(buf);
+		set_vehicle_keywords(ded_veh, buf);
 		
 		// short desc
 		snprintf(buf, sizeof(buf), "%s of %s", VEH_SHORT_DESC(ded_veh), index->fullname);
-		if (!proto || VEH_SHORT_DESC(ded_veh) != VEH_SHORT_DESC(proto)) {
-			free(VEH_SHORT_DESC(ded_veh));
-		}
-		VEH_SHORT_DESC(ded_veh) = str_dup(buf);
+		set_vehicle_short_desc(ded_veh, buf);
 	}
 }
 

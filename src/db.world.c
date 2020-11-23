@@ -3598,7 +3598,7 @@ INTERACTION_FUNC(ruin_building_to_vehicle_interaction) {
 		}
 	}
 	
-	// custom naming if #n is present
+	// custom naming if #n is present: NOTE: this doesn't use set_vehicle_keywords etc because of special handling
 	if (strstr(VEH_KEYWORDS(ruin), "#n")) {
 		to_free = (!proto || VEH_KEYWORDS(ruin) != VEH_KEYWORDS(proto)) ? VEH_KEYWORDS(ruin) : NULL;
 		VEH_KEYWORDS(ruin) = str_replace("#n", old_bld ? GET_BLD_NAME(old_bld) : "a building", VEH_KEYWORDS(ruin));
@@ -3625,6 +3625,7 @@ INTERACTION_FUNC(ruin_building_to_vehicle_interaction) {
 		set_vehicle_extra_data(ruin, ROOM_EXTRA_PAINT_COLOR, paint);
 	}
 	
+	request_vehicle_save_in_world(ruin);
 	load_vtrigger(ruin);
 	request_world_save(GET_ROOM_VNUM(inter_room), WSAVE_ROOM);
 	return TRUE;

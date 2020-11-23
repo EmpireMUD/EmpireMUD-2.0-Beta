@@ -4081,6 +4081,7 @@ struct descriptor_data {
 	int notes_id;	// idnum of player for notes-editing
 	int island_desc_id;	// editing an island desc
 	room_vnum save_room_id;	// editing a room desc
+	room_vnum save_room_pack_id;	// editing a vehicle desc in the room
 	any_vnum save_empire;	// for the text editor to know which empire to save
 	struct config_type *save_config;	// saves the config file when done editing text
 	bool allow_null;	// string editor can be empty/null
