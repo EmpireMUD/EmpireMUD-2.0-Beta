@@ -1806,6 +1806,7 @@ void delete_empire(empire_data *emp) {
 		LL_FOREACH(VEH_ANIMALS(veh), vam) {
 			if (vam->empire == vnum) {
 				vam->empire = NOTHING;
+				request_vehicle_save_in_world(veh);
 			}
 		}
 	}
@@ -5076,6 +5077,7 @@ void clear_obj_eq_sets(obj_data *obj) {
 			free_obj_eq_set(eq_set);
 		}
 	}
+	request_obj_save_in_world(obj);
 }
 
 

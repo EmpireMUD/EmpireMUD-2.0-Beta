@@ -779,6 +779,8 @@ ACMD(do_disenchant) {
 		act("$n shouts 'KA!' and cracks $p, which blasts out red light, and then fizzles.", FALSE, ch, obj, NULL, TO_ROOM);
 		gain_ability_exp(ch, ABIL_DISENCHANT, 33.4);
 		
+		request_obj_save_in_world(obj);
+		
 		// obj back?
 		if (skill_check(ch, ABIL_DISENCHANT, DIFF_MEDIUM)) {
 			rnd = number(1, 10000);

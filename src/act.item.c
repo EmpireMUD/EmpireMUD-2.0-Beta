@@ -1449,6 +1449,9 @@ bool used_lighter(char_data *ch, obj_data *obj) {
 			extract_obj(obj);
 			return TRUE;	// did use it up
 		}
+		else {
+			request_obj_save_in_world(obj);
+		}
 	}
 	
 	return FALSE;	// did not use it up
@@ -5197,6 +5200,7 @@ ACMD(do_eat) {
 			bind_obj_to_player(food, ch);
 			reduce_obj_binding(food, ch);
 		}
+		request_obj_save_in_world(food);
 	}
 }
 
@@ -5817,6 +5821,8 @@ ACMD(do_keep) {
 			act(buf, FALSE, ch, obj, NULL, TO_CHAR);
 		}
 	}
+	
+	queue_delayed_update(ch, CDU_SAVE);
 }
 
 
@@ -6688,6 +6694,7 @@ ACMD(do_seed) {
 			}
 			else {
 				SET_BIT(GET_OBJ_EXTRA(obj), OBJ_SEEDED | OBJ_NO_STORE);
+				request_obj_save_in_world(obj);
 			}
 		}
 		else {

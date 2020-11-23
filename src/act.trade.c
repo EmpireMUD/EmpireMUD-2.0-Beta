@@ -1558,6 +1558,7 @@ ACMD(do_gen_augment) {
 		}
 		
 		command_lag(ch, WAIT_ABILITY);
+		request_obj_save_in_world(obj);
 	}
 }
 

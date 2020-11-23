@@ -6094,6 +6094,7 @@ void bind_obj_to_group(obj_data *obj, struct group_data *group) {
 			add_obj_binding(GET_IDNUM(mem->member), &OBJ_BOUND_TO(obj));
 		}
 	}
+	request_obj_save_in_world(obj);
 }
 
 
@@ -6115,6 +6116,7 @@ void bind_obj_to_player(obj_data *obj, char_data *ch) {
 	}
 	
 	add_obj_binding(GET_IDNUM(ch), &OBJ_BOUND_TO(obj));
+	request_obj_save_in_world(obj);
 }
 
 
@@ -6157,6 +6159,7 @@ void bind_obj_to_tag_list(obj_data *obj, struct mob_tag *list) {
 			break;
 		}
 	}
+	request_obj_save_in_world(obj);
 }
 
 
@@ -6252,6 +6255,7 @@ void reduce_obj_binding(obj_data *obj, char_data *player) {
 			free(bind);
 		}
 	}
+	request_obj_save_in_world(obj);
 }
 
 

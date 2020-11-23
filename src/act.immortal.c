@@ -8949,6 +8949,7 @@ ACMD(do_oset) {
 	}
 	else if (is_abbrev(field_arg, "flags")) {
 		GET_OBJ_EXTRA(obj) = olc_process_flag(ch, argument, "extra", "oset name flags", extra_bits, GET_OBJ_EXTRA(obj));
+		request_obj_save_in_world(obj);
 	}
 	else if (is_abbrev(field_arg, "keywords") || is_abbrev(field_arg, "aliases")) {
 		if (!*argument) {
@@ -10471,6 +10472,7 @@ ACMD(do_unbind) {
 	}
 	else {
 		free_obj_binding(&OBJ_BOUND_TO(obj));
+		request_obj_save_in_world(obj);
 		syslog(SYS_GC, GET_ACCESS_LEVEL(ch), TRUE, "ABUSE: %s used unbind on %s", GET_REAL_NAME(ch), GET_OBJ_SHORT_DESC(obj));
 		act("You unbind $p.", FALSE, ch, obj, NULL, TO_CHAR | DG_NO_TRIG);
 	}

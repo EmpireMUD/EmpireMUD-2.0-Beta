@@ -729,6 +729,7 @@ void harness_mob_to_vehicle(char_data *mob, vehicle_data *veh) {
 	vam->empire = GET_LOYALTY(mob) ? EMPIRE_VNUM(GET_LOYALTY(mob)) : NOTHING;
 	
 	LL_PREPEND(VEH_ANIMALS(veh), vam);
+	request_vehicle_save_in_world(veh);
 	extract_char(mob);
 }
 
@@ -1144,6 +1145,7 @@ char_data *unharness_mob_from_vehicle(struct vehicle_attached_mob *vam, vehicle_
 	
 	// remove the vam entry now
 	LL_DELETE(VEH_ANIMALS(veh), vam);
+	request_vehicle_save_in_world(veh);
 	
 	// things that keep us from spawning the mob
 	if (!IN_ROOM(veh) || !mob_proto(vam->mob)) {
@@ -3608,6 +3610,7 @@ void save_olc_vehicle(descriptor_data *desc) {
 		}
 		
 		affect_total_room(IN_ROOM(iter));
+		request_vehicle_save_in_world(iter);
 	}
 	
 	// free prototype strings and pointers

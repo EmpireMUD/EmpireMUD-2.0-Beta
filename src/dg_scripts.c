@@ -4373,6 +4373,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						if (subfield && *subfield) {
 							if (!str_cmp(subfield, "none") || !str_cmp(subfield, "nobody")) {
 								free_obj_binding(&OBJ_BOUND_TO(o));
+								request_obj_save_in_world(o);
 							}
 							else {	// attempt to bind it
 								char_data *targ = (*subfield == UID_CHAR) ? get_char(subfield) : get_char_by_obj(o, subfield);
@@ -4381,12 +4382,14 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 									free_obj_binding(&OBJ_BOUND_TO(o));
 									bind_obj_to_player(o, targ);
 									reduce_obj_binding(o, targ);
+									request_obj_save_in_world(o);
 								}
 								else {	// wasn't targeting a person, try an obj
 									obj_data *oarg = (*subfield == UID_CHAR) ? get_obj(subfield) : get_obj_by_obj(o, subfield);
 									if (oarg) {
 										free_obj_binding(&OBJ_BOUND_TO(o));	// unbind first
 										OBJ_BOUND_TO(o) = copy_obj_bindings(OBJ_BOUND_TO(oarg));
+										request_obj_save_in_world(o);
 									}
 								}
 							}
@@ -4477,6 +4480,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 							if (fl != NOTHING) {
 								TOGGLE_BIT(GET_OBJ_EXTRA(o), BIT(fl));
 								snprintf(str, slen, (OBJ_FLAGGED(o, BIT(fl)) ? "1" : "0"));
+								request_obj_save_in_world(obj);
 							}
 							else {
 								snprintf(str, slen, "0");

@@ -4466,7 +4466,7 @@ void purge_bound_items(int idnum) {
 	
 	// this uses a global, purge_bound_items_next, to avoid problems where both obj and next-obj are purged from being nested (like a corpse)
 	DL_FOREACH_SAFE(object_list, obj, purge_bound_items_next) {
-		if (obj->bound_to && obj->bound_to->idnum == idnum && !obj->bound_to->next) {
+		if (OBJ_BOUND_TO(obj) && OBJ_BOUND_TO(obj)->idnum == idnum && !OBJ_BOUND_TO(obj)->next) {
 			// bound to exactly 1 idnum and it's this one
 			if (IN_ROOM(obj) && ROOM_PEOPLE(IN_ROOM(obj))) {
 				act("$p vanishes with a wisp of smoke.", FALSE, NULL, obj, NULL, TO_ROOM);
@@ -5285,6 +5285,8 @@ void add_obj_to_eq_set(obj_data *obj, int set_id, int pos) {
 		eq_set->pos = pos;
 		LL_PREPEND(GET_OBJ_EQ_SETS(obj), eq_set);
 	}
+	
+	request_obj_save_in_world(obj);
 }
 
 
@@ -5299,6 +5301,7 @@ void check_eq_sets(char_data *ch) {
 	struct eq_set_obj *oset, *next_oset;
 	obj_data *obj;
 	int pos;
+	bool any = FALSE;
 	
 	if (IS_NPC(ch)) {
 		return;
@@ -5320,6 +5323,7 @@ void check_eq_sets(char_data *ch) {
 					// not found
 					LL_DELETE(GET_OBJ_EQ_SETS(obj), oset);
 					free_obj_eq_set(oset);
+					any = TRUE;
 				}
 			}
 		}
@@ -5330,8 +5334,13 @@ void check_eq_sets(char_data *ch) {
 				// not found
 				LL_DELETE(GET_OBJ_EQ_SETS(obj), oset);
 				free_obj_eq_set(oset);
+				any = TRUE;
 			}
 		}
+	}
+	
+	if (any) {
+		request_char_save_in_world(ch);
 	}
 }
 
@@ -5446,6 +5455,8 @@ void remove_obj_from_eq_set(obj_data *obj, int set_id) {
 			free_obj_eq_set(eq_set);
 		}
 	}
+	
+	request_obj_save_in_world(obj);
 }
 
 

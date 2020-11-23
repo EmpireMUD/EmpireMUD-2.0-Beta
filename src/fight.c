@@ -3929,6 +3929,7 @@ void perform_violence_missile(char_data *ch, obj_data *weapon) {
 	if (best) {
 		set_obj_val(best, VAL_AMMO_QUANTITY, GET_AMMO_QUANTITY(best) - 1);
 		SET_BIT(GET_OBJ_EXTRA(best), OBJ_NO_STORE);	// can no longer be stored
+		request_obj_save_in_world(best);
 	}
 	
 	// compute
