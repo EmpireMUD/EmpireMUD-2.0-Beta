@@ -636,11 +636,9 @@ void perform_reboot(void) {
 
 	// prepare for the end!
 	save_all_empires();
-	
-	// TODO: uncomment these (they are turned off for testing)
-	// write_fresh_binary_map_file();
-	// write_whole_binary_world_index();
-	// write_all_wld_files();
+	write_fresh_binary_map_file();
+	write_whole_binary_world_index();
+	write_all_wld_files();
 	
 	if (binary_map_fl) {
 		fclose(binary_map_fl);

@@ -1099,6 +1099,7 @@ void olc_delete_generic(char_data *ch, any_vnum vnum) {
 	DL_FOREACH_SAFE(vehicle_list, veh, next_veh) {
 		if (VEH_NEEDS_RESOURCES(veh)) {
 			remove_thing_from_resource_list(&VEH_NEEDS_RESOURCES(veh), res_type, vnum);
+			request_vehicle_save_in_world(veh);
 			
 			if (!VEH_NEEDS_RESOURCES(veh)) {
 				complete_vehicle(veh);	// this could purge it

@@ -2811,6 +2811,7 @@ void vehicle_chore_build(empire_data *emp, vehicle_data *veh, int chore) {
 		else {
 			sprintf(buf, "$n works on %s $V.", (chore == CHORE_MAINTENANCE) ? "repairing" : "constructing");
 			act(buf, FALSE, worker, NULL, veh, TO_ROOM | TO_SPAMMY);
+			request_vehicle_save_in_world(veh);
 		}
 	}
 	else if (can_do) {

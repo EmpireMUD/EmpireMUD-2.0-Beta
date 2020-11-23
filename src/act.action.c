@@ -2452,6 +2452,7 @@ void process_repairing(char_data *ch) {
 	if ((res = get_next_resource(ch, VEH_NEEDS_RESOURCES(veh), can_use_room(ch, IN_ROOM(ch), MEMBERS_ONLY), TRUE, &found_obj))) {
 		// take the item; possibly free the res
 		apply_resource(ch, res, &VEH_NEEDS_RESOURCES(veh), found_obj, APPLY_RES_REPAIR, veh, VEH_FLAGGED(veh, VEH_NEVER_DISMANTLE) ? NULL : &VEH_BUILT_WITH(veh));
+		request_vehicle_save_in_world(veh);
 		found = TRUE;
 	}
 	
