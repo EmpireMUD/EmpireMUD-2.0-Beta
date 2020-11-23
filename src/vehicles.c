@@ -1011,7 +1011,7 @@ void start_dismantle_vehicle(vehicle_data *veh) {
 	delete_vehicle_interior(veh);
 	
 	// set up flags
-	SET_BIT(VEH_FLAGS(veh), VEH_DISMANTLING);
+	set_vehicle_flags(veh, VEH_DISMANTLING);
 	VEH_CONSTRUCTION_ID(veh) = get_new_vehicle_construction_id();
 	
 	// remove any existing resources remaining to build/maintain
@@ -1076,7 +1076,7 @@ void start_vehicle_burning(vehicle_data *veh) {
 		log_to_empire(VEH_OWNER(veh), ELOG_HOSTILITY, "Your %s has caught on fire at (%d, %d)", skip_filler(VEH_SHORT_DESC(veh)), X_COORD(IN_ROOM(veh)), Y_COORD(IN_ROOM(veh)));
 	}
 	msg_to_vehicle(veh, TRUE, "It seems %s has caught fire!\r\n", VEH_SHORT_DESC(veh));
-	SET_BIT(VEH_FLAGS(veh), VEH_ON_FIRE);
+	set_vehicle_flags(veh, VEH_ON_FIRE);
 
 	if (VEH_SITTING_ON(veh)) {
 		do_unseat_from_vehicle(VEH_SITTING_ON(veh));
@@ -1540,7 +1540,7 @@ void complete_vehicle(vehicle_data *veh) {
 	
 	// only if it was incomplete:
 	if (VEH_FLAGGED(veh, VEH_INCOMPLETE)) {
-		REMOVE_BIT(VEH_FLAGS(veh), VEH_INCOMPLETE);
+		remove_vehicle_flags(veh, VEH_INCOMPLETE);
 		
 		if (VEH_OWNER(veh)) {
 			qt_empire_players_vehicle(VEH_OWNER(veh), qt_gain_vehicle, veh);
@@ -1995,7 +1995,7 @@ vehicle_data *read_vehicle(any_vnum vnum, bool with_triggers) {
 	VEH_NEEDS_RESOURCES(veh) = NULL;
 	VEH_BUILT_WITH(veh) = NULL;
 	IN_ROOM(veh) = NULL;
-	REMOVE_BIT(VEH_FLAGS(veh), VEH_INCOMPLETE | VEH_DISMANTLING);	// ensure not marked incomplete/dismantle
+	remove_vehicle_flags(veh, VEH_INCOMPLETE | VEH_DISMANTLING);	// ensure not marked incomplete/dismantle
 	
 	veh->script_id = 0;	// initialize later
 	

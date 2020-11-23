@@ -2734,7 +2734,7 @@ void vehicle_chore_fire_brigade(empire_data *emp, vehicle_data *veh) {
 	
 	if (worker && VEH_FLAGGED(veh, VEH_ON_FIRE)) {
 		charge_workforce(emp, IN_ROOM(veh), worker, 1, NOTHING, 0);
-		REMOVE_BIT(VEH_FLAGS(veh), VEH_ON_FIRE);
+		remove_vehicle_flags(veh, VEH_ON_FIRE);
 		
 		act("$n throws a bucket of water to douse the flames!", FALSE, worker, NULL, NULL, TO_ROOM);
 		msg_to_vehicle(veh, FALSE, "The flames have been extinguished!\r\n");

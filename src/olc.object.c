@@ -1841,6 +1841,130 @@ obj_data *setup_olc_object(obj_data *input) {
 //// OBJECT SETTERS //////////////////////////////////////////////////////////
 
 /**
+* Updates the object's keywords. It does no validation, so you must
+* pre-validate the text.
+*
+* @param obj_data *obj The object to change.
+* @param const char *str The new keywords (will be copied). Or, NULL to set it back to the prototype.
+*/
+void set_obj_keywords(obj_data *obj, const char *str) {
+	obj_data *proto = obj_proto(GET_OBJ_VNUM(obj));
+	const char *default_val = "object unknown";
+	
+	if (GET_OBJ_KEYWORDS(obj) && (!proto || GET_OBJ_KEYWORDS(obj) != GET_OBJ_KEYWORDS(proto))) {
+		free(GET_OBJ_KEYWORDS(obj));
+	}
+	GET_OBJ_KEYWORDS(obj) = (str ? str_dup(str) : (proto ? GET_OBJ_KEYWORDS(proto) : str_dup(default_val)));
+	request_obj_save_in_world(obj);
+}
+
+
+/**
+* Updates the object's long desc. It does no validation, so you must
+* pre-validate the text.
+*
+* @param obj_data *obj The object to change.
+* @param const char *str The new long desc (will be copied). Or, NULL to set it back to the prototype.
+*/
+void set_obj_long_desc(obj_data *obj, const char *str) {
+	obj_data *proto = obj_proto(GET_OBJ_VNUM(obj));
+	const char *default_val = "An unknown object is here.";
+	
+	if (GET_OBJ_LONG_DESC(obj) && (!proto || GET_OBJ_LONG_DESC(obj) != GET_OBJ_LONG_DESC(proto))) {
+		free(GET_OBJ_LONG_DESC(obj));
+	}
+	GET_OBJ_LONG_DESC(obj) = (str ? str_dup(str) : (proto ? GET_OBJ_LONG_DESC(proto) : str_dup(default_val)));
+	request_obj_save_in_world(obj);
+}
+
+
+/**
+* Updates the object's look desc. It does no validation, so you must
+* pre-validate the text.
+*
+* @param obj_data *obj The object to change.
+* @param const char *str The new look desc (will be copied). Or, NULL to set it back to the prototype.
+* @param bool format If TRUE, will format it as a paragraph (IF str was not-null).
+*/
+void set_obj_look_desc(obj_data *obj, const char *str, bool format) {
+	obj_data *proto = obj_proto(GET_OBJ_VNUM(obj));
+	const char *default_val = "An unknown object is here.\r\n";
+	char temp[MAX_STRING_LENGTH];
+	const char *val = str;
+	
+	if (GET_OBJ_ACTION_DESC(obj) && (!proto || GET_OBJ_ACTION_DESC(obj) != GET_OBJ_ACTION_DESC(proto))) {
+		free(GET_OBJ_ACTION_DESC(obj));
+	}
+	
+	// check trailing crlf
+	if (str && *str && str[strlen(str)-1] != '\r' && str[strlen(str)-1] != '\n') {
+		strcpy(temp, str);
+		strcat(temp, "\r\n");	// I think there's always room for this
+		val = temp;
+	}
+	GET_OBJ_ACTION_DESC(obj) = (val ? str_dup(val) : (proto ? GET_OBJ_ACTION_DESC(proto) : str_dup(default_val)));
+	
+	// format if requested
+	if (val && format) {
+		format_text(&GET_OBJ_ACTION_DESC(obj), (strlen(GET_OBJ_ACTION_DESC(obj)) > 80 ? FORMAT_INDENT : 0), NULL, MAX_STRING_LENGTH);
+	}
+	
+	request_obj_save_in_world(obj);
+}
+
+
+/**
+* Updates the object's short desc. It does no validation, so you must
+* pre-validate the text.
+*
+* @param obj_data *obj The object to change.
+* @param const char *str The new short desc (will be copied). Or, NULL to set it back to the prototype.
+*/
+void set_obj_short_desc(obj_data *obj, const char *str) {
+	obj_data *proto = obj_proto(GET_OBJ_VNUM(obj));
+	const char *default_val = "an unknown object";
+	
+	if (GET_OBJ_SHORT_DESC(obj) && (!proto || GET_OBJ_SHORT_DESC(obj) != GET_OBJ_SHORT_DESC(proto))) {
+		free(GET_OBJ_SHORT_DESC(obj));
+	}
+	GET_OBJ_SHORT_DESC(obj) = (str ? str_dup(str) : (proto ? GET_OBJ_SHORT_DESC(proto) : str_dup(default_val)));
+	request_obj_save_in_world(obj);
+}
+
+
+/**
+* Updates the object's look desc by adding to the end. It does no validation,
+* so you must pre-validate the text.
+*
+* @param obj_data *obj The object to change.
+* @param const char *str The text to append to the look desc (will be copied).
+* @param bool format If TRUE, will format it as a paragraph.
+*/
+void set_obj_look_desc_append(obj_data *obj, const char *str, bool format) {
+	obj_data *proto = obj_proto(GET_OBJ_VNUM(obj));
+	char temp[MAX_STRING_LENGTH];
+	
+	if (str && *str) {
+		snprintf(temp, sizeof(temp), "%s%s", NULLSAFE(GET_OBJ_ACTION_DESC(obj)), str);
+		
+		// check trailing crlf
+		if (str[strlen(str)-1] != '\r' && str[strlen(str)-1] != '\n') {
+			strcat(temp, "\r\n");
+		}
+		if (GET_OBJ_ACTION_DESC(obj) && (!proto || GET_OBJ_ACTION_DESC(obj) != GET_OBJ_ACTION_DESC(proto))) {
+			free(GET_OBJ_ACTION_DESC(obj));
+		}
+		GET_OBJ_ACTION_DESC(obj) = str_dup(temp);
+		if (format) {
+			format_text(&GET_OBJ_ACTION_DESC(obj), (strlen(GET_OBJ_ACTION_DESC(obj)) > 80 ? FORMAT_INDENT : 0), NULL, MAX_STRING_LENGTH);
+		}
+		
+		request_obj_save_in_world(obj);
+	}
+}
+
+
+/**
 * Sets one of an object's generic numeric values and ensures the object gets
 * saved if necessary.
 *

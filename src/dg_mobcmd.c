@@ -1225,7 +1225,7 @@ ACMD(do_mrestore) {
 		// not sure what to do for objs
 	}
 	if (veh) {
-		REMOVE_BIT(VEH_FLAGS(veh), VEH_ON_FIRE);
+		remove_vehicle_flags(veh, VEH_ON_FIRE);
 		if (!VEH_IS_DISMANTLING(veh)) {
 			complete_vehicle(veh);
 		}

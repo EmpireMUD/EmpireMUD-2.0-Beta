@@ -1698,7 +1698,7 @@ void do_gen_craft_vehicle(char_data *ch, craft_data *type, int dir) {
 	
 	// ok: new vehicle craft setup
 	veh = read_vehicle(GET_CRAFT_OBJECT(type), TRUE);
-	SET_BIT(VEH_FLAGS(veh), VEH_INCOMPLETE);	// set incomplete before putting in the room
+	set_vehicle_flags(veh, VEH_INCOMPLETE);	// set incomplete before putting in the room
 	vehicle_to_room(veh, IN_ROOM(ch));
 	special_vehicle_setup(ch, veh);
 	
@@ -2461,24 +2461,15 @@ ACMD(do_reforge) {
 			
 			// rename keywords
 			snprintf(temp, sizeof(temp), "%s %s", fname(GET_OBJ_KEYWORDS(proto)), skip_filler(argument));
-			if (!proto || GET_OBJ_KEYWORDS(obj) != GET_OBJ_KEYWORDS(proto)) {
-				free(GET_OBJ_KEYWORDS(obj));
-			}
-			GET_OBJ_KEYWORDS(obj) = str_dup(temp);
+			set_obj_keywords(obj, temp);
 			
 			// rename short desc
-			if (!proto || GET_OBJ_SHORT_DESC(obj) != GET_OBJ_SHORT_DESC(proto)) {
-				free(GET_OBJ_SHORT_DESC(obj));
-			}
-			GET_OBJ_SHORT_DESC(obj) = str_dup(argument);
+			set_obj_short_desc(obj, argument);
 			
 			// rename long desc
 			sprintf(temp, "%s is lying here.", argument);
 			CAP(temp);
-			if (!proto || GET_OBJ_LONG_DESC(obj) != GET_OBJ_LONG_DESC(proto)) {
-				free(GET_OBJ_LONG_DESC(obj));
-			}
-			GET_OBJ_LONG_DESC(obj) = str_dup(temp);
+			set_obj_long_desc(obj, temp);
 			
 			// message
 			act(buf1, FALSE, ch, obj, obj->worn_by, TO_CHAR);
@@ -2585,16 +2576,16 @@ ACMD(do_reforge) {
 			
 			// copy over strings?
 			if (GET_OBJ_KEYWORDS(obj) != GET_OBJ_KEYWORDS(proto)) {
-				GET_OBJ_KEYWORDS(new) = GET_OBJ_KEYWORDS(obj) ? str_dup(GET_OBJ_KEYWORDS(obj)) : NULL;
+				set_obj_keywords(new, GET_OBJ_KEYWORDS(obj));
 			}
 			if (GET_OBJ_SHORT_DESC(obj) != GET_OBJ_SHORT_DESC(proto)) {
-				GET_OBJ_SHORT_DESC(new) = GET_OBJ_SHORT_DESC(obj) ? str_dup(GET_OBJ_SHORT_DESC(obj)) : NULL;
+				set_obj_short_desc(new, GET_OBJ_SHORT_DESC(obj));
 			}
 			if (GET_OBJ_LONG_DESC(obj) != GET_OBJ_LONG_DESC(proto)) {
-				GET_OBJ_LONG_DESC(new) = GET_OBJ_LONG_DESC(obj) ? str_dup(GET_OBJ_LONG_DESC(obj)) : NULL;
+				set_obj_long_desc(new, GET_OBJ_LONG_DESC(obj));
 			}
 			if (GET_OBJ_ACTION_DESC(obj) != GET_OBJ_ACTION_DESC(proto)) {
-				GET_OBJ_ACTION_DESC(new) = GET_OBJ_ACTION_DESC(obj) ? str_dup(GET_OBJ_ACTION_DESC(obj)) : NULL;
+				set_obj_look_desc(new, GET_OBJ_ACTION_DESC(obj), FALSE);
 			}
 			
 			// re-apply values

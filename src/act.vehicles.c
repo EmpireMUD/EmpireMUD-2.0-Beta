@@ -1009,7 +1009,7 @@ void do_douse_vehicle(char_data *ch, vehicle_data *veh, obj_data *cont) {
 	}
 	else {
 		set_obj_val(cont, VAL_DRINK_CONTAINER_CONTENTS, 0);
-		REMOVE_BIT(VEH_FLAGS(veh), VEH_ON_FIRE);
+		remove_vehicle_flags(veh, VEH_ON_FIRE);
 		
 		act("You put out the fire on $V with $p!", FALSE, ch, cont, veh, TO_CHAR);
 		act("$n puts out the fire on $V with $p!", FALSE, ch, cont, veh, TO_ROOM);

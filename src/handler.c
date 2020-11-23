@@ -2198,14 +2198,14 @@ obj_data *create_money(empire_data *type, int amount) {
 	strcpy(buf, money_desc(type, amount));
 	
 	// strings
-	GET_OBJ_KEYWORDS(obj) = str_dup(skip_filler(buf));
-	GET_OBJ_SHORT_DESC(obj) = str_dup(buf);
+	set_obj_keywords(obj, skip_filler(buf));
+	set_obj_short_desc(obj, buf);
 	snprintf(buf2, sizeof(buf2), "%s is lying here.", CAP(buf));
-	GET_OBJ_LONG_DESC(obj) = str_dup(buf2);
+	set_obj_long_desc(obj, buf2);
 
 	// description
 	if (amount == 1) {
-		GET_OBJ_ACTION_DESC(obj) = str_dup("It's just one miserable little coin.");
+		set_obj_look_desc(obj, "It's just one miserable little coin.", TRUE);
 	}
 	else {
 		if (amount < 10)
@@ -2219,7 +2219,7 @@ obj_data *create_money(empire_data *type, int amount) {
 		else
 			strcpy(buf, "There are a LOT of coins.");	/* strcpy: OK (is < MAX_STRING_LENGTH) */
 
-		GET_OBJ_ACTION_DESC(obj) = str_dup(buf);
+		set_obj_look_desc(obj, buf, TRUE);
 	}
 
 	// data
@@ -3006,7 +3006,7 @@ void perform_abandon_vehicle(vehicle_data *veh) {
 		bool provided_light = VEH_PROVIDES_LIGHT(veh);
 		
 		VEH_OWNER(veh) = NULL;
-		REMOVE_BIT(VEH_FLAGS(veh), VEH_PLAYER_NO_WORK | VEH_PLAYER_NO_DISMANTLE);
+		remove_vehicle_flags(veh, VEH_PLAYER_NO_WORK | VEH_PLAYER_NO_DISMANTLE);
 	
 		if (VEH_INTERIOR_HOME_ROOM(veh)) {
 			abandon_room(VEH_INTERIOR_HOME_ROOM(veh));
@@ -5653,16 +5653,16 @@ obj_data *copy_warehouse_obj(obj_data *input) {
 	
 	// pointer copies
 	if (GET_OBJ_KEYWORDS(input) && (!proto || GET_OBJ_KEYWORDS(input) != GET_OBJ_KEYWORDS(proto))) {
-		GET_OBJ_KEYWORDS(obj) = str_dup(GET_OBJ_KEYWORDS(input));
+		set_obj_keywords(obj, GET_OBJ_KEYWORDS(input));
 	}
 	if (GET_OBJ_SHORT_DESC(input) && (!proto || GET_OBJ_SHORT_DESC(input) != GET_OBJ_SHORT_DESC(proto))) {
-		GET_OBJ_SHORT_DESC(obj) = str_dup(GET_OBJ_SHORT_DESC(input));
+		set_obj_short_desc(obj, GET_OBJ_SHORT_DESC(input));
 	}
 	if (GET_OBJ_LONG_DESC(input) && (!proto || GET_OBJ_LONG_DESC(input) != GET_OBJ_LONG_DESC(proto))) {
-		GET_OBJ_LONG_DESC(obj) = str_dup(GET_OBJ_LONG_DESC(input));
+		set_obj_long_desc(obj, GET_OBJ_LONG_DESC(input));
 	}
 	if (GET_OBJ_ACTION_DESC(input) && (!proto || GET_OBJ_ACTION_DESC(input) != GET_OBJ_ACTION_DESC(proto))) {
-		GET_OBJ_ACTION_DESC(obj) = str_dup(GET_OBJ_ACTION_DESC(input));
+		set_obj_look_desc(obj, GET_OBJ_ACTION_DESC(input), FALSE);
 	}
 	
 	// non-point copies
@@ -5835,16 +5835,16 @@ obj_data *fresh_copy_obj(obj_data *obj, int scale_level) {
 	
 	// custom strings?
 	if (GET_OBJ_SHORT_DESC(obj) && GET_OBJ_SHORT_DESC(obj) != GET_OBJ_SHORT_DESC(proto)) {
-		GET_OBJ_SHORT_DESC(new) = str_dup(GET_OBJ_SHORT_DESC(obj));
+		set_obj_short_desc(new, GET_OBJ_SHORT_DESC(obj));
 	}
 	if (GET_OBJ_LONG_DESC(obj) && GET_OBJ_LONG_DESC(obj) != GET_OBJ_LONG_DESC(proto)) {
-		GET_OBJ_LONG_DESC(new) = str_dup(GET_OBJ_LONG_DESC(obj));
+		set_obj_long_desc(new, GET_OBJ_LONG_DESC(obj));
 	}
 	if (GET_OBJ_KEYWORDS(obj) && GET_OBJ_KEYWORDS(obj) != GET_OBJ_KEYWORDS(proto)) {
-		GET_OBJ_KEYWORDS(new) = str_dup(GET_OBJ_KEYWORDS(obj));
+		set_obj_keywords(new, GET_OBJ_KEYWORDS(obj));
 	}
 	if (GET_OBJ_ACTION_DESC(obj) && GET_OBJ_ACTION_DESC(obj) != GET_OBJ_ACTION_DESC(proto)) {
-		GET_OBJ_ACTION_DESC(new) = str_dup(GET_OBJ_ACTION_DESC(obj));
+		set_obj_look_desc(new, GET_OBJ_ACTION_DESC(obj), FALSE);
 	}
 	
 	// certain things that must always copy over
@@ -10038,7 +10038,7 @@ int get_number(char **name) {
 void extract_vehicle(vehicle_data *veh) {
 	if (!VEH_IS_EXTRACTED(veh)) {
 		check_dg_owner_purged_vehicle(veh);
-		SET_BIT(VEH_FLAGS(veh), VEH_EXTRACTED);
+		set_vehicle_flags(veh, VEH_EXTRACTED);
 		++veh_extractions_pending;
 	}
 }
@@ -10119,7 +10119,7 @@ void extract_pending_vehicles(void) {
 		}
 		
 		if (VEH_IS_EXTRACTED(veh)) {
-			REMOVE_BIT(VEH_FLAGS(veh), VEH_EXTRACTED);
+			remove_vehicle_flags(veh, VEH_EXTRACTED);
 		}
 		else {	// not extracting
 			continue;

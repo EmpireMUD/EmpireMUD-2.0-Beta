@@ -1502,7 +1502,7 @@ VCMD(do_vrestore) {
 		// not sure what to do for objs
 	}
 	if (vtarg) {
-		REMOVE_BIT(VEH_FLAGS(vtarg), VEH_ON_FIRE);
+		remove_vehicle_flags(vtarg, VEH_ON_FIRE);
 		if (!VEH_IS_DISMANTLING(vtarg)) {
 			complete_vehicle(vtarg);
 		}

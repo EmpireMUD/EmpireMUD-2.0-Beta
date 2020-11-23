@@ -51,22 +51,13 @@
 */
 void ensure_safe_obj(obj_data *obj) {
 	if (!GET_OBJ_KEYWORDS(obj) || !*GET_OBJ_KEYWORDS(obj)) {
-		if (GET_OBJ_KEYWORDS(obj)) {
-			free(GET_OBJ_KEYWORDS(obj));
-		}
-		GET_OBJ_KEYWORDS(obj) = str_dup("object item unknown");
+		set_obj_keywords(obj, "object item unknown");
 	}
 	if (!GET_OBJ_SHORT_DESC(obj) || !*GET_OBJ_SHORT_DESC(obj)) {
-		if (GET_OBJ_SHORT_DESC(obj)) {
-			free(GET_OBJ_SHORT_DESC(obj));
-		}
-		GET_OBJ_SHORT_DESC(obj) = str_dup("an unknown object");
+		set_obj_short_desc(obj, "an unknown object");
 	}
 	if (!GET_OBJ_LONG_DESC(obj) || !*GET_OBJ_LONG_DESC(obj)) {
-		if (GET_OBJ_LONG_DESC(obj)) {
-			free(GET_OBJ_LONG_DESC(obj));
-		}
-		GET_OBJ_LONG_DESC(obj) = str_dup("An unknown object is here.");
+		set_obj_long_desc(obj, "An unknown object is here.");
 	}
 }
 

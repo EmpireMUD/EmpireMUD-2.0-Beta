@@ -1571,9 +1571,9 @@ obj_data *make_corpse(char_data *ch) {
 	}
 	
 	// set strings
-	GET_OBJ_KEYWORDS(corpse) = str_dup(kws);
-	GET_OBJ_SHORT_DESC(corpse) = str_dup(shortdesc);
-	GET_OBJ_LONG_DESC(corpse) = str_dup(longdesc);
+	set_obj_keywords(corpse, kws);
+	set_obj_short_desc(corpse, shortdesc);
+	set_obj_long_desc(corpse, longdesc);
 
 	set_obj_val(corpse, VAL_CORPSE_IDNUM, IS_NPC(ch) ? GET_MOB_VNUM(ch) : (-1 * GET_IDNUM(ch)));
 	set_obj_val(corpse, VAL_CORPSE_SIZE, size);
@@ -2756,7 +2756,7 @@ bool besiege_vehicle(char_data *attacker, vehicle_data *veh, int damage, int sie
 		// return 0 prevents the destruction
 		if (!destroy_vtrigger(veh)) {
 			VEH_HEALTH(veh) = MAX(1, VEH_HEALTH(veh));	// ensure health
-			REMOVE_BIT(VEH_FLAGS(veh), VEH_ON_FIRE);	// cancel fire
+			remove_vehicle_flags(veh, VEH_ON_FIRE);	// cancel fire
 			return TRUE;
 		}
 

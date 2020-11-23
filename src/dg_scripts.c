@@ -5443,7 +5443,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					}
 					else if (!str_cmp(field, "extinguish")) {
 						if (VEH_FLAGGED(v, VEH_ON_FIRE)) {
-							REMOVE_BIT(VEH_FLAGS(v), VEH_ON_FIRE);
+							remove_vehicle_flags(v, VEH_ON_FIRE);
 						}
 						*str = '\0';
 					}

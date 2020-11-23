@@ -1223,26 +1223,17 @@ void script_modify(char *argument) {
 		o_proto = obj_proto(GET_OBJ_VNUM(obj));
 		
 		if (is_abbrev(field_arg, "keywords")) {
-			if (GET_OBJ_KEYWORDS(obj) && (!o_proto || GET_OBJ_KEYWORDS(obj) != GET_OBJ_KEYWORDS(o_proto))) {
-				free(GET_OBJ_KEYWORDS(obj));
-			}
-			GET_OBJ_KEYWORDS(obj) = clear ? (o_proto ? GET_OBJ_KEYWORDS(o_proto) : str_dup("ERROR")) : str_dup(value);
+			set_obj_keywords(obj, clear ? NULL : value);
 		}
 		else if (is_abbrev(field_arg, "longdescription")) {
-			if (GET_OBJ_LONG_DESC(obj) && (!o_proto || GET_OBJ_LONG_DESC(obj) != GET_OBJ_LONG_DESC(o_proto))) {
-				free(GET_OBJ_LONG_DESC(obj));
-			}
-			GET_OBJ_LONG_DESC(obj) = clear ? (o_proto ? GET_OBJ_LONG_DESC(o_proto) : str_dup("ERROR")) : str_dup(value);
+			set_obj_long_desc(obj, clear ? NULL : value);
 		}
 		else if (is_abbrev(field_arg, "lookdescription")) {	// SETS the lookdescription
 			if (GET_OBJ_ACTION_DESC(obj) && (!o_proto || GET_OBJ_ACTION_DESC(obj) != GET_OBJ_ACTION_DESC(o_proto))) {
 				free(GET_OBJ_ACTION_DESC(obj));
 			}
 			strcat(value, "\r\n");
-			GET_OBJ_ACTION_DESC(obj) = clear ? (o_proto ? GET_OBJ_ACTION_DESC(o_proto) : str_dup("")) : str_dup(value);
-			if (GET_OBJ_ACTION_DESC(obj) && (!o_proto || GET_OBJ_ACTION_DESC(obj) != GET_OBJ_ACTION_DESC(o_proto))) {
-				format_text(&GET_OBJ_ACTION_DESC(obj), (strlen(GET_OBJ_ACTION_DESC(obj)) > 80 ? FORMAT_INDENT : 0), NULL, MAX_STRING_LENGTH);
-			}
+			set_obj_look_desc(obj, clear ? NULL : value, !clear);
 		}
 		else if (is_abbrev(field_arg, "append-lookdescription")) {	// ADDS TO THE END OF the lookdescription
 			if (strlen(NULLSAFE(GET_OBJ_ACTION_DESC(obj))) + strlen(value) + 2 > MAX_ITEM_DESCRIPTION) {
@@ -1250,13 +1241,7 @@ void script_modify(char *argument) {
 			}
 			else {
 				snprintf(temp, sizeof(temp), "%s%s\r\n", NULLSAFE(GET_OBJ_ACTION_DESC(obj)), value);
-				if (GET_OBJ_ACTION_DESC(obj) && (!o_proto || GET_OBJ_ACTION_DESC(obj) != GET_OBJ_ACTION_DESC(o_proto))) {
-					free(GET_OBJ_ACTION_DESC(obj));
-				}
-				GET_OBJ_ACTION_DESC(obj) = str_dup(temp);
-				if (GET_OBJ_ACTION_DESC(obj) && (!o_proto || GET_OBJ_ACTION_DESC(obj) != GET_OBJ_ACTION_DESC(o_proto))) {
-					format_text(&GET_OBJ_ACTION_DESC(obj), (strlen(GET_OBJ_ACTION_DESC(obj)) > 80 ? FORMAT_INDENT : 0), NULL, MAX_STRING_LENGTH);
-				}
+				set_obj_look_desc(obj, temp, TRUE);
 			}
 		}
 		else if (is_abbrev(field_arg, "append-lookdesc-noformat")) {	// ADDS TO THE END OF the lookdescription without formatting
@@ -1265,17 +1250,11 @@ void script_modify(char *argument) {
 			}
 			else {
 				snprintf(temp, sizeof(temp), "%s%s\r\n", NULLSAFE(GET_OBJ_ACTION_DESC(obj)), value);
-				if (GET_OBJ_ACTION_DESC(obj) && (!o_proto || GET_OBJ_ACTION_DESC(obj) != GET_OBJ_ACTION_DESC(o_proto))) {
-					free(GET_OBJ_ACTION_DESC(obj));
-				}
-				GET_OBJ_ACTION_DESC(obj) = str_dup(temp);
+				set_obj_look_desc(obj, temp, FALSE);
 			}
 		}
 		else if (is_abbrev(field_arg, "shortdescription")) {
-			if (GET_OBJ_SHORT_DESC(obj) && (!o_proto || GET_OBJ_SHORT_DESC(obj) != GET_OBJ_SHORT_DESC(o_proto))) {
-				free(GET_OBJ_SHORT_DESC(obj));
-			}
-			GET_OBJ_SHORT_DESC(obj) = clear ? (o_proto ? GET_OBJ_SHORT_DESC(o_proto) : str_dup("ERROR")) : str_dup(value);
+			set_obj_short_desc(obj, clear ? NULL : value);
 		}
 		else {
 			script_log("%%mod%% called with invalid obj field '%s'", field_arg);

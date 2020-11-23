@@ -5799,14 +5799,14 @@ void do_manage_vehicle(char_data *ch, vehicle_data *veh, char *argument) {
 		// check for optional on/off arg
 		if (!str_cmp(argument, "on")) {
 			if (manage_vehicle_data[type].flag != NOBITS) {
-				SET_BIT(VEH_FLAGS(veh), manage_vehicle_data[type].flag);
+				set_vehicle_flags(veh, manage_vehicle_data[type].flag);
 			}
 			// else: nothing to do?
 			on = TRUE;
 		}
 		else if (!str_cmp(argument, "off")) {
 			if (manage_vehicle_data[type].flag != NOBITS) {
-				REMOVE_BIT(VEH_FLAGS(veh), manage_vehicle_data[type].flag);
+				remove_vehicle_flags(veh, manage_vehicle_data[type].flag);
 			}
 			// else: nothing to do?
 			on = FALSE;
@@ -5815,10 +5815,10 @@ void do_manage_vehicle(char_data *ch, vehicle_data *veh, char *argument) {
 			if (manage_vehicle_data[type].flag != NOBITS) {
 				on = !VEH_FLAGGED(veh, manage_vehicle_data[type].flag);
 				if (on) {
-					SET_BIT(VEH_FLAGS(veh), manage_vehicle_data[type].flag);
+					set_vehicle_flags(veh, manage_vehicle_data[type].flag);
 				}
 				else {	// off
-					REMOVE_BIT(VEH_FLAGS(veh), manage_vehicle_data[type].flag);
+					remove_vehicle_flags(veh, manage_vehicle_data[type].flag);
 				}
 			}
 			else {

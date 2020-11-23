@@ -649,6 +649,11 @@ void free_obj_proto_data(struct obj_proto_data *data);
 obj_data *obj_proto(obj_vnum vnum);
 obj_data *read_object(obj_vnum nr, bool with_triggers);
 void remove_object_from_table(obj_data *obj);
+void set_obj_keywords(obj_data *obj, const char *str);
+void set_obj_long_desc(obj_data *obj, const char *str);
+void set_obj_look_desc(obj_data *obj, const char *str, bool format);
+void set_obj_look_desc_append(obj_data *obj, const char *str, bool format);
+void set_obj_short_desc(obj_data *obj, const char *str);
 int sort_objects(obj_data *a, obj_data *b);
 
 // objsave
@@ -1031,4 +1036,17 @@ extern struct empire_territory_data *global_next_territory_entry;
 #define remove_mob_flags(mob, to_set)  do { \
 	REMOVE_BIT(MOB_FLAGS(mob), (to_set));	\
 	request_char_save_in_world(mob);	\
+} while (0)
+
+
+// combine setting these with saving
+#define set_vehicle_flags(veh, to_set)  do { \
+	SET_BIT(VEH_FLAGS(veh), (to_set));	\
+	request_vehicle_save_in_world(veh);	\
+} while (0)
+
+// combine removing these with saving
+#define remove_vehicle_flags(veh, to_set)  do { \
+	REMOVE_BIT(VEH_FLAGS(veh), (to_set));	\
+	request_vehicle_save_in_world(veh);	\
 } while (0)

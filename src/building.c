@@ -2355,10 +2355,10 @@ ACMD(do_paint) {
 		
 		// brighten if same color or remove bright if not
 		if (VEH_PAINT_COLOR(paint_veh) == GET_PAINT_COLOR(paint)) {
-			SET_BIT(VEH_FLAGS(paint_veh), VEH_BRIGHT_PAINT);
+			set_vehicle_flags(paint_veh, VEH_BRIGHT_PAINT);
 		}
 		else {
-			REMOVE_BIT(VEH_FLAGS(paint_veh), VEH_BRIGHT_PAINT);
+			remove_vehicle_flags(paint_veh, VEH_BRIGHT_PAINT);
 		}
 		
 		set_vehicle_extra_data(paint_veh, ROOM_EXTRA_PAINT_COLOR, GET_PAINT_COLOR(paint));
@@ -2534,7 +2534,7 @@ ACMD(do_unpaint) {
 		act("You strip the paint from $V!", FALSE, ch, NULL, paint_veh, TO_CHAR);
 		act("$n strips the paint from $V!", FALSE, ch, NULL, paint_veh, TO_ROOM);
 		remove_vehicle_extra_data(paint_veh, ROOM_EXTRA_PAINT_COLOR);
-		REMOVE_BIT(VEH_FLAGS(paint_veh), VEH_BRIGHT_PAINT);
+		remove_vehicle_flags(paint_veh, VEH_BRIGHT_PAINT);
 	}
 	
 	command_lag(ch, WAIT_ABILITY);
@@ -2865,7 +2865,7 @@ ACMD(do_upgrade) {
 		paint_color = get_vehicle_extra_data(from_veh, ROOM_EXTRA_PAINT_COLOR);
 		remove_vehicle_extra_data(from_veh, ROOM_EXTRA_PAINT_COLOR);
 		bright_paint = VEH_FLAGGED(from_veh, VEH_BRIGHT_PAINT);
-		REMOVE_BIT(VEH_FLAGS(from_veh), VEH_BRIGHT_PAINT);
+		remove_vehicle_flags(from_veh, VEH_BRIGHT_PAINT);
 	}
 	else {
 		msg_to_char(ch, "There was an unexpected error in the upgrade process.\r\n");
@@ -2979,7 +2979,7 @@ ACMD(do_upgrade) {
 		to_veh = read_vehicle(GET_CRAFT_OBJECT(to_craft), TRUE);
 		
 		// set incomplete before putting in the room
-		SET_BIT(VEH_FLAGS(to_veh), VEH_INCOMPLETE);
+		set_vehicle_flags(to_veh, VEH_INCOMPLETE);
 		vehicle_to_room(to_veh, in_room);
 		
 		if (from_room) {
@@ -3056,7 +3056,7 @@ ACMD(do_upgrade) {
 			// adapt flags: find flags added to from_veh
 			if ((old_proto = vehicle_proto(VEH_VNUM(from_veh)))) {
 				set_bits = VEH_FLAGS(from_veh) & SAVABLE_VEH_FLAGS & ~VEH_FLAGS(old_proto);
-				SET_BIT(VEH_FLAGS(to_veh), set_bits);
+				set_vehicle_flags(to_veh, set_bits);
 			}
 		
 			// transfer/dump contents
@@ -3128,11 +3128,11 @@ ACMD(do_upgrade) {
 		if (paint_color > 0 && !VEH_FLAGGED(to_veh, VEH_NO_PAINT)) {
 			set_vehicle_extra_data(to_veh, ROOM_EXTRA_PAINT_COLOR, paint_color);
 			if (bright_paint) {
-				SET_BIT(VEH_FLAGS(to_veh), VEH_BRIGHT_PAINT);
+				set_vehicle_flags(to_veh, VEH_BRIGHT_PAINT);
 			}
 		}
 		else {	// ensure not painted
-			REMOVE_BIT(VEH_FLAGS(to_veh), VEH_BRIGHT_PAINT);
+			remove_vehicle_flags(to_veh, VEH_BRIGHT_PAINT);
 			remove_vehicle_extra_data(to_veh, ROOM_EXTRA_PAINT_COLOR);
 		}
 		

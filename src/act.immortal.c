@@ -715,34 +715,34 @@ ADMIN_UTIL(util_bldconvert) {
 		VEH_INTERIOR_ROOM_VNUM(to_veh) = to_bld ? to_vnum : NOWHERE;
 		
 		// flags
-		SET_BIT(VEH_FLAGS(to_veh), VEH_CUSTOMIZABLE | VEH_NO_BUILDING | VEH_NO_LOAD_ONTO_VEHICLE | VEH_VISIBLE_IN_DARK | VEH_BUILDING);
+		set_vehicle_flags(to_veh, VEH_CUSTOMIZABLE | VEH_NO_BUILDING | VEH_NO_LOAD_ONTO_VEHICLE | VEH_VISIBLE_IN_DARK | VEH_BUILDING);
 		if (!BLD_FLAGGED(from_bld, BLD_OPEN)) {
-			SET_BIT(VEH_FLAGS(to_veh), VEH_IN);
+			set_vehicle_flags(to_veh, VEH_IN);
 		}
 		if (BLD_FLAGGED(from_bld, BLD_BURNABLE)) {
-			SET_BIT(VEH_FLAGS(to_veh), VEH_BURNABLE);
+			set_vehicle_flags(to_veh, VEH_BURNABLE);
 		}
 		if (BLD_FLAGGED(from_bld, BLD_INTERLINK)) {
-			SET_BIT(VEH_FLAGS(to_veh), VEH_INTERLINK);
+			set_vehicle_flags(to_veh, VEH_INTERLINK);
 		}
 		if (BLD_FLAGGED(from_bld, BLD_ALLOW_MOUNTS | BLD_HERD)) {
-			SET_BIT(VEH_FLAGS(to_veh), VEH_CARRY_MOBS);
+			set_vehicle_flags(to_veh, VEH_CARRY_MOBS);
 		}
 		if (BLD_FLAGGED(from_bld, BLD_ALLOW_MOUNTS)) {
-			SET_BIT(VEH_FLAGS(to_veh), VEH_CARRY_VEHICLES);
+			set_vehicle_flags(to_veh, VEH_CARRY_VEHICLES);
 		}
 		if (BLD_FLAGGED(from_bld, BLD_IS_RUINS)) {
-			SET_BIT(VEH_FLAGS(to_veh), VEH_IS_RUINS);
+			set_vehicle_flags(to_veh, VEH_IS_RUINS);
 		}
 		if (BLD_FLAGGED(from_bld, BLD_NO_PAINT)) {
-			SET_BIT(VEH_FLAGS(to_veh), VEH_NO_PAINT);
+			set_vehicle_flags(to_veh, VEH_NO_PAINT);
 		}
 		if (BLD_FLAGGED(from_bld, BLD_DEDICATE)) {
-			SET_BIT(VEH_FLAGS(to_veh), VEH_DEDICATE);
+			set_vehicle_flags(to_veh, VEH_DEDICATE);
 		}
 		if (IS_SET(room_affs, ROOM_AFF_CHAMELEON)) {
 			REMOVE_BIT(room_affs, ROOM_AFF_CHAMELEON);
-			SET_BIT(VEH_FLAGS(to_veh), VEH_CHAMELEON);
+			set_vehicle_flags(to_veh, VEH_CHAMELEON);
 		}
 		
 		// copy traits over
@@ -8933,7 +8933,7 @@ ACMD(do_moveeinv) {
 
 ACMD(do_oset) {
 	char obj_arg[MAX_INPUT_LENGTH], field_arg[MAX_INPUT_LENGTH], *obj_arg_ptr = obj_arg;
-	obj_data *obj, *proto;
+	obj_data *obj;
 	int number;
 	
 	argument = one_argument(argument, obj_arg);
@@ -8956,17 +8956,12 @@ ACMD(do_oset) {
 			msg_to_char(ch, "Set the keywords to what?\r\n");
 		}
 		else {
-			proto = obj_proto(GET_OBJ_VNUM(obj));
-			
-			if (GET_OBJ_KEYWORDS(obj) && (!proto || GET_OBJ_KEYWORDS(obj) != GET_OBJ_KEYWORDS(proto))) {
-				free(GET_OBJ_KEYWORDS(obj));
-			}
-			if (proto && !str_cmp(argument, "none")) {
-				GET_OBJ_KEYWORDS(obj) = GET_OBJ_KEYWORDS(proto);
+			if (!str_cmp(argument, "none")) {
+				set_obj_keywords(obj, NULL);
 				msg_to_char(ch, "You restore its original keywords.\r\n");
 			}
 			else {
-				GET_OBJ_KEYWORDS(obj) = str_dup(argument);
+				set_obj_keywords(obj, argument);
 				msg_to_char(ch, "You change its keywords to '%s'.\r\n", GET_OBJ_KEYWORDS(obj));
 			}
 		}
@@ -8976,17 +8971,12 @@ ACMD(do_oset) {
 			msg_to_char(ch, "Set the long description to what?\r\n");
 		}
 		else {
-			proto = obj_proto(GET_OBJ_VNUM(obj));
-			
-			if (GET_OBJ_LONG_DESC(obj) && (!proto || GET_OBJ_LONG_DESC(obj) != GET_OBJ_LONG_DESC(proto))) {
-				free(GET_OBJ_LONG_DESC(obj));
-			}
-			if (proto && !str_cmp(argument, "none")) {
-				GET_OBJ_LONG_DESC(obj) = GET_OBJ_LONG_DESC(proto);
+			if (!str_cmp(argument, "none")) {
+				set_obj_long_desc(obj, NULL);
 				msg_to_char(ch, "You restore its original long description.\r\n");
 			}
 			else {
-				GET_OBJ_LONG_DESC(obj) = str_dup(argument);
+				set_obj_long_desc(obj, argument);
 				msg_to_char(ch, "You change its long description to '%s'.\r\n", GET_OBJ_LONG_DESC(obj));
 			}
 		}
@@ -8996,17 +8986,12 @@ ACMD(do_oset) {
 			msg_to_char(ch, "Set the short description to what?\r\n");
 		}
 		else {
-			proto = obj_proto(GET_OBJ_VNUM(obj));
-			
-			if (GET_OBJ_SHORT_DESC(obj) && (!proto || GET_OBJ_SHORT_DESC(obj) != GET_OBJ_SHORT_DESC(proto))) {
-				free(GET_OBJ_SHORT_DESC(obj));
-			}
-			if (proto && !str_cmp(argument, "none")) {
-				GET_OBJ_SHORT_DESC(obj) = GET_OBJ_SHORT_DESC(proto);
+			if (!str_cmp(argument, "none")) {
+				set_obj_short_desc(obj, NULL);
 				msg_to_char(ch, "You restore its original short description.\r\n");
 			}
 			else {
-				GET_OBJ_SHORT_DESC(obj) = str_dup(argument);
+				set_obj_short_desc(obj, argument);
 				msg_to_char(ch, "You change its short description to '%s'.\r\n", GET_OBJ_SHORT_DESC(obj));
 			}
 		}
@@ -9537,7 +9522,7 @@ ACMD(do_restore) {
 			act("$n waves $s hand and restores $V!", FALSE, ch, NULL, veh, TO_ROOM | DG_NO_TRIG);
 		}
 		
-		REMOVE_BIT(VEH_FLAGS(veh), VEH_ON_FIRE);
+		remove_vehicle_flags(veh, VEH_ON_FIRE);
 		if (!VEH_IS_DISMANTLING(veh)) {
 			complete_vehicle(veh);
 		}
