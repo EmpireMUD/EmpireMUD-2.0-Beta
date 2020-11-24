@@ -771,7 +771,7 @@ void run_mobile_activity(char_data *ch) {
 	bool acted = FALSE, moved = FALSE;
 	obj_data *obj;
 
-	#define CAN_AGGRO(mob, vict)  (!IS_DEAD(vict) && !NOHASSLE(vict) && (IS_NPC(vict) || !PRF_FLAGGED(vict, PRF_WIZHIDE)) && !IS_GOD(vict) && vict != mob->master && !AFF_FLAGGED(vict, AFF_IMMUNE_PHYSICAL | AFF_NO_TARGET_IN_ROOM | AFF_NO_SEE_IN_ROOM | AFF_NO_ATTACK) && CAN_SEE(mob, vict) && can_fight((mob), (vict)))
+	#define CAN_AGGRO(mob, vict)  (!IS_IMMORTAL(vict) && !IS_DEAD(vict) && !NOHASSLE(vict) && (IS_NPC(vict) || !PRF_FLAGGED(vict, PRF_WIZHIDE)) && !IS_GOD(vict) && vict != mob->master && !AFF_FLAGGED(vict, AFF_IMMUNE_PHYSICAL | AFF_NO_TARGET_IN_ROOM | AFF_NO_SEE_IN_ROOM | AFF_NO_ATTACK) && CAN_SEE(mob, vict) && can_fight((mob), (vict)))
 	
 	// prevent running multiple mob moves during a catch-up cycle
 	if (!catch_up_mobs) {
