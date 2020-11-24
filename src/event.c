@@ -2956,12 +2956,6 @@ EVENT_CMD(evcmd_collect) {
 	}
 	
 	any = FALSE;
-	/*
-	
-	if (GET_HIGHEST_KNOWN_LEVEL(ch) > ped->level) {
-		ped->level = GET_HIGHEST_KNOWN_LEVEL(ch);
-	}
-	*/
 	
 	// check player's event data
 	HASH_ITER(hh, GET_EVENT_DATA(ch), ped, next_ped) {
