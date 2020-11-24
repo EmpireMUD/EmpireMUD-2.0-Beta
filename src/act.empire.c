@@ -1282,7 +1282,7 @@ void show_workforce_why(empire_data *emp, char_data *ch, char *argument) {
 	struct workforce_log *wf_log;
 	room_vnum only_loc = NOWHERE;
 	bool any = FALSE;
-	room_data *room;
+	room_data *only_room = NULL;
 	size_t size;
 	
 	if (!ch->desc) {
@@ -1320,9 +1320,10 @@ void show_workforce_why(empire_data *emp, char_data *ch, char *argument) {
 		if (only_chore == NOTHING) {	// find location?
 			if (!str_cmp(argument, "here")) {
 				only_loc = GET_ROOM_VNUM(IN_ROOM(ch));
+				only_room = IN_ROOM(ch);
 			}
-			else if ((room = find_target_room(ch, argument))) {
-				only_loc = GET_ROOM_VNUM(room);
+			else if ((only_room = find_target_room(ch, argument))) {
+				only_loc = GET_ROOM_VNUM(only_room);
 			}
 			else {
 				msg_to_char(ch, "Unknown argument '%s'. You can specify a chore or location.\r\n", argument);
@@ -1400,6 +1401,9 @@ void show_workforce_why(empire_data *emp, char_data *ch, char *argument) {
 	
 	if (any || *unsupplied) {
 		page_string(ch->desc, buf, TRUE);
+	}
+	else if (only_room && ROOM_OWNER(only_room) != GET_LOYALTY(ch)) {
+		msg_to_char(ch, "Workforce isn't working because your empire doesn't own %s location.\r\n", (only_room == IN_ROOM(ch)) ? "this" : "that");
 	}
 	else {
 		msg_to_char(ch, "No matching workforce problems found.\r\n");
