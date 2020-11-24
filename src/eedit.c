@@ -55,7 +55,7 @@ EEDIT(eedit_num_ranks);
 * @return bool TRUE if the banner is valid; FALSE otherwise
 */
 bool check_banner_color_string(char *str) {
-	const char *valid_colors = "rgbymcwajloptvnRGBYMCWAJLOPTV0u";
+	const char *valid_colors = "rgbymcwajloptvRGBYMCWAJLOPTV";
 	
 	bool ok = TRUE;
 	int pos, num_codes = 0;
@@ -68,6 +68,7 @@ bool check_banner_color_string(char *str) {
 			}
 			else if (strchr(valid_colors, str[pos+1])) {
 				// this code is ok but count number of non-underlined codes
+				// NOTE: as of b5.116 &u is not allowed
 				if (str[pos+1] != 'u') {
 					++num_codes;
 				}
