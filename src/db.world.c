@@ -5432,6 +5432,7 @@ void write_mapout_updates(void) {
 			// each line after the header is width+1 (for the \n)
 			pos = header_size + (y * (MAP_WIDTH + 1)) + x;
 			fseek(map_fl, pos * sizeof(char), SEEK_SET);
+			fseek(pol_fl, pos * sizeof(char), SEEK_SET);
 			
 			write_graphical_map_data(&world_map[x][y], map_fl, pol_fl);
 		}
