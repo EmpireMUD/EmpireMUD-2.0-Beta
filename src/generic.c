@@ -498,6 +498,7 @@ void olc_search_generic(char_data *ch, any_vnum vnum) {
 			++found;
 			size += snprintf(buf + size, sizeof(buf) - size, "OBJ [%5d] %s\r\n", GET_OBJ_VNUM(obj), GET_OBJ_SHORT_DESC(obj));
 		}
+	}
 	
 	
 	// progress
@@ -514,7 +515,7 @@ void olc_search_generic(char_data *ch, any_vnum vnum) {
 			++found;
 			size += snprintf(buf + size, sizeof(buf) - size, "PRG [%5d] %s\r\n", PRG_VNUM(prg), PRG_NAME(prg));
 		}
-	}}
+	}
 	
 	// check quests
 	HASH_ITER(hh, quest_table, quest, next_quest) {
