@@ -115,6 +115,8 @@ void add_tracks(char_data *ch, room_data *room, byte dir, room_data *to_room) {
 			track->timestamp = time(0);
 			track->dir = dir;
 			track->to_room = to_room ? GET_ROOM_VNUM(to_room) : NOWHERE;
+			
+			request_world_save(GET_ROOM_VNUM(room), WSAVE_ROOM);
 		}
 	}
 }
@@ -462,6 +464,16 @@ void do_doorcmd(char_data *ch, obj_data *obj, int door, int scmd) {
 			act(buf, FALSE, ROOM_PEOPLE(other_room), 0, 0, TO_ROOM);
 			act(buf, FALSE, ROOM_PEOPLE(other_room), 0, 0, TO_CHAR);
 		}
+		
+		request_world_save(GET_ROOM_VNUM(other_room), WSAVE_ROOM);
+	}
+	
+	// check for more saves
+	if (obj) {
+		request_obj_save_in_world(obj);
+	}
+	else {
+		request_world_save(GET_ROOM_VNUM(IN_ROOM(ch)), WSAVE_ROOM);
 	}
 }
 
@@ -2541,7 +2553,7 @@ ACMD(do_portal) {
 	
 	// portal this side
 	portal = read_object(o_PORTAL, TRUE);
-	GET_OBJ_VAL(portal, VAL_PORTAL_TARGET_VNUM) = GET_ROOM_VNUM(target);
+	set_obj_val(portal, VAL_PORTAL_TARGET_VNUM, GET_ROOM_VNUM(target));
 	GET_OBJ_TIMER(portal) = 5;
 	obj_to_room(portal, IN_ROOM(ch));
 	
@@ -2558,7 +2570,7 @@ ACMD(do_portal) {
 	
 	// portal other side
 	end = read_object(o_PORTAL, TRUE);
-	GET_OBJ_VAL(end, VAL_PORTAL_TARGET_VNUM) = GET_ROOM_VNUM(IN_ROOM(ch));
+	set_obj_val(end, VAL_PORTAL_TARGET_VNUM, GET_ROOM_VNUM(IN_ROOM(ch)));
 	GET_OBJ_TIMER(end) = 5;
 	obj_to_room(end, target);
 	if (GET_ROOM_VNUM(IN_ROOM(end))) {

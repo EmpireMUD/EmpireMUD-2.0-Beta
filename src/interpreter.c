@@ -716,7 +716,7 @@ cpp_extern const struct command_info cmd_info[] = {
 	SIMPLE_CMD( "expel", POS_DEAD, do_expel, NO_MIN, CTYPE_EMPIRE ),
 	STANDARD_CMD( "edelete", POS_DEAD, do_edelete, LVL_CIMPL, GRANT_EMPIRES, NO_SCMD, CTYPE_EMPIRE, CMD_NO_ABBREV, NO_ABIL ),
 
-	SCMD_CMD( "fill", POS_STANDING, do_pour, NO_MIN, CTYPE_UTIL, SCMD_FILL ),
+	SCMD_CMD( "fill", POS_RESTING, do_pour, NO_MIN, CTYPE_UTIL, SCMD_FILL ),
 	SIMPLE_CMD( "factions", POS_DEAD, do_factions, NO_MIN, CTYPE_UTIL ),
 	SCMD_CMD( "fastmorph", POS_RESTING, do_morph, NO_MIN, CTYPE_MOVE, SCMD_FASTMORPH ),
 	SIMPLE_CMD( "feed", POS_STANDING, do_feed, NO_MIN, CTYPE_UTIL ),
@@ -881,7 +881,7 @@ cpp_extern const struct command_info cmd_info[] = {
 	SCMD_CMD( "poofin", POS_DEAD, do_poofset, LVL_GOD, CTYPE_IMMORTAL, SCMD_POOFIN ),
 	SCMD_CMD( "poofout", POS_DEAD, do_poofset, LVL_GOD, CTYPE_IMMORTAL, SCMD_POOFOUT ),
 	SIMPLE_CMD( "portal", POS_STANDING, do_portal, NO_MIN, CTYPE_MOVE ),
-	SCMD_CMD( "pour", POS_STANDING, do_pour, NO_MIN, CTYPE_UTIL, SCMD_POUR ),
+	SCMD_CMD( "pour", POS_RESTING, do_pour, NO_MIN, CTYPE_UTIL, SCMD_POUR ),
 	STANDARD_CMD( "press", POS_DEAD, do_gen_craft, NO_MIN, NO_GRANTS, CRAFT_TYPE_PRESS, CTYPE_BUILD, CMD_NO_ANIMALS, NO_ABIL ),
 	ABILITY_CMD( "prick", POS_FIGHTING, do_prick, NO_MIN, CTYPE_COMBAT, ABIL_PRICK ),
 	SIMPLE_CMD( "progress", POS_DEAD, do_progress, NO_MIN, CTYPE_EMPIRE ),

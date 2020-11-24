@@ -372,6 +372,8 @@ void do_dg_build(room_data *target, char *argument) {
 			COMPLEX_DATA(target)->entrance = rev_dir[dir];
 		}
 	}
+	
+	request_world_save(GET_ROOM_VNUM(target), WSAVE_ROOM);
 }
 
 
@@ -394,9 +396,11 @@ void do_dg_own(empire_data *emp, char_data *vict, obj_data *obj, room_data *room
 		}
 		GET_LOYALTY(vict) = emp;
 		setup_generic_npc(vict, emp, MOB_DYNAMIC_NAME(vict), MOB_DYNAMIC_SEX(vict));
+		request_char_save_in_world(vict);
 	}
 	if (obj) {
 		obj->last_empire_id = emp ? EMPIRE_VNUM(emp) : NOTHING;
+		request_obj_save_in_world(obj);
 	}
 	if (veh) {
 		if ((owner = VEH_OWNER(veh)) && emp != owner) {
@@ -414,7 +418,7 @@ void do_dg_own(empire_data *emp, char_data *vict, obj_data *obj, room_data *room
 			claim_room(room, emp);
 		}
 		if (GET_ROOM_VEHICLE(room)) {
-			VEH_OWNER(GET_ROOM_VEHICLE(room)) = emp;
+			perform_claim_vehicle(GET_ROOM_VEHICLE(room), emp);
 		}
 	}
 }
@@ -1128,7 +1132,7 @@ void script_heal(void *thing, int type, char *argument) {
 */
 void script_modify(char *argument) {
 	char targ_arg[MAX_INPUT_LENGTH], field_arg[MAX_INPUT_LENGTH], value[MAX_INPUT_LENGTH], temp[MAX_STRING_LENGTH];
-	vehicle_data *veh = NULL, *v_proto;
+	vehicle_data *veh = NULL;
 	struct companion_data *cd;
 	char_data *mob = NULL;
 	obj_data *obj = NULL, *o_proto;
@@ -1219,26 +1223,17 @@ void script_modify(char *argument) {
 		o_proto = obj_proto(GET_OBJ_VNUM(obj));
 		
 		if (is_abbrev(field_arg, "keywords")) {
-			if (GET_OBJ_KEYWORDS(obj) && (!o_proto || GET_OBJ_KEYWORDS(obj) != GET_OBJ_KEYWORDS(o_proto))) {
-				free(GET_OBJ_KEYWORDS(obj));
-			}
-			GET_OBJ_KEYWORDS(obj) = clear ? (o_proto ? GET_OBJ_KEYWORDS(o_proto) : str_dup("ERROR")) : str_dup(value);
+			set_obj_keywords(obj, clear ? NULL : value);
 		}
 		else if (is_abbrev(field_arg, "longdescription")) {
-			if (GET_OBJ_LONG_DESC(obj) && (!o_proto || GET_OBJ_LONG_DESC(obj) != GET_OBJ_LONG_DESC(o_proto))) {
-				free(GET_OBJ_LONG_DESC(obj));
-			}
-			GET_OBJ_LONG_DESC(obj) = clear ? (o_proto ? GET_OBJ_LONG_DESC(o_proto) : str_dup("ERROR")) : str_dup(value);
+			set_obj_long_desc(obj, clear ? NULL : value);
 		}
 		else if (is_abbrev(field_arg, "lookdescription")) {	// SETS the lookdescription
 			if (GET_OBJ_ACTION_DESC(obj) && (!o_proto || GET_OBJ_ACTION_DESC(obj) != GET_OBJ_ACTION_DESC(o_proto))) {
 				free(GET_OBJ_ACTION_DESC(obj));
 			}
 			strcat(value, "\r\n");
-			GET_OBJ_ACTION_DESC(obj) = clear ? (o_proto ? GET_OBJ_ACTION_DESC(o_proto) : str_dup("")) : str_dup(value);
-			if (GET_OBJ_ACTION_DESC(obj) && (!o_proto || GET_OBJ_ACTION_DESC(obj) != GET_OBJ_ACTION_DESC(o_proto))) {
-				format_text(&GET_OBJ_ACTION_DESC(obj), (strlen(GET_OBJ_ACTION_DESC(obj)) > 80 ? FORMAT_INDENT : 0), NULL, MAX_STRING_LENGTH);
-			}
+			set_obj_look_desc(obj, clear ? NULL : value, !clear);
 		}
 		else if (is_abbrev(field_arg, "append-lookdescription")) {	// ADDS TO THE END OF the lookdescription
 			if (strlen(NULLSAFE(GET_OBJ_ACTION_DESC(obj))) + strlen(value) + 2 > MAX_ITEM_DESCRIPTION) {
@@ -1246,13 +1241,7 @@ void script_modify(char *argument) {
 			}
 			else {
 				snprintf(temp, sizeof(temp), "%s%s\r\n", NULLSAFE(GET_OBJ_ACTION_DESC(obj)), value);
-				if (GET_OBJ_ACTION_DESC(obj) && (!o_proto || GET_OBJ_ACTION_DESC(obj) != GET_OBJ_ACTION_DESC(o_proto))) {
-					free(GET_OBJ_ACTION_DESC(obj));
-				}
-				GET_OBJ_ACTION_DESC(obj) = str_dup(temp);
-				if (GET_OBJ_ACTION_DESC(obj) && (!o_proto || GET_OBJ_ACTION_DESC(obj) != GET_OBJ_ACTION_DESC(o_proto))) {
-					format_text(&GET_OBJ_ACTION_DESC(obj), (strlen(GET_OBJ_ACTION_DESC(obj)) > 80 ? FORMAT_INDENT : 0), NULL, MAX_STRING_LENGTH);
-				}
+				set_obj_look_desc(obj, temp, TRUE);
 			}
 		}
 		else if (is_abbrev(field_arg, "append-lookdesc-noformat")) {	// ADDS TO THE END OF the lookdescription without formatting
@@ -1261,17 +1250,11 @@ void script_modify(char *argument) {
 			}
 			else {
 				snprintf(temp, sizeof(temp), "%s%s\r\n", NULLSAFE(GET_OBJ_ACTION_DESC(obj)), value);
-				if (GET_OBJ_ACTION_DESC(obj) && (!o_proto || GET_OBJ_ACTION_DESC(obj) != GET_OBJ_ACTION_DESC(o_proto))) {
-					free(GET_OBJ_ACTION_DESC(obj));
-				}
-				GET_OBJ_ACTION_DESC(obj) = str_dup(temp);
+				set_obj_look_desc(obj, temp, FALSE);
 			}
 		}
 		else if (is_abbrev(field_arg, "shortdescription")) {
-			if (GET_OBJ_SHORT_DESC(obj) && (!o_proto || GET_OBJ_SHORT_DESC(obj) != GET_OBJ_SHORT_DESC(o_proto))) {
-				free(GET_OBJ_SHORT_DESC(obj));
-			}
-			GET_OBJ_SHORT_DESC(obj) = clear ? (o_proto ? GET_OBJ_SHORT_DESC(o_proto) : str_dup("ERROR")) : str_dup(value);
+			set_obj_short_desc(obj, clear ? NULL : value);
 		}
 		else {
 			script_log("%%mod%% called with invalid obj field '%s'", field_arg);
@@ -1287,24 +1270,15 @@ void script_modify(char *argument) {
 				script_log("%%mod%% called with invalid room icon '%s'", value);
 			}
 			else {
-				if (ROOM_CUSTOM_ICON(room)) {
-					free(ROOM_CUSTOM_ICON(room));
-				}
-				ROOM_CUSTOM_ICON(room) = (clear || !str_cmp(value, "none")) ? NULL : str_dup(value);
+				set_room_custom_icon(room, (clear || !str_cmp(value, "none")) ? NULL : value);
 			}
 		}
 		else if (is_abbrev(field_arg, "name") || is_abbrev(field_arg, "title")) {
-			if (ROOM_CUSTOM_NAME(room)) {
-				free(ROOM_CUSTOM_NAME(room));
-			}
-			ROOM_CUSTOM_NAME(room) = clear ? NULL : str_dup(value);
+			set_room_custom_name(room, (clear || !str_cmp(value, "none")) ? NULL : value);
 		}
 		else if (is_abbrev(field_arg, "description")) {	// SETS the description
-			if (ROOM_CUSTOM_DESCRIPTION(room)) {
-				free(ROOM_CUSTOM_DESCRIPTION(room));
-			}
 			strcat(value, "\r\n");
-			ROOM_CUSTOM_DESCRIPTION(room) = clear ? NULL : str_dup(value);
+			set_room_custom_description(room, (clear ? NULL : value));
 			if (ROOM_CUSTOM_DESCRIPTION(room)) {
 				format_text(&ROOM_CUSTOM_DESCRIPTION(room), (strlen(ROOM_CUSTOM_DESCRIPTION(room)) > 80 ? FORMAT_INDENT : 0), NULL, MAX_STRING_LENGTH);
 			}
@@ -1315,10 +1289,7 @@ void script_modify(char *argument) {
 			}
 			else {
 				snprintf(temp, sizeof(temp), "%s%s\r\n", ROOM_CUSTOM_DESCRIPTION(room) ? ROOM_CUSTOM_DESCRIPTION(room) : get_room_description(room), value);
-				if (ROOM_CUSTOM_DESCRIPTION(room)) {
-					free(ROOM_CUSTOM_DESCRIPTION(room));
-				}
-				ROOM_CUSTOM_DESCRIPTION(room) = str_dup(temp);
+				set_room_custom_description(room, temp);
 				format_text(&ROOM_CUSTOM_DESCRIPTION(room), (strlen(ROOM_CUSTOM_DESCRIPTION(room)) > 80 ? FORMAT_INDENT : 0), NULL, MAX_STRING_LENGTH);
 			}
 		}
@@ -1328,10 +1299,7 @@ void script_modify(char *argument) {
 			}
 			else {
 				snprintf(temp, sizeof(temp), "%s%s\r\n", ROOM_CUSTOM_DESCRIPTION(room) ? ROOM_CUSTOM_DESCRIPTION(room) : get_room_description(room), value);
-				if (ROOM_CUSTOM_DESCRIPTION(room)) {
-					free(ROOM_CUSTOM_DESCRIPTION(room));
-				}
-				ROOM_CUSTOM_DESCRIPTION(room) = str_dup(temp);
+				set_room_custom_description(room, temp);
 			}
 		}
 		else {
@@ -1340,48 +1308,23 @@ void script_modify(char *argument) {
 	}
 	// VEHICLE MODE
 	else if ((veh = get_vehicle(targ_arg))) {
-		v_proto = vehicle_proto(VEH_VNUM(veh));
-		
 		if (is_abbrev(field_arg, "icon")) {
 			if (!clear && str_cmp(value, "none") && !validate_icon(value)) {
 				script_log("%%mod%% called with invalid vehicle icon '%s'", value);
 			}
 			else {
-				if (VEH_ICON(veh) && (!v_proto || VEH_ICON(veh) != VEH_ICON(v_proto))) {
-					free(VEH_ICON(veh));
-				}
-				if (clear) {
-					VEH_ICON(veh) = VEH_ICON(v_proto);
-				}
-				else if (!str_cmp(value, "none")) {
-					VEH_ICON(veh) = NULL;
-				}
-				else {
-					VEH_ICON(veh) = str_dup(value);
-				}
+				set_vehicle_icon(veh, (clear || !str_cmp(value, "none")) ? NULL : value);
 			}
 		}
 		else if (is_abbrev(field_arg, "keywords")) {
-			if (VEH_KEYWORDS(veh) && (!v_proto || VEH_KEYWORDS(veh) != VEH_KEYWORDS(v_proto))) {
-				free(VEH_KEYWORDS(veh));
-			}
-			VEH_KEYWORDS(veh) = clear ? (v_proto ? VEH_KEYWORDS(v_proto) : str_dup("ERROR")) : str_dup(value);
+			set_vehicle_keywords(veh, clear ? NULL : value);
 		}
 		else if (is_abbrev(field_arg, "longdescription")) {
-			if (VEH_LONG_DESC(veh) && (!v_proto || VEH_LONG_DESC(veh) != VEH_LONG_DESC(v_proto))) {
-				free(VEH_LONG_DESC(veh));
-			}
-			VEH_LONG_DESC(veh) = clear ? (v_proto ? VEH_LONG_DESC(v_proto) : str_dup("ERROR")) : str_dup(value);
+			set_vehicle_long_desc(veh, clear ? NULL : value);
 		}
 		else if (is_abbrev(field_arg, "lookdescription")) {	// SETS the lookdescription
-			if (VEH_LOOK_DESC(veh) && (!v_proto || VEH_LOOK_DESC(veh) != VEH_LOOK_DESC(v_proto))) {
-				free(VEH_LOOK_DESC(veh));
-			}
 			strcat(value, "\r\n");
-			VEH_LOOK_DESC(veh) = clear ? (v_proto ? VEH_LOOK_DESC(v_proto) : str_dup("")) : str_dup(value);
-			if (VEH_LOOK_DESC(veh) && (!v_proto || VEH_LOOK_DESC(veh) != VEH_LOOK_DESC(v_proto))) {
-				format_text(&VEH_LOOK_DESC(veh), (strlen(VEH_LOOK_DESC(veh)) > 80 ? FORMAT_INDENT : 0), NULL, MAX_STRING_LENGTH);
-			}
+			set_vehicle_look_desc(veh, clear ? NULL : value, TRUE);
 		}
 		else if (is_abbrev(field_arg, "append-lookdescription")) {	// ADDS TO THE END OF the lookdescription
 			if (strlen(NULLSAFE(VEH_LOOK_DESC(veh))) + strlen(value) + 2 > MAX_ITEM_DESCRIPTION) {
@@ -1389,13 +1332,7 @@ void script_modify(char *argument) {
 			}
 			else {
 				snprintf(temp, sizeof(temp), "%s%s\r\n", NULLSAFE(VEH_LOOK_DESC(veh)), value);
-				if (VEH_LOOK_DESC(veh) && (!v_proto || VEH_LOOK_DESC(veh) != VEH_LOOK_DESC(v_proto))) {
-					free(VEH_LOOK_DESC(veh));
-				}
-				VEH_LOOK_DESC(veh) = str_dup(temp);
-				if (VEH_LOOK_DESC(veh) && (!v_proto || VEH_LOOK_DESC(veh) != VEH_LOOK_DESC(v_proto))) {
-					format_text(&VEH_LOOK_DESC(veh), (strlen(VEH_LOOK_DESC(veh)) > 80 ? FORMAT_INDENT : 0), NULL, MAX_STRING_LENGTH);
-				}
+				set_vehicle_look_desc_append(veh, temp, TRUE);
 			}
 		}
 		else if (is_abbrev(field_arg, "append-lookdesc-noformat")) {	// ADDS TO THE END OF the lookdescription
@@ -1404,17 +1341,11 @@ void script_modify(char *argument) {
 			}
 			else {
 				snprintf(temp, sizeof(temp), "%s%s\r\n", NULLSAFE(VEH_LOOK_DESC(veh)), value);
-				if (VEH_LOOK_DESC(veh) && (!v_proto || VEH_LOOK_DESC(veh) != VEH_LOOK_DESC(v_proto))) {
-					free(VEH_LOOK_DESC(veh));
-				}
-				VEH_LOOK_DESC(veh) = str_dup(temp);
+				set_vehicle_look_desc_append(veh, temp, FALSE);
 			}
 		}
 		else if (is_abbrev(field_arg, "shortdescription")) {
-			if (VEH_SHORT_DESC(veh) && (!v_proto || VEH_SHORT_DESC(veh) != VEH_SHORT_DESC(v_proto))) {
-				free(VEH_SHORT_DESC(veh));
-			}
-			VEH_SHORT_DESC(veh) = clear ? (v_proto ? VEH_SHORT_DESC(v_proto) : str_dup("ERROR")) : str_dup(value);
+			set_vehicle_short_desc(veh, clear ? NULL : value);
 		}
 		else {
 			script_log("%%mod%% called with invalid vehicle field '%s'", field_arg);

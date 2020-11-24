@@ -625,7 +625,7 @@ ADMIN_UTIL(util_bldconvert) {
 	}
 	else {
 		// open building: copy portions of it for the vehicle but don't create a new bld
-		icon = GET_BLD_ICON(from_bld) ? str_dup(GET_BLD_ICON(from_bld)) : NULL;
+		icon = GET_BLD_ICON(from_bld) ? GET_BLD_ICON(from_bld) : NULL;
 		fame = GET_BLD_FAME(from_bld);
 		military = GET_BLD_MILITARY(from_bld);
 		functions = GET_BLD_FUNCTIONS(from_bld);
@@ -676,10 +676,7 @@ ADMIN_UTIL(util_bldconvert) {
 		VEH_VNUM(to_veh) = to_vnum;
 		
 		// copy kws
-		if (VEH_KEYWORDS(to_veh)) {
-			free(VEH_KEYWORDS(to_veh));
-		}
-		VEH_KEYWORDS(to_veh) = str_dup(GET_BLD_NAME(from_bld));
+		set_vehicle_keywords(to_veh, GET_BLD_NAME(from_bld));
 		strtolower(VEH_KEYWORDS(to_veh));
 		
 		// build short desc
@@ -688,7 +685,7 @@ ADMIN_UTIL(util_bldconvert) {
 		}
 		snprintf(buf, sizeof(buf), "%s %s", AN(GET_BLD_NAME(from_bld)), GET_BLD_NAME(from_bld));
 		strtolower(buf);
-		VEH_SHORT_DESC(to_veh) = str_dup(buf);
+		set_vehicle_short_desc(to_veh, buf);
 		
 		// build long desc
 		if (VEH_LONG_DESC(to_veh)) {
@@ -696,53 +693,47 @@ ADMIN_UTIL(util_bldconvert) {
 		}
 		snprintf(buf, sizeof(buf), "%s %s is here.", AN(GET_BLD_NAME(from_bld)), GET_BLD_NAME(from_bld));
 		strtolower(buf);
-		VEH_LONG_DESC(to_veh) = str_dup(CAP(buf));
+		set_vehicle_long_desc(to_veh, CAP(buf));
 		
 		// look desc?
-		if (VEH_LOOK_DESC(to_veh)) {
-			free(VEH_LOOK_DESC(to_veh));
-		}
-		VEH_LOOK_DESC(to_veh) = GET_BLD_DESC(from_bld) ? str_dup(GET_BLD_DESC(from_bld)) : NULL;
+		set_vehicle_look_desc(to_veh, GET_BLD_DESC(from_bld), FALSE);
 		
 		// icon?
-		if (VEH_ICON(to_veh)) {
-			free(VEH_ICON(to_veh));
-		}
-		VEH_ICON(to_veh) = icon;
+		set_vehicle_icon(to_veh, icon);
 		
 		// basic traits
 		VEH_SIZE(to_veh) = 1;
 		VEH_INTERIOR_ROOM_VNUM(to_veh) = to_bld ? to_vnum : NOWHERE;
 		
 		// flags
-		SET_BIT(VEH_FLAGS(to_veh), VEH_CUSTOMIZABLE | VEH_NO_BUILDING | VEH_NO_LOAD_ONTO_VEHICLE | VEH_VISIBLE_IN_DARK | VEH_BUILDING);
+		set_vehicle_flags(to_veh, VEH_CUSTOMIZABLE | VEH_NO_BUILDING | VEH_NO_LOAD_ONTO_VEHICLE | VEH_VISIBLE_IN_DARK | VEH_BUILDING);
 		if (!BLD_FLAGGED(from_bld, BLD_OPEN)) {
-			SET_BIT(VEH_FLAGS(to_veh), VEH_IN);
+			set_vehicle_flags(to_veh, VEH_IN);
 		}
 		if (BLD_FLAGGED(from_bld, BLD_BURNABLE)) {
-			SET_BIT(VEH_FLAGS(to_veh), VEH_BURNABLE);
+			set_vehicle_flags(to_veh, VEH_BURNABLE);
 		}
 		if (BLD_FLAGGED(from_bld, BLD_INTERLINK)) {
-			SET_BIT(VEH_FLAGS(to_veh), VEH_INTERLINK);
+			set_vehicle_flags(to_veh, VEH_INTERLINK);
 		}
 		if (BLD_FLAGGED(from_bld, BLD_ALLOW_MOUNTS | BLD_HERD)) {
-			SET_BIT(VEH_FLAGS(to_veh), VEH_CARRY_MOBS);
+			set_vehicle_flags(to_veh, VEH_CARRY_MOBS);
 		}
 		if (BLD_FLAGGED(from_bld, BLD_ALLOW_MOUNTS)) {
-			SET_BIT(VEH_FLAGS(to_veh), VEH_CARRY_VEHICLES);
+			set_vehicle_flags(to_veh, VEH_CARRY_VEHICLES);
 		}
 		if (BLD_FLAGGED(from_bld, BLD_IS_RUINS)) {
-			SET_BIT(VEH_FLAGS(to_veh), VEH_IS_RUINS);
+			set_vehicle_flags(to_veh, VEH_IS_RUINS);
 		}
 		if (BLD_FLAGGED(from_bld, BLD_NO_PAINT)) {
-			SET_BIT(VEH_FLAGS(to_veh), VEH_NO_PAINT);
+			set_vehicle_flags(to_veh, VEH_NO_PAINT);
 		}
 		if (BLD_FLAGGED(from_bld, BLD_DEDICATE)) {
-			SET_BIT(VEH_FLAGS(to_veh), VEH_DEDICATE);
+			set_vehicle_flags(to_veh, VEH_DEDICATE);
 		}
 		if (IS_SET(room_affs, ROOM_AFF_CHAMELEON)) {
 			REMOVE_BIT(room_affs, ROOM_AFF_CHAMELEON);
-			SET_BIT(VEH_FLAGS(to_veh), VEH_CHAMELEON);
+			set_vehicle_flags(to_veh, VEH_CHAMELEON);
 		}
 		
 		// copy traits over
@@ -2791,7 +2782,7 @@ int perform_set(char_data *ch, char_data *vict, int mode, char *val_arg) {
 		value = MAX(GET_MIN_SCALE_LEVEL(vict), value);
 		value = MIN(GET_MAX_SCALE_LEVEL(vict), value);
 		scale_mob_to_level(vict, value);
-		SET_BIT(MOB_FLAGS(vict), MOB_NO_RESCALE);
+		set_mob_flags(vict, MOB_NO_RESCALE);
 	}
 	
 	// this goes last, after all SET_CASE statements
@@ -8457,7 +8448,9 @@ ACMD(do_fullsave) {
 	syslog(SYS_INFO, 0, FALSE, "Updating zone files...");
 	
 	time = microtime();
-	write_world_to_files();
+	write_fresh_binary_map_file();
+	write_whole_binary_world_index();
+	write_all_wld_files();
 	send_config_msg(ch, "ok_string");
 	
 	if (ch->desc) {
@@ -8931,7 +8924,7 @@ ACMD(do_moveeinv) {
 
 ACMD(do_oset) {
 	char obj_arg[MAX_INPUT_LENGTH], field_arg[MAX_INPUT_LENGTH], *obj_arg_ptr = obj_arg;
-	obj_data *obj, *proto;
+	obj_data *obj;
 	int number;
 	
 	argument = one_argument(argument, obj_arg);
@@ -8947,23 +8940,19 @@ ACMD(do_oset) {
 	}
 	else if (is_abbrev(field_arg, "flags")) {
 		GET_OBJ_EXTRA(obj) = olc_process_flag(ch, argument, "extra", "oset name flags", extra_bits, GET_OBJ_EXTRA(obj));
+		request_obj_save_in_world(obj);
 	}
 	else if (is_abbrev(field_arg, "keywords") || is_abbrev(field_arg, "aliases")) {
 		if (!*argument) {
 			msg_to_char(ch, "Set the keywords to what?\r\n");
 		}
 		else {
-			proto = obj_proto(GET_OBJ_VNUM(obj));
-			
-			if (GET_OBJ_KEYWORDS(obj) && (!proto || GET_OBJ_KEYWORDS(obj) != GET_OBJ_KEYWORDS(proto))) {
-				free(GET_OBJ_KEYWORDS(obj));
-			}
-			if (proto && !str_cmp(argument, "none")) {
-				GET_OBJ_KEYWORDS(obj) = GET_OBJ_KEYWORDS(proto);
+			if (!str_cmp(argument, "none")) {
+				set_obj_keywords(obj, NULL);
 				msg_to_char(ch, "You restore its original keywords.\r\n");
 			}
 			else {
-				GET_OBJ_KEYWORDS(obj) = str_dup(argument);
+				set_obj_keywords(obj, argument);
 				msg_to_char(ch, "You change its keywords to '%s'.\r\n", GET_OBJ_KEYWORDS(obj));
 			}
 		}
@@ -8973,17 +8962,12 @@ ACMD(do_oset) {
 			msg_to_char(ch, "Set the long description to what?\r\n");
 		}
 		else {
-			proto = obj_proto(GET_OBJ_VNUM(obj));
-			
-			if (GET_OBJ_LONG_DESC(obj) && (!proto || GET_OBJ_LONG_DESC(obj) != GET_OBJ_LONG_DESC(proto))) {
-				free(GET_OBJ_LONG_DESC(obj));
-			}
-			if (proto && !str_cmp(argument, "none")) {
-				GET_OBJ_LONG_DESC(obj) = GET_OBJ_LONG_DESC(proto);
+			if (!str_cmp(argument, "none")) {
+				set_obj_long_desc(obj, NULL);
 				msg_to_char(ch, "You restore its original long description.\r\n");
 			}
 			else {
-				GET_OBJ_LONG_DESC(obj) = str_dup(argument);
+				set_obj_long_desc(obj, argument);
 				msg_to_char(ch, "You change its long description to '%s'.\r\n", GET_OBJ_LONG_DESC(obj));
 			}
 		}
@@ -8993,17 +8977,12 @@ ACMD(do_oset) {
 			msg_to_char(ch, "Set the short description to what?\r\n");
 		}
 		else {
-			proto = obj_proto(GET_OBJ_VNUM(obj));
-			
-			if (GET_OBJ_SHORT_DESC(obj) && (!proto || GET_OBJ_SHORT_DESC(obj) != GET_OBJ_SHORT_DESC(proto))) {
-				free(GET_OBJ_SHORT_DESC(obj));
-			}
-			if (proto && !str_cmp(argument, "none")) {
-				GET_OBJ_SHORT_DESC(obj) = GET_OBJ_SHORT_DESC(proto);
+			if (!str_cmp(argument, "none")) {
+				set_obj_short_desc(obj, NULL);
 				msg_to_char(ch, "You restore its original short description.\r\n");
 			}
 			else {
-				GET_OBJ_SHORT_DESC(obj) = str_dup(argument);
+				set_obj_short_desc(obj, argument);
 				msg_to_char(ch, "You change its short description to '%s'.\r\n", GET_OBJ_SHORT_DESC(obj));
 			}
 		}
@@ -9014,6 +8993,7 @@ ACMD(do_oset) {
 		}
 		else {
 			GET_OBJ_TIMER(obj) = atoi(argument);
+			request_obj_save_in_world(obj);
 			msg_to_char(ch, "You change its timer to %d.\r\n", GET_OBJ_TIMER(obj));
 		}
 	}
@@ -9219,6 +9199,7 @@ ACMD(do_purge) {
 					}
 				}
 				VEH_SHIPPING_ID(veh) = -1;
+				request_vehicle_save_in_world(veh);
 			}
 			
 			act("$n destroys $V.", FALSE, ch, NULL, veh, TO_ROOM | DG_NO_TRIG);
@@ -9451,7 +9432,7 @@ ACMD(do_rescale) {
 		}
 		else {
 			scale_mob_to_level(vict, level);
-			SET_BIT(MOB_FLAGS(vict), MOB_NO_RESCALE);
+			set_mob_flags(vict, MOB_NO_RESCALE);
 			
 			syslog(SYS_GC, GET_ACCESS_LEVEL(ch), TRUE, "ABUSE: %s has rescaled mob %s to level %d at %s", GET_NAME(ch), PERS(vict, vict, FALSE), GET_CURRENT_SCALE_LEVEL(vict), room_log_identifier(IN_ROOM(vict)));
 			
@@ -9532,7 +9513,7 @@ ACMD(do_restore) {
 			act("$n waves $s hand and restores $V!", FALSE, ch, NULL, veh, TO_ROOM | DG_NO_TRIG);
 		}
 		
-		REMOVE_BIT(VEH_FLAGS(veh), VEH_ON_FIRE);
+		remove_vehicle_flags(veh, VEH_ON_FIRE);
 		if (!VEH_IS_DISMANTLING(veh)) {
 			complete_vehicle(veh);
 		}
@@ -10430,6 +10411,7 @@ ACMD(do_trans) {
 				}
 			}
 			VEH_SHIPPING_ID(veh) = -1;
+			request_vehicle_save_in_world(veh);
 		}
 		
 		if (ROOM_PEOPLE(IN_ROOM(veh))) {
@@ -10466,6 +10448,7 @@ ACMD(do_unbind) {
 	}
 	else {
 		free_obj_binding(&OBJ_BOUND_TO(obj));
+		request_obj_save_in_world(obj);
 		syslog(SYS_GC, GET_ACCESS_LEVEL(ch), TRUE, "ABUSE: %s used unbind on %s", GET_REAL_NAME(ch), GET_OBJ_SHORT_DESC(obj));
 		act("You unbind $p.", FALSE, ch, obj, NULL, TO_CHAR | DG_NO_TRIG);
 	}

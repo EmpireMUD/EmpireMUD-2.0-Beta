@@ -779,6 +779,8 @@ ACMD(do_disenchant) {
 		act("$n shouts 'KA!' and cracks $p, which blasts out red light, and then fizzles.", FALSE, ch, obj, NULL, TO_ROOM);
 		gain_ability_exp(ch, ABIL_DISENCHANT, 33.4);
 		
+		request_obj_save_in_world(obj);
+		
 		// obj back?
 		if (skill_check(ch, ABIL_DISENCHANT, DIFF_MEDIUM)) {
 			rnd = number(1, 10000);
@@ -1099,7 +1101,7 @@ ACMD(do_mirrorimage) {
 	mob->real_attributes[WITS] = GET_WITS(ch);
 
 	SET_BIT(AFF_FLAGS(mob), AFF_CHARM);
-	SET_BIT(MOB_FLAGS(mob), MOB_NO_RESCALE);
+	set_mob_flags(mob, MOB_NO_RESCALE);
 	affect_total(mob);
 	
 	act("You create a mirror image to distract your foes!", FALSE, ch, NULL, NULL, TO_CHAR);

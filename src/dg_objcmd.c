@@ -481,7 +481,7 @@ OCMD(do_orestore) {
 		// not sure what to do for objs
 	}
 	if (veh) {
-		REMOVE_BIT(VEH_FLAGS(veh), VEH_ON_FIRE);
+		remove_vehicle_flags(veh, VEH_ON_FIRE);
 		if (!VEH_IS_DISMANTLING(veh)) {
 			complete_vehicle(veh);
 		}
@@ -490,8 +490,9 @@ OCMD(do_orestore) {
 		if (COMPLEX_DATA(room)) {
 			free_resource_list(GET_BUILDING_RESOURCES(room));
 			GET_BUILDING_RESOURCES(room) = NULL;
-			COMPLEX_DATA(room)->damage = 0;
-			COMPLEX_DATA(room)->burn_down_time = 0;
+			set_room_damage(room, 0);
+			set_burn_down_time(room, 0, FALSE);
+			request_world_save(GET_ROOM_VNUM(room), WSAVE_ROOM);
 		}
 	}
 }
@@ -537,8 +538,10 @@ OCMD(do_otimer) {
 		obj_log(obj, "otimer: missing argument");
 	else if (!isdigit(*arg)) 
 		obj_log(obj, "otimer: bad argument");
-	else
+	else {
 		GET_OBJ_TIMER(obj) = atoi(arg);
+		request_obj_save_in_world(obj);
+	}
 }
 
 
@@ -1183,7 +1186,7 @@ OCMD(do_oload) {
 		if (target && *target && isdigit(*target)) {
 			// target is scale level
 			scale_mob_to_level(mob, atoi(target));
-			SET_BIT(MOB_FLAGS(mob), MOB_NO_RESCALE);
+			set_mob_flags(mob, MOB_NO_RESCALE);
 		}
 		
 		load_mtrigger(mob);
@@ -1587,7 +1590,7 @@ OCMD(do_osetval) {
 	position = atoi(arg1);
 	new_value = atoi(arg2);
 	if (position >= 0 && position < NUM_OBJ_VAL_POSITIONS)
-		GET_OBJ_VAL(obj, position) = new_value;
+		set_obj_val(obj, position, new_value);
 	else
 		obj_log(obj, "osetval: position out of bounds!");
 }
@@ -1676,7 +1679,7 @@ OCMD(do_oscale) {
 		}
 
 		scale_mob_to_level(victim, level);
-		SET_BIT(MOB_FLAGS(victim), MOB_NO_RESCALE);
+		set_mob_flags(victim, MOB_NO_RESCALE);
 	}
 	// scale vehicle
 	else if ((veh = get_vehicle_by_obj(obj, arg))) {

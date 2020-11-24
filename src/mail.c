@@ -175,9 +175,9 @@ ACMD(do_mail) {
 		else {
 			while ((mail = GET_MAIL_PENDING(ch)) && amt-- && ++count) {
 				obj = create_obj();
-				GET_OBJ_KEYWORDS(obj) = str_dup("letter small mail");
-				GET_OBJ_SHORT_DESC(obj) = str_dup("a small letter");
-				GET_OBJ_LONG_DESC(obj) = str_dup("Someone has left a small letter here.");
+				set_obj_keywords(obj, "letter small mail");
+				set_obj_short_desc(obj, "a small letter");
+				set_obj_long_desc(obj, "Someone has left a small letter here.");
 				obj->proto_data->type_flag = ITEM_MAIL;
 				GET_OBJ_WEAR(obj) = ITEM_WEAR_TAKE | ITEM_WEAR_HOLD;
 				GET_OBJ_TIMER(obj) = UNLIMITED;
@@ -192,7 +192,7 @@ ACMD(do_mail) {
 					"  To: %s\r\n"
 					"From: %s\r\n\r\n%s", tmstr, PERS(ch, ch, TRUE),
 						index ? index->fullname : "Unknown", NULLSAFE(mail->body));
-				GET_OBJ_ACTION_DESC(obj) = str_dup(mail_buf);
+				set_obj_look_desc(obj, mail_buf, FALSE);
 				
 				obj_to_char(obj, ch);
 				

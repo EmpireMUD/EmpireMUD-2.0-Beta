@@ -89,17 +89,17 @@ obj_data *create_book_obj(book_data *book) {
 	
 	obj = create_obj();
 	
-	GET_OBJ_SHORT_DESC(obj) = str_dup(NULLSAFE(book->item_name));
+	set_obj_short_desc(obj, NULLSAFE(book->item_name));
 	snprintf(buf, sizeof(buf), "book %s", skip_filler(NULLSAFE(book->item_name)));
-	GET_OBJ_KEYWORDS(obj) = str_dup(buf);
+	set_obj_keywords(obj, buf);
 	snprintf(buf, sizeof(buf), "Someone has left %s here.", NULLSAFE(book->item_name));
-	GET_OBJ_LONG_DESC(obj) = str_dup(buf);
-	GET_OBJ_ACTION_DESC(obj) = str_dup(NULLSAFE(book->item_description));
+	set_obj_long_desc(obj, buf);
+	set_obj_look_desc(obj, NULLSAFE(book->item_description), FALSE);
 	
 	obj->proto_data->type_flag = ITEM_BOOK;
 	GET_OBJ_WEAR(obj) = ITEM_WEAR_TAKE;
 	GET_OBJ_TIMER(obj) = UNLIMITED;
-	GET_OBJ_VAL(obj, VAL_BOOK_ID) = book->vnum;
+	set_obj_val(obj, VAL_BOOK_ID, book->vnum);
 	
 	return obj;
 }

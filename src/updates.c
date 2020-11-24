@@ -25,11 +25,14 @@
 #include "skills.h"
 #include "vnums.h"
 
+#include <glob.h>
+
 /**
 * Contents:
 *   Update Functions -- Write a function to be run once at startup
 *   Update Data -- Add to the end of this array to activate the function
 *   Core Functions
+*   Pre-b5.116 World Loading
 */
 
 
@@ -218,7 +221,7 @@ void b5_3_missile_update(void) {
 		// ALL bows are TYPE_BOW before this update
 		if (GET_MISSILE_WEAPON_TYPE(obj) != TYPE_BOW) {
 			log(" - updating %d %s from %d to %d (bow)", GET_OBJ_VNUM(obj), skip_filler(GET_OBJ_SHORT_DESC(obj)), GET_MISSILE_WEAPON_TYPE(obj), TYPE_BOW);
-			GET_OBJ_VAL(obj, VAL_MISSILE_WEAPON_TYPE) = TYPE_BOW;
+			set_obj_val(obj, VAL_MISSILE_WEAPON_TYPE, TYPE_BOW);
 			save_library_file_for_vnum(DB_BOOT_OBJ, GET_OBJ_VNUM(obj));
 		}
 	}
@@ -950,6 +953,7 @@ void b5_82_snowman_fix(void) {
 				create_script_data(ch, MOB_TRIGGER);
 			}
 			add_trigger(SCRIPT(ch), trig, -1);
+			request_char_save_in_world(ch);
 		}
 	}
 }
@@ -1134,15 +1138,15 @@ void b5_86_update(void) {
 	// update all map tiles
 	LL_FOREACH(land_map, map) {
 		if (!map->natural_sector || GET_SECT_VNUM(map->natural_sector) == temperate_crop) {
-			map->natural_sector = temperate_sect;
+			set_natural_sector(map, temperate_sect);
 			++temp;
 		}
 		else if (GET_SECT_VNUM(map->natural_sector) == desert_crop) {
-			map->natural_sector = desert_sect;
+			set_natural_sector(map, desert_sect);
 			++des;
 		}
 		else if (GET_SECT_VNUM(map->natural_sector) == jungle_crop) {
-			map->natural_sector = jungle_sect;
+			set_natural_sector(map, jungle_sect);
 			++jung;
 		}
 	}
@@ -2025,6 +2029,662 @@ void check_version(void) {
 		run_delayed_refresh();
 		free_loaded_players();
 		save_all_empires();
-		write_world_to_files();
+		save_world_after_startup = TRUE;
+	}
+}
+
+
+ //////////////////////////////////////////////////////////////////////////////
+//// PRE-B5.116 WORLD LOADING ////////////////////////////////////////////////
+
+#define PRE_B5_116_WORLD_MAP_FILE  LIB_WORLD"base_map"	// storage for the game's base map
+
+
+/**
+* After successfully starting up and saving the new version, this will clean
+* up old files including: base_map, world index, world files, obj packs.
+*/
+void delete_pre_b5_116_world_files(void) {
+	int wld_count = 0, pack_count = 0;
+	char fname[256];
+	glob_t globbuf;
+	int iter;
+	FILE *fl;
+	
+	if (access(LIB_WORLD "base_map", F_OK) == 0) {
+		log("Deleting: %s", LIB_WORLD "base_map");
+		unlink(LIB_WORLD "base_map");
+	}
+	sprintf(fname, "%s%s", WLD_PREFIX, INDEX_FILE);
+	if ((fl = fopen(fname, "w"))) {
+		log("Overwriting: %s", fname);
+		fprintf(fl, "$\n");
+		fclose(fl);
+	}
+	
+	// old world files:
+	sprintf(fname, "%s*%s", WLD_PREFIX, WLD_SUFFIX);
+	glob(fname, 0, NULL, &globbuf);
+	for (iter = 0; iter < globbuf.gl_pathc; ++iter) {
+		++wld_count;
+		unlink(globbuf.gl_pathv[iter]);
+	}
+	if (wld_count > 0) {
+		log("Deleting: %d world file%s", wld_count, PLURAL(wld_count));
+	}
+	globfree(&globbuf);
+	
+	// old pack files:
+	sprintf(fname, "%s*%s", LIB_OBJPACK, SUF_PACK);
+	glob(fname, 0, NULL, &globbuf);
+	for (iter = 0; iter < globbuf.gl_pathc; ++iter) {
+		++pack_count;
+		unlink(globbuf.gl_pathv[iter]);
+	}
+	if (pack_count > 0) {
+		log("Deleting: %d pack file%s", pack_count, PLURAL(pack_count));
+	}
+	globfree(&globbuf);
+}
+
+
+/**
+* This function helps upgrade EmpireMUDs to b5.116+:
+*
+* This loads the world_map array from file. This is optional, and this data
+* can be overwritten by the actual rooms from the .wld files. This should be
+* run after sectors are loaded, and before the .wld files are read in.
+*
+* @return bool TRUE if we did successfully load an old base_map; FALSE if not.
+*/
+bool load_pre_b5_116_world_map_from_file(void) {
+	void init_map();
+	
+	char line[256], line2[256], str1[256], str2[256], error_buf[MAX_STRING_LENGTH];
+	struct map_data *map, *last = NULL;
+	struct depletion_data *dep;
+	struct track_data *track;
+	int var[8];
+	long l_in;
+	FILE *fl;
+	
+	if (!(fl = fopen(PRE_B5_116_WORLD_MAP_FILE, "r"))) {
+		// no longer log this: this was a backup option anyway
+		// log(" - no %s file, booting without one", PRE_B5_116_WORLD_MAP_FILE);
+		return FALSE;
+	}
+	
+	strcpy(error_buf, "base_map file");
+	
+	// optionals
+	while (get_line(fl, line)) {
+		if (*line == '$') {
+			break;
+		}
+		
+		// new room
+		if (isdigit(*line)) {
+			// x y island sect base natural crop misc
+			if (sscanf(line, "%d %d %d %d %d %d %d %d", &var[0], &var[1], &var[2], &var[3], &var[4], &var[5], &var[6], &var[7]) != 8) {
+				var[7] = 0;	// backwards-compatible on the misc
+				if (sscanf(line, "%d %d %d %d %d %d %d", &var[0], &var[1], &var[2], &var[3], &var[4], &var[5], &var[6]) != 7) {
+					log("Encountered bad line in world map file: %s", line);
+					continue;
+				}
+			}
+			if (var[0] < 0 || var[0] >= MAP_WIDTH || var[1] < 0 || var[1] >= MAP_HEIGHT) {
+				log("Encountered bad location in world map file: (%d, %d)", var[0], var[1]);
+				continue;
+			}
+		
+			map = &(world_map[var[0]][var[1]]);
+			sprintf(error_buf, "base_map tile %d", map->vnum);
+			
+			if (var[3] != BASIC_OCEAN && map->shared == &ocean_shared_data) {
+				map->shared = NULL;	// unlink basic ocean
+				CREATE(map->shared, struct shared_room_data, 1);
+			}
+			
+			if (map->shared->island_id != var[2]) {
+				map->shared->island_id = var[2];
+				map->shared->island_ptr = (var[2] == NO_ISLAND ? NULL : get_island(var[2], TRUE));
+			}
+			
+			// these will be validated later
+			map->sector_type = sector_proto(var[3]);
+			map->base_sector = sector_proto(var[4]);
+			map->natural_sector = sector_proto(var[5]);
+			map->crop_type = crop_proto(var[6]);
+			// var[7] is ignored -- this is misc keys for the evolve.c utility
+			
+			last = map;	// store in case of more data
+		}
+		else if (last) {
+			switch (*line) {
+				case 'E': {	// affects
+					if (!get_line(fl, line2)) {
+						log("SYSERR: Unable to get E line for map tile #%d", last->vnum);
+						break;
+					}
+					if (sscanf(line2, "%s %s", str1, str2) != 2) {
+						if (sscanf(line2, "%s", str1) != 1) {
+							log("SYSERR: Invalid E line for map tile #%d", last->vnum);
+							break;
+						}
+						// otherwise backwards-compatible:
+						strcpy(str2, str1);
+					}
+
+					last->shared->base_affects = asciiflag_conv(str1);
+					last->shared->affects = asciiflag_conv(str2);
+					break;
+				}
+				case 'I': {	// icon
+					if (last->shared->icon) {
+						free(last->shared->icon);
+					}
+					last->shared->icon = fread_string(fl, error_buf);
+					break;
+				}
+				case 'M': {	// description
+					if (last->shared->description) {
+						free(last->shared->description);
+					}
+					last->shared->description = fread_string(fl, error_buf);
+					break;
+				}
+				case 'N': {	// name
+					if (last->shared->name) {
+						free(last->shared->name);
+					}
+					last->shared->name = fread_string(fl, error_buf);
+					break;
+				}
+				case 'U': {	// other data (height etc)
+					parse_other_shared_data(last->shared, line, error_buf);
+					break;
+				}
+				case 'X': {	// resource depletion
+					if (!get_line(fl, line2)) {
+						log("SYSERR: Unable to read depletion line of map tile #%d", last->vnum);
+						exit(1);
+					}
+					if ((sscanf(line2, "%d %d", &var[0], &var[1])) != 2) {
+						log("SYSERR: Format in depletion line of map tile #%d", last->vnum);
+						exit(1);
+					}
+				
+					CREATE(dep, struct depletion_data, 1);
+					dep->type = var[0];
+					dep->count = var[1];
+					LL_PREPEND(last->shared->depletion, dep);
+					break;
+				}
+				case 'Y': {	// tracks
+					if (!get_line(fl, line2)) {
+						log("SYSERR: Missing Y section of map tile #%d", last->vnum);
+						exit(1);
+					}
+					if (sscanf(line2, "%d %d %ld %d %d", &var[0], &var[1], &l_in, &var[2], &var[3]) != 5) {
+						var[3] = NOWHERE;	// to_room: backwards-compatible with old version
+						if (sscanf(line2, "%d %d %ld %d", &var[0], &var[1], &l_in, &var[2]) != 4) {
+							log("SYSERR: Bad formatting in Y section of map tile #%d", last->vnum);
+							exit(1);
+						}
+					}
+					
+					// note: var[0] is no longer used (formerly player id)
+					HASH_FIND_INT(last->shared->tracks, &var[1], track);
+					if (!track) {
+						CREATE(track, struct track_data, 1);
+						track->id = var[1];
+						HASH_ADD_INT(last->shared->tracks, id, track);
+					}
+					track->timestamp = l_in;
+					track->dir = var[2];
+					track->to_room = var[3];
+					break;
+				}
+				case 'Z': {	// extra data
+					if (!get_line(fl, line2) || sscanf(line2, "%d %d", &var[0], &var[1]) != 2) {
+						log("SYSERR: Bad formatting in Z section of map tile #%d", last->vnum);
+						exit(1);
+					}
+					
+					set_extra_data(&last->shared->extra_data, var[0], var[1]);
+					break;
+				}
+			}
+		}
+		else {
+			log("Junk data found in base_map file: %s", line);
+			exit(0);
+		}
+	}
+	
+	fclose(fl);
+	converted_to_b5_116 = TRUE;
+	return TRUE;
+}
+
+
+/**
+* This function helps upgrade EmpireMUDs to b5.116+:
+*
+* Reads direction data from a file and builds an exit for it.
+*
+* @param FILE *fl The file to read from.
+* @param room_data *room Which room to add an exit to.
+* @param int dir The direction to add the exit.
+*/
+void setup_pre_b5_116_dir(FILE *fl, room_data *room, int dir) {
+	struct room_direction_data *ex;
+	int t[5];
+	char line[256], str_in[256], *tmp;
+	
+	// ensure we have a building -- although we SHOULD
+	if (!COMPLEX_DATA(room)) {
+		COMPLEX_DATA(room) = init_complex_data();
+	}
+
+	sprintf(buf2, "room #%d, direction D%d", GET_ROOM_VNUM(room), dir);
+	
+	// keyword
+	tmp = fread_string(fl, buf2);
+	
+	if (!get_line(fl, line)) {
+		log("SYSERR: Format error, %s", buf2);
+		exit(1);
+	}
+	if (sscanf(line, " %s %d ", str_in, &t[0]) != 2) {
+		log("SYSERR: Format error, %s", buf2);
+		exit(1);
+	}
+
+	// see if there's already an exit before making one
+	if (!(ex = find_exit(room, dir))) {
+		CREATE(ex, struct room_direction_data, 1);
+		ex->dir = dir;
+		LL_PREPEND(COMPLEX_DATA(room)->exits, ex);
+	}
+
+	// exit data
+	ex->keyword = tmp;
+	ex->to_room = t[0];	// this is a vnum
+	ex->room_ptr = NULL;	// will be set in renum_world
+	ex->exit_info = asciiflag_conv(str_in);
+
+	// sort last
+	LL_SORT(COMPLEX_DATA(room)->exits, sort_exits);
+}
+
+
+/**
+* This function helps upgrade EmpireMUDs to b5.116+:
+*
+* Load one room from file.
+*
+* @param FILE *fl The open file (having just read the # line).
+* @param room_vnum vnum The vnum to read in.
+*/
+void parse_pre_b5_116_room(FILE *fl, room_vnum vnum) {
+	char line[256], line2[256], error_buf[256], error_log[MAX_STRING_LENGTH], str1[256], str2[256];
+	double dbl_in;
+	long l_in;
+	int t[10];
+	struct depletion_data *dep;
+	struct reset_com *reset;
+	struct affected_type *af;
+	struct track_data *track;
+	room_data *room, *find;
+	bool error = FALSE;
+	char *ptr;
+
+	sprintf(error_buf, "room #%d", vnum);
+	
+	CREATE(room, room_data, 1);
+	
+	// basic setup: things that don't default to 0/NULL
+	room->vnum = vnum;
+	
+	// attach/create shared data
+	if (vnum < MAP_SIZE) {
+		GET_MAP_LOC(room) = &(world_map[MAP_X_COORD(vnum)][MAP_Y_COORD(vnum)]);
+		SHARED_DATA(room) = GET_MAP_LOC(room)->shared;
+		GET_MAP_LOC(room)->room = room;
+	}
+	else {
+		CREATE(SHARED_DATA(room), struct shared_room_data, 1);
+	}
+	
+	HASH_FIND_INT(world_table, &vnum, find);
+	if (find) {
+		log("WARNING: Duplicate room vnum #%d", vnum);
+		// but have to load it anyway to advance the file
+	}
+	
+	// put it in the hash table
+	add_room_to_world_tables(room);
+	
+	// FIRST LINE: sector original subtype progress
+	if (!get_line(fl, line)) {
+		log("SYSERR: Expecting sector line of room #%d but file ended!", vnum);
+		exit(1);
+	}
+
+	if (sscanf(line, "%d %d %d", &t[0], &t[1], &t[2]) != 3) {
+		log("SYSERR: Format error in sector line of room #%d", vnum);
+		exit(1);
+	}
+	
+	// need to unlink shared data, if present, if this is not an ocean
+	if (t[1] != BASIC_OCEAN && SHARED_DATA(room) == &ocean_shared_data) {
+		// converting from ocean to non-ocean
+		SHARED_DATA(room) = NULL;	// unlink ocean share
+		CREATE(SHARED_DATA(room), struct shared_room_data, 1);
+		
+		if (GET_MAP_LOC(room)) {	// and pass this shared data back up to the world
+			GET_MAP_LOC(room)->shared = SHARED_DATA(room);
+		}
+	}
+	
+	GET_ISLAND_ID(room) = t[0];
+	SHARED_DATA(room)->island_ptr = (t[0] == NO_ISLAND ? NULL : get_island(t[0], TRUE));
+	room->sector_type = sector_proto(t[1]);
+	room->base_sector = sector_proto(t[2]);
+	
+	if (GET_MAP_LOC(room)) {
+		GET_MAP_LOC(room)->sector_type = room->sector_type;
+		GET_MAP_LOC(room)->base_sector = room->base_sector;
+	}
+
+	// set up building data?
+	if (IS_ANY_BUILDING(room) || IS_ADVENTURE_ROOM(room)) {
+		COMPLEX_DATA(room) = init_complex_data();
+	}
+
+	// extra data
+	sprintf(error_log, "SYSERR: Format error in room #%d (expecting D/E/S)", vnum);
+
+	for (;;) {
+		if (!get_line(fl, line)) {
+			log("%s", error_log);
+			exit(1);
+		}
+		switch (*line) {
+			case 'A': {	// affects
+				if (!get_line(fl, line2) || sscanf(line2, "%d %d %ld %d %d %s", &t[0], &t[1], &l_in, &t[3], &t[4], str1) != 6) {
+					log("SYSERR: Format error in A line of room #%d", vnum);
+					exit(1);
+				}
+				
+				CREATE(af, struct affected_type, 1);
+				af->type = t[0];
+				af->cast_by = t[1];
+				af->duration = l_in;
+				af->modifier = t[3];
+				af->location = t[4];
+				af->bitvector = asciiflag_conv(str1);
+				
+				LL_PREPEND(ROOM_AFFECTS(room), af);
+				break;
+			}
+			case 'B': {	// building data
+				if (!get_line(fl, line2) || sscanf(line2, "%d %d %d %d %ld %lf %d %d", &t[0], &t[1], &t[2], &t[3], &l_in, &dbl_in, &t[6], &t[7]) != 8) {
+					log("SYSERR: Format error in B line of room #%d", vnum);
+					exit(1);
+				}
+				
+				// ensure has building
+				if (!COMPLEX_DATA(room)) {
+					COMPLEX_DATA(room) = init_complex_data();
+				}
+				
+				if (t[0] != NOTHING) {
+					attach_building_to_room(building_proto(t[0]), room, FALSE);
+				}
+				if (t[1] != NOTHING) {
+					attach_template_to_room(room_template_proto(t[1]), room);
+				}
+				
+				COMPLEX_DATA(room)->entrance = t[2];
+				// see below for t[3]
+				COMPLEX_DATA(room)->burn_down_time = l_in;
+				COMPLEX_DATA(room)->damage = dbl_in;	// formerly t[5], which is now unused
+				COMPLEX_DATA(room)->private_owner = t[6];
+				
+				// b5.108: now converts the dedicate id / paint color if it sees it here; it's now saved as extra data
+				if (t[3] != 0) {
+					set_room_extra_data(room, ROOM_EXTRA_DEDICATE_ID, t[3]);
+				}
+				if (t[7] != 0) {
+					set_room_extra_data(room, ROOM_EXTRA_PAINT_COLOR, t[7]);
+				}
+				break;
+			}
+			case 'C': { // reset command
+				if (!*(line + 1) || !*(line + 2) || *(line + 2) == '*') {
+					// skip
+					break;
+				}
+			
+				CREATE(reset, struct reset_com, 1);
+				DL_APPEND(room->reset_commands, reset);
+				
+				// load data
+				reset->command = *(line + 2);
+				ptr = line + 3;
+				
+				if (reset->command == 'V') { // V: script variable reset
+					// trigger_type misc? room_vnum sarg1 sarg2
+					if (sscanf(line + 3, " %lld %lld %lld %79s %79[^\f\n\r\t\v]", &reset->arg1, &reset->arg2, &reset->arg3, str1, str2) != 5) {
+						error = TRUE;
+					}
+					else {
+						reset->sarg1 = strdup(str1);
+						reset->sarg2 = strdup(str2);
+					}
+				}
+				else if (strchr("Y", reset->command) != NULL) {	// generic-mob: 3-arg command
+					// generic-sex generic-name empire-id
+					if (sscanf(ptr, " %lld %lld %lld ", &reset->arg1, &reset->arg2, &reset->arg3) != 3) {
+						error = TRUE;
+					}
+				}
+				else if (strchr("CDT", reset->command) != NULL) {	/* C, D, Trigger: a 2-arg command */
+					// trigger_type trigger_vnum
+					if (sscanf(ptr, " %lld %lld ", &reset->arg1, &reset->arg2) != 2) {
+						error = TRUE;
+					}
+				}
+				else if (strchr("M", reset->command) != NULL) {	// Mob: 3 args
+					if (sscanf(ptr, " %lld %s %lld ", &reset->arg1, str1, &reset->arg3) != 3) {
+						error = TRUE;
+					}
+					else {
+						// this was formerly saved as ascii flags
+						reset->arg2 = asciiflag_conv(str1);
+					}
+				}
+				else if (strchr("I", reset->command) != NULL) {	/* a 1-arg command */
+					if (sscanf(ptr, " %lld ", &reset->arg1) != 1) {
+						error = TRUE;
+					}
+				}
+				else if (strchr("O", reset->command) != NULL) {
+					// 0-arg: nothing to do
+				}
+				else if (strchr("S", reset->command) != NULL) {	// mob custom strings: <string type> <value>
+					skip_spaces(&ptr);
+					reset->sarg1 = strdup(ptr);
+				}
+				else {	// all other types (1-arg?)
+					if (sscanf(ptr, " %lld ", &reset->arg1) != 1) {
+						error = TRUE;
+					}
+				}
+
+				if (error) {
+					log("SYSERR: Format error in room %d, zone command: '%s'", vnum, line);
+					exit(1);
+				}
+				
+				break;
+			}
+			case 'D': {	// door
+				setup_pre_b5_116_dir(fl, room, atoi(line + 1));
+				break;
+			}
+			case 'E': {	// affects
+				if (!get_line(fl, line2)) {
+					log("SYSERR: Unable to get E line for room #%d", vnum);
+					break;
+				}
+				if (sscanf(line2, "%s %s", str1, str2) != 2) {
+					if (sscanf(line2, "%s", str1) != 1) {
+						log("SYSERR: Invalid E line for room #%d", vnum);
+						break;
+					}
+					// otherwise backwards-compatible:
+					strcpy(str2, str1);
+				}
+
+				ROOM_BASE_FLAGS(room) = asciiflag_conv(str1);
+				ROOM_AFF_FLAGS(room) = asciiflag_conv(str2);
+				break;
+			}
+			case 'H': {	// home_room
+				// ensure it has building data
+				if (!COMPLEX_DATA(room)) {
+					COMPLEX_DATA(room) = init_complex_data();
+				}
+
+				// actual home room will be set later
+				add_trd_home_room(vnum, atoi(line + 1));
+				break;
+			}
+			case 'I': {	// icon
+				if (ROOM_CUSTOM_ICON(room)) {
+					free(ROOM_CUSTOM_ICON(room));
+				}
+				ROOM_CUSTOM_ICON(room) = fread_string(fl, error_buf);
+				break;
+			}
+			case 'M': {	// description
+				if (ROOM_CUSTOM_DESCRIPTION(room)) {
+					free(ROOM_CUSTOM_DESCRIPTION(room));
+				}
+				ROOM_CUSTOM_DESCRIPTION(room) = fread_string(fl, error_buf);
+				break;
+			}
+			case 'N': {	// name
+				if (ROOM_CUSTOM_NAME(room)) {
+					free(ROOM_CUSTOM_NAME(room));
+				}
+				ROOM_CUSTOM_NAME(room) = fread_string(fl, error_buf);
+				break;
+			}
+			case 'O': {	// owner (empire_vnum)
+				add_trd_owner(vnum, atoi(line+1));
+				break;
+			}
+			case 'P': { // crop (plants)
+				set_crop_type(room, crop_proto(atoi(line+1)));
+				break;
+			}
+			case 'R': {	/* resources */
+				if (!COMPLEX_DATA(room)) {	// ensure complex data
+					COMPLEX_DATA(room) = init_complex_data();
+				}
+				
+				parse_resource(fl, &GET_BUILDING_RESOURCES(room), error_log);
+				break;
+			}
+			
+			case 'T': {	// trigger (deprecated)
+				// NOTE: prior to b2.11, trigger prototypes were saved and read
+				// this way they are no longer saved this way at all, but this
+				// must be left in to be backwards-compatbile. If your mud has
+				// been up since b2.11, you can safely remove this block.
+				parse_trig_proto(line, &(room->proto_script), error_log);
+				break;
+			}
+			
+			case 'U': {	// other data (height etc)
+				parse_other_shared_data(SHARED_DATA(room), line, error_buf);
+				break;
+			}
+			
+			case 'X': {	// resource depletion
+				if (!get_line(fl, line2)) {
+					log("SYSERR: Unable to read depletion line of room #%d", vnum);
+					exit(1);
+				}
+				if ((sscanf(line2, "%d %d", t, t+1)) != 2) {
+					log("SYSERR: Format in depletion line of room #%d", vnum);
+					exit(1);
+				}
+				
+				CREATE(dep, struct depletion_data, 1);
+				dep->type = t[0];
+				dep->count = t[1];
+				LL_PREPEND(ROOM_DEPLETION(room), dep);
+				
+				break;
+			}
+			
+			case 'W': {	// built-with resources
+				if (!COMPLEX_DATA(room)) {	// ensure complex data
+					COMPLEX_DATA(room) = init_complex_data();
+				}
+				
+				parse_resource(fl, &GET_BUILT_WITH(room), error_log);
+				break;
+			}
+			
+			case 'Y': {	// tracks
+				if (!get_line(fl, line2)) {
+					log("SYSERR: Missing Y section of room #%d", vnum);
+					exit(1);
+				}
+				if (sscanf(line2, "%d %d %ld %d %d", &t[0], &t[1], &l_in, &t[2], &t[3]) != 5) {
+					t[3] = NOWHERE;	// to_room: backwards-compatible with old version
+					if (sscanf(line2, "%d %d %ld %d", &t[0], &t[1], &l_in, &t[2]) != 4) {
+						log("SYSERR: Bad formatting in Y section of room #%d", vnum);
+						exit(1);
+					}
+				}
+				
+				// t[0] is no longer used at all (formerly player id)
+				HASH_FIND_INT(ROOM_TRACKS(room), &t[1], track);
+				if (!track) {
+					CREATE(track, struct track_data, 1);
+					track->id = t[1];
+					HASH_ADD_INT(ROOM_TRACKS(room), id, track);
+				}
+				track->timestamp = l_in;
+				track->dir = t[2];
+				track->to_room = t[3];
+				break;
+			}
+			
+			case 'Z': {	// extra data
+				if (!get_line(fl, line2) || sscanf(line2, "%d %d", &t[0], &t[1]) != 2) {
+					log("SYSERR: Bad formatting in Z section of room #%d", vnum);
+					exit(1);
+				}
+				
+				set_room_extra_data(room, t[0], t[1]);
+				break;
+			}
+
+			case 'S': {	// end of room
+				return;
+			}
+			default: {
+				log("%s", error_log);
+				exit(1);
+			}
+		}
 	}
 }

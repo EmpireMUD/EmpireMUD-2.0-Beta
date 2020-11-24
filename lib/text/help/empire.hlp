@@ -93,7 +93,7 @@ CITY
 (Disambiguation: Did you mean HELP CITY INFORMATION, HELP CITY COMMANDS,
 or HELP CITY TYPES ?)
 #
-"CITY COMMANDS"
+"CITY COMMANDS" "CITY UPGRADE" "CITY LIST" "CITY FOUND" FOUND "FOUND CITY" "CITY DOWNGRADE" "CITY CLAIM" "CITY ABANDON" "CITY RENAME "RENAME CITY"
 
 Usage:  city <command> [city name]
 
@@ -756,7 +756,7 @@ Rewards the following buildings:
 
 See also: LUXURY RESOURCES GOAL, PROGRESS
 #
-"LUXURY RESOURCES" "LUXURY RESOURCES GOAL"
+"LUXURY RESOURCES" "LUXURY RESOURCES GOAL" GARDENS "HERB GARDENS"
 
 Luxury Resources (Industry goal)
 
@@ -766,7 +766,7 @@ Rewards the following buildings:
   &c~&b##&c~&0  raftgarden
   &g|&y##&g|&0  shadygarden
   &y/&r##&y\&0  terracedgarden
-  &g^/\^&0  trappersPost
+  &g^/\^&0  trapperspost
 
 See also: LUXURIES GOAL, PROGRESS
 #

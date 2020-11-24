@@ -297,7 +297,7 @@ void complete_building(room_data *room) {
 	GET_BUILDING_RESOURCES(room) = NULL;
 	
 	// ensure no damage (locally, not home-room)
-	COMPLEX_DATA(room)->damage = 0;
+	set_room_damage(room, 0);
 	
 	// remove incomplete
 	REMOVE_BIT(ROOM_BASE_FLAGS(room), ROOM_AFF_INCOMPLETE);
@@ -329,6 +329,8 @@ void complete_building(room_data *room) {
 	}
 	
 	affect_total_room(room);
+	request_mapout_update(GET_ROOM_VNUM(room));
+	request_world_save(GET_ROOM_VNUM(room), WSAVE_ROOM);
 }
 
 
@@ -382,6 +384,8 @@ void construct_building(room_data *room, bld_vnum type) {
 	}
 	
 	load_wtrigger(room);
+	request_mapout_update(GET_ROOM_VNUM(room));
+	request_world_save(GET_ROOM_VNUM(room), WSAVE_ROOM);
 }
 
 
@@ -645,6 +649,8 @@ void disassociate_building(room_data *room) {
 			// (totals do not change)
 		}
 	}
+	
+	request_mapout_update(GET_ROOM_VNUM(room));
 }
 
 
@@ -849,23 +855,24 @@ void finish_dismantle(char_data *ch, room_data *room) {
 /**
 * Process the end of maintenance.
 *
-* @param char_data *ch the repairman (pc or npc)
-* @param room_data *room the location
+* @param char_data *ch Optional: The repairman (pc or npc; may be NULL).
+* @param room_data *room The location.
 */
 void finish_maintenance(char_data *ch, room_data *room) {
 	// repair all damage
-	if (COMPLEX_DATA(room)) {
-		COMPLEX_DATA(room)->damage = 0;
-	}
+	set_room_damage(room, 0);
 	if (IS_COMPLETE(room) && BUILDING_RESOURCES(room)) {
 		free_resource_list(GET_BUILDING_RESOURCES(room));
 		GET_BUILDING_RESOURCES(room) = NULL;
 	}
 	
-	msg_to_char(ch, "You complete the maintenance.\r\n");
-	act("$n has completed the maintenance.", FALSE, ch, NULL, NULL, TO_ROOM);
+	if (ch) {
+		msg_to_char(ch, "You complete the maintenance.\r\n");
+		act("$n has completed the maintenance.", FALSE, ch, NULL, NULL, TO_ROOM);
+	}
 	stop_room_action(room, ACT_MAINTENANCE);
 	stop_room_action(room, ACT_BUILDING);
+	request_world_save(GET_ROOM_VNUM(room), WSAVE_ROOM);
 }
 
 
@@ -1011,6 +1018,7 @@ void process_build(char_data *ch, room_data *room, int act_type) {
 			
 			// take the item; possibly free the res
 			apply_resource(ch, res, &GET_BUILDING_RESOURCES(room), found_obj, APPLY_RES_BUILD, NULL, &GET_BUILT_WITH(room));
+			request_world_save(GET_ROOM_VNUM(room), WSAVE_ROOM);
 			
 			// skillups (building only)
 			if (type && act_type == ACT_BUILDING && GET_CRAFT_ABILITY(type) != NO_ABIL) {
@@ -1137,6 +1145,8 @@ void process_dismantling(char_data *ch, room_data *room) {
 			free(res);
 		}
 	}
+	
+	request_world_save(GET_ROOM_VNUM(room), WSAVE_ROOM);
 	
 	// done?
 	if (!BUILDING_RESOURCES(room)) {
@@ -1302,7 +1312,7 @@ void start_dismantle_building(room_data *loc) {
 	
 	// unset private owner
 	if (ROOM_PRIVATE_OWNER(loc) != NOBODY) {
-		COMPLEX_DATA(loc)->private_owner = NOBODY;
+		set_private_owner(loc, NOBODY);
 	}
 	
 	// remove any existing resources remaining
@@ -1357,6 +1367,8 @@ void start_dismantle_building(room_data *loc) {
 	stop_room_action(loc, ACT_PICKING);
 	
 	affect_total_room(loc);
+	request_mapout_update(GET_ROOM_VNUM(loc));
+	request_world_save(GET_ROOM_VNUM(loc), WSAVE_ROOM);
 }
 
 
@@ -1631,10 +1643,7 @@ void do_customize_room(char_data *ch, char *argument) {
 			msg_to_char(ch, "What would you like to name this room (or \"none\")?\r\n");
 		}
 		else if (!str_cmp(arg2, "none")) {
-			if (ROOM_CUSTOM_NAME(IN_ROOM(ch))) {
-				free(ROOM_CUSTOM_NAME(IN_ROOM(ch)));
-				ROOM_CUSTOM_NAME(IN_ROOM(ch)) = NULL;
-			}
+			set_room_custom_name(IN_ROOM(ch), NULL);
 			
 			// they lose hide-real-name if they rename it themselves
 			REMOVE_BIT(ROOM_BASE_FLAGS(IN_ROOM(ch)), ROOM_AFF_HIDE_REAL_NAME);
@@ -1650,13 +1659,10 @@ void do_customize_room(char_data *ch, char *argument) {
 			msg_to_char(ch, "That name is too long. Room names may not be over 60 characters.\r\n");
 		}
 		else {
-			if (ROOM_CUSTOM_NAME(IN_ROOM(ch))) {
-				free(ROOM_CUSTOM_NAME(IN_ROOM(ch)));
-			}
-			else {
+			if (!ROOM_CUSTOM_NAME(IN_ROOM(ch))) {
 				gain_player_tech_exp(ch, PTECH_CUSTOMIZE_BUILDING, 33.4);
 			}
-			ROOM_CUSTOM_NAME(IN_ROOM(ch)) = str_dup(arg2);
+			set_room_custom_name(IN_ROOM(ch), arg2);
 			
 			// they lose hide-real-name if they rename it themselves
 			REMOVE_BIT(ROOM_BASE_FLAGS(IN_ROOM(ch)), ROOM_AFF_HIDE_REAL_NAME);
@@ -1675,10 +1681,7 @@ void do_customize_room(char_data *ch, char *argument) {
 			msg_to_char(ch, "You are already editing something else.\r\n");
 		}
 		else if (is_abbrev(arg2, "none")) {
-			if (ROOM_CUSTOM_DESCRIPTION(IN_ROOM(ch))) {
-				free(ROOM_CUSTOM_DESCRIPTION(IN_ROOM(ch)));
-				ROOM_CUSTOM_DESCRIPTION(IN_ROOM(ch)) = NULL;
-			}
+			set_room_custom_description(IN_ROOM(ch), NULL);
 			msg_to_char(ch, "This room no longer has a custom description.\r\n");
 		}
 		else if (is_abbrev(arg2, "set")) {
@@ -1686,6 +1689,7 @@ void do_customize_room(char_data *ch, char *argument) {
 				gain_player_tech_exp(ch, PTECH_CUSTOMIZE_BUILDING, 33.4);
 			}
 			start_string_editor(ch->desc, "room description", &(ROOM_CUSTOM_DESCRIPTION(IN_ROOM(ch))), MAX_ROOM_DESCRIPTION, TRUE);
+			ch->desc->save_room_id = GET_ROOM_VNUM(IN_ROOM(ch));
 			act("$n begins editing the room description.", TRUE, ch, 0, 0, TO_ROOM);
 		}
 		else {
@@ -1700,7 +1704,7 @@ void do_customize_room(char_data *ch, char *argument) {
 
 ACMD(do_dedicate) {
 	char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH];
-	vehicle_data *ded_veh = NULL, *proto;
+	vehicle_data *ded_veh = NULL;
 	room_data *ded_room = NULL;
 	player_index_data *index;
 	
@@ -1785,14 +1789,10 @@ ACMD(do_dedicate) {
 		set_room_extra_data(ded_room, ROOM_EXTRA_DEDICATE_ID, index->idnum);
 		
 		snprintf(buf, sizeof(buf), "%s of %s", get_room_name(ded_room, FALSE), index->fullname);
-		if (ROOM_CUSTOM_NAME(ded_room)) {
-			free(ROOM_CUSTOM_NAME(ded_room));
-		}
-		else {
-			// if the name wasn't already custom, grant them hide-real-name
-			SET_BIT(ROOM_BASE_FLAGS(ded_room), ROOM_AFF_HIDE_REAL_NAME);
-		}
-		ROOM_CUSTOM_NAME(ded_room) = str_dup(buf);
+
+		// grant them hide-real-name for this
+		SET_BIT(ROOM_BASE_FLAGS(ded_room), ROOM_AFF_HIDE_REAL_NAME);
+		set_room_custom_name(ded_room, buf);
 		affect_total_room(ded_room);
 	}
 	if (ded_veh) {
@@ -1802,22 +1802,15 @@ ACMD(do_dedicate) {
 		act(buf, FALSE, ch, NULL, ded_veh, TO_ROOM);
 		set_vehicle_extra_data(ded_veh, ROOM_EXTRA_DEDICATE_ID, index->idnum);
 		
-		// update strs
-		proto = vehicle_proto(VEH_VNUM(ded_veh));
+		// update strs:
 		
 		// keywords
 		snprintf(buf, sizeof(buf), "%s %s", VEH_KEYWORDS(ded_veh), index->fullname);
-		if (!proto || VEH_KEYWORDS(ded_veh) != VEH_KEYWORDS(proto)) {
-			free(VEH_KEYWORDS(ded_veh));
-		}
-		VEH_KEYWORDS(ded_veh) = str_dup(buf);
+		set_vehicle_keywords(ded_veh, buf);
 		
 		// short desc
 		snprintf(buf, sizeof(buf), "%s of %s", VEH_SHORT_DESC(ded_veh), index->fullname);
-		if (!proto || VEH_SHORT_DESC(ded_veh) != VEH_SHORT_DESC(proto)) {
-			free(VEH_SHORT_DESC(ded_veh));
-		}
-		VEH_SHORT_DESC(ded_veh) = str_dup(buf);
+		set_vehicle_short_desc(ded_veh, buf);
 	}
 }
 
@@ -2112,6 +2105,7 @@ ACMD(do_lay) {
 		// this will tear it back down to its base type
 		disassociate_building(IN_ROOM(ch));
 		command_lag(ch, WAIT_OTHER);
+		request_world_save(GET_ROOM_VNUM(IN_ROOM(ch)), WSAVE_ROOM);
 	}
 	else if (!road_sect) {
 		msg_to_char(ch, "Road data has not been set up for this game.\r\n");
@@ -2148,6 +2142,7 @@ ACMD(do_lay) {
 		}
 		
 		command_lag(ch, WAIT_OTHER);
+		request_world_save(GET_ROOM_VNUM(IN_ROOM(ch)), WSAVE_ROOM);
 	}
 }
 
@@ -2353,10 +2348,10 @@ ACMD(do_paint) {
 		
 		// brighten if same color or remove bright if not
 		if (VEH_PAINT_COLOR(paint_veh) == GET_PAINT_COLOR(paint)) {
-			SET_BIT(VEH_FLAGS(paint_veh), VEH_BRIGHT_PAINT);
+			set_vehicle_flags(paint_veh, VEH_BRIGHT_PAINT);
 		}
 		else {
-			REMOVE_BIT(VEH_FLAGS(paint_veh), VEH_BRIGHT_PAINT);
+			remove_vehicle_flags(paint_veh, VEH_BRIGHT_PAINT);
 		}
 		
 		set_vehicle_extra_data(paint_veh, ROOM_EXTRA_PAINT_COLOR, GET_PAINT_COLOR(paint));
@@ -2532,7 +2527,7 @@ ACMD(do_unpaint) {
 		act("You strip the paint from $V!", FALSE, ch, NULL, paint_veh, TO_CHAR);
 		act("$n strips the paint from $V!", FALSE, ch, NULL, paint_veh, TO_ROOM);
 		remove_vehicle_extra_data(paint_veh, ROOM_EXTRA_PAINT_COLOR);
-		REMOVE_BIT(VEH_FLAGS(paint_veh), VEH_BRIGHT_PAINT);
+		remove_vehicle_flags(paint_veh, VEH_BRIGHT_PAINT);
 	}
 	
 	command_lag(ch, WAIT_ABILITY);
@@ -2816,7 +2811,7 @@ ACMD(do_upgrade) {
 		
 		private_owner = ROOM_PRIVATE_OWNER(from_room);
 		if (COMPLEX_DATA(from_room)) {
-			COMPLEX_DATA(from_room)->private_owner = NOBODY;
+			set_private_owner(from_room, NOBODY);
 		}
 		
 		// store dedication and remove it
@@ -2829,6 +2824,7 @@ ACMD(do_upgrade) {
 		bright_paint = ROOM_AFF_FLAGGED(from_room, ROOM_AFF_BRIGHT_PAINT);
 		REMOVE_BIT(ROOM_BASE_FLAGS(from_room), ROOM_AFF_BRIGHT_PAINT);
 		// affect_total_room(from_room);	// probably don't need to do this here because it's done later
+		request_world_save(GET_ROOM_VNUM(from_room), WSAVE_ROOM);
 	}
 	else if (from_veh) {
 		// upgrade FROM vehicle
@@ -2851,7 +2847,7 @@ ACMD(do_upgrade) {
 		
 		if (VEH_INTERIOR_HOME_ROOM(from_veh) && COMPLEX_DATA(VEH_INTERIOR_HOME_ROOM(from_veh))) {
 			private_owner = ROOM_PRIVATE_OWNER(VEH_INTERIOR_HOME_ROOM(from_veh));
-			COMPLEX_DATA(VEH_INTERIOR_HOME_ROOM(from_veh))->private_owner = NOBODY;
+			set_private_owner(VEH_INTERIOR_HOME_ROOM(from_veh), NOBODY);
 		}
 		
 		// store dedication and remove it
@@ -2862,7 +2858,7 @@ ACMD(do_upgrade) {
 		paint_color = get_vehicle_extra_data(from_veh, ROOM_EXTRA_PAINT_COLOR);
 		remove_vehicle_extra_data(from_veh, ROOM_EXTRA_PAINT_COLOR);
 		bright_paint = VEH_FLAGGED(from_veh, VEH_BRIGHT_PAINT);
-		REMOVE_BIT(VEH_FLAGS(from_veh), VEH_BRIGHT_PAINT);
+		remove_vehicle_flags(from_veh, VEH_BRIGHT_PAINT);
 	}
 	else {
 		msg_to_char(ch, "There was an unexpected error in the upgrade process.\r\n");
@@ -2914,6 +2910,7 @@ ACMD(do_upgrade) {
 			dismantle_wtrigger(from_room, NULL, FALSE);
 			detach_building_from_room(from_room);
 			attach_building_to_room(building_proto(GET_CRAFT_BUILD_TYPE(to_craft)), from_room, TRUE);
+			request_world_save(GET_ROOM_VNUM(from_room), WSAVE_ROOM);
 		}
 		else if (from_veh) {
 			// upgraded from vehicle
@@ -2945,7 +2942,7 @@ ACMD(do_upgrade) {
 		}
 		
 		// transfer old data
-		COMPLEX_DATA(in_room)->private_owner = private_owner;
+		set_private_owner(in_room, private_owner);
 		GET_BUILT_WITH(in_room) = built_with;
 		ROOM_DEPLETION(in_room) = depletion;
 		
@@ -2975,7 +2972,7 @@ ACMD(do_upgrade) {
 		to_veh = read_vehicle(GET_CRAFT_OBJECT(to_craft), TRUE);
 		
 		// set incomplete before putting in the room
-		SET_BIT(VEH_FLAGS(to_veh), VEH_INCOMPLETE);
+		set_vehicle_flags(to_veh, VEH_INCOMPLETE);
 		vehicle_to_room(to_veh, in_room);
 		
 		if (from_room) {
@@ -2996,6 +2993,7 @@ ACMD(do_upgrade) {
 					
 					COMPLEX_DATA(room_iter)->home_room = interior;
 					add_room_to_vehicle(room_iter, to_veh);
+					request_world_save(GET_ROOM_VNUM(room_iter), WSAVE_ROOM);
 					
 					// check exits to the old home room and move them
 					LL_FOREACH(COMPLEX_DATA(room_iter)->exits, exits) {
@@ -3019,7 +3017,7 @@ ACMD(do_upgrade) {
 				}
 				
 				// apply data inside
-				COMPLEX_DATA(interior)->private_owner = private_owner;
+				set_private_owner(interior, private_owner);
 				
 				// need to run this early because it won't run on completion
 				complete_wtrigger(interior);
@@ -3051,7 +3049,7 @@ ACMD(do_upgrade) {
 			// adapt flags: find flags added to from_veh
 			if ((old_proto = vehicle_proto(VEH_VNUM(from_veh)))) {
 				set_bits = VEH_FLAGS(from_veh) & SAVABLE_VEH_FLAGS & ~VEH_FLAGS(old_proto);
-				SET_BIT(VEH_FLAGS(to_veh), set_bits);
+				set_vehicle_flags(to_veh, set_bits);
 			}
 		
 			// transfer/dump contents
@@ -3089,7 +3087,7 @@ ACMD(do_upgrade) {
 				}
 				
 				// apply data
-				COMPLEX_DATA(interior)->private_owner = private_owner;
+				set_private_owner(interior, private_owner);
 				
 				// need to run this early because it won't run on completion
 				complete_wtrigger(interior);
@@ -3123,11 +3121,11 @@ ACMD(do_upgrade) {
 		if (paint_color > 0 && !VEH_FLAGGED(to_veh, VEH_NO_PAINT)) {
 			set_vehicle_extra_data(to_veh, ROOM_EXTRA_PAINT_COLOR, paint_color);
 			if (bright_paint) {
-				SET_BIT(VEH_FLAGS(to_veh), VEH_BRIGHT_PAINT);
+				set_vehicle_flags(to_veh, VEH_BRIGHT_PAINT);
 			}
 		}
 		else {	// ensure not painted
-			REMOVE_BIT(VEH_FLAGS(to_veh), VEH_BRIGHT_PAINT);
+			remove_vehicle_flags(to_veh, VEH_BRIGHT_PAINT);
 			remove_vehicle_extra_data(to_veh, ROOM_EXTRA_PAINT_COLOR);
 		}
 		
@@ -3138,6 +3136,8 @@ ACMD(do_upgrade) {
 			complete_vehicle(to_veh);
 			cancel_action(ch);
 		}
+		
+		request_vehicle_save_in_world(to_veh);
 	} // end upgrade-to-vehicle
 	
 	affect_total_room(in_room);

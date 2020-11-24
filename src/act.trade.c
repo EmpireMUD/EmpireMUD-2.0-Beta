@@ -892,12 +892,12 @@ const struct gen_craft_data_t gen_craft_data[] = {
 	{ "brew", "brewing", NOBITS, { "You stir the potion and infuse it with mana...", "$n stirs the potion...", "$n stirs a potion." } },
 	{ "mix", "mixing", NOBITS, { "The poison bubbles as you stir it...", "$n stirs the bubbling poison...", "$n stirs a bubbling poison." } },
 									// note: build does not use the message strings
-	{ "build", "building", NOBITS, { "You work on building the %s...", "$n works on the building the %s...", "$n is building the %s." } },
+	{ "build", "building", ACTF_HASTE | ACTF_FAST_CHORES, { "You work on building the %s...", "$n works on the building the %s...", "$n is building the %s." } },
 	{ "weave", "weaving", NOBITS, { "You carefully weave the %s...", "$n carefully weaves the %s...", "$n is weaving %s." } },
 	
 	{ "workforce", "making", NOBITS, { "You work on the %s...", "$n works on the %s...", "$n is working dilligently." } },	// not used by players
 	
-	{ "manufacture", "manufacturing", NOBITS, { "You carefully manufacture the %s...", "$n carefully manufactures the %s...", "$n is manufacturing %s." } },
+	{ "manufacture", "manufacturing", ACTF_HASTE | ACTF_FAST_CHORES, { "You carefully manufacture the %s...", "$n carefully manufactures the %s...", "$n is manufacturing %s." } },
 	{ "smelt", "smelting", ACTF_FAST_CHORES, { "You smelt the %s in the fire...", "$n smelts the %s in the fire...", "$n is smelting %s." } },
 	{ "press", "pressing", NOBITS, { "You press the %s...", "$n presses the %s...", "$n is working the press." } },
 	
@@ -921,7 +921,7 @@ void cancel_gen_craft(char_data *ch) {
 			obj = read_object(GET_ACTION_VNUM(ch, 1), TRUE);
 
 			// just empty it
-			GET_OBJ_VAL(obj, VAL_DRINK_CONTAINER_CONTENTS) = 0;
+			set_obj_val(obj, VAL_DRINK_CONTAINER_CONTENTS, 0);
 			if (CAN_WEAR(obj, ITEM_WEAR_TAKE)) {
 				obj_to_char(obj, ch);
 			}
@@ -1002,8 +1002,8 @@ void finish_gen_craft(char_data *ch) {
 		// load the drink container back
 		obj = read_object(GET_ACTION_VNUM(ch, 1), TRUE);
 	
-		GET_OBJ_VAL(obj, VAL_DRINK_CONTAINER_CONTENTS) = MIN(GET_CRAFT_QUANTITY(type), GET_DRINK_CONTAINER_CAPACITY(obj));
-		GET_OBJ_VAL(obj, VAL_DRINK_CONTAINER_TYPE) = GET_CRAFT_OBJECT(type);
+		set_obj_val(obj, VAL_DRINK_CONTAINER_CONTENTS, MIN(GET_CRAFT_QUANTITY(type), GET_DRINK_CONTAINER_CAPACITY(obj)));
+		set_obj_val(obj, VAL_DRINK_CONTAINER_TYPE, GET_CRAFT_OBJECT(type));
 	
 		// set it to go bad... very bad
 		GET_OBJ_TIMER(obj) = SOUP_TIMER;
@@ -1137,6 +1137,7 @@ void process_gen_craft_vehicle(char_data *ch, craft_data *type) {
 	if ((res = get_next_resource(ch, VEH_NEEDS_RESOURCES(veh), can_use_room(ch, IN_ROOM(ch), MEMBERS_ONLY), TRUE, &found_obj))) {
 		// take the item; possibly free the res
 		apply_resource(ch, res, &VEH_NEEDS_RESOURCES(veh), found_obj, APPLY_RES_CRAFT, veh, VEH_FLAGGED(veh, VEH_NEVER_DISMANTLE) ? NULL : &VEH_BUILT_WITH(veh));
+		request_vehicle_save_in_world(veh);
 		
 		// experience per resource
 		if (GET_CRAFT_ABILITY(type) != NO_ABIL) {
@@ -1558,6 +1559,7 @@ ACMD(do_gen_augment) {
 		}
 		
 		command_lag(ch, WAIT_ABILITY);
+		request_obj_save_in_world(obj);
 	}
 }
 
@@ -1658,6 +1660,7 @@ void do_gen_craft_building(char_data *ch, craft_data *type, int dir) {
 	
 	// do a build action now
 	process_build(ch, IN_ROOM(ch), ACT_BUILDING);
+	request_world_save(GET_ROOM_VNUM(IN_ROOM(ch)), WSAVE_ROOM);
 }
 
 
@@ -1696,7 +1699,7 @@ void do_gen_craft_vehicle(char_data *ch, craft_data *type, int dir) {
 	
 	// ok: new vehicle craft setup
 	veh = read_vehicle(GET_CRAFT_OBJECT(type), TRUE);
-	SET_BIT(VEH_FLAGS(veh), VEH_INCOMPLETE);	// set incomplete before putting in the room
+	set_vehicle_flags(veh, VEH_INCOMPLETE);	// set incomplete before putting in the room
 	vehicle_to_room(veh, IN_ROOM(ch));
 	special_vehicle_setup(ch, veh);
 	
@@ -1746,6 +1749,7 @@ void do_gen_craft_vehicle(char_data *ch, craft_data *type, int dir) {
 	act(buf, FALSE, ch, NULL, veh, TO_ROOM);
 	
 	process_gen_craft_vehicle(ch, type);
+	request_vehicle_save_in_world(veh);
 }
 
 
@@ -2458,24 +2462,15 @@ ACMD(do_reforge) {
 			
 			// rename keywords
 			snprintf(temp, sizeof(temp), "%s %s", fname(GET_OBJ_KEYWORDS(proto)), skip_filler(argument));
-			if (!proto || GET_OBJ_KEYWORDS(obj) != GET_OBJ_KEYWORDS(proto)) {
-				free(GET_OBJ_KEYWORDS(obj));
-			}
-			GET_OBJ_KEYWORDS(obj) = str_dup(temp);
+			set_obj_keywords(obj, temp);
 			
 			// rename short desc
-			if (!proto || GET_OBJ_SHORT_DESC(obj) != GET_OBJ_SHORT_DESC(proto)) {
-				free(GET_OBJ_SHORT_DESC(obj));
-			}
-			GET_OBJ_SHORT_DESC(obj) = str_dup(argument);
+			set_obj_short_desc(obj, argument);
 			
 			// rename long desc
 			sprintf(temp, "%s is lying here.", argument);
 			CAP(temp);
-			if (!proto || GET_OBJ_LONG_DESC(obj) != GET_OBJ_LONG_DESC(proto)) {
-				free(GET_OBJ_LONG_DESC(obj));
-			}
-			GET_OBJ_LONG_DESC(obj) = str_dup(temp);
+			set_obj_long_desc(obj, temp);
 			
 			// message
 			act(buf1, FALSE, ch, obj, obj->worn_by, TO_CHAR);
@@ -2582,16 +2577,16 @@ ACMD(do_reforge) {
 			
 			// copy over strings?
 			if (GET_OBJ_KEYWORDS(obj) != GET_OBJ_KEYWORDS(proto)) {
-				GET_OBJ_KEYWORDS(new) = GET_OBJ_KEYWORDS(obj) ? str_dup(GET_OBJ_KEYWORDS(obj)) : NULL;
+				set_obj_keywords(new, GET_OBJ_KEYWORDS(obj));
 			}
 			if (GET_OBJ_SHORT_DESC(obj) != GET_OBJ_SHORT_DESC(proto)) {
-				GET_OBJ_SHORT_DESC(new) = GET_OBJ_SHORT_DESC(obj) ? str_dup(GET_OBJ_SHORT_DESC(obj)) : NULL;
+				set_obj_short_desc(new, GET_OBJ_SHORT_DESC(obj));
 			}
 			if (GET_OBJ_LONG_DESC(obj) != GET_OBJ_LONG_DESC(proto)) {
-				GET_OBJ_LONG_DESC(new) = GET_OBJ_LONG_DESC(obj) ? str_dup(GET_OBJ_LONG_DESC(obj)) : NULL;
+				set_obj_long_desc(new, GET_OBJ_LONG_DESC(obj));
 			}
 			if (GET_OBJ_ACTION_DESC(obj) != GET_OBJ_ACTION_DESC(proto)) {
-				GET_OBJ_ACTION_DESC(new) = GET_OBJ_ACTION_DESC(obj) ? str_dup(GET_OBJ_ACTION_DESC(obj)) : NULL;
+				set_obj_look_desc(new, GET_OBJ_ACTION_DESC(obj), FALSE);
 			}
 			
 			// re-apply values

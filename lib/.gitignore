@@ -9,3 +9,5 @@ plralias/*/*.alias
 plrlore/*/*.lore
 plrobjs/*/*.objs
 plrvars/*/*.mem
+world/binary_map
+world/binary_world_index

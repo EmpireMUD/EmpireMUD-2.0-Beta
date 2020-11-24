@@ -291,7 +291,7 @@ void olc_delete_craft(char_data *ch, craft_vnum vnum) {
 	// update objs
 	HASH_ITER(hh, object_table, obj, next_obj) {
 		if (IS_RECIPE(obj) && GET_RECIPE_VNUM(obj) == vnum) {
-			GET_OBJ_VAL(obj, VAL_RECIPE_VNUM) = 0;
+			set_obj_val(obj, VAL_RECIPE_VNUM, 0);
 			save_library_file_for_vnum(DB_BOOT_OBJ, GET_OBJ_VNUM(obj));
 		}
 	}
@@ -311,7 +311,7 @@ void olc_delete_craft(char_data *ch, craft_vnum vnum) {
 	for (desc = descriptor_list; desc; desc = desc->next) {
 		if (GET_OLC_OBJECT(desc)) {
 			if (IS_RECIPE(GET_OLC_OBJECT(desc)) && GET_RECIPE_VNUM(GET_OLC_OBJECT(desc)) == vnum) {
-				GET_OBJ_VAL(GET_OLC_OBJECT(desc), VAL_RECIPE_VNUM) = 0;
+				set_obj_val(GET_OLC_OBJECT(desc), VAL_RECIPE_VNUM, 0);
 				msg_to_char(desc->character, "The recipe used by the item you're editing was deleted.\r\n");
 			}
 		}

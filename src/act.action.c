@@ -119,7 +119,7 @@ const struct action_data_struct action_data[] = {
 	{ "repairing", "is doing some repairs.", ACTF_FAST_CHORES | ACTF_HASTE, process_repairing, NULL },	// ACT_REPAIR_VEHICLE
 	{ "chipping", "is chipping flints.", ACTF_FAST_CHORES, process_chipping, cancel_resource_list },	// ACT_CHIPPING
 	{ "panning", "is panning for gold.", ACTF_FINDER, process_panning, NULL },	// ACT_PANNING
-	{ "playing", "is playing soothing music.", ACTF_ANYWHERE | ACTF_HASTE, process_music, NULL },	// ACT_MUSIC
+	{ "playing", "is playing soothing music.", ACTF_ANYWHERE | ACTF_HASTE | ACTF_IGNORE_COND, process_music, NULL },	// ACT_MUSIC
 	{ "excavating", "is excavating a trench.", ACTF_HASTE | ACTF_FAST_CHORES | ACTF_FAST_EXCAVATE, process_excavating, NULL },	// ACT_EXCAVATING
 	{ "siring", "is hunched over.", NOBITS, process_siring, cancel_siring },	// ACT_SIRING
 	{ "picking", "is looking around at the ground.", ACTF_FINDER | ACTF_HASTE | ACTF_FAST_CHORES, process_gen_interact_room, NULL },	// ACT_PICKING
@@ -137,7 +137,7 @@ const struct action_data_struct action_data[] = {
 	{ "quarrying", "is quarrying stone.", ACTF_HASTE | ACTF_FAST_CHORES, process_gen_interact_room, NULL },	// ACT_QUARRYING
 	{ "driving", "is driving.", ACTF_VEHICLE_SPEEDS | ACTF_SITTING, process_driving, cancel_driving },	// ACT_DRIVING
 	{ "tanning", "is tanning leather.", ACTF_FAST_CHORES, process_tanning, cancel_resource_list },	// ACT_TANNING
-	{ "reading", "is reading a book.", ACTF_SITTING | ACTF_ALWAYS_FAST, process_reading, NULL },	// ACT_READING
+	{ "reading", "is reading a book.", ACTF_SITTING | ACTF_ALWAYS_FAST | ACTF_EVEN_FASTER | ACTF_IGNORE_COND, process_reading, NULL },	// ACT_READING
 	{ "copying", "is writing out a copy of a book.", NOBITS, process_copying_book, NULL },	// ACT_COPYING_BOOK
 	{ "crafting", "is working on something.", NOBITS, process_gen_craft, cancel_gen_craft },	// ACT_GEN_CRAFT
 	{ "sailing", "is sailing the ship.", ACTF_VEHICLE_SPEEDS | ACTF_SITTING, process_driving, cancel_driving },	// ACT_SAILING
@@ -381,7 +381,7 @@ void update_actions(void) {
 		}
 		
 		// things that slow you down
-		if (AFF_FLAGGED(ch, AFF_SLOW) || IS_HUNGRY(ch) || IS_THIRSTY(ch) || IS_BLOOD_STARVED(ch)) {
+		if ((AFF_FLAGGED(ch, AFF_SLOW) || IS_HUNGRY(ch) || IS_THIRSTY(ch) || IS_BLOOD_STARVED(ch)) && !IS_SET(act_flags, ACTF_IGNORE_COND)) {
 			speed /= 2.0;
 			speed = MAX(1.0, speed);	// don't stall them completely
 		}
@@ -2026,7 +2026,7 @@ void process_hunting(char_data *ch) {
 		
 		// scale it to the hunter's level and flag it to keep it there
 		scale_mob_for_character(mob, ch);
-		SET_BIT(MOB_FLAGS(mob), MOB_NO_RESCALE | MOB_SPAWNED);
+		set_mob_flags(mob, MOB_NO_RESCALE | MOB_SPAWNED);
 		
 		// messaging
 		act("You've found $N!", FALSE, ch, NULL, mob, TO_CHAR);
@@ -2452,6 +2452,7 @@ void process_repairing(char_data *ch) {
 	if ((res = get_next_resource(ch, VEH_NEEDS_RESOURCES(veh), can_use_room(ch, IN_ROOM(ch), MEMBERS_ONLY), TRUE, &found_obj))) {
 		// take the item; possibly free the res
 		apply_resource(ch, res, &VEH_NEEDS_RESOURCES(veh), found_obj, APPLY_RES_REPAIR, veh, VEH_FLAGGED(veh, VEH_NEVER_DISMANTLE) ? NULL : &VEH_BUILT_WITH(veh));
+		request_vehicle_save_in_world(veh);
 		found = TRUE;
 	}
 	

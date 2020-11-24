@@ -328,6 +328,10 @@ void extract_script_mem(struct script_memory *sc) {
 * Checks if all script data is empty and it's safe to free the script data
 * from the 'go'.
 *
+* This is only (and always) called when triggers are removed so, as a courtesy,
+* it also triggers a world save even if it doesn't extract the script data,
+* to save a large amount of code ATFO to save when triggers are removed. -pc
+*
 * @param void *go The mob, obj, etc to check.
 * @param int type The corresponding *_TRIGGER type for 'go' (e.g. MOB_TRIGGER).
 */
@@ -339,6 +343,7 @@ void check_extract_script(void *go, int type) {
 			if (SCRIPT(mob) && !TRIGGERS(SCRIPT(mob)) && !SCRIPT(mob)->global_vars) {
 				extract_script(mob, MOB_TRIGGER);
 			}
+			request_char_save_in_world(mob);
 			break;
 		}
 		case OBJ_TRIGGER: {
@@ -346,6 +351,7 @@ void check_extract_script(void *go, int type) {
 			if (SCRIPT(obj) && !TRIGGERS(SCRIPT(obj)) && !SCRIPT(obj)->global_vars) {
 				extract_script(obj, OBJ_TRIGGER);
 			}
+			request_obj_save_in_world(obj);
 			break;
 		}
 		case WLD_TRIGGER:
@@ -357,6 +363,7 @@ void check_extract_script(void *go, int type) {
 				extract_script(room, WLD_TRIGGER);
 			}
 			type = WLD_TRIGGER;	// override other types
+			request_world_save(GET_ROOM_VNUM(room), WSAVE_ROOM);
 			break;
 		}
 		case VEH_TRIGGER: {
@@ -364,6 +371,7 @@ void check_extract_script(void *go, int type) {
 			if (SCRIPT(veh) && !TRIGGERS(SCRIPT(veh)) && !SCRIPT(veh)->global_vars) {
 				extract_script(veh, VEH_TRIGGER);
 			}
+			request_vehicle_save_in_world(veh);
 			break;
 		}
 		case EMP_TRIGGER: {

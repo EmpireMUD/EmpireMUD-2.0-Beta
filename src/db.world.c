@@ -43,17 +43,27 @@
 *   Helpers
 *   World Map System
 *   World Map Saving
+*   World Map Loading
+*   Mapout System
 */
+
+// external vars
+extern FILE *binary_map_fl;
 
 // external funcs
 EVENT_CANCEL_FUNC(cancel_room_event);
 EVENT_CANCEL_FUNC(cancel_room_expire_event);
+bool load_pre_b5_116_world_map_from_file();
+bool objpack_save_room(room_data *room);
+void save_instances();
 
 // locals
+void cancel_all_world_save_requests(int only_save_type);
 void grow_crop(struct map_data *map);
 void init_room(room_data *room, room_vnum vnum);
 int naturalize_newbie_island(struct map_data *tile, bool do_unclaim);
 int sort_empire_islands(struct empire_island *a, struct empire_island *b);
+bool write_map_and_room_to_file(room_data *room, struct map_data *map, bool force_obj_pack);
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -320,7 +330,7 @@ void check_terrain_height(room_data *room) {
 			// ok, it has a height we can borrow... let's see if it's a good match
 			if (GET_SECT_CLIMATE(BASE_SECT(to_room)) == GET_SECT_CLIMATE(BASE_SECT(room))) {
 				// perfect match: just copy it
-				ROOM_HEIGHT(room) = ROOM_HEIGHT(to_room);
+				set_room_height(room, ROOM_HEIGHT(to_room));
 				return;
 			}
 			else if (GET_SECT_CLIMATE(BASE_SECT(to_room)) & GET_SECT_CLIMATE(BASE_SECT(room)) && good_match != 0) {
@@ -333,16 +343,11 @@ void check_terrain_height(room_data *room) {
 			}
 		}
 		
-		if (good_match != 0) {
-			ROOM_HEIGHT(room) = good_match;
-		}
-		else {
-			ROOM_HEIGHT(room) = bad_match;	// may still be 0
-		}
+		set_room_height(room, good_match ? good_match : bad_match);
 	}
 	else if (!ROOM_SECT_FLAGGED(room, SECTF_NEEDS_HEIGHT) && !SECT_FLAGGED(BASE_SECT(room), SECTF_NEEDS_HEIGHT)) {
 		// clear it
-		ROOM_HEIGHT(room) = 0;
+		set_room_height(room, 0);
 	}
 }
 
@@ -401,6 +406,11 @@ struct room_direction_data *create_exit(room_data *from, room_data *to, int dir,
 		++GET_EXITS_HERE(from);
 	}
 	
+	request_world_save(GET_ROOM_VNUM(from), WSAVE_ROOM);
+	if (to && back) {
+		request_world_save(GET_ROOM_VNUM(to), WSAVE_ROOM);
+	}
+	
 	// re-find just in case
 	return find_exit(from, dir);
 }
@@ -434,16 +444,12 @@ room_data *create_room(room_data *home) {
 	init_room(room, vnum);
 	add_room_to_world_tables(room);
 	
-	// only if saveable
-	if (!CAN_UNLOAD_MAP_ROOM(room)) {
-		need_world_index = TRUE;
-	}
-	
 	COMPLEX_DATA(room)->home_room = home;
 	GET_MAP_LOC(room) = home ? GET_MAP_LOC(home) : NULL;
 	GET_ISLAND_ID(room) = home ? GET_ISLAND_ID(home) : NO_ISLAND;
 	GET_ISLAND(room) = home ? GET_ISLAND(home) : NULL;
 	
+	request_world_save(GET_ROOM_VNUM(room), WSAVE_ROOM);
 	return room;
 }
 
@@ -467,10 +473,12 @@ void delete_room(room_data *room, bool check_exits) {
 	vehicle_data *veh, *next_veh;
 	struct instance_data *inst;
 	struct affected_type *af;
-	struct reset_com *reset;
+	struct reset_com *reset, *next_reset;
+	descriptor_data *desc;
 	char_data *c, *next_c;
 	obj_data *o, *next_o;
 	empire_data *emp;
+	char fname[256];
 	int iter;
 	
 	// this blocks deleting map rooms unless they can be unloaded (or the mud is being shut down)
@@ -479,7 +487,30 @@ void delete_room(room_data *room, bool check_exits) {
 		return;
 	}
 	
+	if (GET_ROOM_VNUM(room) >= MAP_SIZE) {
+		// cancel anybody editing its description, if it's not a shared map room
+		LL_FOREACH(descriptor_list, desc) {
+			if (desc->str == &ROOM_CUSTOM_DESCRIPTION(room)) {
+				// abort the editor
+				string_add(desc, "/a");
+			}
+		}
+	}
+	
 	check_dg_owner_purged_room(room);
+	update_world_index(GET_ROOM_VNUM(room), 0);
+	
+	// attempt to delete wld save files (unless shutting down)
+	if (!block_all_saves_due_to_shutdown) {
+		get_world_filename(fname, GET_ROOM_VNUM(room), WLD_SUFFIX);
+		if (access(fname, F_OK) == 0) {
+			unlink(fname);
+		}
+		get_world_filename(fname, GET_ROOM_VNUM(room), SUF_PACK);
+		if (access(fname, F_OK) == 0) {
+			unlink(fname);
+		}
+	}
 	
 	// delete this first
 	if (ROOM_UNLOAD_EVENT(room)) {
@@ -528,6 +559,7 @@ void delete_room(room_data *room, bool check_exits) {
 	// check if it was part of the interior of a vehicle
 	if (GET_ROOM_VEHICLE(room) && VEH_INTERIOR_HOME_ROOM(GET_ROOM_VEHICLE(room)) == room) {
 		VEH_INTERIOR_HOME_ROOM(GET_ROOM_VEHICLE(room)) = NULL;
+		request_vehicle_save_in_world(GET_ROOM_VEHICLE(room));
 	}
 	
 	// shrink home
@@ -585,8 +617,7 @@ void delete_room(room_data *room, bool check_exits) {
 	free_proto_scripts(&room->proto_script);
 	room->proto_script = NULL;
 	
-	while ((reset = room->reset_commands)) {
-		room->reset_commands = reset->next;
+	DL_FOREACH_SAFE(room->reset_commands, reset, next_reset) {
 		if (reset->sarg1) {
 			free(reset->sarg1);
 		}
@@ -694,8 +725,6 @@ void delete_room(room_data *room, bool check_exits) {
 	
 	// free the room
 	free(room);
-	
-	need_world_index = TRUE;
 }
 
 
@@ -837,6 +866,95 @@ void perform_burn_room(room_data *room) {
 
 
 /**
+* Updates the natural sector of a map tile (interiors do not have this
+* property).
+*
+* @param struct map_data *map The location.
+* @param sector_data *sect The new natural sector.
+*/
+void set_natural_sector(struct map_data *map, sector_data *sect) {
+	map->natural_sector = sect;
+	request_world_save(map->vnum, WSAVE_MAP);
+}
+
+
+/**
+* Updates the natural sector of a map tile (interiors do not have this
+* property).
+*
+* @param room_data *room The room to change.
+* @param int idnum The new owner id (NOBODY to clear it).
+*/
+void set_private_owner(room_data *room, int idnum) {
+	if (COMPLEX_DATA(room) && COMPLEX_DATA(room)->private_owner != idnum) {
+		COMPLEX_DATA(room)->private_owner = idnum;
+		request_world_save(GET_ROOM_VNUM(room), WSAVE_ROOM);
+	}
+}
+
+
+/**
+* Updates the room's custom description. It does no validation, so you must
+* pre-validate the description.
+*
+* @param room_data *room The room to change.
+* @param char *desc The new description (will be copied).
+*/
+void set_room_custom_description(room_data *room, char *desc) {
+	if (ROOM_CUSTOM_DESCRIPTION(room)) {
+		free(ROOM_CUSTOM_DESCRIPTION(room));
+	}
+	ROOM_CUSTOM_DESCRIPTION(room) = desc ? str_dup(desc) : NULL;
+	request_world_save(GET_ROOM_VNUM(room), WSAVE_ROOM);
+}
+
+
+/**
+* Updates the room's custom icon. It does no validation, so you must
+* pre-validate the icon.
+*
+* @param room_data *room The room to change.
+* @param char *icon The new icon (will be copied).
+*/
+void set_room_custom_icon(room_data *room, char *icon) {
+	if (ROOM_CUSTOM_ICON(room)) {
+		free(ROOM_CUSTOM_ICON(room));
+	}
+	ROOM_CUSTOM_ICON(room) = icon ? str_dup(icon) : NULL;
+	request_world_save(GET_ROOM_VNUM(room), WSAVE_ROOM);
+}
+
+
+/**
+* Updates the room's custom name. It does no validation, so you must
+* pre-validate the name.
+*
+* @param room_data *room The room to change.
+* @param char *name The new name (will be copied).
+*/
+void set_room_custom_name(room_data *room, char *name) {
+	if (ROOM_CUSTOM_NAME(room)) {
+		free(ROOM_CUSTOM_NAME(room));
+	}
+	ROOM_CUSTOM_NAME(room) = name ? str_dup(name) : NULL;
+	request_world_save(GET_ROOM_VNUM(room), WSAVE_ROOM);
+}
+
+
+/**
+* Updates the height of a map tile/room. Technically interiors have this
+* property, too, but it has no function.
+*
+* @param room_data *room The room to change height on.
+* @param int height The new height.
+*/
+void set_room_height(room_data *room, int height) {
+	ROOM_HEIGHT(room) = height;
+	request_world_save(GET_ROOM_VNUM(room), WSAVE_MAP | WSAVE_ROOM);
+}
+
+
+/**
 * This handles returning a crop tile to a non-crop state after harvesting (or
 * for any other reason). It prefers the harvest-to evolution, but has a chain
 * of data sources for the target sector.
@@ -967,6 +1085,26 @@ void untrench_room(room_data *room) {
 
 
 /**
+* Sets the burn-down time for a room and, on request, also schedules it to
+* happen.
+*
+* @param room_data *room The room to set burn-down time for.
+* @param time_t when The timestamp when the building will burn down (0 for never/not-burning).
+* @param bool schedule_burn Whether or not to start the burn-down event (you should usually pass TRUE here).
+*/
+void set_burn_down_time(room_data *room, time_t when, bool schedule_burn) {
+	if (COMPLEX_DATA(room)) {
+		COMPLEX_DATA(room)->burn_down_time = when;
+		cancel_stored_event_room(room, SEV_BURN_DOWN);
+		if (when > 0 && schedule_burn) {
+			schedule_burn_down(room);
+		}
+		request_world_save(GET_ROOM_VNUM(room), WSAVE_ROOM);
+	}
+}
+
+
+/**
 * Set the crop on a room, and mark it on the base map.
 *
 * @param room_data *room The room to set crop for.
@@ -980,6 +1118,25 @@ void set_crop_type(room_data *room, crop_data *cp) {
 	ROOM_CROP(room) = cp;
 	if (GET_ROOM_VNUM(room) < MAP_SIZE) {
 		world_map[FLAT_X_COORD(room)][FLAT_Y_COORD(room)].crop_type = cp;
+		request_world_save(GET_ROOM_VNUM(room), WSAVE_MAP);
+	}
+	else {
+		request_world_save(GET_ROOM_VNUM(room), WSAVE_ROOM);
+	}
+}
+
+
+/**
+* Updates the damage on a room. This does NOT cause it to be destroyed; only
+* sets the value.
+*
+* @param room_data *room The room.
+* @param int damage_amount How much to set its damage to (not bounded).
+*/
+void set_room_damage(room_data *room, int damage_amount) {
+	if (COMPLEX_DATA(room) && COMPLEX_DATA(room)->damage != damage_amount) {
+		COMPLEX_DATA(room)->damage = damage_amount;
+		request_world_save(GET_ROOM_VNUM(room), WSAVE_ROOM);
 	}
 }
 
@@ -1078,7 +1235,7 @@ void annual_update_map_tile(struct map_data *tile) {
 			dmg = MAX(1.0, dmg);
 		
 			// apply damage
-			COMPLEX_DATA(room)->damage += dmg;
+			set_room_damage(room, BUILDING_DAMAGE(room) + dmg);
 		
 			// apply maintenance resources (if any, and if it's not being dismantled)
 			if (GET_BLD_YEARLY_MAINTENANCE(GET_BUILDING(room)) && !IS_DISMANTLING(room)) {
@@ -1179,6 +1336,9 @@ void annual_update_vehicle(vehicle_data *veh) {
 		add_to_resource_list(&default_res, RES_COMPONENT, COMP_NAILS, 1, 0);
 	}
 	
+	// ensure a save
+	request_vehicle_save_in_world(veh);
+	
 	// non-damage stuff:
 	annual_update_depletions(&VEH_DEPLETION(veh));
 	
@@ -1259,7 +1419,6 @@ void annual_world_update(void) {
 	
 	// rename islands
 	update_island_names();
-	write_world_to_files();
 	
 	// store the time now
 	data_set_long(DATA_LAST_NEW_YEAR, time(0));
@@ -1335,6 +1494,7 @@ int naturalize_newbie_island(struct map_data *tile, bool do_unclaim) {
 		remove_extra_data(&tile->shared->extra_data, ROOM_EXTRA_TRENCH_ORIGINAL_SECTOR);
 	}
 	
+	request_world_save(tile->vnum, WSAVE_MAP | WSAVE_ROOM);
 	return 1;
 }
 
@@ -1518,8 +1678,7 @@ void start_burning(room_data *room) {
 	}
 	
 	set_room_extra_data(room, ROOM_EXTRA_FIRE_REMAINING, config_get_int("fire_extinguish_value"));
-	COMPLEX_DATA(room)->burn_down_time = time(0) + config_get_int("burn_down_time");
-	schedule_burn_down(room);
+	set_burn_down_time(room, time(0) + config_get_int("burn_down_time"), TRUE);
 	
 	// ensure no building or dismantling
 	stop_room_action(room, ACT_BUILDING);
@@ -1536,8 +1695,7 @@ void stop_burning(room_data *room) {
 	room = HOME_ROOM(room);	// always
 	
 	if (COMPLEX_DATA(room)) {
-		COMPLEX_DATA(room)->burn_down_time = 0;
-		cancel_stored_event_room(room, SEV_BURN_DOWN);
+		set_burn_down_time(room, 0, FALSE);
 		remove_room_extra_data(room, ROOM_EXTRA_FIRE_REMAINING);
 	}
 }
@@ -1664,7 +1822,7 @@ struct empire_city_data *create_city_entry(empire_data *emp, char *name, room_da
 */
 void reset_one_room(room_data *room) {
 	char field[256], str[MAX_INPUT_LENGTH];
-	struct reset_com *reset;
+	struct reset_com *reset, *next_reset;
 	char_data *tmob = NULL; /* for trigger assignment */
 	char_data *mob = NULL;
 	trig_data *trig;
@@ -1675,18 +1833,18 @@ void reset_one_room(room_data *room) {
 	}
 	
 	// start loading
-	for (reset = room->reset_commands; reset; reset = reset->next) {
+	DL_FOREACH_SAFE(room->reset_commands, reset, next_reset) {
 		switch (reset->command) {
 			case 'M': {	// read a mobile
 				mob = read_mobile(reset->arg1, FALSE);	// no scripts
-				MOB_FLAGS(mob) = asciiflag_conv(reset->sarg1);
+				MOB_FLAGS(mob) = reset->arg2;
 				char_to_room(mob, room);
 				
 				// sanity
 				SET_BIT(MOB_FLAGS(mob), MOB_ISNPC);
 				REMOVE_BIT(MOB_FLAGS(mob), MOB_EXTRACTED);
 				
-				GET_ROPE_VNUM(mob) = reset->arg2;
+				GET_ROPE_VNUM(mob) = reset->arg3;
 				
 				tmob = mob;
 				break;
@@ -1727,7 +1885,8 @@ void reset_one_room(room_data *room) {
 			}
 
 			case 'O': {	// load an obj pack
-				objpack_load_room(room);
+				// if there's no arg1, assume it's an old pack file (second arg of objpack_load_room)
+				objpack_load_room(room, (reset->arg1 == 0) ? TRUE : FALSE);
 				break;
 			}
 			
@@ -1743,6 +1902,9 @@ void reset_one_room(room_data *room) {
 					}
 					else if (is_abbrev(field, "shortdescription")) {
 						change_short_desc(mob, str);
+					}
+					else if (is_abbrev(field, "lookdescription")) {
+						change_look_desc(mob, reset->sarg2, FALSE);
 					}
 					else {
 						log("Warning: Unknown mob string in resets for room %d: C S %s", GET_ROOM_VNUM(room), reset->sarg1);
@@ -1790,12 +1952,10 @@ void reset_one_room(room_data *room) {
 				}
 				break;
 			}
-		}
-	}
-	
-	// remove resets
-	while ((reset = room->reset_commands)) {
-		room->reset_commands = reset->next;
+		}	// end switch
+		
+		// free as we go
+		DL_DELETE(room->reset_commands, reset);
 		if (reset->sarg1) {
 			free(reset->sarg1);
 		}
@@ -1804,7 +1964,6 @@ void reset_one_room(room_data *room) {
 		}
 		free(reset);
 	}
-	room->reset_commands = NULL;
 }
 
 
@@ -1820,6 +1979,9 @@ void startup_room_reset(void) {
 			reset_one_room(room);
 		}
 	}
+	
+	// cancel any world saves triggered by resets
+	cancel_all_world_save_requests(WSAVE_ROOM | WSAVE_OBJS_AND_VEHS);
 }
 
 
@@ -1873,11 +2035,13 @@ void perform_change_base_sect(room_data *loc, struct map_data *map, sector_data 
 	// update room
 	if (loc || (loc = map->room)) {
 		BASE_SECT(loc) = sect;
+		request_world_save(GET_ROOM_VNUM(loc), WSAVE_ROOM);
 	}
 	
 	// update the world map
 	if (map || (GET_ROOM_VNUM(loc) < MAP_SIZE && (map = &(world_map[FLAT_X_COORD(loc)][FLAT_Y_COORD(loc)])))) {
 		map->base_sector = sect;
+		request_world_save(map->vnum, WSAVE_MAP);
 	}
 	
 	// old index
@@ -1938,11 +2102,13 @@ void perform_change_sect(room_data *loc, struct map_data *map, sector_data *sect
 	// update room
 	if (loc) {
 		SECT(loc) = sect;
+		request_world_save(GET_ROOM_VNUM(loc), WSAVE_ROOM);
 	}
 	
 	// update the world map
 	if (map || (GET_ROOM_VNUM(loc) < MAP_SIZE && (map = &(world_map[FLAT_X_COORD(loc)][FLAT_Y_COORD(loc)])))) {
 		map->sector_type = sect;
+		request_world_save(map->vnum, WSAVE_MAP);
 	}
 	
 	if (old_sect && GET_SECT_VNUM(old_sect) == BASIC_OCEAN && GET_SECT_VNUM(sect) != BASIC_OCEAN && map->shared == &ocean_shared_data) {
@@ -1952,6 +2118,7 @@ void perform_change_sect(room_data *loc, struct map_data *map, sector_data *sect
 		
 		map->shared->island_id = NO_ISLAND;	// it definitely was before, must still be
 		map->shared->island_ptr = NULL;
+		request_world_save(map->vnum, WSAVE_MAP);
 		
 		if (loc) {
 			SHARED_DATA(loc) = map->shared;
@@ -2018,6 +2185,8 @@ void perform_change_sect(room_data *loc, struct map_data *map, sector_data *sect
 	else {
 		remove_extra_data(loc ? &ROOM_EXTRA_DATA(loc) : &map->shared->extra_data, ROOM_EXTRA_SECTOR_TIME);
 	}
+	
+	request_mapout_update(map ? map->vnum : GET_ROOM_VNUM(loc));
 }
 
 
@@ -2847,7 +3016,7 @@ void clear_private_owner(int id) {
 	// now actually clear it from any remaining rooms
 	HASH_ITER(hh, world_table, iter, next_iter) {
 		if (COMPLEX_DATA(iter) && ROOM_PRIVATE_OWNER(iter) == id) {
-			COMPLEX_DATA(iter)->private_owner = NOBODY;
+			set_private_owner(iter, NOBODY);
 			
 			// reset autostore timer
 			DL_FOREACH2(ROOM_CONTENTS(iter), obj, next_content) {
@@ -2932,9 +3101,10 @@ room_data *get_extraction_room(void) {
 * rooms as-needed.
 *
 * @param room_vnum vnum The vnum of the map room to load.
+* @param bool schedule_unload If TRUE, runs schedule_check_unload().
 * @return room_data* A fresh map room.
 */
-room_data *load_map_room(room_vnum vnum) {
+room_data *load_map_room(room_vnum vnum, bool schedule_unload) {
 	struct map_data *map;
 	room_data *room;
 	
@@ -2959,20 +3129,18 @@ room_data *load_map_room(room_vnum vnum) {
 	
 	ROOM_CROP(room) = map->crop_type;
 	
-	// only if saveable
-	if (!CAN_UNLOAD_MAP_ROOM(room)) {
-		need_world_index = TRUE;
-	}
-	
 	// checks if it's unloadable, and unloads it
-	schedule_check_unload(room, FALSE);
+	if (schedule_unload) {
+		schedule_check_unload(room, FALSE);
+	}
 	
 	return room;
 }
 
 
 /**
-* Removes custom name/icon/desc on shared room data.
+* Removes custom name/icon/desc on shared room data. Note: you must schedule
+* a request_world_save(vnum, WSAVE_ROOM) after this.
 *
 * @param struct shared_room_data *shared The shared data to decustomize.
 */
@@ -3002,6 +3170,7 @@ void decustomize_shared_data(struct shared_room_data *shared) {
 void decustomize_room(room_data *room) {
 	if (room) {
 		decustomize_shared_data(SHARED_DATA(room));
+		request_world_save(GET_ROOM_VNUM(room), WSAVE_ROOM);
 	}
 }
 
@@ -3208,6 +3377,7 @@ void grow_crop(struct map_data *map) {
 	}
 	remove_depletion_from_list(&map->shared->depletion, DPLTN_PICK);
 	remove_depletion_from_list(&map->shared->depletion, DPLTN_FORAGE);
+	request_world_save(map->vnum, WSAVE_ROOM);
 }
 
 
@@ -3301,9 +3471,7 @@ INTERACTION_FUNC(ruin_building_to_building_interaction) {
 	
 	// custom naming if #n is present (before complete_building)
 	if (strstr(GET_BLD_TITLE(proto), "#n")) {
-		if (ROOM_CUSTOM_NAME(inter_room)) {
-			free(ROOM_CUSTOM_NAME(inter_room));
-		}
+		set_room_custom_name(inter_room, NULL);
 		ROOM_CUSTOM_NAME(inter_room) = str_replace("#n", old_bld ? GET_BLD_NAME(old_bld) : "a Building", GET_BLD_TITLE(proto));
 	}
 	
@@ -3331,6 +3499,7 @@ INTERACTION_FUNC(ruin_building_to_building_interaction) {
 		}
 	}
 	
+	request_world_save(GET_ROOM_VNUM(inter_room), WSAVE_ROOM);
 	return TRUE;
 }
 
@@ -3429,7 +3598,7 @@ INTERACTION_FUNC(ruin_building_to_vehicle_interaction) {
 		}
 	}
 	
-	// custom naming if #n is present
+	// custom naming if #n is present: NOTE: this doesn't use set_vehicle_keywords etc because of special handling
 	if (strstr(VEH_KEYWORDS(ruin), "#n")) {
 		to_free = (!proto || VEH_KEYWORDS(ruin) != VEH_KEYWORDS(proto)) ? VEH_KEYWORDS(ruin) : NULL;
 		VEH_KEYWORDS(ruin) = str_replace("#n", old_bld ? GET_BLD_NAME(old_bld) : "a building", VEH_KEYWORDS(ruin));
@@ -3456,7 +3625,9 @@ INTERACTION_FUNC(ruin_building_to_vehicle_interaction) {
 		set_vehicle_extra_data(ruin, ROOM_EXTRA_PAINT_COLOR, paint);
 	}
 	
+	request_vehicle_save_in_world(ruin);
 	load_vtrigger(ruin);
+	request_world_save(GET_ROOM_VNUM(inter_room), WSAVE_ROOM);
 	return TRUE;
 }
 
@@ -3712,203 +3883,24 @@ void build_world_map(void) {
 
 
 /**
-* This loads the world_map array from file. This is optional, and this data
-* can be overwritten by the actual rooms from the .wld files. This should be
-* run after sectors are loaded, and before the .wld files are read in.
+* Called at startup to initialize the whole map.
 */
-void load_world_map_from_file(void) {
-	char line[256], line2[256], str1[256], str2[256], error_buf[MAX_STRING_LENGTH];
-	struct map_data *map, *last = NULL;
-	struct depletion_data *dep;
-	struct track_data *track;
-	int var[8], x, y;
-	long l_in;
-	FILE *fl;
+void init_map(void) {
+	int x, y;
 	
-	// initialize ocean_shared_data -- TODO should we clear the memory explicitly?
+	// initialize ocean_shared_data
+	memset((char*)&ocean_shared_data, 0, sizeof(struct shared_room_data));
 	ocean_shared_data.island_id = NO_ISLAND;
-	ocean_shared_data.island_ptr = NULL;
-	ocean_shared_data.name = NULL;
-	ocean_shared_data.description = NULL;
-	ocean_shared_data.icon = NULL;
-	ocean_shared_data.affects = NOBITS;
-	ocean_shared_data.base_affects = NOBITS;
-	ocean_shared_data.depletion = NULL;
-	ocean_shared_data.extra_data = NULL;
-	ocean_shared_data.tracks = NULL;
 	
-	// init
 	land_map = NULL;
 	for (x = 0; x < MAP_WIDTH; ++x) {
 		for (y = 0; y < MAP_HEIGHT; ++y) {
+			memset((char*)&world_map[x][y], 0, sizeof(struct map_data));
 			world_map[x][y].vnum = (y * MAP_WIDTH) + x;
-			world_map[x][y].room = NULL;
 			world_map[x][y].shared = &ocean_shared_data;
 			world_map[x][y].shared->island_id = NO_ISLAND;
-			world_map[x][y].shared->island_ptr = NULL;
-			world_map[x][y].sector_type = NULL;
-			world_map[x][y].base_sector = NULL;
-			world_map[x][y].natural_sector = NULL;
-			world_map[x][y].crop_type = NULL;
-			world_map[x][y].pathfind_key = 0;
-			world_map[x][y].next = NULL;
 		}
 	}
-	
-	if (!(fl = fopen(WORLD_MAP_FILE, "r"))) {
-		log(" - no %s file, booting without one", WORLD_MAP_FILE);
-		return;
-	}
-	
-	strcpy(error_buf, "map file");
-	
-	// optionals
-	while (get_line(fl, line)) {
-		if (*line == '$') {
-			break;
-		}
-		
-		// new room
-		if (isdigit(*line)) {
-			// x y island sect base natural crop misc
-			if (sscanf(line, "%d %d %d %d %d %d %d %d", &var[0], &var[1], &var[2], &var[3], &var[4], &var[5], &var[6], &var[7]) != 8) {
-				var[7] = 0;	// backwards-compatible on the misc
-				if (sscanf(line, "%d %d %d %d %d %d %d", &var[0], &var[1], &var[2], &var[3], &var[4], &var[5], &var[6]) != 7) {
-					log("Encountered bad line in world map file: %s", line);
-					continue;
-				}
-			}
-			if (var[0] < 0 || var[0] >= MAP_WIDTH || var[1] < 0 || var[1] >= MAP_HEIGHT) {
-				log("Encountered bad location in world map file: (%d, %d)", var[0], var[1]);
-				continue;
-			}
-		
-			map = &(world_map[var[0]][var[1]]);
-			sprintf(error_buf, "map tile %d", map->vnum);
-			
-			if (var[3] != BASIC_OCEAN && map->shared == &ocean_shared_data) {
-				map->shared = NULL;	// unlink basic ocean
-				CREATE(map->shared, struct shared_room_data, 1);
-			}
-			
-			if (map->shared->island_id != var[2]) {
-				map->shared->island_id = var[2];
-				map->shared->island_ptr = (var[2] == NO_ISLAND ? NULL : get_island(var[2], TRUE));
-			}
-			
-			// these will be validated later
-			map->sector_type = sector_proto(var[3]);
-			map->base_sector = sector_proto(var[4]);
-			map->natural_sector = sector_proto(var[5]);
-			map->crop_type = crop_proto(var[6]);
-			// var[7] is ignored -- this is misc keys for the evolve.c utility
-			
-			last = map;	// store in case of more data
-		}
-		else if (last) {
-			switch (*line) {
-				case 'E': {	// affects
-					if (!get_line(fl, line2)) {
-						log("SYSERR: Unable to get E line for map tile #%d", last->vnum);
-						break;
-					}
-					if (sscanf(line2, "%s %s", str1, str2) != 2) {
-						if (sscanf(line2, "%s", str1) != 1) {
-							log("SYSERR: Invalid E line for map tile #%d", last->vnum);
-							break;
-						}
-						// otherwise backwards-compatible:
-						strcpy(str2, str1);
-					}
-
-					last->shared->base_affects = asciiflag_conv(str1);
-					last->shared->affects = asciiflag_conv(str2);
-					break;
-				}
-				case 'I': {	// icon
-					if (last->shared->icon) {
-						free(last->shared->icon);
-					}
-					last->shared->icon = fread_string(fl, error_buf);
-					break;
-				}
-				case 'M': {	// description
-					if (last->shared->description) {
-						free(last->shared->description);
-					}
-					last->shared->description = fread_string(fl, error_buf);
-					break;
-				}
-				case 'N': {	// name
-					if (last->shared->name) {
-						free(last->shared->name);
-					}
-					last->shared->name = fread_string(fl, error_buf);
-					break;
-				}
-				case 'U': {	// other data (height etc)
-					parse_other_shared_data(last->shared, line, error_buf);
-					break;
-				}
-				case 'X': {	// resource depletion
-					if (!get_line(fl, line2)) {
-						log("SYSERR: Unable to read depletion line of map tile #%d", last->vnum);
-						exit(1);
-					}
-					if ((sscanf(line2, "%d %d", &var[0], &var[1])) != 2) {
-						log("SYSERR: Format in depletion line of map tile #%d", last->vnum);
-						exit(1);
-					}
-				
-					CREATE(dep, struct depletion_data, 1);
-					dep->type = var[0];
-					dep->count = var[1];
-					LL_PREPEND(last->shared->depletion, dep);
-					break;
-				}
-				case 'Y': {	// tracks
-					if (!get_line(fl, line2)) {
-						log("SYSERR: Missing Y section of map tile #%d", last->vnum);
-						exit(1);
-					}
-					if (sscanf(line2, "%d %d %ld %d %d", &var[0], &var[1], &l_in, &var[2], &var[3]) != 5) {
-						var[3] = NOWHERE;	// to_room: backwards-compatible with old version
-						if (sscanf(line2, "%d %d %ld %d", &var[0], &var[1], &l_in, &var[2]) != 4) {
-							log("SYSERR: Bad formatting in Y section of map tile #%d", last->vnum);
-							exit(1);
-						}
-					}
-					
-					// note: var[0] is no longer used (formerly player id)
-					HASH_FIND_INT(last->shared->tracks, &var[1], track);
-					if (!track) {
-						CREATE(track, struct track_data, 1);
-						track->id = var[1];
-						HASH_ADD_INT(last->shared->tracks, id, track);
-					}
-					track->timestamp = l_in;
-					track->dir = var[2];
-					track->to_room = var[3];
-					break;
-				}
-				case 'Z': {	// extra data
-					if (!get_line(fl, line2) || sscanf(line2, "%d %d", &var[0], &var[1]) != 2) {
-						log("SYSERR: Bad formatting in Z section of map tile #%d", last->vnum);
-						exit(1);
-					}
-					
-					set_extra_data(&last->shared->extra_data, var[0], var[1]);
-					break;
-				}
-			}
-		}
-		else {
-			log("Junk data found in base_map file: %s", line);
-			exit(0);
-		}
-	}
-	
-	fclose(fl);
 }
 
 
@@ -3947,6 +3939,1344 @@ void parse_other_shared_data(struct shared_room_data *shared, char *line, char *
 
  //////////////////////////////////////////////////////////////////////////////
 //// WORLD MAP SAVING ////////////////////////////////////////////////////////
+
+/**
+* To be called after saving everything, to prevent anything currently
+* requesting a save from re-saving.
+*/
+void cancel_all_world_save_requests(int only_save_type) {
+	struct world_save_request_data *iter, *next_iter;
+	HASH_ITER(hh, world_save_requests, iter, next_iter) {
+		if (only_save_type != NOBITS) {
+			REMOVE_BIT(iter->save_type, only_save_type);
+		}
+		
+		if (!iter->save_type || only_save_type == NOBITS) {
+			HASH_DEL(world_save_requests, iter);
+			free(iter);
+		}
+	}
+}
+
+
+/**
+* Cancels any open world-save-requests for a given room.
+*
+* @param room_vnum room The room to cancel requests for.
+* @param int only_save_type Optional: Only clear certain flags (pass NOBITS to clear all).
+*/
+void cancel_world_save_request(room_vnum room, int only_save_type) {
+	struct world_save_request_data *item;
+	
+	// check for existing entry
+	HASH_FIND_INT(world_save_requests, &room, item);
+	
+	if (item) {
+		if (only_save_type != NOBITS) {
+			REMOVE_BIT(item->save_type, only_save_type);
+		}
+		
+		if (!item->save_type || only_save_type == NOBITS) {
+			HASH_DEL(world_save_requests, item);
+			free(item);
+		}
+	}
+}
+
+
+/**
+* This will either guarantee that the binary map file is open, or will SYSERR
+* and exit.
+*
+* After calling this, you can use the global 'binary_map_fl' variable.
+*/
+void ensure_binary_map_file_is_open(void) {
+	if (binary_map_fl || (binary_map_fl = fopen(BINARY_MAP_FILE, "r+b"))) {
+		return;	// ok: was open or is now open
+	}
+	
+	if (errno != ENOENT) {
+		// failed to open for some reason OTHER than does-not-exist
+		perror("SYSERR: fatal error opening binary map file");
+		exit(1);
+	}
+	
+	// try to create it
+	touch(BINARY_MAP_FILE);
+	if (!(binary_map_fl = fopen(BINARY_MAP_FILE, "r+b"))) {
+		perror("SYSERR: fatal error opening binary map file");
+		exit(1);
+	}
+	
+	// successfully created it -- trigger this for later:
+	save_world_after_startup = TRUE;
+}
+
+
+/**
+* Copies the savable part of a map entry to storable for.
+*
+* @param struct map_data *map The map tile to save.
+* @param map_file_data *store A pointer to the data to write to.
+*/
+void map_to_store(struct map_data *map, map_file_data *store) {
+	memset((char *) store, 0, sizeof(map_file_data));
+	store->island_id = map->shared->island_id;
+	
+	store->sector_type = map->sector_type ? GET_SECT_VNUM(map->sector_type) : NOTHING;
+	store->base_sector = map->base_sector ? GET_SECT_VNUM(map->base_sector) : NOTHING;
+	store->natural_sector = map->natural_sector ? GET_SECT_VNUM(map->natural_sector) : NOTHING;
+	store->crop_type = map->crop_type ? GET_CROP_VNUM(map->crop_type) : NOTHING;
+	
+	store->affects = map->shared->affects;
+	store->base_affects = map->shared->base_affects;
+	store->height = map->shared->height;
+	
+	// for the evolver
+	store->misc = 0;
+	if (map->room && ROOM_OWNER(map->room)) {
+		store->misc |= EVOLVER_OWNED;
+	}
+	store->sector_time = get_extra_data(map->shared->extra_data, ROOM_EXTRA_SECTOR_TIME);
+}
+
+
+/**
+* Performs various world saves on-request. Schedule these with:
+*   request_world_save()
+*/
+void perform_requested_world_saves(void) {
+	struct world_save_request_data *iter, *next_iter;
+	struct map_data *map;
+	bool any_map = FALSE;
+	
+	if (block_all_saves_due_to_shutdown) {
+		return;
+	}
+	
+	HASH_ITER(hh, world_save_requests, iter, next_iter) {
+		// WSAVE_x: what to do for different save bits
+		if (IS_SET(iter->save_type, WSAVE_OBJS_AND_VEHS)) {
+			// do this before WSAVE_ROOM because it may also trigger a WSAVE_ROOM
+			objpack_save_room(real_real_room(iter->vnum));
+			REMOVE_BIT(iter->save_type, WSAVE_OBJS_AND_VEHS);
+		}
+		if (IS_SET(iter->save_type, WSAVE_MAP)) {
+			// do this before WSAVE_ROOM because it may also trigger a WSAVE_ROOM
+			if (iter->vnum >= 0 && iter->vnum < MAP_SIZE) {
+				map = &world_map[MAP_X_COORD(iter->vnum)][MAP_Y_COORD(iter->vnum)];
+				write_one_tile_to_binary_map_file(map);
+				if (HAS_SHARED_DATA_TO_SAVE(map)) {
+					// ensure this is saved
+					SET_BIT(iter->save_type, WSAVE_ROOM);
+				}
+				any_map = TRUE;
+			}
+			REMOVE_BIT(iter->save_type, WSAVE_MAP);
+		}
+		if (IS_SET(iter->save_type, WSAVE_ROOM)) {
+			write_map_and_room_to_file(real_real_room(iter->vnum), NULL, FALSE);
+			REMOVE_BIT(iter->save_type, WSAVE_ROOM);
+		}
+		
+		// remove ONLY if no bits are left (in case any function queued more saves)
+		if (iter->save_type == NOBITS) {
+			HASH_DEL(world_save_requests, iter);
+			free(iter);
+		}
+	}
+	
+	// check for map saves
+	if (any_map && binary_map_fl) {
+		fflush(binary_map_fl);
+	}
+	
+	// check for instance saves
+	if (need_instance_save) {
+		save_instances();
+		need_instance_save = FALSE;
+	}
+}
+
+
+/**
+* Schedules a save for any part of a room.
+*
+* @param room_vnum vnum The room/map vnum to save.
+* @param int save_type Any WSAVE_ bits.
+*/
+void request_world_save(room_vnum vnum, int save_type) {
+	struct world_save_request_data *item;
+	
+	// check for existing entry
+	HASH_FIND_INT(world_save_requests, &vnum, item);
+	
+	// create if needed
+	if (!item) {
+		CREATE(item, struct world_save_request_data, 1);
+		item->vnum = vnum;
+		HASH_ADD_INT(world_save_requests, vnum, item);
+	}
+	
+	// add  bits
+	item->save_type |= save_type;
+}
+
+
+/**
+* Calls a world save request based on whatever the script is attached to, using
+* the "go" and "type" vars in the DG Scripts system.
+*
+* @param void *go The thing the script is attached to.
+* @param int type The _TRIGGER type, indicating what type the 'go' is.
+*/
+void request_world_save_by_script(void *go, int type) {
+	// X_TRIGGER:
+	switch (type) {
+		case MOB_TRIGGER: {
+			request_char_save_in_world((char_data*)go);
+			break;
+		}
+		case OBJ_TRIGGER: {
+			request_obj_save_in_world((obj_data*)go);
+			break;
+		}
+		case WLD_TRIGGER:
+		case RMT_TRIGGER:
+		case BLD_TRIGGER:
+		case ADV_TRIGGER: {
+			request_world_save(GET_ROOM_VNUM((room_data*)go), WSAVE_ROOM);
+			break;
+		}
+		case VEH_TRIGGER: {
+			request_vehicle_save_in_world((vehicle_data*)go);
+			break;
+		}
+		// default: no work
+	}
+}
+
+
+/**
+* Updates the entry in the world index for a room vnu.
+*
+* @param room_vnum vnum The room to update.
+* @param char value The value to set it to (0 = no room, 1 = room present; other values can be added).
+*/
+void update_world_index(room_vnum vnum, char value) {
+	int iter;
+	
+	// check size of index
+	if (vnum > top_of_world_index) {
+		if (world_index_data) {
+			// reallocate and clear the new space
+			RECREATE(world_index_data, char, vnum + 1);
+			for (iter = top_of_world_index+1; iter <= vnum; ++iter) {
+				world_index_data[iter] = 0;
+			}
+		}
+		else {
+			CREATE(world_index_data, char, vnum + 1);
+		}
+		top_of_world_index = vnum;
+	}
+	
+	// make the update if possible
+	if (vnum >= 0) {
+		if (world_index_data[vnum] != value) {
+			// trigger a file save
+			add_vnum_hash(&binary_world_index_updates, vnum, 1);
+		}
+		world_index_data[vnum] = value;
+	}
+}
+
+
+/**
+* Writes the .wld file for every room. CAUTION: You should only do this at
+* shutdown, when it is done as a courtesy. Ideally, all these rooms are saved
+* individually, within 1 second of being changed, by request_world_save().
+*/
+void write_all_wld_files(void) {
+	room_data *room, *next_room;
+	
+	HASH_ITER(hh, world_table, room, next_room) {
+		write_map_and_room_to_file(room, NULL, TRUE);
+	}
+	
+	// no need to save any more room updates
+	cancel_all_world_save_requests(WSAVE_ROOM | WSAVE_OBJS_AND_VEHS);
+}
+
+
+/**
+* Writes changes to the binary world index without rewriting the entire file.
+* This runs frequently. Add to its queue with:
+* update_world_index(vnum, value)
+*/
+void write_binary_world_index_updates(void) {
+	struct vnum_hash *iter, *next_iter;
+	int max_vnum = 0, top_vnum = 0;
+	char tmp, zero = 0;
+	FILE *fl;
+	
+	if (!(fl = fopen(BINARY_WORLD_INDEX, "r+b"))) {
+		log("write_binary_world_index_updates: %s doesn't exist, writing fresh one", BINARY_WORLD_INDEX);
+		write_whole_binary_world_index();
+		return;
+	}
+	
+	// read header info (top vnum)
+	fread(&top_vnum, sizeof(int), 1, fl);
+	
+	// determine maximum vnum needed
+	HASH_ITER(hh, binary_world_index_updates, iter, next_iter) {
+		if (iter->vnum > max_vnum) {
+			max_vnum = iter->vnum;
+		}
+	}
+	
+	// ensure space for our vnum (or add space)
+	if (max_vnum > top_vnum) {
+		// add space at the end
+		fseek(fl, 0L, SEEK_END);
+		while (top_vnum++ < max_vnum) {
+			fwrite(&zero, sizeof(char), 1, fl);
+		}
+		
+		// rewrite header
+		fseek(fl, 0L, SEEK_SET);
+		fwrite(&top_vnum, sizeof(int), 1, fl);
+	}
+	
+	// now do all the updates
+	HASH_ITER(hh, binary_world_index_updates, iter, next_iter) {
+		if (iter->vnum >= 0 && iter->vnum <= top_of_world_index) {
+			// copy it to a char
+			tmp = world_index_data[iter->vnum];
+		
+			// seek to the correct spot and write
+			fseek(fl, sizeof(int) + (iter->vnum * sizeof(char)), SEEK_SET);
+			fwrite(&tmp, sizeof(char), 1, fl);
+		}
+		
+		// and clean up
+		HASH_DEL(binary_world_index_updates, iter);
+		free(iter);
+	}
+	
+	fclose(fl);
+}
+
+
+/**
+* Writes all the room/map data for a given map tile or interior room. Pass
+* either a map tile or a room pointer (or pass both for the same room, but it
+* can detect whichever one you don't pass). If there's nothing to save, it
+* returns FALSE and deletes the wld file if present.
+*
+* @param room_data *room Optional: The full room to write (may be NULL).
+* @param struct map_data *map Optional: The map tile to save (may be NULL).
+* @param bool force_obj_pack If TRUE, will always write the obj/veh pack, if one exists, rather than skipping it if already written.
+* @return bool TRUE if it wrote a file, FALSE if it did not.
+*/
+bool write_map_and_room_to_file(room_data *room, struct map_data *map, bool force_obj_pack) {
+	room_vnum vnum = (map ? map->vnum : (room ? GET_ROOM_VNUM(room) : NOTHING));
+	struct shared_room_data *shared = (map ? map->shared : (room ? SHARED_DATA(room) : NULL));
+	struct room_extra_data *red, *next_red;
+	char temp[MAX_STRING_LENGTH], fname[256];
+	struct depletion_data *dep;
+	struct track_data *track, *next_track;
+	struct room_direction_data *ex;
+	struct cooldown_data *cool;
+	struct resource_data *res;
+	struct trig_var_data *tvd;
+	struct affected_type *af;
+	trig_data *trig;
+	char_data *mob, *m_proto;
+	time_t now = time(0);
+	FILE *fl;
+	
+	if (vnum == NOTHING || block_all_saves_due_to_shutdown) {
+		return FALSE;	// very early exit if we couldn't pull a vnum from the args
+	}
+	
+	// grab filename now
+	get_world_filename(fname, vnum, WLD_SUFFIX);
+	
+	// look for map/room if one is not provided
+	if (map && !room) {
+		room = map->room;
+	}
+	if (room && !map && GET_MAP_LOC(room) && GET_MAP_LOC(room)->vnum == GET_ROOM_VNUM(room)) {
+		map = GET_MAP_LOC(room);
+	}
+	
+	// cancel map/room if there's nothing to save for them
+	if (room && CAN_UNLOAD_MAP_ROOM(room)) {	// but actually skip the room if it's unloadable
+		room = NULL;
+	}
+	if (map && !HAS_SHARED_DATA_TO_SAVE(map)) {	// also skip map if it doesn't have anything that belongs here
+		map = NULL;
+	}
+	
+	// do we (still) have anything to save
+	if (!map && !room) {
+		// yank from index
+		update_world_index(vnum, 0);
+		
+		// delete old file if we're not saving
+		if (!block_all_saves_due_to_shutdown) {
+			if (access(fname, F_OK) == 0) {
+				unlink(fname);
+			}
+			// also delete pack file?
+			get_world_filename(fname, vnum, SUF_PACK);
+			if (access(fname, F_OK) == 0) {
+				unlink(fname);
+			}
+		}
+		
+		// nothing to save
+		return FALSE;
+	}
+	// safety check
+	if (map && room && map->vnum != GET_ROOM_VNUM(room)) {
+		log("SYSERR: write_map_and_room_to_file called with map and room that have different vnums");
+		return FALSE;
+	}
+	
+	// OK: open the file and start saving
+	get_world_filename(fname, vnum, WLD_SUFFIX);
+	if (!(fl = fopen(fname, "w"))) {
+		log("SYSERR: write_map_and_room_to_file: unable to open world file %s", fname);
+		return FALSE;
+	}
+	
+	// ensure we are in the index
+	update_world_index(vnum, 1);
+	
+	// print tagged file info
+	fprintf(fl, "#%d %c\n", vnum, room ? 'R' : 'M');
+	
+	if (room) {
+		fprintf(fl, "Sector: %d %d\n", GET_SECT_VNUM(SECT(room)), GET_SECT_VNUM(BASE_SECT(room)));
+		
+		LL_FOREACH(ROOM_AFFECTS(room), af) {
+			fprintf(fl, "Affect: %d %d %ld %d %d %llu\n", af->type, af->cast_by, af->duration, af->modifier, af->location, af->bitvector);
+		}
+		if (HOME_ROOM(room) != room) {
+			fprintf(fl, "Home-room: %d\n", GET_ROOM_VNUM(HOME_ROOM(room)));
+		}
+		if (ROOM_OWNER(room)) {
+			fprintf(fl, "Owner: %d\n", EMPIRE_VNUM(ROOM_OWNER(room)));
+		}
+		
+		if (COMPLEX_DATA(room)) {
+			if (GET_BUILDING(room)) {
+				fprintf(fl, "Building: %d\n", GET_BLD_VNUM(GET_BUILDING(room)));
+			}
+			if (GET_ROOM_TEMPLATE(room)) {
+				fprintf(fl, "Template: %d\n", GET_RMT_VNUM(GET_ROOM_TEMPLATE(room)));
+			}
+			if (COMPLEX_DATA(room)->entrance != NO_DIR) {
+				fprintf(fl, "Entrance: %d\n", COMPLEX_DATA(room)->entrance);
+			}
+			if (COMPLEX_DATA(room)->burn_down_time) {
+				fprintf(fl, "Burn-down-time: %ld\n", COMPLEX_DATA(room)->burn_down_time);
+			}
+			if (COMPLEX_DATA(room)->damage) {
+				fprintf(fl, "Damage: %.2f\n", COMPLEX_DATA(room)->damage);
+			}
+			if (COMPLEX_DATA(room)->private_owner != NOBODY) {
+				fprintf(fl, "Private: %d\n", COMPLEX_DATA(room)->private_owner);
+			}
+			
+			LL_FOREACH(BUILDING_RESOURCES(room), res) {
+				fprintf(fl, "Resource: %d %d %d %d\n", res->type, res->vnum, res->misc, res->amount);
+			}
+			LL_FOREACH(GET_BUILT_WITH(room), res) {
+				fprintf(fl, "Built-with: %d %d %d %d\n", res->type, res->vnum, res->misc, res->amount);
+			}
+			LL_FOREACH(COMPLEX_DATA(room)->exits, ex) {
+				if (ex->keyword && *ex->keyword) {
+					fprintf(fl, "Exit: %d %d %d 1\n%s~\n", ex->dir, ex->exit_info, ex->to_room, ex->keyword);
+				}
+				else {
+					fprintf(fl, "Exit: %d %d %d 0\n", ex->dir, ex->exit_info, ex->to_room);
+				}
+			}
+		}
+	}
+	
+	// shared data
+	if (shared->icon) {
+		fprintf(fl, "Icon:\n%s~\n", shared->icon);
+	}
+	if (shared->description) {
+		strcpy(temp, shared->description);
+		strip_crlf(temp);
+		fprintf(fl, "Desc:\n%s~\n", temp);
+	}
+	if (shared->name) {
+		fprintf(fl, "Name:\n%s~\n", shared->name);
+	}
+	LL_FOREACH(shared->depletion, dep) {
+		fprintf(fl, "Depletion: %d %d\n", dep->type, dep->count);
+	}
+	HASH_ITER(hh, shared->tracks, track, next_track) {
+		if (now - track->timestamp > SECS_PER_REAL_HOUR) {
+			// delete expired tracks while we're here
+			HASH_DEL(shared->tracks, track);
+			free(track);
+		}
+		else {
+			fprintf(fl, "Track: %d %ld %d %d\n", track->id, track->timestamp, track->dir, track->to_room);
+		}
+	}
+	HASH_ITER(hh, shared->extra_data, red, next_red) {
+		fprintf(fl, "Extra: %d %d\n", red->type, red->value);
+	}
+	
+	// data only stored if it's not in the binary map file
+	if (room && !map) {
+		if (shared->height) {
+			fprintf(fl, "Height: %d\n", shared->height);
+		}
+		if (shared->island_id) {
+			fprintf(fl, "Island: %d\n", shared->island_id);
+		}
+		if (shared->affects || shared->base_affects) {
+			fprintf(fl, "Aff-flags: %llu %llu\n", shared->base_affects, shared->affects);
+		}
+		if (ROOM_CROP(room)) {
+			fprintf(fl, "Crop: %d\n", GET_CROP_VNUM(ROOM_CROP(room)));
+		}
+	}
+	
+	// 'load' commands ("resets"), last
+	// each reset (except 'S') has 4 digits. The first 3 are variable; the last 1 indicates 2 more lines of strings.
+	if (room) {
+		// must save obj pack instruction BEFORE mob instruction
+		if ((!force_obj_pack && IS_SET(room->save_info, SAVE_INFO_PACK_SAVED)) || objpack_save_room(room)) {
+			// the "1" in the arg1 slot indicates it will use the new objpack location, see objpack_load_room()
+			fprintf(fl, "Load: O 1 0 0 0\n");
+		}
+	
+		if (SCRIPT(room)) {
+			// triggers
+			LL_FOREACH(TRIGGERS(SCRIPT(room)), trig) {
+				fprintf(fl, "Load: T %d %d 0 0\n", WLD_TRIGGER, GET_TRIG_VNUM(trig));
+			}
+			// vars
+			LL_FOREACH(SCRIPT(room)->global_vars, tvd) {
+				if (*tvd->name == '-' || !*tvd->value) { // don't save if it begins with - or is empty
+					continue;
+				}
+			
+				// trig-type 0 context name value
+				fprintf(fl, "Load: V %d %d %d 1\n%s~\n%s~\n", WLD_TRIGGER, 0, (int)tvd->context, tvd->name, tvd->value);
+			}
+		}
+		// people
+		DL_FOREACH2(ROOM_PEOPLE(room), mob, next_in_room) {
+			if (mob && MOB_SAVES_TO_ROOM(mob)) {
+				// basic mob data
+				fprintf(fl, "Load: M %d %llu %d 0\n", GET_MOB_VNUM(mob), MOB_FLAGS(mob), GET_ROPE_VNUM(mob));
+				
+				// instance id if any
+				if (MOB_INSTANCE_ID(mob) != NOTHING) {
+					fprintf(fl, "Load: I %d 0 0 0\n", MOB_INSTANCE_ID(mob));
+				}
+				
+				// dynamic naming info
+				if (MOB_DYNAMIC_SEX(mob) != NOTHING || MOB_DYNAMIC_NAME(mob) != NOTHING || GET_LOYALTY(mob)) {
+					fprintf(fl, "Load: Y %d %d %d 0\n", MOB_DYNAMIC_SEX(mob), MOB_DYNAMIC_NAME(mob), GET_LOYALTY(mob) ? EMPIRE_VNUM(GET_LOYALTY(mob)) : NOTHING);
+				}
+				
+				// cooldowns
+				for (cool = mob->cooldowns; cool; cool = cool->next) {
+					fprintf(fl, "Load: C %d %d 0 0\n", cool->type, (int)(cool->expire_time - time(0)));
+				}
+				
+				// custom strings
+				if (mob->customized) {
+					m_proto = mob_proto(GET_MOB_VNUM(mob));
+					if (!m_proto || GET_PC_NAME(mob) != GET_PC_NAME(m_proto)) {
+						fprintf(fl, "Load: S keywords %s\n", NULLSAFE(GET_PC_NAME(mob)));
+					}
+					if (!m_proto || GET_SHORT_DESC(mob) != GET_SHORT_DESC(m_proto)) {
+						fprintf(fl, "Load: S short %s\n", NULLSAFE(GET_SHORT_DESC(mob)));
+					}
+					if (!m_proto || GET_LONG_DESC(mob) != GET_LONG_DESC(m_proto)) {
+						strcpy(temp, NULLSAFE(GET_LONG_DESC(mob)));
+						strip_crlf(temp);
+						fprintf(fl, "Load: S long %s\n", temp);
+					}
+					if (!m_proto || GET_LOOK_DESC(mob) != GET_LOOK_DESC(m_proto)) {
+						strcpy(temp, NULLSAFE(GET_LOOK_DESC(mob)));
+						strip_crlf(temp);
+						fprintf(fl, "Load: S look\n%s~\n", temp);
+					}
+				}
+			
+				if (SCRIPT(mob)) {
+					// triggers on the mob
+					LL_FOREACH(TRIGGERS(SCRIPT(mob)), trig) {
+						fprintf(fl, "Load: T %d %d 0 0\n", MOB_TRIGGER, GET_TRIG_VNUM(trig));
+					}
+				
+					// variables on the mob
+					LL_FOREACH(SCRIPT(mob)->global_vars, tvd) {
+						if (*tvd->name == '-' || !*tvd->value) { // don't save if it begins with - or is empty
+							continue;
+						}
+					
+						// trig-type 0 context name value
+						fprintf(fl, "Load: V %d %d %d 1\n%s~\n%s~\n\n", MOB_TRIGGER, 0, (int)tvd->context, tvd->name, tvd->value);
+					}
+				}
+			}
+		}
+	}
+	
+	fprintf(fl, "End World File\n");
+	fclose(fl);
+	
+	// ensure it's in the wld index
+	update_world_index(vnum, 1);
+	return TRUE;
+}
+
+
+/**
+* Updates the binary map file with the data from a single map tile. Note that
+* this is only flat data; anything in lists or dynamic strings must be saved
+* with write_map_and_room_to_file() instead.
+*
+* Call this through: request_world_save(vnum, WSAVE_MAP)
+*
+* @param struct map_data *map The map tile to save.
+*/
+void write_one_tile_to_binary_map_file(struct map_data *map) {
+	map_file_data store;
+	
+	if (!map) {
+		return;	// no work
+	}
+	
+	ensure_binary_map_file_is_open();
+	
+	// seek to the correct spot
+	fseek(binary_map_fl, sizeof(struct map_file_header) + (sizeof(map_file_data) * map->vnum), SEEK_SET);
+	
+	map_to_store(map, &store);
+	fwrite(&store, sizeof(map_file_data), 1, binary_map_fl);
+	
+	// leave the map file open; it will be flushed later
+}
+
+
+/**
+* Saves a full fresh binary map file.
+*/
+void write_fresh_binary_map_file(void) {
+	struct map_file_header header;
+	map_file_data store;
+	FILE *fl;
+	int x, y;
+	
+	if (binary_map_fl) {
+		// it will re-open itself when it needs to later
+		fclose(binary_map_fl);
+		binary_map_fl = NULL;
+	}
+	
+	if (!(fl = fopen(BINARY_MAP_FILE TEMP_SUFFIX, "w+b"))) {
+		log("SYSERR: Unable to open binary map file '%s' for writing.", BINARY_MAP_FILE TEMP_SUFFIX);
+		exit(1);
+	}
+	
+	// binary map file is now open at the start: write header...
+	header.version = CURRENT_BINARY_MAP_VERSION;
+	header.width = MAP_WIDTH;
+	header.height = MAP_HEIGHT;
+	fwrite(&header, sizeof(struct map_file_header), 1, fl);
+	
+	// write all entries sequentially
+	for (y = 0; y < MAP_HEIGHT; ++y) {
+		for (x = 0; x < MAP_WIDTH; ++x) {
+			map_to_store(&world_map[x][y], &store);
+			fwrite(&store, sizeof(map_file_data), 1, fl);
+		}
+	}
+	
+	fclose(fl);
+	rename(BINARY_MAP_FILE TEMP_SUFFIX, BINARY_MAP_FILE);
+	
+	// no need to save any map updates
+	cancel_all_world_save_requests(WSAVE_MAP);
+}
+
+
+/**
+* Writes the full binary index file for the world. This should be called once
+* at the end of startup to ensure a full binary file exists, and may also be
+* called before shutting down/rebooting. After that, call
+* update_world_index() to make changes.
+*/
+void write_whole_binary_world_index(void) {
+	FILE *fl;
+	
+	if (block_all_saves_due_to_shutdown) {
+		return;
+	}
+	
+	// open temp file for writing
+	if (!(fl = fopen(BINARY_WORLD_INDEX TEMP_SUFFIX, "w+b"))) {
+		log("SYSERR: Unable to open %s for writing", BINARY_WORLD_INDEX TEMP_SUFFIX);
+		return;
+	}
+	
+	HASH_SORT(world_table, sort_world_table_func);
+	
+	// header info: top vnum
+	fwrite(&top_of_world_index, sizeof(int), 1, fl);
+	
+	// write the whole index as a series of chars
+	fwrite(world_index_data, sizeof(char), top_of_world_index+1, fl);
+	
+	// close and rename
+	fclose(fl);
+	rename(BINARY_WORLD_INDEX TEMP_SUFFIX, BINARY_WORLD_INDEX);
+}
+
+
+ //////////////////////////////////////////////////////////////////////////////
+//// WORLD MAP LOADING ///////////////////////////////////////////////////////
+
+// for more readable if/else chain
+#define LOG_BAD_WLD_TAG_WARNINGS  TRUE	// triggers syslogs for invalid tags
+#define BAD_WLD_TAG_WARNING  else if (LOG_BAD_WLD_TAG_WARNINGS) { log("SYSERR: Bad tag in wld file for room %d: %s%s", vnum, line, (room ? "" : " (no room)")); }
+
+
+/**
+* First part of loading the world: Loads the basic map data.
+*
+* This also includes some backwards-compatibility for systems older than b5.116
+* when it used a larger text file.
+*/
+void load_binary_map_file(void) {
+	int x, y, height, width;
+	struct map_file_header header;
+	bool eof = FALSE;
+	
+	if (binary_map_fl) {
+		// this shouldln't be open, but just in case...
+		fclose(binary_map_fl);
+		binary_map_fl = NULL;
+	}
+	
+	// run this ONLY if this is the first step in booting the map
+	init_map();
+	
+	if (!(binary_map_fl = fopen(BINARY_MAP_FILE, "r+b"))) {
+		if (errno != ENOENT) {
+			perror("SYSERR: fatal error opening binary map file");
+			exit(1);
+		}
+		else {	// no file
+			//log("No binary map file; creating one");
+			log("No binary map file: attempting to load pre-b5.116 base_map file...");
+			
+			if (load_pre_b5_116_world_map_from_file()) {
+				log("- successfully loaded old base_map file (deleting it now)");
+			}
+			
+			// need a full file now
+			write_fresh_binary_map_file();
+		}
+		ensure_binary_map_file_is_open();
+	}
+	
+	// load header
+	fread(&header, sizeof(struct map_file_header), 1, binary_map_fl);
+	if (feof(binary_map_fl)) {
+		// nothing to load?
+		return;
+	}
+	
+	// get the dimensions that the map was saved with
+	width = (header.width ? header.width : MAP_WIDTH);
+	height = (header.height ? header.height : MAP_HEIGHT);
+	
+	// load records: this will load the entire width/height the file was saved
+	// with, even if it's larger than the current MAP_WIDTH/MAP_HEIGHT
+	for (y = 0; y < height && !eof; ++y) {
+		if (feof(binary_map_fl)) {
+			eof = TRUE;
+			break;
+		}
+		
+		for (x = 0; x < width && !eof; ++x) {
+			switch (header.version) {
+				/* notes on adding backwards-compatibility here:
+				*  - create a new map_file_data_v# struct and new store_to_map_v# function
+				*  - update #define store_to_map to use your new one
+				*  - update the map_file_data typedef to use your new one
+				*  - use this example to allow the game to load the last version:
+				* example:
+				case 1: {
+					struct map_file_data_v1 store;
+					fread(&store, sizeof(struct map_file_data_v1), 1, binary_map_fl);
+					if (feof(binary_map_fl)) {
+						eof = TRUE;
+						break;
+					}
+					
+					if (x < MAP_WIDTH && y < MAP_HEIGHT) {
+						// only use it if it's within the current map width/height
+						store_to_map_v1(&store, &world_map[x][y]);
+					}
+					break;
+				}
+				*/
+				case CURRENT_BINARY_MAP_VERSION:
+				default: {
+					map_file_data store;
+					fread(&store, sizeof(map_file_data), 1, binary_map_fl);
+					if (feof(binary_map_fl)) {
+						eof = TRUE;
+						break;
+					}
+					
+					if (x < MAP_WIDTH && y < MAP_HEIGHT) {
+						// only use it if it's within the current map width/height
+						store_to_map(&store, &world_map[x][y]);
+					}
+					break;
+				}
+			}
+		}
+	}
+	
+	// cancel any save requests triggered by loading
+	cancel_all_world_save_requests(WSAVE_MAP);
+	
+	// but ensure a full save if the version has changed
+	if (header.version != CURRENT_BINARY_MAP_VERSION) {
+		save_world_after_startup = TRUE;
+	}
+}
+
+
+/**
+* Loads one room from its .wld file into the game. This file will contain map
+* data, room data, or both.
+*
+* @param room_vnum vnum The vnum of the room to load.
+* @param char index_data The load code from the binary index file.
+*/
+void load_one_room_from_wld_file(room_vnum vnum, char index_data) {
+	char line[MAX_INPUT_LENGTH], error[256], fname[256];
+	struct shared_room_data *shared;
+	struct room_direction_data *ex;
+	struct depletion_data *dep;
+	struct resource_data *res;
+	struct affected_type *af;
+	struct track_data *track;
+	struct reset_com *reset;
+	struct map_data *map = NULL;
+	room_data *room;
+	bool end;
+	bitvector_t bit_in[2];
+	long long_in;
+	int int_in[4];
+	char char_in, *reset_read;
+	FILE *fl;
+	
+	map = (vnum < MAP_SIZE) ? &world_map[MAP_X_COORD(vnum)][MAP_Y_COORD(vnum)] : NULL;
+	room = real_real_room(vnum);	// if loaded already for some reason
+	shared = map ? map->shared : (room ? SHARED_DATA(room) : NULL);
+	
+	get_world_filename(fname, vnum, WLD_SUFFIX);
+	if (!(fl = fopen(fname, "r"))) {
+		if (errno == ENOENT) {
+			log("Warning: Unable to find wld file %s: removing from world index", fname);
+			update_world_index(vnum, 0);
+			save_world_after_startup = TRUE;
+		}
+		else {
+			log("SYSERR: Unable to open wld file %s", fname);
+		}
+		return;
+	}
+	
+	// for fread_string
+	sprintf(error, "load_one_room_from_wld_file: vnum %d (code %d)", vnum, index_data);
+	
+	end = FALSE;
+	while (!end) {
+		// load next line
+		if (!get_line(fl, line)) {
+			log("SYSERR: Unexpected end of file: %s", error);
+			exit(1);
+		}
+		
+		// tags by starting letter (for speed)
+		switch (UPPER(*line)) {
+			case '#': {	// the vnum line with the load code
+				if (sscanf(line, "#%d %c", &int_in[0], &char_in) != 2) {
+					log("SYSERR: Invalid # line: %s", error);
+					exit(1);
+				}
+				// #code may be M or R -- NEED room if it's R
+				if (char_in == 'R' && !room) {
+					if (vnum >= MAP_SIZE || !(room = load_map_room(vnum, FALSE))) {
+						// note that for map rooms this was actually handled by real_room() above calling load_map_room()
+						CREATE(room, room_data, 1);
+						room->vnum = vnum;
+						
+						CREATE(SHARED_DATA(room), struct shared_room_data, 1);
+						SHARED_DATA(room)->island_id = NO_ISLAND;
+						
+						shared = SHARED_DATA(room);
+						
+						// put it in the hash table -- do not need to update_world_index as this is a startup load
+						add_room_to_world_tables(room);
+					}
+				}
+				break;
+			}
+			case 'A': {
+				if (!strn_cmp(line, "Affect: ", 8) && room) {
+					if (sscanf(line + 8, "%d %d %ld %d %d %llu", &int_in[0], &int_in[1], &long_in, &int_in[2], &int_in[3], &bit_in[0]) != 6) {
+						log("SYSERR: Invalid affect line: %s", error);
+						exit(1);
+					}
+					
+					CREATE(af, struct affected_type, 1);
+					af->type = int_in[0];
+					af->cast_by = int_in[1];
+					af->duration = long_in;
+					af->modifier = int_in[2];
+					af->location = int_in[3];
+					af->bitvector = bit_in[0];
+					
+					LL_PREPEND(ROOM_AFFECTS(room), af);
+				}
+				else if (!strn_cmp(line, "Aff-flags: ", 11)) {
+					if (sscanf(line + 11, "%llu %llu", &bit_in[0], &bit_in[1]) != 2) {
+						log("SYSERR: Invalid aff-flags line: %s", error);
+						exit(1);
+					}
+					
+					shared->base_affects = bit_in[0];
+					shared->affects = bit_in[1];
+				}
+				BAD_WLD_TAG_WARNING
+				break;
+			}
+			case 'B': {
+				if (!strn_cmp(line, "Building: ", 10) && room) {
+					attach_building_to_room(building_proto(atoi(line+10)), room, FALSE);
+				}
+				else if (!strn_cmp(line, "Built-with: ", 12) && room) {
+					if (sscanf(line + 12, "%d %d %d %d", &int_in[0], &int_in[1], &int_in[2], &int_in[3]) != 4) {
+						log("SYSERR: Invalid built-with line: %s", error);
+						exit(1);
+					}
+					if (!COMPLEX_DATA(room)) {
+						COMPLEX_DATA(room) = init_complex_data();
+					}
+					
+					CREATE(res, struct resource_data, 1);
+					res->type = int_in[0];
+					res->vnum = int_in[1];
+					res->misc = int_in[2];
+					res->amount = int_in[3];
+					LL_APPEND(GET_BUILT_WITH(room), res);
+				}
+				else if (!strn_cmp(line, "Burn-down-time: ", 16) && room) {
+					if (!COMPLEX_DATA(room)) {
+						COMPLEX_DATA(room) = init_complex_data();
+					}
+					set_burn_down_time(room, atoi(line+16), TRUE);
+				}
+				BAD_WLD_TAG_WARNING
+				break;
+			}
+			case 'C': {
+				if (!strn_cmp(line, "Crop: ", 6) && room) {
+					set_crop_type(room, crop_proto(atoi(line+6)));
+				}
+				BAD_WLD_TAG_WARNING
+				break;
+			}
+			case 'D': {
+				if (!strn_cmp(line, "Damage: ", 8) && room) {
+					if (!COMPLEX_DATA(room)) {
+						COMPLEX_DATA(room) = init_complex_data();
+					}
+					COMPLEX_DATA(room)->damage = atof(line+8);
+				}
+				else if (!strn_cmp(line, "Depletion: ", 11)) {
+					if (sscanf(line + 11, "%d %d", &int_in[0], &int_in[1]) != 2) {
+						log("SYSERR: Invalid depletion line: %s", error);
+						exit(1);
+					}
+					
+					CREATE(dep, struct depletion_data, 1);
+					dep->type = int_in[0];
+					dep->count = int_in[1];
+					LL_PREPEND(shared->depletion, dep);
+				}
+				else if (!strn_cmp(line, "Desc:", 5)) {
+					if (shared->description) {
+						free(shared->description);
+					}
+					shared->description = fread_string(fl, error);
+				}
+				BAD_WLD_TAG_WARNING
+				break;
+			}
+			case 'E': {
+				if (!strn_cmp(line, "End World File", 14)) {
+					// actual end
+					end = TRUE;
+				}
+				else if (!strn_cmp(line, "Entrance: ", 10) && room) {
+					if (!COMPLEX_DATA(room)) {
+						COMPLEX_DATA(room) = init_complex_data();
+					}
+					COMPLEX_DATA(room)->entrance = atoi(line+10);
+				}
+				else if (!strn_cmp(line, "Exit: ", 6) && room) {
+					if (sscanf(line + 6, "%d %d %d %d", &int_in[0], &int_in[1], &int_in[2], &int_in[3]) != 4) {
+						log("SYSERR: Invalid exit line: %s", error);
+						exit(1);
+					}
+					if (!COMPLEX_DATA(room)) {
+						COMPLEX_DATA(room) = init_complex_data();
+					}
+					
+					// see if there's already an exit before making one
+					if (!(ex = find_exit(room, int_in[0]))) {
+						CREATE(ex, struct room_direction_data, 1);
+						ex->dir = int_in[0];
+						LL_INSERT_INORDER(COMPLEX_DATA(room)->exits, ex, sort_exits);
+					}
+					
+					ex->exit_info = int_in[1];
+					ex->to_room = int_in[2];	// this is a vnum; room pointer will be set in renum_world
+					if (int_in[3] != 0) {	// followed by keywords ONLY if the last int is set
+						if (ex->keyword) {
+							free(ex->keyword);
+						}
+						ex->keyword = fread_string(fl, error);
+					}
+				}
+				else if (!strn_cmp(line, "Extra: ", 7)) {
+					if (sscanf(line + 7, "%d %d", &int_in[0], &int_in[1]) != 2) {
+						log("SYSERR: Invalid extra-data line: %s", error);
+						exit(1);
+					}
+					set_extra_data(&shared->extra_data, int_in[0], int_in[1]);
+				}
+				BAD_WLD_TAG_WARNING
+				break;
+			}
+			case 'H': {
+				if (!strn_cmp(line, "Home-room: ", 11) && room) {
+					add_trd_home_room(vnum, atoi(line + 11));
+				}
+				else if (!strn_cmp(line, "Height: ", 8)) {
+					shared->height = atoi(line + 8);
+				}
+				BAD_WLD_TAG_WARNING
+				break;
+			}
+			case 'I': {
+				if (!strn_cmp(line, "Icon:", 5)) {
+					if (shared->icon) {
+						free(shared->icon);
+					}
+					shared->icon = fread_string(fl, error);
+				}
+				else if (!strn_cmp(line, "Island: ", 8)) {
+					shared->island_id = atoi(line + 8);
+					shared->island_ptr = (shared->island_id == NO_ISLAND ? NULL : get_island(shared->island_id, TRUE));
+				}
+				BAD_WLD_TAG_WARNING
+				break;
+			}
+			case 'L': {
+				if (!strn_cmp(line, "Load: ", 6) && room) {
+					if (strlen(line) < 7 || line[6] == '*') {
+						// skip (blank or comment)
+						break;
+					}
+					
+					reset_read = line + 6;
+					
+					CREATE(reset, struct reset_com, 1);
+					DL_APPEND(room->reset_commands, reset);
+					
+					if (*reset_read == 'S') {	// mob custom strings: <string type> <value>
+						reset->command = *reset_read;
+						reset->sarg1 = strdup(reset_read + 2);
+						if (!strn_cmp(reset->sarg1, "look", 4)) {
+							// look desc pulls the next section as a string
+							reset->sarg2 = fread_string(fl, error);
+						}
+					}
+					else {	// all other types:
+						if (sscanf(reset_read, "%c %lld %lld %lld %d", &reset->command, &reset->arg1, &reset->arg2, &reset->arg3, &int_in[0]) != 5) {
+							log("SYSERR: Invalid load command: %s: '%s'", error, line);
+							exit(1);
+						}
+						else {
+							// try to load strings ONLY if the last digit is non-zero
+							if (int_in[0] != 0) {
+								reset->sarg1 = fread_string(fl, error);
+								reset->sarg2 = fread_string(fl, error);
+							}
+						}
+					}
+				}
+				BAD_WLD_TAG_WARNING
+				break;
+			}
+			case 'N': {
+				if (!strn_cmp(line, "Name:", 5)) {
+					if (shared->name) {
+						free(shared->name);
+					}
+					shared->name = fread_string(fl, error);
+				}
+				BAD_WLD_TAG_WARNING
+				break;
+			}
+			case 'O': {
+				if (!strn_cmp(line, "Owner: ", 7) && room) {
+					add_trd_owner(vnum, atoi(line+7));
+				}
+				BAD_WLD_TAG_WARNING
+				break;
+			}
+			case 'P': {
+				if (!strn_cmp(line, "Private: ", 9) && room) {
+					if (!COMPLEX_DATA(room)) {
+						COMPLEX_DATA(room) = init_complex_data();
+					}
+					COMPLEX_DATA(room)->private_owner = atoi(line+9);
+				}
+				BAD_WLD_TAG_WARNING
+				break;
+			}
+			case 'R': {
+				if (!strn_cmp(line, "Resource: ", 10) && room) {
+					if (sscanf(line + 10, "%d %d %d %d", &int_in[0], &int_in[1], &int_in[2], &int_in[3]) != 4) {
+						log("SYSERR: Invalid resource line: %s", error);
+						exit(1);
+					}
+					if (!COMPLEX_DATA(room)) {
+						COMPLEX_DATA(room) = init_complex_data();
+					}
+					
+					CREATE(res, struct resource_data, 1);
+					res->type = int_in[0];
+					res->vnum = int_in[1];
+					res->misc = int_in[2];
+					res->amount = int_in[3];
+					LL_APPEND(COMPLEX_DATA(room)->to_build, res);
+				}
+				BAD_WLD_TAG_WARNING
+				break;
+			}
+			case 'S': {
+				if (!strn_cmp(line, "Sector: ", 8) && room) {
+					if (sscanf(line + 8, "%d %d", &int_in[0], &int_in[1]) != 2) {
+						log("SYSERR: Invalid sector line: %s", error);
+						exit(1);
+					}
+					
+					// need to unlink shared data, if present, if this is not an ocean
+					if (int_in[0] != BASIC_OCEAN && SHARED_DATA(room) == &ocean_shared_data) {
+						// converting from ocean to non-ocean
+						SHARED_DATA(room) = NULL;	// unlink ocean share
+						CREATE(SHARED_DATA(room), struct shared_room_data, 1);
+						if (map) {	// and pass this shared data back up to the world
+							map->shared = SHARED_DATA(room);
+						}
+						shared = SHARED_DATA(room);
+					}
+					
+					room->sector_type = sector_proto(int_in[0]);
+					room->base_sector = sector_proto(int_in[1]);
+					
+					// pass back up to map?
+					if (map) {
+						map->sector_type = room->sector_type;
+						map->base_sector = room->base_sector;
+					}
+					
+					// set up building data?
+					if (IS_ANY_BUILDING(room) || IS_ADVENTURE_ROOM(room)) {
+						COMPLEX_DATA(room) = init_complex_data();
+					}
+				}
+				BAD_WLD_TAG_WARNING
+				break;
+			}
+			case 'T': {
+				if (!strn_cmp(line, "Template: ", 10) && room) {
+					attach_template_to_room(room_template_proto(atoi(line+10)), room);
+				}
+				else if (!strn_cmp(line, "Track: ", 7)) {
+					if (sscanf(line + 7, "%d %ld %d %d", &int_in[0], &long_in, &int_in[1], &int_in[2]) != 4) {
+						log("SYSERR: Invalid track line: %s", error);
+						exit(1);
+					}
+					
+					HASH_FIND_INT(shared->tracks, &int_in[0], track);
+					if (!track) {
+						CREATE(track, struct track_data, 1);
+						track->id = int_in[0];
+						HASH_ADD_INT(shared->tracks, id, track);
+					}
+					track->timestamp = long_in;
+					track->dir = int_in[1];
+					track->to_room = int_in[2];
+				}
+				BAD_WLD_TAG_WARNING
+				break;
+			}
+		}	// switch(starting letter)
+	}	// loop
+	
+	fclose(fl);
+	
+	// cancel any save requests that were caused by loading
+	cancel_world_save_request(vnum, NOBITS);
+}
+
+
+/**
+* Reads in the binary index file and then loads whatever world files it
+* indicates. To be called at startup, AFTER loading in the world map.
+*/
+void load_world_from_binary_index(void) {
+	FILE *index_fl;
+	room_vnum vnum, top_vnum = 0, count;
+	int iter;
+	
+	// open the index
+	if (!(index_fl = fopen(BINARY_WORLD_INDEX, "r+b"))) {
+		// b5.116: attempt to boot old-style world instead
+		log("Booting with no world files (binary index file %s does not exist)", BINARY_WORLD_INDEX);
+		log("Attempting to load pre-b5.116 world files...");
+		index_boot(DB_BOOT_WLD);
+		save_world_after_startup = TRUE;
+		converted_to_b5_116 = TRUE;
+		return;
+	}
+	
+	// read size
+	fread(&top_vnum, sizeof(int), 1, index_fl);
+	
+	// make space
+	if (top_vnum > top_of_world_index || !world_index_data) {
+		if (world_index_data) {
+			// reallocate and clear the new space
+			RECREATE(world_index_data, char, top_vnum+1);
+			for (iter = top_of_world_index+1; iter <= top_vnum; ++iter) {
+				world_index_data[iter] = 0;
+			}
+		}
+		else {
+			CREATE(world_index_data, char, top_vnum+1);
+		}
+		top_of_world_index = top_vnum;
+	}
+	
+	fread(world_index_data, sizeof(char), top_of_world_index+1, index_fl);
+	fclose(index_fl);
+	
+	// and load rooms...
+	count = 0;
+	for (vnum = 0; vnum <= top_of_world_index; ++vnum) {
+		// only load if it's not a 0
+		if (world_index_data[vnum] != 0) {
+			load_one_room_from_wld_file(vnum, world_index_data[vnum]);
+			++count;
+		}
+	}
+	
+	log("Loaded %d room%s from wld files", count, PLURAL(count));
+	
+	// cancel any saves triggered by this
+	cancel_all_world_save_requests(WSAVE_ROOM);
+}
+
+
+/**
+* Applies a loaded map_file_data struct to a map tile in-game. Copy this
+* function when you need to make changes to map_file_data, but keep the v1
+* structure and function so your EmpireMUD can still load your existing binary
+* map file.
+*
+* @param struct map_file_data_v1 *store The data loaded from file.
+* @param struct map_data *map The tile to apply to.
+*/
+void store_to_map_v1(struct map_file_data_v1 *store, struct map_data *map) {
+	// warning: do not assign any 'shared' data until after the SHARED assignment
+	
+	map->sector_type = sector_proto(store->sector_type);
+	map->base_sector = sector_proto(store->base_sector);
+	map->natural_sector = sector_proto(store->natural_sector);
+	map->crop_type = crop_proto(store->crop_type);
+	
+	// SHARED: add/remove shared ocean pointer?
+	if (store->sector_type != BASIC_OCEAN && map->shared == &ocean_shared_data) {
+		map->shared = NULL;	// unlink basic ocean
+		CREATE(map->shared, struct shared_room_data, 1);
+	}
+	else if (store->sector_type == BASIC_OCEAN && map->shared != &ocean_shared_data) {
+		if (map->shared) {
+			free_shared_room_data(map->shared);
+		}
+		map->shared = &ocean_shared_data;
+	}
+	
+	// only grab these if it's not basic-ocean
+	if (map->shared != &ocean_shared_data) {
+		map->shared->island_id = store->island_id;
+		map->shared->island_ptr = (store->island_id == NO_ISLAND) ? NULL : get_island(store->island_id, TRUE);
+		map->shared->affects = store->affects;
+		map->shared->base_affects = store->base_affects;
+		map->shared->height = store->height;
+	}
+	
+	// ignore store->misc
+}
+
+
+ //////////////////////////////////////////////////////////////////////////////
+//// MAPOUT SYSTEM ///////////////////////////////////////////////////////////
+
+/**
+* This is centralized to make sure it's always consistent, which is important
+* for fseek'ing the file.
+*
+* @return char* The header text for a mapout file (map.txt, etc).
+*/
+char *get_mapout_header(void) {
+	static char output[256];
+	snprintf(output, sizeof(output), "%dx%d\n", MAP_WIDTH, MAP_HEIGHT);
+	return output;
+}
+
 
 /**
 * Writes the city data used by the graphical map.
@@ -3993,69 +5323,37 @@ void write_graphical_map_data(struct map_data *map, FILE *map_fl, FILE *pol_fl) 
 	}
 	
 	// normal map output
-	if (map_fl) {
-		if (SECT_FLAGGED(sect, SECTF_HAS_CROP_DATA) && map->crop_type) {
-			fprintf(map_fl, "%c", mapout_color_tokens[GET_CROP_MAPOUT(map->crop_type)]);
-		}
-		else {
-			fprintf(map_fl, "%c", mapout_color_tokens[GET_SECT_MAPOUT(sect)]);
-		}
+	if (SECT_FLAGGED(sect, SECTF_HAS_CROP_DATA) && map->crop_type) {
+		fputc(mapout_color_tokens[GET_CROP_MAPOUT(map->crop_type)], map_fl);
+	}
+	else {
+		fputc(mapout_color_tokens[GET_SECT_MAPOUT(sect)], map_fl);
 	}
 
 	// political output
-	if (pol_fl && map->room && (emp = ROOM_OWNER(map->room)) && (!ROOM_AFF_FLAGGED(map->room, ROOM_AFF_CHAMELEON) || !IS_COMPLETE(map->room)) && EMPIRE_MAPOUT_TOKEN(emp) != 0) {
-		fprintf(pol_fl, "%c", EMPIRE_MAPOUT_TOKEN(emp));
+	if (map->room && (emp = ROOM_OWNER(map->room)) && (!ROOM_AFF_FLAGGED(map->room, ROOM_AFF_CHAMELEON) || !IS_COMPLETE(map->room)) && EMPIRE_MAPOUT_TOKEN(emp) != 0) {
+		fputc(EMPIRE_MAPOUT_TOKEN(emp), pol_fl);
 	}
-	else if (pol_fl) {
+	else {
 		// no owner -- only some sects get printed
 		if (SECT_FLAGGED(sect, SECTF_SHOW_ON_POLITICAL_MAPOUT)) {
-			fprintf(pol_fl, "%c", mapout_color_tokens[GET_SECT_MAPOUT(sect)]);
+			fputc(mapout_color_tokens[GET_SECT_MAPOUT(sect)], pol_fl);
 		}
 		else {
-			fprintf(pol_fl, "?");
+			fputc('?', pol_fl);
 		}
 	}
 }
 
 
 /**
-* New function (as of b5.115) to combine the writing of the world_table and
-* world_map data, which are written out as base_map, the .wld files, and the
-* various text files that are used to build the graphical maps. Performing all
-* this at once is meant to reduce iterations over the various world tables and
-* lists.
+* Writes the full mapout data (used to generate the graphical version of the
+* map). This is called at startup or with the 'mapout' command. Any changes
+* are updated piecemeal.
 */
-void write_world_to_files(void) {
-	FILE *world_fl = NULL, *index_fl = NULL, *base_fl = NULL, *map_fl = NULL, *pol_fl = NULL;
-	struct track_data *track, *next_track;
-	room_data *iter, *next_iter;
-	room_vnum vnum;
-	int block, last_block, misc, x, y;
-	struct map_data *map;
-	time_t now = time(0);
-	
-	int tracks_lifespan = config_get_int("tracks_lifespan");
-	
-	if (block_all_saves_due_to_shutdown) {
-		return;
-	}
-	
-	// prepare to write
-	last_block = -1;
-	
-	// open base map
-	if (!(base_fl = fopen(WORLD_MAP_FILE TEMP_SUFFIX, "w"))) {
-		log("Unable to open %s for writing", WORLD_MAP_FILE TEMP_SUFFIX);
-		return;
-	}
-	
-	// open index file
-	if (need_world_index) {
-		if (!(index_fl = fopen(WLD_PREFIX INDEX_FILE TEMP_SUFFIX, "w"))) {
-			syslog(SYS_ERROR, LVL_START_IMM, TRUE, "SYSERR: Unable to write index file '%s': %s", WLD_PREFIX INDEX_FILE TEMP_SUFFIX, strerror(errno));
-			return;
-		}
-	}
+void write_whole_mapout(void) {
+	FILE *map_fl, *pol_fl;
+	int x, y;
 
 	// open geographical map data file
 	if (!(map_fl = fopen(GEOGRAPHIC_MAP_FILE TEMP_SUFFIX, "w"))) {
@@ -4069,119 +5367,81 @@ void write_world_to_files(void) {
 		return;
 	}
 	
-	// write preliminary data
-	fprintf(map_fl, "%dx%d\n", MAP_WIDTH, MAP_HEIGHT);
-	fprintf(pol_fl, "%dx%d\n", MAP_WIDTH, MAP_HEIGHT);
+	// write header data
+	fprintf(map_fl, "%s", get_mapout_header());
+	fprintf(pol_fl, "%s", get_mapout_header());
 	
 	// write world_map:
 	for (y = 0; y < MAP_HEIGHT; ++y) {
 		// iterating x inside of y will ensure we're in vnum-order here
 		for (x = 0; x < MAP_WIDTH; ++x) {
-			map = &world_map[x][y];
-			write_graphical_map_data(map, map_fl, pol_fl);
-			
-			// save base map only if not blank ocean
-			if (map->shared != &ocean_shared_data) {
-				// free some junk while we're here anyway
-				HASH_ITER(hh, map->shared->tracks, track, next_track) {
-					if (now - track->timestamp > tracks_lifespan * SECS_PER_REAL_MIN) {
-						HASH_DEL(map->shared->tracks, track);
-						free(track);
-					}
-				}
-				
-				// misc is some extra flags we pass to the evolver here, and is not really read back in by the MUD
-				misc = 0;
-				if (map->room && ROOM_OWNER(map->room)) {
-					misc |= EVOLVER_OWNED;
-				}
-				
-				// SAVE: x y island sect base natural crop misc
-				fprintf(base_fl, "%d %d %d %d %d %d %d %d\n", MAP_X_COORD(map->vnum), MAP_Y_COORD(map->vnum), map->shared->island_id, (map->sector_type ? GET_SECT_VNUM(map->sector_type) : -1), (map->base_sector ? GET_SECT_VNUM(map->base_sector) : -1), (map->natural_sector ? GET_SECT_VNUM(map->natural_sector) : -1), (map->crop_type ? GET_CROP_VNUM(map->crop_type) : -1), misc);
-				write_shared_room_data(base_fl, map->shared);
-			}
-			
-			// world file portion (duplicated below)
-			if (map->room) {
-				vnum = GET_ROOM_VNUM(map->room);
-				block = GET_WORLD_BLOCK(vnum);
-				
-				if (block != last_block || !world_fl) {
-					if (index_fl) {
-						fprintf(index_fl, "%d%s\n", block, WLD_SUFFIX);
-					}
-					
-					if (world_fl) {
-						save_and_close_world_file(world_fl, last_block);
-						world_fl = NULL;
-					}
-					world_fl = open_world_file(block);
-					last_block = block;
-				}
-				
-				// only save a room at all if it couldn't be unloaded
-				if (!CAN_UNLOAD_MAP_ROOM(map->room)) {
-					write_room_to_file(world_fl, map->room);
-				}
-			}
+			write_graphical_map_data(&world_map[x][y], map_fl, pol_fl);
 		}	// end X
 		
 		// end of row
 		fprintf(map_fl, "\n");
 		fprintf(pol_fl, "\n");	
 	}	// end Y
+
+	// close files
+	fclose(map_fl);
+	rename(GEOGRAPHIC_MAP_FILE TEMP_SUFFIX, GEOGRAPHIC_MAP_FILE);
 	
-	// sort interior
-	DL_SORT2(interior_room_list, sort_world_table_func, prev_interior, next_interior);
+	fclose(pol_fl);
+	rename(POLITICAL_MAP_FILE TEMP_SUFFIX, POLITICAL_MAP_FILE);
 	
-	// interior portion (duplicated from above)
-	DL_FOREACH_SAFE2(interior_room_list, iter, next_iter, next_interior) {
-		vnum = GET_ROOM_VNUM(iter);
-		block = GET_WORLD_BLOCK(vnum);
-		
-		if (block != last_block || !world_fl) {
-			if (index_fl) {
-				fprintf(index_fl, "%d%s\n", block, WLD_SUFFIX);
-			}
-			
-			if (world_fl) {
-				save_and_close_world_file(world_fl, last_block);
-				world_fl = NULL;
-			}
-			world_fl = open_world_file(block);
-			last_block = block;
-		}
-		
-		// only save a room at all if it couldn't be unloaded
-		if (!CAN_UNLOAD_MAP_ROOM(iter)) {
-			write_room_to_file(world_fl, iter);
-		}
-	}
-	
-	// save/close files
-	if (world_fl) {
-		save_and_close_world_file(world_fl, last_block);
-	}
-	if (base_fl) {
-		fclose(base_fl);
-		rename(WORLD_MAP_FILE TEMP_SUFFIX, WORLD_MAP_FILE);
-	}
-	if (index_fl) {
-		fprintf(index_fl, "$\n");
-		fclose(index_fl);
-		rename(WLD_PREFIX INDEX_FILE TEMP_SUFFIX, WLD_PREFIX INDEX_FILE);
-		need_world_index = FALSE;
-	}
-	if (map_fl) {
-		fclose(map_fl);
-		rename(GEOGRAPHIC_MAP_FILE TEMP_SUFFIX, GEOGRAPHIC_MAP_FILE);
-	}
-	if (pol_fl) {
-		fclose(pol_fl);
-		rename(POLITICAL_MAP_FILE TEMP_SUFFIX, POLITICAL_MAP_FILE);
-	}
-	
-	// additional work
-	save_instances();
+	// also write a city data file
 	write_city_data_file();
+}
+
+
+/**
+* Updates the mapout files (used to generate the graphical map) with any tiles
+* that were added with request_mapout_update(vnum).
+*/
+void write_mapout_updates(void) {
+	FILE *map_fl, *pol_fl;
+	int x, y, header_size, pos;
+	struct vnum_hash *iter, *next_iter;
+	
+	if (!mapout_update_requests) {
+		return;	// no work
+	}
+	
+	// open geographical map data file
+	if (!(map_fl = fopen(GEOGRAPHIC_MAP_FILE, "r+"))) {
+		log("SYSERR: Unable to open file '%s' for updates; saving fresh file", GEOGRAPHIC_MAP_FILE);
+		write_whole_mapout();
+		return;
+	}
+	
+	// open political map data file
+	if (!(pol_fl = fopen(POLITICAL_MAP_FILE, "r+"))) {
+		log("SYSERR: Unable to open file '%s' for updates; saving fresh file", POLITICAL_MAP_FILE);
+		write_whole_mapout();
+		return;
+	}
+	
+	header_size = strlen(get_mapout_header());
+	
+	HASH_ITER(hh, mapout_update_requests, iter, next_iter) {
+		if (iter->vnum >= 0 && iter->vnum < MAP_SIZE) {
+			x = MAP_X_COORD(iter->vnum);
+			y = MAP_Y_COORD(iter->vnum);
+			
+			// each line after the header is width+1 (for the \n)
+			pos = header_size + (y * (MAP_WIDTH + 1)) + x;
+			fseek(map_fl, pos * sizeof(char), SEEK_SET);
+			
+			write_graphical_map_data(&world_map[x][y], map_fl, pol_fl);
+		}
+		
+		// cleanup
+		HASH_DEL(mapout_update_requests, iter);
+		free(iter);
+	}
+	
+	// close files
+	fclose(map_fl);
+	fclose(pol_fl);
 }

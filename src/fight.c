@@ -1571,16 +1571,16 @@ obj_data *make_corpse(char_data *ch) {
 	}
 	
 	// set strings
-	GET_OBJ_KEYWORDS(corpse) = str_dup(kws);
-	GET_OBJ_SHORT_DESC(corpse) = str_dup(shortdesc);
-	GET_OBJ_LONG_DESC(corpse) = str_dup(longdesc);
+	set_obj_keywords(corpse, kws);
+	set_obj_short_desc(corpse, shortdesc);
+	set_obj_long_desc(corpse, longdesc);
 
-	GET_OBJ_VAL(corpse, VAL_CORPSE_IDNUM) = IS_NPC(ch) ? GET_MOB_VNUM(ch) : (-1 * GET_IDNUM(ch));
-	GET_OBJ_VAL(corpse, VAL_CORPSE_SIZE) = size;
-	GET_OBJ_VAL(corpse, VAL_CORPSE_FLAGS) = (MOB_FLAGGED(ch, MOB_NO_LOOT) ? CORPSE_NO_LOOT : NOBITS);
+	set_obj_val(corpse, VAL_CORPSE_IDNUM, IS_NPC(ch) ? GET_MOB_VNUM(ch) : (-1 * GET_IDNUM(ch)));
+	set_obj_val(corpse, VAL_CORPSE_SIZE, size);
+	set_obj_val(corpse, VAL_CORPSE_FLAGS, (MOB_FLAGGED(ch, MOB_NO_LOOT) ? CORPSE_NO_LOOT : NOBITS));
 		
 	if (human) {
-		SET_BIT(GET_OBJ_VAL(corpse, VAL_CORPSE_FLAGS), CORPSE_HUMAN);
+		set_obj_val(corpse, VAL_CORPSE_FLAGS, GET_CORPSE_FLAGS(corpse) | CORPSE_HUMAN);
 	}
 
 	/* transfer character's inventory to the corpse -- ONLY FOR NPCs */
@@ -2623,7 +2623,7 @@ void besiege_room(char_data *attacker, room_data *to_room, int damage, vehicle_d
 	}
 	
 	if (IS_MAP_BUILDING(to_room)) {
-		COMPLEX_DATA(to_room)->damage += damage;
+		set_room_damage(to_room, BUILDING_DAMAGE(to_room) + damage);
 		
 		// maximum damage
 		max_dam = GET_BLD_MAX_DAMAGE(building_proto(BUILDING_VNUM(to_room)));
@@ -2726,6 +2726,9 @@ bool besiege_vehicle(char_data *attacker, vehicle_data *veh, int damage, int sie
 	// deal damage
 	VEH_HEALTH(veh) -= damage;
 	
+	// will need a save no matter what
+	request_vehicle_save_in_world(veh);
+	
 	// not dead yet
 	if (VEH_HEALTH(veh) > 0) {
 		// apply needed maintenance if we did more than 10% damage
@@ -2753,7 +2756,7 @@ bool besiege_vehicle(char_data *attacker, vehicle_data *veh, int damage, int sie
 		// return 0 prevents the destruction
 		if (!destroy_vtrigger(veh)) {
 			VEH_HEALTH(veh) = MAX(1, VEH_HEALTH(veh));	// ensure health
-			REMOVE_BIT(VEH_FLAGS(veh), VEH_ON_FIRE);	// cancel fire
+			remove_vehicle_flags(veh, VEH_ON_FIRE);	// cancel fire
 			return TRUE;
 		}
 
@@ -3924,8 +3927,9 @@ void perform_violence_missile(char_data *ch, obj_data *weapon) {
 	
 	// update ammo
 	if (best) {
-		GET_OBJ_VAL(best, VAL_AMMO_QUANTITY) -= 1;
+		set_obj_val(best, VAL_AMMO_QUANTITY, GET_AMMO_QUANTITY(best) - 1);
 		SET_BIT(GET_OBJ_EXTRA(best), OBJ_NO_STORE);	// can no longer be stored
+		request_obj_save_in_world(best);
 	}
 	
 	// compute

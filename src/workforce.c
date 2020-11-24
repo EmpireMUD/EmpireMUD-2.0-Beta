@@ -825,7 +825,7 @@ void deactivate_workforce(empire_data *emp, int island_id, int type) {
 			}
 			else {
 				// mark for despawn just in case
-				SET_BIT(MOB_FLAGS(mob), MOB_SPAWNED);
+				set_mob_flags(mob, MOB_SPAWNED);
 			}
 		}
 	}
@@ -895,7 +895,7 @@ void deactivate_workforce_room(empire_data *emp, room_data *room) {
 				}
 				else {
 					// mark for despawn
-					SET_BIT(MOB_FLAGS(mob), MOB_SPAWNED);
+					set_mob_flags(mob, MOB_SPAWNED);
 				}
 			}
 		}
@@ -1206,7 +1206,7 @@ char_data *place_chore_worker(empire_data *emp, int chore, room_data *room) {
 				mob = spawn_empire_npc_to_room(emp, npc, room, NOTHING);
 				
 				// guarantee SPAWNED flag -- the spawn timer will be reset each time the mob works (charge_workforce), until it's done
-				SET_BIT(MOB_FLAGS(mob), MOB_SPAWNED);
+				set_mob_flags(mob, MOB_SPAWNED);
 				break;
 			}
 		}
@@ -1217,7 +1217,7 @@ char_data *place_chore_worker(empire_data *emp, int chore, room_data *room) {
 		mob = spawn_empire_npc_to_room(emp, npc, room, chore_data[chore].mob);
 		
 		// guarantee SPAWNED flag -- the spawn timer will be reset each time the mob works (charge_workforce), until it's done
-		SET_BIT(MOB_FLAGS(mob), MOB_SPAWNED);
+		set_mob_flags(mob, MOB_SPAWNED);
 	}
 	else if (!mob) {
 		log_workforce_problem(emp, room, chore, WF_PROB_NO_WORKERS, FALSE);
@@ -1709,6 +1709,8 @@ void do_chore_building(empire_data *emp, room_data *room, int mode) {
 				LL_DELETE(GET_BUILDING_RESOURCES(room), res);
 				free(res);
 			}
+			
+			request_world_save(GET_ROOM_VNUM(room), WSAVE_ROOM);
 		}
 		
 		// check for completion
@@ -1968,6 +1970,8 @@ void do_chore_dismantle(empire_data *emp, room_data *room) {
 				free(res);
 			}
 		}
+		
+		request_world_save(GET_ROOM_VNUM(room), WSAVE_ROOM);
 		
 		// check for completion
 		if (!BUILDING_RESOURCES(room)) {
@@ -2730,7 +2734,7 @@ void vehicle_chore_fire_brigade(empire_data *emp, vehicle_data *veh) {
 	
 	if (worker && VEH_FLAGGED(veh, VEH_ON_FIRE)) {
 		charge_workforce(emp, IN_ROOM(veh), worker, 1, NOTHING, 0);
-		REMOVE_BIT(VEH_FLAGS(veh), VEH_ON_FIRE);
+		remove_vehicle_flags(veh, VEH_ON_FIRE);
 		
 		act("$n throws a bucket of water to douse the flames!", FALSE, worker, NULL, NULL, TO_ROOM);
 		msg_to_vehicle(veh, FALSE, "The flames have been extinguished!\r\n");
@@ -2807,6 +2811,7 @@ void vehicle_chore_build(empire_data *emp, vehicle_data *veh, int chore) {
 		else {
 			sprintf(buf, "$n works on %s $V.", (chore == CHORE_MAINTENANCE) ? "repairing" : "constructing");
 			act(buf, FALSE, worker, NULL, veh, TO_ROOM | TO_SPAMMY);
+			request_vehicle_save_in_world(veh);
 		}
 	}
 	else if (can_do) {

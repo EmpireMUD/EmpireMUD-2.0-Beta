@@ -21,7 +21,7 @@ Show your holiday spirit by collecting candy and completing quests, and earn
 this progress reward for your empire by winning the haunted snowglobe (750
 threshold points), then use it to build the haunted mansion!
 ~
-2 4 0 5 c
+3 4 0 5 ac
 K 7 5
 W
 8 18899 0 1

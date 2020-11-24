@@ -99,6 +99,7 @@ void convert_empire_shipping(empire_data *old_emp, empire_data *new_emp) {
 		}
 		
 		VEH_SHIPPING_ID(veh) = new_id;
+		request_vehicle_save_in_world(veh);
 	}
 	
 	// move all shipping entries over
@@ -1281,7 +1282,7 @@ void show_workforce_why(empire_data *emp, char_data *ch, char *argument) {
 	struct workforce_log *wf_log;
 	room_vnum only_loc = NOWHERE;
 	bool any = FALSE;
-	room_data *room;
+	room_data *only_room = NULL;
 	size_t size;
 	
 	if (!ch->desc) {
@@ -1319,9 +1320,10 @@ void show_workforce_why(empire_data *emp, char_data *ch, char *argument) {
 		if (only_chore == NOTHING) {	// find location?
 			if (!str_cmp(argument, "here")) {
 				only_loc = GET_ROOM_VNUM(IN_ROOM(ch));
+				only_room = IN_ROOM(ch);
 			}
-			else if ((room = find_target_room(ch, argument))) {
-				only_loc = GET_ROOM_VNUM(room);
+			else if ((only_room = find_target_room(ch, argument))) {
+				only_loc = GET_ROOM_VNUM(only_room);
 			}
 			else {
 				msg_to_char(ch, "Unknown argument '%s'. You can specify a chore or location.\r\n", argument);
@@ -1400,6 +1402,9 @@ void show_workforce_why(empire_data *emp, char_data *ch, char *argument) {
 	if (any || *unsupplied) {
 		page_string(ch->desc, buf, TRUE);
 	}
+	else if (only_room && ROOM_OWNER(only_room) != GET_LOYALTY(ch)) {
+		msg_to_char(ch, "Workforce isn't working because your empire doesn't own %s location.\r\n", (only_room == IN_ROOM(ch)) ? "this" : "that");
+	}
 	else {
 		msg_to_char(ch, "No matching workforce problems found.\r\n");
 	}
@@ -1456,7 +1461,7 @@ void show_workforce_setup_to_char(empire_data *emp, char_data *ch) {
 		
 		snprintf(part, sizeof(part), "%s: %s%s", chore_data[chore].name, here ? "&con&0" : "&yoff&0", ((on && !here) || (off && here)) ? (PRF_FLAGGED(ch, PRF_SCREEN_READER) ? " (partial)" : "*") : "");
 		size = 24 + color_code_length(part) + (PRF_FLAGGED(ch, PRF_SCREEN_READER) ? 24 : 0);
-		msg_to_char(ch, " %-*.*s%s", size, size, part, (PRF_FLAGGED(ch, PRF_SCREEN_READER) || !((count+1)%3)) ? "\r\n" : " ");
+		msg_to_char(ch, " %-*.*s%s", size, size, part, (PRF_FLAGGED(ch, PRF_SCREEN_READER) || !(count % 3)) ? "\r\n" : " ");
 	}
 	if (count % 3 && !PRF_FLAGGED(ch, PRF_SCREEN_READER)) {
 		msg_to_char(ch, "\r\n");
@@ -1515,6 +1520,7 @@ void abandon_city(char_data *ch, empire_data *emp, char *argument) {
 	EMPIRE_NEEDS_SAVE(emp) = TRUE;
 	
 	et_change_cities(emp);
+	write_city_data_file();
 }
 
 
@@ -1726,6 +1732,7 @@ void downgrade_city(char_data *ch, empire_data *emp, char *argument) {
 	send_config_msg(ch, "ok_string");
 	read_empire_territory(emp, FALSE);
 	EMPIRE_NEEDS_SAVE(emp) = TRUE;
+	write_city_data_file();
 }
 
 
@@ -1864,6 +1871,7 @@ void found_city(char_data *ch, empire_data *emp, char *argument) {
 	EMPIRE_NEEDS_SAVE(emp) = TRUE;
 	
 	et_change_cities(emp);
+	write_city_data_file();
 }
 
 
@@ -2073,6 +2081,7 @@ void perform_abandon_city(empire_data *emp, struct empire_city_data *city, bool 
 		abandon_room(cityloc);
 	}
 	
+	EMPIRE_NEEDS_SAVE(emp) = TRUE;
 	et_change_cities(emp);
 }
 
@@ -2115,6 +2124,7 @@ void rename_city(char_data *ch, empire_data *emp, char *argument) {
 	free(city->name);
 	city->name = str_dup(newname);
 	EMPIRE_NEEDS_SAVE(emp) = TRUE;
+	write_city_data_file();
 }
 
 
@@ -2156,6 +2166,7 @@ void upgrade_city(char_data *ch, empire_data *emp, char *argument) {
 	read_empire_territory(emp, FALSE);
 	et_change_cities(emp);
 	EMPIRE_NEEDS_SAVE(emp) = TRUE;
+	write_city_data_file();
 }
 
 
@@ -4214,7 +4225,7 @@ ACMD(do_efind) {
 
 // syntax: elog [empire] [type] [lines]
 ACMD(do_elog) {
-	char *argptr, *tempptr, buf[MAX_STRING_LENGTH], line[MAX_STRING_LENGTH];
+	char *argptr, *tempptr, buf[MAX_STRING_LENGTH * 4], line[MAX_STRING_LENGTH];
 	int iter, count, type = NOTHING, lines = -1;
 	struct empire_log_data *elog;
 	empire_data *emp = NULL;
@@ -4307,7 +4318,7 @@ ACMD(do_elog) {
 			if (count-- - lines <= 0) {
 				snprintf(line, sizeof(line), "%3s: %s&0\r\n", simple_time_since(elog->timestamp), strip_color(elog->string));
 				
-				if (size + strlen(line) + 10 < MAX_STRING_LENGTH) {
+				if (size + strlen(line) + 10 < sizeof(buf)) {
 					strcat(buf, line);
 					size += strlen(line);
 				}
@@ -4639,6 +4650,7 @@ ACMD(do_enroll) {
 			DL_FOREACH(character_list, mob) {
 				if (GET_LOYALTY(mob) == old) {
 					GET_LOYALTY(mob) = e;
+					request_char_save_in_world(mob);
 				}
 			}
 			
@@ -4646,6 +4658,7 @@ ACMD(do_enroll) {
 			DL_FOREACH(object_list, obj) {
 				if (obj->last_empire_id == EMPIRE_VNUM(old)) {
 					obj->last_empire_id = EMPIRE_VNUM(e);
+					request_obj_save_in_world(obj);
 				}
 			}
 			
@@ -5327,7 +5340,7 @@ ACMD(do_home) {
 				}
 			}
 			
-			COMPLEX_DATA(real)->private_owner = GET_IDNUM(ch);
+			set_private_owner(real, GET_IDNUM(ch));
 
 			// interior only
 			DL_FOREACH_SAFE2(interior_room_list, iter, next_iter, next_interior) {
@@ -5796,14 +5809,14 @@ void do_manage_vehicle(char_data *ch, vehicle_data *veh, char *argument) {
 		// check for optional on/off arg
 		if (!str_cmp(argument, "on")) {
 			if (manage_vehicle_data[type].flag != NOBITS) {
-				SET_BIT(VEH_FLAGS(veh), manage_vehicle_data[type].flag);
+				set_vehicle_flags(veh, manage_vehicle_data[type].flag);
 			}
 			// else: nothing to do?
 			on = TRUE;
 		}
 		else if (!str_cmp(argument, "off")) {
 			if (manage_vehicle_data[type].flag != NOBITS) {
-				REMOVE_BIT(VEH_FLAGS(veh), manage_vehicle_data[type].flag);
+				remove_vehicle_flags(veh, manage_vehicle_data[type].flag);
 			}
 			// else: nothing to do?
 			on = FALSE;
@@ -5812,10 +5825,10 @@ void do_manage_vehicle(char_data *ch, vehicle_data *veh, char *argument) {
 			if (manage_vehicle_data[type].flag != NOBITS) {
 				on = !VEH_FLAGGED(veh, manage_vehicle_data[type].flag);
 				if (on) {
-					SET_BIT(VEH_FLAGS(veh), manage_vehicle_data[type].flag);
+					set_vehicle_flags(veh, manage_vehicle_data[type].flag);
 				}
 				else {	// off
-					REMOVE_BIT(VEH_FLAGS(veh), manage_vehicle_data[type].flag);
+					remove_vehicle_flags(veh, manage_vehicle_data[type].flag);
 				}
 			}
 			else {

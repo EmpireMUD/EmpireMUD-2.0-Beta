@@ -283,7 +283,7 @@ void olc_delete_sector(char_data *ch, sector_vnum vnum) {
 				perform_change_base_sect(NULL, map, replace_sect);
 			}
 			if (map->natural_sector == sect) {
-				map->natural_sector = replace_sect;
+				set_natural_sector(map, replace_sect);
 			}
 		}
 	}

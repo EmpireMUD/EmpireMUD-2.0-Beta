@@ -51,6 +51,7 @@
 
 // external vars
 extern struct ban_list_element *ban_list;
+extern FILE *binary_map_fl;
 extern bool data_table_needs_save;
 extern int num_invalid;
 extern int no_auto_deletes;
@@ -75,9 +76,9 @@ void check_wars();
 void chore_update();
 void display_automessages();
 void frequent_combat(unsigned long pulse);
+void perform_requested_world_saves();
 void process_import_evolutions();
 void process_theft_logs();
-void prune_instances();
 void real_update();
 void reduce_city_overages();
 void reduce_outside_territory();
@@ -92,6 +93,8 @@ void update_guard_towers();
 void update_instance_world_size();
 void update_trading_post();
 void weather_and_time();
+void write_binary_world_index_updates();
+void write_mapout_updates();
 void write_running_events_file();
 
 // local functions
@@ -631,10 +634,6 @@ void perform_reboot(void) {
 		return;
 	}
 
-	// prepare for the end!
-	save_all_empires();
-	write_world_to_files();
-
 	if (reboot_control.type == SCMD_REBOOT) {
 		sprintf(buf, "\r\n[0;0;31m *** Rebooting ***[0;0;37m\r\nPlease be patient, this will take a second.\r\n\r\n");
 	}
@@ -672,6 +671,17 @@ void perform_reboot(void) {
 		// extract is not actually necessary since we're rebooting, right?
 		// extract_all_items(och);
 		// extract_char(och);
+	}
+	
+	// prepare for the end!
+	save_all_empires();
+	write_fresh_binary_map_file();
+	write_whole_binary_world_index();
+	write_all_wld_files();
+	
+	if (binary_map_fl) {
+		fclose(binary_map_fl);
+		binary_map_fl = NULL;
 	}
 
 	if (reboot_control.type == SCMD_REBOOT && fl) {
@@ -804,7 +814,10 @@ void heartbeat(unsigned long heart_pulse) {
 		gain_cond_message = TRUE;
 	}
 	
+	HEARTBEAT_LOG("start")
+	
 	dg_event_process();
+	HEARTBEAT_LOG("0")
 
 	// this is meant to be slightly longer than the mobile_activity pulse (10), and is mentioned in help files
 	if (HEARTBEAT(13)) {
@@ -953,11 +966,6 @@ void heartbeat(unsigned long heart_pulse) {
 		HEARTBEAT_LOG("32")
 	}
 	
-	if (HEARTBEAT(30 * SECS_PER_REAL_MIN)) {
-		write_world_to_files();
-		HEARTBEAT_LOG("33")
-	}
-	
 	// this goes roughly last -- update MSDP users
 	if (HEARTBEAT(1)) {
 		msdp_update();
@@ -971,6 +979,15 @@ void heartbeat(unsigned long heart_pulse) {
 		
 		free_loaded_players();	// ensure this comes AFTER run_delayed_refresh
 		HEARTBEAT_LOG("37")
+		
+		perform_requested_world_saves();
+		HEARTBEAT_LOG("38")
+		
+		write_mapout_updates();
+		HEARTBEAT_LOG("39")
+		
+		write_binary_world_index_updates();
+		HEARTBEAT_LOG("40")
 	}
 
 	/* Every pulse! Don't want them to stink the place up... */

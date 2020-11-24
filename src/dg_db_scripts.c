@@ -243,6 +243,7 @@ void assign_triggers(void *i, int type) {
 				trg_proto = trg_proto->next;
 			}
 			reread_companion_trigs(mob);
+			request_char_save_in_world(mob);
 			break;
 		case OBJ_TRIGGER:
 			obj = (obj_data*)i;
@@ -260,6 +261,7 @@ void assign_triggers(void *i, int type) {
 				}
 				trg_proto = trg_proto->next;
 			}
+			request_obj_save_in_world(obj);
 			break;
 		case WLD_TRIGGER:
 		case ADV_TRIGGER:
@@ -281,6 +283,7 @@ void assign_triggers(void *i, int type) {
 				}
 				trg_proto = trg_proto->next;
 			}
+			request_world_save(GET_ROOM_VNUM(room), WSAVE_ROOM);
 			break;
 		case VEH_TRIGGER: {
 			veh = (vehicle_data*)i;
@@ -298,6 +301,7 @@ void assign_triggers(void *i, int type) {
 				}
 				trg_proto = trg_proto->next;
 			}
+			request_vehicle_save_in_world(veh);
 			break;
 		}
 		case EMP_TRIGGER: {

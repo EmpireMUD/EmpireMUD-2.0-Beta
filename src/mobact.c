@@ -191,7 +191,7 @@ INTERACTION_FUNC(run_one_encounter) {
 			}
 		}
 		char_to_room(aggr, IN_ROOM(ch));
-		SET_BIT(MOB_FLAGS(aggr), MOB_SPAWNED);
+		set_mob_flags(aggr, MOB_SPAWNED);
 		act("$N appears!", FALSE, ch, 0, aggr, TO_CHAR | TO_ROOM);
 		hit(aggr, ch, GET_EQ(aggr, WEAR_WIELD), TRUE);
 		load_mtrigger(aggr);
@@ -432,6 +432,8 @@ void setup_generic_npc(char_data *mob, empire_data *emp, int name, int sex) {
 			free(free_look);
 		}
 	}
+	
+	request_char_save_in_world(mob);
 }
 
 
@@ -769,7 +771,7 @@ void run_mobile_activity(char_data *ch) {
 	bool acted = FALSE, moved = FALSE;
 	obj_data *obj;
 
-	#define CAN_AGGRO(mob, vict)  (!IS_DEAD(vict) && !NOHASSLE(vict) && (IS_NPC(vict) || !PRF_FLAGGED(vict, PRF_WIZHIDE)) && !IS_GOD(vict) && vict != mob->master && !AFF_FLAGGED(vict, AFF_IMMUNE_PHYSICAL | AFF_NO_TARGET_IN_ROOM | AFF_NO_SEE_IN_ROOM | AFF_NO_ATTACK) && CAN_SEE(mob, vict) && can_fight((mob), (vict)))
+	#define CAN_AGGRO(mob, vict)  (!IS_IMMORTAL(vict) && !IS_DEAD(vict) && !NOHASSLE(vict) && (IS_NPC(vict) || !PRF_FLAGGED(vict, PRF_WIZHIDE)) && !IS_GOD(vict) && vict != mob->master && !AFF_FLAGGED(vict, AFF_IMMUNE_PHYSICAL | AFF_NO_TARGET_IN_ROOM | AFF_NO_SEE_IN_ROOM | AFF_NO_ATTACK) && CAN_SEE(mob, vict) && can_fight((mob), (vict)))
 	
 	// prevent running multiple mob moves during a catch-up cycle
 	if (!catch_up_mobs) {
@@ -1089,7 +1091,7 @@ static int spawn_one_list(room_data *room, struct spawn_info *list) {
 		setup_generic_npc(mob, ROOM_OWNER(home), NOTHING, NOTHING);
 		
 		// enforce spawn data
-		SET_BIT(MOB_FLAGS(mob), MOB_SPAWNED);
+		set_mob_flags(mob, MOB_SPAWNED);
 		
 		// put in the room
 		char_to_room(mob, room);
@@ -1487,7 +1489,7 @@ void scale_mob_as_companion(char_data *mob, char_data *master, int use_level) {
 		scale_level = MAX(CLASS_SKILL_CAP, scale_level - 25);
 	}
 	scale_mob_to_level(mob, scale_level);
-	SET_BIT(MOB_FLAGS(mob), MOB_NO_RESCALE);	// ensure it doesn't rescale itself
+	set_mob_flags(mob, MOB_NO_RESCALE);	// ensure it doesn't rescale itself
 }
 
 

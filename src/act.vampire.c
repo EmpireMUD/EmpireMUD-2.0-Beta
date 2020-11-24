@@ -618,7 +618,7 @@ void un_deathshroud(char_data *ch) {
 void check_un_vampire(char_data *ch, bool remove_vampire_skills) {
 	if (IS_NPC(ch)) {
 		if (remove_vampire_skills) {
-			REMOVE_BIT(MOB_FLAGS(ch), MOB_VAMPIRE);
+			remove_mob_flags(ch, MOB_VAMPIRE);
 		}
 		return;	// no further work
 	}
@@ -1595,9 +1595,10 @@ ACMD(do_veintap) {
 		amt = MIN(amt, GET_DRINK_CONTAINER_CAPACITY(container) - GET_DRINK_CONTAINER_CONTENTS(container));
 
 		charge_ability_cost(ch, BLOOD, amt, NOTHING, 0, WAIT_ABILITY);
-		GET_OBJ_VAL(container, VAL_DRINK_CONTAINER_CONTENTS) += amt;
-		GET_OBJ_VAL(container, VAL_DRINK_CONTAINER_TYPE) = LIQ_BLOOD;
+		set_obj_val(container, VAL_DRINK_CONTAINER_CONTENTS, GET_DRINK_CONTAINER_CONTENTS(container) + amt);
+		set_obj_val(container, VAL_DRINK_CONTAINER_TYPE, LIQ_BLOOD);
 		GET_OBJ_TIMER(container) = UNLIMITED;
+		request_obj_save_in_world(container);
 		
 		gain_ability_exp(ch, ABIL_VEINTAP, 33.4);
 	}

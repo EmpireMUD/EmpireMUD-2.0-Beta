@@ -1402,6 +1402,7 @@ ACMD(do_tattach) {
 		}
 		add_trigger(SCRIPT(victim), trig, loc);
 		reread_companion_trigs(victim);
+		request_char_save_in_world(victim);
 
 		syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: Trigger %d (%s) attached to %s [%d] by %s", tn, GET_TRIG_NAME(trig), GET_SHORT(victim), GET_MOB_VNUM(victim), GET_NAME(ch));
 		msg_to_char(ch, "Trigger %d (%s) attached to %s [%d].\r\n", tn, GET_TRIG_NAME(trig), GET_SHORT(victim), GET_MOB_VNUM(victim));
@@ -1445,6 +1446,7 @@ ACMD(do_tattach) {
 			create_script_data(object, OBJ_TRIGGER);
 		}
 		add_trigger(SCRIPT(object), trig, loc);
+		request_obj_save_in_world(object);
 
 		syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: Trigger %d (%s) attached to %s [%d] by %s", tn, GET_TRIG_NAME(trig), (GET_OBJ_SHORT_DESC(object) ? GET_OBJ_SHORT_DESC(object) : object->name), GET_OBJ_VNUM(object), GET_NAME(ch));
 		msg_to_char(ch, "Trigger %d (%s) attached to %s [%d].\r\n", tn, GET_TRIG_NAME(trig), (GET_OBJ_SHORT_DESC(object) ? GET_OBJ_SHORT_DESC(object) : object->name), GET_OBJ_VNUM(object));
@@ -1482,6 +1484,7 @@ ACMD(do_tattach) {
 			create_script_data(veh, VEH_TRIGGER);
 		}
 		add_trigger(SCRIPT(veh), trig, loc);
+		request_vehicle_save_in_world(veh);
 
 		syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: Trigger %d (%s) attached to %s [%d] by %s", tn, GET_TRIG_NAME(trig), VEH_SHORT_DESC(veh), VEH_VNUM(veh), GET_NAME(ch));
 		msg_to_char(ch, "Trigger %d (%s) attached to %s [%d].\r\n", tn, GET_TRIG_NAME(trig), VEH_SHORT_DESC(veh), VEH_VNUM(veh));
@@ -1518,6 +1521,7 @@ ACMD(do_tattach) {
 			create_script_data(room, WLD_TRIGGER);
 		}
 		add_trigger(SCRIPT(room), trig, loc);
+		request_world_save(GET_ROOM_VNUM(room), WSAVE_ROOM);
 
 		syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: Trigger %d (%s) attached to room %d by %s", tn, GET_TRIG_NAME(trig), GET_ROOM_VNUM(room), GET_NAME(ch));
 		msg_to_char(ch, "Trigger %d (%s) attached to room %d.\r\n", tn, GET_TRIG_NAME(trig), GET_ROOM_VNUM(room));
@@ -2815,7 +2819,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						if (subfield && *subfield && IS_NPC(c)) {
 							bitvector_t pos = search_block(subfield, action_bits, FALSE);
 							if (pos != NOTHING) {
-								SET_BIT(MOB_FLAGS(c), BIT(pos));
+								set_mob_flags(c, BIT(pos));
 							}
 							else {
 								script_log("Trigger: %s, VNum %d, unknown mob flag: '%s'", GET_TRIG_NAME(trig), GET_TRIG_VNUM(trig), subfield);
@@ -3748,6 +3752,8 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 								MOB_INSTANCE_ID(c) = inst->id;
 								add_instance_mob(inst, GET_MOB_VNUM(c));
 							}
+							
+							request_char_save_in_world(c);
 						}
 						*str = '\0';
 					}
@@ -4078,7 +4084,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						if (subfield && *subfield && IS_NPC(c)) {
 							bitvector_t pos = search_block(subfield, action_bits, FALSE);
 							if (pos != NOTHING) {
-								REMOVE_BIT(MOB_FLAGS(c), BIT(pos));
+								remove_mob_flags(c, BIT(pos));
 							}
 							else {
 								script_log("Trigger: %s, VNum %d, unknown mob flag: '%s'", GET_TRIG_NAME(trig), GET_TRIG_VNUM(trig), subfield);
@@ -4226,6 +4232,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						if (IS_NPC(c) && MOB_INSTANCE_ID(c) != NOTHING) {
 							subtract_instance_mob(real_instance(MOB_INSTANCE_ID(c)), GET_MOB_VNUM(c));
 							MOB_INSTANCE_ID(c) = NOTHING;
+							request_char_save_in_world(c);
 						}
 						*str = '\0';
 					}
@@ -4240,7 +4247,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 									make_vampire(c, TRUE, NOTHING);
 								}
 								else {
-									SET_BIT(MOB_FLAGS(c), MOB_VAMPIRE);
+									set_mob_flags(c, MOB_VAMPIRE);
 								}
 							}
 							else if ((!str_cmp("off", subfield) || *subfield == '0') && IS_VAMPIRE(c)) {
@@ -4248,7 +4255,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 									check_un_vampire(c, TRUE);
 								}
 								else {
-									REMOVE_BIT(MOB_FLAGS(c), MOB_VAMPIRE);
+									remove_mob_flags(c, MOB_VAMPIRE);
 								}
 							}
 						}
@@ -4366,6 +4373,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						if (subfield && *subfield) {
 							if (!str_cmp(subfield, "none") || !str_cmp(subfield, "nobody")) {
 								free_obj_binding(&OBJ_BOUND_TO(o));
+								request_obj_save_in_world(o);
 							}
 							else {	// attempt to bind it
 								char_data *targ = (*subfield == UID_CHAR) ? get_char(subfield) : get_char_by_obj(o, subfield);
@@ -4374,12 +4382,14 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 									free_obj_binding(&OBJ_BOUND_TO(o));
 									bind_obj_to_player(o, targ);
 									reduce_obj_binding(o, targ);
+									request_obj_save_in_world(o);
 								}
 								else {	// wasn't targeting a person, try an obj
 									obj_data *oarg = (*subfield == UID_CHAR) ? get_obj(subfield) : get_obj_by_obj(o, subfield);
 									if (oarg) {
 										free_obj_binding(&OBJ_BOUND_TO(o));	// unbind first
 										OBJ_BOUND_TO(o) = copy_obj_bindings(OBJ_BOUND_TO(oarg));
+										request_obj_save_in_world(o);
 									}
 								}
 							}
@@ -4470,6 +4480,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 							if (fl != NOTHING) {
 								TOGGLE_BIT(GET_OBJ_EXTRA(o), BIT(fl));
 								snprintf(str, slen, (OBJ_FLAGGED(o, BIT(fl)) ? "1" : "0"));
+								request_obj_save_in_world(obj);
 							}
 							else {
 								snprintf(str, slen, "0");
@@ -4676,19 +4687,19 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						snprintf(str, slen, "%d", GET_OBJ_VNUM(o));
 					else if (!str_cmp(field, "val0")) {
 						if (subfield && is_number(subfield)) {
-							GET_OBJ_VAL(o, 0) = atoi(subfield);
+							set_obj_val(o, 0, atoi(subfield));
 						}
 						snprintf(str, slen, "%d", GET_OBJ_VAL(o, 0));
 					}
 					else if (!str_cmp(field, "val1")) {
 						if (subfield && is_number(subfield)) {
-							GET_OBJ_VAL(o, 1) = atoi(subfield);
+							set_obj_val(o, 1, atoi(subfield));
 						}
 						snprintf(str, slen, "%d", GET_OBJ_VAL(o, 1));
 					}
 					else if (!str_cmp(field, "val2")) {
 						if (subfield && is_number(subfield)) {
-							GET_OBJ_VAL(o, 2) = atoi(subfield);
+							set_obj_val(o, 2, atoi(subfield));
 						}
 						snprintf(str, slen, "%d", GET_OBJ_VAL(o, 2));
 					}
@@ -5006,7 +5017,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					}
 					else if (!str_cmp(field, "height")) {
 						if (subfield && *subfield && isdigit(*subfield)) {
-							ROOM_HEIGHT(r) = atoi(subfield);
+							set_room_height(r, atoi(subfield));
 						}
 						snprintf(str, slen, "%d", ROOM_HEIGHT(r));
 					}
@@ -5432,7 +5443,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					}
 					else if (!str_cmp(field, "extinguish")) {
 						if (VEH_FLAGGED(v, VEH_ON_FIRE)) {
-							REMOVE_BIT(VEH_FLAGS(v), VEH_ON_FIRE);
+							remove_vehicle_flags(v, VEH_ON_FIRE);
 						}
 						*str = '\0';
 					}
@@ -5553,6 +5564,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						if ((inst = find_instance_by_room(IN_ROOM(v), FALSE, TRUE))) {
 							VEH_INSTANCE_ID(v) = inst->id;
 						}
+						request_vehicle_save_in_world(v);
 						*str = '\0';
 					}
 					else if (!str_cmp(field, "longdesc")) {
@@ -5646,6 +5658,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					}
 					else if (!str_cmp(field, "unlink_instance")) {
 						VEH_INSTANCE_ID(v) = NOTHING;
+						request_vehicle_save_in_world(v);
 						*str = '\0';
 					}
 					break;
@@ -6629,6 +6642,7 @@ void process_attach(void *go, struct script_data *sc, trig_data *trig, int type,
 		}
 		add_trigger(SCRIPT(c), newtrig, -1);
 		reread_companion_trigs(c);
+		request_char_save_in_world(c);
 		return;
 	}
 
@@ -6637,6 +6651,7 @@ void process_attach(void *go, struct script_data *sc, trig_data *trig, int type,
 			create_script_data(v, VEH_TRIGGER);
 		}
 		add_trigger(SCRIPT(v), newtrig, -1);
+		request_vehicle_save_in_world(v);
 		return;
 	}
 
@@ -6645,6 +6660,7 @@ void process_attach(void *go, struct script_data *sc, trig_data *trig, int type,
 			create_script_data(o, OBJ_TRIGGER);
 		}
 		add_trigger(SCRIPT(o), newtrig, -1);
+		request_obj_save_in_world(o);
 		return;
 	}
 
@@ -6653,6 +6669,7 @@ void process_attach(void *go, struct script_data *sc, trig_data *trig, int type,
 			create_script_data(r, WLD_TRIGGER);
 		}
 		add_trigger(SCRIPT(r), newtrig, -1);
+		request_world_save(GET_ROOM_VNUM(r), WSAVE_ROOM);
 		return;
 	}
 }
@@ -7049,18 +7066,22 @@ void process_remote(struct script_data *sc, trig_data *trig, char *cmd) {
 
 	if ((room = find_room(uid))) {
 		sc_remote = SCRIPT(room) ? SCRIPT(room) : create_script_data(room, WLD_TRIGGER);
+		request_world_save(GET_ROOM_VNUM(room), WSAVE_ROOM);
 	}
 	else if ((mob = find_char(uid))) {
 		sc_remote = SCRIPT(mob) ? SCRIPT(mob) : create_script_data(mob, MOB_TRIGGER);
 		if (!IS_NPC(mob))
 			context = 0;
 		add_companion_var(mob, vd->name, vd->value, context);
+		request_char_save_in_world(mob);
 	}
 	else if ((obj = find_obj(uid))) {
 		sc_remote = SCRIPT(obj) ? SCRIPT(obj) : create_script_data(obj, OBJ_TRIGGER);
+		request_obj_save_in_world(obj);
 	}
 	else if ((veh = find_vehicle(uid))) {
 		sc_remote = SCRIPT(veh) ? SCRIPT(veh) : create_script_data(veh, VEH_TRIGGER);
+		request_vehicle_save_in_world(veh);
 	}
 	else if ((emp = find_empire_by_uid(uid))) {
 		sc_remote = SCRIPT(emp) ? SCRIPT(emp) : create_script_data(emp, EMP_TRIGGER);
@@ -7170,6 +7191,8 @@ ACMD(do_vdelete) {
 	free(vd->value);
 	free(vd->name);
 	free(vd);
+	
+	request_world_save_by_script(sc_remote->attached_to, sc_remote->attached_type);
 
 	msg_to_char(ch, "Deleted.\r\n");
 }
@@ -7214,10 +7237,12 @@ void process_rdelete(struct script_data *sc, trig_data *trig, char *cmd) {
 
 	if ((room = find_room(uid))) {
 		sc_remote = SCRIPT(room);
+		request_world_save(GET_ROOM_VNUM(room), WSAVE_ROOM);
 	}
 	else if ((mob = find_char(uid))) {
 		sc_remote = SCRIPT(mob);
 		remove_companion_var(mob, var, sc->context);
+		request_char_save_in_world(mob);
 		/*
 		// this was set but never used
 		if (!IS_NPC(mob))
@@ -7226,9 +7251,11 @@ void process_rdelete(struct script_data *sc, trig_data *trig, char *cmd) {
 	}
 	else if ((obj = find_obj(uid))) {
 		sc_remote = SCRIPT(obj);
+		request_obj_save_in_world(obj);
 	}
 	else if ((veh = find_vehicle(uid))) {
 		sc_remote = SCRIPT(veh);
+		request_vehicle_save_in_world(veh);
 	}
 	else if ((emp = find_empire_by_uid(uid))) {
 		sc_remote = SCRIPT(emp);
@@ -7507,8 +7534,10 @@ int script_driver(union script_driver_data_u *sdd, trig_data *trig, int type, in
 			else if (!strn_cmp(cmd, "dg_affect_room ", 15))
 				do_dg_affect_room(go, sc, trig, type, cmd);
 
-			else if (!strn_cmp(cmd, "global ", 7))
+			else if (!strn_cmp(cmd, "global ", 7)) {
 				process_global(sc, trig, cmd, sc->context);
+				request_world_save_by_script(go, type);
+			}
 
 			else if (!strn_cmp(cmd, "context ", 8))
 				process_context(sc, trig, cmd);
@@ -7525,8 +7554,10 @@ int script_driver(union script_driver_data_u *sdd, trig_data *trig, int type, in
 			else if (!strn_cmp(cmd, "set ", 4))
 				process_set(sc, trig, cmd);
 
-			else if (!strn_cmp(cmd, "unset ", 6))
+			else if (!strn_cmp(cmd, "unset ", 6)) {
 				process_unset(sc, trig, cmd);
+				request_world_save_by_script(go, type);
+			}
 
 			else if (!strn_cmp(cmd, "wait ", 5)) {
 				process_wait(go, trig, type, cmd, cl);

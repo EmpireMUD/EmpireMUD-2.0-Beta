@@ -646,6 +646,7 @@ void affect_remove_room(room_data *room, struct affected_type *af) {
 	free(af);
 	
 	affect_total_room(room);
+	request_world_save(GET_ROOM_VNUM(room), WSAVE_ROOM);
 }
 
 
@@ -718,6 +719,7 @@ void affect_to_room(room_data *room, struct affected_type *af) {
 	
 	SET_BIT(ROOM_AFF_FLAGS(room), affected_alloc->bitvector);
 	schedule_room_affect_expire(room, affected_alloc);
+	request_world_save(GET_ROOM_VNUM(room), WSAVE_ROOM);
 	
 	affect_total_room(room);
 }
@@ -878,7 +880,7 @@ void affect_total(char_data *ch) {
 * @param room_data *room The room to check.
 */
 void affect_total_room(room_data *room) {
-	bool was_unclaimable = IS_SET(ROOM_AFF_FLAGS(room), ROOM_AFF_UNCLAIMABLE) ? TRUE : FALSE;
+	bitvector_t old_affs = ROOM_AFF_FLAGS(room);
 	struct affected_type *af;
 	vehicle_data *veh;
 	
@@ -908,8 +910,18 @@ void affect_total_room(room_data *room) {
 	}
 	
 	// if unclaimable changed, update room lights
-	if (was_unclaimable != (IS_SET(ROOM_AFF_FLAGS(room), ROOM_AFF_UNCLAIMABLE) ? TRUE : FALSE)) {
+	if (IS_SET(ROOM_AFF_FLAGS(room), ROOM_AFF_UNCLAIMABLE) != IS_SET(old_affs, ROOM_AFF_UNCLAIMABLE)) {
 		reset_light_count(room);
+	}
+	
+	// if chameleon changed, update mapout
+	if (IS_SET(ROOM_AFF_FLAGS(room), ROOM_AFF_CHAMELEON) != IS_SET(old_affs, ROOM_AFF_CHAMELEON)) {
+		request_mapout_update(GET_ROOM_VNUM(room));
+	}
+	
+	// check for map save
+	if (ROOM_AFF_FLAGS(room) != old_affs) {
+		request_world_save(GET_ROOM_VNUM(room), WSAVE_MAP | WSAVE_ROOM);
 	}
 }
 
@@ -1551,6 +1563,8 @@ void char_from_room(char_data *ch) {
 	if (FIGHTING(ch) != NULL) {
 		stop_fighting(ch);
 	}
+	
+	request_char_save_in_world(ch);
 
 	// update lights
 	ROOM_LIGHTS(IN_ROOM(ch)) -= GET_LIGHTS(ch);
@@ -1607,10 +1621,11 @@ void char_to_room(char_data *ch, room_data *room) {
 			}
 		}
 		
-		// store last room to player
 		if (!IS_NPC(ch)) {
+			// store last room to player
 			GET_LAST_ROOM(ch) = GET_ROOM_VNUM(room);
 		}
+		request_char_save_in_world(ch);
 	}
 }
 
@@ -2183,14 +2198,14 @@ obj_data *create_money(empire_data *type, int amount) {
 	strcpy(buf, money_desc(type, amount));
 	
 	// strings
-	GET_OBJ_KEYWORDS(obj) = str_dup(skip_filler(buf));
-	GET_OBJ_SHORT_DESC(obj) = str_dup(buf);
+	set_obj_keywords(obj, skip_filler(buf));
+	set_obj_short_desc(obj, buf);
 	snprintf(buf2, sizeof(buf2), "%s is lying here.", CAP(buf));
-	GET_OBJ_LONG_DESC(obj) = str_dup(buf2);
+	set_obj_long_desc(obj, buf2);
 
 	// description
 	if (amount == 1) {
-		GET_OBJ_ACTION_DESC(obj) = str_dup("It's just one miserable little coin.");
+		set_obj_look_desc(obj, "It's just one miserable little coin.", TRUE);
 	}
 	else {
 		if (amount < 10)
@@ -2204,7 +2219,7 @@ obj_data *create_money(empire_data *type, int amount) {
 		else
 			strcpy(buf, "There are a LOT of coins.");	/* strcpy: OK (is < MAX_STRING_LENGTH) */
 
-		GET_OBJ_ACTION_DESC(obj) = str_dup(buf);
+		set_obj_look_desc(obj, buf, TRUE);
 	}
 
 	// data
@@ -2212,8 +2227,8 @@ obj_data *create_money(empire_data *type, int amount) {
 	obj->proto_data->material = MAT_GOLD;
 	SET_BIT(GET_OBJ_WEAR(obj), ITEM_WEAR_TAKE);
 
-	GET_OBJ_VAL(obj, VAL_COINS_AMOUNT) = amount;
-	GET_OBJ_VAL(obj, VAL_COINS_EMPIRE_ID) = (!type ? OTHER_COIN : EMPIRE_VNUM(type));
+	set_obj_val(obj, VAL_COINS_AMOUNT, amount);
+	set_obj_val(obj, VAL_COINS_EMPIRE_ID, (!type ? OTHER_COIN : EMPIRE_VNUM(type)));
 
 	return (obj);
 }
@@ -2601,6 +2616,7 @@ void add_cooldown(char_data *ch, any_vnum type, int seconds_duration) {
 	if (ch->desc) {
 		queue_delayed_update(ch, CDU_MSDP_COOLDOWNS);
 	}
+	request_char_save_in_world(ch);
 }
 
 
@@ -2639,6 +2655,7 @@ void remove_cooldown(char_data *ch, struct cooldown_data *cool) {
 	if (ch->desc) {
 		queue_delayed_update(ch, CDU_MSDP_COOLDOWNS);
 	}
+	request_char_save_in_world(ch);
 }
 
 
@@ -2948,7 +2965,7 @@ void perform_abandon_room(room_data *room) {
 	REMOVE_BIT(ROOM_BASE_FLAGS(room), ROOM_AFF_PUBLIC | ROOM_AFF_NO_WORK | ROOM_AFF_NO_ABANDON | ROOM_AFF_NO_DISMANTLE);
 
 	if (ROOM_PRIVATE_OWNER(room) != NOBODY) {
-		COMPLEX_DATA(room)->private_owner = NOBODY;
+		set_private_owner(room, NOBODY);
 	}
 	
 	// reschedule unload check now that it's unowned
@@ -2973,6 +2990,8 @@ void perform_abandon_room(room_data *room) {
 	
 	affect_total_room(room);
 	update_MSDP_empire_data_all(emp, TRUE, TRUE);
+	request_mapout_update(GET_ROOM_VNUM(room));
+	request_world_save(GET_ROOM_VNUM(room), WSAVE_ROOM);
 }
 
 
@@ -2987,7 +3006,7 @@ void perform_abandon_vehicle(vehicle_data *veh) {
 		bool provided_light = VEH_PROVIDES_LIGHT(veh);
 		
 		VEH_OWNER(veh) = NULL;
-		REMOVE_BIT(VEH_FLAGS(veh), VEH_PLAYER_NO_WORK | VEH_PLAYER_NO_DISMANTLE);
+		remove_vehicle_flags(veh, VEH_PLAYER_NO_WORK | VEH_PLAYER_NO_DISMANTLE);
 	
 		if (VEH_INTERIOR_HOME_ROOM(veh)) {
 			abandon_room(VEH_INTERIOR_HOME_ROOM(veh));
@@ -3012,6 +3031,8 @@ void perform_abandon_vehicle(vehicle_data *veh) {
 				++ROOM_LIGHTS(IN_ROOM(veh));
 			}
 		}
+		
+		request_vehicle_save_in_world(veh);
 	}
 }
 
@@ -3071,6 +3092,8 @@ void perform_claim_room(room_data *room, empire_data *emp) {
 	
 	add_dropped_item_list(emp, ROOM_CONTENTS(room));
 	update_MSDP_empire_data_all(emp, TRUE, TRUE);
+	request_mapout_update(GET_ROOM_VNUM(room));
+	request_world_save(GET_ROOM_VNUM(room), WSAVE_ROOM);
 }
 
 
@@ -3118,6 +3141,8 @@ void perform_claim_vehicle(vehicle_data *veh, empire_data *emp) {
 				--ROOM_LIGHTS(IN_ROOM(veh));
 			}
 		}
+		
+		request_vehicle_save_in_world(veh);
 	}
 }
 
@@ -5628,16 +5653,16 @@ obj_data *copy_warehouse_obj(obj_data *input) {
 	
 	// pointer copies
 	if (GET_OBJ_KEYWORDS(input) && (!proto || GET_OBJ_KEYWORDS(input) != GET_OBJ_KEYWORDS(proto))) {
-		GET_OBJ_KEYWORDS(obj) = str_dup(GET_OBJ_KEYWORDS(input));
+		set_obj_keywords(obj, GET_OBJ_KEYWORDS(input));
 	}
 	if (GET_OBJ_SHORT_DESC(input) && (!proto || GET_OBJ_SHORT_DESC(input) != GET_OBJ_SHORT_DESC(proto))) {
-		GET_OBJ_SHORT_DESC(obj) = str_dup(GET_OBJ_SHORT_DESC(input));
+		set_obj_short_desc(obj, GET_OBJ_SHORT_DESC(input));
 	}
 	if (GET_OBJ_LONG_DESC(input) && (!proto || GET_OBJ_LONG_DESC(input) != GET_OBJ_LONG_DESC(proto))) {
-		GET_OBJ_LONG_DESC(obj) = str_dup(GET_OBJ_LONG_DESC(input));
+		set_obj_long_desc(obj, GET_OBJ_LONG_DESC(input));
 	}
 	if (GET_OBJ_ACTION_DESC(input) && (!proto || GET_OBJ_ACTION_DESC(input) != GET_OBJ_ACTION_DESC(proto))) {
-		GET_OBJ_ACTION_DESC(obj) = str_dup(GET_OBJ_ACTION_DESC(input));
+		set_obj_look_desc(obj, GET_OBJ_ACTION_DESC(input), FALSE);
 	}
 	
 	// non-point copies
@@ -5650,7 +5675,7 @@ obj_data *copy_warehouse_obj(obj_data *input) {
 	GET_STOLEN_FROM(obj) = GET_STOLEN_FROM(input);
 	
 	for (iter = 0; iter < NUM_OBJ_VAL_POSITIONS; ++iter) {
-		GET_OBJ_VAL(obj, iter) = GET_OBJ_VAL(input, iter);
+		set_obj_val(obj, iter, GET_OBJ_VAL(input, iter));
 	}
 	GET_OBJ_APPLIES(obj) = copy_obj_apply_list(GET_OBJ_APPLIES(input));
 	OBJ_BOUND_TO(obj) = copy_obj_bindings(OBJ_BOUND_TO(input));
@@ -5733,6 +5758,32 @@ void extract_obj(obj_data *obj) {
 
 
 /**
+* Finds the room whose .pack file this object should be saved in, if any.
+*
+* This is mainly called by: request_obj_save_in_world(obj)
+*
+* @param obj_data *obj The object.
+* @return room_data* A room that this object should save in.
+*/
+room_data *find_room_obj_saves_in(obj_data *obj) {
+	// find parent obj
+	while (obj->in_obj) {
+		obj = obj->in_obj;
+	}
+	
+	if (IN_ROOM(obj)) {
+		return IN_ROOM(obj);
+	}
+	else if (obj->in_vehicle) {
+		return IN_ROOM(obj->in_vehicle);
+	}
+	else {	// is not in a room (or in a vehicle in a room)
+		return NULL;
+	}
+}
+
+
+/**
 * Makes a fresh copy of an object, preserving certain flags such as superior
 * and keep. All temporary properties including bindings are copied over. You
 * can swap it out using swap_obj_for_obj() or any other method, then extract
@@ -5784,45 +5835,45 @@ obj_data *fresh_copy_obj(obj_data *obj, int scale_level) {
 	
 	// custom strings?
 	if (GET_OBJ_SHORT_DESC(obj) && GET_OBJ_SHORT_DESC(obj) != GET_OBJ_SHORT_DESC(proto)) {
-		GET_OBJ_SHORT_DESC(new) = str_dup(GET_OBJ_SHORT_DESC(obj));
+		set_obj_short_desc(new, GET_OBJ_SHORT_DESC(obj));
 	}
 	if (GET_OBJ_LONG_DESC(obj) && GET_OBJ_LONG_DESC(obj) != GET_OBJ_LONG_DESC(proto)) {
-		GET_OBJ_LONG_DESC(new) = str_dup(GET_OBJ_LONG_DESC(obj));
+		set_obj_long_desc(new, GET_OBJ_LONG_DESC(obj));
 	}
 	if (GET_OBJ_KEYWORDS(obj) && GET_OBJ_KEYWORDS(obj) != GET_OBJ_KEYWORDS(proto)) {
-		GET_OBJ_KEYWORDS(new) = str_dup(GET_OBJ_KEYWORDS(obj));
+		set_obj_keywords(new, GET_OBJ_KEYWORDS(obj));
 	}
 	if (GET_OBJ_ACTION_DESC(obj) && GET_OBJ_ACTION_DESC(obj) != GET_OBJ_ACTION_DESC(proto)) {
-		GET_OBJ_ACTION_DESC(new) = str_dup(GET_OBJ_ACTION_DESC(obj));
+		set_obj_look_desc(new, GET_OBJ_ACTION_DESC(obj), FALSE);
 	}
 	
 	// certain things that must always copy over
 	switch (GET_OBJ_TYPE(new)) {
 		case ITEM_AMMO: {
-			GET_OBJ_VAL(new, VAL_AMMO_QUANTITY) = GET_OBJ_VAL(obj, VAL_AMMO_QUANTITY);
+			set_obj_val(new, VAL_AMMO_QUANTITY, GET_OBJ_VAL(obj, VAL_AMMO_QUANTITY));
 			break;
 		}
 		case ITEM_BOOK: {
-			GET_OBJ_VAL(new, VAL_BOOK_ID) = GET_OBJ_VAL(obj, VAL_BOOK_ID);
+			set_obj_val(new, VAL_BOOK_ID, GET_OBJ_VAL(obj, VAL_BOOK_ID));
 			break;
 		}
 		case ITEM_DRINKCON: {
-			GET_OBJ_VAL(new, VAL_DRINK_CONTAINER_CONTENTS) = GET_OBJ_VAL(obj, VAL_DRINK_CONTAINER_CONTENTS);
-			GET_OBJ_VAL(new, VAL_DRINK_CONTAINER_TYPE) = GET_OBJ_VAL(obj, VAL_DRINK_CONTAINER_TYPE);
+			set_obj_val(new, VAL_DRINK_CONTAINER_CONTENTS, GET_OBJ_VAL(obj, VAL_DRINK_CONTAINER_CONTENTS));
+			set_obj_val(new, VAL_DRINK_CONTAINER_TYPE, GET_OBJ_VAL(obj, VAL_DRINK_CONTAINER_TYPE));
 			break;
 		}
 		case ITEM_PORTAL: {
-			GET_OBJ_VAL(new, VAL_PORTAL_TARGET_VNUM) = GET_OBJ_VAL(obj, VAL_PORTAL_TARGET_VNUM);
+			set_obj_val(new, VAL_PORTAL_TARGET_VNUM, GET_OBJ_VAL(obj, VAL_PORTAL_TARGET_VNUM));
 			break;
 		}
 		case ITEM_POISON: {
-			GET_OBJ_VAL(new, VAL_POISON_CHARGES) = GET_OBJ_VAL(obj, VAL_POISON_CHARGES);
+			set_obj_val(new, VAL_POISON_CHARGES, GET_OBJ_VAL(obj, VAL_POISON_CHARGES));
 			break;
 		}
 		case ITEM_SHIP: {
 			// copy these blind
 			for (iter = 0; iter < NUM_OBJ_VAL_POSITIONS; ++iter) {
-				GET_OBJ_VAL(new, iter) = GET_OBJ_VAL(obj, iter);
+				set_obj_val(new, iter, GET_OBJ_VAL(obj, iter));
 			}
 			break;
 		}
@@ -6043,6 +6094,7 @@ void bind_obj_to_group(obj_data *obj, struct group_data *group) {
 			add_obj_binding(GET_IDNUM(mem->member), &OBJ_BOUND_TO(obj));
 		}
 	}
+	request_obj_save_in_world(obj);
 }
 
 
@@ -6064,6 +6116,7 @@ void bind_obj_to_player(obj_data *obj, char_data *ch) {
 	}
 	
 	add_obj_binding(GET_IDNUM(ch), &OBJ_BOUND_TO(obj));
+	request_obj_save_in_world(obj);
 }
 
 
@@ -6106,6 +6159,7 @@ void bind_obj_to_tag_list(obj_data *obj, struct mob_tag *list) {
 			break;
 		}
 	}
+	request_obj_save_in_world(obj);
 }
 
 
@@ -6201,6 +6255,7 @@ void reduce_obj_binding(obj_data *obj, char_data *player) {
 			free(bind);
 		}
 	}
+	request_obj_save_in_world(obj);
 }
 
 
@@ -6313,6 +6368,8 @@ void obj_from_char(obj_data *object) {
 		log("SYSERR: NULL object passed to obj_from_char.");
 	}
 	else {
+		request_obj_save_in_world(object);
+		
 		DL_DELETE2(object->carried_by->carrying, object, prev_content, next_content);
 		object->next_content = object->prev_content = NULL;
 
@@ -6347,6 +6404,7 @@ void obj_from_obj(obj_data *obj) {
 	}
 	else {
 		remove_dropped_item_anywhere(obj);
+		request_obj_save_in_world(obj);
 		
 		obj_from = obj->in_obj;
 		DL_DELETE2(obj_from->contains, obj, prev_content, next_content);
@@ -6377,6 +6435,8 @@ void obj_from_room(obj_data *object) {
 		log("SYSERR: NULL object (%p) or obj not in a room (%p) passed to obj_from_room", object, IN_ROOM(object));
 	}
 	else {
+		request_obj_save_in_world(object);
+		
 		// update lights
 		if (OBJ_FLAGGED(object, OBJ_LIGHT)) {
 			--ROOM_LIGHTS(IN_ROOM(object));
@@ -6400,6 +6460,7 @@ void obj_from_vehicle(obj_data *object) {
 		log("SYSERR: NULL object (%p) or obj not in a vehicle (%p) passed to obj_from_vehicle", object, object->in_vehicle);
 	}
 	else {
+		request_obj_save_in_world(object);
 		if (VEH_OWNER(object->in_vehicle)) {
 			remove_dropped_item(VEH_OWNER(object->in_vehicle), object);
 		}
@@ -6483,6 +6544,7 @@ void obj_to_char(obj_data *object, char_data *ch) {
 		}
 		
 		qt_get_obj(ch, object);
+		request_obj_save_in_world(object);
 	}
 	else {
 		log("SYSERR: NULL obj (%p) or char (%p) passed to obj_to_char.", object, ch);
@@ -6606,6 +6668,7 @@ void obj_to_obj(obj_data *obj, obj_data *obj_to) {
 		obj->in_obj = obj_to;
 		
 		add_dropped_item_anywhere(obj, NULL);
+		request_obj_save_in_world(obj);
 	}
 }
 
@@ -6640,6 +6703,8 @@ void obj_to_room(obj_data *object, room_data *room) {
 		if (ROOM_OWNER(room)) {
 			add_dropped_item(ROOM_OWNER(room), object);
 		}
+		
+		request_obj_save_in_world(object);
 	}
 }
 
@@ -6671,6 +6736,8 @@ void obj_to_vehicle(obj_data *object, vehicle_data *veh) {
 		if (VEH_OWNER(veh)) {
 			add_dropped_item(VEH_OWNER(veh), object);
 		}
+		
+		request_obj_save_in_world(object);
 	}
 }
 
@@ -8337,6 +8404,7 @@ void add_depletion(room_data *room, int type, bool multiple) {
 		return;
 	}
 	perform_add_depletion(&ROOM_DEPLETION(room), type, multiple);
+	request_world_save(GET_ROOM_VNUM(room), WSAVE_ROOM);
 }
 
 
@@ -8419,16 +8487,21 @@ void perform_add_depletion(struct depletion_data **list, int type, bool multiple
 *
 * @param room_data *room where
 * @param int type DPLTN_
+* @return bool TRUE if it removed one.
 */
-void remove_depletion_from_list(struct depletion_data **list, int type) {
+bool remove_depletion_from_list(struct depletion_data **list, int type) {
 	struct depletion_data *dep, *next_dep;
+	bool any = FALSE;
 	
 	LL_FOREACH_SAFE(*list, dep, next_dep) {
 		if (dep->type == type) {
 			LL_DELETE(*list, dep);
 			free(dep);
+			any = TRUE;
 		}
 	}
+	
+	return any;
 }
 
 
@@ -8439,7 +8512,9 @@ void remove_depletion_from_list(struct depletion_data **list, int type) {
 * @param int type DPLTN_
 */
 void remove_depletion(room_data *room, int type) {
-	remove_depletion_from_list(&ROOM_DEPLETION(room), type);
+	if (remove_depletion_from_list(&ROOM_DEPLETION(room), type)) {
+		request_world_save(GET_ROOM_VNUM(room), WSAVE_ROOM);
+	}
 }
 
 
@@ -8482,6 +8557,8 @@ void set_depletion(room_data *room, int type, int value) {
 		
 		LL_PREPEND(ROOM_DEPLETION(room), dep);
 	}
+	
+	request_world_save(GET_ROOM_VNUM(room), WSAVE_ROOM);
 }
 
 
@@ -8516,6 +8593,8 @@ void attach_building_to_room(bld_data *bld, room_data *room, bool with_triggers)
 		}
 		assign_triggers(room, WLD_TRIGGER);
 	}
+	
+	request_world_save(GET_ROOM_VNUM(room), WSAVE_ROOM);
 }
 
 
@@ -8534,6 +8613,8 @@ void attach_template_to_room(room_template *rmt, room_data *room) {
 		COMPLEX_DATA(room) = init_complex_data();
 	}
 	COMPLEX_DATA(room)->rmt_ptr = rmt;
+	
+	request_world_save(GET_ROOM_VNUM(room), WSAVE_ROOM);
 }
 
 
@@ -9705,8 +9786,8 @@ void store_unique_item(char_data *ch, struct empire_unique_storage **to_list, ob
 	obj->last_empire_id = NOTHING;
 	empty_obj_before_extract(obj);
 	if (IS_DRINK_CONTAINER(obj)) {
-		GET_OBJ_VAL(obj, VAL_DRINK_CONTAINER_CONTENTS) = 0;
-		GET_OBJ_VAL(obj, VAL_DRINK_CONTAINER_TYPE) = LIQ_WATER;
+		set_obj_val(obj, VAL_DRINK_CONTAINER_CONTENTS, 0);
+		set_obj_val(obj, VAL_DRINK_CONTAINER_TYPE, LIQ_WATER);
 	}
 	
 	// existing eus entry or new one? only passes 'room' if it's an empire; player storage is global
@@ -9957,7 +10038,7 @@ int get_number(char **name) {
 void extract_vehicle(vehicle_data *veh) {
 	if (!VEH_IS_EXTRACTED(veh)) {
 		check_dg_owner_purged_vehicle(veh);
-		SET_BIT(VEH_FLAGS(veh), VEH_EXTRACTED);
+		set_vehicle_flags(veh, VEH_EXTRACTED);
 		++veh_extractions_pending;
 	}
 }
@@ -10038,7 +10119,7 @@ void extract_pending_vehicles(void) {
 		}
 		
 		if (VEH_IS_EXTRACTED(veh)) {
-			REMOVE_BIT(VEH_FLAGS(veh), VEH_EXTRACTED);
+			remove_vehicle_flags(veh, VEH_EXTRACTED);
 		}
 		else {	// not extracting
 			continue;
@@ -10111,6 +10192,7 @@ void vehicle_from_room(vehicle_data *veh) {
 	
 	// yank empire tech (which may be island-based)
 	adjust_vehicle_tech(veh, FALSE);
+	request_vehicle_save_in_world(veh);
 	
 	// check lights
 	if (VEH_PROVIDES_LIGHT(veh)) {
@@ -10122,6 +10204,11 @@ void vehicle_from_room(vehicle_data *veh) {
 	IN_ROOM(veh) = NULL;
 	
 	affect_total_room(was_in);
+	
+	// update mapout if applicable
+	if (VEH_IS_VISIBLE_ON_MAPOUT(veh)) {
+		request_mapout_update(GET_ROOM_VNUM(was_in));
+	}
 }
 
 
@@ -10154,6 +10241,13 @@ void vehicle_to_room(vehicle_data *veh, room_data *room) {
 	
 	// apply empire tech (which may be island-based)
 	adjust_vehicle_tech(veh, TRUE);
+	
+	// update mapout if applicable
+	if (VEH_IS_VISIBLE_ON_MAPOUT(veh)) {
+		request_mapout_update(GET_ROOM_VNUM(room));
+	}
+	
+	request_vehicle_save_in_world(veh);
 }
 
 

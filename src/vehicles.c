@@ -290,6 +290,7 @@ bool decay_one_vehicle(vehicle_data *veh, char *message) {
 	
 	// update health
 	VEH_HEALTH(veh) -= MAX(1.0, ((double) VEH_MAX_HEALTH(veh) / 10.0));
+	request_vehicle_save_in_world(veh);
 	
 	// check very low health
 	if (VEH_HEALTH(veh) <= 0) {
@@ -468,12 +469,15 @@ void finish_dismantle_vehicle(char_data *ch, vehicle_data *veh) {
 	}
 	
 	if (IN_ROOM(veh)) {
+		if (VEH_IS_VISIBLE_ON_MAPOUT(veh)) {
+			request_mapout_update(GET_ROOM_VNUM(IN_ROOM(veh)));
+		}
 		DL_FOREACH2(ROOM_PEOPLE(IN_ROOM(veh)), iter, next_in_room) {
 			if (!IS_NPC(iter) && GET_ACTION(iter) == ACT_DISMANTLE_VEHICLE && GET_ACTION_VNUM(iter, 1) == VEH_CONSTRUCTION_ID(veh)) {
 				cancel_action(iter);
 			}
 			else if (IS_NPC(iter) && GET_MOB_VNUM(iter) == chore_data[CHORE_BUILDING].mob) {
-				SET_BIT(MOB_FLAGS(iter), MOB_SPAWNED);
+				set_mob_flags(iter, MOB_SPAWNED);
 			}
 		}
 	}
@@ -615,7 +619,8 @@ room_data *get_vehicle_interior(vehicle_data *veh) {
 	}
 	
 	complete_wtrigger(room);
-		
+	
+	request_vehicle_save_in_world(veh);
 	return room;
 }
 
@@ -724,6 +729,7 @@ void harness_mob_to_vehicle(char_data *mob, vehicle_data *veh) {
 	vam->empire = GET_LOYALTY(mob) ? EMPIRE_VNUM(GET_LOYALTY(mob)) : NOTHING;
 	
 	LL_PREPEND(VEH_ANIMALS(veh), vam);
+	request_vehicle_save_in_world(veh);
 	extract_char(mob);
 }
 
@@ -872,7 +878,7 @@ INTERACTION_FUNC(ruin_vehicle_to_vehicle_interaction) {
 		}
 	}
 	
-	// custom naming if #n is present
+	// custom naming if #n is present: note does not use set_vehicle_keywords etc because of special handling
 	if (strstr(VEH_KEYWORDS(ruin), "#n")) {
 		to_free = (!proto || VEH_KEYWORDS(ruin) != VEH_KEYWORDS(proto)) ? VEH_KEYWORDS(ruin) : NULL;
 		VEH_KEYWORDS(ruin) = str_replace("#n", VEH_SHORT_DESC(inter_veh), VEH_KEYWORDS(ruin));
@@ -899,6 +905,7 @@ INTERACTION_FUNC(ruin_vehicle_to_vehicle_interaction) {
 		set_vehicle_extra_data(ruin, ROOM_EXTRA_PAINT_COLOR, VEH_PAINT_COLOR(inter_veh));
 	}
 	
+	request_vehicle_save_in_world(ruin);
 	load_vtrigger(ruin);
 	return TRUE;
 }
@@ -979,6 +986,149 @@ void scale_vehicle_to_level(vehicle_data *veh, int level) {
 	
 	// set the level
 	VEH_SCALE_LEVEL(veh) = level;
+	request_vehicle_save_in_world(veh);
+}
+
+
+/**
+* Updates the vehicle's icon. It does no validation, so you must
+* pre-validate the text as 4 visible characters wide.
+*
+* @param vehicle_data *veh The vehicle to change.
+* @param const char *str The new icon (will be copied). Or, NULL to set it back to the prototype.
+*/
+void set_vehicle_icon(vehicle_data *veh, const char *str) {
+	vehicle_data *proto = vehicle_proto(VEH_VNUM(veh));
+	
+	if (VEH_ICON(veh) && (!proto || VEH_ICON(veh) != VEH_ICON(proto))) {
+		free(VEH_ICON(veh));
+	}
+	VEH_ICON(veh) = (str ? str_dup(str) : (proto ? VEH_ICON(proto) : NULL));
+	request_vehicle_save_in_world(veh);
+}
+
+
+/**
+* Updates the vehicle's keywords. It does no validation, so you must
+* pre-validate the text.
+*
+* @param vehicle_data *veh The vehicle to change.
+* @param const char *str The new keywords (will be copied). Or, NULL to set it back to the prototype.
+*/
+void set_vehicle_keywords(vehicle_data *veh, const char *str) {
+	vehicle_data *proto = vehicle_proto(VEH_VNUM(veh));
+	const char *default_val = "vehicle unknown";
+	
+	if (VEH_KEYWORDS(veh) && (!proto || VEH_KEYWORDS(veh) != VEH_KEYWORDS(proto))) {
+		free(VEH_KEYWORDS(veh));
+	}
+	VEH_KEYWORDS(veh) = (str ? str_dup(str) : (proto ? VEH_KEYWORDS(proto) : str_dup(default_val)));
+	request_vehicle_save_in_world(veh);
+}
+
+
+/**
+* Updates the vehicle's long desc. It does no validation, so you must
+* pre-validate the text.
+*
+* @param vehicle_data *veh The vehicle to change.
+* @param const char *str The new long desc (will be copied). Or, NULL to set it back to the prototype.
+*/
+void set_vehicle_long_desc(vehicle_data *veh, const char *str) {
+	vehicle_data *proto = vehicle_proto(VEH_VNUM(veh));
+	const char *default_val = "An unknown vehicle is here.";
+	
+	if (VEH_LONG_DESC(veh) && (!proto || VEH_LONG_DESC(veh) != VEH_LONG_DESC(proto))) {
+		free(VEH_LONG_DESC(veh));
+	}
+	VEH_LONG_DESC(veh) = (str ? str_dup(str) : (proto ? VEH_LONG_DESC(proto) : str_dup(default_val)));
+	request_vehicle_save_in_world(veh);
+}
+
+
+/**
+* Updates the vehicle's look desc. It does no validation, so you must
+* pre-validate the text.
+*
+* @param vehicle_data *veh The vehicle to change.
+* @param const char *str The new look desc (will be copied). Or, NULL to set it back to the prototype.
+* @param bool format If TRUE, will format it as a paragraph (IF str was not-null).
+*/
+void set_vehicle_look_desc(vehicle_data *veh, const char *str, bool format) {
+	vehicle_data *proto = vehicle_proto(VEH_VNUM(veh));
+	const char *default_val = "An unknown vehicle is here.\r\n";
+	char temp[MAX_STRING_LENGTH];
+	const char *val = str;
+	
+	if (VEH_LOOK_DESC(veh) && (!proto || VEH_LOOK_DESC(veh) != VEH_LOOK_DESC(proto))) {
+		free(VEH_LOOK_DESC(veh));
+	}
+	
+	// check trailing crlf
+	if (str && *str && str[strlen(str)-1] != '\r' && str[strlen(str)-1] != '\n') {
+		strcpy(temp, str);
+		strcat(temp, "\r\n");	// I think there's always room for this
+		val = temp;
+	}
+	VEH_LOOK_DESC(veh) = (val ? str_dup(val) : (proto ? VEH_LOOK_DESC(proto) : str_dup(default_val)));
+	
+	// format if requested
+	if (val && format) {
+		format_text(&VEH_LOOK_DESC(veh), (strlen(VEH_LOOK_DESC(veh)) > 80 ? FORMAT_INDENT : 0), NULL, MAX_STRING_LENGTH);
+	}
+	
+	request_vehicle_save_in_world(veh);
+}
+
+
+/**
+* Updates the vehicle's short desc. It does no validation, so you must
+* pre-validate the text.
+*
+* @param vehicle_data *veh The vehicle to change.
+* @param const char *str The new short desc (will be copied). Or, NULL to set it back to the prototype.
+*/
+void set_vehicle_short_desc(vehicle_data *veh, const char *str) {
+	vehicle_data *proto = vehicle_proto(VEH_VNUM(veh));
+	const char *default_val = "an unknown vehicle";
+	
+	if (VEH_SHORT_DESC(veh) && (!proto || VEH_SHORT_DESC(veh) != VEH_SHORT_DESC(proto))) {
+		free(VEH_SHORT_DESC(veh));
+	}
+	VEH_SHORT_DESC(veh) = (str ? str_dup(str) : (proto ? VEH_SHORT_DESC(proto) : str_dup(default_val)));
+	request_vehicle_save_in_world(veh);
+}
+
+
+/**
+* Updates the vehicle's look desc by adding to the end. It does no validation,
+* so you must pre-validate the text.
+*
+* @param vehicle_data *veh The vehicle to change.
+* @param const char *str The text to append to the look desc (will be copied).
+* @param bool format If TRUE, will format it as a paragraph.
+*/
+void set_vehicle_look_desc_append(vehicle_data *veh, const char *str, bool format) {
+	vehicle_data *proto = vehicle_proto(VEH_VNUM(veh));
+	char temp[MAX_STRING_LENGTH];
+	
+	if (str && *str) {
+		snprintf(temp, sizeof(temp), "%s%s", NULLSAFE(VEH_LOOK_DESC(veh)), str);
+		
+		// check trailing crlf
+		if (str[strlen(str)-1] != '\r' && str[strlen(str)-1] != '\n') {
+			strcat(temp, "\r\n");
+		}
+		if (VEH_LOOK_DESC(veh) && (!proto || VEH_LOOK_DESC(veh) != VEH_LOOK_DESC(proto))) {
+			free(VEH_LOOK_DESC(veh));
+		}
+		VEH_LOOK_DESC(veh) = str_dup(temp);
+		if (format) {
+			format_text(&VEH_LOOK_DESC(veh), (strlen(VEH_LOOK_DESC(veh)) > 80 ? FORMAT_INDENT : 0), NULL, MAX_STRING_LENGTH);
+		}
+		
+		request_vehicle_save_in_world(veh);
+	}
 }
 
 
@@ -1004,7 +1154,7 @@ void start_dismantle_vehicle(vehicle_data *veh) {
 	delete_vehicle_interior(veh);
 	
 	// set up flags
-	SET_BIT(VEH_FLAGS(veh), VEH_DISMANTLING);
+	set_vehicle_flags(veh, VEH_DISMANTLING);
 	VEH_CONSTRUCTION_ID(veh) = get_new_vehicle_construction_id();
 	
 	// remove any existing resources remaining to build/maintain
@@ -1052,6 +1202,10 @@ void start_dismantle_vehicle(vehicle_data *veh) {
 	}
 	
 	affect_total_room(IN_ROOM(veh));
+	request_vehicle_save_in_world(veh);
+	if (VEH_IS_VISIBLE_ON_MAPOUT(veh)) {
+		request_mapout_update(GET_ROOM_VNUM(IN_ROOM(veh)));
+	}
 }
 
 
@@ -1065,7 +1219,7 @@ void start_vehicle_burning(vehicle_data *veh) {
 		log_to_empire(VEH_OWNER(veh), ELOG_HOSTILITY, "Your %s has caught on fire at (%d, %d)", skip_filler(VEH_SHORT_DESC(veh)), X_COORD(IN_ROOM(veh)), Y_COORD(IN_ROOM(veh)));
 	}
 	msg_to_vehicle(veh, TRUE, "It seems %s has caught fire!\r\n", VEH_SHORT_DESC(veh));
-	SET_BIT(VEH_FLAGS(veh), VEH_ON_FIRE);
+	set_vehicle_flags(veh, VEH_ON_FIRE);
 
 	if (VEH_SITTING_ON(veh)) {
 		do_unseat_from_vehicle(VEH_SITTING_ON(veh));
@@ -1134,6 +1288,7 @@ char_data *unharness_mob_from_vehicle(struct vehicle_attached_mob *vam, vehicle_
 	
 	// remove the vam entry now
 	LL_DELETE(VEH_ANIMALS(veh), vam);
+	request_vehicle_save_in_world(veh);
 	
 	// things that keep us from spawning the mob
 	if (!IN_ROOM(veh) || !mob_proto(vam->mob)) {
@@ -1170,13 +1325,16 @@ void update_vehicle_island_and_loc(vehicle_data *veh, room_data *loc) {
 	}
 	
 	LL_FOREACH(VEH_ROOM_LIST(veh), vrl) {
-		GET_ISLAND_ID(vrl->room) = GET_ISLAND_ID(loc);
-		GET_ISLAND(vrl->room) = GET_ISLAND(loc);
-		GET_MAP_LOC(vrl->room) = GET_MAP_LOC(loc);
+		if (GET_ISLAND_ID(vrl->room) != GET_ISLAND_ID(loc)) {
+			GET_ISLAND_ID(vrl->room) = GET_ISLAND_ID(loc);
+			GET_ISLAND(vrl->room) = GET_ISLAND(loc);
+			GET_MAP_LOC(vrl->room) = GET_MAP_LOC(loc);
+			request_world_save(GET_ROOM_VNUM(vrl->room), WSAVE_ROOM);
 		
-		// check vehicles inside and cascade
-		DL_FOREACH2(ROOM_VEHICLES(vrl->room), iter, next_in_room) {
-			update_vehicle_island_and_loc(iter, loc);
+			// check vehicles inside and cascade
+			DL_FOREACH2(ROOM_VEHICLES(vrl->room), iter, next_in_room) {
+				update_vehicle_island_and_loc(iter, loc);
+			}
 		}
 	}
 }
@@ -1525,7 +1683,7 @@ void complete_vehicle(vehicle_data *veh) {
 	
 	// only if it was incomplete:
 	if (VEH_FLAGGED(veh, VEH_INCOMPLETE)) {
-		REMOVE_BIT(VEH_FLAGS(veh), VEH_INCOMPLETE);
+		remove_vehicle_flags(veh, VEH_INCOMPLETE);
 		
 		if (VEH_OWNER(veh)) {
 			qt_empire_players_vehicle(VEH_OWNER(veh), qt_gain_vehicle, veh);
@@ -1544,6 +1702,10 @@ void complete_vehicle(vehicle_data *veh) {
 	
 	if (room) {
 		affect_total_room(room);
+		request_vehicle_save_in_world(veh);
+		if (VEH_IS_VISIBLE_ON_MAPOUT(veh)) {
+			request_mapout_update(GET_ROOM_VNUM(room));	// in case
+		}
 	}
 }
 
@@ -1976,7 +2138,7 @@ vehicle_data *read_vehicle(any_vnum vnum, bool with_triggers) {
 	VEH_NEEDS_RESOURCES(veh) = NULL;
 	VEH_BUILT_WITH(veh) = NULL;
 	IN_ROOM(veh) = NULL;
-	REMOVE_BIT(VEH_FLAGS(veh), VEH_INCOMPLETE | VEH_DISMANTLING);	// ensure not marked incomplete/dismantle
+	remove_vehicle_flags(veh, VEH_INCOMPLETE | VEH_DISMANTLING);	// ensure not marked incomplete/dismantle
 	
 	veh->script_id = 0;	// initialize later
 	
@@ -2142,13 +2304,14 @@ void store_one_vehicle_to_file(vehicle_data *veh, FILE *fl) {
 *
 * @param FILE *fl The file open for reading, just after the %VNUM line.
 * @param any_vnum vnum The vnum already read from the file.
+* @param char *error_str Used in logging errors, to indicate where they come from.
 * @return vehicle_data* The loaded vehicle, if possible.
 */
-vehicle_data *unstore_vehicle_from_file(FILE *fl, any_vnum vnum) {
+vehicle_data *unstore_vehicle_from_file(FILE *fl, any_vnum vnum, char *error_str) {
 	char line[MAX_INPUT_LENGTH], error[MAX_STRING_LENGTH], s_in[MAX_INPUT_LENGTH];
 	obj_data *load_obj, *obj, *next_obj, *cont_row[MAX_BAG_ROWS];
 	struct vehicle_attached_mob *vam;
-	int length, iter, i_in[4], location = 0, timer;
+	int iter, i_in[4], location = 0, timer;
 	struct resource_data *res;
 	vehicle_data *proto = vehicle_proto(vnum);
 	bool end = FALSE, seek_end = FALSE;
@@ -2156,6 +2319,11 @@ vehicle_data *unstore_vehicle_from_file(FILE *fl, any_vnum vnum) {
 	vehicle_data *veh;
 	long long_in[2];
 	double dbl_in;
+	
+	#define LOG_BAD_TAG_WARNINGS  TRUE	// triggers syslogs for invalid vehicle tags
+	#define BAD_TAG_WARNING(src)  else if (LOG_BAD_TAG_WARNINGS) { \
+		log("SYSERR: Bad tag in vehicle %d for %s: %s", vnum, NULLSAFE(error_str), (src));	\
+	}
 	
 	// load based on vnum or, if NOTHING, create anonymous object
 	if (proto) {
@@ -2168,21 +2336,14 @@ vehicle_data *unstore_vehicle_from_file(FILE *fl, any_vnum vnum) {
 		
 	// for fread_string
 	sprintf(error, "unstore_vehicle_from_file %d", vnum);
-	
-	// for more readable if/else chain	
-	#define OBJ_FILE_TAG(src, tag, len)  (!strn_cmp((src), (tag), ((len) = strlen(tag))))
 
 	while (!end) {
 		if (!get_line(fl, line)) {
-			log("SYSERR: Unexpected end of pack file in unstore_vehicle_from_file");
+			log("SYSERR: Unexpected end of pack file in unstore_vehicle_from_file for %s", NULLSAFE(error_str));
 			exit(1);
 		}
 		
-		if (OBJ_FILE_TAG(line, "Vehicle-end", length)) {
-			end = TRUE;
-			continue;
-		}
-		else if (seek_end) {
+		if (seek_end) {
 			// are we looking for the end of the vehicle? ignore this line
 			// WARNING: don't put any ifs that require "veh" above seek_end; obj is not guaranteed
 			continue;
@@ -2191,8 +2352,8 @@ vehicle_data *unstore_vehicle_from_file(FILE *fl, any_vnum vnum) {
 		// normal tags by letter
 		switch (UPPER(*line)) {
 			case 'A': {
-				if (OBJ_FILE_TAG(line, "Animal:", length)) {
-					if (sscanf(line + length + 1, "%d %d %s %d", &i_in[0], &i_in[1], s_in, &i_in[2]) == 4) {
+				if (!strn_cmp(line, "Animal: ", 8)) {
+					if (sscanf(line + 8, "%d %d %s %d", &i_in[0], &i_in[1], s_in, &i_in[2]) == 4) {
 						CREATE(vam, struct vehicle_attached_mob, 1);
 						vam->mob = i_in[0];
 						vam->scale_level = i_in[1];
@@ -2201,11 +2362,12 @@ vehicle_data *unstore_vehicle_from_file(FILE *fl, any_vnum vnum) {
 						LL_APPEND(VEH_ANIMALS(veh), vam);
 					}
 				}
+				BAD_TAG_WARNING(line)
 				break;
 			}
 			case 'B': {
-				if (OBJ_FILE_TAG(line, "Built-with:", length)) {
-					if (sscanf(line + length + 1, "%d %d %d %d", &i_in[0], &i_in[1], &i_in[2], &i_in[3]) != 4) {
+				if (!strn_cmp(line, "Built-with: ", 12)) {
+					if (sscanf(line + 12, "%d %d %d %d", &i_in[0], &i_in[1], &i_in[2], &i_in[3]) != 4) {
 						// unknown number of args?
 						break;
 					}
@@ -2217,15 +2379,16 @@ vehicle_data *unstore_vehicle_from_file(FILE *fl, any_vnum vnum) {
 					res->misc = i_in[3];
 					LL_APPEND(VEH_BUILT_WITH(veh), res);
 				}
+				BAD_TAG_WARNING(line)
 				break;
 			}
 			case 'C': {
-				if (OBJ_FILE_TAG(line, "Construction-id:", length)) {
-					if (sscanf(line + length + 1, "%d", &i_in[0])) {
+				if (!strn_cmp(line, "Construction-id: ", 17)) {
+					if (sscanf(line + 17, "%d", &i_in[0])) {
 						VEH_CONSTRUCTION_ID(veh) = i_in[0];
 					}
 				}
-				else if (OBJ_FILE_TAG(line, "Contents:", length)) {
+				else if (!strn_cmp(line, "Contents:", 9)) {
 					// empty container lists
 					for (iter = 0; iter < MAX_BAG_ROWS; iter++) {
 						cont_row[iter] = NULL;
@@ -2245,7 +2408,7 @@ vehicle_data *unstore_vehicle_from_file(FILE *fl, any_vnum vnum) {
 								extract_vehicle(veh);
 								return NULL;
 							}
-							if ((load_obj = Obj_load_from_file(fl, load_vnum, &location, NULL))) {
+							if ((load_obj = Obj_load_from_file(fl, load_vnum, &location, NULL, error))) {
 								// Obj_load_from_file may return a NULL for deleted objs
 				
 								// Not really an inventory, but same idea.
@@ -2306,11 +2469,12 @@ vehicle_data *unstore_vehicle_from_file(FILE *fl, any_vnum vnum) {
 						}
 					}
 				}
+				BAD_TAG_WARNING(line)
 				break;
 			}
 			case 'D': {
-				if (OBJ_FILE_TAG(line, "Depletion:", length)) {
-					if (sscanf(line + length + 1, "%d %d", &i_in[0], &i_in[1]) == 2) {
+				if (!strn_cmp(line, "Depletion: ", 11)) {
+					if (sscanf(line + 11, "%d %d", &i_in[0], &i_in[1]) == 2) {
 						struct depletion_data *dep;
 						CREATE(dep, struct depletion_data, 1);
 						dep->type = i_in[0];
@@ -2318,19 +2482,21 @@ vehicle_data *unstore_vehicle_from_file(FILE *fl, any_vnum vnum) {
 						LL_PREPEND(VEH_DEPLETION(veh), dep);
 					}
 				}
+				BAD_TAG_WARNING(line)
 				break;
 			}
 			case 'E': {
-				if (OBJ_FILE_TAG(line, "Extra-data:", length)) {
-					if (sscanf(line + length + 1, "%d %d", &i_in[0], &i_in[1]) == 2) {
+				if (!strn_cmp(line, "Extra-data: ", 12)) {
+					if (sscanf(line + 12, "%d %d", &i_in[0], &i_in[1]) == 2) {
 						set_extra_data(&VEH_EXTRA_DATA(veh), i_in[0], i_in[1]);
 					}
 				}
+				BAD_TAG_WARNING(line)
 				break;
 			}
 			case 'F': {
-				if (OBJ_FILE_TAG(line, "Flags:", length)) {
-					if (sscanf(line + length + 1, "%s", s_in)) {
+				if (!strn_cmp(line, "Flags: ", 7)) {
+					if (sscanf(line + 7, "%s", s_in)) {
 						if (proto) {	// prefer to keep flags from the proto
 							VEH_FLAGS(veh) = VEH_FLAGS(proto) & ~SAVABLE_VEH_FLAGS;
 							VEH_FLAGS(veh) |= asciiflag_conv(s_in) & SAVABLE_VEH_FLAGS;
@@ -2340,75 +2506,80 @@ vehicle_data *unstore_vehicle_from_file(FILE *fl, any_vnum vnum) {
 						}
 					}
 				}
+				BAD_TAG_WARNING(line)
 				break;
 			}
 			case 'H': {
-				if (OBJ_FILE_TAG(line, "Health:", length)) {
-					if (sscanf(line + length + 1, "%lf", &dbl_in)) {
+				if (!strn_cmp(line, "Health: ", 8)) {
+					if (sscanf(line + 8, "%lf", &dbl_in)) {
 						VEH_HEALTH(veh) = MIN(dbl_in, VEH_MAX_HEALTH(veh));
 					}
 				}
+				BAD_TAG_WARNING(line)
 				break;
 			}
 			case 'I': {
-				if (OBJ_FILE_TAG(line, "Icon:", length)) {
+				if (!strn_cmp(line, "Icon:", 5)) {
 					if (VEH_ICON(veh) && (!proto || VEH_ICON(veh) != VEH_ICON(proto))) {
 						free(VEH_ICON(veh));
 					}
 					VEH_ICON(veh) = fread_string(fl, error);
 				}
-				else if (OBJ_FILE_TAG(line, "Instance-id:", length)) {
-					if (sscanf(line + length + 1, "%d", &i_in[0])) {
+				else if (!strn_cmp(line, "Instance-id: ", 13)) {
+					if (sscanf(line + 13, "%d", &i_in[0])) {
 						VEH_INSTANCE_ID(veh) = i_in[0];
 					}
 				}
-				else if (OBJ_FILE_TAG(line, "Interior-home:", length)) {
-					if (sscanf(line + length + 1, "%d", &i_in[0])) {
+				else if (!strn_cmp(line, "Interior-home: ", 15)) {
+					if (sscanf(line + 15, "%d", &i_in[0])) {
 						VEH_INTERIOR_HOME_ROOM(veh) = real_room(i_in[0]);
 					}
 				}
+				BAD_TAG_WARNING(line)
 				break;
 			}
 			case 'K': {
-				if (OBJ_FILE_TAG(line, "Keywords:", length)) {
+				if (!strn_cmp(line, "Keywords:", 9)) {
 					if (VEH_KEYWORDS(veh) && (!proto || VEH_KEYWORDS(veh) != VEH_KEYWORDS(proto))) {
 						free(VEH_KEYWORDS(veh));
 					}
 					VEH_KEYWORDS(veh) = fread_string(fl, error);
 				}
+				BAD_TAG_WARNING(line)
 				break;
 			}
 			case 'L': {
-				if (OBJ_FILE_TAG(line, "Last-fired:", length)) {
-					if (sscanf(line + length + 1, "%ld", &long_in[0])) {
+				if (!strn_cmp(line, "Last-fired: ", 12)) {
+					if (sscanf(line + 12, "%ld", &long_in[0])) {
 						VEH_LAST_FIRE_TIME(veh) = long_in[0];
 					}
 				}
-				else if (OBJ_FILE_TAG(line, "Last-moved:", length)) {
-					if (sscanf(line + length + 1, "%ld", &long_in[0])) {
+				else if (!strn_cmp(line, "Last-moved: ", 12)) {
+					if (sscanf(line + 12, "%ld", &long_in[0])) {
 						VEH_LAST_MOVE_TIME(veh) = long_in[0];
 					}
 				}
-				else if (OBJ_FILE_TAG(line, "Long-desc:", length)) {
+				else if (!strn_cmp(line, "Long-desc:", 10)) {
 					if (VEH_LONG_DESC(veh) && (!proto || VEH_LONG_DESC(veh) != VEH_LONG_DESC(proto))) {
 						free(VEH_LONG_DESC(veh));
 					}
 					VEH_LONG_DESC(veh) = fread_string(fl, error);
 				}
-				else if (OBJ_FILE_TAG(line, "Look-desc:", length)) {
+				else if (!strn_cmp(line, "Look-desc:", 10)) {
 					if (VEH_LOOK_DESC(veh) && (!proto || VEH_LOOK_DESC(veh) != VEH_LOOK_DESC(proto))) {
 						free(VEH_LOOK_DESC(veh));
 					}
 					VEH_LOOK_DESC(veh) = fread_string(fl, error);
 				}
+				BAD_TAG_WARNING(line)
 				break;
 			}
 			case 'N': {
-				if (OBJ_FILE_TAG(line, "Needs-res:", length)) {
-					if (sscanf(line + length + 1, "%d %d %d %d", &i_in[0], &i_in[1], &i_in[2], &i_in[3]) == 4) {
+				if (!strn_cmp(line, "Needs-res: ", 11)) {
+					if (sscanf(line + 11, "%d %d %d %d", &i_in[0], &i_in[1], &i_in[2], &i_in[3]) == 4) {
 						// all args present
 					}
-					else if (sscanf(line + length + 1, "%d %d", &i_in[0], &i_in[1]) == 2) {
+					else if (sscanf(line + 11, "%d %d", &i_in[0], &i_in[1]) == 2) {
 						// backwards-compatible to pre-2.0b3.17
 						i_in[2] = RES_OBJECT;
 						i_in[3] = 0;
@@ -2425,57 +2596,62 @@ vehicle_data *unstore_vehicle_from_file(FILE *fl, any_vnum vnum) {
 					res->misc = i_in[3];
 					LL_APPEND(VEH_NEEDS_RESOURCES(veh), res);
 				}
+				BAD_TAG_WARNING(line)
 				break;
 			}
 			case 'O': {
-				if (OBJ_FILE_TAG(line, "Owner:", length)) {
-					if (sscanf(line + length + 1, "%d", &i_in[0])) {
+				if (!strn_cmp(line, "Owner: ", 7)) {
+					if (sscanf(line + 7, "%d", &i_in[0])) {
 						// VEH_OWNER(veh) = real_empire(i_in[0]);
 						perform_claim_vehicle(veh, real_empire(i_in[0]));
 					}
 				}
+				BAD_TAG_WARNING(line)
 				break;
 			}
 			case 'R': {
-				if (OBJ_FILE_TAG(line, "Room-affects:", length)) {
-					VEH_ROOM_AFFECTS(veh) = strtoull(line + length + 1, NULL, 10);
+				if (!strn_cmp(line, "Room-affects: ", 14)) {
+					VEH_ROOM_AFFECTS(veh) = strtoull(line + 14, NULL, 10);
 				}
+				BAD_TAG_WARNING(line)
 				break;
 			}
 			case 'S': {
-				if (OBJ_FILE_TAG(line, "Scale:", length)) {
-					if (sscanf(line + length + 1, "%d", &i_in[0])) {
+				if (!strn_cmp(line, "Scale: ", 7)) {
+					if (sscanf(line + 7, "%d", &i_in[0])) {
 						VEH_SCALE_LEVEL(veh) = i_in[0];
 					}
 				}
-				else if (OBJ_FILE_TAG(line, "Shipping-id:", length)) {
-					if (sscanf(line + length + 1, "%d", &i_in[0])) {
+				else if (!strn_cmp(line, "Shipping-id: ", 13)) {
+					if (sscanf(line + 13, "%d", &i_in[0])) {
 						VEH_SHIPPING_ID(veh) = i_in[0];
 					}
 				}
-				else if (OBJ_FILE_TAG(line, "Short-desc:", length)) {
+				else if (!strn_cmp(line, "Short-desc:", 11)) {
 					if (VEH_SHORT_DESC(veh) && (!proto || VEH_SHORT_DESC(veh) != VEH_SHORT_DESC(proto))) {
 						free(VEH_SHORT_DESC(veh));
 					}
 					VEH_SHORT_DESC(veh) = fread_string(fl, error);
 				}
+				BAD_TAG_WARNING(line)
 				break;
 			}
 			case 'T': {
-				if (OBJ_FILE_TAG(line, "Trigger:", length)) {
-					if (sscanf(line + length + 1, "%d", &i_in[0]) && real_trigger(i_in[0])) {
+				if (!strn_cmp(line, "Trigger: ", 9)) {
+					if (sscanf(line + 9, "%d", &i_in[0]) && real_trigger(i_in[0])) {
 						if (!SCRIPT(veh)) {
 							create_script_data(veh, VEH_TRIGGER);
 						}
 						add_trigger(SCRIPT(veh), read_trigger(i_in[0]), -1);
 					}
 				}
+				BAD_TAG_WARNING(line)
 				break;
 			}
 			case 'V': {
-				if (OBJ_FILE_TAG(line, "Variable:", length)) {
-					if (sscanf(line + length + 1, "%s %d", s_in, &i_in[0]) != 2 || !get_line(fl, line)) {
-						log("SYSERR: Bad variable format in unstore_vehicle_from_file: #%d", VEH_VNUM(veh));
+				if (!strn_cmp(line, "Variable: ", 10)) {
+					if (sscanf(line + 10, "%s %d", s_in, &i_in[0]) != 2 || !get_line(fl, line)) {
+						log("SYSERR: Bad variable format in unstore_vehicle_from_file for %s: #%d", NULLSAFE(error_str), VEH_VNUM(veh));
 						exit(1);
 					}
 					if (!SCRIPT(veh)) {
@@ -2483,6 +2659,11 @@ vehicle_data *unstore_vehicle_from_file(FILE *fl, any_vnum vnum) {
 					}
 					add_var(&(SCRIPT(veh)->global_vars), s_in, line, i_in[0]);
 				}
+				else if (!strn_cmp(line, "Vehicle-end", 11)) {
+					end = TRUE;
+				}
+				BAD_TAG_WARNING(line)
+				break;
 			}
 		}
 	}
@@ -3572,6 +3753,7 @@ void save_olc_vehicle(descriptor_data *desc) {
 		}
 		
 		affect_total_room(IN_ROOM(iter));
+		request_vehicle_save_in_world(iter);
 	}
 	
 	// free prototype strings and pointers

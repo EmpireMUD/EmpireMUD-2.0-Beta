@@ -37,6 +37,7 @@
 #include <stdlib.h>
 #include <time.h>
 #include <math.h>
+#include <glob.h>
 
 #include "../conf.h"
 #include "../sysdep.h"
@@ -148,6 +149,7 @@ void cleanup_mud_files();
 void clear_pass(void);
 struct island_data *closest_island(int x, int y);
 inline int compute_distance(int x1, int y1, int x2, int y2);
+void delete_old_files(void);
 void empire_srandom(unsigned long initial_seed);
 int find_border(struct island_data *isle, int x_dir, int y_dir);
 int get_line(FILE *fl, char *buf);
@@ -488,6 +490,7 @@ int main(int argc, char **argv) {
 
 	create_map();
 
+	delete_old_files();
 	print_map_graphic();
 	print_map_to_files();
 	print_island_file();
@@ -681,6 +684,51 @@ inline int compute_distance(int x1, int y1, int x2, int y2) {
 }
 
 
+// deletes old map files
+void delete_old_files(void) {
+	int wld_count = 0, pack_count = 0;
+	char fname[256];
+	glob_t globbuf;
+	int iter, sub;
+	
+	if (access(LIB_PATH LIB_WORLD "base_map", F_OK) == 0) {
+		printf("Deleting: %s\n", LIB_PATH LIB_WORLD "base_map");
+		unlink(LIB_PATH LIB_WORLD "base_map");
+	}
+	if (access(LIB_PATH BINARY_MAP_FILE, F_OK) == 0) {
+		printf("Deleting: %s\n", LIB_PATH BINARY_MAP_FILE);
+		unlink(LIB_PATH BINARY_MAP_FILE);
+	}
+	if (access(LIB_PATH BINARY_WORLD_INDEX, F_OK) == 0) {
+		printf("Deleting: %s\n", LIB_PATH BINARY_WORLD_INDEX);
+		unlink(LIB_PATH BINARY_WORLD_INDEX);
+	}
+	
+	for (iter = 0; iter < 100; ++iter) {
+		// wld files
+		sprintf(fname, "%s%02d/*%s", LIB_PATH WLD_PREFIX, iter, WLD_SUFFIX);
+		glob(fname, 0, NULL, &globbuf);
+		for (sub = 0; sub < globbuf.gl_pathc; ++sub) {
+			++wld_count;
+			unlink(globbuf.gl_pathv[sub]);
+		}
+		
+		// pack files
+		sprintf(fname, "%s%02d/*%s", LIB_PATH WLD_PREFIX, iter, SUF_PACK);
+		glob(fname, 0, NULL, &globbuf);
+		for (sub = 0; sub < globbuf.gl_pathc; ++sub) {
+			++pack_count;
+			unlink(globbuf.gl_pathv[sub]);
+		}
+		
+		globfree(&globbuf);
+	}
+	if (wld_count > 0 || pack_count > 0) {
+		printf("Deleted %d wld and %d pack files\n", wld_count, pack_count);
+	}
+}
+
+
 /* Returns a room on the island/ocean border in a given dir */
 int find_border(struct island_data *isle, int x_dir, int y_dir) {
 	int i, loc;
@@ -851,63 +899,36 @@ void print_map_graphic(void) {
 
 // outputs the .wld data files
 void print_map_to_files(void) {
-	FILE *out = NULL, *index_fl, *base_fl;
-	bool first = TRUE;
-	int i, j, pos;
-	char fname[256];
+	FILE *binary_map_fl;
+	struct map_file_header header;
+	map_file_data store;
+	int pos;
 	
-	if (!(index_fl = fopen(INDEX_FILE, "w"))) {
-		printf("Unable to write index file!\n");
+	if (!(binary_map_fl = fopen(LIB_PATH BINARY_MAP_FILE, "w+b"))) {
+		printf("Unable to write %s file!\n", BINARY_MAP_FILE);
 		exit(0);
 	}
 	
-	if (!(base_fl = fopen(LIB_PATH WORLD_MAP_FILE, "w"))) {
-		printf("Unable to write base_map file!\n");
-		exit(0);
-	}
-
-	for (i = 0; i < NUM_BLOCKS; i++) {
-		sprintf(fname, "%d%s", i, WLD_SUFFIX);
-		if (!(out = fopen(fname, "w"))) {
-			printf("Unable to write file %s!\n", fname);
-			exit(0);
-		}
-		first = TRUE;
+	// write header
+	header.version = CURRENT_BINARY_MAP_VERSION;
+	header.width = USE_WIDTH;
+	header.height = USE_HEIGHT;
+	fwrite(&header, sizeof(struct map_file_header), 1, binary_map_fl);
+	
+	for (pos = 0; pos < USE_SIZE; ++pos) {
+		memset((char *) &store, 0, sizeof(map_file_data));
+		store.island_id = grid[pos].island_id;
 		
-		// add to index
-		fprintf(index_fl, "%s\n", fname);
-
-		for (j = 0; j < USE_BLOCK_SIZE; j++) {
-			pos = i * USE_BLOCK_SIZE + j;
-			
-			if (grid[pos].type != OCEAN || first) {
-				// .wld file
-				fprintf(out, "#%d\n", pos);
-				fprintf(out, "%d %d %d\n", grid[pos].island_id, terrains[grid[pos].type].sector_vnum, terrains[grid[pos].type].sector_vnum);
-				fprintf(out, "S\n");
-				first = FALSE;	// guarantee at least 1 entry per file (even if ocean)
-			}
-			
-			if (grid[pos].type != OCEAN) {
-				// base_map file
-				fprintf(base_fl, "%d %d %d %d %d %d %d\n", X_COORD(pos), Y_COORD(pos), grid[pos].island_id, terrains[grid[pos].type].sector_vnum, terrains[grid[pos].type].sector_vnum, terrains[grid[pos].type].sector_vnum, NOTHING);
-			}
-		}
+		store.sector_type = terrains[grid[pos].type].sector_vnum;
+		store.base_sector = terrains[grid[pos].type].sector_vnum;
+		store.natural_sector = terrains[grid[pos].type].sector_vnum;
+		store.crop_type = NOTHING;
 		
-		// end wld file
-		fprintf(out, "$~\n");
-		fclose(out);
+		// and write it
+		fwrite(&store, sizeof(map_file_data), 1, binary_map_fl);
 	}
 	
-	// end index file
-	fprintf(index_fl, "$\n");
-	fclose(index_fl);
-	
-	// end base_map file
-	fprintf(base_fl, "$\n");
-	fclose(base_fl);
-
-	return;
+	fclose(binary_map_fl);
 }
 
 
@@ -1857,9 +1878,11 @@ void splotch(int room, int type, struct island_data *isle) {
 //// BONUS FEATURES //////////////////////////////////////////////////////////
 
 void load_and_shift_map(int dist) {
-	char fname[256], line[1024];
-	FILE *index, *wld;
-	int block, vnum, island, type, junk;
+	struct map_file_header header;
+	struct grid_type *tile;
+	map_file_data store;
+	FILE *binary_map_fl;
+	int x, y;
 	
 	// nowork
 	if (dist == 0) {
@@ -1871,47 +1894,31 @@ void load_and_shift_map(int dist) {
 	printf("Loaded existing map...\n");
 	
 	// load in existing map
-	if (!(index = fopen(INDEX_FILE, "r"))) {
-		printf("ERROR: Unable to load index file.\n");
+	if (!(binary_map_fl = fopen(LIB_PATH BINARY_MAP_FILE, "r+b"))) {
+		printf("ERROR: Unable to load %s\n", LIB_PATH BINARY_MAP_FILE);
 		exit(1);
 	}
 	
-	while (fscanf(index, "%d.wld\n", &block) == 1) {
-		sprintf(fname, "%d.wld", block);
-		printf("Loading file %s ...\n", fname);
-		if (!(wld = fopen(fname, "r"))) {
-			printf("ERROR: Unable to open world file %s.\n", fname);
-			exit(1);
-		}
-		
-		while (get_line(wld, line)) {
-			if (*line == '$') {
-				break;
-			}
-			else if (*line == '#') {
-				// found entry
-				vnum = atoi(line + 1);
-				
-				if (!get_line(wld, line) || sscanf(line, "%d %d %d", &island, &type, &junk) != 3) {
-					printf("Error reading room #%d\n", vnum);
-					exit(1);
-				}
-				
-				change_grid(vnum, sect_to_terrain(type));
-				grid[vnum].island_id = island;
-				
-				// trailing 'S' line
-				get_line(wld, line);
-			}
-			else {
-				printf("Unknown line in %s: %s\n", fname, line);
-				exit(1);
-			}
+	fread(&header, sizeof(struct map_file_header), 1, binary_map_fl);
+	if (header.version != CURRENT_BINARY_MAP_VERSION) {
+		printf("Unable to load existing map: version is too old\n");
+		exit(1);
+	}
+	
+	// read in order
+	for (y = 0; y < header.height; ++y) {
+		for (x = 0; x < header.width; ++x) {
+			fread(&store, sizeof(map_file_data), 1, binary_map_fl);
+			tile = &grid[MAP(x,y)];
+			tile->island_id = store.island_id;
+			tile->type = sect_to_terrain(store.sector_type);
 		}
 	}
+	fclose(binary_map_fl);
 	
 	shift_map_x(dist);
 	
+	delete_old_files();
 	print_map_graphic();
 	print_map_to_files();
 	print_island_file();

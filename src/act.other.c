@@ -239,11 +239,7 @@ void do_customize_road(char_data *ch, char *argument) {
 			msg_to_char(ch, "What would you like to name this road (or \"none\")?\r\n");
 		}
 		else if (!str_cmp(arg2, "none")) {
-			if (ROOM_CUSTOM_NAME(IN_ROOM(ch))) {
-				free(ROOM_CUSTOM_NAME(IN_ROOM(ch)));
-				ROOM_CUSTOM_NAME(IN_ROOM(ch)) = NULL;
-			}
-			
+			set_room_custom_name(IN_ROOM(ch), NULL);
 			msg_to_char(ch, "This road no longer has a custom name.\r\n");
 			command_lag(ch, WAIT_ABILITY);
 		}
@@ -267,11 +263,7 @@ void do_customize_road(char_data *ch, char *argument) {
 				return;
 			}
 			
-			if (ROOM_CUSTOM_NAME(IN_ROOM(ch))) {
-				free(ROOM_CUSTOM_NAME(IN_ROOM(ch)));
-			}
-			ROOM_CUSTOM_NAME(IN_ROOM(ch)) = str_dup(arg2);
-			
+			set_room_custom_name(IN_ROOM(ch), arg2);
 			msg_to_char(ch, "This road tile is now called \"%s\".\r\n", arg2);
 			command_lag(ch, WAIT_ABILITY);
 		}
@@ -300,7 +292,7 @@ void do_douse_obj(char_data *ch, obj_data *obj, obj_data *cont) {
 		msg_to_char(ch, "You can't douse anything here.\r\n");
 	}
 	else {
-		GET_OBJ_VAL(cont, VAL_DRINK_CONTAINER_CONTENTS) = 0;
+		set_obj_val(cont, VAL_DRINK_CONTAINER_CONTENTS, 0);
 		
 		act("You douse $p with $P.", FALSE, ch, obj, cont, TO_CHAR);
 		act("$n douses $p with $P.", FALSE, ch, obj, cont, TO_ROOM);
@@ -652,7 +644,7 @@ bool perform_summon(char_data *ch, ability_data *abil, any_vnum vnum, bool check
 	// load/update mob:
 	mob = read_mobile(vnum, TRUE);
 	
-	SET_BIT(MOB_FLAGS(mob), MOB_NO_EXPERIENCE | MOB_SPAWNED | MOB_NO_LOOT);
+	set_mob_flags(mob, MOB_NO_EXPERIENCE | MOB_SPAWNED | MOB_NO_LOOT);
 	setup_generic_npc(mob, MOB_FLAGGED(mob, MOB_EMPIRE) ? GET_LOYALTY(ch) : NULL, NOTHING, NOTHING);
 	scale_mob_as_companion(mob, ch, level);
 	char_to_room(mob, IN_ROOM(ch));
@@ -2183,7 +2175,7 @@ ACMD(do_douse) {
 		msg_to_char(ch, "There's no fire here!\r\n");
 	else {
 		amount = GET_DRINK_CONTAINER_CONTENTS(obj);
-		GET_OBJ_VAL(obj, VAL_DRINK_CONTAINER_CONTENTS) = 0;
+		set_obj_val(obj, VAL_DRINK_CONTAINER_CONTENTS, 0);
 		
 		add_to_room_extra_data(room, ROOM_EXTRA_FIRE_REMAINING, -amount);
 		act("You throw some water from $p onto the flames!", FALSE, ch, obj, 0, TO_CHAR);
@@ -2846,10 +2838,11 @@ ACMD(do_milk) {
 		act("$n milks $N into $p.", FALSE, ch, cont, mob, TO_ROOM);
 		add_cooldown(mob, COOLDOWN_MILK, 2 * SECS_PER_MUD_DAY);
 		amount = GET_DRINK_CONTAINER_CAPACITY(cont) - GET_DRINK_CONTAINER_CONTENTS(cont);
-		GET_OBJ_VAL(cont, VAL_DRINK_CONTAINER_CONTENTS) += amount;
-		GET_OBJ_VAL(cont, VAL_DRINK_CONTAINER_TYPE) = LIQ_MILK;
+		set_obj_val(cont, VAL_DRINK_CONTAINER_CONTENTS, GET_DRINK_CONTAINER_CONTENTS(cont) + amount);
+		set_obj_val(cont, VAL_DRINK_CONTAINER_TYPE, LIQ_MILK);
 		GET_OBJ_TIMER(cont) = 72;	// mud hours
 		gain_player_tech_exp(ch, PTECH_MILK, 33);
+		request_obj_save_in_world(cont);
 	}
 }
 
@@ -2956,7 +2949,7 @@ ACMD(do_minipets) {
 			dismiss_any_minipet(ch);	// out with the old...
 			
 			mob = read_mobile(GET_MOB_VNUM(to_summon), TRUE);
-			SET_BIT(MOB_FLAGS(mob), default_minipet_flags);
+			set_mob_flags(mob, default_minipet_flags);
 			SET_BIT(AFF_FLAGS(mob), default_minipet_affs);	// will this work?
 			
 			// try to scale mob to the summoner (most minipets have level caps of 1 tho)
@@ -3525,7 +3518,7 @@ ACMD(do_skin) {
 			gain_player_tech_exp(ch, PTECH_SKINNING_UPGRADE, 15);
 		}
 		
-		SET_BIT(GET_OBJ_VAL(obj, VAL_CORPSE_FLAGS), CORPSE_SKINNED);
+		set_obj_val(obj, VAL_CORPSE_FLAGS, GET_CORPSE_FLAGS(obj) | CORPSE_SKINNED);
 		command_lag(ch, WAIT_OTHER);
 	}
 }

@@ -71,6 +71,7 @@ void clean_empire_logs();
 void compute_generic_relations();
 void delete_old_players();
 void delete_orphaned_rooms();
+void delete_pre_b5_116_world_files();
 void expire_old_politics();
 void generate_island_descriptions();
 void index_boot_world();
@@ -81,6 +82,7 @@ void init_text_file_strings();
 void link_and_check_vehicles();
 void load_automessages();
 void load_banned();
+void load_binary_map_file();
 void load_daily_quest_file();
 void load_empire_storage();
 void load_fight_messages();
@@ -90,7 +92,7 @@ void load_running_events_file();
 void load_slash_channels();
 void load_tips_of_the_day();
 void load_trading_post();
-void load_world_map_from_file();
+void load_world_from_binary_index();
 void renum_world();
 void run_reboot_triggers();
 void schedule_map_unloads();
@@ -101,6 +103,7 @@ void update_instance_world_size();
 void verify_empire_goals();
 void verify_running_events();
 void verify_sectors();
+void write_whole_mapout();
 int sort_abilities_by_data(ability_data *a, ability_data *b);
 int sort_archetypes_by_data(archetype_data *a, archetype_data *b);
 int sort_augments_by_data(augment_data *a, augment_data *b);
@@ -192,6 +195,7 @@ int top_of_helpt = 0;	// top of help index table
 struct instance_data *instance_list = NULL;	// doubly-linked global instance list
 bool instance_save_wait = FALSE;	// prevents repeated instance saving
 struct instance_data *quest_instance_global = NULL;	// passes instances through to some quest triggers
+bool need_instance_save = FALSE;	// triggers full instance saves
 
 // map
 room_vnum *start_locs = NULL;	// array of start locations
@@ -290,18 +294,25 @@ vehicle_data *next_pending_vehicle = NULL;	// used in handler.c
 // world / rooms
 room_data *world_table = NULL;	// hash table of the whole world
 room_data *interior_room_list = NULL;	// doubly-linked list of interior rooms: room->prev_interior, room->next_interior
-bool need_world_index = TRUE;	// used to trigger world index saving (always save at least once)
 struct island_info *island_table = NULL; // hash table for all the islands
 struct map_data world_map[MAP_WIDTH][MAP_HEIGHT];	// master world map
 struct map_data *land_map = NULL;	// linked list of non-ocean
 int size_of_world = 1;	// used by the instancer to adjust instance counts
 struct shared_room_data ocean_shared_data;	// for BASIC_OCEAN tiles
+struct vnum_hash *mapout_update_requests = NULL;	// hash table of requests for mapout updates, by room vnum
+struct world_save_request_data *world_save_requests = NULL;	// hash table of save requests
+struct vnum_hash *binary_world_index_updates = NULL;	// hash of updates to write to the binary world index
+FILE *binary_map_fl = NULL;	// call ensure_binary_map_file_is_open() before using this, and leave it open
+char *world_index_data = NULL;	// for managing the binary world file
+int top_of_world_index = -1;	// current max entry index
+bool save_world_after_startup = FALSE;	// if TRUE, will trigger a world save at the end of startup
+bool converted_to_b5_116 = FALSE;	// triggers old world file deletes, only if it converted at startup
 
 
 // DB_BOOT_x
 struct db_boot_info_type db_boot_info[NUM_DB_BOOT_TYPES] = {
 	// prefix, suffix, allow-zero-of-it
-	{ WLD_PREFIX, WLD_SUFFIX, TRUE },	// DB_BOOT_WLD
+	{ WLD_PREFIX, WLD_SUFFIX, TRUE },	// DB_BOOT_WLD	-- this is no longer used as of b5.116, other than in the converter
 	{ MOB_PREFIX, MOB_SUFFIX, FALSE },	// DB_BOOT_MOB
 	{ OBJ_PREFIX, OBJ_SUFFIX, FALSE },	// DB_BOOT_OBJ
 	{ NAMES_PREFIX, NULL, FALSE },	// DB_BOOT_NAMES
@@ -455,6 +466,15 @@ void boot_db(void) {
 	chore_update();
 	
 	log("Final startup...");
+	write_whole_mapout();
+	if (save_world_after_startup) {
+		write_fresh_binary_map_file();
+		write_all_wld_files();
+		write_whole_binary_world_index();
+	}
+	if (converted_to_b5_116) {
+		delete_pre_b5_116_world_files();
+	}
 	// put things here
 	
 	// END
@@ -511,8 +531,8 @@ void boot_world(void) {
 	
 	// requires sectors, buildings, and room templates -- order matters here
 	log("Loading the world.");
-	load_world_map_from_file();	// get base data
-	index_boot(DB_BOOT_WLD);	// override with live rooms
+	load_binary_map_file();	// get base data
+	load_world_from_binary_index();	// override with live rooms
 	build_world_map();	// ensure full world map
 	build_land_map();	// determine which parts are land
 	
@@ -704,11 +724,13 @@ void check_for_bad_buildings(void) {
 			// map building
 			log(" removing building at %d for bad building type", GET_ROOM_VNUM(room));
 			disassociate_building(room);
+			save_world_after_startup = TRUE;
 		}
 		else if (IS_CITY_CENTER(room) && (!ROOM_OWNER(room) || !find_city_entry(ROOM_OWNER(room), room))) {
 			// city center with no matching city
 			log(" removing city center at %d for lack of city entry", GET_ROOM_VNUM(room));
 			disassociate_building(room);
+			save_world_after_startup = TRUE;
 		}
 		else if (GET_ROOM_VNUM(room) >= MAP_SIZE && ROOM_SECT_FLAGGED(room, SECTF_INSIDE) && !GET_BUILDING(room)) {
 			// designated room
@@ -726,6 +748,8 @@ void check_for_bad_buildings(void) {
 			// room is marked as an instance entrance, but no instance is associated with it
 			log(" unlinking instance entrance room %d for no association with an instance", GET_ROOM_VNUM(room));
 			unlink_instance_entrance(room, NULL, FALSE);
+			prune_instances();	// cleans up rooms too
+			save_world_after_startup = TRUE;
 		}
 		/* This probably isn't necessary and having it here will cause roads to be pulled up as of b3.17 -paul
 		else if (COMPLEX_DATA(room) && !GET_BUILDING(room) && !GET_ROOM_TEMPLATE(room)) {
@@ -736,6 +760,7 @@ void check_for_bad_buildings(void) {
 	}
 	if (deleted) {
 		check_all_exits();
+		save_world_after_startup = TRUE;
 	}
 	
 	// check craft "build" recipes: disable
@@ -929,7 +954,10 @@ void process_temporary_room_data(void) {
 	HASH_ITER(hh, temporary_room_data, trd, next_trd) {
 		if ((room = real_room(trd->vnum))) {
 			// home room
-			if (trd->home_room != NOWHERE && COMPLEX_DATA(room) && (home = real_room(trd->home_room))) {
+			if (trd->home_room != NOWHERE && (home = real_room(trd->home_room))) {
+				if (!COMPLEX_DATA(room)) {
+					COMPLEX_DATA(room) = init_complex_data();
+				}
 				COMPLEX_DATA(room)->home_room = home;
 			}
 			// owner
@@ -1511,13 +1539,20 @@ void check_newbie_islands(void) {
 *
 * @param struct map_data *map A map location.
 * @param int island The island id.
+* @param struct island_info *ptr Optional: Prevent having to look up the island pointer if it's already available. (NULL to detect here)
+* @param ubyte pathfind_key Uses this to prevent re-working the same tile.
 */
-void number_island(struct map_data *map, int island) {
+void number_island(struct map_data *map, int island, struct island_info *isle_ptr, ubyte pathfind_key) {
 	int x, y, new_x, new_y;
 	struct map_data *tile;
 	
+	if (map->pathfind_key == pathfind_key) {
+		return;	// no work
+	}
+	
+	map->pathfind_key = pathfind_key;
 	map->shared->island_id = island;
-	map->shared->island_ptr = get_island(island, TRUE);
+	map->shared->island_ptr = isle_ptr ? isle_ptr : get_island(island, TRUE);
 	
 	// check neighboring tiles
 	for (x = -1; x <= 1; ++x) {
@@ -1530,7 +1565,7 @@ void number_island(struct map_data *map, int island) {
 			if (get_coord_shift(MAP_X_COORD(map->vnum), MAP_Y_COORD(map->vnum), x, y, &new_x, &new_y)) {
 				tile = &(world_map[new_x][new_y]);
 				
-				if (!SECT_FLAGGED(tile->sector_type, SECTF_NON_ISLAND) && tile->shared->island_id <= 0) {
+				if (tile->pathfind_key != pathfind_key && !SECT_FLAGGED(tile->sector_type, SECTF_NON_ISLAND) && tile->shared->island_id <= 0) {
 					// add to stack
 					push_island(tile);
 				}
@@ -1562,10 +1597,11 @@ void number_and_count_islands(bool reset) {
 	struct island_read_data *data, *next_data, *list = NULL;
 	bool re_empire = (top_island_num != -1);
 	struct island_num_data_t *item;
-	struct island_info *isle;
+	struct island_info *isle, *use_isle;
 	room_data *room, *next_room, *maploc;
 	struct map_data *map;
 	int iter, use_id;
+	ubyte pathfind_key;
 	
 	// find top island id (and reset if requested)
 	top_island_num = 0;	// this ensures any new island ID has a minimum of 1
@@ -1582,29 +1618,33 @@ void number_and_count_islands(bool reset) {
 	
 	// 1. expand EXISTING islands
 	if (!reset) {
+		pathfind_key = get_pathfind_key();
 		for (map = land_map; map; map = map->next) {
-			if (map->shared->island_id == NO_ISLAND) {
+			if (map->shared->island_id == NO_ISLAND || map->shared->island_id == 0) {
 				continue;
 			}
 			
 			use_id = map->shared->island_id;
+			use_isle = map->shared->island_ptr;
 			push_island(map);
 			
 			while ((item = pop_island())) {
-				number_island(item->loc, use_id);
+				number_island(item->loc, use_id, use_isle, pathfind_key);
 				free(item);
 			}
 		}
 	}
 	
 	// 2. look for places that have no island id but need one -- and also measure islands while we're here
+	pathfind_key = get_pathfind_key();
 	for (map = land_map; map; map = map->next) {
 		if (map->shared->island_id == NO_ISLAND && !SECT_FLAGGED(map->sector_type, SECTF_NON_ISLAND)) {
 			use_id = ++top_island_num;
+			use_isle = get_island(use_id, TRUE);
 			push_island(map);
 			
 			while ((item = pop_island())) {
-				number_island(item->loc, use_id);
+				number_island(item->loc, use_id, use_isle, pathfind_key);
 				free(item);
 			}
 		}
@@ -2210,7 +2250,7 @@ void load_trading_post(void) {
 				break;
 			}
 			case '#': { // load object into last T
-				obj = Obj_load_from_file(fl, atoi(line+1), &int_in[0], NULL);	// last val is junk
+				obj = Obj_load_from_file(fl, atoi(line+1), &int_in[0], NULL, "the trading post");
 				
 				if (obj && tpd) {
 					remove_from_object_list(obj);	// doesn't really go here right now

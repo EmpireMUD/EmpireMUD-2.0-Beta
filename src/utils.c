@@ -2414,6 +2414,8 @@ void change_keywords(char_data *ch, char *str) {
 			queue_delayed_update(GET_COMPANION(ch), CDU_SAVE);
 		}
 	}
+	
+	request_char_save_in_world(ch);
 }
 
 
@@ -2460,6 +2462,8 @@ void change_long_desc(char_data *ch, char *str) {
 			queue_delayed_update(GET_COMPANION(ch), CDU_SAVE);
 		}
 	}
+	
+	request_char_save_in_world(ch);
 }
 
 
@@ -2520,6 +2524,8 @@ void change_look_desc(char_data *ch, char *str, bool format) {
 			queue_delayed_update(GET_COMPANION(ch), CDU_SAVE);
 		}
 	}
+	
+	request_char_save_in_world(ch);
 }
 
 
@@ -2563,6 +2569,8 @@ void change_look_desc_append(char_data *ch, char *str, bool format) {
 			queue_delayed_update(GET_COMPANION(ch), CDU_SAVE);
 		}
 	}
+	
+	request_char_save_in_world(ch);
 }
 
 
@@ -2591,6 +2599,7 @@ void change_sex(char_data *ch, int sex) {
 	
 	// update msdp
 	update_MSDP_gender(ch, UPDATE_SOON);
+	request_char_save_in_world(ch);
 }
 
 
@@ -2637,6 +2646,8 @@ void change_short_desc(char_data *ch, char *str) {
 			queue_delayed_update(GET_COMPANION(ch), CDU_SAVE);
 		}
 	}
+	
+	request_char_save_in_world(ch);
 }
 
 
@@ -3305,9 +3316,9 @@ void apply_resource(char_data *ch, struct resource_data *res, struct resource_da
 				amt = MIN(res->amount, amt);
 				
 				res->amount -= amt;	// possible partial payment
-				GET_OBJ_VAL(use_obj, VAL_DRINK_CONTAINER_CONTENTS) -= amt;
+				set_obj_val(use_obj, VAL_DRINK_CONTAINER_CONTENTS, GET_DRINK_CONTAINER_CONTENTS(use_obj) - amt);
 				if (GET_DRINK_CONTAINER_CONTENTS(use_obj) == 0) {
-					GET_OBJ_VAL(use_obj, VAL_DRINK_CONTAINER_TYPE) = LIQ_WATER;
+					set_obj_val(use_obj, VAL_DRINK_CONTAINER_TYPE, LIQ_WATER);
 				}
 				
 				if (build_used_list) {
@@ -3510,10 +3521,10 @@ void extract_resources(char_data *ch, struct resource_data *list, bool ground, s
 									if (IS_DRINK_CONTAINER(obj) && GET_DRINK_CONTAINER_TYPE(obj) == res->vnum) {
 										diff = MIN(res->amount, GET_DRINK_CONTAINER_CONTENTS(obj));
 										res->amount -= diff;
-										GET_OBJ_VAL(obj, VAL_DRINK_CONTAINER_CONTENTS) -= diff;
+										set_obj_val(obj, VAL_DRINK_CONTAINER_CONTENTS, GET_DRINK_CONTAINER_CONTENTS(obj) - diff);
 									
 										if (GET_OBJ_VAL(obj, VAL_DRINK_CONTAINER_CONTENTS) == 0) {
-											GET_OBJ_VAL(obj, VAL_DRINK_CONTAINER_TYPE) = LIQ_WATER;
+											set_obj_val(obj, VAL_DRINK_CONTAINER_TYPE, LIQ_WATER);
 										}
 									
 										if (build_used_list) {
@@ -3846,11 +3857,11 @@ void give_resources(char_data *ch, struct resource_data *list, bool split) {
 							diff = GET_DRINK_CONTAINER_CAPACITY(obj) - GET_DRINK_CONTAINER_CONTENTS(obj);
 							diff = MIN(remaining, diff);
 							remaining -= diff;
-							GET_OBJ_VAL(obj, VAL_DRINK_CONTAINER_CONTENTS) += diff;
+							set_obj_val(obj, VAL_DRINK_CONTAINER_CONTENTS, GET_DRINK_CONTAINER_CONTENTS(obj) + diff);
 							
 							// set type in case container was empty
 							if (GET_DRINK_CONTAINER_CONTENTS(obj) > 0) {
-								GET_OBJ_VAL(obj, VAL_DRINK_CONTAINER_TYPE) = res->vnum;
+								set_obj_val(obj, VAL_DRINK_CONTAINER_TYPE, res->vnum);
 							}
 						}
 						
@@ -5971,7 +5982,7 @@ void lock_icon(room_data *room, struct icon_data *use_icon) {
 	if (!(icon = use_icon)) {
 		icon = get_icon_from_set(GET_SECT_ICONS(SECT(room)), GET_SEASON(room));
 	}
-	ROOM_CUSTOM_ICON(room) = str_dup(icon->icon);
+	set_room_custom_icon(room, icon->icon);
 }
 
 
@@ -6177,6 +6188,34 @@ int Y_COORD(room_data *room) {
 //// MISC UTILS //////////////////////////////////////////////////////////////
 
 /**
+* Adds an entry to a pair-hash. This is a general tool for hashing simple pairs
+* of numbers. IDs are unique (it will overwrite a duplicate). Example:
+*   struct pair_hash *my_hash = NULL;	// initialize to null
+*	add_pair_hash(&my_hash, 123, 321);	// add item {123, 321}
+*   HASH_ITER(hh, my_hash, iter, next) { ... }	// use hash
+*   free_pair_hash(&my_hash);	// free when done
+*
+* @param struct pair_hash **hash A pointer to the hash we're adding to.
+* @param int int The id to add to the hash (first part of the pair).
+* @param int value The value (second part of the pair).
+*/
+void add_pair_hash(struct pair_hash **hash, int id, int value) {
+	struct pair_hash *item = NULL;
+	
+	if (hash) {
+		HASH_FIND_INT(*hash, &id, item);
+		if (!item) {
+			CREATE(item, struct pair_hash, 1);
+			item->id = id;
+			HASH_ADD_INT(*hash, id, item);
+		}
+		
+		item->value = value;
+	}
+}
+
+
+/**
 * Adds an entry to a string hash. This is a general tool for listing/counting
 * unique names/things. Example:
 *   struct string_hash *my_hash = NULL;	// initialize to null
@@ -6228,6 +6267,23 @@ void add_vnum_hash(struct vnum_hash **hash, any_vnum vnum, int count) {
 		}
 		
 		SAFE_ADD(item->count, count, INT_MIN, INT_MAX, FALSE);
+	}
+}
+
+
+/**
+* Frees a pair_hash when you're done with it.
+*
+* @param struct pair_hash **hash The pair hash to free.
+*/
+void free_pair_hash(struct pair_hash **hash) {
+	struct pair_hash *iter, *next;
+	
+	if (hash) {
+		HASH_ITER(hh, *hash, iter, next) {
+			HASH_DEL(*hash, iter);
+			free(iter);
+		}
 	}
 }
 

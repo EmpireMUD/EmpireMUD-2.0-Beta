@@ -225,7 +225,7 @@ void olc_delete_crop(char_data *ch, crop_vnum vnum) {
 	// update objects
 	HASH_ITER(hh, object_table, obj, next_obj) {
 		if (OBJ_FLAGGED(obj, OBJ_PLANTABLE) && GET_OBJ_VAL(obj, VAL_FOOD_CROP_TYPE) == vnum) {
-			GET_OBJ_VAL(obj, VAL_FOOD_CROP_TYPE) = NOTHING;
+			set_obj_val(obj, VAL_FOOD_CROP_TYPE, NOTHING);
 			save_library_file_for_vnum(DB_BOOT_OBJ, GET_OBJ_VNUM(obj));
 		}
 	}
@@ -242,7 +242,7 @@ void olc_delete_crop(char_data *ch, crop_vnum vnum) {
 		}
 		if (GET_OLC_OBJECT(desc)) {
 			if (OBJ_FLAGGED(GET_OLC_OBJECT(desc), OBJ_PLANTABLE) && GET_OBJ_VAL(GET_OLC_OBJECT(desc), VAL_FOOD_CROP_TYPE) == vnum) {
-				GET_OBJ_VAL(GET_OLC_OBJECT(desc), VAL_FOOD_CROP_TYPE) = NOTHING;
+				set_obj_val(GET_OLC_OBJECT(desc), VAL_FOOD_CROP_TYPE, NOTHING);
 				msg_to_char(desc->character, "The crop planted by the object you're editing was deleted.\r\n");
 			}
 		}

@@ -122,6 +122,8 @@ void start_string_editor(descriptor_data *d, char *prompt, char **writeto, size_
 	d->mail_to = 0;
 	d->notes_id = 0;
 	d->island_desc_id = NOTHING;
+	d->save_room_id = NOWHERE;
+	d->save_room_pack_id = NOWHERE;
 	d->save_empire = NOTHING;
 	d->file_storage = NULL;
 	d->allow_null = allow_null;
@@ -311,6 +313,24 @@ void string_add(descriptor_data *d, char *str) {
 				SEND_TO_Q("Edit aborted.\r\n", d);
 			}
 		}
+		else if (d->save_room_id != NOWHERE) {
+			if (action != STRINGADD_ABORT) {
+				request_world_save(d->save_room_id, WSAVE_ROOM);
+				SEND_TO_Q("Room description saved.\r\n", d);
+			}
+			else {
+				SEND_TO_Q("Edit aborted.\r\n", d);
+			}
+		}
+		else if (d->save_room_pack_id != NOWHERE) {
+			if (action != STRINGADD_ABORT) {
+				request_world_save(d->save_room_pack_id, WSAVE_OBJS_AND_VEHS);
+				SEND_TO_Q("Description saved.\r\n", d);
+			}
+			else {
+				SEND_TO_Q("Edit aborted.\r\n", d);
+			}
+		}
 		else if (d->file_storage) {
 			if (action != STRINGADD_ABORT) {
 				if ((fl = fopen((char *)d->file_storage, "w"))){
@@ -350,6 +370,8 @@ void string_add(descriptor_data *d, char *str) {
 		d->mail_to = 0;
 		d->notes_id = 0;
 		d->island_desc_id = NOTHING;
+		d->save_room_id = NOWHERE;
+		d->save_room_pack_id = NOWHERE;
 		d->max_str = 0;
 		d->save_empire = NOTHING;
 		if (d->file_storage) {

@@ -786,6 +786,9 @@ int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_COORD(ge
 #define WRAP_X_COORD(x)  (WRAP_X ? (((x) < 0) ? ((x) + MAP_WIDTH) : (((x) >= MAP_WIDTH) ? ((x) - MAP_WIDTH) : (x))) : MAX(0, MIN(MAP_WIDTH-1, (x))))
 #define WRAP_Y_COORD(y)  (WRAP_Y ? (((y) < 0) ? ((y) + MAP_HEIGHT) : (((y) >= MAP_HEIGHT) ? ((y) - MAP_HEIGHT) : (y))) : MAX(0, MIN(MAP_HEIGHT-1, (y))))
 
+#define HAS_SHARED_DATA_TO_SAVE(map)  ((map)->shared->icon || (map)->shared->name || (map)->shared->description || (map)->shared->depletion || (map)->shared->tracks || (map)->shared->extra_data)
+#define request_mapout_update(vnum)  add_vnum_hash(&mapout_update_requests, (vnum), 1)
+
 
  //////////////////////////////////////////////////////////////////////////////
 //// MEMORY UTILS ////////////////////////////////////////////////////////////
@@ -839,6 +842,7 @@ int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_COORD(ge
 #define IS_MOB(ch)  (IS_NPC(ch) && GET_MOB_VNUM(ch) != NOTHING)
 #define IS_TAGGED_BY(mob, player)  (IS_NPC(mob) && !IS_NPC(player) && find_id_in_tag_list(GET_IDNUM(player), MOB_TAGGED_BY(mob)))
 #define MOB_FLAGGED(ch, flag)  (IS_NPC(ch) && IS_SET(MOB_FLAGS(ch), (flag)))
+#define MOB_SAVES_TO_ROOM(mob)  (IS_NPC(mob) && GET_MOB_VNUM(mob) != NOTHING && !MOB_FLAGGED((mob), MOB_EMPIRE) && !GET_COMPANION(mob))
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -1375,6 +1379,7 @@ int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_COORD(ge
 #define ROOM_CAN_MINE(room)  (ROOM_SECT_FLAGGED((room), SECTF_CAN_MINE) || room_has_function_and_city_ok(ROOM_OWNER(room), (room), FNC_MINE) || (IS_ROAD(room) && SECT_FLAGGED(BASE_SECT(room), SECTF_CAN_MINE)))
 #define ROOM_IS_CLOSED(room)  (IS_INSIDE(room) || IS_ADVENTURE_ROOM(room) || (IS_ANY_BUILDING(room) && !ROOM_BLD_FLAGGED(room, BLD_OPEN) && (IS_COMPLETE(room) || ROOM_BLD_FLAGGED(room, BLD_CLOSED))))
 #define ROOM_IS_UPGRADED(room)  ((IS_COMPLETE(room) && HAS_FUNCTION((room), FNC_UPGRADED)) || (IS_COMPLETE(HOME_ROOM(room)) && HAS_FUNCTION(HOME_ROOM(room), FNC_UPGRADED)) || (GET_ROOM_VEHICLE(room) && IS_SET(VEH_FUNCTIONS(GET_ROOM_VEHICLE(room)), FNC_UPGRADED)))
+#define ROOM_NEEDS_PACK_SAVE(room)  (ROOM_CONTENTS(room) || ROOM_VEHICLES(room))
 #define SHOW_PEOPLE_IN_ROOM(room)  (!ROOM_IS_CLOSED(room) && !ROOM_SECT_FLAGGED(room, SECTF_OBSCURE_VISION))
 
 // interaction checks (by type)
@@ -1605,6 +1610,7 @@ int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_COORD(ge
 #define IN_OR_ON(veh)		(VEH_FLAGGED((veh), VEH_IN) ? "in" : "on")
 #define VEH_CLAIMS_WITH_ROOM(veh)  (VEH_FLAGGED((veh), VEH_BUILDING) && !VEH_FLAGGED((veh), MOVABLE_VEH_FLAGS | VEH_NO_CLAIM))
 #define VEH_IS_EXTRACTED(veh)  VEH_FLAGGED((veh), VEH_EXTRACTED)
+#define VEH_IS_VISIBLE_ON_MAPOUT(veh)  (VEH_FLAGGED(veh, VEH_BUILDING) && VEH_SIZE(veh) > 0)
 #define VEH_FLAGGED(veh, flag)  IS_SET(VEH_FLAGS(veh), (flag))
 #define VEH_HAS_MINOR_DISREPAIR(veh)  (VEH_HEALTH(veh) < VEH_MAX_HEALTH(veh) && (VEH_HEALTH(veh) <= (VEH_MAX_HEALTH(veh) * config_get_int("disrepair_minor") / 100)))
 #define VEH_HAS_MAJOR_DISREPAIR(veh)  (VEH_HEALTH(veh) < VEH_MAX_HEALTH(veh) && (VEH_HEALTH(veh) <= (VEH_MAX_HEALTH(veh) * config_get_int("disrepair_major") / 100)))
@@ -1651,8 +1657,10 @@ extern struct weather_data weather_info;	// db.c
 #define log  basic_mud_log
 
 // string/vnum hash tools from utils.c
+void add_pair_hash(struct pair_hash **hash, int id, int value);
 void add_string_hash(struct string_hash **hash, const char *string, int count);
 void add_vnum_hash(struct vnum_hash **hash, any_vnum vnum, int count);
+void free_pair_hash(struct pair_hash **hash);
 void free_string_hash(struct string_hash **hash);
 void free_vnum_hash(struct vnum_hash **hash);
 int sort_string_hash(struct string_hash *a, struct string_hash *b);
@@ -2161,9 +2169,9 @@ void get_scale_constraints(room_data *room, char_data *mob, int *scale_level, in
 void instance_obj_setup(struct instance_data *inst, obj_data *obj);
 int lock_instance_level(room_data *room, int level);
 void mark_instance_completed(struct instance_data *inst);
+void prune_instances();
 void remove_instance_fake_loc(struct instance_data *inst);
 void reset_instance(struct instance_data *inst);
-void save_instances();
 void scale_instance_to_level(struct instance_data *inst, int level);
 void set_instance_fake_loc(struct instance_data *inst, room_data *loc);
 void unlink_instance_entrance(room_data *room, struct instance_data *inst, bool run_cleanup);
@@ -2241,6 +2249,7 @@ char *get_bld_name_by_proto(bld_vnum vnum);
 bool rmt_has_exit(room_template *rmt, int dir);
 
 // pathfind.c
+ubyte get_pathfind_key(void);
 char *get_pathfind_string(room_data *start, room_data *end, char_data *ch, vehicle_data *veh, PATHFIND_VALIDATOR(*validator));
 PATHFIND_VALIDATOR(pathfind_ocean);
 PATHFIND_VALIDATOR(pathfind_pilot);
@@ -2405,7 +2414,7 @@ void start_vehicle_burning(vehicle_data *veh);
 int total_small_vehicles_in_room(room_data *room);
 int total_vehicle_size_in_room(room_data *room);
 char_data *unharness_mob_from_vehicle(struct vehicle_attached_mob *vam, vehicle_data *veh);
-vehicle_data *unstore_vehicle_from_file(FILE *fl, any_vnum vnum);
+vehicle_data *unstore_vehicle_from_file(FILE *fl, any_vnum vnum, char *error_str);
 void update_vehicle_island_and_loc(vehicle_data *veh, room_data *loc);
 bool vehicle_allows_climate(vehicle_data *veh, room_data *room, bool *allow_slow_ruin);
 bool vehicle_is_chameleon(vehicle_data *veh, room_data *from);

@@ -24,5 +24,6 @@ soc - Socials
 trg - DG Scripts triggers
 veh - Vehicles (ships, carts)
 
-The final one is different.
+Additional files and directories:
+base_map - No longer used as of b5.116
 wld - The live world map and live rooms
