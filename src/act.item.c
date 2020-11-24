@@ -6694,13 +6694,8 @@ ACMD(do_seed) {
 	}
 	else {		
 		if (run_interactions(ch, GET_OBJ_INTERACTIONS(obj), INTERACT_SEED, IN_ROOM(ch), NULL, obj, NULL, seed_obj_interact)) {
-			if (OBJ_FLAGGED(obj, OBJ_SINGLE_USE)) {
-				extract_obj(obj);
-			}
-			else {
-				SET_BIT(GET_OBJ_EXTRA(obj), OBJ_SEEDED | OBJ_NO_STORE);
-				request_obj_save_in_world(obj);
-			}
+			SET_BIT(GET_OBJ_EXTRA(obj), OBJ_SEEDED | OBJ_NO_STORE);
+			request_obj_save_in_world(obj);
 		}
 		else {
 			act("You fail to seed $p.", FALSE, ch, obj, NULL, TO_CHAR);
