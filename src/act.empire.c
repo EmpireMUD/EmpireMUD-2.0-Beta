@@ -1457,7 +1457,7 @@ void show_workforce_setup_to_char(empire_data *emp, char_data *ch) {
 		
 		snprintf(part, sizeof(part), "%s: %s%s", chore_data[chore].name, here ? "&con&0" : "&yoff&0", ((on && !here) || (off && here)) ? (PRF_FLAGGED(ch, PRF_SCREEN_READER) ? " (partial)" : "*") : "");
 		size = 24 + color_code_length(part) + (PRF_FLAGGED(ch, PRF_SCREEN_READER) ? 24 : 0);
-		msg_to_char(ch, " %-*.*s%s", size, size, part, (PRF_FLAGGED(ch, PRF_SCREEN_READER) || !((count+1)%3)) ? "\r\n" : " ");
+		msg_to_char(ch, " %-*.*s%s", size, size, part, (PRF_FLAGGED(ch, PRF_SCREEN_READER) || !(count % 3)) ? "\r\n" : " ");
 	}
 	if (count % 3 && !PRF_FLAGGED(ch, PRF_SCREEN_READER)) {
 		msg_to_char(ch, "\r\n");
