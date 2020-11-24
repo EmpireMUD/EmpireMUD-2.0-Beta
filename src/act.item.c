@@ -6116,7 +6116,12 @@ ACMD(do_pour) {
 	int amount;
 
 	two_arguments(argument, arg1, arg2);
-
+	
+	if (GET_POS(ch) == POS_FIGHTING) {
+		msg_to_char(ch, "You're too busy fighting!\r\n");
+		return;
+	}
+	
 	if (subcmd == SCMD_POUR) {
 		if (!*arg1) {		/* No arguments */
 			send_to_char("From what do you want to pour?\r\n", ch);
