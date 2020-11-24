@@ -3533,6 +3533,7 @@ ACMD(do_survey) {
 
 
 ACMD(do_time) {
+	char time_of_day[MAX_STRING_LENGTH];
 	struct time_info_data tinfo;
 	const char *suf;
 	int weekday, day, latitude, y_coord, sun;
@@ -3561,29 +3562,30 @@ ACMD(do_time) {
 	
 		gain_player_tech_exp(ch, PTECH_CLOCK, 1);
 	}
-
+	
+	// prepare the start of a string for time-of-day (used below)
 	sun = get_sun_status(IN_ROOM(ch));
 	if (sun == SUN_DARK) {
-		msg_to_char(ch, "It's nighttime.\r\n");
+		snprintf(time_of_day, sizeof(time_of_day), "It's nighttime");
 	}
 	else if (sun == SUN_RISE) {
-		msg_to_char(ch, "It's almost dawn.\r\n");
+		snprintf(time_of_day, sizeof(time_of_day), "It's almost dawn");
 	}
 	else if (sun == SUN_SET) {
-		msg_to_char(ch, "It's sunset.\r\n");
+		snprintf(time_of_day, sizeof(time_of_day), "It's sunset");
 	}
 	else if (has_player_tech(ch, PTECH_CLOCK)) {
-		msg_to_char(ch, "It's daytime.\r\n");
+		snprintf(time_of_day, sizeof(time_of_day), "It's daytime");
 	}
 	// all other time options are only shown without clocks:
 	else if (tinfo.hours == 12) {
-		msg_to_char(ch, "It's noon.\r\n");
+		snprintf(time_of_day, sizeof(time_of_day), "It's midday");
 	}
 	else if (tinfo.hours < 12) {
-		msg_to_char(ch, "It's %smorning.\r\n", tinfo.hours <= 8 ? "early " : "");
+		snprintf(time_of_day, sizeof(time_of_day), "It's %smorning", tinfo.hours <= 8 ? "early " : "");
 	}
 	else {	// afternoon is all that's left
-		msg_to_char(ch, "It's %safternoon.\r\n", tinfo.hours >= 17 ? "late " : "");
+		snprintf(time_of_day, sizeof(time_of_day), "It's %safternoon", tinfo.hours >= 17 ? "late " : "");
 	}
 
 	if (has_player_tech(ch, PTECH_CALENDAR)) {
@@ -3599,9 +3601,13 @@ ACMD(do_time) {
 		else
 			suf = "th";
 
-		msg_to_char(ch, "The %d%s day of the month of %s, year %d.\r\n", day, suf, month_name[(int) tinfo.month], tinfo.year);
+		msg_to_char(ch, "%s on the %d%s day of the month of %s, year %d.\r\n", time_of_day, day, suf, month_name[(int) tinfo.month], tinfo.year);
 		
 		gain_player_tech_exp(ch, PTECH_CALENDAR, 1);
+	}
+	else {
+		// no calendar -- just show time of day
+		msg_to_char(ch, "%s.\r\n", time_of_day);
 	}
 	
 	// check season
@@ -3611,16 +3617,16 @@ ACMD(do_time) {
 	
 	// check solstices
 	if (DAY_OF_YEAR(tinfo) == FIRST_EQUINOX_DOY) {
-		msg_to_char(ch, "It is the %s equinox.\r\n", latitude >= 0 ? "vernal" : "autumnal");
+		msg_to_char(ch, "Today is the %s equinox.\r\n", latitude >= 0 ? "vernal" : "autumnal");
 	}
 	else if (DAY_OF_YEAR(tinfo) == NORTHERN_SOLSTICE_DOY) {
-		msg_to_char(ch, "It is the %s solstice.\r\n", latitude >= 0 ? "summer" : "winter");
+		msg_to_char(ch, "Today is the %s solstice.\r\n", latitude >= 0 ? "summer" : "winter");
 	}
 	else if (DAY_OF_YEAR(tinfo) == LAST_EQUINOX_DOY) {
-		msg_to_char(ch, "It is the %s equinox.\r\n", latitude >= 0 ? "autumnal" : "vernal");
+		msg_to_char(ch, "Today is the %s equinox.\r\n", latitude >= 0 ? "autumnal" : "vernal");
 	}
 	else if (DAY_OF_YEAR(tinfo) == SOUTHERN_SOLSTICE_DOY) {
-		msg_to_char(ch, "It is the %s solstice.\r\n", latitude >= 0 ? "winter" : "summer");
+		msg_to_char(ch, "Today is the %s solstice.\r\n", latitude >= 0 ? "winter" : "summer");
 	}
 	
 	// check zenith
