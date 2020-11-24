@@ -4221,7 +4221,7 @@ ACMD(do_efind) {
 
 // syntax: elog [empire] [type] [lines]
 ACMD(do_elog) {
-	char *argptr, *tempptr, buf[MAX_STRING_LENGTH], line[MAX_STRING_LENGTH];
+	char *argptr, *tempptr, buf[MAX_STRING_LENGTH * 4], line[MAX_STRING_LENGTH];
 	int iter, count, type = NOTHING, lines = -1;
 	struct empire_log_data *elog;
 	empire_data *emp = NULL;
@@ -4314,7 +4314,7 @@ ACMD(do_elog) {
 			if (count-- - lines <= 0) {
 				snprintf(line, sizeof(line), "%3s: %s&0\r\n", simple_time_since(elog->timestamp), strip_color(elog->string));
 				
-				if (size + strlen(line) + 10 < MAX_STRING_LENGTH) {
+				if (size + strlen(line) + 10 < sizeof(buf)) {
 					strcat(buf, line);
 					size += strlen(line);
 				}
