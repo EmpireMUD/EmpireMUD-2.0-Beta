@@ -1972,6 +1972,7 @@ typedef enum {
 #define ACTF_FAST_EXCAVATE  BIT(9)	// empire tech boosts speed, when in-city
 #define ACTF_VEHICLE_SPEEDS BIT(10)  // signals that this action accelerates based on vehicle speeds
 #define ACTF_EVEN_FASTER  BIT(11)	// another speed boost for various actions
+#define ACTF_IGNORE_COND  BIT(12)	// not slowed by hunger/thirst/slow
 
 
 // BONUS_x: bonus traits
