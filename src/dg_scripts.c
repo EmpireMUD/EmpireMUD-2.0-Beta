@@ -4480,7 +4480,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 							if (fl != NOTHING) {
 								TOGGLE_BIT(GET_OBJ_EXTRA(o), BIT(fl));
 								snprintf(str, slen, (OBJ_FLAGGED(o, BIT(fl)) ? "1" : "0"));
-								request_obj_save_in_world(obj);
+								request_obj_save_in_world(o);
 							}
 							else {
 								snprintf(str, slen, "0");
