@@ -307,9 +307,9 @@ Winter Wonderland minipet whistle (gain list in order)~
 1 c 2
 use~
 * List of vnums granted by this whistle (minipet mobs)
-set list 10723 10724 10725 10726 16653 16654 16655 16656
+set list 16657 16658 10723 10724 10725 10726 16653 16654 16655 16656
 * length is used to shuffle the start point of the list
-set length 8
+set length 10
 * Check targeting
 if %actor.obj_target(%arg.car%)% != %self%
   return 0

@@ -97,7 +97,7 @@ remove it, you could always light it on fire.
 3 v 0 0 8
 0 0 0
 0 8064
-I 11 1002 100.00 1  # LIGHT: a roaring fire
+I 11 1002 100.00 1  # LIGHT: roaring fire
 S
 #16608
 binding rope tree Christmas~
@@ -388,7 +388,7 @@ Usage: enchant sleigh
 0 0 0
 10 0
 R
-5193 0
+4 5193 0
 T 16650
 S
 #16651
@@ -499,7 +499,7 @@ Type 'spin dreidel' to use it.
 0 0 0
 0 0
 R
-5193 0
+4 5193 0
 T 16657
 T 16651
 S
@@ -804,6 +804,94 @@ You're filled with $p!~
 M
 9
 $n glows with $p!~
+S
+#16695
+jar magewood empty~
+an empty magewood jar~
+An empty magewood jar is sitting here.~
+   This jar is made from a pale blond magewood that shimmers with veins of
+bright green and magenta light. This jar once held the Nordlys, a mystical
+light from beyond the North. An inscription on the side of the jar gives the
+magic words to recapture the Nordlys:
+Usage: capture nordlys
+~
+3 p a 0 3
+0 0 0
+0 0
+C
+1 1
+T 16695
+S
+#16696
+jar magewood shimmering~
+a shimmering magewood jar~
+A shimmering magewood jar is sitting here.~
+   The jar is made from pale blond magewood, with veins of green and magenta
+light streaking down it. The jar is closed but a brilliant, shimmering light
+seems to be trying to force its way out of every seam.
+   Legend says that if you open the jar in an evergreen forest and release the
+Nordlys within, the Nordlys will be trapped in the trees and fill them with its
+powerful magic. This will only work on Evergreen Forest tiles -- seek the seeds
+of pure ice from the Magiterranean to obtain these rare trees. Be sure to claim
+the forest, or you risk losing it. Unlike other enchanted forests, this one
+won't spread beyond the first tile.
+Usage: open jar
+~
+3 p a 0 4
+0 0 0
+0 0
+C
+1 1
+T 16696
+S
+#16697
+tree nordlys glowing~
+a glowing nordlys tree~
+A glowing nordlys tree has fallen here.~
+   This magnificent tree dances with green and magenta lights even after it has
+fallen. It shimmers with an ethereal magic that seems to warm you even in the
+cold.
+~
+3 e a 0 13
+0 0 0
+0 0
+C
+1 1
+I 11 617 100.00 1  # LIGHT: magical fire
+I 17 16698 100.00 1  # SAW: glowing magewood
+O+ 1 6012
+R
+4 5118 0
+S
+#16698
+magewood wood glowing stack~
+some glowing magewood~
+Some glowing magewood is stacked here.~
+   This stack of lumber has the pale color of oak or maple, but even in bright
+light you can see rivulets of green and magenta light streaming down the length
+of the boards. Magewood is used in some highly skilled crafts.
+~
+3 e a 0 11
+0 0 0
+0 0
+C
+1 1
+I 11 617 100.00 1  # LIGHT: magical fire
+M
+0
+You place $p in midair, where it seems to float.~
+M
+1
+$n places $p in midair, where it seems to float.~
+M
+6
+You attach $p in midair, where it seems to float.~
+M
+7
+$n attaches $p in midair, where it seems to float.~
+O+ 1 6001
+R
+4 5118 0
 S
 #16699
 marker immortal~

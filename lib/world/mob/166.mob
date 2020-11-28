@@ -49,15 +49,15 @@ Each year, he tries to ruin Christmas for as many empires as possible. He's
 spinning a long whip made from Christmas lights, and not just any Who can stop
 him! Drive him off before it's too late.
 ~
-I 4 16663 14.00 1 l  # LOOT: a rocking horse saddle
-I 4 16670 14.00 1 l  # LOOT: a hearty Christmas spirit
-I 4 16671 14.00 1 l  # LOOT: a generous Christmas spirit
-I 4 16672 14.00 1 l  # LOOT: a serene Christmas spirit
-I 4 16673 14.00 1 l  # LOOT: a warm Christmas spirit
-I 4 16674 14.00 1 l  # LOOT: an anxious Christmas spirit
-I 4 16675 14.00 1 l  # LOOT: a nostalgic Christmas spirit
-I 4 16664 1.00 1 l  # LOOT: a mini-grinchy pet whistle
-I 4 16665 1.00 1 l  # LOOT: a reindeer dog mini-pet whistle
+I 4 16663 14.00 1 l  # LOOT: rocking horse saddle
+I 4 16670 14.00 1 l  # LOOT: hearty Christmas spirit
+I 4 16671 14.00 1 l  # LOOT: generous Christmas spirit
+I 4 16672 14.00 1 l  # LOOT: serene Christmas spirit
+I 4 16673 14.00 1 l  # LOOT: warm Christmas spirit
+I 4 16674 14.00 1 l  # LOOT: anxious Christmas spirit
+I 4 16675 14.00 1 l  # LOOT: nostalgic Christmas spirit
+I 4 16664 1.00 1 l  # LOOT: mini-grinchy pet whistle
+I 4 16665 1.00 1 l  # LOOT: reindeer dog mini-pet whistle
 T 16603
 T 16614
 T 16615
@@ -137,8 +137,8 @@ A goose is waddling around.
 D
 This fat white goose looks ready to eat.
 ~
-I 0 3200 100.00 2  # BUTCHER: a cut of poultry
-I 0 9025 100.00 1  # BUTCHER: some bird feathers
+I 0 3200 100.00 2  # BUTCHER: cut of poultry
+I 0 9025 100.00 1  # BUTCHER: bird feathers
 M
 0
 $n honks.~
@@ -160,9 +160,9 @@ D
    This reindeer has a shiny nose. Now that you can see it, you would even say
 it glows!
 ~
-I 0 3012 100.00 2  # BUTCHER: a fillet of raw meat
-I 0 9175 100.00 2  # BUTCHER: a reindeer's antlers
-I 1 1351 100.00 1  # SKIN: a large skin
+I 0 3012 100.00 2  # BUTCHER: fillet of raw meat
+I 0 9175 100.00 2  # BUTCHER: reindeer's antlers
+I 1 1351 100.00 1  # SKIN: large skin
 S
 #16653
 ghost christmas present~
@@ -281,6 +281,75 @@ How nice to make your acquaintance.~
 M
 1
 What was it they said? Yippee-ki-ay?~
+S
+#16657
+bells jingling~
+some jingling bells~
+Some jingling bells hang in the air.
+~
+1 1 bdoD n 2
+0 0 27 11
+D
+   The silver bells seem to float in the air, but they dangle back and forth as
+if attached to the holiday spirit itself!
+~
+M
+0
+Silver bells jingle in the air.~
+M
+0
+The bells chime a melodic tune.~
+M
+0
+You think you hear the Carol of the Bells in the distance.~
+M
+0
+You can hear someone caroling in the distance.~
+M
+0
+You feel a sudden sense of holiday cheer.~
+M
+0
+A snowflake lands on your nose.~
+S
+#16658
+dreidel spinning little~
+a spinning dreidel~
+A little dreidel is spinning around.
+~
+1 1 bdoD n 2
+0 0 31 11
+D
+   The dreidel is made of wood, but it seems that some good pixy has brought it
+to life!
+~
+M
+0
+The dreidel spins around.~
+M
+0
+The dreidel spins in circles around you.~
+M
+0
+The dreidel falls over.~
+M
+0
+The dreidel shouts, 'Nun!'~
+M
+0
+The dreidel shouts, 'Hei!'~
+M
+0
+The dreidel shouts, 'Gimel!'~
+M
+0
+The dreidel shouts, 'Shin!~
+M
+0
+The dreidel spins around.~
+M
+0
+The dreidel spins around.~
 S
 #16664
 demon grinchy tiny~
