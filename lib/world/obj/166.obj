@@ -458,17 +458,19 @@ packet enchanted upgrade glitter~
 an enchanted packet of upgrade glitter~
 An enchanted packet of upgrade glitter has fallen here.~
    Apply this packet of glitter to the hideous sweater, the red Christmas hat,
-or the bottomless gift sack from the Winter Wonderland. The glow of the glitter
-will make one of these items better using the magic of Christmas!
+the silver elfish omni-tool, or the bottomless gift sack from the Winter
+Wonderland. The glow of the glitter will make one of these items better using
+the magic of Christmas!
 Usage: upgrade <item>
 
 hideous sweater: gains +1 Greatness and a different player description
 bottomless gift sack: increased size (becomes superior)
-red Christmas hat: +1 Greatness
+red Christmas hat: +1 Greatness (become superior)
+silver elfish omni-tool: +50 total crafting and +1 greatness (becomes superior)
 
 (The item must be in your inventory.)
 ~
-3 p a 0 5
+3 p a 0 6
 0 0 0
 0 0
 T 16655
@@ -636,6 +638,26 @@ Type 'use whistle'.
 19 p a 0 8
 16665 0 0
 2 0
+S
+#16666
+omni-tool omnitool tool elfish silver~
+a silver elfish omni-tool~
+An elfish omni-tool is lying here.~
+   This little device is small, but made by a master elfish silversmith. 
+Flecks of brightly colored paint decorate each part of the tool, no doubt the
+result of centuries of toymaking.
+~
+3 mp ao cefm 11
+0 0 0
+2 0
+A
+25 25 0
+A
+25 25 3
+A
+5 1 3
+C
+100 400
 S
 #16670
 spirit christmas hearty~
@@ -813,9 +835,9 @@ An empty magewood jar is sitting here.~
 bright green and magenta light. This jar once held the Nordlys, a mystical
 light from beyond the North. An inscription on the side of the jar gives the
 magic words to recapture the Nordlys:
-Usage: capture nordlys
+Usage: recapture nordlys
 ~
-3 p a 0 3
+3 p a 0 4
 0 0 0
 0 0
 C

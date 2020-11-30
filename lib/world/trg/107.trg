@@ -1,3 +1,13 @@
+#10700
+cookie turn in~
+2 v 0
+~
+if %room.max_citizens% < 1
+  return 0
+  %send% %actor% You need to leave these in a home for the elves to collect.
+  halt
+end
+~
 #10701
 Carolers caroling a'merrily~
 0 g 100
@@ -61,6 +71,10 @@ done
 Christmas Gift open~
 1 c 2
 open~
+* gifts are given in order
+set gift_list 10717 16666 10728 10719 10720 16657 16696 10704 10710 16656
+set first_gift 10717
+* targ check
 if %actor.obj_target(%arg%)% != %self%
   return 0
   halt
@@ -72,49 +86,30 @@ wait 5 sec
 if %actor.room% != %room_var% || %actor.fighting% || %self.carried_by% != %actor% || %actor.disabled%
   halt
 end
+* find last gift
 if !%actor.varexists(last_christmas_gift_item)%
-  set last_christmas_gift_item 16656
+  set last_christmas_gift_item 0
 else
   set last_christmas_gift_item %actor.last_christmas_gift_item%
 end
+* determine next gift
 set next_gift 0
-switch %last_christmas_gift_item%
-  case 16657
-    set next_gift 10709
-  break
-  case 10709
-    set next_gift 10704
-  break
-  case 10704
-    set next_gift 10710
-  break
-  case 10710
-    set next_gift 16656
-  break
-  case 16656
-    set next_gift 10717
-  break
-  case 10717
-    set next_gift 10714
-  break
-  case 10714
-    set next_gift 10728
-  break
-  case 10728
-    set next_gift 10719
-  break
-  case 10719
-    set next_gift 10720
-  break
-  case 10720
-    set next_gift 16657
-  break
-  default
-    set next_gift 10717
-  break
+while %gift_list%
+  set entry %gift_list.car%
+  if %entry% == %last_christmas_gift_item%
+    set next_gift %gift_list.cdr%
+    set next_gift %next_gift.car%
+    set gift_list 0
+  else
+    set gift_list %gift_list.cdr%
+  end
 done
+if !%next_gift%
+  set next_gift %first_gift%
+end
+* ok go for it
 %load% obj %next_gift% %actor% inv
-set item %actor.inventory()%
+set item %actor.inventory(%next_gift%)%
 %send% %actor% You finish unwrapping the gift and find @%item% inside!
 %echoaround% %actor% ~%actor% finishes unwrapping the gift and finds @%item%!
 set last_christmas_gift_item %next_gift%
@@ -303,13 +298,13 @@ if %actor.char_target(%arg.car%)% == %self% && %self.room.template% >= 10700 && 
 end
 ~
 #10727
-Winter Wonderland minipet whistle (gain list in order)~
+Winter Wonderland minipet whistle (random order)~
 1 c 2
 use~
 * List of vnums granted by this whistle (minipet mobs)
-set list 16657 16658 10723 10724 10725 10726 16653 16654 16655 16656
+set list 10709 16657 16658 10723 10724 10725 10726 16653 16654 16655 16656
 * length is used to shuffle the start point of the list
-set length 10
+set length 11
 * Check targeting
 if %actor.obj_target(%arg.car%)% != %self%
   return 0

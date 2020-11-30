@@ -29,7 +29,7 @@ D4
 ..&t.&?.~
 &0~
 E
-4 0 0.90 16698
+4 0 0.50 16698
 E
 22 0 25.00 36
 I 5 103 2.00 1 d  # DIG: yellow lightning stone
@@ -82,12 +82,24 @@ D3
 D3
 .&M#&yW&?.~
 &g~
+D4
+.W&G#&?.~
+&W~
+D4
+.&G#&?W.~
+&W~
+D4
+.W&M#&?.~
+&W~
+D4
+.&M#&?W.~
+&W~
 E
 0 0 10.00 16699
 E
 0 0 100.00 16697
 E
-4 0 0.75 16699
+4 0 0.50 16699
 E
 22 0 0.40 10562
 I 5 103 6.00 1 d  # DIG: yellow lightning stone
@@ -97,7 +109,7 @@ I 5 1206 6.00 1 d  # DIG: iridescent blue iris
 I 5 106 18.00 1 d  # DIG: rough piece of obsidian
 I 5 100 58.00 1 d  # DIG: rock
 I 6 606 100.00 1  # FORAGE: handful of elderberries
-I 20 16698 100.00 1  # CHOP: glowing magewood
+I 20 16697 100.00 1  # CHOP: glowing nordlys tree
 M
 615 10.00 c
 M
@@ -218,7 +230,7 @@ I 5 1206 6.00 1 d  # DIG: iridescent blue iris
 I 5 106 18.00 1 d  # DIG: rough piece of obsidian
 I 5 100 58.00 1 d  # DIG: rock
 I 6 606 100.00 1  # FORAGE: handful of elderberries
-I 20 16698 100.00 1  # CHOP: glowing magewood
+I 20 16697 100.00 1  # CHOP: glowing nordlys tree
 M
 615 10.00 c
 M

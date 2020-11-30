@@ -72,7 +72,7 @@ Type: use syringe <target>
    You got the blood and the wanderer is delighted. Here's hoping it hurt the
 old fool.
 ~
-13 de 0 0 -1
+14 de 0 0 -1
 A
 1 9064
 D 16602
@@ -92,7 +92,7 @@ W
 W
 9 7 0 1 a
 Z
-1 9064
+4 16601
 S
 #16603
 Winter Wonderland: Magic Blood~
@@ -106,7 +106,7 @@ Type: use syringe <target>
 ability to fly without turning into giant bats. Hopefully it was from a flying
 reindeer.
 ~
-20 de 0 0 -1
+21 de 0 0 -1
 A
 1 18208
 A
@@ -130,9 +130,7 @@ W
 W
 9 7 0 1 a
 Z
-1 18208
-Z
-1 18218
+4 16601
 S
 #16604
 Winter Wonderland: Letter to Father Christmas~

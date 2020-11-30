@@ -128,6 +128,7 @@ else
   %echoaround% %actor% %actor% does something near %target%, but it happens so fast you can't tell what.
 end
 if %OnQuest% > 0
+  %send% %actor% A voice whispers, "thanks for the blood,' as the syringe vanishes from your hand.
   %quest% %actor% finish %OnQuest%
   %purge% %self%
 end
@@ -379,13 +380,15 @@ remote winter_holiday_sect_check %self.id%
 xmas tree chopping~
 1 c 2
 chop~
+* config valid sects (must also update trig 16609)
+set valid_sects 4 602 603 604 612 613 614 10562 10563 10564 10565 16698 16699
 return 0
 if %actor.inventory(16606)%
   %send% %actor% You really should get this tree back to your city center and plant it.
   halt
 end
 set winter_holiday_sect_check %self.room.sector_vnum%
-if !(%winter_holiday_sect_check% == 4 || %winter_holiday_sect_check% == 604 || (%winter_holiday_sect_check% >= 10562 && %winter_holiday_sect_check% <= 10565))
+if !(%valid_sects% ~= %winter_holiday_sect_check%)
   halt
 end
 eval maxcarrying %actor.maxcarrying% - 1
@@ -408,16 +411,11 @@ end
 xmas tree replacer~
 0 e 1
 collects~
-if !%actor.on_quest(16607)%
+if !%actor.on_quest(16607)% || %actor.inventory(16606)% || %actor.carrying% >= (%actor.maxcarrying% - 1)
+  * exit early if not on quest or already has tree, or inventory full
   halt
 end
-if %actor.inventory(16606)%
-  halt
-end
-eval maxcarrying %actor.maxcarrying% - 1
-if %actor.carrying% >= %maxcarrying%
-  halt
-end
+* attempt to determine if they just got a tree
 while %arg%
   if %arg.cdr% == tree.
     set tree_type %actor.inventory()%
@@ -426,25 +424,64 @@ while %arg%
   set arg %arg.cdr%
 done
 set winter_holiday_sect_check %self.winter_holiday_sect_check%
-set tree_roll %random.100%
-if !(%tree_type% == 10558 || %tree_type% == 603 || %tree_type% == 120)
+set valid_tree_types 10558 603 120 618 16697
+if !(%valid_tree_types% ~= %tree_type%)
+  * not a valid tree
   halt
 end
-if %winter_holiday_sect_check% == 10565 && %tree_roll% <= 60
-  %purge% %actor.inventory(10558)%
-elseif %winter_holiday_sect_check% == 10564 && %tree_roll% <= 45
-  %purge% %actor.inventory(10558)%
-elseif %winter_holiday_sect_check% == 10563 && %tree_roll% <= 30
-  %purge% %actor.inventory(10558)%
-elseif %winter_holiday_sect_check% == 10562 && %tree_roll% <= 15
-  %purge% %actor.inventory(10558)%
-elseif %winter_holiday_sect_check% == 604 && %tree_roll% <= 13
-  %purge% %actor.inventory(603)%
-elseif %winter_holiday_sect_check% == 4 && %tree_roll% <= 30
-  %purge% %actor.inventory(120)%
-else
+* chances of success
+switch %winter_holiday_sect_check%
+  case 10565
+    set chance 60
+  break
+  case 10564
+    set chance 45
+  break
+  case 10563
+    set chance 30
+  break
+  case 10562
+    set chance 15
+  break
+  case 604
+    set chance 60
+  break
+  case 603
+    set chance 50
+  break
+  case 602
+    set chance 40
+  break
+  case 614
+    set chance 60
+  break
+  case 613
+    set chance 50
+  break
+  case 612
+    set chance 40
+  break
+  case 4
+    set chance 30
+  break
+  case 16699
+    set chance 100
+  break
+  case 16698
+    set chance 100
+  break
+  default
+    * invalid sect
+    halt
+  break
+done
+* determine if we have a valid tree
+if %random.100% > %chance%
+  * fail
   halt
 end
+* success
+%purge% %actor.inventory(%tree_type%)%
 %load% obj 16606 %actor% inv
 set mod_tree %actor.inventory()%
 remote winter_holiday_sect_check %mod_tree.id%
@@ -1548,8 +1585,8 @@ if !%target%
 end
 * All other cases return 1
 return 1
-if %target.vnum% != 16653 && %target.vnum% != 16654 && %target.vnum% != 10711 && %target.vnum% != 10712
-  %send% %actor% You can only use @%self% on the gift sack, sweater, and hat from Winter Wonderland.
+if %target.vnum% != 16653 && %target.vnum% != 16654 && %target.vnum% != 10711 && %target.vnum% != 10712 && %target.vnum% != 16666
+  %send% %actor% You can only use @%self% on the gift sack, sweater, omni-tool, and hat from Winter Wonderland.
   halt
 end
 if %target.is_flagged(SUPERIOR)% || %target.vnum% == 16654
@@ -1733,16 +1770,19 @@ set roll %random.1000%
 if %roll% <= 5
   * 0.5% chance: a strange crystal seed
   set vnum 600
-elseif %roll% <= 105
+elseif %roll% <= 20
+  * 1.5% chance: a shimmering magewood jar (nordlys forest)
+  set vnum 16696
+elseif %roll% <= 120
   * 6% chance: minipet whistle
   set vnum 10727
-elseif %roll% <= 355
+elseif %roll% <= 370
   * 25% chance: some chocolate coins (+stats)
   set vnum 16660
-elseif %roll% <= 605
+elseif %roll% <= 620
   * 25% chance: some snowball cookies (+inventory)
   set vnum 16661
-elseif %roll% <= 855
+elseif %roll% <= 870
   * 25% chance: some thumbprint cookies (+move regen)
   set vnum 16662
 else
@@ -1764,15 +1804,15 @@ return 1
 #16695
 Capture nordlys in jar~
 1 c 2
-capture~
-* capture nordlys
+recapture~
+* recapture nordlys
 set room %actor.room%
 if !%arg% || !(nordlys /= %arg%)
   return 0
   halt
 end
 if !%actor.canuseroom_member(%room%)%
-  %send% %actor% You don't have permission to capture anything here.
+  %send% %actor% You don't have permission to recapture anything here.
   return 1
   halt
 end
@@ -1782,17 +1822,17 @@ switch %room.sector_vnum%
     set new_t The trees shrink and shake as the magic leaves them and evergreen needles sprout from their branches.
   break
   case 16698
-    %send% %actor% You must let the nordlys trees grow to full strength before you can re-capture the lights.
+    %send% %actor% You must let the nordlys trees grow to full strength before you can recapture the lights.
     return 1
     halt
   break
   case 16697
-    %send% %actor% You must let the nordlys trees grow before you can re-capture the lights.
+    %send% %actor% You must let the nordlys trees grow before you can recapture the lights.
     return 1
     halt
   break
   default
-    %send% %actor% There's no nordlys to capture here.
+    %send% %actor% There's no nordlys to recapture here.
     return 1
     halt
   break
