@@ -6346,7 +6346,7 @@ void olc_process_icons(char_data *ch, char *argument, struct icon_data **list) {
 		else if ((loc = search_block(arg2, icon_types, FALSE)) == NOTHING) {
 			msg_to_char(ch, "Invalid type.\r\n");
 		}
-		else if (strlen(arg3) != 2 || !check_banner_color_string(arg3)) {
+		else if (strlen(arg3) != 2 || !check_banner_color_string(arg3, TRUE, TRUE)) {
 			msg_to_char(ch, "You must specify a single color code, starting with \t&.\r\n");
 		}
 		else if (!validate_icon(arg4)) {
@@ -6454,7 +6454,7 @@ void olc_process_icons(char_data *ch, char *argument, struct icon_data **list) {
 			}
 		}
 		else if (is_abbrev(type_arg, "color")) {
-			if (strlen(val_arg) != 2 || !check_banner_color_string(val_arg)) {
+			if (strlen(val_arg) != 2 || !check_banner_color_string(val_arg, TRUE, TRUE)) {
 				msg_to_char(ch, "You must specify a single color code, starting with \t&.\r\n");
 			}
 			else {

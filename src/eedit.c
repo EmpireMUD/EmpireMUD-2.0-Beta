@@ -52,10 +52,14 @@ EEDIT(eedit_num_ranks);
 
 /**
 * @param char *str The proposed banner string (color codes)
+* @param bool allow_neutral_color If TRUE, allows &0/&n. If FALSE, does not.
+* @param bool allow_underline If TRUE, allows &u. If FALSE, does not.
 * @return bool TRUE if the banner is valid; FALSE otherwise
 */
-bool check_banner_color_string(char *str) {
+bool check_banner_color_string(char *str, bool allow_neutral_color, bool allow_underline) {
 	const char *valid_colors = "rgbymcwajloptvRGBYMCWAJLOPTV";
+	const char *neutral_colors = "0n";
+	const char *underline_colors = "u";
 	
 	bool ok = TRUE;
 	int pos, num_codes = 0;
@@ -66,9 +70,7 @@ bool check_banner_color_string(char *str) {
 				// trailing &
 				ok = FALSE;
 			}
-			else if (strchr(valid_colors, str[pos+1])) {
-				// this code is ok but count number of non-underlined codes
-				// NOTE: as of b5.116 &u is not allowed
+			else if (strchr(valid_colors, str[pos+1]) || (allow_neutral_color && strchr(neutral_colors, str[pos+1])) || (allow_underline && strchr(underline_colors, str[pos+1]))) {
 				if (str[pos+1] != 'u') {
 					++num_codes;
 				}
@@ -392,7 +394,7 @@ EEDIT(eedit_banner) {
 	if (!*argument) {
 		msg_to_char(ch, "Set the empire banner to what (HELP COLOR)?\r\n");
 	}
-	else if (!check_banner_color_string(argument)) {
+	else if (!check_banner_color_string(argument, FALSE, FALSE)) {
 		msg_to_char(ch, "Invalid banner color (HELP COLOR) or too many color codes.\r\n");
 	}
 	else {
