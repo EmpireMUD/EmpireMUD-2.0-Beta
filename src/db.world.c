@@ -4183,11 +4183,10 @@ void update_world_index(room_vnum vnum, char value) {
 	
 	// make the update if possible
 	if (vnum >= 0) {
-		if (world_index_data[vnum] != value) {
-			// trigger a file save
-			add_vnum_hash(&binary_world_index_updates, vnum, 1);
-		}
 		world_index_data[vnum] = value;
+		
+		// and trigger a file save
+		add_vnum_hash(&binary_world_index_updates, vnum, 1);
 	}
 }
 
