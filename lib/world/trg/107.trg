@@ -4,7 +4,8 @@ cookie turn in~
 ~
 if %room.max_citizens% < 1
   return 0
-  %send% %actor% You need to leave these in a home for the elves to collect.
+  %send% %actor% You need to leave Christmas cookies in a house for the elves to collect.
+  %send% %actor% (Go to any place where citizens live and try to finish this quest again.)
   halt
 end
 ~
