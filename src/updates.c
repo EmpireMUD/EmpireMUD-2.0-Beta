@@ -1854,6 +1854,23 @@ void b5_112_update(void) {
 	}
 }
 
+ 
+// b5.117: clear last_christmas_gift_item
+PLAYER_UPDATE_FUNC(b5_117_update_players) {
+	struct trig_var_data *var, *next_var;
+	
+	check_delayed_load(ch);
+	
+	if (SCRIPT(ch) && SCRIPT(ch)->global_vars) {
+		LL_FOREACH_SAFE(SCRIPT(ch)->global_vars, var, next_var) {
+			if (!strcmp(var->name, "last_christmas_gift_item")) {
+				LL_DELETE(SCRIPT(ch)->global_vars, var);
+				free_var_el(var);
+			}
+		}
+	}
+}
+
 
  //////////////////////////////////////////////////////////////////////////////
 //// UPDATE DATA /////////////////////////////////////////////////////////////
@@ -1907,6 +1924,7 @@ const struct {
 	{ "b5.106", b5_106_update, b5_106_players, "Fix ruins icons and re-save all players with equipment in the main file" },
 	{ "b5.107", NULL, b5_107_players, "Move lastname data" },
 	{ "b5.112", b5_112_update, NULL, "Fix bad dedicate data" },
+	{ "b5.117", NULL, b5_117_update_players, "Clear last Christmas gift data" },
 	
 	{ "\n", NULL, NULL, "\n" }	// must be last
 };
