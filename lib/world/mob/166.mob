@@ -401,4 +401,103 @@ would fool any Who, but it looks adorable.
 T 9901
 T 9902
 S
+#16698
+raven enchanted~
+an enchanted raven~
+An enchanted raven is perched in a tree.
+~
+40 60 djo cm 2
+0 0 2 21
+D
+   The raven is such a deep shade of black that it almost looks blue. It's also
+the largest bird you've seen in these parts. It watches you intently, and you
+can't help but watch it, too.
+~
+I 0 3200 100.00 2  # BUTCHER: cut of poultry
+I 0 9025 100.00 1  # BUTCHER: bird feathers
+I 1 607 100.00 1  # SKIN: shimmering hide
+M
+1
+Nevermore.~
+M
+1
+Nevermore.~
+M
+1
+Nevermore.~
+M
+1
+Nevermore.~
+M
+1
+Nevermore.~
+M
+1
+Nevermore.~
+M
+1
+Nevermore.~
+M
+1
+Nevermore.~
+M
+1
+Nevermore.~
+M
+1
+Nevermore.~
+M
+0
+You feel like you're going mad.~
+S
+#16699
+fox enchanted~
+an enchanted fox~
+An enchanted fox darts in and out of the woods.
+~
+40 60 djo c 2
+0 0 7 16
+D
+   The fox shifts in color from orange to green to magenta and back as it rolls
+about playfully. It seems to watch you when it thinks you aren't looking.
+~
+I 0 3012 100.00 1  # BUTCHER: fillet of raw meat
+I 1 607 100.00 1  # SKIN: shimmering hide
+M
+0
+You think you see Ylvis behind a tree.~
+M
+1
+Bark!~
+M
+1
+Bark!~
+M
+1
+Bark!~
+M
+1
+Bark!~
+M
+0
+$n makes a gekkering sound.~
+M
+0
+$n makes a gekkering sound.~
+M
+1
+Ring-ding-ding-ding-dingeringeding!~
+M
+1
+Wa-pa-pa-pa-pa-pa-pa-pow!~
+M
+1
+Hatee-hatee-hatee-ho!~
+M
+1
+Joff-tchoff-tchoffo-tchoffo-tchoff!~
+M
+1
+Bark!~
+S
 $
