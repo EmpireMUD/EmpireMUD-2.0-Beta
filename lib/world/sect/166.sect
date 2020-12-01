@@ -1,0 +1,247 @@
+#16697
+Nordlys Stumps~
+A Field of Nordlys Tree Stumps~
+'.' 4 fij 2 0 p
+C
+dig~
+D1
+.&t.&?..~
+&g~
+D1
+..&t.&?.~
+&g~
+D2
+.&t.&?..~
+&g~
+D2
+..&t.&?.~
+&g~
+D3
+.&t.&?..~
+&g~
+D3
+..&t.&?.~
+&g~
+D4
+.&t.&?..~
+&0~
+D4
+..&t.&?.~
+&0~
+E
+4 0 0.50 16698
+E
+22 0 25.00 36
+I 5 103 2.00 1 d  # DIG: yellow lightning stone
+I 5 104 2.00 1 d  # DIG: red bloodstone
+I 5 1300 2.00 1 d  # DIG: glowing green seashell
+I 5 1206 2.00 1 d  # DIG: iridescent blue iris
+I 5 102 9.00 1 d  # DIG: flint stone
+I 5 100 83.00 1 d  # DIG: rock
+I 6 606 100.00 1  # FORAGE: handful of elderberries
+S
+#16698
+Nordlys Tree~
+A Towering Nordlys Tree~
+'.' 4 fijq 6 d np
+C
+chop, dig~
+D1
+.W&G#&?.~
+&g~
+D1
+.&G#&?W.~
+&g~
+D1
+.W&M#&?.~
+&g~
+D1
+.&M#&?W.~
+&g~
+D2
+.W&G#&?.~
+&g~
+D2
+.&G#&?W.~
+&g~
+D2
+.W&M#&?.~
+&g~
+D2
+.&M#&?W.~
+&g~
+D3
+.&yW&G#&?.~
+&g~
+D3
+.&G#&yW&?.~
+&g~
+D3
+.&yW&M#&?.~
+&g~
+D3
+.&M#&yW&?.~
+&g~
+D4
+.W&G#&?.~
+&W~
+D4
+.&G#&?W.~
+&W~
+D4
+.W&M#&?.~
+&W~
+D4
+.&M#&?W.~
+&W~
+E
+0 0 10.00 16699
+E
+0 0 100.00 16697
+E
+4 0 0.50 16699
+E
+22 0 0.40 10562
+I 5 103 6.00 1 d  # DIG: yellow lightning stone
+I 5 104 6.00 1 d  # DIG: red bloodstone
+I 5 1300 6.00 1 d  # DIG: glowing green seashell
+I 5 1206 6.00 1 d  # DIG: iridescent blue iris
+I 5 106 18.00 1 d  # DIG: rough piece of obsidian
+I 5 100 58.00 1 d  # DIG: rock
+I 6 606 100.00 1  # FORAGE: handful of elderberries
+I 20 16697 100.00 1  # CHOP: glowing nordlys tree
+M
+615 10.00 c
+M
+616 1.00 c
+M
+16698 10.00 0
+M
+16699 10.00 0
+S
+#16699
+Nordlys Grove~
+A Grove of Enchanting Nordlys Trees~
+'w' 4 fijq 8 d dnp
+C
+chop, dig~
+D1
+W&G#&?Ww~
+&g~
+D1
+WW&M#&?w~
+&g~
+D1
+W&M^&?wW~
+&g~
+D1
+WWw&G#~
+&g~
+D1
+&G#&?wWW~
+&g~
+D1
+Ww&M#&?W~
+&g~
+D1
+w&G#&?WW~
+&g~
+D1
+wWW&M#~
+&g~
+D2
+W&G#&?Ww~
+&g~
+D2
+WW&M#&?w~
+&g~
+D2
+W&M#&?wW~
+&g~
+D2
+WWw&G#~
+&g~
+D2
+&G#&?wWW~
+&g~
+D2
+Ww&M#&?W~
+&g~
+D2
+w&G#&?WW~
+&g~
+D2
+wWW&M#~
+&g~
+D3
+W&G#&?Ww~
+&y~
+D3
+WW&M#&?w~
+&y~
+D3
+W&M#&?wW~
+&y~
+D3
+WWw&G#~
+&y~
+D3
+&G#&?wWW~
+&y~
+D3
+Ww&M#&?W~
+&y~
+D3
+w&G#&?WW~
+&y~
+D3
+wWW&M#~
+&y~
+D4
+W&G#&?Ww~
+&W~
+D4
+WW&M#&?w~
+&W~
+D4
+W&M#&?wW~
+&W~
+D4
+WWw&G#~
+&W~
+D4
+&G#&?wWW~
+&W~
+D4
+Ww&M#&?W~
+&W~
+D4
+w&G#&?WW~
+&W~
+D4
+wWW&M#~
+&W~
+E
+0 0 33.33 16699
+E
+0 0 100.00 16698
+E
+22 0 0.40 10564
+I 5 103 6.00 1 d  # DIG: yellow lightning stone
+I 5 104 6.00 1 d  # DIG: red bloodstone
+I 5 1300 6.00 1 d  # DIG: glowing green seashell
+I 5 1206 6.00 1 d  # DIG: iridescent blue iris
+I 5 106 18.00 1 d  # DIG: rough piece of obsidian
+I 5 100 58.00 1 d  # DIG: rock
+I 6 606 100.00 1  # FORAGE: handful of elderberries
+I 20 16697 100.00 1  # CHOP: glowing nordlys tree
+M
+615 10.00 c
+M
+616 1.00 c
+M
+16698 10.00 0
+M
+16699 10.00 0
+S
+$

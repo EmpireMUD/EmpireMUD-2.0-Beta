@@ -1,14 +1,16 @@
 #10700
 Winter Wonderland: Cookie Crunch Time~
-   Santa's elves have completely run out of Christmas cookies! They offer you a
+    Santa's elves have completely run out of Christmas cookies! They offer you a
 gift from the few spare gifts that are left un-wrapped, if you can bake them a
-few more.
+few more. Once you've baked 20 plates of cookies, head to any house (anywhere
+that citizens live) to finish this quest.
 (If you don't have the recipe for Christmas cookies, try opening more gifts.)
 ~
-   You hand over the freshly baked Christmas cookies, and the elf gives you a
-left-over gift.
+   You leave the cookies, festively packaged on the table for the elves to come
+collect. By time you've turned around, the cookies are gone and a left-over
+gift has replaced them.
 ~
-11 de 0 0 -1
+14 de 0 0 -1
 A
 1 10702
 D 10700
@@ -18,12 +20,13 @@ R
 9 10700 10
 R
 2 16659 1
+T 10700
 W
 2 10716 0 20 a
 W
 36 10700 0 1 a
 Z
-1 10702
+2 10716
 S
 #10730
 Hey Diddle Diddle~

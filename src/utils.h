@@ -2100,7 +2100,7 @@ void start_dismantle_building(room_data *loc);
 int get_room_scale_level(room_data *room, char_data *targ);
 
 // eedit.c
-bool check_banner_color_string(char *str);
+bool check_banner_color_string(char *str, bool allow_neutral_color, bool allow_underline);
 bool check_unique_empire_name(empire_data *for_emp, char *name);
 char empire_banner_to_mapout_token(const char *banner);
 bool valid_rank_name(char_data *ch, char *newname);
