@@ -3019,7 +3019,7 @@ SHOW(show_inventory) {
 	bool all = FALSE, loaded;
 	char_data *load;
 	size_t size, lsize;
-	int count, pos;
+	int count, pos, players;
 	
 	half_chop(argument, arg1, arg2);
 	all = !str_cmp(arg2, "all") || !str_cmp(arg2, "-all");
@@ -3036,6 +3036,7 @@ SHOW(show_inventory) {
 	else {
 		timer = microtime();
 		size = snprintf(buf, sizeof(buf), "Searching%s inventories for %d %s:\r\n", (all ? " all" : ""), vnum, get_obj_name_by_proto(vnum));
+		players = 0;
 		HASH_ITER(idnum_hh, player_table_by_idnum, index, next_index) {
 			// determine if we should load them
 			if (!all && (time(0) - index->last_logon) > 60 * SECS_PER_REAL_DAY) {
@@ -3073,6 +3074,7 @@ SHOW(show_inventory) {
 			
 			// build text
 			lsize = snprintf(line, sizeof(line), "%s: %d\r\n", index->fullname, count);
+			++players;
 			
 			if (size + lsize + 10 < sizeof(buf)) {
 				strcat(buf, line);
@@ -3084,7 +3086,7 @@ SHOW(show_inventory) {
 			}
 		}
 		
-		lsize = snprintf(line, sizeof(line), "(%.2f seconds for search)\r\n", (microtime() - timer) / 1000000.0);
+		lsize = snprintf(line, sizeof(line), "(%d player%s, %.2f seconds for search)\r\n", players, PLURAL(players), (microtime() - timer) / 1000000.0);
 		if (size + lsize < sizeof(buf)) {
 			strcat(buf, line);
 		}
