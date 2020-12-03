@@ -3058,7 +3058,7 @@ SHOW(show_inventory) {
 			}
 			
 			DL_FOREACH(GET_HOME_STORAGE(load), eus) {
-				if (eus->obj) {
+				if (eus->obj && GET_OBJ_VNUM(eus->obj) == vnum) {
 					count += eus->amount;
 					// does not have contents in home storage
 				}
@@ -3066,6 +3066,9 @@ SHOW(show_inventory) {
 			
 			if (loaded) {
 				free_char(load);
+			}
+			if (count <= 0) {
+				continue;	// nothing to show
 			}
 			
 			// build text
