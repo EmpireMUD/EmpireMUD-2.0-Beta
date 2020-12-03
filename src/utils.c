@@ -2829,6 +2829,9 @@ char *get_mob_name_by_proto(mob_vnum vnum, bool replace_placeholders) {
 int count_objs_by_vnum(obj_vnum vnum, obj_data *list) {
 	int count = 0;
 	
+	if (!list) {
+		return 0;
+	}
 	if (GET_OBJ_VNUM(list) == vnum) {
 		++count;
 	}

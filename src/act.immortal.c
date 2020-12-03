@@ -3053,7 +3053,9 @@ SHOW(show_inventory) {
 					count += count_objs_by_vnum(vnum, GET_EQ(load, pos));
 				}
 			}
-			count += count_objs_by_vnum(vnum, load->carrying);
+			if (load->carrying) {
+				count += count_objs_by_vnum(vnum, load->carrying);
+			}
 			
 			DL_FOREACH(GET_HOME_STORAGE(load), eus) {
 				if (eus->obj) {
