@@ -1012,6 +1012,7 @@ if %target.morph%
   halt
 end
 if %actor.on_quest(16617)%
+  set questnum 16617
   if %target.vnum% != 223
     %send% %actor% You're looking for a terrier to dress up.
     halt
@@ -1028,11 +1029,19 @@ if %actor.on_quest(16617)%
   end
 end
 if %actor.on_quest(16618)%
-  if %target.is_pc% || %target.pc_name.car% != horse
-    %send% %actor% You're going to need a horse for this outfit.
+  set questnum 16618
+  set horse_list horse warhose
+  set camel_list camel warcamel
+  if %target.is_pc% || !(%horse_list% ~= %target.pc_name.car% || %camel_list% ~= %target.pc_name.car%)
+    %send% %actor% You're going to need a horse or camel for this outfit.
     halt
   else
-    set morphnum 16618
+    * determine morph num
+    if (%horse_list% ~= %target.pc_name.car%)
+      set morphnum 16618
+    else
+      set morphnum 16619
+    end
     if !%self.varexists(dress_up_counter)%
       set dress_up_counter 5
     else
@@ -1047,10 +1056,10 @@ eval dress_up_counter %dress_up_counter% - 1
 if %dress_up_counter% > 0
   remote dress_up_counter %self.id%
 else
-  %quest% %actor% trigger %morphnum%
+  %quest% %actor% trigger %questnum%
 end
-if %actor.quest_finished(%morphnum%)%
-  %quest% %actor% finish %morphnum%
+if %actor.quest_finished(%questnum%)%
+  %quest% %actor% finish %questnum%
   %purge% %self%
 end
 ~

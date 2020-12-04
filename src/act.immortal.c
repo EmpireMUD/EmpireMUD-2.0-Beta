@@ -3010,6 +3010,92 @@ SHOW(show_homeless) {
 }
 
 
+SHOW(show_inventory) {
+	char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH], line[256];
+	player_index_data *index, *next_index;
+	struct empire_unique_storage *eus;
+	unsigned long long timer;
+	obj_vnum vnum;
+	bool all = FALSE, loaded;
+	char_data *load;
+	size_t size, lsize;
+	int count, pos, players;
+	
+	half_chop(argument, arg1, arg2);
+	all = !str_cmp(arg2, "all") || !str_cmp(arg2, "-all");
+	
+	if (!ch->desc) {
+		// don't bother
+	}
+	else if (!*arg1 || !isdigit(*arg1) || (*arg2 && !all)) {
+		msg_to_char(ch, "Usage: show inventory <obj vnum> [all]\r\n");
+	}
+	else if ((vnum = atoi(arg1)) < 0 || !obj_proto(vnum)) {
+		msg_to_char(ch, "Unknown object vnum '%s'.\r\n", arg1);
+	}
+	else {
+		timer = microtime();
+		size = snprintf(buf, sizeof(buf), "Searching%s inventories for %d %s:\r\n", (all ? " all" : ""), vnum, get_obj_name_by_proto(vnum));
+		players = 0;
+		HASH_ITER(idnum_hh, player_table_by_idnum, index, next_index) {
+			// determine if we should load them
+			if (!all && (time(0) - index->last_logon) > 60 * SECS_PER_REAL_DAY) {
+				continue;	// skip due to timeout
+			}
+			if (!(load = find_or_load_player(index->name, &loaded))) {
+				continue;	// no player
+			}
+			
+			// determine if they have any
+			check_delayed_load(load);
+			count = 0;
+			for (pos = 0; pos < NUM_WEARS; ++pos) {
+				if (GET_EQ(load, pos)) {
+					count += count_objs_by_vnum(vnum, GET_EQ(load, pos));
+				}
+			}
+			if (load->carrying) {
+				count += count_objs_by_vnum(vnum, load->carrying);
+			}
+			
+			DL_FOREACH(GET_HOME_STORAGE(load), eus) {
+				if (eus->obj && GET_OBJ_VNUM(eus->obj) == vnum) {
+					count += eus->amount;
+					// does not have contents in home storage
+				}
+			}
+			
+			if (loaded) {
+				free_char(load);
+			}
+			if (count <= 0) {
+				continue;	// nothing to show
+			}
+			
+			// build text
+			lsize = snprintf(line, sizeof(line), "%s: %d\r\n", index->fullname, count);
+			++players;
+			
+			if (size + lsize + 10 < sizeof(buf)) {
+				strcat(buf, line);
+				size += lsize;
+			}
+			else {	// full
+				size += snprintf(buf + size, sizeof(buf) - size, "OVERFLOW\r\n");
+				break;
+			}
+		}
+		
+		lsize = snprintf(line, sizeof(line), "(%d player%s, %.2f seconds for search)\r\n", players, PLURAL(players), (microtime() - timer) / 1000000.0);
+		if (size + lsize < sizeof(buf)) {
+			strcat(buf, line);
+		}
+		
+		page_string(ch->desc, buf, TRUE);
+	}
+}
+
+
 // for show_islands	
 struct show_island_data {
 	int island;
@@ -9885,6 +9971,7 @@ ACMD(do_show) {
 		{ "spawns", LVL_START_IMM, show_spawns },
 		{ "ignoring", LVL_START_IMM, show_ignoring },
 		{ "workforce", LVL_START_IMM, show_workforce },
+		{ "inventory", LVL_START_IMM, show_inventory },
 		{ "islands", LVL_START_IMM, show_islands },
 		{ "variables", LVL_START_IMM, show_variables },
 		{ "components", LVL_START_IMM, show_components },

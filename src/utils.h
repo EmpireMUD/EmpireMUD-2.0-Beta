@@ -1775,6 +1775,7 @@ void syslog(bitvector_t type, int level, bool file, const char *str, ...) __attr
 char *get_mob_name_by_proto(mob_vnum vnum, bool replace_placeholders);
 
 // object functions from utils.c
+int count_objs_by_vnum(obj_vnum vnum, obj_data *list);
 char *get_obj_name_by_proto(obj_vnum vnum);
 obj_data *get_top_object(obj_data *obj);
 double rate_item(obj_data *obj);

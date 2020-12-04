@@ -1099,6 +1099,7 @@ dropped    Immort   Shows all items an empire has on the ground.
 factions   Immort   Shows a player's faction levels.
 homeless   Immort   Shows the homeless citizen list for an empire.
 ignoring   Immort   Shows you who a player has on their ignore list.
+inventory  Immort   Shows how many players have a certain item.
 islands    Immort   Shows you which island ids have empire storage (for MOVEEINV).
 lastnames  Immort   Shows target player's lastname list.
 learned    Immort   Shows you learned recipes.
@@ -1219,6 +1220,16 @@ Usage:  show ignoring <player name>
 Shows you who a player is ignoring.
 
 See also: IGNORE, SHOW
+#e
+"SHOW INVENTORY"
+
+Usage:  show inventory <obj vnum> [all]
+
+Searches all players, including offline ones, to see how many of a certain
+object they have in their inventory, equipment, and home storage.
+
+Without the "all" argument, only checks players that have been online in the
+last two months.
 #e
 "SHOW ISLANDS"
 

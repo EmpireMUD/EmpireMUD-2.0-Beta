@@ -196,11 +196,11 @@ S
 outfit reindeer set~
 a reindeer outfit set~
 Some reindeer outfits lay here empty.~
-   This reindeer outfit is sized for a horse and has been used before given the
-hairs on the inside.
-Usage: dress horse
+   This reindeer outfit is sized for a horse or camel and has been used before,
+given the hairs on the inside.
+Usage: dress <horse | camel>
 ~
-3 k a 0 5
+3 k a 0 6
 0 0 0
 11 0
 Q 16618
@@ -643,7 +643,7 @@ S
 omni-tool omnitool tool elfish silver~
 a silver elfish omni-tool~
 An elfish omni-tool is lying here.~
-   This little device is small, but made by a master elfish silversmith. 
+   This little device is small, but made by a master elfish silversmith.
 Flecks of brightly colored paint decorate each part of the tool, no doubt the
 result of centuries of toymaking.
 ~

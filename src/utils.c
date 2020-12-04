@@ -2821,6 +2821,31 @@ char *get_mob_name_by_proto(mob_vnum vnum, bool replace_placeholders) {
 //// OBJECT UTILS ////////////////////////////////////////////////////////////
 
 /**
+* Count how many of a vnum there are in a set of objs.
+*
+* @param obj_vnum vnum The object to look for/count.
+* @param obj_Data *list One or more objects in a "next_content" list.
+*/
+int count_objs_by_vnum(obj_vnum vnum, obj_data *list) {
+	int count = 0;
+	
+	if (!list) {
+		return 0;
+	}
+	if (GET_OBJ_VNUM(list) == vnum) {
+		++count;
+	}
+	if (list->contains) {
+		count += count_objs_by_vnum(vnum, list->contains);
+	}
+	if (list->next_content) {
+		count += count_objs_by_vnum(vnum, list->next_content);
+	}
+	return count;
+}
+
+
+/**
 * Finds a portal in the room with a given destination.
 *
 * @param room_data *room The room to start in.

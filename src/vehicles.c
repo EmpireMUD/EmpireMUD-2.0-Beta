@@ -2343,6 +2343,11 @@ vehicle_data *unstore_vehicle_from_file(FILE *fl, any_vnum vnum, char *error_str
 			exit(1);
 		}
 		
+		if (!strn_cmp(line, "Vehicle-end", 11)) {
+			// this MUST be before seek_end
+			end = TRUE;
+			continue;
+		}
 		if (seek_end) {
 			// are we looking for the end of the vehicle? ignore this line
 			// WARNING: don't put any ifs that require "veh" above seek_end; obj is not guaranteed
@@ -2658,9 +2663,6 @@ vehicle_data *unstore_vehicle_from_file(FILE *fl, any_vnum vnum, char *error_str
 						create_script_data(veh, VEH_TRIGGER);
 					}
 					add_var(&(SCRIPT(veh)->global_vars), s_in, line, i_in[0]);
-				}
-				else if (!strn_cmp(line, "Vehicle-end", 11)) {
-					end = TRUE;
 				}
 				BAD_TAG_WARNING(line)
 				break;

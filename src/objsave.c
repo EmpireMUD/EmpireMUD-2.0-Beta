@@ -125,6 +125,11 @@ obj_data *Obj_load_from_file(FILE *fl, obj_vnum vnum, int *location, char_data *
 			exit(1);
 		}
 		
+		if (!str_cmp(line, "End")) {
+			// this MUST be before seek_end
+			end = TRUE;
+			continue;
+		}
 		if (seek_end) {
 			// are we looking for the end of the object? ignore this line
 			// WARNING: don't put any ifs that require "obj" above seek_end; obj is not guaranteed
@@ -250,9 +255,6 @@ obj_data *Obj_load_from_file(FILE *fl, obj_vnum vnum, int *location, char_data *
 					if (sscanf(line + 8, "%d %d", &i_in[0], &i_in[1]) == 2) {
 						add_obj_to_eq_set(obj, i_in[0], i_in[1]);
 					}
-				}
-				else if (!strn_cmp(line, "End", 3)) {
-					end = TRUE;
 				}
 				BAD_TAG_WARNING(line)
 				break;
