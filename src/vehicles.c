@@ -1325,7 +1325,7 @@ void update_vehicle_island_and_loc(vehicle_data *veh, room_data *loc) {
 	}
 	
 	LL_FOREACH(VEH_ROOM_LIST(veh), vrl) {
-		if (GET_ISLAND_ID(vrl->room) != GET_ISLAND_ID(loc)) {
+		if (GET_ISLAND_ID(vrl->room) != GET_ISLAND_ID(loc) || GET_ISLAND(vrl->room) != GET_ISLAND(loc) || GET_MAP_LOC(vrl->room) != GET_MAP_LOC(loc)) {
 			GET_ISLAND_ID(vrl->room) = GET_ISLAND_ID(loc);
 			GET_ISLAND(vrl->room) = GET_ISLAND(loc);
 			GET_MAP_LOC(vrl->room) = GET_MAP_LOC(loc);
