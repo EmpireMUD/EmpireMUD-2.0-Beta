@@ -3397,6 +3397,11 @@ struct empire_homeless_citizen *find_homeless_citizen(empire_data *emp, struct m
 	
 	int homeless_citizen_speed = config_get_int("homeless_citizen_speed");	// tiles per minute
 	
+	// sanity first
+	if (!emp || !loc) {
+		return NULL;
+	}
+	
 	LL_FOREACH(EMPIRE_HOMELESS_CITIZENS(emp), ehc) {
 		if (with_vnum != NOTHING && ehc->vnum != with_vnum) {
 			continue;	// doesn't match required vnum
