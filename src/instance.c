@@ -2130,7 +2130,9 @@ void remove_instance_fake_loc(struct instance_data *inst) {
 				GET_ISLAND(INST_ROOM(inst, iter)) = INST_FAKE_LOC(inst) ? GET_ISLAND(INST_FAKE_LOC(inst)) : NULL;
 				request_world_save(GET_ROOM_VNUM(INST_ROOM(inst, iter)), WSAVE_ROOM);
 			}
-			GET_MAP_LOC(INST_ROOM(inst, iter)) = INST_FAKE_LOC(inst) ? GET_MAP_LOC(INST_FAKE_LOC(inst)) : NULL;
+			if (INST_ROOM(inst, iter)) {
+				GET_MAP_LOC(INST_ROOM(inst, iter)) = INST_FAKE_LOC(inst) ? GET_MAP_LOC(INST_FAKE_LOC(inst)) : NULL;
+			}
 		}
 	}
 	
@@ -2174,7 +2176,9 @@ void set_instance_fake_loc(struct instance_data *inst, room_data *loc) {
 			GET_ISLAND(INST_ROOM(inst, iter)) = INST_FAKE_LOC(inst) ? GET_ISLAND(INST_FAKE_LOC(inst)) : NULL;
 			request_world_save(GET_ROOM_VNUM(INST_ROOM(inst, iter)), WSAVE_ROOM);
 		}
-		GET_MAP_LOC(INST_ROOM(inst, iter)) = INST_FAKE_LOC(inst) ? GET_MAP_LOC(INST_FAKE_LOC(inst)) : NULL;
+		if (INST_ROOM(inst, iter)) {
+			GET_MAP_LOC(INST_ROOM(inst, iter)) = INST_FAKE_LOC(inst) ? GET_MAP_LOC(INST_FAKE_LOC(inst)) : NULL;
+		}
 	}
 	
 	need_instance_save = TRUE;
@@ -2495,7 +2499,9 @@ static void renum_instances(void) {
 					GET_ISLAND(INST_ROOM(inst, iter)) = GET_ISLAND(INST_FAKE_LOC(inst));
 					request_world_save(GET_ROOM_VNUM(INST_ROOM(inst, iter)), WSAVE_ROOM);
 				}
-				GET_MAP_LOC(INST_ROOM(inst, iter)) = GET_MAP_LOC(INST_FAKE_LOC(inst));
+				if (INST_ROOM(inst, iter)) {
+					GET_MAP_LOC(INST_ROOM(inst, iter)) = GET_MAP_LOC(INST_FAKE_LOC(inst));
+				}
 			}
 		}
 		
