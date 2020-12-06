@@ -1229,9 +1229,6 @@ void script_modify(char *argument) {
 			set_obj_long_desc(obj, clear ? NULL : value);
 		}
 		else if (is_abbrev(field_arg, "lookdescription")) {	// SETS the lookdescription
-			if (GET_OBJ_ACTION_DESC(obj) && (!o_proto || GET_OBJ_ACTION_DESC(obj) != GET_OBJ_ACTION_DESC(o_proto))) {
-				free(GET_OBJ_ACTION_DESC(obj));
-			}
 			strcat(value, "\r\n");
 			set_obj_look_desc(obj, clear ? NULL : value, !clear);
 		}
