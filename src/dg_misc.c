@@ -1135,7 +1135,7 @@ void script_modify(char *argument) {
 	vehicle_data *veh = NULL;
 	struct companion_data *cd;
 	char_data *mob = NULL;
-	obj_data *obj = NULL, *o_proto;
+	obj_data *obj = NULL;
 	room_data *room = NULL;
 	bool clear;
 	int pos;
@@ -1220,8 +1220,6 @@ void script_modify(char *argument) {
 	}
 	// OBJECT MODE
 	else if ((obj = get_obj(targ_arg))) {
-		o_proto = obj_proto(GET_OBJ_VNUM(obj));
-		
 		if (is_abbrev(field_arg, "keywords")) {
 			set_obj_keywords(obj, clear ? NULL : value);
 		}
