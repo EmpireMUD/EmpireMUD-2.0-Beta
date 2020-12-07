@@ -401,6 +401,67 @@ would fool any Who, but it looks adorable.
 T 9901
 T 9902
 S
+#16675
+#n~
+#n~
+#n is dancing to the music.
+~
+20 20 bdov n 3
+0 0 0 15
+D
+This cheerful citizen seems to be having a great time!
+~
+T 16675
+S
+#16676
+dogs prancing group~
+a group of prancing dogs~
+A group of dogs are prancing around.
+~
+20 20 bdo nG 3
+0 0 0 15
+D
+The dogs are prancing around to the music, almost as if they're dancing!
+~
+M
+0
+One of the dogs is barking and you could swear the rhythm is "Jingle Bells"...~
+M
+0
+Two of the dogs spin around each other until it makes you dizzy!~
+M
+0
+One of the dogs puts its paws up on you and dances with you!~
+M
+0
+Some of the dogs roll over together, then jump up and start dancing!~
+S
+#16677
+orphans group~
+a group of orphans~
+A group of orphans is dancing around.
+~
+20 20 bdo nG 3
+0 0 0 15
+D
+The orphans are dancing around, having a good time.
+~
+M
+0
+The orphans dance arm-in-arm in a big circle.~
+M
+0
+Some of the orphans belt out a festive song.~
+M
+0
+The orphans dance around you.~
+M
+0
+The orphans dance in a circle around you.~
+M
+0
+Everyone is singing holiday carols.~
+S
 #16698
 raven enchanted~
 an enchanted raven~

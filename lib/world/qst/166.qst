@@ -599,4 +599,59 @@ W
 Z
 4 16628
 S
+#16676
+Winter Wonderland: Cheer for the City~
+   Take this tambourine and go around your city, playing it for 10 of your
+citizens until they catch the holiday spirit and start dancing! This should
+lift everyone's spirits and bring cheer to the entire city. Just hold the
+tambourine (or any instrument) and play music in front of each citizen.
+~
+You've lifted everyone's holiday spirit!
+~
+17 e 0 0 -1
+A
+1 10701
+D 16676
+P
+36 10700 0 1 a
+R
+9 10700 10
+R
+2 16659 1
+T 16602
+W
+36 10700 0 1 a
+W
+11 0 0 1 a
+Z
+4 16677
+S
+#16677
+Winter Wonderland: Charity Concert~
+   Take these sleigh bells, return to your city, and lift everyone's holiday
+spirits by playing charity concerts at 4 different shrines, temples, statues,
+or other dedicate-able buildings. Any building that can be dedicated will do.
+Just hold the sleigh bells (or any instrument) and play music at each of the 4
+buildings.
+~
+Through the gift of charity, you've lifted everyone's holiday spirit!
+~
+17 e 0 0 -1
+A
+1 10701
+D 16676
+P
+36 10700 0 1 a
+R
+9 10700 10
+R
+2 16659 1
+T 16602
+W
+36 10700 0 1 a
+W
+11 0 0 1 a
+Z
+4 16677
+S
 $
