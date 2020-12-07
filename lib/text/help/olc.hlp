@@ -4661,6 +4661,7 @@ The following morph flags are available:
  CONSUME-OBJ - Will use up the requiresobj to morph.
  !FASTMORPH - This morph won't work with 'fastmorph'.
  !MORPH-MESSAGE - Shows no message to the room when forced to un-morph.
+ HIDE-REAL-NAME - Never shows real name on 'look'.
 
 See also: OLC MORPHS
 #d
