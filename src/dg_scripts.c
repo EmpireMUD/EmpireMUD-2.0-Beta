@@ -5449,6 +5449,23 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					}
 					break;
 				}
+				case 'f': {	// veh.f*
+					if (!str_cmp(field, "function")) {
+						if (subfield && *subfield) {
+							bitvector_t pos = search_block(subfield, function_flags, FALSE);
+							if (pos != NOTHING) {
+								snprintf(str, slen, "%d", vehicle_has_function_and_city_ok(v, BIT(pos)) ? 1 : 0);
+							}
+							else {
+								snprintf(str, slen, "0");
+							}
+						}
+						else {
+							snprintf(str, slen, "0");
+						}
+					}
+					break;
+				}
 				case 'h': {	// veh.h*
 					if (!str_cmp(field, "harness")) {
 						if (subfield && *subfield && VEH_ANIMALS_REQUIRED(v) < count_harnessed_animals(v)) {

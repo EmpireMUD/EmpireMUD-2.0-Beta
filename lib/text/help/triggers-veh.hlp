@@ -102,6 +102,7 @@ When using field  - The variable returns:
 &cempire_id&0 - ID of the empire that owns the vehicle, if any.
 &cempire_name&0 - The name of the empire that owns the vehicle, if any.
 &cextinguish&0 - If the vehicle is on fire, puts it out.
+&cfunction(FLAG)&0 - If the vehicle has a function on it.
 &charness(mob)&0 - Harnesses a mob to the vehicle (or loads and harnesses one if
    you give a vnum instead of a mob).
 &chas_in(str)&0 - True if an object with a given name/vnum is inside.
@@ -135,6 +136,6 @@ When using field  - The variable returns:
 &cvarexists()&0 - Returns 1 if global variable in subfield exists, 0 if not.
 &cvnum&0 - The vehicle's vnum.
 
-See also: EMPIRE VARS, VEDIT FLAGS
+See also: EMPIRE VARS, VEDIT FLAGS, FUNCTION FLAGS
 #d
 $~
