@@ -1881,6 +1881,7 @@ switch %questid%
           eval music_count %music_count% + 1
           %echo% ~%person% starts dancing!
           attach 16675 %person.id%
+          %morph% %person% 16675
           eval loss %%random.%music_score%%%
           eval music_score %music_score% - %loss%
         end
@@ -1890,6 +1891,7 @@ switch %questid%
     if %any%
       remote music_count %self.id%
       remote music_score %self.id%
+      %send% %actor% (That's %music_count%!)
     else
       eval music_score %music_score% + 25
       remote music_score %self.id%
