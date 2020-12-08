@@ -4182,7 +4182,7 @@ void update_world_index(room_vnum vnum, char value) {
 	}
 	
 	// make the update if possible
-	if (vnum >= 0) {
+	if (vnum >= 0 && world_index_data[vnum] != value) {
 		world_index_data[vnum] = value;
 		
 		// and trigger a file save
@@ -4218,6 +4218,10 @@ void write_binary_world_index_updates(void) {
 	int max_vnum = 0, top_vnum = 0;
 	char tmp, zero = 0;
 	FILE *fl;
+	
+	if (!binary_world_index_updates) {
+		return;	// shortcut/no work
+	}
 	
 	if (!(fl = fopen(BINARY_WORLD_INDEX, "r+b"))) {
 		log("write_binary_world_index_updates: %s doesn't exist, writing fresh one", BINARY_WORLD_INDEX);
