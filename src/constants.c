@@ -4293,6 +4293,7 @@ const char *morph_flags[] = {
 	"CONSUME-OBJ",	// 10
 	"!FASTMORPH",
 	"!MORPH-MESSAGE",
+	"HIDE-REAL-NAME",
 	"\n"
 };
 

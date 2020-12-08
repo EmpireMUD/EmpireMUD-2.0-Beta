@@ -200,6 +200,12 @@ switch %questvnum%
     set PlayerOnAbominableQuest %actor%
     remote PlayerOnAbominableQuest %SnowmanInRoomID%
   break
+  case 16676
+    %load% obj 16676 %actor% inv
+  break
+  case 16677
+    %load% obj 16677 %actor% inv
+  break
 done
 ~
 #16603
@@ -1809,6 +1815,148 @@ else
 end
 return 1
 %purge% %self%
+~
+#16675
+Citizen dances~
+0 bw 50
+~
+switch %random.5%
+  case 1
+    %echo% ~%self% dances around!
+  break
+  case 2
+    %echo% ~%self% sings along!
+  break
+  case 3
+    %echo% ~%self% twirls around with glee!
+  break
+  case 4
+    %echo% ~%self% leaps around as &%self% dances!
+  break
+  case 5
+    %echo% ~%self% stomps to the beat!
+  break
+done
+~
+#16676
+Winter Wonderland music quests: play~
+1 c 3
+play~
+return 0
+set music_score 0
+remote music_score %self.id%
+if !%self.varexists(music_count)%
+  set music_count 0
+  remote music_count %self.id%
+end
+if !%self.has_trigger(16677)%
+  attach 16677 %self.id%
+end
+~
+#16677
+Winter Wonderland music quests: detect playing~
+1 b 100
+~
+set questid %self.vnum%
+if %self.carried_by%
+  set actor %self.carried_by%
+else if %self.worn_by%
+  set actor %self.worn_by%
+end
+if %actor.action% != playing
+  detach 16677 %self.id%
+  halt
+end
+set music_score %self.music_score%
+set music_count %self.music_count%
+switch %questid%
+  case 16676
+    * 10x citizens must dance
+    set any 0
+    set person %self.room.people%
+    while %person%
+      if %music_score% >= %random.100%
+        if %person.is_npc% && !%person.disabled% && %person.empire% == %actor.empire% && %person.mob_flagged(SPAWNED)% && %person.mob_flagged(HUMAN)% && !%person.has_trigger(16675)%
+          set any 1
+          eval music_count %music_count% + 1
+          %echo% ~%person% starts dancing!
+          attach 16675 %person.id%
+          %morph% %person% 16675
+          eval loss %%random.%music_score%%%
+          eval music_score %music_score% - %loss%
+        end
+      end
+      set person %person.next_in_room%
+    done
+    if %any%
+      remote music_count %self.id%
+      remote music_score %self.id%
+      %send% %actor% (That's %music_count%!)
+    else
+      eval music_score %music_score% + 25
+      remote music_score %self.id%
+    end
+    * check done
+    if %music_count% >= 10
+      %quest% %actor% trigger %questid%
+    end
+  break
+  case 16677
+    * 4x dedicate buildings
+    set room %actor.room%
+    * check already played here
+    set mob %room.people%
+    while %mob%
+      if %mob.vnum% >= 16675 && %mob.vnum% <= 16677
+        halt
+      end
+      set mob %mob.next_in_room%
+    done
+    * ensure dedicate here
+    set any 0
+    if %room.bld_flagged(DEDICATE)% && %actor.canuseroom_member(%room%)%
+      set any 1
+    else if %room.in_vehicle% && %actor.empire% == %room.in_vehicle.empire%
+      if %room.in_vehicle.is_flagged(DEDICATE)%
+        set any 1
+      end
+    end
+    if !%any%
+      set veh %room.vehicles%
+      while %veh% && !%any%
+        if %veh.is_flagged(DEDICATE)% && %actor.empire% == %veh.empire%
+          set any 1
+        end
+        set veh %veh.next_in_room%
+      done
+    end
+    if !%any%
+      %send% %actor% You need to play the instrument at a dedicate-able building.
+      halt
+    end
+    * check music score
+    if %music_score% >= %random.100%
+      * success!
+      eval mobv 16674 + %random.3%
+      %load% mob %mobv%
+      eval mobv 16674 + %random.3%
+      %load% mob %mobv%
+      eval music_count %music_count% + 1
+      remote music_count %self.id%
+      %send% %actor% Your music has drawn a crowd (that's %music_count%)!
+      %echoaround% %actor% |%actor% music has drawn a crowd!
+    else
+      eval music_score %music_score% + 25
+      remote music_score %self.id%
+    end
+    if %music_count% >= 4
+      %quest% %actor% trigger %questid%
+    end
+  break
+done
+if %actor.quest_finished(%questid%)%
+  %quest% %actor% finish %questid%
+end
 ~
 #16695
 Capture nordlys in jar~
