@@ -911,8 +911,11 @@ void objpack_load_room(room_data *room, bool use_pre_b5_116_dir) {
 	}
 
 	if (!(fl = fopen(fname, "r"))) {
-		if (errno != ENOENT) {
-			log("SYSERR: READING OBJECT FILE %s (5): %s", fname, strerror(errno));
+		if (errno == ENOENT) {
+			log("SYSERR: Unable to find expected pack file: %s", fname);
+		}
+		else {
+			log("SYSERR: READING PACK FILE %s (5): %s", fname, strerror(errno));
 		}
 		return;
 	}

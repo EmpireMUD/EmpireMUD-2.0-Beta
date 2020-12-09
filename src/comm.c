@@ -985,15 +985,17 @@ void heartbeat(unsigned long heart_pulse) {
 		
 		write_mapout_updates();
 		HEARTBEAT_LOG("39")
-		
-		write_binary_world_index_updates();
-		HEARTBEAT_LOG("40")
 	}
 
 	/* Every pulse! Don't want them to stink the place up... */
+	write_binary_world_index_updates();
+	HEARTBEAT_LOG("40")
 	extract_pending_chars();
+	HEARTBEAT_LOG("41")
 	extract_pending_vehicles();
+	HEARTBEAT_LOG("42")
 	free_freeable_triggers();
+	HEARTBEAT_LOG("43")
 
 	/* Turn this off */
 	gain_cond_message = FALSE;

@@ -63,7 +63,7 @@ void grow_crop(struct map_data *map);
 void init_room(room_data *room, room_vnum vnum);
 int naturalize_newbie_island(struct map_data *tile, bool do_unclaim);
 int sort_empire_islands(struct empire_island *a, struct empire_island *b);
-bool write_map_and_room_to_file(room_data *room, struct map_data *map, bool force_obj_pack);
+bool write_map_and_room_to_file(room_vnum vnum, bool force_obj_pack);
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -478,7 +478,6 @@ void delete_room(room_data *room, bool check_exits) {
 	char_data *c, *next_c;
 	obj_data *o, *next_o;
 	empire_data *emp;
-	char fname[256];
 	int iter;
 	
 	// this blocks deleting map rooms unless they can be unloaded (or the mud is being shut down)
@@ -498,20 +497,10 @@ void delete_room(room_data *room, bool check_exits) {
 	}
 	
 	check_dg_owner_purged_room(room);
-	update_world_index(GET_ROOM_VNUM(room), 0);
 	
-	// attempt to delete wld save files (unless shutting down)
-	if (!block_all_saves_due_to_shutdown) {
-		get_world_filename(fname, GET_ROOM_VNUM(room), WLD_SUFFIX);
-		if (access(fname, F_OK) == 0) {
-			unlink(fname);
-		}
-		get_world_filename(fname, GET_ROOM_VNUM(room), SUF_PACK);
-		if (access(fname, F_OK) == 0) {
-			unlink(fname);
-		}
-	}
-	
+	// this will ensure any map data is still saved and will update the world index, while also deleting the world file
+	request_world_save(GET_ROOM_VNUM(room), WSAVE_MAP | WSAVE_ROOM);
+		
 	// delete this first
 	if (ROOM_UNLOAD_EVENT(room)) {
 		dg_event_cancel(ROOM_UNLOAD_EVENT(room), cancel_room_event);
@@ -4075,7 +4064,7 @@ void perform_requested_world_saves(void) {
 			REMOVE_BIT(iter->save_type, WSAVE_MAP);
 		}
 		if (IS_SET(iter->save_type, WSAVE_ROOM)) {
-			write_map_and_room_to_file(real_real_room(iter->vnum), NULL, FALSE);
+			write_map_and_room_to_file(iter->vnum, FALSE);
 			REMOVE_BIT(iter->save_type, WSAVE_ROOM);
 		}
 		
@@ -4182,7 +4171,7 @@ void update_world_index(room_vnum vnum, char value) {
 	}
 	
 	// make the update if possible
-	if (vnum >= 0) {
+	if (vnum >= 0 && world_index_data[vnum] != value) {
 		world_index_data[vnum] = value;
 		
 		// and trigger a file save
@@ -4200,7 +4189,7 @@ void write_all_wld_files(void) {
 	room_data *room, *next_room;
 	
 	HASH_ITER(hh, world_table, room, next_room) {
-		write_map_and_room_to_file(room, NULL, TRUE);
+		write_map_and_room_to_file(GET_ROOM_VNUM(room), TRUE);
 	}
 	
 	// no need to save any more room updates
@@ -4218,6 +4207,10 @@ void write_binary_world_index_updates(void) {
 	int max_vnum = 0, top_vnum = 0;
 	char tmp, zero = 0;
 	FILE *fl;
+	
+	if (!binary_world_index_updates || block_all_saves_due_to_shutdown) {
+		return;	// shortcut/no work
+	}
 	
 	if (!(fl = fopen(BINARY_WORLD_INDEX, "r+b"))) {
 		log("write_binary_world_index_updates: %s doesn't exist, writing fresh one", BINARY_WORLD_INDEX);
@@ -4279,11 +4272,10 @@ void write_binary_world_index_updates(void) {
 * @param bool force_obj_pack If TRUE, will always write the obj/veh pack, if one exists, rather than skipping it if already written.
 * @return bool TRUE if it wrote a file, FALSE if it did not.
 */
-bool write_map_and_room_to_file(room_data *room, struct map_data *map, bool force_obj_pack) {
-	room_vnum vnum = (map ? map->vnum : (room ? GET_ROOM_VNUM(room) : NOTHING));
-	struct shared_room_data *shared = (map ? map->shared : (room ? SHARED_DATA(room) : NULL));
-	struct room_extra_data *red, *next_red;
+bool write_map_and_room_to_file(room_vnum vnum, bool force_obj_pack) {
 	char temp[MAX_STRING_LENGTH], fname[256];
+	struct shared_room_data *shared;
+	struct room_extra_data *red, *next_red;
 	struct depletion_data *dep;
 	struct track_data *track, *next_track;
 	struct room_direction_data *ex;
@@ -4291,6 +4283,8 @@ bool write_map_and_room_to_file(room_data *room, struct map_data *map, bool forc
 	struct resource_data *res;
 	struct trig_var_data *tvd;
 	struct affected_type *af;
+	struct map_data *map;
+	room_data *room;
 	trig_data *trig;
 	char_data *mob, *m_proto;
 	time_t now = time(0);
@@ -4300,16 +4294,10 @@ bool write_map_and_room_to_file(room_data *room, struct map_data *map, bool forc
 		return FALSE;	// very early exit if we couldn't pull a vnum from the args
 	}
 	
-	// grab filename now
-	get_world_filename(fname, vnum, WLD_SUFFIX);
-	
-	// look for map/room if one is not provided
-	if (map && !room) {
-		room = map->room;
-	}
-	if (room && !map && GET_MAP_LOC(room) && GET_MAP_LOC(room)->vnum == GET_ROOM_VNUM(room)) {
-		map = GET_MAP_LOC(room);
-	}
+	// determine what we've got:
+	map = (vnum < MAP_SIZE) ? &world_map[MAP_X_COORD(vnum)][MAP_Y_COORD(vnum)] : NULL;
+	room = (map && map->room) ? map->room : real_real_room(vnum);
+	shared = (map ? map->shared : (room ? SHARED_DATA(room) : NULL));
 	
 	// cancel map/room if there's nothing to save for them
 	if (room && CAN_UNLOAD_MAP_ROOM(room)) {	// but actually skip the room if it's unloadable
@@ -4320,17 +4308,20 @@ bool write_map_and_room_to_file(room_data *room, struct map_data *map, bool forc
 	}
 	
 	// do we (still) have anything to save
+	if (!room) {
+		// delete pack file if no room
+		get_world_filename(fname, vnum, SUF_PACK);
+		if (access(fname, F_OK) == 0) {
+			unlink(fname);
+		}
+	}
 	if (!map && !room) {
 		// yank from index
 		update_world_index(vnum, 0);
 		
-		// delete old file if we're not saving
+		// delete wld file if we're not saving at all
 		if (!block_all_saves_due_to_shutdown) {
-			if (access(fname, F_OK) == 0) {
-				unlink(fname);
-			}
-			// also delete pack file?
-			get_world_filename(fname, vnum, SUF_PACK);
+			get_world_filename(fname, vnum, WLD_SUFFIX);
 			if (access(fname, F_OK) == 0) {
 				unlink(fname);
 			}
@@ -4542,8 +4533,6 @@ bool write_map_and_room_to_file(room_data *room, struct map_data *map, bool forc
 	fprintf(fl, "End World File\n");
 	fclose(fl);
 	
-	// ensure it's in the wld index
-	update_world_index(vnum, 1);
 	return TRUE;
 }
 
