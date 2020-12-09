@@ -498,7 +498,9 @@ void delete_room(room_data *room, bool check_exits) {
 	}
 	
 	check_dg_owner_purged_room(room);
-	update_world_index(GET_ROOM_VNUM(room), 0);
+	
+	// this will ensure any map data is still saved and will update the world index
+	request_world_save(GET_ROOM_VNUM(room), WSAVE_MAP | WSAVE_ROOM);
 	
 	// attempt to delete wld save files (unless shutting down)
 	if (!block_all_saves_due_to_shutdown) {
@@ -4075,7 +4077,7 @@ void perform_requested_world_saves(void) {
 			REMOVE_BIT(iter->save_type, WSAVE_MAP);
 		}
 		if (IS_SET(iter->save_type, WSAVE_ROOM)) {
-			write_map_and_room_to_file(real_real_room(iter->vnum), NULL, FALSE);
+			write_map_and_room_to_file(real_real_room(iter->vnum), (iter->vnum < MAP_SIZE ? &world_map[MAP_X_COORD(iter->vnum)][MAP_Y_COORD(iter->vnum)] : NULL), FALSE);
 			REMOVE_BIT(iter->save_type, WSAVE_ROOM);
 		}
 		
@@ -4219,7 +4221,7 @@ void write_binary_world_index_updates(void) {
 	char tmp, zero = 0;
 	FILE *fl;
 	
-	if (!binary_world_index_updates) {
+	if (!binary_world_index_updates || block_all_saves_due_to_shutdown) {
 		return;	// shortcut/no work
 	}
 	
@@ -4304,12 +4306,9 @@ bool write_map_and_room_to_file(room_data *room, struct map_data *map, bool forc
 		return FALSE;	// very early exit if we couldn't pull a vnum from the args
 	}
 	
-	// grab filename now
-	get_world_filename(fname, vnum, WLD_SUFFIX);
-	
 	// look for map/room if one is not provided
 	if (map && !room) {
-		room = map->room;
+		room = map->room;	// if any
 	}
 	if (room && !map && GET_MAP_LOC(room) && GET_MAP_LOC(room)->vnum == GET_ROOM_VNUM(room)) {
 		map = GET_MAP_LOC(room);
@@ -4330,6 +4329,7 @@ bool write_map_and_room_to_file(room_data *room, struct map_data *map, bool forc
 		
 		// delete old file if we're not saving
 		if (!block_all_saves_due_to_shutdown) {
+			get_world_filename(fname, vnum, WLD_SUFFIX);
 			if (access(fname, F_OK) == 0) {
 				unlink(fname);
 			}
@@ -4546,8 +4546,6 @@ bool write_map_and_room_to_file(room_data *room, struct map_data *map, bool forc
 	fprintf(fl, "End World File\n");
 	fclose(fl);
 	
-	// ensure it's in the wld index
-	update_world_index(vnum, 1);
 	return TRUE;
 }
 
