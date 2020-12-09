@@ -2749,6 +2749,7 @@ typedef enum {
 #define ROOM_AFF_REPEL_ANIMALS  BIT(21)	// v. animals are prevented from wandering in
 #define ROOM_AFF_NO_WORKFORCE_EVOS  BIT(22)	// w. workforce chores that would evolve the tile don't run
 #define ROOM_AFF_HIDE_REAL_NAME  BIT(23)	// x. won't show the real name after a custom name, like Ruins of a House (Ruins)
+#define ROOM_AFF_MAPOUT_BUILDING  BIT(24)	// y. shows as a building on the mapout (set automatically)
 // NOTE: limit BIT(31) -- This is currently an unsigned int, to save space since there are a lot of rooms in the world
 
 

@@ -5311,7 +5311,10 @@ void write_graphical_map_data(struct map_data *map, FILE *map_fl, FILE *pol_fl) 
 	}
 	
 	// normal map output
-	if (SECT_FLAGGED(sect, SECTF_HAS_CROP_DATA) && map->crop_type) {
+	if (IS_SET(map->shared->affects, ROOM_AFF_MAPOUT_BUILDING)) {
+		fputc('s', map_fl);
+	}
+	else if (SECT_FLAGGED(sect, SECTF_HAS_CROP_DATA) && map->crop_type) {
 		fputc(mapout_color_tokens[GET_CROP_MAPOUT(map->crop_type)], map_fl);
 	}
 	else {
@@ -5324,7 +5327,10 @@ void write_graphical_map_data(struct map_data *map, FILE *map_fl, FILE *pol_fl) 
 	}
 	else {
 		// no owner -- only some sects get printed
-		if (SECT_FLAGGED(sect, SECTF_SHOW_ON_POLITICAL_MAPOUT)) {
+		if (IS_SET(map->shared->affects, ROOM_AFF_MAPOUT_BUILDING)) {
+			fputc('s', map_fl);
+		}
+		else if (SECT_FLAGGED(sect, SECTF_SHOW_ON_POLITICAL_MAPOUT)) {
 			fputc(mapout_color_tokens[GET_SECT_MAPOUT(sect)], pol_fl);
 		}
 		else {

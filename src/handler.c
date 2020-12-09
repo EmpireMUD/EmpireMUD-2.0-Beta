@@ -896,6 +896,10 @@ void affect_total_room(room_data *room) {
 	DL_FOREACH2(ROOM_VEHICLES(room), veh, next_in_room) {
 		if (!VEH_IS_EXTRACTED(veh)) {
 			SET_BIT(ROOM_AFF_FLAGS(room), VEH_ROOM_AFFECTS(veh));
+			
+			if (VEH_IS_VISIBLE_ON_MAPOUT(veh)) {
+				SET_BIT(ROOM_AFF_FLAGS(room), ROOM_AFF_MAPOUT_BUILDING);
+			}
 		}
 	}
 	

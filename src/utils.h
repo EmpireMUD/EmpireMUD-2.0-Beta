@@ -1610,7 +1610,7 @@ int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_COORD(ge
 #define IN_OR_ON(veh)		(VEH_FLAGGED((veh), VEH_IN) ? "in" : "on")
 #define VEH_CLAIMS_WITH_ROOM(veh)  (VEH_FLAGGED((veh), VEH_BUILDING) && !VEH_FLAGGED((veh), MOVABLE_VEH_FLAGS | VEH_NO_CLAIM))
 #define VEH_IS_EXTRACTED(veh)  VEH_FLAGGED((veh), VEH_EXTRACTED)
-#define VEH_IS_VISIBLE_ON_MAPOUT(veh)  (VEH_FLAGGED(veh, VEH_BUILDING) && VEH_SIZE(veh) > 0)
+#define VEH_IS_VISIBLE_ON_MAPOUT(veh)  (VEH_FLAGGED((veh), VEH_BUILDING) && VEH_ICON(veh) && VEH_SIZE(veh) > 0 && !VEH_FLAGGED((veh), VEH_CHAMELEON))
 #define VEH_FLAGGED(veh, flag)  IS_SET(VEH_FLAGS(veh), (flag))
 #define VEH_HAS_MINOR_DISREPAIR(veh)  (VEH_HEALTH(veh) < VEH_MAX_HEALTH(veh) && (VEH_HEALTH(veh) <= (VEH_MAX_HEALTH(veh) * config_get_int("disrepair_minor") / 100)))
 #define VEH_HAS_MAJOR_DISREPAIR(veh)  (VEH_HEALTH(veh) < VEH_MAX_HEALTH(veh) && (VEH_HEALTH(veh) <= (VEH_MAX_HEALTH(veh) * config_get_int("disrepair_major") / 100)))

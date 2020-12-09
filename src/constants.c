@@ -3541,6 +3541,7 @@ const char *room_aff_bits[] = {
 	"REPEL-ANIMALS",
 	"NO-WORKFORCE-EVOS",
 	"*HIDE-REAL-NAME",
+	"MAPOUT-BUILDING",
 	"\n"
 };
 

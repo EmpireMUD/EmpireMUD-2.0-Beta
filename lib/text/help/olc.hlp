@@ -1929,6 +1929,7 @@ Available affects:
  REPEL-NPCS - npcs won't wander in
  REPEL-ANIMALS - animal npcs won't wander in
  NO-WORKFORCE-EVOS - workforce won't do chores that would change the tile type
+ MAPOUT-BUILDING - appears as a building on the graphical map
 
 Some affects are managed by live data and commands (do not set affects with *):
  *HAS-INSTANCE - an adventure is linked here
