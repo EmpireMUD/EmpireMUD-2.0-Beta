@@ -478,7 +478,6 @@ void delete_room(room_data *room, bool check_exits) {
 	char_data *c, *next_c;
 	obj_data *o, *next_o;
 	empire_data *emp;
-	char fname[256];
 	int iter;
 	
 	// this blocks deleting map rooms unless they can be unloaded (or the mud is being shut down)
@@ -499,21 +498,9 @@ void delete_room(room_data *room, bool check_exits) {
 	
 	check_dg_owner_purged_room(room);
 	
-	// this will ensure any map data is still saved and will update the world index
+	// this will ensure any map data is still saved and will update the world index, while also deleting the world file
 	request_world_save(GET_ROOM_VNUM(room), WSAVE_MAP | WSAVE_ROOM);
-	
-	// attempt to delete wld save files (unless shutting down)
-	if (!block_all_saves_due_to_shutdown) {
-		get_world_filename(fname, GET_ROOM_VNUM(room), WLD_SUFFIX);
-		if (access(fname, F_OK) == 0) {
-			unlink(fname);
-		}
-		get_world_filename(fname, GET_ROOM_VNUM(room), SUF_PACK);
-		if (access(fname, F_OK) == 0) {
-			unlink(fname);
-		}
-	}
-	
+		
 	// delete this first
 	if (ROOM_UNLOAD_EVENT(room)) {
 		dg_event_cancel(ROOM_UNLOAD_EVENT(room), cancel_room_event);
@@ -4321,18 +4308,20 @@ bool write_map_and_room_to_file(room_vnum vnum, bool force_obj_pack) {
 	}
 	
 	// do we (still) have anything to save
+	if (!room) {
+		// delete pack file if no room
+		get_world_filename(fname, vnum, SUF_PACK);
+		if (access(fname, F_OK) == 0) {
+			unlink(fname);
+		}
+	}
 	if (!map && !room) {
 		// yank from index
 		update_world_index(vnum, 0);
 		
-		// delete old file if we're not saving
+		// delete wld file if we're not saving at all
 		if (!block_all_saves_due_to_shutdown) {
 			get_world_filename(fname, vnum, WLD_SUFFIX);
-			if (access(fname, F_OK) == 0) {
-				unlink(fname);
-			}
-			// also delete pack file?
-			get_world_filename(fname, vnum, SUF_PACK);
 			if (access(fname, F_OK) == 0) {
 				unlink(fname);
 			}
