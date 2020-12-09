@@ -63,7 +63,7 @@ void grow_crop(struct map_data *map);
 void init_room(room_data *room, room_vnum vnum);
 int naturalize_newbie_island(struct map_data *tile, bool do_unclaim);
 int sort_empire_islands(struct empire_island *a, struct empire_island *b);
-bool write_map_and_room_to_file(room_data *room, struct map_data *map, bool force_obj_pack);
+bool write_map_and_room_to_file(room_vnum vnum, bool force_obj_pack);
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -4077,7 +4077,7 @@ void perform_requested_world_saves(void) {
 			REMOVE_BIT(iter->save_type, WSAVE_MAP);
 		}
 		if (IS_SET(iter->save_type, WSAVE_ROOM)) {
-			write_map_and_room_to_file(real_real_room(iter->vnum), (iter->vnum < MAP_SIZE ? &world_map[MAP_X_COORD(iter->vnum)][MAP_Y_COORD(iter->vnum)] : NULL), FALSE);
+			write_map_and_room_to_file(iter->vnum, FALSE);
 			REMOVE_BIT(iter->save_type, WSAVE_ROOM);
 		}
 		
@@ -4202,7 +4202,7 @@ void write_all_wld_files(void) {
 	room_data *room, *next_room;
 	
 	HASH_ITER(hh, world_table, room, next_room) {
-		write_map_and_room_to_file(room, NULL, TRUE);
+		write_map_and_room_to_file(GET_ROOM_VNUM(room), TRUE);
 	}
 	
 	// no need to save any more room updates
@@ -4285,11 +4285,10 @@ void write_binary_world_index_updates(void) {
 * @param bool force_obj_pack If TRUE, will always write the obj/veh pack, if one exists, rather than skipping it if already written.
 * @return bool TRUE if it wrote a file, FALSE if it did not.
 */
-bool write_map_and_room_to_file(room_data *room, struct map_data *map, bool force_obj_pack) {
-	room_vnum vnum = (map ? map->vnum : (room ? GET_ROOM_VNUM(room) : NOTHING));
-	struct shared_room_data *shared = (map ? map->shared : (room ? SHARED_DATA(room) : NULL));
-	struct room_extra_data *red, *next_red;
+bool write_map_and_room_to_file(room_vnum vnum, bool force_obj_pack) {
 	char temp[MAX_STRING_LENGTH], fname[256];
+	struct shared_room_data *shared;
+	struct room_extra_data *red, *next_red;
 	struct depletion_data *dep;
 	struct track_data *track, *next_track;
 	struct room_direction_data *ex;
@@ -4297,6 +4296,8 @@ bool write_map_and_room_to_file(room_data *room, struct map_data *map, bool forc
 	struct resource_data *res;
 	struct trig_var_data *tvd;
 	struct affected_type *af;
+	struct map_data *map;
+	room_data *room;
 	trig_data *trig;
 	char_data *mob, *m_proto;
 	time_t now = time(0);
@@ -4306,13 +4307,10 @@ bool write_map_and_room_to_file(room_data *room, struct map_data *map, bool forc
 		return FALSE;	// very early exit if we couldn't pull a vnum from the args
 	}
 	
-	// look for map/room if one is not provided
-	if (map && !room) {
-		room = map->room;	// if any
-	}
-	if (room && !map && GET_MAP_LOC(room) && GET_MAP_LOC(room)->vnum == GET_ROOM_VNUM(room)) {
-		map = GET_MAP_LOC(room);
-	}
+	// determine what we've got:
+	map = (vnum < MAP_SIZE) ? &world_map[MAP_X_COORD(vnum)][MAP_Y_COORD(vnum)] : NULL;
+	room = (map && map->room) ? map->room : real_real_room(vnum);
+	shared = (map ? map->shared : (room ? SHARED_DATA(room) : NULL));
 	
 	// cancel map/room if there's nothing to save for them
 	if (room && CAN_UNLOAD_MAP_ROOM(room)) {	// but actually skip the room if it's unloadable
