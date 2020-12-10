@@ -523,12 +523,14 @@ void build_los_grid_one(char_data *ch, int x_shift, int y_shift, room_vnum **gri
 	dist = compute_distance(IN_ROOM(ch), end_room);
 	blocked = FALSE;
 	top_height = 0;
+	log("test: %+d, %+d", x_shift, y_shift);
 	for (iter = 1, room = straight_line(IN_ROOM(ch), end_room, iter); iter <= dist && room && room != end_room; ++iter, room = straight_line(IN_ROOM(ch), end_room, iter)) {
 		r_vnum = GET_ROOM_VNUM(room);
 		x_pos = MAP_X_COORD(r_vnum) - X_COORD(IN_ROOM(ch));
 		x_pos = ((x_pos >= radius) ? (x_pos - MAP_WIDTH) : ((x_pos <= -radius) ? (x_pos + MAP_WIDTH) : x_pos)) + radius;
 		y_pos = MAP_Y_COORD(r_vnum) - Y_COORD(IN_ROOM(ch));
 		y_pos = ((y_pos >= radius) ? (y_pos - MAP_HEIGHT) : ((y_pos <= -radius) ? (y_pos + MAP_HEIGHT) : y_pos)) + radius;
+		log("      x_pos=%d y+pos=%d", x_pos, y_pos);
 		if (x_pos < 0 || x_pos >= side || y_pos < 0 || y_pos >= side) {
 			// off the grid somehow
 			break;
