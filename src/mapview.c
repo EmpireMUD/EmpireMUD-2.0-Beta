@@ -1010,7 +1010,10 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options) {
 					xx = (y_first ? second_iter : first_iter) * (invert_x ? -1 : 1);
 					yy = (y_first ? first_iter : second_iter) * (invert_y ? -1 : 1);
 					
-					if (view_grid) {
+					if (xx == 0 && yy == 0) {
+						to_room = room;		
+					}
+					else if (view_grid) {
 						to_room = real_room(view_grid[xx + magnitude][yy + magnitude]);
 					}
 					else {
