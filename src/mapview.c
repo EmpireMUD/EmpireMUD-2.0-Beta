@@ -523,21 +523,18 @@ void build_los_grid_one(char_data *ch, int x_shift, int y_shift, room_vnum **gri
 	dist = compute_distance(IN_ROOM(ch), end_room);
 	blocked = FALSE;
 	top_height = 0;
-	room = straight_line(IN_ROOM(ch), end_room, 1);
-	log("test: %+d, %+d, dist=%d, end_room=(%d, %d), room=(%d, %d)", x_shift, y_shift, dist, X_COORD(end_room), Y_COORD(end_room), room ? X_COORD(room) : -1, room ? Y_COORD(room) : -1);
 	for (iter = 1, room = straight_line(IN_ROOM(ch), end_room, iter); iter <= dist && room && room != end_room; ++iter, room = straight_line(IN_ROOM(ch), end_room, iter)) {
 		r_vnum = GET_ROOM_VNUM(room);
 		x_pos = MAP_X_COORD(r_vnum) - X_COORD(IN_ROOM(ch));
 		x_pos = ((x_pos >= radius) ? (x_pos - MAP_WIDTH) : ((x_pos <= -radius) ? (x_pos + MAP_WIDTH) : x_pos)) + radius;
 		y_pos = MAP_Y_COORD(r_vnum) - Y_COORD(IN_ROOM(ch));
 		y_pos = ((y_pos >= radius) ? (y_pos - MAP_HEIGHT) : ((y_pos <= -radius) ? (y_pos + MAP_HEIGHT) : y_pos)) + radius;
-		log("      x_pos=%d y+pos=%d", x_pos, y_pos);
 		if (x_pos < 0 || x_pos >= side || y_pos < 0 || y_pos >= side) {
 			// off the grid somehow
 			break;
 		}
 		if (y_pos < radius) {
-			log("test: (%d, %d) blocked=%d height=%d top_height=%d", MAP_X_COORD(r_vnum), MAP_Y_COORD(r_vnum), blocked ? 1 : 0, ROOM_HEIGHT(room), top_height);
+			// log("test: (%d, %d) blocked=%d height=%d top_height=%d", MAP_X_COORD(r_vnum), MAP_Y_COORD(r_vnum), blocked ? 1 : 0, ROOM_HEIGHT(room), top_height);
 		}
 		
 		if (blocked && ROOM_HEIGHT(room) <= top_height && ROOM_HEIGHT(room) >= ROOM_HEIGHT(IN_ROOM(ch))) {
