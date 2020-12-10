@@ -6150,18 +6150,8 @@ room_data *straight_line(room_data *origin, room_data *destination, int iter) {
 	new_y = y1 + round(slope * (double)iter);
 	
 	// bounds check
-	if (WRAP_X) {
-		new_x = WRAP_X_COORD(new_x);
-	}
-	else {
-		return NULL;
-	}
-	if (WRAP_Y) {
-		new_y = WRAP_Y_COORD(new_y);
-	}
-	else {
-		return NULL;
-	}
+	new_x = WRAP_X_COORD(new_x);
+	new_y = WRAP_Y_COORD(new_y);
 	
 	// new position as a vnum
 	new_loc = new_y * MAP_WIDTH + new_x;
