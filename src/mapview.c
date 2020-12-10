@@ -1027,7 +1027,7 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options) {
 					
 					if (!to_room) {
 						// nothing to show?
-						send_to_char("    ", ch);
+						send_to_char("\tw****", ch);
 					}
 					else if (to_room != room && ROOM_AFF_FLAGGED(to_room, ROOM_AFF_DARK)) {
 						// magic dark: show blank
