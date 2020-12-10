@@ -525,8 +525,10 @@ void build_los_grid_one(char_data *ch, int x_shift, int y_shift, room_vnum **gri
 	top_height = 0;
 	for (iter = 1, room = straight_line(IN_ROOM(ch), end_room, iter); iter <= dist && room && room != end_room; ++iter, room = straight_line(IN_ROOM(ch), end_room, iter)) {
 		r_vnum = GET_ROOM_VNUM(room);
-		x_pos = MAP_X_COORD(r_vnum) - X_COORD(IN_ROOM(ch)) + radius;
-		y_pos = MAP_Y_COORD(r_vnum) - Y_COORD(IN_ROOM(ch)) + radius;
+		x_pos = MAP_X_COORD(r_vnum) - X_COORD(IN_ROOM(ch));
+		x_pos = WRAP_X_COORD(x_pos) + radius;
+		y_pos = MAP_Y_COORD(r_vnum) - Y_COORD(IN_ROOM(ch));
+		y_pos = WRAP_Y_COORD(y_pos) + radius;
 		if (x_pos < 0 || x_pos >= side || y_pos < 0 || y_pos >= side) {
 			// off the grid somehow
 			break;
