@@ -523,7 +523,8 @@ void build_los_grid_one(char_data *ch, int x_shift, int y_shift, room_vnum **gri
 	dist = compute_distance(IN_ROOM(ch), end_room);
 	blocked = FALSE;
 	top_height = 0;
-	log("test: %+d, %+d", x_shift, y_shift);
+	room = straight_line(IN_ROOM(ch), end_room, 1);
+	log("test: %+d, %+d, dist=%d, end_room=(%d, %d), room=(%d, %d)", x_shift, y_shift, dist, X_COORD(end_room), Y_COORD(end_room), room ? X_COORD(room) : -1, room ? Y_COORD(room) : -1);
 	for (iter = 1, room = straight_line(IN_ROOM(ch), end_room, iter); iter <= dist && room && room != end_room; ++iter, room = straight_line(IN_ROOM(ch), end_room, iter)) {
 		r_vnum = GET_ROOM_VNUM(room);
 		x_pos = MAP_X_COORD(r_vnum) - X_COORD(IN_ROOM(ch));
