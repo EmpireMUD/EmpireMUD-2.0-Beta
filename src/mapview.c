@@ -598,7 +598,7 @@ room_vnum **build_line_of_sight_grid(char_data *ch, int radius) {
 	for (r = radius; r > 0; --r) {
 		for (x = -r; x <= r; ++x) {
 			for (y = -r; y <= r; ++y) {
-				if (ABSOLUTE(x) == r || ABSOLUTE(y) == r) {
+				if (grid[x+radius][y+radius] == (NOWHERE - 1) && (ABSOLUTE(x) == r || ABSOLUTE(y) == r)) {
 					build_los_grid_one(ch, x, y, grid, radius, side);
 				}
 			}
