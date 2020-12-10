@@ -6140,7 +6140,7 @@ room_data *straight_line(room_data *origin, room_data *destination, int iter) {
 	dy = y2 - y1;
 	
 	// to draw better lines, this uses "y as a function of x" for low slopes and "x as a function of y" for high slopes
-	if (dy <= dx) {
+	if (ABSOLUTE(dy) <= ABSOLUTE(dx)) {
 		// y as a function of x
 		slope = dy / dx;
 	
