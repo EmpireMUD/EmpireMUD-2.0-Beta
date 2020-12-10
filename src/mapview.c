@@ -31,6 +31,7 @@
 * Contents:
 *   Data
 *   Helpers
+*   Line-of-Sight Functions
 *   Mappc Functions
 *   Map View Functions
 *   Screen Reader Functions
@@ -488,6 +489,156 @@ void replace_color_codes(char *string, char *new_color) {
 
 
  //////////////////////////////////////////////////////////////////////////////
+//// LINE-OF-SIGHT FUNCTIONS /////////////////////////////////////////////////
+
+/**
+* Builds part of the line-of-sight grid, using the line from the player to a
+* given room near them. It also determines the grid info for any tile along
+* the way. This function should ideally be called on tiles from the outside in,
+* to avoid repeating work.
+*
+* @param char_data *ch The player who is looking at the map.
+* @param int x_shift How far east/west the tile to check is.
+* @param int y_shift How far north/south the tile to check is.
+* @param room_vnum **grid The grid that's being built (by build_line_of_sight_grid).
+* @param int radius The player's view radius.
+* @param int side The size of one of the "sizes" of the grid var.
+*/
+void build_los_grid_one(char_data *ch, int x_shift, int y_shift, room_vnum **grid, int radius, int side) {
+	room_vnum *dat = &grid[x_shift + radius][y_shift + radius];
+	room_data *end_room, *room;
+	room_vnum r_vnum;
+	int iter, dist, x_pos, y_pos, top_height;
+	bool blocked;
+	
+	if (*dat != (NOWHERE - 1)) {
+		return;	// already done
+	}
+	if (!(end_room = real_shift(IN_ROOM(ch), x_shift, y_shift))) {
+		// no room there
+		*dat = NOWHERE;
+		return;
+	}
+	
+	dist = compute_distance(IN_ROOM(ch), end_room);
+	blocked = FALSE;
+	top_height = 0;
+	for (iter = 1, room = straight_line(IN_ROOM(ch), end_room, iter); iter <= dist && room && room != end_room; ++iter, room = straight_line(IN_ROOM(ch), end_room, iter)) {
+		r_vnum = GET_ROOM_VNUM(room);
+		x_pos = MAP_X_COORD(r_vnum) - X_COORD(IN_ROOM(ch)) + radius;
+		y_pos = MAP_Y_COORD(r_vnum) - Y_COORD(IN_ROOM(ch)) + radius;
+		if (x_pos < 0 || x_pos >= side || y_pos < 0 || y_pos >= side) {
+			// off the grid somehow
+			break;
+		}
+		
+		if (blocked && ROOM_HEIGHT(room) <= top_height) {
+			// already blocked unless it's talled than the previous top height
+			grid[x_pos][y_pos] = NOWHERE;
+		}
+		else {
+			// record it even if it will block what's behind it
+			grid[x_pos][y_pos] = r_vnum;
+			
+			// record new top height
+			top_height = MAX(top_height, ROOM_HEIGHT(room));
+			
+			if (!blocked && (ROOM_SECT_FLAGGED(room, SECTF_OBSCURE_VISION) || SECT_FLAGGED(BASE_SECT(room), SECTF_OBSCURE_VISION)) && ROOM_HEIGHT(room) >= ROOM_HEIGHT(IN_ROOM(ch))) {
+				// rest of line will be blocked
+				blocked = TRUE;
+			}
+		}
+	}
+	
+	// and record the end tile
+	*dat = blocked ? NOWHERE : GET_ROOM_VNUM(end_room);
+}
+
+
+/**
+* Builds a grid of tiles the player can see from here, based on line-of-sight
+* rules. This returns an allocated two-dimensional array of room vnums for any
+* rooms that can be seen. The player is at the center of this grid (e.g. if
+* the radius is 7, the player is at grid[7][7] and the grid goes from 0 to 14
+* in both the x and y dimensions.)
+*
+* Note: You MUST free the data that comes out of here with 
+*       free_line_of_sight_grid() and you must pass it the same radius you
+*       passed to this.
+*
+* @param char_data *ch The player who is viewing the area.
+* @param int radius The viewing radius to use (determines the size of the grid).
+* @return room_vnum** The two-dimensional grid of rooms the player can see.
+*/
+room_vnum **build_line_of_sight_grid(char_data *ch, int radius) {
+	room_vnum **grid;
+	int x, y, r, side;
+	
+	if (!ch || radius < 1) {
+		return NULL;	// bad input
+	}
+	if (radius > 100) {
+		log("SYSERR: build_line_of_sight_grid requested with radius %d; defaulting to 7", radius);
+		radius = 7;
+	}
+	
+	// length of a side
+	side = radius * 2 + 1;
+	
+	// create and initialize grid
+	CREATE(grid, room_vnum*, side);
+	for (x = 0; x < side; ++x) {
+		CREATE(grid[x], room_vnum, side);
+		for (y = 0; y < side; ++y) {
+			grid[x][y] = NOWHERE - 1;
+		}
+	}
+	
+	// build lines to edges first then work the way in
+	for (r = radius; r > 0; --r) {
+		for (x = -r; x <= r; ++x) {
+			for (y = -r; y <= r; ++y) {
+				if (ABSOLUTE(x) == r || ABSOLUTE(y) == r) {
+					build_los_grid_one(ch, x, y, grid, radius, side);
+				}
+			}
+		}
+	}
+	
+	// now wipe any locations that were missed (usually due to being off-grid)
+	for (x = 0; x < side; ++x) {
+		for (y = 0; y < side; ++y) {
+			if (grid[x][y] == NOWHERE - 1) {
+				grid[x][y] = NOWHERE;
+			}
+		}
+	}
+	
+	return grid;
+}
+
+
+/**
+* Frees a 2d array that was allocated by build_line_of_sight_grid().
+*
+* @param room_vnum **grid The grid to free.
+* @param int radius The original radius that was given to create it.
+*/
+void free_line_of_sight_grid(room_vnum **grid, int radius) {
+	int iter, side = radius * 2 + 1;
+	
+	if (grid) {
+		for (iter = 0; iter < side; ++iter) {
+			if (grid[iter]) {
+				free(grid[iter]);
+			}
+		}
+		free(grid);
+	}
+}
+
+
+ //////////////////////////////////////////////////////////////////////////////
 //// MAPPC FUNCTIONS /////////////////////////////////////////////////////////
 
 /**
@@ -628,6 +779,7 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options) {
 	bool y_first, invert_x, invert_y, comma, junk;
 	struct instance_data *inst;
 	player_index_data *index;
+	room_vnum **view_grid = NULL;
 	room_data *to_room;
 	empire_data *emp, *pcemp;
 	crop_data *cp;
@@ -745,7 +897,7 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options) {
 				show_screenreader_room(ch, room, options);
 			}
 		}
-		else {	// normal map view
+		else {	// ASCII map view
 			magnitude = PRF_FLAGGED(ch, PRF_BRIEF) ? 3 : mapsize;
 			*buf = '\0';
 			
@@ -773,6 +925,10 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options) {
 			first_start = second_start = magnitude;
 			first_end = second_end = magnitude;
 			can_see_in_dark_distance = distance_can_see_in_dark(ch);
+			
+			if (!PRF_FLAGGED(ch, PRF_HOLYLIGHT)) {
+				view_grid = build_line_of_sight_grid(ch, magnitude);
+			}
 			
 			// map edges?
 			if (!WRAP_Y) {
@@ -854,7 +1010,12 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options) {
 					xx = (y_first ? second_iter : first_iter) * (invert_x ? -1 : 1);
 					yy = (y_first ? first_iter : second_iter) * (invert_y ? -1 : 1);
 					
-					to_room = real_shift(room, xx, yy);
+					if (view_grid) {
+						to_room = real_room(view_grid[xx + magnitude][yy + magnitude]);
+					}
+					else {
+						to_room = real_shift(room, xx, yy);
+					}
 					
 					if (!to_room) {
 						// nothing to show?
@@ -897,6 +1058,11 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options) {
 				send_to_char("----", ch);
 			}
 			send_to_char("+\r\n", ch);
+			
+			if (view_grid) {
+				free_line_of_sight_grid(view_grid, magnitude);
+				view_grid = NULL;
+			}
 		}
 
 		// notify character they can't see in the dark
