@@ -1061,7 +1061,7 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options) {
 						}
 					}	// end dark
 					else if (show_blocked) {
-						if (MAGIC_DARKNESS(to_room) || get_sun_status(to_room) == SUN_DARK) {
+						if ((MAGIC_DARKNESS(to_room) || get_sun_status(to_room) == SUN_DARK) && (compute_distance(room, to_room) > can_see_in_dark_distance)) {
 							// blocked dark tile
 							send_to_char("    ", ch);
 						}
