@@ -6139,15 +6139,31 @@ room_data *straight_line(room_data *origin, room_data *destination, int iter) {
 	dx = x2 - x1;
 	dy = y2 - y1;
 	
-	slope = dy / dx;
+	// to draw better lines, this uses "y as a function of x" for low slopes and "x as a function of y" for high slopes
+	if (dy <= dx) {
+		// y as a function of x
+		slope = dy / dx;
 	
-	// moving left
-	if (dx < 0) {
-		iter *= -1;
+		// moving left
+		if (dx < 0) {
+			iter *= -1;
+		}
+	
+		new_x = x1 + iter;
+		new_y = y1 + round(slope * (double)iter);
 	}
+	else {
+		// x as a function of y
+		slope = dx / dy;
 	
-	new_x = x1 + iter;
-	new_y = y1 + round(slope * (double)iter);
+		// moving down
+		if (dy < 0) {
+			iter *= -1;
+		}
+	
+		new_y = y1 + iter;
+		new_x = x1 + round(slope * (double)iter);
+	}
 	
 	// bounds check
 	new_x = WRAP_X_COORD(new_x);
