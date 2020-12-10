@@ -778,7 +778,7 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options) {
 	int first_iter, second_iter, xx, yy, magnitude, north;
 	int first_start, first_end, second_start, second_end, temp;
 	int dist, can_see_in_dark_distance;
-	bool y_first, invert_x, invert_y, comma, junk;
+	bool y_first, invert_x, invert_y, comma, junk, show_blocked;
 	struct instance_data *inst;
 	player_index_data *index;
 	room_vnum **view_grid = NULL;
@@ -786,6 +786,8 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options) {
 	empire_data *emp, *pcemp;
 	crop_data *cp;
 	char *strptr;
+	
+	const char *blocked_tile = "\tw****";
 	
 	// configs
 	int trench_initial_value = config_get_int("trench_initial_value");
@@ -1011,12 +1013,17 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options) {
 				for (second_iter = second_start; second_iter >= -second_end; --second_iter) {
 					xx = (y_first ? second_iter : first_iter) * (invert_x ? -1 : 1);
 					yy = (y_first ? first_iter : second_iter) * (invert_y ? -1 : 1);
+					show_blocked = FALSE;
 					
 					if (xx == 0 && yy == 0) {
 						to_room = room;		
 					}
 					else if (view_grid) {
 						to_room = real_room(view_grid[xx + magnitude][yy + magnitude]);
+						if (!to_room) {
+							show_blocked = TRUE;
+							to_room = real_shift(room, xx, yy);
+						}
 					}
 					else {
 						to_room = real_shift(room, xx, yy);
@@ -1024,9 +1031,9 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options) {
 					
 					if (!to_room) {
 						// nothing to show?
-						send_to_char("\tw****", ch);
+						send_to_char(blocked_tile, ch);
 					}
-					else if (to_room != room && ROOM_AFF_FLAGGED(to_room, ROOM_AFF_DARK)) {
+					else if (to_room != room && ROOM_AFF_FLAGGED(to_room, ROOM_AFF_DARK) && !show_blocked) {
 						// magic dark: show blank
 						send_to_char("    ", ch);
 					}
@@ -1036,9 +1043,14 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options) {
 						
 						if (dist <= can_see_in_dark_distance) {
 							// close enough to see
-							show_map_to_char(ch, mappc, to_room, options);
+							if (show_blocked) {
+								send_to_char(blocked_tile, ch);
+							}
+							else {
+								show_map_to_char(ch, mappc, to_room, options);
+							}
 						}
-						else if ((dist <= (can_see_in_dark_distance + 2) || adjacent_room_is_light(to_room)) && !PRF_FLAGGED(ch, PRF_NOMAPCOL | PRF_POLITICAL | PRF_INFORMATIVE)) {
+						else if ((dist <= (can_see_in_dark_distance + 2) || adjacent_room_is_light(to_room)) && !PRF_FLAGGED(ch, PRF_NOMAPCOL | PRF_POLITICAL | PRF_INFORMATIVE) && !show_blocked) {
 							// see-distance to see-distance+2: show as dark tile
 							// note: no-map-color toggle will show these as blank instead
 							show_map_to_char(ch, mappc, to_room, options | LRR_SHOW_DARK);
@@ -1048,6 +1060,9 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options) {
 							send_to_char("    ", ch);
 						}
 					}	// end dark
+					else if (show_blocked) {
+						send_to_char(blocked_tile, ch);
+					}
 					else {
 						// normal view
 						show_map_to_char(ch, mappc, to_room, options);
