@@ -533,6 +533,9 @@ void build_los_grid_one(char_data *ch, int x_shift, int y_shift, room_vnum **gri
 			// off the grid somehow
 			break;
 		}
+		if (y_pos < radius) {
+			log("test: (%d, %d) blocked=%d height=%d top_height=%d", MAP_X_COORD(r_vnum), MAP_Y_COORD(r_vnum), blocked ? 1 : 0, ROOM_HEIGHT(room), top_height);
+		}
 		
 		if (blocked && ROOM_HEIGHT(room) <= top_height && ROOM_HEIGHT(room) >= ROOM_HEIGHT(IN_ROOM(ch))) {
 			// already blocked unless it's talled than the previous top height
@@ -610,7 +613,7 @@ room_vnum **build_line_of_sight_grid(char_data *ch, int radius) {
 	// now wipe any locations that were missed (usually due to being off-grid)
 	for (x = 0; x < side; ++x) {
 		for (y = 0; y < side; ++y) {
-			if (grid[x][y] == NOWHERE - 1) {
+			if (grid[x][y] == (NOWHERE - 1)) {
 				grid[x][y] = NOWHERE;
 			}
 		}
