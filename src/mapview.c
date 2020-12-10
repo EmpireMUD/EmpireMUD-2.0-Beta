@@ -1061,7 +1061,14 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options) {
 						}
 					}	// end dark
 					else if (show_blocked) {
-						send_to_char(blocked_tile, ch);
+						if (MAGIC_DARKNESS(to_room) || get_sun_status(to_room) == SUN_DARK) {
+							// blocked light tile
+							send_to_char(blocked_tile, ch);
+						}
+						else {
+							// blocked dark tile
+							send_to_char("    ", ch);
+						}
 					}
 					else {
 						// normal view
