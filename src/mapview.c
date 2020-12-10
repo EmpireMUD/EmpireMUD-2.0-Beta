@@ -534,7 +534,7 @@ void build_los_grid_one(char_data *ch, int x_shift, int y_shift, room_vnum **gri
 			break;
 		}
 		
-		if (blocked && ROOM_HEIGHT(room) <= top_height) {
+		if (blocked && ROOM_HEIGHT(room) <= top_height && ROOM_HEIGHT(room) >= ROOM_HEIGHT(IN_ROOM(ch))) {
 			// already blocked unless it's talled than the previous top height
 			grid[x_pos][y_pos] = NOWHERE;
 		}
@@ -545,7 +545,7 @@ void build_los_grid_one(char_data *ch, int x_shift, int y_shift, room_vnum **gri
 			// record new top height
 			top_height = MAX(top_height, ROOM_HEIGHT(room));
 			
-			if (!blocked && (ROOM_SECT_FLAGGED(room, SECTF_OBSCURE_VISION) || SECT_FLAGGED(BASE_SECT(room), SECTF_OBSCURE_VISION)) && ROOM_HEIGHT(room) >= ROOM_HEIGHT(IN_ROOM(ch))) {
+			if (!blocked && (ROOM_SECT_FLAGGED(room, SECTF_OBSCURE_VISION) || SECT_FLAGGED(BASE_SECT(room), SECTF_OBSCURE_VISION))) {
 				// rest of line will be blocked
 				blocked = TRUE;
 			}
