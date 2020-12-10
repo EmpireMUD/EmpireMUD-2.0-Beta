@@ -533,9 +533,6 @@ void build_los_grid_one(char_data *ch, int x_shift, int y_shift, room_vnum **gri
 			// off the grid somehow
 			break;
 		}
-		if (y_pos < radius) {
-			// log("test: (%d, %d) blocked=%d height=%d top_height=%d", MAP_X_COORD(r_vnum), MAP_Y_COORD(r_vnum), blocked ? 1 : 0, ROOM_HEIGHT(room), top_height);
-		}
 		
 		if (blocked && ROOM_HEIGHT(room) <= top_height) {
 			// already blocked unless it's talled than the previous top height
@@ -2001,13 +1998,26 @@ char *get_screenreader_room_name(char_data *ch, room_data *from_room, room_data 
 }
 
 
+/**
+* Displays the tiles in one direction from the character, up to their mapsize
+* (radius) in distance.
+*
+* @param char_data *ch The player.
+* @param room_data *origin Where the player is looking from.
+* @paraim int dir The direction they are looking.
+*/
 void screenread_one_dir(char_data *ch, room_data *origin, int dir) {
 	char buf[MAX_STRING_LENGTH], roombuf[MAX_INPUT_LENGTH], lastroom[MAX_INPUT_LENGTH];
 	char dirbuf[MAX_STRING_LENGTH];
 	int mapsize, dist, dist_iter, can_see_in_dark_distance;
 	room_data *to_room;
-	int repeats;
+	int repeats, top_height;
+	bool check_blocking, is_blocked = FALSE;
 	bool allow_stacking = TRUE;	// always
+	
+	if (!ch->desc) {
+		return;	// nobody to show it to
+	}
 	
 	mapsize = GET_MAPSIZE(REAL_CHAR(ch));
 	if (mapsize == 0) {
@@ -2020,10 +2030,12 @@ void screenread_one_dir(char_data *ch, room_data *origin, int dir) {
 	}
 
 	// setup
+	check_blocking = PRF_FLAGGED(ch, PRF_HOLYLIGHT) ? FALSE : TRUE;
 	can_see_in_dark_distance = distance_can_see_in_dark(ch);
 	*dirbuf = '\0';
 	*lastroom = '\0';
 	repeats = 0;
+	top_height = 0;
 
 	// show distance that direction		
 	for (dist_iter = 1; dist_iter <= mapsize; ++dist_iter) {
@@ -2034,7 +2046,11 @@ void screenread_one_dir(char_data *ch, room_data *origin, int dir) {
 		}
 		
 		*roombuf = '\0';
-		if (ROOM_AFF_FLAGGED(to_room, ROOM_AFF_DARK)) {
+		if (is_blocked && ROOM_HEIGHT(to_room) <= top_height) {
+			// blocked by closer tile
+			strcpy(roombuf, "Blocked");
+		}
+		else if (ROOM_AFF_FLAGGED(to_room, ROOM_AFF_DARK)) {
 			// magic dark
 			strcpy(roombuf, "Dark");
 		}
@@ -2082,6 +2098,14 @@ void screenread_one_dir(char_data *ch, room_data *origin, int dir) {
 			// reset
 			repeats = 0;
 			strcpy(lastroom, roombuf);
+		}
+		
+		// record new top height
+		top_height = MAX(top_height, ROOM_HEIGHT(to_room));
+		
+		// check blocking
+		if (check_blocking && !is_blocked && (ROOM_SECT_FLAGGED(to_room, SECTF_OBSCURE_VISION) || SECT_FLAGGED(BASE_SECT(to_room), SECTF_OBSCURE_VISION)) && ROOM_HEIGHT(to_room) >= ROOM_HEIGHT(origin)) {
+			is_blocked = TRUE;
 		}
 	}
 	
