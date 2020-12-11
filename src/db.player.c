@@ -4876,14 +4876,16 @@ void load_map_memory(char_data *ch) {
 	
 	if (ch && !IS_NPC(ch) && !GET_MAP_MEMORY_LOADED(ch)) {
 		timer = microtime();
+		
+		// this will be true no matter what
+		GET_MAP_MEMORY_LOADED(ch) = TRUE;
+		
 		if (!get_filename(GET_PC_NAME(ch), filename, MAP_MEMORY_FILE)) {
 			log("SYSERR: load_map_memory: Unable to get memory filename for '%s'", GET_PC_NAME(ch));
-			GET_MAP_MEMORY_LOADED(ch) = TRUE;
 			return;
 		}
 		if (!(fl = fopen(filename, "r"))) {
 			// non-fatal: memory file does not exist
-			GET_MAP_MEMORY_LOADED(ch) = TRUE;
 			return;
 		}
 		
@@ -4907,7 +4909,6 @@ void load_map_memory(char_data *ch) {
 		
 		fclose(fl);	
 		
-		GET_MAP_MEMORY_LOADED(ch) = TRUE;
 		GET_MAP_MEMORY_NEEDS_SAVE(ch) = FALSE;	// this is set by the loading process
 		
 		log("load_map_memory: %s %.2f sec", GET_PC_NAME(ch), (microtime() - timer) / 1000000.0);
