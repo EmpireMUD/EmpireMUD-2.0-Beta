@@ -1181,6 +1181,7 @@ int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_COORD(ge
 #define GET_LOAD_ROOM_CHECK(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->load_room_check))
 #define GET_MAIL_PENDING(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->mail_pending))
 #define GET_MAP_MEMORY(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->map_memory))
+#define GET_MAP_MEMORY_COUNT(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->map_memory_count))
 #define GET_MAP_MEMORY_LOADED(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->map_memory_loaded))
 #define GET_MAP_MEMORY_NEEDS_SAVE(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->map_memory_needs_save))
 #define GET_MAPSIZE(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->mapsize))

@@ -4781,6 +4781,7 @@ void add_player_map_memory(char_data *ch, room_vnum vnum, char *icon, char *name
 		map_mem->vnum = vnum;
 		HASH_ADD_INT(GET_MAP_MEMORY(ch), vnum, map_mem);
 		GET_MAP_MEMORY_NEEDS_SAVE(ch) = TRUE;
+		++GET_MAP_MEMORY_COUNT(ch);
 	}
 	
 	// update
@@ -4814,6 +4815,7 @@ void delete_player_map_memory(struct player_map_memory *memory, char_data *ch) {
 	// ch is optional
 	if (ch && !IS_NPC(ch)) {
 		HASH_DEL(GET_MAP_MEMORY(ch), memory);
+		--GET_MAP_MEMORY_COUNT(ch);
 	}
 	
 	// free the memory
@@ -4911,6 +4913,12 @@ void load_map_memory(char_data *ch) {
 }
 
 
+// simple sorter to put memories in ascending order of timestamp
+int sort_map_memory(struct player_map_memory *a, struct player_map_memory *b) {
+	return a->timestamp - b->timestamp;
+}
+
+
 /**
 * Writes the map memory file for a player.
 *
@@ -4928,6 +4936,16 @@ void write_map_memory(char_data *ch) {
 	
 	timer = microtime();
 	
+	// cleanup when there are too many
+	if (GET_MAP_MEMORY_COUNT(ch) > 17000) {
+		HASH_SORT(GET_MAP_MEMORY(ch), sort_map_memory);
+		HASH_ITER(hh, GET_MAP_MEMORY(ch), map_mem, next) {
+			if (GET_MAP_MEMORY_COUNT(ch) > 15000) {
+				delete_player_map_memory(map_mem, ch);
+			}
+		}
+	}
+	
 	// update this no matter what
 	GET_MAP_MEMORY_NEEDS_SAVE(ch) = FALSE;
 	
@@ -4942,11 +4960,6 @@ void write_map_memory(char_data *ch) {
 	}
 	
 	HASH_ITER(hh, GET_MAP_MEMORY(ch), map_mem, next) {
-		// remove timed-out entries now
-		if ((time(0) - map_mem->timestamp) > (2 * SECS_PER_REAL_WEEK)) {
-			delete_player_map_memory(map_mem, ch);
-			continue;
-		}
 		fprintf(fl, "%d %ld %-4.4s %s\n", map_mem->vnum, map_mem->timestamp, NULLSAFE(map_mem->icon), (map_mem->name && *map_mem->name) ? map_mem->name : "~");
 	}
 	

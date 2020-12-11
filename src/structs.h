@@ -4427,6 +4427,7 @@ struct player_special_data {
 	int last_look_sun;	// used to determine if the player needs to 'look' at sunrise/set
 	bool map_memory_needs_save;	// whether or not to save the map memory file
 	bool map_memory_loaded;	// whether or not it has been loaded yet
+	int map_memory_count;	// how many tiles are currently remembered
 	
 	struct combat_meters meters;	// combat meter data
 	

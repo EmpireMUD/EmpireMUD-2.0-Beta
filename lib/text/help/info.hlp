@@ -22,6 +22,10 @@ See HELP CROPS for the icons for various wild crops.
 You can find specific buildings in the HELP BUILDING information as well as
 the other help files listed in its "see also".
 
+Tiles you can't see from your current location are shown in gray when blocked
+by a mountain, or dark blue when it's too dark to see them. If you don't know
+what terrain is blocked, it is shown as &w****&0.
+
 See also: LOOK, MAP, TOWER OF SOULS, BUILDING, CROPS
 #
 ACCOUNT ACCOUNTS
