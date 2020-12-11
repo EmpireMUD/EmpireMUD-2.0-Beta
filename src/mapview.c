@@ -2030,6 +2030,16 @@ char *get_screenreader_room_name(char_data *ch, room_data *from_room, room_data 
 		}
 		sprintf(temp, "Dark %s", temp2);
 	}
+	else {
+		// not dark: memorize it?
+		if (strchr(temp, ' ')) {
+			chop_last_arg(temp, junk, temp2);
+		}
+		else {
+			*temp2 = '\0';
+		}
+		add_player_map_memory(ch, GET_ROOM_VNUM(to_room), NULL, *temp2 ? temp2 : temp, 0);
+	}
 	
 	// start lbuf: color
 	if (ROOM_PAINT_COLOR(to_room) && !PRF_FLAGGED(ch, PRF_NO_PAINT)) {
@@ -2073,6 +2083,7 @@ void screenread_one_dir(char_data *ch, room_data *origin, int dir) {
 	int repeats, top_height;
 	bool check_blocking, is_blocked = FALSE;
 	bool allow_stacking = TRUE;	// always
+	const char *memory;
 	
 	if (!ch->desc) {
 		return;	// nobody to show it to
@@ -2107,7 +2118,12 @@ void screenread_one_dir(char_data *ch, room_data *origin, int dir) {
 		*roombuf = '\0';
 		if (is_blocked && ROOM_HEIGHT(to_room) <= top_height) {
 			// blocked by closer tile
-			strcpy(roombuf, "Blocked");
+			if ((memory = get_player_map_memory(ch, GET_ROOM_VNUM(to_room), MAP_MEM_NAME))) {
+				snprintf(roombuf, sizeof(roombuf), "Blocked %s", memory);
+			}
+			else {
+				strcpy(roombuf, "Blocked");
+			}
 		}
 		else if (ROOM_AFF_FLAGGED(to_room, ROOM_AFF_DARK)) {
 			// magic dark
@@ -2131,7 +2147,12 @@ void screenread_one_dir(char_data *ch, room_data *origin, int dir) {
 			}
 			else {
 				// too far: show only darkness
-				strcpy(roombuf, "Dark");
+				if ((memory = get_player_map_memory(ch, GET_ROOM_VNUM(to_room), MAP_MEM_NAME))) {
+					snprintf(roombuf, sizeof(roombuf), "Dark %s", memory);
+				}
+				else {
+					strcpy(roombuf, "Dark");
+				}
 			}
 		}
 		else {	// not dark
