@@ -598,10 +598,19 @@ room_vnum **build_line_of_sight_grid(char_data *ch, int radius) {
 	
 	// build lines to edges first then work the way in
 	for (r = radius; r > 0; --r) {
-		for (x = -r; x <= r; ++x) {
-			for (y = -r; y <= r; ++y) {
-				if (grid[x+radius][y+radius] == (NOWHERE - 1) && (ABSOLUTE(x) == r || ABSOLUTE(y) == r)) {
-					build_los_grid_one(ch, x, y, grid, radius, side);
+		for (x = r; x >= 0; --x)  {
+			for (y = r; y >= 0; --y) {
+				if (x != r && y != r) {
+					continue;	// only doing edges
+				}
+				// this builds from the outside in
+				// positive:
+				if (grid[radius+x][radius+y] == (NOWHERE - 1)) {
+					build_los_grid_one(ch, radius+x, radius+y, grid, radius, side);
+				}
+				// negative
+				if (grid[radius-x][radius-y] == (NOWHERE - 1)) {
+					build_los_grid_one(ch, radius-x, radius-y, grid, radius, side);
 				}
 			}
 		}
