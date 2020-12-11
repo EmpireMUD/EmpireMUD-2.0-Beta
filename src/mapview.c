@@ -787,7 +787,6 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options) {
 	const char *memory;
 	crop_data *cp;
 	char *strptr;
-	unsigned long long timer = 0;
 	
 	const char *blocked_tile = "\tw****";
 	
@@ -804,8 +803,6 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options) {
 	// begin with the sanity check
 	if (!ch || !ch->desc)
 		return;
-	
-	timer = microtime();
 	
 	if (!IS_NPC(ch)) {
 		// store the sun's status to be able to force a 'look' correctly at sunrise/set
@@ -1339,10 +1336,6 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options) {
 	/* Exits ? */
 	if (!PRF_FLAGGED(ch, PRF_NO_EXITS) && COMPLEX_DATA(room) && ROOM_IS_CLOSED(room)) {
 		do_exits(ch, "", -1, GET_ROOM_VNUM(room));
-	}
-	
-	if (timer) {
-		log("look_at_room_by_loc time for %s: %.2f sec", GET_NAME(ch), (microtime() - timer) / 1000000.0);
 	}
 }
 
