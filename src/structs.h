@@ -4235,6 +4235,16 @@ struct player_ability_data {
 };
 
 
+// remembers a tile a player has seen before
+struct player_map_memory {
+	room_vnum vnum;	// map loc
+	time_t timestamp;	// when last set
+	char *icon;	// icon, if any
+	char *name;	// name, if any
+	UT_hash_handle hh;	// GET_MAP_MEMORY(ch)
+};
+
+
 // used for a hash of skills per player in player_special_data
 struct player_skill_data {
 	any_vnum vnum;	// SKILL_ or skill vnum
@@ -4335,6 +4345,7 @@ struct player_special_data {
 	struct player_automessage *automessages;	// hash of seen messages
 	struct player_event_data *event_data;	// hash of event scores and results
 	struct affected_type *passive_buffs;	// from PASSIVE-BUFF abilities
+	struct player_map_memory *map_memory;	// hash of memories of map locations
 
 	// some daily stuff
 	int daily_cycle;	// Last update cycle registered
@@ -4413,6 +4424,8 @@ struct player_special_data {
 	time_t move_time[TRACK_MOVE_TIMES];	// timestamp of last X moves
 	int beckoned_by;	// idnum of player who beckoned (for follow)
 	int last_look_sun;	// used to determine if the player needs to 'look' at sunrise/set
+	bool map_memory_needs_save;	// whether or not to save the map memory file
+	bool map_memory_loaded;	// whether or not it has been loaded yet
 	
 	struct combat_meters meters;	// combat meter data
 	

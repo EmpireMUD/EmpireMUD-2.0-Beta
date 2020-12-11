@@ -784,6 +784,7 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options) {
 	room_vnum **view_grid = NULL;
 	room_data *to_room;
 	empire_data *emp, *pcemp;
+	const char *memory;
 	crop_data *cp;
 	char *strptr;
 	
@@ -1044,7 +1045,12 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options) {
 						if (dist <= can_see_in_dark_distance) {
 							// close enough to see
 							if (show_blocked) {
-								send_to_char(blocked_tile, ch);
+								if ((memory = get_player_map_memory(ch, GET_ROOM_VNUM(to_room), MAP_MEM_ICON))) {
+									msg_to_char(ch, "\tw%-4.4s", memory);
+								}
+								else {
+									send_to_char(blocked_tile, ch);
+								}
 							}
 							else {
 								show_map_to_char(ch, mappc, to_room, options);
@@ -1057,7 +1063,12 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options) {
 						}
 						else {
 							// too far (or color is off): show blank
-							send_to_char("    ", ch);
+							if ((memory = get_player_map_memory(ch, GET_ROOM_VNUM(to_room), MAP_MEM_ICON))) {
+								msg_to_char(ch, "\tb%-4.4s", memory);
+							}
+							else {
+								send_to_char("    ", ch);
+							}
 						}
 					}	// end dark
 					else if (show_blocked) {
@@ -1067,7 +1078,12 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options) {
 						}
 						else {
 							// blocked light tile
-							send_to_char(blocked_tile, ch);
+							if ((memory = get_player_map_memory(ch, GET_ROOM_VNUM(to_room), MAP_MEM_ICON))) {
+								msg_to_char(ch, "\tw%-4.4s", memory);
+							}
+							else {
+								send_to_char(blocked_tile, ch);
+							}
 						}
 					}
 					else {
@@ -1923,6 +1939,9 @@ static void show_map_to_char(char_data *ch, struct mappc_data_container *mappc, 
 	if (need_color_terminator) {
 		strcat(buf, "&0");
 	}
+	
+	// record uncolored version as memory
+	add_player_map_memory(ch, GET_ROOM_VNUM(to_room), strip_color(buf), NULL);
 	
 	send_to_char(buf, ch);
 }

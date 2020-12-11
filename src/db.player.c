@@ -34,6 +34,7 @@
 *   loaded_player_hash For Offline Players
 *   Autowiz Wizlist Generator
 *   Helpers
+*   Map Memory
 *   Playtime Tracking
 *   Empire Member/Greatness Tracking
 *   Empire Player Management
@@ -4735,6 +4736,100 @@ void update_played_time(char_data *ch) {
 	// track to empire
 	if (!IS_NPC(ch) && GET_LOYALTY(ch)) {
 		track_empire_playtime(GET_LOYALTY(ch), amt);
+	}
+}
+
+
+ //////////////////////////////////////////////////////////////////////////////
+//// MAP MEMORY //////////////////////////////////////////////////////////////
+
+/**
+* Marks a tile for a player to remember.
+*
+* @param char_data *ch The player.
+* @param room_vnum vnum The room (must be on the map).
+* @param char *icon The map icon (Optional: may be NULL for screenreaders).
+* @param char *name The room name (Optional: may be NULL if just looking at the ascii map).
+*/
+void add_player_map_memory(char_data *ch, room_vnum vnum, char *icon, char *name) {
+	struct player_map_memory *map_mem;
+	
+	if (!ch || IS_NPC(ch) || vnum == NOWHERE || vnum >= MAP_SIZE) {
+		return;	// no work
+	}
+	
+	// ensure this is loaded
+	load_map_memory(ch);
+	
+	// find or create entry
+	HASH_FIND_INT(GET_MAP_MEMORY(ch), &vnum, map_mem);
+	if (!map_mem) {
+		CREATE(map_mem, struct player_map_memory, 1);
+		map_mem->vnum = vnum;
+		HASH_ADD_INT(GET_MAP_MEMORY(ch), vnum, map_mem);
+	}
+	
+	// update
+	map_mem->timestamp = time(0);
+	
+	if (icon) {
+		if (map_mem->icon) {
+			free(map_mem->icon);
+		}
+		map_mem->icon = str_dup(icon);
+	}
+	
+	if (name) {
+		if (map_mem->name) {
+			free(map_mem->name);
+		}
+		map_mem->name = str_dup(name);
+	}
+	
+	GET_MAP_MEMORY_NEEDS_SAVE(ch) = TRUE;
+}
+
+
+/**
+* Gets a player's memory of a map location, if any.
+*
+* @param char_data *ch The player.
+* @param room_vnum vnum Any map location.
+* @param int type MAP_MEM_ICON or MAP_MEM_NAME -- which string to fetch.
+* @return const char* The icon or name, if available, or NULL if not.
+*/
+const char *get_player_map_memory(char_data *ch, room_vnum vnum, int type) {
+	struct player_map_memory *map_mem;
+	
+	if (ch && !IS_NPC(ch)) {
+		// ensure this is loaded
+		load_map_memory(ch);
+		
+		HASH_FIND_INT(GET_MAP_MEMORY(ch), &vnum, map_mem);
+		if (map_mem) {
+			if (type == MAP_MEM_ICON) {
+				return map_mem->icon;	// if any
+			}
+			else if (type == MAP_MEM_NAME) {
+				return map_mem->name;	// if any
+			}
+		}
+	}
+	
+	return NULL;	// all other cases
+}
+
+
+/**
+* Only loads a player's map memory if needed, and if not already loaded.
+*
+* @param char_data *ch The player.
+*/
+void load_map_memory(char_data *ch) {
+	if (ch && !IS_NPC(ch) && !GET_MAP_MEMORY_LOADED(ch)) {
+		// ...
+		GET_MAP_MEMORY_LOADED(ch) = TRUE;
+		GET_MAP_MEMORY_NEEDS_SAVE(ch) = FALSE;	// this is set by the loading process
 	}
 }
 
