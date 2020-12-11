@@ -2238,13 +2238,10 @@ void save_char(char_data *ch, room_data *load_room) {
 	player_index_data *index;
 	struct map_data *map;
 	FILE *fl;
-	unsigned long long timer;
 
 	if (IS_NPC(ch) || block_all_saves_due_to_shutdown) {
 		return;
 	}
-	
-	timer = microtime();
 	
 	// update load room if they aren't flagged for a static one
 	if (!PLR_FLAGGED(ch, PLR_LOADROOM)) {
@@ -2304,8 +2301,6 @@ void save_char(char_data *ch, room_data *load_room) {
 	// update the index in case any of this changed
 	index = find_player_index_by_idnum(GET_IDNUM(ch));
 	update_player_index(index, ch);
-	
-	log("save_char: %s %.2f sec", GET_PC_NAME(ch), (microtime() - timer) / 1000000.0);
 }
 
 
