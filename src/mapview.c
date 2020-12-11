@@ -606,11 +606,11 @@ room_vnum **build_line_of_sight_grid(char_data *ch, int radius) {
 				// this builds from the outside in
 				// positive:
 				if (grid[radius+x][radius+y] == (NOWHERE - 1)) {
-					build_los_grid_one(ch, radius+x, radius+y, grid, radius, side);
+					build_los_grid_one(ch, x, y, grid, radius, side);
 				}
 				// negative
 				if (grid[radius-x][radius-y] == (NOWHERE - 1)) {
-					build_los_grid_one(ch, radius-x, radius-y, grid, radius, side);
+					build_los_grid_one(ch, -x, -y, grid, radius, side);
 				}
 			}
 		}
