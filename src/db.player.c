@@ -2238,10 +2238,13 @@ void save_char(char_data *ch, room_data *load_room) {
 	player_index_data *index;
 	struct map_data *map;
 	FILE *fl;
+	unsigned long long timer;
 
 	if (IS_NPC(ch) || block_all_saves_due_to_shutdown) {
 		return;
 	}
+	
+	timer = microtime();
 	
 	// update load room if they aren't flagged for a static one
 	if (!PLR_FLAGGED(ch, PLR_LOADROOM)) {
@@ -2301,6 +2304,8 @@ void save_char(char_data *ch, room_data *load_room) {
 	// update the index in case any of this changed
 	index = find_player_index_by_idnum(GET_IDNUM(ch));
 	update_player_index(index, ch);
+	
+	log("save_char: %s %.2f sec", GET_PC_NAME(ch), (microtime() - timer) / 1000000.0);
 }
 
 
@@ -4867,8 +4872,10 @@ void load_map_memory(char_data *ch) {
 	long timestamp;
 	room_vnum vnum;
 	FILE *fl;
+	unsigned long long timer;
 	
 	if (ch && !IS_NPC(ch) && !GET_MAP_MEMORY_LOADED(ch)) {
+		timer = microtime();
 		if (!get_filename(GET_PC_NAME(ch), filename, MAP_MEMORY_FILE)) {
 			log("SYSERR: load_map_memory: Unable to get memory filename for '%s'", GET_PC_NAME(ch));
 			GET_MAP_MEMORY_LOADED(ch) = TRUE;
@@ -4902,6 +4909,8 @@ void load_map_memory(char_data *ch) {
 		
 		GET_MAP_MEMORY_LOADED(ch) = TRUE;
 		GET_MAP_MEMORY_NEEDS_SAVE(ch) = FALSE;	// this is set by the loading process
+		
+		log("load_map_memory: %s %.2f sec", GET_PC_NAME(ch), (microtime() - timer) / 1000000.0);
 	}
 }
 
@@ -4915,10 +4924,13 @@ void write_map_memory(char_data *ch) {
 	struct player_map_memory *map_mem, *next;
 	char filename[256], tempname[256];
 	FILE *fl;
+	unsigned long long timer;
 	
 	if (!ch || IS_NPC(ch) || !GET_MAP_MEMORY_LOADED(ch) || !GET_MAP_MEMORY_NEEDS_SAVE(ch)) {	
 		return;	// no work
 	}
+	
+	timer = microtime();
 	
 	// update this no matter what
 	GET_MAP_MEMORY_NEEDS_SAVE(ch) = FALSE;
@@ -4944,6 +4956,8 @@ void write_map_memory(char_data *ch) {
 	
 	fclose(fl);
 	rename(tempname, filename);
+	
+	log("write_map_memory: %s %.2f sec", GET_PC_NAME(ch), (microtime() - timer) / 1000000.0);
 }
 
 
