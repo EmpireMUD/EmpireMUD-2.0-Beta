@@ -1084,6 +1084,7 @@ Available techs are:
  &cChip-Command&0 * - Can use the 'chip' command.
  &Saw-Command&0 * - Can use the 'saw' command.
  &Scrape-Command&0 * - Can use the 'scrape' command.
+ &cMap-Memory *&0 - Remembers blocked/dark tiles on look/scan.
 
 * Marked techs trigger ability gains on their own without gain hooks.
 

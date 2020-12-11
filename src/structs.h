@@ -2354,6 +2354,7 @@ typedef enum {
 #define PTECH_CHIP_COMMAND  80	// can 'chip'
 #define PTECH_SAW_COMMAND  81	// can 'saw'
 #define PTECH_SCRAPE_COMMAND  82	// can 'scrape'
+#define PTECH_MAP_MEMORY  83	// remembers blocked/dark tiles on look/scan
 
 
 // summon types for oval_summon, ofin_summon, and add_offer

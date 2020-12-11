@@ -1355,6 +1355,10 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options) {
 	if (!PRF_FLAGGED(ch, PRF_NO_EXITS) && COMPLEX_DATA(room) && ROOM_IS_CLOSED(room)) {
 		do_exits(ch, "", -1, GET_ROOM_VNUM(room));
 	}
+	
+	if (IS_OUTDOORS(ch) && GET_ROOM_VNUM(IN_ROOM(ch)) < MAP_SIZE) {
+		gain_player_tech_exp(ch, PTECH_MAP_MEMORY, 0.1);
+	}
 }
 
 
@@ -2705,6 +2709,7 @@ ACMD(do_scan) {
 	else if ((dir = parse_direction(ch, argument)) == NO_DIR) {
 		clear_recent_moves(ch);
 		scan_for_tile(ch, argument);
+		gain_player_tech_exp(ch, PTECH_MAP_MEMORY, 0.1);
 	}
 	else if (dir >= NUM_2D_DIRS) {
 		msg_to_char(ch, "You can't scan that way.\r\n");
@@ -2712,6 +2717,7 @@ ACMD(do_scan) {
 	else {
 		clear_recent_moves(ch);
 		screenread_one_dir(ch, use_room, dir);
+		gain_player_tech_exp(ch, PTECH_MAP_MEMORY, 0.1);
 	}
 }
 

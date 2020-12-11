@@ -891,6 +891,7 @@ const char *player_tech_types[] = {
 	"Chip-Command",	// 80
 	"Saw-Command",
 	"Scrape-Command",
+	"Map-Memory",
 	"\n"
 };
 

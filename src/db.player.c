@@ -4767,7 +4767,7 @@ void update_played_time(char_data *ch) {
 void add_player_map_memory(char_data *ch, room_vnum vnum, char *icon, char *name, time_t use_timestamp) {
 	struct player_map_memory *map_mem;
 	
-	if (!ch || IS_NPC(ch) || vnum == NOWHERE || vnum >= MAP_SIZE) {
+	if (!ch || IS_NPC(ch) || vnum == NOWHERE || vnum >= MAP_SIZE || !has_player_tech(ch, PTECH_MAP_MEMORY)) {
 		return;	// no work
 	}
 	
@@ -4838,7 +4838,7 @@ void delete_player_map_memory(struct player_map_memory *memory, char_data *ch) {
 const char *get_player_map_memory(char_data *ch, room_vnum vnum, int type) {
 	struct player_map_memory *map_mem;
 	
-	if (ch && !IS_NPC(ch)) {
+	if (ch && !IS_NPC(ch) && has_player_tech(ch, PTECH_MAP_MEMORY)) {
 		// ensure this is loaded
 		load_map_memory(ch);
 		
@@ -4869,7 +4869,7 @@ void load_map_memory(char_data *ch) {
 	FILE *fl;
 	unsigned long long timer;
 	
-	if (ch && !IS_NPC(ch) && !GET_MAP_MEMORY_LOADED(ch)) {
+	if (ch && !IS_NPC(ch) && !GET_MAP_MEMORY_LOADED(ch) && has_player_tech(ch, PTECH_MAP_MEMORY)) {
 		timer = microtime();
 		
 		// this will be true no matter what
