@@ -2761,12 +2761,15 @@ int perform_set(char_data *ch, char_data *vict, int mode, char *val_arg) {
 			add_player_to_table(found_index);
 		}
 		
-		// rename the save file
+		// rename the save files
 		get_filename(oldname, buf1, PLR_FILE);
 		get_filename(GET_NAME(vict), buf2, PLR_FILE);
 		rename(buf1, buf2);
 		get_filename(oldname, buf1, DELAYED_FILE);
 		get_filename(GET_NAME(vict), buf2, DELAYED_FILE);
+		rename(buf1, buf2);
+		get_filename(oldname, buf1, MAP_MEMORY_FILE);
+		get_filename(GET_NAME(vict), buf2, MAP_MEMORY_FILE);
 		rename(buf1, buf2);
 		
 		// update msdp

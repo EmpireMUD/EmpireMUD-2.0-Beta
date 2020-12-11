@@ -75,6 +75,7 @@ int sort_players_by_idnum(player_index_data *a, player_index_data *b);
 int sort_players_by_name(player_index_data *a, player_index_data *b);
 void track_empire_playtime(empire_data *emp, int add_seconds);
 void update_played_time(char_data *ch);
+void write_map_memory(char_data *ch);
 void write_player_delayed_data_to_file(FILE *fl, char_data *ch);
 void write_player_primary_data_to_file(FILE *fl, char_data *ch);
 
@@ -2294,6 +2295,9 @@ void save_char(char_data *ch, room_data *load_room) {
 		rename(tempname, filename);
 	}
 	
+	// check map memory
+	write_map_memory(ch);
+	
 	// update the index in case any of this changed
 	index = find_player_index_by_idnum(GET_IDNUM(ch));
 	update_player_index(index, ch);
@@ -3934,6 +3938,10 @@ void delete_player_character(char_data *ch) {
 			log("SYSERR: moving deleted player delay file %s: %s", filename, strerror(errno));
 		}
 	}
+	if (get_filename(GET_NAME(ch), filename, MAP_MEMORY_FILE) && access(filename, F_OK) == 0) {
+		// just delete map memory, if present
+		unlink(filename);
+	}
 	
 	// cleanup
 	if (emp) {
@@ -4754,8 +4762,9 @@ void update_played_time(char_data *ch) {
 * @param room_vnum vnum The room (must be on the map).
 * @param char *icon The map icon (Optional: may be NULL for screenreaders).
 * @param char *name The room name (Optional: may be NULL if just looking at the ascii map).
+* @param time_t use_timestamp When this entry was added (Optional: Just pass 0 to detect here).
 */
-void add_player_map_memory(char_data *ch, room_vnum vnum, char *icon, char *name) {
+void add_player_map_memory(char_data *ch, room_vnum vnum, char *icon, char *name, time_t use_timestamp) {
 	struct player_map_memory *map_mem;
 	
 	if (!ch || IS_NPC(ch) || vnum == NOWHERE || vnum >= MAP_SIZE) {
@@ -4774,16 +4783,16 @@ void add_player_map_memory(char_data *ch, room_vnum vnum, char *icon, char *name
 	}
 	
 	// update
-	map_mem->timestamp = time(0);
+	map_mem->timestamp = (use_timestamp > 0) ? use_timestamp : time(0);
 	
-	if (icon) {
+	if (icon && *icon) {
 		if (map_mem->icon) {
 			free(map_mem->icon);
 		}
-		map_mem->icon = str_dup(icon);
+		map_mem->icon = str_dup(strip_color(icon));
 	}
 	
-	if (name) {
+	if (name && *name) {
 		if (map_mem->name) {
 			free(map_mem->name);
 		}
@@ -4853,11 +4862,87 @@ const char *get_player_map_memory(char_data *ch, room_vnum vnum, int type) {
 * @param char_data *ch The player.
 */
 void load_map_memory(char_data *ch) {
+	char filename[256], line[256], icon[256], name[256];
+	long timestamp;
+	room_vnum vnum;
+	FILE *fl;
+	
 	if (ch && !IS_NPC(ch) && !GET_MAP_MEMORY_LOADED(ch)) {
-		// ...
+		if (!get_filename(GET_PC_NAME(ch), filename, MAP_MEMORY_FILE)) {
+			log("SYSERR: load_map_memory: Unable to get memory filename for '%s'", GET_PC_NAME(ch));
+			GET_MAP_MEMORY_LOADED(ch) = TRUE;
+			return;
+		}
+		if (!(fl = fopen(filename, "r"))) {
+			// non-fatal: memory file does not exist
+			GET_MAP_MEMORY_LOADED(ch) = TRUE;
+			return;
+		}
+		
+		// load from file
+		while (get_line(fl, line)) {
+			if (*line && sscanf(line, "%d %ld %4s %s", &vnum, &timestamp, icon, name) == 4) {
+				// remove dummy values
+				if (!strcmp(icon, "    ")) {
+					*icon = '\0';
+				}
+				if (!strcmp(name, "~")) {
+					*name = '\0';
+				}
+				// and add
+				add_player_map_memory(ch, vnum, icon, name, timestamp);
+			}
+			else {
+				log("Warning: Unknown map memory line for %s: %s", GET_PC_NAME(ch), line);
+			}
+		}
+		
+		fclose(fl);	
+		
 		GET_MAP_MEMORY_LOADED(ch) = TRUE;
 		GET_MAP_MEMORY_NEEDS_SAVE(ch) = FALSE;	// this is set by the loading process
 	}
+}
+
+
+/**
+* Writes the map memory file for a player.
+*
+* @param char_data *ch The player whose map memory to save.
+*/
+void write_map_memory(char_data *ch) {
+	struct player_map_memory *map_mem, *next;
+	char filename[256], tempname[256];
+	FILE *fl;
+	
+	if (!ch || IS_NPC(ch) || !GET_MAP_MEMORY_LOADED(ch) || !GET_MAP_MEMORY_NEEDS_SAVE(ch)) {	
+		return;	// no work
+	}
+	
+	// update this no matter what
+	GET_MAP_MEMORY_NEEDS_SAVE(ch) = FALSE;
+	
+	if (!get_filename(GET_PC_NAME(ch), filename, MAP_MEMORY_FILE)) {
+		log("SYSERR: write_map_memory: Unable to get memory filename for '%s'", GET_PC_NAME(ch));
+		return;
+	}
+	snprintf(tempname, sizeof(tempname), "%s%s", filename, TEMP_SUFFIX);
+	if (!(fl = fopen(tempname, "w"))) {
+		log("SYSERR: write_map_memory: Unable to get open file for writing: %s", tempname);
+		return;
+	}
+	
+	HASH_ITER(hh, GET_MAP_MEMORY(ch), map_mem, next) {
+		// remove timed-out entries now
+		if ((time(0) - map_mem->timestamp) > (2 * SECS_PER_REAL_WEEK)) {
+			delete_player_map_memory(map_mem, ch);
+			continue;
+		}
+		fprintf(fl, "%d %ld %-4.4s %s\n", map_mem->vnum, map_mem->timestamp, NULLSAFE(map_mem->icon), (map_mem->name && *map_mem->name) ? map_mem->name : "~");
+	}
+	
+	fclose(fl);
+	rename(tempname, filename);
 }
 
 

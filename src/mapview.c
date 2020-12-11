@@ -1946,7 +1946,7 @@ static void show_map_to_char(char_data *ch, struct mappc_data_container *mappc, 
 	}
 	
 	// record uncolored version as memory
-	add_player_map_memory(ch, GET_ROOM_VNUM(to_room), strip_color(buf), NULL);
+	add_player_map_memory(ch, GET_ROOM_VNUM(to_room), buf, NULL, 0);
 	
 	send_to_char(buf, ch);
 }

@@ -2560,6 +2560,7 @@ void set_workforce_production_limit(empire_data *emp, any_vnum vnum, int amount)
 #define DELAYED_FILE  1
 #define DELETED_PLR_FILE  2
 #define DELETED_DELAYED_FILE  3
+#define MAP_MEMORY_FILE  4
 
 
 // APPLY_RES_x: messaging for the apply_resource() function

@@ -1606,6 +1606,7 @@ int land_can_claim(empire_data *emp, int ter_type) {
 *
 * @param char *orig_name The player name.
 * @param char *filename A variable to write the filename to.
+* @param int mode PLR_FILE, DELAYED_FILE, MAP_MEMORY_FILE, DELETED_PLR_FILE, DELETED_DELAYED_FILE
 * @return int 1=success, 0=fail
 */
 int get_filename(char *orig_name, char *filename, int mode) {
@@ -1626,6 +1627,11 @@ int get_filename(char *orig_name, char *filename, int mode) {
 		case DELAYED_FILE: {
 			prefix = LIB_PLAYERS;
 			suffix = SUF_DELAY;
+			break;
+		}
+		case MAP_MEMORY_FILE: {
+			prefix = LIB_PLAYERS;
+			suffix = SUF_MEMORY;
 			break;
 		}
 		case DELETED_PLR_FILE: {
