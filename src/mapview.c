@@ -1342,7 +1342,7 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options) {
 	}
 	
 	if (timer) {
-		log("look_at_room_by_loc time for %s: %.2f sec", GET_NAME(ch), (time(0) - timer) / 1000000.0);
+		log("look_at_room_by_loc time for %s: %.2f sec", GET_NAME(ch), (microtime() - timer) / 1000000.0);
 	}
 }
 
