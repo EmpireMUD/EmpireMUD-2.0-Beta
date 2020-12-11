@@ -553,7 +553,12 @@ void build_los_grid_one(char_data *ch, int x_shift, int y_shift, room_vnum **gri
 	}
 	
 	// and record the end tile
-	*dat = blocked ? NOWHERE : GET_ROOM_VNUM(end_room);
+	if (blocked && (!ROOM_OWNER(end_room) || ROOM_OWNER(end_room) != GET_LOYALTY(ch))) {
+		*dat = NOWHERE;
+	}
+	else {
+		*dat = GET_ROOM_VNUM(end_room);
+	}
 }
 
 
