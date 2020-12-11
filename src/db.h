@@ -595,6 +595,7 @@ void update_island_names();
 #define MAP_MEM_NAME  1
 
 void add_player_map_memory(char_data *ch, room_vnum vnum, char *icon, char *name);
+void delete_player_map_memory(struct player_map_memory *memory, char_data *ch);
 const char *get_player_map_memory(char_data *ch, room_vnum vnum, int type);
 void load_map_memory(char_data *ch);
 

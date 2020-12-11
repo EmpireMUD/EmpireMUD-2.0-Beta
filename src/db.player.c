@@ -1013,6 +1013,10 @@ void free_char(char_data *ch) {
 			free_player_eq_set(eq_set);
 		}
 		
+		while (GET_MAP_MEMORY(ch)) {
+			delete_player_map_memory(GET_MAP_MEMORY(ch), ch);
+		}
+		
 		while ((ptech = GET_TECHS(ch))) {
 			GET_TECHS(ch) = ptech->next;
 			free(ptech);
@@ -4787,6 +4791,29 @@ void add_player_map_memory(char_data *ch, room_vnum vnum, char *icon, char *name
 	}
 	
 	GET_MAP_MEMORY_NEEDS_SAVE(ch) = TRUE;
+}
+
+
+/**
+* Deletes and frees a map memory.
+*
+* @param struct player_map_memory *memory The memory to free.
+* @param char_data *ch Optional: If provided, removes the memory from this player's hash. (NULL to skip this step.)
+*/
+void delete_player_map_memory(struct player_map_memory *memory, char_data *ch) {
+	// ch is optional
+	if (ch && !IS_NPC(ch)) {
+		HASH_DEL(GET_MAP_MEMORY(ch), memory);
+	}
+	
+	// free the memory
+	if (memory->icon) {
+		free(memory->icon);
+	}
+	if (memory->name) {
+		free(memory->name);
+	}
+	free(memory);
 }
 
 
