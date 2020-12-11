@@ -4780,26 +4780,27 @@ void add_player_map_memory(char_data *ch, room_vnum vnum, char *icon, char *name
 		CREATE(map_mem, struct player_map_memory, 1);
 		map_mem->vnum = vnum;
 		HASH_ADD_INT(GET_MAP_MEMORY(ch), vnum, map_mem);
+		GET_MAP_MEMORY_NEEDS_SAVE(ch) = TRUE;
 	}
 	
 	// update
 	map_mem->timestamp = (use_timestamp > 0) ? use_timestamp : time(0);
 	
-	if (icon && *icon) {
+	if (icon && *icon && (!map_mem->icon || strcmp(icon, map_mem->icon))) {
 		if (map_mem->icon) {
 			free(map_mem->icon);
 		}
 		map_mem->icon = str_dup(strip_color(icon));
+		GET_MAP_MEMORY_NEEDS_SAVE(ch) = TRUE;
 	}
 	
-	if (name && *name) {
+	if (name && *name && (!map_mem->name || strcmp(name, map_mem->name))) {
 		if (map_mem->name) {
 			free(map_mem->name);
 		}
 		map_mem->name = str_dup(name);
+		GET_MAP_MEMORY_NEEDS_SAVE(ch) = TRUE;
 	}
-	
-	GET_MAP_MEMORY_NEEDS_SAVE(ch) = TRUE;
 }
 
 
