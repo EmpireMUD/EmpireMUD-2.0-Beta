@@ -534,8 +534,8 @@ void build_los_grid_one(char_data *ch, int x_shift, int y_shift, room_vnum **gri
 			break;
 		}
 		
-		if (blocked && ROOM_HEIGHT(room) <= top_height) {
-			// already blocked unless it's talled than the previous top height
+		if (blocked && ROOM_HEIGHT(room) <= top_height && (!ROOM_OWNER(room) || ROOM_OWNER(room) != GET_LOYALTY(ch))) {
+			// already blocked unless it's talled than the previous top height, or owned by the player
 			grid[x_pos][y_pos] = NOWHERE;
 		}
 		else {
@@ -545,7 +545,7 @@ void build_los_grid_one(char_data *ch, int x_shift, int y_shift, room_vnum **gri
 			// record new top height
 			top_height = MAX(top_height, ROOM_HEIGHT(room));
 			
-			if (!blocked && (ROOM_SECT_FLAGGED(room, SECTF_OBSCURE_VISION) || SECT_FLAGGED(BASE_SECT(room), SECTF_OBSCURE_VISION)) && ROOM_HEIGHT(room) >= ROOM_HEIGHT(IN_ROOM(ch))) {
+			if (!blocked && (ROOM_SECT_FLAGGED(room, SECTF_OBSCURE_VISION) || SECT_FLAGGED(BASE_SECT(room), SECTF_OBSCURE_VISION)) && ROOM_HEIGHT(room) >= GET_VIEW_HEIGHT(ch)) {
 				// rest of line will be blocked
 				blocked = TRUE;
 			}
@@ -2116,7 +2116,7 @@ void screenread_one_dir(char_data *ch, room_data *origin, int dir) {
 		}
 		
 		*roombuf = '\0';
-		if (is_blocked && ROOM_HEIGHT(to_room) <= top_height) {
+		if (is_blocked && ROOM_HEIGHT(to_room) <= top_height && (!ROOM_OWNER(to_room) || ROOM_OWNER(to_room) != GET_LOYALTY(ch))) {
 			// blocked by closer tile
 			if ((memory = get_player_map_memory(ch, GET_ROOM_VNUM(to_room), MAP_MEM_NAME))) {
 				snprintf(roombuf, sizeof(roombuf), "Blocked %s", memory);
@@ -2184,7 +2184,7 @@ void screenread_one_dir(char_data *ch, room_data *origin, int dir) {
 		top_height = MAX(top_height, ROOM_HEIGHT(to_room));
 		
 		// check blocking
-		if (check_blocking && !is_blocked && (ROOM_SECT_FLAGGED(to_room, SECTF_OBSCURE_VISION) || SECT_FLAGGED(BASE_SECT(to_room), SECTF_OBSCURE_VISION)) && ROOM_HEIGHT(to_room) >= ROOM_HEIGHT(origin)) {
+		if (check_blocking && !is_blocked && (ROOM_SECT_FLAGGED(to_room, SECTF_OBSCURE_VISION) || SECT_FLAGGED(BASE_SECT(to_room), SECTF_OBSCURE_VISION)) && ROOM_HEIGHT(to_room) >= GET_VIEW_HEIGHT(ch)) {
 			is_blocked = TRUE;
 		}
 	}
