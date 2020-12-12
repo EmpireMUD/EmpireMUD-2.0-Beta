@@ -2082,7 +2082,7 @@ void perform_change_sect(room_data *loc, struct map_data *map, sector_data *sect
 	}
 	
 	// for updating territory counts
-	was_large = (loc && SECT(loc)) ? ROOM_SECT_FLAGGED(loc, SECTF_LARGE_CITY_RADIUS) : FALSE;
+	was_large = (loc && SECT(loc)) ? LARGE_CITY_RADIUS(loc) : FALSE;
 	was_ter = (loc && ROOM_OWNER(loc)) ? get_territory_type_for_empire(loc, ROOM_OWNER(loc), FALSE, &junk) : TER_FRONTIER;
 	
 	// preserve
@@ -2140,7 +2140,7 @@ void perform_change_sect(room_data *loc, struct map_data *map, sector_data *sect
 	
 	// check for territory updates
 	if (loc && ROOM_OWNER(loc)) {
-		if (was_large != ROOM_SECT_FLAGGED(loc, SECTF_LARGE_CITY_RADIUS)) {
+		if (was_large != LARGE_CITY_RADIUS(loc)) {
 			struct empire_island *eisle = get_empire_island(ROOM_OWNER(loc), GET_ISLAND_ID(loc));
 			is_ter = get_territory_type_for_empire(loc, ROOM_OWNER(loc), FALSE, &junk);
 			
