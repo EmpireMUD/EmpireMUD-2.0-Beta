@@ -498,13 +498,14 @@ void replace_color_codes(char *string, char *new_color) {
 * to avoid repeating work.
 *
 * @param char_data *ch The player who is looking at the map.
+* @param room_data *from The room the player is looking from.
 * @param int x_shift How far east/west the tile to check is.
 * @param int y_shift How far north/south the tile to check is.
 * @param room_vnum **grid The grid that's being built (by build_line_of_sight_grid).
 * @param int radius The player's view radius.
 * @param int side The size of one of the "sizes" of the grid var.
 */
-void build_los_grid_one(char_data *ch, int x_shift, int y_shift, room_vnum **grid, int radius, int side) {
+void build_los_grid_one(char_data *ch, room_data *from, int x_shift, int y_shift, room_vnum **grid, int radius, int side) {
 	room_vnum *dat = &grid[x_shift + radius][y_shift + radius];
 	room_data *end_room, *room;
 	room_vnum r_vnum;
@@ -514,20 +515,20 @@ void build_los_grid_one(char_data *ch, int x_shift, int y_shift, room_vnum **gri
 	if (*dat != (NOWHERE - 1)) {
 		return;	// already done
 	}
-	if (!(end_room = real_shift(IN_ROOM(ch), x_shift, y_shift))) {
+	if (!(end_room = real_shift(from, x_shift, y_shift))) {
 		// no room there
 		*dat = NOWHERE;
 		return;
 	}
 	
-	dist = compute_distance(IN_ROOM(ch), end_room);
+	dist = compute_distance(from, end_room);
 	blocked = FALSE;
 	top_height = 0;
-	for (iter = 1, room = straight_line(IN_ROOM(ch), end_room, iter); iter <= dist && room && room != end_room; ++iter, room = straight_line(IN_ROOM(ch), end_room, iter)) {
+	for (iter = 1, room = straight_line(from, end_room, iter); iter <= dist && room && room != end_room; ++iter, room = straight_line(from, end_room, iter)) {
 		r_vnum = GET_ROOM_VNUM(room);
-		x_pos = MAP_X_COORD(r_vnum) - X_COORD(IN_ROOM(ch));
+		x_pos = MAP_X_COORD(r_vnum) - X_COORD(from);
 		x_pos = ((x_pos >= radius) ? (x_pos - MAP_WIDTH) : ((x_pos <= -radius) ? (x_pos + MAP_WIDTH) : x_pos)) + radius;
-		y_pos = MAP_Y_COORD(r_vnum) - Y_COORD(IN_ROOM(ch));
+		y_pos = MAP_Y_COORD(r_vnum) - Y_COORD(from);
 		y_pos = ((y_pos >= radius) ? (y_pos - MAP_HEIGHT) : ((y_pos <= -radius) ? (y_pos + MAP_HEIGHT) : y_pos)) + radius;
 		if (x_pos < 0 || x_pos >= side || y_pos < 0 || y_pos >= side) {
 			// off the grid somehow
@@ -574,10 +575,11 @@ void build_los_grid_one(char_data *ch, int x_shift, int y_shift, room_vnum **gri
 *       passed to this.
 *
 * @param char_data *ch The player who is viewing the area.
+* @param room_data *from The room the player is looking at (the center).
 * @param int radius The viewing radius to use (determines the size of the grid).
 * @return room_vnum** The two-dimensional grid of rooms the player can see.
 */
-room_vnum **build_line_of_sight_grid(char_data *ch, int radius) {
+room_vnum **build_line_of_sight_grid(char_data *ch, room_data *from, int radius) {
 	room_vnum **grid;
 	int x, y, r, side;
 	
@@ -610,16 +612,16 @@ room_vnum **build_line_of_sight_grid(char_data *ch, int radius) {
 				}
 				// this builds from the outside in
 				if (grid[radius+x][radius+y] == (NOWHERE - 1)) {
-					build_los_grid_one(ch, x, y, grid, radius, side);
+					build_los_grid_one(ch, from, x, y, grid, radius, side);
 				}
 				if (grid[radius-x][radius-y] == (NOWHERE - 1)) {
-					build_los_grid_one(ch, -x, -y, grid, radius, side);
+					build_los_grid_one(ch, from, -x, -y, grid, radius, side);
 				}
 				if (grid[radius+x][radius-y] == (NOWHERE - 1)) {
-					build_los_grid_one(ch, x, -y, grid, radius, side);
+					build_los_grid_one(ch, from, x, -y, grid, radius, side);
 				}
 				if (grid[radius-x][radius+y] == (NOWHERE - 1)) {
-					build_los_grid_one(ch, -x, y, grid, radius, side);
+					build_los_grid_one(ch, from, -x, y, grid, radius, side);
 				}
 			}
 		}
@@ -950,7 +952,7 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options) {
 			can_see_in_dark_distance = distance_can_see_in_dark(ch);
 			
 			if (!PRF_FLAGGED(ch, PRF_HOLYLIGHT)) {
-				view_grid = build_line_of_sight_grid(ch, magnitude);
+				view_grid = build_line_of_sight_grid(ch, room, magnitude);
 			}
 			
 			// map edges?
