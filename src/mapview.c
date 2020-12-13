@@ -45,6 +45,7 @@ vehicle_data *find_vehicle_to_show(char_data *ch, room_data *room);
 
 // locals
 ACMD(do_exits);
+char *get_screenreader_room_name(char_data *ch, room_data *from_room, room_data *to_room, bool show_dark);
 char *screenread_one_tile(char_data *ch, room_data *origin, room_data *to_room, bool show_dark);
 void show_screenreader_room(char_data *ch, room_data *room, bitvector_t options);
 
@@ -1970,7 +1971,11 @@ static void show_map_to_char(char_data *ch, struct mappc_data_container *mappc, 
 	}
 	
 	// record uncolored version as memory
-	add_player_map_memory(ch, GET_ROOM_VNUM(to_room), buf, NULL, 0);
+	if (has_player_tech(ch, PTECH_MAP_MEMORY)) {
+		add_player_map_memory(ch, GET_ROOM_VNUM(to_room), buf, NULL, 0);
+		// this will add the name, too
+		get_screenreader_room_name(ch, IN_ROOM(ch), to_room, FALSE);
+	}
 	
 	send_to_char(buf, ch);
 }
