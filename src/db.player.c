@@ -4869,11 +4869,8 @@ void load_map_memory(char_data *ch) {
 	long timestamp;
 	room_vnum vnum;
 	FILE *fl;
-	unsigned long long timer;
 	
 	if (ch && !IS_NPC(ch) && !GET_MAP_MEMORY_LOADED(ch) && config_get_bool("line_of_sight") && has_player_tech(ch, PTECH_MAP_MEMORY)) {
-		timer = microtime();
-		
 		// this will be true no matter what
 		GET_MAP_MEMORY_LOADED(ch) = TRUE;
 		
@@ -4907,8 +4904,6 @@ void load_map_memory(char_data *ch) {
 		fclose(fl);	
 		
 		GET_MAP_MEMORY_NEEDS_SAVE(ch) = FALSE;	// this is set by the loading process
-		
-		log("load_map_memory: %s %.2f sec", GET_PC_NAME(ch), (microtime() - timer) / 1000000.0);
 	}
 }
 
@@ -4928,14 +4923,11 @@ void write_map_memory(char_data *ch) {
 	struct player_map_memory *map_mem, *next;
 	char filename[256], tempname[256];
 	FILE *fl;
-	unsigned long long timer;
 	const int limit = config_get_int("map_memory_limit");
 	
 	if (!ch || IS_NPC(ch) || !GET_MAP_MEMORY_LOADED(ch) || !GET_MAP_MEMORY_NEEDS_SAVE(ch)) {	
 		return;	// no work
 	}
-	
-	timer = microtime();
 	
 	// cleanup when there are too many
 	if (GET_MAP_MEMORY_COUNT(ch) > limit) {
@@ -4966,8 +4958,6 @@ void write_map_memory(char_data *ch) {
 	
 	fclose(fl);
 	rename(tempname, filename);
-	
-	log("write_map_memory: %s %.2f sec", GET_PC_NAME(ch), (microtime() - timer) / 1000000.0);
 }
 
 
