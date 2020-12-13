@@ -1082,8 +1082,8 @@ Available techs are:
  &cCustomize-Vehicle&0 * - Can use 'customize vehicle'.
  &cPlant-Crops&0 * - Can use the 'plant' command.
  &cChip-Command&0 * - Can use the 'chip' command.
- &Saw-Command&0 * - Can use the 'saw' command.
- &Scrape-Command&0 * - Can use the 'scrape' command.
+ &cSaw-Command&0 * - Can use the 'saw' command.
+ &cScrape-Command&0 * - Can use the 'scrape' command.
  &cMap-Memory *&0 - Remembers blocked/dark tiles on look/scan.
 
 * Marked techs trigger ability gains on their own without gain hooks.
