@@ -526,7 +526,7 @@ void disassociate_building(room_data *room) {
 	char_data *temp_ch;
 	
 	// for updating territory counts
-	was_large = LARGE_CITY_RADIUS(room);
+	was_large = ROOM_BLD_FLAGGED(room, BLD_LARGE_CITY_RADIUS) ? TRUE : FALSE;
 	was_ter = ROOM_OWNER(room) ? get_territory_type_for_empire(room, ROOM_OWNER(room), FALSE, &junk) : TER_FRONTIER;
 	
 	if (ROOM_OWNER(room) && GET_BUILDING(room) && IS_COMPLETE(room)) {
@@ -635,7 +635,7 @@ void disassociate_building(room_data *room) {
 	}
 	
 	// check for territory updates
-	if (ROOM_OWNER(room) && was_large != LARGE_CITY_RADIUS(room)) {
+	if (ROOM_OWNER(room) && was_large != (ROOM_BLD_FLAGGED(room, BLD_LARGE_CITY_RADIUS) ? TRUE : FALSE)) {
 		struct empire_island *eisle = get_empire_island(ROOM_OWNER(room), GET_ISLAND_ID(room));
 		is_ter = get_territory_type_for_empire(room, ROOM_OWNER(room), FALSE, &junk);
 		
