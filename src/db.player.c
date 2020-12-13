@@ -4929,6 +4929,7 @@ void write_map_memory(char_data *ch) {
 	char filename[256], tempname[256];
 	FILE *fl;
 	unsigned long long timer;
+	const int limit = config_get_int("map_memory_limit");
 	
 	if (!ch || IS_NPC(ch) || !GET_MAP_MEMORY_LOADED(ch) || !GET_MAP_MEMORY_NEEDS_SAVE(ch)) {	
 		return;	// no work
@@ -4937,10 +4938,10 @@ void write_map_memory(char_data *ch) {
 	timer = microtime();
 	
 	// cleanup when there are too many
-	if (GET_MAP_MEMORY_COUNT(ch) > 17000) {
+	if (GET_MAP_MEMORY_COUNT(ch) > limit) {
 		HASH_SORT(GET_MAP_MEMORY(ch), sort_map_memory);
 		HASH_ITER(hh, GET_MAP_MEMORY(ch), map_mem, next) {
-			if (GET_MAP_MEMORY_COUNT(ch) > 15000) {
+			if (GET_MAP_MEMORY_COUNT(ch) > (limit * 0.9)) {
 				delete_player_map_memory(map_mem, ch);
 			}
 		}

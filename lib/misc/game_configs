@@ -148,6 +148,7 @@ idle_linkdead_rent_time 5
 idle_rent_time 20
 lastname_mode ac
 line_of_sight 1
+map_memory_limit 20000
 max_capitals_in_name 2
 max_home_store_uniques 300
 max_light_radius_base 5

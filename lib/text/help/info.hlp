@@ -277,7 +277,7 @@ that are at the same height as the tile they're standing on.
 Screenreaders show the tiles as "Blocked" while the ASCII map displays them
 with the &w****&0 icon.
 
-See also: MAP MEMORY
+See also: MAP-MEMORY
 #
 BLOOD "BLOOD POINTS" "BLOOD POOL" "BLOOD UPKEEP"
 
