@@ -8538,8 +8538,8 @@ ACMD(do_fullsave) {
 	
 	time = microtime();
 	write_fresh_binary_map_file();
-	write_whole_binary_world_index();
 	write_all_wld_files();
+	write_whole_binary_world_index();
 	send_config_msg(ch, "ok_string");
 	
 	if (ch->desc) {
