@@ -41,6 +41,7 @@ tower may be upgraded by typing upgrade here.
 ~
 F
 j
+H 0 1
 I 29 5010 100.00 1 r  # RUINS-TO-BLD: Flooded Ruins
 M
 251 5.00 ce
@@ -55,7 +56,7 @@ S
 Advanced Oceanic Tower~
 An Advanced Oceanic Tower~
 &T"TT"~
-64 5 blR 0
+64 5 blrR 0
 0 0 0 -1
 D
    This is a well-constructed guard tower, anchored by long hydra bones. It is
@@ -65,6 +66,7 @@ not well protected against invasion. Hopefully, it will be enough defense.
 ~
 F
 bj
+H 0 1
 I 29 5010 100.00 1 r  # RUINS-TO-BLD: Flooded Ruins
 M
 251 5.00 ce

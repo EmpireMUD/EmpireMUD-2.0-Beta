@@ -1319,6 +1319,7 @@ gems, and worn pestles cover the stone tables that sit around the room. A tall,
 winding staircase leads to the top of the tower, although you can't tell what
 is supporting the stairs.
 ~
+H 0 1
 I 29 5007 100.00 1 r  # RUINS-TO-BLD: Ruins
 M
 237 20.00 ce
@@ -1334,7 +1335,7 @@ S
 Portcullis~
 A Great Portcullis~
 @U&0[]@V~
-64 0 floR abeghijkm
+64 0 florR abeghijkm
 30 0 0 -1
 D
    You are standing beneath a great portcullis. This is the entrance to a
@@ -1346,6 +1347,7 @@ E
 portcullis gate~
 The portcullis is massive. It must take 5 men to close it.
 ~
+H 0 1
 I 29 5007 100.00 1 r  # RUINS-TO-BLD: Ruins
 R
 6000 2 1 0
@@ -1356,7 +1358,7 @@ S
 Great Hall~
 The Great Hall~
 &0[**]~
-64 0 flR abeghijkm
+64 0 flrR abeghijkm
 30 0 0 -1
 D
    This is the Great Hall, a room lined with magnificent suits of armor and
@@ -1364,6 +1366,7 @@ decorated with the best gold available. The Great Hall is often one of the most
 important parts of the castle as it shows the wealth of the monarch. It also
 leads to the throne room.
 ~
+H 0 1
 I 29 5007 100.00 1 r  # RUINS-TO-BLD: Ruins
 R
 6000 2 1 0
@@ -1387,6 +1390,7 @@ upgraded by typing upgrade here.
 ~
 F
 j
+H 0 1
 I 29 5007 100.00 1 r  # RUINS-TO-BLD: Ruins
 M
 251 5.00 ce
@@ -1414,6 +1418,7 @@ upgraded by typing upgrade here again.
 ~
 F
 bj
+H 0 1
 I 29 5007 100.00 1 r  # RUINS-TO-BLD: Ruins
 M
 251 5.00 ce
@@ -1428,7 +1433,7 @@ S
 Superior Guard Tower~
 A Superior Guard Tower~
 &0"TT"~
-64 0 blR 0
+64 0 blrR 0
 0 0 0 -1
 D
    This is a well-constructed guard tower. It is tall, allowing it to see
@@ -1438,6 +1443,7 @@ against invasion. Hopefully, it will be enough defense.
 ~
 F
 bj
+H 0 1
 I 29 5007 100.00 1 r  # RUINS-TO-BLD: Ruins
 M
 251 5.00 ce
@@ -1502,13 +1508,14 @@ S
 Gatehouse~
 The Gatehouse~
 @U&0||@V~
-32 0 bcgoR 0
+32 0 bcgorR 0
 0 0 0 -1
 D
    The gatehouse is a welcoming sight for weary travellers. It signifies the
 return home to a safe place. While not effective against thieves and
 infiltrators, it prevents access by common men and animals.
 ~
+H 0 1
 I 29 5017 100.00 1 r  # RUINS-TO-BLD: Gatehouse Ruins
 M
 251 33.00 ce
@@ -1521,8 +1528,9 @@ S
 Wall~
 A Stone Wall~
 @U&#VV@V~
-32 0 djkn 0
+32 0 djknr 0
 0 0 0 -1
+H 0 1
 I 29 5006 100.00 1 r  # RUINS-TO-BLD: Ruins
 R
 6075 1 1 0
