@@ -3143,7 +3143,9 @@ int get_view_height(char_data *ch, room_data *from_room) {
 	// room modifiers
 	if (from_room) {
 		home_room = HOME_ROOM(from_room);
-		height += ROOM_HEIGHT(home_room);
+		
+		// ignore negative heights: these are used to track water flow
+		height += MAX(0, ROOM_HEIGHT(home_room));
 		
 		if (GET_BUILDING(home_room)) {
 			height += GET_BLD_HEIGHT(GET_BUILDING(home_room));
@@ -5725,7 +5727,8 @@ int get_room_blocking_height(room_data *room) {
 		return 0;
 	}
 	
-	height += ROOM_HEIGHT(room);
+	// ignore negative heights: these are used to track water flow
+	height += MAX(0, ROOM_HEIGHT(room));
 	
 	if (GET_BUILDING(room)) {
 		height += GET_BLD_HEIGHT(GET_BUILDING(room));

@@ -551,7 +551,7 @@ void build_los_grid_one(char_data *ch, room_data *from, int x_shift, int y_shift
 			// record new top height
 			top_height = MAX(top_height, r_height);
 			
-			if (!blocked && (ROOM_SECT_FLAGGED(room, SECTF_OBSCURE_VISION) || SECT_FLAGGED(BASE_SECT(room), SECTF_OBSCURE_VISION)) && r_height >= view_height) {
+			if (!blocked && (r_height > view_height || ROOM_SECT_FLAGGED(room, SECTF_OBSCURE_VISION) || SECT_FLAGGED(BASE_SECT(room), SECTF_OBSCURE_VISION)) && r_height >= view_height) {
 				// rest of line will be blocked
 				blocked = TRUE;
 			}
@@ -2207,7 +2207,7 @@ void screenread_one_dir(char_data *ch, room_data *origin, int dir) {
 		top_height = MAX(top_height, r_height);
 		
 		// check blocking
-		if (check_blocking && !is_blocked && (ROOM_SECT_FLAGGED(to_room, SECTF_OBSCURE_VISION) || SECT_FLAGGED(BASE_SECT(to_room), SECTF_OBSCURE_VISION)) && r_height >= view_height) {
+		if (check_blocking && !is_blocked && (r_height > view_height || ROOM_SECT_FLAGGED(to_room, SECTF_OBSCURE_VISION) || SECT_FLAGGED(BASE_SECT(to_room), SECTF_OBSCURE_VISION)) && r_height >= view_height) {
 			is_blocked = TRUE;
 		}
 	}
