@@ -511,7 +511,7 @@ void build_los_grid_one(char_data *ch, room_data *from, int x_shift, int y_shift
 	room_data *end_room, *room;
 	room_vnum r_vnum;
 	int iter, dist, x_pos, y_pos, top_height, view_height, r_height;
-	bool blocked;
+	bool blocked, blocking_veh;
 	
 	if (*dat != (NOWHERE - 1)) {
 		return;	// already done
@@ -538,7 +538,7 @@ void build_los_grid_one(char_data *ch, room_data *from, int x_shift, int y_shift
 			break;
 		}
 		
-		r_height = get_room_blocking_height(room);
+		r_height = get_room_blocking_height(room, &blocking_veh);
 		
 		if (blocked && r_height <= top_height && (!ROOM_OWNER(room) || ROOM_OWNER(room) != GET_LOYALTY(ch))) {
 			// already blocked unless it's talled than the previous top height, or owned by the player
@@ -551,7 +551,7 @@ void build_los_grid_one(char_data *ch, room_data *from, int x_shift, int y_shift
 			// record new top height
 			top_height = MAX(top_height, r_height);
 			
-			if (!blocked && (r_height > view_height || ROOM_SECT_FLAGGED(room, SECTF_OBSCURE_VISION) || SECT_FLAGGED(BASE_SECT(room), SECTF_OBSCURE_VISION)) && r_height >= view_height) {
+			if (!blocked && (blocking_veh || ROOM_SECT_FLAGGED(room, SECTF_OBSCURE_VISION) || SECT_FLAGGED(BASE_SECT(room), SECTF_OBSCURE_VISION) || ROOM_BLD_FLAGGED(room, BLD_OBSCURE_VISION)) && r_height >= view_height) {
 				// rest of line will be blocked
 				blocked = TRUE;
 			}
@@ -2101,7 +2101,7 @@ void screenread_one_dir(char_data *ch, room_data *origin, int dir) {
 	int mapsize, dist, dist_iter, can_see_in_dark_distance, view_height, r_height;
 	room_data *to_room;
 	int repeats, top_height;
-	bool check_blocking, is_blocked = FALSE;
+	bool blocking_veh, check_blocking, is_blocked = FALSE;
 	bool allow_stacking = TRUE;	// always
 	const char *memory;
 	
@@ -2136,7 +2136,7 @@ void screenread_one_dir(char_data *ch, room_data *origin, int dir) {
 			break;
 		}
 		
-		r_height = get_room_blocking_height(to_room);
+		r_height = get_room_blocking_height(to_room, &blocking_veh);
 		
 		*roombuf = '\0';
 		if (is_blocked && r_height <= top_height && (!ROOM_OWNER(to_room) || ROOM_OWNER(to_room) != GET_LOYALTY(ch))) {
@@ -2207,7 +2207,7 @@ void screenread_one_dir(char_data *ch, room_data *origin, int dir) {
 		top_height = MAX(top_height, r_height);
 		
 		// check blocking
-		if (check_blocking && !is_blocked && (r_height > view_height || ROOM_SECT_FLAGGED(to_room, SECTF_OBSCURE_VISION) || SECT_FLAGGED(BASE_SECT(to_room), SECTF_OBSCURE_VISION)) && r_height >= view_height) {
+		if (check_blocking && !is_blocked && (blocking_veh || ROOM_SECT_FLAGGED(to_room, SECTF_OBSCURE_VISION) || SECT_FLAGGED(BASE_SECT(to_room), SECTF_OBSCURE_VISION) || ROOM_BLD_FLAGGED(to_room, BLD_OBSCURE_VISION)) && r_height >= view_height) {
 			is_blocked = TRUE;
 		}
 	}

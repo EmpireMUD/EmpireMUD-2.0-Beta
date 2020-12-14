@@ -770,7 +770,7 @@ typedef struct vehicle_data vehicle_data;
 #define BLD_ATTACH_ROAD  BIT(14)	// building connects to roads on the map
 #define BLD_BURNABLE  BIT(15)	// fire! fire!
 #define BLD_EXIT  BIT(16)	// for ROOM-flagged interiors, players can 'exit' here
-// #define BLD_UNUSED5  BIT(17)
+#define BLD_OBSCURE_VISION  BIT(17)	// blocks tiles behind it
 // #define BLD_UNUSED6  BIT(18)
 // #define BLD_UNUSED7  BIT(19)
 // #define BLD_UNUSED8  BIT(20)
@@ -2558,6 +2558,7 @@ typedef enum {
 #define VEH_EXTRACTED  BIT(34)	// I. vehicle is mid-extraction
 #define VEH_RUIN_SLOWLY_FROM_CLIMATE  BIT(35)	// J. always ruins slowly no matter what climate
 #define VEH_RUIN_QUICKLY_FROM_CLIMATE  BIT(36)	// K. always ruins quickly no matter what climate
+#define VEH_OBSCURE_VISION  BIT(37)	// L. blocks tiles behind it on the map
 
 // VEH_CUSTOM_x: custom message types
 #define VEH_CUSTOM_RUINS_TO_ROOM  0	// sent when the building falls into ruin

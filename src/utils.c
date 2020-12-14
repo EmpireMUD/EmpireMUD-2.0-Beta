@@ -5717,11 +5717,17 @@ room_data *get_map_location_for(room_data *room) {
 * it (building; tallest vehicle).
 *
 * @param room_data *room The map room.
+* @param bool *blocking_vehicle Optional: Will bind TRUE to this if there's a vehicle blocking at that height.
 * @return int The effective height of the tile.
 */
-int get_room_blocking_height(room_data *room) {
+int get_room_blocking_height(room_data *room, bool *blocking_vehicle) {
 	vehicle_data *veh;
 	int height = 0, best_veh = 0;
+	
+	if (blocking_vehicle) {
+		// initialize
+		*blocking_vehicle = FALSE;
+	}
 	
 	if (!room) {
 		return 0;
@@ -5730,15 +5736,18 @@ int get_room_blocking_height(room_data *room) {
 	// ignore negative heights: these are used to track water flow
 	height += MAX(0, ROOM_HEIGHT(room));
 	
-	if (GET_BUILDING(room)) {
+	if (GET_BUILDING(room) && ROOM_BLD_FLAGGED(room, BLD_OBSCURE_VISION)) {
 		height += GET_BLD_HEIGHT(GET_BUILDING(room));
 	}
 	
 	// look for tallest vehicle if room is open
 	if (!ROOM_IS_CLOSED(room)) {
 		DL_FOREACH2(ROOM_VEHICLES(room), veh, next_in_room) {
-			if (VEH_IS_COMPLETE(veh)) {
+			if (VEH_IS_COMPLETE(veh) && VEH_FLAGGED(veh, VEH_OBSCURE_VISION)) {
 				best_veh = MAX(best_veh, VEH_HEIGHT(veh));
+				if (blocking_vehicle) {
+					*blocking_vehicle = TRUE;
+				}
 			}
 		}
 		height += best_veh;

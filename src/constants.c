@@ -2998,7 +2998,7 @@ const char *bld_flags[] = {
 	"ATTACH-ROAD",
 	"BURNABLE",	// 15
 	"EXIT",
-	"*",
+	"OBSCURE-VISION",
 	"*",
 	"*",
 	"*",	// 20
@@ -4536,6 +4536,7 @@ const char *vehicle_flags[] = {
 	"*EXTRACTED",
 	"RUIN-SLOWLY-FROM-CLIMATE",	// 35
 	"RUIN-QUICKLY-FROM-CLIMATE",
+	"OBSCURE-VISION",
 	"\n"
 };
 
@@ -4579,6 +4580,7 @@ const char *identify_vehicle_flags[] = {
 	"",	// *EXTRACTED
 	"",	// RUIN-SLOWLY-FROM-CLIMATE	// 35
 	"",	// RUIN-QUICKLY-FROM-CLIMATE
+	"",	// OBSCURE-VISION
 	"\n"
 };
 
