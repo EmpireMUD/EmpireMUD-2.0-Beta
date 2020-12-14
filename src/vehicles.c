@@ -2332,7 +2332,7 @@ vehicle_data *unstore_vehicle_from_file(FILE *fl, any_vnum vnum, char *error_str
 		log("SYSERR: Bad tag in vehicle %d for %s: %s", vnum, NULLSAFE(error_str), (src));	\
 	}
 	
-	// load based on vnum or, if NOTHING, create anonymous object
+	// load based on vnum or, if NOTHING, this will fail
 	if (proto) {
 		veh = read_vehicle(vnum, FALSE);
 	}
