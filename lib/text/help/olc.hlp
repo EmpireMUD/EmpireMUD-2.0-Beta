@@ -4027,7 +4027,7 @@ negative means further from the sea). If a river or lake has no height
 property, it probably isn't attached to the sea.
 
 Sectors that cover or replace mountains, rivers, and lakes should have the
-NEEDS-HEIGHT sector flag so they will keep their previous heights.
+KEEPS-HEIGHT sector flag so they will keep their previous heights.
 
 See also: STAT
 #d
@@ -7029,7 +7029,9 @@ Available sector flags:
  NO-GLOBAL-SPAWNS - Won't use global spawn lists.
  ROUGH - This is rough, raised terrain, like a mountain
  SHALLOW-WATER - The tile has water but requires no boat (like a swamp)
- NEEDS-HEIGHT - Uses the 'height' property in some way and will inherit it.
+ NEEDS-HEIGHT - Uses the 'height' property in some way and will set itself from
+    nearby tiles if missing.
+ KEEPS-HEIGHT - Uses the 'height' property but won't change it (for roads etc).
 
 See also: OLC SECTORS, TERRAIN HEIGHT
 #d

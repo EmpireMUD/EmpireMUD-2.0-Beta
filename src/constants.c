@@ -3601,6 +3601,7 @@ const char *sector_flags[] = {
 	"ROUGH",
 	"SHALLOW-WATER",
 	"NEEDS-HEIGHT",
+	"KEEPS-HEIGHT",
 	"\n"
 };
 

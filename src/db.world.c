@@ -345,7 +345,7 @@ void check_terrain_height(room_data *room) {
 		
 		set_room_height(room, good_match ? good_match : bad_match);
 	}
-	else if (!ROOM_SECT_FLAGGED(room, SECTF_NEEDS_HEIGHT) && !SECT_FLAGGED(BASE_SECT(room), SECTF_NEEDS_HEIGHT)) {
+	else if (!ROOM_SECT_FLAGGED(room, SECTF_NEEDS_HEIGHT | SECTF_KEEPS_HEIGHT) && !SECT_FLAGGED(BASE_SECT(room), SECTF_NEEDS_HEIGHT | SECTF_KEEPS_HEIGHT)) {
 		// clear it
 		set_room_height(room, 0);
 	}
