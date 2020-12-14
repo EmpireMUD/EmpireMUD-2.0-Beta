@@ -3478,7 +3478,7 @@ ACMD(do_survey) {
 	struct empire_city_data *city;
 	struct empire_island *eisle;
 	struct island_info *island;
-	int ter_type;
+	int ter_type, base_height, mod_height;
 	bool junk;
 	
 	msg_to_char(ch, "You survey the area:\r\n");
@@ -3496,6 +3496,17 @@ ACMD(do_survey) {
 	if (IS_OUTDOOR_TILE(IN_ROOM(ch)) && GET_SECT_CLIMATE(SECT(IN_ROOM(ch)))) {
 		ordered_sprintbit(GET_SECT_CLIMATE(SECT(IN_ROOM(ch))), climate_flags, climate_flags_order, FALSE, buf);
 		msg_to_char(ch, "Climate: %s\r\n", buf);
+	}
+	
+	base_height = ROOM_HEIGHT(HOME_ROOM(IN_ROOM(ch)));
+	mod_height = get_room_blocking_height(IN_ROOM(ch));
+	if (base_height || mod_height) {
+		if (mod_height != base_height) {
+			msg_to_char(ch, "Elevation: %d (with structures: %d)\r\n", base_height, mod_height);
+		}
+		else {
+			msg_to_char(ch, "Elevation: %d\r\n", base_height);
+		}
 	}
 	
 	// empire

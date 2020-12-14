@@ -269,7 +269,8 @@ beyond the blocking tile, but nothing else. If you stand on a high spot, like
 the top of a mountain range, you'll be able to see over most tiles around you.
 
 Tiles owned by your empire are always shown un-blocked, even when behind tall
-mountains.
+mountains. Sitting on a vehicle or being inside a vehicle/building can increase
+your view height.
 
 Flying players get +1 height to their view, allowing them to see over things
 that are at the same height as the tile they're standing on.
@@ -277,7 +278,7 @@ that are at the same height as the tile they're standing on.
 Screenreaders show the tiles as "Blocked" while the ASCII map displays them
 with the &w****&0 icon.
 
-See also: MAP-MEMORY
+See also: MAP-MEMORY, SURVEY
 #
 BLOOD "BLOOD POINTS" "BLOOD POOL" "BLOOD UPKEEP"
 

@@ -679,7 +679,7 @@ struct vehicle_attached_mob *find_harnessed_mob_by_name(vehicle_data *veh, char 
 vehicle_data *find_vehicle_to_show(char_data *ch, room_data *room) {
 	vehicle_data *iter, *in_veh, *found = NULL;
 	bool is_on_vehicle = ((in_veh = GET_ROOM_VEHICLE(IN_ROOM(ch))) && room == IN_ROOM(in_veh));
-	int found_size = -1;
+	int found_size = -1, found_height = -1;
 	
 	// we don't show vehicles in buildings or closed tiles (unless the player is on a vehicle in that room, in which case we override)
 	if (!is_on_vehicle && (IS_ANY_BUILDING(room) || ROOM_IS_CLOSED(room))) {
@@ -697,10 +697,13 @@ vehicle_data *find_vehicle_to_show(char_data *ch, room_data *room) {
 			continue;	// can't see from here
 		}
 		
-		// valid to show! only if first/bigger
-		if (!found || VEH_SIZE(iter) > found_size) {
-			found = iter;
-			found_size = VEH_SIZE(iter);
+		// valid to show! only if first/bigger (prefer height over size)
+		if (!found || VEH_HEIGHT(iter) >= found_height) {
+			found_height = VEH_HEIGHT(iter);
+			if (!found || VEH_SIZE(iter) > found_size) {
+				found_size = VEH_SIZE(iter);
+				found = iter;
+			}
 		}
 	}
 	

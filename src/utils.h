@@ -1245,7 +1245,6 @@ int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_COORD(ge
 #define SHOW_FIGHT_MESSAGES(ch, bit)  (!IS_NPC(ch) && IS_SET(GET_FIGHT_MESSAGES(ch), (bit)))
 
 // definitions
-#define GET_VIEW_HEIGHT(ch)  ((IN_ROOM(ch) ? ROOM_HEIGHT(IN_ROOM(ch)) : 0) + (EFFECTIVELY_FLYING(ch) ? 1 : 0))
 #define HAS_NAVIGATION(ch)  has_player_tech(ch, PTECH_NAVIGATION)
 #define IN_HOSTILE_TERRITORY(ch)  (!IS_NPC(ch) && !IS_IMMORTAL(ch) && ROOM_OWNER(IN_ROOM(ch)) && ROOM_OWNER(IN_ROOM(ch)) != GET_LOYALTY(ch) && (IS_HOSTILE(ch) || empire_is_hostile(ROOM_OWNER(IN_ROOM(ch)), GET_LOYALTY(ch), IN_ROOM(ch))))
 #define IS_APPROVED(ch)  (IS_NPC(ch) || PLR_FLAGGED(ch, PLR_APPROVED) || ACCOUNT_FLAGGED(ch, ACCT_APPROVED))
@@ -1795,6 +1794,7 @@ void despawn_charmies(char_data *ch, any_vnum only_vnum);
 void determine_gear_level(char_data *ch);
 room_data *find_load_room(char_data *ch);
 room_data *find_starting_location();
+int get_view_height(char_data *ch, room_data *from_room);
 bool has_one_day_playtime(char_data *ch);
 int num_earned_bonus_traits(char_data *ch);
 int pick_level_from_range(int level, int min, int max);
@@ -1873,6 +1873,7 @@ bool find_sect_within_distance_from_room(room_data *room, sector_vnum sect, int 
 bool get_coord_shift(int start_x, int start_y, int x_shift, int y_shift, int *new_x, int *new_y);
 int get_direction_to(room_data *from, room_data *to);
 room_data *get_map_location_for(room_data *room);
+int get_room_blocking_height(room_data *room);
 bool is_deep_mine(room_data *room);
 void lock_icon(room_data *room, struct icon_data *use_icon);
 room_data *real_shift(room_data *origin, int x_shift, int y_shift);

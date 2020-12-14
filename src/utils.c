@@ -3124,6 +3124,63 @@ int get_attribute_by_name(char *name) {
 
 
 /**
+* Determines what effective terrain height a player has when looking at the
+* map, for the purpose of determining what terrain is blocked.
+*
+* @param char_data *ch The person.
+* @param room_data *from_room Optional: What room the person is looking at (if NULL, assumes it's the room they're in).
+* @return int The person's view height.
+*/
+int get_view_height(char_data *ch, room_data *from_room) {
+	room_data *home_room;
+	vehicle_data *veh;
+	int height = 0, best_veh = 0;
+	
+	if (!from_room) {
+		from_room = IN_ROOM(ch);
+	}
+	
+	// room modifiers
+	if (from_room) {
+		home_room = HOME_ROOM(from_room);
+		height += ROOM_HEIGHT(home_room);
+		
+		if (GET_BUILDING(home_room)) {
+			height += GET_BLD_HEIGHT(GET_BUILDING(home_room));
+		}
+		
+		// if in a vehicle, apply it here
+		if (GET_ROOM_VEHICLE(from_room)) {
+			height += VEH_HEIGHT(GET_ROOM_VEHICLE(from_room));
+		}
+	}
+	
+	// character modifiers
+	if (from_room == IN_ROOM(ch) && EFFECTIVELY_FLYING(ch)) {
+		++height;
+	}
+	
+	// possible vehicle modifiers
+	if (GET_SITTING_ON(ch)) {
+		// prefer sitting-on
+		height += VEH_HEIGHT(GET_SITTING_ON(ch));
+	}
+	else if (from_room) {
+		// if not sitting-on, look for a vehicle in the room that has no sit/inside
+		DL_FOREACH2(ROOM_VEHICLES(from_room), veh, next_in_room) {
+			if (!VEH_FLAGGED(veh, VEH_SIT | VEH_SLEEP) && VEH_INTERIOR_ROOM_VNUM(veh) == NOWHERE && VEH_IS_COMPLETE(veh)) {
+				best_veh = MAX(best_veh, VEH_HEIGHT(veh));
+			}
+		}
+		
+		height += best_veh;
+	}
+	
+	return height;
+}
+
+
+/**
 * Picks a level based on a min/max and base.
 *
 * @param int level The base level (usually player's level).
@@ -5650,6 +5707,41 @@ room_data *get_map_location_for(room_data *room) {
 	else {
 		return NULL;	// found a location not on the map
 	}
+}
+
+
+/**
+* Determines the visible height of a map room, as blocked by whatever is on
+* it (building; tallest vehicle).
+*
+* @param room_data *room The map room.
+* @return int The effective height of the tile.
+*/
+int get_room_blocking_height(room_data *room) {
+	vehicle_data *veh;
+	int height = 0, best_veh = 0;
+	
+	if (!room) {
+		return 0;
+	}
+	
+	height += ROOM_HEIGHT(room);
+	
+	if (GET_BUILDING(room)) {
+		height += GET_BLD_HEIGHT(GET_BUILDING(room));
+	}
+	
+	// look for tallest vehicle if room is open
+	if (!ROOM_IS_CLOSED(room)) {
+		DL_FOREACH2(ROOM_VEHICLES(room), veh, next_in_room) {
+			if (VEH_IS_COMPLETE(veh)) {
+				best_veh = MAX(best_veh, VEH_HEIGHT(veh));
+			}
+		}
+		height += best_veh;
+	}
+	
+	return height;
 }
 
 

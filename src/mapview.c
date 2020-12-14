@@ -510,7 +510,7 @@ void build_los_grid_one(char_data *ch, room_data *from, int x_shift, int y_shift
 	room_vnum *dat = &grid[x_shift + radius][y_shift + radius];
 	room_data *end_room, *room;
 	room_vnum r_vnum;
-	int iter, dist, x_pos, y_pos, top_height;
+	int iter, dist, x_pos, y_pos, top_height, view_height, r_height;
 	bool blocked;
 	
 	if (*dat != (NOWHERE - 1)) {
@@ -521,6 +521,8 @@ void build_los_grid_one(char_data *ch, room_data *from, int x_shift, int y_shift
 		*dat = NOWHERE;
 		return;
 	}
+	
+	view_height = get_view_height(ch, from);
 	
 	dist = compute_distance(from, end_room);
 	blocked = FALSE;
@@ -536,7 +538,9 @@ void build_los_grid_one(char_data *ch, room_data *from, int x_shift, int y_shift
 			break;
 		}
 		
-		if (blocked && ROOM_HEIGHT(room) <= top_height && (!ROOM_OWNER(room) || ROOM_OWNER(room) != GET_LOYALTY(ch))) {
+		r_height = get_room_blocking_height(room);
+		
+		if (blocked && r_height <= top_height && (!ROOM_OWNER(room) || ROOM_OWNER(room) != GET_LOYALTY(ch))) {
 			// already blocked unless it's talled than the previous top height, or owned by the player
 			grid[x_pos][y_pos] = NOWHERE;
 		}
@@ -545,9 +549,9 @@ void build_los_grid_one(char_data *ch, room_data *from, int x_shift, int y_shift
 			grid[x_pos][y_pos] = r_vnum;
 			
 			// record new top height
-			top_height = MAX(top_height, ROOM_HEIGHT(room));
+			top_height = MAX(top_height, r_height);
 			
-			if (!blocked && (ROOM_SECT_FLAGGED(room, SECTF_OBSCURE_VISION) || SECT_FLAGGED(BASE_SECT(room), SECTF_OBSCURE_VISION)) && ROOM_HEIGHT(room) >= GET_VIEW_HEIGHT(ch)) {
+			if (!blocked && (ROOM_SECT_FLAGGED(room, SECTF_OBSCURE_VISION) || SECT_FLAGGED(BASE_SECT(room), SECTF_OBSCURE_VISION)) && r_height >= view_height) {
 				// rest of line will be blocked
 				blocked = TRUE;
 			}
@@ -2094,7 +2098,7 @@ char *get_screenreader_room_name(char_data *ch, room_data *from_room, room_data 
 void screenread_one_dir(char_data *ch, room_data *origin, int dir) {
 	char buf[MAX_STRING_LENGTH], roombuf[MAX_INPUT_LENGTH], lastroom[MAX_INPUT_LENGTH];
 	char dirbuf[MAX_STRING_LENGTH];
-	int mapsize, dist, dist_iter, can_see_in_dark_distance;
+	int mapsize, dist, dist_iter, can_see_in_dark_distance, view_height, r_height;
 	room_data *to_room;
 	int repeats, top_height;
 	bool check_blocking, is_blocked = FALSE;
@@ -2122,6 +2126,7 @@ void screenread_one_dir(char_data *ch, room_data *origin, int dir) {
 	*lastroom = '\0';
 	repeats = 0;
 	top_height = 0;
+	view_height = get_view_height(ch, origin);
 
 	// show distance that direction		
 	for (dist_iter = 1; dist_iter <= mapsize; ++dist_iter) {
@@ -2131,8 +2136,10 @@ void screenread_one_dir(char_data *ch, room_data *origin, int dir) {
 			break;
 		}
 		
+		r_height = get_room_blocking_height(to_room);
+		
 		*roombuf = '\0';
-		if (is_blocked && ROOM_HEIGHT(to_room) <= top_height && (!ROOM_OWNER(to_room) || ROOM_OWNER(to_room) != GET_LOYALTY(ch))) {
+		if (is_blocked && r_height <= top_height && (!ROOM_OWNER(to_room) || ROOM_OWNER(to_room) != GET_LOYALTY(ch))) {
 			// blocked by closer tile
 			if ((memory = get_player_map_memory(ch, GET_ROOM_VNUM(to_room), MAP_MEM_NAME))) {
 				snprintf(roombuf, sizeof(roombuf), "Blocked %s", memory);
@@ -2197,10 +2204,10 @@ void screenread_one_dir(char_data *ch, room_data *origin, int dir) {
 		}
 		
 		// record new top height
-		top_height = MAX(top_height, ROOM_HEIGHT(to_room));
+		top_height = MAX(top_height, r_height);
 		
 		// check blocking
-		if (check_blocking && !is_blocked && (ROOM_SECT_FLAGGED(to_room, SECTF_OBSCURE_VISION) || SECT_FLAGGED(BASE_SECT(to_room), SECTF_OBSCURE_VISION)) && ROOM_HEIGHT(to_room) >= GET_VIEW_HEIGHT(ch)) {
+		if (check_blocking && !is_blocked && (ROOM_SECT_FLAGGED(to_room, SECTF_OBSCURE_VISION) || SECT_FLAGGED(BASE_SECT(to_room), SECTF_OBSCURE_VISION)) && r_height >= view_height) {
 			is_blocked = TRUE;
 		}
 	}
