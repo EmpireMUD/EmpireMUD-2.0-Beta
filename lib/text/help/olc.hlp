@@ -2205,6 +2205,21 @@ buildings and stationary vehicles.
 See also: OLC BUILDINGS, OLC CRAFTS, OLC ROOM TEMPLATES, OLC VEHICLES,
   OLC WORKFORCE
 #d
+"BEDIT HEIGHT"
+
+Usage:  .height <value>
+
+Building height is added to terrain height for the purpose of blocking the map
+beyond it, or seeing over other blocked tiles. This only applies to map
+buildings, not interior rooms (who inherit the height of their base building
+when using "look out").
+
+Most buildings should have height 0. Height 1 means it will block the view
+of non-flying players, and is equivalent to the outer tiles of a mountain
+range.
+
+See also: OLC BUILDINGS
+#d
 "BEDIT HITPOINTS" "BEDIT HEALTH"
 
 Usage:  .hitpoints <value>
@@ -8211,6 +8226,23 @@ To search other fields, you can generally use the normal "search" option for
 other OLC types. For example, to find all vehicles that have a certain interior
 room vnum, use ".b search 12345", which will search the vnum field on all
 vehicles for that building/room.
+#d
+"VEDIT HEIGHT"
+
+Usage:  .height <value>
+
+Vehicle height is added to terrain height for the purpose of blocking the map
+beyond it, or for seeing over other blocked tiles. Players who are in/on a
+vehicle and looking out at the map will have the same height as the vehicle.
+Players who are in the same map tile as a vehicle will have its height under
+certain conditions (such as if there's no interior or they are sitting in/on
+the vehicle).
+
+Most vehicles should have height 0. Height 1 means it will block the view
+of non-flying players, and is equivalent to the outer tiles of a mountain
+range.
+
+See also: OLC VEHICLES
 #d
 "VEDIT HITPOINTS" "VEDIT HEALTH"
 

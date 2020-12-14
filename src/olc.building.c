@@ -107,6 +107,10 @@ bool audit_building(bld_data *bld, char_data *ch) {
 		olc_audit_msg(ch, GET_BLD_VNUM(bld), "No RUINS-TO-* interactions");
 		problem = TRUE;
 	}
+	if (GET_BLD_HEIGHT(bld) < 0 || GET_BLD_HEIGHT(bld) > 5) {
+		olc_audit_msg(ch, GET_BLD_VNUM(bld), "Unusual height: %d", GET_BLD_HEIGHT(bld));
+		problem = TRUE;
+	}
 	
 	// check scripts
 	for (tpl = GET_BLD_SCRIPTS(bld); tpl; tpl = tpl->next) {
@@ -1210,6 +1214,7 @@ void olc_show_building(char_data *ch) {
 	if (!is_room) {
 		sprintf(buf + strlen(buf), "<%shitpoints\t0> %d\r\n", OLC_LABEL_VAL(GET_BLD_MAX_DAMAGE(bdg), 1), GET_BLD_MAX_DAMAGE(bdg));
 		sprintf(buf + strlen(buf), "<%srooms\t0> %d\r\n", OLC_LABEL_VAL(GET_BLD_EXTRA_ROOMS(bdg), 0), GET_BLD_EXTRA_ROOMS(bdg));
+		sprintf(buf + strlen(buf), "<%sheight\t0> %d\r\n", OLC_LABEL_VAL(GET_BLD_HEIGHT(bdg), 0), GET_BLD_HEIGHT(bdg));
 	}
 
 	sprintf(buf + strlen(buf), "<%sfame\t0> %d\r\n", OLC_LABEL_VAL(GET_BLD_FAME(bdg), 0), GET_BLD_FAME(bdg));	
@@ -1424,6 +1429,18 @@ OLC_MODULE(bedit_flags) {
 OLC_MODULE(bedit_functions) {
 	bld_data *bdg = GET_OLC_BUILDING(ch->desc);
 	GET_BLD_FUNCTIONS(bdg) = olc_process_flag(ch, argument, "function", "functions", function_flags, GET_BLD_FUNCTIONS(bdg));
+}
+
+
+OLC_MODULE(bedit_height) {
+	bld_data *bdg = GET_OLC_BUILDING(ch->desc);
+	
+	if (IS_SET(GET_BLD_FLAGS(bdg), BLD_ROOM)) {
+		msg_to_char(ch, "You can't set that on a ROOM.\r\n");
+	}
+	else {
+		GET_BLD_HEIGHT(bdg) = olc_process_number(ch, argument, "height", "height", -100, 100, GET_BLD_HEIGHT(bdg));
+	}
 }
 
 

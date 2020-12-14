@@ -5706,7 +5706,7 @@ void do_stat_building(char_data *ch, bld_data *bdg) {
 		msg_to_char(ch, "Command list: &c%s&0\r\n", GET_BLD_COMMANDS(bdg));
 	}
 	
-	msg_to_char(ch, "Hitpoints: [&g%d&0], Fame: [&g%d&0], Extra Rooms: [&g%d&0]\r\n", GET_BLD_MAX_DAMAGE(bdg), GET_BLD_FAME(bdg), GET_BLD_EXTRA_ROOMS(bdg));
+	msg_to_char(ch, "Hitpoints: [&g%d&0], Fame: [&g%d&0], Extra Rooms: [&g%d&0], Height: [&g%d&0]\r\n", GET_BLD_MAX_DAMAGE(bdg), GET_BLD_FAME(bdg), GET_BLD_EXTRA_ROOMS(bdg), GET_BLD_HEIGHT(bdg));
 	
 	// artisan?
 	if (GET_BLD_ARTISAN(bdg) != NOTHING) {

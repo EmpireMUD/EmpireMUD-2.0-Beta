@@ -3746,6 +3746,7 @@ struct bld_data {
 	bitvector_t flags;	// BLD_
 	bitvector_t functions;	// FNC_
 	bld_vnum upgrades_to;	// the vnum of any building
+	int height;	// 0+ addition to terrain height (map buildings only)
 	
 	int extra_rooms;	// how many rooms it can have
 	bitvector_t designate_flags;	// DES_x
@@ -5864,6 +5865,7 @@ struct vehicle_attribute_data {
 	int military;	// how much it adds to the military pool
 	struct custom_message *custom_msgs;	// any custom messages
 	struct bld_relation *relations;	// links to buildings/vehicles
+	int height;	// 0+ addition to terrain height
 };
 
 

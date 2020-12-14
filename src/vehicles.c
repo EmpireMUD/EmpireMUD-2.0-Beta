@@ -1619,6 +1619,10 @@ bool audit_vehicle(vehicle_data *veh, char_data *ch) {
 		olc_audit_msg(ch, VEH_VNUM(veh), "Has RUINS-TO-BLD interaction; this won't work on vehicles");
 		problem = TRUE;
 	}
+	if (VEH_HEIGHT(veh) < 0 || VEH_HEIGHT(veh) > 5) {
+		olc_audit_msg(ch, VEH_VNUM(veh), "Unusual height: %d", VEH_HEIGHT(veh));
+		problem = TRUE;
+	}
 	
 	// check for storage on moving vehicles
 	if (VEH_FLAGGED(veh, MOVABLE_VEH_FLAGS)) {
@@ -2966,6 +2970,14 @@ void parse_vehicle(FILE *fl, any_vnum vnum) {
 				parse_extra_desc(fl, &VEH_EX_DESCS(veh), error);
 				break;
 			}
+			case 'H': {	// height
+				if (sscanf(line, "H 0 %d", &int_in[1]) != 1) {
+					log("SYSERR: Format error in H line of %s: %s", error, line);
+					exit(1);
+				}
+				VEH_HEIGHT(veh) = int_in[1];
+				break;
+			}
 			case 'I': {	// interaction item
 				parse_interaction(line, &VEH_INTERACTIONS(veh), error);
 				break;
@@ -3119,6 +3131,11 @@ void write_vehicle_to_file(FILE *fl, vehicle_data *veh) {
 	
 	// I: interactions
 	write_interactions_to_file(fl, VEH_INTERACTIONS(veh));
+	
+	// H: height
+	if (VEH_HEIGHT(veh)) {
+		fprintf(fl, "H 0 %d\n", VEH_HEIGHT(veh));
+	}
 	
 	// K: custom messages
 	write_custom_messages_to_file(fl, 'K', VEH_CUSTOM_MSGS(veh));
@@ -3911,7 +3928,8 @@ void do_stat_vehicle(char_data *ch, vehicle_data *veh) {
 	
 	// stats lines
 	size += snprintf(buf + size, sizeof(buf) - size, "Health: [\tc%d\t0/\tc%d\t0], Capacity: [\tc%d\t0/\tc%d\t0], Animals Req: [\tc%d\t0], Move Type: [\ty%s\t0]\r\n", (int) VEH_HEALTH(veh), VEH_MAX_HEALTH(veh), VEH_CARRYING_N(veh), VEH_CAPACITY(veh), VEH_ANIMALS_REQUIRED(veh), mob_move_types[VEH_MOVE_TYPE(veh)]);
-	size += snprintf(buf + size, sizeof(buf) - size, "Fame: [\tc%d\t0], Military: [\tc%d\t0], Speed: [\ty%s\t0], Size: [\tc%d\t0]\r\n", VEH_FAME(veh), VEH_MILITARY(veh), vehicle_speed_types[VEH_SPEED_BONUSES(veh)], VEH_SIZE(veh));
+	size += snprintf(buf + size, sizeof(buf) - size, "Speed: [\ty%s\t0], Size: [\tc%d\t0], Height: [\tc%d\t0]\r\n", vehicle_speed_types[VEH_SPEED_BONUSES(veh)], VEH_SIZE(veh), VEH_HEIGHT(veh));
+	size += snprintf(buf + size, sizeof(buf) - size, "Fame: [\tc%d\t0], Military: [\tc%d\t0]\r\n", VEH_FAME(veh), VEH_MILITARY(veh));
 	
 	if (VEH_INTERIOR_ROOM_VNUM(veh) != NOTHING || VEH_MAX_ROOMS(veh) || VEH_DESIGNATE_FLAGS(veh)) {
 		sprintbit(VEH_DESIGNATE_FLAGS(veh), designate_flags, part, TRUE);
@@ -4156,6 +4174,7 @@ void olc_show_vehicle(char_data *ch) {
 	sprintf(buf + strlen(buf), "<%sextrarooms\t0> %d\r\n", OLC_LABEL_VAL(VEH_MAX_ROOMS(veh), 0), VEH_MAX_ROOMS(veh));
 	sprintbit(VEH_DESIGNATE_FLAGS(veh), designate_flags, lbuf, TRUE);
 	sprintf(buf + strlen(buf), "<%sdesignate\t0> %s\r\n", OLC_LABEL_VAL(VEH_DESIGNATE_FLAGS(veh), NOBITS), lbuf);
+	sprintf(buf + strlen(buf), "<%sheight\t0> %d\r\n", OLC_LABEL_VAL(VEH_HEIGHT(veh), 0), VEH_HEIGHT(veh));
 	sprintf(buf + strlen(buf), "<%sfame\t0> %d\r\n", OLC_LABEL_VAL(VEH_FAME(veh), 0), VEH_FAME(veh));
 	sprintf(buf + strlen(buf), "<%smilitary\t0> %d\r\n", OLC_LABEL_VAL(VEH_MILITARY(veh), 0), VEH_MILITARY(veh));
 	
@@ -4319,6 +4338,12 @@ OLC_MODULE(vedit_forbidclimate) {
 OLC_MODULE(vedit_functions) {
 	vehicle_data *veh = GET_OLC_VEHICLE(ch->desc);
 	VEH_FUNCTIONS(veh) = olc_process_flag(ch, argument, "function", "functions", function_flags, VEH_FUNCTIONS(veh));
+}
+
+
+OLC_MODULE(vedit_height) {
+	vehicle_data *veh = GET_OLC_VEHICLE(ch->desc);
+	VEH_HEIGHT(veh) = olc_process_number(ch, argument, "height", "height", -100, 100, VEH_HEIGHT(veh));
 }
 
 

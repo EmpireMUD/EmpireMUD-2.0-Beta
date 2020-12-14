@@ -751,6 +751,15 @@ void parse_building(FILE *fl, bld_vnum vnum) {
 				break;	
 			}
 			
+			case 'H': {	// height
+				if (sscanf(line, "H 0 %d", &int_in[1]) != 1) {
+					log("SYSERR: Format error in H line of %s: %s", buf2, line);
+					exit(1);
+				}
+				GET_BLD_HEIGHT(bld) = int_in[1];
+				break;
+			}
+			
 			case 'I': {	// interaction item
 				parse_interaction(line, &GET_BLD_INTERACTIONS(bld), buf2);
 				break;
@@ -874,6 +883,11 @@ void write_building_to_file(FILE *fl, bld_data *bld) {
 	if (GET_BLD_FUNCTIONS(bld)) {
 		fprintf(fl, "F\n");
 		fprintf(fl, "%s\n", bitv_to_alpha(GET_BLD_FUNCTIONS(bld)));
+	}
+	
+	// H: height
+	if (GET_BLD_HEIGHT(bld)) {
+		fprintf(fl, "H 0 %d\n", GET_BLD_HEIGHT(bld));
 	}
 	
 	// I: interactions
