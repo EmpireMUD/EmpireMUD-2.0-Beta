@@ -632,6 +632,7 @@ void olc_fullsearch_building(char_data *ch, char *argument) {
 	bitvector_t only_affs = NOBITS;
 	int only_cits = NOTHING, cits_over = NOTHING, cits_under = NOTHING;
 	int only_fame = NOTHING, fame_over = NOTHING, fame_under = NOTHING;
+	int only_height = NOTHING, height_over = NOTHING, height_under = NOTHING;
 	int only_hitpoints = NOTHING, hitpoints_over = NOTHING, hitpoints_under = NOTHING;
 	int only_military = NOTHING, military_over = NOTHING, military_under = NOTHING;
 	int only_rooms = NOTHING, rooms_over = NOTHING, rooms_under = NOTHING;
@@ -673,6 +674,9 @@ void olc_fullsearch_building(char_data *ch, char *argument) {
 		FULLSEARCH_FLAGS("functions", only_functions, function_flags)
 		FULLSEARCH_STRING("icon", only_icon)
 		FULLSEARCH_FLAGS("interaction", find_interacts, interact_types)
+		FULLSEARCH_INT("height", only_height, 0, INT_MAX)
+		FULLSEARCH_INT("heightover", height_over, 0, INT_MAX)
+		FULLSEARCH_INT("heightunder", height_under, 0, INT_MAX)
 		FULLSEARCH_INT("hitpoints", only_hitpoints, 0, INT_MAX)
 		FULLSEARCH_INT("hitpointsover", hitpoints_over, 0, INT_MAX)
 		FULLSEARCH_INT("hitpointsunder", hitpoints_under, 0, INT_MAX)
@@ -727,6 +731,15 @@ void olc_fullsearch_building(char_data *ch, char *argument) {
 			continue;
 		}
 		if (only_functions != NOBITS && (GET_BLD_FUNCTIONS(bld) & only_functions) != only_functions) {
+			continue;
+		}
+		if (only_height != NOTHING && GET_BLD_HEIGHT(bld) != only_height) {
+			continue;
+		}
+		if (height_over != NOTHING && GET_BLD_HEIGHT(bld) < height_over) {
+			continue;
+		}
+		if (height_under != NOTHING && GET_BLD_HEIGHT(bld) > height_under) {
 			continue;
 		}
 		if (only_hitpoints != NOTHING && GET_BLD_MAX_DAMAGE(bld) != only_hitpoints) {

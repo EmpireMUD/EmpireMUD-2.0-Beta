@@ -2131,6 +2131,7 @@ Fields:
   &c-functions&0 - see HELP BEDIT FUNCTIONS
   &c-icon&0 - match the text of the icon, if any
   &c-interactions&0 - has a specific type, see HELP BEDIT INTERACTION
+  &c-height -heightover -heightunder&0 - specific height amount
   &c-hitpoints -hitpointsover -hitpointsunder&0 - specific hitpoint amount
   &c-military -militaryover -militaryunder&0 - specific military value
   &c-rooms -roomsover -roomsunder&0 - specific extra rooms value
@@ -8214,6 +8215,7 @@ Fields:
   &c-functions&0 - see HELP VEDIT FUNCTIONS
   &c-icon [any]&0 - match the text of the icon (or "any" to just require an icon)
   &c-interactions&0 - has a specific type, see HELP VEDIT INTERACTION
+  &c-height -heightover -heightunder&0 - specific height amount
   &c-hitpoints -hitpointsover -hitpointsunder&0 - specific hitpoint amount
   &c-level&0 - matches anything where this level is within the range
   &c-military -militaryover -militaryunder&0 - specific military value

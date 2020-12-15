@@ -3460,6 +3460,7 @@ void olc_fullsearch_vehicle(char_data *ch, char *argument) {
 	bitvector_t find_interacts = NOBITS, not_flagged = NOBITS, found_interacts = NOBITS, find_custom = NOBITS, found_custom = NOBITS;
 	int only_animals = NOTHING, only_cap = NOTHING, cap_over = NOTHING, cap_under = NOTHING;
 	int only_fame = NOTHING, fame_over = NOTHING, fame_under = NOTHING, only_speed = NOTHING;
+	int only_height = NOTHING, height_over = NOTHING, height_under = NOTHING;
 	int only_hitpoints = NOTHING, hitpoints_over = NOTHING, hitpoints_under = NOTHING, only_level = NOTHING;
 	int only_military = NOTHING, military_over = NOTHING, military_under = NOTHING;
 	int only_rooms = NOTHING, rooms_over = NOTHING, rooms_under = NOTHING, only_move = NOTHING;
@@ -3506,6 +3507,9 @@ void olc_fullsearch_vehicle(char_data *ch, char *argument) {
 		FULLSEARCH_FLAGS("functions", only_functions, function_flags)
 		FULLSEARCH_STRING("icon", only_icon)
 		FULLSEARCH_FLAGS("interaction", find_interacts, interact_types)
+		FULLSEARCH_INT("height", only_height, 0, INT_MAX)
+		FULLSEARCH_INT("heightover", height_over, 0, INT_MAX)
+		FULLSEARCH_INT("heightunder", height_under, 0, INT_MAX)
 		FULLSEARCH_INT("hitpoints", only_hitpoints, 0, INT_MAX)
 		FULLSEARCH_INT("hitpointsover", hitpoints_over, 0, INT_MAX)
 		FULLSEARCH_INT("hitpointsunder", hitpoints_under, 0, INT_MAX)
@@ -3571,6 +3575,15 @@ void olc_fullsearch_vehicle(char_data *ch, char *argument) {
 			continue;
 		}
 		if (only_functions != NOBITS && (VEH_FUNCTIONS(veh) & only_functions) != only_functions) {
+			continue;
+		}
+		if (only_height != NOTHING && VEH_HEIGHT(veh) != only_height) {
+			continue;
+		}
+		if (height_over != NOTHING && VEH_HEIGHT(veh) < height_over) {
+			continue;
+		}
+		if (height_under != NOTHING && VEH_HEIGHT(veh) > height_under) {
 			continue;
 		}
 		if (only_hitpoints != NOTHING && VEH_MAX_HEALTH(veh) != only_hitpoints) {
