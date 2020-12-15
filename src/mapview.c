@@ -509,7 +509,7 @@ void replace_color_codes(char *string, char *new_color) {
 * @param int y_offset If the player is near an edge of the map, this offsets the grid.
 */
 void build_los_grid_one(char_data *ch, room_data *from, int x_shift, int y_shift, room_vnum **grid, int radius, int side, int x_offset, int y_offset) {
-	room_vnum *dat = &grid[x_shift + radius - x_offset][y_shift + radius - y_offset];
+	room_vnum *dat = &grid[x_shift + radius][y_shift + radius];
 	room_data *end_room, *room;
 	room_vnum r_vnum;
 	int iter, dist, x_pos, y_pos, top_height, view_height, r_height;
