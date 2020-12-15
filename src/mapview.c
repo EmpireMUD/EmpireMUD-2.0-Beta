@@ -964,7 +964,7 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options) {
 			// map edges?
 			if (!WRAP_Y) {
 				if (Y_COORD(room) < magnitude) {
-					y_offset = magnitude - Y_COORD(room);
+					y_offset = Y_COORD(room) - magnitude;
 					if (y_first) {
 						first_end = Y_COORD(room);
 						first_start = magnitude + magnitude - first_end;
@@ -975,7 +975,7 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options) {
 					}
 				}
 				if (Y_COORD(room) >= (MAP_HEIGHT - magnitude)) {
-					y_offset = (MAP_HEIGHT - Y_COORD(room) - 1) - magnitude;
+					y_offset = magnitude - (MAP_HEIGHT - Y_COORD(room) - 1);
 					if (y_first) {
 						first_start = MAP_HEIGHT - Y_COORD(room) - 1;
 						first_end = magnitude + magnitude - first_start;
@@ -1001,7 +1001,7 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options) {
 			}
 			if (!WRAP_X) {
 				if (X_COORD(room) < magnitude) {
-					x_offset = magnitude - X_COORD(room);
+					x_offset = X_COORD(room) - magnitude;
 					if (y_first) {
 						second_end = X_COORD(room);
 						second_start = magnitude + magnitude - second_end;
@@ -1012,7 +1012,7 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options) {
 					}
 				}
 				if (X_COORD(room) >= (MAP_WIDTH - magnitude)) {
-					x_offset = (MAP_WIDTH - X_COORD(room) - 1) - magnitude;
+					x_offset = magnitude - (MAP_WIDTH - X_COORD(room) - 1);
 					if (y_first) {
 						second_start = MAP_WIDTH - X_COORD(room) - 1;
 						second_end = magnitude + magnitude - second_start;
