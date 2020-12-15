@@ -23,13 +23,14 @@ S
 The Tower Skycleave~
 The Grand Foyer~
 &?.&c||&?.~
-1000 0 e 0
+1000 0 er 0
 0 0 0 -1
 D
    For all you've heard of the Tower Skycleave, the ebony paneled walls and
 inky black nocturnium fixtures still leave you breathless. The room is
 impossibly large, and yet somehow you know there is more to the tower.
 ~
+H 0 2
 T 10068
 S
 $

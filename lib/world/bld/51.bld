@@ -1026,7 +1026,7 @@ S
 High Temple~
 The High Temple~
 &0[||]~
-48 10 fhR de
+48 10 fhrR de
 5 0 0 -1
 C
 dedicate~
@@ -1347,7 +1347,6 @@ E
 portcullis gate~
 The portcullis is massive. It must take 5 men to close it.
 ~
-H 0 1
 I 29 5007 100.00 1 r  # RUINS-TO-BLD: Ruins
 R
 6000 2 1 0
@@ -1366,7 +1365,6 @@ decorated with the best gold available. The Great Hall is often one of the most
 important parts of the castle as it shows the wealth of the monarch. It also
 leads to the throne room.
 ~
-H 0 1
 I 29 5007 100.00 1 r  # RUINS-TO-BLD: Ruins
 R
 6000 2 1 0
@@ -1515,7 +1513,6 @@ D
 return home to a safe place. While not effective against thieves and
 infiltrators, it prevents access by common men and animals.
 ~
-H 0 1
 I 29 5017 100.00 1 r  # RUINS-TO-BLD: Gatehouse Ruins
 M
 251 33.00 ce
@@ -1530,7 +1527,6 @@ A Stone Wall~
 @U&#VV@V~
 32 0 djknr 0
 0 0 0 -1
-H 0 1
 I 29 5006 100.00 1 r  # RUINS-TO-BLD: Ruins
 R
 6075 1 1 0
