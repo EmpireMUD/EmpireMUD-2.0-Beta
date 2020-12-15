@@ -518,7 +518,7 @@ void build_los_grid_one(char_data *ch, room_data *from, int x_shift, int y_shift
 	if (*dat != (NOWHERE - 1)) {
 		return;	// already done
 	}
-	if (!(end_room = real_shift(from, x_shift, y_shift))) {
+	if (!(end_room = real_shift(from, x_shift - x_offset, y_shift - y_offset))) {
 		// no room there
 		*dat = NOWHERE;
 		return;
