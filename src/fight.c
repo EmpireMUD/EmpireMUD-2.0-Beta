@@ -1857,7 +1857,7 @@ static bool tower_would_shoot(room_data *from_room, char_data *vict) {
 	empire_data *m_empire;
 	room_data *shift_room, *to_room = IN_ROOM(vict);
 	char_data *m;
-	int iter, distance;
+	int iter, distance, tower_height;
 	bool hostile = IS_HOSTILE(vict);
 	
 	// sanity check
@@ -1941,6 +1941,13 @@ static bool tower_would_shoot(room_data *from_room, char_data *vict) {
 
 	// check intervening terrain
 	if (distance > 1) {
+		// determine view height first
+		tower_height = MAX(0, ROOM_HEIGHT(from_room));
+		if (GET_BUILDING(from_room)) {
+			tower_height += GET_BLD_HEIGHT(GET_BUILDING(from_room));
+		}
+		// TODO: vehicle-based towers need their own height calculation
+		
 		for (iter = 1; iter <= distance; ++iter) {
 			shift_room = straight_line(from_room, to_room, iter);
 			
@@ -1954,7 +1961,7 @@ static bool tower_would_shoot(room_data *from_room, char_data *vict) {
 				break;
 			}
 			
-			if (ROOM_SECT_FLAGGED(shift_room, SECTF_OBSCURE_VISION)) {
+			if (ROOM_SECT_FLAGGED(shift_room, SECTF_OBSCURE_VISION) && get_room_blocking_height(shift_room, NULL) > tower_height) {
 				return FALSE;
 			}
 		}
