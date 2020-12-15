@@ -1055,7 +1055,7 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options) {
 						to_room = room;		
 					}
 					else if (view_grid) {
-						to_room = real_room(view_grid[xx + magnitude + x_offset][yy + magnitude + y_offset]);
+						to_room = real_room(view_grid[xx + magnitude - x_offset][yy + magnitude - y_offset]);
 						if (!to_room) {
 							show_blocked = TRUE;
 							to_room = real_shift(room, xx, yy);
