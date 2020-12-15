@@ -5903,8 +5903,7 @@ void do_stat_character(char_data *ch, char_data *k) {
 		msg_to_char(ch, "NPC flags: &c%s&0\r\n", buf2);
 	}
 	else {
-		sprintf(buf, "Idle Timer (in tics) [%d]\r\n", k->char_specials.timer);
-		send_to_char(buf, ch);
+		msg_to_char(ch, "Idle Timer (in tics) [\tg%d\t0], View Height: [\tg%d\t0]\r\n", k->char_specials.timer, get_view_height(k, IN_ROOM(k)));
 		sprintbit(PLR_FLAGS(k), player_bits, buf2, TRUE);
 		msg_to_char(ch, "PLR: &c%s&0\r\n", buf2);
 		sprintbit(PRF_FLAGS(k), preference_bits, buf2, TRUE);
