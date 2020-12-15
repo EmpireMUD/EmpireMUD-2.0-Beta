@@ -505,9 +505,11 @@ void replace_color_codes(char *string, char *new_color) {
 * @param room_vnum **grid The grid that's being built (by build_line_of_sight_grid).
 * @param int radius The player's view radius.
 * @param int side The size of one of the "sizes" of the grid var.
+* @param int x_offset If the player is near an edge of the map, this offsets the grid.
+* @param int y_offset If the player is near an edge of the map, this offsets the grid.
 */
-void build_los_grid_one(char_data *ch, room_data *from, int x_shift, int y_shift, room_vnum **grid, int radius, int side) {
-	room_vnum *dat = &grid[x_shift + radius][y_shift + radius];
+void build_los_grid_one(char_data *ch, room_data *from, int x_shift, int y_shift, room_vnum **grid, int radius, int side, int x_offset, int y_offset) {
+	room_vnum *dat = &grid[x_shift + radius + x_offset][y_shift + radius + y_offset];
 	room_data *end_room, *room;
 	room_vnum r_vnum;
 	int iter, dist, x_pos, y_pos, top_height, view_height, r_height;
@@ -529,9 +531,9 @@ void build_los_grid_one(char_data *ch, room_data *from, int x_shift, int y_shift
 	top_height = 0;
 	for (iter = 1, room = straight_line(from, end_room, iter); iter <= dist && room && room != end_room; ++iter, room = straight_line(from, end_room, iter)) {
 		r_vnum = GET_ROOM_VNUM(room);
-		x_pos = MAP_X_COORD(r_vnum) - X_COORD(from);
+		x_pos = MAP_X_COORD(r_vnum) - X_COORD(from) + x_offset;
 		x_pos = ((x_pos >= radius) ? (x_pos - MAP_WIDTH) : ((x_pos <= -radius) ? (x_pos + MAP_WIDTH) : x_pos)) + radius;
-		y_pos = MAP_Y_COORD(r_vnum) - Y_COORD(from);
+		y_pos = MAP_Y_COORD(r_vnum) - Y_COORD(from) + y_offset;
 		y_pos = ((y_pos >= radius) ? (y_pos - MAP_HEIGHT) : ((y_pos <= -radius) ? (y_pos + MAP_HEIGHT) : y_pos)) + radius;
 		if (x_pos < 0 || x_pos >= side || y_pos < 0 || y_pos >= side) {
 			// off the grid somehow
@@ -582,9 +584,11 @@ void build_los_grid_one(char_data *ch, room_data *from, int x_shift, int y_shift
 * @param char_data *ch The player who is viewing the area.
 * @param room_data *from The room the player is looking at (the center).
 * @param int radius The viewing radius to use (determines the size of the grid).
+* @param int x_offset If the player is near an edge of the map, this offsets the grid.
+* @param int y_offset If the player is near an edge of the map, this offsets the grid.
 * @return room_vnum** The two-dimensional grid of rooms the player can see.
 */
-room_vnum **build_line_of_sight_grid(char_data *ch, room_data *from, int radius) {
+room_vnum **build_line_of_sight_grid(char_data *ch, room_data *from, int radius, int x_offset, int y_offset) {
 	room_vnum **grid;
 	int x, y, r, side;
 	
@@ -617,16 +621,16 @@ room_vnum **build_line_of_sight_grid(char_data *ch, room_data *from, int radius)
 				}
 				// this builds from the outside in
 				if (grid[radius+x][radius+y] == (NOWHERE - 1)) {
-					build_los_grid_one(ch, from, x, y, grid, radius, side);
+					build_los_grid_one(ch, from, x, y, grid, radius, side, x_offset, y_offset);
 				}
 				if (grid[radius-x][radius-y] == (NOWHERE - 1)) {
-					build_los_grid_one(ch, from, -x, -y, grid, radius, side);
+					build_los_grid_one(ch, from, -x, -y, grid, radius, side, x_offset, y_offset);
 				}
 				if (grid[radius+x][radius-y] == (NOWHERE - 1)) {
-					build_los_grid_one(ch, from, x, -y, grid, radius, side);
+					build_los_grid_one(ch, from, x, -y, grid, radius, side, x_offset, y_offset);
 				}
 				if (grid[radius-x][radius+y] == (NOWHERE - 1)) {
-					build_los_grid_one(ch, from, -x, y, grid, radius, side);
+					build_los_grid_one(ch, from, -x, y, grid, radius, side, x_offset, y_offset);
 				}
 			}
 		}
@@ -803,6 +807,7 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options) {
 	int first_iter, second_iter, xx, yy, magnitude, north;
 	int first_start, first_end, second_start, second_end, temp;
 	int dist, can_see_in_dark_distance;
+	int x_offset = 0, y_offset = 0;
 	bool y_first, invert_x, invert_y, comma, junk, show_blocked;
 	struct instance_data *inst;
 	player_index_data *index;
@@ -956,13 +961,10 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options) {
 			first_end = second_end = magnitude;
 			can_see_in_dark_distance = distance_can_see_in_dark(ch);
 			
-			if (!PRF_FLAGGED(ch, PRF_HOLYLIGHT)) {
-				view_grid = build_line_of_sight_grid(ch, room, magnitude);
-			}
-			
 			// map edges?
 			if (!WRAP_Y) {
 				if (Y_COORD(room) < magnitude) {
+					y_offset = magnitude - Y_COORD(room);
 					if (y_first) {
 						first_end = Y_COORD(room);
 						first_start = magnitude + magnitude - first_end;
@@ -973,6 +975,7 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options) {
 					}
 				}
 				if (Y_COORD(room) >= (MAP_HEIGHT - magnitude)) {
+					y_offset = (MAP_HEIGHT - Y_COORD(room) - 1) - magnitude;
 					if (y_first) {
 						first_start = MAP_HEIGHT - Y_COORD(room) - 1;
 						first_end = magnitude + magnitude - first_start;
@@ -998,6 +1001,7 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options) {
 			}
 			if (!WRAP_X) {
 				if (X_COORD(room) < magnitude) {
+					x_offset = magnitude - X_COORD(room);
 					if (y_first) {
 						second_end = X_COORD(room);
 						second_start = magnitude + magnitude - second_end;
@@ -1008,6 +1012,7 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options) {
 					}
 				}
 				if (X_COORD(room) >= (MAP_WIDTH - magnitude)) {
+					x_offset = (MAP_WIDTH - X_COORD(room) - 1) - magnitude;
 					if (y_first) {
 						second_start = MAP_WIDTH - X_COORD(room) - 1;
 						second_end = magnitude + magnitude - second_start;
@@ -1031,6 +1036,11 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options) {
 					}
 				}
 			}
+			
+			// check if we need a line-of-sight grid AFTER determining offsets
+			if (!PRF_FLAGGED(ch, PRF_HOLYLIGHT)) {
+				view_grid = build_line_of_sight_grid(ch, room, magnitude, x_offset, y_offset);
+			}
 		
 			// which iter is x/y depends on which way is north!
 			for (first_iter = first_start; first_iter >= -first_end; --first_iter) {
@@ -1045,7 +1055,7 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options) {
 						to_room = room;		
 					}
 					else if (view_grid) {
-						to_room = real_room(view_grid[xx + magnitude][yy + magnitude]);
+						to_room = real_room(view_grid[xx + magnitude + x_offset][yy + magnitude + y_offset]);
 						if (!to_room) {
 							show_blocked = TRUE;
 							to_room = real_shift(room, xx, yy);

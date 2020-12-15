@@ -3147,7 +3147,7 @@ int get_view_height(char_data *ch, room_data *from_room) {
 		// ignore negative heights: these are used to track water flow
 		height += MAX(0, ROOM_HEIGHT(home_room));
 		
-		if (GET_BUILDING(home_room)) {
+		if (GET_BUILDING(home_room) && IS_COMPLETE(home_room)) {
 			height += GET_BLD_HEIGHT(GET_BUILDING(home_room));
 		}
 		
@@ -5736,7 +5736,7 @@ int get_room_blocking_height(room_data *room, bool *blocking_vehicle) {
 	// ignore negative heights: these are used to track water flow
 	height += MAX(0, ROOM_HEIGHT(room));
 	
-	if (GET_BUILDING(room) && ROOM_BLD_FLAGGED(room, BLD_OBSCURE_VISION)) {
+	if (GET_BUILDING(room) && IS_COMPLETE(room)) {
 		height += GET_BLD_HEIGHT(GET_BUILDING(room));
 	}
 	
