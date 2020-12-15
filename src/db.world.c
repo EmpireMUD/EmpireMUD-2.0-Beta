@@ -345,7 +345,7 @@ void check_terrain_height(room_data *room) {
 		
 		set_room_height(room, good_match ? good_match : bad_match);
 	}
-	else if (!ROOM_SECT_FLAGGED(room, SECTF_NEEDS_HEIGHT) && !SECT_FLAGGED(BASE_SECT(room), SECTF_NEEDS_HEIGHT)) {
+	else if (!ROOM_SECT_FLAGGED(room, SECTF_NEEDS_HEIGHT | SECTF_KEEPS_HEIGHT) && !SECT_FLAGGED(BASE_SECT(room), SECTF_NEEDS_HEIGHT | SECTF_KEEPS_HEIGHT)) {
 		// clear it
 		set_room_height(room, 0);
 	}
@@ -2082,7 +2082,7 @@ void perform_change_sect(room_data *loc, struct map_data *map, sector_data *sect
 	}
 	
 	// for updating territory counts
-	was_large = (loc && SECT(loc)) ? ROOM_SECT_FLAGGED(loc, SECTF_LARGE_CITY_RADIUS) : FALSE;
+	was_large = (loc && SECT(loc)) ? LARGE_CITY_RADIUS(loc) : FALSE;
 	was_ter = (loc && ROOM_OWNER(loc)) ? get_territory_type_for_empire(loc, ROOM_OWNER(loc), FALSE, &junk) : TER_FRONTIER;
 	
 	// preserve
@@ -2140,7 +2140,7 @@ void perform_change_sect(room_data *loc, struct map_data *map, sector_data *sect
 	
 	// check for territory updates
 	if (loc && ROOM_OWNER(loc)) {
-		if (was_large != ROOM_SECT_FLAGGED(loc, SECTF_LARGE_CITY_RADIUS)) {
+		if (was_large != LARGE_CITY_RADIUS(loc)) {
 			struct empire_island *eisle = get_empire_island(ROOM_OWNER(loc), GET_ISLAND_ID(loc));
 			is_ter = get_territory_type_for_empire(loc, ROOM_OWNER(loc), FALSE, &junk);
 			
@@ -5311,7 +5311,10 @@ void write_graphical_map_data(struct map_data *map, FILE *map_fl, FILE *pol_fl) 
 	}
 	
 	// normal map output
-	if (SECT_FLAGGED(sect, SECTF_HAS_CROP_DATA) && map->crop_type) {
+	if (IS_SET(map->shared->affects, ROOM_AFF_MAPOUT_BUILDING)) {
+		fputc('s', map_fl);
+	}
+	else if (SECT_FLAGGED(sect, SECTF_HAS_CROP_DATA) && map->crop_type) {
 		fputc(mapout_color_tokens[GET_CROP_MAPOUT(map->crop_type)], map_fl);
 	}
 	else {
@@ -5324,7 +5327,10 @@ void write_graphical_map_data(struct map_data *map, FILE *map_fl, FILE *pol_fl) 
 	}
 	else {
 		// no owner -- only some sects get printed
-		if (SECT_FLAGGED(sect, SECTF_SHOW_ON_POLITICAL_MAPOUT)) {
+		if (IS_SET(map->shared->affects, ROOM_AFF_MAPOUT_BUILDING)) {
+			fputc('s', map_fl);
+		}
+		else if (SECT_FLAGGED(sect, SECTF_SHOW_ON_POLITICAL_MAPOUT)) {
 			fputc(mapout_color_tokens[GET_SECT_MAPOUT(sect)], pol_fl);
 		}
 		else {

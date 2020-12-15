@@ -22,6 +22,10 @@ See HELP CROPS for the icons for various wild crops.
 You can find specific buildings in the HELP BUILDING information as well as
 the other help files listed in its "see also".
 
+Tiles you can't see from your current location are shown in gray when blocked
+by a mountain, or dark blue when it's too dark to see them. If you don't know
+what terrain is blocked, it is shown as &w****&0.
+
 See also: LOOK, MAP, TOWER OF SOULS, BUILDING, CROPS
 #
 ACCOUNT ACCOUNTS
@@ -256,6 +260,25 @@ Block cap:
 - For group mobs, raise the total by 30%
 
 See also: AFFECTS, SCORE, SHIELD BLOCK, WARD AGAINST MAGIC
+#
+"BLOCKED TILE" BLOCKED LINE-OF-SIGHT "LINE OF SIGHT" LOS ****
+
+Mountains (and similar terrain) block a player's line-of-sight when looking
+at the outdoors (including when using scan). You can see higher map tiles
+beyond the blocking tile, but nothing else. If you stand on a high spot, like
+the top of a mountain range, you'll be able to see over most tiles around you.
+
+Tiles owned by your empire are always shown un-blocked, even when behind tall
+mountains. Sitting on a vehicle or being inside a vehicle/building can increase
+your view height.
+
+Flying players get +1 height to their view, allowing them to see over things
+that are at the same height as the tile they're standing on.
+
+Screenreaders show the tiles as "Blocked" while the ASCII map displays them
+with the &w****&0 icon.
+
+See also: MAP-MEMORY, SURVEY
 #
 BLOOD "BLOOD POINTS" "BLOOD POOL" "BLOOD UPKEEP"
 
@@ -943,6 +966,24 @@ stop to recover some. All players begin with 50 mana points. Some abilities and
 gear give you a larger mana pool, and you can enchant gear to get even more.
 
 See also: ARCANE POWER, GIFT OF NATURE, SOLAR POWER
+#
+MAP-MEMORY "MAP MEMORY"
+
+Players with map-memory can remember parts of the map that can't be seen in the
+dark (or because they're blocked by other terrain). These areas will show up on
+the ascii map as blue/gray or on the screenreader view as "Dark/Blocked <name>"
+when out of view.
+
+When you see a tile displayed from memory, you see it the same as it was last
+time it was in view. You won't see if the tile has changed (e.g. built upon)
+until you're close enough to actually see it again.
+
+Remembered tiles are not shown when political or informative views are
+toggled on.
+
+Due to space limitations, older map memories are lost when you have too many.
+
+See also: CARTOGRAPHY
 #
 MAPSCAN "MAP SCAN"
 

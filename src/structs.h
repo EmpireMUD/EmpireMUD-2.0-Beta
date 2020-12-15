@@ -770,7 +770,7 @@ typedef struct vehicle_data vehicle_data;
 #define BLD_ATTACH_ROAD  BIT(14)	// building connects to roads on the map
 #define BLD_BURNABLE  BIT(15)	// fire! fire!
 #define BLD_EXIT  BIT(16)	// for ROOM-flagged interiors, players can 'exit' here
-// #define BLD_UNUSED5  BIT(17)
+#define BLD_OBSCURE_VISION  BIT(17)	// blocks tiles behind it
 // #define BLD_UNUSED6  BIT(18)
 // #define BLD_UNUSED7  BIT(19)
 // #define BLD_UNUSED8  BIT(20)
@@ -2354,6 +2354,7 @@ typedef enum {
 #define PTECH_CHIP_COMMAND  80	// can 'chip'
 #define PTECH_SAW_COMMAND  81	// can 'saw'
 #define PTECH_SCRAPE_COMMAND  82	// can 'scrape'
+#define PTECH_MAP_MEMORY  83	// remembers blocked/dark tiles on look/scan
 
 
 // summon types for oval_summon, ofin_summon, and add_offer
@@ -2487,6 +2488,7 @@ typedef enum {
 #define SECTF_ROUGH  BIT(21)	// hard terrain, requires ATR; other mountain-like properties
 #define SECTF_SHALLOW_WATER  BIT(22)	// can't earthmeld; other properties like swamp and oasis have
 #define SECTF_NEEDS_HEIGHT  BIT(23)	// will automatically set its 'height' property under certain circumstances
+#define SECTF_KEEPS_HEIGHT  BIT(24)	// retains its 'height' property but won't inherit a new one
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -2557,6 +2559,7 @@ typedef enum {
 #define VEH_EXTRACTED  BIT(34)	// I. vehicle is mid-extraction
 #define VEH_RUIN_SLOWLY_FROM_CLIMATE  BIT(35)	// J. always ruins slowly no matter what climate
 #define VEH_RUIN_QUICKLY_FROM_CLIMATE  BIT(36)	// K. always ruins quickly no matter what climate
+#define VEH_OBSCURE_VISION  BIT(37)	// L. blocks tiles behind it on the map
 
 // VEH_CUSTOM_x: custom message types
 #define VEH_CUSTOM_RUINS_TO_ROOM  0	// sent when the building falls into ruin
@@ -2749,6 +2752,7 @@ typedef enum {
 #define ROOM_AFF_REPEL_ANIMALS  BIT(21)	// v. animals are prevented from wandering in
 #define ROOM_AFF_NO_WORKFORCE_EVOS  BIT(22)	// w. workforce chores that would evolve the tile don't run
 #define ROOM_AFF_HIDE_REAL_NAME  BIT(23)	// x. won't show the real name after a custom name, like Ruins of a House (Ruins)
+#define ROOM_AFF_MAPOUT_BUILDING  BIT(24)	// y. shows as a building on the mapout (set automatically)
 // NOTE: limit BIT(31) -- This is currently an unsigned int, to save space since there are a lot of rooms in the world
 
 
@@ -3744,6 +3748,7 @@ struct bld_data {
 	bitvector_t flags;	// BLD_
 	bitvector_t functions;	// FNC_
 	bld_vnum upgrades_to;	// the vnum of any building
+	int height;	// 0+ addition to terrain height (map buildings only)
 	
 	int extra_rooms;	// how many rooms it can have
 	bitvector_t designate_flags;	// DES_x
@@ -4234,6 +4239,16 @@ struct player_ability_data {
 };
 
 
+// remembers a tile a player has seen before
+struct player_map_memory {
+	room_vnum vnum;	// map loc
+	time_t timestamp;	// when last set
+	char *icon;	// icon, if any
+	char *name;	// name, if any
+	UT_hash_handle hh;	// GET_MAP_MEMORY(ch)
+};
+
+
 // used for a hash of skills per player in player_special_data
 struct player_skill_data {
 	any_vnum vnum;	// SKILL_ or skill vnum
@@ -4334,6 +4349,7 @@ struct player_special_data {
 	struct player_automessage *automessages;	// hash of seen messages
 	struct player_event_data *event_data;	// hash of event scores and results
 	struct affected_type *passive_buffs;	// from PASSIVE-BUFF abilities
+	struct player_map_memory *map_memory;	// hash of memories of map locations
 
 	// some daily stuff
 	int daily_cycle;	// Last update cycle registered
@@ -4412,6 +4428,9 @@ struct player_special_data {
 	time_t move_time[TRACK_MOVE_TIMES];	// timestamp of last X moves
 	int beckoned_by;	// idnum of player who beckoned (for follow)
 	int last_look_sun;	// used to determine if the player needs to 'look' at sunrise/set
+	bool map_memory_needs_save;	// whether or not to save the map memory file
+	bool map_memory_loaded;	// whether or not it has been loaded yet
+	int map_memory_count;	// how many tiles are currently remembered
 	
 	struct combat_meters meters;	// combat meter data
 	
@@ -5848,6 +5867,7 @@ struct vehicle_attribute_data {
 	int military;	// how much it adds to the military pool
 	struct custom_message *custom_msgs;	// any custom messages
 	struct bld_relation *relations;	// links to buildings/vehicles
+	int height;	// 0+ addition to terrain height
 };
 
 

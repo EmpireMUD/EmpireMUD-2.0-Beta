@@ -1606,6 +1606,7 @@ int land_can_claim(empire_data *emp, int ter_type) {
 *
 * @param char *orig_name The player name.
 * @param char *filename A variable to write the filename to.
+* @param int mode PLR_FILE, DELAYED_FILE, MAP_MEMORY_FILE, DELETED_PLR_FILE, DELETED_DELAYED_FILE
 * @return int 1=success, 0=fail
 */
 int get_filename(char *orig_name, char *filename, int mode) {
@@ -1626,6 +1627,11 @@ int get_filename(char *orig_name, char *filename, int mode) {
 		case DELAYED_FILE: {
 			prefix = LIB_PLAYERS;
 			suffix = SUF_DELAY;
+			break;
+		}
+		case MAP_MEMORY_FILE: {
+			prefix = LIB_PLAYERS;
+			suffix = SUF_MEMORY;
 			break;
 		}
 		case DELETED_PLR_FILE: {
@@ -3114,6 +3120,65 @@ int get_attribute_by_name(char *name) {
 	
 	// didn't find exact...
 	return partial;
+}
+
+
+/**
+* Determines what effective terrain height a player has when looking at the
+* map, for the purpose of determining what terrain is blocked.
+*
+* @param char_data *ch The person.
+* @param room_data *from_room Optional: What room the person is looking at (if NULL, assumes it's the room they're in).
+* @return int The person's view height.
+*/
+int get_view_height(char_data *ch, room_data *from_room) {
+	room_data *home_room;
+	vehicle_data *veh;
+	int height = 0, best_veh = 0;
+	
+	if (!from_room) {
+		from_room = IN_ROOM(ch);
+	}
+	
+	// room modifiers
+	if (from_room) {
+		home_room = HOME_ROOM(from_room);
+		
+		// ignore negative heights: these are used to track water flow
+		height += MAX(0, ROOM_HEIGHT(home_room));
+		
+		if (GET_BUILDING(home_room) && IS_COMPLETE(home_room)) {
+			height += GET_BLD_HEIGHT(GET_BUILDING(home_room));
+		}
+		
+		// if in a vehicle, apply it here
+		if (GET_ROOM_VEHICLE(from_room)) {
+			height += VEH_HEIGHT(GET_ROOM_VEHICLE(from_room));
+		}
+	}
+	
+	// character modifiers
+	if (from_room == IN_ROOM(ch) && EFFECTIVELY_FLYING(ch)) {
+		++height;
+	}
+	
+	// possible vehicle modifiers
+	if (GET_SITTING_ON(ch)) {
+		// prefer sitting-on
+		height += VEH_HEIGHT(GET_SITTING_ON(ch));
+	}
+	else if (from_room) {
+		// if not sitting-on, look for a vehicle in the room that has no sit/inside
+		DL_FOREACH2(ROOM_VEHICLES(from_room), veh, next_in_room) {
+			if (!VEH_FLAGGED(veh, VEH_SIT | VEH_SLEEP) && VEH_INTERIOR_ROOM_VNUM(veh) == NOWHERE && VEH_IS_COMPLETE(veh)) {
+				best_veh = MAX(best_veh, VEH_HEIGHT(veh));
+			}
+		}
+		
+		height += best_veh;
+	}
+	
+	return height;
 }
 
 
@@ -5648,6 +5713,51 @@ room_data *get_map_location_for(room_data *room) {
 
 
 /**
+* Determines the visible height of a map room, as blocked by whatever is on
+* it (building; tallest vehicle).
+*
+* @param room_data *room The map room.
+* @param bool *blocking_vehicle Optional: Will bind TRUE to this if there's a vehicle blocking at that height.
+* @return int The effective height of the tile.
+*/
+int get_room_blocking_height(room_data *room, bool *blocking_vehicle) {
+	vehicle_data *veh;
+	int height = 0, best_veh = 0;
+	
+	if (blocking_vehicle) {
+		// initialize
+		*blocking_vehicle = FALSE;
+	}
+	
+	if (!room) {
+		return 0;
+	}
+	
+	// ignore negative heights: these are used to track water flow
+	height += MAX(0, ROOM_HEIGHT(room));
+	
+	if (GET_BUILDING(room) && IS_COMPLETE(room)) {
+		height += GET_BLD_HEIGHT(GET_BUILDING(room));
+	}
+	
+	// look for tallest vehicle if room is open
+	if (!ROOM_IS_CLOSED(room)) {
+		DL_FOREACH2(ROOM_VEHICLES(room), veh, next_in_room) {
+			if (VEH_IS_COMPLETE(veh) && VEH_FLAGGED(veh, VEH_OBSCURE_VISION)) {
+				best_veh = MAX(best_veh, VEH_HEIGHT(veh));
+				if (blocking_vehicle) {
+					*blocking_vehicle = TRUE;
+				}
+			}
+		}
+		height += best_veh;
+	}
+	
+	return height;
+}
+
+
+/**
 * Find an optimal place to start upon new login or death.
 *
 * @param char_data *ch The player to find a loadroom for.
@@ -6139,29 +6249,35 @@ room_data *straight_line(room_data *origin, room_data *destination, int iter) {
 	dx = x2 - x1;
 	dy = y2 - y1;
 	
-	slope = dy / dx;
+	// to draw better lines, this uses "y as a function of x" for low slopes and "x as a function of y" for high slopes
+	if (ABSOLUTE(dy) <= ABSOLUTE(dx)) {
+		// y as a function of x
+		slope = dy / dx;
 	
-	// moving left
-	if (dx < 0) {
-		iter *= -1;
+		// moving left
+		if (dx < 0) {
+			iter *= -1;
+		}
+	
+		new_x = x1 + iter;
+		new_y = y1 + round(slope * (double)iter);
 	}
+	else {
+		// x as a function of y
+		slope = dx / dy;
 	
-	new_x = x1 + iter;
-	new_y = y1 + round(slope * (double)iter);
+		// moving down
+		if (dy < 0) {
+			iter *= -1;
+		}
+	
+		new_y = y1 + iter;
+		new_x = x1 + round(slope * (double)iter);
+	}
 	
 	// bounds check
-	if (WRAP_X) {
-		new_x = WRAP_X_COORD(new_x);
-	}
-	else {
-		return NULL;
-	}
-	if (WRAP_Y) {
-		new_y = WRAP_Y_COORD(new_y);
-	}
-	else {
-		return NULL;
-	}
+	new_x = WRAP_X_COORD(new_x);
+	new_y = WRAP_Y_COORD(new_y);
 	
 	// new position as a vnum
 	new_loc = new_y * MAP_WIDTH + new_x;

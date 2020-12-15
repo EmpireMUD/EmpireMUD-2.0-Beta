@@ -1872,6 +1872,25 @@ PLAYER_UPDATE_FUNC(b5_117_update_players) {
 }
 
 
+// b5.119: repair bad terrain heights
+void b5_119_repair_heights(void) {
+	struct map_data *map;
+	
+	LL_FOREACH(land_map, map) {
+		if (map->shared->height != 0 && SECT_FLAGGED(map->sector_type, SECTF_KEEPS_HEIGHT) && !SECT_FLAGGED(map->sector_type, SECTF_NEEDS_HEIGHT) && !SECT_FLAGGED(map->base_sector, SECTF_NEEDS_HEIGHT)) {
+			// tile gained height through a pre-b5.119 bug and shouldn't have it
+			if (map->room) {
+				set_room_height(map->room, 0);
+			}
+			else {
+				map->shared->height = 0;
+				request_world_save(map->vnum, WSAVE_MAP);
+			}
+		}
+	}
+}
+
+
  //////////////////////////////////////////////////////////////////////////////
 //// UPDATE DATA /////////////////////////////////////////////////////////////
 
@@ -1925,6 +1944,7 @@ const struct {
 	{ "b5.107", NULL, b5_107_players, "Move lastname data" },
 	{ "b5.112", b5_112_update, NULL, "Fix bad dedicate data" },
 	{ "b5.117", NULL, b5_117_update_players, "Clear last Christmas gift data" },
+	{ "b5.119", b5_119_repair_heights, NULL, "Repairing tiles that shouldn't have heights" },
 	
 	{ "\n", NULL, NULL, "\n" }	// must be last
 };

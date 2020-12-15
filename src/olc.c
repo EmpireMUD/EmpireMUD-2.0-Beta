@@ -139,6 +139,7 @@ OLC_MODULE(bedit_extrarooms);
 OLC_MODULE(bedit_fame);
 OLC_MODULE(bedit_flags);
 OLC_MODULE(bedit_functions);
+OLC_MODULE(bedit_height);
 OLC_MODULE(bedit_hitpoints);
 OLC_MODULE(bedit_icon);
 OLC_MODULE(bedit_interaction);
@@ -492,6 +493,7 @@ OLC_MODULE(vedit_fame);
 OLC_MODULE(vedit_flags);
 OLC_MODULE(vedit_forbidclimate);
 OLC_MODULE(vedit_functions);
+OLC_MODULE(vedit_height);
 OLC_MODULE(vedit_hitpoints);
 OLC_MODULE(vedit_icon);
 OLC_MODULE(vedit_interaction);
@@ -626,6 +628,7 @@ const struct olc_command_data olc_data[] = {
 	{ "fame", bedit_fame, OLC_BUILDING, OLC_CF_EDITOR },
 	{ "flags", bedit_flags, OLC_BUILDING, OLC_CF_EDITOR },
 	{ "functions", bedit_functions, OLC_BUILDING, OLC_CF_EDITOR },
+	{ "height", bedit_height, OLC_BUILDING, OLC_CF_EDITOR },
 	{ "hitpoints", bedit_hitpoints, OLC_BUILDING, OLC_CF_EDITOR },
 	{ "icon", bedit_icon, OLC_BUILDING, OLC_CF_EDITOR },
 	{ "interaction", bedit_interaction, OLC_BUILDING, OLC_CF_EDITOR },
@@ -990,6 +993,7 @@ const struct olc_command_data olc_data[] = {
 	{ "flags", vedit_flags, OLC_VEHICLE, OLC_CF_EDITOR },
 	{ "forbidclimate", vedit_forbidclimate, OLC_VEHICLE, OLC_CF_EDITOR },
 	{ "functions", vedit_functions, OLC_VEHICLE, OLC_CF_EDITOR },
+	{ "height", vedit_height, OLC_VEHICLE, OLC_CF_EDITOR },
 	{ "hitpoints", vedit_hitpoints, OLC_VEHICLE, OLC_CF_EDITOR },
 	{ "icon", vedit_icon, OLC_VEHICLE, OLC_CF_EDITOR },
 	{ "interaction", vedit_interaction, OLC_VEHICLE, OLC_CF_EDITOR },

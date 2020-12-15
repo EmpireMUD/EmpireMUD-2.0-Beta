@@ -1082,8 +1082,9 @@ Available techs are:
  &cCustomize-Vehicle&0 * - Can use 'customize vehicle'.
  &cPlant-Crops&0 * - Can use the 'plant' command.
  &cChip-Command&0 * - Can use the 'chip' command.
- &Saw-Command&0 * - Can use the 'saw' command.
- &Scrape-Command&0 * - Can use the 'scrape' command.
+ &cSaw-Command&0 * - Can use the 'saw' command.
+ &cScrape-Command&0 * - Can use the 'scrape' command.
+ &cMap-Memory *&0 - Remembers blocked/dark tiles on look/scan.
 
 * Marked techs trigger ability gains on their own without gain hooks.
 
@@ -1929,6 +1930,7 @@ Available affects:
  REPEL-NPCS - npcs won't wander in
  REPEL-ANIMALS - animal npcs won't wander in
  NO-WORKFORCE-EVOS - workforce won't do chores that would change the tile type
+ MAPOUT-BUILDING - appears as a building on the graphical map
 
 Some affects are managed by live data and commands (do not set affects with *):
  *HAS-INSTANCE - an adventure is linked here
@@ -2094,6 +2096,7 @@ Available flags:
  ATTACH-ROAD - on the ascii map, roads attach to this tile like it's a road
  BURNABLE - will catch fire if a fire is placed inside by a hostile empire
  EXIT - on interior rooms, players can 'exit' (or disembark) to leave from here
+ OBSCURE-VISION - blocks tiles behind it on the map
  SAIL - can enter this building with a boat
  ITEM-LIMIT - only a certain number of items can be dropped here
  LONG-AUTOSTORE - autostore takes 72 hours instead of 3 here
@@ -2128,6 +2131,7 @@ Fields:
   &c-functions&0 - see HELP BEDIT FUNCTIONS
   &c-icon&0 - match the text of the icon, if any
   &c-interactions&0 - has a specific type, see HELP BEDIT INTERACTION
+  &c-height -heightover -heightunder&0 - specific height amount
   &c-hitpoints -hitpointsover -hitpointsunder&0 - specific hitpoint amount
   &c-military -militaryover -militaryunder&0 - specific military value
   &c-rooms -roomsover -roomsunder&0 - specific extra rooms value
@@ -2202,6 +2206,21 @@ buildings and stationary vehicles.
 
 See also: OLC BUILDINGS, OLC CRAFTS, OLC ROOM TEMPLATES, OLC VEHICLES,
   OLC WORKFORCE
+#d
+"BEDIT HEIGHT"
+
+Usage:  .height <value>
+
+Building height is added to terrain height for the purpose of blocking the map
+beyond it, or seeing over other blocked tiles. This only applies to map
+buildings, not interior rooms (who inherit the height of their base building
+when using "look out").
+
+Most buildings should have height 0. Height 1 means it will block the view
+of non-flying players, and is equivalent to the outer tiles of a mountain
+range.
+
+See also: OLC BUILDINGS
 #d
 "BEDIT HITPOINTS" "BEDIT HEALTH"
 
@@ -4009,7 +4028,7 @@ negative means further from the sea). If a river or lake has no height
 property, it probably isn't attached to the sea.
 
 Sectors that cover or replace mountains, rivers, and lakes should have the
-NEEDS-HEIGHT sector flag so they will keep their previous heights.
+KEEPS-HEIGHT sector flag so they will keep their previous heights.
 
 See also: STAT
 #d
@@ -7011,7 +7030,9 @@ Available sector flags:
  NO-GLOBAL-SPAWNS - Won't use global spawn lists.
  ROUGH - This is rough, raised terrain, like a mountain
  SHALLOW-WATER - The tile has water but requires no boat (like a swamp)
- NEEDS-HEIGHT - Uses the 'height' property in some way and will inherit it.
+ NEEDS-HEIGHT - Uses the 'height' property in some way and will set itself from
+    nearby tiles if missing.
+ KEEPS-HEIGHT - Uses the 'height' property but won't change it (for roads etc).
 
 See also: OLC SECTORS, TERRAIN HEIGHT
 #d
@@ -8147,6 +8168,7 @@ Available flags:
  DEDICATE - can be dedicated
  RUIN-SLOWLY-FROM-CLIMATE - always ruins slowly no matter what climate change
  RUIN-QUICKLY-FROM-CLIMATE - always ruins quickly due to climate change
+ OBSCURE-VISION - blocks tiles behind it on the map
 
 ** The DRIVING/SAILING/FLYING flags each enable specific commands for moving
 the vehicle. If it has more than one of these, each command will work. Usually
@@ -8193,6 +8215,7 @@ Fields:
   &c-functions&0 - see HELP VEDIT FUNCTIONS
   &c-icon [any]&0 - match the text of the icon (or "any" to just require an icon)
   &c-interactions&0 - has a specific type, see HELP VEDIT INTERACTION
+  &c-height -heightover -heightunder&0 - specific height amount
   &c-hitpoints -hitpointsover -hitpointsunder&0 - specific hitpoint amount
   &c-level&0 - matches anything where this level is within the range
   &c-military -militaryover -militaryunder&0 - specific military value
@@ -8209,6 +8232,23 @@ To search other fields, you can generally use the normal "search" option for
 other OLC types. For example, to find all vehicles that have a certain interior
 room vnum, use ".b search 12345", which will search the vnum field on all
 vehicles for that building/room.
+#d
+"VEDIT HEIGHT"
+
+Usage:  .height <value>
+
+Vehicle height is added to terrain height for the purpose of blocking the map
+beyond it, or for seeing over other blocked tiles. Players who are in/on a
+vehicle and looking out at the map will have the same height as the vehicle.
+Players who are in the same map tile as a vehicle will have its height under
+certain conditions (such as if there's no interior or they are sitting in/on
+the vehicle).
+
+Most vehicles should have height 0. Height 1 means it will block the view
+of non-flying players, and is equivalent to the outer tiles of a mountain
+range.
+
+See also: OLC VEHICLES
 #d
 "VEDIT HITPOINTS" "VEDIT HEALTH"
 

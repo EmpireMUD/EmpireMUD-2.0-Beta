@@ -891,6 +891,7 @@ const char *player_tech_types[] = {
 	"Chip-Command",	// 80
 	"Saw-Command",
 	"Scrape-Command",
+	"Map-Memory",
 	"\n"
 };
 
@@ -2997,7 +2998,7 @@ const char *bld_flags[] = {
 	"ATTACH-ROAD",
 	"BURNABLE",	// 15
 	"EXIT",
-	"*",
+	"OBSCURE-VISION",
 	"*",
 	"*",
 	"*",	// 20
@@ -3541,6 +3542,7 @@ const char *room_aff_bits[] = {
 	"REPEL-ANIMALS",
 	"NO-WORKFORCE-EVOS",
 	"*HIDE-REAL-NAME",
+	"MAPOUT-BUILDING",
 	"\n"
 };
 
@@ -3599,6 +3601,7 @@ const char *sector_flags[] = {
 	"ROUGH",
 	"SHALLOW-WATER",
 	"NEEDS-HEIGHT",
+	"KEEPS-HEIGHT",
 	"\n"
 };
 
@@ -4534,6 +4537,7 @@ const char *vehicle_flags[] = {
 	"*EXTRACTED",
 	"RUIN-SLOWLY-FROM-CLIMATE",	// 35
 	"RUIN-QUICKLY-FROM-CLIMATE",
+	"OBSCURE-VISION",
 	"\n"
 };
 
@@ -4577,6 +4581,7 @@ const char *identify_vehicle_flags[] = {
 	"",	// *EXTRACTED
 	"",	// RUIN-SLOWLY-FROM-CLIMATE	// 35
 	"",	// RUIN-QUICKLY-FROM-CLIMATE
+	"",	// OBSCURE-VISION
 	"\n"
 };
 

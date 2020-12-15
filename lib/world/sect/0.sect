@@ -436,7 +436,7 @@ S
 #9
 Road~
 On a Road~
-'-' 26 0 1 mrx opx
+'-' 26 0 1 mry opx
 D1
 ----~
 &0~
@@ -453,7 +453,7 @@ S
 #10
 Building~
 A Building~
-'?' 27 0 1 dopux 0
+'?' 27 0 1 dopuy 0
 D1
 [..]~
 &0~
@@ -1724,7 +1724,7 @@ S
 #52
 Cliffs~
 Along the Cliffs~
-'^' 25 ms 50 nvx c
+'^' 25 ms 50 nsvx c
 C
 dig, pick~
 D1

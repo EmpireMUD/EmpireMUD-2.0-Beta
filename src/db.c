@@ -1784,6 +1784,7 @@ void init_player_specials(char_data *ch) {
 	GET_TEMPORARY_ACCOUNT_ID(ch) = NOTHING;
 	GET_IMMORTAL_LEVEL(ch) = -1;	// Not an immortal
 	USING_POISON(ch) = NOTHING;
+	GET_MAP_MEMORY_LOADED(ch) = FALSE;
 	
 	for (iter = 0; iter < NUM_ARCHETYPE_TYPES; ++iter) {
 		CREATION_ARCHETYPE(ch, iter) = NOTHING;

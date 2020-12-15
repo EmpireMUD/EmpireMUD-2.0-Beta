@@ -679,7 +679,7 @@ struct vehicle_attached_mob *find_harnessed_mob_by_name(vehicle_data *veh, char 
 vehicle_data *find_vehicle_to_show(char_data *ch, room_data *room) {
 	vehicle_data *iter, *in_veh, *found = NULL;
 	bool is_on_vehicle = ((in_veh = GET_ROOM_VEHICLE(IN_ROOM(ch))) && room == IN_ROOM(in_veh));
-	int found_size = -1;
+	int found_size = -1, found_height = -1;
 	
 	// we don't show vehicles in buildings or closed tiles (unless the player is on a vehicle in that room, in which case we override)
 	if (!is_on_vehicle && (IS_ANY_BUILDING(room) || ROOM_IS_CLOSED(room))) {
@@ -697,10 +697,13 @@ vehicle_data *find_vehicle_to_show(char_data *ch, room_data *room) {
 			continue;	// can't see from here
 		}
 		
-		// valid to show! only if first/bigger
-		if (!found || VEH_SIZE(iter) > found_size) {
-			found = iter;
-			found_size = VEH_SIZE(iter);
+		// valid to show! only if first/bigger (prefer height over size)
+		if (!found || VEH_HEIGHT(iter) >= found_height) {
+			found_height = VEH_HEIGHT(iter);
+			if (!found || VEH_SIZE(iter) > found_size) {
+				found_size = VEH_SIZE(iter);
+				found = iter;
+			}
 		}
 	}
 	
@@ -1619,6 +1622,10 @@ bool audit_vehicle(vehicle_data *veh, char_data *ch) {
 		olc_audit_msg(ch, VEH_VNUM(veh), "Has RUINS-TO-BLD interaction; this won't work on vehicles");
 		problem = TRUE;
 	}
+	if (VEH_HEIGHT(veh) < 0 || VEH_HEIGHT(veh) > 5) {
+		olc_audit_msg(ch, VEH_VNUM(veh), "Unusual height: %d", VEH_HEIGHT(veh));
+		problem = TRUE;
+	}
 	
 	// check for storage on moving vehicles
 	if (VEH_FLAGGED(veh, MOVABLE_VEH_FLAGS)) {
@@ -2325,7 +2332,7 @@ vehicle_data *unstore_vehicle_from_file(FILE *fl, any_vnum vnum, char *error_str
 		log("SYSERR: Bad tag in vehicle %d for %s: %s", vnum, NULLSAFE(error_str), (src));	\
 	}
 	
-	// load based on vnum or, if NOTHING, create anonymous object
+	// load based on vnum or, if NOTHING, this will fail
 	if (proto) {
 		veh = read_vehicle(vnum, FALSE);
 	}
@@ -2966,6 +2973,14 @@ void parse_vehicle(FILE *fl, any_vnum vnum) {
 				parse_extra_desc(fl, &VEH_EX_DESCS(veh), error);
 				break;
 			}
+			case 'H': {	// height
+				if (sscanf(line, "H 0 %d", &int_in[1]) != 1) {
+					log("SYSERR: Format error in H line of %s: %s", error, line);
+					exit(1);
+				}
+				VEH_HEIGHT(veh) = int_in[1];
+				break;
+			}
 			case 'I': {	// interaction item
 				parse_interaction(line, &VEH_INTERACTIONS(veh), error);
 				break;
@@ -3119,6 +3134,11 @@ void write_vehicle_to_file(FILE *fl, vehicle_data *veh) {
 	
 	// I: interactions
 	write_interactions_to_file(fl, VEH_INTERACTIONS(veh));
+	
+	// H: height
+	if (VEH_HEIGHT(veh)) {
+		fprintf(fl, "H 0 %d\n", VEH_HEIGHT(veh));
+	}
 	
 	// K: custom messages
 	write_custom_messages_to_file(fl, 'K', VEH_CUSTOM_MSGS(veh));
@@ -3440,6 +3460,7 @@ void olc_fullsearch_vehicle(char_data *ch, char *argument) {
 	bitvector_t find_interacts = NOBITS, not_flagged = NOBITS, found_interacts = NOBITS, find_custom = NOBITS, found_custom = NOBITS;
 	int only_animals = NOTHING, only_cap = NOTHING, cap_over = NOTHING, cap_under = NOTHING;
 	int only_fame = NOTHING, fame_over = NOTHING, fame_under = NOTHING, only_speed = NOTHING;
+	int only_height = NOTHING, height_over = NOTHING, height_under = NOTHING;
 	int only_hitpoints = NOTHING, hitpoints_over = NOTHING, hitpoints_under = NOTHING, only_level = NOTHING;
 	int only_military = NOTHING, military_over = NOTHING, military_under = NOTHING;
 	int only_rooms = NOTHING, rooms_over = NOTHING, rooms_under = NOTHING, only_move = NOTHING;
@@ -3486,6 +3507,9 @@ void olc_fullsearch_vehicle(char_data *ch, char *argument) {
 		FULLSEARCH_FLAGS("functions", only_functions, function_flags)
 		FULLSEARCH_STRING("icon", only_icon)
 		FULLSEARCH_FLAGS("interaction", find_interacts, interact_types)
+		FULLSEARCH_INT("height", only_height, 0, INT_MAX)
+		FULLSEARCH_INT("heightover", height_over, 0, INT_MAX)
+		FULLSEARCH_INT("heightunder", height_under, 0, INT_MAX)
 		FULLSEARCH_INT("hitpoints", only_hitpoints, 0, INT_MAX)
 		FULLSEARCH_INT("hitpointsover", hitpoints_over, 0, INT_MAX)
 		FULLSEARCH_INT("hitpointsunder", hitpoints_under, 0, INT_MAX)
@@ -3551,6 +3575,15 @@ void olc_fullsearch_vehicle(char_data *ch, char *argument) {
 			continue;
 		}
 		if (only_functions != NOBITS && (VEH_FUNCTIONS(veh) & only_functions) != only_functions) {
+			continue;
+		}
+		if (only_height != NOTHING && VEH_HEIGHT(veh) != only_height) {
+			continue;
+		}
+		if (height_over != NOTHING && VEH_HEIGHT(veh) < height_over) {
+			continue;
+		}
+		if (height_under != NOTHING && VEH_HEIGHT(veh) > height_under) {
 			continue;
 		}
 		if (only_hitpoints != NOTHING && VEH_MAX_HEALTH(veh) != only_hitpoints) {
@@ -3911,7 +3944,8 @@ void do_stat_vehicle(char_data *ch, vehicle_data *veh) {
 	
 	// stats lines
 	size += snprintf(buf + size, sizeof(buf) - size, "Health: [\tc%d\t0/\tc%d\t0], Capacity: [\tc%d\t0/\tc%d\t0], Animals Req: [\tc%d\t0], Move Type: [\ty%s\t0]\r\n", (int) VEH_HEALTH(veh), VEH_MAX_HEALTH(veh), VEH_CARRYING_N(veh), VEH_CAPACITY(veh), VEH_ANIMALS_REQUIRED(veh), mob_move_types[VEH_MOVE_TYPE(veh)]);
-	size += snprintf(buf + size, sizeof(buf) - size, "Fame: [\tc%d\t0], Military: [\tc%d\t0], Speed: [\ty%s\t0], Size: [\tc%d\t0]\r\n", VEH_FAME(veh), VEH_MILITARY(veh), vehicle_speed_types[VEH_SPEED_BONUSES(veh)], VEH_SIZE(veh));
+	size += snprintf(buf + size, sizeof(buf) - size, "Speed: [\ty%s\t0], Size: [\tc%d\t0], Height: [\tc%d\t0]\r\n", vehicle_speed_types[VEH_SPEED_BONUSES(veh)], VEH_SIZE(veh), VEH_HEIGHT(veh));
+	size += snprintf(buf + size, sizeof(buf) - size, "Fame: [\tc%d\t0], Military: [\tc%d\t0]\r\n", VEH_FAME(veh), VEH_MILITARY(veh));
 	
 	if (VEH_INTERIOR_ROOM_VNUM(veh) != NOTHING || VEH_MAX_ROOMS(veh) || VEH_DESIGNATE_FLAGS(veh)) {
 		sprintbit(VEH_DESIGNATE_FLAGS(veh), designate_flags, part, TRUE);
@@ -4156,6 +4190,7 @@ void olc_show_vehicle(char_data *ch) {
 	sprintf(buf + strlen(buf), "<%sextrarooms\t0> %d\r\n", OLC_LABEL_VAL(VEH_MAX_ROOMS(veh), 0), VEH_MAX_ROOMS(veh));
 	sprintbit(VEH_DESIGNATE_FLAGS(veh), designate_flags, lbuf, TRUE);
 	sprintf(buf + strlen(buf), "<%sdesignate\t0> %s\r\n", OLC_LABEL_VAL(VEH_DESIGNATE_FLAGS(veh), NOBITS), lbuf);
+	sprintf(buf + strlen(buf), "<%sheight\t0> %d\r\n", OLC_LABEL_VAL(VEH_HEIGHT(veh), 0), VEH_HEIGHT(veh));
 	sprintf(buf + strlen(buf), "<%sfame\t0> %d\r\n", OLC_LABEL_VAL(VEH_FAME(veh), 0), VEH_FAME(veh));
 	sprintf(buf + strlen(buf), "<%smilitary\t0> %d\r\n", OLC_LABEL_VAL(VEH_MILITARY(veh), 0), VEH_MILITARY(veh));
 	
@@ -4319,6 +4354,12 @@ OLC_MODULE(vedit_forbidclimate) {
 OLC_MODULE(vedit_functions) {
 	vehicle_data *veh = GET_OLC_VEHICLE(ch->desc);
 	VEH_FUNCTIONS(veh) = olc_process_flag(ch, argument, "function", "functions", function_flags, VEH_FUNCTIONS(veh));
+}
+
+
+OLC_MODULE(vedit_height) {
+	vehicle_data *veh = GET_OLC_VEHICLE(ch->desc);
+	VEH_HEIGHT(veh) = olc_process_number(ch, argument, "height", "height", -100, 100, VEH_HEIGHT(veh));
 }
 
 

@@ -42,6 +42,16 @@ Gains experience passively when you're standing in a dark room.
 
 See also: DARK, NIGHTSIGHT
 #
+CARTOGRAPHY
+
+Cartography (Survival ability)
+
+Grants map-memory (allows you to remember tiles you've seen before when you
+can't see them due to darkness or being blocking by mountains). This ability
+gains experience whenever you look or scan on the map.
+
+See also: MAP-MEMORY, NAVIGATION
+#
 "FIND HERBS" WHITEGRASS FIVELEAF REDTHORN MAGEWHISPER DAGGERBITE BILEBERRIES BILEBERRY "WHITE GRASS" "FIVE LEAF" "RED THORN" "MAGE WHISPER" "DAGGER BITE" "BILE BERRIES"
 
 Find Herbs (Survival ability)
@@ -199,7 +209,8 @@ If you have a saddle in your inventory, you will automatically equip it when
 you mount up. The saddle will be removed automatically when you dismount. You
 can make a simple saddle with Basic Crafts.
 
-Flying mounts require All-Terrain Riding, or Fly + Ride.
+Flying mounts require All-Terrain Riding, or Fly + Ride. Flying mounts allow
+you to see over blocked terrain that's at the same elevation as you are.
 
 Ride gains experience just from moving around while mounted, but All-Terrain
 Riding only gains experience when you cross water or mountains while mounted.
@@ -225,9 +236,11 @@ move from mountain to mountain.
 To enter a mountain tile, you must type 'climb'. This prevents players from
 wasting move points by accidentally walking onto a mountain.
 
+Mountains block terrain behind them from view.
+
 Gains experience when you cross mountains while not riding.
 
-See also: CLIMB, AUTOCLIMB
+See also: CLIMB, AUTOCLIMB, BLOCKED TILE
 #
 NAVIGATION COORDINATES
 
@@ -246,7 +259,7 @@ correct "North".
 
 Gains experience when you move around while not mounted.
 
-See also: MAPSCAN
+See also: MAPSCAN, CARTOGRAPHY
 #
 NIGHTSIGHT "NIGHT SIGHT"
 

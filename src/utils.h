@@ -242,6 +242,7 @@
 #define GET_BLD_FAME(bld)  ((bld)->fame)
 #define GET_BLD_FLAGS(bld)  ((bld)->flags)
 #define GET_BLD_FUNCTIONS(bld)  ((bld)->functions)
+#define GET_BLD_HEIGHT(bld)  ((bld)->height)
 #define GET_BLD_EX_DESCS(bld)  ((bld)->ex_description)
 #define GET_BLD_EXTRA_ROOMS(bld)  ((bld)->extra_rooms)
 #define GET_BLD_DESIGNATE_FLAGS(bld)  ((bld)->designate_flags)
@@ -1180,6 +1181,10 @@ int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_COORD(ge
 #define GET_LOADROOM(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->load_room))
 #define GET_LOAD_ROOM_CHECK(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->load_room_check))
 #define GET_MAIL_PENDING(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->mail_pending))
+#define GET_MAP_MEMORY(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->map_memory))
+#define GET_MAP_MEMORY_COUNT(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->map_memory_count))
+#define GET_MAP_MEMORY_LOADED(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->map_memory_loaded))
+#define GET_MAP_MEMORY_NEEDS_SAVE(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->map_memory_needs_save))
 #define GET_MAPSIZE(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->mapsize))
 #define GET_MARK_LOCATION(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->marked_location))
 #define GET_MINIPETS(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->minipets))
@@ -1591,6 +1596,7 @@ int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_COORD(ge
 #define VEH_FAME(veh)  ((veh)->attributes->fame)
 #define VEH_FORBID_CLIMATE(veh)  ((veh)->attributes->forbid_climate)
 #define VEH_FUNCTIONS(veh)  ((veh)->attributes->functions)
+#define VEH_HEIGHT(veh)  ((veh)->attributes->height)
 #define VEH_INTERACTIONS(veh)  ((veh)->attributes->interactions)
 #define VEH_INTERIOR_ROOM_VNUM(veh)  ((veh)->attributes->interior_room_vnum)
 #define VEH_MAX_HEALTH(veh)  ((veh)->attributes->maxhealth)
@@ -1610,7 +1616,7 @@ int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_COORD(ge
 #define IN_OR_ON(veh)		(VEH_FLAGGED((veh), VEH_IN) ? "in" : "on")
 #define VEH_CLAIMS_WITH_ROOM(veh)  (VEH_FLAGGED((veh), VEH_BUILDING) && !VEH_FLAGGED((veh), MOVABLE_VEH_FLAGS | VEH_NO_CLAIM))
 #define VEH_IS_EXTRACTED(veh)  VEH_FLAGGED((veh), VEH_EXTRACTED)
-#define VEH_IS_VISIBLE_ON_MAPOUT(veh)  (VEH_FLAGGED(veh, VEH_BUILDING) && VEH_SIZE(veh) > 0)
+#define VEH_IS_VISIBLE_ON_MAPOUT(veh)  (VEH_FLAGGED((veh), VEH_BUILDING) && VEH_ICON(veh) && VEH_SIZE(veh) > 0 && !VEH_FLAGGED((veh), VEH_CHAMELEON))
 #define VEH_FLAGGED(veh, flag)  IS_SET(VEH_FLAGS(veh), (flag))
 #define VEH_HAS_MINOR_DISREPAIR(veh)  (VEH_HEALTH(veh) < VEH_MAX_HEALTH(veh) && (VEH_HEALTH(veh) <= (VEH_MAX_HEALTH(veh) * config_get_int("disrepair_minor") / 100)))
 #define VEH_HAS_MAJOR_DISREPAIR(veh)  (VEH_HEALTH(veh) < VEH_MAX_HEALTH(veh) && (VEH_HEALTH(veh) <= (VEH_MAX_HEALTH(veh) * config_get_int("disrepair_major") / 100)))
@@ -1788,6 +1794,7 @@ void despawn_charmies(char_data *ch, any_vnum only_vnum);
 void determine_gear_level(char_data *ch);
 room_data *find_load_room(char_data *ch);
 room_data *find_starting_location();
+int get_view_height(char_data *ch, room_data *from_room);
 bool has_one_day_playtime(char_data *ch);
 int num_earned_bonus_traits(char_data *ch);
 int pick_level_from_range(int level, int min, int max);
@@ -1866,6 +1873,7 @@ bool find_sect_within_distance_from_room(room_data *room, sector_vnum sect, int 
 bool get_coord_shift(int start_x, int start_y, int x_shift, int y_shift, int *new_x, int *new_y);
 int get_direction_to(room_data *from, room_data *to);
 room_data *get_map_location_for(room_data *room);
+int get_room_blocking_height(room_data *room, bool *blocking_vehicle);
 bool is_deep_mine(room_data *room);
 void lock_icon(room_data *room, struct icon_data *use_icon);
 room_data *real_shift(room_data *origin, int x_shift, int y_shift);
@@ -2557,6 +2565,7 @@ void set_workforce_production_limit(empire_data *emp, any_vnum vnum, int amount)
 #define DELAYED_FILE  1
 #define DELETED_PLR_FILE  2
 #define DELETED_DELAYED_FILE  3
+#define MAP_MEMORY_FILE  4
 
 
 // APPLY_RES_x: messaging for the apply_resource() function

@@ -1889,6 +1889,8 @@ void init_config_system(void) {
 	init_config(CONFIG_PLAYERS, "num_bonus_trait_daily_skills", CONFTYPE_INT, "bonus trait for skillups");
 	init_config(CONFIG_PLAYERS, "idle_rent_time", CONFTYPE_INT, "how many ticks before a player is idle-rented");
 	init_config(CONFIG_PLAYERS, "idle_linkdead_rent_time", CONFTYPE_INT, "how many ticks before a linkdead player is idle-rented");
+	init_config(CONFIG_PLAYERS, "line_of_sight", CONFTYPE_BOOL, "if on, terrain can block view on the map");
+	init_config(CONFIG_PLAYERS, "map_memory_limit", CONFTYPE_INT, "how many tiles a player is allowed to remember (10k tiles = 1MB RAM)");
 	init_config(CONFIG_PLAYERS, "max_capitals_in_name", CONFTYPE_INT, "how many uppercase letters can be in a player name (0 for unlimited)");
 	init_config(CONFIG_PLAYERS, "max_home_store_uniques", CONFTYPE_INT, "how many unique (stackable) items can be in home storage");
 	init_config(CONFIG_PLAYERS, "max_player_attribute", CONFTYPE_INT, "how high primary player attributes go");

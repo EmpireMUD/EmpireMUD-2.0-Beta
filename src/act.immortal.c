@@ -2761,12 +2761,15 @@ int perform_set(char_data *ch, char_data *vict, int mode, char *val_arg) {
 			add_player_to_table(found_index);
 		}
 		
-		// rename the save file
+		// rename the save files
 		get_filename(oldname, buf1, PLR_FILE);
 		get_filename(GET_NAME(vict), buf2, PLR_FILE);
 		rename(buf1, buf2);
 		get_filename(oldname, buf1, DELAYED_FILE);
 		get_filename(GET_NAME(vict), buf2, DELAYED_FILE);
+		rename(buf1, buf2);
+		get_filename(oldname, buf1, MAP_MEMORY_FILE);
+		get_filename(GET_NAME(vict), buf2, MAP_MEMORY_FILE);
 		rename(buf1, buf2);
 		
 		// update msdp
@@ -5703,7 +5706,7 @@ void do_stat_building(char_data *ch, bld_data *bdg) {
 		msg_to_char(ch, "Command list: &c%s&0\r\n", GET_BLD_COMMANDS(bdg));
 	}
 	
-	msg_to_char(ch, "Hitpoints: [&g%d&0], Fame: [&g%d&0], Extra Rooms: [&g%d&0]\r\n", GET_BLD_MAX_DAMAGE(bdg), GET_BLD_FAME(bdg), GET_BLD_EXTRA_ROOMS(bdg));
+	msg_to_char(ch, "Hitpoints: [&g%d&0], Fame: [&g%d&0], Extra Rooms: [&g%d&0], Height: [&g%d&0]\r\n", GET_BLD_MAX_DAMAGE(bdg), GET_BLD_FAME(bdg), GET_BLD_EXTRA_ROOMS(bdg), GET_BLD_HEIGHT(bdg));
 	
 	// artisan?
 	if (GET_BLD_ARTISAN(bdg) != NOTHING) {
@@ -5900,8 +5903,7 @@ void do_stat_character(char_data *ch, char_data *k) {
 		msg_to_char(ch, "NPC flags: &c%s&0\r\n", buf2);
 	}
 	else {
-		sprintf(buf, "Idle Timer (in tics) [%d]\r\n", k->char_specials.timer);
-		send_to_char(buf, ch);
+		msg_to_char(ch, "Idle Timer (in tics) [\tg%d\t0], View Height: [\tg%d\t0]\r\n", k->char_specials.timer, get_view_height(k, IN_ROOM(k)));
 		sprintbit(PLR_FLAGS(k), player_bits, buf2, TRUE);
 		msg_to_char(ch, "PLR: &c%s&0\r\n", buf2);
 		sprintbit(PRF_FLAGS(k), preference_bits, buf2, TRUE);
@@ -6693,7 +6695,7 @@ void do_stat_room(char_data *ch) {
 	}
 	msg_to_char(ch, "\r\n");
 	
-	msg_to_char(ch, "VNum: [\tg%d\t0], Lights: [\tg%d\t0], Island: [\tg%d\t0] %s, Height [\tg%d\t0]\r\n", GET_ROOM_VNUM(IN_ROOM(ch)), ROOM_LIGHTS(IN_ROOM(ch)), GET_ISLAND_ID(IN_ROOM(ch)), GET_ISLAND(IN_ROOM(ch)) ? GET_ISLAND(IN_ROOM(ch))->name : "no island", ROOM_HEIGHT(IN_ROOM(ch)));
+	msg_to_char(ch, "VNum: [\tg%d\t0], Lights: [\tg%d\t0], Island: [\tg%d\t0] %s, Height [\tg%d/%d\t0]\r\n", GET_ROOM_VNUM(IN_ROOM(ch)), ROOM_LIGHTS(IN_ROOM(ch)), GET_ISLAND_ID(IN_ROOM(ch)), GET_ISLAND(IN_ROOM(ch)) ? GET_ISLAND(IN_ROOM(ch))->name : "no island", ROOM_HEIGHT(IN_ROOM(ch)), get_room_blocking_height(IN_ROOM(ch), NULL));
 	
 	// location/time data
 	if (X_COORD(IN_ROOM(ch)) != -1) {
@@ -8535,8 +8537,8 @@ ACMD(do_fullsave) {
 	
 	time = microtime();
 	write_fresh_binary_map_file();
-	write_whole_binary_world_index();
 	write_all_wld_files();
+	write_whole_binary_world_index();
 	send_config_msg(ch, "ok_string");
 	
 	if (ch->desc) {

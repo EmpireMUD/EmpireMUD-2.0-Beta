@@ -95,7 +95,7 @@ S
 Dome~
 The Dome~
 &0(  )~
-48 15 h 0
+48 15 hr 0
 0 0 0 -1
 C
 dedicate~
@@ -111,7 +111,8 @@ mosaics tiles walls~
 others are religious scenes and legends. At the top, the walls come together in
 the great dome, which depicts a massive, rust-colored bird: the roc.
 ~
-I 29 5007 100.00 1 r  # RUINS-TO-BLD: Large Ruins
+H 0 1
+I 29 5007 100.00 1 r  # RUINS-TO-BLD: Ruins
 R
 1002 1 5 0
 S

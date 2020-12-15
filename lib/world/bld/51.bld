@@ -1026,7 +1026,7 @@ S
 High Temple~
 The High Temple~
 &0[||]~
-48 10 fhR de
+48 10 fhrR de
 5 0 0 -1
 C
 dedicate~
@@ -1319,6 +1319,7 @@ gems, and worn pestles cover the stone tables that sit around the room. A tall,
 winding staircase leads to the top of the tower, although you can't tell what
 is supporting the stairs.
 ~
+H 0 1
 I 29 5007 100.00 1 r  # RUINS-TO-BLD: Ruins
 M
 237 20.00 ce
@@ -1334,7 +1335,7 @@ S
 Portcullis~
 A Great Portcullis~
 @U&0[]@V~
-64 0 floR abeghijkm
+64 0 florR abeghijkm
 30 0 0 -1
 D
    You are standing beneath a great portcullis. This is the entrance to a
@@ -1356,7 +1357,7 @@ S
 Great Hall~
 The Great Hall~
 &0[**]~
-64 0 flR abeghijkm
+64 0 flrR abeghijkm
 30 0 0 -1
 D
    This is the Great Hall, a room lined with magnificent suits of armor and
@@ -1387,6 +1388,7 @@ upgraded by typing upgrade here.
 ~
 F
 j
+H 0 1
 I 29 5007 100.00 1 r  # RUINS-TO-BLD: Ruins
 M
 251 5.00 ce
@@ -1414,6 +1416,7 @@ upgraded by typing upgrade here again.
 ~
 F
 bj
+H 0 1
 I 29 5007 100.00 1 r  # RUINS-TO-BLD: Ruins
 M
 251 5.00 ce
@@ -1428,7 +1431,7 @@ S
 Superior Guard Tower~
 A Superior Guard Tower~
 &0"TT"~
-64 0 blR 0
+64 0 blrR 0
 0 0 0 -1
 D
    This is a well-constructed guard tower. It is tall, allowing it to see
@@ -1438,6 +1441,7 @@ against invasion. Hopefully, it will be enough defense.
 ~
 F
 bj
+H 0 1
 I 29 5007 100.00 1 r  # RUINS-TO-BLD: Ruins
 M
 251 5.00 ce
@@ -1502,7 +1506,7 @@ S
 Gatehouse~
 The Gatehouse~
 @U&0||@V~
-32 0 bcgoR 0
+32 0 bcgorR 0
 0 0 0 -1
 D
    The gatehouse is a welcoming sight for weary travellers. It signifies the
@@ -1521,7 +1525,7 @@ S
 Wall~
 A Stone Wall~
 @U&#VV@V~
-32 0 djkn 0
+32 0 djknr 0
 0 0 0 -1
 I 29 5006 100.00 1 r  # RUINS-TO-BLD: Ruins
 R

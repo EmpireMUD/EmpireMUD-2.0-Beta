@@ -31,6 +31,7 @@
 * Contents:
 *   Data
 *   Helpers
+*   Line-of-Sight Functions
 *   Mappc Functions
 *   Map View Functions
 *   Screen Reader Functions
@@ -44,6 +45,7 @@ vehicle_data *find_vehicle_to_show(char_data *ch, room_data *room);
 
 // locals
 ACMD(do_exits);
+char *get_screenreader_room_name(char_data *ch, room_data *from_room, room_data *to_room, bool show_dark);
 char *screenread_one_tile(char_data *ch, room_data *origin, room_data *to_room, bool show_dark);
 void show_screenreader_room(char_data *ch, room_data *room, bitvector_t options);
 
@@ -488,6 +490,186 @@ void replace_color_codes(char *string, char *new_color) {
 
 
  //////////////////////////////////////////////////////////////////////////////
+//// LINE-OF-SIGHT FUNCTIONS /////////////////////////////////////////////////
+
+/**
+* Builds part of the line-of-sight grid, using the line from the player to a
+* given room near them. It also determines the grid info for any tile along
+* the way. This function should ideally be called on tiles from the outside in,
+* to avoid repeating work.
+*
+* @param char_data *ch The player who is looking at the map.
+* @param room_data *from The room the player is looking from.
+* @param int x_shift How far east/west the tile to check is.
+* @param int y_shift How far north/south the tile to check is.
+* @param room_vnum **grid The grid that's being built (by build_line_of_sight_grid).
+* @param int radius The player's view radius.
+* @param int side The size of one of the "sizes" of the grid var.
+* @param int x_offset If the player is near an edge of the map, this offsets the grid.
+* @param int y_offset If the player is near an edge of the map, this offsets the grid.
+*/
+void build_los_grid_one(char_data *ch, room_data *from, int x_shift, int y_shift, room_vnum **grid, int radius, int side, int x_offset, int y_offset) {
+	room_vnum *dat = &grid[x_shift + radius][y_shift + radius];
+	room_data *end_room, *room;
+	room_vnum r_vnum;
+	int iter, dist, x_pos, y_pos, top_height, view_height, r_height;
+	bool blocked, blocking_veh;
+	
+	if (*dat != (NOWHERE - 1)) {
+		return;	// already done
+	}
+	if (!(end_room = real_shift(from, x_shift - x_offset, y_shift - y_offset))) {
+		// no room there
+		*dat = NOWHERE;
+		return;
+	}
+	
+	view_height = get_view_height(ch, from);
+	
+	dist = compute_distance(from, end_room);
+	blocked = FALSE;
+	top_height = 0;
+	for (iter = 1, room = straight_line(from, end_room, iter); iter <= dist && room && room != end_room; ++iter, room = straight_line(from, end_room, iter)) {
+		r_vnum = GET_ROOM_VNUM(room);
+		x_pos = MAP_X_COORD(r_vnum) - X_COORD(from) + x_offset;
+		x_pos = ((x_pos > radius) ? (x_pos - MAP_WIDTH) : ((x_pos < -radius) ? (x_pos + MAP_WIDTH) : x_pos)) + radius;
+		y_pos = MAP_Y_COORD(r_vnum) - Y_COORD(from) + y_offset;
+		y_pos = ((y_pos > radius) ? (y_pos - MAP_HEIGHT) : ((y_pos < -radius) ? (y_pos + MAP_HEIGHT) : y_pos)) + radius;
+		if (x_pos < 0 || x_pos >= side || y_pos < 0 || y_pos >= side) {
+			// off the grid somehow
+			break;
+		}
+		
+		r_height = get_room_blocking_height(room, &blocking_veh);
+		
+		if (blocked && r_height <= top_height && (!ROOM_OWNER(room) || ROOM_OWNER(room) != GET_LOYALTY(ch))) {
+			// already blocked unless it's talled than the previous top height, or owned by the player
+			grid[x_pos][y_pos] = NOWHERE;
+		}
+		else {
+			// record it even if it will block what's behind it
+			grid[x_pos][y_pos] = r_vnum;
+			
+			// record new top height
+			top_height = MAX(top_height, r_height);
+			
+			if (!blocked && (blocking_veh || ROOM_SECT_FLAGGED(room, SECTF_OBSCURE_VISION) || SECT_FLAGGED(BASE_SECT(room), SECTF_OBSCURE_VISION) || ROOM_BLD_FLAGGED(room, BLD_OBSCURE_VISION)) && r_height >= view_height) {
+				// rest of line will be blocked
+				blocked = TRUE;
+			}
+		}
+	}
+	
+	// and record the end tile
+	if (blocked && (!ROOM_OWNER(end_room) || ROOM_OWNER(end_room) != GET_LOYALTY(ch))) {
+		*dat = NOWHERE;
+	}
+	else {
+		*dat = GET_ROOM_VNUM(end_room);
+	}
+}
+
+
+/**
+* Builds a grid of tiles the player can see from here, based on line-of-sight
+* rules. This returns an allocated two-dimensional array of room vnums for any
+* rooms that can be seen. The player is at the center of this grid (e.g. if
+* the radius is 7, the player is at grid[7][7] and the grid goes from 0 to 14
+* in both the x and y dimensions.)
+*
+* Note: You MUST free the data that comes out of here with 
+*       free_line_of_sight_grid() and you must pass it the same radius you
+*       passed to this.
+*
+* @param char_data *ch The player who is viewing the area.
+* @param room_data *from The room the player is looking at (the center).
+* @param int radius The viewing radius to use (determines the size of the grid).
+* @param int x_offset If the player is near an edge of the map, this offsets the grid.
+* @param int y_offset If the player is near an edge of the map, this offsets the grid.
+* @return room_vnum** The two-dimensional grid of rooms the player can see.
+*/
+room_vnum **build_line_of_sight_grid(char_data *ch, room_data *from, int radius, int x_offset, int y_offset) {
+	room_vnum **grid;
+	int x, y, r, side;
+	
+	if (!ch || radius < 1) {
+		return NULL;	// bad input
+	}
+	if (radius > 100) {
+		log("SYSERR: build_line_of_sight_grid requested with radius %d; defaulting to 7", radius);
+		radius = 7;
+	}
+	
+	// length of a side
+	side = radius * 2 + 1;
+	
+	// create and initialize grid
+	CREATE(grid, room_vnum*, side);
+	for (x = 0; x < side; ++x) {
+		CREATE(grid[x], room_vnum, side);
+		for (y = 0; y < side; ++y) {
+			grid[x][y] = NOWHERE - 1;
+		}
+	}
+	
+	// build lines to edges first then work the way in
+	for (r = radius; r > 0; --r) {
+		for (x = r; x >= 0; --x)  {
+			for (y = r; y >= 0; --y) {
+				if (x != r && y != r) {
+					continue;	// only doing edges
+				}
+				// this builds from the outside in
+				if (grid[radius+x][radius+y] == (NOWHERE - 1)) {
+					build_los_grid_one(ch, from, x, y, grid, radius, side, x_offset, y_offset);
+				}
+				if (grid[radius-x][radius-y] == (NOWHERE - 1)) {
+					build_los_grid_one(ch, from, -x, -y, grid, radius, side, x_offset, y_offset);
+				}
+				if (grid[radius+x][radius-y] == (NOWHERE - 1)) {
+					build_los_grid_one(ch, from, x, -y, grid, radius, side, x_offset, y_offset);
+				}
+				if (grid[radius-x][radius+y] == (NOWHERE - 1)) {
+					build_los_grid_one(ch, from, -x, y, grid, radius, side, x_offset, y_offset);
+				}
+			}
+		}
+	}
+	
+	// now wipe any locations that were missed (usually due to being off-grid)
+	for (x = 0; x < side; ++x) {
+		for (y = 0; y < side; ++y) {
+			if (grid[x][y] == (NOWHERE - 1)) {
+				grid[x][y] = NOWHERE;
+			}
+		}
+	}
+	
+	return grid;
+}
+
+
+/**
+* Frees a 2d array that was allocated by build_line_of_sight_grid().
+*
+* @param room_vnum **grid The grid to free.
+* @param int radius The original radius that was given to create it.
+*/
+void free_line_of_sight_grid(room_vnum **grid, int radius) {
+	int iter, side = radius * 2 + 1;
+	
+	if (grid) {
+		for (iter = 0; iter < side; ++iter) {
+			if (grid[iter]) {
+				free(grid[iter]);
+			}
+		}
+		free(grid);
+	}
+}
+
+
+ //////////////////////////////////////////////////////////////////////////////
 //// MAPPC FUNCTIONS /////////////////////////////////////////////////////////
 
 /**
@@ -625,13 +807,18 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options) {
 	int first_iter, second_iter, xx, yy, magnitude, north;
 	int first_start, first_end, second_start, second_end, temp;
 	int dist, can_see_in_dark_distance;
-	bool y_first, invert_x, invert_y, comma, junk;
+	int x_offset = 0, y_offset = 0;
+	bool y_first, invert_x, invert_y, comma, junk, show_blocked;
 	struct instance_data *inst;
 	player_index_data *index;
+	room_vnum **view_grid = NULL;
 	room_data *to_room;
 	empire_data *emp, *pcemp;
+	const char *memory;
 	crop_data *cp;
 	char *strptr;
+	
+	const char *blocked_tile = "\tw****";
 	
 	// configs
 	int trench_initial_value = config_get_int("trench_initial_value");
@@ -745,7 +932,7 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options) {
 				show_screenreader_room(ch, room, options);
 			}
 		}
-		else {	// normal map view
+		else {	// ASCII map view
 			magnitude = PRF_FLAGGED(ch, PRF_BRIEF) ? 3 : mapsize;
 			*buf = '\0';
 			
@@ -777,6 +964,7 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options) {
 			// map edges?
 			if (!WRAP_Y) {
 				if (Y_COORD(room) < magnitude) {
+					y_offset = Y_COORD(room) - magnitude;
 					if (y_first) {
 						first_end = Y_COORD(room);
 						first_start = magnitude + magnitude - first_end;
@@ -787,6 +975,7 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options) {
 					}
 				}
 				if (Y_COORD(room) >= (MAP_HEIGHT - magnitude)) {
+					y_offset = magnitude - (MAP_HEIGHT - Y_COORD(room) - 1);
 					if (y_first) {
 						first_start = MAP_HEIGHT - Y_COORD(room) - 1;
 						first_end = magnitude + magnitude - first_start;
@@ -812,6 +1001,7 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options) {
 			}
 			if (!WRAP_X) {
 				if (X_COORD(room) < magnitude) {
+					x_offset = X_COORD(room) - magnitude;
 					if (y_first) {
 						second_end = X_COORD(room);
 						second_start = magnitude + magnitude - second_end;
@@ -822,6 +1012,7 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options) {
 					}
 				}
 				if (X_COORD(room) >= (MAP_WIDTH - magnitude)) {
+					x_offset = magnitude - (MAP_WIDTH - X_COORD(room) - 1);
 					if (y_first) {
 						second_start = MAP_WIDTH - X_COORD(room) - 1;
 						second_end = magnitude + magnitude - second_start;
@@ -845,6 +1036,11 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options) {
 					}
 				}
 			}
+			
+			// check if we need a line-of-sight grid AFTER determining offsets
+			if (!PRF_FLAGGED(ch, PRF_HOLYLIGHT)) {
+				view_grid = build_line_of_sight_grid(ch, room, magnitude, x_offset, y_offset);
+			}
 		
 			// which iter is x/y depends on which way is north!
 			for (first_iter = first_start; first_iter >= -first_end; --first_iter) {
@@ -853,14 +1049,27 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options) {
 				for (second_iter = second_start; second_iter >= -second_end; --second_iter) {
 					xx = (y_first ? second_iter : first_iter) * (invert_x ? -1 : 1);
 					yy = (y_first ? first_iter : second_iter) * (invert_y ? -1 : 1);
+					show_blocked = FALSE;
 					
-					to_room = real_shift(room, xx, yy);
+					if (xx == 0 && yy == 0) {
+						to_room = room;		
+					}
+					else if (view_grid) {
+						to_room = real_room(view_grid[xx + magnitude + x_offset][yy + magnitude + y_offset]);
+						if (!to_room) {
+							show_blocked = TRUE;
+							to_room = real_shift(room, xx, yy);
+						}
+					}
+					else {
+						to_room = real_shift(room, xx, yy);
+					}
 					
 					if (!to_room) {
 						// nothing to show?
-						send_to_char("    ", ch);
+						send_to_char(blocked_tile, ch);
 					}
-					else if (to_room != room && ROOM_AFF_FLAGGED(to_room, ROOM_AFF_DARK)) {
+					else if (to_room != room && ROOM_AFF_FLAGGED(to_room, ROOM_AFF_DARK) && !show_blocked) {
 						// magic dark: show blank
 						send_to_char("    ", ch);
 					}
@@ -870,18 +1079,53 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options) {
 						
 						if (dist <= can_see_in_dark_distance) {
 							// close enough to see
-							show_map_to_char(ch, mappc, to_room, options);
+							if (show_blocked) {
+								if ((memory = get_player_map_memory(ch, GET_ROOM_VNUM(to_room), MAP_MEM_ICON))) {
+									msg_to_char(ch, "\tw%-4.4s", memory);
+								}
+								else {
+									send_to_char(blocked_tile, ch);
+								}
+							}
+							else {
+								show_map_to_char(ch, mappc, to_room, options);
+							}
 						}
-						else if ((dist <= (can_see_in_dark_distance + 2) || adjacent_room_is_light(to_room)) && !PRF_FLAGGED(ch, PRF_NOMAPCOL | PRF_POLITICAL | PRF_INFORMATIVE)) {
+						else if ((dist <= (can_see_in_dark_distance + 2) || adjacent_room_is_light(to_room)) && !PRF_FLAGGED(ch, PRF_NOMAPCOL | PRF_POLITICAL | PRF_INFORMATIVE) && !show_blocked) {
 							// see-distance to see-distance+2: show as dark tile
 							// note: no-map-color toggle will show these as blank instead
 							show_map_to_char(ch, mappc, to_room, options | LRR_SHOW_DARK);
 						}
 						else {
 							// too far (or color is off): show blank
-							send_to_char("    ", ch);
+							if (!PRF_FLAGGED(ch, PRF_NOMAPCOL | PRF_POLITICAL | PRF_INFORMATIVE) && (memory = get_player_map_memory(ch, GET_ROOM_VNUM(to_room), MAP_MEM_ICON))) {
+								msg_to_char(ch, "\tb%-4.4s", memory);
+							}
+							else {
+								send_to_char("    ", ch);
+							}
 						}
 					}	// end dark
+					else if (show_blocked) {
+						if ((MAGIC_DARKNESS(to_room) || get_sun_status(to_room) == SUN_DARK) && (compute_distance(room, to_room) > can_see_in_dark_distance)) {
+							// blocked dark tile
+							if (!PRF_FLAGGED(ch, PRF_NOMAPCOL | PRF_POLITICAL | PRF_INFORMATIVE) && (memory = get_player_map_memory(ch, GET_ROOM_VNUM(to_room), MAP_MEM_ICON))) {
+								msg_to_char(ch, "\tb%-4.4s", memory);
+							}
+							else {
+								send_to_char("    ", ch);
+							}
+						}
+						else {
+							// blocked light tile
+							if (!PRF_FLAGGED(ch, PRF_NOMAPCOL | PRF_POLITICAL | PRF_INFORMATIVE) && (memory = get_player_map_memory(ch, GET_ROOM_VNUM(to_room), MAP_MEM_ICON))) {
+								msg_to_char(ch, "\tw%-4.4s", memory);
+							}
+							else {
+								send_to_char(blocked_tile, ch);
+							}
+						}
+					}
 					else {
 						// normal view
 						show_map_to_char(ch, mappc, to_room, options);
@@ -897,6 +1141,11 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options) {
 				send_to_char("----", ch);
 			}
 			send_to_char("+\r\n", ch);
+			
+			if (view_grid) {
+				free_line_of_sight_grid(view_grid, magnitude);
+				view_grid = NULL;
+			}
 		}
 
 		// notify character they can't see in the dark
@@ -1122,6 +1371,10 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options) {
 	/* Exits ? */
 	if (!PRF_FLAGGED(ch, PRF_NO_EXITS) && COMPLEX_DATA(room) && ROOM_IS_CLOSED(room)) {
 		do_exits(ch, "", -1, GET_ROOM_VNUM(room));
+	}
+	
+	if (IS_OUTDOORS(ch) && GET_ROOM_VNUM(IN_ROOM(ch)) < MAP_SIZE) {
+		gain_player_tech_exp(ch, PTECH_MAP_MEMORY, 0.1);
 	}
 }
 
@@ -1731,6 +1984,13 @@ static void show_map_to_char(char_data *ch, struct mappc_data_container *mappc, 
 		strcat(buf, "&0");
 	}
 	
+	// record uncolored version as memory
+	if (config_get_bool("line_of_sight") && has_player_tech(ch, PTECH_MAP_MEMORY)) {
+		add_player_map_memory(ch, GET_ROOM_VNUM(to_room), buf, NULL, 0);
+		// this will add the name, too
+		get_screenreader_room_name(ch, IN_ROOM(ch), to_room, FALSE);
+	}
+	
 	send_to_char(buf, ch);
 }
 
@@ -1800,6 +2060,16 @@ char *get_screenreader_room_name(char_data *ch, room_data *from_room, room_data 
 		}
 		sprintf(temp, "Dark %s", temp2);
 	}
+	else if (config_get_bool("line_of_sight") && has_player_tech(ch, PTECH_MAP_MEMORY)) {
+		// not dark: memorize it?
+		if (strchr(temp, ' ')) {
+			chop_last_arg(temp, junk, temp2);
+		}
+		else {
+			*temp2 = '\0';
+		}
+		add_player_map_memory(ch, GET_ROOM_VNUM(to_room), NULL, *temp2 ? temp2 : temp, 0);
+	}
 	
 	// start lbuf: color
 	if (ROOM_PAINT_COLOR(to_room) && !PRF_FLAGGED(ch, PRF_NO_PAINT)) {
@@ -1827,13 +2097,27 @@ char *get_screenreader_room_name(char_data *ch, room_data *from_room, room_data 
 }
 
 
+/**
+* Displays the tiles in one direction from the character, up to their mapsize
+* (radius) in distance.
+*
+* @param char_data *ch The player.
+* @param room_data *origin Where the player is looking from.
+* @paraim int dir The direction they are looking.
+*/
 void screenread_one_dir(char_data *ch, room_data *origin, int dir) {
 	char buf[MAX_STRING_LENGTH], roombuf[MAX_INPUT_LENGTH], lastroom[MAX_INPUT_LENGTH];
 	char dirbuf[MAX_STRING_LENGTH];
-	int mapsize, dist, dist_iter, can_see_in_dark_distance;
+	int mapsize, dist, dist_iter, can_see_in_dark_distance, view_height, r_height;
 	room_data *to_room;
-	int repeats;
+	int repeats, top_height;
+	bool blocking_veh, check_blocking, is_blocked = FALSE;
 	bool allow_stacking = TRUE;	// always
+	const char *memory;
+	
+	if (!ch->desc) {
+		return;	// nobody to show it to
+	}
 	
 	mapsize = GET_MAPSIZE(REAL_CHAR(ch));
 	if (mapsize == 0) {
@@ -1846,10 +2130,13 @@ void screenread_one_dir(char_data *ch, room_data *origin, int dir) {
 	}
 
 	// setup
+	check_blocking = PRF_FLAGGED(ch, PRF_HOLYLIGHT) ? FALSE : TRUE;
 	can_see_in_dark_distance = distance_can_see_in_dark(ch);
 	*dirbuf = '\0';
 	*lastroom = '\0';
 	repeats = 0;
+	top_height = 0;
+	view_height = get_view_height(ch, origin);
 
 	// show distance that direction		
 	for (dist_iter = 1; dist_iter <= mapsize; ++dist_iter) {
@@ -1859,8 +2146,19 @@ void screenread_one_dir(char_data *ch, room_data *origin, int dir) {
 			break;
 		}
 		
+		r_height = get_room_blocking_height(to_room, &blocking_veh);
+		
 		*roombuf = '\0';
-		if (ROOM_AFF_FLAGGED(to_room, ROOM_AFF_DARK)) {
+		if (is_blocked && r_height <= top_height && (!ROOM_OWNER(to_room) || ROOM_OWNER(to_room) != GET_LOYALTY(ch))) {
+			// blocked by closer tile
+			if ((memory = get_player_map_memory(ch, GET_ROOM_VNUM(to_room), MAP_MEM_NAME))) {
+				snprintf(roombuf, sizeof(roombuf), "Blocked %s", memory);
+			}
+			else {
+				strcpy(roombuf, "Blocked");
+			}
+		}
+		else if (ROOM_AFF_FLAGGED(to_room, ROOM_AFF_DARK)) {
 			// magic dark
 			strcpy(roombuf, "Dark");
 		}
@@ -1882,7 +2180,12 @@ void screenread_one_dir(char_data *ch, room_data *origin, int dir) {
 			}
 			else {
 				// too far: show only darkness
-				strcpy(roombuf, "Dark");
+				if ((memory = get_player_map_memory(ch, GET_ROOM_VNUM(to_room), MAP_MEM_NAME))) {
+					snprintf(roombuf, sizeof(roombuf), "Dark %s", memory);
+				}
+				else {
+					strcpy(roombuf, "Dark");
+				}
 			}
 		}
 		else {	// not dark
@@ -1908,6 +2211,14 @@ void screenread_one_dir(char_data *ch, room_data *origin, int dir) {
 			// reset
 			repeats = 0;
 			strcpy(lastroom, roombuf);
+		}
+		
+		// record new top height
+		top_height = MAX(top_height, r_height);
+		
+		// check blocking
+		if (check_blocking && !is_blocked && (blocking_veh || ROOM_SECT_FLAGGED(to_room, SECTF_OBSCURE_VISION) || SECT_FLAGGED(BASE_SECT(to_room), SECTF_OBSCURE_VISION) || ROOM_BLD_FLAGGED(to_room, BLD_OBSCURE_VISION)) && r_height >= view_height) {
+			is_blocked = TRUE;
 		}
 	}
 	
@@ -2422,6 +2733,7 @@ ACMD(do_scan) {
 	else if ((dir = parse_direction(ch, argument)) == NO_DIR) {
 		clear_recent_moves(ch);
 		scan_for_tile(ch, argument);
+		gain_player_tech_exp(ch, PTECH_MAP_MEMORY, 0.1);
 	}
 	else if (dir >= NUM_2D_DIRS) {
 		msg_to_char(ch, "You can't scan that way.\r\n");
@@ -2429,6 +2741,7 @@ ACMD(do_scan) {
 	else {
 		clear_recent_moves(ch);
 		screenread_one_dir(ch, use_room, dir);
+		gain_player_tech_exp(ch, PTECH_MAP_MEMORY, 0.1);
 	}
 }
 
