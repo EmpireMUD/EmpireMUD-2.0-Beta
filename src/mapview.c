@@ -1038,7 +1038,7 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options) {
 			}
 			
 			// check if we need a line-of-sight grid AFTER determining offsets
-			if (!PRF_FLAGGED(ch, PRF_HOLYLIGHT)) {
+			if (!PRF_FLAGGED(ch, PRF_HOLYLIGHT) && config_get_bool("line_of_sight")) {
 				view_grid = build_line_of_sight_grid(ch, room, magnitude, x_offset, y_offset);
 			}
 		
@@ -1985,7 +1985,7 @@ static void show_map_to_char(char_data *ch, struct mappc_data_container *mappc, 
 	}
 	
 	// record uncolored version as memory
-	if (config_get_bool("line_of_sight") && has_player_tech(ch, PTECH_MAP_MEMORY)) {
+	if (has_player_tech(ch, PTECH_MAP_MEMORY)) {
 		add_player_map_memory(ch, GET_ROOM_VNUM(to_room), buf, NULL, 0);
 		// this will add the name, too
 		get_screenreader_room_name(ch, IN_ROOM(ch), to_room, FALSE);
@@ -2060,7 +2060,7 @@ char *get_screenreader_room_name(char_data *ch, room_data *from_room, room_data 
 		}
 		sprintf(temp, "Dark %s", temp2);
 	}
-	else if (config_get_bool("line_of_sight") && has_player_tech(ch, PTECH_MAP_MEMORY)) {
+	else if (has_player_tech(ch, PTECH_MAP_MEMORY)) {
 		// not dark: memorize it?
 		if (strchr(temp, ' ')) {
 			chop_last_arg(temp, junk, temp2);
@@ -2130,7 +2130,7 @@ void screenread_one_dir(char_data *ch, room_data *origin, int dir) {
 	}
 
 	// setup
-	check_blocking = PRF_FLAGGED(ch, PRF_HOLYLIGHT) ? FALSE : TRUE;
+	check_blocking = (!PRF_FLAGGED(ch, PRF_HOLYLIGHT) && config_get_bool("line_of_sight"));
 	can_see_in_dark_distance = distance_can_see_in_dark(ch);
 	*dirbuf = '\0';
 	*lastroom = '\0';
