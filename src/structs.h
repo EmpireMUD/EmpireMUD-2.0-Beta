@@ -771,8 +771,8 @@ typedef struct vehicle_data vehicle_data;
 #define BLD_BURNABLE  BIT(15)	// fire! fire!
 #define BLD_EXIT  BIT(16)	// for ROOM-flagged interiors, players can 'exit' here
 #define BLD_OBSCURE_VISION  BIT(17)	// blocks tiles behind it
-// #define BLD_UNUSED6  BIT(18)
-// #define BLD_UNUSED7  BIT(19)
+#define BLD_ROAD_ICON  BIT(18)	// replaces its icon with the generated road icons (dashes)
+#define BLD_ROAD_ICON_WIDE  BIT(19)	// replaces its icon with wide road icons (equals signs)
 // #define BLD_UNUSED8  BIT(20)
 // #define BLD_UNUSED9  BIT(21)
 // #define BLD_UNUSED10  BIT(22)

@@ -2999,8 +2999,8 @@ const char *bld_flags[] = {
 	"BURNABLE",	// 15
 	"EXIT",
 	"OBSCURE-VISION",
-	"*",
-	"*",
+	"ROAD-ICON",
+	"ROAD-ICON-WIDE",
 	"*",	// 20
 	"*",
 	"*",

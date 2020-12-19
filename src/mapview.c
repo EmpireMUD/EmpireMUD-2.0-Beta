@@ -53,7 +53,8 @@ void show_screenreader_room(char_data *ch, room_data *room, bitvector_t options)
  //////////////////////////////////////////////////////////////////////////////
 //// DATA ////////////////////////////////////////////////////////////////////
 
-#define ANY_ROAD_TYPE(tile)  (IS_ROAD(tile) || BUILDING_VNUM(tile) == BUILDING_BRIDGE || BUILDING_VNUM(tile) == BUILDING_SWAMPWALK || BUILDING_VNUM(tile) == BUILDING_BOARDWALK)
+#define WIDE_ROAD_TYPE(tile)  ROOM_BLD_FLAGGED(tile, BLD_ROAD_ICON_WIDE)
+#define ANY_ROAD_TYPE(tile)  (IS_ROAD(tile) || ROOM_BLD_FLAGGED(tile, BLD_ROAD_ICON | BLD_ROAD_ICON_WIDE))
 #define CONNECTS_TO_ROAD(tile)  (tile && (ANY_ROAD_TYPE(tile) || ROOM_BLD_FLAGGED(tile, BLD_ATTACH_ROAD)))
 #define IS_BARRIER(tile)  (BUILDING_VNUM(tile) == BUILDING_WALL || BUILDING_VNUM(tile) == BUILDING_FENCE || BUILDING_VNUM(tile) == BUILDING_GATE || BUILDING_VNUM(tile) == BUILDING_GATEHOUSE)
 
@@ -823,6 +824,50 @@ void build_map_icon(char_data *ch, room_data *to_room, struct icon_data *base_ic
 		// Rooms with custom icons (take precedence over all but hidden rooms
 		strcat(icon_buf, ROOM_CUSTOM_ICON(to_room));
 	}
+	else if (WIDE_ROAD_TYPE(to_room)) {
+		// adjacent rooms, shifted by map change
+		// WARNING: You must make sure these are not NULL when you try to use them
+		room_data *r_north = SHIFT_CHAR_DIR(ch, to_room, NORTH);
+		room_data *r_east = SHIFT_CHAR_DIR(ch, to_room, EAST);
+		room_data *r_south = SHIFT_CHAR_DIR(ch, to_room, SOUTH);
+		room_data *r_west = SHIFT_CHAR_DIR(ch, to_room, WEST);
+		room_data *r_northwest = SHIFT_CHAR_DIR(ch, to_room, NORTHWEST);
+		room_data *r_northeast = SHIFT_CHAR_DIR(ch, to_room, NORTHEAST);
+		room_data *r_southwest = SHIFT_CHAR_DIR(ch, to_room, SOUTHWEST);
+		room_data *r_southeast = SHIFT_CHAR_DIR(ch, to_room, SOUTHEAST);
+		
+		// check west for the first 2 parts of the tile
+		if (CONNECTS_TO_ROAD(r_west) || (CONNECTS_TO_ROAD(r_southwest) && !CONNECTS_TO_ROAD(r_south)) || (CONNECTS_TO_ROAD(r_northwest) && !CONNECTS_TO_ROAD(r_north))) {
+			// road west
+			strcat(icon_buf, "&0=");
+		}
+		else {
+			sprintf(icon_buf + strlen(icon_buf), "&?%c", GET_SECT_ROADSIDE_ICON(BASE_SECT(to_room)));
+		}
+		
+		// middle part
+		if (CONNECTS_TO_ROAD(r_north) || CONNECTS_TO_ROAD(r_south)) {
+			// N/S are road
+			
+			if (strstr(icon_buf, "=") || CONNECTS_TO_ROAD(r_east) || (CONNECTS_TO_ROAD(r_northeast) && !CONNECTS_TO_ROAD(r_north)) || (CONNECTS_TO_ROAD(r_southeast) && !CONNECTS_TO_ROAD(r_south))) {
+				strcat(icon_buf, "&0++");
+			}
+			else {
+				strcat(icon_buf, "&0||");
+			}
+		}
+		else {
+			strcat(icon_buf, "&0==");
+		}
+		
+		// check east for last part of tile
+		if (CONNECTS_TO_ROAD(r_east) || (CONNECTS_TO_ROAD(r_northeast) && !CONNECTS_TO_ROAD(r_north)) || (CONNECTS_TO_ROAD(r_southeast) && !CONNECTS_TO_ROAD(r_south))) {
+			strcat(icon_buf, "=");
+		}
+		else {
+			sprintf(icon_buf + strlen(icon_buf), "&?%c", GET_SECT_ROADSIDE_ICON(BASE_SECT(to_room)));
+		}
+	}
 	else if (ANY_ROAD_TYPE(to_room)) {
 		// adjacent rooms, shifted by map change
 		// WARNING: You must make sure these are not NULL when you try to use them
@@ -890,50 +935,6 @@ void build_map_icon(char_data *ch, room_data *to_room, struct icon_data *base_ic
 		else if (CONNECTS_TO_ROAD(r_southeast) && !CONNECTS_TO_ROAD(r_south)) {
 			// just se
 			strcat(icon_buf, ",");
-		}
-		else {
-			sprintf(icon_buf + strlen(icon_buf), "&?%c", GET_SECT_ROADSIDE_ICON(BASE_SECT(to_room)));
-		}
-	}
-	else if (BUILDING_VNUM(to_room) == BUILDING_STEPS) {
-		// adjacent rooms, shifted by map change
-		// WARNING: You must make sure these are not NULL when you try to use them
-		room_data *r_north = SHIFT_CHAR_DIR(ch, to_room, NORTH);
-		room_data *r_east = SHIFT_CHAR_DIR(ch, to_room, EAST);
-		room_data *r_south = SHIFT_CHAR_DIR(ch, to_room, SOUTH);
-		room_data *r_west = SHIFT_CHAR_DIR(ch, to_room, WEST);
-		room_data *r_northwest = SHIFT_CHAR_DIR(ch, to_room, NORTHWEST);
-		room_data *r_northeast = SHIFT_CHAR_DIR(ch, to_room, NORTHEAST);
-		room_data *r_southwest = SHIFT_CHAR_DIR(ch, to_room, SOUTHWEST);
-		room_data *r_southeast = SHIFT_CHAR_DIR(ch, to_room, SOUTHEAST);
-		
-		// check west for the first 2 parts of the tile
-		if (CONNECTS_TO_ROAD(r_west) || (CONNECTS_TO_ROAD(r_southwest) && !CONNECTS_TO_ROAD(r_south)) || (CONNECTS_TO_ROAD(r_northwest) && !CONNECTS_TO_ROAD(r_north))) {
-			// road west
-			strcat(icon_buf, "&0=");
-		}
-		else {
-			sprintf(icon_buf + strlen(icon_buf), "&?%c", GET_SECT_ROADSIDE_ICON(BASE_SECT(to_room)));
-		}
-		
-		// middle part
-		if (CONNECTS_TO_ROAD(r_north) || CONNECTS_TO_ROAD(r_south)) {
-			// N/S are road
-			
-			if (strstr(icon_buf, "=") || CONNECTS_TO_ROAD(r_east) || (CONNECTS_TO_ROAD(r_northeast) && !CONNECTS_TO_ROAD(r_north)) || (CONNECTS_TO_ROAD(r_southeast) && !CONNECTS_TO_ROAD(r_south))) {
-				strcat(icon_buf, "&0++");
-			}
-			else {
-				strcat(icon_buf, "&0||");
-			}
-		}
-		else {
-			strcat(icon_buf, "&0==");
-		}
-		
-		// check east for last part of tile
-		if (CONNECTS_TO_ROAD(r_east) || (CONNECTS_TO_ROAD(r_northeast) && !CONNECTS_TO_ROAD(r_north)) || (CONNECTS_TO_ROAD(r_southeast) && !CONNECTS_TO_ROAD(r_south))) {
-			strcat(icon_buf, "=");
 		}
 		else {
 			sprintf(icon_buf + strlen(icon_buf), "&?%c", GET_SECT_ROADSIDE_ICON(BASE_SECT(to_room)));
@@ -1847,7 +1848,7 @@ void look_in_direction(char_data *ch, int dir) {
 */
 static void show_map_to_char(char_data *ch, struct mappc_data_container *mappc, room_data *to_room, bitvector_t options) {
 	bool need_color_terminator = FALSE;
-	char buf1[30], col_buf[256], lbuf[MAX_STRING_LENGTH], self_icon[256], mappc_icon[256], map_icon[256], veh_icon[256], show_icon[256];
+	char no_color[256], col_buf[256], lbuf[MAX_STRING_LENGTH], self_icon[256], mappc_icon[256], map_icon[256], veh_icon[256], show_icon[256];
 	int iter;
 	int tileset = GET_SEASON(to_room);
 	struct icon_data *base_icon, *crop_icon = NULL;
@@ -1913,12 +1914,12 @@ static void show_map_to_char(char_data *ch, struct mappc_data_container *mappc, 
 	
 	// 3. Check for special icon coloring including &?
 	if (IS_BURNING(to_room)) {
-		strcpy(buf1, strip_color(show_icon));
-		sprintf(show_icon, "\t0\t[B300]%s", buf1);
+		strcpy(no_color, strip_color(show_icon));
+		sprintf(show_icon, "\t0\t[B300]%s", no_color);
 		need_color_terminator = TRUE;
 	}
 	else if (PRF_FLAGGED(ch, PRF_NOMAPCOL | PRF_POLITICAL | PRF_INFORMATIVE) || show_dark) {
-		strcpy(buf1, strip_color(show_icon));
+		strcpy(no_color, strip_color(show_icon));
 
 		if (PRF_FLAGGED(ch, PRF_POLITICAL) && !show_dark) {
 			if (GET_LOYALTY(ch) && (GET_LOYALTY(ch) == ROOM_OWNER(to_room) || find_city(GET_LOYALTY(ch), to_room)) && is_in_city_for_empire(to_room, GET_LOYALTY(ch), FALSE, &junk)) {
@@ -1930,29 +1931,29 @@ static void show_map_to_char(char_data *ch, struct mappc_data_container *mappc, 
 			}
 			
 			if (show_veh && !VEH_FLAGGED(show_veh, VEH_NO_CLAIM)) {
-				sprintf(show_icon, "%s%s%s", (VEH_OWNER(show_veh) && EMPIRE_BANNER(VEH_OWNER(show_veh))) ? EMPIRE_BANNER(VEH_OWNER(show_veh)) : "&0", buf2, buf1);
+				sprintf(show_icon, "%s%s%s", (VEH_OWNER(show_veh) && EMPIRE_BANNER(VEH_OWNER(show_veh))) ? EMPIRE_BANNER(VEH_OWNER(show_veh)) : "&0", buf2, no_color);
 			}
 			else if (ROOM_OWNER(to_room) && (!CHECK_CHAMELEON(IN_ROOM(ch), to_room) || ROOM_OWNER(to_room) == GET_LOYALTY(ch))) {
-				sprintf(show_icon, "%s%s%s", EMPIRE_BANNER(ROOM_OWNER(to_room)) ? EMPIRE_BANNER(ROOM_OWNER(to_room)) : "&0", buf2, buf1);
+				sprintf(show_icon, "%s%s%s", EMPIRE_BANNER(ROOM_OWNER(to_room)) ? EMPIRE_BANNER(ROOM_OWNER(to_room)) : "&0", buf2, no_color);
 			}
 			else {
-				sprintf(show_icon, "&0%s%s", buf2, buf1);
+				sprintf(show_icon, "&0%s%s", buf2, no_color);
 			}
 		}
 		else if (PRF_FLAGGED(ch, PRF_INFORMATIVE) && !show_dark) {
 			if (show_veh) {
-				sprintf(show_icon, "%s%s", get_informative_color_veh(ch, show_veh), buf1);
+				sprintf(show_icon, "%s%s", get_informative_color_veh(ch, show_veh), no_color);
 			}
 			else {
-				sprintf(show_icon, "%s%s", get_informative_color_room(ch, to_room), buf1);
+				sprintf(show_icon, "%s%s", get_informative_color_room(ch, to_room), no_color);
 			}
 		}
 		else if (!PRF_FLAGGED(ch, PRF_NOMAPCOL | PRF_INFORMATIVE | PRF_POLITICAL) && show_dark) {
-			sprintf(show_icon, "&b%s", buf1);
+			sprintf(show_icon, "&b%s", no_color);
 		}
 		else {
 			// color was stripped but no color added, so add a "normal" color to prevent color bleed
-			sprintf(show_icon, "&0%s", buf1);
+			sprintf(show_icon, "&0%s", no_color);
 		}
 	}
 	else if (painted && (!show_veh || veh_is_shown)) {
