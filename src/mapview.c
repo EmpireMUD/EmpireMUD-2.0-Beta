@@ -699,14 +699,24 @@ bool can_see_player_in_other_room(char_data *ch, char_data *vict) {
 }
 
 
-bool show_pc_in_room(char_data *ch, room_data *room, struct mappc_data_container *mappc) {
+/**
+* Determines if there's a person or mob in the room to show as the map icon.
+*
+* @param char_data *ch The person viewing it.
+* @param room_data *room The room they are looking at.
+* @param struct mappc_data_container *mappc A container to store the discovered data here.
+* @param char *icon_buf Where it will write the icon (a string of some kind).
+*/
+bool show_pc_in_room(char_data *ch, room_data *room, struct mappc_data_container *mappc, char *icon_buf) {
 	struct mappc_data *pc, *start_this_room = NULL;
 	bool show_mob = FALSE;
-	char lbuf[60];
 	char_data *c;
 	empire_data *emp;
 	int count = 0, iter;
 	char *charmap = "<oo>";
+	
+	// init this, in case
+	*icon_buf = '\0';
 
 	if (!SHOW_PEOPLE_IN_ROOM(room)) {
 		return FALSE;
@@ -737,58 +747,306 @@ bool show_pc_in_room(char_data *ch, room_data *room, struct mappc_data_container
 	}
 	else if (count == 1) {
 		emp = GET_LOYALTY(start_this_room->character);
-		msg_to_char(ch, "&0<%soo&0>", !emp ? "" : EMPIRE_BANNER(emp));
+		sprintf(icon_buf, "&0<%soo&0>", !emp ? "" : EMPIRE_BANNER(emp));
 	}
 	else if (count == 2) {
 		pc = start_this_room;
 		emp = GET_LOYALTY(pc->character);
-		sprintf(lbuf, "&0<%so", !emp ? "&0" : EMPIRE_BANNER(emp));
+		sprintf(icon_buf, "&0<%so", !emp ? "&0" : EMPIRE_BANNER(emp));
 		
 		pc = pc->next;
 		emp = GET_LOYALTY(pc->character);
-		sprintf(lbuf + strlen(lbuf), "%so&0>", !emp ? "" : EMPIRE_BANNER(emp));
-		
-		send_to_char(lbuf, ch);
+		sprintf(icon_buf + strlen(icon_buf), "%so&0>", !emp ? "" : EMPIRE_BANNER(emp));
 	}
 	else if (count == 3) {
 		pc = start_this_room;
 		emp = GET_LOYALTY(pc->character);
-		sprintf(lbuf, "%s<", !emp ? "&0" : EMPIRE_BANNER(emp));
+		sprintf(icon_buf, "%s<", !emp ? "&0" : EMPIRE_BANNER(emp));
 		
 		pc = pc->next;
 		emp = GET_LOYALTY(pc->character);
-		sprintf(lbuf + strlen(lbuf), "%soo", !emp ? "" : EMPIRE_BANNER(emp));
+		sprintf(icon_buf + strlen(icon_buf), "%soo", !emp ? "" : EMPIRE_BANNER(emp));
 		
 		pc = pc->next;
 		emp = GET_LOYALTY(pc->character);
-		sprintf(lbuf + strlen(lbuf), "%s>", !emp ? "" : EMPIRE_BANNER(emp));
-		
-		send_to_char(lbuf, ch);
+		sprintf(icon_buf + strlen(icon_buf), "%s>", !emp ? "" : EMPIRE_BANNER(emp));
 	}
 	else if (count >= 4) {
 		pc = start_this_room;
-		*lbuf = '\0';
+		*icon_buf = '\0';
 		
 		// only show the first 4 colors in this case
 		for (iter = 0; iter < 4; ++iter) {
 			emp = GET_LOYALTY(pc->character);
-			sprintf(lbuf + strlen(lbuf), "%s%c", !emp ? "&0" : EMPIRE_BANNER(emp), charmap[iter]);
+			sprintf(icon_buf + strlen(icon_buf), "%s%c", !emp ? "&0" : EMPIRE_BANNER(emp), charmap[iter]);
 			pc = pc->next;
 		}
-		
-		send_to_char(lbuf, ch);
 	}
 	else if (show_mob) {
-		send_to_char("&0(oo)", ch);
+		strcpy(icon_buf, "&0(oo)");
 	}
 	
-	// if we got here we showed a pc
+	// if we got here we found any pc/visible mob
 	return TRUE;
 }
 
 
  //////////////////////////////////////////////////////////////////////////////
 //// MAP VIEW FUNCTIONS //////////////////////////////////////////////////////
+
+/**
+* Builds the final icon for a single map tile, based on its current conditions.
+* This excludes any person/vehicle on it.
+*
+* @param char_data *ch The person looking at it.
+* @param room_data *to_room The room they are looking at.
+* @param struct icon_data *base_icon The icon for the base tile (used for color etc).
+* @param struct icon_data *crop_icon The icon for a crop on the tile (may be NULL).
+* @param int tileset Which tile set (season) to pull icons from.
+* @param char *icon_buf A string to write the icon to.
+*/
+void build_map_icon(char_data *ch, room_data *to_room, struct icon_data *base_icon, struct icon_data *crop_icon, int tileset, char *icon_buf) {
+	struct empire_city_data *city;
+	struct icon_data *icon;
+	sector_data *sect;
+	bool enchanted;
+	char *str;
+	
+	// initialize this
+	*icon_buf = '\0';
+
+	if (CHECK_CHAMELEON(IN_ROOM(ch), to_room)) {
+		// Hidden buildings
+		strcat(icon_buf, base_icon->icon);
+	}
+	else if (ROOM_CUSTOM_ICON(to_room)) {
+		// Rooms with custom icons (take precedence over all but hidden rooms
+		strcat(icon_buf, ROOM_CUSTOM_ICON(to_room));
+	}
+	else if (ANY_ROAD_TYPE(to_room)) {
+		// adjacent rooms, shifted by map change
+		// WARNING: You must make sure these are not NULL when you try to use them
+		room_data *r_north = SHIFT_CHAR_DIR(ch, to_room, NORTH);
+		room_data *r_east = SHIFT_CHAR_DIR(ch, to_room, EAST);
+		room_data *r_south = SHIFT_CHAR_DIR(ch, to_room, SOUTH);
+		room_data *r_west = SHIFT_CHAR_DIR(ch, to_room, WEST);
+		room_data *r_northwest = SHIFT_CHAR_DIR(ch, to_room, NORTHWEST);
+		room_data *r_northeast = SHIFT_CHAR_DIR(ch, to_room, NORTHEAST);
+		room_data *r_southwest = SHIFT_CHAR_DIR(ch, to_room, SOUTHWEST);
+		room_data *r_southeast = SHIFT_CHAR_DIR(ch, to_room, SOUTHEAST);
+		
+		// check west for the first 2 parts of the tile
+		if (CONNECTS_TO_ROAD(r_west)) {
+			// road west
+			strcat(icon_buf, "&0--");
+		}
+		else if ((CONNECTS_TO_ROAD(r_southwest) && !CONNECTS_TO_ROAD(r_south)) && (CONNECTS_TO_ROAD(r_northwest) && !CONNECTS_TO_ROAD(r_north))) {
+			// both nw and sw
+			strcat(icon_buf, "&0>-");
+		}
+		else if (CONNECTS_TO_ROAD(r_southwest) && !CONNECTS_TO_ROAD(r_south)) {
+			// just sw
+			strcat(icon_buf, "&0,-");
+		}
+		else if (CONNECTS_TO_ROAD(r_northwest) && !CONNECTS_TO_ROAD(r_north)) {
+			// just nw
+			strcat(icon_buf, "&0`-");
+		}
+		else if (CONNECTS_TO_ROAD(r_north) || CONNECTS_TO_ROAD(r_south)) {
+			// road north/south but NOT west
+			sprintf(icon_buf + strlen(icon_buf), "&?%c%c", GET_SECT_ROADSIDE_ICON(BASE_SECT(to_room)), GET_SECT_ROADSIDE_ICON(BASE_SECT(to_room)));
+		}
+		else {
+			// N/W/S were not road
+			sprintf(icon_buf + strlen(icon_buf), "&?%c&0-", GET_SECT_ROADSIDE_ICON(BASE_SECT(to_room)));
+		}
+		
+		// middle part
+		if (CONNECTS_TO_ROAD(r_north) || CONNECTS_TO_ROAD(r_south)) {
+			// N/S are road
+			if (strstr(icon_buf, "-") || CONNECTS_TO_ROAD(r_east) || (CONNECTS_TO_ROAD(r_northeast) && !CONNECTS_TO_ROAD(r_north)) || (CONNECTS_TO_ROAD(r_southeast) && !CONNECTS_TO_ROAD(r_south))) {
+				strcat(icon_buf, "&0+");
+			}
+			else {
+				strcat(icon_buf, "&0|");
+			}
+		}
+		else {
+			strcat(icon_buf, "&0-");
+		}
+		
+		// check east for last part of tile
+		if (CONNECTS_TO_ROAD(r_east)) {
+			strcat(icon_buf, "-");
+		}
+		else if ((CONNECTS_TO_ROAD(r_northeast) && !CONNECTS_TO_ROAD(r_north)) && (CONNECTS_TO_ROAD(r_southeast) && !CONNECTS_TO_ROAD(r_south))) {
+			// ne and se
+			strcat(icon_buf, "<");
+		}
+		else if (CONNECTS_TO_ROAD(r_northeast) && !CONNECTS_TO_ROAD(r_north)) {
+			// just ne
+			strcat(icon_buf, "'");
+		}
+		else if (CONNECTS_TO_ROAD(r_southeast) && !CONNECTS_TO_ROAD(r_south)) {
+			// just se
+			strcat(icon_buf, ",");
+		}
+		else {
+			sprintf(icon_buf + strlen(icon_buf), "&?%c", GET_SECT_ROADSIDE_ICON(BASE_SECT(to_room)));
+		}
+	}
+	else if (BUILDING_VNUM(to_room) == BUILDING_STEPS) {
+		// adjacent rooms, shifted by map change
+		// WARNING: You must make sure these are not NULL when you try to use them
+		room_data *r_north = SHIFT_CHAR_DIR(ch, to_room, NORTH);
+		room_data *r_east = SHIFT_CHAR_DIR(ch, to_room, EAST);
+		room_data *r_south = SHIFT_CHAR_DIR(ch, to_room, SOUTH);
+		room_data *r_west = SHIFT_CHAR_DIR(ch, to_room, WEST);
+		room_data *r_northwest = SHIFT_CHAR_DIR(ch, to_room, NORTHWEST);
+		room_data *r_northeast = SHIFT_CHAR_DIR(ch, to_room, NORTHEAST);
+		room_data *r_southwest = SHIFT_CHAR_DIR(ch, to_room, SOUTHWEST);
+		room_data *r_southeast = SHIFT_CHAR_DIR(ch, to_room, SOUTHEAST);
+		
+		// check west for the first 2 parts of the tile
+		if (CONNECTS_TO_ROAD(r_west) || (CONNECTS_TO_ROAD(r_southwest) && !CONNECTS_TO_ROAD(r_south)) || (CONNECTS_TO_ROAD(r_northwest) && !CONNECTS_TO_ROAD(r_north))) {
+			// road west
+			strcat(icon_buf, "&0=");
+		}
+		else {
+			sprintf(icon_buf + strlen(icon_buf), "&?%c", GET_SECT_ROADSIDE_ICON(BASE_SECT(to_room)));
+		}
+		
+		// middle part
+		if (CONNECTS_TO_ROAD(r_north) || CONNECTS_TO_ROAD(r_south)) {
+			// N/S are road
+			
+			if (strstr(icon_buf, "=") || CONNECTS_TO_ROAD(r_east) || (CONNECTS_TO_ROAD(r_northeast) && !CONNECTS_TO_ROAD(r_north)) || (CONNECTS_TO_ROAD(r_southeast) && !CONNECTS_TO_ROAD(r_south))) {
+				strcat(icon_buf, "&0++");
+			}
+			else {
+				strcat(icon_buf, "&0||");
+			}
+		}
+		else {
+			strcat(icon_buf, "&0==");
+		}
+		
+		// check east for last part of tile
+		if (CONNECTS_TO_ROAD(r_east) || (CONNECTS_TO_ROAD(r_northeast) && !CONNECTS_TO_ROAD(r_north)) || (CONNECTS_TO_ROAD(r_southeast) && !CONNECTS_TO_ROAD(r_south))) {
+			strcat(icon_buf, "=");
+		}
+		else {
+			sprintf(icon_buf + strlen(icon_buf), "&?%c", GET_SECT_ROADSIDE_ICON(BASE_SECT(to_room)));
+		}
+	}
+	else if (ROOM_SECT_FLAGGED(to_room, SECTF_CROP) && ROOM_CROP(to_room) && crop_icon) {
+		strcat(icon_buf, crop_icon->icon);
+	}
+	else if (IS_CITY_CENTER(to_room)) {
+		if ((city = find_city(ROOM_OWNER(to_room), to_room))) {
+			strcat(icon_buf, city_type[city->type].icon);
+		}
+		else {
+			strcat(icon_buf, "[  ]");
+		}
+	}
+	else if (IS_MAP_BUILDING(to_room) && GET_BUILDING(to_room)) {
+		strcat(icon_buf, GET_BLD_ICON(GET_BUILDING(to_room)));
+	}
+	else if ((icon = get_icon_from_set(GET_SECT_ICONS(SECT(to_room)), tileset))) {
+		strcat(icon_buf, icon->icon);
+	}
+	else {	// error: no icon available
+		strcat(icon_buf, "????");
+	}
+	
+	// icon_buf is now the completed icon, but has both color codes (&) and variable tile codes (@)
+	if (strchr(icon_buf, '@')) {
+		room_data *r_east = SHIFT_CHAR_DIR(ch, to_room, EAST);
+		room_data *r_west = SHIFT_CHAR_DIR(ch, to_room, WEST);
+		// NOTE: If you add new @ codes here, you must update "const char *icon_codes" in utils.c
+		
+		// here (@.) roadside icon
+		if (strstr(icon_buf, "@.")) {
+			icon = get_icon_from_set(GET_SECT_ICONS(BASE_SECT(to_room)), tileset);
+			sprintf(buf1, "%s%c", icon ? icon->color : "&0", GET_SECT_ROADSIDE_ICON(BASE_SECT(to_room)));
+			str = str_replace("@.", buf1, icon_buf);
+			strcpy(icon_buf, str);
+			free(str);
+		}
+		// east (@e) tile attachment
+		if (strstr(icon_buf, "@e")) {
+			sect = r_east ? BASE_SECT(r_east) : BASE_SECT(to_room);
+			icon = get_icon_from_set(GET_SECT_ICONS(sect), tileset);
+			sprintf(buf1, "%s%c", icon ? icon->color : "&0", GET_SECT_ROADSIDE_ICON(sect));
+			str = str_replace("@e", buf1, icon_buf);
+			strcpy(icon_buf, str);
+			free(str);
+		}
+		// west (@w) tile attachment
+		if (strstr(icon_buf, "@w")) {
+			sect = r_west ? BASE_SECT(r_west) : BASE_SECT(to_room);
+			icon = get_icon_from_set(GET_SECT_ICONS(sect), tileset);
+			sprintf(buf1, "%s%c", icon ? icon->color : "&0", GET_SECT_ROADSIDE_ICON(sect));
+			str = str_replace("@w", buf1, icon_buf);
+			strcpy(icon_buf, str);
+			free(str);
+		}
+		
+		// west (@u) barrier attachment
+		if (strstr(icon_buf, "@u") || strstr(icon_buf, "@U")) {
+			if (!r_west || ((IS_BARRIER(r_west) || ROOM_IS_CLOSED(r_west)) && !ROOM_AFF_FLAGGED(r_west, ROOM_AFF_CHAMELEON))) {
+				enchanted = (r_west && ROOM_AFF_FLAGGED(r_west, ROOM_AFF_NO_FLY)) || ROOM_AFF_FLAGGED(to_room, ROOM_AFF_NO_FLY);
+				// west is a barrier
+				sprintf(buf1, "%sv", enchanted ? "&m" : "&0");
+				str = str_replace("@u", buf1, icon_buf);
+				strcpy(icon_buf, str);
+				free(str);
+				sprintf(buf1, "%sV", enchanted ? "&m" : "&0");
+				str = str_replace("@U", buf1, icon_buf);
+				strcpy(icon_buf, str);
+				free(str);
+			}
+			else {
+				// west is not a barrier
+				sprintf(buf1, "&?%c", GET_SECT_ROADSIDE_ICON(BASE_SECT(to_room)));
+				str = str_replace("@u", buf1, icon_buf);
+				strcpy(icon_buf, str);
+				free(str);
+				str = str_replace("@U", buf1, icon_buf);
+				strcpy(icon_buf, str);
+				free(str);
+			}
+		}
+		
+		//  east (@v) barrier attachment
+		if (strstr(icon_buf, "@v") || strstr(icon_buf, "@V")) {
+			if (!r_east || ((IS_BARRIER(r_east) || ROOM_IS_CLOSED(r_east)) && !ROOM_AFF_FLAGGED(r_east, ROOM_AFF_CHAMELEON))) {
+				enchanted = (r_east && ROOM_AFF_FLAGGED(r_east, ROOM_AFF_NO_FLY)) || ROOM_AFF_FLAGGED(to_room, ROOM_AFF_NO_FLY);
+				// east is a barrier
+				sprintf(buf1, "%sv", enchanted ? "&m" : "&0");
+				str = str_replace("@v", buf1, icon_buf);
+				strcpy(icon_buf, str);
+				free(str);
+				sprintf(buf1, "%sV", enchanted ? "&m" : "&0");
+				str = str_replace("@V", buf1, icon_buf);
+				strcpy(icon_buf, str);
+				free(str);
+			}
+			else {
+				// east is not a barrier
+				sprintf(buf1, "&?%c", GET_SECT_ROADSIDE_ICON(BASE_SECT(to_room)));
+				str = str_replace("@v", buf1, icon_buf);
+				strcpy(icon_buf, str);
+				free(str);
+				str = str_replace("@V", buf1, icon_buf);
+				strcpy(icon_buf, str);
+				free(str);
+			}
+		}
+	}
+}
+
 
 /**
 * Does a normal "look" at a room.
@@ -1589,289 +1847,82 @@ void look_in_direction(char_data *ch, int dir) {
 */
 static void show_map_to_char(char_data *ch, struct mappc_data_container *mappc, room_data *to_room, bitvector_t options) {
 	bool need_color_terminator = FALSE;
-	char buf[30], buf1[30], col_buf[256], lbuf[MAX_STRING_LENGTH];
-	struct empire_city_data *city;
+	char buf1[30], col_buf[256], lbuf[MAX_STRING_LENGTH], self_icon[256], mappc_icon[256], map_icon[256], veh_icon[256], show_icon[256];
 	int iter;
-	empire_data *emp, *chemp = GET_LOYALTY(ch);
 	int tileset = GET_SEASON(to_room);
-	struct icon_data *base_icon, *icon, *crop_icon = NULL;
-	bool junk, enchanted, hidden = FALSE, painted, veh_is_shown = FALSE;
-	crop_data *cp = ROOM_CROP(to_room);
-	sector_data *st, *base_sect = BASE_SECT(to_room);
+	struct icon_data *base_icon, *crop_icon = NULL;
+	bool junk, painted, veh_is_shown = FALSE;
 	char *base_color, *str;
-	room_data *map_loc;
 	vehicle_data *show_veh = NULL;
 	
 	// options
 	bool show_dark = IS_SET(options, LRR_SHOW_DARK) ? TRUE : FALSE;
-	// bool ship_partial = IS_SET(options, LRR_SHIP_PARTIAL) ? TRUE : FALSE;
-		
-	// adjacent rooms, shifted by map change
-	// WARNING: You must make sure these are not NULL when you try to use them
-	room_data *r_north = SHIFT_CHAR_DIR(ch, to_room, NORTH);
-	room_data *r_east = SHIFT_CHAR_DIR(ch, to_room, EAST);
-	room_data *r_south = SHIFT_CHAR_DIR(ch, to_room, SOUTH);
-	room_data *r_west = SHIFT_CHAR_DIR(ch, to_room, WEST);
-	room_data *r_northwest = SHIFT_CHAR_DIR(ch, to_room, NORTHWEST);
-	room_data *r_northeast = SHIFT_CHAR_DIR(ch, to_room, NORTHEAST);
-	room_data *r_southwest = SHIFT_CHAR_DIR(ch, to_room, SOUTHWEST);
-	room_data *r_southeast = SHIFT_CHAR_DIR(ch, to_room, SOUTHEAST);
+	bool remember_icon = has_player_tech(ch, PTECH_MAP_MEMORY) ? TRUE : FALSE;
 	
-	#define distance(x, y, a, b)		((x - a) * (x - a) + (y - b) * (y - b))
+	// clear icon strings
+	*self_icon = *mappc_icon = *map_icon = *veh_icon = *show_icon = '\0';
 	
-	// detect map locations
-	map_loc = (GET_MAP_LOC(IN_ROOM(ch)) ? real_room(GET_MAP_LOC(IN_ROOM(ch))->vnum) : NULL);
-
 	// detect base icon
-	base_icon = get_icon_from_set(GET_SECT_ICONS(base_sect), tileset);
+	base_icon = get_icon_from_set(GET_SECT_ICONS(BASE_SECT(to_room)), tileset);
 	base_color = base_icon->color;
-	if (ROOM_SECT_FLAGGED(to_room, SECTF_CROP) && cp) {
-		crop_icon = get_icon_from_set(GET_CROP_ICONS(cp), tileset);
+	if (ROOM_SECT_FLAGGED(to_room, SECTF_CROP) && ROOM_CROP(to_room)) {
+		crop_icon = get_icon_from_set(GET_CROP_ICONS(ROOM_CROP(to_room)), tileset);
 		base_color = crop_icon->color;
 	}
 	
 	show_veh = find_vehicle_to_show(ch, to_room);
 	painted = (!IS_NPC(ch) && !PRF_FLAGGED(ch, PRF_NO_PAINT)) ? (show_veh ? VEH_PAINT_COLOR(show_veh) : ROOM_PAINT_COLOR(to_room)) : FALSE;
 
-	// start with an empty buf for the icon
-	*buf = '\0';
-
+	// 1: Build basic icon strings: self_icon, mappc_icon, veh_icon, map_icon (any of these may be empty)
+	
+	// build possible icons: self, pc/mob
 	if (to_room == IN_ROOM(ch) && !ROOM_IS_CLOSED(IN_ROOM(ch))) {
-		sprintf(buf, "&0<%soo&0>", chemp ? EMPIRE_BANNER(chemp) : "");
+		sprintf(self_icon, "&0<%soo&0>", GET_LOYALTY(ch) ? EMPIRE_BANNER(GET_LOYALTY(ch)) : "");
 	}
-	else if (!show_dark && !PRF_FLAGGED(ch, PRF_INFORMATIVE | PRF_POLITICAL) && show_pc_in_room(ch, to_room, mappc)) {
-		return;
+	else if (!show_dark && !PRF_FLAGGED(ch, PRF_INFORMATIVE | PRF_POLITICAL) && show_pc_in_room(ch, to_room, mappc, mappc_icon)) {
+		// no work here: show_pc_in_room already set mappc_icon
 	}
 	
-	// check for a vehicle with an icon
-	else if (show_veh) {
-		strcat(buf, NULLSAFE(VEH_ICON(show_veh)));
+	// check for a vehicle with an icon: we do this even if it won't be displayed later (because it may be stored as the tile icon)
+	if (show_veh && VEH_ICON(show_veh)) {
+		strcpy(veh_icon, VEH_ICON(show_veh));
+	}
+	
+	// determine if we need to build a map icon:
+	if ((!*self_icon && !*mappc_icon && !*veh_icon) || remember_icon) {
+		build_map_icon(ch, to_room, base_icon, crop_icon, tileset, map_icon);
+	}
+	
+	// 2. Determine which icon will be shown (but veh_/map_icon is often used later too)
+	if (*self_icon) {
+		strcpy(show_icon, self_icon);
+	}
+	else if (*mappc_icon) {
+		strcpy(show_icon, mappc_icon);
+	}
+	else if (*veh_icon) {
+		strcpy(show_icon, veh_icon);
 		veh_is_shown = TRUE;
 	}
-
-	/* Hidden buildings */
-	else if (CHECK_CHAMELEON(map_loc, to_room)) {
-		strcat(buf, base_icon->icon);
-		hidden = TRUE;
+	else if (*map_icon) {
+		strcpy(show_icon, map_icon);
 	}
-
-	/* Rooms with custom icons (take precedence over all but hidden rooms */
-	else if (ROOM_CUSTOM_ICON(to_room)) {
-		strcat(buf, ROOM_CUSTOM_ICON(to_room));
-	}
-	else if (ANY_ROAD_TYPE(to_room)) {
-		// check west for the first 2 parts of the tile
-		if (CONNECTS_TO_ROAD(r_west)) {
-			// road west
-			strcat(buf, "&0--");
-		}
-		else if ((CONNECTS_TO_ROAD(r_southwest) && !CONNECTS_TO_ROAD(r_south)) && (CONNECTS_TO_ROAD(r_northwest) && !CONNECTS_TO_ROAD(r_north))) {
-			// both nw and sw
-			strcat(buf, "&0>-");
-		}
-		else if (CONNECTS_TO_ROAD(r_southwest) && !CONNECTS_TO_ROAD(r_south)) {
-			// just sw
-			strcat(buf, "&0,-");
-		}
-		else if (CONNECTS_TO_ROAD(r_northwest) && !CONNECTS_TO_ROAD(r_north)) {
-			// just nw
-			strcat(buf, "&0`-");
-		}
-		else if (CONNECTS_TO_ROAD(r_north) || CONNECTS_TO_ROAD(r_south)) {
-			// road north/south but NOT west
-			sprintf(buf + strlen(buf), "&?%c%c", GET_SECT_ROADSIDE_ICON(base_sect), GET_SECT_ROADSIDE_ICON(base_sect));
-		}
-		else {
-			// N/W/S were not road
-			sprintf(buf + strlen(buf), "&?%c&0-", GET_SECT_ROADSIDE_ICON(base_sect));
-		}
-		
-		// middle part
-		if (CONNECTS_TO_ROAD(r_north) || CONNECTS_TO_ROAD(r_south)) {
-			// N/S are road
-			if (strstr(buf, "-") || CONNECTS_TO_ROAD(r_east) || (CONNECTS_TO_ROAD(r_northeast) && !CONNECTS_TO_ROAD(r_north)) || (CONNECTS_TO_ROAD(r_southeast) && !CONNECTS_TO_ROAD(r_south))) {
-				strcat(buf, "&0+");
-			}
-			else {
-				strcat(buf, "&0|");
-			}
-		}
-		else {
-			strcat(buf, "&0-");
-		}
-		
-		// check east for last part of tile
-		if (CONNECTS_TO_ROAD(r_east)) {
-			strcat(buf, "-");
-		}
-		else if ((CONNECTS_TO_ROAD(r_northeast) && !CONNECTS_TO_ROAD(r_north)) && (CONNECTS_TO_ROAD(r_southeast) && !CONNECTS_TO_ROAD(r_south))) {
-			// ne and se
-			strcat(buf, "<");
-		}
-		else if (CONNECTS_TO_ROAD(r_northeast) && !CONNECTS_TO_ROAD(r_north)) {
-			// just ne
-			strcat(buf, "'");
-		}
-		else if (CONNECTS_TO_ROAD(r_southeast) && !CONNECTS_TO_ROAD(r_south)) {
-			// just se
-			strcat(buf, ",");
-		}
-		else {
-			sprintf(buf + strlen(buf), "&?%c", GET_SECT_ROADSIDE_ICON(base_sect));
-		}
-	}
-	else if (BUILDING_VNUM(to_room) == BUILDING_STEPS) {
-		// check west for the first 2 parts of the tile
-		if (CONNECTS_TO_ROAD(r_west) || (CONNECTS_TO_ROAD(r_southwest) && !CONNECTS_TO_ROAD(r_south)) || (CONNECTS_TO_ROAD(r_northwest) && !CONNECTS_TO_ROAD(r_north))) {
-			// road west
-			strcat(buf, "&0=");
-		}
-		else {
-			sprintf(buf + strlen(buf), "&?%c", GET_SECT_ROADSIDE_ICON(base_sect));
-		}
-		
-		// middle part
-		if (CONNECTS_TO_ROAD(r_north) || CONNECTS_TO_ROAD(r_south)) {
-			// N/S are road
-			
-			if (strstr(buf, "=") || CONNECTS_TO_ROAD(r_east) || (CONNECTS_TO_ROAD(r_northeast) && !CONNECTS_TO_ROAD(r_north)) || (CONNECTS_TO_ROAD(r_southeast) && !CONNECTS_TO_ROAD(r_south))) {
-				strcat(buf, "&0++");
-			}
-			else {
-				strcat(buf, "&0||");
-			}
-		}
-		else {
-			strcat(buf, "&0==");
-		}
-		
-		// check east for last part of tile
-		if (CONNECTS_TO_ROAD(r_east) || (CONNECTS_TO_ROAD(r_northeast) && !CONNECTS_TO_ROAD(r_north)) || (CONNECTS_TO_ROAD(r_southeast) && !CONNECTS_TO_ROAD(r_south))) {
-			strcat(buf, "=");
-		}
-		else {
-			sprintf(buf + strlen(buf), "&?%c", GET_SECT_ROADSIDE_ICON(base_sect));
-		}
-	}
-	else if (ROOM_SECT_FLAGGED(to_room, SECTF_CROP) && cp) {
-		strcat(buf, crop_icon->icon);
-	}
-	else if (IS_CITY_CENTER(to_room)) {
-		emp = ROOM_OWNER(to_room);
-		if ((city = find_city(emp, to_room))) {
-			strcat(buf, city_type[city->type].icon);
-		}
-		else {
-			strcat(buf, "[  ]");
-		}
-	}
-	else if (IS_MAP_BUILDING(to_room) && GET_BUILDING(to_room)) {
-		strcat(buf, GET_BLD_ICON(GET_BUILDING(to_room)));
-	}
-	else {
-		icon = get_icon_from_set(GET_SECT_ICONS(SECT(to_room)), tileset);
-		strcat(buf, icon->icon);
+	else {	// no valid icon??
+		strcpy(show_icon, "????");
 	}
 	
-	// buf is now the completed icon, but has both color codes (&) and variable tile codes (@)
-	if (strchr(buf, '@')) {
-		// NOTE: If you add new @ codes here, you must update "const char *icon_codes" in utils.c
-		
-		// here (@.) roadside icon
-		if (strstr(buf, "@.")) {
-			icon = get_icon_from_set(GET_SECT_ICONS(base_sect), tileset);
-			sprintf(buf1, "%s%c", icon->color, GET_SECT_ROADSIDE_ICON(base_sect));
-			str = str_replace("@.", buf1, buf);
-			strcpy(buf, str);
-			free(str);
-		}
-		// east (@e) tile attachment
-		if (strstr(buf, "@e")) {
-			st = r_east ? BASE_SECT(r_east) : BASE_SECT(to_room);
-			icon = get_icon_from_set(GET_SECT_ICONS(st), tileset);
-			sprintf(buf1, "%s%c", icon->color, GET_SECT_ROADSIDE_ICON(st));
-			str = str_replace("@e", buf1, buf);
-			strcpy(buf, str);
-			free(str);
-		}
-		// west (@w) tile attachment
-		if (strstr(buf, "@w")) {
-			st = r_west ? BASE_SECT(r_west) : BASE_SECT(to_room);
-			icon = get_icon_from_set(GET_SECT_ICONS(st), tileset);
-			sprintf(buf1, "%s%c", icon->color, GET_SECT_ROADSIDE_ICON(st));
-			str = str_replace("@w", buf1, buf);
-			strcpy(buf, str);
-			free(str);
-		}
-		
-		// west (@u) barrier attachment
-		if (strstr(buf, "@u") || strstr(buf, "@U")) {
-			if (!r_west || ((IS_BARRIER(r_west) || ROOM_IS_CLOSED(r_west)) && !ROOM_AFF_FLAGGED(r_west, ROOM_AFF_CHAMELEON))) {
-				enchanted = (r_west && ROOM_AFF_FLAGGED(r_west, ROOM_AFF_NO_FLY)) || ROOM_AFF_FLAGGED(to_room, ROOM_AFF_NO_FLY);
-				// west is a barrier
-				sprintf(buf1, "%sv", enchanted ? "&m" : "&0");
-				str = str_replace("@u", buf1, buf);
-				strcpy(buf, str);
-				free(str);
-				sprintf(buf1, "%sV", enchanted ? "&m" : "&0");
-				str = str_replace("@U", buf1, buf);
-				strcpy(buf, str);
-				free(str);
-			}
-			else {
-				// west is not a barrier
-				sprintf(buf1, "&?%c", GET_SECT_ROADSIDE_ICON(base_sect));
-				str = str_replace("@u", buf1, buf);
-				strcpy(buf, str);
-				free(str);
-				str = str_replace("@U", buf1, buf);
-				strcpy(buf, str);
-				free(str);
-			}
-		}
-		
-		//  east (@v) barrier attachment
-		if (strstr(buf, "@v") || strstr(buf, "@V")) {
-			if (!r_east || ((IS_BARRIER(r_east) || ROOM_IS_CLOSED(r_east)) && !ROOM_AFF_FLAGGED(r_east, ROOM_AFF_CHAMELEON))) {
-				enchanted = (r_east && ROOM_AFF_FLAGGED(r_east, ROOM_AFF_NO_FLY)) || ROOM_AFF_FLAGGED(to_room, ROOM_AFF_NO_FLY);
-				// east is a barrier
-				sprintf(buf1, "%sv", enchanted ? "&m" : "&0");
-				str = str_replace("@v", buf1, buf);
-				strcpy(buf, str);
-				free(str);
-				sprintf(buf1, "%sV", enchanted ? "&m" : "&0");
-				str = str_replace("@V", buf1, buf);
-				strcpy(buf, str);
-				free(str);
-			}
-			else {
-				// east is not a barrier
-				sprintf(buf1, "&?%c", GET_SECT_ROADSIDE_ICON(base_sect));
-				str = str_replace("@v", buf1, buf);
-				strcpy(buf, str);
-				free(str);
-				str = str_replace("@V", buf1, buf);
-				strcpy(buf, str);
-				free(str);
-			}
-		}
-	}
-
-	// buf now contains the tile with preliminary color codes including &?
-
+	// 3. Check for special icon coloring including &?
 	if (IS_BURNING(to_room)) {
-		strcpy(buf1, strip_color(buf));
-		sprintf(buf, "\t0\t[B300]%s", buf1);
+		strcpy(buf1, strip_color(show_icon));
+		sprintf(show_icon, "\t0\t[B300]%s", buf1);
 		need_color_terminator = TRUE;
 	}
 	else if (PRF_FLAGGED(ch, PRF_NOMAPCOL | PRF_POLITICAL | PRF_INFORMATIVE) || show_dark) {
-		strcpy(buf1, strip_color(buf));
+		strcpy(buf1, strip_color(show_icon));
 
 		if (PRF_FLAGGED(ch, PRF_POLITICAL) && !show_dark) {
-			emp = ROOM_OWNER(to_room);
-			
-			if (chemp && (chemp == emp || find_city(chemp, to_room)) && is_in_city_for_empire(to_room, chemp, FALSE, &junk)) {
-				strcpy(buf2, get_banner_complement_color(chemp));
+			if (GET_LOYALTY(ch) && (GET_LOYALTY(ch) == ROOM_OWNER(to_room) || find_city(GET_LOYALTY(ch), to_room)) && is_in_city_for_empire(to_room, GET_LOYALTY(ch), FALSE, &junk)) {
+				strcpy(buf2, get_banner_complement_color(GET_LOYALTY(ch)));
 				need_color_terminator = TRUE;
 			}
 			else {
@@ -1879,29 +1930,29 @@ static void show_map_to_char(char_data *ch, struct mappc_data_container *mappc, 
 			}
 			
 			if (show_veh && !VEH_FLAGGED(show_veh, VEH_NO_CLAIM)) {
-				sprintf(buf, "%s%s%s", (VEH_OWNER(show_veh) && EMPIRE_BANNER(VEH_OWNER(show_veh))) ? EMPIRE_BANNER(VEH_OWNER(show_veh)) : "&0", buf2, buf1);
+				sprintf(show_icon, "%s%s%s", (VEH_OWNER(show_veh) && EMPIRE_BANNER(VEH_OWNER(show_veh))) ? EMPIRE_BANNER(VEH_OWNER(show_veh)) : "&0", buf2, buf1);
 			}
-			else if (emp && (!hidden || emp == GET_LOYALTY(ch))) {
-				sprintf(buf, "%s%s%s", EMPIRE_BANNER(emp) ? EMPIRE_BANNER(emp) : "&0", buf2, buf1);
+			else if (ROOM_OWNER(to_room) && (!CHECK_CHAMELEON(IN_ROOM(ch), to_room) || ROOM_OWNER(to_room) == GET_LOYALTY(ch))) {
+				sprintf(show_icon, "%s%s%s", EMPIRE_BANNER(ROOM_OWNER(to_room)) ? EMPIRE_BANNER(ROOM_OWNER(to_room)) : "&0", buf2, buf1);
 			}
 			else {
-				sprintf(buf, "&0%s%s", buf2, buf1);
+				sprintf(show_icon, "&0%s%s", buf2, buf1);
 			}
 		}
 		else if (PRF_FLAGGED(ch, PRF_INFORMATIVE) && !show_dark) {
 			if (show_veh) {
-				sprintf(buf, "%s%s", get_informative_color_veh(ch, show_veh), buf1);
+				sprintf(show_icon, "%s%s", get_informative_color_veh(ch, show_veh), buf1);
 			}
 			else {
-				sprintf(buf, "%s%s", get_informative_color_room(ch, to_room), buf1);
+				sprintf(show_icon, "%s%s", get_informative_color_room(ch, to_room), buf1);
 			}
 		}
 		else if (!PRF_FLAGGED(ch, PRF_NOMAPCOL | PRF_INFORMATIVE | PRF_POLITICAL) && show_dark) {
-			sprintf(buf, "&b%s", buf1);
+			sprintf(show_icon, "&b%s", buf1);
 		}
 		else {
 			// color was stripped but no color added, so add a "normal" color to prevent color bleed
-			sprintf(buf, "&0%s", buf1);
+			sprintf(show_icon, "&0%s", buf1);
 		}
 	}
 	else if (painted && (!show_veh || veh_is_shown)) {
@@ -1910,70 +1961,70 @@ static void show_map_to_char(char_data *ch, struct mappc_data_container *mappc, 
 			strtoupper(col_buf);
 		}
 		
-		// buf is the icon
-		replace_color_codes(buf, col_buf);
+		// show_icon is the icon
+		replace_color_codes(show_icon, col_buf);
 		
 		// check for ? colors
-		if (strstr(buf, "&?")) {
-			replace_question_color(buf, base_color, lbuf);
-			strcpy(buf, lbuf);
+		if (strstr(show_icon, "&?")) {
+			replace_question_color(show_icon, base_color, lbuf);
+			strcpy(show_icon, lbuf);
 		}
 		// need a leading color base color?
-		if (*buf != '&') {
-			snprintf(lbuf, sizeof(lbuf), "%s%s", base_color, buf);
-			strcpy(buf, lbuf);
+		if (*show_icon != '&') {
+			snprintf(lbuf, sizeof(lbuf), "%s%s", base_color, show_icon);
+			strcpy(show_icon, lbuf);
 		}
 	}
 	else {
 		// need a leading color base color?
-		if (*buf != '&') {
-			snprintf(lbuf, sizeof(lbuf), "%s%s", base_color, buf);
-			strcpy(buf, lbuf);
+		if (*show_icon != '&') {
+			snprintf(lbuf, sizeof(lbuf), "%s%s", base_color, show_icon);
+			strcpy(show_icon, lbuf);
 		}
 		
 		// normal color
-		if (strstr(buf, "&?")) {
-			replace_question_color(buf, base_color, lbuf);
-			strcpy(buf, lbuf);
+		if (strstr(show_icon, "&?")) {
+			replace_question_color(show_icon, base_color, lbuf);
+			strcpy(show_icon, lbuf);
 		}
-		if (strstr(buf, "&#")) {
-			str = str_replace("&#", ROOM_AFF_FLAGGED(to_room, ROOM_AFF_NO_FLY) ? "&m" : "&0", buf);
-			strcpy(buf, str);
+		if (strstr(show_icon, "&#")) {
+			str = str_replace("&#", ROOM_AFF_FLAGGED(to_room, ROOM_AFF_NO_FLY) ? "&m" : "&0", show_icon);
+			strcpy(show_icon, str);
 			free(str);
 		}
 		
 		// stoned coloring
 		if (AFF_FLAGGED(ch, AFF_STONED)) {
 			// check all but the final char
-			for (iter = 0; buf[iter] != 0 && buf[iter+1] != 0; ++iter) {
-				if (buf[iter] == '&' || buf[iter] == '\t') {
-					switch(buf[iter+1]) {
-						case 'r':	buf[iter+1] = 'b';	break;
-						case 'g':	buf[iter+1] = 'c';	break;
-						case 'y':	buf[iter+1] = 'm';	break;
-						case 'b':	buf[iter+1] = 'g';	break;
-						case 'm':	buf[iter+1] = 'r';	break;
-						case 'c':	buf[iter+1] = 'y';	break;
-						case 'p':	buf[iter+1] = 'l';	break;
-						case 'v':	buf[iter+1] = 'o';	break;
-						case 'a':	buf[iter+1] = 't';	break;
-						case 'l':	buf[iter+1] = 'w';	break;
-						case 'j':	buf[iter+1] = 'v';	break;
-						case 'o':	buf[iter+1] = 'p';	break;
-						case 't':	buf[iter+1] = 'j';	break;
-						case 'R':	buf[iter+1] = 'B';	break;
-						case 'G':	buf[iter+1] = 'C';	break;
-						case 'Y':	buf[iter+1] = 'M';	break;
-						case 'B':	buf[iter+1] = 'G';	break;
-						case 'M':	buf[iter+1] = 'R';	break;
-						case 'C':	buf[iter+1] = 'Y';	break;
-						case 'P':	buf[iter+1] = 'L';	break;
-						case 'V':	buf[iter+1] = 'O';	break;
-						case 'A':	buf[iter+1] = 'T';	break;
-						case 'L':	buf[iter+1] = 'W';	break;
-						case 'J':	buf[iter+1] = 'V';	break;
-						case 'O':	buf[iter+1] = 'P';	break;
-						case 'T':	buf[iter+1] = 'J';	break;
+			for (iter = 0; show_icon[iter] != 0 && show_icon[iter+1] != 0; ++iter) {
+				if (show_icon[iter] == '&' || show_icon[iter] == '\t') {
+					switch(show_icon[iter+1]) {
+						case 'r':	show_icon[iter+1] = 'b';	break;
+						case 'g':	show_icon[iter+1] = 'c';	break;
+						case 'y':	show_icon[iter+1] = 'm';	break;
+						case 'b':	show_icon[iter+1] = 'g';	break;
+						case 'm':	show_icon[iter+1] = 'r';	break;
+						case 'c':	show_icon[iter+1] = 'y';	break;
+						case 'p':	show_icon[iter+1] = 'l';	break;
+						case 'v':	show_icon[iter+1] = 'o';	break;
+						case 'a':	show_icon[iter+1] = 't';	break;
+						case 'l':	show_icon[iter+1] = 'w';	break;
+						case 'j':	show_icon[iter+1] = 'v';	break;
+						case 'o':	show_icon[iter+1] = 'p';	break;
+						case 't':	show_icon[iter+1] = 'j';	break;
+						case 'R':	show_icon[iter+1] = 'B';	break;
+						case 'G':	show_icon[iter+1] = 'C';	break;
+						case 'Y':	show_icon[iter+1] = 'M';	break;
+						case 'B':	show_icon[iter+1] = 'G';	break;
+						case 'M':	show_icon[iter+1] = 'R';	break;
+						case 'C':	show_icon[iter+1] = 'Y';	break;
+						case 'P':	show_icon[iter+1] = 'L';	break;
+						case 'V':	show_icon[iter+1] = 'O';	break;
+						case 'A':	show_icon[iter+1] = 'T';	break;
+						case 'L':	show_icon[iter+1] = 'W';	break;
+						case 'J':	show_icon[iter+1] = 'V';	break;
+						case 'O':	show_icon[iter+1] = 'P';	break;
+						case 'T':	show_icon[iter+1] = 'J';	break;
 					}
 				}
 			}
@@ -1981,17 +2032,27 @@ static void show_map_to_char(char_data *ch, struct mappc_data_container *mappc, 
 	}
 	
 	if (need_color_terminator) {
-		strcat(buf, "&0");
+		strcat(show_icon, "&0");
 	}
 	
 	// record uncolored version as memory
 	if (has_player_tech(ch, PTECH_MAP_MEMORY)) {
-		add_player_map_memory(ch, GET_ROOM_VNUM(to_room), buf, NULL, 0);
+		if (show_veh && VEH_FLAGGED(show_veh, VEH_BUILDING) && !VEH_FLAGGED(show_veh, VEH_CHAMELEON)) {
+			// memorize building-vehicle icon
+			add_player_map_memory(ch, GET_ROOM_VNUM(to_room), veh_icon, NULL, 0);
+		}
+		else {
+			// memorize map icon (may be a map building)
+			// TODO: should this ignore chameleon buildings and show the terrain instead? if so, split buildings from other icons
+			add_player_map_memory(ch, GET_ROOM_VNUM(to_room), map_icon, NULL, 0);
+		}
+		
 		// this will add the name, too
+		// TODO: should this override chameleon and always remember the base tile?
 		get_screenreader_room_name(ch, IN_ROOM(ch), to_room, FALSE);
 	}
 	
-	send_to_char(buf, ch);
+	send_to_char(show_icon, ch);
 }
 
 
