@@ -1891,6 +1891,19 @@ void b5_119_repair_heights(void) {
 }
 
 
+// b5.120: re-save whole world to fix junk ocean files
+void b5_120_resave_world(void) {
+	bool write_map_and_room_to_file(room_vnum vnum, bool force_obj_pack);
+	
+	int iter;
+	
+	// this actually ensures there are no stray files by calling writes on ones that shouldn't exist
+	for (iter = 0; iter <= top_of_world_index; ++iter) {
+		write_map_and_room_to_file(iter, FALSE);
+	}
+}
+
+
  //////////////////////////////////////////////////////////////////////////////
 //// UPDATE DATA /////////////////////////////////////////////////////////////
 
@@ -1945,6 +1958,7 @@ const struct {
 	{ "b5.112", b5_112_update, NULL, "Fix bad dedicate data" },
 	{ "b5.117", NULL, b5_117_update_players, "Clear last Christmas gift data" },
 	{ "b5.119", b5_119_repair_heights, NULL, "Repairing tiles that shouldn't have heights" },
+	{ "b5.120", b5_120_resave_world, NULL, "Resaving whole world to clear junk files" },
 	
 	{ "\n", NULL, NULL, "\n" }	// must be last
 };

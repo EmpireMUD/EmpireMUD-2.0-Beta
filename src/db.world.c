@@ -4186,19 +4186,19 @@ void update_world_index(room_vnum vnum, char value) {
 * individually, within 1 second of being changed, by request_world_save().
 */
 void write_all_wld_files(void) {
-	//room_data *room, *next_room;
-	int iter;
-	/*
+	room_data *room, *next_room;
+	int x, y;
+	
 	HASH_ITER(hh, world_table, room, next_room) {
 		write_map_and_room_to_file(GET_ROOM_VNUM(room), TRUE);
 	}
 	
-	*/
-	// this actually ensures there are no stray files by calling writes on ones that shouldn't exist
-	for (iter = 0; iter <= top_of_world_index; ++iter) {
-		//if (world_index_data[iter] == 0) {
-			write_map_and_room_to_file(iter, TRUE);
-	//	}
+	for (x = 0; x < MAP_WIDTH; ++x) {
+		for (y = 0; y < MAP_HEIGHT; ++y) {
+			if (!world_map[x][y].room && HAS_SHARED_DATA_TO_SAVE(&world_map[x][y])) {
+				write_map_and_room_to_file((y * MAP_WIDTH + x), TRUE);
+			}
+		}
 	}
 	
 	// no need to save any more room updates
