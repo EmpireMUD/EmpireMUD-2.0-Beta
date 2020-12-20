@@ -26,12 +26,6 @@
 #define BUILDING_TUNNEL  5008  // building.c
 #define BUILDING_CITY_CENTER  5009
 
-#define BUILDING_FENCE  5112	// TODO: remove fence, gate, gatehouse, and wall vnums in favor of a new flag
-#define BUILDING_GATE  5113
-
-#define BUILDING_GATEHOUSE  5173	// custom icons, rituals
-#define BUILDING_WALL  5174
-
 // Room building vnums
 #define RTYPE_SHIP_HOLDING_PEN  5509	// for the shipping system's storage room
 #define RTYPE_EXTRACTION_PIT  5523	// a place to keep chars when they are pending extraction

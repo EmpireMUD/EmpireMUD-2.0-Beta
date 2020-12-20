@@ -56,7 +56,7 @@ void show_screenreader_room(char_data *ch, room_data *room, bitvector_t options)
 #define WIDE_ROAD_TYPE(tile)  ROOM_BLD_FLAGGED(tile, BLD_ROAD_ICON_WIDE)
 #define ANY_ROAD_TYPE(tile)  (IS_ROAD(tile) || ROOM_BLD_FLAGGED(tile, BLD_ROAD_ICON | BLD_ROAD_ICON_WIDE))
 #define CONNECTS_TO_ROAD(tile)  (tile && (ANY_ROAD_TYPE(tile) || ROOM_BLD_FLAGGED(tile, BLD_ATTACH_ROAD)))
-#define IS_BARRIER(tile)  (BUILDING_VNUM(tile) == BUILDING_WALL || BUILDING_VNUM(tile) == BUILDING_FENCE || BUILDING_VNUM(tile) == BUILDING_GATE || BUILDING_VNUM(tile) == BUILDING_GATEHOUSE)
+#define ATTACHES_TO_BARRIER(tile)  ((ROOM_BLD_FLAGGED((tile), BLD_BARRIER | BLD_ATTACH_BARRIER) || ROOM_IS_CLOSED(tile)) && !ROOM_AFF_FLAGGED((tile), ROOM_AFF_CHAMELEON))
 
 
 // for showing map pcs
@@ -996,7 +996,7 @@ void build_map_icon(char_data *ch, room_data *to_room, struct icon_data *base_ic
 		
 		// west (@u) barrier attachment
 		if (strstr(icon_buf, "@u") || strstr(icon_buf, "@U")) {
-			if (!r_west || ((IS_BARRIER(r_west) || ROOM_IS_CLOSED(r_west)) && !ROOM_AFF_FLAGGED(r_west, ROOM_AFF_CHAMELEON))) {
+			if (!r_west || ATTACHES_TO_BARRIER(r_west)) {
 				enchanted = (r_west && ROOM_AFF_FLAGGED(r_west, ROOM_AFF_NO_FLY)) || ROOM_AFF_FLAGGED(to_room, ROOM_AFF_NO_FLY);
 				// west is a barrier
 				sprintf(buf1, "%sv", enchanted ? "&m" : "&0");
@@ -1022,7 +1022,7 @@ void build_map_icon(char_data *ch, room_data *to_room, struct icon_data *base_ic
 		
 		//  east (@v) barrier attachment
 		if (strstr(icon_buf, "@v") || strstr(icon_buf, "@V")) {
-			if (!r_east || ((IS_BARRIER(r_east) || ROOM_IS_CLOSED(r_east)) && !ROOM_AFF_FLAGGED(r_east, ROOM_AFF_CHAMELEON))) {
+			if (!r_east || ATTACHES_TO_BARRIER(r_east)) {
 				enchanted = (r_east && ROOM_AFF_FLAGGED(r_east, ROOM_AFF_NO_FLY)) || ROOM_AFF_FLAGGED(to_room, ROOM_AFF_NO_FLY);
 				// east is a barrier
 				sprintf(buf1, "%sv", enchanted ? "&m" : "&0");

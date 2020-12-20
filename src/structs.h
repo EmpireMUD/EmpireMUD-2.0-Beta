@@ -773,7 +773,7 @@ typedef struct vehicle_data vehicle_data;
 #define BLD_OBSCURE_VISION  BIT(17)	// blocks tiles behind it
 #define BLD_ROAD_ICON  BIT(18)	// replaces its icon with the generated road icons (dashes)
 #define BLD_ROAD_ICON_WIDE  BIT(19)	// replaces its icon with wide road icons (equals signs)
-// #define BLD_UNUSED8  BIT(20)
+#define BLD_ATTACH_BARRIER  BIT(20)	// icons with @u/@v will attach to this
 // #define BLD_UNUSED9  BIT(21)
 // #define BLD_UNUSED10  BIT(22)
 // #define BLD_UNUSED11  BIT(23)
