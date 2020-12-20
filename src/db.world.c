@@ -4187,9 +4187,17 @@ void update_world_index(room_vnum vnum, char value) {
 */
 void write_all_wld_files(void) {
 	room_data *room, *next_room;
+	int iter;
 	
 	HASH_ITER(hh, world_table, room, next_room) {
 		write_map_and_room_to_file(GET_ROOM_VNUM(room), TRUE);
+	}
+	
+	// this actually ensures there are no stray files by calling writes on ones that shouldn't exist
+	for (iter = 0; iter <= top_of_world_index; ++iter) {
+		if (world_index_data[iter] == 0) {
+			write_map_and_room_to_file(iter, TRUE);
+		}
 	}
 	
 	// no need to save any more room updates
