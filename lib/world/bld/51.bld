@@ -254,7 +254,7 @@ S
 Fence~
 A Wooden Fence~
 @u&0vv@v~
-4 0 djmp 0
+4 0 djmpu 0
 0 0 0 -1
 R
 1003 1 5 0
@@ -265,7 +265,7 @@ S
 Gate~
 A Wooden Gate~
 @u&0xx@v~
-4 0 djp 0
+4 0 djpu 0
 0 0 0 -1
 R
 1003 1 5 0
@@ -664,7 +664,7 @@ S
 Bridge~
 A Bridge Over the River~
 &c~&0--&c~~
-16 0 dmD 0
+16 0 dmsD 0
 0 0 0 -1
 I 29 5010 100.00 1 r  # RUINS-TO-BLD: Flooded Ruins
 R
@@ -843,7 +843,7 @@ S
 Steps~
 On The Steps~
 .&0==&?.~
-4 0 dno 0
+4 0 dnot 0
 0 0 0 -1
 R
 1002 1 5 0
@@ -1154,7 +1154,7 @@ S
 Swamp Walk~
 A Rickety Swamp Walk~
 &c~&0--&c~~
-10 0 dmnp 0
+10 0 dmnps 0
 0 0 0 -1
 I 29 5010 100.00 1 r  # RUINS-TO-BLD: Flooded Ruins
 R
@@ -1375,7 +1375,7 @@ S
 Guard Tower~
 A Guard Tower~
 @U&0TT@V~
-16 0 blpR 0
+16 0 blp 0
 0 0 0 -1
 C
 upgrade~
@@ -1403,10 +1403,10 @@ S
 Advanced Guard Tower~
 An Advanced Guard Tower~
 &0'TT'~
-24 0 blpR 0
+24 0 blprR 0
 0 0 0 -1
 C
-upgrade~
+look out, upgrade~
 D
    This is a well-constructed guard tower. It is tall, allowing it to see
 over most buildings and structures. The tower shoots at any unescorted
@@ -1433,11 +1433,13 @@ A Superior Guard Tower~
 &0"TT"~
 64 0 blrR 0
 0 0 0 -1
+C
+look out~
 D
-   This is a well-constructed guard tower. It is tall, allowing it to see
-over most buildings and structures. The tower shoots at any unescorted
-trespassers it sees. The tower is made from wood, so it is not well protected
-against invasion. Hopefully, it will be enough defense.
+   This brick tower is tall, allowing it to see over most buildings and
+structures. It shoots any unescorted trespassers it sees. It looks like the
+brick portions of the tower have been built around the frame of an older wooden
+tower.
 ~
 F
 bj
@@ -1451,6 +1453,8 @@ R
 6790 1 1 0
 R
 6720 1 1 0
+R
+6075 1 1 0
 S
 #5170
 Outpost~
@@ -1506,7 +1510,7 @@ S
 Gatehouse~
 The Gatehouse~
 @U&0||@V~
-32 0 bcgorR 0
+32 0 bcgoruR 0
 0 0 0 -1
 D
    The gatehouse is a welcoming sight for weary travellers. It signifies the
