@@ -95,7 +95,7 @@ void add_tracks(char_data *ch, room_data *room, byte dir, room_data *to_room) {
 	struct track_data *track;
 	int id;
 	
-	if (!IS_IMMORTAL(ch) && !ROOM_SECT_FLAGGED(room, SECTF_FRESH_WATER | SECTF_FRESH_WATER)) {
+	if (!IS_IMMORTAL(ch) && !ROOM_SECT_FLAGGED(room, SECTF_OCEAN | SECTF_FRESH_WATER) && SHARED_DATA(room) != &ocean_shared_data) {
 		if (!IS_NPC(ch) && has_player_tech(ch, PTECH_NO_TRACK_WILD) && valid_no_trace(room)) {
 			gain_player_tech_exp(ch, PTECH_NO_TRACK_WILD, 5);
 		}
