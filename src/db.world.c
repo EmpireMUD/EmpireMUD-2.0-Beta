@@ -61,8 +61,10 @@ void save_instances();
 void cancel_all_world_save_requests(int only_save_type);
 void grow_crop(struct map_data *map);
 void init_room(room_data *room, room_vnum vnum);
+void perform_requested_world_saves();
 int naturalize_newbie_island(struct map_data *tile, bool do_unclaim);
 int sort_empire_islands(struct empire_island *a, struct empire_island *b);
+void write_binary_world_index_updates();
 bool write_map_and_room_to_file(room_vnum vnum, bool force_obj_pack);
 
 
@@ -1961,7 +1963,13 @@ void reset_one_room(room_data *room) {
 */
 void startup_room_reset(void) {
 	room_data *room, *next_room;
-
+	
+	// run any pending saves before doing the resets
+	if (!save_world_after_startup) {
+		perform_requested_world_saves();
+		write_binary_world_index_updates();
+	}
+	
 	HASH_ITER(hh, world_table, room, next_room) {
 		affect_total_room(room);
 		if (room->reset_commands) {
@@ -1969,7 +1977,7 @@ void startup_room_reset(void) {
 		}
 	}
 	
-	// cancel any world saves triggered by resets
+	// cancel any new world saves triggered by resets
 	cancel_all_world_save_requests(WSAVE_ROOM | WSAVE_OBJS_AND_VEHS);
 }
 
@@ -4805,7 +4813,6 @@ void load_one_room_from_wld_file(room_vnum vnum, char index_data) {
 		if (errno == ENOENT) {
 			log("Warning: Unable to find wld file %s: removing from world index", fname);
 			update_world_index(vnum, 0);
-			save_world_after_startup = TRUE;
 		}
 		else {
 			log("SYSERR: Unable to open wld file %s", fname);
