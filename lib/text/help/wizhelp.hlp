@@ -335,8 +335,12 @@ FULLSAVE
 
 Usage:  fullsave
 
-This allows you to force all of the zones in the world to save. They will
-only do so if they've been flagged for saves (thus minimizing lag).
+This command forces a full save of the entire world. Because EmpireMUD writes
+world changes as they occur (or, within 1 second), it should never be necessary
+to perform a full save.
+
+The game automatically performs a full save when shutting down or rebooting.
+It will also do this during startup if any auto-updaters were run.
 #d
 GHISTORY "GODHISTORY" "WIZNET HISTORY" WIZHISTORY
 
