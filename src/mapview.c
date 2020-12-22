@@ -811,6 +811,7 @@ void build_map_icon(char_data *ch, room_data *to_room, struct icon_data *base_ic
 	struct icon_data *icon;
 	sector_data *sect;
 	bool enchanted;
+	char temp[256];
 	char *str;
 	
 	// initialize this
@@ -970,8 +971,8 @@ void build_map_icon(char_data *ch, room_data *to_room, struct icon_data *base_ic
 		// here (@.) roadside icon
 		if (strstr(icon_buf, "@.")) {
 			icon = get_icon_from_set(GET_SECT_ICONS(BASE_SECT(to_room)), tileset);
-			sprintf(buf1, "%s%c", icon ? icon->color : "&0", GET_SECT_ROADSIDE_ICON(BASE_SECT(to_room)));
-			str = str_replace("@.", buf1, icon_buf);
+			sprintf(temp, "%s%c", icon ? icon->color : "&0", GET_SECT_ROADSIDE_ICON(BASE_SECT(to_room)));
+			str = str_replace("@.", temp, icon_buf);
 			strcpy(icon_buf, str);
 			free(str);
 		}
@@ -979,8 +980,8 @@ void build_map_icon(char_data *ch, room_data *to_room, struct icon_data *base_ic
 		if (strstr(icon_buf, "@e")) {
 			sect = r_east ? BASE_SECT(r_east) : BASE_SECT(to_room);
 			icon = get_icon_from_set(GET_SECT_ICONS(sect), tileset);
-			sprintf(buf1, "%s%c", icon ? icon->color : "&0", GET_SECT_ROADSIDE_ICON(sect));
-			str = str_replace("@e", buf1, icon_buf);
+			sprintf(temp, "%s%c", icon ? icon->color : "&0", GET_SECT_ROADSIDE_ICON(sect));
+			str = str_replace("@e", temp, icon_buf);
 			strcpy(icon_buf, str);
 			free(str);
 		}
@@ -988,8 +989,8 @@ void build_map_icon(char_data *ch, room_data *to_room, struct icon_data *base_ic
 		if (strstr(icon_buf, "@w")) {
 			sect = r_west ? BASE_SECT(r_west) : BASE_SECT(to_room);
 			icon = get_icon_from_set(GET_SECT_ICONS(sect), tileset);
-			sprintf(buf1, "%s%c", icon ? icon->color : "&0", GET_SECT_ROADSIDE_ICON(sect));
-			str = str_replace("@w", buf1, icon_buf);
+			sprintf(temp, "%s%c", icon ? icon->color : "&0", GET_SECT_ROADSIDE_ICON(sect));
+			str = str_replace("@w", temp, icon_buf);
 			strcpy(icon_buf, str);
 			free(str);
 		}
@@ -999,22 +1000,22 @@ void build_map_icon(char_data *ch, room_data *to_room, struct icon_data *base_ic
 			if (!r_west || ATTACHES_TO_BARRIER(r_west)) {
 				enchanted = (r_west && ROOM_AFF_FLAGGED(r_west, ROOM_AFF_NO_FLY)) || ROOM_AFF_FLAGGED(to_room, ROOM_AFF_NO_FLY);
 				// west is a barrier
-				sprintf(buf1, "%sv", enchanted ? "&m" : "&0");
-				str = str_replace("@u", buf1, icon_buf);
+				sprintf(temp, "%sv", enchanted ? "&m" : "&0");
+				str = str_replace("@u", temp, icon_buf);
 				strcpy(icon_buf, str);
 				free(str);
-				sprintf(buf1, "%sV", enchanted ? "&m" : "&0");
-				str = str_replace("@U", buf1, icon_buf);
+				sprintf(temp, "%sV", enchanted ? "&m" : "&0");
+				str = str_replace("@U", temp, icon_buf);
 				strcpy(icon_buf, str);
 				free(str);
 			}
 			else {
 				// west is not a barrier
-				sprintf(buf1, "&?%c", GET_SECT_ROADSIDE_ICON(BASE_SECT(to_room)));
-				str = str_replace("@u", buf1, icon_buf);
+				sprintf(temp, "&?%c", GET_SECT_ROADSIDE_ICON(BASE_SECT(to_room)));
+				str = str_replace("@u", temp, icon_buf);
 				strcpy(icon_buf, str);
 				free(str);
-				str = str_replace("@U", buf1, icon_buf);
+				str = str_replace("@U", temp, icon_buf);
 				strcpy(icon_buf, str);
 				free(str);
 			}
@@ -1025,22 +1026,22 @@ void build_map_icon(char_data *ch, room_data *to_room, struct icon_data *base_ic
 			if (!r_east || ATTACHES_TO_BARRIER(r_east)) {
 				enchanted = (r_east && ROOM_AFF_FLAGGED(r_east, ROOM_AFF_NO_FLY)) || ROOM_AFF_FLAGGED(to_room, ROOM_AFF_NO_FLY);
 				// east is a barrier
-				sprintf(buf1, "%sv", enchanted ? "&m" : "&0");
-				str = str_replace("@v", buf1, icon_buf);
+				sprintf(temp, "%sv", enchanted ? "&m" : "&0");
+				str = str_replace("@v", temp, icon_buf);
 				strcpy(icon_buf, str);
 				free(str);
-				sprintf(buf1, "%sV", enchanted ? "&m" : "&0");
-				str = str_replace("@V", buf1, icon_buf);
+				sprintf(temp, "%sV", enchanted ? "&m" : "&0");
+				str = str_replace("@V", temp, icon_buf);
 				strcpy(icon_buf, str);
 				free(str);
 			}
 			else {
 				// east is not a barrier
-				sprintf(buf1, "&?%c", GET_SECT_ROADSIDE_ICON(BASE_SECT(to_room)));
-				str = str_replace("@v", buf1, icon_buf);
+				sprintf(temp, "&?%c", GET_SECT_ROADSIDE_ICON(BASE_SECT(to_room)));
+				str = str_replace("@v", temp, icon_buf);
 				strcpy(icon_buf, str);
 				free(str);
-				str = str_replace("@V", buf1, icon_buf);
+				str = str_replace("@V", temp, icon_buf);
 				strcpy(icon_buf, str);
 				free(str);
 			}
