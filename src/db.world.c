@@ -4198,6 +4198,10 @@ void write_all_wld_files(void) {
 			if (!world_map[x][y].room && HAS_SHARED_DATA_TO_SAVE(&world_map[x][y])) {
 				write_map_and_room_to_file((y * MAP_WIDTH + x), TRUE);
 			}
+			else if (!world_map[x][y].room) {
+				// if there's no room and no shared data, ensure it has a zero here
+				update_world_index((y * MAP_WIDTH + x), 0);
+			}
 		}
 	}
 	
