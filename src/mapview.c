@@ -1849,7 +1849,7 @@ void look_in_direction(char_data *ch, int dir) {
 */
 static void show_map_to_char(char_data *ch, struct mappc_data_container *mappc, room_data *to_room, bitvector_t options) {
 	bool need_color_terminator = FALSE;
-	char no_color[256], col_buf[256], lbuf[MAX_STRING_LENGTH], self_icon[256], mappc_icon[256], map_icon[256], veh_icon[256], show_icon[256];
+	char no_color[256], col_buf[256], lbuf[MAX_STRING_LENGTH], self_icon[256], mappc_icon[256], map_icon[256], veh_icon[256], show_icon[256], temp[256];
 	int iter;
 	int tileset = GET_SEASON(to_room);
 	struct icon_data *base_icon, *crop_icon = NULL;
@@ -1924,21 +1924,21 @@ static void show_map_to_char(char_data *ch, struct mappc_data_container *mappc, 
 
 		if (PRF_FLAGGED(ch, PRF_POLITICAL) && !show_dark) {
 			if (GET_LOYALTY(ch) && (GET_LOYALTY(ch) == ROOM_OWNER(to_room) || find_city(GET_LOYALTY(ch), to_room)) && is_in_city_for_empire(to_room, GET_LOYALTY(ch), FALSE, &junk)) {
-				strcpy(buf2, get_banner_complement_color(GET_LOYALTY(ch)));
+				strcpy(temp, get_banner_complement_color(GET_LOYALTY(ch)));
 				need_color_terminator = TRUE;
 			}
 			else {
-				*buf2 = '\0';
+				*temp = '\0';
 			}
 			
 			if (show_veh && !VEH_FLAGGED(show_veh, VEH_NO_CLAIM)) {
-				sprintf(show_icon, "%s%s%s", (VEH_OWNER(show_veh) && EMPIRE_BANNER(VEH_OWNER(show_veh))) ? EMPIRE_BANNER(VEH_OWNER(show_veh)) : "&0", buf2, no_color);
+				sprintf(show_icon, "%s%s%s", (VEH_OWNER(show_veh) && EMPIRE_BANNER(VEH_OWNER(show_veh))) ? EMPIRE_BANNER(VEH_OWNER(show_veh)) : "&0", temp, no_color);
 			}
 			else if (ROOM_OWNER(to_room) && (!CHECK_CHAMELEON(IN_ROOM(ch), to_room) || ROOM_OWNER(to_room) == GET_LOYALTY(ch))) {
-				sprintf(show_icon, "%s%s%s", EMPIRE_BANNER(ROOM_OWNER(to_room)) ? EMPIRE_BANNER(ROOM_OWNER(to_room)) : "&0", buf2, no_color);
+				sprintf(show_icon, "%s%s%s", EMPIRE_BANNER(ROOM_OWNER(to_room)) ? EMPIRE_BANNER(ROOM_OWNER(to_room)) : "&0", temp, no_color);
 			}
 			else {
-				sprintf(show_icon, "&0%s%s", buf2, no_color);
+				sprintf(show_icon, "&0%s%s", temp, no_color);
 			}
 		}
 		else if (PRF_FLAGGED(ch, PRF_INFORMATIVE) && !show_dark) {
