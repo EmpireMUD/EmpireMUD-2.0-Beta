@@ -5184,6 +5184,10 @@ char *strip_color(char *input) {
 				lbuf[pos++] = input[iter];
 				lbuf[pos++] = input[++iter];
 			}
+			else if (input[iter+1] == '[') {
+				// skip to the end of the color code
+				for (++iter; input[iter] && input[iter] != ']'; ++iter);
+			}
 			else {
 				// single \t: skip next char (color code)
 				++iter;
