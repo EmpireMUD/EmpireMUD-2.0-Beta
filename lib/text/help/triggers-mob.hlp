@@ -344,7 +344,7 @@ For each type, there is a help file named &yMTRIG <type>&0.
 All mob scripts provide the &c%self%&0 variable.
 
 Names and pronouns:
-&c~%person%&0 - name, someone, your
+&c~%person%&0 - name, someone, you
 &c|%person%&0 - name's, someone's, your
 &c&&%person%&0 - he/she/it, you
 &c*%person%&0 - him/her/it, you
