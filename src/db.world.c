@@ -64,7 +64,6 @@ void init_room(room_data *room, room_vnum vnum);
 void perform_requested_world_saves();
 int naturalize_newbie_island(struct map_data *tile, bool do_unclaim);
 int sort_empire_islands(struct empire_island *a, struct empire_island *b);
-void write_binary_world_index_updates();
 bool write_map_and_room_to_file(room_vnum vnum, bool force_obj_pack);
 
 
@@ -1964,11 +1963,8 @@ void reset_one_room(room_data *room) {
 void startup_room_reset(void) {
 	room_data *room, *next_room;
 	
-	// run any pending saves before doing the resets
-	if (!save_world_after_startup) {
-		perform_requested_world_saves();
-		write_binary_world_index_updates();
-	}
+	// prevent putting things in rooms from triggering a save
+	block_world_save_requests = TRUE;
 	
 	HASH_ITER(hh, world_table, room, next_room) {
 		affect_total_room(room);
@@ -1977,8 +1973,7 @@ void startup_room_reset(void) {
 		}
 	}
 	
-	// cancel any new world saves triggered by resets
-	cancel_all_world_save_requests(WSAVE_ROOM | WSAVE_OBJS_AND_VEHS);
+	block_world_save_requests = FALSE;
 }
 
 
@@ -4105,6 +4100,11 @@ void perform_requested_world_saves(void) {
 void request_world_save(room_vnum vnum, int save_type) {
 	struct world_save_request_data *item;
 	
+	// disallow save requests during parts of startup
+	if (block_world_save_requests) {
+		return;
+	}
+	
 	// check for existing entry
 	HASH_FIND_INT(world_save_requests, &vnum, item);
 	
@@ -4686,6 +4686,9 @@ void load_binary_map_file(void) {
 		binary_map_fl = NULL;
 	}
 	
+	// don't allow loading to trigger saves
+	block_world_save_requests = TRUE;
+	
 	// run this ONLY if this is the first step in booting the map
 	init_map();
 	
@@ -4712,6 +4715,7 @@ void load_binary_map_file(void) {
 	fread(&header, sizeof(struct map_file_header), 1, binary_map_fl);
 	if (feof(binary_map_fl)) {
 		// nothing to load?
+		block_world_save_requests = FALSE;
 		return;
 	}
 	
@@ -4769,8 +4773,7 @@ void load_binary_map_file(void) {
 		}
 	}
 	
-	// cancel any save requests triggered by loading
-	cancel_all_world_save_requests(WSAVE_MAP);
+	block_world_save_requests = FALSE;
 	
 	// but ensure a full save if the version has changed
 	if (header.version != CURRENT_BINARY_MAP_VERSION) {
@@ -5164,9 +5167,6 @@ void load_one_room_from_wld_file(room_vnum vnum, char index_data) {
 	}	// loop
 	
 	fclose(fl);
-	
-	// cancel any save requests that were caused by loading
-	cancel_world_save_request(vnum, NOBITS);
 }
 
 
@@ -5189,6 +5189,9 @@ void load_world_from_binary_index(void) {
 		converted_to_b5_116 = TRUE;
 		return;
 	}
+	
+	// don't allow loading to trigger saves
+	block_world_save_requests = TRUE;
 	
 	// read size
 	fread(&top_vnum, sizeof(int), 1, index_fl);
@@ -5222,9 +5225,7 @@ void load_world_from_binary_index(void) {
 	}
 	
 	log("Loaded %d room%s from wld files", count, PLURAL(count));
-	
-	// cancel any saves triggered by this
-	cancel_all_world_save_requests(WSAVE_ROOM);
+	block_world_save_requests = FALSE;
 }
 
 

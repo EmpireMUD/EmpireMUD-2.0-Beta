@@ -309,6 +309,7 @@ char *world_index_data = NULL;	// for managing the binary world file
 int top_of_world_index = -1;	// current max entry index
 bool save_world_after_startup = FALSE;	// if TRUE, will trigger a world save at the end of startup
 bool converted_to_b5_116 = FALSE;	// triggers old world file deletes, only if it converted at startup
+bool block_world_save_requests = FALSE;	// used during startup to prevent unnecessary writes
 
 
 // DB_BOOT_x
@@ -489,6 +490,7 @@ void boot_db(void) {
 	// put things here
 	
 	// END
+	block_world_save_requests = FALSE;	// in case
 	log("Boot db -- DONE.");
 	boot_time = time(0);
 }
