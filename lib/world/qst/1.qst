@@ -1,7 +1,8 @@
 #100
 Flint Tutorial~
    You found a flint stone! You can dig up rocks and flints all over. Both
-types can be used to lay roads, but you can also make tools from flints.
+types can be used to lay roads, but you can also make tools from flints. Flint
+is generally found 9% of the time when digging.
 Instructions:
  1. You need a rock and a flint stone.
  2. 'Use' the rock.
@@ -9,9 +10,9 @@ Instructions:
 (You can type 'toggle tutorials' to stop seeing new tutorial quests.)
 ~
    Chipped flints aren't very useful on their own, but you can make them into
-other tools.
+other tools. Chip it again to make one.
 ~
-6 h 0 15 -1
+8 h 0 15 -1
 A
 2 102
 R
@@ -25,9 +26,9 @@ Z
 S
 #102
 Fire Sticks Tutorial~
-   You have found some sticks. You can select the best ones to make a
+   After gathering some sticks, you can select the best ones to make a
 fire-starting tool. Here are the steps:
- 1. Gather a couple sticks (gather).
+ 1. Gather a couple sticks in the forest (gather).
  2. Check what you need to make the fire sticks (craft info fire sticks).
  3. Make the fire sticks (craft fire sticks).
 (You can type 'toggle tutorials' to stop seeing new tutorial quests.)
@@ -35,7 +36,7 @@ fire-starting tool. Here are the steps:
    Congratulations! You can now light sticks, trees, and other items. Now get
 out there and set the world on fire!
 ~
-6 h 0 15 -1
+7 h 0 15 -1
 A
 2 121
 R
@@ -49,22 +50,24 @@ Z
 S
 #121
 Handle Tutorial~
-   You can turn this sapling into a handle that could be made into a tool or
+   You can turn a sapling into a handle that could then be made into a tool or
 weapon. Here are the instructions:
- 1. 'Use' some kind of knife, such as a spear head.
- 2. Type 'craft handle'.
+ 1. 'Gather' a sapling in a forest (12% chance) or 'chop' one down in a copse.
+ 2. 'Use' some kind of knife, such as a spear head (chip flints to make one).
+ 3. Type 'craft handle'.
  Tip: You can type 'craft info handle' to see more info about the craft.
 (You can type 'toggle tutorials' to stop seeing new tutorial quests.)
 ~
 This handle can be used for lots of other crafts.
 ~
-4 h 0 15 -1
+6 h 0 15 -1
 A
 2 131
 R
 0 0 1
 R
 6 919 1
+T 121
 W
 2 919 0 1
 Z
@@ -245,11 +248,13 @@ into a better tool. Don't forget to 'use' a rock to chip it with.
 ~
 Chipping flints is a good way to make primitive tools.
 ~
-5 h 0 15 -1
+6 h 0 15 -1
 A
 2 180
 R
 0 0 1
+R
+6 919 919
 W
 2 181 0 1
 Z
