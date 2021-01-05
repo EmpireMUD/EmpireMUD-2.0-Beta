@@ -3167,7 +3167,7 @@ void update_MSDP_attributes(char_data *ch, int send_update) {
 * @param int send_update NO_UPDATE, UPDATE_NOW (immediately send MSDP update), or UPDATE_SOON (send MSDP update within 1 second).
 */
 void update_MSDP_bonus_exp(char_data *ch, int send_update) {
-	if (ch->desc) {
+	if (ch->desc && !IS_NPC(ch)) {
 		MSDPSetNumber(ch->desc, eMSDP_BONUS_EXP, GET_DAILY_BONUS_EXPERIENCE(ch));
 		check_send_msdp_update(ch, send_update);
 	}
@@ -3405,7 +3405,7 @@ void update_MSDP_skills(char_data *ch, int send_update) {
 	char buf[MAX_STRING_LENGTH];
 	size_t buf_size;
 	
-	if (ch->desc) {
+	if (ch->desc && !IS_NPC(ch)) {
 		get_player_skill_string(ch, buf, FALSE);
 		MSDPSetString(ch->desc, eMSDP_CLASS, buf);
 	

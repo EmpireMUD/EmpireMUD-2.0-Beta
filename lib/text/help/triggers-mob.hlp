@@ -344,7 +344,7 @@ For each type, there is a help file named &yMTRIG <type>&0.
 All mob scripts provide the &c%self%&0 variable.
 
 Names and pronouns:
-&c~%person%&0 - name, someone, your
+&c~%person%&0 - name, someone, you
 &c|%person%&0 - name's, someone's, your
 &c&&%person%&0 - he/she/it, you
 &c*%person%&0 - him/her/it, you
@@ -554,6 +554,8 @@ When using field  - The variable returns:
 &cvampire(on/off)&0 - Can change whether a player/mob is a vampire if on/off
    provided; without those, just returns whether they are one or not.
 &cveh_target(name)&0 - Finds a targeted object in the room with the person.
+&cview_height&0 - The character's effective height when looking at the map,
+   including the terrain they're on and if they're flying.
 &cvnum&0 - The actor's virtual number.  
 &cwits&0 - The actor's Wits.
 &c<global>&0 - If the specified field is not a recognized one, the 

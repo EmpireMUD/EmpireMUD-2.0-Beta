@@ -4271,6 +4271,9 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 							}
 						}
 					}
+					else if (!str_cmp(field, "view_height")) {
+						snprintf(str, slen, "%d", get_view_height(c, IN_ROOM(c)));
+					}
 					else if (!str_cmp(field, "vnum")) {
 						if (IS_NPC(c))
 							snprintf(str, slen, "%d", GET_MOB_VNUM(c));
@@ -5282,6 +5285,9 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						else {
 							*str = '\0';
 						}
+					}
+					else if (!str_cmp(field, "view_height")) {
+						snprintf(str, slen, "%d", get_room_blocking_height(r, NULL));
 					}
 					else if (!str_cmp(field, "vnum")) {
 						snprintf(str, slen, "%d", GET_ROOM_VNUM(r)); 

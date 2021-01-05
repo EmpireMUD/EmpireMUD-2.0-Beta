@@ -23,27 +23,8 @@
  //////////////////////////////////////////////////////////////////////////////
 //// BUILDINGS ///////////////////////////////////////////////////////////////
 
-// NOTE: many of these are used just for spawn data and if we could do that in
-// file instead of code, these would not be needed
-
 #define BUILDING_TUNNEL  5008  // building.c
 #define BUILDING_CITY_CENTER  5009
-
-#define BUILDING_FENCE  5112
-#define BUILDING_GATE  5113
-
-#define BUILDING_BRIDGE  5133	// TODO: this is only used to indicate use-road-icon
-
-#define BUILDING_STEPS  5140	// custom icons
-
-#define BUILDING_SWAMPWALK  5155	// road icon
-
-#define BUILDING_TRAPPERS_POST  5161	// workforce.c
-
-#define BUILDING_GATEHOUSE  5173	// custom icons, rituals
-#define BUILDING_WALL  5174
-
-#define BUILDING_BOARDWALK  5206	// road icon
 
 // Room building vnums
 #define RTYPE_SHIP_HOLDING_PEN  5509	// for the shipping system's storage room

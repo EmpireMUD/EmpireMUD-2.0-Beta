@@ -8411,11 +8411,14 @@ int count_hash_records(FILE *fl) {
 empire_data *get_or_create_empire(char_data *ch) {
 	empire_data *emp;
 	
-	if (IS_NPC(ch) || PRF_FLAGGED(ch, PRF_NOEMPIRE)) {
+	if (IS_NPC(ch)) {
 		return NULL;
 	}
 	if ((emp = GET_LOYALTY(ch))) {
 		return emp;
+	}
+	if (PRF_FLAGGED(ch, PRF_NOEMPIRE)) {
+		return NULL;	// do not create
 	}
 	if (!IS_APPROVED(ch) && config_get_bool("manage_empire_approval")) {
 		return NULL;	// do not create

@@ -3643,7 +3643,7 @@ struct empire_city_data *find_city(empire_data *emp, room_data *loc) {
 	int dist, min = -1;
 
 	if (!emp) {
-		return FALSE;
+		return NULL;
 	}
 	
 	for (city = EMPIRE_CITY_LIST(emp); city; city = city->next) {

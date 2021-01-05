@@ -1,3 +1,12 @@
+#2100
+Start Chop Tutorial~
+2 u 0
+~
+* start axe tutorial
+if !%actor.completed_quest(919)% && !%actor.on_quest(919)%
+  %quest% %actor% start 919
+end
+~
 #2149
 Guard whistle~
 1 c 2

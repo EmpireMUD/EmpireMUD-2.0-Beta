@@ -501,6 +501,8 @@ int gain_event_points(char_data *ch, any_vnum event_vnum, int points) {
 	else if (points < 0) {
 		msg_to_char(ch, "\tyYou lose %d point%s for '%s'! You now have %d point%s.\t0\r\n", ABSOLUTE(points), PLURAL(ABSOLUTE(points)), running->event ? EVT_NAME(running->event) : "Unknown Event", ped->points, PLURAL(ped->points));
 	}
+	
+	queue_delayed_update(ch, CDU_SAVE);
 	return ped->points;
 }
 

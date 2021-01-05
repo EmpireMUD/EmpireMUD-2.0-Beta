@@ -113,6 +113,19 @@ if %stored% >= %max%
   wait 7200 s
 end
 ~
+#919
+Start Axe Tutorial~
+2 u 0
+~
+* start flint tutorial
+if !%actor.completed_quest(100)% && !%actor.on_quest(100)%
+  %quest% %actor% start 100
+end
+* start handle tutorial
+if !%actor.completed_quest(121)% && !%actor.on_quest(121)%
+  %quest% %actor% start 121
+end
+~
 #921
 Caravan setup~
 5 n 100

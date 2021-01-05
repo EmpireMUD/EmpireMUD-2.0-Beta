@@ -93,6 +93,7 @@ void load_slash_channels();
 void load_tips_of_the_day();
 void load_trading_post();
 void load_world_from_binary_index();
+void perform_requested_world_saves();
 void renum_world();
 void run_reboot_triggers();
 void schedule_map_unloads();
@@ -103,6 +104,7 @@ void update_instance_world_size();
 void verify_empire_goals();
 void verify_running_events();
 void verify_sectors();
+void write_binary_world_index_updates();
 void write_whole_mapout();
 int sort_abilities_by_data(ability_data *a, ability_data *b);
 int sort_archetypes_by_data(archetype_data *a, archetype_data *b);
@@ -307,6 +309,7 @@ char *world_index_data = NULL;	// for managing the binary world file
 int top_of_world_index = -1;	// current max entry index
 bool save_world_after_startup = FALSE;	// if TRUE, will trigger a world save at the end of startup
 bool converted_to_b5_116 = FALSE;	// triggers old world file deletes, only if it converted at startup
+bool block_world_save_requests = FALSE;	// used during startup to prevent unnecessary writes
 
 
 // DB_BOOT_x
@@ -468,16 +471,26 @@ void boot_db(void) {
 	log("Final startup...");
 	write_whole_mapout();
 	if (save_world_after_startup) {
+		log(" writing fresh binary map file...");
 		write_fresh_binary_map_file();
+		log(" writing fresh wld files...");
 		write_all_wld_files();
+		log(" writing fresh binary world index...");
 		write_whole_binary_world_index();
 	}
+	else {	// not doing a whole save but it's good to do a partial
+		log(" writing pending saves...");
+		perform_requested_world_saves();
+		write_binary_world_index_updates();
+	}
 	if (converted_to_b5_116) {
+		log(" deleting pre-b5.116 world files...");
 		delete_pre_b5_116_world_files();
 	}
 	// put things here
 	
 	// END
+	block_world_save_requests = FALSE;	// in case
 	log("Boot db -- DONE.");
 	boot_time = time(0);
 }
@@ -724,13 +737,11 @@ void check_for_bad_buildings(void) {
 			// map building
 			log(" removing building at %d for bad building type", GET_ROOM_VNUM(room));
 			disassociate_building(room);
-			save_world_after_startup = TRUE;
 		}
 		else if (IS_CITY_CENTER(room) && (!ROOM_OWNER(room) || !find_city_entry(ROOM_OWNER(room), room))) {
 			// city center with no matching city
 			log(" removing city center at %d for lack of city entry", GET_ROOM_VNUM(room));
 			disassociate_building(room);
-			save_world_after_startup = TRUE;
 		}
 		else if (GET_ROOM_VNUM(room) >= MAP_SIZE && ROOM_SECT_FLAGGED(room, SECTF_INSIDE) && !GET_BUILDING(room)) {
 			// designated room
@@ -749,7 +760,6 @@ void check_for_bad_buildings(void) {
 			log(" unlinking instance entrance room %d for no association with an instance", GET_ROOM_VNUM(room));
 			unlink_instance_entrance(room, NULL, FALSE);
 			prune_instances();	// cleans up rooms too
-			save_world_after_startup = TRUE;
 		}
 		/* This probably isn't necessary and having it here will cause roads to be pulled up as of b3.17 -paul
 		else if (COMPLEX_DATA(room) && !GET_BUILDING(room) && !GET_ROOM_TEMPLATE(room)) {
@@ -760,7 +770,6 @@ void check_for_bad_buildings(void) {
 	}
 	if (deleted) {
 		check_all_exits();
-		save_world_after_startup = TRUE;
 	}
 	
 	// check craft "build" recipes: disable

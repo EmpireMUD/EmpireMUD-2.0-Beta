@@ -751,6 +751,7 @@ void real_update_char(char_data *ch) {
 		
 			// update to this cycle so it only happens once a day
 			GET_DAILY_CYCLE(ch) = data_get_long(DATA_DAILY_CYCLE);
+			queue_delayed_update(ch, CDU_SAVE);
 		}
 
 		/* Update conditions */

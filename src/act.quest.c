@@ -189,6 +189,8 @@ void complete_quest(char_data *ch, struct player_quest *pq, empire_data *giver_e
 			msg_to_char(ch, "You have hit the daily quest limit and your remaining daily quests expire.\r\n");
 		}
 	}
+	
+	queue_delayed_update(ch, CDU_SAVE);
 }
 
 

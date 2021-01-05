@@ -186,10 +186,6 @@ typedef struct map_file_data_v1  map_file_data;	// the current version of the st
 #define POLITICAL_MAP_FILE  DATA_DIR"map-political.txt"	// for political map
 #define CITY_DATA_FILE  DATA_DIR"map-cities.txt"	// for cities on the website
 
-// world blocks: the world is split into chunks for saving
-#define WORLD_BLOCK_SIZE  (MAP_WIDTH * 5)	// number of rooms per .wld file
-#define GET_WORLD_BLOCK(roomvnum)  (roomvnum == NOWHERE ? NOWHERE : (int)(roomvnum / WORLD_BLOCK_SIZE))
-
 // additional files
 #define BINARY_MAP_FILE  WLD_PREFIX"binary_map"	// all the map data
 #define BINARY_WORLD_INDEX  WLD_PREFIX"binary_world_index"	// index of rooms
@@ -887,6 +883,7 @@ extern char *world_index_data;
 extern int top_of_world_index;
 extern bool save_world_after_startup;
 extern bool converted_to_b5_116;
+extern bool block_world_save_requests;
 
 void add_room_to_world_tables(room_data *room);
 void add_trd_home_room(room_vnum vnum, room_vnum home_room);

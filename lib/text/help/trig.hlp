@@ -531,7 +531,7 @@ Special Variables When using field - The variable returns:
 &cweather&0 - One of: sunny, cloudy, raining, lightning
 
 Names and pronouns:
-&c~%var%&0 - name, someone, your
+&c~%var%&0 - name, someone, you
 &c|%var%&0 - name's, someone's, your
 &c&&%var%&0 - he/she/it, you
 &c*%var%&0 - him/her/it, you

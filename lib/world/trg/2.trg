@@ -162,6 +162,19 @@ end
 nop %actor.set_cooldown(256, 3600)%
 nop %actor.cancel_adventure_summon%
 ~
+#257
+Start Brick Tutorial~
+2 u 0
+~
+* start chop tutorial
+if !%actor.completed_quest(2100)% && !%actor.on_quest(2100)%
+  %quest% %actor% start 2100
+end
+* start firesticks tutorial
+if !%actor.completed_quest(102)% && !%actor.on_quest(102)%
+  %quest% %actor% start 102
+end
+~
 #258
 Peace Pipe Toker~
 1 c 2
