@@ -1060,8 +1060,6 @@ void build_map_icon(char_data *ch, room_data *to_room, struct icon_data *base_ic
 	else {	// error: no icon available
 		strcat(icon_buf, "????");
 	}
-	
-	replace_icon_codes(ch, to_room, icon_buf, tileset);
 }
 
 
@@ -2058,11 +2056,13 @@ static void show_map_to_char(char_data *ch, struct mappc_data_container *mappc, 
 	if (has_player_tech(ch, PTECH_MAP_MEMORY)) {
 		if (show_veh && VEH_FLAGGED(show_veh, VEH_BUILDING) && !VEH_FLAGGED(show_veh, VEH_CHAMELEON)) {
 			// memorize building-vehicle icon
+			replace_icon_codes(ch, to_room, veh_icon, tileset);
 			add_player_map_memory(ch, GET_ROOM_VNUM(to_room), veh_icon, NULL, 0);
 		}
 		else {
 			// memorize map icon (may be a map building)
 			// TODO: should this ignore chameleon buildings and show the terrain instead? if so, split buildings from other icons
+			replace_icon_codes(ch, to_room, map_icon, tileset);
 			add_player_map_memory(ch, GET_ROOM_VNUM(to_room), map_icon, NULL, 0);
 		}
 		
