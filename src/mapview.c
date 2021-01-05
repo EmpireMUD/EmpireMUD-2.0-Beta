@@ -490,6 +490,109 @@ void replace_color_codes(char *string, char *new_color) {
 }
 
 
+/**
+* Replaces special icon codes like @. in the string.
+*
+* @param char_data *ch The person looking at the tile.
+* @param room_data *to_room The room being looked at.
+* @param char *icon_buf The buffer where the icon is stored -- text in this buffer will be replaced.
+* @param int tileset Which tile set (season) to pull icons from.
+*/
+void replace_icon_codes(char_data *ch, room_data *to_room, char *icon_buf, int tileset) {
+	struct icon_data *icon;
+	sector_data *sect;
+	bool enchanted;
+	char temp[256];
+	char *str;
+	
+	// icon_buf is now the completed icon, but has both color codes (&) and variable tile codes (@)
+	if (strchr(icon_buf, '@')) {
+		room_data *r_east = SHIFT_CHAR_DIR(ch, to_room, EAST);
+		room_data *r_west = SHIFT_CHAR_DIR(ch, to_room, WEST);
+		// NOTE: If you add new @ codes here, you must update "const char *icon_codes" in utils.c
+		
+		// here (@.) roadside icon
+		if (strstr(icon_buf, "@.")) {
+			icon = get_icon_from_set(GET_SECT_ICONS(BASE_SECT(to_room)), tileset);
+			sprintf(temp, "%s%c", icon ? icon->color : "&0", GET_SECT_ROADSIDE_ICON(BASE_SECT(to_room)));
+			str = str_replace("@.", temp, icon_buf);
+			strcpy(icon_buf, str);
+			free(str);
+		}
+		// east (@e) tile attachment
+		if (strstr(icon_buf, "@e")) {
+			sect = r_east ? BASE_SECT(r_east) : BASE_SECT(to_room);
+			icon = get_icon_from_set(GET_SECT_ICONS(sect), tileset);
+			sprintf(temp, "%s%c", icon ? icon->color : "&0", GET_SECT_ROADSIDE_ICON(sect));
+			str = str_replace("@e", temp, icon_buf);
+			strcpy(icon_buf, str);
+			free(str);
+		}
+		// west (@w) tile attachment
+		if (strstr(icon_buf, "@w")) {
+			sect = r_west ? BASE_SECT(r_west) : BASE_SECT(to_room);
+			icon = get_icon_from_set(GET_SECT_ICONS(sect), tileset);
+			sprintf(temp, "%s%c", icon ? icon->color : "&0", GET_SECT_ROADSIDE_ICON(sect));
+			str = str_replace("@w", temp, icon_buf);
+			strcpy(icon_buf, str);
+			free(str);
+		}
+		
+		// west (@u) barrier attachment
+		if (strstr(icon_buf, "@u") || strstr(icon_buf, "@U")) {
+			if (!r_west || ATTACHES_TO_BARRIER(r_west)) {
+				enchanted = (r_west && ROOM_AFF_FLAGGED(r_west, ROOM_AFF_NO_FLY)) || ROOM_AFF_FLAGGED(to_room, ROOM_AFF_NO_FLY);
+				// west is a barrier
+				sprintf(temp, "%sv", enchanted ? "&m" : "&0");
+				str = str_replace("@u", temp, icon_buf);
+				strcpy(icon_buf, str);
+				free(str);
+				sprintf(temp, "%sV", enchanted ? "&m" : "&0");
+				str = str_replace("@U", temp, icon_buf);
+				strcpy(icon_buf, str);
+				free(str);
+			}
+			else {
+				// west is not a barrier
+				sprintf(temp, "&?%c", GET_SECT_ROADSIDE_ICON(BASE_SECT(to_room)));
+				str = str_replace("@u", temp, icon_buf);
+				strcpy(icon_buf, str);
+				free(str);
+				str = str_replace("@U", temp, icon_buf);
+				strcpy(icon_buf, str);
+				free(str);
+			}
+		}
+		
+		//  east (@v) barrier attachment
+		if (strstr(icon_buf, "@v") || strstr(icon_buf, "@V")) {
+			if (!r_east || ATTACHES_TO_BARRIER(r_east)) {
+				enchanted = (r_east && ROOM_AFF_FLAGGED(r_east, ROOM_AFF_NO_FLY)) || ROOM_AFF_FLAGGED(to_room, ROOM_AFF_NO_FLY);
+				// east is a barrier
+				sprintf(temp, "%sv", enchanted ? "&m" : "&0");
+				str = str_replace("@v", temp, icon_buf);
+				strcpy(icon_buf, str);
+				free(str);
+				sprintf(temp, "%sV", enchanted ? "&m" : "&0");
+				str = str_replace("@V", temp, icon_buf);
+				strcpy(icon_buf, str);
+				free(str);
+			}
+			else {
+				// east is not a barrier
+				sprintf(temp, "&?%c", GET_SECT_ROADSIDE_ICON(BASE_SECT(to_room)));
+				str = str_replace("@v", temp, icon_buf);
+				strcpy(icon_buf, str);
+				free(str);
+				str = str_replace("@V", temp, icon_buf);
+				strcpy(icon_buf, str);
+				free(str);
+			}
+		}
+	}
+}
+
+
  //////////////////////////////////////////////////////////////////////////////
 //// LINE-OF-SIGHT FUNCTIONS /////////////////////////////////////////////////
 
@@ -809,10 +912,6 @@ bool show_pc_in_room(char_data *ch, room_data *room, struct mappc_data_container
 void build_map_icon(char_data *ch, room_data *to_room, struct icon_data *base_icon, struct icon_data *crop_icon, int tileset, char *icon_buf) {
 	struct empire_city_data *city;
 	struct icon_data *icon;
-	sector_data *sect;
-	bool enchanted;
-	char temp[256];
-	char *str;
 	
 	// initialize this
 	*icon_buf = '\0';
@@ -962,91 +1061,7 @@ void build_map_icon(char_data *ch, room_data *to_room, struct icon_data *base_ic
 		strcat(icon_buf, "????");
 	}
 	
-	// icon_buf is now the completed icon, but has both color codes (&) and variable tile codes (@)
-	if (strchr(icon_buf, '@')) {
-		room_data *r_east = SHIFT_CHAR_DIR(ch, to_room, EAST);
-		room_data *r_west = SHIFT_CHAR_DIR(ch, to_room, WEST);
-		// NOTE: If you add new @ codes here, you must update "const char *icon_codes" in utils.c
-		
-		// here (@.) roadside icon
-		if (strstr(icon_buf, "@.")) {
-			icon = get_icon_from_set(GET_SECT_ICONS(BASE_SECT(to_room)), tileset);
-			sprintf(temp, "%s%c", icon ? icon->color : "&0", GET_SECT_ROADSIDE_ICON(BASE_SECT(to_room)));
-			str = str_replace("@.", temp, icon_buf);
-			strcpy(icon_buf, str);
-			free(str);
-		}
-		// east (@e) tile attachment
-		if (strstr(icon_buf, "@e")) {
-			sect = r_east ? BASE_SECT(r_east) : BASE_SECT(to_room);
-			icon = get_icon_from_set(GET_SECT_ICONS(sect), tileset);
-			sprintf(temp, "%s%c", icon ? icon->color : "&0", GET_SECT_ROADSIDE_ICON(sect));
-			str = str_replace("@e", temp, icon_buf);
-			strcpy(icon_buf, str);
-			free(str);
-		}
-		// west (@w) tile attachment
-		if (strstr(icon_buf, "@w")) {
-			sect = r_west ? BASE_SECT(r_west) : BASE_SECT(to_room);
-			icon = get_icon_from_set(GET_SECT_ICONS(sect), tileset);
-			sprintf(temp, "%s%c", icon ? icon->color : "&0", GET_SECT_ROADSIDE_ICON(sect));
-			str = str_replace("@w", temp, icon_buf);
-			strcpy(icon_buf, str);
-			free(str);
-		}
-		
-		// west (@u) barrier attachment
-		if (strstr(icon_buf, "@u") || strstr(icon_buf, "@U")) {
-			if (!r_west || ATTACHES_TO_BARRIER(r_west)) {
-				enchanted = (r_west && ROOM_AFF_FLAGGED(r_west, ROOM_AFF_NO_FLY)) || ROOM_AFF_FLAGGED(to_room, ROOM_AFF_NO_FLY);
-				// west is a barrier
-				sprintf(temp, "%sv", enchanted ? "&m" : "&0");
-				str = str_replace("@u", temp, icon_buf);
-				strcpy(icon_buf, str);
-				free(str);
-				sprintf(temp, "%sV", enchanted ? "&m" : "&0");
-				str = str_replace("@U", temp, icon_buf);
-				strcpy(icon_buf, str);
-				free(str);
-			}
-			else {
-				// west is not a barrier
-				sprintf(temp, "&?%c", GET_SECT_ROADSIDE_ICON(BASE_SECT(to_room)));
-				str = str_replace("@u", temp, icon_buf);
-				strcpy(icon_buf, str);
-				free(str);
-				str = str_replace("@U", temp, icon_buf);
-				strcpy(icon_buf, str);
-				free(str);
-			}
-		}
-		
-		//  east (@v) barrier attachment
-		if (strstr(icon_buf, "@v") || strstr(icon_buf, "@V")) {
-			if (!r_east || ATTACHES_TO_BARRIER(r_east)) {
-				enchanted = (r_east && ROOM_AFF_FLAGGED(r_east, ROOM_AFF_NO_FLY)) || ROOM_AFF_FLAGGED(to_room, ROOM_AFF_NO_FLY);
-				// east is a barrier
-				sprintf(temp, "%sv", enchanted ? "&m" : "&0");
-				str = str_replace("@v", temp, icon_buf);
-				strcpy(icon_buf, str);
-				free(str);
-				sprintf(temp, "%sV", enchanted ? "&m" : "&0");
-				str = str_replace("@V", temp, icon_buf);
-				strcpy(icon_buf, str);
-				free(str);
-			}
-			else {
-				// east is not a barrier
-				sprintf(temp, "&?%c", GET_SECT_ROADSIDE_ICON(BASE_SECT(to_room)));
-				str = str_replace("@v", temp, icon_buf);
-				strcpy(icon_buf, str);
-				free(str);
-				str = str_replace("@V", temp, icon_buf);
-				strcpy(icon_buf, str);
-				free(str);
-			}
-		}
-	}
+	replace_icon_codes(ch, to_room, icon_buf, tileset);
 }
 
 
@@ -1912,6 +1927,8 @@ static void show_map_to_char(char_data *ch, struct mappc_data_container *mappc, 
 	else {	// no valid icon??
 		strcpy(show_icon, "????");
 	}
+	
+	replace_icon_codes(ch, to_room, show_icon, tileset);
 	
 	// 3. Check for special icon coloring including &?
 	if (IS_BURNING(to_room)) {
