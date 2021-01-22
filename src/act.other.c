@@ -3448,7 +3448,7 @@ ACMD(do_shear) {
 	else if (!(mob = get_char_vis(ch, arg, NULL, FIND_CHAR_ROOM))) {
 		send_config_msg(ch, "no_person");
 	}
-	else if (!IS_NPC(mob)) {
+	else if (!IS_NPC(mob) || !has_interaction(mob->interactions, INTERACT_SHEAR)) {
 		act("You can't shear $N!", FALSE, ch, NULL, mob, TO_CHAR);
 	}
 	else if (get_cooldown_time(mob, COOLDOWN_SHEAR) > 0) {
