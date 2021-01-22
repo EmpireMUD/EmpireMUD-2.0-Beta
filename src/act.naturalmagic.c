@@ -498,7 +498,7 @@ ACMD(do_earthmeld) {
 
 	if (AFF_FLAGGED(ch, AFF_EARTHMELD)) {
 		// only check sector on rise if the person has earth mastery, otherwise they are trapped
-		if (has_ability(ch, ABIL_WORM) && IS_ANY_BUILDING(IN_ROOM(ch)) && !ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_OPEN)) {
+		if (has_ability(ch, ABIL_WORM) && IS_COMPLETE(IN_ROOM(ch)) && IS_ANY_BUILDING(IN_ROOM(ch)) && !ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_OPEN) && !ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_BARRIER)) {
 			msg_to_char(ch, "You can't rise from the earth here!\r\n");
 		}
 		else {
@@ -511,6 +511,11 @@ ACMD(do_earthmeld) {
 	// sect validation
 	if (ROOM_SECT_FLAGGED(IN_ROOM(ch), SECTF_FRESH_WATER | SECTF_OCEAN | SECTF_SHALLOW_WATER | SECTF_INSIDE) || (GET_BUILDING(IN_ROOM(ch)) && !ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_OPEN))) {
 		msg_to_char(ch, "You can't earthmeld without natural ground below you!\r\n");
+		return;
+	}
+	
+	if (ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_BARRIER) && IS_COMPLETE(IN_ROOM(ch))) {
+		msg_to_char(ch, "You can't earthmeld here.\r\n");
 		return;
 	}
 	
