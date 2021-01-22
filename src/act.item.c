@@ -4424,10 +4424,6 @@ void warehouse_store(char_data *ch, char *argument, int mode) {
 	dotmode = find_all_dots(argument);
 	
 	if (dotmode == FIND_ALL) {
-		if (!ch->carrying) {
-			msg_to_char(ch, "You don't seem to be carrying anything.\r\n");
-			return;
-		}
 		DL_FOREACH_SAFE2(ch->carrying, obj, next_obj, next_content) {
 			if (full) {
 				break;	// early break
