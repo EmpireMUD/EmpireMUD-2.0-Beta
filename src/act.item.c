@@ -7124,10 +7124,6 @@ ACMD(do_store) {
 	dotmode = find_all_dots(arg1);
 
 	if (dotmode == FIND_ALL || all || room || inv) {
-		if (!ch->carrying) {
-			send_to_char("You don't seem to be carrying anything.\r\n", ch);
-			return;
-		}
 		for (iter = 0; iter < 2; ++iter) {
 			DL_FOREACH_SAFE2(lists[iter], obj, next_obj, next_content) {
 				if (!OBJ_FLAGGED(obj, OBJ_KEEP) && OBJ_CAN_STORE(obj) && obj_can_be_stored(obj, IN_ROOM(ch), GET_LOYALTY(ch), FALSE)) {
