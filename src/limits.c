@@ -190,11 +190,17 @@ bool check_idling(char_data *ch) {
 	}
 
 	ch->char_specials.timer++;
+	
+	// prevent idle-out if active and acting
+	if (ch->desc && GET_ACTION(ch) != ACT_NONE) {
+		return TRUE;
+	}
 
-	if ((ch->desc && ch->char_specials.timer > config_get_int("idle_rent_time")) || (!ch->desc && ch->char_specials.timer > config_get_int("idle_linkdead_rent_time"))) {
+	if (ch->char_specials.timer > (ch->desc ? config_get_int("idle_rent_time") : config_get_int("idle_linkdead_rent_time"))) {
 		return perform_idle_out(ch);
 	}
 	
+	// survived this long
 	return TRUE;
 }
 
