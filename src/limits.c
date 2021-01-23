@@ -192,7 +192,7 @@ bool check_idling(char_data *ch) {
 	ch->char_specials.timer++;
 	
 	// prevent idle-out if active and acting
-	if (ch->desc && GET_ACTION(ch) != ACT_NONE) {
+	if (ch->desc && !IS_NPC(ch) && GET_ACTION(ch) != ACT_NONE) {
 		return TRUE;
 	}
 
