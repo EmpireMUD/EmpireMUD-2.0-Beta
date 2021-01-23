@@ -1121,9 +1121,11 @@ void set_crop_type(room_data *room, crop_data *cp) {
 * sets the value.
 *
 * @param room_data *room The room.
-* @param int damage_amount How much to set its damage to (not bounded).
+* @param double damage_amount How much to set its damage to (not bounded).
 */
-void set_room_damage(room_data *room, int damage_amount) {
+void set_room_damage(room_data *room, double damage_amount) {
+	// cheap rounding to %.2f
+	damage_amount = ((int)(damage_amount * 100)) / 100.0;
 	if (COMPLEX_DATA(room) && COMPLEX_DATA(room)->damage != damage_amount) {
 		COMPLEX_DATA(room)->damage = damage_amount;
 		request_world_save(GET_ROOM_VNUM(room), WSAVE_ROOM);
