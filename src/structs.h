@@ -2150,6 +2150,19 @@ typedef enum {
 #define GRANT_TRIGGERS  BIT(43)
 
 
+// INFORMATIVE_x: For players' informative views
+#define INFORMATIVE_BUILDING_STATUS  BIT(0)	// a. dismantling/unfinished
+#define INFORMATIVE_DISREPAIR  BIT(1)	// b. major/minor disrepair
+#define INFORMATIVE_MINE_STATUS  BIT(2)	// c. shows whether a mine has ore
+#define INFORMATIVE_PUBLIC  BIT(3)	// g. tile is flagged as public
+#define INFORMATIVE_NO_WORK  BIT(4)	// d. workforce is off
+#define INFORMATIVE_NO_ABANDON  BIT(5)	// e. protection against abandon
+#define INFORMATIVE_NO_DISMANTLE  BIT(6)	// f. workforce won't dismantle
+
+// flags set at character creation
+#define DEFAULT_INFORMATIVE_BITS  (INFORMATIVE_BUILDING_STATUS | INFORMATIVE_DISREPAIR | INFORMATIVE_MINE_STATUS | INFORMATIVE_PUBLIC | INFORMATIVE_NO_WORK | INFORMATIVE_NO_ABANDON | INFORMATIVE_NO_DISMANTLE)
+
+
 // LASTNAME_x: config players lastname_mode: determines how players get last names
 #define LASTNAME_SET_AT_CREATION  BIT(0)	// a. player chooses during creation menus
 #define LASTNAME_CHANGE_ANY_TIME  BIT(1)	// b. player can change with 'lastname change'
@@ -4296,6 +4309,7 @@ struct player_special_data {
 	bitvector_t syslogs;	// which syslogs people want to see
 	bitvector_t bonus_traits;	// BONUS_
 	bitvector_t fight_messages;	// FM_ flags
+	bitvector_t informative_flags;	// INFORMATIVE_ flags
 	ubyte bad_pws;	// number of bad password attemps
 	struct mail_data *mail_pending;	// uncollected letters
 	int create_alt_id;	// used in CON_Q_ALT_NAME and CON_Q_ALT_PASSWORD

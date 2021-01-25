@@ -599,6 +599,19 @@ const char *grant_bits[] = {
 };
 
 
+// INFORMATIVE_x: For players' informative views
+const char *informative_view_bits[] = {
+	"building-status",	// 0
+	"disrepair",
+	"mine-status",
+	"public",
+	"no-work",
+	"no-abandon",	// 5
+	"no-dismantle",
+	"\n"
+};
+
+
 // MOUNT_x: mount flags
 const char *mount_flags[] = {
 	"riding",

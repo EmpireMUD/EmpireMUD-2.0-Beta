@@ -258,34 +258,46 @@ struct icon_data *get_icon_from_set(struct icon_data *set, int type) {
 * @param bool major_disrepair
 * @param bool minor_disrepair
 * @param int mine_view 0 = not a mine, 1 = mine with ore, -1 = mine with no ore
+* @param bool public
 * @param bool no_work
+* @param bool no_abandon
+* @param bool no_dismantle
 * @param bool chameleon
 * @return char* The color code.
 */
-char *get_informative_color(char_data *ch, bool dismantling, bool unfinished, bool major_disrepair, bool minor_disrepair, int mine_view, bool no_work, bool chameleon) {
+char *get_informative_color(char_data *ch, bool dismantling, bool unfinished, bool major_disrepair, bool minor_disrepair, int mine_view, bool public, bool no_work, bool no_abandon, bool no_dismantle, bool chameleon) {
 	if (chameleon) {
 		return "\ty";
 	}
-	else if (dismantling) {
+	else if (dismantling && (!ch || INFORMATIVE_FLAGGED(ch, INFORMATIVE_BUILDING_STATUS))) {
 		return "\tC";
 	}
-	else if (unfinished) {
+	else if (unfinished && (!ch || INFORMATIVE_FLAGGED(ch, INFORMATIVE_BUILDING_STATUS))) {
 		return "\tc";
 	}
-	else if (major_disrepair) {
+	else if (major_disrepair && (!ch || INFORMATIVE_FLAGGED(ch, INFORMATIVE_DISREPAIR))) {
 		return "\tr";
 	}
-	else if (minor_disrepair) {
+	else if (minor_disrepair && (!ch || INFORMATIVE_FLAGGED(ch, INFORMATIVE_DISREPAIR))) {
 		return "\tm";
 	}
-	else if (mine_view > 0) {
+	else if (mine_view > 0 && (!ch || INFORMATIVE_FLAGGED(ch, INFORMATIVE_MINE_STATUS))) {
 		return "\tg";
 	}
-	else if (mine_view < 0) {
+	else if (mine_view < 0 && (!ch || INFORMATIVE_FLAGGED(ch, INFORMATIVE_MINE_STATUS))) {
 		return "\tr";
 	}
-	else if (no_work) {
+	else if (public && (!ch || INFORMATIVE_FLAGGED(ch, INFORMATIVE_PUBLIC))) {
+		return "\to";
+	}
+	else if (no_work && (!ch || INFORMATIVE_FLAGGED(ch, INFORMATIVE_NO_WORK))) {
 		return "\tB";
+	}
+	else if (no_abandon && (!ch || INFORMATIVE_FLAGGED(ch, INFORMATIVE_NO_ABANDON))) {
+		return "\tV";
+	}
+	else if (no_dismantle && (!ch || INFORMATIVE_FLAGGED(ch, INFORMATIVE_NO_DISMANTLE))) {
+		return "\tJ";
 	}
 	else {
 		return "\t0";
@@ -303,29 +315,41 @@ char *get_informative_color(char_data *ch, bool dismantling, bool unfinished, bo
 * @param bool major_disrepair
 * @param bool minor_disrepair
 * @param int mine_view 0 = not a mine, 1 = mine with ore, -1 = mine with no ore
+* @param bool public
 * @param bool no_work
+* @param bool no_abandon
+* @param bool no_dismantle
 * @param bool chameleon
 */
-void get_informative_string(char_data *ch, char *buffer, bool dismantling, bool unfinished, bool major_disrepair, bool minor_disrepair, int mine_view, bool no_work, bool chameleon) {
+void get_informative_string(char_data *ch, char *buffer, bool dismantling, bool unfinished, bool major_disrepair, bool minor_disrepair, int mine_view, bool public, bool no_work, bool no_abandon, bool no_dismantle, bool chameleon) {
 	*buffer = '\0';
 
-	if (dismantling) {
+	if (dismantling && (!ch || INFORMATIVE_FLAGGED(ch, INFORMATIVE_BUILDING_STATUS))) {
 		sprintf(buffer + strlen(buffer), "%sdismantling", *buffer ? ", " : "");
 	}
-	else if (unfinished) {
+	else if (unfinished && (!ch || INFORMATIVE_FLAGGED(ch, INFORMATIVE_BUILDING_STATUS))) {
 		sprintf(buffer + strlen(buffer), "%sunfinished", *buffer ? ", " :"");
 	}
-	else if (major_disrepair) {
+	else if (major_disrepair && (!ch || INFORMATIVE_FLAGGED(ch, INFORMATIVE_DISREPAIR))) {
 		sprintf(buffer + strlen(buffer), "%sbad disrepair", *buffer ? ", " :"");
 	}
-	else if (minor_disrepair) {
+	else if (minor_disrepair && (!ch || INFORMATIVE_FLAGGED(ch, INFORMATIVE_DISREPAIR))) {
 		sprintf(buffer + strlen(buffer), "%sdisrepair", *buffer ? ", " :"");
 	}
-	if (mine_view != 0) {
+	if (mine_view != 0 && (!ch || INFORMATIVE_FLAGGED(ch, INFORMATIVE_MINE_STATUS))) {
 		sprintf(buffer + strlen(buffer), "%s%s", *buffer ? ", " :"", mine_view > 0 ? "has ore" : "depleted");
 	}
-	if (no_work) {
+	if (public && (!ch || INFORMATIVE_FLAGGED(ch, INFORMATIVE_PUBLIC))) {
+		sprintf(buffer + strlen(buffer), "%spublic", *buffer ? ", " :"");
+	}
+	if (no_work && (!ch || INFORMATIVE_FLAGGED(ch, INFORMATIVE_NO_WORK))) {
 		sprintf(buffer + strlen(buffer), "%sno-work", *buffer ? ", " :"");
+	}
+	if (no_abandon && (!ch || INFORMATIVE_FLAGGED(ch, INFORMATIVE_NO_ABANDON))) {
+		sprintf(buffer + strlen(buffer), "%sno-abandon", *buffer ? ", " :"");
+	}
+	if (no_dismantle && (!ch || INFORMATIVE_FLAGGED(ch, INFORMATIVE_NO_DISMANTLE))) {
+		sprintf(buffer + strlen(buffer), "%sno-dismantle", *buffer ? ", " :"");
 	}
 	if (chameleon) {
 		sprintf(buffer + strlen(buffer), "%schameleon", *buffer ? ", " :"");

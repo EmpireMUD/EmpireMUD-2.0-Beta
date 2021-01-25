@@ -25,6 +25,7 @@
 #include "vnums.h"
 #include "constants.h"
 #include "boards.h"
+#include "olc.h"
 
 /**
 * Contents:
@@ -2639,6 +2640,27 @@ ACMD(do_helpsearch) {
 	}
 	if (words) {
 		free(words);
+	}
+}
+
+
+ACMD(do_informative) {
+	int iter;
+	
+	skip_spaces(&argument);
+	
+	if (IS_NPC(ch)) {
+		msg_to_char(ch, "You can't change your informative settings right now.\r\n");
+	}
+	else if (!str_cmp(argument, "all")) {
+		// turn on all informatives
+		for (iter = 0; *informative_view_bits[iter] != '\n'; ++iter) {
+			GET_INFORMATIVE_FLAGS(ch) |= BIT(iter);
+		}
+		msg_to_char(ch, "Your informative view now shows all types.\r\n");
+	}
+	else {
+		GET_INFORMATIVE_FLAGS(ch) = olc_process_flag(ch, argument, "informative", "informative", informative_view_bits, GET_INFORMATIVE_FLAGS(ch));
 	}
 }
 

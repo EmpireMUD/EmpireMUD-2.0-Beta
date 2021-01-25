@@ -1718,6 +1718,9 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *c
 				else if (!strn_cmp(line, "Immortal Level: ", 16)) {
 					GET_IMMORTAL_LEVEL(ch) = atoi(line + 16);
 				}
+				else if (!strn_cmp(line, "Informative: ", 13)) {
+					GET_INFORMATIVE_FLAGS(ch) = asciiflag_conv(line + 13);
+				}
 				else if (!strn_cmp(line, "Injuries: ", 10)) {
 					INJURY_FLAGS(ch) = asciiflag_conv(line + 10);
 				}
@@ -2930,6 +2933,11 @@ void write_player_delayed_data_to_file(FILE *fl, char_data *ch) {
 		}
 		fprintf(fl, "Home Storage: %d %d %d\n", eus->island, eus->amount, eus->flags);
 		Crash_save_one_obj_to_file(fl, eus->obj, 0);
+	}
+	
+	// 'I'
+	if (GET_INFORMATIVE_FLAGS(ch)) {
+		fprintf(fl, "Informative: %s\n", bitv_to_alpha(GET_INFORMATIVE_FLAGS(ch)));
 	}
 	
 	// 'L'
@@ -4644,7 +4652,9 @@ void start_new_character(char_data *ch) {
 	ch->player.time.played = 0;
 	ch->player.time.logon = time(0);
 	
+	// default flags
 	SET_BIT(PRF_FLAGS(ch), PRF_AUTOKILL);
+	SET_BIT(GET_INFORMATIVE_FLAGS(ch), DEFAULT_INFORMATIVE_BITS);
 	
 	// ensure custom channel colors default to off
 	for (iter = 0; iter < NUM_CUSTOM_COLORS; ++iter) {

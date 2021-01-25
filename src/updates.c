@@ -1854,7 +1854,7 @@ void b5_112_update(void) {
 	}
 }
 
- 
+
 // b5.117: clear last_christmas_gift_item
 PLAYER_UPDATE_FUNC(b5_117_update_players) {
 	struct trig_var_data *var, *next_var;
@@ -1901,6 +1901,13 @@ void b5_120_resave_world(void) {
 	for (iter = 0; iter <= top_of_world_index; ++iter) {
 		write_map_and_room_to_file(iter, FALSE);
 	}
+}
+
+
+// b5.121: set default informative flags
+PLAYER_UPDATE_FUNC(b5_121_update_players) {
+	check_delayed_load(ch);
+	SET_BIT(GET_INFORMATIVE_FLAGS(ch), DEFAULT_INFORMATIVE_BITS);
 }
 
 
@@ -1959,6 +1966,7 @@ const struct {
 	{ "b5.117", NULL, b5_117_update_players, "Clear last Christmas gift data" },
 	{ "b5.119", b5_119_repair_heights, NULL, "Repairing tiles that shouldn't have heights" },
 	{ "b5.120", b5_120_resave_world, NULL, "Resaving whole world to clear junk files" },
+	{ "b5.121", NULL, b5_121_update_players, "Adding default informative flags" },
 	
 	{ "\n", NULL, NULL, "\n" }	// must be last
 };
