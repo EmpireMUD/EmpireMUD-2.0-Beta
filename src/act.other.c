@@ -1425,11 +1425,19 @@ void afk_notify(char_data *ch) {
 * @param char_data *ch The player.
 */
 void tog_informative(char_data *ch) {
+	char temp[256];
+	
+	// if on...
 	if (PRF_FLAGGED(ch, PRF_INFORMATIVE)) {
+		// shut off other color options
 		REMOVE_BIT(PRF_FLAGS(ch), PRF_POLITICAL);
 		if (!PRF_FLAGGED(ch, PRF_SCREEN_READER)) {
 			REMOVE_BIT(PRF_FLAGS(ch), PRF_NOMAPCOL);
 		}
+		
+		// show current informative flags
+		prettier_sprintbit(GET_INFORMATIVE_FLAGS(ch), informative_view_bits, temp);
+		msg_to_char(ch, "Current informative options (type informative to change): %s\r\n", GET_INFORMATIVE_FLAGS(ch) ? temp : "none");
 	}
 }
 
@@ -3448,7 +3456,7 @@ ACMD(do_shear) {
 	else if (!(mob = get_char_vis(ch, arg, NULL, FIND_CHAR_ROOM))) {
 		send_config_msg(ch, "no_person");
 	}
-	else if (!IS_NPC(mob)) {
+	else if (!IS_NPC(mob) || !has_interaction(mob->interactions, INTERACT_SHEAR)) {
 		act("You can't shear $N!", FALSE, ch, NULL, mob, TO_CHAR);
 	}
 	else if (get_cooldown_time(mob, COOLDOWN_SHEAR) > 0) {

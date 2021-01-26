@@ -19,6 +19,27 @@ O+ 1 6800
 R
 4 5137 0
 S
+#6801
+cloth bolt basic~
+a bolt of basic cloth~
+A bolt of basic cloth is lying on the ground.~
+This simple cloth is used to sew clothing.
+~
+3 0 a 0 11
+0 0 0
+11 0
+C
+1 1
+M
+6
+You hang some cloth on $V.~
+M
+7
+$n hangs some cloth on $V.~
+O+ 1 6801
+R
+4 5137 0
+S
 #6810
 cloth magic bolt~
 a bolt of magic cloth~

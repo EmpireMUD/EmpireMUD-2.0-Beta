@@ -433,7 +433,7 @@ fine linen cloth.
 0 0
 O+ 1 6421
 R
-5137 0
+4 5137 0
 S
 #18322
 sack flaxseed seed~
@@ -446,7 +446,7 @@ The small seeds aren't very good to eat, but can be pressed into linseed oil.
 0 96
 O+ 1 6181
 R
-5210 0
+4 5210 0
 S
 #18323
 jar oil linseed~
@@ -460,13 +460,13 @@ storage. It could be used for cooking or for vehicle maintenance.
 6 168
 O+ 1 6321
 R
-5134 0
+4 5134 0
 R
-5192 0
+4 5192 0
 R
-5148 0
+4 5148 0
 R
-5150 0
+4 5150 0
 S
 #18324
 bolt linen~
@@ -474,7 +474,7 @@ a bolt of linen~
 A bolt of linen is lying here.~
 The white linen cloth is very fine, like no other you've seen.
 ~
-3 0 a 0 10
+3 0 a 0 11
 0 0 0
 11 0
 M
@@ -483,11 +483,11 @@ You carefully hang some linen cloth on $V.~
 M
 7
 $n carefully hangs some linen cloth on $V.~
-O+ 1 6800
+O+ 1 6801
 R
-5137 0
+4 5137 0
 R
-5134 0
+4 5134 0
 S
 #18325
 ankh hedj-wer hedjwer~

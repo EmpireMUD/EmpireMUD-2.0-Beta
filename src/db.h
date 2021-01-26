@@ -933,7 +933,7 @@ void schedule_burn_down(room_data *room);
 void schedule_check_unload(room_data *room, bool offset);
 void schedule_trench_fill(struct map_data *map);
 void set_burn_down_time(room_data *room, time_t when, bool schedule_burn);
-void set_room_damage(room_data *room, int damage_amount);
+void set_room_damage(room_data *room, double damage_amount);
 void setup_start_locations();
 int sort_exits(struct room_direction_data *a, struct room_direction_data *b);
 void start_burning(room_data *room);

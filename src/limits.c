@@ -190,11 +190,17 @@ bool check_idling(char_data *ch) {
 	}
 
 	ch->char_specials.timer++;
+	
+	// delay idle-out if active and acting
+	if (ch->desc && !IS_NPC(ch) && GET_ACTION(ch) != ACT_NONE && ch->char_specials.timer < config_get_int("idle_action_rent_time")) {
+		return TRUE;
+	}
 
-	if ((ch->desc && ch->char_specials.timer > config_get_int("idle_rent_time")) || (!ch->desc && ch->char_specials.timer > config_get_int("idle_linkdead_rent_time"))) {
+	if (ch->char_specials.timer > (ch->desc ? config_get_int("idle_rent_time") : config_get_int("idle_linkdead_rent_time"))) {
 		return perform_idle_out(ch);
 	}
 	
+	// survived this long
 	return TRUE;
 }
 
@@ -614,7 +620,7 @@ void real_update_char(char_data *ch) {
 		return;
 	}
 	// earthmeld damage
-	if (!IS_NPC(ch) && !IS_IMMORTAL(ch) && AFF_FLAGGED(ch, AFF_EARTHMELD) && ROOM_IS_CLOSED(IN_ROOM(ch))) {
+	if (!IS_NPC(ch) && !IS_IMMORTAL(ch) && AFF_FLAGGED(ch, AFF_EARTHMELD) && IS_COMPLETE(IN_ROOM(ch)) && (ROOM_IS_CLOSED(IN_ROOM(ch)) || ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_BARRIER))) {
 		if (!affected_by_spell(ch, ATYPE_NATURE_BURN)) {
 			msg_to_char(ch, "You are beneath a building and begin taking nature burn as the earth you're buried in is separated from fresh air...\r\n");
 		}

@@ -223,6 +223,7 @@ ACMD(do_identify);
 ACMD(do_ignore);
 ACMD(do_import);
 ACMD(do_infiltrate);
+ACMD(do_informative);
 ACMD(do_instance);
 ACMD(do_inspire);
 ACMD(do_insult);
@@ -780,8 +781,9 @@ cpp_extern const struct command_info cmd_info[] = {
 	SCMD_CMD( "import", POS_DEAD, do_import, NO_MIN, CTYPE_UTIL, TRADE_IMPORT ),
 	SCMD_CMD( "imotd", POS_DEAD, do_gen_text_string, LVL_START_IMM, CTYPE_IMMORTAL, TEXT_FILE_IMOTD ),
 	SIMPLE_CMD( "infiltrate", POS_STANDING, do_infiltrate, NO_MIN, CTYPE_MOVE ),
-	GRANT_CMD( "instance", POS_DEAD, do_instance, LVL_CIMPL, CTYPE_IMMORTAL, GRANT_INSTANCE ),
 	SCMD_CMD( "info", POS_DEAD, do_gen_text_string, NO_MIN, CTYPE_UTIL, TEXT_FILE_INFO ),
+	SIMPLE_CMD( "informative", POS_DEAD, do_informative, NO_MIN, CTYPE_UTIL ),
+	GRANT_CMD( "instance", POS_DEAD, do_instance, LVL_CIMPL, CTYPE_IMMORTAL, GRANT_INSTANCE ),
 	ABILITY_CMD( "inspire", POS_STANDING, do_inspire, NO_MIN, CTYPE_SKILL, ABIL_INSPIRE ),
 	SIMPLE_CMD( "insult", POS_RESTING, do_insult, NO_MIN, CTYPE_COMM ),
 	SIMPLE_CMD( "interlink", POS_STANDING, do_interlink, NO_MIN, CTYPE_BUILD ),

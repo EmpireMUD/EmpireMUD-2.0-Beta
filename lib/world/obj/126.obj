@@ -641,7 +641,7 @@ blows in the wind when you put it down.
 C
 1 1
 R
-5611 0
+4 5611 0
 S
 #12685
 lint pocket magiterranean~
@@ -677,9 +677,9 @@ floss from sugar.
 6 12687 0
 10 168
 R
-5621 0
+4 5621 0
 R
-5193 0
+4 5193 0
 S
 #12689
 bolt cloth candy~
@@ -687,7 +687,7 @@ a bolt of candy cloth~
 A bolt of candy cloth is sitting out.~
 This strange, sweet cloth is woven from sugar and yet surprisingly durable.
 ~
-6 l a 0 8
+6 l a 0 9
 2 0 0
 11 0
 M
@@ -696,10 +696,10 @@ You hang some candy cloth on $V.~
 M
 7
 $n hangs some candy cloth on $V.~
-O+ 1 6800
+O+ 1 6801
 R
-5193 0
+4 5193 0
 R
-5621 0
+4 5621 0
 S
 $

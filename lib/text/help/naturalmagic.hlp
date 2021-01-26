@@ -349,8 +349,12 @@ Natural Magic. You can do nothing while interred within the earth, but it is
 often the safest place to be.
 
 However, you will take damage from nature burn if someone is digging in the
-dirt while you're earthmelded. You stop taking nature burn damage as soon as
-you end your earthmeld.
+dirt while you're earthmelded. Being underneath a building or barrier can also
+cause nature burn. You stop taking nature burn damage as soon as you end your
+earthmeld.
+
+You cannot enter or leave earthmeld under map tiles that are enclosed buildings
+or barriers.
 
 Gains experience when you sink into the ground.
 

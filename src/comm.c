@@ -2936,7 +2936,7 @@ char *make_prompt(descriptor_data *d) {
 		*prompt = '\0';
 		
 		// show idle after 10 minutes
-		if ((d->character->char_specials.timer * SECS_PER_MUD_HOUR / SECS_PER_REAL_MIN) >= 10) {
+		if ((d->character->char_specials.timer * SECS_PER_MUD_HOUR / SECS_PER_REAL_MIN) >= 5) {
 			strcat(prompt, "\tr[IDLE]\t0 ");
 		}
 
