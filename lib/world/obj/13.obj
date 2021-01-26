@@ -422,29 +422,6 @@ a bolt of cotton cloth~
 A bolt of cotton cloth is lying on the ground.~
 This simple cloth is used to sew clothing.
 ~
-3 l a 0 8
-0 0 0
-11 0
-C
-1 1
-M
-6
-You hang some cloth on $V.~
-M
-7
-$n hangs some cloth on $V.~
-O+ 1 6800
-R
-4 5137 0
-R
-4 5134 0
-S
-#1360
-cloth wool bolt~
-a bolt of wool cloth~
-A bolt of wool cloth is sitting here.~
-This simple cloth is used to sew clothing.
-~
 3 l a 0 9
 0 0 0
 11 0
@@ -456,7 +433,30 @@ You hang some cloth on $V.~
 M
 7
 $n hangs some cloth on $V.~
-O+ 1 6800
+O+ 1 6801
+R
+4 5137 0
+R
+4 5134 0
+S
+#1360
+cloth wool bolt~
+a bolt of wool cloth~
+A bolt of wool cloth is sitting here.~
+This simple cloth is used to sew clothing.
+~
+3 l a 0 10
+0 0 0
+11 0
+C
+1 1
+M
+6
+You hang some cloth on $V.~
+M
+7
+$n hangs some cloth on $V.~
+O+ 1 6801
 R
 4 5137 0
 R
@@ -485,12 +485,12 @@ A bolt of llama wool cloth is lying here.~
    Often smoother and warmer than sheep wool, llama wool cloth can be used to
 sew clothing.
 ~
-3 0 a 0 3
+3 0 a 0 4
 0 0 0
 11 0
 C
 1 1
-O+ 1 6800
+O+ 1 6801
 R
 4 5137 0
 R
