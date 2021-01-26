@@ -178,12 +178,18 @@ char *exit_description(char_data *ch, room_data *room, const char *prefix) {
 
 
 /**
-* @param empire_data *emp
+* @param char_data *ch Optional: The player looking at it. (May be NULL)
+* @param empire_data *emp The empire to get a color for.
 * @return char* The background color that's a good fit for the banner color
 */
-const char *get_banner_complement_color(empire_data *emp) {
+const char *get_banner_complement_color(char_data *ch, empire_data *emp) {
 	if (!emp) {
 		return "";
+	}
+	
+	// no extended colors? Send a gray background and hope for the best -- otherwise there's a risk of no-contrast coloring
+	if (!ch || !ch->desc || !ch->desc->pProtocol->pVariables[eMSDP_XTERM_256_COLORS]->ValueInt) {
+		return "\t[B111]";
 	}
 
 	if (strchrstr(EMPIRE_BANNER(emp), "rRtT")) {
@@ -1963,7 +1969,7 @@ static void show_map_to_char(char_data *ch, struct mappc_data_container *mappc, 
 
 		if (PRF_FLAGGED(ch, PRF_POLITICAL) && !show_dark) {
 			if (GET_LOYALTY(ch) && (GET_LOYALTY(ch) == ROOM_OWNER(to_room) || find_city(GET_LOYALTY(ch), to_room)) && is_in_city_for_empire(to_room, GET_LOYALTY(ch), FALSE, &junk)) {
-				strcpy(temp, get_banner_complement_color(GET_LOYALTY(ch)));
+				strcpy(temp, get_banner_complement_color(ch, GET_LOYALTY(ch)));
 				need_color_terminator = TRUE;
 			}
 			else {
