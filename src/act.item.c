@@ -1345,7 +1345,7 @@ void do_shop_identify(char_data *ch, obj_data *shop_obj) {
 	
 	// temporarily put it in the room to inherit scale constraints
 	obj_to_room(obj, IN_ROOM(ch));
-	scale_item_to_level(obj, get_approximate_level(ch));
+	scale_item_to_level(obj, GET_HIGHEST_KNOWN_LEVEL(ch));
 	obj_from_room(obj);
 	
 	// show id and desc
@@ -4585,7 +4585,7 @@ ACMD(do_buy) {
 			// load the object before the buy trigger, in case
 			obj = read_object(item->vnum, TRUE);
 			obj_to_char(obj, ch);
-			scale_item_to_level(obj, 1);
+			scale_item_to_level(obj, GET_HIGHEST_KNOWN_LEVEL(ch));
 			
 			if (!check_buy_trigger(ch, stl->from_mob, obj, item->cost, item->currency)) {
 				// triggered: purchase failed
