@@ -804,7 +804,7 @@ void show_craft_info(char_data *ch, char *argument, int craft_type) {
 	if (GET_CRAFT_REQUIRES_FUNCTION(craft)) {
 		prettier_sprintbit(GET_CRAFT_REQUIRES_FUNCTION(craft), function_flags_long, buf);
 		if (*buf) {
-			msg_to_char(ch, "Must be: %s%s\t0\r\n", room_has_function_and_city_ok(GET_LOYALTY(ch), IN_ROOM(ch), GET_CRAFT_REQUIRES_FUNCTION(craft)) ? "" : "\tr", buf);
+			msg_to_char(ch, "Must be: %s\r\n", buf);
 		}
 	}
 	
