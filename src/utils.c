@@ -786,6 +786,9 @@ bool process_import_one(empire_data *emp) {
 	obj_data *orn;
 	double cost;
 	
+	// round to %.1f
+	#define IMPORT_ROUND(amt)  (((int)((amt) * 10)) / 10.0)
+	
 	// find trading partners
 	HASH_ITER(hh, empire_table, partner, next_partner) {
 		if (is_trading_with(emp, partner)) {
@@ -815,7 +818,7 @@ bool process_import_one(empire_data *emp) {
 			if (!(p_trade = find_trade_entry(plt->emp, TRADE_EXPORT, trade->vnum))) {
 				continue;	// not trading this item
 			}
-			if ((p_trade->cost * (1.0/plt->rate)) > trade->cost) {
+			if (IMPORT_ROUND(p_trade->cost * (1.0/plt->rate)) > trade->cost) {
 				continue;	// too expensive
 			}
 			if ((their_amt = get_total_stored_count(plt->emp, trade->vnum, FALSE)) <= p_trade->limit) {
@@ -832,7 +835,7 @@ bool process_import_one(empire_data *emp) {
 				pair->emp = plt->emp;
 				pair->amount = their_amt;
 				pair->rate = plt->rate;
-				pair->cost = p_trade->cost * (1.0/plt->rate);
+				pair->cost = IMPORT_ROUND(p_trade->cost * (1.0/plt->rate));
 				DL_APPEND(pair_list, pair);
 			}
 		}
