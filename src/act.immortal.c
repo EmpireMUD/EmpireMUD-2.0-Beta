@@ -6834,7 +6834,7 @@ void do_stat_room(char_data *ch) {
 			found = 0;
 			
 			HASH_ITER(hh, str_hash, str_iter, next_str) {
-				if (str_iter->count > 1) {
+				if (str_iter->count == 1) {
 					snprintf(buf2, sizeof(buf2), "%s %s", (found++ ? "," : ""), str_iter->str);
 				}
 				else {
