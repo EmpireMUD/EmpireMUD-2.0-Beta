@@ -93,6 +93,7 @@ See also: DOT
 Banshee
 Natural Magic Synergy Ability: 100 Vampire
 Familiar type:  debuff
+Command:  companion banshee
 
 The banshee familiar will use the following abilities in combat:
 - Soul-shattering wail: -(level/20) Resist-Physical/Magical on enemies (30 sec)
@@ -100,7 +101,7 @@ The banshee familiar will use the following abilities in combat:
 - Heart-wrenching wail: -(level/30) Bonus-Physical/Magical on enemies (30 sec)
 - Blood-curdling wail: Magical DoT on enemies (30 sec)
 
-See also: DEBUFF, FAMILIAR, DEBUFF FAMILIARS
+See also: DEBUFF, FAMILIAR, DEBUFF FAMILIARS, COMPANION, DISMISS
 #
 "ASTRAL WEREWOLF FORM"
 
@@ -119,6 +120,7 @@ See also: CASTER, MORPH
 Basilisk
 Natural Magic Synergy Ability: 100 Survival
 Familiar type:  debuff
+Command:  companion basilisk
 
 The basilisk familiar will use the following abilities in combat:
 - Marble gaze: +(15+level/50) Block on the tank (30 sec)
@@ -126,7 +128,7 @@ The basilisk familiar will use the following abilities in combat:
 - Basalt gaze: -(2+level/100) Wits on enemy (30 sec)
 - Granite gaze: -(15+level/25) To-Hit on enemy (30 sec)
 
-See also: DEBUFF, FAMILIAR, DEBUFF FAMILIARS
+See also: DEBUFF, FAMILIAR, DEBUFF FAMILIARS, COMPANION, DISMISS
 #
 BREW
 
@@ -301,11 +303,12 @@ death seeps into him.
 Dire Wolf
 Natural Magic Synergy Ability: 100 Battle
 Familiar type:  damage
+Command:  companion dire wolf
 
 The dire wolf will assist you in combat, adding to the damage against your
 enemy.
 
-See also: FAMILIAR
+See also: FAMILIAR, COMPANION, DISMISS
 #
 DISPIRIT DESPIRIT
 
@@ -463,11 +466,12 @@ See also: ARCANE POWER, ROLE
 Griffin
 Natural Magic Synergy Ability: 100 Trade, High Sorcery, Survival, or Stealth
 Familiar type:  tank
+Command:  companion griffin
 
 The griffin is a powerful familiar that will rescue party members in combat,
 and tank for them.
 
-See also: FAMILIAR
+See also: FAMILIAR, COMPANION, DISMISS
 #
 HASTEN HASTE
 
@@ -573,17 +577,19 @@ Gains experience when you cast this spell.
 Manticore
 Natural Magic Synergy Ability: 100 Trade or Stealth
 Familiar type:  melee
+Command:  companion manticore
 
 The manticore will assist you in combat, adding to the damage against your
 enemy.
 
-See also: FAMILIAR
+See also: FAMILIAR, COMPANION, DISMISS
 #
 "MOON RABBIT FAMILIAR"
 
 Moon Rabbit
 Natural Magic Synergy Ability: 100 Battle
 Familiar type:  buff
+Command:  companion moon rabbit
 
 The moon rabbit familiar will use the following abilities in combat:
 - Replenish: +(scaled amount) Mana to master (instant)
@@ -591,7 +597,7 @@ The moon rabbit familiar will use the following abilities in combat:
 - Bright as the moon: +(level/20) Resist-Physical/Magical on party (30 sec)
 - Moon's protection: +(level/5) Resist-Physical/Magical on the tank (30 sec)
 
-See also: BUFF, FAMILIAR, BUFF FAMILIARS
+See also: BUFF, FAMILIAR, BUFF FAMILIARS, COMPANION, DISMISS
 #
 MOONRISE
 
@@ -635,6 +641,7 @@ See also: BREW, HEALING ELIXIRS, QUAFF
 Owl Shadow
 Natural Magic Synergy Ability: 100 Stealth
 Familiar type:  buff
+Command:  companion owl shadow
 
 The owl shadow familiar will use the following abilities in combat:
 - Dark Wings: +(15+level/25) Dodge on tank (30 sec)
@@ -644,13 +651,14 @@ The owl shadow familiar will use the following abilities in combat:
 
 When you hide, this familiar will hide too.
 
-See also: BUFF, FAMILIAR, BUFF FAMILIARS
+See also: BUFF, FAMILIAR, BUFF FAMILIARS, COMPANION, DISMISS
 #
 "PHOENIX FAMILIAR"
 
 Phoenix
 Natural Magic Synergy Ability: 100 High Sorcery
 Familiar type:  buff
+Command:  companion phoenix
 
 The phoenix familiar will use the following abilities in combat:
 - Blaze with Power: +(level/20) bonus healing to master (30 sec)
@@ -658,7 +666,7 @@ The phoenix familiar will use the following abilities in combat:
 - Healing Fire: smaller heal for the whole party (instant)
 - Burning Passion: +(level/30) bonus physical/magical damage to party (30 sec)
 
-See also: BUFF, FAMILIAR, BUFF FAMILIARS
+See also: BUFF, FAMILIAR, BUFF FAMILIARS, COMPANION, DISMISS
 #
 PURIFY
 
@@ -767,6 +775,7 @@ See also: MORPH
 Salamander
 Natural Magic Synergy Ability: 100 Trade
 Familiar type:  buff
+Command:  companion salamander
 
 The salamander familiar will use the following abilities in combat:
 - Alchemist's Fire: +(level/4) Bonus-Healing on master (10 sec)
@@ -774,7 +783,7 @@ The salamander familiar will use the following abilities in combat:
 - Guardian flames: +(15+level/25) Dodge on tank (10 sec)
 - Ember surge: +(level/30) Bonus-Physical/Magical on party (30 sec)
 
-See also: BUFF, FAMILIAR, BUFF FAMILIARS
+See also: BUFF, FAMILIAR, BUFF FAMILIARS, COMPANION, DISMISS
 #
 "SAVAGE WEREWOLF FORM"
 
@@ -793,6 +802,7 @@ See also: MORPH
 Scorpion Shadow
 Natural Magic Synergy Ability: 100 Stealth
 Familiar type:  debuff
+Command:  companion scorpion shadow
 
 The scorpion shadow familiar will use the following abilities in combat:
 - Creeping Venom: slows an enemy (30 sec)
@@ -802,18 +812,19 @@ The scorpion shadow familiar will use the following abilities in combat:
 
 When you hide, this familiar will hide too.
 
-See also: DEBUFF, FAMILIAR, DEBUFF FAMILIARS
+See also: DEBUFF, FAMILIAR, DEBUFF FAMILIARS, COMPANION, DISMISS
 #
 "SKELETAL HULK FAMILIAR"
 
 Skeletal Hulk
 Natural Magic Synergy Ability: 100 Vampire
 Familiar type:  melee
+Command:  companion skeletal hulk
 
 The skeletal hulk will assist you in combat, adding to the damage against your
 enemy.
 
-See also: FAMILIAR
+See also: FAMILIAR, COMPANION, DISMISS
 #
 SKYBRAND
 
@@ -871,6 +882,7 @@ See also: SOULMASK
 Spirit Wolf
 Natural Magic Synergy Ability: 100 Battle
 Familiar type:  debuff
+Command:  companion spirit wolf
 
 The spirit wolf familiar will use the following abilities in combat:
 - Bolt of Lightning: -(level/100) Dexterity on enemy (30 sec)
@@ -878,7 +890,7 @@ The spirit wolf familiar will use the following abilities in combat:
 - Bark/Blurred Vision: -(15+level/25) To-Hit on enemy (30 sec)
 - Bite/Ghost Energy: Magical DoT on enemy (30 sec)
 
-See also: DEBUFF, FAMILIAR, DEBUFF FAMILIARS
+See also: DEBUFF, FAMILIAR, DEBUFF FAMILIARS, COMPANION, DISMISS
 #
 "SUMMON ANIMALS"
 
