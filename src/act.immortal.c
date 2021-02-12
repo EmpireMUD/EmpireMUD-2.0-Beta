@@ -6642,7 +6642,7 @@ void do_stat_object(char_data *ch, obj_data *j) {
 
 /* Displays the vital statistics of IN_ROOM(ch) to ch */
 void do_stat_room(char_data *ch) {
-	char buf1[MAX_STRING_LENGTH], buf2[MAX_STRING_LENGTH], buf3[MAX_STRING_LENGTH], *nstr;
+	char buf[MAX_STRING_LENGTH], buf1[MAX_STRING_LENGTH], buf2[MAX_STRING_LENGTH], buf3[MAX_STRING_LENGTH], *nstr;
 	struct depletion_data *dep;
 	struct empire_city_data *city;
 	struct time_info_data tinfo;
@@ -6664,6 +6664,8 @@ void do_stat_room(char_data *ch) {
 	double latitude, longitude;
 	struct map_data *map;
 	vehicle_data *veh;
+	struct string_hash *str_iter, *next_str, *str_hash = NULL;
+	size_t size;
 	
 	if (ROOM_SECT_FLAGGED(IN_ROOM(ch), SECTF_HAS_CROP_DATA) && (cp = ROOM_CROP(IN_ROOM(ch)))) {
 		strcpy(buf2, GET_CROP_NAME(cp));
@@ -6819,25 +6821,46 @@ void do_stat_room(char_data *ch) {
 	}
 	
 	if (ROOM_CONTENTS(IN_ROOM(ch))) {
-		sprintf(buf, "Contents:&g");
-		found = 0;
+		// build contents list
 		DL_FOREACH2(ROOM_CONTENTS(IN_ROOM(ch)), j, next_content) {
-			if (!CAN_SEE_OBJ(ch, j))
+			if (!CAN_SEE_OBJ(ch, j)) {
 				continue;
-			sprintf(buf2, "%s %s", found++ ? "," : "", GET_OBJ_DESC(j, ch, OBJ_DESC_SHORT));
-			strcat(buf, buf2);
-			if (strlen(buf) >= 62) {
-				if (j->next_content)
-					send_to_char(strcat(buf, ",\r\n"), ch);
-				else
-					send_to_char(strcat(buf, "\r\n"), ch);
-				*buf = found = 0;
 			}
+			add_string_hash(&str_hash, GET_OBJ_DESC(j, ch, OBJ_DESC_SHORT), 1);
 		}
-
-		if (*buf)
-			send_to_char(strcat(buf, "\r\n"), ch);
-		send_to_char("&0", ch);
+		
+		if (str_hash) {
+			size = snprintf(buf, sizeof(buf), "Contents:\tg");
+			found = 0;
+			
+			HASH_ITER(hh, str_hash, str_iter, next_str) {
+				if (str_iter->count > 1) {
+					snprintf(buf2, sizeof(buf2), "%s %s", (found++ ? "," : ""), str_iter->str);
+				}
+				else {
+					snprintf(buf2, sizeof(buf2), "%s %s (x%d)", (found++ ? "," : ""), str_iter->str, str_iter->count);
+				}
+				if (size + strlen(buf2) > 79 && *buf) {
+					// end of line
+					msg_to_char(ch, "%s%s\r\n", buf, (found > 1) ? "," : "");
+					found = 0;
+					size = 0;
+					*buf = '\0';
+				}
+				else {
+					// append to line
+					strcat(buf, buf2);
+					size += strlen(buf2);
+				}
+				free_string_hash(&str_hash);
+			}
+			
+			// anything left?
+			if (*buf) {
+				msg_to_char(ch, "%s\r\n", buf);
+			}
+			send_to_char("\t0", ch);
+		}
 	}
 	
 	// empire citizens
