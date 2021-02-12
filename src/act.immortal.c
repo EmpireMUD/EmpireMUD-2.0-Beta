@@ -6852,8 +6852,8 @@ void do_stat_room(char_data *ch) {
 					strcat(buf, buf2);
 					size += strlen(buf2);
 				}
-				free_string_hash(&str_hash);
 			}
+			free_string_hash(&str_hash);
 			
 			// anything left?
 			if (*buf) {
