@@ -1693,7 +1693,7 @@ See also: FILL, TRENCH
 PROGRESS PROGRESSION "EMPIRE PROGRESSION" "PROGRESS GOALS" "PROGRESSION GOALS" "PROGRESS POINTS" GOAL GOALS
 
 Usage:  progress [category]
-        progress [info] [goal name]
+        progress [info] [goal/reward name]
         progress buy [reward name]
         progress <completed | purchased> [category]
         progress summary
