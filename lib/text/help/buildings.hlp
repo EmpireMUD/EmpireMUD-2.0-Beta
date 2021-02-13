@@ -105,7 +105,7 @@ Basic buildings granted by the Build ability:
   (==) house
   &y.&0[]&y.&0 pueblo
   &y[==]&0 cliffdwelling
-  &t(&c~~&t) well
+  &t(&c~~&t)&0 well
   &y/&0[]&y\&0 mine
   (FF) forge
   (MM) mill  (must be by a river)
