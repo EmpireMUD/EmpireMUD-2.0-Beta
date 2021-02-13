@@ -1211,6 +1211,9 @@ WOODWORKING "WOOD WORKING"
 
 Woodworking (Trade ability)
 
+This ability lets you craft items from wood, and lets you saw or scrape trees
+faster.
+
 With Woodworking you can craft:
   flute
   shortbow
@@ -1232,6 +1235,6 @@ With Woodworking you can craft:
 Many of these crafts require you to equip a good knife.
 * Crafts marked with an asterisk require the Carpenter building.
 
-See also: CRAFT, LAND VEHICLES
+See also: CRAFT, LAND VEHICLES, SAW, SCRAPE
 #
 $
