@@ -4711,21 +4711,21 @@ SHOW(show_account) {
 		
 		if (GET_ACCOUNT(loaded)->id == acc_id) {
 			if (!loaded_file) {
-				msg_to_char(ch, " &c[%d %s] %s (online)&0\r\n", GET_COMPUTED_LEVEL(loaded), skills, GET_PC_NAME(loaded));
+				msg_to_char(ch, " &c[%d %s] %s  (online)&0\r\n", GET_COMPUTED_LEVEL(loaded), skills, GET_PC_NAME(loaded));
 				last_online = ONLINE_NOW;
 			}
 			else {
 				// not playing but same account
 				ago_ptr = strcpy(ago_buf, simple_time_since(loaded->prev_logon));
 				skip_spaces(&ago_ptr);
-				msg_to_char(ch, " [%d %s] %s (%s ago)\r\n", GET_LAST_KNOWN_LEVEL(loaded), skills, GET_PC_NAME(loaded), ago_ptr);
+				msg_to_char(ch, " [%d %s] %s  (%s ago)\r\n", GET_LAST_KNOWN_LEVEL(loaded), skills, GET_PC_NAME(loaded), ago_ptr);
 				if (last_online != ONLINE_NOW) {
 					last_online = MAX(last_online, loaded->prev_logon);
 				}
 			}
 		}
 		else {
-			msg_to_char(ch, " &r[%d %s] %s (not on account)&0\r\n", loaded_file ? GET_LAST_KNOWN_LEVEL(loaded) : GET_COMPUTED_LEVEL(loaded), skills, GET_PC_NAME(loaded));
+			msg_to_char(ch, " &r[%d %s] %s  (not on account)&0\r\n", loaded_file ? GET_LAST_KNOWN_LEVEL(loaded) : GET_COMPUTED_LEVEL(loaded), skills, GET_PC_NAME(loaded));
 		}
 		
 		if (loaded_file) {
