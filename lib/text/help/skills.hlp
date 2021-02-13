@@ -397,7 +397,10 @@ Temperate: plains
 Arid: desert
 Jungle: light jungle (partially chopped but not plains)
 
-See also: CROPS, HARVEST, PICK
+Some crops can only be planted within 4 tiles of a fresh water source such as a
+river. You can irrigate any terrain, including deserts, by making canals.
+
+See also: CROPS, HARVEST, PICK, FARMING, WORKFORCE CHORES, IRRIGATION
 #
 PRESS PRESSING OILMAKING "OIL MAKING"
 
