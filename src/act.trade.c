@@ -605,7 +605,7 @@ bool obj_has_apply_type(obj_data *obj, int apply_type) {
 * @param craft_data *craft The craft recipe for the building.
 */
 void resume_craft_building(char_data *ch, craft_data *craft) {
-	char buf[MAX_STRING_LENGTH];
+	char buf[MAX_STRING_LENGTH], bld_name[256], the_buf[256];
 	
 	if (!ch || IS_NPC(ch) || !craft || !IS_INCOMPLETE(IN_ROOM(ch))) {
 		return;
@@ -620,8 +620,16 @@ void resume_craft_building(char_data *ch, craft_data *craft) {
 	start_action(ch, ACT_BUILDING, 0);
 	GET_ACTION_VNUM(ch, 0) = GET_CRAFT_VNUM(craft);
 	
-	msg_to_char(ch, "You go back to work on the %s!\r\n", GET_CRAFT_NAME(craft));
-	sprintf(buf, "$n goes back to work on the %s!", GET_CRAFT_NAME(craft));
+	strcpy(bld_name, GET_BUILDING(IN_ROOM(ch)) ? GET_BLD_NAME(GET_BUILDING(IN_ROOM(ch))) : GET_CRAFT_NAME(craft));
+	if (strn_cmp(bld_name, "the ", 4) && strn_cmp(bld_name, "a ", 2) && strn_cmp(bld_name, "an ", 3)) {
+		strcpy(the_buf, "the ");
+	}
+	else {
+		*the_buf = '\0';
+	}
+	
+	msg_to_char(ch, "You go back to work on %s%s!\r\n", the_buf, bld_name);
+	sprintf(buf, "$n goes back to work on %s%s!", the_buf, bld_name);
 	act(buf, FALSE, ch, NULL, NULL, TO_ROOM);
 }
 
