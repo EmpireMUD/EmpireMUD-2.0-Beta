@@ -4660,7 +4660,7 @@ SHOW(show_uses) {
 SHOW(show_account) {
 	player_index_data *plr_index = NULL, *index, *next_index;
 	bool file = FALSE, loaded_file = FALSE;
-	char skills[MAX_STRING_LENGTH];
+	char skills[MAX_STRING_LENGTH], ago_buf[256], *ago_ptr;
 	char_data *plr = NULL, *loaded;
 	int acc_id = NOTHING;
 	time_t last_online = -1;	// -1 here will indicate no data, -2 will indicate online now
@@ -4716,7 +4716,9 @@ SHOW(show_account) {
 			}
 			else {
 				// not playing but same account
-				msg_to_char(ch, " [%d %s] %s (%s ago)\r\n", GET_LAST_KNOWN_LEVEL(loaded), skills, GET_PC_NAME(loaded), simple_time_since(loaded->prev_logon));
+				ago_ptr = strcpy(ago_buf, simple_time_since(loaded->prev_logon));
+				skip_spaces(&ago_ptr);
+				msg_to_char(ch, " [%d %s] %s (%s ago)\r\n", GET_LAST_KNOWN_LEVEL(loaded), skills, GET_PC_NAME(loaded), ago_ptr);
 				if (last_online != ONLINE_NOW) {
 					last_online = MAX(last_online, loaded->prev_logon);
 				}
@@ -4733,7 +4735,9 @@ SHOW(show_account) {
 	}
 	
 	if (last_online > 0) {
-		msg_to_char(ch, " (last online: %-24.24s, %s ago)\r\n", ctime(&last_online), simple_time_since(last_online));
+		ago_ptr = strcpy(ago_buf, simple_time_since(last_online));
+		skip_spaces(&ago_ptr);
+		msg_to_char(ch, " (last online: %-24.24s, %s ago)\r\n", ctime(&last_online), ago_ptr);
 	}
 	
 	if (plr && file) {
@@ -8868,7 +8872,7 @@ ACMD(do_island) {
 ACMD(do_last) {
 	char_data *plr = NULL;
 	bool file = FALSE;
-	char status[10];
+	char status[10], ago_buf[256], *ago_ptr;
 
 	one_argument(argument, arg);
 
@@ -8886,7 +8890,9 @@ ACMD(do_last) {
 		// crlf built into ctime
 		msg_to_char(ch, "[%5d] [%s] %-12s : %-18s : %-20s", GET_IDNUM(plr), status, GET_PC_NAME(plr), plr->desc ? plr->desc->host : plr->prev_host, file ? ctime(&plr->prev_logon) : ctime(&plr->player.time.logon));
 		if (file) {
-			msg_to_char(ch, "Last online %s ago\r\n", simple_time_since(plr->prev_logon));
+			ago_ptr = strcpy(ago_buf, simple_time_since(plr->prev_logon));
+			skip_spaces(&ago_ptr);
+			msg_to_char(ch, "Last online %s ago\r\n", ago_ptr);
 		}
 	}
 	
