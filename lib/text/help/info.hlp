@@ -934,7 +934,7 @@ a water source, it will slowly turn into a canal. Afterwards, the desert around
 it will begin to change terrain type and you can plant crops or grow trees on
 the irrigated terrain. This happens up to 2 tiles away from the canal.
 
-See also: PLANT, FARMING
+See also: EXCAVATE, PLANT, FARMING
 #
 LEVEL LEVELS "GEAR LEVELS" "SKILL LEVEL" "COMPOSITE LEVEL" "TOTAL LEVEL"
 
