@@ -4716,7 +4716,7 @@ SHOW(show_account) {
 			}
 			else {
 				// not playing but same account
-				msg_to_char(ch, " [%d %s] %s\r\n", GET_LAST_KNOWN_LEVEL(loaded), skills, GET_PC_NAME(loaded));
+				msg_to_char(ch, " [%d %s] %s (%s ago)\r\n", GET_LAST_KNOWN_LEVEL(loaded), skills, GET_PC_NAME(loaded), simple_time_since(loaded->prev_logon));
 				if (last_online != ONLINE_NOW) {
 					last_online = MAX(last_online, loaded->prev_logon);
 				}
@@ -4733,7 +4733,7 @@ SHOW(show_account) {
 	}
 	
 	if (last_online > 0) {
-		msg_to_char(ch, " (last online: %-24.24s)\r\n", ctime(&last_online));
+		msg_to_char(ch, " (last online: %-24.24s, %s ago)\r\n", ctime(&last_online), simple_time_since(last_online));
 	}
 	
 	if (plr && file) {
@@ -8885,6 +8885,9 @@ ACMD(do_last) {
 		strcpy(status, level_names[(int) GET_ACCESS_LEVEL(plr)][0]);
 		// crlf built into ctime
 		msg_to_char(ch, "[%5d] [%s] %-12s : %-18s : %-20s", GET_IDNUM(plr), status, GET_PC_NAME(plr), plr->desc ? plr->desc->host : plr->prev_host, file ? ctime(&plr->prev_logon) : ctime(&plr->player.time.logon));
+		if (file) {
+			msg_to_char(ch, "Last online %s ago\r\n", simple_time_since(plr->prev_logon));
+		}
 	}
 	
 	if (plr && file) {
