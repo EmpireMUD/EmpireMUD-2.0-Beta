@@ -7065,7 +7065,12 @@ ACMD(do_territory) {
 			total += node->count;
 			
 			if (!full) {
-				lsize = snprintf(line, sizeof(line), "%2d tile%s near%s %s\r\n", node->count, (node->count != 1 ? "s" : ""), coord_display_room(ch, node->loc, TRUE), get_room_name(node->loc, FALSE));
+				if (node->count > 1) {
+					lsize = snprintf(line, sizeof(line), "%2d tiles near%s %s\r\n", node->count, coord_display_room(ch, node->loc, TRUE), get_room_name(node->loc, FALSE));
+				}
+				else {
+					lsize = snprintf(line, sizeof(line), "%s %s\r\n", coord_display_room(ch, node->loc, TRUE), get_room_name(node->loc, FALSE));
+				}
 				
 				if (size + lsize < sizeof(buf)) {
 					strcat(buf, line);
