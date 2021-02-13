@@ -444,7 +444,7 @@ void olc_fullsearch_room_template(char_data *ch, char *argument) {
 		skip_spaces(&argument);
 	}
 	
-	size = snprintf(buf, sizeof(buf), "Room template fullsearch: %s\r\n", find_keywords);
+	size = snprintf(buf, sizeof(buf), "Room template fullsearch: %s\r\n", show_color_codes(find_keywords));
 	count = 0;
 	
 	// okay now look up templates
