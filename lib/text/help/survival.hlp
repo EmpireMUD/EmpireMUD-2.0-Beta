@@ -368,13 +368,14 @@ Stamina increases the rate at which you recover movement points.
 
 Gains experience when moving.
 #
-SWIMMING
+SWIMMING DROWNING
 
 Swimming (Survival ability)
 
 Swimming allows you to move through river and ocean squares without a canoe
 or ship. However, sharks are attracted to the splashing of swimmers and will
-attack you if you are in the ocean.
+attack you if you are in the ocean. You will lose movement points constantly
+while swimming, and will drown if you run out of moves completely.
 
 You must type 'swim' to enter a water tile from land. This keeps players from
 wasting movement points or wandering into the mouth of a shark.
