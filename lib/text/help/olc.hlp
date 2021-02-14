@@ -8464,6 +8464,13 @@ Usage:  .speed
 The SPEED trait indicates how many speed bonuses are granted to the player 
 while sailing, piloting, or driving the selected vehicle.
 
+Speeds are:
+ Very Slow - cart, canoe
+ Slow - carriage, caravel, cog
+ Normal - caravan, carrack
+ Fast - heroic caravan, heroic galleon
+ Very Fast - reserved for high-level adventure rewards
+
 See also: OLC VEHICLES
 #d
 "WEALTH ITEM" "WEALTH OBJECT"
