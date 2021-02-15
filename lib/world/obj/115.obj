@@ -20,7 +20,7 @@ This trophy looks like it came from a first-place win!
 64 0 0
 4 0
 R
-5611 a
+4 5611 a
 S
 #11502
 trophy event~
@@ -32,7 +32,7 @@ This golden trophy must have come from a high-ranking event finish!
 32 0 0
 4 0
 R
-5611 a
+4 5611 a
 S
 #11503
 trophy participation~
@@ -44,7 +44,7 @@ It looks like the owner of this trophy participated in an event.
 16 0 0
 4 0
 R
-5611 a
+4 5611 a
 S
 #11505
 list supplies guild~
@@ -335,10 +335,10 @@ a tiny pixy house schematic~
 The schematic for a tiny pixy house is lying here.~
    This fragile piece of magewood bark is enscribed with the instructions for
 building a tiny pixy house. These houses are known to shrink anyone who enters
-them. Be warned, you can only use this schematic a single time.
+them.
 Usage: build pixyhouse <direction to face>
 ~
-3 0 a 0 3
+3 0 a 0 4
 0 0 0
 0 0
 S

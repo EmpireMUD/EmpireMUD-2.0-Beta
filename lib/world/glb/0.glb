@@ -461,7 +461,7 @@ M
 S
 #65
 Non-Arid Coast Spawns~
-3 0 s efkop 0-0 d
+3 0 s efkmop 0-0 d
 E
 -1 100.00
 0 0 0
@@ -476,7 +476,7 @@ M
 S
 #66
 Arid Coast Spawns~
-3 0 ks efop 0-0 d
+3 0 ks efmop 0-0 d
 E
 -1 100.00
 0 0 0
