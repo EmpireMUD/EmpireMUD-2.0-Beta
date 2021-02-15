@@ -9995,6 +9995,7 @@ ACMD(do_show) {
 		{ "crops", LVL_START_IMM, show_crops },
 		{ "dropped", LVL_START_IMM, show_dropped_items },
 		{ "players", LVL_START_IMM, show_players },
+		{ "sectors", LVL_START_IMM, show_terrain },
 		{ "terrain", LVL_START_IMM, show_terrain },
 		{ "account", LVL_TO_SEE_ACCOUNTS, show_account },
 		{ "notes", LVL_START_IMM, show_notes },
