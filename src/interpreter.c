@@ -2106,7 +2106,7 @@ void send_motd(descriptor_data *d) {
 		SEND_TO_Q(text_file_strings[TEXT_FILE_IMOTD], d);
 	}
 	else if (text_file_strings[TEXT_FILE_MOTD]) {
-		SEND_TO_Q(text_file_strings[TEXT_FILE_IMOTD], d);
+		SEND_TO_Q(text_file_strings[TEXT_FILE_MOTD], d);
 	}
 
 	SEND_TO_Q("\r\n ", d);

@@ -4660,7 +4660,7 @@ SHOW(show_uses) {
 SHOW(show_account) {
 	player_index_data *plr_index = NULL, *index, *next_index;
 	bool file = FALSE, loaded_file = FALSE;
-	char skills[MAX_STRING_LENGTH];
+	char skills[MAX_STRING_LENGTH], ago_buf[256], *ago_ptr;
 	char_data *plr = NULL, *loaded;
 	int acc_id = NOTHING;
 	time_t last_online = -1;	// -1 here will indicate no data, -2 will indicate online now
@@ -4711,19 +4711,21 @@ SHOW(show_account) {
 		
 		if (GET_ACCOUNT(loaded)->id == acc_id) {
 			if (!loaded_file) {
-				msg_to_char(ch, " &c[%d %s] %s (online)&0\r\n", GET_COMPUTED_LEVEL(loaded), skills, GET_PC_NAME(loaded));
+				msg_to_char(ch, " &c[%d %s] %s  (online)&0\r\n", GET_COMPUTED_LEVEL(loaded), skills, GET_PC_NAME(loaded));
 				last_online = ONLINE_NOW;
 			}
 			else {
 				// not playing but same account
-				msg_to_char(ch, " [%d %s] %s\r\n", GET_LAST_KNOWN_LEVEL(loaded), skills, GET_PC_NAME(loaded));
+				ago_ptr = strcpy(ago_buf, simple_time_since(loaded->prev_logon));
+				skip_spaces(&ago_ptr);
+				msg_to_char(ch, " [%d %s] %s  (%s ago)\r\n", GET_LAST_KNOWN_LEVEL(loaded), skills, GET_PC_NAME(loaded), ago_ptr);
 				if (last_online != ONLINE_NOW) {
 					last_online = MAX(last_online, loaded->prev_logon);
 				}
 			}
 		}
 		else {
-			msg_to_char(ch, " &r[%d %s] %s (not on account)&0\r\n", loaded_file ? GET_LAST_KNOWN_LEVEL(loaded) : GET_COMPUTED_LEVEL(loaded), skills, GET_PC_NAME(loaded));
+			msg_to_char(ch, " &r[%d %s] %s  (not on account)&0\r\n", loaded_file ? GET_LAST_KNOWN_LEVEL(loaded) : GET_COMPUTED_LEVEL(loaded), skills, GET_PC_NAME(loaded));
 		}
 		
 		if (loaded_file) {
@@ -4733,7 +4735,9 @@ SHOW(show_account) {
 	}
 	
 	if (last_online > 0) {
-		msg_to_char(ch, " (last online: %-24.24s)\r\n", ctime(&last_online));
+		ago_ptr = strcpy(ago_buf, simple_time_since(last_online));
+		skip_spaces(&ago_ptr);
+		msg_to_char(ch, " (last online: %-24.24s, %s ago)\r\n", ctime(&last_online), ago_ptr);
 	}
 	
 	if (plr && file) {
@@ -6642,7 +6646,7 @@ void do_stat_object(char_data *ch, obj_data *j) {
 
 /* Displays the vital statistics of IN_ROOM(ch) to ch */
 void do_stat_room(char_data *ch) {
-	char buf1[MAX_STRING_LENGTH], buf2[MAX_STRING_LENGTH], buf3[MAX_STRING_LENGTH], *nstr;
+	char buf[MAX_STRING_LENGTH], buf1[MAX_STRING_LENGTH], buf2[MAX_STRING_LENGTH], buf3[MAX_STRING_LENGTH], *nstr;
 	struct depletion_data *dep;
 	struct empire_city_data *city;
 	struct time_info_data tinfo;
@@ -6664,6 +6668,8 @@ void do_stat_room(char_data *ch) {
 	double latitude, longitude;
 	struct map_data *map;
 	vehicle_data *veh;
+	struct string_hash *str_iter, *next_str, *str_hash = NULL;
+	size_t size;
 	
 	if (ROOM_SECT_FLAGGED(IN_ROOM(ch), SECTF_HAS_CROP_DATA) && (cp = ROOM_CROP(IN_ROOM(ch)))) {
 		strcpy(buf2, GET_CROP_NAME(cp));
@@ -6819,25 +6825,46 @@ void do_stat_room(char_data *ch) {
 	}
 	
 	if (ROOM_CONTENTS(IN_ROOM(ch))) {
-		sprintf(buf, "Contents:&g");
-		found = 0;
+		// build contents list
 		DL_FOREACH2(ROOM_CONTENTS(IN_ROOM(ch)), j, next_content) {
-			if (!CAN_SEE_OBJ(ch, j))
+			if (!CAN_SEE_OBJ(ch, j)) {
 				continue;
-			sprintf(buf2, "%s %s", found++ ? "," : "", GET_OBJ_DESC(j, ch, OBJ_DESC_SHORT));
-			strcat(buf, buf2);
-			if (strlen(buf) >= 62) {
-				if (j->next_content)
-					send_to_char(strcat(buf, ",\r\n"), ch);
-				else
-					send_to_char(strcat(buf, "\r\n"), ch);
-				*buf = found = 0;
 			}
+			add_string_hash(&str_hash, GET_OBJ_DESC(j, ch, OBJ_DESC_SHORT), 1);
 		}
-
-		if (*buf)
-			send_to_char(strcat(buf, "\r\n"), ch);
-		send_to_char("&0", ch);
+		
+		if (str_hash) {
+			size = snprintf(buf, sizeof(buf), "Contents:\tg");
+			found = 0;
+			
+			HASH_ITER(hh, str_hash, str_iter, next_str) {
+				if (str_iter->count == 1) {
+					snprintf(buf2, sizeof(buf2), "%s %s", (found++ ? "," : ""), str_iter->str);
+				}
+				else {
+					snprintf(buf2, sizeof(buf2), "%s %s (x%d)", (found++ ? "," : ""), str_iter->str, str_iter->count);
+				}
+				if (size + strlen(buf2) > 79 && *buf) {
+					// end of line
+					msg_to_char(ch, "%s%s\r\n", buf, (found > 1) ? "," : "");
+					found = 0;
+					size = 0;
+					*buf = '\0';
+				}
+				else {
+					// append to line
+					strcat(buf, buf2);
+					size += strlen(buf2);
+				}
+			}
+			free_string_hash(&str_hash);
+			
+			// anything left?
+			if (*buf) {
+				msg_to_char(ch, "%s\r\n", buf);
+			}
+			send_to_char("\t0", ch);
+		}
 	}
 	
 	// empire citizens
@@ -8845,7 +8872,7 @@ ACMD(do_island) {
 ACMD(do_last) {
 	char_data *plr = NULL;
 	bool file = FALSE;
-	char status[10];
+	char status[10], ago_buf[256], *ago_ptr;
 
 	one_argument(argument, arg);
 
@@ -8862,6 +8889,11 @@ ACMD(do_last) {
 		strcpy(status, level_names[(int) GET_ACCESS_LEVEL(plr)][0]);
 		// crlf built into ctime
 		msg_to_char(ch, "[%5d] [%s] %-12s : %-18s : %-20s", GET_IDNUM(plr), status, GET_PC_NAME(plr), plr->desc ? plr->desc->host : plr->prev_host, file ? ctime(&plr->prev_logon) : ctime(&plr->player.time.logon));
+		if (file) {
+			ago_ptr = strcpy(ago_buf, simple_time_since(plr->prev_logon));
+			skip_spaces(&ago_ptr);
+			msg_to_char(ch, "Last online %s ago\r\n", ago_ptr);
+		}
 	}
 	
 	if (plr && file) {
@@ -9963,6 +9995,7 @@ ACMD(do_show) {
 		{ "crops", LVL_START_IMM, show_crops },
 		{ "dropped", LVL_START_IMM, show_dropped_items },
 		{ "players", LVL_START_IMM, show_players },
+		{ "sectors", LVL_START_IMM, show_terrain },
 		{ "terrain", LVL_START_IMM, show_terrain },
 		{ "account", LVL_TO_SEE_ACCOUNTS, show_account },
 		{ "notes", LVL_START_IMM, show_notes },

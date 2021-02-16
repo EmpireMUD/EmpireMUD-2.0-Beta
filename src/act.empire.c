@@ -2913,13 +2913,14 @@ struct find_territory_node *reduce_territory_node_list(struct find_territory_nod
 void scan_for_tile(char_data *ch, char *argument) {
 	struct find_territory_node *node_list = NULL, *node, *next_node;
 	int dir, dist, mapsize, total, x, y, check_x, check_y, over_count, dark_distance;
+	int iter, top_height, r_height, view_height;
 	char output[MAX_STRING_LENGTH], line[128], info[256], veh_string[MAX_STRING_LENGTH], temp[MAX_STRING_LENGTH], paint_str[256];
 	vehicle_data *veh, *scanned_veh;
 	struct map_data *map_loc;
-	room_data *map, *room;
+	room_data *map, *room, *block_room;
 	size_t size, lsize;
 	crop_data *crop;
-	bool ok, claimed, unclaimed, foreign, adventures;
+	bool ok, claimed, unclaimed, foreign, adventures, check_blocking, is_blocked, blocking_veh;
 	size_t vsize;
 	
 	skip_spaces(&argument);
@@ -2942,6 +2943,7 @@ void scan_for_tile(char_data *ch, char *argument) {
 	foreign = !str_cmp(argument, "foreign");
 	adventures = !str_cmp(argument, "adventures") || !str_cmp(argument, "adventure");
 	dark_distance = distance_can_see_in_dark(ch);
+	check_blocking = (!PRF_FLAGGED(ch, PRF_HOLYLIGHT) && config_get_bool("line_of_sight"));
 	
 	for (x = -mapsize; x <= mapsize; ++x) {
 		for (y = -mapsize; y <= mapsize; ++y) {
@@ -2958,6 +2960,35 @@ void scan_for_tile(char_data *ch, char *argument) {
 			// darkness check
 			if (room != IN_ROOM(ch) && !can_see_in_dark_room(ch, room, FALSE) && dist > dark_distance) {
 				continue;
+			}
+			
+			// blocked view check
+			if (room != IN_ROOM(ch) && check_blocking && (!ROOM_OWNER(room) || ROOM_OWNER(room) != GET_LOYALTY(ch))) {
+				view_height = get_view_height(ch, IN_ROOM(ch));
+				is_blocked = FALSE;
+				top_height = 0;
+				for (iter = 1, block_room = straight_line(map, room, iter); iter <= dist && block_room && block_room != room; ++iter, block_room = straight_line(map, room, iter)) {
+					r_height = get_room_blocking_height(block_room, &blocking_veh);
+					
+					if (is_blocked && r_height <= top_height && (!ROOM_OWNER(block_room) || ROOM_OWNER(block_room) != GET_LOYALTY(ch))) {
+						// already blocked unless it's taller than the previous top height, or owned by the player
+						is_blocked = TRUE;	// still (this doesn't currently change)
+					}
+					else {
+						// not blocked -- record new top height (if applicable)
+						top_height = MAX(top_height, r_height);
+						
+						if (!is_blocked && (blocking_veh || ROOM_SECT_FLAGGED(block_room, SECTF_OBSCURE_VISION) || SECT_FLAGGED(BASE_SECT(block_room), SECTF_OBSCURE_VISION) || ROOM_BLD_FLAGGED(block_room, BLD_OBSCURE_VISION)) && r_height >= view_height) {
+							// rest of line will be blocked
+							is_blocked = TRUE;
+						}
+					}
+				}
+				
+				// no clear view
+				if (is_blocked && get_room_blocking_height(room, &blocking_veh) <= top_height) {
+					continue;
+				}
 			}
 			
 			// chameleon check
@@ -7034,7 +7065,12 @@ ACMD(do_territory) {
 			total += node->count;
 			
 			if (!full) {
-				lsize = snprintf(line, sizeof(line), "%2d tile%s near%s %s\r\n", node->count, (node->count != 1 ? "s" : ""), coord_display_room(ch, node->loc, TRUE), get_room_name(node->loc, FALSE));
+				if (node->count > 1) {
+					lsize = snprintf(line, sizeof(line), "%2d tiles near%s %s\r\n", node->count, coord_display_room(ch, node->loc, TRUE), get_room_name(node->loc, FALSE));
+				}
+				else {
+					lsize = snprintf(line, sizeof(line), "%s %s\r\n", coord_display_room(ch, node->loc, TRUE), get_room_name(node->loc, FALSE));
+				}
 				
 				if (size + lsize < sizeof(buf)) {
 					strcat(buf, line);

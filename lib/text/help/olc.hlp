@@ -608,8 +608,8 @@ This includes 'debuffs', which give negative abilities to enemies.
 You must always set the VIOLENT flag on a debuff.
 
 Buff abilities have the following properties:
- <&yshortduration&0> How long it lasts (at low level).
- <&ylongduration&0> How long it lasts (at class level).
+ <&yshortduration&0> How long it lasts (at low skill level).
+ <&ylongduration&0> How long it lasts (at high skill level).
  <&yaffects&0> Affect flags to set.
  <&yapply&0> Trait modifiers to give.
  <&yaffectvnum&0> Which affect (generic) to use for the buff.
@@ -8463,6 +8463,13 @@ Usage:  .speed
 
 The SPEED trait indicates how many speed bonuses are granted to the player 
 while sailing, piloting, or driving the selected vehicle.
+
+Speeds are:
+ Very Slow - cart, canoe
+ Slow - carriage, caravel, cog
+ Normal - caravan, carrack
+ Fast - heroic caravan, heroic galleon
+ Very Fast - reserved for high-level adventure rewards
 
 See also: OLC VEHICLES
 #d

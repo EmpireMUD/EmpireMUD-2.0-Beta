@@ -7785,7 +7785,7 @@ void extract_required_items(char_data *ch, struct req_data *list) {
 				break;
 			}
 			case REQ_GET_CURRENCY: {
-				add_currency(ch, req->vnum, req->needed);
+				add_currency(ch, req->vnum, -req->needed);
 				break;
 			}
 			case REQ_GET_COINS: {

@@ -1126,7 +1126,8 @@ spawns     Immort   Shows where a mob spawns on the map, similar to ".mob search
 startlocs  Immort   Shows the location of all starting location tiles.
 storage    Immort   Shows items that can be stored in a given building/room type.
 technology Immort   Shows ability techs a player has.
-terrain    Immort   Shows tile counts for all sector types (vnum/name optional).
+sectors    Immort   Shows tile counts for all sector types (vnum/name optional).
+terrain    Immort   Same as 'sectors' (for historical reasons).
 tools      Immort   Shows all objects with a given tool type.
 unlearnable Immrt   Shows stats on LEANRED crafts with no assignments.
 uses       Immort   Shows crafts (and vehicles, etc.) that use a component type.
@@ -1405,9 +1406,9 @@ Usage:  show technology <player>
 
 Lists all the ability techs the player has.
 #e
-"SHOW TERRAIN" "SHOW CROPS" "SHOW BUILDINGS"
+"SHOW TERRAIN" "SHOW CROPS" "SHOW BUILDINGS" "SHOW SECTORS"
 
-Usage:  show terrain [name/vnum]
+Usage:  show sectors [name/vnum]
         show crops [name/vnum]
         show buildings [name/vnum]
 
@@ -1415,6 +1416,9 @@ Lists the total count of each sector, crop, or building type in the world. You
 can also specify one to see a list of matching tiles in the world, with their
 owners. However, if there is a large number of tiles, you'll only be able to
 see as many as fit in the text buffer.
+
+"Show sectors" was formerly called "show terrain", which is also included for
+immortals who still use the old version.
 #e
 "SHOW TOOLS"
 

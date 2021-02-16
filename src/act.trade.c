@@ -605,7 +605,7 @@ bool obj_has_apply_type(obj_data *obj, int apply_type) {
 * @param craft_data *craft The craft recipe for the building.
 */
 void resume_craft_building(char_data *ch, craft_data *craft) {
-	char buf[MAX_STRING_LENGTH];
+	char buf[MAX_STRING_LENGTH], bld_name[256], the_buf[256];
 	
 	if (!ch || IS_NPC(ch) || !craft || !IS_INCOMPLETE(IN_ROOM(ch))) {
 		return;
@@ -620,8 +620,16 @@ void resume_craft_building(char_data *ch, craft_data *craft) {
 	start_action(ch, ACT_BUILDING, 0);
 	GET_ACTION_VNUM(ch, 0) = GET_CRAFT_VNUM(craft);
 	
-	msg_to_char(ch, "You go back to work on the %s!\r\n", GET_CRAFT_NAME(craft));
-	sprintf(buf, "$n goes back to work on the %s!", GET_CRAFT_NAME(craft));
+	strcpy(bld_name, GET_BUILDING(IN_ROOM(ch)) ? GET_BLD_NAME(GET_BUILDING(IN_ROOM(ch))) : GET_CRAFT_NAME(craft));
+	if (strn_cmp(bld_name, "the ", 4) && strn_cmp(bld_name, "a ", 2) && strn_cmp(bld_name, "an ", 3)) {
+		strcpy(the_buf, "the ");
+	}
+	else {
+		*the_buf = '\0';
+	}
+	
+	msg_to_char(ch, "You go back to work on %s%s!\r\n", the_buf, bld_name);
+	sprintf(buf, "$n goes back to work on %s%s!", the_buf, bld_name);
 	act(buf, FALSE, ch, NULL, NULL, TO_ROOM);
 }
 
@@ -665,7 +673,7 @@ void resume_craft_vehicle(char_data *ch, vehicle_data *veh, craft_data *craft) {
 * @param int craft_type Whichever CRAFT_TYPE_ the player is using.
 */
 void show_craft_info(char_data *ch, char *argument, int craft_type) {
-	char buf[MAX_STRING_LENGTH], part[MAX_STRING_LENGTH], range[MAX_STRING_LENGTH];
+	char buf[MAX_STRING_LENGTH], part[MAX_STRING_LENGTH];
 	struct obj_apply *apply;
 	ability_data *abil;
 	craft_data *craft;
@@ -705,6 +713,9 @@ void show_craft_info(char_data *ch, char *argument, int craft_type) {
 	else if ((proto = obj_proto(GET_CRAFT_OBJECT(craft)))) {
 		// build info string
 		sprintf(buf, " (%s", item_types[(int) GET_OBJ_TYPE(proto)]);
+		if (GET_OBJ_MIN_SCALE_LEVEL(proto) > 0 || GET_OBJ_MAX_SCALE_LEVEL(proto) > 0) {
+			sprintf(buf + strlen(buf), ", level %s", level_range_string(GET_OBJ_MIN_SCALE_LEVEL(proto), GET_OBJ_MAX_SCALE_LEVEL(proto), 0));
+		}
 		if (GET_OBJ_WEAR(proto) & ~ITEM_WEAR_TAKE) {
 			prettier_sprintbit(GET_OBJ_WEAR(proto) & ~ITEM_WEAR_TAKE, wear_bits, part);
 			sprintf(buf + strlen(buf), ", %s", part);
@@ -767,18 +778,11 @@ void show_craft_info(char_data *ch, char *argument, int craft_type) {
 		strcat(buf, ")");
 		strtolower(buf);
 		
-		if (GET_OBJ_MIN_SCALE_LEVEL(proto) > 0 || GET_OBJ_MAX_SCALE_LEVEL(proto) > 0) {
-			sprintf(range, " [%s]", level_range_string(GET_OBJ_MIN_SCALE_LEVEL(proto), GET_OBJ_MAX_SCALE_LEVEL(proto), 0));
-		}
-		else {
-			*range = '\0';
-		}
-		
 		if (GET_CRAFT_QUANTITY(craft) == 1) {
-			msg_to_char(ch, "Creates: %s%s%s\r\n", get_obj_name_by_proto(GET_CRAFT_OBJECT(craft)), range, buf);
+			msg_to_char(ch, "Creates: %s%s\r\n", get_obj_name_by_proto(GET_CRAFT_OBJECT(craft)), buf);
 		}
 		else {
-			msg_to_char(ch, "Creates: %dx %s%s%s\r\n", GET_CRAFT_QUANTITY(craft), get_obj_name_by_proto(GET_CRAFT_OBJECT(craft)), range, buf);
+			msg_to_char(ch, "Creates: %dx %s%s\r\n", GET_CRAFT_QUANTITY(craft), get_obj_name_by_proto(GET_CRAFT_OBJECT(craft)), buf);
 		}
 	}
 	
@@ -799,6 +803,13 @@ void show_craft_info(char_data *ch, char *argument, int craft_type) {
 	
 	if (GET_CRAFT_MIN_LEVEL(craft) > 0) {
 		msg_to_char(ch, "Requires: crafting level %d\r\n", GET_CRAFT_MIN_LEVEL(craft));
+	}
+	
+	if (GET_CRAFT_REQUIRES_FUNCTION(craft)) {
+		prettier_sprintbit(GET_CRAFT_REQUIRES_FUNCTION(craft), function_flags_long, buf);
+		if (*buf) {
+			msg_to_char(ch, "Must be: %s\r\n", buf);
+		}
 	}
 	
 	if (GET_CRAFT_REQUIRES_TOOL(craft)) {

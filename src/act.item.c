@@ -858,6 +858,10 @@ void identify_vehicle_to_char(vehicle_data *veh, char_data *ch) {
 	msg_to_char(ch, "Type: %s\r\n", skip_filler((proto && !strchr(VEH_SHORT_DESC(proto), '#')) ? VEH_SHORT_DESC(proto) : VEH_SHORT_DESC(veh)));
 	msg_to_char(ch, "Level: %d\r\n", VEH_SCALE_LEVEL(veh));
 	
+	if (VEH_FLAGGED(veh, MOVABLE_VEH_FLAGS)) {
+		msg_to_char(ch, "Speed: %s\r\n", vehicle_speed_types[VEH_SPEED_BONUSES(veh)]);
+	}
+	
 	if (VEH_PATRON(veh) && (index = find_player_index_by_idnum(VEH_PATRON(veh)))) {
 		msg_to_char(ch, "Dedicated to: %s\r\n", index->fullname);
 	}
@@ -1345,7 +1349,7 @@ void do_shop_identify(char_data *ch, obj_data *shop_obj) {
 	
 	// temporarily put it in the room to inherit scale constraints
 	obj_to_room(obj, IN_ROOM(ch));
-	scale_item_to_level(obj, get_approximate_level(ch));
+	scale_item_to_level(obj, GET_HIGHEST_KNOWN_LEVEL(ch));
 	obj_from_room(obj);
 	
 	// show id and desc
@@ -4585,7 +4589,7 @@ ACMD(do_buy) {
 			// load the object before the buy trigger, in case
 			obj = read_object(item->vnum, TRUE);
 			obj_to_char(obj, ch);
-			scale_item_to_level(obj, 1);
+			scale_item_to_level(obj, GET_HIGHEST_KNOWN_LEVEL(ch));
 			
 			if (!check_buy_trigger(ch, stl->from_mob, obj, item->cost, item->currency)) {
 				// triggered: purchase failed

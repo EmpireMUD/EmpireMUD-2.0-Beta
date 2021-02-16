@@ -273,6 +273,9 @@ const char *get_morph_desc(char_data *ch, bool long_desc_if_true) {
 			char *tmp = str_replace("#n", realname, source);
 			strcpy(output, tmp);
 			free(tmp);	// str_replace allocated this
+			if (long_desc_if_true) {
+				CAP(output);
+			}
 			return output;
 		}
 		else if (long_desc_if_true) {

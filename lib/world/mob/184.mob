@@ -10,8 +10,8 @@ D
 through trees and building dams across rivers. This one is the size of a large
 dog!
 ~
-I 4 18452 5.00 1  # LOOT: a beaver whistle
-I 4 18453 100.00 1 x  # LOOT: a gnawed walking stick
+I 4 18452 5.00 1  # LOOT: beaver whistle
+I 4 18453 100.00 1 x  # LOOT: gnawed walking stick
 T 18451
 T 18453
 T 18454
@@ -321,12 +321,12 @@ A woolly cow stares at you sheepishly.
 ~
 10 20 dfjoy 0 3
 0 0 0 11
-I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
-I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
-I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
-I 2 1358 100.00 1  # SHEAR: a bag of wool
-I 2 1358 50.00 1  # SHEAR: a bag of wool
-I 2 1358 5.00 1  # SHEAR: a bag of wool
+I 0 3012 100.00 1  # BUTCHER: fillet of raw meat
+I 0 3012 100.00 1  # BUTCHER: fillet of raw meat
+I 0 3012 100.00 1  # BUTCHER: fillet of raw meat
+I 2 1358 100.00 1  # SHEAR: bag of sheep's wool
+I 2 1358 50.00 1  # SHEAR: bag of sheep's wool
+I 2 1358 5.00 1  # SHEAR: bag of sheep's wool
 M
 0
 $n moos contentedly.~
@@ -341,13 +341,13 @@ M
 $n baas contentedly, then looks confused.~
 S
 #18487
-something horse~
+something horse definitely~
 something that definitely isn't a horse~
 Something is standing here, and you're pretty sure it's not a horse.
 ~
 100 125 bdej 0 4
 0 0 14 11
-I 3 18488 100.00 1  # BARDE: an armored whatsit
+I 3 18488 100.00 1  # BARDE: armored whatsit
 S
 #18488
 whatsit armored~

@@ -174,13 +174,15 @@ Usage:  claim [target]
 Claims the acre you're currently on for your empire. This can also be used
 to claim vehicles.
 
+To claim things inside the radius of one of your cities, try "city claim".
+
 You can't claim land that's inside another empire's city radius while at war
 with that empire.
 
 Privileged immortals can claim land/vehicles for other empires by giving the
 empire name as the last arg.
 
-See also: PRIVILEGE, ABANDON, CEDE, PUBLICIZE, TERRITORY
+See also: PRIVILEGE, ABANDON, CEDE, PUBLICIZE, TERRITORY, CITY CLAIM
 #
 DEDICATE
 

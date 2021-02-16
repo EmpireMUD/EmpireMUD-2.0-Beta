@@ -584,14 +584,9 @@ static bool can_gain_chore_resource(empire_data *emp, room_data *loc, int chore,
 	island_id = GET_ISLAND_ID(loc);
 	isle = ewt_find_island(tt, island_id);
 	
-	// check manual production limit
-	if ((limit = get_workforce_production_limit(emp, vnum)) != UNLIMITED) {
-		max = limit;
-	}
-	else {
-		max = config_get_int("max_chore_resource_per_member") * EMPIRE_MEMBERS(emp);
-		max += EMPIRE_ATTRIBUTE(emp, EATT_WORKFORCE_CAP);
-	}
+	// base cap
+	max = config_get_int("max_chore_resource_per_member") * EMPIRE_MEMBERS(emp);
+	max += EMPIRE_ATTRIBUTE(emp, EATT_WORKFORCE_CAP);
 	
 	glob_max = max;	// does not change
 	
@@ -600,6 +595,11 @@ static bool can_gain_chore_resource(empire_data *emp, room_data *loc, int chore,
 		if (emp_isle->workforce_limit[chore] > 0 && emp_isle->workforce_limit[chore] < max) {
 			max = emp_isle->workforce_limit[chore];
 		}
+	}
+	
+	// check manual production limit
+	if ((limit = get_workforce_production_limit(emp, vnum)) != UNLIMITED && limit < max) {
+		max = limit;
 	}
 
 	// do we have too much?

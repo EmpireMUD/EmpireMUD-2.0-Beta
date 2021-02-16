@@ -76,6 +76,7 @@ The following things will speed up various chores:
 - Higher level tool: fish
 - Progression goals: excavate, prospect
 - Mastery abilities: forge, sew, crafts in general
+- Woodworking ability: saw, scrape
 - Certain buildings: sew (tailor), weaving (tailor), craft (clay at potter)
 
 See also: BONUS TRAITS, FINDER, SHOVEL, TOGGLE
@@ -763,7 +764,8 @@ Most crops are used to make food and drink. Some, like cotton, have other uses.
 More crops come from adventures. Make sure you claim all your map tiles that
 have crops as unclaimed crops may vanish at the end of the year.
 
-See also: CHOP, COOK, FORAGE, HARVEST, MILL, PICK, PLANT, TAVERN, WEAVE
+See also: CHOP, COOK, FORAGE, HARVEST, MILL, PICK, PLANT, TAVERN, WEAVE,
+    IRRIGATION
 #
 APRICOTS CUCUMBERS GARLIC LEMONS SUGARCANE
 
@@ -918,6 +920,21 @@ Intelligence is used for:
  - Increasing the effect of many other spells.
 
 See also: ATTRIBUTES, CASTER, HEALER
+#
+IRRIGATION IRRIGATING IRRIGATED
+
+You can irrigate plains or desert tiles in order to grow more types of crops.
+Some temperate crops, such as rice and sugarcane, must be planted within 4
+tiles of a source of fresh water. Irrigating the desert will allow you to grow
+all types of crops, including temperate ones.
+
+To irrigate an area, excavate a canal and let it fill with water. In the
+desert, the canal will become an oasis first. If a chain of oases connects to
+a water source, it will slowly turn into a canal. Afterwards, the desert around
+it will begin to change terrain type and you can plant crops or grow trees on
+the irrigated terrain. This happens up to 2 tiles away from the canal.
+
+See also: EXCAVATE, PLANT, FARMING
 #
 LEVEL LEVELS "GEAR LEVELS" "SKILL LEVEL" "COMPOSITE LEVEL" "TOTAL LEVEL"
 
