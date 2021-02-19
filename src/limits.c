@@ -2103,10 +2103,6 @@ int health_gain(char_data *ch, bool info_only) {
 		gain = regen_by_pos[(int) GET_POS(ch)];
 		gain += GET_HEALTH_REGEN(ch);
 		
-		if (HAS_BONUS_TRAIT(ch, BONUS_HEALTH_REGEN)) {
-			gain += 1 + (get_approximate_level(ch) / 20);
-		}
-		
 		if (GET_POS(ch) == POS_SLEEPING && !AFF_FLAGGED(ch, AFF_EARTHMELD)) {
 			needed = MAX(GET_MAX_HEALTH(ch), GET_MAX_HEALTH(ch) - GET_HEALTH(ch)) + GET_HEALTH_DEFICIT(ch);
 			min = round(needed / ((double) config_get_int("max_sleeping_regen_time") / (room_has_function_and_city_ok(GET_LOYALTY(ch), IN_ROOM(ch), FNC_BEDROOM) ? 2.0 : 1.0) / SECS_PER_REAL_UPDATE));

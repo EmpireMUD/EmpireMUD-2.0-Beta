@@ -1976,24 +1976,37 @@ typedef enum {
 
 
 // BONUS_x: bonus traits
-#define BONUS_STRENGTH  BIT(0)
-#define BONUS_DEXTERITY  BIT(1)
-#define BONUS_CHARISMA  BIT(2)
-#define BONUS_GREATNESS  BIT(3)
-#define BONUS_INTELLIGENCE  BIT(4)
-#define BONUS_WITS  BIT(5)
-#define BONUS_HEALTH  BIT(6)
-#define BONUS_MOVES  BIT(7)
-#define BONUS_MANA  BIT(8)
-#define BONUS_HEALTH_REGEN  BIT(9)
-#define BONUS_MOVE_REGEN  BIT(10)
-#define BONUS_MANA_REGEN  BIT(11)
-#define BONUS_FAST_CHORES  BIT(12)
-#define BONUS_EXTRA_DAILY_SKILLS  BIT(13)
-#define BONUS_INVENTORY  BIT(14)
-#define BONUS_FASTER  BIT(15)
-#define BONUS_BLOOD  BIT(16)
-#define NUM_BONUS_TRAITS  17
+#define BONUS_STRENGTH  BIT(0)	// "big boned"
+#define BONUS_DEXTERITY  BIT(1)	// "double-jointed"
+#define BONUS_CHARISMA  BIT(2)	// "friendly"
+#define BONUS_GREATNESS  BIT(3)	// "upper class"
+#define BONUS_INTELLIGENCE  BIT(4)	// "literate upbringing"
+#define BONUS_WITS  BIT(5)	// "quick-witted"
+#define BONUS_HEALTH  BIT(6)	// "thick skinned"
+#define BONUS_MOVES  BIT(7)	// "traveller"
+#define BONUS_MANA  BIT(8)	// "mana vessel"
+#define BONUS_LIGHT_RADIUS  BIT(9)	// "twilight sight" - larger light radius
+#define BONUS_MOVE_REGEN  BIT(10)	// "unusual stamina"
+#define BONUS_MANA_REGEN  BIT(11)	// "channeler"
+#define BONUS_FAST_CHORES  BIT(12)	// "work ethic"
+#define BONUS_EXTRA_DAILY_SKILLS  BIT(13)	// "quick learner"
+#define BONUS_INVENTORY  BIT(14)	// "pack mule" - bonus inventory
+#define BONUS_FASTER  BIT(15)	// "nimble" - shorter movement penalty
+#define BONUS_BLOOD  BIT(16)	// "rich veins" - larger blood pool
+#define BONUS_CLOCK  BIT(17)	// "sense of time" - can tell time without a ptech
+#define BONUS_NO_THIRST  BIT(18)	// "salt blooded" - never thirsty
+#define BONUS_NO_HUNGER  BIT(19)	// "tenacious waif" - never hungry
+#define BONUS_VIEW_HEIGHT  BIT(20)	// "surveyor" - +1 view height
+#define BONUS_HEAT_RESIST  BIT(21)	// "fire born" - tolerant of hot climates
+#define BONUS_COLD_RESIST  BIT(22)	// "frost born" - tolerant of cold climates
+#define BONUS_NO_DROWN  BIT(23)	// "buoyant" - won't lose stamina or drown in normal water
+#define NUM_BONUS_TRAITS  24
+
+// bonus traits available to newbies (first 12h)
+#define NEWBIE_BONUS_TRAITS  (BONUS_STRENGTH | BONUS_DEXTERITY | BONUS_CHARISMA | BONUS_GREATNESS | BONUS_INTELLIGENCE | BONUS_WITS | BONUS_HEALTH | BONUS_MOVES | BONUS_MANA | BONUS_MOVE_REGEN | BONUS_MANA_REGEN | BONUS_EXTRA_DAILY_SKILLS)
+
+// bonus traits not available at all (not used on this mud)
+#define FORBIDDEN_BONUS_TRAITS  (BONUS_CLOCK | BONUS_HEAT_RESIST | BONUS_COLD_RESIST)
 
 
 // CDU_x: delayed update types
@@ -2216,7 +2229,7 @@ typedef enum {
 
 // PLR_x: Player flags: used by char_data.char_specials.act
 #define PLR_APPROVED	BIT(0)	// player is approved to play the full game
-	#define PLR_UNUSED1		BIT(1)
+#define PLR_TRAITS_RESET	BIT(1)	// has already had traits reset
 #define PLR_MAILING		BIT(2)	/* Player is writing mail				*/
 #define PLR_DONTSET		BIT(3)	/* Don't EVER set (ISNPC bit)			*/
 	#define PLR_UNUSED2		BIT(4)

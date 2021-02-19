@@ -1879,6 +1879,8 @@ void init_config_system(void) {
 	init_config(CONFIG_PLAYERS, "delete_inactive_players_after", CONFTYPE_INT, "days an account can be inactive before auto-delete (0 = never)");
 	init_config(CONFIG_PLAYERS, "delete_invalid_players_after", CONFTYPE_INT, "days to wait before deleting accounts with no level or who never logged in (0 = never)");
 	init_config(CONFIG_PLAYERS, "exp_level_difference", CONFTYPE_INT, "levels a player can have above a mob and still gain exp from it");
+	init_config(CONFIG_PLAYERS, "hours_to_advanced_bonus_traits", CONFTYPE_INT, "prior to this players can only choose newbie traits");
+	init_config(CONFIG_PLAYERS, "hours_to_bonus_trait_reset", CONFTYPE_INT, "players get a free bonus trait reset after this long");
 	init_config(CONFIG_PLAYERS, "hours_to_first_bonus_trait", CONFTYPE_INT, "how much playtime to get the first bonus trait");
 	init_config(CONFIG_PLAYERS, "hours_to_second_bonus_trait", CONFTYPE_INT, "how much playtime to get the second bonus trait");
 	init_config(CONFIG_PLAYERS, "lastname_mode", CONFTYPE_BITVECTOR, "how players choose their lastname, if at all");

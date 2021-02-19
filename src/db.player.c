@@ -3655,6 +3655,43 @@ void announce_login(char_data *ch) {
 
 
 /**
+* Checks if a player needs their traits reset, and does it if so.
+*
+* @param char_data *ch The player to check (and possibly reset).
+*/
+void check_bonus_trait_reset(char_data *ch) {
+	int iter, hours;
+	struct time_info_data t;
+	
+	if (IS_NPC(ch) || !ch->desc) {
+		return;
+	}
+	
+	// compute playtime
+	t = *real_time_passed((time(0) - ch->player.time.logon) + ch->player.time.played, 0);
+	hours = t.day * 24 + t.hours;
+	
+	if (PLR_FLAGGED(ch, PLR_TRAITS_RESET)) {
+		return;	// already reset
+	}
+	if (!config_get_int("hours_to_bonus_trait_reset") || hours < config_get_int("hours_to_bonus_trait_reset")) {
+		return;	// no need to reset
+	}
+	
+	// reset all traits
+	for (iter = 0; iter < NUM_BONUS_TRAITS; ++iter) {
+		if (HAS_BONUS_TRAIT(ch, BIT(iter))) {
+			apply_bonus_trait(ch, BIT(iter), FALSE);
+		}
+	}
+	GET_BONUS_TRAITS(ch) = NOBITS;
+	
+	// mark as having reset them
+	SET_BIT(PLR_FLAGS(ch), PLR_TRAITS_RESET);
+}
+
+
+/**
 * Checks that all a player's learned crafts are valid.
 *
 * @param char_data *ch The player to check.

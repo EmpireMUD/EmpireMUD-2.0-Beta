@@ -2024,15 +2024,54 @@ void set_creation_state(descriptor_data *d, int state) {
 * @param char_data *ch The player to show the menu to.
 */
 void show_bonus_trait_menu(char_data *ch) {
-	int iter;
+	int iter, count, first, second, reset, hours, advanced;
+	struct time_info_data t;
 	
 	if (IS_NPC(ch) || !ch->desc) {
 		return;
 	}
 	
-	msg_to_char(ch, "\r\nAdd a bonus trait:\r\n");
-	for (iter = 0; iter < NUM_BONUS_TRAITS; ++iter) {
-		msg_to_char(ch, "%2d. %s%s\r\n", (iter+1), bonus_bit_descriptions[iter], (HAS_BONUS_TRAIT(ch, BIT(iter)) ? " &g(already chosen)&0" : ""));
+	// compute playtime
+	t = *real_time_passed((time(0) - ch->player.time.logon) + ch->player.time.played, 0);
+	hours = t.day * 24 + t.hours;
+	
+	// pull configs
+	first = config_get_int("hours_to_first_bonus_trait");
+	second = config_get_int("hours_to_second_bonus_trait");
+	reset = config_get_int("hours_to_bonus_trait_reset");
+	advanced = config_get_int("hours_to_advanced_bonus_traits");
+	
+	msg_to_char(ch, "Bonus Traits:\r\n");
+	
+	// info section
+	if (first > 0) {
+		msg_to_char(ch, "You get one bonus trait after %d hour%s of play", first, PLURAL(first));
+	}
+	else if (second > 0) {
+		msg_to_char(ch, "You get one bonus trait automatically");
+	}
+	else {
+		msg_to_char(ch, "You get two bonus traits automatically");
+	}
+	if (second > 0) {
+		msg_to_char(ch, " and another after %d hour%s%s", second, PLURAL(second), (first == 0) ? " of play" : "");
+	}
+	if (reset > 0) {
+		msg_to_char(ch, ".\r\nYour bonus traits automatically reset after %d hour%s%s.\r\n", reset, PLURAL(reset), (first == 0 && second == 0) ? " of play" : "");
+	}
+	else {
+		msg_to_char(ch, ".\r\n");
+	}
+	
+	msg_to_char(ch, "Add a bonus trait:\r\n");
+	for (iter = 0, count = 0; iter < NUM_BONUS_TRAITS; ++iter) {
+		if (IS_SET(FORBIDDEN_BONUS_TRAITS, BIT(iter))) {
+			continue;	// not allowed on this mud
+		}
+		if (hours < advanced && !IS_SET(NEWBIE_BONUS_TRAITS, BIT(iter))) {
+			continue;	// not enough playtime
+		}
+		msg_to_char(ch, "%2d. %s%s\r\n", ++count, bonus_bit_descriptions[iter], (HAS_BONUS_TRAIT(ch, BIT(iter)) ? " &g(already chosen)&0" : ""));
 	}
 	
 	msg_to_char(ch, "\r\nEnter a number to choose (or 'skip' to choose later) > ");
@@ -2318,6 +2357,7 @@ int _parse_name(char *arg, char *name) {
 void nanny(descriptor_data *d, char *arg) {
 	char buf[MAX_STRING_LENGTH], tmp_name[MAX_INPUT_LENGTH];
 	int load_result, i, iter;
+	bitvector_t bit;
 	bool show_start = FALSE;
 	char_data *temp_char;
 	
@@ -2512,6 +2552,7 @@ void nanny(descriptor_data *d, char *arg) {
 				}
 
 				// check here if they need more traits than they have
+				check_bonus_trait_reset(d->character);
 				if (num_earned_bonus_traits(d->character) > count_bits(GET_BONUS_TRAITS(d->character))) {
 					show_bonus_trait_menu(d->character);
 					STATE(d) = CON_BONUS_EXISTING;
@@ -2857,7 +2898,8 @@ void nanny(descriptor_data *d, char *arg) {
 		// add-trait menu
 		case CON_BONUS_EXISTING: {
 			bool skip = FALSE;
-			i = 0;
+			int hours;
+			struct time_info_data t;
 			
 			if (!str_cmp(arg, "skip")) {
 				skip = TRUE;
@@ -2868,27 +2910,51 @@ void nanny(descriptor_data *d, char *arg) {
 					show_bonus_trait_menu(d->character);
 					return;
 				}
+				
 				if ((i = atoi(arg)) < 1 || i > NUM_BONUS_TRAITS) {
 					SEND_TO_Q("\r\nInvalid trait choice. Try again > ", d);
 					return;
 				}
-			
-				// i is 1 over the value we want (menu is 1-based)
-				--i;
-			
-				if (HAS_BONUS_TRAIT(d->character, BIT(i))) {
+				
+				// compute playtime
+				t = *real_time_passed((time(0) - d->character->player.time.logon) + d->character->player.time.played, 0);
+				hours = t.day * 24 + t.hours;
+				
+				// determine what trait they chose
+				bit = 0;
+				for (iter = 0; iter < NUM_BONUS_TRAITS; ++iter) {
+					if (IS_SET(FORBIDDEN_BONUS_TRAITS, BIT(iter))) {
+						continue;	// not allowed on this mud
+					}
+					if (hours < config_get_int("hours_to_advanced_bonus_traits") && !IS_SET(NEWBIE_BONUS_TRAITS, BIT(iter))) {
+						continue;	// not enough playtime
+					}
+					
+					// otherwise...
+					if (--i == 0) {
+						bit = BIT(iter);
+						break;
+					}
+				}
+				
+				if (!bit) {
+					SEND_TO_Q("\r\nInvalid trait choice. Try again > ", d);
+					return;
+				}
+				
+				if (HAS_BONUS_TRAIT(d->character, bit)) {
 					SEND_TO_Q("\r\nYou already have that trait! Try again > ", d);
 					return;
 				}
 			
 				// seems ok
-				SET_BIT(GET_BONUS_TRAITS(d->character), BIT(i));
+				SET_BIT(GET_BONUS_TRAITS(d->character), bit);
 			}
 			
 			// only apply now if they are NOT currently doing creation -- otherwise it will be applied during creation
 			if (GET_ACCESS_LEVEL(d->character) > 0) {
 				if (!skip) {
-					apply_bonus_trait(d->character, BIT(i), TRUE);
+					apply_bonus_trait(d->character, bit, TRUE);
 				}
 
 				// and send them to the motd
