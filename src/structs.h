@@ -1997,10 +1997,9 @@ typedef enum {
 #define BONUS_NO_THIRST  BIT(18)	// "salt blooded" - never thirsty
 #define BONUS_NO_HUNGER  BIT(19)	// "tenacious waif" - never hungry
 #define BONUS_VIEW_HEIGHT  BIT(20)	// "surveyor" - +1 view height
-#define BONUS_HEAT_RESIST  BIT(21)	// "fire born" - tolerant of hot climates
-#define BONUS_COLD_RESIST  BIT(22)	// "frost born" - tolerant of cold climates
-#define BONUS_NO_DROWN  BIT(23)	// "buoyant" - won't lose stamina or drown in normal water
-#define NUM_BONUS_TRAITS  24
+#define BONUS_HEAT_RESIST  BIT(21)	// "fire born" - tolerant of hot climates (UNIMPLEMENTED)
+#define BONUS_COLD_RESIST  BIT(22)	// "frost born" - tolerant of cold climates (UNIMPLEMENTED)
+#define NUM_BONUS_TRAITS  23
 
 // bonus traits available to newbies (first 12h)
 #define NEWBIE_BONUS_TRAITS  (BONUS_STRENGTH | BONUS_DEXTERITY | BONUS_CHARISMA | BONUS_GREATNESS | BONUS_INTELLIGENCE | BONUS_WITS | BONUS_HEALTH | BONUS_MOVES | BONUS_MANA | BONUS_MOVE_REGEN | BONUS_MANA_REGEN | BONUS_EXTRA_DAILY_SKILLS)

@@ -2041,7 +2041,7 @@ void show_bonus_trait_menu(char_data *ch) {
 	reset = config_get_int("hours_to_bonus_trait_reset");
 	advanced = config_get_int("hours_to_advanced_bonus_traits");
 	
-	msg_to_char(ch, "Bonus Traits:\r\n");
+	msg_to_char(ch, "\r\nBonus Traits:\r\n");
 	
 	// info section
 	if (first > 0) {
@@ -2955,9 +2955,16 @@ void nanny(descriptor_data *d, char *arg) {
 			if (GET_ACCESS_LEVEL(d->character) > 0) {
 				if (!skip) {
 					apply_bonus_trait(d->character, bit, TRUE);
+					
+					// didn't skip and got another trait?
+					if (num_earned_bonus_traits(d->character) > count_bits(GET_BONUS_TRAITS(d->character))) {
+						show_bonus_trait_menu(d->character);
+						STATE(d) = CON_BONUS_EXISTING;
+						return;
+					}
 				}
-
-				// and send them to the motd
+				
+				// now send them to the motd
 				send_login_motd(d, GET_BAD_PWS(d->character));
 				
 				SEND_TO_Q("\r\n*** Press ENTER: ", d);

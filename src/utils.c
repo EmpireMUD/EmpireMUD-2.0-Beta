@@ -103,7 +103,7 @@ bool any_players_in_room(room_data *room) {
 * Applies bonus traits whose effects are one-time-only.
 *
 * @param char_data *ch The player to apply the trait to.
-* @param bitvector_t trait Any BONUS_x bit.
+* @param bitvector_t trait Any BONUS_ bit.
 * @param bool add If TRUE, we are adding the trait; FALSE means removing it;
 */
 void apply_bonus_trait(char_data *ch, bitvector_t trait, bool add) {	
@@ -3162,6 +3162,9 @@ int get_view_height(char_data *ch, room_data *from_room) {
 	
 	// character modifiers
 	if (from_room == IN_ROOM(ch) && EFFECTIVELY_FLYING(ch)) {
+		++height;
+	}
+	if (from_room == IN_ROOM(ch) && HAS_BONUS_TRAIT(ch, BONUS_VIEW_HEIGHT)) {
 		++height;
 	}
 	

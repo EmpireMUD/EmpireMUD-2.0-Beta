@@ -463,7 +463,6 @@ const char *bonus_bits[] = {
 	"VIEW-HEIGHT",	// 20
 	"HEAT-RESIST",
 	"COLD-RESIST",
-	"NO-DROWN",
 	"\n"
 };
 
@@ -493,7 +492,6 @@ const char *bonus_bit_descriptions[] = {
 	"Surveyor (+1 view height)",	// 20
 	"Fire born (tolerates hot climates)",
 	"Frost born (tolerates cold climates)",
-	"Buoyant (won't drown in normal water)",
 	"\n"
 };
 
