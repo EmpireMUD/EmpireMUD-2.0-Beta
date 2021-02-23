@@ -45,7 +45,7 @@ CHIP KNAPPER KNAPPING "FLINT KNAPPING"
 Chip (Primitive Crafts ability)
 
 Usage:  chip <item>
-Speed boosts:  Faster Chores bonus
+Speed boosts:  Work ethic bonus
 Tool: knapper
 
 This lets you chip a flint down to a sharper, more refined tool. You need to be
@@ -62,7 +62,7 @@ CHOP
 Chop (Scavenging ability)
 
 Usage:  chop
-Speed boosts:  Faster Chores bonus, haste, higher axe damage, higher Strength
+Speed boosts:  Work ethic bonus, haste, higher axe damage, higher Strength
 
 This command allows you to chop trees in the forest. Beware, trees are a
 limited resource. Different types of forest give different qualities and
@@ -127,7 +127,7 @@ DIG
 Dig (Scavenging ability)
 
 Usage:  dig
-Speed boosts:  Faster Chores bonus, Finder ability, haste, shovel
+Speed boosts:  Work ethic bonus, Finder ability, haste, shovel
 
 This lets you claw at the ground until you find something useful. Among
 things that may be found, rocks, flint, and clay are the most common.
@@ -137,7 +137,7 @@ See also: DEPLETION, ROCKS, FLINT, CLAY, FINDER, SHOVEL, SCAVENGING
 DISMANTLE
 
 Usage:  dismantle [vehicle | building]
-Speed boosts:  Faster Chores bonus, haste
+Speed boosts:  Work ethic bonus, haste
 
 This command allows you to tear down a building when you're done with it. You
 get back some of the resources you spent to build it depending on the condition
@@ -175,7 +175,7 @@ GATHER
 Gather (Scavenging ability)
 
 Usage:  gather
-Speed boosts:  Faster Chores bonus, Finder ability, Haste
+Speed boosts:  Work ethic bonus, Finder ability, Haste
 
 Allows you to gather sticks from the ground, as well as small saplings. This
 generally works best in the forest.
@@ -206,7 +206,7 @@ HARVEST HARVESTING SICKLE SCYTHE
 Harvest (Scavenging ability)
 
 Usage:  harvest
-Speed boosts:  Faster Chores bonus, haste
+Speed boosts:  Work ethic bonus, haste
 Tool type: sickle or scythe
 
 Allows you to harvest a crop. Be careful that you also replant some,
@@ -301,7 +301,7 @@ MINE MINES
 Mine (Primitive Crafts ability)
 
 Building:  &y/&0[]&y\&0  Mine  (Build ability)
-Speed boosts:  Faster Chores bonus, haste, higher pick damage, higher Strength
+Speed boosts:  Work ethic bonus, haste, higher pick damage, higher Strength
 Command:  mine
 
 "Mine" is both a building type, and the command to work in that building. Mines
@@ -337,7 +337,7 @@ Mint (Basic Crafts ability)
 
 Building:  [MM]  Mint  (Trade Routes goal)
 Fame:  5
-Speed boosts:  Faster Chores bonus
+Speed boosts:  Work ethic bonus
 Command:  mint <object>
 
 The mint building allows you to mint valuable metals into coins. Each building
@@ -380,7 +380,7 @@ PLANT
 Plant (Cook ability)
 
 Usage:  plant <seed/food>
-Speed boosts:  Faster Chores bonus, haste
+Speed boosts:  Work ethic bonus, haste
 
 You can replant crops in open fields so that they may regrow and be harvested
 again. This is essential in keeping your crops from dying out.
@@ -457,7 +457,7 @@ SAW
 Saw (Primitive Crafts ability)
 
 Usage:  saw <item>
-Speed boosts:  Faster Chores bonus, haste
+Speed boosts:  Work ethic bonus, haste
 Tool:  saw or lumber yard
 
 You can saw most trees and logs into lumber. You must be in a lumber yard. This
@@ -475,7 +475,7 @@ SCRAPE
 Scrape (Primitive Crafts ability)
 
 Usage:  scrape <item>
-Speed boosts:  Faster Chores bonus, haste
+Speed boosts:  Work ethic bonus, haste
 
 This skill is used to process some types of trees into logs.
 
@@ -653,7 +653,7 @@ SMELT MELT
 Smelt (Basic Crafts ability)
 
 Usage:  smelt [number] <type of ingot/bar>
-Speed boosts:  Faster Chores bonus
+Speed boosts:  Work ethic bonus
 
 Using a forge or foundry, you can melt down metals like iron, silver, and gold
 into ingots or bars. Smelting generally requires two of the base metal (e.g.

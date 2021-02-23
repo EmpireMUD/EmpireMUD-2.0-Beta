@@ -1872,6 +1872,7 @@ void init_config_system(void) {
 	init_config(CONFIG_OTHER, "test_config", CONFTYPE_INT, "this is a test config");
 	
 	// players
+	init_config(CONFIG_PLAYERS, "bonus_trait_reset_message", CONFTYPE_LONG_STRING, "message shown when player hits hours_to_bonus_trait_reset and re-logs in");
 	init_config(CONFIG_PLAYERS, "dailies_per_day", CONFTYPE_INT, "how many daily quests a player can complete each day");
 	init_config(CONFIG_PLAYERS, "default_class_abbrev", CONFTYPE_SHORT_STRING, "abbreviation to show for unclassed players");
 	init_config(CONFIG_PLAYERS, "default_class_name", CONFTYPE_SHORT_STRING, "name to show for unclassed players");

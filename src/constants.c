@@ -823,8 +823,8 @@ const char *connected_types[] = {
 	"Finish Creation",	// 20
 	"Archetype",
 	"Goodbye",
-		"UNUSED 2",
-	"Add bonus",
+	"Bonus reset",
+	"Bonus trait",
 	"Promo code?",	// 25
 	"Confirm promo",
 	"\n"

@@ -217,7 +217,7 @@ Command:  cook [number] <item>
           cook info <item>
           cook list <keywords>
 
-Speed boosts:  Faster Chores bonus
+Speed boosts:  Work ethic bonus
 
 The bake and cook commands allow you to make food from a variety of raw
 ingredients. To cook, you'll need a heat source: a cooking fire, a kitchen,
@@ -867,7 +867,7 @@ Quarry (Primitive Crafts ability)
 
 Command:  quarry
 Building:  |__|  Quarry  (Build ability)
-Speed boosts:  Faster Chores bonus, haste
+Speed boosts:  Work ethic bonus, haste
 
 A quarry must be built on plains or desert, facing a mountain. Quarries are a
 good place to dig up rocks. You can also quarry stone here using the "quarry"
@@ -1128,7 +1128,7 @@ TAN TANNING
 Tan (Basic Crafts ability)
 
 Usage:  tan <skin>
-Speed boosts:  Faster Chores bonus
+Speed boosts:  Work ethic bonus
 Stored in:  Tannery
 
 You can tan skins into leather. This process will go faster at a tannery. Both

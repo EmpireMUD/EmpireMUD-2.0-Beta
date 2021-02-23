@@ -2070,8 +2070,8 @@ typedef enum {
 #define CON_FINISH_CREATION  20	// Done!
 #define CON_Q_ARCHETYPE  21	// starting skills and spells
 #define CON_GOODBYE  22	// Close on <enter>
-	#define CON_UNUSED2  23
-#define CON_BONUS_EXISTING  24	// choose bonus trait (existing char)
+#define CON_BONUS_RESET  23	// player will get new bonus traits (enter to continue)
+#define CON_BONUS_TRAIT  24	// choose bonus trait (existing char)
 #define CON_PROMO_CODE  25	// promo code?
 #define CON_CONFIRM_PROMO_CODE  26	// promo confirmation
 

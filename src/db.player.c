@@ -3655,16 +3655,19 @@ void announce_login(char_data *ch) {
 
 
 /**
-* Checks if a player needs their traits reset, and does it if so.
+* Checks if a player needs their traits reset, and does it if so. This will
+* display a message to the player informing them of what ws reset.
 *
 * @param char_data *ch The player to check (and possibly reset).
+* @return bool TRUE if it reset the traits and showed a message; FALSE if not.
 */
-void check_bonus_trait_reset(char_data *ch) {
+bool check_bonus_trait_reset(char_data *ch) {
+	char buf[MAX_STRING_LENGTH];
 	int iter, hours;
 	struct time_info_data t;
 	
 	if (IS_NPC(ch) || !ch->desc) {
-		return;
+		return FALSE;
 	}
 	
 	// compute playtime
@@ -3672,10 +3675,19 @@ void check_bonus_trait_reset(char_data *ch) {
 	hours = t.day * 24 + t.hours;
 	
 	if (PLR_FLAGGED(ch, PLR_TRAITS_RESET)) {
-		return;	// already reset
+		return FALSE;	// already reset
 	}
 	if (!config_get_int("hours_to_bonus_trait_reset") || hours < config_get_int("hours_to_bonus_trait_reset")) {
-		return;	// no need to reset
+		return FALSE;	// no need to reset
+	}
+	
+	// OK: show explainer
+	msg_to_char(ch, "%d-hour Bonus Trait Reset:\r\n%s", config_get_int("hours_to_bonus_trait_reset"), config_get_string("bonus_trait_reset_message"));
+	
+	// OK: show old traits
+	if (GET_BONUS_TRAITS(ch)) {
+		prettier_sprintbit(GET_BONUS_TRAITS(ch), bonus_bit_descriptions, buf);
+		msg_to_char(ch, "Your previous bonus trait%s: %s\r\n", count_bits(GET_BONUS_TRAITS(ch)) == 1 ? " was" : "s were", buf);
 	}
 	
 	// reset all traits
@@ -3688,6 +3700,7 @@ void check_bonus_trait_reset(char_data *ch) {
 	
 	// mark as having reset them
 	SET_BIT(PLR_FLAGS(ch), PLR_TRAITS_RESET);
+	return TRUE;
 }
 
 

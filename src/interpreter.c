@@ -41,6 +41,7 @@
 // locals
 void set_creation_state(descriptor_data *d, int state);
 void show_bonus_trait_menu(char_data *ch);
+void send_login_motd(descriptor_data *desc, int bad_pws);
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -1745,8 +1746,10 @@ struct {
 	{ CON_Q_ALT_NAME },
 	{ CON_Q_ALT_PASSWORD },
 	
-	{ CON_Q_ARCHETYPE },	// skips to CON_PROMO_CODE if no archetypes exist
+	{ CON_Q_ARCHETYPE },	// skips to CON_BONUS_TRAIT if no archetypes exist
 	{ CON_ARCHETYPE_CNFRM },
+	
+	{ CON_BONUS_TRAIT },	// skips if there's no 0-hour first bonus trait
 	
 	{ CON_PROMO_CODE },
 	{ CON_CONFIRM_PROMO_CODE },	// only if given invalid code
@@ -1840,7 +1843,7 @@ void prompt_creation(descriptor_data *d) {
 			}
 			else {
 				// no archetypes for some reason?
-				set_creation_state(d, CON_PROMO_CODE);
+				set_creation_state(d, CON_BONUS_TRAIT);
 			}
 			break;
 		}
@@ -1886,8 +1889,20 @@ void prompt_creation(descriptor_data *d) {
 			SEND_TO_Q("\r\n*** Press ENTER: ", d);
 			break;
 		}
-		case CON_BONUS_EXISTING: {
-			show_bonus_trait_menu(d->character);
+		case CON_BONUS_TRAIT: {
+			if (num_earned_bonus_traits(d->character) > count_bits(GET_BONUS_TRAITS(d->character))) {
+				show_bonus_trait_menu(d->character);
+			}
+			else if (GET_ACCESS_LEVEL(d->character) > 0) {
+				// existing: send player to game
+				send_login_motd(d, GET_BAD_PWS(d->character));
+				SEND_TO_Q("\r\n*** Press ENTER: ", d);
+				STATE(d) = CON_RMOTD;
+			}
+			else {
+				// creating
+				next_creation_step(d);
+			}
 			break;
 		}
 	}
@@ -2550,12 +2565,16 @@ void nanny(descriptor_data *d, char *arg) {
 				if (!PLR_FLAGGED(d->character, PLR_INVSTART)) {
 					syslog(SYS_LOGIN, GET_INVIS_LEV(d->character), TRUE, "%s [%s] has connected", GET_NAME(d->character), PLR_FLAGGED(d->character, PLR_IPMASK) ? "masked" : d->host);
 				}
-
-				// check here if they need more traits than they have
-				check_bonus_trait_reset(d->character);
-				if (num_earned_bonus_traits(d->character) > count_bits(GET_BONUS_TRAITS(d->character))) {
-					show_bonus_trait_menu(d->character);
-					STATE(d) = CON_BONUS_EXISTING;
+				
+				// check if traits need to be reset
+				if (check_bonus_trait_reset(d->character)) {
+					SEND_TO_Q("Press ENTER to continue:\r\n", d);
+					STATE(d) = CON_BONUS_RESET;
+					return;
+				}
+				// otherwise check here if they need more traits than they have
+				else if (num_earned_bonus_traits(d->character) > count_bits(GET_BONUS_TRAITS(d->character))) {
+					set_creation_state(d, CON_BONUS_TRAIT);
 					return;
 				}
 				
@@ -2894,9 +2913,16 @@ void nanny(descriptor_data *d, char *arg) {
 			d->has_prompt = 0;
 			break;
 		}
+		
+		// info page about trait reset
+		case CON_BONUS_RESET: {
+			// this will pass them to the right place
+			set_creation_state(d, CON_BONUS_TRAIT);
+			break;
+		}
 
 		// add-trait menu
-		case CON_BONUS_EXISTING: {
+		case CON_BONUS_TRAIT: {
 			bool skip = FALSE;
 			int hours;
 			struct time_info_data t;
@@ -2959,7 +2985,7 @@ void nanny(descriptor_data *d, char *arg) {
 					// didn't skip and got another trait?
 					if (num_earned_bonus_traits(d->character) > count_bits(GET_BONUS_TRAITS(d->character))) {
 						show_bonus_trait_menu(d->character);
-						STATE(d) = CON_BONUS_EXISTING;
+						STATE(d) = CON_BONUS_TRAIT;
 						return;
 					}
 				}
