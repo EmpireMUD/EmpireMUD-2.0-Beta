@@ -332,7 +332,7 @@ Usage:  build <building> [direction]
         build info <building>
         build list <keywords>
 
-Speed boosts:  Faster Chores bonus, haste
+Speed boosts:  Work ethic bonus, haste
 
 This command is used to create buildings using raw materials. Most buildings
 require a direction that they'll face. Resources are added from left to right
@@ -810,7 +810,7 @@ EXCAVATE EXCAVATION TRENCH MOAT CANAL FILLIN
 Usage:  excavate
         fillin
 
-Speed boosts:  Faster Chores bonus, haste, Faster Excavations goal
+Speed boosts:  Work ethic bonus, haste, Faster Excavations goal
 
 Using a shovel, your own strength, and a lot of time, you can excavate a
 trench from a desert or plains. Once the trench is complete, it will begin
@@ -1860,7 +1860,7 @@ See also: GRAB, HOLD, WEAR, WIELD, SHEATH, DRAW, SWAP
 REPAIR MAINTAIN MAINTENANCE DISREPAIR
 
 Usage:  repair [vehicle | building]
-Speed boosts:  Faster Chores bonus, haste
+Speed boosts:  Work ethic bonus, haste
 
 Buildings and vehicles fall into disrepair over time, and require various
 resources or actions for maintenance.

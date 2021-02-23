@@ -134,6 +134,11 @@ test_config 0
 *
 * Players configs
 blood_starvation_level 20
+bonus_trait_reset_message 1
+   You have reached enough play time to reset your character's bonus trait. You
+can choose to pick the same trait again, or pick something new for your
+character. This is the only time you'll get to reset your bonus traits.
+~
 dailies_per_day 5
 default_class_abbrev Advn
 default_class_name Adventurer
@@ -142,7 +147,9 @@ delete_abandoned_players_after 0
 delete_inactive_players_after 0
 delete_invalid_players_after 30
 exp_level_difference 50
-hours_to_first_bonus_trait 4
+hours_to_advanced_bonus_traits 12
+hours_to_bonus_trait_reset 12
+hours_to_first_bonus_trait 0
 hours_to_second_bonus_trait 48
 idle_action_rent_time 225
 idle_linkdead_rent_time 5

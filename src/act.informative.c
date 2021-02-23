@@ -3575,7 +3575,7 @@ ACMD(do_time) {
 	y_coord = Y_COORD(IN_ROOM(ch));
 	latitude = (y_coord != -1) ? Y_TO_LATITUDE(y_coord) : 0;
 	
-	if (has_player_tech(ch, PTECH_CLOCK)) {
+	if (HAS_CLOCK(ch)) {
 		sprintf(buf, "It is %d o'clock %s", ((tinfo.hours % 12 == 0) ? 12 : ((tinfo.hours) % 12)), ((tinfo.hours >= 12) ? "pm" : "am"));
 		
 		if (has_player_tech(ch, PTECH_CALENDAR)) {
@@ -3607,7 +3607,7 @@ ACMD(do_time) {
 	else if (sun == SUN_SET) {
 		snprintf(time_of_day, sizeof(time_of_day), "It's sunset");
 	}
-	else if (has_player_tech(ch, PTECH_CLOCK)) {
+	else if (HAS_CLOCK(ch)) {
 		snprintf(time_of_day, sizeof(time_of_day), "It's daytime");
 	}
 	// all other time options are only shown without clocks:

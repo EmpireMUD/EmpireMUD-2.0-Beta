@@ -761,7 +761,7 @@ void real_update_char(char_data *ch) {
 		}
 
 		/* Update conditions */
-		if (has_player_tech(ch, PTECH_NO_HUNGER)) {			
+		if (HAS_BONUS_TRAIT(ch, BONUS_NO_HUNGER) || has_player_tech(ch, PTECH_NO_HUNGER)) {			
 			gain_condition(ch, FULL, -1);
 		}
 		else {
@@ -773,7 +773,7 @@ void real_update_char(char_data *ch) {
 		run_ability_gain_hooks(ch, NULL, AGH_PASSIVE_FREQUENT);
 	
 		// more thirsty?
-		if (has_player_tech(ch, PTECH_NO_THIRST)) {
+		if (HAS_BONUS_TRAIT(ch, BONUS_NO_THIRST) || has_player_tech(ch, PTECH_NO_THIRST)) {
 			gain_condition(ch, THIRST, -1);
 		}
 		else {
@@ -2032,12 +2032,12 @@ void gain_condition(char_data *ch, int condition, int value) {
 	}
 	
 	// things that prevent thirst
-	if (value > 0 && condition == THIRST && has_player_tech(ch, PTECH_NO_THIRST)) {
+	if (value > 0 && condition == THIRST && (HAS_BONUS_TRAIT(ch, BONUS_NO_THIRST) || has_player_tech(ch, PTECH_NO_THIRST))) {
 		return;
 	}
 	
 	// things that prevent hunger
-	if (value > 0 && condition == FULL && has_player_tech(ch, PTECH_NO_HUNGER)) {
+	if (value > 0 && condition == FULL && (HAS_BONUS_TRAIT(ch, BONUS_NO_HUNGER) || has_player_tech(ch, PTECH_NO_HUNGER))) {
 		return;
 	}
 
@@ -2102,10 +2102,6 @@ int health_gain(char_data *ch, bool info_only) {
 	else {
 		gain = regen_by_pos[(int) GET_POS(ch)];
 		gain += GET_HEALTH_REGEN(ch);
-		
-		if (HAS_BONUS_TRAIT(ch, BONUS_HEALTH_REGEN)) {
-			gain += 1 + (get_approximate_level(ch) / 20);
-		}
 		
 		if (GET_POS(ch) == POS_SLEEPING && !AFF_FLAGGED(ch, AFF_EARTHMELD)) {
 			needed = MAX(GET_MAX_HEALTH(ch), GET_MAX_HEALTH(ch) - GET_HEALTH(ch)) + GET_HEALTH_DEFICIT(ch);

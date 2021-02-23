@@ -664,7 +664,7 @@ S
 Bridge~
 A Bridge Over the River~
 &c~&0--&c~~
-16 0 dmsD 0
+16 0 dmosD 0
 0 0 0 -1
 I 29 5010 100.00 1 r  # RUINS-TO-BLD: Flooded Ruins
 R
@@ -1154,7 +1154,7 @@ S
 Swamp Walk~
 A Rickety Swamp Walk~
 &c~&0--&c~~
-10 0 dmnps 0
+10 0 dmnops 0
 0 0 0 -1
 I 29 5010 100.00 1 r  # RUINS-TO-BLD: Flooded Ruins
 R

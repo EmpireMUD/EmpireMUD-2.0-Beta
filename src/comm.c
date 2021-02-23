@@ -3313,7 +3313,7 @@ char *replace_prompt_codes(char_data *ch, char *str) {
 						strcpy(i, "\tBnight\t0");
 					}
 					
-					if (has_player_tech(ch, PTECH_CLOCK)) {
+					if (HAS_CLOCK(ch)) {
 						// has clock: append clock after color code
 						sprintf(i+2, "%d%s\t0", TIME_TO_12H(tinfo.hours), AM_PM(tinfo.hours));
 					}

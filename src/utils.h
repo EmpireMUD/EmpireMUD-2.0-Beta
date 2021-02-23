@@ -1247,16 +1247,17 @@ int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_COORD(ge
 #define SHOW_FIGHT_MESSAGES(ch, bit)  (!IS_NPC(ch) && IS_SET(GET_FIGHT_MESSAGES(ch), (bit)))
 
 // definitions
+#define HAS_CLOCK(ch)  (HAS_BONUS_TRAIT((ch), BONUS_CLOCK) || has_player_tech((ch), PTECH_CLOCK))
 #define HAS_NAVIGATION(ch)  has_player_tech(ch, PTECH_NAVIGATION)
 #define IN_HOSTILE_TERRITORY(ch)  (!IS_NPC(ch) && !IS_IMMORTAL(ch) && ROOM_OWNER(IN_ROOM(ch)) && ROOM_OWNER(IN_ROOM(ch)) != GET_LOYALTY(ch) && (IS_HOSTILE(ch) || empire_is_hostile(ROOM_OWNER(IN_ROOM(ch)), GET_LOYALTY(ch), IN_ROOM(ch))))
 #define IS_APPROVED(ch)  (IS_NPC(ch) || PLR_FLAGGED(ch, PLR_APPROVED) || ACCOUNT_FLAGGED(ch, ACCT_APPROVED))
 #define IS_HOSTILE(ch)  (!IS_NPC(ch) && (get_cooldown_time((ch), COOLDOWN_HOSTILE_FLAG) > 0 || get_cooldown_time((ch), COOLDOWN_ROGUE_FLAG) > 0))
-#define IS_HUNGRY(ch)  (GET_COND(ch, FULL) >= 360 && !has_player_tech(ch, PTECH_NO_HUNGER))
+#define IS_HUNGRY(ch)  (GET_COND((ch), FULL) >= 360 && !HAS_BONUS_TRAIT((ch), BONUS_NO_HUNGER) && !has_player_tech((ch), PTECH_NO_HUNGER))
 #define IS_DRUNK(ch)  (GET_COND(ch, DRUNK) >= 360)
 #define IS_GOD(ch)  (GET_ACCESS_LEVEL(ch) == LVL_GOD)
 #define IS_IMMORTAL(ch)  (GET_ACCESS_LEVEL(ch) >= LVL_START_IMM)
 #define IS_RIDING(ch)  (!IS_NPC(ch) && GET_MOUNT_VNUM(ch) != NOTHING && MOUNT_FLAGGED(ch, MOUNT_RIDING))
-#define IS_THIRSTY(ch)  (GET_COND(ch, THIRST) >= 360 && !has_player_tech(ch, PTECH_NO_THIRST))
+#define IS_THIRSTY(ch)  (GET_COND((ch), THIRST) >= 360 && !HAS_BONUS_TRAIT((ch), BONUS_NO_THIRST) && !has_player_tech((ch), PTECH_NO_THIRST))
 #define IS_BLOOD_STARVED(ch)  (IS_VAMPIRE(ch) && GET_BLOOD(ch) <= config_get_int("blood_starvation_level"))
 
 // for act() and act-like things (requires to_sleeping and is_spammy set to true/false)

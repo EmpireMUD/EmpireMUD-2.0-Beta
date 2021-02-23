@@ -115,6 +115,9 @@ int distance_can_see_in_dark(char_data *ch) {
 	if (has_player_tech(ch, PTECH_LARGER_LIGHT_RADIUS)) {
 		dist += 1;
 	}
+	if (HAS_BONUS_TRAIT(ch, BONUS_LIGHT_RADIUS)) {
+		++dist;
+	}
 	if (room_is_light(IN_ROOM(ch), TRUE)) {
 		++dist;
 	}

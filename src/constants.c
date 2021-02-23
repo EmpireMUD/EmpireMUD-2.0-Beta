@@ -440,46 +440,58 @@ const char *account_flags[] = {
 
 // BONUS_x
 const char *bonus_bits[] = {
-	"STRENGTH",
+	"STRENGTH",		// 0
 	"DEXTERITY",
 	"CHARISMA",
 	"GREATNESS",
 	"INTELLIGENCE",
-	"WITS",
+	"WITS",	// 5
 	"HEALTH",
 	"MOVES",
 	"MANA",
-	"HEALTH-REGEN",
-	"MOVE-REGEN",
+	"LIGHT-RADIUS",
+	"MOVE-REGEN",	// 10
 	"MANA-REGEN",
 	"FAST-CHORES",
 	"EXTRA-DAILY-SKILLS",
 	"INVENTORY",
-	"FASTER",
+	"FASTER",	// 15
 	"BLOOD",
+	"CLOCK",
+	"NO-THIRST",
+	"NO-HUNGER",
+	"VIEW-HEIGHT",	// 20
+	"HEAT-RESIST",
+	"COLD-RESIST",
 	"\n"
 };
 
 
 // BONUS_x
 const char *bonus_bit_descriptions[] = {
-	"+1 Strength",
-	"+1 Dexterity",
-	"+1 Charisma",
-	"+1 Greatness",
-	"+1 Intelligence",
-	"+1 Wits",
-	"Extra health",
-	"Extra moves",
-	"Extra mana",
-	"Faster health regeneration",
-	"Faster move regeneration",
-	"Faster mana regeneration",
-	"Faster chores (e.g. chopping)",
-	"Extra daily bonus experience",
-	"Larger inventory",
-	"Faster walking",
-	"Extra blood (for vampires)",
+	"Big boned (+1 Strength)",	// 0
+	"Double-jointed (+1 Dexterity)",
+	"Friendly (+1 Charisma)",
+	"Upper class (+1 Greatness)",
+	"Literate upbringing (+1 Intelligence)",
+	"Quick-witted (+1 Wits)",	// 5
+	"Thick skinned (extra health)",
+	"Traveller (extra moves)",
+	"Mana vessel (extra mana)",
+	"Twilight sight (larger light radius)",
+	"Unusual stamina (faster move regeneration)",	// 10
+	"Channeler (faster mana regeneration)",
+	"Work ethic (faster chores like chopping)",
+	"Quick learner (extra daily bonus exp)",
+	"Pack mule (larger inventory)",
+	"Nimble (shorter walking delay)",	// 15
+	"Rich veins (extra blood for vampires)",
+	"Sense of time (don't need a clock)",
+	"Salt blooded (never thirsty)",
+	"Tenacious waif (never hungry)",
+	"Surveyor (+1 view height)",	// 20
+	"Fire born (tolerates hot climates)",
+	"Frost born (tolerates cold climates)",
 	"\n"
 };
 
@@ -624,7 +636,7 @@ const char *mount_flags[] = {
 /* PLR_x */
 const char *player_bits[] = {
 	"APPR",
-	"WRITING",
+	"TR",
 	"MAILING",
 	"DONTSET",
 		"UNUSED",
@@ -811,8 +823,8 @@ const char *connected_types[] = {
 	"Finish Creation",	// 20
 	"Archetype",
 	"Goodbye",
-		"UNUSED 2",
-	"Add bonus",
+	"Bonus reset",
+	"Bonus trait",
 	"Promo code?",	// 25
 	"Confirm promo",
 	"\n"
