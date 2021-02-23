@@ -2046,9 +2046,14 @@ void show_bonus_trait_menu(char_data *ch) {
 		return;
 	}
 	
-	// compute playtime
-	t = *real_time_passed((time(0) - ch->player.time.logon) + ch->player.time.played, 0);
-	hours = t.day * 24 + t.hours;
+	if (GET_ACCESS_LEVEL(ch) == 0) {
+		hours = 0;
+	}
+	else {
+		// compute playtime
+		t = *real_time_passed((time(0) - ch->player.time.logon) + ch->player.time.played, 0);
+		hours = t.day * 24 + t.hours;
+	}
 	
 	// pull configs
 	first = config_get_int("hours_to_first_bonus_trait");
@@ -2942,9 +2947,14 @@ void nanny(descriptor_data *d, char *arg) {
 					return;
 				}
 				
-				// compute playtime
-				t = *real_time_passed((time(0) - d->character->player.time.logon) + d->character->player.time.played, 0);
-				hours = t.day * 24 + t.hours;
+				if (GET_ACCESS_LEVEL(d->character) == 0) {
+					hours = 0;
+				}
+				else {
+					// compute playtime
+					t = *real_time_passed((time(0) - d->character->player.time.logon) + d->character->player.time.played, 0);
+					hours = t.day * 24 + t.hours;
+				}
 				
 				// determine what trait they chose
 				bit = 0;
