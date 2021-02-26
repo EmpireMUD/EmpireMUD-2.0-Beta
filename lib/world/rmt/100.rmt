@@ -42,8 +42,8 @@ S
 A Strange Grove~
    The trees grow thick here and though there is no underbrush or grass, it is
 sometimes hard to move. In the corner of your eye, shadows dart between trees.
-Behind the fog, you can hear the cackle of wildlings and the chants of their
-druid masters.
+Behind the fog, you can hear the cackle of wildlings and the chants of the
+druids.
 ~
 ad 0 0
 D14
@@ -654,7 +654,7 @@ S
 #10035
 The Second Floor~
    The curved hallway is lined with portraits of the Tower Skycleave's former
-masters, from the first to the last. The frames are interrupted by a large door
+leaders, from the first to the last. The frames are interrupted by a large door
 marked 'Caution: Goblins', from which you can hear strange, small, high-pitched
 shrieks.
 ~
@@ -672,7 +672,7 @@ M 0 10037 100.00 3
 S
 #10036
 The Second Floor~
-   The long, curving hallway is lined with portraits of former masters of Tower
+   The long, curving hallway is lined with portraits of former leaders of Tower
 Skycleave. You can't see the outside from here, but the door marked 'Pixy
 Races' is covered in glowing yellow dust, sometimes in a shape resembling a
 small bird, which must have smacked into it.
@@ -695,7 +695,7 @@ The Second Floor~
    The long hallway is filled with stations where the Tower Skycleave's various
 apprentices practice their experiments and conduct their research, hoping to
 join the upper echelons of Skycleave's hierarchy. As if to inspire them, the
-wall is lined with portraits of former masters of the tower.
+wall is lined with portraits of former leaders of the tower.
 ~
 ch 0 0
 D7
@@ -711,7 +711,7 @@ S
 The Base of the Staircase~
    The second floor, with its immaculate wooden floors, comes to a gradual end
 here, as it curves up into a staircase and further up the tower. A long line of
-the Tower Skycleave's former masters comes to an apparent end here at the
+the Tower Skycleave's former leaders comes to an apparent end here at the
 stairs, where its current leaders, Knezz, Barrosh, and Celiya occupy the final
 three frames.
 ~
@@ -860,7 +860,7 @@ The Top Floor~
    As you finally reach the end of the Tower Skycleave's immense spiral
 hallway, you find yourself in the office of Grand High Sorcerer Knezz, the
 tower's patron and leader. A plaque on the wall indicates he has been employee
-of the year for nearly a century, meaning all those portraits of former masters
+of the year for nearly a century, meaning all those portraits of former leaders
 on the second floor must be ancient indeed. The office is lined in black
 nocturnium, which seems to glow from some angles.
 ~
@@ -1032,7 +1032,7 @@ The Ground Floor~
 staircase that spirals the inner column of the tower. The first floor caters
 primarily to tourists. The second floor is where the apprentices conduct their
 experiments. The third floor has more advanced research, while the top floor
-holds the offices of the tower's masters.
+holds the offices of the tower's leaders.
 ~
 cdh 0 0
 D5

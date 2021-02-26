@@ -1378,7 +1378,7 @@ void extract_char(char_data *ch) {
 	}
 	
 	// end following now
-	if (ch->followers || ch->master) {
+	if (ch->followers || GET_LEADER(ch)) {
 		die_follower(ch);
 	}
 	
@@ -3806,10 +3806,10 @@ empire_data *get_empire_by_name(char *raw_name) {
 void add_follower(char_data *ch, char_data *leader, bool msg) {
 	struct follow_type *k;
 
-	if (ch->master || ch == leader)
+	if (GET_LEADER(ch) || ch == leader)
 		return;
 
-	ch->master = leader;
+	GET_LEADER(ch) = leader;
 
 	CREATE(k, struct follow_type, 1);
 
@@ -3835,7 +3835,7 @@ void add_follower(char_data *ch, char_data *leader, bool msg) {
 void die_follower(char_data *ch) {
 	struct follow_type *j, *k;
 
-	if (ch->master) {
+	if (GET_LEADER(ch)) {
 		stop_follower(ch);
 	}
 
@@ -3855,27 +3855,27 @@ void die_follower(char_data *ch) {
 void stop_follower(char_data *ch) {
 	struct follow_type *fol, *next_fol;
 
-	if (ch->master == NULL)
+	if (GET_LEADER(ch) == NULL)
 		return;
 	
 	// only message if neither was just extracted
-	if (!EXTRACTED(ch) && !EXTRACTED(ch->master)) {
-		act("You stop following $N.", FALSE, ch, 0, ch->master, TO_CHAR);
-		act("$n stops following $N.", TRUE, ch, 0, ch->master, TO_NOTVICT);
-		if (CAN_SEE(ch->master, ch) && WIZHIDE_OK(ch->master, ch)) {
-			act("$n stops following you.", TRUE, ch, 0, ch->master, TO_VICT);
+	if (!EXTRACTED(ch) && !EXTRACTED(GET_LEADER(ch))) {
+		act("You stop following $N.", FALSE, ch, 0, GET_LEADER(ch), TO_CHAR);
+		act("$n stops following $N.", TRUE, ch, 0, GET_LEADER(ch), TO_NOTVICT);
+		if (CAN_SEE(GET_LEADER(ch), ch) && WIZHIDE_OK(GET_LEADER(ch), ch)) {
+			act("$n stops following you.", TRUE, ch, 0, GET_LEADER(ch), TO_VICT);
 		}
 	}
 	
 	// delete from list
-	LL_FOREACH_SAFE(ch->master->followers, fol, next_fol) {
+	LL_FOREACH_SAFE(GET_LEADER(ch)->followers, fol, next_fol) {
 		if (fol->follower == ch) {
-			LL_DELETE(ch->master->followers, fol);
+			LL_DELETE(GET_LEADER(ch)->followers, fol);
 			free(fol);
 		}
 	}
 
-	ch->master = NULL;
+	GET_LEADER(ch) = NULL;
 	REMOVE_BIT(AFF_FLAGS(ch), AFF_CHARM);
 }
 
@@ -3884,7 +3884,7 @@ void stop_follower(char_data *ch) {
 //// GLOBAL HANDLERS /////////////////////////////////////////////////////////
 
 /**
-* This is the master function for running a set of globals.
+* This is the main function for running a set of globals.
 *
 * If you need to pass additional data through to the validator, put it into a
 * pointer and pass it as 'other_data' (see: struct glb_emp_bean).
@@ -4067,8 +4067,8 @@ bool in_same_group(char_data *ch, char_data *vict) {
 	char_data *use_ch, *use_vict;
 
 	// use immediate leader if it's an npc
-	use_ch = IS_NPC(ch) ? ch->master : ch;
-	use_vict = IS_NPC(vict) ? vict->master : vict;
+	use_ch = IS_NPC(ch) ? GET_LEADER(ch) : ch;
+	use_vict = IS_NPC(vict) ? GET_LEADER(vict) : vict;
 
 	if (use_ch && use_vict && !IS_NPC(use_ch) && !IS_NPC(use_vict) && GROUP(use_ch) && GROUP(use_ch) == GROUP(use_vict)) {
 		return TRUE;
@@ -5438,8 +5438,8 @@ void tag_mob(char_data *mob, char_data *player) {
 	struct group_member_data *mem;
 	
 	// find top player -- if it's a companion or charmie of some kind
-	while (player && IS_NPC(player) && player->master && IN_ROOM(player) == IN_ROOM(player->master)) {
-		player = player->master;
+	while (player && IS_NPC(player) && GET_LEADER(player) && IN_ROOM(player) == IN_ROOM(GET_LEADER(player))) {
+		player = GET_LEADER(player);
 	}
 	
 	// simple sanity

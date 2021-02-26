@@ -846,29 +846,29 @@ bool is_class_ability(ability_data *abil) {
 * mob in the room and runs load triggers, but does not send any messages of its
 * own.
 *
-* @param char_data *master The player summoning the companion.
+* @param char_data *leader The player summoning the companion.
 * @param struct companion_data *cd The companion (data) to summon as a mob.
 * @return char_data* The mob that was summoned, if possible (NULL otherwise).
 */
-char_data *load_companion_mob(char_data *master, struct companion_data *cd) {
+char_data *load_companion_mob(char_data *leader, struct companion_data *cd) {
 	struct trig_proto_list *tp;
 	struct trig_var_data *var;
 	struct companion_mod *cm;
 	char_data *mob, *proto;
 	trig_data *trig;
 	
-	if (!master || IS_NPC(master) || !cd || !(proto = mob_proto(cd->vnum))) {
+	if (!leader || IS_NPC(leader) || !cd || !(proto = mob_proto(cd->vnum))) {
 		return NULL;	// safety first
 	}
 	
 	// get rid of any old companion
-	despawn_companion(master, NOTHING);
+	despawn_companion(leader, NOTHING);
 	
 	// load mob
 	mob = read_mobile(cd->vnum, cd->instantiated ? FALSE : TRUE);
 	set_mob_flags(mob, MOB_NO_EXPERIENCE | MOB_SPAWNED | MOB_NO_EXPERIENCE | MOB_NO_LOOT);
 	SET_BIT(AFF_FLAGS(mob), AFF_CHARM | AFF_NO_DRINK_BLOOD);
-	setup_generic_npc(mob, GET_LOYALTY(master), NOTHING, NOTHING);
+	setup_generic_npc(mob, GET_LOYALTY(leader), NOTHING, NOTHING);
 	
 	// CMOD_x: modify the companion
 	LL_FOREACH(cd->mods, cm) {
@@ -932,9 +932,9 @@ char_data *load_companion_mob(char_data *master, struct companion_data *cd) {
 	}
 	
 	// set companion data
-	GET_COMPANION(master) = mob;
-	GET_COMPANION(mob) = master;
-	GET_LAST_COMPANION(master) = GET_MOB_VNUM(mob);
+	GET_COMPANION(leader) = mob;
+	GET_COMPANION(mob) = leader;
+	GET_LAST_COMPANION(leader) = GET_MOB_VNUM(mob);
 	
 	// for new mobs, ensure any data is saved back
 	if (!cd->instantiated) {
@@ -960,13 +960,13 @@ char_data *load_companion_mob(char_data *master, struct companion_data *cd) {
 		
 		// mark as instantiated
 		cd->instantiated = TRUE;
-		queue_delayed_update(master, CDU_SAVE);
+		queue_delayed_update(leader, CDU_SAVE);
 	}
 	
 	// scale to summoner
-	scale_mob_as_companion(mob, master, get_player_level_for_ability(master, cd->from_abil));
-	char_to_room(mob, IN_ROOM(master));
-	add_follower(mob, master, FALSE);
+	scale_mob_as_companion(mob, leader, get_player_level_for_ability(leader, cd->from_abil));
+	char_to_room(mob, IN_ROOM(leader));
+	add_follower(mob, leader, FALSE);
 	
 	// triggers last
 	load_mtrigger(mob);
@@ -1662,8 +1662,8 @@ void do_ability(char_data *ch, ability_data *abil, char *argument, char_data *ta
 		data->stop = TRUE;
 		return;
 	}
-	if (targ && AFF_FLAGGED(ch, AFF_CHARM) && (ch->master == targ)) {
-		msg_to_char(ch, "You are afraid you might hurt your master!\r\n");
+	if (targ && AFF_FLAGGED(ch, AFF_CHARM) && (GET_LEADER(ch) == targ)) {
+		msg_to_char(ch, "You are afraid you might hurt your leader!\r\n");
 		data->stop = TRUE;
 		return;
 	}

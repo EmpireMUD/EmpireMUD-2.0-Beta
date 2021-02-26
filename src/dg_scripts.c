@@ -3729,6 +3729,12 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					else if (!str_cmp(field, "last_move_dir")) {
 						snprintf(str, slen, "%s", GET_LAST_DIR(c) != NO_DIR ? dirs[GET_LAST_DIR(c)] : "");
 					}
+					else if (!str_cmp(field, "leader")) {
+						if (!GET_LEADER(c))
+							strcpy(str, "");
+						else
+							snprintf(str, slen, "%c%d", UID_CHAR, char_script_id(GET_LEADER(c)));
+					}
 					else if (!str_cmp(field, "learned")) {
 						if (subfield && *subfield && isdigit(*subfield) && has_learned_craft(c, atoi(subfield))) {
 							strcpy(str, "1");
@@ -3801,10 +3807,11 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						snprintf(str, slen, "%d", GET_MAX_MOVE(c));
 
 					else if (!str_cmp(field, "master")) {
-						if (!c->master)
+						// for historical reasons .master is here -- but please use .leader
+						if (!GET_LEADER(c))
 							strcpy(str, "");
 						else
-							snprintf(str, slen, "%c%d", UID_CHAR, char_script_id(c->master));
+							snprintf(str, slen, "%c%d", UID_CHAR, char_script_id(GET_LEADER(c)));
 					}
 					else if (!str_cmp(field, "mob_flagged")) {
 						if (subfield && *subfield) {
@@ -3851,8 +3858,8 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						struct follow_type *fol;
 						bool fnd = FALSE, success = FALSE;
 						
-						if (c->master) {
-							LL_FOREACH(c->master->followers, fol) {
+						if (GET_LEADER(c)) {
+							LL_FOREACH(GET_LEADER(c)->followers, fol) {
 								if (fnd && fol->follower) {	// already found c...
 									snprintf(str, slen, "%c%d", UID_CHAR, char_script_id(fol->follower));
 									success = TRUE;
@@ -3866,7 +3873,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 							}
 						}
 						else {
-							*str = '\0';	// no master == no next follower
+							*str = '\0';	// no leader == no next follower
 						}
 					}
 					else if (!str_cmp(field, "next_in_room")) {

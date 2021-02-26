@@ -260,7 +260,7 @@ An unsorted list of things I'd like to add to this document:
 	room_data *world_table;	// hash table of the whole world
 	room_data *interior_room_list;	// linked list of interior rooms: room->next_interior
 	struct island_info *island_table; // hash table for all the islands
-	struct map_data world_map[MAP_WIDTH][MAP_HEIGHT];	// master world map
+	struct map_data world_map[MAP_WIDTH][MAP_HEIGHT];	// main world map
 	struct map_data *land_map;	// linked list of non-ocean
 
 	empire_data *empire_table;	// hash table of empires

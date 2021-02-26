@@ -889,7 +889,7 @@ ACMD(do_mmove) {
 	}
 	
 	// things that block moves
-	if (MOB_FLAGGED(ch, MOB_SENTINEL | MOB_TIED) || AFF_FLAGGED(ch, AFF_CHARM | AFF_ENTANGLED) || GET_POS(ch) != POS_STANDING || (ch->master && IN_ROOM(ch) == IN_ROOM(ch->master))) {
+	if (MOB_FLAGGED(ch, MOB_SENTINEL | MOB_TIED) || AFF_FLAGGED(ch, AFF_CHARM | AFF_ENTANGLED) || GET_POS(ch) != POS_STANDING || (GET_LEADER(ch) && IN_ROOM(ch) == IN_ROOM(GET_LEADER(ch)))) {
 		return;
 	}
 	
@@ -1311,7 +1311,7 @@ ACMD(do_mteleport) {
 					}
 					
 					// teleport players and their followers
-					if (!IS_NPC(vict) || (vict->master && !IS_NPC(vict->master))) {
+					if (!IS_NPC(vict) || (GET_LEADER(vict) && !IS_NPC(GET_LEADER(vict)))) {
 						char_from_room(vict);
 						char_to_room(vict, target);
 						GET_LAST_DIR(vict) = NO_DIR;
@@ -2016,7 +2016,7 @@ ACMD(do_mtransform) {
 		tmpmob.script = ch->script;
 		tmpmob.memory = ch->memory;
 		tmpmob.followers = ch->followers;
-		tmpmob.master = ch->master;
+		tmpmob.leader = GET_LEADER(ch);
 		tmpmob.cooldowns = ch->cooldowns;
 	
 		if (keep_attr) {
@@ -2198,22 +2198,22 @@ ACMD(do_mfollow) {
 		return;
 	}
 
-	if (ch->master == leader) /* already following */
+	if (GET_LEADER(ch) == leader) /* already following */
 		return;
 
-	if (AFF_FLAGGED(ch, AFF_CHARM) && (ch->master))  /* can't override charm */
+	if (AFF_FLAGGED(ch, AFF_CHARM) && (GET_LEADER(ch)))  /* can't override charm */
 		return;
 
 	/* stop following someone else first */
-	if (ch->master) {
-		LL_FOREACH_SAFE(ch->master->followers, fol, next_fol) {
+	if (GET_LEADER(ch)) {
+		LL_FOREACH_SAFE(GET_LEADER(ch)->followers, fol, next_fol) {
 			if (fol->follower == ch) {
-				LL_DELETE(ch->master->followers, fol);
+				LL_DELETE(GET_LEADER(ch)->followers, fol);
 				free(fol);
 			}
 		}
 		
-		ch->master = NULL;
+		GET_LEADER(ch) = NULL;
 	}
 
 	if (ch == leader) 
@@ -2224,7 +2224,7 @@ ACMD(do_mfollow) {
 		return;
 	}
 
-	ch->master = leader;
+	GET_LEADER(ch) = leader;
 
 	CREATE(fol, struct follow_type, 1);
 	fol->follower = ch;

@@ -5960,7 +5960,7 @@ void do_stat_character(char_data *ch, char_data *k) {
 	}
 
 	if (!is_proto) {
-		sprintf(buf, "Master is: %s, Followers are:", ((k->master) ? GET_NAME(k->master) : "<none>"));
+		sprintf(buf, "Leader is: %s, Followers are:", ((GET_LEADER(k)) ? GET_NAME(GET_LEADER(k)) : "<none>"));
 		for (fol = k->followers; fol; fol = fol->next) {
 			sprintf(buf2, "%s %s", found++ ? "," : "", PERS(fol->follower, ch, 1));
 			strcat(buf, buf2);

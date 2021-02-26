@@ -17,8 +17,8 @@ end
 nop %self.set_cooldown(500, 25)
 switch %selected_ability%
   case 1
-    * Restore mana on master
-    set targ %self.master%
+    * Restore mana on leader
+    set targ %self.leader%
     if !%targ%
       %echo% ~%self% glows and purrs.
       halt
@@ -34,8 +34,8 @@ switch %selected_ability%
     %heal% %actor% mana 100
   break
   case 2
-    * Mana regen buff on master
-    set targ %self.master%
+    * Mana regen buff on leader
+    set targ %self.leader%
     if !%targ%
       %echo% ~%self% glows and purrs.
       halt
@@ -91,7 +91,7 @@ if %actor.char_target(%arg1%)% != %self%
   return 0
   halt
 end
-if %actor% != %self.master%
+if %actor% != %self.leader%
   return 0
   halt
 end
@@ -122,8 +122,8 @@ elseif status /= %arg2%
   eval ability_name %%ability_%current_ability%%%
   %send% %actor% ~%self% is currently using: %ability_name%.
   %send% %actor% ~%self% has the following abilities available:
-  %send% %actor% replenish: Replenish (restore mana on master)
-  %send% %actor% energize: Re-energize (+mana-regen on master)
+  %send% %actor% replenish: Replenish (restore mana on player)
+  %send% %actor% energize: Re-energize (+mana-regen on player)
   %send% %actor% brightness: Bright as the moon (+resistance on party)
   %send% %actor% protection: Moon's protection (+resistance on tank)
   halt
@@ -207,7 +207,7 @@ if %actor.char_target(%arg1%)% != %self%
   return 0
   halt
 end
-if %actor% != %self.master%
+if %actor% != %self.leader%
   return 0
   halt
 end
@@ -276,8 +276,8 @@ end
 nop %self.set_cooldown(500, 25)
 switch %selected_ability%
   case 1
-    * Bonus-healing buff on master
-    set targ %self.master%
+    * Bonus-healing buff on leader
+    set targ %self.leader%
     if !%targ%
       %echo% ~%self% flickers and burns.
       halt
@@ -300,8 +300,8 @@ switch %selected_ability%
       halt
     end
     if %targ.health% == %targ.maxhealth%
-      %send% %self.master% ~%self% tries to heal ~%targ%, but &%targ% doesn't need healing.
-      %echoneither% %self.master% %targ% ~%self% flies in circles around ~%targ%.
+      %send% %self.leader% ~%self% tries to heal ~%targ%, but &%targ% doesn't need healing.
+      %echoneither% %self.leader% %targ% ~%self% flies in circles around ~%targ%.
       %send% %targ% ~%self% flies in circles around you.
       nop %self.set_cooldown(500, 5)%
       halt
@@ -352,8 +352,8 @@ Scorpion Shadow Familiar Debuffs~
 if %self.disabled%
   halt
 end
-set master %self.master%
-if !%master%
+set leader %self.leader%
+if !%leader%
   %echo% ~%self% shrinks into the shadows and vanishes.
   %purge% %self%
   halt
@@ -366,7 +366,7 @@ if %self.varexists(selected_ability)%
 end
 set targ %random.enemy%
 if !%targ%
-  %echo% |%master% scorpion shadow twists and coils from the darkness.
+  %echo% |%leader% scorpion shadow twists and coils from the darkness.
   halt
 end
 nop %self.set_cooldown(500, 25)%
@@ -376,33 +376,33 @@ end
 switch %selected_ability%
   case 1
     * Slow on enemy
-    %send% %targ% |%master% scorpion shadow stings you with a creeping venom!
-    %send% %master% Your scorpion shadow stings ~%targ% with a creeping venom!
-    %echoneither% %targ% %master% |%master% scorpion shadow stings ~%targ% with a creeping venom!
+    %send% %targ% |%leader% scorpion shadow stings you with a creeping venom!
+    %send% %leader% Your scorpion shadow stings ~%targ% with a creeping venom!
+    %echoneither% %targ% %leader% |%leader% scorpion shadow stings ~%targ% with a creeping venom!
     dg_affect #510 %targ% SLOW ON 30
   break
   case 2
     * Damage debuff on enemy
-    %send% %targ% |%master% scorpion shadow stings you with shadow venom!
-    %send% %master% Your scorpion shadow stings ~%targ% with shadow venom!
-    %echoneither% %targ% %master% |%master% scorpion shadow stings ~%targ% with shadow venom!
+    %send% %targ% |%leader% scorpion shadow stings you with shadow venom!
+    %send% %leader% Your scorpion shadow stings ~%targ% with shadow venom!
+    %echoneither% %targ% %leader% |%leader% scorpion shadow stings ~%targ% with shadow venom!
     eval amount %self.level% / 20
     dg_affect #510 %targ% BONUS-PHYSICAL -%amount% 30
     dg_affect #510 %targ% BONUS-MAGICAL -%amount% 30
   break
   case 3
     * Wits debuff on enemy
-    %send% %targ% |%master% scorpion shadow stings you with numbing venom!
-    %send% %master% Your scorpion shadow stings ~%targ% with a numbing venom!
-    %echoneither% %targ% %master% |%master% scorpion shadow stings ~%targ% with numbing venom!
+    %send% %targ% |%leader% scorpion shadow stings you with numbing venom!
+    %send% %leader% Your scorpion shadow stings ~%targ% with a numbing venom!
+    %echoneither% %targ% %leader% |%leader% scorpion shadow stings ~%targ% with numbing venom!
     eval amount 2 + %self.level% / 100
     dg_affect #510 %targ% WITS -%amount% 30
   break
   case 4
     * Poison DoT on enemy
-    %send% %targ% |%master% scorpion shadow stings you with agonizing venom!
-    %send% %master% Your scorpion shadow stings ~%targ% with agonizing venom!
-    %echoneither% %targ% %master% |%master% scorpion shadow stings ~%targ% with agonizing venom!
+    %send% %targ% |%leader% scorpion shadow stings you with agonizing venom!
+    %send% %leader% Your scorpion shadow stings ~%targ% with agonizing venom!
+    %echoneither% %targ% %leader% |%leader% scorpion shadow stings ~%targ% with agonizing venom!
     %dot% #510 %targ% 100 30 poison 1
   break
 done
@@ -417,8 +417,8 @@ end
 if %self.cooldown(500)%
   halt
 end
-set master %self.master%
-if !%master%
+set leader %self.leader%
+if !%leader%
   %echo% ~%self% shrinks into the shadows and vanishes.
   %purge% %self%
   halt
@@ -434,29 +434,29 @@ if (%selected_ability% == 4)
   * Dodge buff on one ally
   set enemy %self.fighting%
   if !%enemy%
-    %echoaround% %master% |%master% shadow seems to flap its wings.
+    %echoaround% %leader% |%leader% shadow seems to flap its wings.
     halt
   end
   set targ %enemy.fighting%
   if (!%targ% || !%self.is_ally(%targ%)%)
-    %echoaround% %master% |%master% shadow seems to flap its wings.
+    %echoaround% %leader% |%leader% shadow seems to flap its wings.
     halt
   end
-  if %targ% != %master%
-    %send% %targ% |%master% owl shadow wraps its dark wings around you, protecting you!
-    %send% %master% Your owl shadow wraps its dark wings around ~%targ%, protecting *%targ%!
+  if %targ% != %leader%
+    %send% %targ% |%leader% owl shadow wraps its dark wings around you, protecting you!
+    %send% %leader% Your owl shadow wraps its dark wings around ~%targ%, protecting *%targ%!
   else
-    %send% %master% Your owl shadow wraps its dark wings around you, protecting you!
+    %send% %leader% Your owl shadow wraps its dark wings around you, protecting you!
   end
-  %echoneither% %targ% %master% |%master% owl shadow wraps its dark wings around ~%targ%, protecting *%targ%!
+  %echoneither% %targ% %leader% |%leader% owl shadow wraps its dark wings around ~%targ%, protecting *%targ%!
   eval amount 15 + %self.level% / 25
   dg_affect #511 %targ% DODGE %amount% 30
   nop %self.set_cooldown(500, 25)%
   halt
 end
 * random results 1-3
-%send% %master% Your owl shadow wraps itself around the party!
-%echoaround% %master% |%master% owl shadow wraps itself around the party!
+%send% %leader% Your owl shadow wraps itself around the party!
+%echoaround% %leader% |%leader% owl shadow wraps itself around the party!
 set ch %self.room.people%
 set had_effect 0
 while %ch%
@@ -579,8 +579,8 @@ if !%selected_ability%
 end
 switch %selected_ability%
   case 1
-    * Short, LARGE bonus-healing buff on master
-    set targ %self.master%
+    * Short, LARGE bonus-healing buff on leader
+    set targ %self.leader%
     if !%targ%
       %echo% ~%self% sizzles and simmers.
       halt
@@ -642,24 +642,24 @@ done
 nop %self.set_cooldown(500, 25)%
 ~
 #514
-Shadow Wolf Familiars: Hide with Master~
+Shadow Wolf Familiars: Hide with Player~
 0 ct 0
 hide~
 * never block command
 return 0
-* master only
-set master %self.master%
-if !%master%
+* leader only
+set leader %self.leader%
+if !%leader%
   halt
 end
-if %actor% != %master%
+if %actor% != %leader%
   halt
 end
-if %self.fighting% || %master.fighting%
+if %self.fighting% || %leader.fighting%
   halt
 end
-* master is hiding; hide
-if !%master.ability(Hide)%
+* leader is hiding; hide
+if !%leader.ability(Hide)%
   halt
 end
 dg_affect %self% HIDE on -1
@@ -738,7 +738,7 @@ if %actor.char_target(%arg1%)% != %self%
   return 0
   halt
 end
-if %actor% != %self.master%
+if %actor% != %self.leader%
   return 0
   halt
 end
@@ -769,7 +769,7 @@ elseif status /= %arg2%
   eval ability_name %%ability_%current_ability%%%
   %send% %actor% ~%self% is currently using: %ability_name%.
   %send% %actor% ~%self% has the following abilities available:
-  %send% %actor% blaze: Blaze with Power (+bonus healing on master)
+  %send% %actor% blaze: Blaze with Power (+bonus healing on player)
   %send% %actor% warmth: Healing Warmth (heals the tank)
   %send% %actor% fire: Healing Fire (heals the whole party)
   %send% %actor% passion: Burning Passion (+bonus damage on party)
@@ -800,7 +800,7 @@ if %actor.char_target(%arg1%)% != %self%
   return 0
   halt
 end
-if %actor% != %self.master%
+if %actor% != %self.leader%
   return 0
   halt
 end
@@ -862,7 +862,7 @@ if %actor.char_target(%arg1%)% != %self%
   return 0
   halt
 end
-if %actor% != %self.master%
+if %actor% != %self.leader%
   return 0
   halt
 end
@@ -924,7 +924,7 @@ if %actor.char_target(%arg1%)% != %self%
   return 0
   halt
 end
-if %actor% != %self.master%
+if %actor% != %self.leader%
   return 0
   halt
 end
@@ -986,7 +986,7 @@ if %actor.char_target(%arg1%)% != %self%
   return 0
   halt
 end
-if %actor% != %self.master%
+if %actor% != %self.leader%
   return 0
   halt
 end
@@ -1017,7 +1017,7 @@ elseif status /= %arg2%
   eval ability_name %%ability_%current_ability%%%
   %send% %actor% ~%self% is currently using: %ability_name%.
   %send% %actor% ~%self% has the following abilities available:
-  %send% %actor% alchemy: Alchemist's Fire (short +bonus-healing on master)
+  %send% %actor% alchemy: Alchemist's Fire (short +bonus-healing on player)
   %send% %actor% soothing: Soothing flames (short heal-over-time on tank)
   %send% %actor% guardian: Guardian flames (short +dodge on tank)
   %send% %actor% surge: Ember surge (+damage on party)
@@ -1048,7 +1048,7 @@ if %actor.char_target(%arg1%)% != %self%
   return 0
   halt
 end
-if %actor% != %self.master%
+if %actor% != %self.leader%
   return 0
   halt
 end

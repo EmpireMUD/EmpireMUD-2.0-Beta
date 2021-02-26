@@ -210,7 +210,7 @@ set mobs 0
 set found 0
 set ch %self.room.people%
 while %ch% && !%found%
-  if (%ch.is_npc% && %ch.vnum% >= 10501 && %ch.vnum% <= 10504 && %ch.master% && %ch.master% == %actor%)
+  if (%ch.is_npc% && %ch.vnum% >= 10501 && %ch.vnum% <= 10504 && %ch.leader% && %ch.leader% == %actor%)
     set found 1
   elseif %ch.is_npc%
     eval mobs %mobs% + 1

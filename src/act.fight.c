@@ -317,7 +317,7 @@ ACMD(do_hit) {
 		send_to_char("You hit yourself...OUCH!.\r\n", ch);
 		act("$n hits $mself, and says OUCH!", FALSE, ch, 0, vict, TO_ROOM);
 		}
-	else if (AFF_FLAGGED(ch, AFF_CHARM) && (ch->master == vict))
+	else if (AFF_FLAGGED(ch, AFF_CHARM) && (GET_LEADER(ch) == vict))
 		act("$N is just such a good friend, you simply can't hit $M.", FALSE, ch, 0, vict, TO_CHAR);
 	else if (vict == FIGHTING(ch) && FIGHT_MODE(ch) == FMODE_MISSILE) {
 		if (FIGHT_MODE(vict) == FMODE_MISSILE) {
@@ -331,7 +331,7 @@ ACMD(do_hit) {
 		}
 	}
 	else if (can_fight(ch, vict)) {
-		if (AFF_FLAGGED(ch, AFF_CHARM) && ch->master && !IS_NPC(ch->master) && !IS_NPC(vict))
+		if (AFF_FLAGGED(ch, AFF_CHARM) && GET_LEADER(ch) && !IS_NPC(GET_LEADER(ch)) && !IS_NPC(vict))
 			return;
 
 		if (FIGHTING(ch) == vict) {
@@ -478,7 +478,7 @@ ACMD(do_shoot) {
 		send_config_msg(ch, "no_person");
 	else if (vict == ch)
 		msg_to_char(ch, "Shooting yourself in the foot will do you no good now.\r\n");
-	else if (AFF_FLAGGED(ch, AFF_CHARM) && ch->master == vict)
+	else if (AFF_FLAGGED(ch, AFF_CHARM) && GET_LEADER(ch) == vict)
 		act("$N is just such a good friend, you simply can't hit $M.", FALSE, ch, 0, vict, TO_CHAR);
 	else if (!GET_EQ(ch, WEAR_RANGED)) {
 		msg_to_char(ch, "You aren't holding anything you can shoot!\r\n");
@@ -506,7 +506,7 @@ ACMD(do_shoot) {
 		}
 	}
 	else if (can_fight(ch, vict)) {
-		if (AFF_FLAGGED(ch, AFF_CHARM) && ch->master && !IS_NPC(ch->master) && !IS_NPC(vict))
+		if (AFF_FLAGGED(ch, AFF_CHARM) && GET_LEADER(ch) && !IS_NPC(GET_LEADER(ch)) && !IS_NPC(vict))
 			return;
 
 		msg_to_char(ch, "You take aim.\r\n");

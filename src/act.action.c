@@ -102,7 +102,7 @@ void perform_escape(char_data *ch);
  //////////////////////////////////////////////////////////////////////////////
 //// CONTROL DATA ////////////////////////////////////////////////////////////
 
-// ACT_x: master data for all chores
+// ACT_x: main data for all chores
 const struct action_data_struct action_data[] = {
 	{ "", "", NOBITS, NULL, NULL },	// ACT_NONE
 	{ "digging", "is digging at the ground.", ACTF_SHOVEL | ACTF_FINDER | ACTF_HASTE | ACTF_FAST_CHORES, process_digging, NULL },	// ACT_DIGGING

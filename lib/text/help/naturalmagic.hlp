@@ -592,8 +592,8 @@ Familiar type:  buff
 Command:  companion moon rabbit
 
 The moon rabbit familiar will use the following abilities in combat:
-- Replenish: +(scaled amount) Mana to master (instant)
-- Re-energize: +(level/10) Mana-Regen to master (30 sec)
+- Replenish: +(scaled amount) Mana to the player (instant)
+- Re-energize: +(level/10) Mana-Regen to the player (30 sec)
 - Bright as the moon: +(level/20) Resist-Physical/Magical on party (30 sec)
 - Moon's protection: +(level/5) Resist-Physical/Magical on the tank (30 sec)
 
@@ -661,7 +661,7 @@ Familiar type:  buff
 Command:  companion phoenix
 
 The phoenix familiar will use the following abilities in combat:
-- Blaze with Power: +(level/20) bonus healing to master (30 sec)
+- Blaze with Power: +(level/20) bonus healing to the player (30 sec)
 - Healing Warmth: heals the tank (instant)
 - Healing Fire: smaller heal for the whole party (instant)
 - Burning Passion: +(level/30) bonus physical/magical damage to party (30 sec)
@@ -778,7 +778,7 @@ Familiar type:  buff
 Command:  companion salamander
 
 The salamander familiar will use the following abilities in combat:
-- Alchemist's Fire: +(level/4) Bonus-Healing on master (10 sec)
+- Alchemist's Fire: +(level/4) Bonus-Healing on the player (10 sec)
 - Soothing flames: +(level/4) Heal-Over-Time on tank (10 sec)
 - Guardian flames: +(15+level/25) Dodge on tank (10 sec)
 - Ember surge: +(level/30) Bonus-Physical/Magical on party (30 sec)

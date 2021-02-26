@@ -12,7 +12,7 @@
 
 /**
 * Contents:
-*   Master Configuration
+*   Main Configuration
 *   Basic Types and Consts
 *   #define Section
 *     Miscellaneous Defines
@@ -90,7 +90,7 @@
 #include "utlist.h"	// needed by everything
 
  //////////////////////////////////////////////////////////////////////////////
-//// MASTER CONFIGURATION ////////////////////////////////////////////////////
+//// MAIN CONFIGURATION //////////////////////////////////////////////////////
 
 // These are configurations which need to be in a header file, and most of
 // which can't be changed without corrupting your world or player files.
@@ -1559,7 +1559,7 @@ typedef struct vehicle_data vehicle_data;
 #define MOB_PLURAL  BIT(12)	// m. Mob represents 2+ creatures
 #define MOB_NO_ATTACK  BIT(13)	// n. the mob can be in combat, but will never hit
 #define MOB_SPAWNED  BIT(14)	// o. Mob was spawned and should despawn if nobody is around
-#define MOB_CHAMPION  BIT(15)	// p. Mob auto-rescues its master
+#define MOB_CHAMPION  BIT(15)	// p. Mob auto-rescues its leader
 #define MOB_EMPIRE  BIT(16)	// q. empire NPC
 	#define MOB_UNUSED  BIT(17)	// formerly 'familiar'
 #define MOB_PICKPOCKETED  BIT(18)	// s. has already been pickpocketed
@@ -2956,7 +2956,7 @@ union config_data_union {
 };
 
 
-// for the master config system
+// for the global config system
 struct config_type {
 	int set;	// CONFIG_
 	char *key;	// string key
@@ -3937,7 +3937,7 @@ struct pursuit_data {
  //////////////////////////////////////////////////////////////////////////////
 //// PLAYER STRUCTS //////////////////////////////////////////////////////////
 
-// master player accounts
+// player accounts
 struct account_data {
 	int id;	// corresponds to player_index_data account_id and player's saved account id
 	struct account_player *players;	// linked list of players
@@ -4595,7 +4595,7 @@ struct char_data {
 	bool in_combat_list;	// helps with removing from combat list
 	
 	struct follow_type *followers;	// List of chars followers
-	char_data *master;	// Who is char following?
+	char_data *leader;	// Who is char following?
 	struct group_data *group;	// Character's Group
 
 	char *prev_host;	// Previous host (they're Trills)
@@ -5548,7 +5548,7 @@ struct obj_storage_type {
  //////////////////////////////////////////////////////////////////////////////
 //// PROGRESS STRUCTS ////////////////////////////////////////////////////////
 
-// master progression goal
+// progression goal
 struct progress_data {
 	any_vnum vnum;
 	

@@ -542,7 +542,7 @@ bool is_fight_ally(char_data *ch, char_data *frenemy) {
 		return FALSE;
 	}
 	
-	// check "master" tree up both sides == people are allies if ch (or any of ch's masters) are the same as frenemy (or any of frenemy's masters)
+	// check "leader" tree up both sides == people are allies if ch (or any of ch's masters) are the same as frenemy (or any of frenemy's masters)
 	ch_iter = ch;
 	while (ch_iter) {
 		fr_iter = frenemy;
@@ -552,16 +552,16 @@ bool is_fight_ally(char_data *ch, char_data *frenemy) {
 				return TRUE;
 			}
 			
-			if (FIGHTING(fr_iter) != fr_iter->master) {
-				fr_iter = fr_iter->master;
+			if (FIGHTING(fr_iter) != GET_LEADER(fr_iter)) {
+				fr_iter = GET_LEADER(fr_iter);
 			}
 			else {
 				break;	// hit someone they are fighting AND following
 			}
 		}
 		
-		if (FIGHTING(ch_iter) != ch_iter->master) {
-			ch_iter = ch_iter->master;
+		if (FIGHTING(ch_iter) != GET_LEADER(ch_iter)) {
+			ch_iter = GET_LEADER(ch_iter);
 		}
 		else {
 			break;	// hit someone they are fighting AND following
@@ -574,15 +574,15 @@ bool is_fight_ally(char_data *ch, char_data *frenemy) {
 			return TRUE;
 		}
 		// frenemy is a follower of ch
-		if (frenemy->master == ch) {
+		if (GET_LEADER(frenemy) == ch) {
 			return TRUE;
 		}
 		// frenemy is ch's leader
-		if (frenemy == ch->master && FIGHTING(ch) != frenemy) {
+		if (frenemy == GET_LEADER(ch) && FIGHTING(ch) != frenemy) {
 			return TRUE;
 		}
-		// frenemy and ch follow the same master
-		if (ch->master != NULL && frenemy->master == ch->master && FIGHTING(ch) != frenemy->master && FIGHTING(frenemy) != ch->master) {
+		// frenemy and ch follow the same leader
+		if (GET_LEADER(ch) != NULL && GET_LEADER(frenemy) == GET_LEADER(ch) && FIGHTING(ch) != GET_LEADER(frenemy) && FIGHTING(frenemy) != GET_LEADER(ch)) {
 			return TRUE;
 		}
 		// frenemy and ch are fighting the same thing
@@ -622,15 +622,15 @@ bool is_fight_enemy(char_data *ch, char_data *frenemy) {
 			return TRUE;
 		}
 		// frenemy is fighting a follower of ch
-		if (fighting->master == ch) {
+		if (GET_LEADER(fighting) == ch) {
 			return TRUE;
 		}
-		// frenemy is fighting ch's master
-		if (fighting == ch->master) {
+		// frenemy is fighting ch's leader
+		if (fighting == GET_LEADER(ch)) {
 			return TRUE;
 		}
-		// frenemy is fighting a follower of ch's master
-		if (ch->master != NULL && fighting->master == ch->master) {
+		// frenemy is fighting a follower of ch's leader
+		if (GET_LEADER(ch) != NULL && GET_LEADER(fighting) == GET_LEADER(ch)) {
 			return TRUE;
 		}
 	}
@@ -951,9 +951,9 @@ void combat_meter_damage_dealt(char_data *ch, int amt) {
 	if (!IS_NPC(ch) && !GET_COMBAT_METERS(ch).over) {
 		GET_COMBAT_METERS(ch).damage_dealt += amt;
 	}
-	else if (ch->master && !IS_NPC(ch->master) && !GET_COMBAT_METERS(ch->master).over) {
-		// credit the NPC's immediate master
-		GET_COMBAT_METERS(ch->master).pet_damage += amt;
+	else if (GET_LEADER(ch) && !IS_NPC(GET_LEADER(ch)) && !GET_COMBAT_METERS(GET_LEADER(ch)).over) {
+		// credit the NPC's immediate leader
+		GET_COMBAT_METERS(GET_LEADER(ch)).pet_damage += amt;
 	}
 }
 
@@ -1058,9 +1058,9 @@ void combat_meter_miss(char_data *ch) {
 void add_player_kill(char_data *ch, char_data *killer) {
 	struct pk_data *iter, *data = NULL;
 	
-	// bump up the food chain to find a player master, if possible
-	while (killer && IS_NPC(killer) && killer->master) {
-		killer = killer->master;
+	// bump up the food chain to find a player leader, if possible
+	while (killer && IS_NPC(killer) && GET_LEADER(killer)) {
+		killer = GET_LEADER(killer);
 	}
 	
 	if (!ch || !killer || IS_NPC(ch) || !GET_ACCOUNT(ch) || (IS_NPC(killer) && !GET_LOYALTY(killer))) {
@@ -1260,7 +1260,7 @@ void death_restore(char_data *ch) {
 * @return obj_data *The corpse (if any), or NULL
 */
 obj_data *die(char_data *ch, char_data *killer) {
-	char_data *ch_iter, *player, *killmaster;
+	char_data *ch_iter, *player, *killleader;
 	obj_data *corpse = NULL;
 	struct mob_tag *tag;
 	int iter, trig_val;
@@ -1271,9 +1271,9 @@ obj_data *die(char_data *ch, char_data *killer) {
 	}
 	
 	// find a player in the chain -- in case a pet kills the mob
-	killmaster = killer;
-	while (killmaster && IS_NPC(killmaster) && killmaster->master && IN_ROOM(killmaster) == IN_ROOM(killmaster->master)) {
-		killmaster = killmaster->master;
+	killleader = killer;
+	while (killleader && IS_NPC(killleader) && GET_LEADER(killleader) && IN_ROOM(killleader) == IN_ROOM(GET_LEADER(killleader))) {
+		killleader = GET_LEADER(killleader);
 	}
 	
 	// remove all DoTs (BEFORE phoenix)
@@ -1296,11 +1296,11 @@ obj_data *die(char_data *ch, char_data *killer) {
 	}
 	
 	// hostile activity triggers distrust unless the ch is pvp-flagged or already hostile
-	if (!IS_NPC(killmaster) && GET_LOYALTY(ch) && GET_LOYALTY(killmaster) != GET_LOYALTY(ch)) {
-		// we check the ch's master if it's an NPC and the master is a PC
-		char_data *check = (IS_NPC(ch) && ch->master && !IS_NPC(ch->master)) ? ch->master : ch;
-		if ((IS_NPC(check) || !IS_PVP_FLAGGED(check)) && !IS_HOSTILE(check) && (!ROOM_OWNER(IN_ROOM(killer)) || ROOM_OWNER(IN_ROOM(killer)) != GET_LOYALTY(killmaster))) {
-			trigger_distrust_from_hostile(killmaster, GET_LOYALTY(ch));
+	if (!IS_NPC(killleader) && GET_LOYALTY(ch) && GET_LOYALTY(killleader) != GET_LOYALTY(ch)) {
+		// we check the ch's leader if it's an NPC and the leader is a PC
+		char_data *check = (IS_NPC(ch) && GET_LEADER(ch) && !IS_NPC(GET_LEADER(ch))) ? GET_LEADER(ch) : ch;
+		if ((IS_NPC(check) || !IS_PVP_FLAGGED(check)) && !IS_HOSTILE(check) && (!ROOM_OWNER(IN_ROOM(killer)) || ROOM_OWNER(IN_ROOM(killer)) != GET_LOYALTY(killleader))) {
+			trigger_distrust_from_hostile(killleader, GET_LOYALTY(ch));
 		}
 	}
 	
@@ -1344,8 +1344,8 @@ obj_data *die(char_data *ch, char_data *killer) {
 			act("You have killed $n! R.I.P.", FALSE, ch, NULL, killer, TO_VICT);
 		}
 		
-		if (ch != killmaster) {
-			add_player_kill(ch, killmaster);
+		if (ch != killleader) {
+			add_player_kill(ch, killleader);
 		}
 		add_cooldown(ch, COOLDOWN_DEATH_RESPAWN, config_get_int("death_release_minutes") * SECS_PER_REAL_MIN);
 		msg_to_char(ch, "Type 'respawn' to come back at your tomb.\r\n");
@@ -1359,7 +1359,7 @@ obj_data *die(char_data *ch, char_data *killer) {
 
 	/* To make ordinary commands work in scripts.  welcor*/  
 	GET_POS(ch) = POS_STANDING;
-	trig_val = death_mtrigger(ch, killmaster);
+	trig_val = death_mtrigger(ch, killleader);
 	trig_val &= run_kill_triggers(ch, killer, NULL);
 	if (trig_val) {
 		if (ch == killer) {
@@ -1395,7 +1395,7 @@ obj_data *die(char_data *ch, char_data *killer) {
 		}
 	}
 
-	drop_loot(ch, killmaster);
+	drop_loot(ch, killleader);
 	if (MOB_FLAGGED(ch, MOB_NO_CORPSE)) {
 		// remove any gear
 		for (iter = 0; iter < NUM_WEARS; ++iter) {
@@ -1406,8 +1406,8 @@ obj_data *die(char_data *ch, char_data *killer) {
 				}
 			}
 		}
-		if (!IS_NPC(killmaster) && IS_NPC(ch)) {
-			recursive_loot_set(ch->carrying, GET_IDNUM(killmaster), GET_LOYALTY(killmaster));
+		if (!IS_NPC(killleader) && IS_NPC(ch)) {
+			recursive_loot_set(ch->carrying, GET_IDNUM(killleader), GET_LOYALTY(killleader));
 		}
 		while (ch->carrying) {
 			if (IS_NPC(ch) && MOB_TAGGED_BY(ch)) {
@@ -1422,8 +1422,8 @@ obj_data *die(char_data *ch, char_data *killer) {
 		obj_to_room(corpse, IN_ROOM(ch));
 		
 		// tag corpse
-		if (corpse && !IS_NPC(killmaster)) {
-			recursive_loot_set(corpse, GET_IDNUM(killmaster), GET_LOYALTY(killmaster));
+		if (corpse && !IS_NPC(killleader)) {
+			recursive_loot_set(corpse, GET_IDNUM(killleader), GET_LOYALTY(killleader));
 		}
 		
 		load_otrigger(corpse);
@@ -1914,7 +1914,7 @@ static bool tower_would_shoot(room_data *from_room, char_data *vict) {
 	}
 	
 	// check character OR their leader for permission to use the guard tower room -- that saves them
-	if (!((m = vict->master) && in_same_group(vict, m))) {
+	if (!((m = GET_LEADER(vict)) && in_same_group(vict, m))) {
 		m = vict;
 	}
 	
@@ -1931,7 +1931,7 @@ static bool tower_would_shoot(room_data *from_room, char_data *vict) {
 		return FALSE;
 	}
 	
-	// check master
+	// check leader
 	m_empire = GET_LOYALTY(m);
 	if (m_empire && !empire_is_hostile(emp, m_empire, to_room)) {
 		return FALSE;
@@ -2819,7 +2819,7 @@ bool besiege_vehicle(char_data *attacker, vehicle_data *veh, int damage, int sie
 * @param char_data *ch The person who needs help!
 */
 void check_auto_assist(char_data *ch) {
-	char_data *ch_iter, *next_iter, *iter_master, *top_ch, *top_iter;
+	char_data *ch_iter, *next_iter, *iter_leader, *top_ch, *top_iter;
 	bool assist;
 	
 	// sanity
@@ -2828,7 +2828,7 @@ void check_auto_assist(char_data *ch) {
 	}
 	
 	DL_FOREACH_SAFE2(ROOM_PEOPLE(IN_ROOM(ch)), ch_iter, next_iter, next_in_room) {
-		iter_master = (ch_iter->master ? ch_iter->master : ch_iter);
+		iter_leader = (GET_LEADER(ch_iter) ? GET_LEADER(ch_iter) : ch_iter);
 		assist = FALSE;
 		
 		// it's possible for this to drop mid-combat
@@ -2842,7 +2842,7 @@ void check_auto_assist(char_data *ch) {
 		}
 		
 		// champion
-		if (MOB_FLAGGED(ch_iter, MOB_CHAMPION) && iter_master == ch && FIGHTING(ch) && FIGHTING(FIGHTING(ch)) == ch && IS_NPC(ch_iter)) {
+		if (MOB_FLAGGED(ch_iter, MOB_CHAMPION) && iter_leader == ch && FIGHTING(ch) && FIGHTING(FIGHTING(ch)) == ch && IS_NPC(ch_iter)) {
 			if (FIGHT_MODE(FIGHTING(ch)) == FMODE_MELEE) {
 				// can rescue only in melee
 				perform_rescue(ch_iter, ch, FIGHTING(ch), RESCUE_RESCUE);
@@ -2852,7 +2852,7 @@ void check_auto_assist(char_data *ch) {
 		}
 		
 		// things which stop normal auto-assist but not champion or follower
-		if (MOB_FLAGGED(ch_iter, MOB_NO_ATTACK) && iter_master != ch) {
+		if (MOB_FLAGGED(ch_iter, MOB_NO_ATTACK) && iter_leader != ch) {
 			continue;
 		}
 		
@@ -2860,7 +2860,7 @@ void check_auto_assist(char_data *ch) {
 			// party assist
 			assist = TRUE;
 		}
-		else if (iter_master == ch && AFF_FLAGGED(ch_iter, AFF_CHARM)) {
+		else if (iter_leader == ch && AFF_FLAGGED(ch_iter, AFF_CHARM)) {
 			// charm
 			assist = TRUE;
 		}
@@ -2869,15 +2869,15 @@ void check_auto_assist(char_data *ch) {
 			if (MOB_FLAGGED(ch_iter, MOB_BRING_A_FRIEND)) {
 				assist = TRUE;
 			}
-			else if (ch->master || ch_iter->master) {	// if not BAF, still assist if in the same follow chain without players
+			else if (GET_LEADER(ch) || GET_LEADER(ch_iter)) {	// if not BAF, still assist if in the same follow chain without players
 				// check same follow chain
 				top_ch = ch;
-				while (top_ch->master && IS_NPC(top_ch)) {
-					top_ch = top_ch->master;
+				while (GET_LEADER(top_ch) && IS_NPC(top_ch)) {
+					top_ch = GET_LEADER(top_ch);
 				}
 				top_iter = ch_iter;
-				while (top_iter->master && IS_NPC(top_iter)) {
-					top_iter = top_iter->master;
+				while (GET_LEADER(top_iter) && IS_NPC(top_iter)) {
+					top_iter = GET_LEADER(top_iter);
 				}
 				if (top_ch == top_iter && IS_NPC(top_ch)) {
 					// found same follow chain AND no players in that chain
@@ -3004,10 +3004,10 @@ int damage(char_data *ch, char_data *victim, int dam, int attacktype, byte damty
 	}
 
 	/* If you attack a pet, it hates your guts */
-	if (victim->master == ch) {
+	if (GET_LEADER(victim) == ch) {
 		stop_follower(victim);
 	}
-	if (ch->master == victim) {
+	if (GET_LEADER(ch) == victim) {
 		stop_follower(ch);	// don't allow following of people while fighting them
 	}
 
@@ -3358,8 +3358,8 @@ int hit(char_data *ch, char_data *victim, obj_data *weapon, bool combat_round) {
 	
 	// hostile activity triggers distrust unless the victim is pvp-flagged or already hostile
 	if (!IS_NPC(ch) && victim_emp && GET_LOYALTY(ch) != victim_emp) {
-		// we check the victim's master if it's an NPC and the master is a PC
-		check = (IS_NPC(victim) && victim->master && !IS_NPC(victim->master)) ? victim->master : victim;
+		// we check the victim's leader if it's an NPC and the leader is a PC
+		check = (IS_NPC(victim) && GET_LEADER(victim) && !IS_NPC(GET_LEADER(victim))) ? GET_LEADER(victim) : victim;
 		if ((IS_NPC(check) || !IS_PVP_FLAGGED(check)) && !IS_HOSTILE(check) && (!ROOM_OWNER(IN_ROOM(ch)) || ROOM_OWNER(IN_ROOM(ch)) != GET_LOYALTY(ch))) {
 			trigger_distrust_from_hostile(ch, victim_emp);
 		}
@@ -4166,7 +4166,7 @@ void fight_wait_run(char_data *ch, double speed) {
 	}
 
 	// animals try to flee ranged combat
-	if (IS_NPC(ch) && !ch->master && MOB_FLAGGED(ch, MOB_ANIMAL) && !number(0, 10)) {
+	if (IS_NPC(ch) && !GET_LEADER(ch) && MOB_FLAGGED(ch, MOB_ANIMAL) && !number(0, 10)) {
 		do_flee(ch, "", 0, 0);
 	}
 	

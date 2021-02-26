@@ -29,7 +29,7 @@
 /**
 * Contents:
 *   Command Prototypes
-*   Master Command List
+*   Main Command List
 *   Command Interpreter
 *   Alias System
 *   Helper Functions
@@ -507,14 +507,14 @@ ACMD(do_mfollow);
 
 
  //////////////////////////////////////////////////////////////////////////////
-//// MASTER COMMAND LIST /////////////////////////////////////////////////////
+//// MAIN COMMAND LIST ///////////////////////////////////////////////////////
 
-/* This is the Master Command List(tm).
+/* This is the Main Command List(tm).
  * You can put new commands in, take commands out, change the order
  * they appear in, etc.  You can adjust the "priority" of commands
  * simply by changing the order they appear in the command list.
  * (For example, if you want "as" to mean "assist" instead of "ask",
- * just put "assist" above "ask" in the Master Command List(tm).
+ * just put "assist" above "ask" in the Main Command List(tm).
  *
  * In general, utility commands such as "at" should have high priority;
  * infrequently used and dangerously destructive commands should have low
@@ -2372,7 +2372,7 @@ int _parse_name(char *arg, char *name) {
 
 
 /**
-* Master "socket nanny" for processing menu input.
+* Main "socket nanny" for processing menu input.
 */
 void nanny(descriptor_data *d, char *arg) {
 	char buf[MAX_STRING_LENGTH], tmp_name[MAX_INPUT_LENGTH];

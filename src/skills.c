@@ -255,7 +255,7 @@ void check_skill_sell(char_data *ch, ability_data *abil) {
 		}
 		case ABIL_MIRRORIMAGE: {
 			DL_FOREACH_SAFE(character_list, mob, next_mob) {
-				if (mob->master == ch && IS_NPC(mob) && GET_MOB_VNUM(mob) == MIRROR_IMAGE_MOB) {
+				if (GET_LEADER(mob) == ch && IS_NPC(mob) && GET_MOB_VNUM(mob) == MIRROR_IMAGE_MOB) {
 					act("$n vanishes.", TRUE, mob, NULL, NULL, TO_ROOM);
 					extract_char(mob);
 				}

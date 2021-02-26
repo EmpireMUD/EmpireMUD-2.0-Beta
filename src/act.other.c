@@ -45,7 +45,7 @@ char_data *find_minipet(char_data *ch);
 
 // configs for mini-pets
 // TODO this seemsl ike it should move to structs.h / utils.h
-#define IS_MINIPET_OF(mob, ch)  (!EXTRACTED(mob) && IS_NPC(mob) && (mob)->master == (ch) && !GET_COMPANION(mob) && (MOB_FLAGS(mob) & default_minipet_flags) == default_minipet_flags && (AFF_FLAGS(mob) & default_minipet_affs) == default_minipet_affs)
+#define IS_MINIPET_OF(mob, ch)  (!EXTRACTED(mob) && IS_NPC(mob) && GET_LEADER(mob) == (ch) && !GET_COMPANION(mob) && (MOB_FLAGS(mob) & default_minipet_flags) == default_minipet_flags && (AFF_FLAGS(mob) & default_minipet_affs) == default_minipet_affs)
 bitvector_t default_minipet_flags = MOB_SENTINEL | MOB_SPAWNED | MOB_NO_LOOT | MOB_NO_EXPERIENCE;
 bitvector_t default_minipet_affs = AFF_NO_ATTACK | AFF_CHARM;
 
@@ -1797,7 +1797,7 @@ ACMD(do_beckon) {
 		any = FALSE;
 		// beckon all
 		DL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), vict, next_in_room) {
-			if (vict == ch || is_ignoring(vict, ch) || vict->master) {
+			if (vict == ch || is_ignoring(vict, ch) || GET_LEADER(vict)) {
 				continue;	// nopes
 			}
 			
@@ -1824,10 +1824,10 @@ ACMD(do_beckon) {
 	else if (!IS_NPC(vict) && is_ignoring(vict, ch)) {
 		act("You can't beckon $M.", FALSE, ch, NULL, vict, TO_CHAR);
 	}
-	else if (vict->master == ch) {
+	else if (GET_LEADER(vict) == ch) {
 		act("$E is already following you.", FALSE, ch, NULL, vict, TO_CHAR);
 	}
-	else if (vict->master) {
+	else if (GET_LEADER(vict)) {
 		act("$E is already following someone else.", FALSE, ch, NULL, vict, TO_CHAR);
 	}
 	else {
@@ -2128,7 +2128,7 @@ ACMD(do_dismiss) {
 	else if (!(vict = get_char_vis(ch, arg, NULL, FIND_CHAR_ROOM))) {
 		send_config_msg(ch, "no_person");
 	}
-	else if (!IS_NPC(vict) || vict->master != ch || (!GET_COMPANION(vict) && !IS_MINIPET_OF(vict, ch))) {
+	else if (!IS_NPC(vict) || GET_LEADER(vict) != ch || (!GET_COMPANION(vict) && !IS_MINIPET_OF(vict, ch))) {
 		msg_to_char(ch, "You can only dismiss a companion or mini-pet.\r\n");
 	}
 	else if (FIGHTING(vict) || GET_POS(vict) < POS_SLEEPING) {
@@ -2427,7 +2427,7 @@ ACMD(do_group) {
 		}
 		
 		GET_GROUP_INVITE(vict) = GET_IDNUM(ch);
-		if (!vict->master) {
+		if (!GET_LEADER(vict)) {
 			// auto-beckon
 			GET_BECKONED_BY(vict) = GET_IDNUM(REAL_CHAR(ch));
 		}
@@ -2513,7 +2513,7 @@ ACMD(do_group) {
 			msg_to_char(ch, "They are not a member of your group!\r\n");
 			return;
 		}
-		GROUP(ch)->leader = vict;
+		GET_LEADER(GROUP(ch)) = vict;
 		send_to_group(NULL, GROUP(ch), "%s is now group leader.", GET_NAME(vict));
 		send_config_msg(ch, "ok_string");
 	}
@@ -3175,7 +3175,7 @@ ACMD(do_order) {
 			act(buf, FALSE, vict, 0, ch, TO_CHAR);
 			act("$n gives $N an order.", FALSE, ch, 0, vict, TO_ROOM);
 
-			if ((vict->master != ch) || !AFF_FLAGGED(vict, AFF_CHARM))
+			if ((GET_LEADER(vict) != ch) || !AFF_FLAGGED(vict, AFF_CHARM))
 				act("$n has an indifferent look.", FALSE, vict, 0, 0, TO_ROOM);
 			else {
 				send_config_msg(ch, "ok_string");
@@ -3643,7 +3643,7 @@ ACMD(do_summon) {
 		if (IS_NPC(mob)) {
 			++count;
 			
-			if (!GET_COMPANION(mob) && mob->master == ch) {
+			if (!GET_COMPANION(mob) && GET_LEADER(mob) == ch) {
 				++fol_count;
 			}
 		}

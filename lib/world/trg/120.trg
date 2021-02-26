@@ -623,7 +623,7 @@ set person %self.room.people%
 %echo% As ~%self% is destroyed, the eye of the storm collapses!
 while %person%
   set next_person %person.next_in_room%
-  if %person.is_pc% || (%person.is_npc% && %person.master%)
+  if %person.is_pc% || (%person.is_npc% && %person.leader%)
     %send% %person% You are expelled from the eye of the storm!
     %echoaround% %person% ~%person% is expelled from the eye of the storm!
     %teleport% %person% %destination%

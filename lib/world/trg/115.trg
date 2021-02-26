@@ -345,12 +345,12 @@ end
 Pixy Pursuit: spawn on move~
 0 i 100
 ~
-* ensure master present and event running
-set master %self.master%
-if !%master% || !%event.running(11520)%
+* ensure leader present and event running
+set leader %self.leader%
+if !%leader% || !%event.running(11520)%
   halt
 end
-if %master.room% != %self.room% || %master.is_npc%
+if %leader.room% != %self.room% || %leader.is_npc%
   halt
 end
 * short delay
@@ -360,8 +360,8 @@ if %self.room.contents(11523)%
   halt
 end
 * check for last-spawn timer
-if %master.varexists(last_11520_spawn)%
-  eval timesince %timestamp% - %master.last_11520_spawn%
+if %leader.varexists(last_11520_spawn)%
+  eval timesince %timestamp% - %leader.last_11520_spawn%
 else
   * Fake 120 seconds since last spawn
   set timesince 120
@@ -371,14 +371,14 @@ if %random.10% > 1 && %timesince% < %random.180%
   halt
 end
 * Figure out which pixy to spawn
-if %master.room.template% > 0 && %random.5% == 5
+if %leader.room.template% > 0 && %random.5% == 5
   * royal pixy, only in adventures
   set vnum 11520
 else
   eval vnum 11520 + %random.6%
 end
 %load% mob %vnum%
-set pix %master.room.people%
+set pix %leader.room.people%
 if %pix.vnum% == %vnum%
   switch %random.4%
     case 1
@@ -397,7 +397,7 @@ if %pix.vnum% == %vnum%
 end
 * store last spawn time
 set last_11520_spawn %timestamp%
-remote last_11520_spawn %master.id%
+remote last_11520_spawn %leader.id%
 * block next spawn
 %load% obj 11523 room
 * try to move
@@ -535,7 +535,7 @@ set ch %actor.room.people%
 set found 0
 * Check only 1
 while %ch% && !%found%
-  if %ch.is_npc% && %ch.vnum% == 11527 && %ch.master% == %actor%
+  if %ch.is_npc% && %ch.vnum% == 11527 && %ch.leader% == %actor%
     set found 1
   end
   set ch %ch.next_in_room%
@@ -548,7 +548,7 @@ end
 * Load it
 %load% mob 11527
 set hog %actor.room.people%
-if %hog% && %hog.vnum% == 11527 && !%hog.master%
+if %hog% && %hog.vnum% == 11527 && !%hog.leader%
   %force% %hog% mfollow %actor%
   %echo% ~%hog% comes trotting up with its belly flapping side to side!
   nop %hog.unlink_instance%

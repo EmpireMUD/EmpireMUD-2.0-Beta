@@ -25,9 +25,9 @@ set found 0
 set found_pet 0
 set ch %self.room.people%
 while %ch% && !%found%
-  if (%ch.is_npc% && %ch.vnum% == %self.val0% && %ch.master% && %ch.master% == %actor%)
+  if (%ch.is_npc% && %ch.vnum% == %self.val0% && %ch.leader% && %ch.leader% == %actor%)
     set found 1
-  elseif (%ch.is_npc% && %ch.master% && %ch.master% == %actor% && !%ch.companion%)
+  elseif (%ch.is_npc% && %ch.leader% && %ch.leader% == %actor% && !%ch.companion%)
     set found_pet 1
   elseif %ch.is_npc%
     eval mobs %mobs% + 1
@@ -66,7 +66,7 @@ if %arg% != pet
     halt
   end
 end
-if (%self.master% && %self.master% == %actor%)
+if (%self.leader% && %self.leader% == %actor%)
   %send% %actor% You dismiss ~%self%.
   %echoaround% %actor% ~%actor% dismisses ~%self%.
   %purge% %self%
@@ -131,15 +131,15 @@ end
 Heisenbug!~
 0 btw 25
 ~
-set master %self.master%
-if !%master%
+set leader %self.leader%
+if !%leader%
   %purge% %self%
   halt
 end
 if %self.aff_flagged(!SEE)%
   dg_affect %self% !SEE off 1
   dg_affect %self% SNEAK off 1
-  %echo% ~%self% appears out of nowhere and starts following ~%master%.
+  %echo% ~%self% appears out of nowhere and starts following ~%leader%.
 else
   %echo% ~%self% vanishes into thin air.
   dg_affect %self% !SEE on -1

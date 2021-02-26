@@ -2426,7 +2426,7 @@ TOGGLE TOGGLES PREFERENCES PREFS SETTINGS
 
 Usage:  toggle [type] [on/off]
 
-This command is the master switchboard for various preference toggles. You can
+This command is the central switchboard for various preference toggles. You can
 use it to see your current preferences, or to switch them on and off. Some
 toggles have their own help files under 'HELP TOGGLE <option>'.
 
