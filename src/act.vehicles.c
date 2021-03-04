@@ -895,9 +895,6 @@ void do_customize_vehicle(char_data *ch, char *argument) {
 			
 			// optionally, change the longdesc too
 			if (proto && (VEH_LONG_DESC(veh) == VEH_LONG_DESC(proto) || strstr(VEH_LONG_DESC(veh), VEH_LONG_DESC(proto)))) {
-				if (VEH_LONG_DESC(veh) != VEH_LONG_DESC(proto)) {
-					free(VEH_LONG_DESC(veh));
-				}
 				sprintf(buf, "%s (%s)", VEH_LONG_DESC(proto), VEH_SHORT_DESC(veh));
 				set_vehicle_long_desc(veh, buf);
 			}
