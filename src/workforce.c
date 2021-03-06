@@ -112,7 +112,7 @@ struct empire_chore_type chore_data[NUM_CHORES] = {
 	{ "general", NOTHING, TRUE },
 	{ "fishing", FISHERMAN, FALSE },
 	{ "burn-stumps", STUMP_BURNER, FALSE },
-	{ "prospecting", PROSPECTOR, TRUE },
+	{ "prospecting", PROSPECTOR, FALSE },
 		{ "unused", GLASSMAKER, TRUE },
 };
 
