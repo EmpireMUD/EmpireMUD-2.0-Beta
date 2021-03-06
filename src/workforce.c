@@ -51,6 +51,7 @@ void do_chore_gen_craft(empire_data *emp, room_data *room, vehicle_data *veh, in
 void do_chore_mining(empire_data *emp, room_data *room, vehicle_data *veh);
 void do_chore_minting(empire_data *emp, room_data *room, vehicle_data *veh);
 void do_chore_production(empire_data *emp, room_data *room, vehicle_data *veh, int interact_type);
+void do_chore_prospecting(empire_data *emp, room_data *room);
 void do_chore_shearing(empire_data *emp, room_data *room, vehicle_data *veh);
 void vehicle_chore_fire_brigade(empire_data *emp, vehicle_data *veh);
 void vehicle_chore_build(empire_data *emp, vehicle_data *veh, int chore);
@@ -111,7 +112,7 @@ struct empire_chore_type chore_data[NUM_CHORES] = {
 	{ "general", NOTHING, TRUE },
 	{ "fishing", FISHERMAN, FALSE },
 	{ "burn-stumps", STUMP_BURNER, FALSE },
-		{ "unused", BEEKEEPER, TRUE },
+	{ "prospecting", PROSPECTOR, TRUE },
 		{ "unused", GLASSMAKER, TRUE },
 };
 
@@ -206,6 +207,11 @@ void process_one_chore(empire_data *emp, room_data *room) {
 	if (CHORE_ACTIVE(CHORE_CHOPPING) && !ROOM_CROP(room) && !ROOM_AFF_FLAGGED(room, ROOM_AFF_NO_EVOLVE | ROOM_AFF_NO_WORKFORCE_EVOS) && (has_evolution_type(SECT(room), EVO_CHOPPED_DOWN) || CAN_INTERACT_ROOM_NO_VEH((room), INTERACT_CHOP))) {
 		// All choppables -- except crops, which are handled by farming
 		do_chore_chopping(emp, room);
+		return;
+	}
+	if (CHORE_ACTIVE(CHORE_PROSPECTING) && EMPIRE_HAS_TECH(emp, TECH_SKILLED_LABOR) && !GET_BUILDING(room) && ROOM_CAN_MINE(room)) {
+		// Any non-building that's prospectable
+		do_chore_prospecting(emp, room);
 		return;
 	}
 	
@@ -2629,6 +2635,57 @@ void do_chore_production(empire_data *emp, room_data *room, vehicle_data *veh, i
 	}
 	if (!can_gain) {
 		log_workforce_problem(emp, room, CHORE_PRODUCTION, WF_PROB_OVER_LIMIT, FALSE);
+	}
+}
+
+
+void do_chore_prospecting(empire_data *emp, room_data *room) {
+	bool can_mine = ROOM_CAN_MINE(room);
+	bool needs_prospect = (can_mine && get_room_extra_data(room, ROOM_EXTRA_MINE_GLB_VNUM) <= 0);
+	char_data *worker;
+	
+	if (needs_prospect && (worker = find_chore_worker_in_room(emp, room, NULL, chore_data[CHORE_PROSPECTING].mob))) {
+		charge_workforce(emp, room, worker, 1, NOTHING, 0);
+		
+		if (get_room_extra_data(room, ROOM_EXTRA_WORKFORCE_PROSPECT) < config_get_int("prospecting_workforce_hours")) {
+			// still working
+			add_to_room_extra_data(room, ROOM_EXTRA_WORKFORCE_PROSPECT, 1);
+			
+			// only send message if someone else is present (don't bother verifying it's a player)
+			if (ROOM_PEOPLE(IN_ROOM(worker))->next_in_room) {
+				switch (number(0, 2)) {
+					case 0: {
+						act("$n picks at the soil...", FALSE, worker, NULL, NULL, TO_ROOM | TO_SPAMMY | TO_QUEUE);
+						break;
+					}
+					case 1: {
+						act("$n tastes a pinch of soil...", FALSE, worker, NULL, NULL, TO_ROOM | TO_SPAMMY | TO_QUEUE);
+						break;
+					}
+					case 2: {
+						act("$n sifts through the dirt...", FALSE, worker, NULL, NULL, TO_ROOM | TO_SPAMMY | TO_QUEUE);
+						break;
+					}
+				}
+			}
+		}
+		else {
+			// finished
+			act("$n finishes prospecting!", FALSE, worker, NULL, NULL, TO_ROOM | TO_SPAMMY | TO_QUEUE);
+			
+			// pass NULL for ch to init_mine so it just uses the empire
+			init_mine(room, NULL, emp);
+			set_room_extra_data(room, ROOM_EXTRA_PROSPECT_EMPIRE, EMPIRE_VNUM(emp));
+		}
+	}
+	else if (needs_prospect) {
+		// attempt to place worker
+		if ((worker = place_chore_worker(emp, CHORE_PROSPECTING, room))) {
+			charge_workforce(emp, room, worker, 1, NOTHING, 0);
+		}
+	}
+	else if (can_mine && !needs_prospect) {
+		mark_workforce_delay(emp, room, CHORE_PROSPECTING, WF_PROB_ALREADY_PROSPECTED);
 	}
 }
 

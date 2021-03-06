@@ -1431,6 +1431,7 @@ Workforce types:
   &cminting (skilled):&0 NPCs will mint treasure into coins.
   &yoilmaking:&0 Will press oil.
   &yproduction:&0 NPCs will produce resources at various buildings.
+  &cprospecting (skilled):&0 NPCs will slowly prospect mountain tiles.
   &yreplanting:&0 after farming crops, NPCs will replant them.
   &ysawing:&0 NPCs will convert trees into lumber at lumber yards.
   &yscraping:&0 NPCs will convert trees into logs at lumber yards.
@@ -1520,6 +1521,18 @@ Skilled labor also produces:
  Trapper's Post: skins
 
 See also: WORKFORCE CHORES, WORKFORCE LIMIT, SKILLED LABOR
+#
+"WORKFORCE PROSPECTING"
+
+With the 'prospecting' chore, your workforce will camp out on claimed mountain
+tiles and slowly prospect to look for metals. This can take a long time to
+finish but when it is done, any member of the empire can type 'prospect' on the
+tile to instantly find out what metal it has.
+
+This will only work on tiles that have not been prospected, mined, or had mines
+built on them yet (since the last mine reset).
+
+See also: WORKFORCE CHORES, SKILLED LABOR
 #
 "WORKFORCE WHERE"
 

@@ -1996,6 +1996,7 @@ const char *wf_problem_types[] = {
 	"delayed",
 	"out of city",
 	"adventure present",
+	"already prospected or mined",
 	"\n"
 };
 
@@ -3596,6 +3597,7 @@ const char *room_extra_types[] = {
 	"trench original sector",
 	"original builder",	// 20
 	"sector time",
+	"workforce prospect",
 	"\n"
 };
 

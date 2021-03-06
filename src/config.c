@@ -1794,6 +1794,7 @@ void init_config_system(void) {
 	init_config(CONFIG_ACTIONS, "gather_depletion", CONFTYPE_INT, "depletion from gathering");
 	init_config(CONFIG_ACTIONS, "short_depletion", CONFTYPE_INT, "depletion from forage, etc");
 	init_config(CONFIG_ACTIONS, "high_depletion", CONFTYPE_INT, "depletion in buildings with HIGH-DEPLETION");
+	init_config(CONFIG_ACTIONS, "prospecting_workforce_hours", CONFTYPE_INT, "game hours for workforce to prospect 1 tile");
 	init_config(CONFIG_ACTIONS, "shear_growth_time", CONFTYPE_INT, "real hours to regrow wool");
 	init_config(CONFIG_ACTIONS, "tavern_brew_time", CONFTYPE_INT, "# of 5-minute updates for initial tavern brew");
 	init_config(CONFIG_ACTIONS, "tavern_timer", CONFTYPE_INT, "# of 5-minute updates for tavern resource cost");

@@ -139,6 +139,7 @@
 #define GLASSMAKER  282	// unused now
 #define CRAFTING_APPRENTICE  283
 #define PRODUCTION_ASSISTANT  284
+#define PROSPECTOR  285
 
 
  //////////////////////////////////////////////////////////////////////////////

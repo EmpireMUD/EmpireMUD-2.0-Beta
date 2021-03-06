@@ -1312,6 +1312,7 @@ void annual_update_map_tile(struct map_data *tile) {
 		remove_extra_data(&tile->shared->extra_data, ROOM_EXTRA_MINE_GLB_VNUM);
 		remove_extra_data(&tile->shared->extra_data, ROOM_EXTRA_MINE_AMOUNT);
 		remove_extra_data(&tile->shared->extra_data, ROOM_EXTRA_PROSPECT_EMPIRE);
+		remove_extra_data(&tile->shared->extra_data, ROOM_EXTRA_WORKFORCE_PROSPECT);
 	}
 }
 

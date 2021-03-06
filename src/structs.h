@@ -1185,7 +1185,7 @@ typedef struct vehicle_data vehicle_data;
 #define CHORE_GENERAL  28	// for reporting problems
 #define CHORE_FISHING  29
 #define CHORE_BURN_STUMPS  30
-	#define CHORE_UNUSED_B  31
+#define CHORE_PROSPECTING  31
 	#define CHORE_UNUSED4  32
 #define NUM_CHORES  33		// total
 
@@ -1344,6 +1344,7 @@ typedef struct vehicle_data vehicle_data;
 #define WF_PROB_DELAYED  5	// delayed by a previous failure
 #define WF_PROB_OUT_OF_CITY  6	// building requires in-city
 #define WF_PROB_ADVENTURE_PRESENT  7	// blocked by adventure instance
+#define WF_PROB_ALREADY_PROSPECTED  8	// has prospect data
 
 
 // for tracking playtime
@@ -2806,6 +2807,7 @@ typedef enum {
 #define ROOM_EXTRA_TRENCH_ORIGINAL_SECTOR  19	// for un-trenching correctly
 #define ROOM_EXTRA_ORIGINAL_BUILDER  20	// person who started the building
 #define ROOM_EXTRA_SECTOR_TIME  21	// when it became this sector type (for types with a timed evo)
+#define ROOM_EXTRA_WORKFORCE_PROSPECT  22	// progress tracker for workforce
 
 
 // SAVE_INFO_x: flags related to saving (this is a ubyte: only holds 8 bits)
