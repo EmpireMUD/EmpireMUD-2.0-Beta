@@ -237,9 +237,9 @@ from a drunken patron.
 ~
 S
 #221
-#n master shadowmaster~
+#n master shadow~
 #n, Master of Shadow~
-Shadowmaster #n is sitting here, watching you.
+Master #n is sitting here, watching you.
 ~
 100 125 bdqvA 0 3
 1 0 0 4
@@ -1059,6 +1059,18 @@ S
 D
    This citizen appears to be producing resources for the empire. (workforce
 production)
+~
+S
+#285
+#n prospector~
+prospector #n~
+#n is camped here, prospecting for minerals.
+~
+20 50 bdqv 0 3
+1 0 0 8
+D
+   This citizen has camped out and is methodically searching for minerals. 
+(workforce prospecting)
 ~
 S
 $
