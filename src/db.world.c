@@ -786,9 +786,11 @@ GLB_FUNCTION(run_global_mine_data) {
 	set_room_extra_data(room, ROOM_EXTRA_MINE_GLB_VNUM, GET_GLOBAL_VNUM(glb));
 	set_room_extra_data(room, ROOM_EXTRA_MINE_AMOUNT, number(GET_GLOBAL_VAL(glb, GLB_VAL_MAX_MINE_SIZE) / 2, GET_GLOBAL_VAL(glb, GLB_VAL_MAX_MINE_SIZE)));
 	
-	if (ch && (has_player_tech(ch, PTECH_DEEP_MINES) || (emp && EMPIRE_HAS_TECH(emp, TECH_DEEP_MINES)) || (GET_LOYALTY(ch) && EMPIRE_HAS_TECH(GET_LOYALTY(ch), TECH_DEEP_MINES)))) {
+	if ((ch && has_player_tech(ch, PTECH_DEEP_MINES)) || (emp && EMPIRE_HAS_TECH(emp, TECH_DEEP_MINES)) || (ch && GET_LOYALTY(ch) && EMPIRE_HAS_TECH(GET_LOYALTY(ch), TECH_DEEP_MINES))) {
 		multiply_room_extra_data(room, ROOM_EXTRA_MINE_AMOUNT, 1.5);
-		gain_player_tech_exp(ch, PTECH_DEEP_MINES, 15);
+		if (ch) {
+			gain_player_tech_exp(ch, PTECH_DEEP_MINES, 15);
+		}
 	}
 	
 	if (ch && GET_GLOBAL_ABILITY(glb) != NO_ABIL) {
