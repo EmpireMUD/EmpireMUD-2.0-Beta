@@ -1996,7 +1996,6 @@ const char *wf_problem_types[] = {
 	"delayed",
 	"out of city",
 	"adventure present",
-	"already prospected or mined",
 	"\n"
 };
 

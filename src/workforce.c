@@ -2641,17 +2641,18 @@ void do_chore_production(empire_data *emp, room_data *room, vehicle_data *veh, i
 
 void do_chore_prospecting(empire_data *emp, room_data *room) {
 	bool can_mine = ROOM_CAN_MINE(room);
-	bool needs_prospect = (can_mine && get_room_extra_data(room, ROOM_EXTRA_MINE_GLB_VNUM) <= 0);
+	bool prospected_by_emp = (get_room_extra_data(room, ROOM_EXTRA_PROSPECT_EMPIRE) == EMPIRE_VNUM(emp));
+	bool has_ore = (get_room_extra_data(room, ROOM_EXTRA_MINE_AMOUNT) > 0);
+	bool undetermined = (get_room_extra_data(room, ROOM_EXTRA_MINE_GLB_VNUM) <= 0);
+	bool needs_prospect = (can_mine && (undetermined || (!prospected_by_emp && has_ore))); 
 	char_data *worker;
 	
 	if (needs_prospect && (worker = find_chore_worker_in_room(emp, room, NULL, chore_data[CHORE_PROSPECTING].mob))) {
 		charge_workforce(emp, room, worker, 1, NOTHING, 0);
+		add_to_room_extra_data(room, ROOM_EXTRA_WORKFORCE_PROSPECT, 1);
 		
 		if (get_room_extra_data(room, ROOM_EXTRA_WORKFORCE_PROSPECT) < config_get_int("prospecting_workforce_hours")) {
-			// still working
-			add_to_room_extra_data(room, ROOM_EXTRA_WORKFORCE_PROSPECT, 1);
-			
-			// only send message if someone else is present (don't bother verifying it's a player)
+			// still working: only send message if someone else is present (don't bother verifying it's a player)
 			if (ROOM_PEOPLE(IN_ROOM(worker))->next_in_room) {
 				switch (number(0, 2)) {
 					case 0: {
@@ -2670,12 +2671,13 @@ void do_chore_prospecting(empire_data *emp, room_data *room) {
 			}
 		}
 		else {
-			// finished
+			// finished working
 			act("$n finishes prospecting!", FALSE, worker, NULL, NULL, TO_ROOM | TO_SPAMMY | TO_QUEUE);
 			
 			// pass NULL for ch to init_mine so it just uses the empire
 			init_mine(room, NULL, emp);
 			set_room_extra_data(room, ROOM_EXTRA_PROSPECT_EMPIRE, EMPIRE_VNUM(emp));
+			remove_room_extra_data(room, ROOM_EXTRA_WORKFORCE_PROSPECT);
 		}
 	}
 	else if (needs_prospect) {
@@ -2684,8 +2686,15 @@ void do_chore_prospecting(empire_data *emp, room_data *room) {
 			charge_workforce(emp, room, worker, 1, NOTHING, 0);
 		}
 	}
+	else if (can_mine && !undetermined && !prospected_by_emp && !has_ore) {
+		// empty -- just mark it for them
+		charge_workforce(emp, room, worker, 1, NOTHING, 0);
+		set_room_extra_data(room, ROOM_EXTRA_PROSPECT_EMPIRE, EMPIRE_VNUM(emp));
+		remove_room_extra_data(room, ROOM_EXTRA_WORKFORCE_PROSPECT);
+	}
 	else if (can_mine && !needs_prospect) {
-		mark_workforce_delay(emp, room, CHORE_PROSPECTING, WF_PROB_ALREADY_PROSPECTED);
+		// actually do not need this error
+		// mark_workforce_delay(emp, room, CHORE_PROSPECTING, WF_PROB_ALREADY_PROSPECTED);
 	}
 }
 

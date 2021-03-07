@@ -1344,7 +1344,6 @@ typedef struct vehicle_data vehicle_data;
 #define WF_PROB_DELAYED  5	// delayed by a previous failure
 #define WF_PROB_OUT_OF_CITY  6	// building requires in-city
 #define WF_PROB_ADVENTURE_PRESENT  7	// blocked by adventure instance
-#define WF_PROB_ALREADY_PROSPECTED  8	// has prospect data
 
 
 // for tracking playtime
