@@ -4758,6 +4758,7 @@ struct empire_chore_type {
 	char *name;
 	mob_vnum mob;
 	bool hidden;	// won't show in the main chores list
+	int requires_tech;	// if any -- or NOTHING
 };
 
 
