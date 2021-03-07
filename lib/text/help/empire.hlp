@@ -1525,17 +1525,17 @@ Skilled labor also produces:
 
 See also: WORKFORCE CHORES, WORKFORCE LIMIT, SKILLED LABOR
 #
-"WORKFORCE PROSPECTING"
+"WORKFORCE PROSPECTING" "PROSPECTOR TRAINING"
 
 With the 'prospecting' chore, your workforce will camp out on claimed mountain
 tiles and slowly prospect to look for metals. This can take a long time to
 finish but when it is done, any member of the empire can type 'prospect' on the
 tile to instantly find out what metal it has.
 
-This will only work on tiles that have not been prospected, mined, or had mines
-built on them yet (since the last mine reset).
+You can turn on 'toggle informative' to see tiles that have been prospected by
+your empire.
 
-See also: WORKFORCE CHORES, SKILLED LABOR
+See also: WORKFORCE CHORES
 #
 "WORKFORCE WHERE"
 
