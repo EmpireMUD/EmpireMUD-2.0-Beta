@@ -1305,7 +1305,7 @@ typedef struct vehicle_data vehicle_data;
 #define TECH_MASTER_PORTALS  9
 #define TECH_SKILLED_LABOR  10
 #define TECH_TRADE_ROUTES  11
-	#define TECH_UNUSED  12	// formerly exarch crafts
+#define TECH_WORKFORCE_PROSPECTING  12
 #define TECH_DEEP_MINES  13
 #define TECH_RARE_METALS  14
 #define TECH_BONUS_EXPERIENCE  15

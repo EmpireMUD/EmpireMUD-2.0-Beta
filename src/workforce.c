@@ -209,7 +209,7 @@ void process_one_chore(empire_data *emp, room_data *room) {
 		do_chore_chopping(emp, room);
 		return;
 	}
-	if (CHORE_ACTIVE(CHORE_PROSPECTING) && EMPIRE_HAS_TECH(emp, TECH_SKILLED_LABOR) && !GET_BUILDING(room) && ROOM_CAN_MINE(room)) {
+	if (CHORE_ACTIVE(CHORE_PROSPECTING) && EMPIRE_HAS_TECH(emp, TECH_WORKFORCE_PROSPECTING) && !GET_BUILDING(room) && ROOM_CAN_MINE(room)) {
 		// Any non-building that's prospectable
 		do_chore_prospecting(emp, room);
 		return;

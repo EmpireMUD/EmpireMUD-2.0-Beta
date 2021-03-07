@@ -1431,7 +1431,6 @@ Workforce types:
   &cminting (skilled):&0 NPCs will mint treasure into coins.
   &yoilmaking:&0 Will press oil.
   &yproduction:&0 NPCs will produce resources at various buildings.
-  &cprospecting (skilled):&0 NPCs will slowly prospect mountain tiles.
   &yreplanting:&0 after farming crops, NPCs will replant them.
   &ysawing:&0 NPCs will convert trees into lumber at lumber yards.
   &yscraping:&0 NPCs will convert trees into logs at lumber yards.
@@ -1442,6 +1441,9 @@ Workforce types:
   
 Items marked (skilled) require the Skilled Labor goal. Skilled Labor chores
 tend to cost more food.
+
+Additional workforce chores are available from progress buys:
+  &gprospecting (Prospector Training):&0 NPCs will slowly prospect mountain tiles.
 
 See also: ABANDON, WORKFORCE
 #
