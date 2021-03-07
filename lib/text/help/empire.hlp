@@ -1220,6 +1220,7 @@ Available technologies are:
  - Fast Prospect: Members of the empire can prospect much faster.
  - Fast Excavate: Members of the empire excavate much faster when in-city.
  - Hidden Progress: The empire's progress won't show on the /progress channel.
+ - Workforce Prospecting: Workforce can prospect.
 
 * some technologies only function on the same island as the building that
   provides them
