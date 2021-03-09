@@ -1902,7 +1902,7 @@ const char *techs[] = {
 	"Master Portals",
 	"Skilled Labor",
 	"Trade Routes",
-	"*",
+	"Workforce Prospecting",
 	"Deep Mines",
 	"Rare Metals",
 	"Bonus Experience",
@@ -3596,6 +3596,7 @@ const char *room_extra_types[] = {
 	"trench original sector",
 	"original builder",	// 20
 	"sector time",
+	"workforce prospect",
 	"\n"
 };
 

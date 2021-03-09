@@ -19,7 +19,7 @@
 #define BOARD_MAGIC	1048575			/* arbitrary number - see modify.c */
 
 struct board_msginfo {
-	int	slot_num;		/* pos of message in "master index"				*/
+	int	slot_num;		/* pos of message in "global index"				*/
 	char *heading;		/* pointer to message's heading					*/
 	int reply_num;		/* slot_num of message this is a reply for		*/
 	int	level;			/* level of poster								*/

@@ -130,4 +130,14 @@ produce honey and wax for your citizens. ('build apiary')
 K 2 5131
 P 2019
 S
+#2913
+Prospector Training~
+   Train your workforce to prospect! Your workers will now prospect all your
+claimed mountains for ore (slowly) each year. Turn on 'toggle informative' to
+see which tiles they have prospected.
+~
+2 2 70 0 b
+K 0 12
+P 2911
+S
 $

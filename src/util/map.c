@@ -327,7 +327,7 @@ const int winding[NUM_DIRS][3] = {
 #define IS_IN_Y_PRC_RANGE(ycoord, startprc, endprc)  (ycoord >= round(startprc / 100.0 * USE_HEIGHT) && ycoord <= round(endprc / 100.0 * USE_HEIGHT))
 
 
-/* The master grid (USE_WIDTH, USE_HEIGHT) */
+/* The main grid (USE_WIDTH, USE_HEIGHT) */
 struct grid_type {
 	int type;
 	bool pass;	// used to control fresh paint and prevent hideous conglomermountains
@@ -373,7 +373,7 @@ int sort_real_islands(struct real_island *a, struct real_island *b) {
 // locals
 struct grid_type grid[USE_SIZE];	// main working grid
 int total_ocean = 0;	// keep track of ocean to speed up counts
-struct island_data *island_list = NULL;	// Master list
+struct island_data *island_list = NULL;	// global list
 
 
  //////////////////////////////////////////////////////////////////////////////

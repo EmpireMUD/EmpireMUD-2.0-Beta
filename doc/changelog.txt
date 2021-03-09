@@ -2832,7 +2832,7 @@ Abilities:
 using his own bloodsword.
 - Butcher: No longer works on corpses bound to someone else.
 - Cleanse: Changed how cleanse detects that an effect is a penalty (and thus
-can't be cleansed). Instead of a blacklist of affect types, it now considers
+can't be cleansed). Instead of a blocklist of affect types, it now considers
 something a penalty if it was cast by the person it is on.
 - Confer: Now detects when the same effect is conferred by different people,
 and does not stack it or reset its duration if so.
@@ -3654,7 +3654,7 @@ being floored to being rounded.
 - Bloodsweat: New Reaper class ability removes poisons.
 - Bloodsword: Raised the cost on this ability. It now scales better with the
 level of the player.
-- Cleanse: Added a blacklist of affects that cannot be Cleansed, because it was
+- Cleanse: Added a blocklist of affects that cannot be Cleansed, because it was
 able to remove certain penalties and effects: Manashield, Vigor, Mummify,
 Deathshroud, death penalty, and war delay.
 - Colorburst: Updated the to-hit penalty from Colorburst. The cost now also

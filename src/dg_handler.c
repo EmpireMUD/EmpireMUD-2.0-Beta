@@ -524,7 +524,7 @@ struct uid_lookup_table {
 	UT_hash_handle hh;
 };
 
-// master hash table
+// main hash table
 struct uid_lookup_table *master_uid_lookup_table = NULL;
 
 

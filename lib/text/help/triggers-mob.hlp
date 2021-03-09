@@ -400,7 +400,7 @@ When using field  - The variable returns:
 &ccharge_coins(amt)&0 - Charges the actor a number of coins.
 &ccharge_currency(vnum, amt)&0 - Takes away an amount of adventure currency.
 &cclass&0 - The actor's class, as a string.
-&ccompanion&0 - For a PC, their current companion. For the companion, its master.
+&ccompanion&0 - For a PC, their current companion. For the companion, its player.
 &ccompleted_quest(vnum)&0 - Whether or not the player has completed and
    turned in that quest vnum.
 &ccompleted_quest_instance(vnum)&0 - Has completed it in the current instance.
@@ -478,6 +478,7 @@ When using field  - The variable returns:
    to fire on players and not mobs.
 &clastname&0 - The actor's last name (empty for mobs).
 &clast_move_dir&0 - The last direction moved, if any (empty if none).
+&cleader&0 - The leader of the actor (if following), or an empty return.
 &clearned(vnum)&0 - Whether the actor has learned a recipe vnum.
 &clevel&0 - The actor's computed level (or scaled level, for mobs).
 &clink_instance&0 - Marks this mob as belonging to the adventure instance of
@@ -485,7 +486,6 @@ When using field  - The variable returns:
 &clongdesc&0 - The mob's long description.
 &cmana&0 - The current mana points of the actor.
 &cmana(amount)&0 - Add/subtract mana on the actor.
-&cmaster&0 - The master of the actor (as an id), or an empty return.
 &cmaxblood&0 - The maximum blood points of the actor.
 &cmaxcarrying&0 - Inventory size limit (total they can carry).
 &cmaxhealth&0 - The maximum hit points of the actor.

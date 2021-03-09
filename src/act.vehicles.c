@@ -895,9 +895,6 @@ void do_customize_vehicle(char_data *ch, char *argument) {
 			
 			// optionally, change the longdesc too
 			if (proto && (VEH_LONG_DESC(veh) == VEH_LONG_DESC(proto) || strstr(VEH_LONG_DESC(veh), VEH_LONG_DESC(proto)))) {
-				if (VEH_LONG_DESC(veh) != VEH_LONG_DESC(proto)) {
-					free(VEH_LONG_DESC(veh));
-				}
 				sprintf(buf, "%s (%s)", VEH_LONG_DESC(proto), VEH_SHORT_DESC(veh));
 				set_vehicle_long_desc(veh, buf);
 			}
@@ -1543,8 +1540,8 @@ ACMD(do_drag) {
 	else if (WATER_SECT(IN_ROOM(ch))) {
 		msg_to_char(ch, "You can't drag anything in the water.\r\n");
 	}
-	else if (AFF_FLAGGED(ch, AFF_CHARM) && ch->master && IN_ROOM(ch) == IN_ROOM(ch->master)) {
-		msg_to_char(ch, "The thought of leaving your master makes you weep.\r\n");
+	else if (AFF_FLAGGED(ch, AFF_CHARM) && GET_LEADER(ch) && IN_ROOM(ch) == IN_ROOM(GET_LEADER(ch))) {
+		msg_to_char(ch, "The thought of leaving your leader makes you weep.\r\n");
 		act("$n bursts into tears.", FALSE, ch, NULL, NULL, TO_ROOM);
 	}
 	else if (!*what || !*where) {
@@ -2215,7 +2212,7 @@ ACMD(do_load_vehicle) {
 		if (ch == mob) {
 			msg_to_char(ch, "Just board it.\r\n");
 		}
-		else if (!IS_NPC(mob) || mob->master) {
+		else if (!IS_NPC(mob) || GET_LEADER(mob)) {
 			act("You can't load $N.", FALSE, ch, NULL, mob, TO_CHAR);
 		}
 		else if (!MOB_FLAGGED(mob, MOB_ANIMAL | MOB_MOUNTABLE)) {
@@ -2448,7 +2445,7 @@ ACMD(do_unload_vehicle) {
 		if (ch == mob) {
 			msg_to_char(ch, "You can't unload yourself.\r\n");
 		}
-		else if (!IS_NPC(mob) || mob->master) {
+		else if (!IS_NPC(mob) || GET_LEADER(mob)) {
 			act("You can't unload $N.", FALSE, ch, NULL, mob, TO_CHAR);
 		}
 		else if (!MOB_FLAGGED(mob, MOB_ANIMAL | MOB_MOUNTABLE)) {

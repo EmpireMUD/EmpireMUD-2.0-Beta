@@ -23,7 +23,7 @@ set room2 i12500
 set person %start_room.people%
 while %person%
   set next_person %person.next_in_room%
-  if %person.is_npc% && %person.master% == %actor%
+  if %person.is_npc% && %person.leader% == %actor%
     %echoaround% %person% ~%person% follows ~%actor%.
     %teleport% %person% %actor.room%
     %echoneither% %person% %actor% ~%person% follows ~%actor%.
@@ -58,7 +58,7 @@ end
 set person %room.people%
 while %person%
   set next_person %person.next_in_room%
-  if %person.is_npc% && %person.master% == %actor%
+  if %person.is_npc% && %person.leader% == %actor%
     %echoaround% %person% ~%person% follows ~%actor%.
     %teleport% %person% %actor.room%
     %echoneither% %person% %actor% ~%person% follows ~%actor%.
@@ -1209,7 +1209,7 @@ wait 1
 %purge% %self%
 ~
 #12551
-Clockwork Colossus Master Loot Controller~
+Clockwork Colossus Loot Controller~
 1 n 100
 ~
 * loot vars to be 0/1

@@ -397,10 +397,10 @@ if %self.vnum% == 19002
     %echo% ~%self% seems to grow slightly!
   end
   if %enrage_counter% == 100
-    set master %self.master%
-    if %master%
-      %force% %master% shout Magic wand, make my monster groooooooow!
-      %echo% ~%master% smacks ~%self% with her pestle.
+    set leader %self.leader%
+    if %leader%
+      %force% %leader% shout Magic wand, make my monster groooooooow!
+      %echo% ~%leader% smacks ~%self% with her pestle.
     end
   end
 end

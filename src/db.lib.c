@@ -3679,7 +3679,7 @@ void kill_empire_npc(char_data *ch) {
 *
 * @param empire_data *emp The empire being offended.
 * @param int type Any OFFENSE_ type.
-* @param char_data *offender The person committing the offense (will use any player master of an npc).
+* @param char_data *offender The person committing the offense (will use any player leader of an npc).
 * @param room_data *loc Where it happened.
 * @param bitvector_t flags Any OFF_ flags that apply.
 */
@@ -3687,8 +3687,8 @@ void add_offense(empire_data *emp, int type, char_data *offender, room_data *loc
 	struct offense_data *off;
 	
 	// try to find a player
-	while (IS_NPC(offender) && offender->master) {
-		offender = offender->master;
+	while (IS_NPC(offender) && GET_LEADER(offender)) {
+		offender = GET_LEADER(offender);
 	}
 	if (IS_NPC(offender) || GET_LOYALTY(offender) == emp) {
 		return;	// no offense
@@ -3956,8 +3956,8 @@ void remove_recent_offenses(empire_data *emp, int type, char_data *offender) {
 	struct offense_data *off, *next_off;
 	long cutoff = time(0) - (10 * SECS_PER_REAL_MIN);
 	
-	while (offender && IS_NPC(offender) && offender->master) {
-		offender = offender->master;	// climb the food chain
+	while (offender && IS_NPC(offender) && GET_LEADER(offender)) {
+		offender = GET_LEADER(offender);	// climb the food chain
 	}
 	
 	if (!emp || !offender || IS_NPC(offender)) {

@@ -1334,30 +1334,30 @@ end
 Mother's grimoire emotes~
 0 btw 10
 ~
-if !%self.master%
+if !%self.leader%
   halt
 end
 switch %random.4%
   case 1
     %echo% ~%self% flips to a page marked 'Grooming' and begins to glow...
-    %send% %self.master% A blue light flies toward you, straightening your hair!
-    %echoaround% %self.master% A blue light flies toward %self.master.name% and suddenly %self.master.hisher% hair straightens itself!
+    %send% %self.leader% A blue light flies toward you, straightening your hair!
+    %echoaround% %self.leader% A blue light flies toward %self.leader.name% and suddenly %self.leader.hisher% hair straightens itself!
   break
   case 2
     %echo% ~%self% flips to a page marked 'Hygiene' and begins to glow...
-    %send% %self.master% A white light flies into your mouth, polishing your teeth!
-    %echoaround% %self.master% A white light flies toward %self.master.name%, into %self.master.hisher% mouth, and polishing %self.master.hisher% teeth!
+    %send% %self.leader% A white light flies into your mouth, polishing your teeth!
+    %echoaround% %self.leader% A white light flies toward %self.leader.name%, into %self.leader.hisher% mouth, and polishing %self.leader.hisher% teeth!
   break
   case 3
     %echo% ~%self% flips to a page marked 'Food' and begins to glow...
-    %send% %self.master% A yellow light flies into your hand, revealing a chocolate frog!
-    %echoaround% %self.master% A yellow light flies into %self.master.name%'s hand, revealing a chocolate frog!
-    %load% obj 10998 %self.master% inv
+    %send% %self.leader% A yellow light flies into your hand, revealing a chocolate frog!
+    %echoaround% %self.leader% A yellow light flies into %self.leader.name%'s hand, revealing a chocolate frog!
+    %load% obj 10998 %self.leader% inv
   break
   case 4
     %echo% ~%self% flips to a page marked 'Smudges' and begins to glow...
-    %send% %self.master% A green light flies toward you, removing a smudge of dirt from your face!
-    %echoaround% %self.master% A green light flies toward %self.master.name%, removing a smudge of dirt from %self.master.hisher% face!
+    %send% %self.leader% A green light flies toward you, removing a smudge of dirt from your face!
+    %echoaround% %self.leader% A green light flies toward %self.leader.name%, removing a smudge of dirt from %self.leader.hisher% face!
   break
 done
 ~

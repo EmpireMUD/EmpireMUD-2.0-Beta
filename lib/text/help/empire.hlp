@@ -1220,6 +1220,7 @@ Available technologies are:
  - Fast Prospect: Members of the empire can prospect much faster.
  - Fast Excavate: Members of the empire excavate much faster when in-city.
  - Hidden Progress: The empire's progress won't show on the /progress channel.
+ - Workforce Prospecting: Workforce can prospect.
 
 * some technologies only function on the same island as the building that
   provides them
@@ -1442,6 +1443,9 @@ Workforce types:
 Items marked (skilled) require the Skilled Labor goal. Skilled Labor chores
 tend to cost more food.
 
+Additional workforce chores are available from progress buys:
+  &gprospecting (Prospector Training):&0 NPCs will slowly prospect mountain tiles.
+
 See also: ABANDON, WORKFORCE
 #
 "WORKFORCE CRAFTING" "WORKFORCE CRAFTS"
@@ -1520,6 +1524,18 @@ Skilled labor also produces:
  Trapper's Post: skins
 
 See also: WORKFORCE CHORES, WORKFORCE LIMIT, SKILLED LABOR
+#
+"WORKFORCE PROSPECTING" "PROSPECTOR TRAINING"
+
+With the 'prospecting' chore, your workforce will camp out on claimed mountain
+tiles and slowly prospect to look for metals. This can take a long time to
+finish but when it is done, any member of the empire can type 'prospect' on the
+tile to instantly find out what metal it has.
+
+You can turn on 'toggle informative' to see tiles that have been prospected by
+your empire.
+
+See also: WORKFORCE CHORES, TOGGLE INFORMATIVE
 #
 "WORKFORCE WHERE"
 

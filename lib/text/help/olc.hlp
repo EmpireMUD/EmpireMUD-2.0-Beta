@@ -4277,7 +4277,7 @@ Available mob flags:
  *PLURAL - Uses the pronouns 'their', 'they', and 'them' in act messages.
  NO-ATTACK - Mob can be in combat, but will not hit
  SPAWNED - De-spawns after 5 minutes if no players are nearby.
- CHAMPION - Will rescue its master in combat.
+ CHAMPION - Will rescue its leader in combat.
  EMPIRE - Will not be saved through reboots.
  * - Unused (formerly FAMILIAR)
  *PICKPOCKETED - Has already been pickpocketed; cannot be pickpocketed again.

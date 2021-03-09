@@ -128,11 +128,11 @@ ability_data *sorted_abilities = NULL;	// alpha hash (sorted_hh)
 adv_data *adventure_table = NULL;	// adventure hash table
 
 // archetype
-archetype_data *archetype_table = NULL;	// master hash (hh)
+archetype_data *archetype_table = NULL;	// main hash (hh)
 archetype_data *sorted_archetypes = NULL;	// sorted hash (sorted_hh)
 
 // augments
-augment_data *augment_table = NULL;	// master augment hash table
+augment_data *augment_table = NULL;	// main augment hash table
 augment_data *sorted_augments = NULL;	// alphabetic version // sorted_hh
 
 // automessage system
@@ -147,7 +147,7 @@ class_data *class_table = NULL;	// main hash (hh)
 class_data *sorted_classes = NULL;	// alpha hash (sorted_hh)
 
 // crafts
-craft_data *craft_table = NULL;	// master crafting table
+craft_data *craft_table = NULL;	// main crafting table
 craft_data *sorted_crafts = NULL;	// sorted craft table
 
 // crops
@@ -215,7 +215,7 @@ struct generic_name_data *generic_names = NULL;	// LL of generic name sets
 char_data *global_next_char = NULL;	// used in limits.c for iterating
 
 // morphs
-morph_data *morph_table = NULL;	// master morph hash table
+morph_data *morph_table = NULL;	// main morph hash table
 morph_data *sorted_morphs = NULL;	// alphabetic version // sorted_hh
 
 // objects
@@ -260,7 +260,7 @@ skill_data *skill_table = NULL;	// main skills hash (hh)
 skill_data *sorted_skills = NULL;	// alpha hash (sorted_hh)
 
 // socials
-social_data *social_table = NULL;	// master social hash table (hh)
+social_data *social_table = NULL;	// main social hash table (hh)
 social_data *sorted_socials = NULL;	// alphabetic version (sorted_hh)
 
 // strings
@@ -286,7 +286,7 @@ trig_data *free_trigger_list = NULL;	// LL of triggers to free (next_to_free)
 int top_script_uid = OTHER_ID_BASE;	// for unique mobs/objs/vehicles in the DG Scripts system
 
 // vehicles
-vehicle_data *vehicle_table = NULL;	// master vehicle hash table
+vehicle_data *vehicle_table = NULL;	// main vehicle hash table
 vehicle_data *vehicle_list = NULL;	// global doubly-linked list of vehicles (veh->next)
 
 // safe vehicle iterators
@@ -297,7 +297,7 @@ vehicle_data *next_pending_vehicle = NULL;	// used in handler.c
 room_data *world_table = NULL;	// hash table of the whole world
 room_data *interior_room_list = NULL;	// doubly-linked list of interior rooms: room->prev_interior, room->next_interior
 struct island_info *island_table = NULL; // hash table for all the islands
-struct map_data world_map[MAP_WIDTH][MAP_HEIGHT];	// master world map
+struct map_data world_map[MAP_WIDTH][MAP_HEIGHT];	// main world map
 struct map_data *land_map = NULL;	// linked list of non-ocean
 int size_of_world = 1;	// used by the instancer to adjust instance counts
 struct shared_room_data ocean_shared_data;	// for BASIC_OCEAN tiles

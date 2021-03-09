@@ -1113,8 +1113,8 @@ map see tiles in color:
   &c(--)&0  not done building (building-status)
   &m(BB)&0  damaged/needs maintenance (disrepair)
   &r(GG)&0  high damage/extreme disrepair
-  &g/[]\&0  mine with ore (mine-status)
-  &r/[]\&0  depleted mine (mine-status)
+  &g/[]\&0  has minable ore (mine-status)
+  &r/\/\&0  depleted/no ore (mine-status)
   &o{LL}&0  public
   &B^^^^&0  no-work
   &VW*WW&0  no-abandon
@@ -2426,7 +2426,7 @@ TOGGLE TOGGLES PREFERENCES PREFS SETTINGS
 
 Usage:  toggle [type] [on/off]
 
-This command is the master switchboard for various preference toggles. You can
+This command is the central switchboard for various preference toggles. You can
 use it to see your current preferences, or to switch them on and off. Some
 toggles have their own help files under 'HELP TOGGLE <option>'.
 

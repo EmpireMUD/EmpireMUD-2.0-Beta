@@ -502,7 +502,7 @@ end
 set person %self.people%
 while %person%
   set next_person %person.next_in_room%
-  if %person.is_npc% && %person.master% == %actor%
+  if %person.is_npc% && %person.leader% == %actor%
     %echoaround% %person% ~%person% follows ~%actor%.
     %teleport% %person% %actor.room%
     %send% %actor% ~%person% follows you.
@@ -568,7 +568,7 @@ end
 set person %self.people%
 while %person%
   set next_person %person.next_in_room%
-  if %person.is_npc% && %person.master% == %actor%
+  if %person.is_npc% && %person.leader% == %actor%
     %echoaround% %person% ~%person% follows ~%actor%.
     %teleport% %person% %actor.room%
     %send% %actor% ~%person% follows you.
@@ -633,7 +633,7 @@ end
 set person %self.people%
 while %person%
   set next_person %person.next_in_room%
-  if %person.is_npc% && %person.master% == %actor%
+  if %person.is_npc% && %person.leader% == %actor%
     %echoaround% %person% ~%person% follows ~%actor%.
     %teleport% %person% %actor.room%
     %send% %actor% ~%person% follows you.

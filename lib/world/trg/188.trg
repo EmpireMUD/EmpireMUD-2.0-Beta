@@ -2090,7 +2090,7 @@ if invoke /= %cmd%
   * Check for existing spirit
   set ch %room.people%
   while %ch%
-    if %ch.vnum% == 18880 && %ch.master% == %actor%
+    if %ch.vnum% == 18880 && %ch.leader% == %actor%
       %send% %actor% You already have an ancestor's spirit following you.
       halt
     end
@@ -2116,7 +2116,7 @@ elseif paint /= %cmd%
     return 0
     halt
   end
-  if %mob.master% != %actor%
+  if %mob.leader% != %actor%
     %send% %actor% You can only paint your own grandmother.
     halt
   end
@@ -2177,7 +2177,7 @@ end
 set old 0
 set ch %room.people%
 while %ch% && !%old%
-  if %ch.vnum% == 18880 && %ch.master% == %actor%
+  if %ch.vnum% == 18880 && %ch.leader% == %actor%
     set old %ch%
   end
   set ch %ch.next_in_room%

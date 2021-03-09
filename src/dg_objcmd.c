@@ -1004,7 +1004,7 @@ OCMD(do_oteleport) {
 					}
 					
 					// teleport players and their followers
-					if (!IS_NPC(ch) || (ch->master && !IS_NPC(ch->master))) {
+					if (!IS_NPC(ch) || (GET_LEADER(ch) && !IS_NPC(GET_LEADER(ch)))) {
 						char_from_room(ch);
 						char_to_room(ch, target);
 						GET_LAST_DIR(ch) = NO_DIR;
@@ -1400,7 +1400,7 @@ OCMD(do_oaoe) {
 	level = get_obj_scale_level(obj, NULL);
 	DL_FOREACH_SAFE2(ROOM_PEOPLE(orm), vict, next_vict, next_in_room) {
 		// harder to tell friend from foe: hit PCs or people following PCs
-		if (!IS_NPC(vict) || (vict->master && !IS_NPC(vict->master))) {
+		if (!IS_NPC(vict) || (GET_LEADER(vict) && !IS_NPC(GET_LEADER(vict)))) {
 			script_damage(vict, NULL, level, type, modifier);
 		}
 	}

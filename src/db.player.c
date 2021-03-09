@@ -811,7 +811,7 @@ void free_char(char_data *ch) {
 		remove_loaded_player(ch);
 	}
 
-	if (ch->followers || ch->master) {
+	if (ch->followers || GET_LEADER(ch)) {
 		die_follower(ch);
 	}
 	
@@ -4558,7 +4558,7 @@ void purge_bound_items(int idnum) {
 */
 void reset_char(char_data *ch) {	
 	ch->followers = NULL;
-	ch->master = NULL;
+	GET_LEADER(ch) = NULL;
 	IN_ROOM(ch) = NULL;
 	ch->next = NULL;
 	ch->next_fighting = NULL;

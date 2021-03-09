@@ -7447,6 +7447,12 @@ ACMD(do_workforce) {
 			return;
 		}
 		
+		// validate tech AFTER determining limit
+		if (limit != 0 && chore_data[type].requires_tech != NOTHING && !EMPIRE_HAS_TECH(emp, chore_data[type].requires_tech)) {
+			msg_to_char(ch, "You need the %s technology to use that chore.\r\n", techs[chore_data[type].requires_tech]);
+			return;
+		}
+		
 		// island arg
 		if (!*island_arg) {
 			if (!GET_ISLAND(IN_ROOM(ch))) {

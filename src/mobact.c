@@ -771,7 +771,7 @@ void run_mobile_activity(char_data *ch) {
 	bool acted = FALSE, moved = FALSE;
 	obj_data *obj;
 
-	#define CAN_AGGRO(mob, vict)  (!IS_IMMORTAL(vict) && !IS_DEAD(vict) && !NOHASSLE(vict) && (IS_NPC(vict) || !PRF_FLAGGED(vict, PRF_WIZHIDE)) && !IS_GOD(vict) && vict != mob->master && !AFF_FLAGGED(vict, AFF_IMMUNE_PHYSICAL | AFF_NO_TARGET_IN_ROOM | AFF_NO_SEE_IN_ROOM | AFF_NO_ATTACK) && CAN_SEE(mob, vict) && can_fight((mob), (vict)))
+	#define CAN_AGGRO(mob, vict)  (!IS_IMMORTAL(vict) && !IS_DEAD(vict) && !NOHASSLE(vict) && (IS_NPC(vict) || !PRF_FLAGGED(vict, PRF_WIZHIDE)) && !IS_GOD(vict) && vict != GET_LEADER(mob) && !AFF_FLAGGED(vict, AFF_IMMUNE_PHYSICAL | AFF_NO_TARGET_IN_ROOM | AFF_NO_SEE_IN_ROOM | AFF_NO_ATTACK) && CAN_SEE(mob, vict) && can_fight((mob), (vict)))
 	
 	// prevent running multiple mob moves during a catch-up cycle
 	if (!catch_up_mobs) {
@@ -793,7 +793,7 @@ void run_mobile_activity(char_data *ch) {
 	}
 	
 	// 2. try a basic move
-	if (!moved && !MOB_FLAGGED(ch, MOB_SENTINEL | MOB_TIED) && !AFF_FLAGGED(ch, AFF_CHARM | AFF_ENTANGLED) && GET_POS(ch) == POS_STANDING && (!ch->master || IN_ROOM(ch) != IN_ROOM(ch->master)) && (!MOB_FLAGGED(ch, MOB_PURSUE) || !MOB_PURSUIT(ch))) {
+	if (!moved && !MOB_FLAGGED(ch, MOB_SENTINEL | MOB_TIED) && !AFF_FLAGGED(ch, AFF_CHARM | AFF_ENTANGLED) && GET_POS(ch) == POS_STANDING && (!GET_LEADER(ch) || IN_ROOM(ch) != IN_ROOM(GET_LEADER(ch))) && (!MOB_FLAGGED(ch, MOB_PURSUE) || !MOB_PURSUIT(ch))) {
 		moved = try_mobile_movement(ch);
 	}
 
@@ -830,7 +830,7 @@ void run_mobile_activity(char_data *ch) {
 			if (ally == ch || GET_LOYALTY(ally) != GET_LOYALTY(ch)) {
 				continue;	// ignore: is self or is wrong empire
 			}
-			if (!(targ = FIGHTING(ally)) || targ == ch || targ == ch->master) {
+			if (!(targ = FIGHTING(ally)) || targ == ch || targ == GET_LEADER(ch)) {
 				continue;	// ignore: fighting us!
 			}
 			if (!IS_NPC(targ) && GET_LOYALTY(targ) == GET_LOYALTY(ch)) {
@@ -861,7 +861,7 @@ void run_mobile_activity(char_data *ch) {
 				if (GET_LOYALTY(vict) && empire_is_friendly(GET_LOYALTY(ch), GET_LOYALTY(vict))) {
 					continue;	// ignore: friendly empire
 				}
-				if (vict->master && !IS_NPC(vict->master) && in_same_group(vict, vict->master) && GET_LOYALTY(vict->master) == GET_LOYALTY(ch)) {
+				if (GET_LEADER(vict) && !IS_NPC(GET_LEADER(vict)) && in_same_group(vict, GET_LEADER(vict)) && GET_LOYALTY(GET_LEADER(vict)) == GET_LOYALTY(ch)) {
 					continue;	// ignore: grouped leader is in my empire
 				}
 				if (!CAN_AGGRO(ch, vict)) {
@@ -1410,7 +1410,7 @@ bool check_scaling(char_data *mob, char_data *attacker) {
 
 /**
 * This function figures out what level a mob would be scaled to if it were
-* fighting ch. This is largely based on master/party.
+* fighting ch. This is largely based on leader/party.
 *
 * @param char_data *ch The person we'd scale based on.
 * @param bool check_group if TRUE, considers group members' levels too
@@ -1425,8 +1425,8 @@ int determine_best_scale_level(char_data *ch, bool check_group) {
 	int level_ranges[] = { BASIC_SKILL_CAP, SPECIALTY_SKILL_CAP, CLASS_SKILL_CAP, -1 };	// terminate with -1
 	
 	// determine who we're really scaling to
-	while (IS_NPC(scale_to) && scale_to->master) {
-		scale_to = scale_to->master;
+	while (IS_NPC(scale_to) && GET_LEADER(scale_to)) {
+		scale_to = GET_LEADER(scale_to);
 	}
 	
 	// now determine the ideal level based on scale_to
@@ -1465,23 +1465,23 @@ int determine_best_scale_level(char_data *ch, bool check_group) {
 
 
 /**
-* Scales a mob below the master's level like a companion. Companions generally
+* Scales a mob below the leader's level like a companion. Companions generally
 * scale 25 levels below the character's level (or the use_level, if you pass
 * one) if the level is over 100. That is, companions scale with the character
 * up to level 100.
 *
 * @param char_data *mob The mob to scale.
-* @param char_data *master The person to base it on.
+* @param char_data *leader The person to base it on.
 * @param int use_level If you are using something other than character's level, e.g. the level of a skill, pass it here (or 0 to detect level here).
 */
-void scale_mob_as_companion(char_data *mob, char_data *master, int use_level) {
+void scale_mob_as_companion(char_data *mob, char_data *leader, int use_level) {
 	int scale_level;
 	
 	if (use_level > 0) {
 		scale_level = use_level;
 	}
 	else {
-		scale_level = get_approximate_level(master);
+		scale_level = get_approximate_level(leader);
 	}
 	
 	if (scale_level > CLASS_SKILL_CAP) {

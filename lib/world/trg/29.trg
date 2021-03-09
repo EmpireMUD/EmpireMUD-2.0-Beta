@@ -2,7 +2,7 @@
 changeling change~
 0 btw 10
 ~
-if !%self.master%
+if !%self.leader%
   halt
 end
 set start_vnum 2910
@@ -13,13 +13,13 @@ eval select %start_vnum% - 1 + %rand%
 set prev_name %self.name%
 set chance %random.10%
 if %chance% == 10
-  set master %self.master%
-  if !%master.fighting% && !%master.morph%
+  set leader %self.leader%
+  if !%leader.fighting% && !%leader.morph%
     eval select %select% - 10
-    set prev_name %master.name%
-    %morph% %master% %select%
-    %echoaround% %master% ~%self% morphs %prev_name% into ~%master%!
-    %send% %master% ~%self% morphs you into ~%master%!
+    set prev_name %leader.name%
+    %morph% %leader% %select%
+    %echoaround% %leader% ~%self% morphs %prev_name% into ~%leader%!
+    %send% %leader% ~%self% morphs you into ~%leader%!
     halt
   end
 end

@@ -1061,4 +1061,16 @@ D
 production)
 ~
 S
+#285
+#n prospector~
+prospector #n~
+#n is camped here, prospecting for minerals.
+~
+20 50 bdqv 0 3
+1 0 0 8
+D
+   This citizen has camped out and is methodically searching for minerals. 
+(workforce prospecting)
+~
+S
 $

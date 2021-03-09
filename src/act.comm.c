@@ -179,8 +179,8 @@ bool is_ignoring(char_data *ch, char_data *victim) {
 	int iter, alts = 0;
 	
 	// if it's an npc, follow up the chain to a player (e.g. charmed npc)
-	while (victim && IS_NPC(victim) && victim->master) {
-		victim = victim->master;
+	while (victim && IS_NPC(victim) && GET_LEADER(victim)) {
+		victim = GET_LEADER(victim);
 	}
 	
 	// shortcuts
@@ -599,7 +599,7 @@ ACMD(do_pub_comm) {
 bool global_mute_slash_channel_joins = FALSE;
 
 // local vars
-struct slash_channel *slash_channel_list = NULL;	// master list
+struct slash_channel *slash_channel_list = NULL;	// global list
 int top_slash_channel_id = 0;
 
 

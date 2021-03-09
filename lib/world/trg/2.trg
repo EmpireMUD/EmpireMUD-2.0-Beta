@@ -31,7 +31,7 @@ Summon Thug load script~
 0 n 100
 ~
 * cancels follow and sets loyalty to current room's empire
-if %self.master%
+if %self.leader%
   mfollow self
 end
 set room %self.room%

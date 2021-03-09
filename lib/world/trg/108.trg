@@ -136,7 +136,7 @@ if (%actor.is_pc% && %actor.completed_quest(10835)%)
   %teleport% %actor% i10826
   halt
 end
-set boss %actor.master%
+set boss %actor.leader%
 if (%actor.is_npc% && %boss%)
   %teleport% %actor% %boss.room%
 end

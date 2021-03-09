@@ -404,7 +404,7 @@ S
 #8
 Mountain~
 On a Mountain~
-'^' 25 m 75 lnsvx c
+'^' 25 m 75 dlnsvx c
 C
 dig, pick~
 D1
@@ -1724,7 +1724,7 @@ S
 #52
 Cliffs~
 Along the Cliffs~
-'^' 25 ms 50 nsvx c
+'^' 25 ms 50 dnsvx c
 C
 dig, pick~
 D1

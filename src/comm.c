@@ -122,7 +122,7 @@ sigfunc *my_signal(int signo, sigfunc * func);
 //// DATA ////////////////////////////////////////////////////////////////////
 
 /* local globals (I majored in oxymoronism) */
-descriptor_data *descriptor_list = NULL;/* master desc list					*/
+descriptor_data *descriptor_list = NULL;/* global desc list					*/
 struct txt_block *bufpool = 0;			/* pool of large output buffers		*/
 int buf_largecount = 0;					/* # of large buffers which exist	*/
 int buf_overflows = 0;					/* # of overflows of output			*/

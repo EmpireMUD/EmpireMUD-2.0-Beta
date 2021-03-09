@@ -977,10 +977,10 @@ Someone has scrawled some words onto the side of the alcove.
 T 12556
 S
 #12562
-key master clockwork~
-the clockwork master key~
-The clockwork master key is lying here. (debug item)~
-   You can 'use' this master key to damage the clockwork colossus. It only
+key control clockwork~
+the clockwork control key~
+The clockwork control key is lying here. (debug item)~
+   You can 'use' this control key to damage the clockwork colossus. It only
 works for immortals.
 ~
 3 0 a 0 1

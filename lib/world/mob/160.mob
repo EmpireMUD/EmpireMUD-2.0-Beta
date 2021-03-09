@@ -56,8 +56,8 @@ A skeletal warrior rattles here.
 0 0 22 15
 D
    This skeleton stands with no weapon in hand, but clearly ready to fight for
-it's master. The various marks on it's bones indicate that it is no stranger to
-war.
+its necromancer. The various marks on its bones indicate that it is no
+stranger to war.
 ~
 I 4 16005 100.00 1  # LOOT: a crushed skeleton
 I 4 16004 4.00 1 i  # LOOT: a rib bone dagger
@@ -79,8 +79,8 @@ A skeletal soldier rattles here.
 0 0 22 1
 D
    This skeleton stands with a simple but effective blade in hand, clearly
-ready to fight for it's master. The various marks on it's bones indicate that
-it is no stranger to war.
+ready to fight for its necromancer. The various marks on its bones indicate
+that it is no stranger to war.
 ~
 I 4 16005 100.00 1  # LOOT: a crushed skeleton
 I 4 16004 4.00 1 i  # LOOT: a rib bone dagger

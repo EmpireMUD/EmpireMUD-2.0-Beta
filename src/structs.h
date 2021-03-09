@@ -12,7 +12,7 @@
 
 /**
 * Contents:
-*   Master Configuration
+*   Main Configuration
 *   Basic Types and Consts
 *   #define Section
 *     Miscellaneous Defines
@@ -90,7 +90,7 @@
 #include "utlist.h"	// needed by everything
 
  //////////////////////////////////////////////////////////////////////////////
-//// MASTER CONFIGURATION ////////////////////////////////////////////////////
+//// MAIN CONFIGURATION //////////////////////////////////////////////////////
 
 // These are configurations which need to be in a header file, and most of
 // which can't be changed without corrupting your world or player files.
@@ -1185,7 +1185,7 @@ typedef struct vehicle_data vehicle_data;
 #define CHORE_GENERAL  28	// for reporting problems
 #define CHORE_FISHING  29
 #define CHORE_BURN_STUMPS  30
-	#define CHORE_UNUSED_B  31
+#define CHORE_PROSPECTING  31
 	#define CHORE_UNUSED4  32
 #define NUM_CHORES  33		// total
 
@@ -1305,7 +1305,7 @@ typedef struct vehicle_data vehicle_data;
 #define TECH_MASTER_PORTALS  9
 #define TECH_SKILLED_LABOR  10
 #define TECH_TRADE_ROUTES  11
-	#define TECH_UNUSED  12	// formerly exarch crafts
+#define TECH_WORKFORCE_PROSPECTING  12
 #define TECH_DEEP_MINES  13
 #define TECH_RARE_METALS  14
 #define TECH_BONUS_EXPERIENCE  15
@@ -1559,7 +1559,7 @@ typedef struct vehicle_data vehicle_data;
 #define MOB_PLURAL  BIT(12)	// m. Mob represents 2+ creatures
 #define MOB_NO_ATTACK  BIT(13)	// n. the mob can be in combat, but will never hit
 #define MOB_SPAWNED  BIT(14)	// o. Mob was spawned and should despawn if nobody is around
-#define MOB_CHAMPION  BIT(15)	// p. Mob auto-rescues its master
+#define MOB_CHAMPION  BIT(15)	// p. Mob auto-rescues its leader
 #define MOB_EMPIRE  BIT(16)	// q. empire NPC
 	#define MOB_UNUSED  BIT(17)	// formerly 'familiar'
 #define MOB_PICKPOCKETED  BIT(18)	// s. has already been pickpocketed
@@ -2806,6 +2806,7 @@ typedef enum {
 #define ROOM_EXTRA_TRENCH_ORIGINAL_SECTOR  19	// for un-trenching correctly
 #define ROOM_EXTRA_ORIGINAL_BUILDER  20	// person who started the building
 #define ROOM_EXTRA_SECTOR_TIME  21	// when it became this sector type (for types with a timed evo)
+#define ROOM_EXTRA_WORKFORCE_PROSPECT  22	// progress tracker for workforce
 
 
 // SAVE_INFO_x: flags related to saving (this is a ubyte: only holds 8 bits)
@@ -2956,7 +2957,7 @@ union config_data_union {
 };
 
 
-// for the master config system
+// for the global config system
 struct config_type {
 	int set;	// CONFIG_
 	char *key;	// string key
@@ -3937,7 +3938,7 @@ struct pursuit_data {
  //////////////////////////////////////////////////////////////////////////////
 //// PLAYER STRUCTS //////////////////////////////////////////////////////////
 
-// master player accounts
+// player accounts
 struct account_data {
 	int id;	// corresponds to player_index_data account_id and player's saved account id
 	struct account_player *players;	// linked list of players
@@ -4595,7 +4596,7 @@ struct char_data {
 	bool in_combat_list;	// helps with removing from combat list
 	
 	struct follow_type *followers;	// List of chars followers
-	char_data *master;	// Who is char following?
+	char_data *leader;	// Who is char following?
 	struct group_data *group;	// Character's Group
 
 	char *prev_host;	// Previous host (they're Trills)
@@ -4757,6 +4758,7 @@ struct empire_chore_type {
 	char *name;
 	mob_vnum mob;
 	bool hidden;	// won't show in the main chores list
+	int requires_tech;	// if any -- or NOTHING
 };
 
 
@@ -5548,7 +5550,7 @@ struct obj_storage_type {
  //////////////////////////////////////////////////////////////////////////////
 //// PROGRESS STRUCTS ////////////////////////////////////////////////////////
 
-// master progression goal
+// progression goal
 struct progress_data {
 	any_vnum vnum;
 	

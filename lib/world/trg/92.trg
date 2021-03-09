@@ -2,7 +2,7 @@
 Feral Dog Pack~
 0 n 100
 ~
-if %self.master%
+if %self.leader%
   halt
 end
 set num %random.3%

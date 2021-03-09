@@ -194,8 +194,8 @@ bool can_enter_portal(char_data *ch, obj_data *portal, bool allow_infiltrate, bo
 	else if (AFF_FLAGGED(ch, AFF_ENTANGLED)) {
 		msg_to_char(ch, "You are entangled and can't enter anything.\r\n");
 	}
-	else if (AFF_FLAGGED(ch, AFF_CHARM) && ch->master && IN_ROOM(ch) == IN_ROOM(ch->master)) {
-		msg_to_char(ch, "The thought of leaving your master makes you weep.\r\n");
+	else if (AFF_FLAGGED(ch, AFF_CHARM) && GET_LEADER(ch) && IN_ROOM(ch) == IN_ROOM(GET_LEADER(ch))) {
+		msg_to_char(ch, "The thought of leaving your leader makes you weep.\r\n");
 		act("$n bursts into tears.", FALSE, ch, NULL, NULL, TO_ROOM);
 	}
 	else if (!IS_PORTAL(portal) || !(to_room = real_room(GET_PORTAL_TARGET_VNUM(portal)))) {
@@ -930,8 +930,8 @@ bool char_can_move(char_data *ch, int dir, room_data *to_room, bitvector_t flags
 		msg_to_char(ch, "You are tied in place.\r\n");
 		return FALSE;
 	}
-	if (AFF_FLAGGED(ch, AFF_CHARM) && ch->master && IN_ROOM(ch) == IN_ROOM(ch->master)) {
-		send_to_char("The thought of leaving your master makes you weep.\r\n", ch);
+	if (AFF_FLAGGED(ch, AFF_CHARM) && GET_LEADER(ch) && IN_ROOM(ch) == IN_ROOM(GET_LEADER(ch))) {
+		send_to_char("The thought of leaving your leader makes you weep.\r\n", ch);
 		act("$n bursts into tears.", FALSE, ch, NULL, NULL, TO_ROOM);
 		return FALSE;
 	}
@@ -1079,7 +1079,7 @@ bool player_can_move(char_data *ch, int dir, room_data *to_room, bitvector_t fla
 		return FALSE;
 	}
 	// permission check
-	if (ROOM_IS_CLOSED(to_room) && !IS_IMMORTAL(ch) && !IS_INSIDE(IN_ROOM(ch)) && !ROOM_IS_CLOSED(IN_ROOM(ch)) && !IS_ADVENTURE_ROOM(IN_ROOM(ch)) && IS_ANY_BUILDING(to_room) && !can_use_room(ch, to_room, GUESTS_ALLOWED) && (!IS_SET(flags, MOVE_IGNORE) || (ch->master && !IS_NPC(ch) && IS_NPC(ch->master)))) {
+	if (ROOM_IS_CLOSED(to_room) && !IS_IMMORTAL(ch) && !IS_INSIDE(IN_ROOM(ch)) && !ROOM_IS_CLOSED(IN_ROOM(ch)) && !IS_ADVENTURE_ROOM(IN_ROOM(ch)) && IS_ANY_BUILDING(to_room) && !can_use_room(ch, to_room, GUESTS_ALLOWED) && (!IS_SET(flags, MOVE_IGNORE) || (GET_LEADER(ch) && !IS_NPC(ch) && IS_NPC(GET_LEADER(ch))))) {
 		msg_to_char(ch, "You can't enter a building without permission.\r\n");
 		return FALSE;
 	}
@@ -1434,7 +1434,7 @@ void char_through_portal(char_data *ch, obj_data *portal, bool following) {
 
 
 /* do_simple_move assumes
-*    1. That there is no master and no followers.
+*    1. That there is no leader and no followers.
 *    2. That the direction exists.
 *
 * @param char_data *ch The person moving.
@@ -1470,7 +1470,7 @@ bool do_simple_move(char_data *ch, int dir, room_data *to_room, bitvector_t flag
 			GET_MOVE(ch) -= need_movement;
 		}
 		else {
-			msg_to_char(ch, "You are too exhausted%s.\r\n", (IS_SET(flags, MOVE_FOLLOW) && ch->master) ? " to follow" : "");
+			msg_to_char(ch, "You are too exhausted%s.\r\n", (IS_SET(flags, MOVE_FOLLOW) && GET_LEADER(ch)) ? " to follow" : "");
 			return FALSE;
 		}
 	}
@@ -1662,10 +1662,10 @@ void send_arrive_message(char_data *ch, room_data *from_room, room_data *to_room
 		act("$E leads $n behind $M.", TRUE, ch, NULL, GET_LED_BY(ch), TO_NOTVICT);
 		act("You lead $n behind you.", TRUE, ch, NULL, GET_LED_BY(ch), TO_VICT);
 	}
-	else if (IS_SET(flags, MOVE_FOLLOW) && ch->master) {
-		act("$n follows $N.", TRUE, ch, NULL, ch->master, TO_NOTVICT);
-		if (CAN_SEE(ch->master, ch) && WIZHIDE_OK(ch->master, ch)) {
-			act("$n follows you.", TRUE, ch, NULL, ch->master, TO_VICT);
+	else if (IS_SET(flags, MOVE_FOLLOW) && GET_LEADER(ch)) {
+		act("$n follows $N.", TRUE, ch, NULL, GET_LEADER(ch), TO_NOTVICT);
+		if (CAN_SEE(GET_LEADER(ch), ch) && WIZHIDE_OK(GET_LEADER(ch), ch)) {
+			act("$n follows you.", TRUE, ch, NULL, GET_LEADER(ch), TO_VICT);
 		}
 	}
 	else if (IS_SET(flags, MOVE_ENTER_PORTAL)) {
@@ -1782,11 +1782,11 @@ void send_leave_message(char_data *ch, room_data *from_room, room_data *to_room,
 	else if (IS_SET(flags, MOVE_LEAD) && GET_LED_BY(ch)) {
 		snprintf(msg, sizeof(msg), "%s leads $n with %s.", HSSH(GET_LED_BY(ch)), HMHR(GET_LED_BY(ch)));
 	}
-	else if (IS_SET(flags, MOVE_FOLLOW) && ch->master && dir != NO_DIR) {
-		snprintf(msg, sizeof(msg), "$n follows %s %%s.", HMHR(ch->master));
+	else if (IS_SET(flags, MOVE_FOLLOW) && GET_LEADER(ch) && dir != NO_DIR) {
+		snprintf(msg, sizeof(msg), "$n follows %s %%s.", HMHR(GET_LEADER(ch)));
 	}
-	else if (IS_SET(flags, MOVE_FOLLOW) && ch->master) {
-		act("$n follows $M.", TRUE, ch, NULL, ch->master, TO_NOTVICT);
+	else if (IS_SET(flags, MOVE_FOLLOW) && GET_LEADER(ch)) {
+		act("$n follows $M.", TRUE, ch, NULL, GET_LEADER(ch), TO_NOTVICT);
 	}
 	else if (IS_SET(flags, MOVE_ENTER_PORTAL)) {
 		obj_data *portal = find_portal_in_room_targetting(from_room, GET_ROOM_VNUM(to_room));
@@ -1880,7 +1880,7 @@ ACMD(do_avoid) {
 	else if (vict == ch) {
 		send_to_char("You can't avoid yourself, no matter how hard you try.\r\n", ch);
 	}
-	else if (vict->master != ch) {
+	else if (GET_LEADER(vict) != ch) {
 		act("$E isn't even following you.", FALSE, ch, NULL, vict, TO_CHAR);
 	}
 	else if (IS_NPC(vict)) {
@@ -2250,15 +2250,15 @@ ACMD(do_follow) {
 		}
 	}
 
-	if (ch->master == leader) {
+	if (GET_LEADER(ch) == leader) {
 		act("You are already following $M.", FALSE, ch, 0, leader, TO_CHAR);
 		return;
 	}
-	if (AFF_FLAGGED(ch, AFF_CHARM) && (ch->master))
-		act("But you only feel like following $N!", FALSE, ch, 0, ch->master, TO_CHAR);
+	if (AFF_FLAGGED(ch, AFF_CHARM) && (GET_LEADER(ch)))
+		act("But you only feel like following $N!", FALSE, ch, 0, GET_LEADER(ch), TO_CHAR);
 	else {			/* Not Charmed follow person */
 		if (leader == ch) {
-			if (!ch->master) {
+			if (!GET_LEADER(ch)) {
 				send_to_char("You are already following yourself.\r\n", ch);
 				return;
 			}
@@ -2269,7 +2269,7 @@ ACMD(do_follow) {
 				send_to_char("Sorry, but following in loops is not allowed.\r\n", ch);
 				return;
 			}
-			if (ch->master) {
+			if (GET_LEADER(ch)) {
 				stop_follower(ch);
 			}
 

@@ -163,7 +163,7 @@ int att_max(char_data *ch) {
 bool circle_follow(char_data *ch, char_data *victim) {
 	char_data *k;
 
-	for (k = victim; k; k = k->master) {
+	for (k = victim; k; k = GET_LEADER(k)) {
 		if (k == ch) {
 			return (TRUE);
 		}
@@ -994,7 +994,7 @@ bool can_build_or_claim_at_war(char_data *ch, room_data *loc) {
 /**
 * Similar to has_relationship except it takes two characters, and attempts to
 * check their player masters first. It also considers npc affinities, if there
-* is no player master.
+* is no player leader.
 *
 * @param char_data *ch_a One character.
 * @param char_data *ch_b Another character.
@@ -1011,12 +1011,12 @@ bool char_has_relationship(char_data *ch_a, char_data *ch_b, bitvector_t dipl_bi
 	
 	// find a player for each
 	top_a = ch_a;
-	while (IS_NPC(top_a) && top_a->master) {
-		top_a = top_a->master;
+	while (IS_NPC(top_a) && GET_LEADER(top_a)) {
+		top_a = GET_LEADER(top_a);
 	}
 	top_b = ch_b;
-	while (IS_NPC(top_b) && top_b->master) {
-		top_b = top_b->master;
+	while (IS_NPC(top_b) && GET_LEADER(top_b)) {
+		top_b = GET_LEADER(top_b);
 	}
 	
 	// look up 
@@ -2671,7 +2671,7 @@ void despawn_charmies(char_data *ch, any_vnum only_vnum) {
 	char_data *iter, *next_iter;
 	
 	DL_FOREACH_SAFE(character_list, iter, next_iter) {
-		if (IS_NPC(iter) && iter->master == ch && (only_vnum == NOTHING || GET_MOB_VNUM(iter) == only_vnum)) {
+		if (IS_NPC(iter) && GET_LEADER(iter) == ch && (only_vnum == NOTHING || GET_MOB_VNUM(iter) == only_vnum)) {
 			if (GET_COMPANION(iter) == ch || AFF_FLAGGED(iter, AFF_CHARM)) {
 				act("$n leaves.", TRUE, iter, NULL, NULL, TO_ROOM);
 				extract_char(iter);

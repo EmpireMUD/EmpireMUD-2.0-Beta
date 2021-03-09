@@ -27,7 +27,7 @@
 /**
 * Contents:
 *   Data
-*   Master Chore Control
+*   Main Chore Control
 *   EWT Tracker
 *   Helpers
 *   Generic Craft Workforce
@@ -51,6 +51,7 @@ void do_chore_gen_craft(empire_data *emp, room_data *room, vehicle_data *veh, in
 void do_chore_mining(empire_data *emp, room_data *room, vehicle_data *veh);
 void do_chore_minting(empire_data *emp, room_data *room, vehicle_data *veh);
 void do_chore_production(empire_data *emp, room_data *room, vehicle_data *veh, int interact_type);
+void do_chore_prospecting(empire_data *emp, room_data *room);
 void do_chore_shearing(empire_data *emp, room_data *room, vehicle_data *veh);
 void vehicle_chore_fire_brigade(empire_data *emp, vehicle_data *veh);
 void vehicle_chore_build(empire_data *emp, vehicle_data *veh, int chore);
@@ -79,40 +80,40 @@ bool workforce_is_delayed(empire_data *emp, room_data *room, int chore);
 
 // CHORE_x
 struct empire_chore_type chore_data[NUM_CHORES] = {
-	// name, npc vnum, hidden
-	{ "building", BUILDER, FALSE },
-	{ "farming", FARMER, FALSE },
-	{ "replanting", NOTHING, FALSE },
-	{ "chopping", FELLER, FALSE },
-	{ "maintenance", REPAIRMAN, FALSE },
-	{ "mining", MINER, FALSE },
-	{ "digging", DIGGER, FALSE },
-	{ "sawing", SAWYER, FALSE },
-	{ "scraping", SCRAPER, FALSE },
-	{ "smelting", SMELTER, FALSE },
-	{ "weaving", WEAVER, FALSE },
-	{ "production", PRODUCTION_ASSISTANT, FALSE },
-	{ "crafting", CRAFTING_APPRENTICE, FALSE },
-		{ "unused", BRICKMAKER, TRUE },
-	{ "abandon-dismantled", NOTHING, FALSE },
-		{ "unused", GARDENER, TRUE },
-	{ "fire-brigade", FIRE_BRIGADE, FALSE },
-		{ "unused", TRAPPER, TRUE },
-	{ "tanning", TANNER, FALSE },
-	{ "shearing", SHEARER, FALSE },
-	{ "minting", COIN_MAKER, FALSE },
-	{ "dismantle-mines", MINE_SUPERVISOR, FALSE },
-	{ "abandon-chopped", NOTHING, FALSE },
-	{ "abandon-farmed", NOTHING, FALSE },
-		{ "unused", APPRENTICE_EXARCH, TRUE },
-	{ "milling", MILL_WORKER, FALSE },
-		{ "unused", VEHICLE_REPAIRMAN, TRUE },	// note: formerly repair-vehicles, which merged with maintenance
-	{ "oilmaking", PRESS_WORKER, FALSE },
-	{ "general", NOTHING, TRUE },
-	{ "fishing", FISHERMAN, FALSE },
-	{ "burn-stumps", STUMP_BURNER, FALSE },
-		{ "unused", BEEKEEPER, TRUE },
-		{ "unused", GLASSMAKER, TRUE },
+	// name, npc vnum, hidden, requires tech
+	{ "building", BUILDER, FALSE, NOTHING },
+	{ "farming", FARMER, FALSE, NOTHING },
+	{ "replanting", NOTHING, FALSE, NOTHING },
+	{ "chopping", FELLER, FALSE, NOTHING },
+	{ "maintenance", REPAIRMAN, FALSE, NOTHING },
+	{ "mining", MINER, FALSE, NOTHING },
+	{ "digging", DIGGER, FALSE, NOTHING },
+	{ "sawing", SAWYER, FALSE, NOTHING },
+	{ "scraping", SCRAPER, FALSE, NOTHING },
+	{ "smelting", SMELTER, FALSE, NOTHING },
+	{ "weaving", WEAVER, FALSE, NOTHING },
+	{ "production", PRODUCTION_ASSISTANT, FALSE, NOTHING },
+	{ "crafting", CRAFTING_APPRENTICE, FALSE, NOTHING },
+		{ "unused", BRICKMAKER, TRUE, NOTHING },
+	{ "abandon-dismantled", NOTHING, FALSE, NOTHING },
+		{ "unused", GARDENER, TRUE, NOTHING },
+	{ "fire-brigade", FIRE_BRIGADE, FALSE, NOTHING },
+		{ "unused", TRAPPER, TRUE, NOTHING },
+	{ "tanning", TANNER, FALSE, NOTHING },
+	{ "shearing", SHEARER, FALSE, NOTHING },
+	{ "minting", COIN_MAKER, FALSE, TECH_SKILLED_LABOR },
+	{ "dismantle-mines", MINE_SUPERVISOR, FALSE, NOTHING },
+	{ "abandon-chopped", NOTHING, FALSE, NOTHING },
+	{ "abandon-farmed", NOTHING, FALSE, NOTHING },
+		{ "unused", APPRENTICE_EXARCH, TRUE, NOTHING },
+	{ "milling", MILL_WORKER, FALSE, NOTHING },
+		{ "unused", VEHICLE_REPAIRMAN, TRUE, NOTHING },	// note: formerly repair-vehicles, which merged with maintenance
+	{ "oilmaking", PRESS_WORKER, FALSE, NOTHING },
+	{ "general", NOTHING, TRUE, NOTHING },
+	{ "fishing", FISHERMAN, FALSE, NOTHING },
+	{ "burn-stumps", STUMP_BURNER, FALSE, NOTHING },
+	{ "prospecting", PROSPECTOR, FALSE, TECH_WORKFORCE_PROSPECTING },
+		{ "unused", GLASSMAKER, TRUE, NOTHING },
 };
 
 
@@ -120,13 +121,13 @@ struct empire_chore_type chore_data[NUM_CHORES] = {
 int einv_interaction_chore_type = 0;
 
 
-#define CHORE_ACTIVE(chore)  (empire_chore_limit(emp, island, (chore)) != 0 && !workforce_is_delayed(emp, room, (chore)))
+#define CHORE_ACTIVE(chore)  (empire_chore_limit(emp, island, (chore)) != 0 && !workforce_is_delayed(emp, room, (chore)) && (chore_data[(chore)].requires_tech == NOTHING || EMPIRE_HAS_TECH(emp, chore_data[(chore)].requires_tech)))
 #define GET_CHORE_DEPLETION(room, veh, type)  ((veh) ? get_vehicle_depletion((veh), (type), FALSE) : get_depletion((room), (type), FALSE))
 #define ADD_CHORE_DEPLETION(room, veh, type, multiple)  { if (veh) { add_vehicle_depletion((veh), (type), (multiple)); } else { add_depletion((room), (type), (multiple)); } }
 
 
  /////////////////////////////////////////////////////////////////////////////
-//// MASTER CHORE CONTROL ///////////////////////////////////////////////////
+//// MAIN CHORE CONTROL /////////////////////////////////////////////////////
 
 
 /**
@@ -208,20 +209,15 @@ void process_one_chore(empire_data *emp, room_data *room) {
 		do_chore_chopping(emp, room);
 		return;
 	}
+	if (CHORE_ACTIVE(CHORE_PROSPECTING) && EMPIRE_HAS_TECH(emp, TECH_WORKFORCE_PROSPECTING) && !GET_BUILDING(room) && ROOM_CAN_MINE(room)) {
+		// Any non-building that's prospectable
+		do_chore_prospecting(emp, room);
+		return;
+	}
 	
 	// THING 6: all other chores (would be blocked by incompleteness)
 	if (!IS_COMPLETE(room)) {
 		return;
-	}
-	
-	// skilled labor
-	if (EMPIRE_HAS_TECH(emp, TECH_SKILLED_LABOR)) {
-		if (HAS_FUNCTION(room, FNC_MINT) && CHORE_ACTIVE(CHORE_MINTING)) {
-			do_chore_minting(emp, room, NULL);
-		}
-		if (CHORE_ACTIVE(CHORE_PRODUCTION) && CAN_INTERACT_ROOM_NO_VEH(room, INTERACT_SKILLED_LABOR)) {
-			do_chore_production(emp, room, NULL, INTERACT_SKILLED_LABOR);
-		}
 	}
 	
 	// function chores
@@ -238,6 +234,9 @@ void process_one_chore(empire_data *emp, room_data *room) {
 		else if (get_room_extra_data(room, ROOM_EXTRA_MINE_AMOUNT) <= 0 && IS_MAP_BUILDING(room) && !ROOM_AFF_FLAGGED(room, ROOM_AFF_NO_DISMANTLE) && CHORE_ACTIVE(CHORE_DISMANTLE_MINES)) {
 			do_chore_dismantle_mines(emp, room, NULL);	// no ore left
 		}
+	}
+	if (HAS_FUNCTION(room, FNC_MINT) && CHORE_ACTIVE(CHORE_MINTING)) {
+		do_chore_minting(emp, room, NULL);
 	}
 	
 	// gen-craft chores
@@ -256,7 +255,12 @@ void process_one_chore(empire_data *emp, room_data *room) {
 	}
 	
 	// room interaction chores
+	if (CHORE_ACTIVE(CHORE_PRODUCTION) && EMPIRE_HAS_TECH(emp, TECH_SKILLED_LABOR) && CAN_INTERACT_ROOM_NO_VEH(room, INTERACT_SKILLED_LABOR)) {
+		// skilled production
+		do_chore_production(emp, room, NULL, INTERACT_SKILLED_LABOR);
+	}
 	if (CHORE_ACTIVE(CHORE_PRODUCTION) && CAN_INTERACT_ROOM_NO_VEH(room, INTERACT_PRODUCTION)) {
+		// unskilled production
 		do_chore_production(emp, room, NULL, INTERACT_PRODUCTION);
 	}
 	
@@ -338,16 +342,6 @@ void process_one_vehicle_chore(empire_data *emp, vehicle_data *veh) {
 		return;	// can only fire-brigade/repair if low health
 	}
 	
-	// skilled labor chores:
-	if (EMPIRE_HAS_TECH(emp, TECH_SKILLED_LABOR)) {
-		if (vehicle_has_function_and_city_ok(veh, FNC_MINT) && CHORE_ACTIVE(CHORE_MINTING)) {
-			do_chore_minting(emp, room, veh);
-		}
-		if (has_interaction(VEH_INTERACTIONS(veh), INTERACT_SKILLED_LABOR) && CHORE_ACTIVE(CHORE_PRODUCTION)) {
-			do_chore_production(emp, room, veh, INTERACT_SKILLED_LABOR);
-		}
-	}
-	
 	// function chores:
 	if (vehicle_has_function_and_city_ok(veh, FNC_DIGGING) && CHORE_ACTIVE(CHORE_DIGGING)) {
 		do_chore_digging(emp, room, veh);
@@ -362,6 +356,9 @@ void process_one_vehicle_chore(empire_data *emp, vehicle_data *veh) {
 		else if (get_room_extra_data(room, ROOM_EXTRA_MINE_AMOUNT) <= 0 && !VEH_FLAGGED(veh, VEH_NEVER_DISMANTLE | VEH_PLAYER_NO_DISMANTLE) && CHORE_ACTIVE(CHORE_DISMANTLE_MINES)) {
 			do_chore_dismantle_mines(emp, room, veh);	// no ore left
 		}
+	}
+	if (vehicle_has_function_and_city_ok(veh, FNC_MINT) && CHORE_ACTIVE(CHORE_MINTING)) {
+		do_chore_minting(emp, room, veh);
 	}
 	
 	// gen-craft chores:
@@ -380,7 +377,12 @@ void process_one_vehicle_chore(empire_data *emp, vehicle_data *veh) {
 	}
 	
 	// vehicle interaction chores
+	if (has_interaction(VEH_INTERACTIONS(veh), INTERACT_SKILLED_LABOR) && EMPIRE_HAS_TECH(emp, TECH_SKILLED_LABOR) && CHORE_ACTIVE(CHORE_PRODUCTION)) {
+		// skilled production
+		do_chore_production(emp, room, veh, INTERACT_SKILLED_LABOR);
+	}
 	if (has_interaction(VEH_INTERACTIONS(veh), INTERACT_PRODUCTION) && CHORE_ACTIVE(CHORE_PRODUCTION)) {
+		// unskilled production
 		do_chore_production(emp, room, veh, INTERACT_PRODUCTION);
 	}
 	
@@ -2629,6 +2631,66 @@ void do_chore_production(empire_data *emp, room_data *room, vehicle_data *veh, i
 	}
 	if (!can_gain) {
 		log_workforce_problem(emp, room, CHORE_PRODUCTION, WF_PROB_OVER_LIMIT, FALSE);
+	}
+}
+
+
+void do_chore_prospecting(empire_data *emp, room_data *room) {
+	bool can_mine = ROOM_CAN_MINE(room);
+	bool prospected_by_emp = (get_room_extra_data(room, ROOM_EXTRA_PROSPECT_EMPIRE) == EMPIRE_VNUM(emp));
+	bool has_ore = (get_room_extra_data(room, ROOM_EXTRA_MINE_AMOUNT) > 0);
+	bool undetermined = (get_room_extra_data(room, ROOM_EXTRA_MINE_GLB_VNUM) <= 0);
+	bool needs_prospect = (can_mine && (undetermined || (!prospected_by_emp && has_ore))); 
+	char_data *worker;
+	
+	if (needs_prospect && (worker = find_chore_worker_in_room(emp, room, NULL, chore_data[CHORE_PROSPECTING].mob))) {
+		charge_workforce(emp, room, worker, 1, NOTHING, 0);
+		add_to_room_extra_data(room, ROOM_EXTRA_WORKFORCE_PROSPECT, 1);
+		
+		if (get_room_extra_data(room, ROOM_EXTRA_WORKFORCE_PROSPECT) < config_get_int("prospecting_workforce_hours")) {
+			// still working: only send message if someone else is present (don't bother verifying it's a player)
+			if (ROOM_PEOPLE(IN_ROOM(worker))->next_in_room) {
+				switch (number(0, 2)) {
+					case 0: {
+						act("$n picks at the soil...", FALSE, worker, NULL, NULL, TO_ROOM | TO_SPAMMY | TO_QUEUE);
+						break;
+					}
+					case 1: {
+						act("$n tastes a pinch of soil...", FALSE, worker, NULL, NULL, TO_ROOM | TO_SPAMMY | TO_QUEUE);
+						break;
+					}
+					case 2: {
+						act("$n sifts through the dirt...", FALSE, worker, NULL, NULL, TO_ROOM | TO_SPAMMY | TO_QUEUE);
+						break;
+					}
+				}
+			}
+		}
+		else {
+			// finished working
+			act("$n finishes prospecting!", FALSE, worker, NULL, NULL, TO_ROOM | TO_SPAMMY | TO_QUEUE);
+			
+			// pass NULL for ch to init_mine so it just uses the empire
+			init_mine(room, NULL, emp);
+			set_room_extra_data(room, ROOM_EXTRA_PROSPECT_EMPIRE, EMPIRE_VNUM(emp));
+			remove_room_extra_data(room, ROOM_EXTRA_WORKFORCE_PROSPECT);
+		}
+	}
+	else if (needs_prospect) {
+		// attempt to place worker
+		if ((worker = place_chore_worker(emp, CHORE_PROSPECTING, room))) {
+			charge_workforce(emp, room, worker, 1, NOTHING, 0);
+		}
+	}
+	else if (can_mine && !undetermined && !prospected_by_emp && !has_ore) {
+		// empty -- just mark it for them
+		charge_workforce(emp, room, worker, 1, NOTHING, 0);
+		set_room_extra_data(room, ROOM_EXTRA_PROSPECT_EMPIRE, EMPIRE_VNUM(emp));
+		remove_room_extra_data(room, ROOM_EXTRA_WORKFORCE_PROSPECT);
+	}
+	else if (can_mine && !needs_prospect) {
+		// actually do not need this error
+		// mark_workforce_delay(emp, room, CHORE_PROSPECTING, WF_PROB_ALREADY_PROSPECTED);
 	}
 }
 

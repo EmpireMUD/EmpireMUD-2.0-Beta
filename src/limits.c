@@ -612,10 +612,10 @@ void real_update_char(char_data *ch) {
 		}
 	}
 	
-	// check master's solo role
+	// check leader's solo role
 	if (IS_NPC(ch) && GET_COMPANION(ch) && GET_CLASS_ROLE(GET_COMPANION(ch)) == ROLE_SOLO && (compan = has_companion(GET_COMPANION(ch), GET_MOB_VNUM(ch))) && compan->from_abil != NO_ABIL && (abil = find_ability_by_vnum(compan->from_abil)) && ABIL_IS_SYNERGY(abil) && !check_solo_role(GET_COMPANION(ch))) {
-		act("$N vanishes because you're in the solo role but not alone.", FALSE, ch->master, NULL, ch, TO_CHAR);
-		act("$N vanishes.", FALSE, ch->master, NULL, ch, TO_NOTVICT);
+		act("$N vanishes because you're in the solo role but not alone.", FALSE, GET_LEADER(ch), NULL, ch, TO_CHAR);
+		act("$N vanishes.", FALSE, GET_LEADER(ch), NULL, ch, TO_NOTVICT);
 		extract_char(ch);
 		return;
 	}
@@ -888,7 +888,7 @@ void real_update_char(char_data *ch) {
 		fol_count = 0;
 		DL_FOREACH_SAFE2(ROOM_PEOPLE(IN_ROOM(ch)), room_ch, next_ch, next_in_room) {
 			// check is npc following ch
-			if (room_ch == ch || room_ch->desc || !IS_NPC(room_ch) || room_ch->master != ch) {
+			if (room_ch == ch || room_ch->desc || !IS_NPC(room_ch) || GET_LEADER(room_ch) != ch) {
 				continue;
 			}
 		
