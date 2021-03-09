@@ -1113,8 +1113,8 @@ map see tiles in color:
   &c(--)&0  not done building (building-status)
   &m(BB)&0  damaged/needs maintenance (disrepair)
   &r(GG)&0  high damage/extreme disrepair
-  &g/[]\&0  mine with ore (mine-status)
-  &r/[]\&0  depleted mine (mine-status)
+  &g/[]\&0  has minable ore (mine-status)
+  &r/\/\&0  depleted/no ore (mine-status)
   &o{LL}&0  public
   &B^^^^&0  no-work
   &VW*WW&0  no-abandon
