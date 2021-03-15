@@ -158,6 +158,8 @@ and intelligence) by spending blood. You can also boost additional traits,
 depending on what role you're currently in. Type 'boost' by itself to see the
 list of traits you can currently boost.
 
+Boost also grants you a larger blood pool, even while it isn't active.
+
 At high skill levels, you may get a stronger boost at the same cost. You can
 end your boosts early by typing "boost end". Gains experience when you activate
 your boosts.
@@ -368,6 +370,8 @@ Sanguine Restoration (Vampire ability)
 
 Blood is life. When drinking blood from a human victim, your health, move, and
 mana will regenerate by 10% per drink.
+
+Sanguine Restoration also grants you a larger blood pool.
 
 You will gain experience with this ability when drinking blood.
 

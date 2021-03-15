@@ -451,11 +451,12 @@ V||V  Gatehouse
 
 The gatehouse creates a secure way through your walls. Only players who can
 infiltrate will make it through the gatehouse, and many of those will be
-stopped by your city guards.
+stopped by your city guards. You require the Walled Town progress goal to
+build this.
 
 If you want to allow all traffic through the gatehouse, publicize it.
 
-See also: INFILTRATE, PUBLICIZE, WALL
+See also: INFILTRATE, PUBLICIZE, WALL, WALLED TOWN
 #
 GLASSBLOWER "GLASS BLOWER" GLASSBLOWING "GLASS BLOWING"
 
