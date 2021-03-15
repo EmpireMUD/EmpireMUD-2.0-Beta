@@ -9,10 +9,10 @@ This jar can be used to paint a building with the 'paint' command.
 6 0
 C
 1 1
-I 27 801 100.00 1  # CONSUMES-TO: a jar
+I 27 801 100.00 1  # CONSUMES-TO: glass jar
 O+ 1 6890
 R
-1401 0
+4 1401 0
 S
 #1401
 recipe blue paint~
@@ -35,10 +35,10 @@ This jar can be used to paint a building with the 'paint' command.
 6 0
 C
 1 1
-I 27 801 100.00 1  # CONSUMES-TO: a jar
+I 27 801 100.00 1  # CONSUMES-TO: glass jar
 O+ 1 6890
 R
-1401 0
+4 1401 0
 S
 #1403
 recipe red paint~
@@ -61,10 +61,10 @@ This jar can be used to paint a building with the 'paint' command.
 6 0
 C
 1 1
-I 27 801 100.00 1  # CONSUMES-TO: a jar
+I 27 801 100.00 1  # CONSUMES-TO: glass jar
 O+ 1 6890
 R
-1401 0
+4 1401 0
 S
 #1405
 recipe yellow paint~
@@ -82,14 +82,15 @@ a jar of green paint~
 A jar of green paint is sitting on the ground.~
 This jar can be used to paint a building with the 'paint' command.
 ~
-13 el a 0 7
+13 el a 0 8
 4 0 0
 6 0
 C
 1 1
+I 27 801 100.00 1  # CONSUMES-TO: glass jar
 O+ 1 6890
 R
-1401 0
+4 1401 0
 S
 #1407
 recipe green paint~
@@ -107,14 +108,15 @@ a jar of orange paint~
 A jar of orange paint is sitting on the ground.~
 This jar can be used to paint a building with the 'paint' command.
 ~
-13 el a 0 8
+13 el a 0 9
 5 0 0
 6 0
 C
 1 1
+I 27 801 100.00 1  # CONSUMES-TO: glass jar
 O+ 1 6890
 R
-1401 0
+4 1401 0
 S
 #1409
 recipe orange paint~
@@ -132,14 +134,15 @@ a jar of violet paint~
 A jar of violet paint is sitting on the ground.~
 This jar can be used to paint a building with the 'paint' command.
 ~
-13 el a 0 9
+13 el a 0 10
 6 0 0
 6 0
 C
 1 1
+I 27 801 100.00 1  # CONSUMES-TO: glass jar
 O+ 1 6890
 R
-1401 0
+4 1401 0
 S
 #1411
 recipe violet paint~
@@ -157,14 +160,15 @@ a jar of azure paint~
 A jar of azure paint is sitting on the ground.~
 This jar can be used to paint a building with the 'paint' command.
 ~
-13 el a 0 10
+13 el a 0 11
 7 0 0
 6 0
 C
 1 1
+I 27 801 100.00 1  # CONSUMES-TO: glass jar
 O+ 1 6890
 R
-1401 0
+4 1401 0
 S
 #1413
 recipe azure paint~
@@ -182,14 +186,15 @@ a jar of cyan paint~
 A jar of cyan paint is sitting on the ground.~
 This jar can be used to paint a building with the 'paint' command.
 ~
-13 el a 0 11
+13 el a 0 12
 8 0 0
 6 0
 C
 1 1
+I 27 801 100.00 1  # CONSUMES-TO: glass jar
 O+ 1 6890
 R
-1401 0
+4 1401 0
 S
 #1415
 recipe cyan paint~
@@ -207,14 +212,15 @@ a jar of jade paint~
 A jar of jade paint is sitting on the ground.~
 This jar can be used to paint a building with the 'paint' command.
 ~
-13 el a 0 12
+13 el a 0 13
 9 0 0
 6 0
 C
 1 1
+I 27 801 100.00 1  # CONSUMES-TO: glass jar
 O+ 1 6890
 R
-1401 0
+4 1401 0
 S
 #1417
 recipe jade paint~
@@ -232,14 +238,15 @@ a jar of lime paint~
 A jar of lime paint is sitting on the ground.~
 This jar can be used to paint a building with the 'paint' command.
 ~
-13 el a 0 13
+13 el a 0 14
 10 0 0
 6 0
 C
 1 1
+I 27 801 100.00 1  # CONSUMES-TO: glass jar
 O+ 1 6890
 R
-1401 0
+4 1401 0
 S
 #1419
 recipe lime paint~
@@ -257,14 +264,15 @@ a jar of magenta paint~
 A jar of magenta paint is sitting on the ground.~
 This jar can be used to paint a building with the 'paint' command.
 ~
-13 el a 0 13
+13 el a 0 14
 11 0 0
 6 0
 C
 1 1
+I 27 801 100.00 1  # CONSUMES-TO: glass jar
 O+ 1 6890
 R
-1401 0
+4 1401 0
 S
 #1421
 recipe magenta paint~
@@ -282,14 +290,15 @@ a jar of pink paint~
 A jar of pink paint is sitting on the ground.~
 This jar can be used to paint a building with the 'paint' command.
 ~
-13 el a 0 13
+13 el a 0 14
 12 0 0
 6 0
 C
 1 1
+I 27 801 100.00 1  # CONSUMES-TO: glass jar
 O+ 1 6890
 R
-1401 0
+4 1401 0
 S
 #1423
 recipe pink paint~
@@ -307,14 +316,15 @@ a jar of tan paint~
 A jar of tan paint is sitting on the ground.~
 This jar can be used to paint a building with the 'paint' command.
 ~
-13 el a 0 13
+13 el a 0 14
 13 0 0
 6 0
 C
 1 1
+I 27 801 100.00 1  # CONSUMES-TO: glass jar
 O+ 1 6890
 R
-1401 0
+4 1401 0
 S
 #1425
 recipe tan paint~
@@ -337,10 +347,10 @@ This jar can be used to paint a building with the 'paint' command.
 6 0
 C
 1 1
-I 27 801 100.00 1  # CONSUMES-TO: a jar
+I 27 801 100.00 1  # CONSUMES-TO: glass jar
 O+ 1 6890
 R
-1401 0
+4 1401 0
 S
 #1427
 recipe white paint~
@@ -389,7 +399,7 @@ Type 'paint experimental' to use it.
 13 e a 0 8
 1 0 0
 6 0
-I 27 801 100.00 1  # CONSUMES-TO: a jar
+I 27 801 100.00 1  # CONSUMES-TO: glass jar
 Q 1402
 T 1498
 S
