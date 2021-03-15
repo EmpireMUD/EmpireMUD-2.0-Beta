@@ -2275,7 +2275,7 @@ ACMD(do_load_vehicle) {
 		}
 	}
 	else {
-		msg_to_char(ch, "You don't see %s %s here.\r\n", arg1, AN(arg1));
+		msg_to_char(ch, "You don't see %s %s here.\r\n", AN(arg1), arg1);
 	}
 }
 
@@ -2504,6 +2504,6 @@ ACMD(do_unload_vehicle) {
 		}
 	}
 	else {
-		msg_to_char(ch, "You don't see %s %s here.\r\n", arg, AN(arg));
+		msg_to_char(ch, "You don't see %s %s here.\r\n", AN(arg), arg);
 	}
 }
