@@ -515,7 +515,10 @@ static void ewt_mark_resource_worker(empire_data *emp, room_data *loc, obj_vnum 
 * @param int interaction_type Any INTERACT_ types.
 */
 static void ewt_mark_for_interaction_list(empire_data *emp, room_data *location, struct interaction_item *list, int interaction_type) {
+	struct vnum_hash *vhash = NULL, *item;
 	struct interaction_item *interact;
+	int amount;
+	
 	LL_FOREACH(list, interact) {
 		// should this be checking meets_interaction_restrictions() ?
 		if (interact->type == interaction_type) {
@@ -524,10 +527,25 @@ static void ewt_mark_for_interaction_list(empire_data *emp, room_data *location,
 				ewt_mark_resource_worker(emp, location, interact->vnum, 1);
 			}
 			else {
-				ewt_mark_resource_worker(emp, location, interact->vnum, interact->quantity);
+				// not 1-at-a-time: ensure we don't overcount if multiple interactions have the same item
+				if ((item = find_in_vnum_hash(vhash, interact->vnum))) {
+					amount = interact->quantity - item->count;
+				}
+				else {
+					// not found -- just add full amount
+					amount = interact->quantity;
+				}
+				
+				// add if needed
+				if (amount > 0) {
+					ewt_mark_resource_worker(emp, location, interact->vnum, amount);
+					add_vnum_hash(&vhash, interact->vnum, amount);
+				}
 			}
 		}
 	}
+	
+	free_vnum_hash(&vhash);
 }
 
 
