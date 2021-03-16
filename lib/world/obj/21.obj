@@ -216,8 +216,8 @@ a grave marker~
 A grave marker has been left behind.~
    You can use this grave marker to 'build grave', and then set it as your tomb
 in order to have a nearby respawn point when you die. This grave marker can
-only be used once, so pick a good spot for it. You'll need the Monuments
-ability to build a proper tomb after that.
+only be used once, so pick a good spot for it. Later, you can build other types
+of tombs and graves with various abilities, such as the family grave site.
 ~
 3 g a 0 1
 0 0 0
@@ -678,7 +678,7 @@ S
 knife skinning simple~
 a simple skinning knife~
 A simple skinning knife stands in the ground here.~
-   This knife isn't really good for fighting, but you case 'use' it to equip it
+   This knife isn't really good for fighting, but you can 'use' it to equip it
 in your tool slot and use it for skinning, butchering, and even crafting.
 ~
 3 p a f 1

@@ -5,7 +5,7 @@ blue paint~
 R
 1206 1 0 0
 R
-801 1 0 0
+801 3 0 0
 S
 #1401
 painter~
@@ -27,7 +27,7 @@ red paint~
 R
 104 1 0 0
 R
-801 1 0 0
+801 3 0 0
 S
 #1404
 yellow paint~
@@ -36,7 +36,7 @@ yellow paint~
 R
 103 1 0 0
 R
-801 1 0 0
+801 3 0 0
 S
 #1406
 green paint~
@@ -94,7 +94,7 @@ R
 S
 #1418
 lime paint~
-1418 3
+1418 1
 2 203 hq 3 -1 0 0
 R
 1406 1 0 0

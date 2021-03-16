@@ -1670,6 +1670,7 @@ extern struct weather_data weather_info;	// db.c
 void add_pair_hash(struct pair_hash **hash, int id, int value);
 void add_string_hash(struct string_hash **hash, const char *string, int count);
 void add_vnum_hash(struct vnum_hash **hash, any_vnum vnum, int count);
+struct vnum_hash *find_in_vnum_hash(struct vnum_hash *hash, any_vnum vnum);
 void free_pair_hash(struct pair_hash **hash);
 void free_string_hash(struct string_hash **hash);
 void free_vnum_hash(struct vnum_hash **hash);

@@ -6423,6 +6423,20 @@ void add_vnum_hash(struct vnum_hash **hash, any_vnum vnum, int count) {
 
 
 /**
+* Finds an entry in a vnum hash by vnum.
+*
+* @param struct vnum_hash *hash The hash to search.
+* @param any_vnum vnum The vnum to look for.
+* @return struct vnum_hash* The entry in the hash, if it exists, or else NULL.
+*/
+struct vnum_hash *find_in_vnum_hash(struct vnum_hash *hash, any_vnum vnum) {
+	struct vnum_hash *item = NULL;
+	HASH_FIND_INT(hash, &vnum, item);
+	return item;
+}
+
+
+/**
 * Frees a pair_hash when you're done with it.
 *
 * @param struct pair_hash **hash The pair hash to free.
