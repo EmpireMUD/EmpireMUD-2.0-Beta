@@ -1646,7 +1646,7 @@ S
 #50
 Shore~
 Along the Shore~
-'.' 10 js 2 l bpr
+'.' 10 jrs 2 l bpr
 C
 dig, pick~
 D1
@@ -1852,7 +1852,7 @@ S
 #56
 Estuary Shore~
 The Shore of the Estuary~
-'.' 37 js 2 l bprs
+'.' 37 jrs 2 l bprs
 C
 dig, pick~
 D1
