@@ -6423,6 +6423,34 @@ void add_vnum_hash(struct vnum_hash **hash, any_vnum vnum, int count) {
 
 
 /**
+* Finds an entry in a pair hash by id.
+*
+* @param struct pair_hash *hash The hash to search.
+* @param int id The id to look for.
+* @return struct pair_hash* The entry in the hash, if it exists, or else NULL.
+*/
+struct pair_hash *find_in_pair_hash(struct pair_hash *hash, int id) {
+	struct pair_hash *item = NULL;
+	HASH_FIND_INT(hash, &id, item);
+	return item;
+}
+
+
+/**
+* Finds an entry in a string hash by string match.
+*
+* @param struct string_hash *hash The hash to search.
+* @param const char *string The string to look for.
+* @return struct string_hash* The entry in the hash, if it exists, or else NULL.
+*/
+struct string_hash *find_in_string_hash(struct string_hash *hash, const char *string) {
+	struct string_hash *item = NULL;
+	HASH_FIND_STR(hash, string, item);
+	return item;
+}
+
+
+/**
 * Finds an entry in a vnum hash by vnum.
 *
 * @param struct vnum_hash *hash The hash to search.
