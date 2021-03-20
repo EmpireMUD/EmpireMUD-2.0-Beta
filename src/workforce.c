@@ -2431,6 +2431,9 @@ INTERACTION_FUNC(one_mining_chore) {
 			add_to_empire_storage(emp, GET_ISLAND_ID(inter_room), interaction->vnum, interaction->quantity);
 			add_production_total(emp, interaction->vnum, interaction->quantity);
 			
+			// set as prospected
+			set_room_extra_data(inter_room, ROOM_EXTRA_PROSPECT_EMPIRE, EMPIRE_VNUM(emp));
+			
 			// only send message if someone else is present (don't bother verifying it's a player)
 			if (ROOM_PEOPLE(IN_ROOM(ch))->next_in_room) {
 				sprintf(buf, "$n strikes the wall and %s falls loose!", get_obj_name_by_proto(interaction->vnum));

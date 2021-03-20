@@ -2127,6 +2127,11 @@ void process_mining(char_data *ch) {
 			// amount of ore remaining
 			add_to_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_MINE_AMOUNT, -1);
 			
+			// set as prospected
+			if (GET_LOYALTY(ch) && (!ROOM_OWNER(IN_ROOM(ch)) || GET_LOYALTY(ch) == ROOM_OWNER(IN_ROOM(ch)))) {
+				set_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_PROSPECT_EMPIRE, EMPIRE_VNUM(GET_LOYALTY(ch)));
+			}
+			
 			glb = global_proto(get_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_MINE_GLB_VNUM));
 			if (!glb || GET_GLOBAL_TYPE(glb) != GLOBAL_MINE_DATA) {
 				msg_to_char(ch, "You can't seem to mine here.\r\n");

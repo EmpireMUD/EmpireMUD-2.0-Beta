@@ -1633,7 +1633,7 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options) {
 		if (get_room_extra_data(room, ROOM_EXTRA_MINE_AMOUNT) <= 0) {
 			msg_to_char(ch, "This mine is depleted.\r\n");
 		}
-		else {
+		else if (GET_LOYALTY(ch) && get_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_PROSPECT_EMPIRE) == EMPIRE_VNUM(GET_LOYALTY(ch))) {
 			strcpy(locbuf, get_mine_type_name(room));
 			msg_to_char(ch, "This appears to be %s %s.\r\n", AN(locbuf), locbuf);
 		}
