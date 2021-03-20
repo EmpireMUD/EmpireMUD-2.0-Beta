@@ -1052,6 +1052,7 @@ struct affected_type *create_aff(any_vnum type, int duration, int location, int 
 */
 void apply_dot_effect(char_data *ch, any_vnum type, sh_int duration, sh_int damage_type, sh_int damage, sh_int max_stack, char_data *cast_by) {
 	struct over_time_effect_type *iter, *dot;
+	generic_data *gen;
 	bool found = FALSE;
 	int id = (cast_by ? CAST_BY_ID(cast_by) : 0);
 	
@@ -1081,6 +1082,16 @@ void apply_dot_effect(char_data *ch, any_vnum type, sh_int duration, sh_int dama
 	}
 	
 	queue_delayed_update(ch, CDU_MSDP_DOTS);
+	
+	// any messaging
+	if ((gen = find_generic(type, GENERIC_AFFECT))) {
+		if (GET_AFFECT_APPLY_TO_CHAR(gen)) {
+			act(GET_AFFECT_APPLY_TO_CHAR(gen), FALSE, ch, NULL, NULL, TO_CHAR);
+		}
+		if (GET_AFFECT_APPLY_TO_ROOM(gen)) {
+			act(GET_AFFECT_APPLY_TO_ROOM(gen), TRUE, ch, NULL, NULL, TO_ROOM);
+		}
+	}
 }
 
 
