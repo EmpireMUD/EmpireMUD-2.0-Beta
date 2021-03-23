@@ -1458,7 +1458,7 @@ bool check_autostore(obj_data *obj, bool force, empire_data *override_emp) {
 	empire_data *emp = override_emp;
 	char_data *loaded_ch;
 	vehicle_data *in_veh;
-	room_data *real_loc;
+	room_data *real_loc, *last_loc;
 	obj_data *top_obj;
 	bool store, unique, full, is_home, file;
 	int islid, home_idnum = NOBODY;
@@ -1478,11 +1478,21 @@ bool check_autostore(obj_data *obj, bool force, empire_data *override_emp) {
 	real_loc = IN_ROOM(top_obj);
 	in_veh = top_obj->in_vehicle;
 	
+	// follow up the chain of rooms until SOMETHING is claimed:
+	do {
+		last_loc = real_loc;
+		
+		// backup: if in a room which is inside a vehicle, go up the chain
+		if (real_loc && !ROOM_OWNER(real_loc) && GET_ROOM_VEHICLE(real_loc) && IN_ROOM(GET_ROOM_VEHICLE(real_loc))) {
+			real_loc = IN_ROOM(GET_ROOM_VEHICLE(real_loc));
+		}
+	} while (last_loc != real_loc);
+	
 	// detect home?
-	if (real_loc && (home_idnum = ROOM_PRIVATE_OWNER(HOME_ROOM(real_loc))) != NOBODY) {
+	if (in_veh && VEH_INTERIOR_HOME_ROOM(in_veh) && (home_idnum = ROOM_PRIVATE_OWNER(VEH_INTERIOR_HOME_ROOM(in_veh))) != NOBODY) {
 		is_home = TRUE;
 	}
-	else if (in_veh && VEH_INTERIOR_HOME_ROOM(in_veh) && (home_idnum = ROOM_PRIVATE_OWNER(VEH_INTERIOR_HOME_ROOM(in_veh))) != NOBODY) {
+	else if (real_loc && (home_idnum = ROOM_PRIVATE_OWNER(HOME_ROOM(real_loc))) != NOBODY) {
 		is_home = TRUE;
 	}
 	else {
