@@ -2041,7 +2041,8 @@ void free_empire(empire_data *emp) {
 		free(ehc);
 	}
 	
-	// free workforce log
+	// free workforce logs
+	free_workforce_where_log(&EMPIRE_WORKFORCE_WHERE_LOG(emp));
 	while ((wf_log = EMPIRE_WORKFORCE_LOG(emp))) {
 		EMPIRE_WORKFORCE_LOG(emp) = wf_log->next;
 		free(wf_log);
