@@ -137,11 +137,12 @@ void write_mail_to_file(FILE *fl, char_data *ch) {
 //// MAIL COMMANDS ///////////////////////////////////////////////////////////
 
 ACMD(do_mail) {
-	char mail_buf[MAX_STRING_LENGTH * 2];
+	char mail_buf[MAX_STRING_LENGTH * 2], part[256];
 	player_index_data *index;
 	int amt = -1, count = 0;
 	struct mail_data *mail;
-	char *tmstr, **write;
+	char *tmstr, **write, *replaced;
+	const char *msg;
 	obj_data *obj;
 	
 	if (IS_NPC(ch)) {
@@ -158,10 +159,10 @@ ACMD(do_mail) {
 	}
 	else if (is_abbrev(arg, "check")) {
 		if (GET_MAIL_PENDING(ch)) {
-			msg_to_char(ch, "A pigeon is circling overhead with mail for you.\r\n");
+			msg_to_char(ch, "%s\r\n", config_get_string("mail_available_message") ? config_get_string("mail_available_message") : "You have mail waiting for you.");
 		}
 		else {
-			msg_to_char(ch, "You can't see any mail pigeons following you.\r\n");
+			msg_to_char(ch, "%s\r\n", config_get_string("mail_not_available_message") ? config_get_string("mail_not_available_message") : "You don't seem to have any mail waiting for you.");
 		}
 	}
 	else if (is_abbrev(arg, "receive")) {
@@ -169,7 +170,10 @@ ACMD(do_mail) {
 			amt = MAX(1, atoi(buf));
 		}
 
-		if (!GET_MAIL_PENDING(ch)) {
+		if (config_get_bool("mail_requires_building_to_receive") && !IS_IMMORTAL(ch) && !room_has_function_and_city_ok(GET_LOYALTY(ch), IN_ROOM(ch), FNC_MAIL)) {
+			msg_to_char(ch, "%s\r\n", config_get_string("mail_requires_building_to_receive_message") ? config_get_string("mail_requires_building_to_receive_message") : "You can only receive mail at a working post office.");
+		}
+		else if (!GET_MAIL_PENDING(ch)) {
 			msg_to_char(ch, "You don't have any mail waiting.\r\n");
 		}
 		else {
@@ -199,20 +203,36 @@ ACMD(do_mail) {
 				GET_MAIL_PENDING(ch) = mail->next;
 				free_mail(mail);
 			}
-			msg_to_char(ch, "A pigeon lands and you find %d letter%s attached to its leg.\r\n", count, count != 1 ? "s" : "");
-			sprintf(buf1, "A pigeon lands and $n unties %d letter%s from its leg.", count, count != 1 ? "s" : "");
-			act(buf1, TRUE, ch, NULL, NULL, TO_ROOM);
+			
+			// pre-messaging
+			snprintf(part, sizeof(part), "%d letter%s", count, PLURAL(count));
+			
+			// message to player
+			msg = config_get_string("mail_receive_message_to_char") ? config_get_string("mail_receive_message_to_char") : "You receive ##.";
+			if (strstr(msg, "##")) {
+				replaced = str_replace("##", part, msg);
+				msg_to_char(ch, "%s\r\n", replaced);
+				free(replaced);
+			}
+			else {
+				msg_to_char(ch, "%s\r\n", msg);
+			}
+			
+			// message to room
+			msg = config_get_string("mail_receive_message_to_room") ? config_get_string("mail_receive_message_to_room") : "$n receives ##.";
+			if (strstr(msg, "##")) {
+				replaced = str_replace("##", part, msg);
+				act(replaced, TRUE, ch, NULL, NULL, TO_ROOM);
+				free(replaced);
+			}
+			else {
+				act(msg, TRUE, ch, NULL, NULL, TO_ROOM);
+			}
 		}
 	}
 	else if (is_abbrev(arg, "send")) {
-		if (!IS_IMMORTAL(ch) && !room_has_function_and_city_ok(GET_LOYALTY(ch), IN_ROOM(ch), FNC_MAIL)) {
-			msg_to_char(ch, "You can only send mail from a pigeon post.\r\n");
-		}
-		else if (!IS_IMMORTAL(ch) && !check_in_city_requirement(IN_ROOM(ch), TRUE)) {
-			msg_to_char(ch, "This pigeon post only works if it's in a city.\r\n");
-		}
-		else if (!IS_IMMORTAL(ch) && !IS_COMPLETE(IN_ROOM(ch))) {
-			msg_to_char(ch, "Complete the building first.\r\n");
+		if (config_get_bool("mail_requires_building_to_send") && !IS_IMMORTAL(ch) && !room_has_function_and_city_ok(GET_LOYALTY(ch), IN_ROOM(ch), FNC_MAIL)) {
+			msg_to_char(ch, "%s\r\n", config_get_string("mail_requires_building_to_send_message") ? config_get_string("mail_requires_building_to_send_message") : "You can only send mail from a working post office.");
 		}
 		else if (!ch->desc) {
 			msg_to_char(ch, "You can't do that.\r\n");
@@ -235,6 +255,6 @@ ACMD(do_mail) {
 		}
 	}
 	else {
-		msg_to_char(ch, "Usage: mail send <name>, mail check, mail receive <number>\r\n");
+		msg_to_char(ch, "Usage: mail send <name>, mail check, mail receive [number]\r\n");
 	}
 }

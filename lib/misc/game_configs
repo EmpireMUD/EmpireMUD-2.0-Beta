@@ -269,4 +269,15 @@ the game, but have a limited set of commands and features. Contact the game's
 staff to find out what you have to do to be approved.
 ~
 write_approval 1
+*
+* Mail configs
+mail_available_message A pigeon is circling overhead with mail for you.
+mail_not_available_message You can't see any mail pigeons following you.
+mail_receive_message_to_char A pigeon lands and you find ## attached to its leg.
+mail_receive_message_to_room A pigeon lands and $n unties ## from its leg.
+mail_requires_building_to_receive 0
+mail_requires_building_to_receive_message You can only recieve mail at a working pigeon post.
+mail_requires_building_to_send 1
+mail_requires_building_to_send_message You can only send mail from a working pigeon post.
+mail_send_message You tie your message to a pigeon and it flies away!
 $~

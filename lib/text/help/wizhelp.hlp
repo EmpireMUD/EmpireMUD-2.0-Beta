@@ -153,14 +153,14 @@ See also: GRANT, SET
 CONFIG
 
 Usage:  config <type> [-v]
-        config <type> <key> [value]
+        config [type] <key> [value]
 
 This privileged command controls many global game configurations. You can get
 view explanations for the configs using the -v option with any set of configs.
 Be careful changing global configs, as some of them make powerful changes to
 features.
 
-Long strings use the full text editor. To edit, use: config <type> <key> edit
+Long strings use the full text editor. To edit, use: config <key> edit
 
 There is no undo button, but all changes are logged.
 
