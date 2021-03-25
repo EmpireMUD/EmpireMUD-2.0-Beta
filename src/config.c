@@ -2061,7 +2061,7 @@ ACMD(do_config) {
 		verbose = (!str_cmp(argument, "-v") ? TRUE : FALSE);
 		
 		// or, for backwards-compatibility, may also be: <type> <key> [value]
-		if (!verbose) {
+		if (!verbose && *argument) {
 			val_arg = any_one_word(argument, arg2);
 			skip_spaces(&val_arg);
 			if (!(cnf = get_config_by_key(arg2)) || cnf->set != set) {
@@ -2077,12 +2077,12 @@ ACMD(do_config) {
 		
 		msg_to_char(ch, "Usage: config <type> [-v]\r\n");
 		msg_to_char(ch, "Usage: config <key> [value]\r\n");
-		msg_to_char(ch, "Valid types:");
+		msg_to_char(ch, "Valid types:\r\n");
 		count = 0;
 		for (iter = 0; *config_groups[iter] != '\n'; ++iter) {
-			msg_to_char(ch, " %-22.22s%s", config_groups[iter], !(++count % 3) ? "\r\n" : "");
+			msg_to_char(ch, " %-22.22s%s", config_groups[iter], (PRF_FLAGGED(ch, PRF_SCREEN_READER) || !(++count % 3)) ? "\r\n" : "");
 		}
-		if (count % 3) {
+		if (!PRF_FLAGGED(ch, PRF_SCREEN_READER) && count % 3) {
 			msg_to_char(ch, "\r\n");
 		}
 		return;
