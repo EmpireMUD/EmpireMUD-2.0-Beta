@@ -49,7 +49,7 @@ struct q_element {
 
 /* - events - function protos need by other modules */
 void dg_event_init(void);
-struct dg_event *dg_event_create(EVENTFUNC(*func), void *event_obj, unsigned long when);
+struct dg_event *dg_event_create(EVENTFUNC(*func), void *event_obj, long long when);
 void dg_event_cancel(struct dg_event *event, EVENT_CANCEL_FUNC(*func));
 void dg_event_process(void);
 unsigned long dg_event_time(struct dg_event *event);

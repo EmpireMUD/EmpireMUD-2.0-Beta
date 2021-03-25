@@ -39,7 +39,7 @@ void dg_event_init(void) {
 ** Add an event to the current list
 */
 /* creates an event and returns it */
-struct dg_event *dg_event_create(EVENTFUNC(*func), void *event_obj, unsigned long when) {
+struct dg_event *dg_event_create(EVENTFUNC(*func), void *event_obj, long long when) {
 	struct dg_event *new_event;
 
 	if (when < 1) /* make sure its in the future */
