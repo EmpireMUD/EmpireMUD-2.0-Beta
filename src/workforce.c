@@ -1878,7 +1878,12 @@ INTERACTION_FUNC(one_chop_chore) {
 		
 		// only send message if someone else is present (don't bother verifying it's a player)
 		if (ROOM_PEOPLE(IN_ROOM(ch))->next_in_room) {
-			sprintf(buf, "$n chops %s.", get_obj_name_by_proto(interaction->vnum));
+			if (amt > 1) {
+				sprintf(buf, "$n chops %s (x%d).", get_obj_name_by_proto(interaction->vnum), amt);
+			}
+			else {
+				sprintf(buf, "$n chops %s.", get_obj_name_by_proto(interaction->vnum));
+			}
 			act(buf, FALSE, ch, NULL, NULL, TO_ROOM | TO_SPAMMY | TO_QUEUE);
 		}
 		return TRUE;
@@ -1952,7 +1957,7 @@ void do_chore_chopping(empire_data *emp, room_data *room) {
 
 INTERACTION_FUNC(one_dig_chore) {
 	empire_data *emp = inter_veh ? VEH_OWNER(inter_veh) : ROOM_OWNER(inter_room);
-	char buf[MAX_STRING_LENGTH];
+	char buf[MAX_STRING_LENGTH], amtbuf[256];
 	int amt;
 	
 	if (emp && can_gain_chore_resource(emp, inter_room, CHORE_DIGGING, interaction->vnum)) {
@@ -1963,11 +1968,18 @@ INTERACTION_FUNC(one_dig_chore) {
 		ADD_CHORE_DEPLETION(inter_room, inter_veh, DPLTN_DIG, TRUE);
 		// only send message if someone else is present (don't bother verifying it's a player)
 		if (ROOM_PEOPLE(IN_ROOM(ch))->next_in_room) {
-			if (inter_veh) {
-				sprintf(buf, "$n digs up %s from $V.", get_obj_name_by_proto(interaction->vnum));
+			if (amt > 1) {
+				snprintf(amtbuf, sizeof(amtbuf), " (x%d)", amt);
 			}
 			else {
-				sprintf(buf, "$n digs up %s.", get_obj_name_by_proto(interaction->vnum));
+				*amtbuf = '\0';
+			}
+			
+			if (inter_veh) {
+				sprintf(buf, "$n digs up %s%s from $V.", get_obj_name_by_proto(interaction->vnum), amtbuf);
+			}
+			else {
+				sprintf(buf, "$n digs up %s%s.", get_obj_name_by_proto(interaction->vnum), amtbuf);
 			}
 			act(buf, FALSE, ch, NULL, inter_veh, TO_ROOM | TO_SPAMMY | TO_QUEUE);
 		}
@@ -2136,7 +2148,12 @@ INTERACTION_FUNC(one_einv_interaction_chore) {
 		add_production_total(emp, interaction->vnum, amt);
 		// only send message if someone else is present (don't bother verifying it's a player)
 		if (ROOM_PEOPLE(IN_ROOM(ch))->next_in_room) {
-			sprintf(buf, "$n produces %s.", get_obj_name_by_proto(interaction->vnum));
+			if (amt > 1) {
+				sprintf(buf, "$n produces %s (x%d).", get_obj_name_by_proto(interaction->vnum), amt);
+			}
+			else {
+				sprintf(buf, "$n produces %s.", get_obj_name_by_proto(interaction->vnum));
+			}
 			act(buf, FALSE, ch, NULL, NULL, TO_ROOM | TO_SPAMMY | TO_QUEUE);
 		}
 		return TRUE;
@@ -2396,7 +2413,12 @@ INTERACTION_FUNC(one_fishing_chore) {
 		ADD_CHORE_DEPLETION(inter_room, inter_veh, DPLTN_FISH, TRUE);
 		// only send message if someone else is present (don't bother verifying it's a player)
 		if (ROOM_PEOPLE(IN_ROOM(ch))->next_in_room) {
-			sprintf(buf, "$n catches %s.", get_obj_name_by_proto(interaction->vnum));
+			if (amt > 1) {
+				sprintf(buf, "$n catches %s (x%d).", get_obj_name_by_proto(interaction->vnum), amt);
+			}
+			else {
+				sprintf(buf, "$n catches %s.", get_obj_name_by_proto(interaction->vnum));
+			}
 			act(buf, FALSE, ch, NULL, NULL, TO_ROOM | TO_SPAMMY | TO_QUEUE);
 		}
 		return TRUE;
@@ -2508,7 +2530,12 @@ INTERACTION_FUNC(one_mining_chore) {
 			
 			// only send message if someone else is present (don't bother verifying it's a player)
 			if (ROOM_PEOPLE(IN_ROOM(ch))->next_in_room) {
-				sprintf(buf, "$n strikes the wall and %s falls loose!", get_obj_name_by_proto(interaction->vnum));
+				if (interaction->quantity > 1) {
+					sprintf(buf, "$n strikes the wall and %s (x%d) falls loose!", get_obj_name_by_proto(interaction->vnum), interaction->quantity);
+				}
+				else {
+					sprintf(buf, "$n strikes the wall and %s falls loose!", get_obj_name_by_proto(interaction->vnum));
+				}
 				act(buf, FALSE, ch, NULL, NULL, TO_ROOM | TO_SPAMMY | TO_QUEUE);
 			}
 			return TRUE;
@@ -2579,8 +2606,9 @@ void do_chore_mining(empire_data *emp, room_data *room, vehicle_data *veh) {
 void do_chore_minting(empire_data *emp, room_data *room, vehicle_data *veh) {
 	struct empire_storage_data *highest = NULL, *store, *next_store;
 	char_data *worker = find_chore_worker_in_room(emp, room, veh, chore_data[CHORE_MINTING].mob);
-	int high_amt, limit, islid = GET_ISLAND_ID(room);
+	int amt, high_amt, limit, islid = GET_ISLAND_ID(room);
 	struct empire_island *eisle = get_empire_island(emp, islid);
+	char buf[MAX_STRING_LENGTH];
 	bool can_do = TRUE;
 	obj_data *orn;
 	obj_vnum vnum;
@@ -2628,9 +2656,16 @@ void do_chore_minting(empire_data *emp, room_data *room, vehicle_data *veh) {
 			charge_stored_resource(emp, islid, highest->vnum, 1);
 			
 			orn = obj_proto(vnum);	// existence of this was pre-validated
-			increase_empire_coins(emp, emp, GET_WEALTH_VALUE(orn) * (1.0/COIN_VALUE));
+			amt = GET_WEALTH_VALUE(orn) * (1.0/COIN_VALUE);
+			increase_empire_coins(emp, emp, amt);
 			
-			act("$n finishes minting some coins.", FALSE, worker, NULL, NULL, TO_ROOM | TO_QUEUE | TO_SPAMMY);
+			if (amt > 1) {
+				snprintf(buf, sizeof(buf), "$n finishes minting a batch of %d %s coins.", amt, EMPIRE_ADJECTIVE(emp));
+			}
+			else {
+				snprintf(buf, sizeof(buf), "$n finishes minting a single %s coin.", EMPIRE_ADJECTIVE(emp));
+			}
+			act(buf, FALSE, worker, NULL, NULL, TO_ROOM | TO_QUEUE | TO_SPAMMY);
 		}
 		else {
 			log_workforce_problem(emp, room, CHORE_MINTING, WF_PROB_NO_RESOURCES, FALSE);
@@ -2652,7 +2687,7 @@ void do_chore_minting(empire_data *emp, room_data *room, vehicle_data *veh) {
 
 INTERACTION_FUNC(one_production_chore) {
 	empire_data *emp = inter_veh ? VEH_OWNER(inter_veh) : ROOM_OWNER(inter_room);
-	char buf[MAX_STRING_LENGTH];
+	char buf[MAX_STRING_LENGTH], amtbuf[256];
 	int amt;
 	
 	// make sure this item isn't depleted
@@ -2668,11 +2703,18 @@ INTERACTION_FUNC(one_production_chore) {
 		
 		// only send message if someone else is present (don't bother verifying it's a player)
 		if (ROOM_PEOPLE(IN_ROOM(ch))->next_in_room) {
-			if (inter_veh) {
-				sprintf(buf, "$n produces %s from $V.", get_obj_name_by_proto(interaction->vnum));
+			if (amt > 1) {
+				snprintf(amtbuf, sizeof(amtbuf), " (x%d)", amt);
 			}
 			else {
-				sprintf(buf, "$n produces %s.", get_obj_name_by_proto(interaction->vnum));
+				*amtbuf = '\0';
+			}
+			
+			if (inter_veh) {
+				sprintf(buf, "$n produces %s%s from $V.", get_obj_name_by_proto(interaction->vnum), amtbuf);
+			}
+			else {
+				sprintf(buf, "$n produces %s%s.", get_obj_name_by_proto(interaction->vnum), amtbuf);
 			}
 			act(buf, FALSE, ch, NULL, inter_veh, TO_ROOM | TO_SPAMMY | TO_QUEUE);
 		}
