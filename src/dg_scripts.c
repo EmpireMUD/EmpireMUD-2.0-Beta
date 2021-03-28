@@ -4225,7 +4225,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					else if (!str_cmp(field, "tool")) {
 						obj_data *tool;
 						int tool_type;
-						if (subfield && *subfield && (tool_type = search_block(subfield, tool_flags, FALSE)) != NOTHING && (tool = has_tool(ch, BIT(tool_type)))) {
+						if (subfield && *subfield && (tool_type = search_block(subfield, tool_flags, FALSE)) != NOTHING && (tool = has_tool(c, BIT(tool_type)))) {
 							snprintf(str, slen, "%c%d", UID_CHAR, obj_script_id(tool));
 						}
 						else {
