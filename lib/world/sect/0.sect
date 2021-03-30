@@ -638,7 +638,7 @@ Desert~
 An Arid Desert~
 '.' 21 k 2 l ep
 C
-dig~
+dig, gather~
 D1
 ....~
 &Y~
@@ -673,6 +673,8 @@ I 7 1206 8.33 125 p  # PICK: iridescent blue iris
 I 7 1204 100.00 125 p  # PICK: daggerbite frond
 I+ 0 70  # Ability: Find Herbs
 I 7 123 100.00 125 p  # PICK: small flower
+I 9 139 92.00 1 g  # GATHER: bundle of long leaves
+I 9 134 8.00 1 g  # GATHER: thorny sapling
 S
 #21
 Oasis~
@@ -740,7 +742,7 @@ Desert Stumps~
 A Group of Stumps in the Desert~
 '.' 21 k 2 dl ep
 C
-burn stumps, dig, pick~
+burn stumps, dig, gather, pick~
 D1
 .&t.&?..~
 &Y~
@@ -783,13 +785,16 @@ I 7 1206 8.33 125 p  # PICK: iridescent blue iris
 I 7 1204 100.00 125 p  # PICK: daggerbite frond
 I+ 0 70  # Ability: Find Herbs
 I 7 123 100.00 125 p  # PICK: small flower
+I 9 134 8.00 1 g  # GATHER: thorny sapling
+I 9 139 46.00 1 g  # GATHER: bundle of long leaves
+I 9 132 46.00 1 g  # GATHER: thorny branches
 S
 #24
 Desert Copse~
 A Gnarled Desert Copse~
 'w' 11 k 6 ad p
 C
-chop, dig, pick~
+chop, dig, gather, pick~
 D0
 &y..&?ww~
 &g~
@@ -819,6 +824,9 @@ I 7 1206 8.33 125 p  # PICK: iridescent blue iris
 I 7 1204 100.00 125 p  # PICK: daggerbite frond
 I+ 0 70  # Ability: Find Herbs
 I 7 123 100.00 125 p  # PICK: small flower
+I 9 134 8.00 1 g  # GATHER: thorny sapling
+I 9 139 46.00 1 g  # GATHER: bundle of long leaves
+I 9 132 46.00 1 g  # GATHER: thorny branches
 I 20 134 100.00 1  # CHOP: thorny sapling
 S
 #25
@@ -826,7 +834,7 @@ Desert Shrub~
 A Large Shrub in the Desert~
 '.' 11 k 5 ad p
 C
-chop, dig, pick~
+chop, dig, gather, pick~
 D0
 &gw&?...~
 &y~
@@ -859,6 +867,9 @@ I 7 1206 8.33 125 p  # PICK: iridescent blue iris
 I 7 1204 100.00 125 p  # PICK: daggerbite frond
 I+ 0 70  # Ability: Find Herbs
 I 7 123 100.00 125 p  # PICK: small flower
+I 9 134 8.00 1 g  # GATHER: thorny sapling
+I 9 139 46.00 1 g  # GATHER: bundle of long leaves
+I 9 132 46.00 1 g  # GATHER: thorny branches
 I 20 134 100.00 1  # CHOP: thorny sapling
 S
 #26
@@ -2212,7 +2223,7 @@ Irrigated Plains~
 An Irrigated Plain~
 '.' 10 jklrv 2 l bp
 C
-dig, pick~
+dig, gather, pick~
 D1
 ....~
 &g~
@@ -2254,6 +2265,8 @@ I+ 0 70  # Ability: Find Herbs
 I 7 1204 45.84 125 p  # PICK: daggerbite frond
 I+ 0 70  # Ability: Find Herbs
 I 7 123 100.00 125 p  # PICK: small flower
+I 9 134 8.00 1 g  # GATHER: thorny sapling
+I 9 139 92.00 1 g  # GATHER: bundle of long leaves
 S
 #71
 Irrigated Forest~
@@ -2342,7 +2355,7 @@ Irrigated Stumps~
 Some Stumps on the Irrigated Plain~
 '.' 10 jkrv 2 dl bp
 C
-burn stumps, dig, pick~
+burn stumps, dig, gather, pick~
 D1
 .&t.&?..~
 &g~
@@ -2386,6 +2399,8 @@ I+ 0 70  # Ability: Find Herbs
 I 7 1204 45.84 125 p  # PICK: daggerbite frond
 I+ 0 70  # Ability: Find Herbs
 I 7 123 100.00 125 p  # PICK: small flower
+I 9 134 8.00 1 g  # GATHER: thorny sapling
+I 9 139 92.00 1 g  # GATHER: bundle of long leaves
 S
 #74
 Irrigated Copse~

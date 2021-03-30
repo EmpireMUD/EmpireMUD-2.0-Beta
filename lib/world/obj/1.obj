@@ -604,6 +604,22 @@ R
 R
 4 5153 0
 S
+#139
+leaves long bundle~
+a bundle of long leaves~
+A bundle of long leaves is lying here.~
+   These long, narrow leaves have toothed edges that cut if you aren't careful.
+The leaves are fibrous and could be used for crafting.
+~
+3 l a 0 7
+0 0 0
+0 0
+C
+1 1
+O+ 1 6421
+R
+4 5118 0
+S
 #141
 wheat bundle~
 a bundle of wheat~

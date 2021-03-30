@@ -145,7 +145,8 @@ Bound Wooden Column Tutorial~
    In order to make pillars out of desert resources, you'll need to craft bound
 wooden columns. Here's how:
  1. Gather 3 saplings (of any kind).
- 2. Gather 5 items made of plant fiber, such as thorny branches.
+ 2. Gather 5 items made of soft plant fiber, such as bundles of long leaves or
+    cotton.
  3. Make a rope (craft rope).
  4. Make a bound wooden column (craft bound wooden column).
  Tip: Type 'craft info bound wooden column' to see more information about it.
@@ -153,9 +154,11 @@ wooden columns. Here's how:
 ~
 You can use the column to build all kinds of things.
 ~
-4 h 0 15 -1
+6 h 0 15 -1
 A
 2 134
+A
+2 139
 R
 0 0 1
 R
