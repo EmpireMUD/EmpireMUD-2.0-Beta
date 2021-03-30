@@ -393,6 +393,7 @@ void do_dg_own(empire_data *emp, char_data *vict, obj_data *obj, room_data *room
 		if (GET_LOYALTY(vict) && emp != GET_LOYALTY(vict) && GET_EMPIRE_NPC_DATA(vict)) {
 			// resets the population timer on their house
 			kill_empire_npc(vict);
+			remove_from_workforce_where_log(GET_LOYALTY(vict), vict);
 		}
 		GET_LOYALTY(vict) = emp;
 		setup_generic_npc(vict, emp, MOB_DYNAMIC_NAME(vict), MOB_DYNAMIC_SEX(vict));

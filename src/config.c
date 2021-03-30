@@ -268,7 +268,7 @@ bitvector_t pk_ok = PK_WAR;
  //////////////////////////////////////////////////////////////////////////////
 //// CONFIG SYSTEM: DATA /////////////////////////////////////////////////////
 
-// groupings for config command
+// CONFIG_x: groupings for config command
 #define CONFIG_GAME  0
 #define CONFIG_ACTIONS  1
 #define CONFIG_CITY  2
@@ -283,6 +283,7 @@ bitvector_t pk_ok = PK_WAR;
 #define CONFIG_WAR  11
 #define CONFIG_WORLD  12
 #define CONFIG_APPROVAL  13
+#define CONFIG_MAIL  14
 
 
 // data types of configs (search CONFTYPE_x for places to configure)
@@ -312,6 +313,7 @@ const char *config_groups[] = {
 	"War",
 	"World",
 	"Approval",
+	"Mail",
 	"\n"
 };
 
@@ -988,7 +990,7 @@ CONFIG_HANDLER(config_show_who_list_sort) {
 		return;
 	}
 	
-	msg_to_char(ch, "&y%s&0: %s\r\n", config->key, who_list_sort_types[config->data.int_val]);
+	msg_to_char(ch, "Current sort: %s\r\n", who_list_sort_types[config->data.int_val]);
 	
 	msg_to_char(ch, "Valid sorts are:\r\n");
 	for (iter = 0; *who_list_sort_types[iter] != '\n'; ++iter) {
@@ -1033,7 +1035,7 @@ CONFIG_HANDLER(config_show_bool) {
 		return;
 	}
 	
-	msg_to_char(ch, "&y%s&0: %s\r\n", config->key, config->data.bool_val ? "true" : "false");
+	msg_to_char(ch, "Boolean value: %s\r\n", config->data.bool_val ? "true" : "false");
 }
 
 
@@ -1050,7 +1052,7 @@ CONFIG_HANDLER(config_show_building) {
 	
 	bld = building_proto(config->data.int_val);
 	
-	msg_to_char(ch, "&y%s&0: %d %s\r\n", config->key, config->data.int_val, bld ? GET_BLD_NAME(bld) : "UNKNOWN");
+	msg_to_char(ch, "Current building: [%d] %s\r\n", config->data.int_val, bld ? GET_BLD_NAME(bld) : "UNKNOWN");
 }
 
 
@@ -1063,7 +1065,7 @@ CONFIG_HANDLER(config_show_double) {
 		return;
 	}
 	
-	msg_to_char(ch, "&y%s&0: %f\r\n", config->key, config->data.double_val);
+	msg_to_char(ch, "Decimal value: %f\r\n", config->data.double_val);
 }
 
 
@@ -1076,7 +1078,7 @@ CONFIG_HANDLER(config_show_int) {
 		return;
 	}
 	
-	msg_to_char(ch, "&y%s&0: %d\r\n", config->key, config->data.int_val);
+	msg_to_char(ch, "Integer value: %d\r\n", config->data.int_val);
 }
 
 
@@ -1089,7 +1091,7 @@ CONFIG_HANDLER(config_show_long_string) {
 		return;
 	}
 	
-	msg_to_char(ch, "&y%s&0:\r\n%s", config->key, config->data.string_val ? config->data.string_val : "<not set>\r\n");
+	msg_to_char(ch, "Long string value:\r\n%s", config->data.string_val ? config->data.string_val : "<not set>\r\n");
 }
 
 
@@ -1106,7 +1108,7 @@ CONFIG_HANDLER(config_show_sector) {
 	
 	sect = sector_proto(config->data.int_val);
 	
-	msg_to_char(ch, "&y%s&0: %d %s\r\n", config->key, config->data.int_val, sect ? GET_SECT_NAME(sect) : "UNKNOWN");
+	msg_to_char(ch, "Sector value: %d %s\r\n", config->data.int_val, sect ? GET_SECT_NAME(sect) : "UNKNOWN");
 }
 
 
@@ -1119,7 +1121,7 @@ CONFIG_HANDLER(config_show_short_string) {
 		return;
 	}
 	
-	msg_to_char(ch, "&y%s&0: %s\r\n", config->key, config->data.string_val);
+	msg_to_char(ch, "String value: %s\r\n", config->data.string_val);
 }
 
 
@@ -1158,7 +1160,7 @@ CONFIG_HANDLER(config_show_typelist) {
 	}
 	
 	if (*buf) {
-		msg_to_char(ch, "&y%s&0:\r\n%s", config->key, buf);
+		msg_to_char(ch, "List value:\r\n%s", buf);
 	}
 	else {
 		msg_to_char(ch, "No types are configured for key %s.\r\n", config->key);
@@ -1851,6 +1853,17 @@ void init_config_system(void) {
 	init_config(CONFIG_ITEMS, "scale_drink_capacity", CONFTYPE_DOUBLE, "drink hours per scaling point");
 	init_config(CONFIG_ITEMS, "scale_coin_amount", CONFTYPE_DOUBLE, "coins per scaling point");
 	init_config(CONFIG_ITEMS, "scale_pack_size", CONFTYPE_DOUBLE, "inventory size per scaling point");
+	
+	// mail
+	init_config(CONFIG_MAIL, "mail_available_message", CONFTYPE_SHORT_STRING, "text shown when player has mail");
+	init_config(CONFIG_MAIL, "mail_not_available_message", CONFTYPE_SHORT_STRING, "text shown when player does not have mail");
+	init_config(CONFIG_MAIL, "mail_receive_message_to_char", CONFTYPE_SHORT_STRING, "text shown to player upon receiving mail, may contain ## to indicate what was received");
+	init_config(CONFIG_MAIL, "mail_receive_message_to_room", CONFTYPE_SHORT_STRING, "text shown to room when someone receives mail; use $n for player name and ## to indicate what was received");
+	init_config(CONFIG_MAIL, "mail_requires_building_to_receive", CONFTYPE_BOOL, "whether players must be somewhere with the MAIL function to receive");
+	init_config(CONFIG_MAIL, "mail_requires_building_to_receive_message", CONFTYPE_SHORT_STRING, "text shown when player is not at a building");
+	init_config(CONFIG_MAIL, "mail_requires_building_to_send", CONFTYPE_BOOL, "whether players must be somewhere with the MAIL function to send");
+	init_config(CONFIG_MAIL, "mail_requires_building_to_send_message", CONFTYPE_SHORT_STRING, "text shown when player is not at a building");
+	init_config(CONFIG_MAIL, "mail_send_message", CONFTYPE_SHORT_STRING, "text shown when player finishes writing mail");
 
 	// mobs
 	init_config(CONFIG_MOBS, "max_npc_attribute", CONFTYPE_INT, "how high primary attributes go on mobs");
@@ -2023,35 +2036,60 @@ void init_config_system(void) {
 //// CONFIG SYSTEM: COMMAND //////////////////////////////////////////////////
 
 ACMD(do_config) {
-	char output[MAX_STRING_LENGTH*2], line[MAX_STRING_LENGTH], setarg[MAX_INPUT_LENGTH], keyarg[MAX_INPUT_LENGTH], part[MAX_INPUT_LENGTH];
-	struct config_type *cnf, *next_cnf;
-	int set, iter, size, lsize;
-	bool verbose;
+	char output[MAX_STRING_LENGTH*2], line[MAX_STRING_LENGTH], part[MAX_INPUT_LENGTH];
+	char *val_arg = NULL, arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH];
+	struct config_type *cnf = NULL, *next_cnf;
+	int set = NOTHING, iter, size, lsize, count;
+	bool verbose = FALSE;
 	
-	argument = any_one_word(argument, setarg);
-	skip_spaces(&argument);
-	
-	// for later
-	verbose = (!str_cmp(argument, "-v") ? TRUE : FALSE);
-	
+	// basic safety
 	if (IS_NPC(ch) || !ch->desc) {
-		msg_to_char(ch, "You can't do that.\r\n");
+		msg_to_char(ch, "You can't do that right now.\r\n");
 		return;
 	}
 	
-	// no set provided, or invalid set?
-	if (!*setarg || (set = search_block(setarg, config_groups, FALSE)) == NOTHING) {
-		msg_to_char(ch, "Usage: config <type [-v]> [key] [value]\r\n");
-		msg_to_char(ch, "Valid types:");
-		for (iter = 0; *config_groups[iter] != '\n'; ++iter) {
-			msg_to_char(ch, "%s%s", (iter > 0 ? ", " : " "), config_groups[iter]);
+	// arg 1: may be <type>, may be <key>, may be nothing
+	argument = any_one_word(argument, arg1);
+	skip_spaces(&argument);
+	
+	if (*arg1 && (cnf = get_config_by_key(arg1))) {
+		// will use: <key> [value]
+		val_arg = argument;
+	}
+	else if (*arg1 && (set = search_block(arg1, config_groups, FALSE))) {
+		// will use: <type> [key] [value]
+		verbose = (!str_cmp(argument, "-v") ? TRUE : FALSE);
+		
+		// or, for backwards-compatibility, may also be: <type> <key> [value]
+		if (!verbose && *argument) {
+			val_arg = any_one_word(argument, arg2);
+			skip_spaces(&val_arg);
+			if (!(cnf = get_config_by_key(arg2)) || cnf->set != set) {
+				msg_to_char(ch, "Invalid key %s in %s configs.\r\n", arg2, config_groups[set]);
+				return;
+			}
 		}
-		msg_to_char(ch, "\r\n");
+	}
+	else {	// no arg or invalid arg
+		if (*arg1) {
+			msg_to_char(ch, "Invalid config type or key '%s'.\r\n", arg1);
+		}
+		
+		msg_to_char(ch, "Usage: config <type> [-v]\r\n");
+		msg_to_char(ch, "Usage: config <key> [value]\r\n");
+		msg_to_char(ch, "Valid types:\r\n");
+		count = 0;
+		for (iter = 0; *config_groups[iter] != '\n'; ++iter) {
+			msg_to_char(ch, " %-22.22s%s", config_groups[iter], (PRF_FLAGGED(ch, PRF_SCREEN_READER) || !(++count % 3)) ? "\r\n" : "");
+		}
+		if (!PRF_FLAGGED(ch, PRF_SCREEN_READER) && count % 3) {
+			msg_to_char(ch, "\r\n");
+		}
 		return;
 	}
 	
 	// show whole set?
-	if (!*argument || verbose) {
+	if (set != NOTHING && (verbose || !cnf)) {
 		// only set given: display that set
 		size = snprintf(output, sizeof(output), "%s configs:\r\n", config_groups[set]);
 		HASH_ITER(hh, config_table, cnf, next_cnf) {
@@ -2124,33 +2162,32 @@ ACMD(do_config) {
 		page_string(ch->desc, output, TRUE);
 		return;
 	}
-	
-	// ok, we have config <set> 
-	argument = any_one_arg(argument, keyarg);
-	skip_spaces(&argument);
-	
-	// validate key
-	if (!(cnf = get_config_by_key(keyarg)) || cnf->set != set) {
-		msg_to_char(ch, "Invalid key %s in %s configs.\r\n", keyarg, config_groups[set]);
-		return;
-	}
-	
-	if (*argument) {
-		// any argument: edit
-		if (cnf->edit_func != NULL) {
-			(cnf->edit_func)(ch, cnf, argument);
+	else if (cnf) {
+		// player is viewing or changing a cnf (val_arg will be set if changing)
+		
+		if (*val_arg) {
+			// any argument: edit
+			if (cnf->edit_func != NULL) {
+				(cnf->edit_func)(ch, cnf, val_arg);
+			}
+			else {
+				msg_to_char(ch, "Editing is not implemented for the %s config.\r\n", cnf->key);
+			}	
 		}
 		else {
-			msg_to_char(ch, "Editing is not implemented for that config.\r\n");
-		}	
+			// no argument: show
+			msg_to_char(ch, "&y%s&0: &c%s&0\r\n", cnf->key, cnf->description);
+			
+			if (cnf->show_func != NULL) {
+				(cnf->show_func)(ch, cnf, val_arg);
+			}
+			else {
+				msg_to_char(ch, "Detail is not implemented for the %s config.\r\n", cnf->key);
+			}
+		}
 	}
 	else {
-		// no argument: show
-		if (cnf->show_func != NULL) {
-			(cnf->show_func)(ch, cnf, argument);
-		}
-		else {
-			msg_to_char(ch, "Detail is not implemented for that config.\r\n");
-		}
+		// unknown arg?
+		msg_to_char(ch, "Invalid config command.\r\n");
 	}
 }

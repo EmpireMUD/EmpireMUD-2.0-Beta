@@ -5099,6 +5099,15 @@ struct workforce_log {
 };
 
 
+// structure that records individual mobs who worked in the last cycle
+struct workforce_where_log {
+	char_data *mob;	// may be NULL if purged
+	int chore;	// CHORE_ const
+	room_vnum loc;	// where it happened
+	struct workforce_where_log *prev, *next;
+};
+
+
 // The main data structure for the empires
 struct empire_data {
 	empire_vnum vnum;	// empire's virtual number
@@ -5167,6 +5176,7 @@ struct empire_data {
 	int top_shipping_id;	// shipping system quick id for the empire
 	bool banner_has_underline;	// helper
 	struct workforce_log *wf_log;	// errors with workforce
+	struct workforce_where_log *wf_where_log;	// list of people working
 	time_t next_timeout;	// for triggering rescans
 	int min_level;	// minimum level in the empire
 	int max_level;	// maximum level in the empire

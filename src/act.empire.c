@@ -1145,8 +1145,9 @@ void show_workforce_where(empire_data *emp, char_data *to, bool here, char *argu
 
 	struct workforce_count_type *find, *wct, *next_wct, *counts = NULL;
 	char buf[MAX_STRING_LENGTH * 2], line[MAX_STRING_LENGTH];
-	char_data *ch_iter;
-	int chore, iter, total, requesters_island, only_chore = NOTHING;
+	struct workforce_where_log *wwl;
+	room_data *room;
+	int iter, total, requesters_island, only_chore = NOTHING;
 	size_t size, lsize;
 	
 	if (!emp) {
@@ -1170,23 +1171,23 @@ void show_workforce_where(empire_data *emp, char_data *to, bool here, char *argu
 	requesters_island = GET_ISLAND_ID(IN_ROOM(to));
 	
 	if (only_chore != NOTHING) {	// SHOW DETAILS FOR 1 CHORE
-		size = snprintf(buf, sizeof(buf), "Citizens working the %s chore (excluding artisans):\r\n", chore_data[only_chore].name);
+		size = snprintf(buf, sizeof(buf), "Citizens working the %s chore:\r\n", chore_data[only_chore].name);
 		total = 0;
 		
-		DL_FOREACH(character_list, ch_iter) {
-			if (!IS_NPC(ch_iter) || GET_LOYALTY(ch_iter) != emp) {
-				continue;
+		DL_FOREACH(EMPIRE_WORKFORCE_WHERE_LOG(emp), wwl) {
+			if (wwl->chore != only_chore || !wwl->mob) {
+				continue;	// wrong chore or no mob
 			}
-			if (GET_MOB_VNUM(ch_iter) != chore_data[only_chore].mob) {
-				continue;
+			if (!(room = real_room(wwl->loc))) {
+				continue;	// no location
 			}
-			if (here && requesters_island != GET_ISLAND_ID(IN_ROOM(ch_iter))) {
-				continue;
+			if (here && requesters_island != GET_ISLAND_ID(room)) {
+				continue;	// bad location
 			}
 			
 			// found
 			++total;
-			lsize = snprintf(line, sizeof(line), "%s %s: %s\r\n", coord_display_room(to, IN_ROOM(ch_iter), TRUE), skip_filler(get_room_name(IN_ROOM(ch_iter), FALSE)), GET_SHORT_DESC(ch_iter));
+			lsize = snprintf(line, sizeof(line), "%s %s: %s\r\n", coord_display_room(to, room, TRUE), skip_filler(get_room_name(room, FALSE)), GET_SHORT_DESC(wwl->mob));
 			if (size + lsize < sizeof(buf)) {
 				strcat(buf, line);
 				size += lsize;
@@ -1207,32 +1208,21 @@ void show_workforce_where(empire_data *emp, char_data *to, bool here, char *argu
 	}
 	else {	// SHOW ALL CHORES
 		// count up workforce mobs
-		DL_FOREACH(character_list, ch_iter) {
-			if (!IS_NPC(ch_iter) || GET_LOYALTY(ch_iter) != emp) {
-				continue;
+		DL_FOREACH(EMPIRE_WORKFORCE_WHERE_LOG(emp), wwl) {
+			if (!wwl->mob) {
+				continue;	// no mob?
 			}
-		
-			if (here && requesters_island != GET_ISLAND_ID(IN_ROOM(ch_iter))) {
-				continue;
+			if (!(room = real_room(wwl->loc))) {
+				continue;	// no location
 			}
-		
-			chore = -1;
-			for (iter = 0; iter < NUM_CHORES; ++iter) {
-				if (GET_MOB_VNUM(ch_iter) == chore_data[iter].mob) {
-					chore = iter;
-					break;
-				}
+			if (here && requesters_island != GET_ISLAND_ID(room)) {
+				continue;	// wrong location
 			}
-		
-			// not a workforce mob
-			if (chore == -1) {
-				continue;
-			}
-		
-			HASH_FIND_INT(counts, &chore, find);
+			
+			HASH_FIND_INT(counts, &(wwl->chore), find);
 			if (!find) {
 				CREATE(find, struct workforce_count_type, 1);
-				find->chore = chore;
+				find->chore = wwl->chore;
 				find->count = 0;
 				HASH_ADD_INT(counts, chore, find);
 			}
@@ -1246,7 +1236,7 @@ void show_workforce_where(empire_data *emp, char_data *to, bool here, char *argu
 			return;
 		}
 	
-		size = snprintf(buf, sizeof(buf), "Working %s citizens (excluding artisans):\r\n", EMPIRE_ADJECTIVE(emp));
+		size = snprintf(buf, sizeof(buf), "Working %s citizens:\r\n", EMPIRE_ADJECTIVE(emp));
 	
 		HASH_ITER(hh, counts, wct, next_wct) {
 			// only bother adding if there's room in the buffer

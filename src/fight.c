@@ -1377,6 +1377,9 @@ obj_data *die(char_data *ch, char_data *killer) {
 	if (IS_NPC(ch) && GET_EMPIRE_NPC_DATA(ch)) {
 		kill_empire_npc(ch);
 	}
+	if (IS_NPC(ch) && GET_LOYALTY(ch)) {
+		remove_from_workforce_where_log(GET_LOYALTY(ch), ch);
+	}
 	
 	// expand tags, if there are any
 	expand_mob_tags(ch);

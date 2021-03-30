@@ -606,6 +606,7 @@ int GET_MAX_BLOOD(char_data *ch);	// this one is different than the other max po
 #define EMPIRE_TOP_SHIPPING_ID(emp)  ((emp)->top_shipping_id)
 #define EMPIRE_OFFENSES(emp)  ((emp)->offenses)
 #define EMPIRE_WORKFORCE_LOG(emp)  ((emp)->wf_log)
+#define EMPIRE_WORKFORCE_WHERE_LOG(emp)  ((emp)->wf_where_log)
 
 // helpers
 #define EMPIRE_ADMIN_FLAGGED(emp, flag)  IS_SET(EMPIRE_ADMIN_FLAGS(emp), (flag))
@@ -2464,7 +2465,10 @@ void deactivate_workforce_island(empire_data *emp, int island_id);
 void deactivate_workforce_room(empire_data *emp, room_data *room);
 char_data *find_chore_worker_in_room(empire_data *emp, room_data *room, vehicle_data *veh, mob_vnum vnum);
 struct empire_npc_data *find_free_npc_for_chore(empire_data *emp, room_data *loc);
+void free_workforce_where_log(struct workforce_where_log **to_free);
 int *get_ordered_chores();
+void log_workforce_where(empire_data *emp, char_data *mob, int chore);
+void remove_from_workforce_where_log(empire_data *emp, char_data *mob);
 void set_workforce_production_limit(empire_data *emp, any_vnum vnum, int amount);
 
 

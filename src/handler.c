@@ -1364,6 +1364,10 @@ void extract_char(char_data *ch) {
 			if (MOB_INSTANCE_ID(ch) != NOTHING) {
 				subtract_instance_mob(real_instance(MOB_INSTANCE_ID(ch)), GET_MOB_VNUM(ch));
 			}
+			
+			if (GET_LOYALTY(ch)) {
+				remove_from_workforce_where_log(GET_LOYALTY(ch), ch);
+			}
 		}
 		else {
 			SET_BIT(PLR_FLAGS(ch), PLR_EXTRACTED);
