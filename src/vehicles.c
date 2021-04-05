@@ -1644,7 +1644,7 @@ bool audit_vehicle(vehicle_data *veh, char_data *ch) {
 	}
 	
 	LL_FOREACH(VEH_RELATIONS(veh), relat) {
-		if (relat->type == BLD_REL_UPGRADES_TO_BLD && (proto = building_proto(relat->vnum)) && !BLD_FLAGGED(proto, BLD_OPEN)) {
+		if ((relat->type == BLD_REL_UPGRADES_TO_BLD || relat->type == BLD_REL_FORCE_UPGRADE_BLD) && (proto = building_proto(relat->vnum)) && !BLD_FLAGGED(proto, BLD_OPEN)) {
 			olc_audit_msg(ch, VEH_VNUM(veh), "UPGRADES-TO a non-open building (cannot do this because there's no 'facing' information for the upgrade)");
 			problem = TRUE;
 		}
@@ -3261,6 +3261,7 @@ void olc_delete_vehicle(char_data *ch, any_vnum vnum) {
 		found = delete_from_interaction_list(&GET_BLD_INTERACTIONS(bld), TYPE_VEH, vnum);
 		found |= delete_bld_relation_by_vnum(&GET_BLD_RELATIONS(bld), BLD_REL_STORES_LIKE_VEH, vnum);
 		found |= delete_bld_relation_by_vnum(&GET_BLD_RELATIONS(bld), BLD_REL_UPGRADES_TO_VEH, vnum);
+		found |= delete_bld_relation_by_vnum(&GET_BLD_RELATIONS(bld), BLD_REL_FORCE_UPGRADE_VEH, vnum);
 		if (found) {
 			save_library_file_for_vnum(DB_BOOT_BLD, GET_BLD_VNUM(bld));
 		}
@@ -3349,6 +3350,7 @@ void olc_delete_vehicle(char_data *ch, any_vnum vnum) {
 		found = delete_from_interaction_list(&VEH_INTERACTIONS(iter), TYPE_VEH, vnum);
 		found |= delete_bld_relation_by_vnum(&VEH_RELATIONS(iter), BLD_REL_STORES_LIKE_VEH, vnum);
 		found |= delete_bld_relation_by_vnum(&VEH_RELATIONS(iter), BLD_REL_UPGRADES_TO_VEH, vnum);
+		found |= delete_bld_relation_by_vnum(&VEH_RELATIONS(iter), BLD_REL_FORCE_UPGRADE_VEH, vnum);
 		if (found) {
 			save_library_file_for_vnum(DB_BOOT_VEH, VEH_VNUM(iter));
 		}
@@ -3360,6 +3362,7 @@ void olc_delete_vehicle(char_data *ch, any_vnum vnum) {
 			found = delete_from_interaction_list(&GET_BLD_INTERACTIONS(GET_OLC_BUILDING(desc)), TYPE_VEH, vnum);
 			found |= delete_bld_relation_by_vnum(&GET_BLD_RELATIONS(GET_OLC_BUILDING(desc)), BLD_REL_STORES_LIKE_VEH, vnum);
 			found |= delete_bld_relation_by_vnum(&GET_BLD_RELATIONS(GET_OLC_BUILDING(desc)), BLD_REL_UPGRADES_TO_VEH, vnum);
+			found |= delete_bld_relation_by_vnum(&GET_BLD_RELATIONS(GET_OLC_BUILDING(desc)), BLD_REL_FORCE_UPGRADE_VEH, vnum);
 			if (found) {
 				msg_to_char(desc->character, "One of the vehicles used in the building you're editing was deleted.\r\n");
 			}
@@ -3432,6 +3435,7 @@ void olc_delete_vehicle(char_data *ch, any_vnum vnum) {
 			found = delete_from_interaction_list(&VEH_INTERACTIONS(GET_OLC_VEHICLE(desc)), TYPE_VEH, vnum);
 			found |= delete_bld_relation_by_vnum(&VEH_RELATIONS(GET_OLC_VEHICLE(desc)), BLD_REL_STORES_LIKE_VEH, vnum);
 			found |= delete_bld_relation_by_vnum(&VEH_RELATIONS(GET_OLC_VEHICLE(desc)), BLD_REL_UPGRADES_TO_VEH, vnum);
+			found |= delete_bld_relation_by_vnum(&VEH_RELATIONS(GET_OLC_VEHICLE(desc)), BLD_REL_FORCE_UPGRADE_VEH, vnum);
 			if (found) {
 				msg_to_char(desc->character, "One of the vehicles used on the vehicle you're editing was deleted.\r\n");
 			}

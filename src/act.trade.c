@@ -1741,6 +1741,10 @@ void do_gen_craft_vehicle(char_data *ch, craft_data *type, int dir) {
 	VEH_CONSTRUCTION_ID(veh) = get_new_vehicle_construction_id();
 	set_vehicle_extra_data(veh, ROOM_EXTRA_BUILD_RECIPE, GET_CRAFT_VNUM(type));
 	
+	if (!IS_NPC(ch)) {
+		set_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_ORIGINAL_BUILDER, GET_ACCOUNT(ch)->id);
+	}
+	
 	start_action(ch, ACT_GEN_CRAFT, -1);
 	GET_ACTION_VNUM(ch, 0) = GET_CRAFT_VNUM(type);
 	GET_ACTION_VNUM(ch, 1) = VEH_CONSTRUCTION_ID(veh);

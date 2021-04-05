@@ -1600,6 +1600,7 @@ bool start_upgrade(char_data *ch, craft_data *upgrade_craft, room_data *from_roo
 		remove_vehicle_extra_data(from_veh, ROOM_EXTRA_DEDICATE_ID);
 		
 		// record and remove paint color
+		original_builder = get_vehicle_extra_data(from_veh, ROOM_EXTRA_ORIGINAL_BUILDER);
 		paint_color = get_vehicle_extra_data(from_veh, ROOM_EXTRA_PAINT_COLOR);
 		remove_vehicle_extra_data(from_veh, ROOM_EXTRA_PAINT_COLOR);
 		bright_paint = VEH_FLAGGED(from_veh, VEH_BRIGHT_PAINT);
@@ -1871,6 +1872,12 @@ bool start_upgrade(char_data *ch, craft_data *upgrade_craft, room_data *from_roo
 		}
 		VEH_CONSTRUCTION_ID(to_veh) = get_new_vehicle_construction_id();
 		set_vehicle_extra_data(to_veh, ROOM_EXTRA_BUILD_RECIPE, GET_CRAFT_VNUM(upgrade_craft));
+		if (ch) {
+			set_vehicle_extra_data(to_veh, ROOM_EXTRA_ORIGINAL_BUILDER, GET_ACCOUNT(ch)->id);
+		}
+		else if (original_builder > 0) {
+			set_vehicle_extra_data(to_veh, ROOM_EXTRA_ORIGINAL_BUILDER, original_builder);
+		}
 		
 		// transfer stuff from old data
 		VEH_BUILT_WITH(to_veh) = built_with;
@@ -1980,10 +1987,10 @@ void do_dismantle_vehicle(char_data *ch, vehicle_data *veh) {
 	else if (WATER_SECT(IN_ROOM(ch))) {
 		msg_to_char(ch, "You can't dismantle it in the water.\r\n");
 	}
-	else if (VEH_OWNER(veh) && GET_LOYALTY(ch) && GET_RANK(ch) < EMPIRE_PRIV(GET_LOYALTY(ch), PRIV_DISMANTLE)) {
+	else if (VEH_OWNER(veh) && GET_LOYALTY(ch) && GET_RANK(ch) < EMPIRE_PRIV(GET_LOYALTY(ch), PRIV_DISMANTLE) && get_vehicle_extra_data(veh, ROOM_EXTRA_ORIGINAL_BUILDER) != GET_ACCOUNT(ch)->id) {
 		msg_to_char(ch, "You don't have permission to dismantle that.\r\n");
 	}
-	else if ((craft = find_craft_for_vehicle(veh)) && GET_CRAFT_ABILITY(craft) != NO_ABIL && !has_ability(ch, GET_CRAFT_ABILITY(craft))) {
+	else if ((craft = find_craft_for_vehicle(veh)) && GET_CRAFT_ABILITY(craft) != NO_ABIL && !has_ability(ch, GET_CRAFT_ABILITY(craft)) && get_vehicle_extra_data(veh, ROOM_EXTRA_ORIGINAL_BUILDER) != GET_ACCOUNT(ch)->id) {
 		msg_to_char(ch, "You don't have the skill needed to dismantle that properly.\r\n");
 	}
 	else if (VEH_FLAGGED(veh, VEH_PLAYER_NO_DISMANTLE) || ROOM_AFF_FLAGGED(IN_ROOM(veh), ROOM_AFF_NO_DISMANTLE)) {
@@ -2119,7 +2126,7 @@ ACMD(do_dismantle) {
 		return;
 	}
 
-	if (GET_CRAFT_ABILITY(type) != NO_ABIL && !has_ability(ch, GET_CRAFT_ABILITY(type))) {
+	if (GET_CRAFT_ABILITY(type) != NO_ABIL && !has_ability(ch, GET_CRAFT_ABILITY(type)) && get_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_ORIGINAL_BUILDER) != GET_ACCOUNT(ch)->id) {
 		msg_to_char(ch, "You don't have the skill needed to dismantle this building properly.\r\n");
 		return;
 	}

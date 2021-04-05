@@ -835,6 +835,8 @@ typedef struct vehicle_data vehicle_data;
 #define BLD_REL_STORES_LIKE_BLD  1	// acts like another building for storage locations
 #define BLD_REL_STORES_LIKE_VEH  2	// acts like another vehicle for storage locations
 #define BLD_REL_UPGRADES_TO_VEH  3	// upgrades to another vehicle type
+#define BLD_REL_FORCE_UPGRADE_BLD  4	// automatically upgrades on-reboot
+#define BLD_REL_FORCE_UPGRADE_VEH  5	// automatically upgrades on-reboot
 
 
 // tavern types
