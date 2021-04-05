@@ -2095,7 +2095,7 @@ void save_author_index();
 
 // building.c
 bool can_build_on(room_data *room, bitvector_t flags);
-bool check_build_location_and_dir(char_data *ch, craft_data *type, int dir, bool is_upgrade, bool *bld_is_closed, bool *bld_needs_reverse);
+bool check_build_location_and_dir(char_data *ch, room_data *room, craft_data *type, int dir, bool is_upgrade, bool *bld_is_closed, bool *bld_needs_reverse);
 struct resource_data *combine_resources(struct resource_data *combine_a, struct resource_data *combine_b);
 void complete_building(room_data *room);
 void do_customize_room(char_data *ch, char *argument);
