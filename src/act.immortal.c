@@ -685,9 +685,6 @@ ADMIN_UTIL(util_bldconvert) {
 		set_vehicle_short_desc(to_veh, buf);
 		
 		// build long desc
-		if (VEH_LONG_DESC(to_veh)) {
-			free(VEH_LONG_DESC(to_veh));
-		}
 		snprintf(buf, sizeof(buf), "%s %s is here.", AN(GET_BLD_NAME(from_bld)), GET_BLD_NAME(from_bld));
 		strtolower(buf);
 		set_vehicle_long_desc(to_veh, CAP(buf));
