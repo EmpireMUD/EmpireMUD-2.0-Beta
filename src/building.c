@@ -35,6 +35,7 @@
 
 // local prototypes
 void setup_tunnel_entrance(char_data *ch, room_data *room, int dir);
+bool start_upgrade(char_data *ch, craft_data *upgrade_craft, room_data *from_room, vehicle_data *from_veh);
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -1022,6 +1023,63 @@ bool is_entrance(room_data *room) {
 		}
 	}
 	return FALSE;
+}
+
+
+/**
+* Performs any forced-upgrades of buildings and vehicles. This is to be called
+* at startup.
+*/
+void perform_force_upgrades(void) {
+	room_data *room, *next_room;
+	vehicle_data *veh, *next_veh;
+	struct bld_relation *relat;
+	craft_data *craft;
+	bld_data *bld;
+	
+	HASH_ITER(hh, world_table, room, next_room) {
+		if (IS_DISMANTLING(room)) {
+			continue;	// skip anything beind dismantled
+		}
+		if (!(bld = GET_BUILDING(room)) || BLD_FLAGGED(bld, BLD_OPEN) || !GET_BLD_RELATIONS(bld)) {
+			continue;	// invalid building
+		}
+		
+		// look for a forced-relation and process it
+		LL_FOREACH(GET_BLD_RELATIONS(bld), relat) {
+			if (relat->type == BLD_REL_FORCE_UPGRADE_BLD && (craft = find_upgrade_craft_for_bld(NULL, relat->vnum, NULL))) {
+				start_upgrade(NULL, craft, room, NULL);
+				break;	// 1 only
+			}
+			else if (relat->type == BLD_REL_FORCE_UPGRADE_VEH && (craft = find_upgrade_craft_for_veh(NULL, relat->vnum, NULL))) {
+				start_upgrade(NULL, craft, room, NULL);
+				break;	// 1 only
+			}
+		}
+		// caution: building may be gone by the end of the loop
+	}
+	
+	DL_FOREACH_SAFE(vehicle_list, veh, next_veh) {
+		if (VEH_IS_DISMANTLING(veh)) {
+			continue;	// skip anything beind dismantled
+		}
+		if (VEH_RELATIONS(veh)) {
+			continue;	// invalid vehicle
+		}
+		
+		// look for a forced-relation and process it
+		LL_FOREACH(VEH_RELATIONS(veh), relat) {
+			if (relat->type == BLD_REL_FORCE_UPGRADE_BLD && (craft = find_upgrade_craft_for_bld(NULL, relat->vnum, NULL))) {
+				start_upgrade(NULL, craft, NULL, veh);
+				break;	// 1 only
+			}
+			else if (relat->type == BLD_REL_FORCE_UPGRADE_VEH && (craft = find_upgrade_craft_for_veh(NULL, relat->vnum, NULL))) {
+				start_upgrade(NULL, craft, NULL, veh);
+				break;	// 1 only
+			}
+		}
+		// caution: vehicle may be gone by the end of the loop
+	}
 }
 
 

@@ -629,6 +629,7 @@ void boot_world(void) {
 	check_skills();
 	check_for_bad_buildings();
 	check_for_bad_sectors();
+	perform_force_upgrades();
 	verify_running_events();
 	read_ability_requirements();
 	check_triggers();

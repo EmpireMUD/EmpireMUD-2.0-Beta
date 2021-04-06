@@ -2107,6 +2107,7 @@ void herd_animals_out(room_data *location);
 bool is_entrance(room_data *room);
 void process_build(char_data *ch, room_data *room, int act_type);
 void process_dismantling(char_data *ch, room_data *room);
+void perform_force_upgrades();
 void remove_like_component_from_built_with(struct resource_data **built_with, any_vnum component);
 void remove_like_item_from_built_with(struct resource_data **built_with, obj_data *obj);
 void special_building_setup(char_data *ch, room_data *room);
