@@ -1047,10 +1047,12 @@ void perform_force_upgrades(void) {
 		// look for a forced-relation and process it
 		LL_FOREACH(GET_BLD_RELATIONS(bld), relat) {
 			if (relat->type == BLD_REL_FORCE_UPGRADE_BLD) {
+				log("perform_force_upgrades: %s%s: bld %d", get_room_name(room, FALSE), coord_display_room(NULL, room, FALSE), relat->vnum);
 				start_upgrade(NULL, NULL, room, NULL, building_proto(relat->vnum), NULL);
 				break;	// 1 only
 			}
 			else if (relat->type == BLD_REL_FORCE_UPGRADE_VEH) {
+				log("perform_force_upgrades: %s%s: veh %d", get_room_name(room, FALSE), coord_display_room(NULL, room, FALSE), relat->vnum);
 				start_upgrade(NULL, NULL, room, NULL, NULL, vehicle_proto(relat->vnum));
 				break;	// 1 only
 			}
@@ -1069,10 +1071,12 @@ void perform_force_upgrades(void) {
 		// look for a forced-relation and process it
 		LL_FOREACH(VEH_RELATIONS(veh), relat) {
 			if (relat->type == BLD_REL_FORCE_UPGRADE_BLD) {
+				log("perform_force_upgrades: %s%s: bld %d", VEH_SHORT_DESC(veh), coord_display_room(NULL, IN_ROOM(veh), FALSE), relat->vnum);
 				start_upgrade(NULL, NULL, NULL, veh, building_proto(relat->vnum), NULL);
 				break;	// 1 only
 			}
 			else if (relat->type == BLD_REL_FORCE_UPGRADE_VEH) {
+				log("perform_force_upgrades: %s%s: veh %d", VEH_SHORT_DESC(veh), coord_display_room(NULL, IN_ROOM(veh), FALSE), relat->vnum);
 				start_upgrade(NULL, NULL, NULL, veh, NULL, vehicle_proto(relat->vnum));
 				break;	// 1 only
 			}
