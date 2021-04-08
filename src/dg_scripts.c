@@ -5071,7 +5071,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					}
 					else if (!str_cmp(field, "mine_type")) {
 						if (get_room_extra_data(r, ROOM_EXTRA_MINE_GLB_VNUM) > 0) {
-							snprintf(str, slen, "%s", get_mine_type_name(room));
+							snprintf(str, slen, "%s", get_mine_type_name(r));
 						}
 						else {
 							*str = '\0';
