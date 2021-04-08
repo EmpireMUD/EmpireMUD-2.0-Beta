@@ -830,6 +830,23 @@ ADMIN_UTIL(util_bldconvert) {
 		GET_OLC_CRAFT(ch->desc) = NULL;
 	}
 	
+	// force-upgrade?
+	if (add_force) {
+		GET_OLC_TYPE(ch->desc) = OLC_BUILDING;
+		GET_OLC_BUILDING(ch->desc) = setup_olc_building(from_bld);
+		GET_OLC_VNUM(ch->desc) = from_vnum;
+		
+		CREATE(new_rel, struct bld_relation, 1);
+		new_rel->type = BLD_REL_FORCE_UPGRADE_VEH;
+		new_rel->vnum = to_vnum;
+		LL_APPEND(GET_BLD_RELATIONS(GET_OLC_BUILDING(ch->desc)), new_rel);
+		
+		// and save it
+		save_olc_building(ch->desc);
+		free_building(GET_OLC_BUILDING(ch->desc));
+		GET_OLC_BUILDING(ch->desc) = NULL;
+	}
+	
 	// and clean up
 	GET_OLC_TYPE(ch->desc) = 0;
 	GET_OLC_VNUM(ch->desc) = NOTHING;
@@ -933,23 +950,6 @@ ADMIN_UTIL(util_bldconvert) {
 			msg_to_char(ch, "- Building %d %s in relations VEH [%d %s].\r\n", to_vnum, GET_BLD_NAME(from_bld), VEH_VNUM(veh_iter), VEH_SHORT_DESC(veh_iter));
 			break;
 		}
-	}
-	
-	// force-upgrade?
-	if (add_force) {
-		GET_OLC_TYPE(ch->desc) = OLC_BUILDING;
-		GET_OLC_BUILDING(ch->desc) = setup_olc_building(from_bld);
-		GET_BLD_VNUM(GET_OLC_BUILDING(ch->desc)) = to_vnum;
-		
-		CREATE(new_rel, struct bld_relation, 1);
-		new_rel->type = BLD_REL_FORCE_UPGRADE_VEH;
-		new_rel->vnum = to_vnum;
-		LL_APPEND(GET_BLD_RELATIONS(from_bld), new_rel);
-		
-		// and save it
-		save_olc_building(ch->desc);
-		free_building(GET_OLC_BUILDING(ch->desc));
-		GET_OLC_BUILDING(ch->desc) = NULL;
 	}
 	
 	snprintf(buf, sizeof(buf), "OLC: %s has cloned building %d %s to vehicle %d", GET_NAME(ch), from_vnum, GET_BLD_NAME(from_bld), to_vnum);
