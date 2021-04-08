@@ -452,7 +452,7 @@ ADMIN_UTIL(util_approval) {
 
 // util bldconvert <building vnum> <start of new vnums>
 ADMIN_UTIL(util_bldconvert) {
-	char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH];
+	char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH], *remaining_args;
 	any_vnum from_vnum, start_to_vnum, to_vnum = NOTHING;
 	craft_data *from_craft = NULL, *to_craft = NULL;
 	bld_data *from_bld = NULL, *to_bld = NULL;
@@ -476,7 +476,7 @@ ADMIN_UTIL(util_bldconvert) {
 	struct bld_relation *relat;
 	adv_data *adv, *next_adv;
 	obj_data *obj, *next_obj;
-	bool any;
+	bool any, add_force = FALSE;
 	
 	// stuff to copy
 	bitvector_t functions = NOBITS, designate = NOBITS, room_affs = NOBITS;
@@ -493,7 +493,8 @@ ADMIN_UTIL(util_bldconvert) {
 		return;
 	}
 	
-	two_arguments(argument, arg1, arg2);
+	remaining_args = two_arguments(argument, arg1, arg2);
+	skip_spaces(&remaining_args);
 	
 	// basic args
 	if (!*arg1 || !*arg2 || !isdigit(*arg1) || !isdigit(*arg2)) {
@@ -547,9 +548,21 @@ ADMIN_UTIL(util_bldconvert) {
 		return;
 	}
 	
+	// any additional args?
+	if (!str_cmp(remaining_args, "force") || !str_cmp(remaining_args, "-force")) {
+		add_force = TRUE;
+	}
+	else if (*remaining_args) {
+		msg_to_char(ch, "Unknown argument(s): %s\r\n", remaining_args);
+		return;
+	}
+	
 	// check olc access
 	if (!can_start_olc_edit(ch, OLC_VEHICLE, to_vnum) || (from_craft && !can_start_olc_edit(ch, OLC_CRAFT, to_vnum)) || (!BLD_FLAGGED(from_bld, BLD_OPEN) && !can_start_olc_edit(ch, OLC_BUILDING, to_vnum))) {
 		return;	// sends own message
+	}
+	if (add_force && !can_start_olc_edit(ch, OLC_BUILDING, GET_BLD_VNUM(from_bld))) {
+		return; // sends own message
 	}
 	
 	msg_to_char(ch, "Creating new building-vehicle %d from building %d %s%s%s:\r\n", to_vnum, from_vnum, GET_BLD_NAME(from_bld), from_craft ? ", with craft" : "", !BLD_FLAGGED(from_bld, BLD_OPEN) ? ", with interior" : "");
@@ -920,6 +933,23 @@ ADMIN_UTIL(util_bldconvert) {
 			msg_to_char(ch, "- Building %d %s in relations VEH [%d %s].\r\n", to_vnum, GET_BLD_NAME(from_bld), VEH_VNUM(veh_iter), VEH_SHORT_DESC(veh_iter));
 			break;
 		}
+	}
+	
+	// force-upgrade?
+	if (add_force) {
+		GET_OLC_TYPE(ch->desc) = OLC_BUILDING;
+		GET_OLC_BUILDING(ch->desc) = setup_olc_building(from_bld);
+		GET_BLD_VNUM(GET_OLC_BUILDING(ch->desc)) = to_vnum;
+		
+		CREATE(new_rel, struct bld_relation, 1);
+		new_rel->type = BLD_REL_FORCE_UPGRADE_VEH;
+		new_rel->vnum = to_vnum;
+		LL_APPEND(GET_BLD_RELATIONS(from_bld), new_rel);
+		
+		// and save it
+		save_olc_building(ch->desc);
+		free_building(GET_OLC_BUILDING(ch->desc));
+		GET_OLC_BUILDING(ch->desc) = NULL;
 	}
 	
 	snprintf(buf, sizeof(buf), "OLC: %s has cloned building %d %s to vehicle %d", GET_NAME(ch), from_vnum, GET_BLD_NAME(from_bld), to_vnum);
