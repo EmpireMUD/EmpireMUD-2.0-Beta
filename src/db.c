@@ -826,8 +826,14 @@ void check_for_bad_buildings(void) {
 	// check buildings for bad relations: unset
 	HASH_ITER(hh, building_table, bld, next_bld) {
 		LL_FOREACH_SAFE(GET_BLD_RELATIONS(bld), relat, next_relat) {
-			if (relat->vnum == NOTHING || !building_proto(relat->vnum)) {
+			if (bld_relationship_vnum_types[relat->type] == TYPE_BLD && (relat->vnum == NOTHING || !building_proto(relat->vnum))) {
 				log(" removing %s relationship for building %d for bad building type", bld_relationship_types[relat->type], GET_BLD_VNUM(bld));
+				LL_DELETE(GET_BLD_RELATIONS(bld), relat);
+				free(relat);
+				save_library_file_for_vnum(DB_BOOT_BLD, GET_BLD_VNUM(bld));
+			}
+			if (bld_relationship_vnum_types[relat->type] == TYPE_VEH && (relat->vnum == NOTHING || !vehicle_proto(relat->vnum))) {
+				log(" removing %s relationship for building %d for bad vehicle type", bld_relationship_types[relat->type], GET_BLD_VNUM(bld));
 				LL_DELETE(GET_BLD_RELATIONS(bld), relat);
 				free(relat);
 				save_library_file_for_vnum(DB_BOOT_BLD, GET_BLD_VNUM(bld));
