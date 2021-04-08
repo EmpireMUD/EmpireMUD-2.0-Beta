@@ -35,7 +35,7 @@
 
 // local prototypes
 void setup_tunnel_entrance(char_data *ch, room_data *room, int dir);
-bool start_upgrade(char_data *ch, craft_data *upgrade_craft, room_data *from_room, vehicle_data *from_veh);
+bool start_upgrade(char_data *ch, craft_data *upgrade_craft, room_data *from_room, vehicle_data *from_veh, bld_data *to_building, vehicle_data *to_veh);
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -1034,7 +1034,6 @@ void perform_force_upgrades(void) {
 	room_data *room, *next_room;
 	vehicle_data *veh, *next_veh;
 	struct bld_relation *relat;
-	craft_data *craft;
 	bld_data *bld;
 	
 	HASH_ITER(hh, world_table, room, next_room) {
@@ -1047,12 +1046,12 @@ void perform_force_upgrades(void) {
 		
 		// look for a forced-relation and process it
 		LL_FOREACH(GET_BLD_RELATIONS(bld), relat) {
-			if (relat->type == BLD_REL_FORCE_UPGRADE_BLD && (craft = find_upgrade_craft_for_bld(NULL, relat->vnum, NULL))) {
-				start_upgrade(NULL, craft, room, NULL);
+			if (relat->type == BLD_REL_FORCE_UPGRADE_BLD) {
+				start_upgrade(NULL, NULL, room, NULL, building_proto(relat->vnum), NULL);
 				break;	// 1 only
 			}
-			else if (relat->type == BLD_REL_FORCE_UPGRADE_VEH && (craft = find_upgrade_craft_for_veh(NULL, relat->vnum, NULL))) {
-				start_upgrade(NULL, craft, room, NULL);
+			else if (relat->type == BLD_REL_FORCE_UPGRADE_VEH) {
+				start_upgrade(NULL, NULL, room, NULL, NULL, vehicle_proto(relat->vnum));
 				break;	// 1 only
 			}
 		}
@@ -1069,12 +1068,12 @@ void perform_force_upgrades(void) {
 		
 		// look for a forced-relation and process it
 		LL_FOREACH(VEH_RELATIONS(veh), relat) {
-			if (relat->type == BLD_REL_FORCE_UPGRADE_BLD && (craft = find_upgrade_craft_for_bld(NULL, relat->vnum, NULL))) {
-				start_upgrade(NULL, craft, NULL, veh);
+			if (relat->type == BLD_REL_FORCE_UPGRADE_BLD) {
+				start_upgrade(NULL, NULL, NULL, veh, building_proto(relat->vnum), NULL);
 				break;	// 1 only
 			}
-			else if (relat->type == BLD_REL_FORCE_UPGRADE_VEH && (craft = find_upgrade_craft_for_veh(NULL, relat->vnum, NULL))) {
-				start_upgrade(NULL, craft, NULL, veh);
+			else if (relat->type == BLD_REL_FORCE_UPGRADE_VEH) {
+				start_upgrade(NULL, NULL, NULL, veh, NULL, vehicle_proto(relat->vnum));
 				break;	// 1 only
 			}
 		}
@@ -1474,19 +1473,20 @@ void start_dismantle_building(room_data *loc) {
 * Note this does not check permission or validity.
 *
 * @param char_data *ch Optional: The player who's doing the upgrade, for messaging (may be NULL).
-* @param craft_data *upgrade_craft The craft recipe for the upgraded/new thing (REQUIRED).
+* @param craft_data *upgrade_craft Optional: The craft recipe for the upgraded/new thing (required if a player is upgrading; optional if the MUD is forcing it).
 * @param room_data *from_room Optional: The room/building being upgraded (MUST be NULL if upgrading a vehicle).
 * @param vehicle_data *from_veh Optional: The vehicle being upgraded (may be NULL if it's a building/room being upgraded).
+* @param bld_data *to_building Optional: New building's prototype for the upgrade (provide this OR to_vehicle, not both).
+* @param vehicle_data *to_vehicle Optional: New vehicle's prototype for the upgrade (provide this OR to_building, not both).
 * @return bool TRUE if the upgrade succeeded, FALSE if not.
 */
-bool start_upgrade(char_data *ch, craft_data *upgrade_craft, room_data *from_room, vehicle_data *from_veh) {
-	vehicle_data *prev_veh, *to_veh, *old_proto, *veh_proto = NULL;
+bool start_upgrade(char_data *ch, craft_data *upgrade_craft, room_data *from_room, vehicle_data *from_veh, bld_data *to_building, vehicle_data *to_vehicle) {
+	vehicle_data *prev_veh, *new_veh, *old_proto;
 	room_data *interior, *in_room, *room_iter, *next_iter;
 	craft_data *from_craft = NULL;
 	obj_data *obj, *next_obj;
 	struct room_direction_data *exits;
 	struct vehicle_room_list *vrl;
-	bld_data *bld_proto = NULL;
 	bool fail, deleted;
 	bitvector_t set_bits;
 	char_data *temp_ch;
@@ -1510,25 +1510,16 @@ bool start_upgrade(char_data *ch, craft_data *upgrade_craft, room_data *from_roo
 	}
 	
 	// basic checking
-	if (!upgrade_craft) {
-		if (ch) {
-			msg_to_char(ch, "That upgrade doesn't appear to be implemented.\r\n");
-		}
-		else {
-			log("Warning: perform_upgrade called without 'upgrade_craft'");
-		}
-		return FALSE;
-	}
-	if (!CRAFT_IS_BUILDING(upgrade_craft) && !CRAFT_IS_VEHICLE(upgrade_craft)) {
+	if (!to_building && !to_vehicle) {
 		if (ch) {
 			msg_to_char(ch, "That upgrade doesn't appear to be implemented correctly.\r\n");
 		}
 		else {
-			log("Warning: perform_upgrade called with invalid 'upgrade_craft'");
+			log("Warning: perform_upgrade called without to_building or to_vehicle");
 		}
 		return FALSE;
 	}
-	if (CRAFT_IS_BUILDING(upgrade_craft) && !(bld_proto = building_proto(GET_CRAFT_BUILD_TYPE(upgrade_craft)))) {
+	if (upgrade_craft && CRAFT_IS_BUILDING(upgrade_craft) && !to_building) {
 		if (ch) {
 			msg_to_char(ch, "That upgrade is unimplemented.\r\n");
 		}
@@ -1537,7 +1528,7 @@ bool start_upgrade(char_data *ch, craft_data *upgrade_craft, room_data *from_roo
 		}
 		return FALSE;
 	}
-	if (CRAFT_IS_VEHICLE(upgrade_craft) && !(veh_proto = vehicle_proto(GET_CRAFT_OBJECT(upgrade_craft)))) {
+	if (upgrade_craft && CRAFT_IS_VEHICLE(upgrade_craft) && !to_vehicle) {
 		if (ch) {
 			msg_to_char(ch, "That upgrade is unimplemented.\r\n");
 		}
@@ -1546,7 +1537,7 @@ bool start_upgrade(char_data *ch, craft_data *upgrade_craft, room_data *from_roo
 		}
 		return FALSE;
 	}
-	if (from_veh && bld_proto && !BLD_FLAGGED(bld_proto, BLD_OPEN)) {
+	if (from_veh && to_building && !BLD_FLAGGED(to_building, BLD_OPEN)) {
 		if (ch) {
 			msg_to_char(ch, "You can't do that upgrade because it's incorrectly configured with a non-open building.\r\n");
 		}
@@ -1555,7 +1546,7 @@ bool start_upgrade(char_data *ch, craft_data *upgrade_craft, room_data *from_roo
 		}
 		return FALSE;
 	}
-	if (from_room && !check_build_location_and_dir(ch, from_room, upgrade_craft, BUILDING_ENTRANCE(from_room) != NO_DIR ? rev_dir[BUILDING_ENTRANCE(from_room)] : NO_DIR, TRUE, NULL, NULL)) {
+	if (from_room && upgrade_craft && !check_build_location_and_dir(ch, from_room, upgrade_craft, BUILDING_ENTRANCE(from_room) != NO_DIR ? rev_dir[BUILDING_ENTRANCE(from_room)] : NO_DIR, TRUE, NULL, NULL)) {
 		// sends own messages if ch is present
 		if (!ch) {
 			log("Warning: perform_upgrade called (on room) with invalid location or direction");
@@ -1567,7 +1558,7 @@ bool start_upgrade(char_data *ch, craft_data *upgrade_craft, room_data *from_roo
 		prev_veh = (from_veh == ROOM_VEHICLES(IN_ROOM(from_veh))) ? NULL : from_veh->prev_in_room;
 		DL_DELETE2(ROOM_VEHICLES(IN_ROOM(from_veh)), from_veh, prev_in_room, next_in_room);
 		
-		fail = !check_build_location_and_dir(ch, IN_ROOM(from_veh), upgrade_craft, NO_DIR, TRUE, NULL, NULL);
+		fail = upgrade_craft ? !check_build_location_and_dir(ch, IN_ROOM(from_veh), upgrade_craft, NO_DIR, TRUE, NULL, NULL) : FALSE;
 		
 		// re-add vehicle
 		if (prev_veh) {
@@ -1579,9 +1570,9 @@ bool start_upgrade(char_data *ch, craft_data *upgrade_craft, room_data *from_roo
 		
 		if (fail) {
 			// sends own messages if ch is present
-		if (!ch) {
-			log("Warning: perform_upgrade called (on vehicle) with invalid location or direction");
-		}
+			if (!ch) {
+				log("Warning: perform_upgrade called (on vehicle) with invalid location or direction");
+			}
 			return FALSE;
 		}
 	}		
@@ -1683,9 +1674,9 @@ bool start_upgrade(char_data *ch, craft_data *upgrade_craft, room_data *from_roo
 	// ---- upgrade-from above; upgrade-to below -----
 	
 	// upgrade TO building
-	if (CRAFT_IS_BUILDING(upgrade_craft)) {
+	if (to_building) {
 		if (from_room) {	// upgrading from a traditional building
-			if (GET_INSIDE_ROOMS(from_room) > 0 && !ROOM_BLD_FLAGGED(from_room, BLD_OPEN) && BLD_FLAGGED(bld_proto, BLD_OPEN)) {
+			if (GET_INSIDE_ROOMS(from_room) > 0 && !ROOM_BLD_FLAGGED(from_room, BLD_OPEN) && BLD_FLAGGED(to_building, BLD_OPEN)) {
 				// closed building to open building with interior: remove the interior
 				deleted = FALSE;
 				DL_FOREACH_SAFE2(interior_room_list, room_iter, next_iter, next_interior) {
@@ -1719,12 +1710,12 @@ bool start_upgrade(char_data *ch, craft_data *upgrade_craft, room_data *from_roo
 			// don't disassociate; just attach new building type
 			dismantle_wtrigger(from_room, NULL, FALSE);
 			detach_building_from_room(from_room);
-			attach_building_to_room(building_proto(GET_CRAFT_BUILD_TYPE(upgrade_craft)), from_room, TRUE);
+			attach_building_to_room(building_proto(GET_BLD_VNUM(to_building)), from_room, TRUE);
 			request_world_save(GET_ROOM_VNUM(from_room), WSAVE_ROOM);
 		}
 		else if (from_veh) {
 			// upgraded from vehicle
-			construct_building(in_room, GET_CRAFT_BUILD_TYPE(upgrade_craft));
+			construct_building(in_room, GET_BLD_VNUM(to_building));
 			
 			// dump the vehicle -- no way to move the interior since the new building needs to be open
 			fully_empty_vehicle(from_veh, in_room);
@@ -1740,14 +1731,19 @@ bool start_upgrade(char_data *ch, craft_data *upgrade_craft, room_data *from_roo
 		
 		// main setup
 		special_building_setup(ch, in_room);
-		set_room_extra_data(in_room, ROOM_EXTRA_BUILD_RECIPE, GET_CRAFT_VNUM(upgrade_craft));
+		if (upgrade_craft) {
+			set_room_extra_data(in_room, ROOM_EXTRA_BUILD_RECIPE, GET_CRAFT_VNUM(upgrade_craft));
+		}
 		if (ch) {
 			set_room_extra_data(in_room, ROOM_EXTRA_ORIGINAL_BUILDER, GET_ACCOUNT(ch)->id);
 		}
 		else if (original_builder > 0) {
 			set_room_extra_data(in_room, ROOM_EXTRA_ORIGINAL_BUILDER, original_builder);
 		}
-		GET_BUILDING_RESOURCES(in_room) = copy_resource_list(GET_CRAFT_RESOURCES(upgrade_craft));
+		// TODO preserve any needed-resources
+		if (upgrade_craft) {
+			GET_BUILDING_RESOURCES(in_room) = copy_resource_list(GET_CRAFT_RESOURCES(upgrade_craft));
+		}
 		SET_BIT(ROOM_BASE_FLAGS(in_room), ROOM_AFF_INCOMPLETE);
 		affect_total_room(in_room);	// do this right away to ensure incomplete flag
 		
@@ -1785,22 +1781,22 @@ bool start_upgrade(char_data *ch, craft_data *upgrade_craft, room_data *from_roo
 	} // end upgrade-to-building
 	
 	// upgrade TO vehicle
-	else if (CRAFT_IS_VEHICLE(upgrade_craft)) {
-		to_veh = read_vehicle(GET_CRAFT_OBJECT(upgrade_craft), TRUE);
+	else if (to_vehicle) {
+		new_veh = read_vehicle(VEH_VNUM(to_vehicle), TRUE);
 		
 		// set incomplete before putting in the room
-		set_vehicle_flags(to_veh, VEH_INCOMPLETE);
-		vehicle_to_room(to_veh, in_room);
+		set_vehicle_flags(new_veh, VEH_INCOMPLETE);
+		vehicle_to_room(new_veh, in_room);
 		
 		if (from_room) {
 			// upgraded from building
 			
 			// claim check
-			if (ROOM_OWNER(from_room) && !VEH_FLAGGED(to_veh, VEH_NO_CLAIM)) {
-				perform_claim_vehicle(to_veh, ROOM_OWNER(from_room));
+			if (ROOM_OWNER(from_room) && !VEH_FLAGGED(new_veh, VEH_NO_CLAIM)) {
+				perform_claim_vehicle(new_veh, ROOM_OWNER(from_room));
 			}
 			
-			if ((interior = get_vehicle_interior(to_veh))) {
+			if ((interior = get_vehicle_interior(new_veh))) {
 				// move objs/vehs inside the incomplete vehicle's main room?
 				
 				DL_FOREACH2(interior_room_list, room_iter, next_interior) {
@@ -1809,7 +1805,7 @@ bool start_upgrade(char_data *ch, craft_data *upgrade_craft, room_data *from_roo
 					}
 					
 					COMPLEX_DATA(room_iter)->home_room = interior;
-					add_room_to_vehicle(room_iter, to_veh);
+					add_room_to_vehicle(room_iter, new_veh);
 					request_world_save(GET_ROOM_VNUM(room_iter), WSAVE_ROOM);
 					
 					// check exits to the old home room and move them
@@ -1847,32 +1843,32 @@ bool start_upgrade(char_data *ch, craft_data *upgrade_craft, room_data *from_roo
 			// upgraded from vehicle
 			
 			// see if we need to abandon the old one
-			if (VEH_OWNER(from_veh) && VEH_FLAGGED(to_veh, VEH_NO_CLAIM)) {
+			if (VEH_OWNER(from_veh) && VEH_FLAGGED(new_veh, VEH_NO_CLAIM)) {
 				perform_abandon_vehicle(from_veh);
 			}
 			else if (VEH_OWNER(from_veh)) {
-				perform_claim_vehicle(to_veh, VEH_OWNER(from_veh));
+				perform_claim_vehicle(new_veh, VEH_OWNER(from_veh));
 			}
 			
 			// veh-to-veh data
-			VEH_INSTANCE_ID(to_veh) = VEH_INSTANCE_ID(from_veh);
+			VEH_INSTANCE_ID(new_veh) = VEH_INSTANCE_ID(from_veh);
 			
-			VEH_ANIMALS(to_veh) = VEH_ANIMALS(from_veh);
+			VEH_ANIMALS(new_veh) = VEH_ANIMALS(from_veh);
 			VEH_ANIMALS(from_veh) = NULL;
 			
-			VEH_EXTRA_DATA(to_veh) = VEH_EXTRA_DATA(from_veh);
+			VEH_EXTRA_DATA(new_veh) = VEH_EXTRA_DATA(from_veh);
 			VEH_EXTRA_DATA(from_veh) = NULL;
 			
 			// adapt flags: find flags added to from_veh
 			if ((old_proto = vehicle_proto(VEH_VNUM(from_veh)))) {
 				set_bits = VEH_FLAGS(from_veh) & SAVABLE_VEH_FLAGS & ~VEH_FLAGS(old_proto);
-				set_vehicle_flags(to_veh, set_bits);
+				set_vehicle_flags(new_veh, set_bits);
 			}
 		
 			// transfer/dump contents
-			if (VEH_CAPACITY(to_veh) > 0) {
+			if (VEH_CAPACITY(new_veh) > 0) {
 				DL_FOREACH_SAFE2(VEH_CONTAINS(from_veh), obj, next_obj, next_content) {
-					obj_to_vehicle(obj, to_veh);
+					obj_to_vehicle(obj, new_veh);
 				}
 			}
 			else {
@@ -1880,27 +1876,27 @@ bool start_upgrade(char_data *ch, craft_data *upgrade_craft, room_data *from_roo
 			}
 			
 			// transfer rooms
-			if (VEH_INTERIOR_ROOM_VNUM(to_veh) != NOTHING && (interior = get_vehicle_interior(from_veh))) {
-				VEH_INSIDE_ROOMS(to_veh) = VEH_INSIDE_ROOMS(from_veh);
+			if (VEH_INTERIOR_ROOM_VNUM(new_veh) != NOTHING && (interior = get_vehicle_interior(from_veh))) {
+				VEH_INSIDE_ROOMS(new_veh) = VEH_INSIDE_ROOMS(from_veh);
 				
 				// move home room
-				VEH_INTERIOR_HOME_ROOM(to_veh) = interior;
-				COMPLEX_DATA(interior)->vehicle = to_veh;
+				VEH_INTERIOR_HOME_ROOM(new_veh) = interior;
+				COMPLEX_DATA(interior)->vehicle = new_veh;
 				
 				// move whole interior
 				LL_FOREACH(VEH_ROOM_LIST(from_veh), vrl) {
-					COMPLEX_DATA(vrl->room)->vehicle = to_veh;
+					COMPLEX_DATA(vrl->room)->vehicle = new_veh;
 				}
 				
 				// transfer room list
-				VEH_ROOM_LIST(to_veh) = VEH_ROOM_LIST(from_veh);
+				VEH_ROOM_LIST(new_veh) = VEH_ROOM_LIST(from_veh);
 				VEH_ROOM_LIST(from_veh) = NULL;
 				VEH_INTERIOR_HOME_ROOM(from_veh) = NULL;
 				
 				// change room
-				if (VEH_INTERIOR_ROOM_VNUM(to_veh) != VEH_INTERIOR_ROOM_VNUM(from_veh) && building_proto(VEH_INTERIOR_ROOM_VNUM(to_veh))) {
+				if (VEH_INTERIOR_ROOM_VNUM(new_veh) != VEH_INTERIOR_ROOM_VNUM(from_veh) && building_proto(VEH_INTERIOR_ROOM_VNUM(new_veh))) {
 					detach_building_from_room(interior);
-					attach_building_to_room(building_proto(VEH_INTERIOR_ROOM_VNUM(to_veh)), interior, TRUE);
+					attach_building_to_room(building_proto(VEH_INTERIOR_ROOM_VNUM(new_veh)), interior, TRUE);
 				}
 				
 				// apply data
@@ -1918,56 +1914,63 @@ bool start_upgrade(char_data *ch, craft_data *upgrade_craft, room_data *from_roo
 		}
 	
 		// additional setup
-		special_vehicle_setup(ch, to_veh);
-		VEH_NEEDS_RESOURCES(to_veh) = copy_resource_list(GET_CRAFT_RESOURCES(upgrade_craft));
-		VEH_HEALTH(to_veh) = MAX(1, VEH_MAX_HEALTH(to_veh) * 0.2);	// start at 20% health, will heal on completion
+		special_vehicle_setup(ch, new_veh);
+		// TODO: preserve any needed-resources
+		if (upgrade_craft) {
+			VEH_NEEDS_RESOURCES(new_veh) = copy_resource_list(GET_CRAFT_RESOURCES(upgrade_craft));
+		}
+		VEH_HEALTH(new_veh) = MAX(1, VEH_MAX_HEALTH(new_veh) * 0.2);	// start at 20% health, will heal on completion
 		if (ch) {
-			scale_vehicle_to_level(to_veh, get_craft_scale_level(ch, upgrade_craft));
-			GET_ACTION_VNUM(ch, 1) = VEH_CONSTRUCTION_ID(to_veh);
+			GET_ACTION_VNUM(ch, 1) = VEH_CONSTRUCTION_ID(new_veh);
+		}
+		if (ch && upgrade_craft) {
+			scale_vehicle_to_level(new_veh, get_craft_scale_level(ch, upgrade_craft));
 		}
 		else {
-			scale_vehicle_to_level(to_veh, veh_level);
+			scale_vehicle_to_level(new_veh, veh_level);
 		}
-		VEH_CONSTRUCTION_ID(to_veh) = get_new_vehicle_construction_id();
-		set_vehicle_extra_data(to_veh, ROOM_EXTRA_BUILD_RECIPE, GET_CRAFT_VNUM(upgrade_craft));
+		VEH_CONSTRUCTION_ID(new_veh) = get_new_vehicle_construction_id();
+		if (upgrade_craft) {
+			set_vehicle_extra_data(new_veh, ROOM_EXTRA_BUILD_RECIPE, GET_CRAFT_VNUM(upgrade_craft));
+		}
 		if (ch) {
-			set_vehicle_extra_data(to_veh, ROOM_EXTRA_ORIGINAL_BUILDER, GET_ACCOUNT(ch)->id);
+			set_vehicle_extra_data(new_veh, ROOM_EXTRA_ORIGINAL_BUILDER, GET_ACCOUNT(ch)->id);
 		}
 		else if (original_builder > 0) {
-			set_vehicle_extra_data(to_veh, ROOM_EXTRA_ORIGINAL_BUILDER, original_builder);
+			set_vehicle_extra_data(new_veh, ROOM_EXTRA_ORIGINAL_BUILDER, original_builder);
 		}
 		
 		// transfer stuff from old data
-		VEH_BUILT_WITH(to_veh) = built_with;
-		VEH_DEPLETION(to_veh) = depletion;
+		VEH_BUILT_WITH(new_veh) = built_with;
+		VEH_DEPLETION(new_veh) = depletion;
 		
-		if (dedicated_to > 0 && VEH_FLAGGED(to_veh, BLD_DEDICATE)) {
-			set_vehicle_extra_data(to_veh, ROOM_EXTRA_DEDICATE_ID, dedicated_to);
+		if (dedicated_to > 0 && VEH_FLAGGED(new_veh, BLD_DEDICATE)) {
+			set_vehicle_extra_data(new_veh, ROOM_EXTRA_DEDICATE_ID, dedicated_to);
 		}
 		
 		// check the paint
-		if (paint_color > 0 && !VEH_FLAGGED(to_veh, VEH_NO_PAINT)) {
-			set_vehicle_extra_data(to_veh, ROOM_EXTRA_PAINT_COLOR, paint_color);
+		if (paint_color > 0 && !VEH_FLAGGED(new_veh, VEH_NO_PAINT)) {
+			set_vehicle_extra_data(new_veh, ROOM_EXTRA_PAINT_COLOR, paint_color);
 			if (bright_paint) {
-				set_vehicle_flags(to_veh, VEH_BRIGHT_PAINT);
+				set_vehicle_flags(new_veh, VEH_BRIGHT_PAINT);
 			}
 		}
 		else {	// ensure not painted
-			remove_vehicle_flags(to_veh, VEH_BRIGHT_PAINT);
-			remove_vehicle_extra_data(to_veh, ROOM_EXTRA_PAINT_COLOR);
+			remove_vehicle_flags(new_veh, VEH_BRIGHT_PAINT);
+			remove_vehicle_extra_data(new_veh, ROOM_EXTRA_PAINT_COLOR);
 		}
 		
 		// DONE: autocomplete if no resources on the upgrade
-		if (!VEH_NEEDS_RESOURCES(to_veh)) {
+		if (!VEH_NEEDS_RESOURCES(new_veh)) {
 			if (ch) {
 				msg_to_char(ch, "You finish the upgrade!\r\n");
 				act("$n finished the upgrade!", FALSE, ch, NULL, NULL, TO_ROOM);
 				cancel_action(ch);
 			}
-			complete_vehicle(to_veh);
+			complete_vehicle(new_veh);
 		}
 		
-		request_vehicle_save_in_world(to_veh);
+		request_vehicle_save_in_world(new_veh);
 	} // end upgrade-to-vehicle
 	
 	affect_total_room(in_room);
@@ -3361,7 +3364,7 @@ ACMD(do_upgrade) {
 	}		
 	
 	// ---- SUCCESS: try start_upgrade ----
-	if (start_upgrade(ch, to_craft, from_room, from_veh)) {
+	if (start_upgrade(ch, to_craft, from_room, from_veh, bld_proto, veh_proto)) {
 		if (CRAFT_IS_BUILDING(to_craft)) {
 			start_action(ch, ACT_BUILDING, 0);
 		}

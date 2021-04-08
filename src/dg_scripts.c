@@ -5069,6 +5069,14 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					if (!str_cmp(field, "max_citizens")) {
 						snprintf(str, slen, "%d", GET_BUILDING(HOME_ROOM(r)) ? GET_BLD_CITIZENS(GET_BUILDING(HOME_ROOM(r))) : 0);
 					}
+					else if (!str_cmp(field, "mine_type")) {
+						if (get_room_extra_data(r, ROOM_EXTRA_MINE_GLB_VNUM) > 0) {
+							snprintf(str, slen, "%s", get_mine_type_name(room));
+						}
+						else {
+							*str = '\0';
+						}
+					}
 					else if (!str_cmp(field, "moon_phase")) {
 						char arg1[256], arg2[256];
 						generic_data *moon;
