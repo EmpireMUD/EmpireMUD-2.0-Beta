@@ -2004,6 +2004,10 @@ int text_processed(char *field, char *subfield, struct trig_var_data *vd, char *
 		snprintf(str, slen, "%s", p);
 		return TRUE;
 	}
+	else if (!str_cmp(field, "ana")) {                 /* ana or an/a       */
+		snprintf(str, slen, "%s", AN(vd->value));
+		return TRUE;
+	}
 	else if (!str_cmp(field, "char")) {
 		int pos = atoi(NULLSAFE(subfield));
 		if (subfield && strlen(vd->value) > pos) {

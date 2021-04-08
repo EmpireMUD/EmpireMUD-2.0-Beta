@@ -582,7 +582,7 @@ Variables:
 
 See also: FINISH QUEST TRIGGER, WAIT
 #d
-"TEXT VARIABLES" "TEXT VARS" TRIGEDIT-VARIABLES-TEXTS TEXT-VAR TRIGEDIT-TEXT-VAR
+"TEXT VARIABLES" "TEXT VARS" TRIGEDIT-VARIABLES-TEXTS TEXT-VAR TRIGEDIT-TEXT-VAR STRING-VARIABLES
 
 Text Variable Fields 
 
@@ -595,6 +595,7 @@ When using field - The variable returns
 &cstrlen&0 - Returns the number of characters in the string.
 &ctrim&0 - Returns the string without any leading or trailing whitespace. 
    This is used to trim extra spaces from the beginning or end of a string.
+&cana&0 - Returns "a" or "an" depending on the first letter of the string.
 &ccar&0 - Returns the first word of the string. For %text%="this is the string";
    %text.car% will yield "this".
 &ccdr&0 - Returns all but the first word of the string, trimmed. For %text%=
