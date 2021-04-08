@@ -1040,7 +1040,7 @@ void perform_force_upgrades(void) {
 		if (IS_DISMANTLING(room)) {
 			continue;	// skip anything beind dismantled
 		}
-		if (!(bld = GET_BUILDING(room)) || BLD_FLAGGED(bld, BLD_OPEN) || !GET_BLD_RELATIONS(bld)) {
+		if (!(bld = GET_BUILDING(room)) || !GET_BLD_RELATIONS(bld)) {
 			continue;	// invalid building
 		}
 		
