@@ -5390,7 +5390,7 @@ ACMD(do_get) {
 		}
 		cont_dotmode = find_all_dots(arg2);
 		if (cont_dotmode == FIND_INDIV) {
-			mode = generic_find(arg2, FIND_OBJ_INV | FIND_OBJ_ROOM | FIND_OBJ_EQUIP | FIND_VEHICLE_ROOM | FIND_VEHICLE_INSIDE, ch, &tmp_char, &cont, &find_veh);
+			mode = generic_find(arg2, NULL, FIND_OBJ_INV | FIND_OBJ_ROOM | FIND_OBJ_EQUIP | FIND_VEHICLE_ROOM | FIND_VEHICLE_INSIDE, ch, &tmp_char, &cont, &find_veh);
 			
 			if (find_veh) {
 				// pass off to vehicle handler
@@ -5693,7 +5693,7 @@ ACMD(do_identify) {
 		}
 	}	// /all.
 	else {	// specific obj/vehicle
-		if (!generic_find(arg, inv_only ? FIND_OBJ_INV : (FIND_OBJ_INV | FIND_OBJ_ROOM | FIND_OBJ_EQUIP | FIND_VEHICLE_ROOM | FIND_VEHICLE_INSIDE), ch, &tmp_char, &obj, &veh)) {
+		if (!generic_find(arg, NULL, inv_only ? FIND_OBJ_INV : (FIND_OBJ_INV | FIND_OBJ_ROOM | FIND_OBJ_EQUIP | FIND_VEHICLE_ROOM | FIND_VEHICLE_INSIDE), ch, &tmp_char, &obj, &veh)) {
 			msg_to_char(ch, "You see nothing like that %s.\r\n", inv_only ? "in your inventory" : "here");
 		}
 		else if (obj) {
@@ -6325,7 +6325,7 @@ ACMD(do_put) {
 		send_to_char(buf, ch);
 	}
 	else {
-		generic_find(thecont, FIND_OBJ_INV | FIND_OBJ_ROOM | FIND_OBJ_EQUIP | FIND_VEHICLE_ROOM | FIND_VEHICLE_INSIDE, ch, &tmp_char, &cont, &find_veh);
+		generic_find(thecont, NULL, FIND_OBJ_INV | FIND_OBJ_ROOM | FIND_OBJ_EQUIP | FIND_VEHICLE_ROOM | FIND_VEHICLE_INSIDE, ch, &tmp_char, &cont, &find_veh);
 		
 		if (find_veh) {
 			// override for put obj in vehicle

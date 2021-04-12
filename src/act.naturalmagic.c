@@ -845,7 +845,7 @@ ACMD(do_moonrise) {
 			add_offer(vict, ch, OFFER_RESURRECTION, ABIL_MOONRISE);
 		}
 	}
-	else if (generic_find(arg, FIND_OBJ_INV | FIND_OBJ_ROOM, ch, NULL, &corpse, NULL)) {
+	else if (generic_find(arg, NULL, FIND_OBJ_INV | FIND_OBJ_ROOM, ch, NULL, &corpse, NULL)) {
 		// obj target
 		if (!IS_CORPSE(corpse)) {
 			msg_to_char(ch, "You can't resurrect that.\r\n");
@@ -1103,7 +1103,7 @@ ACMD(do_resurrect) {
 			add_offer(vict, ch, OFFER_RESURRECTION, ABIL_RESURRECT);
 		}
 	}
-	else if (generic_find(arg, FIND_OBJ_INV | FIND_OBJ_ROOM, ch, NULL, &corpse, NULL)) {
+	else if (generic_find(arg, NULL, FIND_OBJ_INV | FIND_OBJ_ROOM, ch, NULL, &corpse, NULL)) {
 		// obj target
 		if (!IS_CORPSE(corpse)) {
 			msg_to_char(ch, "You can't resurrect that.\r\n");

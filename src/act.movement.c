@@ -2165,7 +2165,7 @@ ACMD(do_enter) {
 		return;
 	}
 
-	generic_find(arg, FIND_OBJ_ROOM | FIND_VEHICLE_ROOM, ch, &tmp_char, &portal, &find_veh);
+	generic_find(arg, NULL, FIND_OBJ_ROOM | FIND_VEHICLE_ROOM, ch, &tmp_char, &portal, &find_veh);
 	
 	if (find_veh) {
 		// overload by passing to board
@@ -2307,7 +2307,7 @@ ACMD(do_gen_door) {
 		return;
 	}
 	two_arguments(argument, type, dir);
-	if (!generic_find(type, FIND_OBJ_INV | FIND_OBJ_ROOM, ch, &victim, &obj, &tmp_veh))
+	if (!generic_find(type, NULL, FIND_OBJ_INV | FIND_OBJ_ROOM, ch, &victim, &obj, &tmp_veh))
 		door = find_door(ch, type, dir, cmd_door[subcmd]);
 	
 	ex = find_exit(IN_ROOM(ch), door);

@@ -3917,7 +3917,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 				case 'o': {	// char.o*
 					if (!str_cmp(field, "obj_target")) {
 						obj_data *targ;
-						if (subfield && generic_find(subfield, FIND_OBJ_INV | FIND_OBJ_ROOM, c, NULL, &targ, NULL)) {
+						if (subfield && generic_find(subfield, NULL, FIND_OBJ_INV | FIND_OBJ_ROOM, c, NULL, &targ, NULL)) {
 							snprintf(str, slen, "%c%d", UID_CHAR, obj_script_id(targ));
 						}
 						else {

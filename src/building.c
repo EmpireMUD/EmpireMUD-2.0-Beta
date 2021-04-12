@@ -2340,7 +2340,7 @@ ACMD(do_dedicate) {
 			ded_room = IN_ROOM(ch);
 		}
 	}
-	else if (!generic_find(arg1, FIND_VEHICLE_ROOM | FIND_VEHICLE_INSIDE, ch, NULL, NULL, &ded_veh)) {
+	else if (!generic_find(arg1, NULL, FIND_VEHICLE_ROOM | FIND_VEHICLE_INSIDE, ch, NULL, NULL, &ded_veh)) {
 		msg_to_char(ch, "You don't see %s %s here to dedicate.\r\n", AN(arg1), arg1);
 		return;
 	}
@@ -2886,7 +2886,7 @@ ACMD(do_paint) {
 			paint_room = HOME_ROOM(IN_ROOM(ch));
 		}
 	}
-	else if (!generic_find(arg1, FIND_VEHICLE_ROOM | FIND_VEHICLE_INSIDE, ch, NULL, NULL, &paint_veh)) {
+	else if (!generic_find(arg1, NULL, FIND_VEHICLE_ROOM | FIND_VEHICLE_INSIDE, ch, NULL, NULL, &paint_veh)) {
 		msg_to_char(ch, "You don't see %s %s here to paint.\r\n", AN(arg1), arg1);
 		return;
 	}
@@ -3102,7 +3102,7 @@ ACMD(do_unpaint) {
 			paint_room = HOME_ROOM(IN_ROOM(ch));
 		}
 	}
-	else if (!generic_find(arg, FIND_VEHICLE_ROOM | FIND_VEHICLE_INSIDE, ch, NULL, NULL, &paint_veh)) {
+	else if (!generic_find(arg, NULL, FIND_VEHICLE_ROOM | FIND_VEHICLE_INSIDE, ch, NULL, NULL, &paint_veh)) {
 		msg_to_char(ch, "You don't see %s %s here to unpaint.\r\n", AN(arg), arg);
 		return;
 	}
@@ -3184,7 +3184,7 @@ ACMD(do_upgrade) {
 			from_room = HOME_ROOM(IN_ROOM(ch));
 		}
 	}
-	else if (!generic_find(arg1, FIND_VEHICLE_ROOM | FIND_VEHICLE_INSIDE, ch, NULL, NULL, &from_veh)) {
+	else if (!generic_find(arg1, NULL, FIND_VEHICLE_ROOM | FIND_VEHICLE_INSIDE, ch, NULL, NULL, &from_veh)) {
 		msg_to_char(ch, "You don't see %s %s here to upgrade.\r\n", AN(arg1), arg1);
 		return;
 	}

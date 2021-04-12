@@ -84,14 +84,17 @@ void display_tip_to_char(char_data *ch) {
 *
 * @param char *word First word of argument.
 * @param struct extra_descr_data *list Pointer to the start of an exdesc list.
+* @param int *number Optional: For counting #.name syntax across lists.
 * @return char* A pointer to the description to show, or NULL if no match.
 */
-char *find_exdesc(char *word, struct extra_descr_data *list) {
+char *find_exdesc(char *word, struct extra_descr_data *list, int *number) {
 	struct extra_descr_data *i;
 
-	for (i = list; i; i = i->next)
-		if (isname(word, i->keyword))
+	for (i = list; i; i = i->next) {
+		if (isname(word, i->keyword) && (!number || --(*number) == 0)) {
 			return (i->description);
+		}
+	}
 
 	return (NULL);
 }
@@ -329,8 +332,9 @@ void look_at_target(char_data *ch, char *arg, char *more_args) {
 		send_to_char("Look at what?\r\n", ch);
 		return;
 	}
-
-	bits = generic_find(arg, inv_only ? FIND_OBJ_INV : (FIND_OBJ_INV | FIND_OBJ_ROOM | FIND_OBJ_EQUIP | FIND_CHAR_ROOM | FIND_VEHICLE_ROOM | FIND_VEHICLE_INSIDE), ch, &found_char, &found_obj, &found_veh);
+	
+	fnum = get_number(&arg);
+	bits = generic_find(arg, &fnum, inv_only ? FIND_OBJ_INV : (FIND_OBJ_INV | FIND_OBJ_ROOM | FIND_OBJ_EQUIP | FIND_CHAR_ROOM | FIND_VEHICLE_ROOM | FIND_VEHICLE_INSIDE), ch, &found_char, &found_obj, &found_veh);
 
 	/* Is the target a character? */
 	if (found_char != NULL) {
@@ -351,8 +355,8 @@ void look_at_target(char_data *ch, char *arg, char *more_args) {
 		return;
 	}
 
-	/* Strip off "number." from 2.foo and friends. */
-	if (!(fnum = get_number(&arg))) {
+	// are we at 0.name?
+	if (fnum <= 0) {
 		send_to_char("Look at what?\r\n", ch);
 		return;
 	}
@@ -361,7 +365,7 @@ void look_at_target(char_data *ch, char *arg, char *more_args) {
 	if (!found) {
 		DL_FOREACH2(ch->carrying, obj, next_content) {
 			if (CAN_SEE_OBJ(ch, obj)) {
-				if ((desc = find_exdesc(arg, GET_OBJ_EX_DESCS(obj))) != NULL && --fnum == 0) {
+				if ((desc = find_exdesc(arg, GET_OBJ_EX_DESCS(obj), &fnum)) != NULL) {
 					send_to_char(desc, ch);
 					act("$n looks at $p.", TRUE, ch, obj, NULL, TO_ROOM);
 					found = TRUE;
@@ -374,7 +378,7 @@ void look_at_target(char_data *ch, char *arg, char *more_args) {
 	/* Does the argument match an extra desc in the char's equipment? */
 	for (j = 0; j < NUM_WEARS && !found; j++)
 		if (GET_EQ(ch, j) && CAN_SEE_OBJ(ch, GET_EQ(ch, j)))
-			if ((desc = find_exdesc(arg, GET_OBJ_EX_DESCS(GET_EQ(ch, j)))) != NULL && --fnum == 0) {
+			if ((desc = find_exdesc(arg, GET_OBJ_EX_DESCS(GET_EQ(ch, j)), &fnum)) != NULL) {
 				send_to_char(desc, ch);
 				act("$n looks at $p.", TRUE, ch, GET_EQ(ch, j), NULL, TO_ROOM);
 				found = TRUE;
@@ -384,7 +388,7 @@ void look_at_target(char_data *ch, char *arg, char *more_args) {
 	if (!found) {
 		DL_FOREACH2(ROOM_CONTENTS(IN_ROOM(ch)), obj, next_content) {
 			if (CAN_SEE_OBJ(ch, obj)) {
-				if ((desc = find_exdesc(arg, GET_OBJ_EX_DESCS(obj))) != NULL && --fnum == 0) {
+				if ((desc = find_exdesc(arg, GET_OBJ_EX_DESCS(obj), &fnum)) != NULL) {
 					send_to_char(desc, ch);
 					act("$n looks at $p.", TRUE, ch, obj, NULL, TO_ROOM);
 					found = TRUE;
@@ -397,7 +401,7 @@ void look_at_target(char_data *ch, char *arg, char *more_args) {
 	// does it match an extra desc of a vehicle here?
 	if (!found && ROOM_VEHICLES(IN_ROOM(ch))) {
 		DL_FOREACH2(ROOM_VEHICLES(IN_ROOM(ch)), veh, next_in_room) {
-			if (!VEH_IS_EXTRACTED(veh) && CAN_SEE_VEHICLE(ch, veh) && (desc = find_exdesc(arg, VEH_EX_DESCS(veh))) != NULL && --fnum == 0) {
+			if (!VEH_IS_EXTRACTED(veh) && CAN_SEE_VEHICLE(ch, veh) && (desc = find_exdesc(arg, VEH_EX_DESCS(veh), &fnum)) != NULL) {
 				send_to_char(desc, ch);
 				act("$n looks at $V.", TRUE, ch, NULL, veh, TO_ROOM);
 				found = TRUE;
@@ -408,7 +412,7 @@ void look_at_target(char_data *ch, char *arg, char *more_args) {
 
 	// does it match an extra desc of the room template?
 	if (!found && GET_ROOM_TEMPLATE(IN_ROOM(ch))) {
-		if ((desc = find_exdesc(arg, GET_RMT_EX_DESCS(GET_ROOM_TEMPLATE(IN_ROOM(ch))))) != NULL && --fnum == 0) {
+		if ((desc = find_exdesc(arg, GET_RMT_EX_DESCS(GET_ROOM_TEMPLATE(IN_ROOM(ch))), &fnum)) != NULL) {
 			send_to_char(desc, ch);
 			found = TRUE;
 		}
@@ -416,7 +420,7 @@ void look_at_target(char_data *ch, char *arg, char *more_args) {
 
 	// does it match an extra desc of the building?
 	if (!found && GET_BUILDING(IN_ROOM(ch))) {
-		if ((desc = find_exdesc(arg, GET_BLD_EX_DESCS(GET_BUILDING(IN_ROOM(ch))))) != NULL && --fnum == 0) {
+		if ((desc = find_exdesc(arg, GET_BLD_EX_DESCS(GET_BUILDING(IN_ROOM(ch))), &fnum)) != NULL) {
 			send_to_char(desc, ch);
 			found = TRUE;
 		}
@@ -462,7 +466,7 @@ void look_in_obj(char_data *ch, char *arg) {
 
 	if (!*arg)
 		send_to_char("Look in what?\r\n", ch);
-	else if (!(bits = generic_find(arg, FIND_OBJ_INV | FIND_OBJ_ROOM | FIND_OBJ_EQUIP | FIND_VEHICLE_ROOM | FIND_VEHICLE_INSIDE, ch, &dummy, &obj, &veh))) {
+	else if (!(bits = generic_find(arg, NULL, FIND_OBJ_INV | FIND_OBJ_ROOM | FIND_OBJ_EQUIP | FIND_VEHICLE_ROOM | FIND_VEHICLE_INSIDE, ch, &dummy, &obj, &veh))) {
 		sprintf(buf, "There doesn't seem to be %s %s here.\r\n", AN(arg), arg);
 		send_to_char(buf, ch);
 	}
@@ -2400,7 +2404,7 @@ ACMD(do_examine) {
 	}
 	look_at_target(ch, arg, argument);
 
-	generic_find(arg, FIND_OBJ_INV | FIND_OBJ_ROOM | FIND_CHAR_ROOM | FIND_OBJ_EQUIP | FIND_VEHICLE_ROOM | FIND_VEHICLE_INSIDE, ch, &tmp_char, &tmp_object, &tmp_veh);
+	generic_find(arg, NULL, FIND_OBJ_INV | FIND_OBJ_ROOM | FIND_CHAR_ROOM | FIND_OBJ_EQUIP | FIND_VEHICLE_ROOM | FIND_VEHICLE_INSIDE, ch, &tmp_char, &tmp_object, &tmp_veh);
 
 	if (tmp_object) {
 		if ((GET_OBJ_TYPE(tmp_object) == ITEM_DRINKCON) || (GET_OBJ_TYPE(tmp_object) == ITEM_CONTAINER) || (GET_OBJ_TYPE(tmp_object) == ITEM_CORPSE)) {

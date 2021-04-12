@@ -7784,7 +7784,7 @@ ACMD(do_autostore) {
 		msg_to_char(ch, "Nobody owns this spot. Use purge instead.\r\n");
 	}
 	else if (*arg) {
-		generic_find(arg, FIND_OBJ_ROOM | FIND_VEHICLE_ROOM | FIND_VEHICLE_INSIDE, ch, NULL, &obj, &veh);
+		generic_find(arg, NULL, FIND_OBJ_ROOM | FIND_VEHICLE_ROOM | FIND_VEHICLE_INSIDE, ch, NULL, &obj, &veh);
 		
 		if (obj) {
 			act("$n auto-stores $p.", FALSE, ch, obj, NULL, TO_ROOM | DG_NO_TRIG);
@@ -8058,7 +8058,7 @@ ACMD(do_echo) {
 			*end = '\0';
 		}
 		len = strlen(lbuf);
-		generic_find(lbuf, FIND_OBJ_INV | FIND_OBJ_ROOM | FIND_OBJ_EQUIP, ch, &tmp_char, &obj, &tmp_veh);
+		generic_find(lbuf, NULL, FIND_OBJ_INV | FIND_OBJ_ROOM | FIND_OBJ_EQUIP, ch, &tmp_char, &obj, &tmp_veh);
 		
 		if (obj) {
 			// replace with $p
@@ -9566,7 +9566,7 @@ ACMD(do_rescale) {
 	else if (level < 0) {
 		msg_to_char(ch, "Invalid level.\r\n");
 	}
-	else if (!generic_find(arg, FIND_CHAR_ROOM | FIND_OBJ_INV | FIND_OBJ_ROOM | FIND_VEHICLE_ROOM, ch, &vict, &obj, &veh)) {
+	else if (!generic_find(arg, NULL, FIND_CHAR_ROOM | FIND_OBJ_INV | FIND_OBJ_ROOM | FIND_VEHICLE_ROOM, ch, &vict, &obj, &veh)) {
 		msg_to_char(ch, "You don't see %s %s here.\r\n", AN(arg), arg);
 	}
 	else if (vict) {
@@ -9639,7 +9639,7 @@ ACMD(do_restore) {
 		send_to_char("Whom do you wish to restore?\r\n", ch);
 		return;
 	}
-	if (!generic_find(name_arg, FIND_CHAR_ROOM | FIND_CHAR_WORLD | FIND_VEHICLE_ROOM | FIND_VEHICLE_INSIDE | FIND_VEHICLE_WORLD, ch, &vict, NULL, &veh)) {
+	if (!generic_find(name_arg, NULL, FIND_CHAR_ROOM | FIND_CHAR_WORLD | FIND_VEHICLE_ROOM | FIND_VEHICLE_INSIDE | FIND_VEHICLE_WORLD, ch, &vict, NULL, &veh)) {
 		send_config_msg(ch, "no_person");
 		return;
 	}
@@ -10586,7 +10586,7 @@ ACMD(do_unbind) {
 	if (!*arg) {
 		msg_to_char(ch, "Unbind which object?\r\n");
 	}
-	else if (!generic_find(arg, FIND_OBJ_INV | FIND_OBJ_ROOM, ch, NULL, &obj, NULL)) {
+	else if (!generic_find(arg, NULL, FIND_OBJ_INV | FIND_OBJ_ROOM, ch, NULL, &obj, NULL)) {
 		msg_to_char(ch, "Unable to find '%s'.\r\n", argument);
 	}
 	else if (!OBJ_BOUND_TO(obj)) {

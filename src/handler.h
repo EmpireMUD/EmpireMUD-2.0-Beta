@@ -427,7 +427,7 @@ bool stored_item_requires_withdraw(obj_data *obj);
 
 // targeting handlers
 int find_all_dots(char *arg);
-bitvector_t generic_find(char *arg, bitvector_t bitvector, char_data *ch, char_data **tar_ch, obj_data **tar_obj, vehicle_data **tar_veh);
+bitvector_t generic_find(char *arg, int *number, bitvector_t bitvector, char_data *ch, char_data **tar_ch, obj_data **tar_obj, vehicle_data **tar_veh);
 int get_number(char **name);
 
 // trading post handlers
