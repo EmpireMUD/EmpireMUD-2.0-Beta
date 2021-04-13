@@ -766,9 +766,9 @@ R
 6075 4 1 0
 S
 #5161
-trapperspost~
+dismantle trappers post~
 -1 1
-8 300 q 1 -1 c 0
+8 300 lq 1 -1 c 0
 B
 5161 del op
 R

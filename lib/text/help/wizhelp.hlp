@@ -1698,7 +1698,7 @@ Available utilities:
 #d
 "UTILITY BLDCONVERT" "UTIL BLDCONVERT" "UTILITY BLD CONVERT" "UTIL BLD CONVERT" "UTILITY BUILD CONVERT" "UTIL BUILD CONVERT" BLDCONVERT
 
-Usage:  util bldconvert <old building vnum> <start of new vnum range>
+Usage:  util bldconvert <old building vnum> <start of new vnum range> [force]
 
 This tool will clone a traditional building as a building-vehicle, a new style
 of building that sits in a map room. The <start of new vnum range> argument
@@ -1717,6 +1717,9 @@ What this tool does:
   - in some cases, it removes the build-facing flag, but keeps them if certain
     flags were set -- you must review these yourself
 - updates the old craft with a DISMANTLE-ONLY flag
+- if you add the "force" argument at the end, it will add a FORCE-UPGRADE-VEH
+  relation to the old building. This will cause any copies of the old building
+  to automatically upgrade after the next reboot
 
 What you need to do after:
 - update the vehicle's strings (short desc, keywords, long desc, look desc)

@@ -1603,7 +1603,7 @@ void do_gen_craft_building(char_data *ch, craft_data *type, int dir) {
 	found_obj = (GET_CRAFT_REQUIRES_OBJ(type) != NOTHING ? has_required_obj_for_craft(ch, GET_CRAFT_REQUIRES_OBJ(type)) : NULL);
 	
 	// validate
-	if (!check_build_location_and_dir(ch, type, dir, FALSE, &is_closed, &needs_reverse)) {
+	if (!check_build_location_and_dir(ch, IN_ROOM(ch), type, dir, FALSE, &is_closed, &needs_reverse)) {
 		return;	// sends own messages
 	}
 	else if (found_obj && !consume_otrigger(found_obj, ch, OCMD_BUILD, NULL)) {
@@ -1704,7 +1704,7 @@ void do_gen_craft_vehicle(char_data *ch, craft_data *type, int dir) {
 		msg_to_char(ch, "You can't %s that while %s is unfinished here.\r\n", gen_craft_data[GET_CRAFT_TYPE(type)].command, VEH_SHORT_DESC(found_other));
 		return;
 	}
-	if (!check_build_location_and_dir(ch, type, dir, FALSE, NULL, NULL)) {
+	if (!check_build_location_and_dir(ch, IN_ROOM(ch), type, dir, FALSE, NULL, NULL)) {
 		return;	// sends own messages
 	}
 	
@@ -1740,6 +1740,10 @@ void do_gen_craft_vehicle(char_data *ch, craft_data *type, int dir) {
 	scale_vehicle_to_level(veh, get_craft_scale_level(ch, type));
 	VEH_CONSTRUCTION_ID(veh) = get_new_vehicle_construction_id();
 	set_vehicle_extra_data(veh, ROOM_EXTRA_BUILD_RECIPE, GET_CRAFT_VNUM(type));
+	
+	if (!IS_NPC(ch)) {
+		set_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_ORIGINAL_BUILDER, GET_ACCOUNT(ch)->id);
+	}
 	
 	start_action(ch, ACT_GEN_CRAFT, -1);
 	GET_ACTION_VNUM(ch, 0) = GET_CRAFT_VNUM(type);

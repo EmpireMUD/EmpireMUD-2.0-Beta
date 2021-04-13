@@ -2310,6 +2310,8 @@ ways:
 Available relationship types:
  &cUPGRADES-TO-BLD&0 - Becomes a building, see UPGRADE CRAFTS
  &cUPGRADES-TO-VEH&0 - Becomes a vehicle, see UPGRADE CRAFTS
+ &cFORCE-UPGRADE-BLD&0 - Automatically becomes a building after a reboot
+ &cFORCE-UPGRADE-VEH&0 - Automatically becomes a vehicle after a reboot
  &cSTORES-LIKE-BLD&0 - Inherits the storage as target building
  &cSTORES-LIKE-VEH&0 - Inherits the storage as target vehicle
                   (stores-like does not include warehouses; use function flags)

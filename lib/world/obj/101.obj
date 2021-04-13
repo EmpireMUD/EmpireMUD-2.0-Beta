@@ -742,12 +742,14 @@ A sack of mesquite flour is sitting here.~
    Mesquite flour is slightly sweet. It is made from the ground up bean pods of
 the mesquite tree, which grows in the driest deserts.
 ~
-3 0 a 0 3
+3 0 a 0 4
 0 0 0
 7 168
 O+ 1 6300
 R
 4 5109 0
+R
+4 5606 0
 S
 #10165
 totem mule~

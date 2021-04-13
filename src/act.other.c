@@ -2169,7 +2169,7 @@ ACMD(do_douse) {
 		else if (GET_ROOM_VEHICLE(IN_ROOM(ch)) && isname(arg, VEH_KEYWORDS(GET_ROOM_VEHICLE(IN_ROOM(ch))))) {
 			do_douse_vehicle(ch, GET_ROOM_VEHICLE(IN_ROOM(ch)), obj);
 		}
-		else if (generic_find(arg, FIND_OBJ_INV | FIND_OBJ_ROOM, ch, NULL, &found_obj, NULL)) {
+		else if (generic_find(arg, NULL, FIND_OBJ_INV | FIND_OBJ_ROOM, ch, NULL, &found_obj, NULL)) {
 			do_douse_obj(ch, found_obj, obj);
 		}
 		else {

@@ -9904,24 +9904,20 @@ int find_all_dots(char *arg) {
 
 /* Generic Find, designed to find any object/character
  *
- * Calling:
- *  *arg     is the pointer containing the string to be searched for.
+ * @param char *arg is the pointer containing the string to be searched for.
  *           This string doesn't have to be a single word, the routine
  *           extracts the next word itself.
- *  bitv..   All those bits that you want to "search through".
- *           Bit found will be result of the function
- *  *ch      This is the person that is trying to "find"
- *  **tar_ch Will be NULL if no character was found, otherwise points
- * **tar_obj Will be NULL if no object was found, otherwise points
- * **tar_veh Will be NULL if no vehicle was found, otherwise points
- *
- * The routine used to return a pointer to the next word in *arg (just
- * like the one_argument routine), but now it returns an integer that
- * describes what it filled in.
+ * @param int *number Optional, will pass through #.name targeting (detects it itself otherwise)
+ * @param bitvector_t bitvector   All those bits that you want to "search through". Bit found will be result of the function
+ * @param char_data *ch This is the person that is trying to "find" something
+ * @param char_data **tar_ch Will be NULL if no character was found, otherwise points
+ * @param obj_data **tar_obj Will be NULL if no object was found, otherwise points
+ * @param veh_data **tar_veh Will be NULL if no vehicle was found, otherwise points
+ * @return bitvector_t Which type was found, or NOBITS for none
  */
-bitvector_t generic_find(char *arg, bitvector_t bitvector, char_data *ch, char_data **tar_ch, obj_data **tar_obj, vehicle_data **tar_veh) {
-	char name[MAX_INPUT_LENGTH], *name_ptr = name;
-	int i, found, number;
+bitvector_t generic_find(char *arg, int *number, bitvector_t bitvector, char_data *ch, char_data **tar_ch, obj_data **tar_obj, vehicle_data **tar_veh) {
+	char name[MAX_INPUT_LENGTH], temp[MAX_INPUT_LENGTH], *name_ptr = name, *tmp = temp;
+	int i, found, num;
 	bitvector_t npc_only = (bitvector & FIND_NPC_ONLY);
 	
 	if (tar_ch) {
@@ -9933,13 +9929,23 @@ bitvector_t generic_find(char *arg, bitvector_t bitvector, char_data *ch, char_d
 	if (tar_veh) {
 		*tar_veh = NULL;
 	}
-
-	one_argument(arg, name);
+	
+	// check if a number is passed throguh
+	if (!number) {
+		strcpy(tmp, arg);
+		number = &num;
+		num = get_number(&tmp);
+	}
+	else {
+		tmp = arg;	// use whole arg instead
+	}
+	
+	one_argument(tmp, name);
 
 	if (!*name_ptr) {
 		return (0);
 	}
-	if ((number = get_number(&name_ptr)) == 0) {
+	if (*number == 0) {
 		// only looking for players
 		if (!npc_only && IS_SET(bitvector, FIND_CHAR_ROOM) && tar_ch && (*tar_ch = get_player_vis(ch, name_ptr, FIND_CHAR_ROOM))) {
 			return FIND_CHAR_ROOM;
@@ -9953,23 +9959,23 @@ bitvector_t generic_find(char *arg, bitvector_t bitvector, char_data *ch, char_d
 	}
 
 	if (IS_SET(bitvector, FIND_CHAR_ROOM) && tar_ch) {	/* Find person in room */
-		if ((*tar_ch = get_char_vis(ch, name_ptr, &number, FIND_CHAR_ROOM | npc_only)) != NULL) {
+		if ((*tar_ch = get_char_vis(ch, name_ptr, number, FIND_CHAR_ROOM | npc_only)) != NULL) {
 			return (FIND_CHAR_ROOM);
 		}
 	}
 	if (IS_SET(bitvector, FIND_VEHICLE_ROOM) && tar_veh) {
-		if ((*tar_veh = get_vehicle_in_room_vis(ch, name_ptr, &number)) != NULL) {
+		if ((*tar_veh = get_vehicle_in_room_vis(ch, name_ptr, number)) != NULL) {
 			return (FIND_VEHICLE_ROOM);
 		}
 	}
 	if (IS_SET(bitvector, FIND_CHAR_WORLD) && tar_ch) {
-		if ((*tar_ch = get_char_vis(ch, name_ptr, &number, FIND_CHAR_WORLD | npc_only)) != NULL) {
+		if ((*tar_ch = get_char_vis(ch, name_ptr, number, FIND_CHAR_WORLD | npc_only)) != NULL) {
 			return (FIND_CHAR_WORLD);
 		}
 	}
 	if (IS_SET(bitvector, FIND_OBJ_EQUIP) && tar_obj) {
 		for (found = FALSE, i = 0; i < NUM_WEARS && !found; i++) {
-			if (GET_EQ(ch, i) && isname(name_ptr, GET_OBJ_KEYWORDS(GET_EQ(ch, i))) && --number == 0) {
+			if (GET_EQ(ch, i) && isname(name_ptr, GET_OBJ_KEYWORDS(GET_EQ(ch, i))) && --(*number) == 0) {
 				*tar_obj = GET_EQ(ch, i);
 				found = TRUE;
 			}
@@ -9979,28 +9985,28 @@ bitvector_t generic_find(char *arg, bitvector_t bitvector, char_data *ch, char_d
 		}
 	}
 	if (IS_SET(bitvector, FIND_OBJ_INV) && tar_obj) {
-		if ((*tar_obj = get_obj_in_list_vis(ch, name_ptr, &number, ch->carrying)) != NULL) {
+		if ((*tar_obj = get_obj_in_list_vis(ch, name_ptr, number, ch->carrying)) != NULL) {
 			return (FIND_OBJ_INV);
 		}
 	}
 	if (IS_SET(bitvector, FIND_VEHICLE_INSIDE) && tar_veh) {
-		if (GET_ROOM_VEHICLE(IN_ROOM(ch)) && isname(name_ptr, VEH_KEYWORDS(GET_ROOM_VEHICLE(IN_ROOM(ch)))) && --number == 0) {
+		if (GET_ROOM_VEHICLE(IN_ROOM(ch)) && isname(name_ptr, VEH_KEYWORDS(GET_ROOM_VEHICLE(IN_ROOM(ch)))) && --(*number) == 0) {
 			*tar_veh = GET_ROOM_VEHICLE(IN_ROOM(ch));
 			return (FIND_VEHICLE_INSIDE);
 		}
 	}
 	if (IS_SET(bitvector, FIND_VEHICLE_WORLD) && tar_veh) {
-		if ((*tar_veh = get_vehicle_world_vis(ch, name_ptr, &number)) != NULL) {
+		if ((*tar_veh = get_vehicle_world_vis(ch, name_ptr, number)) != NULL) {
 			return (FIND_VEHICLE_WORLD);
 		}
 	}
 	if (IS_SET(bitvector, FIND_OBJ_ROOM) && tar_obj) {
-		if ((*tar_obj = get_obj_in_list_vis(ch, name_ptr, &number, ROOM_CONTENTS(IN_ROOM(ch)))) != NULL) {
+		if ((*tar_obj = get_obj_in_list_vis(ch, name_ptr, number, ROOM_CONTENTS(IN_ROOM(ch)))) != NULL) {
 			return (FIND_OBJ_ROOM);
 		}
 	}
 	if (IS_SET(bitvector, FIND_OBJ_WORLD) && tar_obj) {
-		if ((*tar_obj = get_obj_vis(ch, name_ptr, &number))) {
+		if ((*tar_obj = get_obj_vis(ch, name_ptr, number))) {
 			return (FIND_OBJ_WORLD);
 		}
 	}

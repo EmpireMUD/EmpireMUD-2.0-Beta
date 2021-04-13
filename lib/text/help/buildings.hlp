@@ -1163,16 +1163,21 @@ you can designate extra rooms and interlink with other buildings.
 
 See also: DESIGNATE, INTERLINK
 #
-TRAPPERSPOST "TRAPPERS POST" "TRAPPING POST" "TRAPPER'S POST"
+TRAPPERSPOST "TRAPPERS POST" "TRAPPING POST" "TRAPPER'S POST" "TRAPPERS' POST" "JUNGLE TRAPPERS POST" "DESERT TRAPPERS POST" "EXOTIC TRAPPERS"
 
 &g^/\^&0  Trapper's Post  (Luxury Resources goal)
+&y.&T/\&y.&0  Desert Trapper's Post  (Exotic Trappers goal)
+&G^/\^&0  Jungle Trapper's Post  (Exotic Trappers goal)
 
 The trapper's post is a place where trappers come to trade their skins. This
 building is required in order for your workforce to gather skins. Trapper's
 Posts become depleted like any other resource, and will refresh at the end of
 the year.
 
-You need Skilled Labor for your workers to work this building.
+Purchasing the Exotic Trappers progress goal will allow you to build trappers
+in the desert and jungle, too.
+
+You need Skilled Labor for your workers to work these buildings.
 
 See also: DEPLETION, WORKFORCE, SKILLED LABOR
 #

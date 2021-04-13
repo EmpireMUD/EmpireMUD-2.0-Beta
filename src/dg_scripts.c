@@ -2004,6 +2004,10 @@ int text_processed(char *field, char *subfield, struct trig_var_data *vd, char *
 		snprintf(str, slen, "%s", p);
 		return TRUE;
 	}
+	else if (!str_cmp(field, "ana")) {                 /* ana or an/a       */
+		snprintf(str, slen, "%s", AN(vd->value));
+		return TRUE;
+	}
 	else if (!str_cmp(field, "char")) {
 		int pos = atoi(NULLSAFE(subfield));
 		if (subfield && strlen(vd->value) > pos) {
@@ -3913,7 +3917,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 				case 'o': {	// char.o*
 					if (!str_cmp(field, "obj_target")) {
 						obj_data *targ;
-						if (subfield && generic_find(subfield, FIND_OBJ_INV | FIND_OBJ_ROOM, c, NULL, &targ, NULL)) {
+						if (subfield && generic_find(subfield, NULL, FIND_OBJ_INV | FIND_OBJ_ROOM, c, NULL, &targ, NULL)) {
 							snprintf(str, slen, "%c%d", UID_CHAR, obj_script_id(targ));
 						}
 						else {
@@ -5068,6 +5072,14 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 				case 'm': {	// room.m*
 					if (!str_cmp(field, "max_citizens")) {
 						snprintf(str, slen, "%d", GET_BUILDING(HOME_ROOM(r)) ? GET_BLD_CITIZENS(GET_BUILDING(HOME_ROOM(r))) : 0);
+					}
+					else if (!str_cmp(field, "mine_type")) {
+						if (get_room_extra_data(r, ROOM_EXTRA_MINE_GLB_VNUM) > 0) {
+							snprintf(str, slen, "%s", get_mine_type_name(r));
+						}
+						else {
+							*str = '\0';
+						}
 					}
 					else if (!str_cmp(field, "moon_phase")) {
 						char arg1[256], arg2[256];

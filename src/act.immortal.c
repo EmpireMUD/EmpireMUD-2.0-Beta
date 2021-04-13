@@ -452,7 +452,7 @@ ADMIN_UTIL(util_approval) {
 
 // util bldconvert <building vnum> <start of new vnums>
 ADMIN_UTIL(util_bldconvert) {
-	char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH];
+	char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH], *remaining_args;
 	any_vnum from_vnum, start_to_vnum, to_vnum = NOTHING;
 	craft_data *from_craft = NULL, *to_craft = NULL;
 	bld_data *from_bld = NULL, *to_bld = NULL;
@@ -476,7 +476,7 @@ ADMIN_UTIL(util_bldconvert) {
 	struct bld_relation *relat;
 	adv_data *adv, *next_adv;
 	obj_data *obj, *next_obj;
-	bool any;
+	bool any, add_force = FALSE;
 	
 	// stuff to copy
 	bitvector_t functions = NOBITS, designate = NOBITS, room_affs = NOBITS;
@@ -493,7 +493,8 @@ ADMIN_UTIL(util_bldconvert) {
 		return;
 	}
 	
-	two_arguments(argument, arg1, arg2);
+	remaining_args = two_arguments(argument, arg1, arg2);
+	skip_spaces(&remaining_args);
 	
 	// basic args
 	if (!*arg1 || !*arg2 || !isdigit(*arg1) || !isdigit(*arg2)) {
@@ -547,9 +548,21 @@ ADMIN_UTIL(util_bldconvert) {
 		return;
 	}
 	
+	// any additional args?
+	if (!str_cmp(remaining_args, "force") || !str_cmp(remaining_args, "-force")) {
+		add_force = TRUE;
+	}
+	else if (*remaining_args) {
+		msg_to_char(ch, "Unknown argument(s): %s\r\n", remaining_args);
+		return;
+	}
+	
 	// check olc access
 	if (!can_start_olc_edit(ch, OLC_VEHICLE, to_vnum) || (from_craft && !can_start_olc_edit(ch, OLC_CRAFT, to_vnum)) || (!BLD_FLAGGED(from_bld, BLD_OPEN) && !can_start_olc_edit(ch, OLC_BUILDING, to_vnum))) {
 		return;	// sends own message
+	}
+	if (add_force && !can_start_olc_edit(ch, OLC_BUILDING, GET_BLD_VNUM(from_bld))) {
+		return; // sends own message
 	}
 	
 	msg_to_char(ch, "Creating new building-vehicle %d from building %d %s%s%s:\r\n", to_vnum, from_vnum, GET_BLD_NAME(from_bld), from_craft ? ", with craft" : "", !BLD_FLAGGED(from_bld, BLD_OPEN) ? ", with interior" : "");
@@ -680,17 +693,11 @@ ADMIN_UTIL(util_bldconvert) {
 		strtolower(VEH_KEYWORDS(to_veh));
 		
 		// build short desc
-		if (VEH_SHORT_DESC(to_veh)) {
-			free(VEH_SHORT_DESC(to_veh));
-		}
 		snprintf(buf, sizeof(buf), "%s %s", AN(GET_BLD_NAME(from_bld)), GET_BLD_NAME(from_bld));
 		strtolower(buf);
 		set_vehicle_short_desc(to_veh, buf);
 		
 		// build long desc
-		if (VEH_LONG_DESC(to_veh)) {
-			free(VEH_LONG_DESC(to_veh));
-		}
 		snprintf(buf, sizeof(buf), "%s %s is here.", AN(GET_BLD_NAME(from_bld)), GET_BLD_NAME(from_bld));
 		strtolower(buf);
 		set_vehicle_long_desc(to_veh, CAP(buf));
@@ -821,6 +828,23 @@ ADMIN_UTIL(util_bldconvert) {
 		save_olc_craft(ch->desc);
 		free_craft(GET_OLC_CRAFT(ch->desc));
 		GET_OLC_CRAFT(ch->desc) = NULL;
+	}
+	
+	// force-upgrade?
+	if (add_force) {
+		GET_OLC_TYPE(ch->desc) = OLC_BUILDING;
+		GET_OLC_BUILDING(ch->desc) = setup_olc_building(from_bld);
+		GET_OLC_VNUM(ch->desc) = from_vnum;
+		
+		CREATE(new_rel, struct bld_relation, 1);
+		new_rel->type = BLD_REL_FORCE_UPGRADE_VEH;
+		new_rel->vnum = to_vnum;
+		LL_APPEND(GET_BLD_RELATIONS(GET_OLC_BUILDING(ch->desc)), new_rel);
+		
+		// and save it
+		save_olc_building(ch->desc);
+		free_building(GET_OLC_BUILDING(ch->desc));
+		GET_OLC_BUILDING(ch->desc) = NULL;
 	}
 	
 	// and clean up
@@ -7760,7 +7784,7 @@ ACMD(do_autostore) {
 		msg_to_char(ch, "Nobody owns this spot. Use purge instead.\r\n");
 	}
 	else if (*arg) {
-		generic_find(arg, FIND_OBJ_ROOM | FIND_VEHICLE_ROOM | FIND_VEHICLE_INSIDE, ch, NULL, &obj, &veh);
+		generic_find(arg, NULL, FIND_OBJ_ROOM | FIND_VEHICLE_ROOM | FIND_VEHICLE_INSIDE, ch, NULL, &obj, &veh);
 		
 		if (obj) {
 			act("$n auto-stores $p.", FALSE, ch, obj, NULL, TO_ROOM | DG_NO_TRIG);
@@ -8034,7 +8058,7 @@ ACMD(do_echo) {
 			*end = '\0';
 		}
 		len = strlen(lbuf);
-		generic_find(lbuf, FIND_OBJ_INV | FIND_OBJ_ROOM | FIND_OBJ_EQUIP, ch, &tmp_char, &obj, &tmp_veh);
+		generic_find(lbuf, NULL, FIND_OBJ_INV | FIND_OBJ_ROOM | FIND_OBJ_EQUIP, ch, &tmp_char, &obj, &tmp_veh);
 		
 		if (obj) {
 			// replace with $p
@@ -9542,7 +9566,7 @@ ACMD(do_rescale) {
 	else if (level < 0) {
 		msg_to_char(ch, "Invalid level.\r\n");
 	}
-	else if (!generic_find(arg, FIND_CHAR_ROOM | FIND_OBJ_INV | FIND_OBJ_ROOM | FIND_VEHICLE_ROOM, ch, &vict, &obj, &veh)) {
+	else if (!generic_find(arg, NULL, FIND_CHAR_ROOM | FIND_OBJ_INV | FIND_OBJ_ROOM | FIND_VEHICLE_ROOM, ch, &vict, &obj, &veh)) {
 		msg_to_char(ch, "You don't see %s %s here.\r\n", AN(arg), arg);
 	}
 	else if (vict) {
@@ -9615,7 +9639,7 @@ ACMD(do_restore) {
 		send_to_char("Whom do you wish to restore?\r\n", ch);
 		return;
 	}
-	if (!generic_find(name_arg, FIND_CHAR_ROOM | FIND_CHAR_WORLD | FIND_VEHICLE_ROOM | FIND_VEHICLE_INSIDE | FIND_VEHICLE_WORLD, ch, &vict, NULL, &veh)) {
+	if (!generic_find(name_arg, NULL, FIND_CHAR_ROOM | FIND_CHAR_WORLD | FIND_VEHICLE_ROOM | FIND_VEHICLE_INSIDE | FIND_VEHICLE_WORLD, ch, &vict, NULL, &veh)) {
 		send_config_msg(ch, "no_person");
 		return;
 	}
@@ -10562,7 +10586,7 @@ ACMD(do_unbind) {
 	if (!*arg) {
 		msg_to_char(ch, "Unbind which object?\r\n");
 	}
-	else if (!generic_find(arg, FIND_OBJ_INV | FIND_OBJ_ROOM, ch, NULL, &obj, NULL)) {
+	else if (!generic_find(arg, NULL, FIND_OBJ_INV | FIND_OBJ_ROOM, ch, NULL, &obj, NULL)) {
 		msg_to_char(ch, "Unable to find '%s'.\r\n", argument);
 	}
 	else if (!OBJ_BOUND_TO(obj)) {

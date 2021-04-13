@@ -3064,6 +3064,8 @@ const char *bld_relationship_types[] = {
 	"STORES-LIKE-BLD",
 	"STORES-LIKE-VEH",
 	"UPGRADES-TO-VEH",
+	"FORCE-UPGRADE-BLD",
+	"FORCE-UPGRADE-VEH",
 	"\n"
 };
 
@@ -3074,6 +3076,8 @@ const int bld_relationship_vnum_types[] = {
 	TYPE_BLD,	// "STORES-LIKE-BLD",
 	TYPE_VEH,	// "STORES-LIKE-VEH",
 	TYPE_VEH,	// "UPGRADES-TO-VEH",
+	TYPE_BLD,	// "FORCE-UPGRADE-BLD",
+	TYPE_VEH,	// "FORCE-UPGRADE-VEH",
 };
 
 

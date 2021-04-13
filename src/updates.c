@@ -1911,6 +1911,79 @@ PLAYER_UPDATE_FUNC(b5_121_update_players) {
 }
 
 
+// this is needed for update_learned_recipes
+int (*updatable_recipe_list)[][2] = NULL;
+
+
+// warning: call this ONLY inside updatE_learned_recipes
+PLAYER_UPDATE_FUNC(update_learned_recipes_player) {
+	struct player_craft_data *pcd;
+	int iter, vnum;
+	
+	if (!updatable_recipe_list) {
+		return;
+	}
+	
+	for (iter = 0; (*updatable_recipe_list)[iter][0] != -1; ++iter) {
+		vnum = (*updatable_recipe_list)[iter][0];
+		HASH_FIND_INT(GET_LEARNED_CRAFTS(ch), &vnum, pcd);
+		if (pcd) {
+			HASH_DEL(GET_LEARNED_CRAFTS(ch), pcd);
+			pcd->vnum = (*updatable_recipe_list)[iter][1];
+			HASH_ADD_INT(GET_LEARNED_CRAFTS(ch), vnum, pcd);
+		}
+	}
+}
+
+
+/**
+* Swaps one learned recipe for another, e.g. for building upgrades.
+* This updates:
+* - empire learned
+* - player learned
+*
+* @param int (*list)[][2] an array of int pairs { from-vnum, to-vnum } which MUST end with { -1, -1 }
+*/
+void update_learned_recipes(int (*list)[][2]) {
+	struct player_craft_data *pcd;
+	empire_data *emp, *next_emp;
+	int iter, vnum;
+	
+	if (!list || !*list) {
+		return;
+	}
+	
+	HASH_ITER(hh, empire_table, emp, next_emp) {
+		for (iter = 0; (*list)[iter][0] != -1; ++iter) {
+			vnum = (*list)[iter][0];
+			HASH_FIND_INT(EMPIRE_LEARNED_CRAFTS(emp), &vnum, pcd);
+			if (pcd) {
+				HASH_DEL(EMPIRE_LEARNED_CRAFTS(emp), pcd);
+				pcd->vnum = (*list)[iter][1];
+				HASH_ADD_INT(EMPIRE_LEARNED_CRAFTS(emp), vnum, pcd);
+				EMPIRE_NEEDS_SAVE(emp) = TRUE;
+			}
+		}
+	}
+	
+	// store to global
+	updatable_recipe_list = list;
+	update_all_players(NULL, update_learned_recipes_player);
+}
+
+
+// b5.128: swap out learned recipes
+void b5_128_learned_update(void) {
+	// update list
+	static int list[][2] = {
+		{ 5161, 5300 },
+		{ -1, -1 }
+	};
+	
+	update_learned_recipes(&list);
+}
+
+
  //////////////////////////////////////////////////////////////////////////////
 //// UPDATE DATA /////////////////////////////////////////////////////////////
 
@@ -1967,6 +2040,7 @@ const struct {
 	{ "b5.119", b5_119_repair_heights, NULL, "Repairing tiles that shouldn't have heights" },
 	{ "b5.120", b5_120_resave_world, NULL, "Resaving whole world to clear junk files" },
 	{ "b5.121", NULL, b5_121_update_players, "Adding default informative flags" },
+	{ "b5.128", b5_128_learned_update, NULL, "Updated learned crafts for trappers posts" },
 	
 	{ "\n", NULL, NULL, "\n" }	// must be last
 };
