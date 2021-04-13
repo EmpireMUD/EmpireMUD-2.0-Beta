@@ -1499,7 +1499,7 @@ bool start_upgrade(char_data *ch, craft_data *upgrade_craft, room_data *from_roo
 	// for moving data
 	int private_owner = NOBODY, dedicated_to = 0;
 	struct depletion_data *depletion = NULL;
-	struct resource_data *built_with = NULL;
+	struct resource_data *needs_res = NULL, *built_with = NULL;
 	bool bright_paint = FALSE;
 	int paint_color = 0;
 	
@@ -1601,6 +1601,11 @@ bool start_upgrade(char_data *ch, craft_data *upgrade_craft, room_data *from_roo
 		built_with = GET_BUILT_WITH(from_room);
 		GET_BUILT_WITH(from_room) = NULL;
 		
+		if (BUILDING_RESOURCES(from_room)) {
+			needs_res = BUILDING_RESOURCES(from_room);
+			GET_BUILDING_RESOURCES(from_room) = NULL;
+		}
+		
 		depletion = ROOM_DEPLETION(from_room);
 		ROOM_DEPLETION(from_room) = NULL;
 		
@@ -1639,6 +1644,9 @@ bool start_upgrade(char_data *ch, craft_data *upgrade_craft, room_data *from_roo
 		// store some data
 		built_with = VEH_BUILT_WITH(from_veh);
 		VEH_BUILT_WITH(from_veh) = NULL;
+		
+		needs_res = VEH_NEEDS_RESOURCES(from_veh);
+		VEH_NEEDS_RESOURCES(from_veh) = NULL;
 		
 		depletion = VEH_DEPLETION(from_veh);
 		VEH_DEPLETION(from_veh) = NULL;
@@ -1744,9 +1752,9 @@ bool start_upgrade(char_data *ch, craft_data *upgrade_craft, room_data *from_roo
 		else if (original_builder > 0) {
 			set_room_extra_data(in_room, ROOM_EXTRA_ORIGINAL_BUILDER, original_builder);
 		}
-		// TODO preserve any needed-resources
 		if (upgrade_craft) {
-			GET_BUILDING_RESOURCES(in_room) = copy_resource_list(GET_CRAFT_RESOURCES(upgrade_craft));
+			GET_BUILDING_RESOURCES(in_room) = combine_resources(needs_res, GET_CRAFT_RESOURCES(upgrade_craft));
+			free_resource_list(needs_res);
 		}
 		SET_BIT(ROOM_BASE_FLAGS(in_room), ROOM_AFF_INCOMPLETE);
 		affect_total_room(in_room);	// do this right away to ensure incomplete flag
@@ -1919,9 +1927,9 @@ bool start_upgrade(char_data *ch, craft_data *upgrade_craft, room_data *from_roo
 	
 		// additional setup
 		special_vehicle_setup(ch, new_veh);
-		// TODO: preserve any needed-resources
 		if (upgrade_craft) {
-			VEH_NEEDS_RESOURCES(new_veh) = copy_resource_list(GET_CRAFT_RESOURCES(upgrade_craft));
+			VEH_NEEDS_RESOURCES(new_veh) = combine_resources(needs_res, GET_CRAFT_RESOURCES(upgrade_craft));
+			free_resource_list(needs_res);
 		}
 		VEH_HEALTH(new_veh) = MAX(1, VEH_MAX_HEALTH(new_veh) * 0.2);	// start at 20% health, will heal on completion
 		if (ch) {
