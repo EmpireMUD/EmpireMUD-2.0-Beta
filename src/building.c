@@ -1756,6 +1756,9 @@ bool start_upgrade(char_data *ch, craft_data *upgrade_craft, room_data *from_roo
 			GET_BUILDING_RESOURCES(in_room) = combine_resources(needs_res, GET_CRAFT_RESOURCES(upgrade_craft));
 			free_resource_list(needs_res);
 		}
+		else {
+			GET_BUILDING_RESOURCES(in_room) = needs_res;
+		}
 		SET_BIT(ROOM_BASE_FLAGS(in_room), ROOM_AFF_INCOMPLETE);
 		affect_total_room(in_room);	// do this right away to ensure incomplete flag
 		
@@ -1930,6 +1933,9 @@ bool start_upgrade(char_data *ch, craft_data *upgrade_craft, room_data *from_roo
 		if (upgrade_craft) {
 			VEH_NEEDS_RESOURCES(new_veh) = combine_resources(needs_res, GET_CRAFT_RESOURCES(upgrade_craft));
 			free_resource_list(needs_res);
+		}
+		else {
+			VEH_NEEDS_RESOURCES(new_veh) = needs_res;
 		}
 		VEH_HEALTH(new_veh) = MAX(1, VEH_MAX_HEALTH(new_veh) * 0.2);	// start at 20% health, will heal on completion
 		if (ch) {
