@@ -62,13 +62,13 @@ Luxury Resources~
    Your empire can now build trapper's posts for skins and herb gardens for
 rare herbs.
 ~
-4 2 50 0 b
-K 2 5161
+5 2 50 0 b
 K 2 5177
 K 2 5178
 K 2 5179
 K 2 5180
 K 2 5181
+K 2 5300
 P 2019
 S
 #2907
@@ -139,5 +139,18 @@ see which tiles they have prospected.
 2 2 70 0 b
 K 0 12
 P 2911
+S
+#2914
+Exotic Trappers~
+   Expand your trappers to the deserts and jungles. Your workforce will collect
+snakeskins and furs in these exotic environments. Expanding your network of
+trappers also lets you control a little more territory.
+~
+2 2 40 0 b
+K 2 5301
+K 2 5302
+K 7 15
+P 2904
+P 2906
 S
 $
