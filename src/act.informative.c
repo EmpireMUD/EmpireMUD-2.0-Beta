@@ -311,7 +311,7 @@ int sort_chart_hash(struct chart_territory *a, struct chart_territory *b) {
 */
 void look_at_target(char_data *ch, char *arg, char *more_args) {
 	char targ_arg[MAX_INPUT_LENGTH];
-	int bits, found = FALSE, j, fnum;
+	int found = FALSE, j, fnum;
 	char_data *found_char = NULL;
 	obj_data *obj, *found_obj = NULL;
 	vehicle_data *veh, *found_veh = NULL;
@@ -334,7 +334,7 @@ void look_at_target(char_data *ch, char *arg, char *more_args) {
 	}
 	
 	fnum = get_number(&arg);
-	bits = generic_find(arg, &fnum, inv_only ? FIND_OBJ_INV : (FIND_OBJ_INV | FIND_OBJ_ROOM | FIND_OBJ_EQUIP | FIND_CHAR_ROOM | FIND_VEHICLE_ROOM | FIND_VEHICLE_INSIDE), ch, &found_char, &found_obj, &found_veh);
+	generic_find(arg, &fnum, inv_only ? FIND_OBJ_INV : (FIND_OBJ_INV | FIND_OBJ_ROOM | FIND_OBJ_EQUIP | FIND_CHAR_ROOM | FIND_VEHICLE_ROOM | FIND_VEHICLE_INSIDE), ch, &found_char, &found_obj, &found_veh);
 
 	/* Is the target a character? */
 	if (found_char != NULL) {
@@ -352,6 +352,15 @@ void look_at_target(char_data *ch, char *arg, char *more_args) {
 	if (found_veh != NULL) {
 		look_at_vehicle(found_veh, ch);
 		act("$n looks at $V.", TRUE, ch, NULL, found_veh, TO_ROOM);
+		return;
+	}
+	
+	// was it an object?
+	if (found_obj != NULL) {
+		if (ch->desc) {
+			page_string(ch->desc, obj_desc_for_char(found_obj, ch, OBJ_DESC_LOOK_AT), TRUE);	/* Show no-description */
+		}
+		act("$n looks at $p.", TRUE, ch, found_obj, NULL, TO_ROOM);
 		return;
 	}
 
@@ -437,16 +446,7 @@ void look_at_target(char_data *ch, char *arg, char *more_args) {
 		found = TRUE;
 	}
 	
-	/* If an object was found back in generic_find */
-	if (bits) {
-		if (!found) {
-			if (ch->desc) {
-				page_string(ch->desc, obj_desc_for_char(found_obj, ch, OBJ_DESC_LOOK_AT), TRUE);	/* Show no-description */
-			}
-			act("$n looks at $p.", TRUE, ch, found_obj, NULL, TO_ROOM);
-		}
-	}
-	else if (!found) {
+	if (!found) {
 		send_to_char("You do not see that here.\r\n", ch);
 	}
 }
