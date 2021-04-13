@@ -354,6 +354,15 @@ void look_at_target(char_data *ch, char *arg, char *more_args) {
 		act("$n looks at $V.", TRUE, ch, NULL, found_veh, TO_ROOM);
 		return;
 	}
+	
+	// was it an object?
+	if (found_obj != NULL) {
+		if (ch->desc) {
+			page_string(ch->desc, obj_desc_for_char(found_obj, ch, OBJ_DESC_LOOK_AT), TRUE);	/* Show no-description */
+		}
+		act("$n looks at $p.", TRUE, ch, found_obj, NULL, TO_ROOM);
+		return;
+	}
 
 	// are we at 0.name?
 	if (fnum <= 0) {
@@ -437,16 +446,7 @@ void look_at_target(char_data *ch, char *arg, char *more_args) {
 		found = TRUE;
 	}
 	
-	/* If an object was found back in generic_find */
-	if (bits) {
-		if (!found) {
-			if (ch->desc) {
-				page_string(ch->desc, obj_desc_for_char(found_obj, ch, OBJ_DESC_LOOK_AT), TRUE);	/* Show no-description */
-			}
-			act("$n looks at $p.", TRUE, ch, found_obj, NULL, TO_ROOM);
-		}
-	}
-	else if (!found) {
+	if (!found) {
 		send_to_char("You do not see that here.\r\n", ch);
 	}
 }
