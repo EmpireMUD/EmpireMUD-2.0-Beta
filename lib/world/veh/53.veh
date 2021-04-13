@@ -13,7 +13,7 @@ hmuwF 19 10 0 0 G 0 0 4 w
 I 30 5006 100.00 1 r  # RUINS-TO-VEH: ruins of #n
 I 32 1350 3.00 25 s  # SKILLED-LABOR: small skin
 I 32 1351 3.00 25 s  # SKILLED-LABOR: large skin
-L jq 0
+L q 0
 M
 9194 5.00 c
 M
@@ -61,13 +61,13 @@ sides of the trees, up off of the overgrown jungle floor. The only part of the
 post at ground level is the fire pit.
 ~
 @.&G/\@.~
-hmuwF 19 10 0 0 G 0 0 4 w
+hmuwFK 19 10 0 0 G 0 0 4 w
 I 30 5006 100.00 1 r  # RUINS-TO-VEH: ruins of #n
 I 32 1350 3.00 25 s  # SKILLED-LABOR: small skin
 I 32 1351 3.00 25 s  # SKILLED-LABOR: large skin
 I 32 1355 1.00 25 s  # SKILLED-LABOR: snakeskin
 I 32 1353 1.00 25 s  # SKILLED-LABOR: big cat pelt
-L lq 0
+L q 0
 M
 9194 5.00 c
 M
