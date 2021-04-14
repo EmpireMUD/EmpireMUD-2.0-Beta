@@ -2248,13 +2248,16 @@ void save_char(char_data *ch, room_data *load_room) {
 	
 	// update load room if they aren't flagged for a static one
 	if (!PLR_FLAGGED(ch, PLR_LOADROOM)) {
-		if (load_room) {
+		if (!load_room) {
+			GET_LOADROOM(ch) = NOWHERE;
+		}
+		else if (IN_ROOM(ch) || GET_LOADROOM(ch) != GET_ROOM_VNUM(load_room)) {
 			GET_LOADROOM(ch) = GET_ROOM_VNUM(load_room);
 			map = GET_MAP_LOC(load_room);
 			GET_LOAD_ROOM_CHECK(ch) = (map ? map->vnum : NOWHERE);
 		}
 		else {
-			GET_LOADROOM(ch) = NOWHERE;
+			// preserve old loadroom/check data
 		}
 	}
 	
