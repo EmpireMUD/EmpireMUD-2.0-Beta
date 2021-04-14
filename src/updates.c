@@ -1924,6 +1924,8 @@ PLAYER_UPDATE_FUNC(update_learned_recipes_player) {
 		return;
 	}
 	
+	check_delayed_load(ch);
+	
 	for (iter = 0; (*updatable_recipe_list)[iter][0] != -1; ++iter) {
 		vnum = (*updatable_recipe_list)[iter][0];
 		HASH_FIND_INT(GET_LEARNED_CRAFTS(ch), &vnum, pcd);

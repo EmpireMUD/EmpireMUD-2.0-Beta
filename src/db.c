@@ -412,6 +412,9 @@ void boot_db(void) {
 	// this loads objs and mobs back into the world
 	log("Resetting all rooms.");
 	startup_room_reset();
+	
+	log("Linking and checking vehicles.");
+	link_and_check_vehicles();
 
 	// NOTE: check_version() updates many things that change from version to
 	// version. See the function itself for a list of one-time updates it runs
@@ -428,9 +431,6 @@ void boot_db(void) {
 	
 	log("Checking for orphaned rooms...");
 	delete_orphaned_rooms();
-	
-	log("Linking and checking vehicles.");
-	link_and_check_vehicles();
 	
 	log("Building quest lookup hints.");
 	build_all_quest_lookups();
