@@ -1272,7 +1272,7 @@ void show_workforce_why(empire_data *emp, char_data *ch, char *argument) {
 	struct workforce_log *wf_log;
 	room_vnum only_loc = NOWHERE;
 	bool any = FALSE;
-	room_data *only_room = NULL;
+	room_data *room, *only_room = NULL;
 	size_t size;
 	
 	if (!ch->desc) {
@@ -1333,6 +1333,9 @@ void show_workforce_why(empire_data *emp, char_data *ch, char *argument) {
 			if (only_chore != NOTHING && only_chore != wf_log->chore) {
 				continue;	// wrong chore
 			}
+			if (!(room = real_room(wf_log->loc))) {
+				continue;	// room is gone now
+			}
 			
 			// ok, show it:
 			if (wf_log->count > 1) {
@@ -1343,7 +1346,7 @@ void show_workforce_why(empire_data *emp, char_data *ch, char *argument) {
 			}
 			
 			if (only_chore != NOTHING) {
-				 snprintf(rname, sizeof(rname), "%s: ", skip_filler(get_room_name(real_room(wf_log->loc), FALSE)));
+				 snprintf(rname, sizeof(rname), "%s: ", skip_filler(get_room_name(room, FALSE)));
 			}
 			else {
 				*rname = '\0';
