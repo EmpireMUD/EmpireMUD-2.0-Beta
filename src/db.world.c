@@ -5354,7 +5354,7 @@ void write_graphical_map_data(struct map_data *map, FILE *map_fl, FILE *pol_fl) 
 	else {
 		// no owner -- only some sects get printed
 		if (IS_SET(map->shared->affects, ROOM_AFF_MAPOUT_BUILDING)) {
-			fputc('s', map_fl);
+			fputc('s', pol_fl);
 		}
 		else if (SECT_FLAGGED(sect, SECTF_SHOW_ON_POLITICAL_MAPOUT)) {
 			fputc(mapout_color_tokens[GET_SECT_MAPOUT(sect)], pol_fl);
