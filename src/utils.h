@@ -2471,6 +2471,7 @@ int *get_ordered_chores();
 void log_workforce_where(empire_data *emp, char_data *mob, int chore);
 void remove_from_workforce_where_log(empire_data *emp, char_data *mob);
 void set_workforce_production_limit(empire_data *emp, any_vnum vnum, int amount);
+void sort_einv_for_empire(empire_data *emp);
 
 
  //////////////////////////////////////////////////////////////////////////////

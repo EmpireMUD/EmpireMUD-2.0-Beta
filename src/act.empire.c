@@ -4540,6 +4540,9 @@ ACMD(do_empire_inventory) {
 		}
 	}
 	if (emp) {
+		// sort to get predictable order
+		sort_einv_for_empire(emp);
+		
 		if ( subcmd == SCMD_EINVENTORY ) {
 			show_empire_inventory_to_char(ch, emp, arg2);
 		} else {
@@ -7332,6 +7335,9 @@ ACMD(do_workforce) {
 			msg_to_char(ch, "Keep (or unkeep) which stored item?\r\n");
 			return;
 		}
+		
+		// sort to ensure predictable order
+		sort_einv_for_empire(emp);
 		
 		found = FALSE;
 		HASH_ITER(hh, eisle->store, store, next_store) {
