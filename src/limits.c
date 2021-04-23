@@ -1813,7 +1813,7 @@ void real_update_obj(obj_data *obj) {
 	}
 	
 	// point-update if it's my turn
-	if ((GET_OBJ_VNUM(obj) % REAL_UPDATES_PER_MUD_HOUR) == point_update_cycle) {
+	if ((ABSOLUTE(GET_OBJ_VNUM(obj)) % REAL_UPDATES_PER_MUD_HOUR) == point_update_cycle) {
 		point_update_obj(obj);
 	}
 }
