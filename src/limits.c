@@ -926,7 +926,7 @@ void real_update_char(char_data *ch) {
 	}
 	
 	// mob activity: if we're still here, run half the mobs each time
-	if (IS_NPC(ch) && (GET_MOB_VNUM(ch) % 2) == mobile_activity_cycle) {
+	if (IS_NPC(ch) && (ABSOLUTE(GET_MOB_VNUM(ch)) % 2) == mobile_activity_cycle) {
 		run_mobile_activity(ch);
 	}
 	
