@@ -9035,7 +9035,7 @@ void parse_link_rule(FILE *fl, struct adventure_link_rule **list, char *error_pa
 		log("SYSERR: EOF in link rule line 2 of %s", buf2);
 		exit(1);
 	}
-	if (!get_line(fl, line) || sscanf(line, "%d %d %d %d", &int_in[0], &int_in[1], &int_in[2], &int_in[3]) != 4) {
+	if (sscanf(line, "%d %d %d %d", &int_in[0], &int_in[1], &int_in[2], &int_in[3]) != 4) {
 		int_in[3] = NOTHING;	// backwards-compatible
 		if (sscanf(line, "%d %d %d", &int_in[0], &int_in[1], &int_in[2]) != 3) {
 			log("SYSERR: Format error in link rule line 2 of %s", buf2);
