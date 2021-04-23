@@ -9016,7 +9016,7 @@ void parse_generic_name_file(FILE *fl, char *err_str) {
 void parse_link_rule(FILE *fl, struct adventure_link_rule **list, char *error_part) {
 	char line[MAX_INPUT_LENGTH], str_in[MAX_INPUT_LENGTH], str_in2[MAX_INPUT_LENGTH];
 	struct adventure_link_rule *link;
-	int int_in[3];
+	int int_in[4];
 	
 	CREATE(link, struct adventure_link_rule, 1);
 	LL_APPEND(*list, link);
@@ -9030,15 +9030,23 @@ void parse_link_rule(FILE *fl, struct adventure_link_rule **list, char *error_pa
 	link->type = int_in[0];
 	link->flags = asciiflag_conv(str_in);
 	
-	// line 2: value portal_in portal_out
-	if (!get_line(fl, line) || sscanf(line, "%d %d %d", &int_in[0], &int_in[1], &int_in[2]) != 3) {
-		log("SYSERR: Format error in link rule line 2 of %s", buf2);
+	// line 2: value portal_in portal_out vehicle_vnum
+	if (!get_line(fl, line)) {
+		log("SYSERR: EOF in link rule line 2 of %s", buf2);
 		exit(1);
+	}
+	if (!get_line(fl, line) || sscanf(line, "%d %d %d %d", &int_in[0], &int_in[1], &int_in[2], &int_in[3]) != 4) {
+		int_in[3] = NOTHING;	// backwards-compatible
+		if (sscanf(line, "%d %d %d", &int_in[0], &int_in[1], &int_in[2]) != 3) {
+			log("SYSERR: Format error in link rule line 2 of %s", buf2);
+			exit(1);
+		}
 	}
 	
 	link->value = int_in[0];
 	link->portal_in = int_in[1];
 	link->portal_out = int_in[2];
+	link->vehicle_vnum = int_in[3];
 	
 	// line 3: dir bld_on bld_facing
 	if (!get_line(fl, line) || sscanf(line, "%d %s %s", &int_in[0], str_in, str_in2) != 3) {
@@ -9140,7 +9148,7 @@ void write_linking_rules_to_file(FILE *fl, char letter, struct adventure_link_ru
 	LL_FOREACH(list, link) {
 		fprintf(fl, "%c\n", letter);
 		fprintf(fl, "%d %s\n", link->type, bitv_to_alpha(link->flags));
-		fprintf(fl, "%d %d %d\n", link->value, link->portal_in, link->portal_out);
+		fprintf(fl, "%d %d %d %d\n", link->value, link->portal_in, link->portal_out, link->vehicle_vnum);
 		
 		strcpy(temp, bitv_to_alpha(link->bld_on));
 		strcpy(temp2, bitv_to_alpha(link->bld_facing));

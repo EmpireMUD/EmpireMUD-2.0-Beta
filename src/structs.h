@@ -668,6 +668,16 @@ typedef struct vehicle_data vehicle_data;
 #define ADV_LINK_NOT_NEAR_SELF  6
 #define ADV_LINK_PORTAL_CROP  7
 #define ADV_LINK_EVENT_RUNNING  8
+#define ADV_LINK_PORTAL_VEH_EXISTING  9
+#define ADV_LINK_PORTAL_VEH_NEW_BUILDING_EXISTING  10
+#define ADV_LINK_PORTAL_VEH_NEW_BUILDING_NEW  11
+#define ADV_LINK_PORTAL_VEH_NEW_CROP  12
+#define ADV_LINK_PORTAL_VEH_NEW_WORLD  13
+#define ADV_LINK_IN_VEH_EXISTING  14
+#define ADV_LINK_IN_VEH_NEW_BUILDING_EXISTING  15
+#define ADV_LINK_IN_VEH_NEW_BUILDING_NEW  16
+#define ADV_LINK_IN_VEH_NEW_CROP  17
+#define ADV_LINK_IN_VEH_NEW_WORLD  18
 
 
 // ADV_LINKF_x: adventure link rule flags
@@ -3538,6 +3548,7 @@ struct adventure_link_rule {
 	obj_vnum portal_in, portal_out;	// some types use portals
 	int dir;	// some attachments take a preferred direction
 	bitvector_t bld_on, bld_facing;	// for applying to the map
+	any_vnum vehicle_vnum;	// for rules that use a vehicle
 	
 	struct adventure_link_rule *next;
 };

@@ -278,7 +278,7 @@ bool delete_link_rule_by_type_value(struct adventure_link_rule **list, int type,
 * @param int type ADV_LINK_ type.
 * @param ... All other parameters are pointers to variables to set up based on type.
 */
-void get_advedit_linking_params(int type, int *vnum_type, bool *need_vnum, bool *need_dir, bool *need_buildon, bool *need_buildfacing, bool *need_portalin, bool *need_portalout, bool *need_num, bool *no_rooms, bool *restrict_sect) {
+void get_advedit_linking_params(int type, int *vnum_type, bool *need_vnum, bool *need_dir, bool *need_buildon, bool *need_buildfacing, bool *need_portalin, bool *need_portalout, bool *need_num, bool *no_rooms, bool *restrict_sect, bool *need_veh) {
 	// init
 	*vnum_type = OLC_SECTOR;
 	*need_vnum = FALSE;
@@ -290,6 +290,7 @@ void get_advedit_linking_params(int type, int *vnum_type, bool *need_vnum, bool 
 	*need_num = FALSE;
 	*no_rooms = FALSE;
 	*restrict_sect = FALSE;
+	*need_veh = FALSE;
 	
 	// ADV_LINK_x: needed params depend on type
 	switch (type) {
@@ -351,6 +352,82 @@ void get_advedit_linking_params(int type, int *vnum_type, bool *need_vnum, bool 
 		case ADV_LINK_EVENT_RUNNING: {
 			*need_vnum = TRUE;
 			*vnum_type = OLC_EVENT;
+			break;
+		}
+		
+		// vehicle types:
+		case ADV_LINK_PORTAL_VEH_EXISTING: {
+			*need_veh = TRUE;
+			*need_portalin = TRUE;
+			*need_portalout = TRUE;
+			break;
+		}
+		case ADV_LINK_PORTAL_VEH_NEW_BUILDING_EXISTING: {
+			*need_veh = TRUE;
+			*need_portalin = TRUE;
+			*need_portalout = TRUE;
+			*need_vnum = TRUE;
+			*vnum_type = OLC_BUILDING;
+			break;
+		}
+		case ADV_LINK_PORTAL_VEH_NEW_BUILDING_NEW: {
+			*need_veh = TRUE;
+			*need_portalin = TRUE;
+			*need_portalout = TRUE;
+			*need_vnum = TRUE;
+			*need_buildon = TRUE;
+			*need_buildfacing = TRUE;
+			*no_rooms = TRUE;
+			*vnum_type = OLC_BUILDING;
+			break;
+		}
+		case ADV_LINK_PORTAL_VEH_NEW_CROP: {
+			*need_veh = TRUE;
+			*need_portalin = TRUE;
+			*need_portalout = TRUE;
+			*need_vnum = TRUE;
+			*vnum_type = OLC_CROP;
+			break;
+		}
+		case ADV_LINK_PORTAL_VEH_NEW_WORLD: {
+			*need_veh = TRUE;
+			*need_portalin = TRUE;
+			*need_portalout = TRUE;
+			*need_vnum = TRUE;
+			*vnum_type = OLC_SECTOR;
+			*restrict_sect = TRUE;
+			break;
+		}
+		case ADV_LINK_IN_VEH_EXISTING: {
+			*need_veh = TRUE;
+			break;
+		}
+		case ADV_LINK_IN_VEH_NEW_BUILDING_EXISTING: {
+			*need_veh = TRUE;
+			*need_vnum = TRUE;
+			*vnum_type = OLC_BUILDING;
+			break;
+		}
+		case ADV_LINK_IN_VEH_NEW_BUILDING_NEW: {
+			*need_veh = TRUE;
+			*need_vnum = TRUE;
+			*need_buildon = TRUE;
+			*need_buildfacing = TRUE;
+			*no_rooms = TRUE;
+			*vnum_type = OLC_BUILDING;
+			break;
+		}
+		case ADV_LINK_IN_VEH_NEW_CROP: {
+			*need_veh = TRUE;
+			*need_vnum = TRUE;
+			*vnum_type = OLC_CROP;
+			break;
+		}
+		case ADV_LINK_IN_VEH_NEW_WORLD: {
+			*need_veh = TRUE;
+			*need_vnum = TRUE;
+			*vnum_type = OLC_SECTOR;
+			*restrict_sect = TRUE;
 			break;
 		}
 	}
@@ -576,6 +653,7 @@ void get_adventure_linking_display(struct adventure_link_rule *list, char *save_
 	crop_data *crop;
 	bld_data *bld;
 	int count = 0;
+	size_t size;
 	
 	*save_buffer = '\0';
 	
@@ -648,6 +726,53 @@ void get_adventure_linking_display(struct adventure_link_rule *list, char *save_
 				sprintf(lbuf, "[\tc%d\t0] %s", rule->value, get_event_name_by_proto(rule->value));
 				break;
 			}
+			
+			// vehicle types:
+			case ADV_LINK_PORTAL_VEH_EXISTING:	// drop-thru
+			case ADV_LINK_PORTAL_VEH_NEW_BUILDING_EXISTING:	// drop-thru
+			case ADV_LINK_PORTAL_VEH_NEW_BUILDING_NEW:	// drop-thru
+			case ADV_LINK_PORTAL_VEH_NEW_CROP:	// drop-thru
+			case ADV_LINK_PORTAL_VEH_NEW_WORLD:	// drop-thru
+			case ADV_LINK_IN_VEH_EXISTING:	// drop-thru
+			case ADV_LINK_IN_VEH_NEW_BUILDING_EXISTING:	// drop-thru
+			case ADV_LINK_IN_VEH_NEW_BUILDING_NEW:	// drop-thru
+			case ADV_LINK_IN_VEH_NEW_CROP:	// drop-thru
+			case ADV_LINK_IN_VEH_NEW_WORLD: {
+				size = snprintf(lbuf, sizeof(lbuf), "[\tc%d\t0] %s", rule->vehicle_vnum, get_vehicle_name_by_proto(rule->vehicle_vnum));
+				
+				// has portal
+				if (rule->portal_in != NOTHING) {
+					size += snprintf(lbuf + size, sizeof(lbuf) - size, ", in: [\tc%d\t0] %s", rule->portal_in, skip_filler(get_obj_name_by_proto(rule->portal_in)));
+				}
+				if (rule->portal_out != NOTHING) {
+					size += snprintf(lbuf + size, sizeof(lbuf) - size, ", out: [\tc%d\t0] %s", rule->portal_out, skip_filler(get_obj_name_by_proto(rule->portal_out)));
+				}
+				
+				// has building
+				if (rule->type == ADV_LINK_PORTAL_VEH_NEW_BUILDING_EXISTING || rule->type == ADV_LINK_PORTAL_VEH_NEW_BUILDING_NEW || rule->type == ADV_LINK_IN_VEH_NEW_BUILDING_EXISTING || rule->type == ADV_LINK_IN_VEH_NEW_BUILDING_NEW) {
+					size += snprintf(lbuf + size, sizeof(lbuf) - size, ", in building [\tc%d\t0] %s", rule->value, get_bld_name_by_proto(rule->value));
+					
+					if (rule->bld_on) {
+						size += snprintf(lbuf + size, sizeof(lbuf) - size, ", built on \"%s\"", bon);
+					}
+					if (rule->bld_facing) {
+						size += snprintf(lbuf + size, sizeof(lbuf) - size, ", facing \"%s\"", bfac);
+					}
+				}
+				
+				// has sector
+				if (rule->type == ADV_LINK_PORTAL_VEH_NEW_WORLD || rule->type == ADV_LINK_IN_VEH_NEW_WORLD) {
+					sect = sector_proto(rule->value);
+					size += snprintf(lbuf + size, sizeof(lbuf) - size, "[\tc%d\t0] %s", rule->value, sect ? GET_SECT_NAME(sect) : "UNKNOWN");
+				}
+				
+				// has crop
+				if (rule->type == ADV_LINK_PORTAL_VEH_NEW_CROP || rule->type == ADV_LINK_IN_VEH_NEW_CROP) {
+					crop = crop_proto(rule->value);
+					size += snprintf(lbuf + size, sizeof(lbuf) - size, "[\tc%d\t0] %s", rule->value, crop ? GET_CROP_NAME(crop) : "UNKNOWN");
+				}
+			}
+			
 			default: {
 				*lbuf = '\0';
 				break;
@@ -894,15 +1019,15 @@ OLC_MODULE(advedit_limit) {
 
 // warning: linking rules require highly-customized input
 OLC_MODULE(advedit_linking) {
-	bool need_vnum, need_dir, need_buildon, need_buildfacing, need_portalin, need_portalout, need_num, no_rooms, restrict_sect;
-	char type_arg[MAX_INPUT_LENGTH], vnum_arg[MAX_INPUT_LENGTH], dir_arg[MAX_INPUT_LENGTH], buildon_arg[MAX_INPUT_LENGTH], buildfacing_arg[MAX_INPUT_LENGTH], portalin_arg[MAX_INPUT_LENGTH], portalout_arg[MAX_INPUT_LENGTH], num_arg[MAX_INPUT_LENGTH], val_arg[MAX_INPUT_LENGTH];
+	bool need_vnum, need_dir, need_buildon, need_buildfacing, need_portalin, need_portalout, need_num, no_rooms, restrict_sect, need_veh;
+	char type_arg[MAX_INPUT_LENGTH], vnum_arg[MAX_INPUT_LENGTH], dir_arg[MAX_INPUT_LENGTH], buildon_arg[MAX_INPUT_LENGTH], buildfacing_arg[MAX_INPUT_LENGTH], portalin_arg[MAX_INPUT_LENGTH], portalout_arg[MAX_INPUT_LENGTH], num_arg[MAX_INPUT_LENGTH], val_arg[MAX_INPUT_LENGTH], veh_arg[MAX_INPUT_LENGTH];
 	bitvector_t buildon = NOBITS, buildfacing = NOBITS;
 	char arg1[MAX_INPUT_LENGTH], lbuf[MAX_STRING_LENGTH];
 	struct adventure_link_rule *link, *change;
 	obj_data *portalin = NULL, *portalout = NULL;
 	adv_data *adv = GET_OLC_ADVENTURE(ch->desc);
 	int linktype = 0, dir = NO_DIR, vnum_type;
-	any_vnum value = NOTHING;
+	any_vnum value = NOTHING, veh_vnum = NOTHING;
 	int iter, num;
 	bool found;
 	
@@ -943,7 +1068,7 @@ OLC_MODULE(advedit_linking) {
 	}
 	else if (is_abbrev(arg1, "add")) {
 		// defaults
-		*type_arg = *vnum_arg = *dir_arg = *buildon_arg = *buildfacing_arg = *portalin_arg = *portalout_arg = *num_arg = '\0';
+		*type_arg = *vnum_arg = *dir_arg = *buildon_arg = *buildfacing_arg = *portalin_arg = *portalout_arg = *num_arg = *veh_arg = '\0';
 		
 		// pull out type arg
 		argument = any_one_word(argument, type_arg);
@@ -953,7 +1078,7 @@ OLC_MODULE(advedit_linking) {
 		}
 		
 		// determine params
-		get_advedit_linking_params(linktype, &vnum_type, &need_vnum, &need_dir, &need_buildon, &need_buildfacing, &need_portalin, &need_portalout, &need_num, &no_rooms, &restrict_sect);
+		get_advedit_linking_params(linktype, &vnum_type, &need_vnum, &need_dir, &need_buildon, &need_buildfacing, &need_portalin, &need_portalout, &need_num, &no_rooms, &restrict_sect, &need_veh);
 		
 		// ADV_LINK_x: argument order depends on type
 		switch (linktype) {
@@ -1007,12 +1132,78 @@ OLC_MODULE(advedit_linking) {
 				argument = any_one_word(argument, vnum_arg);
 				break;
 			}
+			
+			// vehicle types:
+			case ADV_LINK_PORTAL_VEH_EXISTING: {
+				argument = any_one_word(argument, veh_arg);
+				argument = any_one_word(argument, portalin_arg);
+				argument = any_one_word(argument, portalout_arg);
+				break;
+			}
+			case ADV_LINK_PORTAL_VEH_NEW_BUILDING_EXISTING: {
+				argument = any_one_word(argument, veh_arg);
+				argument = any_one_word(argument, vnum_arg);
+				argument = any_one_word(argument, portalin_arg);
+				argument = any_one_word(argument, portalout_arg);
+				break;
+			}
+			case ADV_LINK_PORTAL_VEH_NEW_BUILDING_NEW: {
+				argument = any_one_word(argument, veh_arg);
+				argument = any_one_word(argument, vnum_arg);
+				argument = any_one_word(argument, portalin_arg);
+				argument = any_one_word(argument, portalout_arg);
+				argument = any_one_word(argument, buildon_arg);
+				argument = any_one_word(argument, buildfacing_arg);
+				break;
+			}
+			case ADV_LINK_PORTAL_VEH_NEW_CROP: {
+				argument = any_one_word(argument, veh_arg);
+				argument = any_one_word(argument, vnum_arg);
+				argument = any_one_word(argument, portalin_arg);
+				argument = any_one_word(argument, portalout_arg);
+				break;
+			}
+			case ADV_LINK_PORTAL_VEH_NEW_WORLD: {
+				argument = any_one_word(argument, veh_arg);
+				argument = any_one_word(argument, vnum_arg);
+				argument = any_one_word(argument, portalin_arg);
+				argument = any_one_word(argument, portalout_arg);
+				break;
+			}
+			case ADV_LINK_IN_VEH_EXISTING: {
+				argument = any_one_word(argument, veh_arg);
+				break;
+			}
+			case ADV_LINK_IN_VEH_NEW_BUILDING_EXISTING: {
+				argument = any_one_word(argument, veh_arg);
+				argument = any_one_word(argument, vnum_arg);
+				break;
+			}
+			case ADV_LINK_IN_VEH_NEW_BUILDING_NEW: {
+				argument = any_one_word(argument, veh_arg);
+				argument = any_one_word(argument, vnum_arg);
+				argument = any_one_word(argument, buildon_arg);
+				argument = any_one_word(argument, buildfacing_arg);
+				break;
+			}
+			case ADV_LINK_IN_VEH_NEW_CROP: {
+				argument = any_one_word(argument, veh_arg);
+				argument = any_one_word(argument, vnum_arg);
+				break;
+			}
+			case ADV_LINK_IN_VEH_NEW_WORLD: {
+				argument = any_one_word(argument, veh_arg);
+				argument = any_one_word(argument, vnum_arg);
+				break;
+			}
 		}
 		
 		// anything left is flags
 		skip_spaces(&argument);
 		
-		if (need_vnum && !*vnum_arg) {
+		if (need_veh && !*veh_arg) {
+		}
+		else if (need_vnum && !*vnum_arg) {
 			msg_to_char(ch, "You must specify a vnum.\r\n");
 		}
 		else if (need_dir && !*dir_arg) {
@@ -1043,6 +1234,13 @@ OLC_MODULE(advedit_linking) {
 			// BASIC SUCCESS: some additional setup
 			if (need_num) {
 				value = atoi(num_arg);
+			}
+			if (need_veh) {
+				veh_vnum = atoi(veh_arg);
+				if (!vehicle_proto(veh_vnum)) {
+					msg_to_char(ch, "Invalid vehicle vnum '%s'.\r\n", vnum_arg);
+					return;
+				}
 			}
 			if (need_vnum) {
 				value = atoi(vnum_arg);
@@ -1090,9 +1288,13 @@ OLC_MODULE(advedit_linking) {
 			link->dir = dir;
 			link->bld_on = buildon;
 			link->bld_facing = buildfacing;
+			link->vehicle_vnum = veh_vnum;
 			LL_APPEND(GET_ADV_LINKING(adv), link);
 
 			msg_to_char(ch, "You add a linking rule of type: %s\r\n", adventure_link_types[linktype]);
+			if (need_veh) {
+				msg_to_char(ch, " - vehicle: %d %s\r\n", veh_vnum, get_vehicle_name_by_proto(veh_vnum));
+			}
 			if (need_vnum) {
 				msg_to_char(ch, " - vnum: %d\r\n", value);
 			}
@@ -1128,7 +1330,7 @@ OLC_MODULE(advedit_linking) {
 		
 		if (!*num_arg || !isdigit(*num_arg) || !*type_arg) {
 			msg_to_char(ch, "Usage: linking change <number> <field> <value>\r\n");
-			msg_to_char(ch, "Valid fields: vnum, dir, flags, buildon, buildfacing, portalin, portalout, number\r\n");
+			msg_to_char(ch, "Valid fields: vnum, vehicle, dir, flags, buildon, buildfacing, portalin, portalout, number\r\n");
 			return;
 		}
 		
@@ -1148,7 +1350,7 @@ OLC_MODULE(advedit_linking) {
 		}
 		
 		// determine params
-		get_advedit_linking_params(change->type, &vnum_type, &need_vnum, &need_dir, &need_buildon, &need_buildfacing, &need_portalin, &need_portalout, &need_num, &no_rooms, &restrict_sect);
+		get_advedit_linking_params(change->type, &vnum_type, &need_vnum, &need_dir, &need_buildon, &need_buildfacing, &need_portalin, &need_portalout, &need_num, &no_rooms, &restrict_sect, &need_veh);
 		
 		if (is_abbrev(type_arg, "vnum")) {
 			if (!need_vnum) {
@@ -1181,6 +1383,21 @@ OLC_MODULE(advedit_linking) {
 			else {
 				change->value = value;
 				msg_to_char(ch, "Linking rule %d changed to vnum %d.\r\n", atoi(num_arg), value);
+			}
+		}
+		else if (is_abbrev(type_arg, "vehicle")) {
+			if (!need_veh) {
+				msg_to_char(ch, "That link has no vehicle.\r\n");
+			}
+			else if (!*val_arg) {
+				msg_to_char(ch, "Set the vehicle to what vnum?\r\n");
+			}
+			else if (!isdigit(*val_arg) || (value = atoi(val_arg)) < 0 || !vehicle_proto(value)) {
+				msg_to_char(ch, "Invalid vehicle vnum '%s'.\r\n", val_arg);
+			}
+			else {
+				change->vehicle_vnum = value;
+				msg_to_char(ch, "Linking rule %d changed to vehicle %d %s.\r\n", atoi(num_arg), value, get_vehicle_name_by_proto(value));
 			}
 		}
 		else if (is_abbrev(type_arg, "direction")) {
