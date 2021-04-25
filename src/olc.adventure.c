@@ -771,6 +771,7 @@ void get_adventure_linking_display(struct adventure_link_rule *list, char *save_
 					crop = crop_proto(rule->value);
 					size += snprintf(lbuf + size, sizeof(lbuf) - size, "[\tc%d\t0] %s", rule->value, crop ? GET_CROP_NAME(crop) : "UNKNOWN");
 				}
+				break;
 			}
 			
 			default: {
