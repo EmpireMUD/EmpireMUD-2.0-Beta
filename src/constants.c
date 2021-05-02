@@ -4588,6 +4588,8 @@ const char *vehicle_flags[] = {
 	"RUIN-SLOWLY-FROM-CLIMATE",	// 35
 	"RUIN-QUICKLY-FROM-CLIMATE",
 	"OBSCURE-VISION",
+	"*INSTANCE",
+	"*TEMPORARY",
 	"\n"
 };
 
@@ -4632,6 +4634,8 @@ const char *identify_vehicle_flags[] = {
 	"",	// RUIN-SLOWLY-FROM-CLIMATE	// 35
 	"",	// RUIN-QUICKLY-FROM-CLIMATE
 	"",	// OBSCURE-VISION
+	"",	// *INSTANCE
+	"",	// *TEMPORARY
 	"\n"
 };
 

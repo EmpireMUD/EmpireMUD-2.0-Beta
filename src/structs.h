@@ -2597,6 +2597,9 @@ typedef enum {
 #define VEH_RUIN_SLOWLY_FROM_CLIMATE  BIT(35)	// J. always ruins slowly no matter what climate
 #define VEH_RUIN_QUICKLY_FROM_CLIMATE  BIT(36)	// K. always ruins quickly no matter what climate
 #define VEH_OBSCURE_VISION  BIT(37)	// L. blocks tiles behind it on the map
+#define VEH_HAS_INSTANCE  BIT(38)	// M. instance is attached to vehicle
+#define VEH_TEMPORARY  BIT(39)	// N. vehicle will be removed when instance ends
+
 
 // VEH_CUSTOM_x: custom message types
 #define VEH_CUSTOM_RUINS_TO_ROOM  0	// sent when the building falls into ruin
@@ -2613,7 +2616,7 @@ typedef enum {
 // The following vehicle flags are saved to file rather than read from the
 // prototype. Flags which are NOT included in this list can be altered with
 // OLC and affect live copies.
-#define SAVABLE_VEH_FLAGS  (VEH_INCOMPLETE | VEH_ON_FIRE | VEH_PLAYER_NO_DISMANTLE | VEH_PLAYER_NO_WORK | VEH_DISMANTLING | VEH_CHAMELEON | VEH_BRIGHT_PAINT)
+#define SAVABLE_VEH_FLAGS  (VEH_INCOMPLETE | VEH_ON_FIRE | VEH_PLAYER_NO_DISMANTLE | VEH_PLAYER_NO_WORK | VEH_DISMANTLING | VEH_CHAMELEON | VEH_BRIGHT_PAINT | VEH_HAS_INSTANCE | VEH_TEMPORARY)
 
 // The following vehicle flags indicate a vehicle can move
 #define MOVABLE_VEH_FLAGS  (VEH_DRIVING | VEH_SAILING | VEH_FLYING | VEH_DRAGGABLE | VEH_CAN_PORTAL | VEH_LEADABLE)
