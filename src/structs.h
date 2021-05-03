@@ -1092,7 +1092,7 @@ typedef struct vehicle_data vehicle_data;
 #define CRAFT_POTTERY  BIT(0)  // bonus at pottery; requires fire
 #define CRAFT_BUILDING  BIT(1)  // makes a building (on any craft type; BUILD type automatically counts as this)
 #define CRAFT_SKILLED_LABOR  BIT(2)  // workforce can only produce this if the empire has skilled labor
-	#define CRAFT_UNUSED1  BIT(3)  // formerly glassblower (which now uses a function)
+#define CRAFT_SKIP_CONSUMES_TO  BIT(3)  // won't run the consumes-to interaction on components (e.g. keep the jar from paint when mixing it into a new paint)
 	#define CRAFT_UNUSED2  BIT(4)  // formerly carpenter (now using function)
 	#define CRAFT_UNUSED3  BIT(5)  // formerly alchemist (which ultimately was the same as FIRE)
 	#define CRAFT_UNUSED  BIT(6)  // formerly sharp-tool/knife (now uses requires-tool)

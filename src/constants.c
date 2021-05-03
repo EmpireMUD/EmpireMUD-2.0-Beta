@@ -1689,7 +1689,7 @@ const char *craft_flags[] = {
 	"POTTERY",
 	"BUILDING",
 	"SKILLED-LABOR",
-	"*",	// formerly glassblower (now uses a function)
+	"SKIP-CONSUMES-TO",
 	"*",	// formerly carpenter (now uses a function)
 	"*",	// formerly alchemy (identical to FIRE)
 	"*",	// formerly sharp-tool
@@ -1715,7 +1715,7 @@ const char *craft_flag_for_info[] = {
 	"pottery",
 	"",	// building
 	"",	// skilled labor
-	"",
+	"",	// skip-consumes-to
 	"",
 	"",
 	"",
