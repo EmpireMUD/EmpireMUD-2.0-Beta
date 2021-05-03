@@ -190,7 +190,7 @@ bool audit_object(obj_data *obj, char_data *ch) {
 			half_chop(temp, temp2, temp3);
 			strcpy(temp, temp3);
 			
-			if (!isname(temp, GET_OBJ_KEYWORDS(obj_iter))) {
+			if (!isname(temp2, GET_OBJ_KEYWORDS(obj_iter))) {
 				found = TRUE;	// keyword doesn't match
 			}
 		}
