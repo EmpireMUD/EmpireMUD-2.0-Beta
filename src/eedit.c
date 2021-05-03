@@ -609,16 +609,19 @@ EEDIT(eedit_name) {
 		msg_to_char(ch, "Invalid empire name.\r\n");
 	}
 	else {
+		// full name
 		strcpy(buf, NULLSAFE(EMPIRE_NAME(emp)));
 		if (EMPIRE_NAME(emp)) {
 			free(EMPIRE_NAME(emp));
 		}
 		EMPIRE_NAME(emp) = str_dup(argument);
 		
+		// adjective
+		strcpy(buf, skip_filler(argument));
 		if (EMPIRE_ADJECTIVE(emp)) {
 			free(EMPIRE_ADJECTIVE(emp));
 		}
-		EMPIRE_ADJECTIVE(emp) = str_dup(argument);
+		EMPIRE_ADJECTIVE(emp) = str_dup(*buf ? buf : argument);
 		
 		log_to_empire(emp, ELOG_ADMIN, "%s has changed the empire name to %s", PERS(ch, ch, TRUE), EMPIRE_NAME(emp));
 		msg_to_char(ch, "The empire's name is now: %s\r\n", EMPIRE_NAME(emp));
