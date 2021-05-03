@@ -552,24 +552,25 @@ static void show_detailed_empire(char_data *ch, empire_data *e) {
 	msg_to_char(ch, "Wealth: %d (%d treasure + %.1f coin%s at %d%%)\r\n", (int) GET_TOTAL_WEALTH(e), EMPIRE_WEALTH(e), EMPIRE_COINS(e), (EMPIRE_COINS(e) != 1.0 ? "s" : ""), (int)(COIN_VALUE * 100));
 	msg_to_char(ch, "Greatness: %d, Fame: %d\r\n", EMPIRE_GREATNESS(e), EMPIRE_FAME(e));
 	
+	// self-only portions
 	if (is_own_empire) {
 		total = config_get_int("max_chore_resource_per_member") * EMPIRE_MEMBERS(e) + EMPIRE_ATTRIBUTE(e, EATT_WORKFORCE_CAP);
 		for (iter = 0; *city_type[iter].name != '\n'; ++iter);
 		type = MIN(iter-1, EMPIRE_ATTRIBUTE(e, EATT_MAX_CITY_SIZE));
 		msg_to_char(ch, "Workforce cap: %d item%s, Max city size: %s\r\n", total, PLURAL(total), city_type[type].name);
-	}
-	
-	msg_to_char(ch, "Technology: ");
-	for (iter = 0, comma = FALSE; iter < NUM_TECHS; ++iter) {
-		if (EMPIRE_HAS_TECH(e, iter)) {
-			msg_to_char(ch, "%s%s", (comma ? ", " : ""), techs[iter]);
-			comma = TRUE;
+		
+		msg_to_char(ch, "Technology: ");
+		for (iter = 0, comma = FALSE; iter < NUM_TECHS; ++iter) {
+			if (EMPIRE_HAS_TECH(e, iter)) {
+				msg_to_char(ch, "%s%s", (comma ? ", " : ""), techs[iter]);
+				comma = TRUE;
+			}
 		}
+		if (!comma) {
+			msg_to_char(ch, "none");
+		}
+		msg_to_char(ch, "\r\n");
 	}
-	if (!comma) {
-		msg_to_char(ch, "none");
-	}
-	msg_to_char(ch, "\r\n");
 	
 	// determine rank by iterating over the sorted empire list
 	found_rank = 0;
