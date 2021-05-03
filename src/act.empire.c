@@ -231,6 +231,9 @@ void do_customize_island(char_data *ch, char *argument) {
 				EMPIRE_NEEDS_SAVE(GET_LOYALTY(ch)) = TRUE;
 			}
 		}
+		else if (config_get_bool("no_redundant_island_names") && (!strn_cmp(argument, "The Island", 10) || !strn_cmp(argument, "The Isle", 8) || !strn_cmp(argument, "Island ", 7) || !strn_cmp(argument, "Isle ", 5) || !str_cmp(argument, "Island") || !str_cmp(argument, "Isle"))) {
+			msg_to_char(ch, "Custom island names can't start with Island, Isle, The Island, or The Isle.\r\n");
+		}
 		else if (color_code_length(argument) > 0) {
 			msg_to_char(ch, "You cannot use color codes in custom names.\r\n");
 		}

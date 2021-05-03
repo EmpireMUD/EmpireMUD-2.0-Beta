@@ -238,6 +238,7 @@ naturalize_newbie_islands 0
 naturalize_unclaimable 1
 nearby_sector_distance 2
 newbie_adventure_cap 25
+no_redundant_island_names 1
 ocean_pool_size 1000
 tropics_percent 40.000000
 use_local_time 1
