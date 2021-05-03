@@ -558,7 +558,7 @@ void perform_herd(char_data *ch, char_data *mob, room_data *to_room, int dir, ve
 		was_in = IN_ROOM(ch);
 		out = (dir == NO_DIR && !into_veh);
 		
-		if (perform_move(mob, dir, to_room, MOVE_HERD | (out ? MOVE_EXIT : (into_veh ? MOVE_ENTER_VEH : NOBITS)))) {
+		if (perform_move(mob, dir, to_room, MOVE_HERD | (out ? MOVE_EXIT : (into_veh ? (MOVE_ENTER_VEH | MOVE_NO_COST) : NOBITS)))) {
 			if (into_veh) {
 				act("You skillfully herd $N into $v.", FALSE, ch, into_veh, mob, TO_CHAR | ACT_VEHICLE_OBJ);
 				act("$n skillfully herds $N into $v.", FALSE, ch, into_veh, mob, TO_ROOM | ACT_VEHICLE_OBJ);
@@ -573,7 +573,7 @@ void perform_herd(char_data *ch, char_data *mob, room_data *to_room, int dir, ve
 			}
 			
 			// only attempt to move ch if they weren't moved already (e.g. by following)
-			if (IN_ROOM(ch) == was_in && !perform_move(ch, dir, to_room, (out ? MOVE_EXIT : (into_veh ? MOVE_ENTER_VEH : NOBITS)))) {
+			if (IN_ROOM(ch) == was_in && !perform_move(ch, dir, to_room, (out ? MOVE_EXIT : (into_veh ? (MOVE_ENTER_VEH | MOVE_NO_COST) : NOBITS)))) {
 				char_to_room(mob, IN_ROOM(ch));
 			}
 			gain_player_tech_exp(ch, PTECH_HERD, 5);

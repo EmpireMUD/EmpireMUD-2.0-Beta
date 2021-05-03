@@ -1172,6 +1172,11 @@ bool player_can_move(char_data *ch, int dir, room_data *to_room, bitvector_t fla
 int move_cost(char_data *ch, room_data *from, room_data *to, int dir, bitvector_t flags) {
 	double need_movement, cost_from, cost_to;
 	
+	// shortcut: is it free?
+	if (IS_SET(flags, MOVE_NO_COST)) {
+		return 0;
+	}
+	
 	/* move points needed is avg. move loss for src and destination sect type */	
 	
 	// open buildings and incomplete non-closed buildings use average of current & original sect's move cost
@@ -1461,8 +1466,8 @@ bool do_simple_move(char_data *ch, int dir, room_data *to_room, bitvector_t flag
 		}
 	}
 	
-	// movement costs: do not apply to immortals/npcs
-	if (!IS_IMMORTAL(ch) && !IS_NPC(ch)) {
+	// movement costs: do not apply to immortals/npcs; also skip entirely if set no-cost (even negative moves can't block this)
+	if (!IS_IMMORTAL(ch) && !IS_NPC(ch) && !IS_SET(flags, MOVE_NO_COST)) {
 		// move points needed is avg. move loss for src and destination sect type
 		int need_movement = move_cost(ch, IN_ROOM(ch), to_room, dir, flags);
 		
