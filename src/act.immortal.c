@@ -4684,7 +4684,7 @@ SHOW(show_uses) {
 SHOW(show_account) {
 	player_index_data *plr_index = NULL, *index, *next_index;
 	bool file = FALSE, loaded_file = FALSE;
-	char skills[MAX_STRING_LENGTH], ago_buf[256], *ago_ptr;
+	char skills[MAX_STRING_LENGTH], ago_buf[256], *ago_ptr, color;
 	char_data *plr = NULL, *loaded;
 	int acc_id = NOTHING;
 	time_t last_online = -1;	// -1 here will indicate no data, -2 will indicate online now
@@ -4742,7 +4742,21 @@ SHOW(show_account) {
 				// not playing but same account
 				ago_ptr = strcpy(ago_buf, simple_time_since(loaded->prev_logon));
 				skip_spaces(&ago_ptr);
-				msg_to_char(ch, " [%d %s] %s  (%s ago)\r\n", GET_LAST_KNOWN_LEVEL(loaded), skills, GET_PC_NAME(loaded), ago_ptr);
+				
+				if (strchr(ago_ptr, 'y')) {
+					color = 'R';
+				}
+				else if (strchr(ago_ptr, 'w')) {
+					color = 'Y';
+				}
+				else if (strchr(ago_ptr, 'd')) {
+					color = 'B';
+				}
+				else {
+					color = 'G';
+				}
+				
+				msg_to_char(ch, " [%d %s] %s - \t%c%s ago\t0\r\n", GET_LAST_KNOWN_LEVEL(loaded), skills, GET_PC_NAME(loaded), color, ago_ptr);
 				if (last_online != ONLINE_NOW) {
 					last_online = MAX(last_online, loaded->prev_logon);
 				}
