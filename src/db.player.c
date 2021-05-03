@@ -2307,6 +2307,12 @@ void save_char(char_data *ch, room_data *load_room) {
 	// update the index in case any of this changed
 	index = find_player_index_by_idnum(GET_IDNUM(ch));
 	update_player_index(index, ch);
+	
+	// update empire logon time if the player is in-game
+	if (IN_ROOM(ch) && !PLR_FLAGGED(ch, PLR_KEEP_LAST_LOGIN_INFO) && GET_LOYALTY(ch)) {
+		EMPIRE_LAST_LOGON(GET_LOYALTY(ch)) = time(0);
+		EMPIRE_NEEDS_SAVE(GET_LOYALTY(ch)) = TRUE;
+	}
 }
 
 
