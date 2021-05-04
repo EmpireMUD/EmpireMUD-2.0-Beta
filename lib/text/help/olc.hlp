@@ -5805,7 +5805,7 @@ bad and are poured out.
 Food items are usually set to last longer if they are harder to get/make, and
 shorter if they are found easily.
 
-Remember, items left on the ground outdoors will decay or bestored after 3
+Remember, items left on the ground outdoors will decay or be stored after 3
 real hours, regardless of their decay timers.
 
 See also: AUTOSTORE, OEDIT TYPE, OLC OBJECTS
@@ -7895,8 +7895,8 @@ Optional flags:
   inside, you need both these flags.
 
 Some important notes:
-- Building-vhicles are only claimed when the whole tile is claimed (unless they
-  have a movement flag like DRIVING, in which case they work like vehicles).
+- Building-vehicles are only claimed when the whole tile is claimed unless they
+  have a movement flag like DRIVING, in which case they work like vehicles.
 - Using '%load% vehicle <vnum>' to load a building-vehicle will automatically
   set its owner to the owner of the room.
 - Be careful using %own% on building-vehicles. It's better to %own% the whole
