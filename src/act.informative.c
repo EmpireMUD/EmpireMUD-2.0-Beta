@@ -2157,7 +2157,11 @@ ACMD(do_chart) {
 		msg_to_char(ch, "That island doesn't appear on any charts.\r\n");
 	}
 	else {
-		msg_to_char(ch, "Chart information for %s:\r\n", isle->name);
+		msg_to_char(ch, "Chart information for %s:\r\n", get_island_name_for(isle->id, ch));
+		if (GET_LOYALTY(ch) && (e_isle = get_empire_island(GET_LOYALTY(ch), isle->id)) && e_isle->name && strcmp(e_isle->name, isle->name)) {
+			// show global name if different
+			msg_to_char(ch, "Also known as: %s\r\n", isle->name);
+		}
 		if (isle->desc) {
 			send_to_char(isle->desc, ch);
 		}
