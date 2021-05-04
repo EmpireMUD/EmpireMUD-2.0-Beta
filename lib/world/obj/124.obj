@@ -41,13 +41,13 @@ X X X X are scratched into the side.
 0 0
 S
 #12404
-fillet fish~
-a fillet of fish~
-A fillet of fish is stinking on the ground.~
+fillet filet fish raw~
+a fillet of raw fish~
+A fillet of raw fish is stinking on the ground.~
    This raw fillet looks good enough to eat, but you could also cook it into
 something even better.
 ~
-6 0 a 0 1
+6 0 a 0 2
 6 0 0
 7 24
 O+ 1 6203

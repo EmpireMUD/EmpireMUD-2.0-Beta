@@ -42,9 +42,10 @@ S
 #3904
 Hidden Progress~
    Your empire dwells in the shadows of society. Other empires will no longer
-see announcements of your progress on the /progress channel.
+see announcements of your progress on the /progress channel and cannot see
+which technologies your empire has.
 ~
-1 3 30 0 b
+2 3 30 0 b
 K 0 19
 S
 #3905
