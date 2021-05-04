@@ -1730,7 +1730,13 @@ ACMD(do_skills) {
 		}
 		
 		if (!(abil = find_ability_by_name(arg2))) {
-			msg_to_char(ch, "No such ability '%s'.\r\n", arg2);
+			// did they try to skill-buy a skill?
+			if ((skill = find_skill_by_name(arg2))) {
+				msg_to_char(ch, "You can only \"skill buy\" an ability from one of your skill trees, not the whole %s tree.\r\n", skill->name);
+			}
+			else {
+				msg_to_char(ch, "No such ability '%s'.\r\n", arg2);
+			}
 			return;
 		}
 		
@@ -1881,8 +1887,8 @@ ACMD(do_skills) {
 		else if (!config_get_bool("skill_swap_allowed")) {
 			msg_to_char(ch, "This game does not allow skill swap.\r\n");
 		}
-		else if (get_approximate_level(ch) < config_get_int("skill_swap_min_level")) {
-			msg_to_char(ch, "You must be at least level %d to swap skill sets.\r\n", config_get_int("skill_swap_min_level"));
+		else if (GET_SKILL_LEVEL(ch) < config_get_int("skill_swap_min_level")) {
+			msg_to_char(ch, "You require skill level %d to swap skill sets.\r\n", config_get_int("skill_swap_min_level"));
 		}
 		else if (GET_POS(ch) < POS_STANDING) {
 			msg_to_char(ch, "You can't swap skill sets right now.\r\n");

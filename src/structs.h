@@ -668,6 +668,16 @@ typedef struct vehicle_data vehicle_data;
 #define ADV_LINK_NOT_NEAR_SELF  6
 #define ADV_LINK_PORTAL_CROP  7
 #define ADV_LINK_EVENT_RUNNING  8
+#define ADV_LINK_PORTAL_VEH_EXISTING  9
+#define ADV_LINK_PORTAL_VEH_NEW_BUILDING_EXISTING  10
+#define ADV_LINK_PORTAL_VEH_NEW_BUILDING_NEW  11
+#define ADV_LINK_PORTAL_VEH_NEW_CROP  12
+#define ADV_LINK_PORTAL_VEH_NEW_WORLD  13
+#define ADV_LINK_IN_VEH_EXISTING  14
+#define ADV_LINK_IN_VEH_NEW_BUILDING_EXISTING  15
+#define ADV_LINK_IN_VEH_NEW_BUILDING_NEW  16
+#define ADV_LINK_IN_VEH_NEW_CROP  17
+#define ADV_LINK_IN_VEH_NEW_WORLD  18
 
 
 // ADV_LINKF_x: adventure link rule flags
@@ -1082,7 +1092,7 @@ typedef struct vehicle_data vehicle_data;
 #define CRAFT_POTTERY  BIT(0)  // bonus at pottery; requires fire
 #define CRAFT_BUILDING  BIT(1)  // makes a building (on any craft type; BUILD type automatically counts as this)
 #define CRAFT_SKILLED_LABOR  BIT(2)  // workforce can only produce this if the empire has skilled labor
-	#define CRAFT_UNUSED1  BIT(3)  // formerly glassblower (which now uses a function)
+#define CRAFT_SKIP_CONSUMES_TO  BIT(3)  // won't run the consumes-to interaction on components (e.g. keep the jar from paint when mixing it into a new paint)
 	#define CRAFT_UNUSED2  BIT(4)  // formerly carpenter (now using function)
 	#define CRAFT_UNUSED3  BIT(5)  // formerly alchemist (which ultimately was the same as FIRE)
 	#define CRAFT_UNUSED  BIT(6)  // formerly sharp-tool/knife (now uses requires-tool)
@@ -2587,6 +2597,9 @@ typedef enum {
 #define VEH_RUIN_SLOWLY_FROM_CLIMATE  BIT(35)	// J. always ruins slowly no matter what climate
 #define VEH_RUIN_QUICKLY_FROM_CLIMATE  BIT(36)	// K. always ruins quickly no matter what climate
 #define VEH_OBSCURE_VISION  BIT(37)	// L. blocks tiles behind it on the map
+#define VEH_HAS_INSTANCE  BIT(38)	// M. instance is attached to vehicle
+#define VEH_TEMPORARY  BIT(39)	// N. vehicle will be removed when instance ends
+
 
 // VEH_CUSTOM_x: custom message types
 #define VEH_CUSTOM_RUINS_TO_ROOM  0	// sent when the building falls into ruin
@@ -2603,7 +2616,7 @@ typedef enum {
 // The following vehicle flags are saved to file rather than read from the
 // prototype. Flags which are NOT included in this list can be altered with
 // OLC and affect live copies.
-#define SAVABLE_VEH_FLAGS  (VEH_INCOMPLETE | VEH_ON_FIRE | VEH_PLAYER_NO_DISMANTLE | VEH_PLAYER_NO_WORK | VEH_DISMANTLING | VEH_CHAMELEON | VEH_BRIGHT_PAINT)
+#define SAVABLE_VEH_FLAGS  (VEH_INCOMPLETE | VEH_ON_FIRE | VEH_PLAYER_NO_DISMANTLE | VEH_PLAYER_NO_WORK | VEH_DISMANTLING | VEH_CHAMELEON | VEH_BRIGHT_PAINT | VEH_HAS_INSTANCE | VEH_TEMPORARY)
 
 // The following vehicle flags indicate a vehicle can move
 #define MOVABLE_VEH_FLAGS  (VEH_DRIVING | VEH_SAILING | VEH_FLYING | VEH_DRAGGABLE | VEH_CAN_PORTAL | VEH_LEADABLE)
@@ -3538,6 +3551,7 @@ struct adventure_link_rule {
 	obj_vnum portal_in, portal_out;	// some types use portals
 	int dir;	// some attachments take a preferred direction
 	bitvector_t bld_on, bld_facing;	// for applying to the map
+	any_vnum vehicle_vnum;	// for rules that use a vehicle
 	
 	struct adventure_link_rule *next;
 };

@@ -55,8 +55,9 @@ char **olc_material_list = NULL;	// used for olc
 */
 bool audit_object(obj_data *obj, char_data *ch) {
 	bool is_adventure = (get_adventure_for_vnum(GET_OBJ_VNUM(obj)) != NULL);
-	char temp[MAX_STRING_LENGTH], unplural[MAX_STRING_LENGTH], *ptr;
-	bool problem = FALSE;
+	char temp[MAX_STRING_LENGTH], temp2[MAX_STRING_LENGTH], temp3[MAX_STRING_LENGTH], unplural[MAX_STRING_LENGTH], *ptr;
+	obj_data *obj_iter, *next_obj;
+	bool problem = FALSE, found;
 	
 	if (!GET_OBJ_KEYWORDS(obj) || !*GET_OBJ_KEYWORDS(obj) || !str_cmp(GET_OBJ_KEYWORDS(obj), default_obj_keywords)) {
 		olc_audit_msg(ch, GET_OBJ_VNUM(obj), "Keywords not set");
@@ -173,6 +174,35 @@ bool audit_object(obj_data *obj, char_data *ch) {
 		problem = TRUE;
 	}
 	
+	// look for full keyword collisions
+	HASH_ITER(hh, object_table, obj_iter, next_obj) {
+		if (GET_OBJ_VNUM(obj_iter) == GET_OBJ_VNUM(obj)) {
+			continue;	// same obj
+		}
+		
+		// duplicate the string
+		strcpy(temp, NULLSAFE(GET_OBJ_KEYWORDS(obj)));
+		found = FALSE;
+		
+		// check all keywords
+		while (*temp && !found) {
+			// strip 1st remaining keyword
+			half_chop(temp, temp2, temp3);
+			strcpy(temp, temp3);
+			
+			if (!isname(temp2, GET_OBJ_KEYWORDS(obj_iter))) {
+				found = TRUE;	// keyword doesn't match
+			}
+		}
+		
+		// problem?
+		if (!found) {
+			olc_audit_msg(ch, GET_OBJ_VNUM(obj), "Full keyword overlap with obj [%d] %s", GET_OBJ_VNUM(obj_iter), GET_OBJ_SHORT_DESC(obj_iter));
+			problem = TRUE;
+		}
+	}
+	
+	// interactions
 	problem |= audit_interactions(GET_OBJ_VNUM(obj), GET_OBJ_INTERACTIONS(obj), TYPE_OBJ, ch);
 	
 	// ITEM_X: auditors

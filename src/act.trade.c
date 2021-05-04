@@ -1096,14 +1096,16 @@ void finish_gen_craft(char_data *ch) {
 	}
 	
 	// check for consumes-to on the resources
-	LL_FOREACH(GET_ACTION_RESOURCES(ch), res) {
-		if ((proto = obj_proto(res->vnum)) && has_interaction(GET_OBJ_INTERACTIONS(proto), INTERACT_CONSUMES_TO)) {
-			temp_obj = read_object(res->vnum, FALSE);
-			obj_to_char(temp_obj, ch);
-			for (iter = 0; iter < res->amount; ++iter) {
-				run_interactions(ch, GET_OBJ_INTERACTIONS(temp_obj), INTERACT_CONSUMES_TO, IN_ROOM(ch), NULL, temp_obj, NULL, consumes_or_decays_interact);
+	if (!CRAFT_FLAGGED(type, CRAFT_SKIP_CONSUMES_TO)) {
+		LL_FOREACH(GET_ACTION_RESOURCES(ch), res) {
+			if ((proto = obj_proto(res->vnum)) && has_interaction(GET_OBJ_INTERACTIONS(proto), INTERACT_CONSUMES_TO)) {
+				temp_obj = read_object(res->vnum, FALSE);
+				obj_to_char(temp_obj, ch);
+				for (iter = 0; iter < res->amount; ++iter) {
+					run_interactions(ch, GET_OBJ_INTERACTIONS(temp_obj), INTERACT_CONSUMES_TO, IN_ROOM(ch), NULL, temp_obj, NULL, consumes_or_decays_interact);
+				}
+				extract_obj(temp_obj);
 			}
-			extract_obj(temp_obj);
 		}
 	}
 	

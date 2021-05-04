@@ -539,18 +539,20 @@ void identify_obj_to_char(obj_data *obj, char_data *ch) {
 	}
 	
 	// other storage
-	library = (IS_BOOK(obj) && book_proto(GET_BOOK_ID(obj)));
-	if (UNIQUE_OBJ_CAN_STORE(obj, FALSE)) {
-		msg_to_char(ch, "Storage location: Home, Warehouse%s\r\n", (library ? ", Library" : ""));
-	}
-	else if (UNIQUE_OBJ_CAN_STORE(obj, TRUE)) {
-		msg_to_char(ch, "Storage location: Home%s\r\n", (library ? ", Library" : ""));
-	}
-	else if (library) {
-		msg_to_char(ch, "Storage location: Library\r\n");
-	}
-	else if (OBJ_FLAGGED(obj, OBJ_NO_STORE)) {
-		msg_to_char(ch, "Storage location: none (modified object)\r\n");
+	if (CAN_WEAR(obj, ITEM_WEAR_TAKE)) {
+		library = (IS_BOOK(obj) && book_proto(GET_BOOK_ID(obj)));
+		if (UNIQUE_OBJ_CAN_STORE(obj, FALSE)) {
+			msg_to_char(ch, "Storage location: Home, Warehouse%s\r\n", (library ? ", Library" : ""));
+		}
+		else if (UNIQUE_OBJ_CAN_STORE(obj, TRUE)) {
+			msg_to_char(ch, "Storage location: Home%s\r\n", (library ? ", Library" : ""));
+		}
+		else if (library) {
+			msg_to_char(ch, "Storage location: Library\r\n");
+		}
+		else if (OBJ_FLAGGED(obj, OBJ_NO_STORE)) {
+			msg_to_char(ch, "Storage location: none (modified object)\r\n");
+		}
 	}
 
 	// binding section
@@ -6890,7 +6892,7 @@ ACMD(do_ship) {
 				from_isle = get_island(sd->from_island, TRUE);
 				to_isle = get_island(sd->to_island, TRUE);
 				to_room = sd->to_room == NOWHERE ? NULL : real_room(sd->to_room);
-				snprintf(line, sizeof(line), "    %s (%s to %s%s, %s)\r\n", skip_filler(VEH_SHORT_DESC(veh)), from_isle ? from_isle->name : "unknown", to_isle ? to_isle->name : "unknown", coord_display(ch, to_room ? X_COORD(to_room) : -1, to_room ? Y_COORD(to_room) : -1, FALSE), status_type[sd->status]);
+				snprintf(line, sizeof(line), "    %s (%s to %s%s, %s)\r\n", skip_filler(VEH_SHORT_DESC(veh)), from_isle ? get_island_name_for(from_isle->id, ch) : "unknown", to_isle ? get_island_name_for(to_isle->id, ch) : "unknown", coord_display(ch, to_room ? X_COORD(to_room) : -1, to_room ? Y_COORD(to_room) : -1, FALSE), status_type[sd->status]);
 			}
 			else {
 				// normal object shipment
@@ -6905,7 +6907,7 @@ ACMD(do_ship) {
 				from_isle = get_island(sd->from_island, TRUE);
 				to_isle = get_island(sd->to_island, TRUE);
 				to_room = sd->to_room == NOWHERE ? NULL : real_room(sd->to_room);
-				snprintf(line, sizeof(line), " %dx %s (%s to %s%s, %s)\r\n", sd->amount, skip_filler(GET_OBJ_SHORT_DESC(proto)), from_isle ? from_isle->name : "unknown", to_isle ? to_isle->name : "unknown", coord_display(ch, to_room ? X_COORD(to_room) : -1, to_room ? Y_COORD(to_room) : -1, FALSE), status_type[sd->status]);
+				snprintf(line, sizeof(line), " %dx %s (%s to %s%s, %s)\r\n", sd->amount, skip_filler(GET_OBJ_SHORT_DESC(proto)), from_isle ? get_island_name_for(from_isle->id, ch) : "unknown", to_isle ? get_island_name_for(to_isle->id, ch) : "unknown", coord_display(ch, to_room ? X_COORD(to_room) : -1, to_room ? Y_COORD(to_room) : -1, FALSE), status_type[sd->status]);
 			}
 			
 			done = TRUE;

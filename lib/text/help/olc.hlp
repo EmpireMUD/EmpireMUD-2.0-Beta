@@ -1379,6 +1379,82 @@ event is not running.
 
 See also: ADVEDIT LINKING
 #d
+"ADVEDIT IN-VEHICLE-EXISTING" "ADVEDIT LINK IN-VEHICLE-EXISTING" "ADVEDIT LINKING IN-VEHICLE-EXISTING"
+
+Usage:  .linking add IN-VEHICLE-EXISTING <vehicle vnum> [flags]
+
+The adventure will be the interior of an existing vehicle in the world, meaning
+that when a player types "board <vehicle>" or "enter <vehicle>", they will be
+placed inside the adventure.
+
+If a vehicle already has an interior, it will not qualify for this linking
+rule. To link to the existing interior of a vehicle, link to a room (building)
+that's used in that vehicle with a BDG-EXISTING linking rule.
+
+The vehicle must be unclaimed unless the CLAIMED-OK flag is set. After the
+adventure ends, the vehicle will be left behind.
+
+See also: ADVEDIT LINKING, VNUM
+#d
+"ADVEDIT IN-VEHICLE-NEW-BDG-EXISTING" "ADVEDIT LINK IN-VEHICLE-NEW-BDG-EXISTING" "ADVEDIT LINIKING IN-VEHICLE-NEW-BDG-EXISTING"
+
+Usage:  .linking add IN-VEHICLE-NEW-BDG-EXISTING <vehicle vnum> <building vnum> [flags]
+
+The adventure will be the interior of a new vehicle, placed at an existing
+building (or interior room) somewhere in the world. When a player types 
+"board <vehicle>" or "enter <vehicle>", they will be placed inside the
+adventure.
+
+After the adventure ends, the vehicle will vanish unless you remove its
+*TEMPORARY flag.
+
+See also: ADVEDIT LINKING, VNUM
+#d
+"ADVEDIT IN-VEHICLE-NEW-BDG-NEW" "ADVEDIT LINK IN-VEHICLE-NEW-BDG-NEW" "ADVEDIT LINKING IN-VEHICLE-NEW-BDG-NEW"
+
+Usage:  .linking add IN-VEHICLE-NEW-BDG-NEW <vehicle vnum> <building vnum> "<build on>" "[build facing]" <[flags]
+
+The adventure will be the interior of a new vehicle, placed at a new building
+which is build on the map based on your build-on and build-facing flags. When a
+player types "board <vehicle>" or "enter <vehicle>", they will be placed
+inside the adventure.
+
+If you use multiple build-on or build-facing flags, they must be in quotes.
+If there are no build-facing flags (for an open building), use an empty pair
+of quotes: ""
+
+After the adventure ends, the vehicle will vanish unless you remove its
+*TEMPORARY flag.
+
+See also: ADVEDIT LINKING, VNUM, CEDIT BUILDON, CEDIT BUILDFACING
+#d
+"ADVEDIT IN-VEHICLE-NEW-CROP" "ADVEDIT LINK IN-VEHICLE-NEW-CROP" "ADVEDIT LINKING IN-VEHICLE-NEW-CROP"
+
+Usage:  .linking add IN-VEHICLE-NEW-CROP <vehicle vnum> <crop vnum> [flags]
+
+The adventure will be the interior of a new vehicle, which is placed at a crop
+tile somewhere in the world. When a player types "board <vehicle>" or
+"enter <vehicle>", they will be placed inside the adventure.
+
+After the adventure ends, the vehicle will vanish unless you remove its
+*TEMPORARY flag.
+
+See also: ADVEDIT LINKING, VNUM
+#d
+"ADVEDIT IN-VEHICLE-NEW-WORLD" "ADVEDIT LINK IN-VEHICLE-NEW-WORLD" "ADVEDIT LINKING IN-VEHICLE-NEW-WORLD"
+
+Usage:  .linking add PORTAL-VEHICLE-NEW-CROP <vehicle vnum> <sector vnum> [flags]
+
+The adventure will be the interior of a new vehicle, which is placed at at tile
+of the given sector somewhere in the world. When a player types
+"board <vehicle>" or "enter <vehicle>", they will be placed inside the
+adventure.
+
+After the adventure ends, the vehicle will vanish unless you remove its
+*TEMPORARY flag.
+
+See also: ADVEDIT LINKING, VNUM
+#d
 "ADVEDIT NOT-NEAR-SELF" "ADVEDIT LINK NOT-NEAR-SELF" "ADVEDIT LINKING NOT-NEAR-SELF"
 
 Usage:  .linking add NOT-NEAR-SELF <distance>
@@ -1460,6 +1536,97 @@ flag) for this, because they can't be built on the map.
 
 See also: ADVEDIT LINKING, SECTEDIT BUILDFLAGS, VNUM
 #d
+"ADVEDIT PORTAL-VEHICLE-EXISTING" "ADVEDIT LINK PORTAL-VEHICLE-EXISTING" "ADVEDIT LINKING PORTAL-VEHICLE-EXISTING"
+
+Usage:  .linking add PORTAL-VEHICLE-EXISTING <vehicle vnum> <portal-in vnum> <portal-out vnum> [flags]
+
+The adventure spawns as a portal at an existing vehicle in the world. This will
+not affect the vehicle or its interior, but the portal will move with the
+vehicle.
+
+You must provide portal object vnums for the in- and out-portals, but it is
+okay if both are the same. Remember that the portals don't have to be called
+portals. You could use "a strange door in the side of the tree", and the
+messages would look correct when players type "enter door" or "enter tree".
+
+The vehicle must be unclaimed unless the CLAIMED-OK flag is set. After the
+adventure ends, the vehicle will be left behind.
+
+See also: ADVEDIT LINKING, VNUM
+#d
+"ADVEDIT PORTAL-VEHICLE-NEW-BDG-EXISTING" "ADVEDIT LINK PORTAL-VEHICLE-NEW-BDG-EXISTING" "ADVEDIT LINKING PORTAL-VEHICLE-NEW-BDG-EXISTING"
+
+Usage:  .linking add PORTAL-VEHICLE-NEW-BDG-EXISTING <vehicle vnum> <building vnum> <portal-in vnum> <portal-out vnum> [flags]
+
+The adventure spawns as a portal at a new vehicle, which is placed at an
+existing building (or interior room). The portal will move with the vehicle.
+
+You must provide portal object vnums for the in- and out-portals, but it is
+okay if both are the same. Remember that the portals don't have to be called
+portals. You could use "a strange door in the side of the tree", and the
+messages would look correct when players type "enter door" or "enter tree".
+
+After the adventure ends, the vehicle will vanish unless you remove its
+*TEMPORARY flag.
+
+See also: ADVEDIT LINKING, VNUM
+#d
+"ADVEDIT PORTAL-VEHICLE-NEW-BDG-NEW" "ADVEDIT LINK PORTAL-VEHICLE-NEW-BDG-NEW" "ADVEDIT LINKING PORTAL-VEHICLE-NEW-BDG-NEW"
+
+Usage:  .linking add PORTAL-VEHICLE-NEW-BDG-NEW <vehicle vnum> <building vnum> <portal-in vnum> <portal-out vnum> "<build on>" "[build facing]" <[flags]
+
+The adventure spawns as a portal at a new vehicle, which is placed at a new
+building, constructed on the map based on build rules. The portal will move
+with the vehicle.
+
+You must provide portal object vnums for the in- and out-portals, but it is
+okay if both are the same. Remember that the portals don't have to be called
+portals. You could use "a strange door in the side of the tree", and the
+messages would look correct when players type "enter door" or "enter tree".
+
+If you use multiple build-on or build-facing flags, they must be in quotes.
+If there are no build-facing flags (for an open building), use an empty pair
+of quotes: ""
+
+After the adventure ends, the vehicle will vanish unless you remove its
+*TEMPORARY flag.
+
+See also: ADVEDIT LINKING, VNUM, CEDIT BUILDON, CEDIT BUILDFACING
+#d
+"ADVEDIT PORTAL-VEHICLE-NEW-CROP" "ADVEDIT LINK PORTAL-VEHICLE-NEW-CROP" "ADVEDIT LINKING PORTAL-VEHICLE-NEW-CROP"
+
+Usage:  .linking add PORTAL-VEHICLE-NEW-CROP <vehicle vnum> <crop vnum> <portal-in vnum> <portal-out vnum> [flags]
+
+The adventure spawns as a portal at a new vehicle, which is placed at a crop
+tile somewhere in the world. The portal will move with the vehicle.
+
+You must provide portal object vnums for the in- and out-portals, but it is
+okay if both are the same. Remember that the portals don't have to be called
+portals. You could use "a strange door in the side of the tree", and the
+messages would look correct when players type "enter door" or "enter tree".
+
+After the adventure ends, the vehicle will vanish unless you remove its
+*TEMPORARY flag.
+
+See also: ADVEDIT LINKING, VNUM
+#d
+"ADVEDIT PORTAL-VEHICLE-NEW-WORLD" "ADVEDIT LINK PORTAL-VEHICLE-NEW-WORLD" "ADVEDIT LINKING PORTAL-VEHICLE-NEW-WORLD"
+
+Usage:  .linking add PORTAL-VEHICLE-NEW-WORLD <vehicle vnum> <sector vnum> <portal-in vnum> <portal-out vnum> [flags]
+
+The adventure spawns as a portal at a new vehicle, which is placed at a tile of
+the given sector somewhere in the world. The portal will move with the vehicle.
+
+You must provide portal object vnums for the in- and out-portals, but it is
+okay if both are the same. Remember that the portals don't have to be called
+portals. You could use "a strange door in the side of the tree", and the
+messages would look correct when players type "enter door" or "enter tree".
+
+After the adventure ends, the vehicle will vanish unless you remove its
+*TEMPORARY flag.
+
+See also: ADVEDIT LINKING, VNUM
+#d
 "ADVEDIT TIME-LIMIT" "ADVEDIT LINK TIME-LIMIT" "ADVEDIT LINKING TIME-LIMIT"
 
 Usage:  .linking add TIME-LIMIT <minutes> [flags]
@@ -1497,6 +1664,16 @@ See specific help files for each type: &yHELP ADVEDIT <TYPE>&0
  &cTIME-LIMIT&0: Removes instances after a certain number of minutes expire.
  &cNOT-NEAR-SELF&0: Prevent the adventure from linking near other copies of itself.
  &cEVENT-RUNNING&0: This adventure can only spawn when a specific event is running.
+ &cPORTAL-VEHICLE-EXISTING&0: Portal appears at an existing vehicle.
+ &cPORTAL-VEHICLE-NEW-BDG-EXISTING&0: Portal and new vehicle at existing building.
+ &cPORTAL-VEHICLE-NEW-BDG-NEW&0: Portal and new vehicle at new building.
+ &cPORTAL-VEHICLE-NEW-CROP&0: Portal and new vehicle at a crop.
+ &cPORTAL-VEHICLE-NEW-WORLD&0: Portal and new vehicle at a sector.
+ &cIN-VEHICLE-EXISTING&0: Link as the interior of existing vehicle.
+ &cIN-VEHICLE-NEW-BDG-EXISTING&0: Interior of new vehicle at existing building.
+ &cIN-VEHICLE-NEW-BDG-NEW&0: Interior of new vehicle at new building.
+ &cIN-VEHICLE-NEW-CROP&0: Interior of new vehicle at a crop.
+ &cIN-VEHICLE-NEW-WORLD&0: Interior of new vehicle at a sector.
 
 Available flags:
  &cCLAIMED-OK&0 - Can link to claimed locations (default: unclaimed only).
@@ -2536,9 +2713,8 @@ Available flags:
  POTTERY - always requires cooking fire, goes faster at potter's hut
  BUILDING - makes a building (not needed on the BUILD craft type)
  SKILLED-LABOR - workforce cannot work this craft unless you have Skilled Labor
- GLASSBLOWER - requires being at glassblower building
- CARPENTER - requires being at a carpenter building
- ALCHEMY - requires cooking fire or alchemist/laboratory
+ SKIP-CONSUMES-TO - won't run consumes-to interactions on any of the resources
+    (for example: if you're mixing paints and don't want to refund the jars)
  FIRE - requires cooking fire
  SOUP - requires a container of water and creates a liquid instead of an item
  IN-DEVELOPMENT - only immortals can use this recipe
@@ -2548,7 +2724,6 @@ Available flags:
     to be dismantled, but not built; it won't show up in the build list
  IN-CITY-ONLY - a craft or building can only be made in a city radius
  VEHICLE - creates a vehicle instead of an item, see CRAFT VEHICLES
- SHIPYARD - requires being at a shipyard
  LEARNED - requires the player/empire 'learn' a recipe to use it
  BY-RIVER - must be adjacent to a river
  REMOVE-PRODUCTION - removes this craft's resources from empire production
@@ -2556,6 +2731,8 @@ Available flags:
     Does not work on vehicles/buildings.
  TAKE-REQUIRED-OBJ - takes the 'required object' when you start the craft, and
     may refund it when dismantled (unless the object is 1-USE)
+
+Additional flags are available via the REQUIRESFUNCTION option.
 
 See also: CEDIT TYPE, OLC CRAFTS, OLC REMOVEINDEV
 #d
@@ -5628,7 +5805,7 @@ bad and are poured out.
 Food items are usually set to last longer if they are harder to get/make, and
 shorter if they are found easily.
 
-Remember, items left on the ground outdoors will decay or bestored after 3
+Remember, items left on the ground outdoors will decay or be stored after 3
 real hours, regardless of their decay timers.
 
 See also: AUTOSTORE, OEDIT TYPE, OLC OBJECTS
@@ -7718,8 +7895,8 @@ Optional flags:
   inside, you need both these flags.
 
 Some important notes:
-- Building-vhicles are only claimed when the whole tile is claimed (unless they
-  have a movement flag like DRIVING, in which case they work like vehicles).
+- Building-vehicles are only claimed when the whole tile is claimed unless they
+  have a movement flag like DRIVING, in which case they work like vehicles.
 - Using '%load% vehicle <vnum>' to load a building-vehicle will automatically
   set its owner to the owner of the room.
 - Be careful using %own% on building-vehicles. It's better to %own% the whole
@@ -8174,6 +8351,8 @@ Available flags:
  RUIN-SLOWLY-FROM-CLIMATE - always ruins slowly no matter what climate change
  RUIN-QUICKLY-FROM-CLIMATE - always ruins quickly due to climate change
  OBSCURE-VISION - blocks tiles behind it on the map
+ *INSTANCE - vehicle has an instance attached
+ *TEMPORARY - vehicle will be removed when the instance ends
 
 ** The DRIVING/SAILING/FLYING flags each enable specific commands for moving
 the vehicle. If it has more than one of these, each command will work. Usually

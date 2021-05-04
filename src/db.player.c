@@ -2248,13 +2248,16 @@ void save_char(char_data *ch, room_data *load_room) {
 	
 	// update load room if they aren't flagged for a static one
 	if (!PLR_FLAGGED(ch, PLR_LOADROOM)) {
-		if (load_room) {
+		if (!load_room) {
+			GET_LOADROOM(ch) = NOWHERE;
+		}
+		else if (IN_ROOM(ch) || GET_LOADROOM(ch) != GET_ROOM_VNUM(load_room)) {
 			GET_LOADROOM(ch) = GET_ROOM_VNUM(load_room);
 			map = GET_MAP_LOC(load_room);
 			GET_LOAD_ROOM_CHECK(ch) = (map ? map->vnum : NOWHERE);
 		}
 		else {
-			GET_LOADROOM(ch) = NOWHERE;
+			// preserve old loadroom/check data
 		}
 	}
 	
@@ -2304,6 +2307,12 @@ void save_char(char_data *ch, room_data *load_room) {
 	// update the index in case any of this changed
 	index = find_player_index_by_idnum(GET_IDNUM(ch));
 	update_player_index(index, ch);
+	
+	// update empire logon time if the player is in-game
+	if (IN_ROOM(ch) && !PLR_FLAGGED(ch, PLR_KEEP_LAST_LOGIN_INFO) && GET_LOYALTY(ch)) {
+		EMPIRE_LAST_LOGON(GET_LOYALTY(ch)) = time(0);
+		EMPIRE_NEEDS_SAVE(GET_LOYALTY(ch)) = TRUE;
+	}
 }
 
 

@@ -2161,7 +2161,7 @@ void coin_string(struct coin_data *list, char *storage) {
 	}
 	
 	if (other) {
-		sprintf(temp, "%s%d %scoin%s", (*local ? ", and " : ""), other->amount, (*local ? "other " : ""), (other->amount != 1 ? "s" : ""));
+		sprintf(temp, "%s%d %smiscellaneous coin%s", (*local ? ", and " : ""), other->amount, (*local ? "other " : ""), (other->amount != 1 ? "s" : ""));
 		if (strlen(local) + strlen(temp) > MAX_STRING_LENGTH) {
 			// safety
 			strcat(local, "...");

@@ -231,6 +231,9 @@ void do_customize_island(char_data *ch, char *argument) {
 				EMPIRE_NEEDS_SAVE(GET_LOYALTY(ch)) = TRUE;
 			}
 		}
+		else if (config_get_bool("no_redundant_island_names") && (!strn_cmp(argument, "The Island", 10) || !strn_cmp(argument, "The Isle", 8) || !strn_cmp(argument, "Island ", 7) || !strn_cmp(argument, "Isle ", 5) || !str_cmp(argument, "Island") || !str_cmp(argument, "Isle"))) {
+			msg_to_char(ch, "Custom island names can't start with Island, Isle, The Island, or The Isle.\r\n");
+		}
 		else if (color_code_length(argument) > 0) {
 			msg_to_char(ch, "You cannot use color codes in custom names.\r\n");
 		}
@@ -556,17 +559,19 @@ static void show_detailed_empire(char_data *ch, empire_data *e) {
 		msg_to_char(ch, "Workforce cap: %d item%s, Max city size: %s\r\n", total, PLURAL(total), city_type[type].name);
 	}
 	
-	msg_to_char(ch, "Technology: ");
-	for (iter = 0, comma = FALSE; iter < NUM_TECHS; ++iter) {
-		if (EMPIRE_HAS_TECH(e, iter)) {
-			msg_to_char(ch, "%s%s", (comma ? ", " : ""), techs[iter]);
-			comma = TRUE;
+	if (is_own_empire || !EMPIRE_HAS_TECH(e, TECH_HIDDEN_PROGRESS)) {
+		msg_to_char(ch, "Technology: ");
+		for (iter = 0, comma = FALSE; iter < NUM_TECHS; ++iter) {
+			if (EMPIRE_HAS_TECH(e, iter)) {
+				msg_to_char(ch, "%s%s", (comma ? ", " : ""), techs[iter]);
+				comma = TRUE;
+			}
 		}
+		if (!comma) {
+			msg_to_char(ch, "none");
+		}
+		msg_to_char(ch, "\r\n");
 	}
-	if (!comma) {
-		msg_to_char(ch, "none");
-	}
-	msg_to_char(ch, "\r\n");
 	
 	// determine rank by iterating over the sorted empire list
 	found_rank = 0;
@@ -4543,6 +4548,9 @@ ACMD(do_empire_inventory) {
 		}
 	}
 	if (emp) {
+		// sort to get predictable order
+		sort_einv_for_empire(emp);
+		
 		if ( subcmd == SCMD_EINVENTORY ) {
 			show_empire_inventory_to_char(ch, emp, arg2);
 		} else {
@@ -5563,12 +5571,12 @@ ACMD(do_tavern) {
 		msg_to_char(ch, "You need the workforce privilege to change what this tavern is brewing.\r\n");
 	}
 	else if (!*arg || type == NOTHING) {
-		if (type == NOTHING) {
+		if (*arg && type == NOTHING) {
 			msg_to_char(ch, "Invalid tavern type. ");	// deliberate lack of CRLF
 		}
 		else {
-			show_tavern_status(ch);
 			msg_to_char(ch, "This tavern is currently brewing %s.\r\n", tavern_data[get_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_TAVERN_TYPE)].name);
+			show_tavern_status(ch);
 		}
 		send_to_char("You can have it make:\r\n", ch);
 		for (iter = 0; *tavern_data[iter].name != '\n'; ++iter) {
@@ -7335,6 +7343,9 @@ ACMD(do_workforce) {
 			msg_to_char(ch, "Keep (or unkeep) which stored item?\r\n");
 			return;
 		}
+		
+		// sort to ensure predictable order
+		sort_einv_for_empire(emp);
 		
 		found = FALSE;
 		HASH_ITER(hh, eisle->store, store, next_store) {

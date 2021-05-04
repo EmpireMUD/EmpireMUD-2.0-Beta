@@ -926,7 +926,7 @@ void real_update_char(char_data *ch) {
 	}
 	
 	// mob activity: if we're still here, run half the mobs each time
-	if (IS_NPC(ch) && (GET_MOB_VNUM(ch) % 2) == mobile_activity_cycle) {
+	if (IS_NPC(ch) && (ABSOLUTE(GET_MOB_VNUM(ch)) % 2) == mobile_activity_cycle) {
 		run_mobile_activity(ch);
 	}
 	
@@ -1215,7 +1215,21 @@ static void reduce_outside_territory_one(empire_data *emp) {
 	}
 	
 	if (farthest) {
-		log_to_empire(emp, ELOG_TERRITORY, "Abandoning %s (%d, %d) because too much %s territory has been claimed", get_room_name(farthest, FALSE), X_COORD(farthest), Y_COORD(farthest), (far_type == TER_FRONTIER) ? "frontier" : "outskirts");
+		switch (far_type) {
+			case TER_OUTSKIRTS: {
+				log_to_empire(emp, ELOG_TERRITORY, "Abandoning %s (%d, %d) because too much outskirts territory has been claimed (%d/%d)", get_room_name(farthest, FALSE), X_COORD(farthest), Y_COORD(farthest), EMPIRE_TERRITORY(emp, TER_OUTSKIRTS), OUTSKIRTS_CLAIMS_AVAILABLE(emp));
+				break;
+			}
+			case TER_FRONTIER: {
+				log_to_empire(emp, ELOG_TERRITORY, "Abandoning %s (%d, %d) because too much frontier territory has been claimed (%d/%d)", get_room_name(farthest, FALSE), X_COORD(farthest), Y_COORD(farthest), EMPIRE_TERRITORY(emp, TER_FRONTIER), land_can_claim(emp, TER_FRONTIER));
+				break;
+			}
+			default: {
+				log_to_empire(emp, ELOG_TERRITORY, "Abandoning %s (%d, %d) because too much territory has been claimed (%d/%d)", get_room_name(farthest, FALSE), X_COORD(farthest), Y_COORD(farthest), EMPIRE_TERRITORY(emp, TER_TOTAL), land_can_claim(emp, TER_TOTAL));
+				break;
+			}
+		}
+		
 		abandon_room(farthest);
 	}
 }
@@ -1813,7 +1827,7 @@ void real_update_obj(obj_data *obj) {
 	}
 	
 	// point-update if it's my turn
-	if ((GET_OBJ_VNUM(obj) % REAL_UPDATES_PER_MUD_HOUR) == point_update_cycle) {
+	if ((ABSOLUTE(GET_OBJ_VNUM(obj)) % REAL_UPDATES_PER_MUD_HOUR) == point_update_cycle) {
 		point_update_obj(obj);
 	}
 }

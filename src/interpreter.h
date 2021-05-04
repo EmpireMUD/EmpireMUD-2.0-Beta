@@ -281,6 +281,7 @@ struct alias_data {
 #define MOVE_EXIT  BIT(9)	// the 'exit' command
 #define MOVE_ENTER_VEH  BIT(10)	// entering a vehicle
 #define MOVE_ENTER_PORTAL  BIT(11)	// entering a portal
+#define MOVE_NO_COST  BIT(12)	// modifier: ignore movement cost
 
 // flags that ignore some move checks
 #define MOVE_IGNORE  (MOVE_LEAD | MOVE_FOLLOW | MOVE_HERD | MOVE_WANDER)

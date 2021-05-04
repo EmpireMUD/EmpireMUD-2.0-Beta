@@ -290,6 +290,16 @@ const char *adventure_link_types[] = {
 	"NOT-NEAR-SELF",
 	"PORTAL-CROP",
 	"EVENT-RUNNING",
+	"PORTAL-VEHICLE-EXISTING",
+	"PORTAL-VEHICLE-NEW-BDG-EXISTING",	// 10
+	"PORTAL-VEHICLE-NEW-BDG-NEW",
+	"PORTAL-VEHICLE-NEW-CROP",
+	"PORTAL-VEHICLE-NEW-WORLD",
+	"IN-VEHICLE-EXISTING",
+	"IN-VEHICLE-NEW-BDG-EXISTING",	// 15
+	"IN-VEHICLE-NEW-BDG-NEW",
+	"IN-VEHICLE-NEW-CROP",
+	"IN-VEHICLE-NEW-WORLD",
 	"\n"
 };
 
@@ -305,6 +315,16 @@ const bool adventure_link_is_location_rule[] = {
 	FALSE,	// ADV_LINK_NOT_NEAR_SELF
 	TRUE,	// ADV_LINK_PORTAL_CROP
 	FALSE,	// ADV_LINK_EVENT_RUNNING
+	TRUE,	// ADV_LINK_PORTAL_VEH_EXISTING
+	TRUE,	// ADV_LINK_PORTAL_VEH_NEW_BUILDING_EXISTING
+	TRUE,	// ADV_LINK_PORTAL_VEH_NEW_BUILDING_NEW
+	TRUE,	// ADV_LINK_PORTAL_VEH_NEW_CROP
+	TRUE,	// ADV_LINK_PORTAL_VEH_NEW_WORLD
+	TRUE,	// ADV_LINK_IN_VEH_EXISTING
+	TRUE,	// ADV_LINK_IN_VEH_NEW_BUILDING_EXISTING
+	TRUE,	// ADV_LINK_IN_VEH_NEW_BUILDING_NEW
+	TRUE,	// ADV_LINK_IN_VEH_NEW_CROP
+	TRUE,	// ADV_LINK_IN_VEH_NEW_WORLD
 };
 
 
@@ -1669,7 +1689,7 @@ const char *craft_flags[] = {
 	"POTTERY",
 	"BUILDING",
 	"SKILLED-LABOR",
-	"*",	// formerly glassblower (now uses a function)
+	"SKIP-CONSUMES-TO",
 	"*",	// formerly carpenter (now uses a function)
 	"*",	// formerly alchemy (identical to FIRE)
 	"*",	// formerly sharp-tool
@@ -1695,7 +1715,7 @@ const char *craft_flag_for_info[] = {
 	"pottery",
 	"",	// building
 	"",	// skilled labor
-	"",
+	"",	// skip-consumes-to
 	"",
 	"",
 	"",
@@ -4568,6 +4588,8 @@ const char *vehicle_flags[] = {
 	"RUIN-SLOWLY-FROM-CLIMATE",	// 35
 	"RUIN-QUICKLY-FROM-CLIMATE",
 	"OBSCURE-VISION",
+	"*INSTANCE",
+	"*TEMPORARY",
 	"\n"
 };
 
@@ -4612,6 +4634,8 @@ const char *identify_vehicle_flags[] = {
 	"",	// RUIN-SLOWLY-FROM-CLIMATE	// 35
 	"",	// RUIN-QUICKLY-FROM-CLIMATE
 	"",	// OBSCURE-VISION
+	"",	// *INSTANCE
+	"",	// *TEMPORARY
 	"\n"
 };
 

@@ -1318,7 +1318,7 @@ ACMD(do_board) {
 	
 	// ok:
 	else {
-		perform_move(ch, NO_DIR, to_room, MOVE_ENTER_VEH);
+		perform_move(ch, NO_DIR, to_room, MOVE_ENTER_VEH | MOVE_NO_COST);
 	}
 }
 

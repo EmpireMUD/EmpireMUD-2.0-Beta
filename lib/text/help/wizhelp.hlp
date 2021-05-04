@@ -1482,6 +1482,13 @@ Usage:  show account <player name | account id>
 
 Shows all characters associated with the target character's account (the target
 player's alternates). You can look this up by player or by id.
+
+Each character on this display shows how long ago they last logged in. This is
+color-coded to show the information at a glance: green for same day, yellow for
+same week, blue for same year, and red if it's over a year.
+
+If the account is not currently online, the most recent login time for the
+whole account is displayed at the bottom.
 #e
 "SHOW QUESTS"
 

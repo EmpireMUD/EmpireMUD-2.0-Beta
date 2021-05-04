@@ -69,7 +69,6 @@ CHORE_GEN_CRAFT_VALIDATOR(chore_workforce_crafting);
 // other local prototypes
 int get_workforce_production_limit(empire_data *emp, obj_vnum vnum);
 int empire_chore_limit(empire_data *emp, int island_id, int chore);
-int sort_einv(struct empire_storage_data *a, struct empire_storage_data *b);
 void log_workforce_problem(empire_data *emp, room_data *room, int chore, int problem, bool is_delay);
 bool workforce_is_delayed(empire_data *emp, room_data *room, int chore);
 
@@ -830,14 +829,10 @@ void chore_update(void) {
 			continue;
 		}
 		
+		sort_einv_for_empire(emp);
+		
 		// update islands
 		HASH_ITER(hh, EMPIRE_ISLANDS(emp), eisle, next_eisle) {
-			// sort einv now to ensure it's in a useful order (most quantity first)
-			if (!eisle->store_is_sorted) {
-				HASH_SORT(eisle->store, sort_einv);
-				eisle->store_is_sorted = TRUE;
-			}
-			
 			// run needs (8pm only)
 			if (main_time_info.hours == 20) {
 				// TODO: currently this runs 1 need at a time, but could probably save a lot of processing if it ran all needs at once
@@ -1360,6 +1355,26 @@ void set_workforce_production_limit(empire_data *emp, any_vnum vnum, int amount)
 */
 int sort_einv(struct empire_storage_data *a, struct empire_storage_data *b) {
 	return b->amount - a->amount;
+}
+
+
+/**
+* Ensures einv is sorted. Call before einv-related tasks.
+*
+* @param empire_data *emp The empire to sort.
+*/
+void sort_einv_for_empire(empire_data *emp) {
+	struct empire_island *eisle, *next_eisle;
+	
+	if (emp) {
+		HASH_ITER(hh, EMPIRE_ISLANDS(emp), eisle, next_eisle) {
+			// sort einv now to ensure it's in a useful order (most quantity first)
+			if (!eisle->store_is_sorted) {
+				HASH_SORT(eisle->store, sort_einv);
+				eisle->store_is_sorted = TRUE;
+			}
+		}
+	}
 }
 
 
