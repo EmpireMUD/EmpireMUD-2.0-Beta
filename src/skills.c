@@ -1730,7 +1730,13 @@ ACMD(do_skills) {
 		}
 		
 		if (!(abil = find_ability_by_name(arg2))) {
-			msg_to_char(ch, "No such ability '%s'.\r\n", arg2);
+			// did they try to skill-buy a skill?
+			if ((skill = find_skill_by_name(arg2))) {
+				msg_to_char(ch, "You can only \"skill buy\" an ability from one of your skill trees, not the whole %s tree.\r\n", skill->name);
+			}
+			else {
+				msg_to_char(ch, "No such ability '%s'.\r\n", arg2);
+			}
 			return;
 		}
 		
