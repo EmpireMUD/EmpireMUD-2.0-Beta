@@ -5572,8 +5572,8 @@ ACMD(do_tavern) {
 			msg_to_char(ch, "Invalid tavern type. ");	// deliberate lack of CRLF
 		}
 		else {
-			show_tavern_status(ch);
 			msg_to_char(ch, "This tavern is currently brewing %s.\r\n", tavern_data[get_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_TAVERN_TYPE)].name);
+			show_tavern_status(ch);
 		}
 		send_to_char("You can have it make:\r\n", ch);
 		for (iter = 0; *tavern_data[iter].name != '\n'; ++iter) {
