@@ -5568,7 +5568,7 @@ ACMD(do_tavern) {
 		msg_to_char(ch, "You need the workforce privilege to change what this tavern is brewing.\r\n");
 	}
 	else if (!*arg || type == NOTHING) {
-		if (type == NOTHING) {
+		if (*arg && type == NOTHING) {
 			msg_to_char(ch, "Invalid tavern type. ");	// deliberate lack of CRLF
 		}
 		else {
