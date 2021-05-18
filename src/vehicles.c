@@ -1149,7 +1149,7 @@ void start_dismantle_vehicle(vehicle_data *veh) {
 	if (VEH_OWNER(veh) && VEH_IS_COMPLETE(veh)) {
 		qt_empire_players_vehicle(VEH_OWNER(veh), qt_lose_vehicle, veh);
 		et_lose_vehicle(VEH_OWNER(veh), veh);
-		adjust_vehicle_tech(veh, FALSE);
+		adjust_vehicle_tech(veh, IN_ROOM(veh), FALSE);
 	}
 	
 	// clear it out
@@ -1333,11 +1333,11 @@ void update_vehicle_island_and_loc(vehicle_data *veh, room_data *loc) {
 			GET_ISLAND_ID(vrl->room) = GET_ISLAND_ID(loc);
 			GET_ISLAND(vrl->room) = GET_ISLAND(loc);
 			request_world_save(GET_ROOM_VNUM(vrl->room), WSAVE_ROOM);
+		}
 		
-			// check vehicles inside and cascade
-			DL_FOREACH2(ROOM_VEHICLES(vrl->room), iter, next_in_room) {
-				update_vehicle_island_and_loc(iter, loc);
-			}
+		// check vehicles inside and cascade
+		DL_FOREACH2(ROOM_VEHICLES(vrl->room), iter, next_in_room) {
+			update_vehicle_island_and_loc(iter, loc);
 		}
 	}
 }
@@ -1695,7 +1695,7 @@ void complete_vehicle(vehicle_data *veh) {
 		if (VEH_OWNER(veh)) {
 			qt_empire_players_vehicle(VEH_OWNER(veh), qt_gain_vehicle, veh);
 			et_gain_vehicle(VEH_OWNER(veh), veh);
-			adjust_vehicle_tech(veh, TRUE);
+			adjust_vehicle_tech(veh, IN_ROOM(veh), TRUE);
 		}
 		
 		finish_vehicle_setup(veh);
@@ -2757,6 +2757,7 @@ void clear_vehicle(vehicle_data *veh) {
 	VEH_CONSTRUCTION_ID(veh) = NOTHING;
 	VEH_INSTANCE_ID(veh) = NOTHING;
 	VEH_SPEED_BONUSES(veh) = VSPEED_NORMAL;
+	VEH_APPLIED_TO_ISLAND(veh) = NO_ISLAND;
 }
 
 

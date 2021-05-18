@@ -3031,7 +3031,7 @@ void perform_abandon_vehicle(vehicle_data *veh) {
 			abandon_room(VEH_INTERIOR_HOME_ROOM(veh));
 		}
 		
-		adjust_vehicle_tech(veh, FALSE);
+		adjust_vehicle_tech(veh, IN_ROOM(veh), FALSE);
 		if (VEH_IS_COMPLETE(veh) && emp) {
 			qt_empire_players_vehicle(emp, qt_lose_vehicle, veh);
 			et_lose_vehicle(emp, veh);
@@ -3143,7 +3143,7 @@ void perform_claim_vehicle(vehicle_data *veh, empire_data *emp) {
 			claim_room(VEH_INTERIOR_HOME_ROOM(veh), emp);
 		}
 		
-		adjust_vehicle_tech(veh, TRUE);
+		adjust_vehicle_tech(veh, IN_ROOM(veh), TRUE);
 		if (VEH_IS_COMPLETE(veh)) {
 			qt_empire_players_vehicle(emp, qt_gain_vehicle, veh);
 			et_gain_vehicle(emp, veh);
@@ -10062,6 +10062,7 @@ int get_number(char **name) {
 */
 void extract_vehicle(vehicle_data *veh) {
 	if (!VEH_IS_EXTRACTED(veh)) {
+		unapply_vehicle_to_room(veh);
 		check_dg_owner_purged_vehicle(veh);
 		set_vehicle_flags(veh, VEH_EXTRACTED);
 		++veh_extractions_pending;
@@ -10088,7 +10089,7 @@ void extract_vehicle_final(vehicle_data *veh) {
 	delete_vehicle_interior(veh);
 	
 	// ownership stuff
-	adjust_vehicle_tech(veh, FALSE);
+	unapply_vehicle_to_room(veh);
 	if (VEH_IS_COMPLETE(veh) && VEH_OWNER(veh)) {
 		qt_empire_players_vehicle(VEH_OWNER(veh), qt_lose_vehicle, veh);
 		et_lose_vehicle(VEH_OWNER(veh), veh);
@@ -10215,8 +10216,7 @@ void vehicle_from_room(vehicle_data *veh) {
 		return;
 	}
 	
-	// yank empire tech (which may be island-based)
-	adjust_vehicle_tech(veh, FALSE);
+	// mark the room for save
 	request_vehicle_save_in_world(veh);
 	
 	// check lights
@@ -10256,22 +10256,21 @@ void vehicle_to_room(vehicle_data *veh, room_data *room) {
 	DL_PREPEND2(ROOM_VEHICLES(room), veh, prev_in_room, next_in_room);
 	IN_ROOM(veh) = room;
 	VEH_LAST_MOVE_TIME(veh) = time(0);
-	update_vehicle_island_and_loc(veh, room);
-	affect_total_room(room);
+	
+	// apply-vehicle: only sets traits if the vehicle has moved to a new island/region
+	apply_vehicle_to_room(veh, room);
 	
 	// check lights
 	if (VEH_PROVIDES_LIGHT(veh)) {
 		++ROOM_LIGHTS(room);
 	}
 	
-	// apply empire tech (which may be island-based)
-	adjust_vehicle_tech(veh, TRUE);
-	
 	// update mapout if applicable
 	if (VEH_IS_VISIBLE_ON_MAPOUT(veh)) {
 		request_mapout_update(GET_ROOM_VNUM(room));
 	}
 	
+	affect_total_room(room);
 	request_vehicle_save_in_world(veh);
 }
 

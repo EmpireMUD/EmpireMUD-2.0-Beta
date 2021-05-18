@@ -1560,6 +1560,8 @@ int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_COORD(ge
 
 // basic data
 #define VEH_ANIMALS(veh)  ((veh)->animals)
+#define VEH_APPLIED_TO_ISLAND(veh)  ((veh)->applied_to_island)
+#define VEH_APPLIED_TO_ROOM(veh)  ((veh)->applied_to_room)
 #define VEH_BUILT_WITH(veh)  ((veh)->built_with)
 #define VEH_CARRYING_N(veh)  ((veh)->carrying_n)
 #define VEH_CONSTRUCTION_ID(veh)  ((veh)->construction_id)
