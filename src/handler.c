@@ -363,7 +363,7 @@ void affect_join(char_data *ch, struct affected_type *af, int flags) {
 	// FIX: merge af into af_iter instead of vice versa; do not remove/add the effect, but may still need to call messaging
 	
 	for (af_iter = ch->affected; af_iter && !found; af_iter = af_iter->next) {
-		if (af_iter->type == af->type && af_iter->location == af->location) {
+		if (af_iter->type == af->type && af_iter->location == af->location && af_iter->bitvector == af->bitvector) {
 			// found match: will merge the new af into the old one
 			if (IS_SET(flags, ADD_DURATION)) {
 				af_iter->duration += af->duration;
@@ -387,6 +387,9 @@ void affect_join(char_data *ch, struct affected_type *af, int flags) {
 
 			// prior to b5.129b this removed the old aff and applied a new one,
 			// which caused list iteration problems
+			
+			// update this:
+			af_iter->cast_by = af->cast_by;
 			
 			// send the message, if needed
 			if (!IS_SET(flags, SILENT_AFF) && (gen = find_generic(af->type, GENERIC_AFFECT))) {
