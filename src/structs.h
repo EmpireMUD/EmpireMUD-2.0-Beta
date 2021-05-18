@@ -2920,7 +2920,8 @@ struct affected_type {
 	byte location;	// Tells which ability to change - APPLY_
 	bitvector_t bitvector;	// Tells which bits to set - AFF_
 	
-	struct dg_event *expire_event;	// SOMETIMES these have scheduled events
+	struct dg_event *expire_event;	// SOMETIMES these have scheduled events (only on rooms)
+		// NOTE: if you apply expire_event to character buffs, functions like affect_join that update the duration must check it
 	
 	struct affected_type *next;
 };
