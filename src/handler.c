@@ -357,36 +357,54 @@ void affect_from_room_by_bitvector(room_data *room, any_vnum type, bitvector_t b
 */
 void affect_join(char_data *ch, struct affected_type *af, int flags) {
 	struct affected_type *af_iter;
+	generic_data *gen;
 	bool found = FALSE;
+	
+	// FIX: merge af into af_iter instead of vice versa; do not remove/add the effect, but may still need to call messaging
 	
 	for (af_iter = ch->affected; af_iter && !found; af_iter = af_iter->next) {
 		if (af_iter->type == af->type && af_iter->location == af->location) {
+			// found match: will merge the new af into the old one
 			if (IS_SET(flags, ADD_DURATION)) {
-				af->duration += af_iter->duration;
+				af_iter->duration += af->duration;
 			}
 			else if (IS_SET(flags, AVG_DURATION)) {
-				af->duration = (af->duration + af_iter->duration) / 2;
+				af_iter->duration = (af->duration + af_iter->duration) / 2;
 			}
-
+			else {	// otherwise keep the new duration
+				af_iter->duration = af->duration;
+			}
+			
 			if (IS_SET(flags, ADD_MODIFIER)) {
-				af->modifier += af_iter->modifier;
+				af_iter->modifier += af->modifier;
 			}
-			if (IS_SET(flags, AVG_MODIFIER)) {
-				af->modifier = (af->modifier + af_iter->modifier) / 2;
+			else if (IS_SET(flags, AVG_MODIFIER)) {
+				af_iter->modifier = (af->modifier + af_iter->modifier) / 2;
+			}
+			else {	// otherwise keep the new modifier
+				af_iter->modifier = af->modifier;
 			}
 
-			affect_remove(ch, af_iter);
-			if (IS_SET(flags, SILENT_AFF)) {
-				affect_to_char_silent(ch, af);
+			// prior to b5.129b this removed the old aff and applied a new one,
+			// which caused list iteration problems
+			
+			// send the message, if needed
+			if (!IS_SET(flags, SILENT_AFF) && (gen = find_generic(af->type, GENERIC_AFFECT))) {
+				if (GET_AFFECT_APPLY_TO_CHAR(gen)) {
+					act(GET_AFFECT_APPLY_TO_CHAR(gen), FALSE, ch, NULL, NULL, TO_CHAR);
+				}
+				if (GET_AFFECT_APPLY_TO_ROOM(gen)) {
+					act(GET_AFFECT_APPLY_TO_ROOM(gen), TRUE, ch, NULL, NULL, TO_ROOM);
+				}
 			}
-			else {
-				affect_to_char(ch, af);
-			}
+			
+			queue_delayed_update(ch, CDU_MSDP_AFFECTS);
 			found = TRUE;
 			break;
 		}
 	}
 	
+	// add it if not found
 	if (!found) {
 		if (IS_SET(flags, SILENT_AFF)) {
 			affect_to_char_silent(ch, af);
@@ -396,7 +414,7 @@ void affect_join(char_data *ch, struct affected_type *af, int flags) {
 		}
 	}
 	
-	// affect_to_char seems to duplicate af so we must free it
+	// af is always copied or duplicated; must free it now
 	free(af);
 	affect_total(ch);
 }
