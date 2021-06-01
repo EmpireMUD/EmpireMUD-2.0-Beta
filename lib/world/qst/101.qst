@@ -50,13 +50,11 @@ cactus stirs to life... Defeat it to complete this quest and close the rift.
 immediately. You sense that the mana holding open the rift has begun to fade,
 and realize you should leave the rift immediately.
 ~
-11 bc 75 100 0
+12 bc 75 100 0
 A
 4 10148
 P
 9 0 0 51 a
-P
-6 10141 0 1 a
 P
 6 10144 0 1 a
 P
@@ -134,7 +132,7 @@ monsoon rift and type 'ritual rift' to seal it off and end the cactus invasion.
 fade and lose its hold. Almost instantly, the rift begins to collapse.
 Hopefully nobody is trapped on the wrong side of it!
 ~
-13 bc 75 100 0
+14 bc 75 100 0
 A
 2 10142
 P
@@ -143,8 +141,6 @@ P
 6 10141 0 1 a
 P
 6 10142 0 1 a
-P
-6 10144 0 1 a
 P
 6 10147 0 1 a
 P
@@ -374,7 +370,7 @@ have been ravaging the countryside.
 animates the cacti begins to fade. In the distance, you can see the rift
 starting to close. You better hurry out!
 ~
-12 bc 75 100 0
+13 bc 75 100 0
 A
 2 10161
 P
@@ -395,8 +391,6 @@ P
 6 10150 0 1 a
 P
 6 10153 0 1 a
-P
-6 10156 0 1 a
 R
 0 0 3
 R
