@@ -2473,6 +2473,7 @@ void do_import_list(char_data *ch, empire_data *emp, char *argument, int subcmd)
 			}
 			else {
 				strcat(buf, " and more\r\n");	// strcat: OK (-12 saved room)
+				break;
 			}
 		}
 	}
