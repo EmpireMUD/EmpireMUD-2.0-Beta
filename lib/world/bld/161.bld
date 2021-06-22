@@ -31,7 +31,7 @@ An Oceanic Tower~
 24 0 blpR 0
 0 0 0 -1
 C
-upgrade~
+look out, upgrade~
 D
    This is a well-constructed guard tower, anchored by long hydra bones. It is
 tall, allowing it to see over most buildings and structures. The tower shoots
@@ -58,6 +58,8 @@ An Advanced Oceanic Tower~
 &T"TT"~
 64 5 blrR 0
 0 0 0 -1
+C
+look out~
 D
    This is a well-constructed guard tower, anchored by long hydra bones. It is
 tall, allowing it to see over most buildings and structures. The tower shoots

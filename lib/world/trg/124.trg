@@ -496,14 +496,18 @@ if %self.cooldown(12400)%
 end
 nop %self.set_cooldown(12400, 30)%
 say Get 'em, Polly!
+set verify_target %actor.id%
 wait 2 sec
 if %random.20% == 20
   %echo% |%self% parrot says, 'Awk! Polly want a cracker!'
   wait 5 sec
   say Arr! Curse ye, mutinous fowl!
 else
-  %send% %actor% &&r|%self% parrot dive-bombs you, forcing you to cover your eyes!
-  %echoaround% %actor% |%self% parrot dive-bombs ~%actor%, forcing *%actor% to cover ^%actor% eyes!
+  if %verify_target% != %actor.id%
+    %echo% |%self% parrot says, 'They be gone captin!'
+    halt
+  end
+  %echo% |%self% parrot dive-bombs ~%actor%, forcing *%actor% to cover ^%actor% eyes!
   %damage% %actor% 25 physical
   dg_affect #12422 %actor% BLIND on 5
   %dot% #12423 %actor% 50 10 physical

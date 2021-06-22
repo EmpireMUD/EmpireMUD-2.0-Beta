@@ -58,8 +58,7 @@ if %self.cooldown(9503)%
   halt
 end
 nop %self.set_cooldown(9503, 15)%
-%send% %actor% ~%self% puts ^%self% head down and charges you!
-%echoaround% %actor% ~%self% puts ^%self% head down and charges ~%actor%!
+%echo% ~%self% puts ^%self% head down and charges ~%actor%!
 wait 2 sec
 if !%actor% || %actor.room% != %self.room% || %self.aff_flagged(ENTANGLED)% || %self.aff_flagged(STUNNED)%
   %echo% |%self% attack is interrupted.

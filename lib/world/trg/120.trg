@@ -375,6 +375,7 @@ set person %self.room.people%
 while %person%
   if %person.vnum% == 12000
     set anat %person%
+    set verify_goddess %person.id%
   end
   set person %person.next_in_room%
 done
@@ -392,20 +393,28 @@ if %target.is_pc%
   set target_string %target.firstname%
 else
   set name %target.name%
-  set target_string the %name.cdr%
+  set target_string %name.cdr%
+  if !%target_string%
+    set target_string %name%
+  elseif %target_string.car% != the
+    set target_string the %target_string%
+  end
 end
 %force% %anat% say Yatpan! Strike %target_string% down!
-%send% %target% ~%self% screeches and dives at you!
-%echoaround% %target% ~%self% screeches and dives at ~%target%!
+%echo% ~%self% screeches and dives at ~%target%!
 * Give the tank time to prepare
+set verify_target %target.id%
 wait 5 sec
-if !%anat%
+if %anat.id% != %verify_goddess%
   %echo% ~%self% gives a mournful cry, and vanishes in a flash of light!
   %purge% %self%
   halt
 end
-%send% %target% &&r~%self% crashes into you, talons tearing, and seizes your weapon!
-%echoaround% %target% ~%self% crashes into ~%target%, talons tearing, and seizes ^%target% weapon!
+if %target.id% != %verify_target%
+  %echo% ~%self% circles about, seeming to have lost ^%self% target.
+  halt
+end
+%echo% ~%self% crashes into ~%target%, talons tearing, and seizes ^%target% weapon!
 if %anat.mob_flagged(GROUP)%
   %damage% %target% 200 physical
   dg_affect #12013 %target% HARD-STUNNED on 10

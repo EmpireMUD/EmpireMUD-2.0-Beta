@@ -300,7 +300,7 @@ switch %selected_ability%
       halt
     end
     if %targ.health% == %targ.maxhealth%
-      %send% %self.leader% ~%self% tries to heal ~%targ%, but &%targ% doesn't need healing.
+      %send% %self.leader% ~%self% tries to heal ~%targ%, but &%targ% didn't need healing.
       %echoneither% %self.leader% %targ% ~%self% flies in circles around ~%targ%.
       %send% %targ% ~%self% flies in circles around you.
       nop %self.set_cooldown(500, 5)%
