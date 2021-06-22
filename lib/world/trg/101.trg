@@ -62,8 +62,7 @@ else
       end
     break
     case 3
-      %send% %actor% ~%self% hexes you!
-      %echoaround% %actor% ~%self% hexes ~%actor%!
+      %echo% ~%self% hexes ~%actor%!
       dg_affect %actor% SLOW on 30
     break
     case 4
@@ -102,7 +101,6 @@ done
 Swamp Rat combat~
 0 k 15
 ~
-wait 10
 %echo% ~%self% bites deep!
 %send% %actor% You don't feel so good...
 %echoaround% %actor% ~%actor% doesnt look so good...
@@ -1679,7 +1677,8 @@ if (!%instance.location% || %self.room.template% != 10190)
   halt
 end
 mgoto %instance.location%
-%purge% volcanoportal
+set volcanoportal %self.room.contents(10190)%
+%purge% %volcanoportal%
 ~
 #10191
 Lavaforming~

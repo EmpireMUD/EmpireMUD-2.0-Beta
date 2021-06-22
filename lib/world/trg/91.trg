@@ -55,9 +55,13 @@ if %target.affect(9104)%
 end
 nop %self.cooldown(9103, 20)%
 * Valid target found, start attack
-%send% %target% ~%self% starts to wrap around you...
-%echoaround% %target% ~%self% starts to wrap around ~%target%...
+%echo% ~%self% starts to wrap around ~%target%...
+set verify_target %target.id%
 wait 3 sec
+if %target.id% != %verify_target%
+  %echo% ~%self% releases the newly strangled corpse!
+  halt
+end
 if (!%target% || %target.room% != %self.room%)
   halt
 end

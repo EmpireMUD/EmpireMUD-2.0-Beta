@@ -48,7 +48,7 @@ plated hydra gloves (FORGE, Imperial Armors)
 0 0 0
 7 0
 R
-5193 0
+4 5193 0
 S
 #16102
 wand hydra fang~
@@ -195,7 +195,7 @@ Seems it would make an excellent mast on a ship though.
 C
 1 1
 R
-5193 0
+4 5193 0
 S
 #16109
 fang hydra~
@@ -231,7 +231,7 @@ hydra fang bow (CRAFT, Deadly Weapons)
 0 0 0
 14 0
 R
-5193 0
+4 5193 0
 S
 #16110
 skull hydra~
@@ -791,7 +791,7 @@ hydra scale leggings (FORGE, Imperial Armors)
 2 0 0
 7 0
 R
-5611 a
+4 5611 a
 S
 #16135
 whistle hydraling~
@@ -1136,6 +1136,6 @@ Usage: build oceanictower <direction>
 0 0 0
 7 0
 R
-5193 0
+4 5193 0
 S
 $

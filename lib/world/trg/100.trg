@@ -39,7 +39,7 @@ Archdruid combat: frost~
 0 k 10
 ~
 set chance %random.3%
-if (chance < 3)
+if %chance% < 3
   * Arctic chill on tank
   %send% %actor% &&r~%self% draws moisture from the air and hits you with an arctic chill!&&0
   %echoaround% %actor% ~%self% draws moisture from the air and hits ~%actor% with an arctic chill!
@@ -322,10 +322,9 @@ Baby dragon combat~
 0 k 10
 ~
 set chance %random.3%
-if (chance < 3)
+if %chance% < 3
   * Fire spurt on tank
-  %send% %actor% ~%self% spurts fire at you, causing searing burns!
-  %echoaround% %actor% ~%self% spurts fire at ~%actor%, causing searing burns!
+  %echo% ~%self% spurts fire at ~%actor%, causing searing burns!
   %dot% %actor% 100 60 fire
   %damage% %actor% 20 fire
 else
@@ -1182,13 +1181,21 @@ Barrosh combat~
 switch %random.4%
   case 1
     %echo% ~%self% speaks an arcane phrase...
+    set verify_target %actor.id%
     wait 1 sec
+    if %verify_target% != %actor.id%
+      halt
+    end
     dg_affect %actor% STRENGTH -1 20
     %send% %actor% You feel weaker.
   break
   case 2
     %echo% ~%self% speaks an arcane phrase...
+    set verify_target %actor.id%
     wait 1 sec
+    if %verify_target% != %actor.id%
+      halt
+    end
     dg_affect %actor% INTELLIGENCE -1 20
     %send% %actor% You feel dumber.
   break

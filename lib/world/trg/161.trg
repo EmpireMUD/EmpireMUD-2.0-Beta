@@ -418,6 +418,9 @@ else
   set level 225
 end
 set actor %self.carried_by%
+if !%actor%
+  set actor %self.worn_by%
+end
 if !%actor.is_pc%
   if !%self.is_flagged(GROUP-DROP)%
     nop %self.flag(GROUP-DROP)%

@@ -244,6 +244,12 @@ if !%self.has_trigger(16003)%
   attach 16003 %self.id%
 end
 ~
+#16012
+necrogoblin adventure removal~
+0 f 100
+~
+%adventurecomplete%
+~
 #16020
 no drop me~
 1 h 100

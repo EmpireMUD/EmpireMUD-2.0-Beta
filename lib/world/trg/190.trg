@@ -406,7 +406,11 @@ if %self.vnum% == 19002
 end
 * Bite deep
 if %random.6% == 6
+  set verify_target %actor.id%
   wait 1
+  if %verify_target% != %actor.id%
+    halt
+  end
   %echo% ~%self% bites deep!
   %send% %actor% You don't feel so good...
   %echoaround% %actor% ~%actor% doesn't look so good...
