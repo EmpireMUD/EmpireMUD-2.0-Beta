@@ -1037,11 +1037,13 @@ if %target.affect(10760)%
 end
 nop %self.cooldown(10761, 15)%
 * Valid target found, start attack
-%send% %target% ~%self% twists around, pointing ^%self% spinneret at you...
-%echoaround% %target% ~%self% twists around, pointing ^%self% spinneret at ~%target%...
+%echo% ~%self% twists around, pointing ^%self% spinneret at ~%target%...
+set verify_target %target.id%
 wait 3 sec
-%send% %target% A stream of sticky webs flies out, binding your limbs!
-%echoaround% %target% A stream of sticky webs flies out, binding |%target% limbs!
+if %verify_target% != %actor.id%
+  halt
+end
+%echo% A stream of sticky webs flies out, binding |%target% limbs!
 %send% %target% Type 'struggle' to break free!
 dg_affect #10760 %actor% STUNNED on 15
 ~

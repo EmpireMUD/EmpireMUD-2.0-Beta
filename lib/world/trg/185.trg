@@ -191,6 +191,7 @@ if %self.cooldown(18501)%
 end
 nop %self.set_cooldown(18501, 30)%
 set heroic_mode %self.mob_flagged(GROUP)%
+set verify_target %actor.id%
 switch %random.4%
   case 1
     * Blade Dance
@@ -223,6 +224,9 @@ switch %random.4%
     %send% %actor% ~%self% lunges forward and grabs you!
     %echoaround% %actor% ~%self% lunges forward and grabs onto ~%actor%!
     wait 3 sec
+    if %verify_target% != %actor.id%
+      halt
+    end
     %send% %actor% ~%self% sinks ^%self% fangs deep into your neck!
     %echoaround% %actor% ~%self% sinks ^%self% fangs deep into |%actor% neck!
     if %heroic_mode%
@@ -245,6 +249,9 @@ switch %random.4%
     say I'll sssmash you to dussst!
     %echo% ~%self% raises all four of ^%self% blades overhead!
     wait 3 sec
+    if %verify_target% != %actor.id%
+      halt
+    end
     %send% %actor% &&rAll four of |%self% blades strike you with deadly force!
     %echoaround% %actor% All four of |%self% blades strike ~%actor% with deadly force!
     %send% %actor% You are stunned by |%self% powerful blow!
@@ -302,6 +309,7 @@ switch %random.4%
     * Hard: Blind tank for 10 seconds, 25% damage
     * Boss: Blind everyone for 10 seconds, 25% aoe damage
     %echo% ~%self% spreads ^%self% prismatic wings wide!
+    set verify_target %actor.id%
     wait 2 sec
     if %heroic_mode%
       %echo% &&r|%self% jeweled feathers flash brightly, blinding everyone!
@@ -314,8 +322,10 @@ switch %random.4%
         set person %person.next_in_room%
       done
     else
-      %send% %actor% &&r|%self% jeweled feathers flash brightly, blinding you!
-      %echoaround% %actor% |%self% jeweled feathers flash brightly, blinding ~%actor%!
+      if %verify_target% != %actor.id%
+        halt
+      end
+      %echo% |%self% jeweled feathers flash brightly, blinding ~%actor%!
       %damage% %actor% 25 magical
       dg_affect #18511 %actor% BLIND on 10
     end

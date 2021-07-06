@@ -816,7 +816,12 @@ end
 nop %self.set_cooldown(10200, 30)%
 set heroic_mode %self.mob_flagged(GROUP)%
 %echo% ~%self% draws back ^%self% fist for a mighty blow...
+set verify_target %actor.id%
 wait 3 sec
+if %verify_target% != %actor.id%
+  %echo% ~%self% changes his mind.
+  halt
+end
 if %heroic_mode%
   %send% %actor% &&r|%self% fist flies right at your face!
   %damage% %actor% 150 physical
@@ -825,8 +830,7 @@ if %heroic_mode%
   dg_affect #10206 %actor% BLIND on 15
   dg_affect #10206 %actor% HARD-STUNNED on 15
 else
-  %send% %actor% ~%self% hits you hard, stunning you!
-  %echoaround% %actor% ~%self% hits ~%actor% hard, stunning *%actor%!
+  %echo% ~%self% hits ~%actor% hard, stunning *%actor%!
   %damage% %actor% 100 physical
   dg_affect #10206 %actor% STUNNED on 5
 end
@@ -872,11 +876,13 @@ end
 if !%target%
   halt
 end
-%send% %actor% ~%self% dashes backwards, draws ^%self% bow, and aims at you!
-%echoaround% %actor% ~%self% dashes backwards, draws ^%self% bow, and aims at ~%actor%!
+%echo% ~%self% dashes backwards, draws ^%self% bow, and aims at ~%actor%!
+set verify_target %actor.id%
 wait 2 sec
-%send% %actor% ~%self% shoots you with a poisoned arrow!
-%echoaround% %actor% ~%self% shoots ~%actor% with a poisoned arrow!
+if %verify_target% != %actor.id%
+  halt
+end
+%echo% ~%self% shoots ~%actor% with a poisoned arrow!
 if %heroic_mode%
   %damage% %actor% 50 physical
   %dot% #10208 %actor% 200 30 poison

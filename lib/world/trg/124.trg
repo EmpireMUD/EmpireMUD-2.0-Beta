@@ -846,7 +846,11 @@ if %self.cooldown(12400)%
 end
 nop %self.set_cooldown(12400, 30)%
 %echo% ~%self% chants and waves ^%self% arms!
+set verify_target %actor.id%
 wait 5 sec
+if %verify_target% != %actor.id%
+  halt
+end
 if %actor.trigger_counterspell%
   %send% %actor% ~%self% points at you, but nothing seems to happen.
   %echaround% %actor% %self.name% points at %actor.name%, but nothing seems to happen.
@@ -854,6 +858,9 @@ else
   %send% %actor% ~%self% points at you, and you feel your lungs begin to fill with water!
   %dot% #12435 %actor% 50 30 magical 5
   wait 5 sec
+  if %verify_target% != %actor.id%
+    halt
+  end
   while %actor.affect(12435)%
     %send% %actor% |%self% curse strengthens!
     %dot% #12435 %actor% 50 30 magical 5

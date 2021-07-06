@@ -255,12 +255,20 @@ nop %self.set_cooldown(12002, 30)%
 * Might need to clear blind?
 %echo% ~%self% draws ^%self% axe.
 dg_affect %self% STUNNED on 5
+set verify_target %actor.id%
 wait 2 sec
+if %verify_target% != %actor.id%
+  %echo% ~%self% seems to change ^%self% mind as the axe is resheathed.
+  halt
+end
 %echo% ~%self% raises her axe over one shoulder in a two-handed grip...
 wait 3 sec
+if %verify_target% != %actor.id%
+  %echo% ~%self% resheaths ^%self% axe.
+  halt
+end
 if %self.aff_flagged(ENTANGLE)%
-  %send% %actor% &&r~%self% hacks at you between attempts to free *%self%self from the entanglement!
-  %echoaround% %actor% ~%self% hacks at ~%actor% between attempts to free *%self%self from the entanglement.
+  %echo% ~%self% hacks at ~%actor% between attempts to free *%self%self from the entanglement.
   %damage% %actor% 250 physical
   %dot% #12008 %actor% 150 30 physical
   halt
@@ -303,9 +311,12 @@ end
 nop %self.set_cooldown(12002, 30)%
 %echo% ~%self% draws ^%self% spear.
 dg_affect %self% HARD-STUNNED on 5
+set verify_target %actor.id%
 wait 2 sec
-%send% %actor% &&r~%self% drives ^%self% spear through your chest, impaling you upon it!
-%echoaround% %actor% ~%self% drives ^%self% spear through |%actor% chest, impaling *%actor% upon it!
+if %verify_target% != %actor.id%
+  halt
+end
+%echo% ~%self% drives ^%self% spear through |%actor% chest, impaling *%actor% upon it!
 if %self.mob_flagged(GROUP)%
   %damage% %actor% 500 physical
   dg_affect #12009 %actor% HARD-STUNNED on 15
@@ -316,8 +327,11 @@ else
   %dot% #12009 %actor% 200 10 physical
 end
 wait 3 sec
-%send% %actor% ~%self% releases ^%self% spear, allowing you to slump to the ground.
-%echoaround% %actor% ~%self% releases ^%self% spear, allowing ~%actor% to slump to the ground.
+if %verify_target% != %actor.id%
+  %echo% ~%self% retrieves ^%self% spear from the corpse.
+  halt
+end
+%echo% ~%self% releases ^%self% spear, allowing ~%actor% to slump to the ground.
 ~
 #12010
 Anat: Earthshatter~
@@ -761,11 +775,13 @@ while %time% <= %times%
   if !%target%
     set target %actor%
   end
-  %send% %target% ~%self% draws back an arm and takes aim at you...
-  %echoaround% %target% ~%self% draws back an arm and takes aim at ~%target%...
+  %echo% ~%self% draws back an arm and takes aim at ~%target%...
+  set verify_target %target.id%
   wait 2 sec
-  %send% %target% ~%self% hurls a thunderbolt at you!
-  %echoaround% %target% ~%self% hurls a thunderbolt at ~%target%!
+  if %verify_target% != %actor.id%
+    halt
+  end
+  %echo% ~%self% hurls a thunderbolt at ~%target%!
   %send% %target% &&rThe thunderbolt explodes in your face!
   %echoaround% %target% The thunderbolt explodes in front of |%target% face!
   %damage% %target% 100 magical
