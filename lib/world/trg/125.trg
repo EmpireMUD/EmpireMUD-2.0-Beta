@@ -197,31 +197,36 @@ else
       * Tee hee
       nop %self.set_cooldown(12502, 15)%
     end
+    set verify_target %actor.id%
     %echo% ~%self% raises ^%self% left arm, and a massive blade extends from ^%self% clenched fist.
     wait 3 sec
-    if %actor.is_pc%
-      * PC
-      %send% %actor% &&r|%self% slashes at you with ^%self% retractable blade, rending your armor and causing mortal injury!
-      %echoaround% %actor% |%self% slashes at ~%actor% with ^%self% retractable blade, rending ^%actor% armor and causing mortal injury!
-      %damage% %actor% 900 physical
-      %dot% #12506 %actor% 1000 15 physical 1
-      dg_affect #12506 %actor% RESIST-PHYSICAL -50 15
-    else
-      * Tank familiar
-      %send% %actor% &&r~%self% slashes at you with ^%self% retractable blade, decapitating you with a single strike!
-      %send% %actor% ~%self% slashes at ~%actor% with ^%self% retractable blade, decapitating *%actor% with a single strike!
-      %damage% %actor% 99999 physical
+    if %verify_target% == %actor.id%
+      if %actor.is_pc%
+        * PC
+        %send% %actor% &&r|%self% slashes at you with ^%self% retractable blade, rending your armor and causing mortal injury!
+        %echoaround% %actor% |%self% slashes at ~%actor% with ^%self% retractable blade, rending ^%actor% armor and causing mortal injury!
+        %damage% %actor% 900 physical
+        %dot% #12506 %actor% 1000 15 physical 1
+        dg_affect #12506 %actor% RESIST-PHYSICAL -50 15
+      else
+        * Tank familiar
+        %send% %actor% &&r~%self% slashes at you with ^%self% retractable blade, decapitating you with a single strike!
+        %send% %actor% ~%self% slashes at ~%actor% with ^%self% retractable blade, decapitating *%actor% with a single strike!
+        %damage% %actor% 99999 physical
+      end
+      wait 1 sec
     end
-    wait 1 sec
     %echo% |%self% retractable blade slides back into its fist.
   else
     %echo% ~%self% raises ^%self% left arm, and a massive blade extends from ^%self% clenched fist.
     wait 3 sec
-    %send% %actor% &&r|%self% slashes at you with ^%self% retractable blade, opening bleeding wounds!
-    %echoaround% %actor% |%self% slashes at ~%actor% with ^%self% retractable blade, opening bleeding wounds!
-    %damage% %actor% 300 physical
-    %dot% #12506 %actor% 200 15 physical 1
-    wait 1 sec
+    if %verify_target% == %actor.id%
+      %send% %actor% &&r|%self% slashes at you with ^%self% retractable blade, opening bleeding wounds!
+      %echoaround% %actor% |%self% slashes at ~%actor% with ^%self% retractable blade, opening bleeding wounds!
+      %damage% %actor% 300 physical
+      %dot% #12506 %actor% 200 15 physical 1
+      wait 1 sec
+    end
     %echo% |%self% retractable blade slides back into its fist.
   end
 end

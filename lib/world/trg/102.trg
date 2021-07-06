@@ -735,22 +735,22 @@ end
 wait 5
 %echo% ~%self% cackles insanely!
 wait 3 sec
-if (%self.fighting% || %self.disabled%)
+if (%self.fighting% || %self.disabled% || %actor.room% != %self.room%)
   halt
 end
 %echo% A strange violet glow encircles ~%self%, as if some arcane magic is controlling him.
 wait 3 sec
-if (%self.fighting% || %self.disabled%)
+if (%self.fighting% || %self.disabled% || %actor.room% != %self.room%)
   halt
 end
 say How dare you follow me here!
 wait 3 sec
-if (%self.fighting% || %self.disabled%)
+if (%self.fighting% || %self.disabled% || %actor.room% != %self.room%)
   halt
 end
 say Did the Academy send you? Are you here to take me back? I'm not going back there!
 wait 3 sec
-if (%self.fighting% || %self.disabled%)
+if (%self.fighting% || %self.disabled% || %actor.room% != %self.room%)
   halt
 end
 %aggro% %actor%
@@ -986,23 +986,23 @@ end
 wait 5
 %echo% The earth itself tremors in fear as ~%self% stomps toward you.
 wait 3 sec
-if (%self.fighting% || %self.disabled%)
+if (%self.fighting% || %self.disabled% || %actor.room% != %self.room%)
   halt
 end
 %echo% ~%self% stops and lets out a terrifying roar!
 wait 3 sec
-if (%self.fighting% || %self.disabled%)
+if (%self.fighting% || %self.disabled% || %actor.room% != %self.room%)
   halt
 end
 %echo% ~%self% swipes ^%self% massive tail, and a tree goes flying!
 %load% obj 120 room
 wait 3 sec
-if (%self.fighting% || %self.disabled%)
+if (%self.fighting% || %self.disabled% || %actor.room% != %self.room%)
   halt
 end
 %echo% ~%self% looms close, and it's only as &%self% bends down to bite you that you realize how big &%self% is!
 wait 3 sec
-if (%self.fighting% || %self.disabled%)
+if (%self.fighting% || %self.disabled% || %actor.room% != %self.room%)
   halt
 end
 %aggro% %actor%
@@ -1017,23 +1017,23 @@ end
 wait 5
 %echo% A wicked screech pierces the air!
 wait 3 sec
-if (%self.fighting% || %self.disabled%)
+if (%self.fighting% || %self.disabled% || %actor.room% != %self.room%)
   halt
 end
 %echo% ~%self% drops the crocodile &%self% was carrying in its talons, and swoops toward you!
 wait 3 sec
-if (%self.fighting% || %self.disabled%)
+if (%self.fighting% || %self.disabled% || %actor.room% != %self.room%)
   halt
 end
 %echo% ~%self% vanishes as &%self% swoops too close to the trees for you to see exactly which way &%self%'s coming from.
 %load% obj 120
 wait 3 sec
-if (%self.fighting% || %self.disabled%)
+if (%self.fighting% || %self.disabled% || %actor.room% != %self.room%)
   halt
 end
 %echo% ~%self% reappears over the clearing, suddenly so close &%self% blots out the sun!
 wait 3 sec
-if (%self.fighting% || %self.disabled%)
+if (%self.fighting% || %self.disabled% || %actor.room% != %self.room%)
   halt
 end
 %aggro% %actor%

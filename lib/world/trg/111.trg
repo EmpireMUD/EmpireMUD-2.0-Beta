@@ -711,22 +711,23 @@ end
 dg_affect %target% HARD-STUNNED on 15
 dg_affect %self% HARD-STUNNED on 15
 %damage% %target% 50
+set verify_target %target.id%
 wait 5 sec
-if !%target% || !%self% || !%self.fighting%
+if %verify_target% != %target.id%
   halt
 end
 %send% %target% ~%self% constricts and crushes you!
 %echoaround% %target% ~%self% constricts and crushes ~%target%!
 %damage% %target% 50
 wait 5 sec
-if !%target% || !%self% || !%self.fighting%
+if %verify_target% != %target.id%
   halt
 end
 %send% %target% ~%self% constricts and crushes you!
 %echoaround% %target% ~%self% constricts and crushes ~%target%!
 %damage% %target% 50
 wait 5 sec
-if !%target% || !%self% || !%self.fighting%
+if %verify_target% != %target.id%
   halt
 end
 %send% %target% ~%self% releases you!

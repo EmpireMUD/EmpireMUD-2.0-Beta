@@ -115,7 +115,11 @@ if !%actor.affect(disarm)%
 elseif !%actor.affect(blind)% && %random.2% == 2
   blind
 else
+  set verify_target %actor.id%
   wait 10
+  if %verify_target% != %actor.id%
+    halt
+  end
   %send% %actor% Berk's dagger seems to have left some poison in your system!
   %echoaround% %actor% ~%actor% looks as if &%actor%'s been poisoned!
   * 1 or both poison effects:
@@ -137,16 +141,19 @@ end
 Jorr combat~
 0 k 15
 ~
-if !%actor.affect(colorburst)%
+if !%actor.affect(3015)%
   colorburst
-elseif !%self.affect(foresight)%
+elseif !%self.affect(3009)%
   foresight
 else
+  set verify_target %actor.id%
   wait 10
   switch %random.3%
     case 1
-      %send% %actor% Jorr raises her hand over the fire and it whips toward you, causing painful burns!
-      %echoaround% %actor% Jorr raises her hand over the fire and it whips toward ~%actor%, causing painful burns!
+      if %verify_target% != %actor.id%
+        halt
+      end
+      %echo% ~%self% raises her hand over the fire and it whips toward ~%actor%, causing painful burns!
       %dot% %actor% 100 15 fire
       %damage %actor% 30 fire
     break
@@ -176,15 +183,14 @@ Tranc combat~
 wait 10
 * If dog summoned, tank
 if %self.varexists(hound)%
-  if %self.hound%
-    if !%actor.affect(disarm)%
-      disarm
-    elseif %self.health% < (%self.maxhealth% / 2)
-      %echo% Tranc quaffs a potion!
-      %damage% %self% -50
-    end
-    halt
+  if !%actor.aff_flagged(DISARM)%
+    %echo% ~%self% disarms ~%actor%!
+    dg_affect #3018 %actor% DISARM on 15
+  elseif %self.health% < (%self.maxhealth% / 2)
+    %echo% Tranc quaffs a potion!
+    %heal% %self% health 50
   end
+  halt
 end
 * Otherwise, summon dog
 %echo% Tranc whistles loudly!
@@ -256,27 +262,43 @@ wait 1 sec
 Sly combat~
 0 k 10
 ~
-%send% %actor% Sly's shadow stretches out and grabs at you...
-%echoaround% %actor% Sly's shadow stretches out and grabs at ~%actor%...
+%echo% Sly's shadow stretches out and grabs at ~%actor%...
+set verify_target %actor.id%
 dg_affect %actor% STUNNED on 10
 wait 2 sec
+if %verify_target% != %actor.id%
+  halt
+end
 %send% %actor% The shadows grasp and pull at you!
 wait 2 sec
+if %verify_target% != %actor.id%
+  halt
+end
 %send% %actor% The shadows rip at your very soul!
 wait 2 sec
+if %verify_target% != %actor.id%
+  halt
+end
 %send% %actor% Feelings of terror wash over you!
 wait 2 sec
+if %verify_target% != %actor.id%
+  halt
+end
 %send% %actor% Your own shadow reaches up to strangle you!
 ~
 #10112
 Chiv combat~
-0 k 8
+0 k 100
 ~
 wait 10
 %echo% Chiv sinks into the shadows...
+set verify_target %actor.id%
 wait 30
-%send% %actor% Chiv appears behind you and sinks her dagger into your back!
-%echoaround% %actor% Chiv appears behind ~%actor% and sinks her dagger into ^%actor% back!
+if %verify_target% != %actor.id%
+  %echo% ~%self% appears from the shadows, seemingly without doing anything?
+  halt
+end
+%echo% Chiv appears behind ~%actor% and sinks her dagger into ^%actor% back!
 %dot% %actor% 50 15 physical
 %damage% %actor% 150 physical
 ~
@@ -576,8 +598,9 @@ done
 ~
 #10143
 Saguaro treant combat~
-0 k 25
+0 k 100
 ~
+set verify_target %actor.id%
 switch %random.4%
   case 1
     %send% %actor% ~%self% brushes an arm against you, leaving dozens of painful spines behind!
@@ -588,6 +611,9 @@ switch %random.4%
   case 2
     %echo% |%self% spines ripple, and storm clouds form overhead.
     wait 1 sec
+    if %verify_target% != %actor.id%
+      halt
+    end
     %send% %actor% You are struck by lightning!
     %echoaround% %actor% ~%actor% is struck by lightning!
     %damage% %actor% 75 magical
@@ -595,13 +621,14 @@ switch %random.4%
   case 3
     %echo% ~%self% puffs up like an angry cat, and monsoon clouds form overhead.
     wait 1 sec
-    %send% %actor% The clouds burst, turning the ground beneath your feet into mud and slowing you down!
-    %echoaround% %actor% The clouds burst, turning the ground beneath |%actor% feet into mud and slowing *%actor% down!
+    if %verify_target% != %actor.id%
+      halt
+    end
+    %echo% The clouds burst, turning the ground beneath |%actor% feet into mud and slowing *%actor% down!
     dg_affect %actor% SLOW on 30
   break
   case 4
-    %send% %actor% ~%self% clubs you painfully with an arm, leaving stinging spines stuck into you!
-    %echoaround% %actor% ~%self% clubs ~%actor% with an arm, leaving several spines stuck in *%actor%!
+    %echo% ~%self% clubs ~%actor% with an arm, leaving several spines stuck in *%actor%!
     %damage% %actor% 25 physical
     %dot% %actor% 20 30 physical 10
   break

@@ -5,37 +5,37 @@ A colossal red dragon looms over you!
 ~
 250 300 bdgxyzAB cmE 6
 2 0 2 10
-I 0 10907 75.00 2  # BUTCHER: a raw dragon steak
-I 0 10907 75.00 2  # BUTCHER: a raw dragon steak
-I 0 10907 75.00 2  # BUTCHER: a raw dragon steak
-I 0 10907 75.00 2  # BUTCHER: a raw dragon steak
-I 0 10903 25.00 4 b  # BUTCHER: a colossal dragon bone
-I 0 10903 25.00 3 b  # BUTCHER: a colossal dragon bone
-I 0 10903 25.00 2 b  # BUTCHER: a colossal dragon bone
-I 0 10903 25.00 1 b  # BUTCHER: a colossal dragon bone
-I 1 10902 25.00 4 s  # SKIN: a red dragon hide
-I 1 10902 25.00 3 s  # SKIN: a red dragon hide
-I 1 10902 25.00 2 s  # SKIN: a red dragon hide
-I 1 10902 25.00 1 s  # SKIN: a red dragon hide
-I 1 10006 25.00 2 t  # SKIN: a dragon scale
-I 1 10006 75.00 1 t  # SKIN: a dragon scale
-I 4 10944 100.00 1  # LOOT: a shining red dragon stone
-I 4 10904 4.00 1 e  # LOOT: a crimson serpent egg
-I 4 10905 2.00 1 e  # LOOT: a crimson dragon egg
-I 4 10906 2.00 1 e  # LOOT: a sea dragon egg
-I 4 10910 7.69 1 g  # LOOT: a dragonsteel warhammer
-I 4 10911 7.69 1 g  # LOOT: a dragonsteel claymore
-I 4 10912 7.69 1 g  # LOOT: a dragonbone mace
-I 4 10913 7.69 1 g  # LOOT: a flaming draconic wand
-I 4 10914 7.69 1 g  # LOOT: a flaming dragonbone staff
-I 4 10915 7.69 1 g  # LOOT: a dragonbone wristblade
-I 4 10916 7.69 1 g  # LOOT: a dragonbone tower shield
-I 4 10917 7.69 1 g  # LOOT: a flaming red dragon charm
-I 4 10918 7.69 1 g  # LOOT: the tome of dragonkind
-I 4 10919 7.69 1 g  # LOOT: a crimson dragon girdle
-I 4 10920 7.70 1 g  # LOOT: a burning dragonsteel waistband
-I 4 10921 7.70 1 g  # LOOT: a flaming draconic cincture
-I 4 10922 7.70 1 g  # LOOT: a burning dragoncloth sash
+I 0 10907 75.00 2  # BUTCHER: raw dragon steak
+I 0 10907 75.00 2  # BUTCHER: raw dragon steak
+I 0 10907 75.00 2  # BUTCHER: raw dragon steak
+I 0 10907 75.00 2  # BUTCHER: raw dragon steak
+I 0 10903 25.00 4 b  # BUTCHER: colossal dragon bone
+I 0 10903 25.00 3 b  # BUTCHER: colossal dragon bone
+I 0 10903 25.00 2 b  # BUTCHER: colossal dragon bone
+I 0 10903 25.00 1 b  # BUTCHER: colossal dragon bone
+I 1 10902 25.00 4 s  # SKIN: red dragon hide
+I 1 10902 25.00 3 s  # SKIN: red dragon hide
+I 1 10902 25.00 2 s  # SKIN: red dragon hide
+I 1 10902 25.00 1 s  # SKIN: red dragon hide
+I 1 10006 25.00 2 t  # SKIN: dragon scale
+I 1 10006 75.00 1 t  # SKIN: dragon scale
+I 4 10944 100.00 1  # LOOT: shining red dragon stone
+I 4 10904 4.00 1 e  # LOOT: crimson serpent egg
+I 4 10905 2.00 1 e  # LOOT: crimson dragon egg
+I 4 10906 2.00 1 e  # LOOT: sea dragon egg
+I 4 10910 7.69 1 g  # LOOT: dragonsteel warhammer
+I 4 10911 7.69 1 g  # LOOT: dragonsteel claymore
+I 4 10912 7.69 1 g  # LOOT: dragonbone mace
+I 4 10913 7.69 1 g  # LOOT: flaming draconic wand
+I 4 10914 7.69 1 g  # LOOT: flaming dragonbone staff
+I 4 10915 7.69 1 g  # LOOT: dragonbone wristblade
+I 4 10916 7.69 1 g  # LOOT: dragonbone tower shield
+I 4 10917 7.69 1 g  # LOOT: flaming red dragon charm
+I 4 10918 7.69 1 g  # LOOT: tome of dragonkind
+I 4 10919 7.69 1 g  # LOOT: crimson dragon girdle
+I 4 10920 7.70 1 g  # LOOT: burning dragonsteel waistband
+I 4 10921 7.70 1 g  # LOOT: flaming draconic cincture
+I 4 10922 7.70 1 g  # LOOT: burning dragoncloth sash
 M
 0
 $n coils around her hoard.~
@@ -62,37 +62,37 @@ Sir Vivor is glancing around nervously.
 ~
 250 300 bdkvxyzAB cE 3
 1 0 0 1
-I 4 10907 75.00 2  # LOOT: a raw dragon steak
-I 4 10907 75.00 2  # LOOT: a raw dragon steak
-I 4 10907 75.00 2  # LOOT: a raw dragon steak
-I 4 10907 75.00 2  # LOOT: a raw dragon steak
-I 4 10944 100.00 1  # LOOT: a shining red dragon stone
-I 4 10903 25.00 1 b  # LOOT: a colossal dragon bone
-I 4 10903 25.00 2 b  # LOOT: a colossal dragon bone
-I 4 10903 25.00 3 b  # LOOT: a colossal dragon bone
-I 4 10903 25.00 4 b  # LOOT: a colossal dragon bone
-I 4 10904 4.00 1 e  # LOOT: a crimson serpent egg
-I 4 10905 2.00 1 e  # LOOT: a crimson dragon egg
-I 4 10906 2.00 1 e  # LOOT: a sea dragon egg
-I 4 10910 7.69 1 g  # LOOT: a dragonsteel warhammer
-I 4 10911 7.69 1 g  # LOOT: a dragonsteel claymore
-I 4 10912 7.69 1 g  # LOOT: a dragonbone mace
-I 4 10913 7.69 1 g  # LOOT: a flaming draconic wand
-I 4 10914 7.69 1 g  # LOOT: a flaming dragonbone staff
-I 4 10915 7.69 1 g  # LOOT: a dragonbone wristblade
-I 4 10916 7.69 1 g  # LOOT: a dragonbone tower shield
-I 4 10917 7.69 1 g  # LOOT: a flaming red dragon charm
-I 4 10918 7.69 1 g  # LOOT: the tome of dragonkind
-I 4 10919 7.69 1 g  # LOOT: a crimson dragon girdle
-I 4 10920 7.70 1 g  # LOOT: a burning dragonsteel waistband
-I 4 10921 7.70 1 g  # LOOT: a flaming draconic cincture
-I 4 10922 7.70 1 g  # LOOT: a burning dragoncloth sash
-I 4 10902 25.00 1 s  # LOOT: a red dragon hide
-I 4 10902 25.00 2 s  # LOOT: a red dragon hide
-I 4 10902 25.00 3 s  # LOOT: a red dragon hide
-I 4 10902 25.00 4 s  # LOOT: a red dragon hide
-I 4 10006 75.00 1 t  # LOOT: a dragon scale
-I 4 10006 25.00 2 t  # LOOT: a dragon scale
+I 4 10907 75.00 2  # LOOT: raw dragon steak
+I 4 10907 75.00 2  # LOOT: raw dragon steak
+I 4 10907 75.00 2  # LOOT: raw dragon steak
+I 4 10907 75.00 2  # LOOT: raw dragon steak
+I 4 10944 100.00 1  # LOOT: shining red dragon stone
+I 4 10903 25.00 1 b  # LOOT: colossal dragon bone
+I 4 10903 25.00 2 b  # LOOT: colossal dragon bone
+I 4 10903 25.00 3 b  # LOOT: colossal dragon bone
+I 4 10903 25.00 4 b  # LOOT: colossal dragon bone
+I 4 10904 4.00 1 e  # LOOT: crimson serpent egg
+I 4 10905 2.00 1 e  # LOOT: crimson dragon egg
+I 4 10906 2.00 1 e  # LOOT: sea dragon egg
+I 4 10910 7.69 1 g  # LOOT: dragonsteel warhammer
+I 4 10911 7.69 1 g  # LOOT: dragonsteel claymore
+I 4 10912 7.69 1 g  # LOOT: dragonbone mace
+I 4 10913 7.69 1 g  # LOOT: flaming draconic wand
+I 4 10914 7.69 1 g  # LOOT: flaming dragonbone staff
+I 4 10915 7.69 1 g  # LOOT: dragonbone wristblade
+I 4 10916 7.69 1 g  # LOOT: dragonbone tower shield
+I 4 10917 7.69 1 g  # LOOT: flaming red dragon charm
+I 4 10918 7.69 1 g  # LOOT: tome of dragonkind
+I 4 10919 7.69 1 g  # LOOT: crimson dragon girdle
+I 4 10920 7.70 1 g  # LOOT: burning dragonsteel waistband
+I 4 10921 7.70 1 g  # LOOT: flaming draconic cincture
+I 4 10922 7.70 1 g  # LOOT: burning dragoncloth sash
+I 4 10902 25.00 1 s  # LOOT: red dragon hide
+I 4 10902 25.00 2 s  # LOOT: red dragon hide
+I 4 10902 25.00 3 s  # LOOT: red dragon hide
+I 4 10902 25.00 4 s  # LOOT: red dragon hide
+I 4 10006 75.00 1 t  # LOOT: dragon scale
+I 4 10006 25.00 2 t  # LOOT: dragon scale
 M
 1
 Mama said there'd be dragons like this...~
@@ -137,7 +137,7 @@ A crimson serpent is coiled here.
 ~
 100 125 dej 0 2
 0 0 5 10
-I 0 10907 100.00 2  # BUTCHER: a raw dragon steak
+I 0 10907 100.00 2  # BUTCHER: raw dragon steak
 S
 #10905
 dragon crimson small~
@@ -146,7 +146,7 @@ A small crimson dragon is circling.
 ~
 100 125 dej m 2
 0 0 2 10
-I 0 10907 100.00 2  # BUTCHER: a raw dragon steak
+I 0 10907 100.00 2  # BUTCHER: raw dragon steak
 S
 #10906
 dragon sea crimson~
@@ -155,7 +155,7 @@ A crimson sea dragon splashes around.
 ~
 100 125 dejl 0 2
 0 0 6 9
-I 0 10907 100.00 2  # BUTCHER: a raw dragon steak
+I 0 10907 100.00 2  # BUTCHER: raw dragon steak
 S
 #10950
 dragon muck viscous vicious~
@@ -170,17 +170,17 @@ water, but it is enormous! The muck dragon's turquoise scales drip mud as its
 back arches out of the water, coiling in circles around you. What sort of prize
 might this dragon hold?
 ~
-I 0 10907 100.00 4  # BUTCHER: a raw dragon steak
-I 1 1351 100.00 8  # SKIN: a large skin
-I 1 10006 60.00 1 a  # SKIN: a dragon scale
-I 1 10006 30.00 2 a  # SKIN: a dragon scale
-I 1 10006 10.00 3 a  # SKIN: a dragon scale
-I 4 10960 100.00 1  # LOOT: the monstrous carcass of a muck dragon
-I 4 10951 60.00 1 a  # LOOT: a muck dragon's hoard
-I 4 10952 30.00 1 a  # LOOT: the Draconomicon
-I 4 10953 10.00 1 a  # LOOT: a golden princess
-I 4 10954 12.50 3 b  # LOOT: a bag of tiny red seeds
-I 4 10955 12.50 1 b  # LOOT: a muck elemental stone
+I 0 10907 100.00 4  # BUTCHER: raw dragon steak
+I 1 1351 100.00 8  # SKIN: large skin
+I 1 10006 60.00 1 a  # SKIN: dragon scale
+I 1 10006 30.00 2 a  # SKIN: dragon scale
+I 1 10006 10.00 3 a  # SKIN: dragon scale
+I 4 10960 100.00 1  # LOOT: monstrous carcass of a muck dragon
+I 4 10951 60.00 1 a  # LOOT: muck dragon's hoard
+I 4 10952 30.00 1 a  # LOOT: Draconomicon
+I 4 10953 10.00 1 a  # LOOT: golden princess
+I 4 10954 12.50 3 b  # LOOT: bag of tiny red seeds
+I 4 10955 12.50 1 b  # LOOT: muck elemental stone
 M
 0
 $n circles you in the water.~
@@ -247,12 +247,12 @@ D
 as a club. Luckily, the giant seems to be focused on problems its own size, and
 isn't even looking down at you.
 ~
-I 4 10973 100.00 1  # LOOT: a giant wooden club
-I 4 10968 60.00 1 a  # LOOT: a giant gold coin
-I 4 10970 10.00 1 a  # LOOT: a golden harp
-I 4 10969 30.00 1 a  # LOOT: a golden goose
-I 4 10974 12.50 1 b  # LOOT: the giant hovel schematic
-I 4 10971 12.50 1 b  # LOOT: a giant ant whistle
+I 4 10973 100.00 1  # LOOT: giant wooden club
+I 4 10968 60.00 1 a  # LOOT: giant gold coin
+I 4 10970 10.00 1 a  # LOOT: golden harp
+I 4 10969 30.00 1 a  # LOOT: golden goose
+I 4 10974 12.50 1 b  # LOOT: giant hovel schematic
+I 4 10971 12.50 1 b  # LOOT: giant ant whistle
 M
 0
 $n casually swings $s tree, barely missing you as $e passes.~
@@ -290,12 +290,12 @@ D
 fishing tools. Its height dominates the landscape, taller than most trees. In
 fact, it has a tree slung over its shoulder like a club.
 ~
-I 4 10973 100.00 1  # LOOT: a giant wooden club
-I 4 10968 60.00 1 a  # LOOT: a giant gold coin
-I 4 10970 10.00 1 a  # LOOT: a golden harp
-I 4 10969 30.00 1 a  # LOOT: a golden goose
-I 4 10972 12.50 1 b  # LOOT: the giant's causeway schematic
-I 4 10971 12.50 1 b  # LOOT: a giant ant whistle
+I 4 10973 100.00 1  # LOOT: giant wooden club
+I 4 10968 60.00 1 a  # LOOT: giant gold coin
+I 4 10970 10.00 1 a  # LOOT: golden harp
+I 4 10969 30.00 1 a  # LOOT: golden goose
+I 4 10972 12.50 1 b  # LOOT: giant's causeway schematic
+I 4 10971 12.50 1 b  # LOOT: giant ant whistle
 M
 0
 $n casually swings $s tree, barely missing you as $e passes.~
@@ -333,12 +333,12 @@ D
 club. The giant is so large that it doesn't even appear to notice you down
 here.
 ~
-I 4 10973 100.00 1  # LOOT: a giant wooden club
-I 4 10968 60.00 1 a  # LOOT: a giant gold coin
-I 4 10970 10.00 1 a  # LOOT: a golden harp
-I 4 10969 30.00 1 a  # LOOT: a golden goose
-I 4 10975 12.50 1 b  # LOOT: the giant stone head schematic
-I 4 10971 12.50 1 b  # LOOT: a giant ant whistle
+I 4 10973 100.00 1  # LOOT: giant wooden club
+I 4 10968 60.00 1 a  # LOOT: giant gold coin
+I 4 10970 10.00 1 a  # LOOT: golden harp
+I 4 10969 30.00 1 a  # LOOT: golden goose
+I 4 10975 12.50 1 b  # LOOT: giant stone head schematic
+I 4 10971 12.50 1 b  # LOOT: giant ant whistle
 M
 0
 $n casually swings $s tree, barely missing you as $e passes.~
@@ -420,12 +420,12 @@ with High Sorcery -- that this wizard is no friend. Indeed, only outcasts in
 search of power would don such colors. He notices you looking at him and begins
 spinning a powerful spell. Hopefully you aren't too late with the counterspell.
 ~
-I 4 10982 60.00 10 a  # LOOT: a fiery brimstone
-I 4 10983 30.00 1 a  # LOOT: a pure crystal orb
-I 4 10984 10.00 1 a  # LOOT: a crystal skull
-I 4 10986 12.50 1 b  # LOOT: an ember of the eternal flame
-I 4 10987 12.50 1 b  # LOOT: a talking skull
-I 4 10990 12.50 1 b  # LOOT: a fractured sorcerer's stone
+I 4 10982 60.00 10 a  # LOOT: fiery brimstone
+I 4 10983 30.00 1 a  # LOOT: pure crystal orb
+I 4 10984 10.00 1 a  # LOOT: crystal skull
+I 4 10986 12.50 1 b  # LOOT: ember of the eternal flame
+I 4 10987 12.50 1 b  # LOOT: talking skull
+I 4 10990 12.50 1 b  # LOOT: fractured sorcerer's stone
 M
 1
 I shouldn't've left Llewdor.~
@@ -473,12 +473,12 @@ D
 fears something is following him. He catches your eye and a look of
 fury crosses his face. He doesn't look happy to see you.
 ~
-I 4 10982 60.00 10 a  # LOOT: a fiery brimstone
-I 4 10983 30.00 1 a  # LOOT: a pure crystal orb
-I 4 10984 10.00 1 a  # LOOT: a crystal skull
-I 4 10986 12.50 1 b  # LOOT: an ember of the eternal flame
+I 4 10982 60.00 10 a  # LOOT: fiery brimstone
+I 4 10983 30.00 1 a  # LOOT: pure crystal orb
+I 4 10984 10.00 1 a  # LOOT: crystal skull
+I 4 10986 12.50 1 b  # LOOT: ember of the eternal flame
 I 4 10988 12.50 1 b  # LOOT: Mother's grimoire
-I 4 10991 12.50 1 b  # LOOT: a strange spore
+I 4 10991 12.50 1 b  # LOOT: strange spore
 M
 0
 $n draws mana from you.~
@@ -517,12 +517,12 @@ white skin look almost unnatural. Then, just as that thought passes through
 your mind, her eyes dart toward you. Can she read your thoughts? She looks
 angry.
 ~
-I 4 10982 60.00 10 a  # LOOT: a fiery brimstone
-I 4 10983 30.00 1 a  # LOOT: a pure crystal orb
-I 4 10984 10.00 1 a  # LOOT: a crystal skull
-I 4 10986 12.50 1 b  # LOOT: an ember of the eternal flame
-I 4 10989 12.50 1 b  # LOOT: a cat's collar
-I 4 10993 12.50 1 b  # LOOT: the keys to the magicycle
+I 4 10982 60.00 10 a  # LOOT: fiery brimstone
+I 4 10983 30.00 1 a  # LOOT: pure crystal orb
+I 4 10984 10.00 1 a  # LOOT: crystal skull
+I 4 10986 12.50 1 b  # LOOT: ember of the eternal flame
+I 4 10989 12.50 1 b  # LOOT: cat's collar
+I 4 10993 12.50 1 b  # LOOT: keys to the magicycle
 M
 1
 I'm team Angel.~
@@ -537,7 +537,7 @@ M
 Oh, my cheeks are killing me, from smiling... pretending to be polite is so exhausting.~
 M
 1
-Nowadays every girl with a henna tatto and a spice rack thinks she's a sister to the dark ones.~
+Nowadays every girl with a henna tattoo and a spice rack thinks she's a sister to the dark ones.~
 T 10984
 T 10992
 T 10993
@@ -559,12 +559,12 @@ to drift elsewhere, lost in thought if only momentarily. Suddenly she
 looks down toward you and her face turns bright red. You can't read her
 thoughts, but it looks as if she can read yours.
 ~
-I 4 10982 60.00 10 a  # LOOT: a fiery brimstone
-I 4 10983 30.00 1 a  # LOOT: a pure crystal orb
-I 4 10984 10.00 1 a  # LOOT: a crystal skull
-I 4 10986 12.50 1 b  # LOOT: an ember of the eternal flame
-I 4 10989 12.50 1 b  # LOOT: a cat's collar
-I 4 10993 12.50 1 b  # LOOT: the keys to the magicycle
+I 4 10982 60.00 10 a  # LOOT: fiery brimstone
+I 4 10983 30.00 1 a  # LOOT: pure crystal orb
+I 4 10984 10.00 1 a  # LOOT: crystal skull
+I 4 10986 12.50 1 b  # LOOT: ember of the eternal flame
+I 4 10989 12.50 1 b  # LOOT: cat's collar
+I 4 10993 12.50 1 b  # LOOT: keys to the magicycle
 M
 1
 I'm team Damon.~

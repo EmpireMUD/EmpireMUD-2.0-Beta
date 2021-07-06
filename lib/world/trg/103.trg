@@ -43,10 +43,9 @@ Flame Dragon combat~
 0 k 5
 ~
 set chance %random.3%
-if (chance < 3)
+if %chance% < 3
   * Searing burns on tank
-  %send% %actor% ~%self% spits fire at you, causing searing burns!
-  %echoaround% %actor% ~%self% spits fire at ~%actor%, causing searing burns!
+  %echo% ~%self% spits fire at ~%actor%, causing searing burns!
   %dot% %actor% 100 60 fire
   %damage% %actor% 75 fire
 else

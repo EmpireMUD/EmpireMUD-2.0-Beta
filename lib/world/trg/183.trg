@@ -155,8 +155,7 @@ switch %random.4%
   break
   * Bandage bondage
   case 4
-    %send% %actor% |%self% bandages unfurl and lash out like tentacles, wrapping around you!
-    %echoaround% %actor% |%self% bandages unfurl and lash out like tentacles, wrapping around ~%actor%!
+    %echo% |%self% bandages unfurl and lash out like tentacles, wrapping around ~%actor%!
     if %heroic_mode%
       set max_cycles 5
     else
@@ -164,20 +163,22 @@ switch %random.4%
     end
     eval duration %max_cycles%*5
     dg_affect %actor% HARD-STUNNED on %duration%
+    set verify_target %actor.id%
     set cycle 1
     while %cycle% <= %max_cycles%
-      if %actor%
-        if %actor.health% > -10
-          %send% %actor% &&r|%self% bandages tighten around you, trying to squeeze the life out of you!
-          %echoaround% %actor% |%self% bandages tighten around ~%actor%!
-          %damage% %actor% 150 physical
-          wait 5 sec
-        end
+      if %verify_target% != %actor.id%
+        %echo% |%self% bandages return to their proper place.
+        halt
+      end
+      if %actor.health% > -10
+        %send% %actor% &&r|%self% bandages tighten around you, trying to squeeze the life out of you!
+        %echoaround% %actor% |%self% bandages tighten around ~%actor%!
+        %damage% %actor% 150 physical
+        wait 5 sec
       end
       eval cycle %cycle% + 1
     done
-    %send% %actor% |%self% bandages release you.
-    %echoaround% %actor% |%self% bandages release ~%actor%.
+    %echo% |%self% bandages release ~%actor%.
     eval time_left 30 - %duration%
     wait %time_left% sec
   break

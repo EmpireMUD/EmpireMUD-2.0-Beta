@@ -587,28 +587,37 @@ if %self.cooldown(10950)%
   halt
 end
 nop %self.set_cooldown(10950, 30)%
+set verify_target %actor.id%
 wait 1 sec
 dg_affect #10959 %self% HARD-STUNNED on 20
 dg_affect #10959 %self% IMMUNE-DAMAGE on 20
 %echo% ~%self% dives into the marshy water and vanishes from view!
 wait 3 sec
+if %verify_target% != %actor.id%
+  %echo% ~%self% rises from the swampy ground with a splash!
+  dg_affect #10959 %self% off
+  halt
+end
 %send% %actor% The swampy ground shifts beneath your feet!
 %send% %actor% ('leap' out of the way!)
 %echoaround% %actor% The ground shifts beneath |%actor% feet!
 set target %actor.id%
 remote target %self.id%
 wait 9 sec
+if %verify_target% != %actor.id%
+  %echo% ~%self% rises from the swampy ground with a splash!
+  dg_affect #10959 %self% off
+  halt
+end
 if %self.varexists(success)%
   set success %self.success%
 end
 rdelete target %self.id%
 rdelete success %self.id%
 if %success%
-  %send% %actor% ~%self% bursts from the swampy ground, narrowly missing you!
-  %echoaround% %actor% ~%self% bursts from the swampy ground, narrowly missing ~%actor%!
+  %echo% ~%self% bursts from the swampy ground, narrowly missing ~%actor%!
 else
-  %send% %actor% &&r~%self% bursts from the swampy ground beneath your feet, sending you flying!
-  %send% %actor% ~%self% bursts from the swampy ground beneath |%actor% feet, sending *%actor% flying!
+  %echo% ~%self% bursts from the swampy ground beneath |%actor% feet, sending *%actor% flying!
   %damage% %actor% 200 physical
   dg_affect #10957 %actor% HARD-STUNNED on 10
 end
@@ -965,6 +974,9 @@ switch %self.vnum%
   break
 done
 wait 2 sec
+if %actor.room% != %self.room%
+  halt
+end
 nop %self.add_mob_flag(AGGR)%
 detach 10984 %self.id%
 set other_witch %instance.mob(10983)%
@@ -989,7 +1001,11 @@ else
   %echo% ~%self% flickers momentarily with a blue-white aura.
 end
 dg_affect #3021 %self% RESIST-MAGICAL 1 35
+set verify_target %actor.id%
 wait 1 sec
+if %verify_target% != %actor.id%
+  halt
+end
 %echo% ~%self% opens a tiny portal and reaches inside...
 if !%self.varexists(rare_summon_done)%
   if %random.10% == 10
@@ -1037,7 +1053,11 @@ else
   %echo% ~%self% flickers momentarily with a blue-white aura.
 end
 dg_affect #3021 %self% RESIST-MAGICAL 1 35
+set verify_target %actor.id%
 wait 1 sec
+if %verify_target% != %actor.id%
+  halt
+end
 if %actor.trigger_counterspell%
   %send% %actor% ~%self% shouts some kind of hex at you, but your counterspell dispels it!
   %echoaround% %actor% ~%self% shouts some kind of hex at ~%actor%, but nothing seems to happen!
@@ -1064,6 +1084,7 @@ else
   %echo% ~%self% flickers momentarily with a blue-white aura.
 end
 dg_affect #3021 %self% RESIST-MAGICAL 1 35
+set verify_target %actor.id%
 wait 1 sec
 %echo% ~%self% begins drawing mana to *%self%self...
 %echo% (You should 'interrupt' ^%self% ritual.)
@@ -1076,6 +1097,10 @@ end
 %echo% ~%self% concentrates ^%self% power into a whip of crackling flames!
 wait 5 sec
 if !%self.ritual_active%
+  halt
+end
+if %verify_target% != %actor.id%
+  %echo% |%self.% whip fades as ^%self% target is no longer viable.
   halt
 end
 %send% %actor% &&r~%self% cracks the blazing whip at you, blowing you off your feet!
@@ -1109,6 +1134,7 @@ if %self.cooldown(10981)%
   halt
 end
 nop %self.set_cooldown(10981, 30)%
+set verify_target %actor.id%
 if %self.affect(3021)%
   dg_affect #3021 %self% off
 else
@@ -1123,7 +1149,9 @@ if !%self.morph%
   wait 1 sec
 end
 %echo% &&r~%self% goes berserk, claws flailing in all directions!
-%damage% %actor% 75 physical
+if %verify_target% != %actor.id%
+  %damage% %actor% 75 physical
+end
 %aoe% 25 physical
 ~
 #10990
@@ -1140,6 +1168,7 @@ else
   %echo% ~%self% flickers momentarily with a blue-white aura.
 end
 dg_affect #3021 %self% RESIST-MAGICAL 1 35
+set verify_target %actor.id%
 wait 1 sec
 if %self.morph%
   set current %self.name%
@@ -1147,17 +1176,23 @@ if %self.morph%
   %echo% %current% rapidly morphs into ~%self%!
   wait 1 sec
 end
+if %verify_target% != %actor.id%
+  halt
+end
 %echo% ~%self% makes a sweeping skyward gesture with both arms!
 if %actor.trigger_counterspell%
   %send% %actor% The dust around your feet swirls gently in a circle, then your counterspell stops it.
   %echoaround% %actor% The dust around |%actor% feet swirls gently in a circle, then stops.
 else
   dg_affect #10982 %self% HARD-STUNNED on 10
-  %send% %actor% &&rA swirling dust devil abruptly envelops you and hurls you into the air!
-  %echoaround% %actor% A swirling dust devil abruptly envelops ~%actor% and hurls *%actor% into the air!
+  %echo% A swirling dust devil abruptly envelops ~%actor% and hurls *%actor% into the air!
   %damage% %actor% 50 magical
   dg_affect #10990 %actor% HARD-STUNNED on 10
   wait 5 sec
+  if %verify_target% != %actor.id%
+    dg_affect #10982 %self% off
+    halt
+  end
   if %actor.affect(10990)%
     %echo% ~%self% slams ^%self% fist into the earth!
     %send% %actor% &&rA gust of wind suddenly hurls you downward!
