@@ -3297,10 +3297,10 @@ ACMD(do_abandon) {
 	else if (FIGHTING(ch)) {
 		msg_to_char(ch, "You're too busy fighting!\r\n");
 	}
-	else if (!GET_LOYALTY(ch) && !imm_access) {
+	else if (!imm_access && !GET_LOYALTY(ch)) {
 		msg_to_char(ch, "You're not part of an empire.\r\n");
 	}
-	else if (GET_RANK(ch) < EMPIRE_PRIV(GET_LOYALTY(ch), PRIV_CEDE) && !imm_access) {
+	else if (!imm_access && GET_RANK(ch) < EMPIRE_PRIV(GET_LOYALTY(ch), PRIV_CEDE)) {
 		// could probably now use has_permission
 		msg_to_char(ch, "You don't have permission to abandon.\r\n");
 	}
