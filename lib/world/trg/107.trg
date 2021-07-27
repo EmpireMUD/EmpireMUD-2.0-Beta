@@ -483,7 +483,7 @@ switch %random.3%
     say Me mum says jumping is evel.
   break
   case 3
-    %echo% plants a regular stick in the ground and jumps over it, but it's just not the same.
+    %echo% ~%self% plants a regular stick in the ground and jumps over it, but it's just not the same.
   break
 done
 ~

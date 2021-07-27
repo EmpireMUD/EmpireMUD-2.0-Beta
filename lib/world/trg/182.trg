@@ -1612,7 +1612,7 @@ while %cycles_left% >= 0
   * Fake ritual messages
   switch %cycles_left%
     case 5
-      %echo% ~%self% rolls around clutching his belly, groaning with hunger. Then, slowly, he seems to realize you just answered his riddle.
+      %echo% ~%self% rolls around clutching his belly, groaning with hunger. Then, slowly, he seems to realize ~%actor% just answered his riddle.
     break
     case 4
       %echo% ~%self% stands up, brushes himself off, and stops sucking in his gut. He doesn't actually look all that hungry.

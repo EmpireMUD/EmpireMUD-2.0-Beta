@@ -68,7 +68,7 @@ end
 %send% %target% ~%self% squeezes around you, constricting until you cannot move!
 %echoaround% %target% ~%self% constricts around ~%target%!
 %send% %target% Type 'struggle' to break free!
-dg_affect #9104 %actor% STUNNED on 20
+dg_affect #9104 %target% STUNNED on 20
 ~
 #9105
 Snake: Venom~
