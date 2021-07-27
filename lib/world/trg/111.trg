@@ -430,6 +430,15 @@ Burrow Canyons Timed Despawn~
 * After 2 hours, ends the instance
 %adventurecomplete%
 ~
+#11125
+Add up exit to BC~
+2 n 100
+~
+set loc %instance.location%
+if %loc%
+  %door% %self% up room %loc.vnum%
+end
+~
 #11130
 Caretaker Replacement~
 2 q 100

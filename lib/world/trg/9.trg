@@ -144,9 +144,11 @@ bloodletter arrows~
 1 s 25
 ~
 set scale 100
-%send% %actor% ~%target% begins to bleed from the wound left by your bloodletter arrow!
+if !%target%
+  halt
+end
 %send% %target% You begin to bleed from the wound left by |%actor% bloodletter arrow!
-%echoneither% %target% %actor% ~%target% begins to bleed from the wound left by |%actor% bloodletter arrow!
+%echoaround% %target% ~%target% begins to bleed from the wound left by |%actor% bloodletter arrow!
 %dot% %target% %scale% 15 physical
 ~
 #952

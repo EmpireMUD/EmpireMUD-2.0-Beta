@@ -352,6 +352,29 @@ constantly) near the entrance, punctuated by the occasional pebble or rock.
 1 96
 T 11124
 S
+#11125
+shaft secondary~
+the secondary mine shaft~
+A secondary mine shaft has been dug here. (adventure)~
+   It looks like someone was digging a mining shaft here when they broke into
+an old tunnel below. You can see signs of previous visitors, but this shaft
+hasn't been used for mining in a long time.
+Type 'enter shaft' to head in and check it out.
+~
+8 0 0 0 7
+-1 0 0
+1 0
+S
+#11126
+shaft entrance~
+the entrance shaft~
+The entrance shaft leads out of here.~
+This shaft leads back out of the canyons to the mountain above.
+~
+8 0 0 0 4
+-1 0 0
+1 0
+S
 #11130
 leather leatherbound book journal~
 a mage's journal~

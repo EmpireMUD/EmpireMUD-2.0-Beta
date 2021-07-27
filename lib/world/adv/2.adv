@@ -1,6 +1,6 @@
 #200
 Burrow Canyons~
-JL Decker and Owen Morris~
+JL Decker with updates by EmpireMUD staff~
    Burrow Canyons is a chain of underground caverns which connect to hidden
 mountain vales. But be wary! There are treacherous paths to follow, and
 dangerous creatures within. It will take a valiant party to survive these
@@ -9,16 +9,16 @@ realms. The spoils gained by those who do, however, are worth the trial!
 11100 11129 75-100
 10 1440 bk 4
 L
-0 a
-5107 -1 -1
-9 0 0
-L
 5 0
-10080 -1 -1
+10080 -1 -1 -1
 -1 0 0
 L
 6 0
-100 -1 -1
+100 -1 -1 -1
+-1 0 0
+L
+3 a
+5107 11125 11126 -1
 -1 0 0
 S
 #201
@@ -34,15 +34,15 @@ only the curse were reversed.
 5 0 ck 4
 L
 5 0
-4320 -1 -1
+4320 -1 -1 -1
 -1 0 0
 L
 6 0
-100 -1 -1
+100 -1 -1 -1
 -1 0 0
 L
 1 0
-11130 -1 -1
+11130 -1 -1 -1
 5 m m
 S
 #281
@@ -57,15 +57,15 @@ fueled the fires of its rage!
 5 0 k 4
 L
 6 0
-50 -1 -1
+50 -1 -1 -1
 -1 0 0
 L
 1 0
-18075 -1 -1
+18075 -1 -1 -1
 9 c c
 L
 5 0
-1440 -1 -1
+1440 -1 -1 -1
 -1 0 0
 S
 #282
@@ -81,15 +81,15 @@ should drive them from the region.
 10 0 d 0
 L
 6 0
-75 -1 -1
+75 -1 -1 -1
 -1 0 0
 L
 5 0
-10080 -1 -1
+10080 -1 -1 -1
 -1 0 0
 L
 1 0
-18100 -1 -1
+18100 -1 -1 -1
 14 d n
 T 18104
 S
