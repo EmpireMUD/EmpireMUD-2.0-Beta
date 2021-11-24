@@ -4717,7 +4717,7 @@ ACMD(do_draw) {
 }
 
 
-ACMD(do_drink) {	
+ACMD(do_drink) {
 	obj_data *obj = NULL;
 	int amount, i, liquid;
 	double thirst_amt, hunger_amt;
@@ -4885,23 +4885,31 @@ ACMD(do_drink) {
 	}
 
 	if (obj) {
-		set_obj_val(obj, VAL_DRINK_CONTAINER_CONTENTS, GET_DRINK_CONTAINER_CONTENTS(obj) - amount);
-		if (GET_DRINK_CONTAINER_CONTENTS(obj) <= 0) {	/* The last bit */
-			set_obj_val(obj, VAL_DRINK_CONTAINER_TYPE, 0);
-			GET_OBJ_TIMER(obj) = UNLIMITED;
-			request_obj_save_in_world(obj);
-		}
-		
 		// ensure binding
 		if (!IS_NPC(ch) && OBJ_FLAGGED(obj, OBJ_BIND_FLAGS)) {
 			bind_obj_to_player(obj, ch);
 			reduce_obj_binding(obj, ch);
 		}
+		
+		// reduce contents
+		set_obj_val(obj, VAL_DRINK_CONTAINER_CONTENTS, GET_DRINK_CONTAINER_CONTENTS(obj) - amount);
+		
+		if (GET_DRINK_CONTAINER_CONTENTS(obj) <= 0) {	/* The last bit */
+			set_obj_val(obj, VAL_DRINK_CONTAINER_TYPE, 0);
+			GET_OBJ_TIMER(obj) = UNLIMITED;
+			request_obj_save_in_world(obj);
+			
+			if (OBJ_FLAGGED(obj, OBJ_SINGLE_USE)) {
+				run_interactions(ch, GET_OBJ_INTERACTIONS(obj), INTERACT_CONSUMES_TO, IN_ROOM(ch), NULL, obj, NULL, consumes_or_decays_interact);
+				empty_obj_before_extract(obj);
+				extract_obj(obj);
+			}
+		}
 	}
 }
 
 
-ACMD(do_drop) {	
+ACMD(do_drop) {
 	obj_data *obj, *next_obj;
 	byte mode = SCMD_DROP;
 	int this, dotmode, amount = 0, multi, coin_amt;
@@ -6275,7 +6283,17 @@ ACMD(do_pour) {
 		amount += GET_DRINK_CONTAINER_CONTENTS(from_obj);
 		set_obj_val(from_obj, VAL_DRINK_CONTAINER_CONTENTS, 0);
 		set_obj_val(from_obj, VAL_DRINK_CONTAINER_TYPE, 0);
-		GET_OBJ_TIMER(from_obj) = UNLIMITED;
+		
+		if (OBJ_FLAGGED(from_obj, OBJ_SINGLE_USE)) {
+			// single-use: extract it
+			run_interactions(ch, GET_OBJ_INTERACTIONS(from_obj), INTERACT_CONSUMES_TO, IN_ROOM(ch), NULL, from_obj, NULL, consumes_or_decays_interact);
+			empty_obj_before_extract(from_obj);
+			extract_obj(from_obj);
+		}
+		else {
+			// if it wasn't single-use, reset its timer to UNLIMITED since the timer refers to the contents
+			GET_OBJ_TIMER(from_obj) = UNLIMITED;
+		}
 	}
 	
 	// check max
