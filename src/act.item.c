@@ -6212,6 +6212,11 @@ ACMD(do_pour) {
 			return;
 		}
 		if (!str_cmp(arg2, "out")) {
+			if (!CAN_WEAR(from_obj, ITEM_WEAR_TAKE)) {
+				msg_to_char(ch, "You can't pour that out.\r\n");
+				return;
+			}
+			
 			act("$n empties $p.", TRUE, ch, from_obj, 0, TO_ROOM);
 			act("You empty $p.", FALSE, ch, from_obj, 0, TO_CHAR);
 
