@@ -68,6 +68,9 @@ D0
 D3
 ~
 0 10704
+D7
+~
+0 10706
 E
 sugarplums~
 The sugarplums appear to be dancing.
@@ -115,6 +118,17 @@ throne~
 actually be made from candy canes.
 ~
 M 0 10703 100.00 1
+S
+#10706
+An Icy Cave~
+   This seems to be an icy cave, or perhaps a large igloo off the beaten path
+of the mountain. It isn't obvious just who made the chamber, or what it is for,
+but a sense of malevolence hangs in the air.
+~
+aci 0 0
+D4
+~
+0 10703
 S
 #10730
 Misplaced Mother Goose Spawning Chamber~
