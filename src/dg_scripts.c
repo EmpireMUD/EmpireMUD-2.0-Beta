@@ -2008,6 +2008,23 @@ int text_processed(char *field, char *subfield, struct trig_var_data *vd, char *
 		snprintf(str, slen, "%s", AN(vd->value));
 		return TRUE;
 	}
+	else if (!str_cmp(field, "cap")) {                 /* ana or an/a       */
+		snprintf(str, slen, "%s", vd->value);
+		for (p = str; *p; ++p) {
+			if (isspace(*p)) {
+				continue;
+			}
+			else if (*p == '&' && *(p + 1)) {
+				++p;	// skip one for &
+			}
+			else if (isdigit(*p) || isalpha(*p)) {
+				// found an alpha/numeric char? cap it and break
+				CAP(p);
+				break;
+			}
+		}
+		return TRUE;
+	}
 	else if (!str_cmp(field, "char")) {
 		int pos = atoi(NULLSAFE(subfield));
 		if (subfield && strlen(vd->value) > pos) {

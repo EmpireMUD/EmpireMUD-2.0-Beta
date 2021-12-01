@@ -1632,6 +1632,7 @@ bool check_autostore(obj_data *obj, bool force, empire_data *override_emp) {
 */
 void point_update_obj(obj_data *obj) {
 	char buf[MAX_STRING_LENGTH];
+	char *to_char_str = NULL, *to_room_str = NULL;
 	room_data *to_room, *obj_r;
 	obj_data *top;
 	char_data *c;
@@ -1718,12 +1719,36 @@ void point_update_obj(obj_data *obj) {
 		}
 		
 		if (IS_DRINK_CONTAINER(obj)) {
-			if (GET_DRINK_CONTAINER_CONTENTS(obj) > 0) {
-				if (obj->carried_by) {
-					act("$p has gone bad and you pour it out.", FALSE, obj->carried_by, obj, 0, TO_CHAR);
+			// messaging
+			if (GET_DRINK_CONTAINER_CONTENTS(obj) > 0 || OBJ_FLAGGED(obj, OBJ_SINGLE_USE)) {
+				// messaging to char
+				if (obj->carried_by || obj->worn_by) {
+					if (obj_has_custom_message(obj, OBJ_CUSTOM_DECAYS_ON_CHAR)) {
+						to_char_str = obj_get_custom_message(obj, OBJ_CUSTOM_DECAYS_ON_CHAR);
+					}
+					else {
+						to_char_str = "$p has gone bad and you pour it out.";
+					}
+
+					if (obj->carried_by && to_char_str) {
+						act(to_char_str, FALSE, obj->carried_by, obj, NULL, TO_CHAR);
+					}
+					else if (obj->worn_by && to_char_str) {
+						act(to_char_str, FALSE, obj->worn_by, obj, NULL, TO_CHAR);
+					}
 				}
-				else if (obj->worn_by) {
-					act("$p has gone bad and you pour it out.", FALSE, obj->worn_by, obj, 0, TO_CHAR);
+				// messaging to room
+				else if (IN_ROOM(obj) && ROOM_PEOPLE(IN_ROOM(obj))) {
+					if (obj_has_custom_message(obj, OBJ_CUSTOM_DECAYS_IN_ROOM)) {
+						to_room_str = obj_get_custom_message(obj, OBJ_CUSTOM_DECAYS_IN_ROOM);
+					}
+					else {
+						to_room_str = "$p has gone bad.";
+					}
+					
+					if (to_room_str) {
+						act(to_room_str, FALSE, ROOM_PEOPLE(IN_ROOM(obj)), obj, NULL, TO_CHAR | TO_ROOM | TO_QUEUE);
+					}
 				}
 			}
 			
@@ -1733,44 +1758,50 @@ void point_update_obj(obj_data *obj) {
 			GET_OBJ_TIMER(obj) = UNLIMITED;
 			request_obj_save_in_world(obj);
 			
-			// do not extract
+			// do not extract unless it's 1-use
+			if (OBJ_FLAGGED(obj, OBJ_SINGLE_USE)) {
+				// decays-to
+				run_interactions(NULL, GET_OBJ_INTERACTIONS(obj), INTERACT_DECAYS_TO, obj_room(obj), NULL, obj, NULL, consumes_or_decays_interact);
+				
+				empty_obj_before_extract(obj);
+				extract_obj(obj);
+				return;
+			}
 		}
 		else {  // all others actually decay
-			char *to_char = NULL, *to_room = NULL;
-			
 			// check custom messages first, then material message, then default
 			if (obj->carried_by || obj->worn_by) {
 				if (obj_has_custom_message(obj, OBJ_CUSTOM_DECAYS_ON_CHAR)) {
-					to_char = obj_get_custom_message(obj, OBJ_CUSTOM_DECAYS_ON_CHAR);
+					to_char_str = obj_get_custom_message(obj, OBJ_CUSTOM_DECAYS_ON_CHAR);
 				}
 				else if (materials[GET_OBJ_MATERIAL(obj)].decay_on_char) {
-					to_char = materials[GET_OBJ_MATERIAL(obj)].decay_on_char;
+					to_char_str = materials[GET_OBJ_MATERIAL(obj)].decay_on_char;
 				}
 				else {
-					to_char = "$p disintegrates in your hands.";
+					to_char_str = "$p disintegrates in your hands.";
 				}
 			}
 			else if (IN_ROOM(obj) && ROOM_PEOPLE(IN_ROOM(obj))) {
 				if (obj_has_custom_message(obj, OBJ_CUSTOM_DECAYS_IN_ROOM)) {
-					to_room = obj_get_custom_message(obj, OBJ_CUSTOM_DECAYS_IN_ROOM);
+					to_room_str = obj_get_custom_message(obj, OBJ_CUSTOM_DECAYS_IN_ROOM);
 				}
 				else if (materials[GET_OBJ_MATERIAL(obj)].decay_in_room) {
-					to_room = materials[GET_OBJ_MATERIAL(obj)].decay_in_room;
+					to_room_str = materials[GET_OBJ_MATERIAL(obj)].decay_in_room;
 				}
 				else {
-					to_room = "$p disintegrates and falls apart.";
+					to_room_str = "$p disintegrates and falls apart.";
 				}
 			}
 			
 			// send messages
-			if (obj->carried_by && to_char) {
-				act(to_char, FALSE, obj->carried_by, obj, NULL, TO_CHAR | TO_QUEUE);
+			if (obj->carried_by && to_char_str) {
+				act(to_char_str, FALSE, obj->carried_by, obj, NULL, TO_CHAR | TO_QUEUE);
 			}
-			else if (obj->worn_by && to_char) {
-				act(to_char, FALSE, obj->worn_by, obj, NULL, TO_CHAR | TO_QUEUE);
+			else if (obj->worn_by && to_char_str) {
+				act(to_char_str, FALSE, obj->worn_by, obj, NULL, TO_CHAR | TO_QUEUE);
 			}
-			if (IN_ROOM(obj) && ROOM_PEOPLE(IN_ROOM(obj)) && to_room) {
-				act(to_char, FALSE,ROOM_PEOPLE(IN_ROOM(obj)), obj, NULL, TO_CHAR | TO_ROOM | TO_QUEUE);
+			if (IN_ROOM(obj) && ROOM_PEOPLE(IN_ROOM(obj)) && to_room_str) {
+				act(to_room_str, FALSE,ROOM_PEOPLE(IN_ROOM(obj)), obj, NULL, TO_CHAR | TO_ROOM | TO_QUEUE);
 			}
 			
 			// decays-to
