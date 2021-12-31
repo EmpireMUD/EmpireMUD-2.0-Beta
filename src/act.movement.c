@@ -284,7 +284,7 @@ bool can_enter_room(char_data *ch, room_data *room) {
 	// player limit
 	if (IS_ADVENTURE_ROOM(room) && (inst = find_instance_by_room(room, FALSE, FALSE))) {
 		// only if not already in there
-		if (!IS_ADVENTURE_ROOM(IN_ROOM(ch)) || find_instance_by_room(IN_ROOM(ch), FALSE, FALSE) != inst) {
+		if (find_instance_by_room(IN_ROOM(ch), FALSE, FALSE) != inst) {
 			if (!can_enter_instance(ch, inst)) {
 				return FALSE;
 			}
