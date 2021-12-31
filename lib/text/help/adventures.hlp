@@ -172,31 +172,63 @@ Blacklung, Goblin Foreman sells a goblin coffin (temporary, single-use tomb).
 #
 "GOBLIN OUTPOST" "SEWER: GOBLIN OUTPOST" "THE SEWER: GOBLIN OUTPOST"
 
-The Sewer: Goblin Outpost (level 50-100 adventure)
+The Sewer: Goblin Outpost (level 50-150 adventure)
 
    Strange sounds are coming from the sewer grate, and waste has been backing
 up into the streets. This can only mean one thing: Goblins! Will you buy the
-goblins' wares, or drive them from the city? This adventure sells 6 crafting
-patterns and 4 unique buildings. You can also fight the goblins solo or in
-pairs, to earn their prized gear.
+goblins' wares, or drive them from the city? This adventure sells 30 BoE items,
+the crafting patterns BoE for them all, and 4 unique buildings. You can also
+fight the goblins solo or in pairs (on normal, hard, or group difficulty) to
+earn their prized gear.
 
-Dryleef, vanguard leader sells:
-  a goblin war tent - a portable home/forge
-  a goblin message post - a portable mail building
-  a goblin lab tent - a portable alchemist
-  a goblin dolmen stone - a semi-portable tomb
+   The gear sold in the shops is the same as the gear created by the crafting
+patterns and the loot dropped by the goblins except for the levels and flags:
+- Loot from defeating goblins: levels 50-50, normal/hard/group difficulty, BoP
+- Purchased items: levels 1-175, normal difficulty, BoE
+- Crafted items: levels 1-175, normal or superior, BoE
 
-Pimmin, goblin shaman sells:
-  the violet leopard shawl pattern - healer cloak
-  the wildfire gloves pattern - caster gloves
+Healer crafts (Haxaw's mad sketches):
+ Haxaw's poison ring  (finger, forged, Jewelry)
+ goblin neck smile  (neck, crafted, Magical Vestments)
+ flail of many blessings  (wield, forged, Deadly Weapons)
+ goose-beak totem  (hold, crafted, Exquisite Woodworking)
+ goblin deathshroud  (about body, sewn, Magical Vestments)
+ doubleskin gloves  (hands, sewn, Magical Vestments)
+ 
+Caster crafts (Pimmin's roll of goblin crafts):
+ Pimmin's ring  (finger, forged, Jewelry)
+ bone charm necklace  (neck, crafted, Magical Vestments)
+ chicken-bone wand  (wield, crafted, Deadly Weapons)
+ goblinward tome  (hold, crafted, Deadly Weapons)
+ violet leopard shawl  (about body, sewn, Magical Vestments)
+ wildfire gloves  (hands, sewn, Magical Vestments)
 
-Shivsper, goblin assassin
-  the rat-fur cloak pattern - melee cloak
-  the wooden gauntlets pattern - melee gauntlets
+Melee crafts (perfectly legal goblincraft patterns):
+ Shivsper's poison ring  (finger, forged, Jewelry)
+ gaudy copper chain  (neck, forged, Jewelry)
+ someone else's axe  (wield, forged, Deadly Weapons)
+ giant dagger  (wield/hold, forged, Deadly Weapons)
+ rat-fur cloak  (about body, sewn, Dangerous Leathers)
+ wooden gauntlets  (hands, crafted, Dangerous Leathers)
 
-Wargreyn, goblin blacksmith
-  the mesh cloak pattern - tank cloak
-  the heavy goblin gauntlets pattern - tank gauntlets
+Tank crafts (Wargreyn's lead plates of goblincrafting):
+ Wargreyn's ring  (finger, forged, Jewelry)
+ blacksmith's charm  (neck, forged, Jewelry)
+ goblinsmith's hammer  (wield, forged, Deadly Weapons)
+ wargskull shield  (hold, forged, Imperial Armors)
+ mesh cloak  (about body, forged, Imperial Armors)
+ heavy goblin gauntlets  (hands, forged, Imperial Armors)
+
+Solo/PVP crafts (book of Dryleef's family goblincrafts):
+ Dryleef's pitfighting ring  (finger, forged, Jewelry)
+ zirconian amulet of goblin bravery  (neck, forged, Jewelry)
+ bog-iron pitfighter's sword  (wield, forged, Deadly Weapons)
+ Dryleef's pitfighting buckler  (hold, forged, Imperial Armors)
+ goblin pitfighter's cape  (about body, forged, Dangerous Leathers)
+ goblin punching bags  (hands, forged, Dangerous Leathers)
+
+NOTE: Using 'list id' in the shops labels the gear BoP. However, when purchased
+or crafted, these items are always BoE. They will be BoP if dropped as loot.
 #
 "GOLDEN GOBLIN" "THE GOLDEN GOBLIN" SMEEGLE "QUARTERMASTER SMEEGLE"
 
