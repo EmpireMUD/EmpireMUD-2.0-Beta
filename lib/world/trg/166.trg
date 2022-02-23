@@ -14,7 +14,7 @@ if %actor.cooldown(16600)%
   %send% %actor% Your %cooldown.16600% is on cooldown!
   halt
 end
-set player_name %actor.name%
+set player_name %actor.firstname%
 if %cmd% == make
   if (snowman /= %arg%) && %actor.has_resources(16605,3)%
     set BuildRoom %self.room%
@@ -212,6 +212,15 @@ switch %questvnum%
   case 16680
     %load% obj 16680 %actor% inv
   break
+  case 16643
+    %load% mob 16643
+  break
+  case 16644
+    %load% mob 16644
+  break
+  case 16660
+    %load% obj 16616 %actor% inv
+  break
 done
 ~
 #16603
@@ -346,20 +355,29 @@ end
 %load% obj 16607 room
 %quest% %actor% trigger 16607
 set xmas_tree %room.contents(16607)%
+* update descriptions? each entry must end in a colon
+set unimpressive_sects 4: 26: 45: 54: 71:
+set giant_sects 28: 55:
+set spruce_sects 10562: 10563: 10564: 10565:
+set magic_sects 602: 603: 604: 612: 613: 614: 16698: 16699:
 if %self.varexists(winter_holiday_sect_check)%
-  set winter_holiday_sect_check %self.winter_holiday_sect_check%
-  if %winter_holiday_sect_check% == 10565 || %winter_holiday_sect_check% == 10564 || %winter_holiday_sect_check% == 10563 || %winter_holiday_sect_check% == 10562
+  set compare %self.winter_holiday_sect_check%:
+  if %spruce_sects% ~= %compare%
     %mod% %xmas_tree% keywords tree spruce Christmas tall
     %mod% %xmas_tree% shortdesc a spruce Christmas tree
     %mod% %xmas_tree% longdesc A tall spruce Christmas tree cheers the citizens.
-  elseif %winter_holiday_sect_check% == 604
+  elseif %magic_sects% ~= %compare%
     %mod% %xmas_tree% keywords tree enchanted Christmas tall
     %mod% %xmas_tree% shortdesc an enchanted Christmas tree
     %mod% %xmas_tree% longdesc A tall enchanted Christmas tree cheers the citizens.
-  elseif %winter_holiday_sect_check% == 4
+  elseif %unimpressive_sects% ~= %compare%
     %mod% %xmas_tree% keywords tree Christmas unimpressive tall
     %mod% %xmas_tree% shortdesc an unimpressive Christmas tree
     %mod% %xmas_tree% longdesc A tall but unimpressive Christmas tree cheers the citizens.
+  elseif %giant_sects% ~= %compare%
+    %mod% %xmas_tree% keywords tree Christmas enormous
+    %mod% %xmas_tree% shortdesc an enormous Christmas tree
+    %mod% %xmas_tree% longdesc An enormous Christmas tree cheers the citizens.
   end
 end
 * See if the player's empire has the twelve trees of xmas progress or not.
@@ -403,7 +421,7 @@ xmas tree chopping~
 1 c 2
 chop~
 * config valid sects (must also update trig 16609)
-set valid_sects 4 602 603 604 612 613 614 10562 10563 10564 10565 16698 16699
+set valid_sects 4 26 28 45 54 55 71 602 603 604 612 613 614 10562 10563 10564 10565 16698 16699
 return 0
 if %actor.inventory(16606)%
   %send% %actor% You really should get this tree back to your city center and plant it.
@@ -438,65 +456,41 @@ if !%actor.on_quest(16607)% || %actor.inventory(16606)% || %actor.carrying% >= (
   halt
 end
 * attempt to determine if they just got a tree
-while %arg%
-  if %arg.cdr% == tree.
-    set tree_type %actor.inventory()%
-    set tree_type %tree_type.vnum%
-  end
-  set arg %arg.cdr%
-done
+if (%arg% ~= tree. || %arg% ~= wood.)
+  set tree_type %actor.inventory()%
+  set tree_type %tree_type.vnum%
+end
 set winter_holiday_sect_check %self.winter_holiday_sect_check%
-set valid_tree_types 10558 603 120 618 16697
+set valid_tree_types 10558 603 120 122 128 618 16697
 if !(%valid_tree_types% ~= %tree_type%)
   * not a valid tree
   halt
 end
-* chances of success
-switch %winter_holiday_sect_check%
-  case 10565
-    set chance 60
-  break
-  case 10564
-    set chance 45
-  break
-  case 10563
-    set chance 30
-  break
-  case 10562
-    set chance 15
-  break
-  case 604
-    set chance 60
-  break
-  case 603
-    set chance 50
-  break
-  case 602
-    set chance 40
-  break
-  case 614
-    set chance 60
-  break
-  case 613
-    set chance 50
-  break
-  case 612
-    set chance 40
-  break
-  case 4
-    set chance 30
-  break
-  case 16699
-    set chance 100
-  break
-  case 16698
-    set chance 100
-  break
-  default
-    * invalid sect
-    halt
-  break
-done
+* chances of success: each entry should end in a colon
+set 30_percent_sects 4: 26: 71: 10562: 10563:
+set 40_percent_sects 28: 45: 54: 55: 602: 612: 10564:
+set 50_percent_sects 603: 613:
+set 60_percent_sects 604: 614: 10565:
+set 100_percent_sects 16698: 16699:
+set compare %winter_holiday_sect_check%:
+if %30_percent_sects% ~= %compare%
+  set chance 30
+elseif %40_percent_sects% ~= %compare%
+  set chance 40
+elseif %50_percent_sects% ~= %compare%
+  set chance 50
+elseif %60_percent_sects% ~= %compare%
+  set chance 60
+elseif %100_percent_sects% ~= %compare%
+  set chance 100
+else
+  switch %winter_holiday_sect_check%
+    default
+      * invalid sect
+      halt
+    break
+  done
+end
 * determine if we have a valid tree
 if %random.100% > %chance%
   * fail
@@ -1620,7 +1614,7 @@ Holiday pet self-naming helper~
 xmas_pet_setup~
 * Note: Some of this script is very similar to the load trigger 16636
 * Note: this requires that self is currently a companion and that its player
-* has these vars: xmas_pet_type, xmas_pet_coat, xmas_pet_sex, and 
+* has these vars: xmas_pet_type, xmas_pet_coat, xmas_pet_sex, and
 * xmas_pet_name (which may be 0/empty)
 * Note: This script is ONLY called by the mob itself
 return 0
@@ -2069,6 +2063,234 @@ end
 * and purge
 %purge% %food%
 ~
+#16643
+Straw goat spawn trigger~
+0 n 100
+~
+if %self.vnum% == 16643
+  * Small mob goat
+  * not currently echoing when it runs off
+  * %echo% ~%self% runs off as fast as its little legs will carry it!
+  dg_affect %self% SNEAK on -1
+  set tries 50
+  while %tries% > 0
+    eval tries %tries% - 1
+    mmove
+  done
+  dg_affect %self% SNEAK off
+  %echo% ~%self% scampers in.
+elseif %self.vnum% == 16644
+  * Large object goat version: this uses a helper mob
+  set tries 50
+  while %tries% > 0
+    eval tries %tries% - 1
+    mmove
+  done
+  %load% obj 16644 room
+  %echo% Some citizens have erected a giant straw goat!
+  %purge% %self%
+end
+~
+#16644
+Burning straw goat~
+1 n 100
+~
+wait 1
+set ch %self.room.people%
+while %ch%
+  set next_ch %ch.next_in_room%
+  if %ch.on_quest(16643)%
+    %quest% %ch% trigger 16643
+    %quest% %ch% finish 16643
+  end
+  if %ch.on_quest(16644)%
+    %quest% %ch% trigger 16644
+    %quest% %ch% finish 16644
+  end
+  set ch %next_ch%
+done
+~
+#16645
+Straw goat leash: keep it outside~
+0 i 100
+~
+* This is used for both the small goat and the spawner for the large goat
+* keeps the mob outside
+if %self.room.is_outdoors%
+  return 1
+else
+  return 0
+end
+~
+#16646
+Command: Burn or Light the small straw goat~
+0 c 0
+burn light~
+* targeting
+set target %actor.char_target(%arg%)%
+if %target% != %self%
+  return 0
+  halt
+else
+  * all other cases
+  return 1
+end
+* lighter?
+set lighter %actor.find_lighter%
+if !%lighter% && !%actor.has_tech(Light-Fire)%
+  %send% %actor% You don't have anything to light the straw goat with.
+  halt
+end
+* chance to fail
+if %random.2% == 2 && !%self.disabled% && %actor.skill(Stealth)% < 100 && !%actor.aff_flagged(HIDE)% && !%self.aff_flagged(ENTANGLED)% && %self.position% == Standing
+  %send% %actor% You try to light the little straw goat on fire but it darts away!
+  %echoaround% %actor% ~%actor% tries to light the little straw goat on fire but it darts away!
+  * replace with fresh copy
+  %load% mob %self.vnum%
+  %purge% %self%
+  halt
+end
+* ok
+if %actor.has_tech(Light-Fire)% || !%lighter%
+  %send% %actor% You light the little straw goat on fire! It stops running and begins to crackle and pop.
+  %echoaround% %actor% ~%actor% lights the little straw goat on fire! It stops running and begins to crackle and pop.
+elseif %lighter%
+  %send% %actor% You use @%lighter% to set the little straw goat on fire! It stops running and begins to crackle and pop.
+  %echoaround% %actor% ~%actor% uses @%lighter% to set the little straw goat on fire! It stops running and begins to crackle and pop.
+  nop %lighter.used_lighter(%actor%)%
+end
+%load% obj 16643 room
+%purge% %self%
+~
+#16647
+Prevent burning of straw goat in front of witnesses~
+1 c 4
+light burn~
+* check targeting
+if !%arg% || %actor.obj_target(%arg.car%)% != %self%
+  return 0
+  halt
+end
+* check witnesses
+if !%ch.aff_flagged(HIDE)% && %ch.skill(Stealth)% < 100
+  set witnesses 0
+  set ch %actor.room.people%
+  while %ch% && %witnesses% < 2
+    if %ch.position% == Standing && !%ch.leader% && !%ch.disabled% && !%ch.leader% && %ch.mob_flagged(HUMAN)%
+      eval witnesses %witnesses% + 1
+    end
+    set ch %ch.next_in_room%
+  done
+  if %witnesses% > 1
+    %send% %actor% You can't set it on fire in front of witnesses!
+    return 1
+    halt
+  elseif %witnesses% > 0
+    %send% %actor% You can't set it on fire in front of a witness!
+    return 1
+    halt
+  end
+end
+* if we made it this far, just allow it
+return 0
+~
+#16648
+Holiday pet interactions and emotes~
+0 bt 10
+~
+* basics
+set vnum %self.vnum%
+if %vnum% >= 16635 && %vnum% <= 16637
+  set dog 1
+  set cat 0
+elseif %vnum% >= 16638 && %vnum% <= 16640
+  set dog 0
+  set cat 1
+else
+  * unknown animal
+  halt
+end
+if %vnum% == 16635 || %vnum% == 16638
+  set small 1
+else
+  set small 0
+end
+if %vnum% == 16637 || %vnum% == 16640
+  set heroic 1
+else
+  set heroic 0
+end
+* ensure companion here (companionless messages)
+set pc %self.companion%
+if !%pc% || %pc.room% != %self.room%
+  switch %random.4%
+    case 1
+      %echo% ~%self% looks around, lonely.
+    break
+    case 2
+      %echo% ~%self% paces back and forth.
+    break
+    case 3
+      %echo% ~%self% curls up but doesn't sleep.
+    break
+    case 4
+      %echo% ~%self% seems wary.
+    break
+  done
+  halt
+end
+* normal messages (random)
+switch %random.8%
+  case 1
+    %echo% ~%self% nuzzles up against ~%pc%.
+  break
+  case 2
+    if %cat%
+      %echo% ~%self% rubs up against ~%pc% and purrs.
+    elseif %dog%
+      %echo% ~%self% whacks ~%pc% with *%self% tail.
+    end
+  break
+  case 3
+    if %cat%
+      %echo% ~%self% cleans *%self%self.
+    elseif %dog%
+      %echo% ~%self% chases ^%self% tail in circles.
+    end
+  break
+  case 4
+    if %pc.position% == Standing || %pc.position% == Sitting || %pc.position% == Resting
+      if %dog%
+        set thing a little ball
+      else
+        set thing a ball of string
+      end
+      %send% %pc% You throw %thing% and ~%self% chases after it and brings it back!
+      %echoaround% %pc% ~%pc% throws %thing% and ~%self% chases after it and brings it back to *%pc%!
+    end
+  break
+  * remaining numbers: normal meow/bark
+  default
+    if %cat%
+      if %small%
+        %echo% ~%self% mews.
+      elseif %heroic% && %random.2% == 2
+        %echo% ~%self% lets out a mighty roar!
+      else
+        %echo% ~%self% meows.
+      end
+    elseif %dog%
+      if %small%
+        %echo% ~%self% whimpers.
+      elseif %heroic% && %random.2% == 2
+        %echo% ~%self% lets out a mighty howl!
+      else
+        %echo% ~%self% barks.
+      end
+    end
+  break
+done
+~
 #16649
 Only harness flying mobs~
 5 c 0
@@ -2395,6 +2617,239 @@ end
 %echo% It's empty!
 return 1
 %purge% %self%
+~
+#16660
+Straw Goat vandalism driver~
+5 ab 33
+~
+* configs
+set quest_vnum 16660
+set protect_times 3
+* name lists: count must be the number of words in the list; all list entries must be 1-word
+set adj_list dastardly timid wily devious despicable mischievous vexatious roguish puckish fiendish rotten
+set adj_count 11
+set age_list young older
+set age_count 2
+set male_list boy man gentleman farmhand merchant apprentice
+set male_count 6
+set female_list girl woman lady milkmaid merchant apprentice
+set female_count 6
+* ensure a crowd is present or just spawn one
+set found 0
+set room %self.room%
+set ch %room.people%
+while %ch% && !%found%
+  if %ch.vnum% == 16660
+    set found 1
+  end
+  set ch %ch.next_in_room%
+done
+if !%found%
+  %load% mob 16660
+  %echo% A crowd has formed around the straw goat.
+  halt
+end
+* ensure goat is complete
+if !%self.complete%
+  halt
+end
+* pull or set up variables
+set is_active 1
+if %self.varexists(protect_count)%
+  set protect_count %self.protect_count%
+else
+  set protect_count 0
+end
+* generate a random vandal: leading adjective
+eval pos %%random.%adj_count%%%
+while %pos% > 1
+  set adj_list %adj_list.cdr%
+  eval pos %pos% - 1
+done
+set vandal %adj_list.car%
+* random vandal: optional age
+if %random.2% == 2
+  eval pos %%random.%age_count%%%
+  while %pos% > 1
+    set age_list %age_list.cdr%
+    eval pos %pos% - 1
+  done
+  set vandal %vandal% %age_list.car%
+end
+* random vandal: gender-based name
+if %random.2% == 1
+  set vandal_sex male
+  set vandal_hisher his
+  set name_list %male_list%
+  set name_count %male_count%
+else
+  set vandal_sex female
+  set vandal_hisher her
+  set name_list %female_list%
+  set name_count %female_count%
+end
+eval pos %%random.%name_count%%%
+while %pos% > 1
+  set name_list %name_list.cdr%
+  eval pos %pos% - 1
+done
+* this is the final step in the name:
+set vandal %vandal% %name_list.car%
+* store vars now (while running)
+remote protect_count %self.id%
+remote is_active %self.id%
+remote vandal %self.id%
+remote vandal_sex %self.id%
+* determine cycle count: check for early-protect
+if %self.varexists(early_protect)%
+  set cycle 5
+  rdelete early_protect %self.id%
+else
+  set cycle 10
+end
+* BEGIN BIG LOOP
+while %cycle%
+  * pull these each cycle as they are changed by another script
+  set protect_count %self.protect_count%
+  set is_active %self.is_active%
+  * checks to do on each loop
+  if %self.is_flagged(ON-FIRE)%
+    wait 60s
+    halt
+  elseif %protect_count% >= %protect_times%
+    * QUEST COMPLETE
+    %echo% The celebration comes to an end and giant straw goat is safe from vandals! The citizens take down the goat and the crowd disperses.
+    set ch %room.people%
+    while %ch%
+      set next_ch %ch.next_in_room%
+      if %ch.on_quest(%quest_vnum%)%
+        %quest% %ch% trigger %quest_vnum%
+        %quest% %ch% finish %quest_vnum%
+      elseif %ch.vnum% == 16660
+        * despawn crowd
+        %purge% %ch%
+      end
+      set ch %next_ch%
+    done
+    * done with the goat
+    %purge% %self%
+    halt
+  elseif !%is_active%
+    * stopped by the command trigger
+    halt
+  end
+  switch %cycle%
+    * cycle counts down; 1 will be the last cycle
+    case 10
+      %echo% You think you spot %vandal.ana% %vandal% sneaking through the crowd.
+    break
+    * skip case 9
+    case 8
+      %echo% You can definitely see %vandal.ana% %vandal% creeping toward the giant straw goat.
+    break
+    * skip case 7
+    case 6
+      %echo% You've lost sight of the %vandal%...
+    break
+    * skip case 5
+    case 4
+      %echo% %vandal.ana.cap% %vandal% has made it to the giant straw goat!
+    break
+    case 3
+      %echo% The %vandal% crouches behind one leg of the straw goat and begins trying to set it alight!
+    break
+    case 2
+      %echo% The %vandal% strikes at %vandal_hisher% fire starter...
+    break
+    case 1
+      * last cycle: burn it down!
+      %echo% The %vandal% manages to light the giant straw goat and it goes up in flames!
+      %load% obj 16643 room
+      %purge% %self%
+    break
+  done
+  * end of cycle:
+  eval cycle %cycle% - 1
+  remote cycle %self.id%
+  wait %random.2%s
+done
+~
+#16661
+Straw Goat protect command~
+5 c 0
+protect~
+* this pairs with trigger 16660 to handle quest 16660
+* pull vars
+if %self.varexists(protect_count)%
+  set protect_count %self.protect_count%
+else
+  set protect_count 0
+end
+if %self.varexists(is_active)%
+  set is_active %self.is_active%
+else
+  set is_active 0
+end
+if %self.varexists(vandal)%
+  set vandal %self.vandal%
+else
+  set vandal vandal
+end
+if %self.varexists(vandal_sex)%
+  set vandal_sex %self.vandal_sex%
+else
+  set vandal_sex male
+end
+switch %vandal_sex%
+  case male
+    set heshe he
+  break
+  case female
+    set heshe she
+  break
+done
+* check args
+if !%arg%
+  %send% %actor% Protect what?
+  halt
+elseif !(giant straw goat /= %arg%) && !(straw goat /= %arg%) && !(goat /= %arg%)
+  %send% %actor% You can't protect that.
+  halt
+elseif %self.is_flagged(ON-FIRE)%
+  %send% %actor% It's on fire! You need to douse it before it burns down!
+  halt
+elseif !%is_active%
+  %send% %actor% There's nobody coming for the straw goat right now, but you manage to cause a small distraction by pointing fingers at no one.
+  %echoaround% %actor% ~%actor% points into the crowd and you watch as &%actor% searches fruitlessly for someone who isn't there.
+  * this will speed up the next vandal
+  set early_protect 1
+  remote early_protect %self.id%
+  halt
+end
+* successfully thwarted
+eval protect_count %protect_count% + 1
+remote protect_count %self.id%
+set is_active 0
+remote is_active %self.id%
+* messaging
+switch %random.4%
+  case 1
+    %send% %actor% You push through the crowd to stop the %vandal% but %heshe% sees you and runs off!
+    %echoaround% %actor% ~%actor% pushes through the crowd to stop the %vandal%, who runs off when %heshe% sees *%actor%.
+  break
+  case 2
+    %send% %actor% You signal to the city guards, who stop the %vandal% from burning the goat.
+    %echoaround% %actor% ~%actor% signals the city guards, who stop the %vandal% from burning the goat.
+  break
+  case 3
+    %send% %actor% You grab the %vandal% before %heshe% can vandalize the goat, but %heshe% slips free and runs off.
+    %echoaround% %actor% ~%actor% grabs the %vandal% before %heshe% can vandalize the goat, but %heshe% slips free and runs off.
+  break
+  case 4
+    %send% %actor% The %vandal% sees you coming and runs off.
+    %echoaround% %actor% ~%actor% heads toward the %vandal%, who sees *%actor% coming and runs off.
+  break
+done
 ~
 #16666
 Floating lantern expiry~
@@ -2954,6 +3409,10 @@ set Cookie16661 %self.Cookie16661%
 set Cookie16662 %self.Cookie16662%
 * only looking at it?
 if %cmd% == look
+  if %arg.car% == in || %arg.car% == at
+    * pull off a leading in/at
+    set arg %arg.cdr%
+  end
   if %actor.obj_target(%arg.car%)% != %self%
     return 0
     halt
@@ -2986,7 +3445,7 @@ if %cmd% == look
       set string a mess of snow
     break
     case 2
-      if %Cookie1660% >= 1
+      if %Cookie16660% >= 1
         set string %string1%
       elseif %Cookie16661% >= 1
         set string %string2%
@@ -2995,9 +3454,9 @@ if %cmd% == look
       end
     break
     case 3
-      if %Cookie1660% == 0
+      if %Cookie16660% == 0
         set string %string2% and %string3%
-      elseif %Cookie1661% == 0
+      elseif %Cookie16661% == 0
         set string %string1% and %string3%
       else
         set string %string1% and %string2%
@@ -3063,8 +3522,8 @@ while (%item% && (%all% || %CookieCount% == 0))
     remote %WhatCookie% %self.id%
     %purge% %item%
     eval CookieTotal %CookieTotal% + 1
-if %CookieTotal% == %Needs%
-break
+    if %CookieTotal% == %Needs%
+      break
     end
   end
   * and repeat the loop

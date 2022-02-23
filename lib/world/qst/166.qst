@@ -500,10 +500,10 @@ Type 'craft winter ornament set' to make them, then 'hang ornament' in 4 rooms.
    You've got this decorating thing down. Tree? Check! Ornaments? Check! What
 else could your citizens ask for?
 ~
-11 e 0 0 -1
+12 e 0 0 -1
 A
 2 16607
-D 10700
+D 16620
 P
 36 10700 0 1 a
 P
@@ -596,6 +596,108 @@ W
 36 10700 0 1 a
 Z
 4 16628
+S
+#16643
+Winter Wonderland: Got Your Goat~
+   Some sorcerers have been enchanting the little straw goats made by the
+villagers so that the goats run around. For some people, it's a constant source
+of mirth. But for certain Guild members, it has become a nuissance. The straw
+goats are drawing too much attention to covert activities -- and perhaps that's
+what the sorcerers designed them to do.
+   A subtle escalation merits a subtle reaction. Find a straw goat and light it
+on fire. Children will love the little bonfires and it will warm the poorest
+citizens while also thwarting those city sorcerers.
+   'Light' or 'burn' a little straw goat. You'll need a lighter.
+~
+Your actions today have warmed the hearts -- and bodies -- of the citizens.
+~
+6 e 0 0 -1
+A
+2 16607
+D 16643
+P
+9 4 0 1 a
+P
+36 10700 0 1 a
+R
+9 10700 10
+R
+2 16678 1
+T 16602
+W
+36 10700 0 1 a
+W
+11 0 0 1 a
+Z
+4 16644
+S
+#16644
+Winter Wonderland: Hay, Got a Light?~
+   The winter festivities have descended on the city like a blizzard, and
+everyone is abustle decorating. Some citizens have built up a giant straw goat
+near here and an important client of the Guild has paid to bring it back down.
+   Now, there's a competition amongst the city's underworld to be the first to
+burn down the giant straw goat for the client. This won't be a paid job, but it
+will certainly increase someone's holiday cheer. As a bonus, the massive
+bonfire from the burning goat will surely warm the hearts -- and bodies -- of
+many of the empire's poorest citizens.
+   Find the giant straw goat and 'light' it on fire.
+~
+You've managed to burn down a straw goat! It looks like you won the competition.
+~
+6 e 0 0 -1
+A
+2 16607
+D 16643
+P
+36 10700 0 1 a
+P
+9 4 0 1 a
+R
+9 10700 10
+R
+2 16678 1
+T 16602
+W
+36 10700 0 1 a
+W
+11 0 0 1 a
+Z
+4 16644
+S
+#16660
+Winter Wonderland: Goat to Celebrate~
+   People are eager to see a giant straw goat to rival the one from last year.
+Craft one in your city for them to dance and party around, but beware: vandals
+love to burn the straw goat. You will need to stand guard until the revelry has
+ended.
+Steps:
+1. Find a good place and 'craft giant straw goat'.
+2. Stand around and wait for the crowd to gather.
+3. If someone from the crowd approaches the straw goat, type 'protect goat'.
+4. Wait until the party ends and the crowd disperses.
+~
+Your giant straw goat was a huge hit this year. That was the biggest crowd yet!
+~
+4 e 0 0 -1
+A
+2 16607
+D 16620
+P
+9 6 0 1 a
+P
+36 10700 0 1 a
+R
+9 10700 10
+R
+2 16678 1
+T 16602
+W
+36 10700 0 1 a
+W
+11 0 0 1 a
+Z
+6 16660
 S
 #16676
 Winter Wonderland: Cheer for the City~

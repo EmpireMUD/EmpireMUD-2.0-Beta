@@ -207,6 +207,18 @@ M
 18
 $p dries up.~
 S
+#16616
+ribbon red giant~
+a giant red ribbon~
+A giant red ribbon is floating in the breeze.~
+   This ribbon is used when making a giant straw goat. Find a nice outdoor spot
+in your empire and 'craft giant straw goat'.
+~
+3 p a 0 2
+0 0 0
+0 0
+Q 16660
+S
 #16618
 outfit reindeer set~
 a reindeer outfit set~
@@ -422,6 +434,40 @@ Additional notes:
 C
 1 1
 T 16641
+S
+#16643
+goat straw burning~
+a burning straw goat~
+A straw goat crackles and spits as it burns.~
+   Someone put a lot of time into making the straw goat, only to have it burned
+down by a common vandal. What is this city coming to?
+~
+3 c 0 0 3
+0 0 0
+0 576
+M
+18
+The straw goat finally burns itself out, leaving only ash that blows away on the wind.~
+T 16644
+S
+#16644
+goat straw giant~
+the giant straw goat~
+A giant straw goat looms over you.~
+   This enormous goat has been constructed from straw, wood, and rope to
+celebrate the Yule season. Its long, curved horns are dusted with snow at the
+top, well out of reach.
+~
+3 0 0 0 3
+0 0 0
+0 576
+C
+1 1
+I 11 16643 100.00 1  # LIGHT: burning straw goat
+M
+18
+Citizens show up to take down the giant straw goat and shuffle off with the remaining materials.~
+T 16647
 S
 #16650
 wax sleigh elfish flying~
@@ -1096,6 +1142,17 @@ A new object is sitting here.~
 0 0 a 0 1
 0 0 0
 0 0
+S
+#16685
+whistle burning straw goat~
+a burning straw goat whistle~
+A burning straw goat whistle is lying here.~
+   This whistle will teach you the burning straw goat mini-pet. Type 'use
+whistle'.
+~
+19 p a 0 10
+16685 0 0
+2 0
 S
 #16690
 vortex polar miniature constantly-spinning spinning~

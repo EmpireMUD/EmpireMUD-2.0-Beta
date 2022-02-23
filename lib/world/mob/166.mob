@@ -143,6 +143,7 @@ T 16638
 T 16637
 T 16639
 T 16642
+T 16648
 S
 #16636
 dog~
@@ -160,6 +161,7 @@ T 16638
 T 16637
 T 16639
 T 16642
+T 16648
 S
 #16637
 dog heroic~
@@ -176,6 +178,7 @@ T 16636
 T 16638
 T 16637
 T 16642
+T 16648
 S
 #16638
 kitten~
@@ -193,6 +196,7 @@ T 16638
 T 16637
 T 16639
 T 16642
+T 16648
 S
 #16639
 cat~
@@ -210,6 +214,7 @@ T 16638
 T 16637
 T 16639
 T 16642
+T 16648
 S
 #16640
 cat heroic~
@@ -226,6 +231,37 @@ T 16636
 T 16638
 T 16637
 T 16642
+T 16648
+S
+#16643
+goat straw~
+a straw goat~
+A straw goat dashes past you!
+~
+1 1 dq n 3
+0 0 11 15
+D
+   The little straw goat is smaller than a real goat, but it has all the
+character. It seems to be running frantically around, butting into anything
+that gets in its way. The goat must have been made by one of the local citizens
+for the upcoming yule festival, but it seems that it got away!
+~
+T 16643
+T 16645
+T 16646
+S
+#16644
+goat spawner straw~
+the straw goat spawner~
+The straw goat spawner is here.
+~
+0 0 d cdln 3
+0 0 0 15
+D
+This invisible mob moves around randomly then spawns a goat object.
+~
+T 16645
+T 16643
 S
 #16651
 goose plump~
@@ -450,6 +486,49 @@ The dreidel spins around.~
 M
 0
 The dreidel spins around.~
+S
+#16660
+crowd people~
+the crowd~
+A crowd of people has formed around the goat.
+~
+100 100 bdho n 3
+0 0 0 15
+D
+   A crowd has gathered around the giant straw goat. People are reveling and
+celebrating the winter season. Some are singing, some are drinking, and some
+are just catching up with old friends.
+~
+M
+0
+You think you spot someone sneaking through the crowd.~
+M
+0
+The crowd dances around the straw goat.~
+M
+0
+The murmur of the crowd makes it hard to hear what anybody is saying.~
+M
+0
+The crowd parades clockwise around the goat.~
+M
+0
+The crowd parades counter-clockwise around the goat.~
+M
+0
+The crowd cheers for the straw goat.~
+M
+0
+The crowd around the goat is enormous.~
+M
+0
+There are so many people around the straw goat that it's hard to tell what's going on.~
+M
+0
+At times, you can't see through the crowd at all.~
+M
+0
+You can hear faint music behind the din of the crowd.~
 S
 #16664
 demon grinchy tiny~
@@ -708,7 +787,7 @@ I 4 16673 14.00 1 l  # LOOT: warm Christmas spirit
 I 4 16674 14.00 1 l  # LOOT: anxious Christmas spirit
 I 4 16675 14.00 1 l  # LOOT: nostalgic Christmas spirit
 I 4 16679 1.00 1 l  # LOOT: tiny krampus whistle
-I 4 16679 1.00 1 l  # LOOT: tiny krampus whistle
+I 4 16685 1.00 1 l  # LOOT: burning straw goat whistle
 T 16681
 T 16682
 T 16603
@@ -744,6 +823,40 @@ A new mobile is standing here.
 ~
 0 0 d 0 3
 0 0 0 15
+S
+#16685
+goat straw burning~
+a burning straw goat~
+A straw goat runs around on fire!
+~
+1 1 bdoD n 2
+0 0 9 15
+D
+   This little straw goat has been brought to life by some cruel demon, only to
+be lit on fire. It runs around, never seeming to burn out, gleeful but
+dangerous.
+~
+M
+0
+A straw goat trails fire as it races past you!~
+M
+0
+The burning straw goat stops running to scratch itself with its horn.~
+M
+0
+The straw goat crackles as it burns.~
+M
+0
+The burning straw goat charges at you, but veers off at the last second.~
+M
+0
+The burning straw goat runs around in circles.~
+M
+0
+The burning straw goat stops, drops, and rolls.~
+M
+0
+The burning straw goat catches an ember on its tongue.~
 S
 #16698
 raven enchanted~

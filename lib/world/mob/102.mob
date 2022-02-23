@@ -87,10 +87,10 @@ A big, hairy goblin warg is snarling at you!
 ~
 50 50 dej 0 3
 0 0 0 10
-I 0 3012 100.00 2  # BUTCHER: a fillet of raw meat
-I 1 1351 100.00 1  # SKIN: a large skin
-I 1 1351 50.00 1  # SKIN: a large skin
-I 3 10207 100.00 1 X  # BARDE: an armored goblin warg
+I 0 3012 100.00 2  # BUTCHER: fillet of raw meat
+I 1 1351 100.00 1  # SKIN: large skin
+I 1 1351 50.00 1  # SKIN: large skin
+I 3 10207 100.00 1 X  # BARDE: armored goblin warg
 S
 #10207
 warg goblin armored~
@@ -99,9 +99,9 @@ An armored goblin warg is here!
 ~
 100 100 bdej 0 3
 0 0 0 10
-I 0 3012 100.00 2  # BUTCHER: a fillet of raw meat
-I 1 1351 100.00 1  # SKIN: a large skin
-I 1 1351 50.00 1  # SKIN: a large skin
+I 0 3012 100.00 2  # BUTCHER: fillet of raw meat
+I 1 1351 100.00 1  # SKIN: large skin
+I 1 1351 50.00 1  # SKIN: large skin
 S
 #10222
 warg goblin hairy big~
@@ -110,10 +110,10 @@ A big, hairy goblin warg is snarling at you!
 ~
 50 50 dej 0 3
 0 0 0 10
-I 0 3012 100.00 2  # BUTCHER: a fillet of raw meat
-I 1 1351 100.00 1  # SKIN: a large skin
-I 1 1351 50.00 1  # SKIN: a large skin
-I 3 10207 100.00 1 X  # BARDE: an armored goblin warg
+I 0 3012 100.00 2  # BUTCHER: fillet of raw meat
+I 1 1351 100.00 1  # SKIN: large skin
+I 1 1351 50.00 1  # SKIN: large skin
+I 3 10207 100.00 1 X  # BARDE: armored goblin warg
 S
 #10224
 wolf winged~
@@ -158,7 +158,15 @@ A chronomancer is holding the portal open.
 ~
 0 0 bdv cnD 3
 0 2 0 16
+D
+   The chronomancer is well-dressed with stunning violet fur robes and perhaps
+a little too much nocturnium jewelry. There is noticeable concern every time a
+roar, screech, or tremor echoes through the camp, but the chronomancer remains
+professional.
+~
 T 10250
+T 10258
+T 10259
 S
 #10251
 salesman~
@@ -167,6 +175,12 @@ A salesman is running a booth that says 'list'.
 ~
 0 0 bdv cnD 3
 1 0 0 15
+D
+   From his clothes, he obviously works with the sorcerers. But the salesman
+seems more interested in profit than adventure -- even at his own peril. Use
+'list', 'list id', and 'buy' to purchase patterns and crafting materials.
+~
+T 10273
 S
 #10252
 dracosaur king~
@@ -175,21 +189,36 @@ The King of the Dracosaurs crushes trees as he approaches!
 ~
 0 0 bdjyzBE cCE 5
 1 0 0 9
-I 0 3012 100.00 4  # BUTCHER: a fillet of raw meat
-I 0 10267 100.00 1  # BUTCHER: a serrated dracosaur tooth
-I 0 10267 50.00 1  # BUTCHER: a serrated dracosaur tooth
-I 0 10267 50.00 1  # BUTCHER: a serrated dracosaur tooth
-I 1 10265 100.00 2  # SKIN: a thick dracosaur hide
-I 1 10265 50.00 1  # SKIN: a thick dracosaur hide
-I 1 10265 50.00 1  # SKIN: a thick dracosaur hide
-I 1 1351 50.00 1  # SKIN: a large skin
-I 1 1351 50.00 1  # SKIN: a large skin
-I 4 10252 100.00 1  # LOOT: a huge dracosaur bone
-I 4 10286 5.00 1 X  # LOOT: a terrosaur whistle
-I 4 10263 10.00 1 X  # LOOT: a dracosaur whistle
-I 4 10255 20.00 1 X  # LOOT: a dracosaur bone bracelet
-I 4 10259 10.00 1 X  # LOOT: a primitive satchel
-I 4 10261 10.00 1 X  # LOOT: an unlit branch
+D
+   This enormous beast seems to be part dragon, part bird, and part reptile --
+and it is certainly the king of all three. Even hunched over with its long tail
+trailing straight out behind it, the beast is taller than your mightiest steed
+and heavier than a carriage laden with gold. Its tiny arms in no way hinder its
+ferocity: if the enormous talons on its toes weren't frightening enough, its
+main offensive advantage is its colossal, crushing bite, and its teeth, which
+are the size of shortswords.
+~
+I 0 3200 100.00 4  # BUTCHER: cut of poultry
+I 0 10267 50.00 3 t  # BUTCHER: serrated dracosaur tooth
+I 0 10267 40.00 2 t  # BUTCHER: serrated dracosaur tooth
+I 0 10267 10.00 1 t  # BUTCHER: serrated dracosaur tooth
+I 1 1351 50.00 2 k  # SKIN: large skin
+I 1 1351 50.00 1 k  # SKIN: large skin
+I 1 10265 50.00 4 s  # SKIN: thick dracosaur hide
+I 1 10265 40.00 3 s  # SKIN: thick dracosaur hide
+I 1 10265 10.00 2 s  # SKIN: thick dracosaur hide
+I 4 10296 100.00 1  # LOOT: Primeval Portal loot replacer
+I+ 4 0  # Hard
+I 4 10296 100.00 1  # LOOT: Primeval Portal loot replacer
+I+ 5 0  # Group
+I 4 10296 100.00 2  # LOOT: Primeval Portal loot replacer
+I+ 6 0  # Boss
+I 4 10295 1.00 1  # LOOT: teeny terrosaur minipet whistle
+I 4 10286 5.00 1 X  # LOOT: terrosaur whistle
+I 4 10263 10.00 1 X  # LOOT: dracosaur whistle
+I 4 10259 10.00 1 X  # LOOT: primitive satchel
+I 4 10261 10.00 1 X  # LOOT: unlit branch
+I 4 10252 100.00 1 u  # LOOT: huge dracosaur bone
 T 10262
 T 10265
 T 10256
@@ -203,21 +232,38 @@ A fearsome Terrosaur swoops down from the sky!
 ~
 0 0 bdjyzBE cmCE 4
 0 0 0 27
-I 0 3200 100.00 4  # BUTCHER: a cut of poultry
-I 0 10267 100.00 2  # BUTCHER: a serrated dracosaur tooth
-I 0 10267 50.00 1  # BUTCHER: a serrated dracosaur tooth
-I 0 10267 50.00 1  # BUTCHER: a serrated dracosaur tooth
-I 1 10265 100.00 1  # SKIN: a thick dracosaur hide
-I 1 10265 50.00 1  # SKIN: a thick dracosaur hide
-I 1 10265 50.00 1  # SKIN: a thick dracosaur hide
-I 1 1351 50.00 1  # SKIN: a large skin
-I 1 1351 50.00 1  # SKIN: a large skin
-I 4 10253 100.00 1  # LOOT: the essence of terror
-I 4 10286 5.00 1 X  # LOOT: a terrosaur whistle
-I 4 10263 10.00 1 X  # LOOT: a dracosaur whistle
-I 4 10256 20.00 1 X  # LOOT: a dracosaur scale wristband
-I 4 10259 10.00 1 X  # LOOT: a primitive satchel
-I 4 10261 10.00 1 X  # LOOT: an unlit branch
+D
+   Neither bird nor bat, the Terrosaur is in a class all its own as it swoops
+back and forth across the sky. Its enormous head is capped by a crest on the
+back and a long, triangular beak on the front. Its wings -- wide enough to wrap
+a four-horse carriage -- are leathery and graceful, supported only by long thin
+arms. But it isn't the giant mouth or tremendous size that puts the terror in
+Terrosaur... It's that bone-chilling screech.
+~
+I 0 3200 100.00 4  # BUTCHER: cut of poultry
+I 0 10267 50.00 4 t  # BUTCHER: serrated dracosaur tooth
+I 0 10267 40.00 3 t  # BUTCHER: serrated dracosaur tooth
+I 0 10267 10.00 2 t  # BUTCHER: serrated dracosaur tooth
+I 1 1351 50.00 2 k  # SKIN: large skin
+I 1 1351 50.00 1 k  # SKIN: large skin
+I 1 10265 50.00 3 s  # SKIN: thick dracosaur hide
+I 1 10265 40.00 2 s  # SKIN: thick dracosaur hide
+I 1 10265 10.00 1 s  # SKIN: thick dracosaur hide
+I 4 10296 100.00 1  # LOOT: Primeval Portal loot replacer
+I+ 4 0  # Hard
+I 4 10296 100.00 1  # LOOT: Primeval Portal loot replacer
+I+ 5 0  # Group
+I 4 10296 100.00 2  # LOOT: Primeval Portal loot replacer
+I+ 6 0  # Boss
+I 4 10295 1.00 1  # LOOT: teeny terrosaur minipet whistle
+I 4 10286 5.00 1 X  # LOOT: terrosaur whistle
+I 4 10263 10.00 1 X  # LOOT: dracosaur whistle
+I 4 10259 10.00 1 X  # LOOT: primitive satchel
+I 4 10261 10.00 1 X  # LOOT: unlit branch
+I 4 10253 100.00 1 u  # LOOT: essence of terror
+M
+0
+$n lets out a bone-chilling screech!~
 T 10262
 T 10265
 T 10256
@@ -231,16 +277,33 @@ Archsorcerer Malfernes is here, and he looks like he's gone mad!
 ~
 0 0 bdvxzBE cCE 3
 1 0 0 22
-I 4 10254 100.00 1  # LOOT: a stunning violet gem
-I 4 10265 75.00 1  # LOOT: a thick dracosaur hide
-I 4 10265 75.00 1  # LOOT: a thick dracosaur hide
-I 4 10267 75.00 1  # LOOT: a serrated dracosaur tooth
-I 4 10267 75.00 1  # LOOT: a serrated dracosaur tooth
-I 4 10286 5.00 1 X  # LOOT: a terrosaur whistle
-I 4 10263 10.00 1 X  # LOOT: a dracosaur whistle
-I 4 10258 20.00 1 X  # LOOT: an obsidian bracelet
-I 4 10259 10.00 1 X  # LOOT: a primitive satchel
-I 4 10261 10.00 1 X  # LOOT: an unlit branch
+D
+   The Archsorcerer's silky violet robe drapes on the ground as he hovers
+around the clearing. The tall collar, towering mitre, and exaggerated sleeves
+are all lined with gold that has a swirling nocturnium-black pattern which
+shifts in the light. Malfernes is muttering something under his breath -- or at
+least, he was until he noticed you.
+~
+I 4 10296 100.00 1  # LOOT: Primeval Portal loot replacer
+I+ 4 0  # Hard
+I 4 10296 100.00 1  # LOOT: Primeval Portal loot replacer
+I+ 5 0  # Group
+I 4 10296 100.00 2  # LOOT: Primeval Portal loot replacer
+I+ 6 0  # Boss
+I 4 10295 1.00 1  # LOOT: teeny terrosaur minipet whistle
+I 4 10286 5.00 1 X  # LOOT: terrosaur whistle
+I 4 10263 10.00 1 X  # LOOT: dracosaur whistle
+I 4 10259 10.00 1 X  # LOOT: primitive satchel
+I 4 10261 10.00 1 X  # LOOT: unlit branch
+I 4 10265 10.00 4 s  # LOOT: thick dracosaur hide
+I 4 10265 20.00 3 s  # LOOT: thick dracosaur hide
+I 4 10265 30.00 2 s  # LOOT: thick dracosaur hide
+I 4 10265 40.00 1 s  # LOOT: thick dracosaur hide
+I 4 10267 10.00 4 t  # LOOT: serrated dracosaur tooth
+I 4 10267 20.00 3 t  # LOOT: serrated dracosaur tooth
+I 4 10267 30.00 2 t  # LOOT: serrated dracosaur tooth
+I 4 10267 40.00 1 t  # LOOT: serrated dracosaur tooth
+I 4 10254 100.00 1 u  # LOOT: stunning violet gem
 T 10262
 T 10265
 T 10256
@@ -254,17 +317,36 @@ A frilled, three-horned dracosaur is charging at you like a bull!
 ~
 0 0 bdjyAE ch 5
 0 0 0 27
-I 0 3012 100.00 2  # BUTCHER: a fillet of raw meat
-I 0 10267 50.00 1  # BUTCHER: a serrated dracosaur tooth
-I 0 10267 50.00 1  # BUTCHER: a serrated dracosaur tooth
-I 1 10265 100.00 1  # SKIN: a thick dracosaur hide
-I 1 10265 50.00 1  # SKIN: a thick dracosaur hide
-I 1 10265 50.00 1  # SKIN: a thick dracosaur hide
-I 1 1351 50.00 1  # SKIN: a large skin
-I 1 1351 50.00 1  # SKIN: a large skin
-I 4 10255 10.00 1 X  # LOOT: a dracosaur bone bracelet
-I 4 10259 10.00 1 X  # LOOT: a primitive satchel
-I 4 10261 10.00 1 X  # LOOT: an unlit branch
+D
+   This oversized creature looks like a land dragon, perhaps mixed with a bull.
+Three horns on its face point straight at you, and its neck and body are
+guarded by an enormous frill. If you could tame but one of these creatures, its
+galloping charge would destroy any defensive line.
+~
+I 0 3200 100.00 2  # BUTCHER: cut of poultry
+I 0 10267 10.00 3 t  # BUTCHER: serrated dracosaur tooth
+I 0 10267 60.00 2 t  # BUTCHER: serrated dracosaur tooth
+I 0 10267 30.00 1 t  # BUTCHER: serrated dracosaur tooth
+I 1 1351 50.00 2 k  # SKIN: large skin
+I 1 1351 50.00 1 k  # SKIN: large skin
+I 1 10265 30.00 3 s  # SKIN: thick dracosaur hide
+I 1 10265 60.00 2 s  # SKIN: thick dracosaur hide
+I 1 10265 10.00 1 s  # SKIN: thick dracosaur hide
+I 4 10295 1.00 1  # LOOT: teeny terrosaur minipet whistle
+I 4 10259 10.00 1 X  # LOOT: primitive satchel
+I 4 10261 10.00 1 X  # LOOT: unlit branch
+M
+0
+The dracosaur huffs and stomps at the ground.~
+M
+0
+The dracosaur paws at the ground as if it's preparing to charge.~
+M
+0
+The dracosaur makes a hissing, screeching sound as it eyes you.~
+M
+0
+The dracosaur knocks a tree halfway over as it rubs -- or sharpens -- its enormous horns.~
 T 10262
 T 10265
 T 10256
@@ -276,13 +358,31 @@ A brightly feathered dracosaur raises its wings to ward you off.
 ~
 0 0 abdjzE c 4
 0 0 0 10
-I 0 3200 100.00 2  # BUTCHER: a cut of poultry
-I 0 10267 100.00 1  # BUTCHER: a serrated dracosaur tooth
-I 1 10265 100.00 1  # SKIN: a thick dracosaur hide
-I 1 1351 50.00 1  # SKIN: a large skin
-I 4 10256 10.00 1 X  # LOOT: a dracosaur scale wristband
-I 4 10259 10.00 1 X  # LOOT: a primitive satchel
-I 4 10261 10.00 1 X  # LOOT: an unlit branch
+D
+   Feathered like a bird, the toothy grin of a crocodile, the ferocious claws
+of a lion... This dracosaur is in the midst of an identity crisis that it has
+solved with a veritable carnival of bright colors. Still, you wouldn't want to
+be on the business end of that grin.
+~
+I 0 3200 100.00 2  # BUTCHER: cut of poultry
+I 0 10267 100.00 1  # BUTCHER: serrated dracosaur tooth
+I 1 10265 100.00 1  # SKIN: thick dracosaur hide
+I 1 1351 50.00 1  # SKIN: large skin
+I 4 10295 1.00 1  # LOOT: teeny terrosaur minipet whistle
+I 4 10259 10.00 1 X  # LOOT: primitive satchel
+I 4 10261 10.00 1 X  # LOOT: unlit branch
+M
+0
+The brightly colored dracosaur opens its mouth wide and hisses as it shows its teeth.~
+M
+0
+The lead dracosaur paces around you, keeping its feathered arms wide.~
+M
+0
+The lead dracosaur spreads its arms high and wide to try to look even bigger.~
+M
+0
+The dracosaurs shake their feathers at you in some sort of dance.~
 T 10262
 T 10265
 T 10256
@@ -294,10 +394,24 @@ A small, feathered dracosaur begins to circle around you.
 ~
 0 0 abdjzE c 3
 0 0 0 9
-I 0 3200 100.00 1  # BUTCHER: a cut of poultry
-I 0 10267 50.00 1  # BUTCHER: a serrated dracosaur tooth
-I 1 10265 50.00 1 X  # SKIN: a thick dracosaur hide
-I 1 1351 100.00 1 X  # SKIN: a large skin
+D
+   The small dracosaur looks like it might just be a younger or subordinate
+member of the same species as the larger one. Its feathers are more green and
+brown, though, with white speckles to help it blend into the forest.
+~
+I 0 3200 100.00 1  # BUTCHER: cut of poultry
+I 0 10267 50.00 1  # BUTCHER: serrated dracosaur tooth
+I 1 10265 50.00 1 X  # SKIN: thick dracosaur hide
+I 1 1351 50.00 1 X  # SKIN: large skin
+M
+0
+The small dracosaur runs in circles around you, just out of reach but close enough to make you nervous.~
+M
+0
+A small dracosaur runs in circles around you, just out of reach but close enough to make you nervous.~
+M
+0
+A small dracosaur catches you looking at it and puffs up its feathers to look bigger.~
 T 10262
 T 10265
 S
@@ -308,13 +422,44 @@ A druid is magically growing the foliage over the path.
 ~
 0 0 bdvxzAE c 3
 1 3 0 16
-I 4 10265 50.00 1  # LOOT: a thick dracosaur hide
-I 4 10265 50.00 1  # LOOT: a thick dracosaur hide
-I 4 10267 50.00 1  # LOOT: a serrated dracosaur tooth
-I 4 10267 50.00 1  # LOOT: a serrated dracosaur tooth
-I 4 10258 10.00 1 X  # LOOT: an obsidian bracelet
-I 4 10259 10.00 1 X  # LOOT: a primitive satchel
-I 4 10261 10.00 1 X  # LOOT: an unlit branch
+D
+   The druid is clad in a simple brown robe with a mantle and hood. He seems
+equally surprised to have found you as he is to have found the trail again, as
+every impression indicates he is very lost.
+~
+I 4 10295 1.00 1  # LOOT: teeny terrosaur minipet whistle
+I 4 10259 10.00 1 X  # LOOT: primitive satchel
+I 4 10261 10.00 1 X  # LOOT: unlit branch
+I 4 10265 10.00 3 s  # LOOT: thick dracosaur hide
+I 4 10265 60.00 2 s  # LOOT: thick dracosaur hide
+I 4 10265 30.00 1 s  # LOOT: thick dracosaur hide
+I 4 10267 30.00 3 t  # LOOT: serrated dracosaur tooth
+I 4 10267 60.00 2 t  # LOOT: serrated dracosaur tooth
+I 4 10267 10.00 1 t  # LOOT: serrated dracosaur tooth
+M
+1
+I can't let you past here. I've already staked a claim.~
+M
+1
+I'm not really sure how I ended up here, but I was here before you.~
+M
+1
+You'll truly be sorry when I figure out which spell charms these wretched dracosaurs.~
+M
+1
+I have a spell that turns you into dracosaur chow, so it's best if you turn back.~
+M
+1
+Some day an archaeologist is going to dig up your bones right there on that very spot.~
+M
+1
+I could turn you into obsidian right here and now. If I wanted to, that is.~
+M
+1
+The whole forest already belongs to me. Might as well head back through the portal.~
+M
+1
+These sorcerers have really fouled it up this time. Never send a city witch through a portal to a nature realm. We always have to clean it up.~
 T 10262
 T 10265
 T 10256
@@ -326,10 +471,25 @@ A fierce terror bird is pacing toward you!
 ~
 0 0 abdjE c 3
 0 0 0 10
-I 0 3200 100.00 1  # BUTCHER: a cut of poultry
-I 1 1351 100.00 1  # SKIN: a large skin
-I 4 10259 10.00 1 X  # LOOT: a primitive satchel
-I 4 10261 10.00 1 X  # LOOT: an unlit branch
+D
+   Like an ostrich's bad-neighborhood cousin, this enormous bird is taller than
+any human. Its tiny, useless wings are dwarfed by its enormous beak, which
+could surely fit your entire head. And worse, it leads a small pack.
+~
+I 0 3200 100.00 1  # BUTCHER: cut of poultry
+I 1 1351 100.00 1  # SKIN: large skin
+I 4 10295 1.00 1  # LOOT: teeny terrosaur minipet whistle
+I 4 10259 10.00 1 X  # LOOT: primitive satchel
+I 4 10261 10.00 1 X  # LOOT: unlit branch
+M
+0
+$n clicks its beak at you.~
+M
+0
+$n bobs its head as it follows you with its eyes.~
+M
+0
+$n taps its enormous talons on the ground, perhaps impatiently.~
 T 10262
 T 10265
 S
@@ -340,8 +500,23 @@ A terror bird is eyeing you from the foliage.
 ~
 0 0 abdjE c 3
 0 0 0 9
-I 0 3200 100.00 1  # BUTCHER: a cut of poultry
-I 1 1351 75.00 1  # SKIN: a large skin
+D
+   Though it's only about as tall as you are, the terror bird's beak still
+looks large enough to fit your entire head in its crushing grasp. With tiny,
+useless wings, this bird could never fly. But you don't need to fly when you
+can hunt deer -- or man.
+~
+I 0 3200 100.00 1  # BUTCHER: cut of poultry
+I 1 1351 75.00 1  # SKIN: large skin
+M
+0
+$n walks slowly around you in a large circle.~
+M
+0
+$n preens its feathers.~
+M
+0
+The crest on the terror bird's head stands up as it watches you look at it.~
 T 10262
 T 10265
 S
@@ -352,8 +527,15 @@ A swarm of ants is coming toward you!
 ~
 0 0 bdjyE cG 2
 0 0 0 9
-I 4 10259 10.00 1 X  # LOOT: a primitive satchel
-I 4 10261 10.00 1 X  # LOOT: an unlit branch
+D
+   These ants are only a little bit bigger than the ones you're familiar with,
+but they have arrived en masse and the mass is enormous. A veritable army of
+ants cover the whole forest floor, and they don't seem intimidated by your size
+in the least.
+~
+I 4 10295 1.00 1  # LOOT: teeny terrosaur minipet whistle
+I 4 10259 10.00 1 X  # LOOT: primitive satchel
+I 4 10261 10.00 1 X  # LOOT: unlit branch
 T 10262
 T 10265
 S
@@ -363,9 +545,39 @@ the trophy hunter~
 A trophy hunter is crouching in the underbrush.
 ~
 0 0 bdvzE c 3
-1 3 0 2
-I 4 10259 10.00 1 X  # LOOT: a primitive satchel
-I 4 10261 10.00 1 X  # LOOT: an unlit branch
+1 3 0 32
+D
+   The trophy hunter is dressed in a strange shirt with small white buttons,
+rugged boots with strong soles, and an odd hat with two peaks and a wide brim.
+Luckily, his weapon looks thin and blunt.
+~
+I 4 10295 1.00 1  # LOOT: teeny terrosaur minipet whistle
+I 4 10259 10.00 1 X  # LOOT: primitive satchel
+I 4 10261 10.00 1 X  # LOOT: unlit branch
+M
+1
+Not sure how I ended up here...~
+M
+1
+The big game hunting here is second to naught.~
+M
+1
+The boys at the lodge will be jealous if I can ever figure out how to get back to the future.~
+M
+1
+I've claimed this entire area so don't get any funny ideas.~
+M
+1
+I'll mount your head in the lodge as quickly as those dinos if you get in my way.~
+M
+1
+Should've brought my elephant gun.~
+M
+1
+It's a regular Land of the Lost out here.~
+M
+1
+I'm going to need to bring back a crane if I can nab one of those tee-rexes.~
 T 10262
 T 10265
 S
@@ -375,16 +587,25 @@ a dracosaur~
 A dracosaur is sniffing around for food.
 ~
 75 100 dej 0 5
-0 0 0 10
-I 3 10264 100.00 1 X  # BARDE: an armored dracosaur
+0 0 0 27
+D
+   The dracosaur almost looks like an oversized bull, if not for its scaly
+skin, frilled neck, and third horn.
+~
+I 3 10264 100.00 1 X  # BARDE: armored dracosaur
 S
 #10264
 dracosaur armored~
 an armored dracosaur~
 An armored dracosaur stands guard valiantly.
 ~
-75 100 bdej 0 5
-0 0 0 10
+75 175 bdej 0 5
+0 0 0 27
+D
+   The dracosaur almost looks like an oversized bull, if not for its scaly
+skin, frilled neck, and third horn. It has been outfitted with modern battle
+armor and looks ready to ride to war.
+~
 S
 #10285
 terrosaur flying armored~
@@ -393,6 +614,11 @@ An armored, flying terrosaur has perched here.
 ~
 75 100 bdej m 4
 0 0 0 27
+D
+   This strange flying beast is straight out of the Primeval Portal. It is
+neither bat nor bird, nor in between, but somehow its own race of creature
+entirely!
+~
 S
 #10286
 terrosaur flying~
@@ -401,6 +627,45 @@ A flying terrosaur swoops low and lands.
 ~
 75 100 dej m 4
 0 0 0 27
-I 3 10285 100.00 1 X  # BARDE: a flying, armored terrosaur
+D
+   This strange flying beast is straight out of the Primeval Portal. It is
+neither bat nor bird, nor in between, but somehow its own race of creature
+entirely! And stranger still, someone has outfitted it in modern armor!
+~
+I 3 10285 100.00 1 X  # BARDE: flying, armored terrosaur
+S
+#10295
+terrosaur teeny~
+a teeny terrosaur~
+A teeny terrosaur flaps around your head.
+~
+1 1 bdo mn 1
+0 0 2 9
+D
+   This fuzzy, beaky, adorable little creature is a clearly a terrosaur. But
+its teeny screech hardly strikes terror in your heart. Quite the opposite, in
+fact: it gives you the warm feeling of flying over a primordial volcano.
+~
+M
+0
+$n lets out its mightiest little screech!~
+M
+0
+$n dips as $e starts to look drowsy, then starts flapping for its little life.~
+M
+0
+$n flaps around your head.~
+M
+0
+$n flies up into the air then dive-bombs toward you before veering off at the last second.~
+M
+0
+A wicked little screech from $n pierces the air!~
+M
+0
+$n flies out of sight before reappearing out of nowhere as $e swoops straight for your hair!~
+M
+0
+$n flies so close to your face that $e blots out the light for a moment!~
 S
 $

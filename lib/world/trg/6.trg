@@ -292,7 +292,7 @@ done
 Walking Tree script~
 0 bw 10
 ~
-if %self.disabled%
+if %self.disabled% || %self.fighting%
   halt
 end
 switch %random.4%
