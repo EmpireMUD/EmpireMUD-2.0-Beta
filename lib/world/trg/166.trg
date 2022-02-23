@@ -3394,7 +3394,7 @@ snow cube summon~
 feed the vortex~
 1 c 2
 look put~
-set Needs 75
+set Needs 50
 if %actor.aff_flagged(blind)%
   return 0
   halt
@@ -3522,7 +3522,7 @@ while (%item% && (%all% || %CookieCount% == 0))
     remote %WhatCookie% %self.id%
     %purge% %item%
     eval CookieTotal %CookieTotal% + 1
-    if %CookieTotal% == %Needs%
+    if %CookieTotal% >= %Needs%
       break
     end
   end
@@ -3538,7 +3538,7 @@ if !%CookieCount%
   end
 end
 * get a Cookie total and see if the quest is over
-if %CookieTotal% == %Needs%
+if %CookieTotal% >= %Needs%
   %quest% %actor% finish 16690
   %purge% %self%
 end
