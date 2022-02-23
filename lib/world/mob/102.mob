@@ -178,7 +178,9 @@ A salesman is running a booth that says 'list'.
 D
    From his clothes, he obviously works with the sorcerers. But the salesman
 seems more interested in profit than adventure -- even at his own peril. Use
-'list', 'list id', and 'buy' to purchase patterns and crafting materials.
+'list', 'list id', and 'buy' to purchase patterns and crafting materials. He
+will also buy primeval crafting materials from you if you type 'sell <item>' or
+'sell all'.
 ~
 T 10273
 S
