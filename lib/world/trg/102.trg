@@ -723,7 +723,7 @@ if %self.varexists(scaled)%
   halt
 end
 if !%arg%
-  %send% %actor% You must specify a level of difficulty.
+  %send% %actor% You must specify a level of difficulty (normal \| hard \| group \| boss).
   halt
 end
 if normal /= %arg%
@@ -743,7 +743,7 @@ elseif boss /= %arg%
   set difficulty 4
   set hard_mini 1
 else
-  %send% %actor% That is not a valid difficulty level for this adventure.
+  %send% %actor% That is not a valid difficulty level for this adventure (normal \| hard \| group \| boss).
   halt
 end
 * Clear existing difficulty flags and set new ones.
