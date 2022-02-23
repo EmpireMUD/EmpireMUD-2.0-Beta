@@ -479,23 +479,28 @@ Craft patterns sold by the vendor outside the portal:
   Healer weapon: icy star of winter
   Caster weapon: glacial staff of the Maelstrom pattern
 #
-"PORTAL TO THE PRIMEVAL" "PRIMEVAL PORTAL" DRACOSAUR
+"PORTAL TO THE PRIMEVAL" "PRIMEVAL PORTAL" DRACOSAUR "PRIMEVAL TOKENS"
 
 Portal to the Primeval (level 75-175)
 
-   The High Sorcerers in your tower have managed to open a chronoportal into
+The High Sorcerers in your tower have managed to open a chronoportal into
 the past! Follow Archsorcerer Malfernes through the portal and explore the
 Primeval Era, when the ancient ancestors of the dragons ruled endless jungles.
 But beware, because it's easy to get lost and you make a delicious snack for
 the dracosaurs.
-   The time stream is unstable, so each time you visit you might have to track
+
+The time stream is unstable, so each time you visit you might have to track
 down a different final boss: Malfernes, the Terrosaur, or even the King of the
 Dracosaurs! Purchase patterns at the base camp to craft mighty primordial gear,
 or fight the dracosaurs on higher difficulties for a chance to find many of 
 those same items, which the dracosaurs have collected from less fortunate
 adventurers.
 
-The salesman sells:
+The salesman will buy primeval crafting materials from you. Type 'sell <item>'
+or 'sell all' to exchange them for Primeval tokens. These tokens can be used to
+purchase other crafting materials in the shop.
+
+The salesman also sells:
 Book of primordial weapon schematics:
   jeweled bone staff  (Healer, Craft, Powerful Staves)
   dracosaur bone spear  (Tank/Solo/PVP, Jabbing, Forge, Deadly Weapons)
