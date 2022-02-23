@@ -219,7 +219,7 @@ nop %instance.set_location(%instance.real_location%)%
 hydra withering head debuff~
 0 k 20
 ~
-switch %random.13%
+switch 3
   case 1
     eval DebuffValue ( %self.level% - 274 ) / 15 + 2
     set WitheringDebuff greatness
@@ -273,7 +273,7 @@ switch %random.13%
     set WitheringDebuff bonus-healing
   break
 done
-switch %random.3%
+switch 2
   case 1
     set target %random.enemy%
   break

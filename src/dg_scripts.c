@@ -4622,9 +4622,18 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					}
 					break;
 				}
+				case 'k': {	// obj.k*
+					if (!str_cmp(field, "keywords")) {
+						snprintf(str, slen, "%s", GET_OBJ_KEYWORDS(o));
+					}
+					break;
+				}
 				case 'l': {	// obj.l*
 					if (!str_cmp(field, "level")) {
 						snprintf(str, slen, "%d", GET_OBJ_CURRENT_SCALE_LEVEL(o));
+					}
+					else if (!str_cmp(field, "longdesc")) {
+						snprintf(str, slen, "%s", GET_OBJ_LONG_DESC(o));
 					}
 					break;
 				}

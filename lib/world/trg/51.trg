@@ -269,6 +269,10 @@ if !%target.wearable%
   %send% %actor% @%target% is not an equipment item.
   halt
 end
+if %target.is_flagged(*keep)%
+  %send% %actor% You can not shatter something you are keeping.
+  halt
+end
 * 26 ~ 200
 eval level_modified %target.level% + 25
 eval level_in_range (%level_modified% // 100)

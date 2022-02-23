@@ -479,26 +479,60 @@ Craft patterns sold by the vendor outside the portal:
   Healer weapon: icy star of winter
   Caster weapon: glacial staff of the Maelstrom pattern
 #
-"PORTAL TO THE PRIMEVAL" "PRIMEVAL PORTAL"
+"PORTAL TO THE PRIMEVAL" "PRIMEVAL PORTAL" DRACOSAUR "PRIMEVAL TOKENS"
 
-Portal to the Primeval (level 75-100 group adventure)
+Portal to the Primeval (level 75-175)
 
-   The High Sorcerers in your tower have managed to open a chronoportal into
+The High Sorcerers in your tower have managed to open a chronoportal into
 the past! Follow Archsorcerer Malfernes through the portal and explore the
 Primeval Era, when the ancient ancestors of the dragons ruled endless jungles.
 But beware, because it's easy to get lost and you make a delicious snack for
 the dracosaurs.
 
-The salesman sells:
-  primordial axe pattern - two-handed melee weapon
-  dracosaur bone spear pattern - tank weapon
-  jeweled bone staff pattern - caster staff weapon
-  dracosaur scale robe pattern - healer armor
-  dracosaur scale boots pattern - pvp/solo boots
-  primordial boots pattern - tank boots
-  dracosaur scale gauntlets pattern - melee gauntlets
-  Tome of the Primordium schematic - caster offhand
-  bone crown pattern - greatness crown
+The time stream is unstable, so each time you visit you might have to track
+down a different final boss: Malfernes, the Terrosaur, or even the King of the
+Dracosaurs! Purchase patterns at the base camp to craft mighty primordial gear,
+or fight the dracosaurs on higher difficulties for a chance to find many of 
+those same items, which the dracosaurs have collected from less fortunate
+adventurers.
+
+The salesman will buy primeval crafting materials from you. Type 'sell <item>'
+or 'sell all' to exchange them for Primeval tokens. These tokens can be used to
+purchase other crafting materials in the shop.
+
+The salesman also sells:
+Book of primordial weapon schematics:
+  jeweled bone staff  (Healer, Craft, Powerful Staves)
+  dracosaur bone spear  (Tank/Solo/PVP, Jabbing, Forge, Deadly Weapons)
+  primordial axe  (2-Handed Melee, Slicing, Forge, Deadly Weapons)
+  edge of extinction  (1-Handed Melee, Stabbing, Forge, Deadly Weapons)
+  Tome of the Primordium  (Caster, Wield/Hold, Mana Blast, Craft, Powerful Staves)
+Book of dracosaur armor schematics:
+  dracosaur scale robe  (Healer, Sew, Magical Vestments)
+  dracoscale armor  (Tank, Forge, Imperial Armors)
+  dracosaur hide armor  (Melee, Sew, Dangerous Leathers)
+  dracosaur tooth robe  (Caster, Sew, Magical Vestments)
+  dracosaur fang armor  (PVP/Solo, Forge, Imperial Armors)
+Book of primordial footwear designs:
+  dracosaur scale sandals  (Healer, Sew, Magical Vestments)
+  primordial boots  (Tank, Forge, Imperial Armors)
+  dracosaur fang shoes  (Melee, Sew, Dangerous Leathers)
+  dracosaur tooth boots  (Caster, Sew, Magical Vestments)
+  dracosaur scale boots  (PVP/Solo, Forge, Imperial Armors)
+Book of dracosaur wristwear designs:
+  obsidian bracelet  (Healer, Craft, Magical Vestments)
+  dracoscale vambraces  (Tank, Forge, Imperial Armors)
+  dracosaur bone bracelet  (Melee, Sew, Dangerous Leathers)
+  dracosaur scale wristband  (Caster, Sew, Magical Vestments)
+  stunning dracosaur wristguard  (PVP/Solo, Forge, Imperial Armors)
+Book of dracosaur belt patterns:
+  dracosaur fang belt  (Melee or Caster DPS, Sew, Dangerous Leathers)
+  obsidian dracosaur waistband  (Caster or Healer, Sew, Magical Vestments)
+  mighty dracoscale belt  (Tank or PVP/Solo, Forge, Imperial Armors)
+Design for the bone crown of the primeval:
+  bone crown of the primeval  (Greatness/Charisma, Head, Craft, Jewelry)
+
+Hint: Try digging for resources in the base camp or the clearing.
 #
 SKYCLEAVE "SKY CLEAVE" "TOWER SKYCLEAVE" "THE TOWER SKYCLEAVE"
 

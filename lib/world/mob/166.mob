@@ -127,6 +127,142 @@ doesn't seem like something you would want to take in a straight fight.
 T 16631
 T 16632
 S
+#16635
+puppy~
+a puppy~
+A puppy sits here with a bow around its neck.
+~
+1 25 doG cfmG 1
+0 0 0 9
+D
+This adorable little puppy has a bow around its neck.
+~
+T 16635
+T 16636
+T 16638
+T 16637
+T 16639
+T 16642
+T 16648
+S
+#16636
+dog~
+a dog~
+A dog sits here with a bow around its neck.
+~
+1 75 doG cfmG 2
+0 0 0 9
+D
+This adorable dog has a bow around its neck.
+~
+T 16635
+T 16636
+T 16638
+T 16637
+T 16639
+T 16642
+T 16648
+S
+#16637
+dog heroic~
+a heroic dog~
+A heroic dog is sitting here.
+~
+1 150 doG cfmG 2
+0 0 0 9
+D
+This heroic dog has all the poise of a champion.
+~
+T 16635
+T 16636
+T 16638
+T 16637
+T 16642
+T 16648
+S
+#16638
+kitten~
+a kitten~
+A kitten sits here with a bow around its neck.
+~
+1 25 doG cfmG 1
+0 0 0 10
+D
+This adorable little kitten has a bow around its neck.
+~
+T 16635
+T 16636
+T 16638
+T 16637
+T 16639
+T 16642
+T 16648
+S
+#16639
+cat~
+a cat~
+A cat sits here with a bow around its neck.
+~
+1 75 doG cfmG 2
+0 0 0 10
+D
+This adorable cat has a bow around its neck.
+~
+T 16635
+T 16636
+T 16638
+T 16637
+T 16639
+T 16642
+T 16648
+S
+#16640
+cat heroic~
+a heroic cat~
+A heroic cat is sitting here.
+~
+1 150 doG cfmG 2
+0 0 0 10
+D
+This heroic cat has all the poise of a champion.
+~
+T 16635
+T 16636
+T 16638
+T 16637
+T 16642
+T 16648
+S
+#16643
+goat straw~
+a straw goat~
+A straw goat dashes past you!
+~
+1 1 dq n 3
+0 0 11 15
+D
+   The little straw goat is smaller than a real goat, but it has all the
+character. It seems to be running frantically around, butting into anything
+that gets in its way. The goat must have been made by one of the local citizens
+for the upcoming yule festival, but it seems that it got away!
+~
+T 16643
+T 16645
+T 16646
+S
+#16644
+goat spawner straw~
+the straw goat spawner~
+The straw goat spawner is here.
+~
+0 0 d cdln 3
+0 0 0 15
+D
+This invisible mob moves around randomly then spawns a goat object.
+~
+T 16645
+T 16643
+S
 #16651
 goose plump~
 a plump goose~
@@ -351,6 +487,49 @@ M
 0
 The dreidel spins around.~
 S
+#16660
+crowd people~
+the crowd~
+A crowd of people has formed around the goat.
+~
+100 100 bdho n 3
+0 0 0 15
+D
+   A crowd has gathered around the giant straw goat. People are reveling and
+celebrating the winter season. Some are singing, some are drinking, and some
+are just catching up with old friends.
+~
+M
+0
+You think you spot someone sneaking through the crowd.~
+M
+0
+The crowd dances around the straw goat.~
+M
+0
+The murmur of the crowd makes it hard to hear what anybody is saying.~
+M
+0
+The crowd parades clockwise around the goat.~
+M
+0
+The crowd parades counter-clockwise around the goat.~
+M
+0
+The crowd cheers for the straw goat.~
+M
+0
+The crowd around the goat is enormous.~
+M
+0
+There are so many people around the straw goat that it's hard to tell what's going on.~
+M
+0
+At times, you can't see through the crowd at all.~
+M
+0
+You can hear faint music behind the din of the crowd.~
+S
 #16664
 demon grinchy tiny~
 a tiny grinchy demon~
@@ -413,6 +592,107 @@ would fool any Who, but it looks adorable.
 T 9901
 T 9902
 S
+#16666
+elf strange~
+a strange elf~
+A strange elf sits motionless, watching you.
+~
+1 1 bdoD dn 1
+0 0 0 15
+D
+   The little elf doesn't seem to move at all. On closer inspection, it might
+even be made of cloth. Nevertheless, wherever you move, its eyes always seem
+fixed on you. Each time you look, the elf seems to be in a different place, but
+always with its gaze on you.
+~
+M
+6
+A strange elf sits motionless, watching you.~
+M
+6
+A strange elf sits motionless, watching you.~
+M
+6
+A strange elf is relaxing here, watching you.~
+M
+6
+A strange elf watches you as it sits with its legs crossed.~
+M
+6
+A strange elf is standing here.~
+M
+6
+A strange elf is watching you.~
+S
+#16667
+lantern little floating~
+a floating lantern~
+A little lantern floats in the air above you.
+~
+1 1 bdoD n 1
+0 0 27 15
+D
+This little paper lantern seems to float all on its own!
+~
+T 16667
+S
+#16668
+gingerbread bread man~
+a gingerbread man~
+A gingerbread man is standing here.
+~
+1 1 bdoD n 1
+1 0 0 15
+D
+   This little brown cookie is in the shape of a man, with a simple line for a
+mouth, two dots for eyes, a sugar bow, and clothes made of icing.
+~
+M
+1
+Run, run as fast as you can. You can't catch me. I'm the Gingerbread Man!~
+M
+0
+$n runs around in circles.~
+M
+0
+$n runs around wildly.~
+M
+0
+$n runs around.~
+M
+0
+$n runs around.~
+M
+0
+$n runs around you.~
+M
+1
+Eat me!~
+M
+1
+Do you know the muffin man?~
+M
+1
+Donkey?~
+M
+1
+It looks like we're up Chocolate Creek without a Popsicle stick!~
+T 16668
+S
+#16669
+snowmother mother snow-mother~
+the snowmother~
+A snowmother has been built here.
+~
+1 1 bdoD n 1
+0 0 34 15
+D
+   It's a snowman, so to speak, although it has a decidedly feminine character
+to it with sculpted hair and lacy finishes. The snowmother comes from the cold
+north, where it is called lumememm.
+~
+T 16669
+S
 #16675
 #n~
 #n~
@@ -473,6 +753,110 @@ The orphans dance in a circle around you.~
 M
 0
 Everyone is singing holiday carols.~
+S
+#16679
+krampus tiny~
+a tiny krampus~
+A tiny krampus is stalking you.
+~
+1 1 bdoD n 2
+0 0 9 15
+D
+   It's a little krampus -- a bizarre goat-man who keeps children in line in
+the winter season.
+~
+S
+#16680
+krampus demon~
+the Krampus demon~
+The Krampus demon stands on mismatched legs, brandishing a switch.
+~
+25 400 bdoz cqE 3
+1 0 14 15
+D
+   This demonic figure is half goat and half human, with the division down the
+center of his body. One side sports a hoof at the end of his leg, and the other
+a normal human foot. His wrists and ankles each drag chains behind them, and a
+birch switch is strapped across his back.
+~
+I 4 16663 14.00 1 l  # LOOT: rocking horse saddle
+I 4 16670 14.00 1 l  # LOOT: hearty Christmas spirit
+I 4 16671 14.00 1 l  # LOOT: generous Christmas spirit
+I 4 16672 14.00 1 l  # LOOT: serene Christmas spirit
+I 4 16673 14.00 1 l  # LOOT: warm Christmas spirit
+I 4 16674 14.00 1 l  # LOOT: anxious Christmas spirit
+I 4 16675 14.00 1 l  # LOOT: nostalgic Christmas spirit
+I 4 16679 1.00 1 l  # LOOT: tiny krampus whistle
+I 4 16685 1.00 1 l  # LOOT: burning straw goat whistle
+T 16681
+T 16682
+T 16603
+S
+#16681
+mobile new~
+floating lantern~
+A new mobile is standing here.
+~
+0 0 d 0 3
+0 0 0 15
+S
+#16682
+mobile new~
+snow mother~
+A new mobile is standing here.
+~
+0 0 d 0 3
+0 0 0 15
+S
+#16683
+mobile new~
+zero the red nosed ghost dog~
+A new mobile is standing here.
+~
+0 0 d 0 3
+0 0 0 15
+S
+#16684
+mobile new~
+gingerbread man~
+A new mobile is standing here.
+~
+0 0 d 0 3
+0 0 0 15
+S
+#16685
+goat straw burning~
+a burning straw goat~
+A straw goat runs around on fire!
+~
+1 1 bdoD n 2
+0 0 9 15
+D
+   This little straw goat has been brought to life by some cruel demon, only to
+be lit on fire. It runs around, never seeming to burn out, gleeful but
+dangerous.
+~
+M
+0
+A straw goat trails fire as it races past you!~
+M
+0
+The burning straw goat stops running to scratch itself with its horn.~
+M
+0
+The straw goat crackles as it burns.~
+M
+0
+The burning straw goat charges at you, but veers off at the last second.~
+M
+0
+The burning straw goat runs around in circles.~
+M
+0
+The burning straw goat stops, drops, and rolls.~
+M
+0
+The burning straw goat catches an ember on its tongue.~
 S
 #16698
 raven enchanted~

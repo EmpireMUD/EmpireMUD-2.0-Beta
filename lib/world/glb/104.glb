@@ -1,0 +1,12 @@
+#10400
+Minipet and Mount chance for Hamlet~
+0 b 0 0 0-0 0
+E
+-1 1.00
+0 0 0
+I 4 10418 25.00 1 m  # LOOT: skeletal horse whip
+I 4 10420 15.00 1 m  # LOOT: skeletal mammoth crop
+I 4 10436 10.00 1 m  # LOOT: skeletal terrosaur whistle
+I 4 10437 50.00 1 m  # LOOT: skeletal mammoth minipet whistle
+S
+$

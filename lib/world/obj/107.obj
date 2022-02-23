@@ -45,7 +45,7 @@ A
 C
 50 50
 R
-5619 0
+4 5619 0
 S
 #10704
 recipe ham honey-cured cured~
@@ -74,7 +74,7 @@ M
 4
 As you eat the fruitcake, you feel warm deep down inside.~
 R
-5619 0
+4 5619 0
 S
 #10706
 recipe cake fruitcake~
@@ -100,7 +100,7 @@ A
 C
 50 50
 R
-5619 0
+4 5619 0
 S
 #10708
 recipe roast goose~
@@ -210,7 +210,7 @@ M
 4
 You're filled with holiday cheer!~
 R
-5606 0
+4 5606 0
 S
 #10717
 recipe cookie christmas~
@@ -256,7 +256,7 @@ eaten, if you can remove them from their prickly green cases.
 6 b a 0 5
 12 10700 0
 7 336
-I 15 10721 100.00 4  # SEPARATE: a handful of chestnuts
+I 15 10721 100.00 4  # SEPARATE: handful of chestnuts
 M
 4
 You peel open $p and eat them.~
@@ -264,9 +264,9 @@ M
 5
 $n peels open $p and eats them.~
 R
-5606 0
+4 5606 0
 R
-5610 0
+4 5610 0
 S
 #10721
 chestnuts handful~
@@ -278,7 +278,7 @@ them, if you can find some more.
 6 0 a 0 4
 1 0 0
 7 48
-I 14 10720 100.00 4  # COMBINE: a basket of chestnuts
+I 14 10720 100.00 4  # COMBINE: basket of chestnuts
 M
 4
 You peel open $p and eat them.~
@@ -301,7 +301,7 @@ A
 C
 50 50
 R
-5606 0
+4 5606 0
 S
 #10723
 whistle Christmas tree minipet~
@@ -370,6 +370,18 @@ middle of summer! Just 'use coal' to get started.
 0 0 0
 7 0
 T 10728
+S
+#10729
+whistle minipet winter wonderland~
+a Winter Wonderland minipet whistle~
+A Winter Wonderland minipet whistle is lying here.~
+   Type 'use whistle' to gain a mini-pet from the Winter Wonderland, if there
+are any left you don't have.
+~
+3 p a 0 1
+0 0 0
+10 0
+T 10729
 S
 #10730
 fiddle~
@@ -456,7 +468,7 @@ adventure. From there, try 'where nimble' to find the right Jack.
 3 p ao 0 4
 0 0 0
 13 0
-I 11 10735 100.00 1  # LIGHT: a lit candlestick
+I 11 10735 100.00 1  # LIGHT: lit candlestick
 T 10738
 S
 #10735
@@ -763,7 +775,7 @@ A
 C
 50 50
 R
-5130 0
+4 5130 0
 S
 #10755
 bread goblin crusty~
@@ -866,7 +878,7 @@ You wonder if you could light it without burning yourself.
 3 0 ao 0 2
 0 0 0
 11 0
-I 11 10764 100.00 1  # LIGHT: a lit spidersilk lantern
+I 11 10764 100.00 1  # LIGHT: lit spidersilk lantern
 S
 #10764
 lantern lit spidersilk silk~

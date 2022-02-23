@@ -32,7 +32,7 @@ D0
 ~
 0 10402
 M 1 10402 100.00 1
-M 1 10405 100.00 3
+M 1 10401 100.00 20
 T 10408
 S
 #10402
@@ -50,7 +50,7 @@ D0
 ~
 0 10403
 M 1 10402 100.00 1
-M 1 10405 100.00 3
+M 1 10401 100.00 20
 T 10408
 S
 #10403
@@ -67,7 +67,7 @@ D3
 ~
 0 10404
 M 0 10404 100.00 1
-M 1 10401 100.00 2
+M 1 10401 100.00 20
 T 10408
 S
 #10404
@@ -84,12 +84,12 @@ D0
 ~
 0 10405
 M 1 10402 100.00 1
-M 1 10407 100.00 2
+M 1 10401 100.00 20
 T 10408
 S
 #10405
 A Back Alley~
-   The alley comes to an end behind town square, past the burning blockade.
+   The alley comes to an end behind the town square, past the burning blockade.
 From here you can see the square, which looks like it's being torn up by a huge
 animal. For the moment, though, you're safe here.
 ~
@@ -131,7 +131,7 @@ D2
 D0
 ~
 0 10408
-M 1 10403 100.00 1
+M 1 10402 100.00 1
 T 10408
 S
 #10408
@@ -147,8 +147,8 @@ D2
 D0
 ~
 0 10409
-M 1 10403 100.00 1
-M 1 10405 100.00 3
+M 1 10402 100.00 1
+M 1 10401 100.00 20
 T 10408
 S
 #10409
@@ -165,7 +165,7 @@ D5
 ~
 0 10410
 M 0 10409 100.00 1
-M 1 10401 100.00 2
+M 1 10401 100.00 20
 T 10408
 S
 #10410
@@ -181,7 +181,7 @@ D6
 D3
 ~
 0 10411
-M 1 10403 100.00 1
+M 1 10402 100.00 1
 T 10408
 S
 #10411
@@ -198,8 +198,8 @@ D1
 D0
 ~
 0 10412
-M 1 10403 100.00 1
-M 1 10406 100.00 2
+M 1 10402 100.00 1
+M 1 10401 100.00 20
 T 10408
 S
 #10412
@@ -230,7 +230,7 @@ D6
 D5
 ~
 0 10414
-M 1 10404 100.00 1
+M 1 10402 100.00 1
 T 10408
 S
 #10414
@@ -246,8 +246,8 @@ D6
 D0
 ~
 0 10415
-M 1 10404 100.00 1
-M 1 10406 100.00 2
+M 1 10402 100.00 1
+M 1 10401 100.00 20
 T 10408
 S
 #10415
@@ -279,7 +279,7 @@ D9
 D8
 ~
 0 10417
-M 1 10404 100.00 1
+M 1 10402 100.00 1
 T 10408
 S
 #10417
@@ -295,8 +295,8 @@ D9
 D0
 ~
 0 10418
-M 1 10404 100.00 1
-M 1 10407 100.00 2
+M 1 10402 100.00 1
+M 1 10401 100.00 20
 T 10408
 S
 #10418
@@ -335,7 +335,7 @@ D3
 ~
 0 10454
 M 0 10450 50.00 5
-M 0 10455 1.00 1
+M 0 10455 10.00 1
 T 10452
 T 10454
 S
@@ -344,8 +344,7 @@ The Rat-Fur Throne~
    The sewer grate is stopped up with straw, loosely covered with blankets of
 matted rat fur to make room for a grand throne -- at least, to the goblins. It
 appears some ambitious goblin has set up a command post here. Perhaps they're
-planning an invasion?
-   A sign on the wall lists items for sale.
+planning an invasion? A sign on wall says Dryleef sells some items here.
 ~
 c 0 0
 D2
@@ -358,23 +357,33 @@ The throne is made of wood, but covered entirely in loosely-stitched rat fur.
 E
 sign list~
 Dryleef sells the following unique buildings:
- war tent (500 coins)
- message post (500 coins)
- lab tent (500 coins)
- dolmen stone (500 coins)
+ war tent  (semi-portable home with a forge)
+ message post  (sends mail)
+ lab tent  (alchemy workshop)
+ dolmen stone  (tomb)
 
-(Type 'buy <item>' to purchase one.)
+Dryleef sells the following solo/pvp gear:
+ Dryleef's pitfighting ring  (finger)
+ zirconian amulet of goblin bravery  (neck)
+ bog-iron pitfighter's sword  (slashing weapon)
+ Dryleef's pitfighting buckler  (shield)
+ goblin pitfighter's cape  (about body, medium armor)
+ goblin punching bags  (hands, medium armor)
+
+Use the list, list id, and buy commands to shop from Dryleef.
 ~
 M 0 10450 50.00 5
 M 0 10451 100.00 1
+M 2 10457 100.00 1
+M 0 10457 100.00 1
 T 10452
 S
 #10452
 A Makeshift Laboratory~
    Some enterprising goblin has set up a small laboratory in an alcove in the
 sewer wall. None of the potions looks like anything you'd want to drink, but
-there are some old spellbooks lying about.
-   A sign on the wall lists items for sale.
+there are some old spellbooks lying about. A sign on the wall lists items
+Pimmin sells here.
 ~
 c 0 0
 D3
@@ -390,11 +399,15 @@ On closer inspection, these aren't potions. They are sewage.
 ~
 E
 sign list~
-Pimmin sells the following caster craft recipes:
- violet leopard shawl pattern (500 coins)
- wildfire gloves pattern (500 coins)
-
-(These require Magical Vestments. Type 'buy <item>' to purchase one.)
+Pimmin sells the following caster gear:
+ Pimmin's ring  (finger)
+ bone charm necklace  (neck)
+ chicken-bone wand  (magic shock weapon)
+ goblinward tome  (offhand item)
+ violet leopard shawl  (about body, mage armor)
+ wildfire gloves  (hands, mage armor)
+ 
+Use the list, list id, and buy commands to shop from Pimmin.
 ~
 M 0 10450 50.00 5
 M 0 10452 100.00 1
@@ -404,8 +417,8 @@ S
 A Blocked Tunnel~
    The end of the tunnel has been blocked off, with straw mashed against the
 sewer grate. It looks like several goblins have been sleeping here. And from
-the pile of rat bones, they've been cooking here as well.
-   A sign on the wall lists items for sale.
+the pile of rat bones, they've been cooking here as well. A sign on the wall
+indicates that Shivsper is open for business.
 ~
 c 0 0
 D0
@@ -417,11 +430,21 @@ It looks like someone has been eating rats.
 ~
 E
 sign list~
-Shivsper sells the following melee craft recipes:
- rat-fur cloak pattern (500 coins)
- wooden gauntlets pattern (500 coins)
-
-(These require Dangerous Leathers. Type 'buy <item>' to purchase one.)
+Shivsper sells the following melee gear:
+ Shivsper's poison ring  (finger)
+ gaudy copper chain  (neck)
+ someone else's axe  (slicing weapon)
+ giant dagger  (wield/hold, stabbing weapon)
+ rat-fur cloak  (about body, light armor)
+ wooden gauntlets  (hands, light armor)
+ 
+Use the list, list id, and buy commands to shop from Shivsper.
+~
+E
+target wall~
+   The target on the wall is a crudely drawn human figure that has been
+repeatedly punctured around the eyes, throat, heart, groin, and for some reason
+also the spleen.
 ~
 M 0 10450 50.00 5
 M 0 10453 100.00 1
@@ -431,8 +454,8 @@ S
 The Goblin Forge~
    The industrious goblins appear to have set up a smithy here in the sewers.
 A heavy, flat block of meteorite ore sits next to a smoldering pit of embers,
-and several ingots of low-grade have been discarded nearby.
-   A sign on the wall lists items for sale.
+and several ingots of low-grade have been discarded nearby. A sign on the wall
+tells you Wargreyn sells fine wares here.
 ~
 c 0 0
 D1
@@ -440,11 +463,15 @@ D1
 0 10450
 E
 sign list~
-Wargreyn sells the following tank craft recipes:
- mesh cloak pattern (500 coins)
- heavy goblin gauntlets pattern (500 coins)
-
-(These require Imperial Armors. Type 'buy <item>' to purchase one.)
+Wargreyn sells the following tank gear:
+ Wargreyn's ring  (finger)
+ blacksmith's charm  (neck)
+ goblinsmith's hammer  (pounding weapon, hammer)
+ wargskull shield  (shield)
+ mesh cloak  (about body, heavy armor)
+ heavy goblin gauntlets  (hands, heavy armor)
+ 
+Use the list, list id, and buy commands to shop from Wargreyn.
 ~
 M 0 10450 50.00 5
 M 0 10454 100.00 1

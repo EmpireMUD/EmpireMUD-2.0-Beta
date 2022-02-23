@@ -299,9 +299,10 @@ if %actor.char_target(%arg.car%)% == %self% && %self.room.template% >= 10700 && 
 end
 ~
 #10727
-Winter Wonderland minipet whistle (random order)~
+Winter Wonderland minipet whistle (random order) pre-2021~
 1 c 2
 use~
+* NOTE: This is the pre-2021 version and has a shorter minipet list, for people who hoarded old whistles.
 * List of vnums granted by this whistle (minipet mobs)
 set list 10709 16657 16658 10723 10724 10725 10726 16653 16654 16655 16656
 * length is used to shuffle the start point of the list
@@ -421,6 +422,55 @@ if (%mob% && %mob.vnum% == %self.val0%)
   nop %mob.unlink_instance%
 end
 ~
+#10729
+Winter Wonderland minipet whistle (random order) 2021~
+1 c 2
+use~
+* List of vnums granted by this whistle (minipet mobs)
+set list 10709 16657 16658 10723 10724 10725 10726 16653 16654 16655 16656 16666 16667 16668 16669
+* length is used to shuffle the start point of the list
+set length 15
+* Check targeting
+if %actor.obj_target(%arg.car%)% != %self%
+  return 0
+  halt
+end
+* All other results will return 1
+return 1
+* shuffle the start point
+eval start %%random.%length%%% - 1
+while %start% > 0
+  eval start %start% - 1
+  set list %list.cdr% %list.car%
+done
+* Pick a random pet the owner doesn't know
+set found 0
+while (%list% && !%found%)
+  * get next vnum in list
+  set vnum %list.car%
+  set list %list.cdr%
+  if !%actor.has_minipet(%vnum%)%
+    set found %vnum%
+  end
+done
+* Nothing to give
+if !%found%
+  %send% %actor% You already have all the mini-pets from the Winter Wonderland!
+  %purge% %self%
+  halt
+end
+* and load 1 for verification and messaging
+%load% mob %vnum%
+set pet %actor.room.people%
+if %pet.vnum% == %vnum%
+  nop %actor.add_minipet(%vnum%)%
+  %send% %actor% You gain '~%pet%' as a mini-pet. Use the minipets command to summon it.
+  %purge% %pet%
+else
+  %send% %actor% There seems to be a problem giving you minipet #%vnum%. Please report this.
+end
+%purge% %self%
+~
 #10730
 Hey Diddle Diddle~
 0 bw 10
@@ -483,7 +533,7 @@ switch %random.3%
     say Me mum says jumping is evel.
   break
   case 3
-    %echo% ~%self% plants a regular stick in the ground and jumps over it, but it's just not the same.
+    %echo% plants a regular stick in the ground and jumps over it, but it's just not the same.
   break
 done
 ~
@@ -1037,13 +1087,11 @@ if %target.affect(10760)%
 end
 nop %self.cooldown(10761, 15)%
 * Valid target found, start attack
-%echo% ~%self% twists around, pointing ^%self% spinneret at ~%target%...
-set verify_target %target.id%
+%send% %target% ~%self% twists around, pointing ^%self% spinneret at you...
+%echoaround% %target% ~%self% twists around, pointing ^%self% spinneret at ~%target%...
 wait 3 sec
-if %verify_target% != %actor.id%
-  halt
-end
-%echo% A stream of sticky webs flies out, binding |%target% limbs!
+%send% %target% A stream of sticky webs flies out, binding your limbs!
+%echoaround% %target% A stream of sticky webs flies out, binding |%target% limbs!
 %send% %target% Type 'struggle' to break free!
 dg_affect #10760 %actor% STUNNED on 15
 ~
