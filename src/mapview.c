@@ -1118,7 +1118,7 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options) {
 	struct instance_data *inst;
 	player_index_data *index;
 	room_vnum **view_grid = NULL;
-	room_data *to_room;
+	room_data *to_room, *outer;
 	empire_data *emp, *pcemp;
 	const char *memory;
 	crop_data *cp;
@@ -1168,6 +1168,12 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options) {
 	// BASE: room name
 	strcpy(room_name_color, get_room_name(room, TRUE));
 	
+	// find outer room for vehicles
+	outer = room;
+	while (GET_ROOM_VEHICLE(outer) && IN_ROOM(GET_ROOM_VEHICLE(outer))) {
+		outer = IN_ROOM(GET_ROOM_VEHICLE(outer));
+	}
+	
 	// put ship in name
 	if (ship_partial && GET_ROOM_VEHICLE(IN_ROOM(ch))) {
 		strcpy(tmpbuf, skip_filler(VEH_SHORT_DESC(GET_ROOM_VEHICLE(IN_ROOM(ch)))));
@@ -1196,7 +1202,7 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options) {
 	
 	// coloring for adventures
 	*advcolbuf = '\0';
-	if ((GET_ROOM_TEMPLATE(room) || ROOM_AFF_FLAGGED(room, ROOM_AFF_TEMPORARY)) && (inst = find_instance_by_room(room, FALSE, FALSE))) {
+	if ((GET_ROOM_TEMPLATE(outer) || ROOM_AFF_FLAGGED(outer, ROOM_AFF_TEMPORARY)) && (inst = find_instance_by_room(outer, FALSE, FALSE))) {
 		level = (INST_LEVEL(inst) > 0 ? INST_LEVEL(inst) : get_approximate_level(ch));
 		strcpy(advcolbuf, color_by_difficulty((ch), pick_level_from_range(level, GET_ADV_MIN_LEVEL(INST_ADVENTURE(inst)), GET_ADV_MAX_LEVEL(INST_ADVENTURE(inst)))));
 	}

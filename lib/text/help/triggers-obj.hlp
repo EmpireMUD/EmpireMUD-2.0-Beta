@@ -198,7 +198,9 @@ When using field  - The variable returns:
    lists current flags instead.
 &cis_inroom&0 - Returns true if object is in room.
 &cis_name(str)&0 - Returns true if str contains names for the object.
+&ckeywords&0 - The list of keywords for the object.
 &clevel&0 - The current scaled level of the object (0 if not yet scaled).
+&clongdesc&0 - The object's long description.
 &cmaterial&0 - Name of what the object is made out of, e.g. GOLD.
 &cname&0 - The list of key words of the object.
 &cnext_in_list&0 - The id of the next object in the inventory/room, or an
