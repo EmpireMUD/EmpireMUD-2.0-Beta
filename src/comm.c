@@ -3080,6 +3080,9 @@ char *replace_prompt_codes(char_data *ch, char *str) {
 					if (HAS_NEW_OFFENSES(ch)) {
 						strcat(i, "\t0O");
 					}
+					if (HAS_WATERWALK(ch)) {
+						strcat(i, "\t0W");
+					}
 					if (!IS_NPC(ch)) {
 						if (get_cooldown_time(ch, COOLDOWN_ROGUE_FLAG) > 0) {
 							strcat(i, "\tMR");
@@ -3128,6 +3131,9 @@ char *replace_prompt_codes(char_data *ch, char *str) {
 					}
 					if (IS_THIRSTY(ch)) {
 						sprintf(i + strlen(i), "%sthirsty", (*i ? " " : ""));
+					}
+					if (EFFECTIVELY_FLYING(ch)) {
+						sprintf(i + strlen(i), "%swaterwalk", (*i ? " " : ""));
 					}
 					if (!IS_NPC(ch)) {
 						if (get_cooldown_time(ch, COOLDOWN_ROGUE_FLAG) > 0) {

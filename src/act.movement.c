@@ -395,7 +395,7 @@ int determine_move_type(char_data *ch, room_data *to_room) {
 	}
 	
 	// overrides
-	if (type == MOB_MOVE_WALK && to_room && (WATER_SECT(IN_ROOM(ch)) || WATER_SECT(to_room)) && type != MOB_MOVE_FLY) {
+	if (type == MOB_MOVE_WALK && to_room && (WATER_SECT(IN_ROOM(ch)) || WATER_SECT(to_room)) && type != MOB_MOVE_FLY && !HAS_WATERWALK(ch)) {
 		type = MOB_MOVE_SWIM;
 	}
 	else if (type == MOB_MOVE_WALK && (ROOM_SECT_FLAGGED(IN_ROOM(ch), SECTF_ROUGH) || ROOM_SECT_FLAGGED(to_room, SECTF_ROUGH)) && type != MOB_MOVE_FLY) {
@@ -1047,7 +1047,7 @@ bool player_can_move(char_data *ch, int dir, room_data *to_room, bitvector_t fla
 				}
 			}
 			// auto-swim ?
-			if (!PRF_FLAGGED(ch, PRF_AUTOSWIM) && !WATER_SECT(IN_ROOM(ch)) && !IS_SET(flags, MOVE_SWIM | MOVE_IGNORE) && !EFFECTIVELY_FLYING(ch) && !IS_INSIDE(IN_ROOM(ch)) && !IS_ADVENTURE_ROOM(IN_ROOM(ch)) && (!IS_RIDING(ch) || !MOUNT_FLAGGED(ch, MOUNT_AQUATIC))) {
+			if (!PRF_FLAGGED(ch, PRF_AUTOSWIM) && !WATER_SECT(IN_ROOM(ch)) && !IS_SET(flags, MOVE_SWIM | MOVE_IGNORE) && !EFFECTIVELY_FLYING(ch) && !HAS_WATERWALK(ch) && !IS_INSIDE(IN_ROOM(ch)) && !IS_ADVENTURE_ROOM(IN_ROOM(ch)) && (!IS_RIDING(ch) || !MOUNT_FLAGGED(ch, MOUNT_AQUATIC))) {
 				msg_to_char(ch, "You must type 'swim' to enter the water.\r\n");
 				return FALSE;
 			}
@@ -1465,7 +1465,7 @@ bool do_simple_move(char_data *ch, int dir, room_data *to_room, bitvector_t flag
 	
 	// update move types AFTER char_can_move: detect swim and set movement type
 	if (WATER_SECT(to_room) && !EFFECTIVELY_FLYING(ch) && !IS_RIDING(ch) && !IS_SET(flags, MOVE_EARTHMELD)) {
-		if (has_player_tech(ch, PTECH_SWIMMING)) {
+		if (has_player_tech(ch, PTECH_SWIMMING) && !HAS_WATERWALK(ch)) {
 			flags |= MOVE_SWIM;
 		}
 		else if (IS_NPC(ch) && MOB_FLAGGED(ch, MOB_AQUATIC)) {

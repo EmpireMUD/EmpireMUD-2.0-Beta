@@ -1003,6 +1003,7 @@ typedef struct vehicle_data vehicle_data;
 #define AFF_HARD_STUNNED  BIT(34)	// I. Hard stuns are uncleansable and don't trigger stun-immunity
 #define AFF_IMMUNE_DAMAGE  BIT(35)	// J. Cannot take damage
 #define AFF_NO_WHERE  BIT(36)	// K. cannot be found using 'WHERE'
+#define AFF_WATERWALK  BIT(37)	// L. won't drown or be affected by water restrictions
 
 
 // Injury flags -- IS_INJURED

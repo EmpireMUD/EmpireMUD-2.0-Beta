@@ -1255,6 +1255,7 @@ const char *affected_bits[] = {
 	"HARD-STUNNED",
 	"IMMUNE-DAMAGE",	// 35
 	"!WHERE",
+	"WATERWALK",
 	"\n"
 };
 
@@ -1297,6 +1298,7 @@ const char *affected_bits_consider[] = {
 	"",	// hard-stunned
 	"",	// 35 - immune-damage
 	"",	// !where
+	"",	// waterwalk
 	"\n"
 };
 
@@ -1338,6 +1340,7 @@ const bool aff_is_bad[] = {
 	TRUE,
 	FALSE,	// hard-stunned (not 'bad' because it's uncleansable)
 	FALSE,	// 35 - immune-damage
+	FALSE,
 	FALSE,
 };
 
