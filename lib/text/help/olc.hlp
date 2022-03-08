@@ -4985,7 +4985,7 @@ Examples:
 
 See also: MORPHEDIT LONG DESCRIPTION, OLC MORPHS
 #d
-"MOUNT WHISTLE" WHISTLE "MOUNT REWARD"
+"MOUNT WHISTLE" WHISTLE "MOUNT REWARD" "BUILDING MOUNTS" "MOUNTS"
 
 Mount whistles (or other similar items) are used to reward players with mounts
 using the loot drop table of an NPC. Players seem to prefer receiving their
@@ -4997,8 +4997,16 @@ kill it without realizing what it is. Another problem is that if the player
 leads a mount out of the adventure, the mount may despawn when the adventure
 despawns.
 
-To create a mount whistle, attach script 10263 (Mount whistle use) to an
-object, and set the object's <value0> field to the vnum of the mount.
+To create a mount whistle, attach script 9910 (Summon mob / Mount whistle) to
+an object, and set the object's <value0> field to the vnum of the mount. This
+is a 'use' command trigger that summons the mob.
+
+Types of mounts:
+  FLY affect: Flying mount; requires the Riding-Flying ptech.
+  WATERWALK affect: Can ride on water just like land; requires Riding-Upgrade.
+  AQUATIC mob flag: Aquatic mount; can only ride on water tiles.
+
+See also: PTECH
 #d
 NOBITS "NO BITS"
 
