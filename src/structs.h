@@ -987,7 +987,7 @@ typedef struct vehicle_data vehicle_data;
 #define AFF_SLOW  BIT(18)	// s. slow (how great did that work out)
 #define AFF_STUNNED  BIT(19)	// t. stunned/unable to act
 #define AFF_STONED  BIT(20)	// u. trippy effects
-#define AFF_CANT_SPEND_BLOOD  BIT(21)	// v. hinder vitae
+#define AFF_CANT_SPEND_BLOOD  BIT(21)	// v. prevents most vampire powers
 #define AFF_CLAWS  BIT(22)	// w. claws
 #define AFF_DEATHSHROUD  BIT(23)	// x. deathshroud
 #define AFF_EARTHMELD  BIT(24)	// y. interred in the earth
