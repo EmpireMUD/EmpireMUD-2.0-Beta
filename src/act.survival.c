@@ -200,6 +200,9 @@ void do_mount_current(char_data *ch) {
 	else if (MOUNT_FLAGGED(ch, MOUNT_FLYING) && !CAN_RIDE_FLYING_MOUNT(ch)) {
 		msg_to_char(ch, "You don't have the correct ability to ride %s! (see HELP RIDE)\r\n", get_mob_name_by_proto(GET_MOUNT_VNUM(ch), TRUE));
 	}
+	else if (MOUNT_FLAGGED(ch, MOUNT_WATERWALK) && !CAN_RIDE_WATERWALK_MOUNT(ch)) {
+		msg_to_char(ch, "You don't have the correct ability to ride %s! (see HELP RIDE)\r\n", get_mob_name_by_proto(GET_MOUNT_VNUM(ch), TRUE));
+	}
 	else if (run_ability_triggers_by_player_tech(ch, PTECH_RIDING, NULL, NULL)) {
 		return;
 	}
@@ -341,7 +344,7 @@ void do_mount_new(char_data *ch, char *argument) {
 	else if (!MOB_FLAGGED(mob, MOB_MOUNTABLE) && !IS_IMMORTAL(ch)) {
 		act("You can't ride $N!", FALSE, ch, 0, mob, TO_CHAR);
 	}
-	else if (AFF_FLAGGED(mob, AFF_FLY) && !CAN_RIDE_FLYING_MOUNT(ch)) {
+	else if (!CAN_RIDE_MOUNT(ch, mob)) {
 		act("You don't have the correct ability to ride $N! (see HELP RIDE)", FALSE, ch, 0, mob, TO_CHAR);
 	}
 	else if (mob->desc || (GET_PC_NAME(mob) && (proto = mob_proto(GET_MOB_VNUM(mob))) && GET_PC_NAME(mob) != GET_PC_NAME(proto))) {

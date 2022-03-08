@@ -277,7 +277,7 @@ void check_should_dismount(char_data *ch) {
 	else if (DEEP_WATER_SECT(IN_ROOM(ch)) && !MOUNT_FLAGGED(ch, MOUNT_AQUATIC | MOUNT_WATERWALK) && !EFFECTIVELY_FLYING(ch)) {
 		ok = FALSE;
 	}
-	else if (!has_player_tech(ch, PTECH_RIDING_UPGRADE) && DEEP_WATER_SECT(IN_ROOM(ch)) && MOUNT_FLAGGED(ch, MOUNT_WATERWALK) && !EFFECTIVELY_FLYING(ch)) {
+	else if (!CAN_RIDE_WATERWALK_MOUNT(ch) && DEEP_WATER_SECT(IN_ROOM(ch)) && MOUNT_FLAGGED(ch, MOUNT_WATERWALK) && !EFFECTIVELY_FLYING(ch)) {
 		// has a waterwalk mount, in deep water, but is missing the riding upgrade
 		ok = FALSE;
 	}

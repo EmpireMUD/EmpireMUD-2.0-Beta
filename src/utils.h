@@ -403,6 +403,8 @@ int GET_MAX_BLOOD(char_data *ch);	// this one is different than the other max po
 #define CAN_GET_OBJ(ch, obj)  (CAN_WEAR((obj), ITEM_WEAR_TAKE) && CAN_CARRY_OBJ((ch),(obj)) && CAN_SEE_OBJ((ch),(obj)))
 #define CAN_RECOGNIZE(ch, vict)  (PRF_FLAGGED(ch, PRF_HOLYLIGHT) || (!AFF_FLAGGED(vict, AFF_NO_SEE_IN_ROOM) && ((GET_LOYALTY(ch) && GET_LOYALTY(ch) == GET_LOYALTY(vict)) || (GROUP(ch) && in_same_group(ch, vict)) || (!CHAR_MORPH_FLAGGED((vict), MORPHF_ANIMAL) && !IS_DISGUISED(vict)))))
 #define CAN_RIDE_FLYING_MOUNT(ch)  (has_player_tech((ch), PTECH_RIDING_FLYING))
+#define CAN_RIDE_MOUNT(ch, mob)  (MOB_FLAGGED((mob), MOB_MOUNTABLE) && (!AFF_FLAGGED((mob), AFF_FLY) || CAN_RIDE_FLYING_MOUNT(ch)) && (!AFF_FLAGGED((mob), AFF_WATERWALK) || CAN_RIDE_WATERWALK_MOUNT(ch)))
+#define CAN_RIDE_WATERWALK_MOUNT(ch)  (has_player_tech((ch), PTECH_RIDING_UPGRADE))
 #define CAN_SEE_IN_MAGIC_DARKNESS(ch)  (IS_NPC(ch) ? (get_approximate_level(ch) > 100) : (PRF_FLAGGED((ch), PRF_HOLYLIGHT) || has_ability((ch), ABIL_DARKNESS)))
 #define CAN_SPEND_BLOOD(ch)  (!AFF_FLAGGED(ch, AFF_CANT_SPEND_BLOOD))
 #define CAST_BY_ID(ch)  (IS_NPC(ch) ? (-1 * GET_MOB_VNUM(ch)) : GET_IDNUM(ch))
