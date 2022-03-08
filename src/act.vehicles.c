@@ -1707,7 +1707,7 @@ ACMD(do_drive) {
 	
 	skip_run_filler(&argument);
 	dir_only = !strchr(argument, ' ') && (parse_direction(ch, argument) != NO_DIR);	// only 1 word, and is a direction
-	path_to_room = (*argument && HAS_NAVIGATION(ch)) ? parse_room_from_coords(argument) : NULL;	// maybe
+	path_to_room = *argument ? parse_room_from_coords(argument) : NULL;	// maybe
 	
 	// basics
 	if (IS_NPC(ch)) {
@@ -1774,6 +1774,9 @@ ACMD(do_drive) {
 	}
 	else if (strlen(argument) > 2 && (portal = get_obj_in_list_vis(ch, argument, NULL, ROOM_CONTENTS(IN_ROOM(veh)))) && IS_PORTAL(portal)) {
 		do_drive_through_portal(ch, veh, portal, subcmd);
+	}
+	else if (path_to_room && !HAS_NAVIGATION(ch)) {
+		msg_to_char(ch, "You need a navigation ability to %s using coordinates.\r\n", drive_data[subcmd].command);
 	}
 	else if (!dir_only && !path_to_room && !parse_next_dir_from_string(ch, argument, &dir, &dist, TRUE)) {
 		// sends own error
