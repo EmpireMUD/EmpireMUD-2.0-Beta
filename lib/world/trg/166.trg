@@ -2897,7 +2897,7 @@ if %lit%
   %mod% %self% longdesc A glowing lantern floats in the air.
   * %mod% %self% shortdesc a floating lantern
   %mod% %self% lookdesc This little paper lantern, which seems to float all on its own, is bright enough to light up the whole area!
-  %mod% %self% append-lookdesc It feels you with a warm cheer, even when it's cold out.
+  %mod% %self% append-lookdesc It fills you with a warm cheer, even when it's cold out.
 else
   * not lit
   %mod% %self% keywords lantern little floating unlit
