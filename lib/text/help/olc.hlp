@@ -7389,7 +7389,7 @@ See also: OLC SHOPS, OLC REMOVEINDEV
 #d
 "SHOPEDIT ITEMS"
 Usage: .item add <vnum> <cost> <currency vnum | coins> [min reputation]
-       .item change <number> vnum <value>
+       .item change <number> <vnum | cost | currency | reputation> <value>
        .item move <number> <up | down>
        .item copy <from type> <from vnum>
        .item remove <number | all>
@@ -7398,13 +7398,13 @@ The shop's item list determines what it sells. Shops have an infinite number
 of each item, and do not run out. Shopkeepers do not receive the coins or
 currency that are paid to them; this is always lost.
 
-The parameters for add/copy are:
+The parameters for add/change are:
 - vnum: The object vnum to sell.
 - cost: The number of coins/currency.
 - currency: Either the word 'coins' or the vnum of a generic currency. Coins
   will always be miscellaneous coins unless the shop's mob/room belong to an
   empire, in which case it will be empire coins.
-- min reputation: If the shop has allegiance to a faction, this is the lowest
+- reputation: If the shop has allegiance to a faction, this is the lowest
   reputation that can buy the item (optional).
 
 See also: SHOPEDIT ALLEGIANCE, OLC SHOPS, GENERIC CURRENCY, VNUM
