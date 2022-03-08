@@ -410,7 +410,7 @@ int GET_MAX_BLOOD(char_data *ch);	// this one is different than the other max po
 #define EFFECTIVELY_SWIMMING(ch)  (EFFECTIVELY_FLYING(ch) || HAS_WATERWALK(ch) || (IS_RIDING(ch) && (MOUNT_FLAGGED((ch), MOUNT_AQUATIC) || has_player_tech((ch), PTECH_RIDING_UPGRADE))) || (IS_NPC(ch) ? MOB_FLAGGED((ch), MOB_AQUATIC) : has_player_tech((ch), PTECH_SWIMMING)))
 #define FREE_TO_CARRY(obj)  (IS_COINS(obj) || GET_OBJ_REQUIRES_QUEST(obj) != NOTHING)
 #define HAS_INFRA(ch)  AFF_FLAGGED(ch, AFF_INFRAVISION)
-#define HAS_WATERWALK(ch)  AFF_FLAGGED(ch, AFF_WATERWALK)
+#define HAS_WATERWALK(ch)  (AFF_FLAGGED((ch), AFF_WATERWALK) || MOUNT_FLAGGED((ch), MOUNT_WATERWALK))
 #define IS_HUMAN(ch)  (!IS_VAMPIRE(ch))
 #define IS_MAGE(ch)  (IS_NPC(ch) ? MOB_FLAGGED((ch), MOB_CASTER) : (has_skill_flagged((ch), SKILLF_CASTER) > 0))
 #define IS_OUTDOORS(ch)  IS_OUTDOOR_TILE(IN_ROOM(ch))
@@ -1967,6 +1967,7 @@ void get_player_skill_string(char_data *ch, char *buffer, bool abbrev);
 void list_char_to_char(char_data *list, char_data *ch);
 void list_obj_to_char(obj_data *list, char_data *ch, int mode, int show);
 void list_vehicles_to_char(vehicle_data *list, char_data *ch);
+char *obj_color_by_quality(obj_data *obj, char_data *ch);
 char *obj_desc_for_char(obj_data *obj, char_data *ch, int mode);
 struct custom_message *pick_custom_longdesc(char_data *ch);
 void show_character_affects(char_data *ch, char_data *to);

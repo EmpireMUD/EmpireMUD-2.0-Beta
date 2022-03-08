@@ -649,6 +649,7 @@ const char *mount_flags[] = {
 	"riding",
 	"aquatic",
 	"flying",
+	"waterwalk",
 	"\n"
 };
 

@@ -1047,7 +1047,7 @@ bool player_can_move(char_data *ch, int dir, room_data *to_room, bitvector_t fla
 				}
 			}
 			// auto-swim ?
-			if (!PRF_FLAGGED(ch, PRF_AUTOSWIM) && !WATER_SECT(IN_ROOM(ch)) && !IS_SET(flags, MOVE_SWIM | MOVE_IGNORE) && !EFFECTIVELY_FLYING(ch) && !HAS_WATERWALK(ch) && !IS_INSIDE(IN_ROOM(ch)) && !IS_ADVENTURE_ROOM(IN_ROOM(ch)) && (!IS_RIDING(ch) || !MOUNT_FLAGGED(ch, MOUNT_AQUATIC))) {
+			if (!PRF_FLAGGED(ch, PRF_AUTOSWIM) && !WATER_SECT(IN_ROOM(ch)) && !IS_SET(flags, MOVE_SWIM | MOVE_IGNORE) && !EFFECTIVELY_FLYING(ch) && !HAS_WATERWALK(ch) && !IS_INSIDE(IN_ROOM(ch)) && !IS_ADVENTURE_ROOM(IN_ROOM(ch)) && (!IS_RIDING(ch) || !MOUNT_FLAGGED(ch, MOUNT_AQUATIC | MOUNT_WATERWALK))) {
 				msg_to_char(ch, "You must type 'swim' to enter the water.\r\n");
 				return FALSE;
 			}
@@ -1116,7 +1116,7 @@ bool player_can_move(char_data *ch, int dir, room_data *to_room, bitvector_t fla
 			return FALSE;
 		}
 	}
-	if (IS_RIDING(ch) && DEEP_WATER_SECT(to_room) && !MOUNT_FLAGGED(ch, MOUNT_AQUATIC) && !EFFECTIVELY_FLYING(ch)) {
+	if (IS_RIDING(ch) && DEEP_WATER_SECT(to_room) && !MOUNT_FLAGGED(ch, MOUNT_AQUATIC | MOUNT_WATERWALK) && !EFFECTIVELY_FLYING(ch)) {
 		// Riding-Upgrade does not help ocean
 		if (PRF_FLAGGED(ch, PRF_AUTODISMOUNT)) {
 			do_dismount(ch, "", 0, 0);
@@ -1126,7 +1126,7 @@ bool player_can_move(char_data *ch, int dir, room_data *to_room, bitvector_t fla
 			return FALSE;
 		}
 	}
-	if (IS_RIDING(ch) && !has_player_tech(ch, PTECH_RIDING_UPGRADE) && WATER_SECT(to_room) && !MOUNT_FLAGGED(ch, MOUNT_AQUATIC) && !EFFECTIVELY_FLYING(ch)) {
+	if (IS_RIDING(ch) && !has_player_tech(ch, PTECH_RIDING_UPGRADE) && WATER_SECT(to_room) && !MOUNT_FLAGGED(ch, MOUNT_AQUATIC | MOUNT_WATERWALK) && !EFFECTIVELY_FLYING(ch)) {
 		if (PRF_FLAGGED(ch, PRF_AUTODISMOUNT)) {
 			do_dismount(ch, "", 0, 0);
 		}

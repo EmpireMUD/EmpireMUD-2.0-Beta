@@ -2229,8 +2229,9 @@ typedef enum {
 
 // MOUNT_x: mount flags -- MOUNT_FLAGGED(ch, flag)
 #define MOUNT_RIDING  BIT(0)	// player is currently mounted
-#define MOUNT_AQUATIC  BIT(1)	// mount can swim
+#define MOUNT_AQUATIC  BIT(1)	// mount can swim (but not go on land)
 #define MOUNT_FLYING  BIT(2)	// mount can fly
+#define MOUNT_WATERWALK  BIT(3)	// mount can do land/water
 
 
 // OFFER_x - types for the do_accept/offer_data system
