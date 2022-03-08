@@ -2248,7 +2248,7 @@ switch %random.8%
     if %cat%
       %echo% ~%self% rubs up against ~%pc% and purrs.
     elseif %dog%
-      %echo% ~%self% whacks ~%pc% with *%self% tail.
+      %echo% ~%self% whacks ~%pc% with ^%self% tail.
     end
   break
   case 3
