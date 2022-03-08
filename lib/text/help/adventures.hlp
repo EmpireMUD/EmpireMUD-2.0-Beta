@@ -478,6 +478,11 @@ Craft patterns sold by the vendor outside the portal:
   Melee weapon: frozen pykrete sword
   Healer weapon: icy star of winter
   Caster weapon: glacial staff of the Maelstrom pattern
+
+The vendor will only show up once you have at least 14 permafrost tokens and
+can affor his items.
+
+Hint: You can find multiple types of seeds when foraging outside the portal.
 #
 "PORTAL TO THE PRIMEVAL" "PRIMEVAL PORTAL" DRACOSAUR "PRIMEVAL TOKENS"
 
