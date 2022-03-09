@@ -37,6 +37,7 @@ blocks that are currently in use.
 3100   "
 3200  Butchering foods
 3300  Cooking/crafted foods
+3800  Basic foods made by/for workforce
 
 5000  System buildings
 5100  Skill-based buildings
