@@ -68,7 +68,7 @@ I 4 12340 3.84 1 L  # LOOT: livery collar of the dragon king
 S
 #12302
 Fur Dragon: random loot (hard)~
-0 0 A B 225-350 0
+0 b A B 225-350 0
 E
 -1 100.00
 0 0 0
@@ -91,7 +91,7 @@ I 4 173 4.20 2 R  # LOOT: gold bar
 S
 #12303
 Fur Dragon: random loot (group)~
-0 0 B A 225-350 0
+0 b B A 225-350 0
 E
 -1 100.00
 0 0 0
@@ -114,7 +114,7 @@ I 4 173 4.10 3 R  # LOOT: gold bar
 S
 #12304
 Fur Dragon: random loot (boss)~
-0 0 AB 0 225-350 0
+0 b AB 0 225-350 0
 E
 -1 100.00
 0 0 0

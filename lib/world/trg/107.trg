@@ -600,6 +600,9 @@ if %actor.cooldown(10738)%
 end
 set room_var %actor.room%
 %send% %actor% You touch @%self% and it begins to swirl with light...
+if !%actor.home%
+  %send% %actor% You might want to set a home to return to, and get yourself a hestian trinket.
+end
 %echoaround% %actor% ~%actor% touches @%self% and it begins to swirl with light...
 wait 5 sec
 if %actor.room% != %room_var% || %actor.fighting% || %self.carried_by% != %actor% || %actor.aff_flagged(DISTRACTED)%

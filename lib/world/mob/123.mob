@@ -4,7 +4,7 @@ the fur dragon~
 An enormous fur dragon is stalking low to the ground.
 ~
 225 325 dghk choBCD 6
-2 0 9 10
+0 0 9 10
 D
    This tremendous brown creature is undoubtedly a dragon, but its scales are
 covered with fur from snout to tail. If it can fly, you don't see where the
@@ -39,6 +39,7 @@ T 12311
 T 12317
 T 12319
 T 12320
+T 12322
 S
 #12306
 dragon fur flying~
@@ -122,5 +123,6 @@ D
 It looks like the fur dragon has had kittens, and boy are they sharp!
 ~
 T 12318
+T 12321
 S
 $
