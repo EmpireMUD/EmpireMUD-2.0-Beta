@@ -601,26 +601,47 @@ Fur Dragon Combat: Baby spawner~
 if %self.cooldown(12317)% || %self.cooldown(12318)%
   halt
 end
-eval roll %random.100%
-%echo% ~%self% shifts as you hear growling from somewhere.
+set difficulty 1
+if %self.mob_flagged(hard)%
+  eval defficulty %difficulty% + 1
+end
+if %self.mob_flagged(group)%
+  eval difficulty %difficulty% + 2
+end
+switch %difficulty%
+  case 1
+    set roll 1
+  break
+  case 2
+    eval roll %random.84%
+  break
+  case 3
+    eval roll %random.90%
+  break
+  case 4
+    eval roll %random.100%
+  break
+done
+%echo% %self% shifts as you hear growling from somewhere.
 wait 3
 if %roll% > 95
-  set SpawnStr a few baby fur dragons approach
-  set BabyCount 3
-elseif %roll% >= 75
-  set SpawnStr a couple baby fur dragons approach
-  set BabyCount 2
+  set SpawnStr a few fledgling fur dragons approach
+  set FledglingCount 3
+elseif %roll% > 80
+  set SpawnStr a couple fledgling fur dragons approach
+  set FledglingCount 2
 else
-  set SpawnStr a baby fur dragon approaches
-  set BabyCount 1
+  set SpawnStr a fledgling fur dragon approaches
+  set FledglingCount 1
   set str s
 end
 %echo% Suddenly, %SpawnStr% from the corner and attack%str%!
-while %BabyCount%
-  %load% mob 12318 %self.level% ally
-  eval BabyCount %BabyCount% - 1
+while %FledglingCount%
+  %load% mob 12318 ally
+  eval FledglingCount %FledglingCount% - 1
 done
-nop %self.set_cooldown(12317, 25)%
+eval timer 60 - %difficulty% * 10
+nop %self.set_cooldown(12317, %timer%)%
 ~
 #12318
 Fur Dragon Combat: Purge baby dragons on enter~
@@ -634,7 +655,7 @@ end
 ~
 #12319
 Fur Dragon Combat: Itchy mother~
-0 b 100
+0 b 15
 ~
 if !%self.fighting%
   halt
@@ -666,6 +687,9 @@ if %CountScratched% >= %PlayerCount%
   halt
 end
 eval buff ( %PlayerCount% - %CountScratched% ) * 10
+if %self.mob_flagged(group)%
+  eval buff %buff% * 2
+end
 dg_affect #12319 %self% BONUS-PHYSICAL %buff% -1
 %echo% ~%self% seems to become enraged and fights with a greater furiosity!
 ~
@@ -708,5 +732,127 @@ end
 %eachoaround %actor% ~%actor% reaches out and scratches ~%self% behind ^%self% ear.
 set FurScratching 1
 remote FurScratching %actor.id%
+~
+#12321
+buff the baby fur dragon~
+0 b 30
+~
+if !%self.fighting%
+  %echo% ~%self% hisses and vanishes in a puff of fur!
+  %purge% %self%
+  halt
+end
+set person %self.room.people%
+while %person%
+  if %person.vnum% == 12318
+    eval count %count% + 1
+    if %person% == %self%
+      set IAm %count%
+    end
+  end
+  set person %person.next_in_room%
+done
+switch %IAm%
+  case 1
+    set IAm first
+  break
+  case 2
+    set IAm second
+  break
+  case 3
+    set IAm third
+  break
+  case 4
+    set IAm fourth
+  break
+  case 5
+    set IAm fifth
+  break
+  case 6
+    set IAm sixth
+  break
+  case 7
+    set IAm seventh
+  break
+  case 8
+    set IAm eighth
+  break
+  case 9
+    set IAm ninth
+  break
+  case 10
+    set IAm tenth
+  break
+  case 11
+    set IAm eleventh
+  break
+  case 12
+    set IAm twelth
+  break
+  case 13
+    set IAm thirteenth
+  break
+  case 14
+    set IAm fourteenth
+  break
+  case 15
+    set IAm fifteenth
+  break
+  case 16
+    set IAm sixteenth
+  break
+  case 17
+    set IAm seventeenth
+  break
+  case 18
+    set IAm eighteenth
+  break
+  case 19
+    set IAm nineteenth
+  break
+  case 20
+    set IAm twentieth
+  break
+  default
+    set IAm unknown
+  break
+done
+if %IAm% == unknown
+  %echo% One of the many fledglings growls as it becomes enraged!
+else
+  %echo% The %IAm% fledgling puffs up as it becomes enraged!
+end
+if %count% >=10 && !%self.affect(haste)%
+  dg_affect %self% HASTE on -1
+end
+eval count %count% * 5
+dg_affect #12319 %self% BONUS-PHYSICAL %count% -1
+~
+#12322
+fur dragon pounce~
+0 l 40
+~
+if %self.cooldown(12322)%
+  halt
+end
+set person %self.room.people%
+while %person%
+  if %person.vnum% == 12318
+    eval count %count% + 1
+  end
+  set person %person.next_in_room%
+done
+eval count %count% * 2
+if %count% > 20
+  set timer 10
+else
+  eval timer 30 - %count%
+end
+%echo% ~%self% begins to wiggle ^%self% butt as &%self% prepares to pounce!
+wait 3 s
+nop %self.set_cooldown(12322, %timer%)%
+%echo% ~%self% lunges at ~%actor% and strikes with both front claws!
+%damage% %actor% 65 physical
+%damage% %actor% 80 physical
 ~
 $

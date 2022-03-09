@@ -1,6 +1,6 @@
 #205
 Bodyguard refresh and cooldown on death~
-0 f 100
+0 ft 100
 ~
 * partial copy of 9803
 * This script deletes a companion's entry when it dies.

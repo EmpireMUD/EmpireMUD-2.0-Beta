@@ -73,6 +73,16 @@ T 18803
 T 18804
 T 18805
 S
+#18803
+guard cityguard risen~
+a risen city guard~
+A risen city guard hunts for intruders.
+~
+75 125 dhqtuvA cG 3
+0 0 13 10
+T 251
+T 18811
+S
 #18805
 lantern attack-o-lantern~
 the attack-o-lantern~
@@ -414,6 +424,19 @@ $n shudders as $s muscles lock up.~
 T 18873
 T 18876
 S
+#18875
+t-rex zombie~
+a zombie t-rex~
+A dragon sized zombie stomps about.
+~
+1 100 dehk c 4
+2 0 26 9
+D
+   This former queen of the primeval world has a rough pebbled hide, colored
+similar to a jaguar's pelt. Solid muscle ripples under the desiccated flesh as
+she moves about.
+~
+S
 #18876
 pig~
 a pig~
@@ -523,7 +546,7 @@ A zombie terrier is chasing its tail.
 1 1 bdoD n 1
 0 0 0 9
 D
-   This poor, adorable soul has been stitched back together an reanimated by
+   This poor, adorable soul has been stitched back together and reanimated by
 some unknown necromancy. In life, it was an exuberant loyal terrier. In death,
 little has changed.
 ~
@@ -689,7 +712,7 @@ M
 The hair on the back of your neck stands up.~
 M
 0
-You head the sound of marble shattering from the hall.~
+You hear the sound of marble shattering from the hall.~
 M
 0
 A book flies in from the doorway and shelves itself.~

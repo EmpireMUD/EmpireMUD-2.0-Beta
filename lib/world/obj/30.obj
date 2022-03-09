@@ -717,11 +717,12 @@ A head of lettuce is sitting here.~
    Lettuce is bland on its own, but you can still eat it that way. It can also
 be made into a salad with the 'cook' command.
 ~
-6 l a 0 7
+6 l a 0 8
 2 3017 0
 7 168
 C
 1 1
+O+ 1 6152
 R
 4 5606 0
 S
