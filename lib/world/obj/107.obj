@@ -131,10 +131,11 @@ A snowglobe is lying here.~
 snowglobe' to teleport home, like a hestian trinket. Use the home command to
 set your home.
 ~
-3 p a 0 5
+3 p a 0 6
 0 0 0
 8 0
 T 10710
+T 9806
 S
 #10711
 hat red christmas~
@@ -393,7 +394,7 @@ can also play it as an instrument.
    You can 'use' this item to teleport back to the nearest Mother Goose
 adventure. From there, try 'where musical' to find the cat.
 ~
-22 p ao 0 7
+22 p ao 0 8
 0 0 0
 0 0
 M
@@ -409,6 +410,7 @@ M
 3
 You dance as $n plays fine music with $p.~
 T 10738
+T 9806
 S
 #10731
 cloak starry~
@@ -435,10 +437,11 @@ would reward you if you gave it back to them.
    You can 'use' this item to teleport back to the nearest Mother Goose
 adventure. From there, try 'where jack' or 'where jill' to find them.
 ~
-5 p a 0 3
+5 p a 0 4
 32 32 0
 0 0
 T 10738
+T 9806
 S
 #10733
 trousers fetching pair~
@@ -465,11 +468,12 @@ could find its owner, he'd reward you.
    You can 'use' this item to teleport back to the nearest Mother Goose
 adventure. From there, try 'where nimble' to find the right Jack.
 ~
-3 p ao 0 4
+3 p ao 0 5
 0 0 0
 13 0
 I 11 10735 100.00 1  # LIGHT: lit candlestick
 T 10738
+T 9806
 S
 #10735
 candlestick lit~
@@ -481,10 +485,11 @@ could find its owner, he'd reward you.
    You can 'use' this item to teleport back to the nearest Mother Goose
 adventure. From there, try 'where nimble' to find the right Jack.
 ~
-3 cp ao 0 5
+3 cp ao 0 6
 0 0 0
 13 168
 T 10738
+T 9806
 S
 #10736
 shoes burnt pair~
@@ -511,7 +516,7 @@ if you returned it.
    You can 'use' this item to teleport back to the nearest Mother Goose
 adventure. From there, try 'where sprat' to find the right Jack.
 ~
-6 p a 0 7
+6 p a 0 8
 72 0 0
 7 336
 A
@@ -523,6 +528,7 @@ M
 4
 You eat the ham, carefully making sure you eat no lean.~
 T 10738
+T 9806
 S
 #10738
 belt lean~
@@ -549,7 +555,7 @@ would reward you if you returned it to him.
    You can 'use' this item to teleport back to the nearest Mother Goose
 adventure. From there, try 'where horner' to find the right Jack.
 ~
-6 p a 0 7
+6 p a 0 8
 72 0 0
 7 336
 M
@@ -571,6 +577,7 @@ M
 5
 $n sticks $s thumb into a Christmas pie, and pulls out a plum!~
 T 10738
+T 9806
 S
 #10740
 gloves plum-stained stained~
@@ -596,7 +603,7 @@ find her, she might reward you for their safe return.
    You can 'use' this item to teleport back to the nearest Mother Goose
 adventure. From there, try 'where muffet' to find her.
 ~
-6 p a 0 7
+6 p a 0 8
 72 0 0
 7 336
 M
@@ -609,6 +616,7 @@ M
 5
 $n enjoys some curds and whey.~
 T 10738
+T 9806
 S
 #10742
 spider dangling~
@@ -654,11 +662,12 @@ will gain a little lamb mini-pet.
    You can 'use' this item to teleport back to the nearest Mother Goose
 adventure. From there, try 'where mary' to find her.
 ~
-3 p a 0 9
+3 p a 0 10
 10744 0 0
 2 0
 T 10744
 T 10738
+T 9806
 S
 #10745
 skirt fetching~
@@ -684,7 +693,7 @@ lives in the shoe. If you returned it, she might reward you.
    You can 'use' this item to teleport back to the nearest Mother Goose
 adventure, where you can turn in this quest.
 ~
-6 p a 0 9
+6 p a 0 10
 72 0 0
 7 336
 A
@@ -696,6 +705,7 @@ M
 5
 $n chews on a leathery broth.~
 T 10738
+T 9806
 S
 #10747
 shoestring string spare~
@@ -711,6 +721,23 @@ A
 2 1 0
 C
 25 25
+S
+#10749
+breadcrumbs crumbs enchanted~
+some enchanted breadcrumbs~
+Some enchanted breadcrumbs have been dropped here.~
+   These breadcrumbs won't last long, but they have been enchanted to return
+you to your home. To use these, you must already have a home that you set with
+the 'home' command. Type 'use breadcrumbs' to teleport to it. If you don't use
+these soon, they'll be lost.
+~
+3 p a 0 4
+0 0 0
+7 24
+C
+1 1
+T 10749
+T 9806
 S
 #10750
 parts spider pile~

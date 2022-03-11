@@ -8,9 +8,9 @@ A flying reindeer prances above the ground.
 D
 This stunning slate-gray reindeer is hovering a few feet above the ground!
 ~
-I 0 3012 100.00 2  # BUTCHER: a fillet of raw meat
-I 0 9175 100.00 2  # BUTCHER: a reindeer's antlers
-I 1 1351 100.00 1  # SKIN: a large skin
+I 0 3012 100.00 2  # BUTCHER: fillet of raw meat
+I 0 9175 100.00 2  # BUTCHER: reindeer's antlers
+I 1 1351 100.00 1  # SKIN: large skin
 T 10715
 S
 #10701
@@ -143,8 +143,8 @@ A goose is playing in the snow.
 D
 This fat white goose is frolicking in the snow.
 ~
-I 0 3200 100.00 2  # BUTCHER: a cut of poultry
-I 0 9025 100.00 1  # BUTCHER: some bird feathers
+I 0 3200 100.00 2  # BUTCHER: cut of poultry
+I 0 9025 100.00 1  # BUTCHER: bird feathers
 M
 0
 $n honks.~
@@ -165,10 +165,10 @@ A reindeer raises its head from grazing.
 D
 The reindeer is a beautiful slate-gray color, with long, strong antlers.
 ~
-I 0 3012 100.00 2  # BUTCHER: a fillet of raw meat
-I 0 9175 100.00 2  # BUTCHER: a reindeer's antlers
-I 1 1351 100.00 1  # SKIN: a large skin
-I 3 9176 100.00 1  # BARDE: a barded reindeer
+I 0 3012 100.00 2  # BUTCHER: fillet of raw meat
+I 0 9175 100.00 2  # BUTCHER: reindeer's antlers
+I 1 1351 100.00 1  # SKIN: large skin
+I 3 9176 100.00 1  # BARDE: barded reindeer
 T 10715
 S
 #10709
@@ -374,6 +374,10 @@ A musical cat stands on his hind legs, looking for his fiddle.
 ~
 0 25 d n 1
 1 0 0 15
+D
+   This little orange tabby dances about, humming to himself as he looks for
+his fiddle.
+~
 T 10748
 T 10730
 T 10731
@@ -385,6 +389,9 @@ Jack is looking for a pail to fetch some water.
 ~
 0 25 d n 3
 1 0 0 15
+D
+Jack is a messy little boy with tousled brown hair.
+~
 T 10748
 T 10732
 T 10731
@@ -396,6 +403,9 @@ Jill seems to be looking for something.
 ~
 0 25 d n 3
 2 0 0 15
+D
+Jill is a strong little girl with a dainty dress all covered in grass stains.
+~
 T 10736
 T 10731
 T 10733
@@ -407,6 +417,9 @@ Jack B. Nimble is looking for something to leap over.
 ~
 0 25 d n 3
 1 0 0 15
+D
+Jack is doing some stretches and preparing to do some jumps.
+~
 T 10748
 T 10734
 T 10731
@@ -418,6 +431,9 @@ Jack Sprat holds his belly as it rumbles for food.
 ~
 0 25 d n 3
 1 0 0 15
+D
+Jack looks awfully lean.
+~
 T 10748
 T 10737
 T 10731
@@ -429,6 +445,9 @@ Jack Horner is sitting in the corner.
 ~
 0 25 d n 3
 1 0 0 15
+D
+Jack is looking a little plump, but nobody says 'no' to pie.
+~
 T 10748
 T 10739
 T 10731
@@ -440,6 +459,9 @@ Little Miss Muffet is sitting here, hungry.
 ~
 0 25 d n 3
 2 0 0 15
+D
+Miss Muffet is a prim and proper little girl who is ready for a tea party.
+~
 T 10748
 T 10741
 T 10731
@@ -451,6 +473,9 @@ Mary is looking frantically for her lamb.
 ~
 0 25 d n 3
 2 0 0 15
+D
+Mary seems really worried about the lamb.
+~
 T 10748
 T 10743
 T 10731
@@ -462,6 +487,9 @@ A little lamb is prancing about.
 ~
 1 1 bdoD n 2
 0 0 14 9
+D
+This fluffy little white lamb is just munching on some grass.
+~
 T 9901
 T 9902
 S
@@ -472,6 +500,10 @@ An old woman sits in a rocking chair by the giant shoe.
 ~
 0 25 bd n 3
 2 0 0 15
+D
+   Though she's seen better days, the old woman is quite proud of her house,
+cobbled together such as it is.
+~
 T 10748
 T 10746
 T 10731
@@ -483,14 +515,19 @@ A giant, hairy spider stares at you from the mine wall.
 ~
 0 25 bcdgj cG 2
 0 0 8 9
+D
+   It's not that the spider is large in the objective sense, as it's not much
+bigger than a great dane. The problem is that it's large in the subjective
+sense, in that it's a lot bigger than a spider should be.
+~
 I 0 10751 100.00 1  # BUTCHER: spider meat
 I 4 10750 90.00 1  # LOOT: spider parts
-I 4 10753 8.33 1 a  # LOOT: a spider egg
+I 4 10753 8.33 1 a  # LOOT: spider egg
 I 4 10755 8.33 1 a  # LOOT: crusty goblin bread
-I 4 10756 8.33 1 a  # LOOT: a rusty goblin ring
-I 4 10757 8.33 1 a  # LOOT: a rusty goblin idol
-I 4 10758 8.33 1 a  # LOOT: a rusty goblin helmet
-I 4 10759 8.33 1 a  # LOOT: a rusty flask
+I 4 10756 8.33 1 a  # LOOT: rusty goblin ring
+I 4 10757 8.33 1 a  # LOOT: rusty goblin idol
+I 4 10758 8.33 1 a  # LOOT: rusty goblin helmet
+I 4 10759 8.33 1 a  # LOOT: rusty flask
 S
 #10751
 spider hunter~
@@ -499,14 +536,19 @@ A hunter spider stalks you on long legs.
 ~
 0 25 bcdgj cG 2
 0 0 8 9
+D
+   The spider's body is slightly larger than a loaf of bread -- which, in
+itself, is deeply concerning. But the bread knives it calls fangs are the real
+terror here.
+~
 I 0 10751 100.00 1  # BUTCHER: spider meat
 I 4 10750 90.00 1  # LOOT: spider parts
-I 4 10753 8.33 1 a  # LOOT: a spider egg
+I 4 10753 8.33 1 a  # LOOT: spider egg
 I 4 10755 8.33 1 a  # LOOT: crusty goblin bread
-I 4 10756 8.33 1 a  # LOOT: a rusty goblin ring
-I 4 10757 8.33 1 a  # LOOT: a rusty goblin idol
-I 4 10758 8.33 1 a  # LOOT: a rusty goblin helmet
-I 4 10759 8.33 1 a  # LOOT: a rusty flask
+I 4 10756 8.33 1 a  # LOOT: rusty goblin ring
+I 4 10757 8.33 1 a  # LOOT: rusty goblin idol
+I 4 10758 8.33 1 a  # LOOT: rusty goblin helmet
+I 4 10759 8.33 1 a  # LOOT: rusty flask
 S
 #10752
 spider widow massive~
@@ -515,17 +557,21 @@ A massive widow spider eyes you from her nest.
 ~
 0 25 bcdgj ceG 3
 2 0 8 9
+D
+   She's been through more than a few husbands, and from the look in all eight
+of her eyes, you're going to need a priest.
+~
 I 0 10751 100.00 1  # BUTCHER: spider meat
 I 4 10750 90.00 1  # LOOT: spider parts
-I 4 10767 100.00 1  # LOOT: some goblin coins
-I 4 10753 12.50 1 a  # LOOT: a spider egg
-I 4 10760 12.50 1 a  # LOOT: a spidersilk gown
-I 4 10761 12.50 1 a  # LOOT: a spidersilk pouch
-I 4 10762 12.50 1 a  # LOOT: a spidersilk whip
-I 4 10763 12.50 1 a  # LOOT: a spidersilk lantern
-I 4 10764 12.50 1 a  # LOOT: a lit spidersilk lantern
+I 4 10767 100.00 1  # LOOT: goblin coins
+I 4 10753 12.50 1 a  # LOOT: spider egg
+I 4 10760 12.50 1 a  # LOOT: spidersilk gown
+I 4 10761 12.50 1 a  # LOOT: spidersilk pouch
+I 4 10762 12.50 1 a  # LOOT: spidersilk whip
+I 4 10763 12.50 1 a  # LOOT: spidersilk lantern
+I 4 10764 12.50 1 a  # LOOT: lit spidersilk lantern
 I 4 10765 12.50 1 a  # LOOT: spidersilk slippers
-I 4 10766 12.50 1 a  # LOOT: a spidersilk mask
+I 4 10766 12.50 1 a  # LOOT: spidersilk mask
 T 10757
 T 10760
 T 10761
@@ -537,6 +583,9 @@ A spiderling crawls over you.
 ~
 1 1 bdoD n 1
 0 0 8 9
+D
+It has no business being as adorable as it is.
+~
 M
 0
 $n skitters around playfully.~
@@ -556,6 +605,11 @@ Nynar the goblin stands here, looking into his boot ('buy potion').
 ~
 25 25 d cn 2
 1 0 0 15
+D
+   Nynar is frantically checking his boots, gloves, cuffs, and hat for any
+spiders that might have hitched a ride. You can 'list' and 'buy' here. The bug
+potion gives you a little dexterity for a little while.
+~
 M
 1
 So much webs... So much webs...~
@@ -580,6 +634,11 @@ Meena the goblin is sitting here, filing her pick ('buy pick').
 ~
 25 25 d cn 2
 2 0 0 15
+D
+   Meena seems a little nervous, but she keeps sharpening her pick as if she
+has a holy purpose here. You can 'list' and 'buy' here to get a pick of your
+own.
+~
 M
 1
 All of the screaming!~
@@ -604,12 +663,15 @@ A goblin-shaped cocoon dangles from the ceiling.
 ~
 0 1 bdn 0 2
 0 0 0 15
-I 4 10767 4.17 1 a  # LOOT: some goblin coins
+D
+There's not much you can do for him now.
+~
+I 4 10767 4.17 1 a  # LOOT: goblin coins
 I 4 10755 4.17 1 a  # LOOT: crusty goblin bread
-I 4 10756 4.17 1 a  # LOOT: a rusty goblin ring
-I 4 10757 4.17 1 a  # LOOT: a rusty goblin idol
-I 4 10758 4.17 1 a  # LOOT: a rusty goblin helmet
-I 4 10759 4.17 1 a  # LOOT: a rusty flask
+I 4 10756 4.17 1 a  # LOOT: rusty goblin ring
+I 4 10757 4.17 1 a  # LOOT: rusty goblin idol
+I 4 10758 4.17 1 a  # LOOT: rusty goblin helmet
+I 4 10759 4.17 1 a  # LOOT: rusty flask
 S
 #10757
 Blacklung, goblin foreman~
@@ -618,6 +680,12 @@ The goblin foreman is looking around nervously ('buy coffin').
 ~
 25 25 d cn 2
 1 0 0 15
+D
+   Blacklung looks like he's been mining his entire tiny life, and though he's
+wary of spiders, he doesn't seem as scared as the others. You can 'list' and
+'buy' here to get a goblin coffin, which can be used as a short-term tomb to
+respawn from when you die.
+~
 M
 1
 Coffin for sale! 50 coin! (type 'buy coffin')~
@@ -642,6 +710,11 @@ Miner Hanx runs past you ('buy raft').
 ~
 25 25 d cn 2
 1 0 0 15
+D
+   Hanx never meant to end up on this island, and he only took the mining job
+to pay for a way off. You can 'list' and 'buy' here to get a raft, which will
+get you off this spider-infested island.
+~
 M
 1
 Goblin selling spare raft, 50 coin! (type 'buy raft')~
@@ -663,10 +736,10 @@ A great buffalo grazes below the green boughs.
 ~
 100 125 dejo 0 4
 0 0 0 27
-I 0 3012 100.00 3  # BUTCHER: a fillet of raw meat
-I 1 1351 100.00 4  # SKIN: a large skin
-I 3 10777 100.00 1  # BARDE: an armored war buffalo
-I 4 10781 100.00 1  # LOOT: a buffalo leash
+I 0 3012 100.00 3  # BUTCHER: fillet of raw meat
+I 1 1351 100.00 4  # SKIN: large skin
+I 3 10777 100.00 1  # BARDE: armored war buffalo
+I 4 10781 100.00 1  # LOOT: buffalo leash
 S
 #10777
 buffalo war armored~
@@ -675,9 +748,9 @@ An armored war buffalo is grazing under heavy armor.
 ~
 200 225 bdejo 0 4
 0 0 0 27
-I 0 3012 100.00 3  # BUTCHER: a fillet of raw meat
-I 1 1351 100.00 4  # SKIN: a large skin
-I 4 10781 100.00 1  # LOOT: a buffalo leash
+I 0 3012 100.00 3  # BUTCHER: fillet of raw meat
+I 1 1351 100.00 4  # SKIN: large skin
+I 4 10781 100.00 1  # LOOT: buffalo leash
 S
 #10778
 zebra great~
@@ -686,10 +759,10 @@ A great zebra stands in the shadows, hidden.
 ~
 100 125 dejo 0 4
 0 0 0 27
-I 0 3012 100.00 2  # BUTCHER: a fillet of raw meat
-I 1 1351 100.00 2  # SKIN: a large skin
-I 3 10779 100.00 1  # BARDE: an armored war zebra
-I 4 10782 100.00 1  # LOOT: a zebra leash
+I 0 3012 100.00 2  # BUTCHER: fillet of raw meat
+I 1 1351 100.00 2  # SKIN: large skin
+I 3 10779 100.00 1  # BARDE: armored war zebra
+I 4 10782 100.00 1  # LOOT: zebra leash
 S
 #10779
 zebra war armored~
@@ -698,9 +771,9 @@ An armored war zebra stands valliantly before you.
 ~
 200 225 bdejo 0 4
 0 0 0 27
-I 0 3012 100.00 2  # BUTCHER: a fillet of raw meat
-I 1 1351 100.00 2  # SKIN: a large skin
-I 4 10782 100.00 1  # LOOT: a zebra leash
+I 0 3012 100.00 2  # BUTCHER: fillet of raw meat
+I 1 1351 100.00 2  # SKIN: large skin
+I 4 10782 100.00 1  # LOOT: zebra leash
 S
 #10781
 buffalo calf~

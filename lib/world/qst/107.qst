@@ -42,12 +42,16 @@ you a little tune:
  The little dog laughed,
  To see such sport,
  And the dish ran away with the spoon.
+
+You can use your enchanted breadcrumbs to teleport home, but do it quickly.
 ~
-6 d 0 25 0
+7 d 0 25 0
 A
 2 10730
 R
 2 10731 1
+R
+2 10749 1
 W
 2 10730 0 1
 Z
@@ -66,12 +70,16 @@ Jack and Jill went up the hill
 To fetch a pail of water.
 Jack fell down and broke his crown,
 And Jill came tumbling after.
+ 
+You can use your enchanted breadcrumbs to teleport home, but do it quickly.
 ~
-5 d 1 25 0
+6 d 1 25 0
 A
 2 10732
 R
 2 10733 1
+R
+2 10749 1
 T 10740
 W
 2 10732 0 1
@@ -90,12 +98,16 @@ Jack and Jill went up the hill
 To fetch a pail of water.
 Jack fell down and broke his crown,
 And Jill came tumbling after.
+ 
+You can use your enchanted breadcrumbs to teleport home, but do it quickly.
 ~
-7 d 1 25 0
+8 d 1 25 0
 A
 2 10732
 R
 2 10745 1
+R
+2 10749 1
 T 10740
 W
 2 10732 0 1
@@ -117,12 +129,16 @@ Jack be nimble,
 Jack be quick,
 Jack jump over
 The candlestick.
+ 
+You can use your enchanted breadcrumbs to teleport home, but do it quickly.
 ~
-8 d 0 25 0
+9 d 0 25 0
 A
 2 10734
 R
 2 10736 1
+R
+2 10749 1
 W
 2 10734 0 1
 Z
@@ -143,12 +159,16 @@ Jack be nimble,
 Jack be quick,
 Jack jump over
 The candlestick.
+ 
+You can use your enchanted breadcrumbs to teleport home, but do it quickly.
 ~
-8 d 0 25 0
+9 d 0 25 0
 A
 2 10735
 R
 2 10736 1
+R
+2 10749 1
 T 10735
 W
 2 10735 0 1
@@ -168,12 +188,16 @@ Jack Sprat could eat no fat.
 His wife could eat no lean.
 And so between them both, you see,
 They licked the platter clean.
+ 
+You can use your enchanted breadcrumbs to teleport home, but do it quickly.
 ~
-9 d 0 25 0
+10 d 0 25 0
 A
 2 10737
 R
 2 10738 1
+R
+2 10749 1
 W
 2 10737 0 1
 Z
@@ -193,12 +217,16 @@ Eating a Christmas pie;
 He put in his thumb,
 And pulled out a plum,
 And said 'What a good boy am I!'
+ 
+You can use your enchanted breadcrumbs to teleport home, but do it quickly.
 ~
-8 d 0 25 0
+9 d 0 25 0
 A
 2 10739
 R
 2 10740 1
+R
+2 10749 1
 W
 2 10739 0 1
 Z
@@ -219,12 +247,16 @@ Eating her curds and whey;
 Along came a spider
 Who sat down beside her
 And frightened Miss Muffet away.
+ 
+You can use your enchanted breadcrumbs to teleport home, but do it quickly.
 ~
-9 d 0 25 0
+10 d 0 25 0
 A
 2 10741
 R
 2 10742 1
+R
+2 10749 1
 W
 2 10741 0 1
 Z
@@ -242,12 +274,16 @@ Mary had a little lamb,
 His fleece was white as snow,
 And everwhere that Mary went,
 The lamb was sure to go.
+ 
+You can use your enchanted breadcrumbs to teleport home, but do it quickly.
 ~
-10 d 0 25 0
+11 d 0 25 0
 A
 2 10744
 R
 2 10743 1
+R
+2 10749 1
 W
 2 10744 0 1
 Z
@@ -266,12 +302,16 @@ There was an old woman who lived in a shoe.
 She had so many children, she didn't know what to do;
 So she gave them some broth without any bread;
 And she whipped them all soundly and sent them to bed.
+ 
+You can use your enchanted breadcrumbs to teleport home, but do it quickly.
 ~
-10 d 0 25 0
+11 d 0 25 0
 A
 2 10746
 R
 2 10747 1
+R
+2 10749 1
 W
 2 10746 0 1
 Z

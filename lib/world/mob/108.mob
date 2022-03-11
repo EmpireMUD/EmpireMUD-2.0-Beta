@@ -42,6 +42,10 @@ The museum crier is standing here.
 ~
 0 25 dv nD 3
 1 0 0 15
+D
+   Beyond his tear-stained face, you can see the crier has had a rough life. 
+This is probably his first paying job in a long time.
+~
 T 10825
 T 10827
 S
@@ -52,6 +56,10 @@ The curator is dusting the shelves.
 ~
 0 0 bdv nD 3
 1 0 0 15
+D
+   Horation is an aging man on a mission to bring history to the people. He
+just needs a few 'authentic' artifacts to get started.
+~
 M
 1
 Maybe I should hire some skeletons to stand around and chat with visitors.~
@@ -73,6 +81,9 @@ Curator Horation stands proudly next to the exhibit.
 ~
 0 0 bdv nD 3
 1 0 0 15
+D
+Horation is absolutely beaming at his little museum.
+~
 M
 1
 Maybe I should hire some skeletons to stand around and chat with visitors.~

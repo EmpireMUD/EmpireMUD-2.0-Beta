@@ -622,7 +622,7 @@ switch %difficulty%
     eval roll %random.100%
   break
 done
-%echo% %self% shifts as you hear growling from somewhere.
+%echo% ~%self% shifts as you hear growling from somewhere.
 wait 3
 if %roll% > 95
   set SpawnStr a few fledgling fur dragons approach

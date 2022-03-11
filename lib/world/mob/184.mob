@@ -3,7 +3,7 @@ beaver dire~
 a dire beaver~
 A dire beaver is building a huge dam here.
 ~
-25 75 djy cm 3
+25 75 djy cL 3
 0 0 0 9
 D
    Beavers are large, furry, semi-aquatic rodents, best known for chewing
@@ -23,6 +23,9 @@ The water is rising here.
 ~
 0 0 dh dklmn 0
 0 0 0 15
+D
+Only immortals should see this. This is the terraformer and beaver spawner.
+~
 T 18450
 T 18451
 S

@@ -45,8 +45,8 @@ A hestian trinket is sitting on the ground.~
    You can use the trinket to teleport home. Use the home command to set your
 home.
 ~
-3 0 a 0 2
-0 0 0
+3 0 a 0 4
+256 3600 0
 6 0
 C
 1 1
@@ -55,6 +55,7 @@ R
 R
 4 5610 0
 T 256
+T 9806
 S
 #257
 bricks pile~
@@ -147,8 +148,8 @@ a trinket of conveyance~
 A trinket of conveyance seems to have been dropped here.~
 You can use this trinket to teleport to a random starting location.
 ~
-3 0 a 0 2
-0 0 0
+3 0 a 0 4
+262 1800 0
 6 0
 C
 1 1
@@ -157,6 +158,7 @@ R
 R
 4 5610 0
 T 262
+T 9806
 S
 #263
 icon icons letheian~

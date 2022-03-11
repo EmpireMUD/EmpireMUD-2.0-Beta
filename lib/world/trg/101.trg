@@ -860,69 +860,40 @@ Saguaro treant must-fight~
 return 0
 ~
 #10150
-Free-tailed bat emotes~
-0 bw 10
+Free-tailed bat self-despawn~
+0 bw 3
 ~
 if (%self.disabled% || %self.fighting%)
   halt
 end
-switch %random.3%
-  case 1
-    %echo% ~%self% flits about overhead.
-  break
-  case 2
-    %echo% ~%self% snatches a moth out of the air.
-  break
-  case 3
-    %echo% ~%self% joins a swarm of bats overhead.
-    %purge% %self%
-  break
-done
+%echo% ~%self% joins a swarm of bats overhead.
+%purge% %self%
 ~
 #10151
-Gila monster emotes~
-0 bw 10
+Gila monster self-despawn~
+0 bw 3
 ~
 if (%self.disabled% || %self.fighting%)
   halt
 end
-switch %random.3%
-  case 1
-    %echo% ~%self% suns itself on the rocks.
-  break
-  case 2
-    %echo% ~%self% flicks its tongue in search of a scent.
-  break
-  case 3
-    %echo% ~%self% crawls into a burrow in the ground.
-    %purge% %self%
-  break
-done
+%echo% ~%self% crawls into a burrow in the ground.
+%purge% %self%
 ~
 #10152
-Armadillo emotes~
-0 bw 10
+Armadillo self-despawn~
+0 bw 3
 ~
 if (%self.disabled% || %self.fighting%)
   halt
 end
-switch %random.3%
-  case 1
-    %echo% ~%self% rolls up into a ball and rolls away from you.
-    %purge% %self%
-  break
-  case 2
-    %echo% ~%self% digs at the ground until it finds a tasty grub.
-  break
-  case 3
-    %echo% ~%self% scampers around in the dirt.
-  break
-done
+%echo% ~%self% rolls up into a ball and rolls away from you.
+%purge% %self%
 ~
 #10153
-Cactus wren emotes~
+Cactus wren emotes DEPRECATED~
 0 bw 10
 ~
+* DEPRECATED: these are now handled by custom mob screens
 if (%self.disabled% || %self.fighting%)
   halt
 end
@@ -939,9 +910,10 @@ switch %random.3%
 done
 ~
 #10154
-Antelope squirrel emotes~
+Antelope squirrel emotes DEPRECATED~
 0 bw 10
 ~
+* DEPRECATED: these are now just mob custom emotes
 if (%self.disabled% || %self.fighting%)
   halt
 end
@@ -958,29 +930,20 @@ switch %random.3%
 done
 ~
 #10155
-Bighorn sheep emotes~
-0 bw 10
+Bighorn sheep self-despawn~
+0 bw 3
 ~
 if (%self.disabled% || %self.fighting%)
   halt
 end
-switch %random.3%
-  case 1
-    %echo% ~%self% rubs its horns against a shrub.
-  break
-  case 2
-    %echo% ~%self% runs off after an interloping ram.
-    %purge% %self%
-  break
-  case 3
-    %echo% ~%self% chews thoughtfully on a stray branch from a shrub.
-  break
-done
+%echo% ~%self% runs off after an interloping ram.
+%purge% %self%
 ~
 #10156
-Coati emotes~
+Coati emotes DEPRECATED~
 0 bw 10
 ~
+* DEPRECATED: these are now mob custom emotes
 if (%self.disabled% || %self.fighting%)
   halt
 end
@@ -1030,9 +993,10 @@ end
 return 1
 ~
 #10159
-Teddybear cactus emotes~
+Teddybear cactus emoted DEPRECATED~
 0 btw 5
 ~
+* DEPRECATED: these are now mob custom strings
 if (%self.disabled% || %self.fighting%)
   halt
 end
