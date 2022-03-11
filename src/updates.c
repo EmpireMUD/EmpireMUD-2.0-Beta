@@ -2020,17 +2020,17 @@ obj_data *b5_130b_check_replace_obj(obj_data *obj) {
 			
 				// check scripts
 				found = FALSE;
-				if (!SCRIPT(obj)) {
-					create_script_data(obj, OBJ_TRIGGER);
+				if (!SCRIPT(new_obj)) {
+					create_script_data(new_obj, OBJ_TRIGGER);
 				}
-				LL_FOREACH(TRIGGERS(SCRIPT(obj)), trig) {
+				LL_FOREACH(TRIGGERS(SCRIPT(new_obj)), trig) {
 					if (GET_TRIG_VNUM(trig) == stop_trig) {
 						found = TRUE;
 					}
 				}
 				// add if needed
 				if (!found && (trig = read_trigger(stop_trig))) {
-					add_trigger(SCRIPT(obj), trig, -1);
+					add_trigger(SCRIPT(new_obj), trig, -1);
 				}
 				
 				// only need 1
