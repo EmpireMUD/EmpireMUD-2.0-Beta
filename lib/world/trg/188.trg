@@ -296,6 +296,74 @@ else
   %aoe% 50 magical
 end
 ~
+#18811
+risen guard combat~
+0 k 75
+~
+if %self.cooldown(18812)%
+  halt
+end
+eval atk %random.2%
+if %atk% == 1
+  switch %random.5%
+    case 1
+      set BodyPart left arm
+    break
+    case 2
+      set BodyPart right arm
+    break
+    case 3
+      set BodyPart left leg
+    break
+    case 4
+      set BodyPart right leg
+    break
+    case 5
+      set BodyPart cheek
+    break
+  done
+end
+switch %atk%
+  case 1
+    if %self.level% >= 125
+      set duration 90
+    elseif %self.level% >= 115
+      set duration 80
+    elseif %self.level% >= 105
+      set duration 70
+    elseif %self.level% >= 95
+      set duration 60
+    elseif %self.level% >= 85
+      set duration 50
+    elseif %self.level% >= 75
+      set duration 40
+    else
+      set duration 30
+    end
+    %echo% ~%self% lunges forward and bites ~%actor% on the %BodyPart%!
+    %damage% %actor% 90 physical
+    %dot% #18811 %actor% 30 %duration% poison 6
+  break
+  case 2
+    %echo% ~%self% zombie stomps ~%actor% in the chest!
+    if !%actor.disabled%
+      if %self.level% >= 125
+        set timer 20
+      elseif %self.level% >= 100
+        set timer 15
+      elseif %self.level% >= 75
+        set timer 10
+      else
+        set timer 5
+      end
+      dg_affect %actor% stunned on %timer%
+    else
+      %damage% %actor% 110 physical
+    end
+  break
+done
+nop %self.set_cooldown(18812, 30)%
+~
 #18818
 Learn Halloween Costumes~
 1 c 2
@@ -448,6 +516,9 @@ switch %questvnum%
   break
   case 18880
     %load% obj 18880 %actor% inv
+  break
+  case 18808
+    %load% obj 18848 %actor% inv
   break
 done
 ~
