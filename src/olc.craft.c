@@ -378,7 +378,7 @@ void olc_fullsearch_craft(char_data *ch, char *argument) {
 		FULLSEARCH_INT("quantitysover", quantity_over, 0, INT_MAX)
 		FULLSEARCH_INT("quantityunder", quantity_under, 0, INT_MAX)
 		FULLSEARCH_INT("level", only_level, 0, INT_MAX)
-		FULLSEARCH_INT("levelsover", level_over, 0, INT_MAX)
+		FULLSEARCH_INT("levelover", level_over, 0, INT_MAX)
 		FULLSEARCH_INT("levelunder", level_under, 0, INT_MAX)
 		FULLSEARCH_FLAGS("requiresfunction", only_functions, function_flags)
 		FULLSEARCH_BOOL("requiresobject", requires_obj)
