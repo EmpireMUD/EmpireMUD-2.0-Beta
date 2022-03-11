@@ -1986,92 +1986,115 @@ void b5_128_learned_update(void) {
 }
 
 
-// b5.130b: fix a small number of items that have scripts they need attached
-void b5_130b_item_refresh(void) {
-	obj_data *obj, *next_obj, *new;
-	struct empire_unique_storage *eus;
-	struct trading_post_data *tpd;
-	empire_data *emp, *next_emp;
+obj_data *b5_130b_check_replace_obj(obj_data *obj) {
+	obj_data *new_obj = NULL;
+	trig_data *trig;
+	bool found;
 	int iter;
 	
 	// any vnum in this list triggers a new copy
-	obj_vnum vnum_list[] = { 10710, 256, 262, 2926, 10730, 10732, 10734, 10735, 10737, 10739, 10741, 10744, 10746, -1 };
+	obj_vnum stop_list[] = { 10710, 256, 262, 10730, 10732, 10734, 10735, 10737, 10739, 10741, 10744, 10746, -1 };
+	obj_vnum potion_fix = 2926;
+	any_vnum stop_trig = 9806;
+	
+	if (GET_OBJ_VNUM(obj) == potion_fix) {
+		found = (SCRIPT(obj) ? FALSE : TRUE);
+		if (!SCRIPT(obj)) {
+			create_script_data(obj, OBJ_TRIGGER);
+		}
+		LL_FOREACH(TRIGGERS(SCRIPT(obj)), trig) {
+			if (GET_TRIG_VNUM(trig) == potion_fix) {
+				found = TRUE;
+			}
+		}
+		// add if needed
+		if (!found && (trig = read_trigger(potion_fix))) {
+			add_trigger(SCRIPT(obj), trig, -1);
+		}
+	}
+	else {
+		for (iter = 0; stop_list[iter] != -1; ++iter) {
+			if (GET_OBJ_VNUM(obj) == stop_list[iter]) {
+				// copy obj
+				new_obj = fresh_copy_obj(obj, GET_OBJ_CURRENT_SCALE_LEVEL(obj));
+			
+				// check scripts
+				found = (SCRIPT(obj) ? FALSE : TRUE);
+				if (!SCRIPT(obj)) {
+					create_script_data(obj, OBJ_TRIGGER);
+				}
+				LL_FOREACH(TRIGGERS(SCRIPT(obj)), trig) {
+					if (GET_TRIG_VNUM(trig) == stop_trig) {
+						found = TRUE;
+					}
+				}
+				// add if needed
+				if (!found && (trig = read_trigger(stop_trig))) {
+					add_trigger(SCRIPT(obj), trig, -1);
+				}
+				
+				// only need 1
+				break;
+			}
+		}
+	}
+	
+	return new_obj;	// if any
+}
+
+// b5.130b: fix a small number of items that have scripts they need attached
+void b5_130b_item_refresh(void) {
+	obj_data *obj, *next_obj, *new_obj;
+	struct empire_unique_storage *eus;
+	struct trading_post_data *tpd;
+	empire_data *emp, *next_emp;
 	
 	// part 1:	
 	log(" - refreshing the object list...");
 	DL_FOREACH_SAFE(object_list, obj, next_obj) {
-		for (iter = 0; vnum_list[iter] != -1; ++iter) {
-			if (GET_OBJ_VNUM(obj) == vnum_list[iter]) {
-				new = fresh_copy_obj(obj, GET_OBJ_CURRENT_SCALE_LEVEL(obj));
-				swap_obj_for_obj(obj, new);
-				extract_obj(obj);
-				break;
-			}
+		if ((new_obj = b5_130b_check_replace_obj(obj))) {
+			swap_obj_for_obj(obj, new_obj);
+			extract_obj(obj);
 		}
 	}
 	
 	log(" - refreshing warehouse objects...");
 	HASH_ITER(hh, empire_table, emp, next_emp) {
 		DL_FOREACH(EMPIRE_UNIQUE_STORAGE(emp), eus) {
-			if ((obj = eus->obj)) {
-				for (iter = 0; vnum_list[iter] != -1; ++iter) {
-					if (GET_OBJ_VNUM(obj) == vnum_list[iter]) {
-						new = fresh_copy_obj(obj, GET_OBJ_CURRENT_SCALE_LEVEL(obj));
-						eus->obj = new;
-						extract_obj(obj);
-						EMPIRE_NEEDS_STORAGE_SAVE(emp) = TRUE;
-						break;
-					}
-				}
+			if ((obj = eus->obj) && (new_obj = b5_130b_check_replace_obj(obj))) {
+				eus->obj = new_obj;
+				extract_obj(obj);
+				EMPIRE_NEEDS_STORAGE_SAVE(emp) = TRUE;
 			}
 		}
 	}
 	
 	log(" - refreshing trading post objects...");
 	DL_FOREACH(trading_list, tpd) {
-		if ((obj = tpd->obj)) {
-			for (iter = 0; vnum_list[iter] != -1; ++iter) {
-				if (GET_OBJ_VNUM(obj) == vnum_list[iter]) {
-					new = fresh_copy_obj(obj, GET_OBJ_CURRENT_SCALE_LEVEL(obj));
-					tpd->obj = new;
-					extract_obj(obj);
-					break;
-				}
-			}
+		if ((obj = tpd->obj) && (new_obj = b5_130b_check_replace_obj(obj))) {
+			tpd->obj = new_obj;
+			extract_obj(obj);
 		}
 	}
 }
 
 // b5.130b: fix a small number of items that have scripts they need attached
 PLAYER_UPDATE_FUNC(b5_130b_player_refresh) {
-	obj_data *obj, *next_obj, *new;
-	int iter, pos;
-	
-	// any vnum in this list triggers a new copy
-	obj_vnum vnum_list[] = { 10710, 256, 262, 2926, 10730, 10732, 10734, 10735, 10737, 10739, 10741, 10744, 10746, -1 };
+	obj_data *obj, *next_obj, *new_obj;
+	int pos;
 	
 	check_delayed_load(ch);
 	
 	for (pos = 0; pos < NUM_WEARS; ++pos) {
-		if ((obj = GET_EQ(ch, pos))) {
-			for (iter = 0; vnum_list[iter] != -1; ++iter) {
-				if (GET_OBJ_VNUM(obj) == vnum_list[iter]) {
-					new = fresh_copy_obj(obj, GET_OBJ_CURRENT_SCALE_LEVEL(obj));
-					swap_obj_for_obj(obj, new);
-					extract_obj(obj);
-					break;
-				}
-			}
+		if ((obj = GET_EQ(ch, pos)) && (new_obj = b5_130b_check_replace_obj(obj))) {
+			swap_obj_for_obj(obj, new_obj);
+			extract_obj(obj);
 		}
 	}
 	DL_FOREACH_SAFE2(ch->carrying, obj, next_obj, next_content) {
-		for (iter = 0; vnum_list[iter] != -1; ++iter) {
-			if (GET_OBJ_VNUM(obj) == vnum_list[iter]) {
-				new = fresh_copy_obj(obj, GET_OBJ_CURRENT_SCALE_LEVEL(obj));
-				swap_obj_for_obj(obj, new);
-				extract_obj(obj);
-				break;
-			}
+		if ((new_obj = b5_130b_check_replace_obj(obj))) {
+			swap_obj_for_obj(obj, new_obj);
+			extract_obj(obj);
 		}
 	}
 	
@@ -2135,7 +2158,7 @@ const struct {
 	{ "b5.120", b5_120_resave_world, NULL, "Resaving whole world to clear junk files" },
 	{ "b5.121", NULL, b5_121_update_players, "Adding default informative flags" },
 	{ "b5.128", b5_128_learned_update, NULL, "Updated learned crafts for trappers posts" },
-	// { "b5.130b", b5_130b_item_refresh, b5_130b_player_refresh, "Updated items that need script attachments" },
+	{ "b5.130b", b5_130b_item_refresh, b5_130b_player_refresh, "Updated items that need script attachments" },
 	
 	{ "\n", NULL, NULL, "\n" }	// must be last
 };
