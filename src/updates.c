@@ -2135,7 +2135,7 @@ const struct {
 	{ "b5.120", b5_120_resave_world, NULL, "Resaving whole world to clear junk files" },
 	{ "b5.121", NULL, b5_121_update_players, "Adding default informative flags" },
 	{ "b5.128", b5_128_learned_update, NULL, "Updated learned crafts for trappers posts" },
-	{ "b5.130b", b5_130b_item_refresh, b5_130b_player_refresh, "Updated items that need script attachments" },
+	// { "b5.130b", b5_130b_item_refresh, b5_130b_player_refresh, "Updated items that need script attachments" },
 	
 	{ "\n", NULL, NULL, "\n" }	// must be last
 };
