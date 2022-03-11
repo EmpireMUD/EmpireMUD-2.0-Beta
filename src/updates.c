@@ -1998,7 +1998,7 @@ obj_data *b5_130b_check_replace_obj(obj_data *obj) {
 	any_vnum stop_trig = 9806;
 	
 	if (GET_OBJ_VNUM(obj) == potion_fix) {
-		found = (SCRIPT(obj) ? FALSE : TRUE);
+		found = FALSE;
 		if (!SCRIPT(obj)) {
 			create_script_data(obj, OBJ_TRIGGER);
 		}
@@ -2019,7 +2019,7 @@ obj_data *b5_130b_check_replace_obj(obj_data *obj) {
 				new_obj = fresh_copy_obj(obj, GET_OBJ_CURRENT_SCALE_LEVEL(obj));
 			
 				// check scripts
-				found = (SCRIPT(obj) ? FALSE : TRUE);
+				found = FALSE;
 				if (!SCRIPT(obj)) {
 					create_script_data(obj, OBJ_TRIGGER);
 				}
@@ -2097,7 +2097,6 @@ PLAYER_UPDATE_FUNC(b5_130b_player_refresh) {
 			extract_obj(obj);
 		}
 	}
-	
 }
 
 
