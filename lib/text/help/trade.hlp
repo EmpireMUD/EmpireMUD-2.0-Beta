@@ -239,6 +239,8 @@ You can cook:
   sausage link (to-hit)                  blueberry jam (mana)
   road biscuit (block)                   coffee
   candied apple                          mushroom plate (resist-magical)
+  gruel                                  rice
+  pickled vegetables
 
 You can bake:
   bread (move-regen)                     
@@ -251,7 +253,8 @@ You can bake:
   casserole (inventory)                  roast meat
   oat cake (bonus-healing)
 
-There are also more recipes to find.
+Raw meat, fish, poultry, and pork can be cooked by themselves but will not
+provide a food buff. There are also more recipes to find in the world.
 
 See also: COOKING FIRE, FAMILY RECIPES, GOURMET CHEF, CRAFTING LEVEL, MILL,
    BAKERY, RESOURCES, KEEP, RECIPES, COOK INFO, RECIPES
