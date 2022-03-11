@@ -285,7 +285,7 @@ Fur Dragon: greet and slaughter and start progress~
 ~
 set room %self.room%
 * attempt to kill an npc if it qualifies
-if %actor.is_npc% && !%actor.leader% && %self.can_see(%actor%)%
+if %actor.is_npc% && !%actor.leader% && %self.can_see(%actor%)% && !%actor.mob_flagged(HARD)% && !%actor.mob_flagged(GROUP)% && %actor.level% < 100
   %echo% ~%self% crouches low and tries to hide...
   * short wait (store id to prevent errors)
   set id %actor.id%
@@ -294,6 +294,7 @@ if %actor.is_npc% && !%actor.leader% && %self.can_see(%actor%)%
   if %actor.room% == %room% && %actor.id% == %id%
     %echoaround% %actor% ~%self% pounces on ~%actor%, biting hard into ^%actor% neck, killing *%person%!
     %send% %actor% ~%self% pounces out of nowhere and the last thing you feel is its jaws closing around your neck!
+    nop %actor.add_mob_flag(!LOOT)%
     %slay% %actor%
   end
 end
@@ -734,7 +735,7 @@ set FurScratching 1
 remote FurScratching %actor.id%
 ~
 #12321
-buff the baby fur dragon~
+Fur Dragon Combat: Buff the baby fur dragon~
 0 b 30
 ~
 if !%self.fighting%
@@ -829,7 +830,7 @@ eval count %count% * 5
 dg_affect #12319 %self% BONUS-PHYSICAL %count% -1
 ~
 #12322
-fur dragon pounce~
+Fur Dragon Combat: pounce~
 0 l 40
 ~
 if %self.cooldown(12322)%
