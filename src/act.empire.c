@@ -4511,7 +4511,7 @@ ACMD(do_empires) {
 }
 
 
-// do_einventory (search hint)
+// do_einventory, do_eidentify (search hints)
 ACMD(do_empire_inventory) {
 	char error[MAX_STRING_LENGTH], arg2[MAX_INPUT_LENGTH];
 	empire_data *emp;

@@ -90,7 +90,7 @@ A zombie horse is standing here, skin still falling off it.
 ~
 30 60 dejo G 4
 0 0 14 11
-I 3 10510 100.00 1 X  # BARDE: a zombie charger
+I 3 10510 100.00 1 X  # BARDE: zombie charger
 S
 #10510
 charger zombie armored~
@@ -99,10 +99,10 @@ An armored zombie charger is decomposing valiantly here.
 ~
 40 80 bdej G 4
 0 0 0 11
-I 4 175 100.00 4  # LOOT: an iron ingot
-I 4 175 75.00 2  # LOOT: an iron ingot
-I 4 175 50.00 2  # LOOT: an iron ingot
-I 4 175 50.00 2  # LOOT: an iron ingot
+I 4 175 100.00 4  # LOOT: iron ingot
+I 4 175 75.00 2  # LOOT: iron ingot
+I 4 175 50.00 2  # LOOT: iron ingot
+I 4 175 50.00 2  # LOOT: iron ingot
 S
 #10511
 cat skeletal~
@@ -159,22 +159,22 @@ Aquilo, the Polar Baron, hovers above the snow on a frosty updraft.
 ~
 0 0 bdvxyzABE cm 3
 1 0 2 20
-I 4 10570 100.00 1  # LOOT: a chance of boss loot
+I 4 10570 100.00 1  # LOOT: chance of boss loot
 I 4 10579 14.28 1 L  # LOOT: cold echoes of the future
-I 4 10584 14.29 1 L  # LOOT: the metaimperium amulet of the Permafrost
-I 4 10589 14.28 1 L  # LOOT: the polar bear shield
+I 4 10584 14.29 1 L  # LOOT: metaimperium amulet of the Permafrost
+I 4 10589 14.28 1 L  # LOOT: polar bear shield
 I 4 10580 14.28 1 L  # LOOT: whispers of icy cataclysm
-I 4 10585 14.29 1 L  # LOOT: the frozen heart of the Permafrost
-I 4 10590 14.28 1 L  # LOOT: an intricately runed walrus tusk
+I 4 10585 14.29 1 L  # LOOT: frozen heart of the Permafrost
+I 4 10590 14.28 1 L  # LOOT: intricately runed walrus tusk
 I 4 10583 14.30 1 L  # LOOT: hoarfrost earplates
 I 4 10581 14.28 1 M  # LOOT: dangling baubles of the eternal sun
-I 4 10586 14.29 1 M  # LOOT: the celestial locket of the Permafrost
-I 4 10591 14.28 1 M  # LOOT: a frozen adder stone
+I 4 10586 14.29 1 M  # LOOT: celestial locket of the Permafrost
+I 4 10591 14.28 1 M  # LOOT: frozen adder stone
 I 4 10582 14.28 1 M  # LOOT: frost flower ear cuffs
-I 4 10587 14.29 1 M  # LOOT: the empyrean pearls of the Permafrost
-I 4 10592 14.28 1 M  # LOOT: the Tome of the Polar Baron
-I 4 10588 14.30 1 M  # LOOT: the aegis charm of the Permafrost
-I 12 10598 100.00 1  # PICKPOCKET: a frozen gemstone
+I 4 10587 14.29 1 M  # LOOT: empyrean pearls of the Permafrost
+I 4 10592 14.28 1 M  # LOOT: Tome of the Polar Baron
+I 4 10588 14.30 1 M  # LOOT: aegis charm of the Permafrost
+I 12 10598 100.00 1  # PICKPOCKET: frozen gemstone
 M
 1
 The frost will be your doooooooom!~
@@ -194,22 +194,22 @@ Cryomancer #n, apprentice to the Polar Baron, glares at you from atop a frozen c
 ~
 0 0 bdvxyE c 3
 0 3 0 20
-I 4 10570 100.00 1  # LOOT: a chance of boss loot
+I 4 10570 100.00 1  # LOOT: chance of boss loot
 I 4 10579 7.15 1 L  # LOOT: cold echoes of the future
 I 4 10580 7.14 1 L  # LOOT: whispers of icy cataclysm
 I 4 10581 7.14 1 L  # LOOT: dangling baubles of the eternal sun
 I 4 10582 7.14 1 L  # LOOT: frost flower ear cuffs
 I 4 10583 7.14 1 L  # LOOT: hoarfrost earplates
-I 4 10584 7.14 1 L  # LOOT: the metaimperium amulet of the Permafrost
-I 4 10585 7.15 1 L  # LOOT: the frozen heart of the Permafrost
-I 4 10586 7.14 1 L  # LOOT: the celestial locket of the Permafrost
-I 4 10587 7.14 1 L  # LOOT: the empyrean pearls of the Permafrost
-I 4 10588 7.15 1 L  # LOOT: the aegis charm of the Permafrost
-I 4 10589 7.14 1 L  # LOOT: the polar bear shield
-I 4 10590 7.14 1 L  # LOOT: an intricately runed walrus tusk
-I 4 10591 7.15 1 L  # LOOT: a frozen adder stone
-I 4 10592 7.14 1 L  # LOOT: the Tome of the Polar Baron
-I 12 10598 100.00 1  # PICKPOCKET: a frozen gemstone
+I 4 10584 7.14 1 L  # LOOT: metaimperium amulet of the Permafrost
+I 4 10585 7.15 1 L  # LOOT: frozen heart of the Permafrost
+I 4 10586 7.14 1 L  # LOOT: celestial locket of the Permafrost
+I 4 10587 7.14 1 L  # LOOT: empyrean pearls of the Permafrost
+I 4 10588 7.15 1 L  # LOOT: aegis charm of the Permafrost
+I 4 10589 7.14 1 L  # LOOT: polar bear shield
+I 4 10590 7.14 1 L  # LOOT: intricately runed walrus tusk
+I 4 10591 7.15 1 L  # LOOT: frozen adder stone
+I 4 10592 7.14 1 L  # LOOT: Tome of the Polar Baron
+I 12 10598 100.00 1  # PICKPOCKET: frozen gemstone
 M
 1
 Aquilo said you'd come.~
@@ -227,22 +227,22 @@ Rime Mage #n glowers at you from behind a cold violet fire.
 ~
 0 0 bdvxyE c 3
 0 3 0 20
-I 4 10570 100.00 1  # LOOT: a chance of boss loot
+I 4 10570 100.00 1  # LOOT: chance of boss loot
 I 4 10579 7.15 1 L  # LOOT: cold echoes of the future
 I 4 10580 7.14 1 L  # LOOT: whispers of icy cataclysm
 I 4 10581 7.14 1 L  # LOOT: dangling baubles of the eternal sun
 I 4 10582 7.14 1 L  # LOOT: frost flower ear cuffs
 I 4 10583 7.14 1 L  # LOOT: hoarfrost earplates
-I 4 10584 7.14 1 L  # LOOT: the metaimperium amulet of the Permafrost
-I 4 10585 7.15 1 L  # LOOT: the frozen heart of the Permafrost
-I 4 10586 7.14 1 L  # LOOT: the celestial locket of the Permafrost
-I 4 10587 7.14 1 L  # LOOT: the empyrean pearls of the Permafrost
-I 4 10588 7.15 1 L  # LOOT: the aegis charm of the Permafrost
-I 4 10589 7.14 1 L  # LOOT: the polar bear shield
-I 4 10590 7.14 1 L  # LOOT: an intricately runed walrus tusk
-I 4 10591 7.15 1 L  # LOOT: a frozen adder stone
-I 4 10592 7.14 1 L  # LOOT: the Tome of the Polar Baron
-I 12 10598 100.00 1  # PICKPOCKET: a frozen gemstone
+I 4 10584 7.14 1 L  # LOOT: metaimperium amulet of the Permafrost
+I 4 10585 7.15 1 L  # LOOT: frozen heart of the Permafrost
+I 4 10586 7.14 1 L  # LOOT: celestial locket of the Permafrost
+I 4 10587 7.14 1 L  # LOOT: empyrean pearls of the Permafrost
+I 4 10588 7.15 1 L  # LOOT: aegis charm of the Permafrost
+I 4 10589 7.14 1 L  # LOOT: polar bear shield
+I 4 10590 7.14 1 L  # LOOT: intricately runed walrus tusk
+I 4 10591 7.15 1 L  # LOOT: frozen adder stone
+I 4 10592 7.14 1 L  # LOOT: Tome of the Polar Baron
+I 12 10598 100.00 1  # PICKPOCKET: frozen gemstone
 M
 1
 The elements will be your undoing!~
@@ -260,7 +260,7 @@ A rabid caribou charges at you, spraying frozen foam from its mouth!
 ~
 0 0 bdj 0 4
 0 0 0 27
-I 0 10596 100.00 1  # BUTCHER: a fillet of frozen meat
+I 0 10596 100.00 1  # BUTCHER: fillet of frozen meat
 T 10558
 T 10553
 S
@@ -271,7 +271,7 @@ An enchanted orca surprises you from above!
 ~
 0 0 bdj m 5
 0 0 2 9
-I 0 10596 100.00 1  # BUTCHER: a fillet of frozen meat
+I 0 10596 100.00 1  # BUTCHER: fillet of frozen meat
 T 10558
 T 10553
 S
@@ -282,7 +282,7 @@ A pack of vicious ermines surprises you from tunnels in the snow!
 ~
 0 0 bdj 0 2
 0 0 0 9
-I 0 10596 100.00 1  # BUTCHER: a fillet of frozen meat
+I 0 10596 100.00 1  # BUTCHER: fillet of frozen meat
 T 10558
 T 10553
 S
@@ -293,8 +293,8 @@ A snowshoe hare darts away from you.
 ~
 1 5 djo 0 1
 0 0 15 9
-I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
-I 1 1350 100.00 1  # SKIN: a small skin
+I 0 3012 100.00 1  # BUTCHER: fillet of raw meat
+I 1 1350 100.00 1  # SKIN: small skin
 M
 0
 $n sees you and darts away!~
@@ -309,9 +309,9 @@ A white arctic wolf hunches low and bares its fangs.
 ~
 20 40 djo c 3
 0 0 0 10
-I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
-I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
-I 1 1351 100.00 1  # SKIN: a large skin
+I 0 3012 100.00 1  # BUTCHER: fillet of raw meat
+I 0 3012 100.00 1  # BUTCHER: fillet of raw meat
+I 1 1351 100.00 1  # SKIN: large skin
 M
 0
 $n looks directly at you, opens $s mouth to show $s fangs, and growls deep in $s chest as $s hackles stand on end...~
@@ -326,7 +326,7 @@ An arctic tern swoops low in the sky.
 ~
 5 15 djoz m 1
 0 0 2 9
-I 0 3200 100.00 1  # BUTCHER: a cut of poultry
+I 0 3200 100.00 1  # BUTCHER: cut of poultry
 S
 #10559
 freezer river~
@@ -335,6 +335,10 @@ The river freezer is here.
 ~
 0 0 dh dklmn 3
 0 0 0 15
+D
+   Only immortals should see this. This is the mob that changes rivers and
+lakes into frozen rivers and lakes.
+~
 T 10559
 T 10560
 S

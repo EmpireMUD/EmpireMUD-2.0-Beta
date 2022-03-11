@@ -403,17 +403,20 @@ int GET_MAX_BLOOD(char_data *ch);	// this one is different than the other max po
 #define CAN_GET_OBJ(ch, obj)  (CAN_WEAR((obj), ITEM_WEAR_TAKE) && CAN_CARRY_OBJ((ch),(obj)) && CAN_SEE_OBJ((ch),(obj)))
 #define CAN_RECOGNIZE(ch, vict)  (PRF_FLAGGED(ch, PRF_HOLYLIGHT) || (!AFF_FLAGGED(vict, AFF_NO_SEE_IN_ROOM) && ((GET_LOYALTY(ch) && GET_LOYALTY(ch) == GET_LOYALTY(vict)) || (GROUP(ch) && in_same_group(ch, vict)) || (!CHAR_MORPH_FLAGGED((vict), MORPHF_ANIMAL) && !IS_DISGUISED(vict)))))
 #define CAN_RIDE_FLYING_MOUNT(ch)  (has_player_tech((ch), PTECH_RIDING_FLYING))
+#define CAN_RIDE_MOUNT(ch, mob)  (MOB_FLAGGED((mob), MOB_MOUNTABLE) && (!AFF_FLAGGED((mob), AFF_FLY) || CAN_RIDE_FLYING_MOUNT(ch)) && (!AFF_FLAGGED((mob), AFF_WATERWALK) || CAN_RIDE_WATERWALK_MOUNT(ch)))
+#define CAN_RIDE_WATERWALK_MOUNT(ch)  (has_player_tech((ch), PTECH_RIDING_UPGRADE))
 #define CAN_SEE_IN_MAGIC_DARKNESS(ch)  (IS_NPC(ch) ? (get_approximate_level(ch) > 100) : (PRF_FLAGGED((ch), PRF_HOLYLIGHT) || has_ability((ch), ABIL_DARKNESS)))
 #define CAN_SPEND_BLOOD(ch)  (!AFF_FLAGGED(ch, AFF_CANT_SPEND_BLOOD))
 #define CAST_BY_ID(ch)  (IS_NPC(ch) ? (-1 * GET_MOB_VNUM(ch)) : GET_IDNUM(ch))
 #define EFFECTIVELY_FLYING(ch)  (IS_RIDING(ch) ? MOUNT_FLAGGED(ch, MOUNT_FLYING) : AFF_FLAGGED(ch, AFF_FLY))
-#define EFFECTIVELY_SWIMMING(ch)  (EFFECTIVELY_FLYING(ch) || (IS_RIDING(ch) && (MOUNT_FLAGGED((ch), MOUNT_AQUATIC) || has_player_tech((ch), PTECH_RIDING_UPGRADE))) || (IS_NPC(ch) ? MOB_FLAGGED((ch), MOB_AQUATIC) : has_player_tech((ch), PTECH_SWIMMING)))
+#define EFFECTIVELY_SWIMMING(ch)  (EFFECTIVELY_FLYING(ch) || HAS_WATERWALK(ch) || (IS_RIDING(ch) && (MOUNT_FLAGGED((ch), MOUNT_AQUATIC) || has_player_tech((ch), PTECH_RIDING_UPGRADE))) || (IS_NPC(ch) ? MOB_FLAGGED((ch), MOB_AQUATIC) : has_player_tech((ch), PTECH_SWIMMING)))
 #define FREE_TO_CARRY(obj)  (IS_COINS(obj) || GET_OBJ_REQUIRES_QUEST(obj) != NOTHING)
 #define HAS_INFRA(ch)  AFF_FLAGGED(ch, AFF_INFRAVISION)
+#define HAS_WATERWALK(ch)  (AFF_FLAGGED((ch), AFF_WATERWALK) || MOUNT_FLAGGED((ch), MOUNT_WATERWALK))
 #define IS_HUMAN(ch)  (!IS_VAMPIRE(ch))
 #define IS_MAGE(ch)  (IS_NPC(ch) ? MOB_FLAGGED((ch), MOB_CASTER) : (has_skill_flagged((ch), SKILLF_CASTER) > 0))
 #define IS_OUTDOORS(ch)  IS_OUTDOOR_TILE(IN_ROOM(ch))
-#define IS_SWIMMING(ch)  (WATER_SECT(IN_ROOM(ch)) && !GET_SITTING_ON(ch) && !IS_RIDING(ch) && !EFFECTIVELY_FLYING(ch))
+#define IS_SWIMMING(ch)  (WATER_SECT(IN_ROOM(ch)) && !GET_SITTING_ON(ch) && !IS_RIDING(ch) && !EFFECTIVELY_FLYING(ch) && !HAS_WATERWALK(ch))
 #define IS_VAMPIRE(ch)  (IS_NPC(ch) ? MOB_FLAGGED((ch), MOB_VAMPIRE) : (has_skill_flagged((ch), SKILLF_VAMPIRE) > 0))
 #define NOT_MELEE_RANGE(ch, vict)  ((FIGHTING(ch) && FIGHT_MODE(ch) != FMODE_MELEE) || (FIGHTING(vict) && FIGHT_MODE(vict) != FMODE_MELEE))
 #define WOULD_EXECUTE(ch, vict)  (MOB_FLAGGED((vict), MOB_HARD | MOB_GROUP) || (IS_NPC(ch) ? ((GET_LEADER(ch) && !IS_NPC(GET_LEADER(ch))) ? PRF_FLAGGED(GET_LEADER(ch), PRF_AUTOKILL) : (!MOB_FLAGGED((ch), MOB_ANIMAL) || MOB_FLAGGED((ch), MOB_AGGRESSIVE | MOB_HARD | MOB_GROUP))) : PRF_FLAGGED((ch), PRF_AUTOKILL)))
@@ -1966,6 +1969,7 @@ void get_player_skill_string(char_data *ch, char *buffer, bool abbrev);
 void list_char_to_char(char_data *list, char_data *ch);
 void list_obj_to_char(obj_data *list, char_data *ch, int mode, int show);
 void list_vehicles_to_char(vehicle_data *list, char_data *ch);
+char *obj_color_by_quality(obj_data *obj, char_data *ch);
 char *obj_desc_for_char(obj_data *obj, char_data *ch, int mode);
 struct custom_message *pick_custom_longdesc(char_data *ch);
 void show_character_affects(char_data *ch, char_data *to);

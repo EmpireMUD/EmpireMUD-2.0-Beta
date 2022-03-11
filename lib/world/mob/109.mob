@@ -162,7 +162,7 @@ dragon muck viscous vicious~
 a viscous muck dragon~
 A viscous muck dragon coils through the water.
 ~
-225 325 dghuB chmoBCD 6
+225 325 dghuB choBCDL 6
 0 0 5 27
 D
    You can only see the fins and head of the dragon as it moves through the
@@ -209,7 +209,7 @@ elemental muck little~
 a muck elemental~
 A little elemental is rolling around in a puddle of muck.
 ~
-1 1 bdoD mn 1
+1 1 bdoD nL 1
 0 0 2 5
 D
 This little ball of muck is playing in its own mess.
@@ -371,6 +371,10 @@ Portents of the giant linger in the air.
 ~
 100 175 bd kln 3
 0 0 0 15
+D
+   Only immortals should see this. This is the spawner for the giants in the
+wandering giant adventure.
+~
 T 10966
 S
 #10971
@@ -405,6 +409,10 @@ Portents of doom linger in the air.
 ~
 100 175 bd kln 3
 0 0 0 15
+D
+   Only immortals should see this. It spawns the renegade casters for the
+adventure by the same name.
+~
 T 10980
 S
 #10981

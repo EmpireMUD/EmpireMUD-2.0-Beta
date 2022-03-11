@@ -5551,13 +5551,22 @@ void add_mount(char_data *ch, mob_vnum vnum, bitvector_t flags) {
 */
 bitvector_t get_mount_flags_by_mob(char_data *mob) {
 	bitvector_t flags = NOBITS;
+	char_data *proto = mob_proto(GET_MOB_VNUM(mob));
+	
+	if (!proto) {
+		// somehow? just fall back
+		proto = mob;
+	}
 	
 	// MOUNT_x: detect mount flags
-	if (AFF_FLAGGED(mob, AFF_FLY)) {
+	if (AFF_FLAGGED(proto, AFF_FLY)) {
 		SET_BIT(flags, MOUNT_FLYING);
 	}
-	if (MOB_FLAGGED(mob, MOB_AQUATIC)) {
+	if (MOB_FLAGGED(proto, MOB_AQUATIC)) {
 		SET_BIT(flags, MOUNT_AQUATIC);
+	}
+	if (AFF_FLAGGED(proto, AFF_WATERWALK)) {
+		SET_BIT(flags, MOUNT_WATERWALK);
 	}
 	
 	return flags;

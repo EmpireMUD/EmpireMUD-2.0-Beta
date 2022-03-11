@@ -649,6 +649,7 @@ const char *mount_flags[] = {
 	"riding",
 	"aquatic",
 	"flying",
+	"waterwalk",
 	"\n"
 };
 
@@ -1255,6 +1256,7 @@ const char *affected_bits[] = {
 	"HARD-STUNNED",
 	"IMMUNE-DAMAGE",	// 35
 	"!WHERE",
+	"WATERWALK",
 	"\n"
 };
 
@@ -1297,6 +1299,7 @@ const char *affected_bits_consider[] = {
 	"",	// hard-stunned
 	"",	// 35 - immune-damage
 	"",	// !where
+	"",	// waterwalk
 	"\n"
 };
 
@@ -1338,6 +1341,7 @@ const bool aff_is_bad[] = {
 	TRUE,
 	FALSE,	// hard-stunned (not 'bad' because it's uncleansable)
 	FALSE,	// 35 - immune-damage
+	FALSE,
 	FALSE,
 };
 
@@ -2544,7 +2548,7 @@ const double obj_flag_scaling_bonus[] = {
 	1.1,	// OBJ_UNIQUE
 	1.0,	// OBJ_PLANTABLE
 	1.0,	// OBJ_LIGHT
-	1.6,	// OBJ_SUPERIOR
+	1.73,	// OBJ_SUPERIOR
 	1.0,	// OBJ_LARGE
 	1.0,	// OBJ_CREATED
 	1.0,	// OBJ_SINGLE_USE
@@ -2555,8 +2559,8 @@ const double obj_flag_scaling_bonus[] = {
 	1.0,	// OBJ_CREATABLE
 	1.0,	// OBJ_SCALABLE
 	1.5,	// OBJ_TWO_HANDED
-	1.3333,	// OBJ_BIND_ON_EQUIP
-	1.5,	// OBJ_BIND_ON_PICKUP
+	1.3,	// OBJ_BIND_ON_EQUIP
+	1.4,	// OBJ_BIND_ON_PICKUP
 	1.0,	// unused
 	1.0,	// OBJ_UNCOLLECTED_LOOT
 	1.0,	// OBJ_KEEP
@@ -2564,7 +2568,7 @@ const double obj_flag_scaling_bonus[] = {
 	1.0,	// unused
 	1.0,	// OBJ_NO_AUTOSTORE
 	1.2,	// OBJ_HARD_DROP
-	1.4,	// OBJ_GROUP_DROP
+	1.3333,	// OBJ_GROUP_DROP
 	1.0,	// OBJ_GENERIC_DROP
 	1.0,	// OBJ_NO_STORE
 	1.0,	// OBJ_SEEDED

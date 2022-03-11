@@ -1042,7 +1042,7 @@ void list_one_char(char_data *i, char_data *ch, int num) {
 		}
 	if (!IS_NPC(i) && GET_ACTION(i) == ACT_MORPHING)
 		act("...$e is undergoing a hideous transformation!", FALSE, i, 0, ch, TO_VICT);
-	if ((IS_MORPHED(i) || IS_DISGUISED(i)) && (PRF_FLAGGED(ch, PRF_HOLYLIGHT) || CAN_RECOGNIZE(ch, i)) && !CHAR_MORPH_FLAGGED(i, MORPHF_HIDE_REAL_NAME)) {
+	if ((IS_MORPHED(i) || IS_DISGUISED(i)) && CAN_RECOGNIZE(ch, i) && !CHAR_MORPH_FLAGGED(i, MORPHF_HIDE_REAL_NAME)) {
 		act("...this appears to be $o.", FALSE, i, 0, ch, TO_VICT);
 	}
 	
@@ -1237,7 +1237,7 @@ void look_at_char(char_data *i, char_data *ch, bool show_eq) {
 		}
 	}
 	
-	if (IS_NPC(i) && !disguise && MOB_FLAGGED(i, MOB_MOUNTABLE) && has_player_tech(ch, PTECH_RIDING) && (!AFF_FLAGGED(i, AFF_FLY) || CAN_RIDE_FLYING_MOUNT(ch))) {
+	if (IS_NPC(i) && !disguise && MOB_FLAGGED(i, MOB_MOUNTABLE) && CAN_RIDE_MOUNT(ch, i)) {
 		act("You can ride on $M.", FALSE, ch, NULL, i, TO_CHAR);
 	}
 	

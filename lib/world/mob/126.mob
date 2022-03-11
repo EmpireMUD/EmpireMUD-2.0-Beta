@@ -5,8 +5,12 @@ A sorcerer's apprentice stands in front of the rift (adventure).
 ~
 0 25 bdv cn 3
 1 0 0 15
-I 12 12600 100.00 4  # PICKPOCKET: an elemental binding trap
-I 12 12616 10.00 1  # PICKPOCKET: a tiny broom whistle
+D
+   The apprentice looks rather comical in his oversized blue robe, hat, and
+ears. He seems a little panicked that his spells have gone wrong.
+~
+I 12 12600 100.00 4  # PICKPOCKET: elemental binding trap
+I 12 12616 10.00 1  # PICKPOCKET: tiny broom whistle
 M
 1
 The sorcerer won't like this.~
@@ -42,8 +46,11 @@ A rocky earth elemental rises from the soil.
 ~
 0 25 dh cG 2
 0 0 21 14
-I 4 12601 100.00 1  # LOOT: the essence of earth
-I 4 12612 10.00 1  # LOOT: a rolling rock whistle
+D
+This ball of rocks rolls and roils as if it's alive!
+~
+I 4 12601 100.00 1  # LOOT: essence of earth
+I 4 12612 10.00 1  # LOOT: rolling rock whistle
 M
 0
 $n makes crunching noises as it moves.~
@@ -68,8 +75,11 @@ A fire elemental burns brightly!
 ~
 0 25 dh cG 2
 0 0 18 33
-I 4 12602 100.00 1  # LOOT: the essence of fire
-I 4 12613 10.00 1  # LOOT: a ball of fire whistle
+D
+Like a flame without a wick, this elemental burns brightly but all-too-briefly.
+~
+I 4 12602 100.00 1  # LOOT: essence of fire
+I 4 12613 10.00 1  # LOOT: ball of fire whistle
 M
 0
 Embers trail behind $n.~
@@ -93,8 +103,11 @@ A wind elemental rips across the land like a tornado!
 ~
 0 25 dh cG 2
 0 0 27 21
-I 4 12603 100.00 1  # LOOT: the essence of wind
-I 4 12614 10.00 1  # LOOT: a light breeze whistle
+D
+It looks like a little cone of dirt and debris.
+~
+I 4 12603 100.00 1  # LOOT: essence of wind
+I 4 12614 10.00 1  # LOOT: light breeze whistle
 M
 0
 $n whirls around you!~
@@ -115,8 +128,12 @@ A water elemental splashes about.
 ~
 0 25 dh cG 2
 0 0 10 20
-I 4 12604 100.00 1  # LOOT: the essence of water
-I 4 12615 10.00 1  # LOOT: a little puddle whistle
+D
+   When it rests, it just looks like a puddle. But when it's playing, it's
+somewhere between an otter and a tsunami.
+~
+I 4 12604 100.00 1  # LOOT: essence of water
+I 4 12615 10.00 1  # LOOT: little puddle whistle
 M
 0
 $n splashes about gleefully.~
@@ -135,6 +152,9 @@ An ember is floating here.
 ~
 1 1 bdhnoD G 0
 0 0 27 33
+D
+It's just a little glint of fire caught on the air.
+~
 T 12608
 S
 #12612
@@ -144,6 +164,10 @@ A little rock rolls around on the ground.
 ~
 1 1 bdoD n 2
 0 0 21 15
+D
+   It's just a regular old cobble. If it didn't roll on its own, you'd hardly
+realize it's an elemental.
+~
 M
 0
 The little rock rolls around at your feet.~
@@ -157,6 +181,10 @@ A little ball of fire rolls around in the air.
 ~
 1 1 bdoD n 1
 0 0 21 15
+D
+   It twists and turns in the air, always on the verge of burning out but never
+quite fading.
+~
 M
 0
 The ball of fire sputters and sparks.~
@@ -170,6 +198,9 @@ A light breeze whistles through your hair.
 ~
 1 1 bdoD n 0
 0 0 29 15
+D
+Well... how can you look at a breeze?
+~
 M
 0
 A light breeze blows peacefully around your head.~
@@ -183,6 +214,9 @@ A little puddle splashes around on the ground.
 ~
 1 1 bdoD n 1
 0 0 10 15
+D
+The puddle is splashing around in itself.
+~
 M
 0
 The little puddle splashes itself around.~
@@ -196,6 +230,9 @@ A tiny broom marches in circles.
 ~
 1 1 bdoD n 2
 0 0 35 15
+D
+The broom just looks happy to be here.
+~
 M
 0
 The tiny broom splits into two smaller brooms, but the second one runs off.~
@@ -215,9 +252,9 @@ face and hands. The face is bestial almost to the point of being inhuman, and
 the hands are unusually hairy.
 ~
 I 4 12654 5.00 1  # LOOT: wild fire
-I 12 12684 5.00 1 p  # PICKPOCKET: a golden seedling
-I 12 12686 20.00 1 p  # PICKPOCKET: some sugar cubes
-I 12 12685 75.00 1 p  # PICKPOCKET: the pocket lint of the Magiterranean
+I 12 12684 5.00 1 p  # PICKPOCKET: golden seedling
+I 12 12686 20.00 1 p  # PICKPOCKET: sugar cubes
+I 12 12685 75.00 1 p  # PICKPOCKET: pocket lint of the Magiterranean
 T 12651
 T 12650
 T 12662
@@ -235,9 +272,9 @@ face and hands. The face is bestial almost to the point of being inhuman, and
 the hands are unusually hairy.
 ~
 I 4 12654 5.00 1  # LOOT: wild fire
-I 12 12684 5.00 1 p  # PICKPOCKET: a golden seedling
-I 12 12686 20.00 1 p  # PICKPOCKET: some sugar cubes
-I 12 12685 75.00 1 p  # PICKPOCKET: the pocket lint of the Magiterranean
+I 12 12684 5.00 1 p  # PICKPOCKET: golden seedling
+I 12 12686 20.00 1 p  # PICKPOCKET: sugar cubes
+I 12 12685 75.00 1 p  # PICKPOCKET: pocket lint of the Magiterranean
 T 12650
 T 12660
 T 12651
@@ -255,9 +292,9 @@ that protrude from the druid's forehead. Whatever this druid is, she's not
 entirely human.
 ~
 I 4 12654 5.00 1  # LOOT: wild fire
-I 12 12684 5.00 1 p  # PICKPOCKET: a golden seedling
-I 12 12686 20.00 1 p  # PICKPOCKET: some sugar cubes
-I 12 12685 75.00 1 p  # PICKPOCKET: the pocket lint of the Magiterranean
+I 12 12684 5.00 1 p  # PICKPOCKET: golden seedling
+I 12 12686 20.00 1 p  # PICKPOCKET: sugar cubes
+I 12 12685 75.00 1 p  # PICKPOCKET: pocket lint of the Magiterranean
 T 12650
 T 12651
 T 12659
@@ -275,9 +312,9 @@ behavior is odd -- he's crouched down, scraping at the dirt with his hands like
 a gopher.
 ~
 I 4 12654 5.00 1  # LOOT: wild fire
-I 12 12684 5.00 1 p  # PICKPOCKET: a golden seedling
-I 12 12686 20.00 1 p  # PICKPOCKET: some sugar cubes
-I 12 12685 75.00 1 p  # PICKPOCKET: the pocket lint of the Magiterranean
+I 12 12684 5.00 1 p  # PICKPOCKET: golden seedling
+I 12 12686 20.00 1 p  # PICKPOCKET: sugar cubes
+I 12 12685 75.00 1 p  # PICKPOCKET: pocket lint of the Magiterranean
 T 12650
 T 12651
 T 12660
@@ -294,9 +331,9 @@ D
 this half-man, half-badger creature.
 ~
 I 4 12654 5.00 1  # LOOT: wild fire
-I 12 12684 5.00 1 p  # PICKPOCKET: a golden seedling
-I 12 12686 20.00 1 p  # PICKPOCKET: some sugar cubes
-I 12 12685 75.00 1 p  # PICKPOCKET: the pocket lint of the Magiterranean
+I 12 12684 5.00 1 p  # PICKPOCKET: golden seedling
+I 12 12686 20.00 1 p  # PICKPOCKET: sugar cubes
+I 12 12685 75.00 1 p  # PICKPOCKET: pocket lint of the Magiterranean
 M
 0
 $n digs around at the soil.~
@@ -323,9 +360,9 @@ D
 silver, which seem to pulse as she channels mana from the earth.
 ~
 I 4 12654 5.00 1  # LOOT: wild fire
-I 12 12684 5.00 1 p  # PICKPOCKET: a golden seedling
-I 12 12686 20.00 1 p  # PICKPOCKET: some sugar cubes
-I 12 12685 75.00 1 p  # PICKPOCKET: the pocket lint of the Magiterranean
+I 12 12684 5.00 1 p  # PICKPOCKET: golden seedling
+I 12 12686 20.00 1 p  # PICKPOCKET: sugar cubes
+I 12 12685 75.00 1 p  # PICKPOCKET: pocket lint of the Magiterranean
 M
 1
 Our ambitions cannot be contained by these trees!~
@@ -354,9 +391,9 @@ She's crouched on a narrow branch with such agility that even the breeze
 doesn't cost her her footing.
 ~
 I 4 12654 5.00 1  # LOOT: wild fire
-I 12 12684 5.00 1 p  # PICKPOCKET: a golden seedling
-I 12 12686 20.00 1 p  # PICKPOCKET: some sugar cubes
-I 12 12685 75.00 1 p  # PICKPOCKET: the pocket lint of the Magiterranean
+I 12 12684 5.00 1 p  # PICKPOCKET: golden seedling
+I 12 12686 20.00 1 p  # PICKPOCKET: sugar cubes
+I 12 12685 75.00 1 p  # PICKPOCKET: pocket lint of the Magiterranean
 M
 0
 $n caws at you.~
@@ -384,9 +421,9 @@ the rest of this grove. He isn't doing much. In fact, he seems content just to
 wallow in the water.
 ~
 I 4 12654 5.00 1  # LOOT: wild fire
-I 12 12684 5.00 1 p  # PICKPOCKET: a golden seedling
-I 12 12686 20.00 1 p  # PICKPOCKET: some sugar cubes
-I 12 12685 75.00 1 p  # PICKPOCKET: the pocket lint of the Magiterranean
+I 12 12684 5.00 1 p  # PICKPOCKET: golden seedling
+I 12 12686 20.00 1 p  # PICKPOCKET: sugar cubes
+I 12 12685 75.00 1 p  # PICKPOCKET: pocket lint of the Magiterranean
 M
 0
 $n lets out a few bubbles.~
@@ -414,8 +451,8 @@ D
 the canopy of trees. Long spines protrude from its black fur, and only its
 gleaming white teeth give away its demeanor.
 ~
-I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
-I 1 1350 100.00 1  # SKIN: a small skin
+I 0 3012 100.00 1  # BUTCHER: fillet of raw meat
+I 1 1350 100.00 1  # SKIN: small skin
 I 4 12654 5.00 1  # LOOT: wild fire
 T 12656
 T 12658
@@ -433,8 +470,8 @@ D
 encountered earlier, except that it seems to be able to swim without coming up
 to the surface for air.
 ~
-I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
-I 1 1350 100.00 1  # SKIN: a small skin
+I 0 3012 100.00 1  # BUTCHER: fillet of raw meat
+I 1 1350 100.00 1  # SKIN: small skin
 I 4 12654 5.00 1  # LOOT: wild fire
 T 12656
 T 12658
@@ -452,8 +489,8 @@ D
 the canopy of trees. Long spines protrude from its black fur, and only its
 gleaming white teeth give away its demeanor.
 ~
-I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
-I 1 1350 100.00 1  # SKIN: a small skin
+I 0 3012 100.00 1  # BUTCHER: fillet of raw meat
+I 1 1350 100.00 1  # SKIN: small skin
 I 4 12654 5.00 1  # LOOT: wild fire
 T 12656
 T 12658
@@ -469,8 +506,8 @@ A spiny black wildling is crawling down the tree.
 D
 This strange little black creature doesn't look particularly friendly.
 ~
-I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
-I 1 1350 100.00 1  # SKIN: a small skin
+I 0 3012 100.00 1  # BUTCHER: fillet of raw meat
+I 1 1350 100.00 1  # SKIN: small skin
 I 4 12654 5.00 1  # LOOT: wild fire
 T 12656
 T 12658
@@ -489,9 +526,9 @@ face and hands. The face is bestial almost to the point of being inhuman, and
 the hands are unusually hairy.
 ~
 I 4 12654 5.00 1  # LOOT: wild fire
-I 12 12684 5.00 1 p  # PICKPOCKET: a golden seedling
-I 12 12686 20.00 1 p  # PICKPOCKET: some sugar cubes
-I 12 12685 75.00 1 p  # PICKPOCKET: the pocket lint of the Magiterranean
+I 12 12684 5.00 1 p  # PICKPOCKET: golden seedling
+I 12 12686 20.00 1 p  # PICKPOCKET: sugar cubes
+I 12 12685 75.00 1 p  # PICKPOCKET: pocket lint of the Magiterranean
 T 12650
 T 12651
 T 12683
@@ -537,9 +574,9 @@ D
    This huge black furry creature is hard to identify, but it appears tame
 enough that you might be able to ride it.
 ~
-I 3 12670 100.00 1  # BARDE: an armored wildling
+I 3 12670 100.00 1  # BARDE: armored wildling
 I 4 12654 25.00 1  # LOOT: wild fire
-I 4 12669 100.00 1  # LOOT: a wildling whistle
+I 4 12669 100.00 1  # LOOT: wildling whistle
 S
 #12670
 wildling armored~
@@ -566,7 +603,7 @@ D
 and failed. Long, spiky black fur protrudes from what's left of the druid's
 tattered robe. It doesn't look friendly, but it hasn't moved to attack you yet.
 ~
-I 4 1107 10.00 1  # LOOT: a wooden staff
+I 4 1107 10.00 1  # LOOT: wooden staff
 M
 0
 $n scrambles up onto the top of the henge, then back down.~

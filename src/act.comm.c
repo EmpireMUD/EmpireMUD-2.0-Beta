@@ -556,7 +556,7 @@ ACMD(do_pub_comm) {
 							
 							// send message
 							if (CAN_SEE_NO_DARK(desc->character, ch)) {
-								if ((IS_MORPHED(ch) || IS_DISGUISED(ch)) && (IS_IMMORTAL(desc->character) || CAN_RECOGNIZE(desc->character, ch))) {
+								if ((IS_MORPHED(ch) || IS_DISGUISED(ch)) && CAN_RECOGNIZE(desc->character, ch)) {
 									act(recog, FALSE, ch, NULL, desc->character, TO_VICT | TO_SLEEP | TO_NODARK);
 								}
 								else {
@@ -1852,7 +1852,7 @@ ACMD(do_say) {
 			color = (!IS_NPC(c) && GET_CUSTOM_COLOR(c, ctype)) ? GET_CUSTOM_COLOR(c, ctype) : '0';
 			msg_to_char(c, "\t%c", color);
 			
-			if ((IS_MORPHED(ch) || IS_DISGUISED(ch)) && (IS_IMMORTAL(c) || CAN_RECOGNIZE(c, ch))) {
+			if ((IS_MORPHED(ch) || IS_DISGUISED(ch)) && CAN_RECOGNIZE(c, ch)) {
 				sprintf(buf, recog, color);
 			}
 			else {

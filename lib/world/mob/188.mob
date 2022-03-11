@@ -73,6 +73,16 @@ T 18803
 T 18804
 T 18805
 S
+#18803
+guard cityguard risen~
+a risen city guard~
+A risen city guard hunts for intruders.
+~
+75 125 dhqtuvA cG 3
+0 0 13 10
+T 251
+T 18811
+S
 #18805
 lantern attack-o-lantern~
 the attack-o-lantern~
@@ -349,6 +359,12 @@ A massive demon of nether origin roars at you!
 ~
 400 400 bdgyzABDF choqABCDEK 5
 0 0 0 15
+D
+   What are you doing looking at this thing? You should be trying to run, or
+preparing to die! It is massive, far too large to fit through the portal you
+just came through. Unfortunately, its coloring blends in with everything else
+in this nether land.
+~
 M
 1
 You never should have come here. Now you will never leave here.~
@@ -413,6 +429,19 @@ M
 $n shudders as $s muscles lock up.~
 T 18873
 T 18876
+S
+#18875
+t-rex zombie~
+a zombie t-rex~
+A dragon sized zombie stomps about.
+~
+1 100 dehk c 4
+2 0 26 9
+D
+   This former queen of the primeval world has a rough pebbled hide, colored
+similar to a jaguar's pelt. Solid muscle ripples under the desiccated flesh as
+she moves about.
+~
 S
 #18876
 pig~
@@ -523,7 +552,7 @@ A zombie terrier is chasing its tail.
 1 1 bdoD n 1
 0 0 0 9
 D
-   This poor, adorable soul has been stitched back together an reanimated by
+   This poor, adorable soul has been stitched back together and reanimated by
 some unknown necromancy. In life, it was an exuberant loyal terrier. In death,
 little has changed.
 ~
@@ -689,7 +718,7 @@ M
 The hair on the back of your neck stands up.~
 M
 0
-You head the sound of marble shattering from the hall.~
+You hear the sound of marble shattering from the hall.~
 M
 0
 A book flies in from the doorway and shelves itself.~
@@ -786,7 +815,7 @@ M
 A book flies by the doorway on its way to the library.~
 M
 0
-You head the sound of marble shattering from the hall.~
+You hear the sound of marble shattering from the hall.~
 M
 0
 You stumble as the floor tilts.~

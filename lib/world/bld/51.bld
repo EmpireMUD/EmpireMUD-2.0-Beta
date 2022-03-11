@@ -4,6 +4,8 @@ A Small Hut~
 .&0()&?.~
 4 0 pR 0
 0 1 0 -1
+C
+sleep~
 D
    You are standing inside a small hut. The walls and ceiling are constructed
 from branches of various sizes and are held together loosely by many smaller
@@ -25,6 +27,8 @@ A Log Cabin~
 &0(--)~
 8 0 pR em
 0 2 0 -1
+C
+sleep~
 D
    You are huddled inside a cozy log cabin. It is made of large, stripped
 trees from the forest and seems much stronger than the smaller huts found
@@ -63,6 +67,8 @@ A Mud Hut~
 .&0()&?.~
 4 0 pR 0
 0 1 0 -1
+C
+sleep~
 D
    The walls flake around; this hut has a feeling of instability. It is made
 of mud and rocks and designed to withstand heavy desert heat. It can't be

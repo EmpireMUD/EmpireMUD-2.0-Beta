@@ -5,9 +5,9 @@ A giant roc raises her wings in a threatening pose.
 ~
 100 125 bcdjyA cmE 5
 2 0 2 26
-I 0 3200 100.00 8  # BUTCHER: a cut of poultry
-I 0 11002 25.00 1 b  # BUTCHER: a giant lobster
-I 0 11003 25.00 1 b  # BUTCHER: a dolphin carcass
+I 0 3200 100.00 8  # BUTCHER: cut of poultry
+I 0 11002 25.00 1 b  # BUTCHER: giant lobster
+I 0 11003 25.00 1 b  # BUTCHER: dolphin carcass
 T 11024
 T 11002
 S
@@ -27,9 +27,9 @@ A giant roc swoops low toward you!
 ~
 100 125 cdjuyA cmE 5
 2 0 2 26
-I 0 3200 100.00 8  # BUTCHER: a cut of poultry
-I 0 11002 25.00 1 b  # BUTCHER: a giant lobster
-I 0 11003 25.00 1 b  # BUTCHER: a dolphin carcass
+I 0 3200 100.00 8  # BUTCHER: cut of poultry
+I 0 11002 25.00 1 b  # BUTCHER: giant lobster
+I 0 11003 25.00 1 b  # BUTCHER: dolphin carcass
 T 11002
 T 11020
 S
@@ -75,6 +75,10 @@ The invisible carcass spawner exists here.
 ~
 0 0 dhk cdln 3
 0 0 29 15
+D
+   Only immortals should see this. It loads the carcasses, which are hints for
+the players that a roc nest is nearby.
+~
 T 11010
 T 11011
 S

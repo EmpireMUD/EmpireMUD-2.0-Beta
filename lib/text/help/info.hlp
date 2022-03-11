@@ -1615,6 +1615,16 @@ people.
 See also: BOARD, CUSTOMIZE, DESIGNATE, DISEMBARK, DRAG, DRIVE, HARNESS,
 LAND VEHICLES, LEAD, LIGHT, REPAIR, SCRAP, SHIPS, SIT
 #
+WATERWALK "WATER WALK" "WATER WALKING" "WALK ON WATER" "WALKING ON WATER"
+
+The WATERWALK effect allows you to walk normally on water. You will not drown
+or lose movement points from swimming.
+
+Normal land mounts do not benefit from WATERWALK on the player -- you still
+need the correct mount ability to cross water while mounted.
+
+See also: DROWNING
+#
 WHEREAMI "WHERE AM I"
 
 Usage:  whereami

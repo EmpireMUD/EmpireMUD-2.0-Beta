@@ -1489,7 +1489,7 @@ OLC_MODULE(shopedit_items) {
 	}	// end 'move'
 	else {
 		msg_to_char(ch, "Usage: item add <vnum> <cost> <currency vnum | coins> [min reputation]\r\n");
-		msg_to_char(ch, "Usage: item change <number> vnum <value>\r\n");
+		msg_to_char(ch, "Usage: item change <number> <vnum | cost | currency | reputation> <value>\r\n");
 		msg_to_char(ch, "Usage: item move <number> <up | down>\r\n");
 		msg_to_char(ch, "Usage: item copy <from type> <from vnum>\r\n");
 		msg_to_char(ch, "Usage: item remove <number | all>\r\n");

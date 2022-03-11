@@ -1276,6 +1276,16 @@ obj_data *die(char_data *ch, char_data *killer) {
 		killleader = GET_LEADER(killleader);
 	}
 	
+	// ensure scaling
+	if (IS_NPC(ch) && GET_CURRENT_SCALE_LEVEL(ch) == 0) {
+		if (killer && killer != ch) {
+			scale_mob_for_character(ch, killer);
+		}
+		else {
+			scale_mob_to_level(ch, GET_MIN_SCALE_LEVEL(ch));
+		}
+	}
+	
 	// remove all DoTs (BEFORE phoenix)
 	while (ch->over_time_effects) {
 		dot_remove(ch, ch->over_time_effects);

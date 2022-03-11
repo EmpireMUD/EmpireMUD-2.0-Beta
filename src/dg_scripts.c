@@ -3737,6 +3737,9 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					else if (!str_cmp(field, "is_immortal")) {
 						snprintf(str, slen, "%d", IS_IMMORTAL(c) ? 1 : 0);
 					}
+					else if (!str_cmp(field, "is_waterwalking")) {
+						snprintf(str, slen, HAS_WATERWALK(c) ? "1" : "0");
+					}
 
 					else if (!str_cmp(field, "int") || !str_cmp(field, "intelligence")) {
 						snprintf(str, slen, "%d", GET_INTELLIGENCE(c));

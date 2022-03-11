@@ -5,7 +5,7 @@ An enormous clockwork colossus towers over you (adventure).
 ~
 100 200 dkuyzAB cG 6
 0 0 26 14
-I 4 12551 100.00 1  # LOOT: the clockwork loot controller
+I 4 12551 100.00 1  # LOOT: clockwork loot controller
 T 12516
 T 12500
 T 12517
@@ -25,7 +25,7 @@ A miniature clockwork colossus stomps toward you!
 ~
 100 200 dkuyz cG 3
 0 0 26 5
-I 4 12551 100.00 1  # LOOT: the clockwork loot controller
+I 4 12551 100.00 1  # LOOT: clockwork loot controller
 T 12518
 T 12520
 T 12521
@@ -45,8 +45,8 @@ A clockwork spider walks slowly down the colossus.
 ~
 100 200 bdj GK 4
 0 0 0 21
-I 0 12507 100.00 1  # BUTCHER: a piece of brass scrap metal
-I 4 12507 100.00 1  # LOOT: a piece of brass scrap metal
+I 0 12507 100.00 1  # BUTCHER: piece of brass scrap metal
+I 4 12507 100.00 1  # LOOT: piece of brass scrap metal
 T 12513
 S
 #12503
@@ -56,9 +56,9 @@ A magpie is stealing bits of wire from the colossus.
 ~
 100 200 bdj cmK 1
 0 0 2 26
-I 0 3200 100.00 1  # BUTCHER: a cut of poultry
-I 4 12506 75.00 1 x  # LOOT: some salvaged copper wire
-I 4 12506 25.00 2 x  # LOOT: some salvaged copper wire
+I 0 3200 100.00 1  # BUTCHER: cut of poultry
+I 4 12506 75.00 1 x  # LOOT: salvaged copper wire
+I 4 12506 25.00 2 x  # LOOT: salvaged copper wire
 T 12513
 S
 #12504
@@ -105,6 +105,10 @@ Eye lasers are being fired at here.
 ~
 0 0 bd clnK 0
 0 0 0 15
+D
+   Only immortals should see this. This mob is how the colossus fires lasers at
+players randomly.
+~
 T 12503
 T 12502
 T 12525
@@ -129,7 +133,7 @@ The left arm sways as the colossus moves.
 ~
 0 0 dhy cGK 5
 0 0 0 14
-I 4 12503 100.00 1  # LOOT: the destroyed left arm
+I 4 12503 100.00 1  # LOOT: destroyed left arm
 T 12528
 T 12529
 T 12531
@@ -141,7 +145,7 @@ The right arm sways as the colossus moves.
 ~
 0 0 dhy cGK 5
 0 0 0 5
-I 4 12502 100.00 1  # LOOT: the crippled right arm
+I 4 12502 100.00 1  # LOOT: crippled right arm
 T 12528
 T 12529
 T 12531

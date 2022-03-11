@@ -462,7 +462,7 @@ void identify_obj_to_char(obj_data *obj, char_data *ch) {
 	}
 	
 	// basic info
-	snprintf(lbuf, sizeof(lbuf), "Your analysis of $p%s reveals:", location);
+	snprintf(lbuf, sizeof(lbuf), "Your analysis of %s$p\t0%s reveals:", obj_color_by_quality(obj, ch), location);
 	act(lbuf, FALSE, ch, obj, NULL, TO_CHAR);
 	
 	if (GET_OBJ_REQUIRES_QUEST(obj) != NOTHING) {

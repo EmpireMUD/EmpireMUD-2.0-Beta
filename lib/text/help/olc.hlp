@@ -1790,6 +1790,7 @@ The following affect flags are available:
  HARD-STUNNED - A stun that cannot be cleansed and does not trigger immunity.
  IMMUNE-DAMAGE - Cannot take damage -- do not use this on items.
  !WHERE - Cannot be found using the 'where' command.
+ WATERWALK - Does not need to swim and doesn't drown.
 #d
 ARCHEDIT "OLC ARCHETYPES" "ARCHETYPE OLC" "ARCHETYPE EDITOR"
 
@@ -2282,7 +2283,7 @@ Available flags:
  LONG-AUTOSTORE - autostore takes 72 hours instead of 3 here
  HIGH-DEPLETION - has more resources than a normal tile
  !DELETE - will not be deleted for not having a homeroom
- NEED-BOAT - requires a boat, flying, or swimming to enter
+ NEED-BOAT - requires a boat, flying, waterwalk, or swimming to enter
  LOOK-OUT - can see the map using "look out"
  2ND-TERRITORY - counts as territory off the map (e.g. in a ship)
  UPGRADED - modifies other building types like SHIPYARD
@@ -4984,7 +4985,7 @@ Examples:
 
 See also: MORPHEDIT LONG DESCRIPTION, OLC MORPHS
 #d
-"MOUNT WHISTLE" WHISTLE "MOUNT REWARD"
+"MOUNT WHISTLE" WHISTLE "MOUNT REWARD" "BUILDING MOUNTS" "MOUNTS"
 
 Mount whistles (or other similar items) are used to reward players with mounts
 using the loot drop table of an NPC. Players seem to prefer receiving their
@@ -4996,8 +4997,16 @@ kill it without realizing what it is. Another problem is that if the player
 leads a mount out of the adventure, the mount may despawn when the adventure
 despawns.
 
-To create a mount whistle, attach script 10263 (Mount whistle use) to an
-object, and set the object's <value0> field to the vnum of the mount.
+To create a mount whistle, attach script 9910 (Summon mob / Mount whistle) to
+an object, and set the object's <value0> field to the vnum of the mount. This
+is a 'use' command trigger that summons the mob.
+
+Types of mounts:
+  FLY affect: Flying mount; requires the Riding-Flying ptech.
+  WATERWALK affect: Can ride on water just like land; requires Riding-Upgrade.
+  AQUATIC mob flag: Aquatic mount; can only ride on water tiles.
+
+See also: PTECH
 #d
 NOBITS "NO BITS"
 
@@ -6927,7 +6936,7 @@ The following room template flags are available:
  LIGHT - Never requires a light.
  !MOB - Mobs will not wander into the room (they may still be spawned there).
  PEACEFUL - No combat allowed.
- NEED-BOAT - Requires a boat, swimming, or fly.
+ NEED-BOAT - Requires a boat, swimming, waterwalk, or fly.
  !TELEPORT - Cannot teleport in or out.
  LOOK-OUT - can see the map using "look out"
  !LOCATION - no location shown; disables "where"
@@ -7380,7 +7389,7 @@ See also: OLC SHOPS, OLC REMOVEINDEV
 #d
 "SHOPEDIT ITEMS"
 Usage: .item add <vnum> <cost> <currency vnum | coins> [min reputation]
-       .item change <number> vnum <value>
+       .item change <number> <vnum | cost | currency | reputation> <value>
        .item move <number> <up | down>
        .item copy <from type> <from vnum>
        .item remove <number | all>
@@ -7389,13 +7398,13 @@ The shop's item list determines what it sells. Shops have an infinite number
 of each item, and do not run out. Shopkeepers do not receive the coins or
 currency that are paid to them; this is always lost.
 
-The parameters for add/copy are:
+The parameters for add/change are:
 - vnum: The object vnum to sell.
 - cost: The number of coins/currency.
 - currency: Either the word 'coins' or the vnum of a generic currency. Coins
   will always be miscellaneous coins unless the shop's mob/room belong to an
   empire, in which case it will be empire coins.
-- min reputation: If the shop has allegiance to a faction, this is the lowest
+- reputation: If the shop has allegiance to a faction, this is the lowest
   reputation that can buy the item (optional).
 
 See also: SHOPEDIT ALLEGIANCE, OLC SHOPS, GENERIC CURRENCY, VNUM

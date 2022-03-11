@@ -6129,9 +6129,9 @@ void do_stat_craft(char_data *ch, craft_data *craft) {
 		msg_to_char(ch, "Creates Quantity: [&g%d&0], Item: [&c%d&0] %s\r\n", GET_CRAFT_QUANTITY(craft), GET_CRAFT_OBJECT(craft), get_obj_name_by_proto(GET_CRAFT_OBJECT(craft)));
 	}
 	
-	sprintf(buf, "%s", (GET_CRAFT_ABILITY(craft) == NO_ABIL ? "none" : get_ability_name_by_vnum(GET_CRAFT_ABILITY(craft))));
+	sprintf(buf, "[%d] %s", GET_CRAFT_ABILITY(craft), (GET_CRAFT_ABILITY(craft) == NO_ABIL ? "none" : get_ability_name_by_vnum(GET_CRAFT_ABILITY(craft))));
 	if ((abil = find_ability_by_vnum(GET_CRAFT_ABILITY(craft))) && ABIL_ASSIGNED_SKILL(abil) != NULL) {
-		sprintf(buf + strlen(buf), " (%s %d)", SKILL_NAME(ABIL_ASSIGNED_SKILL(abil)), ABIL_SKILL_LEVEL(abil));
+		sprintf(buf + strlen(buf), " ([%d] %s %d)", SKILL_VNUM(ABIL_ASSIGNED_SKILL(abil)), SKILL_NAME(ABIL_ASSIGNED_SKILL(abil)), ABIL_SKILL_LEVEL(abil));
 	}
 	msg_to_char(ch, "Ability: &y%s&0, Level: &g%d&0", buf, GET_CRAFT_MIN_LEVEL(craft));
 	

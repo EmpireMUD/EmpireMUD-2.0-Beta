@@ -5,11 +5,11 @@ An old hag is rocking slowly in her chair.
 ~
 0 0 bdgvxA c 3
 2 0 0 15
-I 4 10100 5.00 1 X  # LOOT: the hag's pestle
-I 4 10101 5.00 1 X  # LOOT: the hag's stench
-I 4 10102 5.00 1 X  # LOOT: the hag's stench
-I 4 10103 5.00 1 X  # LOOT: the hag's stench
-I 4 10104 5.00 1 X  # LOOT: a fistful of firebird feathers
+I 4 10100 5.00 1 X  # LOOT: hag's pestle
+I 4 10101 5.00 1 X  # LOOT: hag's stench
+I 4 10102 5.00 1 X  # LOOT: hag's stench
+I 4 10103 5.00 1 X  # LOOT: hag's stench
+I 4 10104 5.00 1 X  # LOOT: fistful of firebird feathers
 M
 0
 $n rocks in $s chair.~
@@ -41,8 +41,8 @@ Berk is crouched by the fire, whittling some wood.
 ~
 100 200 abdvzB 0 3
 1 0 0 4
-I 4 10109 10.00 1 X  # LOOT: the bloodletter's ring
-I 4 10107 5.00 1 X  # LOOT: a pack of dry rations
+I 4 10109 10.00 1 X  # LOOT: bloodletter's ring
+I 4 10107 5.00 1 X  # LOOT: pack of dry rations
 T 10000
 T 10105
 S
@@ -54,7 +54,7 @@ Jorr is cooking a pot of beans over the fire.
 100 200 abdvxzB 0 3
 2 0 0 12
 I 4 10105 10.00 1 X  # LOOT: black leather armor
-I 4 10107 5.00 1 X  # LOOT: a pack of dry rations
+I 4 10107 5.00 1 X  # LOOT: pack of dry rations
 T 10000
 T 10106
 S
@@ -65,8 +65,8 @@ Tranc is strapping on his armor.
 ~
 100 200 abdvyB 0 3
 1 0 0 5
-I 4 10106 10.00 1 X  # LOOT: a spiked aklys
-I 4 10108 5.00 1 X  # LOOT: an armored neck guard
+I 4 10106 10.00 1 X  # LOOT: spiked aklys
+I 4 10108 5.00 1 X  # LOOT: armored neck guard
 T 10000
 T 10107
 S
@@ -86,19 +86,19 @@ A thief is hunched in the corner.
 ~
 0 0 abdv D 3
 1 0 0 4
-I 4 10114 10.00 1 a  # LOOT: a talismanic shiv
-I 4 10118 10.00 1 a  # LOOT: a makeshift wand
-I 4 10119 10.00 1 a  # LOOT: an old morning star
-I 4 10111 7.00 1 a  # LOOT: a charming necklace
-I 4 10112 7.00 1 a  # LOOT: some wooden beads
-I 4 10113 7.00 1 a  # LOOT: a shifter's chain
-I 4 10117 7.00 1 a  # LOOT: a spidersilk choker
+I 4 10114 10.00 1 a  # LOOT: talismanic shiv
+I 4 10118 10.00 1 a  # LOOT: makeshift wand
+I 4 10119 10.00 1 a  # LOOT: old morning star
+I 4 10111 7.00 1 a  # LOOT: charming necklace
+I 4 10112 7.00 1 a  # LOOT: wooden beads
+I 4 10113 7.00 1 a  # LOOT: shifter's chain
+I 4 10117 7.00 1 a  # LOOT: spidersilk choker
 I 4 10120 7.00 1 a  # LOOT: roguish pants
 I 4 10121 7.00 1 a  # LOOT: darkfiber pants
 I 4 10122 7.00 1 a  # LOOT: shadowcraft pants
-I 4 10123 7.00 1 a  # LOOT: a brawler's wristcuff
-I 4 10124 7.00 1 a  # LOOT: a freethinker's wristcuff
-I 4 10125 7.00 1 a  # LOOT: an adulterer's wristcuff
+I 4 10123 7.00 1 a  # LOOT: brawler's wristcuff
+I 4 10124 7.00 1 a  # LOOT: freethinker's wristcuff
+I 4 10125 7.00 1 a  # LOOT: adulterer's wristcuff
 T 10113
 T 10111
 T 10000
@@ -110,19 +110,19 @@ A thief is warming her hands by the fire.
 ~
 0 0 abdv D 3
 2 0 0 4
-I 4 10114 10.00 1 a  # LOOT: a talismanic shiv
-I 4 10118 10.00 1 a  # LOOT: a makeshift wand
-I 4 10119 10.00 1 a  # LOOT: an old morning star
-I 4 10111 7.00 1 a  # LOOT: a charming necklace
-I 4 10112 7.00 1 a  # LOOT: some wooden beads
-I 4 10113 7.00 1 a  # LOOT: a shifter's chain
-I 4 10117 7.00 1 a  # LOOT: a spidersilk choker
+I 4 10114 10.00 1 a  # LOOT: talismanic shiv
+I 4 10118 10.00 1 a  # LOOT: makeshift wand
+I 4 10119 10.00 1 a  # LOOT: old morning star
+I 4 10111 7.00 1 a  # LOOT: charming necklace
+I 4 10112 7.00 1 a  # LOOT: wooden beads
+I 4 10113 7.00 1 a  # LOOT: shifter's chain
+I 4 10117 7.00 1 a  # LOOT: spidersilk choker
 I 4 10120 7.00 1 a  # LOOT: roguish pants
 I 4 10121 7.00 1 a  # LOOT: darkfiber pants
 I 4 10122 7.00 1 a  # LOOT: shadowcraft pants
-I 4 10123 7.00 1 a  # LOOT: a brawler's wristcuff
-I 4 10124 7.00 1 a  # LOOT: a freethinker's wristcuff
-I 4 10125 7.00 1 a  # LOOT: an adulterer's wristcuff
+I 4 10123 7.00 1 a  # LOOT: brawler's wristcuff
+I 4 10124 7.00 1 a  # LOOT: freethinker's wristcuff
+I 4 10125 7.00 1 a  # LOOT: adulterer's wristcuff
 T 10113
 T 10112
 T 10000
@@ -134,19 +134,19 @@ A thief is leaning against the wall.
 ~
 0 0 abdv D 3
 2 0 0 4
-I 4 10114 5.00 1 a  # LOOT: a talismanic shiv
-I 4 10118 5.00 1 a  # LOOT: a makeshift wand
-I 4 10119 5.00 1 a  # LOOT: an old morning star
-I 4 10111 3.00 1 a  # LOOT: a charming necklace
-I 4 10112 3.50 1 a  # LOOT: some wooden beads
-I 4 10113 3.50 1 a  # LOOT: a shifter's chain
-I 4 10117 3.50 1 a  # LOOT: a spidersilk choker
+I 4 10114 5.00 1 a  # LOOT: talismanic shiv
+I 4 10118 5.00 1 a  # LOOT: makeshift wand
+I 4 10119 5.00 1 a  # LOOT: old morning star
+I 4 10111 3.00 1 a  # LOOT: charming necklace
+I 4 10112 3.50 1 a  # LOOT: wooden beads
+I 4 10113 3.50 1 a  # LOOT: shifter's chain
+I 4 10117 3.50 1 a  # LOOT: spidersilk choker
 I 4 10120 3.50 1 a  # LOOT: roguish pants
 I 4 10121 3.50 1 a  # LOOT: darkfiber pants
 I 4 10122 3.50 1 a  # LOOT: shadowcraft pants
-I 4 10123 3.50 1 a  # LOOT: a brawler's wristcuff
-I 4 10124 3.50 1 a  # LOOT: a freethinker's wristcuff
-I 4 10125 3.50 1 a  # LOOT: an adulterer's wristcuff
+I 4 10123 3.50 1 a  # LOOT: brawler's wristcuff
+I 4 10124 3.50 1 a  # LOOT: freethinker's wristcuff
+I 4 10125 3.50 1 a  # LOOT: adulterer's wristcuff
 T 10113
 T 10000
 S
@@ -157,8 +157,8 @@ A baby dragon has hatched!
 ~
 0 0 bdy c 3
 0 0 2 9
-I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
-I 1 10006 100.00 1  # SKIN: a dragon scale
+I 0 3012 100.00 1  # BUTCHER: fillet of raw meat
+I 1 10006 100.00 1  # SKIN: dragon scale
 T 10024
 T 10114
 S
@@ -169,20 +169,20 @@ A thief is hunched in the corner.
 ~
 0 0 abdv D 3
 1 0 0 4
-I 4 10126 100.00 1  # LOOT: a tenebrous aura
-I 4 10114 10.00 1 a  # LOOT: a talismanic shiv
-I 4 10118 10.00 1 a  # LOOT: a makeshift wand
-I 4 10119 10.00 1 a  # LOOT: an old morning star
-I 4 10111 7.00 1 a  # LOOT: a charming necklace
-I 4 10112 7.00 1 a  # LOOT: some wooden beads
-I 4 10113 7.00 1 a  # LOOT: a shifter's chain
-I 4 10117 7.00 1 a  # LOOT: a spidersilk choker
+I 4 10126 100.00 1  # LOOT: tenebrous aura
+I 4 10114 10.00 1 a  # LOOT: talismanic shiv
+I 4 10118 10.00 1 a  # LOOT: makeshift wand
+I 4 10119 10.00 1 a  # LOOT: old morning star
+I 4 10111 7.00 1 a  # LOOT: charming necklace
+I 4 10112 7.00 1 a  # LOOT: wooden beads
+I 4 10113 7.00 1 a  # LOOT: shifter's chain
+I 4 10117 7.00 1 a  # LOOT: spidersilk choker
 I 4 10120 7.00 1 a  # LOOT: roguish pants
 I 4 10121 7.00 1 a  # LOOT: darkfiber pants
 I 4 10122 7.00 1 a  # LOOT: shadowcraft pants
-I 4 10123 7.00 1 a  # LOOT: a brawler's wristcuff
-I 4 10124 7.00 1 a  # LOOT: a freethinker's wristcuff
-I 4 10125 7.00 1 a  # LOOT: an adulterer's wristcuff
+I 4 10123 7.00 1 a  # LOOT: brawler's wristcuff
+I 4 10124 7.00 1 a  # LOOT: freethinker's wristcuff
+I 4 10125 7.00 1 a  # LOOT: adulterer's wristcuff
 T 10113
 T 10111
 T 10000
@@ -194,7 +194,12 @@ A jumping cactus leans toward you with its bristling spines.
 ~
 75 100 dhuxz cdiG 2
 0 0 8 23
-I 4 10170 100.00 1  # LOOT: a cactus skeleton
+D
+   This odd, segmented little cactus almost has the shape of a human as it
+leaps about. But the instant it touches you, its spines hook into your skin and
+its human-like shape is suddenly the furthest thing from your mind!
+~
+I 4 10170 100.00 1  # LOOT: cactus skeleton
 T 10140
 T 10141
 T 10148
@@ -207,7 +212,11 @@ A barbary fig cactus turns its spiny pads toward you.
 ~
 75 100 dhuxz cdiG 2
 0 0 8 23
-I 4 10170 100.00 1  # LOOT: a cactus skeleton
+D
+   This litle cactus is made from a series of spiny green discs or pads, and
+topped with equally spiny purple fruit. It seems to have come to life...
+~
+I 4 10170 100.00 1  # LOOT: cactus skeleton
 T 10140
 T 10141
 T 10148
@@ -220,7 +229,12 @@ A creeping devil cactus lies dangerously close to your feet.
 ~
 75 100 dhuxz cdiG 2
 0 0 8 23
-I 4 10170 100.00 1  # LOOT: a cactus skeleton
+D
+   Like a bristly snake, this deadly cactus creeps along the ground. Under
+bush, through tall grass, beneath the flowers, until it's wrapped around your
+ankle.
+~
+I 4 10170 100.00 1  # LOOT: cactus skeleton
 T 10140
 T 10141
 T 10148
@@ -233,8 +247,13 @@ A huge saguaro cactus bends its spiny arm down toward you.
 ~
 75 100 bdhxzA cdiG 5
 0 0 8 23
-I 4 10149 100.00 1  # LOOT: a fallen saguaro cactus
-I 4 10146 100.00 2  # LOOT: a basket of saguaro fruit
+D
+   Though it's as tall as a tree, this treant has no branches or leaves. Its
+pale green flesh is spined from top to bottom in pleated rows, and its
+tremendous arms seem to be reaching for you!
+~
+I 4 10149 100.00 1  # LOOT: fallen saguaro cactus
+I 4 10146 100.00 2  # LOOT: basket of saguaro fruit
 T 10149
 T 10143
 S
@@ -245,6 +264,10 @@ Head Druid #n stands at the center of the circle, protected by powerful magic.
 ~
 0 0 bd n 3
 0 2 0 15
+D
+   Robed in brown and with an air of superiority, the druid seems to think they
+are the master of the monsoon. It certainly seems to have bent to their will.
+~
 T 18258
 S
 #10145
@@ -254,6 +277,9 @@ A robed thief leans out from behind a large shrub.
 ~
 0 0 bd ein 3
 1 0 0 15
+D
+He's wearing beige and brown to blend into the desert.
+~
 T 10171
 T 10167
 S
@@ -264,6 +290,9 @@ A wandering merchant stands here, lamenting the loss of his goods.
 ~
 0 0 d n 3
 1 0 0 15
+D
+He seems a little soaked by the monsoon.
+~
 T 10175
 T 10146
 S
@@ -274,6 +303,10 @@ A pale man is lurking in the shadows.
 ~
 0 0 bdw in 3
 1 0 0 15
+D
+   There's a reddish glint when the light catches his eyes, and he looks like
+he hasn't eaten in some time.
+~
 T 10167
 T 10171
 S
@@ -284,6 +317,15 @@ A little bat flitters around above you.
 ~
 1 5 djo m 1
 0 0 2 9
+D
+This tiny bat is hard to see in the dark.
+~
+M
+0
+$n flits about overhead.~
+M
+0
+$n snatches a moth out of the air.~
 T 10150
 S
 #10151
@@ -293,7 +335,17 @@ An orange and black gila monster is lying on a rock.
 ~
 10 20 dj 0 1
 0 0 0 9
-I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
+D
+   This odd, oversized lizard has beaded orange and black skin, and a vicious
+bite that's both venomous and putrid.
+~
+I 0 3012 100.00 1  # BUTCHER: fillet of raw meat
+M
+0
+$n suns itself on the rocks.~
+M
+0
+$n flicks its tongue in search of a scent.~
 T 10151
 S
 #10152
@@ -303,7 +355,16 @@ An armadillo is rolling around on the ground.
 ~
 10 20 dj 0 2
 0 0 0 9
-I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
+D
+This roly poly animal seems to curl up into a ball when threatened.
+~
+I 0 3012 100.00 1  # BUTCHER: fillet of raw meat
+M
+0
+$n digs at the ground until it finds a tasty grub.~
+M
+0
+$n scampers around in the dirt.~
 T 10152
 S
 #10153
@@ -313,8 +374,19 @@ A cactus wren is picking at seeds.
 ~
 1 5 dgjo c 1
 0 0 2 9
-I 0 3200 100.00 1  # BUTCHER: a cut of poultry
-T 10153
+D
+This curious little bird is speckled all over.
+~
+I 0 3200 100.00 1  # BUTCHER: cut of poultry
+M
+0
+$n pecks at loose seeds on the ground.~
+M
+0
+$n picks through leaves and sticks, looking for insects.~
+M
+0
+$n pokes its head out from its home in a cactus.~
 S
 #10154
 squirrel antelope~
@@ -323,9 +395,21 @@ An antelope squirrel darts out from under a shrub.
 ~
 1 5 djo c 1
 0 0 0 9
-I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
-I 1 1350 100.00 1  # SKIN: a small skin
-T 10154
+D
+   More squirrel than antelope, this striped little rodent holds its tail over
+its back like a shade.
+~
+I 0 3012 100.00 1  # BUTCHER: fillet of raw meat
+I 1 1350 100.00 1  # SKIN: small skin
+M
+0
+$n stashes a seed in its cheek.~
+M
+0
+$n grooms its long, thin tail.~
+M
+0
+$n scurries into the shade and hugs the cool ground.~
 S
 #10155
 sheep bighorn desert~
@@ -334,10 +418,19 @@ A desert bighorn sheep won't take its eyes off of you.
 ~
 10 20 djo 0 3
 0 0 0 27
-I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
-I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
-I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
-I 1 1351 100.00 1  # SKIN: a large skin
+D
+This scrawny sheep has horns that are bigger than its head!
+~
+I 0 3012 100.00 1  # BUTCHER: fillet of raw meat
+I 0 3012 100.00 1  # BUTCHER: fillet of raw meat
+I 0 3012 100.00 1  # BUTCHER: fillet of raw meat
+I 1 1351 100.00 1  # SKIN: large skin
+M
+0
+$n rubs its horns against a shrub.~
+M
+0
+$n chews thoughtfully on a stray branch from a shrub.~
 T 10155
 S
 #10156
@@ -347,10 +440,22 @@ A long-tailed coati is digging furiously at the ground.
 ~
 20 30 djo c 2
 0 0 0 10
-I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
-I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
-I 1 1351 100.00 1  # SKIN: a large skin
-T 10156
+D
+   This odd critter has a pointed black face, a reddish brown body, and a long,
+striped tail. You've really never seen anything like it!
+~
+I 0 3012 100.00 1  # BUTCHER: fillet of raw meat
+I 0 3012 100.00 1  # BUTCHER: fillet of raw meat
+I 1 1351 100.00 1  # SKIN: large skin
+M
+0
+$n rustles through the ground litter, looking for bugs.~
+M
+0
+$n chirps and snorts at you.~
+M
+0
+$n struts around with its long tail held straight up.~
 S
 #10158
 elemental melon~
@@ -359,8 +464,11 @@ A melon elemental is rolling around.
 ~
 55 75 dhoz cG 3
 0 0 21 28
-I 4 10157 50.00 2 x  # LOOT: a maroon firemelon
-I 4 10158 50.00 2 x  # LOOT: a crimson firemelon
+D
+It's made from a cluster of large melons.
+~
+I 4 10157 50.00 2 x  # LOOT: maroon firemelon
+I 4 10158 50.00 2 x  # LOOT: crimson firemelon
 S
 #10159
 teddybear cactus white spiny~
@@ -369,10 +477,22 @@ A white, spiny teddybear cactus is growing here.
 ~
 1 1 bdoD dn 2
 0 0 0 9
+D
+   It's a segmented cactus that's almost shaped like a little bear. The long
+white spines are so dense that it actually appears furry.
+~
+M
+1
+Why won't anyone huuuug me?~
+M
+0
+$n brushes its spines.~
+M
+0
+You find $n sitting dangerously close to your leg.~
 T 9901
 T 9902
 T 10158
-T 10159
 S
 #10160
 armadillo giant~
@@ -381,6 +501,10 @@ A giant armadillo grazes nearby.
 ~
 100 125 dej 0 4
 0 0 26 9
+D
+   It's big, it's armored, and you're just hoping it doesn't roll into a ball
+while you're riding it.
+~
 S
 #10161
 sloth giant ground~
@@ -389,6 +513,9 @@ A giant ground sloth turns slowly toward you.
 ~
 100 125 dej 0 4
 0 0 26 24
+D
+It's not as slow as it looks -- the enormous size makes up the difference.
+~
 S
 #10162
 moth sphinx giant~
@@ -397,6 +524,9 @@ A giant sphinx moth buzzes over you.
 ~
 100 125 dej mG 4
 0 0 2 28
+D
+This amazing moth flaps as fast as a hummingbird.
+~
 S
 #10190
 lavaflow flow~
@@ -405,6 +535,9 @@ The lavaflow rages by.
 ~
 150 150 dhk dkln 3
 0 0 0 15
+D
+Only immortals should see this. This is the lava terraformer mob.
+~
 T 10190
 T 10191
 S

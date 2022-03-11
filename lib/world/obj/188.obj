@@ -928,22 +928,6 @@ C
 Q 18870
 T 18869
 S
-#18871
-report medical~
-a medical report~
-A medical report about a victim of the headless centaur is folded here.~
-   The report makes it look like the centaur's victim doesn't have much time
-left.
-Type:  build medical tent
-~
-3 0 a 0 7
-0 0 0
-7 0
-C
-1 1
-Q 18873
-T 18869
-S
 #18873
 report medical~
 a medical report~
@@ -1259,7 +1243,7 @@ A roast pumpkin is lying here.~
    The pumpkin has taken on a dark orange color -- almost brown. It's mushy,
 but tastes a lot better than it did fresh.
 ~
-6 gm a 0 12
+6 gm a 0 13
 24 18890 0
 7 1680
 A
@@ -1267,6 +1251,8 @@ A
 C
 50 50
 O+ 1 6241
+R
+4 5619 0
 S
 #18894
 seeds roasted pumpkin~

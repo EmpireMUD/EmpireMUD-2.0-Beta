@@ -987,7 +987,7 @@ typedef struct vehicle_data vehicle_data;
 #define AFF_SLOW  BIT(18)	// s. slow (how great did that work out)
 #define AFF_STUNNED  BIT(19)	// t. stunned/unable to act
 #define AFF_STONED  BIT(20)	// u. trippy effects
-#define AFF_CANT_SPEND_BLOOD  BIT(21)	// v. hinder vitae
+#define AFF_CANT_SPEND_BLOOD  BIT(21)	// v. prevents most vampire powers
 #define AFF_CLAWS  BIT(22)	// w. claws
 #define AFF_DEATHSHROUD  BIT(23)	// x. deathshroud
 #define AFF_EARTHMELD  BIT(24)	// y. interred in the earth
@@ -1003,6 +1003,7 @@ typedef struct vehicle_data vehicle_data;
 #define AFF_HARD_STUNNED  BIT(34)	// I. Hard stuns are uncleansable and don't trigger stun-immunity
 #define AFF_IMMUNE_DAMAGE  BIT(35)	// J. Cannot take damage
 #define AFF_NO_WHERE  BIT(36)	// K. cannot be found using 'WHERE'
+#define AFF_WATERWALK  BIT(37)	// L. won't drown or be affected by water restrictions
 
 
 // Injury flags -- IS_INJURED
@@ -2228,8 +2229,9 @@ typedef enum {
 
 // MOUNT_x: mount flags -- MOUNT_FLAGGED(ch, flag)
 #define MOUNT_RIDING  BIT(0)	// player is currently mounted
-#define MOUNT_AQUATIC  BIT(1)	// mount can swim
+#define MOUNT_AQUATIC  BIT(1)	// mount can swim (but not go on land)
 #define MOUNT_FLYING  BIT(2)	// mount can fly
+#define MOUNT_WATERWALK  BIT(3)	// mount can do land/water
 
 
 // OFFER_x - types for the do_accept/offer_data system

@@ -1,0 +1,138 @@
+#12300
+Fur Dragon: whistle and gold drops~
+0 b 0 0 225-325 0
+E
+-1 100.00
+0 0 0
+I 4 12303 60.00 1 g  # LOOT: fur dragon's hoard
+I+ 4 0  # Hard
+I 4 12303 30.00 1 g  # LOOT: fur dragon's hoard
+I+ 5 0  # Group
+I 4 12303 10.00 1 g  # LOOT: fur dragon's hoard
+I+ 6 0  # Boss
+I 4 12304 30.00 1 g  # LOOT: mauled golden fleece
+I+ 4 0  # Hard
+I 4 12304 60.00 1 g  # LOOT: mauled golden fleece
+I+ 5 0  # Group
+I 4 12304 60.00 1 g  # LOOT: mauled golden fleece
+I+ 6 0  # Boss
+I 4 12305 10.00 1 g  # LOOT: fabled golden yarn of Bast
+I+ 4 0  # Hard
+I 4 12305 10.00 1 g  # LOOT: fabled golden yarn of Bast
+I+ 5 0  # Group
+I 4 12305 30.00 1 g  # LOOT: fabled golden yarn of Bast
+I+ 6 0  # Boss
+I 4 12308 1.00 1 p  # LOOT: furry drake familiar flute
+I+ 6 0  # Boss
+I 4 12306 1.00 1 p  # LOOT: flying fur dragon mount whistle
+I+ 4 0  # Hard
+I 4 12306 5.00 1 p  # LOOT: flying fur dragon mount whistle
+I+ 5 0  # Group
+I 4 12306 10.00 1 p  # LOOT: flying fur dragon mount whistle
+I+ 6 0  # Boss
+I 4 12307 10.00 1 p  # LOOT: tiny fur dragon minipet whistle
+I 4 12311 10.00 1 p  # LOOT: furry dragonscale traveling pack
+S
+#12301
+Fur Dragon: primary loot~
+0 b 0 0 225-325 0
+E
+-1 100.00
+0 0 0
+I 4 12315 3.85 1 L  # LOOT: valiant dragon hunter sabatons
+I 4 12316 3.85 1 L  # LOOT: shadow virtuoso foot wraps
+I 4 12317 3.85 1 L  # LOOT: fiery dracomancer boots
+I 4 12318 3.85 1 L  # LOOT: radiant sandals of the living flame
+I 4 12319 3.85 1 L  # LOOT: dragon pit fighter boots
+I 4 12320 3.85 1 L  # LOOT: valiant dragon hunter vambraces
+I 4 12321 3.85 1 L  # LOOT: shadow virtuoso arm wraps
+I 4 12322 3.85 1 L  # LOOT: fiery dracomancer sleeves
+I 4 12323 3.85 1 L  # LOOT: radiant braces of the living flame
+I 4 12324 3.85 1 L  # LOOT: dragon pit fighter armguards
+I 4 12325 3.85 1 L  # LOOT: fur dragon hunter ring
+I 4 12326 3.85 1 L  # LOOT: dragonpike ring
+I 4 12327 3.85 1 L  # LOOT: ring of living mana
+I 4 12328 3.85 1 L  # LOOT: shadowforged ring
+I 4 12329 3.85 1 L  # LOOT: dracomancer ring
+I 4 12330 3.85 1 L  # LOOT: ring of living flame
+I 4 12331 3.84 1 L  # LOOT: valiant dragon hunter bow
+I 4 12332 3.84 1 L  # LOOT: shadow virtuoso bow
+I 4 12333 3.84 1 L  # LOOT: fiery dracomancer bow
+I 4 12334 3.84 1 L  # LOOT: radiant bow of the living flame
+I 4 12335 3.84 1 L  # LOOT: dragon pit fighter bow
+I 4 12336 3.84 1 L  # LOOT: righteous bow of the dragon king
+I 4 12337 3.84 1 L  # LOOT: scaled crown of the dragon king
+I 4 12338 3.84 1 L  # LOOT: traveling boots of the dragon king
+I 4 12339 3.84 1 L  # LOOT: signet ring of the dragon king
+I 4 12340 3.84 1 L  # LOOT: livery collar of the dragon king
+S
+#12302
+Fur Dragon: random loot (hard)~
+0 b A B 225-350 0
+E
+-1 100.00
+0 0 0
+I 4 600 0.60 1 R  # LOOT: strange crystal seed
+I 4 604 7.00 3 R  # LOOT: stellar magewood
+I 4 619 7.00 3 R  # LOOT: empyreal magewood
+I 4 612 7.00 5 R  # LOOT: bolt of sparkfiber cloth
+I 4 613 7.00 5 R  # LOOT: bolt of manasilk cloth
+I 4 614 7.00 5 R  # LOOT: briar hide
+I 4 615 7.00 5 R  # LOOT: absinthian leather
+I 4 610 7.00 5 R  # LOOT: argentine ingot
+I 4 611 7.00 5 R  # LOOT: eventide ingot
+I 4 602 7.00 5 R  # LOOT: prismatic crystal
+I 4 1206 7.00 10 R  # LOOT: iridescent blue iris
+I 4 1300 7.00 10 R  # LOOT: glowing green seashell
+I 4 103 7.00 10 R  # LOOT: yellow lightning stone
+I 4 104 7.00 10 R  # LOOT: red bloodstone
+I 4 172 4.20 3 R  # LOOT: silver bar
+I 4 173 4.20 2 R  # LOOT: gold bar
+S
+#12303
+Fur Dragon: random loot (group)~
+0 b B A 225-350 0
+E
+-1 100.00
+0 0 0
+I 4 600 0.80 1 R  # LOOT: strange crystal seed
+I 4 604 7.00 6 R  # LOOT: stellar magewood
+I 4 619 7.00 6 R  # LOOT: empyreal magewood
+I 4 612 7.00 10 R  # LOOT: bolt of sparkfiber cloth
+I 4 613 7.00 10 R  # LOOT: bolt of manasilk cloth
+I 4 614 7.00 10 R  # LOOT: briar hide
+I 4 615 7.00 10 R  # LOOT: absinthian leather
+I 4 610 7.00 10 R  # LOOT: argentine ingot
+I 4 611 7.00 10 R  # LOOT: eventide ingot
+I 4 602 7.00 10 R  # LOOT: prismatic crystal
+I 4 1206 7.00 20 R  # LOOT: iridescent blue iris
+I 4 1300 7.00 20 R  # LOOT: glowing green seashell
+I 4 103 7.00 20 R  # LOOT: yellow lightning stone
+I 4 104 7.00 20 R  # LOOT: red bloodstone
+I 4 172 4.10 4 R  # LOOT: silver bar
+I 4 173 4.10 3 R  # LOOT: gold bar
+S
+#12304
+Fur Dragon: random loot (boss)~
+0 b AB 0 225-350 0
+E
+-1 100.00
+0 0 0
+I 4 600 1.00 1 R  # LOOT: strange crystal seed
+I 4 604 7.00 10 R  # LOOT: stellar magewood
+I 4 619 7.00 10 R  # LOOT: empyreal magewood
+I 4 612 7.00 15 R  # LOOT: bolt of sparkfiber cloth
+I 4 613 7.00 15 R  # LOOT: bolt of manasilk cloth
+I 4 614 7.00 15 R  # LOOT: briar hide
+I 4 615 7.00 15 R  # LOOT: absinthian leather
+I 4 610 7.00 15 R  # LOOT: argentine ingot
+I 4 611 7.00 15 R  # LOOT: eventide ingot
+I 4 602 7.00 15 R  # LOOT: prismatic crystal
+I 4 1206 7.00 30 R  # LOOT: iridescent blue iris
+I 4 1300 7.00 30 R  # LOOT: glowing green seashell
+I 4 103 7.00 30 R  # LOOT: yellow lightning stone
+I 4 104 7.00 30 R  # LOOT: red bloodstone
+I 4 172 4.00 6 R  # LOOT: silver bar
+I 4 173 4.00 4 R  # LOOT: gold bar
+S
+$
