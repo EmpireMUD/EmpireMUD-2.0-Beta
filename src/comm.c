@@ -3132,7 +3132,7 @@ char *replace_prompt_codes(char_data *ch, char *str) {
 					if (IS_THIRSTY(ch)) {
 						sprintf(i + strlen(i), "%sthirsty", (*i ? " " : ""));
 					}
-					if (EFFECTIVELY_FLYING(ch)) {
+					if (HAS_WATERWALK(ch)) {
 						sprintf(i + strlen(i), "%swaterwalk", (*i ? " " : ""));
 					}
 					if (!IS_NPC(ch)) {
