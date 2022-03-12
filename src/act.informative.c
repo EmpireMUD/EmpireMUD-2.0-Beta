@@ -3753,7 +3753,34 @@ ACMD(do_weather) {
 
 
 ACMD(do_whereami) {
+	struct map_data *map;
+	adv_data *adv;
+	
 	msg_to_char(ch, "You are at: %s%s\r\n", get_room_name(IN_ROOM(ch), FALSE), coord_display_room(ch, IN_ROOM(ch), FALSE));
+	
+	// extra info:
+	if (IS_IMMORTAL(ch)) {
+		// sector (basically the same as stat room)
+		msg_to_char(ch, "Sector: [%d] %s", GET_SECT_VNUM(SECT(IN_ROOM(ch))), GET_SECT_NAME(SECT(IN_ROOM(ch))));
+		msg_to_char(ch, ", Base: [%d] %s", GET_SECT_VNUM(BASE_SECT(IN_ROOM(ch))), GET_SECT_NAME(BASE_SECT(IN_ROOM(ch))));
+		if (GET_ROOM_VNUM(IN_ROOM(ch)) < MAP_SIZE && (map = &world_map[X_COORD(IN_ROOM(ch))][Y_COORD(IN_ROOM(ch))])) {
+			msg_to_char(ch, ", Natural: [%d] %s", GET_SECT_VNUM(map->natural_sector), GET_SECT_NAME(map->natural_sector));
+		}
+		msg_to_char(ch, "\r\n");
+		
+		if (ROOM_CROP(IN_ROOM(ch))) {
+			msg_to_char(ch, "Crop: [%d] %s\r\n", GET_CROP_VNUM(ROOM_CROP(IN_ROOM(ch))), GET_CROP_NAME(ROOM_CROP(IN_ROOM(ch))));
+		}
+		if (GET_ROOM_TEMPLATE(IN_ROOM(ch))) {
+			msg_to_char(ch, "Room template: [%d] %s\r\n", GET_RMT_VNUM(GET_ROOM_TEMPLATE(IN_ROOM(ch))), GET_RMT_TITLE(GET_ROOM_TEMPLATE(IN_ROOM(ch))));
+			if ((adv = get_adventure_for_vnum(GET_RMT_VNUM(GET_ROOM_TEMPLATE(IN_ROOM(ch)))))) {
+				msg_to_char(ch, "Adventure: [%d] %s\r\n", GET_ADV_VNUM(adv), GET_ADV_NAME(adv));
+			}
+		}
+		if (GET_BUILDING(IN_ROOM(ch))) {
+			msg_to_char(ch, "Building: [%d] %s\r\n", GET_BLD_VNUM(GET_BUILDING(IN_ROOM(ch))), GET_BLD_NAME(GET_BUILDING(IN_ROOM(ch))));
+		}
+	}
 }
 
 
