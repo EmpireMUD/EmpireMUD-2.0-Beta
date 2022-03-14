@@ -1790,7 +1790,8 @@ The following affect flags are available:
  HARD-STUNNED - A stun that cannot be cleansed and does not trigger immunity.
  IMMUNE-DAMAGE - Cannot take damage -- do not use this on items.
  !WHERE - Cannot be found using the 'where' command.
- WATERWALK - Does not need to swim and doesn't drown.
+ WATERWALK - Does not need to swim and doesn't drown. Unlike the AQUATIC mob
+   flag, this allows it to move on both water and land.
 #d
 ARCHEDIT "OLC ARCHETYPES" "ARCHETYPE OLC" "ARCHETYPE EDITOR"
 
@@ -4453,7 +4454,7 @@ Available mob flags:
  TIED - Tied to a hitching post; will not wander unless untied; does not despawn.
  ANIMAL - Counts as an animal for herding, tying, etc.
  MOUNTAIN-WALK - Can cross mountain tiles.
- AQUATIC - Can cross water tiles, but won't move on land.
+ AQUATIC - Can cross water tiles, but won't move on land. (see WATERWALK)
  *PLURAL - Uses the pronouns 'their', 'they', and 'them' in act messages.
  NO-ATTACK - Mob can be in combat, but will not hit
  SPAWNED - De-spawns after 5 minutes if no players are nearby.

@@ -1623,6 +1623,9 @@ or lose movement points from swimming.
 Normal land mounts do not benefit from WATERWALK on the player -- you still
 need the correct mount ability to cross water while mounted.
 
+On mobs, this is different from the AQUATIC mob flag, which allows the mob to
+move on water but forbids it from moving onto land.
+
 See also: DROWNING
 #
 WHEREAMI "WHERE AM I"
