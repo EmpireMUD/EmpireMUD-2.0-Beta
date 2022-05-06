@@ -396,7 +396,7 @@ VCMD(do_vsend) {
 
 	if ((ch = get_char_by_vehicle(veh, buf))) {
 		if (subcmd == SCMD_VSEND)
-			sub_write(msg, ch, TRUE, TO_CHAR | (use_queue ? TO_QUEUE : 0));
+			sub_write(msg, ch, TRUE, TO_CHAR | TO_SLEEP | (use_queue ? TO_QUEUE : 0));
 		else if (subcmd == SCMD_VECHOAROUND)
 			sub_write(msg, ch, TRUE, TO_ROOM | (use_queue ? TO_QUEUE : 0));
 	}

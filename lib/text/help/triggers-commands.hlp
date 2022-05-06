@@ -104,7 +104,7 @@ See also: %TERRAFORM%, %TERRACROP%
    Message will be sent to all characters in the room EXCEPT the two people.
 
 &c%send% <victim> <message>&0
-   Message will be sent to the victim only.
+   Message will be sent to the victim only. Works even if sleeping.
   
 &c%buildingecho% <room vnum> <message>&0
    Buildingecho echoes message to the entire building. room vnum should be any

@@ -500,7 +500,7 @@ ACMD(do_msend) {
 		return;
 	}
 
-	sub_write(p, victim, TRUE, TO_CHAR | (use_queue ? TO_QUEUE : 0));
+	sub_write(p, victim, TRUE, TO_CHAR | TO_SLEEP | (use_queue ? TO_QUEUE : 0));
 }
 
 

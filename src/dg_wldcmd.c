@@ -268,7 +268,7 @@ WCMD(do_wsend) {
 
 	if ((ch = get_char_by_room(room, buf))) {
 		if (subcmd == SCMD_WSEND)
-			sub_write(msg, ch, TRUE, TO_CHAR | (use_queue ? TO_QUEUE : 0));
+			sub_write(msg, ch, TRUE, TO_CHAR | TO_SLEEP | (use_queue ? TO_QUEUE : 0));
 		else if (subcmd == SCMD_WECHOAROUND)
 			sub_write(msg, ch, TRUE, TO_ROOM | (use_queue ? TO_QUEUE : 0));
 	}
