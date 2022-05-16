@@ -1691,8 +1691,17 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options) {
 }
 
 
-void look_in_direction(char_data *ch, int dir) {
+/**
+* Called when a player types 'look <direction>' with no further pre-validation.
+*
+* @param char_data *ch The player.
+* @param int dir The direction they typed.
+* @param char *arg The actual arg (direction) -- sometimes passed through here.
+* @param char *more_args Any additional args.
+*/
+void look_in_direction(char_data *ch, int dir, char *arg, char *more_args) {
 	char buf[MAX_STRING_LENGTH - 9], buf2[MAX_STRING_LENGTH - 9];	// save room for the "You see "
+	char *exdesc;
 	vehicle_data *veh;
 	char_data *c;
 	room_data *to_room;
@@ -1761,6 +1770,10 @@ void look_in_direction(char_data *ch, int dir) {
 					msg_to_char(ch, "You don't see anyone in that direction.\r\n");
 				}
 			}
+		}
+		else if ((exdesc = find_exdesc_for_char(ch, arg, NULL, NULL, NULL, NULL))) {
+			// try an exdesc matching the dir instead
+			send_to_char(exdesc, ch);
 		}
 		else {
 			send_to_char("Nothing special there...\r\n", ch);

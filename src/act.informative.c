@@ -101,6 +101,111 @@ char *find_exdesc(char *word, struct extra_descr_data *list, int *number) {
 
 
 /**
+* Finds an extra description around 'ch' that matches the given word, if any.
+* Also binds the thing that had the description, if any. If you pass the
+* 'number' parameter, this will correctly decrement the number as it matches
+* descriptions.
+*
+* @param char_data *ch The person looking.
+* @param char *word The keyword given.
+* @param int *number Optional: Pointer to the counter for 'look 3.sign' etc (may be NULL).
+* @param obj_data **found_obj Optional: If the description is on an object, it will be passed back here (may be NULL).
+* @param vehicle_data **found_veh Optional: If the description is on an vehicle, it will be passed back here (may be NULL).
+* @param room_data **found_room Optional: If the description is on the room, it will be passed back here (may be NULL).
+* @return char* The description to show, if one was found.
+*/
+char *find_exdesc_for_char(char_data *ch, char *word, int *number, obj_data **found_obj, vehicle_data **found_veh, room_data **found_room) {
+	int pos, fnum;
+	char *exdesc;
+	obj_data *obj;
+	vehicle_data *veh;
+	
+	if (found_obj) {
+		*found_obj = NULL;
+	}
+	if (found_veh) {
+		*found_veh = NULL;
+	}
+	if (found_room) {
+		*found_room = NULL;
+	}
+	
+	if (!ch || !word || !*word) {
+		return NULL;
+	}
+	
+	// did we get a number
+	if (!number) {
+		fnum = get_number(&word);
+		number = &fnum;
+	}
+	
+	// check inventory
+	DL_FOREACH2(ch->carrying, obj, next_content) {
+		if (CAN_SEE_OBJ(ch, obj) && (exdesc = find_exdesc(word, GET_OBJ_EX_DESCS(obj), number)) != NULL) {
+			if (found_obj) {
+				*found_obj = obj;
+			}
+			return exdesc;
+		}
+	}
+	
+	// check equipment
+	for (pos = 0; pos < NUM_WEARS; ++pos) {
+		if (GET_EQ(ch, pos) && CAN_SEE_OBJ(ch, GET_EQ(ch, pos)) && (exdesc = find_exdesc(word, GET_OBJ_EX_DESCS(GET_EQ(ch, pos)), number)) != NULL) {
+			if (found_obj) {
+				*found_obj = GET_EQ(ch, pos);
+			}
+			return exdesc;
+		}
+	}
+	
+	// check objects in the room
+	DL_FOREACH2(ROOM_CONTENTS(IN_ROOM(ch)), obj, next_content) {
+		if (CAN_SEE_OBJ(ch, obj) && (exdesc = find_exdesc(word, GET_OBJ_EX_DESCS(obj), number)) != NULL) {
+			if (found_obj) {
+				*found_obj = obj;
+			}
+			return exdesc;
+		}
+	}
+	
+	// check vehicles
+	DL_FOREACH2(ROOM_VEHICLES(IN_ROOM(ch)), veh, next_in_room) {
+		if (!VEH_IS_EXTRACTED(veh) && CAN_SEE_VEHICLE(ch, veh) && (exdesc = find_exdesc(word, VEH_EX_DESCS(veh), number)) != NULL) {
+			if (found_veh) {
+				*found_veh = veh;
+			}
+			return exdesc;
+		}
+	}
+	
+	// does it match an extra desc of the room template?
+	if (GET_ROOM_TEMPLATE(IN_ROOM(ch))) {
+		if ((exdesc = find_exdesc(word, GET_RMT_EX_DESCS(GET_ROOM_TEMPLATE(IN_ROOM(ch))), number)) != NULL) {
+			if (found_room) {
+				*found_room = IN_ROOM(ch);
+			}
+			return exdesc;
+		}
+	}
+
+	// does it match an extra desc of the building?
+	if (GET_BUILDING(IN_ROOM(ch))) {
+		if ((exdesc = find_exdesc(word, GET_BLD_EX_DESCS(GET_BUILDING(IN_ROOM(ch))), number)) != NULL) {
+			if (found_room) {
+				*found_room = IN_ROOM(ch);
+			}
+			return exdesc;
+		}
+	}
+	
+	// no?
+	return NULL;
+}
+
+
+/**
 * Gets the list of a character's class-level skills, for use on who/whois.
 *
 * @param char_data *ch The player.
@@ -311,13 +416,13 @@ int sort_chart_hash(struct chart_territory *a, struct chart_territory *b) {
 */
 void look_at_target(char_data *ch, char *arg, char *more_args) {
 	char targ_arg[MAX_INPUT_LENGTH];
-	int found = FALSE, j, fnum;
+	int found = FALSE, fnum;
 	bitvector_t bits;
 	char_data *found_char = NULL;
-	obj_data *obj, *found_obj = NULL;
-	vehicle_data *veh, *found_veh = NULL;
+	obj_data *found_obj = NULL, *ex_obj = NULL;
+	vehicle_data *found_veh = NULL, *ex_veh = NULL;
 	bool inv_only = FALSE;
-	char *desc;
+	char *exdesc;
 
 	if (!ch->desc)
 		return;
@@ -361,70 +466,17 @@ void look_at_target(char_data *ch, char *arg, char *more_args) {
 		send_to_char("Look at what?\r\n", ch);
 		return;
 	}
-
-	/* Does the argument match an extra desc in the char's inventory? */
-	if (!found) {
-		DL_FOREACH2(ch->carrying, obj, next_content) {
-			if (CAN_SEE_OBJ(ch, obj)) {
-				if ((desc = find_exdesc(arg, GET_OBJ_EX_DESCS(obj), &fnum)) != NULL) {
-					send_to_char(desc, ch);
-					act("$n looks at $p.", TRUE, ch, obj, NULL, TO_ROOM);
-					found = TRUE;
-					break;
-				}
-			}
+	
+	// does the argument match an extra description?
+	if ((exdesc = find_exdesc_for_char(ch, arg, &fnum, &ex_obj, &ex_veh, NULL))) {
+		if (ex_obj) {
+			act("$n looks at $p.", TRUE, ch, ex_obj, NULL, TO_ROOM);
 		}
-	}
-
-	/* Does the argument match an extra desc in the char's equipment? */
-	for (j = 0; j < NUM_WEARS && !found; j++)
-		if (GET_EQ(ch, j) && CAN_SEE_OBJ(ch, GET_EQ(ch, j)))
-			if ((desc = find_exdesc(arg, GET_OBJ_EX_DESCS(GET_EQ(ch, j)), &fnum)) != NULL) {
-				send_to_char(desc, ch);
-				act("$n looks at $p.", TRUE, ch, GET_EQ(ch, j), NULL, TO_ROOM);
-				found = TRUE;
-			}
-
-	/* Does the argument match an extra desc of an object in the room? */
-	if (!found) {
-		DL_FOREACH2(ROOM_CONTENTS(IN_ROOM(ch)), obj, next_content) {
-			if (CAN_SEE_OBJ(ch, obj)) {
-				if ((desc = find_exdesc(arg, GET_OBJ_EX_DESCS(obj), &fnum)) != NULL) {
-					send_to_char(desc, ch);
-					act("$n looks at $p.", TRUE, ch, obj, NULL, TO_ROOM);
-					found = TRUE;
-					break;
-				}
-			}
+		if (ex_veh) {
+			act("$n looks at $V.", TRUE, ch, NULL, ex_veh, TO_ROOM);
 		}
-	}
-
-	// does it match an extra desc of a vehicle here?
-	if (!found && ROOM_VEHICLES(IN_ROOM(ch))) {
-		DL_FOREACH2(ROOM_VEHICLES(IN_ROOM(ch)), veh, next_in_room) {
-			if (!VEH_IS_EXTRACTED(veh) && CAN_SEE_VEHICLE(ch, veh) && (desc = find_exdesc(arg, VEH_EX_DESCS(veh), &fnum)) != NULL) {
-				send_to_char(desc, ch);
-				act("$n looks at $V.", TRUE, ch, NULL, veh, TO_ROOM);
-				found = TRUE;
-				break;	// only 1
-			}
-		}
-	}
-
-	// does it match an extra desc of the room template?
-	if (!found && GET_ROOM_TEMPLATE(IN_ROOM(ch))) {
-		if ((desc = find_exdesc(arg, GET_RMT_EX_DESCS(GET_ROOM_TEMPLATE(IN_ROOM(ch))), &fnum)) != NULL) {
-			send_to_char(desc, ch);
-			found = TRUE;
-		}
-	}
-
-	// does it match an extra desc of the building?
-	if (!found && GET_BUILDING(IN_ROOM(ch))) {
-		if ((desc = find_exdesc(arg, GET_BLD_EX_DESCS(GET_BUILDING(IN_ROOM(ch))), &fnum)) != NULL) {
-			send_to_char(desc, ch);
-			found = TRUE;
-		}
+		send_to_char(exdesc, ch);
+		found = TRUE;
 	}
 	
 	// try moons
@@ -2832,6 +2884,7 @@ ACMD(do_inventory) {
 
 ACMD(do_look) {
 	char arg2[MAX_INPUT_LENGTH], arg3[MAX_INPUT_LENGTH];
+	char *exdesc;
 	room_data *map;
 	int look_type;
 
@@ -2858,7 +2911,11 @@ ACMD(do_look) {
 			look_at_room(ch);
 		}
 		else if (!str_cmp(arg, "out")) {
-			if (!(map = (GET_MAP_LOC(IN_ROOM(ch)) ? real_room(GET_MAP_LOC(IN_ROOM(ch))->vnum) : NULL))) {
+			if ((exdesc = find_exdesc_for_char(ch, arg, NULL, NULL, NULL, NULL))) {
+				// extra desc takes priority
+				send_to_char(exdesc, ch);
+			}
+			else if (!(map = (GET_MAP_LOC(IN_ROOM(ch)) ? real_room(GET_MAP_LOC(IN_ROOM(ch))->vnum) : NULL))) {
 				msg_to_char(ch, "You can't do that from here.\r\n");
 			}
 			else if (map == IN_ROOM(ch) && !ROOM_IS_CLOSED(IN_ROOM(ch))) {
@@ -2877,7 +2934,7 @@ ACMD(do_look) {
 			look_in_obj(ch, arg2);
 		/* did the char type 'look <direction>?' */
 		else if ((look_type = parse_direction(ch, arg)) != NO_DIR)
-			look_in_direction(ch, look_type);
+			look_in_direction(ch, look_type, arg, arg2);
 		else if (is_abbrev(arg, "at")) {
 			half_chop(arg2, arg, arg3);
 			look_at_target(ch, arg, arg3);
@@ -3571,6 +3628,11 @@ ACMD(do_survey) {
 	if (find_instance_by_room(IN_ROOM(ch), FALSE, TRUE)) {
 		do_adventure(ch, "", 0, 0);
 	}
+	
+	// TO ADD:
+	//	- room name
+	//	- building info (name)
+	
 }
 
 

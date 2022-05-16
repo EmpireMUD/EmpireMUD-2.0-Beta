@@ -1964,6 +1964,7 @@ void show_spawn_summary_to_char(char_data *ch, struct spawn_info *list);
 void diag_char_to_char(char_data *i, char_data *ch);
 void display_attributes(char_data *ch, char_data *to);
 void display_tip_to_char(char_data *ch);
+char *find_exdesc_for_char(char_data *ch, char *word, int *number, obj_data **found_obj, vehicle_data **found_veh, room_data **found_room);
 char *get_obj_desc(obj_data *obj, char_data *ch, int mode);
 void get_player_skill_string(char_data *ch, char *buffer, bool abbrev);
 void list_char_to_char(char_data *list, char_data *ch);
@@ -2218,7 +2219,7 @@ char *get_room_description(room_data *room);
 char *get_room_name(room_data *room, bool color);
 void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options);
 #define look_at_room(ch)  look_at_room_by_loc((ch), IN_ROOM(ch), NOBITS)
-void look_in_direction(char_data *ch, int dir);
+void look_in_direction(char_data *ch, int dir, char *arg, char *more_args);
 
 #define HOLYLIGHT_OR_TILE_OWNER(ch, room)  (PRF_FLAGGED((ch), PRF_HOLYLIGHT) || !ROOM_OWNER(room) || (GET_LOYALTY(ch) && GET_LOYALTY(ch) == ROOM_OWNER(room)))
 #define HOLYLIGHT_OR_VEH_OWNER(ch, veh)  (PRF_FLAGGED((ch), PRF_HOLYLIGHT) || !VEH_OWNER(veh) || (GET_LOYALTY(ch) && GET_LOYALTY(ch) == VEH_OWNER(veh)))
