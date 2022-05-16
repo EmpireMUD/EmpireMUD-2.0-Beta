@@ -2219,7 +2219,7 @@ char *get_room_description(room_data *room);
 char *get_room_name(room_data *room, bool color);
 void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options);
 #define look_at_room(ch)  look_at_room_by_loc((ch), IN_ROOM(ch), NOBITS)
-void look_in_direction(char_data *ch, int dir, char *arg, char *more_args);
+void look_in_direction(char_data *ch, int dir);
 
 #define HOLYLIGHT_OR_TILE_OWNER(ch, room)  (PRF_FLAGGED((ch), PRF_HOLYLIGHT) || !ROOM_OWNER(room) || (GET_LOYALTY(ch) && GET_LOYALTY(ch) == ROOM_OWNER(room)))
 #define HOLYLIGHT_OR_VEH_OWNER(ch, veh)  (PRF_FLAGGED((ch), PRF_HOLYLIGHT) || !VEH_OWNER(veh) || (GET_LOYALTY(ch) && GET_LOYALTY(ch) == VEH_OWNER(veh)))

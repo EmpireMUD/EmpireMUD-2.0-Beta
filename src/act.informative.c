@@ -2934,7 +2934,7 @@ ACMD(do_look) {
 			look_in_obj(ch, arg2);
 		/* did the char type 'look <direction>?' */
 		else if ((look_type = parse_direction(ch, arg)) != NO_DIR)
-			look_in_direction(ch, look_type, arg, arg2);
+			look_in_direction(ch, look_type);
 		else if (is_abbrev(arg, "at")) {
 			half_chop(arg2, arg, arg3);
 			look_at_target(ch, arg, arg3);

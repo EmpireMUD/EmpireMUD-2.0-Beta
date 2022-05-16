@@ -1696,10 +1696,8 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options) {
 *
 * @param char_data *ch The player.
 * @param int dir The direction they typed.
-* @param char *arg The actual arg (direction) -- sometimes passed through here.
-* @param char *more_args Any additional args.
 */
-void look_in_direction(char_data *ch, int dir, char *arg, char *more_args) {
+void look_in_direction(char_data *ch, int dir) {
 	char buf[MAX_STRING_LENGTH - 9], buf2[MAX_STRING_LENGTH - 9];	// save room for the "You see "
 	char *exdesc;
 	vehicle_data *veh;
@@ -1708,6 +1706,13 @@ void look_in_direction(char_data *ch, int dir, char *arg, char *more_args) {
 	struct room_direction_data *ex;
 	int last_comma_pos, prev_comma_pos, num_commas;
 	size_t bufsize;
+	
+	// check first for an extra description that covers the direction
+	snprintf(buf, sizeof(buf), "%s", dirs[dir]);
+	if ((exdesc = find_exdesc_for_char(ch, buf, NULL, NULL, NULL, NULL))) {
+		send_to_char(exdesc, ch);
+		return;
+	}
 	
 	// weather override
 	if (IS_OUTDOORS(ch) && dir == UP && !find_exit(IN_ROOM(ch), dir)) {
@@ -1770,10 +1775,6 @@ void look_in_direction(char_data *ch, int dir, char *arg, char *more_args) {
 					msg_to_char(ch, "You don't see anyone in that direction.\r\n");
 				}
 			}
-		}
-		else if ((exdesc = find_exdesc_for_char(ch, arg, NULL, NULL, NULL, NULL))) {
-			// try an exdesc matching the dir instead
-			send_to_char(exdesc, ch);
 		}
 		else {
 			send_to_char("Nothing special there...\r\n", ch);
