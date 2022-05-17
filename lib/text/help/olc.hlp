@@ -2307,6 +2307,7 @@ Fields:
   &c-affects&0 - see HELP BEDIT AFFECTS
   &c-citizens -citizensover -citizensunder&0 - specific number of citizens
   &c-commands&0 - match the text of the commands line, if any
+  &c-depletion&0 - see HELP OLC DEPLETION
   &c-designate&0 - see HELP DESIGNATE FLAGS
   &c-fame -fameover -fameunder&0 - specific fame amount
   &c-flagged -unflagged&0 - see HELP BEDIT FLAGS
@@ -8436,6 +8437,7 @@ with a dash (-) are matched to the vehicle's name and other text.
 Fields:
   &c-animalsrequired&0 - number required (or "any" for anything over zero)
   &c-capacity -capacityover -capacityunder&0 - specific capacity
+  &c-depletion&0 - see HELP OLC DEPLETION
   &c-designate&0 - see HELP DESIGNATE FLAGS
   &c-fame -fameover -fameunder&0 - specific fame amount
   &c-flagged -unflagged&0 - see HELP VEDIT FLAGS
