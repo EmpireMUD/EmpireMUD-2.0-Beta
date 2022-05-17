@@ -209,7 +209,7 @@ extern const char *climate_flags[];
 extern const bitvector_t climate_flags_order[];
 extern const bool climate_ruins_vehicle_slowly[][2];
 extern const char *crop_flags[];
-extern const char *depletion_type[NUM_DEPLETION_TYPES];
+extern const char *depletion_type[];
 extern const char *designate_flags[];
 extern const char *evo_types[];
 extern const int evo_val_types[NUM_EVOS];

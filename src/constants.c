@@ -3196,7 +3196,7 @@ const char *crop_flags[] = {
 
 
 // DPLTN_x
-const char *depletion_type[NUM_DEPLETION_TYPES] = {
+const char *depletion_type[] = {
 	"dig",
 	"forage",
 	"gather",
@@ -3208,6 +3208,7 @@ const char *depletion_type[NUM_DEPLETION_TYPES] = {
 	"chop",
 	"hunt",
 	"production",
+	"\n"
 };
 
 
