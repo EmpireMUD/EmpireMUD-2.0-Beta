@@ -693,7 +693,7 @@ void start_chopping(char_data *ch) {
 	if (!ROOM_AFF_FLAGGED(IN_ROOM(ch), ROOM_AFF_UNCLAIMABLE) && !can_use_room(ch, IN_ROOM(ch), MEMBERS_ONLY)) {
 		msg_to_char(ch, "You don't have permission to chop here.\r\n");
 	}
-	else if (!CAN_CHOP_ROOM(IN_ROOM(ch)) || get_depletion(IN_ROOM(ch), DPLTN_CHOP, FALSE) >= config_get_int("chop_depletion")) {
+	else if (!CAN_CHOP_ROOM(IN_ROOM(ch)) || get_depletion(IN_ROOM(ch), DPLTN_CHOP) >= config_get_int("chop_depletion")) {
 		msg_to_char(ch, "There's nothing left here to chop.\r\n");
 	}
 	else if (ROOM_AFF_FLAGGED(IN_ROOM(ch), ROOM_AFF_HAS_INSTANCE | ROOM_AFF_NO_EVOLVE)) {
@@ -841,7 +841,7 @@ INTERACTION_FUNC(finish_digging) {
 	int num;
 	
 	// depleted? (uses rock for all types except clay)
-	if (get_depletion(inter_room, DPLTN_DIG, FALSE) >= DEPLETION_LIMIT(inter_room)) {
+	if (get_depletion(inter_room, DPLTN_DIG) >= DEPLETION_LIMIT(inter_room)) {
 		msg_to_char(ch, "The ground is too hard and there doesn't seem to be anything useful to dig up here.\r\n");
 		return FALSE;
 	}
@@ -1473,7 +1473,7 @@ void process_chop(char_data *ch) {
 		remove_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_CHOP_PROGRESS);
 		
 		// run interacts for items only if not depleted
-		if (get_depletion(IN_ROOM(ch), DPLTN_CHOP, FALSE) < config_get_int("chop_depletion")) {
+		if (get_depletion(IN_ROOM(ch), DPLTN_CHOP) < config_get_int("chop_depletion")) {
 			got_any = run_room_interactions(ch, IN_ROOM(ch), INTERACT_CHOP, NULL, GUESTS_ALLOWED, finish_chopping);
 		}
 		
@@ -1523,7 +1523,7 @@ void process_digging(char_data *ch) {
 		GET_ACTION(ch) = ACT_NONE;
 		in_room = IN_ROOM(ch);
 		
-		if (get_depletion(IN_ROOM(ch), DPLTN_DIG, FALSE) < DEPLETION_LIMIT(IN_ROOM(ch)) && run_room_interactions(ch, IN_ROOM(ch), INTERACT_DIG, NULL, GUESTS_ALLOWED, finish_digging)) {
+		if (get_depletion(IN_ROOM(ch), DPLTN_DIG) < DEPLETION_LIMIT(IN_ROOM(ch)) && run_room_interactions(ch, IN_ROOM(ch), INTERACT_DIG, NULL, GUESTS_ALLOWED, finish_digging)) {
 			// success
 			gain_player_tech_exp(ch, PTECH_DIG, 10);
 		
@@ -1791,7 +1791,7 @@ void process_fishing(char_data *ch) {
 			}
 		}
 	}
-	else if (get_depletion(room, DPLTN_FISH, FALSE) >= DEPLETION_LIMIT(room)) {
+	else if (get_depletion(room, DPLTN_FISH) >= DEPLETION_LIMIT(room)) {
 		msg_to_char(ch, "You just don't seem to be able to catch anything here.\r\n");
 		GET_ACTION(ch) = ACT_NONE;
 	}
@@ -1854,7 +1854,7 @@ void process_foraging(char_data *ch) {
 			return;
 		}
 		
-		if (get_depletion(IN_ROOM(ch), DPLTN_FORAGE, FALSE) >= forage_depletion) {
+		if (get_depletion(IN_ROOM(ch), DPLTN_FORAGE) >= forage_depletion) {
 			msg_to_char(ch, "You can't find anything left to eat here.\r\n");
 			act("$n stops looking for things to eat as $e comes up empty-handed.", TRUE, ch, NULL, NULL, TO_ROOM);
 		}
@@ -1896,7 +1896,7 @@ void process_gathering(char_data *ch) {
 		
 	// done ?
 	if (GET_ACTION_TIMER(ch) <= 0) {
-		if (get_depletion(IN_ROOM(ch), DPLTN_GATHER, FALSE) >= gather_depletion) {
+		if (get_depletion(IN_ROOM(ch), DPLTN_GATHER) >= gather_depletion) {
 			msg_to_char(ch, "There's nothing good left to gather here.\r\n");
 			GET_ACTION(ch) = ACT_NONE;
 		}
@@ -2011,7 +2011,7 @@ void process_hunting(char_data *ch) {
 	if (number(1, 10000) <= chance_times_100) {
 		// found it!
 		
-		if (get_depletion(IN_ROOM(ch), DPLTN_HUNT, FALSE) >= config_get_int("short_depletion")) {
+		if (get_depletion(IN_ROOM(ch), DPLTN_HUNT) >= config_get_int("short_depletion")) {
 			// late check for depletion: make them hunt first
 			msg_to_char(ch, "You don't seem to be able to find any. Maybe this area has been hunted to depletion.\r\n");
 			GET_ACTION(ch) = ACT_NONE;
@@ -2295,7 +2295,7 @@ void process_panning(char_data *ch) {
 			GET_ACTION(ch) = ACT_NONE;
 			
 			// pan will silently fail if depleted
-			if (get_depletion(room, DPLTN_PAN, FALSE) <= config_get_int("short_depletion")) {
+			if (get_depletion(room, DPLTN_PAN) <= config_get_int("short_depletion")) {
 				success = run_room_interactions(ch, room, INTERACT_PAN, NULL, GUESTS_ALLOWED, finish_panning);
 			}
 			
@@ -3730,7 +3730,7 @@ bool can_gen_interact_room(char_data *ch, room_data *room, const struct gen_inte
 		if (!can_use_room(ch, IN_ROOM(ch), MEMBERS_ONLY)) {
 			can_room_but_no_permit = TRUE;	// error later
 		}
-		else if (data->depletion && get_depletion(room, data->depletion, FALSE) >= get_interaction_depletion_room(ch, GET_LOYALTY(ch), room, data->interact, FALSE)) {
+		else if (data->depletion && get_depletion(room, data->depletion) >= get_interaction_depletion_room(ch, GET_LOYALTY(ch), room, data->interact, FALSE)) {
 			can_room_but_depleted = TRUE;	// error later
 		}
 		else {
@@ -3748,7 +3748,7 @@ bool can_gen_interact_room(char_data *ch, room_data *room, const struct gen_inte
 			can_veh_but_no_permit = veh;
 			continue;
 		}
-		else if (data->depletion != NOTHING && get_vehicle_depletion(veh, data->depletion, FALSE) >= get_interaction_depletion(ch, GET_LOYALTY(ch), VEH_INTERACTIONS(veh), data->interact, FALSE)) {
+		else if (data->depletion != NOTHING && get_vehicle_depletion(veh, data->depletion) >= get_interaction_depletion(ch, GET_LOYALTY(ch), VEH_INTERACTIONS(veh), data->interact, FALSE)) {
 			can_veh_but_depleted = veh;
 			continue;
 		}
@@ -3821,10 +3821,10 @@ INTERACTION_FUNC(finish_gen_interact_room) {
 	if (!data) {
 		return FALSE;
 	}
-	if (data->depletion != NOTHING && inter_veh && get_vehicle_depletion(inter_veh, data->depletion, FALSE) >= (interact_one_at_a_time[interaction->type] ? interaction->quantity : config_get_int("common_depletion"))) {
+	if (data->depletion != NOTHING && inter_veh && get_vehicle_depletion(inter_veh, data->depletion) >= (interact_one_at_a_time[interaction->type] ? interaction->quantity : config_get_int("common_depletion"))) {
 		return FALSE;	// depleted vehicle
 	}
-	else if (data->depletion != NOTHING && !inter_veh && get_depletion(inter_room, data->depletion, FALSE) >= (interact_one_at_a_time[interaction->type] ? interaction->quantity : config_get_int("common_depletion"))) {
+	else if (data->depletion != NOTHING && !inter_veh && get_depletion(inter_room, data->depletion) >= (interact_one_at_a_time[interaction->type] ? interaction->quantity : config_get_int("common_depletion"))) {
 		return FALSE;	// depleted room
 	}
 	

@@ -4331,6 +4331,7 @@ const char *interact_restriction_types[] = {
 	"hard",
 	"group",
 	"boss",
+	"depletion",
 	"\n"
 };
 

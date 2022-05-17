@@ -4064,6 +4064,10 @@ char *get_interaction_restriction_display(struct interact_restriction *list, boo
 				snprintf(line, sizeof(line), "Boss");
 				break;
 			}
+			case INTERACT_RESTRICT_DEPLETION: {
+				snprintf(line, sizeof(line), "Depletion: %s", depletion_type[res->vnum]);
+				break;
+			}
 			default: {
 				snprintf(line, sizeof(line), "Unknown %d:%d", res->type, res->vnum);
 				break;
@@ -6551,6 +6555,19 @@ bool parse_interaction_restrictions(char_data *ch, char *argument, struct intera
 			}
 			else {
 				msg_to_char(ch, "Invalid ability '%s'.\r\n", arg);
+				fail = TRUE;
+			}
+		}
+		else if (is_abbrev(arg, "-depletion")) {
+			ptr = any_one_word(ptr, arg);
+			if ((num = search_block(arg, depletion_type, FALSE)) != NOTHING) {
+				CREATE(res, struct interact_restriction, 1);
+				res->type = INTERACT_RESTRICT_DEPLETION;
+				res->vnum = num;
+				LL_APPEND(*found_restrictions, res);
+			}
+			else {
+				msg_to_char(ch, "Invalid depletion type '%s'.\r\n", arg);
 				fail = TRUE;
 			}
 		}

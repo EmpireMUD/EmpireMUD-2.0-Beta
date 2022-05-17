@@ -4605,6 +4605,7 @@ Optional interaction restrictions:
  &c-normal&0 - Mob/obj must have no HARD or GROUP flag.
  &c-ptech <name>&0 - Player must have this player-tech.
  &c-tech <name>&0 - Empire must have this tech.
+ &c-depletion <type>&0 - Uses this type of depletion (see OLC DEPLETION).
 
 Examples:
 > .interaction add FORAGE 1 12345 100 x -ability "Find Herbs"
@@ -6205,6 +6206,35 @@ WARNING: This cannot be undone (except by restoring a backup, if there is one).
 
 See also: VNUM
 #d
+"OLC DEPLETION" "OLC DEPLETIONS" "INTERACTION DEPLETIONS" "PRODUCTION DEPLETIONS"
+
+The 'production' and 'skilled labor' workforce chores use building interactions
+to generate items for the empire. These default to the 'production' depletion
+type on the tile, but you can specify a different one using -depletion <type>
+on the interaction.
+
+Example: .interaction add PRODUCTION 125 12345 100.0 -depletion trapping
+ 125 is the maximum number to generate, 12345 is the vnum, 100.0 is the chance
+ to produce 1 each hour, and it uses the 'trapping' depletion type.
+
+Available depletion types:
+ dig
+ forage
+ gather
+ pick
+ fish
+ quarry
+ pan
+ trapping
+ chop
+ hunt
+ production
+
+Note: This only applies to the PRODUCTION and SKILLED-LABOR interactions, and
+only on buildings and vehicles.
+
+See also: BEDIT INTERACTION
+#d
 "OLC EDIT"
 
 Usage:  .<type> edit <vnum>
@@ -6545,12 +6575,15 @@ chore.
 
 The interaction's "quantity" is the depletion limit; workforce will produce the
 item 1 at a time. Depletions are slightly random; set this number 25% higher
-than the amount you want the player to get per year. All production on a single
-tile or building will share the same depletion counter.
+than the amount you want the player to get per year.
+
+All production on a single tile or building will share the same depletion
+counter unless you use the "-depletion <type>" option on each interaction. See
+the help file on OLC DEPLETION.
 
 The interaction's "percentage" is the chance per hour to produce the item.
 
-See also: INTERACTIONS, OLC WORKFORCE
+See also: INTERACTIONS, OLC WORKFORCE, OLC DEPLETION
 #d
 PROGEDIT "OLC PROGRESSION" "PROGRESSION OLC" "PROGRESS OLC"
 

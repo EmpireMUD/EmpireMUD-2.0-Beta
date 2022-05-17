@@ -3458,6 +3458,7 @@ void olc_delete_vehicle(char_data *ch, any_vnum vnum) {
 void olc_fullsearch_vehicle(char_data *ch, char *argument) {
 	char buf[MAX_STRING_LENGTH * 2], line[MAX_STRING_LENGTH], type_arg[MAX_INPUT_LENGTH], val_arg[MAX_INPUT_LENGTH], find_keywords[MAX_INPUT_LENGTH];
 	int count;
+	bool found_one;
 	
 	char only_icon[MAX_INPUT_LENGTH];
 	bitvector_t only_designate = NOBITS, only_flags = NOBITS, only_functions = NOBITS, only_affs = NOBITS;
@@ -3468,11 +3469,12 @@ void olc_fullsearch_vehicle(char_data *ch, char *argument) {
 	int only_hitpoints = NOTHING, hitpoints_over = NOTHING, hitpoints_under = NOTHING, only_level = NOTHING;
 	int only_military = NOTHING, military_over = NOTHING, military_under = NOTHING;
 	int only_rooms = NOTHING, rooms_over = NOTHING, rooms_under = NOTHING, only_move = NOTHING;
-	int size_under = NOTHING, size_over = NOTHING;
+	int size_under = NOTHING, size_over = NOTHING, only_depletion = NOTHING;
 	struct custom_message *cust;
 	bool needs_animals = FALSE;
 	
 	struct interaction_item *inter;
+	struct interact_restriction *inter_res;
 	vehicle_data *veh, *next_veh;
 	size_t size;
 	
@@ -3501,6 +3503,7 @@ void olc_fullsearch_vehicle(char_data *ch, char *argument) {
 		FULLSEARCH_INT("capacityover", cap_over, 0, INT_MAX)
 		FULLSEARCH_INT("capacityunder", cap_under, 0, INT_MAX)
 		FULLSEARCH_FLAGS("custom", find_custom, veh_custom_types)
+		FULLSEARCH_LIST("depletion", only_depletion, depletion_type)
 		FULLSEARCH_FLAGS("designate", only_designate, designate_flags)
 		FULLSEARCH_INT("fame", only_fame, 0, INT_MAX)
 		FULLSEARCH_INT("fameover", fame_over, 0, INT_MAX)
@@ -3611,6 +3614,20 @@ void olc_fullsearch_vehicle(char_data *ch, char *argument) {
 				found_interacts |= BIT(inter->type);
 			}
 			if ((find_interacts & found_interacts) != find_interacts) {
+				continue;
+			}
+		}
+		if (only_depletion != NOTHING) {
+			found_one = FALSE;
+			LL_FOREACH(VEH_INTERACTIONS(veh), inter) {
+				LL_FOREACH(inter->restrictions, inter_res) {
+					if (inter_res->type == INTERACT_RESTRICT_DEPLETION && inter_res->vnum == only_depletion) {
+						found_one = TRUE;
+						break;
+					}
+				}
+			}
+			if (!found_one) {
 				continue;
 			}
 		}
