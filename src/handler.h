@@ -359,10 +359,11 @@ bool remove_thing_from_resource_list(struct resource_data **list, int type, any_
 
 // resource depletion handlers
 void add_depletion(room_data *room, int type, bool multiple);
+void clear_depletions(room_data *room);
 #define add_vehicle_depletion(veh, type, multiple)  do { perform_add_depletion(&VEH_DEPLETION(veh), (type), (multiple)); request_vehicle_save_in_world(veh); } while (0)
-int get_depletion_amount(struct depletion_data *list, int type, bool only_type);
-#define get_depletion(room, type, only_type)  get_depletion_amount(ROOM_DEPLETION(room), (type), (only_type))
-#define get_vehicle_depletion(veh, type, only_type)  get_depletion_amount(VEH_DEPLETION(veh), (type), (only_type))
+int get_depletion_amount(struct depletion_data *list, int type);
+#define get_depletion(room, type)  get_depletion_amount(ROOM_DEPLETION(room), (type))
+#define get_vehicle_depletion(veh, type)  get_depletion_amount(VEH_DEPLETION(veh), (type))
 void perform_add_depletion(struct depletion_data **list, int type, bool multiple);
 bool remove_depletion_from_list(struct depletion_data **list, int type);
 void remove_depletion(room_data *room, int type);

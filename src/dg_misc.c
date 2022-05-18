@@ -664,18 +664,7 @@ void do_dg_terracrop(room_data *target, crop_data *cp) {
 	else {
 		change_terrain(target, GET_SECT_VNUM(sect), NOTHING);
 		set_crop_type(target, cp);
-		
-		remove_depletion(target, DPLTN_PICK);
-		remove_depletion(target, DPLTN_FORAGE);
-		remove_depletion(target, DPLTN_DIG);
-		remove_depletion(target, DPLTN_GATHER);
-		remove_depletion(target, DPLTN_FISH);
-		remove_depletion(target, DPLTN_QUARRY);
-		remove_depletion(target, DPLTN_PAN);
-		remove_depletion(target, DPLTN_TRAPPING);
-		remove_depletion(target, DPLTN_CHOP);
-		remove_depletion(target, DPLTN_HUNT);
-		remove_depletion(target, DPLTN_PRODUCTION);
+		clear_depletions(target);
 		
 		if (ROOM_OWNER(target)) {
 			deactivate_workforce_room(ROOM_OWNER(target), target);
@@ -698,18 +687,7 @@ void do_dg_terraform(room_data *target, sector_data *sect) {
 	
 	// preserve old original sect for roads -- TODO this is a special-case, also in .map terrain
 	change_terrain(target, GET_SECT_VNUM(sect), IS_ROAD(target) ? GET_SECT_VNUM(BASE_SECT(target)) : NOTHING);
-	
-	remove_depletion(target, DPLTN_PICK);
-	remove_depletion(target, DPLTN_FORAGE);
-	remove_depletion(target, DPLTN_DIG);
-	remove_depletion(target, DPLTN_GATHER);
-	remove_depletion(target, DPLTN_FISH);
-	remove_depletion(target, DPLTN_QUARRY);
-	remove_depletion(target, DPLTN_PAN);
-	remove_depletion(target, DPLTN_TRAPPING);
-	remove_depletion(target, DPLTN_CHOP);
-	remove_depletion(target, DPLTN_HUNT);
-	remove_depletion(target, DPLTN_PRODUCTION);
+	clear_depletions(target);
 	
 	if (ROOM_OWNER(target)) {
 		deactivate_workforce_room(ROOM_OWNER(target), target);

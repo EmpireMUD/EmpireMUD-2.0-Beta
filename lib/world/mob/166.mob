@@ -792,14 +792,6 @@ T 16681
 T 16682
 T 16603
 S
-#16681
-mobile new~
-floating lantern~
-A new mobile is standing here.
-~
-0 0 d 0 3
-0 0 0 15
-S
 #16682
 mobile new~
 snow mother~
@@ -811,14 +803,6 @@ S
 #16683
 mobile new~
 zero the red nosed ghost dog~
-A new mobile is standing here.
-~
-0 0 d 0 3
-0 0 0 15
-S
-#16684
-mobile new~
-gingerbread man~
 A new mobile is standing here.
 ~
 0 0 d 0 3

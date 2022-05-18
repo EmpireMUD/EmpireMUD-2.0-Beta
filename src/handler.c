@@ -8458,41 +8458,41 @@ void add_depletion(room_data *room, int type, bool multiple) {
 
 
 /**
-* Fetch a depletion amount. In normal cases, it returns the requested type
-* PLUS the production depletion, as production applies to all types. If you
-* request production, it will add the next-highest type. Or pass only_type=TRUE
-* to skip this part.
+* Clears all depletions on the room, e.g. when the terrain changes.
+*
+* @param room_data *room Which room.
+*/
+void clear_depletions(room_data *room) {
+	struct depletion_data *dep, *next_dep;
+	
+	if (room && ROOM_DEPLETION(room)) {
+		LL_FOREACH_SAFE(ROOM_DEPLETION(room), dep, next_dep) {
+			LL_DELETE(ROOM_DEPLETION(room), dep);
+			free(dep);
+		}
+		
+		request_world_save(GET_ROOM_VNUM(room), WSAVE_ROOM);
+	}
+}
+
+
+/**
+* Fetch a depletion amount.
 *
 * @param struct depletion_data *list List of depletions.
-* @param int type DPLTN_
-* @param bool only_type Normally this function combines 'production' depletion with the requested type, unless only_type is TRUE.
+* @param int type DPLTN_ Which type to get.
 * @return int The depletion counter on that resource in that room.
 */
-int get_depletion_amount(struct depletion_data *list, int type, bool only_type) {
+int get_depletion_amount(struct depletion_data *list, int type) {
 	struct depletion_data *dep;
-	int amount = 0, highest = 0;
 	
 	LL_FOREACH(list, dep) {
-		if (only_type && dep->type == type) {
-			// shortcut
+		if (dep->type == type) {
 			return dep->count;
-		}
-		else if (!only_type && type == DPLTN_PRODUCTION) {
-			// requesting 'production' will add the next-highest too
-			if (dep->type == DPLTN_PRODUCTION) {
-				amount += dep->count;
-			}
-			else if (dep->count > highest) {
-				highest = dep->count;
-			}
-		}
-		else if (!only_type && (dep->type == type || dep->type == DPLTN_PRODUCTION)) {
-			// requested a non-production type and will also add production to that
-			amount += dep->count;
 		}
 	}
 	
-	return amount + highest;
+	return 0;
 }
 
 

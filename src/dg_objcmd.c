@@ -519,7 +519,7 @@ OCMD(do_osend) {
 
 	if ((ch = get_char_by_obj(obj, buf))) {
 		if (subcmd == SCMD_OSEND)
-			sub_write(msg, ch, TRUE, TO_CHAR | (use_queue ? TO_QUEUE : 0));
+			sub_write(msg, ch, TRUE, TO_CHAR | TO_SLEEP | (use_queue ? TO_QUEUE : 0));
 		else if (subcmd == SCMD_OECHOAROUND)
 			sub_write(msg, ch, TRUE, TO_ROOM | (use_queue ? TO_QUEUE : 0));
 	}

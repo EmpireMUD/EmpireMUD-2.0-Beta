@@ -315,7 +315,7 @@ while %cycle% < 2
     break
     case 1
       %echoaround% %actor% ~%actor% vanishes in a flourish of yellow light!
-      %teleport% %actor% %actor.home%
+      %teleport% %actor% %startloc%
       %force% %actor% look
       %echoaround% %actor% ~%actor% appears in a flourish of yellow light!
     break

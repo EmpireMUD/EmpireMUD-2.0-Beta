@@ -1691,14 +1691,28 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options) {
 }
 
 
+/**
+* Called when a player types 'look <direction>' with no further pre-validation.
+*
+* @param char_data *ch The player.
+* @param int dir The direction they typed.
+*/
 void look_in_direction(char_data *ch, int dir) {
 	char buf[MAX_STRING_LENGTH - 9], buf2[MAX_STRING_LENGTH - 9];	// save room for the "You see "
+	char *exdesc;
 	vehicle_data *veh;
 	char_data *c;
 	room_data *to_room;
 	struct room_direction_data *ex;
 	int last_comma_pos, prev_comma_pos, num_commas;
 	size_t bufsize;
+	
+	// check first for an extra description that covers the direction
+	snprintf(buf, sizeof(buf), "%s", dirs[dir]);
+	if ((exdesc = find_exdesc_for_char(ch, buf, NULL, NULL, NULL, NULL))) {
+		send_to_char(exdesc, ch);
+		return;
+	}
 	
 	// weather override
 	if (IS_OUTDOORS(ch) && dir == UP && !find_exit(IN_ROOM(ch), dir)) {

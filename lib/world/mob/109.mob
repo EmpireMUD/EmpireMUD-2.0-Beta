@@ -5,6 +5,11 @@ A colossal red dragon looms over you!
 ~
 250 300 bdgxyzAB cmE 6
 2 0 2 10
+D
+   Towering over you like a scaly red keep, the dragon simultaneously chills
+you to the bone and brings your skin blisteringly close to burning. Perhaps she
+hasn't seen you yet...
+~
 I 0 10907 75.00 2  # BUTCHER: raw dragon steak
 I 0 10907 75.00 2  # BUTCHER: raw dragon steak
 I 0 10907 75.00 2  # BUTCHER: raw dragon steak
@@ -62,6 +67,11 @@ Sir Vivor is glancing around nervously.
 ~
 250 300 bdkvxyzAB cE 3
 1 0 0 1
+D
+   Rarely have these lands seen a man so gallant as this. His armor gleams even
+in the low light of the fire and his stark white teeth and protruding chin are
+the very definition of handsomeness. At least, according to his biography.
+~
 I 4 10907 75.00 2  # LOOT: raw dragon steak
 I 4 10907 75.00 2  # LOOT: raw dragon steak
 I 4 10907 75.00 2  # LOOT: raw dragon steak
@@ -117,6 +127,10 @@ A nervous thief is hiding in the shadows.
 ~
 250 300 dkv nD 3
 1 0 0 15
+D
+   True to his name, he's wearing a colossal number of bangles on his wrists.
+Some of them still have price tags attached!
+~
 T 10902
 T 10903
 T 10913
@@ -128,6 +142,10 @@ The token vendor is peddling his wares (list).
 ~
 250 300 bdov nD 3
 1 0 0 15
+D
+   This hapless little man looks a little singed and his hands start to shake
+at any loud noise nearby.
+~
 T 10914
 S
 #10904
@@ -137,6 +155,10 @@ A crimson serpent is coiled here.
 ~
 100 125 dej 0 2
 0 0 5 10
+D
+   This stunning creature resembles a legless dragon. Its crimson scales are
+warm to the touch, and it seems docile enough to ride.
+~
 I 0 10907 100.00 2  # BUTCHER: raw dragon steak
 S
 #10905
@@ -146,6 +168,11 @@ A small crimson dragon is circling.
 ~
 100 125 dej m 2
 0 0 2 10
+D
+   Though small by dragon standards, this stunning crimson beast is easily
+twice the size of a horse and already strong enough to carry a full-grown man
+while flying.
+~
 I 0 10907 100.00 2  # BUTCHER: raw dragon steak
 S
 #10906
@@ -155,6 +182,10 @@ A crimson sea dragon splashes around.
 ~
 100 125 dejl 0 2
 0 0 6 9
+D
+   This elegant dragon has tall fins in place of wings. With webbed feet and a
+flattened tail, it seems to have taken to the sea.
+~
 I 0 10907 100.00 2  # BUTCHER: raw dragon steak
 S
 #10950

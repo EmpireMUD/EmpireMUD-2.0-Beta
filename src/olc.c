@@ -4064,6 +4064,10 @@ char *get_interaction_restriction_display(struct interact_restriction *list, boo
 				snprintf(line, sizeof(line), "Boss");
 				break;
 			}
+			case INTERACT_RESTRICT_DEPLETION: {
+				snprintf(line, sizeof(line), "Depletion: %s", depletion_type[res->vnum]);
+				break;
+			}
 			default: {
 				snprintf(line, sizeof(line), "Unknown %d:%d", res->type, res->vnum);
 				break;
@@ -4143,7 +4147,7 @@ void get_interaction_display(struct interaction_item *list, char *save_buffer) {
 			sprintf(save_buffer + strlen(save_buffer), " (%c)", interact->exclusion_code);
 		}
 		if (interact->restrictions) {
-			sprintf(save_buffer + strlen(save_buffer), " (requires: %s)", get_interaction_restriction_display(interact->restrictions, TRUE));
+			sprintf(save_buffer + strlen(save_buffer), " (%s)", get_interaction_restriction_display(interact->restrictions, TRUE));
 		}
 		strcat(save_buffer, "\r\n");
 	}
@@ -6554,6 +6558,19 @@ bool parse_interaction_restrictions(char_data *ch, char *argument, struct intera
 				fail = TRUE;
 			}
 		}
+		else if (is_abbrev(arg, "-depletion")) {
+			ptr = any_one_word(ptr, arg);
+			if ((num = search_block(arg, depletion_type, FALSE)) != NOTHING) {
+				CREATE(res, struct interact_restriction, 1);
+				res->type = INTERACT_RESTRICT_DEPLETION;
+				res->vnum = num;
+				LL_APPEND(*found_restrictions, res);
+			}
+			else {
+				msg_to_char(ch, "Invalid depletion type '%s'.\r\n", arg);
+				fail = TRUE;
+			}
+		}
 		else if (is_abbrev(arg, "-boss")) {
 			CREATE(res, struct interact_restriction, 1);
 			res->type = INTERACT_RESTRICT_BOSS;
@@ -6887,7 +6904,7 @@ void olc_process_interactions(char_data *ch, char *argument, struct interaction_
 				msg_to_char(ch, " (%c)", exc);
 			}
 			if (found_restrictions) {
-				msg_to_char(ch, " (requires: %s)", get_interaction_restriction_display(found_restrictions, TRUE));
+				msg_to_char(ch, " (%s)", get_interaction_restriction_display(found_restrictions, TRUE));
 			}
 			msg_to_char(ch, "\r\n");
 		}

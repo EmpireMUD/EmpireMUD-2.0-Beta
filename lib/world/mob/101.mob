@@ -41,6 +41,11 @@ Berk is crouched by the fire, whittling some wood.
 ~
 100 200 abdvzB 0 3
 1 0 0 4
+D
+   He looks like he's been living out here for a while. You can't see what he's
+whittling, but there are a lot of charred wooden skewers around, so he's
+probably getting ready to make dinner.
+~
 I 4 10109 10.00 1 X  # LOOT: bloodletter's ring
 I 4 10107 5.00 1 X  # LOOT: pack of dry rations
 T 10000
@@ -53,6 +58,9 @@ Jorr is cooking a pot of beans over the fire.
 ~
 100 200 abdvxzB 0 3
 2 0 0 12
+D
+She's stirring the beans with a dagger. It's tough living out here.
+~
 I 4 10105 10.00 1 X  # LOOT: black leather armor
 I 4 10107 5.00 1 X  # LOOT: pack of dry rations
 T 10000
@@ -65,6 +73,10 @@ Tranc is strapping on his armor.
 ~
 100 200 abdvyB 0 3
 1 0 0 5
+D
+   From the tusk marks on his armor, you can surmise he's getting ready to go
+hunt a boar.
+~
 I 4 10106 10.00 1 X  # LOOT: spiked aklys
 I 4 10108 5.00 1 X  # LOOT: armored neck guard
 T 10000
@@ -77,6 +89,10 @@ A black-haired thief hound is standing guard.
 ~
 100 200 abdjz 0 2
 0 0 0 9
+D
+   This shaggy old dog has gone a little gray around the muzzle, but it looks
+like she still has all her teeth.
+~
 T 10108
 S
 #10110
@@ -86,6 +102,10 @@ A thief is hunched in the corner.
 ~
 0 0 abdv D 3
 1 0 0 4
+D
+   He looks like he's doing pretty well for himself, between his charming
+necklace and expensive shadowcraft pants.
+~
 I 4 10114 10.00 1 a  # LOOT: talismanic shiv
 I 4 10118 10.00 1 a  # LOOT: makeshift wand
 I 4 10119 10.00 1 a  # LOOT: old morning star
@@ -110,6 +130,10 @@ A thief is warming her hands by the fire.
 ~
 0 0 abdv D 3
 2 0 0 4
+D
+   She has a roguish look about her. And presumably, she's good at it, as she
+seems to be using a talismanic weapon. Those are expensive.
+~
 I 4 10114 10.00 1 a  # LOOT: talismanic shiv
 I 4 10118 10.00 1 a  # LOOT: makeshift wand
 I 4 10119 10.00 1 a  # LOOT: old morning star
@@ -134,6 +158,9 @@ A thief is leaning against the wall.
 ~
 0 0 abdv D 3
 2 0 0 4
+D
+Looks like she's just a hired dagger.
+~
 I 4 10114 5.00 1 a  # LOOT: talismanic shiv
 I 4 10118 5.00 1 a  # LOOT: makeshift wand
 I 4 10119 5.00 1 a  # LOOT: old morning star
@@ -157,6 +184,9 @@ A baby dragon has hatched!
 ~
 0 0 bdy c 3
 0 0 2 9
+D
+What a cute little green dragon. Wonder where the mother went.
+~
 I 0 3012 100.00 1  # BUTCHER: fillet of raw meat
 I 1 10006 100.00 1  # SKIN: dragon scale
 T 10024
@@ -169,6 +199,9 @@ A thief is hunched in the corner.
 ~
 0 0 abdv D 3
 1 0 0 4
+D
+You barely noticed him there. That must be why they call him Sly.
+~
 I 4 10126 100.00 1  # LOOT: tenebrous aura
 I 4 10114 10.00 1 a  # LOOT: talismanic shiv
 I 4 10118 10.00 1 a  # LOOT: makeshift wand

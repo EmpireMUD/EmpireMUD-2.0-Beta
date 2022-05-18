@@ -6690,6 +6690,7 @@ void do_stat_room(char_data *ch) {
 	struct time_info_data tinfo;
 	int found, num, zenith;
 	bool comma;
+	adv_data *adv;
 	obj_data *j;
 	char_data *k;
 	crop_data *cp;
@@ -6738,6 +6739,17 @@ void do_stat_room(char_data *ch) {
 		msg_to_char(ch, ", Natural: [\tg%d\t0 - \tg%s\t0]", GET_SECT_VNUM(map->natural_sector), GET_SECT_NAME(map->natural_sector));
 	}
 	msg_to_char(ch, "\r\n");
+	
+	// building/room data
+	if (GET_ROOM_TEMPLATE(IN_ROOM(ch))) {
+		msg_to_char(ch, "Room template: [\to%d\t0 - \to%s\t0]\r\n", GET_RMT_VNUM(GET_ROOM_TEMPLATE(IN_ROOM(ch))), GET_RMT_TITLE(GET_ROOM_TEMPLATE(IN_ROOM(ch))));
+		if ((adv = get_adventure_for_vnum(GET_RMT_VNUM(GET_ROOM_TEMPLATE(IN_ROOM(ch)))))) {
+			msg_to_char(ch, "Adventure: [\to%d\t0 - \to%s\t0]\r\n", GET_ADV_VNUM(adv), GET_ADV_NAME(adv));
+		}
+	}
+	if (GET_BUILDING(IN_ROOM(ch))) {
+		msg_to_char(ch, "Building: [\to%d\t0 - \to%s\t0]\r\n", GET_BLD_VNUM(GET_BUILDING(IN_ROOM(ch))), GET_BLD_NAME(GET_BUILDING(IN_ROOM(ch))));
+	}
 	
 	msg_to_char(ch, "VNum: [\tg%d\t0], Lights: [\tg%d\t0], Island: [\tg%d\t0] %s, Height [\tg%d/%d\t0]\r\n", GET_ROOM_VNUM(IN_ROOM(ch)), ROOM_LIGHTS(IN_ROOM(ch)), GET_ISLAND_ID(IN_ROOM(ch)), GET_ISLAND(IN_ROOM(ch)) ? GET_ISLAND(IN_ROOM(ch))->name : "no island", ROOM_HEIGHT(IN_ROOM(ch)), get_room_blocking_height(IN_ROOM(ch), NULL));
 	

@@ -1017,22 +1017,22 @@ remote msg_pos %self.id%
 Lich combat~
 0 k 10
 ~
-if !%self.affect(foresight)%
+if !%self.affect(3009)%
   foresight
-elseif !%actor.affect(slow)%
+elseif !%actor.affect(3035)%
   slow
 else
   switch %random.4%
     case 1
       %send% %actor% ~%self% grabs you by the neck and you're both enveloped in a bright purple glow!
       %echoaround% %actor% ~%self% grabs ~%actor% by the neck and they're both enveloped in a bright purple glow!
-      %damage% %self% -50
+      %heal% %self% health 50
       %damage% %actor% 75 magical
     break
     case 2
-      %send% %actor% ~%self% stares into your eyes. You can't move!
-      %echoaround% %actor% ~%self% stares into |%actor% eyes. ~%actor% seems unable to move!
-      dg_affect %actor% STUNNED on 10
+      %send% %actor% ~%self% stares into your eyes. You begin to wither!
+      %echoaround% %actor% ~%self% stares into |%actor% eyes. ~%actor% seems to wither!
+      dg_affect #10052 %actor% strength -2 10
     break
     case 3
       %echo% ~%self% raises ^%self% arms and the floor begins to rumble...

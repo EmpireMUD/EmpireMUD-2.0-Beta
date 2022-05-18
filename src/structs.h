@@ -419,6 +419,7 @@ typedef struct vehicle_data vehicle_data;
 #define INTERACT_RESTRICT_HARD  4	// only when mob/obj is 'hard' (but not group)
 #define INTERACT_RESTRICT_GROUP  5	// only when mob/obj is 'group' (but not hard)
 #define INTERACT_RESTRICT_BOSS  6	// only when mob/obj is 'hard' (hard + group)
+#define INTERACT_RESTRICT_DEPLETION  7	// determines which depletion is checked/applied, if applicable
 
 
 // for object saving

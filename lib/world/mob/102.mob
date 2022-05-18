@@ -5,6 +5,11 @@ A goblin bruiser is guarding the nest.
 ~
 50 150 bd 0 2
 1 0 0 5
+D
+   The scars and bruises on Zelkab tell of a short, rough life in the goblin
+fighting pits. For all that, he walks tall (for a goblin, at least) and carries
+his club like a warrior.
+~
 T 10201
 T 10205
 T 19061
@@ -18,6 +23,11 @@ A goblin shaman is drawing symbols in the blood on the floor.
 ~
 50 150 bdxyA 0 2
 2 0 0 16
+D
+   As she draws sigils and signs in the ash and blood on the floor, Garlgarl
+mutters strange words in goblinese. It's hard to tell what she's doing, but
+there's little chance it's something good.
+~
 T 10200
 T 10201
 T 10207
@@ -32,6 +42,10 @@ A goblin archer is trying to fix her bow.
 ~
 50 150 abdzA 0 2
 2 0 0 1
+D
+   Fliks is scrawny, even for a goblin, but it seems to make him more lithe. 
+He's quicker than most.
+~
 T 10200
 T 10201
 T 10209
@@ -46,6 +60,10 @@ A goblin sapper is trying to light something on fire.
 ~
 50 150 abdyA s 2
 1 0 0 4
+D
+   Walts is on the chubby side. At least, you hope that's pudge hiding under
+his shirt. If it's more bombs, you're in trouble.
+~
 T 10200
 T 10201
 T 10211
@@ -60,6 +78,11 @@ The goblin champion is unpolishing her armor.
 ~
 50 150 bdB 0 2
 2 0 0 2
+D
+   Nilbog is scrubbing her armor with a goblin polishing stone. It just looks
+like pumice, but telling her she's scratching her armor will only lead to a
+fight.
+~
 T 10200
 T 10201
 T 10213
@@ -74,6 +97,11 @@ The goblin war shaman is raising his staff!
 ~
 50 150 bdxyAB 0 2
 1 0 0 18
+D
+   Furl swirls his staff in the fire, drawing visions of battle from the fire.
+Every so often, one of the flaming visions swirls into Furl's mouth, and he
+seems to consume it with a fiery belch.
+~
 T 10200
 T 10201
 T 19065
@@ -87,6 +115,9 @@ A big, hairy goblin warg is snarling at you!
 ~
 50 50 dej 0 3
 0 0 0 10
+D
+It's like someone bred a back alley howler with a dire wolf.
+~
 I 0 3012 100.00 2  # BUTCHER: fillet of raw meat
 I 1 1351 100.00 1  # SKIN: large skin
 I 1 1351 50.00 1  # SKIN: large skin
@@ -99,6 +130,9 @@ An armored goblin warg is here!
 ~
 100 100 bdej 0 3
 0 0 0 10
+D
+This mangy warg has been plated in green-tinged iron armor.
+~
 I 0 3012 100.00 2  # BUTCHER: fillet of raw meat
 I 1 1351 100.00 1  # SKIN: large skin
 I 1 1351 50.00 1  # SKIN: large skin
@@ -110,6 +144,9 @@ A big, hairy goblin warg is snarling at you!
 ~
 50 50 dej 0 3
 0 0 0 10
+D
+It's like someone bred a back alley howler with a dire wolf.
+~
 I 0 3012 100.00 2  # BUTCHER: fillet of raw meat
 I 1 1351 100.00 1  # SKIN: large skin
 I 1 1351 50.00 1  # SKIN: large skin
@@ -122,6 +159,11 @@ A winged wolf flaps around near the ground.
 ~
 100 125 dej m 3
 0 0 2 9
+D
+   Astonishingly, someone has magically grafted condor wings to this poor wolf.
+It doesn't seem any worse for the wear, though, as it flies in circles chasing
+its own tail.
+~
 S
 #10225
 druid #n~
@@ -130,6 +172,10 @@ the druid #n~
 ~
 50 50 bdv nD 3
 0 2 0 15
+D
+   The druid is wearing a cool white robe, stained from the waist down from
+working in the dirt.
+~
 T 10233
 T 10225
 T 10226
@@ -141,6 +187,9 @@ the gardener~
 ~
 50 50 bdv nD 3
 0 0 0 15
+D
+You can tell they take pride in these gardens.
+~
 T 10233
 S
 #10227
@@ -150,6 +199,9 @@ An enchanted tumbleweed is blowing through.
 ~
 0 50 de G 2
 0 0 4 28
+D
+It's rolling around to its stem's content.
+~
 S
 #10250
 chronomancer #n~

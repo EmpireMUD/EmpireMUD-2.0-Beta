@@ -1790,7 +1790,8 @@ The following affect flags are available:
  HARD-STUNNED - A stun that cannot be cleansed and does not trigger immunity.
  IMMUNE-DAMAGE - Cannot take damage -- do not use this on items.
  !WHERE - Cannot be found using the 'where' command.
- WATERWALK - Does not need to swim and doesn't drown.
+ WATERWALK - Does not need to swim and doesn't drown. Unlike the AQUATIC mob
+   flag, this allows it to move on both water and land.
 #d
 ARCHEDIT "OLC ARCHETYPES" "ARCHETYPE OLC" "ARCHETYPE EDITOR"
 
@@ -2306,6 +2307,7 @@ Fields:
   &c-affects&0 - see HELP BEDIT AFFECTS
   &c-citizens -citizensover -citizensunder&0 - specific number of citizens
   &c-commands&0 - match the text of the commands line, if any
+  &c-depletion&0 - see HELP OLC DEPLETION
   &c-designate&0 - see HELP DESIGNATE FLAGS
   &c-fame -fameover -fameunder&0 - specific fame amount
   &c-flagged -unflagged&0 - see HELP BEDIT FLAGS
@@ -4453,7 +4455,7 @@ Available mob flags:
  TIED - Tied to a hitching post; will not wander unless untied; does not despawn.
  ANIMAL - Counts as an animal for herding, tying, etc.
  MOUNTAIN-WALK - Can cross mountain tiles.
- AQUATIC - Can cross water tiles, but won't move on land.
+ AQUATIC - Can cross water tiles, but won't move on land. (see WATERWALK)
  *PLURAL - Uses the pronouns 'their', 'they', and 'them' in act messages.
  NO-ATTACK - Mob can be in combat, but will not hit
  SPAWNED - De-spawns after 5 minutes if no players are nearby.
@@ -4604,6 +4606,7 @@ Optional interaction restrictions:
  &c-normal&0 - Mob/obj must have no HARD or GROUP flag.
  &c-ptech <name>&0 - Player must have this player-tech.
  &c-tech <name>&0 - Empire must have this tech.
+ &c-depletion <type>&0 - Uses this type of depletion (see OLC DEPLETION).
 
 Examples:
 > .interaction add FORAGE 1 12345 100 x -ability "Find Herbs"
@@ -6204,6 +6207,35 @@ WARNING: This cannot be undone (except by restoring a backup, if there is one).
 
 See also: VNUM
 #d
+"OLC DEPLETION" "OLC DEPLETIONS" "INTERACTION DEPLETIONS" "PRODUCTION DEPLETIONS"
+
+The 'production' and 'skilled labor' workforce chores use building interactions
+to generate items for the empire. These default to the 'production' depletion
+type on the tile, but you can specify a different one using -depletion <type>
+on the interaction.
+
+Example: .interaction add PRODUCTION 125 12345 100.0 -depletion trapping
+ 125 is the maximum number to generate, 12345 is the vnum, 100.0 is the chance
+ to produce 1 each hour, and it uses the 'trapping' depletion type.
+
+Available depletion types:
+ dig
+ forage
+ gather
+ pick
+ fish
+ quarry
+ pan
+ trapping
+ chop
+ hunt
+ production
+
+Note: This only applies to the PRODUCTION and SKILLED-LABOR interactions, and
+only on buildings and vehicles.
+
+See also: BEDIT INTERACTION
+#d
 "OLC EDIT"
 
 Usage:  .<type> edit <vnum>
@@ -6544,12 +6576,15 @@ chore.
 
 The interaction's "quantity" is the depletion limit; workforce will produce the
 item 1 at a time. Depletions are slightly random; set this number 25% higher
-than the amount you want the player to get per year. All production on a single
-tile or building will share the same depletion counter.
+than the amount you want the player to get per year.
+
+All production on a single tile or building will share the same depletion
+counter unless you use the "-depletion <type>" option on each interaction. See
+the help file on OLC DEPLETION.
 
 The interaction's "percentage" is the chance per hour to produce the item.
 
-See also: INTERACTIONS, OLC WORKFORCE
+See also: INTERACTIONS, OLC WORKFORCE, OLC DEPLETION
 #d
 PROGEDIT "OLC PROGRESSION" "PROGRESSION OLC" "PROGRESS OLC"
 
@@ -8402,6 +8437,7 @@ with a dash (-) are matched to the vehicle's name and other text.
 Fields:
   &c-animalsrequired&0 - number required (or "any" for anything over zero)
   &c-capacity -capacityover -capacityunder&0 - specific capacity
+  &c-depletion&0 - see HELP OLC DEPLETION
   &c-designate&0 - see HELP DESIGNATE FLAGS
   &c-fame -fameover -fameunder&0 - specific fame amount
   &c-flagged -unflagged&0 - see HELP VEDIT FLAGS

@@ -736,6 +736,11 @@ A great buffalo grazes below the green boughs.
 ~
 100 125 dejo 0 4
 0 0 0 27
+D
+   This majestic animal stands head and shoulders above you. Its shaggy
+shoulders look like a mountain from down here, and its short horns are plenty
+long enough to gore you.
+~
 I 0 3012 100.00 3  # BUTCHER: fillet of raw meat
 I 1 1351 100.00 4  # SKIN: large skin
 I 3 10777 100.00 1  # BARDE: armored war buffalo
@@ -748,6 +753,12 @@ An armored war buffalo is grazing under heavy armor.
 ~
 200 225 bdejo 0 4
 0 0 0 27
+D
+   This majestic armored animal stands head and shoulders above you. Its shaggy
+shoulders look like a mountain from down here, and its short horns are plenty
+long enough to gore you. Fine plate armor has been fitted to the buffalo to
+ensure that when it rides into battle, nothing can stop it.
+~
 I 0 3012 100.00 3  # BUTCHER: fillet of raw meat
 I 1 1351 100.00 4  # SKIN: large skin
 I 4 10781 100.00 1  # LOOT: buffalo leash
@@ -759,6 +770,10 @@ A great zebra stands in the shadows, hidden.
 ~
 100 125 dejo 0 4
 0 0 0 27
+D
+   This stunning beast is emblazoned with white stripes on a black background.
+It holds its head high as it watches you, always ready to move.
+~
 I 0 3012 100.00 2  # BUTCHER: fillet of raw meat
 I 1 1351 100.00 2  # SKIN: large skin
 I 3 10779 100.00 1  # BARDE: armored war zebra
@@ -771,6 +786,11 @@ An armored war zebra stands valliantly before you.
 ~
 200 225 bdejo 0 4
 0 0 0 27
+D
+   This stunning beast is emblazoned with white stripes on a black background.
+It holds its head high as it watches you, always ready to move. Its gleaming
+armor makes it a formidable steed in battle.
+~
 I 0 3012 100.00 2  # BUTCHER: fillet of raw meat
 I 1 1351 100.00 2  # SKIN: large skin
 I 4 10782 100.00 1  # LOOT: zebra leash
@@ -782,6 +802,11 @@ A buffalo calf prances around you.
 ~
 1 1 bdoD n 2
 0 0 0 9
+D
+   This little brown calf looks like the shaggy cousin of a young cow. It
+barely shows the shoulder hump it will grow as an adult but it looks absolutely
+adorable.
+~
 M
 0
 $n prances around you.~
@@ -807,6 +832,9 @@ A zebra foal prances around you.
 ~
 1 1 bdoD n 2
 0 0 0 9
+D
+This adorable little foal is striped in white and black.
+~
 M
 0
 $n prances around you.~

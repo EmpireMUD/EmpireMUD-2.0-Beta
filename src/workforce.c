@@ -122,7 +122,7 @@ int einv_interaction_chore_type = 0;
 
 
 #define CHORE_ACTIVE(chore)  (empire_chore_limit(emp, island, (chore)) != 0 && !workforce_is_delayed(emp, room, (chore)) && (chore_data[(chore)].requires_tech == NOTHING || EMPIRE_HAS_TECH(emp, chore_data[(chore)].requires_tech)))
-#define GET_CHORE_DEPLETION(room, veh, type)  ((veh) ? get_vehicle_depletion((veh), (type), FALSE) : get_depletion((room), (type), FALSE))
+#define GET_CHORE_DEPLETION(room, veh, type)  ((veh) ? get_vehicle_depletion((veh), (type)) : get_depletion((room), (type)))
 #define ADD_CHORE_DEPLETION(room, veh, type, multiple)  { if (veh) { add_vehicle_depletion((veh), (type), (multiple)); } else { add_depletion((room), (type), (multiple)); } }
 
 
@@ -989,6 +989,29 @@ void deactivate_workforce_room(empire_data *emp, room_data *room) {
 
 
 /**
+* Determines which DPLTN_ depletion type the interaction uses. This defaults
+* to 'production' depletion.
+*
+* @param struct interaction_item *interact The interaction item.
+* @return int The DPLTN_ type for the interaction.
+*/
+int determine_depletion_type(struct interaction_item *interact) {
+	struct interact_restriction *res;
+	int type = DPLTN_PRODUCTION;	// default
+	
+	if (interact) {
+		LL_FOREACH(interact->restrictions, res) {
+			if (res->type == INTERACT_RESTRICT_DEPLETION) {
+				type = res->vnum;
+			}
+		}
+	}
+	
+	return type;
+}
+
+
+/**
 * Gets an empire's workforce chore limit:
 * 0: Do not work
 * -1: Use natural limit
@@ -1182,6 +1205,57 @@ int get_workforce_production_limit(empire_data *emp, obj_vnum vnum) {
 	}
 	
 	return UNLIMITED;	// no entry
+}
+
+
+/**
+* Checks the depletion types for all matching interactions to see if there's at
+* least 1 available for a chore.
+*
+* @param room_data *room Optional: The room to check for interactions. May be NULL if using a vehicle.
+* @param vehicle_data *veh Optional: The vehicle to check for interactions. May be NULL if using a room.
+* @param int interaction_type Any INTERACT_ type.
+* @return bool TRUE if at least 1 interaction is available and undepleted.
+*/
+bool has_any_undepleted_interaction_for_chore(room_data *room, vehicle_data *veh, int interaction_type) {
+	struct interaction_item *interact, *list[4] = { NULL, NULL, NULL, NULL };
+	int iter, list_size, common_depletion, depletion_type;
+	crop_data *cp;
+	
+	if (!room && !veh) {
+		return FALSE;	// requires 1 or the other
+	}
+	
+	// prevent more lookups in the loop
+	common_depletion = config_get_int("common_depletion");
+	
+	// build lists of interactions to check
+	list_size = 0;
+	if (room) {
+		list[list_size++] = GET_SECT_INTERACTIONS(SECT(room));
+		if (ROOM_SECT_FLAGGED(room, SECTF_CROP) && (cp = ROOM_CROP(room))) {
+			list[list_size++] = GET_CROP_INTERACTIONS(cp);
+		}
+		if (GET_BUILDING(room) && IS_COMPLETE(room)) {
+			list[list_size++] = GET_BLD_INTERACTIONS(GET_BUILDING(room));
+		}
+	}
+	if (veh) {
+		list[list_size++] = VEH_INTERACTIONS(veh);
+	}
+	
+	// check all lists
+	for (iter = 0; iter < list_size; ++iter) {
+		LL_FOREACH(list[iter], interact) {
+			depletion_type = determine_depletion_type(interact);
+			if (GET_CHORE_DEPLETION(room, veh, depletion_type) < (interact_one_at_a_time[interaction_type] ? interact->quantity : common_depletion)) {
+				// only needed 1
+				return TRUE;
+			}
+		}
+	}
+	
+	return FALSE;
 }
 
 
@@ -1910,7 +1984,7 @@ INTERACTION_FUNC(one_chop_chore) {
 
 void do_chore_chopping(empire_data *emp, room_data *room) {
 	char_data *worker = find_chore_worker_in_room(emp, room, NULL, chore_data[CHORE_CHOPPING].mob);
-	bool depleted = (get_depletion(room, DPLTN_CHOP, FALSE) >= config_get_int("chop_depletion"));
+	bool depleted = (get_depletion(room, DPLTN_CHOP) >= config_get_int("chop_depletion"));
 	bool can_gain = can_gain_chore_resource_from_interaction_room(emp, room, CHORE_CHOPPING, INTERACT_CHOP);
 	bool can_do = !depleted && can_gain;
 	
@@ -2370,7 +2444,7 @@ void do_chore_farming(empire_data *emp, room_data *room) {
 			run_room_interactions(worker, room, INTERACT_PICK, NULL, NOTHING, one_farming_chore);
 			
 			// only change to seeded if it's over-picked			
-			if (get_depletion(room, DPLTN_PICK, FALSE) >= get_interaction_depletion_room(NULL, emp, room, INTERACT_PICK, TRUE)) {
+			if (get_depletion(room, DPLTN_PICK) >= get_interaction_depletion_room(NULL, emp, room, INTERACT_PICK, TRUE)) {
 				if (empire_chore_limit(emp, GET_ISLAND_ID(room), CHORE_REPLANTING) && (old_sect = reverse_lookup_evolution_for_sector(SECT(room), EVO_CROP_GROWS))) {
 					// sly-convert back to what it was grown from ... not using change_terrain
 					perform_change_sect(room, NULL, old_sect);
@@ -2703,10 +2777,11 @@ void do_chore_minting(empire_data *emp, room_data *room, vehicle_data *veh) {
 INTERACTION_FUNC(one_production_chore) {
 	empire_data *emp = inter_veh ? VEH_OWNER(inter_veh) : ROOM_OWNER(inter_room);
 	char buf[MAX_STRING_LENGTH], amtbuf[256];
-	int amt;
+	int amt, depletion_type;
 	
 	// make sure this item isn't depleted
-	if (emp && GET_CHORE_DEPLETION(inter_room, inter_veh, DPLTN_PRODUCTION) >= (interact_one_at_a_time[interaction->type] ? interaction->quantity : config_get_int("common_depletion"))) {
+	depletion_type = determine_depletion_type(interaction);
+	if (emp && GET_CHORE_DEPLETION(inter_room, inter_veh, depletion_type) >= (interact_one_at_a_time[interaction->type] ? interaction->quantity : config_get_int("common_depletion"))) {
 		return FALSE;
 	}
 	
@@ -2715,6 +2790,8 @@ INTERACTION_FUNC(one_production_chore) {
 		ewt_mark_resource_worker(emp, inter_room, interaction->vnum, amt);
 		add_to_empire_storage(emp, GET_ISLAND_ID(inter_room), interaction->vnum, amt);
 		add_production_total(emp, interaction->vnum, amt);
+		
+		ADD_CHORE_DEPLETION(inter_room, inter_veh, depletion_type, TRUE);
 		
 		// only send message if someone else is present (don't bother verifying it's a player)
 		if (ROOM_PEOPLE(IN_ROOM(ch))->next_in_room) {
@@ -2750,19 +2827,20 @@ INTERACTION_FUNC(one_production_chore) {
 */
 void do_chore_production(empire_data *emp, room_data *room, vehicle_data *veh, int interact_type) {
 	char_data *worker = find_chore_worker_in_room(emp, room, veh, chore_data[CHORE_PRODUCTION].mob);
-	int max_depletion = interact_one_at_a_time[interact_type] ? (veh ? get_interaction_depletion(NULL, emp, VEH_INTERACTIONS(veh), interact_type, TRUE) : get_interaction_depletion_room(NULL, emp, room, interact_type, TRUE)) : config_get_int("common_depletion");
-	bool depleted = (GET_CHORE_DEPLETION(room, veh, DPLTN_PRODUCTION) >= max_depletion) ? TRUE : FALSE;
 	bool can_gain = veh ? can_gain_chore_resource_from_interaction_list(emp, room, CHORE_PRODUCTION, VEH_INTERACTIONS(veh), interact_type, FALSE) : can_gain_chore_resource_from_interaction_room(emp, room, CHORE_PRODUCTION, interact_type);
-	bool can_do = !depleted && can_gain;
+	bool depleted = !has_any_undepleted_interaction_for_chore(room, veh, interact_type);
+	bool can_do = can_gain && !depleted;
 	
 	if (worker && can_do) {
 		charge_workforce(emp, CHORE_PRODUCTION, room, worker, 1, NOTHING, 0);
 		
 		if (veh && run_interactions(worker, VEH_INTERACTIONS(veh), interact_type, room, NULL, NULL, veh, one_production_chore)) {
-			ADD_CHORE_DEPLETION(room, veh, DPLTN_PRODUCTION, TRUE);
+			// depletions are now set inside one_production_chore
+			// ADD_CHORE_DEPLETION(room, veh, DPLTN_PRODUCTION, TRUE);
 		}
 		else if (!veh && run_room_interactions(worker, room, interact_type, veh, NOTHING, one_production_chore)) {
-			ADD_CHORE_DEPLETION(room, veh, DPLTN_PRODUCTION, TRUE);
+			// depletions are now set inside one_production_chore
+			// ADD_CHORE_DEPLETION(room, veh, DPLTN_PRODUCTION, TRUE);
 		}
 	}
 	else if (can_do) {
