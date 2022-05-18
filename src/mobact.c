@@ -694,7 +694,7 @@ bool try_mobile_movement(char_data *ch) {
 	}
 	
 	// pick a random direction
-	if (IS_OUTDOORS(ch)) {
+	if (IS_OUTDOORS(ch) && !IS_ADVENTURE_ROOM(IN_ROOM(ch))) {
 		dir = number(-1, NUM_2D_DIRS-1);
 	}
 	else {
