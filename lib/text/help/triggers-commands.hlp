@@ -757,7 +757,7 @@ This command instantly kills a mob or player.
 #d
 "SWITCH STATEMENT" "CASE STATEMENT" "BREAK STATEMENT" "DEFAULT STATEMENT" CASE DEFAULT BREAK TRIG-SWITCH TRIGEDIT-SWITCH
 
-Switch statements let you compare once variable to several outcomes. A switch
+Switch statements let you compare one variable to several outcomes. A switch
 always ends with a break statement. Inside, it contains pairs of case/break
 section, and may have a default/break section.
 
