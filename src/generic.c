@@ -616,11 +616,19 @@ void add_generic_to_table(generic_data *gen) {
 	
 	if (gen) {
 		vnum = GEN_VNUM(gen);
+		
+		// main table
 		HASH_FIND_INT(generic_table, &vnum, find);
 		if (!find) {
 			HASH_ADD_INT(generic_table, vnum, gen);
 			HASH_SORT(generic_table, sort_generics);
-			HASH_SORT(sorted_generics, sort_generics_by_data);
+		}
+		
+		// sorted table
+		HASH_FIND(sorted_hh, sorted_generics, &vnum, sizeof(int), find);
+		if (!find) {
+			HASH_ADD(sorted_hh, sorted_generics, vnum, sizeof(int), gen);
+			HASH_SRT(sorted_hh, sorted_generics, sort_generics_by_data);
 		}
 	}
 }
@@ -633,6 +641,7 @@ void add_generic_to_table(generic_data *gen) {
 */
 void remove_generic_from_table(generic_data *gen) {
 	HASH_DEL(generic_table, gen);
+	HASH_DELETE(sorted_hh, sorted_generics, gen);
 }
 
 
@@ -1470,7 +1479,7 @@ void save_olc_generic(descriptor_data *desc) {
 	save_library_file_for_vnum(DB_BOOT_GEN, vnum);
 	
 	// resort
-	HASH_SORT(sorted_generics, sort_generics_by_data);
+	HASH_SRT(sorted_hh, sorted_generics, sort_generics_by_data);
 	
 	// update computed relations
 	if (GEN_TYPE(gen) == GENERIC_COMPONENT || GEN_RELATIONS(gen) || GEN_COMPUTED_RELATIONS(gen)) {
