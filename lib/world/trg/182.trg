@@ -547,6 +547,33 @@ set tortoise %room.vehicles%
 return 0
 %purge% %self%
 ~
+#18226
+random guild adventurer description~
+0 n 100
+~
+switch %random.4%
+  case 1
+    %mod% %self% longdesc %self.name% is looking for a place to setup %self.hisher% lab tent.
+    %mod% %self% lookdesc The shoes of this adventurer are completely covered in muck and other unspeakable things from the city's sewers where the local goblin outpost is located.
+    %mod% %self% append-lookdesc Seems as though %self.heshe% had some luck however, as a goblin made dagger rests in a sheath on %self.hisher% hip and a bundled lab tent is over %self.hisher% shoulder.
+  break
+  case 2
+    %mod% %self% longdesc Muck slowly drips from %self.name%'s winged armor.
+    %mod% %self% lookdesc The shoes of this adventurer are completely covered in muck and other unspeakable things from the city's sewers where %self.heshe% has been hunting rats and other denizens of those smelly tunnels.
+    %mod% %self% append-lookdesc It seems %self.heshe% might have found a young dragon down there as well, given the winged armor containing %self.hisher% torso.
+  break
+  case 3
+    %mod% %self% longdesc %self.name% looks a little burnt but happy as %self.heshe% walks around.
+    %mod% %self% lookdesc Even with this adventurer's obvious low to mid quality gear, you can see %self.heshe%'s been rather busy hunting the wandering dragons of the world.
+    %mod% %self% append-lookdesc With slightly scorched armor, weapon, and hair %self.heshe% is still grinning as %self.heshe% sports a reasonable collection of dragon scales.
+  break
+  case 4
+    %mod% %self% longdesc %self.name% wanders along in a scent cloud of burning bodies.
+    %mod% %self% lookdesc The scent of burning bodies clings to this adventurer as %self.heshe% walks about.
+    %mod% %self% append-lookdesc At first it isn't clear just where that offensive scent would have come from, but then %self.heshe% plucks a Necrofiend's spike from %self.hisher% backside with a wince.
+  break
+done
+~
 #18238
 Consider / Kill Death~
 0 c 0
@@ -559,7 +586,7 @@ end
 if consider /= %cmd%
   %send% %actor% You consider your chances against ~%self%.
   %echoaround% %actor% ~%actor% considers ^%actor% chances against ~%self%.
-  %send% %actor% &%self% looks like &%self%'d destroy you!
+  %send% %actor% &%self% looks like &%self% will destroy you in time!
   return 1
   halt
 else

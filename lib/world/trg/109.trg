@@ -161,7 +161,7 @@ switch %random.4%
     if (%target%)
       %send% %target% &&r~%self% uses ^%self% tail to hurl a rock at you, stunning you momentarily!&&0
       %echoaround% %target% ~%self% hurls a rock at ~%target% with ^%self% tail, stunning *%target% momentarily!
-      dg_affect %target% HARD-STUNNED on 10
+      dg_affect %target% STUNNED on 10
       %damage% %target% 150 physical
     end
   break

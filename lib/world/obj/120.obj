@@ -736,14 +736,17 @@ R
 4 5114 0
 S
 #12053
-seeds jar date palm~
-a jar of date palm seeds~
-A jar of date palm seeds is sitting here.~
-   This clay jar looks truly ancient. There's no telling how long these seeds
-have been sealed inside. You could probably still plant them, if you had a
-fertile desert.
+seeds purse date palm~
+a purse of date palm seeds~
+A purse of date palm seeds is lying here.~
+   This purse is made from well-worn snake leather, so old that the pattern on
+its scales is no longer discernible. Though the seeds have been tucked away in
+the purse a long time, you could probably still PLANT them.
+   Since ancient times, dates have been cultivated in Mesopotamia, Egypt,
+Arabia, and beyond. The fronds of the date palm were used in Roman triumphal
+processions. Beyond that, it makes a beautiful ornimental tree.
 ~
-3 b a 0 7
+3 b a 0 8
 0 12052 0
 7 168
 R

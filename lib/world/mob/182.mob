@@ -28,6 +28,10 @@ A man is waiting for his turn in the fight.
 ~
 200 250 bd n 3
 1 0 0 15
+D
+   He's bouncing on the balls of his feet, practising his jabs at the air, and
+just amped up for his turn.
+~
 S
 #18204
 leon~
@@ -147,6 +151,10 @@ The shadows curl around #n, guild umbramancer.
 ~
 0 0 bdv nD 3
 0 2 0 15
+D
+   Multiple varied forms can be seen in the shadows covering this being. 
+Though no one is quite sure what its true shape looks like.
+~
 F 18200
 M
 1
@@ -265,9 +273,14 @@ S
 ~
 100 150 dqv 0 3
 0 0 0 1
+D
+   This nondescript adventurer is armored in some standard adventuring gear,
+nothing too special nor too poor. All in all, they seem ready to rush into
+anything that might offer a pay out and some adventure.
+~
 M
 1
-Brr, I thought I was going to freeze to death on that last adventure.~
+Brr, I thought I was going to freeze to death on that one adventure.~
 M
 0
 $n winces as $e pulls some spines out of $s leg.~
@@ -280,6 +293,7 @@ Could've sworn I had my coinpurse before I cleared out those thieves...~
 M
 1
 That boy and his rats...~
+T 18226
 S
 #18217
 guildmage mage #n~
@@ -469,6 +483,11 @@ An umbral warg stalks from shadow to shadow.
 ~
 100 125 dej 0 4
 0 0 9 9
+D
+   This wolfish beast is smokey black from its head to the tip of its tail,
+allowing for easier blending with the shadows. The only bright coloration
+visible comes from its vibrent eyes and white fangs.
+~
 T 18240
 S
 #18232
@@ -478,6 +497,11 @@ A clockwork steed is munching on some rocks.
 ~
 100 125 de 0 4
 0 0 12 9
+D
+   Thin metal flesh coats this beast of burden, concealing most cogs and wires
+within granting movement. Glowing red eyes shine from the face, clearly lit in
+some manor, though by what is unclear.
+~
 T 18240
 S
 #18234
@@ -528,6 +552,13 @@ A bony tavern patron with a hooded cloak and scythe is sitting here.
 ~
 0 0 bd nD 3
 1 0 0 15
+D
+   With a voice like two slabs of stone rubbed together, He strikes a
+commanding presence -- at least, to those who can see Him. Some of the patrons
+seems to be oblivious to His presence. It's hard to imagine how, as He has a
+skeletal face, hands, and feet visible beneath His inky black robe. On top of
+that, He wields a massive scythe and has a glimmering sword at His waist.
+~
 M
 1
 WHAT'S IT ALL ABOUT? SERIOUSLY? WHEN YOU GET RIGHT DOWN TO IT?~
@@ -598,6 +629,13 @@ Archsorcerer Malfernes removes his cloak and hangs it in the air.
 ~
 0 0 bdvxzBE cnCE 3
 1 0 0 22
+D
+   The Archsorcerer's silky violet robe drapes on the ground as he hovers
+around the clearing. The tall collar, towering mitre, and exaggerated sleeves
+are all lined with gold that has a swirling nocturnium-black pattern which
+shifts in the light. None of this is important though, as he has removed said
+cloak and is floating about in basic black clothing.
+~
 T 18296
 S
 #18282
@@ -607,9 +645,9 @@ A fearsome dragon coils through the halls and archways of the tower!
 ~
 0 200 dghnxA choBCDEG 5
 0 0 5 16
-I 4 18284 33.34 1 a  # LOOT: an imaginary whistle
-I 4 18285 33.33 1 a  # LOOT: an imaginary egg
-I 4 18293 33.33 1 a  # LOOT: an imaginary seed
+I 4 18284 33.34 1 a  # LOOT: imaginary whistle
+I 4 18285 33.33 1 a  # LOOT: imaginary egg
+I 4 18293 33.33 1 a  # LOOT: imaginary seed
 M
 0
 $n spurts clouds of black smoke, which rise up to the ceiling and hang overhead.~
@@ -691,9 +729,9 @@ A pen dragon flies around, trailing a stream of black ink.
 ~
 100 200 djoxA cm 5
 0 0 2 27
-I 0 3012 100.00 4  # BUTCHER: a fillet of raw meat
-I 1 10006 50.00 1  # SKIN: a dragon scale
-I 1 1351 100.00 2  # SKIN: a large skin
+I 0 3012 100.00 4  # BUTCHER: fillet of raw meat
+I 1 10006 50.00 1  # SKIN: dragon scale
+I 1 1351 100.00 2  # SKIN: large skin
 S
 #18298
 dragon dungeon~
@@ -702,9 +740,9 @@ A dungeon dragon has gotten free!
 ~
 100 200 djoxA cm 5
 0 0 2 27
-I 0 3012 100.00 4  # BUTCHER: a fillet of raw meat
-I 1 10006 50.00 1  # SKIN: a dragon scale
-I 1 1351 100.00 2  # SKIN: a large skin
+I 0 3012 100.00 4  # BUTCHER: fillet of raw meat
+I 1 10006 50.00 1  # SKIN: dragon scale
+I 1 1351 100.00 2  # SKIN: large skin
 S
 #18299
 dragon luck little~
@@ -713,8 +751,8 @@ A little luck dragon twists and turns through the air.
 ~
 100 200 djoxA cm 2
 0 0 2 27
-I 0 3012 100.00 4  # BUTCHER: a fillet of raw meat
-I 1 10006 50.00 1  # SKIN: a dragon scale
-I 1 1351 100.00 2  # SKIN: a large skin
+I 0 3012 100.00 4  # BUTCHER: fillet of raw meat
+I 1 10006 50.00 1  # SKIN: dragon scale
+I 1 1351 100.00 2  # SKIN: large skin
 S
 $

@@ -5,6 +5,9 @@ The adviser's pageboy is standing here.
 ~
 0 25 dv nD 3
 1 0 0 15
+D
+He's running around and announcing the Royal Planning Office.
+~
 T 10800
 T 10802
 S
@@ -15,6 +18,9 @@ Clara, the Forest Ranger, is adjusting her boot.
 ~
 0 0 bdv nD 3
 2 0 0 15
+D
+Clara is here to ensure the forests are safe and well-kept.
+~
 T 10801
 S
 #10802
@@ -24,6 +30,9 @@ Rosemary, the City Planner, is reviewing a scroll.
 ~
 0 0 bdv nD 3
 2 0 0 15
+D
+Rosemary has been tasked with setting up a fledgling city.
+~
 T 10801
 S
 #10803
@@ -33,6 +42,9 @@ Hugo, the Royal Adviser, sits behind his desk.
 ~
 0 0 bdv nD 3
 1 0 0 15
+D
+Hugo is just keeping track of things and report back to the king.
+~
 T 10801
 S
 #10825
@@ -43,7 +55,7 @@ The museum crier is standing here.
 0 25 dv nD 3
 1 0 0 15
 D
-   Beyond his tear-stained face, you can see the crier has had a rough life. 
+   Beyond his tear-stained face, you can see the crier has had a rough life.
 This is probably his first paying job in a long time.
 ~
 T 10825
@@ -220,6 +232,9 @@ A friendly spirit is floating nearby.
 ~
 1 1 bdoD n 0
 0 0 27 9
+D
+It fades in and out of view, but you feel warm whenever it appears.
+~
 T 9901
 T 9902
 S

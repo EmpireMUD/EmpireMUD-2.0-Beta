@@ -689,12 +689,12 @@ done
 Adventurer bribe~
 0 tv 0
 ~
-if %self.aff_flagged(*CHARM)%
-  %send% %actor% Someone else has already bribed ~%self%.
-  return 0
-  halt
-end
 if %questvnum% == 12504
+  if %self.aff_flagged(*CHARM)%
+    %send% %actor% Someone else has already bribed ~%self%.
+    return 0
+    halt
+  end
   return 1
   mfollow %actor%
   dg_affect %self% *CHARM on -1
