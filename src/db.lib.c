@@ -6620,7 +6620,12 @@ void discrete_load(FILE *fl, int mode, char *filename) {
 
 	/* modes positions correspond to DB_BOOT_x in db.h */
 	// TODO move this into the other DB_BOOT_x array
-	const char *modes[] = {"world", "mob", "obj", "zone", "empire", "book", "craft", "trg", "crop", "sector", "adventure", "room template", "global", "account", "augment", "archetype", "ability", "class", "skill", "vehicle", "morph", "quest", "social", "faction", "generic", "shop", "progress", "event" };
+	const char *modes[] = {"world", "mob", "obj", "names", "empire", "book",
+		"craft", "building", "trigger", "crop", "sector", "adventure",
+		"room template", "global", "account", "augment", "archetype",
+		"ability", "class", "skill", "vehicle", "morph", "quest", "social",
+		"faction", "generic", "shop", "progress", "event"
+	};
 
 	for (;;) {
 		if (!get_line(fl, line)) {
