@@ -694,7 +694,12 @@ bool try_mobile_movement(char_data *ch) {
 	}
 	
 	// pick a random direction
-	dir = number(-1, NUM_2D_DIRS-1);
+	if (IS_OUTDOORS(ch)) {
+		dir = number(-1, NUM_2D_DIRS-1);
+	}
+	else {
+		dir = number(-1, NUM_NATURAL_DIRS-1);
+	}
 	
 	// -1 will attempt to enter/exit a vehicle instead
 	if (dir == -1 && ROOM_CAN_EXIT(IN_ROOM(ch)) && (!GET_ROOM_VEHICLE(IN_ROOM(ch)) || VEH_FLAGGED(GET_ROOM_VEHICLE(IN_ROOM(ch)), VEH_BUILDING))) {
