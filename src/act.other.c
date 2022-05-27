@@ -867,21 +867,24 @@ void summon_player(char_data *ch, char *argument) {
 	}
 	else {
 		// mostly-valid by now... just a little bit more to check
-		found = FALSE;
-		DL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), ch_iter, next_in_room) {
-			if (IS_DEAD(ch_iter) || !ch_iter->desc) {
-				continue;
-			}
+		// requires a 2nd group member present IF the target is from a different empire
+		if (GET_LOYALTY(vict) != GET_LOYALTY(ch) || !GET_LOYALTY(ch)) {
+			found = FALSE;
+			DL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), ch_iter, next_in_room) {
+				if (IS_DEAD(ch_iter) || !ch_iter->desc) {
+					continue;
+				}
 			
-			if (ch_iter != ch && GROUP(ch_iter) == GROUP(ch)) {
-				found = TRUE;
-				break;
+				if (ch_iter != ch && GROUP(ch_iter) == GROUP(ch)) {
+					found = TRUE;
+					break;
+				}
 			}
-		}
 		
-		if (!found) {
-			msg_to_char(ch, "You need a second group member present to help summon.\r\n");
-			return;
+			if (!found) {
+				msg_to_char(ch, "You need a second group member present to help summon.\r\n");
+				return;
+			}
 		}
 		
 		act("You start summoning $N...", FALSE, ch, NULL, vict, TO_CHAR);
