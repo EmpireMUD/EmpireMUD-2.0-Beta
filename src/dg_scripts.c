@@ -3737,6 +3737,18 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					else if (!str_cmp(field, "is_immortal")) {
 						snprintf(str, slen, "%d", IS_IMMORTAL(c) ? 1 : 0);
 					}
+					else if (!str_cmp(field, "is_tagged_by")) {
+						char_data *targ;
+						if (subfield && *subfield && (targ = get_char(subfield))) {
+							if (IS_NPC(targ) && GET_LEADER(targ)) {
+								targ = GET_LEADER(targ);
+							}
+							snprintf(str, slen, "%d", IS_TAGGED_BY(c, targ) ? 1 : 0);
+						}
+						else {
+							strcpy(str, "0");
+						}
+					}
 					else if (!str_cmp(field, "is_waterwalking")) {
 						snprintf(str, slen, HAS_WATERWALK(c) ? "1" : "0");
 					}
