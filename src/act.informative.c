@@ -1251,7 +1251,9 @@ void look_at_char(char_data *i, char_data *ch, bool show_eq) {
 	}
 	
 	// diagnose at the end
-	diag_char_to_char(i, ch);
+	if (GET_HEALTH(i) < GET_MAX_HEALTH(i)) {
+		diag_char_to_char(i, ch);
+	}
 	
 	// membership info
 	if (GET_LOYALTY(i) && !disguise) {
