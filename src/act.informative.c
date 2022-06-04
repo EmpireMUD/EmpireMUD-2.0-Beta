@@ -1316,7 +1316,7 @@ void look_at_char(char_data *i, char_data *ch, bool show_eq) {
 		}
 	
 		// show inventory
-		if (ch != i && has_player_tech(ch, PTECH_SEE_INVENTORY)) {
+		if (ch != i && has_player_tech(ch, PTECH_SEE_INVENTORY) && i->carrying) {
 			act("\r\nYou appraise $s inventory:", FALSE, i, 0, ch, TO_VICT);
 			list_obj_to_char(i->carrying, ch, OBJ_DESC_INVENTORY, TRUE);
 
