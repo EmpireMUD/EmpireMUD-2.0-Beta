@@ -26,6 +26,7 @@
 /* same as any_one_arg except that it stops at punctuation */
 char *any_one_name(char *argument, char *first_arg) {
 	char *arg;
+	bool has_uid = FALSE;
 
 	/* Find first non blank */
 	while (isspace(*argument)) {
@@ -33,7 +34,11 @@ char *any_one_name(char *argument, char *first_arg) {
 	}
 
 	/* Find length of first word */
-	for (arg = first_arg; *argument && !isspace(*argument) && (!ispunct(*argument) || *argument == UID_CHAR || *argument == '#' || *argument == '-'); arg++, argument++) {
+	// update: if it finds a UID char, it now ends after the numeric portion, preventing it from eating the 'self' in *%mob%self
+	for (arg = first_arg; *argument && !isspace(*argument) && (!has_uid || isdigit(*argument)) && (!ispunct(*argument) || *argument == UID_CHAR || *argument == '#' || *argument == '-'); arg++, argument++) {
+		if (*argument == UID_CHAR) {
+			has_uid = TRUE;
+		}
 		*arg = LOWER(*argument);
 	}
 	*arg = '\0';
