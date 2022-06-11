@@ -153,6 +153,9 @@ ACMD(do_consider) {
 	else if (vict == ch) {
 		msg_to_char(ch, "You look pretty wimpy.\r\n");
 	}
+	else if (AFF_FLAGGED(vict, AFF_NO_ATTACK)) {
+		act("$N cannot be attacked.", FALSE, ch, NULL, vict, TO_CHAR);
+	}
 	else {
 		// scale first
 		if (!IS_IMMORTAL(ch)) {
