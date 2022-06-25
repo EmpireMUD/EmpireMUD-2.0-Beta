@@ -798,7 +798,8 @@ ACMD(do_mload) {
 		}
 		
 		cnt = (*arg1 == UID_CHAR) ? get_obj(arg1) : get_obj_vis(ch, arg1, NULL);
-		if (cnt && GET_OBJ_TYPE(cnt) == ITEM_CONTAINER) {	// load in container
+		if (cnt && (GET_OBJ_TYPE(cnt) == ITEM_CONTAINER || GET_OBJ_TYPE(cnt) == ITEM_CORPSE)) {
+			// load in container
 			obj_to_obj(object, cnt);
 			load_otrigger(object);
 			return;

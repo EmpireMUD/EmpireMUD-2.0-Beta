@@ -1136,7 +1136,7 @@ WCMD(do_wload) {
 			return;
 		}
 		cnt = get_obj_in_room(room, arg1);
-		if (cnt && GET_OBJ_TYPE(cnt) == ITEM_CONTAINER) {
+		if (cnt && (GET_OBJ_TYPE(cnt) == ITEM_CONTAINER || GET_OBJ_TYPE(cnt) == ITEM_CORPSE)) {
 			obj_to_obj(object, cnt);
 			load_otrigger(object);
 			return;
