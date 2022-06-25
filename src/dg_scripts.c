@@ -6528,7 +6528,7 @@ struct cmdlist_element *find_end(struct cmdlist_element *cl) {
 	if (!(cl->next))
 		return cl;
 
-	for (c = cl->next; c->next; c = c->next) {
+	for (c = cl->next; c && c->next; c = c->next) {
 		for (p = c->cmd; *p && isspace(*p); p++);
 
 		if (!strn_cmp("if ", p, 3))
