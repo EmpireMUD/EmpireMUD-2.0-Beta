@@ -1888,7 +1888,10 @@ void reset_one_room(room_data *room) {
 			case 'S': { // custom string
 				if (mob) {
 					half_chop(reset->sarg1, field, str);
-					if (is_abbrev(field, "keywords")) {
+					if (is_abbrev(field, "sex")) {
+						change_sex(mob, atoi(str));
+					}
+					else if (is_abbrev(field, "keywords")) {
 						change_keywords(mob, str);
 					}
 					else if (is_abbrev(field, "longdescription")) {
@@ -4519,6 +4522,9 @@ bool write_map_and_room_to_file(room_vnum vnum, bool force_obj_pack) {
 				// custom strings
 				if (mob->customized) {
 					m_proto = mob_proto(GET_MOB_VNUM(mob));
+					if (!m_proto || GET_REAL_SEX(mob) != GET_REAL_SEX(m_proto)) {
+						fprintf(fl, "Load: S sex %d\n", GET_REAL_SEX(mob));
+					}
 					if (!m_proto || GET_PC_NAME(mob) != GET_PC_NAME(m_proto)) {
 						fprintf(fl, "Load: S keywords %s\n", NULLSAFE(GET_PC_NAME(mob)));
 					}
