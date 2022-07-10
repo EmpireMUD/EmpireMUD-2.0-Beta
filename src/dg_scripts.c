@@ -5190,12 +5190,24 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					}
 					else if (!str_cmp(field, "people")) {
 						char_data *temp_ch = NULL;
+						mob_vnum find_vnum = NOTHING;
+						
+						// optional vnum search
+						if (subfield && *subfield && isdigit(*subfield)) {
+							find_vnum = atoi(subfield);
+						}
 				
 						// attempt to prevent extracted people from showing in lists
 						DL_FOREACH2(ROOM_PEOPLE(r), temp_ch, next_in_room) {
-							if (!SCRIPT_SHOULD_SKIP_CHAR(temp_ch)) {
-								break;
+							if (find_vnum != NOTHING && GET_MOB_VNUM(temp_ch) != find_vnum) {
+								continue;	// vnum mismatch
 							}
+							if (find_vnum == NOTHING && SCRIPT_SHOULD_SKIP_CHAR(temp_ch)) {
+								continue;	// skippable character (if not searching by vnum)
+							}
+							
+							// if we got to here, this is valid character; break out
+							break;
 						}
 				
 						if (temp_ch) {
