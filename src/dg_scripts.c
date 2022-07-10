@@ -5199,6 +5199,9 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 				
 						// attempt to prevent extracted people from showing in lists
 						DL_FOREACH2(ROOM_PEOPLE(r), temp_ch, next_in_room) {
+							if (EXTRACTED(ch)) {
+								continue;	// always skip
+							}
 							if (find_vnum != NOTHING && GET_MOB_VNUM(temp_ch) != find_vnum) {
 								continue;	// vnum mismatch
 							}
