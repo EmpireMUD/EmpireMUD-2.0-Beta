@@ -1271,7 +1271,7 @@ void look_at_char(char_data *i, char_data *ch, bool show_eq) {
 		act(buf, FALSE, ch, NULL, i, TO_CHAR);
 	}
 	
-	if (size_data[GET_SIZE(i)].show_on_look) {
+	if (size_data[GET_SIZE(i)].show_on_look && (IS_MORPHED(i) ? !MORPH_LOOK_DESC(GET_MORPH(i)) : !GET_LOOK_DESC(i))) {
 		act(size_data[GET_SIZE(i)].show_on_look, FALSE, ch, NULL, i, TO_CHAR);
 	}
 	
