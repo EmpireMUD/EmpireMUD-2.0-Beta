@@ -4465,7 +4465,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 				case 'c': {	// obj.c*
 					if (!str_cmp(field, "can_wear")) {
 						int pos;
-						if (subfield && *subfield && (pos = search_block(subfield, wear_bits, FALSE))) {
+						if (subfield && *subfield && (pos = search_block(subfield, wear_bits, FALSE)) != NOTHING) {
 							snprintf(str, slen, "%d", CAN_WEAR(o, BIT(pos)) ? 1 : 0);
 						}
 						else {
