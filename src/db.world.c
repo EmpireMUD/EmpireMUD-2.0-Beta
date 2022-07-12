@@ -1936,17 +1936,13 @@ void reset_one_room(room_data *room) {
 					if (!SCRIPT(tmob)) {
 						create_script_data(tmob, MOB_TRIGGER);
 					}
-					else {
-						add_var(&(SCRIPT(tmob)->global_vars), reset->sarg1, reset->sarg2, reset->arg3);
-					}
+					add_var(&(SCRIPT(tmob)->global_vars), reset->sarg1, reset->sarg2, reset->arg3);
 				}
 				else if (reset->arg1 == WLD_TRIGGER) {
 					if (!room->script) {
 						create_script_data(room, WLD_TRIGGER);
 					}
-					else {
-						add_var(&(room->script->global_vars), reset->sarg1, reset->sarg2, reset->arg3);
-					}
+					add_var(&(room->script->global_vars), reset->sarg1, reset->sarg2, reset->arg3);
 				}
 				break;
 			}
