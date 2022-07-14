@@ -4828,7 +4828,7 @@ void load_one_room_from_wld_file(room_vnum vnum, char index_data) {
 	bitvector_t bit_in[2];
 	long long_in;
 	int int_in[4];
-	char char_in, *reset_read;
+	char char_in, *reset_read, str_in[256];
 	FILE *fl;
 	
 	map = (vnum < MAP_SIZE) ? &world_map[MAP_X_COORD(vnum)][MAP_Y_COORD(vnum)] : NULL;
@@ -5058,10 +5058,11 @@ void load_one_room_from_wld_file(room_vnum vnum, char index_data) {
 					DL_APPEND(room->reset_commands, reset);
 					
 					if (*reset_read == 'A') {	// affect: type cast_by duration modifier location bitvector
-						if (sscanf(reset_read, "%c %lld %lld %lld %lld %lld %s", &reset->command, &reset->arg1, &reset->arg2, &reset->arg3, &reset->arg4, &reset->arg5, reset->sarg2) != 7) {
+						if (sscanf(reset_read, "%c %lld %lld %lld %lld %lld %s", &reset->command, &reset->arg1, &reset->arg2, &reset->arg3, &reset->arg4, &reset->arg5, str_in) != 7) {
 							log("SYSERR: Invalid load command: %s: '%s'", error, line);
 							exit(1);
 						}
+						reset->sarg1 = str_dup(str_in);
 					}
 					else if (*reset_read == 'S') {	// mob custom strings: <string type> <value>
 						reset->command = *reset_read;
