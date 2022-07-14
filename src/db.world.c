@@ -1839,6 +1839,7 @@ void reset_one_room(room_data *room) {
 					affect_to_char(mob, aff);
 					free(aff);
 				}
+				break;
 			}
 			case 'M': {	// read a mobile
 				mob = read_mobile(reset->arg1, FALSE);	// no scripts
