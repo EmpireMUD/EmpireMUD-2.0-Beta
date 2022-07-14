@@ -6102,6 +6102,8 @@ struct reset_com {
 	long long arg1;
 	long long arg2;	// Arguments to the command
 	long long arg3;
+	long long arg4;
+	long long arg5;
 
 	char *sarg1;	// string argument
 	char *sarg2;	// string argument

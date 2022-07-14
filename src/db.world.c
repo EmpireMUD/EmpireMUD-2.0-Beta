@@ -1817,6 +1817,7 @@ struct empire_city_data *create_city_entry(empire_data *emp, char *name, room_da
 */
 void reset_one_room(room_data *room) {
 	char field[256], str[MAX_INPUT_LENGTH];
+	struct affected_type *aff;
 	struct reset_com *reset, *next_reset;
 	char_data *tmob = NULL; /* for trigger assignment */
 	char_data *mob = NULL;
@@ -1830,6 +1831,15 @@ void reset_one_room(room_data *room) {
 	// start loading
 	DL_FOREACH_SAFE(room->reset_commands, reset, next_reset) {
 		switch (reset->command) {
+			case 'A': {	// add affect to mob
+				if (mob) {
+					aff = create_aff(reset->arg1, reset->arg3, reset->arg5, reset->arg4, asciiflag_conv(reset->sarg1), NULL);
+					aff->cast_by = reset->arg2;
+					aff->duration = reset->arg3;
+					affect_to_char(mob, aff);
+					free(aff);
+				}
+			}
 			case 'M': {	// read a mobile
 				mob = read_mobile(reset->arg1, FALSE);	// no scripts
 				MOB_FLAGS(mob) = reset->arg2;
@@ -4300,6 +4310,7 @@ void write_binary_world_index_updates(void) {
 */
 bool write_map_and_room_to_file(room_vnum vnum, bool force_obj_pack) {
 	char temp[MAX_STRING_LENGTH], fname[256];
+	struct affected_type *aff;
 	struct shared_room_data *shared;
 	struct room_extra_data *red, *next_red;
 	struct depletion_data *dep;
@@ -4499,6 +4510,11 @@ bool write_map_and_room_to_file(room_vnum vnum, bool force_obj_pack) {
 			if (mob && MOB_SAVES_TO_ROOM(mob)) {
 				// basic mob data
 				fprintf(fl, "Load: M %d %llu %d 0\n", GET_MOB_VNUM(mob), MOB_FLAGS(mob), GET_ROPE_VNUM(mob));
+				
+				// save affects but not dots
+				LL_FOREACH(mob->affected, aff) {
+					fprintf(fl, "Load: A %d %d %ld %d %d %lld\n", aff->type, aff->cast_by, aff->duration, aff->modifier, aff->location, aff->bitvector);
+				}
 				
 				// instance id if any
 				if (MOB_INSTANCE_ID(mob) != NOTHING) {
@@ -5041,7 +5057,13 @@ void load_one_room_from_wld_file(room_vnum vnum, char index_data) {
 					CREATE(reset, struct reset_com, 1);
 					DL_APPEND(room->reset_commands, reset);
 					
-					if (*reset_read == 'S') {	// mob custom strings: <string type> <value>
+					if (*reset_read == 'A') {	// affect: type cast_by duration modifier location bitvector
+						if (sscanf(reset_read, "%c %lld %lld %lld %lld %lld %s", &reset->command, &reset->arg1, &reset->arg2, &reset->arg3, &reset->arg4, &reset->arg5, reset->sarg2) != 7) {
+							log("SYSERR: Invalid load command: %s: '%s'", error, line);
+							exit(1);
+						}
+					}
+					else if (*reset_read == 'S') {	// mob custom strings: <string type> <value>
 						reset->command = *reset_read;
 						reset->sarg1 = strdup(reset_read + 2);
 						if (!strn_cmp(reset->sarg1, "look", 4)) {
