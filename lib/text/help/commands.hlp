@@ -911,7 +911,7 @@ FILL
 
 Usage:  fill <item> [from] well
         fill <item> [from] fountain
-        fill <item> river
+        fill <item> [from] river
         fill <item> [from] <item>
        
 If you want to fill a container you're holding with liquid from a fountain or
