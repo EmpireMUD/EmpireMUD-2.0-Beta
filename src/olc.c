@@ -4294,10 +4294,11 @@ void get_script_display(struct trig_proto_list *list, char *save_buffer) {
 * @return bool TRUE if any problems were reported; FALSE if all good.
 */
 bool audit_extra_descs(any_vnum vnum, struct extra_descr_data *list, char_data *ch) {
-	struct extra_descr_data *iter;
+	char copy[MAX_INPUT_LENGTH], word[MAX_INPUT_LENGTH], temp[MAX_INPUT_LENGTH];
+	struct extra_descr_data *iter, *sub;
 	bool problem = FALSE;
 	
-	for (iter = list; iter; iter = iter->next) {
+	LL_FOREACH(list, iter) {
 		if (!iter->keyword || !*skip_filler(iter->keyword)) {
 			olc_audit_msg(ch, vnum, "Extra desc: bad keywords");
 			problem = TRUE;
@@ -4309,6 +4310,21 @@ bool audit_extra_descs(any_vnum vnum, struct extra_descr_data *list, char_data *
 		else if (!strn_cmp(iter->description, "Nothing.", 8)) {
 			olc_audit_msg(ch, vnum, "Extra desc '%s': description starting with 'Nothing.'", NULLSAFE(iter->keyword));
 			problem = TRUE;
+		}
+		
+		// check for masking keywords later in the list
+		if (iter->keyword) {
+			LL_FOREACH(iter->next, sub) {
+				strcpy(copy, NULLSAFE(sub->keyword));
+				while (*copy) {
+					half_chop(copy, word, temp);
+					strcpy(copy, temp);
+					if (isname(word, iter->keyword)) {
+						olc_audit_msg(ch, vnum, "Extra desc '%s': keyword '%s' is masked by earlier desc", NULLSAFE(sub->keyword), word);
+						problem = TRUE;
+					}
+				 }
+			}
 		}
 	}
 	
