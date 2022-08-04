@@ -1570,6 +1570,11 @@ RITUAL_SETUP_FUNC(start_ritual_of_teleportation) {
 	
 	if (!*argument) {
 		// random!
+		if (RMT_FLAGGED(IN_ROOM(ch), RMT_NO_LOCATION)) {
+			msg_to_char(ch, "You can't teleport out of here.\r\n");
+			return FALSE;
+		}
+		// ok:
 		subtype = NOWHERE;
 	}
 	else if (!str_cmp(argument, "home")) {
