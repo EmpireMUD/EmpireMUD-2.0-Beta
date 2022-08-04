@@ -132,6 +132,7 @@ void adventure_summon(char_data *ch, char *argument) {
 */
 void adventure_unsummon(char_data *ch) {
 	room_data *room, *map;
+	bool reloc = FALSE;
 	
 	// safety first
 	if (!ch || IS_NPC(ch) || !PLR_FLAGGED(ch, PLR_ADVENTURE_SUMMONED)) {
@@ -151,6 +152,7 @@ void adventure_unsummon(char_data *ch) {
 	else {
 		// nowhere safe to send back to
 		char_to_room(ch, find_load_room(ch));
+		reloc = TRUE;
 	}
 	
 	act("$n appears in a burst of smoke!", TRUE, ch, NULL, NULL, TO_ROOM);
@@ -158,7 +160,12 @@ void adventure_unsummon(char_data *ch) {
 	qt_visit_room(ch, IN_ROOM(ch));
 	
 	look_at_room(ch);
-	msg_to_char(ch, "\r\nYou have been returned to your original location after leaving the adventure.\r\n");
+	if (reloc) {
+		msg_to_char(ch, "\r\nYour original location could not be located. You have been returned to a safe location after leaving the adventure.\r\n");
+	}
+	else {
+		msg_to_char(ch, "\r\nYou have been returned to your original location after leaving the adventure.\r\n");
+	}
 	
 	msdp_update_room(ch);
 }

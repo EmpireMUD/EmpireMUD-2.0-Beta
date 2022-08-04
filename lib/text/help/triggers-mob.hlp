@@ -360,6 +360,7 @@ When using field  - The variable returns:
 &cadd_mount(vnum)&0 - Player learns a specific mount.
 &cadd_mob_flag(FLG)&0 - Adds a mob flag to the mob. Also, remove_mob_flag().
 &cadd_resources(vnum,amt)&0 - Gives a person <amt> of object <vnum>.
+&cadventure_summoned_from&0 - If a pc was summoned, the location where from.
 &caff_flagged(FLG)&0 - Checks if the actor has an AFF flag (e.g. ENTANGLED).
    If called with no argument, lists current flags instead.
 &caffect(vnum/name)&0 - Checks the actor for the affect (by name or generic 
@@ -416,6 +417,7 @@ When using field  - The variable returns:
 &cdrunk&0 or &cdrunk(hours)&0 - Get a character's drunk level, or add/subtract
    hours of drunkenness. A character behaves drunk if this passes 24 hours.
 &cempire&0 - The character's empire, if any.
+&cend_adventure_summon&0 - Returns a pc to where they were summoned from, if any.
 &ceq()&0 - This will return the identifier (id) for the object equipped in
    position, if any. The specified position may be either a position number
    (0-18) or the name of the location * checks all positions. &yHELP %LOAD%&0
@@ -485,11 +487,17 @@ When using field  - The variable returns:
 &cleader&0 - The leader of the actor (if following), or an empty return.
 &clearned(vnum)&0 - Whether the actor has learned a recipe vnum.
 &clevel&0 - The actor's computed level (or scaled level, for mobs).
+&clink_adventure_summon&0 - Links a player's adventure summon to the instance
+   they are currently in. Use mark_adventure_summoned_from in the original room
+   first if they were not already summoned.
 &clink_instance&0 - Marks this mob as belonging to the adventure instance of
    the room it's currently in.
 &clongdesc&0 - The mob's long description.
 &cmana&0 - The current mana points of the actor.
 &cmana(amount)&0 - Add/subtract mana on the actor.
+&cmark_adventure_summoned_from&0 - For a pc, sets their current room as the
+   place they were summoned from and marks them as adventure-summoned. Use
+   'link_adventure_summon' after moving them to an adventure.
 &cmaxblood&0 - The maximum blood points of the actor.
 &cmaxcarrying&0 - Inventory size limit (total they can carry).
 &cmaxhealth&0 - The maximum hit points of the actor.

@@ -2888,6 +2888,15 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 							*str = '\0';
 						}
 					}
+					else if (!str_cmp(field, "adventure_summoned_from")) {
+						room_data *find;
+						if (!IS_NPC(c) && PLR_FLAGGED(c, PLR_ADVENTURE_SUMMONED) && (find = real_room(GET_ADVENTURE_SUMMON_RETURN_LOCATION(c)))) {
+							snprintf(str, slen, "%c%d", UID_CHAR, room_script_id(find));
+						}
+						else {
+							snprintf(str, slen, "0");
+						}
+					}
 					else if (!str_cmp(field, "aff_flagged")) {
 						if (subfield && *subfield) {
 							bitvector_t pos = search_block(subfield, affected_bits, FALSE);
@@ -3300,6 +3309,12 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 							*str = '\0';
 						}
 					}
+					else if (!str_cmp(field, "end_adventure_summon")) {
+						*str = '\0';
+						if (IS_NPC(c) && PLR_FLAGGED(c, PLR_ADVENTURE_SUMMONED)) {
+							adventure_unsummon(c);
+						}
+					}
 					else if (!str_cmp(field, "eq")) {
 						int pos;
 						if (!subfield || !*subfield)
@@ -3642,9 +3657,9 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					break;
 				}
 				case 'i': {	// char.i*
-					if (!str_cmp(field, "id"))
+					if (!str_cmp(field, "id")) {
 						snprintf(str, slen, "%d", char_script_id(c));
-
+					}
 					else if (!str_cmp(field, "is_name")) {
 						if (subfield && *subfield && match_char_name(NULL, c, subfield, NOBITS)) {
 							snprintf(str, slen, "1");
@@ -3799,6 +3814,13 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						}
 						*str = '\0';
 					}
+					else if (!str_cmp(field, "link_adventure_summon")) {
+						*str = '\0';
+						if (!IS_NPC(c) && PLR_FLAGGED(c, PLR_ADVENTURE_SUMMONED)) {
+							struct instance_data *inst = find_instance_by_room(IN_ROOM(c), FALSE, FALSE);
+							GET_ADVENTURE_SUMMON_INSTANCE_ID(c) = inst ? INST_ID(inst) : NOTHING;
+						}
+					}
 					else if (!str_cmp(field, "longdesc")) {
 						snprintf(str, slen, "%s", GET_LONG_DESC(c));
 						// trim trailing CRLFs
@@ -3809,7 +3831,21 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					break;
 				}
 				case 'm': {	// char.m*
-					if (!str_cmp(field, "maxcarrying")) {
+					if (!str_cmp(field, "mark_adventure_summoned_from")) {
+						*str = '\0';
+						if (!IS_NPC(c)) {
+							struct map_data *map;
+							if (!PLR_FLAGGED(c, PLR_ADVENTURE_SUMMONED)) {
+								// ensure this is not set
+								GET_ADVENTURE_SUMMON_INSTANCE_ID(ch) = NOWHERE;
+							}
+							SET_BIT(PLR_FLAGS(c), PLR_ADVENTURE_SUMMONED);
+							GET_ADVENTURE_SUMMON_RETURN_LOCATION(c) = GET_ROOM_VNUM(IN_ROOM(c));
+							map = GET_MAP_LOC(IN_ROOM(c));
+							GET_ADVENTURE_SUMMON_RETURN_MAP(c) = map ? map->vnum : NOWHERE;
+						}
+					}
+					else if (!str_cmp(field, "maxcarrying")) {
 						snprintf(str, slen, "%d", CAN_CARRY_N(c));
 					}
 					else if (!str_cmp(field, "maxhitp") || !str_cmp(field, "maxhealth"))
