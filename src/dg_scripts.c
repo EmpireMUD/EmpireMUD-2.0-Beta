@@ -3837,7 +3837,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 							struct map_data *map;
 							if (!PLR_FLAGGED(c, PLR_ADVENTURE_SUMMONED)) {
 								// ensure this is not set
-								GET_ADVENTURE_SUMMON_INSTANCE_ID(ch) = NOWHERE;
+								GET_ADVENTURE_SUMMON_INSTANCE_ID(c) = NOTHING;
 							}
 							SET_BIT(PLR_FLAGS(c), PLR_ADVENTURE_SUMMONED);
 							GET_ADVENTURE_SUMMON_RETURN_LOCATION(c) = GET_ROOM_VNUM(IN_ROOM(c));
