@@ -2402,8 +2402,13 @@ bool can_fight(char_data *ch, char_data *victim) {
 		return FALSE;
 
 	/* Already fighting */
-	if (FIGHTING(victim) == ch)
+	if (FIGHTING(victim) == ch) {
 		return TRUE;
+	}
+	
+	if (!can_fight_mtrigger(victim, ch)) {
+		return FALSE;
+	}
 
 	if (AFF_FLAGGED(victim, AFF_NO_ATTACK | AFF_NO_TARGET_IN_ROOM) || AFF_FLAGGED(ch, AFF_NO_ATTACK | AFF_NO_TARGET_IN_ROOM))
 		return FALSE;

@@ -670,6 +670,44 @@ int bribe_mtrigger(char_data *ch, char_data *actor, int amount) {
 }
 
 
+/**
+* Called when someone tries to attack the mob it's on.
+*
+* @param char_data *ch The mob to check for triggers.
+* @param char_data *actor The person trying to attack.
+* @return int 0 to block the fight, 1 to allow it
+*/
+int can_fight_mtrigger(char_data *ch, char_data *actor) {
+	trig_data *trig, *next_t;
+	int ret_val;
+
+	if (!SCRIPT_CHECK(ch, MTRIG_CAN_FIGHT)) {
+		return 1;
+	}
+
+	LL_FOREACH_SAFE(TRIGGERS(SCRIPT(ch)), trig, next_t) {
+		if (AFF_FLAGGED(ch, AFF_CHARM) && !TRIGGER_CHECK(trig, MTRIG_CHARMED)) {
+			continue;
+		}
+		if (TRIGGER_CHECK(trig, MTRIG_CAN_FIGHT)) {
+			union script_driver_data_u sdd;
+			sdd.c = ch;
+			ADD_UID_VAR(buf, trig, char_script_id(actor), "actor", 0);
+			ret_val = script_driver(&sdd, trig, MOB_TRIGGER, TRIG_NEW);
+			
+			if (EXTRACTED(actor) || EXTRACTED(ch) || IS_DEAD(actor) || IS_DEAD(ch)) {
+				return 0;
+			}
+			else {
+				return ret_val;
+			}
+		}
+	}
+	
+	return 1;	// allow
+}
+
+
 void load_mtrigger(char_data *ch) {
 	trig_data *t, *next_t;
 

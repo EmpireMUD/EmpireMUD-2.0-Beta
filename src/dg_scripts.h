@@ -64,6 +64,7 @@
 #define MTRIG_BUY              BIT(24)	// attempting a purchase
 #define MTRIG_KILL             BIT(25)	// mob has killed something
 #define MTRIG_ALLOW_MULTIPLE   BIT(26)	// for triggers that block other triggers, allows multiple to run
+#define MTRIG_CAN_FIGHT        BIT(27)	// checked when trying to attack a mob you're not already fighting
 
 
 // OTRIG_x: obj trigger types
@@ -336,6 +337,7 @@ int death_mtrigger(char_data *ch, char_data *actor);
 void fight_mtrigger(char_data *ch);
 void hitprcnt_mtrigger(char_data *ch);
 int bribe_mtrigger(char_data *ch, char_data *actor, int amount);
+int can_fight_mtrigger(char_data *ch, char_data *actor);
 
 void complete_wtrigger(room_data *room);
 int dismantle_wtrigger(room_data *room, char_data *actor, bool preventable);
