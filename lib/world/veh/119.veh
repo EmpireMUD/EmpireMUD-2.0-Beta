@@ -1,0 +1,45 @@
+#11939
+gardens hanging beautiful~
+the hanging gardens~
+Beautiful trees, shrubs, and flowers hang over you from raised terraces.~
+   The gardens hang over raised terraces build from stone and brick strike a
+sense of wonder into every onlooker. Indeed, people travel from the corners of
+the world to sit in the shade of these gardens. Like the famed hanging gardens
+of Sennacherib, they are sure to inspire legends for many generations to come.
+A small pond next to the walkway reflects the beautiful gardens.
+~
+&g[%%]~
+hF 19 30 0 0 F 10 0 4 0
+E
+trees~
+   Trees of all types hang over you from the raised terraces of the garden. 
+Each has been expertly manicured and trained to grow out over the walkways to
+provide shade.
+~
+E
+walkways~
+Walkways surround the hanging gardens to give you a better view.
+~
+E
+shrubs~
+   Ornamental shrubs from every corner of the world grow on the terraces of the
+hanging garden.
+~
+E
+flowers~
+Gorgeous, fragrant flowers in every shade and hue fill the gardens.
+~
+E
+pools water~
+   Below the gardens, along the walkway, a small pond provides crystal-clear
+water and reflects the trees above.
+~
+H 0 1
+P
+2
+R
+1002 1 5 0
+R
+1010 1 5 0
+S
+$

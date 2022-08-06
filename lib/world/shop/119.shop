@@ -1,0 +1,26 @@
+#11905
+Cafe Skycleave~
+-1 0 0 0
+I 11902 25 -1 0
+I 11903 50 -1 0
+I 11904 100 -1 0
+I 11905 100 -1 0
+L
+1 11905
+S
+#11907
+Skycleave: Towerwinkel's Gift Shop~
+-1 0 0 0
+I 11913 1 11900 0
+I 11909 1 11900 0
+L
+1 11907
+S
+#11940
+Skycleave: Magineer Waltur's Hidden Shop~
+-1 0 0 0
+I 11939 1 11900 0
+L
+1 11940
+S
+$
