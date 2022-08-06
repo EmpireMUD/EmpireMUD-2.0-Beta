@@ -187,6 +187,7 @@ When using field  - The variable returns:
 &ccontents&0 - Gives the first object in a container.
 &ccount(str)&0 - Number of matching items (name/vnum) inside it.
 &cempire&0 - The last empire that controlled the object, if any.
+&cempty&0 - Causes an object to be emptied out (nop %obj.empty%).
 &cflag(FLAG)&0 - Toggles the flag then returns whether or not the flag is on.
 &chas_in(str)&0 - Has an object (name/vnum) inside it.
 &chas_trigger(vnum)&0 - Has the specified trigger attached.

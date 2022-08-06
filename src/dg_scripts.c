@@ -4553,6 +4553,16 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 							*str = '\0';
 						}
 					}
+					else if (!str_cmp(field, "empty")) {
+						*str = '\0';
+						if (IS_CORPSE(o) || IS_CONTAINER(o)) {
+							empty_obj_before_extract(o);
+						}
+						else if (IS_DRINK_CONTAINER(o)) {
+							set_obj_val(o, VAL_DRINK_CONTAINER_CONTENTS, 0);
+							set_obj_val(o, VAL_DRINK_CONTAINER_TYPE, 0);
+						}
+					}
 					break;
 				}
 				case 'f': {	// obj.f*
