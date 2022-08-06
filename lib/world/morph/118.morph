@@ -1,0 +1,51 @@
+#11800
+teapot pot large talking~
+the teapot~
+A large, talking teapot is standing here.~
+cil 5 15 100 nrG 3
+1 0 -1 11807
+A
+11 -5
+D
+   This oversized teapot is pearly white with a purple base and curved purple
+lid. The teapot's spout forms the enormous nose of the face on the side of the
+teapot which, to your surprise, can talk!
+~
+S
+#11827
+donkey confused~
+a confused donkey~
+A confused donkey stands nearby.~
+bcj 11 0 0 0 3
+0 0 -1 -1
+A
+21 -25
+A
+22 -25
+A
+23 -25
+A
+13 -5
+A
+18 -5
+A
+17 -5
+D
+It seems awfully intelligent for a donkey...
+~
+S
+#11848
+viper pit mercenary druid~
+a pit viper~
+A pit viper is coiled and ready to strike!~
+bj 15 5 0 0 2
+0 0 -1 -1
+A
+21 -1
+A
+17 1
+D
+Staring into the serpent's eyes, you detect a hint of intelligence.
+~
+S
+$
