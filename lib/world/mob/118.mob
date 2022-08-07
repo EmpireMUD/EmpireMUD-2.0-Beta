@@ -1028,7 +1028,7 @@ barrosh high sorcerer~
 Barrosh~
 High Sorcerer Barrosh is kneeling on the floor.
 ~
-0 0 bdvxE 0 3
+0 0 bdvxE n 3
 1 0 0 15
 D
    Barrosh looks disheveled, kneeling on the floor in his violet high sorcerer
@@ -1120,7 +1120,7 @@ S
 #11867
 barrosh high sorcerer~
 High Sorcerer Barrosh~
-High Sorcerer Barrosh stands with his staff raised high.
+High Sorcerer Barrosh stands with his staff raised high and an anguished look.
 ~
 0 0 bdhvx 0 3
 1 0 0 15
@@ -1138,7 +1138,7 @@ knezz master~
 Knezz~
 Master Knezz is in his chair, with his head back, and his eyes and mouth wide open.
 ~
-0 0 bdvxE 0 3
+0 0 bdvxE n 3
 1 0 0 15
 D
    Grand High Sorcerer Knezz doesn't seem to be conscious, splayed out such as

@@ -284,6 +284,23 @@ end
 * mark me as scaled
 set scaled 1
 remote scaled %self.id%
+* attempt to remove (difficulty) from longdesc
+set test (difficulty)
+if %self.longdesc% ~= %test%
+  set string %self.longdesc%
+  set replace %string.car%
+  set string %string.cdr%
+  while %string%
+    set word %string.car%
+    set string %string.cdr%
+    if %word% != %test%
+      set replace %replace% %word%
+    end
+  done
+  if %replace%
+    %mod% %self% longdesc %replace%
+  end
+end
 ~
 #11810
 Skycleave: Message when no-attack mob is attacked~
@@ -322,7 +339,7 @@ end
 #11811
 Skycleave: Directory look description~
 1 c 4
-look~
+look examine~
 return 0
 if %actor.obj_target(%arg%)% != %self%
   halt
@@ -480,7 +497,7 @@ if %summon.vnum% == %summon_vnum%
   nop %summon.add_mob_flag(NO-CORPSE)%
   %send% %actor% ~%summon% rushes into the room and attacks you!
   %echoaround% %actor% ~%summon% rushes into the room and attacks ~%actor%!
-  %force% summon mkill %actor%
+  %force% %summon% mkill %actor%
 else
   %echo% Something strange happened. Please report this bug.
 end
@@ -899,7 +916,7 @@ elseif %type% == 4
   set old_shortdesc %target.name%
   %morph% %target% 11827
   %echoaround% %target% %old_shortdesc% is suddenly transformed into ~%target%!
-  %send% %target% You are suddenly transformed into ~%target%!
+  %send% %target% You are suddenly transformed into %target.name%!
   %send% %target% (Type 'fastmorph normal' to transform yourself back.)
 end
 ~
@@ -1382,7 +1399,7 @@ if %vnum%
   if %mob.vnum% == %vnum%
     %echo% ~%mob% walks in from the foyer.
     makeuid foyer room i11800
-    %at% %foyer% %echo% ~%self% walks through the foyer and into the tower.
+    %at% %foyer% %echo% ~%mob% walks through the foyer and into the tower.
   end
 end
 * and detach if the list is empty
@@ -2738,6 +2755,8 @@ switch %line%
     say I... will... burn you all down!
     %at% i11862 %echo% You hear shouting from the office to the east.
     %at% i11867 %echo% You hear shouting from the office.
+    wait 6 sec
+    %aggro%
   break
   case 5
     %echo% High Sorcerer Barrosh throws a book hard at you, but it misses and goes out the door.
@@ -2745,9 +2764,13 @@ switch %line%
   break
   case 6
     say My mind... is not my own.
+    wait 6 sec
+    %aggro%
   break
   case 7
     say Flee while you can! I can't hold it off.
+    wait 6 sec
+    %aggro%
   break
   case 8
     %echo% High Sorcerer Barrosh grasps his staff and tries to support himself as he doubles over in agony!

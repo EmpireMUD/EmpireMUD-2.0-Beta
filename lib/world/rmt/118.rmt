@@ -47,7 +47,7 @@ M 1 11800 100.00 2
 M 0 11900 100.00 1
 S
 #11801
-The Central Chamber of Tower Skycleave~
+The Central Chamber of the Tower Skycleave~
    The vast central chamber of the Tower Skycleave stretches up above, where
 you can see the second floor railing, which is covered in giant leaves and
 vines. Directly above you, the bottom of the ever-spiraling walkway forms a
@@ -132,12 +132,12 @@ looks like people have been sleeping around it.
 M 1 11809 100.00 8
 S
 #11802
-The Central Chamber of Tower Skycleave~
+The Central Chamber of the Tower Skycleave~
    Crates of food are stacked around the archway on the east end of the round
 central chamber of the tower. An arrow-shaped sign to the left of the archway
 indicates it's a cafe, but it's covered with a piece of parchment. A painting
 of the tower hangs on the other side of the archway. The tile floor is scuffed
-and sorched; it hasn't been polished recently.
+and scorched; it hasn't been polished recently.
 ~
 c 0 0
 D6
@@ -234,7 +234,7 @@ The central chamber of the ground floor is huge!
 M 0 11811 100.00 1
 S
 #11803
-The Central Chamber of Tower Skycleave~
+The Central Chamber of the Tower Skycleave~
    A tremendous amount of foot traffic has left the floors littered and scuffed
 all over the grand chamber. The midnight-black walls are dusty and cobwebs have
 begun to accumulate on the underside of the second-floor walkway above you. A
@@ -338,7 +338,7 @@ M 0 11804 100.00 1
 M 1 11832 100.00 3
 S
 #11804
-The Central Chamber of Tower Skycleave~
+The Central Chamber of the Tower Skycleave~
    The curving hallway formed by the crates ends at the bottom of the stairs to
 the ever-spiraling walkway that ascends the Tower Skycleave. The wooden steps
 connect only to the wall; the staircase seems to float on air. Just in front of
@@ -589,7 +589,7 @@ M 0 11832 100.00 1
 M 1 11907 100.00 1
 S
 #11808
-The Central Chamber of Tower Skycleave~
+The Central Chamber of the Tower Skycleave~
    The center of the great central chamber looks like a refugee camp, with
 sleeping mats and piles of blankets around the fountain. The benches have been
 pushed aside to make room; stray trash has been swept underneath them and parts
@@ -1133,7 +1133,7 @@ couple of people standing up. You don't even want to imagine how many goblins
 could be squeezed into it. As you close in to get a good look at this bin, a
 powerful stench overwhelms you. Before you are forced to back away, however,
 you see that it seems to be of one piece with the wall behind it. There are
-unusual scrapes along the floor next to it. Perhaps if you 'search' around, you
+unusual scrapes along the floor next to it. Perhaps if you search around, you
 could find a way to move it.
 ~
 E

@@ -1625,7 +1625,7 @@ end
 ~
 #11927
 Skycleave Enchanting Lab noises~
-2 bw 20
+2 bw 15
 ~
 if %self.template% == 11839
   * Phase A
@@ -1634,8 +1634,8 @@ if %self.template% == 11839
     * No messages in phase A unless the Rogue Boss is present.
     halt
   end
-  if %rogue.room% != %room%
-    * Rogue Boss is not in this room.
+  if %rogue.room% != %room% || %rogue.fighting%
+    * Rogue Boss is not in this room or is fighting
     halt
   end
   switch %random.3%
@@ -1718,10 +1718,12 @@ end
 * check for existing tracks in that dir, and bump the new ones up in the list
 set iter %room.contents(11930)%
 while %iter%
-  if %iter.vnum% == 11930 && %iter.direction% == %direction%
-    * found match: teleport to same room to bump them up in the list
-    %teleport% %iter% %room%
-    halt
+  if %iter.vnum% == 11930
+    if %iter.direction% == %direction%
+      * found match: teleport to same room to bump them up in the list
+      %teleport% %iter% %room%
+      halt
+    end
   end
   set iter %iter.next_in_list%
 done
@@ -1740,7 +1742,6 @@ remote direction %obj.id%
 Elemental Plane of Water: Spawn boss~
 2 bw 100
 ~
-wait 15 sec
 if %room.people(11928)%
   halt
 end
@@ -1755,8 +1756,10 @@ if %mob.vnum% == 11928
   end
   remote spawned %room.id%
   if %spawned% > 1
+    wait 15 sec
     %echo% The water stirs and comes back to life... you're caught in the embodiment of the First Water!
   else
+    wait 5 sec
     %echo% The water around you comes to life... you're caught in the embodiment of the First Water!
   end
 end
@@ -1891,6 +1894,7 @@ if %difficulty% == 1
 end
 set room %self.room%
 set ch %room.people%
+set aggro 0
 while %ch%
   set next_ch %ch.next_in_room%
   if %ch.is_pc% && !%ch.nohassle%
@@ -1917,11 +1921,36 @@ while %ch%
       end
     elseif %left% < 50
       %send% %ch% &&rYour nose and throat HURT as water presses its way in...&&0
+      set aggro 1
     elseif %left% < 90
       %send% %ch% You feel yourself begin to drown...
+      set aggro 1
     end
   end
   set ch %next_ch%
+done
+if %aggro%
+  wait 1
+  if !%self.fighting%
+    %aggro%
+  end
+end
+~
+#11934
+Skycleave: Janitor cleanup service~
+0 bi 20
+~
+set purge_list 1000 11929 11930
+wait 2 sec
+set obj %self.room.contents%
+while %obj%
+  set next_obj %obj.next_in_list%
+  if %purge_list% ~= %obj.vnum%
+    %echo% ~%self% cleans up @%obj%.
+    nop %obj.empty%
+    %purge% %obj%
+  end
+  set obj %next_obj%
 done
 ~
 #11936
@@ -3578,7 +3607,7 @@ end
 ~
 #11970
 Goblin's Dream: Arena challenge spawner~
-2 bw 75
+2 bw 90
 ~
 set mob_list 11956 11957 11958
 set first_mob 11956
