@@ -493,6 +493,18 @@ void look_at_target(char_data *ch, char *arg, char *more_args) {
 	/* If an object was found back in generic_find */
 	if (bits) {
 		if (!found) {
+			if (found_obj->worn_by) {
+				act("You look at $p (worn):", FALSE, ch, found_obj, NULL, TO_CHAR);
+			}
+			else if (found_obj->carried_by) {
+				act("You look at $p (inventory):", FALSE, ch, found_obj, NULL, TO_CHAR);
+			}
+			else if (IN_ROOM(found_obj)) {
+				act("You look at $p (in room):", FALSE, ch, found_obj, NULL, TO_CHAR);
+			}
+			else {
+				act("You look at $p:", FALSE, ch, found_obj, NULL, TO_CHAR);
+			}
 			if (ch->desc) {
 				page_string(ch->desc, obj_desc_for_char(found_obj, ch, OBJ_DESC_LOOK_AT), TRUE);	/* Show no-description */
 			}
