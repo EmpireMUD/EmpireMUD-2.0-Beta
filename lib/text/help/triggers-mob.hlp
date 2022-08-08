@@ -498,6 +498,7 @@ When using field  - The variable returns:
 &cis_npc&0 - True if the actor is NOT a player.
 &cis_pc&0 - Checks if the actor is a player. Useful when you want a trigger
    to fire on players and not mobs.
+&cis_scaled&0 - True if the NPC has already been scaled (by an attack, etc).
 &cis_tagged_by(player)&0 - True if the mob is 'tagged' by the player. For NPCs,
    this will check if tagged by the player's leader. Tagging means the player
    has the right to get loot from the mob (their group started the fight).

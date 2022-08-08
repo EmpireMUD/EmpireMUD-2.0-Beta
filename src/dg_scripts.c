@@ -3764,6 +3764,9 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 							strcpy(str, "0");
 						}
 					}
+					else if (!str_cmp(field, "is_scaled")) {
+						snprintf(str, slen, "%d", (IS_NPC(c) && GET_CURRENT_SCALE_LEVEL(c) > 0) ? 1 : 0);
+					}
 					else if (!str_cmp(field, "is_waterwalking")) {
 						snprintf(str, slen, HAS_WATERWALK(c) ? "1" : "0");
 					}
