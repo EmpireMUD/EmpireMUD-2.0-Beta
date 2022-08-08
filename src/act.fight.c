@@ -153,8 +153,14 @@ ACMD(do_consider) {
 	else if (vict == ch) {
 		msg_to_char(ch, "You look pretty wimpy.\r\n");
 	}
-	else if (AFF_FLAGGED(vict, AFF_NO_ATTACK)) {
-		act("$N cannot be attacked.", FALSE, ch, NULL, vict, TO_CHAR);
+	else if (!can_fight(ch, vict)) {
+		if (AFF_FLAGGED(vict, AFF_NO_ATTACK)) {
+			// never attackable
+			act("$N cannot be attacked.", FALSE, ch, NULL, vict, TO_CHAR);
+		}
+		else {	// probably script-based or permissions-based
+			act("You cannot attack $N.", FALSE, ch, NULL, vict, TO_CHAR);
+		}
 	}
 	else {
 		// scale first
