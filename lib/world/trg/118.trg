@@ -519,7 +519,7 @@ while %mobs_list% && !%trig_vnum%
   set mob %mobs_list.car%
   set mobs_list %mobs_list.cdr%
   set trig %trig_list.car%
-  set trig_list %trig_list.car%
+  set trig_list %trig_list.cdr%
   if %mob% == %self.vnum%
     set trig_vnum %trig%
   end
@@ -1536,32 +1536,32 @@ elseif %self.vnum% == 11827
   switch %line%
     case 1
       say Can you believe Mezvienne herself attacked the tower?
-      wait 6 s
+      wait 9 s
       %force% %djon% say I know, right? I heard she was possessed by a time lion.
-      wait 6 s
+      wait 9 s
       say Please don't tell me you believe in time lions now.
-      wait 6 s
+      wait 9 s
       %force% %djon% say Ok, how does a rank amateur of modest reputation...
       wait 3 s
       say Modest?
       wait 3 s
       %force% %djon% say ...of above-average reputation invade the single greatest sorcery tower in history?
-      wait 6 s
+      wait 9 s
       if %instance.mob(11969)%
         say Well, she defeated GHS Knezz in single combat.
       else
         say And yet she did.
       end
-      wait 6 s
+      wait 9 s
       %force% %djon% say Fine. Where'd you hide out?
-      wait 6 s
+      wait 9 s
       say Attunement lab with a gargoyle charm.
-      wait 6 s
+      wait 9 s
       %force% %djon% say Clever. I warded myself in Niamh's office.
-      wait 6 s
+      wait 9 s
       say Smart.
-      wait 6 s
-      %echo% ~%self% and %djon% sip their tea.
+      wait 9 s
+      %echo% ~%self% and ~%djon% sip their tea.
     break
     *** HERE
   done
@@ -1856,7 +1856,7 @@ if %target%
     break
     case 11844
       * druid merc
-      %echo% ~%target% starts to twist and morph into something enormous... until Scaldorran wraps his bandages around ^%target%, whereupon &%target% dissolves into a sticky mess!
+      %echo% ~%target% starts to twist and morph into something enormous... until Scaldorran wraps his bandages around *%target%, whereupon &%target% dissolves into a sticky mess!
     break
     case 11845
       * vampire merc
@@ -2291,7 +2291,7 @@ elseif %type% == 3
   nop %self.set_cooldown(11800, 30)%
   %echo% ~%self% mutters an incantation...
   %echo% Arcane tattoos all over |%self% body glow gold, and ^%self% wounds begin to close!
-  %heal% %self% 100
+  %heal% %self% health
   dg_affect #12425 %self% HEAL-OVER-TIME %self.level% 30
   wait 5 sec
   %echo% ~%self% mutters another incantation...
@@ -2863,7 +2863,7 @@ if %seconds% > 120
     if %self.mob_flagged(GROUP)%
       nop %mob.add_mob_flag(GROUP)%
     end
-    %restore% %mob%
+    %scale% %mob% %self.level%
     if %self.fighting%
       %force% %mob% %aggro% %self.fighting%
     else
@@ -3411,37 +3411,36 @@ else
   set cycle 1
 end
 * force a restart if the sap is gone
-if !%self.room.contents(11888)% && %cycle% > 10
+if !%self.room.contents(11888)% && %cycle% > 4
   set cycle 1
+end
+* check skip?
+if %self.varexists(skip)%
+  rdelete skip %self.id%
+  set cycle 4
+  set skip 1
 end
 * main messages: must be sequential starting with 1 or it will just loop back to 1
 switch %cycle%
   case 1
     say Iskip wennur, faskoh vadur, Iskip sal-ash Tagra Nes.
     wait 9 sec
-    %echo% ~%nayyur% slowly rocks back and forth as blood drips from ^%nayyur% back.
-    wait 9 sec
     say Iskip sal-ash Tagra Nes...
     wait 1
     %force% %nayyur% say Iskip sal-ash Tagra Nes.
+    wait 9 sec
+    say Foroh undune aspeh a wo owri...
   break
   case 2
-    say Foroh undune aspeh a wo owri...
-    wait 9 sec
-    say Foroh may grassal undune...
-    wait 5 sec
-    %force% %nayyur% say Foroh may grassan eksudnay.
-  break
-  case 3
     say Smol Nes-Pik pos ne wo owri...
-    wait 8 sec
+    wait 9 sec
     %force% %nayyur% say Iskip sal-ash Tagra Nes.
     wait 9 sec
     say Fras kee selmo tagra tyewa...
     wait 1 sec
     %echo% Thousands of tiny splinters of rotted wood rise from the trunk and hover in the air...
   break
-  case 4
+  case 3
     say Fras kee selmo tagra tyewa...
     wait 1 sec
     %echo% More and more splinters rise into the air until you can scarcely breath!
@@ -3454,70 +3453,70 @@ switch %cycle%
     wait 1 sec
     %echo% ~%self% stabs the rotten tree with a flint knife as the splinters of wood fall out of the air...
   break
-  case 5
-    say Ickor carzo a wo owri...
-    wait 1 sec
-    %force% %nayyur% say Iskip sal-ash Tagra Nes.
-    say Iskip sal-ash Tagra Nes.
-    * load putrid sap now
-    wait 2 sec
+  case 4
+    if !%skip%
+      say Ickor carzo a wo owri...
+      wait 1 sec
+      %force% %nayyur% say Iskip sal-ash Tagra Nes.
+      say Iskip sal-ash Tagra Nes.
+      wait 2 sec
+    end
     %echo% Sap begins to trickle from the rotting tree.
+    * load putrid sap now
     if !%self.room.contents(11888)%
       %load% obj 11888 room
     end
   break
-  case 6
-    say Ickor fras kee selmo yozo...
-    wait 4 sec
-    %echo% ~%nayyur% slowly rocks back and forth as blood drips from ^%nayyur% back.
+  case 5
+    %echo% ~%self% and ~%nayyur% taste the putrid sap and their eyes glaze over with a milky film.
   break
-  case 7
+  case 6
     say Doron kasko Iskip sal-ash...
     wait 1
     %force% %nayyur% say Yozol sal-ash Tagra Nes.
   break
-  case 8
+  case 7
     say Opol kasko Iskip sal-ash...
     wait 1
     %force% %nayyur% say Yozol sal-ash Tagra Nes.
   break
-  case 9
+  case 8
     say Tofvon kaskon Iskip sal-ash...
     wait 1
     %force% %nayyur% say Yozol sal-ash Tagra Nes.
   break
-  case 10
+  case 9
     say Afta kasko Iskip sal-ash...
     wait 1
     %force% %nayyur% Besta sulyo tagra irrun.
   break
-  case 11
+  case 10
     %echo% ~%self% digs ^%self% fingernails into the rotted tree until blood trickles down ^%self% arms...
     wait 6 sec
     say Devor esh pik necafuir devor recless.
   break
-  case 12
+  case 11
     say Nayyur beo a wo tock nefor.
     wait 1 sec
     %echo% ~%nayyur% scoops up a fistful of rotted splinters and cradles them in both hands.
   break
-  case 13
+  case 12
     %echo% Blood from |%self% hands drips onto the rotted splinters in |%nayyur%.
     wait 3 sec
     %echo% The bloody splinters in |%nayyur% hands burst into jet-black flames, releasing choking smoke.
   break
-  case 14
+  case 13
     wait 4 sec
     say Iskip sal-ash Tagra Nes.
     wait 1
     %echo% Smoke from |%nayyur% black flame fills the hollow and diffuses into the rotten wood.
   break
-  case 15
+  case 14
     %force% %nayyur% say Iskip sal-ash Tagra Nes.
     wait 6 sec
     %force% %nayyur% say Iskip shallas Tagra Nes.
   break
-  case 16
+  case 15
     wait 55 sec
   break
   default

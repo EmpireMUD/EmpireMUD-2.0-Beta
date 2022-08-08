@@ -1043,6 +1043,11 @@ D1
 ~
 0 11815
 E
+cages~
+   The cages are made of iron bars, most bent out of shape from years of abuse.
+Most of the cages are open; some have had their doors ripped off.
+~
+E
 east~
 The cages continue deeper into the long room.
 ~
@@ -1051,7 +1056,7 @@ north door~
 The door back out to the walkway is hanging on one hinge.
 ~
 E
-windows boards boarded-over~
+windows boards boarded-over grid~
    The window is boarded over. Or, at least, it was. One of the boards has
 been pried loose, revealing a metal grid that makes escape impossible.
 ~
@@ -1118,6 +1123,20 @@ ch 0 0
 D3
 ~
 0 11814
+E
+debris~
+There's debris everywhere -- in the cages, on the floor, and in every corner.
+~
+E
+shadows~
+   The windows are almost entirely blocked, creating many shadows from what
+little light trickles in.
+~
+E
+cages~
+   The cages are made of iron bars, most bent out of shape from years of abuse.
+Most of the cages are open; some have had their doors ripped off.
+~
 E
 west~
 The exit to the long room is to the west.
@@ -1938,7 +1957,7 @@ turned, but it's not clear where it all came from. Doors line the ebony walls,
 though most are locked shut, other than one right in front of you here.
 ~
 E
-furniture tables tea chairs plush~
+furniture tables tea chairs plush armchairs~
 Tea tables and plush chairs are broken and overturned.
 ~
 E
@@ -3650,6 +3669,10 @@ D7
 ~
 0 11876
 E
+southeast se~
+The enormous branch leads southeast toward the trunk.
+~
+E
 branch~
    You have never seen a branch of such tremendous size in your life! The
 lumber from this one branch could build a hundred ships, so you can't even
@@ -3706,6 +3729,14 @@ D4
 D2
 ~
 0 11877
+E
+northwest nw~
+The gigantic branch extends to the northwest.
+~
+E
+south~
+The gigantic branch continues south toward the trunk.
+~
 E
 branch~
    The branch looks old, with crevices and grooves from years -- or even
@@ -3765,6 +3796,14 @@ D0
 D7
 ~
 0 11878
+E
+north~
+The enormous branch reaches out to the north.
+~
+E
+southeast se~
+The enormous branch continues to the southeast, toward the trunk.
+~
 E
 branch~
    The branch is wide enough here to drive a large wagon with a full team of
@@ -3828,6 +3867,10 @@ D4
 D9
 ~
 0 11879
+E
+northwest nw~
+The enormous branch reaches up toward the northwest.
+~
 E
 branch~
    The branch is enormous where it meets the tree. You've never seen anything
@@ -3909,6 +3952,14 @@ D7
 ~
 0 11881
 E
+north~
+The grand overlook is to the north.
+~
+E
+southeast se~
+The glimmering stairs spiral down toward the southeast.
+~
+E
 stairs staircase bricks blocks stones masonry steps~
    Each block of the staircase is cut from brilliant stone in violet, blue,
 green, yellow, orange, red, and every color in between. From here, you can see
@@ -3981,6 +4032,10 @@ ci 0 0
 D2
 ~
 0 11879
+E
+south~
+You see the top of the glimmering staircase.
+~
 E
 stones platform blocks~
    The platform is long and narrow, jutting out away from the tree to help you
@@ -4059,6 +4114,10 @@ D9
 ~
 0 11883
 E
+northwest nw~
+The stairs ascend to the northwest.
+~
+E
 shell seashell emerald east green~
    It bears a striking resemblance to the glowing green seashells that you
 sometimes fish up on the coast. The biggest difference, of course, is the size.
@@ -4135,6 +4194,10 @@ D3
 ~
 0 11881
 E
+west doorway~
+The doorway leads back out to the glimmering stair.
+~
+E
 green light~
    Everything here inside the shell is green -- the only light source is the
 glowing shell itself.
@@ -4197,6 +4260,10 @@ D0
 D7
 ~
 0 11886
+E
+southeast se~
+The staircase continues to spiral down toward the southeast.
+~
 E
 platform~
    The platform, like everything here, is hewn from many colors of stone, from
@@ -4440,6 +4507,14 @@ D3
 ~
 0 11887
 E
+west~
+There is a large, rotten hole in the tree to the west of you.
+~
+E
+northwest nw~
+The stairs spiral upward toward the northwest.
+~
+E
 stairway glimmering stairs staircase stones every-color color steps~
    Here, better than anywhere, you can see how the enormous stone staircase is
 attached to the tree. Its blocks, cut from stone in every color of the rainbow,
@@ -4511,6 +4586,10 @@ cdi 0 0
 D1
 ~
 0 11886
+E
+east~
+It looks like you can still reach the stairs to the east.
+~
 E
 tree trunk holes rot~
    From your vantage point inside the large hole, the tree is not healthy.

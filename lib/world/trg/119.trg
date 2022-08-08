@@ -573,27 +573,27 @@ if %guile_roll% > %guile_def%
     * small gap
     switch %guile_roll%
       case 1
-        say %name2% slams into %name1%! There's no penalty for that in this sport!
+        say %name2.cap% slams into %name1%! There's no penalty for that in this sport!
         eval penalty%pos1% %penalty1% + 2
         remote penalty%pos1% %self.id%
       break
       case 2
-        say %name2% sprinkles %name1% with pixy dust! Dirty tricks!
+        say %name2.cap% sprinkles %name1% with pixy dust! Dirty tricks!
         eval penalty%pos1% %penalty1% + 3
         remote penalty%pos1% %self.id%
       break
       case 3
-        say %name2% blasts %name1% with pixy dust! That scoundrel!
+        say %name2.cap% blasts %name1% with pixy dust! That scoundrel!
         eval penalty%pos1% %penalty1% + 5
         remote penalty%pos1% %self.id%
       break
       case 4
-        say %name2% hurls an acorn at %name1%'s head! That had to hurt!
+        say %name2.cap% hurls an acorn at %name1%'s head! That had to hurt!
         eval penalty%pos1% %penalty1% + 7
         remote penalty%pos1% %self.id%
       break
       case 5
-        say %name2% hurls a fireball at %name1%! That's going to leave a scorchmark!
+        say %name2.cap% hurls a fireball at %name1%! That's going to leave a scorchmark!
         eval penalty%pos1% %penalty1% + 8
         remote penalty%pos1% %self.id%
       break
@@ -602,17 +602,17 @@ if %guile_roll% > %guile_def%
     * large gap
     switch %random.3%
       case 1
-        say %name2% hurls a spiked blue shell at %name1%! That has to sting!
+        say %name2.cap% hurls a spiked blue shell at %name1%! That has to sting!
         eval penalty%pos1% %penalty1% + 10
         remote penalty%pos1% %self.id%
       break
       case 2
-        say %name2% calls a lightningbolt down through the window! It hits %name1% with a loud sizzle!
+        say %name2.cap% calls a lightningbolt down through the window! It hits %name1% with a loud sizzle!
         eval penalty%pos1% %penalty1% + 14
         remote penalty%pos1% %self.id%
       break
       case 3
-        say %name2% teleports! That has to be cheating, right? No? Everything is legal in Pixy Racing!
+        say %name2.cap% teleports! That has to be cheating, right? No? Everything is legal in Pixy Racing!
         eval dist%pos2% %self.dist2% + 20
         remote dist%pos2% %self.id%
       break
@@ -826,6 +826,9 @@ elseif %obj.vnum% == 11836 && release /= %cmd%
   halt
 elseif %obj% != %self%
   %send% %actor% You can't do that with @%obj%.
+  halt
+elseif %obj.last_race% + 180 > %timestamp%
+  %send% %actor% You can't do that while your pixy is racing.
   halt
 end
 if release /= %cmd%
@@ -1306,9 +1309,9 @@ if %arg% == start
   elseif %dist1% == %dist2%
     say It's wing-and-wing right out the gate with %name1% and %name2% in the lead!
   elseif %dist2% == %dist3%
-    say %name1% blasts out of the gate and takes an early lead with %name2% and %name3% wing to wing right behind!
+    say %name1.cap% blasts out of the gate and takes an early lead with %name2% and %name3% wing to wing right behind!
   else
-    say %name1% blasts out of the gate and takes an early lead, followed by %name2%, with %name3% trailing!
+    say %name1.cap% blasts out of the gate and takes an early lead, followed by %name2%, with %name3% trailing!
   end
   * end of start-race call
 elseif %arg% == win
@@ -1316,17 +1319,17 @@ elseif %arg% == win
   if %self.winner1% && %self.winner2% && %self.winner3%
     say It's a three-way tie! Everybody wins!
   elseif %self.winner1% && %self.winner2%
-    say %self.name1% and %self.name2% cross the finish line at exactly the same time! We have a tie!
+    say %self.name1.cap% and %self.name2% cross the finish line at exactly the same time! We have a tie!
   elseif %self.winner1% && %self.winner3%
-    say %self.name1% and %self.name3% cross the finish line at exactly the same time! We have a tie!
+    say %self.name1.cap% and %self.name3% cross the finish line at exactly the same time! We have a tie!
   elseif %self.winner3% && %self.winner2%
-    say %self.name3% and %self.name2% cross the finish line at exactly the same time! We have a tie!
+    say %self.name3.cap% and %self.name2% cross the finish line at exactly the same time! We have a tie!
   elseif %self.winner1%
-    say %self.name1% wins!
+    say %self.name1.cap% wins!
   elseif %self.winner2%
-    say %self.name2% wins!
+    say %self.name2.cap% wins!
   elseif %self.winner3%
-    say %self.name3% wins!
+    say %self.name3.cap% wins!
   end
   * reward victory
   set pos 1
@@ -2604,24 +2607,21 @@ end
 switch %cycle%
   case 1
     %send% %person% The sap crystallizes around you, freezing you in time as the world passes around you...
-  break
-  case 2
+    wait 9 sec
     %send% %person% You watch in horror as rot takes the Great Tree. Bud by bud, leaf by leaf, branch by branch, it falls into ruin.
-  break
-  case 3
+    wait 9 sec
     %send% %person% The primordial mana that once surged through the veins of the tree now flows like blood down its rotten trunk.
   break
-  case 4
+  case 2
     %send% %person% Slowly from the haze, a great giant arises, clad all in violet...
-  break
-  case 5
+    wait 9 sec
     %send% %person% The giant waves his enormous hand and speaks a few words in a language you've never heard. A gleaming, radiant axe forms in midair from the haze itself, and the giant grabs it in both hands.
-  break
-  case 6
+    wait 9 sec
     %send% %person% With a single mighty swing of his axe, the giant cleaves the Great Tree in two, straight through you. But what you feel isn't pain, it's an unfathomable anguish. It's the shattering of thousands of years of history.
+    wait 1
     %send% %person% As the tree comes crashing down, so too falls a fatal stillness. For a moment, nothing moves. The giant stands mid-swing. Shards of rotten wood hang like a cloud around the trunk.
   break
-  case 7
+  case 3
     %send% %person% Slowly, inch by inch, time resumes again, and for the first time in ages, you almost feel like you can breathe again.
   break
   default
@@ -2991,7 +2991,7 @@ switch %line%
     wait 9 sec
     %force% %mob% emote 'Thank you, great Queen,' is all the envoy manages to say.
     wait 9 sec
-    say And I shall despatch my personal psychopomp. May she see as many giants across the great divide as there knots in the tree.
+    say And I shall despatch my personal psychopomp. May she see as many giants across the great divide as there are knots in the tree.
   break
   case 13
     %force% %mob% say Thank you, great Queen.
@@ -3747,11 +3747,12 @@ if %next_vnum%
   if %mob.vnum% == %next_vnum%
     * setup flags
     if %self.mob_flagged(HARD)%
-      %mob.add_mob_flag(HARD)%
+      nop %mob.add_mob_flag(HARD)%
     end
     if %self.mob_flagged(GROUP)%
-      %mob.add_mob_flag(GROUP)%
+      nop %mob.add_mob_flag(GROUP)%
     end
+    %scale% %mob% %self.level%
     * message
     %echo% ~%mob% steps into the arena!
   end
