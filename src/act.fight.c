@@ -153,12 +153,12 @@ ACMD(do_consider) {
 	else if (vict == ch) {
 		msg_to_char(ch, "You look pretty wimpy.\r\n");
 	}
-	else if (!can_fight(ch, vict)) {
+	else if (!can_fight_mtrigger(vict, ch) || AFF_FLAGGED(vict, AFF_NO_ATTACK)) {
 		if (AFF_FLAGGED(vict, AFF_NO_ATTACK)) {
 			// never attackable
 			act("$N cannot be attacked.", FALSE, ch, NULL, vict, TO_CHAR);
 		}
-		else {	// probably script-based or permissions-based
+		else {	// script-based
 			act("You cannot attack $N.", FALSE, ch, NULL, vict, TO_CHAR);
 		}
 	}
