@@ -1661,6 +1661,10 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options) {
 	if (GET_ROOM_VEHICLE(room) && VEH_FLAGGED(GET_ROOM_VEHICLE(room), VEH_ON_FIRE)) {
 		msg_to_char(ch, "\t[B300]The %s has caught on fire!\t0\r\n", skip_filler(VEH_SHORT_DESC(GET_ROOM_VEHICLE(room))));
 	}
+	
+	if (ROOM_AFF_FLAGGED(room, ROOM_AFF_DARK)) {
+		msg_to_char(ch, "The area is blanketed in an inky darkness.\r\n");
+	}
 
 	if (!AFF_FLAGGED(ch, AFF_EARTHMELD)) {
 		if (can_get_quest_from_room(ch, room, NULL)) {
