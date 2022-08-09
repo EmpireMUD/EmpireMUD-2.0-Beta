@@ -350,6 +350,10 @@ D3
 ~
 0 11902
 E
+fixtures nocturnium~
+Small, elegant nocturnium oil lamps are affixed to the walls.
+~
+E
 pictures paintings paper walls~
    The walls are papered with pictures of birds, flowers, bees, and
 butterflies. If you stare at them long enough, they actually seem to move,
@@ -434,7 +438,7 @@ D2
 ~
 0 11903
 E
-blackboard board chalkboard words~
+blackboard board chalkboard words writing~
    The blackboard is a large piece of slate attached to the wall. It is covered
 in eraser smears and stray chalk dust. There are words written on the board,
 but you don't understand them, if they're really words at all.
@@ -465,6 +469,10 @@ The floors are highly-polished white marble.
 E
 doorway south~
 The door leads back to the central chamber.
+~
+E
+walls~
+The paneled black walls are made from ebony.
 ~
 S
 #11907
@@ -1538,7 +1546,7 @@ saving measure to use it here in place of the ebony and calamander of other
 parts of the tower.
 ~
 E
-teacups cups books items~
+teacups cups books items magical~
    The apprentices don't seem to spend a great deal of time cleaning. That part
 will seem ironic later.
 ~
@@ -1762,6 +1770,11 @@ D2
 ~
 0 11919
 E
+windows curtains~
+   The purple velvet curtains are tied back to reveal a stunning landscape view
+out the window (look out).
+~
+E
 south~
 The door leads back out to the hallway.
 ~
@@ -1932,9 +1945,13 @@ mahogany wood panels~
 is made of well-polished mahogany.
 ~
 E
-rug~
+rug floors~
    The large rug covers most of the mahogany floors. You look underneath, but
 there's only the clean floor.
+~
+E
+walls~
+The walls are made from black ebony panels, like most of the tower.
 ~
 S
 #11930
@@ -2887,6 +2904,11 @@ c 0 0
 D1
 ~
 0 11939
+E
+dais center~
+   There is a raised dais in the center of the floor. Goef the Oreonic is
+sitting (or, perhaps, standing) on it.
+~
 E
 obelisks~
    Four obelisks mark the east, south, west, and north points of the room. The
@@ -4428,6 +4450,10 @@ cdi 0 0
 D8
 ~
 0 11980
+E
+ossuary~
+This whole chamber is an ossuary: a place to store the bones of the long-dead.
+~
 E
 staircase up light dust~
    Very little light spills down the staircase, as the building above is lit

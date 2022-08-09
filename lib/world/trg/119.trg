@@ -1826,7 +1826,7 @@ while %ch%
 done
 * ensure a player has loot permission
 if %actor.is_pc% && %actor.level% >= %min_level% && %self.is_tagged_by(%actor%)%
-  set varname pc%actor.id%_%dailycycle%
+  set varname pc%actor.id%
   set ok 0
   if !%room.varexists(%varname%)%
     set ok 1
@@ -1848,7 +1848,7 @@ end
 set ch %room.people%
 while %ch% && !%any_ok%
   if %ch.is_pc% && %ch.level% >= %min_level% && %self.is_tagged_by(%ch%)%
-    set varname pc%ch.id%_%dailycycle%
+    set varname pc%ch.id%
     set ok 0
     if !%room.varexists(%varname%)%
       set ok 1
@@ -2084,7 +2084,7 @@ if %actor.is_pc% && %actor.level% >= %min_level% && %self.is_tagged_by(%actor%)%
     set ok 1
   else
     eval daycheck %%room.%varname%%%
-    if %daycheck% < %dailycycle%
+    if !%daycheck%
       set ok 1
     end
   end
@@ -2106,7 +2106,7 @@ while %ch%
       set ok 1
     else
       eval daycheck %%room.%varname%%%
-      if %daycheck% < %dailycycle%
+      if !%daycheck%
         set ok 1
       end
     end
@@ -2621,10 +2621,9 @@ switch %cycle%
     wait 1
     %send% %person% As the tree comes crashing down, so too falls a fatal stillness. For a moment, nothing moves. The giant stands mid-swing. Shards of rotten wood hang like a cloud around the trunk.
   break
-  case 3
-    %send% %person% Slowly, inch by inch, time resumes again, and for the first time in ages, you almost feel like you can breathe again.
-  break
   default
+    %send% %person% Slowly, inch by inch, time resumes again, and for the first time in ages, you almost feel like you can breathe again.
+    wait 1
     * done: teleport the character
     set target %instance.nearest_rmt(11888)%
     %teleport% %person% %target%
@@ -3764,7 +3763,7 @@ else
 end
 * ensure a player has loot permission
 if %actor.is_pc% && %actor.level% >= %min_level% && %self.is_tagged_by(%actor%)%
-  set varname pc%actor.id%_%dailycycle%
+  set varname pc%actor.id%
   set ok 0
   if !%room.varexists(%varname%)%
     set ok 1
@@ -3787,7 +3786,7 @@ end
 set ch %room.people%
 while %ch%
   if %ch.is_pc% && %ch.level% >= %min_level% && %self.is_tagged_by(%ch%)%
-    set varname pc%ch.id%_%dailycycle%
+    set varname pc%ch.id%
     set ok 0
     if !%room.varexists(%varname%)%
       set ok 1

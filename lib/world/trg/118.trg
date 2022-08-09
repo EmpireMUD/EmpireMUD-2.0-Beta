@@ -12,6 +12,7 @@ Skycleave: Floor 2A mobs: complex leave rules~
 ~
 * configs first
 set sneakable_vnums 11815 11816 11817
+set maze_vnums 11812 11813 11818 11819 11820 11821 11823 11824 11825 11826
 set pixy_vnums 11820
 * One quick trick to get the target room
 set room_var %self.room%
@@ -44,7 +45,7 @@ if %actor.aff_flagged(SNEAK)% && %sneakable_vnums% ~= %self.vnum%
   end
 end
 * check direction
-if (%room_var.template% >= 11812 && %room_var.template% <= 11826)
+if %maze_vnums% ~= %room_var.template%
   * in pixy maze (allow only south)
   if %direction% == south
     halt
@@ -280,6 +281,10 @@ end
 * remove no-attack
 if %mob.aff_flagged(!ATTACK)%
   dg_affect %mob% !ATTACK off
+end
+* if I was scaled before, need to rescale me
+if %self.is_scaled%
+  %scale% %self% %self.level%
 end
 * mark me as scaled
 set scaled 1
@@ -1418,14 +1423,14 @@ if %self.room% != %room%
 end
 * check time limits
 if %room.varexists(speak_time)%
-  if %room.speak_time% + 30 < %timestamp%
+  if %room.speak_time% + 30 > %timestamp%
     halt
   end
 end
 set varname last_%room.template%
 if %self.varexists(%varname%)%
   eval last %%self.%varname%%%
-  if %last% + 120 < %timestamp%
+  if %last% + 120 > %timestamp%
     halt
   end
 end
@@ -1689,7 +1694,7 @@ switch %self.room.template%
   break
   case 11832
     * Third Floor East (3A)
-    %mod% %self% keywords furniture stack barricade
+    %mod% %self% keywords furniture stack barricade chairs tables
     %mod% %self% shortdesc a stack of furniture
     %mod% %self% longdesc This section of the walkway is blocked off with a stack of furniture.
     %mod% %self% lookdesc Skycleave's fancy chairs and end tables have been stacked to force would-be rescuers to move single-file through a narrow gap in order to make progress along the walkway.
@@ -1815,6 +1820,7 @@ if %target%
     if %ch.leader% == %self% && %ch.position% == Standing
       %send% %ch% You try to follow but smack into the wall. Ouch!
       %echoaround% %ch% ~%ch% tries to follow but smacks into the wall with a thud.
+      %damage% %ch% 10 physical
     end
     set ch %ch.next_in_room%
   done
@@ -2811,24 +2817,29 @@ Skycleave: Shade ascension / Death of Knezz~
 0 b 100
 ~
 * This starts a timer that will kill Knezz and ascend the shade after 2 minutes
-* fetch timer
-if %self.varexists(knezz_timer)%
-  set knezz_timer %self.knezz_timer%
+if %room.people(11868)%
+  * fetch timer
+  if %self.varexists(knezz_timer)%
+    set knezz_timer %self.knezz_timer%
+  else
+    set knezz_timer 0
+  end
+  * check startup
+  if %knezz_timer% == 0 && !%self.fighting%
+    * not started
+    halt
+  end
+  if %knezz_timer% == 0 && %self.fighting%
+    set knezz_timer %timestamp%
+    remote knezz_timer %self.id%
+    halt
+  end
+  * the rest of this is based on time since start
+  eval seconds %timestamp% - %knezz_timer%
 else
-  set knezz_timer 0
+  * no knezz at all
+  set seconds 99999
 end
-* check startup
-if %knezz_timer% == 0 && !%self.fighting%
-  * not started
-  halt
-end
-if %knezz_timer% == 0 && %self.fighting%
-  set knezz_timer %timestamp%
-  remote knezz_timer %self.id%
-  halt
-end
-* the rest of this is based on time since start
-eval seconds %timestamp% - %knezz_timer%
 if %seconds% > 120
   * 2 minutes: Knezz dies
   nop %self.add_mob_flag(NO-ATTACK)%

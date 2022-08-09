@@ -430,6 +430,10 @@ D3
 ~
 0 11802
 E
+fixtures nocturnium~
+Small, elegant nocturnium oil lamps are affixed to the walls.
+~
+E
 pictures paintings paper walls~
    The walls are papered with pictures of birds, flowers, bees, and
 butterflies. If you stare at them long enough, they actually seem to move,
@@ -508,12 +512,21 @@ fixtures nocturnium~
 reduced to tiny flames so the room is only dimly lit.
 ~
 E
-chalkboard blackboard~
+walls~
+The paneled black walls are made from ebony.
+~
+E
+chalkboard blackboard writing~
    In an orderly grid, yet in almost completely incomprehensible writing, what
 looks like a bunch of names with numbers next to them cover the slate. Perhaps
 this is some sort of attempt to organize who sleeps where, and when. In all
 defiance of the orderly convention of the grid is some graffiti that reads,
-                      'All hail! The everything bagel!'
+                     'All hail! The everything bagel!'
+~
+E
+bagel~
+Someone has drawn a crudely-shaped bagel on the board with the text:
+                     'All hail! The everything bagel!'
 ~
 E
 bunkbeds beds~
@@ -2657,6 +2670,12 @@ c 0 0
 D1
 ~
 0 11839
+E
+dais center~
+   A raised dais in the center of the room is protected by a shimmering wall
+of light. An odd nocturnium sculpture stands upon it, well-protected by the
+ward.
+~
 E
 statue marie~
    There is an old, worn, but lifelike statue in the shape of a lovely young
