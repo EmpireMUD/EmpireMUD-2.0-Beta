@@ -724,6 +724,7 @@ const char *preference_bits[] = {
 	"ITEM-QUALITY",
 	"ITEM-DETAILS",
 	"!EXITS",
+	"BRIEF-EXITS",
 	"\n"
 };
 
@@ -801,6 +802,7 @@ const struct toggle_data_type toggle_data[] = {
 	
 	{ "channel-joins", TOG_OFFON, PRF_NO_CHANNEL_JOINS, 0, NULL },
 	{ "exits", TOG_OFFON, PRF_NO_EXITS, 0, NULL },
+	{ "brief-exits", TOG_ONOFF, PRF_BRIEF_EXITS, 0, NULL },
 	
 	// imm section
 	{ "wiznet", TOG_OFFON, PRF_NOWIZ, LVL_START_IMM, NULL },
@@ -996,10 +998,10 @@ const char *alt_dirs[] = {
 	"se",
 	"u",
 	"d",
-	"fore",
-	"starboard",
-	"port",
-	"aft",
+	"fo",
+	"st",
+	"po",
+	"af",
 	"random",
 	"\n"
 };

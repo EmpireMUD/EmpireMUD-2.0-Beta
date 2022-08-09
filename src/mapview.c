@@ -127,6 +127,31 @@ int distance_can_see_in_dark(char_data *ch) {
 
 
 /**
+* Shows the single-line version of available exits in the CircleMUD style.
+*
+* @param char_data *ch The person looking.
+* @param room_data *room The room to see exits for.
+*/
+static void do_brief_auto_exits(struct char_data *ch, room_data *room) {
+	struct room_direction_data *ex;
+	bool any = FALSE;
+	
+	msg_to_char(ch, "\tc[ Exits: ");
+
+	if (COMPLEX_DATA(room) && ROOM_IS_CLOSED(room)) {
+		for (ex = COMPLEX_DATA(room)->exits; ex; ex = ex->next) {
+			if (ex->room_ptr && !EXIT_FLAGGED(ex, EX_CLOSED)) {
+				msg_to_char(ch, "\t(%s\t) ", alt_dirs[get_direction_for_char(ch, ex->dir)]);
+				any = TRUE;
+			}
+		}
+	}
+	
+	msg_to_char(ch, "%s]\t0\r\n", any ? "" : "None! ");
+}
+
+
+/**
 * Gets the one-line description for a single exit.
 *
 * @param char_data *ch The person looking at exits (for see-in-dark/roomflags).
@@ -1512,6 +1537,11 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options) {
 		return;
 	}
 	
+	// brief version of exits goes here
+	if (PRF_FLAGGED(ch, PRF_BRIEF_EXITS) && !PRF_FLAGGED(ch, PRF_NO_EXITS) && COMPLEX_DATA(room) && ROOM_IS_CLOSED(room)) {
+		do_brief_auto_exits(ch, room);
+	}
+	
 	// commands: only show if the first entry is not a \0, which terminates the list
 	if (GET_BUILDING(room)) {
 		if (GET_BLD_COMMANDS(GET_BUILDING(room)) && *GET_BLD_COMMANDS(GET_BUILDING(room))) {
@@ -1685,7 +1715,7 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options) {
 	}
 
 	/* Exits ? */
-	if (!PRF_FLAGGED(ch, PRF_NO_EXITS) && COMPLEX_DATA(room) && ROOM_IS_CLOSED(room)) {
+	if (!PRF_FLAGGED(ch, PRF_NO_EXITS | PRF_BRIEF_EXITS) && COMPLEX_DATA(room) && ROOM_IS_CLOSED(room)) {
 		do_exits(ch, "", -1, GET_ROOM_VNUM(room));
 	}
 	

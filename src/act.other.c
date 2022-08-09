@@ -1208,7 +1208,7 @@ void alt_import_preferences(char_data *ch, char_data *alt) {
 					PRF_NOEMPIRE | PRF_CLEARMETERS | PRF_NO_PAINT | 
 					PRF_EXTRA_SPACING | PRF_TRAVEL_LOOK | PRF_AUTOCLIMB | 
 					PRF_AUTOSWIM | PRF_ITEM_QUALITY | PRF_ITEM_DETAILS | 
-					PRF_NO_EXITS;
+					PRF_NO_EXITS | PRF_BRIEF_EXITS;
 	
 	// add flags
 	set = PRF_FLAGS(alt) & prfs;
