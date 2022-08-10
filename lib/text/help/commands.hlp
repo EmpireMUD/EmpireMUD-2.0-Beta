@@ -300,13 +300,14 @@ but don't forget to turn it off again!
 
 See also: BITE, CEDE, PURIFY, SIRE, TOGGLE
 #
-BRIEF "TOGGLE BRIEF"
+BRIEF "TOGGLE ROOM-DESCS" "TOGGLE BRIEF"
 
-Usage:  toggle brief [on/off]
+Usage:  toggle room-descs [on/off]
 
-This toggle turns off room descriptions and shrinks the map display from 15 by
-15 to 7 by 7. It reduces disconnects from buffer overflows for people moving
-quickly across the world.
+This toggle turns on/off room descriptions.
+
+This toggle was formerly called 'brief'. It also formerly reduced the mapsize
+to 3.
 
 See also: COMPACT, MAPSIZE, TOGGLE
 #
@@ -2119,8 +2120,6 @@ Available options:
  * toggle informative - If on, tiles will indicate if they are being built
      or dismantled, need repair, and some other status types.
  * toggle political - Indicates who owns each map tile.
- * toggle brief - This will hide the map display entirely and not show you
-     what you can see in each direction.
 
 See also: DISPLAY, SCAN, TOGGLE, MAPSIZE, FMESSAGES, MAPSCAN, CHART
 #
@@ -2441,8 +2440,6 @@ Toggles:
   autorecall - if you're logged out over an hour, automatically sends you home
   autoswim - can enter water without typing 'swim'
   bother - allows "bothersome" things like bite and purify
-  brief - see smaller maps and no room descriptions
-  brief-exits - shows CircleMUD-style exits for interior rooms
   channel-joins - blocks slash-channel join messages
   clearmeters - automatically clears your meters between combats
   compact - no extra newlines
@@ -2458,9 +2455,11 @@ Toggles:
   no-repeat - Some commands will say "ok" instead of typing out your message
   political - shows empire colors instead of terrain colors
   pvp - turns on/off free pvp; will remain on 5 minutes after toggled off
+  room-descs - view or hide room descriptions
   rp - Whether or not you are roleplaying
   screen-reader - see HELP SCREEN READER
   scrolling - scroll long text instead of paginating
+  short-exits - shows CircleMUD-style exits for interior rooms
   shout - the local shout channel
   stealthable - if off, you will be prevented from accidentally stealing
   tell - the tell channel

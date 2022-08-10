@@ -2284,7 +2284,7 @@ typedef enum {
 #define PRF_NO_CHANNEL_JOINS  BIT(15)	// Won't wee channel joins
 #define PRF_AUTOKILL  BIT(16)	// Stops from knocking players out
 #define PRF_SCROLLING  BIT(17)	// Turns off page_string
-#define PRF_BRIEF  BIT(18)	// Cuts map size, removes room descs
+#define PRF_NO_ROOM_DESCS  BIT(18)	// Removes room descs; formerly 'brief'
 #define PRF_BOTHERABLE  BIT(19)	// allows bite, purify, feed, etc
 #define PRF_AUTORECALL  BIT(20)	// free recall when logged off too long
 #define PRF_NOGODNET  BIT(21)	// Can't hear godnet
@@ -2307,7 +2307,7 @@ typedef enum {
 #define PRF_ITEM_QUALITY  BIT(38)	// shows loot quality color/tag in inv/eq
 #define PRF_ITEM_DETAILS  BIT(39)	// shows additional item details on inv/eq
 #define PRF_NO_EXITS  BIT(40)	// hides exits on look and auto-look
-#define PRF_BRIEF_EXITS  BIT(41)	// shows circlemud-style exits
+#define PRF_SHORT_EXITS  BIT(41)	// shows circlemud-style exits
 // note: if you add prefs, consider adding them to alt_import_preferences()
 
 

@@ -1270,15 +1270,15 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options) {
 			}
 		}
 		else {	// ASCII map view
-			magnitude = PRF_FLAGGED(ch, PRF_BRIEF) ? 3 : mapsize;
+			magnitude = mapsize;
 			*buf = '\0';
 			
 			if (show_title) {
 				// spacing to center the title
 				s = ((4 * (magnitude * 2 + 1)) + 2 - (strlen(output)-4))/2;
-				if (!PRF_FLAGGED(ch, PRF_BRIEF))
-					for (t = 1; t <= s; t++)
-						send_to_char(" ", ch);
+				for (t = 1; t <= s; t++) {
+					send_to_char(" ", ch);
+				}
 				send_to_char(output, ch);
 			}		
 		
@@ -1501,7 +1501,7 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options) {
 			}
 			
 			// description
-			if (!PRF_FLAGGED(ch, PRF_BRIEF) && (strptr = get_room_description(room))) {
+			if (!PRF_FLAGGED(ch, PRF_NO_ROOM_DESCS) && (strptr = get_room_description(room))) {
 				msg_to_char(ch, "%s", strptr);
 			}
 		}
@@ -1538,7 +1538,7 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options) {
 	}
 	
 	// brief version of exits goes here
-	if (PRF_FLAGGED(ch, PRF_BRIEF_EXITS) && !PRF_FLAGGED(ch, PRF_NO_EXITS) && COMPLEX_DATA(room) && ROOM_IS_CLOSED(room)) {
+	if (PRF_FLAGGED(ch, PRF_SHORT_EXITS) && !PRF_FLAGGED(ch, PRF_NO_EXITS) && COMPLEX_DATA(room) && ROOM_IS_CLOSED(room)) {
 		do_brief_auto_exits(ch, room);
 	}
 	
@@ -1715,7 +1715,7 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options) {
 	}
 
 	/* Exits ? */
-	if (!PRF_FLAGGED(ch, PRF_NO_EXITS | PRF_BRIEF_EXITS) && COMPLEX_DATA(room) && ROOM_IS_CLOSED(room)) {
+	if (!PRF_FLAGGED(ch, PRF_NO_EXITS | PRF_SHORT_EXITS) && COMPLEX_DATA(room) && ROOM_IS_CLOSED(room)) {
 		do_exits(ch, "", -1, GET_ROOM_VNUM(room));
 	}
 	
@@ -2289,11 +2289,6 @@ void screenread_one_dir(char_data *ch, room_data *origin, int dir) {
 	mapsize = GET_MAPSIZE(REAL_CHAR(ch));
 	if (mapsize == 0) {
 		mapsize = config_get_int("default_map_size");
-	}
-	
-	// constrain for brief
-	if (PRF_FLAGGED(ch, PRF_BRIEF)) {
-		mapsize = MIN(3, mapsize);
 	}
 
 	// setup

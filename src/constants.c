@@ -701,7 +701,7 @@ const char *preference_bits[] = {
 	"!CHANNEL-JOINS",
 	"AUTOKILL",
 	"SCRL",
-	"BRIEF",
+	"NO-ROOM-DESCS",
 	"BOTHER",
 	"AUTORECALL",
 	"!GOD",
@@ -724,7 +724,7 @@ const char *preference_bits[] = {
 	"ITEM-QUALITY",
 	"ITEM-DETAILS",
 	"!EXITS",
-	"BRIEF-EXITS",
+	"SHORT-EXITS",
 	"\n"
 };
 
@@ -773,7 +773,7 @@ const struct toggle_data_type toggle_data[] = {
 	{ "clearmeters", TOG_ONOFF, PRF_CLEARMETERS, 0, NULL },
 	
 	{ "autorecall", TOG_ONOFF, PRF_AUTORECALL, 0, NULL },
-	{ "brief", TOG_ONOFF, PRF_BRIEF, 0, NULL },
+	{ "room-descs", TOG_OFFON, PRF_NO_ROOM_DESCS, 0, NULL },
 	{ "rp", TOG_ONOFF, PRF_RP, 0, NULL },
 	
 	{ "autoswim", TOG_ONOFF, PRF_AUTOSWIM, 0, NULL },
@@ -802,7 +802,7 @@ const struct toggle_data_type toggle_data[] = {
 	
 	{ "channel-joins", TOG_OFFON, PRF_NO_CHANNEL_JOINS, 0, NULL },
 	{ "exits", TOG_OFFON, PRF_NO_EXITS, 0, NULL },
-	{ "brief-exits", TOG_ONOFF, PRF_BRIEF_EXITS, 0, NULL },
+	{ "short-exits", TOG_ONOFF, PRF_SHORT_EXITS, 0, NULL },
 	
 	// imm section
 	{ "wiznet", TOG_OFFON, PRF_NOWIZ, LVL_START_IMM, NULL },
