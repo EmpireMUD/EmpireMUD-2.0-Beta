@@ -974,14 +974,14 @@ typedef struct vehicle_data vehicle_data;
 #define AFF_HIDE  BIT(4)	// e. Char is hidden
 #define AFF_CHARM  BIT(5)	// f. Char is charmed
 #define AFF_INVISIBLE  BIT(6)	// g. Char is invisible
-#define AFF_IMMUNE_BATTLE  BIT(7)	// h. Immunity to Battle debuffs
+#define AFF_IMMUNE_PHYSICAL_DEBUFFS  BIT(7)	// h. Immunity to 'physical' debuffs
 #define AFF_SENSE_HIDE  BIT(8)	// i. See hidden people
 #define AFF_IMMUNE_PHYSICAL  BIT(9)	// j. Immune to physical damage
 #define AFF_NO_TARGET_IN_ROOM  BIT(10)	// k. no-target
 #define AFF_NO_SEE_IN_ROOM  BIT(11)	// l. don't see on look
 #define AFF_FLY  BIT(12)	// m. person can fly
 #define AFF_NO_ATTACK  BIT(13)	// n. can't be attacked
-#define AFF_IMMUNE_HIGH_SORCERY  BIT(14)	// o. immune to high sorcery debuffs
+#define AFF_IMMUNE_MAGICAL_DEBUFFS  BIT(14)	// o. immune to 'magical' debuffs
 #define AFF_DISARMED  BIT(15)	// p. disarmed
 #define AFF_HASTE  BIT(16)	// q. haste: attacks faster
 #define AFF_IMMOBILIZED  BIT(17)	// r. immobilized: can't move (entangled)
@@ -994,9 +994,9 @@ typedef struct vehicle_data vehicle_data;
 #define AFF_EARTHMELD  BIT(24)	// y. interred in the earth
 #define AFF_MUMMIFY  BIT(25)	// z. mummified
 #define AFF_SOULMASK  BIT(26)	// A. soulmask
-#define AFF_IMMUNE_NATURAL_MAGIC  BIT(27)	// B. immune to natural magic debuffs
-#define AFF_IMMUNE_STEALTH  BIT(28)	// C. Immune to stealth debuffs
-#define AFF_IMMUNE_VAMPIRE  BIT(29)	// D. Immune to vampire debuffs
+	#define AFF_UNUSED  BIT(27)	// B. formerly !natural-magic
+#define AFF_IMMUNE_POISON_DEBUFFS  BIT(28)	// C. Immune to any 'poison' debuffs
+#define AFF_IMMUNE_MENTAL_DEBUFFS  BIT(29)	// D. Immune to any 'mental' debuffs
 #define AFF_IMMUNE_STUN  BIT(30)	// E. Cannot be hit by stun effects
 #define AFF_ORDERED  BIT(31)	// F. Has been issued an order from a player
 #define AFF_NO_DRINK_BLOOD  BIT(32)	// G. Vampires can't bite or sire

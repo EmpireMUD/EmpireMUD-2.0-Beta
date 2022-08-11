@@ -2414,7 +2414,7 @@ bool can_fight(char_data *ch, char_data *victim) {
 		return FALSE;
 
 	// try to hit people through majesty?
-	if (CHECK_MAJESTY(victim) && !AFF_FLAGGED(ch, AFF_IMMUNE_VAMPIRE)) {
+	if (CHECK_MAJESTY(victim) && !AFF_FLAGGED(ch, AFF_IMMUNE_MENTAL_DEBUFFS)) {
 		return FALSE;
 	}
 
@@ -3546,7 +3546,7 @@ int hit(char_data *ch, char_data *victim, obj_data *weapon, bool combat_round) {
 		// check post-hit skills
 		if (result > 0 && !EXTRACTED(victim) && !IS_DEAD(victim) && IN_ROOM(victim) == IN_ROOM(ch)) {
 			// cut deep: players only
-			if (!IS_NPC(ch) && !AFF_FLAGGED(victim, AFF_IMMUNE_BATTLE) && skill_check(ch, ABIL_CUT_DEEP, DIFF_RARELY) && weapon && attack_hit_info[w_type].weapon_type == WEAPON_SHARP) {
+			if (!IS_NPC(ch) && !AFF_FLAGGED(victim, AFF_IMMUNE_PHYSICAL_DEBUFFS) && skill_check(ch, ABIL_CUT_DEEP, DIFF_RARELY) && weapon && attack_hit_info[w_type].weapon_type == WEAPON_SHARP) {
 				act("You cut deep wounds in $N -- $E is bleeding!", FALSE, ch, NULL, victim, TO_CHAR);
 				act("$n's last attack cuts deep -- you are bleeding!", FALSE, ch, NULL, victim, TO_VICT);
 				act("$n's last attack cuts deep -- $N is bleeding!", FALSE, ch, NULL, victim, TO_NOTVICT);
@@ -3559,7 +3559,7 @@ int hit(char_data *ch, char_data *victim, obj_data *weapon, bool combat_round) {
 			}
 		
 			// stunning blow: players only
-			if (!IS_NPC(ch) && !AFF_FLAGGED(victim, AFF_IMMUNE_BATTLE | AFF_IMMUNE_STUN) && skill_check(ch, ABIL_STUNNING_BLOW, DIFF_RARELY) && weapon && attack_hit_info[w_type].weapon_type == WEAPON_BLUNT) {
+			if (!IS_NPC(ch) && !AFF_FLAGGED(victim, AFF_IMMUNE_PHYSICAL_DEBUFFS | AFF_IMMUNE_STUN) && skill_check(ch, ABIL_STUNNING_BLOW, DIFF_RARELY) && weapon && attack_hit_info[w_type].weapon_type == WEAPON_BLUNT) {
 				af = create_flag_aff(ATYPE_STUNNING_BLOW, CHOOSE_BY_ABILITY_LEVEL(stunning_blow_durations, ch, ABIL_STUNNING_BLOW), AFF_STUNNED, ch);
 				affect_join(victim, af, 0);
 				
@@ -4009,7 +4009,7 @@ void perform_violence_missile(char_data *ch, obj_data *weapon) {
 			}
 		
 			// ability effects
-			if (!IS_NPC(ch) && weapon && !AFF_FLAGGED(vict, AFF_IMMUNE_BATTLE) && skill_check(ch, ABIL_TRICK_SHOTS, DIFF_RARELY)) {
+			if (!IS_NPC(ch) && weapon && !AFF_FLAGGED(vict, AFF_IMMUNE_PHYSICAL_DEBUFFS) && skill_check(ch, ABIL_TRICK_SHOTS, DIFF_RARELY)) {
 				switch (GET_MISSILE_WEAPON_TYPE(weapon)) {
 					case TYPE_BOW: {
 						af = create_flag_aff(ATYPE_TRICK_SHOT, 2, AFF_SLOW, ch);

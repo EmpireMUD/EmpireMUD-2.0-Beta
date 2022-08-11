@@ -1218,7 +1218,7 @@ ACMD(do_command) {
 			gain_ability_exp(ch, ABIL_VAMP_COMMAND, 33.4);
 		}
 
-		if (skill_check(ch, ABIL_VAMP_COMMAND, DIFF_MEDIUM) && !AFF_FLAGGED(victim, AFF_IMMUNE_VAMPIRE)) {
+		if (skill_check(ch, ABIL_VAMP_COMMAND, DIFF_MEDIUM) && !AFF_FLAGGED(victim, AFF_IMMUNE_MENTAL_DEBUFFS)) {
 			un_charm = AFF_FLAGGED(victim, AFF_CHARM) ? FALSE : TRUE;
 			SET_BIT(AFF_FLAGS(victim), AFF_CHARM);
 			

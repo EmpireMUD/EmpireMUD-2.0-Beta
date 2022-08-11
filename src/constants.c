@@ -1228,14 +1228,14 @@ const char *affected_bits[] = {
 	"HIDE",
 	"*CHARM",
 	"INVIS",
-	"!BATTLE",
+	"IMMUNE-PHYSICAL-DEBUFFS",
 	"SENSE-HIDE",
 	"!PHYSICAL",
 	"!TARGET",
 	"!SEE",
 	"FLY",
 	"!ATTACK",
-	"!HIGH-SORCERY",
+	"IMMUNE-MAGICAL-DEBUFFS",
 	"DISARMED",
 	"HASTE",
 	"IMMOBILIZED",
@@ -1248,9 +1248,9 @@ const char *affected_bits[] = {
 	"EARTHMELD",
 	"MUMMIFY",
 	"SOULMASK",
-	"!NATURAL-MAGIC",
-	"!STEALTH",
-	"!VAMPIRE",
+	"*",	// formerly !NATURAL-MAGIC; merged with IMMUNE-MAGICAL-DEBUFFS
+	"IMMUNE-POISON-DEBUFFS",
+	"IMMUNE-MENTAL-DEBUFFS",
 	"!STUN",
 	"*ORDERED",
 	"!DRINK-BLOOD",
@@ -1271,14 +1271,14 @@ const char *affected_bits_consider[] = {
 	"",	// hide
 	"",	// 5 - charm
 	"",	// invis
-	"$E is immune to Battle debuffs.",	// !battle
+	"$E is immune to physical debuffs.",	// immune-phyical-debuffs
 	"",	// sense hide
 	"$E is immune to physical damage.",	// !physical
 	"",	// 10 - no-target-in-room
 	"",	// no-see-in-room
 	"",	// fly
 	"$E cannot be attacked.",	// !attack
-	"$E is immune to High Sorcery debuffs.",	// !highsorc
+	"$E is immune to magical debuffs.",	// immune-magical-debuffs
 	"",	// 15 - disarmed
 	"",	// haste
 	"",	// immobilized
@@ -1291,9 +1291,9 @@ const char *affected_bits_consider[] = {
 	"",	// earthmeld
 	"",	// 25 - mummify
 	"$E is soulmasked.",	// soulmask
-	"$E is immune to Natural Magic debuffs.",	// !natmag
-	"$E is immune to Stealth debuffs.",	// !stealth
-	"$E is immune to Vampire debuffs.",	// !vampire
+	"",	// * unused
+	"$E is immune to poison debuffs.",	// immune-poison-debuffs
+	"$E is immune to mental debuffs.",	// immune-mental-debuffs
 	"$E is immune to stuns.",	// 30 - !stun
 	"",	// ordred
 	"",	// !drink-blood

@@ -423,8 +423,8 @@ int apply_poison(char_data *ch, char_data *vict) {
 		return 0;
 	}
 	
-	if (AFF_FLAGGED(vict, AFF_IMMUNE_STEALTH)) {
-		return 0;	// immune to stealth debuffs
+	if (AFF_FLAGGED(vict, AFF_IMMUNE_POISON_DEBUFFS)) {
+		return 0;	// immune to poison debuffs specfically
 	}
 	
 	if (!(obj = find_poison_by_vnum(ch->carrying, USING_POISON(ch)))) {
@@ -785,7 +785,7 @@ ACMD(do_diversion) {
 		}
 		
 		DL_FOREACH_SAFE2(ROOM_PEOPLE(IN_ROOM(ch)), victim, next_vict, next_in_room) {
-			if (AFF_FLAGGED(victim, AFF_IMMUNE_STEALTH)) {
+			if (AFF_FLAGGED(victim, AFF_IMMUNE_MENTAL_DEBUFFS)) {
 				continue;
 			}
 			
@@ -919,7 +919,7 @@ ACMD(do_howl) {
 		act("$n lets out a bone-chilling howl!", FALSE, ch, NULL, NULL, TO_ROOM);
 		
 		DL_FOREACH_SAFE2(ROOM_PEOPLE(IN_ROOM(ch)), victim, next_vict, next_in_room) {
-			if (AFF_FLAGGED(victim, AFF_IMMUNE_STEALTH)) {
+			if (AFF_FLAGGED(victim, AFF_IMMUNE_MENTAL_DEBUFFS)) {
 				continue;
 			}
 			
@@ -1077,21 +1077,21 @@ ACMD(do_jab) {
 		if (hit(ch, vict, GET_EQ(ch, WEAR_WIELD), FALSE) > 0 && !IS_DEAD(vict)) {
 			apply_dot_effect(vict, ATYPE_JABBED, 3, DAM_PHYSICAL, get_ability_level(ch, ABIL_JAB) / 24, 2, ch);
 			
-			if (has_ability(ch, ABIL_STAGGER_JAB) && !AFF_FLAGGED(vict, AFF_IMMUNE_STEALTH) && check_solo_role(ch)) {
+			if (has_ability(ch, ABIL_STAGGER_JAB) && !AFF_FLAGGED(vict, AFF_IMMUNE_PHYSICAL_DEBUFFS) && check_solo_role(ch)) {
 				struct affected_type *af;
 				int value = ceil(GET_CHARISMA(ch) / 5);
 				af = create_mod_aff(ATYPE_STAGGER_JAB, 3, APPLY_TO_HIT, -value, ch);
 				affect_join(vict, af, ADD_MODIFIER);
 			}
 			
-			if (has_ability(ch, ABIL_CRUCIAL_JAB) && !AFF_FLAGGED(vict, AFF_IMMUNE_STEALTH) && check_solo_role(ch)) {
+			if (has_ability(ch, ABIL_CRUCIAL_JAB) && !AFF_FLAGGED(vict, AFF_IMMUNE_PHYSICAL_DEBUFFS) && check_solo_role(ch)) {
 				struct affected_type *af;
 				int value = round(GET_COMPUTED_LEVEL(ch) / 80);
 				af = create_mod_aff(ATYPE_CRUCIAL_JAB, 2, APPLY_DEXTERITY, -value, ch);
 				affect_join(vict, af, NOBITS);
 			}
 			
-			if (has_ability(ch, ABIL_SHADOW_JAB) && !AFF_FLAGGED(vict, AFF_IMMUNE_STEALTH) && check_solo_role(ch)) {
+			if (has_ability(ch, ABIL_SHADOW_JAB) && !AFF_FLAGGED(vict, AFF_IMMUNE_PHYSICAL_DEBUFFS) && check_solo_role(ch)) {
 				struct affected_type *af;
 				int value = ceil(GET_CHARISMA(ch) / 5);
 				af = create_mod_aff(ATYPE_SHADOW_JAB, 3, APPLY_DEXTERITY, -value, ch);
@@ -1307,7 +1307,7 @@ ACMD(do_sap) {
 	else if (!can_fight(ch, vict)) {
 		act("You can't attack $M!", FALSE, ch, NULL, vict, TO_CHAR);
 	}
-	else if (AFF_FLAGGED(vict, AFF_IMMUNE_STUN | AFF_IMMUNE_STEALTH)) {
+	else if (AFF_FLAGGED(vict, AFF_IMMUNE_STUN | AFF_IMMUNE_PHYSICAL_DEBUFFS)) {
 		act("$E doesn't look like $E'd be affected by that.", FALSE, ch, NULL, vict, TO_CHAR);
 	}
 	else if (AFF_FLAGGED(vict, AFF_STUNNED)) {
@@ -1319,7 +1319,7 @@ ACMD(do_sap) {
 	else {
 		charge_ability_cost(ch, MOVE, cost, COOLDOWN_SAP, 9, WAIT_COMBAT_ABILITY);
 	
-		success = !AFF_FLAGGED(vict, AFF_IMMUNE_STEALTH) && (!CAN_SEE(vict, ch) || skill_check(ch, ABIL_SAP, DIFF_MEDIUM));
+		success = !AFF_FLAGGED(vict, AFF_IMMUNE_PHYSICAL_DEBUFFS) && (!CAN_SEE(vict, ch) || skill_check(ch, ABIL_SAP, DIFF_MEDIUM));
 
 		act("You sap $N in the back of the head.", FALSE, ch, NULL, vict, TO_CHAR);
 		act("$n saps you in the back of the head. That hurt!", FALSE, ch, NULL, vict, TO_VICT);
@@ -1434,7 +1434,7 @@ ACMD(do_shadowcage) {
 		act("$n shoots webs of pure shadow, forming a tight cage!", FALSE, ch, NULL, NULL, TO_ROOM);
 		
 		DL_FOREACH_SAFE2(ROOM_PEOPLE(IN_ROOM(ch)), victim, next_vict, next_in_room) {
-			if (AFF_FLAGGED(victim, AFF_IMMUNE_STEALTH)) {
+			if (AFF_FLAGGED(victim, AFF_IMMUNE_MENTAL_DEBUFFS)) {
 				continue;
 			}
 			
