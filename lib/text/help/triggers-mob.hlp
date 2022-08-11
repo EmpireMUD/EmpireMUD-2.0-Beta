@@ -270,7 +270,7 @@ Usage:  mmove
 
 This causes the mob to attempt a normal random movement, like it does
 periodically anyway. This won't work on SENTINEL mobs, or ones who are
-entangled or following someone.
+immobilized or following someone.
 
 Note: You must use "mmove" (not "%move%") for this.
 
@@ -381,7 +381,7 @@ When using field  - The variable returns:
 &cadd_mob_flag(FLG)&0 - Adds a mob flag to the mob. Also, remove_mob_flag().
 &cadd_resources(vnum,amt)&0 - Gives a person <amt> of object <vnum>.
 &cadventure_summoned_from&0 - If a pc was summoned, the location where from.
-&caff_flagged(FLG)&0 - Checks if the actor has an AFF flag (e.g. ENTANGLED).
+&caff_flagged(FLG)&0 - Checks if the actor has an AFF flag (e.g. IMMOBILIZED).
    If called with no argument, lists current flags instead.
 &caffect(vnum/name)&0 - Checks the actor for the affect (by name or generic 
    affect vnum) in the subfield.

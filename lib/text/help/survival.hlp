@@ -149,7 +149,7 @@ Requires:  Huntsman (Survival ability)
 Speed boost:  Finder ability
 
 You can hunt animals that live in the area, even if you can't see any at the
-moment. The animal will be entangled briefly, to give you time to attack it
+moment. The animal will be immobilized briefly, to give you time to attack it
 when you find it with this command.
 
 This ability only targets animals that spawn with a rate of at least 1% in the

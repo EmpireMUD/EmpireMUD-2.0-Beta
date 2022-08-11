@@ -2180,7 +2180,7 @@ ACMD(do_load_vehicle) {
 				if (!MOB_FLAGGED(mob, MOB_ANIMAL | MOB_MOUNTABLE) || GET_LED_BY(mob)) {
 					continue;
 				}
-				if (GET_POS(mob) < POS_STANDING || FIGHTING(mob) || AFF_FLAGGED(mob, AFF_ENTANGLED) || GET_FED_ON_BY(mob)) {
+				if (GET_POS(mob) < POS_STANDING || FIGHTING(mob) || AFF_FLAGGED(mob, AFF_IMMOBILIZED) || GET_FED_ON_BY(mob)) {
 					continue;
 				}
 			
@@ -2224,7 +2224,7 @@ ACMD(do_load_vehicle) {
 		else if (!VEH_FLAGGED(cont, VEH_CARRY_MOBS)) {
 			act("$v won't carry mobs.", FALSE, ch, cont, NULL, TO_CHAR | ACT_VEHICLE_OBJ);
 		}
-		else if (GET_POS(mob) < POS_STANDING || FIGHTING(mob) || AFF_FLAGGED(mob, AFF_ENTANGLED) || GET_FED_ON_BY(mob)) {
+		else if (GET_POS(mob) < POS_STANDING || FIGHTING(mob) || AFF_FLAGGED(mob, AFF_IMMOBILIZED) || GET_FED_ON_BY(mob)) {
 			act("You can't load $M right now.", FALSE, ch, NULL, mob, TO_CHAR);
 		}
 		else if (GET_LED_BY(mob)) {
@@ -2413,7 +2413,7 @@ ACMD(do_unload_vehicle) {
 				if (!MOB_FLAGGED(mob, MOB_ANIMAL | MOB_MOUNTABLE) || GET_LED_BY(mob)) {
 					continue;
 				}
-				if (GET_POS(mob) < POS_STANDING || FIGHTING(mob) || AFF_FLAGGED(mob, AFF_ENTANGLED) || GET_FED_ON_BY(mob)) {
+				if (GET_POS(mob) < POS_STANDING || FIGHTING(mob) || AFF_FLAGGED(mob, AFF_IMMOBILIZED) || GET_FED_ON_BY(mob)) {
 					continue;
 				}
 			
@@ -2457,7 +2457,7 @@ ACMD(do_unload_vehicle) {
 		else if (GET_ROOM_VEHICLE(IN_ROOM(cont)) && !VEH_FLAGGED(GET_ROOM_VEHICLE(IN_ROOM(cont)), VEH_CARRY_MOBS)) {
 			msg_to_char(ch, "You can't unload mobs here.\r\n");
 		}
-		else if (GET_POS(mob) < POS_STANDING || FIGHTING(mob) || AFF_FLAGGED(mob, AFF_ENTANGLED) || GET_FED_ON_BY(mob)) {
+		else if (GET_POS(mob) < POS_STANDING || FIGHTING(mob) || AFF_FLAGGED(mob, AFF_IMMOBILIZED) || GET_FED_ON_BY(mob)) {
 			act("You can't unload $M right now.", FALSE, ch, NULL, mob, TO_CHAR);
 		}
 		else if (GET_LED_BY(mob)) {

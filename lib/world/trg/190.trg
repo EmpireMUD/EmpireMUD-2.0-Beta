@@ -714,7 +714,7 @@ if !%heroic_mode%
 end
 %echoaround% %actor% ~%self% slips around behind ~%actor% and draws a wicked dagger...
 wait 5 sec
-if %self.disabled% || %actor.fighting% == %self% || !%actor.fighting% || %self.aff_flagged(DISARM)% || %self.aff_flagged(ENTANGLED)%
+if %self.disabled% || %actor.fighting% == %self% || !%actor.fighting% || %self.aff_flagged(DISARM)% || %self.aff_flagged(IMMOBILIZED)%
   %echo% |%self% backstab is interrupted!
   halt
 else

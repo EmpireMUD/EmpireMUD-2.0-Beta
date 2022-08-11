@@ -1579,8 +1579,8 @@ ACMD(do_sneak) {
 	if (!sneaking && !can_use_ability(ch, ABIL_SNEAK, NOTHING, 0, NOTHING)) {
 		return;
 	}
-	if (AFF_FLAGGED(ch, AFF_ENTANGLED)) {
-		msg_to_char(ch, "You are entangled and can't sneak.\r\n");
+	if (AFF_FLAGGED(ch, AFF_IMMOBILIZED)) {
+		msg_to_char(ch, "You are immobilized and can't sneak.\r\n");
 		return;
 	}
 	if (GET_LEADING_MOB(ch) || GET_LEADING_VEHICLE(ch)) {

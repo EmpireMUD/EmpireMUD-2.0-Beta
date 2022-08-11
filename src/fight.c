@@ -4178,8 +4178,8 @@ void fight_wait_run(char_data *ch, double speed) {
 		return;
 	}
 	
-	if (AFF_FLAGGED(ch, AFF_ENTANGLED)) {
-		msg_to_char(ch, "You are entangled and can't run into combat!\r\n");
+	if (AFF_FLAGGED(ch, AFF_IMMOBILIZED)) {
+		msg_to_char(ch, "You are immobilized and can't run into combat!\r\n");
 		return;
 	}
 

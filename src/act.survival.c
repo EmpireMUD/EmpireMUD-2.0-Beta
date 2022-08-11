@@ -702,8 +702,8 @@ ACMD(do_hunt) {
 		msg_to_char(ch, "You can't hunt in cities.\r\n");
 		return;
 	}
-	if (AFF_FLAGGED(ch, AFF_ENTANGLED)) {
-		msg_to_char(ch, "You can't hunt anything while entangled.\r\n");
+	if (AFF_FLAGGED(ch, AFF_IMMOBILIZED)) {
+		msg_to_char(ch, "You can't hunt anything while immobilized.\r\n");
 		return;
 	}
 	if (GET_ACTION(ch) != ACT_NONE && GET_ACTION(ch) != ACT_HUNTING) {

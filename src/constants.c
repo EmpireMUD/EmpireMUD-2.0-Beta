@@ -1238,7 +1238,7 @@ const char *affected_bits[] = {
 	"!HIGH-SORCERY",
 	"DISARM",
 	"HASTE",
-	"ENTANGLED",
+	"IMMOBILIZED",
 	"SLOW",
 	"STUNNED",
 	"STONED",
@@ -1281,7 +1281,7 @@ const char *affected_bits_consider[] = {
 	"$E is immune to High Sorcery debuffs.",	// !highsorc
 	"",	// 15 - disarm
 	"",	// haste
-	"",	// entangled
+	"",	// immobilized
 	"",	// slow
 	"",	// stunned
 	"",	// 20 - stoned
@@ -1324,7 +1324,7 @@ const bool aff_is_bad[] = {
 	FALSE,	// unused
 	TRUE,	// 15 - disarm
 	FALSE,
-	TRUE,	// entangled
+	TRUE,	// immobilized
 	TRUE,	// slow
 	TRUE,	// stunned
 	TRUE,	// 20 - stoned

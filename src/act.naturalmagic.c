@@ -623,7 +623,7 @@ ACMD(do_entangle) {
 		act("$n shoots vines of green mana at you, entangling you!", FALSE, ch, NULL, vict, TO_VICT);
 		act("$n shoots vines of green mana at $N, entangling $M!", FALSE, ch, NULL, vict, TO_NOTVICT);
 	
-		af = create_aff(ATYPE_ENTANGLE, 6, APPLY_DEXTERITY, -1, AFF_ENTANGLED, ch);
+		af = create_aff(ATYPE_ENTANGLE, 6, APPLY_DEXTERITY, -1, AFF_IMMOBILIZED, ch);
 		affect_join(vict, af, 0);
 
 		engage_combat(ch, vict, TRUE);

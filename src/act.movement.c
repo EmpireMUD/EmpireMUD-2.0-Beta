@@ -191,8 +191,8 @@ bool can_enter_portal(char_data *ch, obj_data *portal, bool allow_infiltrate, bo
 	if (!IS_APPROVED(ch) && config_get_bool("travel_approval")) {
 		send_config_msg(ch, "need_approval_string");
 	}
-	else if (AFF_FLAGGED(ch, AFF_ENTANGLED)) {
-		msg_to_char(ch, "You are entangled and can't enter anything.\r\n");
+	else if (AFF_FLAGGED(ch, AFF_IMMOBILIZED)) {
+		msg_to_char(ch, "You are immobilized and can't enter anything.\r\n");
 	}
 	else if (AFF_FLAGGED(ch, AFF_CHARM) && GET_LEADER(ch) && IN_ROOM(ch) == IN_ROOM(GET_LEADER(ch))) {
 		msg_to_char(ch, "The thought of leaving your leader makes you weep.\r\n");
@@ -929,8 +929,8 @@ bool char_can_move(char_data *ch, int dir, room_data *to_room, bitvector_t flags
 		msg_to_char(ch, "You can't seem to move!\r\n");
 		return FALSE;
 	}
-	if (AFF_FLAGGED(ch, AFF_ENTANGLED)) {
-		msg_to_char(ch, "You are entangled and can't move.\r\n");
+	if (AFF_FLAGGED(ch, AFF_IMMOBILIZED)) {
+		msg_to_char(ch, "You are immobilized and can't move.\r\n");
 		return FALSE;
 	}
 	if (MOB_FLAGGED(ch, MOB_TIED)) {

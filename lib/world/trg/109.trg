@@ -272,7 +272,7 @@ if %enraged%
     if %self.aff_flagged(HARD-STUNNED)%
       %echo% ~%self% shakes his head and recovers from stunning!
     end
-    if %self.aff_flagged(ENTANGLED)%
+    if %self.aff_flagged(IMMOBILIZED)%
       %echo% ~%self% breaks free of the vines entangling him!
     end
     %echo% ~%self% tries to flee...

@@ -707,7 +707,7 @@ Titanaconda combat~
 0 k 50
 ~
 * Countered by good entangle (not always desirable)
-if (%self.aff_flagged(ENTANGLED)% || %self.disabled%)
+if (%self.aff_flagged(IMMOBILIZED)% || %self.disabled%)
   halt
 end
 set target %random.enemy%
@@ -749,7 +749,7 @@ Sleeping Ivy combat~
 * This is a mini-version of Titanconda's combat script (11138), and should
 * train the player for it.
 * Countered by good entangle (not always desirable)
-if (%self.aff_flagged(ENTANGLED)% || %self.disabled%)
+if (%self.aff_flagged(IMMOBILIZED)% || %self.disabled%)
   halt
 end
 set target %random.enemy%

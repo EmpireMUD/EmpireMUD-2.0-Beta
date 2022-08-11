@@ -648,7 +648,7 @@ switch %random.3%
       %send% %actor% ~%self% puts its head down and charges you!
       %echoaround% %actor% ~%self% puts its head down and charges ~%actor%!
       wait 2 sec
-      if %self.aff_flagged(ENTANGLED)% || %self.aff_flagged(STUNNED)%
+      if %self.aff_flagged(IMMOBILIZED)% || %self.aff_flagged(STUNNED)%
         %echo% |%self% attack is interrupted.
         halt
       end

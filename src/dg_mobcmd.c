@@ -890,7 +890,7 @@ ACMD(do_mmove) {
 	}
 	
 	// things that block moves
-	if (MOB_FLAGGED(ch, MOB_SENTINEL | MOB_TIED) || AFF_FLAGGED(ch, AFF_CHARM | AFF_ENTANGLED) || GET_POS(ch) != POS_STANDING || (GET_LEADER(ch) && IN_ROOM(ch) == IN_ROOM(GET_LEADER(ch)))) {
+	if (MOB_FLAGGED(ch, MOB_SENTINEL | MOB_TIED) || AFF_FLAGGED(ch, AFF_CHARM | AFF_IMMOBILIZED) || GET_POS(ch) != POS_STANDING || (GET_LEADER(ch) && IN_ROOM(ch) == IN_ROOM(GET_LEADER(ch)))) {
 		return;
 	}
 	
