@@ -1593,7 +1593,7 @@ char *obj_desc_for_char(obj_data *obj, char_data *ch, int mode) {
 	}
 
 	if (mode == OBJ_DESC_EQUIPMENT) {
-		if (obj->worn_by && AFF_FLAGGED(obj->worn_by, AFF_DISARM) && (obj->worn_on == WEAR_WIELD || obj->worn_on == WEAR_RANGED || obj->worn_on == WEAR_HOLD)) {
+		if (obj->worn_by && AFF_FLAGGED(obj->worn_by, AFF_DISARMED) && (obj->worn_on == WEAR_WIELD || obj->worn_on == WEAR_RANGED || obj->worn_on == WEAR_HOLD)) {
 			sprintf(tags + strlen(tags), "%s disarmed", (*tags ? "," : ""));
 		}
 	}

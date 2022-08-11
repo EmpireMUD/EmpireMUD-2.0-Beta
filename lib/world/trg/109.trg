@@ -299,13 +299,13 @@ switch %random.4%
     set target %random.enemy%
     set person %room.people%
     while %person%
-      if (%person.tohit% > %target.tohit%) && %self.is_enemy(%person%)% && !%person.aff_flagged(DISARM)%
+      if (%person.tohit% > %target.tohit%) && %self.is_enemy(%person%)% && !%person.aff_flagged(DISARMED)%
         set target %person%
       end
       set person %person.next_in_room%
     done
     if %target%
-      if !%target.aff_flagged(DISARM)%
+      if !%target.aff_flagged(DISARMED)%
         disarm %target%
       end
     end
@@ -1345,7 +1345,7 @@ if %actor.trigger_counterspell%
 else
   %send% %actor% Your weapon flies out of your hand!
   %echoaround% %actor% |%actor% weapon flies out of ^%actor% hand!
-  dg_affect #10995 %actor% DISARM on 20
+  dg_affect #10995 %actor% DISARMED on 20
 end
 ~
 #10995

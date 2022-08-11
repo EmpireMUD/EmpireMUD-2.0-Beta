@@ -432,11 +432,11 @@ end
 if %anat.mob_flagged(GROUP)%
   %damage% %target% 200 physical
   dg_affect #12013 %target% HARD-STUNNED on 10
-  dg_affect #12012 %target% DISARM on 30
+  dg_affect #12012 %target% DISARMED on 30
   %dot% #12011 %target% 150 60 physical
 else
   %damage% %target% 100 physical
-  dg_affect #12012 %target% DISARM on 15
+  dg_affect #12012 %target% DISARMED on 15
 end
 ~
 #12012

@@ -1769,7 +1769,7 @@ The following affect flags are available:
  FLY - Is flying.
  !ATTACK - Cannot be attacked -- do not use this on items.
  !HIGH-SORCERY - Immune to High Sorcery debuffs.
- DISARM - Has lost their weapon -- do not use this on items.
+ DISARMED - Has lost their weapon -- do not use this on items.
  HASTE - Has the effect of the Hasten ability.
  IMMOBILIZED - Cannot move -- do not use this on items.
  SLOW - Combat speed reduced, like the Slow spell.

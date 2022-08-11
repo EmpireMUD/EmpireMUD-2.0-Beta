@@ -208,7 +208,7 @@ int get_attack_type(char_data *ch, obj_data *weapon) {
 	int w_type = TYPE_HIT;
 
 	// always prefer weapon
-	if (weapon && IS_WEAPON(weapon) && !AFF_FLAGGED(ch, AFF_DISARM)) {
+	if (weapon && IS_WEAPON(weapon) && !AFF_FLAGGED(ch, AFF_DISARMED)) {
 		w_type = GET_WEAPON_TYPE(weapon);
 	}
 	else {
@@ -219,10 +219,10 @@ int get_attack_type(char_data *ch, obj_data *weapon) {
 		else if (IS_MORPHED(ch)) {
 			w_type = MORPH_ATTACK_TYPE(GET_MORPH(ch));
 		}
-		else if (IS_NPC(ch) && (MOB_ATTACK_TYPE(ch) != 0) && !AFF_FLAGGED(ch, AFF_DISARM)) {
+		else if (IS_NPC(ch) && (MOB_ATTACK_TYPE(ch) != 0) && !AFF_FLAGGED(ch, AFF_DISARMED)) {
 			w_type = MOB_ATTACK_TYPE(ch);
 		}
-		else if (IS_NPC(ch) && (MOB_ATTACK_TYPE(ch) != 0) && AFF_FLAGGED(ch, AFF_DISARM)) {
+		else if (IS_NPC(ch) && (MOB_ATTACK_TYPE(ch) != 0) && AFF_FLAGGED(ch, AFF_DISARMED)) {
 			// disarmed mob
 			if (attack_hit_info[MOB_ATTACK_TYPE(ch)].damage_type == DAM_MAGICAL) {
 				w_type = TYPE_MANA_BLAST;
@@ -231,7 +231,7 @@ int get_attack_type(char_data *ch, obj_data *weapon) {
 				w_type = TYPE_HIT;
 			}
 		}
-		else if (AFF_FLAGGED(ch, AFF_DISARM) && weapon && IS_WEAPON(weapon) && attack_hit_info[GET_WEAPON_TYPE(weapon)].damage_type == DAM_MAGICAL) {
+		else if (AFF_FLAGGED(ch, AFF_DISARMED) && weapon && IS_WEAPON(weapon) && attack_hit_info[GET_WEAPON_TYPE(weapon)].damage_type == DAM_MAGICAL) {
 			w_type = TYPE_MANA_BLAST;
 		}
 		else {
@@ -3351,7 +3351,7 @@ int hit(char_data *ch, char_data *victim, obj_data *weapon, bool combat_round) {
 	victim_emp = GET_LOYALTY(victim);
 	
 	// weapons not allowed if disarmed (do this after get_attack type, which accounts for this)
-	if (AFF_FLAGGED(ch, AFF_DISARM)) {
+	if (AFF_FLAGGED(ch, AFF_DISARMED)) {
 		weapon = NULL;
 	}
 	
@@ -3461,7 +3461,7 @@ int hit(char_data *ch, char_data *victim, obj_data *weapon, bool combat_round) {
 		}
 		
 		if (IS_NPC(ch)) {
-			dam += MOB_DAMAGE(ch) / (AFF_FLAGGED(ch, AFF_DISARM) ? 2 : 1);
+			dam += MOB_DAMAGE(ch) / (AFF_FLAGGED(ch, AFF_DISARMED) ? 2 : 1);
 		}
 		
 		// applicable bonuses

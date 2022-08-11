@@ -982,7 +982,7 @@ typedef struct vehicle_data vehicle_data;
 #define AFF_FLY  BIT(12)	// m. person can fly
 #define AFF_NO_ATTACK  BIT(13)	// n. can't be attacked
 #define AFF_IMMUNE_HIGH_SORCERY  BIT(14)	// o. immune to high sorcery debuffs
-#define AFF_DISARM  BIT(15)	// p. disarmed
+#define AFF_DISARMED  BIT(15)	// p. disarmed
 #define AFF_HASTE  BIT(16)	// q. haste: attacks faster
 #define AFF_IMMOBILIZED  BIT(17)	// r. immobilized: can't move (entangled)
 #define AFF_SLOW  BIT(18)	// s. slow (how great did that work out)

@@ -1236,7 +1236,7 @@ const char *affected_bits[] = {
 	"FLY",
 	"!ATTACK",
 	"!HIGH-SORCERY",
-	"DISARM",
+	"DISARMED",
 	"HASTE",
 	"IMMOBILIZED",
 	"SLOW",
@@ -1279,7 +1279,7 @@ const char *affected_bits_consider[] = {
 	"",	// fly
 	"$E cannot be attacked.",	// !attack
 	"$E is immune to High Sorcery debuffs.",	// !highsorc
-	"",	// 15 - disarm
+	"",	// 15 - disarmed
 	"",	// haste
 	"",	// immobilized
 	"",	// slow
@@ -1322,7 +1322,7 @@ const bool aff_is_bad[] = {
 	FALSE,
 	FALSE,
 	FALSE,	// unused
-	TRUE,	// 15 - disarm
+	TRUE,	// 15 - disarmed
 	FALSE,
 	TRUE,	// immobilized
 	TRUE,	// slow

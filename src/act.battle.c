@@ -111,7 +111,7 @@ ACMD(do_bash) {
 		send_to_char("You need to wield a weapon to make it a success.\r\n", ch);
 		return;
 	}
-	if (AFF_FLAGGED(ch, AFF_DISARM)) {
+	if (AFF_FLAGGED(ch, AFF_DISARMED)) {
 		msg_to_char(ch, "You can't bash -- your weapon has been disarmed!\r\n");
 		return;
 	}
@@ -283,7 +283,7 @@ ACMD(do_disarm) {
 	else if (IS_NPC(victim) && !GET_EQ(victim, WEAR_WIELD) && !attack_hit_info[MOB_ATTACK_TYPE(victim)].disarmable) {
 		act("You can't disarm $M -- $E isn't using a weapon.", FALSE, ch, 0, victim, TO_CHAR);
 	}
-	else if (AFF_FLAGGED(victim, AFF_DISARM)) {
+	else if (AFF_FLAGGED(victim, AFF_DISARMED)) {
 		act("$E is already disarmed.", FALSE, ch, 0, victim, TO_CHAR);
 	}
 	else if (ABILITY_TRIGGERS(ch, victim, NULL, ABIL_DISARM)) {
@@ -306,7 +306,7 @@ ACMD(do_disarm) {
 			act("$n disarms you! (Your weapon will not work until it wears off.)", FALSE, ch, 0, victim, TO_VICT);
 			act("$n skillfully disarms $N!", TRUE, ch, 0, victim, TO_NOTVICT);
 
-			af = create_flag_aff(ATYPE_DISARM, CHOOSE_BY_ABILITY_LEVEL(disarm_levels, ch, ABIL_DISARM), AFF_DISARM, ch);
+			af = create_flag_aff(ATYPE_DISARM, CHOOSE_BY_ABILITY_LEVEL(disarm_levels, ch, ABIL_DISARM), AFF_DISARMED, ch);
 			affect_join(victim, af, 0);
 		}
 		

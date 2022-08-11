@@ -959,7 +959,7 @@ else
   end
   %send% %actor% ~%self% snatches your weapon while you're distracted!
   %echoaround% %actor% ~%self% snatches |%actor% weapon while &%actor%'s distracted!
-  dg_affect #11815 %actor% DISARM on 20
+  dg_affect #11815 %actor% DISARMED on 20
 end
 ~
 #11821

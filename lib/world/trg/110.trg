@@ -47,7 +47,7 @@ switch %random.4%
   case 2
     %send% %actor% ~%self% buffets you with ^%self% wing, knocking your weapon away!
     %echoaround% %actor% ~%self% buffets ~%actor% with ^%self% wing, knocking ^%actor% weapon away!
-    dg_affect %actor% DISARM on 5
+    dg_affect %actor% DISARMED on 5
   break
   case 3
     %send% %actor% ~%self% stabs at you with a series of powerful pecks!
