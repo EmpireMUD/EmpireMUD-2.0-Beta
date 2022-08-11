@@ -1771,7 +1771,7 @@ The following affect flags are available:
  !HIGH-SORCERY - Immune to High Sorcery debuffs.
  DISARM - Has lost their weapon -- do not use this on items.
  HASTE - Has the effect of the Hasten ability.
- ENTANGLED - Cannot move -- do not use this on items.
+ IMMOBILIZED - Cannot move -- do not use this on items.
  SLOW - Combat speed reduced, like the Slow spell.
  STUNNED - Can't participate in combat or move -- do not use this on items.
  STONED - Sees the world in strange, trippy colors.
