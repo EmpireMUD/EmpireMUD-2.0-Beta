@@ -1817,6 +1817,7 @@ struct empire_city_data *create_city_entry(empire_data *emp, char *name, room_da
 */
 void reset_one_room(room_data *room) {
 	char field[256], str[MAX_INPUT_LENGTH];
+	struct affected_type *aff;
 	struct reset_com *reset, *next_reset;
 	char_data *tmob = NULL; /* for trigger assignment */
 	char_data *mob = NULL;
@@ -1830,6 +1831,16 @@ void reset_one_room(room_data *room) {
 	// start loading
 	DL_FOREACH_SAFE(room->reset_commands, reset, next_reset) {
 		switch (reset->command) {
+			case 'A': {	// add affect to mob
+				if (mob) {
+					aff = create_aff(reset->arg1, reset->arg3, reset->arg5, reset->arg4, asciiflag_conv(reset->sarg1), NULL);
+					aff->cast_by = reset->arg2;
+					aff->duration = reset->arg3;
+					affect_to_char(mob, aff);
+					free(aff);
+				}
+				break;
+			}
 			case 'M': {	// read a mobile
 				mob = read_mobile(reset->arg1, FALSE);	// no scripts
 				MOB_FLAGS(mob) = reset->arg2;
@@ -1888,7 +1899,10 @@ void reset_one_room(room_data *room) {
 			case 'S': { // custom string
 				if (mob) {
 					half_chop(reset->sarg1, field, str);
-					if (is_abbrev(field, "keywords")) {
+					if (is_abbrev(field, "sex")) {
+						change_sex(mob, atoi(str));
+					}
+					else if (is_abbrev(field, "keywords")) {
 						change_keywords(mob, str);
 					}
 					else if (is_abbrev(field, "longdescription")) {
@@ -1933,17 +1947,13 @@ void reset_one_room(room_data *room) {
 					if (!SCRIPT(tmob)) {
 						create_script_data(tmob, MOB_TRIGGER);
 					}
-					else {
-						add_var(&(SCRIPT(tmob)->global_vars), reset->sarg1, reset->sarg2, reset->arg3);
-					}
+					add_var(&(SCRIPT(tmob)->global_vars), reset->sarg1, reset->sarg2, reset->arg3);
 				}
 				else if (reset->arg1 == WLD_TRIGGER) {
 					if (!room->script) {
 						create_script_data(room, WLD_TRIGGER);
 					}
-					else {
-						add_var(&(room->script->global_vars), reset->sarg1, reset->sarg2, reset->arg3);
-					}
+					add_var(&(room->script->global_vars), reset->sarg1, reset->sarg2, reset->arg3);
 				}
 				break;
 			}
@@ -4301,6 +4311,7 @@ void write_binary_world_index_updates(void) {
 */
 bool write_map_and_room_to_file(room_vnum vnum, bool force_obj_pack) {
 	char temp[MAX_STRING_LENGTH], fname[256];
+	struct affected_type *aff;
 	struct shared_room_data *shared;
 	struct room_extra_data *red, *next_red;
 	struct depletion_data *dep;
@@ -4501,6 +4512,11 @@ bool write_map_and_room_to_file(room_vnum vnum, bool force_obj_pack) {
 				// basic mob data
 				fprintf(fl, "Load: M %d %llu %d 0\n", GET_MOB_VNUM(mob), MOB_FLAGS(mob), GET_ROPE_VNUM(mob));
 				
+				// save affects but not dots
+				LL_FOREACH(mob->affected, aff) {
+					fprintf(fl, "Load: A %d %d %ld %d %d %lld\n", aff->type, aff->cast_by, aff->duration, aff->modifier, aff->location, aff->bitvector);
+				}
+				
 				// instance id if any
 				if (MOB_INSTANCE_ID(mob) != NOTHING) {
 					fprintf(fl, "Load: I %d 0 0 0\n", MOB_INSTANCE_ID(mob));
@@ -4519,6 +4535,9 @@ bool write_map_and_room_to_file(room_vnum vnum, bool force_obj_pack) {
 				// custom strings
 				if (mob->customized) {
 					m_proto = mob_proto(GET_MOB_VNUM(mob));
+					if (!m_proto || GET_REAL_SEX(mob) != GET_REAL_SEX(m_proto)) {
+						fprintf(fl, "Load: S sex %d\n", GET_REAL_SEX(mob));
+					}
 					if (!m_proto || GET_PC_NAME(mob) != GET_PC_NAME(m_proto)) {
 						fprintf(fl, "Load: S keywords %s\n", NULLSAFE(GET_PC_NAME(mob)));
 					}
@@ -4810,7 +4829,7 @@ void load_one_room_from_wld_file(room_vnum vnum, char index_data) {
 	bitvector_t bit_in[2];
 	long long_in;
 	int int_in[4];
-	char char_in, *reset_read;
+	char char_in, *reset_read, str_in[256];
 	FILE *fl;
 	
 	map = (vnum < MAP_SIZE) ? &world_map[MAP_X_COORD(vnum)][MAP_Y_COORD(vnum)] : NULL;
@@ -5039,7 +5058,14 @@ void load_one_room_from_wld_file(room_vnum vnum, char index_data) {
 					CREATE(reset, struct reset_com, 1);
 					DL_APPEND(room->reset_commands, reset);
 					
-					if (*reset_read == 'S') {	// mob custom strings: <string type> <value>
+					if (*reset_read == 'A') {	// affect: type cast_by duration modifier location bitvector
+						if (sscanf(reset_read, "%c %lld %lld %lld %lld %lld %s", &reset->command, &reset->arg1, &reset->arg2, &reset->arg3, &reset->arg4, &reset->arg5, str_in) != 7) {
+							log("SYSERR: Invalid load command: %s: '%s'", error, line);
+							exit(1);
+						}
+						reset->sarg1 = str_dup(str_in);
+					}
+					else if (*reset_read == 'S') {	// mob custom strings: <string type> <value>
 						reset->command = *reset_read;
 						reset->sarg1 = strdup(reset_read + 2);
 						if (!strn_cmp(reset->sarg1, "look", 4)) {

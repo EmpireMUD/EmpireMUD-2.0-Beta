@@ -611,7 +611,7 @@ ACMD(do_entangle) {
 	}
 	
 	// counterspell??
-	if (trigger_counterspell(vict) || AFF_FLAGGED(vict, AFF_IMMUNE_NATURAL_MAGIC)) {
+	if (trigger_counterspell(vict) || AFF_FLAGGED(vict, AFF_IMMUNE_MAGICAL_DEBUFFS)) {
 		act("You send out vines of green mana to entangle $N, but they can't seem to grasp $M.", FALSE, ch, NULL, vict, TO_CHAR);
 		act("$n sends out vines of green mana to entangle you, but they can't seem to latch on.", FALSE, ch, NULL, vict, TO_VICT);
 		act("$n sends out vines of green mana to entangle $N, but they can't seem to grasp $M.", FALSE, ch, NULL, vict, TO_NOTVICT);
@@ -623,7 +623,7 @@ ACMD(do_entangle) {
 		act("$n shoots vines of green mana at you, entangling you!", FALSE, ch, NULL, vict, TO_VICT);
 		act("$n shoots vines of green mana at $N, entangling $M!", FALSE, ch, NULL, vict, TO_NOTVICT);
 	
-		af = create_aff(ATYPE_ENTANGLE, 6, APPLY_DEXTERITY, -1, AFF_ENTANGLED, ch);
+		af = create_aff(ATYPE_ENTANGLE, 6, APPLY_DEXTERITY, -1, AFF_IMMOBILIZED, ch);
 		affect_join(vict, af, 0);
 
 		engage_combat(ch, vict, TRUE);
@@ -906,7 +906,7 @@ ACMD(do_purify) {
 	else if (vict != ch && !IS_NPC(vict) && !PRF_FLAGGED(vict, PRF_BOTHERABLE)) {
 		act("You can't purify someone without permission (ask $M to type 'toggle bother').", FALSE, ch, NULL, vict, TO_CHAR);
 	}
-	else if (ch != vict && AFF_FLAGGED(vict, AFF_IMMUNE_NATURAL_MAGIC)) {
+	else if (ch != vict && AFF_FLAGGED(vict, AFF_IMMUNE_MAGICAL_DEBUFFS)) {
 		msg_to_char(ch, "Your victim is immune to that spell.\r\n");
 	}
 	else if (ABILITY_TRIGGERS(ch, vict, NULL, ABIL_PURIFY)) {
@@ -1199,7 +1199,7 @@ ACMD(do_skybrand) {
 	}
 	
 	// counterspell??
-	if (trigger_counterspell(vict) || AFF_FLAGGED(vict, AFF_IMMUNE_NATURAL_MAGIC)) {
+	if (trigger_counterspell(vict) || AFF_FLAGGED(vict, AFF_IMMUNE_MAGICAL_DEBUFFS)) {
 		act("You can't seem to mark $N with the skybrand!", FALSE, ch, NULL, vict, TO_CHAR);
 		act("$n tries to mark you with a skybrand, but fails!", FALSE, ch, NULL, vict, TO_VICT);
 		act("$n tries to mark $N with a skybrand, but fails!", FALSE, ch, NULL, vict, TO_NOTVICT);

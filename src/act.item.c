@@ -6119,9 +6119,9 @@ ACMD(do_list) {
 }
 
 
+// this is also 'do_fill'
 ACMD(do_pour) {	
-	char arg1[MAX_INPUT_LENGTH];
-	char arg2[MAX_INPUT_LENGTH];
+	char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH];
 	obj_data *from_obj = NULL, *to_obj = NULL;
 	int amount;
 
@@ -6141,30 +6141,31 @@ ACMD(do_pour) {
 			send_to_char("You can't find it!\r\n", ch);
 			return;
 		}
-		if (GET_OBJ_TYPE(from_obj) != ITEM_DRINKCON) {
+		if (!IS_DRINK_CONTAINER(from_obj)) {
 			send_to_char("You can't pour from that!\r\n", ch);
 			return;
 		}
 	}
 	if (subcmd == SCMD_FILL) {
 		if (!*arg1) {		/* no arguments */
-			send_to_char("What do you want to fill?  And from what are you filling it?\r\n", ch);
+			send_to_char("What do you want to fill? And from what are you filling it?\r\n", ch);
 			return;
 		}
 		if (!(to_obj = get_obj_in_list_vis(ch, arg1, NULL, ch->carrying))) {
 			send_to_char("You can't find it!\r\n", ch);
 			return;
 		}
-		if (GET_OBJ_TYPE(to_obj) != ITEM_DRINKCON) {
+		if (!IS_DRINK_CONTAINER(to_obj)) {
 			act("You can't fill $p!", FALSE, ch, to_obj, 0, TO_CHAR);
 			return;
 		}
-		if (!*arg2) {		/* no 2nd argument */
+		if (!*arg2) {	// no 2nd argument: fill from room
 			if (ROOM_SECT_FLAGGED(IN_ROOM(ch), SECTF_DRINK) || find_flagged_sect_within_distance_from_char(ch, SECTF_DRINK, NOBITS, 1) || (room_has_function_and_city_ok(GET_LOYALTY(ch), IN_ROOM(ch), FNC_DRINK_WATER | FNC_TAVERN) && IS_COMPLETE(IN_ROOM(ch)))) {
 				fill_from_room(ch, to_obj);
 				return;
 			}
 			else if (IS_IMMORTAL(ch)) {
+				// immortals get a free fill (with water) anywhere
 				// empty before message
 				set_obj_val(to_obj, VAL_DRINK_CONTAINER_CONTENTS, 0);
 				
@@ -6178,29 +6179,35 @@ ACMD(do_pour) {
 				return;
 			}
 			else {
-				act("From what would you like to fill $p?", FALSE, ch, to_obj, 0, TO_CHAR);
+				act("From what would you like to fill $p?", FALSE, ch, to_obj, NULL, TO_CHAR);
 				return;
 			}
 		}
-		if ((is_abbrev(arg2, "water") || isname(arg2, get_room_name(IN_ROOM(ch), FALSE))) && room_has_function_and_city_ok(GET_LOYALTY(ch), IN_ROOM(ch), FNC_DRINK_WATER)) {
-			fill_from_room(ch, to_obj);
+		if (!(from_obj = get_obj_in_list_vis(ch, arg2, NULL, ROOM_CONTENTS(IN_ROOM(ch))))) {
+			// no matching obj
+			if ((is_abbrev(arg2, "water") || isname(arg2, get_room_name(IN_ROOM(ch), FALSE))) && room_has_function_and_city_ok(GET_LOYALTY(ch), IN_ROOM(ch), FNC_DRINK_WATER)) {
+				fill_from_room(ch, to_obj);
+			}
+			else if (is_abbrev(arg2, "river") || is_abbrev(arg2, "water")) {
+				if (ROOM_SECT_FLAGGED(IN_ROOM(ch), SECTF_DRINK)) {
+					fill_from_room(ch, to_obj);
+				}
+				else if (find_flagged_sect_within_distance_from_char(ch, SECTF_DRINK, NOBITS, 1)) {
+					fill_from_room(ch, to_obj);
+				}
+				else {
+					msg_to_char(ch, "There doesn't seem to be %s %s here.\r\n", AN(arg2), arg2);
+				}
+			}
+			else {
+				msg_to_char(ch, "There doesn't seem to be %s %s here.\r\n", AN(arg2), arg2);
+			}
 			return;
 		}
-		if (is_abbrev(arg2, "river") || is_abbrev(arg2, "water")) {
-			if (ROOM_SECT_FLAGGED(IN_ROOM(ch), SECTF_DRINK)) {
-				fill_from_room(ch, to_obj);
-				return;
-			}
-			else if (find_flagged_sect_within_distance_from_char(ch, SECTF_DRINK, NOBITS, 1)) {
-				fill_from_room(ch, to_obj);
-				return;
-			}
-			msg_to_char(ch, "There doesn't seem to be %s %s here.\r\n", AN(arg2), arg2);
+		if (!IS_DRINK_CONTAINER(from_obj) || CAN_WEAR(from_obj, ITEM_WEAR_TAKE)) {
+			act("You can't fill anything from $p.", FALSE, ch, from_obj, NULL, TO_CHAR);
 			return;
 		}
-		sprintf(buf, "There doesn't seem to be %s %s here.\r\n", AN(arg2), arg2);
-		send_to_char(buf, ch);
-		return;
 	}
 	if (GET_DRINK_CONTAINER_CONTENTS(from_obj) == 0) {
 		act("$p is empty.", FALSE, ch, from_obj, 0, TO_CHAR);
@@ -6240,7 +6247,7 @@ ACMD(do_pour) {
 			send_to_char("You can't find it!\r\n", ch);
 			return;
 		}
-		if ((GET_OBJ_TYPE(to_obj) != ITEM_DRINKCON)) {
+		if (!IS_DRINK_CONTAINER(to_obj)) {
 			send_to_char("You can't pour anything into that.\r\n", ch);
 			return;
 		}

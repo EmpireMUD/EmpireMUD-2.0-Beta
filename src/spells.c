@@ -96,7 +96,7 @@ const struct damage_spell_type damage_spell[] = {
 	
 	// SHADOWLASH
 	// TODO: ability system does not support: must add support for 2-part abilities (buff and dot separately)
-	{ ABIL_SHADOWLASH, 1.2, ATTACK_SHADOWLASH, 0.25, AFF_IMMUNE_HIGH_SORCERY,
+	{ ABIL_SHADOWLASH, 1.2, ATTACK_SHADOWLASH, 0.25, AFF_IMMUNE_MAGICAL_DEBUFFS,
 		ATYPE_SHADOWLASH_BLIND, 1, APPLY_NONE, 0, AFF_BLIND,
 		ATYPE_SHADOWLASH_DOT, 3, DAM_MAGICAL, 0.75, 3,
 		COOLDOWN_SHADOWLASH, 9

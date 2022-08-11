@@ -36,7 +36,7 @@ Veintap~
 S
 #108
 Weaken~
-a -1 0.50 D 0
+a -1 0.50 h 0
 A
 1 -1
 A
@@ -100,7 +100,7 @@ T g 1
 S
 #118
 Lightningbolt~
-abi -1 1.00 B 0
+abi -1 1.00 o 0
 C
 lightningbolt 7 bf 2 10 3 2023 9 8 3 0
 T c 8
@@ -270,7 +270,7 @@ Jab~
 S
 #156
 Blind~
-a -1 1.00 C 0
+a -1 1.00 h 0
 C
 blind 7 bf 1 15 0 2040 10 0 2 2
 M

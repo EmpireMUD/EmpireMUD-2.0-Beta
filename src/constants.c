@@ -701,7 +701,7 @@ const char *preference_bits[] = {
 	"!CHANNEL-JOINS",
 	"AUTOKILL",
 	"SCRL",
-	"BRIEF",
+	"NO-ROOM-DESCS",
 	"BOTHER",
 	"AUTORECALL",
 	"!GOD",
@@ -724,6 +724,7 @@ const char *preference_bits[] = {
 	"ITEM-QUALITY",
 	"ITEM-DETAILS",
 	"!EXITS",
+	"SHORT-EXITS",
 	"\n"
 };
 
@@ -772,7 +773,7 @@ const struct toggle_data_type toggle_data[] = {
 	{ "clearmeters", TOG_ONOFF, PRF_CLEARMETERS, 0, NULL },
 	
 	{ "autorecall", TOG_ONOFF, PRF_AUTORECALL, 0, NULL },
-	{ "brief", TOG_ONOFF, PRF_BRIEF, 0, NULL },
+	{ "room-descs", TOG_OFFON, PRF_NO_ROOM_DESCS, 0, NULL },
 	{ "rp", TOG_ONOFF, PRF_RP, 0, NULL },
 	
 	{ "autoswim", TOG_ONOFF, PRF_AUTOSWIM, 0, NULL },
@@ -801,6 +802,7 @@ const struct toggle_data_type toggle_data[] = {
 	
 	{ "channel-joins", TOG_OFFON, PRF_NO_CHANNEL_JOINS, 0, NULL },
 	{ "exits", TOG_OFFON, PRF_NO_EXITS, 0, NULL },
+	{ "short-exits", TOG_ONOFF, PRF_SHORT_EXITS, 0, NULL },
 	
 	// imm section
 	{ "wiznet", TOG_OFFON, PRF_NOWIZ, LVL_START_IMM, NULL },
@@ -996,10 +998,10 @@ const char *alt_dirs[] = {
 	"se",
 	"u",
 	"d",
-	"fore",
-	"starboard",
-	"port",
-	"aft",
+	"fo",
+	"st",
+	"po",
+	"af",
 	"random",
 	"\n"
 };
@@ -1226,17 +1228,17 @@ const char *affected_bits[] = {
 	"HIDE",
 	"*CHARM",
 	"INVIS",
-	"!BATTLE",
+	"IMMUNE-PHYSICAL-DEBUFFS",
 	"SENSE-HIDE",
 	"!PHYSICAL",
 	"!TARGET",
 	"!SEE",
 	"FLY",
 	"!ATTACK",
-	"!HIGH-SORCERY",
-	"DISARM",
+	"IMMUNE-MAGICAL-DEBUFFS",
+	"DISARMED",
 	"HASTE",
-	"ENTANGLED",
+	"IMMOBILIZED",
 	"SLOW",
 	"STUNNED",
 	"STONED",
@@ -1246,9 +1248,9 @@ const char *affected_bits[] = {
 	"EARTHMELD",
 	"MUMMIFY",
 	"SOULMASK",
-	"!NATURAL-MAGIC",
-	"!STEALTH",
-	"!VAMPIRE",
+	"*",	// formerly !NATURAL-MAGIC; merged with IMMUNE-MAGICAL-DEBUFFS
+	"IMMUNE-POISON-DEBUFFS",
+	"IMMUNE-MENTAL-DEBUFFS",
 	"!STUN",
 	"*ORDERED",
 	"!DRINK-BLOOD",
@@ -1269,17 +1271,17 @@ const char *affected_bits_consider[] = {
 	"",	// hide
 	"",	// 5 - charm
 	"",	// invis
-	"$E is immune to Battle debuffs.",	// !battle
+	"$E is immune to physical debuffs.",	// immune-phyical-debuffs
 	"",	// sense hide
 	"$E is immune to physical damage.",	// !physical
 	"",	// 10 - no-target-in-room
 	"",	// no-see-in-room
 	"",	// fly
 	"$E cannot be attacked.",	// !attack
-	"$E is immune to High Sorcery debuffs.",	// !highsorc
-	"",	// 15 - disarm
+	"$E is immune to magical debuffs.",	// immune-magical-debuffs
+	"",	// 15 - disarmed
 	"",	// haste
-	"",	// entangled
+	"",	// immobilized
 	"",	// slow
 	"",	// stunned
 	"",	// 20 - stoned
@@ -1289,9 +1291,9 @@ const char *affected_bits_consider[] = {
 	"",	// earthmeld
 	"",	// 25 - mummify
 	"$E is soulmasked.",	// soulmask
-	"$E is immune to Natural Magic debuffs.",	// !natmag
-	"$E is immune to Stealth debuffs.",	// !stealth
-	"$E is immune to Vampire debuffs.",	// !vampire
+	"",	// * unused
+	"$E is immune to poison debuffs.",	// immune-poison-debuffs
+	"$E is immune to mental debuffs.",	// immune-mental-debuffs
 	"$E is immune to stuns.",	// 30 - !stun
 	"",	// ordred
 	"",	// !drink-blood
@@ -1320,9 +1322,9 @@ const bool aff_is_bad[] = {
 	FALSE,
 	FALSE,
 	FALSE,	// unused
-	TRUE,	// 15 - disarm
+	TRUE,	// 15 - disarmed
 	FALSE,
-	TRUE,	// entangled
+	TRUE,	// immobilized
 	TRUE,	// slow
 	TRUE,	// stunned
 	TRUE,	// 20 - stoned
@@ -3860,6 +3862,7 @@ const char *trig_types[] = {
 	"Buy",
 	"Kill",	// 25
 	"Allow-Multiple",
+	"Can-Fight",
 	"\n"
 };
 
@@ -3892,6 +3895,7 @@ const bitvector_t mtrig_argument_types[] = {
 	NOBITS,	// buy
 	TRIG_ARG_PERCENT,	// kill
 	NOBITS,	// allow-multiple
+	NOBITS,	// can-fight
 };
 
 

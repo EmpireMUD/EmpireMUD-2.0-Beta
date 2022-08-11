@@ -2888,6 +2888,15 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 							*str = '\0';
 						}
 					}
+					else if (!str_cmp(field, "adventure_summoned_from")) {
+						room_data *find;
+						if (!IS_NPC(c) && PLR_FLAGGED(c, PLR_ADVENTURE_SUMMONED) && (find = real_room(GET_ADVENTURE_SUMMON_RETURN_LOCATION(c)))) {
+							snprintf(str, slen, "%c%d", UID_CHAR, room_script_id(find));
+						}
+						else {
+							snprintf(str, slen, "0");
+						}
+					}
 					else if (!str_cmp(field, "aff_flagged")) {
 						if (subfield && *subfield) {
 							bitvector_t pos = search_block(subfield, affected_bits, FALSE);
@@ -3300,6 +3309,12 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 							*str = '\0';
 						}
 					}
+					else if (!str_cmp(field, "end_adventure_summon")) {
+						*str = '\0';
+						if (IS_NPC(c) && PLR_FLAGGED(c, PLR_ADVENTURE_SUMMONED)) {
+							adventure_unsummon(c);
+						}
+					}
 					else if (!str_cmp(field, "eq")) {
 						int pos;
 						if (!subfield || !*subfield)
@@ -3642,9 +3657,9 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					break;
 				}
 				case 'i': {	// char.i*
-					if (!str_cmp(field, "id"))
+					if (!str_cmp(field, "id")) {
 						snprintf(str, slen, "%d", char_script_id(c));
-
+					}
 					else if (!str_cmp(field, "is_name")) {
 						if (subfield && *subfield && match_char_name(NULL, c, subfield, NOBITS)) {
 							snprintf(str, slen, "1");
@@ -3737,6 +3752,21 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					else if (!str_cmp(field, "is_immortal")) {
 						snprintf(str, slen, "%d", IS_IMMORTAL(c) ? 1 : 0);
 					}
+					else if (!str_cmp(field, "is_tagged_by")) {
+						char_data *targ;
+						if (subfield && *subfield && (targ = get_char(subfield))) {
+							if (IS_NPC(targ) && GET_LEADER(targ)) {
+								targ = GET_LEADER(targ);
+							}
+							snprintf(str, slen, "%d", IS_TAGGED_BY(c, targ) ? 1 : 0);
+						}
+						else {
+							strcpy(str, "0");
+						}
+					}
+					else if (!str_cmp(field, "is_scaled")) {
+						snprintf(str, slen, "%d", (IS_NPC(c) && GET_CURRENT_SCALE_LEVEL(c) > 0) ? 1 : 0);
+					}
 					else if (!str_cmp(field, "is_waterwalking")) {
 						snprintf(str, slen, HAS_WATERWALK(c) ? "1" : "0");
 					}
@@ -3787,6 +3817,13 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						}
 						*str = '\0';
 					}
+					else if (!str_cmp(field, "link_adventure_summon")) {
+						*str = '\0';
+						if (!IS_NPC(c) && PLR_FLAGGED(c, PLR_ADVENTURE_SUMMONED)) {
+							struct instance_data *inst = find_instance_by_room(IN_ROOM(c), FALSE, FALSE);
+							GET_ADVENTURE_SUMMON_INSTANCE_ID(c) = inst ? INST_ID(inst) : NOTHING;
+						}
+					}
 					else if (!str_cmp(field, "longdesc")) {
 						snprintf(str, slen, "%s", GET_LONG_DESC(c));
 						// trim trailing CRLFs
@@ -3797,7 +3834,21 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					break;
 				}
 				case 'm': {	// char.m*
-					if (!str_cmp(field, "maxcarrying")) {
+					if (!str_cmp(field, "mark_adventure_summoned_from")) {
+						*str = '\0';
+						if (!IS_NPC(c)) {
+							struct map_data *map;
+							if (!PLR_FLAGGED(c, PLR_ADVENTURE_SUMMONED)) {
+								// ensure this is not set
+								GET_ADVENTURE_SUMMON_INSTANCE_ID(c) = NOTHING;
+							}
+							SET_BIT(PLR_FLAGS(c), PLR_ADVENTURE_SUMMONED);
+							GET_ADVENTURE_SUMMON_RETURN_LOCATION(c) = GET_ROOM_VNUM(IN_ROOM(c));
+							map = GET_MAP_LOC(IN_ROOM(c));
+							GET_ADVENTURE_SUMMON_RETURN_MAP(c) = map ? map->vnum : NOWHERE;
+						}
+					}
+					else if (!str_cmp(field, "maxcarrying")) {
 						snprintf(str, slen, "%d", CAN_CARRY_N(c));
 					}
 					else if (!str_cmp(field, "maxhitp") || !str_cmp(field, "maxhealth"))
@@ -4453,7 +4504,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 				case 'c': {	// obj.c*
 					if (!str_cmp(field, "can_wear")) {
 						int pos;
-						if (subfield && *subfield && (pos = search_block(subfield, wear_bits, FALSE))) {
+						if (subfield && *subfield && (pos = search_block(subfield, wear_bits, FALSE)) != NOTHING) {
 							snprintf(str, slen, "%d", CAN_WEAR(o, BIT(pos)) ? 1 : 0);
 						}
 						else {
@@ -4503,6 +4554,16 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						}
 						else {
 							*str = '\0';
+						}
+					}
+					else if (!str_cmp(field, "empty")) {
+						*str = '\0';
+						if (IS_CORPSE(o) || IS_CONTAINER(o)) {
+							empty_obj_before_extract(o);
+						}
+						else if (IS_DRINK_CONTAINER(o)) {
+							set_obj_val(o, VAL_DRINK_CONTAINER_CONTENTS, 0);
+							set_obj_val(o, VAL_DRINK_CONTAINER_TYPE, 0);
 						}
 					}
 					break;
@@ -5178,12 +5239,27 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					}
 					else if (!str_cmp(field, "people")) {
 						char_data *temp_ch = NULL;
+						mob_vnum find_vnum = NOTHING;
+						
+						// optional vnum search
+						if (subfield && *subfield && isdigit(*subfield)) {
+							find_vnum = atoi(subfield);
+						}
 				
 						// attempt to prevent extracted people from showing in lists
 						DL_FOREACH2(ROOM_PEOPLE(r), temp_ch, next_in_room) {
-							if (!SCRIPT_SHOULD_SKIP_CHAR(temp_ch)) {
-								break;
+							if (EXTRACTED(temp_ch)) {
+								continue;	// always skip
 							}
+							if (find_vnum != NOTHING && GET_MOB_VNUM(temp_ch) != find_vnum) {
+								continue;	// vnum mismatch
+							}
+							if (find_vnum == NOTHING && SCRIPT_SHOULD_SKIP_CHAR(temp_ch)) {
+								continue;	// skippable character (if not searching by vnum)
+							}
+							
+							// if we got to here, this is valid character; break out
+							break;
 						}
 				
 						if (temp_ch) {
@@ -6516,7 +6592,7 @@ struct cmdlist_element *find_end(struct cmdlist_element *cl) {
 	if (!(cl->next))
 		return cl;
 
-	for (c = cl->next; c->next; c = c->next) {
+	for (c = cl->next; c && c->next; c = c->next) {
 		for (p = c->cmd; *p && isspace(*p); p++);
 
 		if (!strn_cmp("if ", p, 3))

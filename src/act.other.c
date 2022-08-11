@@ -132,6 +132,7 @@ void adventure_summon(char_data *ch, char *argument) {
 */
 void adventure_unsummon(char_data *ch) {
 	room_data *room, *map;
+	bool reloc = FALSE;
 	
 	// safety first
 	if (!ch || IS_NPC(ch) || !PLR_FLAGGED(ch, PLR_ADVENTURE_SUMMONED)) {
@@ -151,6 +152,7 @@ void adventure_unsummon(char_data *ch) {
 	else {
 		// nowhere safe to send back to
 		char_to_room(ch, find_load_room(ch));
+		reloc = TRUE;
 	}
 	
 	act("$n appears in a burst of smoke!", TRUE, ch, NULL, NULL, TO_ROOM);
@@ -158,7 +160,12 @@ void adventure_unsummon(char_data *ch) {
 	qt_visit_room(ch, IN_ROOM(ch));
 	
 	look_at_room(ch);
-	msg_to_char(ch, "\r\nYou have been returned to your original location after leaving the adventure.\r\n");
+	if (reloc) {
+		msg_to_char(ch, "\r\nYour original location could not be located. You have been returned to a safe location after leaving the adventure.\r\n");
+	}
+	else {
+		msg_to_char(ch, "\r\nYou have been returned to your original location after leaving the adventure.\r\n");
+	}
 	
 	msdp_update_room(ch);
 }
@@ -867,21 +874,24 @@ void summon_player(char_data *ch, char *argument) {
 	}
 	else {
 		// mostly-valid by now... just a little bit more to check
-		found = FALSE;
-		DL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), ch_iter, next_in_room) {
-			if (IS_DEAD(ch_iter) || !ch_iter->desc) {
-				continue;
-			}
+		// requires a 2nd group member present IF the target is from a different empire
+		if (GET_LOYALTY(vict) != GET_LOYALTY(ch) || !GET_LOYALTY(ch)) {
+			found = FALSE;
+			DL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), ch_iter, next_in_room) {
+				if (IS_DEAD(ch_iter) || !ch_iter->desc) {
+					continue;
+				}
 			
-			if (ch_iter != ch && GROUP(ch_iter) == GROUP(ch)) {
-				found = TRUE;
-				break;
+				if (ch_iter != ch && GROUP(ch_iter) == GROUP(ch)) {
+					found = TRUE;
+					break;
+				}
 			}
-		}
 		
-		if (!found) {
-			msg_to_char(ch, "You need a second group member present to help summon.\r\n");
-			return;
+			if (!found) {
+				msg_to_char(ch, "You need a second group member present to help summon.\r\n");
+				return;
+			}
 		}
 		
 		act("You start summoning $N...", FALSE, ch, NULL, vict, TO_CHAR);
@@ -1193,12 +1203,12 @@ void alt_import_preferences(char_data *ch, char_data *alt) {
 	// prf flags to import
 	bitvector_t prfs = PRF_COMPACT | PRF_DEAF | PRF_NOTELL | PRF_MORTLOG | 
 					PRF_NOREPEAT | PRF_NOMAPCOL | PRF_NO_CHANNEL_JOINS | 
-					PRF_SCROLLING | PRF_BRIEF | PRF_AUTORECALL | PRF_NOSPAM | 
+					PRF_SCROLLING | PRF_NO_ROOM_DESCS | PRF_AUTORECALL | PRF_NOSPAM | 
 					PRF_SCREEN_READER | PRF_AUTOKILL | PRF_AUTODISMOUNT | 
 					PRF_NOEMPIRE | PRF_CLEARMETERS | PRF_NO_PAINT | 
 					PRF_EXTRA_SPACING | PRF_TRAVEL_LOOK | PRF_AUTOCLIMB | 
 					PRF_AUTOSWIM | PRF_ITEM_QUALITY | PRF_ITEM_DETAILS | 
-					PRF_NO_EXITS;
+					PRF_NO_EXITS | PRF_SHORT_EXITS;
 	
 	// add flags
 	set = PRF_FLAGS(alt) & prfs;

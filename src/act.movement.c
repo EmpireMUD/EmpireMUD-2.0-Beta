@@ -191,8 +191,8 @@ bool can_enter_portal(char_data *ch, obj_data *portal, bool allow_infiltrate, bo
 	if (!IS_APPROVED(ch) && config_get_bool("travel_approval")) {
 		send_config_msg(ch, "need_approval_string");
 	}
-	else if (AFF_FLAGGED(ch, AFF_ENTANGLED)) {
-		msg_to_char(ch, "You are entangled and can't enter anything.\r\n");
+	else if (AFF_FLAGGED(ch, AFF_IMMOBILIZED)) {
+		msg_to_char(ch, "You are immobilized and can't enter anything.\r\n");
 	}
 	else if (AFF_FLAGGED(ch, AFF_CHARM) && GET_LEADER(ch) && IN_ROOM(ch) == IN_ROOM(GET_LEADER(ch))) {
 		msg_to_char(ch, "The thought of leaving your leader makes you weep.\r\n");
@@ -929,8 +929,8 @@ bool char_can_move(char_data *ch, int dir, room_data *to_room, bitvector_t flags
 		msg_to_char(ch, "You can't seem to move!\r\n");
 		return FALSE;
 	}
-	if (AFF_FLAGGED(ch, AFF_ENTANGLED)) {
-		msg_to_char(ch, "You are entangled and can't move.\r\n");
+	if (AFF_FLAGGED(ch, AFF_IMMOBILIZED)) {
+		msg_to_char(ch, "You are immobilized and can't move.\r\n");
 		return FALSE;
 	}
 	if (MOB_FLAGGED(ch, MOB_TIED)) {
@@ -1651,6 +1651,7 @@ void send_arrive_message(char_data *ch, room_data *from_room, room_data *to_room
 	room_data *cur_room = IN_ROOM(ch);
 	char msg[256], temp[256];
 	char_data *targ;
+	int move_type;
 	
 	// no work if they can't be seen moving
 	if (AFF_FLAGGED(ch, AFF_SNEAK | AFF_NO_SEE_IN_ROOM)) {
@@ -1665,6 +1666,7 @@ void send_arrive_message(char_data *ch, room_data *from_room, room_data *to_room
 	
 	// prepare empty room message
 	*msg = '\0';
+	move_type = determine_move_type(ch, to_room);
 	
 	// MOVE_x: prepare message: Leave a %s (%%s) in the message if you want a direction.
 	if (IS_SET(flags, MOVE_EARTHMELD)) {
@@ -1722,11 +1724,14 @@ void send_arrive_message(char_data *ch, room_data *from_room, room_data *to_room
 			act("$n exits the building.", TRUE, ch, NULL, NULL, TO_ROOM);
 		}
 	}
+	else if ((dir == UP || dir == DOWN) && move_type == MOB_MOVE_WALK) {	// override for walking in from up/down
+		snprintf(msg, sizeof(msg), "$n comes in from %%s.");
+	}
 	else if (dir != NO_DIR) {	// normal move message
-		snprintf(msg, sizeof(msg), "$n %s %s from %%s.", mob_move_types[determine_move_type(ch, to_room)], (ROOM_IS_CLOSED(IN_ROOM(ch)) ? "in" : "up"));
+		snprintf(msg, sizeof(msg), "$n %s %s from %%s.", mob_move_types[move_type], (ROOM_IS_CLOSED(IN_ROOM(ch)) ? "in" : "up"));
 	}
 	else {	// move message with no direction?
-		snprintf(msg, sizeof(msg), "$n %s %s.", mob_move_types[determine_move_type(ch, to_room)], (ROOM_IS_CLOSED(IN_ROOM(ch)) ? "in" : "up"));
+		snprintf(msg, sizeof(msg), "$n %s %s.", mob_move_types[move_type], (ROOM_IS_CLOSED(IN_ROOM(ch)) ? "in" : "up"));
 	}
 	
 	// process/send the message, if one was set
@@ -1772,6 +1777,7 @@ void send_leave_message(char_data *ch, room_data *from_room, room_data *to_room,
 	room_data *cur_room = IN_ROOM(ch);
 	char msg[256], temp[256];
 	char_data *targ;
+	int move_type;
 	
 	// no work if they can't be seen moving
 	if (AFF_FLAGGED(ch, AFF_SNEAK | AFF_NO_SEE_IN_ROOM)) {
@@ -1786,6 +1792,7 @@ void send_leave_message(char_data *ch, room_data *from_room, room_data *to_room,
 	
 	// prepare empty room message
 	*msg = '\0';
+	move_type = determine_move_type(ch, to_room);
 	
 	// MOVE_x: prepare message: Leave a %s (%%s) in the message if you want a direction.
 	if (IS_SET(flags, MOVE_EARTHMELD)) {
@@ -1841,11 +1848,14 @@ void send_leave_message(char_data *ch, room_data *from_room, room_data *to_room,
 			act("$n exits a building.", TRUE, ch, NULL, NULL, TO_ROOM);
 		}
 	}
+	else if ((dir == UP || dir == DOWN) && move_type == MOB_MOVE_WALK) {	// override for up/down walk
+		snprintf(msg, sizeof(msg), "$n goes %%s.");
+	}
 	else if (dir != NO_DIR) {	// normal move message
-		snprintf(msg, sizeof(msg), "$n %s %%s.", mob_move_types[determine_move_type(ch, to_room)]);
+		snprintf(msg, sizeof(msg), "$n %s %%s.", mob_move_types[move_type]);
 	}
 	else {	// move message with no direction?
-		snprintf(msg, sizeof(msg), "$n %s away.", mob_move_types[determine_move_type(ch, to_room)]);
+		snprintf(msg, sizeof(msg), "$n %s away.", mob_move_types[move_type]);
 	}
 	
 	// process/send the message

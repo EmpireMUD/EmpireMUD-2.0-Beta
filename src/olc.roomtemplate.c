@@ -182,7 +182,7 @@ room_template *create_room_template_table_entry(rmt_vnum vnum) {
 */
 char *list_one_room_template(room_template *rmt, bool detail) {
 	static char output[MAX_STRING_LENGTH];
-	char flags[MAX_STRING_LENGTH];
+	char flags[MAX_STRING_LENGTH], funcs[MAX_STRING_LENGTH];
 	
 	bitvector_t show_flags = RMT_OUTDOOR | RMT_DARK | RMT_LIGHT | RMT_NO_MOB | RMT_NO_TELEPORT | RMT_LOOK_OUT | RMT_NO_LOCATION;
 	
@@ -194,8 +194,15 @@ char *list_one_room_template(room_template *rmt, bool detail) {
 		else {
 			*flags = '\0';
 		}
+		if (GET_RMT_FUNCTIONS(rmt)) {
+			strcpy(funcs, " - ");
+			sprintbit(GET_RMT_FUNCTIONS(rmt), function_flags, funcs + 3, TRUE);
+		}
+		else {
+			*funcs = '\0';
+		}
 		
-		snprintf(output, sizeof(output), "[%5d] %s%s", GET_RMT_VNUM(rmt), GET_RMT_TITLE(rmt), flags);
+		snprintf(output, sizeof(output), "[%5d] %s%s%s", GET_RMT_VNUM(rmt), GET_RMT_TITLE(rmt), flags, funcs);
 	}
 	else {
 		snprintf(output, sizeof(output), "[%5d] %s", GET_RMT_VNUM(rmt), GET_RMT_TITLE(rmt));

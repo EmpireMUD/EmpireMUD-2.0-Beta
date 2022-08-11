@@ -1,0 +1,200 @@
+#11800
+Skycleave mob ability cooldown~
+3 0
+0 0 0 0
+S
+#11804
+Enchanted Water~
+1 0
+0 0 3 0
+T0
+enchanted water~
+T1
+crystal clear~
+S
+#11814
+prone~
+4 0
+0 0 0 0
+T0
+You get up.~
+S
+#11815
+disarmed~
+4 0
+0 0 0 0
+T0
+You recover your weapon.~
+S
+#11816
+ankle stab~
+4 0
+0 0 0 0
+T0
+You recover from your leg wound.~
+S
+#11817
+embiggened~
+4 0
+0 0 0 0
+T1
+$n returns to normal size.~
+S
+#11818
+off-balance~
+4 0
+0 0 0 0
+T0
+You regain your balance.~
+S
+#11819
+spellcasting~
+4 0
+0 0 0 0
+S
+#11820
+miniaturized~
+4 0
+0 0 0 0
+T0
+You return to normal size.~
+T1
+$n returns to normal size.~
+T2
+You suddenly shrink to the size of a pixy!~
+T3
+$n suddenly shrinks to the size of a pixy!~
+S
+#11821
+miniaturized~
+4 0
+0 0 0 0
+S
+#11823
+blinding bomb~
+4 0
+0 0 0 0
+T0
+You can see again.~
+S
+#11824
+blinding bomb~
+4 0
+0 0 0 0
+T0
+You are no longer stunned by the blinding bomb.~
+S
+#11841
+blind~
+4 0
+0 0 0 0
+T0
+You can see again.~
+S
+#11842
+bleeding~
+4 0
+0 0 0 0
+T0
+You are no longer bleeding.~
+S
+#11843
+flame brand~
+4 0
+0 0 0 0
+T0
+The flame brand on your arm burns out.~
+T1
+The flaming brand on $n's arm burns out.~
+S
+#11844
+enchanted weapon~
+4 0
+0 0 0 0
+S
+#11845
+weapon sheathed~
+4 0
+0 0 0 0
+S
+#11848
+poisoned~
+4 0
+0 0 0 0
+T0
+You are no longer poisoned.~
+S
+#11849
+blood curse~
+4 0
+0 0 0 0
+T0
+Your blood curse wears off.~
+S
+#11851
+stunned~
+4 0
+0 0 0 0
+T0
+You are no longer stunned.~
+S
+#11853
+chain lightning~
+4 0
+0 0 0 0
+T0
+The lightning shock wears off.~
+S
+#11855
+arcane tattoos~
+4 0
+0 0 0 0
+S
+#11858
+deadly poison~
+4 0
+0 0 0 0
+T0
+You recover from the poison.~
+S
+#11860
+complete darkness~
+4 0
+0 0 0 0
+T0
+You can see again!~
+S
+#11861
+pinned shadow~
+4 0
+0 0 0 0
+S
+#11865
+flying~
+4 0
+0 0 0 0
+T0
+Your flying wears off.~
+T1
+$n stops flying.~
+S
+#11866
+magic sword~
+4 0
+0 0 0 0
+S
+#11885
+pure morning dew~
+1 0
+-4 0 4 0
+T0
+pure morning dew~
+T1
+crystal clear~
+S
+#11891
+crystallized sap~
+4 0
+0 0 0 0
+S
+$

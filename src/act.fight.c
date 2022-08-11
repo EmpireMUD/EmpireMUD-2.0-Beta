@@ -65,7 +65,7 @@ ACMD(do_approach) {
 	else if (FIGHT_MODE(ch) == FMODE_WAITING) {
 		msg_to_char(ch, "You're already trying to approach!\r\n");
 	}
-	else if (AFF_FLAGGED(ch, AFF_STUNNED | AFF_HARD_STUNNED | AFF_ENTANGLED)) {
+	else if (AFF_FLAGGED(ch, AFF_STUNNED | AFF_HARD_STUNNED | AFF_IMMOBILIZED)) {
 		msg_to_char(ch, "You can't try to approach right now!\r\n");
 	}
 	else {
@@ -152,6 +152,15 @@ ACMD(do_consider) {
 	}
 	else if (vict == ch) {
 		msg_to_char(ch, "You look pretty wimpy.\r\n");
+	}
+	else if (!can_fight_mtrigger(vict, ch) || AFF_FLAGGED(vict, AFF_NO_ATTACK)) {
+		if (AFF_FLAGGED(vict, AFF_NO_ATTACK)) {
+			// never attackable
+			act("$N cannot be attacked.", FALSE, ch, NULL, vict, TO_CHAR);
+		}
+		else {	// script-based
+			act("You cannot attack $N.", FALSE, ch, NULL, vict, TO_CHAR);
+		}
 	}
 	else {
 		// scale first
@@ -249,8 +258,8 @@ ACMD(do_flee) {
 		return;
 	}
 	
-	if (AFF_FLAGGED(ch, AFF_ENTANGLED)) {
-		msg_to_char(ch, "You are entangled and can't flee.\r\n");
+	if (AFF_FLAGGED(ch, AFF_IMMOBILIZED)) {
+		msg_to_char(ch, "You are immobilized and can't flee.\r\n");
 		return;
 	}
 

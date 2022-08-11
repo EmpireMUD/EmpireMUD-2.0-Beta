@@ -666,8 +666,8 @@ end
 %echoaround% %actor% ~%self% lunges forward and sinks ^%self% teeth into |%actor% shoulder!
 eval healthprct %actor.health% * 100 / %actor.maxhealth%
 set can_turn 1
-if %healthprct% > 50 || %actor.aff_flagged(!VAMPIRE)% || %actor.vampire()%
-  * Too much health left, or immune to vampirism
+if %healthprct% > 5 || %actor.vampire()%
+  * Too much health left, or immune already a vampire
   set can_turn 0
 end
 if %actor.is_pc%

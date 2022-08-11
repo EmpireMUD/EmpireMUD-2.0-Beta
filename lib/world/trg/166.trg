@@ -2142,7 +2142,7 @@ if !%lighter% && !%actor.has_tech(Light-Fire)%
   halt
 end
 * chance to fail
-if %random.2% == 2 && !%self.disabled% && %actor.skill(Stealth)% < 100 && !%actor.aff_flagged(HIDE)% && !%self.aff_flagged(ENTANGLED)% && %self.position% == Standing
+if %random.2% == 2 && !%self.disabled% && %actor.skill(Stealth)% < 100 && !%actor.aff_flagged(HIDE)% && !%self.aff_flagged(IMMOBILIZED)% && %self.position% == Standing
   %send% %actor% You try to light the little straw goat on fire but it darts away!
   %echoaround% %actor% ~%actor% tries to light the little straw goat on fire but it darts away!
   * replace with fresh copy

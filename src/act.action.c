@@ -2036,7 +2036,7 @@ void process_hunting(char_data *ch) {
 		
 		// stun it if triggers allow
 		if (!run_ability_triggers_by_player_tech(ch, PTECH_HUNT_ANIMALS, mob, NULL)) {
-			af = create_flag_aff(ATYPE_HUNTED, 1, AFF_ENTANGLED, ch);
+			af = create_flag_aff(ATYPE_HUNTED, 1, AFF_IMMOBILIZED, ch);
 			affect_join(mob, af, 0);
 		}
 		

@@ -449,7 +449,7 @@ X c
 S
 #274
 Acidblast~
-abi -1 1.00 B 0
+abi -1 1.00 o 0
 A
 24 -1
 C
@@ -463,7 +463,7 @@ X c
 S
 #275
 Arclight~
-abi -1 1.40 B 0
+abi -1 1.40 o 0
 C
 arclight 7 bf 2 10 3 2057 9 8 3 0
 T c 1
@@ -472,7 +472,7 @@ X c
 S
 #276
 Astralclaw~
-abi -1 1.00 B 0
+abi -1 1.00 o 0
 C
 astralclaw 7 bf 2 10 3 2058 9 8 3 0
 T c 4
@@ -496,7 +496,7 @@ X c
 S
 #278
 Deathtouch~
-abi -1 1.20 B 0
+abi -1 1.20 o 0
 C
 deathtouch 7 bf 2 10 3 2060 6 8 3 0
 T c 1
@@ -505,7 +505,7 @@ X c
 S
 #279
 Dispirit~
-abio -1 1.00 B 0
+abio -1 1.00 o 0
 A
 9 -4
 C
@@ -537,7 +537,7 @@ X c
 S
 #284
 Starstrike~
-abi -1 1.50 B 0
+abi -1 1.50 o 0
 C
 starstrike 7 bf 2 10 3 2066 9 8 3 0
 T c 1
@@ -546,7 +546,7 @@ X c
 S
 #285
 Thornlash~
-abi -1 1.00 o 0
+abi -1 1.00 h 0
 C
 thornlash 7 bf 2 10 3 2067 9 8 3 0
 T c 4

@@ -493,6 +493,18 @@ void look_at_target(char_data *ch, char *arg, char *more_args) {
 	/* If an object was found back in generic_find */
 	if (bits) {
 		if (!found) {
+			if (found_obj->worn_by) {
+				act("You look at $p (worn):", FALSE, ch, found_obj, NULL, TO_CHAR);
+			}
+			else if (found_obj->carried_by) {
+				act("You look at $p (inventory):", FALSE, ch, found_obj, NULL, TO_CHAR);
+			}
+			else if (IN_ROOM(found_obj)) {
+				act("You look at $p (in room):", FALSE, ch, found_obj, NULL, TO_CHAR);
+			}
+			else {
+				act("You look at $p:", FALSE, ch, found_obj, NULL, TO_CHAR);
+			}
 			if (ch->desc) {
 				page_string(ch->desc, obj_desc_for_char(found_obj, ch, OBJ_DESC_LOOK_AT), TRUE);	/* Show no-description */
 			}
@@ -1251,7 +1263,9 @@ void look_at_char(char_data *i, char_data *ch, bool show_eq) {
 	}
 	
 	// diagnose at the end
-	diag_char_to_char(i, ch);
+	if (GET_HEALTH(i) < GET_MAX_HEALTH(i)) {
+		diag_char_to_char(i, ch);
+	}
 	
 	// membership info
 	if (GET_LOYALTY(i) && !disguise) {
@@ -1269,7 +1283,7 @@ void look_at_char(char_data *i, char_data *ch, bool show_eq) {
 		act(buf, FALSE, ch, NULL, i, TO_CHAR);
 	}
 	
-	if (size_data[GET_SIZE(i)].show_on_look) {
+	if (size_data[GET_SIZE(i)].show_on_look && (IS_MORPHED(i) ? !MORPH_LOOK_DESC(GET_MORPH(i)) : !GET_LOOK_DESC(i))) {
 		act(size_data[GET_SIZE(i)].show_on_look, FALSE, ch, NULL, i, TO_CHAR);
 	}
 	
@@ -1314,7 +1328,7 @@ void look_at_char(char_data *i, char_data *ch, bool show_eq) {
 		}
 	
 		// show inventory
-		if (ch != i && has_player_tech(ch, PTECH_SEE_INVENTORY)) {
+		if (ch != i && has_player_tech(ch, PTECH_SEE_INVENTORY) && i->carrying) {
 			act("\r\nYou appraise $s inventory:", FALSE, i, 0, ch, TO_VICT);
 			list_obj_to_char(i->carrying, ch, OBJ_DESC_INVENTORY, TRUE);
 
@@ -1442,7 +1456,7 @@ char *get_obj_desc(obj_data *obj, char_data *ch, int mode) {
 	/* sdesc will be empty unless the short desc is modified */
 	*sdesc = '\0';
 
-	if (IS_DRINK_CONTAINER(obj) && GET_DRINK_CONTAINER_CONTENTS(obj) > 0 && mode != OBJ_DESC_LONG) {
+	if (IS_DRINK_CONTAINER(obj) && GET_DRINK_CONTAINER_CONTENTS(obj) > 0 && (mode == OBJ_DESC_CONTENTS || mode == OBJ_DESC_INVENTORY || mode == OBJ_DESC_WAREHOUSE)) {
 		sprintf(sdesc, "%s of %s", GET_OBJ_SHORT_DESC(obj), get_generic_string_by_vnum(GET_DRINK_CONTAINER_TYPE(obj), GENERIC_LIQUID, GSTR_LIQUID_NAME));
 	}
 	else if (IS_AMMO(obj)) {
@@ -1579,7 +1593,7 @@ char *obj_desc_for_char(obj_data *obj, char_data *ch, int mode) {
 	}
 
 	if (mode == OBJ_DESC_EQUIPMENT) {
-		if (obj->worn_by && AFF_FLAGGED(obj->worn_by, AFF_DISARM) && (obj->worn_on == WEAR_WIELD || obj->worn_on == WEAR_RANGED || obj->worn_on == WEAR_HOLD)) {
+		if (obj->worn_by && AFF_FLAGGED(obj->worn_by, AFF_DISARMED) && (obj->worn_on == WEAR_WIELD || obj->worn_on == WEAR_RANGED || obj->worn_on == WEAR_HOLD)) {
 			sprintf(tags + strlen(tags), "%s disarmed", (*tags ? "," : ""));
 		}
 	}

@@ -280,11 +280,11 @@ Note: Greet triggers attached to charmed mobs will not fire unless the trigger
    also has the Charmed type.
 Note: Players entering magically (or via something other than a normal room
    exit) may not be prevented from entering. You can usually check this by
-   seeing if the %direction% variable is empty.
+   seeing if the %direction% variable is 'none'.
 
 Variables:
   &c%actor%&0 - The character entering the room.
-  &c%direction%&0 - The direction the character came from, if any.
+  &c%direction%&0 - The direction the character came from, or 'none'.
   
 See also: MTRIG CHARMED
 #d

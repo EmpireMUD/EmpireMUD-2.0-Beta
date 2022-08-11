@@ -267,7 +267,7 @@ if %verify_target% != %actor.id%
   %echo% ~%self% resheaths ^%self% axe.
   halt
 end
-if %self.aff_flagged(ENTANGLE)%
+if %self.aff_flagged(IMMOBILIZED)%
   %echo% ~%self% hacks at ~%actor% between attempts to free *%self%self from the entanglement.
   %damage% %actor% 250 physical
   %dot% #12008 %actor% 150 30 physical
@@ -432,11 +432,11 @@ end
 if %anat.mob_flagged(GROUP)%
   %damage% %target% 200 physical
   dg_affect #12013 %target% HARD-STUNNED on 10
-  dg_affect #12012 %target% DISARM on 30
+  dg_affect #12012 %target% DISARMED on 30
   %dot% #12011 %target% 150 60 physical
 else
   %damage% %target% 100 physical
-  dg_affect #12012 %target% DISARM on 15
+  dg_affect #12012 %target% DISARMED on 15
 end
 ~
 #12012
@@ -738,7 +738,7 @@ wait 2 sec
 if !%self.fighting%
   halt
 end
-if (%self.aff_flagged(ENTANGLED)% || %target.room% != %self.room%) && (%target% != %self.fighting%)
+if (%self.aff_flagged(IMMOBILIZED)% || %target.room% != %self.room%) && (%target% != %self.fighting%)
   %send% %target% Unable to reach you, ~%self% turns ^%self% attention to %self.fighting.name%!
   %send% %self.fighting% Unable to reach ~%target%, ~%self% turns ^%self% attention to you!
   %echoneither% %self.fighting% %target% Unable to reach ~%target%, ~%self% turns ^%self% attention to %self.fighting.name%!

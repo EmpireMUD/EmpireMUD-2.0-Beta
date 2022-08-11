@@ -208,7 +208,7 @@ int get_attack_type(char_data *ch, obj_data *weapon) {
 	int w_type = TYPE_HIT;
 
 	// always prefer weapon
-	if (weapon && IS_WEAPON(weapon) && !AFF_FLAGGED(ch, AFF_DISARM)) {
+	if (weapon && IS_WEAPON(weapon) && !AFF_FLAGGED(ch, AFF_DISARMED)) {
 		w_type = GET_WEAPON_TYPE(weapon);
 	}
 	else {
@@ -219,10 +219,10 @@ int get_attack_type(char_data *ch, obj_data *weapon) {
 		else if (IS_MORPHED(ch)) {
 			w_type = MORPH_ATTACK_TYPE(GET_MORPH(ch));
 		}
-		else if (IS_NPC(ch) && (MOB_ATTACK_TYPE(ch) != 0) && !AFF_FLAGGED(ch, AFF_DISARM)) {
+		else if (IS_NPC(ch) && (MOB_ATTACK_TYPE(ch) != 0) && !AFF_FLAGGED(ch, AFF_DISARMED)) {
 			w_type = MOB_ATTACK_TYPE(ch);
 		}
-		else if (IS_NPC(ch) && (MOB_ATTACK_TYPE(ch) != 0) && AFF_FLAGGED(ch, AFF_DISARM)) {
+		else if (IS_NPC(ch) && (MOB_ATTACK_TYPE(ch) != 0) && AFF_FLAGGED(ch, AFF_DISARMED)) {
 			// disarmed mob
 			if (attack_hit_info[MOB_ATTACK_TYPE(ch)].damage_type == DAM_MAGICAL) {
 				w_type = TYPE_MANA_BLAST;
@@ -231,7 +231,7 @@ int get_attack_type(char_data *ch, obj_data *weapon) {
 				w_type = TYPE_HIT;
 			}
 		}
-		else if (AFF_FLAGGED(ch, AFF_DISARM) && weapon && IS_WEAPON(weapon) && attack_hit_info[GET_WEAPON_TYPE(weapon)].damage_type == DAM_MAGICAL) {
+		else if (AFF_FLAGGED(ch, AFF_DISARMED) && weapon && IS_WEAPON(weapon) && attack_hit_info[GET_WEAPON_TYPE(weapon)].damage_type == DAM_MAGICAL) {
 			w_type = TYPE_MANA_BLAST;
 		}
 		else {
@@ -2402,14 +2402,19 @@ bool can_fight(char_data *ch, char_data *victim) {
 		return FALSE;
 
 	/* Already fighting */
-	if (FIGHTING(victim) == ch)
+	if (FIGHTING(victim) == ch) {
 		return TRUE;
+	}
+	
+	if (!can_fight_mtrigger(victim, ch)) {
+		return FALSE;
+	}
 
 	if (AFF_FLAGGED(victim, AFF_NO_ATTACK | AFF_NO_TARGET_IN_ROOM) || AFF_FLAGGED(ch, AFF_NO_ATTACK | AFF_NO_TARGET_IN_ROOM))
 		return FALSE;
 
 	// try to hit people through majesty?
-	if (CHECK_MAJESTY(victim) && !AFF_FLAGGED(ch, AFF_IMMUNE_VAMPIRE)) {
+	if (CHECK_MAJESTY(victim) && !AFF_FLAGGED(ch, AFF_IMMUNE_MENTAL_DEBUFFS)) {
 		return FALSE;
 	}
 
@@ -3346,7 +3351,7 @@ int hit(char_data *ch, char_data *victim, obj_data *weapon, bool combat_round) {
 	victim_emp = GET_LOYALTY(victim);
 	
 	// weapons not allowed if disarmed (do this after get_attack type, which accounts for this)
-	if (AFF_FLAGGED(ch, AFF_DISARM)) {
+	if (AFF_FLAGGED(ch, AFF_DISARMED)) {
 		weapon = NULL;
 	}
 	
@@ -3456,7 +3461,7 @@ int hit(char_data *ch, char_data *victim, obj_data *weapon, bool combat_round) {
 		}
 		
 		if (IS_NPC(ch)) {
-			dam += MOB_DAMAGE(ch) / (AFF_FLAGGED(ch, AFF_DISARM) ? 2 : 1);
+			dam += MOB_DAMAGE(ch) / (AFF_FLAGGED(ch, AFF_DISARMED) ? 2 : 1);
 		}
 		
 		// applicable bonuses
@@ -3541,7 +3546,7 @@ int hit(char_data *ch, char_data *victim, obj_data *weapon, bool combat_round) {
 		// check post-hit skills
 		if (result > 0 && !EXTRACTED(victim) && !IS_DEAD(victim) && IN_ROOM(victim) == IN_ROOM(ch)) {
 			// cut deep: players only
-			if (!IS_NPC(ch) && !AFF_FLAGGED(victim, AFF_IMMUNE_BATTLE) && skill_check(ch, ABIL_CUT_DEEP, DIFF_RARELY) && weapon && attack_hit_info[w_type].weapon_type == WEAPON_SHARP) {
+			if (!IS_NPC(ch) && !AFF_FLAGGED(victim, AFF_IMMUNE_PHYSICAL_DEBUFFS) && skill_check(ch, ABIL_CUT_DEEP, DIFF_RARELY) && weapon && attack_hit_info[w_type].weapon_type == WEAPON_SHARP) {
 				act("You cut deep wounds in $N -- $E is bleeding!", FALSE, ch, NULL, victim, TO_CHAR);
 				act("$n's last attack cuts deep -- you are bleeding!", FALSE, ch, NULL, victim, TO_VICT);
 				act("$n's last attack cuts deep -- $N is bleeding!", FALSE, ch, NULL, victim, TO_NOTVICT);
@@ -3554,7 +3559,7 @@ int hit(char_data *ch, char_data *victim, obj_data *weapon, bool combat_round) {
 			}
 		
 			// stunning blow: players only
-			if (!IS_NPC(ch) && !AFF_FLAGGED(victim, AFF_IMMUNE_BATTLE | AFF_IMMUNE_STUN) && skill_check(ch, ABIL_STUNNING_BLOW, DIFF_RARELY) && weapon && attack_hit_info[w_type].weapon_type == WEAPON_BLUNT) {
+			if (!IS_NPC(ch) && !AFF_FLAGGED(victim, AFF_IMMUNE_PHYSICAL_DEBUFFS | AFF_IMMUNE_STUN) && skill_check(ch, ABIL_STUNNING_BLOW, DIFF_RARELY) && weapon && attack_hit_info[w_type].weapon_type == WEAPON_BLUNT) {
 				af = create_flag_aff(ATYPE_STUNNING_BLOW, CHOOSE_BY_ABILITY_LEVEL(stunning_blow_durations, ch, ABIL_STUNNING_BLOW), AFF_STUNNED, ch);
 				affect_join(victim, af, 0);
 				
@@ -4004,7 +4009,7 @@ void perform_violence_missile(char_data *ch, obj_data *weapon) {
 			}
 		
 			// ability effects
-			if (!IS_NPC(ch) && weapon && !AFF_FLAGGED(vict, AFF_IMMUNE_BATTLE) && skill_check(ch, ABIL_TRICK_SHOTS, DIFF_RARELY)) {
+			if (!IS_NPC(ch) && weapon && !AFF_FLAGGED(vict, AFF_IMMUNE_PHYSICAL_DEBUFFS) && skill_check(ch, ABIL_TRICK_SHOTS, DIFF_RARELY)) {
 				switch (GET_MISSILE_WEAPON_TYPE(weapon)) {
 					case TYPE_BOW: {
 						af = create_flag_aff(ATYPE_TRICK_SHOT, 2, AFF_SLOW, ch);
@@ -4173,8 +4178,8 @@ void fight_wait_run(char_data *ch, double speed) {
 		return;
 	}
 	
-	if (AFF_FLAGGED(ch, AFF_ENTANGLED)) {
-		msg_to_char(ch, "You are entangled and can't run into combat!\r\n");
+	if (AFF_FLAGGED(ch, AFF_IMMOBILIZED)) {
+		msg_to_char(ch, "You are immobilized and can't run into combat!\r\n");
 		return;
 	}
 

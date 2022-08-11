@@ -305,7 +305,7 @@ switch %random.2%
       %send% %target% ~%self% shoots a web at you, anchoring you to the ground!
       %echoaround% %target% ~%self% shoots a web at ~%target%, anchoring *%target% to the ground!
       dg_affect %actor% SLOW on 120
-      dg_affect %actor% ENTANGLED on 120
+      dg_affect %actor% IMMOBILIZED on 120
     end
   break
   * Searing Pain poison (DoT) on tank
@@ -1066,7 +1066,7 @@ Shackled Ghost combat~
 %send% %actor% ~%self% envelops you. You hear a terrible, soul-piercing scream!
 %echoaround% %actor% ~%self% envelops ~%actor%, who lets out a terrible, soul-piercing scream!
 dg_affect %actor% SLOW on 20
-dg_affect %actor% ENTANGLED on 20
+dg_affect %actor% IMMOBILIZED on 20
 ~
 #10055
 Celiya passive~

@@ -2057,7 +2057,7 @@ ACMD(do_config) {
 		// will use: <key> [value]
 		val_arg = argument;
 	}
-	else if (*arg1 && (set = search_block(arg1, config_groups, FALSE))) {
+	else if (*arg1 && (set = search_block(arg1, config_groups, FALSE)) != NOTHING) {
 		// will use: <type> [key] [value]
 		verbose = (!str_cmp(argument, "-v") ? TRUE : FALSE);
 		

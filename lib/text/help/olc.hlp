@@ -889,8 +889,8 @@ See also: OLC ABILITIES
 Usage:  .immunities [add | remove] <flag>
 
 These are affect flags that make the target immune to this ability. For
-example, the !BATTLE immunity means mobs with that flag can't be targeted by
-this ability.
+example, the IMMUNE-PHYSICAL-DEBUFFS immunity means mobs with that flag can't
+be targeted by this ability.
 
 Any affect flag can be used for this.
 
@@ -1761,17 +1761,17 @@ The following affect flags are available:
  HIDE - Cannot be seen in room (without search).
  *CHARM - NPC will take orders from its master -- do not use this on items.
  INVIS - Can't be seen, except by magic.
- !BATTLE - Immune to the Battle debuffs.
+ IMMUNE-PHYSICAL-DEBUFFS - Immune to any 'physical' debuffs.
  SENSE-HIDE - Can see hidden people.
  !PHYSICAL - Immune to physical damage -- do not use this on items.
  !TARGET - Cannot be targeted in the room -- do not use this on items.
  !SEE - Cannot be seen in the room at all -- do not use this on items.
  FLY - Is flying.
  !ATTACK - Cannot be attacked -- do not use this on items.
- !HIGH-SORCERY - Immune to High Sorcery debuffs.
- DISARM - Has lost their weapon -- do not use this on items.
+ IMMUNE-MAGICAL-DEBUFFS- Immune to any 'magical' debuffs.
+ DISARMED - Has lost their weapon -- do not use this on items.
  HASTE - Has the effect of the Hasten ability.
- ENTANGLED - Cannot move -- do not use this on items.
+ IMMOBILIZED - Cannot move -- do not use this on items.
  SLOW - Combat speed reduced, like the Slow spell.
  STUNNED - Can't participate in combat or move -- do not use this on items.
  STONED - Sees the world in strange, trippy colors.
@@ -1781,9 +1781,8 @@ The following affect flags are available:
  EARTHMELD - Submerged in the earth and can't take normal actions -- do not use this on items.
  MUMMIFY - Immune to attack and cannot act -- do not use this on items.
  SOULMASK - Immune to soulsight.
- !NATURAL-MAGIC - Immune to the Natural Magic debuffs.
- !STEALTH - Immune to the Stealth debuffs.
- !VAMPIRE - Immune to Vampire debuffs.
+ IMMUNE-POISON-DEBUFFS - Immune to any 'poison' debuffs.
+ IMMUNE-MENTAL-DEBUFFS - Immune to any 'mental' debuffs.
  !STUN - Immune to stun effects.
  !DRINK-BLOOD - Can't be bitten/sired by vampires.
  DISTRACTED - Cannot perform timed actions.
@@ -8011,6 +8010,9 @@ scalable in order to automatically determine how many drinks it will hold.
 Other drink containers are like fountains, as no-take objects in the room
 which can provide very large amounts of liquid to players. These shouldn't
 be scalable, and you can set the capacity as high as you like.
+
+If a drink container doesn't have TAKE (can't be taken) and is in the room,
+players can 'fill' from it like a fountain.
 
 Note: Unlike other items, if there is a 'timer' on a drink container, it will
 only cause the liquid inside to go bad and be poured out, rather than purging

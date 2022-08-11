@@ -127,6 +127,31 @@ int distance_can_see_in_dark(char_data *ch) {
 
 
 /**
+* Shows the single-line version of available exits in the CircleMUD style.
+*
+* @param char_data *ch The person looking.
+* @param room_data *room The room to see exits for.
+*/
+static void do_brief_auto_exits(struct char_data *ch, room_data *room) {
+	struct room_direction_data *ex;
+	bool any = FALSE;
+	
+	msg_to_char(ch, "\tc[ Exits: ");
+
+	if (COMPLEX_DATA(room) && ROOM_IS_CLOSED(room)) {
+		for (ex = COMPLEX_DATA(room)->exits; ex; ex = ex->next) {
+			if (ex->room_ptr && !EXIT_FLAGGED(ex, EX_CLOSED)) {
+				msg_to_char(ch, "\t(%s\t) ", alt_dirs[get_direction_for_char(ch, ex->dir)]);
+				any = TRUE;
+			}
+		}
+	}
+	
+	msg_to_char(ch, "%s]\t0\r\n", any ? "" : "None! ");
+}
+
+
+/**
 * Gets the one-line description for a single exit.
 *
 * @param char_data *ch The person looking at exits (for see-in-dark/roomflags).
@@ -1245,15 +1270,15 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options) {
 			}
 		}
 		else {	// ASCII map view
-			magnitude = PRF_FLAGGED(ch, PRF_BRIEF) ? 3 : mapsize;
+			magnitude = mapsize;
 			*buf = '\0';
 			
 			if (show_title) {
 				// spacing to center the title
 				s = ((4 * (magnitude * 2 + 1)) + 2 - (strlen(output)-4))/2;
-				if (!PRF_FLAGGED(ch, PRF_BRIEF))
-					for (t = 1; t <= s; t++)
-						send_to_char(" ", ch);
+				for (t = 1; t <= s; t++) {
+					send_to_char(" ", ch);
+				}
 				send_to_char(output, ch);
 			}		
 		
@@ -1476,7 +1501,7 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options) {
 			}
 			
 			// description
-			if (!PRF_FLAGGED(ch, PRF_BRIEF) && (strptr = get_room_description(room))) {
+			if (!PRF_FLAGGED(ch, PRF_NO_ROOM_DESCS) && (strptr = get_room_description(room))) {
 				msg_to_char(ch, "%s", strptr);
 			}
 		}
@@ -1510,6 +1535,11 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options) {
 	if (look_out) {
 		// nothing else to show on a look-out
 		return;
+	}
+	
+	// brief version of exits goes here
+	if (PRF_FLAGGED(ch, PRF_SHORT_EXITS) && !PRF_FLAGGED(ch, PRF_NO_EXITS) && COMPLEX_DATA(room) && ROOM_IS_CLOSED(room)) {
+		do_brief_auto_exits(ch, room);
 	}
 	
 	// commands: only show if the first entry is not a \0, which terminates the list
@@ -1661,6 +1691,10 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options) {
 	if (GET_ROOM_VEHICLE(room) && VEH_FLAGGED(GET_ROOM_VEHICLE(room), VEH_ON_FIRE)) {
 		msg_to_char(ch, "\t[B300]The %s has caught on fire!\t0\r\n", skip_filler(VEH_SHORT_DESC(GET_ROOM_VEHICLE(room))));
 	}
+	
+	if (ROOM_AFF_FLAGGED(room, ROOM_AFF_DARK)) {
+		msg_to_char(ch, "The area is blanketed in an inky darkness.\r\n");
+	}
 
 	if (!AFF_FLAGGED(ch, AFF_EARTHMELD)) {
 		if (can_get_quest_from_room(ch, room, NULL)) {
@@ -1681,7 +1715,7 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options) {
 	}
 
 	/* Exits ? */
-	if (!PRF_FLAGGED(ch, PRF_NO_EXITS) && COMPLEX_DATA(room) && ROOM_IS_CLOSED(room)) {
+	if (!PRF_FLAGGED(ch, PRF_NO_EXITS | PRF_SHORT_EXITS) && COMPLEX_DATA(room) && ROOM_IS_CLOSED(room)) {
 		do_exits(ch, "", -1, GET_ROOM_VNUM(room));
 	}
 	
@@ -2255,11 +2289,6 @@ void screenread_one_dir(char_data *ch, room_data *origin, int dir) {
 	mapsize = GET_MAPSIZE(REAL_CHAR(ch));
 	if (mapsize == 0) {
 		mapsize = config_get_int("default_map_size");
-	}
-	
-	// constrain for brief
-	if (PRF_FLAGGED(ch, PRF_BRIEF)) {
-		mapsize = MIN(3, mapsize);
 	}
 
 	// setup

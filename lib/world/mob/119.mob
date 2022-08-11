@@ -1,0 +1,1969 @@
+#11900
+spirit skycleave~
+the spirit of Skycleave~
+The spirit of Skycleave lingers in the air.
+~
+0 0 bd ln 3
+0 0 0 15
+D
+   This mob manages data for the tower. Use this to check the current status of
+the tower:
+set spirit %instance.mob(11900)%
+To see the difficulty of a floor (1-4):
+%spirit.diff2%
+To see if a floor is phase A (0) or phase B (1):
+%spirit.phase3% == 1
+~
+T 11903
+S
+#11901
+gossiper #n~
+gossiper #n~
+#n is standing here, gossipping.
+~
+30 50 dv 0 3
+0 0 0 15
+D
+   This tourist is simply enamored with the Tower Skycleave. They won't stop
+talking about it!
+~
+I 4 2015 40.00 1  # LOOT: tunic
+I 4 2021 40.00 1  # LOOT: cloth mantle
+I 4 2023 40.00 1  # LOOT: fine cloth gloves
+M
+1
+I visited the Tower Skycleave and all I got was this skystone!~
+M
+1
+Have you heard about this traveling sorcery tower?~
+M
+1
+I swear that Skycleave barista re-heated my coffee with a wand.~
+M
+1
+I can't believe the Tower Skycleave is finally here!~
+T 11905
+S
+#11902
+bucket wooden~
+the bucket~
+A wooden bucket is sitting here, filled with water.
+~
+50 50 dh G 2
+0 0 15 5
+D
+   The sudsy little wooden bucket hops along, sloshing water on the floor as
+its sponge dutifully glides along behind.
+   Maureen tricked her way into Skycleave, having quick hands but no magical
+talent to speak of. But when she couldn't pass the apprentice exam, the
+disappointed sorcerers put her to work.
+~
+M
+0
+$n hops around, sloshing water as it goes.~
+M
+0
+$n hops around, leaving puddles in its wake.~
+M
+0
+$n hops around the room.~
+M
+0
+$n hops around.~
+M
+0
+$n hops around.~
+M
+0
+$n hops around.~
+M
+0
+$n hops around.~
+M
+0
+$n hops around.~
+M
+0
+$n hops around.~
+M
+0
+You hear a soft sobbing sound as the bucket slowly refills.~
+T 11902
+T 11904
+S
+#11903
+sponge~
+a sponge~
+A sponge is scrubbing the floor.
+~
+50 50 bdh G 1
+0 0 24 21
+D
+   The sponge zigs and zags across the floors as it chases the hopping bucket
+around the tower. It never seems to wring itself out, but somehow it always
+looks clean.
+   After her only confidant vanished, Apprentice Eloise became despondent,
+often seen crying into a bucket in the corner. Her studies suffered as she
+missed lesson after lesson. As disappointment mounted, her master saw fit to
+reunite the two friends.
+~
+M
+0
+$n slides around, scrubbing the floor.~
+T 11934
+S
+#11904
+corwin page~
+Page Corwin~
+Corwin is bustling about.
+~
+0 0 dvxA n 3
+1 0 0 15
+D
+   Corwin is a young man of perhaps 16 years. He keeps his hair cropped short
+so it's off his neck and forehead while he bustles around the tower in his
+heavy jute page robe.
+~
+S
+#11905
+Mageina barista~
+Mageina the barista~
+The barista seems to be daydreaming behind the bar. (list)
+~
+0 0 bdvxA n 3
+2 0 0 16
+D
+   Mageina hardly spares you a glance as she leans behind the bar, idly
+spinning her cinnamon wand. Her hat, a comically oversized black cone with a
+wide brim, droops over her brown and violet hair, which is pinned up in loose
+curls. Her black apron matches the hat, but for its stylized Tower Skycleave
+logo.
+   You can 'list' and 'buy' refreshments here.
+~
+M
+0
+$n points a stick of cinnamomn at a mug and heats it with a wild, cackling flame!~
+M
+0
+$n twirls her wand idly.~
+M
+0
+$n blasts out a dirty bowl with her wand.~
+M
+0
+$n casts a scouring spell on a table from behind the bar.~
+M
+0
+$n hums a little tune.~
+M
+0
+$n hums a little tune.~
+S
+#11906
+Huberus instructor~
+Instructor Huberus~
+Instructor Huberus is seated atop her desk.
+~
+0 0 bdvxA n 3
+2 0 0 16
+D
+   Instructor Huberus is a gruff sort of woman, well-dressed in overflowing
+violet robes that identify her as a master sorcerer. She sits beneath an
+intimidating thicket of gray hair, studying every person who walks into the
+classroom through thick glasses. The fingers of her left hand, made of
+nocturnium filigree, tap slowly on the desk.
+- This will be a mage with a repeatable quest that trains the player in high sorcery.
+~
+S
+#11907
+#n shopkeep shopkeeper~
+#n the shopkeep~
+#n is behind the counter, wearing an apron.
+~
+0 0 bdvA n 3
+1 0 0 15
+D
+   He's dressed in black slacks, a gray shirt, and a purple vest with the Hazel
+and Wand of the Skycleave sigil. He doesn't seem to have a wand or a staff, but
+bears a toothy smile and seems happy to help customers.
+- This person sells bonus items in the gift shop.
+- Their speech and emotes should indicate they are rather new here.
+~
+M
+0
+The claw machine slides smoothly across the floor and nuzzles your hand.~
+M
+0
+The claw machine bounces itself up and down, sounding a jingling bell.~
+M
+0
+The claw machine flashes a brightly colored sign reading, 'PLAY ME!'~
+T 11806
+S
+#11908
+Elamm man young eager~
+Elamm~
+An eager young man is seated at a desk.
+~
+0 0 bdvxA n 3
+2 0 0 16
+D
+   Elamm is dressed in well-pressed black slacks and a crisp white shirt. He
+wears his brown hair long but tied back. Over his left eye, he wears a monocle
+of black glass, while the right eye, brown, is uncovered.
+Notes:
+- This student could be a sarcastic assassin trying to learn magic to improve his trade.
+~
+S
+#11909
+Akeldama student pale~
+Akeldama~
+A pale student is seated in the back.
+~
+0 0 bdvxA n 3
+2 0 0 16
+D
+   Akeldama has chosen a seat in the corner, barely touched by the flickering
+lamplight from the front. Her skin has a pale, almost ashy color, perhaps due
+to the hardships the tower has recently suffered.
+- This student could be a vampire bloodmage or someone else with nefarious plans for their magic.
+~
+S
+#11910
+Annaca watcher~
+Watcher Annaca~
+Annaca is watching over the apprentices.
+~
+0 0 dvxA n 3
+2 0 0 15
+D
+   Annaca looks bedraggled in her loose midnight blue robes. The toll that
+recent events have taken on her is clear on her face and in her posture as she
+shuffles through the halls. Her golden brown hair almost forms a mane as it
+seems to have stacked itself curl-upon-curl.
+~
+S
+#11911
+apprentice kayla~
+Apprentice Kayla~
+Apprentice Kayla is here.
+~
+0 0 dvxA n 3
+2 0 0 15
+D
+   Kayla is dressed in simple white apprentice robes. She wears her hair in
+chunky braids, as there appears to be a lot of it to tame. Her eyes display a
+starry pink and purple pattern the swirls around her irises. Kayla is young,
+but Skycleave's selection process is notoriously difficult, so she has surely
+earned her spot.
+~
+S
+#11912
+cosimo apprentice~
+Apprentice Cosimo~
+Apprentice Cosimo is here.
+~
+0 0 dvxA n 3
+1 0 0 15
+D
+   Cosimo is clad in white apprentice robes with fiery red trim. On his face
+he bears a long scar that clips the left side of his lips. He wears his over-
+grown hair up in a sweeping modern style, with a stubbly chin that almost
+resembles a beard.
+~
+S
+#11913
+tyrone apprentice~
+Apprentice Tyrone~
+Apprentice Tyrone is standing here.
+~
+0 0 dvxA n 3
+1 0 0 15
+D
+   Tyrone is tall, with soft features and black eyes. His face bears no creases
+and with his hair dyed fire-orange, he barely looks old enough to study at the
+tower. But he walks with confidence and speaks with authority like many of the
+older, wiser sorcerers.
+~
+S
+#11914
+Wright wrangler~
+Wrangler Wright~
+The goblin wrangler is cleaning up the mess.
+~
+0 0 bdvxA n 3
+1 0 0 15
+D
+   Though he's old and more than a little scarred, Wrangler Wright seems to be
+enjoying himself as he picks up debris and straightens the room. His skin has
+grown translucent with time, showing every blue vein beneath dark age spots.
+Unlike most of the tower's occupants, he wears no robes -- only simple overalls
+and a gray shirt.
+~
+M
+1
+I'm going to lose my job...~
+M
+1
+I'm getting too old for this crap.~
+M
+0
+$n shouts, 'Shut up!'~
+M
+1
+They're going to blame me for the goblins getting loose in the first place.~
+M
+0
+$n sweeps the debris into the corners.~
+M
+0
+$n cleans the front of a cage.~
+M
+0
+$n struggles in futility to clean the grime out from under $s nails.~
+M
+0
+$n covers $s ears.~
+M
+0
+$n climbs on a chair and tries to clean something brown from the ceiling.~
+T 11934
+S
+#11915
+goblin caged cages~
+the caged goblin~
+A goblin sits with its arms and legs dangling out of its cage.
+~
+0 0 bd 0 3
+1 0 0 15
+D
+   The cages aren't large enough to stand in, so this poor goblin is dangling
+his arms and legs through the bars to get room to stretch. He's a wretched,
+scrawny little thing, with pale green skin and drooping eyes. It doesn't look
+like they're feeding him very much.
+~
+M
+0
+$n sings, 'No bodies known the trouble I seed...'~
+M
+0
+$n sings, 'Well I knows I had it comin', I knows I cain't be free, but those people keep a-whippin', and that's what tortures me.'~
+M
+0
+$n sings, 'Goblin threw a party in the tower jail, prison band was there and they began to wail. Band was jumpin' and the tower start to swing... You should've heard them goblins sing!'~
+M
+0
+$n sings, 'I saw goblins runnin' out, they looked like middleweights. Jumped onto a white horse with stolen silver plates...'~
+M
+0
+$n sings, 'Breakin' rocks in the hot sun, I fought the tower and the tower won...'~
+M
+0
+$n sings, 'Jailhouse get empty. Rusty get plenty. The baton stick get shorter... Rusty gets taller. Can't fight against the wand... Cause them rude, rude people...'~
+M
+0
+$n sings, 'Nothing I does, nothing I say, I tell them to go get plucked, they put me away...'~
+M
+0
+$n sings, 'There's some jewels in the skull that he could sell if he chose...'~
+M
+0
+$n sings, 'You can't run away from yourself, ay. Can't runaway from yourself, no, no...'~
+M
+0
+$n sings, 'Inna di street, tings ah get rougher than rough, inna di street...'~
+M
+0
+$n sings, 'Tonight there's gonna be trouble, some of us won't survive, see the Gobs and me mean business, bustin' out dead or alive...'~
+M
+0
+$n sings, 'And someone's sneakin' 'round the tower. Could that someone be Mack the Knife?'~
+M
+0
+$n sings, 'As $e came into the window, was the sound of, a crash-end-o, $e came into giant tower, $e left bloodstains, on the parapet...'~
+M
+0
+$n sings, 'They headed down to, oooh, old Elk Castle, that's where they ran into a great big hassle. Gobly Jo shot a man while robbin' his castle, Gobly Sue took the money and run...  Hoo-hoo-hoo, go on, take the money and run...'~
+M
+0
+$n sings, 'Oh, there ain't no rest for the wicked, goblins don't grow on trees. I got guys to pay, I got mouths to feed, there ain't nothin' in this world for free...'~
+M
+0
+$n sings, 'Straight outta Goblin, crazy featherplucker named Filks, from the gang called Goblinz Wit Attitudes. When I'm called off, I get sawed off, pull the blade and the bodies are hauled off...'~
+M
+0
+$n sings, 'Desperate goblin... Why don't you come to your senses? You've been out ridin' fences for so long now...'~
+S
+#11916
+goblin caged cages~
+a caged goblin~
+A goblin is laying on the dirty floor of her cage.
+~
+0 0 bd 0 3
+2 0 0 15
+D
+   The cages have not been cleaned in some time, but one hapless goblin has
+given up any concern as she lays in the filth. Her skin is pale green and waxy,
+blistered in places, and nearly as dirty as the cage. She takes little notice
+of you as she stares blankly at the ceiling.
+~
+M
+0
+One of the goblins stares blankly at the ceiling as $e lays in $s cage.~
+M
+1
+Nobody comes to help.~
+M
+1
+Goblins is treated worse than pixies.~
+M
+1
+We tried and died.~
+M
+0
+One of the goblins cries quietly in the cage.~
+S
+#11917
+goblin caged cages~
+a caged goblin~
+One of the goblins is trying to climb the bars of its cage.
+~
+0 0 bd 0 3
+1 0 0 15
+D
+   One of the goblins has become restless and is trying to climb the bars of
+its cage -- a futile move as there is no escape at the top. His green skin has
+lost its luster, now covered in dust and dirt that might never get washed off
+in these filthy cages.
+~
+M
+0
+One of the goblins rattles the cage bars as loudly as $e can.~
+M
+0
+One of the goblins screams at the top of its lungs!~
+M
+1
+This not be the last time we get in!~
+M
+1
+Evil wizards can't protect the tower forever!~
+M
+1
+Goblins' day is coming!~
+S
+#11918
+Chicanders warden ~
+the warden~
+The warden, Chicanders, is overseeing the track. (race)
+~
+0 0 bdvA n 3
+1 0 0 15
+D
+   With his hair receding and his gut protruding, Warden Chicanders has settled
+into middle age. His black and violet robes drape from his tall chair over the
+race track, where he can see ever turn. His high vantage point also gives you
+an uneasy view of the thicket of long hairs that protrude from the nostrils of
+his bulbous nose.
+   To check the status of the race, just type 'race'.
+~
+T 11912
+T 11916
+T 11918
+T 11919
+T 11920
+T 11911
+S
+#11919
+pixy escaped~
+the escaped pixy~
+A pixy has escaped and is frantically trying to flee!
+~
+0 0 adv 0 3
+1 0 0 15
+D
+   The pixy is tiny, not larger than a field mouse. It flits back and forth in
+a panic as it tries to find a way out of the tower, its silvery butterfly wings
+beating as fast as they possibly can. The pixy shoots a burst of yellow dust
+at you, which you dodge, leaving a stain on the wall behind you.
+~
+S
+#11920
+experiment escaped~
+the escaped experiment~
+An escaped experiment runs past you!
+~
+0 0 d 0 3
+1 0 0 15
+D
+   Though it's not clear what this thing is -- or even what it used to be -- it
+seems to be in a hurry to escape. It has the countenance and consistency of
+spoiled oatmeal, squirking and blatting as it shifts shape and form to get by
+you. You turn toward it, and it turns back, glowering at you through 3 shining
+blue spots on its face.
+~
+S
+#11921
+broom~
+the broom~
+A broom is sweeping up the remaining debris.
+~
+50 50 dh G 2
+0 0 36 5
+D
+   With its short heather pole and twiggy end, this old besom broom would be
+difficult for a person to use. Fortunately, it seems to be doing all the
+sweeping on its own.
+   When she arrived at Skycleave, Apprentice Heather had already raised six
+children and nine grandchildren. Magic had come naturally to her in her youth,
+and she had determined to study it at her first opportunity. But opportunity
+knocked late, and she never excelled at her studies.
+~
+M
+0
+The enchanted broom sweeps up little piles of dust.~
+M
+0
+The broom twirls its staff-end and a pile of dust vanishes.~
+M
+0
+The broom sweeps around you.~
+M
+0
+The broom flips over and beats itself against a railing.~
+M
+0
+The enchanted broom sweeps across the floor.~
+M
+0
+The broom makes a sniffling noise.~
+M
+0
+The broom stops for a moment and looks out into the distance, almost somberly.~
+T 11902
+T 11904
+T 11934
+S
+#11922
+duster feather~
+the feather duster~
+A feather duster swishes as it flies across every surface.
+~
+50 50 dh G 2
+0 0 2 21
+D
+   This elegant little plume of fluffy red feathers is bound by a strap of
+inky shadowhide. It flits and dances over shelves, chairs, railings, and even
+your shoulders as it makes its way around the room.
+   Alastair was a model apprentice, at least in his lessons. He spent many a
+long night excavating the bookshelves and cabinets, and he showed a great deal
+of promise. But he was never known to put a book away when he was done with it
+and his untidiness soon outweighed his inborn talent.
+~
+M
+0
+The feather duster twirls across a shelf.~
+M
+0
+You feel a tickle as the feather duster dances over your head.~
+M
+0
+The feather duster brushes you off, causing you to sputter a little as it does your face.~
+M
+0
+The feather duster flips itself and dusts the underside of the furniture.~
+M
+0
+The feather duster dances about.~
+M
+0
+The feather duster pauses in the morning and seems to sob.~
+T 11902
+T 11904
+T 11934
+S
+#11923
+goblin secret passage opener~
+the goblin passage opener~
+The goblin secret passage opener is here.
+~
+250 250 bd ln 3
+0 0 0 15
+D
+This mob opens the secret passage on the goblin side.
+~
+T 11923
+T 11925
+S
+#11924
+hall secret passage opener~
+the hall passage opener~
+The hall secret passage opener is here.
+~
+250 250 bd ln 3
+0 0 0 15
+D
+This mob opens the secret passage on the hallway side.
+~
+T 11924
+T 11925
+S
+#11925
+ravinder apprentice~
+Apprentice Ravinder~
+Apprentice Ravinder is here.
+~
+0 0 dvxA n 3
+1 0 0 15
+D
+   Ravinder Singh is not a tall man, but he stands tall in his violet dastar,
+a high turban that covers all of his hair. He has a long, loose beard that
+covers the front of his white and gray apprentice robes. He wears a single iron
+bracelet on his wrist and a curved kirpan knife on his waist.
+~
+S
+#11926
+sponge giant~
+the sponge~
+A giant sponge tries in futility to clean the empty cages.
+~
+50 50 bdh G 2
+0 0 24 15
+D
+   The oversized sponge looks old and worn, discolored from years spent in
+these wretched cages. It trudges back and forth, barely able to make a dent in
+the filth that has accumulated here.
+   John Wright came to work at Skycleave as a young man, freshly blooded in the
+Goblin Crusade. Though he served the tower for his entire adult life, his
+inability to keep the goblins under control made him little more than a
+disappointment in the end.
+~
+M
+0
+$n sloshes around inside one of the cages.~
+M
+0
+$n tries to squeeze itself into a corner.~
+M
+0
+$n hops onto the window sill and wrings itself out.~
+M
+0
+$n tries to clean the desk but only gets the papers wet.~
+M
+0
+$n spins in circles trying to figure out where to even start on the cleaning.~
+M
+0
+$n brushes uncomfortably close to your leg as it tries to clean.~
+M
+0
+$n makes the occasional sobbing sound as it cleans.~
+T 11934
+S
+#11927
+Henri DeClaire~
+Henri DeClaire~
+Henri DeClaire is lying here.
+~
+0 0 bdh 0 3
+1 0 0 15
+D
+   This character represents a person stuck in the Tower Skycleave's time loop
+who expired inside. He is the author of the "time traveler's diary page" items.
+He appears only as a corpse in the seccret passage in 2B, only for players who
+have visited the 2B secret passage on previous days.
+~
+S
+#11928
+water first embodiment living~
+the First Water~
+You are surrounded by the living embodiment of the First Water! (difficulty)
+~
+0 0 bdhxyD 0 5
+0 0 0 28
+D
+   The water on all sides of you is alive! You have found yourself trapped in
+the First Water, or something animated by its essence. As you hold your breath
+with all your strength, you feel the water press itself against your nostrils.
+Slowly, the burn creeps in. You'll have to defeat it quickly!
+To fight the First Water, type: difficulty <Normal | Hard | Group | Boss>
+~
+I 4 11900 100.00 1  # LOOT: unattuned skystone
+T 11809
+T 11810
+T 11931
+T 11932
+T 11933
+S
+#11929
+Paige page~
+Paige~
+A page is bustling past you.
+~
+0 0 dvxA n 3
+2 0 0 15
+D
+   Paige is a young woman with her brown and blonde hair in a jaw-length bob.
+She's wearing the same plain jute robe as the other pages, but she's stitched
+the sides to create more shape. If her face is stern, it's only because she's
+focused on something in her own head while she works.
+~
+S
+#11930
+caius sirensbane high master~
+Caius Sirensbane~
+High Master Caius Sirensbane is supervising the residents.
+~
+0 0 dvxA n 3
+1 0 0 15
+D
+   Where the other sorcerers would wear a robe, Caius is draped in a white
+wool toga with a violet stripe running the length of the cloth. His lightly
+bronzed complexion, aquiline nose, choice of clothing, and short imperial hair
+style give the impression of a Roman patrician.
+~
+S
+#11931
+Niamh resident~
+Resident Niamh~
+Resident Niamh is standing here.
+~
+0 0 dvxA n 3
+2 0 0 15
+D
+   Niamh's black hair shows fiery red roots as she stoops to pick up a book.
+Her pale face and hands stick out in stark contrast to her dark purple and
+black robes. She looks rather young compared to many of the sorcerers here.
+~
+S
+#11932
+mohammed resident~
+Resident Mohammed~
+Resident Mohammed is standing here.
+~
+0 0 dvxA n 3
+1 0 0 15
+D
+   Mohammed stands like a beanpole, tall and thin, wearing a long, slim, gray
+thobe with a violet ghutra headscarf and black egal band. He smiles at you
+through a short, neat beard.
+~
+S
+#11933
+mop bucket~
+the mop~
+A mop carries a bucket past you.
+~
+50 50 dh G 2
+0 0 35 5
+D
+   The mop has a pale handle, perhaps made from poplar, with the yarn of the
+mop head made from white wool. The headband is checkered violet and white, with
+a matching tail band. The mop is immaculate despite the amount of cleaning it
+seems to have done. It carries its own bucket on thin wooden arms and though
+the mop seems alive -- almost moody, even -- the bucket is inanimate.
+   Dylane the Younger was sent, at great expense, to Skycleave by his father,
+who was ever-so-pleased to have a sorcerer in the family. The elder Dylane
+spent a great sum of money and no small amount of influence to ensure his son
+could receive the best education. But when the younger Dylane couldn't stop
+spilling potions on the fine ebony floors, he amounted to little more than a
+disappointment to the tower.
+~
+T 11902
+T 11904
+T 11934
+S
+#11934
+otherworlder tall blue person~
+the otherworlder~
+A tall, blue person is pulling at the chains that hold it to the floor.
+~
+0 0 bdvxA n 3
+2 0 0 15
+D
+   The otherworlder is taller than a human, with periwinkle skin dappled with
+white speckles. It has no hair or nose, but four wide-set round black eyes that
+never blink. Its curved arms tug and flail against the shackles that hold it
+to the ground, moving like they have no bones, though the magical shackles hold
+firm. The otherworlder wears some kind of scale armor that appears as thin as a
+sheet, allowing it to move effortlessly with its curved, boneless arms and legs.
+   There's no way to tell which of the many worlds this creature might have
+come from. The only thing you're sure about is that it doesn't want to be here.
+~
+T 11834
+S
+#11935
+Sanjiv apprentice~
+Apprentice Sanjiv~
+Apprentice Sanjiv is using an arcane contraption on the otherworlder.
+~
+0 0 bdvxA n 3
+1 0 0 15
+D
+   Sanjiv is dressed in a white kurta with a violet hem along the bottom. He's
+a young man, with tousled brown hair and skin the color of summer wheat. He
+holds some kind of arcane contraption in both hands, slowly circling around the
+otherworlder as light streams from the contraption, illuminating the other-
+worlder with bright white light.
+~
+M
+1
+Interesting...~
+M
+1
+Fascinating...~
+M
+1
+In sheer defiance of logic...~
+M
+1
+Amaze-balls...~
+M
+0
+$n circles the otherworlder slowly.~
+M
+0
+$n bangs in the contraption in $s hands.~
+S
+#11936
+scaldorran lich~
+Scaldorran the Lich~
+Scaldorran the Lich twists and curls in the air.
+~
+0 0 bdvxA n 3
+1 0 0 15
+D
+   Scaldorran is a mass of tattered gray linen wraps, slithering and writhing
+in midair, sometimes forming a hood or a face or arms, but always splitting
+back apart. And he is so much more than that. As a lich, he wields vast power
+over death -- and he has a reputation for sharing it.
+~
+S
+#11937
+skeleton~
+the skeleton~
+A skeleton is picking bits of flesh off its bones.
+~
+0 0 bd n 3
+0 0 0 15
+D
+   The skeleton is seated on top of a work bench, perplexed by several spare
+bones that were left over and don't seem to fit. It's cleaning off bits of
+flesh that you can only hope were its own.
+~
+M
+0
+$n polishes itself with a sander.~
+M
+0
+$n washes off some gore with a sponge.~
+M
+0
+$n cleans out its eye socket with a rag.~
+M
+0
+$n picks a tooth up off the ground and tries it out in a gap.~
+M
+1
+Ask me how I lost 14 stone fast.~
+M
+1
+It's not just that the pay was low. It's that someone stole the pittance Vye paid me right off my carcass.~
+M
+1
+Lady Virduke was actually my cousin, so that was bad luck from the start.~
+M
+1
+Hey, who turned off the lamps?~
+M
+1
+No bones about it, this is definitely going to be more interesting than my last job.~
+M
+1
+At least I don't get that hair-raising feeling around the lich anymore.~
+S
+#11938
+Weyonomon spirit apprentice~
+the spirit of Weyonomon~
+The spirit of Apprentice Weyonomon is channeling a spell.
+~
+0 0 bd n 3
+1 0 0 15
+D
+   Weyonomon is -- or rather, was -- a promising young apprentice. He still
+wears the white robes he earned here, which hang in stark contrast to his
+golden brown skin. His eyes are the hollow, smoky-black depressions of the
+unliving, but his face bears a soft, friendly smile. He stands in front of one
+of the artifacts, channeling ghastly energy from it.
+~
+M
+0
+A trio of bells on a low shelf are suddenly having A Major fight.~
+M
+0
+You watch a square jade coin spin under its dome.~
+M
+0
+A spine-tingling scratching noise comes from one of the cases.~
+M
+0
+Whatever the thing is that's chained to the post, it shakes at its chains when you get too close.~
+M
+0
+You cough out dust as Weyonomon passes straight through you.~
+M
+0
+Weyonomon reaches through one of the domes and pets a little scarab beetle.~
+M
+0
+You feel a tap on the shoulder, but when you turn around, it's just a sculpture of a hand. You swear it was on a different shelf before.~
+M
+0
+As you walk past an empty dome, you swear you hear someone shout 'Power of Skycleave!'~
+M
+0
+Your breath freezes in the air.~
+M
+0
+Your breath freezes in the air.~
+M
+0
+The hair on the back of your neck stands up.~
+M
+0
+You start to open a small box, but it howls and you shut it fast.~
+S
+#11939
+Annelise enchanter~
+Enchanter Annelise~
+Enchanter Annelise is working on something.
+~
+0 0 bdvxA n 3
+2 0 0 15
+D
+   Annelise is strikingly young for a woman wearing the many purple robes of
+a Skycleave master. In truth, she barely looks 15, with baby-smooth skin and
+large eyes. There's a slight clunking sound as she walks around the lab owing
+to her bronze leg.
+- emotes should hint that she's a lot older
+- she should be enchanting things
+- could have a rare interaction where a disappointing student arrives and is transformed into a broom
+~
+S
+#11940
+Waltur walter magineer~
+Magineer Waltur~
+Magineer Waltur is here. (list)
+~
+0 0 bdvxA n 3
+1 0 0 15
+D
+tba
+~
+T 11806
+S
+#11941
+goef oreonic rock creature pitch black~
+Goef the Oreonic~
+A pitch black rock creature stands in the center of the room. (attune)
+~
+0 0 bdx n 3
+0 0 0 5
+D
+   It stands in the center of the room, sometimes so still that it looks like a
+sculpture. It looks like it's made of living nocturnium ore, still in its raw
+form with chunks of black rock sticking out. In form, it resembles a hunched
+person, though it has six arms and indistinct legs. The lowest pair of arms are
+thick and rocky, almost resembling muscles, while the upper four arms are
+slender and formed from long, twisting cables of wrought nocturnium.
+   If the sculpture-creature was made to resemble a man or woman, you're not
+sure which. Its face bears a mouth but no eyes, nose, or ears, though it has
+been sculpted to have a thick brow ridge above where the eyes would be, and the
+brow is very expressive when it speaks.
+   Goef the Oreonic can 'attune' skystones for you.
+~
+T 11939
+T 11806
+S
+#11942
+Sanjiv apprentice~
+Apprentice Sanjiv~
+Apprentice Sanjiv is using an arcane contraption on the walls.
+~
+0 0 bdvxA n 3
+1 0 0 15
+D
+   Sanjiv is dressed in a white kurta with a violet hem along the bottom. He's
+a young man, with tousled brown hair and skin the color of summer wheat. He
+holds some kind of arcane contraption in both hands, illuminating the cracked
+ebony wall with streams of violet and silver light.
+~
+M
+0
+$n waves $s light contraption over the walls...~
+M
+0
+A crack on the wall seals itself!~
+M
+0
+A crack on the wall seals itself and the dented panel pops out.~
+M
+0
+$n hums to $mself, '... and every task you undertake becomes a peace of cake...'~
+M
+0
+$n bangs on the side of $s arcane contraption as the light flickers.~
+M
+0
+$n walks along the wall, passing the light from $s contraption over it.~
+S
+#11946
+fox gray~
+the gray fox~
+There is a gray fox sniffing around.
+~
+0 0 dj n 3
+0 0 14 15
+D
+   The curious fox isn't much larger than a cat, with an ashen-silver coat, a
+white belly, and red fur in between. It has an adorable little pointed face
+with floppy ears and big, brown eyes that follow you. All four of its legs are
+white at the bottom, so it looks like it's wearing socks!
+~
+M
+0
+$n wags its tail.~
+M
+0
+$n wags its tail happily.~
+M
+0
+$n sniffs at your feet.~
+M
+0
+$n trots around in a circle.~
+M
+0
+$n tilts its head at you.~
+M
+0
+$n smiles with its tongue out.~
+M
+0
+$n's tongue hangs out as it pants.~
+M
+0
+$n barks.~
+M
+0
+$n chases its tail in a circle.~
+M
+0
+$n rolls around on the ground.~
+S
+#11947
+fox gray~
+the gray fox~
+A gray fox is sitting by the gate.
+~
+0 0 bdj n 3
+0 0 14 15
+D
+   The loyal fox isn't much larger than a cat, with an ashen-silver coat, a
+white belly, red fur in between, and large white spots on its back and nose. It
+has an adorable little pointed face with floppy ears and big, brown eyes that
+follow you.
+~
+S
+#11948
+Loern goblin~
+Loern~
+Beneath the stone, Loern kneels on a reed mat.
+~
+0 0 bd n 3
+1 0 0 15
+D
+   Except for the rare bow where he touches his head to the ground, you can
+hardly tell if Loern is meditating or sleeping. He kneels with his juniper-
+green robe splayed out around him, mere feet from the towering stone. Loern's
+head is entirely bald, with brown splotches on his dark green skin. He trembles
+a little bit when he pushes himself back up after each bow, but he never makes
+a noise.
+~
+S
+#11949
+Raek goblin~
+Raek~
+Raek is looking at everything.
+~
+0 0 d n 3
+1 0 0 15
+D
+   Raek's gray-green skin is lighter than most of the goblins here, and his
+hair is dirty blonde. He's on the short side, having not reached 4 feet tall,
+and he frequently steps to the edge of the walkway for a better view. He's
+dressed in a forest green robe that's a little too large, always draping behind
+him as he walks.
+~
+S
+#11950
+Ortimer goblin~
+Ortimer~
+Ortimer is laying on the higher bed.
+~
+0 0 bd n 3
+1 0 0 15
+D
+   Dressed in a green robe that nearly matches his moss-green skin, you suppose
+Ortimer would disappear into a forest or even tall grassland. At almost five
+feet tall and half as wide, he's large for a goblin, especially as he sprawls
+out on the small bed.
+~
+S
+#11951
+Meyina goblin~
+Meyina~
+Meyina sits by the fire.
+~
+0 0 bd n 3
+2 0 0 15
+D
+   Meyina stokes the fire with a piece of wood, then brushes ashes from her
+green gown. She's a heavy-set woman with a ruddy glow to the juniper skin of
+her cheeks. She makes little notice of you, but she looks back at Ortimer
+rather often.
+~
+S
+#11952
+Orkhan goblin boy~
+Orkhan~
+There's a boy sitting on one of the taller houses.
+~
+0 0 d n 3
+1 0 0 15
+D
+   Orkhan, a slight boy with verdant jade skin, is sitting on the edge of one
+of the taller houses with his spindly green legs hanging down, just watching
+people pass. He pays close attention to the people in green robes, but he
+watches others, too. His wild brown hair covers his head like a mop, so you're
+not sure how much he's seeing anyway.
+~
+S
+#11953
+Khoab goblin~
+Khoab~
+Khoab is snacking as he walks.
+~
+0 0 d n 3
+1 0 0 15
+D
+   Khoab has a sack of boiled clams tucked under his arm and every so often,
+he pulls a clam out, shucks it with a flat rock, and eats the meat inside, then
+unceremoniously chucks the shell over the side of the city. His jade green skin
+sparkles with bits of leftover clam as he's not very good at eating while
+walking. The meal has stained his purple tunic as well.
+~
+S
+#11954
+Zelen goblin~
+Zelen~
+Zelen is standing here.
+~
+0 0 d n 3
+1 0 0 15
+D
+   Zelen's bright green skin is all the brighter as he sweats in the sun. He
+seems to be enjoying the hot day, as he isn't seeking shade on the rooftops.
+He's dressed in a fine white shirt and purple trousers, with a pair of wooden
+shoes that clack as he walks.
+~
+S
+#11955
+Pimmi goblin~
+Pimmi~
+Pimmi is organizing the store room.
+~
+0 0 bd n 3
+2 0 0 15
+D
+   Pimmi's bright hazel eyes are undimmed by their place on her deeply creased,
+sagging, gray-green face. Her hair, so white as to be almost transparent, hangs
+down to her waist, which is sinched with a black belt between her lavender
+blouse and deep purple skirt. Her ears both have wide shell discs stretching
+the lobes, which hang down to her shoulders.
+~
+S
+#11956
+Elver worthy goblin~
+Elver the Worthy~
+Elver the Worthy stands in the center of the arena. (difficulty)
+~
+0 0 bdhD 0 3
+1 0 0 5
+D
+   Elver is on the small side, even for a goblin, nearly outsized by his own
+muscles as he stands there, shirtless, in the middle of the arena, the sun
+gleaming off his sweaty jade skin. He's wearing only quilted purple pants and
+a matching helmet, but it's the pair of stone hammers you should be worrying
+about.
+To fight Elver the Worthy, type: difficulty <Normal | Hard | Group | Boss>
+~
+I 4 11976 100.00 1  # LOOT: goblin trinkets
+I 4 11977 100.00 1  # LOOT: steamed mussels
+T 11973
+T 11808
+T 11809
+T 11810
+S
+#11957
+Nailbokh axe goblin~
+Nailbokh the Axe~
+Nailbokh the Axe stands in the center of the arena.
+~
+0 0 bdhD 0 3
+2 0 0 2
+D
+   Nailbokh drags her giant stone axe across the arena sand, drawing a line
+between you and her. She has muscles stacked on muscles; she's easily the
+biggest and most intimidating goblin here, with deep olive skin that shines
+like a diamond in the sun. Like Elver, she fights shirtless, wearing only
+padded blue pants that have been reinforced with wooden plates and a blue
+bandana that barely tames the frizzy black hair spilling out the sides.
+~
+I 4 11976 100.00 1  # LOOT: goblin trinkets
+I 4 11977 100.00 1  # LOOT: steamed mussels
+T 11973
+S
+#11958
+Biksi champion orka~
+Biksi, Champion of Orka~
+Biksi, Champion of Orka, stands in the center of the arena.
+~
+0 0 bdhD 0 3
+2 0 0 7
+D
+   The Champion of Orka stands in the center of the arena, readying a pair of
+nasty-looking thorned whips. Like Elver and Nailbokh, she fights shirtless. She
+wears many layers of purple skirts around her waist, making it hard to see even
+the largest movements of her legs. The sun shimmers off of her sweaty
+pear-green skin as she moves, creating a dazzling display.
+~
+I 4 11965 100.00 1  # LOOT: jade tear of Gobbrabakh of Orka
+I 4 11977 100.00 1  # LOOT: steamed mussels
+I 4 11899 100.00 1  # LOOT: piece of rough-cut blue jade
+I 4 11976 100.00 1  # LOOT: goblin trinkets
+T 11973
+S
+#11959
+sheila page~
+Page Sheila~
+Sheila is bustling about, getting things in order.
+~
+0 0 dvxA n 3
+2 0 0 15
+D
+   Sheila is dressed in a plain jute robe, like all the pages in the tower. She
+has dyed her fingertip-short black hair with a streak of lavender that stands
+out in stark contrast to her dark brown skin. She doesn't spare a single glance
+in your direction as she stays focused on her work.
+~
+S
+#11960
+cabinet filing~
+the filing cabinet~
+A filing cabinet is standing here.
+~
+50 50 dh G 2
+0 0 15 5
+D
+   The wooden cabinet is mahogany, stained with a slight violet tinge, with
+three sliding drawers that clatter open and shut as it hops along. Though it
+has no arms, it seems capable of just enough magic to clean up the files that
+have been strewn about.
+   Ametnik was young when he came to Skycleave to study as an apprentice,
+though he showed promise from a young age. But he was quicker to learn spells
+than perform them, and in the end, he was a disappointment to them.
+~
+M
+0
+The filing cabinet opens its bottom draw and makes a clicking sound, and a couple of papers whoosh up into it.~
+M
+0
+The filing cabinet hops along.~
+M
+0
+The filing cabinet bends forward and a sheet of paper leaps into its top drawer.~
+M
+0
+The filing cabinet clatters its drawers.~
+M
+0
+The filing cabinet bumps into some furniture and tips over. It uses its drawers to push itself upright again.~
+M
+0
+You yelp as the filing cabinet accidentally hops onto your foot.~
+M
+0
+The filing cabinet sounds like it's crying in the corner.~
+T 11902
+T 11904
+T 11934
+S
+#11961
+bookshelf shelf ebony~
+the bookshelf~
+An ebony bookshelf is standing here.
+~
+50 50 dh G 3
+0 0 15 5
+D
+   The bookshelf is made from dark ebony wood with striped calamander accents
+on the front. It's taller than you, and wider, and looks quite heavy. The floor
+creakes as the bookshelf waddles along on four short, square feet.
+   Apprentice Boghylda spent most of her time tucked away in the mage quarters,
+reading. When she emerged, it was often carrying a stack of books so high that
+one could barely see her face. She often missed class, to be found wormed away
+in a book.
+~
+M
+0
+The bookshelf waddles past you.~
+M
+0
+The bookshelf shakes itself to straighten the books.~
+M
+0
+The bookshelf seems to whimper when it thinks you aren't looking.~
+M
+0
+The bookshelf falls foward onto a book with a THUD! When it gets back up, the book is on one of the shelves.~
+M
+0
+The bookshelf falls foward onto a book with a THUD! When it gets back up, the book is on one of the shelves.~
+M
+0
+The bookshelf falls foward onto a book with a THUD! When it gets back up, the book is on one of the shelves.~
+T 11902
+T 11904
+T 11934
+S
+#11962
+thorley apprentice~
+Apprentice Thorley~
+Apprentice Thorley is leaning against the wall.
+~
+0 0 dvxA n 3
+1 0 0 15
+D
+   Thorley is a young apprentice, not more than fourteen by the look of him.
+He's tall but scrawny, with sharp cheekbones and pale gray eyes. His brown hair
+falls over his ears and eyes like a mop. He's dressed in a fresh white
+apprentice robe with a black margin.
+~
+S
+#11964
+celiya high sorcerer~
+High Sorcerer Celiya~
+High Sorcerer Celiya is rushing from task to task.
+~
+0 0 dvxA n 3
+2 0 0 15
+D
+   Celiya strikes an elegant figure in robes of violet, lavender, lilac, and
+azure; with a cloud-like halo of gray hair surrounding her rounded, brown face.
+A trio of blue gems hovers beneath each of her ears and she wears a nocturnium
+stud on the right side of her short, rounded nose.
+~
+S
+#11965
+trolley cleaning~
+the cleaning trolley~
+A cleaning trolley is parked in the middle of the office.
+~
+0 0 bdvxA n 3
+0 0 0 15
+D
+   The little trolley is equipped with a bucket and mob, some sponges, a large
+wastebin, a broom, and various other supplies. Nobody seems to be using it at
+the moment. Instead, the various components of the trolley seem to come to life
+on their own.
+   Cleaning a tower as large as Skycleave is an odious task that students would
+go to great lengths to avoid. Fortunately, custodial work is only the fate of
+the most disappointing among them.
+~
+T 11902
+T 11904
+S
+#11966
+Grace sorcerer assistant~
+Grace~
+The sorcerer's assistant, Grace, is sorting papers.
+~
+0 0 bdvxA n 3
+2 0 0 15
+D
+   Grace, with her white hair up in a high beehive and her blue witchglass
+spectacles and her high-waisted dress, looks like a relic of an earlier era.
+The she's short, she tilts her head back in order to look down at you through
+the base of her glasses as you enter. She makes a small gesture of approval
+with her lips and then goes back to what she was doing.
+~
+S
+#11967
+barrosh high sorcerer~
+Barrosh~
+High Sorcerer Barrosh sits with his head in his hands.
+~
+0 0 bdvxA n 3
+1 0 0 15
+D
+   Barrosh has shed his violet high sorcerer robes in the corner and now sits
+only in his wool braies. The forward posture, with his head in his hands, is
+unflattering to his figure as his middle-aged body, though not fat, pudges and
+plumps at the sides. He doesn't even look up at you -- you aren't sure he's
+even aware you're here.
+~
+S
+#11968
+knezz grand high sorcerer~
+Grand High Sorcerer Knezz~
+Grand High Sorcerer Knezz is standing here.
+~
+0 0 dvxA n 3
+1 0 0 15
+D
+   Knezz has the characteristic long, unkempt salt-and-pepper hair and beard
+sported by many a powerful sorcerer who spent more time over a book than a wash
+basin. The long years hang off his face. Between his bushy eyebrows and thick
+crescent glasses, his eyes have the milky blue color of age. He stands tall
+despite it, in violet and gold robes, with two nocturnium studs in his ear and
+several nocturnium beads in his beard. If he carries anything else on his
+person, it's covered by the robes.
+~
+S
+#11969
+celiya grand high sorcerer~
+Grand High Sorcerer Celiya~
+Grand High Sorcerer Celiya is here.
+~
+0 0 dvxA n 3
+2 0 0 15
+D
+   Grand High Sorcerer Celiya strikes an elegant figure in robes of gold,
+violet, lavender, and lilac. She has dyed a pair of stripes in black and gold
+in the cloud of gray hair surrounding her rounded, brown face. A trio of violet
+gems hovers beneath each of her ears and she wears a nocturnium stud on the
+right side of her short, rounded nose.
+~
+S
+#11970
+Niamh acting high sorcerer~
+Acting High Sorcerer Niamh~
+Acting High Sorcerer Niamh is standing here.
+~
+0 0 dvxA n 3
+2 0 0 15
+D
+   Niamh's black hair shows fiery red roots as she stoops to pick up a book.
+Her pale face and hands stick out in stark contrast to her dark purple and
+black robes. She looks rather young compared to many of the sorcerers here.
+~
+S
+#11972
+crowd~
+the crowd~
+A crowd has gathered on the adjoining rooftops.
+~
+0 0 bd n 3
+0 0 0 15
+D
+   A crowd of eager goblins has gathered on the rooftops that overlook the
+arena. Some are eating clams, others chit-chatting, still others just patiently
+waiting to see the combat.
+~
+S
+#11973
+Broker captain guard goblin~
+Captain Broker~
+Captain Broker is doing the rounds.
+~
+0 0 bd n 3
+1 0 0 15
+D
+   Broker is clad in a purple quilted cloth doublet that gives him an almost
+rotund look. If it's armor, it appears ceremonial. He wears brown pants and
+wooden shoes that clack as he walks. Over his left shoulder, a thrice-coiled
+purple rope signifies his station as captain of the guard. A small, iridescent
+seashell disc fills a pierced hole in the left side of his nose.
+~
+T 11989
+S
+#11974
+Celles voice goblin~
+Celles~
+Celles, Voice of Orka, stands before the stone.
+~
+0 0 bd n 3
+2 0 0 15
+D
+   With long, straight, translucent white hair that flows over her deep purple
+robe, Celles looks to be the oldest goblin in the city. Her skin, perhaps
+chartreuse once, has faded almost to gray. Her eyes are milky white to match
+her hair, and she stares off toward the horizon as she speaks.
+~
+S
+#11975
+Filliks goblin~
+Filliks~
+On the lower bed, Filliks is mending some socks.
+~
+0 0 bd n 3
+2 0 0 15
+D
+   Though she's small even for a goblin, Filliks has an old woman's fine white
+hair, which she keeps in a thick braid. Her face droops in concentration as she
+forces her stiff fingers to pass a bone needle back and forth through a sock to
+close a hole.
+   Filliks looks comfortable on the platform bed, though the bed itself doesn't
+resemble your version of comfort. She is dressed in a simple green gown that
+covers her feet even as she reclines.
+~
+S
+#11976
+Pim goblin~
+Pim~
+Pim is tidying up.
+~
+0 0 bd n 3
+2 0 0 15
+D
+   Pim wears a pleated purple skirt and a gray blouse. Two large white shell
+discs stretch her chartreuse earlobes into thin bands, and a small cylindrical
+stone pierces the bridge of her nose. Futile though it may be, she is busy
+collecting the clutter and sorting it into baskets.
+~
+S
+#11977
+fox gray~
+the gray fox~
+A gray fox is sitting by the oven.
+~
+0 0 bdj n 3
+0 0 14 15
+D
+   The curious fox isn't much larger than a cat, with an ashen-silver coat, a
+white belly, and red fur in between. The tip of its tail is white, and it has a
+little white star on its forehead. It has an adorable little pointed face with
+floppy ears and big, brown eyes that follow you.
+~
+M
+0
+$n wags its tail.~
+M
+0
+$n wags its tail happily.~
+M
+0
+$n sniffs at your feet.~
+M
+0
+$n trots around in a circle.~
+M
+0
+$n tilts its head at you.~
+M
+0
+$n smiles with its tongue out.~
+M
+0
+$n's tongue hangs out as it pants.~
+M
+0
+$n barks.~
+M
+0
+$n chases its tail in a circle.~
+M
+0
+$n rolls around on the ground.~
+S
+#11978
+moth~
+the moth~
+There is a moth on the wall.
+~
+1 1 bdj mn 3
+0 0 2 15
+D
+   The small moth sits motionless on the wall, its silvery wings folded down in
+a triangular shape on its back.
+~
+S
+#11979
+pilgrim altar~
+an altar pilgrim~
+A pilgrim is here.
+~
+0 0 bd n 3
+0 0 0 15
+D
+   This NPC is loaded and renamed dynamically as part of the scenery for the
+Altar Below.
+~
+T 11978
+S
+#11980
+Ryken elder goblin~
+Ryken the Elder~
+Ryken the Elder is on his knees in front of one of the bodies.
+~
+0 0 bd n 3
+1 0 0 15
+D
+   You can hear Ryken's bones creaking as he moves. He's an old man, surely not
+far from one of these shelves himself. His gray hair, what's left of it, is
+pulled into a knot at the back of his head. His drooping nose has a hole in the
+side that might once have held jewelry, but he wears only a necklace made from
+shell beads over his violet tunic and pants.
+~
+S
+#11981
+crowd~
+the crowd~
+There is a large crowd of people around the plaza.
+~
+0 0 bd n 3
+0 0 0 15
+D
+   The plaza is a sea of green, with dozens of goblins, many of whom are
+sitting on the edges of taller homes around the plaza in order to see the
+entertainment. Others are merely passing through, but have stopped to talk. The
+click-clack of their shoes creates its own din as they walk, almost louder than
+the gossip as it fills the air.
+~
+S
+#11982
+pixy little~
+the little pixy~
+A little pixy is fluttering about.
+~
+1 1 bdoD mn 1
+0 0 2 15
+D
+   When it moves, this little pixy is little more than a flutter of silvery
+light. But when it lands for a moment, you can see it's a tiny person, with its
+wings folded down on its back like a moth. It cuts a crooked grin as it looks
+up at you, raises one of its high-arching eyebrows, and flies up toward you in
+a half-hearted attack that barely tingles.
+~
+M
+0
+$n flutters about.~
+M
+0
+$n tries to fly away, but can't seem to leave.~
+M
+0
+$n whirls around your head.~
+M
+0
+$n pelts you with pebbles.~
+M
+0
+$n glows and shimmers in the light as $e flies around.~
+M
+0
+$n zips around your head.~
+M
+0
+$n vanishes into thin air, only to reappear nearby!~
+M
+0
+$n flutters about.~
+S
+#11983
+Ryke goblin~
+Ryke~
+Ryke is out for a walk.
+~
+0 0 d n 3
+1 0 0 15
+D
+   Ryke strolls along at a leisurely pace, looking at everyone he passes, and
+casting the occasional smile. He's young, tall (for a goblin), and his skin
+glows a healthy jade tone in the midday sun. He's dressed in fine black pants,
+a violet shirt, and a black vest. But curiously, he's barefoot and seems
+happier for it.
+~
+S
+#11984
+Yena goblin~
+Yena~
+Yena is standing here.
+~
+0 0 d n 3
+2 0 0 15
+D
+   Yena is young, with fair chartreuse skin and long, straight, brown hair tied
+up in a thick braid. She's dressed in a simple green gown that drapes to the
+ground, covering her legs and feet completely. Around her neck, she wears a
+string of iridescent shell beads.
+~
+S
+#11985
+Ballen goblin~
+Ballen~
+Ballen is out for a stroll.
+~
+0 0 d n 3
+1 0 0 15
+D
+   Though he just seems to be out for a walk, Ballen seems to be sight-seeing
+as he constantly stops to take in the view, whether of the ocean, the city, or
+the great standing stone. He wears a plain green robe, nearly the same color as
+his jade skin.
+~
+S
+#11986
+Orkonna goblin~
+Orkonna~
+Orkonna is stirring one of the cauldrons.
+~
+0 0 bd n 3
+2 0 0 15
+D
+   Orkonna is big, for a goblin, both in height and in weight. Her head is
+shaved bald and she wears a messy gray smock over a purple blouse and skirt.
+In both ears, she wears large abalone shell discs that stretch her earlobes
+larger than your palm. She expertly wields a long wooden spoon as she churns
+the shellfish in the cauldron.
+~
+S
+#11987
+Orlin goblin repairman~
+Orlin~
+A repairman is working on the damage.
+~
+0 0 bd n 3
+1 0 0 15
+D
+   Orlan's jade skin glistens in the sun as he works, shirtless, on repairing
+the damaged rooftop walkway. He's wearing only his deep purple pants; his gray
+shirt is draped over a damaged roof beam. He has a set of tools laid out next
+to him including a stone hammer, a bone hammer, a wooden mallet, several stone
+chisels, and some bits and bobs you don't recognize.
+~
+M
+0
+$n hammers a peg into a wooden beam.~
+M
+0
+$n chisels a hole in a beam.~
+M
+0
+$n hammers loudly as $e works.~
+M
+0
+$n hums a little tune as $e works.~
+M
+1
+This won't take long. It will be open again tomorrow.~
+M
+1
+Watch your step around that edge!~
+S
+#11988
+guards pair~
+the guards~
+A pair of guards stand at attention inside the gate.
+~
+0 0 bd n 3
+1 0 0 15
+D
+   Both of the little green men are wearing quilted armor in deep purple and
+armed with halberds as they stand watch. On the left, the older man has a faded
+olive complexion and a bald head. On the right, the other guard looks much
+younger, with an unlined face, short orange hair, and a face the color of
+dewy clovers.
+~
+S
+#11989
+shoes walking pair~
+a pair of walking shoes~
+A pair of walking shoes is here.
+~
+1 1 bdoD n 1
+0 0 0 15
+D
+mini-pet
+tba
+~
+S
+#11990
+wand liberated~
+the liberated wand~
+A liberated wand swishes and flicks in the air.
+~
+1 1 bdoD n 1
+0 0 27 15
+D
+   The wand has freed itself of its master and now makes its own decisions,
+floating free of any master. Still, it seems to have found someone it likes to
+follow, and it does so loyally. The wand is made from a thin hazel branch. The
+handle is intricately carved with many tiny keys, each slightly different,
+while the business end of the wand is uncarved and unfinished.
+   Since the early days, wise men and women have known of the power that grows
+in wood as it taps mana hidden deep beneath the world. A living tree is a
+conduit for natural magic; a cut tree, properly prepared, can do the same for
+the more civilized uses of mana.
+~
+T 11990
+S
+#11991
+toaster brave little~
+a brave little toaster~
+A liberated wand floats here.
+~
+1 1 bdoD n 1
+0 0 15 15
+D
+mini-pet
+tba
+~
+S
+#11992
+lamp hopping~
+a hopping lamp~
+A hopping lamp is here.
+~
+1 1 bdoD n 1
+0 0 15 15
+D
+mini-pet
+tba
+~
+S
+#11993
+cloak clingy fancy~
+the clingy cloak~
+A fancy cloak is floating here.
+~
+1 1 bdoD n 1
+0 0 27 15
+D
+   This pet will transform itself into a cloak worn by someone in the room, at
+random. Please add some good echoes to its custom strings as it attempts to
+wrap itself around people.
+Also update the look description of obj 11993 to match.
+~
+T 11993
+S
+#11994
+footstool loyal stool~
+the loyal footstool~
+A loyal footstool is hopping around.
+~
+1 1 bdoD n 1
+0 0 0 15
+D
+   The footstool is a plus little square with deep purple fabric and mahogany
+legs. The corners are set with little tassles that wave as it hops around like
+a dog. This could be the perfect pet.
+   Though the Tower Skycleave has acquired a reputation for frightening magical
+experiments, and deservedly so, it's very unlikely that the footstool's
+resemblance to a dog comes from it actually being a transmogrified dog. It's
+far more likely to be a former student.
+~
+M
+0
+$n hops along beside you.~
+M
+0
+$n runs around in circles.~
+M
+0
+$n seems to chase its tassles.~
+M
+0
+$n sits down for a moment to rest.~
+M
+0
+$n rolls over and gets its cushion all dirty.~
+M
+0
+$n scampers up to you.~
+M
+0
+$n wags its tassles.~
+M
+0
+$n leaps up into the air and, upon landing, dashes in a circle.~
+S
+#11995
+mirror complimentary complementary~
+a complimentary mirror~
+A complimentary mirror is floating here.
+~
+1 1 bdoD n 1
+0 0 27 15
+D
+mini-pet
+tba
+~
+S
+#11996
+teapot pot piping~
+a piping teapot~
+A piping teapot is here.
+~
+1 1 bdoD n 1
+0 0 15 15
+D
+mini-pet
+tba
+~
+S
+#11997
+fan adoring~
+the adoring fan~
+An adoring fan is floating here.
+~
+1 1 bdoD n 1
+0 0 27 15
+D
+   This pretty little folded paper fan wafts around in the air, stopping on
+occasion to flatter or cool someone. A stylized wizard's tower is painted on
+the fan, although you can only see it when the fan is fully opened.
+   Skycleave's magichanical tinkerers first created these fans during a
+devastating summer heatwave. But when summer ended, a particularly punny
+sorcerer upgraded the fans to dispense more than just cool air.
+~
+T 11997
+S
+#11998
+hat singing~
+a singing hat~
+A singing hat is sitting on the ground.
+~
+1 1 bdoD n 1
+0 0 15 15
+D
+mini-pet
+tba
+~
+S
+#11999
+ball crystal~
+a crystal ball~
+A crystal ball is sitting on the ground.
+~
+1 1 bdoD n 1
+0 0 21 15
+D
+The crystal ball shows you fantastic things when you look at it.
+(You should see its scripted text instead.)
+~
+T 11999
+S
+$

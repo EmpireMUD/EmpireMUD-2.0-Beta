@@ -974,17 +974,17 @@ typedef struct vehicle_data vehicle_data;
 #define AFF_HIDE  BIT(4)	// e. Char is hidden
 #define AFF_CHARM  BIT(5)	// f. Char is charmed
 #define AFF_INVISIBLE  BIT(6)	// g. Char is invisible
-#define AFF_IMMUNE_BATTLE  BIT(7)	// h. Immunity to Battle debuffs
+#define AFF_IMMUNE_PHYSICAL_DEBUFFS  BIT(7)	// h. Immunity to 'physical' debuffs
 #define AFF_SENSE_HIDE  BIT(8)	// i. See hidden people
 #define AFF_IMMUNE_PHYSICAL  BIT(9)	// j. Immune to physical damage
 #define AFF_NO_TARGET_IN_ROOM  BIT(10)	// k. no-target
 #define AFF_NO_SEE_IN_ROOM  BIT(11)	// l. don't see on look
 #define AFF_FLY  BIT(12)	// m. person can fly
 #define AFF_NO_ATTACK  BIT(13)	// n. can't be attacked
-#define AFF_IMMUNE_HIGH_SORCERY  BIT(14)	// o. immune to high sorcery debuffs
-#define AFF_DISARM  BIT(15)	// p. disarmed
+#define AFF_IMMUNE_MAGICAL_DEBUFFS  BIT(14)	// o. immune to 'magical' debuffs
+#define AFF_DISARMED  BIT(15)	// p. disarmed
 #define AFF_HASTE  BIT(16)	// q. haste: attacks faster
-#define AFF_ENTANGLED  BIT(17)	// r. entangled: can't move
+#define AFF_IMMOBILIZED  BIT(17)	// r. immobilized: can't move (entangled)
 #define AFF_SLOW  BIT(18)	// s. slow (how great did that work out)
 #define AFF_STUNNED  BIT(19)	// t. stunned/unable to act
 #define AFF_STONED  BIT(20)	// u. trippy effects
@@ -994,9 +994,9 @@ typedef struct vehicle_data vehicle_data;
 #define AFF_EARTHMELD  BIT(24)	// y. interred in the earth
 #define AFF_MUMMIFY  BIT(25)	// z. mummified
 #define AFF_SOULMASK  BIT(26)	// A. soulmask
-#define AFF_IMMUNE_NATURAL_MAGIC  BIT(27)	// B. immune to natural magic debuffs
-#define AFF_IMMUNE_STEALTH  BIT(28)	// C. Immune to stealth debuffs
-#define AFF_IMMUNE_VAMPIRE  BIT(29)	// D. Immune to vampire debuffs
+	#define AFF_UNUSED  BIT(27)	// B. formerly !natural-magic
+#define AFF_IMMUNE_POISON_DEBUFFS  BIT(28)	// C. Immune to any 'poison' debuffs
+#define AFF_IMMUNE_MENTAL_DEBUFFS  BIT(29)	// D. Immune to any 'mental' debuffs
 #define AFF_IMMUNE_STUN  BIT(30)	// E. Cannot be hit by stun effects
 #define AFF_ORDERED  BIT(31)	// F. Has been issued an order from a player
 #define AFF_NO_DRINK_BLOOD  BIT(32)	// G. Vampires can't bite or sire
@@ -2284,7 +2284,7 @@ typedef enum {
 #define PRF_NO_CHANNEL_JOINS  BIT(15)	// Won't wee channel joins
 #define PRF_AUTOKILL  BIT(16)	// Stops from knocking players out
 #define PRF_SCROLLING  BIT(17)	// Turns off page_string
-#define PRF_BRIEF  BIT(18)	// Cuts map size, removes room descs
+#define PRF_NO_ROOM_DESCS  BIT(18)	// Removes room descs; formerly 'brief'
 #define PRF_BOTHERABLE  BIT(19)	// allows bite, purify, feed, etc
 #define PRF_AUTORECALL  BIT(20)	// free recall when logged off too long
 #define PRF_NOGODNET  BIT(21)	// Can't hear godnet
@@ -2307,6 +2307,7 @@ typedef enum {
 #define PRF_ITEM_QUALITY  BIT(38)	// shows loot quality color/tag in inv/eq
 #define PRF_ITEM_DETAILS  BIT(39)	// shows additional item details on inv/eq
 #define PRF_NO_EXITS  BIT(40)	// hides exits on look and auto-look
+#define PRF_SHORT_EXITS  BIT(41)	// shows circlemud-style exits
 // note: if you add prefs, consider adding them to alt_import_preferences()
 
 
@@ -6102,6 +6103,8 @@ struct reset_com {
 	long long arg1;
 	long long arg2;	// Arguments to the command
 	long long arg3;
+	long long arg4;
+	long long arg5;
 
 	char *sarg1;	// string argument
 	char *sarg2;	// string argument

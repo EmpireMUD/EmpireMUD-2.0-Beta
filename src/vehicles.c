@@ -4102,8 +4102,7 @@ void look_at_vehicle(vehicle_data *veh, char_data *ch) {
 	proto = vehicle_proto(VEH_VNUM(veh));
 	
 	if (VEH_LOOK_DESC(veh) && *VEH_LOOK_DESC(veh)) {
-		sprintf(lbuf, "%s:\r\n%s", VEH_SHORT_DESC(veh), VEH_LOOK_DESC(veh));
-		msg_to_char(ch, "%s", CAP(lbuf));
+		msg_to_char(ch, "You look at %s:\r\n%s", VEH_SHORT_DESC(veh), VEH_LOOK_DESC(veh));
 	}
 	else {
 		act("You look at $V but see nothing special.", FALSE, ch, NULL, veh, TO_CHAR);

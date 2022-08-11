@@ -183,9 +183,9 @@ Tranc combat~
 wait 10
 * If dog summoned, tank
 if %self.varexists(hound)%
-  if !%actor.aff_flagged(DISARM)%
+  if !%actor.aff_flagged(DISARMED)%
     %echo% ~%self% disarms ~%actor%!
-    dg_affect #3018 %actor% DISARM on 15
+    dg_affect #3018 %actor% DISARMED on 15
   elseif %self.health% < (%self.maxhealth% / 2)
     %echo% Tranc quaffs a potion!
     %heal% %self% health 50

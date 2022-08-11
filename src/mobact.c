@@ -119,7 +119,7 @@ bool return_to_pursuit_location(char_data *ch) {
 	struct pursuit_data *purs, *next_purs;
 	room_data *loc;
 	
-	if (!ch || ch->desc || !IS_NPC(ch) || FIGHTING(ch) || GET_POS(ch) < POS_STANDING || AFF_FLAGGED(ch, AFF_ENTANGLED) || MOB_PURSUIT_LEASH_LOC(ch) == NOWHERE) {
+	if (!ch || ch->desc || !IS_NPC(ch) || FIGHTING(ch) || GET_POS(ch) < POS_STANDING || AFF_FLAGGED(ch, AFF_IMMOBILIZED) || MOB_PURSUIT_LEASH_LOC(ch) == NOWHERE) {
 		return FALSE;
 	}
 	
@@ -522,7 +522,7 @@ bool check_mob_pursuit(char_data *ch) {
 		}
 	}	// end iteration
 	
-	if (found && (dir != NO_DIR || track_to_room != NOWHERE) && !AFF_FLAGGED(ch, AFF_CHARM | AFF_ENTANGLED)) {
+	if (found && (dir != NO_DIR || track_to_room != NOWHERE) && !AFF_FLAGGED(ch, AFF_CHARM | AFF_IMMOBILIZED)) {
 		if (track_to_room && find_portal_in_room_targetting(IN_ROOM(ch), track_to_room)) {
 			perform_move(ch, NO_DIR, real_room(track_to_room), MOVE_ENTER_PORTAL | MOVE_WANDER);
 			moved = TRUE;
@@ -694,7 +694,12 @@ bool try_mobile_movement(char_data *ch) {
 	}
 	
 	// pick a random direction
-	dir = number(-1, NUM_2D_DIRS-1);
+	if (IS_OUTDOORS(ch) && !IS_ADVENTURE_ROOM(IN_ROOM(ch))) {
+		dir = number(-1, NUM_2D_DIRS-1);
+	}
+	else {
+		dir = number(-1, NUM_NATURAL_DIRS-1);
+	}
 	
 	// -1 will attempt to enter/exit a vehicle instead
 	if (dir == -1 && ROOM_CAN_EXIT(IN_ROOM(ch)) && (!GET_ROOM_VEHICLE(IN_ROOM(ch)) || VEH_FLAGGED(GET_ROOM_VEHICLE(IN_ROOM(ch)), VEH_BUILDING))) {
@@ -793,7 +798,7 @@ void run_mobile_activity(char_data *ch) {
 	}
 	
 	// 2. try a basic move
-	if (!moved && !MOB_FLAGGED(ch, MOB_SENTINEL | MOB_TIED) && !AFF_FLAGGED(ch, AFF_CHARM | AFF_ENTANGLED) && GET_POS(ch) == POS_STANDING && (!GET_LEADER(ch) || IN_ROOM(ch) != IN_ROOM(GET_LEADER(ch))) && (!MOB_FLAGGED(ch, MOB_PURSUE) || !MOB_PURSUIT(ch))) {
+	if (!moved && !MOB_FLAGGED(ch, MOB_SENTINEL | MOB_TIED) && !AFF_FLAGGED(ch, AFF_CHARM | AFF_IMMOBILIZED) && GET_POS(ch) == POS_STANDING && (!GET_LEADER(ch) || IN_ROOM(ch) != IN_ROOM(GET_LEADER(ch))) && (!MOB_FLAGGED(ch, MOB_PURSUE) || !MOB_PURSUIT(ch))) {
 		moved = try_mobile_movement(ch);
 	}
 
@@ -951,7 +956,7 @@ void run_mob_echoes(void) {
 		// now find a mob with a valid message
 		DL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), mob, next_in_room) {
 			// things that disqualify the mob
-			if (mob->desc || !IS_NPC(mob) || IS_DEAD(mob) || EXTRACTED(mob) || FIGHTING(mob) || !AWAKE(mob) || MOB_FLAGGED(mob, MOB_TIED | MOB_SILENT) || IS_INJURED(mob, INJ_TIED) || GET_LED_BY(mob) || GET_FED_ON_BY(mob) || AFF_FLAGGED(mob, AFF_STUNNED | AFF_HARD_STUNNED | AFF_ENTANGLED)) {
+			if (mob->desc || !IS_NPC(mob) || IS_DEAD(mob) || EXTRACTED(mob) || FIGHTING(mob) || !AWAKE(mob) || MOB_FLAGGED(mob, MOB_TIED | MOB_SILENT) || IS_INJURED(mob, INJ_TIED) || GET_LED_BY(mob) || GET_FED_ON_BY(mob) || AFF_FLAGGED(mob, AFF_STUNNED | AFF_HARD_STUNNED | AFF_IMMOBILIZED)) {
 				continue;
 			}
 			

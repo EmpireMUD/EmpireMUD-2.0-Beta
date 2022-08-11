@@ -260,7 +260,7 @@ switch %random.4%
       dg_affect #18509 %actor% HARD-STUNNED on 10
       %send% %actor% |%self% powerful blow sends your weapon flying!
       %echoaround% %actor% |%self% powerful blow sends |%actor% weapon flying!
-      dg_affect #18510 %actor% DISARM on 30
+      dg_affect #18510 %actor% DISARMED on 30
     else
       %damage% %actor% 75 physical
       dg_affect #18509 %actor% STUNNED on 5
@@ -353,7 +353,7 @@ switch %random.4%
     set person %self.room.people%
     while %person%
       if %self.is_enemy(%person%)%
-        dg_affect #18513 %person% DISARM on 15
+        dg_affect #18513 %person% DISARMED on 15
       end
       set person %person.next_in_room%
     done

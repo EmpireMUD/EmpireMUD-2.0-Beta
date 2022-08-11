@@ -1,0 +1,62 @@
+#11900
+Skycleave Skystones~
+5 0
+0 0 0 0
+T0
+skystone~
+T1
+skystones~
+S
+#11902
+Skycleaver Coffee~
+1 0
+-24 1 2 0
+T0
+skycleaver coffee~
+T1
+milky brown~
+S
+#11903
+Skycleaver Wine~
+1 0
+8 0 8 0
+T0
+vintage skycleaver violet wine~
+T1
+deep violet~
+S
+#11909
+skycleaver trinket~
+3 0
+0 0 0 0
+T0
+Your skycleaver trinket is no longer depleted.~
+S
+#11921
+Violet Tea~
+1 0
+-4 0 2 0
+T0
+violet tea~
+T1
+swirling violet~
+S
+#11936
+cursed~
+4 0
+0 0 0 0
+T0
+The curse fades.~
+T2
+The spirit passes through you... you are cursed!~
+T3
+The spirit passes through $n, who glows briefly.~
+S
+#11990
+wand glow~
+4 0
+0 0 0 0
+T0
+The glow around you fades.~
+S
+$

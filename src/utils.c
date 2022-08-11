@@ -2598,6 +2598,9 @@ void change_sex(char_data *ch, int sex) {
 	}
 	
 	// the change
+	if (sex != GET_REAL_SEX(ch)) {
+		ch->customized = TRUE;
+	}
 	GET_REAL_SEX(ch) = sex;
 	
 	// update companion data

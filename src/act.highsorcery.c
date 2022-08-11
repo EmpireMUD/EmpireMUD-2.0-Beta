@@ -710,7 +710,7 @@ ACMD(do_colorburst) {
 	}
 	
 	// counterspell??
-	if (trigger_counterspell(vict) || AFF_FLAGGED(vict, AFF_IMMUNE_HIGH_SORCERY)) {
+	if (trigger_counterspell(vict) || AFF_FLAGGED(vict, AFF_IMMUNE_MAGICAL_DEBUFFS)) {
 		act("You fire a burst of color at $N, but $E deflects it!", FALSE, ch, NULL, vict, TO_CHAR);
 		act("$n fires a burst of color at you, but it's deflected by your counterspell!", FALSE, ch, NULL, vict, TO_VICT);
 		act("$n fires a burst of color at $N, but $E deflects it.", FALSE, ch, NULL, vict, TO_NOTVICT);
@@ -915,7 +915,7 @@ ACMD(do_enervate) {
 	}
 	
 	// counterspell??
-	if (trigger_counterspell(vict) || AFF_FLAGGED(vict, AFF_IMMUNE_HIGH_SORCERY)) {
+	if (trigger_counterspell(vict) || AFF_FLAGGED(vict, AFF_IMMUNE_MAGICAL_DEBUFFS)) {
 		act("You attempt to hex $N with enervate, but it fails!", FALSE, ch, NULL, vict, TO_CHAR);
 		act("$n attempts to hex you with enervate, but it's deflected by your counterspell!", FALSE, ch, NULL, vict, TO_VICT);
 		act("$n attempts to hex $N with enervate, but it fails!", FALSE, ch, NULL, vict, TO_NOTVICT);
@@ -1266,7 +1266,7 @@ ACMD(do_siphon) {
 	}
 	
 	// counterspell??
-	if (trigger_counterspell(vict) || AFF_FLAGGED(vict, AFF_IMMUNE_HIGH_SORCERY)) {
+	if (trigger_counterspell(vict) || AFF_FLAGGED(vict, AFF_IMMUNE_MAGICAL_DEBUFFS)) {
 		act("You try to siphon mana from $N, but are deflected by a counterspell!", FALSE, ch, NULL, vict, TO_CHAR);
 		act("$n tries to siphon mana from you, but it's deflected by your counterspell!", FALSE, ch, NULL, vict, TO_VICT);
 		act("$n tries to siphon mana from $N, but it fails!", FALSE, ch, NULL, vict, TO_NOTVICT);
@@ -1336,7 +1336,7 @@ ACMD(do_slow) {
 	}
 	
 	// counterspell??
-	if (trigger_counterspell(vict) || AFF_FLAGGED(vict, AFF_IMMUNE_HIGH_SORCERY)) {
+	if (trigger_counterspell(vict) || AFF_FLAGGED(vict, AFF_IMMUNE_MAGICAL_DEBUFFS)) {
 		act("You try to use a slow hex on $N, but $E deflects it!", FALSE, ch, NULL, vict, TO_CHAR);
 		act("$n tries to hex you, but it's deflected by your counterspell!", FALSE, ch, NULL, vict, TO_VICT);
 		act("$n tries to hex $N, but $E deflects it.", FALSE, ch, NULL, vict, TO_NOTVICT);
@@ -1570,6 +1570,11 @@ RITUAL_SETUP_FUNC(start_ritual_of_teleportation) {
 	
 	if (!*argument) {
 		// random!
+		if (RMT_FLAGGED(IN_ROOM(ch), RMT_NO_LOCATION)) {
+			msg_to_char(ch, "You can't teleport out of here.\r\n");
+			return FALSE;
+		}
+		// ok:
 		subtype = NOWHERE;
 	}
 	else if (!str_cmp(argument, "home")) {
