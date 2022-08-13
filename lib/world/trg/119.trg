@@ -312,19 +312,19 @@ else
   end
 end
 * Chance for rare reward
-if %random.100% <= 2
-  set vnum 11992
-  %load% obj %vnum% %actor%
-  set obj %actor.inventory%
-  if %obj.vnum% != %vnum%
-    * Uh-oh.
-    %echo% Something went horribly wrong while granting a reward. Please bug-report this error.
-    halt
-  else
-    %send% %actor% It's your lucky day! You also win '%obj.shortdesc%'!
-    %echoaround% %actor% ~%actor% has won '%obj.shortdesc%'!
-  end
-end
+* if %random.100% <= 1
+*   set vnum 11992
+*   %load% obj %vnum% %actor%
+*   set obj %actor.inventory%
+*   if %obj.vnum% != %vnum%
+*     * Uh-oh.
+*     %echo% Something went horribly wrong while granting a reward. Please bug-report this error.
+*     halt
+*   else
+*     %send% %actor% It's your lucky day! You also win '%obj.shortdesc%'!
+*     %echoaround% %actor% ~%actor% has won '%obj.shortdesc%'!
+*   end
+* end
 ~
 #11909
 Skycleave: Skycleaver trinket 2.0~
@@ -4219,6 +4219,35 @@ done
 dg_affect #11990 %ch% %type% %amount% 300
 %send% %ch% ~%self% %verb% itself toward you... you take on a %glow% glow.
 %echoaround% %ch% ~%self% %verb% itself toward ~%ch%... &%ch% takes on a %glow% glow.
+~
+#11992
+Skycleave: Smash calamander statuette to create forest~
+1 c 2
+smash~
+* smash <self>
+set valid_sects 27 28 55 62 64 65
+set room %actor.room%
+set targ %actor.obj_target(%arg%)%
+if %targ% != %self%
+  return 0
+  halt
+end
+return 1
+if !(%valid_sects% ~= %room.sector_vnum%)
+  %send% %actor% You don't want to do that here. Try a jungle.
+  halt
+elseif !%room.empire_id%
+  %send% %actor% You need to claim the area to do this.
+  halt
+elseif !%actor.canuseroom_member(%room%)%
+  %send% %actor% You don't have permission to use @%self% here.
+  halt
+end
+%send% %actor% You smash @%self% on the ground...
+%echoaround% %actor% ~%actor% smashes @%self% on the ground...
+%echo% Streaks of brown light burst from the broken statuette! The jungle transforms before your very eyes as the light strikes it!
+%terraform% %room% 11990
+%purge% %self%
 ~
 #11993
 Clingy cloak~

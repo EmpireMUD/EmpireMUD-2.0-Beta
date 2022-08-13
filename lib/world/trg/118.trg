@@ -1430,7 +1430,7 @@ end
 set varname last_%room.template%
 if %self.varexists(%varname%)%
   eval last %%self.%varname%%%
-  if %last% + 120 > %timestamp%
+  if %last% + 150 > %timestamp%
     halt
   end
 end
@@ -4614,6 +4614,11 @@ end
 if !%self.room.up(room)%
   %door% %self.room% u room i11810
 end
+* Remove ward
+set ward %self.room.contents(11831)%
+if %ward%
+  %purge% %ward%
+end
 * Store difficulty
 set spirit %instance.mob(11900)%
 set diff2 %difficulty%
@@ -4672,6 +4677,11 @@ end
 if !%self.room.up(room)%
   %door% %self.room% u room i11830
 end
+* Remove ward
+set ward %self.room.contents(11831)%
+if %ward%
+  %purge% %ward%
+end
 * Store difficulty
 set spirit %instance.mob(11900)%
 set diff3 %difficulty%
@@ -4728,6 +4738,11 @@ end
 %echo% ~%self% drops ^%self% wards and warns you to be careful upstairs.
 if !%self.room.up(room)%
   %door% %self.room% u room i11860
+end
+* Remove ward
+set ward %self.room.contents(11831)%
+if %ward%
+  %purge% %ward%
 end
 * Store difficulty
 set spirit %instance.mob(11900)%
@@ -4824,11 +4839,14 @@ nop %self.link_instance%
 %door% i11910 down room i11904
 * 3. Mobs: Any checks based on surviving mobs go here (step 4 will purge them)
 %at% i11800 %load% mob 11901  * Gossipper
+%at% i11800 %load% mob 11901  * Additional Gossipper
 %at% i11903 %load% mob 11904  * Page Corwin
 %at% i11905 %load% mob 11905  * Barista
 %at% i11905 %load% mob 11827  * chatty couple
 %at% i11905 %load% mob 11828  * chatty couple
 %at% i11906 %load% mob 11906  * Instructor
+%at% i11906 %load% mob 11908  * Student Elamm
+%at% i11906 %load% mob 11909  * Student Akeldama
 %at% i11907 %load% mob 11907  * Gift Shop Keeper
 set shopkeep %instance.mob(11807)%
 set newshop %instance.mob(11907)%
@@ -4836,17 +4854,7 @@ if %shopkeep% && %newshop%
   nop %newshop.namelist(%shopkeep.namelist%)%
 end
 %at% i11904 %load% mob 11902  * Bucket (and sponge)
-switch %random.3%
-  case 1
-    %at% i11800 %load% mob 11901  * Additional Gossipper
-  break
-  case 2
-    %at% i11906 %load% mob 11908  * Student
-  break
-  case 3
-    %at% i11906 %load% mob 11909  * Student
-  break
-done
+* attach tourist loader
 makeuid entryway room i11901
 attach 11827 %entryway.id%
 * 4. Move people from the old rooms

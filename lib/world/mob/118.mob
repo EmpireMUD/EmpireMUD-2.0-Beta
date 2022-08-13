@@ -24,6 +24,30 @@ hide his wealth, Dylane is making himself as conspicuous as possible. His face
 is tired and long, though he hasn't reached his fourth decade, and his hair
 is flattened on one side.
 ~
+M
+0
+$n sips $s tea.~
+M
+0
+$n sips $s tea.~
+M
+0
+$n orders another tea.~
+M
+0
+$n glances around the cafe, making brief eye contact with you.~
+M
+0
+$n clutches tightly to a lock of blond hair in $s left hand.~
+M
+0
+$n picks at a piece of cheese, eating a small crumble off the side.~
+M
+0
+$n slouches in $s chair for a moment as $e stares off.~
+M
+0
+$n sips $s tea.~
 T 11828
 S
 #11802
@@ -38,6 +62,27 @@ D
 at the ceilings and arches. His skin has a yellowish-gray tone and he seems to
 be sweating a little.
 ~
+M
+0
+$n coughs.~
+M
+0
+$n sneezes.~
+M
+0
+$n coughs into $s hand.~
+M
+0
+$n pulls out a handkerchief and makes an vulgar sound as he spits into it.~
+M
+0
+$n coughs.~
+M
+0
+$n coughs.~
+M
+0
+$n coughs.~
 S
 #11803
 #n~
@@ -110,8 +155,6 @@ D
    Though he looks like he's new here, he has set right to work sorting and
 organizing the supplies that are stored in here. In a gray wool shirt and
 dark slacks, he doesn't look much like a sorcerer.
-- notes: This person does NOT sell anything in phase 1 and needs a new job here.
-  Their speech and emotes should indicate they were only hired today.
 ~
 M
 0
@@ -122,12 +165,24 @@ The broken claw machine tries to rattle its way across the floor, but only goes 
 M
 0
 The broken claw machine whirs, and you get the distinct feeling it's looking at you.~
+M
+1
+Sorry, it's my first day.~
+M
+1
+The shop isn't open. Things are going on, if you hadn't noticed.~
+M
+0
+$n rearranges the supplies.~
+M
+0
+$n scratches $s head.~
 T 11806
 S
 #11808
+#n young lady~
 #n~
-#n~
-A young woman is standing here.
+A young lady is standing here.
 ~
 0 0 dvA n 3
 2 0 0 15
@@ -136,6 +191,36 @@ D
 crying. She wears a simple white dress and silver jewelry; she's constantly
 fidgeting with a locket around her neck.
 ~
+M
+1
+Oh...~
+M
+1
+Loneliness does not befit a young lady.~
+M
+1
+I still can't believe he ran off with that trollop.~
+M
+1
+Do you think they make love potions?~
+M
+1
+I pray these wizards can mend a broken heart.~
+M
+1
+If they can't make him love me again, maybe they can have him toad.~
+M
+0
+$n's voice quavers as she speaks.~
+M
+0
+$n lets out a small sigh.~
+M
+0
+$n lets out a fume of sighs as she fidgets with a handkerchief.~
+M
+1
+What lust has rent, mayhap sorcery can repair.~
 S
 #11809
 #n~
@@ -182,8 +267,6 @@ D
 much better. Kayla herself, though young, has the bedraggled look of someone
 who hasn't slept right in some time. Her dark hair is worn in chunky, uneven
 braids tied back behind her head.
-- animation notes in 1A: moves items around and frets over things
-- Kayla is on floor 1 until 2B, then she moves to 2B.
 ~
 S
 #11812
@@ -424,6 +507,30 @@ D
    He's middle-aged, perhaps past his prime as he stands with a hunch. He's
 dressed as an artisan, but his hands seem to shake.
 ~
+M
+1
+Could use something for my back if they've got it.~
+M
+1
+I do hope they sell Wand-R-Grow here.~
+M
+1
+Do you suppose they sell something for my hands here? Hard to author with the authoritis.~
+M
+1
+This tower hasn't changed a bit since last time I was here.~
+M
+0
+$n rubs $s knuckles and sighs.~
+M
+1
+Who do I see about the serious spells?~
+M
+1
+I'm not getting any younger, yet.~
+M
+0
+$n looks around.~
 S
 #11824
 #n~

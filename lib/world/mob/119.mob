@@ -172,8 +172,16 @@ violet robes that identify her as a master sorcerer. She sits beneath an
 intimidating thicket of gray hair, studying every person who walks into the
 classroom through thick glasses. The fingers of her left hand, made of
 nocturnium filigree, tap slowly on the desk.
-- This will be a mage with a repeatable quest that trains the player in high sorcery.
 ~
+M
+1
+Alright, settle down.~
+M
+1
+That will be enough.~
+M
+1
+Please pay attention.~
 S
 #11907
 #n shopkeep shopkeeper~
@@ -186,8 +194,6 @@ D
    He's dressed in black slacks, a gray shirt, and a purple vest with the Hazel
 and Wand of the Skycleave sigil. He doesn't seem to have a wand or a staff, but
 bears a toothy smile and seems happy to help customers.
-- This person sells bonus items in the gift shop.
-- Their speech and emotes should indicate they are rather new here.
 ~
 M
 0
@@ -198,6 +204,21 @@ The claw machine bounces itself up and down, sounding a jingling bell.~
 M
 0
 The claw machine flashes a brightly colored sign reading, 'PLAY ME!'~
+M
+0
+$n gets blasted in the face by yellow dust as $e tries to rearrange products.~
+M
+1
+Everything here is one-of-a-kind. Wait, that's not it...~
+M
+1
+Money can't buy happiness, but it can still make you, er, happy. To spend it, I mean.~
+M
+1
+We don't sell pixies here. No, that would be amoral. We sell the jars, though.~
+M
+0
+$n tries to dust one of the shelves, but the dust seems to be one step ahead of $m.~
 T 11806
 S
 #11908
@@ -211,9 +232,34 @@ D
    Elamm is dressed in well-pressed black slacks and a crisp white shirt. He
 wears his brown hair long but tied back. Over his left eye, he wears a monocle
 of black glass, while the right eye, brown, is uncovered.
-Notes:
-- This student could be a sarcastic assassin trying to learn magic to improve his trade.
 ~
+M
+1
+If I cast a silence spell over a whole room, does that work on screams?~
+M
+1
+Is there a spell that prevents bleeding for a few minutes without preventing it entirely?~
+M
+1
+I was hoping for some crossroad magic. You know, help people get to the other side.~
+M
+1
+I have a great idea but I need a spell to resist iocaine powder.~
+M
+0
+$n covers $s right eye and looks around the room.~
+M
+1
+This magic is really going to raise my fee.~
+M
+1
+Is it possible to teleport out of a building from behind a curtain?~
+M
+1
+Is there a spell that just teleports a small tool like, say, a dagger?~
+M
+1
+Do you think it's possible to teleport the contents of a small vial into a very specific place?~
 S
 #11909
 Akeldama student pale~
@@ -226,8 +272,31 @@ D
    Akeldama has chosen a seat in the corner, barely touched by the flickering
 lamplight from the front. Her skin has a pale, almost ashy color, perhaps due
 to the hardships the tower has recently suffered.
-- This student could be a vampire bloodmage or someone else with nefarious plans for their magic.
 ~
+M
+1
+Is blood an element?~
+M
+1
+Oh, don't worry your precious little necks, I'm on the paleo diet. I don't eat anyone civilized.~
+M
+1
+What prevents a sorcerer of a certain talent from teleporting some, erm, liquid, erm, out of its container?~
+M
+1
+Is moonlight actually just sunlight? Follow-up question: Do you know why it's different?~
+M
+1
+Will you be serving refreshments after class? I'm feeling peckish.~
+M
+0
+$n's eyes flash bright red for a second.~
+M
+1
+Really do love the whole aesthetic.~
+M
+1
+When do they let us upstairs? It feels like I've been studying down here for ages.~
 S
 #11910
 Annaca watcher~
