@@ -49,7 +49,7 @@ bucket wooden~
 the bucket~
 A wooden bucket is sitting here, filled with water.
 ~
-50 50 dh G 2
+50 50 dh nG 2
 0 0 15 5
 D
    The sudsy little wooden bucket hops along, sloshing water on the floor as
@@ -96,7 +96,7 @@ sponge~
 a sponge~
 A sponge is scrubbing the floor.
 ~
-50 50 bdh G 1
+50 50 bdh nG 1
 0 0 24 21
 D
    The sponge zigs and zags across the floors as it chases the hopping bucket
@@ -577,7 +577,7 @@ broom~
 the broom~
 A broom is sweeping up the remaining debris.
 ~
-50 50 dh G 2
+50 50 dh nG 2
 0 0 36 5
 D
    With its short heather pole and twiggy end, this old besom broom would be
@@ -618,7 +618,7 @@ duster feather~
 the feather duster~
 A feather duster swishes as it flies across every surface.
 ~
-50 50 dh G 2
+50 50 dh nG 2
 0 0 2 21
 D
    This elegant little plume of fluffy red feathers is bound by a strap of
@@ -696,7 +696,7 @@ sponge giant~
 the sponge~
 A giant sponge tries in futility to clean the empty cages.
 ~
-50 50 bdh G 2
+50 50 bdh nG 2
 0 0 24 15
 D
    The oversized sponge looks old and worn, discolored from years spent in
@@ -749,8 +749,8 @@ water first embodiment living~
 the First Water~
 You are surrounded by the living embodiment of the First Water! (difficulty)
 ~
-0 0 bdhxyD 0 5
-0 0 0 28
+0 0 bdhyD 0 5
+0 0 0 14
 D
    The water on all sides of you is alive! You have found yourself trapped in
 the First Water, or something animated by its essence. As you hold your breath
@@ -824,7 +824,7 @@ mop bucket~
 the mop~
 A mop carries a bucket past you.
 ~
-50 50 dh G 2
+50 50 dh nG 2
 0 0 35 5
 D
    The mop has a pale handle, perhaps made from poplar, with the yarn of the
@@ -1290,7 +1290,7 @@ Nailbokh axe goblin~
 Nailbokh the Axe~
 Nailbokh the Axe stands in the center of the arena.
 ~
-0 0 bdhD 0 3
+0 0 bdhzD 0 3
 2 0 0 2
 D
    Nailbokh drags her giant stone axe across the arena sand, drawing a line
@@ -1309,7 +1309,7 @@ Biksi champion orka~
 Biksi, Champion of Orka~
 Biksi, Champion of Orka, stands in the center of the arena.
 ~
-0 0 bdhD 0 3
+0 0 bdhyD 0 3
 2 0 0 7
 D
    The Champion of Orka stands in the center of the arena, readying a pair of
@@ -1343,7 +1343,7 @@ cabinet filing~
 the filing cabinet~
 A filing cabinet is standing here.
 ~
-50 50 dh G 2
+50 50 dh nG 2
 0 0 15 5
 D
    The wooden cabinet is mahogany, stained with a slight violet tinge, with
@@ -1384,7 +1384,7 @@ bookshelf shelf ebony~
 the bookshelf~
 An ebony bookshelf is standing here.
 ~
-50 50 dh G 3
+50 50 dh nG 3
 0 0 15 5
 D
    The bookshelf is made from dark ebony wood with striped calamander accents
@@ -1461,6 +1461,42 @@ on their own.
 go to great lengths to avoid. Fortunately, custodial work is only the fate of
 the most disappointing among them.
 ~
+M
+0
+A broom floats off of the trolley and straightens the painting.~
+M
+0
+Sponges hop on and off of the cleaning trolley as they clean the floor.~
+M
+0
+The trolley shakes and glows, causing stray bits of parchment to fly into the wastebin.~
+M
+0
+A feather duster whisks itself off the trolley and sweeps the bookshelf.~
+M
+0
+The trolley cleans the office.~
+M
+0
+The trolley cleans the office.~
+M
+0
+The trolley cleans the office.~
+M
+0
+The trolley cleans the office.~
+M
+0
+The trolley cleans the office.~
+M
+0
+The trolley cleans the office.~
+M
+0
+The trolley cleans the office.~
+M
+0
+The trolley cleans the office.~
 T 11902
 T 11904
 S

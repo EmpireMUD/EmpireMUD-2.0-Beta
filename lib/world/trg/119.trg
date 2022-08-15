@@ -332,7 +332,7 @@ Skycleave: Skycleaver trinket 2.0~
 use~
 * will teleport the actor if used within this distance without a cooldown
 set max_distance 100
-set cooldown_time 3600
+set cooldown_time 1800
 set cooldown_vnum 11909
 * basics
 if %actor.obj_target(%arg%)% != %self%
@@ -387,10 +387,12 @@ while %cycle% < 3
   switch %cycle%
     case 0
       %send% %actor% @%self% begins to glow bright violet and shake violently...
+      wait 5 sec
     break
     case 1
       %send% %actor% The violet glow from @%self% envelops you!
       %echoaround% %actor% |%actor% skycleaver trinket glows a stunning violet and the light envelops *%actor%!
+      wait 5 sec
     break
     case 2
       %echoaround% %actor% ~%actor% vanishes in a flash of violet light!
@@ -400,7 +402,6 @@ while %cycle% < 3
     break
   done
   eval cycle %cycle% + 1
-  wait 5 sec
 done
 * cleanup
 nop %actor.set_cooldown(%cooldown_vnum%, %cooldown_time%)%
@@ -1340,7 +1341,7 @@ elseif %arg% == win
     eval winner %%self.winner%pos%%%
     if %owner% > 0
       makeuid owner %owner%
-      if %owner%
+      if %owner.is_pc%
         if %winner%
           %send% %owner% Your pixy, %name%, won the race!
         else
@@ -2223,6 +2224,7 @@ if !%to_room%
   * Error?
   halt
 end
+set skycleave_wake_room %room.template%
 set ch %room.people%
 while %ch%
   set next_ch %ch.next_in_room%
@@ -2232,6 +2234,7 @@ while %ch%
     %teleport% %ch% %to_room%
     %echoaround% %ch% ~%ch% appears out of nowhere, asleep on the branch!
     %send% %ch% You dream you're falling -- the kind where you really feel it!
+    remote skycleave_wake_room %ch.id%
     * bring followers
     set fol %room.people%
     while %fol%
@@ -2330,7 +2333,26 @@ if %actor.position% == Standing || %actor.position% == Resting || %actor.positio
   end
   * If we made it this far, we teleport them:
   set room %actor.room%
-  if %actor.plr_flagged(ADV-SUMMON)% && %actor.adventure_summoned_from%
+  * check stored room first
+  set wake_room 0
+  if %actor.varexists(skycleave_wake_room)%
+    if %actor.skycleave_wake_room% > 0
+      set spirit %instance.mob(11900)%
+      set wake_room %actor.skycleave_wake_room%
+      * account for phase change
+      if %wake_room% < 11830 && %spirit.phase2%
+        eval wake_room %wake_room% + 100
+      elseif %wake_room% < 11875 && %spirit.phase4%
+        eval wake_room %wake_room% + 100
+      end
+    end
+  end
+  * otherwise find a room
+  set leaving_adv 1
+  if %wake_room%
+    set target %instance.nearest_rmt(%wake_room%)%
+    set leaving_adv 0
+  elseif %actor.plr_flagged(ADV-SUMMON)% && %actor.adventure_summoned_from%
     set target %actor.adventure_summoned_from%
   elseif %actor.home%
     set target %actor.home%
@@ -2338,7 +2360,9 @@ if %actor.position% == Standing || %actor.position% == Resting || %actor.positio
     set target %startloc%
   end
   %teleport% %actor% %target%
-  nop %actor.cancel_adventure_summon%
+  if %leaving_adv%
+    nop %actor.cancel_adventure_summon%
+  end
   %echoaround% %actor% ~%actor% wakes up with a start! You didn't even see *%actor% there.
   * move fellows
   set ch %room.people%
@@ -2347,7 +2371,9 @@ if %actor.position% == Standing || %actor.position% == Resting || %actor.positio
     if %ch.is_npc% && %ch.leader% == %actor% && !%ch.fighting% && !%ch.disabled%
       %echoaround% %ch% ~%ch% fades away and vanishes!
       %teleport% %ch% %target%
-      nop %ch.cancel_adventure_summon%
+      if %leaving_adv%
+        nop %ch.cancel_adventure_summon%
+      end
       %send% %ch% You wake up with the hazy feeling you were just somewhere else.
       %echoneither% %actor% %ch% ~%ch% wakes up.
     end
@@ -2368,10 +2394,13 @@ Skycleave Dreams: Reset wake on poof-in~
 ~
 * When a player enters by any means OTHER than normal walking, reset their
 * 'wake' count. Typing 'wake' 3 times exits the area using trigger 11945.
+* This also clears their wake-room, which will be set by another script.
 set dir_list north east south west northwest northeast southwest southeast up down
 if %actor.is_pc% && (%direction% == none || !(%dir_list% ~= %direction%))
   set skycleave_wake 0
   remote skycleave_wake %actor.id%
+  set skycleave_wake_room 0
+  remote skycleave_wake_room %actor.id%
 end
 ~
 #11947
@@ -3299,6 +3328,14 @@ while %count% < 12
   end
   * did we find a teleport target?
   if %to_room%
+    * determine where to send them back to
+    if (%room.template% >= 11800 && %room.template% <= 11874) || (%room.template% >= 11900 && %room.template% <= 11974)
+      set skycleave_wake_room %room.template%
+    elseif %actor.varexists(skycleave_wake_room)%
+      set skycleave_wake_room %actor.skycleave_wake_room%
+    else
+      set skycleave_wake_room 0
+    end
     if !%actor.plr_flagged(ADV-SUMMON)%
       nop %actor.mark_adventure_summoned_from%
     end
@@ -3307,6 +3344,7 @@ while %count% < 12
     nop %actor.link_adventure_summon%
     %echoaround% %actor% ~%actor% appears out of nowhere, asleep on the floor!
     %send% %actor% You dream you're falling -- the kind where you really feel it!
+    remote skycleave_wake_room %actor.id%
     * teleport fellows
     set ch %room.people%
     while %ch%
@@ -3319,6 +3357,7 @@ while %count% < 12
         %teleport% %ch% %to_room%
         if %ch.is_pc%
           nop %ch.link_adventure_summon%
+          remote skycleave_wake_room %ch.id%
         end
         %echoaround% %ch% ~%ch% appears out of nowhere!
         if %ch.position% != Sleeping
@@ -3509,6 +3548,14 @@ while %count% < 12
   end
   * did we find a teleport target?
   if %to_room%
+    * determine where to send them back to
+    if (%room.template% >= 11800 && %room.template% <= 11874) || (%room.template% >= 11900 && %room.template% <= 11974)
+      set skycleave_wake_room %room.template%
+    elseif %actor.varexists(skycleave_wake_room)%
+      set skycleave_wake_room %actor.skycleave_wake_room%
+    else
+      set skycleave_wake_room 0
+    end
     if !%actor.plr_flagged(ADV-SUMMON)%
       nop %actor.mark_adventure_summoned_from%
     end
@@ -3517,6 +3564,7 @@ while %count% < 12
     nop %actor.link_adventure_summon%
     %echoaround% %actor% ~%actor% appears out of nowhere, asleep on the bed!
     %send% %actor% You dream you're falling -- the kind where you really feel it!
+    remote skycleave_wake_room %actor.id%
     * teleport fellows
     set ch %room.people%
     while %ch%
@@ -3529,6 +3577,7 @@ while %count% < 12
         %teleport% %ch% %to_room%
         if %ch.is_pc%
           nop %ch.link_adventure_summon%
+          remote skycleave_wake_room %ch.id%
         end
         %echoaround% %ch% ~%ch% appears out of nowhere!
         if %ch.position% != Sleeping
@@ -3858,6 +3907,7 @@ if !%to_room%
   * Error?
   halt
 end
+set skycleave_wake_room %room.template%
 set ch %room.people%
 while %ch%
   set next_ch %ch.next_in_room%
@@ -3867,6 +3917,7 @@ while %ch%
     %teleport% %ch% %to_room%
     %echoaround% %ch% ~%ch% appears out of nowhere, asleep on the bed!
     %send% %ch% You dream you're falling -- the kind where you really feel it!
+    remote skycleave_wake_room %ch.id%
     * bring followers
     set fol %room.people%
     while %fol%

@@ -317,10 +317,10 @@ goblin uncaged~
 uncaged goblin~
 Uncaged goblin is here.
 ~
-0 0 abd 0 3
+0 0 abd 0 2
 0 0 0 15
 D
-Strings set by trig 11833.
+Strings set by trig 11824.
 ~
 I 4 11929 90.00 1  # LOOT: very crummy bread
 T 11801
@@ -333,10 +333,10 @@ goblin commando~
 the goblin commando~
 The goblin commando is here.
 ~
-0 0 abd 0 3
-0 0 0 1
+0 0 abd 0 2
+0 0 0 4
 D
-Strings set by trig 11833.
+Strings set by trig 11824.
 ~
 I 4 11929 90.00 1  # LOOT: very crummy bread
 T 11801
@@ -349,10 +349,10 @@ bruiser goblin~
 a goblin bruiser~
 Goblin bruiser is here.
 ~
-0 0 abd 0 3
+0 0 abd 0 2
 0 0 0 2
 D
-Strings set by trig 11833.
+Strings set by trig 11824.
 ~
 I 4 11929 90.00 1  # LOOT: very crummy bread
 T 11801
@@ -365,7 +365,7 @@ Venjer fox goblin~
 Venjer the Fox~
 Venjer the Fox is prodding at the vines with a staff.
 ~
-0 0 abdE 0 3
+0 0 abdE 0 2
 2 0 0 17
 D
    Venjer is a small woman, though she stands tall and proud, light on her feet
@@ -391,7 +391,7 @@ the pixy queen~
 A majestic pixy queen dazzles you with blinding sparkles!
 ~
 0 0 abdE 0 3
-2 0 0 15
+2 0 0 28
 D
    The pixy queen is scarcely more than a colorful sparkle of light. As your
 eyes adjust to her magnificence, you see that her iridescent clothing is
@@ -412,7 +412,7 @@ pixy~
 a pixy~
 A pixy has escaped!
 ~
-0 0 abdx 0 3
+0 0 abdx 0 1
 0 0 0 28
 D
    The little pixy is no larger than a mouse. It flies on silvery butterfly
@@ -657,7 +657,7 @@ otherworlder~
 an otherworlder~
 An escaped otherworlder barreling through!
 ~
-0 0 bd 0 3
+0 0 bdz 0 3
 0 0 0 15
 D
    The otherworlder hunches as it runs to avoid hitting its head. It's taller
@@ -923,9 +923,9 @@ T 11857
 T 11843
 S
 #11844
-mercenary druid~
-druid mercenary~
-Druid mercenary is playing with fire.
+mercenary nature mage~
+nature mage mercenary~
+Nature mage mercenary is playing with fire.
 ~
 0 0 abdv 0 3
 0 0 0 16
@@ -985,7 +985,7 @@ mercenary armored~
 armored mercenary~
 Armored mercenary is spoiling for a fight.
 ~
-0 0 abdvy 0 3
+0 0 abdvy s 3
 0 0 0 5
 D
 This mob is loaded by trig 11900/skymerc and named by 11857.
@@ -1015,7 +1015,7 @@ Kara Virduke~
 Kara Virduke is digging through cabinets.
 ~
 0 0 bdvxE 0 3
-2 0 0 15
+2 0 0 18
 D
    Kara Virduke is nearly seven feet tall, such that she must stoop to work in
 some parts of the lab, but when she stands up straight, you feel quite small.
@@ -1033,8 +1033,8 @@ Rojjer bleak~
 Bleak Rojjer~
 Bleak Rojjer is searching for something on the left side of the room.
 ~
-0 0 bdvE 0 3
-1 0 0 15
+0 0 bdvzE 0 3
+1 0 0 4
 D
    Bleak Rojjer's back is to you as you enter. He must think you're one of his
 lackeys because he utterly disregards you as he searches the east side of the
@@ -1052,8 +1052,8 @@ Trixton Vye~
 Trixton Vye~
 Trixton Vye is searching for something.
 ~
-0 0 bdvE 0 3
-1 0 0 15
+0 0 bdvyE 0 3
+1 0 0 1
 D
    When you enter the room, you do not initially notice Trixton Vye. It's not
 until he picks up a disembodied arm that he comes into focus. He holds up the
@@ -1237,7 +1237,7 @@ shadow ascendant mezvienne~
 the Shadow Ascendant~
 The Shadow Ascendant looms over the chamber as it draws more and more power!
 ~
-0 0 bdhx 0 3
+0 0 bdhxy 0 3
 0 0 0 20
 D
    The shade, once merely a projection of the powerful enchantress Mezvienne,
@@ -1301,7 +1301,7 @@ barrosh high sorcerer~
 High Sorcerer Barrosh~
 High Sorcerer Barrosh stands with his staff raised high and an anguished look.
 ~
-0 0 bdhvx 0 3
+0 0 bdhvxy 0 3
 1 0 0 15
 D
    Barrosh takes a menacing position as you enter and seems to be muttering
@@ -1335,8 +1335,8 @@ Mezvienne shade shadow~
 the Shade of Mezvienne~
 The Shade of Mezvienne surrounds Knezz like a phantom.
 ~
-0 0 bdhx 0 3
-0 0 0 20
+0 0 bdhy 0 3
+0 0 0 7
 D
    The Shade is lithe, feminine, even graceful as it swirls back and forth
 around Grand High Sorcerer Knezz. At times, it almost has a face, but it
@@ -1369,8 +1369,8 @@ Mezvienne enchantress~
 Mezvienne the Enchantress~
 Mezvienne the Enchantress hovers above the tower as she channels the heartwood.
 ~
-0 0 bdhvxD 0 3
-2 0 0 15
+0 0 bdhvxyD 0 3
+2 0 0 21
 D
    The enchantress's long gossamer gown blows madly in the wind as she floats
 above the tower. Streams of mana in all colors swirl around the heartwood of
@@ -1387,8 +1387,8 @@ lion time skithe ler-wyn lerwyn~
 the Lion of Time~
 Skithe Ler-Wyn, the Lion of Time, has erupted from Mezvienne's limp body!
 ~
-0 0 bdhvxE 0 3
-2 0 0 15
+0 0 bdhyzE 0 3
+2 0 0 10
 D
    Mezvienne the Enchantress floats limp and bloody in the time stream, her
 back split open when the great lion emerged. Skithe Ler-Wyn, the Lion of Time,
@@ -1729,7 +1729,7 @@ Iskip giant~
 Iskip of Rot and Ruin~
 The giant stands knee-deep in the water, turned away from you. (difficulty)
 ~
-0 0 bdhyD 0 6
+0 0 bdhxyD 0 6
 1 0 0 19
 D
    The giant Iskip is truly huge -- you'd scarcely reach his ankles if he were

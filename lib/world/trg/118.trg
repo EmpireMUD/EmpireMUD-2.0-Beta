@@ -684,7 +684,7 @@ if %self.cooldown(11800)%
 end
 if %random.2% == 1
   * Flail Wildly
-  %echo% slay the griffin!
+  say slay the griffin!
   nop %self.set_cooldown(11800, 20)%
   set loops 1
   if %self.difficulty% == 4
@@ -1861,7 +1861,7 @@ if %target%
       %echo% ~%target% shoots a dozen arrows into Scaldorran, who comes apart at the wrappings and envelops ~%target%, stabbing *%target% with every arrow!
     break
     case 11844
-      * druid merc
+      * nature mage merc
       %echo% ~%target% starts to twist and morph into something enormous... until Scaldorran wraps his bandages around *%target%, whereupon &%target% dissolves into a sticky mess!
     break
     case 11845
@@ -2061,7 +2061,7 @@ else
 end
 ~
 #11844
-Mercenary Druid combat~
+Mercenary Nature Mage combat~
 0 k 100
 ~
 if %self.cooldown(11800)%
@@ -2577,7 +2577,7 @@ switch %self.vnum%
     set verbiage is fletching an arrow.
   break
   case 11844
-    * druid mercenary
+    * nature mage mercenary
     set name_list Aella  Oriana Faron Aiden Blaise Briar Ariadne Aislinn Daphne Ellis Bruin
     set sex_list  female female male  male  female male  female  female  female male  male
     set name_size 11
@@ -2648,7 +2648,7 @@ switch %self.vnum%
     %mod% %self% append-lookdesc well-dressed, %self.heshe% bears a large, heavy coin purse on %self.hisher% belt.
   break
   case 11844
-    * druid mercenary
+    * nature mage mercenary
     %mod% %self% lookdesc %self.name% rolls a little ball of fire back and forth over %self.hisher% hands, occasionally singeing the cuffs of %self.hisher% robe. The robe, brown and rough,
     %mod% %self% append-lookdesc conceals whatever %self.heshe% might be carrying underneath.
   break
@@ -2817,6 +2817,7 @@ Skycleave: Shade ascension / Death of Knezz~
 0 b 100
 ~
 * This starts a timer that will kill Knezz and ascend the shade after 2 minutes
+set room %self.room%
 if %room.people(11868)%
   * fetch timer
   if %self.varexists(knezz_timer)%
@@ -2840,8 +2841,8 @@ else
   * no knezz at all
   set seconds 99999
 end
-if %seconds% > 120
-  * 2 minutes: Knezz dies
+if %seconds% > 60
+  * 1 minute: Knezz dies
   nop %self.add_mob_flag(NO-ATTACK)%
   %restore% %self%
   * stun everyone
