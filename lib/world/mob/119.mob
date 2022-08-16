@@ -124,6 +124,7 @@ D
 so it's off his neck and forehead while he bustles around the tower in his
 heavy jute page robe.
 ~
+F 11800
 S
 #11905
 Mageina barista~
@@ -140,6 +141,7 @@ curls. Her black apron matches the hat, but for its stylized Tower Skycleave
 logo.
    You can 'list' and 'buy' refreshments here.
 ~
+F 11800
 M
 0
 $n points a stick of cinnamomn at a mug and heats it with a wild, cackling flame!~
@@ -173,6 +175,7 @@ intimidating thicket of gray hair, studying every person who walks into the
 classroom through thick glasses. The fingers of her left hand, made of
 nocturnium filigree, tap slowly on the desk.
 ~
+F 11800
 M
 1
 Alright, settle down.~
@@ -311,6 +314,7 @@ recent events have taken on her is clear on her face and in her posture as she
 shuffles through the halls. Her golden brown hair almost forms a mane as it
 seems to have stacked itself curl-upon-curl.
 ~
+F 11800
 S
 #11911
 apprentice kayla~
@@ -326,6 +330,7 @@ starry pink and purple pattern the swirls around her irises. Kayla is young,
 but Skycleave's selection process is notoriously difficult, so she has surely
 earned her spot.
 ~
+F 11800
 S
 #11912
 cosimo apprentice~
@@ -340,6 +345,7 @@ he bears a long scar that clips the left side of his lips. He wears his over-
 grown hair up in a sweeping modern style, with a stubbly chin that almost
 resembles a beard.
 ~
+F 11800
 S
 #11913
 tyrone apprentice~
@@ -354,6 +360,7 @@ and with his hair dyed fire-orange, he barely looks old enough to study at the
 tower. But he walks with confidence and speaks with authority like many of the
 older, wiser sorcerers.
 ~
+F 11800
 S
 #11914
 Wright wrangler~
@@ -369,6 +376,7 @@ grown translucent with time, showing every blue vein beneath dark age spots.
 Unlike most of the tower's occupants, he wears no robes -- only simple overalls
 and a gray shirt.
 ~
+F 11800
 M
 1
 I'm going to lose my job...~
@@ -690,6 +698,7 @@ a high turban that covers all of his hair. He has a long, loose beard that
 covers the front of his white and gray apprentice robes. He wears a single iron
 bracelet on his wrist and a curved kirpan knife on his waist.
 ~
+F 11800
 S
 #11926
 sponge giant~
@@ -778,6 +787,7 @@ She's wearing the same plain jute robe as the other pages, but she's stitched
 the sides to create more shape. If her face is stern, it's only because she's
 focused on something in her own head while she works.
 ~
+F 11800
 S
 #11930
 caius sirensbane high master~
@@ -792,6 +802,7 @@ wool toga with a violet stripe running the length of the cloth. His lightly
 bronzed complexion, aquiline nose, choice of clothing, and short imperial hair
 style give the impression of a Roman patrician.
 ~
+F 11800
 S
 #11931
 Niamh resident~
@@ -805,6 +816,7 @@ D
 Her pale face and hands stick out in stark contrast to her dark purple and
 black robes. She looks rather young compared to many of the sorcerers here.
 ~
+F 11800
 S
 #11932
 mohammed resident~
@@ -818,6 +830,7 @@ D
 thobe with a violet ghutra headscarf and black egal band. He smiles at you
 through a short, neat beard.
 ~
+F 11800
 S
 #11933
 mop bucket~
@@ -876,6 +889,7 @@ holds some kind of arcane contraption in both hands, slowly circling around the
 otherworlder as light streams from the contraption, illuminating the other-
 worlder with bright white light.
 ~
+F 11800
 M
 1
 Interesting...~
@@ -908,6 +922,7 @@ in midair, sometimes forming a hood or a face or arms, but always splitting
 back apart. And he is so much more than that. As a lich, he wields vast power
 over death -- and he has a reputation for sharing it.
 ~
+F 11800
 S
 #11937
 skeleton~
@@ -966,6 +981,7 @@ golden brown skin. His eyes are the hollow, smoky-black depressions of the
 unliving, but his face bears a soft, friendly smile. He stands in front of one
 of the artifacts, channeling ghastly energy from it.
 ~
+F 11800
 M
 0
 A trio of bells on a low shelf are suddenly having A Major fight.~
@@ -1019,6 +1035,7 @@ to her bronze leg.
 - she should be enchanting things
 - could have a rare interaction where a disappointing student arrives and is transformed into a broom
 ~
+F 11800
 S
 #11940
 Waltur walter magineer~
@@ -1030,6 +1047,7 @@ Magineer Waltur is here. (list)
 D
 tba
 ~
+F 11800
 T 11806
 S
 #11941
@@ -1052,6 +1070,7 @@ been sculpted to have a thick brow ridge above where the eyes would be, and the
 brow is very expressive when it speaks.
    Goef the Oreonic can 'attune' skystones for you.
 ~
+F 11800
 T 11939
 T 11806
 S
@@ -1068,6 +1087,7 @@ a young man, with tousled brown hair and skin the color of summer wheat. He
 holds some kind of arcane contraption in both hands, illuminating the cracked
 ebony wall with streams of violet and silver light.
 ~
+F 11800
 M
 0
 $n waves $s light contraption over the walls...~
@@ -1337,6 +1357,7 @@ has dyed her fingertip-short black hair with a streak of lavender that stands
 out in stark contrast to her dark brown skin. She doesn't spare a single glance
 in your direction as she stays focused on her work.
 ~
+F 11800
 S
 #11960
 cabinet filing~
@@ -1430,6 +1451,7 @@ He's tall but scrawny, with sharp cheekbones and pale gray eyes. His brown hair
 falls over his ears and eyes like a mop. He's dressed in a fresh white
 apprentice robe with a black margin.
 ~
+F 11800
 S
 #11964
 celiya high sorcerer~
@@ -1444,6 +1466,7 @@ azure; with a cloud-like halo of gray hair surrounding her rounded, brown face.
 A trio of blue gems hovers beneath each of her ears and she wears a nocturnium
 stud on the right side of her short, rounded nose.
 ~
+F 11800
 S
 #11965
 trolley cleaning~
@@ -1514,6 +1537,7 @@ The she's short, she tilts her head back in order to look down at you through
 the base of her glasses as you enter. She makes a small gesture of approval
 with her lips and then goes back to what she was doing.
 ~
+F 11800
 S
 #11967
 barrosh high sorcerer~
@@ -1529,6 +1553,7 @@ unflattering to his figure as his middle-aged body, though not fat, pudges and
 plumps at the sides. He doesn't even look up at you -- you aren't sure he's
 even aware you're here.
 ~
+F 11800
 S
 #11968
 knezz grand high sorcerer~
@@ -1546,6 +1571,7 @@ despite it, in violet and gold robes, with two nocturnium studs in his ear and
 several nocturnium beads in his beard. If he carries anything else on his
 person, it's covered by the robes.
 ~
+F 11800
 S
 #11969
 celiya grand high sorcerer~
@@ -1561,6 +1587,7 @@ in the cloud of gray hair surrounding her rounded, brown face. A trio of violet
 gems hovers beneath each of her ears and she wears a nocturnium stud on the
 right side of her short, rounded nose.
 ~
+F 11800
 S
 #11970
 Niamh acting high sorcerer~
@@ -1574,6 +1601,7 @@ D
 Her pale face and hands stick out in stark contrast to her dark purple and
 black robes. She looks rather young compared to many of the sorcerers here.
 ~
+F 11800
 S
 #11972
 crowd~

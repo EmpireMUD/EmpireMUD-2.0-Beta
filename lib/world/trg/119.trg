@@ -2341,7 +2341,7 @@ if %actor.position% == Standing || %actor.position% == Resting || %actor.positio
       set wake_room %actor.skycleave_wake_room%
       * account for phase change
       if %wake_room% < 11830 && %spirit.phase2%
-        eval wake_room %wake_room% + 100
+        set wake_room 11925
       elseif %wake_room% < 11875 && %spirit.phase4%
         eval wake_room %wake_room% + 100
       end
@@ -3272,6 +3272,7 @@ end
 return 1
 %send% %actor% You drink a little of the dew and start to feel drowsy...
 %echoaround% %actor% ~%actor% drinks from a small vial.
+dg_affect #11961 %actor% SLOW on 60
 set teleported 0
 * begin loop to wait for sleep
 set count 0
@@ -3372,6 +3373,7 @@ while %count% < 12
   * next while loop
   eval count %count% + 1
 done
+dg_affect #11961 %actor% off
 ~
 #11962
 broken mirror portal~
@@ -3489,6 +3491,7 @@ end
 return 1
 %send% %actor% You hold the jade tear up to your head and suddenly feel drowsy...
 %echoaround% %actor% ~%actor% holds a little jade stone up to ^%actor% head for a moment.
+dg_affect #11965 %actor% SLOW on 60
 set teleported 0
 * begin loop to wait for sleep
 set count 0
@@ -3592,6 +3595,7 @@ while %count% < 12
   * next while loop
   eval count %count% + 1
 done
+dg_affect #11961 %actor% off
 ~
 #11969
 Skycleave: Hendecagon fountain summoned NPC run~

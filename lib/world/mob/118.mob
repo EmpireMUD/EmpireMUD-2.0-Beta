@@ -110,6 +110,7 @@ D
 trying to organize the refugees down here on the first floor. He looks young,
 perhaps 16, but he's putting in twice as much work as everyone else around him.
 ~
+F 11800
 S
 #11805
 Mageina barista~
@@ -126,6 +127,7 @@ and soup spatter. Her hair, brown with violet streaks, is pulled back in a
 curly bun. Her face, though young, looks absolutely exhausted, as if she hasn't
 slept in some time.
 ~
+F 11800
 S
 #11806
 Huberus master sorcerer instructor~
@@ -143,6 +145,7 @@ her left hand has been replaced with intricate nocturnium filigree.
 - animation notes: shuffles back and forth around the room, keeping things in
   order. May tell the player there's no room for them.
 ~
+F 11800
 S
 #11807
 #n~
@@ -252,6 +255,7 @@ hang loose and wild. She wears a loose set of layered robes in midnight blue,
 making it impossible to see what she might have stashed underneath.
    You must finish rescuing the second floor to get to the staircase.
 ~
+F 11800
 T 11893
 T 11814
 S
@@ -268,6 +272,7 @@ much better. Kayla herself, though young, has the bedraggled look of someone
 who hasn't slept right in some time. Her dark hair is worn in chunky, uneven
 braids tied back behind her head.
 ~
+F 11800
 S
 #11812
 cosimo apprentice~
@@ -281,6 +286,7 @@ D
 dusty and disheveled, presumably from hiding in the secret passage. On his face
 he bears a long scar that clips the left side of his lips.
 ~
+F 11800
 T 11906
 T 11806
 S
@@ -297,6 +303,7 @@ apprentice robes are clean and neatly pressed with nary a spot of dust. He
 studies a small tome, occasionally flipping a few pages, scratching his short,
 fire-orange hair.
 ~
+F 11800
 S
 #11814
 wright old~
@@ -311,6 +318,7 @@ you can see blue veins through his age-spotted translucent skin. His gray
 dressing gown is a far cry from the layers of sorcerer robes worn around most
 of the tower, but he seems to give little notice to you or anyone else in here.
 ~
+F 11800
 S
 #11815
 goblin uncaged~
@@ -588,6 +596,7 @@ turban. He has piled a blanket on top of himself haphazardly, such that it's
 only covering part of his robed body, though he doesn't seem to be trying to
 sleep.
 ~
+F 11800
 S
 #11826
 #n~
@@ -636,6 +645,7 @@ black-blue hair brushes back and forth over her shoulders in big, rolling waves
 as she laughs. She's one of the youngest apprentices here, and you notice the
 table sparks as she taps it with her fingers.
 ~
+F 11800
 T 11828
 S
 #11828
@@ -651,6 +661,7 @@ outstretched; one blocks half the aisle while the other is entwined with
 Marie's leg under the table. Djon is wearing a plain white apprentice robe. He
 has shaved the sides of his head and has short, curly black hair piled on top.
 ~
+F 11800
 S
 #11829
 otherworlder~
@@ -686,6 +697,7 @@ style give the impression of a Roman patrician.
    You must defeat the mercenary leader, Trixton Vye, before you can proceed
 upstairs.
 ~
+F 11800
 T 11893
 T 11814
 S
@@ -702,6 +714,7 @@ visible beneath her pitch-black hair lend a worn-out look to her otherwise
 youthful appearance. Her dark purple and black robes are dusty, but she seems
 to have other priorities.
 ~
+F 11800
 S
 #11832
 mohammed resident~
@@ -715,6 +728,7 @@ D
 thobe with a violet ghutra headscarf and black egal band. He seems busy helping
 the new shopkeeper organize supplies.
 ~
+F 11800
 S
 #11833
 shimmer slight goef~
@@ -734,6 +748,7 @@ a lot bigger than you are. They're moving around the first floor but they seem
 oblivious to what's going on around them; they don't even seem to notice you
 watching them.
 ~
+F 11800
 S
 #11834
 otherworlder person tall blue~
@@ -769,6 +784,7 @@ hot air over a fire. But when you approach, it's clearly a young man trying his
 best to remain hidden. He gives you a wide-eyed face and nudges his head toward
 the door.
 ~
+F 11800
 S
 #11836
 scaldorran lich~
@@ -783,6 +799,7 @@ very soul as you look into the writhing mass of tattered gray linens that is
 Scaldorran. His wrappings swirl around you, hissing, freezing your blood, but
 he seems to determine you're not his enemy.
 ~
+F 11800
 T 11839
 T 11806
 S
@@ -800,6 +817,7 @@ golden brown skin. His eyes are the hollow, smoky-black depressions of the
 unliving, but his face bears a soft, friendly smile. He seems to be wandering
 back and forth through the walls, listless.
 ~
+F 11800
 T 11838
 S
 #11839
@@ -815,6 +833,7 @@ of the cafe. She hugs her soup bowl in front of her with her arm, as if to
 protect it as she eats. She's dressed in a loose-fitting gray sweater and
 an old skirt, from under which peaks a shining bronze leg.
 ~
+F 11800
 S
 #11840
 Waltur walter magineer~
@@ -827,6 +846,7 @@ D
 He's hiding out in his lab in 3A.
 tba
 ~
+F 11800
 T 11806
 S
 #11841
@@ -1015,7 +1035,7 @@ Kara Virduke~
 Kara Virduke is digging through cabinets.
 ~
 0 0 bdvxE 0 3
-2 0 0 18
+2 0 0 17
 D
    Kara Virduke is nearly seven feet tall, such that she must stoop to work in
 some parts of the lab, but when she stands up straight, you feel quite small.
@@ -1027,6 +1047,7 @@ waterfall at sunset.
 T 11813
 T 11847
 T 11814
+T 11823
 S
 #11848
 Rojjer bleak~
@@ -1100,6 +1121,7 @@ expression is blank. She doesn't seem to see you. Her jaw-length brown and
 blonde hair hangs from her drooping head, unmoving in the breeze. You touch her
 hand, but it's cold and stiff. Still, she has a faint heartbeat.
 ~
+F 11800
 S
 #11854
 alpaca fluidic~
@@ -1186,6 +1208,7 @@ when you come in. She has a bright streak of lavender in her fingertip-short
 black hair, in stark contrast to her dark brown skin. Her unembellished jute
 robe and distinctive shoes identify her as one of the tower's pages.
 ~
+F 11800
 S
 #11860
 Grace woman old helpless~
@@ -1201,6 +1224,7 @@ while her high beehive hairdo nearly scrapes the tile floor. It looks fright-
 fully uncomfortable to hang upside-down, but she seems to be unconscious --
 almost serene.
 ~
+F 11800
 S
 #11861
 barrosh high sorcerer~
@@ -1216,6 +1240,7 @@ decades, not years, hang from his face. His face is streaked on one side as if
 he's been crying. When he turns, you see his other eye has been replaced by a
 carved yellow lightning stone.
 ~
+F 11800
 T 11864
 S
 #11862
@@ -1230,6 +1255,7 @@ D
 tall despite his age, he has scrunched himself up awkwardly to try to keep
 himself from being visible from the door.
 ~
+F 11800
 T 11806
 S
 #11863
@@ -1266,6 +1292,7 @@ in shades of purple. A trio of blue gems hover beneath each of her ears, under
 the cloud-like halo of gray hair that surrounds her rounded, brown face. It's
 clear she hasn't slept in quite some time.
 ~
+F 11800
 S
 #11865
 vortex enormous~
@@ -1329,6 +1356,7 @@ doesn't stir.
 him, sometimes passing through his chest. When it does, his body twitches and
 jolts, but no sound escapes his lips and his eyes never waver.
 ~
+F 11800
 S
 #11869
 Mezvienne shade shadow~
@@ -1362,6 +1390,7 @@ book than a wash basin. The long years hang off his face. Between his bushy
 eyebrows and thick crescent glasses, his eyes have the milky blue color of age.
 He sits hunched over, letting his violet and gold robes drape.
 ~
+F 11800
 T 11865
 S
 #11871

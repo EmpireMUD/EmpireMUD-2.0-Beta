@@ -991,7 +991,7 @@ rdelete drinking %self.id%
 nop %self.set_cooldown(11800, 15)%
 ~
 #11823
-Skycleave: Boss Deaths (Pixy, Barrosh, Shade)~
+Skycleave: Boss Deaths (Pixy, Kara, Barrosh, Shade)~
 0 f 100
 ~
 switch %self.vnum%
@@ -1006,6 +1006,15 @@ switch %self.vnum%
     %echo% The pixy queen sputters as her power fades and a look of shock -- and peace -- crosses her face.
     say Thank you for this release, be it ever so brief. We shall meet... again... in time.
     * dies with death-cry
+  break
+  case 11847
+    * Kara Virduke
+    set sanjiv %self.room.people(11835)%
+    if %sanjiv%
+      %echo% The camouflage around Apprentice Sanjiv fades as he collapses to his knees and vomits on the floor.
+      %mod% %sanjiv% longdesc An apprentice is kneeling on the floor, heaving.
+      %mod% %sanjiv% lookdesc The young apprentice is on his knees, dirtying his white kurta. His wavy brown hair is matted with sweat and he heaves as if he might vomit again.
+    end
   break
   case 11863
     * Shadow Ascendant
