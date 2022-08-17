@@ -4869,7 +4869,7 @@ while %ch%
     if %ch.on_quest(11810)% && %room.template% >= 11810 && %room.template% <= 11826
       %quest% %ch% trigger 11810
     elseif  %ch.on_quest(11811)% && %room.template% >= 11830 && %room.template% <= 11841
-      %quest% %ch% trigger 11812
+      %quest% %ch% trigger 11811
     elseif  %ch.on_quest(11812)% && %room.template% >= 11860 && %room.template% <= 11872
       %quest% %ch% trigger 11812
     end
