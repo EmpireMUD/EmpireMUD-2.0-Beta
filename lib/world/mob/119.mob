@@ -125,6 +125,7 @@ so it's off his neck and forehead while he bustles around the tower in his
 heavy jute page robe.
 ~
 F 11800
+T 11810
 S
 #11905
 Mageina barista~
@@ -160,6 +161,7 @@ $n hums a little tune.~
 M
 0
 $n hums a little tune.~
+T 11810
 S
 #11906
 Huberus instructor~
@@ -185,6 +187,7 @@ That will be enough.~
 M
 1
 Please pay attention.~
+T 11810
 S
 #11907
 #n shopkeep shopkeeper~
@@ -223,6 +226,7 @@ M
 0
 $n tries to dust one of the shelves, but the dust seems to be one step ahead of $m.~
 T 11806
+T 11810
 S
 #11908
 Elamm man young eager~
@@ -263,6 +267,7 @@ Is there a spell that just teleports a small tool like, say, a dagger?~
 M
 1
 Do you think it's possible to teleport the contents of a small vial into a very specific place?~
+T 11810
 S
 #11909
 Akeldama student pale~
@@ -300,6 +305,7 @@ Really do love the whole aesthetic.~
 M
 1
 When do they let us upstairs? It feels like I've been studying down here for ages.~
+T 11810
 S
 #11910
 Annaca watcher~
@@ -315,6 +321,7 @@ shuffles through the halls. Her golden brown hair almost forms a mane as it
 seems to have stacked itself curl-upon-curl.
 ~
 F 11800
+T 11810
 S
 #11911
 apprentice kayla~
@@ -331,6 +338,7 @@ but Skycleave's selection process is notoriously difficult, so she has surely
 earned her spot.
 ~
 F 11800
+T 11810
 S
 #11912
 cosimo apprentice~
@@ -346,6 +354,7 @@ grown hair up in a sweeping modern style, with a stubbly chin that almost
 resembles a beard.
 ~
 F 11800
+T 11810
 S
 #11913
 tyrone apprentice~
@@ -361,6 +370,7 @@ tower. But he walks with confidence and speaks with authority like many of the
 older, wiser sorcerers.
 ~
 F 11800
+T 11810
 S
 #11914
 Wright wrangler~
@@ -405,6 +415,7 @@ M
 0
 $n climbs on a chair and tries to clean something brown from the ceiling.~
 T 11934
+T 11810
 S
 #11915
 goblin caged cages~
@@ -470,6 +481,7 @@ $n sings, 'Straight outta Goblin, crazy featherplucker named Filks, from the gan
 M
 0
 $n sings, 'Desperate goblin... Why don't you come to your senses? You've been out ridin' fences for so long now...'~
+T 11810
 S
 #11916
 goblin caged cages~
@@ -499,6 +511,7 @@ We tried and died.~
 M
 0
 One of the goblins cries quietly in the cage.~
+T 11810
 S
 #11917
 goblin caged cages~
@@ -528,6 +541,7 @@ Evil wizards can't protect the tower forever!~
 M
 1
 Goblins' day is coming!~
+T 11810
 S
 #11918
 Chicanders warden ~
@@ -550,6 +564,7 @@ T 11918
 T 11919
 T 11920
 T 11911
+T 11810
 S
 #11919
 pixy escaped~
@@ -620,6 +635,7 @@ The broom stops for a moment and looks out into the distance, almost somberly.~
 T 11902
 T 11904
 T 11934
+T 11810
 S
 #11922
 duster feather~
@@ -658,6 +674,7 @@ The feather duster pauses in the morning and seems to sob.~
 T 11902
 T 11904
 T 11934
+T 11810
 S
 #11923
 goblin secret passage opener~
@@ -699,6 +716,7 @@ covers the front of his white and gray apprentice robes. He wears a single iron
 bracelet on his wrist and a curved kirpan knife on his waist.
 ~
 F 11800
+T 11810
 S
 #11926
 sponge giant~
@@ -738,6 +756,7 @@ M
 0
 $n makes the occasional sobbing sound as it cleans.~
 T 11934
+T 11810
 S
 #11927
 Henri DeClaire~
@@ -788,6 +807,7 @@ the sides to create more shape. If her face is stern, it's only because she's
 focused on something in her own head while she works.
 ~
 F 11800
+T 11810
 S
 #11930
 caius sirensbane high master~
@@ -803,6 +823,7 @@ bronzed complexion, aquiline nose, choice of clothing, and short imperial hair
 style give the impression of a Roman patrician.
 ~
 F 11800
+T 11810
 S
 #11931
 Niamh resident~
@@ -817,6 +838,7 @@ Her pale face and hands stick out in stark contrast to her dark purple and
 black robes. She looks rather young compared to many of the sorcerers here.
 ~
 F 11800
+T 11810
 S
 #11932
 mohammed resident~
@@ -831,6 +853,7 @@ thobe with a violet ghutra headscarf and black egal band. He smiles at you
 through a short, neat beard.
 ~
 F 11800
+T 11810
 S
 #11933
 mop bucket~
@@ -853,8 +876,8 @@ spilling potions on the fine ebony floors, he amounted to little more than a
 disappointment to the tower.
 ~
 T 11902
-T 11904
 T 11934
+T 11810
 S
 #11934
 otherworlder tall blue person~
@@ -874,6 +897,7 @@ sheet, allowing it to move effortlessly with its curved, boneless arms and legs.
 come from. The only thing you're sure about is that it doesn't want to be here.
 ~
 T 11834
+T 11810
 S
 #11935
 Sanjiv apprentice~
@@ -908,6 +932,7 @@ $n circles the otherworlder slowly.~
 M
 0
 $n bangs in the contraption in $s hands.~
+T 11810
 S
 #11936
 scaldorran lich~
@@ -923,6 +948,7 @@ back apart. And he is so much more than that. As a lich, he wields vast power
 over death -- and he has a reputation for sharing it.
 ~
 F 11800
+T 11810
 S
 #11937
 skeleton~
@@ -966,6 +992,7 @@ No bones about it, this is definitely going to be more interesting than my last 
 M
 1
 At least I don't get that hair-raising feeling around the lich anymore.~
+T 11810
 S
 #11938
 Weyonomon spirit apprentice~
@@ -1018,6 +1045,7 @@ The hair on the back of your neck stands up.~
 M
 0
 You start to open a small box, but it howls and you shut it fast.~
+T 11810
 S
 #11939
 Annelise enchanter~
@@ -1036,6 +1064,7 @@ to her bronze leg.
 - could have a rare interaction where a disappointing student arrives and is transformed into a broom
 ~
 F 11800
+T 11810
 S
 #11940
 Waltur walter magineer~
@@ -1049,6 +1078,7 @@ tba
 ~
 F 11800
 T 11806
+T 11810
 S
 #11941
 goef oreonic rock creature pitch black~
@@ -1073,6 +1103,7 @@ brow is very expressive when it speaks.
 F 11800
 T 11939
 T 11806
+T 11810
 S
 #11942
 Sanjiv apprentice~
@@ -1106,6 +1137,7 @@ $n bangs on the side of $s arcane contraption as the light flickers.~
 M
 0
 $n walks along the wall, passing the light from $s contraption over it.~
+T 11810
 S
 #11946
 fox gray~
@@ -1150,6 +1182,7 @@ $n chases its tail in a circle.~
 M
 0
 $n rolls around on the ground.~
+T 11810
 S
 #11947
 fox gray~
@@ -1164,6 +1197,7 @@ white belly, red fur in between, and large white spots on its back and nose. It
 has an adorable little pointed face with floppy ears and big, brown eyes that
 follow you.
 ~
+T 11810
 S
 #11948
 Loern goblin~
@@ -1180,6 +1214,7 @@ head is entirely bald, with brown splotches on his dark green skin. He trembles
 a little bit when he pushes himself back up after each bow, but he never makes
 a noise.
 ~
+T 11810
 S
 #11949
 Raek goblin~
@@ -1195,6 +1230,7 @@ and he frequently steps to the edge of the walkway for a better view. He's
 dressed in a forest green robe that's a little too large, always draping behind
 him as he walks.
 ~
+T 11810
 S
 #11950
 Ortimer goblin~
@@ -1209,6 +1245,7 @@ Ortimer would disappear into a forest or even tall grassland. At almost five
 feet tall and half as wide, he's large for a goblin, especially as he sprawls
 out on the small bed.
 ~
+T 11810
 S
 #11951
 Meyina goblin~
@@ -1223,6 +1260,7 @@ green gown. She's a heavy-set woman with a ruddy glow to the juniper skin of
 her cheeks. She makes little notice of you, but she looks back at Ortimer
 rather often.
 ~
+T 11810
 S
 #11952
 Orkhan goblin boy~
@@ -1238,6 +1276,7 @@ people pass. He pays close attention to the people in green robes, but he
 watches others, too. His wild brown hair covers his head like a mop, so you're
 not sure how much he's seeing anyway.
 ~
+T 11810
 S
 #11953
 Khoab goblin~
@@ -1253,6 +1292,7 @@ unceremoniously chucks the shell over the side of the city. His jade green skin
 sparkles with bits of leftover clam as he's not very good at eating while
 walking. The meal has stained his purple tunic as well.
 ~
+T 11810
 S
 #11954
 Zelen goblin~
@@ -1267,6 +1307,7 @@ seems to be enjoying the hot day, as he isn't seeking shade on the rooftops.
 He's dressed in a fine white shirt and purple trousers, with a pair of wooden
 shoes that clack as he walks.
 ~
+T 11810
 S
 #11955
 Pimmi goblin~
@@ -1282,6 +1323,7 @@ down to her waist, which is sinched with a black belt between her lavender
 blouse and deep purple skirt. Her ears both have wide shell discs stretching
 the lobes, which hang down to her shoulders.
 ~
+T 11810
 S
 #11956
 Elver worthy goblin~
@@ -1358,6 +1400,7 @@ out in stark contrast to her dark brown skin. She doesn't spare a single glance
 in your direction as she stays focused on her work.
 ~
 F 11800
+T 11810
 S
 #11960
 cabinet filing~
@@ -1399,6 +1442,7 @@ The filing cabinet sounds like it's crying in the corner.~
 T 11902
 T 11904
 T 11934
+T 11810
 S
 #11961
 bookshelf shelf ebony~
@@ -1437,6 +1481,7 @@ The bookshelf falls foward onto a book with a THUD! When it gets back up, the bo
 T 11902
 T 11904
 T 11934
+T 11810
 S
 #11962
 thorley apprentice~
@@ -1452,6 +1497,7 @@ falls over his ears and eyes like a mop. He's dressed in a fresh white
 apprentice robe with a black margin.
 ~
 F 11800
+T 11810
 S
 #11964
 celiya high sorcerer~
@@ -1467,6 +1513,7 @@ A trio of blue gems hovers beneath each of her ears and she wears a nocturnium
 stud on the right side of her short, rounded nose.
 ~
 F 11800
+T 11810
 S
 #11965
 trolley cleaning~
@@ -1522,6 +1569,7 @@ M
 The trolley cleans the office.~
 T 11902
 T 11904
+T 11810
 S
 #11966
 Grace sorcerer assistant~
@@ -1538,6 +1586,7 @@ the base of her glasses as you enter. She makes a small gesture of approval
 with her lips and then goes back to what she was doing.
 ~
 F 11800
+T 11810
 S
 #11967
 barrosh high sorcerer~
@@ -1554,6 +1603,7 @@ plumps at the sides. He doesn't even look up at you -- you aren't sure he's
 even aware you're here.
 ~
 F 11800
+T 11810
 S
 #11968
 knezz grand high sorcerer~
@@ -1572,6 +1622,7 @@ several nocturnium beads in his beard. If he carries anything else on his
 person, it's covered by the robes.
 ~
 F 11800
+T 11810
 S
 #11969
 celiya grand high sorcerer~
@@ -1588,6 +1639,7 @@ gems hovers beneath each of her ears and she wears a nocturnium stud on the
 right side of her short, rounded nose.
 ~
 F 11800
+T 11810
 S
 #11970
 Niamh acting high sorcerer~
@@ -1602,6 +1654,7 @@ Her pale face and hands stick out in stark contrast to her dark purple and
 black robes. She looks rather young compared to many of the sorcerers here.
 ~
 F 11800
+T 11810
 S
 #11972
 crowd~
@@ -1631,6 +1684,7 @@ purple rope signifies his station as captain of the guard. A small, iridescent
 seashell disc fills a pierced hole in the left side of his nose.
 ~
 T 11989
+T 11810
 S
 #11974
 Celles voice goblin~
@@ -1645,6 +1699,7 @@ robe, Celles looks to be the oldest goblin in the city. Her skin, perhaps
 chartreuse once, has faded almost to gray. Her eyes are milky white to match
 her hair, and she stares off toward the horizon as she speaks.
 ~
+T 11810
 S
 #11975
 Filliks goblin~
@@ -1662,6 +1717,7 @@ close a hole.
 resemble your version of comfort. She is dressed in a simple green gown that
 covers her feet even as she reclines.
 ~
+T 11810
 S
 #11976
 Pim goblin~
@@ -1676,6 +1732,7 @@ discs stretch her chartreuse earlobes into thin bands, and a small cylindrical
 stone pierces the bridge of her nose. Futile though it may be, she is busy
 collecting the clutter and sorting it into baskets.
 ~
+T 11810
 S
 #11977
 fox gray~
@@ -1720,6 +1777,7 @@ $n chases its tail in a circle.~
 M
 0
 $n rolls around on the ground.~
+T 11810
 S
 #11978
 moth~
@@ -1732,6 +1790,7 @@ D
    The small moth sits motionless on the wall, its silvery wings folded down in
 a triangular shape on its back.
 ~
+T 11810
 S
 #11979
 pilgrim altar~
@@ -1745,6 +1804,7 @@ D
 Altar Below.
 ~
 T 11978
+T 11810
 S
 #11980
 Ryken elder goblin~
@@ -1760,6 +1820,7 @@ pulled into a knot at the back of his head. His drooping nose has a hole in the
 side that might once have held jewelry, but he wears only a necklace made from
 shell beads over his violet tunic and pants.
 ~
+T 11810
 S
 #11981
 crowd~
@@ -1775,6 +1836,7 @@ entertainment. Others are merely passing through, but have stopped to talk. The
 click-clack of their shoes creates its own din as they walk, almost louder than
 the gossip as it fills the air.
 ~
+T 11810
 S
 #11982
 pixy little~
@@ -1829,6 +1891,7 @@ glows a healthy jade tone in the midday sun. He's dressed in fine black pants,
 a violet shirt, and a black vest. But curiously, he's barefoot and seems
 happier for it.
 ~
+T 11810
 S
 #11984
 Yena goblin~
@@ -1843,6 +1906,7 @@ up in a thick braid. She's dressed in a simple green gown that drapes to the
 ground, covering her legs and feet completely. Around her neck, she wears a
 string of iridescent shell beads.
 ~
+T 11810
 S
 #11985
 Ballen goblin~
@@ -1857,6 +1921,7 @@ as he constantly stops to take in the view, whether of the ocean, the city, or
 the great standing stone. He wears a plain green robe, nearly the same color as
 his jade skin.
 ~
+T 11810
 S
 #11986
 Orkonna goblin~
@@ -1872,6 +1937,7 @@ In both ears, she wears large abalone shell discs that stretch her earlobes
 larger than your palm. She expertly wields a long wooden spoon as she churns
 the shellfish in the cauldron.
 ~
+T 11810
 S
 #11987
 Orlin goblin repairman~
@@ -1905,6 +1971,7 @@ This won't take long. It will be open again tomorrow.~
 M
 1
 Watch your step around that edge!~
+T 11810
 S
 #11988
 guards pair~
@@ -1920,6 +1987,7 @@ olive complexion and a bald head. On the right, the other guard looks much
 younger, with an unlined face, short orange hair, and a face the color of
 dewy clovers.
 ~
+T 11810
 S
 #11989
 shoes walking pair~

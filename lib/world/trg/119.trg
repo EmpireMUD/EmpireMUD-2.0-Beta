@@ -172,26 +172,33 @@ if %self.loadtime% + 3600 > %timestamp%
   * more time left
   halt
 end
-* despawn helper first, if bucket
-if %self.vnum% == 11902
-  set sponge %instance.mob(11903)%
-  if %sponge%
-    %echo% ~%sponge% hops into ~%self%.
-    %purge% %sponge%
-  end
-end
-* possible replacement for the missing high sorcerer
-if %self.vnum% == 11965
-  * check for Niamh
-  set niamh %instance.mob(11931)%
-  if %niamh%
-    %at% %niamh.room% %echo% ~%niamh% heads upstairs.
-    %purge% %niamh%
-    %load% mob 11970
-    %echo% Niamh walks in from the north.
-    wait 3 sec
-  end
-end
+* extra tasks for specific mobs
+switch %self.vnum%
+  case 11902
+    * bucket: despawn helper first
+    set sponge %instance.mob(11903)%
+    if %sponge%
+      %echo% ~%sponge% hops into ~%self%.
+      %purge% %sponge%
+    end
+  break
+  case 11961
+    * bookshelf: load the skeleton in the lich labs
+    %at% i11937 %load% mob 11937
+    %at% i11937 %echo% A skeleton sits up on the work bench.
+  break
+  case 11965
+    * trolley: possible replacement for the missing high sorcerer
+    set niamh %instance.mob(11931)%
+    if %niamh%
+      %at% %niamh.room% %echo% ~%niamh% heads upstairs.
+      %purge% %niamh%
+      %load% mob 11970
+      %echo% Niamh walks in from the north.
+      wait 3 sec
+    end
+  break
+done
 * and leave
 %echo% ~%self% scuttles away.
 %purge% %self%

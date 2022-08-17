@@ -1174,29 +1174,6 @@ if %self.vnum% == 11818
       set done 1
     break
   done
-elseif %self.vnum% == 11830
-  * High Master Caius Sirensbane 3A
-  switch %line%
-    case 1
-      %echo% ~%self% struggles to hold up the magical ward...
-      wait 9 sec
-      say I can't hold this much longer.
-      wait 9 sec
-      say Some sort of shadow keeps attacking me from over the railing.
-    break
-    case 2
-      say We have no chance of retaking this floor without defeating that scoundrel Trixton Vye.
-      wait 9 sec
-      if %instance.mob(11847)% || %instance.mob(11848)%
-        say He's being protected by magic from his allies, Lady Virduke and Bleak Rojjer.
-      else
-        say He's unprotected; you need to get to him in the Lich Labs and finish this.
-      end
-    break
-    default
-      set done 1
-    break
-  done
 elseif %self.vnum% == 11847
   * Kara Virduke, Mercenary Archmage boss
   switch %line%
@@ -1324,20 +1301,6 @@ elseif %self.vnum% == 11891
     break
     case 2
       say If you're heading upstairs, be on the lookout for cutthroat mercenaries.
-    break
-    default
-      set done 1
-    break
-  done
-elseif %self.vnum% == 11892
-  * High Master Caius Sirensbane 3B
-  switch %line%
-    case 1
-      %echo% ~%self% struggles to hold up the magical ward...
-      wait 9 sec
-      say This is taking too much power... please tell me you're ready to take on the shadow.
-      wait 9 sec
-      say I'll drop the ward as soon as you're ready.
     break
     default
       set done 1
@@ -1651,6 +1614,49 @@ else
   * unknown location somehow? Oh well, we tried
   detach 11829 %self.id%
 end
+~
+#11830
+Skycleave: Shared quest completion script~
+2 v 0
+~
+return 1
+switch %questvnum%
+  case 11810
+  case 11811
+  case 11812
+    * all three first-time floor scripts guarantee Liked reputation
+    if !%actor.has_reputation(11800,Liked)%
+      nop %actor.set_reputation(11800,Liked)%
+    end
+  break
+done
+~
+#11831
+Skycleave: Shared quest start script~
+2 u 0
+~
+return 1
+set spirit %instance.mob(11900)%
+switch %questvnum%
+  case 11810
+    if %spirit.phase2%
+      %send% %actor% You cannot start '%questname%' because floor 2 has already been rescued.
+      return 0
+    end
+  break
+  case 11811
+    if %spirit.phase3%
+      %send% %actor% You cannot start '%questname%' because floor 3 has already been rescued.
+      return 0
+    end
+  break
+  case 11812
+    if %spirit.phase4%
+      %send% %actor% You cannot start '%questname%' because floor 4 has already been rescued.
+      return 0
+    end
+  break
+done
 ~
 #11834
 Skycleave: Free the otherworlder~
@@ -2694,7 +2700,30 @@ end
 remote line %self.id%
 set done 0
 * switch: message cases goes +1 per 13 seconds and automatically ends when it hits default
-if %self.vnum% == 11869
+if %self.vnum% == 11830
+  * High Master Caius Sirensbane 3A
+  switch %line%
+    case 1
+      %echo% ~%self% struggles to hold up the magical ward...
+      wait 9 sec
+      say I can't hold this much longer.
+      wait 9 sec
+      say Some sort of shadow keeps attacking me from over the railing.
+    break
+    case 2
+      say We have no chance of retaking this floor without defeating that scoundrel Trixton Vye.
+      wait 9 sec
+      if %instance.mob(11847)% || %instance.mob(11848)%
+        say He's being protected by magic from his allies, Lady Virduke and Bleak Rojjer.
+      else
+        say He's unprotected; you need to get to him in the Lich Labs and finish this.
+      end
+    break
+    default
+      set done 1
+    break
+  done
+elseif %self.vnum% == 11869
   * Shade of Mezvienne
   switch %line%
     case 1
@@ -2722,6 +2751,20 @@ elseif %self.vnum% == 11863
       %echo% Low chanting builds from the shadows as the Ascendant grows in power.
       wait 9 sec
       %echo% You feel your own power being drained by the Shadow Ascendant as it absorbs everything in sight.
+    break
+    default
+      set done 1
+    break
+  done
+elseif %self.vnum% == 11892
+  * High Master Caius Sirensbane 3B
+  switch %line%
+    case 1
+      %echo% ~%self% struggles to hold up the magical ward...
+      wait 9 sec
+      say This is taking too much power... please tell me you're ready to take on the shadow.
+      wait 9 sec
+      say I'll drop the ward as soon as you're ready.
     break
     default
       set done 1
@@ -4786,14 +4829,15 @@ if %actor.nohassle%
   halt
 end
 wait 0
-if %self.room.template% < 11801 || %self.room.template% > 11899
+set room %self.room%
+if %room.template% < 11801 || %room.template% > 11899
   * Only works in phase 1 of Skycleave
   %purge% %self%
   halt
 end
 * Ensure part of the instance
 nop %self.link_instance%
-eval to_vnum %self.room.template% + 100
+eval to_vnum %room.template% + 100
 set to_room %instance.nearest_rmt(%to_vnum%)%
 if !%to_room%
   * No destination
@@ -4803,7 +4847,7 @@ end
 * Message now
 %echo% This part of Skycleave has been restored!
 * Check items here
-set obj %self.room.contents%
+set obj %room.contents%
 while %obj%
   set next_obj %obj.next_in_list%
   if %obj.can_wear(TAKE)%
@@ -4812,7 +4856,7 @@ while %obj%
   set obj %next_obj%
 done
 * Check people here
-set ch %self.room.people%
+set ch %room.people%
 while %ch%
   set next_ch %ch.next_in_room%
   if %ch.nohassle% || (%ch.vnum% >= 11890 && %ch.vnum% <= 11899)
@@ -4821,6 +4865,14 @@ while %ch%
     * Move ch (stops at 11988 because of mini-pets from this adventure)
     %teleport% %ch% %to_room%
     %load% obj 11805 %ch%
+    * check quest completion
+    if %ch.on_quest(11810)% && %room.template% >= 11810 && %room.template% <= 11826
+      %quest% %ch% trigger 11810
+    elseif  %ch.on_quest(11811)% && %room.template% >= 11830 && %room.template% <= 11841
+      %quest% %ch% trigger 11812
+    elseif  %ch.on_quest(11812)% && %room.template% >= 11860 && %room.template% <= 11872
+      %quest% %ch% trigger 11812
+    end
   elseif %ch% != %self%
     * Adventure mob: purge
     %purge% %ch%
@@ -5009,7 +5061,6 @@ if %instance.mob(11835)%
   end
 end
 %at% i11936 %load% mob 11936  * Scaldorran
-%at% i11937 %load% mob 11937  * Skeleton
 skydel 11838 1  * Ghost
 %at% i11938 %load% mob 11938  * Ghost
 skydel 11839 1  * Enchanter Annelise
@@ -5018,12 +5069,6 @@ set waltur %instance.mob(11840)%
 if %waltur%
   %at% i11940 %load% mob 11940  * Magineer Waltur (if he survived)
 end
-* if %random.2% == 2
-*   %at% i11937 %load% mob 11937  * (additional) Skeleton
-* end
-* if %random.3% == 3
-*   %at% i11937 %load% mob 11937  * (additional) Skeleton
-* end
 %at% i11932 %load% mob 11933  * Walking Mop
 skydel 11833 0  * Goef the shimmer
 %at% i11941 %load% mob 11941  * Goef the Attuner

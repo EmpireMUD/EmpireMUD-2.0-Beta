@@ -1,0 +1,98 @@
+#11810
+Skycleave: Past Pixies and Goblins~
+   High Sorceress Celiya wipes her brow with her sleeve and sighs. 'It's not
+looking good up there, sugar,' she says, her eyes flitting upward.
+   'If it's not one thing, it's another. Half of the second floor is overrun by
+goblins and the other half is overgrown with some kind of pixy maze. We have
+enough trouble for ourselves down here. We need somebody to get through that
+maze and find a way to get rid of it!'
+   Rescue the second floor of the Tower Skylceave to complete this quest. See
+Watcher Annaca on the second floor when it's done.
+~
+   Annaca glances over at you. 'Ah, there you are,' she says. 'I saw you clear
+out that pixy maze. Nothing to it, eh? We could use a few more like you around
+here for when things get messy.'
+~
+4 0 125 250 -1
+A
+1 11864
+A
+1 11890
+R
+7 11800 50
+R
+6 11811 11811
+T 11830
+T 11831
+W
+11 0 0 1
+Z
+1 11891
+Z
+1 11910
+S
+#11811
+Skycleave: Clear Out the Mercenaries~
+   'While you're here,' Annaca says, 'We're still having trouble retaking the
+third floor. It's full of mercenaries. I heard one of them mention Trixton Vye,
+so you'll want to be careful. He's notorious. If he's leading them, they're
+more than your average rabble.
+   'If you manage to stop Vye, we'll finally have the upper hand. And see if
+you can find Watcher Caius up there. Nobody has seen him.'
+   Rescue the third floor of the Tower Skycleave to complete this quest. See
+Watcher Caius on the third floor when it's done.
+~
+   'My word, that was atrocious. Those provincials got into everything. It will
+take weeks to sort out.' Caius Sirensbane adjusts his toga as he speaks. He
+stops and looks you up and down.
+   'Seems you had the virtue to see them gone, however,' he says. 'We are in
+your debt.'
+~
+6 0 125 250 -1
+A
+1 11891
+A
+1 11910
+R
+7 11800 50
+R
+6 11812 11812
+T 11830
+T 11831
+W
+11 0 0 1
+Z
+1 11892
+Z
+1 11930
+S
+#11812
+Skycleave: Find the Enchantress and Stop Her~
+   'Now that the nastiness with that scoundrel Trixton Vye is settled, we must
+turn our attention upstairs,' Caius says. 'Masters Knezz and Barrosh are both
+missing since the attack. I must tend to matters here on the third floor. And
+if the gods are merciful, let us hope those common thugs didn't damage anything
+of value.'
+   Caius turns and begins to walk away, but he turns back and adds, 'To be
+crystal ball clear, I expect you to go up and rescue them. You have come this
+far. See it through. You are no quitter.'
+   Rescue the top floor of the Tower Skycleave to complete this quest. See High
+Sorcerer Barrosh in his office when it's done.
+~
+'Fine, what do you want, a cookie?' Master Barrosh says without looking at you.
+~
+5 0 125 250 -1
+A
+1 11892
+A
+1 11930
+R
+7 11800 50
+T 11830
+T 11831
+W
+11 0 0 1
+Z
+1 11967
+S
+$

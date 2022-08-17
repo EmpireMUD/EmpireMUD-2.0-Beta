@@ -10,6 +10,7 @@ D
 as a member of the Sisterhood. Her hair is tied up under her hat and she's
 wearing boots with dried mud on the sides.
 ~
+T 11810
 S
 #11801
 Dylane trense~
@@ -49,6 +50,7 @@ M
 0
 $n sips $s tea.~
 T 11828
+T 11810
 S
 #11802
 #n~
@@ -83,6 +85,7 @@ $n coughs.~
 M
 0
 $n coughs.~
+T 11810
 S
 #11803
 #n~
@@ -97,6 +100,7 @@ useful tidbits -- all of which you've never heard before -- as he tours the
 tower.
 ~
 T 11828
+T 11810
 S
 #11804
 corwin page~
@@ -111,6 +115,7 @@ trying to organize the refugees down here on the first floor. He looks young,
 perhaps 16, but he's putting in twice as much work as everyone else around him.
 ~
 F 11800
+T 11810
 S
 #11805
 Mageina barista~
@@ -128,6 +133,7 @@ curly bun. Her face, though young, looks absolutely exhausted, as if she hasn't
 slept in some time.
 ~
 F 11800
+T 11810
 S
 #11806
 Huberus master sorcerer instructor~
@@ -146,6 +152,7 @@ her left hand has been replaced with intricate nocturnium filigree.
   order. May tell the player there's no room for them.
 ~
 F 11800
+T 11810
 S
 #11807
 #n~
@@ -181,6 +188,7 @@ M
 0
 $n scratches $s head.~
 T 11806
+T 11810
 S
 #11808
 #n young lady~
@@ -224,6 +232,7 @@ $n lets out a fume of sighs as she fidgets with a handkerchief.~
 M
 1
 What lust has rent, mayhap sorcery can repair.~
+T 11810
 S
 #11809
 #n~
@@ -238,6 +247,7 @@ suspenders. He walks around the tower with a huge grin, astounded by everything
 he comes across.
 ~
 T 11828
+T 11810
 S
 #11810
 Annaca watcher~
@@ -273,6 +283,7 @@ who hasn't slept right in some time. Her dark hair is worn in chunky, uneven
 braids tied back behind her head.
 ~
 F 11800
+T 11810
 S
 #11812
 cosimo apprentice~
@@ -289,6 +300,7 @@ he bears a long scar that clips the left side of his lips.
 F 11800
 T 11906
 T 11806
+T 11810
 S
 #11813
 tyrone~
@@ -304,6 +316,7 @@ studies a small tome, occasionally flipping a few pages, scratching his short,
 fire-orange hair.
 ~
 F 11800
+T 11810
 S
 #11814
 wright old~
@@ -319,6 +332,7 @@ dressing gown is a far cry from the layers of sorcerer robes worn around most
 of the tower, but he seems to give little notice to you or anyone else in here.
 ~
 F 11800
+T 11810
 S
 #11815
 goblin uncaged~
@@ -488,6 +502,7 @@ You get a whif of goblin. Maybe it's coming from upstairs.~
 M
 0
 $n seems to be arguing with $mself inside $s coat.~
+T 11810
 S
 #11822
 #n~
@@ -503,6 +518,7 @@ to small details. She's wearing brown leather pants and a tight gray shirt, but
 nobody else seems to notice her.
 ~
 T 11828
+T 11810
 S
 #11823
 #n~
@@ -539,6 +555,7 @@ I'm not getting any younger, yet.~
 M
 0
 $n looks around.~
+T 11810
 S
 #11824
 #n~
@@ -580,6 +597,7 @@ M
 0
 $n picks up a skycleaver trinket but it starts to glow and $e puts it back down fast.~
 T 11828
+T 11810
 S
 #11825
 ravinder apprentice~
@@ -597,6 +615,7 @@ only covering part of his robed body, though he doesn't seem to be trying to
 sleep.
 ~
 F 11800
+T 11810
 S
 #11826
 #n~
@@ -631,6 +650,7 @@ M
 0
 $n mills around the shop.~
 T 11828
+T 11810
 S
 #11827
 Marie apprentice~
@@ -647,6 +667,7 @@ table sparks as she taps it with her fingers.
 ~
 F 11800
 T 11828
+T 11810
 S
 #11828
 Djon apprentice~
@@ -662,6 +683,7 @@ Marie's leg under the table. Djon is wearing a plain white apprentice robe. He
 has shaved the sides of his head and has short, curly black hair piled on top.
 ~
 F 11800
+T 11810
 S
 #11829
 otherworlder~
@@ -729,6 +751,7 @@ thobe with a violet ghutra headscarf and black egal band. He seems busy helping
 the new shopkeeper organize supplies.
 ~
 F 11800
+T 11810
 S
 #11833
 shimmer slight goef~
@@ -749,6 +772,7 @@ oblivious to what's going on around them; they don't even seem to notice you
 watching them.
 ~
 F 11800
+T 11810
 S
 #11834
 otherworlder person tall blue~
@@ -819,6 +843,7 @@ back and forth through the walls, listless.
 ~
 F 11800
 T 11838
+T 11810
 S
 #11839
 Annelise~
@@ -834,6 +859,7 @@ protect it as she eats. She's dressed in a loose-fitting gray sweater and
 an old skirt, from under which peaks a shining bronze leg.
 ~
 F 11800
+T 11810
 S
 #11840
 Waltur walter magineer~
@@ -1135,6 +1161,7 @@ D
 bounds along, spritzing everyone it passes with a fine mist.
 ~
 T 11969
+T 11810
 S
 #11855
 dragon water~
@@ -1150,6 +1177,7 @@ walkway, sparing not a single thought for the people it sloshes through along
 the way.
 ~
 T 11969
+T 11810
 S
 #11856
 hawk liquiform~
@@ -1165,6 +1193,7 @@ sometimes compressing into a ball of water as it changes direction abruptly,
 then flattens back into a hawk as it glides.
 ~
 T 11969
+T 11810
 S
 #11857
 lion aqueous~
@@ -1179,6 +1208,7 @@ Skycleave's spiraling walkway. A fish is swimming around the lion's stomach,
 unperturbed by the jaunt outside the fountain.
 ~
 T 11969
+T 11810
 S
 #11858
 unicorn water sparkling~
@@ -1193,6 +1223,7 @@ stunning sculpture if it held still, but it never does -- it's galloping
 through the tower, leaving only effervescent bubbles in its wake.
 ~
 T 11969
+T 11810
 S
 #11859
 sheila~
@@ -1293,6 +1324,7 @@ the cloud-like halo of gray hair that surrounds her rounded, brown face. It's
 clear she hasn't slept in quite some time.
 ~
 F 11800
+T 11810
 S
 #11865
 vortex enormous~
@@ -1447,6 +1479,7 @@ instead of stars, it is dotted with bits of dust and the dried crumbs of many
 meals. Moneryl's triangular silver cape, however, is as stiff and perfect as
 everyone else's.
 ~
+T 11810
 S
 #11874
 envoy~
@@ -1462,6 +1495,7 @@ high-arching eyebrows pulled down in a furrow. She stands almost at attention,
 though not quite like a soldier, with a triangular silver cape hanging stiffly
 on her back.
 ~
+T 11810
 S
 #11875
 Nayyul messenger young~
@@ -1479,6 +1513,7 @@ red and violet glimstone. In shadow, they seem to emit a faint glow. The armor
 is tied together through holes in the wood with brown silk ribbons. On his
 back, Nayyul wears a stiff, silvery cape in the shape of a peaked triangle.
 ~
+T 11810
 S
 #11876
 Pelet urborist royal~
@@ -1494,6 +1529,7 @@ people you've met in Smol Nes-Pik. His violet silk double-robe hangs open,
 underneath which he's wearing a white floor-length silk cassock. Behind him,
 his stiff triangular cape sticks out backwards to follow his crooked posture.
 ~
+T 11810
 S
 #11877
 Joiago~
@@ -1514,6 +1550,7 @@ business.
 T 11877
 T 11875
 T 11876
+T 11810
 S
 #11878
 Bastain keeper~
@@ -1531,6 +1568,7 @@ such that you can hardly imagine how he can stand after a long day of this.
 he plods up and down the glimmering staircase.
 ~
 T 11878
+T 11810
 S
 #11879
 Veloryan royal guard~
@@ -1548,6 +1586,7 @@ is as intricately carved as the palace around you, and inlaid with smaller red
 and blue gems. On his back, he bears a stiff, triangular cape in silver and
 yellow.
 ~
+T 11810
 S
 #11880
 Lotte~
@@ -1569,6 +1608,7 @@ almost childlike interest in every facet of the city.
 ~
 T 11876
 T 11880
+T 11810
 S
 #11881
 Kym~
@@ -1586,6 +1626,7 @@ triangular cape on her back, adorned with patterns of silver and yellow, stays
 perfectly still as she moves with the elegance of a trained dancer. She gives
 you a crooked smile as you pass her.
 ~
+T 11810
 S
 #11882
 tresydion high~
@@ -1601,6 +1642,7 @@ ears and chins hang in contrast to the tight, youthful features of the other
 residents of Smol Nes-Pik.
 ~
 T 11882
+T 11810
 S
 #11883
 Meket black~
@@ -1678,6 +1720,7 @@ $n glances around the seashell.~
 M
 0
 $n looks up at you and says, 'Wake up.'~
+T 11810
 S
 #11884
 Queen image queen's Vehl somber~
@@ -1701,6 +1744,7 @@ somewhere else.
 ~
 T 11947
 T 11955
+T 11810
 S
 #11885
 Tyewa~
@@ -1716,6 +1760,7 @@ blue under the triangular silver and yellow cape of Smol Nes-Pik. She kneels by
 each pool in turn, touching the surface with her long, delicate fingers,
 swirling it around, then touching her fingers to her closed lips.
 ~
+T 11810
 S
 #11886
 Torru~
@@ -1736,6 +1781,7 @@ here not wearing one.
 ~
 T 11874
 T 11866
+T 11810
 S
 #11887
 Nayyur~
@@ -1752,6 +1798,7 @@ short, but soaked at the back with blood that has flowed from his wounds. He
 seems to have taken off his cape, or lost it somewhere.
    You can type 'skip' to skip to the important part of this cutscene.
 ~
+T 11810
 S
 #11888
 Iskip giant~
@@ -1810,6 +1857,7 @@ T 11890
 T 11899
 T 11888
 T 11814
+T 11810
 S
 #11891
 Annaca watcher difficulty~
@@ -1834,6 +1882,7 @@ T 11891
 T 11899
 T 11900
 T 11814
+T 11810
 S
 #11892
 Caius sirensbane high master difficulty~
@@ -1858,6 +1907,7 @@ Usage: difficulty <normal | hard | group | boss>
 T 11892
 T 11899
 T 11814
+T 11810
 S
 #11894
 progress sense phase changer~
