@@ -95,4 +95,56 @@ W
 Z
 1 11967
 S
+#11875
+Smol Nes-Pik: What Is This Place?~
+   You find yourself on the branches of a truly enormous tree, with little idea
+how you got here. Were you just in a tower? It's hard to remember now. Like the
+world beyond this tree, your mind seems hazy. This place merits some deeper
+exploration. Will anyone even believe it when you tell them about it?
+   Find something tangible to take back to the tower. Perhaps you can find a
+sorcerer there who will be interested in it.
+~
+   Celiya stops what she was doing as you hand her the little green vial of
+dew. She spins it in her hand, examining it from every angle, taking careful
+note of the carvings and shape before opening the vial and wafting air over the
+mouth to smell the contents.
+   'And you say you found this... on a giant tree?' she asks.
+   'No,' you say. 'It came from the giant who cut the tree down. At least, I
+think it did. It was more like a dream.'
+   'Sugar, this could be the discovery of a lifetime! I'll be sure to put one
+of the residents on this. You did good.'
+~
+8 d 125 250 -1
+A
+4 11946
+R
+7 11800 25
+T 11830
+W
+2 11961 0 1
+Z
+1 11864
+Z
+1 11964
+Z
+1 11890
+Z
+1 11969
+S
+#11890
+Skycleave: Trapped in a Jar~
+tba
+~
+tba
+~
+10 0 125 250 -1
+A
+4 11946
+P
+16 11800 0 6
+R
+7 11800 10
+W
+13 11890 0 1
+S
 $

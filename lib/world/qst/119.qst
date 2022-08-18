@@ -24,4 +24,69 @@ W
 Z
 1 11906
 S
+#11975
+Gobbrabakh of Orka: Where Am I?~
+   As you step onto the rooftop, it begins to dawn on you that you are NOT
+where you were before -- or where you expected to be. 'What is this place?
+And where am I?' you wonder aloud as you look out over the city.
+   The hot summer sun beats down on you as you try to get your bearings. Were
+you just in a tower somewhere? As you struggle to find the answer in your own
+memory, you're quickly distracted by someone walking by. You start to wonder if
+anyone is going to believe you about this place...
+   Find something tangible to take back to the tower. Perhaps you can find a
+sorcerer there who will be interested in it.
+~
+   Tyrone makes a puzzles face as he takes the jade tear from you and turns it
+over and over between his fingers.
+   'I have one exactly like this in my room,' he says. 'I mean, ex-act-lee. I
+wonder if it even... well...'
+   He holds the tear up to the light, rubs it between his palms, even sniffs at
+it as he marvels.
+   'I need to compare it's, er, properties. To the other one. Thanks!'
+~
+9 d 125 250 -1
+A
+4 11946
+R
+7 11800 25
+T 11830
+W
+2 11965 0 1
+Z
+1 11813
+Z
+1 11913
+S
+#11993
+Skycleave: The Endless River~
+tba
+~
+tba
+~
+9 0 125 250 -1
+A
+4 11946
+P
+16 11800 0 6
+R
+7 11800 10
+W
+13 11993 0 1
+S
+#11994
+Skycleave: Presence of the God~
+tba
+~
+tba
+~
+11 0 125 250 -1
+A
+4 11946
+P
+16 11800 0 6
+R
+7 11800 10
+W
+13 11994 0 1
+S
 $

@@ -1624,7 +1624,9 @@ switch %questvnum%
   case 11810
   case 11811
   case 11812
-    * all three first-time floor scripts guarantee Liked reputation
+  case 11875
+  case 11975
+    * these scripts guarantee Liked reputation
     if !%actor.has_reputation(11800,Liked)%
       nop %actor.set_reputation(11800,Liked)%
     end
