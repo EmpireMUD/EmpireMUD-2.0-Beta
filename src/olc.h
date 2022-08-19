@@ -116,6 +116,9 @@ struct olc_command_data {
 	int flags;	// OLC_CF_
 };
 
+// for parse_quest_reward_vnum:
+#define PARSE_QRV_FAILED  -999
+
 
 // olc.c helpers
 bool can_start_olc_edit(char_data *ch, int type, any_vnum vnum);

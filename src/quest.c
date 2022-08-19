@@ -3617,7 +3617,7 @@ void olc_search_quest(char_data *ch, any_vnum vnum) {
 * @param int type The QR_ reward type.
 * @param char *vnum_arg The argument which the player supplied.
 * @param char *prev_arg The argument right BEFORE that one (if it's the quantity arg, because types that don't use quantity will want that instead).
-* @return any_vnum The 'vnum' field for the reward, or NOTHING if it failed.
+* @return any_vnum The 'vnum' field for the reward, or -999 if it failed (because -1 is a VALID result).
 */
 any_vnum parse_quest_reward_vnum(char_data *ch, int type, char *vnum_arg, char *prev_arg) {
 	faction_data *fct;
@@ -3643,18 +3643,18 @@ any_vnum parse_quest_reward_vnum(char_data *ch, int type, char *vnum_arg, char *
 			}
 			else {
 				msg_to_char(ch, "You must choose misc or empire coins.\r\n");
-				return NOTHING;
+				return PARSE_QRV_FAILED;
 			}
 			break;	
 		}
 		case QR_CURRENCY: {
 			if (!*vnum_arg) {
 				msg_to_char(ch, "You must specify a currency (generic) vnum.\r\n");
-				return NOTHING;
+				return PARSE_QRV_FAILED;
 			}
 			if (!isdigit(*vnum_arg) || (vnum = atoi(vnum_arg)) < 0) {
 				msg_to_char(ch, "Invalid generic vnum '%s'.\r\n", vnum_arg);
-				return NOTHING;
+				return PARSE_QRV_FAILED;
 			}
 			if (find_generic(vnum, GENERIC_CURRENCY)) {
 				ok = TRUE;
@@ -3664,11 +3664,11 @@ any_vnum parse_quest_reward_vnum(char_data *ch, int type, char *vnum_arg, char *
 		case QR_OBJECT: {
 			if (!*vnum_arg) {
 				msg_to_char(ch, "You must specify an object vnum.\r\n");
-				return NOTHING;
+				return PARSE_QRV_FAILED;
 			}
 			if (!isdigit(*vnum_arg) || (vnum = atoi(vnum_arg)) < 0) {
 				msg_to_char(ch, "Invalid obj vnum '%s'.\r\n", vnum_arg);
-				return NOTHING;
+				return PARSE_QRV_FAILED;
 			}
 			if (obj_proto(vnum)) {
 				ok = TRUE;
@@ -3680,11 +3680,11 @@ any_vnum parse_quest_reward_vnum(char_data *ch, int type, char *vnum_arg, char *
 		case QR_SKILL_LEVELS: {
 			if (!*vnum_arg) {
 				msg_to_char(ch, "You must specify a skill vnum.\r\n");
-				return NOTHING;
+				return PARSE_QRV_FAILED;
 			}
 			if (!isdigit(*vnum_arg) || (vnum = atoi(vnum_arg)) < 0) {
 				msg_to_char(ch, "Invalid skill vnum '%s'.\r\n", vnum_arg);
-				return NOTHING;
+				return PARSE_QRV_FAILED;
 			}
 			if (find_skill_by_vnum(vnum)) {
 				ok = TRUE;
@@ -3697,7 +3697,7 @@ any_vnum parse_quest_reward_vnum(char_data *ch, int type, char *vnum_arg, char *
 			}
 			if (!*vnum_arg || !isdigit(*vnum_arg) || (vnum = atoi(vnum_arg)) < 0) {
 				msg_to_char(ch, "Invalid quest vnum '%s'.\r\n", vnum_arg);
-				return NOTHING;
+				return PARSE_QRV_FAILED;
 			}
 			if (quest_proto(vnum)) {
 				ok = TRUE;
@@ -3707,11 +3707,11 @@ any_vnum parse_quest_reward_vnum(char_data *ch, int type, char *vnum_arg, char *
 		case QR_REPUTATION: {
 			if (!*vnum_arg) {
 				msg_to_char(ch, "You must specify a faction name or vnum.\r\n");
-				return NOTHING;
+				return PARSE_QRV_FAILED;
 			}
 			if (!(fct = find_faction(vnum_arg))) {
 				msg_to_char(ch, "Invalid faction '%s'.\r\n", vnum_arg);
-				return NOTHING;
+				return PARSE_QRV_FAILED;
 			}
 			vnum = FCT_VNUM(fct);
 			ok = TRUE;
@@ -3720,11 +3720,11 @@ any_vnum parse_quest_reward_vnum(char_data *ch, int type, char *vnum_arg, char *
 		case QR_EVENT_POINTS: {
 			if (!*vnum_arg || !isdigit(*vnum_arg)) {
 				msg_to_char(ch, "You must specify an event vnum.\r\n");
-				return NOTHING;
+				return PARSE_QRV_FAILED;
 			}
 			if (!(event = find_event_by_vnum(atoi(vnum_arg)))) {
 				msg_to_char(ch, "Invalid event vnum '%s'.\r\n", vnum_arg);
-				return NOTHING;
+				return PARSE_QRV_FAILED;
 			}
 			vnum = EVT_VNUM(event);
 			ok = TRUE;
@@ -3735,7 +3735,7 @@ any_vnum parse_quest_reward_vnum(char_data *ch, int type, char *vnum_arg, char *
 	// did we find one?
 	if (!ok) {
 		msg_to_char(ch, "Unable to find %s %d.\r\n", quest_reward_types[type], vnum);
-		return NOTHING;
+		return PARSE_QRV_FAILED;
 	}
 	
 	return vnum;
@@ -5420,7 +5420,7 @@ OLC_MODULE(qedit_rewards) {
 		else if ((num = atoi(num_arg)) < 1) {
 			msg_to_char(ch, "Invalid amount '%s'.\r\n", num_arg);
 		}
-		else if ((vnum = parse_quest_reward_vnum(ch, stype, vnum_arg, num_arg)) == NOTHING) {
+		else if ((vnum = parse_quest_reward_vnum(ch, stype, vnum_arg, num_arg)) == PARSE_QRV_FAILED) {
 			// sends own error
 		}
 		else {	// success
@@ -5468,7 +5468,7 @@ OLC_MODULE(qedit_rewards) {
 			}
 		}
 		else if (is_abbrev(field_arg, "vnum")) {
-			if ((vnum = parse_quest_reward_vnum(ch, change->type, vnum_arg, NULL)) == NOTHING) {
+			if ((vnum = parse_quest_reward_vnum(ch, change->type, vnum_arg, NULL)) == PARSE_QRV_FAILED) {
 				// sends own error
 			}
 			else {

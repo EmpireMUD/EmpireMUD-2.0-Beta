@@ -1653,7 +1653,7 @@ void process_evedit_rewards(char_data *ch, char *argument, struct event_reward *
 		else if ((num = atoi(num_arg)) < 1) {
 			msg_to_char(ch, "Invalid amount '%s'.\r\n", num_arg);
 		}
-		else if ((vnum = parse_quest_reward_vnum(ch, stype, vnum_arg, num_arg)) == NOTHING) {
+		else if ((vnum = parse_quest_reward_vnum(ch, stype, vnum_arg, num_arg)) == PARSE_QRV_FAILED) {
 			// this should have sent its own message
 		}
 		else {	// ok!
@@ -1746,7 +1746,7 @@ void process_evedit_rewards(char_data *ch, char *argument, struct event_reward *
 			}
 		}
 		else if (is_abbrev(field_arg, "vnum")) {
-			if ((vnum = parse_quest_reward_vnum(ch, change->type, vnum_arg, NULL)) == NOTHING) {
+			if ((vnum = parse_quest_reward_vnum(ch, change->type, vnum_arg, NULL)) == PARSE_QRV_FAILED) {
 				// sends own error
 			}
 			else {
