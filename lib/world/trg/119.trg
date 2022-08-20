@@ -1964,6 +1964,18 @@ while %obj%
   set obj %next_obj%
 done
 ~
+#11935
+Skycleave: Detect quest interaction~
+0 c 0
+look~
+return 0
+* detects looking at character
+if %actor.char_target(%arg.car%)% == %self%
+  if %actor.on_quest(11801)%
+    %quest% %actor% trigger 11801
+  end
+end
+~
 #11936
 Skycleave: Don't touch the desk in the Lich Labs~
 2 c 0
@@ -2410,7 +2422,7 @@ if %actor.is_pc% && (%direction% == none || !(%dir_list% ~= %direction%))
   remote skycleave_wake_room %actor.id%
 end
 * all player visitors: ensure they are on the right dream quest
-if %actor.is_pc% 
+if %actor.is_pc%
   set 11975_rooms 11982 11983 11984 11985 11986 11987 11988 11989 11990 11991
   if !%actor.on_quest(11875)% && !%actor.completed_quest(11875)% && %room.template% >= 11876 && %room.template% <= 11889
     %quest% %actor% start 11875
@@ -3569,6 +3581,12 @@ while %count% < 12
   elseif %room.template% == 11976 || %room.template% == 11978
     * commoner/guard's dream
     set to_room %instance.nearest_rmt(11993)%
+    * ensure fishing net
+    if %to_room%
+      if !%to_room.contents(11979)%
+        %at% %to_room% %load% obj 11979 room
+      end
+    end
   elseif %room.template% == 11977
     * priestess's dream
     set to_room %instance.nearest_rmt(11994)%

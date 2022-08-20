@@ -1694,6 +1694,14 @@ if %mob.vnum% == 11829
     nop %mob.add_mob_flag(GROUP)%
   end
 end
+* check triggers
+set ch %self.room.people%
+while %ch%
+  if %ch.on_quest(11834)%
+    %quest% %ch% trigger 11834
+  end
+  set ch %ch.next_in_room%
+done
 * and me
 %purge% %self%
 ~
@@ -1768,6 +1776,15 @@ set claw3 1
 remote claw3 %spirit.id%
 set lich_released %actor.id%
 remote lich_released %spirit.id%
+* check triggers
+set ch %self.room.people%
+while %ch%
+  if %ch.on_quest(11836)%
+    %quest% %ch% trigger 11836
+  end
+  set ch %ch.next_in_room%
+done
+* and done
 %purge% %self%
 ~
 #11837
@@ -4868,12 +4885,24 @@ while %ch%
     %teleport% %ch% %to_room%
     %load% obj 11805 %ch%
     * check quest completion
-    if %ch.on_quest(11810)% && %room.template% >= 11810 && %room.template% <= 11826
-      %quest% %ch% trigger 11810
-    elseif  %ch.on_quest(11811)% && %room.template% >= 11830 && %room.template% <= 11841
-      %quest% %ch% trigger 11811
-    elseif  %ch.on_quest(11812)% && %room.template% >= 11860 && %room.template% <= 11872
-      %quest% %ch% trigger 11812
+    if %room.template% >= 11810 && %room.template% <= 11826
+      * Floor 2
+      if %ch.on_quest(11810)%
+        %quest% %ch% trigger 11810
+      end
+      if %ch.on_quest(11826)%
+        %quest% %ch% trigger 11826
+      end
+    elseif %room.template% >= 11830 && %room.template% <= 11841
+      * Floor 3
+      if %ch.on_quest(11811)%
+        %quest% %ch% trigger 11811
+      end
+    elseif %room.template% >= 11860 && %room.template% <= 11872
+      * Floor 4
+      if %ch.on_quest(11812)%
+        %quest% %ch% trigger 11812
+      end
     end
   elseif %ch% != %self%
     * Adventure mob: purge

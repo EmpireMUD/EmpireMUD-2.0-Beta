@@ -24,6 +24,40 @@ W
 Z
 1 11906
 S
+#11970
+Skycleave: Secret Niamh~
+   Amongst the Skycleave variations, there is a hidden thread in the time loop
+in which the Shadow Hide herself, Niamh, rises to the rank of High Sorcerer.
+Seek out this twist of fate and learn Niamh's own thoughts on her place in the
+time loop.
+   Finding Acting High Sorcerer Niamh will require patience. Return to the
+tower some time after saving it to see if she has received this rare promotion.
+~
+   Acting High Sorcerer Niamh stops what she's doing and listens dismissively,
+at first, as you tell her about the time loop and its variations. But her
+interest grows as you provide more and more details...
+   'You're saying Grand High Sorcerer Knezz might have lived?' she asks, and
+you nod. She ponders it for a moment.
+   'My word,' she says at last. 'I shall set myself to researching this odd
+phenomenon at once. Perhaps my new station in the Tower will prove useful in
+getting answers.'
+   You try to discuss it further, but Niamh seems lost in her own thoughts and
+she soon wanders off.
+~
+15 e 125 250 -1
+A
+3 11800
+P
+16 11800 0 6 a
+P
+0 11812 0 1 a
+R
+7 11800 10
+W
+13 11964 0 1
+Z
+1 11970
+S
 #11975
 Gobbrabakh of Orka: Where Am I?~
    As you step onto the rooftop, it begins to dawn on you that you are NOT
@@ -59,11 +93,19 @@ Z
 S
 #11993
 Skycleave: The Endless River~
-tba
+   As you drift off to sleep, you find yourself sitting by a muddy river with
+your trusty fishing net hanging nearby. You've been here before. Or, at least,
+you think you have.
+   When you get back to the Tower Skycleave, perhaps you can find someone who
+wants to hear about your dream. In the meantime, try some fishing.
 ~
-tba
+   'I've had that exact dream,' Sanjiv says as you recall the story of the
+endless fishing river.
+   'Which is just awful,' he adds. 'Imagine doing work in your dream. As if
+things weren't stressful enough here already. I almost got merc'd by that
+stylish archmage just trying... just trying to do my job.'
 ~
-9 0 125 250 -1
+10 0 125 250 -1
 A
 4 11946
 P
@@ -72,14 +114,29 @@ R
 7 11800 10
 W
 13 11993 0 1
+Z
+1 11935
+Z
+1 11942
 S
 #11994
-Skycleave: Presence of the God~
-tba
+Skycleave: House of God~
+   Just as sleep overtakes you, a bright light grows behind your eyelids and
+a feeling of warmth and comfort envelops you like a blanket. A sense of small-
+ness settles in as you find yourself in an audience with a being far, far
+greater than yourself.
+   It's a cozy dream; the kind you'll yearn for when you finally wake up. And
+perhaps it will be of interest to someone next time you're in the Tower
+Skycleave.
 ~
-tba
+   There's a creaking noise as Goef turns its head toward you and raises its
+heavy brow.
+   'A curious thing,' it says slowly. 'My... people... have neither dreams nor
+gods. After all, we were created by the wizards of Man -- a creator neither
+safe to worship, nor ever worthy of it. I would surely like to meet a god some
+day. Perhaps it would give us something Mankind could not.'
 ~
-11 0 125 250 -1
+12 0 125 250 -1
 A
 4 11946
 P
@@ -88,5 +145,7 @@ R
 7 11800 10
 W
 13 11994 0 1
+Z
+1 11941
 S
 $

@@ -1,3 +1,45 @@
+#11801
+Skycleave: In Search of the Son~
+   Dylane grasps at his short beard with his hand as he looks you up and down
+with wary eyes. He seems to study you for a moment.
+   'You don't look like one of them,' he says at last. 'The Skycleavers, that
+is. And yet you seem to have earned their respect. That makes you exactly the
+person I've been searching for. If I could ask a favor.'
+   You sit and listen to Dylane tell the story of his firstborn son, whom he
+sent away to study at the Tower Skycleave at considerable personal expense. He
+tells you how his son was the first person in the family to show any talent
+for magic in generations, even if it wasn't much.
+   At first, Dylane's son sent letters home to the family. In them, he always
+wrote of being happy, but something always seemed wrong.
+   'And then, one day, the letters just stopped,' says Dylane. 'We wrote and
+wrote, with no response. The sorcerers won't speak to me. Nobody will help me.
+I'm not allowed upstairs. Please, I'm just a father in search of my son. Please
+find any sign of him. I pray he is okay.'
+   Perhaps you can find some sign of Dylane's son and return to him. Dylane is
+often found in the Tower Skycleave after it has been rescued.
+~
+   'No...' Dylane crumples to the floor, breathing heavily. It takes him a
+moment to compose himself. You wait, unsure what to do.
+   'Are you certain?' he askes as he tries to rebuild his composure. 'There's
+no doubt? Those monsters turned him into a... into a mop?'
+   You nod, hardly sure what to say.
+   The man's eyes redden and begin to well up with tears. He slides a small
+purse of money across to you, and turns away.
+~
+8 0 125 250 -1
+A
+1 11801
+P
+0 11811 0 1 a
+P
+16 11800 0 7 a
+R
+1 -1 1000
+W
+11 0 0 1
+Z
+1 11801
+S
 #11810
 Skycleave: Past Pixies and Goblins~
    High Sorceress Celiya wipes her brow with her sleeve and sighs. 'It's not
@@ -95,6 +137,274 @@ W
 Z
 1 11967
 S
+#11816
+Skycleave: Room Under the Stairs~
+   The Tower Skycleave is full of secrets, some well-known and others well-
+kept. You have heard the apprentices speak of a hidden passage under the stairs
+and now is the time to find it. Search high and low; it must be somewhere.
+   Once you have found your way through the secret passage, look for someone
+in the tower who might be interested in the secret.
+~
+tba
+~
+18 e 125 250 -1
+A
+3 11800
+P
+16 11800 0 6 a
+P
+0 11810 0 1 a
+R
+7 11800 10
+W
+13 11816 0 1 a
+W
+13 11916 0 1 b
+S
+#11818
+Skycleave: Clever Like the Fox~
+   The Tower Skycleave too often finds itself the victim of a goblin invasion.
+Whatever draws them to the tower, they must be stopped before they find it. But
+by a stroke of luck, the goblin warchief is stuck in the pixy maze! Hunt down
+the one called 'The Fox' and ensure she doesn't make it out of that maze alive.
+   Once you've washed the blood off your weapon, look for someone in the tower
+who wants to hear about this. This quest cannot be completed if the second
+floor has already been rescued.
+~
+tba
+~
+19 e 125 250 -1
+A
+3 11800
+P
+16 11800 0 6 a
+P
+0 11810 0 1 a
+R
+7 11800 10
+W
+3 11818 0 1
+S
+#11819
+Skycleave: Free the Pixy Queen~
+   The Tower Skycleave has long held a pixy queen in its collection of rare and
+magical things. In all the commotion of the invasion, the pixy queen has
+escaped from the Forest Dome of the racetrack on the second floor. But rather
+than flee the tower, she has created some sort of enchanted maze that blocks
+all access to the upper levels.
+   The pixy queen, it seems, desperately wants freedom but cannot leave the
+tower. Once you have found a way to set her free, look for someone in the tower
+who wants to talk about it. This quest cannot be completed if the second floor
+has already been rescued.
+~
+tba
+~
+20 e 125 250 -1
+A
+3 11800
+P
+16 11800 0 6 a
+P
+0 11810 0 1 a
+R
+7 11800 10
+W
+3 11819 0 1
+S
+#11826
+Skycleave: Break the Illusion~
+   The second floor of the Tower Skycleave is suddenly overgrown with a strange
+maze that blocks all access to the upper levels. All attempts to chop through
+the jungle of vines and saplings failed -- and that was before the goblins
+overran the walkway.
+   Clear the maze any way you can, then find someone in the tower who wants to
+talk about it. This quest cannot be completed if the second floor has already
+been rescued.
+~
+tba
+~
+20 e 125 250 -1
+A
+3 11800
+P
+16 11800 0 6 a
+P
+0 11810 0 1 a
+R
+7 11800 10
+W
+11 0 0 1
+S
+#11834
+Skycleave: Unjustified Captivity~
+   Throughout the Tower Skycleave's captivity in this time loop, its many
+denizens have been denied the passage of time. Each and every one of them
+believes they caught an otherworlder in a crashed vessel just yesterday. But
+the otherworlder does not experience time as we do, and it has felt every
+single agonizing day of its confinement.
+   There is no chance of freeing the otherworlder under the watchful gaze of
+its captors -- so you cannot complete this quest if the third floor has already
+been rescued. Free the otherworlder while the mercenaries still have the tower
+and its staff distracted. Afterwards, find someone in the tower who wants to
+discuss the situation.
+~
+tba
+~
+17 e 125 250 -1
+A
+3 11800
+P
+16 11800 0 6 a
+P
+0 11811 0 1 a
+R
+7 11800 10
+W
+11 0 0 1
+S
+#11836
+Skycleave: The Greatest Treasure~
+   Jagged writing on the blackboard in the Lich Labs reads 'The greatest
+treasure is inside the repository.' But the only mercenaries who can read the
+words are also too wary to open such a powerful artifact. And so, the old stone
+repository sits unopened.
+   Reach the Lich Labs and open the repository while there are still
+mercenaries on the third floor. Share the treasure inside with them. After it's
+done and the third floor has been rescued, find someone in the Lich Labs who
+wants to discuss it.
+   This quest cannot be completed if the third floor has already been rescued.
+~
+tba
+~
+16 e 125 250 -1
+A
+3 11800
+P
+16 11800 0 6 a
+P
+0 11811 0 1 a
+R
+7 11800 10
+W
+11 0 0 1
+S
+#11849
+Skycleave: Mercenary Threat~
+   The once-notorious criminal who calls himself Trixton Vye has holed up in
+the Tower Skycleave with a small army of mercenaries. Though he's old, he is
+famous for being the sole survivor of many a street fight and duel. His assault
+on the tower cannot stand; he cannot be allowed to wield its magic.
+   Reach the third floor of the tower and personally dispose of Trixton Vye and
+his two lieutenants, Bleak Rojjer and Lady Kara Virduke. After it's done, look
+for someone in the tower with more information. This quest cannot be completed
+if the third floor has already been rescued.
+~
+tba
+~
+15 e 125 250 -1
+A
+3 11800
+P
+16 11800 0 6 a
+P
+0 11811 0 1 a
+R
+7 11800 10
+W
+3 11847 0 1 a
+W
+3 11848 0 1 a
+W
+3 11849 0 1 a
+S
+#11863
+Skycleave: Shadow Ascendant~
+   Dark things stir on the top floor of the Tower Skycleave. Things darker
+still lie on the fringes of the time loop that has consumed it. Among the many
+Skycleave variations, there is a rather singular creature -- one made of the
+pure magic that thrives in the dark. And it is more dangerous than you know.
+   Draw out the Shadow Ascendant and defeat it before it can spread beyond the
+tower. It is magic without form; life without limit. Such a thing must never be
+allowed free. After you defeat it, look for someone in the tower who is
+interested in discussing it.
+   This quest cannot be completed if the fourth floor has already been rescued.
+~
+tba
+~
+14 e 125 250 -1
+A
+3 11800
+P
+16 11800 0 6 a
+P
+0 11812 0 1 a
+R
+7 11800 10
+W
+3 11863 0 1
+S
+#11870
+Skycleave: Save Grand High Sorcerer Knezz~
+   The tower's headmaster is in grave peril. When the mercenaries took the
+third floor, Grand High Sorcerer Knezz remained above to protect the tower's
+greatest relics. But all contact with him was lost and there are dark portents
+regarding his fate. Whatever else happens, Knezz must survive.
+   Reach the top floor of the Tower Skycleave, engage Knezz's attacker, and
+save the venerated sorcerer before it's too late. Speak to him after you finish
+rescuing the tower. This quest cannot be completed if the fourth floor has
+already been rescued.
+~
+   Knezz's voice shakes as much as his hands as he thanks you for your help.
+   'I feel unimaginable gratitude that you have come to my rescue,' he says.
+'This damnable time loop only covers the tower. It certainly doesn't extend to
+the afterlife. Had I died in the loop, another of me would be sent off to the
+here-after.'
+   Knezz chuckles to himself.
+   'Can you imagine?' he says. 'The hells full to the gills with Jozef Knezz!'
+~
+16 e 125 250 -1
+A
+3 11800
+P
+16 11800 0 6 a
+P
+0 11812 0 1 a
+R
+7 11800 10
+W
+3 11869 0 1
+Z
+1 11870
+Z
+1 11968
+S
+#11872
+Skycleave: The Predator in Time~
+   A time lion? In Skycleave? Is such a thing possible? Most of the sorcerers
+didn't seem to think so and perhaps that's why they had no wards or protections
+that could stop it. Nevertheless, this time loop ends when Skithe Ler-Wyn, the
+Lion of Time, consumes the tower and everything stuck inside. So much would be
+lost that this can never be allowed to happen.
+   Enter the tower, ascend its ever-spiraling walkway, defeat the shadow, and
+take on Mezvienne the Enchantress. After all that, engage the lion and see if
+you can end this threat for all time.
+   After it's done, fidn someone in the tower who would like to discuss it.
+This quest cannot be completed if the fourth floor has already been rescued.
+~
+tba
+~
+17 e 125 250 -1
+A
+3 11800
+P
+16 11800 0 6 a
+P
+0 11812 0 1 a
+R
+7 11800 10
+W
+3 11872 0 1
+S
 #11875
 Smol Nes-Pik: What Is This Place?~
    You find yourself on the branches of a truly enormous tree, with little idea
@@ -133,11 +443,20 @@ Z
 S
 #11890
 Skycleave: Trapped in a Jar~
-tba
+   As you fall asleep, you begin to panic as you watch the last beams of light
+vanish beneath a giant wax seal. You're trapped in a giant clay jay with no way
+out. You dig at the seal with your fingernails but can make no dent in the wax
+and your fingers begin to sting as wax is pressed into the nail beds.
+   This is the sort of nightmare you can't wait to wake up from. But perhaps
+someone will find it interesting next time you're at the Tower Skycleave.
 ~
-tba
+   The warden looks down at you from his tall chair as you recount the dream of
+being trapped in a jar.
+   'Harrumph. I reckon I wouldn't want to be stuffed into a jar, either,' he
+says as he rubs his long forehead with a handkerchief. Lucky for you and me,
+nobody makes jars big enough.'
 ~
-10 0 125 250 -1
+11 0 125 250 -1
 A
 4 11946
 P
@@ -146,5 +465,7 @@ R
 7 11800 10
 W
 13 11890 0 1
+Z
+1 11918
 S
 $
