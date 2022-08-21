@@ -145,9 +145,14 @@ and now is the time to find it. Search high and low; it must be somewhere.
    Once you have found your way through the secret passage, look for someone
 in the tower who might be interested in the secret.
 ~
-tba
+   Kayla listens with wide eyes as you explain how you found the secret passage
+behind the goblin cages.
+   'I knew it!' she says as a purple fire burns in her eyes. 'Those sons of
+goblins swore up and down there wasn't a secret passage but they've been
+playing stupid pranks on me for months using it.'
+   She fumes and stomps off without thanking you.
 ~
-18 e 125 250 -1
+20 e 125 250 -1
 A
 3 11800
 P
@@ -160,6 +165,8 @@ W
 13 11816 0 1 a
 W
 13 11916 0 1 b
+Z
+1 11911
 S
 #11818
 Skycleave: Clever Like the Fox~
@@ -173,7 +180,7 @@ floor has already been rescued.
 ~
 tba
 ~
-19 e 125 250 -1
+20 e 125 250 -1
 A
 3 11800
 P
@@ -184,6 +191,10 @@ R
 7 11800 10
 W
 3 11818 0 1
+Z
+1 11806
+Z
+1 11906
 S
 #11819
 Skycleave: Free the Pixy Queen~
@@ -199,7 +210,7 @@ has already been rescued.
 ~
 tba
 ~
-20 e 125 250 -1
+21 e 125 250 -1
 A
 3 11800
 P
@@ -210,6 +221,10 @@ R
 7 11800 10
 W
 3 11819 0 1
+Z
+1 11910
+Z
+1 11891
 S
 #11826
 Skycleave: Break the Illusion~
@@ -223,7 +238,7 @@ been rescued.
 ~
 tba
 ~
-20 e 125 250 -1
+21 e 125 250 -1
 A
 3 11800
 P
@@ -234,6 +249,8 @@ R
 7 11800 10
 W
 11 0 0 1
+Z
+1 11918
 S
 #11834
 Skycleave: Unjustified Captivity~
@@ -250,7 +267,7 @@ discuss the situation.
 ~
 tba
 ~
-17 e 125 250 -1
+18 e 125 250 -1
 A
 3 11800
 P
@@ -261,6 +278,8 @@ R
 7 11800 10
 W
 11 0 0 1
+Z
+1 11939
 S
 #11836
 Skycleave: The Greatest Treasure~
@@ -276,7 +295,7 @@ wants to discuss it.
 ~
 tba
 ~
-16 e 125 250 -1
+17 e 125 250 -1
 A
 3 11800
 P
@@ -287,6 +306,10 @@ R
 7 11800 10
 W
 11 0 0 1
+Z
+1 11836
+Z
+1 11936
 S
 #11849
 Skycleave: Mercenary Threat~
@@ -301,7 +324,7 @@ if the third floor has already been rescued.
 ~
 tba
 ~
-15 e 125 250 -1
+16 e 125 250 -1
 A
 3 11800
 P
@@ -316,6 +339,8 @@ W
 3 11848 0 1 a
 W
 3 11849 0 1 a
+Z
+1 11936
 S
 #11863
 Skycleave: Shadow Ascendant~
@@ -329,9 +354,19 @@ allowed free. After you defeat it, look for someone in the tower who is
 interested in discussing it.
    This quest cannot be completed if the fourth floor has already been rescued.
 ~
-tba
+   You stop Grand High Sorceress Celiya and begin to tell her about your
+fateful encounter with the Shadow Ascendant.
+   'I've been researching it, too, sugar,' she says. 'I spent most of my life
+in the shadow of Jozef Knezz. Can't imagine him being murdered by a wizard's
+shade. There's no precedent for a shade ascending, either. It really tapped in
+to Skycleave's power.'
+   She makes a puzzled face and stops for a moment, then pulls out a piece of
+rose-colored glass from a pocket inside her robe and holds it up to one eye.
+   'Now I see why you were able to stop it,' she says. 'You aren't bound to the
+time loop. I guess by now you've noticed we didn't get free of it. Next time
+maybe you can save Knezz. He might actually know how to get us out of it.'
 ~
-14 e 125 250 -1
+15 e 125 250 -1
 A
 3 11800
 P
@@ -342,6 +377,8 @@ R
 7 11800 10
 W
 3 11863 0 1
+Z
+1 11969
 S
 #11870
 Skycleave: Save Grand High Sorcerer Knezz~
@@ -388,12 +425,12 @@ lost that this can never be allowed to happen.
    Enter the tower, ascend its ever-spiraling walkway, defeat the shadow, and
 take on Mezvienne the Enchantress. After all that, engage the lion and see if
 you can end this threat for all time.
-   After it's done, fidn someone in the tower who would like to discuss it.
+   After it's done, find someone in the tower who would like to discuss it.
 This quest cannot be completed if the fourth floor has already been rescued.
 ~
 tba
 ~
-17 e 125 250 -1
+19 e 125 250 -1
 A
 3 11800
 P
@@ -404,6 +441,8 @@ R
 7 11800 10
 W
 3 11872 0 1
+Z
+1 11905
 S
 #11875
 Smol Nes-Pik: What Is This Place?~
@@ -440,6 +479,44 @@ Z
 1 11890
 Z
 1 11969
+S
+#11888
+Smol Nes-Pik: Only In Dreams~
+   The face of the Queen's image seems to turn toward you even as it also faces
+forward; she speaks to you as she speaks to her court. It is as if the Queen
+has two faces. Her second face becons you up to the throne and when you
+approach, she leans close to you -- nearly splitting herself in two to do it --
+and speaks to you in hushed tones under the echoing voice of her other
+conversation.
+   'I watched from afar as you slew Iskip under the full moon. This is no small
+task, if you will pardon the wordplay. I know this is only a long-forgotten
+dream, but that victory gave us hope.' The Queen's split image stops for a
+moment as her voice begins to choke up.
+   'I will be brief; this is very difficult for me,' she says at last. 'We
+would see you do it again. Though it may mean nothing, we would see you cut
+down the giant once again. That is all.'
+~
+   As Iskip falls into the endless water, the air seems to sparkle with yellow
+dust that hangs on the moonlight. You catch your breath but are quickly
+overcome with feelings of relief and remorse; glee and guilt; satisfaction but
+deep, unending sadness.
+   'Thank you,' whispers a the Queen's voice in your ear. You walk to the edge
+of the stump and look down into the water, where you see her reflection instead
+of your own.
+   'Thank you,' she says again. 'I only wish you had been our champion when rot
+and ruin came for us. I shall not forget you, even when you have forgotten me.'
+~
+9 e 125 250 -1
+A
+1 11884
+P
+0 11875 0 1
+R
+7 11800 10
+W
+3 11888 0 1
+Z
+3 11888
 S
 #11890
 Skycleave: Trapped in a Jar~

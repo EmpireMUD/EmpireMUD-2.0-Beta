@@ -91,6 +91,42 @@ Z
 Z
 1 11913
 S
+#11991
+Gobbrabakh of Orka: The Bloodletting Ritual~
+   Celles bids you sit for a moment and you take a spot on one of the mats. She
+carefully leans herself onto a small stool and breathes hard out her nose as
+she lets herself relax.
+   'These old bones don't move like they used to,' she says. 'Thank you for
+taking a moment to speak with me. Today is an important day for the Gobbrabakh
+of Orka. On this day, we celebrate with food and stories and, most importantly,
+bloodletting in the arena.'
+   The old goblin pauses for a moment and shifts her weight on the stool.
+   'It would be a great honor for us if you would participate. It's quite rare
+to have an outsider here during the holy days. Please, do us this honor. Face
+our champion in the arena.'
+~
+   As the dust settles on the arena and the champion, Biksi, collects herself
+in the shade, the crowd stands in awe. The sun crests the sky overhead and
+slowly, a chant builds among the spectators, louder and louder, until it grows
+into a cheer. You can't make out what they're saying -- or you can't understand
+it -- but they seem thrilled at your performance in the arena.
+~
+10 e 125 250 -1
+A
+1 11974
+P
+0 11975 0 1
+R
+7 11800 10
+W
+3 11956 0 1 a
+W
+3 11957 0 1 a
+W
+3 11958 0 1 a
+Z
+3 11991
+S
 #11993
 Skycleave: The Endless River~
    As you drift off to sleep, you find yourself sitting by a muddy river with
