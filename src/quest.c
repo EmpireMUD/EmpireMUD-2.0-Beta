@@ -760,11 +760,11 @@ void give_quest_rewards(char_data *ch, struct quest_reward *list, int reward_lev
 			}
 			case QR_SKILL_EXP: {
 				msg_to_char(ch, "\tyYou gain %s skill experience!\t0\r\n", get_skill_name_by_vnum(reward->vnum));
-				gain_skill_exp(ch, reward->vnum, reward->amount);
+				gain_skill_exp(ch, reward->vnum, reward->amount, NULL);
 				break;
 			}
 			case QR_SKILL_LEVELS: {
-				if (gain_skill(ch, find_skill_by_vnum(reward->vnum), reward->amount)) {
+				if (gain_skill(ch, find_skill_by_vnum(reward->vnum), reward->amount, NULL)) {
 					// sends its own message
 					// msg_to_char(ch, "Your %s is now level %d!\r\n", get_skill_name_by_vnum(reward->vnum), get_skill_level(ch, reward->vnum));
 				}

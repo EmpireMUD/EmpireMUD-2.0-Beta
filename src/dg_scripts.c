@@ -3465,7 +3465,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 							
 							comma_args(subfield, arg1, arg2);
 							if (*arg1 && *arg2 && (sk = find_skill(arg1)) && (amount = atoi(arg2)) != 0 && noskill_ok(c, SKILL_VNUM(sk))) {
-								gain_skill(c, sk, amount);
+								gain_skill(c, sk, amount, NULL);
 								snprintf(str, slen, "1");
 							}
 						}
