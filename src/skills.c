@@ -908,7 +908,7 @@ bool gain_skill(char_data *ch, skill_data *skill, int amount, ability_data *from
 	
 	if (any) {
 		if (from_abil) {
-			snprintf(abil_buf, sizeof(abil_buf), " (%s)", ABIL_NAME(from_abil));
+			snprintf(abil_buf, sizeof(abil_buf), " using %s", ABIL_NAME(from_abil));
 		}
 		else {
 			*abil_buf = '\0';
