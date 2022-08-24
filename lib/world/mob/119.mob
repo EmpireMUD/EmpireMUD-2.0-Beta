@@ -1,20 +1,25 @@
 #11900
-spirit skycleave~
-the spirit of Skycleave~
-The spirit of Skycleave lingers in the air.
+spirit faded~
+the faded spirit~
+A faded spirit lingers in the air.
 ~
-0 0 bd ln 3
+0 0 bd n 3
 0 0 0 15
 D
-   This mob manages data for the tower. Use this to check the current status of
-the tower:
-set spirit %instance.mob(11900)%
-To see the difficulty of a floor (1-4):
-%spirit.diff2%
-To see if a floor is phase A (0) or phase B (1):
-%spirit.phase3% == 1
+   The spirit fades in and out as moves around the room, visible against the
+black walls but nearly transparent when it passes in front of a light fixture.
+The spirit has no distinct form; you can barely be sure it was once human.
+Violet and gold streamers trail behind it as it moves, leaving a faint sparkle
+in the air behind it.
+   As you watch the spirit, it seems to take an interest in you, too. It makes
+its way to you, moving its head as if it's studying you. You step backwards and
+bump into the buffet as the spirit reaches out toward you. A soul-chilling wave
+passes through you, from your head to your neck, down your spine, filling you
+so completely that even your shadow seems to shiver.
 ~
 T 11903
+T 11832
+T 11810
 S
 #11901
 gossiper #n~

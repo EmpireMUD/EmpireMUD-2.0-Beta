@@ -2408,7 +2408,7 @@ else
 end
 ~
 #11946
-Skycleave Dreams: Reset wake on poof-in, and start quests~
+Skycleave Dreams: Reset wake on poof-in~
 2 g 100
 ~
 * When a player enters by any means OTHER than normal walking, reset their
@@ -2420,26 +2420,6 @@ if %actor.is_pc% && (%direction% == none || !(%dir_list% ~= %direction%))
   remote skycleave_wake %actor.id%
   set skycleave_wake_room 0
   remote skycleave_wake_room %actor.id%
-end
-* all player visitors: ensure they are on the right dream quest
-if %actor.is_pc%
-  set 11975_rooms 11982 11983 11984 11985 11986 11987 11988 11989 11990 11991
-  if !%actor.on_quest(11875)% && !%actor.completed_quest(11875)% && %room.template% >= 11876 && %room.template% <= 11889
-    %quest% %actor% start 11875
-    %send% %actor% &&0
-  elseif !%actor.on_quest(11975)% && !%actor.completed_quest(11975)% && (%11975_rooms% ~= %room.template%)
-    %quest% %actor% start 11975
-    %send% %actor% &&0
-  elseif !%actor.on_quest(11993)% && !%actor.completed_quest(11993)% && %room.template% == 11993
-    %quest% %actor% start 11993
-    %send% %actor% &&0
-  elseif !%actor.on_quest(11994)% && !%actor.completed_quest(11994)% && %room.template% == 11994
-    %quest% %actor% start 11994
-    %send% %actor% &&0
-  elseif !%actor.on_quest(11890)% && !%actor.completed_quest(11890)% && %room.template% == 11890
-    %quest% %actor% start 11890
-    %send% %actor% &&0
-  end
 end
 ~
 #11947

@@ -1621,6 +1621,28 @@ Skycleave: Shared quest completion script~
 ~
 return 1
 switch %questvnum%
+  case 11802
+    * Dylane/Mop rescue
+    set mop %instance.mob(11933)%
+    if %mop%
+      if %mop.room% != %room%
+        %at% %mop.room% %echo% ~%mop% hops away.
+        %teleport% %mop% %room%
+      end
+    else
+      %load% mob 11933
+      set mop %room.people%
+      if %mop.vnum% != 11933
+        %send% %actor% This quest seems to be broken.
+        return 0
+        halt
+      end
+    end
+    if !%mop.has_trigger(11833)%
+      attach 11833 %mop.id%
+    end
+    %force% %mop% cutscene
+  break
   case 11810
   case 11811
   case 11812
@@ -1659,6 +1681,120 @@ switch %questvnum%
     end
   break
 done
+~
+#11832
+Skycleave: Conditional mob visibility~
+0 hi 100
+~
+* toggles silent, !see
+* activated on greet or when moving
+set see 0
+set not 0
+set vis 0
+set ch %self.room.people%
+* determine if anyone should/shouldn't see me
+while %ch%
+  if %ch.is_pc%
+    if %self.vnum% == 11900
+      * intro spirit: shows when any floor quest complete
+      if %ch.completed_quest(11810)% || %ch.completed_quest(11811)% || %ch.completed_quest(11812)%
+        set see 1
+      else
+        set not 1
+      end
+    elseif %self.vnum% == 11801
+      * Dylane: visible only if quest incomplete
+      if %ch.completed_quest(11802)%
+        set not 1
+      else
+       set see 1
+      end
+    end
+  end
+  set ch %ch.next_in_room%
+done
+* determine behavior based on vnum
+switch %self.vnum%
+  case 11900
+    * intro spirit: any "see"
+    set vis %see%
+  break
+  case 11801
+    * Dylane
+    if !%not%
+      set vis 1
+    end
+  break
+done
+* and make visible
+if %vis% && %self.affect(11832)%
+  dg_affect #11832 %self% off
+  if %self.vnum% != 11801 || %self.room.template% == 11905
+    * 11801 Dylane does not remove silent unless he's in the cafe
+    nop %self.remove_mob_flag(SILENT)%
+  end
+  %echo% ~%self% arrives.
+elseif !%vis% && !%self.affect(11832)%
+  dg_affect #11832 %self% !SEE on -1
+  dg_affect #11832 %self% !TARGET on -1
+  dg_affect #11832 %self% SNEAK on -1
+  nop %self.add_mob_flag(SILENT)%
+  %echo% ~%self% leaves.
+end
+~
+#11833
+Skycleave: Quest cutscenes~
+0 cx 0
+cutscene~
+* used for mob cutscenes
+if %actor% && %actor% != %self%
+  return 0
+  halt
+end
+if %self.vnum% == 11933
+  * mop 11933, Dylane quest 11802
+  set annelise %self.room.people(11939)%
+  nop %self.add_mob_flag(SILENT)%
+  nop %self.add_mob_flag(SENTINEL)%
+  wait 1
+  %echo% ~%self% marches in from the north.
+  wait 3 sec
+  %echo% ~%annelise% pulls a surprisingly large staff out of her many-layered robes...
+  wait 9 sec
+  %force% %annelise% say Let the weight of your service to the Tower outweigh your offense against its masters.
+  %echo% She taps her staff on the slate floor three times.
+  wait 9 sec
+  %force% %annelise% say Ahem... In service of the Tower I restore you bodily as you once were!
+  %echo% She taps her staff on the floor agian.
+  wait 9 sec
+  %echo% ~%annelise% sighs.
+  wait 3 sec
+  say By the Black Domain, by all humane, let him regain... Er, un-detain the plain Dylane!
+  wait 1
+  %echo% There's a blinding flash from Annelise's staff as she hits it on the floor one last time...
+  * convert to boy
+  detach 11935 %self.id%
+  detach 11934 %self.id%
+  %mod% %self% keywords Dylane younger boy apprentice
+  %mod% %self% shortdesc Dylane the Younger
+  %mod% %self% longdesc A boy of no more than fourteen stands in the center of the room.
+  %mod% %self% lookdesc Dylane is no more than fourteen years old, tall and gangly with legs that look like a pair of sticks poking out from under white apprentice robes that
+  %mod% %self% append-lookdesc are inexplicably wet at the bottom. Dark, teary eyes poke out from underneath a mop of straw-colored hair as he stares at you wordlessly.
+  * and finish
+  wait 9 sec
+  %force% %annelise% say Rather embarassing to admit I'm dreadful at non-rhyming magic.
+  wait 6 sec
+  say What happened? Oh! I can speak again! I'm free! I'm free!
+  wait 9 sec
+  %echo% ~%self% turns and sees ~%annelise% and his face turns sheet-white.
+  wait 9 sec
+  %force% %annelise% say Yes, you're free, you're free. You shall find your father in the lobby. May I suggest you make a hasty escape?
+  wait 9 sec
+  %force% %annelise% say Okay, on with you, get out of here before the grand high sorcerer catches you lacking.
+  wait 3 sec
+  %echo% The boy wastes no more time and darts out of the room. The last you hear of him is clambering down the stairs.
+  %purge% %self%
+end
 ~
 #11834
 Skycleave: Free the otherworlder~

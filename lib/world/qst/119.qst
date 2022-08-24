@@ -44,9 +44,9 @@ getting answers.'
    You try to discuss it further, but Niamh seems lost in her own thoughts and
 she soon wanders off.
 ~
-15 e 125 250 -1
+16 e 125 250 -1
 A
-3 11800
+1 11900
 P
 16 11800 0 6 a
 P
@@ -78,9 +78,27 @@ wonder if it even... well...'
 it as he marvels.
    'I need to compare it's, er, properties. To the other one. Thanks!'
 ~
-9 d 125 250 -1
+10 d 125 250 -1
 A
-4 11946
+3 11982
+A
+3 11983
+A
+3 11984
+A
+3 11985
+A
+3 11986
+A
+3 11987
+A
+3 11988
+A
+3 11989
+A
+3 11990
+A
+3 11991
 R
 7 11800 25
 T 11830
@@ -141,9 +159,9 @@ endless fishing river.
 things weren't stressful enough here already. I almost got merc'd by that
 stylish archmage just trying... just trying to do my job.'
 ~
-10 0 125 250 -1
+11 0 125 250 -1
 A
-4 11946
+3 11993
 P
 16 11800 0 6
 R
@@ -172,9 +190,9 @@ gods. After all, we were created by the wizards of Man -- a creator neither
 safe to worship, nor ever worthy of it. I would surely like to meet a god some
 day. Perhaps it would give us something Mankind could not.'
 ~
-12 0 125 250 -1
+13 0 125 250 -1
 A
-4 11946
+3 11994
 P
 16 11800 0 6
 R

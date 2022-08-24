@@ -40,6 +40,54 @@ W
 Z
 1 11801
 S
+#11802
+Skycleave: Not Without My Son~
+   Dylane taps his fingers as he sits with his eyes down, waiting for you. As
+you approach, he looks up with a little glimmer of hope in his sagging eyes.
+He hesitates and catches himself as he begins to speak, glancing around and
+then lowering his voice as you move closer.
+   'I see you've gained some clout in the Black Tower,' Dylane says slowly. 'I
+realize you owe me nothing, and I have spent every last penny -- every ragged
+ribbon of influence. Nevertheless, I must beg your help.'
+   You silently study Dylane's aging face as his eyes well up.
+   'I have been to this accursed place a hundred times as it blinks in and out
+across the landscape. Seen a hundred adventurers come and go. Watched the
+wizards fight and fall and rise and fall and rise again. I've studied them
+twice as hard since you told me what happened to my boy. There's a sorceress on
+the third floor, and heaven knows they won't let me up there, but if you can
+get to her and convince her, maybe there's still hope.'
+   Dylane pulls a handkerchief from his pocket and blows his nose like a
+trumpet. He passes you a note which simply reads, 'Annelise'.
+~
+   'Oh bother,' Annelise says as you interrupt her mending an old iron toaster.
+She tosses it carelessly aside and pushes the hair up off her face with a sooty
+hand. She brushes herself off and turns to look at you.
+   'Oh dear, I didn't realize you had an appointment,' she says as she cleans
+herself off using a rag. She glances over at a calendar on the desk, then back
+to you, then back to the calendar. 'Well, nevermind all that. What can I do
+for you, dear?'
+   You weigh how to ask her for a favor for Dylane of Trense, a man you barely
+know. In the end, you tell her the whole story, sparing no detail about
+Dylane's teary eyes and unceasing search for his son. Well, perhaps not the
+entire story. You leave out the much longer explanation about the time loop.
+   'I never did like transmogrifying the students,' Annelise says with a slight
+frown. 'But we certainly can't have the boy running around here. Fine, fine,
+I'm sure I owe you this much. Bring him up here. Just promise me he will leave
+the tower before the headmaster finds out.'
+~
+12 0 125 250 -1
+A
+1 11801
+P
+16 11800 0 8 a
+P
+0 11801 0 1 a
+T 11830
+W
+13 11939 0 1
+Z
+1 11939
+S
 #11810
 Skycleave: Past Pixies and Goblins~
    High Sorceress Celiya wipes her brow with her sleeve and sighs. 'It's not
@@ -152,9 +200,9 @@ goblins swore up and down there wasn't a secret passage but they've been
 playing stupid pranks on me for months using it.'
    She fumes and stomps off without thanking you.
 ~
-20 e 125 250 -1
+21 e 125 250 -1
 A
-3 11800
+1 11900
 P
 16 11800 0 6 a
 P
@@ -178,11 +226,19 @@ the one called 'The Fox' and ensure she doesn't make it out of that maze alive.
 who wants to hear about this. This quest cannot be completed if the second
 floor has already been rescued.
 ~
-tba
+   'I dare say,' old Huberus says as she cleans her thick glasses on the edge
+of her robe. 'John, upstairs, is always telling me his theories on the goblins.
+He thinks they're mad to invade the tower. After all, we always catch them. But
+from the sound of it, you fought a warchief. They wouldn't invade the tower
+without a good reason.'
+   She paces back and forth with her hand on her chin for a few moments.
+   'No, I don't think they would,' she says at last. 'Very interesting. Very
+interesting indeed.'
+   She trails off, completely forgetting you're even here.
 ~
-20 e 125 250 -1
+21 e 125 250 -1
 A
-3 11800
+1 11900
 P
 16 11800 0 6 a
 P
@@ -208,11 +264,14 @@ tower. Once you have found a way to set her free, look for someone in the tower
 who wants to talk about it. This quest cannot be completed if the second floor
 has already been rescued.
 ~
-tba
+   You tell Watcher Annaca what the pixy queen said as she died and Annaca
+thinks on it for a moment.
+   'The pixies never seem to try to escape. I plum thought they liked it here,'
+she says. 'And what did she mean by that last part... 'in time'?'
 ~
-21 e 125 250 -1
+22 e 125 250 -1
 A
-3 11800
+1 11900
 P
 16 11800 0 6 a
 P
@@ -236,11 +295,17 @@ overran the walkway.
 talk about it. This quest cannot be completed if the second floor has already
 been rescued.
 ~
-tba
+   'Oh yes, I do like a good maze,' Warden Chicanders says as you tell him your
+experience with it. 'I was in there, too. Got good and lost, ducking goblins
+and such. The pixies don't seem to mind me as much. Maybe because I feed them.'
+   He pulls a handful of pellets from the pocket of his black robe and dumps it
+near the racetrack stalls.
+   'Those pixies really get into your head; that maze was worse than the Forest
+dome. I had the strangest dreams in there.'
 ~
-21 e 125 250 -1
+22 e 125 250 -1
 A
-3 11800
+1 11900
 P
 16 11800 0 6 a
 P
@@ -265,11 +330,20 @@ been rescued. Free the otherworlder while the mercenaries still have the tower
 and its staff distracted. Afterwards, find someone in the tower who wants to
 discuss the situation.
 ~
-tba
+   'I did lodge a formal protest at imprisoning a sentient being,' Annelise
+says halfway through your story about the otherworlder's escape. 'It's not like
+those wretched goblins who keep trying to sneak into the tower. They get what
+they get. But the otherworlder? You can see in its eyes -- all of them -- that
+it's intelligent. And we noble sorcerers abducted it like common highwaymen.'
+   Annelise starts to go back to what she was doing, but she seems distracted
+as she taps her fingernails against each other. She turns back toward you.
+   'It's good that you freed it, though. What a hateful place to be imprisoned.
+And for what? The pursuit of magic. Are there no limits to what we destroy for
+power?'
 ~
-18 e 125 250 -1
+19 e 125 250 -1
 A
-3 11800
+1 11900
 P
 16 11800 0 6 a
 P
@@ -293,11 +367,22 @@ done and the third floor has been rescued, find someone in the Lich Labs who
 wants to discuss it.
    This quest cannot be completed if the third floor has already been rescued.
 ~
-tba
+   'My eternal gratitude,' Scaldorran howls, with just a little too much
+emphasis on eternal. He picks up the ancient stone lamp that serves as his
+soul's repository and turns it over and over in the linen wrappings that form
+his hands.
+   'I am... in your debt. A grave miscalculation on my part, I'm afraid,' he
+continues. 'Not the debt, no; I appreciate you releasing me. My error was in
+setting a trap that requires those mercenaries read.'
+   Scaldorran points to the blackboard, where the words 'The greatest treasure
+is inside the repository' show faintly through eraser marks. An unearthly
+chuckle burbles out of the old lich as he sets his repository back down.
+   'The only ones who could read were the spellcasters and, to my unending
+chagrin, they were smart enough not to open the thing. Alas.'
 ~
-17 e 125 250 -1
+18 e 125 250 -1
 A
-3 11800
+1 11900
 P
 16 11800 0 6 a
 P
@@ -322,11 +407,29 @@ his two lieutenants, Bleak Rojjer and Lady Kara Virduke. After it's done, look
 for someone in the tower with more information. This quest cannot be completed
 if the third floor has already been rescued.
 ~
-tba
+   Scaldorran alights on the slate floor and his flailing linen wrappings
+tighten and settle until he looks more mummy than lich, though his eyes and
+mouth are only black pits between the strips of cloth. He stands close to you,
+perhaps closer than you'd like. A stale must surrounds him, like an attic in
+late spring.
+   'I knew all three of them, once,' he says at last. 'Trixton, Kara, and
+Rojjer. Kara was my student and I dare say I was too smitten. Far too young for
+me, of course, so I treated her like a daughter and I dare say I spoiled her.
+When she disappointed the masters, I provided her an escape instead of punish-
+ment and in the end, she met a worse fate.
+   'Rojjer was my resurrectionist for some time, though I released him when I
+began to suspect he was making more bodies than he was digging up. Nasty line
+of work, that. His knowledge of Skycleave from that arrangement played no small
+part in the successful invasion of our precious, precious tower.
+   'And Trixton. Oh, Trixton. My nephew by birth, through my youngest sister.
+I blessed him under the sun and the moon, and he came for my power like a
+common thief. Did you see how his lust for power corrupted and withered him so
+far beyond his years? It's good you put an end to it; on that path he'd soon
+have nothing left but his linens.'
 ~
-16 e 125 250 -1
+17 e 125 250 -1
 A
-3 11800
+1 11900
 P
 16 11800 0 6 a
 P
@@ -366,9 +469,9 @@ rose-colored glass from a pocket inside her robe and holds it up to one eye.
 time loop. I guess by now you've noticed we didn't get free of it. Next time
 maybe you can save Knezz. He might actually know how to get us out of it.'
 ~
-15 e 125 250 -1
+16 e 125 250 -1
 A
-3 11800
+1 11900
 P
 16 11800 0 6 a
 P
@@ -399,9 +502,9 @@ here-after.'
    Knezz chuckles to himself.
    'Can you imagine?' he says. 'The hells full to the gills with Jozef Knezz!'
 ~
-16 e 125 250 -1
+17 e 125 250 -1
 A
-3 11800
+1 11900
 P
 16 11800 0 6 a
 P
@@ -428,11 +531,28 @@ you can end this threat for all time.
    After it's done, find someone in the tower who would like to discuss it.
 This quest cannot be completed if the fourth floor has already been rescued.
 ~
-tba
+   Mageina tilts the brim of her oversized black hat up with her wand and peeks
+out at you from underneath. She stands perfectly still for a second as her eyes
+flit left and right while she gauges your sincerity.
+   'I overheard someone mention a time lion, but I didn't believe it, of
+course,' she says. 'And you say you fought the thing?'
+   She walks over to the soup pot and stokes the flame underneath with her
+wand, and stirs it a moment.
+   'A time lion,' she continues. 'I'm not just a pretty face down here, you
+know. I've read all the books upstairs. There's a lot of free time when you're
+stuck in a...'
+   Mageina looks over your shoulder and then leans in close to whisper, 'Stuck
+in a time loop.'
+   She relaxes and picks up a mug, which she polishes with her sleeve.
+   'Oh, don't look at me like that, the barista always knows everything. But
+there isn't a single book in this magical mausoleum about time lions. They're
+a children's story. Your story hinges on a magic lion possessing one of the
+cleverest sorcerers of our time and defeating several of the strongest. If what
+you say is true, then we are definitely not getting out of this time loop.'
 ~
-19 e 125 250 -1
+20 e 125 250 -1
 A
-3 11800
+1 11900
 P
 16 11800 0 6 a
 P
@@ -463,9 +583,35 @@ think it did. It was more like a dream.'
    'Sugar, this could be the discovery of a lifetime! I'll be sure to put one
 of the residents on this. You did good.'
 ~
-8 d 125 250 -1
+9 d 125 250 -1
 A
-4 11946
+3 11875
+A
+3 11876
+A
+3 11877
+A
+3 11878
+A
+3 11879
+A
+3 11880
+A
+3 11881
+A
+3 11882
+A
+3 11883
+A
+3 11884
+A
+3 11885
+A
+3 11886
+A
+3 11887
+A
+3 11889
 R
 7 11800 25
 T 11830
@@ -533,9 +679,9 @@ being trapped in a jar.
 says as he rubs his long forehead with a handkerchief. Lucky for you and me,
 nobody makes jars big enough.'
 ~
-11 0 125 250 -1
+12 0 125 250 -1
 A
-4 11946
+3 11890
 P
 16 11800 0 6
 R
