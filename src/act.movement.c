@@ -1494,6 +1494,7 @@ bool do_simple_move(char_data *ch, int dir, room_data *to_room, bitvector_t flag
 	// ACTUAL MOVEMENT
 	char_from_room(ch);
 	char_to_room(ch, to_room);
+	qt_visit_room(ch, to_room);
 
 	/* move them first, then move them back if they aren't allowed to go. */
 	/* see if an entry trigger disallows the move */
@@ -1532,7 +1533,6 @@ bool do_simple_move(char_data *ch, int dir, room_data *to_room, bitvector_t flag
 	GET_LAST_DIR(ch) = dir;
 	mark_move_time(ch);
 	command_lag(ch, WAIT_MOVEMENT);
-	qt_visit_room(ch, IN_ROOM(ch));
 	add_tracks(ch, was_in, dir, IN_ROOM(ch));
 	gain_ability_exp_from_moves(ch, was_in, flags);
 	msdp_update_room(ch);
