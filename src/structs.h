@@ -1592,6 +1592,7 @@ typedef struct vehicle_data vehicle_data;
 #define MOB_NO_EXPERIENCE  BIT(31)	// F. players get no exp against this mob
 #define MOB_NO_RESCALE  BIT(32)	// G. mob won't rescale (after the first time), e.g. if specific traits were set
 #define MOB_SILENT  BIT(33)	// H. will not set off custom strings
+#define MOB_COINS  BIT(34)	// I. mob drops coins on death/pickpocket
 
 
 // MOB_CUSTOM_x: custom message types

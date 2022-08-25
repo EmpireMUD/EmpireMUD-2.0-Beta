@@ -2180,6 +2180,7 @@ const char *action_bits[] = {
 	"!EXP",
 	"!RESCALE",
 	"SILENT",
+	"COINS",
 	"\n"
 };
 

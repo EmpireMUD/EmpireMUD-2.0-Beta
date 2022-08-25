@@ -1153,7 +1153,7 @@ ACMD(do_pickpocket) {
 		check_scaling(vict, ch);
 
 		// some random coins (negative coins are not given)
-		if (MOB_FLAGGED(vict, MOB_HUMAN) && (!GET_LOYALTY(vict) || GET_LOYALTY(vict) == GET_LOYALTY(ch) || char_has_relationship(ch, vict, DIPL_WAR | DIPL_THIEVERY))) {
+		if (MOB_FLAGGED(vict, MOB_COINS) && (!GET_LOYALTY(vict) || GET_LOYALTY(vict) == GET_LOYALTY(ch) || char_has_relationship(ch, vict, DIPL_WAR | DIPL_THIEVERY))) {
 			coins = mob_coins(vict);
 		}
 		else {

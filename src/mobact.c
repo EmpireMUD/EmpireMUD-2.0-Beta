@@ -156,7 +156,7 @@ int mob_coins(char_data *mob) {
 	empire_data *emp;
 	int amt = 0;
 	
-	if (IS_NPC(mob) && MOB_FLAGGED(mob, MOB_HUMAN) && !MOB_FLAGGED(mob, MOB_PICKPOCKETED)) {
+	if (IS_NPC(mob) && MOB_FLAGGED(mob, MOB_COINS) && !MOB_FLAGGED(mob, MOB_PICKPOCKETED)) {
 		amt = number(-20, get_approximate_level(mob));
 		if (MOB_FLAGGED(mob, MOB_HARD)) {
 			amt *= 3;
