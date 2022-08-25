@@ -275,7 +275,7 @@ keeper peacekeeper~
 the Peacekeeper~
 A Peacekeeper is standing here, ready to jump in at the first sign of trouble.
 ~
-0 0 bdv nD 3
+0 0 bdvI nD 3
 1 0 0 1
 D
 He looks very strong and wise.  Looks like he doesn't answer to ANYONE.
@@ -317,7 +317,7 @@ janitor~
 the janitor~
 A janitor is walking around, cleaning up.
 ~
-0 0 bdv nD 3
+0 0 bdvI nD 3
 1 0 0 1
 D
 What a tough job he has.
@@ -427,7 +427,7 @@ S
 #n~
 A ravenous vampire is standing here.
 ~
-0 0 bdvw nD 3
+0 0 bdvwI nD 3
 0 0 0 9
 D
 You feel entranced by the vampire's eyes.
@@ -439,7 +439,7 @@ crowd shoppers~
 the crowd of shoppers~
 A crowd of busy shoppers moves back and forth, oblivious to your presence.
 ~
-0 0 bdv nD 4
+0 0 bdvI nD 4
 0 0 0 1
 D
    It's hard to even move as the throng of shoppers struggle toward something
@@ -493,7 +493,7 @@ man crazy~
 the crazy man~
 A crazy man with wild, white hair stands here in a matching jacket.
 ~
-0 0 bdv nD 3
+0 0 bdvI nD 3
 1 0 0 1
 D
    He's a tall, thin man with a strained expression on his face as he tries to
@@ -520,7 +520,7 @@ doctor strange mad man~
 the strange doctor~
 A mad man is standing next to his box.
 ~
-0 0 bdv nD 3
+0 0 bdvI nD 3
 1 0 0 1
 D
    He doesn't really look familiar, but you have the strangest feeling that
@@ -590,7 +590,7 @@ woman blue strange~
 the woman in blue~
 A woman in a strange blue and yellow suit stands before you.
 ~
-0 0 bdv nD 3
+0 0 bdvI nD 3
 2 0 0 1
 D
    She's wearing a form-fitting blue and yellow suit with the number 111 -- or

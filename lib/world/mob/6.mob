@@ -3,7 +3,7 @@ necrovandal vandal cultist~
 the necrovandal~
 A necrovandal cultist skulks about beneath a midnight-blue, hooded robe.
 ~
-50 75 bdovx c 3
+50 75 bdovxI c 3
 1 0 0 19
 D
    The necrovandal is cloaked in dark blue, purple, and black. These vandals
@@ -21,9 +21,9 @@ A horse looks up from the grass and greets you by name.
 D
 It just looks like an ordinary horse.
 ~
-I 0 3012 100.00 2  # BUTCHER: a fillet of raw meat
-I 1 607 100.00 2  # SKIN: a shimmering hide
-I 3 611 100.00 1 X  # BARDE: a talking warhorse
+I 0 3012 100.00 2  # BUTCHER: fillet of raw meat
+I 1 607 100.00 2  # SKIN: shimmering hide
+I 3 611 100.00 1 X  # BARDE: talking warhorse
 M
 1
 I've been trying to buy a bamboo harvester, but nobody wants to talk to a horse.~
@@ -47,12 +47,12 @@ An armored warhorse shouts its battle cry.
 D
 This rather plain-looking horse has been barded with the colors of the empire.
 ~
-I 0 3012 100.00 2  # BUTCHER: a fillet of raw meat
-I 1 607 100.00 2  # SKIN: a shimmering hide
-I 4 175 100.00 4  # LOOT: an iron ingot
-I 4 175 75.00 2  # LOOT: an iron ingot
-I 4 175 50.00 2  # LOOT: an iron ingot
-I 4 175 50.00 2  # LOOT: an iron ingot
+I 0 3012 100.00 2  # BUTCHER: fillet of raw meat
+I 1 607 100.00 2  # SKIN: shimmering hide
+I 4 175 100.00 4  # LOOT: iron ingot
+I 4 175 75.00 2  # LOOT: iron ingot
+I 4 175 50.00 2  # LOOT: iron ingot
+I 4 175 50.00 2  # LOOT: iron ingot
 M
 1
 I've been trying to buy a bamboo harvester, but nobody wants to talk to a horse.~
@@ -77,8 +77,8 @@ A bunny thumps its foot and asks you for the time.
 D
 It looks like a perfectly ordinary bunny.
 ~
-I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
-I 1 607 100.00 1  # SKIN: a shimmering hide
+I 0 3012 100.00 1  # BUTCHER: fillet of raw meat
+I 1 607 100.00 1  # SKIN: shimmering hide
 T 612
 S
 #613
@@ -91,8 +91,8 @@ A bear is dancing around and singing a tune.
 D
 It just looks like a regular bear.
 ~
-I 0 3012 100.00 3  # BUTCHER: a fillet of raw meat
-I 1 607 100.00 2  # SKIN: a shimmering hide
+I 0 3012 100.00 3  # BUTCHER: fillet of raw meat
+I 1 607 100.00 2  # SKIN: shimmering hide
 M
 0
 $n sings, 'Look for the bear necessities, the simple bear necessities. Forget about your worries and your strife...'~
@@ -116,7 +116,7 @@ A tree has uprooted itself and is walking around.
 D
 The tree is using its roots like feet!
 ~
-I 4 120 100.00 1  # LOOT: a large tree
+I 4 120 100.00 1  # LOOT: large tree
 T 614
 S
 #615
@@ -130,10 +130,10 @@ D
    This vicious little pixy keeps zipping past your ears, perhaps trying to get
 you to leave. You seem to have angered it.
 ~
-I 4 103 20.00 1 g  # LOOT: a yellow lightning stone
-I 4 104 20.00 1 g  # LOOT: a red bloodstone
-I 4 1300 20.00 1 g  # LOOT: a glowing green seashell
-I 4 1206 20.00 1 g  # LOOT: an iridescent blue iris
+I 4 103 20.00 1 g  # LOOT: yellow lightning stone
+I 4 104 20.00 1 g  # LOOT: red bloodstone
+I 4 1300 20.00 1 g  # LOOT: glowing green seashell
+I 4 1206 20.00 1 g  # LOOT: iridescent blue iris
 T 615
 S
 #616
@@ -147,10 +147,10 @@ D
    This tiny pixy won't seem to leave you alone. She keeps casting spells that
 buzz right past your ear, perhaps as warning shots!
 ~
-I 4 103 20.00 1 g  # LOOT: a yellow lightning stone
-I 4 104 20.00 1 g  # LOOT: a red bloodstone
-I 4 1300 20.00 1 g  # LOOT: a glowing green seashell
-I 4 1206 20.00 1 g  # LOOT: an iridescent blue iris
+I 4 103 20.00 1 g  # LOOT: yellow lightning stone
+I 4 104 20.00 1 g  # LOOT: red bloodstone
+I 4 1300 20.00 1 g  # LOOT: glowing green seashell
+I 4 1206 20.00 1 g  # LOOT: iridescent blue iris
 T 616
 S
 #617
@@ -167,7 +167,7 @@ that his body ends at the waist and everything below that is just a funnel of
 sand and smoke. Since he has no binding cuffs on his wrists, you can also
 assume this is a free genie.
 ~
-I 4 620 100.00 1  # LOOT: a brass bottle
+I 4 620 100.00 1  # LOOT: brass bottle
 M
 1
 Finally free of that itty bitty living space.~
@@ -203,8 +203,8 @@ A monkey in a little hat is sitting here, staring.
 D
 It looks like a rather plain monkey, except for the fez on its head.
 ~
-I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
-I 1 607 100.00 1  # SKIN: a shimmering hide
+I 0 3012 100.00 1  # BUTCHER: fillet of raw meat
+I 1 607 100.00 1  # SKIN: shimmering hide
 M
 0
 $n pulls out a pair of brass cymbals and clangs them together repeatedly.~
@@ -234,8 +234,8 @@ A camel hums quietly as it lumbers around.
 D
 It just looks like an ordinary camel.
 ~
-I 0 3012 100.00 2  # BUTCHER: a fillet of raw meat
-I 1 607 100.00 2  # SKIN: a shimmering hide
+I 0 3012 100.00 2  # BUTCHER: fillet of raw meat
+I 1 607 100.00 2  # SKIN: shimmering hide
 M
 0
 $n croons, 'Salome the camel has ten humps. Salome the camel has ten humps. Salome the camel has ten humps, so ride, Salome, ride. Salome the camel has nine humps...'~

@@ -15,7 +15,7 @@ S
 #n~
 Tavern patron #n is carousing enthusiastically.
 ~
-0 0 bdv nD 3
+0 0 bdvI nD 3
 0 0 0 15
 M
 0
@@ -149,7 +149,7 @@ S
 #n the Umbramancer~
 The shadows curl around #n, guild umbramancer.
 ~
-0 0 bdv nD 3
+0 0 bdvI nD 3
 0 2 0 15
 D
    Multiple varied forms can be seen in the shadows covering this being.
@@ -177,7 +177,7 @@ S
 #n, guild Tinker~
 #n is working furiously at the tinker bench.
 ~
-0 0 bdv nD 3
+0 0 bdvI nD 3
 0 1 0 15
 F 18200
 M
@@ -252,7 +252,7 @@ dwarf giant~
 the giant dwarf~
 A giant dwarf stands, arms crossed, in front of the door.
 ~
-0 0 bdv nD 3
+0 0 bdvI nD 3
 1 0 0 15
 F 18200
 T 18212
@@ -262,7 +262,7 @@ S
 Fancy #n~
 Fancy #n stands here in a vest, hawking wares.
 ~
-100 150 bdv nD 3
+100 150 bdvI nD 3
 0 0 0 19
 F 18200
 S
@@ -271,7 +271,7 @@ S
 #n the adventurer~
 #n walks along, wearing a heavy pack.
 ~
-100 150 dqv 0 3
+100 150 dqvI 0 3
 0 0 0 1
 D
    This nondescript adventurer is armored in some standard adventuring gear,
@@ -300,7 +300,7 @@ guildmage mage #n~
 Guildmage #n~
 Guildmage #n stands at the window.
 ~
-100 150 bdqv e 3
+100 150 bdqvI e 3
 0 2 0 19
 M
 0
@@ -339,7 +339,7 @@ S
 #n the librarian~
 #n is reshelving the disheveled books.
 ~
-100 150 bdqv e 3
+100 150 bdqvI e 3
 0 0 0 5
 M
 1
@@ -360,7 +360,7 @@ superintendant #n~
 Superintendant #n~
 The superintendant is sitting at the desk.
 ~
-100 150 bdqv e 3
+100 150 bdqvI e 3
 1 0 0 1
 M
 0
@@ -394,7 +394,7 @@ S
 #n the treasurer~
 #n is locking up a new treasure.
 ~
-100 150 bdqv e 3
+100 150 bdqvI e 3
 0 1 0 4
 T 18218
 S
@@ -627,7 +627,7 @@ archsorcerer malfernes~
 Archsorcerer Malfernes~
 Archsorcerer Malfernes removes his cloak and hangs it in the air.
 ~
-0 0 bdvxzBE cnCE 3
+0 0 bdvxzBEI cnCE 3
 1 0 0 22
 D
    The Archsorcerer's silky violet robe drapes on the ground as he hovers

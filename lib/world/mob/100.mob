@@ -21,7 +21,7 @@ druid grove hooded figure~
 a druid of the Grove~
 A hooded figure is standing amongst the trees.
 ~
-0 0 abdvxz c 3
+0 0 abdvxzI c 3
 1 0 0 18
 D
    The druid is covered head-to-toe by a long brown robe, exposing only its
@@ -40,7 +40,7 @@ faun druid hooded antlered tall~
 a hooded faun~
 A tall, antlered druid stands beneath the canopy of trees.
 ~
-0 0 abdvxz c 3
+0 0 abdvxzI c 3
 2 0 0 16
 D
    The druid's hood has been pulled back to reveal strange, branching antlers
@@ -59,7 +59,7 @@ druid badger creature huge man~
 the badger druid~
 A huge creature - half man, half badger - looms over you!
 ~
-0 0 abdvz cq 3
+0 0 abdvzI cq 3
 1 0 0 10
 D
    The druid's brown robe is in tatters, barely clinging to the shoulders of
@@ -77,7 +77,7 @@ druid archdruid #n~
 Archdruid #n~
 Archdruid #n seems to glow with the energy of the Grove!
 ~
-0 0 abdvxy c 3
+0 0 abdvxyI c 3
 2 3 0 20
 D
    The archdruid's brown robe is woven with strands of glimmering gold and
@@ -191,7 +191,7 @@ S
 #n Ratskins~
 #n is crouched in the corner, fiddling with a needle.
 ~
-0 50 bdvA 0 3
+0 50 bdvAI 0 3
 1 0 0 4
 D
    True to his name, he's dressed head to foot in hand-stitched ratskin
@@ -211,7 +211,7 @@ urchin street~
 a street urchin~
 A street urchin is chasing rats.
 ~
-0 20 dv c 3
+0 20 dvI c 3
 1 0 7 4
 D
 This poor child seems to be hunting dinner.
@@ -229,7 +229,7 @@ S
 #n the master thief~
 The master thief #n is leaning against the wall, flipping a dagger.
 ~
-20 50 bdvzB 0 3
+20 50 bdvzBI 0 3
 0 0 0 4
 D
    Though this doesn't seem to be a very likely hideout for a master thief,
@@ -247,7 +247,7 @@ S
 #n the thief~
 #n is stalking through the shadows.
 ~
-0 50 bdvz c 3
+0 50 bdvzI c 3
 0 0 0 4
 D
 You clutch your coinpurse as you notice the thief looking back.
@@ -280,7 +280,7 @@ hunter rat amateur amature~
 a rat hunter~
 An amateur rat hunter is stalking his prey.
 ~
-0 50 bdvA c 3
+0 50 bdvAI c 3
 1 0 0 2
 D
    You find yourself hoping he's hunting rats for their pelts, not meat. But
@@ -316,7 +316,7 @@ official city~
 a city official~
 A city official is inspecting the sewer.
 ~
-0 40 dv 0 3
+0 40 dvI 0 3
 1 0 0 5
 D
 He's muttering something about being forced to catch rats himself.
@@ -331,7 +331,7 @@ gossiper #n~
 gossiper #n~
 #n is standing here, gossipping.
 ~
-30 50 dv 0 3
+30 50 dvI 0 3
 0 0 0 15
 I 4 2015 40.00 1  # LOOT: tunic
 I 4 2021 40.00 1  # LOOT: cloth mantle
@@ -354,7 +354,7 @@ page bustling~
 a bustling page~
 A page is bustling past you.
 ~
-30 50 advxA 0 3
+30 50 advxAI 0 3
 1 0 0 15
 I 4 10036 100.00 1  # LOOT: small skystone
 I 4 10043 10.00 1 X  # LOOT: page robes
@@ -378,7 +378,7 @@ barista #n~
 #n the barista~
 The barista is stirring a drink with a gnarled wand.
 ~
-30 50 bdvxA 0 3
+30 50 bdvxAI 0 3
 0 0 0 16
 I 4 10034 10.00 1  # LOOT: gnarled wand
 T 10032
@@ -390,7 +390,7 @@ S
 #n~
 #n is sitting at a cafe table.
 ~
-30 50 bdv 0 3
+30 50 bdvI 0 3
 0 0 0 1
 S
 #10034
@@ -398,7 +398,7 @@ master #n~
 Master #n~
 Master #n is scribbling on the blackboard.
 ~
-50 70 bdvxA 0 3
+50 70 bdvxAI 0 3
 0 2 0 17
 T 10034
 T 10035
@@ -409,7 +409,7 @@ S
 #n~
 #n is writing furiously with a quill.
 ~
-30 50 bdv 0 3
+30 50 bdvI 0 3
 0 0 0 5
 T 10046
 S
@@ -418,7 +418,7 @@ S
 #n~
 #n is standing behind the counter.
 ~
-30 50 bdvxA 0 3
+30 50 bdvxAI 0 3
 0 0 0 1
 T 10036
 T 10037
@@ -429,11 +429,11 @@ apprentice #n~
 Apprentice #n~
 An apprentice is staring intently at a glass case.
 ~
-50 70 advxA 0 3
+50 70 advxAI 0 3
 0 0 0 16
+I 4 10036 100.00 1  # LOOT: small skystone
 I 4 10045 10.00 1 X  # LOOT: apprentice robes
 I 4 10044 10.00 1 X  # LOOT: skycleaver spellbook
-I 4 10036 100.00 1  # LOOT: small skystone
 T 10045
 T 10046
 S
@@ -442,7 +442,7 @@ goblin wrangler~
 the goblin wrangler~
 The goblin wrangler snaps his whip at a cage.
 ~
-50 70 bdvxA 0 2
+50 70 bdvxAI 0 2
 1 0 0 7
 I 4 10036 100.00 1  # LOOT: small skystone
 I 4 10047 10.00 1 X  # LOOT: goblin wrangler pants
@@ -491,7 +491,7 @@ S
 #n~
 #n is betting on the pixy races.
 ~
-50 70 bdvxA 0 3
+50 70 bdvxAI 0 3
 0 0 0 17
 I 4 10036 100.00 1  # LOOT: small skystone
 T 10046
@@ -511,11 +511,11 @@ S
 Watcher #n~
 #n is watching over the apprentices.
 ~
-70 90 advxA 0 3
+70 90 advxAI 0 3
 0 2 0 1
+I 4 10036 100.00 1  # LOOT: small skystone
 I 4 10054 10.00 1 X  # LOOT: glass shield
 I 4 10053 10.00 1 X  # LOOT: glass sword
-I 4 10036 100.00 1  # LOOT: small skystone
 T 10044
 T 10046
 S
@@ -524,11 +524,11 @@ resident sorcerer~
 the resident~
 A sorcerer resident looks rather busy.
 ~
-70 90 advxA 0 3
+70 90 advxAI 0 3
 2 0 0 16
+I 4 10036 100.00 1  # LOOT: small skystone
 I 4 10056 10.00 1 X  # LOOT: glimmering doublet
 I 4 10055 10.00 1 X  # LOOT: pointed earcuff
-I 4 10036 100.00 1  # LOOT: small skystone
 T 10046
 S
 #10045
@@ -536,11 +536,11 @@ master high #n~
 High Master #n~
 High Master #n is overseeing the residents.
 ~
-110 110 bdvxA 0 3
+110 110 bdvxAI 0 3
 0 2 0 16
+I 4 10036 100.00 1  # LOOT: small skystone
 I 4 10058 10.00 1 X  # LOOT: double-pocket
 I 4 10057 10.00 1 X  # LOOT: bone wand
-I 4 10036 100.00 1  # LOOT: small skystone
 T 10047
 T 10046
 S
@@ -549,7 +549,7 @@ assistant lab~
 the lab assistant~
 The lab assistant is fiddling with some crystals.
 ~
-70 90 bdvxA 0 3
+70 90 bdvxAI 0 3
 1 0 0 15
 T 10048
 T 10046
@@ -631,7 +631,7 @@ celiya high sorceress~
 High Sorceress Celiya~
 High Sorceress Celiya is here.
 ~
-120 120 bdvxB 0 3
+120 120 bdvxBI 0 3
 2 0 0 17
 I 4 10037 100.00 1  # LOOT: greater skystone
 I 4 10070 15.00 1 X  # LOOT: reverse impact ring
@@ -647,7 +647,7 @@ barrosh sorcerer high~
 High Sorcerer Barrosh~
 High Sorcerer Barrosh is tinkering with a spell.
 ~
-150 150 bdvxyB 0 3
+150 150 bdvxyBI 0 3
 1 0 0 18
 I 4 10037 100.00 1  # LOOT: greater skystone
 I 4 10073 15.00 1 X  # LOOT: crystal-clear goggles
@@ -663,7 +663,7 @@ knezz nezz grand high sorcerer~
 Grand High Sorcerer Knezz~
 Grand High Sorcerer Knezz appears to be meditating.
 ~
-200 200 bdvxyzB 0 3
+200 200 bdvxyzBI 0 3
 1 0 0 19
 I 4 10037 100.00 1  # LOOT: greater skystone
 I 4 10076 15.00 1 X  # LOOT: phoenix bone earrings

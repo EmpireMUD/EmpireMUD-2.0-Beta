@@ -20,7 +20,7 @@ hermit~
 a hermit~
 A hermit can be seen in the shadows.
 ~
-0 0 bdvA cn 3
+0 0 bdvAI cn 3
 0 0 0 15
 T 11100
 T 11101
@@ -238,7 +238,7 @@ caretaker~
 the caretaker~
 The caretaker, pale and disheveled, pokes at the soil of one of the window boxes, ignoring you.
 ~
-0 0 bdv n 3
+0 0 bdvI n 3
 0 0 13 3
 S
 #11136

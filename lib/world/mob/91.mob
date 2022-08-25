@@ -938,7 +938,7 @@ witch swamp~
 the swamp witch~
 The swamp witch lurches about.
 ~
-75 100 cdovx c 3
+75 100 cdovxI c 3
 2 0 0 19
 D
    The old witch is clothed in bits of swamp. Her hair is indistinguishable
@@ -956,7 +956,7 @@ bandit swamp someone~
 a swamp bandit~
 Someone is lurking behind a tree!
 ~
-75 100 cdov c 3
+75 100 cdovI c 3
 1 0 0 4
 D
    The bandit is dressed in gray and green to match the swamp, with a mask over
@@ -1362,7 +1362,7 @@ emperor penguins~
 the Emperor of Penguins~
 The Emperor of Penguins stares at you from beneath his penguin cowl.
 ~
-150 150 bdovA 0 3
+150 150 bdovAI 0 3
 1 0 13 15
 D
    This strange man is wearing a white suit with a black cape and cowl. He
