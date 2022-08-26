@@ -3864,6 +3864,7 @@ const char *trig_types[] = {
 	"Kill",	// 25
 	"Allow-Multiple",
 	"Can-Fight",
+	"Pre-Greet-All",
 	"\n"
 };
 
@@ -3897,6 +3898,7 @@ const bitvector_t mtrig_argument_types[] = {
 	TRIG_ARG_PERCENT,	// kill
 	NOBITS,	// allow-multiple
 	NOBITS,	// can-fight
+	TRIG_ARG_PERCENT,	// pre-greet-all
 };
 
 
