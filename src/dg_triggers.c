@@ -253,6 +253,46 @@ int greet_mtrigger(char_data *actor, int dir) {
 }
 
 
+int pre_greet_mtrigger(char_data *actor, room_data *room, int dir) {
+	trig_data *t, *next_t;
+	char_data *ch;
+	char buf[MAX_INPUT_LENGTH];
+	int intermediate, final=TRUE;
+
+	if (IS_IMMORTAL(actor) && (GET_INVIS_LEV(actor) > LVL_MORTAL || PRF_FLAGGED(actor, PRF_WIZHIDE))) {
+		return TRUE;
+	}
+	if (!valid_dg_target(actor, DG_ALLOW_GODS))
+		return TRUE;
+	
+	DL_FOREACH2(ROOM_PEOPLE(room), ch, next_in_room) {
+		if (!SCRIPT_CHECK(ch, MTRIG_PRE_GREET_ALL) || (ch == actor)) {
+			continue;
+		}
+
+		LL_FOREACH_SAFE(TRIGGERS(SCRIPT(ch)), t, next_t) {
+			if (AFF_FLAGGED(ch, AFF_CHARM) && !TRIGGER_CHECK(t, MTRIG_CHARMED)) {
+				continue;
+			}
+			if (!GET_TRIG_DEPTH(t) && (number(1, 100) <= GET_TRIG_NARG(t))) {
+				union script_driver_data_u sdd;
+				if (dir>=0 && dir < NUM_OF_DIRS)
+					add_var(&GET_TRIG_VARS(t), "direction", (char *)dirs[rev_dir[dir]], 0);
+				else
+					add_var(&GET_TRIG_VARS(t), "direction", "none", 0);
+				ADD_UID_VAR(buf, t, char_script_id(actor), "actor", 0);
+				sdd.c = ch;
+				intermediate = script_driver(&sdd, t, MOB_TRIGGER, TRIG_NEW);
+				if (!intermediate)
+					final = FALSE;
+				continue;
+			}
+		}
+	}
+	return final;
+}
+
+
 void entry_memory_mtrigger(char_data *ch) {
 	trig_data *t, *next_t;
 	char_data *actor;

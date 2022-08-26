@@ -335,6 +335,7 @@ Mobs can trigger on the following events:
 &cDeath&0 - Triggers when the mob dies.
 &cGreet&0 - Triggers when a visible person enters the room.
 &cGreet-All&0 - Triggers ANY person enters the room.
+&cPre-Greet-All&0 - Triggers right before ANY person enters the room.
 &cEntry&0 - Triggers when the mob moves into a new room.
 &cReceive&0 - Triggers when the mob receives an item.
 &cFight&0 - Triggers during combat rounds.

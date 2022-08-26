@@ -465,6 +465,7 @@ ACMD(do_respawn) {
 		
 		affect_total(ch);
 		queue_delayed_update(ch, CDU_SAVE);
+		pre_greet_mtrigger(ch, IN_ROOM(ch), NO_DIR);	// cannot pre-greet for respawn
 		greet_mtrigger(ch, NO_DIR);
 		greet_memory_mtrigger(ch);
 		greet_vtrigger(ch, NO_DIR);

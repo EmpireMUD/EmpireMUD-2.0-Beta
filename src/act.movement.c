@@ -834,6 +834,7 @@ void perform_transport(char_data *ch, room_data *to_room) {
 	
 	enter_wtrigger(IN_ROOM(ch), ch, NO_DIR);
 	entry_memory_mtrigger(ch);
+	pre_greet_mtrigger(ch, IN_ROOM(ch), NO_DIR);	// cannot pre-greet for transport
 	greet_mtrigger(ch, NO_DIR);
 	greet_memory_mtrigger(ch);
 	greet_vtrigger(ch, NO_DIR);
@@ -1491,6 +1492,11 @@ bool do_simple_move(char_data *ch, int dir, room_data *to_room, bitvector_t flag
 	affects_from_char_by_aff_flag(ch, AFF_HIDE, TRUE);
 	REMOVE_BIT(AFF_FLAGS(ch), AFF_HIDE);
 	
+	// lastly, check pre-greet trigs
+	if (!pre_greet_mtrigger(ch, to_room, dir)) {
+		return FALSE;
+	}
+	
 	// ACTUAL MOVEMENT
 	char_from_room(ch);
 	char_to_room(ch, to_room);
@@ -2071,6 +2077,11 @@ ACMD(do_circle) {
 	
 	if (GET_MOVE(ch) < need_movement && !IS_IMMORTAL(ch) && !IS_NPC(ch)) {
 		msg_to_char(ch, "You're too tired to circle that way.\r\n");
+		return;
+	}
+	
+	// lastly, check pre-greet trigs
+	if (!pre_greet_mtrigger(ch, found_room, dir)) {
 		return;
 	}
 	

@@ -4244,6 +4244,7 @@ void enter_player_game(descriptor_data *d, int dolog, bool fresh) {
 	}
 
 	// script/trigger stuff
+	pre_greet_mtrigger(ch, IN_ROOM(ch), NO_DIR);	// cannot pre-greet for this
 	greet_mtrigger(ch, NO_DIR);
 	greet_memory_mtrigger(ch);
 	greet_vtrigger(ch, NO_DIR);
