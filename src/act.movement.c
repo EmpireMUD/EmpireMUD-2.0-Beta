@@ -1433,7 +1433,7 @@ void char_through_portal(char_data *ch, obj_data *portal, bool following) {
 	
 	// trigger section
 	entry_memory_mtrigger(ch);
-	if (!greet_mtrigger(ch, NO_DIR) || !greet_vtrigger(ch, NO_DIR)) {
+	if (!pre_greet_mtrigger(ch, IN_ROOM(ch), NO_DIR) || !greet_mtrigger(ch, NO_DIR) || !greet_vtrigger(ch, NO_DIR)) {
 		char_from_room(ch);
 		char_to_room(ch, was_in);
 		look_at_room(ch);
