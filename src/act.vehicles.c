@@ -522,6 +522,7 @@ void perform_load_mob(char_data *ch, char_data *mob, vehicle_data *cont, room_da
 	act(buf, FALSE, ch, cont, mob, TO_NOTVICT | ACT_VEHICLE_OBJ);
 	
 	char_to_room(mob, to_room);
+	pre_greet_mtrigger(mob, IN_ROOM(mob), NO_DIR);	// cannot pre-greet for this
 	if (mob->desc) {
 		look_at_room(mob);
 	}
@@ -531,7 +532,6 @@ void perform_load_mob(char_data *ch, char_data *mob, vehicle_data *cont, room_da
 	
 	enter_wtrigger(IN_ROOM(mob), mob, NO_DIR);
 	entry_memory_mtrigger(mob);
-	pre_greet_mtrigger(mob, IN_ROOM(mob), NO_DIR);	// cannot pre-greet for this
 	greet_mtrigger(mob, NO_DIR);
 	greet_memory_mtrigger(mob);
 	greet_vtrigger(mob, NO_DIR);
@@ -576,6 +576,7 @@ void perform_unload_mob(char_data *ch, char_data *mob, vehicle_data *cont) {
 	act("$n unloads $N from $v.", FALSE, ch, cont, mob, TO_NOTVICT | ACT_VEHICLE_OBJ);
 	
 	char_to_room(mob, IN_ROOM(cont));
+	pre_greet_mtrigger(mob, IN_ROOM(mob), NO_DIR);	// cannot pre-greet for this
 	if (mob->desc) {
 		look_at_room(mob);
 	}
@@ -584,7 +585,6 @@ void perform_unload_mob(char_data *ch, char_data *mob, vehicle_data *cont) {
 	
 	enter_wtrigger(IN_ROOM(mob), mob, NO_DIR);
 	entry_memory_mtrigger(mob);
-	pre_greet_mtrigger(mob, IN_ROOM(mob), NO_DIR);	// cannot pre-greet for this
 	greet_mtrigger(mob, NO_DIR);
 	greet_memory_mtrigger(mob);
 	greet_vtrigger(mob, NO_DIR);

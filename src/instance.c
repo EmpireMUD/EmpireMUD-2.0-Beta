@@ -1196,6 +1196,7 @@ void empty_instance_vehicle(struct instance_data *inst, vehicle_data *veh, room_
 				char_from_room(ch);
 				char_to_room(ch, to_room);
 				GET_LAST_DIR(ch) = NO_DIR;
+				pre_greet_mtrigger(ch, IN_ROOM(ch), NO_DIR);	// cannot pre-greet for this
 				look_at_room(ch);
 				
 				// and announce
@@ -1203,7 +1204,6 @@ void empty_instance_vehicle(struct instance_data *inst, vehicle_data *veh, room_
 				
 				entry_mtrigger(ch);
 				enter_wtrigger(IN_ROOM(ch), ch, NO_DIR);
-				pre_greet_mtrigger(ch, IN_ROOM(ch), NO_DIR);	// cannot pre-greet for this
 				greet_mtrigger(ch, NO_DIR);
 				greet_vtrigger(ch, NO_DIR);
 				entry_memory_mtrigger(ch);

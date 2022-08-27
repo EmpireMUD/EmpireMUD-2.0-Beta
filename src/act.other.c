@@ -1052,12 +1052,12 @@ OFFER_FINISH(ofin_summon) {
 	char_to_room(ch, loc);
 	GET_LAST_DIR(ch) = NO_DIR;
 	qt_visit_room(ch, IN_ROOM(ch));
+	pre_greet_mtrigger(ch, IN_ROOM(ch), NO_DIR);	// cannot pre-greet for summon
 	look_at_room(ch);
 	act("$n appears in a swirl of light!", TRUE, ch, NULL, NULL, TO_ROOM);
 	
 	enter_wtrigger(IN_ROOM(ch), ch, NO_DIR);
 	entry_memory_mtrigger(ch);
-	pre_greet_mtrigger(ch, IN_ROOM(ch), NO_DIR);	// cannot pre-greet for summon
 	greet_mtrigger(ch, NO_DIR);
 	greet_memory_mtrigger(ch);
 	greet_vtrigger(ch, NO_DIR);

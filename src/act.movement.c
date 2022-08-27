@@ -827,14 +827,14 @@ void perform_transport(char_data *ch, room_data *to_room) {
 
 	char_to_room(ch, to_room);
 	qt_visit_room(ch, to_room);
-	look_at_room(ch);
 	GET_LAST_DIR(ch) = NO_DIR;
+	pre_greet_mtrigger(ch, IN_ROOM(ch), NO_DIR);	// cannot pre-greet for transport
+	look_at_room(ch);
 
 	act("$n materializes in front of you!", TRUE, ch, 0, 0, TO_ROOM);
 	
 	enter_wtrigger(IN_ROOM(ch), ch, NO_DIR);
 	entry_memory_mtrigger(ch);
-	pre_greet_mtrigger(ch, IN_ROOM(ch), NO_DIR);	// cannot pre-greet for transport
 	greet_mtrigger(ch, NO_DIR);
 	greet_memory_mtrigger(ch);
 	greet_vtrigger(ch, NO_DIR);
