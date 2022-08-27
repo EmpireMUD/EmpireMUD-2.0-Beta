@@ -200,7 +200,7 @@ goblins swore up and down there wasn't a secret passage but they've been
 playing stupid pranks on me for months using it.'
    She fumes and stomps off without thanking you.
 ~
-21 e 125 250 -1
+22 ei 125 250 -1
 A
 1 11900
 P
@@ -236,7 +236,7 @@ without a good reason.'
 interesting indeed.'
    She trails off, completely forgetting you're even here.
 ~
-21 e 125 250 -1
+22 ei 125 250 -1
 A
 1 11900
 P
@@ -269,7 +269,7 @@ thinks on it for a moment.
    'The pixies never seem to try to escape. I plum thought they liked it here,'
 she says. 'And what did she mean by that last part... 'in time'?'
 ~
-22 e 125 250 -1
+23 ei 125 250 -1
 A
 1 11900
 P
@@ -303,7 +303,7 @@ near the racetrack stalls.
    'Those pixies really get into your head; that maze was worse than the Forest
 dome. I had the strangest dreams in there.'
 ~
-22 e 125 250 -1
+23 ei 125 250 -1
 A
 1 11900
 P
@@ -380,7 +380,7 @@ chuckle burbles out of the old lich as he sets his repository back down.
    'The only ones who could read were the spellcasters and, to my unending
 chagrin, they were smart enough not to open the thing. Alas.'
 ~
-18 e 125 250 -1
+19 ei 125 250 -1
 A
 1 11900
 P
@@ -427,7 +427,7 @@ common thief. Did you see how his lust for power corrupted and withered him so
 far beyond his years? It's good you put an end to it; on that path he'd soon
 have nothing left but his linens.'
 ~
-17 e 125 250 -1
+18 ei 125 250 -1
 A
 1 11900
 P
@@ -469,7 +469,7 @@ rose-colored glass from a pocket inside her robe and holds it up to one eye.
 time loop. I guess by now you've noticed we didn't get free of it. Next time
 maybe you can save Knezz. He might actually know how to get us out of it.'
 ~
-16 e 125 250 -1
+17 ei 125 250 -1
 A
 1 11900
 P
@@ -502,7 +502,7 @@ here-after.'
    Knezz chuckles to himself.
    'Can you imagine?' he says. 'The hells full to the gills with Jozef Knezz!'
 ~
-17 e 125 250 -1
+18 ei 125 250 -1
 A
 1 11900
 P
@@ -550,7 +550,7 @@ a children's story. Your story hinges on a magic lion possessing one of the
 cleverest sorcerers of our time and defeating several of the strongest. If what
 you say is true, then we are definitely not getting out of this time loop.'
 ~
-20 e 125 250 -1
+21 ei 125 250 -1
 A
 1 11900
 P

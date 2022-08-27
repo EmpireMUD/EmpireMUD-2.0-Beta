@@ -24,6 +24,132 @@ W
 Z
 1 11906
 S
+#11918
+Skycleave: The Championship Tour~
+   You scrutinize the time-traveler's list of villains, looking for more clues.
+It seems the mysterious author has fought all these people somewhere in the
+Tower Skycleave and now you find yourself eager to duplicate the feat.
+   With this checklist in hand, find and defeat every one of the Tower
+Skycleave's combatants. Be warned: like the time-traveler himself, it will take
+more than one trip through the tower to get them all. Be sure you're the one to
+kill them as well. If they die through some other misfortune, it doesn't count.
+~
+   You sit on the edge of the fountain and reflect on your battles against the
+tower's many villains as you watch the countless twinkling lights from the
+tree overhead reflect off of the softly burbling water. Surely this was the
+tower's most difficult challenge.
+~
+6 0 125 250 -1
+A
+2 11918
+P
+16 11800 0 7
+R
+7 11800 25
+W
+3 11819 0 1 a
+W
+3 11818 0 1 a
+W
+3 11847 0 1 a
+W
+3 11848 0 1 a
+W
+3 11849 0 1 a
+W
+3 11867 0 1 a
+W
+3 11869 0 1 a
+W
+3 11863 0 1 a
+W
+3 11872 0 1 a
+W
+3 11888 0 1 a
+W
+3 11958 0 1 a
+W
+3 11928 0 1 a
+Z
+3 11908
+Z
+3 11808
+S
+#11919
+Skycleave: The Time-Traveler's Tour~
+   You read both sides of the diary page several times, wondering to yourself
+where some of these so-called hidden areas might be. At least now the
+mysterious time-traveler has provided you a checklist.
+   Visit each of the locations in the diary and then return to the first floor
+fountain in the Tower Skycleave to complete the quest. Some of these locations
+must be visited AFTER the tower has been rescued to count.
+~
+   You stroll around the fountain several times, watching the reflection of
+the enormous tree above you meander around the room in the surface of the
+fountain. The tower held so many secrets, a person could spend a lifetime
+plumbing its depths.
+~
+5 0 125 250 -1
+A
+2 11919
+P
+16 11800 0 7
+R
+7 11800 25
+W
+13 11916 0 1 a
+W
+13 11940 0 1 a
+W
+13 11972 0 1 a
+W
+13 11880 0 1 a
+W
+13 11975 0 1 a
+W
+13 11888 0 1 a
+W
+13 11890 0 1 a
+W
+13 11993 0 1 a
+W
+13 11994 0 1 a
+Z
+3 11908
+Z
+3 11808
+S
+#11920
+Skycleave: Out of Time~
+   You read the diary page several times and turn it over in your hands. It
+clearly wasn't written by the hand of any of these sorcerers. Further, it's
+obviously someone who is keenly aware that the Tower Skycleave is stuck in a
+time loop -- a fact that seems lost on most of the tower's denizens.
+   This merits some investigation. Find the mysterious time-traveler who wrote
+the diary and see what insight he has to offer. Afterwards, visit the first
+floor fountain to complete the quest.
+~
+   In the end, it seems the time-traveler met a grim fate. You lay on your back
+and think on it, imagining for a moment that you are at the top, not bottom of
+this enormous chamber, looking down at the nocturnium tree and the tremendous
+fall to its base. This must be how it felt to be trapped in the time loop,
+staring into the pit you can never escape from. At least the sorcerers are, on
+the whole, unaware of their dark fate.
+~
+7 0 125 250 -1
+A
+2 11920
+P
+16 11800 0 7
+R
+7 11800 25
+W
+11 0 0 1
+Z
+3 11908
+Z
+3 11808
+S
 #11970
 Skycleave: Secret Niamh~
    Amongst the Skycleave variations, there is a hidden thread in the time loop
@@ -44,7 +170,7 @@ getting answers.'
    You try to discuss it further, but Niamh seems lost in her own thoughts and
 she soon wanders off.
 ~
-16 e 125 250 -1
+17 ei 125 250 -1
 A
 1 11900
 P
@@ -57,6 +183,47 @@ W
 13 11964 0 1
 Z
 1 11970
+S
+#11972
+Skycleave: Elemental Plane of Water~
+   You struggle for a breath as you realize you fell too far into the fountain.
+All you can see in every direction is water -- and it seems to be alive! The
+situation is as interesting as it is unexpected, and you vow to investigate it
+once you've defeated the living water.
+   After you defeat the living embodiment of the First Water, seek out someone
+in the Tower Skycleave who has more information.
+~
+   'Oh bother,' Annelise says as you interrupt her mending an old iron staff.
+She tosses it into the rubbish pile and ties her hair up out of her face. She
+takes a seat and wipes sweat from her forehead.
+   'I didn't even realize we had an appointment,' she says. She glances across
+the desk at her calendar, then back to you, then back to the calendar.
+   You interrupt and tell her about your fight with the First Water, from which
+you still don't feel like you've completely dried off. You tell her about the
+pressure in your lungs, about feeling like you were about to drown when the
+living water finally died. And, of course, you mention that it came right back
+to life afterward.
+   'I do keep telling the headmaster we should lock that portal,' Annelise says
+when you finish the tale. 'It's an actual elemental plane, if you can believe
+it. Frankly you're lucky to have made it out. We lost a lot of pages before we
+put up a sign... which seems to have gone missing.
+   'Anyway, you can't actually kill it. It's Water itself. All water. Every-
+where. But it's a great test of an adventurer's mettle. Be sure to fight it
+again when you get the chance.'
+~
+13 0 125 250 -1
+A
+3 11972
+P
+16 11800 0 6
+R
+7 11800 10
+W
+3 11928 0 1
+Z
+1 11839
+Z
+1 11939
 S
 #11975
 Gobbrabakh of Orka: Where Am I?~
@@ -129,7 +296,7 @@ slowly, a chant builds among the spectators, louder and louder, until it grows
 into a cheer. You can't make out what they're saying -- or you can't understand
 it -- but they seem thrilled at your performance in the arena.
 ~
-10 e 125 250 -1
+11 ei 125 250 -1
 A
 1 11974
 P

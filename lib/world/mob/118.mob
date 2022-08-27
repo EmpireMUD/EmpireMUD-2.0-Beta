@@ -3,7 +3,7 @@
 #n~
 #n is standing here.
 ~
-0 0 dvAI n 3
+0 0 dvA n 3
 2 0 0 15
 D
    She's dressed in traveling pants and wears a hat that clearly identifies her
@@ -17,7 +17,7 @@ Dylane trense~
 Dylane~
 Dylane of Trense is here, looking around.
 ~
-0 0 dvAHI n 3
+0 0 dvAH n 3
 1 0 0 15
 D
    Dressed unmistakably in the finery of a nobleman and making no efforts to
@@ -58,7 +58,7 @@ S
 #n~
 #n is looking up at everything.
 ~
-0 0 dvAI n 3
+0 0 dvA n 3
 1 0 0 15
 D
    He seems to have a keen interest in architecture as he walks around looking
@@ -93,7 +93,7 @@ S
 #n~
 #n talks with his hands as he walks.
 ~
-0 0 dvAI n 3
+0 0 dvA n 3
 1 0 0 15
 D
    He seems to be very knowledgeable about the tower as he's giving a lot of
@@ -108,7 +108,7 @@ corwin page~
 Page Corwin~
 Corwin is bustling about.
 ~
-0 0 dvxAI n 3
+0 0 dvxA n 3
 1 0 0 15
 D
    Corwin is sweating under his heavy jute page robe. He's bustling around
@@ -123,7 +123,7 @@ Mageina barista~
 Mageina~
 Mageina is managing several pots of soup.
 ~
-0 0 bdvxAI n 3
+0 0 bdvxA n 3
 2 0 0 16
 D
    Mageina moves back and forth between pots of soup, which she heats with a
@@ -141,7 +141,7 @@ Huberus master sorcerer instructor~
 Master Sorcerer Huberus~
 Master Sorcerer Huberus is making one of the beds.
 ~
-0 0 bdvxAI n 3
+0 0 bdvxA n 3
 2 0 0 16
 D
    Huberus is a gruff sort, barely casting a glance from underneath the gnarly
@@ -160,7 +160,7 @@ S
 #n~
 #n is organizing the supplies.
 ~
-0 0 bdvAI n 3
+0 0 bdvA n 3
 1 0 0 16
 D
    Though he looks like he's new here, he has set right to work sorting and
@@ -196,7 +196,7 @@ S
 #n~
 A young lady is standing here.
 ~
-0 0 dvAI n 3
+0 0 dvA n 3
 2 0 0 15
 D
    She's young, not past her second decade, and it looks as if she's been
@@ -240,7 +240,7 @@ S
 #n~
 #n walks around with a huge grin on his face.
 ~
-0 0 dvAI n 3
+0 0 dvA n 3
 1 0 0 15
 D
    The young man is dressed in white shirt and dark wool trousers with
@@ -255,7 +255,7 @@ Annaca watcher~
 Annaca~
 Watcher Annaca is struggling to hold a mana shield over the staircase.
 ~
-0 0 bdvxAI n 3
+0 0 bdvxA n 3
 2 0 0 15
 D
    Though Annaca's face is strained and contorted as she struggles to hold the
@@ -275,7 +275,7 @@ apprentice kayla~
 Kayla~
 Apprentice Kayla is standing here.
 ~
-0 0 dvxAI n 3
+0 0 dvxA n 3
 2 0 0 15
 D
    Kayla's white robes have turned gray below the shins and the back side isn't
@@ -291,7 +291,7 @@ cosimo apprentice~
 Cosimo~
 Apprentice Cosimo is lurking in the passage.
 ~
-0 0 bdvxAI n 3
+0 0 bdvxA n 3
 1 0 0 15
 D
    Cosimo is clad in dingy white apprentice robes with red trim. His hair is
@@ -308,7 +308,7 @@ tyrone~
 Tyrone~
 Tyrone is relaxing on one of the bunks.
 ~
-0 0 bdvxAI n 3
+0 0 bdvxA n 3
 1 0 0 15
 D
    Tyrone looks almost at ease compared to the rest of the tower. His white
@@ -324,7 +324,7 @@ wright old~
 Old Wright~
 Old Wright is reading on his bunk.
 ~
-0 0 bdvxAI n 3
+0 0 bdvxA n 3
 1 0 0 15
 D
    Even in the dim light of the bunk room, Wright's advanced age is such that
@@ -356,7 +356,7 @@ goblin commando~
 the goblin commando~
 The goblin commando is here.
 ~
-0 0 abd 0 2
+0 0 abdI 0 2
 0 0 0 4
 D
 Strings set by trig 11824.
@@ -372,7 +372,7 @@ bruiser goblin~
 a goblin bruiser~
 Goblin bruiser is here.
 ~
-0 0 abd 0 2
+0 0 abdI 0 2
 0 0 0 2
 D
 Strings set by trig 11824.
@@ -388,7 +388,7 @@ Venjer fox goblin~
 Venjer the Fox~
 Venjer the Fox is prodding at the vines with a staff.
 ~
-0 0 abdE 0 2
+0 0 abdEI 0 2
 2 0 0 17
 D
    Venjer is a small woman, though she stands tall and proud, light on her feet
@@ -435,7 +435,7 @@ pixy~
 a pixy~
 A pixy has escaped!
 ~
-0 0 abdx 0 1
+0 0 abdxI 0 1
 0 0 0 28
 D
    The little pixy is no larger than a mouse. It flies on silvery butterfly
@@ -470,7 +470,7 @@ Hugh Mann~
 Hugh~
 Hugh Mann stands here in a low hat and full-length coat.
 ~
-0 0 dvAI n 3
+0 0 dvA n 3
 1 0 0 15
 D
    It's hard to get a good look at his face since his hat is pulled low. You're
@@ -510,7 +510,7 @@ S
 #n~
 #n seems to be studying the tower.
 ~
-0 0 dvAI n 3
+0 0 dvA n 3
 2 0 0 15
 D
    She walks slowly, with her hands behind her back, watching everyone and
@@ -526,7 +526,7 @@ S
 #n~
 #n is walking around.
 ~
-0 0 dvAI n 3
+0 0 dvA n 3
 1 0 0 15
 D
    He's middle-aged, perhaps past his prime as he stands with a hunch. He's
@@ -563,7 +563,7 @@ S
 #n~
 #n is looking around.
 ~
-0 0 dvAHI n 3
+0 0 dvAH n 3
 2 0 0 15
 D
    She's dressed like any young village woman; her clothes aren't in fashion
@@ -605,7 +605,7 @@ ravinder apprentice~
 Apprentice Ravinder~
 Ravinder is reclining on a bunk.
 ~
-0 0 bdvxAI n 3
+0 0 bdvxA n 3
 1 0 0 15
 D
    Ravinder looks positively exhausted. His apprentice robes are dirty from
@@ -623,7 +623,7 @@ S
 #n~
 #n is standing here.
 ~
-0 0 dvAHI n 3
+0 0 dvAH n 3
 2 0 0 15
 D
    She's a young woman sporting a gold wedding ring, perhaps just married. She
@@ -658,7 +658,7 @@ Marie apprentice~
 Marie~
 Marie is sitting with Djon.
 ~
-0 0 bdvAI n 3
+0 0 bdvA n 3
 2 0 0 15
 D
    Marie is dressed in white apprentice robes with a bright blue margin. Her
@@ -675,7 +675,7 @@ Djon apprentice~
 Djon~
 Djon is seated at a table in the corner.
 ~
-0 0 bdvAI n 3
+0 0 bdvA n 3
 1 0 0 15
 D
    Djon leans back, with one arm propped up on an empty chair. His legs are
@@ -707,7 +707,7 @@ Caius sirensbane high master~
 Caius Sirensbane~
 High Master Caius Sirensbane is warding the staircase!
 ~
-0 0 bdvxAI n 3
+0 0 bdvxA n 3
 1 0 0 15
 D
    High Master Caius strains against the shining red ward he has placed over
@@ -744,7 +744,7 @@ mohammed resident~
 Resident Mohammed~
 Resident Mohammed is helping out.
 ~
-0 0 bdvxAI n 3
+0 0 bdvxA n 3
 1 0 0 15
 D
    Mohammed stands like a beanpole, tall and thin, wearing a long, slim, gray
@@ -800,7 +800,7 @@ Sanjiv apprentice~
 Apprentice Sanjiv~
 An apprentice is poorly camouflaged against the wall.
 ~
-0 0 bdvxAI n 3
+0 0 bdvxA n 3
 1 0 0 15
 D
    A young apprentice is magically camouflaged against the wall. From most
@@ -816,7 +816,7 @@ scaldorran lich~
 the Lich Scaldorran~
 The Lich Scaldorran howls as he twists and writhes in the air!
 ~
-0 0 bdvxAI n 3
+0 0 bdvxA n 3
 1 0 0 15
 D
    A bone-chilling howl trickles from your ears, down your spine, into your
@@ -851,7 +851,7 @@ Annelise~
 Annelise~
 Annelise is seated at one of the tables.
 ~
-0 0 bdvxAI n 3
+0 0 bdvxA n 3
 2 0 0 15
 D
    Annelise is seated at a bistro table with her back tucked into the corner
@@ -1139,7 +1139,7 @@ Paige page~
 the page~
 A page hovers motionlessly in the air, her head down.
 ~
-0 0 bdvxAI n 3
+0 0 bdvxA n 3
 2 0 0 15
 D
    You walk in a circle around the young page as she hovers there, perfectly
@@ -1231,7 +1231,7 @@ sheila~
 Sheila~
 Sheila is sitting behind the bed's canopy.
 ~
-0 0 bdvxAI n 3
+0 0 bdvxA n 3
 2 0 0 15
 D
    Sheila has taken refuge behind the canopy of the bed, where she can't be
@@ -1247,7 +1247,7 @@ Grace woman old helpless~
 Grace~
 A helpless old woman floats upside-down near the wardrobe.
 ~
-0 0 bdvxAI n 3
+0 0 bdvxA n 3
 2 0 0 15
 D
    The old woman appears to be Grace, assistant to High Sorcerer Barrosh. Her
@@ -1263,7 +1263,7 @@ barrosh high sorcerer~
 Barrosh~
 High Sorcerer Barrosh is kneeling on the floor.
 ~
-0 0 bdvxEI n 3
+0 0 bdvxE n 3
 1 0 0 15
 D
    Barrosh looks disheveled, kneeling on the floor in his violet high sorcerer
@@ -1280,7 +1280,7 @@ thorley apprentice~
 Apprentice Thorley~
 Thorley is hiding behind a chair.
 ~
-0 0 bdvxAI n 3
+0 0 bdvxA n 3
 1 0 0 15
 D
    Young Thorley is tucked behind a chair, peeking out at every sound. Already
@@ -1316,7 +1316,7 @@ Celiya high sorcerer~
 High Sorcerer Celiya~
 High Sorcerer Celiya is coordinating the defense of the tower.
 ~
-0 0 dvxAI n 3
+0 0 dvxA n 3
 2 0 0 17
 D
    Celiya looks downright exhausted as she hurries about in high sorcerer robes
@@ -1361,7 +1361,7 @@ barrosh high sorcerer~
 High Sorcerer Barrosh~
 High Sorcerer Barrosh stands with his staff raised high and an anguished look.
 ~
-0 0 bdhvxyI 0 3
+0 0 bdhvxy 0 3
 1 0 0 15
 D
    Barrosh takes a menacing position as you enter and seems to be muttering
@@ -1413,7 +1413,7 @@ knezz grand high sorcerer~
 Knezz~
 Grand High Sorcerer Knezz is sitting in the chair.
 ~
-0 0 bdvxAI n 3
+0 0 bdvxA n 3
 1 0 0 15
 D
    The old sorcerer looks exhausted, even drained, as he sits in his chair,
@@ -1842,7 +1842,7 @@ Celiya high sorcerer difficulty~
 High Sorcerer Celiya~
 High Sorcerer Celiya is shielding the staircase with a powerful spell! (difficulty)
 ~
-0 0 bdvxAI n 3
+0 0 bdvxA n 3
 2 0 0 17
 D
    The high sorcerer looks bedraggled, almost exhausted, in her layered purple
@@ -1865,7 +1865,7 @@ Annaca watcher difficulty~
 Watcher Annaca~
 Watcher Annaca is struggling to hold a mana shield over the staircase. (difficulty)
 ~
-0 0 bdvxAI n 3
+0 0 bdvxA n 3
 2 0 0 15
 D
    Though Annaca's face is strained and contorted as she struggles to hold the
@@ -1890,7 +1890,7 @@ Caius sirensbane high master difficulty~
 Caius Sirensbane~
 High Master Caius Sirensbane is warding the staircase! (difficulty)
 ~
-0 0 bdvxAI n 3
+0 0 bdvxA n 3
 1 0 0 15
 D
    High Master Caius strains against the shining red ward he has placed over

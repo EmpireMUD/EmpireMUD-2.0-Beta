@@ -1684,14 +1684,21 @@ done
 ~
 #11832
 Skycleave: Conditional mob visibility~
-0 hi 100
+0 iC 100
 ~
 * toggles silent, !see
 * activated on greet or when moving
 set see 0
 set not 0
 set vis 0
-set ch %self.room.people%
+* special handling to catch actor when not in the room
+if %actor%
+  set ch %actor%
+  set spec 1
+else
+  set ch %self.room.people%
+  set spec 0
+end
 * determine if anyone should/shouldn't see me
 while %ch%
   if %ch.is_pc%
@@ -1711,7 +1718,12 @@ while %ch%
       end
     end
   end
-  set ch %ch.next_in_room%
+  if %spec%
+    set spec 0
+    set ch %self.room.people%
+  else
+    set ch %ch.next_in_room%
+  end
 done
 * determine behavior based on vnum
 switch %self.vnum%
