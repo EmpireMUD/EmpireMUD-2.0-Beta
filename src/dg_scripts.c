@@ -3248,7 +3248,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						if (subfield && *subfield && IS_NPC(c)) {
 							char arg1[256], arg2[256];
 							int ctype, count = 0, pos = -1;
-							struct custom_message *mcm, *found_mcm;
+							struct custom_message *mcm, *found_mcm = NULL;
 							
 							comma_args(subfield, arg1, arg2);
 							if (*arg1 && (ctype = search_block(arg1, mob_custom_types, FALSE)) != NOTHING) {
