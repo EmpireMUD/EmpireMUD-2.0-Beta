@@ -3276,7 +3276,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 								
 								// did we find one
 								if (found_mcm) {
-									strncpy(str, mcm->msg, slen-1);
+									strncpy(str, NULLSAFE(found_mcm->msg), slen-1);
 									str[slen-1] = '\0';
 								}
 							}
