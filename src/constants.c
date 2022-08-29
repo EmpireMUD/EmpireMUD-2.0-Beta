@@ -2194,6 +2194,11 @@ const char *mob_custom_types[] = {
 	"echo-day",
 	"echo-night",
 	"long-desc",
+	"script1",
+	"script2",
+	"script3",
+	"script4",
+	"script5",
 	"\n"
 };
 

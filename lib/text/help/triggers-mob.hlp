@@ -429,6 +429,9 @@ When using field  - The variable returns:
 &ccooldown(vnum)&0 - Gets the character's current cooldown time (seconds).
 &ccrafting_level&0 - The actor's crafting level.
 &ccurrency(vnum)&0 - The amount of an adventure currency that a player has.
+&ccustom(TYPE,NUM)&0 - Get a mob's custom string. NUM is optional. If there is
+   more than one entry for a type, it returns one at random unless you request
+   a specific number like %ch.custom(script1,0)%.
 &cdex&0 - The actor's Dexterity.
 &cdir(name)&0 - Gives the name of the character's perceived direction
    ('name' is the real direction), which is useful for people without

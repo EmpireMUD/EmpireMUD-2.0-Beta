@@ -4425,6 +4425,8 @@ Message types:
  &csay-day&0 - Like say, but only during the day.
  &csay-night&0 - Only during the night.
  &clong-desc&0 - Variable long descriptions (prevents normal long desc showing)
+ &cscript1&0 - &cscript5&0 - Can be referenced in scripts as
+   %mob.custom(script1)%, %mob.custom(script1,0)%, etc.
 
 Note: The 'echo' and 'say' types share the same random interval, and the mob
 will only do one or the other each time.
