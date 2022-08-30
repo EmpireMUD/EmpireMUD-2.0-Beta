@@ -1518,7 +1518,62 @@ A trio of blue gems hovers beneath each of her ears and she wears a nocturnium
 stud on the right side of her short, rounded nose.
 ~
 F 11800
+M
+7
+say You ever hear the story about how I met old Knezz? Oh, sugar...~
+M
+7
+say Well, I was about the hottest thing in the Twenty Villages and boy, did they know it.~
+M
+7
+say You know how it is. Just, bam! Fireball. Bam! Fireball. Bam! Fireball.~
+M
+7
+say Except an untrained sorcerer is like a dragon in an alchemist's shop. So I definitely burned down the town hall.~
+M
+7
+say Well, sugar, me and my first husband hit the road. We were young. Real young. But we were riding that magic...~
+M
+7
+say That's a story for another time. Where was I? Oh yeah.~
+M
+7
+say Now, me and Rackney -- that was my husband -- decided to do the adventure circuit and started putting out for-hires...~
+M
+7
+say And we were good at it. Real good. Rackney could swing a sword like nobody's business, and me...~
+M
+7
+emote $n laughs.~
+M
+7
+say Well, let's just say I left a mark.~
+M
+7
+say Anyway, Rackney got us a job down in Gloomhaven, real cheerful place, sugar, if you catch my meaning...~
+M
+7
+say If you think the goblins are bad, this place had necromancers in its sewers.~
+M
+7
+say Well, we cleared that sewer out but good. Only, Rackney took a venemous arrow to the thigh and dropped.~
+M
+7
+say And I mean DROPPED. Rest him. Racknold Erran Tousel. Dropped right in the sludge and filth.~
+M
+7
+say That's not even the worst part. Well, it is, but it isn't. One of the necros started to raise him against me.~
+M
+7
+say Well, I was real heated. I lit that whole sewer up like a straw roof. Singed my eyebrows right off.~
+M
+7
+say Anyway, Rackney was protected from the conflagration by the sewage and only a little bit 'zombie' if you catch my meaning...~
+M
+7
+say I kept him around almost a month, till he started to fall apart. Rest him. He was a good man.~
 T 11810
+T 11840
 S
 #11965
 trolley cleaning~
@@ -1627,7 +1682,65 @@ several nocturnium beads in his beard. If he carries anything else on his
 person, it's covered by the robes.
 ~
 F 11800
+M
+7
+say Did I ever tell you about how they built this tower? Ah, now there's a story.~
+M
+7
+say The majestic Tower Skycleave has existed in many forms for hundreds of years, but this one is by far the greatest.~
+M
+7
+say It was Grand High Sorcerer Rafaela's vision to build it from stones of power. She searched the ends of the earth to find enough of them...~
+M
+7
+say Wong speculated that nasty plague that killed her was caused by cutting up those stones...~
+M
+7
+say He outsourced the labor to goblins, in the end. Countless thousands of stones to build this thing. It took years.~
+M
+7
+say But it was his vision -- Grand High Sorcerer Wong -- that brought it all together.~
+M
+7
+say Spectacular old thing, Skycleave. I dare say this version of it will stand forever.~
+M
+8
+say It's a shame the heartwood had to be burned. Tremendous source of power, that. Did I ever tell you how I found it?~
+M
+8
+say It was during the war, after Grand High Sorcerer Kofi's death but before I was raised to the office myself.~
+M
+8
+say It was a grand old forest, every tree the same, but out of the black, one of them lit up like a beacon.~
+M
+8
+say Might've been the gods themselves, but I was drawn to it. The old tree was drawing mana up out of the earth...~
+M
+8
+say As I stood before it, time started to spin around me. The tree was caught in a time loop. Sounding familiar?~
+M
+8
+say Well, being me, I cast a rather ingenius spell to break the time loop...~
+M
+8
+say Or, at least, stretch the loop enough to get the tree out. I believed, rightly, the old thing would power us for decades.~
+M
+8
+say Unfortunately whatever Mezvienne did to the tree drew the whole tower into the time loop. Lucky that's past us.~
+M
+1
+I spent six months as a scrub brush once. Never bug the headmaster, was the lesson there.~
+M
+0
+There's a crunching sound as $n realizes he's stepped on his own spectacles. He picks them up, casts a quick spell, and puts them back on.~
+M
+1
+It's a good thing we have the magic. Imagine the repair costs after that invasion!~
+M
+1
+Glad to be free of that time loop.~
 T 11810
+T 11840
 S
 #11969
 celiya grand high sorcerer~
@@ -1644,7 +1757,32 @@ gems hovers beneath each of her ears and she wears a nocturnium stud on the
 right side of her short, rounded nose.
 ~
 F 11800
+M
+7
+say You ever hear the story about how I met old Knezz?~
+M
+7
+say Well, I had just buried my first husband, rest him. Rackney. Real good man.~
+M
+7
+say Anyway, I was on this hot streak, burning necros and taking names. Some real vendetta stuff.~
+M
+7
+say Well, that kind of fury attracts some attention. Both good and bad.~
+M
+7
+say Knezz found me hunting necromancers way down south and offered to teach me at the tower.~
+M
+7
+say And really, the rest is history. That old man saved my life.~
+M
+7
+say I'd have burnt down half the world and myself with it. I've been here ever since.~
+M
+7
+say I owe a lot to old Knezz, rest him.~
 T 11810
+T 11840
 S
 #11970
 Niamh acting high sorcerer~

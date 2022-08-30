@@ -2094,6 +2094,85 @@ done
 %mod% %self% longdesc The Lich Scaldorran is drawing power from the tower.
 detach 11839 %self.id%
 ~
+#11840
+Skycleave: Storytime using custom strings~
+0 bw 100
+~
+* uses mob custom strings script1-script5 to tell short stories
+* custom strings MUST start with 'say', 'echo', or 'emote'.
+set line_gap 9 sec
+set story_gap 180 sec
+* find story number
+if %self.varexists(story)%
+  eval story %self.story% + 1
+  if %story% > 5
+    set story 1
+  end
+else
+  set story 1
+end
+* determine valid story number
+set tries 0
+set ok 0
+while %tries% < 5 && !%ok%
+  if %self.custom(script%story%,0)%
+    set ok 1
+  else
+    eval story %story% + 1
+    if %story% > 5
+      set story 1
+    end
+  end
+  eval tries %tries% + 1
+done
+if !%ok%
+  wait %story_gap%
+  halt
+end
+* story detected: prepare (storing as variables prevents reboot issues)
+if !%self.mob_flagged(SENTINEL)%
+  set no_sentinel 1
+  remote no_sentinel %self.id%
+  nop %self.add_mob_flag(SENTINEL)%
+end
+if !%self.mob_flagged(SILENT)%
+  set no_silent 1
+  remote no_silent %self.id%
+  nop %self.add_mob_flag(SILENT)%
+end
+* tell story
+set pos 0
+set done 0
+while !%done%
+  set msg %self.custom(script%story%,%pos%)%
+  if %msg%
+    set mode %msg.car%
+    if %mode% == say
+      say %msg.cdr%
+    elseif %mode% == echo
+      %echo% %msg.cdr%
+    elseif %mode% == emote
+      emote %msg.cdr%
+    else
+      %echo% %self.name%: Invalid script message type '%msg.car%'.
+    end
+    wait %line_gap%
+  else
+    set done 1
+  end
+  eval pos %pos% + 1
+done
+remote story %self.id%
+* cancel sentinel/silent
+if %self.varexists(no_sentinel)%
+  nop %self.remove_mob_flag(SENTINEL)%
+end
+if %self.varexists(no_silent)%
+  nop %self.remove_mob_flag(SILENT)%
+end
+* wait between stories
+wait %story_gap%
+~
 #11841
 Mercenary Rogue combat~
 0 k 100
