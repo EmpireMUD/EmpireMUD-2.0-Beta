@@ -5382,6 +5382,8 @@ Message types:
  &cdecays-in-room&0 - Shown to the room if the item decays on the ground.
  &cresource-to-char&0 - Shown to the character when they gain it as a resource.
  &cresource-to-room&0 - Shown to room when gained as a resource (e.g. chopped).
+ &cscript1&0 - &cscript5&0 - Can be referenced in scripts as
+   %obj.custom(script1)%, %obj.custom(script1,0)%, etc.
 
 See also: OLC OBJECTS, DOLLAR SIGN CODES
 #d

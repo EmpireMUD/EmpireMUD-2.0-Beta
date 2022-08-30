@@ -1845,6 +1845,11 @@ typedef enum {
 #define OBJ_CUSTOM_DECAYS_IN_ROOM  18	// everywhere else
 #define OBJ_CUSTOM_RESOURCE_TO_CHAR  19  // when gained as a resource
 #define OBJ_CUSTOM_RESOURCE_TO_ROOM  20  // when gained as a resource
+#define OBJ_CUSTOM_SCRIPT_1  21	// called by scripts
+#define OBJ_CUSTOM_SCRIPT_2  22	// called by scripts
+#define OBJ_CUSTOM_SCRIPT_3  23	// called by scripts
+#define OBJ_CUSTOM_SCRIPT_4  24	// called by scripts
+#define OBJ_CUSTOM_SCRIPT_5  25	// called by scripts
 
 
 // RES_x: resource requirement types
