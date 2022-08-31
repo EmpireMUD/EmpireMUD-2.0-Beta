@@ -636,9 +636,13 @@ When using field - The variable returns
 &ccontains()&0 - Subfield used for comparison.
 &cindex_of(char)&0 - Returns the first position of a given character in the
    string, or -1 if it's not found.
+&cempty&0 - Return true if the variable is an empty string or only contains '0'.
 &cmudcommand&0 - Returns the mud command the string is shorthand for. Used to make 
    sure the command you react to is the one you want: For %text%="o"
    %text.mudcommand% will yield "open".
+&cprocess&0 - Processes variable substitutions like %char%, for example when
+   using %mob.custom(script1)% to get text to echo. DO NOT use process on text
+   that comes from player input as this could be manipulated.
    
 See also: MUDCOMMAND
 #d
