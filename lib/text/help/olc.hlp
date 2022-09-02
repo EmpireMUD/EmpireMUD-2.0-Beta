@@ -702,6 +702,7 @@ See also: OLC ABILITIES
 
 Usage:  .custom add <type> <message>
         .custom change <number> <type | message> <value>
+        .custom move <number> <up | down>
         .custom remove <number | all>
 
 You can set custom messages on abilities. Different types of abilities may use
@@ -4407,6 +4408,7 @@ See also: OLC MOBILES
 
 Usage:  .custom add <type> <message>
         .custom change <number> <type | message> <value>
+        .custom move <number> <up | down>
         .custom remove <number | all>
 
 You can set custom messages on mobs, which are shown at different times
@@ -5351,6 +5353,7 @@ See also: GENERIC CURRENCY
 
 Usage:  .custom add <type> <message>
         .custom change <number> <type | message> <value>
+        .custom move <number> <up | down>
         .custom remove <number | all>
 
 You can set custom messages on objects for various actions. These messages
@@ -8314,6 +8317,7 @@ See also: VEDIT FLAGS, OLC VEHICLES
 
 Usage:  .custom add <type> <message>
         .custom change <number> <type | message> <value>
+        .custom move <number> <up | down>
         .custom remove <number | all>
 
 You can set custom messages on vehicles.

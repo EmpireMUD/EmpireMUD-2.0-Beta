@@ -6193,9 +6193,68 @@ void olc_process_custom_messages(char_data *ch, char *argument, struct custom_me
 			msg_to_char(ch, "You can only change the type or message.\r\n");
 		}
 	}
+	else if (is_abbrev(arg1, "move")) {
+		struct custom_message *to_move, *prev;
+		bool up;
+		
+		// usage: <cmd> move <number> <up | down>
+		half_chop(arg2, num_arg, val_arg);
+		up = is_abbrev(val_arg, "up");
+		
+		if (!*num_arg || !*val_arg) {
+			msg_to_char(ch, "Usage: custom move <number> <up | down>\r\n");
+		}
+		else if (!isdigit(*num_arg) || (num = atoi(num_arg)) < 1) {
+			msg_to_char(ch, "Invalid custom message number.\r\n");
+		}
+		else if (!is_abbrev(val_arg, "up") && !is_abbrev(val_arg, "down")) {
+			msg_to_char(ch, "You must specify whether you're moving it up or down in the list.\r\n");
+		}
+		else if (up && num == 1) {
+			msg_to_char(ch, "You can't move it up; it's already at the top of the list.\r\n");
+		}
+		else {
+			// find the one to move
+			to_move = prev = NULL;
+			LL_FOREACH(*list, custm) {
+				if (--num == 0) {
+					to_move = custm;
+					break;	// found
+				}
+				else {
+					// store for next iteration
+					prev = custm;
+				}
+			}
+			
+			if (!to_move) {
+				msg_to_char(ch, "Invalid custom message number.\r\n");
+			}
+			else if (!up && !to_move->next) {
+				msg_to_char(ch, "You can't move it down; it's already at the bottom of the list.\r\n");
+			}
+			else {
+				// SUCCESS: attempt to move
+				if (up && prev) {
+					// can move up
+					LL_DELETE(*list, to_move);
+					LL_PREPEND_ELEM(*list, prev, to_move);
+				}
+				else if (!up && (prev = to_move->next)) {
+					// can move down
+					LL_DELETE(*list, to_move);
+					LL_APPEND_ELEM(*list, prev, to_move);
+				}
+				
+				// message: re-atoi(num_arg) because we destroyed num finding our target
+				msg_to_char(ch, "You move custom %d %s.\r\n", atoi(num_arg), (up ? "up" : "down"));
+			}
+		}
+	}
 	else {
 		msg_to_char(ch, "Usage: custom add <type> <message>\r\n");
 		msg_to_char(ch, "Usage: custom change <number> <type | message> <value>\r\n");
+		msg_to_char(ch, "Usage: custom move <number> <up | down>\r\n");
 		msg_to_char(ch, "Usage: custom remove <number | all>\r\n");
 		msg_to_char(ch, "Available types:\r\n");
 		for (iter = 0; *type_names[iter] != '\n'; ++iter) {
