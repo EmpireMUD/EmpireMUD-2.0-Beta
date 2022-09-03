@@ -4219,6 +4219,10 @@ eyes clustered around a tall stone -- the city's towering monolith. It also
 shows a scene of people attending a dead body, a scene of people dancing, a
 scene of people eating.
 ~
+E
+baskets~
+There are some baskets stacked in the store room through the low doorway.
+~
 M 0 11977 100.00 1
 M 0 11955 100.00 1
 T 11945
@@ -4589,6 +4593,7 @@ others connected by ramps instead.
 ~
 M 0 11981 100.00 1
 M 1 11981 100.00 3
+M 0 11971 100.00 1
 T 11945
 T 11946
 T 11976

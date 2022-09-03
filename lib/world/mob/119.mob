@@ -1219,6 +1219,12 @@ head is entirely bald, with brown splotches on his dark green skin. He trembles
 a little bit when he pushes himself back up after each bow, but he never makes
 a noise.
 ~
+M
+0
+$n coughs.~
+M
+0
+$n bows low and touches $s head to the ground.~
 T 11810
 S
 #11949
@@ -1235,6 +1241,27 @@ and he frequently steps to the edge of the walkway for a better view. He's
 dressed in a forest green robe that's a little too large, always draping behind
 him as he walks.
 ~
+M
+0
+$n looks out over the edge.~
+M
+0
+$n shields $s eyes from the sun as $e looks up at the standing stone.~
+M
+0
+$n coughs.~
+M
+0
+$n sneezes into a rag.~
+M
+0
+$n throws a pebble off the side and watches it fall.~
+M
+1
+Have you ever seen anything like this?~
+M
+1
+Wake up.~
 T 11810
 S
 #11950
@@ -1250,7 +1277,80 @@ Ortimer would disappear into a forest or even tall grassland. At almost five
 feet tall and half as wide, he's large for a goblin, especially as he sprawls
 out on the small bed.
 ~
+M
+0
+$n coughs.~
+M
+7
+say Nice of the Captain to put us up for the festival.~
+M
+7
+vforce 11951 say Lovely home. Not a fan of these bloody war scenes, but a lovely home.~
+M
+7
+skip~
+M
+7
+say Are we going up top for the zenith?~
+M
+7
+vforce 11951 say I'm already sitting.~
+M
+7
+skip~
+M
+7
+say Move back from the fire, Mey.~
+M
+7
+vforce 11951 say What's that?~
+M
+7
+skip~
+M
+7
+say I say, move back from the fire. You're too close.~
+M
+7
+vforce 11951 say It's fine. It's cold everywhere else.~
+M
+7
+skip~
+M
+7
+say Just don't burn down the gobbrabakh.~
+M
+7
+vforce 11951 say Oh fuss, fuss, fuss.~
+M
+7
+skip~
+M
+8
+vforce 11951 say The oysters here are so sweet. I could live here.~
+M
+8
+skip~
+M
+8
+say You'd get fat.~
+M
+8
+vforce 11951 say We're already fat, Ort.~
+M
+8
+skip~
+M
+8
+say Speak for yourself, Mey. This is muscle.~
+M
+8
+vforce 11951 say Me too, then. Couple of regular athletes, we are.~
+M
+8
+skip~
 T 11810
+T 11840
 S
 #11951
 Meyina goblin~
@@ -1265,6 +1365,21 @@ green gown. She's a heavy-set woman with a ruddy glow to the juniper skin of
 her cheeks. She makes little notice of you, but she looks back at Ortimer
 rather often.
 ~
+M
+0
+$n coughs.~
+M
+0
+$n coughs.~
+M
+0
+$n coughs.~
+M
+0
+$n coughs.~
+M
+0
+$n coughs heavily.~
 T 11810
 S
 #11952
@@ -1297,6 +1412,24 @@ unceremoniously chucks the shell over the side of the city. His jade green skin
 sparkles with bits of leftover clam as he's not very good at eating while
 walking. The meal has stained his purple tunic as well.
 ~
+M
+0
+$n shucks a clam and eats it.~
+M
+0
+$n tosses a shell over the side of the city.~
+M
+1
+Beautiful day for the festival.~
+M
+1
+Happy Zenith!~
+M
+0
+$n pulls a clam out of a sack, examines it closely, and tosses it over the side, uneaten.~
+M
+1
+It's a shame to sleep through this.~
 T 11810
 S
 #11954
@@ -1312,6 +1445,27 @@ seems to be enjoying the hot day, as he isn't seeking shade on the rooftops.
 He's dressed in a fine white shirt and purple trousers, with a pair of wooden
 shoes that clack as he walks.
 ~
+M
+0
+$n holds up a hand to shield $s eyes and looks at the sun.~
+M
+1
+Praise the god.~
+M
+0
+$n wipes the sweat from $s brow.~
+M
+0
+$n smiles a toothy grin and nods at you.~
+M
+0
+$n's shoes clack as $e does a little dance.~
+M
+0
+$n whistles.~
+M
+1
+Too bad you're asleep.~
 T 11810
 S
 #11955
@@ -1328,7 +1482,92 @@ down to her waist, which is sinched with a black belt between her lavender
 blouse and deep purple skirt. Her ears both have wide shell discs stretching
 the lobes, which hang down to her shoulders.
 ~
+M
+7
+emote $n stacks baskets and pushes them into the store room.~
+M
+7
+say Oh dear, I didn't see you come in.~
+M
+7
+say Well, sit a minute. Our home is open to all.~
+M
+7
+emote $n folds a blanket and stacks it in the store room.~
+M
+7
+say I suppose you're on pilgrimage. Open to all, even strangers.~
+M
+7
+say That's the price of being the priest's wife so I suppose I chose it.~
+M
+7
+say I haven't any food to offer you, dear, but the festival starts in an hour.~
+M
+7
+say They'll have clams and oysters for all.~
+M
+8
+emote $n sweeps up in front of the store room.~
+M
+8
+emote The fox trots over to $n and yips.~
+M
+8
+say Oh, hello Fermin.~
+M
+8
+emote $n bends over and pats the little fox on the head.~
+M
+8
+say Had this fox eight summers now.~
+M
+8
+say Oh, who's a good little rascal?~
+M
+8
+emote $n pulls a berry from $s pocket and tosses it to the fox, who catches the berry in its mouth.~
+M
+8
+emote $n pats the fox as it snarfs down the berry.~
+M
+9
+say Don't mind me, dear, just tidying up.~
+M
+9
+skip~
+M
+9
+emote $n pulls a basket from the store room and opens it.~
+M
+9
+skip~
+M
+9
+emote $n re-folds some cloths in the basket.~
+M
+9
+skip~
+M
+9
+emote $n sweeps out the store room.~
+M
+9
+skip~
+M
+9
+emote $n folds a blanket.~
+M
+9
+skip~
+M
+9
+emote $n folds another blanket.~
+M
+0
+$n hums to $mself.~
 T 11810
+T 11840
 S
 #11956
 Elver worthy goblin~
@@ -1347,6 +1586,21 @@ To fight Elver the Worthy, type: difficulty <Normal | Hard | Group | Boss>
 ~
 I 4 11976 100.00 1  # LOOT: goblin trinkets
 I 4 11977 100.00 1  # LOOT: steamed mussels
+M
+0
+$n knocks $s stone hammers together.~
+M
+1
+Who wants to challenge us for the honor of the gobbrabakh?~
+M
+1
+Surely someone will shed blood on the god's day?~
+M
+0
+$n draws a line in the sand with $s foot.~
+M
+0
+$n wipes sweat from $s brow.~
 T 11973
 T 11808
 T 11809
@@ -1369,6 +1623,15 @@ bandana that barely tames the frizzy black hair spilling out the sides.
 ~
 I 4 11976 100.00 1  # LOOT: goblin trinkets
 I 4 11977 100.00 1  # LOOT: steamed mussels
+M
+0
+$n drags $s axe through the sand.~
+M
+0
+$n sharpens $s axe with a stone.~
+M
+0
+$n waves $s huge axe in the air.~
 T 11973
 S
 #11958
@@ -1389,6 +1652,18 @@ I 4 11965 100.00 1  # LOOT: jade tear of Gobbrabakh of Orka
 I 4 11977 100.00 1  # LOOT: steamed mussels
 I 4 11899 100.00 1  # LOOT: piece of rough-cut blue jade
 I 4 11976 100.00 1  # LOOT: goblin trinkets
+M
+0
+$n cracks $s thorn whips in the air.~
+M
+0
+$n picks up a handful of arena sand and lets it slowly drain from $s hand.~
+M
+1
+Who wants to try the CHAMPION!?~
+M
+0
+$n drags $s whips to create a big circle in the sand.~
 T 11973
 S
 #11959
@@ -1799,6 +2074,219 @@ black robes. She looks rather young compared to many of the sorcerers here.
 F 11800
 T 11810
 S
+#11971
+Gron goblin~
+Gron~
+Gron is passing through the plaza.
+~
+0 0 bd n 3
+1 0 0 15
+D
+   Gron's olive green skin nearly matches the shade of his oversized robe,
+which billows behind him as he walks through the plaza.
+~
+M
+7
+do restring comedian~
+M
+7
+skip~
+M
+7
+say Hi, how's everyone doing today?~
+M
+7
+say I said, how is everyone doing today?~
+M
+7
+echo The crowd gives a half-hearted cheer.~
+M
+7
+say That's fine, honestly, I'm not even mad. Just disappointed.~
+M
+7
+say Had a lot of disappointments lately. My oldest son was supposed to be a painter like his uncles.~
+M
+7
+say He's a repairman. So that's a disappointment.~
+M
+7
+say Just a joke. Love you, Orl. For real, super proud.~
+M
+7
+emote $n walks back and forth across the plaza.~
+M
+7
+say But yeah, lots of disappointments. My oldest daughter, Fel, has 3 kids.~
+M
+7
+say We were hoping for 4. So that's a disappointment.~
+M
+7
+say My younger son, Bream, left on a pilgrimage to Gobbrabakh of Waur.~
+M
+7
+say Won't see him for a few years. So that's a disappointment.~
+M
+7
+echo The crowd lets out a groan.~
+M
+7
+say Plus, the part about praying to a false god.~
+M
+7
+echo The crowd erupts in laughter.~
+M
+7
+say My youngest daughter wouldn't even let me use her in this bit. Imagine the disappointment.~
+M
+7
+say If it wasn't for disappointment, I wouldn't have any appointments.~
+M
+7
+echo A lone boo emerges from the crowd's subdued laughter.~
+M
+7
+say This guy gets it. Super, super disappointing joke. I'm with ya, man. You waited for that punchline.~
+M
+7
+say Honestly, not a lot of people get my jokes. I was talking to Orlin the other day...~
+M
+7
+say He told me he'd fixed the north bridge twice. You know the one, up near Northbridge...~
+M
+7
+say Anyway, it keeps collapsing near the end and I said to him, I said, Maybe it needs to be abridged.~
+M
+7
+say And he asks, Mom, was that a pun? And I said, Nope unintended. Pause for laughter.~
+M
+7
+echo Crickets chirp in the distance.~
+M
+7
+say Ok, maybe not my best. Could be worse. They were having a joke contest down in the Boothills last month...~
+M
+7
+say I entered my ten best puns figuring one of them had to win.~
+M
+7
+say I went to the god, and I prayed, and I burned the red bark. Everything I could think of to win. And can you believe this...~
+M
+7
+say When I went to check and see if any of them won it, it turned out no pun in ten did.~
+M
+7
+echo The crowd lets out a big laugh.~
+M
+7
+say Thanks. No, really, I appreciate it. I thought my eyes were going square for a moment there.~
+M
+7
+say Thanks, you guys were great. I'll be here all week.~
+M
+11
+do restring priest~
+M
+11
+skip~
+M
+11
+say If I could have everyone's attention... Thank you.~
+M
+11
+say In reverence of truth, I stand before you in the light of the god's hearth on the holy day.~
+M
+11
+say Each and all of you are concerned at the closing of the gates to the gobbrabakh.~
+M
+11
+say In times of murky water, we must stand against rumors and misinformation.~
+M
+11
+say The news you have heard of new arrivals from the eternal sea... are true.~
+M
+11
+echo The murmuring crowd falls silent.~
+M
+11
+say I have spoken at length with Captain Broker and the Grandmothers and we have chosen the cautious ascent.~
+M
+11
+say The gates will remain closed until the newcomers' motives are known.~
+M
+11
+echo Someone in the crowd shouts, 'Who are they?'~
+M
+11
+echo Someone else says, 'I heard they're giants.'~
+M
+11
+say Scouts indeed describe the newcomers as giants, with mighty wooden ships and weapons unlike our own.~
+M
+11
+echo Murmurs build in the crowd again.~
+M
+11
+say We also know...~
+M
+11
+echo The crowd grows louder as they discuss the news in worried tones.~
+M
+11
+say We also know they have begun trading with the seaside villages of Rannar and Gorannar.~
+M
+11
+say Trade with foreign lands has always led to prosperity. We are preparing gifts of jade, incense, and finery.~
+M
+11
+echo Someone shouts, 'What if they're here to take our land?'~
+M
+11
+say The land is large and the sea, eternal. These giants will have little use for our little precipice.~
+M
+11
+echo Someone in the crowd asks, And if they do? We won't let them take our homes.'~
+M
+11
+say I hear your fears and stand beside you in the light of the god's hearth.~
+M
+11
+say Gobbrabakh of Orka is well-placed on these cliffs. No army has ever breeched it. By the god, no army ever will.~
+M
+11
+echo Murmurs spread through agitated crowd as most of the people look to the priest.~
+M
+11
+say The god will see us through this in peace or in victory. Since we were cut from the jade, no gobbrabakh has ever fallen.~
+M
+11
+echo One man in the crowd cheers, and the rest follow.~
+M
+11
+say We will trust that the god has brought us together.~
+M
+11
+say We will trade with these newcomers and learn of their culture. We will learn whence they sail.~
+M
+11
+say We will learn who they are. We will taste sample fish and share with them our oysters.~
+M
+11
+say We will learn how they dance and how they sing. If they lack fire, we will cut flint for them.~
+M
+11
+say We will learn if they are called Hew Mons because of the great trees they hew for their ships.~
+M
+11
+say Be at peace on this holy day.~
+M
+11
+do restring janitor~
+T 11810
+T 11840
+T 11981
+S
 #11972
 crowd~
 the crowd~
@@ -1860,6 +2348,24 @@ close a hole.
 resemble your version of comfort. She is dressed in a simple green gown that
 covers her feet even as she reclines.
 ~
+M
+0
+$n makes a 'tsk' sound as she accidentally jabs her own finger.~
+M
+0
+$n coughs.~
+M
+0
+$n hums softly as $e mends a sock.~
+M
+0
+$n tosses a sock over $s shoulder and starts on the next one.~
+M
+0
+$n sniffles a little and wipes $s nose with a rag.~
+M
+0
+$n holds a sock up close to $s face for a second and then starts pulling a stitch out.~
 T 11810
 S
 #11976
@@ -1875,6 +2381,21 @@ discs stretch her chartreuse earlobes into thin bands, and a small cylindrical
 stone pierces the bridge of her nose. Futile though it may be, she is busy
 collecting the clutter and sorting it into baskets.
 ~
+M
+0
+$n picks up a sock, folds it, and puts it away.~
+M
+0
+$n stokes the oven and adds another piece of wood.~
+M
+0
+$n hums along as $e works.~
+M
+0
+$n sweeps some ash back into the oven.~
+M
+0
+$n stops and scratches $s head for a moment.~
 T 11810
 S
 #11977
@@ -1963,6 +2484,21 @@ pulled into a knot at the back of his head. His drooping nose has a hole in the
 side that might once have held jewelry, but he wears only a necklace made from
 shell beads over his violet tunic and pants.
 ~
+M
+0
+The footsteps above echo down through the chamber.~
+M
+0
+It sounds like people are dancing up on the rooftop.~
+M
+0
+$n weeps softly.~
+M
+0
+$n You hear a drip of water echoing below.~
+M
+0
+You feel a cold breeze blow through the sepulcher.~
 T 11810
 S
 #11981
@@ -2049,6 +2585,21 @@ up in a thick braid. She's dressed in a simple green gown that drapes to the
 ground, covering her legs and feet completely. Around her neck, she wears a
 string of iridescent shell beads.
 ~
+M
+0
+$n coughs.~
+M
+0
+$n coughs into a rag.~
+M
+1
+Oh my.~
+M
+1
+I do love this gobbrabakh.~
+M
+1
+I should have brought my ma.~
 T 11810
 S
 #11985
@@ -2064,6 +2615,21 @@ as he constantly stops to take in the view, whether of the ocean, the city, or
 the great standing stone. He wears a plain green robe, nearly the same color as
 his jade skin.
 ~
+M
+0
+$n coughs.~
+M
+1
+Really is a great standing stone.~
+M
+1
+Don't get views like this back home.~
+M
+1
+Hate to admit this was worth the trip.~
+M
+1
+Should've been born in a gobbrabakh.~
 T 11810
 S
 #11986
@@ -2080,6 +2646,27 @@ In both ears, she wears large abalone shell discs that stretch her earlobes
 larger than your palm. She expertly wields a long wooden spoon as she churns
 the shellfish in the cauldron.
 ~
+M
+0
+$n fishes cooked clams from the cauldron with a wicker strainer.~
+M
+0
+$n throws more shellfish into a cauldron.~
+M
+0
+$n rubs the sweat from $s shining green head.~
+M
+0
+$n cracks open a mussel and eats it, throwing the shell off the side.~
+M
+1
+No harm having a bit before the feast. Help yourself.~
+M
+1
+First time to a gobbrabakh?~
+M
+1
+There's more than enough for everyone.~
 T 11810
 S
 #11987
@@ -2097,24 +2684,40 @@ to him including a stone hammer, a bone hammer, a wooden mallet, several stone
 chisels, and some bits and bobs you don't recognize.
 ~
 M
-0
-$n hammers a peg into a wooden beam.~
+7
+emote $n chisels a hole in a beam.~
 M
-0
-$n chisels a hole in a beam.~
+7
+say Watch your step around that edge!~
 M
-0
-$n hammers loudly as $e works.~
+7
+emote $n hammers a peg into the wooden beam.~
+M
+7
+say This won't take long. It will be open again tomorrow.~
+M
+7
+emote $n hammers loudly as $e works.~
+M
+8
+say Do you live on the west side?~
+M
+8
+emote $n hammers a peg into the wooden beam.~
+M
+8
+say I'm sure one of the folks under the eastern plaza will put you up for the night.~
+M
+8
+say It'll all be fixed tomorrow.~
 M
 0
 $n hums a little tune as $e works.~
 M
-1
-This won't take long. It will be open again tomorrow.~
-M
-1
-Watch your step around that edge!~
+0
+$n wipes sweat from $s brow.~
 T 11810
+T 11840
 S
 #11988
 guards pair~

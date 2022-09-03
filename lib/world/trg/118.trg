@@ -1653,6 +1653,17 @@ switch %questvnum%
       nop %actor.set_reputation(11800,Liked)%
     end
   break
+  case 11821
+    * Hugh Mann
+    set hugh %room.people(11821)%
+    if %hugh%
+      %send% %actor% \&0
+      %echo% ~%hugh% grasps at some goblin trinkets and shouts, 'We did it! Victory for goblins!'
+      %echo% ~%hugh% throws off his coat to reveal he is actually two goblins, one on the other's shoulder!
+      %echo% The goblins sing and shout victory chants as they run out of the tower!
+      %purge% %hugh%
+    end
+  break
 done
 ~
 #11831
@@ -2099,7 +2110,10 @@ Skycleave: Storytime using custom strings~
 0 bw 100
 ~
 * uses mob custom strings script1-script5 to tell short stories
-* custom strings MUST start with 'say', 'echo', or 'emote'.
+* usage: .custom add script# <command> <string>
+* valid commands: say, emote, do (execute command), echo (script), and skip
+* also: vforce <mob vnum in room> <command>
+* NOTE: waits for %line_gap% (9 sec) after all commands EXCEPT do/vforce
 set line_gap 9 sec
 set story_gap 180 sec
 * find story number
@@ -2147,16 +2161,32 @@ while !%done%
   set msg %self.custom(script%story%,%pos%)%
   if %msg%
     set mode %msg.car%
+    set msg %msg.cdr%
     if %mode% == say
-      say %msg.cdr%
+      say %msg%
+      wait %line_gap%
+    elseif %mode% == do
+      %msg.process%
+      * no wait
     elseif %mode% == echo
-      %echo% %msg.cdr%
+      %echo% %msg.process%
+      wait %line_gap%
+    elseif %mode% == vforce
+      set vnum %msg.car%
+      set msg %msg.cdr%
+      set targ %self.room.people(%vnum%)%
+      if %targ%
+        %force% %targ% %msg.process%
+      end
     elseif %mode% == emote
-      emote %msg.cdr%
+      emote %msg%
+      wait %line_gap%
+    elseif %mode% == skip
+      * nothing this round
+      wait %line_gap%
     else
-      %echo% %self.name%: Invalid script message type '%msg.car%'.
+      %echo% %self.name%: Invalid script message type '%mode%'.
     end
-    wait %line_gap%
   else
     set done 1
   end
@@ -2678,6 +2708,7 @@ elseif %type% == 3
     if %person.is_enemy(%self%)%
       dg_affect #11860 %person% BLIND on 25
     end
+    set person %person.next_in_room%
   done
 elseif %type% == 4 && %self.mob_flagged(GROUP)%
   * Pin the Shadow

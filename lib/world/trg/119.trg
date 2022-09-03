@@ -3981,7 +3981,6 @@ if %cmd.mudcommand% == adventure
   end
   * send fake adventure info
   %send% %actor% Zenith of the Gobbrabakhs (inside the Tower Skycleave)
-  %send% %actor% (GOB-ruh-BAK of OR-ka)
   %send% %actor% by Paul S. Clarke
   %send% %actor% \&0   Venture back into the Goblin's Dream to experience a culture lost to history
   %send% %actor% \&0 in this highly-detailed hidden area. For players who enjoy an immersive
@@ -4086,7 +4085,7 @@ done
 ~
 #11979
 Goblin's Dream: Altar below pilgrim loader~
-2 bw 20
+2 bw 33
 ~
 * This script randomly loads a pilgrim into the room, if there isn't one yet.
 * The pilgrim will take care of its own actions and cleanup.
@@ -4156,6 +4155,56 @@ while %vnum% <= %end_v%
 done
 %echo% The vertical tube in the ceiling shows a perfect circle on the altar below as the sun passes directly overhead.
 wait 1787 sec
+~
+#11981
+Skycleave: Handy mob restring command~
+0 c 0
+restring~
+* uses a self-only command trig
+if %actor% != %self%
+  return 0
+  halt
+else
+  return 1
+end
+set old_name %self.name%
+switch %arg.car%
+  case comedian
+    %mod% %self% sex female
+    %mod% %self% keywords Shoan goblin
+    %mod% %self% shortdesc Shoan
+    %mod% %self% longdesc Shoan is standing in front of the crowd.
+    %mod% %self% lookdesc Shoan's pale jade skin shimmers with sweat as she stands before the crowd in the central plaza. She's dressed in an airy purple dress and her dary gray hair
+    %mod% %self% append-lookdesc is cut very short. She doesn't smile as she speaks in a dry, steady voice. But the crowd seems to enjoy it.
+  break
+  case priest
+    %mod% %self% sex female
+    %mod% %self% keywords Celles goblin
+    %mod% %self% shortdesc Celles
+    %mod% %self% longdesc Celles, Voice of Orka, stands in front of the crowd.
+    %mod% %self% lookdesc With long, straight, translucent white hair that flows over her deep purple robe, Celles looks to be the oldest goblin in the city. Her skin, perhaps
+    %mod% %self% append-lookdesc chartreuse once, has faded almost to gray. Her eyes are milky white to match her hair, and she stares off toward the horizon as she speaks.
+  break
+  case janitor
+    %mod% %self% sex male
+    %mod% %self% keywords Rask goblin
+    %mod% %self% shortdesc Rask
+    %mod% %self% longdesc Rask is sweeping the plaza.
+    %mod% %self% lookdesc Rask is clad in short purple trousers and a sleeveless white shirt that show off his ashy green arms and legs. He sweeps the plaza with an old broom that badly needs new bristles.
+  break
+done
+* announce change
+if %old_name% != %self.name%
+  switch %self.room.template%
+    case 11982
+      %echo% %old_name% disappears into the crowd and ~%self% steps down into the center of the plaza.
+    break
+    default
+      %echo% %old_name% leaves.
+      %echo ~%self% arrives.
+    break
+  done
+break
 ~
 #11989
 Goblin's Dream: Guard patrol~

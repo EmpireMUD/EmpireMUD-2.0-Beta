@@ -285,6 +285,43 @@ Z
 Z
 1 11891
 S
+#11821
+Skycleave: Need It For A Friend~
+   Hugh Mann catches your attention while no one else is watching and waves you
+over to him. You approach cautiously, mindful of the smell, and notice rather
+suddenly that he's a goblin! That green skin is unmistakable, though his coat
+and hat do an excellent job of hiding it from a distance. He's also the tallest
+goblin you've ever seen.
+   'Me notice the wizards let you come and go,' Hugh says. 'They doesn't let
+Hugh upstairs. Hugh need something... for a friend.'
+   You roll your eyes and wait for him to get to a point.
+   'Lots of stuff upstairs belongs to goblins,' he says. 'Gadgets and gizmos
+aplenty. My, er, friend want stuff back. Bring us goblin trinkets. Please. It's
+stolen. Don't makes us resort to... goblin justice.'
+   Hugh makes a wide, toothy grin and then pulls the brim of his hat back down
+and tries to disappear back into the crowd.
+~
+   As you hand the goblin trinkets over to Hugh, a look crosses his face that's
+somewhere between surprise and delight. He takes the trinkets from you and
+looks down into his oversized coat...
+~
+10 di 125 250 -1
+A
+1 11821
+P
+0 11810 0 1 a
+P
+16 11800 0 7 a
+P
+0 11975 0 1 a
+R
+7 11800 10
+T 11830
+W
+2 11976 0 1
+Z
+1 11821
+S
 #11826
 Skycleave: Break the Illusion~
    The second floor of the Tower Skycleave is suddenly overgrown with a strange
