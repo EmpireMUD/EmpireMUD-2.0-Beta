@@ -1349,6 +1349,90 @@ vforce 11951 say Me too, then. Couple of regular athletes, we are.~
 M
 8
 skip~
+M
+9
+vforce 11951 say What if we moved here?~
+M
+9
+skip~
+M
+9
+say Don't get any bright ideas.~
+M
+9
+vforce 11951 say I'm serious. Wouldn't it just be enchanting?~
+M
+9
+skip~
+M
+9
+say We're not moving to a gobbrabakh, Mey.~
+M
+9
+vforce 11951 say You love it here.~
+M
+9
+skip~
+M
+9
+say No, YOU love it here. I love it back home.~
+M
+9
+vforce 11951 say What do they have back home that they don't have here?~
+M
+9
+skip~
+M
+9
+say Everyone we know. Fill, Lorra, the kids, my parents, your mother...~
+M
+9
+say You know what? You're right. Let's move to the gobbrabakh.~
+M
+9
+vforce 11951 say Don't take that tone with me.~
+M
+9
+skip~
+M
+9
+say What tone, Mey? I'm agreeing with you!~
+M
+9
+vforce 11951 say Well you don't have to be sarcastic about it.~
+M
+9
+skip~
+M
+9
+say Be serious, though. We are not moving to some god-blessed gobbrabakh. When we get home, I'm not even going on another pilgrimage.~
+M
+9
+vforce 11951 say That's not up to you, is it?~
+M
+9
+skip~
+M
+9
+say I'm going to sit on my own chair, by my own hearth, carving my own figurines from my own wood.~
+M
+9
+vforce 11951 say We could bring your damn chair, Ort.~
+M
+9
+skip~
+M
+9
+say It's not about the chair, Mey! And no way am I walking ten months back home just to turn around and carry everything back here.~
+M
+9
+vforce 11951 say Well, it was just a stray thought.~
+M
+9
+skip~
+M
+9
+emote $n makes a harrumph sound.~
 T 11810
 T 11840
 S
@@ -2314,6 +2398,27 @@ wooden shoes that clack as he walks. Over his left shoulder, a thrice-coiled
 purple rope signifies his station as captain of the guard. A small, iridescent
 seashell disc fills a pierced hole in the left side of his nose.
 ~
+M
+1
+Hello.~
+M
+1
+Magnificent day.~
+M
+1
+What a perfect day for the Zenith.~
+M
+1
+Carry on.~
+M
+1
+Good to see you again.~
+M
+1
+Wake up.~
+M
+1
+Praise the god today.~
 T 11989
 T 11810
 S
@@ -2330,7 +2435,62 @@ robe, Celles looks to be the oldest goblin in the city. Her skin, perhaps
 chartreuse once, has faded almost to gray. Her eyes are milky white to match
 her hair, and she stares off toward the horizon as she speaks.
 ~
+M
+7
+say All are welcome.~
+M
+7
+skip~
+M
+7
+say Praise the god, this is a beautiful day.~
+M
+7
+skip~
+M
+7
+say Have a seat under the stone and pray a minute.~
+M
+8
+emote $n's joints pop and crackle as $e carefully kneels on a reed mat.~
+M
+8
+emote $n holds $s hands out to the sides, open, tilts $s head back, and closes $s eyes.~
+M
+8
+say May the god bless us and our city on this, the holy day.~
+M
+8
+say May the god enrobe and shield the pilgrims...~
+M
+8
+say May the god bring us fish, though we are the school...~
+M
+8
+say May the god bring us sun, as we are the crop...~
+M
+8
+say May the light of the god shine upon the gobbrabakhs for all time.~
+M
+8
+skip~
+M
+8
+emote $n slowly, carefully gets up.~
+M
+9
+say If you're new here, all are welcome.~
+M
+9
+say Orkonna is cooking for the festival. If you're hungry, I am certain she can spare some.~
+M
+9
+say We shed for the holy day; it would be an honor to have you participate.~
+M
+9
+say Our arena is down on the cliffside.~
 T 11810
+T 11840
 S
 #11975
 Filliks goblin~
@@ -2720,20 +2880,102 @@ T 11810
 T 11840
 S
 #11988
-guards pair~
+guards pair alivva rink~
 the guards~
 A pair of guards stand at attention inside the gate.
 ~
 0 0 bd n 3
-1 0 0 15
+0 0 0 15
 D
-   Both of the little green men are wearing quilted armor in deep purple and
-armed with halberds as they stand watch. On the left, the older man has a faded
+   Both of the little green guards are wearing quilted armor in deep purple and
+armed with halberds as they stand watch. On the left, the older one has a faded
 olive complexion and a bald head. On the right, the other guard looks much
-younger, with an unlined face, short orange hair, and a face the color of
-dewy clovers.
+younger, with an unlined face, short orange hair, and a face the color of dewy
+clovers.
 ~
+M
+7
+echo Alivva says, 'Can't remember the last time we had the gate locked.'~
+M
+7
+echo Rink says, 'I heard it's giants.'~
+M
+7
+echo Alivva says, 'No.'~
+M
+7
+echo Rink says, 'Sea giants. Apparently they came by giant ship, at Gorannar.~
+M
+7
+echo Alivva says, 'And we believe this?'~
+M
+7
+echo Rink shrugs.~
+M
+7
+echo Alivva says, 'I swear someone could con you right out of your own head sometimes.'~
+M
+8
+echo Rink says, 'Okay, but what if it IS true?'~
+M
+8
+echo Alivva says, 'By the damn god, Rink, were you born in a jade mine?'~
+M
+8
+echo Rink says, 'I heard it from Konna.'~
+M
+8
+echo Alivva says, 'Your sister boils clams. She has never been to Gorannar. You think she can see the giants from up there?'~
+M
+8
+echo Rink says, 'She talks to everyone. Literally everyone. She heard it from Orlin, who heard it from Shoan, who...'~
+M
+8
+echo Alivva says, 'Shoan is a real comedian.'~
+M
+8
+echo Rink says, 'Doesn't mean it's not true.'~
+M
+8
+echo Alivva says, 'You're an idiot.'~
+M
+9
+echo Rink says, 'So why do YOU think the gate is closed?'~
+M
+9
+echo Alivva says, 'Festival's probably full.'~
+M
+9
+echo Rink says, 'There were more people last year.'~
+M
+9
+echo Aliva says, 'And it made a huge mess. My husband complained about it for weeks.'~
+M
+9
+echo Rink says, 'I thought your husband was a painter.'~
+M
+9
+echo Aliva says, 'Oh, he didn't clean the mess. He just complained about it.'~
+M
+9
+echo Rink says, 'And why does HE think the gate is closed?'~
+M
+9
+echo Aliva says, 'He's in Northbridge painting murals. Shame he had to miss the Zenith. He doesn't even know.'~
+M
+9
+echo Aliva says, 'Hope he's doing ok down there.'~
+M
+9
+echo Rink says, 'Do you think the giants might've gotten there already?'~
+M
+9
+echo Aliva says, 'There's no giants.'~
+M
+9
+echo Aliva says, 'Idiot.'~
 T 11810
+T 11840
 S
 #11989
 shoes walking pair~

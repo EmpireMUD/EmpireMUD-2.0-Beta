@@ -362,7 +362,7 @@ set done 0
 while !%done%
   wait 5 sec
   * check cancellation
-  if %actor.stop_command% || %actor.room% != %room_var% || %actor.fighting% || !%actor.home% || %self.carried_by% != %actor% || %actor.aff_flagged(DISTRACTED)% || %actor.action%
+  if %actor.stop_command% || %actor.room% != %room_var% || %actor.fighting% || %self.carried_by% != %actor% || %actor.aff_flagged(DISTRACTED)% || %actor.action%
     %force% %actor% stop cleardata
     set to_ch %self.custom(script5)%
     if !%to_ch.empty%
