@@ -1657,10 +1657,10 @@ switch %questvnum%
     * Hugh Mann
     set hugh %room.people(11821)%
     if %hugh%
-      %send% %actor% \&0
-      %echo% ~%hugh% grasps at some goblin trinkets and shouts, 'We did it! Victory for goblins!'
-      %echo% ~%hugh% throws off his coat to reveal he is actually two goblins, one on the other's shoulder!
-      %echo% The goblins sing and shout victory chants as they run out of the tower!
+      %echo% # \&0
+      %echo% # ~%hugh% grasps at some goblin trinkets and shouts, 'We did it! Victory for goblins!'
+      %echo% # ~%hugh% throws off his coat to reveal he is actually two goblins, one on the other's shoulder!
+      %echo% # The goblins sing and shout victory chants as they run out of the tower!
       %purge% %hugh%
     end
   break
