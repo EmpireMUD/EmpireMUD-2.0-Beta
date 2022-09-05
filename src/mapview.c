@@ -134,6 +134,8 @@ int distance_can_see_in_dark(char_data *ch) {
 */
 static void do_brief_auto_exits(struct char_data *ch, room_data *room) {
 	struct room_direction_data *ex;
+	room_data *to_room;
+	vehicle_data *veh;
 	bool any = FALSE;
 	
 	msg_to_char(ch, "\tc[ Exits: ");
@@ -144,6 +146,18 @@ static void do_brief_auto_exits(struct char_data *ch, room_data *room) {
 				msg_to_char(ch, "\t(%s\t) ", alt_dirs[get_direction_for_char(ch, ex->dir)]);
 				any = TRUE;
 			}
+		}
+	}
+	
+	// can disembark/exit here?
+	if (ROOM_CAN_EXIT(room)) {
+		// 'disembark'
+		if ((veh = GET_ROOM_VEHICLE(room)) && IN_ROOM(veh) && !VEH_FLAGGED(veh, VEH_BUILDING)) {
+			msg_to_char(ch, "\t(disembark\t) ");
+		}
+		// 'exit'
+		else if ((to_room = get_exit_room(room)) && to_room != IN_ROOM(ch)) {
+			msg_to_char(ch, "\t(exit\t) ");
 		}
 	}
 	
