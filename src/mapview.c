@@ -154,10 +154,12 @@ static void do_brief_auto_exits(struct char_data *ch, room_data *room) {
 		// 'disembark'
 		if ((veh = GET_ROOM_VEHICLE(room)) && IN_ROOM(veh) && !VEH_FLAGGED(veh, VEH_BUILDING)) {
 			msg_to_char(ch, "\t(disembark\t) ");
+			any = TRUE;
 		}
 		// 'exit'
 		else if ((to_room = get_exit_room(room)) && to_room != IN_ROOM(ch)) {
 			msg_to_char(ch, "\t(exit\t) ");
+			any = TRUE;
 		}
 	}
 	
