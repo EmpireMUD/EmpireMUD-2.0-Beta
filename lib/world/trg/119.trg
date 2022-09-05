@@ -4177,6 +4177,14 @@ switch %arg.car%
     %mod% %self% lookdesc Shoan's pale jade skin shimmers with sweat as she stands before the crowd in the central plaza. She's dressed in an airy purple dress and her dary gray hair
     %mod% %self% append-lookdesc is cut very short. She doesn't smile as she speaks in a dry, steady voice. But the crowd seems to enjoy it.
   break
+  case poet
+    %mod% %self% sex male
+    %mod% %self% keywords Choona goblin
+    %mod% %self% shortdesc Choona
+    %mod% %self% longdesc Choona stands alone in front of the crowd.
+    %mod% %self% lookdesc Though he's not tall, Choona's posture is rigidly upright and he stands over many of the other goblins. He's clad in a clean white tunic and violet robe,
+    %mod% %self% append-lookdesc with a kelp wreath in his brown hair. His skin is the shade of spring grass, with rosy red powder on his cheeks.
+  break
   case priest
     %mod% %self% sex female
     %mod% %self% keywords Celles goblin
