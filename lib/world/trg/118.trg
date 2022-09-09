@@ -1124,12 +1124,12 @@ switch %self.vnum%
   case 11816
     * goblin commando
     %mod% %self% longdesc %name% is searching around for something.
-    %mod% %self% lookdesc Armed with dozens of tiny knives, this goblin has come ready for war.
+    %mod% %self% lookdesc Armed with dozens of tiny knives, this forest-green goblin has come ready for war.
   break
   case 11817
     * goblin bruiser
     %mod% %self% longdesc %name% is punching a wall.
-    %mod% %self% lookdesc All muscle and no quit, this goblin looks like %self.heshe% means business. With a war axe in one hand and a spear in the other, %self.heshe% paces back and forth, just waiting for you to make your move.
+    %mod% %self% lookdesc All muscle and no quit, this green little goblin looks like %self.heshe% means business. With a war axe in one hand and a spear in the other, %self.heshe% paces back and forth, just waiting for you to make your move.
   break
 done
 detach 11824 %self.id%
@@ -2113,7 +2113,8 @@ Skycleave: Storytime using custom strings~
 * usage: .custom add script# <command> <string>
 * valid commands: say, emote, do (execute command), echo (script), and skip
 * also: vforce <mob vnum in room> <command>
-* NOTE: waits for %line_gap% (9 sec) after all commands EXCEPT do/vforce
+* also: set <line_gap|story_gap> <time> sec
+* NOTE: waits for %line_gap% (9 sec) after all commands EXCEPT do/vforce/set
 set line_gap 9 sec
 set story_gap 180 sec
 * find story number
@@ -2181,6 +2182,16 @@ while !%done%
     elseif %mode% == emote
       emote %msg%
       wait %line_gap%
+    elseif %mode% == set
+      set subtype %msg.car%
+      set msg %msg.cdr%
+      if %subtype% == line_gap
+        set line_gap %msg%
+      elseif %subtype% == story_gap
+        set story_gap %msg%
+      else
+        %echo% ~%self%: Invalid set type '%subtype%' in storytime script.
+      end
     elseif %mode% == skip
       * nothing this round
       wait %line_gap%
@@ -5205,6 +5216,16 @@ if %shopkeep% && %newshop%
   nop %newshop.namelist(%shopkeep.namelist%)%
 end
 %at% i11904 %load% mob 11902  * Bucket (and sponge)
+* attach some trigs
+set 11937_list 11945 11929
+while %11937_list%
+  set vnum %11937_list.car%
+  set 11937_list %11937_list.cdr%
+  set mob %instance.mob(%vnum%)%
+  if %mob%
+    attach 11937 %mob.id%
+  end
+done
 * attach tourist loader
 makeuid entryway room i11901
 attach 11827 %entryway.id%
@@ -5248,6 +5269,7 @@ skydel 11825 1  * Apprentice Ravinder 1A
 %at% i11922 %load% mob 11891  * Watcher (difficulty selector version)
 %at% i11911 %load% mob 11911  * Apprentice Kayla
 %at% i11912 %load% mob 11912  * Apprentice Cosimo
+%at% i11918 %load% mob 11945  * Page Amets
 %at% i11921 %load% mob 11913  * Apprentice Tyrone
 %at% i11925 %load% mob 11925  * Apprentice Ravinder
 * check for any remaining goblins

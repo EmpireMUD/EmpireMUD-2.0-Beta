@@ -163,6 +163,8 @@ remote phase4 %self.id%
 remote phase3 %self.id%
 remote phase2 %self.id%
 remote phase1 %self.id%
+* and remove
+detach 11903 %self.id%
 ~
 #11904
 Skycleave: Cleaning crew despawn~
@@ -2000,6 +2002,176 @@ else
   %echo% The spirit returns to the desk, which slams shut with a thud!
 end
 ~
+#11937
+Skycleave: Gossipping pages and apprentices~
+0 bw 50
+~
+set spirit %instance.mob(11900)%
+* find a random human to speak to
+set count 0
+set target 0
+while %count% < 10 && !%target%
+  set person %random.char%
+  if %person.is_pc% || %person.mob_flagged(HUMAN)%
+    set target %person%
+  end
+  eval count %count% + 1
+done
+if !%target%
+  halt
+end
+* per-person time limit (mobs and players both)
+set varname limit_%target.id%
+if %self.varexists(%varname%)%
+  eval when %%self.%varname%%%
+  if %when% + 60 > %timestamp%
+    * too soon
+    halt
+  end
+end
+set %varname% %timestamp%
+remote %varname% %self.id%
+* pick 2 rumors
+set rumor1 0
+set rumor2 0
+set rumor1_text
+set rumor2_text
+set count 1
+while %count% <= 2
+  * This should be the number of cases in the switch below
+  set rumor %random.19%
+  if %count% == 1 || %rumor% != %rumor1%
+    * found valid rumor
+    set rumor%count% %rumor%
+    switch %rumor%
+      case 1
+        set rumor%count%_text I heard Marie and Djon are an item now.
+      break
+      case 2
+        set rumor%count%_text I heard Ravinder followed Weyonomon right into a wall.
+      break
+      case 3
+        set rumor%count%_text I heard the statue in the foyer used to be a sorcerer here.
+      break
+      case 4
+        set rumor%count%_text I heard oreonics can separate themselves from their physical forms.
+      break
+      case 5
+        set rumor%count%_text I heard the goblins were trying to break in, not out.
+      break
+      case 6
+        set rumor%count%_text I heard someone left bread all over the second floor.
+      break
+      case 7
+        set rumor%count%_text I heard the entire second floor was turned into a maze.
+      break
+      case 8
+        set rumor%count%_text I heard the mercenaries got stuck outside the Magichanical lab when they couldn't read the sign to get in.
+      break
+      case 9
+        if %instance.mob(11969)%
+          set rumor%count%_text I heard a shadow got ahold of the GHS's wand and made itself real.
+        else
+          set rumor%count%_text I heard there was a time lion. A real one.
+        end
+      break
+      case 10
+        if %instance.mob(11969)%
+          set rumor%count%_text I heard Mezvienne killed Professor Knezz.
+        else
+          set rumor%count%_text I heard Mezvienne was drawing power directly from Professor Knezz and the tower.
+        end
+      break
+      case 11
+        if %spirit.lich_released%
+          set rumor%count%_text I heard Scaldorran shredded some of those mercenaries.
+        else
+          set rumor%count%_text I heard Scaldorran spent the whole invasion hidden in his lamp.
+        end
+      break
+      case 12
+        if %instance.mob(11934)%
+          set rumor%count%_text I heard Sanjiv was stuck in the Eruditorium when the mercenaries took over.
+        else
+          set rumor%count%_text I heard someone let the otherworlder out.
+        end
+      break
+      case 13
+        if %instance.mob(11926)%
+          set rumor%count%_text I heard old Wright couldn't recapture any of the goblins.
+        else
+          set rumor%count%_text I heard old Wright got some of the goblins into cages.
+        end
+      break
+      case 14
+        if %instance.mob(11929)%
+          set rumor%count%_text I heard Mezvienne mind-controlled Profressor Barrosh.
+        else
+          set rumor%count%_text I heard Barrosh got Paige and Grace killed when he was mind-controlled.
+        end
+      break
+      case 15
+        if %instance.mob(11940)%
+          set rumor%count%_text I heard Goef was down on floor 1 when the mercenaries had the Enchanting lab. How does that work?
+        else
+          set rumor%count%_text I heard mercenaries killed Waltur and Niamh.
+        end
+      break
+      case 16
+        if %spirit.claw2%
+          set rumor%count%_text I heard there's a secret passage on floor 2.
+        else
+          set rumor%count%_text I heard one of the pages got trapped in the fountain.
+        end
+      break
+      case 17
+        if %instance.mob(11965)%
+          set rumor%count%_text I heard Niamh is next in line for High Sorcerer.
+        else
+          set rumor%count%_text I heard Professor Knezz invited the enchantress here himself.
+        end
+      break
+      case 18
+        * SEASON (not rumor) - always set rumor1_text
+        set room %self.room%
+        if %room.rmt_flagged(LOOK-OUT)% && %room.season% != summer
+          switch %room.season%
+            case winter
+              set rumor1_text Oh my, it's snowing out. I could swear it was just summer.
+            break
+            case spring
+              set rumor1_text It's a terribly nice day out for midsummer. Look at all the flowers out there.
+            break
+            case autumn
+              set rumor1_text Oh dear, the trees are changing out there. Midsummer seems awfully early for that.
+            break
+        end
+      break
+      case 19
+        * use a random SAY on me (not rumor) - always set rumor1_text
+        set msg %self.custom(say)%
+        if !%msg.empty%
+          set rumor1_text %msg%
+        end
+      break
+      case 20
+          set rumor%count%_text I heard 
+          set rumor%count%_text I heard 
+        end
+      break
+    done
+    eval count %count% + 1
+  else
+    * did not find a valid rumor: repeat
+  end
+done
+* say the rumors
+say %rumor1_text%
+wait 3 sec
+if %target.room% == %self.room% && %target.is_npc% && %response_mobs% ~= %target.vnum% && %rumor2_text%
+  %force% %target% say Oh? %rumor2_text%
+end
+~
 #11939
 Goef the Oreonic: Attune skystone~
 0 c 0
@@ -2671,7 +2843,6 @@ switch %cycle%
   break
   default
     %send% %person% Slowly, inch by inch, time resumes again, and for the first time in ages, you almost feel like you can breathe again.
-    wait 1
     * done: teleport the character
     set target %instance.nearest_rmt(11888)%
     %teleport% %person% %target%

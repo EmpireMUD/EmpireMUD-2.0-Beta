@@ -122,7 +122,7 @@ corwin page~
 Page Corwin~
 Corwin is bustling about.
 ~
-0 0 dvxA n 3
+0 0 dvxAH n 3
 1 0 0 15
 D
    Corwin is a young man of perhaps 16 years. He keeps his hair cropped short
@@ -130,7 +130,17 @@ so it's off his neck and forehead while he bustles around the tower in his
 heavy jute page robe.
 ~
 F 11800
+M
+1
+I heard there's a pair of goblins trying to break in again.~
+M
+1
+Good grief, did you see that thing go into the fountain?~
+M
+1
+I did not like having those spirits down here.~
 T 11810
+T 11937
 S
 #11905
 Mageina barista~
@@ -375,6 +385,27 @@ tower. But he walks with confidence and speaks with authority like many of the
 older, wiser sorcerers.
 ~
 F 11800
+M
+1
+Red touch blue, no good for you. Red touch green, need new spleen. Or was it the other way around?~
+M
+1
+Ravinder won't stop talking about goblins.~
+M
+1
+If they would've let me at those mercs, I'd have shown them a thing or two.~
+M
+1
+It's nice to sleep in my own bed again.~
+M
+1
+Swish and flick! Or was it the other way around?~
+M
+1
+I need to learn this stuff or they'll move me to the broom closet.~
+M
+0
+$n clicks his fingers and a little fire drake bursts into existence. But it spits at Tyrone and costs $m half an eyebrow.~
 T 11810
 S
 #11914
@@ -718,9 +749,31 @@ D
    Ravinder Singh is not a tall man, but he stands tall in his violet dastar,
 a high turban that covers all of his hair. He has a long, loose beard that
 covers the front of his white and gray apprentice robes. He wears a single iron
-bracelet on his wrist and a curved kirpan knife on his waist.
+bracelet on his wrist and a curved kirpan knife on his waist. There is a small
+bruise on his forehead.
 ~
 F 11800
+M
+1
+I had Annelise make a dreamcatcher for me but I keep having that goblin dream...~
+M
+1
+What the heck is a gobbrabock?~
+M
+1
+Have you ever had a dream within a dream?~
+M
+1
+Bloody dreamcatcher must not work.~
+M
+0
+$n coughs.~
+M
+0
+$n covers $s mouth and coughs.~
+M
+1
+I swear if someone says 'zenith' one more time I'm going to crack.~
 T 11810
 S
 #11926
@@ -803,7 +856,7 @@ Paige page~
 Paige~
 A page is bustling past you.
 ~
-0 0 dvxA n 3
+0 0 dvxAH n 3
 2 0 0 15
 D
    Paige is a young woman with her brown and blonde hair in a jaw-length bob.
@@ -812,6 +865,9 @@ the sides to create more shape. If her face is stern, it's only because she's
 focused on something in her own head while she works.
 ~
 F 11800
+M
+1
+Open sesame bagel! No, that's not it...~
 T 11810
 S
 #11930
@@ -1142,6 +1198,29 @@ $n bangs on the side of $s arcane contraption as the light flickers.~
 M
 0
 $n walks along the wall, passing the light from $s contraption over it.~
+T 11810
+S
+#11945
+Amets page~
+Page Amets~
+A page is bustling around.
+~
+0 0 dvxAH n 3
+1 0 0 15
+D
+   Amets is a portly man with a bright red sash over his plain jute robe. He's
+still fairly young, though his age is betrayed by heavy bags under his eyes.
+~
+F 11800
+M
+1
+I got lost deep in that pixy maze and fell asleep and you would not believe the dream I had.~
+M
+1
+I had to pinch myself. I had the most vivid dream in that maze.~
+M
+1
+The queen gave me an iris. What does that mean?~
 T 11810
 S
 #11946
@@ -1719,7 +1798,7 @@ $n waves $s huge axe in the air.~
 T 11973
 S
 #11958
-Biksi champion orka~
+Biksi champion orka goblin~
 Biksi, Champion of Orka~
 Biksi, Champion of Orka, stands in the center of the arena.
 ~
@@ -1755,7 +1834,7 @@ sheila page~
 Page Sheila~
 Sheila is bustling about, getting things in order.
 ~
-0 0 dvxA n 3
+0 0 dvxAH n 3
 2 0 0 15
 D
    Sheila is dressed in a plain jute robe, like all the pages in the tower. She
@@ -1765,6 +1844,7 @@ in your direction as she stays focused on her work.
 ~
 F 11800
 T 11810
+T 11937
 S
 #11960
 cabinet filing~
@@ -1861,6 +1941,27 @@ falls over his ears and eyes like a mop. He's dressed in a fresh white
 apprentice robe with a black margin.
 ~
 F 11800
+M
+1
+Had a bit of a trefoil earlier and now my hat isn't traveling.~
+M
+1
+Can upper dog now?~
+M
+1
+Elf didn't nap right.~
+M
+1
+Can't scheme to word perfect.~
+M
+0
+$n fumbles over $s words.~
+M
+0
+$n looks exasperated.~
+M
+1
+Got moths in my brain.~
 T 11810
 S
 #11964
@@ -2501,7 +2602,7 @@ D
 rotund look. If it's armor, it appears ceremonial. He wears brown pants and
 wooden shoes that clack as he walks. Over his left shoulder, a thrice-coiled
 purple rope signifies his station as captain of the guard. A small, iridescent
-seashell disc fills a pierced hole in the left side of his nose.
+seashell disc fills a pierced hole in the left side of his jade-green nose.
 ~
 M
 1
@@ -2745,9 +2846,10 @@ Ryken the Elder is on his knees in front of one of the bodies.
 D
    You can hear Ryken's bones creaking as he moves. He's an old man, surely not
 far from one of these shelves himself. His gray hair, what's left of it, is
-pulled into a knot at the back of his head. His drooping nose has a hole in the
-side that might once have held jewelry, but he wears only a necklace made from
-shell beads over his violet tunic and pants.
+pulled into a knot at the back of his head and his skin has faded from green to
+nearly the same gray as his hair. His drooping nose has a hole in the side that
+might once have held jewelry, but he wears only a necklace made from shell
+beads over his violet tunic and pants.
 ~
 M
 0
@@ -2878,7 +2980,8 @@ D
    Though he just seems to be out for a walk, Ballen seems to be sight-seeing
 as he constantly stops to take in the view, whether of the ocean, the city, or
 the great standing stone. He wears a plain green robe, nearly the same color as
-his jade skin.
+his jade skin, and his nose has small iridescent plugs through piercings on
+both sides.
 ~
 M
 0
