@@ -206,15 +206,20 @@ done
 %purge% %self%
 ~
 #11905
-Move Gossipper On Load~
+Skycleave: Shared load script~
 0 n 100
 ~
-south
-eval times 2 + %random.3%
-set iter 0
-while %iter% < %times%
-  mmove
-  eval iter %iter% + 1
+switch %self.vnum%
+  case 11901
+    * gossippers in 1B
+    south
+    eval times 2 + %random.3%
+    set iter 0
+    while %iter% < %times%
+      mmove
+      eval iter %iter% + 1
+    done
+  break
 done
 ~
 #11906
@@ -2155,8 +2160,8 @@ while %count% <= 2
         end
       break
       case 20
-          set rumor%count%_text I heard 
-          set rumor%count%_text I heard 
+          set rumor%count%_text I heard
+          set rumor%count%_text I heard
         end
       break
     done

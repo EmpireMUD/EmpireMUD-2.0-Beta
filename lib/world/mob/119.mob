@@ -240,6 +240,9 @@ We don't sell pixies here. No, that would be amoral. We sell the jars, though.~
 M
 0
 $n tries to dust one of the shelves, but the dust seems to be one step ahead of $m.~
+M
+7
+say Hello, erm, and welcome to Towerwin, erm, Towerinkel's Gift Shop, your one shop stop for, erm, your one stop shop for all your, erm, gifts. Oh, that's not right.~
 T 11806
 T 11810
 S
@@ -1138,6 +1141,9 @@ D
 tba
 ~
 F 11800
+M
+7
+say Now that all that nastiness is done, I have some things that might interest you. (list)~
 T 11806
 T 11810
 S
@@ -1162,6 +1168,9 @@ brow is very expressive when it speaks.
    Goef the Oreonic can 'attune' skystones for you.
 ~
 F 11800
+M
+7
+say Salutations, little human. Are you here for attunement? (attune)~
 T 11939
 T 11806
 T 11810
