@@ -573,53 +573,61 @@ else
 end
 ~
 #11814
-Skycleave: Attach one-time intro on enter~
-0 h 100
+Skycleave: Loot controller~
+1 n 100
 ~
-* config: these arrays match up mob vnum to trigger vnum 1:1
-set mobs_list 11810 11818 11830 11847 11849 11869 11863 11890 11891 11892
-set trig_list 11825 11825 11860 11825 11825 11860 11860 11825 11825 11860
-if %actor.is_npc% || %self.fighting%
-  halt
+* Handles loot drops for skycleave bosses
+* determine where we are
+set actor %self.carried_by%
+if %self.level%
+  set level %self.level%
+else
+  set level 100
 end
-set room %self.room%
-* figure out which intro I give
-set trig_vnum 0
-while %mobs_list% && !%trig_vnum%
-  set mob %mobs_list.car%
-  set mobs_list %mobs_list.cdr%
-  set trig %trig_list.car%
-  set trig_list %trig_list.cdr%
-  if %mob% == %self.vnum%
-    set trig_vnum %trig%
+* determine 1 item of loot
+if %self.vnum% == 11837
+  * BoE item list
+  set roll %random.100%
+  if %roll% == 1
+    set loot_list 11918 11919 11920
+  elseif %roll% <= 16
+    set loot_list 11801 11802 11804 11806 11807
+  else
+    set loot_list 11810 11811 11812 11813 11814 11815 11816 11817 11818 11819 11820 11821 11822 11823 11824 11825 11826 11827 11828 11829
   end
-done
-* let everyone arrive
-wait 0
-if %trig_vnum% == 0 || %self.has_trigger(%trig_vnum%)%
-  halt
+  * count list
+  set temp %loot_list%
+  set count 0
+  while !%temp.empty%
+    set temp %temp.cdr%
+    eval count %count% + 1
+  done
+  * roll
+  eval pos %%random.%count%%%
+  while %pos% > 0 && !%loot_list.empty%
+    set loot %loot_list.car%
+    set loot_list %loot_list.cdr%
+    eval pos %pos% - 1
+  done
+elseif %self.vnum% == 11838
+  * BoP item list 11840-11859
+  eval loot 11840 - 1 + %random.20%
 end
-* check for someone who needs the intro
-set any 0
-set ch %room.people%
-while %ch%
-  if %ch.is_pc%
-    set varname intro_%ch.id%
-    if !%room.varexists(%varname%)%
-      set any 1
-      set %varname% 1
-      remote %varname% %room.id%
+* load loot
+if %loot%
+  %load% obj %loot% %actor% inv %level%
+  set item %actor.inventory%
+  if %item.vnum% == %loot%
+    if %item.is_flagged(BOE)% || %item.is_flagged(BOP)%
+      %item.bind(%self%)%
     end
   end
-  set ch %ch.next_in_room%
-done
-* did anyone need the intro
-if %any%
-  attach %trig_vnum% %self.id%
-  set line 0
-  remote line %self.id%
-  start_messages
 end
+* any bonus items?
+*   no
+* done
+wait 0
+%purge% %self%
 ~
 #11815
 Escaped Goblin combat~
@@ -1199,187 +1207,6 @@ switch %self.vnum%
 done
 detach 11824 %self.id%
 ~
-#11825
-Skycleave: Lower floor one-time intros~
-0 abc 100
-start_messages~
-* plays a boss intro until it runs out of lines, then detaches
-* ensure not fighting or detach
-if %self.fighting% || %self.disabled%
-  detach 11825 %self.id%
-  halt
-end
-* fetch position
-if %self.varexists(line)%
-  eval line %self.line% + 1
-else
-  set line 1
-end
-* store line back
-remote line %self.id%
-set done 0
-set no_unflag 0
-* switch: message cases goes +1 per 13 seconds and automatically ends when it hits default
-if %self.vnum% == 11818
-  * Venjer the Fox
-  switch %line%
-    case 1
-      say Stupid pixies, stupid maze, stupid tower, but smart Venjer...
-      wait 9 sec
-      say And smart adventurers. Conquered the pixy maze just like Venjer, only slower.
-      wait 9 sec
-      say Now just have to figure out how to get out. Not you, just me. You die in the maze.
-    break
-    case 2
-      say Everything upstairs is already ours, just have to get up there.
-      wait 6 sec
-      say Not yours. Never yours. Never theirs. Never theirs!
-    break
-    default
-      set done 1
-    break
-  done
-elseif %self.vnum% == 11847
-  * Kara Virduke, Mercenary Archmage boss
-  switch %line%
-    case 1
-      say Must be something in here somewhere...
-      %mod% %self% longdesc Kara Virduke is digging through cabinets.
-      wait 9 sec
-      %echo% ~%self% opens drawer after drawer and rifles through them.
-      wait 9 sec
-      %echo% ~%self% finally notices you and turns.
-    break
-    case 2
-      say This place is a treasure trove. Are you here to loot it or rescue it?
-      wait 6 sec
-      say You know what? I don't care which.
-    break
-    case 3
-      say We got here first.
-      wait 9 sec
-      %echo% ~%self% stops and looks you up and down, making a face that seems dismissive, but perhaps also impressed.
-      wait 9 sec
-      say Has anyone ever told you you have a powerful aura?
-    break
-    case 4
-      %echo% ~%self% holds the foot end her staff out toward your stomach and draws an invisible line across it.
-      wait 9 sec
-      say I would just love to see what portents we can augur out of your precious hero intestines.
-      wait 9 sec
-      %echo% ~%self% raises her staff and begins channeling mana.
-      %mod% %self% longdesc Kara Virduke is holding her staff in the air, channeling mana from the tower!
-    break
-    default
-      set done 1
-    break
-  done
-elseif %self.vnum% == 11849
-  * Trixton Vye, Mercenary Leader
-  switch %line%
-    case 1
-      say It doesn't seem to be in here. I thought that old carcass would have...
-      wait 9 sec
-      %echo% ~%self% turns and notices you.
-      wait 9 sec
-      say Sorry, not who I was expecting. Are you even on the payroll? We can't afford to take on more mercenaries.
-    break
-    case 2
-      say That witch Mezvienne is barely paying us. Loot the tower, she said.
-      wait 6 sec
-      say Sell the artifacts, she said.
-    break
-    case 3
-      say There's a fortune stocked away in the lich's lab, she said.
-      wait 6 sec
-      say Just don't open the repository. Got it. Won't open it. But there's nothing in here I can sell.
-    break
-    case 4
-      %echo% ~%self% sighs.
-      wait 9 sec
-      say Wait, how did you even get in here?
-      wait 9 sec
-      say All this loot is ours. Mezvienne doesn't want to be bothered. Why don't you leave while you're ahead?
-    break
-    default
-      set done 1
-      set no_unflag 1
-    break
-  done
-elseif %self.vnum% == 11810
-  * Watcher Annaca - phase 2A
-  switch %line%
-    case 1
-      say Oh, not another... oh, you're not goblins. Finally some good news.
-      wait 9 sec
-      say I can't hold this shield much longer. The mercenaries are contained on the upper levels.
-      wait 9 sec
-      say Which is not necessarily a good thing. All out most powerful artifacts are up there.
-    break
-    case 2
-      say I'm pretty sure masters Knezz and Barrosh are up there, so they may already have it handled...
-      wait 9 sec
-      say I need to hold this shield up here until the goblins and pixies have been dealt with down here.
-      wait 9 sec
-      say The pixies have enchanted one of the sculptures. It's powering the maze.
-    break
-    case 3
-      say You'll have to be the one to find it. I can't leave this post until it's done.
-    break
-    default
-      set done 1
-    break
-  done
-elseif %self.vnum% == 11890
-  * High Sorcerer Celiya 1A
-  switch %line%
-    case 1
-      say It's rather a good thing you're here...
-      wait 9 sec
-      say There is simply too much going on down here, and too much going on up there.
-      wait 9 sec
-      say We are not at full strength and haven't the people to retake the tower at the moment.
-    break
-    case 2
-      say And anyway, it might be easier for one person or even a small team, as they will not see it coming...
-      wait 9 sec
-      say I can lower the wards on the staircase and let you up, if you're willing to help.
-      wait 9 sec
-      say The second floor is overrun with goblins and pixies. See if you can find Annaca while you're up there, too. She's one of our watchers.
-    break
-    case 3
-      say Just let me know when you're ready... (difficulty)
-    break
-    default
-      set done 1
-    break
-  done
-elseif %self.vnum% == 11891
-  * Watcher Annaca - phase 2B
-  switch %line%
-    case 1
-      say It looks like you did it...
-      wait 9 sec
-      say That creepy-crawling pixy maze is gone. Hopefully the entire floor is back to normal.
-      wait 9 sec
-      say I don't hear any more goblins, either, so maybe John got them back under control.
-    break
-    case 2
-      say If you're heading upstairs, be on the lookout for cutthroat mercenaries.
-    break
-    default
-      set done 1
-    break
-  done
-end
-* detach if done
-if %done%
-  if %self.aff_flagged(!ATTACK)% && !%no_unflag%
-    dg_affect %self% !ATTACK off
-  end
-  detach 11825 %self.id%
-end
-~
 #11826
 Skycleave: Pixy Maze track dummy~
 2 c 0
@@ -1561,7 +1388,7 @@ elseif %self.vnum% == 11822
     break
   done
 elseif %self.vnum% == 11827
-  * Chatty couple: Apprentices Marie 11827 + Djon 11828
+  * Chatty couple: Apprentices Marina 11827 + Djon 11828
   set djon %room.people(11828)%
   if !%djon%
     halt
@@ -3032,105 +2859,6 @@ switch %self.vnum%
 done
 * and detach
 detach 11857 %self.id%
-~
-#11860
-Skycleave: Upper floor one-time intros~
-0 abc 100
-start_messages~
-* plays a boss intro until it runs out of lines, then detaches
-* ensure not fighting or detach
-if %self.fighting% || %self.disabled%
-  detach 11860 %self.id%
-  halt
-end
-* fetch position
-if %self.varexists(line)%
-  eval line %self.line% + 1
-else
-  set line 1
-end
-* store line back
-remote line %self.id%
-set done 0
-* switch: message cases goes +1 per 13 seconds and automatically ends when it hits default
-if %self.vnum% == 11830
-  * High Master Caius Sirensbane 3A
-  switch %line%
-    case 1
-      %echo% ~%self% struggles to hold up the magical ward...
-      wait 9 sec
-      say I can't hold this much longer.
-      wait 9 sec
-      say Some sort of shadow keeps attacking me from over the railing.
-    break
-    case 2
-      say We have no chance of retaking this floor without defeating that scoundrel Trixton Vye.
-      wait 9 sec
-      if %instance.mob(11847)% || %instance.mob(11848)%
-        say He's being protected by magic from his allies, Lady Virduke and Bleak Rojjer.
-      else
-        say He's unprotected; you need to get to him in the Lich Labs and finish this.
-      end
-    break
-    default
-      set done 1
-    break
-  done
-elseif %self.vnum% == 11869
-  * Shade of Mezvienne
-  switch %line%
-    case 1
-      %echo% The shadows gather over the wounded Grand High Sorcerer...
-      wait 6 sec
-      %echo% The shadow takes on the human face of Mezvienne the Enchantress!
-    break
-    case 2
-      %echo% Grand High Sorcerer Knezz's own shadow whips up into the air as the Shade of Mezvienne drinks it in.
-      wait 9 sec
-      say What secrets lie in this withered old sack?
-      wait 9 sec
-      say Let's find out together. Open your mind, Jozef, let us plumb its depths... this should only take a minute.
-    break
-    default
-      set done 1
-    break
-  done
-elseif %self.vnum% == 11863
-  * Shadow Ascendant
-  switch %line%
-    case 1
-      %echo% Raw mana streams from every object in the room into the Shadow Ascendant.
-      wait 9 sec
-      %echo% Low chanting builds from the shadows as the Ascendant grows in power.
-      wait 9 sec
-      %echo% You feel your own power being drained by the Shadow Ascendant as it absorbs everything in sight.
-    break
-    default
-      set done 1
-    break
-  done
-elseif %self.vnum% == 11892
-  * High Master Caius Sirensbane 3B
-  switch %line%
-    case 1
-      %echo% ~%self% struggles to hold up the magical ward...
-      wait 9 sec
-      say This is taking too much power... please tell me you're ready to take on the shadow.
-      wait 9 sec
-      say I'll drop the ward as soon as you're ready.
-    break
-    default
-      set done 1
-    break
-  done
-end
-* detach if done
-if %done%
-  if %self.aff_flagged(!ATTACK)%
-    dg_affect %self% !ATTACK off
-  end
-  detach 11860 %self.id%
-end
 ~
 #11861
 Skycleave: Barrosh mind-control struggle scene~

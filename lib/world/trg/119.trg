@@ -2050,7 +2050,7 @@ while %count% <= 2
     set rumor%count% %rumor%
     switch %rumor%
       case 1
-        set rumor%count%_text I heard Marie and Djon are an item now.
+        set rumor%count%_text I heard Marina and Djon are an item now.
       break
       case 2
         set rumor%count%_text I heard Ravinder followed Weyonomon right into a wall.
@@ -2237,9 +2237,13 @@ remote skystone_progress %actor.id%
 remote skystone_finished %actor.id%
 ~
 #11940
-Skycleave craftables: BoP/BoE twiddler~
+Skycleave craftables: Craft-or-Drop: Set BoE/BoP and loot quality flags~
 1 n 100
 ~
+* This script makes loot BOP when dropped by a mob but BOE when crafted.
+* It will also inherit hard/group flags from an NPC and rescale itself.
+*
+* first ensure there's a person
 set actor %self.carried_by%
 if !%actor%
   set actor %self.worn_by%
@@ -2247,24 +2251,44 @@ end
 if !%actor%
   halt
 end
-if %actor% && %actor.is_pc%
-  * Item was crafted
-  if %self.is_flagged(BOP)%
-    nop %self.flag(BOP)%
-  end
-  if !%self.is_flagged(BOE)%
-    nop %self.flag(BOE)%
-  end
-  * Default flag is BOP so need to unbind when setting BOE
-  nop %self.bind(nobody)%
-else
-  * Item was probably dropped
+set rescale 0
+* next check pc/npc
+if %actor.is_npc%
+  * BOP mode (loot)
   if !%self.is_flagged(BOP)%
     nop %self.flag(BOP)%
+    set rescale 1
   end
   if %self.is_flagged(BOE)%
     nop %self.flag(BOE)%
+    set rescale 1
   end
+  if !%self.is_flagged(GENERIC-DROP)%
+    if %actor.mob_flagged(HARD)% && !%self.is_flagged(HARD-DROP)%
+      nop %self.flag(HARD-DROP)%
+      set rescale 1
+    end
+    if %actor.mob_flagged(GROUP)% && !%self.is_flagged(GROUP-DROP)%
+      nop %self.flag(GROUP-DROP)%
+      set rescale 1
+    end
+  end
+else
+  * BOE mode (crafted)
+  if %self.is_flagged(BOP)%
+    nop %self.flag(BOP)%
+    set rescale 1
+  end
+  if !%self.is_flagged(BOE)%
+    nop %self.flag(BOE)%
+    set rescale 1
+  end
+  * in case
+  nop %self.bind(nobody)%
+end
+if %rescale%
+  wait 0
+  %scale% %self% %self.level%
 end
 ~
 #11941

@@ -760,6 +760,28 @@ mortal plane after their body has rotted and their soul has moved on.
 4 0
 T 11836
 S
+#11837
+skycleave BoE loot controller~
+a skycleave BoE loot controller~
+A skycleave BoE loot controller is here.~
+Loads a bind-on-equip item.
+~
+3 mo a 0 2
+0 0 0
+0 0
+T 11814
+S
+#11838
+skycleave BoP loot controller~
+a skycleave BoP loot controller~
+A skycleave BoP loot controller is here.~
+Loads a bind-on-pickup item.
+~
+3 mp a 0 3
+0 0 0
+0 0
+T 11814
+S
 #11840
 greaves skycleaver magitanium set~
 magitanium skycleaver greaves~
@@ -773,7 +795,7 @@ pen, clasp, button, and plate in Skycleave was made from magitanium. Still,
 among the innovations credited to the Tower, magitanium is most valued by
 smiths across the land.
 ~
-27 mp af 0 19
+27 mp af 0 21
 3 0 0
 2 0
 A
@@ -798,7 +820,7 @@ when rubbed together, while the inside is lined with the finest cloth.
 hiding from others. Though it was her brother who dubbed her "Niamh the Shadow
 Hide", she reclaimed the title for herself at Skycleave.
 ~
-27 mp af 0 20
+27 mp af 0 22
 1 0 0
 7 0
 A
@@ -822,7 +844,7 @@ straight into a sorcerer's body to strengthen their offensive magic.
 moths that pupated at the lightning-kissed tops of the pixy trees. No pixy
 cities yet remain that produce it.
 ~
-27 mp af 0 21
+27 mp af 0 23
 0 0 0
 11 0
 A
@@ -846,7 +868,7 @@ from the infinitely dark, unseeable void that lies at the heart of the fabric.
 When the cloth is done, it is boiled along with the weaver in a stone cauldron,
 trapping the weaver's soul within. This is considered the greatest honor.
 ~
-27 mp af 0 22
+27 mp af 0 24
 0 0 0
 11 0
 A
@@ -872,7 +894,7 @@ armor had started to wane. Though the name is commonly constructed as mocking
 steel-wearers, it was, in truth, invented by a sorcerer who fancied herself
 The Moxie Witch.
 ~
-27 mp af 0 20
+27 mp af 0 22
 2 0 0
 2 0
 A
@@ -899,7 +921,7 @@ dream.
 imperium, though in reality it has been created from many light metals by the
 artificers of Skycleave.
 ~
-27 mp al 0 22
+27 mp al 0 24
 3 0 0
 2 0
 A
@@ -931,7 +953,7 @@ the sound it makes as it rubs against other pieces of armor and clothing.
 foxes, shrinking and silencing their plush fur. Soon, Niamh devised a better
 technique that worked on common leather and required no wild animal.
 ~
-27 mp al 0 25
+27 mp al 0 27
 1 0 0
 7 0
 A
@@ -958,7 +980,7 @@ energy channeled into your body -- and your magic.
 created in small squares that must be stitched together, a trait common to all
 pixy fabrics.
 ~
-27 mp al 0 23
+27 mp al 0 25
 0 0 0
 11 0
 A
@@ -984,7 +1006,7 @@ within and freezes both your fingers and your soul.
    Some mageweavers spend their entire careers dreaming of the day they will
 make a single bolt of soulcloth, such is the promise of immortality it brings.
 ~
-27 mp al 0 24
+27 mp al 0 26
 0 0 0
 11 0
 A
@@ -1013,7 +1035,7 @@ is, a material suited to crowns and scepters. When it never achieved the
 glister of gold, Skycleave turned to its more practical property and began
 working armor from it.
 ~
-27 mp al 0 22
+27 mp al 0 24
 2 0 0
 2 0
 A
@@ -1041,7 +1063,7 @@ the magitanium seem to follow every movement.
 Witch and though she didn't invent it, Itania is credited both with introducing
 the metal to Skycleave's artisan sorcerers, and with naming it.
 ~
-27 mp aj 0 20
+27 mp aj 0 22
 3 0 0
 2 0
 A
@@ -1066,7 +1088,7 @@ against other fabrics.
 Skycleave, the Shadow Hide immediately began infusing it into every jewel,
 trinket, device, and creature, and she found a different result with each.
 ~
-27 mp aj 0 22
+27 mp aj 0 24
 1 0 0
 7 0
 A
@@ -1094,7 +1116,7 @@ before.
 cities. There existed a particular technique for unraveling the coccoon while
 the pupa slept soundly, able to emerge without cutting the precious silk.
 ~
-27 mp aj 0 23
+27 mp aj 0 25
 0 0 0
 11 0
 A
@@ -1121,7 +1143,7 @@ release an ear-piercing screech that leaves you momentarily stunned.
 placed into an ever-burning fire, of which few are known, and the sheer value
 of soulcloth is such that this has never been tested.
 ~
-27 mp aj 0 24
+27 mp aj 0 26
 0 0 0
 11 0
 A
@@ -1148,7 +1170,7 @@ metallurgy. While cleaning her grandfather's tower as an adolescent, she fell
 into a barmy blue portal and returned laden with strange bottles filled with
 her namesake fizzy beverage.
 ~
-27 mp aj 0 22
+27 mp aj 0 24
 2 0 0
 2 0
 A
@@ -1176,7 +1198,7 @@ relics that line Skycleave's shelves. But her true genius was trading for the
 secrets to make them as well, and the process for crafting magitanium was her
 crowning achievement.
 ~
-2 mp am 0 23
+2 mp am 0 25
 0 0 0
 4 0
 A
@@ -1204,7 +1226,7 @@ quietly in battle.
 twirl it like ribbons and sculpt it like clay. The two were fast friends, and
 each shaped the other.
 ~
-2 mp am 0 24
+2 mp am 0 26
 0 0 0
 4 0
 A
@@ -1231,7 +1253,7 @@ earrings, it doesn't make that characteristic crackle as it does.
 trees, where lightning is at its closest. Their caterpillars have furry backs
 that crisp and sizzle as stray sparks in the air are caught and channeled.
 ~
-2 mp am 0 23
+2 mp am 0 25
 0 0 0
 4 0
 A
@@ -1258,7 +1280,7 @@ does when you disturb it.
 single bolt of the stuff is often split into many smaller pieces, at the cost
 of fragmenting the soul held within.
 ~
-2 mp am 0 23
+2 mp am 0 25
 0 0 0
 4 0
 A
@@ -1286,7 +1308,7 @@ even after the Moxie Witch was twice abducted by envious ironmongers who forced
 the secret out of her. Both abductors vanished within a fortnight of her
 release.
 ~
-2 mp am 0 25
+2 mp am 0 27
 0 0 0
 4 0
 A

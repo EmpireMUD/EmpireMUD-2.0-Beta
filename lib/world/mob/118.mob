@@ -461,6 +461,22 @@ with the stripes of the skunk fur dyed bright orange. The armor is tailored
 exactly to her lithe frame and she moves effortlessly in it as she searches the
 maze with her gnarled old wooden staff.
 ~
+I 4 11837 100.00 1  # LOOT: skycleave BoE loot controller
+I+ 4 0  # Hard
+I 4 11837 100.00 1  # LOOT: skycleave BoE loot controller
+I+ 5 0  # Group
+I 4 11837 100.00 1  # LOOT: skycleave BoE loot controller
+I+ 6 0  # Boss
+I 4 11838 100.00 1  # LOOT: skycleave BoP loot controller
+I+ 6 0  # Boss
+I 4 11900 100.00 1  # LOOT: unattuned skystone
+I+ 3 0  # Normal
+I 4 11900 100.00 1  # LOOT: unattuned skystone
+I+ 4 0  # Hard
+I 4 11900 100.00 1  # LOOT: unattuned skystone
+I+ 5 0  # Group
+I 4 11900 100.00 2  # LOOT: unattuned skystone
+I+ 6 0  # Boss
 M
 7
 say Stupid pixies, stupid maze, stupid tower, but smart Venjer...~
@@ -501,6 +517,22 @@ supernatural dazzle. If you focus, you can see her tall brown hair, silvery
 butterfly wings that glint with gold as she flies, a crooked little smile on
 her face as she watches you contemplate your next move.
 ~
+I 4 11837 100.00 1  # LOOT: skycleave BoE loot controller
+I+ 4 0  # Hard
+I 4 11837 100.00 1  # LOOT: skycleave BoE loot controller
+I+ 5 0  # Group
+I 4 11837 100.00 1  # LOOT: skycleave BoE loot controller
+I+ 6 0  # Boss
+I 4 11838 100.00 1  # LOOT: skycleave BoP loot controller
+I+ 6 0  # Boss
+I 4 11900 100.00 1  # LOOT: unattuned skystone
+I+ 3 0  # Normal
+I 4 11900 100.00 1  # LOOT: unattuned skystone
+I+ 4 0  # Hard
+I 4 11900 100.00 1  # LOOT: unattuned skystone
+I+ 5 0  # Group
+I 4 11900 100.00 2  # LOOT: unattuned skystone
+I+ 6 0  # Boss
 T 11948
 T 11949
 T 11813
@@ -732,14 +764,14 @@ T 11828
 T 11810
 S
 #11827
-Marie apprentice~
-Marie~
-Marie is sitting with Djon.
+Marina apprentice~
+Marina~
+Marina is sitting with Djon.
 ~
 0 0 bdvA n 3
 2 0 0 15
 D
-   Marie is dressed in white apprentice robes with a bright blue margin. Her
+   Marina is dressed in white apprentice robes with a bright blue margin. Her
 black-blue hair brushes back and forth over her shoulders in big, rolling waves
 as she laughs. She's one of the youngest apprentices here, and you notice the
 table sparks as she taps it with her fingers.
@@ -758,7 +790,7 @@ Djon is seated at a table in the corner.
 D
    Djon leans back, with one arm propped up on an empty chair. His legs are
 outstretched; one blocks half the aisle while the other is entwined with
-Marie's leg under the table. Djon is wearing a plain white apprentice robe. He
+Marina's leg under the table. Djon is wearing a plain white apprentice robe. He
 has shaved the sides of his head and has short, curly black hair piled on top.
 ~
 F 11800
@@ -1173,6 +1205,19 @@ thin, gnarled calamander staff. Her flame-orange hair rolls off her head,
 cascading over the shoulders of her silver-accented red gown like a wild
 waterfall at sunset.
 ~
+I 4 11837 100.00 1  # LOOT: skycleave BoE loot controller
+I 4 11838 100.00 1  # LOOT: skycleave BoP loot controller
+I+ 5 0  # Group
+I 4 11838 100.00 1  # LOOT: skycleave BoP loot controller
+I+ 6 0  # Boss
+I 4 11900 100.00 1  # LOOT: unattuned skystone
+I+ 3 0  # Normal
+I 4 11900 100.00 1  # LOOT: unattuned skystone
+I+ 4 0  # Hard
+I 4 11900 100.00 1  # LOOT: unattuned skystone
+I+ 5 0  # Group
+I 4 11900 100.00 2  # LOOT: unattuned skystone
+I+ 6 0  # Boss
 M
 7
 mod longdesc Kara Virduke is digging through cabinets.~
@@ -1232,6 +1277,19 @@ down, revealing cropped soot-black hair and pale skin. His inky black cloak
 is too dark and too loose for you to make out any part of his body or see what
 he might be carrying.
 ~
+I 4 11837 100.00 1  # LOOT: skycleave BoE loot controller
+I 4 11838 100.00 1  # LOOT: skycleave BoP loot controller
+I+ 5 0  # Group
+I 4 11838 100.00 1  # LOOT: skycleave BoP loot controller
+I+ 6 0  # Boss
+I 4 11900 100.00 1  # LOOT: unattuned skystone
+I+ 3 0  # Normal
+I 4 11900 100.00 1  # LOOT: unattuned skystone
+I+ 4 0  # Hard
+I 4 11900 100.00 1  # LOOT: unattuned skystone
+I+ 5 0  # Group
+I 4 11900 100.00 2  # LOOT: unattuned skystone
+I+ 6 0  # Boss
 T 11928
 T 11813
 T 11848
@@ -1254,6 +1312,19 @@ yellow teeth. He dresses as a noble in silk and fur and finery, but he has the
 visage of a ghoul. His milky eyes turn ice blue only while he absorbs the
 corpse-flesh; the rest of the time, you're not sure he can even see you.
 ~
+I 4 11837 100.00 1  # LOOT: skycleave BoE loot controller
+I 4 11838 100.00 1  # LOOT: skycleave BoP loot controller
+I+ 5 0  # Group
+I 4 11838 100.00 1  # LOOT: skycleave BoP loot controller
+I+ 6 0  # Boss
+I 4 11900 100.00 1  # LOOT: unattuned skystone
+I+ 3 0  # Normal
+I 4 11900 100.00 1  # LOOT: unattuned skystone
+I+ 4 0  # Hard
+I 4 11900 100.00 1  # LOOT: unattuned skystone
+I+ 5 0  # Group
+I 4 11900 100.00 2  # LOOT: unattuned skystone
+I+ 6 0  # Boss
 M
 7
 say It doesn't seem to be in here. I thought that old carcass would have...~
@@ -1482,6 +1553,19 @@ walls, and between the marble tiles of the floor. Tentacles poke and prod at
 you, trying to find a way to drain your power as well. Worse, it seems to be
 working.
 ~
+I 4 11837 100.00 1  # LOOT: skycleave BoE loot controller
+I+ 5 0  # Group
+I 4 11837 100.00 1  # LOOT: skycleave BoE loot controller
+I+ 6 0  # Boss
+I 4 11838 100.00 1  # LOOT: skycleave BoP loot controller
+I 4 11900 100.00 1  # LOOT: unattuned skystone
+I+ 3 0  # Normal
+I 4 11900 100.00 1  # LOOT: unattuned skystone
+I+ 4 0  # Hard
+I 4 11900 100.00 2  # LOOT: unattuned skystone
+I+ 5 0  # Group
+I 4 11900 100.00 3  # LOOT: unattuned skystone
+I+ 6 0  # Boss
 M
 7
 echo Raw mana streams from every object in the room into the Shadow Ascendant.~
@@ -1552,6 +1636,19 @@ spells under his breath. His stubbled face is turned toward you at all times
 even as his left eye, long ago replaced by a carved yellow lightning stone,
 spins to face each person and object in turn, over and over.
 ~
+I 4 11837 100.00 1  # LOOT: skycleave BoE loot controller
+I+ 5 0  # Group
+I 4 11837 100.00 1  # LOOT: skycleave BoE loot controller
+I+ 6 0  # Boss
+I 4 11838 100.00 1  # LOOT: skycleave BoP loot controller
+I 4 11900 100.00 1  # LOOT: unattuned skystone
+I+ 3 0  # Normal
+I 4 11900 100.00 1  # LOOT: unattuned skystone
+I+ 4 0  # Hard
+I 4 11900 100.00 1  # LOOT: unattuned skystone
+I+ 5 0  # Group
+I 4 11900 100.00 2  # LOOT: unattuned skystone
+I+ 6 0  # Boss
 T 11861
 T 11823
 S
@@ -1587,6 +1684,19 @@ around Grand High Sorcerer Knezz. At times, it almost has a face, but it
 splashes back into a swirling cloud and passes through Knezz's chest and out
 his back. It seems to be draining his life force.
 ~
+I 4 11837 100.00 1  # LOOT: skycleave BoE loot controller
+I+ 5 0  # Group
+I 4 11837 100.00 1  # LOOT: skycleave BoE loot controller
+I+ 6 0  # Boss
+I 4 11838 100.00 1  # LOOT: skycleave BoP loot controller
+I 4 11900 100.00 1  # LOOT: unattuned skystone
+I+ 3 0  # Normal
+I 4 11900 100.00 1  # LOOT: unattuned skystone
+I+ 4 0  # Hard
+I 4 11900 100.00 2  # LOOT: unattuned skystone
+I+ 5 0  # Group
+I 4 11900 100.00 3  # LOOT: unattuned skystone
+I+ 6 0  # Boss
 M
 7
 echo The shadows gather over the wounded Grand High Sorcerer...~
@@ -1658,6 +1768,16 @@ the vortex and separate from it, watching you with deep, piercing eyes.
    You can type 'skip' to shorten Skithe Ler-Wyn's cutscene.
 ~
 I 4 11900 100.00 1  # LOOT: unattuned skystone
+I 4 11837 100.00 1  # LOOT: skycleave BoE loot controller
+I 4 11838 100.00 1  # LOOT: skycleave BoP loot controller
+I 4 11900 100.00 1  # LOOT: unattuned skystone
+I+ 3 0  # Normal
+I 4 11900 100.00 1  # LOOT: unattuned skystone
+I+ 4 0  # Hard
+I 4 11900 100.00 2  # LOOT: unattuned skystone
+I+ 5 0  # Group
+I 4 11900 100.00 3  # LOOT: unattuned skystone
+I+ 6 0  # Boss
 T 11869
 T 11868
 T 11873
