@@ -605,35 +605,6 @@ T 11920
 T 11911
 T 11810
 S
-#11919
-pixy escaped~
-the escaped pixy~
-A pixy has escaped and is frantically trying to flee!
-~
-0 0 advI 0 3
-1 0 0 15
-D
-   The pixy is tiny, not larger than a field mouse. It flits back and forth in
-a panic as it tries to find a way out of the tower, its silvery butterfly wings
-beating as fast as they possibly can. The pixy shoots a burst of yellow dust
-at you, which you dodge, leaving a stain on the wall behind you.
-~
-S
-#11920
-experiment escaped~
-the escaped experiment~
-An escaped experiment runs past you!
-~
-0 0 d 0 3
-1 0 0 15
-D
-   Though it's not clear what this thing is -- or even what it used to be -- it
-seems to be in a hurry to escape. It has the countenance and consistency of
-spoiled oatmeal, squirking and blatting as it shifts shape and form to get by
-you. You turn toward it, and it turns back, glowering at you through 3 shining
-blue spots on its face.
-~
-S
 #11921
 broom~
 the broom~
