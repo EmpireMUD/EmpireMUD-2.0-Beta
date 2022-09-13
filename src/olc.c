@@ -4166,11 +4166,19 @@ void get_interaction_display(struct interaction_item *list, char *save_buffer) {
 */
 void get_requirement_display(struct req_data *list, char *save_buffer) {
 	struct req_data *req;
+	char buf[MAX_INPUT_LENGTH];
 	int count = 0;
 	
 	*save_buffer = '\0';
 	LL_FOREACH(list, req) {
-		sprintf(save_buffer + strlen(save_buffer), "%2d. %s: %s %s\r\n", ++count, requirement_types[req->type], requirement_string(req, TRUE, FALSE), NULLSAFE(req->custom));
+		if (req->custom) {
+			snprintf(buf, sizeof(buf), ": %s", req->custom);
+		}
+		else {
+			*buf = '\0';
+		}
+		
+		sprintf(save_buffer + strlen(save_buffer), "%2d. %s: %s%s\r\n", ++count, requirement_types[req->type], requirement_string(req, TRUE, FALSE), buf);
 	}
 	
 	// empty list not shown
@@ -5802,6 +5810,7 @@ void olc_process_requirements(char_data *ch, char *argument, struct req_data **l
 					free(change->custom);
 				}
 				change->custom = str_dup(argument);
+				snprintf(buf, sizeof(buf), " (%s)", change->custom);
 				msg_to_char(ch, "Changed %s %d to: %s%s\r\n", command, atoi(num_arg), requirement_string(change, TRUE, FALSE), buf);
 			}
 		}
