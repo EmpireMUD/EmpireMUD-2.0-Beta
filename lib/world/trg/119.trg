@@ -2008,7 +2008,7 @@ else
 end
 ~
 #11937
-Skycleave: Gossipping pages and apprentices~
+Skycleave: Gossipping pages~
 0 bw 50
 ~
 set spirit %instance.mob(11900)%
@@ -2242,7 +2242,6 @@ Skycleave craftables: Craft-or-Drop: Set BoE/BoP and loot quality flags~
 ~
 * This script makes loot BOP when dropped by a mob but BOE when crafted.
 * It will also inherit hard/group flags from an NPC and rescale itself.
-*
 * first ensure there's a person
 set actor %self.carried_by%
 if !%actor%
@@ -3556,7 +3555,7 @@ while %count% < 12
     else
       set skycleave_wake_room 0
     end
-    if !%actor.plr_flagged(ADV-SUMMON)%
+    if !%actor.plr_flagged(ADV-SUMMON)% && !%room.template%
       nop %actor.mark_adventure_summoned_from%
     end
     %echoaround% %actor% ~%actor% lets out a raucous snore and then vanishes into ^%actor% dream.
@@ -3570,7 +3569,7 @@ while %count% < 12
     while %ch%
       set next_ch %ch.next_in_room%
       if %ch.leader% == %actor% && !%ch.fighting%
-        if %ch.is_pc% && !%ch.plr_flagged(ADV-SUMMON)%
+        if %ch.is_pc% && !%ch.plr_flagged(ADV-SUMMON)% && !%room.template%
           nop %ch.mark_adventure_summoned_from%
         end
         %echoaround% %ch% ~%ch% vanishes into thin air!
@@ -3784,7 +3783,7 @@ while %count% < 12
     else
       set skycleave_wake_room 0
     end
-    if !%actor.plr_flagged(ADV-SUMMON)%
+    if !%actor.plr_flagged(ADV-SUMMON)% && !%room.template%
       nop %actor.mark_adventure_summoned_from%
     end
     %echoaround% %actor% ~%actor% lets out a whistling snore and then vanishes into ^%actor% dream.
@@ -3798,7 +3797,7 @@ while %count% < 12
     while %ch%
       set next_ch %ch.next_in_room%
       if %ch.leader% == %actor% && !%ch.fighting%
-        if %ch.is_pc% && !%ch.plr_flagged(ADV-SUMMON)%
+        if %ch.is_pc% && !%ch.plr_flagged(ADV-SUMMON)% && !%room.template%
           nop %ch.mark_adventure_summoned_from%
         end
         %echoaround% %ch% ~%ch% vanishes into thin air!
