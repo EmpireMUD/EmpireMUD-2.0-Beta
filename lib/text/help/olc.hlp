@@ -7058,8 +7058,8 @@ See also: OLC ROOM TEMPLATES, ADVEDIT RESET TIME, VNUM
 #d
 REQUIREMENTS "QEDIT TASKS" "QEDIT PREREQS" "QEDIT PREREQUISITES" "SOCEDIT REQUIREMENTS"
 
-Usage:  .<field> add <type> <vnum> [group]
-        .<field> change <number> <amount | group | vnum> <value>
+Usage:  .<field> add <type> <vnum> [group] [custom text]
+        .<field> change <number> <amount | group | text | vnum> <value>
         .<field> copy <from type> <from vnum> [tasks/prereqs (quests only)]
         .<field> remove <number | all>
 
@@ -7071,6 +7071,10 @@ A player only needs to meet 1 requirement from the list. However, you can
 create requirement groups where all conditions on a group must be met. If
 there is more than one group, the player only needs to meet all conditions from
 any 1 group. Group names are always a single case-sensitive letter.
+
+Custom text is optional and will replace the normal display text. If using
+custom text, you MUST provide the [group] argument first, but it can be '-' or
+"none".
 
 Available tasks:
  &cCOMPLETED-QUEST&0 - Must complete a certain quest.

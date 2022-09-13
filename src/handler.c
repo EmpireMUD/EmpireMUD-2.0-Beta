@@ -7715,6 +7715,9 @@ struct req_data *copy_requirements(struct req_data *from) {
 	LL_FOREACH(from, iter) {
 		CREATE(el, struct req_data, 1);
 		*el = *iter;
+		if (iter->custom) {
+			el->custom = str_dup(iter->custom);
+		}
 		LL_APPEND(list, el);
 	}
 	
@@ -7737,6 +7740,9 @@ bool delete_requirement_from_list(struct req_data **list, int type, any_vnum vnu
 	LL_FOREACH_SAFE(*list, iter, next_iter) {
 		if (iter->type == type && iter->vnum == vnum) {
 			any = TRUE;
+			if (iter->custom) {
+				free(iter->custom);
+			}
 			LL_DELETE(*list, iter);
 			free(iter);
 		}
@@ -7874,6 +7880,9 @@ bool find_requirement_in_list(struct req_data *list, int type, any_vnum vnum) {
 void free_requirements(struct req_data *list) {
 	struct req_data *iter, *next_iter;
 	LL_FOREACH_SAFE(list, iter, next_iter) {
+		if (iter->custom) {
+			free(iter->custom);
+		}
 		free(iter);
 	}
 }
@@ -8219,9 +8228,10 @@ bool meets_requirements(char_data *ch, struct req_data *list, struct instance_da
 *
 * @param struct req_data *req The requirement to show.
 * @param bool show_vnums If TRUE, adds [1234] at the start of the string.
+* @param bool allow_custom If TRUE, will show a custom string isntead.
 * @return char* The string display.
 */
-char *requirement_string(struct req_data *req, bool show_vnums) {
+char *requirement_string(struct req_data *req, bool show_vnums, bool allow_custom) {
 	char vnum[256], lbuf[256];
 	static char output[256];
 	vehicle_data *vproto;
@@ -8426,6 +8436,11 @@ char *requirement_string(struct req_data *req, bool show_vnums) {
 			sprintf(output, "Unknown condition");
 			break;
 		}
+	}
+	
+	// override with custom?
+	if (allow_custom && req->custom && *req->custom) {
+		snprintf(output, sizeof(output), "%s", req->custom);
 	}
 	
 	if (show_vnums && req->group) {

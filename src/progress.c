@@ -2060,7 +2060,7 @@ void parse_progress(FILE *fl, any_vnum vnum) {
 				break;
 			}
 			case 'W': {	// tasks / work
-				parse_requirement(fl, &PRG_TASKS(prg), error);
+				parse_requirement(fl, &PRG_TASKS(prg), (*(line+1) == '+' ? TRUE : FALSE), error);
 				break;
 			}
 			

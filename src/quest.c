@@ -663,7 +663,7 @@ void get_tracker_display(struct req_data *tracker, char *save_buffer) {
 				break;
 			}
 		}
-		sprintf(save_buffer + strlen(save_buffer), "  %s%s%s%s\r\n", (task->group ? "  " : ""), ((sub > 1 && !task->group) ? "or " : ""), requirement_string(task, FALSE), buf);
+		sprintf(save_buffer + strlen(save_buffer), "  %s%s%s%s\r\n", (task->group ? "  " : ""), ((sub > 1 && !task->group) ? "or " : ""), requirement_string(task, FALSE, TRUE), buf);
 	}
 }
 
@@ -4446,7 +4446,7 @@ void parse_quest(FILE *fl, any_vnum vnum) {
 				break;
 			}
 			case 'P': {	// preq-requisites
-				parse_requirement(fl, &QUEST_PREREQS(quest), error);
+				parse_requirement(fl, &QUEST_PREREQS(quest), (*(line+1) == '+' ? TRUE : FALSE), error);
 				break;
 			}
 			case 'R': {	// rewards
@@ -4458,7 +4458,7 @@ void parse_quest(FILE *fl, any_vnum vnum) {
 				break;
 			}
 			case 'W': {	// tasks / work
-				parse_requirement(fl, &QUEST_TASKS(quest), error);
+				parse_requirement(fl, &QUEST_TASKS(quest), (*(line+1) == '+' ? TRUE : FALSE), error);
 				break;
 			}
 			case 'Z': {	// ends at

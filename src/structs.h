@@ -3300,6 +3300,8 @@ struct req_data {
 	int needed;	// how many the player needs
 	int current;	// how many the player has (for places where this data is tracked
 	
+	char *custom;	// custom display text, may be NULL
+	
 	struct req_data *next;
 };
 

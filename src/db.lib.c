@@ -9100,9 +9100,10 @@ int sort_requirements_by_group(struct req_data *a, struct req_data *b) {
 *
 * @param FILE *fl The file, having just read the letter tag.
 * @param struct req_data **list The list to append to.
+* @param bool with_custom_text If TRUE, will load the next line for custom text.
 * @param char *error_str How to report if there is an error.
 */
-void parse_requirement(FILE *fl, struct req_data **list, char *error_str) {
+void parse_requirement(FILE *fl, struct req_data **list, bool with_custom_text, char *error_str) {
 	struct req_data *req;
 	int type, needed;
 	bitvector_t misc;
@@ -9133,6 +9134,10 @@ void parse_requirement(FILE *fl, struct req_data **list, char *error_str) {
 	req->group = group;
 	req->needed = needed;
 	req->current = 0;
+	
+	if (with_custom_text) {
+		req->custom = fread_string(fl, error_str);
+	}
 	
 	LL_APPEND(*list, req);
 	LL_SORT(*list, sort_requirements_by_group);
@@ -9173,11 +9178,9 @@ void write_requirements_to_file(FILE *fl, char letter, struct req_data *list) {
 	struct req_data *iter;
 	LL_FOREACH(list, iter) {
 		// NOTE: iter->current is NOT written to file (is only used for live data)
-		if (iter->group) {
-			fprintf(fl, "%c\n%d %d %llu %d %c\n", letter, iter->type, iter->vnum, iter->misc, iter->needed, iter->group);
-		}
-		else {
-			fprintf(fl, "%c\n%d %d %llu %d\n", letter, iter->type, iter->vnum, iter->misc, iter->needed);
+		fprintf(fl, "%c%s\n%d %d %llu %d %c\n", letter, (iter->custom && *iter->custom ? "+" : ""), iter->type, iter->vnum, iter->misc, iter->needed, iter->group ? iter->group : '-');
+		if (iter->custom && *iter->custom) {
+			fprintf(fl, "%s~\n", iter->custom);
 		}
 	}
 }

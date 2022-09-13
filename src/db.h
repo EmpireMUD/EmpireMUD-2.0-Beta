@@ -747,7 +747,7 @@ void remove_quest_from_table(quest_data *quest);
 void write_quest_givers_to_file(FILE *fl, char letter, struct quest_giver *list);
 
 // requirements
-void parse_requirement(FILE *fl, struct req_data **list, char *error_str);
+void parse_requirement(FILE *fl, struct req_data **list, bool with_custom_text, char *error_str);
 int sort_requirements_by_group(struct req_data *a, struct req_data *b);
 void write_requirements_to_file(FILE *fl, char letter, struct req_data *list);
 

@@ -1190,7 +1190,7 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *c
 	trig_data *trig;
 	double dbl_in;
 	long l_in[3];
-	char c_in;
+	char c_in[2];
 	
 	// allocate player if we didn't receive one
 	if (!ch) {
@@ -1525,9 +1525,9 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *c
 					}
 				}
 				else if (!strn_cmp(line, "Color: ", 7)) {
-					sscanf(line + 7, "%s %c", str_in, &c_in);
+					sscanf(line + 7, "%s %c", str_in, &c_in[0]);
 					if ((num = search_block(str_in, custom_color_types, TRUE)) != NOTHING) {
-						GET_CUSTOM_COLOR(ch, num) = c_in;
+						GET_CUSTOM_COLOR(ch, num) = c_in[0];
 					}
 				}
 				else if (!strn_cmp(line, "Currency: ", 10)) {
@@ -1996,11 +1996,16 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *c
 					}
 				}
 				else if (!strn_cmp(line, "Quest-task: ", 12)) {
-					if (last_plrq && sscanf(line + 12, "%d %d %lld %d %d %c", &i_in[0], &i_in[1], &bit_in, &i_in[2], &i_in[3], &c_in) == 6) {
-						// found group
+					if (last_plrq && sscanf(line + 12, "%d %d %lld %d %d %c %c", &i_in[0], &i_in[1], &bit_in, &i_in[2], &i_in[3], &c_in[0], &c_in[1]) == 7) {
+						// found everything
+					}
+					else if (last_plrq && sscanf(line + 12, "%d %d %lld %d %d %c", &i_in[0], &i_in[1], &bit_in, &i_in[2], &i_in[3], &c_in[0]) == 6) {
+						// found group but no custom
+						c_in[1] = 0;
 					}
 					else if (last_plrq && sscanf(line + 12, "%d %d %lld %d %d", &i_in[0], &i_in[1], &bit_in, &i_in[2], &i_in[3]) == 5) {
-						c_in = 0;	// no group given
+						c_in[0] = 0;	// no group given
+						c_in[1] = 0;	// no custom info given
 					}
 					else {
 						// bad format
@@ -2013,7 +2018,11 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *c
 					task->misc = bit_in;
 					task->needed = i_in[2];
 					task->current = i_in[3];
-					task->group = c_in;
+					task->group = isalpha(c_in[0]) ? c_in[0] : 0;
+					
+					if (c_in[1] == '+') {
+						task->custom = fread_string(fl, error);
+					}
 					
 					LL_APPEND(last_plrq->tracker, task);
 				}
@@ -2979,7 +2988,10 @@ void write_player_delayed_data_to_file(FILE *fl, char_data *ch) {
 	LL_FOREACH(GET_QUESTS(ch), plrq) {
 		fprintf(fl, "Quest: %d %d %ld %d %d\n", plrq->vnum, plrq->version, plrq->start_time, plrq->instance_id, plrq->adventure);
 		LL_FOREACH(plrq->tracker, task) {
-			fprintf(fl, "Quest-task: %d %d %lld %d %d %c\n", task->type, task->vnum, task->misc, task->needed, task->current, task->group);
+			fprintf(fl, "Quest-task: %d %d %lld %d %d %c %s\n", task->type, task->vnum, task->misc, task->needed, task->current, task->group ? task->group : '-', (task->custom && *task->custom) ? "+" : "");
+			if (task->custom && *task->custom) {
+				fprintf(fl, "%s~\n", task->custom);
+			}
 		}
 	}
 	HASH_ITER(hh, GET_COMPLETED_QUESTS(ch), plrcom, next_plrcom) {
