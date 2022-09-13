@@ -11,7 +11,7 @@ Hugo gives you some empire advice.
 ~
 14 a 0 25 0
 P
-10 1 0 14
+10 1 0 14 -
 R
 5 1 1
 W
@@ -45,7 +45,7 @@ R
 R
 6 10802 1
 W
-13 10801 0 1
+13 10801 0 1 -
 Z
 1 10801
 S
@@ -74,7 +74,7 @@ tutorial.
 A
 1 10801
 P
-10 1 0 49
+10 1 0 49 -
 R
 0 0 1
 R
@@ -377,7 +377,7 @@ R
 R
 1 -1 50
 W
-7 5108 0 1
+7 5108 0 1 -
 Z
 1 10802
 S
@@ -395,7 +395,7 @@ Royal Advisor Hugo congratulates you on your progress toward greatness.
 A
 1 10801
 P
-0 10802 0 1
+0 10802 0 1 -
 R
 2 10800 1
 R
@@ -403,7 +403,7 @@ R
 R
 0 0 3
 W
-9 1 0 51
+9 1 0 51 -
 Z
 1 10803
 S
@@ -423,7 +423,7 @@ this just isn't the right rock, so he tells you to keep it.
 ~
 15 0 0 25 0
 P
-10 6 0 14
+10 6 0 14 -
 R
 5 6 1
 W
@@ -458,7 +458,7 @@ R
 R
 6 10827 1
 W
-13 10825 0 1
+13 10825 0 1 -
 Z
 1 10826
 S
@@ -482,7 +482,7 @@ Horation looks over each of the rocks and saplings, and seems to approve.
 A
 1 10826
 P
-10 6 0 49
+10 6 0 49 -
 R
 0 0 1
 R
@@ -888,7 +888,7 @@ R
 R
 0 0 3
 W
-9 6 0 51
+9 6 0 51 -
 Z
 1 10826
 Z
@@ -924,7 +924,7 @@ R
 1 -1 100
 T 10837
 W
-2 10838 0 1
+2 10838 0 1 -
 Z
 1 10826
 Z
@@ -954,7 +954,7 @@ A
 R
 0 0 1
 W
-13 10850 0 1
+13 10850 0 1 -
 Z
 3 10850
 Z
@@ -980,7 +980,7 @@ need to learn the Ritual of Burdens.
 ~
 You have performed a ritual and satisfied the Spirit of Order!
 ~
-10 0 0 25 -1
+11 0 0 25 -1
 A
 1 10851
 P
@@ -1001,8 +1001,9 @@ R
 6 10865 10865
 W
 10 2 0 49 a
-W
+W+
 11 0 0 1 a
+Cast the ritual of burdens in the Soulstream~
 Z
 1 10851
 S
@@ -1114,7 +1115,7 @@ Heal Friend), but the Spirit of Mana can be healed with the basic Heal.
    You have restored the Spirit of Mana! You can heal yourself after combat to
 raise your Natural Magic skill further.
 ~
-17 0 0 25 -1
+18 0 0 25 -1
 A
 1 10854
 P
@@ -1135,8 +1136,9 @@ R
 6 10865 10865
 W
 10 3 0 49 a
-W
+W+
 11 0 0 1 a
+Heal the Spirit of Mana~
 Z
 1 10854
 S
@@ -1157,7 +1159,7 @@ worry, you'll get better at it as you level up.
 ~
 You have satisfied the Spirit of Darkness with your stealth.
 ~
-14 0 0 25 -1
+15 0 0 25 -1
 A
 1 10855
 P
@@ -1178,8 +1180,9 @@ R
 6 10865 10865
 W
 10 4 0 49 a
-W
+W+
 11 0 0 1 a
+Sneak into the hidden part of the Soulstream~
 Z
 1 10855
 S
@@ -1201,7 +1204,7 @@ Note: This quest will not show as 'complete' until you re-enter the Soulstream.
    You have satisfied the Spirit of Blood! Buy and use more abilities from the
 Vampire skill tree to become a sanguine master!
 ~
-17 0 0 25 -1
+18 0 0 25 -1
 A
 1 10857
 P
@@ -1223,8 +1226,9 @@ R
 T 10857
 W
 10 7 0 49 a
-W
+W+
 11 0 0 1 a
+Drink blood and return to the Soulstream~
 Z
 1 10857
 S
@@ -1291,7 +1295,7 @@ minipet collection. Then you can type 'minipet companion spirit' to summon it.
 R
 2 10859 1
 W
-20 10852 0 4
+20 10852 0 4 -
 Z
 2 10850
 Z
@@ -1323,7 +1327,7 @@ P
 R
 6 10801 1
 W
-10 1 0 49
+10 1 0 49 -
 Z
 1 10800
 S
@@ -1353,7 +1357,7 @@ P
 R
 6 10826 1
 W
-10 6 0 49
+10 6 0 49 -
 Z
 1 10825
 S
@@ -1367,19 +1371,19 @@ You have completed the Spirit of Order's task and become a sorcerer.
 A
 1 10851
 P
-0 10850 0 1
+0 10850 0 1 -
 P
-10 2 0 0
+10 2 0 0 -
 P
-6 10851 0 1
+6 10851 0 1 -
 P
-5 10851 0 1
+5 10851 0 1 -
 R
 0 0 1
 W
-12 5511 0 1
+12 5511 0 1 -
 W
-9 2 0 1
+9 2 0 1 -
 Z
 1 10851
 S
@@ -1393,19 +1397,19 @@ You have completed the quest.
 A
 1 10854
 P
-0 10850 0 1
+0 10850 0 1 -
 P
-10 3 0 0
+10 3 0 0 -
 P
-6 10854 0 1
+6 10854 0 1 -
 P
-5 10854 0 1
+5 10854 0 1 -
 R
 0 0 1
 W
-12 5142 0 1
+12 5142 0 1 -
 W
-9 3 0 1
+9 3 0 1 -
 Z
 1 10854
 S
@@ -1446,19 +1450,19 @@ die).
 A
 3 10850
 P
-0 10851 0 1
+0 10851 0 1 -
 P
-0 10852 0 1
+0 10852 0 1 -
 P
-0 10853 0 1
+0 10853 0 1 -
 P
-0 10854 0 1
+0 10854 0 1 -
 P
-0 10855 0 1
+0 10855 0 1 -
 P
-0 10857 0 1
+0 10857 0 1 -
 P
-0 10858 0 1
+0 10858 0 1 -
 R
 0 0 5
 R

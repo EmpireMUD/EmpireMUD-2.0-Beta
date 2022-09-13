@@ -26,7 +26,7 @@ no doubt? Those monsters turned him into a... into a mop?'
    The man's eyes redden and begin to well up with tears. He slides a small
 purse of money across to you, and turns away.
 ~
-8 0 125 250 -1
+9 0 125 250 -1
 A
 1 11801
 P
@@ -35,8 +35,9 @@ P
 16 11800 0 7 a
 R
 1 -1 1000
-W
-11 0 0 1
+W+
+11 0 0 1 -
+Find Dylane the Younger~
 Z
 1 11801
 S
@@ -84,7 +85,7 @@ P
 0 11801 0 1 a
 T 11830
 W
-13 11939 0 1
+13 11939 0 1 -
 Z
 1 11939
 S
@@ -103,7 +104,7 @@ Watcher Annaca on the second floor when it's done.
 out that pixy maze. Nothing to it, eh? We could use a few more like you around
 here for when things get messy.'
 ~
-4 0 125 250 -1
+5 0 125 250 -1
 A
 1 11864
 A
@@ -114,8 +115,9 @@ R
 6 11811 11811
 T 11830
 T 11831
-W
-11 0 0 1
+W+
+11 0 0 1 -
+Rescue the second floor~
 Z
 1 11891
 Z
@@ -138,7 +140,7 @@ stops and looks you up and down.
    'Seems you had the virtue to see them gone, however,' he says. 'We are in
 your debt.'
 ~
-6 0 125 250 -1
+7 0 125 250 -1
 A
 1 11891
 A
@@ -149,8 +151,9 @@ R
 6 11812 11812
 T 11830
 T 11831
-W
-11 0 0 1
+W+
+11 0 0 1 -
+Rescue the third floor~
 Z
 1 11892
 Z
@@ -171,7 +174,7 @@ Sorcerer Barrosh in his office when it's done.
 ~
 'Fine, what do you want, a cookie?' Master Barrosh says without looking at you.
 ~
-5 0 125 250 -1
+6 0 125 250 -1
 A
 1 11892
 A
@@ -180,8 +183,9 @@ R
 7 11800 50
 T 11830
 T 11831
-W
-11 0 0 1
+W+
+11 0 0 1 -
+Rescue the top floor~
 Z
 1 11967
 S
@@ -246,7 +250,7 @@ P
 R
 7 11800 10
 W
-3 11818 0 1
+3 11818 0 1 -
 Z
 1 11806
 Z
@@ -279,7 +283,7 @@ P
 R
 7 11800 10
 W
-3 11819 0 1
+3 11819 0 1 -
 Z
 1 11910
 Z
@@ -318,7 +322,7 @@ R
 7 11800 10
 T 11830
 W
-2 11976 0 1
+2 11976 0 1 -
 Z
 1 11821
 S
@@ -340,7 +344,7 @@ near the racetrack stalls.
    'Those pixies really get into your head; that maze was worse than the Forest
 dome. I had the strangest dreams in there.'
 ~
-23 ei 125 250 -1
+24 ei 125 250 -1
 A
 1 11900
 P
@@ -349,8 +353,9 @@ P
 0 11810 0 1 a
 R
 7 11800 10
-W
-11 0 0 1
+W+
+11 0 0 1 -
+Break the illusion in the maze~
 Z
 1 11918
 S
@@ -378,7 +383,7 @@ as she taps her fingernails against each other. She turns back toward you.
 And for what? The pursuit of magic. Are there no limits to what we destroy for
 power?'
 ~
-19 e 125 250 -1
+20 e 125 250 -1
 A
 1 11900
 P
@@ -387,8 +392,9 @@ P
 0 11811 0 1 a
 R
 7 11800 10
-W
-11 0 0 1
+W+
+11 0 0 1 -
+Free the otherworlder~
 Z
 1 11939
 S
@@ -417,7 +423,7 @@ chuckle burbles out of the old lich as he sets his repository back down.
    'The only ones who could read were the spellcasters and, to my unending
 chagrin, they were smart enough not to open the thing. Alas.'
 ~
-19 ei 125 250 -1
+20 ei 125 250 -1
 A
 1 11900
 P
@@ -426,8 +432,9 @@ P
 0 11811 0 1 a
 R
 7 11800 10
-W
-11 0 0 1
+W+
+11 0 0 1 -
+Open the repository~
 Z
 1 11836
 Z
@@ -516,7 +523,7 @@ P
 R
 7 11800 10
 W
-3 11863 0 1
+3 11863 0 1 -
 Z
 1 11969
 S
@@ -549,7 +556,7 @@ P
 R
 7 11800 10
 W
-3 11869 0 1
+3 11869 0 1 -
 Z
 1 11870
 Z
@@ -597,7 +604,7 @@ P
 R
 7 11800 10
 W
-3 11872 0 1
+3 11872 0 1 -
 Z
 1 11905
 S
@@ -653,7 +660,7 @@ R
 7 11800 25
 T 11830
 W
-2 11961 0 1
+2 11961 0 1 -
 Z
 1 11864
 Z
@@ -693,11 +700,11 @@ and ruin came for us. I shall not forget you, even when you have forgotten me.'
 A
 1 11884
 P
-0 11875 0 1
+0 11875 0 1 -
 R
 7 11800 10
 W
-3 11888 0 1
+3 11888 0 1 -
 Z
 3 11888
 S
@@ -720,11 +727,11 @@ nobody makes jars big enough.'
 A
 3 11890
 P
-16 11800 0 6
+16 11800 0 6 -
 R
 7 11800 10
 W
-13 11890 0 1
+13 11890 0 1 -
 Z
 1 11918
 S

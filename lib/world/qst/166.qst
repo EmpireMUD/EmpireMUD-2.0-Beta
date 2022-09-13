@@ -7,17 +7,18 @@ Note: This daily quest does not reward you with a stocking.
 ~
 You thank Father Christmas and he rewards your politeness.
 ~
-23 e 0 0 -1
+24 e 0 0 -1
 A
 3 10705
 P
-36 10700 0 1
+36 10700 0 1 -
 R
 9 10700 10
 W
 36 10700 0 1 a
-W
+W+
 11 0 0 1 a
+Open a gift~
 W
 6 16601 0 1 a
 Z
@@ -213,12 +214,12 @@ Instructions:
    It looks just like you, and it should last a while. Just don't let it go
 inside.
 ~
-14 de 0 0 -1
+15 de 0 0 -1
 A
 1 10701
 D 16606
 P
-36 10700 0 1
+36 10700 0 1 -
 R
 9 10700 10
 R
@@ -230,8 +231,9 @@ W
 2 16600 0 1 a
 W
 2 16605 0 3 a
-W
+W+
 11 0 0 1 a
+Make a snowman~
 Z
 4 16600
 S
@@ -252,7 +254,7 @@ Instructions:
    Your citizens are excited to see the new tree and hope it'll get some
 ornaments soon!
 ~
-21 de 0 0 -1
+22 de 0 0 -1
 A
 1 10701
 P
@@ -268,8 +270,9 @@ W
 2 16602 0 1 a
 W
 2 16606 0 1 a
-W
+W+
 11 0 0 1 a
+Plant a Christmas tree at your city center~
 Z
 4 16606
 S
@@ -288,7 +291,7 @@ A
 A
 1 18211
 P
-36 10700 0 1
+36 10700 0 1 -
 R
 2 16678 1
 W
@@ -309,12 +312,12 @@ Type: make snow angel
 ~
 That will sure make things more wintry around here!
 ~
-11 e 0 0 -1
+12 e 0 0 -1
 A
 2 16607
 D 16606
 P
-36 10700 0 1
+36 10700 0 1 -
 R
 9 10700 10
 R
@@ -322,8 +325,9 @@ R
 T 16602
 W
 36 10700 0 1 a
-W
+W+
 11 0 0 1 a
+Make 5 snow angels~
 Z
 4 16610
 S
@@ -336,7 +340,7 @@ citizen's bedrooms, and leave it for them to find.
    Upon finding the room empty, you put the gift on the bed and grin to
 yourself at the joy you've brought another citizen of your empire.
 ~
-11 e 0 0 -1
+12 e 0 0 -1
 A
 6 16650
 A
@@ -355,8 +359,9 @@ W
 36 10700 0 1 a
 W
 9 4 0 1 a
-W
+W+
 11 0 0 1 a
+Place a gift in a citizen's bedroom~
 Z
 4 16611
 S
@@ -411,7 +416,7 @@ Type 'use sack <normal | hard | group | boss>' to summon the demon.
    You've stopped the grinchy demon, for now. Even though he got away, the
 citizens' gifts are safe for another night.
 ~
-16 e 0 0 -1
+17 e 0 0 -1
 P
 36 10700 0 1 a
 R
@@ -421,8 +426,9 @@ R
 T 16602
 W
 36 10700 0 1 a
-W
+W+
 11 0 0 1 a
+Summon and defeat the demon~
 Z
 4 16603
 S
@@ -437,7 +443,7 @@ Type: 'dress terrier'
    There, now even the animals of your empire are in the holiday mood, whether
 they want to be or not.
 ~
-11 e 0 0 -1
+13 e 0 0 -1
 A
 0 5111
 A
@@ -452,8 +458,9 @@ R
 T 16602
 W
 36 10700 0 1 a
-W
+W+
 11 0 0 1 a
+Dress up 2 terriers~
 Z
 4 16618
 S
@@ -500,7 +507,7 @@ Type 'craft winter ornament set' to make them, then 'hang ornament' in 4 rooms.
    You've got this decorating thing down. Tree? Check! Ornaments? Check! What
 else could your citizens ask for?
 ~
-12 e 0 0 -1
+13 e 0 0 -1
 A
 2 16607
 D 16620
@@ -531,7 +538,7 @@ type: 'place pixy' to place a frozen pixy on the tree.
 ~
 You and your citizens agree that makes the tree look much better.
 ~
-13 de 0 0 -1
+14 de 0 0 -1
 A
 2 16607
 D 16626
@@ -550,8 +557,9 @@ R
 T 16602
 W
 36 10700 0 1 a
-W
+W+
 11 0 0 1 a
+Place a frozen pixy on your Christmas tree~
 W
 2 16626 0 1 a
 Z
@@ -571,7 +579,7 @@ Type: 'throw snowball abominable'
    That'll teach him! Or not, given he's been turned into a snowman. At least
 your buddy is safe again.
 ~
-18 de 0 0 -1
+19 de 0 0 -1
 A
 1 16600
 D 16626
@@ -590,8 +598,9 @@ R
 T 16602
 W
 2 16628 0 1 a
-W
+W+
 11 0 0 1 a
+Throw an enchanted snowball at the abominable snowman~
 W
 36 10700 0 1 a
 Z
@@ -611,7 +620,7 @@ citizens while also thwarting those city sorcerers.
 ~
 Your actions today have warmed the hearts -- and bodies -- of the citizens.
 ~
-6 e 0 0 -1
+7 e 0 0 -1
 A
 2 16607
 D 16643
@@ -626,8 +635,9 @@ R
 T 16602
 W
 36 10700 0 1 a
-W
+W+
 11 0 0 1 a
+Burn a straw goat~
 Z
 4 16644
 S
@@ -645,7 +655,7 @@ many of the empire's poorest citizens.
 ~
 You've managed to burn down a straw goat! It looks like you won the competition.
 ~
-6 e 0 0 -1
+7 e 0 0 -1
 A
 2 16607
 D 16643
@@ -660,8 +670,9 @@ R
 T 16602
 W
 36 10700 0 1 a
-W
+W+
 11 0 0 1 a
+Light a giant straw goat on fire~
 Z
 4 16644
 S
@@ -679,7 +690,7 @@ Steps:
 ~
 Your giant straw goat was a huge hit this year. That was the biggest crowd yet!
 ~
-4 e 0 0 -1
+5 e 0 0 -1
 A
 2 16607
 D 16620
@@ -694,8 +705,9 @@ R
 T 16602
 W
 36 10700 0 1 a
-W
+W+
 11 0 0 1 a
+Protect the straw goat~
 Z
 6 16660
 S
@@ -708,7 +720,7 @@ tambourine (or any instrument) and play music in front of each citizen.
 ~
 You've lifted everyone's holiday spirit!
 ~
-18 e 0 0 -1
+19 e 0 0 -1
 A
 1 10701
 D 16676
@@ -721,8 +733,9 @@ R
 T 16602
 W
 36 10700 0 1 a
-W
+W+
 11 0 0 1 a
+Make 10 citizens dance~
 Z
 4 16677
 S
@@ -736,7 +749,7 @@ buildings.
 ~
 Through the gift of charity, you've lifted everyone's holiday spirit!
 ~
-18 e 0 0 -1
+19 e 0 0 -1
 A
 1 10701
 D 16676
@@ -749,8 +762,9 @@ R
 T 16602
 W
 36 10700 0 1 a
-W
+W+
 11 0 0 1 a
+Play a concert at 4 locations~
 Z
 4 16677
 S
@@ -770,7 +784,7 @@ Type 'use list <normal | hard | group | boss>' in the ice cave.
 are safe for another night but beware, because the demon could try again each
 and every day.
 ~
-16 e 0 0 -1
+17 e 0 0 -1
 A
 1 10703
 P
@@ -782,8 +796,9 @@ R
 T 16602
 W
 36 10700 0 1 a
-W
+W+
 11 0 0 1 a
+Summon and fight the demon~
 Z
 4 16603
 S
@@ -807,18 +822,19 @@ other side. Since it's the holidays, a lot of pets need good homes, so the
 reward for your hard work is an adoption certificate to get a free puppy or
 kitten.
 ~
-7 0 0 0 -1
+8 0 0 0 -1
 A
 2 16659
 A
 2 16678
 P
-36 10700 0 1
+36 10700 0 1 -
 R
 2 16640 1
 T 16602
-W
-11 0 0 1
+W+
+11 0 0 1 -
+Feed the vortex enough treats~
 Z
 2 16690
 S

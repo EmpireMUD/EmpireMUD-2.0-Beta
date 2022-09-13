@@ -154,13 +154,14 @@ To participate in the event:
 ~
 The event has ended.
 ~
-5 0 0 0 0
+6 0 0 0 0
 A
 1 231
 P
-36 11520 0 1
+36 11520 0 1 -
 T 11520
-W
-11 0 0 1
+W+
+11 0 0 1 -
+Catch pixies~
 S
 $

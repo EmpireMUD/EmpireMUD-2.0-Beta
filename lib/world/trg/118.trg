@@ -1805,38 +1805,69 @@ done
 detach 11835 %self.id%
 ~
 #11836
-Release Scaldorran~
+Skycleave: Object interactions~
 1 c 4
-open release~
+open release look~
+return 0
+if %arg.car% == in
+  set arg %arg.cdr%
+  set in_arg 1
+else
+  set in_arg 0
+end
 if %actor.obj_target(%arg.car%)% != %self%
-  return 0
   halt
 end
-return 1
-%load% mob 11836
-set mob %self.room.people%
-if %mob.vnum% != 11836
-  %send% %actor% Something went wrong.
-  halt
-end
-%send% %actor% You open the repository and release the Lich Scaldorran!
-%echoaround% %actor% ~%actor% opens the repository and releases the Lich Scaldorran!
-* Mark for claw game & directory
-set spirit %instance.mob(11900)%
-set claw3 1
-remote claw3 %spirit.id%
-set lich_released %actor.id%
-remote lich_released %spirit.id%
-* check triggers
-set ch %self.room.people%
-while %ch%
-  if %ch.on_quest(11836)%
-    %quest% %ch% trigger 11836
+if %self.vnum% == 11836
+  * Scaldorran's repository: open/release/look in
+  set spirit %instance.mob(11900)%
+  if (open /= %cmd% || release /= %cmd%)
+    return 1
+    if %spirit.lich_released%
+      %send% %actor% The repository is already open!
+      halt
+    end
+    * load lich
+    %load% mob 11836
+    set mob %self.room.people%
+    if %mob.vnum% != 11836
+      %send% %actor% Something went wrong.
+      halt
+    end
+    %send% %actor% You open the repository and release the Lich Scaldorran!
+    %echoaround% %actor% ~%actor% opens the repository and releases the Lich Scaldorran!
+    * Mark for claw game & directory
+    set spirit %instance.mob(11900)%
+    set claw3 1
+    remote claw3 %spirit.id%
+    set lich_released %actor.id%
+    remote lich_released %spirit.id%
+    * check triggers
+    set ch %self.room.people%
+    while %ch%
+      if %ch.on_quest(11836)%
+        %quest% %ch% trigger 11836
+      end
+      set ch %ch.next_in_room%
+    done
+    halt
+  elseif look /= %cmd% && %in_arg%
+    * only look IN
+    return 1
+    if %spirit.lich_released%
+      %send% %actor% There's a message in the bottom of the repository that just says 'BOO!'
+    else
+      %send% %actor% The repository is closed.
+    end
+   end
+elseif %self.vnum% == 11927
+  * time-traveler's corpse
+  if look /= %cmd% && %actor.on_quest(11920)%
+    %quest% %actor% trigger 11920
   end
-  set ch %ch.next_in_room%
-done
-* and done
-%purge% %self%
+  * shhh
+  return 0
+end
 ~
 #11837
 Mercenary Leader no-fight~

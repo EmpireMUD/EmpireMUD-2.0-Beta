@@ -38,7 +38,7 @@ your citizens and deck them out in festive costumes.
    Your citizens are costumed and now the holiday festivities can begin! You
 have earned a goody bag!
 ~
-18 de 0 0 -1
+19 de 0 0 -1
 A
 2 18806
 A
@@ -54,8 +54,9 @@ R
 T 18820
 W
 2 18819 0 1 a
-W
+W+
 11 0 0 1 a
+Costume 6 citizens~
 S
 #18821
 Halloween: Citizens Will Be Toad~
@@ -68,7 +69,7 @@ normal in no time.
 think of the holiday joy you've brought to your city. You have earned a goody
 bag!
 ~
-15 e 0 0 -1
+16 e 0 0 -1
 A
 2 18810
 A
@@ -82,8 +83,9 @@ R
 R
 2 18829 1
 T 18820
-W
-11 0 0 1
+W+
+11 0 0 1 -
+Turn 4 citizens into toads~
 S
 #18823
 Halloween: A City Aghast~
@@ -97,7 +99,7 @@ world of the living.
    Now everyone seems to be getting into the 'spirit' of the holiday! You have
 earned a goody bag!
 ~
-15 e 0 0 -1
+16 e 0 0 -1
 A
 2 18804
 A
@@ -112,8 +114,9 @@ R
 R
 2 18829 1
 T 18820
-W
-11 0 0 1
+W+
+11 0 0 1 -
+Perform the ritual of spirits~
 S
 #18824
 Halloween: A Traditional Bog Roll~
@@ -124,7 +127,7 @@ your city. Type 'use roll' to spread the Halloween cheer to three houses.
    Now that you've redecorated the city, everyone is getting into the holiday
 spirit! You have earned a goody bag!
 ~
-14 e 0 0 -1
+15 e 0 0 -1
 A
 2 18805
 A
@@ -139,8 +142,9 @@ R
 R
 2 18829 1
 T 18820
-W
-11 0 0 1
+W+
+11 0 0 1 -
+Bog roll 3 houses~
 S
 #18827
 Halloween: Get the Blood Pumping~
@@ -155,7 +159,7 @@ blood pumping.
    The citizens' hearts are definitely pumping now. You have earned a goody
 bag!
 ~
-14 e 0 0 -1
+15 e 0 0 -1
 A
 2 18808
 A
@@ -169,8 +173,9 @@ R
 R
 2 18829 1
 T 18820
-W
-11 0 0 1
+W+
+11 0 0 1 -
+Scare 5 citizens as Dracula~
 S
 #18828
 Halloween: House of 100 Corpses~
@@ -189,7 +194,7 @@ R
 2 18829 1
 T 18820
 W
-7 18828 0 1
+7 18828 0 1 -
 Z
 0 18828
 S
@@ -200,81 +205,6 @@ kingdoms and monuments in the next world. You must appease the spirits of the
 dead by making offerings at 5 different tombs. Bring 10x (common metal ingots)
 to each tomb and type 'offer'. Look at the offering instructions for more
 details.
-~
-You have appeased the spirits of the dead for today.
-~
-15 e 0 0 -1
-A
-2 18807
-A
-2 18803
-D 18829
-P
-36 18800 0 1 a
-R
-9 18800 10
-R
-2 18829 1
-T 18820
-W
-11 0 0 1
-S
-#18830
-Halloween: Appease the Spirits~
-   An emperor's work does not end at death. Instead, they go on to build great
-kingdoms and monuments in the next world. You must appease the spirits of the
-dead by making offerings at 5 different tombs. Bring 10x (blocks) to each tomb
-and type 'offer'. Look at the offering instructions for more details.
-~
-You have appeased the spirits of the dead for today.
-~
-15 e 0 0 -1
-A
-2 18807
-A
-2 18803
-D 18829
-P
-36 18800 0 1 a
-R
-9 18800 10
-R
-2 18829 1
-T 18820
-W
-11 0 0 1
-S
-#18831
-Halloween: Appease the Spirits~
-   An emperor's work does not end at death. Instead, they go on to build great
-kingdoms and monuments in the next world. You must appease the spirits of the
-dead by making offerings at 5 different tombs. Bring 10x (rocks) to each tomb
-and type 'offer'. Look at the offering instructions for more details.
-~
-You have appeased the spirits of the dead for today.
-~
-15 e 0 0 -1
-A
-2 18807
-A
-2 18803
-D 18829
-P
-36 18800 0 1 a
-R
-9 18800 10
-R
-2 18829 1
-T 18820
-W
-11 0 0 1
-S
-#18832
-Halloween: Appease the Spirits~
-   An emperor's work does not end at death. Instead, they go on to build great
-kingdoms and monuments in the next world. You must appease the spirits of the
-dead by making offerings at 5 different tombs. Bring 10x (plant fibers) to each
-tomb and type 'offer'. Look at the offering instructions for more details.
 ~
 You have appeased the spirits of the dead for today.
 ~
@@ -291,8 +221,87 @@ R
 R
 2 18829 1
 T 18820
-W
-11 0 0 1
+W+
+11 0 0 1 -
+Make offerings at 5 tombs~
+S
+#18830
+Halloween: Appease the Spirits~
+   An emperor's work does not end at death. Instead, they go on to build great
+kingdoms and monuments in the next world. You must appease the spirits of the
+dead by making offerings at 5 different tombs. Bring 10x (blocks) to each tomb
+and type 'offer'. Look at the offering instructions for more details.
+~
+You have appeased the spirits of the dead for today.
+~
+16 e 0 0 -1
+A
+2 18807
+A
+2 18803
+D 18829
+P
+36 18800 0 1 a
+R
+9 18800 10
+R
+2 18829 1
+T 18820
+W+
+11 0 0 1 -
+Appease spirits at 5 tombs~
+S
+#18831
+Halloween: Appease the Spirits~
+   An emperor's work does not end at death. Instead, they go on to build great
+kingdoms and monuments in the next world. You must appease the spirits of the
+dead by making offerings at 5 different tombs. Bring 10x (rocks) to each tomb
+and type 'offer'. Look at the offering instructions for more details.
+~
+You have appeased the spirits of the dead for today.
+~
+16 e 0 0 -1
+A
+2 18807
+A
+2 18803
+D 18829
+P
+36 18800 0 1 a
+R
+9 18800 10
+R
+2 18829 1
+T 18820
+W+
+11 0 0 1 -
+Appease spirits at 5 tombs~
+S
+#18832
+Halloween: Appease the Spirits~
+   An emperor's work does not end at death. Instead, they go on to build great
+kingdoms and monuments in the next world. You must appease the spirits of the
+dead by making offerings at 5 different tombs. Bring 10x (plant fibers) to each
+tomb and type 'offer'. Look at the offering instructions for more details.
+~
+You have appeased the spirits of the dead for today.
+~
+17 e 0 0 -1
+A
+2 18807
+A
+2 18803
+D 18829
+P
+36 18800 0 1 a
+R
+9 18800 10
+R
+2 18829 1
+T 18820
+W+
+11 0 0 1 -
+Appease spirits at 5 tombs~
 S
 #18854
 Halloween: Pick or Treat~
@@ -319,7 +328,7 @@ R
 2 18829 1
 T 18820
 W
-2 18855 0 5
+2 18855 0 5 -
 S
 #18856
 Halloween: Magic Mirror~
@@ -332,21 +341,22 @@ tedium of seeing the same old unchanging spirits.
    The spirits are highly amused at the various looks you have captured in the
 reflections and thank you for the entertainment.
 ~
-11 e 0 0 -1
+12 e 0 0 -1
 A
 2 18806
 A
 2 18807
 D 18856
 P
-36 18800 0 1
+36 18800 0 1 -
 R
 9 18800 10
 R
 2 18829 1
 T 18820
-W
-11 0 0 1
+W+
+11 0 0 1 -
+Look in the mirror wearing 5 different clothes~
 S
 #18857
 Halloween: Bobbing for Apples~
@@ -358,21 +368,22 @@ complete this quest.
 ~
 Good job finding the bigger apple. Hopefully you had some fun doing it.
 ~
-10 e 0 0 -1
+11 e 0 0 -1
 A
 2 18806
 A
 2 18807
 D 18856
 P
-36 18800 0 1
+36 18800 0 1 -
 R
 9 18800 10
 R
 2 18829 1
 T 18820
-W
-11 0 0 1
+W+
+11 0 0 1 -
+Win at bobbing for apples~
 S
 #18861
 Halloween: Delegation of Demons~
@@ -386,7 +397,7 @@ your city to open three portals to the Nether and lure some demons through.
 ~
 Congratulations! You've brought new demons into this world.
 ~
-8 e 0 0 -1
+9 e 0 0 -1
 A
 2 18804
 A
@@ -401,8 +412,9 @@ R
 R
 9 18800 10
 T 18820
-W
-11 0 0 1
+W+
+11 0 0 1 -
+Perform the ritual of demons to open 3 portals~
 S
 #18869
 Halloween: Songs for the Deaths Yet to Come~
@@ -416,21 +428,22 @@ target can't be a member.
    Seems that music really can soothe the savage soul... Or at least, failing
 that, it can get them dancing!
 ~
-12 e 0 0 -1
+13 e 0 0 -1
 A
 2 18809
 A
 2 18808
 D 18870
 P
-36 18800 0 1
+36 18800 0 1 -
 R
 9 18800 10
 R
 2 18829 1
 T 18820
-W
-11 0 0 1
+W+
+11 0 0 1 -
+Soothe a Hard, Group, or Boss mob~
 S
 #18870
 Halloween: Songs for the Dead~
@@ -443,21 +456,22 @@ share in the merriment. You need to do this in one of your cities.
 back for a brief time. Surely their loved ones will be greatful for the chance
 to make their peace now.
 ~
-11 e 0 0 -1
+12 e 0 0 -1
 A
 2 18809
 A
 2 18808
 D 18870
 P
-36 18800 0 1
+36 18800 0 1 -
 R
 9 18800 10
 R
 2 18829 1
 T 18820
-W
-11 0 0 1
+W+
+11 0 0 1 -
+Play music to bring back 5 citizens in your empire~
 S
 #18873
 Halloween: Songs for the Dying~
@@ -475,21 +489,22 @@ then play some music for the poor soul within.
 the ghost. The healers usher you from the medical tent so they can prepare the
 body for burial.
 ~
-20 e 0 0 -1
+21 e 0 0 -1
 A
 2 18809
 A
 2 18808
 D 18870
 P
-36 18800 0 1
+36 18800 0 1 -
 R
 9 18800 10
 R
 2 18829 1
 T 18820
-W
-11 0 0 1
+W+
+11 0 0 1 -
+Build a medical tent and soothe someone inside~
 S
 #18880
 Halloween: Ancestor's Offering~
@@ -506,19 +521,20 @@ tomb and type 'place portrait'. That should be enough to summon her.
 ~
 Your grandmother is here once again, if only for a while.
 ~
-10 e 0 0 -1
+11 e 0 0 -1
 A
 2 18804
 A
 2 18810
 P
-36 18800 0 1
+36 18800 0 1 -
 R
 9 18800 10
 R
 2 18829 1
 T 18820
-W
-11 0 0 1
+W+
+11 0 0 1 -
+Place a portrait of your grandmother on her tomb~
 S
 $
