@@ -475,7 +475,7 @@ Type: dress <horse | camel>
    There! Now even the animals of your empire are in the holiday mood, whether
 they want to be or not.
 ~
-11 e 0 0 -1
+12 e 0 0 -1
 A
 0 5111
 A
@@ -490,8 +490,9 @@ R
 T 16602
 W
 36 10700 0 1 a
-W
+W+
 11 0 0 1 a
+Dress up 5 horses or camels~
 Z
 4 16618
 S
@@ -507,7 +508,7 @@ Type 'craft winter ornament set' to make them, then 'hang ornament' in 4 rooms.
    You've got this decorating thing down. Tree? Check! Ornaments? Check! What
 else could your citizens ask for?
 ~
-13 e 0 0 -1
+14 e 0 0 -1
 A
 2 16607
 D 16620
@@ -522,8 +523,9 @@ R
 T 16602
 W
 36 10700 0 1 a
-W
+W+
 11 0 0 1 a
+Hang ornaments in 4 rooms~
 Z
 4 16620
 S
