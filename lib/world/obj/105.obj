@@ -789,11 +789,13 @@ a handful of red and green seeds~
 A handful of red and green seeds are scattered on the ground.~
 These small, thin seeds are colored red and green.
 ~
-6 b a 0 7
+6 b a 0 8
 1 10551 0
 7 576
 C
 1 1
+R
+4 5210 0
 S
 #10563
 seed pure ice~
@@ -801,11 +803,13 @@ a seed of pure ice~
 A seed made of ice is lying here.~
 This seed looks like a tiny crystal, but for its delicate, icy touch.
 ~
-3 b a 0 4
+3 b a 0 5
 0 10560 0
 9 0
 C
 1 1
+R
+4 5210 0
 S
 #10564
 charm polar bear~
