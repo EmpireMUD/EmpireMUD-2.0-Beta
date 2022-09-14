@@ -588,6 +588,7 @@ int GET_MAX_BLOOD(char_data *ch);	// this one is different than the other max po
 #define EMPIRE_NEXT_TIMEOUT(emp)  ((emp)->next_timeout)
 #define EMPIRE_PLAYTIME_TRACKER(emp)  ((emp)->playtime_tracker)
 #define EMPIRE_PRODUCTION_LIMITS(emp)  ((emp)->production_limits)
+#define EMPIRE_PRODUCTION_LOGS(emp)  ((emp)->production_logs)
 #define EMPIRE_PRODUCTION_TOTALS(emp)  ((emp)->production_totals)
 #define EMPIRE_PROGRESS_POINTS(emp, type)  ((emp)->progress_points[(type)])
 #define EMPIRE_PROGRESS_POOL(emp)  EMPIRE_ATTRIBUTE((emp), EATT_PROGRESS_POOL)
@@ -2466,6 +2467,7 @@ bool is_zenith_day(room_data *room);
 void reset_weather();
 
 // workforce.c
+void add_workforce_production_log(empire_data *emp, int type, any_vnum vnum, int amount);
 void deactivate_workforce(empire_data *emp, int island_id, int type);
 void deactivate_workforce_island(empire_data *emp, int island_id);
 void deactivate_workforce_room(empire_data *emp, room_data *room);

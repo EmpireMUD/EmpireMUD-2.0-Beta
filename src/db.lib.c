@@ -2212,13 +2212,28 @@ void load_empire_storage_one(FILE *fl, empire_data *emp) {
 			exit(1);
 		}
 		switch (*line) {
-			case 'L': {	// production limit
-				if (sscanf(line, "L %d %d", &t[0], &t[1]) != 2) {
-					log("SYSERR: Workforce limit line L for empire %d was incomplete", EMPIRE_VNUM(emp));
-					exit(1);
-				}
+			case 'L': {	// production limit/logs
+				// uses a subtype
+				switch (*(line+1)) {
+					case ' ': {	// limit
+						if (sscanf(line, "L %d %d", &t[0], &t[1]) != 2) {
+							log("SYSERR: Workforce limit line L for empire %d was incomplete", EMPIRE_VNUM(emp));
+							exit(1);
+						}
 				
-				set_workforce_production_limit(emp, t[0], t[1]);
+						set_workforce_production_limit(emp, t[0], t[1]);
+						break;
+					}
+					case '2': {	// logs
+						if (sscanf(line, "L2 %d %d %d", &t[0], &t[1], &t[2]) != 3) {
+							log("SYSERR: Workforce log line L2 for empire %d was incomplete", EMPIRE_VNUM(emp));
+							exit(1);
+						}
+						
+						add_workforce_production_log(emp, t[0], t[1], t[2]);
+						break;
+					}
+				}
 				break;
 			}
 			case 'O': {	// storage
@@ -3119,6 +3134,7 @@ void write_empire_logs_to_file(FILE *fl, empire_data *emp) {
 */
 void write_empire_storage_to_file(FILE *fl, empire_data *emp) {	
 	struct workforce_production_limit *wpl, *next_wpl;
+	struct workforce_production_log *wplog;
 	struct empire_storage_data *store, *next_store;
 	struct empire_production_total *egt, *next_egt;
 	struct empire_island *isle, *next_isle;
@@ -3133,6 +3149,11 @@ void write_empire_storage_to_file(FILE *fl, empire_data *emp) {
 	// L: production limits
 	HASH_ITER(hh, EMPIRE_PRODUCTION_LIMITS(emp), wpl, next_wpl) {
 		fprintf(fl, "L %d %d\n", wpl->vnum, wpl->limit);
+	}
+	
+	// L2: production logs
+	LL_FOREACH(EMPIRE_PRODUCTION_LOGS(emp), wplog) {
+		fprintf(fl, "L2 %d %d %d\n", wplog->type, wplog->vnum, wplog->amount);
 	}
 	
 	// islands

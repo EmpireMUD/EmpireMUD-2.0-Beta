@@ -1360,6 +1360,19 @@ typedef struct vehicle_data vehicle_data;
 #define WF_PROB_ADVENTURE_PRESENT  7	// blocked by adventure instance
 
 
+// WPLOG_x: Types for the workforce production log
+#define WPLOG_COINS  0
+#define WPLOG_OBJECT  1
+#define WPLOG_BUILDING_DONE  2
+#define WPLOG_BUILDING_DISMANTLED  3
+#define WPLOG_VEHICLE_DONE  4
+#define WPLOG_VEHICLE_DISMANTLED  5
+#define WPLOG_STUMPS_BURNED  6
+#define WPLOG_FIRE_EXTINGUISHED  7
+#define WPLOG_PROSPECTED  8
+#define WPLOG_MAINTENANCE  9
+
+
 // for tracking playtime
 #define PLAYTIME_WEEKS_TO_TRACK  12	// playtime determined by past 12 weeks
 
@@ -5091,6 +5104,16 @@ struct workforce_production_limit {
 };
 
 
+// to support daily workforce elogs
+struct workforce_production_log {
+	int type;	// WPLOG_ type
+	any_vnum vnum;	// object vnum etc
+	int amount;	// quantity
+	
+	struct workforce_production_log *next;	// LL
+};
+
+
 // for offenses committed against an empire
 struct offense_data {
 	int type;	// OFFENSE_ constant
@@ -5183,6 +5206,7 @@ struct empire_data {
 	struct empire_homeless_citizen *homeless;	// list of homeless npcs
 	struct script_data *script;	// for storing variables
 	struct workforce_production_limit *production_limits;	// limits on what workforce can make
+	struct workforce_production_log *production_logs;	// LL of things produced
 	struct empire_playtime_tracker *playtime_tracker;	// tracks real gameplay
 	
 	// unsaved data

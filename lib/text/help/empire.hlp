@@ -417,7 +417,7 @@ Log types are:
  Shipping - Logs related to shipping.
  Territory - Logs such as cede, and city commands.
  Trade - Logs related to empire trades.
- Workforce - Shows logs of food consumption (shown only on request).
+ Workforce - Shows logs of production and consumption (shown only on request).
  Progress - Recently completed goals and purchased rewards.
  
 See also: PRIVILEGE
