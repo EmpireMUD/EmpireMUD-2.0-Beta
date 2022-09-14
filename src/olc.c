@@ -4669,6 +4669,58 @@ int find_olc_type(char *name) {
 
 
 /**
+* @param struct interaction_item *a First interaction.
+* @param struct interaction_item *b Second interaction.
+* @return bool TRUE if both interactions are identical, FALSE if different.
+*/
+bool interactions_are_identical(struct interaction_item *a, struct interaction_item *b) {
+	struct interact_restriction *ir, *find;
+	bool found;
+	
+	// check basic data first
+	if (a->type != b->type || a->vnum != b->vnum || a->percent != b->percent || a->quantity != b->quantity || a->exclusion_code != b->exclusion_code) {
+		return FALSE;
+	}
+	
+	// compare interactions: a to b
+	LL_FOREACH(a->restrictions, ir) {
+		// each restriction in a MUST be present in B
+		found = FALSE;
+		LL_FOREACH(b->restrictions, find) {
+			if (ir->type == find->type && ir->vnum == find->vnum) {
+				found = TRUE;
+				break;
+			}
+		}
+		if (!found) {
+			// not the same
+			return FALSE;
+		}
+	}
+	
+	// compare interactions: b to a
+	LL_FOREACH(b->restrictions, ir) {
+		// each restriction in a MUST be present in B
+		found = FALSE;
+		LL_FOREACH(a->restrictions, find) {
+			if (ir->type == find->type && ir->vnum == find->vnum) {
+				found = TRUE;
+				break;
+			}
+		}
+		if (!found) {
+			// not the same
+			return FALSE;
+		}
+	}
+	
+	// interaction comparison basically ignores duplicates even if there's a different number of dupes
+	// if we got here, these items are the same
+	return TRUE;
+}
+
+
+/**
 * @param char_data *ch The person trying to olc-edit.
 * @param int type Any OLC_ mode.
 * @param any_vnum vnum The vnum they are trying to edit.
@@ -8028,7 +8080,7 @@ void smart_copy_interactions(struct interaction_item **addto, struct interaction
 		// see if an identical interaction is in the addto list
 		found = FALSE;
 		for (find = *addto; find && !found; find = find->next) {
-			if (find->type == interact->type && find->vnum == interact->vnum && find->percent == interact->percent && find->quantity == interact->quantity && find->exclusion_code == interact->exclusion_code) {
+			if (interactions_are_identical(interact, find)) {
 				found = TRUE;
 			}
 		}

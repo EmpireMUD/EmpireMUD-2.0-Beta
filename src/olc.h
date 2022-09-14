@@ -127,6 +127,7 @@ void get_interaction_display(struct interaction_item *list, char *save_buffer);
 void get_resource_display(struct resource_data *list, char *save_buffer);
 void get_script_display(struct trig_proto_list *list, char *save_buffer);
 int find_olc_type(char *name);
+bool interactions_are_identical(struct interaction_item *a, struct interaction_item *b);
 bool player_can_olc_edit(char_data *ch, int type, any_vnum vnum);
 
 // olc auditor functions
