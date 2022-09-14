@@ -3,7 +3,7 @@ gardener hooded magiterranean~
 the Magiterranean gardener~
 A hooded gardener is poking at the ground.
 ~
-5 80 dv cno 3
+5 80 dvI cno 3
 1 2 0 22
 D
    This old druid prods the ground with his staff, tosses in a glowing seed,
@@ -308,7 +308,7 @@ Aquilo polar baron~
 Aquilo, the Polar Baron~
 Aquilo, the Polar Baron, hovers above the snow on a frosty updraft.
 ~
-0 0 bdvxyzABE cm 3
+0 0 bdvxyzABEI cm 3
 1 0 2 20
 D
    Clad in a cosmic robe lined with stark white fur, Baron Aquilo cuts a dash
@@ -349,7 +349,7 @@ S
 Cryomancer #n~
 Cryomancer #n, apprentice to the Polar Baron, glares at you from atop a frozen column.
 ~
-0 0 bdvxyE c 3
+0 0 bdvxyEI c 3
 0 3 0 20
 D
    The cryomancer seems to be channeling the cold from elsewhere on the
@@ -388,7 +388,7 @@ mage rime #n apprentice~
 Rime Mage #n~
 Rime Mage #n glowers at you from behind a cold violet fire.
 ~
-0 0 bdvxyE c 3
+0 0 bdvxyEI c 3
 0 3 0 20
 D
    As you approach the mage, you notice the frost on your breath swirl around

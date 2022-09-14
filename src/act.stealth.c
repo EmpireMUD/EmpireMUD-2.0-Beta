@@ -228,6 +228,9 @@ void perform_escape(char_data *ch) {
 	if (!to_room) {
 		msg_to_char(ch, "But you can't seem to escape from here...\r\n");
 	}
+	else if (!pre_greet_mtrigger(ch, to_room, NO_DIR)) {
+		return;
+	}
 	else {
 		char_to_room(ch, to_room);
 		qt_visit_room(ch, IN_ROOM(ch));
@@ -993,6 +996,9 @@ ACMD(do_infiltrate) {
 		if (!has_player_tech(ch, PTECH_INFILTRATE_UPGRADE) && !player_tech_skill_check(ch, PTECH_INFILTRATE, (emp && EMPIRE_HAS_TECH(emp, TECH_LOCKS)) ? DIFF_RARELY : DIFF_HARD)) {
 			msg_to_char(ch, "You fail.\r\n");
 		}
+		else if (!pre_greet_mtrigger(ch, to_room, dir)) {
+			// no message
+		}
 		else {
 			char_from_room(ch);
 			char_to_room(ch, to_room);
@@ -1153,7 +1159,7 @@ ACMD(do_pickpocket) {
 		check_scaling(vict, ch);
 
 		// some random coins (negative coins are not given)
-		if (MOB_FLAGGED(vict, MOB_HUMAN) && (!GET_LOYALTY(vict) || GET_LOYALTY(vict) == GET_LOYALTY(ch) || char_has_relationship(ch, vict, DIPL_WAR | DIPL_THIEVERY))) {
+		if (MOB_FLAGGED(vict, MOB_COINS) && (!GET_LOYALTY(vict) || GET_LOYALTY(vict) == GET_LOYALTY(ch) || char_has_relationship(ch, vict, DIPL_WAR | DIPL_THIEVERY))) {
 			coins = mob_coins(vict);
 		}
 		else {
@@ -1527,6 +1533,9 @@ ACMD(do_shadowstep) {
 		
 		if (infil && !has_player_tech(ch, PTECH_INFILTRATE_UPGRADE) && !player_tech_skill_check(ch, PTECH_INFILTRATE, DIFF_HARD)) {
 			msg_to_char(ch, "You fail to shadowstep to that location.\r\n");
+		}
+		else if (!pre_greet_mtrigger(ch, IN_ROOM(vict), NO_DIR)) {
+			// no message
 		}
 		else {
 			act("You shadowstep to $N!", FALSE, ch, NULL, vict, TO_CHAR);

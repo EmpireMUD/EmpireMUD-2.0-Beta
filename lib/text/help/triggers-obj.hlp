@@ -186,6 +186,9 @@ When using field  - The variable returns:
 &ccomponent_type&0 - The name of what type of component it is, if it is one.
 &ccontents&0 - Gives the first object in a container.
 &ccount(str)&0 - Number of matching items (name/vnum) inside it.
+&ccustom(TYPE,NUM)&0 - Get an obj's custom string. NUM is optional. If there is
+   more than one entry for a type, it returns one at random unless you request
+   a specific number like %obj.custom(script1,0)%.
 &cempire&0 - The last empire that controlled the object, if any.
 &cempty&0 - Causes an object to be emptied out (nop %obj.empty%).
 &cflag(FLAG)&0 - Toggles the flag then returns whether or not the flag is on.

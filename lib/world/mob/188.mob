@@ -78,7 +78,7 @@ guard cityguard risen~
 a risen city guard~
 A risen city guard hunts for intruders.
 ~
-75 125 dhqtuvA cG 3
+75 125 dhqtuvAI cG 3
 0 0 13 10
 T 251
 T 18811
@@ -111,7 +111,7 @@ S
 guard #n~
 #n the guard is standing here.
 ~
-5 125 bdouv 0 3
+5 125 bdouvI 0 3
 1 0 0 1
 D
 The guard doesn't look happy at what you've been doing.
@@ -153,7 +153,7 @@ ghost knocking~
 a knocking ghost~
 A ghost lingers in the air.
 ~
-25 75 dov deG 0
+25 75 dovI deG 0
 0 0 27 28
 D
 It's knocking on the walls, the doors, and anything else it comes across.
@@ -173,7 +173,7 @@ ghost rattling~
 a rattling ghost~
 A ghost lingers in the air.
 ~
-25 75 dov deG 0
+25 75 dovI deG 0
 0 0 27 28
 D
 The ghost is wrapped in chains, and rattles them loudly as it floats along.
@@ -193,7 +193,7 @@ hand skittering disembodied~
 a skittering hand~
 A disembodied hand skitters across the floor.
 ~
-25 75 dov 0 1
+25 75 dovI 0 1
 0 0 8 15
 D
 You're not sure where this Thing came from.
@@ -282,7 +282,7 @@ goblin mischievous~
 a mischievous goblin~
 A mischievous goblin is lurking around.
 ~
-25 75 dovz 0 2
+25 75 dovzI 0 2
 0 0 9 9
 D
 This little goblin runs away when it realizes you're looking at it.
@@ -293,7 +293,7 @@ vampire skulking~
 a skulking vampire~
 A vampire is skulking in the shadows.
 ~
-25 75 dovwz 0 3
+25 75 dovwzI 0 3
 0 0 7 9
 D
 It's a vampire. Try not to get too close.
@@ -316,7 +316,7 @@ half-spider spider man half-man strange creature~
 a half-spider~
 A strange creature, half-spider, half-man, stands here.
 ~
-25 75 dovz v 3
+25 75 dovzI v 3
 0 0 9 9
 D
    You're not sure what happened to this poor spider, but someone has turned
@@ -411,7 +411,7 @@ victim headless centaur's centaurs~
 the headless centaur's victim~
 The latest victim of the headless centaur lays on the ground dying.
 ~
-1 1 bdv nD 3
+1 1 bdvI nD 3
 1 0 0 15
 D
    This adventurer has been badly wounded by his fight with the headless
@@ -461,7 +461,7 @@ S
 #n Butcher~
 #n is sharpening a cleaver.
 ~
-20 50 bdqv 0 3
+20 50 bdqvI 0 3
 0 1 0 2
 D
 The butcher's face is disturbed by a vicious grin.
@@ -508,7 +508,7 @@ grandmother~
 Grandmother~
 Grandmother is floating here.
 ~
-0 1 dqvDF nG 3
+0 1 dqvDFI nG 3
 2 0 27 15
 D
    This old spirit has returned to visit the land of the living once more. Her

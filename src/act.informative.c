@@ -276,6 +276,19 @@ char *instance_level_string(struct instance_data *inst) {
 }
 
 
+// for nearby sorting
+struct nearby_item_t {
+	char *text;
+	int distance;
+	struct nearby_item_t *prev, *next;
+};
+
+// simple sorter for nearby
+int nrb_sort_distance(struct nearby_item_t *a, struct nearby_item_t *b) {
+	return a->distance - b->distance;
+}
+
+
 /**
 * Picks a random custom long description from a player's equipment.
 *
@@ -3246,6 +3259,7 @@ ACMD(do_nearby) {
 	bool found = FALSE;
 	room_data *loc;
 	any_vnum vnum;
+	struct nearby_item_t *nrb_list = NULL, *nrb_item, *next_item;
 	
 	// for global nearby
 	struct glb_nrb {
@@ -3303,10 +3317,10 @@ ACMD(do_nearby) {
 				dir = get_direction_for_char(ch, get_direction_to(IN_ROOM(ch), loc));
 				snprintf(line, sizeof(line), " %2d %s: %s%s\r\n", dist, NEARBY_DIR, get_room_name(loc, FALSE), coord_display_room(ch, loc, FALSE));
 				
-				if (size + strlen(line) < sizeof(buf)) {
-					strcat(buf, line);
-					size += strlen(line);
-				}
+				CREATE(nrb_item, struct nearby_item_t, 1);
+				nrb_item->text = str_dup(line);
+				nrb_item->distance = dist;
+				DL_APPEND(nrb_list, nrb_item);
 			}
 		}
 	}
@@ -3322,12 +3336,12 @@ ACMD(do_nearby) {
 					found = TRUE;
 				
 					dir = get_direction_for_char(ch, get_direction_to(IN_ROOM(ch), loc));
-					snprintf(line, sizeof(line), " %d %s: the %s of %s%s / %s%s&0\r\n", dist, NEARBY_DIR, city_type[city->type].name, city->name, coord_display_room(ch, loc, FALSE), EMPIRE_BANNER(emp), EMPIRE_NAME(emp));
+					snprintf(line, sizeof(line), " %2d %s: the %s of %s%s / %s%s&0\r\n", dist, NEARBY_DIR, city_type[city->type].name, city->name, coord_display_room(ch, loc, FALSE), EMPIRE_BANNER(emp), EMPIRE_NAME(emp));
 					
-					if (size + strlen(line) < sizeof(buf)) {
-						strcat(buf, line);
-						size += strlen(line);
-					}
+					CREATE(nrb_item, struct nearby_item_t, 1);
+					nrb_item->text = str_dup(line);
+					nrb_item->distance = dist;
+					DL_APPEND(nrb_list, nrb_item);
 				}
 			}
 		}
@@ -3394,7 +3408,7 @@ ACMD(do_nearby) {
 			// show instance
 			found = TRUE;
 			dir = get_direction_for_char(ch, get_direction_to(IN_ROOM(ch), loc));
-			snprintf(line, sizeof(line), " %d %s: %s%s / %s%s\r\n", dist, NEARBY_DIR, GET_ADV_NAME(INST_ADVENTURE(inst)), coord_display_room(ch, loc, FALSE), instance_level_string(inst), part);
+			snprintf(line, sizeof(line), " %2d %s: %s%s / %s%s\r\n", dist, NEARBY_DIR, GET_ADV_NAME(INST_ADVENTURE(inst)), coord_display_room(ch, loc, FALSE), instance_level_string(inst), part);
 			
 			if (glb) {	// just add it to the global list
 				if (glb->str) {
@@ -3402,10 +3416,11 @@ ACMD(do_nearby) {
 				}
 				glb->str = str_dup(line);
 			}
-			else if (size + strlen(line) < sizeof(buf)) {
-				// not global: append to buf
-				strcat(buf, line);
-				size += strlen(line);
+			else {
+				CREATE(nrb_item, struct nearby_item_t, 1);
+				nrb_item->text = str_dup(line);
+				nrb_item->distance = dist;
+				DL_APPEND(nrb_list, nrb_item);
 			}
 		}
 	}
@@ -3414,13 +3429,24 @@ ACMD(do_nearby) {
 	HASH_ITER(hh, hash, glb, next_glb) {
 		HASH_DEL(hash, glb);
 		if (glb->str) {
-			if (size + strlen(glb->str) < sizeof(buf)) {
-				strcat(buf, glb->str);
-				size += strlen(glb->str);
-			}
-			free(glb->str);
+			CREATE(nrb_item, struct nearby_item_t, 1);
+			nrb_item->text = glb->str;	// move instead of freeing
+			nrb_item->distance = glb->dist;
+			DL_APPEND(nrb_list, nrb_item);
 		}
 		free(glb);
+	}
+	
+	DL_SORT(nrb_list, nrb_sort_distance);
+	DL_FOREACH_SAFE(nrb_list, nrb_item, next_item) {
+		if (nrb_item->text) {
+			if (size + strlen(nrb_item->text) < sizeof(buf)) {
+				strcat(buf, nrb_item->text);
+				size += strlen(nrb_item->text);
+			}
+			free(nrb_item->text);
+		}
+		free(nrb_item);
 	}
 	
 	if (!found) {

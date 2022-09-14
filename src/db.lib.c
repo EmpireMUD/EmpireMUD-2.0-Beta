@@ -2212,13 +2212,28 @@ void load_empire_storage_one(FILE *fl, empire_data *emp) {
 			exit(1);
 		}
 		switch (*line) {
-			case 'L': {	// production limit
-				if (sscanf(line, "L %d %d", &t[0], &t[1]) != 2) {
-					log("SYSERR: Workforce limit line L for empire %d was incomplete", EMPIRE_VNUM(emp));
-					exit(1);
-				}
+			case 'L': {	// production limit/logs
+				// uses a subtype
+				switch (*(line+1)) {
+					case ' ': {	// limit
+						if (sscanf(line, "L %d %d", &t[0], &t[1]) != 2) {
+							log("SYSERR: Workforce limit line L for empire %d was incomplete", EMPIRE_VNUM(emp));
+							exit(1);
+						}
 				
-				set_workforce_production_limit(emp, t[0], t[1]);
+						set_workforce_production_limit(emp, t[0], t[1]);
+						break;
+					}
+					case '2': {	// logs
+						if (sscanf(line, "L2 %d %d %d", &t[0], &t[1], &t[2]) != 3) {
+							log("SYSERR: Workforce log line L2 for empire %d was incomplete", EMPIRE_VNUM(emp));
+							exit(1);
+						}
+						
+						add_workforce_production_log(emp, t[0], t[1], t[2]);
+						break;
+					}
+				}
 				break;
 			}
 			case 'O': {	// storage
@@ -3119,6 +3134,7 @@ void write_empire_logs_to_file(FILE *fl, empire_data *emp) {
 */
 void write_empire_storage_to_file(FILE *fl, empire_data *emp) {	
 	struct workforce_production_limit *wpl, *next_wpl;
+	struct workforce_production_log *wplog;
 	struct empire_storage_data *store, *next_store;
 	struct empire_production_total *egt, *next_egt;
 	struct empire_island *isle, *next_isle;
@@ -3133,6 +3149,11 @@ void write_empire_storage_to_file(FILE *fl, empire_data *emp) {
 	// L: production limits
 	HASH_ITER(hh, EMPIRE_PRODUCTION_LIMITS(emp), wpl, next_wpl) {
 		fprintf(fl, "L %d %d\n", wpl->vnum, wpl->limit);
+	}
+	
+	// L2: production logs
+	LL_FOREACH(EMPIRE_PRODUCTION_LOGS(emp), wplog) {
+		fprintf(fl, "L2 %d %d %d\n", wplog->type, wplog->vnum, wplog->amount);
 	}
 	
 	// islands
@@ -9100,9 +9121,10 @@ int sort_requirements_by_group(struct req_data *a, struct req_data *b) {
 *
 * @param FILE *fl The file, having just read the letter tag.
 * @param struct req_data **list The list to append to.
+* @param bool with_custom_text If TRUE, will load the next line for custom text.
 * @param char *error_str How to report if there is an error.
 */
-void parse_requirement(FILE *fl, struct req_data **list, char *error_str) {
+void parse_requirement(FILE *fl, struct req_data **list, bool with_custom_text, char *error_str) {
 	struct req_data *req;
 	int type, needed;
 	bitvector_t misc;
@@ -9133,6 +9155,10 @@ void parse_requirement(FILE *fl, struct req_data **list, char *error_str) {
 	req->group = group;
 	req->needed = needed;
 	req->current = 0;
+	
+	if (with_custom_text) {
+		req->custom = fread_string(fl, error_str);
+	}
 	
 	LL_APPEND(*list, req);
 	LL_SORT(*list, sort_requirements_by_group);
@@ -9173,11 +9199,9 @@ void write_requirements_to_file(FILE *fl, char letter, struct req_data *list) {
 	struct req_data *iter;
 	LL_FOREACH(list, iter) {
 		// NOTE: iter->current is NOT written to file (is only used for live data)
-		if (iter->group) {
-			fprintf(fl, "%c\n%d %d %llu %d %c\n", letter, iter->type, iter->vnum, iter->misc, iter->needed, iter->group);
-		}
-		else {
-			fprintf(fl, "%c\n%d %d %llu %d\n", letter, iter->type, iter->vnum, iter->misc, iter->needed);
+		fprintf(fl, "%c%s\n%d %d %llu %d %c\n", letter, (iter->custom && *iter->custom ? "+" : ""), iter->type, iter->vnum, iter->misc, iter->needed, iter->group ? iter->group : '-');
+		if (iter->custom && *iter->custom) {
+			fprintf(fl, "%s~\n", iter->custom);
 		}
 	}
 }

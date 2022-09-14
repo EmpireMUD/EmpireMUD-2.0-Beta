@@ -5,12 +5,12 @@ Anat, virgin war-goddess of old, stands fierce and bloody (difficulty).
 ~
 225 325 aduyB ciE 5
 2 0 35 1
-I 4 12004 16.67 1 a  # LOOT: the golden chain of the old god Anat
-I 4 12006 16.67 1 a  # LOOT: a vial of the blood of the old god Anat
-I 4 12008 16.67 1 a  # LOOT: an idol of the old god Anat
-I 4 12010 16.67 1 a  # LOOT: the hawk pendant of the old god Anat
-I 4 12012 16.66 1 a  # LOOT: the stone of wrath of the old god Anat
-I 4 12014 16.66 1 a  # LOOT: a vial of the winnowed grain of the old god Anat
+I 4 12004 16.67 1 a  # LOOT: golden chain of the old god Anat
+I 4 12006 16.67 1 a  # LOOT: vial of the blood of the old god Anat
+I 4 12008 16.67 1 a  # LOOT: idol of the old god Anat
+I 4 12010 16.67 1 a  # LOOT: hawk pendant of the old god Anat
+I 4 12012 16.66 1 a  # LOOT: stone of wrath of the old god Anat
+I 4 12014 16.66 1 a  # LOOT: vial of the winnowed grain of the old god Anat
 M
 1
 Our time will come again!~
@@ -121,12 +121,12 @@ The storm god Ba'al Hadad towers over you, lightning in his eyes (difficulty).
 ~
 225 325 aduyB ciE 5
 1 0 26 1
-I 4 12034 16.67 1 a  # LOOT: the bronze bull ring of Ba'al Hadad
-I 4 12036 16.67 1 a  # LOOT: the clouded ring of Ba'al Hadad
-I 4 12038 16.67 1 a  # LOOT: the lightning ring of Ba'al Hadad
-I 4 12040 16.67 1 a  # LOOT: the thunderbolt ring of Ba'al Hadad
-I 4 12042 16.66 1 a  # LOOT: the hurricane ring of Ba'al Hadad
-I 4 12044 16.66 1 a  # LOOT: the stormwashed ring of Ba'al Hadad
+I 4 12034 16.67 1 a  # LOOT: bronze bull ring of Ba'al Hadad
+I 4 12036 16.67 1 a  # LOOT: clouded ring of Ba'al Hadad
+I 4 12038 16.67 1 a  # LOOT: lightning ring of Ba'al Hadad
+I 4 12040 16.67 1 a  # LOOT: thunderbolt ring of Ba'al Hadad
+I 4 12042 16.66 1 a  # LOOT: hurricane ring of Ba'al Hadad
+I 4 12044 16.66 1 a  # LOOT: stormwashed ring of Ba'al Hadad
 M
 1
 Our time will come again!~
@@ -204,7 +204,7 @@ worshipper~
 a worshipper of the storm god~
 A worshipper of the storm god bows low, begging for rain.
 ~
-40 60 dov 0 3
+40 60 dovI 0 3
 1 0 0 21
 M
 1

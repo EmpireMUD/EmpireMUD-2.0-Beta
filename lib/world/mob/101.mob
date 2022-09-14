@@ -3,7 +3,7 @@ hag swamp old~
 the swamp hag~
 An old hag is rocking slowly in her chair.
 ~
-0 0 bdgvxA c 3
+0 0 bdgvxAI c 3
 2 0 0 15
 I 4 10100 5.00 1 X  # LOOT: hag's pestle
 I 4 10101 5.00 1 X  # LOOT: hag's stench
@@ -39,7 +39,7 @@ berk~
 Berk~
 Berk is crouched by the fire, whittling some wood.
 ~
-100 200 abdvzB 0 3
+100 200 abdvzBI 0 3
 1 0 0 4
 D
    He looks like he's been living out here for a while. You can't see what he's
@@ -56,7 +56,7 @@ jorr~
 Jorr~
 Jorr is cooking a pot of beans over the fire.
 ~
-100 200 abdvxzB 0 3
+100 200 abdvxzBI 0 3
 2 0 0 12
 D
 She's stirring the beans with a dagger. It's tough living out here.
@@ -71,7 +71,7 @@ tranc~
 Tranc~
 Tranc is strapping on his armor.
 ~
-100 200 abdvyB 0 3
+100 200 abdvyBI 0 3
 1 0 0 5
 D
    From the tusk marks on his armor, you can surmise he's getting ready to go
@@ -100,7 +100,7 @@ sly thief~
 Sly~
 A thief is hunched in the corner.
 ~
-0 0 abdv D 3
+0 0 abdvI D 3
 1 0 0 4
 D
    He looks like he's doing pretty well for himself, between his charming
@@ -128,7 +128,7 @@ chiv thief~
 Chiv~
 A thief is warming her hands by the fire.
 ~
-0 0 abdv D 3
+0 0 abdvI D 3
 2 0 0 4
 D
    She has a roguish look about her. And presumably, she's good at it, as she
@@ -156,7 +156,7 @@ thief~
 a thief~
 A thief is leaning against the wall.
 ~
-0 0 abdv D 3
+0 0 abdvI D 3
 2 0 0 4
 D
 Looks like she's just a hired dagger.
@@ -197,7 +197,7 @@ sly thief~
 Sly~
 A thief is hunched in the corner.
 ~
-0 0 abdv D 3
+0 0 abdvI D 3
 1 0 0 4
 D
 You barely noticed him there. That must be why they call him Sly.

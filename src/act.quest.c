@@ -736,6 +736,7 @@ QCMD(qcmd_info) {
 	struct player_quest *pq;
 	int complete, total;
 	quest_data *qst;
+	struct string_hash *str_iter, *next_str, *str_hash = NULL;
 	
 	if (!*argument) {
 		msg_to_char(ch, "Get info on which quest? You can use 'quest list' to list quests you're on, or\r\n'quest start' to see ones available here.\r\n");
@@ -769,13 +770,20 @@ QCMD(qcmd_info) {
 			show_quest_tracker(ch, pq);
 		}
 		
-		// show quest giver
-		*buf = '\0';
+		// show quest giver: use a string hash to remove duplicates
 		LL_FOREACH(QUEST_ENDS_AT(qst), giver) {
 			if (giver->type != QG_TRIGGER) {
-				sprintf(buf + strlen(buf), "%s%s", (*buf ? ", " : ""), quest_giver_string(giver, FALSE));
+				add_string_hash(&str_hash, quest_giver_string(giver, FALSE), 1);
 			}
 		}
+		
+		// build string
+		*buf = '\0';
+		HASH_ITER(hh, str_hash, str_iter, next_str) {
+			sprintf(buf + strlen(buf), "%s%s", (*buf ? ", " : ""), str_iter->str);
+		}
+		
+		// show string?
 		if (*buf) {
 			if (strstr(buf, "#e") || strstr(buf, "#n") || strstr(buf, "#a")) {
 				// #n
@@ -792,7 +800,7 @@ QCMD(qcmd_info) {
 				free(buf2);
 			}
 			
-			msg_to_char(ch, "Turn in at: %s.\r\n", buf);
+			msg_to_char(ch, "Turn in at: %s\r\n", buf);
 		}
 		
 		if (QUEST_FLAGGED(qst, QST_GROUP_COMPLETION)) {

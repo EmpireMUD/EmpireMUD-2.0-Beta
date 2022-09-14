@@ -356,6 +356,7 @@ bool move_vehicle(char_data *ch, vehicle_data *veh, int dir, int subcmd) {
 		}
 		
 		entry_memory_mtrigger(VEH_SITTING_ON(veh));
+		pre_greet_mtrigger(VEH_SITTING_ON(veh), to_room, dir);	// cannot pre-greet for this
 		greet_mtrigger(VEH_SITTING_ON(veh), dir);
 		greet_memory_mtrigger(VEH_SITTING_ON(veh));
 		greet_vtrigger(VEH_SITTING_ON(veh), NO_DIR);
@@ -521,6 +522,7 @@ void perform_load_mob(char_data *ch, char_data *mob, vehicle_data *cont, room_da
 	act(buf, FALSE, ch, cont, mob, TO_NOTVICT | ACT_VEHICLE_OBJ);
 	
 	char_to_room(mob, to_room);
+	pre_greet_mtrigger(mob, IN_ROOM(mob), NO_DIR);	// cannot pre-greet for this
 	if (mob->desc) {
 		look_at_room(mob);
 	}
@@ -574,6 +576,7 @@ void perform_unload_mob(char_data *ch, char_data *mob, vehicle_data *cont) {
 	act("$n unloads $N from $v.", FALSE, ch, cont, mob, TO_NOTVICT | ACT_VEHICLE_OBJ);
 	
 	char_to_room(mob, IN_ROOM(cont));
+	pre_greet_mtrigger(mob, IN_ROOM(mob), NO_DIR);	// cannot pre-greet for this
 	if (mob->desc) {
 		look_at_room(mob);
 	}

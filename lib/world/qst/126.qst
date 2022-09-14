@@ -20,7 +20,7 @@ R
 R
 0 0 1
 W
-2 12601 0 1
+2 12601 0 1 -
 Z
 1 12600
 S
@@ -46,7 +46,7 @@ R
 R
 0 0 1
 W
-2 12602 0 1
+2 12602 0 1 -
 Z
 1 12600
 S
@@ -72,7 +72,7 @@ R
 R
 0 0 1
 W
-2 12603 0 1
+2 12603 0 1 -
 Z
 1 12600
 S
@@ -98,7 +98,7 @@ R
 R
 0 0 1
 W
-2 12604 0 1
+2 12604 0 1 -
 Z
 1 12600
 S
@@ -118,7 +118,7 @@ Archdruid.
 get into this kind of trouble again... You receive some magical food, in
 addition to the wooden nickels you already earned.
 ~
-9 bc 1 75 -1
+10 bc 1 75 -1
 A
 1 12676
 P
@@ -133,8 +133,9 @@ R
 0 0 1
 T 12685
 T 12681
-W
-11 0 0 1
+W+
+11 0 0 1 -
+Tranquilize the druid leaders~
 Z
 1 12676
 S

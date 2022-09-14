@@ -276,17 +276,22 @@ returning 0 from the script.
 
 Note: Mobs can only Greet people they can see; use Greet All to also trigger on
    people the mob can't see. Vehicle triggers do not make this distinction.
+
 Note: Greet triggers attached to charmed mobs will not fire unless the trigger
    also has the Charmed type.
+
 Note: Players entering magically (or via something other than a normal room
    exit) may not be prevented from entering. You can usually check this by
    seeing if the %direction% variable is 'none'.
+
+Note: Greet and Greet-All will only catch a person AFTER they enter the room.
+   If you need to run the trigger before they see the room, use Pre-Greet-All.
 
 Variables:
   &c%actor%&0 - The character entering the room.
   &c%direction%&0 - The direction the character came from, or 'none'.
   
-See also: MTRIG CHARMED
+See also: MTRIG CHARMED, MTRIG PRE-GREET-ALL
 #d
 "KILL TRIGGER" "MTRIG KILL" "OTRIG KILL" "VTRIG KILL" TRIGEDIT-MOB-KILL TRIGEDIT-OBJ-KILL TRIGEDIT-VEH-KILL
 
@@ -400,6 +405,31 @@ Supported types:
   Random
 
 See also: RANDOM TRIGGER
+#d
+"PRE-GREET-ALL TRIGGER" "PRE-GREET TRIGGER" "PREGREET TRIGGER" "MTRIG PRE-GREET-ALL" TRIGEDIT-MOB-PRE-GREET-ALL "PRE GREET ALL TRIGGER" "MTRIG PRE GREET ALL" TRIGEDIT-MOB-PREGREET-ALL
+
+Pre-Greet-All (trigger)
+
+Argument type:  percent chance to execute
+Return value:  return 0 to attempt to block movement/entry
+
+When a character attempts to enter a room, all Pre-Greet-All triggers on mobs
+in that room fire first. Some types of entry, like normal movement, can be
+prevented by returning 0 from the script. In this case, the character never
+moves at all, and does not see the new room.
+
+Note: Greet triggers attached to charmed mobs will not fire unless the trigger
+   also has the Charmed type.
+
+Note: Players entering magically (or via something other than a normal room
+   exit) may not be prevented from entering. You can usually check this by
+   seeing if the %direction% variable is 'none'.
+
+Variables:
+  &c%actor%&0 - The character entering the room.
+  &c%direction%&0 - The direction the character came from, or 'none'.
+  
+See also: MTRIG CHARMED, MTRIG GREET
 #d
 "RANDOM TRIGGER" "MTRIG RANDOM" "OTRIG RANDOM" "RTRIG RANDOM" "VTRIG RANDOM" TRIGEDIT-MOB-RANDOM TRIGEDIT-OBJ-RANDOM TRIGEDIT-ROOM-RANDOM TRIGEDIT-VEH-RANDOM RANDOM-TIMING TIMING
 
@@ -606,9 +636,13 @@ When using field - The variable returns
 &ccontains()&0 - Subfield used for comparison.
 &cindex_of(char)&0 - Returns the first position of a given character in the
    string, or -1 if it's not found.
+&cempty&0 - Return true if the variable is an empty string or only contains '0'.
 &cmudcommand&0 - Returns the mud command the string is shorthand for. Used to make 
    sure the command you react to is the one you want: For %text%="o"
    %text.mudcommand% will yield "open".
+&cprocess&0 - Processes variable substitutions like %char%, for example when
+   using %mob.custom(script1)% to get text to echo. DO NOT use process on text
+   that comes from player input as this could be manipulated.
    
 See also: MUDCOMMAND
 #d

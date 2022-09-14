@@ -69,7 +69,7 @@ You've found your way to the Guild of Adventurers!
 A
 1 220
 P
-5 18200 0 1
+5 18200 0 1 -
 R
 0 0 5
 R
@@ -96,7 +96,7 @@ A
 R
 6 18222 1
 W
-7 18221 0 1
+7 18221 0 1 -
 Z
 0 18221
 S
@@ -115,12 +115,12 @@ there's more work to do before it can hatch.
 A
 5 18221
 P
-0 18221 0 1
+0 18221 0 1 -
 R
 6 18223 1
 T 18222
 W
-2 11016 0 4
+2 11016 0 4 -
 Z
 0 18221
 S
@@ -141,7 +141,7 @@ it to hatch...
 A
 5 18222
 P
-0 18222 0 1
+0 18222 0 1 -
 T 18223
 W
 1 6001 0 12 a
@@ -173,14 +173,14 @@ A
 A
 1 18209
 P
-16 18200 0 6
+16 18200 0 6 -
 R
 7 18200 10
 R
 8 18200 1
 T 18257
 W
-2 18257 0 1
+2 18257 0 1 -
 Z
 1 18217
 Z
@@ -199,19 +199,20 @@ when you've accomplished this. (Type 'speak' when you find the druid.)
 propaganda for further study. You can now perform daily quests in the Monsoon
 Rift for the Guild of Adventurers.
 ~
-10 d 0 0 -1
+11 d 0 0 -1
 A
 1 18217
 A
 1 18209
 P
-16 18200 0 6
+16 18200 0 6 -
 R
 7 18200 10
 R
 8 18200 1
-W
-11 0 0 1
+W+
+11 0 0 1 -
+Close the rift~
 W
 2 18258 0 1 a
 Z
@@ -237,14 +238,14 @@ A
 A
 1 18211
 P
-16 18200 0 6
+16 18200 0 6 -
 R
 7 18200 10
 R
 8 18200 1
 T 18261
 W
-2 18261 0 1
+2 18261 0 1 -
 Z
 1 18219
 Z
@@ -269,7 +270,7 @@ A
 A
 1 18210
 P
-16 18200 0 6
+16 18200 0 6 -
 R
 7 18200 10
 R
@@ -299,13 +300,13 @@ A
 A
 1 18208
 P
-16 18200 0 6
+16 18200 0 6 -
 R
 7 18200 10
 R
 8 18200 1
 W
-13 10110 0 1
+13 10110 0 1 -
 Z
 1 18208
 Z
@@ -329,13 +330,13 @@ A
 A
 1 18208
 P
-16 18200 0 6
+16 18200 0 6 -
 R
 7 18200 10
 R
 8 18200 1
 W
-2 10015 0 1
+2 10015 0 1 -
 Z
 1 18218
 Z
@@ -365,7 +366,7 @@ R
 R
 1 -1 50
 W
-2 12654 0 1
+2 12654 0 1 -
 Z
 1 18217
 Z
@@ -394,13 +395,13 @@ R
 R
 1 -1 50
 W
-3 12658 0 1
+3 12658 0 1 -
 W
-3 12659 0 1
+3 12659 0 1 -
 W
-3 12660 0 1
+3 12660 0 1 -
 W
-3 12661 0 1
+3 12661 0 1 -
 Z
 1 18211
 Z
@@ -449,7 +450,7 @@ of what the Guild is paid for this service.
 ~
 The Guild thanks you for closing the rift and helping to protect the locals.
 ~
-5 e 0 0 -1
+6 e 0 0 -1
 A
 1 18217
 A
@@ -463,8 +464,9 @@ R
 7 18200 10
 R
 1 -1 50
-W
-11 0 0 1
+W+
+11 0 0 1 -
+Close a rift~
 Z
 1 18217
 Z
@@ -495,7 +497,7 @@ R
 R
 1 -1 50
 W
-2 10553 0 4
+2 10553 0 4 -
 Z
 1 18208
 Z
@@ -511,7 +513,7 @@ return the siphoned frost power to the guild.
 ~
 You hand over the siphon and the frosty power it contains.
 ~
-13 e 0 0 -1
+14 e 0 0 -1
 A
 1 18210
 A
@@ -526,8 +528,9 @@ R
 R
 1 -1 50
 T 18261
-W
-11 0 0 1
+W+
+11 0 0 1 -
+Use the siphon on the Cryomancer and Rime Mage~
 Z
 1 18210
 Z
@@ -558,9 +561,9 @@ R
 R
 1 -1 50
 W
-3 10110 0 1
+3 10110 0 1 -
 W
-3 10111 0 1
+3 10111 0 1 -
 W
 3 10114 0 1 a
 W
@@ -597,7 +600,7 @@ R
 1 -1 50
 T 18261
 W
-2 18210 0 1
+2 18210 0 1 -
 Z
 3 10110
 S
@@ -625,9 +628,9 @@ R
 R
 1 -1 50
 W
-3 10011 0 10
+3 10011 0 10 -
 W
-3 10012 0 10
+3 10012 0 10 -
 W
 3 10011 0 5 a
 W
@@ -703,7 +706,7 @@ R
 R
 1 -1 50
 W
-1 6510 0 5
+1 6510 0 5 -
 Z
 1 10454
 S
@@ -733,7 +736,7 @@ R
 R
 1 -1 50
 W
-2 1300 0 5
+2 1300 0 5 -
 Z
 1 10452
 S
@@ -759,7 +762,7 @@ P
 R
 6 18278 1
 W
-13 18207 0 1
+13 18207 0 1 -
 Z
 1 18211
 S
@@ -784,7 +787,7 @@ P
 R
 6 18279 1
 W
-12 18219 0 1
+12 18219 0 1 -
 Z
 1 18219
 S
@@ -833,7 +836,7 @@ If you have trouble getting there, try bringing a tracker.
 ~
 Archsorcerer Malfernes agrees to support you, in exchange for some help.
 ~
-7 0 0 0 -1
+8 0 0 0 -1
 A
 1 18217
 P
@@ -847,8 +850,9 @@ R
 T 18277
 W
 13 10255 0 1 a
-W
+W+
 11 0 0 1 a
+Signal and speak to Malfernes~
 Z
 1 18280
 S
@@ -879,7 +883,7 @@ R
 6 18283 1
 T 18277
 W
-2 18283 0 1
+2 18283 0 1 -
 Z
 1 18280
 S
@@ -897,7 +901,7 @@ and 'use staff' again to release the image in the tower.
    Malfernes cackles with glee when you tell him about your escapades at the
 Tower Skycleave.
 ~
-7 0 0 0 -1
+8 0 0 0 -1
 A
 1 18280
 P
@@ -909,8 +913,9 @@ R
 R
 6 18283 1
 T 18277
-W
-11 0 0 1
+W+
+11 0 0 1 -
+Use a staff to imagine a dragon~
 Z
 1 18280
 S
@@ -932,7 +937,7 @@ R
 7 18200 10
 T 18278
 W
-12 18217 0 1
+12 18217 0 1 -
 Z
 1 18217
 S
@@ -947,7 +952,7 @@ Germione a visit. Perhaps her support will be enough to secure your guildhall.
    The hedge witch, Germione, agrees to support you in exchange for some
 'errands'.
 ~
-9 0 0 0 -1
+10 0 0 0 -1
 A
 1 18218
 P
@@ -960,8 +965,9 @@ R
 6 18286 1
 W
 13 19002 0 1 a
-W
+W+
 11 0 0 1 a
+Speak to Germione~
 Z
 1 19000
 S
@@ -979,7 +985,7 @@ Germione squeals with joy to see you've brought back 10 rats.
 A
 1 19000
 P
-0 18284 0 1
+0 18284 0 1 -
 R
 7 18200 10
 R
@@ -988,7 +994,7 @@ R
 6 18287 1
 T 18277
 W
-2 18287 0 10
+2 18287 0 10 -
 Z
 1 19000
 S
@@ -1012,7 +1018,7 @@ beloved Measley's death.
 A
 1 19000
 P
-0 18284 0 1
+0 18284 0 1 -
 R
 7 18200 10
 R
@@ -1045,7 +1051,7 @@ R
 7 18200 10
 T 18278
 W
-12 18218 0 1
+12 18218 0 1 -
 Z
 1 18218
 S
@@ -1063,7 +1069,7 @@ the old fool.
 ~
 High Lich Scaldorran seems convinced to let you prove your worth...
 ~
-11 0 0 0 -1
+12 0 0 0 -1
 A
 1 18217
 P
@@ -1075,8 +1081,9 @@ R
 T 18277
 W
 13 10055 0 1 a
-W
+W+
 11 0 0 1 a
+Speak to Scaldorran~
 Z
 1 10048
 S
@@ -1098,7 +1105,7 @@ drip from his gaping maw.
 A
 1 10048
 P
-0 18288 0 1
+0 18288 0 1 -
 R
 7 18200 10
 R
@@ -1107,7 +1114,7 @@ R
 6 18291 1
 T 18277
 W
-2 18291 0 1
+2 18291 0 1 -
 Z
 1 10048
 S
@@ -1121,11 +1128,11 @@ isn't looking. And be quick about it.'
    Scaldorran taps the tips of his fingerbones together and mutters
 'eeeeexcellent' to himself.
 ~
-7 0 0 0 -1
+8 0 0 0 -1
 A
 1 10048
 P
-0 18288 0 1
+0 18288 0 1 -
 R
 7 18200 10
 R
@@ -1133,8 +1140,9 @@ R
 R
 6 18291 1
 T 18277
-W
-11 0 0 1
+W+
+11 0 0 1 -
+Bug Knezz~
 Z
 1 10048
 S
@@ -1158,7 +1166,7 @@ R
 6 18280 1
 T 18278
 W
-12 18217 0 1
+12 18217 0 1 -
 Z
 1 18217
 S
@@ -1173,7 +1181,7 @@ you must say this answer aloud: River.
 ~
 Adventurer 13 seems convinced you are who you say.
 ~
-11 0 0 0 -1
+12 0 0 0 -1
 A
 1 18218
 P
@@ -1184,8 +1192,9 @@ R
 6 18294 1
 W
 13 11105 0 1 a
-W
+W+
 11 0 0 1 a
+Speak to Adventurer 13~
 Z
 1 11101
 S
@@ -1204,7 +1213,7 @@ Adventurer 13 eagerly takes the serene food you offer him.
 A
 1 11101
 P
-0 18292 0 1
+0 18292 0 1 -
 R
 7 18200 10
 R
@@ -1238,7 +1247,7 @@ message to Furl.
 A
 1 11101
 P
-0 18292 0 1
+0 18292 0 1 -
 R
 7 18200 10
 R
@@ -1246,7 +1255,7 @@ R
 R
 6 18295 1
 W
-3 10205 0 1
+3 10205 0 1 -
 Z
 1 11101
 S
@@ -1271,7 +1280,7 @@ R
 6 18284 1
 T 18278
 W
-12 18218 0 1
+12 18218 0 1 -
 Z
 1 18218
 S

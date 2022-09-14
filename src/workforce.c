@@ -70,6 +70,7 @@ CHORE_GEN_CRAFT_VALIDATOR(chore_workforce_crafting);
 int get_workforce_production_limit(empire_data *emp, obj_vnum vnum);
 int empire_chore_limit(empire_data *emp, int island_id, int chore);
 void log_workforce_problem(empire_data *emp, room_data *room, int chore, int problem, bool is_delay);
+void report_workforce_production_log(empire_data *emp);
 bool workforce_is_delayed(empire_data *emp, room_data *room, int chore);
 
 
@@ -639,6 +640,43 @@ void remove_from_workforce_where_log(empire_data *emp, char_data *mob) {
 //// HELPERS ////////////////////////////////////////////////////////////////
 
 /**
+* Marks production by workforce.
+*
+* @param empire_data *emp Which empire.
+* @param int type Any WPLOG_ type.
+* @param any_vnum vnum Usually an object, building, etc produced; corresponding to type.
+* @param int amount How many were produced.
+*/
+void add_workforce_production_log(empire_data *emp, int type, any_vnum vnum, int amount) {
+	struct workforce_production_log *wplog = NULL, *iter;
+	
+	if (!emp) {
+		return;
+	}
+	
+	// find
+	LL_FOREACH(EMPIRE_PRODUCTION_LOGS(emp), iter) {
+		if (iter->type == type && iter->vnum == vnum) {
+			wplog = iter;
+			break;
+		}
+	}
+	
+	// or create
+	if (!wplog) {
+		CREATE(wplog, struct workforce_production_log, 1);
+		wplog->type = type;
+		wplog->vnum = vnum;
+		LL_PREPEND(EMPIRE_PRODUCTION_LOGS(emp), wplog);
+	}
+	
+	// and tally
+	SAFE_ADD(wplog->amount, amount, 0, INT_MAX, FALSE);
+	EMPIRE_NEEDS_STORAGE_SAVE(emp) = TRUE;
+}
+
+
+/**
 * This function sets the cap at which NPCs will no longer work a certain
 * task. Data is tracked between calls in order to reduce the overall work, and
 * should be freed with ewt_free_tracker() after each chore cycle.
@@ -833,7 +871,7 @@ void chore_update(void) {
 		
 		// update islands
 		HASH_ITER(hh, EMPIRE_ISLANDS(emp), eisle, next_eisle) {
-			// run needs (8pm only)
+			// run needs and logs (8pm only)
 			if (main_time_info.hours == 20) {
 				// TODO: currently this runs 1 need at a time, but could probably save a lot of processing if it ran all needs at once
 				HASH_ITER(hh, eisle->needs, needs, next_needs) {
@@ -874,6 +912,11 @@ void chore_update(void) {
 			
 			// no longer need this -- free up the tracker
 			ewt_free_tracker(&EMPIRE_WORKFORCE_TRACKER(emp));
+		}
+		
+		// report production now, only at 8pm, like needs
+		if (main_time_info.hours == 20) {
+			report_workforce_production_log(emp);
 		}
 	}
 }
@@ -1387,6 +1430,79 @@ char_data *place_chore_worker(empire_data *emp, int chore, room_data *room) {
 
 
 /**
+* Reports (and deletes) the workforce production logs for an empire. These go
+* to the 'elog workforce' command ONLY.
+*
+* @param empire_data *emp The empire.
+*/
+void report_workforce_production_log(empire_data *emp) {
+	struct workforce_production_log *wplog, *next;
+	char amount_str[256];
+	
+	if (EMPIRE_PRODUCTION_LOGS(emp)) {
+		// mark for save now as we will be deleting logs
+		EMPIRE_NEEDS_STORAGE_SAVE(emp) = TRUE;
+	}
+	
+	LL_FOREACH_SAFE(EMPIRE_PRODUCTION_LOGS(emp), wplog, next) {
+		if (wplog->amount > 1) {
+			snprintf(amount_str, sizeof(amount_str), " (x%d)", wplog->amount);
+		}
+		else {
+			*amount_str = '\0';
+		}
+		
+		// WPLOG_x
+		switch (wplog->type) {
+			case WPLOG_COINS: {
+				log_to_empire(emp, ELOG_WORKFORCE, "Minted coins%s", amount_str);
+				break;
+			}
+			case WPLOG_OBJECT: {
+				log_to_empire(emp, ELOG_WORKFORCE, "Produced %s%s", get_obj_name_by_proto(wplog->vnum), amount_str);
+				break;
+			}
+			case WPLOG_BUILDING_DONE: {
+				log_to_empire(emp, ELOG_WORKFORCE, "Built %s%s", get_bld_name_by_proto(wplog->vnum), amount_str);
+				break;
+			}
+			case WPLOG_BUILDING_DISMANTLED: {
+				log_to_empire(emp, ELOG_WORKFORCE, "Dismantled %s%s", get_bld_name_by_proto(wplog->vnum), amount_str);
+				break;
+			}
+			case WPLOG_VEHICLE_DONE: {
+				log_to_empire(emp, ELOG_WORKFORCE, "Built %s%s", get_vehicle_name_by_proto(wplog->vnum), amount_str);
+				break;
+			}
+			case WPLOG_VEHICLE_DISMANTLED: {
+				log_to_empire(emp, ELOG_WORKFORCE, "Dismantled %s%s", get_vehicle_name_by_proto(wplog->vnum), amount_str);
+				break;
+			}
+			case WPLOG_STUMPS_BURNED: {
+				log_to_empire(emp, ELOG_WORKFORCE, "Burned stumps%s", amount_str);
+				break;
+			}
+			case WPLOG_FIRE_EXTINGUISHED: {
+				log_to_empire(emp, ELOG_WORKFORCE, "Extinguished fires%s", amount_str);
+				break;
+			}
+			case WPLOG_PROSPECTED: {
+				log_to_empire(emp, ELOG_WORKFORCE, "Prospected%s", amount_str);
+				break;
+			}
+			case WPLOG_MAINTENANCE: {
+				log_to_empire(emp, ELOG_WORKFORCE, "Maintenance completed%s", amount_str);
+				break;
+			}
+		}
+		
+		LL_DELETE(EMPIRE_PRODUCTION_LOGS(emp), wplog);
+		free(wplog);
+	}
+}
+
+
+/**
 * Sets the workforce production limit for an item.
 *
 * @param empire_data *emp The empire.
@@ -1744,6 +1860,7 @@ void do_chore_gen_craft(empire_data *emp, room_data *room, vehicle_data *veh, in
 		
 		add_to_empire_storage(emp, islid, GET_CRAFT_OBJECT(do_craft), GET_CRAFT_QUANTITY(do_craft));
 		add_production_total(emp, GET_CRAFT_OBJECT(do_craft), GET_CRAFT_QUANTITY(do_craft));
+		add_workforce_production_log(emp, WPLOG_OBJECT, GET_CRAFT_OBJECT(do_craft), GET_CRAFT_QUANTITY(do_craft));
 		
 		// only send message if someone else is present (don't bother verifying it's a player)
 		if (ROOM_PEOPLE(IN_ROOM(worker))->next_in_room) {
@@ -1895,10 +2012,12 @@ void do_chore_building(empire_data *emp, room_data *room, int mode) {
 		// check for completion
 		if (!BUILDING_RESOURCES(room)) {
 			if (mode == CHORE_BUILDING) {
+				add_workforce_production_log(emp, WPLOG_BUILDING_DONE, GET_BUILDING(room) ? GET_BLD_VNUM(GET_BUILDING(room)) : NOTHING, 1);
 				finish_building(worker, room);
 				stop_room_action(room, ACT_BUILDING);
 			}
 			else if (mode == CHORE_MAINTENANCE) {
+				add_workforce_production_log(emp, WPLOG_MAINTENANCE, 0, 1);
 				finish_maintenance(worker, room);
 				stop_room_action(room, ACT_MAINTENANCE);
 			}
@@ -1937,6 +2056,7 @@ void do_chore_burn_stumps(empire_data *emp, room_data *room) {
 			charge_workforce(emp, CHORE_BURN_STUMPS, room, worker, 1, NOTHING, 0);
 			act("$n lights some fires!", FALSE, worker, NULL, NULL, TO_ROOM);
 			perform_burn_room(room);
+			add_workforce_production_log(emp, WPLOG_STUMPS_BURNED, 0, 1);
 		}
 		
 		// done
@@ -1964,6 +2084,7 @@ INTERACTION_FUNC(one_chop_chore) {
 		ewt_mark_resource_worker(emp, inter_room, interaction->vnum, amt);
 		add_to_empire_storage(emp, GET_ISLAND_ID(inter_room), interaction->vnum, amt);
 		add_production_total(emp, interaction->vnum, amt);
+		add_workforce_production_log(emp, WPLOG_OBJECT, interaction->vnum, amt);
 		
 		// only send message if someone else is present (don't bother verifying it's a player)
 		if (ROOM_PEOPLE(IN_ROOM(ch))->next_in_room) {
@@ -2054,6 +2175,7 @@ INTERACTION_FUNC(one_dig_chore) {
 		ewt_mark_resource_worker(emp, inter_room, interaction->vnum, amt);
 		add_to_empire_storage(emp, GET_ISLAND_ID(inter_room), interaction->vnum, amt);
 		add_production_total(emp, interaction->vnum, amt);
+		add_workforce_production_log(emp, WPLOG_OBJECT, interaction->vnum, amt);
 		ADD_CHORE_DEPLETION(inter_room, inter_veh, DPLTN_DIG, TRUE);
 		// only send message if someone else is present (don't bother verifying it's a player)
 		if (ROOM_PEOPLE(IN_ROOM(ch))->next_in_room) {
@@ -2166,6 +2288,7 @@ void do_chore_dismantle(empire_data *emp, room_data *room) {
 		
 		// check for completion
 		if (!BUILDING_RESOURCES(room)) {
+			add_workforce_production_log(emp, WPLOG_BUILDING_DISMANTLED, GET_BUILDING(room) ? GET_BLD_VNUM(GET_BUILDING(room)) : NOTHING, 1);
 			finish_dismantle(worker, room);
 			if (!ROOM_AFF_FLAGGED(room, ROOM_AFF_NO_ABANDON) && empire_chore_limit(emp, GET_ISLAND_ID(room), CHORE_ABANDON_DISMANTLED)) {
 				abandon_room(room);
@@ -2235,6 +2358,7 @@ INTERACTION_FUNC(one_einv_interaction_chore) {
 		ewt_mark_resource_worker(emp, inter_room, interaction->vnum, amt);
 		add_to_empire_storage(emp, GET_ISLAND_ID(inter_room), interaction->vnum, amt);
 		add_production_total(emp, interaction->vnum, amt);
+		add_workforce_production_log(emp, WPLOG_OBJECT, interaction->vnum, amt);
 		// only send message if someone else is present (don't bother verifying it's a player)
 		if (ROOM_PEOPLE(IN_ROOM(ch))->next_in_room) {
 			if (amt > 1) {
@@ -2338,6 +2462,7 @@ INTERACTION_FUNC(one_farming_chore) {
 		
 		add_to_empire_storage(emp, GET_ISLAND_ID(inter_room), interaction->vnum, amt);
 		add_production_total(emp, interaction->vnum, amt);
+		add_workforce_production_log(emp, WPLOG_OBJECT, interaction->vnum, amt);
 		
 		// add depletion only if 'pick' (INTERACT_HARVEST doesn't use it)
 		if (interaction->type == INTERACT_PICK) {
@@ -2499,6 +2624,7 @@ INTERACTION_FUNC(one_fishing_chore) {
 		ewt_mark_resource_worker(emp, inter_room, interaction->vnum, amt);
 		add_to_empire_storage(emp, GET_ISLAND_ID(inter_room), interaction->vnum, amt);
 		add_production_total(emp, interaction->vnum, amt);
+		add_workforce_production_log(emp, WPLOG_OBJECT, interaction->vnum, amt);
 		ADD_CHORE_DEPLETION(inter_room, inter_veh, DPLTN_FISH, TRUE);
 		// only send message if someone else is present (don't bother verifying it's a player)
 		if (ROOM_PEOPLE(IN_ROOM(ch))->next_in_room) {
@@ -2575,6 +2701,7 @@ void do_chore_fire_brigade(empire_data *emp, room_data *room) {
 		if (get_room_extra_data(room, ROOM_EXTRA_FIRE_REMAINING) <= 0) {
 			act("The flames have been extinguished!", FALSE, worker, 0, 0, TO_ROOM);
 			stop_burning(room);
+			add_workforce_production_log(emp, WPLOG_FIRE_EXTINGUISHED, 0, 1);
 		}		
 	}
 	else if (IS_BURNING(room)) {
@@ -2613,6 +2740,7 @@ INTERACTION_FUNC(one_mining_chore) {
 			add_to_room_extra_data(inter_room, ROOM_EXTRA_MINE_AMOUNT, -1 * interaction->quantity);
 			add_to_empire_storage(emp, GET_ISLAND_ID(inter_room), interaction->vnum, interaction->quantity);
 			add_production_total(emp, interaction->vnum, interaction->quantity);
+			add_workforce_production_log(emp, WPLOG_OBJECT, interaction->vnum, interaction->quantity);
 			
 			// set as prospected
 			set_room_extra_data(inter_room, ROOM_EXTRA_PROSPECT_EMPIRE, EMPIRE_VNUM(emp));
@@ -2747,6 +2875,7 @@ void do_chore_minting(empire_data *emp, room_data *room, vehicle_data *veh) {
 			orn = obj_proto(vnum);	// existence of this was pre-validated
 			amt = GET_WEALTH_VALUE(orn) * (1.0/COIN_VALUE);
 			increase_empire_coins(emp, emp, amt);
+			add_workforce_production_log(emp, WPLOG_COINS, 0, amt);
 			
 			if (amt > 1) {
 				snprintf(buf, sizeof(buf), "$n finishes minting a batch of %d %s coins.", amt, EMPIRE_ADJECTIVE(emp));
@@ -2790,6 +2919,7 @@ INTERACTION_FUNC(one_production_chore) {
 		ewt_mark_resource_worker(emp, inter_room, interaction->vnum, amt);
 		add_to_empire_storage(emp, GET_ISLAND_ID(inter_room), interaction->vnum, amt);
 		add_production_total(emp, interaction->vnum, amt);
+		add_workforce_production_log(emp, WPLOG_OBJECT, interaction->vnum, amt);
 		
 		ADD_CHORE_DEPLETION(inter_room, inter_veh, depletion_type, TRUE);
 		
@@ -2902,6 +3032,7 @@ void do_chore_prospecting(empire_data *emp, room_data *room) {
 			init_mine(room, NULL, emp);
 			set_room_extra_data(room, ROOM_EXTRA_PROSPECT_EMPIRE, EMPIRE_VNUM(emp));
 			remove_room_extra_data(room, ROOM_EXTRA_WORKFORCE_PROSPECT);
+			add_workforce_production_log(emp, WPLOG_PROSPECTED, 0, 1);
 		}
 	}
 	else if (needs_prospect) {
@@ -2988,6 +3119,7 @@ void do_chore_shearing(empire_data *emp, room_data *room, vehicle_data *veh) {
 				
 				add_to_empire_storage(emp, GET_ISLAND_ID(room), interact->vnum, interact->quantity);
 				add_production_total(emp, interact->vnum, interact->quantity);
+				add_workforce_production_log(emp, WPLOG_OBJECT, interact->vnum, interact->quantity);
 				add_cooldown(shearable, COOLDOWN_SHEAR, shear_growth_time * SECS_PER_REAL_HOUR);
 				done_any = TRUE;
 			}
@@ -3025,6 +3157,7 @@ void vehicle_chore_fire_brigade(empire_data *emp, vehicle_data *veh) {
 	if (worker && VEH_FLAGGED(veh, VEH_ON_FIRE)) {
 		charge_workforce(emp, CHORE_FIRE_BRIGADE, IN_ROOM(veh), worker, 1, NOTHING, 0);
 		remove_vehicle_flags(veh, VEH_ON_FIRE);
+		add_workforce_production_log(emp, WPLOG_FIRE_EXTINGUISHED, 0, 1);
 		
 		act("$n throws a bucket of water to douse the flames!", FALSE, worker, NULL, NULL, TO_ROOM);
 		msg_to_vehicle(veh, FALSE, "The flames have been extinguished!\r\n");
@@ -3094,8 +3227,14 @@ void vehicle_chore_build(empire_data *emp, vehicle_data *veh, int chore) {
 		
 		// check for completion
 		if (!VEH_NEEDS_RESOURCES(veh)) {
-			sprintf(buf, "$n finishes %s $V.", (chore == CHORE_MAINTENANCE) ? "repairing" : "constructing");
-			act(buf, FALSE, worker, NULL, veh, TO_ROOM);
+			if (chore == CHORE_MAINTENANCE) {
+				add_workforce_production_log(emp, WPLOG_MAINTENANCE, 0, 1);
+				act("$n finishes repairing $V.", FALSE, worker, NULL, veh, TO_ROOM);
+			}
+			else {
+				add_workforce_production_log(emp, WPLOG_VEHICLE_DONE, VEH_VNUM(veh), 1);
+				act("$n finishes constructing $V.", FALSE, worker, NULL, veh, TO_ROOM);
+			}
 			complete_vehicle(veh);
 		}
 		else {
@@ -3172,6 +3311,7 @@ void vehicle_chore_dismantle(empire_data *emp, vehicle_data *veh) {
 			
 			// ok, finish dismantle (purges vehicle)
 			claims_with_room = VEH_CLAIMS_WITH_ROOM(veh);
+			add_workforce_production_log(emp, WPLOG_VEHICLE_DISMANTLED, VEH_VNUM(veh), 1);
 			finish_dismantle_vehicle(worker, veh);	// ** sends own message **
 			
 			// auto-abandon?

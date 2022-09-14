@@ -3,7 +3,7 @@ guard panicked~
 the panicked guard~
 A panicked guard is fleeing the hamlet!
 ~
-0 0 bdvD nD 3
+0 0 bdvDI nD 3
 1 0 0 15
 D
    The guard is still dressed in his city colors, albeit streaked with red and
@@ -631,7 +631,7 @@ citizen fleeing~
 a fleeing citizen~
 A fleeing citizen looks absolutely panicked!
 ~
-40 80 dvD 0 3
+40 80 dvDI 0 3
 2 0 0 15
 D
 She doesn't have time to stop.
@@ -654,7 +654,7 @@ zombie shambling citizen~
 a shambling zombie~
 The shambling zombie of a citizen stumbles toward you.
 ~
-40 80 dvD G 3
+40 80 dvDI G 3
 0 0 0 9
 D
 This former citizen has seen better days.
@@ -1156,7 +1156,7 @@ haxaw medicine goblin~
 Haxaw, medicine goblin~
 Haxaw is sitting here, stirring a small pot.
 ~
-0 0 bdhvxy 0 3
+0 0 bdhvxyI 0 3
 2 0 0 28
 D
    Haxaw is surprisingly tall and pink, for a goblin, but she has the

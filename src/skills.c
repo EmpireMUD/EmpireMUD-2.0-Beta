@@ -826,7 +826,7 @@ void gain_ability_exp(char_data *ch, any_vnum ability, double amount) {
 	}
 		
 	// try gain
-	if (skill && gain_skill_exp(ch, SKILL_VNUM(skill), amount)) {
+	if (skill && gain_skill_exp(ch, SKILL_VNUM(skill), amount, abil)) {
 		// increment gains from this
 		mark_level_gained_from_ability(ch, abil);
 	}
@@ -862,10 +862,12 @@ void gain_player_tech_exp(char_data *ch, int tech, double amount) {
 * @param char_data *ch The character who is to gain/lose the skill.
 * @param skill_data *skill The skill to gain/lose.
 * @param int amount The number of skill points to gain/lose (gaining will stop at any cap).
+* @param ability_data *from_abil Optional: Which ability caused this gain, for reporting purposes. (May be NULL.)
 * @param bool Returns TRUE if a skill point was gained or lost.
 */
-bool gain_skill(char_data *ch, skill_data *skill, int amount) {
+bool gain_skill(char_data *ch, skill_data *skill, int amount, ability_data *from_abil) {
 	bool any = FALSE, pos = (amount > 0);
+	char abil_buf[256];
 	struct player_skill_data *skdata;
 	int points;
 	
@@ -905,9 +907,16 @@ bool gain_skill(char_data *ch, skill_data *skill, int amount) {
 	}
 	
 	if (any) {
+		if (from_abil) {
+			snprintf(abil_buf, sizeof(abil_buf), " using %s", ABIL_NAME(from_abil));
+		}
+		else {
+			*abil_buf = '\0';
+		}
+		
 		// messaging
 		if (pos) {
-			msg_to_char(ch, "\tyYou improve your %s skill to %d.\t0\r\n", SKILL_NAME(skill), skdata->level);
+			msg_to_char(ch, "\tyYou improve your %s skill to %d%s.\t0\r\n", SKILL_NAME(skill), skdata->level, abil_buf);
 			
 			points = get_ability_points_available_for_char(ch, SKILL_VNUM(skill));
 			if (points > 0) {
@@ -925,7 +934,7 @@ bool gain_skill(char_data *ch, skill_data *skill, int amount) {
 			}
 		}
 		else {
-			msg_to_char(ch, "\tyYour %s skill drops to %d.\t0\r\n", SKILL_NAME(skill), skdata->level);
+			msg_to_char(ch, "\tyYour %s skill drops to %d%s.\t0\r\n", SKILL_NAME(skill), skdata->level, abil_buf);
 		}
 		
 		// update class and progression
@@ -951,9 +960,10 @@ bool gain_skill(char_data *ch, skill_data *skill, int amount) {
 * @param char_data *ch The player character who will gain.
 * @param any_vnum skill_vnum The skill to gain experience in.
 * @param double amount The amount to gain (0-100).
+* @param ability_data *from_abil Optional: Which ability caused this gain, for reporting purposes. (May be NULL.)
 * @return bool TRUE if the character gained a skill point from the exp.
 */
-bool gain_skill_exp(char_data *ch, any_vnum skill_vnum, double amount) {
+bool gain_skill_exp(char_data *ch, any_vnum skill_vnum, double amount, ability_data *from_abil) {
 	struct player_skill_data *skdata;
 	skill_data *skill;
 	bool gained;
@@ -986,7 +996,7 @@ bool gain_skill_exp(char_data *ch, any_vnum skill_vnum, double amount) {
 	
 	if (gained) {
 		GET_DAILY_BONUS_EXPERIENCE(ch) = MAX(0, GET_DAILY_BONUS_EXPERIENCE(ch) - 1);
-		gained = gain_skill(ch, skill, 1);
+		gained = gain_skill(ch, skill, 1, from_abil);
 		update_MSDP_bonus_exp(ch, UPDATE_SOON);
 	}
 	

@@ -1755,6 +1755,7 @@ portrait reads:
                  |  Fifteenth Master, Tower Skycleave  |
                  +-------------------------------------+
 ~
+M 1 11831 100.00 5
 S
 #11923
 A Small Bedroom~
@@ -2481,6 +2482,7 @@ down fountain second~
 walkway, second floor walkway below it, and the fountain way below on the
 ground floor.
 ~
+M 1 11831 100.00 5
 S
 #11935
 The Eruditorium~
@@ -2713,6 +2715,11 @@ table~
 lead to the foot of the table. More alarmingly, it also has thick leather
 straps positioned for the neck, hands, and ankles. And it's covered in no
 small number of dark stains.
+~
+E
+skeleton workbench bench~
+   One of the work benches has a fresh skeleton on it. There's still bits of
+flesh on the bones. Honestly, you can barely look.
 ~
 S
 #11938
@@ -3464,6 +3471,11 @@ east bedroom quarters~
 The east door leads into the sorcerer's private quarters.
 ~
 E
+marble white floors~
+   The floor appears to be one enormous sheet of white marble. It is polished
+to such a degree that it reflects everything in the room.
+~
+E
 bookshelf shelf books~
    An entire wall of the office is devoted to the bookshelf, which houses at
 least a hundred old tomes. Strangely, you can't read any of the titles. Even
@@ -4207,6 +4219,10 @@ eyes clustered around a tall stone -- the city's towering monolith. It also
 shows a scene of people attending a dead body, a scene of people dancing, a
 scene of people eating.
 ~
+E
+baskets~
+There are some baskets stacked in the store room through the low doorway.
+~
 M 0 11977 100.00 1
 M 0 11955 100.00 1
 T 11945
@@ -4577,6 +4593,7 @@ others connected by ramps instead.
 ~
 M 0 11981 100.00 1
 M 1 11981 100.00 3
+M 0 11971 100.00 1
 T 11945
 T 11946
 T 11976

@@ -109,9 +109,17 @@ done
 Hestian Trinket~
 1 c 2
 use~
-* HESTIAN TRINKET: basic timed teleport home
-* use val0 for cooldown vnum (-1 for none, defaults to 256 if 0)
-* use val1 for cooldown time (defaults to 3600 if 0)
+* HESTIAN TRINKET: basic timed teleport home; paramenters:
+* val0: cooldown vnum (-1 for none, defaults to 256 if 0)
+* val1: cooldown time (defaults to 3600 if 0)
+* script1: the teleport sequence sent to the character, sent in order
+*   first script1 message is when the actor touches/uses it
+*   remaining script1 messages are sent to the actor every 5 seconds
+* script2: the teleport sequence sent to the room, sent in order
+*   script1 and script2 must match up with the same number of messages
+* script3 (custom): the actor-disappears message, sent to the room
+* script4 (custom): the actor-appears message, sent to the room
+* script5 (custom): cancel mesasge (to actor)
 set default_cooldown_vnum 256
 set default_cooldown_time 3600
 * checks
@@ -175,30 +183,61 @@ remote stop_message_char %actor.id%
 remote stop_message_room %actor.id%
 remote needs_stop_command %actor.id%
 * start going
-%send% %actor% You touch @%self% and it begins to swirl with light...
-%echoaround% %actor% ~%actor% touches @%self% and it begins to swirl with light...
-set cycle 0
-while %cycle% < 2
+set to_ch %self.custom(script1,0)%
+if !%to_ch.empty%
+  %send% %actor% %to_ch.process%
+else
+  %send% %actor% You touch @%self% and it begins to swirl with light...
+end
+set to_room %self.custom(script2,0)%
+if !%to_room.empty%
+  %echoaround% %actor% %to_room.process%
+else
+  %echoaround% %actor% ~%actor% touches @%self% and it begins to swirl with light...
+end
+set message 1
+set done 0
+while !%done%
   wait 5 sec
+  * check cancellation
   if %actor.stop_command% || %actor.room% != %room_var% || %actor.fighting% || !%actor.home% || %self.carried_by% != %actor% || %actor.aff_flagged(DISTRACTED)% || %actor.action%
     %force% %actor% stop cleardata
-    %send% %actor% The swirling light from @%self% fades.
+    set to_ch %self.custom(script5)%
+    if !%to_ch.empty%
+      %send% %actor% %to_ch.process%
+    else
+      %send% %actor% The swirling light from @%self% fades.
+    end
     halt
   end
-  switch %cycle%
-    case 0
-      %send% %actor% @%self% glows a bright blue and the light begins to envelop you!
-      %echoaround% %actor% @%self% glows a bright blue and the light begins to envelop ~%actor%!
-    break
-    case 1
-      %echoaround% %actor% ~%actor% vanishes in a flash of light!
-      %teleport% %actor% %actor.home%
-      %force% %actor% look
-      %echoaround% %actor% ~%actor% appears in a flash of light!
-    break
-  done
-  eval cycle %cycle% + 1
+  * check next message
+  set to_ch %self.custom(script1,%message%)%
+  set to_room %self.custom(script2,%message%)%
+  if %to_ch.empty% || %to_room.empty%
+    set done 1
+  else
+    %send% %actor% %to_ch.process%
+    %echoaround% %actor% %to_room.process%
+  end
+  eval message %message% + 1
 done
+* vanish message
+set to_room %self.custom(script3)%
+if !%to_room.empty%
+  %echoaround% %actor% %to_room.process%
+else
+  %echoaround% %actor% ~%actor% vanishes in a flash of light!
+end
+* teleport
+%teleport% %actor% %actor.home%
+%force% %actor% look
+* arrive message
+set to_room %self.custom(script4)%
+if !%to_room.empty%
+  %echoaround% %actor% %to_room.process%
+else
+  %echoaround% %actor% ~%actor% appears in a flash of light!
+end
 * cleanup
 if %cooldown_vnum% > 0 && %cooldown_time% > 0
   nop %actor.set_cooldown(%cooldown_vnum%, %cooldown_time%)%
@@ -248,9 +287,17 @@ end
 Trinket of Conveyance~
 1 c 2
 use~
-* TRINKET OF CONVEYANCE: teleports the player to a starting location
-* use val0 for cooldown vnum (-1 for none, defaults to 262 if 0)
-* use val1 for cooldown time (defaults to 1800 if 0)
+* TRINKET OF CONVEYANCE: teleports the player to a starting location; params:
+* val0: cooldown vnum (-1 for none, defaults to 262 if 0)
+* val1: cooldown time (defaults to 1800 if 0)
+* script1: the teleport sequence sent to the character, sent in order
+*   first script1 message is when the actor touches/uses it
+*   remaining script1 messages are sent to the actor every 5 seconds
+* script2: the teleport sequence sent to the room, sent in order
+*   script1 and script2 must match up with the same number of messages
+* script3 (custom): the actor-disappears message, sent to the room
+* script4 (custom): the actor-appears message, sent to the room
+* script5 (custom): cancel mesasge (to actor)
 set default_cooldown_vnum 262
 set default_cooldown_time 1800
 * checks
@@ -298,30 +345,61 @@ remote stop_message_char %actor.id%
 remote stop_message_room %actor.id%
 remote needs_stop_command %actor.id%
 * start going
-%send% %actor% You touch @%self% and it begins to swirl with light...
-%echoaround% %actor% ~%actor% touches @%self% and it begins to swirl with light...
-set cycle 0
-while %cycle% < 2
+set to_ch %self.custom(script1,0)%
+if !%to_ch.empty%
+  %send% %actor% %to_ch.process%
+else
+  %send% %actor% You touch @%self% and it begins to swirl with light...
+end
+set to_room %self.custom(script2,0)%
+if !%to_room.empty%
+  %echoaround% %actor% %to_room.process%
+else
+  %echoaround% %actor% ~%actor% touches @%self% and it begins to swirl with light...
+end
+set message 1
+set done 0
+while !%done%
   wait 5 sec
-  if %actor.stop_command% || %actor.room% != %room_var% || %actor.fighting% || !%actor.home% || %self.carried_by% != %actor% || %actor.aff_flagged(DISTRACTED)% || %actor.action%
+  * check cancellation
+  if %actor.stop_command% || %actor.room% != %room_var% || %actor.fighting% || %self.carried_by% != %actor% || %actor.aff_flagged(DISTRACTED)% || %actor.action%
     %force% %actor% stop cleardata
-    %send% %actor% The swirling light from @%self% fades.
+    set to_ch %self.custom(script5)%
+    if !%to_ch.empty%
+      %send% %actor% %to_ch.process%
+    else
+      %send% %actor% The swirling light from @%self% fades.
+    end
     halt
   end
-  switch %cycle%
-    case 0
-      %send% %actor% Yellow light begins to whirl around you...
-      %echoaround% %actor% Yellow light begins to whirl around ~%actor%...
-    break
-    case 1
-      %echoaround% %actor% ~%actor% vanishes in a flourish of yellow light!
-      %teleport% %actor% %startloc%
-      %force% %actor% look
-      %echoaround% %actor% ~%actor% appears in a flourish of yellow light!
-    break
-  done
-  eval cycle %cycle% + 1
+  * check next message
+  set to_ch %self.custom(script1,%message%)%
+  set to_room %self.custom(script2,%message%)%
+  if %to_ch.empty% || %to_room.empty%
+    set done 1
+  else
+    %send% %actor% %to_ch.process%
+    %echoaround% %actor% %to_room.process%
+  end
+  eval message %message% + 1
 done
+* vanish message
+set to_room %self.custom(script3)%
+if !%to_room.empty%
+  %echoaround% %actor% %to_room.process%
+else
+  %echoaround% %actor% ~%actor% vanishes in a flourish of yellow light!
+end
+* teleport
+%teleport% %actor% %startloc%
+%force% %actor% look
+* arrive message
+set to_room %self.custom(script4)%
+if !%to_room.empty%
+  %echoaround% %actor% %to_room.process%
+else
+  %echoaround% %actor% ~%actor% appears in a flourish of yellow light!
+end
 * cleanup
 if %cooldown_vnum% > 0 && %cooldown_time% > 0
   nop %actor.set_cooldown(%cooldown_vnum%, %cooldown_time%)%

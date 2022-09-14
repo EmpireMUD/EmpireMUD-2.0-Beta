@@ -1665,6 +1665,9 @@ RITUAL_FINISH_FUNC(perform_ritual_of_teleportation) {
 	else if (!can_teleport_to(ch, map, FALSE)) {
 		msg_to_char(ch, "Teleportation failed: you can't seem to teleport there right now.\r\n");
 	}
+	else if (!pre_greet_mtrigger(ch, to_room, NO_DIR)) {
+		// hopefully it sent a message
+	}
 	else {
 		act("$n vanishes in a brilliant flash of light!", FALSE, ch, NULL, NULL, TO_ROOM);
 		char_to_room(ch, to_room);

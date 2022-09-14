@@ -1,0 +1,738 @@
+#11801
+Skycleave: In Search of the Son~
+   Dylane grasps at his short beard with his hand as he looks you up and down
+with wary eyes. He seems to study you for a moment.
+   'You don't look like one of them,' he says at last. 'The Skycleavers, that
+is. And yet you seem to have earned their respect. That makes you exactly the
+person I've been searching for. If I could ask a favor.'
+   You sit and listen to Dylane tell the story of his firstborn son, whom he
+sent away to study at the Tower Skycleave at considerable personal expense. He
+tells you how his son was the first person in the family to show any talent
+for magic in generations, even if it wasn't much.
+   At first, Dylane's son sent letters home to the family. In them, he always
+wrote of being happy, but something always seemed wrong.
+   'And then, one day, the letters just stopped,' says Dylane. 'We wrote and
+wrote, with no response. The sorcerers won't speak to me. Nobody will help me.
+I'm not allowed upstairs. Please, I'm just a father in search of my son. Please
+find any sign of him. I pray he is okay.'
+   Perhaps you can find some sign of Dylane's son and return to him. Dylane is
+often found in the Tower Skycleave after it has been rescued.
+~
+   'No...' Dylane crumples to the floor, breathing heavily. It takes him a
+moment to compose himself. You wait, unsure what to do.
+   'Are you certain?' he askes as he tries to rebuild his composure. 'There's
+no doubt? Those monsters turned him into a... into a mop?'
+   You nod, hardly sure what to say.
+   The man's eyes redden and begin to well up with tears. He slides a small
+purse of money across to you, and turns away.
+~
+9 0 125 250 -1
+A
+1 11801
+P
+0 11811 0 1 a
+P
+16 11800 0 7 a
+R
+1 -1 1000
+W+
+11 0 0 1 -
+Find Dylane the Younger~
+Z
+1 11801
+S
+#11802
+Skycleave: Not Without My Son~
+   Dylane taps his fingers as he sits with his eyes down, waiting for you. As
+you approach, he looks up with a little glimmer of hope in his sagging eyes.
+He hesitates and catches himself as he begins to speak, glancing around and
+then lowering his voice as you move closer.
+   'I see you've gained some clout in the Black Tower,' Dylane says slowly. 'I
+realize you owe me nothing, and I have spent every last penny -- every ragged
+ribbon of influence. Nevertheless, I must beg your help.'
+   You silently study Dylane's aging face as his eyes well up.
+   'I have been to this accursed place a hundred times as it blinks in and out
+across the landscape. Seen a hundred adventurers come and go. Watched the
+wizards fight and fall and rise and fall and rise again. I've studied them
+twice as hard since you told me what happened to my boy. There's a sorceress on
+the third floor, and heaven knows they won't let me up there, but if you can
+get to her and convince her, maybe there's still hope.'
+   Dylane pulls a handkerchief from his pocket and blows his nose like a
+trumpet. He passes you a note which simply reads, 'Annelise'.
+~
+   'Oh bother,' Annelise says as you interrupt her mending an old iron toaster.
+She tosses it carelessly aside and pushes the hair up off her face with a sooty
+hand. She brushes herself off and turns to look at you.
+   'Oh dear, I didn't realize you had an appointment,' she says as she cleans
+herself off using a rag. She glances over at a calendar on the desk, then back
+to you, then back to the calendar. 'Well, nevermind all that. What can I do
+for you, dear?'
+   You weigh how to ask her for a favor for Dylane of Trense, a man you barely
+know. In the end, you tell her the whole story, sparing no detail about
+Dylane's teary eyes and unceasing search for his son. Well, perhaps not the
+entire story. You leave out the much longer explanation about the time loop.
+   'I never did like transmogrifying the students,' Annelise says with a slight
+frown. 'But we certainly can't have the boy running around here. Fine, fine,
+I'm sure I owe you this much. Bring him up here. Just promise me he will leave
+the tower before the headmaster finds out.'
+~
+12 0 125 250 -1
+A
+1 11801
+P
+16 11800 0 8 a
+P
+0 11801 0 1 a
+T 11830
+W
+13 11939 0 1 -
+Z
+1 11939
+S
+#11810
+Skycleave: Past Pixies and Goblins~
+   High Sorceress Celiya wipes her brow with her sleeve and sighs. 'It's not
+looking good up there, sugar,' she says, her eyes flitting upward.
+   'If it's not one thing, it's another. Half of the second floor is overrun by
+goblins and the other half is overgrown with some kind of pixy maze. We have
+enough trouble for ourselves down here. We need somebody to get through that
+maze and find a way to get rid of it!'
+   Rescue the second floor of the Tower Skylceave to complete this quest. See
+Watcher Annaca on the second floor when it's done.
+~
+   Annaca glances over at you. 'Ah, there you are,' she says. 'I saw you clear
+out that pixy maze. Nothing to it, eh? We could use a few more like you around
+here for when things get messy.'
+~
+5 0 125 250 -1
+A
+1 11864
+A
+1 11890
+R
+7 11800 50
+R
+6 11811 11811
+T 11830
+T 11831
+W+
+11 0 0 1 -
+Rescue the second floor~
+Z
+1 11891
+Z
+1 11910
+S
+#11811
+Skycleave: Clear Out the Mercenaries~
+   'While you're here,' Annaca says, 'We're still having trouble retaking the
+third floor. It's full of mercenaries. I heard one of them mention Trixton Vye,
+so you'll want to be careful. He's notorious. If he's leading them, they're
+more than your average rabble.
+   'If you manage to stop Vye, we'll finally have the upper hand. And see if
+you can find Watcher Caius up there. Nobody has seen him.'
+   Rescue the third floor of the Tower Skycleave to complete this quest. See
+Watcher Caius on the third floor when it's done.
+~
+   'My word, that was atrocious. Those provincials got into everything. It will
+take weeks to sort out.' Caius Sirensbane adjusts his toga as he speaks. He
+stops and looks you up and down.
+   'Seems you had the virtue to see them gone, however,' he says. 'We are in
+your debt.'
+~
+7 0 125 250 -1
+A
+1 11891
+A
+1 11910
+R
+7 11800 50
+R
+6 11812 11812
+T 11830
+T 11831
+W+
+11 0 0 1 -
+Rescue the third floor~
+Z
+1 11892
+Z
+1 11930
+S
+#11812
+Skycleave: Find the Enchantress and Stop Her~
+   'Now that the nastiness with that scoundrel Trixton Vye is settled, we must
+turn our attention upstairs,' Caius says. 'Masters Knezz and Barrosh are both
+missing since the attack. I must tend to matters here on the third floor. And
+if the gods are merciful, let us hope those common thugs didn't damage anything
+of value.'
+   Caius turns and begins to walk away, but he turns back and adds, 'To be
+crystal ball clear, I expect you to go up and rescue them. You have come this
+far. See it through. You are no quitter.'
+   Rescue the top floor of the Tower Skycleave to complete this quest. See High
+Sorcerer Barrosh in his office when it's done.
+~
+'Fine, what do you want, a cookie?' Master Barrosh says without looking at you.
+~
+6 0 125 250 -1
+A
+1 11892
+A
+1 11930
+R
+7 11800 50
+T 11830
+T 11831
+W+
+11 0 0 1 -
+Rescue the top floor~
+Z
+1 11967
+S
+#11816
+Skycleave: Room Under the Stairs~
+   The Tower Skycleave is full of secrets, some well-known and others well-
+kept. You have heard the apprentices speak of a hidden passage under the stairs
+and now is the time to find it. Search high and low; it must be somewhere.
+   Once you have found your way through the secret passage, look for someone
+in the tower who might be interested in the secret.
+~
+   Kayla listens with wide eyes as you explain how you found the secret passage
+behind the goblin cages.
+   'I knew it!' she says as a purple fire burns in her eyes. 'Those sons of
+goblins swore up and down there wasn't a secret passage but they've been
+playing stupid pranks on me for months using it.'
+   She fumes and stomps off without thanking you.
+~
+22 ei 125 250 -1
+A
+1 11900
+P
+16 11800 0 6 a
+P
+0 11810 0 1 a
+R
+7 11800 10
+W
+13 11816 0 1 a
+W
+13 11916 0 1 b
+Z
+1 11911
+S
+#11818
+Skycleave: Clever Like the Fox~
+   The Tower Skycleave too often finds itself the victim of a goblin invasion.
+Whatever draws them to the tower, they must be stopped before they find it. But
+by a stroke of luck, the goblin warchief is stuck in the pixy maze! Hunt down
+the one called 'The Fox' and ensure she doesn't make it out of that maze alive.
+   Once you've washed the blood off your weapon, look for someone in the tower
+who wants to hear about this. This quest cannot be completed if the second
+floor has already been rescued.
+~
+   'I dare say,' old Huberus says as she cleans her thick glasses on the edge
+of her robe. 'John, upstairs, is always telling me his theories on the goblins.
+He thinks they're mad to invade the tower. After all, we always catch them. But
+from the sound of it, you fought a warchief. They wouldn't invade the tower
+without a good reason.'
+   She paces back and forth with her hand on her chin for a few moments.
+   'No, I don't think they would,' she says at last. 'Very interesting. Very
+interesting indeed.'
+   She trails off, completely forgetting you're even here.
+~
+22 ei 125 250 -1
+A
+1 11900
+P
+16 11800 0 6 a
+P
+0 11810 0 1 a
+R
+7 11800 10
+W
+3 11818 0 1 -
+Z
+1 11806
+Z
+1 11906
+S
+#11819
+Skycleave: Free the Pixy Queen~
+   The Tower Skycleave has long held a pixy queen in its collection of rare and
+magical things. In all the commotion of the invasion, the pixy queen has
+escaped from the Forest Dome of the racetrack on the second floor. But rather
+than flee the tower, she has created some sort of enchanted maze that blocks
+all access to the upper levels.
+   The pixy queen, it seems, desperately wants freedom but cannot leave the
+tower. Once you have found a way to set her free, look for someone in the tower
+who wants to talk about it. This quest cannot be completed if the second floor
+has already been rescued.
+~
+   You tell Watcher Annaca what the pixy queen said as she died and Annaca
+thinks on it for a moment.
+   'The pixies never seem to try to escape. I plum thought they liked it here,'
+she says. 'And what did she mean by that last part... 'in time'?'
+~
+23 ei 125 250 -1
+A
+1 11900
+P
+16 11800 0 6 a
+P
+0 11810 0 1 a
+R
+7 11800 10
+W
+3 11819 0 1 -
+Z
+1 11910
+Z
+1 11891
+S
+#11821
+Skycleave: Need It For A Friend~
+   Hugh Mann catches your attention while no one else is watching and waves you
+over to him. You approach cautiously, mindful of the smell, and notice rather
+suddenly that he's a goblin! That green skin is unmistakable, though his coat
+and hat do an excellent job of hiding it from a distance. He's also the tallest
+goblin you've ever seen.
+   'Me notice the wizards let you come and go,' Hugh says. 'They doesn't let
+Hugh upstairs. Hugh need something... for a friend.'
+   You roll your eyes and wait for him to get to a point.
+   'Lots of stuff upstairs belongs to goblins,' he says. 'Gadgets and gizmos
+aplenty. My, er, friend want stuff back. Bring us goblin trinkets. Please. It's
+stolen. Don't makes us resort to... goblin justice.'
+   Hugh makes a wide, toothy grin and then pulls the brim of his hat back down
+and tries to disappear back into the crowd.
+~
+   As you hand the goblin trinkets over to Hugh, a look crosses his face that's
+somewhere between surprise and delight. He takes the trinkets from you and
+looks down into his oversized coat...
+~
+10 di 125 250 -1
+A
+1 11821
+P
+0 11810 0 1 a
+P
+16 11800 0 7 a
+P
+0 11975 0 1 a
+R
+7 11800 10
+T 11830
+W
+2 11976 0 1 -
+Z
+1 11821
+S
+#11826
+Skycleave: Break the Illusion~
+   The second floor of the Tower Skycleave is suddenly overgrown with a strange
+maze that blocks all access to the upper levels. All attempts to chop through
+the jungle of vines and saplings failed -- and that was before the goblins
+overran the walkway.
+   Clear the maze any way you can, then find someone in the tower who wants to
+talk about it. This quest cannot be completed if the second floor has already
+been rescued.
+~
+   'Oh yes, I do like a good maze,' Warden Chicanders says as you tell him your
+experience with it. 'I was in there, too. Got good and lost, ducking goblins
+and such. The pixies don't seem to mind me as much. Maybe because I feed them.'
+   He pulls a handful of pellets from the pocket of his black robe and dumps it
+near the racetrack stalls.
+   'Those pixies really get into your head; that maze was worse than the Forest
+dome. I had the strangest dreams in there.'
+~
+24 ei 125 250 -1
+A
+1 11900
+P
+16 11800 0 6 a
+P
+0 11810 0 1 a
+R
+7 11800 10
+W+
+11 0 0 1 -
+Break the illusion in the maze~
+Z
+1 11918
+S
+#11834
+Skycleave: Unjustified Captivity~
+   Throughout the Tower Skycleave's captivity in this time loop, its many
+denizens have been denied the passage of time. Each and every one of them
+believes they caught an otherworlder in a crashed vessel just yesterday. But
+the otherworlder does not experience time as we do, and it has felt every
+single agonizing day of its confinement.
+   There is no chance of freeing the otherworlder under the watchful gaze of
+its captors -- so you cannot complete this quest if the third floor has already
+been rescued. Free the otherworlder while the mercenaries still have the tower
+and its staff distracted. Afterwards, find someone in the tower who wants to
+discuss the situation.
+~
+   'I did lodge a formal protest at imprisoning a sentient being,' Annelise
+says halfway through your story about the otherworlder's escape. 'It's not like
+those wretched goblins who keep trying to sneak into the tower. They get what
+they get. But the otherworlder? You can see in its eyes -- all of them -- that
+it's intelligent. And we noble sorcerers abducted it like common highwaymen.'
+   Annelise starts to go back to what she was doing, but she seems distracted
+as she taps her fingernails against each other. She turns back toward you.
+   'It's good that you freed it, though. What a hateful place to be imprisoned.
+And for what? The pursuit of magic. Are there no limits to what we destroy for
+power?'
+~
+20 e 125 250 -1
+A
+1 11900
+P
+16 11800 0 6 a
+P
+0 11811 0 1 a
+R
+7 11800 10
+W+
+11 0 0 1 -
+Free the otherworlder~
+Z
+1 11939
+S
+#11836
+Skycleave: The Greatest Treasure~
+   Jagged writing on the blackboard in the Lich Labs reads 'The greatest
+treasure is inside the repository.' But the only mercenaries who can read the
+words are also too wary to open such a powerful artifact. And so, the old stone
+repository sits unopened.
+   Reach the Lich Labs and open the repository while there are still
+mercenaries on the third floor. Share the treasure inside with them. After it's
+done and the third floor has been rescued, find someone in the Lich Labs who
+wants to discuss it.
+   This quest cannot be completed if the third floor has already been rescued.
+~
+   'My eternal gratitude,' Scaldorran howls, with just a little too much
+emphasis on eternal. He picks up the ancient stone lamp that serves as his
+soul's repository and turns it over and over in the linen wrappings that form
+his hands.
+   'I am... in your debt. A grave miscalculation on my part, I'm afraid,' he
+continues. 'Not the debt, no; I appreciate you releasing me. My error was in
+setting a trap that requires those mercenaries read.'
+   Scaldorran points to the blackboard, where the words 'The greatest treasure
+is inside the repository' show faintly through eraser marks. An unearthly
+chuckle burbles out of the old lich as he sets his repository back down.
+   'The only ones who could read were the spellcasters and, to my unending
+chagrin, they were smart enough not to open the thing. Alas.'
+~
+20 ei 125 250 -1
+A
+1 11900
+P
+16 11800 0 6 a
+P
+0 11811 0 1 a
+R
+7 11800 10
+W+
+11 0 0 1 -
+Open the repository~
+Z
+1 11836
+Z
+1 11936
+S
+#11849
+Skycleave: Mercenary Threat~
+   The once-notorious criminal who calls himself Trixton Vye has holed up in
+the Tower Skycleave with a small army of mercenaries. Though he's old, he is
+famous for being the sole survivor of many a street fight and duel. His assault
+on the tower cannot stand; he cannot be allowed to wield its magic.
+   Reach the third floor of the tower and personally dispose of Trixton Vye and
+his two lieutenants, Bleak Rojjer and Lady Kara Virduke. After it's done, look
+for someone in the tower with more information. This quest cannot be completed
+if the third floor has already been rescued.
+~
+   Scaldorran alights on the slate floor and his flailing linen wrappings
+tighten and settle until he looks more mummy than lich, though his eyes and
+mouth are only black pits between the strips of cloth. He stands close to you,
+perhaps closer than you'd like. A stale must surrounds him, like an attic in
+late spring.
+   'I knew all three of them, once,' he says at last. 'Trixton, Kara, and
+Rojjer. Kara was my student and I dare say I was too smitten. Far too young for
+me, of course, so I treated her like a daughter and I dare say I spoiled her.
+When she disappointed the masters, I provided her an escape instead of punish-
+ment and in the end, she met a worse fate.
+   'Rojjer was my resurrectionist for some time, though I released him when I
+began to suspect he was making more bodies than he was digging up. Nasty line
+of work, that. His knowledge of Skycleave from that arrangement played no small
+part in the successful invasion of our precious, precious tower.
+   'And Trixton. Oh, Trixton. My nephew by birth, through my youngest sister.
+I blessed him under the sun and the moon, and he came for my power like a
+common thief. Did you see how his lust for power corrupted and withered him so
+far beyond his years? It's good you put an end to it; on that path he'd soon
+have nothing left but his linens.'
+~
+18 ei 125 250 -1
+A
+1 11900
+P
+16 11800 0 6 a
+P
+0 11811 0 1 a
+R
+7 11800 10
+W
+3 11847 0 1 a
+W
+3 11848 0 1 a
+W
+3 11849 0 1 a
+Z
+1 11936
+S
+#11863
+Skycleave: Shadow Ascendant~
+   Dark things stir on the top floor of the Tower Skycleave. Things darker
+still lie on the fringes of the time loop that has consumed it. Among the many
+Skycleave variations, there is a rather singular creature -- one made of the
+pure magic that thrives in the dark. And it is more dangerous than you know.
+   Draw out the Shadow Ascendant and defeat it before it can spread beyond the
+tower. It is magic without form; life without limit. Such a thing must never be
+allowed free. After you defeat it, look for someone in the tower who is
+interested in discussing it.
+   This quest cannot be completed if the fourth floor has already been rescued.
+~
+   You stop Grand High Sorceress Celiya and begin to tell her about your
+fateful encounter with the Shadow Ascendant.
+   'I've been researching it, too, sugar,' she says. 'I spent most of my life
+in the shadow of Jozef Knezz. Can't imagine him being murdered by a wizard's
+shade. There's no precedent for a shade ascending, either. It really tapped in
+to Skycleave's power.'
+   She makes a puzzled face and stops for a moment, then pulls out a piece of
+rose-colored glass from a pocket inside her robe and holds it up to one eye.
+   'Now I see why you were able to stop it,' she says. 'You aren't bound to the
+time loop. I guess by now you've noticed we didn't get free of it. Next time
+maybe you can save Knezz. He might actually know how to get us out of it.'
+~
+17 ei 125 250 -1
+A
+1 11900
+P
+16 11800 0 6 a
+P
+0 11812 0 1 a
+R
+7 11800 10
+W
+3 11863 0 1 -
+Z
+1 11969
+S
+#11870
+Skycleave: Save Grand High Sorcerer Knezz~
+   The tower's headmaster is in grave peril. When the mercenaries took the
+third floor, Grand High Sorcerer Knezz remained above to protect the tower's
+greatest relics. But all contact with him was lost and there are dark portents
+regarding his fate. Whatever else happens, Knezz must survive.
+   Reach the top floor of the Tower Skycleave, engage Knezz's attacker, and
+save the venerated sorcerer before it's too late. Speak to him after you finish
+rescuing the tower. This quest cannot be completed if the fourth floor has
+already been rescued.
+~
+   Knezz's voice shakes as much as his hands as he thanks you for your help.
+   'I feel unimaginable gratitude that you have come to my rescue,' he says.
+'This damnable time loop only covers the tower. It certainly doesn't extend to
+the afterlife. Had I died in the loop, another of me would be sent off to the
+here-after.'
+   Knezz chuckles to himself.
+   'Can you imagine?' he says. 'The hells full to the gills with Jozef Knezz!'
+~
+18 ei 125 250 -1
+A
+1 11900
+P
+16 11800 0 6 a
+P
+0 11812 0 1 a
+R
+7 11800 10
+W
+3 11869 0 1 -
+Z
+1 11870
+Z
+1 11968
+S
+#11872
+Skycleave: The Predator in Time~
+   A time lion? In Skycleave? Is such a thing possible? Most of the sorcerers
+didn't seem to think so and perhaps that's why they had no wards or protections
+that could stop it. Nevertheless, this time loop ends when Skithe Ler-Wyn, the
+Lion of Time, consumes the tower and everything stuck inside. So much would be
+lost that this can never be allowed to happen.
+   Enter the tower, ascend its ever-spiraling walkway, defeat the shadow, and
+take on Mezvienne the Enchantress. After all that, engage the lion and see if
+you can end this threat for all time.
+   After it's done, find someone in the tower who would like to discuss it.
+This quest cannot be completed if the fourth floor has already been rescued.
+~
+   Mageina tilts the brim of her oversized black hat up with her wand and peeks
+out at you from underneath. She stands perfectly still for a second as her eyes
+flit left and right while she gauges your sincerity.
+   'I overheard someone mention a time lion, but I didn't believe it, of
+course,' she says. 'And you say you fought the thing?'
+   She walks over to the soup pot and stokes the flame underneath with her
+wand, and stirs it a moment.
+   'A time lion,' she continues. 'I'm not just a pretty face down here, you
+know. I've read all the books upstairs. There's a lot of free time when you're
+stuck in a...'
+   Mageina looks over your shoulder and then leans in close to whisper, 'Stuck
+in a time loop.'
+   She relaxes and picks up a mug, which she polishes with her sleeve.
+   'Oh, don't look at me like that, the barista always knows everything. But
+there isn't a single book in this magical mausoleum about time lions. They're
+a children's story. Your story hinges on a magic lion possessing one of the
+cleverest sorcerers of our time and defeating several of the strongest. If what
+you say is true, then we are definitely not getting out of this time loop.'
+~
+21 ei 125 250 -1
+A
+1 11900
+P
+16 11800 0 6 a
+P
+0 11812 0 1 a
+R
+7 11800 10
+W
+3 11872 0 1 -
+Z
+1 11905
+S
+#11875
+Smol Nes-Pik: What Is This Place?~
+   You find yourself on the branches of a truly enormous tree, with little idea
+how you got here. Were you just in a tower? It's hard to remember now. Like the
+world beyond this tree, your mind seems hazy. This place merits some deeper
+exploration. Will anyone even believe it when you tell them about it?
+   Find something tangible to take back to the tower. Perhaps you can find a
+sorcerer there who will be interested in it.
+~
+   Celiya stops what she was doing as you hand her the little green vial of
+dew. She spins it in her hand, examining it from every angle, taking careful
+note of the carvings and shape before opening the vial and wafting air over the
+mouth to smell the contents.
+   'And you say you found this... on a giant tree?' she asks.
+   'No,' you say. 'It came from the giant who cut the tree down. At least, I
+think it did. It was more like a dream.'
+   'Sugar, this could be the discovery of a lifetime! I'll be sure to put one
+of the residents on this. You did good.'
+~
+9 d 125 250 -1
+A
+3 11875
+A
+3 11876
+A
+3 11877
+A
+3 11878
+A
+3 11879
+A
+3 11880
+A
+3 11881
+A
+3 11882
+A
+3 11883
+A
+3 11884
+A
+3 11885
+A
+3 11886
+A
+3 11887
+A
+3 11889
+R
+7 11800 25
+T 11830
+W
+2 11961 0 1 -
+Z
+1 11864
+Z
+1 11964
+Z
+1 11890
+Z
+1 11969
+S
+#11888
+Smol Nes-Pik: Only In Dreams~
+   The face of the Queen's image seems to turn toward you even as it also faces
+forward; she speaks to you as she speaks to her court. It is as if the Queen
+has two faces. Her second face becons you up to the throne and when you
+approach, she leans close to you -- nearly splitting herself in two to do it --
+and speaks to you in hushed tones under the echoing voice of her other
+conversation.
+   'I watched from afar as you slew Iskip under the full moon. This is no small
+task, if you will pardon the wordplay. I know this is only a long-forgotten
+dream, but that victory gave us hope.' The Queen's split image stops for a
+moment as her voice begins to choke up.
+   'I will be brief; this is very difficult for me,' she says at last. 'We
+would see you do it again. Though it may mean nothing, we would see you cut
+down the giant once again. That is all.'
+~
+   As Iskip falls into the endless water, the air seems to sparkle with yellow
+dust that hangs on the moonlight. You catch your breath but are quickly
+overcome with feelings of relief and remorse; glee and guilt; satisfaction but
+deep, unending sadness.
+   'Thank you,' whispers a the Queen's voice in your ear. You walk to the edge
+of the stump and look down into the water, where you see her reflection instead
+of your own.
+   'Thank you,' she says again. 'I only wish you had been our champion when rot
+and ruin came for us. I shall not forget you, even when you have forgotten me.'
+~
+9 e 125 250 -1
+A
+1 11884
+P
+0 11875 0 1 -
+R
+7 11800 10
+W
+3 11888 0 1 -
+Z
+3 11888
+S
+#11890
+Skycleave: Trapped in a Jar~
+   As you fall asleep, you begin to panic as you watch the last beams of light
+vanish beneath a giant wax seal. You're trapped in a giant clay jay with no way
+out. You dig at the seal with your fingernails but can make no dent in the wax
+and your fingers begin to sting as wax is pressed into the nail beds.
+   This is the sort of nightmare you can't wait to wake up from. But perhaps
+someone will find it interesting next time you're at the Tower Skycleave.
+~
+   The warden looks down at you from his tall chair as you recount the dream of
+being trapped in a jar.
+   'Harrumph. I reckon I wouldn't want to be stuffed into a jar, either,' he
+says as he rubs his long forehead with a handkerchief. Lucky for you and me,
+nobody makes jars big enough.'
+~
+12 0 125 250 -1
+A
+3 11890
+P
+16 11800 0 6 -
+R
+7 11800 10
+W
+13 11890 0 1 -
+Z
+1 11918
+S
+$

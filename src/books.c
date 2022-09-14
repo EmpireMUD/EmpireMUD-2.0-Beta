@@ -470,7 +470,7 @@ int perform_shelve(char_data *ch, obj_data *obj) {
 
 LIBRARY_SCMD(library_shelve) {
 	obj_data *obj, *next_obj;
-	int dotmode, amount = 0, multi;
+	int dotmode, multi;
 	bool found;
 	
 	one_argument(argument, arg);
@@ -499,7 +499,7 @@ LIBRARY_SCMD(library_shelve) {
 		else {
 			do {
 				next_obj = get_obj_in_list_vis(ch, arg, NULL, obj->next_content);
-				amount += perform_shelve(ch, obj);
+				perform_shelve(ch, obj);
 				obj = next_obj;
 			} while (obj && --multi);
 		}
@@ -514,7 +514,7 @@ LIBRARY_SCMD(library_shelve) {
 			else {
 				DL_FOREACH_SAFE2(ch->carrying, obj, next_obj, next_content) {
 					if (!OBJ_FLAGGED(obj, OBJ_KEEP) && IS_BOOK(obj)) {
-						amount += perform_shelve(ch, obj);
+						perform_shelve(ch, obj);
 						found = TRUE;
 					}
 				}
@@ -535,7 +535,7 @@ LIBRARY_SCMD(library_shelve) {
 			while (obj) {
 				next_obj = get_obj_in_list_vis(ch, arg, NULL, obj->next_content);
 				if (!OBJ_FLAGGED(obj, OBJ_KEEP)) {
-					amount += perform_shelve(ch, obj);
+					perform_shelve(ch, obj);
 				}
 				obj = next_obj;
 			}
@@ -545,7 +545,7 @@ LIBRARY_SCMD(library_shelve) {
 				msg_to_char(ch, "You don't seem to have %s %s.\r\n", AN(arg), arg);
 			}
 			else {
-				amount += perform_shelve(ch, obj);
+				perform_shelve(ch, obj);
 			}
 		}
 	}	

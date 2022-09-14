@@ -335,6 +335,7 @@ Mobs can trigger on the following events:
 &cDeath&0 - Triggers when the mob dies.
 &cGreet&0 - Triggers when a visible person enters the room.
 &cGreet-All&0 - Triggers ANY person enters the room.
+&cPre-Greet-All&0 - Triggers right before ANY person enters the room.
 &cEntry&0 - Triggers when the mob moves into a new room.
 &cReceive&0 - Triggers when the mob receives an item.
 &cFight&0 - Triggers during combat rounds.
@@ -428,6 +429,9 @@ When using field  - The variable returns:
 &ccooldown(vnum)&0 - Gets the character's current cooldown time (seconds).
 &ccrafting_level&0 - The actor's crafting level.
 &ccurrency(vnum)&0 - The amount of an adventure currency that a player has.
+&ccustom(TYPE,NUM)&0 - Get a mob's custom string. NUM is optional. If there is
+   more than one entry for a type, it returns one at random unless you request
+   a specific number like %ch.custom(script1,0)%.
 &cdex&0 - The actor's Dexterity.
 &cdir(name)&0 - Gives the name of the character's perceived direction
    ('name' is the real direction), which is useful for people without

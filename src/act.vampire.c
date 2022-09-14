@@ -289,7 +289,7 @@ void make_vampire(char_data *ch, bool lore, any_vnum skill_vnum) {
 		GET_APPARENT_AGE(ch) = GET_REAL_AGE(ch);
 		
 		if (skill_vnum != NOTHING && get_skill_level(ch, skill_vnum) < 1) {
-			gain_skill(ch, find_skill_by_vnum(skill_vnum), 1);
+			gain_skill(ch, find_skill_by_vnum(skill_vnum), 1, NULL);
 		}
 
 		GET_BLOOD(ch) = config_get_int("blood_starvation_level") * 1.5;

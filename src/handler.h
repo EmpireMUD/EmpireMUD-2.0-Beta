@@ -352,7 +352,7 @@ void extract_required_items(char_data *ch, struct req_data *list);
 bool find_requirement_in_list(struct req_data *list, int type, any_vnum vnum);
 void free_requirements(struct req_data *list);
 bool meets_requirements(char_data *ch, struct req_data *list, struct instance_data *instance);
-char *requirement_string(struct req_data *task, bool show_vnums);
+char *requirement_string(struct req_data *task, bool show_vnums, bool allow_custom);
 
 // resource handlers
 bool remove_thing_from_resource_list(struct resource_data **list, int type, any_vnum vnum);

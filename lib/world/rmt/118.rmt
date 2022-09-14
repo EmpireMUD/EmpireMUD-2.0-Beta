@@ -416,6 +416,7 @@ The study hall is to the northeast.
 M 0 11890 100.00 1
 M 0 11838 100.00 1
 M 1 11832 100.00 3
+M 1 11831 100.00 5
 S
 #11805
 Cafe Fendreciel~
@@ -1581,6 +1582,7 @@ his portrait reads:
                  |  Fifteenth Master, Tower Skycleave  |
                  +-------------------------------------+
 ~
+M 1 11831 100.00 5
 S
 #11823
 A Most Peculiar Maze~
@@ -2337,6 +2339,7 @@ down fountain second~
 walkway, second floor walkway below it, and the fountain way below on the
 ground floor.
 ~
+M 1 11831 100.00 5
 S
 #11835
 The Eruditorium~
@@ -3233,6 +3236,10 @@ bookshelf shelf books~
 least a hundred old tomes. Strangely, you can't read any of the titles. Even
 attempting it makes your brain foggy; trying to reach for a book leaves your
 whole arm numb.
+~
+E
+marble white floors~
+The floor appears to be one enormous sheet of white marble.
 ~
 E
 inspirational painting~

@@ -16,7 +16,7 @@ adventurer late~
 the late adventurer~
 A late adventurer is standing here (list).
 ~
-100 125 bdov nD 3
+100 125 bdovI nD 3
 1 0 0 15
 T 11025
 S
@@ -38,7 +38,7 @@ thief shady~
 a shady thief~
 A shady thief is hiding in the shadows (list).
 ~
-100 125 bdov nD 3
+100 125 bdovI nD 3
 1 0 0 15
 T 11026
 S
@@ -64,7 +64,7 @@ poacher~
 a poacher~
 A poacher is creeping through the brush.
 ~
-100 125 bdov c 3
+100 125 bdovI c 3
 1 0 9 2
 T 11007
 S

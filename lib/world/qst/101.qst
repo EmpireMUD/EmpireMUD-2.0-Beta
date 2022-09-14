@@ -5,15 +5,15 @@ arid countryside! Fight and defeat the magical invaders until you have defeated
 enough of them to summon their leader. Then, enter the monsoon rift, find the
 saguaro cactus on the hilltop, and prepare to fight it.
    Killing the jumping cactus, barbary fig, and creeping devil cactus NPCs
-will contribute to your progress on this quest. When the 'scripted condition'
-is complete, turn in this quest inside the rift to start the final combat.
+will contribute to your progress on this quest. When you have killed enough of
+them, turn in this quest inside the rift to start the final combat.
    Note: You can't start other Monsoon Rift quests while you're on this one,
 so if you want to complete the adventure a different way, you must drop this
 quest first.
 ~
 You have defeated enough attackers to summon the final cactus...
 ~
-6 c 75 100 1440
+7 c 75 100 1440
 A
 4 10148
 P
@@ -36,8 +36,9 @@ P
 6 10157 0 1 a
 R
 6 10142 1
-W
-11 0 0 1
+W+
+11 0 0 1 -
+Kill enough cacti~
 Z
 2 10171
 S
@@ -77,7 +78,7 @@ T 10142
 T 10168
 T 18259
 W
-3 10143 0 1
+3 10143 0 1 -
 Z
 3 10145
 S
@@ -91,7 +92,7 @@ spell to seal the rift.
 ~
 You found the spell to seal the rift!
 ~
-7 c 75 100 1440
+8 c 75 100 1440
 A
 2 10140
 P
@@ -117,8 +118,9 @@ R
 T 10174
 W
 12 5511 0 1 a
-W
+W+
 11 0 0 1 a
+Study the monsoon~
 Z
 2 10142
 S
@@ -132,7 +134,7 @@ monsoon rift and type 'ritual rift' to seal it off and end the cactus invasion.
 fade and lose its hold. Almost instantly, the rift begins to collapse.
 Hopefully nobody is trapped on the wrong side of it!
 ~
-14 bc 75 100 0
+15 bc 75 100 0
 A
 2 10142
 P
@@ -160,8 +162,9 @@ R
 T 18259
 W
 12 10140 0 1 a
-W
+W+
 11 0 0 1 a
+Perform the rift ritual~
 Z
 2 10175
 S
@@ -179,7 +182,7 @@ thanks you for your service to nature. Thanks to your help, the thirsty desert
 plants have the water to survive another year. You can already see the rift
 beginning to close -- better hurry back out.
 ~
-10 c 75 100 1440
+11 c 75 100 1440
 A
 1 10144
 P
@@ -207,8 +210,9 @@ R
 T 10147
 T 10142
 T 18259
-W
-11 0 0 1
+W+
+11 0 0 1 -
+Perform the monsoon chant on 6 desert tiles~
 Z
 1 10144
 S
@@ -230,7 +234,7 @@ laundry, ties them to a pigeon, and sends it off.
    Within moments, the rift starts to close. Clearly the head druid got the
 message. You had better head out of the rift, before it collapses completely.
 ~
-10 cd 75 100 1440
+11 cd 75 100 1440
 A
 1 10145
 P
@@ -259,8 +263,9 @@ T 10142
 T 18259
 W
 13 10143 0 1 a
-W
+W+
 11 0 0 1 a
+Search the head druid's tent~
 W
 2 10178 0 1 a
 Z
@@ -310,7 +315,7 @@ R
 T 10173
 T 18259
 W
-2 10177 0 3
+2 10177 0 3 -
 Z
 1 10146
 S
@@ -328,7 +333,7 @@ completed the infusion. Infusing the totem will require some of your blood.
    You infuse the bat totem with some of your blood, and it takes on a reddish
 glow...
 ~
-5 c 75 100 1440
+6 c 75 100 1440
 A
 1 10147
 P
@@ -352,8 +357,9 @@ P
 R
 6 10157 1
 T 10178
-W
-11 0 0 1
+W+
+11 0 0 1 -
+Infuse the totem~
 Z
 2 10161
 S
@@ -370,7 +376,7 @@ have been ravaging the countryside.
 animates the cacti begins to fade. In the distance, you can see the rift
 starting to close. You better hurry out!
 ~
-13 bc 75 100 0
+14 bc 75 100 0
 A
 2 10161
 P
@@ -399,8 +405,9 @@ T 10178
 T 18259
 W
 13 10145 0 1 a
-W
+W+
 11 0 0 1 a
+Perform the eclipse ritual~
 Z
 2 10173
 S

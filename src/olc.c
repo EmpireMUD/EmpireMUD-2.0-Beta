@@ -4166,11 +4166,19 @@ void get_interaction_display(struct interaction_item *list, char *save_buffer) {
 */
 void get_requirement_display(struct req_data *list, char *save_buffer) {
 	struct req_data *req;
+	char buf[MAX_INPUT_LENGTH];
 	int count = 0;
 	
 	*save_buffer = '\0';
 	LL_FOREACH(list, req) {
-		sprintf(save_buffer + strlen(save_buffer), "%2d. %s: %s\r\n", ++count, requirement_types[req->type], requirement_string(req, TRUE));
+		if (req->custom) {
+			snprintf(buf, sizeof(buf), ": %s", req->custom);
+		}
+		else {
+			*buf = '\0';
+		}
+		
+		sprintf(save_buffer + strlen(save_buffer), "%2d. %s: %s%s\r\n", ++count, requirement_types[req->type], requirement_string(req, TRUE, FALSE), buf);
 	}
 	
 	// empty list not shown
@@ -4661,6 +4669,58 @@ int find_olc_type(char *name) {
 
 
 /**
+* @param struct interaction_item *a First interaction.
+* @param struct interaction_item *b Second interaction.
+* @return bool TRUE if both interactions are identical, FALSE if different.
+*/
+bool interactions_are_identical(struct interaction_item *a, struct interaction_item *b) {
+	struct interact_restriction *ir, *find;
+	bool found;
+	
+	// check basic data first
+	if (a->type != b->type || a->vnum != b->vnum || a->percent != b->percent || a->quantity != b->quantity || a->exclusion_code != b->exclusion_code) {
+		return FALSE;
+	}
+	
+	// compare interactions: a to b
+	LL_FOREACH(a->restrictions, ir) {
+		// each restriction in a MUST be present in B
+		found = FALSE;
+		LL_FOREACH(b->restrictions, find) {
+			if (ir->type == find->type && ir->vnum == find->vnum) {
+				found = TRUE;
+				break;
+			}
+		}
+		if (!found) {
+			// not the same
+			return FALSE;
+		}
+	}
+	
+	// compare interactions: b to a
+	LL_FOREACH(b->restrictions, ir) {
+		// each restriction in a MUST be present in B
+		found = FALSE;
+		LL_FOREACH(a->restrictions, find) {
+			if (ir->type == find->type && ir->vnum == find->vnum) {
+				found = TRUE;
+				break;
+			}
+		}
+		if (!found) {
+			// not the same
+			return FALSE;
+		}
+	}
+	
+	// interaction comparison basically ignores duplicates even if there's a different number of dupes
+	// if we got here, these items are the same
+	return TRUE;
+}
+
+
+/**
 * @param char_data *ch The person trying to olc-edit.
 * @param int type Any OLC_ mode.
 * @param any_vnum vnum The vnum they are trying to edit.
@@ -5032,10 +5092,11 @@ int olc_process_number(char_data *ch, char *argument, char *name, char *command,
 * @param int *amount A variable to store the amount to.
 * @param any_vnum *vnum A variable to store the vnum to.
 * @param bitvector_t *misc A variable to store the misc value to.
-* param char *group A variable to store the group arg, if any.
+* @param char *group A variable to store the group arg, if any.
+* @param char **custom_text A variable to store custom display text, if any was provided.
 * @return bool TRUE if the arguments were provided correctly, FALSE if an error was sent.
 */
-bool olc_parse_requirement_args(char_data *ch, int type, char *argument, bool find_amount, int *amount, any_vnum *vnum, bitvector_t *misc, char *group) {
+bool olc_parse_requirement_args(char_data *ch, int type, char *argument, bool find_amount, int *amount, any_vnum *vnum, bitvector_t *misc, char *group, char **custom_text) {
 	char arg[MAX_INPUT_LENGTH]; 
 	bool need_abil = FALSE, need_bld = FALSE, need_component = FALSE;
 	bool need_mob = FALSE, need_obj = FALSE, need_quest = FALSE;
@@ -5048,6 +5109,7 @@ bool olc_parse_requirement_args(char_data *ch, int type, char *argument, bool fi
 	*vnum = 0;
 	*misc = 0;
 	*group = 0;
+	*custom_text = NULL;
 	
 	// REQ_x: determine which args we need
 	switch (type) {
@@ -5360,15 +5422,22 @@ bool olc_parse_requirement_args(char_data *ch, int type, char *argument, bool fi
 	}
 	
 	// anything left for a group letter?
-	skip_spaces(&argument);
-	if (*argument && str_cmp(argument, "none")) {	// ignore a "none" here, for "no group"
-		if (strlen(argument) != 1 || !isalpha(*argument)) {
+	argument = any_one_arg(argument, arg);
+	if (*arg && str_cmp(arg, "none") && *arg != '-') {	// ignore a "none" or "-" here, for "no group"
+		if (strlen(arg) != 1 || !isalpha(*arg)) {
 			msg_to_char(ch, "Group must be a letter (or may be blank).\r\n");
 			return FALSE;
 		}
 		else {
 			*group = *argument;
 		}
+	}
+	
+	// anything left for custom text?
+	skip_spaces(&argument);
+	if (*argument) {
+		*custom_text = str_dup(argument);
+		**custom_text = UPPER(**custom_text);
 	}
 	
 	// all good
@@ -5552,7 +5621,7 @@ void olc_process_requirements(char_data *ch, char *argument, struct req_data **l
 	int findtype, num, type;
 	bitvector_t misc;
 	any_vnum vnum;
-	char group;
+	char group, *custom_text;
 	bool found, none;
 	
 	argument = any_one_arg(argument, cmd_arg);	// add/remove/change/copy
@@ -5650,7 +5719,13 @@ void olc_process_requirements(char_data *ch, char *argument, struct req_data **l
 				if (--num == 0) {
 					found = TRUE;
 					
-					msg_to_char(ch, "You remove the %s info for: %s\r\n", command, requirement_string(iter, TRUE));
+					if (iter->custom) {
+						snprintf(buf, sizeof(buf), " (%s)", iter->custom);
+					}
+					else {
+						*buf = '\0';
+					}
+					msg_to_char(ch, "You remove the %s info for: %s%s\r\n", command, requirement_string(iter, TRUE, FALSE), buf);
 					LL_DELETE(*list, iter);
 					free(iter);
 					break;
@@ -5672,7 +5747,7 @@ void olc_process_requirements(char_data *ch, char *argument, struct req_data **l
 		else if ((type = search_block(type_arg, requirement_types, FALSE)) == NOTHING) {
 			msg_to_char(ch, "Invalid type '%s'.\r\n", type_arg);
 		}
-		else if (!olc_parse_requirement_args(ch, type, argument, TRUE, &num, &vnum, &misc, &group)) {
+		else if (!olc_parse_requirement_args(ch, type, argument, TRUE, &num, &vnum, &misc, &group, &custom_text)) {
 			// sends own error
 		}
 		else if (!allow_tracker_types && requirement_needs_tracker[type]) {
@@ -5686,10 +5761,18 @@ void olc_process_requirements(char_data *ch, char *argument, struct req_data **l
 			req->misc = misc;
 			req->group = group;
 			req->needed = num;
-		
+			req->custom = custom_text;
+			
+			if (req->custom) {
+				snprintf(buf, sizeof(buf), " (%s)", req->custom);
+			}
+			else {
+				*buf = '\0';
+			}
+			
 			LL_APPEND(*list, req);
 			LL_SORT(*list, sort_requirements_by_group);
-			msg_to_char(ch, "You add %s: %s\r\n", command, requirement_string(req, TRUE));
+			msg_to_char(ch, "You add %s: %s%s\r\n", command, requirement_string(req, TRUE, FALSE), buf);
 		}
 	}	// end 'add'
 	else if (is_abbrev(cmd_arg, "change")) {
@@ -5713,6 +5796,14 @@ void olc_process_requirements(char_data *ch, char *argument, struct req_data **l
 			}
 		}
 		
+		// shortcut string to buf
+		if (change && change->custom) {
+			snprintf(buf, sizeof(buf), " (%s)", change->custom);
+		}
+		else {
+			*buf = '\0';
+		}
+		
 		if (!change) {
 			msg_to_char(ch, "Invalid %s number.\r\n", command);
 		}
@@ -5727,25 +5818,25 @@ void olc_process_requirements(char_data *ch, char *argument, struct req_data **l
 			}
 			else {
 				change->needed = num;
-				msg_to_char(ch, "You change %s %d to: %s\r\n", command, atoi(num_arg), requirement_string(change, TRUE));
+				msg_to_char(ch, "You change %s %d to: %s%s\r\n", command, atoi(num_arg), requirement_string(change, TRUE, FALSE), buf);
 			}
 		}
 		else if (is_abbrev(field_arg, "vnum")) {
 			// num is junk here
-			if (!olc_parse_requirement_args(ch, change->type, argument, FALSE, &num, &vnum, &misc, &group)) {
+			if (!olc_parse_requirement_args(ch, change->type, argument, FALSE, &num, &vnum, &misc, &group, &custom_text)) {
 				// sends own error
 			}
 			else {
 				change->vnum = vnum;
 				change->misc = misc;
-				msg_to_char(ch, "Changed %s %d to: %s\r\n", command, atoi(num_arg), requirement_string(change, TRUE));
+				msg_to_char(ch, "Changed %s %d to: %s%s\r\n", command, atoi(num_arg), requirement_string(change, TRUE, FALSE), buf);
 			}
 		}
 		else if (is_abbrev(field_arg, "group")) {
-			if (!str_cmp(argument, "none")) {
+			if (!str_cmp(argument, "none") || *argument == '-') {
 				change->group = 0;
 				LL_SORT(*list, sort_requirements_by_group);
-				msg_to_char(ch, "Changed %s %d to: %s\r\n", command, atoi(num_arg), requirement_string(change, TRUE));
+				msg_to_char(ch, "Changed %s %d to: %s%s\r\n", command, atoi(num_arg), requirement_string(change, TRUE, FALSE), buf);
 			}
 			else if (strlen(argument) != 1 || !isalpha(*argument)) {
 				msg_to_char(ch, "Group must be a letter or 'none'.\r\n");
@@ -5754,11 +5845,29 @@ void olc_process_requirements(char_data *ch, char *argument, struct req_data **l
 			else {
 				change->group = *argument;
 				LL_SORT(*list, sort_requirements_by_group);
-				msg_to_char(ch, "Changed %s %d to: %s\r\n", command, atoi(num_arg), requirement_string(change, TRUE));
+				msg_to_char(ch, "Changed %s %d to: %s%s\r\n", command, atoi(num_arg), requirement_string(change, TRUE, FALSE), buf);
+			}
+		}
+		else if (is_abbrev(field_arg, "text")) {
+			if (!str_cmp(argument, "none")) {
+				if (change->custom) {
+					free(change->custom);
+				}
+				change->custom = NULL;
+				snprintf(buf, sizeof(buf), " (no custom text)");
+				msg_to_char(ch, "Changed %s %d to: %s%s\r\n", command, atoi(num_arg), requirement_string(change, TRUE, FALSE), buf);
+			}
+			else {
+				if (change->custom) {
+					free(change->custom);
+				}
+				change->custom = str_dup(argument);
+				snprintf(buf, sizeof(buf), " (%s)", change->custom);
+				msg_to_char(ch, "Changed %s %d to: %s%s\r\n", command, atoi(num_arg), requirement_string(change, TRUE, FALSE), buf);
 			}
 		}
 		else {
-			msg_to_char(ch, "You can only change the amount, group, or vnum.\r\n");
+			msg_to_char(ch, "You can only change the amount, group, text, or vnum.\r\n");
 		}
 	}	// end 'change'
 	else if (is_abbrev(cmd_arg, "move")) {
@@ -5822,7 +5931,7 @@ void olc_process_requirements(char_data *ch, char *argument, struct req_data **l
 	}	// end 'move'
 	else {
 		msg_to_char(ch, "Usage: %s add <type> <vnum>\r\n", command);
-		msg_to_char(ch, "Usage: %s change <number> vnum <value>\r\n", command);
+		msg_to_char(ch, "Usage: %s change <number> <amount | group | text | vnum> <value>\r\n", command);
 		msg_to_char(ch, "Usage: %s copy <from type> <from vnum> [tasks/prereqs]\r\n", command);
 		msg_to_char(ch, "Usage: %s remove <number | all>\r\n", command);
 		msg_to_char(ch, "Usage: %s move <number> <up | down>\r\n", command);
@@ -6193,9 +6302,68 @@ void olc_process_custom_messages(char_data *ch, char *argument, struct custom_me
 			msg_to_char(ch, "You can only change the type or message.\r\n");
 		}
 	}
+	else if (is_abbrev(arg1, "move")) {
+		struct custom_message *to_move, *prev;
+		bool up;
+		
+		// usage: <cmd> move <number> <up | down>
+		half_chop(arg2, num_arg, val_arg);
+		up = is_abbrev(val_arg, "up");
+		
+		if (!*num_arg || !*val_arg) {
+			msg_to_char(ch, "Usage: custom move <number> <up | down>\r\n");
+		}
+		else if (!isdigit(*num_arg) || (num = atoi(num_arg)) < 1) {
+			msg_to_char(ch, "Invalid custom message number.\r\n");
+		}
+		else if (!is_abbrev(val_arg, "up") && !is_abbrev(val_arg, "down")) {
+			msg_to_char(ch, "You must specify whether you're moving it up or down in the list.\r\n");
+		}
+		else if (up && num == 1) {
+			msg_to_char(ch, "You can't move it up; it's already at the top of the list.\r\n");
+		}
+		else {
+			// find the one to move
+			to_move = prev = NULL;
+			LL_FOREACH(*list, custm) {
+				if (--num == 0) {
+					to_move = custm;
+					break;	// found
+				}
+				else {
+					// store for next iteration
+					prev = custm;
+				}
+			}
+			
+			if (!to_move) {
+				msg_to_char(ch, "Invalid custom message number.\r\n");
+			}
+			else if (!up && !to_move->next) {
+				msg_to_char(ch, "You can't move it down; it's already at the bottom of the list.\r\n");
+			}
+			else {
+				// SUCCESS: attempt to move
+				if (up && prev) {
+					// can move up
+					LL_DELETE(*list, to_move);
+					LL_PREPEND_ELEM(*list, prev, to_move);
+				}
+				else if (!up && (prev = to_move->next)) {
+					// can move down
+					LL_DELETE(*list, to_move);
+					LL_APPEND_ELEM(*list, prev, to_move);
+				}
+				
+				// message: re-atoi(num_arg) because we destroyed num finding our target
+				msg_to_char(ch, "You move custom %d %s.\r\n", atoi(num_arg), (up ? "up" : "down"));
+			}
+		}
+	}
 	else {
 		msg_to_char(ch, "Usage: custom add <type> <message>\r\n");
 		msg_to_char(ch, "Usage: custom change <number> <type | message> <value>\r\n");
+		msg_to_char(ch, "Usage: custom move <number> <up | down>\r\n");
 		msg_to_char(ch, "Usage: custom remove <number | all>\r\n");
 		msg_to_char(ch, "Available types:\r\n");
 		for (iter = 0; *type_names[iter] != '\n'; ++iter) {
@@ -7912,7 +8080,7 @@ void smart_copy_interactions(struct interaction_item **addto, struct interaction
 		// see if an identical interaction is in the addto list
 		found = FALSE;
 		for (find = *addto; find && !found; find = find->next) {
-			if (find->type == interact->type && find->vnum == interact->vnum && find->percent == interact->percent && find->quantity == interact->quantity && find->exclusion_code == interact->exclusion_code) {
+			if (interactions_are_identical(interact, find)) {
 				found = TRUE;
 			}
 		}
@@ -7962,6 +8130,9 @@ void smart_copy_requirements(struct req_data **to_list, struct req_data *from_li
 		if (!found) {
 			CREATE(req, struct req_data, 1);
 			*req = *iter;
+			if (iter->custom) {
+				req->custom = str_dup(iter->custom);
+			}
 			LL_APPEND(*to_list, req);
 		}
 	}

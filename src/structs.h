@@ -1360,6 +1360,19 @@ typedef struct vehicle_data vehicle_data;
 #define WF_PROB_ADVENTURE_PRESENT  7	// blocked by adventure instance
 
 
+// WPLOG_x: Types for the workforce production log
+#define WPLOG_COINS  0
+#define WPLOG_OBJECT  1
+#define WPLOG_BUILDING_DONE  2
+#define WPLOG_BUILDING_DISMANTLED  3
+#define WPLOG_VEHICLE_DONE  4
+#define WPLOG_VEHICLE_DISMANTLED  5
+#define WPLOG_STUMPS_BURNED  6
+#define WPLOG_FIRE_EXTINGUISHED  7
+#define WPLOG_PROSPECTED  8
+#define WPLOG_MAINTENANCE  9
+
+
 // for tracking playtime
 #define PLAYTIME_WEEKS_TO_TRACK  12	// playtime determined by past 12 weeks
 
@@ -1592,6 +1605,7 @@ typedef struct vehicle_data vehicle_data;
 #define MOB_NO_EXPERIENCE  BIT(31)	// F. players get no exp against this mob
 #define MOB_NO_RESCALE  BIT(32)	// G. mob won't rescale (after the first time), e.g. if specific traits were set
 #define MOB_SILENT  BIT(33)	// H. will not set off custom strings
+#define MOB_COINS  BIT(34)	// I. mob drops coins on death/pickpocket
 
 
 // MOB_CUSTOM_x: custom message types
@@ -1602,6 +1616,11 @@ typedef struct vehicle_data vehicle_data;
 #define MOB_CUSTOM_ECHO_DAY  4
 #define MOB_CUSTOM_ECHO_NIGHT  5
 #define MOB_CUSTOM_LONG_DESC  6	// random long descs
+#define MOB_CUSTOM_SCRIPT_1  7	// called by scripts
+#define MOB_CUSTOM_SCRIPT_2  8	// called by scripts
+#define MOB_CUSTOM_SCRIPT_3  9	// called by scripts
+#define MOB_CUSTOM_SCRIPT_4  10	// called by scripts
+#define MOB_CUSTOM_SCRIPT_5  11	// called by scripts
 
 
 // MOB_MOVE_x: mob/vehicle movement types
@@ -1839,6 +1858,11 @@ typedef enum {
 #define OBJ_CUSTOM_DECAYS_IN_ROOM  18	// everywhere else
 #define OBJ_CUSTOM_RESOURCE_TO_CHAR  19  // when gained as a resource
 #define OBJ_CUSTOM_RESOURCE_TO_ROOM  20  // when gained as a resource
+#define OBJ_CUSTOM_SCRIPT_1  21	// called by scripts
+#define OBJ_CUSTOM_SCRIPT_2  22	// called by scripts
+#define OBJ_CUSTOM_SCRIPT_3  23	// called by scripts
+#define OBJ_CUSTOM_SCRIPT_4  24	// called by scripts
+#define OBJ_CUSTOM_SCRIPT_5  25	// called by scripts
 
 
 // RES_x: resource requirement types
@@ -3288,6 +3312,8 @@ struct req_data {
 	
 	int needed;	// how many the player needs
 	int current;	// how many the player has (for places where this data is tracked
+	
+	char *custom;	// custom display text, may be NULL
 	
 	struct req_data *next;
 };
@@ -5078,6 +5104,16 @@ struct workforce_production_limit {
 };
 
 
+// to support daily workforce elogs
+struct workforce_production_log {
+	int type;	// WPLOG_ type
+	any_vnum vnum;	// object vnum etc
+	int amount;	// quantity
+	
+	struct workforce_production_log *next;	// LL
+};
+
+
 // for offenses committed against an empire
 struct offense_data {
 	int type;	// OFFENSE_ constant
@@ -5170,6 +5206,7 @@ struct empire_data {
 	struct empire_homeless_citizen *homeless;	// list of homeless npcs
 	struct script_data *script;	// for storing variables
 	struct workforce_production_limit *production_limits;	// limits on what workforce can make
+	struct workforce_production_log *production_logs;	// LL of things produced
 	struct empire_playtime_tracker *playtime_tracker;	// tracks real gameplay
 	
 	// unsaved data

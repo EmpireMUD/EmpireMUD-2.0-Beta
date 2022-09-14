@@ -458,6 +458,7 @@ ACMD(do_respawn) {
 		char_to_room(ch, find_load_room(ch));
 		GET_LAST_DIR(ch) = NO_DIR;
 		qt_visit_room(ch, IN_ROOM(ch));
+		pre_greet_mtrigger(ch, IN_ROOM(ch), NO_DIR);	// cannot pre-greet for respawn
 		
 		syslog(SYS_DEATH, GET_INVIS_LEV(ch), TRUE, "%s has respawned at %s", GET_NAME(ch), room_log_identifier(IN_ROOM(ch)));
 		act("$n rises from the dead!", TRUE, ch, NULL, NULL, TO_ROOM);

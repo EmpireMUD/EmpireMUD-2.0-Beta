@@ -10,8 +10,8 @@ D
 considerably scruffier. It sniffs along the ground, perhaps looking for fungi
 or roots to eat.
 ~
-I 0 3201 100.00 3  # BUTCHER: a slab of pork
-I 1 1351 100.00 1  # SKIN: a large skin
+I 0 3201 100.00 3  # BUTCHER: slab of pork
+I 1 1351 100.00 1  # SKIN: large skin
 S
 #9201
 tapir forest~
@@ -25,8 +25,8 @@ D
 and elephant, mashed them with a pestle, and made a new animal. The tapir just
 seems to be foraging. It pays very little attention to you.
 ~
-I 0 3012 100.00 2  # BUTCHER: a fillet of raw meat
-I 1 1351 100.00 1  # SKIN: a large skin
+I 0 3012 100.00 2  # BUTCHER: fillet of raw meat
+I 1 1351 100.00 1  # SKIN: large skin
 S
 #9202
 capybara~
@@ -40,8 +40,8 @@ D
 rodents. It watches you with narrowed black eyes which peer out from its shaggy
 brown fur.
 ~
-I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
-I 1 1351 100.00 1  # SKIN: a large skin
+I 0 3012 100.00 1  # BUTCHER: fillet of raw meat
+I 1 1351 100.00 1  # SKIN: large skin
 S
 #9203
 seal harbor~
@@ -53,8 +53,8 @@ A harbor seal is rolling around playfully.
 D
 This friendly seal is light brown with dark spots all over its back.
 ~
-I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
-I 1 1351 100.00 1  # SKIN: a large skin
+I 0 3012 100.00 1  # BUTCHER: fillet of raw meat
+I 1 1351 100.00 1  # SKIN: large skin
 M
 0
 $n barks at you.~
@@ -92,8 +92,8 @@ D
 rocks. These creatures dive beneath the waves to scrape plant material from the
 rocky ocean floor.
 ~
-I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
-I 1 1350 100.00 1  # SKIN: a small skin
+I 0 3012 100.00 1  # BUTCHER: fillet of raw meat
+I 1 1350 100.00 1  # SKIN: small skin
 S
 #9206
 flamingo pink~
@@ -105,8 +105,8 @@ A pink flamingo is standing on one leg.
 D
 The flamingo is bright pink in color. It stands on a single leg just offshore.
 ~
-I 0 3200 100.00 1  # BUTCHER: a cut of poultry
-I 0 9025 75.00 1  # BUTCHER: some bird feathers
+I 0 3200 100.00 1  # BUTCHER: cut of poultry
+I 0 9025 75.00 1  # BUTCHER: bird feathers
 M
 0
 $n spreads $s wings and stretches.~
@@ -125,8 +125,8 @@ D
    The sleek little brown otter rolls and plays in the water, sometimes diving
 below the surface and returning with a fish.
 ~
-I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
-I 1 1350 100.00 1  # SKIN: a small skin
+I 0 3012 100.00 1  # BUTCHER: fillet of raw meat
+I 1 1350 100.00 1  # SKIN: small skin
 M
 0
 $n splashes around in the water.~
@@ -149,8 +149,8 @@ D
 through the water on its spindly legs, occasionally stabbing its long, pointed
 beak into the water to retrieve a fish.
 ~
-I 0 3200 100.00 1  # BUTCHER: a cut of poultry
-I 0 9025 75.00 1  # BUTCHER: some bird feathers
+I 0 3200 100.00 1  # BUTCHER: cut of poultry
+I 0 9025 75.00 1  # BUTCHER: bird feathers
 S
 #9209
 crab mud~
@@ -169,14 +169,14 @@ pirate salty~
 a salty pirate~
 A salty pirate stands atop a half-buried chest.
 ~
-75 100 bdvyz c 3
+75 100 bdvyzI c 3
 1 0 0 1
 D
    The pirate looks like he's had a rough life. He's missing an eye, a leg, and
 part of his arm -- replaced with a patch, a peg, and a hook, respectively. It
 looks like he's trying to bury a chest.
 ~
-I 4 9210 100.00 1  # LOOT: a pirate's chest
+I 4 9210 100.00 1  # LOOT: pirate's chest
 M
 1
 Yarrrr...~
@@ -199,7 +199,7 @@ D
 the shore. It stands upright, tall for its size, and waddles around with
 difficulty. It clearly prefers to spend time in the water.
 ~
-I 0 3200 100.00 1  # BUTCHER: a cut of poultry
+I 0 3200 100.00 1  # BUTCHER: cut of poultry
 M
 0
 $n scampers past you.~
@@ -218,9 +218,9 @@ D
    This odd creature, sometimes called the red bear-cat, is indeed mostly red,
 with white markings on its face, a black belly, and a striped red tail.
 ~
-I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
-I 1 9212 50.00 1 a  # SKIN: a bright red fur
-I 1 1350 50.00 1 a  # SKIN: a small skin
+I 0 3012 100.00 1  # BUTCHER: fillet of raw meat
+I 1 9212 50.00 1 a  # SKIN: bright red fur
+I 1 1350 50.00 1 a  # SKIN: small skin
 M
 0
 $n twitches $s whiskers.~
@@ -245,9 +245,9 @@ D
    These huge black and white bears almost appear to be wearing masks. The
 panda is notoriously lazy, and spends most of its time resting and chewing.
 ~
-I 0 3012 100.00 3  # BUTCHER: a fillet of raw meat
-I 1 1351 25.00 1 s  # SKIN: a large skin
-I 1 9213 75.00 1 s  # SKIN: a black and white hide
+I 0 3012 100.00 3  # BUTCHER: fillet of raw meat
+I 1 1351 25.00 1 s  # SKIN: large skin
+I 1 9213 75.00 1 s  # SKIN: black and white hide
 M
 0
 $n eyes you cautiously as you move around.~
@@ -268,8 +268,8 @@ A mourning dove pecks at the ground.
 D
 This little brown dove seems intent to peck at the ground for food.
 ~
-I 0 3200 100.00 1  # BUTCHER: a cut of poultry
-I 0 9025 75.00 1  # BUTCHER: some bird feathers
+I 0 3200 100.00 1  # BUTCHER: cut of poultry
+I 0 9025 75.00 1  # BUTCHER: bird feathers
 M
 0
 $n coos loudly.~
@@ -288,8 +288,8 @@ D
    The mallard has a bright green head and a ring of white around its neck. It
 can often be found near water.
 ~
-I 0 3200 100.00 1  # BUTCHER: a cut of poultry
-I 0 9025 75.00 1  # BUTCHER: some bird feathers
+I 0 3200 100.00 1  # BUTCHER: cut of poultry
+I 0 9025 75.00 1  # BUTCHER: bird feathers
 M
 0
 $n quacks.~
@@ -305,8 +305,8 @@ D
    The teal has a brown body but when it stretches its wings, it reveals the
 bright feathers that give it its name.
 ~
-I 0 3200 100.00 1  # BUTCHER: a cut of poultry
-I 0 9025 75.00 1  # BUTCHER: some bird feathers
+I 0 3200 100.00 1  # BUTCHER: cut of poultry
+I 0 9025 75.00 1  # BUTCHER: bird feathers
 M
 0
 $n quacks.~
@@ -322,8 +322,8 @@ D
    This honey bear, sometimes called a kinkajou, is the size of a small dog.
 It almost looks like a bear, but it has a long prehensile tail.
 ~
-I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
-I 1 1350 100.00 1 a  # SKIN: a small skin
+I 0 3012 100.00 1  # BUTCHER: fillet of raw meat
+I 1 1350 100.00 1 a  # SKIN: small skin
 S
 #9218
 ovenbird bird~
@@ -336,8 +336,8 @@ D
    Named for its nests that resemble old wood-fired ovens, the ovenbird is a
 common sight in this part of the world.
 ~
-I 0 3200 100.00 1  # BUTCHER: a cut of poultry
-I 0 9025 75.00 1  # BUTCHER: some bird feathers
+I 0 3200 100.00 1  # BUTCHER: cut of poultry
+I 0 9025 75.00 1  # BUTCHER: bird feathers
 M
 0
 $n sings loudly.~
@@ -360,9 +360,9 @@ D
 up and down the trees. As it chitters at you, its mouth begins to foam.
 Hopefully it isn't rabid.
 ~
-I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
-I 1 1350 100.00 2  # SKIN: a small skin
-I 4 9219 100.00 1  # LOOT: a golden acorn
+I 0 3012 100.00 1  # BUTCHER: fillet of raw meat
+I 1 1350 100.00 2  # SKIN: small skin
+I 4 9219 100.00 1  # LOOT: golden acorn
 M
 0
 $n foams at the mouth as it chitters at you.~
@@ -384,8 +384,8 @@ D
    The goshawk is a small raptor with brown stripes. It flies above you,
 hunting for a meal.
 ~
-I 0 3200 100.00 1  # BUTCHER: a cut of poultry
-I 0 9025 75.00 1  # BUTCHER: some bird feathers
+I 0 3200 100.00 1  # BUTCHER: cut of poultry
+I 0 9025 75.00 1  # BUTCHER: bird feathers
 M
 0
 You hear the screech of a bird from somewhere above you.~
@@ -401,8 +401,8 @@ D
    This little grey koala, sometimes called a drop bear, seems content to chew
 on leaves while it hugs trees to stay cool.
 ~
-I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
-I 1 1350 100.00 1 a  # SKIN: a small skin
+I 0 3012 100.00 1  # BUTCHER: fillet of raw meat
+I 1 1350 100.00 1 a  # SKIN: small skin
 S
 #9222
 kangaroo~
@@ -416,8 +416,8 @@ D
 of a kick-boxer. It hops along, using its tail like a tripod, occasionally
 stopping to munch the grass.
 ~
-I 0 3012 100.00 2  # BUTCHER: a fillet of raw meat
-I 1 1351 100.00 1  # SKIN: a large skin
+I 0 3012 100.00 2  # BUTCHER: fillet of raw meat
+I 1 1351 100.00 1  # SKIN: large skin
 S
 #9223
 wombat~
@@ -430,8 +430,8 @@ D
    This odd mammal sits low to the ground, with its rotund back end high in the
 air, digging furiously.
 ~
-I 0 3012 100.00 2  # BUTCHER: a fillet of raw meat
-I 1 1351 100.00 1  # SKIN: a large skin
+I 0 3012 100.00 2  # BUTCHER: fillet of raw meat
+I 1 1351 100.00 1  # SKIN: large skin
 S
 #9224
 snake tiger~
@@ -444,8 +444,8 @@ D
    The tiger snake is mostly brown, with banded stripes much like a real tiger.
 It's highly venomous, so keep your distance.
 ~
-I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
-I 1 1355 100.00 1  # SKIN: some snakeskin
+I 0 3012 100.00 1  # BUTCHER: fillet of raw meat
+I 1 1355 100.00 1  # SKIN: snakeskin
 T 9117
 T 9105
 S
@@ -461,7 +461,7 @@ D
 people in immense pain. It's larger than most lizards you've seen, and you
 should keep your distance.
 ~
-I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
+I 0 3012 100.00 1  # BUTCHER: fillet of raw meat
 S
 #9226
 lyrebird bird~
@@ -474,8 +474,8 @@ D
    This little brown bird has long, curved tail feathers that resemble a lyre
 -- as does its sweet voice, which can mimic nearly any sound.
 ~
-I 0 3200 100.00 1  # BUTCHER: a cut of poultry
-I 0 9025 75.00 1  # BUTCHER: some bird feathers
+I 0 3200 100.00 1  # BUTCHER: cut of poultry
+I 0 9025 75.00 1  # BUTCHER: bird feathers
 M
 0
 You hear a loud whistle.~
@@ -503,9 +503,9 @@ D
    The emu is a soft-feathered, brown bird. But its most impressive trait is
 its size: it stands almost as tall as a man, and as big around as a bear!
 ~
-I 0 3200 100.00 2  # BUTCHER: a cut of poultry
-I 0 9025 75.00 5  # BUTCHER: some bird feathers
-I 1 1351 100.00 1  # SKIN: a large skin
+I 0 3200 100.00 2  # BUTCHER: cut of poultry
+I 0 9025 75.00 5  # BUTCHER: bird feathers
+I 1 1351 100.00 1  # SKIN: large skin
 S
 #9228
 wallaby little~
@@ -518,8 +518,8 @@ D
    This little creature resembles a large rabbit as it hops around, but with a
 long tail that functions as a tripod.
 ~
-I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
-I 1 1350 100.00 1  # SKIN: a small skin
+I 0 3012 100.00 1  # BUTCHER: fillet of raw meat
+I 1 1350 100.00 1  # SKIN: small skin
 S
 #9229
 dog feral~
@@ -532,8 +532,8 @@ D
    This grungy dog looks like it has lived in the wild all its life, and it's
 fiercely defensive of its pack.
 ~
-I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
-I 1 1350 100.00 1  # SKIN: a small skin
+I 0 3012 100.00 1  # BUTCHER: fillet of raw meat
+I 1 1350 100.00 1  # SKIN: small skin
 M
 0
 $n snarls at you.~
@@ -557,8 +557,8 @@ D
 round, leathery nose pad at the end of its oversized face. You aren't sure
 exactly what it is, but it appears to eat grass. Maybe you could ride it.
 ~
-I 0 3012 100.00 5  # BUTCHER: a fillet of raw meat
-I 1 1351 100.00 2  # SKIN: a large skin
+I 0 3012 100.00 5  # BUTCHER: fillet of raw meat
+I 1 1351 100.00 2  # SKIN: large skin
 S
 #9231
 badger honey~
@@ -571,8 +571,8 @@ D
    The honey badger is alternately sniffing at the ground and digging madly
 into it. It must be looking for food.
 ~
-I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
-I 1 1350 100.00 1  # SKIN: a small skin
+I 0 3012 100.00 1  # BUTCHER: fillet of raw meat
+I 1 1350 100.00 1  # SKIN: small skin
 M
 0
 $n doesn't seem to care about you.~
@@ -614,9 +614,9 @@ D
    The yak is a large, hairy cow that lives high in the mountains. They mainly
 eat grains, but will eat whatever small plant material is available.
 ~
-I 0 3012 100.00 3  # BUTCHER: a fillet of raw meat
-I 1 1351 100.00 1  # SKIN: a large skin
-I 24 9234 100.00 1  # TAME: a yak
+I 0 3012 100.00 3  # BUTCHER: fillet of raw meat
+I 1 1351 100.00 1  # SKIN: large skin
+I 24 9234 100.00 1  # TAME: yak
 M
 0
 $n chews some grass.~
@@ -638,10 +638,10 @@ D
    The yak is like a large, hairy cow. The yak seems tame. You could probably
 herd it into a stable and milk or shear it.
 ~
-I 0 3012 100.00 3  # BUTCHER: a fillet of raw meat
-I 2 9234 5.00 4 s  # SHEAR: a sack of yak wool
-I 2 9234 45.00 3 s  # SHEAR: a sack of yak wool
-I 2 9234 50.00 2 s  # SHEAR: a sack of yak wool
+I 0 3012 100.00 3  # BUTCHER: fillet of raw meat
+I 2 9234 5.00 4 s  # SHEAR: sack of yak wool
+I 2 9234 45.00 3 s  # SHEAR: sack of yak wool
+I 2 9234 50.00 2 s  # SHEAR: sack of yak wool
 M
 0
 $n chews some grass.~
@@ -657,7 +657,7 @@ D
    This spiny little creature is a hedgehog -- like a mix between a shrew and a
 porcupine.
 ~
-I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
+I 0 3012 100.00 1  # BUTCHER: fillet of raw meat
 M
 0
 $n sniffs around at the ground.~

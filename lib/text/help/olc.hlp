@@ -702,6 +702,7 @@ See also: OLC ABILITIES
 
 Usage:  .custom add <type> <message>
         .custom change <number> <type | message> <value>
+        .custom move <number> <up | down>
         .custom remove <number | all>
 
 You can set custom messages on abilities. Different types of abilities may use
@@ -4407,6 +4408,7 @@ See also: OLC MOBILES
 
 Usage:  .custom add <type> <message>
         .custom change <number> <type | message> <value>
+        .custom move <number> <up | down>
         .custom remove <number | all>
 
 You can set custom messages on mobs, which are shown at different times
@@ -4425,6 +4427,8 @@ Message types:
  &csay-day&0 - Like say, but only during the day.
  &csay-night&0 - Only during the night.
  &clong-desc&0 - Variable long descriptions (prevents normal long desc showing)
+ &cscript1&0 - &cscript5&0 - Can be referenced in scripts as
+   %mob.custom(script1)%, %mob.custom(script1,0)%, etc.
 
 Note: The 'echo' and 'say' types share the same random interval, and the mob
 will only do one or the other each time.
@@ -4479,6 +4483,7 @@ Available mob flags:
     specific attributes on it after it loaded. Note that it will still scale
     the first time, so ensure that it is scaled before changing attributes.
  SILENT - Mob will not display custom strings while this flag is on.
+ COINS - Mob will drop coins on death/pickpocket.
 
 See also: OLC MOBILES
 #d
@@ -5348,6 +5353,7 @@ See also: GENERIC CURRENCY
 
 Usage:  .custom add <type> <message>
         .custom change <number> <type | message> <value>
+        .custom move <number> <up | down>
         .custom remove <number | all>
 
 You can set custom messages on objects for various actions. These messages
@@ -5379,6 +5385,8 @@ Message types:
  &cdecays-in-room&0 - Shown to the room if the item decays on the ground.
  &cresource-to-char&0 - Shown to the character when they gain it as a resource.
  &cresource-to-room&0 - Shown to room when gained as a resource (e.g. chopped).
+ &cscript1&0 - &cscript5&0 - Can be referenced in scripts as
+   %obj.custom(script1)%, %obj.custom(script1,0)%, etc.
 
 See also: OLC OBJECTS, DOLLAR SIGN CODES
 #d
@@ -7050,8 +7058,8 @@ See also: OLC ROOM TEMPLATES, ADVEDIT RESET TIME, VNUM
 #d
 REQUIREMENTS "QEDIT TASKS" "QEDIT PREREQS" "QEDIT PREREQUISITES" "SOCEDIT REQUIREMENTS"
 
-Usage:  .<field> add <type> <vnum> [group]
-        .<field> change <number> <amount | group | vnum> <value>
+Usage:  .<field> add <type> <vnum> [group] [custom text]
+        .<field> change <number> <amount | group | text | vnum> <value>
         .<field> copy <from type> <from vnum> [tasks/prereqs (quests only)]
         .<field> remove <number | all>
 
@@ -7063,6 +7071,10 @@ A player only needs to meet 1 requirement from the list. However, you can
 create requirement groups where all conditions on a group must be met. If
 there is more than one group, the player only needs to meet all conditions from
 any 1 group. Group names are always a single case-sensitive letter.
+
+Custom text is optional and will replace the normal display text. If using
+custom text, you MUST provide the [group] argument first, but it can be '-' or
+"none".
 
 Available tasks:
  &cCOMPLETED-QUEST&0 - Must complete a certain quest.
@@ -8309,6 +8321,7 @@ See also: VEDIT FLAGS, OLC VEHICLES
 
 Usage:  .custom add <type> <message>
         .custom change <number> <type | message> <value>
+        .custom move <number> <up | down>
         .custom remove <number | all>
 
 You can set custom messages on vehicles.

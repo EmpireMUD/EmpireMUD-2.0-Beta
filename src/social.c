@@ -375,7 +375,7 @@ void parse_social(FILE *fl, any_vnum vnum) {
 		}
 		switch (*line) {
 			case 'L': {	// requirements
-				parse_requirement(fl, &SOC_REQUIREMENTS(soc), error);
+				parse_requirement(fl, &SOC_REQUIREMENTS(soc), (*(line+1) == '+' ? TRUE : FALSE), error);
 				break;
 			}
 			

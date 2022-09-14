@@ -280,6 +280,7 @@ follows here is my list of foes trapped herein:
    * Kara Virduke, Bleak Rojjer, Trixton Vye, and their like.
    * High Sorcerer Barrosh, not in his right mind.
    * The Shade of Mezvienne
+   * The Shadow Ascendant
    * Mezvienne the Enchantress
    * Skithe Ler-Wyn
    * High Sorcerer Knezz
@@ -378,9 +379,10 @@ dressed in simple wool clothing but wrapped in a soft purple robe. His lips are
 bright blue, as are the corners of his eyes. It looks like he might have been
 poisoned!
 ~
-10 0 0 0 1
+10 0 0 0 2
 11927 3 0
 7 0
+T 11836
 S
 #11929
 bread crummy crumby very~
@@ -388,7 +390,9 @@ some very crummy bread~
 Some very crummy bread has been left here.~
    The bread is practically coming apart. In fact, it appears to be leaving a
 trail of crumbs behind you.
-tba - needs flavor text
+   Breadcrumbs form the basis of fairytales such as Hansel and Gretel, where
+two children are abandoned by their parents and leave a trail of breadcrumbs to
+find their way through the forest.
 ~
 6 p a 0 3
 12 0 0
@@ -810,6 +814,16 @@ M
 18
 One of the goblins rakes the sand and smooths it out.~
 S
+#11975
+torch~
+a torch~
+A torch has been dropped here.~
+The torch is made from striped brown and black wood.
+~
+1 ch ano 0 5
+0 2 12
+0 72
+S
 #11976
 trinkets goblin~
 some goblin trinkets~
@@ -1132,18 +1146,26 @@ M
 $n glimmers in the light.~
 S
 #11992
-seed calamander~
-a calamander seed~
-A calamander seed has been dropped here.~
-   This odd little seed has tan and brown stripes running the length of it.
+tree stone striped~
+a striped stone tree~
+A striped stone tree has been dropped here.~
+   This little stone statuette is expertly carved, with long stripes cut into
+it to resemble the wood of a calamander tree. The tree is fragile and cris-
+crossed with cracks that glow with a faint brown light. There's serious magic
+at play here.
+   According to instructions etched in the bottom of the tree, if you 'smash'
+it in a jungle, the magic will take root and transform the jungle into
+enchanted calamander trees. Be sure to claim the tile first -- and keep it
+claimed.
    Calamander forests are cultivated by certain schools of sorcery because the
 bicolor wood excels at focusing and amplifying raw mana.
 ~
-3 0 a 0 2
+3 0 a 0 3
 0 0 0
 0 0
 R
 4 5193 0
+T 11992
 S
 #11993
 cloak clingy~
@@ -1177,12 +1199,12 @@ they have little value but as plant fiber.
 stripes create a truly unique look. The stripes also form near-perfect conduits
 for raw mana, making the wood valuable for mages as well.
 ~
-3 0 a 0 7
+3 0 a 0 8
 0 0 0
 0 0
 C
 1 1
-I 11 184 100.00 1  # LIGHT: torch
+I 11 11975 100.00 1  # LIGHT: torch
 O+ 1 6423
 R
 4 5118 0
@@ -1197,17 +1219,17 @@ interest. All of this belies the fantastically valuable lumber inside.
 and brown wood. As rare as it is beautiful, calamander can only be found in the
 most remote jungles.
 ~
-3 e a 0 11
+3 e a 0 12
 0 0 0
 0 0
-I 11 1002 100.00 1  # LIGHT: roaring fire
+I 11 617 100.00 1  # LIGHT: magical fire
 I 16 11996 100.00 1  # SCRAPE: striped calamander pillar
 I 16 11998 5.00 1  # SCRAPE: fine calamander sapling
 I 16 11994 33.33 3 s  # SCRAPE: striped twigs
 I 16 11994 33.33 4 s  # SCRAPE: striped twigs
 I 16 11994 33.34 5 s  # SCRAPE: striped twigs
-I 17 11997 50.00 2 s  # SAW: stack of calamander boards
-I 17 11997 50.00 3 s  # SAW: stack of calamander boards
+I 17 11997 50.00 2 s  # SAW: stack of calamander magewood boards
+I 17 11997 50.00 3 s  # SAW: stack of calamander magewood boards
 I 17 11994 50.00 1 t  # SAW: striped twigs
 I 17 11994 40.00 2 t  # SAW: striped twigs
 I 17 11994 10.00 3 t  # SAW: striped twigs
@@ -1230,10 +1252,10 @@ striped black and brown wood for which the tree is world-renowned.
    The Tower Skycleave features several fine pieces of furniture crafted from
 fine calamander wood. The high sorcerers often store spare mana in the wood.
 ~
-3 e a 0 7
+3 e a 0 8
 0 0 0
 0 0
-I 11 1002 100.00 1  # LIGHT: roaring fire
+I 11 617 100.00 1  # LIGHT: magical fire
 M
 0
 You hoist $p into place.~
@@ -1251,9 +1273,9 @@ R
 4 5118 0
 S
 #11997
-boards calamander lumber stack~
-a stack of calamander boards~
-A stack of calamander boards is here.~
+boards magewood wood calamander stack~
+a stack of calamander magewood boards~
+Some calamander magewood boards are stacked here.~
    The boards bear a distinctly variegated pattern of black and brown wood
 running their full length. Though it's rarely seen in large-scale construction,
 a collection of calamander trinkets is a conspicuous way of showing off wealth.
@@ -1261,10 +1283,10 @@ a collection of calamander trinkets is a conspicuous way of showing off wealth.
 appearance. It is exceedingly rare, found only in the most remote jungles, and
 it makes the finest woodwork.
 ~
-3 e a 0 5
+3 e a 0 6
 0 0 0
 0 0
-I 11 1002 100.00 1  # LIGHT: roaring fire
+I 11 617 100.00 1  # LIGHT: magical fire
 M
 0
 You position some calamander boards and tie them into place.~
@@ -1277,7 +1299,7 @@ You position some calamander boards onto the frame of $V.~
 M
 7
 $n positions some calamander boards onto the frame of $V.~
-O+ 1 6002
+O+ 1 6001
 R
 4 5118 0
 S
@@ -1294,14 +1316,28 @@ supposed creation by various mages and sorcerers. One, in particular, made the
 mistake of saying 'If I didn't create the calamander, let me be turned into
 one here and now' in the presence of a Stone of Truth.
 ~
-1 0 an 0 4
+1 0 an 0 5
 0 10 5
 0 0
 C
 50 50
-I 11 184 100.00 1  # LIGHT: torch
+I 11 11975 100.00 1  # LIGHT: torch
 O+ 1 6026
 R
 4 5118 0
+S
+#11999
+cheese jade piece~
+a piece of jade cheese~
+A piece of jade cheese is lying on the ground.~
+   This little bit of cheese has a stem, almost like it grew on a tree. It has
+a distinctly marbled jade color, but it tastes like a slightly funky cheese.
+tba flavor text
+~
+6 g a 0 6
+6 0 0
+7 12
+B
+L
 S
 $

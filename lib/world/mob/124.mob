@@ -36,7 +36,7 @@ deckhand hand human~
 the deckhand~
 A human deckhand is chained to the side of the ship.
 ~
-0 0 bdv 0 3
+0 0 bdvI 0 3
 1 0 0 15
 M
 0
@@ -70,17 +70,17 @@ Smeegle, the goblin quartermaster, is walking around with a list.
 1 0 0 4
 F 12401
 I 4 12411 1.50 1 x  # LOOT: dread pirate garb
-I 4 12417 1.00 1 x  # LOOT: a parrot whistle
-I 4 12412 1.00 1 x  # LOOT: a black tricorne hat
-I 4 12424 0.13 1 x  # LOOT: a lucky goblin figurehead
+I 4 12417 1.00 1 x  # LOOT: parrot whistle
+I 4 12412 1.00 1 x  # LOOT: black tricorne hat
+I 4 12424 0.13 1 x  # LOOT: lucky goblin figurehead
 I 4 12425 0.12 1 x  # LOOT: dread goblin sails
 I 4 12426 0.13 1 x  # LOOT: cliffside dock plans
 I 4 12427 0.12 1 x  # LOOT: smuggler's wharf plans
-I 4 12438 9.60 1 x  # LOOT: an imperium pirate hoop
-I 4 12440 9.60 1 x  # LOOT: a nocturnium pirate hoop
-I 4 12444 9.60 1 x  # LOOT: a golden pirate hoop
-I 4 12446 9.60 1 x  # LOOT: a silver pirate hoop
-I 4 12448 9.60 1 x  # LOOT: a bone hoop earring
+I 4 12438 9.60 1 x  # LOOT: imperium pirate hoop
+I 4 12440 9.60 1 x  # LOOT: nocturnium pirate hoop
+I 4 12444 9.60 1 x  # LOOT: golden pirate hoop
+I 4 12446 9.60 1 x  # LOOT: silver pirate hoop
+I 4 12448 9.60 1 x  # LOOT: bone hoop earring
 I 4 12450 9.60 1 x  # LOOT: heavy plated pantaloons
 I 4 12452 9.60 1 x  # LOOT: goblin scullery pantaloons
 I 4 12454 9.60 1 x  # LOOT: goblin sea-shaman pantaloons
@@ -117,17 +117,17 @@ Hornswaggle, the Golden Goblin's first mate, stands ready to fight!
 1 0 0 7
 F 12401
 I 4 12411 1.50 1 x  # LOOT: dread pirate garb
-I 4 12417 1.00 1 x  # LOOT: a parrot whistle
-I 4 12412 1.00 1 x  # LOOT: a black tricorne hat
-I 4 12424 0.13 1 x  # LOOT: a lucky goblin figurehead
+I 4 12417 1.00 1 x  # LOOT: parrot whistle
+I 4 12412 1.00 1 x  # LOOT: black tricorne hat
+I 4 12424 0.13 1 x  # LOOT: lucky goblin figurehead
 I 4 12425 0.12 1 x  # LOOT: dread goblin sails
 I 4 12426 0.13 1 x  # LOOT: cliffside dock plans
 I 4 12427 0.12 1 x  # LOOT: smuggler's wharf plans
-I 4 12438 9.60 1 x  # LOOT: an imperium pirate hoop
-I 4 12440 9.60 1 x  # LOOT: a nocturnium pirate hoop
-I 4 12444 9.60 1 x  # LOOT: a golden pirate hoop
-I 4 12446 9.60 1 x  # LOOT: a silver pirate hoop
-I 4 12448 9.60 1 x  # LOOT: a bone hoop earring
+I 4 12438 9.60 1 x  # LOOT: imperium pirate hoop
+I 4 12440 9.60 1 x  # LOOT: nocturnium pirate hoop
+I 4 12444 9.60 1 x  # LOOT: golden pirate hoop
+I 4 12446 9.60 1 x  # LOOT: silver pirate hoop
+I 4 12448 9.60 1 x  # LOOT: bone hoop earring
 I 4 12450 9.60 1 x  # LOOT: heavy plated pantaloons
 I 4 12452 9.60 1 x  # LOOT: goblin scullery pantaloons
 I 4 12454 9.60 1 x  # LOOT: goblin sea-shaman pantaloons
@@ -161,17 +161,17 @@ Captain Greenbeard stands on the aftercastle, sword held high!
 1 0 0 1
 F 12401
 I 4 12411 1.50 1 x  # LOOT: dread pirate garb
-I 4 12417 1.00 1 x  # LOOT: a parrot whistle
-I 4 12412 1.00 1 x  # LOOT: a black tricorne hat
-I 4 12424 0.13 1 x  # LOOT: a lucky goblin figurehead
+I 4 12417 1.00 1 x  # LOOT: parrot whistle
+I 4 12412 1.00 1 x  # LOOT: black tricorne hat
+I 4 12424 0.13 1 x  # LOOT: lucky goblin figurehead
 I 4 12425 0.12 1 x  # LOOT: dread goblin sails
 I 4 12426 0.13 1 x  # LOOT: cliffside dock plans
 I 4 12427 0.12 1 x  # LOOT: smuggler's wharf plans
-I 4 12438 9.60 1 x  # LOOT: an imperium pirate hoop
-I 4 12440 9.60 1 x  # LOOT: a nocturnium pirate hoop
-I 4 12444 9.60 1 x  # LOOT: a golden pirate hoop
-I 4 12446 9.60 1 x  # LOOT: a silver pirate hoop
-I 4 12448 9.60 1 x  # LOOT: a bone hoop earring
+I 4 12438 9.60 1 x  # LOOT: imperium pirate hoop
+I 4 12440 9.60 1 x  # LOOT: nocturnium pirate hoop
+I 4 12444 9.60 1 x  # LOOT: golden pirate hoop
+I 4 12446 9.60 1 x  # LOOT: silver pirate hoop
+I 4 12448 9.60 1 x  # LOOT: bone hoop earring
 I 4 12450 9.60 1 x  # LOOT: heavy plated pantaloons
 I 4 12452 9.60 1 x  # LOOT: goblin scullery pantaloons
 I 4 12454 9.60 1 x  # LOOT: goblin sea-shaman pantaloons
@@ -205,17 +205,17 @@ Fathma, goblin sorceress of the deep, holds her wand high!
 2 0 0 21
 F 12401
 I 4 12411 1.50 1 x  # LOOT: dread pirate garb
-I 4 12417 1.00 1 x  # LOOT: a parrot whistle
-I 4 12412 1.00 1 x  # LOOT: a black tricorne hat
-I 4 12424 0.13 1 x  # LOOT: a lucky goblin figurehead
+I 4 12417 1.00 1 x  # LOOT: parrot whistle
+I 4 12412 1.00 1 x  # LOOT: black tricorne hat
+I 4 12424 0.13 1 x  # LOOT: lucky goblin figurehead
 I 4 12425 0.12 1 x  # LOOT: dread goblin sails
 I 4 12426 0.13 1 x  # LOOT: cliffside dock plans
 I 4 12427 0.12 1 x  # LOOT: smuggler's wharf plans
-I 4 12438 9.60 1 x  # LOOT: an imperium pirate hoop
-I 4 12440 9.60 1 x  # LOOT: a nocturnium pirate hoop
-I 4 12444 9.60 1 x  # LOOT: a golden pirate hoop
-I 4 12446 9.60 1 x  # LOOT: a silver pirate hoop
-I 4 12448 9.60 1 x  # LOOT: a bone hoop earring
+I 4 12438 9.60 1 x  # LOOT: imperium pirate hoop
+I 4 12440 9.60 1 x  # LOOT: nocturnium pirate hoop
+I 4 12444 9.60 1 x  # LOOT: golden pirate hoop
+I 4 12446 9.60 1 x  # LOOT: silver pirate hoop
+I 4 12448 9.60 1 x  # LOOT: bone hoop earring
 I 4 12450 9.60 1 x  # LOOT: heavy plated pantaloons
 I 4 12452 9.60 1 x  # LOOT: goblin scullery pantaloons
 I 4 12454 9.60 1 x  # LOOT: goblin sea-shaman pantaloons
@@ -255,7 +255,7 @@ S
 deckhand #n~
 #n has been freed from his shackles (list).
 ~
-0 0 bdv 0 3
+0 0 bdvI 0 3
 1 0 0 15
 M
 1
@@ -277,7 +277,7 @@ A blue-ringed octopus clings to the wall and flashes warning colors.
 ~
 0 0 bdj c 2
 0 0 6 7
-I 0 12404 100.00 1  # BUTCHER: a fillet of fish
+I 0 12404 100.00 1  # BUTCHER: fillet of raw fish
 M
 0
 $n flashes brightly at you.~
@@ -296,7 +296,7 @@ A ball of light dances in the shadows.
 ~
 0 0 bdj c 2
 0 0 6 9
-I 0 12404 100.00 1  # BUTCHER: a fillet of fish
+I 0 12404 100.00 1  # BUTCHER: fillet of raw fish
 M
 0
 The ball of light bobs back and forth.~
@@ -312,7 +312,7 @@ A wolf eel pokes its head out from a crevice.
 ~
 0 0 bdj c 2
 0 0 6 9
-I 0 12404 100.00 1  # BUTCHER: a fillet of fish
+I 0 12404 100.00 1  # BUTCHER: fillet of raw fish
 M
 0
 $n snaps its jaw.~
@@ -331,8 +331,8 @@ A banded sea snake coils around your legs.
 ~
 0 0 bdj c 2
 0 0 6 9
-I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
-I 1 1355 100.00 1  # SKIN: some snakeskin
+I 0 3012 100.00 1  # BUTCHER: fillet of raw meat
+I 1 1355 100.00 1  # SKIN: snakeskin
 M
 0
 $n is a little too close for comfort.~
@@ -345,20 +345,20 @@ An armored war orca blocks your way!
 ~
 0 0 bdjy c 5
 0 0 6 9
-I 0 3012 100.00 8  # BUTCHER: a fillet of raw meat
+I 0 3012 100.00 8  # BUTCHER: fillet of raw meat
 I 4 12414 100.00 2  # LOOT: fat of orca
-I 4 12428 2.00 1 x  # LOOT: a deep coral ring
-I 4 12429 2.00 1 x  # LOOT: a deep pearl ring
-I 4 12430 2.00 1 x  # LOOT: a deep seaweed ring
-I 4 12431 2.00 1 x  # LOOT: a deep sharktooth ring
-I 4 12432 2.00 1 x  # LOOT: a deep bone ring
-I 4 12433 2.00 1 x  # LOOT: a coral-buckled girdle
-I 4 12434 2.00 1 x  # LOOT: a pearly sash
-I 4 12435 2.00 1 x  # LOOT: a seaweed cumberbund
-I 4 12436 2.00 1 x  # LOOT: a sharktooth cincture
-I 4 12437 2.00 1 x  # LOOT: a band of human bones
-I 4 12418 1.00 1 x  # LOOT: a hydra conch
-I 4 12421 10.00 1 x  # LOOT: a green orca whistle
+I 4 12428 2.00 1 x  # LOOT: deep coral ring
+I 4 12429 2.00 1 x  # LOOT: deep pearl ring
+I 4 12430 2.00 1 x  # LOOT: deep seaweed ring
+I 4 12431 2.00 1 x  # LOOT: deep sharktooth ring
+I 4 12432 2.00 1 x  # LOOT: deep bone ring
+I 4 12433 2.00 1 x  # LOOT: coral-buckled girdle
+I 4 12434 2.00 1 x  # LOOT: pearly sash
+I 4 12435 2.00 1 x  # LOOT: seaweed cumberbund
+I 4 12436 2.00 1 x  # LOOT: sharktooth cincture
+I 4 12437 2.00 1 x  # LOOT: band of human bones
+I 4 12418 1.00 1 x  # LOOT: hydra conch
+I 4 12421 10.00 1 x  # LOOT: green orca whistle
 M
 0
 $n bares its teeth at you.~
@@ -374,19 +374,19 @@ A giant squid fills the cavern!
 ~
 0 0 bdjy c 5
 0 0 6 7
-I 0 12404 100.00 3  # BUTCHER: a fillet of fish
+I 0 12404 100.00 3  # BUTCHER: fillet of raw fish
 I 4 12415 100.00 2  # LOOT: tentacle of squid
-I 4 12428 2.00 1 x  # LOOT: a deep coral ring
-I 4 12429 2.00 1 x  # LOOT: a deep pearl ring
-I 4 12430 2.00 1 x  # LOOT: a deep seaweed ring
-I 4 12431 2.00 1 x  # LOOT: a deep sharktooth ring
-I 4 12432 2.00 1 x  # LOOT: a deep bone ring
-I 4 12433 2.00 1 x  # LOOT: a coral-buckled girdle
-I 4 12434 2.00 1 x  # LOOT: a pearly sash
-I 4 12435 2.00 1 x  # LOOT: a seaweed cumberbund
-I 4 12436 2.00 1 x  # LOOT: a sharktooth cincture
-I 4 12437 2.00 1 x  # LOOT: a band of human bones
-I 4 12418 1.00 1 x  # LOOT: a hydra conch
+I 4 12428 2.00 1 x  # LOOT: deep coral ring
+I 4 12429 2.00 1 x  # LOOT: deep pearl ring
+I 4 12430 2.00 1 x  # LOOT: deep seaweed ring
+I 4 12431 2.00 1 x  # LOOT: deep sharktooth ring
+I 4 12432 2.00 1 x  # LOOT: deep bone ring
+I 4 12433 2.00 1 x  # LOOT: coral-buckled girdle
+I 4 12434 2.00 1 x  # LOOT: pearly sash
+I 4 12435 2.00 1 x  # LOOT: seaweed cumberbund
+I 4 12436 2.00 1 x  # LOOT: sharktooth cincture
+I 4 12437 2.00 1 x  # LOOT: band of human bones
+I 4 12418 1.00 1 x  # LOOT: hydra conch
 M
 0
 $n snaps its beak menacingly.~
@@ -403,20 +403,20 @@ mermidon myrmidon warrior~
 a mermidon warrior~
 A mermidon warrior aims her trident at you!
 ~
-0 0 bdvy c 3
+0 0 bdvyI c 3
 2 0 6 3
 I 4 12416 100.00 2  # LOOT: eye of mermaid
-I 4 12428 2.00 1 x  # LOOT: a deep coral ring
-I 4 12429 2.00 1 x  # LOOT: a deep pearl ring
-I 4 12430 2.00 1 x  # LOOT: a deep seaweed ring
-I 4 12431 2.00 1 x  # LOOT: a deep sharktooth ring
-I 4 12432 2.00 1 x  # LOOT: a deep bone ring
-I 4 12433 2.00 1 x  # LOOT: a coral-buckled girdle
-I 4 12434 2.00 1 x  # LOOT: a pearly sash
-I 4 12435 2.00 1 x  # LOOT: a seaweed cumberbund
-I 4 12436 2.00 1 x  # LOOT: a sharktooth cincture
-I 4 12437 2.00 1 x  # LOOT: a band of human bones
-I 4 12418 1.00 1 x  # LOOT: a hydra conch
+I 4 12428 2.00 1 x  # LOOT: deep coral ring
+I 4 12429 2.00 1 x  # LOOT: deep pearl ring
+I 4 12430 2.00 1 x  # LOOT: deep seaweed ring
+I 4 12431 2.00 1 x  # LOOT: deep sharktooth ring
+I 4 12432 2.00 1 x  # LOOT: deep bone ring
+I 4 12433 2.00 1 x  # LOOT: coral-buckled girdle
+I 4 12434 2.00 1 x  # LOOT: pearly sash
+I 4 12435 2.00 1 x  # LOOT: seaweed cumberbund
+I 4 12436 2.00 1 x  # LOOT: sharktooth cincture
+I 4 12437 2.00 1 x  # LOOT: band of human bones
+I 4 12418 1.00 1 x  # LOOT: hydra conch
 M
 0
 $n spins her trident to block your path.~
@@ -475,25 +475,25 @@ A massive nine-headed serpent slithers out of the pool.
 0 0 bdjyA c 5
 0 0 6 9
 I 4 12411 1.00 1 x  # LOOT: dread pirate garb
-I 4 12422 1.00 1 x  # LOOT: a raging kraken shell
-I 4 12423 1.00 1 x  # LOOT: an albatross shell
-I 4 12418 2.00 1 x  # LOOT: a hydra conch
-I 4 12403 10.00 1 x  # LOOT: an old barrel
-I 4 12428 7.50 1 x  # LOOT: a deep coral ring
-I 4 12429 7.50 1 x  # LOOT: a deep pearl ring
-I 4 12430 7.50 1 x  # LOOT: a deep seaweed ring
-I 4 12431 7.50 1 x  # LOOT: a deep sharktooth ring
-I 4 12432 7.50 1 x  # LOOT: a deep bone ring
-I 4 12433 7.50 1 x  # LOOT: a coral-buckled girdle
-I 4 12434 7.50 1 x  # LOOT: a pearly sash
-I 4 12435 7.50 1 x  # LOOT: a seaweed cumberbund
-I 4 12436 7.50 1 x  # LOOT: a sharktooth cincture
-I 4 12437 7.50 1 x  # LOOT: a band of human bones
-I 4 12438 1.00 1 x  # LOOT: an imperium pirate hoop
-I 4 12440 1.00 1 x  # LOOT: a nocturnium pirate hoop
-I 4 12444 1.00 1 x  # LOOT: a golden pirate hoop
-I 4 12446 1.00 1 x  # LOOT: a silver pirate hoop
-I 4 12448 1.00 1 x  # LOOT: a bone hoop earring
+I 4 12422 1.00 1 x  # LOOT: raging kraken shell
+I 4 12423 1.00 1 x  # LOOT: albatross shell
+I 4 12418 2.00 1 x  # LOOT: hydra conch
+I 4 12403 10.00 1 x  # LOOT: old barrel
+I 4 12428 7.50 1 x  # LOOT: deep coral ring
+I 4 12429 7.50 1 x  # LOOT: deep pearl ring
+I 4 12430 7.50 1 x  # LOOT: deep seaweed ring
+I 4 12431 7.50 1 x  # LOOT: deep sharktooth ring
+I 4 12432 7.50 1 x  # LOOT: deep bone ring
+I 4 12433 7.50 1 x  # LOOT: coral-buckled girdle
+I 4 12434 7.50 1 x  # LOOT: pearly sash
+I 4 12435 7.50 1 x  # LOOT: seaweed cumberbund
+I 4 12436 7.50 1 x  # LOOT: sharktooth cincture
+I 4 12437 7.50 1 x  # LOOT: band of human bones
+I 4 12438 1.00 1 x  # LOOT: imperium pirate hoop
+I 4 12440 1.00 1 x  # LOOT: nocturnium pirate hoop
+I 4 12444 1.00 1 x  # LOOT: golden pirate hoop
+I 4 12446 1.00 1 x  # LOOT: silver pirate hoop
+I 4 12448 1.00 1 x  # LOOT: bone hoop earring
 I 4 12450 1.00 1 x  # LOOT: heavy plated pantaloons
 I 4 12452 1.00 1 x  # LOOT: goblin scullery pantaloons
 I 4 12454 1.00 1 x  # LOOT: goblin sea-shaman pantaloons
@@ -530,25 +530,25 @@ Scylla floats in the center of the chamber as water swirls around her!
 0 0 bdzA c 4
 2 0 6 7
 I 4 12411 1.00 1 x  # LOOT: dread pirate garb
-I 4 12422 1.00 1 x  # LOOT: a raging kraken shell
-I 4 12423 1.00 1 x  # LOOT: an albatross shell
-I 4 12418 2.00 1 x  # LOOT: a hydra conch
-I 4 12403 10.00 1 x  # LOOT: an old barrel
-I 4 12428 7.50 1 x  # LOOT: a deep coral ring
-I 4 12429 7.50 1 x  # LOOT: a deep pearl ring
-I 4 12430 7.50 1 x  # LOOT: a deep seaweed ring
-I 4 12431 7.50 1 x  # LOOT: a deep sharktooth ring
-I 4 12432 7.50 1 x  # LOOT: a deep bone ring
-I 4 12433 7.50 1 x  # LOOT: a coral-buckled girdle
-I 4 12434 7.50 1 x  # LOOT: a pearly sash
-I 4 12435 7.50 1 x  # LOOT: a seaweed cumberbund
-I 4 12436 7.50 1 x  # LOOT: a sharktooth cincture
-I 4 12437 7.50 1 x  # LOOT: a band of human bones
-I 4 12438 1.00 1 x  # LOOT: an imperium pirate hoop
-I 4 12440 1.00 1 x  # LOOT: a nocturnium pirate hoop
-I 4 12444 1.00 1 x  # LOOT: a golden pirate hoop
-I 4 12446 1.00 1 x  # LOOT: a silver pirate hoop
-I 4 12448 1.00 1 x  # LOOT: a bone hoop earring
+I 4 12422 1.00 1 x  # LOOT: raging kraken shell
+I 4 12423 1.00 1 x  # LOOT: albatross shell
+I 4 12418 2.00 1 x  # LOOT: hydra conch
+I 4 12403 10.00 1 x  # LOOT: old barrel
+I 4 12428 7.50 1 x  # LOOT: deep coral ring
+I 4 12429 7.50 1 x  # LOOT: deep pearl ring
+I 4 12430 7.50 1 x  # LOOT: deep seaweed ring
+I 4 12431 7.50 1 x  # LOOT: deep sharktooth ring
+I 4 12432 7.50 1 x  # LOOT: deep bone ring
+I 4 12433 7.50 1 x  # LOOT: coral-buckled girdle
+I 4 12434 7.50 1 x  # LOOT: pearly sash
+I 4 12435 7.50 1 x  # LOOT: seaweed cumberbund
+I 4 12436 7.50 1 x  # LOOT: sharktooth cincture
+I 4 12437 7.50 1 x  # LOOT: band of human bones
+I 4 12438 1.00 1 x  # LOOT: imperium pirate hoop
+I 4 12440 1.00 1 x  # LOOT: nocturnium pirate hoop
+I 4 12444 1.00 1 x  # LOOT: golden pirate hoop
+I 4 12446 1.00 1 x  # LOOT: silver pirate hoop
+I 4 12448 1.00 1 x  # LOOT: bone hoop earring
 I 4 12450 1.00 1 x  # LOOT: heavy plated pantaloons
 I 4 12452 1.00 1 x  # LOOT: goblin scullery pantaloons
 I 4 12454 1.00 1 x  # LOOT: goblin sea-shaman pantaloons
@@ -592,7 +592,7 @@ A green-tinged orca is stalking you.
 ~
 100 125 dejl 0 5
 0 0 6 9
-I 0 3012 100.00 4  # BUTCHER: a fillet of raw meat
+I 0 3012 100.00 4  # BUTCHER: fillet of raw meat
 S
 #12422
 kraken raging rages~
@@ -601,7 +601,7 @@ A kraken rages violently in the water!
 ~
 100 125 dejl 0 5
 0 0 6 7
-I 0 12404 100.00 3  # BUTCHER: a fillet of fish
+I 0 12404 100.00 3  # BUTCHER: fillet of raw fish
 S
 #12423
 albatross giant~
@@ -610,14 +610,14 @@ A giant albatross with a saddle circles overhead!
 ~
 100 125 dej m 4
 0 0 2 9
-I 0 3200 100.00 3  # BUTCHER: a cut of poultry
+I 0 3200 100.00 3  # BUTCHER: cut of poultry
 S
 #12426
 dockmaster master goblin~
 the goblin dockmaster~
 A goblin dockmaster is pacing with a clipboard.
 ~
-30 60 bdqv 0 2
+30 60 bdqvI 0 2
 1 0 0 15
 M
 1
@@ -628,7 +628,7 @@ deckhand hand goblin~
 a goblin deckhand~
 A goblin deckhand is standing here.
 ~
-20 50 dqv 0 2
+20 50 dqvI 0 2
 1 0 0 15
 M
 1

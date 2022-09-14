@@ -65,6 +65,7 @@
 #define MTRIG_KILL             BIT(25)	// mob has killed something
 #define MTRIG_ALLOW_MULTIPLE   BIT(26)	// for triggers that block other triggers, allows multiple to run
 #define MTRIG_CAN_FIGHT        BIT(27)	// checked when trying to attack a mob you're not already fighting
+#define MTRIG_PRE_GREET_ALL    BIT(28)	// similar to greet-all but called BEFORE moving the person into the room
 
 
 // OTRIG_x: obj trigger types
@@ -317,6 +318,7 @@ void speech_mtrigger(char_data *actor, char *str);
 void speech_wtrigger(char_data *actor, char *str);
 void greet_memory_mtrigger(char_data *ch);
 int greet_mtrigger(char_data *actor, int dir);
+int pre_greet_mtrigger(char_data *actor, room_data *room, int dir);
 int entry_mtrigger(char_data *ch);
 void entry_memory_mtrigger(char_data *ch);
 int enter_wtrigger(room_data *room, char_data *actor, int dir);

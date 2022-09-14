@@ -4912,7 +4912,7 @@ ACMD(do_drink) {
 ACMD(do_drop) {
 	obj_data *obj, *next_obj;
 	byte mode = SCMD_DROP;
-	int this, dotmode, amount = 0, multi, coin_amt;
+	int this, dotmode, multi, coin_amt;
 	empire_data *coin_emp;
 	const char *sname;
 	bool any = FALSE;
@@ -4967,7 +4967,7 @@ ACMD(do_drop) {
 					break;
 				}
 				else {
-					amount += this;
+					// amount += this;
 				}
 			} while (obj && --multi);
 		}
@@ -4994,7 +4994,7 @@ ACMD(do_drop) {
 						break;
 					}
 					else {
-						amount += this;
+						// amount += this;
 						any = TRUE;
 					}
 				}
@@ -5032,7 +5032,7 @@ ACMD(do_drop) {
 					break;
 				}
 				else {
-					amount += this;
+					// amount += this;
 					any = TRUE;
 				}
 			}
@@ -5051,7 +5051,8 @@ ACMD(do_drop) {
 				}
 			}
 			else {
-				amount += perform_drop(ch, obj, mode, sname);
+				// amount += 
+				perform_drop(ch, obj, mode, sname);
 			}
 		}
 	}

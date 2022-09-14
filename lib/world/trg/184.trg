@@ -43,7 +43,9 @@ end
 Beaver dam cleanup~
 2 e 100
 ~
-%terraform% %room% 18450
+* this used to terraform but it results in canals becoming a river
+%build% %room% 18451
+* %terraform% %room% 18450
 ~
 #18453
 Beaver dam construction~

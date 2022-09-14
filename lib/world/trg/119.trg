@@ -163,6 +163,8 @@ remote phase4 %self.id%
 remote phase3 %self.id%
 remote phase2 %self.id%
 remote phase1 %self.id%
+* and remove
+detach 11903 %self.id%
 ~
 #11904
 Skycleave: Cleaning crew despawn~
@@ -172,40 +174,52 @@ if %self.loadtime% + 3600 > %timestamp%
   * more time left
   halt
 end
-* despawn helper first, if bucket
-if %self.vnum% == 11902
-  set sponge %instance.mob(11903)%
-  if %sponge%
-    %echo% ~%sponge% hops into ~%self%.
-    %purge% %sponge%
-  end
-end
-* possible replacement for the missing high sorcerer
-if %self.vnum% == 11965
-  * check for Niamh
-  set niamh %instance.mob(11931)%
-  if %niamh%
-    %at% %niamh.room% %echo% ~%niamh% heads upstairs.
-    %purge% %niamh%
-    %load% mob 11970
-    %echo% Niamh walks in from the north.
-    wait 3 sec
-  end
-end
+* extra tasks for specific mobs
+switch %self.vnum%
+  case 11902
+    * bucket: despawn helper first
+    set sponge %instance.mob(11903)%
+    if %sponge%
+      %echo% ~%sponge% hops into ~%self%.
+      %purge% %sponge%
+    end
+  break
+  case 11961
+    * bookshelf: load the skeleton in the lich labs
+    %at% i11937 %load% mob 11937
+    %at% i11937 %echo% A skeleton sits up on the work bench.
+  break
+  case 11965
+    * trolley: possible replacement for the missing high sorcerer
+    set niamh %instance.mob(11931)%
+    if %niamh%
+      %at% %niamh.room% %echo% ~%niamh% heads upstairs.
+      %purge% %niamh%
+      %load% mob 11970
+      %echo% Niamh walks in from the north.
+      wait 3 sec
+    end
+  break
+done
 * and leave
 %echo% ~%self% scuttles away.
 %purge% %self%
 ~
 #11905
-Move Gossipper On Load~
+Skycleave: Shared load script~
 0 n 100
 ~
-south
-eval times 2 + %random.3%
-set iter 0
-while %iter% < %times%
-  mmove
-  eval iter %iter% + 1
+switch %self.vnum%
+  case 11901
+    * gossippers in 1B
+    south
+    eval times 2 + %random.3%
+    set iter 0
+    while %iter% < %times%
+      mmove
+      eval iter %iter% + 1
+    done
+  break
 done
 ~
 #11906
@@ -312,19 +326,19 @@ else
   end
 end
 * Chance for rare reward
-if %random.100% <= 2
-  set vnum 11992
-  %load% obj %vnum% %actor%
-  set obj %actor.inventory%
-  if %obj.vnum% != %vnum%
-    * Uh-oh.
-    %echo% Something went horribly wrong while granting a reward. Please bug-report this error.
-    halt
-  else
-    %send% %actor% It's your lucky day! You also win '%obj.shortdesc%'!
-    %echoaround% %actor% ~%actor% has won '%obj.shortdesc%'!
-  end
-end
+* if %random.100% <= 1
+*   set vnum 11992
+*   %load% obj %vnum% %actor%
+*   set obj %actor.inventory%
+*   if %obj.vnum% != %vnum%
+*     * Uh-oh.
+*     %echo% Something went horribly wrong while granting a reward. Please bug-report this error.
+*     halt
+*   else
+*     %send% %actor% It's your lucky day! You also win '%obj.shortdesc%'!
+*     %echoaround% %actor% ~%actor% has won '%obj.shortdesc%'!
+*   end
+* end
 ~
 #11909
 Skycleave: Skycleaver trinket 2.0~
@@ -332,7 +346,7 @@ Skycleave: Skycleaver trinket 2.0~
 use~
 * will teleport the actor if used within this distance without a cooldown
 set max_distance 100
-set cooldown_time 3600
+set cooldown_time 1800
 set cooldown_vnum 11909
 * basics
 if %actor.obj_target(%arg%)% != %self%
@@ -387,10 +401,12 @@ while %cycle% < 3
   switch %cycle%
     case 0
       %send% %actor% @%self% begins to glow bright violet and shake violently...
+      wait 5 sec
     break
     case 1
       %send% %actor% The violet glow from @%self% envelops you!
       %echoaround% %actor% |%actor% skycleaver trinket glows a stunning violet and the light envelops *%actor%!
+      wait 5 sec
     break
     case 2
       %echoaround% %actor% ~%actor% vanishes in a flash of violet light!
@@ -400,7 +416,6 @@ while %cycle% < 3
     break
   done
   eval cycle %cycle% + 1
-  wait 5 sec
 done
 * cleanup
 nop %actor.set_cooldown(%cooldown_vnum%, %cooldown_time%)%
@@ -1340,7 +1355,7 @@ elseif %arg% == win
     eval winner %%self.winner%pos%%%
     if %owner% > 0
       makeuid owner %owner%
-      if %owner%
+      if %owner.is_pc%
         if %winner%
           %send% %owner% Your pixy, %name%, won the race!
         else
@@ -1956,6 +1971,18 @@ while %obj%
   set obj %next_obj%
 done
 ~
+#11935
+Skycleave: Detect quest interaction~
+0 c 0
+look~
+return 0
+* detects looking at character
+if %actor.char_target(%arg.car%)% == %self%
+  if %actor.on_quest(11801)%
+    %quest% %actor% trigger 11801
+  end
+end
+~
 #11936
 Skycleave: Don't touch the desk in the Lich Labs~
 2 c 0
@@ -1978,6 +2005,176 @@ else
     set ch %next_ch%
   done
   %echo% The spirit returns to the desk, which slams shut with a thud!
+end
+~
+#11937
+Skycleave: Gossipping pages~
+0 bw 50
+~
+set spirit %instance.mob(11900)%
+* find a random human to speak to
+set count 0
+set target 0
+while %count% < 10 && !%target%
+  set person %random.char%
+  if %person.is_pc% || %person.mob_flagged(HUMAN)%
+    set target %person%
+  end
+  eval count %count% + 1
+done
+if !%target%
+  halt
+end
+* per-person time limit (mobs and players both)
+set varname limit_%target.id%
+if %self.varexists(%varname%)%
+  eval when %%self.%varname%%%
+  if %when% + 60 > %timestamp%
+    * too soon
+    halt
+  end
+end
+set %varname% %timestamp%
+remote %varname% %self.id%
+* pick 2 rumors
+set rumor1 0
+set rumor2 0
+set rumor1_text
+set rumor2_text
+set count 1
+while %count% <= 2
+  * This should be the number of cases in the switch below
+  set rumor %random.19%
+  if %count% == 1 || %rumor% != %rumor1%
+    * found valid rumor
+    set rumor%count% %rumor%
+    switch %rumor%
+      case 1
+        set rumor%count%_text I heard Marina and Djon are an item now.
+      break
+      case 2
+        set rumor%count%_text I heard Ravinder followed Weyonomon right into a wall.
+      break
+      case 3
+        set rumor%count%_text I heard the statue in the foyer used to be a sorcerer here.
+      break
+      case 4
+        set rumor%count%_text I heard oreonics can separate themselves from their physical forms.
+      break
+      case 5
+        set rumor%count%_text I heard the goblins were trying to break in, not out.
+      break
+      case 6
+        set rumor%count%_text I heard someone left bread all over the second floor.
+      break
+      case 7
+        set rumor%count%_text I heard the entire second floor was turned into a maze.
+      break
+      case 8
+        set rumor%count%_text I heard the mercenaries got stuck outside the Magichanical lab when they couldn't read the sign to get in.
+      break
+      case 9
+        if %instance.mob(11969)%
+          set rumor%count%_text I heard a shadow got ahold of the GHS's wand and made itself real.
+        else
+          set rumor%count%_text I heard there was a time lion. A real one.
+        end
+      break
+      case 10
+        if %instance.mob(11969)%
+          set rumor%count%_text I heard Mezvienne killed Professor Knezz.
+        else
+          set rumor%count%_text I heard Mezvienne was drawing power directly from Professor Knezz and the tower.
+        end
+      break
+      case 11
+        if %spirit.lich_released%
+          set rumor%count%_text I heard Scaldorran shredded some of those mercenaries.
+        else
+          set rumor%count%_text I heard Scaldorran spent the whole invasion hidden in his lamp.
+        end
+      break
+      case 12
+        if %instance.mob(11934)%
+          set rumor%count%_text I heard Sanjiv was stuck in the Eruditorium when the mercenaries took over.
+        else
+          set rumor%count%_text I heard someone let the otherworlder out.
+        end
+      break
+      case 13
+        if %instance.mob(11926)%
+          set rumor%count%_text I heard old Wright couldn't recapture any of the goblins.
+        else
+          set rumor%count%_text I heard old Wright got some of the goblins into cages.
+        end
+      break
+      case 14
+        if %instance.mob(11929)%
+          set rumor%count%_text I heard Mezvienne mind-controlled Profressor Barrosh.
+        else
+          set rumor%count%_text I heard Barrosh got Paige and Grace killed when he was mind-controlled.
+        end
+      break
+      case 15
+        if %instance.mob(11940)%
+          set rumor%count%_text I heard Goef was down on floor 1 when the mercenaries had the Enchanting lab. How does that work?
+        else
+          set rumor%count%_text I heard mercenaries killed Waltur and Niamh.
+        end
+      break
+      case 16
+        if %spirit.claw2%
+          set rumor%count%_text I heard there's a secret passage on floor 2.
+        else
+          set rumor%count%_text I heard one of the pages got trapped in the fountain.
+        end
+      break
+      case 17
+        if %instance.mob(11965)%
+          set rumor%count%_text I heard Niamh is next in line for High Sorcerer.
+        else
+          set rumor%count%_text I heard Professor Knezz invited the enchantress here himself.
+        end
+      break
+      case 18
+        * SEASON (not rumor) - always set rumor1_text
+        set room %self.room%
+        if %room.rmt_flagged(LOOK-OUT)% && %room.season% != summer
+          switch %room.season%
+            case winter
+              set rumor1_text Oh my, it's snowing out. I could swear it was just summer.
+            break
+            case spring
+              set rumor1_text It's a terribly nice day out for midsummer. Look at all the flowers out there.
+            break
+            case autumn
+              set rumor1_text Oh dear, the trees are changing out there. Midsummer seems awfully early for that.
+            break
+        end
+      break
+      case 19
+        * use a random SAY on me (not rumor) - always set rumor1_text
+        set msg %self.custom(say)%
+        if !%msg.empty%
+          set rumor1_text %msg%
+        end
+      break
+      case 20
+          set rumor%count%_text I heard
+          set rumor%count%_text I heard
+        end
+      break
+    done
+    eval count %count% + 1
+  else
+    * did not find a valid rumor: repeat
+  end
+done
+* say the rumors
+say %rumor1_text%
+wait 3 sec
+if %target.room% == %self.room% && %target.is_npc% && %response_mobs% ~= %target.vnum% && %rumor2_text%
+  %force% %target% say Oh? %rumor2_text%
 end
 ~
 #11939
@@ -2040,9 +2237,12 @@ remote skystone_progress %actor.id%
 remote skystone_finished %actor.id%
 ~
 #11940
-Skycleave craftables: BoP/BoE twiddler~
+Skycleave craftables: Craft-or-Drop: Set BoE/BoP and loot quality flags~
 1 n 100
 ~
+* This script makes loot BOP when dropped by a mob but BOE when crafted.
+* It will also inherit hard/group flags from an NPC and rescale itself.
+* first ensure there's a person
 set actor %self.carried_by%
 if !%actor%
   set actor %self.worn_by%
@@ -2050,24 +2250,44 @@ end
 if !%actor%
   halt
 end
-if %actor% && %actor.is_pc%
-  * Item was crafted
-  if %self.is_flagged(BOP)%
-    nop %self.flag(BOP)%
-  end
-  if !%self.is_flagged(BOE)%
-    nop %self.flag(BOE)%
-  end
-  * Default flag is BOP so need to unbind when setting BOE
-  nop %self.bind(nobody)%
-else
-  * Item was probably dropped
+set rescale 0
+* next check pc/npc
+if %actor.is_npc%
+  * BOP mode (loot)
   if !%self.is_flagged(BOP)%
     nop %self.flag(BOP)%
+    set rescale 1
   end
   if %self.is_flagged(BOE)%
     nop %self.flag(BOE)%
+    set rescale 1
   end
+  if !%self.is_flagged(GENERIC-DROP)%
+    if %actor.mob_flagged(HARD)% && !%self.is_flagged(HARD-DROP)%
+      nop %self.flag(HARD-DROP)%
+      set rescale 1
+    end
+    if %actor.mob_flagged(GROUP)% && !%self.is_flagged(GROUP-DROP)%
+      nop %self.flag(GROUP-DROP)%
+      set rescale 1
+    end
+  end
+else
+  * BOE mode (crafted)
+  if %self.is_flagged(BOP)%
+    nop %self.flag(BOP)%
+    set rescale 1
+  end
+  if !%self.is_flagged(BOE)%
+    nop %self.flag(BOE)%
+    set rescale 1
+  end
+  * in case
+  nop %self.bind(nobody)%
+end
+if %rescale%
+  wait 0
+  %scale% %self% %self.level%
 end
 ~
 #11941
@@ -2223,6 +2443,7 @@ if !%to_room%
   * Error?
   halt
 end
+set skycleave_wake_room %room.template%
 set ch %room.people%
 while %ch%
   set next_ch %ch.next_in_room%
@@ -2232,6 +2453,7 @@ while %ch%
     %teleport% %ch% %to_room%
     %echoaround% %ch% ~%ch% appears out of nowhere, asleep on the branch!
     %send% %ch% You dream you're falling -- the kind where you really feel it!
+    remote skycleave_wake_room %ch.id%
     * bring followers
     set fol %room.people%
     while %fol%
@@ -2330,7 +2552,26 @@ if %actor.position% == Standing || %actor.position% == Resting || %actor.positio
   end
   * If we made it this far, we teleport them:
   set room %actor.room%
-  if %actor.plr_flagged(ADV-SUMMON)% && %actor.adventure_summoned_from%
+  * check stored room first
+  set wake_room 0
+  if %actor.varexists(skycleave_wake_room)%
+    if %actor.skycleave_wake_room% > 0
+      set spirit %instance.mob(11900)%
+      set wake_room %actor.skycleave_wake_room%
+      * account for phase change
+      if %wake_room% < 11830 && %spirit.phase2%
+        set wake_room 11925
+      elseif %wake_room% < 11875 && %spirit.phase4%
+        eval wake_room %wake_room% + 100
+      end
+    end
+  end
+  * otherwise find a room
+  set leaving_adv 1
+  if %wake_room%
+    set target %instance.nearest_rmt(%wake_room%)%
+    set leaving_adv 0
+  elseif %actor.plr_flagged(ADV-SUMMON)% && %actor.adventure_summoned_from%
     set target %actor.adventure_summoned_from%
   elseif %actor.home%
     set target %actor.home%
@@ -2338,7 +2579,9 @@ if %actor.position% == Standing || %actor.position% == Resting || %actor.positio
     set target %startloc%
   end
   %teleport% %actor% %target%
-  nop %actor.cancel_adventure_summon%
+  if %leaving_adv%
+    nop %actor.cancel_adventure_summon%
+  end
   %echoaround% %actor% ~%actor% wakes up with a start! You didn't even see *%actor% there.
   * move fellows
   set ch %room.people%
@@ -2347,7 +2590,9 @@ if %actor.position% == Standing || %actor.position% == Resting || %actor.positio
     if %ch.is_npc% && %ch.leader% == %actor% && !%ch.fighting% && !%ch.disabled%
       %echoaround% %ch% ~%ch% fades away and vanishes!
       %teleport% %ch% %target%
-      nop %ch.cancel_adventure_summon%
+      if %leaving_adv%
+        nop %ch.cancel_adventure_summon%
+      end
       %send% %ch% You wake up with the hazy feeling you were just somewhere else.
       %echoneither% %actor% %ch% ~%ch% wakes up.
     end
@@ -2368,10 +2613,13 @@ Skycleave Dreams: Reset wake on poof-in~
 ~
 * When a player enters by any means OTHER than normal walking, reset their
 * 'wake' count. Typing 'wake' 3 times exits the area using trigger 11945.
+* This also clears their wake-room, which will be set by another script.
 set dir_list north east south west northwest northeast southwest southeast up down
 if %actor.is_pc% && (%direction% == none || !(%dir_list% ~= %direction%))
   set skycleave_wake 0
   remote skycleave_wake %actor.id%
+  set skycleave_wake_room 0
+  remote skycleave_wake_room %actor.id%
 end
 ~
 #11947
@@ -2623,7 +2871,6 @@ switch %cycle%
   break
   default
     %send% %person% Slowly, inch by inch, time resumes again, and for the first time in ages, you almost feel like you can breathe again.
-    wait 1
     * done: teleport the character
     set target %instance.nearest_rmt(11888)%
     %teleport% %person% %target%
@@ -3243,6 +3490,7 @@ end
 return 1
 %send% %actor% You drink a little of the dew and start to feel drowsy...
 %echoaround% %actor% ~%actor% drinks from a small vial.
+dg_affect #11961 %actor% SLOW on 60
 set teleported 0
 * begin loop to wait for sleep
 set count 0
@@ -3299,7 +3547,15 @@ while %count% < 12
   end
   * did we find a teleport target?
   if %to_room%
-    if !%actor.plr_flagged(ADV-SUMMON)%
+    * determine where to send them back to
+    if (%room.template% >= 11800 && %room.template% <= 11874) || (%room.template% >= 11900 && %room.template% <= 11974)
+      set skycleave_wake_room %room.template%
+    elseif %actor.varexists(skycleave_wake_room)%
+      set skycleave_wake_room %actor.skycleave_wake_room%
+    else
+      set skycleave_wake_room 0
+    end
+    if !%actor.plr_flagged(ADV-SUMMON)% && !%room.template%
       nop %actor.mark_adventure_summoned_from%
     end
     %echoaround% %actor% ~%actor% lets out a raucous snore and then vanishes into ^%actor% dream.
@@ -3307,18 +3563,20 @@ while %count% < 12
     nop %actor.link_adventure_summon%
     %echoaround% %actor% ~%actor% appears out of nowhere, asleep on the floor!
     %send% %actor% You dream you're falling -- the kind where you really feel it!
+    remote skycleave_wake_room %actor.id%
     * teleport fellows
     set ch %room.people%
     while %ch%
       set next_ch %ch.next_in_room%
       if %ch.leader% == %actor% && !%ch.fighting%
-        if %ch.is_pc% && !%ch.plr_flagged(ADV-SUMMON)%
+        if %ch.is_pc% && !%ch.plr_flagged(ADV-SUMMON)% && !%room.template%
           nop %ch.mark_adventure_summoned_from%
         end
         %echoaround% %ch% ~%ch% vanishes into thin air!
         %teleport% %ch% %to_room%
         if %ch.is_pc%
           nop %ch.link_adventure_summon%
+          remote skycleave_wake_room %ch.id%
         end
         %echoaround% %ch% ~%ch% appears out of nowhere!
         if %ch.position% != Sleeping
@@ -3333,6 +3591,7 @@ while %count% < 12
   * next while loop
   eval count %count% + 1
 done
+dg_affect #11961 %actor% off
 ~
 #11962
 broken mirror portal~
@@ -3450,6 +3709,7 @@ end
 return 1
 %send% %actor% You hold the jade tear up to your head and suddenly feel drowsy...
 %echoaround% %actor% ~%actor% holds a little jade stone up to ^%actor% head for a moment.
+dg_affect #11965 %actor% SLOW on 60
 set teleported 0
 * begin loop to wait for sleep
 set count 0
@@ -3500,6 +3760,12 @@ while %count% < 12
   elseif %room.template% == 11976 || %room.template% == 11978
     * commoner/guard's dream
     set to_room %instance.nearest_rmt(11993)%
+    * ensure fishing net
+    if %to_room%
+      if !%to_room.contents(11979)%
+        %at% %to_room% %load% obj 11979 room
+      end
+    end
   elseif %room.template% == 11977
     * priestess's dream
     set to_room %instance.nearest_rmt(11994)%
@@ -3509,7 +3775,15 @@ while %count% < 12
   end
   * did we find a teleport target?
   if %to_room%
-    if !%actor.plr_flagged(ADV-SUMMON)%
+    * determine where to send them back to
+    if (%room.template% >= 11800 && %room.template% <= 11874) || (%room.template% >= 11900 && %room.template% <= 11974)
+      set skycleave_wake_room %room.template%
+    elseif %actor.varexists(skycleave_wake_room)%
+      set skycleave_wake_room %actor.skycleave_wake_room%
+    else
+      set skycleave_wake_room 0
+    end
+    if !%actor.plr_flagged(ADV-SUMMON)% && !%room.template%
       nop %actor.mark_adventure_summoned_from%
     end
     %echoaround% %actor% ~%actor% lets out a whistling snore and then vanishes into ^%actor% dream.
@@ -3517,18 +3791,20 @@ while %count% < 12
     nop %actor.link_adventure_summon%
     %echoaround% %actor% ~%actor% appears out of nowhere, asleep on the bed!
     %send% %actor% You dream you're falling -- the kind where you really feel it!
+    remote skycleave_wake_room %actor.id%
     * teleport fellows
     set ch %room.people%
     while %ch%
       set next_ch %ch.next_in_room%
       if %ch.leader% == %actor% && !%ch.fighting%
-        if %ch.is_pc% && !%ch.plr_flagged(ADV-SUMMON)%
+        if %ch.is_pc% && !%ch.plr_flagged(ADV-SUMMON)% && !%room.template%
           nop %ch.mark_adventure_summoned_from%
         end
         %echoaround% %ch% ~%ch% vanishes into thin air!
         %teleport% %ch% %to_room%
         if %ch.is_pc%
           nop %ch.link_adventure_summon%
+          remote skycleave_wake_room %ch.id%
         end
         %echoaround% %ch% ~%ch% appears out of nowhere!
         if %ch.position% != Sleeping
@@ -3543,6 +3819,7 @@ while %count% < 12
   * next while loop
   eval count %count% + 1
 done
+dg_affect #11961 %actor% off
 ~
 #11969
 Skycleave: Hendecagon fountain summoned NPC run~
@@ -3858,6 +4135,7 @@ if !%to_room%
   * Error?
   halt
 end
+set skycleave_wake_room %room.template%
 set ch %room.people%
 while %ch%
   set next_ch %ch.next_in_room%
@@ -3867,6 +4145,7 @@ while %ch%
     %teleport% %ch% %to_room%
     %echoaround% %ch% ~%ch% appears out of nowhere, asleep on the bed!
     %send% %ch% You dream you're falling -- the kind where you really feel it!
+    remote skycleave_wake_room %ch.id%
     * bring followers
     set fol %room.people%
     while %fol%
@@ -3901,7 +4180,6 @@ if %cmd.mudcommand% == adventure
   end
   * send fake adventure info
   %send% %actor% Zenith of the Gobbrabakhs (inside the Tower Skycleave)
-  %send% %actor% (GOB-ruh-BAK of OR-ka)
   %send% %actor% by Paul S. Clarke
   %send% %actor% \&0   Venture back into the Goblin's Dream to experience a culture lost to history
   %send% %actor% \&0 in this highly-detailed hidden area. For players who enjoy an immersive
@@ -4006,7 +4284,7 @@ done
 ~
 #11979
 Goblin's Dream: Altar below pilgrim loader~
-2 bw 20
+2 bw 33
 ~
 * This script randomly loads a pilgrim into the room, if there isn't one yet.
 * The pilgrim will take care of its own actions and cleanup.
@@ -4076,6 +4354,64 @@ while %vnum% <= %end_v%
 done
 %echo% The vertical tube in the ceiling shows a perfect circle on the altar below as the sun passes directly overhead.
 wait 1787 sec
+~
+#11981
+Skycleave: Handy mob restring command~
+0 c 0
+restring~
+* uses a self-only command trig
+if %actor% != %self%
+  return 0
+  halt
+else
+  return 1
+end
+set old_name %self.name%
+switch %arg.car%
+  case comedian
+    %mod% %self% sex female
+    %mod% %self% keywords Shoan goblin
+    %mod% %self% shortdesc Shoan
+    %mod% %self% longdesc Shoan is standing in front of the crowd.
+    %mod% %self% lookdesc Shoan's pale jade skin shimmers with sweat as she stands before the crowd in the central plaza. She's dressed in an airy purple dress and her dary gray hair
+    %mod% %self% append-lookdesc is cut very short. She doesn't smile as she speaks in a dry, steady voice. But the crowd seems to enjoy it.
+  break
+  case poet
+    %mod% %self% sex male
+    %mod% %self% keywords Choona goblin
+    %mod% %self% shortdesc Choona
+    %mod% %self% longdesc Choona stands alone in front of the crowd.
+    %mod% %self% lookdesc Though he's not tall, Choona's posture is rigidly upright and he stands over many of the other goblins. He's clad in a clean white tunic and violet robe,
+    %mod% %self% append-lookdesc with a kelp wreath in his brown hair. His skin is the shade of spring grass, with rosy red powder on his cheeks.
+  break
+  case priest
+    %mod% %self% sex female
+    %mod% %self% keywords Celles goblin
+    %mod% %self% shortdesc Celles
+    %mod% %self% longdesc Celles, Voice of Orka, stands in front of the crowd.
+    %mod% %self% lookdesc With long, straight, translucent white hair that flows over her deep purple robe, Celles looks to be the oldest goblin in the city. Her skin, perhaps
+    %mod% %self% append-lookdesc chartreuse once, has faded almost to gray. Her eyes are milky white to match her hair, and she stares off toward the horizon as she speaks.
+  break
+  case janitor
+    %mod% %self% sex male
+    %mod% %self% keywords Rask goblin
+    %mod% %self% shortdesc Rask
+    %mod% %self% longdesc Rask is sweeping the plaza.
+    %mod% %self% lookdesc Rask is clad in short purple trousers and a sleeveless white shirt that show off his ashy green arms and legs. He sweeps the plaza with an old broom that badly needs new bristles.
+  break
+done
+* announce change
+if %old_name% != %self.name%
+  switch %self.room.template%
+    case 11982
+      %echo% %old_name% disappears into the crowd and ~%self% steps down into the center of the plaza.
+    break
+    default
+      %echo% %old_name% leaves.
+      %echo ~%self% arrives.
+    break
+  done
+break
 ~
 #11989
 Goblin's Dream: Guard patrol~
@@ -4219,6 +4555,35 @@ done
 dg_affect #11990 %ch% %type% %amount% 300
 %send% %ch% ~%self% %verb% itself toward you... you take on a %glow% glow.
 %echoaround% %ch% ~%self% %verb% itself toward ~%ch%... &%ch% takes on a %glow% glow.
+~
+#11992
+Skycleave: Smash calamander statuette to create forest~
+1 c 2
+smash~
+* smash <self>
+set valid_sects 27 28 55 62 64 65
+set room %actor.room%
+set targ %actor.obj_target(%arg%)%
+if %targ% != %self%
+  return 0
+  halt
+end
+return 1
+if !(%valid_sects% ~= %room.sector_vnum%)
+  %send% %actor% You don't want to do that here. Try a jungle.
+  halt
+elseif !%room.empire_id%
+  %send% %actor% You need to claim the area to do this.
+  halt
+elseif !%actor.canuseroom_member(%room%)%
+  %send% %actor% You don't have permission to use @%self% here.
+  halt
+end
+%send% %actor% You smash @%self% on the ground...
+%echoaround% %actor% ~%actor% smashes @%self% on the ground...
+%echo% Streaks of brown light burst from the broken statuette! The jungle transforms before your very eyes as the light strikes it!
+%terraform% %room% 11990
+%purge% %self%
 ~
 #11993
 Clingy cloak~

@@ -20,8 +20,361 @@ R
 R
 4 2 50
 W
-21 0 0 100
+21 0 0 100 -
 Z
 1 11906
+S
+#11918
+Skycleave: The Championship Tour~
+   You scrutinize the time-traveler's list of villains, looking for more clues.
+It seems the mysterious author has fought all these people somewhere in the
+Tower Skycleave and now you find yourself eager to duplicate the feat.
+   With this checklist in hand, find and defeat every one of the Tower
+Skycleave's combatants. Be warned: like the time-traveler himself, it will take
+more than one trip through the tower to get them all. Be sure you're the one to
+kill them as well. If they die through some other misfortune, it doesn't count.
+~
+   You sit on the edge of the fountain and reflect on your battles against the
+tower's many villains as you watch the countless twinkling lights from the
+tree overhead reflect off of the softly burbling water. Surely this was the
+tower's most difficult challenge.
+~
+7 0 125 250 -1
+A
+2 11918
+P
+16 11800 0 7 -
+R
+7 11800 25
+W
+3 11819 0 1 a
+W
+3 11818 0 1 a
+W
+3 11847 0 1 a
+W
+3 11848 0 1 a
+W
+3 11849 0 1 a
+W+
+3 11867 0 1 a
+Defeat 1x mob: High Sorcerer Barrosh~
+W
+3 11869 0 1 a
+W
+3 11863 0 1 a
+W
+3 11872 0 1 a
+W
+3 11888 0 1 a
+W+
+3 11958 0 1 a
+Defeat 1x mob: Biksi, Champion of Orka~
+W+
+3 11928 0 1 a
+Defeat 1x mob: the First Water~
+Z
+3 11908
+Z
+3 11808
+S
+#11919
+Skycleave: The Time-Traveler's Tour~
+   You read both sides of the diary page several times, wondering to yourself
+where some of these so-called hidden areas might be. At least now the
+mysterious time-traveler has provided you a checklist.
+   Visit each of the locations in the diary and then return to the first floor
+fountain in the Tower Skycleave to complete the quest. Some of these locations
+must be visited AFTER the tower has been rescued to count.
+~
+   You stroll around the fountain several times, watching the reflection of
+the enormous tree above you meander around the room in the surface of the
+fountain. The tower held so many secrets, a person could spend a lifetime
+plumbing its depths.
+~
+5 0 125 250 -1
+A
+2 11919
+P
+16 11800 0 7 -
+R
+7 11800 25
+W
+13 11916 0 1 a
+W
+13 11940 0 1 a
+W
+13 11972 0 1 a
+W
+13 11880 0 1 a
+W
+13 11975 0 1 a
+W
+13 11888 0 1 a
+W
+13 11890 0 1 a
+W
+13 11993 0 1 a
+W
+13 11994 0 1 a
+Z
+3 11908
+Z
+3 11808
+S
+#11920
+Skycleave: Out of Time~
+   You read the diary page several times and turn it over in your hands. It
+clearly wasn't written by the hand of any of these sorcerers. Further, it's
+obviously someone who is keenly aware that the Tower Skycleave is stuck in a
+time loop -- a fact that seems lost on most of the tower's denizens.
+   This merits some investigation. Find the mysterious time-traveler who wrote
+the diary and see what insight he has to offer. Afterwards, visit the first
+floor fountain to complete the quest.
+~
+   In the end, it seems the time-traveler met a grim fate. You lay on your back
+and think on it, imagining for a moment that you are at the top, not bottom of
+this enormous chamber, looking down at the nocturnium tree and the tremendous
+fall to its base. This must be how it felt to be trapped in the time loop,
+staring into the pit you can never escape from. At least the sorcerers are, on
+the whole, unaware of their dark fate.
+~
+8 0 125 250 -1
+A
+2 11920
+P
+16 11800 0 7 -
+R
+7 11800 25
+W+
+11 0 0 1 -
+Find the time-traveler~
+Z
+3 11908
+Z
+3 11808
+S
+#11970
+Skycleave: Secret Niamh~
+   Amongst the Skycleave variations, there is a hidden thread in the time loop
+in which the Shadow Hide herself, Niamh, rises to the rank of High Sorcerer.
+Seek out this twist of fate and learn Niamh's own thoughts on her place in the
+time loop.
+   Finding Acting High Sorcerer Niamh will require patience. Return to the
+tower some time after saving it to see if she has received this rare promotion.
+~
+   Acting High Sorcerer Niamh stops what she's doing and listens dismissively,
+at first, as you tell her about the time loop and its variations. But her
+interest grows as you provide more and more details...
+   'You're saying Grand High Sorcerer Knezz might have lived?' she asks, and
+you nod. She ponders it for a moment.
+   'My word,' she says at last. 'I shall set myself to researching this odd
+phenomenon at once. Perhaps my new station in the Tower will prove useful in
+getting answers.'
+   You try to discuss it further, but Niamh seems lost in her own thoughts and
+she soon wanders off.
+~
+17 ei 125 250 -1
+A
+1 11900
+P
+16 11800 0 6 a
+P
+0 11812 0 1 a
+R
+7 11800 10
+W
+13 11964 0 1 -
+Z
+1 11970
+S
+#11972
+Skycleave: Elemental Plane of Water~
+   You struggle for a breath as you realize you fell too far into the fountain.
+All you can see in every direction is water -- and it seems to be alive! The
+situation is as interesting as it is unexpected, and you vow to investigate it
+once you've defeated the living water.
+   After you defeat the living embodiment of the First Water, seek out someone
+in the Tower Skycleave who has more information.
+~
+   'Oh bother,' Annelise says as you interrupt her mending an old iron staff.
+She tosses it into the rubbish pile and ties her hair up out of her face. She
+takes a seat and wipes sweat from her forehead.
+   'I didn't even realize we had an appointment,' she says. She glances across
+the desk at her calendar, then back to you, then back to the calendar.
+   You interrupt and tell her about your fight with the First Water, from which
+you still don't feel like you've completely dried off. You tell her about the
+pressure in your lungs, about feeling like you were about to drown when the
+living water finally died. And, of course, you mention that it came right back
+to life afterward.
+   'I do keep telling the headmaster we should lock that portal,' Annelise says
+when you finish the tale. 'It's an actual elemental plane, if you can believe
+it. Frankly you're lucky to have made it out. We lost a lot of pages before we
+put up a sign... which seems to have gone missing.
+   'Anyway, you can't actually kill it. It's Water itself. All water. Every-
+where. But it's a great test of an adventurer's mettle. Be sure to fight it
+again when you get the chance.'
+~
+14 0 125 250 -1
+A
+3 11972
+P
+16 11800 0 6 -
+R
+7 11800 10
+W+
+3 11928 0 1 -
+Defeat the First Water~
+Z
+1 11839
+Z
+1 11939
+S
+#11975
+Gobbrabakh of Orka: Where Am I?~
+   As you step onto the rooftop, it begins to dawn on you that you are NOT
+where you were before -- or where you expected to be. 'What is this place?
+And where am I?' you wonder aloud as you look out over the city.
+   The hot summer sun beats down on you as you try to get your bearings. Were
+you just in a tower somewhere? As you struggle to find the answer in your own
+memory, you're quickly distracted by someone walking by. You start to wonder if
+anyone is going to believe you about this place...
+   Find something tangible to take back to the tower. Perhaps you can find a
+sorcerer there who will be interested in it.
+~
+   Tyrone makes a puzzles face as he takes the jade tear from you and turns it
+over and over between his fingers.
+   'I have one exactly like this in my room,' he says. 'I mean, ex-act-lee. I
+wonder if it even... well...'
+   He holds the tear up to the light, rubs it between his palms, even sniffs at
+it as he marvels.
+   'I need to compare it's, er, properties. To the other one. Thanks!'
+~
+10 d 125 250 -1
+A
+3 11982
+A
+3 11983
+A
+3 11984
+A
+3 11985
+A
+3 11986
+A
+3 11987
+A
+3 11988
+A
+3 11989
+A
+3 11990
+A
+3 11991
+R
+7 11800 25
+T 11830
+W
+2 11965 0 1 -
+Z
+1 11813
+Z
+1 11913
+S
+#11991
+Gobbrabakh of Orka: The Bloodletting Ritual~
+   Celles bids you sit for a moment and you take a spot on one of the mats. She
+carefully leans herself onto a small stool and breathes hard out her nose as
+she lets herself relax.
+   'These old bones don't move like they used to,' she says. 'Thank you for
+taking a moment to speak with me. Today is an important day for the Gobbrabakh
+of Orka. On this day, we celebrate with food and stories and, most importantly,
+bloodletting in the arena.'
+   The old goblin pauses for a moment and shifts her weight on the stool.
+   'It would be a great honor for us if you would participate. It's quite rare
+to have an outsider here during the holy days. Please, do us this honor. Face
+our champion in the arena.'
+~
+   As the dust settles on the arena and the champion, Biksi, collects herself
+in the shade, the crowd stands in awe. The sun crests the sky overhead and
+slowly, a chant builds among the spectators, louder and louder, until it grows
+into a cheer. You can't make out what they're saying -- or you can't understand
+it -- but they seem thrilled at your performance in the arena.
+~
+12 ei 125 250 -1
+A
+1 11974
+P
+0 11975 0 1 -
+R
+7 11800 10
+W+
+3 11956 0 1 a
+Defeat the Worthy~
+W+
+3 11957 0 1 a
+Defeat the Axe~
+W+
+3 11958 0 1 a
+Defeat the Champion of Orka~
+Z
+3 11991
+S
+#11993
+Skycleave: The Endless River~
+   As you drift off to sleep, you find yourself sitting by a muddy river with
+your trusty fishing net hanging nearby. You've been here before. Or, at least,
+you think you have.
+   When you get back to the Tower Skycleave, perhaps you can find someone who
+wants to hear about your dream. In the meantime, try some fishing.
+~
+   'I've had that exact dream,' Sanjiv says as you recall the story of the
+endless fishing river.
+   'Which is just awful,' he adds. 'Imagine doing work in your dream. As if
+things weren't stressful enough here already. I almost got merc'd by that
+stylish archmage just trying... just trying to do my job.'
+~
+11 0 125 250 -1
+A
+3 11993
+P
+16 11800 0 6 -
+R
+7 11800 10
+W
+13 11993 0 1 -
+Z
+1 11935
+Z
+1 11942
+S
+#11994
+Skycleave: House of God~
+   Just as sleep overtakes you, a bright light grows behind your eyelids and
+a feeling of warmth and comfort envelops you like a blanket. A sense of small-
+ness settles in as you find yourself in an audience with a being far, far
+greater than yourself.
+   It's a cozy dream; the kind you'll yearn for when you finally wake up. And
+perhaps it will be of interest to someone next time you're in the Tower
+Skycleave.
+~
+   There's a creaking noise as Goef turns its head toward you and raises its
+heavy brow.
+   'A curious thing,' it says slowly. 'My... people... have neither dreams nor
+gods. After all, we were created by the wizards of Man -- a creator neither
+safe to worship, nor ever worthy of it. I would surely like to meet a god some
+day. Perhaps it would give us something Mankind could not.'
+~
+13 0 125 250 -1
+A
+3 11994
+P
+16 11800 0 6 -
+R
+7 11800 10
+W
+13 11994 0 1 -
+Z
+1 11941
 S
 $

@@ -84,6 +84,11 @@ blinding bomb~
 T0
 You are no longer stunned by the blinding bomb.~
 S
+#11832
+conditional visibility~
+4 0
+0 0 0 0
+S
 #11841
 blind~
 4 0

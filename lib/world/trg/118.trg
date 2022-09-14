@@ -122,15 +122,29 @@ end
 %purge% %self%
 ~
 #11806
-Skycleave: One-time one-line greetings~
-0 g 100
+Skycleave: One-time greetings using script1~
+0 gn 100
 ~
-if %actor.is_npc% || %self.fighting%
+* Uses mob custom script1 to for one-time greetings, with each script1 line
+*   sent every %line_gap% (9 sec) until it runs out of strings. The mob will
+*   be SENTINEL and SILENT during this period.
+* usage: .custom add script1 <command> <string>
+* valid commands: say, emote, do (execute command), echo (script), skip, attackable
+* also: vforce <mob vnum in room> <command>
+* also: set line_gap <time> sec
+* also: mod <field> <value> -- runs %mod% %self%
+* NOTE: waits for %line_gap% (9 sec) after all commands EXCEPT do/vforce/set/attackable/mod
+set line_gap 9 sec
+* begin
+if %actor.is_npc%
   halt
 end
 set room %self.room%
 * let everyone arrive
 wait 0
+if %self.fighting% || %self.disabled%
+  halt
+end
 * check for someone who needs the greeting
 set any 0
 set ch %room.people%
@@ -149,40 +163,91 @@ done
 if !%any%
   halt
 end
-switch %self.vnum%
-  case 11807
-    * new shopkeep (1A)
-    say We're not, uh, open yet. It's a crisis, if you haven't noticed.
-  break
-  case 11907
-    * shopkeep (1B)
-    say Hello, erm, and welcome to Towerwin, erm, Towerinkel's Gift Shop, your one shop stop for, erm, your one stop shop for all your, erm, gifts. Oh, that's not right.
-  break
-  case 11812
-    * Apprentice Cosimo (2A)
-    say Keep quiet and they won't find us in here.
-  break
-  case 11836
-    * Lich Scaldorran (3A)
-    %echo% ~%self% comes screaming toward you, lashing at you with snake-like wrappings, before realizing you aren't ^%self% enemy.
-  break
-  case 11840
-    * Magineer Waltur (3A)
-    say You fool, we were hiding in here. Next time leave the wall shut.
-  break
-  case 11940
-    * Magineer Waltur (3B)
-    say Now that all that nastiness is done, I have some things that might interest you. (list)
-  break
-  case 11941
-    * Goef the Oreonic (3B)
-    say Salutations, little human. Are you here for attunement? (attune)
-  break
-  case 11862
-    * Apprentice Thorley (4A)
-    say Oh, thank the Wyrd, you're not with that you-know-what of an enchantress.
-  break
+* greeting detected: prepare (storing as variables prevents reboot issues)
+if !%self.mob_flagged(SENTINEL)%
+  set no_sentinel 1
+  remote no_sentinel %self.id%
+  nop %self.add_mob_flag(SENTINEL)%
+end
+if !%self.mob_flagged(SILENT)%
+  set no_silent 1
+  remote no_silent %self.id%
+  nop %self.add_mob_flag(SILENT)%
+end
+* Show the script1 text
+* tell story
+set pos 0
+set msg %self.custom(script1,%pos%)%
+while !%msg.empty%
+  set mode %msg.car%
+  set msg %msg.cdr%
+  if %mode% == say
+    say %msg%
+    set waits 1
+  elseif %mode% == do
+    %msg.process%
+    set waits 0
+  elseif %mode% == echo
+    %echo% %msg.process%
+    set waits 1
+  elseif %mode% == vforce
+    set vnum %msg.car%
+    set msg %msg.cdr%
+    set targ %self.room.people(%vnum%)%
+    if %targ%
+      %force% %targ% %msg.process%
+    end
+    set waits 0
+  elseif %mode% == emote
+    emote %msg%
+    set waits 1
+  elseif %mode% == set
+    set subtype %msg.car%
+    set msg %msg.cdr%
+    if %subtype% == line_gap
+      set line_gap %msg%
+    else
+      %echo% ~%self%: Invalid set type '%subtype%' in storytime script.
+    end
+    set waits 0
+  elseif %mode% == skip
+    * nothing this round
+    set waits 1
+  elseif %mode% == attackable
+    if %self.aff_flagged(!ATTACK)%
+      dg_affect %self% !ATTACK off
+    end
+    set waits 0
+  elseif %mode% == mod
+    %mod% %self% %msg.process%
+    set waits 0
+  else
+    %echo% %self.name%: Invalid script message type '%mode%'.
+  end
+  * fetch next message and check wait
+  eval pos %pos% + 1
+  set msg %self.custom(script1,%pos%)%
+  if %waits% && %msg%
+    wait %line_gap%
+  end
 done
+* Done: mark as greeted for anybody now present
+set ch %room.people%
+while %ch%
+  if %ch.is_pc%
+    set varname greet_%ch.id%
+    set %varname% 1
+    remote %varname% %self.id%
+  end
+  set ch %ch.next_in_room%
+done
+* Done: cancel sentinel/silent
+if %self.varexists(no_sentinel)%
+  nop %self.remove_mob_flag(SENTINEL)%
+end
+if %self.varexists(no_silent)%
+  nop %self.remove_mob_flag(SILENT)%
+end
 ~
 #11807
 Skycleave: Bribe goblins to leave~
@@ -508,53 +573,61 @@ else
 end
 ~
 #11814
-Skycleave: Attach one-time intro on enter~
-0 h 100
+Skycleave: Loot controller~
+1 n 100
 ~
-* config: these arrays match up mob vnum to trigger vnum 1:1
-set mobs_list 11810 11818 11830 11847 11849 11869 11863 11890 11891 11892
-set trig_list 11825 11825 11860 11825 11825 11860 11860 11825 11825 11860
-if %actor.is_npc% || %self.fighting%
-  halt
+* Handles loot drops for skycleave bosses
+* determine where we are
+set actor %self.carried_by%
+if %self.level%
+  set level %self.level%
+else
+  set level 100
 end
-set room %self.room%
-* figure out which intro I give
-set trig_vnum 0
-while %mobs_list% && !%trig_vnum%
-  set mob %mobs_list.car%
-  set mobs_list %mobs_list.cdr%
-  set trig %trig_list.car%
-  set trig_list %trig_list.cdr%
-  if %mob% == %self.vnum%
-    set trig_vnum %trig%
+* determine 1 item of loot
+if %self.vnum% == 11837
+  * BoE item list
+  set roll %random.100%
+  if %roll% == 1
+    set loot_list 11918 11919 11920
+  elseif %roll% <= 16
+    set loot_list 11801 11802 11804 11806 11807
+  else
+    set loot_list 11810 11811 11812 11813 11814 11815 11816 11817 11818 11819 11820 11821 11822 11823 11824 11825 11826 11827 11828 11829
   end
-done
-* let everyone arrive
-wait 0
-if %trig_vnum% == 0 || %self.has_trigger(%trig_vnum%)%
-  halt
+  * count list
+  set temp %loot_list%
+  set count 0
+  while !%temp.empty%
+    set temp %temp.cdr%
+    eval count %count% + 1
+  done
+  * roll
+  eval pos %%random.%count%%%
+  while %pos% > 0 && !%loot_list.empty%
+    set loot %loot_list.car%
+    set loot_list %loot_list.cdr%
+    eval pos %pos% - 1
+  done
+elseif %self.vnum% == 11838
+  * BoP item list 11840-11859
+  eval loot 11840 - 1 + %random.20%
 end
-* check for someone who needs the intro
-set any 0
-set ch %room.people%
-while %ch%
-  if %ch.is_pc%
-    set varname intro_%ch.id%
-    if !%room.varexists(%varname%)%
-      set any 1
-      set %varname% 1
-      remote %varname% %room.id%
+* load loot
+if %loot%
+  %load% obj %loot% %actor% inv %level%
+  set item %actor.inventory%
+  if %item.vnum% == %loot%
+    if %item.is_flagged(BOE)% || %item.is_flagged(BOP)%
+      %item.bind(%self%)%
     end
   end
-  set ch %ch.next_in_room%
-done
-* did anyone need the intro
-if %any%
-  attach %trig_vnum% %self.id%
-  set line 0
-  remote line %self.id%
-  start_messages
 end
+* any bonus items?
+*   no
+* done
+wait 0
+%purge% %self%
 ~
 #11815
 Escaped Goblin combat~
@@ -684,7 +757,7 @@ if %self.cooldown(11800)%
 end
 if %random.2% == 1
   * Flail Wildly
-  %echo% slay the griffin!
+  say slay the griffin!
   nop %self.set_cooldown(11800, 20)%
   set loops 1
   if %self.difficulty% == 4
@@ -991,7 +1064,7 @@ rdelete drinking %self.id%
 nop %self.set_cooldown(11800, 15)%
 ~
 #11823
-Skycleave: Boss Deaths (Pixy, Barrosh, Shade)~
+Skycleave: Boss Deaths (Pixy, Kara, Barrosh, Shade)~
 0 f 100
 ~
 switch %self.vnum%
@@ -1006,6 +1079,15 @@ switch %self.vnum%
     %echo% The pixy queen sputters as her power fades and a look of shock -- and peace -- crosses her face.
     say Thank you for this release, be it ever so brief. We shall meet... again... in time.
     * dies with death-cry
+  break
+  case 11847
+    * Kara Virduke
+    set sanjiv %self.room.people(11835)%
+    if %sanjiv%
+      %echo% The camouflage around Apprentice Sanjiv fades as he collapses to his knees and vomits on the floor.
+      %mod% %sanjiv% longdesc An apprentice is kneeling on the floor, heaving.
+      %mod% %sanjiv% lookdesc The young apprentice is on his knees, dirtying his white kurta. His wavy brown hair is matted with sweat and he heaves as if he might vomit again.
+    end
   break
   case 11863
     * Shadow Ascendant
@@ -1115,233 +1197,15 @@ switch %self.vnum%
   case 11816
     * goblin commando
     %mod% %self% longdesc %name% is searching around for something.
-    %mod% %self% lookdesc Armed with dozens of tiny knives, this goblin has come ready for war.
+    %mod% %self% lookdesc Armed with dozens of tiny knives, this forest-green goblin has come ready for war.
   break
   case 11817
     * goblin bruiser
     %mod% %self% longdesc %name% is punching a wall.
-    %mod% %self% lookdesc All muscle and no quit, this goblin looks like %self.heshe% means business. With a war axe in one hand and a spear in the other, %self.heshe% paces back and forth, just waiting for you to make your move.
+    %mod% %self% lookdesc All muscle and no quit, this green little goblin looks like %self.heshe% means business. With a war axe in one hand and a spear in the other, %self.heshe% paces back and forth, just waiting for you to make your move.
   break
 done
 detach 11824 %self.id%
-~
-#11825
-Skycleave: Lower floor one-time intros~
-0 abc 100
-start_messages~
-* plays a boss intro until it runs out of lines, then detaches
-* ensure not fighting or detach
-if %self.fighting% || %self.disabled%
-  detach 11825 %self.id%
-  halt
-end
-* fetch position
-if %self.varexists(line)%
-  eval line %self.line% + 1
-else
-  set line 1
-end
-* store line back
-remote line %self.id%
-set done 0
-set no_unflag 0
-* switch: message cases goes +1 per 13 seconds and automatically ends when it hits default
-if %self.vnum% == 11818
-  * Venjer the Fox
-  switch %line%
-    case 1
-      say Stupid pixies, stupid maze, stupid tower, but smart Venjer...
-      wait 9 sec
-      say And smart adventurers. Conquered the pixy maze just like Venjer, only slower.
-      wait 9 sec
-      say Now just have to figure out how to get out. Not you, just me. You die in the maze.
-    break
-    case 2
-      say Everything upstairs is already ours, just have to get up there.
-      wait 6 sec
-      say Not yours. Never yours. Never theirs. Never theirs!
-    break
-    default
-      set done 1
-    break
-  done
-elseif %self.vnum% == 11830
-  * High Master Caius Sirensbane 3A
-  switch %line%
-    case 1
-      %echo% ~%self% struggles to hold up the magical ward...
-      wait 9 sec
-      say I can't hold this much longer.
-      wait 9 sec
-      say Some sort of shadow keeps attacking me from over the railing.
-    break
-    case 2
-      say We have no chance of retaking this floor without defeating that scoundrel Trixton Vye.
-      wait 9 sec
-      if %instance.mob(11847)% || %instance.mob(11848)%
-        say He's being protected by magic from his allies, Lady Virduke and Bleak Rojjer.
-      else
-        say He's unprotected; you need to get to him in the Lich Labs and finish this.
-      end
-    break
-    default
-      set done 1
-    break
-  done
-elseif %self.vnum% == 11847
-  * Kara Virduke, Mercenary Archmage boss
-  switch %line%
-    case 1
-      say Must be something in here somewhere...
-      %mod% %self% longdesc Kara Virduke is digging through cabinets.
-      wait 9 sec
-      %echo% ~%self% opens drawer after drawer and rifles through them.
-      wait 9 sec
-      %echo% ~%self% finally notices you and turns.
-    break
-    case 2
-      say This place is a treasure trove. Are you here to loot it or rescue it?
-      wait 6 sec
-      say You know what? I don't care which.
-    break
-    case 3
-      say We got here first.
-      wait 9 sec
-      %echo% ~%self% stops and looks you up and down, making a face that seems dismissive, but perhaps also impressed.
-      wait 9 sec
-      say Has anyone ever told you you have a powerful aura?
-    break
-    case 4
-      %echo% ~%self% holds the foot end her staff out toward your stomach and draws an invisible line across it.
-      wait 9 sec
-      say I would just love to see what portents we can augur out of your precious hero intestines.
-      wait 9 sec
-      %echo% ~%self% raises her staff and begins channeling mana.
-      %mod% %self% longdesc Kara Virduke is holding her staff in the air, channeling mana from the tower!
-    break
-    default
-      set done 1
-    break
-  done
-elseif %self.vnum% == 11849
-  * Trixton Vye, Mercenary Leader
-  switch %line%
-    case 1
-      say It doesn't seem to be in here. I thought that old carcass would have...
-      wait 9 sec
-      %echo% ~%self% turns and notices you.
-      wait 9 sec
-      say Sorry, not who I was expecting. Are you even on the payroll? We can't afford to take on more mercenaries.
-    break
-    case 2
-      say That witch Mezvienne is barely paying us. Loot the tower, she said.
-      wait 6 sec
-      say Sell the artifacts, she said.
-    break
-    case 3
-      say There's a fortune stocked away in the lich's lab, she said.
-      wait 6 sec
-      say Just don't open the repository. Got it. Won't open it. But there's nothing in here I can sell.
-    break
-    case 4
-      %echo% ~%self% sighs.
-      wait 9 sec
-      say Wait, how did you even get in here?
-      wait 9 sec
-      say All this loot is ours. Mezvienne doesn't want to be bothered. Why don't you leave while you're ahead?
-    break
-    default
-      set done 1
-      set no_unflag 1
-    break
-  done
-elseif %self.vnum% == 11810
-  * Watcher Annaca - phase 2A
-  switch %line%
-    case 1
-      say Oh, not another... oh, you're not goblins. Finally some good news.
-      wait 9 sec
-      say I can't hold this shield much longer. The mercenaries are contained on the upper levels.
-      wait 9 sec
-      say Which is not necessarily a good thing. All out most powerful artifacts are up there.
-    break
-    case 2
-      say I'm pretty sure masters Knezz and Barrosh are up there, so they may already have it handled...
-      wait 9 sec
-      say I need to hold this shield up here until the goblins and pixies have been dealt with down here.
-      wait 9 sec
-      say The pixies have enchanted one of the sculptures. It's powering the maze.
-    break
-    case 3
-      say You'll have to be the one to find it. I can't leave this post until it's done.
-    break
-    default
-      set done 1
-    break
-  done
-elseif %self.vnum% == 11890
-  * High Sorcerer Celiya 1A
-  switch %line%
-    case 1
-      say It's rather a good thing you're here...
-      wait 9 sec
-      say There is simply too much going on down here, and too much going on up there.
-      wait 9 sec
-      say We are not at full strength and haven't the people to retake the tower at the moment.
-    break
-    case 2
-      say And anyway, it might be easier for one person or even a small team, as they will not see it coming...
-      wait 9 sec
-      say I can lower the wards on the staircase and let you up, if you're willing to help.
-      wait 9 sec
-      say The second floor is overrun with goblins and pixies. See if you can find Annaca while you're up there, too. She's one of our watchers.
-    break
-    case 3
-      say Just let me know when you're ready... (difficulty)
-    break
-    default
-      set done 1
-    break
-  done
-elseif %self.vnum% == 11891
-  * Watcher Annaca - phase 2B
-  switch %line%
-    case 1
-      say It looks like you did it...
-      wait 9 sec
-      say That creepy-crawling pixy maze is gone. Hopefully the entire floor is back to normal.
-      wait 9 sec
-      say I don't hear any more goblins, either, so maybe John got them back under control.
-    break
-    case 2
-      say If you're heading upstairs, be on the lookout for cutthroat mercenaries.
-    break
-    default
-      set done 1
-    break
-  done
-elseif %self.vnum% == 11892
-  * High Master Caius Sirensbane 3B
-  switch %line%
-    case 1
-      %echo% ~%self% struggles to hold up the magical ward...
-      wait 9 sec
-      say This is taking too much power... please tell me you're ready to take on the shadow.
-      wait 9 sec
-      say I'll drop the ward as soon as you're ready.
-    break
-    default
-      set done 1
-    break
-  done
-end
-* detach if done
-if %done%
-  if %self.aff_flagged(!ATTACK)% && !%no_unflag%
-    dg_affect %self% !ATTACK off
-  end
-  detach 11825 %self.id%
-end
 ~
 #11826
 Skycleave: Pixy Maze track dummy~
@@ -1430,7 +1294,7 @@ end
 set varname last_%room.template%
 if %self.varexists(%varname%)%
   eval last %%self.%varname%%%
-  if %last% + 120 > %timestamp%
+  if %last% + 150 > %timestamp%
     halt
   end
 end
@@ -1524,7 +1388,7 @@ elseif %self.vnum% == 11822
     break
   done
 elseif %self.vnum% == 11827
-  * Chatty couple: Apprentices Marie 11827 + Djon 11828
+  * Chatty couple: Apprentices Marina 11827 + Djon 11828
   set djon %room.people(11828)%
   if !%djon%
     halt
@@ -1643,6 +1507,210 @@ else
   detach 11829 %self.id%
 end
 ~
+#11830
+Skycleave: Shared quest completion script~
+2 v 0
+~
+return 1
+switch %questvnum%
+  case 11802
+    * Dylane/Mop rescue
+    set mop %instance.mob(11933)%
+    if %mop%
+      if %mop.room% != %room%
+        %at% %mop.room% %echo% ~%mop% hops away.
+        %teleport% %mop% %room%
+      end
+    else
+      %load% mob 11933
+      set mop %room.people%
+      if %mop.vnum% != 11933
+        %send% %actor% This quest seems to be broken.
+        return 0
+        halt
+      end
+    end
+    if !%mop.has_trigger(11833)%
+      attach 11833 %mop.id%
+    end
+    %force% %mop% cutscene
+  break
+  case 11810
+  case 11811
+  case 11812
+  case 11875
+  case 11975
+    * these scripts guarantee Liked reputation
+    if !%actor.has_reputation(11800,Liked)%
+      nop %actor.set_reputation(11800,Liked)%
+    end
+  break
+  case 11821
+    * Hugh Mann
+    set hugh %room.people(11821)%
+    if %hugh%
+      %echo% # \&0
+      %echo% # ~%hugh% grasps at some goblin trinkets and shouts, 'We did it! Victory for goblins!'
+      %echo% # ~%hugh% throws off his coat to reveal he is actually two goblins, one on the other's shoulder!
+      %echo% # The goblins sing and shout victory chants as they run out of the tower!
+      %purge% %hugh%
+    end
+  break
+done
+~
+#11831
+Skycleave: Shared quest start script~
+2 u 0
+~
+return 1
+set spirit %instance.mob(11900)%
+switch %questvnum%
+  case 11810
+    if %spirit.phase2%
+      %send% %actor% You cannot start '%questname%' because floor 2 has already been rescued.
+      return 0
+    end
+  break
+  case 11811
+    if %spirit.phase3%
+      %send% %actor% You cannot start '%questname%' because floor 3 has already been rescued.
+      return 0
+    end
+  break
+  case 11812
+    if %spirit.phase4%
+      %send% %actor% You cannot start '%questname%' because floor 4 has already been rescued.
+      return 0
+    end
+  break
+done
+~
+#11832
+Skycleave: Conditional mob visibility~
+0 iC 100
+~
+* toggles silent, !see
+* activated on greet or when moving
+set see 0
+set not 0
+set vis 0
+* special handling to catch actor when not in the room
+if %actor%
+  set ch %actor%
+  set spec 1
+else
+  set ch %self.room.people%
+  set spec 0
+end
+* determine if anyone should/shouldn't see me
+while %ch%
+  if %ch.is_pc%
+    if %self.vnum% == 11900
+      * intro spirit: shows when any floor quest complete
+      if %ch.completed_quest(11810)% || %ch.completed_quest(11811)% || %ch.completed_quest(11812)%
+        set see 1
+      else
+        set not 1
+      end
+    elseif %self.vnum% == 11801
+      * Dylane: visible only if quest incomplete
+      if %ch.completed_quest(11802)%
+        set not 1
+      else
+       set see 1
+      end
+    end
+  end
+  if %spec%
+    set spec 0
+    set ch %self.room.people%
+  else
+    set ch %ch.next_in_room%
+  end
+done
+* determine behavior based on vnum
+switch %self.vnum%
+  case 11900
+    * intro spirit: any "see"
+    set vis %see%
+  break
+  case 11801
+    * Dylane
+    if !%not%
+      set vis 1
+    end
+  break
+done
+* and make visible
+if %vis% && %self.affect(11832)%
+  dg_affect #11832 %self% off
+  if %self.vnum% != 11801 || %self.room.template% == 11905
+    * 11801 Dylane does not remove silent unless he's in the cafe
+    nop %self.remove_mob_flag(SILENT)%
+  end
+  %echo% ~%self% arrives.
+elseif !%vis% && !%self.affect(11832)%
+  dg_affect #11832 %self% !SEE on -1
+  dg_affect #11832 %self% !TARGET on -1
+  dg_affect #11832 %self% SNEAK on -1
+  nop %self.add_mob_flag(SILENT)%
+  %echo% ~%self% leaves.
+end
+~
+#11833
+Skycleave: Quest cutscenes~
+0 cx 0
+cutscene~
+* used for mob cutscenes
+if %actor% && %actor% != %self%
+  return 0
+  halt
+end
+if %self.vnum% == 11933
+  * mop 11933, Dylane quest 11802
+  set annelise %self.room.people(11939)%
+  nop %self.add_mob_flag(SILENT)%
+  nop %self.add_mob_flag(SENTINEL)%
+  wait 1
+  %echo% ~%self% marches in from the north.
+  wait 3 sec
+  %echo% ~%annelise% pulls a surprisingly large staff out of her many-layered robes...
+  wait 9 sec
+  %force% %annelise% say Let the weight of your service to the Tower outweigh your offense against its masters.
+  %echo% She taps her staff on the slate floor three times.
+  wait 9 sec
+  %force% %annelise% say Ahem... In service of the Tower I restore you bodily as you once were!
+  %echo% She taps her staff on the floor agian.
+  wait 9 sec
+  %echo% ~%annelise% sighs.
+  wait 3 sec
+  say By the Black Domain, by all humane, let him regain... Er, un-detain the plain Dylane!
+  wait 1
+  %echo% There's a blinding flash from Annelise's staff as she hits it on the floor one last time...
+  * convert to boy
+  detach 11935 %self.id%
+  detach 11934 %self.id%
+  %mod% %self% keywords Dylane younger boy apprentice
+  %mod% %self% shortdesc Dylane the Younger
+  %mod% %self% longdesc A boy of no more than fourteen stands in the center of the room.
+  %mod% %self% lookdesc Dylane is no more than fourteen years old, tall and gangly with legs that look like a pair of sticks poking out from under white apprentice robes that
+  %mod% %self% append-lookdesc are inexplicably wet at the bottom. Dark, teary eyes poke out from underneath a mop of straw-colored hair as he stares at you wordlessly.
+  * and finish
+  wait 9 sec
+  %force% %annelise% say Rather embarassing to admit I'm dreadful at non-rhyming magic.
+  wait 6 sec
+  say What happened? Oh! I can speak again! I'm free! I'm free!
+  wait 9 sec
+  %echo% ~%self% turns and sees ~%annelise% and his face turns sheet-white.
+  wait 9 sec
+  %force% %annelise% say Yes, you're free, you're free. You shall find your father in the lobby. May I suggest you make a hasty escape?
+  wait 9 sec
+  %force% %annelise% say Okay, on with you, get out of here before the grand high sorcerer catches you lacking.
+  wait 3 sec
+  %echo% The boy wastes no more time and darts out of the room. The last you hear of him is clambering down the stairs.
+  %purge% %self%
+end
+~
 #11834
 Skycleave: Free the otherworlder~
 0 c 0
@@ -1677,6 +1745,14 @@ if %mob.vnum% == 11829
     nop %mob.add_mob_flag(GROUP)%
   end
 end
+* check triggers
+set ch %self.room.people%
+while %ch%
+  if %ch.on_quest(11834)%
+    %quest% %ch% trigger 11834
+  end
+  set ch %ch.next_in_room%
+done
 * and me
 %purge% %self%
 ~
@@ -1729,29 +1805,69 @@ done
 detach 11835 %self.id%
 ~
 #11836
-Release Scaldorran~
+Skycleave: Object interactions~
 1 c 4
-open release~
+open release look~
+return 0
+if %arg.car% == in
+  set arg %arg.cdr%
+  set in_arg 1
+else
+  set in_arg 0
+end
 if %actor.obj_target(%arg.car%)% != %self%
+  halt
+end
+if %self.vnum% == 11836
+  * Scaldorran's repository: open/release/look in
+  set spirit %instance.mob(11900)%
+  if (open /= %cmd% || release /= %cmd%)
+    return 1
+    if %spirit.lich_released%
+      %send% %actor% The repository is already open!
+      halt
+    end
+    * load lich
+    %load% mob 11836
+    set mob %self.room.people%
+    if %mob.vnum% != 11836
+      %send% %actor% Something went wrong.
+      halt
+    end
+    %send% %actor% You open the repository and release the Lich Scaldorran!
+    %echoaround% %actor% ~%actor% opens the repository and releases the Lich Scaldorran!
+    * Mark for claw game & directory
+    set spirit %instance.mob(11900)%
+    set claw3 1
+    remote claw3 %spirit.id%
+    set lich_released %actor.id%
+    remote lich_released %spirit.id%
+    * check triggers
+    set ch %self.room.people%
+    while %ch%
+      if %ch.on_quest(11836)%
+        %quest% %ch% trigger 11836
+      end
+      set ch %ch.next_in_room%
+    done
+    halt
+  elseif look /= %cmd% && %in_arg%
+    * only look IN
+    return 1
+    if %spirit.lich_released%
+      %send% %actor% There's a message in the bottom of the repository that just says 'BOO!'
+    else
+      %send% %actor% The repository is closed.
+    end
+   end
+elseif %self.vnum% == 11927
+  * time-traveler's corpse
+  if look /= %cmd% && %actor.on_quest(11920)%
+    %quest% %actor% trigger 11920
+  end
+  * shhh
   return 0
-  halt
 end
-return 1
-%load% mob 11836
-set mob %self.room.people%
-if %mob.vnum% != 11836
-  %send% %actor% Something went wrong.
-  halt
-end
-%send% %actor% You open the repository and release the Lich Scaldorran!
-%echoaround% %actor% ~%actor% opens the repository and releases the Lich Scaldorran!
-* Mark for claw game & directory
-set spirit %instance.mob(11900)%
-set claw3 1
-remote claw3 %spirit.id%
-set lich_released %actor.id%
-remote lich_released %spirit.id%
-%purge% %self%
 ~
 #11837
 Mercenary Leader no-fight~
@@ -1861,7 +1977,7 @@ if %target%
       %echo% ~%target% shoots a dozen arrows into Scaldorran, who comes apart at the wrappings and envelops ~%target%, stabbing *%target% with every arrow!
     break
     case 11844
-      * druid merc
+      * nature mage merc
       %echo% ~%target% starts to twist and morph into something enormous... until Scaldorran wraps his bandages around *%target%, whereupon &%target% dissolves into a sticky mess!
     break
     case 11845
@@ -1911,6 +2027,115 @@ done
 * nobody left?
 %mod% %self% longdesc The Lich Scaldorran is drawing power from the tower.
 detach 11839 %self.id%
+~
+#11840
+Skycleave: Storytime using custom strings~
+0 bw 100
+~
+* uses mob custom strings script1-script5 to tell short stories
+* usage: .custom add script# <command> <string>
+* valid commands: say, emote, do (execute command), echo (script), and skip
+* also: vforce <mob vnum in room> <command>
+* also: set <line_gap|story_gap> <time> sec
+* NOTE: waits for %line_gap% (9 sec) after all commands EXCEPT do/vforce/set
+set line_gap 9 sec
+set story_gap 180 sec
+* find story number
+if %self.varexists(story)%
+  eval story %self.story% + 1
+  if %story% > 5
+    set story 1
+  end
+else
+  set story 1
+end
+* determine valid story number
+set tries 0
+set ok 0
+while %tries% < 5 && !%ok%
+  if %self.custom(script%story%,0)%
+    set ok 1
+  else
+    eval story %story% + 1
+    if %story% > 5
+      set story 1
+    end
+  end
+  eval tries %tries% + 1
+done
+if !%ok%
+  wait %story_gap%
+  halt
+end
+* story detected: prepare (storing as variables prevents reboot issues)
+if !%self.mob_flagged(SENTINEL)%
+  set no_sentinel 1
+  remote no_sentinel %self.id%
+  nop %self.add_mob_flag(SENTINEL)%
+end
+if !%self.mob_flagged(SILENT)%
+  set no_silent 1
+  remote no_silent %self.id%
+  nop %self.add_mob_flag(SILENT)%
+end
+* tell story
+set pos 0
+set done 0
+while !%done%
+  set msg %self.custom(script%story%,%pos%)%
+  if %msg%
+    set mode %msg.car%
+    set msg %msg.cdr%
+    if %mode% == say
+      say %msg%
+      wait %line_gap%
+    elseif %mode% == do
+      %msg.process%
+      * no wait
+    elseif %mode% == echo
+      %echo% %msg.process%
+      wait %line_gap%
+    elseif %mode% == vforce
+      set vnum %msg.car%
+      set msg %msg.cdr%
+      set targ %self.room.people(%vnum%)%
+      if %targ%
+        %force% %targ% %msg.process%
+      end
+    elseif %mode% == emote
+      emote %msg%
+      wait %line_gap%
+    elseif %mode% == set
+      set subtype %msg.car%
+      set msg %msg.cdr%
+      if %subtype% == line_gap
+        set line_gap %msg%
+      elseif %subtype% == story_gap
+        set story_gap %msg%
+      else
+        %echo% ~%self%: Invalid set type '%subtype%' in storytime script.
+      end
+    elseif %mode% == skip
+      * nothing this round
+      wait %line_gap%
+    else
+      %echo% %self.name%: Invalid script message type '%mode%'.
+    end
+  else
+    set done 1
+  end
+  eval pos %pos% + 1
+done
+remote story %self.id%
+* cancel sentinel/silent
+if %self.varexists(no_sentinel)%
+  nop %self.remove_mob_flag(SENTINEL)%
+end
+if %self.varexists(no_silent)%
+  nop %self.remove_mob_flag(SILENT)%
+end
+* wait between stories
+wait %story_gap%
 ~
 #11841
 Mercenary Rogue combat~
@@ -2061,7 +2286,7 @@ else
 end
 ~
 #11844
-Mercenary Druid combat~
+Mercenary Nature Mage combat~
 0 k 100
 ~
 if %self.cooldown(11800)%
@@ -2417,6 +2642,7 @@ elseif %type% == 3
     if %person.is_enemy(%self%)%
       dg_affect #11860 %person% BLIND on 25
     end
+    set person %person.next_in_room%
   done
 elseif %type% == 4 && %self.mob_flagged(GROUP)%
   * Pin the Shadow
@@ -2577,7 +2803,7 @@ switch %self.vnum%
     set verbiage is fletching an arrow.
   break
   case 11844
-    * druid mercenary
+    * nature mage mercenary
     set name_list Aella  Oriana Faron Aiden Blaise Briar Ariadne Aislinn Daphne Ellis Bruin
     set sex_list  female female male  male  female male  female  female  female male  male
     set name_size 11
@@ -2648,7 +2874,7 @@ switch %self.vnum%
     %mod% %self% append-lookdesc well-dressed, %self.heshe% bears a large, heavy coin purse on %self.hisher% belt.
   break
   case 11844
-    * druid mercenary
+    * nature mage mercenary
     %mod% %self% lookdesc %self.name% rolls a little ball of fire back and forth over %self.hisher% hands, occasionally singeing the cuffs of %self.hisher% robe. The robe, brown and rough,
     %mod% %self% append-lookdesc conceals whatever %self.heshe% might be carrying underneath.
   break
@@ -2664,68 +2890,6 @@ switch %self.vnum%
 done
 * and detach
 detach 11857 %self.id%
-~
-#11860
-Skycleave: Upper floor one-time intros~
-0 abc 100
-start_messages~
-* plays a boss intro until it runs out of lines, then detaches
-* ensure not fighting or detach
-if %self.fighting% || %self.disabled%
-  detach 11860 %self.id%
-  halt
-end
-* fetch position
-if %self.varexists(line)%
-  eval line %self.line% + 1
-else
-  set line 1
-end
-* store line back
-remote line %self.id%
-set done 0
-* switch: message cases goes +1 per 13 seconds and automatically ends when it hits default
-if %self.vnum% == 11869
-  * Shade of Mezvienne
-  switch %line%
-    case 1
-      %echo% The shadows gather over the wounded Grand High Sorcerer...
-      wait 6 sec
-      %echo% The shadow takes on the human face of Mezvienne the Enchantress!
-    break
-    case 2
-      %echo% Grand High Sorcerer Knezz's own shadow whips up into the air as the Shade of Mezvienne drinks it in.
-      wait 9 sec
-      say What secrets lie in this withered old sack?
-      wait 9 sec
-      say Let's find out together. Open your mind, Jozef, let us plumb its depths... this should only take a minute.
-    break
-    default
-      set done 1
-    break
-  done
-elseif %self.vnum% == 11863
-  * Shadow Ascendant
-  switch %line%
-    case 1
-      %echo% Raw mana streams from every object in the room into the Shadow Ascendant.
-      wait 9 sec
-      %echo% Low chanting builds from the shadows as the Ascendant grows in power.
-      wait 9 sec
-      %echo% You feel your own power being drained by the Shadow Ascendant as it absorbs everything in sight.
-    break
-    default
-      set done 1
-    break
-  done
-end
-* detach if done
-if %done%
-  if %self.aff_flagged(!ATTACK)%
-    dg_affect %self% !ATTACK off
-  end
-  detach 11860 %self.id%
-end
 ~
 #11861
 Skycleave: Barrosh mind-control struggle scene~
@@ -2817,6 +2981,7 @@ Skycleave: Shade ascension / Death of Knezz~
 0 b 100
 ~
 * This starts a timer that will kill Knezz and ascend the shade after 2 minutes
+set room %self.room%
 if %room.people(11868)%
   * fetch timer
   if %self.varexists(knezz_timer)%
@@ -2840,8 +3005,8 @@ else
   * no knezz at all
   set seconds 99999
 end
-if %seconds% > 120
-  * 2 minutes: Knezz dies
+if %seconds% > 60
+  * 1 minute: Knezz dies
   nop %self.add_mob_flag(NO-ATTACK)%
   %restore% %self%
   * stun everyone
@@ -4614,6 +4779,11 @@ end
 if !%self.room.up(room)%
   %door% %self.room% u room i11810
 end
+* Remove ward
+set ward %self.room.contents(11831)%
+if %ward%
+  %purge% %ward%
+end
 * Store difficulty
 set spirit %instance.mob(11900)%
 set diff2 %difficulty%
@@ -4672,6 +4842,11 @@ end
 if !%self.room.up(room)%
   %door% %self.room% u room i11830
 end
+* Remove ward
+set ward %self.room.contents(11831)%
+if %ward%
+  %purge% %ward%
+end
 * Store difficulty
 set spirit %instance.mob(11900)%
 set diff3 %difficulty%
@@ -4729,6 +4904,11 @@ end
 if !%self.room.up(room)%
   %door% %self.room% u room i11860
 end
+* Remove ward
+set ward %self.room.contents(11831)%
+if %ward%
+  %purge% %ward%
+end
 * Store difficulty
 set spirit %instance.mob(11900)%
 set diff4 %difficulty%
@@ -4761,14 +4941,15 @@ if %actor.nohassle%
   halt
 end
 wait 0
-if %self.room.template% < 11801 || %self.room.template% > 11899
+set room %self.room%
+if %room.template% < 11801 || %room.template% > 11899
   * Only works in phase 1 of Skycleave
   %purge% %self%
   halt
 end
 * Ensure part of the instance
 nop %self.link_instance%
-eval to_vnum %self.room.template% + 100
+eval to_vnum %room.template% + 100
 set to_room %instance.nearest_rmt(%to_vnum%)%
 if !%to_room%
   * No destination
@@ -4778,7 +4959,7 @@ end
 * Message now
 %echo% This part of Skycleave has been restored!
 * Check items here
-set obj %self.room.contents%
+set obj %room.contents%
 while %obj%
   set next_obj %obj.next_in_list%
   if %obj.can_wear(TAKE)%
@@ -4787,7 +4968,7 @@ while %obj%
   set obj %next_obj%
 done
 * Check people here
-set ch %self.room.people%
+set ch %room.people%
 while %ch%
   set next_ch %ch.next_in_room%
   if %ch.nohassle% || (%ch.vnum% >= 11890 && %ch.vnum% <= 11899)
@@ -4796,6 +4977,26 @@ while %ch%
     * Move ch (stops at 11988 because of mini-pets from this adventure)
     %teleport% %ch% %to_room%
     %load% obj 11805 %ch%
+    * check quest completion
+    if %room.template% >= 11810 && %room.template% <= 11826
+      * Floor 2
+      if %ch.on_quest(11810)%
+        %quest% %ch% trigger 11810
+      end
+      if %ch.on_quest(11826)%
+        %quest% %ch% trigger 11826
+      end
+    elseif %room.template% >= 11830 && %room.template% <= 11841
+      * Floor 3
+      if %ch.on_quest(11811)%
+        %quest% %ch% trigger 11811
+      end
+    elseif %room.template% >= 11860 && %room.template% <= 11872
+      * Floor 4
+      if %ch.on_quest(11812)%
+        %quest% %ch% trigger 11812
+      end
+    end
   elseif %ch% != %self%
     * Adventure mob: purge
     %purge% %ch%
@@ -4824,11 +5025,14 @@ nop %self.link_instance%
 %door% i11910 down room i11904
 * 3. Mobs: Any checks based on surviving mobs go here (step 4 will purge them)
 %at% i11800 %load% mob 11901  * Gossipper
+%at% i11800 %load% mob 11901  * Additional Gossipper
 %at% i11903 %load% mob 11904  * Page Corwin
 %at% i11905 %load% mob 11905  * Barista
 %at% i11905 %load% mob 11827  * chatty couple
 %at% i11905 %load% mob 11828  * chatty couple
 %at% i11906 %load% mob 11906  * Instructor
+%at% i11906 %load% mob 11908  * Student Elamm
+%at% i11906 %load% mob 11909  * Student Akeldama
 %at% i11907 %load% mob 11907  * Gift Shop Keeper
 set shopkeep %instance.mob(11807)%
 set newshop %instance.mob(11907)%
@@ -4836,17 +5040,17 @@ if %shopkeep% && %newshop%
   nop %newshop.namelist(%shopkeep.namelist%)%
 end
 %at% i11904 %load% mob 11902  * Bucket (and sponge)
-switch %random.3%
-  case 1
-    %at% i11800 %load% mob 11901  * Additional Gossipper
-  break
-  case 2
-    %at% i11906 %load% mob 11908  * Student
-  break
-  case 3
-    %at% i11906 %load% mob 11909  * Student
-  break
+* attach some trigs
+set 11937_list 11945 11929
+while %11937_list%
+  set vnum %11937_list.car%
+  set 11937_list %11937_list.cdr%
+  set mob %instance.mob(%vnum%)%
+  if %mob%
+    attach 11937 %mob.id%
+  end
 done
+* attach tourist loader
 makeuid entryway room i11901
 attach 11827 %entryway.id%
 * 4. Move people from the old rooms
@@ -4889,6 +5093,7 @@ skydel 11825 1  * Apprentice Ravinder 1A
 %at% i11922 %load% mob 11891  * Watcher (difficulty selector version)
 %at% i11911 %load% mob 11911  * Apprentice Kayla
 %at% i11912 %load% mob 11912  * Apprentice Cosimo
+%at% i11918 %load% mob 11945  * Page Amets
 %at% i11921 %load% mob 11913  * Apprentice Tyrone
 %at% i11925 %load% mob 11925  * Apprentice Ravinder
 * check for any remaining goblins
@@ -4991,7 +5196,6 @@ if %instance.mob(11835)%
   end
 end
 %at% i11936 %load% mob 11936  * Scaldorran
-%at% i11937 %load% mob 11937  * Skeleton
 skydel 11838 1  * Ghost
 %at% i11938 %load% mob 11938  * Ghost
 skydel 11839 1  * Enchanter Annelise
@@ -5000,12 +5204,6 @@ set waltur %instance.mob(11840)%
 if %waltur%
   %at% i11940 %load% mob 11940  * Magineer Waltur (if he survived)
 end
-* if %random.2% == 2
-*   %at% i11937 %load% mob 11937  * (additional) Skeleton
-* end
-* if %random.3% == 3
-*   %at% i11937 %load% mob 11937  * (additional) Skeleton
-* end
 %at% i11932 %load% mob 11933  * Walking Mop
 skydel 11833 0  * Goef the shimmer
 %at% i11941 %load% mob 11941  * Goef the Attuner

@@ -35,6 +35,7 @@ extern unsigned long main_game_pulse;
 int eval_lhs_op_rhs(char *expr, char *result, void *go, struct script_data *sc, trig_data *trig, int type);
 struct cmdlist_element *find_case(trig_data *trig, struct cmdlist_element *cl, void *go, struct script_data *sc, int type, char *cond);
 void process_eval(void *go, struct script_data *sc, trig_data *trig, int type, char *cmd);
+void var_subst(void *go, struct script_data *sc, trig_data *trig, int type, char *line, char *buf);
 
 
 int trgvar_in_room(room_vnum vnum) {
@@ -1979,7 +1980,7 @@ void script_log_by_type(int go_type, void *go, const char *format, ...) {
 }
 
 
-int text_processed(char *field, char *subfield, struct trig_var_data *vd, char *str, size_t slen) {
+int text_processed(char *field, char *subfield, struct trig_var_data *vd, char *str, size_t slen, void *go, struct script_data *sc, trig_data *trig, int type) {
 	char *p, *p2;
 	char tmpvar[MAX_STRING_LENGTH];
 
@@ -2060,6 +2061,15 @@ int text_processed(char *field, char *subfield, struct trig_var_data *vd, char *
 		snprintf(str, slen, "%s", cdr);
 		return TRUE;
 	}
+	else if (!str_cmp(field, "empty")) {
+		if (!str_cmp(vd->value, "") || !str_cmp(vd->value, "0")) {
+			snprintf(str, slen, "1");
+		}
+		else {
+			snprintf(str, slen, "0");
+		}
+		return TRUE;
+	}
 	else if (!str_cmp(field, "index_of")) {
 		char *find;
 		if (subfield && *subfield && (find = strchr(vd->value, *subfield))) {
@@ -2082,7 +2092,14 @@ int text_processed(char *field, char *subfield, struct trig_var_data *vd, char *
 			snprintf(str, slen, "%s", cmd_info[cmd].command);
 		return TRUE;
 	}
-
+	else if (!str_cmp(field, "process")) {
+		// processes substitutions
+		char temp[MAX_INPUT_LENGTH];
+		var_subst(go, sc, trig, type, vd->value, temp);
+		snprintf(str, slen, "%s", temp);
+		return TRUE;
+	}
+	
 	return FALSE;
 }
 
@@ -2749,7 +2766,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 		}
 
 		if (c) {
-			if (text_processed(field, subfield, vd, str, slen))
+			if (text_processed(field, subfield, vd, str, slen, go, sc, trig, type))
 				return;
 
 			else if (!str_cmp(field, "global")) { /* get global of something else */
@@ -3242,6 +3259,45 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 							strcpy(str, "0");
 						}
 					}
+					else if (!str_cmp(field, "custom")) {
+						// default to empty
+						*str = '\0';
+						if (subfield && *subfield && IS_NPC(c)) {
+							char arg1[256], arg2[256];
+							int ctype, count = 0, pos = -1;
+							struct custom_message *mcm, *found_mcm = NULL;
+							
+							comma_args(subfield, arg1, arg2);
+							if (*arg1 && (ctype = search_block(arg1, mob_custom_types, FALSE)) != NOTHING) {
+								if (*arg2) {	// optional message pos
+									pos = atoi(arg2);
+								}
+								
+								// valid type
+								LL_FOREACH(MOB_CUSTOM_MSGS(c), mcm) {
+									if (mcm->type != ctype) {
+										continue;
+									}
+									
+									// seems valid
+									if (pos != -1 && pos-- <= 0) {
+										// only looking for 1
+										found_mcm = mcm;
+										break;
+									}
+									else if (pos == -1 && (!number(0, count++) || !found_mcm)) {
+										// picking at random
+										found_mcm = mcm;
+									}
+								}
+								
+								// did we find one
+								if (found_mcm) {
+									snprintf(str, slen, "%s", NULLSAFE(found_mcm->msg));
+								}
+							}
+						}
+					}
 
 					break;
 				}
@@ -3465,7 +3521,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 							
 							comma_args(subfield, arg1, arg2);
 							if (*arg1 && *arg2 && (sk = find_skill(arg1)) && (amount = atoi(arg2)) != 0 && noskill_ok(c, SKILL_VNUM(sk))) {
-								gain_skill(c, sk, amount);
+								gain_skill(c, sk, amount, NULL);
 								snprintf(str, slen, "1");
 							}
 						}
@@ -4410,7 +4466,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 		} /* if (c) ...*/
 
 		else if (o) {
-			if (text_processed(field, subfield, vd, str, slen))
+			if (text_processed(field, subfield, vd, str, slen, go, sc, trig, type))
 				return;
 
 			*str = '\x1';
@@ -4544,6 +4600,45 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 							}
 						}
 						snprintf(str, slen, "%d", count);
+					}
+					else if (!str_cmp(field, "custom")) {
+						// default to empty
+						*str = '\0';
+						if (subfield && *subfield) {
+							char arg1[256], arg2[256];
+							int ctype, count = 0, pos = -1;
+							struct custom_message *mcm, *found_mcm = NULL;
+							
+							comma_args(subfield, arg1, arg2);
+							if (*arg1 && (ctype = search_block(arg1, obj_custom_types, FALSE)) != NOTHING) {
+								if (*arg2) {	// optional message pos
+									pos = atoi(arg2);
+								}
+								
+								// valid type
+								LL_FOREACH(GET_OBJ_CUSTOM_MSGS(o), mcm) {
+									if (mcm->type != ctype) {
+										continue;
+									}
+									
+									// seems valid
+									if (pos != -1 && pos-- <= 0) {
+										// only looking for 1
+										found_mcm = mcm;
+										break;
+									}
+									else if (pos == -1 && (!number(0, count++) || !found_mcm)) {
+										// picking at random
+										found_mcm = mcm;
+									}
+								}
+								
+								// did we find one
+								if (found_mcm) {
+									snprintf(str, slen, "%s", NULLSAFE(found_mcm->msg));
+								}
+							}
+						}
 					}
 					break;
 				}
@@ -4844,7 +4939,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 		} /* if (o) ... */
 
 		else if (r) {
-			if (text_processed(field, subfield, vd, str, slen))
+			if (text_processed(field, subfield, vd, str, slen, go, sc, trig, type))
 				return;
 				
 			*str = '\x1';
@@ -5453,7 +5548,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 		
 
 		else if (v) {	// vehicle variable
-			if (text_processed(field, subfield, vd, str, slen))
+			if (text_processed(field, subfield, vd, str, slen, go, sc, trig, type))
 				return;
 				
 			*str = '\x1';
@@ -5856,7 +5951,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 		
 
 		else if (e) {	// empire variable
-			if (text_processed(field, subfield, vd, str, slen)) {
+			if (text_processed(field, subfield, vd, str, slen, go, sc, trig, type)) {
 				return;
 			}
 				
@@ -6168,7 +6263,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 		}	// if (e) ...
 		
 		else {
-			if (vd && text_processed(field, subfield, vd, str, slen))
+			if (vd && text_processed(field, subfield, vd, str, slen, go, sc, trig, type))
 				return;
 		}
 	}

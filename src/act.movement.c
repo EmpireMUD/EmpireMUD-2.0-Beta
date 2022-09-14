@@ -827,8 +827,9 @@ void perform_transport(char_data *ch, room_data *to_room) {
 
 	char_to_room(ch, to_room);
 	qt_visit_room(ch, to_room);
-	look_at_room(ch);
 	GET_LAST_DIR(ch) = NO_DIR;
+	pre_greet_mtrigger(ch, IN_ROOM(ch), NO_DIR);	// cannot pre-greet for transport
+	look_at_room(ch);
 
 	act("$n materializes in front of you!", TRUE, ch, 0, 0, TO_ROOM);
 	
@@ -1432,7 +1433,7 @@ void char_through_portal(char_data *ch, obj_data *portal, bool following) {
 	
 	// trigger section
 	entry_memory_mtrigger(ch);
-	if (!greet_mtrigger(ch, NO_DIR) || !greet_vtrigger(ch, NO_DIR)) {
+	if (!pre_greet_mtrigger(ch, IN_ROOM(ch), NO_DIR) || !greet_mtrigger(ch, NO_DIR) || !greet_vtrigger(ch, NO_DIR)) {
 		char_from_room(ch);
 		char_to_room(ch, was_in);
 		look_at_room(ch);
@@ -1491,9 +1492,15 @@ bool do_simple_move(char_data *ch, int dir, room_data *to_room, bitvector_t flag
 	affects_from_char_by_aff_flag(ch, AFF_HIDE, TRUE);
 	REMOVE_BIT(AFF_FLAGS(ch), AFF_HIDE);
 	
+	// lastly, check pre-greet trigs
+	if (!pre_greet_mtrigger(ch, to_room, dir)) {
+		return FALSE;
+	}
+	
 	// ACTUAL MOVEMENT
 	char_from_room(ch);
 	char_to_room(ch, to_room);
+	qt_visit_room(ch, to_room);
 
 	/* move them first, then move them back if they aren't allowed to go. */
 	/* see if an entry trigger disallows the move */
@@ -1532,7 +1539,6 @@ bool do_simple_move(char_data *ch, int dir, room_data *to_room, bitvector_t flag
 	GET_LAST_DIR(ch) = dir;
 	mark_move_time(ch);
 	command_lag(ch, WAIT_MOVEMENT);
-	qt_visit_room(ch, IN_ROOM(ch));
 	add_tracks(ch, was_in, dir, IN_ROOM(ch));
 	gain_ability_exp_from_moves(ch, was_in, flags);
 	msdp_update_room(ch);
@@ -2071,6 +2077,11 @@ ACMD(do_circle) {
 	
 	if (GET_MOVE(ch) < need_movement && !IS_IMMORTAL(ch) && !IS_NPC(ch)) {
 		msg_to_char(ch, "You're too tired to circle that way.\r\n");
+		return;
+	}
+	
+	// lastly, check pre-greet trigs
+	if (!pre_greet_mtrigger(ch, found_room, dir)) {
 		return;
 	}
 	
