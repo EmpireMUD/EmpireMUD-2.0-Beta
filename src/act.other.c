@@ -3516,7 +3516,7 @@ ACMD(do_skin) {
 	}
 	else if (!IS_CORPSE(obj))
 		msg_to_char(ch, "You can only skin corpses.\r\n");
-	else if (GET_CORPSE_NPC_VNUM(obj) == NOTHING || !(proto = mob_proto(GET_CORPSE_NPC_VNUM(obj)))) {
+	else if (GET_CORPSE_NPC_VNUM(obj) == NOTHING || !(proto = mob_proto(GET_CORPSE_NPC_VNUM(obj))) || !has_interaction(proto->interactions, INTERACT_SKIN)) {
 		msg_to_char(ch, "You can't skin that.\r\n");
 	}
 	else if (!bind_ok(obj, ch)) {

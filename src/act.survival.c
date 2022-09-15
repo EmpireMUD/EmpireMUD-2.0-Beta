@@ -554,7 +554,7 @@ ACMD(do_butcher) {
 	else if (!bind_ok(corpse, ch)) {
 		msg_to_char(ch, "You can't butcher a corpse that is bound to someone else.\r\n");
 	}
-	else if (GET_CORPSE_NPC_VNUM(corpse) == NOTHING || !(proto = mob_proto(GET_CORPSE_NPC_VNUM(corpse)))) {
+	else if (GET_CORPSE_NPC_VNUM(corpse) == NOTHING || !(proto = mob_proto(GET_CORPSE_NPC_VNUM(corpse))) || !has_interaction(proto->interactions, INTERACT_BUTCHER)) {
 		msg_to_char(ch, "You can't get any good meat out of that.\r\n");
 	}
 	else if (!has_tool(ch, TOOL_KNIFE)) {
