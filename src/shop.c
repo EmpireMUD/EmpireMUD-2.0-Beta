@@ -1046,7 +1046,7 @@ void get_shop_items_display(shop_data *shop, char *save_buffer) {
 	
 	*save_buffer = '\0';
 	LL_FOREACH(SHOP_ITEMS(shop), item) {
-		if (SHOP_ALLEGIANCE(shop)) {
+		if (SHOP_ALLEGIANCE(shop) && item->min_rep != REP_NONE) {
 			snprintf(buf, sizeof(buf), " (%s)", reputation_levels[rep_const_to_index(item->min_rep)].name);
 		}
 		else {
