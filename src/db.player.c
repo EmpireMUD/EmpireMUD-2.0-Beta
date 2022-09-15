@@ -1632,7 +1632,8 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *c
 				else if (!strn_cmp(line, "Extra Attribute: ", 17)) {
 					sscanf(line + 17, "%s %d", str_in, &i_in[0]);
 					if ((num = search_block(str_in, extra_attribute_types, TRUE)) != NOTHING) {
-						GET_EXTRA_ATT(ch, num) = i_in[0];
+						// these are no longer saved/read
+						// GET_EXTRA_ATT(ch, num) = i_in[0];
 					}
 				}
 				BAD_TAG_WARNING(line);
@@ -2625,11 +2626,14 @@ void write_player_primary_data_to_file(FILE *fl, char_data *ch) {
 	}
 	
 	// 'E'
+	/* No longer writing extra attributes: these come from abilities/gear and should not be saved/loaded
+		note that if you reenable this, you must also enable the part that loads it
 	for (iter = 0; iter < NUM_EXTRA_ATTRIBUTES; ++iter) {
 		if (GET_EXTRA_ATT(ch, iter)) {
 			fprintf(fl, "Extra Attribute: %s %d\n", extra_attribute_types[iter], GET_EXTRA_ATT(ch, iter));
 		}
 	}
+	*/
 	
 	// 'F'
 	fprintf(fl, "Fight Messages: %s\n", bitv_to_alpha(GET_FIGHT_MESSAGES(ch)));
