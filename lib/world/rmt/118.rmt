@@ -1450,12 +1450,12 @@ S
 #11822
 The Second Floor Walkway of the Tower Skycleave~
    The second floor walkway, with its scuffed, scratched, worn (and sometimes
-scorched) ebony wood floors, comes to a end as it turns into stairs that continue
-up to the third floor. The line of damaged portraits depicting the former
-masters of the Tower Skycleave ends just before the stairs, where three heavily
-splintered frames hang with damaged nameplates beneath them. The tree-like
-chandelier dangles just out of reach beyond the railing, free from damage. To
-the east, a dense jungle of vines and saplings has grown over the walkway.
+scorched) ebony wood floors, comes to an end as it turns into stairs that
+continue up to the third floor. The line of damaged portraits depicting the
+former masters of the Tower Skycleave ends just before the stairs, where three
+heavily splintered frames hang with damaged nameplates beneath them. The tree-
+like chandelier dangles just out of reach beyond the railing, free from damage.
+To the east, a dense jungle of vines and saplings has grown over the walkway.
 ~
 cg 0 0
 D1
@@ -2949,7 +2949,7 @@ S
 The Upper Walkway of the Tower Skycleave~
    A heavy wooden door lies in the middle of the walkway, its broken hinges
 swinging in the air. There are dozens of books scattered outside the doorway,
-some of them splayed open where the landed. Angry shouting comes from the
+some of them splayed open where they landed. Angry shouting comes from the
 office, encouraging you to keep moving along the walkway that follows the
 curving ebony wall of the chamber.
 ~
@@ -3257,10 +3257,10 @@ S
 #11865
 An Elegant Suite~
    This cozy apartment is full of plush, overstuffed furniture and fluffy
-blankets. A small canopy bed has its curtain drawn on the foot and. A small
-hearth provides a place to cook, although it looks as if it doesn't get much
-use. White marble floors seem to light the room from below as they reflect
-light from the nocturnium chandelier onto the dark walls.
+blankets. A small canopy bed has its curtain drawn at its foot. A small hearth
+provides a place to cook, although it looks as if it doesn't get much use.
+White marble floors seem to light the room from below as they reflect light
+from the nocturnium chandelier onto the dark walls.
 ~
 ch 0 dG
 D3
