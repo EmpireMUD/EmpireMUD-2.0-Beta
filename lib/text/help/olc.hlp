@@ -2283,6 +2283,7 @@ Available flags:
  ROAD-ICON - replaces the building icon with generated road icons/dashes: --+-
  ROAD-ICON-WIDE - replaces the icon with wide road icons: ====
  ATTACH-BARRIER - icons with @u/@v will attach to this building like a barrier
+ NO-CUSTOMIZE - cannot be customized by players
  SAIL - can enter this building with a boat
  ITEM-LIMIT - only a certain number of items can be dropped here
  LONG-AUTOSTORE - autostore takes 72 hours instead of 3 here

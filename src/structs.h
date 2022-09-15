@@ -785,7 +785,7 @@ typedef struct vehicle_data vehicle_data;
 #define BLD_ROAD_ICON  BIT(18)	// replaces its icon with the generated road icons (dashes)
 #define BLD_ROAD_ICON_WIDE  BIT(19)	// replaces its icon with wide road icons (equals signs)
 #define BLD_ATTACH_BARRIER  BIT(20)	// icons with @u/@v will attach to this
-// #define BLD_UNUSED9  BIT(21)
+#define BLD_NO_CUSTOMIZE  BIT(21)	// cannot be customized
 // #define BLD_UNUSED10  BIT(22)
 // #define BLD_UNUSED11  BIT(23)
 // #define BLD_UNUSED12  BIT(24)

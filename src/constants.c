@@ -3064,7 +3064,7 @@ const char *bld_flags[] = {
 	"ROAD-ICON",
 	"ROAD-ICON-WIDE",
 	"ATTACH-BARRIER",	// 20
-	"*",
+	"NO-CUSTOMIZE",
 	"*",
 	"*",
 	"*",
