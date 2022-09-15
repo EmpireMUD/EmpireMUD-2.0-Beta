@@ -4967,7 +4967,9 @@ void load_map_memory(char_data *ch) {
 		
 		// load from file
 		while (get_line(fl, line)) {
-			if (*line && sscanf(line, "%d %ld %4s %s", &vnum, &timestamp, icon, name) == 4) {
+			if (*line && sscanf(line, "%d %ld %c%c%c%c %s", &vnum, &timestamp, &icon[0], &icon[1], &icon[2], &icon[3], name) == 7) {
+				icon[4] = '\0';	// needs terminator
+				
 				// remove dummy values
 				if (!strcmp(icon, "    ")) {
 					*icon = '\0';
