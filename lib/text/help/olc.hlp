@@ -2122,7 +2122,11 @@ Some affects are managed by live data and commands (do not set affects with *):
  *!DISMANTLE - cannot be dismantled until nodismantle is toggled
  *INCOMPLETE - building is unfinished
  *FAKE-INSTANCE - roaming adventure is using this tile
- *HIDE-REAL-NAME - won't show real name after custom room name (see MANAGE)
+
+Affects that are SOMETIMES safe to use:
+ HIDE-REAL-NAME - won't show real name after custom room name (see MANAGE).
+   This can be used on buildings when you expect a script, NOT A PLAYER, to
+   rename it.
 
 See also: OLC BUILDINGS, OLC ROOM TEMPLATES
 #d
