@@ -2568,10 +2568,18 @@ void perform_mortal_where(char_data *ch, char *arg) {
 				continue;
 			}
 			
-			dir = get_direction_for_char(ch, get_direction_to(IN_ROOM(ch), IN_ROOM(i)));
-			// dist already set for us
-		
-			msg_to_char(ch, "%-20s -%s %s, %d tile%s %s\r\n", PERS(i, ch, 0), coord_display_room(ch, IN_ROOM(i), TRUE), get_room_name(IN_ROOM(i), FALSE), dist, PLURAL(dist), (dir != NO_DIR ? dirs[dir] : "away"));
+			// we'll only show distance if they're not on the same location
+			if (GET_MAP_LOC(IN_ROOM(ch)) == GET_MAP_LOC(IN_ROOM(i))) {
+				// same map location:
+				msg_to_char(ch, "%-20s - %s%s\r\n", PERS(i, ch, 0), get_room_name(IN_ROOM(i), FALSE), (IN_ROOM(ch) == IN_ROOM(i)) ? " (here)" : "");
+			}
+			else {
+				// not the same map location -- show distance/coords:
+				dir = get_direction_for_char(ch, get_direction_to(IN_ROOM(ch), IN_ROOM(i)));
+				// dist already set for us
+			
+				msg_to_char(ch, "%-20s -%s %s, %d tile%s %s\r\n", PERS(i, ch, 0), coord_display_room(ch, IN_ROOM(i), TRUE), get_room_name(IN_ROOM(i), FALSE), dist, PLURAL(dist), (dir != NO_DIR ? dirs[dir] : "away"));
+			}
 			gain_player_tech_exp(ch, PTECH_WHERE_UPGRADE, 10);
 		}
 	}
