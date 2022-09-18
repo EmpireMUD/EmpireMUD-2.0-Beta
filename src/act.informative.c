@@ -778,7 +778,7 @@ void display_score_to_char(char_data *ch, char_data *to) {
 
 	count = 0;
 	HASH_ITER(hh, GET_SKILL_HASH(ch), skdata, next_skill) {
-		if (skdata->level > 0) {
+		if (skdata->level > 0 && !SKILL_FLAGGED(skdata->ptr, SKILLF_IN_DEVELOPMENT)) {
 			sprintf(lbuf, " %s: %s%d", SKILL_NAME(skdata->ptr), IS_ANY_SKILL_CAP(ch, skdata->vnum) ? "&g" : "&y", skdata->level);
 			pts = get_ability_points_available_for_char(ch, skdata->vnum);
 			if (pts > 0) {
