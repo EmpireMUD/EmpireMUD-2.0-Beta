@@ -98,13 +98,17 @@ Return value:  return 0 to prevent the mob's death cry
 
 This type of trigger fires when the mob dies (but not when if it is purged).
 
+Only the FIRST successful death trigger on a mob will run unless it also has
+the Allow-Multiple type. Be careful about purging the mob if Allow-Multiple is
+set.
+
 Note: Death triggers attached to charmed mobs will not fire unless the trigger
    also has the Charmed type.
 
 Variables:
   &c%actor%&0 - The character killing this mob, if any.
 
-See also: MTRIG CHARMED
+See also: MTRIG CHARMED, ALLOW-MULTIPLE
 #d
 "FIGHT TRIGGER" "MTRIG FIGHT" TRIGEDIT-MOB-FIGHT
 

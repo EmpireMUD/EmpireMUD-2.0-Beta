@@ -780,7 +780,7 @@ QCMD(qcmd_info) {
 		// build string
 		*buf = '\0';
 		HASH_ITER(hh, str_hash, str_iter, next_str) {
-			sprintf(buf + strlen(buf), "%s%s", (*buf ? ", " : ""), str_iter->str);
+			sprintf(buf + strlen(buf), "%s%s", (*buf ? "; " : ""), str_iter->str);
 		}
 		
 		// show string?
