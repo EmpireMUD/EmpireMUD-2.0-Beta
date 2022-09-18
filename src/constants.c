@@ -2937,6 +2937,7 @@ const char *quest_flags[] = {
 	"NO-GUESTS",
 	"TUTORIAL",
 	"GROUP-COMPLETION",
+	"EVENT",
 	"\n"
 };
 
@@ -2950,7 +2951,6 @@ const char *quest_giver_types[] = {
 	"TRIGGER",
 	"QUEST",	// 5
 	"VEHICLE",
-	"EVENT",
 	"\n"
 };
 
