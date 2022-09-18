@@ -186,7 +186,7 @@ void complete_quest(char_data *ch, struct player_quest *pq, empire_data *giver_e
 	
 		// fail remaining quests
 		if (GET_EVENT_DAILY_QUESTS(ch) >= config_get_int("dailies_per_day") && fail_daily_quests(ch, TRUE)) {
-			msg_to_char(ch, "You have hit the daily quest limit for the event and your remaining daily event quests expire.\r\n");
+			msg_to_char(ch, "You have hit the daily quest limit for the event and your remaining event dailies expire.\r\n");
 		}
 	}
 	else if (IS_NON_EVENT_DAILY(quest)) {	// non-event daily
@@ -478,10 +478,10 @@ char *show_daily_quest_line(char_data *ch) {
 	if (count > 0) {
 		amount = IS_NPC(ch) ? 0 : (config_get_int("dailies_per_day") - GET_EVENT_DAILY_QUESTS(ch));
 		if (amount > 0) {
-			size += snprintf(output + size, sizeof(output) - size, "\r\nYou can complete %d more daily event quest%s today.", amount, PLURAL(amount));
+			size += snprintf(output + size, sizeof(output) - size, "\r\nYou can complete %d more event %s today.", amount, amount != 1 ? "dailies" : "daily");
 		}
 		else {
-			size += snprintf(output + size, sizeof(output) - size, "\r\nYou have completed all your daily event quests for the day.");
+			size += snprintf(output + size, sizeof(output) - size, "\r\nYou have completed all your event dailies for the day.");
 		}
 	}
 	
@@ -623,7 +623,7 @@ bool qcmd_finish_one(char_data *ch, struct player_quest *pq, bool show_errors) {
 	}
 	if (IS_EVENT_DAILY(quest) && GET_EVENT_DAILY_QUESTS(ch) >= config_get_int("dailies_per_day")) {
 		if (show_errors) {
-			msg_to_char(ch, "You can't finish any more daily event quests today.\r\n");
+			msg_to_char(ch, "You can't finish any more event dailies today.\r\n");
 		}
 		return FALSE;
 	}
@@ -1069,7 +1069,7 @@ QCMD(qcmd_start) {
 		msg_to_char(ch, "You can't start any more daily quests today.\r\n");
 	}
 	else if (IS_EVENT_DAILY(qst) && GET_EVENT_DAILY_QUESTS(ch) >= config_get_int("dailies_per_day")) {
-		msg_to_char(ch, "You can't start any more daily event quests today.\r\n");
+		msg_to_char(ch, "You can't start any more event dailies today.\r\n");
 	}
 	else if (get_approximate_level(ch) + 50 < QUEST_MIN_LEVEL(qst)) {
 		msg_to_char(ch, "You can't start that quest because it's more than 50 levels above you.\r\n");
