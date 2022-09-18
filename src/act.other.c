@@ -260,7 +260,7 @@ void do_customize_road(char_data *ch, char *argument) {
 			// looks good, but check that it has a required word
 			found = FALSE;
 			for (iter = 0; *required_words[iter] != '\n' && !found; ++iter) {
-				if ((ptr = str_str(arg2, required_words[iter])) && ptr >= arg2 && *(ptr-1) == ' ') {
+				if ((ptr = str_str(arg2, required_words[iter])) && ptr >= arg2 && (ptr == arg2 || *(ptr-1) == ' ')) {
 					// found it at the start of a word
 					found = TRUE;
 				}
