@@ -1254,6 +1254,10 @@ substance keeps you from reading anything but:
        old goblin knickknacks lying around? Still, seems foolish to
        risk it all for bits of jade. Have never known a goblin ...
 ~
+E
+cages~
+The cages are made of iron bars, most bent out of shape from years of abuse.
+~
 S
 #11915
 The Goblin Cages~
@@ -1298,6 +1302,10 @@ is ebony. A foul bin in the corner appears to be attached to the stone wall.
 E
 floors~
 The floor is made from large slabs of flagstone.
+~
+E
+cages~
+The cages are made of iron bars, most bent out of shape from years of abuse.
 ~
 T 11921
 S
@@ -2801,6 +2809,10 @@ wall east wavering air disturbance~
    There is a distinct border to this strange wall. It has a slight waver to it
 which disturbs the pattern of light when you look at it just right. Centered in
 the wavering area is an unusual painting.
+~
+E
+floors down~
+The gray slate floor is scattered with piles of household items.
 ~
 E
 painting bagel visuals~

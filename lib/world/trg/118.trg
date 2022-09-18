@@ -4792,7 +4792,7 @@ remote diff2 %spirit.id%
 %at% i11810 skygobpix %difficulty% g  * trash mob
 %at% i11811 skygobpix %difficulty% g  * trash mob
 %at% i11812 skygobpix %difficulty% a  * trash mob
-%at% i11813 skygobpix %difficulty% p  * trash mob
+%at% i11813 skygobpix %difficulty% g  * trash mob
 %at% i11814 skygobpix %difficulty% g  * trash mob
 %at% i11816 %load% mob 11812  * Apprentice Cosimo (hiding)
 %at% i11818 skyload 11819 %difficulty%  * Pixy Boss

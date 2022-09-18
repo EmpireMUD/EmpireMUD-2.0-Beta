@@ -43,6 +43,18 @@ calamander~
 from calamander. It's a strange wood that's striped black and brown, and known
 to be extremely rare.
 ~
+E
+walls paneled paneling~
+The walls are paneled with beautiful black ebony wood.
+~
+E
+floors~
+The floor is made from stunning white marble.
+~
+E
+fixtures lights lamps~
+The room is lit by nocturnium oil lamps in fixtures on the walls.
+~
 M 1 11800 100.00 2
 M 0 11900 100.00 1
 S
@@ -2639,6 +2651,10 @@ E
 north doorway~
 The north door leads back out onto the walkway.
 ~
+E
+floors down~
+The gray slate floor is scattered with piles of household items.
+~
 T 11926
 T 11927
 S
@@ -4396,6 +4412,10 @@ sconces oil lamps~
 Each one has an oil reservoir and a wick rest, with a bright white flame atop
 it. Dozens of these lamps cast the light all around the great chamber,
 glimmering off the ceiling, the walls, and the dew pools down below.
+~
+E
+pillars~
+The fluted pillars are cut directly from the obsidian of the palace.
 ~
 E
 chairs~

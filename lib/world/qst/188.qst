@@ -10,7 +10,7 @@ To summon the horse man: use lantern <normal | hard | group | boss>
    You have defeated the headless horse man and saved the local villagers from
 his reins of terror. You have earned a goody bag!
 ~
-19 e 0 0 -1
+20 ej 0 0 -1
 A
 2 18803
 A
@@ -38,7 +38,7 @@ your citizens and deck them out in festive costumes.
    Your citizens are costumed and now the holiday festivities can begin! You
 have earned a goody bag!
 ~
-19 de 0 0 -1
+20 dej 0 0 -1
 A
 2 18806
 A
@@ -69,7 +69,7 @@ normal in no time.
 think of the holiday joy you've brought to your city. You have earned a goody
 bag!
 ~
-16 e 0 0 -1
+17 ej 0 0 -1
 A
 2 18810
 A
@@ -99,7 +99,7 @@ world of the living.
    Now everyone seems to be getting into the 'spirit' of the holiday! You have
 earned a goody bag!
 ~
-16 e 0 0 -1
+17 ej 0 0 -1
 A
 2 18804
 A
@@ -127,7 +127,7 @@ your city. Type 'use roll' to spread the Halloween cheer to three houses.
    Now that you've redecorated the city, everyone is getting into the holiday
 spirit! You have earned a goody bag!
 ~
-15 e 0 0 -1
+16 ej 0 0 -1
 A
 2 18805
 A
@@ -159,7 +159,7 @@ blood pumping.
    The citizens' hearts are definitely pumping now. You have earned a goody
 bag!
 ~
-15 e 0 0 -1
+16 ej 0 0 -1
 A
 2 18808
 A
@@ -187,7 +187,7 @@ out, or if it's the thing that will release them.
    You have built an unearthly manor for the spirits of your ancestors to
 inhabit. Your grandmother must be proud.
 ~
-9 0 0 0 -1
+10 j 0 0 -1
 A
 1 18881
 R
@@ -208,7 +208,7 @@ details.
 ~
 You have appeased the spirits of the dead for today.
 ~
-16 e 0 0 -1
+17 ej 0 0 -1
 A
 2 18807
 A
@@ -234,7 +234,7 @@ and type 'offer'. Look at the offering instructions for more details.
 ~
 You have appeased the spirits of the dead for today.
 ~
-16 e 0 0 -1
+17 ej 0 0 -1
 A
 2 18807
 A
@@ -260,7 +260,7 @@ and type 'offer'. Look at the offering instructions for more details.
 ~
 You have appeased the spirits of the dead for today.
 ~
-16 e 0 0 -1
+17 ej 0 0 -1
 A
 2 18807
 A
@@ -286,7 +286,7 @@ tomb and type 'offer'. Look at the offering instructions for more details.
 ~
 You have appeased the spirits of the dead for today.
 ~
-17 e 0 0 -1
+18 ej 0 0 -1
 A
 2 18807
 A
@@ -312,7 +312,7 @@ gift to the spirits.
 ~
 The spirits take your freshly stolen candy and grin as they vanish, one by one.
 ~
-14 de 0 0 -1
+15 dej 0 0 -1
 A
 2 18802
 A
@@ -341,7 +341,7 @@ tedium of seeing the same old unchanging spirits.
    The spirits are highly amused at the various looks you have captured in the
 reflections and thank you for the entertainment.
 ~
-12 e 0 0 -1
+13 ej 0 0 -1
 A
 2 18806
 A
@@ -368,7 +368,7 @@ complete this quest.
 ~
 Good job finding the bigger apple. Hopefully you had some fun doing it.
 ~
-11 e 0 0 -1
+12 ej 0 0 -1
 A
 2 18806
 A
@@ -397,7 +397,7 @@ your city to open three portals to the Nether and lure some demons through.
 ~
 Congratulations! You've brought new demons into this world.
 ~
-9 e 0 0 -1
+10 ej 0 0 -1
 A
 2 18804
 A
@@ -428,7 +428,7 @@ target can't be a member.
    Seems that music really can soothe the savage soul... Or at least, failing
 that, it can get them dancing!
 ~
-13 e 0 0 -1
+14 ej 0 0 -1
 A
 2 18809
 A
@@ -456,7 +456,7 @@ share in the merriment. You need to do this in one of your cities.
 back for a brief time. Surely their loved ones will be greatful for the chance
 to make their peace now.
 ~
-12 e 0 0 -1
+13 ej 0 0 -1
 A
 2 18809
 A
@@ -489,7 +489,7 @@ then play some music for the poor soul within.
 the ghost. The healers usher you from the medical tent so they can prepare the
 body for burial.
 ~
-21 e 0 0 -1
+22 ej 0 0 -1
 A
 2 18809
 A
@@ -521,7 +521,7 @@ tomb and type 'place portrait'. That should be enough to summon her.
 ~
 Your grandmother is here once again, if only for a while.
 ~
-11 e 0 0 -1
+12 ej 0 0 -1
 A
 2 18804
 A
