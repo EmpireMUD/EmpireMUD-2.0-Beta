@@ -609,7 +609,7 @@ DISMISS
 
 Usage:  dismiss <companion | minipet>
 
-This command causes your companion or mini-pet to leave. You can target it by
+This command causes your companion or minipet to leave. You can target it by
 name if it's in the room with you, or else can type 'dismiss companion' or
 'dismiss minipet' to dismiss it anywhere in the world.
 
@@ -1448,13 +1448,13 @@ Usage:  minipets
         minipet <name>
         minipet dismiss
 
-This command lists, summons, and dismisses your mini-pets. A mini-pet is a
+This command lists, summons, and dismisses your minipets. A minipet is a
 non-combat NPC that follows you around. They are strictly cosmetic, and are
 often awarded as trophies in certain adventures.
 
-You can only have one mini-pet out at a time.
+You can only have one minipet out at a time.
 
-There is no limit to how many mini-pets you can collect. Gotta collect 'em all!
+There is no limit to how many minipets you can collect. Gotta collect 'em all!
 #
 MORTLOG
 

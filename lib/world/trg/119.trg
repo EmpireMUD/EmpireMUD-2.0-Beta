@@ -293,23 +293,23 @@ if %spirit.claw4%
 end
 * Determine reward
 if %id% < 11
-  * Mini-pet
+  * Minipet
   eval vnum 11989 + %id%
   %load% mob %vnum%
   set mob %self.room.people%
   if %mob.vnum% != %vnum%
     * Uh-oh.
-    %echo% Something went horribly wrong while granting a mini-pet. Please bug-report this error.
+    %echo% Something went horribly wrong while granting a minipet. Please bug-report this error.
     halt
   end
   set mob_string %mob.name%
   %purge% %mob%
   if !%actor.has_minipet(%vnum%)%
-    %send% %actor% You win '%mob_string%' as a mini-pet! Use the minipets command to summon it.
+    %send% %actor% You win '%mob_string%' as a minipet! Use the minipets command to summon it.
     %echoaround% %actor% ~%actor% has won '%mob_string%'!
     nop %actor.add_minipet(%vnum%)%
   else
-    %send% %actor% You win '%mob_string%' but you already have it as a mini-pet.
+    %send% %actor% You win '%mob_string%' but you already have it as a minipet.
   end
 else
   * Item reward: 11987, 11988, 11989, 11990, 11991

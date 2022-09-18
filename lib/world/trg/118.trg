@@ -4974,7 +4974,7 @@ while %ch%
   if %ch.nohassle% || (%ch.vnum% >= 11890 && %ch.vnum% <= 11899)
     * nothing (11890-11899 are mobs involved in phase change)
   elseif %ch.is_pc% || %ch.vnum% < 11800 || %ch.vnum% > 11988
-    * Move ch (stops at 11988 because of mini-pets from this adventure)
+    * Move ch (stops at 11988 because of minipets from this adventure)
     %teleport% %ch% %to_room%
     %load% obj 11805 %ch%
     * check quest completion

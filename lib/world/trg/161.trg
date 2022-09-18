@@ -357,7 +357,7 @@ while %check_pet%
     %load% mob %GrantPet%
     set GrantPet %self.room.people.name%
     %purge% %self.room.people%
-    %send% %actor% You gain '%GrantPet%' as a mini-pet. Use the minipets command to summon it.
+    %send% %actor% You gain '%GrantPet%' as a minipet. Use the minipets command to summon it.
     set check_pet 0
     %purge% %self%
   else

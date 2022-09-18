@@ -67,7 +67,7 @@ blocks that are currently in use.
 9600
 9700
 9800
-9900  Miscellaneous mini-pets and summoner items
+9900  Miscellaneous minipets and summoner items
 
 
 Included Adventure Zones

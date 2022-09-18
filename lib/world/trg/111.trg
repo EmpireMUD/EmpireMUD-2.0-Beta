@@ -401,7 +401,7 @@ set target %self.val0%
 %load% v %target%
 * Todo: eval vehicle %self.room.first_vehicle_in_room% / etc
 * and use %vehicle.name% instead of "a rib-bone boat"
-* (see mini-pet use for an example)
+* (see minipet use for an example)
 %send% %actor% You use @%self% and a rib-bone boat appears!
 %echoaround% %actor% ~%actor% uses @%self% and a rib-bone boat appears!
 %purge% %self%

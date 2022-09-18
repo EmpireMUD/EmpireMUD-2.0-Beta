@@ -43,7 +43,7 @@ ACMD(do_slash_channel);
 // local prototypes
 char_data *find_minipet(char_data *ch);
 
-// configs for mini-pets
+// configs for minipets
 // TODO this seemsl ike it should move to structs.h / utils.h
 #define IS_MINIPET_OF(mob, ch)  (!EXTRACTED(mob) && IS_NPC(mob) && GET_LEADER(mob) == (ch) && !GET_COMPANION(mob) && (MOB_FLAGS(mob) & default_minipet_flags) == default_minipet_flags && (AFF_FLAGS(mob) & default_minipet_affs) == default_minipet_affs)
 bitvector_t default_minipet_flags = MOB_SENTINEL | MOB_SPAWNED | MOB_NO_LOOT | MOB_NO_EXPERIENCE;
@@ -187,7 +187,7 @@ void cancel_adventure_summon(char_data *ch) {
 
 
 /**
-* Dismisses all mini-pets controlled by the character, if any.
+* Dismisses all minipets controlled by the character, if any.
 *
 * @param char_data *ch The player whose pet(s) to purge.
 * @return bool TRUE if it dismissed a minipet, FALSE if not.
@@ -313,10 +313,10 @@ void do_douse_obj(char_data *ch, obj_data *obj, obj_data *cont) {
 
 
 /**
-* Finds a mini-pet belonging to the character, if any.
+* Finds a minipet belonging to the character, if any.
 *
 * @param char_data *ch The player whose pet to look for.
-* @return char_data* The found mini-pet, if any.
+* @return char_data* The found minipet, if any.
 */
 char_data *find_minipet(char_data *ch) {
 	char_data *chiter, *found = NULL;
@@ -2130,7 +2130,7 @@ ACMD(do_dismiss) {
 	else if (!strn_cmp(arg, "mini", 4) && (is_abbrev(arg, "minipet") || is_abbrev(arg, "mini-pet"))) {
 		// requires abbrev of at least "famil"
 		if (!dismiss_any_minipet(ch)) {
-			msg_to_char(ch, "You do not have a mini-pet to dismiss.\r\n");
+			msg_to_char(ch, "You do not have a minipet to dismiss.\r\n");
 		}
 		else {
 			send_config_msg(ch, "ok_string");
@@ -2140,7 +2140,7 @@ ACMD(do_dismiss) {
 		send_config_msg(ch, "no_person");
 	}
 	else if (!IS_NPC(vict) || GET_LEADER(vict) != ch || (!GET_COMPANION(vict) && !IS_MINIPET_OF(vict, ch))) {
-		msg_to_char(ch, "You can only dismiss a companion or mini-pet.\r\n");
+		msg_to_char(ch, "You can only dismiss a companion or minipet.\r\n");
 	}
 	else if (FIGHTING(vict) || GET_POS(vict) < POS_SLEEPING) {
 		act("You can't dismiss $M right now.", FALSE, ch, NULL, vict, TO_CHAR);
@@ -2876,7 +2876,7 @@ ACMD(do_minipets) {
 	skip_spaces(&argument);
 	
 	if (IS_NPC(ch)) {
-		msg_to_char(ch, "Mobs don't get mini-pets.\r\n");
+		msg_to_char(ch, "Mobs don't get minipets.\r\n");
 		return;
 	}
 	if (!ch->desc) {
@@ -2884,7 +2884,7 @@ ACMD(do_minipets) {
 	}
 	
 	if (!*argument) {	// just list minipets
-		size = snprintf(output, sizeof(output), "Mini-pets in your collection:\r\n");
+		size = snprintf(output, sizeof(output), "Minipets in your collection:\r\n");
 		count = 0;
 	
 		HASH_ITER(hh, GET_MINIPETS(ch), mini, next_mini) {
@@ -2936,10 +2936,10 @@ ACMD(do_minipets) {
 	}
 	else if (is_abbrev(argument, "dismiss")) {
 		if (!(mob = find_minipet(ch))) {
-			msg_to_char(ch, "You don't seem to have a mini-pet to dismiss.\r\n");
+			msg_to_char(ch, "You don't seem to have a minipet to dismiss.\r\n");
 		}
 		else {
-			msg_to_char(ch, "You dismiss your mini-pet.\r\n");
+			msg_to_char(ch, "You dismiss your minipet.\r\n");
 			dismiss_any_minipet(ch);
 		}
 	}
@@ -2959,10 +2959,10 @@ ACMD(do_minipets) {
 		}
 		
 		if (!to_summon) {
-			msg_to_char(ch, "You don't have a mini-pet called '%s'.\r\n", argument);
+			msg_to_char(ch, "You don't have a minipet called '%s'.\r\n", argument);
 		}
 		else if ((mob = find_minipet(ch)) && GET_MOB_VNUM(mob) == GET_MOB_VNUM(to_summon)) {
-			msg_to_char(ch, "You already have that mini-pet out.\r\n");
+			msg_to_char(ch, "You already have that minipet out.\r\n");
 		}
 		else {
 			dismiss_any_minipet(ch);	// out with the old...

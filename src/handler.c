@@ -49,7 +49,7 @@
 *   Interaction Handlers
 *   Learned Craft Handlers
 *   Lore Handlers
-*   Mini-pet and Companion Handlers
+*   Minipet and Companion Handlers
 *   Mob Tagging Handlers
 *   Mount Handlers
 *   Object Handlers
@@ -4993,7 +4993,7 @@ void remove_lore_record(char_data *ch, struct lore_data *lore) {
 
 
  //////////////////////////////////////////////////////////////////////////////
-//// MINI-PET AND COMPANION HANDLERS /////////////////////////////////////////
+//// MINIPET AND COMPANION HANDLERS //////////////////////////////////////////
 
 // for minipets/show minipets
 int sort_minipets(struct minipet_data *a, struct minipet_data *b) {

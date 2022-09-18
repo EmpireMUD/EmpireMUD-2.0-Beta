@@ -2597,11 +2597,11 @@ int perform_set(char_data *ch, char_data *vict, int mode, char *val_arg) {
 		
 		if (!str_cmp(onoff_arg, "on")) {
 			add_minipet(vict, GET_MOB_VNUM(pet));
-			sprintf(output, "%s: gained mini-pet %d %s.", GET_NAME(vict), GET_MOB_VNUM(pet), GET_SHORT_DESC(pet));
+			sprintf(output, "%s: gained minipet %d %s.", GET_NAME(vict), GET_MOB_VNUM(pet), GET_SHORT_DESC(pet));
 		}
 		else if (!str_cmp(onoff_arg, "off")) {
 			remove_minipet(vict, GET_MOB_VNUM(pet));
-			sprintf(output, "%s: removed mini-pet %d %s.", GET_NAME(vict), GET_MOB_VNUM(pet), GET_SHORT_DESC(pet));
+			sprintf(output, "%s: removed minipet %d %s.", GET_NAME(vict), GET_MOB_VNUM(pet), GET_SHORT_DESC(pet));
 		}
 		else {
 			msg_to_char(ch, "Do you want to turn it on or off?\r\n");
@@ -5218,10 +5218,10 @@ SHOW(show_minipets) {
 	}
 	else {
 		if (*argument) {
-			size = snprintf(output, sizeof(output), "Mini-pets matching '%s' for %s:\r\n", argument, GET_NAME(plr));
+			size = snprintf(output, sizeof(output), "Minipets matching '%s' for %s:\r\n", argument, GET_NAME(plr));
 		}
 		else {
-			size = snprintf(output, sizeof(output), "Mini-pets for %s:\r\n", GET_NAME(plr));
+			size = snprintf(output, sizeof(output), "Minipets for %s:\r\n", GET_NAME(plr));
 		}
 		
 		count = 0;
@@ -6583,7 +6583,7 @@ void do_stat_object(char_data *ch, obj_data *j) {
 			break;
 		}
 		case ITEM_MINIPET: {
-			msg_to_char(ch, "Mini-pet: [%d] %s\r\n", GET_MINIPET_VNUM(j), get_mob_name_by_proto(GET_MINIPET_VNUM(j), FALSE));
+			msg_to_char(ch, "Minipet: [%d] %s\r\n", GET_MINIPET_VNUM(j), get_mob_name_by_proto(GET_MINIPET_VNUM(j), FALSE));
 			break;
 		}
 		default:

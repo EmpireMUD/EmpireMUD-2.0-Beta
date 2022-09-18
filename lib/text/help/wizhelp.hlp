@@ -1065,7 +1065,7 @@ See also: LEARN, LEARNED, SHOW LEARNED
 
 Usage:  set [file] <player> minipet <mob vnum> <on | off>
 
-This lets you give (or revoke) collectible mini-pets.
+This lets you give (or revoke) collectible minipets.
 
 WARNING: This works on ANY mob vnum.
 
@@ -1107,7 +1107,7 @@ inventory  Immort   Shows how many players have a certain item.
 islands    Immort   Shows you which island ids have empire storage (for MOVEEINV).
 lastnames  Immort   Shows target player's lastname list.
 learned    Immort   Shows you learned recipes.
-minipets   Immort   Shows you mini-pets collected by a player.
+minipets   Immort   Shows you minipets collected by a player.
 moons      Immort   Shows any moons and their current phases/positions.
 mounts     Immort   Shows you mounts owned by a player.
 notes      Immort   Show notes on a player.
@@ -1266,7 +1266,7 @@ See also: SET LEARNED
 
 Usage:  show minipets <player> [search phrase]
 
-Shows you mini-pets collected by a player.
+Shows you minipets collected by a player.
 
 See also: SET MINIPET
 #e

@@ -5527,7 +5527,7 @@ Examples:
  > .o fullsearch -level 50 sword
 
 To search other fields, you can generally use the normal "search" option for
-other OLC types. For example, to find all objects with the "Mini-pet Use"
+other OLC types. For example, to find all objects with the "Minipet Use"
 trigger, use ".t search 9900".
 #d
 "OEDIT KEYWORDS"
@@ -5875,7 +5875,7 @@ Available types:
  *MAIL - a letter (internal use only)
  WEALTH - adds to empire wealth when stored
  LIGHTER - can light fires
- MINIPET - teaches a mini-pet to the player on 'use'
+ MINIPET - teaches a minipet to the player on 'use'
  MISSILE-WEAPON - a bow, or similar (requires .wear RANGED)
  AMMO - ammunition for missile weapons
  INSTRUMENT - a musical instrument -- must set custom messages
@@ -8083,18 +8083,18 @@ extra-description to get the same effect.
 #d
 "MINIPET ITEM" "MINIPET OBJECT" "MINI-PET ITEM" "MINI-PET OBJECT" "MINI PET OBJECT" "MINI PET ITEM" "PET WHISTLE"
 
-Mini-pets are a common cosmetic reward from adventure zones. They are taught
+Minipets are a common cosmetic reward from adventure zones. They are taught
 by a MINIPET item, and the player may get that item from a loot drop or a
 shop.
 
 Object values on a MINIPET item:
  0 - mob vnum to teach
 
-Mini-pet mobs should have the following traits:
+Minipet mobs should have the following traits:
  - Locked to a low level like 1
  - Adorable custom messages (optional)
 
-Mini-pets automatically gain the following when summoned:
+Minipets automatically gain the following when summoned:
  - Scaled to the player's level
  - Flags: SENTINEL SPAWNED !LOOT !EXPERIENCE (and ISNPC)
  - Affects: !ATTACK CHARMED
