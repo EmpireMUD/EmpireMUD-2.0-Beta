@@ -4688,6 +4688,7 @@ SHOW(show_account) {
 	char_data *plr = NULL, *loaded;
 	int acc_id = NOTHING;
 	time_t last_online = -1;	// -1 here will indicate no data, -2 will indicate online now
+	account_data *acc_ptr;
 	
 	#define ONLINE_NOW  -2
 	
@@ -4717,6 +4718,14 @@ SHOW(show_account) {
 	// look up id if needed
 	if (acc_id == NOTHING && plr_index) {
 		acc_id = plr_index->account_id;
+	}
+	
+	if (!(acc_ptr = find_account(acc_id))) {
+		msg_to_char(ch, "Unknown account: %d\r\n", acc_id);
+		if (plr && file) {
+			free_char(plr);
+		}
+		return;
 	}
 	
 	// display:
@@ -4762,8 +4771,11 @@ SHOW(show_account) {
 				}
 			}
 		}
+		else if (ACCOUNT_FLAGGED(loaded, ACCT_MULTI_IP) || IS_SET(acc_ptr->flags, ACCT_MULTI_IP)) {
+			msg_to_char(ch, " &r[%d %s] %s  (account %d)&0\r\n", loaded_file ? GET_LAST_KNOWN_LEVEL(loaded) : GET_COMPUTED_LEVEL(loaded), skills, GET_PC_NAME(loaded), GET_ACCOUNT(loaded)->id);
+		}
 		else {
-			msg_to_char(ch, " &r[%d %s] %s  (not on account)&0\r\n", loaded_file ? GET_LAST_KNOWN_LEVEL(loaded) : GET_COMPUTED_LEVEL(loaded), skills, GET_PC_NAME(loaded));
+			msg_to_char(ch, " &r[%d %s] %s  (account %d, not linked)&0\r\n", loaded_file ? GET_LAST_KNOWN_LEVEL(loaded) : GET_COMPUTED_LEVEL(loaded), skills, GET_PC_NAME(loaded), GET_ACCOUNT(loaded)->id);
 		}
 		
 		if (loaded_file) {
