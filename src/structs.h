@@ -2496,6 +2496,7 @@ typedef enum {
 #define QST_NO_GUESTS  BIT(6)	// quest start/finish use MEMBERS_ONLY
 #define QST_TUTORIAL  BIT(7)	// quest can be blocked by 'toggle tutorial'
 #define QST_GROUP_COMPLETION  BIT(8)	// group members auto-finish this quest, even if incomplete, if present when any member does
+#define QST_EVENT  BIT(9)	// shows as an event quest; splits dailies into 2 pools
 
 
 // QG_x: quest giver types
@@ -4429,6 +4430,7 @@ struct player_special_data {
 	int daily_cycle;	// Last update cycle registered
 	ubyte daily_bonus_experience;	// boosted skill gain points
 	int daily_quests;	// number of daily quests completed today
+	int event_daily_quests;	// number of daily event quests completed today
 
 	// action info
 	int action;	// ACT_

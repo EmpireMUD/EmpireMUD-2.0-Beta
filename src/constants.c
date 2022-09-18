@@ -2950,6 +2950,7 @@ const char *quest_giver_types[] = {
 	"TRIGGER",
 	"QUEST",	// 5
 	"VEHICLE",
+	"EVENT",
 	"\n"
 };
 

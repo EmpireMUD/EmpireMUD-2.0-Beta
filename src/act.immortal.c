@@ -2370,6 +2370,9 @@ int perform_set(char_data *ch, char_data *vict, int mode, char *val_arg) {
 	else if SET_CASE("dailyquestscompleted") {
 		GET_DAILY_QUESTS(vict) = RANGE(0, config_get_int("dailies_per_day"));
 	}
+	else if SET_CASE("eventdailyquestscompleted") {
+		GET_EVENT_DAILY_QUESTS(vict) = RANGE(0, config_get_int("dailies_per_day"));
+	}
 	else if SET_CASE("maxlevel") {
 		GET_HIGHEST_KNOWN_LEVEL(vict) = RANGE(0, SHRT_MAX);
 	}
@@ -3433,7 +3436,7 @@ SHOW(show_quests) {
 			return;
 		}
 		
-		size = snprintf(buf, sizeof(buf), "%s's quests (%d/%d dailies):\r\n", GET_NAME(vict), GET_DAILY_QUESTS(vict), config_get_int("dailies_per_day"));
+		size = snprintf(buf, sizeof(buf), "%s's quests (%d/%d dailies, %d/%d event dailies):\r\n", GET_NAME(vict), GET_DAILY_QUESTS(vict), config_get_int("dailies_per_day"), GET_EVENT_DAILY_QUESTS(vict), config_get_int("dailies_per_day"));
 		LL_FOREACH(GET_QUESTS(vict), pq) {
 			count_quest_tasks(pq->tracker, &count, &total);
 			size += snprintf(buf + size, sizeof(buf) - size, "[%5d] %s (%d/%d tasks)\r\n", pq->vnum, get_quest_name_by_proto(pq->vnum), count, total);
@@ -4140,11 +4143,11 @@ SHOW(show_dailycycle) {
 	else {
 		size = snprintf(buf, sizeof(buf), "Daily quests with cycle id %d:\r\n", num);
 		HASH_ITER(hh, quest_table, qst, next_qst) {
-			if (!QUEST_FLAGGED(qst, QST_DAILY) || QUEST_DAILY_CYCLE(qst) != num) {
+			if (!IS_DAILY_QUEST(qst) || QUEST_DAILY_CYCLE(qst) != num) {
 				continue;
 			}
 			
-			size += snprintf(buf + size, sizeof(buf) - size, "[%5d] %s%s\r\n", QUEST_VNUM(qst), QUEST_NAME(qst), QUEST_DAILY_ACTIVE(qst) ? " (active)" : "");
+			size += snprintf(buf + size, sizeof(buf) - size, "[%5d] %s%s%s\r\n", QUEST_VNUM(qst), QUEST_NAME(qst), QUEST_DAILY_ACTIVE(qst) ? " (active)" : "", IS_EVENT_QUEST(qst) ? " (event)" : "");
 		}
 		
 		if (ch->desc) {

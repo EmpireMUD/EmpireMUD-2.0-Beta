@@ -1629,6 +1629,9 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *c
 						}
 					}
 				}
+				else if (!strn_cmp(line, "Event Dailies: ", 15)) {
+					GET_EVENT_DAILY_QUESTS(ch) = atoi(line + 14);
+				}
 				else if (!strn_cmp(line, "Extra Attribute: ", 17)) {
 					sscanf(line + 17, "%s %d", str_in, &i_in[0]);
 					if ((num = search_block(str_in, extra_attribute_types, TRUE)) != NOTHING) {
@@ -2626,6 +2629,7 @@ void write_player_primary_data_to_file(FILE *fl, char_data *ch) {
 	}
 	
 	// 'E'
+	fprintf(fl, "Event Dailies: %d\n", GET_EVENT_DAILY_QUESTS(ch));
 	/* No longer writing extra attributes: these come from abilities/gear and should not be saved/loaded
 		note that if you reenable this, you must also enable the part that loads it
 	for (iter = 0; iter < NUM_EXTRA_ATTRIBUTES; ++iter) {

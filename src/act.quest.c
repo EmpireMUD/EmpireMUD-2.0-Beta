@@ -159,7 +159,7 @@ void complete_quest(char_data *ch, struct player_quest *pq, empire_data *giver_e
 	pcq->last_adventure = pq->adventure;
 	
 	// completion time slightly different for dailies
-	if (QUEST_FLAGGED(quest, QST_DAILY)) {
+	if (IS_DAILY_QUEST(quest)) {
 		pcq->last_completed = data_get_long(DATA_DAILY_CYCLE);
 	}
 	
@@ -181,11 +181,19 @@ void complete_quest(char_data *ch, struct player_quest *pq, empire_data *giver_e
 	free_player_quests(pq);
 	
 	// dailies:
-	if (QUEST_FLAGGED(quest, QST_DAILY)) {
-		GET_DAILY_QUESTS(ch) += 1;
-		
+	if (IS_EVENT_DAILY(quest)) {	// event daily
+		GET_EVENT_DAILY_QUESTS(ch) += 1;
+	
 		// fail remaining quests
-		if (GET_DAILY_QUESTS(ch) >= config_get_int("dailies_per_day") && fail_daily_quests(ch)) {
+		if (GET_EVENT_DAILY_QUESTS(ch) >= config_get_int("dailies_per_day") && fail_daily_quests(ch, TRUE)) {
+			msg_to_char(ch, "You have hit the daily quest limit for the event and your remaining daily event quests expire.\r\n");
+		}
+	}
+	else if (IS_NON_EVENT_DAILY(quest)) {	// non-event daily
+		GET_DAILY_QUESTS(ch) += 1;
+	
+		// fail remaining quests
+		if (GET_DAILY_QUESTS(ch) >= config_get_int("dailies_per_day") && fail_daily_quests(ch, FALSE)) {
 			msg_to_char(ch, "You have hit the daily quest limit and your remaining daily quests expire.\r\n");
 		}
 	}
@@ -289,9 +297,10 @@ void count_quest_tasks(struct req_data *list, int *complete, int *total) {
 * Cancels all daily quests a player is on.
 *
 * @param char_data *ch The player to fail.
+* @param bool event if TRUE, cancels event dailes; if FALSE cancels non-event dailies
 * @return bool TRUE if any quests were failed, FALSE if there were none.
 */
-bool fail_daily_quests(char_data *ch) {
+bool fail_daily_quests(char_data *ch, bool event) {
 	struct player_quest *pq, *next_pq;
 	quest_data *quest;
 	int found = 0;
@@ -304,7 +313,13 @@ bool fail_daily_quests(char_data *ch) {
 		if (!(quest = quest_proto(pq->vnum))) {	// somehow?
 			continue;
 		}
-		if (!QUEST_FLAGGED(quest, QST_DAILY)) {	// not a daily
+		if (!IS_DAILY_QUEST(quest)) {	// not a daily
+			continue;
+		}
+		if (event && !IS_EVENT_QUEST(quest)) {	// not event
+			continue;
+		}
+		if (!event && IS_EVENT_QUEST(quest)) {	// event
 			continue;
 		}
 		
@@ -445,14 +460,29 @@ void drop_quest(char_data *ch, struct player_quest *pq) {
 */
 char *show_daily_quest_line(char_data *ch) {
 	static char output[MAX_STRING_LENGTH];
-	int amount;
+	int amount, count, size = 0;
 	
+	*output = '\0';
+	
+	// non-event dailies
 	amount = IS_NPC(ch) ? 0 : (config_get_int("dailies_per_day") - GET_DAILY_QUESTS(ch));
 	if (amount > 0) {
-		snprintf(output, sizeof(output), "You can complete %d more daily quest%s today.", amount, PLURAL(amount));
+		size += snprintf(output + size, sizeof(output) - size, "You can complete %d more daily quest%s today.", amount, PLURAL(amount));
 	}
 	else {
-		snprintf(output, sizeof(output), "You have completed all your daily quests for the day.");
+		size += snprintf(output + size, sizeof(output) - size, "You have completed all your daily quests for the day.");
+	}
+	
+	// event dailies
+	only_one_running_event(&count);
+	if (count > 0) {
+		amount = IS_NPC(ch) ? 0 : (config_get_int("dailies_per_day") - GET_EVENT_DAILY_QUESTS(ch));
+		if (amount > 0) {
+			size += snprintf(output + size, sizeof(output) - size, "\r\nYou can complete %d more daily event quest%s today.", amount, PLURAL(amount));
+		}
+		else {
+			size += snprintf(output + size, sizeof(output) - size, "\r\nYou have completed all your daily event quests for the day.");
+		}
 	}
 	
 	return output;
@@ -585,9 +615,15 @@ bool qcmd_finish_one(char_data *ch, struct player_quest *pq, bool show_errors) {
 	}
 	
 	// 2nd checks: completability
-	if (QUEST_FLAGGED(quest, QST_DAILY) && GET_DAILY_QUESTS(ch) >= config_get_int("dailies_per_day")) {
+	if (IS_NON_EVENT_DAILY(quest) && GET_DAILY_QUESTS(ch) >= config_get_int("dailies_per_day")) {
 		if (show_errors) {
 			msg_to_char(ch, "You can't finish any more daily quests today.\r\n");
+		}
+		return FALSE;
+	}
+	if (IS_EVENT_DAILY(quest) && GET_EVENT_DAILY_QUESTS(ch) >= config_get_int("dailies_per_day")) {
+		if (show_errors) {
+			msg_to_char(ch, "You can't finish any more daily event quests today.\r\n");
 		}
 		return FALSE;
 	}
@@ -811,7 +847,7 @@ QCMD(qcmd_info) {
 
 
 QCMD(qcmd_list) {
-	char buf[MAX_STRING_LENGTH], vstr[128];
+	char buf[MAX_STRING_LENGTH], vstr[128], typestr[128];
 	struct player_quest *pq;
 	quest_data *proto;
 	int count, total;
@@ -832,7 +868,21 @@ QCMD(qcmd_list) {
 			else {
 				*vstr = '\0';
 			}
-			size += snprintf(buf + size, sizeof(buf) - size, "  %s%s%s\t0 (%d/%d task%s%s)\r\n", vstr, QUEST_LEVEL_COLOR(ch, proto), QUEST_NAME(proto), count, total, PLURAL(total), QUEST_FLAGGED(proto, QST_DAILY) ? "; daily" : "");
+			
+			if (IS_EVENT_DAILY(proto)) {
+				snprintf(typestr, sizeof(typestr), "; event daily");
+			}
+			else if (IS_DAILY_QUEST(proto)) {
+				snprintf(typestr, sizeof(typestr), "; daily");
+			}
+			else if (IS_EVENT_QUEST(proto)) {
+				snprintf(typestr, sizeof(typestr), "; event");
+			}
+			else {
+				*typestr = '\0';
+			}
+			
+			size += snprintf(buf + size, sizeof(buf) - size, "  %s%s%s\t0 (%d/%d task%s%s)\r\n", vstr, QUEST_LEVEL_COLOR(ch, proto), QUEST_NAME(proto), count, total, PLURAL(total), typestr);
 		}
 	}
 	
@@ -908,7 +958,7 @@ QCMD(qcmd_share) {
 QCMD(qcmd_start) {
 	struct quest_temp_list *qtl, *quest_list = NULL;
 	struct instance_data *inst = NULL;
-	char buf[MAX_STRING_LENGTH], vstr[128];
+	char buf[MAX_STRING_LENGTH], vstr[128], typestr[128];
 	quest_data *qst;
 	bool any;
 	
@@ -939,7 +989,20 @@ QCMD(qcmd_start) {
 				*vstr = '\0';
 			}
 			
-			msg_to_char(ch, "  %s%s%s%s%s\t0\r\n", vstr, QUEST_LEVEL_COLOR(ch, qtl->quest), QUEST_NAME(qtl->quest), buf, QUEST_FLAGGED(qtl->quest, QST_DAILY) ? " (daily)" : "");
+			if (IS_EVENT_DAILY(qtl->quest)) {
+				snprintf(typestr, sizeof(typestr), " (event daily)");
+			}
+			else if (IS_DAILY_QUEST(qtl->quest)) {
+				snprintf(typestr, sizeof(typestr), " (daily)");
+			}
+			else if (IS_EVENT_QUEST(qtl->quest)) {
+				snprintf(typestr, sizeof(typestr), " (event)");
+			}
+			else {
+				*typestr = '\0';
+			}
+			
+			msg_to_char(ch, "  %s%s%s%s%s\t0\r\n", vstr, QUEST_LEVEL_COLOR(ch, qtl->quest), QUEST_NAME(qtl->quest), buf, typestr);
 		}
 	
 		if (!any) {
@@ -969,8 +1032,11 @@ QCMD(qcmd_start) {
 			if (get_approximate_level(ch) + 50 < QUEST_MIN_LEVEL(qtl->quest)) {
 				continue;	// must validate level
 			}
-			if (QUEST_FLAGGED(qtl->quest, QST_DAILY) && GET_DAILY_QUESTS(ch) >= config_get_int("dailies_per_day")) {
+			if (IS_NON_EVENT_DAILY(qtl->quest) && GET_DAILY_QUESTS(ch) >= config_get_int("dailies_per_day")) {
 				continue;	// too many dailies
+			}
+			if (IS_EVENT_DAILY(qtl->quest) && GET_EVENT_DAILY_QUESTS(ch) >= config_get_int("dailies_per_day")) {
+				continue;	// too many event dailies
 			}
 			
 			// must re-check prereqs
@@ -999,8 +1065,11 @@ QCMD(qcmd_start) {
 			qcmd_start(ch, "");	// list quests available here
 		}
 	}
-	else if (QUEST_FLAGGED(qst, QST_DAILY) && GET_DAILY_QUESTS(ch) >= config_get_int("dailies_per_day")) {
+	else if (IS_NON_EVENT_DAILY(qst) && GET_DAILY_QUESTS(ch) >= config_get_int("dailies_per_day")) {
 		msg_to_char(ch, "You can't start any more daily quests today.\r\n");
+	}
+	else if (IS_EVENT_DAILY(qst) && GET_EVENT_DAILY_QUESTS(ch) >= config_get_int("dailies_per_day")) {
+		msg_to_char(ch, "You can't start any more daily event quests today.\r\n");
 	}
 	else if (get_approximate_level(ch) + 50 < QUEST_MIN_LEVEL(qst)) {
 		msg_to_char(ch, "You can't start that quest because it's more than 50 levels above you.\r\n");

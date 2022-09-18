@@ -1300,7 +1300,7 @@ void setup_daily_quest_cycles(int only_cycle) {
 		if (QUEST_FLAGGED(qst, QST_IN_DEVELOPMENT)) {
 			continue;	// not active
 		}
-		if (!QUEST_FLAGGED(qst, QST_DAILY) || QUEST_DAILY_CYCLE(qst) == NOTHING) {
+		if (!IS_DAILY_QUEST(qst) || QUEST_DAILY_CYCLE(qst) == NOTHING) {
 			continue;	// not a cycling daily
 		}
 		
@@ -1633,13 +1633,14 @@ bool can_get_quest_from_mob(char_data *ch, char_data *mob, struct quest_temp_lis
 	struct instance_data *inst;
 	struct quest_lookup *ql;
 	bool any = FALSE;
-	bool dailies;
+	bool dailies, event_dailies;
 	
 	if (IS_NPC(ch) || !MOB_QUEST_LOOKUPS(mob) || !CAN_SEE(ch, mob)) {
 		return FALSE;
 	}
 	
 	dailies = GET_DAILY_QUESTS(ch) < config_get_int("dailies_per_day");
+	event_dailies = GET_EVENT_DAILY_QUESTS(ch) < config_get_int("dailies_per_day");
 	
 	LL_FOREACH(MOB_QUEST_LOOKUPS(mob), ql) {
 		// make sure they're a giver
@@ -1651,7 +1652,10 @@ bool can_get_quest_from_mob(char_data *ch, char_data *mob, struct quest_temp_lis
 			continue;
 		}
 		// hide dailies
-		if (QUEST_FLAGGED(ql->quest, QST_DAILY) && !dailies) {
+		if (IS_NON_EVENT_DAILY(ql->quest) && !dailies) {
+			continue;
+		}
+		if (IS_EVENT_DAILY(ql->quest) && !event_dailies) {
 			continue;
 		}
 		// matching empire
@@ -1698,13 +1702,14 @@ bool can_get_quest_from_obj(char_data *ch, obj_data *obj, struct quest_temp_list
 	struct quest_lookup *ql;
 	bool any = FALSE;
 	room_data *room;
-	bool dailies;
+	bool dailies, event_dailies;
 	
 	if (IS_NPC(ch) || !GET_OBJ_QUEST_LOOKUPS(obj) || !CAN_SEE_OBJ(ch, obj) || !bind_ok(obj, ch)) {
 		return FALSE;
 	}
 	
 	dailies = GET_DAILY_QUESTS(ch) < config_get_int("dailies_per_day");
+	event_dailies = GET_EVENT_DAILY_QUESTS(ch) < config_get_int("dailies_per_day");
 	
 	LL_FOREACH(GET_OBJ_QUEST_LOOKUPS(obj), ql) {
 		// make sure they're a giver
@@ -1716,7 +1721,10 @@ bool can_get_quest_from_obj(char_data *ch, obj_data *obj, struct quest_temp_list
 			continue;
 		}
 		// hide dailies
-		if (QUEST_FLAGGED(ql->quest, QST_DAILY) && !dailies) {
+		if (IS_NON_EVENT_DAILY(ql->quest) && !dailies) {
+			continue;
+		}
+		if (IS_EVENT_DAILY(ql->quest) && !event_dailies) {
 			continue;
 		}
 		// already on quest?
@@ -1762,7 +1770,7 @@ bool can_get_quest_from_room(char_data *ch, room_data *room, struct quest_temp_l
 	struct quest_lookup *ql, *list[2];
 	struct instance_data *inst;
 	bool any = FALSE;
-	bool dailies;
+	bool dailies, event_dailies;
 	int iter;
 	
 	if (IS_NPC(ch) || !IS_COMPLETE(room)) {
@@ -1770,6 +1778,7 @@ bool can_get_quest_from_room(char_data *ch, room_data *room, struct quest_temp_l
 	}
 	
 	dailies = GET_DAILY_QUESTS(ch) < config_get_int("dailies_per_day");
+	event_dailies = GET_EVENT_DAILY_QUESTS(ch) < config_get_int("dailies_per_day");
 	
 	// two places to look
 	list[0] = GET_BUILDING(room) ? GET_BLD_QUEST_LOOKUPS(GET_BUILDING(room)) : NULL;
@@ -1789,7 +1798,10 @@ bool can_get_quest_from_room(char_data *ch, room_data *room, struct quest_temp_l
 				continue;
 			}
 			// hide dailies
-			if (QUEST_FLAGGED(ql->quest, QST_DAILY) && !dailies) {
+			if (IS_NON_EVENT_DAILY(ql->quest) && !dailies) {
+				continue;
+			}
+			if (IS_EVENT_DAILY(ql->quest) && !event_dailies) {
 				continue;
 			}
 			// matching empire
@@ -1836,13 +1848,14 @@ bool can_get_quest_from_vehicle(char_data *ch, vehicle_data *veh, struct quest_t
 	struct instance_data *inst;
 	struct quest_lookup *ql;
 	bool any = FALSE;
-	bool dailies;
+	bool dailies, event_dailies;
 	
 	if (IS_NPC(ch) || !VEH_IS_COMPLETE(veh) || !VEH_QUEST_LOOKUPS(veh) || !CAN_SEE_VEHICLE(ch, veh)) {
 		return FALSE;
 	}
 	
 	dailies = GET_DAILY_QUESTS(ch) < config_get_int("dailies_per_day");
+	event_dailies = GET_EVENT_DAILY_QUESTS(ch) < config_get_int("dailies_per_day");
 	
 	LL_FOREACH(VEH_QUEST_LOOKUPS(veh), ql) {
 		// make sure they're a giver
@@ -1854,7 +1867,10 @@ bool can_get_quest_from_vehicle(char_data *ch, vehicle_data *veh, struct quest_t
 			continue;
 		}
 		// hide dailies
-		if (QUEST_FLAGGED(ql->quest, QST_DAILY) && !dailies) {
+		if (IS_NON_EVENT_DAILY(ql->quest) && !dailies) {
+			continue;
+		}
+		if (IS_EVENT_DAILY(ql->quest) && !event_dailies) {
 			continue;
 		}
 		// matching empire
@@ -2119,7 +2135,7 @@ bool can_turn_quest_in_to_vehicle(char_data *ch, vehicle_data *veh, struct quest
 * @return bool TRUE if the player can get the quest.
 */
 bool char_meets_prereqs(char_data *ch, quest_data *quest, struct instance_data *instance) {
-	bool daily = QUEST_FLAGGED(quest, QST_DAILY);
+	bool daily;
 	struct player_completed_quest *completed;
 	bool ok = TRUE;
 	// needs to know instance/adventure
@@ -2129,13 +2145,16 @@ bool char_meets_prereqs(char_data *ch, quest_data *quest, struct instance_data *
 		return FALSE;
 	}
 	
+	daily = IS_DAILY_QUEST(quest) ? TRUE : FALSE;
+	// no need to check event dailies here
+	
 	// only immortals see in-dev quests
 	if (QUEST_FLAGGED(quest, QST_IN_DEVELOPMENT) && !IS_IMMORTAL(ch)) {
 		return FALSE;
 	}
 	
 	// some daily quests are off
-	if (QUEST_FLAGGED(quest, QST_DAILY) && !QUEST_DAILY_ACTIVE(quest)) {
+	if (IS_DAILY_QUEST(quest) && !QUEST_DAILY_ACTIVE(quest)) {
 		return FALSE;
 	}
 	
@@ -3479,12 +3498,26 @@ bool find_quest_reward_in_list(struct quest_reward *list, int type, any_vnum vnu
 */
 char *list_one_quest(quest_data *quest, bool detail) {
 	static char output[MAX_STRING_LENGTH];
+	char typestr[128];
 	
-	if (detail) {
-		snprintf(output, sizeof(output), "[%5d] %s%s", QUEST_VNUM(quest), QUEST_NAME(quest), (QUEST_FLAGGED(quest, QST_DAILY) ? " (daily)" : ""));
+	if (IS_EVENT_DAILY(quest)) {
+		snprintf(typestr, sizeof(typestr), " (event daily)");
+	}
+	else if (IS_DAILY_QUEST(quest)) {
+		snprintf(typestr, sizeof(typestr), " (daily)");
+	}
+	else if (IS_EVENT_QUEST(quest)) {
+		snprintf(typestr, sizeof(typestr), " (event)");
 	}
 	else {
-		snprintf(output, sizeof(output), "[%5d] %s%s", QUEST_VNUM(quest), QUEST_NAME(quest), (QUEST_FLAGGED(quest, QST_DAILY) ? " (daily)" : ""));
+		*typestr = '\0';
+	}
+	
+	if (detail) {
+		snprintf(output, sizeof(output), "[%5d] %s%s", QUEST_VNUM(quest), QUEST_NAME(quest), typestr);
+	}
+	else {
+		snprintf(output, sizeof(output), "[%5d] %s%s", QUEST_VNUM(quest), QUEST_NAME(quest), typestr);
 	}
 		
 	return output;

@@ -6835,6 +6835,8 @@ The following quest flags are available:
     Use this flag for basic tutorials only, like ones on common items.
  GROUP-COMPLETION - Will auto-finish the quest if a group member turns it in
     while in the same room.
+ EVENT - Quest is marked as part of an event. If it's a daily quest, it is
+    separate from non-event dailies.
 
 See also: OLC QUESTS, DAILY QUEST
 #d
