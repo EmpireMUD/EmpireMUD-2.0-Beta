@@ -151,7 +151,7 @@ metals to make jewelry.
 F
 o
 I 5 106 4.00 1 X  # DIG: rough piece of obsidian
-I 5 102 9.00 1 X  # DIG: flint stone
+I 5 102 15.00 1 X  # DIG: flint stone
 I 5 100 100.00 1 X  # DIG: rock
 M
 232 5.00 c
@@ -461,7 +461,7 @@ C
 dig, quarry~
 F
 f
-I 5 102 9.00 1 X  # DIG: flint stone
+I 5 102 15.00 1 X  # DIG: flint stone
 I 5 100 100.00 1 X  # DIG: rock
 I 23 105 100.00 125  # QUARRY: huge stone block
 I 29 5006 100.00 1 r  # RUINS-TO-BLD: Ruins

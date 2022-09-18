@@ -50,7 +50,7 @@ E
 8 0 100.00 13
 E
 9 0 33.33 39
-I 5 102 9.00 1 X  # DIG: flint stone
+I 5 102 15.00 1 X  # DIG: flint stone
 I 5 101 15.00 1 X  # DIG: lump of clay
 I 5 100 100.00 1 X  # DIG: rock
 I 6 3013 75.00 1  # FORAGE: handful of nuts
@@ -91,7 +91,7 @@ E
 4 0 0.80 2
 E
 9 0 50.00 2
-I 5 102 9.00 1 X  # DIG: flint stone
+I 5 102 15.00 1 X  # DIG: flint stone
 I 5 101 15.00 1 X  # DIG: lump of clay
 I 5 100 100.00 1 X  # DIG: rock
 I 6 3015 75.00 1  # FORAGE: red berries
@@ -135,7 +135,7 @@ E
 4 0 0.80 3
 E
 9 0 50.00 3
-I 5 102 9.00 1 X  # DIG: flint stone
+I 5 102 15.00 1 X  # DIG: flint stone
 I 5 101 15.00 1 X  # DIG: lump of clay
 I 5 100 100.00 1 X  # DIG: rock
 I 6 3015 75.00 1  # FORAGE: red berries
@@ -179,7 +179,7 @@ E
 4 0 0.20 4
 E
 9 0 50.00 4
-I 5 102 9.00 1 X  # DIG: flint stone
+I 5 102 15.00 1 X  # DIG: flint stone
 I 5 101 15.00 1 X  # DIG: lump of clay
 I 5 100 100.00 1 X  # DIG: rock
 I 6 3015 75.00 1  # FORAGE: red berries
@@ -249,7 +249,7 @@ E
 3 29 0.80 29
 E
 20 40320 0.01 90
-I 5 102 9.00 1 X  # DIG: flint stone
+I 5 102 15.00 1 X  # DIG: flint stone
 I 5 101 15.00 1 X  # DIG: lump of clay
 I 5 100 100.00 1 X  # DIG: rock
 I 6 3015 75.00 1  # FORAGE: red berries
@@ -397,7 +397,7 @@ D4
 &0~
 E
 19 0 100.00 0
-I 5 102 9.00 1 X  # DIG: flint stone
+I 5 102 15.00 1 X  # DIG: flint stone
 I 5 101 15.00 1 X  # DIG: lump of clay
 I 5 100 100.00 1 X  # DIG: rock
 S
@@ -425,7 +425,7 @@ E
 2 57 10.00 52
 I 5 106 4.00 1 X  # DIG: rough piece of obsidian
 I 5 104 8.00 1 X  # DIG: red bloodstone
-I 5 102 9.00 1 X  # DIG: flint stone
+I 5 102 15.00 1 X  # DIG: flint stone
 I 5 100 100.00 1 X  # DIG: rock
 I 6 3015 100.00 1  # FORAGE: red berries
 I 7 1206 8.33 125 p  # PICK: iridescent blue iris
@@ -502,7 +502,7 @@ D4
 &y~
 E
 19 0 100.00 20
-I 5 102 9.00 1 X  # DIG: flint stone
+I 5 102 15.00 1 X  # DIG: flint stone
 I 5 103 8.00 1 X  # DIG: yellow lightning stone
 I 5 100 100.00 1 X  # DIG: rock
 S
@@ -521,7 +521,7 @@ E
 9 0 20.00 7
 E
 19 0 100.00 0
-I 5 102 9.00 1 X  # DIG: flint stone
+I 5 102 15.00 1 X  # DIG: flint stone
 I 5 100 100.00 1 X  # DIG: rock
 I 6 3003 100.00 1  # FORAGE: handful of grain
 S
@@ -540,7 +540,7 @@ E
 9 0 20.00 12
 E
 19 0 100.00 20
-I 5 102 9.00 1 X  # DIG: flint stone
+I 5 102 15.00 1 X  # DIG: flint stone
 I 5 100 100.00 1 X  # DIG: rock
 I 5 103 8.00 1 X  # DIG: yellow lightning stone
 I 6 3014 100.00 1  # FORAGE: dry beans
@@ -602,7 +602,7 @@ D4
 &0~
 E
 6 0 100.00 19
-I 5 102 9.00 1 X  # DIG: flint stone
+I 5 102 15.00 1 X  # DIG: flint stone
 I 5 101 15.00 1 X  # DIG: lump of clay
 I 5 100 100.00 1 X  # DIG: rock
 S
@@ -666,7 +666,7 @@ E
 E
 9 0 50.00 25
 I 5 103 8.00 1 X  # DIG: yellow lightning stone
-I 5 102 9.00 1 X  # DIG: flint stone
+I 5 102 15.00 1 X  # DIG: flint stone
 I 5 100 100.00 1 X  # DIG: rock
 I 6 3014 75.00 1  # FORAGE: dry beans
 I 7 1206 8.33 125 p  # PICK: iridescent blue iris
@@ -705,7 +705,7 @@ E
 E
 2 19 4.00 19
 I 5 103 8.00 1 X  # DIG: yellow lightning stone
-I 5 102 9.00 1 X  # DIG: flint stone
+I 5 102 15.00 1 X  # DIG: flint stone
 I 5 100 100.00 1 X  # DIG: rock
 I 6 3014 50.00 1  # FORAGE: dry beans
 I 7 1206 8.33 125 p  # PICK: iridescent blue iris
@@ -734,7 +734,7 @@ D4
 E
 6 0 100.00 21
 I 5 103 8.00 1 X  # DIG: yellow lightning stone
-I 5 102 9.00 1 X  # DIG: flint stone
+I 5 102 15.00 1 X  # DIG: flint stone
 I 5 107 100.00 1 X  # DIG: bag of sand
 S
 #23
@@ -778,7 +778,7 @@ E
 E
 16 0 100.00 20
 I 5 103 8.00 1 X  # DIG: yellow lightning stone
-I 5 102 9.00 1 X  # DIG: flint stone
+I 5 102 15.00 1 X  # DIG: flint stone
 I 5 100 100.00 1 X  # DIG: rock
 I 6 3014 75.00 1  # FORAGE: dry beans
 I 7 1206 8.33 125 p  # PICK: iridescent blue iris
@@ -817,7 +817,7 @@ E
 E
 9 0 50.00 26
 I 5 103 8.00 1 X  # DIG: yellow lightning stone
-I 5 102 9.00 1 X  # DIG: flint stone
+I 5 102 15.00 1 X  # DIG: flint stone
 I 5 100 100.00 1 X  # DIG: rock
 I 6 3016 75.00 1  # FORAGE: handful of dates
 I 7 1206 8.33 125 p  # PICK: iridescent blue iris
@@ -860,7 +860,7 @@ E
 E
 9 0 50.00 26
 I 5 103 8.00 1 X  # DIG: yellow lightning stone
-I 5 102 9.00 1 X  # DIG: flint stone
+I 5 102 15.00 1 X  # DIG: flint stone
 I 5 100 100.00 1 X  # DIG: rock
 I 6 3016 75.00 1  # FORAGE: handful of dates
 I 7 1206 8.33 125 p  # PICK: iridescent blue iris
@@ -894,7 +894,7 @@ E
 E
 7 19 0.80 71
 I 5 103 8.00 1 X  # DIG: yellow lightning stone
-I 5 102 9.00 1 X  # DIG: flint stone
+I 5 102 15.00 1 X  # DIG: flint stone
 I 5 100 100.00 1 X  # DIG: rock
 I 6 3016 75.00 1  # FORAGE: handful of dates
 I 7 1206 8.33 125 p  # PICK: iridescent blue iris
@@ -1172,7 +1172,7 @@ E
 9 0 50.00 37
 E
 16 0 100.00 0
-I 5 102 9.00 1 X  # DIG: flint stone
+I 5 102 15.00 1 X  # DIG: flint stone
 I 5 101 15.00 1 X  # DIG: lump of clay
 I 5 100 100.00 1 X  # DIG: rock
 I 6 3013 75.00 1  # FORAGE: handful of nuts
@@ -1211,7 +1211,7 @@ E
 4 0 0.80 38
 E
 9 0 50.00 38
-I 5 102 9.00 1 X  # DIG: flint stone
+I 5 102 15.00 1 X  # DIG: flint stone
 I 5 101 15.00 1 X  # DIG: lump of clay
 I 5 100 100.00 1 X  # DIG: rock
 I 6 3015 75.00 1  # FORAGE: red berries
@@ -1251,7 +1251,7 @@ E
 4 0 0.40 2
 E
 9 0 50.00 2
-I 5 102 9.00 1 X  # DIG: flint stone
+I 5 102 15.00 1 X  # DIG: flint stone
 I 5 101 15.00 1 X  # DIG: lump of clay
 I 5 100 100.00 1 X  # DIG: rock
 I 6 3015 75.00 1  # FORAGE: red berries
@@ -1291,7 +1291,7 @@ E
 4 0 0.80 1
 E
 9 0 50.00 1
-I 5 102 9.00 1 X  # DIG: flint stone
+I 5 102 15.00 1 X  # DIG: flint stone
 I 5 101 15.00 1 X  # DIG: lump of clay
 I 5 100 100.00 1 X  # DIG: rock
 I 6 3015 75.00 1  # FORAGE: red berries
@@ -1754,7 +1754,7 @@ E
 10 57 5.00 8
 I 5 106 4.00 1 X  # DIG: rough piece of obsidian
 I 5 104 8.00 1 X  # DIG: red bloodstone
-I 5 102 9.00 1 X  # DIG: flint stone
+I 5 102 15.00 1 X  # DIG: flint stone
 I 5 100 100.00 1 X  # DIG: rock
 I 6 3015 100.00 1  # FORAGE: red berries
 I 7 1206 8.33 125 p  # PICK: iridescent blue iris
@@ -2254,7 +2254,7 @@ E
 9 0 50.00 71
 E
 11 19 4.00 20
-I 5 102 9.00 1 X  # DIG: flint stone
+I 5 102 15.00 1 X  # DIG: flint stone
 I 5 103 8.00 1 X  # DIG: yellow lightning stone
 I 5 101 15.00 1 X  # DIG: lump of clay
 I 5 100 100.00 1 X  # DIG: rock
@@ -2302,7 +2302,7 @@ E
 0 1 100.00 73
 E
 11 19 4.00 26
-I 5 102 9.00 1 X  # DIG: flint stone
+I 5 102 15.00 1 X  # DIG: flint stone
 I 5 101 15.00 1 X  # DIG: lump of clay
 I 5 103 8.00 1 X  # DIG: yellow lightning stone
 I 5 100 100.00 1 X  # DIG: rock
@@ -2334,7 +2334,7 @@ E
 0 1 100.00 75
 E
 11 19 4.00 26
-I 5 102 9.00 1 X  # DIG: flint stone
+I 5 102 15.00 1 X  # DIG: flint stone
 I 5 101 15.00 1 X  # DIG: lump of clay
 I 5 103 8.00 1 X  # DIG: yellow lightning stone
 I 5 100 100.00 1 X  # DIG: rock
@@ -2388,7 +2388,7 @@ E
 11 19 4.00 23
 E
 16 0 100.00 70
-I 5 102 9.00 1 X  # DIG: flint stone
+I 5 102 15.00 1 X  # DIG: flint stone
 I 5 103 8.00 1 X  # DIG: yellow lightning stone
 I 5 101 15.00 1 X  # DIG: lump of clay
 I 5 100 100.00 1 X  # DIG: rock
@@ -2436,7 +2436,7 @@ E
 9 0 50.00 71
 E
 11 19 4.00 24
-I 5 102 9.00 1 X  # DIG: flint stone
+I 5 102 15.00 1 X  # DIG: flint stone
 I 5 101 15.00 1 X  # DIG: lump of clay
 I 5 103 8.00 1 X  # DIG: yellow lightning stone
 I 5 100 100.00 1 X  # DIG: rock
@@ -2469,7 +2469,7 @@ E
 11 19 4.00 23
 E
 16 0 100.00 70
-I 5 102 9.00 1 X  # DIG: flint stone
+I 5 102 15.00 1 X  # DIG: flint stone
 I 5 101 15.00 1 X  # DIG: lump of clay
 I 5 103 8.00 1 X  # DIG: yellow lightning stone
 I 5 100 100.00 1 X  # DIG: rock
@@ -2503,7 +2503,7 @@ E
 9 0 50.00 72
 E
 11 19 4.00 24
-I 5 102 9.00 1 X  # DIG: flint stone
+I 5 102 15.00 1 X  # DIG: flint stone
 I 5 101 15.00 1 X  # DIG: lump of clay
 I 5 103 8.00 1 X  # DIG: yellow lightning stone
 I 5 100 100.00 1 X  # DIG: rock
