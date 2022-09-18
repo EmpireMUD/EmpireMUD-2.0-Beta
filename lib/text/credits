@@ -3,10 +3,11 @@
                           Version 2.0 beta 5
 
 EmpireMUD 1.0 was developed from CircleMUD 3.0, bpl 17 and tbgMUD 2.4. It was
-created by Paul Clarke, a student at the University of Arizona, in 2000.
-All code which is unique to EmpireMUD is the intellectual property of Paul
-Clarke, and all code distributed as part of EmpireMUD is the property of its
-respective authors. Please read the EmpireMUD license for more information.
+originally created by Paul Clarke, a student at the University of Arizona, in
+2000, with ongoing work by the original author. All code which is unique to
+EmpireMUD is the intellectual property of Paul Clarke, and all code distributed
+as part of EmpireMUD is the property of its respective authors. Please read the
+EmpireMUD license for more information.
 
    Paul S. Clarke / Khufu / Gideon
    Programmer and lead designer
@@ -16,12 +17,10 @@ Special thanks to:
  Jason "Opie" Babo, server admin and supporter since day 1
  Gaia, longtime EmpireMUD admin and purveyor of critical feedback
  Yvain, for numerous contributions and support
- Billy "stormdragon2976" Wolfe, animal scripting
- JL Decker, for content contributions in 2.0 alpha
- Awkens Ryder, for bug fixes and contributions to the code
- Trisha Maelicia, public relations and encourager
+ Domino, for numerous contributions and support
  The DG Scripts authors, for a very handy scripting system
  Dr Ravi and the U of Arizona Cancer Center, for making this possible
+ JL Decker, Billy "stormdragon2976" Wolfe, Awkens Ryder, and Trisha Maelicia
  The entire EmpireMUD community, for ideas and feedback
 
 ============================================================================
