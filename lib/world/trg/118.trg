@@ -1680,7 +1680,7 @@ if %self.vnum% == 11933
   %echo% She taps her staff on the slate floor three times.
   wait 9 sec
   %force% %annelise% say Ahem... In service of the Tower I restore you bodily as you once were!
-  %echo% She taps her staff on the floor agian.
+  %echo% She taps her staff on the floor again.
   wait 9 sec
   %echo% ~%annelise% sighs.
   wait 3 sec
@@ -1697,7 +1697,7 @@ if %self.vnum% == 11933
   %mod% %self% append-lookdesc are inexplicably wet at the bottom. Dark, teary eyes poke out from underneath a mop of straw-colored hair as he stares at you wordlessly.
   * and finish
   wait 9 sec
-  %force% %annelise% say Rather embarassing to admit I'm dreadful at non-rhyming magic.
+  %force% %annelise% say Rather embarrassing to admit I'm dreadful at non-rhyming magic.
   wait 6 sec
   say What happened? Oh! I can speak again! I'm free! I'm free!
   wait 9 sec
