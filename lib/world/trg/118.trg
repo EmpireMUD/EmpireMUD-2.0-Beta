@@ -1191,7 +1191,7 @@ switch %self.vnum%
   case 11815
     * uncaged goblin
     %mod% %self% longdesc %name% is resting here.
-    %mod% %self% lookdesc This little goblin looks positively malnourished as %self.hisher% boney frame protrudes through %self.hisher%
+    %mod% %self% lookdesc This little goblin looks positively malnourished as %self.hisher% bony frame protrudes through %self.hisher%
     %mod% %self% append-lookdesc pale green skin. Dressed only in rags and shaking as %self.heshe% stands, %self.heshe% somehow raises %self.hisher% fists to fight.
   break
   case 11816

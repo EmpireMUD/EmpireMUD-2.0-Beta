@@ -2759,6 +2759,7 @@ Fields:
   &c-level -levelover -levelunder&0 - specific level requirement
   &c-quantity -quantityover -quantityunder&0 - specific quantity value
   &c-requiresobject&0 - requires any object
+  &c-requiresfunction&0 - requires a function flag
   &c-time -timeover -timeunder&0 - specific craft time (in action ticks)
 
 Examples:
