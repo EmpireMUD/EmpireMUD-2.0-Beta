@@ -1980,6 +1980,7 @@ struct set_struct {
 		{ "bonustrait",	LVL_START_IMM,	PC,		MISC },
 		{ "bonusexp", LVL_START_IMM, PC, NUMBER },
 		{ "dailyquestscompleted", LVL_START_IMM, PC, NUMBER },
+		{ "eventdailyquestscompleted", LVL_START_IMM, PC, NUMBER },
 		{ "grants",		LVL_CIMPL,	PC,		MISC },
 		{ "maxlevel", LVL_START_IMM, PC, NUMBER },
 		{ "skill", LVL_START_IMM, PC, MISC },

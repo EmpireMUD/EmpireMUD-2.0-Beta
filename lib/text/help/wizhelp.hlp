@@ -961,6 +961,7 @@ coins          PC      MISC         Sets coins on-hand for player
 companion      PC      MISC         Sets a companion NPC on/off
 currency       PC      MISC         Sets amounts of adventure currencies
 dailyquestscompleted  PC  NUMBER    Number of dailies they have completed today
+eventdailyquests      PC  NUMBER    Number of event dailies they have completed
 faction        PC      MISC         Change faction reputations (SET FACTION)
 grants         PC      MISC         Set grants for player
 invstart       PC      BINARY       Invisible @ Start
