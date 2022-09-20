@@ -75,6 +75,11 @@ eval tricky %%room_var.%direction%(room)%%
 if (%actor.aff_flagged(SNEAK)% || %actor.nohassle% || !%tricky% || %tricky.template% < %room_var.template%)
   halt
 end
+* block higher template id only
+if (%tricky.template% < %room_var.template%)
+  halt
+end
+* blocked
 %send% %actor% You can't seem to get past ~%self%!
 return 0
 ~

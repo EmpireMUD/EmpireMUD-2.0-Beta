@@ -155,7 +155,7 @@ spinning her cinnamon wand. Her hat, a comically oversized black cone with a
 wide brim, droops over her brown and violet hair, which is pinned up in loose
 curls. Her black apron matches the hat, but for its stylized Tower Skycleave
 logo.
-   You can 'list' and 'buy' refreshments here.
+   You can 'list', 'list id', and 'buy' refreshments here.
 ~
 F 11800
 M
@@ -207,7 +207,7 @@ S
 #11907
 #n shopkeep shopkeeper~
 #n the shopkeep~
-#n is behind the counter, wearing an apron.
+#n is behind the counter, wearing an apron. (list)
 ~
 0 0 bdvAI n 3
 1 0 0 15
@@ -215,6 +215,7 @@ D
    He's dressed in black slacks, a gray shirt, and a purple vest with the Hazel
 and Wand of the Skycleave sigil. He doesn't seem to have a wand or a staff, but
 bears a toothy smile and seems happy to help customers.
+   Type 'list', 'list id', or 'buy' to see and purchase items from the shop.
 ~
 M
 0
@@ -414,7 +415,7 @@ S
 #11914
 Wright wrangler~
 Wrangler Wright~
-The goblin wrangler is cleaning up the mess.
+The goblin wrangler is cleaning up the mess. (list)
 ~
 0 0 bdvxA n 3
 1 0 0 15
@@ -424,6 +425,8 @@ enjoying himself as he picks up debris and straightens the room. His skin has
 grown translucent with time, showing every blue vein beneath dark age spots.
 Unlike most of the tower's occupants, he wears no robes -- only simple overalls
 and a gray shirt.
+   Type 'list', 'list id', or 'buy' to see and purchase pvp/solo equipment
+patterns.
 ~
 F 11800
 M
@@ -864,7 +867,7 @@ S
 #11931
 Niamh resident~
 Resident Niamh~
-Resident Niamh is standing here.
+Resident Niamh is standing here. (list)
 ~
 0 0 dvxA n 3
 2 0 0 15
@@ -872,6 +875,8 @@ D
    Niamh's black hair shows fiery red roots as she stoops to pick up a book.
 Her pale face and hands stick out in stark contrast to her dark purple and
 black robes. She looks rather young compared to many of the sorcerers here.
+   Type 'list', 'list id', or 'buy' to see and purchase melee equipment
+patterns.
 ~
 F 11800
 T 11810
@@ -1034,7 +1039,7 @@ S
 #11938
 Weyonomon spirit apprentice~
 the spirit of Weyonomon~
-The spirit of Apprentice Weyonomon is channeling a spell.
+The spirit of Apprentice Weyonomon is channeling a spell. (list)
 ~
 0 0 bd n 3
 1 0 0 15
@@ -1044,6 +1049,8 @@ wears the white robes he earned here, which hang in stark contrast to his
 golden brown skin. His eyes are the hollow, smoky-black depressions of the
 unliving, but his face bears a soft, friendly smile. He stands in front of one
 of the artifacts, channeling ghastly energy from it.
+   Type 'list', 'list id', or 'buy' to see and purchase healer equipment
+patterns.
 ~
 F 11800
 M
@@ -2073,7 +2080,7 @@ S
 #11966
 Grace sorcerer assistant~
 Grace~
-The sorcerer's assistant, Grace, is sorting papers.
+The sorcerer's assistant, Grace, is sorting papers. (list)
 ~
 0 0 bdvxA n 3
 2 0 0 15
@@ -2083,6 +2090,8 @@ spectacles and her high-waisted dress, looks like a relic of an earlier era.
 The she's short, she tilts her head back in order to look down at you through
 the base of her glasses as you enter. She makes a small gesture of approval
 with her lips and then goes back to what she was doing.
+   Type 'list', 'list id', or 'buy' to see and purchase tank equipment
+patterns.
 ~
 F 11800
 T 11810
@@ -2107,7 +2116,7 @@ S
 #11968
 knezz grand high sorcerer~
 Grand High Sorcerer Knezz~
-Grand High Sorcerer Knezz is standing here.
+Grand High Sorcerer Knezz is standing here. (list)
 ~
 0 0 dvxA n 3
 1 0 0 15
@@ -2119,6 +2128,8 @@ crescent glasses, his eyes have the milky blue color of age. He stands tall
 despite it, in violet and gold robes, with two nocturnium studs in his ear and
 several nocturnium beads in his beard. If he carries anything else on his
 person, it's covered by the robes.
+   Type 'list', 'list id', or 'buy' to see and purchase caster equipment
+patterns.
 ~
 F 11800
 M
@@ -2226,7 +2237,7 @@ S
 #11970
 Niamh acting high sorcerer~
 Acting High Sorcerer Niamh~
-Acting High Sorcerer Niamh is standing here.
+Acting High Sorcerer Niamh is standing here. (list)
 ~
 0 0 dvxA n 3
 2 0 0 15
@@ -2234,6 +2245,8 @@ D
    Niamh's black hair shows fiery red roots as she stoops to pick up a book.
 Her pale face and hands stick out in stark contrast to her dark purple and
 black robes. She looks rather young compared to many of the sorcerers here.
+   Type 'list', 'list id', or 'buy' to see and purchase melee equipment
+patterns.
 ~
 F 11800
 T 11810
