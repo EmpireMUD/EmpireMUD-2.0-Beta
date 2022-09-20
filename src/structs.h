@@ -5279,6 +5279,7 @@ struct event_data {
 	int max_level;	// or 0 for no max
 	int duration;	// minutes in length
 	int repeats_after;	// minutes to auto-repeat; 0/NOT_REPEATABLE for none
+	int max_points;	// fixed point cap, if >0
 	
 	UT_hash_handle hh;	// hash handle for event_table
 };

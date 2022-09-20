@@ -3271,10 +3271,24 @@ Avoid starting with "The" or "A".
 
 See also: OLC EVENTS
 #d
+"EVEDIT MAXPOINTS" "EVEDIT MAX POINTS" "EVEDIT MAXIMUM POINTS"
+
+Usage:  .maxpoints <points | none>
+
+This optional trait caps the maximum number of points a player may gain in the
+event. After this, any extra points are ignored. Without this trait, players
+may gain any number of points.
+
+Uses for this:
+- On a long event with a fixed number of points each day, to skip a day safely.
+- On an event where players only need to do daily quests a few times to finish.
+
+See also: OLC EVENTS
+#d
 "EVEDIT MINLEVEL" "EVEDIT MAXLEVEL" "EVEDIT MIN LEVEL" "EVEDIT MAX LEVEL" "EVEDIT MINIMUM LEVEL" "EVEDIT MAXIMUM LEVEL"
 
-Usage:  .minlevel <level>
-        .maxlevel <level>
+Usage:  .minlevel <level | none>
+        .maxlevel <level | none>
 
 This allows you to set the level limits on an event. This is only used for
 display, and is not enforced. If you wish to enforce a level limit on an event,

@@ -477,6 +477,7 @@ void free_player_event_data(struct player_event_data *hash) {
 int gain_event_points(char_data *ch, any_vnum event_vnum, int points) {
 	struct event_running_data *running;
 	struct player_event_data *ped;
+	char capstr[256];
 	
 	if (!ch || !points) {
 		return 0;	// no work
@@ -493,13 +494,24 @@ int gain_event_points(char_data *ch, any_vnum event_vnum, int points) {
 		ped->level = GET_HIGHEST_KNOWN_LEVEL(ch);
 	}
 	SAFE_ADD(ped->points, points, 0, INT_MAX, FALSE);
+	if (EVT_MAX_POINTS(running->event) > 0 && ped->points > EVT_MAX_POINTS(running->event)) {
+		ped->points = EVT_MAX_POINTS(running->event);
+	}
 	update_player_leaderboard(ch, running, ped);
 	
+	// cap?
+	if (EVT_MAX_POINTS(running->event) > 0) {
+		snprintf(capstr, sizeof(capstr), "/%d", EVT_MAX_POINTS(running->event));
+	}
+	else {
+		*capstr = '\0';
+	}
+	
 	if (points > 0) {
-		msg_to_char(ch, "\tyYou gain %d point%s for '%s'! You now have %d point%s.\t0\r\n", points, PLURAL(points), running->event ? EVT_NAME(running->event) : "Unknown Event", ped->points, PLURAL(ped->points));
+		msg_to_char(ch, "\tyYou gain %d point%s for '%s'! You now have %d%s point%s.\t0\r\n", points, PLURAL(points), running->event ? EVT_NAME(running->event) : "Unknown Event", ped->points, capstr, (ped->points != 1 || *capstr) ? "s" : "");
 	}
 	else if (points < 0) {
-		msg_to_char(ch, "\tyYou lose %d point%s for '%s'! You now have %d point%s.\t0\r\n", ABSOLUTE(points), PLURAL(ABSOLUTE(points)), running->event ? EVT_NAME(running->event) : "Unknown Event", ped->points, PLURAL(ped->points));
+		msg_to_char(ch, "\tyYou lose %d point%s for '%s'! You now have %d%s point%s.\t0\r\n", ABSOLUTE(points), PLURAL(ABSOLUTE(points)), running->event ? EVT_NAME(running->event) : "Unknown Event", ped->points, capstr, (ped->points != 1 || *capstr) ? "s" : "");
 	}
 	
 	queue_delayed_update(ch, CDU_SAVE);
@@ -557,6 +569,9 @@ void set_event_points(char_data *ch, any_vnum event_vnum, int points) {
 		ped->level = GET_HIGHEST_KNOWN_LEVEL(ch);
 	}
 	ped->points = points;
+	if (EVT_MAX_POINTS(running->event) > 0 && ped->points > EVT_MAX_POINTS(running->event)) {
+		ped->points = EVT_MAX_POINTS(running->event);
+	}
 	update_player_leaderboard(ch, running, ped);
 }
 
@@ -1443,7 +1458,7 @@ void parse_event_reward(char *line, struct event_reward **list, char *error_str)
 void parse_event(FILE *fl, any_vnum vnum) {
 	char line[256], error[256], str_in[256];
 	event_data *event, *find;
-	int int_in[6];
+	int int_in[7];
 	
 	CREATE(event, event_data, 1);
 	clear_event(event);
@@ -1465,10 +1480,14 @@ void parse_event(FILE *fl, any_vnum vnum) {
 	EVT_COMPLETE_MSG(event) = fread_string(fl, error);
 	EVT_NOTES(event) = fread_string(fl, error);
 	
-	// 5. version type flags min max duration repeats
-	if (!get_line(fl, line) || sscanf(line, "%d %d %s %d %d %d %d", &int_in[0], &int_in[1], str_in, &int_in[2], &int_in[3], &int_in[4], &int_in[5]) != 7) {
-		log("SYSERR: Format error in line 4 of %s", error);
-		exit(1);
+	// 5. version type flags min max duration repeats max-points
+	if (!get_line(fl, line) || sscanf(line, "%d %d %s %d %d %d %d %d", &int_in[0], &int_in[1], str_in, &int_in[2], &int_in[3], &int_in[4], &int_in[5], &int_in[6]) != 8) {
+		// older version:
+		int_in[6] = 0;
+		  if (!get_line(fl, line) || sscanf(line, "%d %d %s %d %d %d %d", &int_in[0], &int_in[1], str_in, &int_in[2], &int_in[3], &int_in[4], &int_in[5]) != 7) {
+			log("SYSERR: Format error in line 4 of %s", error);
+			exit(1);
+		}
 	}
 	
 	EVT_VERSION(event) = int_in[0];
@@ -1478,6 +1497,7 @@ void parse_event(FILE *fl, any_vnum vnum) {
 	EVT_MAX_LEVEL(event) = int_in[3];
 	EVT_DURATION(event) = int_in[4];
 	EVT_REPEATS_AFTER(event) = int_in[5];
+	EVT_MAX_POINTS(event) = int_in[6];
 	
 	// optionals
 	for (;;) {
@@ -1907,8 +1927,8 @@ void write_event_to_file(FILE *fl, event_data *event) {
 	strip_crlf(temp);
 	fprintf(fl, "%s~\n", temp);
 	
-	// 5. version type flags min max duration repeats
-	fprintf(fl, "%d %d %s %d %d %d %d\n", EVT_VERSION(event), EVT_TYPE(event), bitv_to_alpha(EVT_FLAGS(event)), EVT_MIN_LEVEL(event), EVT_MAX_LEVEL(event), EVT_DURATION(event), EVT_REPEATS_AFTER(event));
+	// 5. version type flags min max duration repeats max-points
+	fprintf(fl, "%d %d %s %d %d %d %d %d\n", EVT_VERSION(event), EVT_TYPE(event), bitv_to_alpha(EVT_FLAGS(event)), EVT_MIN_LEVEL(event), EVT_MAX_LEVEL(event), EVT_DURATION(event), EVT_REPEATS_AFTER(event), EVT_MAX_POINTS(event));
 	
 	// R. rank rewards
 	write_event_rewards_to_file(fl, 'R', EVT_RANK_REWARDS(event));
@@ -2317,6 +2337,13 @@ void do_stat_event(char_data *ch, event_data *event) {
 	}
 	size += snprintf(buf + size, sizeof(buf) - size, "Level limits: [\tc%s\t0], Duration: [\tc%d minutes (%d:%02d:%02d)\t0], Repeatable: [\tc%s\t0]\r\n", level_range_string(EVT_MIN_LEVEL(event), EVT_MAX_LEVEL(event), 0), EVT_DURATION(event), (EVT_DURATION(event) / (60 * 24)), ((EVT_DURATION(event) % (60 * 24)) / 60), ((EVT_DURATION(event) % (60 * 24)) % 60), part);
 	
+	if (EVT_MAX_POINTS(event) > 0) {
+		size += snprintf(buf + size, sizeof(buf) - size, "Maximum points: [\tc%d\t0]\r\n", EVT_MAX_POINTS(event));
+	}
+	else {
+		size += snprintf(buf + size, sizeof(buf) - size, "Maximum points: [\tcnone\t0]\r\n");
+	}
+	
 	get_event_reward_display(EVT_RANK_REWARDS(event), part);
 	size += snprintf(buf + size, sizeof(buf) - size, "Rank Rewards:\r\n%s", *part ? part : " none\r\n");
 	
@@ -2373,6 +2400,13 @@ void olc_show_event(char_data *ch) {
 		sprintf(buf + strlen(buf), "<%srepeat\t0> %d minutes (%d:%02d:%02d)\r\n", OLC_LABEL_VAL(EVT_REPEATS_AFTER(event), 0), EVT_REPEATS_AFTER(event), (EVT_REPEATS_AFTER(event) / (60 * 24)), ((EVT_REPEATS_AFTER(event) % (60 * 24)) / 60), ((EVT_REPEATS_AFTER(event) % (60 * 24)) % 60));
 	}
 	
+	if (EVT_MAX_POINTS(event) > 0) {
+		sprintf(buf + strlen(buf), "<%smaxpoints\t0> %d\r\n", OLC_LABEL_CHANGED, EVT_MAX_POINTS(event));
+	}
+	else {
+		sprintf(buf + strlen(buf), "<%smaxpoints\t0> none\r\n", OLC_LABEL_UNCHANGED);
+	}
+	
 	get_event_reward_display(EVT_RANK_REWARDS(event), lbuf);
 	sprintf(buf + strlen(buf), "Rank rewards: <%srank\t0>\r\n%s", OLC_LABEL_PTR(EVT_RANK_REWARDS(event)), lbuf);
 	
@@ -2395,7 +2429,7 @@ void olc_show_event(char_data *ch) {
 void show_event_detail(char_data *ch, event_data *event) {
 	// bool full_access = (GET_ACCESS_LEVEL(ch) >= LVL_CIMPL || IS_GRANTED(ch, GRANT_EVENTS));
 	struct event_running_data *running = find_last_event_by_vnum(EVT_VNUM(event));
-	char vnum[MAX_STRING_LENGTH], part[MAX_STRING_LENGTH];
+	char vnum[MAX_STRING_LENGTH], part[MAX_STRING_LENGTH], point_str[256];
 	struct player_event_data *ped = NULL;
 	int diff, rank = 0;
 	
@@ -2461,16 +2495,25 @@ void show_event_detail(char_data *ch, event_data *event) {
 			// no other status shown
 		}
 		
+		// determine cap and point amount
+		if (EVT_MAX_POINTS(event) > 0) {
+			snprintf(point_str, sizeof(point_str), "/%d points", EVT_MAX_POINTS(event));
+		}
+		else {
+			snprintf(point_str, sizeof(point_str), " point%s", (!ped || ped->points != 1) ? "s" : "");
+		}
+		
+		// show points
 		if (ped) {
 			if (rank > 0) {
-				msg_to_char(ch, "Rank: %d (%d point%s)\r\n", rank, ped->points, PLURAL(ped->points));
+				msg_to_char(ch, "Rank: %d (%d%s)\r\n", rank, ped->points, point_str);
 			}
 			else {
-				msg_to_char(ch, "Rank: unranked (%d point%s)\r\n", ped->points, PLURAL(ped->points));
+				msg_to_char(ch, "Rank: unranked (%d%s)\r\n", ped->points, point_str);
 			}
 		}
 		else {
-			msg_to_char(ch, "Rank: unranked (0 points)\r\n");
+			msg_to_char(ch, "Rank: unranked (0%s)\r\n", point_str);
 		}
 	}
 }
@@ -2615,7 +2658,7 @@ void show_event_rewards(char_data *ch, struct event_running_data *re) {
 void show_events_no_arg(char_data *ch) {
 	struct event_running_data *running, *only;
 	struct player_event_data *ped;
-	char part[MAX_STRING_LENGTH];
+	char part[MAX_STRING_LENGTH], point_str[256];
 	int count, rank, when;
 	
 	// fetch count and optional only-running-event
@@ -2653,13 +2696,21 @@ void show_events_no_arg(char_data *ch) {
 			msg_to_char(ch, " %s%s", EVT_NAME(running->event), part);
 			
 			if ((ped = get_event_data(ch, running->id))) {
+				// determine cap and point amount
+				if (EVT_MAX_POINTS(running->event) > 0) {
+					snprintf(point_str, sizeof(point_str), "/%d points", EVT_MAX_POINTS(running->event));
+				}
+				else {
+					snprintf(point_str, sizeof(point_str), " point%s", PLURAL(ped->points));
+				}
+				
 				if ((rank = get_event_rank(ch, running)) > 0) {
 					sprintf(part, "rank %d", rank);
 				}
 				else {
 					strcpy(part, "unranked");
 				}
-				msg_to_char(ch, " (%d point%s, %s)", ped->points, PLURAL(ped->points), part);
+				msg_to_char(ch, " (%d%s, %s)", ped->points, point_str, part);
 			}
 			
 			when = running->start_time + (EVT_DURATION(running->event) * SECS_PER_REAL_MIN) - time(0);
@@ -2761,13 +2812,37 @@ OLC_MODULE(evedit_name) {
 
 OLC_MODULE(evedit_maxlevel) {
 	event_data *event = GET_OLC_EVENT(ch->desc);
-	EVT_MAX_LEVEL(event) = olc_process_number(ch, argument, "maximum level", "maxlevel", 0, MAX_INT, EVT_MAX_LEVEL(event));
+	if (!str_cmp(argument, "none")) {
+		EVT_MAX_LEVEL(event) = 0;
+		msg_to_char(ch, "It no longer has a maximum level.\r\n");
+	}
+	else {
+		EVT_MAX_LEVEL(event) = olc_process_number(ch, argument, "maximum level", "maxlevel", 0, MAX_INT, EVT_MAX_LEVEL(event));
+	}
+}
+
+
+OLC_MODULE(evedit_maxpoints) {
+	event_data *event = GET_OLC_EVENT(ch->desc);
+	if (!str_cmp(argument, "none")) {
+		EVT_MAX_POINTS(event) = 0;
+		msg_to_char(ch, "It no longer has a maximum number of points.\r\n");
+	}
+	else {
+		EVT_MAX_POINTS(event) = olc_process_number(ch, argument, "maximum points", "maxpoints", 0, MAX_INT, EVT_MAX_POINTS(event));
+	}
 }
 
 
 OLC_MODULE(evedit_minlevel) {
 	event_data *event = GET_OLC_EVENT(ch->desc);
-	EVT_MIN_LEVEL(event) = olc_process_number(ch, argument, "minimum level", "minlevel", 0, MAX_INT, EVT_MIN_LEVEL(event));
+	if (!str_cmp(argument, "none")) {
+		EVT_MIN_LEVEL(event) = 0;
+		msg_to_char(ch, "It no longer has a minimum level.\r\n");
+	}
+	else {
+		EVT_MIN_LEVEL(event) = olc_process_number(ch, argument, "minimum level", "minlevel", 0, MAX_INT, EVT_MIN_LEVEL(event));
+	}
 }
 
 

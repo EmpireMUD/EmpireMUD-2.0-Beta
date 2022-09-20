@@ -644,6 +644,7 @@ int GET_MAX_BLOOD(char_data *ch);	// this one is different than the other max po
 #define EVT_DURATION(evt)  ((evt)->duration)
 #define EVT_FLAGS(evt)  ((evt)->flags)
 #define EVT_MAX_LEVEL(evt)  ((evt)->max_level)
+#define EVT_MAX_POINTS(evt)  ((evt)->max_points)
 #define EVT_MIN_LEVEL(evt)  ((evt)->min_level)
 #define EVT_NAME(evt)  ((evt)->name)
 #define EVT_NOTES(evt)  ((evt)->notes)

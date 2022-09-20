@@ -201,6 +201,7 @@ OLC_MODULE(evedit_duration);
 OLC_MODULE(evedit_flags);
 OLC_MODULE(evedit_name);
 OLC_MODULE(evedit_maxlevel);
+OLC_MODULE(evedit_maxpoints);
 OLC_MODULE(evedit_minlevel);
 OLC_MODULE(evedit_notes);
 OLC_MODULE(evedit_rankrewards);
@@ -691,6 +692,7 @@ const struct olc_command_data olc_data[] = {
 	{ "flags", evedit_flags, OLC_EVENT, OLC_CF_EDITOR },
 	{ "name", evedit_name, OLC_EVENT, OLC_CF_EDITOR },
 	{ "maxlevel", evedit_maxlevel, OLC_EVENT, OLC_CF_EDITOR },
+	{ "maxpoints", evedit_maxpoints, OLC_EVENT, OLC_CF_EDITOR },
 	{ "minlevel", evedit_minlevel, OLC_EVENT, OLC_CF_EDITOR },
 	{ "notes", evedit_notes, OLC_EVENT, OLC_CF_EDITOR },
 	{ "ranks", evedit_rankrewards, OLC_EVENT, OLC_CF_EDITOR },
