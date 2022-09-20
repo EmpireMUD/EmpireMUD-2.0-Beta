@@ -1308,6 +1308,7 @@ cages~
 The cages are made of iron bars, most bent out of shape from years of abuse.
 ~
 T 11921
+T 11936
 S
 #11916
 A Narrow Passageway~
@@ -1380,6 +1381,7 @@ be oak, though they're rough and unfinished.
 ~
 M 1 11922 100.00 4
 T 11917
+T 11825
 S
 #11918
 The Pixy Races~
@@ -1769,6 +1771,7 @@ portrait reads:
                  +-------------------------------------+
 ~
 M 1 11831 100.00 5
+T 11825
 S
 #11923
 A Small Bedroom~
@@ -5163,7 +5166,7 @@ wooden timbers~
 remains of a rock arch.
 ~
 E
-gates~
+gates west~
    The tremendous gate is made of solid wood. It's difficult to tell how strong
 it is while it's closed, but it looks like it can withstand a serious assault.
 The gate is painted white, with hundreds of stylized green faces on it.
@@ -5194,12 +5197,17 @@ ocean down out sea horizon~
 It stretches out as far as the eye can see from here, meeting the sky at every
 horizon.
 ~
+E
+up~
+The steps lead up toward the gobbrabakh.
+~
 M 0 11973 100.00 1
 M 0 11988 100.00 1
 M 0 11947 100.00 1
 T 11945
 T 11946
 T 11976
+T 11936
 S
 #11990
 The Stone Cauldrons~

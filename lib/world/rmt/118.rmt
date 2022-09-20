@@ -1195,6 +1195,7 @@ floors~
 The dirty floor is made from large slabs of flagstone.
 ~
 T 11921
+T 11936
 S
 #11816
 A Narrow Passageway~
@@ -1266,6 +1267,7 @@ spirals up the tower's central chamber. The hefty beams supporting it appear to
 be oak, though they're rough and unfinished.
 ~
 M 1 11922 100.00 4
+T 11825
 S
 #11818
 A Most Peculiar Maze~
@@ -1599,6 +1601,7 @@ his portrait reads:
                  +-------------------------------------+
 ~
 M 1 11831 100.00 5
+T 11825
 S
 #11823
 A Most Peculiar Maze~
@@ -2470,7 +2473,8 @@ stations, crystals on the old desk, crystals hanging from the ceiling...
 ~
 E
 windows north~
-A pair of large windows light the room.
+   Light fills the room from a pair of large windows, one of which is broken
+and missing many of its glass panes.
 ~
 E
 desk chair antique~
@@ -2729,6 +2733,7 @@ east doorway~
 The east doorway leads back to the main lab.
 ~
 M 1 11833 100.00 1
+T 11936
 S
 #11860
 The Upper Walkway of the Tower Skycleave~
