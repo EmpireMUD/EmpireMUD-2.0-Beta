@@ -1484,7 +1484,7 @@ void parse_event(FILE *fl, any_vnum vnum) {
 	if (!get_line(fl, line) || sscanf(line, "%d %d %s %d %d %d %d %d", &int_in[0], &int_in[1], str_in, &int_in[2], &int_in[3], &int_in[4], &int_in[5], &int_in[6]) != 8) {
 		// older version:
 		int_in[6] = 0;
-		  if (!get_line(fl, line) || sscanf(line, "%d %d %s %d %d %d %d", &int_in[0], &int_in[1], str_in, &int_in[2], &int_in[3], &int_in[4], &int_in[5]) != 7) {
+		  if (sscanf(line, "%d %d %s %d %d %d %d", &int_in[0], &int_in[1], str_in, &int_in[2], &int_in[3], &int_in[4], &int_in[5]) != 7) {
 			log("SYSERR: Format error in line 4 of %s", error);
 			exit(1);
 		}
