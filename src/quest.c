@@ -3388,6 +3388,11 @@ bool audit_quest(quest_data *quest, char_data *ch) {
 		}
 	}
 	
+	if (!QUEST_TASKS(quest)) {
+		olc_audit_msg(ch, QUEST_VNUM(quest), "No tasks");
+		problem = TRUE;
+	}
+	
 	// QR_x: audit rewards
 	LL_FOREACH(QUEST_REWARDS(quest), rew) {
 		switch (rew->type) {
