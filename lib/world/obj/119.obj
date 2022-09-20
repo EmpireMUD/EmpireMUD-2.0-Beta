@@ -434,6 +434,7 @@ pattern magitanium skycleaver greaves tank leg~
 the magitanium skycleaver greaves tank leg pattern~
 The magitanium skycleaver greaves pattern is on the ground.~
 This pattern will teach you to forge: magitanium skycleaver greaves.
+These are a tank item worn on the legs.
 ~
 7 0 a 0 2
 11840 0 0
@@ -444,6 +445,7 @@ pattern shadowhide skycleaver trousers melee leg~
 the shadowhide skycleaver trousers melee leg pattern~
 The shadowhide skycleaver trousers pattern is on the ground.~
 This pattern will teach you to sew: shadowhide skycleaver trousers.
+These are a melee item worn on the legs.
 ~
 7 0 a 0 2
 11841 0 0
@@ -454,6 +456,7 @@ pattern thundersilk skycleaver leggings caster~
 the thundersilk skycleaver leggings caster leg pattern~
 The thundersilk skycleaver leggings pattern is on the ground.~
 This pattern will teach you to sew: thundersilk skycleaver leggings.
+These are a caster item worn on the legs.
 ~
 7 0 a 0 2
 11842 0 0
@@ -464,6 +467,7 @@ pattern soulcloth skycleaver skirt healer leg~
 the soulcloth skycleaver skirt healer leg pattern~
 The soulcloth skycleaver skirt pattern is on the ground.~
 This pattern will teach you to sew: soulcloth skycleaver skirt.
+This is a healer item worn on the legs.
 ~
 7 0 a 0 3
 11843 0 0
@@ -474,6 +478,7 @@ pattern moxteel skycleaver shinguards pvp solo leg~
 the moxteel skycleaver shinguards pvp/solo leg pattern~
 The moxteel skycleaver shinguards pattern is on the ground.~
 This pattern will teach you to forge: moxteel skycleaver shinguards.
+These are a pvp/solo item worn on the legs.
 ~
 7 0 a 0 2
 11844 0 0
@@ -484,6 +489,7 @@ pattern magitanium skycleaver girdle tank waist~
 the magitanium skycleaver girdle tank waist pattern~
 The magitanium skycleaver girdle pattern is on the ground.~
 This pattern will teach you to forge: magitanium skycleaver girdle.
+This is a tank item worn on the waist.
 ~
 7 0 a 0 2
 11845 0 0
@@ -494,6 +500,7 @@ pattern shadowhide skycleaver strap melee waist~
 the shadowhide skycleaver strap melee waist pattern~
 The shadowhide skycleaver strap pattern is on the ground.~
 This pattern will teach you to sew: shadowhide skycleaver strap.
+This is a melee item worn on the waist.
 ~
 7 0 a 0 2
 11846 0 0
@@ -504,6 +511,7 @@ pattern thundersilk skycleaver cincture caster waist~
 the thundersilk skycleaver cincture caster waist pattern~
 The thundersilk skycleaver cincture pattern is on the ground.~
 This pattern will teach you to sew: thundersilk skycleaver cincture.
+This is a caster item worn on the waist.
 ~
 7 0 a 0 2
 11847 0 0
@@ -514,6 +522,7 @@ pattern soulcloth skycleaver sash healer waist~
 the soulcloth skycleaver sash healer waist pattern~
 The soulcloth skycleaver sash pattern is on the ground.~
 This pattern will teach you to sew: soulcloth skycleaver sash.
+This is a healer item worn on the waist.
 ~
 7 0 a 0 2
 11848 0 0
@@ -524,6 +533,7 @@ pattern moxteel skycleaver belt pvp solo waist~
 the moxteel skycleaver belt pvp/solo waist pattern~
 The moxteel skycleaver belt pattern is on the ground.~
 This pattern will teach you to forge: moxteel skycleaver belt.
+This is a pvp/solo item worn on the waist.
 ~
 7 0 a 0 2
 11849 0 0
@@ -534,6 +544,7 @@ pattern magitanium skycleaver wristguard tank wrist~
 the magitanium skycleaver wristguard tank wrist pattern~
 The magitanium skycleaver wristguard pattern is on the ground.~
 This pattern will teach you to forge: magitanium skycleaver wristguard.
+This is a tank item worn on the wrist.
 ~
 7 0 a 0 2
 11850 0 0
@@ -544,6 +555,7 @@ pattern shadowhide skycleaver cuffs melee wrist~
 the shadowhide skycleaver cuffs melee wrist pattern~
 The shadowhide skycleaver cuffs pattern is on the ground.~
 This pattern will teach you to sew: shadowhide skycleaver cuffs.
+These are a melee item worn on the wrist.
 ~
 7 0 a 0 2
 11851 0 0
@@ -554,6 +566,7 @@ pattern thundersilk skycleaver wristband caster wrist~
 the thundersilk skycleaver wristband caster wrist pattern~
 The thundersilk skycleaver wristband pattern is on the ground.~
 This pattern will teach you to sew: thundersilk skycleaver wristband.
+This is a caster item worn on the wrist.
 ~
 7 0 a 0 2
 11852 0 0
@@ -564,6 +577,7 @@ pattern soulcloth skycleaver bracelet healer wrist~
 the soulcloth skycleaver bracelet healer wrist pattern~
 The soulcloth skycleaver bracelet pattern is on the ground.~
 This pattern will teach you to sew: soulcloth skycleaver bracelet.
+This is a healer item worn on the wrist.
 ~
 7 0 a 0 2
 11853 0 0
@@ -574,6 +588,7 @@ pattern moxteel skycleaver wristcuff pvp solo wrist~
 the moxteel skycleaver wristcuff pvp/solo wrist pattern~
 The moxteel skycleaver wristcuff pattern is on the ground.~
 This pattern will teach you to forge: moxteel skycleaver wristcuff.
+This is a pvp/solo item worn on the wrist.
 ~
 7 0 a 0 2
 11854 0 0
@@ -584,6 +599,7 @@ design magitanium skycleaver studs tank ear~
 the magitanium skycleaver studs tank ear design~
 The magitanium skycleaver studs design is on the ground.~
 This design will teach you to forge: magitanium skycleaver studs.
+These are a tank item worn on the ears.
 ~
 7 0 a 0 3
 11855 0 0
@@ -594,6 +610,7 @@ design shadowhide skycleaver earrings melee~
 the shadowhide skycleaver earrings melee ear design~
 The shadowhide skycleaver earrings design is on the ground.~
 This design will teach you to forge: shadowhide skycleaver earrings.
+These are a melee item worn on the ears.
 ~
 7 0 a 0 2
 11856 0 0
@@ -604,6 +621,7 @@ design thundersilk skycleaver earrings caster~
 the thundersilk skycleaver earrings caster ear design~
 The thundersilk skycleaver earrings design is on the ground.~
 This design will teach you to forge: thundersilk skycleaver earrings.
+These are a caster item worn on the ears.
 ~
 7 0 a 0 2
 11857 0 0
@@ -614,6 +632,7 @@ design soulcloth skycleaver earrings healer~
 the soulcloth skycleaver earrings healer ear design~
 The soulcloth skycleaver earrings design is on the ground.~
 This design will teach you to forge: soulcloth skycleaver earrings.
+These are a healer item worn on the ears.
 ~
 7 0 a 0 2
 11858 0 0
@@ -624,6 +643,7 @@ design moxteel skycleaver earrings pvp solo ear~
 the moxteel skycleaver earrings pvp/solo ear design~
 The moxteel skycleaver earrings design is on the ground.~
 This design will teach you to forge: moxteel skycleaver earrings.
+These are a pvp/solo item worn on the ears.
 ~
 7 0 a 0 2
 11859 0 0
