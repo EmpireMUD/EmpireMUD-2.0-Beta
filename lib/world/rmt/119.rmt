@@ -1362,7 +1362,11 @@ The long passageway continues to the southeast.
 ~
 E
 northwest nw~
-It looks like the exit to the secret passage is in the northwest wall.
+   It looks like the exit to the secret passage is in the northwest wall. A
+small note on the wall reads:
+
+                             Secret Pass Phrase
+                                'O ala lilo'
 ~
 E
 cobwebs dust~
@@ -1734,6 +1738,7 @@ older versions of the tower. Beneath his painting, the nameplate reads:
                  |       Grand High Sorcerer Wong       |
                  |    Great Builder, Passed Naturally   |
                  |  Thirteenth Master, Tower Skycleave  |
+                 |             'O ala lilo'             |
                  +--------------------------------------+
 ~
 E
