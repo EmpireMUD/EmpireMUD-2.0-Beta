@@ -1207,6 +1207,26 @@ switch %self.vnum%
 done
 detach 11824 %self.id%
 ~
+#11825
+Skycleave: Say 'Ala lilo' to open the secret passage from either side~
+2 d 0
+ala lilo~
+* works from: 11817, 11822, 11917, 11922
+* Check if it's already open
+if (%room.template% == 11817 || %room.template% == 11917) && %room.northwest(room)%
+  * already open
+  detach 11825 %self.id%
+  halt
+elseif (%room.template% == 11822 || %room.template% == 11922) && %room.southeast(room)%
+  * already open
+  detach 11825 %self.id%
+  halt
+end
+* trigger opening
+wait 1
+%load% mob 11924
+detach 11825 %self.id%
+~
 #11826
 Skycleave: Pixy Maze track dummy~
 2 c 0
@@ -1266,9 +1286,18 @@ if %vnum%
   %load% mob %vnum%
   set mob %room.people%
   if %mob.vnum% == %vnum%
-    %echo% ~%mob% walks in from the foyer.
-    makeuid foyer room i11800
-    %at% %foyer% %echo% ~%mob% walks through the foyer and into the tower.
+    if %mob.vnum% == 11801
+      * special handling for dylane: spawns on silent mode
+      dg_affect #11832 %mob% !SEE on -1
+      dg_affect #11832 %mob% !TARGET on -1
+      dg_affect #11832 %mob% SNEAK on -1
+      nop %mob.add_mob_flag(SILENT)%
+    else
+      * all other mobs
+      %echo% ~%mob% walks in from the foyer.
+      makeuid foyer room i11800
+      %at% %foyer% %echo% ~%mob% walks through the foyer and into the tower.
+    end
   end
 end
 * and detach if the list is empty
@@ -1499,8 +1528,17 @@ elseif %room.template% == 11832 || %room.template% == 11833
   end
 elseif %room.template% == 11836
   %echo% The otherworlder barrels through, flailing ^%self% arms wildly, and jumps out the window!
+  wait 0
   %echo% The otherworlder shouts, 'Bok jel thet far mesh bek tol cha... Shaw!
   %echo% You watch out the window as the otherworlder is enveloped in shimmering blue light and vanishes in midair!
+  wait 0
+  set ch %room.people%
+  while %ch%
+    if %ch.is_pc% && %ch.leader% == %self%
+      %send% %ch% You are struck with vertigo as you stop short of the window and think better of following the otherworlder out.
+    end
+    set ch %ch.next_in_room%
+  done
   %purge% %self%
 else
   * unknown location somehow? Oh well, we tried
@@ -3066,8 +3104,8 @@ end
 Skycleave: Barrosh post-fight cutscene~
 0 n 100
 ~
-wait 0 sec
-%echo% Time moves backwards for a second as High Sorcerer Barrosh composes himself and holds his staff to the sky...
+wait 0
+%echo% Time moves backwards for a second as High Sorcerer Barrosh composes himself and holds his staff to the sky, dropping some things in the process...
 wait 9 sec
 say For the honor of Skycleave!
 wait 4 sec
