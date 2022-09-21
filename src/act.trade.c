@@ -1774,7 +1774,7 @@ void do_gen_craft_vehicle(char_data *ch, craft_data *type, int dir) {
 ACMD(do_gen_craft) {
 	char short_arg[MAX_INPUT_LENGTH], last_arg[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH * 2], line[256];
 	int count, timer, num = 1, dir = NO_DIR;
-	craft_data *craft, *next_craft, *type = NULL, *find_type = NULL, *abbrev_match = NULL;
+	craft_data *craft, *next_craft, *type = NULL, *find_type = NULL, *abbrev_match = NULL, *multi_match = NULL;
 	vehicle_data *veh;
 	bool is_master, list_only = FALSE;
 	obj_data *found_obj = NULL, *drinkcon = NULL;
@@ -1885,11 +1885,21 @@ ACMD(do_gen_craft) {
 				// found! maybe
 				abbrev_match = craft;
 			}
+			else if (!multi_match && (multi_isname(arg, GET_CRAFT_NAME(craft)) || (*short_arg && multi_isname(short_arg, GET_CRAFT_NAME(craft))))) {
+				// do this last because it records if they are just missing an ability
+				if (GET_CRAFT_ABILITY(craft) != NO_ABIL && !has_ability(ch, GET_CRAFT_ABILITY(craft))) {
+					missing_abil = GET_CRAFT_ABILITY(craft);
+					continue;	// missing ability
+				}
+				
+				// found! maybe
+				multi_match = craft;
+			}
 		}
 		
-		// maybe we didn't find an exact match, but did find an abbrev match
+		// maybe we didn't find an exact match, but did find an abbrev/multi match
 		if (!type) {
-			type = abbrev_match;
+			type = abbrev_match ? abbrev_match : multi_match;	// if any
 		}
 	}	// end arg-processing
 	
