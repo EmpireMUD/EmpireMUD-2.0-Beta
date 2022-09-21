@@ -6379,7 +6379,7 @@ void do_stat_global(char_data *ch, struct global_data *glb) {
 /* Gives detailed information on an object (j) to ch */
 void do_stat_object(char_data *ch, obj_data *j) {
 	char buf[MAX_STRING_LENGTH], part[MAX_STRING_LENGTH];
-	int found;
+	int found, minutes;
 	struct obj_apply *apply;
 	room_data *room;
 	obj_vnum vnum = GET_OBJ_VNUM(j);
@@ -6432,7 +6432,15 @@ void do_stat_object(char_data *ch, obj_data *j) {
 	prettier_sprintbit(GET_OBJ_TOOL_FLAGS(j), tool_flags, buf);
 	msg_to_char(ch, "Tool types: &y%s&0\r\n", buf);
 	
-	msg_to_char(ch, "Timer: &y%d&0, Material: &y%s&0, Component type: [&y%d&0] &y%s&0\r\n", GET_OBJ_TIMER(j), materials[GET_OBJ_MATERIAL(j)].name, GET_OBJ_COMPONENT(j), GET_OBJ_COMPONENT(j) != NOTHING ? get_generic_name_by_vnum(GET_OBJ_COMPONENT(j)) : "none");
+	if (GET_OBJ_TIMER(j) > 0) {
+		minutes = GET_OBJ_TIMER(j) * SECS_PER_MUD_HOUR / SECS_PER_REAL_MIN;
+		snprintf(part, sizeof(part), "%d ticks (%d:%02d)", GET_OBJ_TIMER(j), minutes / 60, minutes % 60);
+	}
+	else {
+		strcpy(part, "none");
+	}
+	
+	msg_to_char(ch, "Timer: &y%s&0, Material: &y%s&0, Component type: [&y%d&0] &y%s&0\r\n", part, materials[GET_OBJ_MATERIAL(j)].name, GET_OBJ_COMPONENT(j), GET_OBJ_COMPONENT(j) != NOTHING ? get_generic_name_by_vnum(GET_OBJ_COMPONENT(j)) : "none");
 	
 	if (GET_OBJ_REQUIRES_QUEST(j) != NOTHING) {
 		msg_to_char(ch, "Requires quest: [%d] &c%s&0\r\n", GET_OBJ_REQUIRES_QUEST(j), get_quest_name_by_proto(GET_OBJ_REQUIRES_QUEST(j)));
