@@ -138,9 +138,9 @@ the Great Hall, for guard towers, and for some other game rules.
 
 EmpireMUD periodically checks if cities are completely empty and, if so,
 will remove the city center and refund the city point. This helps keep the map
-clean, and you can prevent it by making sure there is at least one building in
-your city. You will also start to lose cities after 1 week if your empire
-shrinks and you no longer have enough city points available.
+clean, and you can prevent it by making sure there is at least one claimed
+building in your city. You will also start to lose cities after 1 week if your
+empire shrinks and you no longer have enough city points available.
 
 See also: CITY COMMANDS, CITY TRAITS, CITY TYPES, TECHNOLOGY, TERRITORY,
   WEALTH
