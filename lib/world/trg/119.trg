@@ -4131,7 +4131,7 @@ elseif %room.people%
   end
   switch %random.6%
     case 1
-      %echo% A horse made of crystal-clear water leaps up from the hendecagon fountain and then splashes back down and vanishes into the water.
+      %echo% A horse made of crystal clear water leaps up from the hendecagon fountain and then splashes back down and vanishes into the water.
     break
     case 2
       %echo% A pair of lions made from pure water leap up from the hendecagon fountain, chase each other, then vanish back into the water.
@@ -4143,7 +4143,7 @@ elseif %room.people%
       %echo% The hendecagon fountain releases a cloud of bubbles into the air. You watch as they float away on the wind.
     break
     case 5
-      %echo% You watch little waves chase eachother playfully in the hendecagon fountain.
+      %echo% You watch little waves chase each other playfully in the hendecagon fountain.
     break
     case 6
       %echo% The water dances and twirls across the surface of the hendecagon fountain.
