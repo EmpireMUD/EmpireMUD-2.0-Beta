@@ -1411,7 +1411,8 @@ See also: WORKFORCE
 "WORKFORCE CHORES" "WORKFORCE TYPES"
 
 Workforce types:
-  &yabandon-chopped:&0 NPCs will abandon a tile when they finish chopping.
+  &yabandon-chopped:&0 NPCs will abandon a tile when they finish chopping it,
+     or after burning it if burn-stumps is also on.
   &yabandon-dismantled:&0 NPCs will abandon a tile when they finish dismantling.
   &yabandon-farmed:&0 NPCs will abandon a tile when they finish farming.
   &ybuilding:&0 NPCs will build any building that has been started, or dismantle
