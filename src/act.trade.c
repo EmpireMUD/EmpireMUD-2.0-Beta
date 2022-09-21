@@ -1310,13 +1310,13 @@ void process_gen_craft(char_data *ch) {
 //// REFORGE / REFASHION /////////////////////////////////////////////////////
 
 const struct {
-	char *command;
+	char *command, *command_3rd;
 	any_vnum ability;	// required ability
 	bool (*validate_func)(char_data *ch);	// e.g. can_forge, func that returns TRUE if ok -- must send own errors if FALSE
 	int types[4];	// NOTHING-terminated list of valid obj types
 } reforge_data[] = {
-	{ "reforge", ABIL_REFORGE, can_forge, { ITEM_WEAPON, ITEM_MISSILE_WEAPON, NOTHING } },	// SCMD_REFORGE
-	{ "refashion", ABIL_REFASHION, can_refashion, { ITEM_ARMOR, ITEM_SHIELD, ITEM_WORN, NOTHING } }	// SCMD_REFASHION
+	{ "reforge", "reforges", ABIL_REFORGE, can_forge, { ITEM_WEAPON, ITEM_MISSILE_WEAPON, NOTHING } },	// SCMD_REFORGE
+	{ "refashion", "refashions", ABIL_REFASHION, can_refashion, { ITEM_ARMOR, ITEM_SHIELD, ITEM_WORN, NOTHING } }	// SCMD_REFASHION
 };
 
 
@@ -2543,7 +2543,7 @@ ACMD(do_reforge) {
 			sprintf(buf, "You %s $p%s!", reforge_data[subcmd].command, shared_by(obj, ch));
 			act(buf, FALSE, ch, obj, obj->worn_by, TO_CHAR);
 			
-			sprintf(buf, "$n %s $p%s!", reforge_data[subcmd].command, shared_by(obj, ch));
+			sprintf(buf, "$n %ss $p%s!", reforge_data[subcmd].command_3rd, shared_by(obj, ch));
 			act(buf, TRUE, ch, obj, obj->worn_by, TO_ROOM);
 			
 			if (reforge_data[subcmd].ability != NO_ABIL) {
@@ -2622,7 +2622,7 @@ ACMD(do_reforge) {
 			sprintf(buf, "You %s $p%s into a masterwork!", reforge_data[subcmd].command, shared_by(obj, ch));
 			act(buf, FALSE, ch, obj, obj->worn_by, TO_CHAR);
 			
-			sprintf(buf, "$n %s $p%s into a masterwork!", reforge_data[subcmd].command, shared_by(obj, ch));
+			sprintf(buf, "$n %s $p%s into a masterwork!", reforge_data[subcmd].command_3rd, shared_by(obj, ch));
 			act(buf, TRUE, ch, obj, obj->worn_by, TO_ROOM);
 
 			if (reforge_data[subcmd].ability != NOTHING) {
