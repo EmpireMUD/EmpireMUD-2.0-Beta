@@ -34,7 +34,8 @@ return 0 to prevent trying to extract the item afterwards.
 
 Variables:
   &c%actor%&0 - The character attempting to consume the object.
-  &c%target%&0 - The target of the consumption (poison/shoot only).
+  &c%target%&0 - The target of the consumption (poison/shoot only; the target
+     may also be missing if they died).
   &c%self%&0 - The object being consumed.
   &c%command%&0 - Which consume command was used (e.g. drink).
 #d
