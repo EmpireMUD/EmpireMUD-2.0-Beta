@@ -269,6 +269,7 @@ bool find_and_bind(char_data *ch, obj_vnum vnum) {
 craft_data *find_best_craft_by_name(char_data *ch, char *argument, int craft_type) {
 	craft_data *unknown_abbrev = NULL;
 	craft_data *known_abbrev = NULL;
+	craft_data *known_multi = NULL, *unknown_multi = NULL;
 	craft_data *craft, *next_craft;
 	
 	skip_spaces(&argument);
@@ -309,10 +310,31 @@ craft_data *find_best_craft_by_name(char_data *ch, char *argument, int craft_typ
 				known_abbrev = craft;
 			}
 		}
+		else if (!known_multi && multi_isname(argument, GET_CRAFT_NAME(craft))) {
+			if (IS_SET(GET_CRAFT_FLAGS(craft), CRAFT_IN_DEVELOPMENT)) {
+				// only imms hit this block
+				if (!unknown_multi) {
+					unknown_multi = craft;
+				}
+			}
+			else if (GET_CRAFT_ABILITY(craft) != NO_ABIL && !has_ability(ch, GET_CRAFT_ABILITY(craft))) {
+				if (!unknown_multi) {	// player missing ability
+					unknown_multi = craft;
+				}
+			}
+			else if (IS_SET(GET_CRAFT_FLAGS(craft), CRAFT_LEARNED) && !has_learned_craft(ch, GET_CRAFT_VNUM(craft))) {
+				if (!unknown_multi) {	// player missing 'learned'
+					unknown_multi = craft;
+				}
+			}
+			else {	// they should have access to it
+				known_multi = craft;
+			}
+		}
 	}
 	
 	// if we got this far, it didn't return an exact match
-	return known_abbrev ? known_abbrev : unknown_abbrev;
+	return known_abbrev ? known_abbrev : (known_multi ? known_multi : (unknown_abbrev ? unknown_abbrev : unknown_multi));
 }
 
 
