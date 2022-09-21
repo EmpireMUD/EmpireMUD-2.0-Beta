@@ -644,7 +644,9 @@ resources will return each year. However, mountains will ONLY replenish ore if
 you dismantle the mines on them completely before the end of the year.
 
 Forests will spread at their edges over time, creating more trees to chop.
-Desert Groves re-grow on their own, at random.
+Desert Groves grow out of desert tiles at random. If you leave stumps behind
+instead of burning them, they will regrow into copses with saplings. Over time,
+the copses will grow into full forests or groves.
 
 Some vehicles and buildings have their own depletions, separate from the
 location they are in.
