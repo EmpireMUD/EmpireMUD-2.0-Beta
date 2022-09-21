@@ -254,14 +254,15 @@ void smart_copy_event_rewards(struct event_reward **to_list, struct event_reward
 *
 * @param char *name The string (name/vnum) to look for.
 * @param bool running_only If TRUE, skips events that aren't running.
+* @param bool allow_in_dev If TRUE, will return in-dev adventures, too.
 * @return event_data* The event prototype found, if any.
 */
-event_data *smart_find_event(char *name, bool running_only) {
+event_data *smart_find_event(char *name, bool running_only, bool allow_in_dev) {
 	event_data *iter, *next_iter, *partial = NULL;
 	any_vnum find_vnum = (isdigit(*name) ? atoi(name) : NOTHING);
 	
 	HASH_ITER(hh, event_table, iter, next_iter) {
-		if (EVT_FLAGGED(iter, EVTF_IN_DEVELOPMENT)) {
+		if (!allow_in_dev && EVT_FLAGGED(iter, EVTF_IN_DEVELOPMENT)) {
 			continue;	// skip in-dev
 		}
 		if (running_only && !find_running_event_by_vnum(EVT_VNUM(iter))) {
@@ -2945,7 +2946,7 @@ ACMD(do_events) {
 	}
 	
 	// are they looking up an event instead?
-	if (*arg && type == NOTHING && (event = smart_find_event(argument, FALSE))) {
+	if (*arg && type == NOTHING && (event = smart_find_event(argument, FALSE, FALSE))) {
 		show_event_detail(ch, event);
 		return;
 	}
@@ -2980,7 +2981,7 @@ EVENT_CMD(evcmd_cancel) {
 	else if (is_number(argument) && !(re = find_running_event_by_id(atoi(argument)))) {
 		msg_to_char(ch, "Unknown event id '%s'.\r\n", argument);
 	}
-	else if (!re && !(event = smart_find_event(argument, TRUE))) {
+	else if (!re && !(event = smart_find_event(argument, TRUE, FALSE))) {
 		msg_to_char(ch, "Unable to find a running event called '%s'.\r\n", argument);
 	}
 	else {
@@ -3124,7 +3125,7 @@ EVENT_CMD(evcmd_end) {
 	else if (is_number(argument) && !(re = find_running_event_by_id(atoi(argument)))) {
 		msg_to_char(ch, "Unknown event id '%s'.\r\n", argument);
 	}
-	else if (!re && !(event = smart_find_event(argument, TRUE))) {
+	else if (!re && !(event = smart_find_event(argument, TRUE, FALSE))) {
 		msg_to_char(ch, "Unable to find a running event called '%s'.\r\n", argument);
 	}
 	else {
@@ -3171,7 +3172,7 @@ EVENT_CMD(evcmd_leaderboard) {
 		event = re->event;
 		// this is a valid case; all other targeting below happens otherwise:
 	}
-	else if (!(event = smart_find_event(argument, FALSE))) {
+	else if (!(event = smart_find_event(argument, FALSE, FALSE))) {
 		msg_to_char(ch, "Unknown event '%s'.\r\n", argument);
 		return;
 	}
@@ -3286,7 +3287,7 @@ EVENT_CMD(evcmd_rewards) {
 		event = re->event;
 		// this is a valid case; all other targeting below happens otherwise:
 	}
-	else if (!(event = smart_find_event(argument, FALSE))) {
+	else if (!(event = smart_find_event(argument, FALSE, FALSE))) {
 		msg_to_char(ch, "Unknown event '%s'.\r\n", argument);
 		return;
 	}
@@ -3307,7 +3308,7 @@ EVENT_CMD(evcmd_start) {
 	if (!*argument) {
 		msg_to_char(ch, "Start what event?\r\n");
 	}
-	else if (!(event = smart_find_event(argument, FALSE))) {
+	else if (!(event = smart_find_event(argument, FALSE, TRUE))) {
 		msg_to_char(ch, "Unknown event '%s'.\r\n", argument);
 	}
 	else if (find_running_event_by_vnum(EVT_VNUM(event))) {
