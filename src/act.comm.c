@@ -1190,6 +1190,7 @@ ACMD(do_slash_channel) {
 	struct channel_history_data *hist;
 	struct player_slash_channel *slash;
 	char arg2[MAX_INPUT_LENGTH], arg3[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH];
+	char message[MAX_INPUT_LENGTH];
 	player_index_data *index;
 	descriptor_data *desc;
 	char_data *vict;
@@ -1397,7 +1398,10 @@ ACMD(do_slash_channel) {
 				else {
 					*buf = '\0';
 				}
-				msg_to_char(ch, "%3s%s: %s%s", simple_time_since(hist->timestamp), buf, hist->message, (hist->message[strlen(hist->message) - 1] != '\n') ? "\r\n" : "");
+				strncpy(message, hist->message, MAX_INPUT_LENGTH-1);
+				message[MAX_INPUT_LENGTH-1] = '\0';
+				delete_doubledollar(message);
+				msg_to_char(ch, "%3s%s: %s%s", simple_time_since(hist->timestamp), buf, message, (message[strlen(message) - 1] != '\n') ? "\r\n" : "");
 			}
 		}
 	}
