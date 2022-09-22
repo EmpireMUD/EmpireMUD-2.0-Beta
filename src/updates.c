@@ -2079,17 +2079,6 @@ void b5_130b_item_refresh(void) {
 }
 
 
-// b5.134: clear map memory for screenreader users
-PLAYER_UPDATE_FUNC(b5_134_update_players) {
-	if (PRF_FLAGGED(ch, PRF_SCREEN_READER)) {
-		load_map_memory(ch);
-		while (GET_MAP_MEMORY(ch)) {
-			delete_player_map_memory(GET_MAP_MEMORY(ch), ch);
-		}
-	}
-}
-
-
 // b5.130b: fix a small number of items that have scripts they need attached
 PLAYER_UPDATE_FUNC(b5_130b_player_refresh) {
 	obj_data *obj, *next_obj, *new_obj;
@@ -2107,6 +2096,17 @@ PLAYER_UPDATE_FUNC(b5_130b_player_refresh) {
 		if ((new_obj = b5_130b_check_replace_obj(obj))) {
 			swap_obj_for_obj(obj, new_obj);
 			extract_obj(obj);
+		}
+	}
+}
+
+
+// b5.134: clear map memory for screenreader users
+PLAYER_UPDATE_FUNC(b5_134_update_players) {
+	if (PRF_FLAGGED(ch, PRF_SCREEN_READER)) {
+		load_map_memory(ch);
+		while (GET_MAP_MEMORY(ch)) {
+			delete_player_map_memory(GET_MAP_MEMORY(ch), ch);
 		}
 	}
 }
