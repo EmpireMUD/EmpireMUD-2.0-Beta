@@ -4975,9 +4975,15 @@ void load_map_memory(char_data *ch) {
 		
 		// load from file
 		while (get_line(fl, line)) {
-			if (*line && sscanf(line, "%d %ld %c%c%c%c %s", &vnum, &timestamp, &icon[0], &icon[1], &icon[2], &icon[3], name) == 7) {
-				icon[4] = '\0';	// needs terminator
-				
+			if (*line == '*' && sscanf(line+2, "%d %ld %s", &vnum, &timestamp, name) == 3) {
+				// remove dummy values
+				if (!strcmp(name, "~")) {
+					*name = '\0';
+				}
+				// and add
+				add_player_map_memory(ch, vnum, "", name, timestamp);
+			}
+			else if (*line && sscanf(line, "%d %ld %4s %s", &vnum, &timestamp, icon, name) == 4) {
 				// remove dummy values
 				if (!strcmp(icon, "    ")) {
 					*icon = '\0';
@@ -5045,7 +5051,12 @@ void write_map_memory(char_data *ch) {
 	}
 	
 	HASH_ITER(hh, GET_MAP_MEMORY(ch), map_mem, next) {
-		fprintf(fl, "%d %ld %-4.4s %s\n", map_mem->vnum, map_mem->timestamp, NULLSAFE(map_mem->icon), (map_mem->name && *map_mem->name) ? map_mem->name : "~");
+		if (map_mem->icon) {
+			fprintf(fl, "%d %ld %-4.4s %s\n", map_mem->vnum, map_mem->timestamp, map_mem->icon, (map_mem->name && *map_mem->name) ? map_mem->name : "~");
+		}
+		else {	// no icon
+			fprintf(fl, "* %d %ld %s\n", map_mem->vnum, map_mem->timestamp, (map_mem->name && *map_mem->name) ? map_mem->name : "~");
+		}
 	}
 	
 	fclose(fl);
