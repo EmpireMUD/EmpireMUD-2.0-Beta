@@ -2108,6 +2108,9 @@ PLAYER_UPDATE_FUNC(b5_134_update_players) {
 		while (GET_MAP_MEMORY(ch)) {
 			delete_player_map_memory(GET_MAP_MEMORY(ch), ch);
 		}
+		// mark these loaded in order to ensure a save (it can be skipped here if they are skill-swapped out of Cartography)
+		GET_MAP_MEMORY_LOADED(ch) = TRUE;
+		GET_MAP_MEMORY_NEEDS_SAVE(ch) = TRUE;
 	}
 }
 
