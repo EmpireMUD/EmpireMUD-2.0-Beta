@@ -841,9 +841,12 @@ elseif %roll% <= 58
 elseif %roll% <= 108
   * 5% chance: giant tarantula whistle
   set vnum 18879
-elseif %roll% <= 208
-  * 10% chance: zombie terrier whistle
+elseif %roll% <= 118
+  * 1% chance: zombie terrier whistle (2021)
   set vnum 18885
+elseif %roll% <= 208
+  * 9% chance: skeleton ghost whistle (2022)
+  set vnum 18859
 elseif %roll% <= 370
   * 16.2% chance: roll of pennies!
   set vnum 18886

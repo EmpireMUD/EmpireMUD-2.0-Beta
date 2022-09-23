@@ -1046,14 +1046,19 @@ void get_shop_items_display(shop_data *shop, char *save_buffer) {
 	
 	*save_buffer = '\0';
 	LL_FOREACH(SHOP_ITEMS(shop), item) {
-		if (SHOP_ALLEGIANCE(shop)) {
+		if (SHOP_ALLEGIANCE(shop) && item->min_rep != REP_NONE) {
 			snprintf(buf, sizeof(buf), " (%s)", reputation_levels[rep_const_to_index(item->min_rep)].name);
 		}
 		else {
 			*buf = '\0';
 		}
 		
-		sprintf(save_buffer + strlen(save_buffer), "%2d. [%5d] %s for %d %s%s\r\n", ++count, item->vnum, get_obj_name_by_proto(item->vnum), item->cost, (item->currency == NOTHING ? "coins" : get_generic_string_by_vnum(item->currency, GENERIC_CURRENCY, WHICH_CURRENCY(item->cost))), buf);
+		if (item->currency == NOTHING) {
+			sprintf(save_buffer + strlen(save_buffer), "%2d. [%5d] %s for %d coin%s%s\r\n", ++count, item->vnum, get_obj_name_by_proto(item->vnum), item->cost, PLURAL(item->cost), buf);
+		}
+		else {
+			sprintf(save_buffer + strlen(save_buffer), "%2d. [%5d] %s for %d [%d] %s%s\r\n", ++count, item->vnum, get_obj_name_by_proto(item->vnum), item->cost, item->currency, get_generic_string_by_vnum(item->currency, GENERIC_CURRENCY, WHICH_CURRENCY(item->cost)), buf);
+		}
 	}
 	
 	// empty list not shown

@@ -778,7 +778,7 @@ void display_score_to_char(char_data *ch, char_data *to) {
 
 	count = 0;
 	HASH_ITER(hh, GET_SKILL_HASH(ch), skdata, next_skill) {
-		if (skdata->level > 0) {
+		if (skdata->level > 0 && !SKILL_FLAGGED(skdata->ptr, SKILLF_IN_DEVELOPMENT)) {
 			sprintf(lbuf, " %s: %s%d", SKILL_NAME(skdata->ptr), IS_ANY_SKILL_CAP(ch, skdata->vnum) ? "&g" : "&y", skdata->level);
 			pts = get_ability_points_available_for_char(ch, skdata->vnum);
 			if (pts > 0) {
@@ -3251,7 +3251,7 @@ ACMD(do_mudstats) {
 ACMD(do_nearby) {
 	int max_dist = room_has_function_and_city_ok(GET_LOYALTY(ch), IN_ROOM(ch), FNC_LARGER_NEARBY) ? 150 : 50;
 	bool cities = TRUE, adventures = TRUE, starts = TRUE, check_arg = FALSE;
-	char buf[MAX_STRING_LENGTH], line[MAX_STRING_LENGTH], part[MAX_STRING_LENGTH];
+	char buf[MAX_STRING_LENGTH], line[MAX_STRING_LENGTH], part[MAX_STRING_LENGTH], adv_color[256], dist_buf[256];
 	struct instance_data *inst;
 	struct empire_city_data *city;
 	empire_data *emp, *next_emp;
@@ -3315,7 +3315,8 @@ ACMD(do_nearby) {
 				found = TRUE;
 
 				dir = get_direction_for_char(ch, get_direction_to(IN_ROOM(ch), loc));
-				snprintf(line, sizeof(line), " %2d %s: %s%s\r\n", dist, NEARBY_DIR, get_room_name(loc, FALSE), coord_display_room(ch, loc, FALSE));
+				snprintf(dist_buf, sizeof(dist_buf), "%d %s", dist, NEARBY_DIR);
+				snprintf(line, sizeof(line), "%7s: %s%s\r\n", dist_buf, get_room_name(loc, FALSE), coord_display_room(ch, loc, FALSE));
 				
 				CREATE(nrb_item, struct nearby_item_t, 1);
 				nrb_item->text = str_dup(line);
@@ -3336,7 +3337,8 @@ ACMD(do_nearby) {
 					found = TRUE;
 				
 					dir = get_direction_for_char(ch, get_direction_to(IN_ROOM(ch), loc));
-					snprintf(line, sizeof(line), " %2d %s: the %s of %s%s / %s%s&0\r\n", dist, NEARBY_DIR, city_type[city->type].name, city->name, coord_display_room(ch, loc, FALSE), EMPIRE_BANNER(emp), EMPIRE_NAME(emp));
+					snprintf(dist_buf, sizeof(dist_buf), "%d %s", dist, NEARBY_DIR);
+					snprintf(line, sizeof(line), "%7s: the %s of %s%s / %s%s&0\r\n", dist_buf, city_type[city->type].name, city->name, coord_display_room(ch, loc, FALSE), EMPIRE_BANNER(emp), EMPIRE_NAME(emp));
 					
 					CREATE(nrb_item, struct nearby_item_t, 1);
 					nrb_item->text = str_dup(line);
@@ -3408,7 +3410,9 @@ ACMD(do_nearby) {
 			// show instance
 			found = TRUE;
 			dir = get_direction_for_char(ch, get_direction_to(IN_ROOM(ch), loc));
-			snprintf(line, sizeof(line), " %2d %s: %s%s / %s%s\r\n", dist, NEARBY_DIR, GET_ADV_NAME(INST_ADVENTURE(inst)), coord_display_room(ch, loc, FALSE), instance_level_string(inst), part);
+			strcpy(adv_color, color_by_difficulty((ch), pick_level_from_range((INST_LEVEL(inst) > 0 ? INST_LEVEL(inst) : get_approximate_level(ch)), GET_ADV_MIN_LEVEL(INST_ADVENTURE(inst)), GET_ADV_MAX_LEVEL(INST_ADVENTURE(inst)))));
+			snprintf(dist_buf, sizeof(dist_buf), "%d %s", dist, NEARBY_DIR);
+			snprintf(line, sizeof(line), "%7s: %s%s\t0%s / %s%s\r\n", dist_buf, adv_color, GET_ADV_NAME(INST_ADVENTURE(inst)), coord_display_room(ch, loc, FALSE), instance_level_string(inst), part);
 			
 			if (glb) {	// just add it to the global list
 				if (glb->str) {

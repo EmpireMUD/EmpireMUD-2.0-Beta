@@ -138,9 +138,9 @@ the Great Hall, for guard towers, and for some other game rules.
 
 EmpireMUD periodically checks if cities are completely empty and, if so,
 will remove the city center and refund the city point. This helps keep the map
-clean, and you can prevent it by making sure there is at least one building in
-your city. You will also start to lose cities after 1 week if your empire
-shrinks and you no longer have enough city points available.
+clean, and you can prevent it by making sure there is at least one claimed
+building in your city. You will also start to lose cities after 1 week if your
+empire shrinks and you no longer have enough city points available.
 
 See also: CITY COMMANDS, CITY TRAITS, CITY TYPES, TECHNOLOGY, TERRITORY,
   WEALTH
@@ -309,9 +309,12 @@ See also: DIPLOMACY, WAR
 #
 DISMANTLE-MINES "DISMANTLE MINES"
 
-The dismantle-mines workforce chore will cause mines to be dismantled auto-
-matically when they are empty. You can prevent this on individual mines using
-the nodismantle command.
+The dismantle-mines workforce chore will automatically mark mines to be
+dismantled when they are empty. However, workers will only dismantle it if the
+building chore is turned on as well. You can prevent dismantling of individual
+mines using the nodismantle command.
+
+Mines must be dismantled each year in order for the ore to refresh.
 
 See also: NODISMANTLE, WORKFORCE
 #
@@ -1313,7 +1316,7 @@ on an empire.
 Some EmpireMUDs require a certain number of offenses before you can declare
 war, to prevent unprovoked wars.
 
-The exchange rate at war it 10%.
+The exchange rate at war is 10%.
 
 See also: DIPLOMACY, EMPIRE SCORE, OFFENSES, THIEVERY PERMIT
 #
@@ -1408,7 +1411,8 @@ See also: WORKFORCE
 "WORKFORCE CHORES" "WORKFORCE TYPES"
 
 Workforce types:
-  &yabandon-chopped:&0 NPCs will abandon a tile when they finish chopping.
+  &yabandon-chopped:&0 NPCs will abandon a tile when they finish chopping it,
+     or after burning it if burn-stumps is also on.
   &yabandon-dismantled:&0 NPCs will abandon a tile when they finish dismantling.
   &yabandon-farmed:&0 NPCs will abandon a tile when they finish farming.
   &ybuilding:&0 NPCs will build any building that has been started, or dismantle
@@ -1422,7 +1426,7 @@ Workforce types:
      use farming without replanting for that).
   &ycrafting:&0 NPCs will make certain crafts (see WORKFORCE CRAFTING).
   &ydigging:&0 NPCs will dig for in any quarry, clay pit, or sand pit.
-  &ydismantle-mines:&0 mines will be dismantled when empty.
+  &ydismantle-mines:&0 marks empty mines to be dismantled by the building chore.
   &yfarming:&0 NPCs will harvest crops. Costs no food.
   &yfire-brigade:&0 NPCs will put out fires.
   &yfishing:&0 Will catch fish at the fishery. Costs no food.

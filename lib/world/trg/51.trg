@@ -1,3 +1,16 @@
+#5107
+Mine Rename Based on Type~
+2 n 100
+~
+wait 0
+set type %room.mine_type%
+if %type%
+  set name %type.car%
+  set pref %name.ana%
+  %mod% %room% title %pref.cap% %name.cap% Mine
+end
+detach 5107 %room.id%
+~
 #5138
 Tavern Hideout Completion~
 2 o 100

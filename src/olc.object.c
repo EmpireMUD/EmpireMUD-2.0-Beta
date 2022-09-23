@@ -327,7 +327,7 @@ bool audit_object(obj_data *obj, char_data *ch) {
 		}
 		case ITEM_MINIPET: {
 			if (GET_MINIPET_VNUM(obj) == NOTHING || !mob_proto(GET_MINIPET_VNUM(obj))) {
-				olc_audit_msg(ch, GET_OBJ_VNUM(obj), "Mini-pet not set");
+				olc_audit_msg(ch, GET_OBJ_VNUM(obj), "Minipet not set");
 				problem = TRUE;
 			}
 			break;
@@ -2914,14 +2914,14 @@ OLC_MODULE(oedit_minipet) {
 		msg_to_char(ch, "You can only set this on a MINIPET item.\r\n");
 	}
 	else {
-		set_obj_val(obj, VAL_MINIPET_VNUM, olc_process_number(ch, argument, "mini-pet", "minipet", 0, MAX_VNUM, GET_OBJ_VAL(obj, VAL_MINIPET_VNUM)));
+		set_obj_val(obj, VAL_MINIPET_VNUM, olc_process_number(ch, argument, "minipet", "minipet", 0, MAX_VNUM, GET_OBJ_VAL(obj, VAL_MINIPET_VNUM)));
 		if (!(mob = mob_proto(GET_MINIPET_VNUM(obj)))) {
 			set_obj_val(obj, VAL_MINIPET_VNUM, old);
 			msg_to_char(ch, "There is no mobile with that vnum. Old value restored.\r\n");
 			return;
 		}
 		else if (!PRF_FLAGGED(ch, PRF_NOREPEAT)) {
-			msg_to_char(ch, "It now gives the mini-pet: %s\r\n", get_mob_name_by_proto(GET_MINIPET_VNUM(obj), FALSE));
+			msg_to_char(ch, "It now gives the minipet: %s\r\n", get_mob_name_by_proto(GET_MINIPET_VNUM(obj), FALSE));
 		}
 		else {
 			send_config_msg(ch, "ok_string");

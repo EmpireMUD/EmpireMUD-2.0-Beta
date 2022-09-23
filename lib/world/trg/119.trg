@@ -293,23 +293,23 @@ if %spirit.claw4%
 end
 * Determine reward
 if %id% < 11
-  * Mini-pet
+  * Minipet
   eval vnum 11989 + %id%
   %load% mob %vnum%
   set mob %self.room.people%
   if %mob.vnum% != %vnum%
     * Uh-oh.
-    %echo% Something went horribly wrong while granting a mini-pet. Please bug-report this error.
+    %echo% Something went horribly wrong while granting a minipet. Please bug-report this error.
     halt
   end
   set mob_string %mob.name%
   %purge% %mob%
   if !%actor.has_minipet(%vnum%)%
-    %send% %actor% You win '%mob_string%' as a mini-pet! Use the minipets command to summon it.
+    %send% %actor% You win '%mob_string%' as a minipet! Use the minipets command to summon it.
     %echoaround% %actor% ~%actor% has won '%mob_string%'!
     nop %actor.add_minipet(%vnum%)%
   else
-    %send% %actor% You win '%mob_string%' but you already have it as a mini-pet.
+    %send% %actor% You win '%mob_string%' but you already have it as a minipet.
   end
 else
   * Item reward: 11987, 11988, 11989, 11990, 11991
@@ -1495,7 +1495,11 @@ end
 Skycleave: Search for Secret Passage~
 2 p 100
 ~
-if %room.north(room)%
+if %ability% != 18 && %abilityname% != Search
+  * wrong ability
+  return 1
+  halt
+elseif %room.north(room)%
   * Already open
   return 1
   halt
@@ -1984,27 +1988,49 @@ if %actor.char_target(%arg.car%)% == %self%
 end
 ~
 #11936
-Skycleave: Don't touch the desk in the Lich Labs~
+Skycleave: Room commands (Lich Labs, Goblin Cages, Gate)~
 2 c 0
-touch open disturb wake awaken~
+touch open disturb wake awaken search attune~
+set lich_cmds touch open disturb wake awaken search
 return 0
-if !%arg%
-  halt
-elseif !(%arg% /= desk || %arg% /= antique)
-  halt
-else
+if attune /= %cmd% && %room.template% == 11841
+  * attunement lab: wrong phase
+  %send% %actor% You seem to be in the right place, but the wrong time. There's nobody here to attune skystones for you.
   return 1
-  %send% %actor% You make the mistake of touching the antique desk...
-  %echoaround% %actor% ~%actor% tries to open the antique desk...
-  %echo% An ethereal spirit flies out of the desk and swirls around the room, howling as it goes!
-  set ch %room.people%
-  while %ch%
-    set next_ch %ch.next_in_room%
-    %dot% #11936 %ch% 1000 30 magical
-    %damage% %ch% 100 magical
-    set ch %next_ch%
-  done
-  %echo% The spirit returns to the desk, which slams shut with a thud!
+elseif open /= %cmd% && %room.template% == 11989
+  * gobbrabakh of orka gate: can't open it
+  if (gates /= %arg% || doors /= %arg%)
+    %send% %actor% You go to open the gate, but the guards stop you.
+    %echoaround% %actor% ~%actor% moves toward the gate but is blocked by the guards.
+    return 1
+  end
+elseif search /= %cmd% && (%room.template% == 11815 || %room.template% == 11915)
+  * goblin cages: searching without skill?
+  if !%actor.ability(Search)%
+    %send% %actor% You search around but don't see anything special.
+    %echoaround% %actor% ~%actor% searches around the room.
+    return 1
+  end
+elseif (%lich_cmds% ~= %cmd%) && (%room.template% == 11836 || %room.template% == 11936)
+  * lich desk
+  if !%arg%
+    halt
+  elseif !(desk /= %arg% || antique /= %arg%)
+    halt
+  else
+    return 1
+    %send% %actor% You make the mistake of touching the antique desk...
+    %echoaround% %actor% ~%actor% tries to open the antique desk...
+    %echo% An ethereal spirit flies out of the desk and swirls around the room, howling as it goes!
+    set ch %room.people%
+    while %ch%
+      set next_ch %ch.next_in_room%
+      %dot% #11936 %ch% 1000 30 magical
+      %damage% %ch% 100 magical
+      set ch %next_ch%
+    done
+    %echo% The spirit returns to the desk, which slams shut with a thud!
+  end
 end
 ~
 #11937
@@ -4105,7 +4131,7 @@ elseif %room.people%
   end
   switch %random.6%
     case 1
-      %echo% A horse made of crystal-clear water leaps up from the hendecagon fountain and then splashes back down and vanishes into the water.
+      %echo% A horse made of crystal clear water leaps up from the hendecagon fountain and then splashes back down and vanishes into the water.
     break
     case 2
       %echo% A pair of lions made from pure water leap up from the hendecagon fountain, chase each other, then vanish back into the water.
@@ -4117,7 +4143,7 @@ elseif %room.people%
       %echo% The hendecagon fountain releases a cloud of bubbles into the air. You watch as they float away on the wind.
     break
     case 5
-      %echo% You watch little waves chase eachother playfully in the hendecagon fountain.
+      %echo% You watch little waves chase each other playfully in the hendecagon fountain.
     break
     case 6
       %echo% The water dances and twirls across the surface of the hendecagon fountain.

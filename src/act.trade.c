@@ -269,6 +269,7 @@ bool find_and_bind(char_data *ch, obj_vnum vnum) {
 craft_data *find_best_craft_by_name(char_data *ch, char *argument, int craft_type) {
 	craft_data *unknown_abbrev = NULL;
 	craft_data *known_abbrev = NULL;
+	craft_data *known_multi = NULL, *unknown_multi = NULL;
 	craft_data *craft, *next_craft;
 	
 	skip_spaces(&argument);
@@ -309,10 +310,31 @@ craft_data *find_best_craft_by_name(char_data *ch, char *argument, int craft_typ
 				known_abbrev = craft;
 			}
 		}
+		else if (!known_multi && multi_isname(argument, GET_CRAFT_NAME(craft))) {
+			if (IS_SET(GET_CRAFT_FLAGS(craft), CRAFT_IN_DEVELOPMENT)) {
+				// only imms hit this block
+				if (!unknown_multi) {
+					unknown_multi = craft;
+				}
+			}
+			else if (GET_CRAFT_ABILITY(craft) != NO_ABIL && !has_ability(ch, GET_CRAFT_ABILITY(craft))) {
+				if (!unknown_multi) {	// player missing ability
+					unknown_multi = craft;
+				}
+			}
+			else if (IS_SET(GET_CRAFT_FLAGS(craft), CRAFT_LEARNED) && !has_learned_craft(ch, GET_CRAFT_VNUM(craft))) {
+				if (!unknown_multi) {	// player missing 'learned'
+					unknown_multi = craft;
+				}
+			}
+			else {	// they should have access to it
+				known_multi = craft;
+			}
+		}
 	}
 	
 	// if we got this far, it didn't return an exact match
-	return known_abbrev ? known_abbrev : unknown_abbrev;
+	return known_abbrev ? known_abbrev : (known_multi ? known_multi : (unknown_abbrev ? unknown_abbrev : unknown_multi));
 }
 
 
@@ -1310,13 +1332,13 @@ void process_gen_craft(char_data *ch) {
 //// REFORGE / REFASHION /////////////////////////////////////////////////////
 
 const struct {
-	char *command;
+	char *command, *command_3rd;
 	any_vnum ability;	// required ability
 	bool (*validate_func)(char_data *ch);	// e.g. can_forge, func that returns TRUE if ok -- must send own errors if FALSE
 	int types[4];	// NOTHING-terminated list of valid obj types
 } reforge_data[] = {
-	{ "reforge", ABIL_REFORGE, can_forge, { ITEM_WEAPON, ITEM_MISSILE_WEAPON, NOTHING } },	// SCMD_REFORGE
-	{ "refashion", ABIL_REFASHION, can_refashion, { ITEM_ARMOR, ITEM_SHIELD, ITEM_WORN, NOTHING } }	// SCMD_REFASHION
+	{ "reforge", "reforges", ABIL_REFORGE, can_forge, { ITEM_WEAPON, ITEM_MISSILE_WEAPON, NOTHING } },	// SCMD_REFORGE
+	{ "refashion", "refashions", ABIL_REFASHION, can_refashion, { ITEM_ARMOR, ITEM_SHIELD, ITEM_WORN, NOTHING } }	// SCMD_REFASHION
 };
 
 
@@ -1774,7 +1796,7 @@ void do_gen_craft_vehicle(char_data *ch, craft_data *type, int dir) {
 ACMD(do_gen_craft) {
 	char short_arg[MAX_INPUT_LENGTH], last_arg[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH * 2], line[256];
 	int count, timer, num = 1, dir = NO_DIR;
-	craft_data *craft, *next_craft, *type = NULL, *find_type = NULL, *abbrev_match = NULL;
+	craft_data *craft, *next_craft, *type = NULL, *find_type = NULL, *abbrev_match = NULL, *multi_match = NULL;
 	vehicle_data *veh;
 	bool is_master, list_only = FALSE;
 	obj_data *found_obj = NULL, *drinkcon = NULL;
@@ -1885,11 +1907,21 @@ ACMD(do_gen_craft) {
 				// found! maybe
 				abbrev_match = craft;
 			}
+			else if (!multi_match && (multi_isname(arg, GET_CRAFT_NAME(craft)) || (*short_arg && multi_isname(short_arg, GET_CRAFT_NAME(craft))))) {
+				// do this last because it records if they are just missing an ability
+				if (GET_CRAFT_ABILITY(craft) != NO_ABIL && !has_ability(ch, GET_CRAFT_ABILITY(craft))) {
+					missing_abil = GET_CRAFT_ABILITY(craft);
+					continue;	// missing ability
+				}
+				
+				// found! maybe
+				multi_match = craft;
+			}
 		}
 		
-		// maybe we didn't find an exact match, but did find an abbrev match
+		// maybe we didn't find an exact match, but did find an abbrev/multi match
 		if (!type) {
-			type = abbrev_match;
+			type = abbrev_match ? abbrev_match : multi_match;	// if any
 		}
 	}	// end arg-processing
 	
@@ -2543,7 +2575,7 @@ ACMD(do_reforge) {
 			sprintf(buf, "You %s $p%s!", reforge_data[subcmd].command, shared_by(obj, ch));
 			act(buf, FALSE, ch, obj, obj->worn_by, TO_CHAR);
 			
-			sprintf(buf, "$n %s $p%s!", reforge_data[subcmd].command, shared_by(obj, ch));
+			sprintf(buf, "$n %ss $p%s!", reforge_data[subcmd].command_3rd, shared_by(obj, ch));
 			act(buf, TRUE, ch, obj, obj->worn_by, TO_ROOM);
 			
 			if (reforge_data[subcmd].ability != NO_ABIL) {
@@ -2622,7 +2654,7 @@ ACMD(do_reforge) {
 			sprintf(buf, "You %s $p%s into a masterwork!", reforge_data[subcmd].command, shared_by(obj, ch));
 			act(buf, FALSE, ch, obj, obj->worn_by, TO_CHAR);
 			
-			sprintf(buf, "$n %s $p%s into a masterwork!", reforge_data[subcmd].command, shared_by(obj, ch));
+			sprintf(buf, "$n %s $p%s into a masterwork!", reforge_data[subcmd].command_3rd, shared_by(obj, ch));
 			act(buf, TRUE, ch, obj, obj->worn_by, TO_ROOM);
 
 			if (reforge_data[subcmd].ability != NOTHING) {

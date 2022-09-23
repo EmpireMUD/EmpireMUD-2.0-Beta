@@ -411,7 +411,7 @@ S
 whistle psychic~
 a psychic whistle~
 A whistle that's slightly psychic has been left here.~
-This whistle can grant you a mini-pet!
+This whistle can grant you a minipet!
 Type 'use whistle' to get it.
 ~
 19 p a 0 5
@@ -652,7 +652,7 @@ S
 whistle ghoul~
 a ghoul whistle~
 A ghoul whistle has been dropped here.~
-This whistle can grant you a mini-pet!
+This whistle can grant you a minipet!
 Type 'use whistle' to get it.
 ~
 19 p a 0 5
@@ -872,6 +872,19 @@ T 18857
 T 18858
 T 18859
 T 18860
+S
+#18859
+whistle bone fading~
+a fading bone whistle~
+A fading bone whistle floats before you.~
+   This curious whistle appears to be made of bone, but you can see right
+through it and you have trouble grasping or blowing the whistle. What sort of
+thing is both bone and ghost at once?
+   Type 'use whistle' to gain a new non-combat minipet.
+~
+19 p a 0 7
+18859 0 0
+14 0
 S
 #18861
 tome notes demon summoning~
@@ -1119,7 +1132,7 @@ S
 whistle well-stitched stitched~
 a well-stitched whistle~
 A well-stitched whistle is lying here.~
-This whistle grants you a zombie terrier mini-pet. Use the whistle to get it.
+This whistle grants you a zombie terrier minipet. Use the whistle to get it.
 ~
 19 p a 0 6
 18885 0 0

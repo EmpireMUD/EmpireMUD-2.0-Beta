@@ -785,7 +785,7 @@ typedef struct vehicle_data vehicle_data;
 #define BLD_ROAD_ICON  BIT(18)	// replaces its icon with the generated road icons (dashes)
 #define BLD_ROAD_ICON_WIDE  BIT(19)	// replaces its icon with wide road icons (equals signs)
 #define BLD_ATTACH_BARRIER  BIT(20)	// icons with @u/@v will attach to this
-// #define BLD_UNUSED9  BIT(21)
+#define BLD_NO_CUSTOMIZE  BIT(21)	// cannot be customized
 // #define BLD_UNUSED10  BIT(22)
 // #define BLD_UNUSED11  BIT(23)
 // #define BLD_UNUSED12  BIT(24)
@@ -2496,6 +2496,7 @@ typedef enum {
 #define QST_NO_GUESTS  BIT(6)	// quest start/finish use MEMBERS_ONLY
 #define QST_TUTORIAL  BIT(7)	// quest can be blocked by 'toggle tutorial'
 #define QST_GROUP_COMPLETION  BIT(8)	// group members auto-finish this quest, even if incomplete, if present when any member does
+#define QST_EVENT  BIT(9)	// shows as an event quest; splits dailies into 2 pools
 
 
 // QG_x: quest giver types
@@ -4429,6 +4430,7 @@ struct player_special_data {
 	int daily_cycle;	// Last update cycle registered
 	ubyte daily_bonus_experience;	// boosted skill gain points
 	int daily_quests;	// number of daily quests completed today
+	int event_daily_quests;	// number of daily event quests completed today
 
 	// action info
 	int action;	// ACT_
@@ -5277,6 +5279,7 @@ struct event_data {
 	int max_level;	// or 0 for no max
 	int duration;	// minutes in length
 	int repeats_after;	// minutes to auto-repeat; 0/NOT_REPEATABLE for none
+	int max_points;	// fixed point cap, if >0
 	
 	UT_hash_handle hh;	// hash handle for event_table
 };

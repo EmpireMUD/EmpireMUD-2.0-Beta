@@ -723,7 +723,7 @@ void identify_obj_to_char(obj_data *obj, char_data *ch) {
 			break;
 		}
 		case ITEM_MINIPET: {
-			msg_to_char(ch, "Grants mini-pet: %s\r\n", get_mob_name_by_proto(GET_MINIPET_VNUM(obj), TRUE));
+			msg_to_char(ch, "Grants minipet: %s\r\n", get_mob_name_by_proto(GET_MINIPET_VNUM(obj), TRUE));
 			break;
 		}
 	}
@@ -1392,7 +1392,7 @@ static void wear_message(char_data *ch, obj_data *obj, int where) {
 
 
 /**
-* Attempt to learn a mini-pet. Caution: this may extract the obj.
+* Attempt to learn a minipet. Caution: this may extract the obj.
 *
 * @param char_data *ch The player trying to learn it.
 * @param obj_data *obj The MINIPET item.
@@ -1410,11 +1410,11 @@ void use_minipet_obj(char_data *ch, obj_data *obj) {
 		msg_to_char(ch, "It doesn't seem to do anything when used.\r\n");
 	}
 	else if (has_minipet(ch, GET_MINIPET_VNUM(obj))) {
-		msg_to_char(ch, "You already have that mini-pet.\r\n");
+		msg_to_char(ch, "You already have that minipet.\r\n");
 	}
 	else {
 		add_minipet(ch, GET_MINIPET_VNUM(obj));
-		msg_to_char(ch, "You gain '%s' as a mini-pet. Use the minipets command to summon it.\r\n", GET_SHORT_DESC(mob));
+		msg_to_char(ch, "You gain '%s' as a minipet. Use the minipets command to summon it.\r\n", GET_SHORT_DESC(mob));
 		act("$n uses $p.", TRUE, ch, obj, NULL, TO_ROOM);
 		extract_obj(obj);
 	}

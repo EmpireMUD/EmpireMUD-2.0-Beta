@@ -2257,7 +2257,7 @@ void do_customize_room(char_data *ch, char *argument) {
 	else if (!emp || ROOM_OWNER(IN_ROOM(ch)) != emp) {
 		msg_to_char(ch, "You must own the tile to do this.\r\n");
 	}
-	else if (!IS_ANY_BUILDING(IN_ROOM(ch))) {
+	else if (!IS_ANY_BUILDING(IN_ROOM(ch)) || ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_NO_CUSTOMIZE)) {
 		msg_to_char(ch, "You can't customize here.\r\n");
 	}
 	else if (!has_permission(ch, PRIV_CUSTOMIZE, IN_ROOM(ch))) {

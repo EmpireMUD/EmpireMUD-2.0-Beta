@@ -1980,6 +1980,7 @@ struct set_struct {
 		{ "bonustrait",	LVL_START_IMM,	PC,		MISC },
 		{ "bonusexp", LVL_START_IMM, PC, NUMBER },
 		{ "dailyquestscompleted", LVL_START_IMM, PC, NUMBER },
+		{ "eventdailyquestscompleted", LVL_START_IMM, PC, NUMBER },
 		{ "grants",		LVL_CIMPL,	PC,		MISC },
 		{ "maxlevel", LVL_START_IMM, PC, NUMBER },
 		{ "skill", LVL_START_IMM, PC, MISC },
@@ -2370,6 +2371,9 @@ int perform_set(char_data *ch, char_data *vict, int mode, char *val_arg) {
 	else if SET_CASE("dailyquestscompleted") {
 		GET_DAILY_QUESTS(vict) = RANGE(0, config_get_int("dailies_per_day"));
 	}
+	else if SET_CASE("eventdailyquestscompleted") {
+		GET_EVENT_DAILY_QUESTS(vict) = RANGE(0, config_get_int("dailies_per_day"));
+	}
 	else if SET_CASE("maxlevel") {
 		GET_HIGHEST_KNOWN_LEVEL(vict) = RANGE(0, SHRT_MAX);
 	}
@@ -2597,11 +2601,11 @@ int perform_set(char_data *ch, char_data *vict, int mode, char *val_arg) {
 		
 		if (!str_cmp(onoff_arg, "on")) {
 			add_minipet(vict, GET_MOB_VNUM(pet));
-			sprintf(output, "%s: gained mini-pet %d %s.", GET_NAME(vict), GET_MOB_VNUM(pet), GET_SHORT_DESC(pet));
+			sprintf(output, "%s: gained minipet %d %s.", GET_NAME(vict), GET_MOB_VNUM(pet), GET_SHORT_DESC(pet));
 		}
 		else if (!str_cmp(onoff_arg, "off")) {
 			remove_minipet(vict, GET_MOB_VNUM(pet));
-			sprintf(output, "%s: removed mini-pet %d %s.", GET_NAME(vict), GET_MOB_VNUM(pet), GET_SHORT_DESC(pet));
+			sprintf(output, "%s: removed minipet %d %s.", GET_NAME(vict), GET_MOB_VNUM(pet), GET_SHORT_DESC(pet));
 		}
 		else {
 			msg_to_char(ch, "Do you want to turn it on or off?\r\n");
@@ -3433,7 +3437,7 @@ SHOW(show_quests) {
 			return;
 		}
 		
-		size = snprintf(buf, sizeof(buf), "%s's quests (%d/%d dailies):\r\n", GET_NAME(vict), GET_DAILY_QUESTS(vict), config_get_int("dailies_per_day"));
+		size = snprintf(buf, sizeof(buf), "%s's quests (%d/%d dailies, %d/%d event dailies):\r\n", GET_NAME(vict), GET_DAILY_QUESTS(vict), config_get_int("dailies_per_day"), GET_EVENT_DAILY_QUESTS(vict), config_get_int("dailies_per_day"));
 		LL_FOREACH(GET_QUESTS(vict), pq) {
 			count_quest_tasks(pq->tracker, &count, &total);
 			size += snprintf(buf + size, sizeof(buf) - size, "[%5d] %s (%d/%d tasks)\r\n", pq->vnum, get_quest_name_by_proto(pq->vnum), count, total);
@@ -4140,11 +4144,11 @@ SHOW(show_dailycycle) {
 	else {
 		size = snprintf(buf, sizeof(buf), "Daily quests with cycle id %d:\r\n", num);
 		HASH_ITER(hh, quest_table, qst, next_qst) {
-			if (!QUEST_FLAGGED(qst, QST_DAILY) || QUEST_DAILY_CYCLE(qst) != num) {
+			if (!IS_DAILY_QUEST(qst) || QUEST_DAILY_CYCLE(qst) != num) {
 				continue;
 			}
 			
-			size += snprintf(buf + size, sizeof(buf) - size, "[%5d] %s%s\r\n", QUEST_VNUM(qst), QUEST_NAME(qst), QUEST_DAILY_ACTIVE(qst) ? " (active)" : "");
+			size += snprintf(buf + size, sizeof(buf) - size, "[%5d] %s%s%s\r\n", QUEST_VNUM(qst), QUEST_NAME(qst), QUEST_DAILY_ACTIVE(qst) ? " (active)" : "", IS_EVENT_QUEST(qst) ? " (event)" : "");
 		}
 		
 		if (ch->desc) {
@@ -4688,6 +4692,7 @@ SHOW(show_account) {
 	char_data *plr = NULL, *loaded;
 	int acc_id = NOTHING;
 	time_t last_online = -1;	// -1 here will indicate no data, -2 will indicate online now
+	account_data *acc_ptr;
 	
 	#define ONLINE_NOW  -2
 	
@@ -4717,6 +4722,14 @@ SHOW(show_account) {
 	// look up id if needed
 	if (acc_id == NOTHING && plr_index) {
 		acc_id = plr_index->account_id;
+	}
+	
+	if (!(acc_ptr = find_account(acc_id))) {
+		msg_to_char(ch, "Unknown account: %d\r\n", acc_id);
+		if (plr && file) {
+			free_char(plr);
+		}
+		return;
 	}
 	
 	// display:
@@ -4762,8 +4775,11 @@ SHOW(show_account) {
 				}
 			}
 		}
+		else if (ACCOUNT_FLAGGED(loaded, ACCT_MULTI_IP) || IS_SET(acc_ptr->flags, ACCT_MULTI_IP)) {
+			msg_to_char(ch, " &r[%d %s] %s  (separate account %d)&0\r\n", loaded_file ? GET_LAST_KNOWN_LEVEL(loaded) : GET_COMPUTED_LEVEL(loaded), skills, GET_PC_NAME(loaded), GET_ACCOUNT(loaded)->id);
+		}
 		else {
-			msg_to_char(ch, " &r[%d %s] %s  (not on account)&0\r\n", loaded_file ? GET_LAST_KNOWN_LEVEL(loaded) : GET_COMPUTED_LEVEL(loaded), skills, GET_PC_NAME(loaded));
+			msg_to_char(ch, " &r[%d %s] %s  (same IP, account %d)&0\r\n", loaded_file ? GET_LAST_KNOWN_LEVEL(loaded) : GET_COMPUTED_LEVEL(loaded), skills, GET_PC_NAME(loaded), GET_ACCOUNT(loaded)->id);
 		}
 		
 		if (loaded_file) {
@@ -5218,10 +5234,10 @@ SHOW(show_minipets) {
 	}
 	else {
 		if (*argument) {
-			size = snprintf(output, sizeof(output), "Mini-pets matching '%s' for %s:\r\n", argument, GET_NAME(plr));
+			size = snprintf(output, sizeof(output), "Minipets matching '%s' for %s:\r\n", argument, GET_NAME(plr));
 		}
 		else {
-			size = snprintf(output, sizeof(output), "Mini-pets for %s:\r\n", GET_NAME(plr));
+			size = snprintf(output, sizeof(output), "Minipets for %s:\r\n", GET_NAME(plr));
 		}
 		
 		count = 0;
@@ -6363,7 +6379,7 @@ void do_stat_global(char_data *ch, struct global_data *glb) {
 /* Gives detailed information on an object (j) to ch */
 void do_stat_object(char_data *ch, obj_data *j) {
 	char buf[MAX_STRING_LENGTH], part[MAX_STRING_LENGTH];
-	int found;
+	int found, minutes;
 	struct obj_apply *apply;
 	room_data *room;
 	obj_vnum vnum = GET_OBJ_VNUM(j);
@@ -6416,7 +6432,15 @@ void do_stat_object(char_data *ch, obj_data *j) {
 	prettier_sprintbit(GET_OBJ_TOOL_FLAGS(j), tool_flags, buf);
 	msg_to_char(ch, "Tool types: &y%s&0\r\n", buf);
 	
-	msg_to_char(ch, "Timer: &y%d&0, Material: &y%s&0, Component type: [&y%d&0] &y%s&0\r\n", GET_OBJ_TIMER(j), materials[GET_OBJ_MATERIAL(j)].name, GET_OBJ_COMPONENT(j), GET_OBJ_COMPONENT(j) != NOTHING ? get_generic_name_by_vnum(GET_OBJ_COMPONENT(j)) : "none");
+	if (GET_OBJ_TIMER(j) > 0) {
+		minutes = GET_OBJ_TIMER(j) * SECS_PER_MUD_HOUR / SECS_PER_REAL_MIN;
+		snprintf(part, sizeof(part), "%d ticks (%d:%02d)", GET_OBJ_TIMER(j), minutes / 60, minutes % 60);
+	}
+	else {
+		strcpy(part, "none");
+	}
+	
+	msg_to_char(ch, "Timer: &y%s&0, Material: &y%s&0, Component type: [&y%d&0] &y%s&0\r\n", part, materials[GET_OBJ_MATERIAL(j)].name, GET_OBJ_COMPONENT(j), GET_OBJ_COMPONENT(j) != NOTHING ? get_generic_name_by_vnum(GET_OBJ_COMPONENT(j)) : "none");
 	
 	if (GET_OBJ_REQUIRES_QUEST(j) != NOTHING) {
 		msg_to_char(ch, "Requires quest: [%d] &c%s&0\r\n", GET_OBJ_REQUIRES_QUEST(j), get_quest_name_by_proto(GET_OBJ_REQUIRES_QUEST(j)));
@@ -6583,7 +6607,7 @@ void do_stat_object(char_data *ch, obj_data *j) {
 			break;
 		}
 		case ITEM_MINIPET: {
-			msg_to_char(ch, "Mini-pet: [%d] %s\r\n", GET_MINIPET_VNUM(j), get_mob_name_by_proto(GET_MINIPET_VNUM(j), FALSE));
+			msg_to_char(ch, "Minipet: [%d] %s\r\n", GET_MINIPET_VNUM(j), get_mob_name_by_proto(GET_MINIPET_VNUM(j), FALSE));
 			break;
 		}
 		default:

@@ -3359,6 +3359,15 @@ char *replace_prompt_codes(char_data *ch, char *str) {
 					tmp = i;
 					break;
 				}
+				case 'Q': {	// daily event quests left
+					int amt = 0;
+					if (!IS_NPC(ch)) {
+						amt = config_get_int("dailies_per_day") - GET_EVENT_DAILY_QUESTS(ch);
+					}
+					sprintf(i, "%d", MAX(0, amt));
+					tmp = i;
+					break;
+				}
 				case 'r': {	// room template/building
 					if (IS_IMMORTAL(ch)) {
 						if (GET_ROOM_TEMPLATE(IN_ROOM(ch))) {

@@ -7,7 +7,7 @@ Note: This daily quest does not reward you with a stocking.
 ~
 You thank Father Christmas and he rewards your politeness.
 ~
-24 e 0 0 -1
+25 ej 0 0 -1
 A
 3 10705
 P
@@ -36,7 +36,7 @@ up your own gift, though, as Father Christmas only gives one per visitor.
    The Guild head is greatful for your kindness and ready to spread holiday
 cheer himself now.
 ~
-17 de 0 0 -1
+18 dej 0 0 -1
 A
 1 18211
 A
@@ -73,7 +73,7 @@ Type: use syringe <target>
    You got the blood and the wanderer is delighted. Here's hoping it hurt the
 old fool.
 ~
-15 de 0 0 -1
+16 dej 0 0 -1
 A
 1 9064
 D 16602
@@ -107,7 +107,7 @@ Type: use syringe <target>
 ability to fly without turning into giant bats. Hopefully it was from a flying
 reindeer.
 ~
-22 de 0 0 -1
+23 dej 0 0 -1
 A
 1 18208
 A
@@ -145,7 +145,7 @@ Instructions:
    As you watch the bird take flight, you feel more holiday cheer infuse your
 body.
 ~
-13 e 0 0 -1
+14 ej 0 0 -1
 A
 1 200
 D 16604
@@ -179,7 +179,7 @@ Instructions:
    As you watch the bird take flight, you feel more holiday cheer infuse your
 body.
 ~
-13 e 0 0 -1
+14 ej 0 0 -1
 A
 1 201
 D 16604
@@ -214,7 +214,7 @@ Instructions:
    It looks just like you, and it should last a while. Just don't let it go
 inside.
 ~
-15 de 0 0 -1
+16 dej 0 0 -1
 A
 1 10701
 D 16606
@@ -254,7 +254,7 @@ Instructions:
    Your citizens are excited to see the new tree and hope it'll get some
 ornaments soon!
 ~
-22 de 0 0 -1
+23 dej 0 0 -1
 A
 1 10701
 P
@@ -285,7 +285,7 @@ Make some cookies and deliver them to the superintendant.
    Who can stay grumpy with Christmas cookies in their belly? Wonder how else
 you could cheer the guild up.
 ~
-7 d 0 0 -1
+8 dj 0 0 -1
 A
 1 18219
 A
@@ -312,7 +312,7 @@ Type: make snow angel
 ~
 That will sure make things more wintry around here!
 ~
-12 e 0 0 -1
+13 ej 0 0 -1
 A
 2 16607
 D 16606
@@ -340,7 +340,7 @@ citizen's bedrooms, and leave it for them to find.
    Upon finding the room empty, you put the gift on the bed and grin to
 yourself at the joy you've brought another citizen of your empire.
 ~
-12 e 0 0 -1
+13 ej 0 0 -1
 A
 6 16650
 A
@@ -376,7 +376,7 @@ to the guild mage.
    The guild mage is shocked that you managed the theft, but appreciative all
 the same.
 ~
-10 de 0 0 -1
+11 dej 0 0 -1
 A
 1 18209
 A
@@ -416,7 +416,7 @@ Type 'use sack <normal | hard | group | boss>' to summon the demon.
    You've stopped the grinchy demon, for now. Even though he got away, the
 citizens' gifts are safe for another night.
 ~
-17 e 0 0 -1
+18 ej 0 0 -1
 P
 36 10700 0 1 a
 R
@@ -443,7 +443,7 @@ Type: 'dress terrier'
    There, now even the animals of your empire are in the holiday mood, whether
 they want to be or not.
 ~
-13 e 0 0 -1
+14 ej 0 0 -1
 A
 0 5111
 A
@@ -475,7 +475,7 @@ Type: dress <horse | camel>
    There! Now even the animals of your empire are in the holiday mood, whether
 they want to be or not.
 ~
-12 e 0 0 -1
+13 ej 0 0 -1
 A
 0 5111
 A
@@ -508,7 +508,7 @@ Type 'craft winter ornament set' to make them, then 'hang ornament' in 4 rooms.
    You've got this decorating thing down. Tree? Check! Ornaments? Check! What
 else could your citizens ask for?
 ~
-14 e 0 0 -1
+15 ej 0 0 -1
 A
 2 16607
 D 16620
@@ -540,7 +540,7 @@ type: 'place pixy' to place a frozen pixy on the tree.
 ~
 You and your citizens agree that makes the tree look much better.
 ~
-14 de 0 0 -1
+15 dej 0 0 -1
 A
 2 16607
 D 16626
@@ -581,7 +581,7 @@ Type: 'throw snowball abominable'
    That'll teach him! Or not, given he's been turned into a snowman. At least
 your buddy is safe again.
 ~
-19 de 0 0 -1
+20 dej 0 0 -1
 A
 1 16600
 D 16626
@@ -622,7 +622,7 @@ citizens while also thwarting those city sorcerers.
 ~
 Your actions today have warmed the hearts -- and bodies -- of the citizens.
 ~
-7 e 0 0 -1
+8 ej 0 0 -1
 A
 2 16607
 D 16643
@@ -657,7 +657,7 @@ many of the empire's poorest citizens.
 ~
 You've managed to burn down a straw goat! It looks like you won the competition.
 ~
-7 e 0 0 -1
+8 ej 0 0 -1
 A
 2 16607
 D 16643
@@ -692,7 +692,7 @@ Steps:
 ~
 Your giant straw goat was a huge hit this year. That was the biggest crowd yet!
 ~
-5 e 0 0 -1
+6 ej 0 0 -1
 A
 2 16607
 D 16620
@@ -722,7 +722,7 @@ tambourine (or any instrument) and play music in front of each citizen.
 ~
 You've lifted everyone's holiday spirit!
 ~
-19 e 0 0 -1
+20 ej 0 0 -1
 A
 1 10701
 D 16676
@@ -751,7 +751,7 @@ buildings.
 ~
 Through the gift of charity, you've lifted everyone's holiday spirit!
 ~
-19 e 0 0 -1
+20 ej 0 0 -1
 A
 1 10701
 D 16676
@@ -786,7 +786,7 @@ Type 'use list <normal | hard | group | boss>' in the ice cave.
 are safe for another night but beware, because the demon could try again each
 and every day.
 ~
-17 e 0 0 -1
+18 ej 0 0 -1
 A
 1 10703
 P
@@ -824,7 +824,7 @@ other side. Since it's the holidays, a lot of pets need good homes, so the
 reward for your hard work is an adoption certificate to get a free puppy or
 kitten.
 ~
-8 0 0 0 -1
+9 j 0 0 -1
 A
 2 16659
 A

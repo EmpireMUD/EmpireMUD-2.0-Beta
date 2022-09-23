@@ -75,6 +75,11 @@ eval tricky %%room_var.%direction%(room)%%
 if (%actor.aff_flagged(SNEAK)% || %actor.nohassle% || !%tricky% || %tricky.template% < %room_var.template%)
   halt
 end
+* block higher template id only
+if (%tricky.template% < %room_var.template%)
+  halt
+end
+* blocked
 %send% %actor% You can't seem to get past ~%self%!
 return 0
 ~
@@ -1191,7 +1196,7 @@ switch %self.vnum%
   case 11815
     * uncaged goblin
     %mod% %self% longdesc %name% is resting here.
-    %mod% %self% lookdesc This little goblin looks positively malnourished as %self.hisher% boney frame protrudes through %self.hisher%
+    %mod% %self% lookdesc This little goblin looks positively malnourished as %self.hisher% bony frame protrudes through %self.hisher%
     %mod% %self% append-lookdesc pale green skin. Dressed only in rags and shaking as %self.heshe% stands, %self.heshe% somehow raises %self.hisher% fists to fight.
   break
   case 11816
@@ -1206,6 +1211,26 @@ switch %self.vnum%
   break
 done
 detach 11824 %self.id%
+~
+#11825
+Skycleave: Say 'Ala lilo' to open the secret passage from either side~
+2 d 0
+ala lilo~
+* works from: 11817, 11822, 11917, 11922
+* Check if it's already open
+if (%room.template% == 11817 || %room.template% == 11917) && %room.northwest(room)%
+  * already open
+  detach 11825 %self.id%
+  halt
+elseif (%room.template% == 11822 || %room.template% == 11922) && %room.southeast(room)%
+  * already open
+  detach 11825 %self.id%
+  halt
+end
+* trigger opening
+wait 1
+%load% mob 11924
+detach 11825 %self.id%
 ~
 #11826
 Skycleave: Pixy Maze track dummy~
@@ -1266,9 +1291,18 @@ if %vnum%
   %load% mob %vnum%
   set mob %room.people%
   if %mob.vnum% == %vnum%
-    %echo% ~%mob% walks in from the foyer.
-    makeuid foyer room i11800
-    %at% %foyer% %echo% ~%mob% walks through the foyer and into the tower.
+    if %mob.vnum% == 11801
+      * special handling for dylane: spawns on silent mode
+      dg_affect #11832 %mob% !SEE on -1
+      dg_affect #11832 %mob% !TARGET on -1
+      dg_affect #11832 %mob% SNEAK on -1
+      nop %mob.add_mob_flag(SILENT)%
+    else
+      * all other mobs
+      %echo% ~%mob% walks in from the foyer.
+      makeuid foyer room i11800
+      %at% %foyer% %echo% ~%mob% walks through the foyer and into the tower.
+    end
   end
 end
 * and detach if the list is empty
@@ -1499,8 +1533,17 @@ elseif %room.template% == 11832 || %room.template% == 11833
   end
 elseif %room.template% == 11836
   %echo% The otherworlder barrels through, flailing ^%self% arms wildly, and jumps out the window!
+  wait 0
   %echo% The otherworlder shouts, 'Bok jel thet far mesh bek tol cha... Shaw!
   %echo% You watch out the window as the otherworlder is enveloped in shimmering blue light and vanishes in midair!
+  wait 0
+  set ch %room.people%
+  while %ch%
+    if %ch.is_pc% && %ch.leader% == %self%
+      %send% %ch% You are struck with vertigo as you stop short of the window and think better of following the otherworlder out.
+    end
+    set ch %ch.next_in_room%
+  done
   %purge% %self%
 else
   * unknown location somehow? Oh well, we tried
@@ -1680,7 +1723,7 @@ if %self.vnum% == 11933
   %echo% She taps her staff on the slate floor three times.
   wait 9 sec
   %force% %annelise% say Ahem... In service of the Tower I restore you bodily as you once were!
-  %echo% She taps her staff on the floor agian.
+  %echo% She taps her staff on the floor again.
   wait 9 sec
   %echo% ~%annelise% sighs.
   wait 3 sec
@@ -1697,7 +1740,7 @@ if %self.vnum% == 11933
   %mod% %self% append-lookdesc are inexplicably wet at the bottom. Dark, teary eyes poke out from underneath a mop of straw-colored hair as he stares at you wordlessly.
   * and finish
   wait 9 sec
-  %force% %annelise% say Rather embarassing to admit I'm dreadful at non-rhyming magic.
+  %force% %annelise% say Rather embarrassing to admit I'm dreadful at non-rhyming magic.
   wait 6 sec
   say What happened? Oh! I can speak again! I'm free! I'm free!
   wait 9 sec
@@ -3066,8 +3109,8 @@ end
 Skycleave: Barrosh post-fight cutscene~
 0 n 100
 ~
-wait 0 sec
-%echo% Time moves backwards for a second as High Sorcerer Barrosh composes himself and holds his staff to the sky...
+wait 0
+%echo% Time moves backwards for a second as High Sorcerer Barrosh composes himself and holds his staff to the sky, dropping some things in the process...
 wait 9 sec
 say For the honor of Skycleave!
 wait 4 sec
@@ -4792,7 +4835,7 @@ remote diff2 %spirit.id%
 %at% i11810 skygobpix %difficulty% g  * trash mob
 %at% i11811 skygobpix %difficulty% g  * trash mob
 %at% i11812 skygobpix %difficulty% a  * trash mob
-%at% i11813 skygobpix %difficulty% p  * trash mob
+%at% i11813 skygobpix %difficulty% g  * trash mob
 %at% i11814 skygobpix %difficulty% g  * trash mob
 %at% i11816 %load% mob 11812  * Apprentice Cosimo (hiding)
 %at% i11818 skyload 11819 %difficulty%  * Pixy Boss
@@ -4974,7 +5017,7 @@ while %ch%
   if %ch.nohassle% || (%ch.vnum% >= 11890 && %ch.vnum% <= 11899)
     * nothing (11890-11899 are mobs involved in phase change)
   elseif %ch.is_pc% || %ch.vnum% < 11800 || %ch.vnum% > 11988
-    * Move ch (stops at 11988 because of mini-pets from this adventure)
+    * Move ch (stops at 11988 because of minipets from this adventure)
     %teleport% %ch% %to_room%
     %load% obj 11805 %ch%
     * check quest completion

@@ -2937,6 +2937,7 @@ const char *quest_flags[] = {
 	"NO-GUESTS",
 	"TUTORIAL",
 	"GROUP-COMPLETION",
+	"EVENT",
 	"\n"
 };
 
@@ -3064,7 +3065,7 @@ const char *bld_flags[] = {
 	"ROAD-ICON",
 	"ROAD-ICON-WIDE",
 	"ATTACH-BARRIER",	// 20
-	"*",
+	"NO-CUSTOMIZE",
 	"*",
 	"*",
 	"*",
@@ -3608,7 +3609,7 @@ const char *room_aff_bits[] = {
 	"REPEL-NPCS",	// 20
 	"REPEL-ANIMALS",
 	"NO-WORKFORCE-EVOS",
-	"*HIDE-REAL-NAME",
+	"HIDE-REAL-NAME",
 	"MAPOUT-BUILDING",
 	"\n"
 };

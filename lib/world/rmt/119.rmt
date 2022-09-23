@@ -1254,11 +1254,15 @@ substance keeps you from reading anything but:
        old goblin knickknacks lying around? Still, seems foolish to
        risk it all for bits of jade. Have never known a goblin ...
 ~
+E
+cages~
+The cages are made of iron bars, most bent out of shape from years of abuse.
+~
 S
 #11915
 The Goblin Cages~
    The long room would be large if not for all the cages, which go all the way
-to the far wall. At full capactiy, this room could hold dozens of goblins,
+to the far wall. At full capacity, this room could hold dozens of goblins,
 though the sorcerers seem unconcerned that the conditions would be inhumane.
 One or two cages are in front of windows, but most of the inhabitants don't get
 a lot of light. The room's aroma is far from pleasant, but a truly disturbing
@@ -1299,7 +1303,12 @@ E
 floors~
 The floor is made from large slabs of flagstone.
 ~
+E
+cages~
+The cages are made of iron bars, most bent out of shape from years of abuse.
+~
 T 11921
+T 11936
 S
 #11916
 A Narrow Passageway~
@@ -1354,7 +1363,11 @@ The long passageway continues to the southeast.
 ~
 E
 northwest nw~
-It looks like the exit to the secret passage is in the northwest wall.
+   It looks like the exit to the secret passage is in the northwest wall. A
+small note on the wall reads:
+
+                             Secret Pass Phrase
+                                'O ala lilo'
 ~
 E
 cobwebs dust~
@@ -1368,6 +1381,7 @@ be oak, though they're rough and unfinished.
 ~
 M 1 11922 100.00 4
 T 11917
+T 11825
 S
 #11918
 The Pixy Races~
@@ -1460,7 +1474,7 @@ enough for pixies to try to overtake the lead.
 ~
 E
 glass~
-The domes and tubes of the racetrack are made from crystal-clear glass.
+The domes and tubes of the racetrack are made from crystal clear glass.
 ~
 E
 chair swiveling~
@@ -1726,6 +1740,7 @@ older versions of the tower. Beneath his painting, the nameplate reads:
                  |       Grand High Sorcerer Wong       |
                  |    Great Builder, Passed Naturally   |
                  |  Thirteenth Master, Tower Skycleave  |
+                 |             'O ala lilo'             |
                  +--------------------------------------+
 ~
 E
@@ -1756,6 +1771,7 @@ portrait reads:
                  +-------------------------------------+
 ~
 M 1 11831 100.00 5
+T 11825
 S
 #11923
 A Small Bedroom~
@@ -1868,8 +1884,9 @@ S
 #11925
 A Small Bunkroom~
    Beds and desks line the walls and fill the center of this old bunkroom.
-Indeed, the room might once have spacious, but the apprentices have been packed
-in like potted fish. The wall by the door has been painted with a large mural.
+Indeed, the room might once have been spacious, but the apprentices have been
+packed in like potted fish. The wall by the door has been painted with a large
+mural.
 ~
 ch 0 d
 D2
@@ -2802,6 +2819,10 @@ which disturbs the pattern of light when you look at it just right. Centered in
 the wavering area is an unusual painting.
 ~
 E
+floors down~
+The gray slate floor is scattered with piles of household items.
+~
+E
 painting bagel visuals~
 You examine the painting on the wavering wall:
    The upper section of this painting is three people standing around a platter
@@ -3409,7 +3430,7 @@ calamander stripes striped~
 and brown striped calamander wood .
 ~
 E
-railing handrail chandelier tree trunk opening~
+railing handrail chandelier tree trunk opening sculpture~
    The striped handrail curves around the walkway that hugs the wall of the
 grand chamber. Across the railing, the trunk of the grand chandelier twists
 downward. Looking over the rail, you see that it branches out into an inverted
@@ -5145,7 +5166,7 @@ wooden timbers~
 remains of a rock arch.
 ~
 E
-gates~
+gates west~
    The tremendous gate is made of solid wood. It's difficult to tell how strong
 it is while it's closed, but it looks like it can withstand a serious assault.
 The gate is painted white, with hundreds of stylized green faces on it.
@@ -5176,12 +5197,17 @@ ocean down out sea horizon~
 It stretches out as far as the eye can see from here, meeting the sky at every
 horizon.
 ~
+E
+up~
+The steps lead up toward the gobbrabakh.
+~
 M 0 11973 100.00 1
 M 0 11988 100.00 1
 M 0 11947 100.00 1
 T 11945
 T 11946
 T 11976
+T 11936
 S
 #11990
 The Stone Cauldrons~

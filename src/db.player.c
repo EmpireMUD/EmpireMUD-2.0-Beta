@@ -1629,10 +1629,14 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *c
 						}
 					}
 				}
+				else if (!strn_cmp(line, "Event Dailies: ", 15)) {
+					GET_EVENT_DAILY_QUESTS(ch) = atoi(line + 14);
+				}
 				else if (!strn_cmp(line, "Extra Attribute: ", 17)) {
 					sscanf(line + 17, "%s %d", str_in, &i_in[0]);
 					if ((num = search_block(str_in, extra_attribute_types, TRUE)) != NOTHING) {
-						GET_EXTRA_ATT(ch, num) = i_in[0];
+						// these are no longer saved/read
+						// GET_EXTRA_ATT(ch, num) = i_in[0];
 					}
 				}
 				BAD_TAG_WARNING(line);
@@ -2625,11 +2629,15 @@ void write_player_primary_data_to_file(FILE *fl, char_data *ch) {
 	}
 	
 	// 'E'
+	fprintf(fl, "Event Dailies: %d\n", GET_EVENT_DAILY_QUESTS(ch));
+	/* No longer writing extra attributes: these come from abilities/gear and should not be saved/loaded
+		note that if you reenable this, you must also enable the part that loads it
 	for (iter = 0; iter < NUM_EXTRA_ATTRIBUTES; ++iter) {
 		if (GET_EXTRA_ATT(ch, iter)) {
 			fprintf(fl, "Extra Attribute: %s %d\n", extra_attribute_types[iter], GET_EXTRA_ATT(ch, iter));
 		}
 	}
+	*/
 	
 	// 'F'
 	fprintf(fl, "Fight Messages: %s\n", bitv_to_alpha(GET_FIGHT_MESSAGES(ch)));
@@ -4896,6 +4904,7 @@ void add_player_map_memory(char_data *ch, room_vnum vnum, char *icon, char *name
 void delete_player_map_memory(struct player_map_memory *memory, char_data *ch) {
 	// ch is optional
 	if (ch && !IS_NPC(ch)) {
+		GET_MAP_MEMORY_NEEDS_SAVE(ch) = TRUE;
 		HASH_DEL(GET_MAP_MEMORY(ch), memory);
 		--GET_MAP_MEMORY_COUNT(ch);
 	}
@@ -4967,7 +4976,15 @@ void load_map_memory(char_data *ch) {
 		
 		// load from file
 		while (get_line(fl, line)) {
-			if (*line && sscanf(line, "%d %ld %4s %s", &vnum, &timestamp, icon, name) == 4) {
+			if (*line == '*' && sscanf(line+2, "%d %ld %s", &vnum, &timestamp, name) == 3) {
+				// remove dummy values
+				if (!strcmp(name, "~")) {
+					*name = '\0';
+				}
+				// and add
+				add_player_map_memory(ch, vnum, "", name, timestamp);
+			}
+			else if (*line && sscanf(line, "%d %ld %4s %s", &vnum, &timestamp, icon, name) == 4) {
 				// remove dummy values
 				if (!strcmp(icon, "    ")) {
 					*icon = '\0';
@@ -5035,7 +5052,12 @@ void write_map_memory(char_data *ch) {
 	}
 	
 	HASH_ITER(hh, GET_MAP_MEMORY(ch), map_mem, next) {
-		fprintf(fl, "%d %ld %-4.4s %s\n", map_mem->vnum, map_mem->timestamp, NULLSAFE(map_mem->icon), (map_mem->name && *map_mem->name) ? map_mem->name : "~");
+		if (map_mem->icon) {
+			fprintf(fl, "%d %ld %-4.4s %s\n", map_mem->vnum, map_mem->timestamp, map_mem->icon, (map_mem->name && *map_mem->name) ? map_mem->name : "~");
+		}
+		else {	// no icon
+			fprintf(fl, "* %d %ld %s\n", map_mem->vnum, map_mem->timestamp, (map_mem->name && *map_mem->name) ? map_mem->name : "~");
+		}
 	}
 	
 	fclose(fl);

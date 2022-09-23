@@ -76,7 +76,7 @@ M
 $n coughs into $s hand.~
 M
 0
-$n pulls out a handkerchief and makes an vulgar sound as he spits into it.~
+$n pulls out a handkerchief and makes a vulgar sound as he spits into it.~
 M
 0
 $n coughs.~
@@ -182,8 +182,6 @@ gray bushes she calls eyebrows. Her ruddy complexion shines like a beacon from
 beneath a thicket of gray hair, which is untamed on a good day -- and good days
 are in short supply in Skycleave. As she tidies the room, you notice most of
 her left hand has been replaced with intricate nocturnium filigree.
-- animation notes: shuffles back and forth around the room, keeping things in
-  order. May tell the player there's no room for them.
 ~
 F 11800
 T 11810
@@ -799,7 +797,7 @@ S
 #11829
 otherworlder~
 an otherworlder~
-An escaped otherworlder barreling through!
+An escaped otherworlder is barreling through!
 ~
 0 0 bdz 0 3
 0 0 0 15
@@ -1247,7 +1245,7 @@ M
 say Has anyone ever told you you have a powerful aura?~
 M
 7
-emote $n holds the foot end her staff out toward your stomach and draws an invisible line across it.~
+emote $n holds the foot end of her staff out toward your stomach and draws an invisible line across it.~
 M
 7
 say I would just love to see what portents we can augur out of your precious hero intestines.~

@@ -117,7 +117,7 @@ bell minipet cheerful elf~
 a cheerful elf minipet bell~
 A cheerful elf minipet bell is lying here.~
 This bell can summon a cheerful elf (a noncombat pet)!
-Type 'use bell' to gain the cheerful elf mini-pet.
+Type 'use bell' to gain the cheerful elf minipet.
 ~
 19 p a 0 7
 10709 0 0
@@ -309,7 +309,7 @@ whistle Christmas tree minipet~
 a Christmas tree minipet whistle~
 Someone has left their Christmas tree whistle here.~
 This whistle can summon a noncombat pet!
-Type 'use whistle' to gain the little pine sapling mini-pet.
+Type 'use whistle' to gain the little pine sapling minipet.
 ~
 19 p a 0 4
 10723 0 0
@@ -320,7 +320,7 @@ whistle reindeer fawn minipet~
 a reindeer fawn minipet whistle~
 Someone has left their reindeer fawn whistle here.~
 This whistle can summon a noncombat pet!
-Type 'use whistle' to gain the reindee fawn mini-pet.
+Type 'use whistle' to gain the reindee fawn minipet.
 ~
 19 p a 0 5
 10724 0 0
@@ -331,7 +331,7 @@ whistle snowman animated minipet~
 an animated snowman minipet whistle~
 Someone has left their animated snowman whistle here.~
 This whistle can summon a noncombat pet!
-Type 'use whistle' to gain the animated snowman mini-pet.
+Type 'use whistle' to gain the animated snowman minipet.
 ~
 19 p a 0 7
 10725 0 0
@@ -342,7 +342,7 @@ whistle toy soldier minipet~
 a toy soldier minipet whistle~
 Someone has left their toy soldier whistle here.~
 This whistle can summon a noncombat pet!
-Type 'use whistle' to gain the toy soldier mini-pet.
+Type 'use whistle' to gain the toy soldier minipet.
 ~
 19 p a 0 7
 10726 0 0
@@ -352,7 +352,7 @@ S
 whistle minipet winter wonderland~
 a Winter Wonderland minipet whistle~
 A Winter Wonderland minipet whistle is lying here.~
-   Type 'use whistle' to gain a mini-pet from the Winter Wonderland, if there
+   Type 'use whistle' to gain a minipet from the Winter Wonderland, if there
 are any left you don't have.
 ~
 3 p a 0 6
@@ -376,7 +376,7 @@ S
 whistle minipet winter wonderland~
 a Winter Wonderland minipet whistle~
 A Winter Wonderland minipet whistle is lying here.~
-   Type 'use whistle' to gain a mini-pet from the Winter Wonderland, if there
+   Type 'use whistle' to gain a minipet from the Winter Wonderland, if there
 are any left you don't have.
 ~
 3 p a 0 1
@@ -658,7 +658,7 @@ a bell on a blue ribbon~
 A bell on a blue ribbon is lying here.~
    This little bell on a blue ribbon belongs to Mary's lost lamb. Surely she
 would reward you if you gave the bell back to her. If you 'ring' the bell, you
-will gain a little lamb mini-pet.
+will gain a little lamb minipet.
    You can 'use' this item to teleport back to the nearest Mother Goose
 adventure. From there, try 'where mary' to find her.
 ~

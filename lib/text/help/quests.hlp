@@ -20,11 +20,15 @@ a lot.
 
 For more information on each, see HELP QUEST <command>.
 #
-"DAILY QUEST" DAILY DAILIES
+"DAILY QUESTS" DAILY DAILIES "EVENT DAILIES"
 
 'Dailies' are a special type of quest, which have a per-day limit. You can only
 complete 5 daily quests total, then can't do any more daily quests until the
 next reset (the same reset as bonus experience).
+
+If a daily quest is part of an event, it has a separate limit than non-event
+daily quests. You can complete 5 event dailies and 5 non-event dailies on the
+same day.
 
 Each individual daily quest can only be completed at most once per day (based
 on the reset time, not a 24-hour counter like other quests). However, some
@@ -48,6 +52,15 @@ item also counts, but exporting it again will count against the total.
 
 However, it does not count toward this requirement if you pick up an item you
 didn't produce yourself, or if another player gives you an item.
+#
+"EVENT QUESTS"
+
+Some events use quests to gain points. These are marked with (event) in their
+name. Daily quests with the (event daily) tag are separate from non-event
+dailies. They have a separate limit of 5-per-day. You can complete 5 event
+dailies and 5 non-event dailies in the same day.
+
+See also: DAILY QUESTS
 #
 "QUEST DROP"
 
@@ -144,7 +157,7 @@ These basic daily quests can be completed for a little extra bonus experience.
 They can be started from an artisan in the listed building (for example, the
 miller for the mill).
 
-Grain for the Miller (Mill)
+Grain for the Miller (Mill, requires Trade 15)
 Forge Horseshoes (Stable, requires Trade 15)
 Steal a Trinket (Tavern, requires Stealth 15)
 Disenchant Trinkets (Tower of Sorcery, requires High Sorcery 15)

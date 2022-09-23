@@ -2122,7 +2122,11 @@ Some affects are managed by live data and commands (do not set affects with *):
  *!DISMANTLE - cannot be dismantled until nodismantle is toggled
  *INCOMPLETE - building is unfinished
  *FAKE-INSTANCE - roaming adventure is using this tile
- *HIDE-REAL-NAME - won't show real name after custom room name (see MANAGE)
+
+Affects that are SOMETIMES safe to use:
+ HIDE-REAL-NAME - won't show real name after custom room name (see MANAGE).
+   This can be used on buildings when you expect a script, NOT A PLAYER, to
+   rename it.
 
 See also: OLC BUILDINGS, OLC ROOM TEMPLATES
 #d
@@ -2279,6 +2283,7 @@ Available flags:
  ROAD-ICON - replaces the building icon with generated road icons/dashes: --+-
  ROAD-ICON-WIDE - replaces the icon with wide road icons: ====
  ATTACH-BARRIER - icons with @u/@v will attach to this building like a barrier
+ NO-CUSTOMIZE - cannot be customized by players
  SAIL - can enter this building with a boat
  ITEM-LIMIT - only a certain number of items can be dropped here
  LONG-AUTOSTORE - autostore takes 72 hours instead of 3 here
@@ -2754,6 +2759,7 @@ Fields:
   &c-level -levelover -levelunder&0 - specific level requirement
   &c-quantity -quantityover -quantityunder&0 - specific quantity value
   &c-requiresobject&0 - requires any object
+  &c-requiresfunction&0 - requires a function flag
   &c-time -timeover -timeunder&0 - specific craft time (in action ticks)
 
 Examples:
@@ -3265,10 +3271,24 @@ Avoid starting with "The" or "A".
 
 See also: OLC EVENTS
 #d
+"EVEDIT MAXPOINTS" "EVEDIT MAX POINTS" "EVEDIT MAXIMUM POINTS"
+
+Usage:  .maxpoints <points | none>
+
+This optional trait caps the maximum number of points a player may gain in the
+event. After this, any extra points are ignored. Without this trait, players
+may gain any number of points.
+
+Uses for this:
+- On a long event with a fixed number of points each day, to skip a day safely.
+- On an event where players only need to do daily quests a few times to finish.
+
+See also: OLC EVENTS
+#d
 "EVEDIT MINLEVEL" "EVEDIT MAXLEVEL" "EVEDIT MIN LEVEL" "EVEDIT MAX LEVEL" "EVEDIT MINIMUM LEVEL" "EVEDIT MAXIMUM LEVEL"
 
-Usage:  .minlevel <level>
-        .maxlevel <level>
+Usage:  .minlevel <level | none>
+        .maxlevel <level | none>
 
 This allows you to set the level limits on an event. This is only used for
 display, and is not enforced. If you wish to enforce a level limit on an event,
@@ -5522,7 +5542,7 @@ Examples:
  > .o fullsearch -level 50 sword
 
 To search other fields, you can generally use the normal "search" option for
-other OLC types. For example, to find all objects with the "Mini-pet Use"
+other OLC types. For example, to find all objects with the "Minipet Use"
 trigger, use ".t search 9900".
 #d
 "OEDIT KEYWORDS"
@@ -5870,7 +5890,7 @@ Available types:
  *MAIL - a letter (internal use only)
  WEALTH - adds to empire wealth when stored
  LIGHTER - can light fires
- MINIPET - teaches a mini-pet to the player on 'use'
+ MINIPET - teaches a minipet to the player on 'use'
  MISSILE-WEAPON - a bow, or similar (requires .wear RANGED)
  AMMO - ammunition for missile weapons
  INSTRUMENT - a musical instrument -- must set custom messages
@@ -6830,6 +6850,8 @@ The following quest flags are available:
     Use this flag for basic tutorials only, like ones on common items.
  GROUP-COMPLETION - Will auto-finish the quest if a group member turns it in
     while in the same room.
+ EVENT - Quest is marked as part of an event. If it's a daily quest, it is
+    separate from non-event dailies.
 
 See also: OLC QUESTS, DAILY QUEST
 #d
@@ -8078,18 +8100,18 @@ extra-description to get the same effect.
 #d
 "MINIPET ITEM" "MINIPET OBJECT" "MINI-PET ITEM" "MINI-PET OBJECT" "MINI PET OBJECT" "MINI PET ITEM" "PET WHISTLE"
 
-Mini-pets are a common cosmetic reward from adventure zones. They are taught
+Minipets are a common cosmetic reward from adventure zones. They are taught
 by a MINIPET item, and the player may get that item from a loot drop or a
 shop.
 
 Object values on a MINIPET item:
  0 - mob vnum to teach
 
-Mini-pet mobs should have the following traits:
+Minipet mobs should have the following traits:
  - Locked to a low level like 1
  - Adorable custom messages (optional)
 
-Mini-pets automatically gain the following when summoned:
+Minipets automatically gain the following when summoned:
  - Scaled to the player's level
  - Flags: SENTINEL SPAWNED !LOOT !EXPERIENCE (and ISNPC)
  - Affects: !ATTACK CHARMED

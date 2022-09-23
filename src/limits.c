@@ -752,10 +752,11 @@ void real_update_char(char_data *ch) {
 				update_MSDP_bonus_exp(ch, UPDATE_SOON);
 			}
 			GET_DAILY_QUESTS(ch) = 0;
+			GET_EVENT_DAILY_QUESTS(ch) = 0;
 		
 			msg_to_char(ch, "&yYour daily quests and bonus experience have reset!&0\r\n");
-		
-			if (fail_daily_quests(ch)) {
+			
+			if (fail_daily_quests(ch, TRUE) | fail_daily_quests(ch, FALSE)) {
 				msg_to_char(ch, "Your daily quests expire.\r\n");
 			}
 		

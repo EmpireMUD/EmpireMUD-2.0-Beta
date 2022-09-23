@@ -43,6 +43,18 @@ calamander~
 from calamander. It's a strange wood that's striped black and brown, and known
 to be extremely rare.
 ~
+E
+walls paneled paneling~
+The walls are paneled with beautiful black ebony wood.
+~
+E
+floors~
+The floor is made from stunning white marble.
+~
+E
+fixtures lights lamps~
+The room is lit by nocturnium oil lamps in fixtures on the walls.
+~
 M 1 11800 100.00 2
 M 0 11900 100.00 1
 S
@@ -560,7 +572,7 @@ Towerwinkel's Gift Shoppe~
 as the gift shop has been hastily converted for storage. The sales counter in
 the middle of the room is covered in maps and papers, and crates of supplies
 are stacked around the room. The floor has quickly become worn from all the
-foot traffic in and out. It doesn't look like they're be selling anything here.
+foot traffic in and out. It doesn't look like they're selling anything here.
 ~
 c 0 0
 D1
@@ -1183,6 +1195,7 @@ floors~
 The dirty floor is made from large slabs of flagstone.
 ~
 T 11921
+T 11936
 S
 #11816
 A Narrow Passageway~
@@ -1237,7 +1250,11 @@ The long passageway continues to the southeast.
 ~
 E
 northwest nw~
-It looks like the exit to the secret passage is in the northwest wall.
+   It looks like the exit to the secret passage is in the northwest wall. A
+small note on the wall reads:
+
+                             Secret Pass Phrase
+                                'O ala lilo'
 ~
 E
 cobwebs dust~
@@ -1250,6 +1267,7 @@ spirals up the tower's central chamber. The hefty beams supporting it appear to
 be oak, though they're rough and unfinished.
 ~
 M 1 11922 100.00 4
+T 11825
 S
 #11818
 A Most Peculiar Maze~
@@ -1450,12 +1468,12 @@ S
 #11822
 The Second Floor Walkway of the Tower Skycleave~
    The second floor walkway, with its scuffed, scratched, worn (and sometimes
-scorched) ebony wood floors, comes to a end as it turns into stairs that continue
-up to the third floor. The line of damaged portraits depicting the former
-masters of the Tower Skycleave ends just before the stairs, where three heavily
-splintered frames hang with damaged nameplates beneath them. The tree-like
-chandelier dangles just out of reach beyond the railing, free from damage. To
-the east, a dense jungle of vines and saplings has grown over the walkway.
+scorched) ebony wood floors, comes to an end as it turns into stairs that
+continue up to the third floor. The line of damaged portraits depicting the
+former masters of the Tower Skycleave ends just before the stairs, where three
+heavily splintered frames hang with damaged nameplates beneath them. The tree-
+like chandelier dangles just out of reach beyond the railing, free from damage.
+To the east, a dense jungle of vines and saplings has grown over the walkway.
 ~
 cg 0 0
 D1
@@ -1583,6 +1601,7 @@ his portrait reads:
                  +-------------------------------------+
 ~
 M 1 11831 100.00 5
+T 11825
 S
 #11823
 A Most Peculiar Maze~
@@ -2454,7 +2473,8 @@ stations, crystals on the old desk, crystals hanging from the ceiling...
 ~
 E
 windows north~
-A pair of large windows light the room.
+   Light fills the room from a pair of large windows, one of which is broken
+and missing many of its glass panes.
 ~
 E
 desk chair antique~
@@ -2639,6 +2659,10 @@ E
 north doorway~
 The north door leads back out onto the walkway.
 ~
+E
+floors down~
+The gray slate floor is scattered with piles of household items.
+~
 T 11926
 T 11927
 S
@@ -2680,7 +2704,7 @@ of light. An odd nocturnium sculpture stands upon it, well-protected by the
 ward.
 ~
 E
-statue marie~
+statue marina~
    There is an old, worn, but lifelike statue in the shape of a lovely young
 apprentice in the corner. For a second, you think you saw her wink.
 ~
@@ -2709,6 +2733,7 @@ east doorway~
 The east doorway leads back to the main lab.
 ~
 M 1 11833 100.00 1
+T 11936
 S
 #11860
 The Upper Walkway of the Tower Skycleave~
@@ -2949,7 +2974,7 @@ S
 The Upper Walkway of the Tower Skycleave~
    A heavy wooden door lies in the middle of the walkway, its broken hinges
 swinging in the air. There are dozens of books scattered outside the doorway,
-some of them splayed open where the landed. Angry shouting comes from the
+some of them splayed open where they landed. Angry shouting comes from the
 office, encouraging you to keep moving along the walkway that follows the
 curving ebony wall of the chamber.
 ~
@@ -3169,7 +3194,7 @@ calamander stripes striped~
 and brown striped calamander wood .
 ~
 E
-railing handrail chandelier tree trunk opening~
+railing handrail chandelier tree trunk opening sculpture~
    The striped handrail curves around the walkway that hugs the wall of the
 grand chamber. Across the railing, the trunk of the grand chandelier twists
 downward. Looking over the rail, you see that it branches out into an inverted
@@ -3257,10 +3282,10 @@ S
 #11865
 An Elegant Suite~
    This cozy apartment is full of plush, overstuffed furniture and fluffy
-blankets. A small canopy bed has its curtain drawn on the foot and. A small
-hearth provides a place to cook, although it looks as if it doesn't get much
-use. White marble floors seem to light the room from below as they reflect
-light from the nocturnium chandelier onto the dark walls.
+blankets. A small canopy bed has its curtain drawn at its foot. A small hearth
+provides a place to cook, although it looks as if it doesn't get much use.
+White marble floors seem to light the room from below as they reflect light
+from the nocturnium chandelier onto the dark walls.
 ~
 ch 0 dG
 D3
@@ -4248,7 +4273,7 @@ translucent stone or gem.
 ~
 E
 pool center shimmering water~
-   A round pool has been cut in the center of the floor and holds crystal-clear
+   A round pool has been cut in the center of the floor and holds crystal clear
 water that seems to ripple and swirl on its own, producing shimmering patterns
 of light that dance across the ceiling.
 ~
@@ -4396,6 +4421,10 @@ sconces oil lamps~
 Each one has an oil reservoir and a wick rest, with a bright white flame atop
 it. Dozens of these lamps cast the light all around the great chamber,
 glimmering off the ceiling, the walls, and the dew pools down below.
+~
+E
+pillars~
+The fluted pillars are cut directly from the obsidian of the palace.
 ~
 E
 chairs~

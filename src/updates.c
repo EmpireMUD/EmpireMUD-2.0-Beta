@@ -2078,6 +2078,7 @@ void b5_130b_item_refresh(void) {
 	}
 }
 
+
 // b5.130b: fix a small number of items that have scripts they need attached
 PLAYER_UPDATE_FUNC(b5_130b_player_refresh) {
 	obj_data *obj, *next_obj, *new_obj;
@@ -2096,6 +2097,20 @@ PLAYER_UPDATE_FUNC(b5_130b_player_refresh) {
 			swap_obj_for_obj(obj, new_obj);
 			extract_obj(obj);
 		}
+	}
+}
+
+
+// b5.134: clear map memory for screenreader users
+PLAYER_UPDATE_FUNC(b5_134_update_players) {
+	if (PRF_FLAGGED(ch, PRF_SCREEN_READER)) {
+		load_map_memory(ch);
+		while (GET_MAP_MEMORY(ch)) {
+			delete_player_map_memory(GET_MAP_MEMORY(ch), ch);
+		}
+		// mark these loaded in order to ensure a save (it can be skipped here if they are skill-swapped out of Cartography)
+		GET_MAP_MEMORY_LOADED(ch) = TRUE;
+		GET_MAP_MEMORY_NEEDS_SAVE(ch) = TRUE;
 	}
 }
 
@@ -2158,6 +2173,7 @@ const struct {
 	{ "b5.121", NULL, b5_121_update_players, "Adding default informative flags" },
 	{ "b5.128", b5_128_learned_update, NULL, "Updated learned crafts for trappers posts" },
 	{ "b5.130b", b5_130b_item_refresh, b5_130b_player_refresh, "Updated items that need script attachments" },
+	{ "b5.134", NULL, b5_134_update_players, "Wiped map memory for screenreader users to clear bad data" },
 	
 	{ "\n", NULL, NULL, "\n" }	// must be last
 };

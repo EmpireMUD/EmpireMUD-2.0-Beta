@@ -105,7 +105,7 @@ a way of encouraging guests to become clients -- or even patrons. Self-filling
 vessels such as this one are difficult to find outside, however, as the
 sorcerers usually enchant them to be unpilferable.
 ~
-5 eo a 0 8
+5 ep a 0 9
 72 72 11804
 3 0
 C
@@ -515,7 +515,7 @@ S
 shield tower glass~
 a glass tower shield~
 A glass tower shield is standing here.~
-   This huge tower shield is made of crystal-clear glass, obscured only by the
+   This huge tower shield is made of crystal clear glass, obscured only by the
 strap and handle on the back, giving its bearer a superior view of the battle
 without compromising saftey. And despite being made from glass, the shield
 takes blow after blow, ringing out like a bell but never shattering.
@@ -673,6 +673,8 @@ A shimmering magical ward covers the staircase, blocking all access!~
    The sputtering blue cascade of mana flowing over the staircase is the only
 thing keeping you from climbing up to the next floor -- and the only thing
 keeping whatever is up there at bay.
+   Use the 'difficulty' command to set the difficulty for the next floor before
+proceeding.
 ~
 3 0 0 0 4
 0 0 0
@@ -838,7 +840,7 @@ leggings thundersilk skycleaver pair~
 thundersilk skycleaver leggings~
 A pair of thundersilk skycleaver leggings is lying here.~
    These loose-fitting leggings are made from rare, elegant thundersilk -- a
-material that channels every stay spark of static electricity in the air
+material that channels every stray spark of static electricity in the air
 straight into a sorcerer's body to strengthen their offensive magic.
    Thundersilk was once made by pixies, masters of silk, from the coccoons of
 moths that pupated at the lightning-kissed tops of the pixy trees. No pixy

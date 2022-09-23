@@ -354,7 +354,7 @@ while (%list% && !%found%)
 done
 * Nothing to give
 if !%found%
-  %send% %actor% You already have all the mini-pets from the Winter Wonderland!
+  %send% %actor% You already have all the minipets from the Winter Wonderland!
   %purge% %self%
   halt
 end
@@ -363,7 +363,7 @@ end
 set pet %actor.room.people%
 if %pet.vnum% == %vnum%
   nop %actor.add_minipet(%vnum%)%
-  %send% %actor% You gain '~%pet%' as a mini-pet. Use the minipets command to summon it.
+  %send% %actor% You gain '~%pet%' as a minipet. Use the minipets command to summon it.
   %purge% %pet%
 else
   %send% %actor% There seems to be a problem giving you minipet #%vnum%. Please report this.
@@ -477,7 +477,7 @@ while (%list% && !%found%)
 done
 * Nothing to give
 if !%found%
-  %send% %actor% You already have all the mini-pets from the Winter Wonderland!
+  %send% %actor% You already have all the minipets from the Winter Wonderland!
   %purge% %self%
   halt
 end
@@ -486,7 +486,7 @@ end
 set pet %actor.room.people%
 if %pet.vnum% == %vnum%
   nop %actor.add_minipet(%vnum%)%
-  %send% %actor% You gain '~%pet%' as a mini-pet. Use the minipets command to summon it.
+  %send% %actor% You gain '~%pet%' as a minipet. Use the minipets command to summon it.
   %purge% %pet%
 else
   %send% %actor% There seems to be a problem giving you minipet #%vnum%. Please report this.
@@ -741,7 +741,7 @@ switch %random.3%
 done
 ~
 #10744
-Mini-pet use - little lamb bell version~
+Minipet use - little lamb bell version~
 1 c 3
 ring~
 if %actor.obj_target(%arg%)% != %self% && !(%self.is_name(%arg%)% && %self.worn_by%)
@@ -749,10 +749,10 @@ if %actor.obj_target(%arg%)% != %self% && !(%self.is_name(%arg%)% && %self.worn_
   halt
 end
 if %actor.has_minipet(%self.val0%)%
-  %send% %actor% You already have the lamb mini-pet.
+  %send% %actor% You already have the lamb minipet.
 else
   nop %actor.add_minipet(%self.val0%)%
-  %send% %actor% You ring @%self% and gain a little lamb mini-pet! (see HELP MINIPET)
+  %send% %actor% You ring @%self% and gain a little lamb minipet! (see HELP MINIPET)
   %echoaround% %actor% ~%actor% rings @%self%.
 end
 ~

@@ -773,7 +773,7 @@ bool try_mobile_movement(char_data *ch) {
 */
 void run_mobile_activity(char_data *ch) {
 	register char_data *ally, *vict, *targ;
-	bool acted = FALSE, moved = FALSE;
+	bool acted = FALSE, moved = FALSE, is_hostile, is_enemy;
 	obj_data *obj;
 
 	#define CAN_AGGRO(mob, vict)  (!IS_IMMORTAL(vict) && !IS_DEAD(vict) && !NOHASSLE(vict) && (IS_NPC(vict) || !PRF_FLAGGED(vict, PRF_WIZHIDE)) && !IS_GOD(vict) && vict != GET_LEADER(mob) && !AFF_FLAGGED(vict, AFF_IMMUNE_PHYSICAL | AFF_NO_TARGET_IN_ROOM | AFF_NO_SEE_IN_ROOM | AFF_NO_ATTACK) && CAN_SEE(mob, vict) && can_fight((mob), (vict)))
@@ -869,7 +869,15 @@ void run_mobile_activity(char_data *ch) {
 				if (GET_LEADER(vict) && !IS_NPC(GET_LEADER(vict)) && in_same_group(vict, GET_LEADER(vict)) && GET_LOYALTY(GET_LEADER(vict)) == GET_LOYALTY(ch)) {
 					continue;	// ignore: grouped leader is in my empire
 				}
+				
+				// further checks:
+				is_hostile = (IS_HOSTILE(vict) || (!IS_DISGUISED(vict) && !IS_NPC(vict) && empire_is_hostile(GET_LOYALTY(ch), GET_LOYALTY(vict), IN_ROOM(ch))));
+				is_enemy = (IS_NPC(vict) && GET_LOYALTY(vict) && empire_is_hostile(GET_LOYALTY(ch), GET_LOYALTY(vict), IN_ROOM(ch)));
+				if (!MOB_FLAGGED(vict, MOB_AGGRESSIVE) && !is_hostile && !is_enemy) {
+					continue;	// ignore: reasons not to attack
+				}
 				if (!CAN_AGGRO(ch, vict)) {
+					// check can-aggro last because it will scale the target
 					continue;	// ignore: invalid target
 				}
 				
@@ -880,13 +888,13 @@ void run_mobile_activity(char_data *ch) {
 					acted = TRUE;
 					break;
 				}
-				else if (IS_HOSTILE(vict) || (!IS_DISGUISED(vict) && !IS_NPC(vict) && empire_is_hostile(GET_LOYALTY(ch), GET_LOYALTY(vict), IN_ROOM(ch)))) {
+				else if (is_hostile) {
 					// attack: hostile to empire
 					hit(ch, vict, GET_EQ(ch, WEAR_WIELD), TRUE);
 					acted = TRUE;
 					break;
 				}
-				else if (IS_NPC(vict) && GET_LOYALTY(vict) && empire_is_hostile(GET_LOYALTY(ch), GET_LOYALTY(vict), IN_ROOM(ch))) {
+				else if (is_enemy) {
 					// attack: hostility against empire mobs
 					hit(ch, vict, GET_EQ(ch, WEAR_WIELD), TRUE);
 					acted = TRUE;

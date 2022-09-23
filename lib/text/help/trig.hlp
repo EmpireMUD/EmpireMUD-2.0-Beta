@@ -45,6 +45,19 @@ Mob and object triggers also provide:
 
 See also: MTRIG CHARMED
 #d
+ALLOW-MULTIPLE "ALLOW-MULTIPLE TRIGGER" "ALLOW MULTIPLE TRIGGER" "MTRIG ALLOW-MULTIPLE" TRIGEDIT-MOB-ALLOW-MULTIPLE
+
+Allow-Multiple (trigger type)
+
+This type of trigger is set in conjunction with Load or Death on a mob trigger
+to allow multiple scripts of the same type to run. Normally, any successful
+Load or Death trigger will prevent further ones from running.
+
+Be sure not to set Allow-Multiple is the trigger will kill or purge the mob
+running it.
+
+See also: MTRIG DEATH, MTRIG LOAD
+#d
 "BUY TRIGGER" "MTRIG BUY" "OTRIG BUY" "RTRIG BUY" "VTRIG BUY" TRIGEDIT-MOB-BUY TRIGEDIT-OBJ-BUY TRIGEDIT-ROOM-BUY TRIGEDIT-VEH-BUY
 
 Buy (trigger type)
@@ -354,7 +367,10 @@ the mob and set off its load triggers.
 Buildings call their load triggers when first constructed, even before they
 are complete.
 
-See also: RTRIG COMPLETE
+Only the FIRST successful load trigger on a mob will run unless it also has the
+Allow-Multiple type.
+
+See also: RTRIG COMPLETE, ALLOW-MULTIPLE
 #d
 "MTRIG ENTRY" "VTRIG ENTRY" "MTRIG ENTER" "VTRIG ENTER" TRIGEDIT-MOB-ENTRY TRIGEDIT-VEH-ENTRY TRIGEDIT-ENTRY TRIGGER-ENTRY 
 

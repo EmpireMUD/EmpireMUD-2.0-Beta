@@ -644,6 +644,7 @@ int GET_MAX_BLOOD(char_data *ch);	// this one is different than the other max po
 #define EVT_DURATION(evt)  ((evt)->duration)
 #define EVT_FLAGS(evt)  ((evt)->flags)
 #define EVT_MAX_LEVEL(evt)  ((evt)->max_level)
+#define EVT_MAX_POINTS(evt)  ((evt)->max_points)
 #define EVT_MIN_LEVEL(evt)  ((evt)->min_level)
 #define EVT_NAME(evt)  ((evt)->name)
 #define EVT_NOTES(evt)  ((evt)->notes)
@@ -1155,6 +1156,7 @@ int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_COORD(ge
 #define GET_DISGUISED_NAME(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->disguised_name))
 #define GET_DISGUISED_SEX(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->disguised_sex))
 #define GET_EQ_SETS(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->eq_sets))
+#define GET_EVENT_DAILY_QUESTS(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->event_daily_quests))
 #define GET_EVENT_DATA(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->event_data))
 #define GET_EXP_TODAY(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->exp_today))
 #define GET_FACTIONS(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->factions))
@@ -1310,6 +1312,11 @@ int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_COORD(ge
 #define QUEST_VERSION(quest)  ((quest)->version)
 
 #define QUEST_FLAGGED(quest, flg)  IS_SET(QUEST_FLAGS(quest), (flg))
+
+#define IS_DAILY_QUEST(quest) (QUEST_FLAGGED((quest), QST_DAILY))
+#define IS_EVENT_QUEST(quest) (QUEST_FLAGGED((quest), QST_EVENT))
+#define IS_EVENT_DAILY(quest) (QUEST_FLAGGED((quest), QST_DAILY) && QUEST_FLAGGED((quest), QST_EVENT))
+#define IS_NON_EVENT_DAILY(quest) (QUEST_FLAGGED((quest), QST_DAILY) && !QUEST_FLAGGED((quest), QST_EVENT))
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -2025,7 +2032,7 @@ bool dismiss_any_minipet(char_data *ch);
 const char *color_by_difficulty(char_data *ch, int level);
 void count_quest_tasks(struct req_data *list, int *complete, int *total);
 void drop_quest(char_data *ch, struct player_quest *pq);
-bool fail_daily_quests(char_data *ch);
+bool fail_daily_quests(char_data *ch, bool event);
 struct instance_data *find_matching_instance_for_shared_quest(char_data *ch, any_vnum quest_vnum);
 void show_quest_tracker(char_data *ch, struct player_quest *pq);
 void start_quest(char_data *ch, quest_data *qst, struct instance_data *inst);
@@ -2132,6 +2139,7 @@ bool valid_rank_name(char_data *ch, char *newname);
 // event.c
 int gain_event_points(char_data *ch, any_vnum event_vnum, int points);
 struct player_event_data *get_event_data(char_data *ch, int event_id);
+struct event_running_data *only_one_running_event(int *count);
 
 // faction.c
 const char *get_faction_name_by_vnum(any_vnum vnum);
