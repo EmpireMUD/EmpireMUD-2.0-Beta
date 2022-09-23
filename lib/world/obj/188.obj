@@ -873,6 +873,19 @@ T 18858
 T 18859
 T 18860
 S
+#18859
+whistle bone fading~
+a fading bone whistle~
+A fading bone whistle floats before you.~
+   This curious whistle appears to be made of bone, but you can see right
+through it and you have trouble grasping or blowing the whistle. What sort of
+thing is both bone and ghost at once?
+   Type 'use whistle' to gain a new non-combat minipet.
+~
+19 p a 0 7
+18859 0 0
+14 0
+S
 #18861
 tome notes demon summoning~
 demon summoning notes~

@@ -323,6 +323,44 @@ D
 half of it into a human!
 ~
 S
+#18859
+ghost skeleton~
+a skeleton ghost~
+The ghost of a skeleton is creeping around.
+~
+1 1 bdoD n 2
+0 0 0 15
+D
+   You can see straight through the little skeleton, and not just between the
+ribs! It seems to be wandering back and forth, lost, often passing straight
+through objects and people. It seems to be in good condition, minus the missing
+flesh and organs, though its eye sockets are strangely square.
+~
+M
+0
+$n wags its chin.~
+M
+0
+The hair on the back of your neck stands up as $n passes straight through you.~
+M
+0
+$n cracks its knuckles and then starts looking frantically for a way to fix them.~
+M
+0
+$n trips over its own two feet and falls through the ground, but quickly reappears nearby.~
+M
+0
+$n scratches its head.~
+M
+0
+$n does a macabre little dance.~
+M
+0
+$n vanishes, only to reappear in front of your face!~
+M
+0
+$n leaps into the air with fright as it sees a shadow on the ground.~
+S
 #18861
 demon small basic~
 a small demon~
