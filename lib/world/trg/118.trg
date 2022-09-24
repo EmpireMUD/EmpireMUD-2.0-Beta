@@ -660,7 +660,9 @@ if %random.2% == 1
       %send% %target% &&r%chosen_object% bonks you in the head!
       %echoaround% %target% %chosen_object% bonks ~%target% in the head!
       %damage% %target% 100 physical
-      dg_affect #11851 %target% HARD-STUNNED on 5
+      if %self.difficulty% >= 3
+        dg_affect #11851 %target% HARD-STUNNED on 5
+      end
     break
     case 2
       %send% %target% &&r%chosen_object% explodes in your face, blinding you!
@@ -678,7 +680,7 @@ if %random.2% == 1
       %send% %target% &&rYou feel %chosen_object% drain your energy as it bounces off you!
       %echoaround% %target% ~%target% looks tired as %chosen_object% bounces off *%target%.
       %damage% %target% 50
-      set magnitude %self.level%/10
+      eval magnitude %self.level% * %self.difficulty% / 10
       nop %target.mana(-%magnitude%)%
       nop %target.move(-%magnitude%)%
     break
@@ -1113,7 +1115,7 @@ switch %self.vnum%
     set ch %self.room.people%
     while %ch%
       if %ch% != %self%
-        dg_affect %ch% HARD-STUNNED on 15
+        dg_affect #11867 %ch% HARD-STUNNED on 15
       end
       set ch %ch.next_in_room%
     done
@@ -3534,7 +3536,7 @@ set ch %room.people%
 while %ch%
   set next_ch %ch.next_in_room%
   if %ch% != %self%
-    dg_affect %ch% HARD-STUNNED on 5
+    dg_affect #11867 %ch% HARD-STUNNED on 5
     %teleport% %ch% %vortex%
   end
   set ch %next_ch%
@@ -3568,7 +3570,7 @@ set ch %room.people%
 while %ch%
   set next_ch %ch.next_in_room%
   if %ch% != %self%
-    dg_affect %ch% HARD-STUNNED on 5
+    dg_affect #11867 %ch% HARD-STUNNED on 5
     %teleport% %ch% %vortex%
   end
   set ch %next_ch%
@@ -5312,6 +5314,7 @@ else
   %at% i11964 %load% mob 11965  * Office Cleaner
   %at% i11968 %load% mob 11969  * GHS Celiya
   %at% i11968 %load% obj 11969  * Celiya's desk
+  %at% i11922 %load% obj 11923  * Celiya's unfinished portrait
   * shout
   set mob %instance.mob(11969)%
   if %mob%

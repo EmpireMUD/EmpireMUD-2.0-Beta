@@ -368,6 +368,68 @@ inside. It looks like you can pull it.
 0 0
 T 11922
 S
+#11923
+brush paintbrush enchanted~
+the enchanted paintbrush~
+An enchanted paintbrush is working on the final portrait.~
+   The shimmering paintbrush twirls back and forth across the canvas like an
+ice dancer, sometimes spinning with such vigor that you find yourself amazed no
+stray droplets of paint have ruined the wall or floor.
+   As it breathes life into the portrait detail by detail, slowly bringing
+Grand High Sorcerer Celiya's likeness into view, the brush pauses only to dunk
+itself in one of the pots of paint that sit on the floor.
+~
+3 0 0 0 1
+0 0 0
+0 0
+E
+celiya canvas unfinished current sorcerer grand final~
+   At the end of the walkway, just before the stairs, Grand High Sorcerer
+Celiya's half-finished likeness is the last -- and latest -- portrait in the
+sequence. An enchanted paintbrush pirouettes across the canvas, stopping only
+to dip into one of the pots of paint on the floor below it. Miraculously, none
+of the paint seems to drip on the pristine floor.
+   Though the portrait is still rough, Celiya's form is already taking shape in
+a pose that's almost grandmotherly, as if she's welcoming you in from the cold.
+The exaggerated cloud of white hair around her head nearly fills the top of the
+frame; also exaggerated are the twirling stripes of black and gold in her hair,
+far more intricate than the colors Celiya has recently added.
+   Below the sorcerer's round, brown, motherly face, most of the portrait is in
+shades of violet, unfinished but surely depicting Celiya's flowing robes. The
+background, too, is unfinished, but the shining new nameplate reads:
+                 +--------------------------------------+
+                 |      Grand High Sorcerer Celiya      |
+                 |                                      |
+                 |   Sixteenth Master, Tower Skycleave  |
+                 +--------------------------------------+
+~
+E
+paint paints pots~
+   Dozens of small pots of paint are clustered along the wall beneath the
+unfinished portrait of Grand High Sorcerer Celiya. Shades of brown and violet
+fill many of the pots, with gold, black, white, blue, green, and red for good
+measure.
+~
+E
+portraits paintings masters~
+   The ebony-framed portraits that line the long curve of the second floor
+hallway end here with the current master, Celiya, her immediate predecessor,
+Knezz, and Grand High Sorcerers Kofi and Wong.
+~
+E
+knezz~
+   Grand High Sorcerer Knezz's portrait, near the end, depicts him in a
+thougtful pose, meditating outdoors in deep violet robes. He looks young in the
+portrait, which is painted from a low angle so as to make him look almost like
+a giant next to the tower. The expression on his face is serene and confident.
+The nameplate below the portrait reads:
+                 +-----------------------------------------+
+                 |        Grand High Sorcerer Knezz        |
+                 |  Master of Time, Died Saving the Tower  |
+                 |    Fifteenth Master, Tower Skycleave    |
+                 +-----------------------------------------+
+~
+S
 #11927
 body corpse henri declaire~
 the body of Henri DeClaire~

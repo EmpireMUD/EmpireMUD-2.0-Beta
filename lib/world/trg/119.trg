@@ -1492,23 +1492,83 @@ elseif %self.state% == 3
 end
 ~
 #11921
-Skycleave: Search for Secret Passage~
+Skycleave: Search ability for hints and secret passages~
 2 p 100
 ~
+return 1
 if %ability% != 18 && %abilityname% != Search
   * wrong ability
-  return 1
-  halt
-elseif %room.north(room)%
-  * Already open
-  return 1
   halt
 end
-* Not already open
-%send% %actor% You search around and find a hidden switch on the side of the bin...
-%echoaround% %actor% ~%actor% seems to have found something while searching around...
-%load% mob 11923
-return 0
+set spirit %instance.mob(11900)%
+switch %room.template%
+  case 11815
+  case 11915
+    * goblin cages (both phases)
+    if %room.north(room)%
+      * Already open
+      halt
+    end
+    * Not already open
+    %send% %actor% You search around and find a hidden switch on the side of the bin...
+    %echoaround% %actor% ~%actor% seems to have found something while searching around...
+    %load% mob 11923
+    return 0
+  break
+  case 11817
+  case 11917
+    * Back of the passage
+    if !%room.northwest(room)%
+      %send% %actor% You search around and notice a note by the exit to the passage.
+      %send% %actor% It reads: Secret Pass Phrase 'O ala lilo'
+      %echoaround% %actor% ~%actor% searches around and finds a note.
+      return 0
+    end
+  break
+  case 11822
+  case 11922
+    * Outside the passage, walkway side
+    if !%room.southeast(room)%
+      %send% %actor% It looks like there's a secret passage in the wall. Perhaps one of the portraits has a hint on how to open it.
+      %echoaround% %actor% ~%actor% searches around.
+      return 0
+    end
+  break
+  case 11835
+    * Eruditorium
+    if %room.people(11847)%
+      %send% %actor% It doesn't look like it would be a good idea to get in Kara Virduke's way as she searches the room.
+    else
+      %send% %actor% You search the room, but can't figure out what Kara Virduke was looking for in here.
+      %echoaround% %actor% ~%actor% searches around the room.
+    end
+    return 0
+  break
+  case 11836
+    * Lich labs
+    if !%spirit.lich_released%
+      %send% %actor% You search around but keep noticing the lich's repository rattling, and the instructions on the blackboard.
+      %echoaround% %actor% ~%actor% searches around the room.
+      return 0
+    end
+  break
+  case 11839
+  case 11939
+    * Enchanting lab
+    if !%room.east(room)%
+      %send% %actor% You search around the illusory wall, trying to figure out how to open it, but can't find a way.
+      %send% %actor% Perhaps there's a clue in the painting's name.
+      %echoaround% %actor% ~%actor% searches around the wall.
+      return 0
+    end
+  break
+  case 11841
+    * Attunement lab 3A
+    %send% %actor% You're not sure how anybody finds anything in this place... it's a mess.
+    %echoaround% %actor% ~%actor% searches around fruitlessly.
+    return 0
+  break
+done
 ~
 #11922
 Skycleave: Secret passage levers~

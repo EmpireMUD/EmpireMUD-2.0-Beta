@@ -1362,7 +1362,7 @@ southeast se~
 The long passageway continues to the southeast.
 ~
 E
-northwest nw~
+northwest nw note~
    It looks like the exit to the secret passage is in the northwest wall. A
 small note on the wall reads:
 
@@ -1382,6 +1382,7 @@ be oak, though they're rough and unfinished.
 M 1 11922 100.00 4
 T 11917
 T 11825
+T 11921
 S
 #11918
 The Pixy Races~
@@ -1757,7 +1758,7 @@ nameplate reads:
                  +--------------------------------------+
 ~
 E
-knezz current sorcerer grand~
+knezz current sorcerer grand final~
    The portrait of Knezz is the last one in line at the base of the stairs. His
 image shows him in his most familiar pose as he stands meditating outdoors in
 his violet and gold robes. He looks younger in the portrait, which is painted
@@ -1772,6 +1773,7 @@ portrait reads:
 ~
 M 1 11831 100.00 5
 T 11825
+T 11921
 S
 #11923
 A Small Bedroom~
@@ -2872,6 +2874,7 @@ The north door leads back out onto the walkway.
 ~
 T 11926
 T 11927
+T 11921
 S
 #11940
 The Magichanical Laboratory~
