@@ -5123,7 +5123,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						}
 						else {
 							// setting
-							set_depletion(r, type, atoi(arg2));
+							set_room_depletion(r, type, atoi(arg2));
 							snprintf(str, slen, "%d", get_depletion(r, type));
 						}
 					}
@@ -5642,6 +5642,27 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						}
 						else {
 							*str = '\0';
+						}
+					}
+					else if (!str_cmp(field, "depletion")) {
+						// usage: %veh.depletion(TYPE)% to get
+						//        %veh.depletion(TYPE,AMOUNT)% to set
+						char arg1[256], arg2[256];
+						int type;
+						comma_args(subfield, arg1, arg2);
+						
+						if (!*arg1 || (type = search_block(arg1, depletion_type, FALSE)) == NOTHING) {
+							// missing type?
+							*str = '\0';
+						}
+						else if (!*arg2 || !isdigit(*arg2)) {
+							// just getting
+							snprintf(str, slen, "%d", get_vehicle_depletion(v, type));
+						}
+						else {
+							// setting
+							set_vehicle_depletion(v, type, atoi(arg2));
+							snprintf(str, slen, "%d", get_vehicle_depletion(v, type));
 						}
 					}
 					else if (!str_cmp(field, "driver")) {
