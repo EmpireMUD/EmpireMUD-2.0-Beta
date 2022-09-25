@@ -5106,6 +5106,27 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 							*str = '\0';
 						}
 					}
+					else if (!str_cmp(field, "depletion")) {
+						// usage: %room.depletion(TYPE)% to get
+						//        %room.depletion(TYPE,AMOUNT)% to set
+						char arg1[256], arg2[256];
+						int depletion_type;
+						comma_args(subfield, arg1, arg2);
+						
+						if (!*arg1 || (depletion_type = search_block(arg1, function_flags, FALSE)) == NOTHING) {
+							// missing type?
+							*str = '\0';
+						}
+						else if (!*arg2 || !isdigit(*arg2)) {
+							// just getting
+							snprintf(str, slen, "%d", get_depletion(r, depletion_type));
+						}
+						else {
+							// setting
+							set_depletion(r, depletion_type, atoi(arg2));
+							snprintf(str, slen, "%d", get_depletion(r, depletion_type));
+						}
+					}
 					else if (!str_cmp(field, "direction")) {
 						room_data *targ;
 						int dir;
