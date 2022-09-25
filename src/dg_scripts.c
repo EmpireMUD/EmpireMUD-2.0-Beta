@@ -5113,7 +5113,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						int depletion_type;
 						comma_args(subfield, arg1, arg2);
 						
-						if (!*arg1 || (depletion_type = search_block(arg1, function_flags, FALSE)) == NOTHING) {
+						if (!*arg1 || (depletion_type = search_block(arg1, depletion_type, FALSE)) == NOTHING) {
 							// missing type?
 							*str = '\0';
 						}
