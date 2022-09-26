@@ -32,7 +32,9 @@ Variables:
   &c%target%&0 - The target object of the action, if any.
   &c%arg%&0 - The entire action phrase that was seen.
 
-See also: MTRIG CHARMED
+You can add the "Player-in-Room" modifier.
+
+See also: MTRIG CHARMED, PLAYER-IN-ROOM TRIGGER
 #d
 "BRIBE TRIGGER" "MTRIG BRIBE" TRIGEDIT-MOB-BRIBE
 
@@ -158,8 +160,10 @@ Note: Memory triggers attached to charmed mobs will not fire unless the trigger
 
 Variables:
   &c%actor%&0 - The character being remembered.
-  
-See also: MTRIG CHARMED
+
+You can add the "Player-in-Room" modifier.
+
+See also: MTRIG CHARMED, PLAYER-IN-ROOM TRIGGER
 #d
 MAGGRO %AGGRO%
 

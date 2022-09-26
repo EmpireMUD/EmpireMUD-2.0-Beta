@@ -160,7 +160,7 @@ void greet_memory_mtrigger(char_data *actor) {
 	char_data *ch;
 	struct script_memory *mem, *next_mem;
 	char buf[MAX_INPUT_LENGTH];
-	int command_performed = 0;
+	int command_performed = 0, any_in_room = -1;
 
 	if (IS_IMMORTAL(actor) && (GET_INVIS_LEV(actor) > LVL_MORTAL || PRF_FLAGGED(actor, PRF_WIZHIDE))) {
 		return;
@@ -188,7 +188,18 @@ void greet_memory_mtrigger(char_data *actor) {
 					if (AFF_FLAGGED(ch, AFF_CHARM) && !TRIGGER_CHECK(t, MTRIG_CHARMED)) {
 						continue;
 					}
-					if (IS_SET(GET_TRIG_TYPE(t), MTRIG_MEMORY) && CAN_SEE(ch, actor) && !GET_TRIG_DEPTH(t) && number(1, 100) <= GET_TRIG_NARG(t)) {
+					if (!TRIGGER_CHECK(t, MTRIG_MEMORY) || !CAN_SEE(ch, actor)) {
+						continue;
+					}
+					if (TRIG_IS_LOCAL(t)) {
+						if (any_in_room == -1) {
+							any_in_room = any_players_in_room(IN_ROOM(ch));
+						}
+						if (!any_in_room) {
+							continue;	// requires a player
+						}
+					}
+					if (number(1, 100) <= GET_TRIG_NARG(t)) {
 						union script_driver_data_u sdd;
 						ADD_UID_VAR(buf, t, char_script_id(actor), "actor", 0);
 						sdd.c = ch;
@@ -214,7 +225,7 @@ int greet_mtrigger(char_data *actor, int dir) {
 	trig_data *t, *next_t;
 	char_data *ch;
 	char buf[MAX_INPUT_LENGTH];
-	int intermediate, final=TRUE;
+	int intermediate, final=TRUE, any_in_room = -1;
 
 	if (IS_IMMORTAL(actor) && (GET_INVIS_LEV(actor) > LVL_MORTAL || PRF_FLAGGED(actor, PRF_WIZHIDE))) {
 		return TRUE;
@@ -234,7 +245,18 @@ int greet_mtrigger(char_data *actor, int dir) {
 			if (AFF_FLAGGED(ch, AFF_CHARM) && !TRIGGER_CHECK(t, MTRIG_CHARMED)) {
 				continue;
 			}
-			if (((IS_SET(GET_TRIG_TYPE(t), MTRIG_GREET) && CAN_SEE(ch, actor)) || IS_SET(GET_TRIG_TYPE(t), MTRIG_GREET_ALL)) && !GET_TRIG_DEPTH(t) && (number(1, 100) <= GET_TRIG_NARG(t))) {
+			if (!TRIGGER_CHECK(t, MTRIG_GREET_ALL) && !(TRIGGER_CHECK(t, MTRIG_GREET) && CAN_SEE(ch, actor))) {
+				continue;	// wrong types
+			}
+			if (TRIG_IS_LOCAL(t)) {
+				if (any_in_room == -1) {
+					any_in_room = any_players_in_room(IN_ROOM(ch));
+				}
+				if (!any_in_room) {
+					continue;	// requires a player
+				}
+			}
+			if (number(1, 100) <= GET_TRIG_NARG(t)) {
 				union script_driver_data_u sdd;
 				if (dir>=0 && dir < NUM_OF_DIRS)
 					add_var(&GET_TRIG_VARS(t), "direction", (char *)dirs[rev_dir[dir]], 0);
@@ -257,7 +279,7 @@ int pre_greet_mtrigger(char_data *actor, room_data *room, int dir) {
 	trig_data *t, *next_t;
 	char_data *ch;
 	char buf[MAX_INPUT_LENGTH];
-	int intermediate, final=TRUE;
+	int intermediate, final=TRUE, any_in_room = -1;
 
 	if (IS_IMMORTAL(actor) && (GET_INVIS_LEV(actor) > LVL_MORTAL || PRF_FLAGGED(actor, PRF_WIZHIDE))) {
 		return TRUE;
@@ -274,7 +296,18 @@ int pre_greet_mtrigger(char_data *actor, room_data *room, int dir) {
 			if (AFF_FLAGGED(ch, AFF_CHARM) && !TRIGGER_CHECK(t, MTRIG_CHARMED)) {
 				continue;
 			}
-			if (!GET_TRIG_DEPTH(t) && (number(1, 100) <= GET_TRIG_NARG(t))) {
+			if (!TRIGGER_CHECK(t, MTRIG_PRE_GREET_ALL)) {
+				continue;
+			}
+			if (TRIG_IS_LOCAL(t)) {
+				if (any_in_room == -1) {
+					any_in_room = any_players_in_room(room);
+				}
+				if (!any_in_room) {
+					continue;	// requires a player
+				}
+			}
+			if (number(1, 100) <= GET_TRIG_NARG(t)) {
 				union script_driver_data_u sdd;
 				if (dir>=0 && dir < NUM_OF_DIRS)
 					add_var(&GET_TRIG_VARS(t), "direction", (char *)dirs[rev_dir[dir]], 0);
@@ -294,10 +327,12 @@ int pre_greet_mtrigger(char_data *actor, room_data *room, int dir) {
 
 
 void entry_memory_mtrigger(char_data *ch) {
+	union script_driver_data_u sdd;
 	trig_data *t, *next_t;
 	char_data *actor;
 	struct script_memory *mem, *next_mem;
 	char buf[MAX_INPUT_LENGTH];
+	int any_in_room = -1;
 
 	if (!SCRIPT_MEM(ch))
 		return;
@@ -317,13 +352,23 @@ void entry_memory_mtrigger(char_data *ch) {
 					}
 					else {
 						LL_FOREACH_SAFE(TRIGGERS(SCRIPT(ch)), t, next_t) {
-							if (TRIGGER_CHECK(t, MTRIG_MEMORY) && (number(1, 100) <= GET_TRIG_NARG(t))){
-								union script_driver_data_u sdd;
-								ADD_UID_VAR(buf, t, char_script_id(actor), "actor", 0);
-								sdd.c = ch;
-								script_driver(&sdd, t, MOB_TRIGGER, TRIG_NEW);
-								break;
+							if (!TRIGGER_CHECK(t, MTRIG_MEMORY) || number(1, 100) > GET_TRIG_NARG(t)) {
+								continue;	// wrong type or no random roll
 							}
+							if (TRIG_IS_LOCAL(t)) {
+								if (any_in_room == -1) {
+									any_in_room = any_players_in_room(IN_ROOM(ch));
+								}
+								if (!any_in_room) {
+									continue;	// requires a player
+								}
+						    }
+						    
+						    // ok
+							ADD_UID_VAR(buf, t, char_script_id(actor), "actor", 0);
+							sdd.c = ch;
+							script_driver(&sdd, t, MOB_TRIGGER, TRIG_NEW);
+							break;
 						}
 					}
 					/* delete the memory */
@@ -340,7 +385,9 @@ void entry_memory_mtrigger(char_data *ch) {
 
 
 int entry_mtrigger(char_data *ch) {
+	union script_driver_data_u sdd;
 	trig_data *t, *next_t;
+	int any_in_room = -1;
 
 	if (!SCRIPT_CHECK(ch, MTRIG_ENTRY))
 		return 1;
@@ -349,12 +396,23 @@ int entry_mtrigger(char_data *ch) {
 		if (AFF_FLAGGED(ch, AFF_CHARM) && !TRIGGER_CHECK(t, MTRIG_CHARMED)) {
 			continue;
 		}
-		if (TRIGGER_CHECK(t, MTRIG_ENTRY) && (number(1, 100) <= GET_TRIG_NARG(t))){
-			union script_driver_data_u sdd;
-			sdd.c = ch;
-			return script_driver(&sdd, t, MOB_TRIGGER, TRIG_NEW);
-			break;
+		if (!TRIGGER_CHECK(t, MTRIG_ENTRY) || (number(1, 100) > GET_TRIG_NARG(t))) {
+			continue;
 		}
+		
+		if (TRIG_IS_LOCAL(t)) {
+			if (any_in_room == -1) {
+				any_in_room = any_players_in_room(IN_ROOM(ch));
+			}
+			if (!any_in_room) {
+				continue;	// requires a player
+			}
+		}
+		
+		// ok:
+		sdd.c = ch;
+		return script_driver(&sdd, t, MOB_TRIGGER, TRIG_NEW);
+		break;
 	}
 
 	return 1;
@@ -487,6 +545,7 @@ void speech_mtrigger(char_data *actor, char *str) {
 	char_data *ch, *ch_next;
 	trig_data *t, *next_t;
 	char buf[MAX_INPUT_LENGTH];
+	int any_in_room = -1;
 	
 	DL_FOREACH_SAFE2(ROOM_PEOPLE(IN_ROOM(actor)), ch, ch_next, next_in_room) {
 		if (SCRIPT_CHECK(ch, MTRIG_SPEECH) && AWAKE(ch) && (actor!=ch)) {
@@ -494,9 +553,18 @@ void speech_mtrigger(char_data *actor, char *str) {
 				if (AFF_FLAGGED(ch, AFF_CHARM) && !TRIGGER_CHECK(t, MTRIG_CHARMED)) {
 					continue;
 				}
-				if (!TRIGGER_CHECK(t, MTRIG_SPEECH))
+				if (!TRIGGER_CHECK(t, MTRIG_SPEECH)) {
 					continue;
-
+				}
+				if (TRIG_IS_LOCAL(t)) {
+					if (any_in_room == -1) {
+						any_in_room = any_players_in_room(IN_ROOM(actor));
+					}
+					if (!any_in_room) {
+						continue;	// requires a player
+					}
+				}
+				
 				if (!GET_TRIG_ARG(t) || !*GET_TRIG_ARG(t)) {
 					syslog(SYS_ERROR, LVL_BUILDER, TRUE, "SYSERR: Speech Trigger #%d has no text argument!", GET_TRIG_VNUM(t));
 					continue;
@@ -519,14 +587,24 @@ void speech_mtrigger(char_data *actor, char *str) {
 void act_mtrigger(const char_data *ch, char *str, char_data *actor, char_data *victim, obj_data *object, obj_data *target, char *arg) {
 	trig_data *t, *next_t;
 	char buf[MAX_INPUT_LENGTH];
+	int any_in_room = -1;
 
 	if (SCRIPT_CHECK(ch, MTRIG_ACT) && (actor!=ch)) {
 		LL_FOREACH_SAFE(TRIGGERS(SCRIPT(ch)), t, next_t) {
 			if (AFF_FLAGGED(ch, AFF_CHARM) && !TRIGGER_CHECK(t, MTRIG_CHARMED)) {
 				continue;
 			}
-			if (!TRIGGER_CHECK(t, MTRIG_ACT))
+			if (!TRIGGER_CHECK(t, MTRIG_ACT)) {
 				continue;
+			}
+			if (TRIG_IS_LOCAL(t)) {
+				if (any_in_room == -1) {
+					any_in_room = any_players_in_room(IN_ROOM(ch));
+				}
+				if (!any_in_room) {
+					continue;	// requires a player
+				}
+			}
 
 			if (!GET_TRIG_ARG(t) || !*GET_TRIG_ARG(t)) {
 				syslog(SYS_ERROR, LVL_BUILDER, TRUE, "SYSERR: Act Trigger #%d has no text argument!", GET_TRIG_VNUM(t));
@@ -811,6 +889,7 @@ int leave_mtrigger(char_data *actor, int dir, char *custom_dir) {
 	trig_data *t, *next_t;
 	char_data *ch;
 	char buf[MAX_INPUT_LENGTH];
+	int any_in_room = -1;
 	
 	if (IS_IMMORTAL(actor) && (GET_INVIS_LEV(actor) > LVL_MORTAL || PRF_FLAGGED(actor, PRF_WIZHIDE))) {
 		return 1;
@@ -828,7 +907,18 @@ int leave_mtrigger(char_data *actor, int dir, char *custom_dir) {
 			if (AFF_FLAGGED(ch, AFF_CHARM) && !TRIGGER_CHECK(t, MTRIG_CHARMED)) {
 				continue;
 			}
-			if (((IS_SET(GET_TRIG_TYPE(t), MTRIG_LEAVE) && CAN_SEE(ch, actor)) || IS_SET(GET_TRIG_TYPE(t), MTRIG_LEAVE_ALL)) && !GET_TRIG_DEPTH(t) && (number(1, 100) <= GET_TRIG_NARG(t))) {
+			if (!TRIGGER_CHECK(t, MTRIG_LEAVE_ALL) && !(TRIGGER_CHECK(t, MTRIG_LEAVE) && CAN_SEE(ch, actor))) {
+				continue;
+			}
+			if (TRIG_IS_LOCAL(t)) {
+				if (any_in_room == -1) {
+					any_in_room = any_players_in_room(IN_ROOM(actor));
+				}
+				if (!any_in_room) {
+					continue;	// requires a player
+				}
+			}
+			if (number(1, 100) <= GET_TRIG_NARG(t)) {
 				union script_driver_data_u sdd;
 				if (dir>=0 && dir < NUM_OF_DIRS)
 					add_var(&GET_TRIG_VARS(t), "direction", custom_dir ? custom_dir : (char *)dirs[dir], 0);
@@ -857,7 +947,7 @@ int door_mtrigger(char_data *actor, int subcmd, int dir) {
 			if (AFF_FLAGGED(ch, AFF_CHARM) && !TRIGGER_CHECK(t, MTRIG_CHARMED)) {
 				continue;
 			}
-			if (IS_SET(GET_TRIG_TYPE(t), MTRIG_DOOR) && CAN_SEE(ch, actor) && !GET_TRIG_DEPTH(t) && (number(1, 100) <= GET_TRIG_NARG(t))) {
+			if (TRIGGER_CHECK(t, MTRIG_DOOR) && CAN_SEE(ch, actor) && (number(1, 100) <= GET_TRIG_NARG(t))) {
 				union script_driver_data_u sdd;
 				add_var(&GET_TRIG_VARS(t), "cmd", (char *)cmd_door[subcmd], 0);
 				if (dir>=0 && dir < NUM_OF_DIRS)
@@ -1346,7 +1436,7 @@ return 1;
 int leave_otrigger(room_data *room, char_data *actor, int dir, char *custom_dir) {
 	trig_data *t, *next_t;
 	char buf[MAX_INPUT_LENGTH];
-	int temp, final = 1;
+	int temp, final = 1, any_in_room = -1;
 	obj_data *obj, *obj_next;
 	
 	if (IS_IMMORTAL(actor) && (GET_INVIS_LEV(actor) > LVL_MORTAL || PRF_FLAGGED(actor, PRF_WIZHIDE))) {
@@ -1358,7 +1448,18 @@ int leave_otrigger(room_data *room, char_data *actor, int dir, char *custom_dir)
 			continue;
 
 		LL_FOREACH_SAFE(TRIGGERS(SCRIPT(obj)), t, next_t) {
-			if (TRIGGER_CHECK(t, OTRIG_LEAVE) && (number(1, 100) <= GET_TRIG_NARG(t))) {
+			if (!TRIGGER_CHECK(t, OTRIG_LEAVE)) {
+				continue;
+			}
+			if (TRIG_IS_LOCAL(t)) {
+				if (any_in_room == -1) {
+					any_in_room = any_players_in_room(room);
+				}
+				if (!any_in_room) {
+					continue;	// requires a player
+				}
+			}
+			if (number(1, 100) <= GET_TRIG_NARG(t)) {
 				union script_driver_data_u sdd;
 				if (dir>=0 && dir < NUM_OF_DIRS)
 					add_var(&GET_TRIG_VARS(t), "direction", custom_dir ? custom_dir : (char *)dirs[dir], 0);
@@ -1657,8 +1758,10 @@ void reset_wtrigger(room_data *room) {
 
 
 int enter_wtrigger(room_data *room, char_data *actor, int dir) {
+	union script_driver_data_u sdd;
 	trig_data *t, *next_t;
 	char buf[MAX_INPUT_LENGTH];
+	int any_in_room = -1;
 	
 	if (IS_IMMORTAL(actor) && (GET_INVIS_LEV(actor) > LVL_MORTAL || PRF_FLAGGED(actor, PRF_WIZHIDE))) {
 		return TRUE;
@@ -1668,17 +1771,27 @@ int enter_wtrigger(room_data *room, char_data *actor, int dir) {
 		return 1;
 
 	LL_FOREACH_SAFE(TRIGGERS(SCRIPT(room)), t, next_t) {
-		if (TRIGGER_CHECK(t, WTRIG_ENTER) && (number(1, 100) <= GET_TRIG_NARG(t))) {
-			union script_driver_data_u sdd;
-			ADD_UID_VAR(buf, t, room_script_id(room), "room", 0);
-			if (dir>=0 && dir < NUM_OF_DIRS)
-				add_var(&GET_TRIG_VARS(t), "direction", (char *)dirs[rev_dir[dir]], 0);
-			else
-				add_var(&GET_TRIG_VARS(t), "direction", "none", 0);
-			ADD_UID_VAR(buf, t, char_script_id(actor), "actor", 0);
-			sdd.r = room;
-			return script_driver(&sdd, t, WLD_TRIGGER, TRIG_NEW);
+		if (!TRIGGER_CHECK(t, WTRIG_ENTER) || (number(1, 100) > GET_TRIG_NARG(t))) {
+			continue;
 		}
+		if (TRIG_IS_LOCAL(t)) {
+			if (any_in_room == -1) {
+				any_in_room = any_players_in_room(room);
+			}
+			if (!any_in_room) {
+				continue;	// requires a player
+			}
+		}
+		
+		// ok:
+		ADD_UID_VAR(buf, t, room_script_id(room), "room", 0);
+		if (dir>=0 && dir < NUM_OF_DIRS)
+			add_var(&GET_TRIG_VARS(t), "direction", (char *)dirs[rev_dir[dir]], 0);
+		else
+			add_var(&GET_TRIG_VARS(t), "direction", "none", 0);
+		ADD_UID_VAR(buf, t, char_script_id(actor), "actor", 0);
+		sdd.r = room;
+		return script_driver(&sdd, t, WLD_TRIGGER, TRIG_NEW);
 	}
 
 	return 1;
@@ -1799,14 +1912,24 @@ void speech_wtrigger(char_data *actor, char *str) {
 	room_data *room;
 	trig_data *t, *next_t;
 	char buf[MAX_INPUT_LENGTH];
+	int any_in_room = -1;
 
 	if (!actor || !SCRIPT_CHECK(IN_ROOM(actor), WTRIG_SPEECH))
 		return;
 
 	room = IN_ROOM(actor);
 	LL_FOREACH_SAFE(TRIGGERS(SCRIPT(room)), t, next_t) {
-		if (!TRIGGER_CHECK(t, WTRIG_SPEECH))
+		if (!TRIGGER_CHECK(t, WTRIG_SPEECH)) {
 			continue;
+		}
+		if (TRIG_IS_LOCAL(t)) {
+			if (any_in_room == -1) {
+				any_in_room = any_players_in_room(room);
+			}
+			if (!any_in_room) {
+				continue;	// requires a player
+			}
+		}
 
 		if (!GET_TRIG_ARG(t) || !*GET_TRIG_ARG(t)) {
 			syslog(SYS_ERROR, LVL_BUILDER, TRUE, "SYSERR: W-Speech Trigger #%d has no text argument!", GET_TRIG_VNUM(t));
@@ -1927,6 +2050,7 @@ int ability_wtrigger(char_data *actor, char_data *vict, obj_data *obj, any_vnum 
 int leave_wtrigger(room_data *room, char_data *actor, int dir, char *custom_dir) {
 	trig_data *t, *next_t;
 	char buf[MAX_INPUT_LENGTH];
+	int any_in_room = -1;
 
 	if (!SCRIPT_CHECK(room, WTRIG_LEAVE))
 		return 1;
@@ -1935,7 +2059,18 @@ int leave_wtrigger(room_data *room, char_data *actor, int dir, char *custom_dir)
 	}
 	
 	LL_FOREACH_SAFE(TRIGGERS(SCRIPT(room)), t, next_t) {
-		if (TRIGGER_CHECK(t, WTRIG_LEAVE) && (number(1, 100) <= GET_TRIG_NARG(t))) {
+		if (!TRIGGER_CHECK(t, WTRIG_LEAVE)) {
+			continue;
+		}
+		if (TRIG_IS_LOCAL(t)) {
+			if (any_in_room == -1) {
+				any_in_room = any_players_in_room(room);
+			}
+			if (!any_in_room) {
+				continue;	// requires a player
+			}
+		}
+		if (number(1, 100) <= GET_TRIG_NARG(t)) {
 			union script_driver_data_u sdd;
 			ADD_UID_VAR(buf, t, room_script_id(room), "room", 0);
 			if (dir>=0 && dir < NUM_OF_DIRS)
@@ -2206,19 +2341,31 @@ int destroy_vtrigger(vehicle_data *veh) {
 
 
 int entry_vtrigger(vehicle_data *veh) {
+	union script_driver_data_u sdd;
 	trig_data *t, *next_t;
+	int any_in_room = -1;
 
 	if (!SCRIPT_CHECK(veh, VTRIG_ENTRY)) {
 		return 1;
 	}
 
 	LL_FOREACH_SAFE(TRIGGERS(SCRIPT(veh)), t, next_t) {
-		if (TRIGGER_CHECK(t, VTRIG_ENTRY) && (number(1, 100) <= GET_TRIG_NARG(t))) {
-			union script_driver_data_u sdd;
-			sdd.v = veh;
-			return script_driver(&sdd, t, VEH_TRIGGER, TRIG_NEW);
-			break;
+		if (!TRIGGER_CHECK(t, VTRIG_ENTRY) || (number(1, 100) > GET_TRIG_NARG(t))) {
+			continue;
 		}
+		if (TRIG_IS_LOCAL(t)) {
+			if (any_in_room == -1) {
+				any_in_room = any_players_in_room(IN_ROOM(veh));
+			}
+			if (!any_in_room) {
+				continue;	// requires a player
+			}
+		}
+		
+		// ok:
+		sdd.v = veh;
+		return script_driver(&sdd, t, VEH_TRIGGER, TRIG_NEW);
+		break;
 	}
 
 	return 1;
@@ -2226,7 +2373,7 @@ int entry_vtrigger(vehicle_data *veh) {
 
 
 int greet_vtrigger(char_data *actor, int dir) {
-	int intermediate, final = TRUE;
+	int intermediate, final = TRUE, any_in_room = -1;
 	vehicle_data *veh, *next_veh;
 	char buf[MAX_INPUT_LENGTH];
 	trig_data *t, *next_t;
@@ -2244,7 +2391,18 @@ int greet_vtrigger(char_data *actor, int dir) {
 		}
 
 		LL_FOREACH_SAFE(TRIGGERS(SCRIPT(veh)), t, next_t) {
-			if (IS_SET(GET_TRIG_TYPE(t), VTRIG_GREET) && !GET_TRIG_DEPTH(t) && (number(1, 100) <= GET_TRIG_NARG(t))) {
+			if (!TRIGGER_CHECK(t, VTRIG_GREET)) {
+				continue;
+			}
+			if (TRIG_IS_LOCAL(t)) {
+				if (any_in_room == -1) {
+					any_in_room = any_players_in_room(IN_ROOM(veh));
+				}
+				if (!any_in_room) {
+					continue;	// requires a player
+				}
+			}
+			if (number(1, 100) <= GET_TRIG_NARG(t)) {
 				union script_driver_data_u sdd;
 				if (dir >= 0 && dir < NUM_OF_DIRS) {
 					add_var(&GET_TRIG_VARS(t), "direction", (char *)dirs[rev_dir[dir]], 0);
@@ -2276,6 +2434,7 @@ int leave_vtrigger(char_data *actor, int dir, char *custom_dir) {
 	vehicle_data *veh, *next_veh;
 	char buf[MAX_INPUT_LENGTH];
 	trig_data *t, *next_t;
+	int any_in_room = -1;
 	
 	if (IS_IMMORTAL(actor) && (GET_INVIS_LEV(actor) > LVL_MORTAL || PRF_FLAGGED(actor, PRF_WIZHIDE))) {
 		return 1;
@@ -2287,7 +2446,18 @@ int leave_vtrigger(char_data *actor, int dir, char *custom_dir) {
 		}
 
 		LL_FOREACH_SAFE(TRIGGERS(SCRIPT(veh)), t, next_t) {
-			if (IS_SET(GET_TRIG_TYPE(t), VTRIG_LEAVE) && !GET_TRIG_DEPTH(t) && (number(1, 100) <= GET_TRIG_NARG(t))) {
+			if (!TRIGGER_CHECK(t, VTRIG_LEAVE)) {
+				continue;
+			}
+			if (TRIG_IS_LOCAL(t)) {
+				if (any_in_room == -1) {
+					any_in_room = any_players_in_room(IN_ROOM(actor));
+				}
+				if (!any_in_room) {
+					continue;	// requires a player
+				}
+			}
+			if (number(1, 100) <= GET_TRIG_NARG(t)) {
 				union script_driver_data_u sdd;
 				if ( dir >= 0 && dir < NUM_OF_DIRS) {
 					add_var(&GET_TRIG_VARS(t), "direction", custom_dir ? custom_dir : (char *)dirs[dir], 0);
@@ -2355,12 +2525,21 @@ void speech_vtrigger(char_data *actor, char *str) {
 	vehicle_data *veh, *next_veh;
 	char buf[MAX_INPUT_LENGTH];
 	trig_data *t, *next_t;
+	int any_in_room = -1;
 	
 	DL_FOREACH_SAFE2(ROOM_VEHICLES(IN_ROOM(actor)), veh, next_veh, next_in_room) {
 		if (!VEH_IS_EXTRACTED(veh) && SCRIPT_CHECK(veh, VTRIG_SPEECH)) {
 			LL_FOREACH_SAFE(TRIGGERS(SCRIPT(veh)), t, next_t) {
 				if (!TRIGGER_CHECK(t, VTRIG_SPEECH)) {
 					continue;
+				}
+				if (TRIG_IS_LOCAL(t)) {
+					if (any_in_room == -1) {
+						any_in_room = any_players_in_room(IN_ROOM(actor));
+					}
+					if (!any_in_room) {
+						continue;	// requires a player
+					}
 				}
 
 				if (!GET_TRIG_ARG(t) || !*GET_TRIG_ARG(t)) {
@@ -2407,7 +2586,7 @@ int start_quest_mtrigger(char_data *actor, quest_data *quest, struct instance_da
 			if (AFF_FLAGGED(ch, AFF_CHARM) && !TRIGGER_CHECK(t, MTRIG_CHARMED)) {
 				continue;
 			}
-			if (IS_SET(GET_TRIG_TYPE(t), MTRIG_START_QUEST)) {
+			if (TRIGGER_CHECK(t, MTRIG_START_QUEST)) {
 				union script_driver_data_u sdd;
 				if (quest) {
 					snprintf(buf, sizeof(buf), "%d", QUEST_VNUM(quest));
@@ -2491,7 +2670,7 @@ int start_quest_vtrigger(char_data *actor, quest_data *quest, struct instance_da
 		}
 
 		LL_FOREACH_SAFE(TRIGGERS(SCRIPT(veh)), t, next_t) {
-			if (IS_SET(GET_TRIG_TYPE(t), VTRIG_START_QUEST)) {
+			if (TRIGGER_CHECK(t, VTRIG_START_QUEST)) {
 				union script_driver_data_u sdd;
 				if (quest) {
 					snprintf(buf, sizeof(buf), "%d", QUEST_VNUM(quest));
@@ -2621,7 +2800,7 @@ int check_start_quest_trigger(char_data *actor, quest_data *quest, struct instan
 			if (!(proto = real_trigger(tpl->vnum))) {
 				continue;
 			}
-			if (!IS_SET(GET_TRIG_TYPE(proto), WTRIG_START_QUEST)) {
+			if (!TRIGGER_CHECK(proto, WTRIG_START_QUEST)) {
 				continue;
 			}
 			
@@ -2642,7 +2821,7 @@ int check_start_quest_trigger(char_data *actor, quest_data *quest, struct instan
 			if (!(proto = real_trigger(tpl->vnum))) {
 				continue;
 			}
-			if (!IS_SET(GET_TRIG_TYPE(proto), WTRIG_START_QUEST)) {
+			if (!TRIGGER_CHECK(proto, WTRIG_START_QUEST)) {
 				continue;
 			}
 			
@@ -2681,7 +2860,7 @@ int finish_quest_mtrigger(char_data *actor, quest_data *quest, struct instance_d
 			if (AFF_FLAGGED(ch, AFF_CHARM) && !TRIGGER_CHECK(t, MTRIG_CHARMED)) {
 				continue;
 			}
-			if (IS_SET(GET_TRIG_TYPE(t), MTRIG_FINISH_QUEST)) {
+			if (TRIGGER_CHECK(t, MTRIG_FINISH_QUEST)) {
 				union script_driver_data_u sdd;
 				if (quest) {
 					snprintf(buf, sizeof(buf), "%d", QUEST_VNUM(quest));
@@ -2766,7 +2945,7 @@ int finish_quest_vtrigger(char_data *actor, quest_data *quest, struct instance_d
 		}
 
 		LL_FOREACH_SAFE(TRIGGERS(SCRIPT(veh)), t, next_t) {
-			if (IS_SET(GET_TRIG_TYPE(t), VTRIG_FINISH_QUEST)) {
+			if (TRIGGER_CHECK(t, VTRIG_FINISH_QUEST)) {
 				union script_driver_data_u sdd;
 				if (quest) {
 					snprintf(buf, sizeof(buf), "%d", QUEST_VNUM(quest));
@@ -2896,7 +3075,7 @@ int check_finish_quest_trigger(char_data *actor, quest_data *quest, struct insta
 			if (!(proto = real_trigger(tpl->vnum))) {
 				continue;
 			}
-			if (!IS_SET(GET_TRIG_TYPE(proto), WTRIG_FINISH_QUEST)) {
+			if (!TRIGGER_CHECK(proto, WTRIG_FINISH_QUEST)) {
 				continue;
 			}
 			
@@ -2917,7 +3096,7 @@ int check_finish_quest_trigger(char_data *actor, quest_data *quest, struct insta
 			if (!(proto = real_trigger(tpl->vnum))) {
 				continue;
 			}
-			if (!IS_SET(GET_TRIG_TYPE(proto), WTRIG_FINISH_QUEST)) {
+			if (!TRIGGER_CHECK(proto, WTRIG_FINISH_QUEST)) {
 				continue;
 			}
 			

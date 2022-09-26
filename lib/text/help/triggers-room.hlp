@@ -116,6 +116,10 @@ Variables:
   &c%actor%&0 - The character entering the room.
   &c%direction%&0 - The direction the character came from, if any.
   &c%room%&0 - The room being entered.
+
+You can add the "Player-in-Room" modifier.
+
+See also: PLAYER-IN-ROOM TRIGGER
 #d
 "RTRIG TYPES" TRIGEDIT-ROOM-TYPES "ROOM TRIGGER TYPES" "WORLD TRIGGER TYPES"
 

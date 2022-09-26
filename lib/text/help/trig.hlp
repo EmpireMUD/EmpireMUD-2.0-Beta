@@ -303,8 +303,10 @@ Note: Greet and Greet-All will only catch a person AFTER they enter the room.
 Variables:
   &c%actor%&0 - The character entering the room.
   &c%direction%&0 - The direction the character came from, or 'none'.
-  
-See also: MTRIG CHARMED, MTRIG PRE-GREET-ALL
+
+You can add the "Player-in-Room" modifier.
+
+See also: MTRIG CHARMED, MTRIG PRE-GREET-ALL, PLAYER-IN-ROOM TRIGGER
 #d
 "KILL TRIGGER" "MTRIG KILL" "OTRIG KILL" "VTRIG KILL" TRIGEDIT-MOB-KILL TRIGEDIT-OBJ-KILL TRIGEDIT-VEH-KILL
 
@@ -349,7 +351,9 @@ Variables:
   &c%direction%&0 - The direction the character is leaving to, or "portal" if
      they are leaving through a portal.
 
-See also: MTRIG LEAVE
+You can add the "Player-in-Room" modifier.
+
+See also: MTRIG LEAVE, PLAYER-IN-ROOM TRIGGER
 #d
 "LOAD TRIGGER" "MTRIG LOAD" "OTRIG LOAD" "RTRIG LOAD" "VTRIG LOAD" TRIGEDIT-MOB-LOAD TRIGEDIT-OBJ-LOAD TRIGEDIT-VEH-LOAD TRIGEDIT-ROOM-LOAD TRIGEDIT-LOAD TRIG-LOAD
 
@@ -392,7 +396,9 @@ things that should happen after someone enters, consider adding a 'wait 1'.
 Note: Entry triggers attached to charmed mobs will not fire unless the trigger
    also has the Charmed type.
 
-See also: WAIT, MTRIG CHARMED
+You can add the "Player-in-Room" modifier.
+
+See also: WAIT, MTRIG CHARMED, PLAYER-IN-ROOM TRIGGER
 #d
 MUDCOMMAND CMD.MUDCOMMAND %CMD.MUDCOMMAND% %MUDCOMMAND%
 
@@ -419,6 +425,13 @@ This generally reduces the number of triggers running when they don't need to.
 
 Supported types:
   Random
+  Greet, Greet-All
+  Pre-Greet-All
+  Entry
+  Enter
+  Leave
+  Speech
+  Act
 
 See also: RANDOM TRIGGER
 #d
@@ -444,8 +457,10 @@ Note: Players entering magically (or via something other than a normal room
 Variables:
   &c%actor%&0 - The character entering the room.
   &c%direction%&0 - The direction the character came from, or 'none'.
-  
-See also: MTRIG CHARMED, MTRIG GREET
+
+You can add the "Player-in-Room" modifier.
+
+See also: MTRIG CHARMED, MTRIG GREET, PLAYER-IN-ROOM TRIGGER
 #d
 "RANDOM TRIGGER" "MTRIG RANDOM" "OTRIG RANDOM" "RTRIG RANDOM" "VTRIG RANDOM" TRIGEDIT-MOB-RANDOM TRIGEDIT-OBJ-RANDOM TRIGEDIT-ROOM-RANDOM TRIGEDIT-VEH-RANDOM RANDOM-TIMING TIMING
 
@@ -605,7 +620,9 @@ Variables:
   &c%actor%&0 - The character whose speech activated the trigger.
   &c%speech%&0 - The entire phrase spoken.
 
-See also: MTRIG CHARMED
+You can add the "Player-in-Room" modifier.
+
+See also: MTRIG CHARMED, PLAYER-IN-ROOM TRIGGER
 #d
 "START QUEST TRIGGER" "MTRIG START-QUEST" "OTRIG START-QUEST" "RTRIG START-QUEST" "VTRIG START-QUEST" TRIGEDIT-MOB-START-QUEST TRIGEDIT-OBJ-START-QUEST TRIGEDIT-ROOM-START-QUEST TRIGEDIT-VEH-START-QUEST "START-QUEST TRIGGER"
 
