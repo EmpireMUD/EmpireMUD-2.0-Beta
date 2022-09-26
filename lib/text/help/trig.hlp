@@ -458,7 +458,8 @@ Variables:
   &c%actor%&0 - The character entering the room.
   &c%direction%&0 - The direction the character came from, or 'none'.
 
-You can add the "Player-in-Room" modifier.
+You can add the "Player-in-Room" modifier. However, this will make the trigger
+fire only when a player is ALREADY in the room with the pre-greet trigger.
 
 See also: MTRIG CHARMED, MTRIG GREET, PLAYER-IN-ROOM TRIGGER
 #d
