@@ -309,7 +309,7 @@ and tries to disappear back into the crowd.
 somewhere between surprise and delight. He takes the trinkets from you and
 looks down into his oversized coat...
 ~
-10 di 125 250 -1
+11 di 125 250 -1
 A
 1 11821
 P
@@ -318,8 +318,6 @@ P
 16 11800 0 7 a
 P
 0 11975 0 1 a
-R
-7 11800 10
 T 11830
 W
 2 11976 0 1 -

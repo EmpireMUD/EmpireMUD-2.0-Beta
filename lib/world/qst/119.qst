@@ -24,6 +24,65 @@ W
 Z
 1 11906
 S
+#11907
+Skycleave: Win a Prize from the Claw Game~
+   'Things are hectic in here, but be sure to find some time to play the claw
+game,' Mageina says to you, over the counter, making a claw motion with her
+hand. 'Never know what you're going to get from that. Let me know.'
+~
+   Mageina sees what you won from the claw game and breathes out a half-laugh
+through her nose.
+   'Yeah, I've seen those before,' she says. 'Maybe I've seen them all, but
+every once in a while, someone comes in with a new one. At least you managed to
+find the machine while it was working. It keeps breaking and I can never keep
+track of where we are in the...'
+   Mageina looks over your shoulder and then leans in close to say, 'Or rather,
+WHEN we are, in the time loop.'
+~
+10 0 125 250 -1
+A
+1 11805
+A
+1 11905
+R
+7 11800 10
+W+
+11 0 0 1 -
+Win a prize from the claw game~
+Z
+1 11905
+S
+#11908
+Skycleave: Win a Prize from the Claw Game~
+   Another day, another trip through the time loop. What does the claw game
+have in store this time? The only way to find out is to play it. Win another
+prize from the claw game -- if it's in working condition, that is. Otherwise,
+you'll need to aid the rescue of the tower in order to give its residents time
+to fix it.
+~
+   'What did you get?' the shopkeeper shouts from behind the counter. He
+stretches his neck to peer over, eyes wide and eyebrows up, but his face falls
+when he sees your prize.
+   'Oh, yeah,' he says. 'It's giving out a lot of those today. Maybe they fixed
+it wrong. I tried hitting it a few times, erm, with a bucket, but it didn't
+really help much. Still, enjoy your prize... Oh! And thank you for your
+established patronage at Towrinkel's, erm, Gift Shop.'
+~
+23 e 125 250 -1
+A
+1 11900
+P
+16 11800 0 6 a
+P
+0 11907 0 1 a
+R
+7 11800 10
+W+
+11 0 0 1 -
+Win a prize from the claw game~
+Z
+4 11908
+S
 #11918
 Skycleave: The Championship Tour~
    You scrutinize the time-traveler's list of villains, looking for more clues.

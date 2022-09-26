@@ -281,6 +281,7 @@ set already%actor.id% 1
 global already%actor.id%
 %send% %actor% You play the claw game...
 %echoaround% %actor% ~%actor% plays the claw game...
+set got_prize 0
 * Determine reward: Each of the claw# tasks are treated as bits in a bitset
 set spirit %instance.mob(11900)%
 set id %spirit.claw1%
@@ -341,6 +342,15 @@ end
 *     %echoaround% %actor% ~%actor% has won '%obj.shortdesc%'!
 *   end
 * end
+*
+* and check quests:
+if %actor.on_quest(11907)%
+  %quest% %actor% trigger 11907
+end
+if %actor.on_quest(11908)%
+  %quest% %actor% trigger 11908
+  %quest% %actor% finish 11908
+end
 ~
 #11909
 Skycleave: Skycleaver trinket 2.0~
