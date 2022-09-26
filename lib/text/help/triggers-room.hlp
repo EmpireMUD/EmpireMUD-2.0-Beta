@@ -207,7 +207,7 @@ When using field - The variable returns:
 &cpeople&0 - The id of the first character in the room, or an empty return.
    Note that this will skip !SEE mobs.
 &cpeople(VNUM)&0 - The id of the first instance of that mob vnum in the room.
-&cplayers_present&0 - True if there's at least 1 player in the room.
+&cplayers_present&0 - Number of players in the room; 0/false if none.
 &crmt_flagged(AFF)&0 - True if the room has a room template flag on it.
    If called with no argument, lists current flags instead.
 &cseason&0 - The local season (spring, summer, autumn, winter).

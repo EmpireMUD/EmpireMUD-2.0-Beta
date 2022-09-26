@@ -5351,7 +5351,14 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						}
 					}
 					else if (!str_cmp(field, "players_present")) {
-						snprintf(str, slen, "%d", any_players_in_room(r) ? 1 : 0);
+						char_data *chit;
+						int num = 0;
+						DL_FOREACH2(ROOM_PEOPLE(r), chit, next_in_room) {
+							if (!IS_NPC(chit)) {
+								++num;
+							}
+						}
+						snprintf(str, slen, "%d", num);
 					}
 					else if (!str_cmp(field, "people")) {
 						char_data *temp_ch = NULL;
