@@ -128,7 +128,7 @@ end
 ~
 #11806
 Skycleave: One-time greetings using script1~
-0 gn 100
+0 gnw 100
 ~
 * Uses mob custom script1 to for one-time greetings, with each script1 line
 *   sent every %line_gap% (9 sec) until it runs out of strings. The mob will
@@ -184,6 +184,11 @@ end
 set pos 0
 set msg %self.custom(script1,%pos%)%
 while !%msg.empty%
+  * check early end
+  if %self.disabled% || %self.fighting%
+    halt
+  end
+  * next message
   set mode %msg.car%
   set msg %msg.cdr%
   if %mode% == say
@@ -1071,7 +1076,7 @@ rdelete drinking %self.id%
 nop %self.set_cooldown(11800, 15)%
 ~
 #11823
-Skycleave: Boss Deaths (Pixy, Kara, Barrosh, Shade)~
+Skycleave: Boss Deaths (Pixy, Kara, Rojjer, Barrosh, Shade)~
 0 f 100
 ~
 switch %self.vnum%
@@ -1095,6 +1100,22 @@ switch %self.vnum%
       %mod% %sanjiv% longdesc An apprentice is kneeling on the floor, heaving.
       %mod% %sanjiv% lookdesc The young apprentice is on his knees, dirtying his white kurta. His wavy brown hair is matted with sweat and he heaves as if he might vomit again.
     end
+    * check Trixton's attackability
+    if !%instance.mob(11848)%
+      set trixton %instance.mob(11849)%
+      if %trixton% && %trixton.aff_flagged(!ATTACK)%
+        %at% %trixton.room% %echo% ~%trixton% has lost ^%trixton% protection!
+        dg_affect %trixton% !ATTACK off
+      end
+  break
+  case 11848
+    * Bleak Rojjer: check Trixton's attackability
+    if !%instance.mob(11847)%
+      set trixton %instance.mob(11849)%
+      if %trixton% && %trixton.aff_flagged(!ATTACK)%
+        %at% %trixton.room% %echo% ~%trixton% has lost ^%trixton% protection!
+        dg_affect %trixton% !ATTACK off
+      end
   break
   case 11863
     * Shadow Ascendant
@@ -1912,17 +1933,6 @@ elseif %self.vnum% == 11927
   end
   * shhh
   return 0
-end
-~
-#11837
-Mercenary Leader no-fight~
-0 h 100
-~
-if %self.aff_flagged(!ATTACK) && !%instance.mob(11848)% && !%instance.mob(11847)%
-  wait 1
-  %echo% ~%self% has lost ^%self% protection!
-  dg_affect %self% !ATTACK off
-  detach 11837 %self.id%
 end
 ~
 #11838
@@ -3971,7 +3981,7 @@ end
 ~
 #11876
 Smol Nes-Pik: Reset comment count on move~
-0 i 100
+0 iw 100
 ~
 * pairs with trigger 11880 etc to reset their commentary when they move
 set comment 0
@@ -4187,7 +4197,7 @@ wait 20 s
 ~
 #11878
 Smol Nes-Pik: Keeper Bastain greeting~
-0 g 90
+0 gw 90
 ~
 if %direction% == none
   halt
@@ -4218,7 +4228,7 @@ end
 ~
 #11879
 Great Tree: Broken Ladder Drop~
-2 g 100
+2 gw 100
 ~
 * always returns 1
 return 1

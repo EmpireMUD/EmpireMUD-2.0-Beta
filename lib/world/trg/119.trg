@@ -224,13 +224,15 @@ done
 ~
 #11906
 Skycleave: Secret Passage Detection~
-0 h 100
+0 hw 100
 ~
-* Mark for claw game
-set spirit %instance.mob(11900)%
-set claw2 1
-remote claw2 %spirit.id%
-detach 11906 %self.id%
+if %actor.is_pc%
+  * Mark for claw game
+  set spirit %instance.mob(11900)%
+  set claw2 1
+  remote claw2 %spirit.id%
+  detach 11906 %self.id%
+end
 ~
 #11907
 Skycleave: Claw Game (broken)~
@@ -640,7 +642,7 @@ end
 ~
 #11912
 Pixy Races: Greet triggers upcoming race~
-0 h 100
+0 hw 100
 ~
 * starts a race countdown if a player shows up and no race is waiting
 if %actor.is_npc%
@@ -991,7 +993,7 @@ end
 ~
 #11917
 Skycleave: Time traveler's corpse~
-2 g 100
+2 gw 100
 ~
 * loads a corpse only if a person visits after having been here on a previous day
 set corpse_vnum 11927
@@ -2499,6 +2501,7 @@ else
   set delay 1
 end
 remote delay %room.id%
+set sleepy 0
 if %delay% == 1
   switch %random.5%
     case 1
@@ -2508,7 +2511,26 @@ if %delay% == 1
       %echo% Pixies taunt you from a distance, but as you try to approach, they seem to vanish!
     break
     case 3
-      %echo% You leap out of the way as a sapling grows so fast underneath you that it threatens to impale you.
+      * sapling growth: check variables
+      if %room.varexists(sapling_time)%
+        set sapling_time %room.sapling_time%
+      else
+        set sapling_time 0
+      end
+      if %room.depletion(chop)% > 0 && %sapling_time% + 1800 > %timestamp%
+        * too soon
+        %echo% A pixy smacks you in the face with a plush sheep full of sleeping dust. Try not to snore!
+        set sleepy 1
+      else
+        %echo% You leap out of the way as a sapling grows so fast underneath you that it threatens to impale you.
+        if %room.depletion(chop)% > 0
+          eval amount %room.depletion(chop)% - 1
+          nop %room.depletion(chop,%amount%)%
+        end
+        * rate limit
+        set sapling_time %timestamp%
+        remote sapling_time %room.id%
+      end
     break
     case 4
       %echo% You feel a tap on your shoulder but when you turn, it's just a dangling vine.
@@ -2516,6 +2538,15 @@ if %delay% == 1
     case 5
       %echo% You feel like it's getting harder to breathe in here.
     break
+  done
+end
+if %sleepy%
+  set ch %room.people%
+  while %ch%
+    if %ch.is_pc%
+      dg_affect #11943 %ch% IMMOBILIZED on 30
+    end
+    set ch %ch.next_in_room%
   done
 end
 ~
@@ -2575,6 +2606,7 @@ else
   set delay 1
 end
 remote delay %room.id%
+set sleepy 0
 if %delay% == 1
   switch %random.5%
     case 1
@@ -2584,14 +2616,43 @@ if %delay% == 1
       %echo% Pixies taunt you from a distance, but as you try to approach, they seem to vanish!
     break
     case 3
-      %echo% You leap out of the way as a sapling grows so fast underneath you that it threatens to impale you.
+      * sapling growth: check variables
+      if %room.varexists(sapling_time)%
+        set sapling_time %room.sapling_time%
+      else
+        set sapling_time 0
+      end
+      if %room.depletion(chop)% > 0 && %sapling_time% + 1800 > %timestamp%
+        * too soon
+        %echo% A pixy smacks you in the face with a plush sheep full of sleeping dust. Try not to snore!
+        set sleepy 1
+      else
+        %echo% You leap out of the way as a sapling grows so fast underneath you that it threatens to impale you.
+        if %room.depletion(chop)% > 0
+          eval amount %room.depletion(chop)% - 1
+          nop %room.depletion(chop,%amount%)%
+        end
+        * rate limit
+        set sapling_time %timestamp%
+        remote sapling_time %room.id%
+      end
     break
     case 4
       %echo% You feel a tap on your shoulder but when you turn, it's just a dangling vine.
     break
     case 5
       %echo% A pixy blows a shimmering yellow dust in your face! You begin to feel drowsy.
+      set sleepy 1
     break
+  done
+end
+if %sleepy%
+  set ch %room.people%
+  while %ch%
+    if %ch.is_pc%
+      dg_affect #11943 %ch% IMMOBILIZED on 30
+    end
+    set ch %ch.next_in_room%
   done
 end
 ~
@@ -2695,7 +2756,7 @@ end
 ~
 #11946
 Skycleave Dreams: Reset wake on poof-in~
-2 g 100
+2 gw 100
 ~
 * When a player enters by any means OTHER than normal walking, reset their
 * 'wake' count. Typing 'wake' 3 times exits the area using trigger 11945.
@@ -2710,7 +2771,7 @@ end
 ~
 #11947
 Smol Nes-Pik: Queen flirts on entry~
-0 g 100
+0 gw 100
 ~
 * Queen flirtatiously greets the first player who enters and gives them a
 * blue iris (1206). On repeat visits, she just winks.
