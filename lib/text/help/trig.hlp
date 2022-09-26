@@ -426,12 +426,14 @@ This generally reduces the number of triggers running when they don't need to.
 Supported types:
   Random
   Greet, Greet-All
-  Pre-Greet-All
   Entry
   Enter
   Leave
   Speech
   Act
+
+Partially-supported types:
+  Pre-Greet-All: Trigger will only fire if a player is ALREADY in the room.
 
 See also: RANDOM TRIGGER
 #d
