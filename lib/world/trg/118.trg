@@ -260,42 +260,125 @@ if %self.varexists(no_silent)%
 end
 ~
 #11807
-Skycleave: Bribe goblins to leave~
+Skycleave: Shared receive trigger (Goblins, Pixy Queen, pixies, Ravinder)~
 0 j 100
 ~
-set goblin_vnums 11815 11816 11817
-if %self.vnum% == 11818
-  say Venjer cannot be bribed!
-  %aggro% %actor%
+if %self.vnum% >= 11815 && %self.vnum% <= 11818
+  * goblins
   return 0
-elseif %object.vnum% != 11976 && (!(%object.keywords% ~= goblin) || (%object.keywords% ~= wrangler))
-  say Goblin doesn't want %object.shortdesc%, stupid human!
-  return 0
-else
-  * actor has given a goblin object
-  %send% %actor% You give ~%self% @%object%...
-  %echoaround% %actor% ~%actor% gives ~%self% @%object%...
-  if %object.vnum% == 11976
-    say This is what we came for! These is not belonging to you! But thanks, you, for returning.
+  set goblin_vnums 11815 11816 11817
+  if %self.vnum% == 11818
+    say Venjer cannot be bribed!
+    %aggro% %actor%
+  elseif %object.vnum% != 11976 && (!(%object.keywords% ~= goblin) || (%object.keywords% ~= wrangler))
+    say Goblin doesn't want %object.shortdesc%, stupid human!
   else
-    say Not what goblin items we came for but still a good prize...
-  end
-  * despawn other goblins here
-  set ch %self.room.people%
-  while %ch%
-    set next_ch %ch.next_in_room%
-    if %ch.is_npc% && %goblin_vnums% ~= %ch.vnum%
-      %echo% ~%ch% leaves.
-      if %ch% != %self%
-        %purge% %ch%
-      end
+    * actor has given a goblin object
+    %send% %actor% You give ~%self% @%object%...
+    %echoaround% %actor% ~%actor% gives ~%self% @%object%...
+    if %object.vnum% == 11976
+      say This is what we came for! These is not belonging to you! But thanks, you, for returning.
+    else
+      say Not what goblin items we came for but still a good prize...
     end
-    set ch %next_ch%
-  done
-  * and leave
+    * despawn other goblins here
+    set ch %self.room.people%
+    while %ch%
+      set next_ch %ch.next_in_room%
+      if %ch.is_npc% && %goblin_vnums% ~= %ch.vnum%
+        %echo% ~%ch% leaves.
+        if %ch% != %self%
+          %purge% %ch%
+        end
+      end
+      set ch %next_ch%
+    done
+    * and leave
+    %purge% %object%
+    %purge% %self%
+  end
+elseif %self.vnum% == 11819
+  * Pixy Queen's gift
   return 0
-  %purge% %object%
-  %purge% %self%
+  if !%actor.varexists(skycleave_queen)%
+    %send% %actor% You try to give @%object% to ~%self% but &%self% rebuffs you.
+    %echoaround% %actor% ~%actor% tries to give something to ~%self% but &%self% rebuffs &%actor%.
+  elseif %object.vnum% != 1206
+    %send% %actor% ~%self% politely refuses @%object%.
+  else
+    * actor has given queen back a flower
+    %send% %actor% You give the queen @%object%...
+    %echoaround% %actor% ~%actor% gives the queen @%object%...
+    say Oh my! I thought you had forgotten! Oh dear, how very sweet. For you, I will open the maze.
+    * open the maze
+    makeuid maze room i11825
+    set shield %maze.contents(11887)%
+    if %shield%
+      %at% %maze% %echo% %shield.shortdesc% flickers and fades!
+      %purge% %shield%
+    end
+    * mark player as having visited on this cycle
+    set skycleave_queen %dailycycle%
+    remote skycleave_queen %actor.id%
+    * get rid of iris
+    %purge% %object%
+  end
+elseif %self.vnum% == 11820
+  * trash pixies: if the player has met the queen in the Pixy's Dream, an iris will despawn a guard pixy
+  return 0
+  if !%actor.varexists(skycleave_queen)%
+    %send% %actor% You try to give @%object% to ~%self% but &%self% rebuffs you.
+    %echoaround% %actor% ~%actor% tries to give something to ~%self% but &%self% rebuffs &%actor%.
+  elseif %object.vnum% != 1206
+    %send% %actor% ~%self% politely refuses @%object%.
+  else
+    %send% %actor% You give @%object% to ~%self%, who looks puzzled for a moment, then smiles...
+    %echoaround% %actor% ~%actor% gives @%object% to ~%self%, who looks puzzled for a moment, then smiles...
+    switch %random.5%
+      case 1
+        say I am as surprised as I am honored, giant.
+      break
+      case 2
+        say You know a surprising amount about pixies.
+      break
+      case 3
+        say Truly a special gift. Thank you.
+      break
+      case 4
+        say Just like the queen's!
+      break
+      case 5
+        say This is magnificent! I shall treasure it.
+      break
+    done
+    %echo% ~%self% flies off with the iris.
+    %purge% %object%
+    %purge% %self%
+  end
+elseif %self.vnum% == 11825 || %self.vnum% == 11925
+  * Ravinder: will not keep any item; purges a good jar
+  return 0
+  if %object.vnum% != 11913
+    * wrong item
+    %send% %actor% You try to give @%object% to ~%self%, but &%self% doesn't seem to want it.
+    %echoaround% ~%actor% ~%actor% tries to give @%object% to ~%self% but &%self% hands it right back.
+    halt
+  elseif !%actor.on_quest(11915)%
+    %echo% ~%self% refuses |%actor% jar.
+    say I don't want your filthy pixy. I'm trying to win on my own merits here.
+  elseif (%object.luck% + %object.guile% + %object.speed%) < 13
+    * low stats
+    %send% %actor% You hand @%object% to ~%self% and &%self% examines it carefully and hands it back...
+    %echoaround% %actor% ~%actor% hands @%object% to ~%self%, who examines it carefully and hands it back...
+    say This seems like a perfectly good pixy, but it just isn't championship material. I'm looking to win, not place.
+  else
+    * ok!
+    %echo% ~%self% eagerly takes @%object% from %actor%.
+    say Oh, splendid, really. This is exactly the sort of pixy I was looking for. O racing world, prepare to tremble!
+    %quest% %actor% trigger 11915
+    %quest% %actor% finish 11915
+    %purge% %object%
+  end
 end
 ~
 #11808

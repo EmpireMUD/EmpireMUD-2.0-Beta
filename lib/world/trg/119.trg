@@ -342,7 +342,6 @@ end
 *     %echoaround% %actor% ~%actor% has won '%obj.shortdesc%'!
 *   end
 * end
-*
 * and check quests:
 if %actor.on_quest(11907)%
   %quest% %actor% trigger 11907
@@ -2853,75 +2852,6 @@ done
 if %fail%
   wait 1
   say On the oath we swore -- on the honor of the moon -- you shall proceed no further!
-end
-~
-#11949
-Skycleave: Gift for the Pixy Queen~
-0 j 100
-~
-if !%actor.varexists(skycleave_queen)%
-  %send% %actor% You try to give @%object% to ~%self% but &%self% rebuffs you.
-  %echoaround% %actor% ~%actor% tries to give something to ~%self% but &%self% rebuffs &%actor%.
-  return 0
-elseif %object.vnum% != 1206
-  %send% %actor% ~%self% politely refuses @%object%.
-  return 0
-else
-  * actor has given queen back a flower
-  %send% %actor% You give the queen @%object%...
-  %echoaround% %actor% ~%actor% gives the queen @%object%...
-  say Oh my! I thought you had forgotten! Oh dear, how very sweet. For you, I will open the maze.
-  * open the maze
-  makeuid maze room i11825
-  set shield %maze.contents(11887)%
-  if %shield%
-    %at% %maze% %echo% %shield.shortdesc% flickers and fades!
-    %purge% %shield%
-  end
-  * mark player as having visited on this cycle
-  set skycleave_queen %dailycycle%
-  remote skycleave_queen %actor.id%
-  * get rid of iris
-  return 0
-  %purge% %object%
-end
-~
-#11950
-Skycleave: Bribe pixy guards with iris~
-0 j 100
-~
-* If the player has met the queen in the Pixy's Dream, an iris will despawn a guard pixy
-if !%actor.varexists(skycleave_queen)%
-  %send% %actor% You try to give @%object% to ~%self% but &%self% rebuffs you.
-  %echoaround% %actor% ~%actor% tries to give something to ~%self% but &%self% rebuffs &%actor%.
-  return 0
-elseif %object.vnum% != 1206
-  %send% %actor% ~%self% politely refuses @%object%.
-  return 0
-else
-  %send% %actor% You give @%object% to ~%self%, who looks puzzled for a moment, then smiles...
-  %echoaround% %actor% ~%actor% gives @%object% to ~%self%, who looks puzzled for a moment, then smiles...
-  switch %random.5%
-    case 1
-      say I am as surprised as I am honored, giant.
-    break
-    case 2
-      say You know a surprising amount about pixies.
-    break
-    case 3
-      say Truly a special gift. Thank you.
-    break
-    case 4
-      say Just like the queen's!
-    break
-    case 5
-      say This is magnificent! I shall treasure it.
-    break
-  done
-  %echo% ~%self% flies off with the iris.
-  return 0
-  %purge% %object%
-  %purge% %self%
 end
 ~
 #11951

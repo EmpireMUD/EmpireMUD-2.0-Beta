@@ -532,11 +532,11 @@ I+ 5 0  # Group
 I 4 11900 100.00 2  # LOOT: unattuned skystone
 I+ 6 0  # Boss
 T 11948
-T 11949
 T 11813
 T 11819
 T 11821
 T 11823
+T 11807
 S
 #11820
 pixy~
@@ -570,8 +570,8 @@ M
 6
 A pixy is flying around.~
 T 11801
-T 11950
 T 11820
+T 11807
 S
 #11821
 Hugh Mann~
@@ -725,6 +725,7 @@ though he doesn't seem to be trying to sleep.
 ~
 F 11800
 T 11810
+T 11807
 S
 #11826
 #n~
