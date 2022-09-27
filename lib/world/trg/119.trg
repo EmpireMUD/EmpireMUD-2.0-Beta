@@ -1367,11 +1367,17 @@ elseif %arg% == win
     eval winner %%self.winner%pos%%%
     if %owner% > 0
       makeuid owner %owner%
-      if %owner.is_pc%
+      if %owner% && %owner.is_pc%
         if %winner%
           %send% %owner% Your pixy, %name%, won the race!
+          if %owner.on_quest(11914)%
+            %quest% %owner% trigger 11914
+          end
         else
           %send% %owner% Your pixy, %name%, lost the race.
+        end
+        if %owner.on_quest(11913)%
+          %quest% %owner% trigger 11913
         end
       end
     end
