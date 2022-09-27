@@ -135,13 +135,15 @@ might be considered cheating. Old rules, new rules; you could go round and
 round about it till the end of time. I say the dirty tricks make it
 interesting. Might have to copy some of yours.'
 ~
-12 e 125 250 -1
+13 e 125 250 -1
 A
 1 11900
 A
 1 11918
 P
-0 11913 0 1 -
+16 11800 0 6 a
+P
+0 11913 0 1 a
 R
 7 11800 10
 W+
@@ -171,11 +173,13 @@ Honestly. Take your reward. Oh, this pixy will be worth so much more. Just,
 truly, from the bottom of my heart, thank you. I'll get started in tomorrow's
 race.'
 ~
-13 0 125 250 -1
+14 0 125 250 -1
 A
 1 11825
 A
 1 11925
+P
+0 11914 0 1 a
 P
 16 11800 0 6 a
 P
@@ -322,12 +326,32 @@ Z
 S
 #11928
 Skycleave: Test of Water~
-tba
--- needs an end point
+   As you once again find yourself underwater and all but trapped by the
+magical boundaries of the elemental plane. Sure, escape is just above you,
+through the portal back to the fountain. But you were never one to shy away
+from a challenge like this.
+   Defeat the First Water again, if you can. And be quick about it; it may be
+impossible to defeat it for good, but it's known to drown anyone who tries.
+Even a brief victory against the First Water would be worthy of celebration.
+Defeat it, then speak to the Oreonic in the Attunement Lab.
 ~
-tba
+   'Ah, little human, a pleasure to see you again. You are looking particularly
+acceptable today,' Goef says as you enter, still dripping from your encounter
+with the First Water.
+   Goef taps one of its spindly upper arms at your head, lightly, making a
+resonant pinging noise as it hits you. The ping echoes off of something in the
+room, though you don't see what; it is beyond cluttered in here. Goef seems to
+be listening to the sound as it bounces back, though he doesn't necessarily
+seem to have ears.
+   'I have added your worthiness... to my own,' Goef says at last. 'I have been
+unable to defeat the First Water, you see. Once, we were locked in combat for a
+week, but even as I could not drown, I also could not... prevail. Next time,
+however, I will try it... your way.'
+   You stare blankly at the bulky stone creature for a moment before he adds:
+   'Not in this body, of course. From time to time, I loose myself from it and
+travel the aether... alone.'
 ~
-10 e 125 250 -1
+11 e 125 250 -1
 A
 3 11972
 P
@@ -337,6 +361,8 @@ R
 W+
 3 11928 0 1 -
 Defeat the First Water~
+Z
+1 11941
 S
 #11970
 Skycleave: Secret Niamh~
