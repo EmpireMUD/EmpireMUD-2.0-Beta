@@ -104,9 +104,11 @@ across the race domes, scribbling some notes to himself.
 you're racing again. Got to get that little pixy into tip-top shape if you want
 to be the best there ever was.'
 ~
-11 0 125 250 -1
+12 0 125 250 -1
 A
 2 11913
+A
+2 11914
 R
 7 11800 10
 W+
@@ -164,7 +166,7 @@ catch my meaning,' Ravinder says under his breath.
 the world to train a good one. So let's see yours. If it's any good, I'll pay
 you for it. Simple transaction. I'm sure I can make it worth your time.'
    Train a high-level pixy in a novelty jar and, when it's strong enough, bring
-it to Ravinder and type 'offer <pixy> Ravinder'.
+it to Ravinder and type 'give <pixy> Ravinder'.
 ~
    Apprentice Ravinder tosses the purple and brown jar in the air and catches
 it with a childlike grin. He's almost hugging it as he says, 'You cannot fathom

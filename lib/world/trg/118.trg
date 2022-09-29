@@ -358,10 +358,10 @@ elseif %self.vnum% == 11820
 elseif %self.vnum% == 11825 || %self.vnum% == 11925
   * Ravinder: will not keep any item; purges a good jar
   return 0
-  if %object.vnum% != 11913
+  if %object.vnum% != 11914
     * wrong item
     %send% %actor% You try to give @%object% to ~%self%, but &%self% doesn't seem to want it.
-    %echoaround% ~%actor% ~%actor% tries to give @%object% to ~%self% but &%self% hands it right back.
+    %echoaround% %actor% ~%actor% tries to give @%object% to ~%self% but &%self% hands it right back.
     halt
   elseif !%actor.on_quest(11915)%
     %echo% ~%self% refuses |%actor% jar.

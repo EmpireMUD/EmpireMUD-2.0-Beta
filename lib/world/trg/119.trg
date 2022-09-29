@@ -496,6 +496,10 @@ while %pos% <= 3
   eval winner%place% %%self.winner%pos%%%
   eval prev_place%place% %%self.prev_place%pos%%%
   eval prev_gap%place% %%self.prev_gap%pos%%%
+  *
+  eval temp1 %%name%place%%%
+  eval temp2 %%pos%place%%%
+  %echo% Debug A: pos=%pos%, name=%temp1%, posplace=%temp2%, place=%place%
   eval pos %pos% + 1
 done
 * 1. announce changes/position
@@ -567,6 +571,9 @@ while %place% <= 3
   end
   * hazards
   eval penalty_var penalty%%pos%place%%%
+  if !%self.varexists(%penalty_var%)%
+    %echo% Debug error: Missing self.%penalty_var%, place=%place%, name=%pix_name%
+  end
   eval current_penalty %%self.%penalty_var%%%
   if %current_penalty% == 0
     set penalty 0
@@ -645,9 +652,7 @@ if %guile_roll% > %guile_def%
     done
   end
 end
-%echo% Debug: 1 %self.name1%: d=%self.dist1% p=%self.penalty1%
-%echo% Debug: 2 %self.name2%: d=%self.dist2% p=%self.penalty2%
-%echo% Debug: 3 %self.name3%: d=%self.dist3% p=%self.penalty3%
+%echo% Debug: 1 %self.name1% (d=%self.dist1%, p=%self.penalty1%), 2 %self.name2% (d=%self.dist2%, p=%self.penalty2%), 3 %self.name3% (d=%self.dist3%, p=%self.penalty3%)
 ~
 #11912
 Pixy Races: Greet triggers upcoming race~
@@ -675,7 +680,7 @@ racework countdown %max_time%
 Pixy Races: Catch pixy in jar command~
 1 c 2
 catch~
-set ok_list 615 616 10042 11520 11521 11522 11523 11524 11525 11526 11820 11919 16624 11625
+set ok_list 615 616 10042 11520 11521 11522 11523 11524 11525 11526 11820 16624 16625 11963
 set clever_list 11819 11982
 set error_list 11873 11874 11875 11876 11877 11878 11879 11880 11881 11882 11883 11884 11885 11886 11887
 set jar_vnum 11914
@@ -715,6 +720,13 @@ set guile 1
 set luck 1
 set pixy a pixy
 switch %target.vnum%
+  case 11963
+    * renegade pixy
+    set pixy a renegade pixy
+    eval speed 1 + %random.3%
+    eval guile 1 + %random.3%
+    eval luck 1 + %random.3%
+  break;
   case 615
     * feral pixy
     set pixy a feral pixy
@@ -785,6 +797,7 @@ remote last_race %jar.id%
 %send% %actor% You catch ~%target% in a jar!
 %echoaround% %actor% ~%actor% catches ~%target% in a jar!
 %purge% %target%
+%purge% %self%
 ~
 #11914
 Pixy Races: Check pixy jar command~
@@ -874,13 +887,20 @@ else
   elseif %arg2.strlen% > 18
     %send% %actor% That name is too long.
   else
-    set pixy %arg2%
+    set first %arg2.car%
+    if %first% == a || %first% == the
+      * do not auto-cap
+      set pixy %arg2%
+    else
+      * auto-cap
+      set pixy %arg2.cap%
+    end
     remote pixy %self.id%
     set named 1
     remote named %self.id%
     %send% %actor% You name your pixy %pixy%.
-    %mod% %self% keywords pixy jar %pixy%
-    %mod% %self% shortdesc a pixy jar with %pixy% inside
+    %mod% %self% keywords pixy jar %pixy%'s
+    %mod% %self% shortdesc %pixy%'s pixy jar
   end
 end
 ~
@@ -1037,13 +1057,6 @@ end
 Pixy Races: racework helper command~
 0 c 0
 racework~
-* helps run the race
-*   racework init  -- clears all data for a new race
-*   racework countdown [timer in seconds]  -- changes the countdown timer
-*   racework announce_countdown  -- announces how long until it starts
-*   racework fillin <1,2,3>  -- generates an NPC pixy for the requested slot
-*   racework places  -- updates the pixies' places and gaps based on their distance, and updates prev_place/gap
-*   racework round -- moves them all once
 * configure:
 set win_distance 150
 set area_marks 50 65 75 90 100 115 150
@@ -1190,7 +1203,7 @@ elseif %mode% == places
     eval prev_gap%pos% %%self.gap%pos%%%
     remote prev_gap%pos% %self.id%
     eval dist %%self.dist%pos%%%
-    if %dist% > %best_dist%
+    if %dist% > %best_dist% || !%best_pos%
       if %best_dist% > %sec_dist%
         set third_pos %sec_pos%
         set third_dist %sec_dist%
@@ -1199,7 +1212,7 @@ elseif %mode% == places
       end
       set best_pos %pos%
       set best_dist %dist%
-    elseif %dist% > %sec_dist%
+    elseif %dist% > %sec_dist% || !%sec_pos%
       set third_pos %sec_pos%
       set third_dist %sec_dist%
       set sec_pos %pos%
@@ -1210,6 +1223,8 @@ elseif %mode% == places
     end
     eval pos %pos% + 1
   done
+  * debug: something might be wrong HERE when 2 people are in the same spot
+    * sec_pos and third_pos must be the same, resulting in an empty place
   * store places
   set place%best_pos% 1
   set place%sec_pos% 2
@@ -1217,6 +1232,7 @@ elseif %mode% == places
   remote place1 %self.id%
   remote place2 %self.id%
   remote place3 %self.id%
+  %echo% Debug store places: %place1% %place2% %place3%, %best_pos%(%best_dist%) %sec_pos%(%sec_dist%) %third_pos%(%third_dist%)
   * store gaps
   eval gap%best_pos% %best_dist% - %sec_dist%
   eval gap%sec_pos% %sec_dist% - %third_dist%
@@ -1237,9 +1253,10 @@ elseif %mode% == places
       remote winner%third_pos% %self.id%
     end
   end
-  %echo% Debug [places]: [%self.place1%/%self.prev_place1%] [%self.place2%/%self.prev_place2%] [%self.place3%/%self.prev_place3%]
-  %echo% Debug [gaps]: [%self.gap1%/%self.prev_gap1%] [%self.gap2%/%self.prev_gap2%] [%self.gap3%/%self.prev_gap3%]
-  %echo% Debug [areas]: [%self.area1%/%self.prev_area1%] [%self.area2%/%self.prev_area2%] [%self.area3%/%self.prev_area3%]
+  set debug1 %self.place1%/%self.prev_place1%, %self.gap1%/%self.prev_gap1%, %self.area1%/%self.prev_area1%
+  set debug2 %self.place2%/%self.prev_place2%, %self.gap2%/%self.prev_gap2%, %self.area2%/%self.prev_area2%
+  set debug3 %self.place3%/%self.prev_place3%, %self.gap3%/%self.prev_gap3%, %self.area3%/%self.prev_area3%
+  %echo% Debug (places, gaps, areas; cur/prev): 1 (%debug1%), 2 (%debug2%), 3 (%debug3%)
 elseif %mode% == round
   * one round: update distances and penalties
   set pos 1
@@ -1326,6 +1343,10 @@ while %pos% <= 3
   eval winner%place% %%self.winner%pos%%%
   eval prev_place%place% %%self.prev_place%pos%%%
   eval prev_gap%place% %%self.prev_gap%pos%%%
+  *
+  eval temp1 %%name%place%%%
+  eval temp2 %%pos%place%%%
+  %echo% Debug B: pos=%pos%, name=%temp1%, posplace=%temp2%, place=%place%
   eval pos %pos% + 1
 done
 if %arg% == start
@@ -4787,7 +4808,7 @@ done
 ~
 #11997
 Skycleave: the adoring fan~
-0 bt 3
+0 bt 8
 ~
 * ensure leader
 set leader %self.leader%
