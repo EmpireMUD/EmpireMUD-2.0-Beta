@@ -665,16 +665,24 @@ end
 if !%self.varexists(next_race_time)%
   racework init
 end
-* a short wait here reduces how often this runs
-wait 1
+* also check watching: clear watching if own pixy isn't in the race
+set watch_var watching_%actor.id%
+if %self.varexists(%watch_var%)%
+  eval is_watching %%self.%watch_var%%%
+  if %is_watching% > 0 && %self.owner1% != %actor.id% && %self.owner2% != %actor.id% && %self.owner3% != %actor.id%
+    set %watch_var% 0
+    remote %watch_var% %self.id%
+  end
+end
+* ensure running soon
 set max_time 300
 if %self.next_race_time% > %timestamp && (%self.next_race_time% <= %timestamp% + %max_time%)
   * already running
   halt
 end
-* let's start it now
+* let's start it now; it will announce itself
 racework countdown %max_time%
-* it will announce itself
+
 ~
 #11913
 Pixy Races: Catch pixy in jar command~
@@ -1193,8 +1201,8 @@ elseif %mode% == places
   set best_pos 0
   set sec_dist 0
   set sec_pos 0
-  set third_pos 0
   set third_dist 0
+  set third_pos 0
   * loop first to determine places and store prev_place/gap
   set pos 1
   while %pos% <= 3
@@ -1204,12 +1212,10 @@ elseif %mode% == places
     remote prev_gap%pos% %self.id%
     eval dist %%self.dist%pos%%%
     if %dist% > %best_dist% || !%best_pos%
-      if %best_dist% > %sec_dist%
-        set third_pos %sec_pos%
-        set third_dist %sec_dist%
-        set sec_pos %best_pos%
-        set sec_dist %best_dist%
-      end
+      set third_pos %sec_pos%
+      set third_dist %sec_dist%
+      set sec_pos %best_pos%
+      set sec_dist %best_dist%
       set best_pos %pos%
       set best_dist %dist%
     elseif %dist% > %sec_dist% || !%sec_pos%
