@@ -1271,7 +1271,7 @@ done
 set varname %self.vnum%_name
 set spirit %instance.mob(11900)%
 if %spirit.varexists(%varname%)%
-  eval pos %%spirit.%varname%%% + 1
+  eval pos %spirit.var(%varname%)% + 1
 else
   set pos 1
 end
@@ -1433,7 +1433,7 @@ if %room.varexists(speak_time)%
 end
 set varname last_%room.template%
 if %self.varexists(%varname%)%
-  eval last %%self.%varname%%%
+  eval last %self.var(%varname%)%
   if %last% + 150 > %timestamp%
     halt
   end
@@ -2966,7 +2966,7 @@ done
 set spirit %instance.mob(11900)%
 set varname merc%self.vnum%
 if %spirit.varexists(%varname%)%
-  eval %varname% %%spirit.%varname%%% + 1
+  eval %varname% %spirit.var(%varname%)% + 1
   eval pos %%%varname%%%
 else
   set %varname% 1

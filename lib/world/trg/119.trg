@@ -89,13 +89,13 @@ elseif information /= %mode% || status /= %mode%
   %send% %actor% Location: %temp.coords%
   set floor 1
   while %floor% <= 4
-    eval phase %%spirit.phase%floor%%%
+    set phase %spirit.var(phase%floor%)%
     if %phase% == 0
       set phase A
     else
       set phase B
     end
-    eval diff %%spirit.diff%floor%%%
+    set diff %spirit.var(diff%floor%)%
     %send% %actor% Floor %floor%: Phase %phase%, Difficulty %diff%
     eval floor %floor% + 1
   done
@@ -483,19 +483,19 @@ set area_name6 the home stretch
 * to their places in stored data
 set pos 1
 while %pos% <= 3
-  eval place %%self.place%pos%%%
+  set place %self.var(place%pos%)%
   * moves them based on current place in TEMPORARY data
-  eval pos%place% %pos%
-  eval name%place% %%self.name%pos%%%
-  eval dist%place% %%self.dist%pos%%%
-  eval area%place% %%self.area%pos%%%
-  eval prev_area%place% %%self.prev_area%pos%%%
-  eval gap%place% %%self.gap%pos%%%
-  eval guile%place% %%self.guile%pos%%%
-  eval luck%place% %%self.luck%pos%%%
-  eval winner%place% %%self.winner%pos%%%
-  eval prev_place%place% %%self.prev_place%pos%%%
-  eval prev_gap%place% %%self.prev_gap%pos%%%
+  set pos%place% %pos%
+  set name%place% %self.var(name%pos%)%
+  set dist%place% %self.var(dist%pos%)%
+  set area%place% %self.var(area%pos%)%
+  set prev_area%place% %self.var(prev_area%pos%)%
+  set gap%place% %self.var(gap%pos%)%
+  set guile%place% %self.var(guile%pos%)%
+  set luck%place% %self.var(luck%pos%)%
+  set winner%place% %self.var(winner%pos%)%
+  set prev_place%place% %self.var(prev_place%pos%)%
+  set prev_gap%place% %self.var(prev_gap%pos%)%
   eval pos %pos% + 1
 done
 * see who's being watched
@@ -506,12 +506,10 @@ set ch %self.room.people%
 while %ch%
   if %ch.is_pc%
     set varname watching_%ch.id%
-    if %self.varexists(%varname%)%
-      eval watching %%self.%varname%%%
-      if %watching% > 0
-        eval watching %%self.place%watching%%%
-        set need%watching% 1
-      end
+    set watching %self.var(%varname%,0)%
+    if %watching% > 0
+      set watching %self.var(place%watching%)%
+      set need%watching% 1
     end
   end
   set ch %ch.next_in_room%
@@ -615,11 +613,7 @@ while %place% <= 3
   end
   * hazards
   eval penalty_var penalty%%pos%place%%%
-  if !%self.varexists(%penalty_var%)%
-    %echo% Debug error: Missing self.%penalty_var%, place=%place%, name=%pix_name%
-  end
-  eval current_penalty %%self.%penalty_var%%%
-  if %current_penalty% == 0 && %area% == %prev_area%
+  if %self.var(%penalty_var%,0)% == 0 && %area% == %prev_area%
     set penalty 0
     if %area% == 1 && !%forestdome% && %rand_luck% < 2
       set penalty 2
@@ -661,17 +655,15 @@ set ch %self.room.people%
 while %ch%
   if %ch.is_pc%
     set varname watching_%ch.id%
-    if %self.varexists(%varname%)%
-      eval watching %%self.%varname%%%
-      if %watching% > 0
-        eval watching %%self.place%watching%%%
-        eval send_str %%str%watching%%%
-        if !%send_str.empty%
-          %send% %ch% %send_str%.
-        end
-      else if %random.3% == 3
-        %send% %ch% The pixies are racing! Type 'race' to see who's running and 'watch' to follow one.
+    set watching %self.var(%varname%,0)%
+    if %watching% > 0
+      set watching %self.var(place%watching%)%
+      eval send_str %%str%watching%%%
+      if !%send_str.empty%
+        %send% %ch% %send_str%.
       end
+    elseif %random.3% == 3
+      %send% %ch% The pixies are racing! Type 'race' to see who's running and 'watch' to follow one.
     end
   end
   set ch %ch.next_in_room%
@@ -692,12 +684,9 @@ if !%self.varexists(next_race_time)%
 end
 * also check watching: clear watching if own pixy isn't in the race
 set watch_var watching_%actor.id%
-if %self.varexists(%watch_var%)%
-  eval is_watching %%self.%watch_var%%%
-  if %is_watching% > 0 && %self.owner1% != %actor.id% && %self.owner2% != %actor.id% && %self.owner3% != %actor.id%
-    set %watch_var% 0
-    remote %watch_var% %self.id%
-  end
+if %self.var(%watch_var%,0)% > 0 && %self.owner1% != %actor.id% && %self.owner2% != %actor.id% && %self.owner3% != %actor.id%
+  set %watch_var% 0
+  remote %watch_var% %self.id%
 end
 * ensure running soon
 set max_time 300
@@ -854,7 +843,7 @@ set stat_list speed guile luck
 while %stat_list%
   set stat %stat_list.car%
   set stat_list %stat_list.cdr%
-  eval value %%self.%stat%%%
+  set value %self.var(%stat%,1)%
   if %stat% == luck
     set stat %stat% \&0
   end
@@ -952,8 +941,8 @@ if race /= %cmd% && %actor.is_pc%
       set pos 1
       while %pos% <= 3
         if %pos% <= %self.count%
-          eval name %%self.name%pos%%%
-          eval owner %%self.owner%pos%%%
+          set name %self.var(name%pos%)%
+          set owner %self.var(owner%pos%,0)%
           if %owner% > 0
             makeuid owner %owner%
           end
@@ -975,9 +964,9 @@ if race /= %cmd% && %actor.is_pc%
       * race running
       set pos 1
       while %pos% <= 3
-        eval name %%self.name%pos%%%
-        eval owner %%self.owner%pos%%%
-        eval place %%self.place%pos%%%
+        set name %self.var(name%pos%)%
+        set owner %self.var(owner%pos%,0)%
+        set place %self.var(place%pos%)%
         if %owner% > 0
           makeuid owner %owner%
         end
@@ -1047,7 +1036,7 @@ if race /= %cmd% && %actor.is_pc%
   * start race early if we have max pixies
   if %count% >= 3
     wait 1
-    eval next_race_time %timestamp%
+    set next_race_time %timestamp%
     remote next_race_time %self.id%
     say The race is getting ready to start...
   elseif %self.next_race_time% > (%timestamp% + 60)
@@ -1074,8 +1063,7 @@ elseif watch /= %cmd% && %actor.is_pc%
   end
   set watching_%actor.id% %found%
   remote watching_%actor.id% %self.id%
-  eval show_name %%self.name%found%%%
-  %send% %actor% You will now watch %show_name% in the race.
+  %send% %actor% You will now watch %self.var(name%found%)% in the race.
 else
   return 0
 end
@@ -1258,11 +1246,11 @@ elseif %mode% == places
   * loop first to determine places and store prev_place/gap
   set pos 1
   while %pos% <= 3
-    eval prev_place%pos% %%self.place%pos%%%
+    set prev_place%pos% %self.var(place%pos%)%
     remote prev_place%pos% %self.id%
-    eval prev_gap%pos% %%self.gap%pos%%%
+    set prev_gap%pos% %self.var(gap%pos%)%
     remote prev_gap%pos% %self.id%
-    eval dist %%self.dist%pos%%%
+    set dist %self.var(dist%pos%)%
     if %dist% > %best_dist% || !%best_pos%
       set third_pos %sec_pos%
       set third_dist %sec_dist%
@@ -1320,11 +1308,11 @@ elseif %mode% == round
   set pos 1
   while %pos% <= 3
     * update distance
-    eval this_dist %%self.dist%pos%%% + %%self.speed%pos%%% + %random.5% - %%self.penalty%pos%%%
+    eval this_dist %self.var(dist%pos%)% + %self.var(speed%pos%)% + %random.5% - %self.var(penalty%pos%)%
     set dist%pos% %this_dist%
     remote dist%pos% %self.id%
     * update penalty
-    eval penalty %%self.penalty%pos%%% - %%self.luck%pos%%%
+    eval penalty %self.var(penalty%pos%)% - %self.var(luck%pos%)%
     if %penalty% > 0
       set penalty%pos% %penalty%
     else
@@ -1332,19 +1320,17 @@ elseif %mode% == round
     end
     remote penalty%pos% %self.id%
     * also extract former place here for a place-to-pos map
-    eval place %%self.place%pos%%%
+    set place %self.var(place%pos%)%
     set place%place% %pos%
     eval pos %pos% + 1
   done
   * check area to see if anyone is in a no-passing zone
-  eval check1 %no_pass_areas% ~= %%self.area%place1%%% && %%self.dist%place2%%% > %%self.dist%place1%%%
-  if %check1%
-    eval dist%place2% %%self.dist%place1%%% - 1
+  if %no_pass_areas% ~= %self.var(area%place1%)% && %self.var(dist%place2%)% > %self.var(dist%place1%)%
+    eval dist%place2% %self.var(dist%place1%)% - 1
     remote dist%place2% %self.id%
   end
-  eval check2 %no_pass_areas% ~= %%self.area%place2%%% && %%self.dist%place3%%% > %%self.dist%place2%%%
-  if %check2%
-    eval dist%place3% %%self.dist%place2%%% - 1
+  if %no_pass_areas% ~= %self.var(area%place2%)% && %self.var(dist%place3%)% > %self.var(dist%place2%)%
+    eval dist%place3% %self.var(dist%place2%)% - 1
     remote dist%place3% %self.id%
   end
   * check areas
@@ -1369,7 +1355,7 @@ elseif %mode% == round
   * store areas
   set pos 1
   while %pos% <= 3
-    eval prev_area%pos% %%self.area%pos%%%
+    set prev_area%pos% %self.var(area%pos%)%
     remote prev_area%pos% %self.id%
     remote area%pos% %self.id%
     eval pos %pos% + 1
@@ -1390,17 +1376,17 @@ end
 * to their places in stored data
 set pos 1
 while %pos% <= 3
-  eval place %%self.place%pos%%%
+  set place %self.var(place%pos%)%
   * moves them based on current place in TEMPORARY data
-  eval pos%place% %pos%
-  eval name%place% %%self.name%pos%%%
-  eval dist%place% %%self.dist%pos%%%
-  eval gap%place% %%self.gap%pos%%%
-  eval guile%place% %%self.guile%pos%%%
-  eval luck%place% %%self.luck%pos%%%
-  eval winner%place% %%self.winner%pos%%%
-  eval prev_place%place% %%self.prev_place%pos%%%
-  eval prev_gap%place% %%self.prev_gap%pos%%%
+  set pos%place% %pos%
+  set name%place% %self.var(name%pos%)%
+  set dist%place% %self.var(dist%pos%)%
+  set gap%place% %self.var(gap%pos%)%
+  set guile%place% %self.var(guile%pos%)%
+  set luck%place% %self.var(luck%pos%)%
+  set winner%place% %self.var(winner%pos%)%
+  set prev_place%place% %self.var(prev_place%pos%)%
+  set prev_gap%place% %self.var(prev_gap%pos%)%
   eval pos %pos% + 1
 done
 if %arg% == start
@@ -1491,9 +1477,9 @@ elseif %arg% == win
   set pos 1
   while %pos% <= 3
     * message owner
-    eval owner %%self.owner%pos%%%
-    eval name %%self.name%pos%%%
-    eval winner %%self.winner%pos%%%
+    set owner %self.var(owner%pos%)%
+    set name %self.var(name%pos%)%
+    set winner %self.var(winner%pos%)%
     if %owner% > 0
       makeuid owner %owner%
       if %owner% && %owner.is_pc%
@@ -1511,7 +1497,7 @@ elseif %arg% == win
       end
     end
     * try finding the jar
-    eval jar %%self.jar%pos%%%
+    set jar %self.var(jar%pos%,0)%
     if %jar% > 0
       makeuid jar %jar%
       if %jar% && %jar.vnum% == 11914
@@ -1583,8 +1569,8 @@ elseif %self.state% == 1
         racework fillin %pos%
       end
       * determine initial distance and position
-      eval luck %%self.luck%pos%%%
-      eval dist%pos% %%self.speed%pos%%% + %%random.%luck%%%
+      set luck %self.var(luck%pos%)%
+      eval dist%pos% %self.var(speed%pos%)% + %%random.%luck%%%
       remote dist%pos% %self.id%
       eval pos %pos% + 1
     done
@@ -1595,7 +1581,17 @@ elseif %self.state% == 1
     wait 1 sec
     * determine and announce initial places
     racework places
-    %echo% There's a loud BANG! sound, and the gate opens!
+    %echo% There's a loud BANG! sound, and the tiny gate opens!
+    set ch %self.room.people%
+    while %ch%
+      if %ch.is_pc%
+        set varname watching_%ch.id%
+        if %self.var(%varname%,0)% == 0
+          %send% %ch% Type 'watch <pixy name>' if you want to follow one through the race.
+        end
+      end
+      set ch %ch.next_in_room%
+    done
     %echo% Type 'watch <pixy name>' if you're not already watching one.
     wait 1
     raceman start
@@ -2065,16 +2061,7 @@ done
 * ensure a player has loot permission
 if %actor.is_pc% && %actor.level% >= %min_level% && %self.is_tagged_by(%actor%)%
   set varname pc%actor.id%
-  set ok 0
-  if !%room.varexists(%varname%)%
-    set ok 1
-  else
-    eval check %%room.%varname%%%
-    if %check% < %pos%
-      set ok 1
-    end
-  end
-  if %ok%
+  if %room.var(%varname%,0)% < %pos%
     * actor qualifies
     set %varname% %pos%
     remote %varname% %room.id%
@@ -2087,16 +2074,7 @@ set ch %room.people%
 while %ch% && !%any_ok%
   if %ch.is_pc% && %ch.level% >= %min_level% && %self.is_tagged_by(%ch%)%
     set varname pc%ch.id%
-    set ok 0
-    if !%room.varexists(%varname%)%
-      set ok 1
-    else
-      eval check %%room.%varname%%%
-      if %check% < %pos%
-        set ok 1
-      end
-    end
-    if %ok%
+    if %room.var(%varname%,0)% < %pos%
       * ch qualifies
       set %varname% %pos%
       remote %varname% %room.id%
@@ -2141,7 +2119,7 @@ while %ch%
   if %ch.is_pc% && !%ch.nohassle%
     set varname enter_%ch.id%
     if %room.varexists(%varname%)%
-      eval time %%room.%varname%%%
+      set time %room.var(%varname%)%
     else
       set time %timestamp%
       set %varname% %time%
@@ -2272,12 +2250,9 @@ if !%target%
 end
 * per-person time limit (mobs and players both)
 set varname limit_%target.id%
-if %self.varexists(%varname%)%
-  eval when %%self.%varname%%%
-  if %when% + 60 > %timestamp%
-    * too soon
-    halt
-  end
+if %self.var(%varname%,0)% + 60 > %timestamp%
+  * too soon
+  halt
 end
 set %varname% %timestamp%
 remote %varname% %self.id%
@@ -2544,16 +2519,7 @@ set room %self.room%
 set min_level 150
 if %actor.is_pc% && %actor.level% >= %min_level% && %self.is_tagged_by(%actor%)%
   set varname pc%actor.id%
-  set ok 0
-  if !%room.varexists(%varname%)%
-    set ok 1
-  else
-    eval daycheck %%room.%varname%%%
-    if !%daycheck%
-      set ok 1
-    end
-  end
-  if %ok%
+  if !%room.var(%varname%,0)%
     * actor qualifies
     set %varname% %dailycycle%
     remote %varname% %room.id%
@@ -2566,16 +2532,7 @@ set ch %room.people%
 while %ch%
   if %ch.is_pc% && %ch.level% >= %min_level% && %self.is_tagged_by(%ch%)%
     set varname pc%ch.id%
-    set ok 0
-    if !%room.varexists(%varname%)%
-      set ok 1
-    else
-      eval daycheck %%room.%varname%%%
-      if !%daycheck%
-        set ok 1
-      end
-    end
-    if %ok%
+    if !%room.var(%varname%,0)%
       * ch qualifies
       set %varname% %dailycycle%
       remote %varname% %room.id%
@@ -4276,16 +4233,7 @@ end
 * ensure a player has loot permission
 if %actor.is_pc% && %actor.level% >= %min_level% && %self.is_tagged_by(%actor%)%
   set varname pc%actor.id%
-  set ok 0
-  if !%room.varexists(%varname%)%
-    set ok 1
-  else
-    eval check %%room.%varname%%%
-    if %check% < %pos%
-      set ok 1
-    end
-  end
-  if %ok%
+  if %room.var(%varname%,0)% < %pos%
     * actor qualifies
     set %varname% %pos%
     remote %varname% %room.id%
@@ -4299,16 +4247,7 @@ set ch %room.people%
 while %ch%
   if %ch.is_pc% && %ch.level% >= %min_level% && %self.is_tagged_by(%ch%)%
     set varname pc%ch.id%
-    set ok 0
-    if !%room.varexists(%varname%)%
-      set ok 1
-    else
-      eval check %%room.%varname%%%
-      if %check% < %pos%
-        set ok 1
-      end
-    end
-    if %ok%
+    if !room.var(%varname%,0)% < %pos%
       * ch qualifies
       set %varname% %pos%
       remote %varname% %room.id%
