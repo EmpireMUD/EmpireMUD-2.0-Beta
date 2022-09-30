@@ -626,7 +626,7 @@ while %place% <= 3
       set forestdome 1
       if %need%
         eval temp %%%strname%%%
-        set %strname% %temp% and is grabbed by a dryad
+        set %strname% %temp% but is grabbed by a dryad
         * in %area_name%
       end
     elseif %area% == 3 && !%lavadome% && %rand_luck% < 3
@@ -634,7 +634,7 @@ while %place% <= 3
       set lavadome 1
       if %need%
         eval temp %%%strname%%%
-        set %strname% %temp% and takes a lava ball to the face from a fire sprite
+        set %strname% %temp% but takes a lava ball to the face from a fire sprite
         * in %area_name%
       end
     elseif %area% == 5 && !%thunderdome% && %rand_luck% < 4
@@ -642,7 +642,7 @@ while %place% <= 3
       set thunderdome 1
       if %need%
         eval temp %%%strname%%%
-        set %strname% %temp% and is blasted by a thunderling
+        set %strname% %temp% but is blasted by a thunderling
         * in %area_name%
       end
     end
@@ -669,11 +669,14 @@ while %ch%
         if !%send_str.empty%
           %send% %ch% %send_str%.
         end
+      else if %random.3% == 3
+        %send% %ch% The pixies are racing! Type 'race' to see who's running and 'watch' to follow one.
       end
     end
   end
   set ch %ch.next_in_room%
 done
+raceman tricks
 * %echo% Debug: %self.name1%, %self.name2%, %self.name3% %self.dist1%-%self.dist2%-%self.dist3% %self.penalty1%/%self.penalty2%/%self.penalty3%
 ~
 #11912
@@ -704,7 +707,6 @@ if %self.next_race_time% > %timestamp && (%self.next_race_time% <= %timestamp% +
 end
 * let's start it now; it will announce itself
 racework countdown %max_time%
-
 ~
 #11913
 Pixy Races: Catch pixy in jar command~
@@ -1378,7 +1380,7 @@ end
 Pixy Races: raceman helper command~
 0 c 0
 raceman~
-* manages the 'start' and 'win' messages/etc argument gives different messages
+* manages the 'start', 'win', and 'tricks' messages/etc argument gives different messages
 if %actor% != %self%
   return 0
   halt
@@ -1413,6 +1415,61 @@ if %arg% == start
     say %name1.cap% blasts out of the gate and takes an early lead, followed by %name2%, with %name3% trailing!
   end
   * end of start-race call
+elseif %arg% == tricks
+  eval guile_roll %%random.%guile2%%%
+  eval guile_def %%random.%guile1%%%
+  if %guile_roll% > %guile_def%
+    wait 1
+    if %gap1% < 20
+      * small gap
+      switch %guile_roll%
+        case 1
+          say %name2.cap% slams into %name1%! There's no penalty for that in this sport!
+          eval penalty%pos1% %penalty1% + 2
+          remote penalty%pos1% %self.id%
+        break
+        case 2
+          say %name2.cap% sprinkles %name1% with pixy dust! Dirty tricks!
+          eval penalty%pos1% %penalty1% + 3
+          remote penalty%pos1% %self.id%
+        break
+        case 3
+          say %name2.cap% blasts %name1% with pixy dust! That scoundrel!
+          eval penalty%pos1% %penalty1% + 5
+          remote penalty%pos1% %self.id%
+        break
+        case 4
+          say %name2.cap% hurls an acorn at %name1%'s head! That had to hurt!
+          eval penalty%pos1% %penalty1% + 7
+          remote penalty%pos1% %self.id%
+        break
+        case 5
+          say %name2.cap% hurls a fireball at %name1%! That's going to leave a scorchmark!
+          eval penalty%pos1% %penalty1% + 8
+          remote penalty%pos1% %self.id%
+        break
+      done
+    else
+      * large gap
+      switch %random.3%
+        case 1
+          say %name2.cap% hurls a spiked blue shell at %name1%! That has to sting!
+          eval penalty%pos1% %penalty1% + 10
+          remote penalty%pos1% %self.id%
+        break
+        case 2
+          say %name2.cap% calls a lightningbolt down through the window! It hits %name1% with a loud sizzle!
+          eval penalty%pos1% %penalty1% + 14
+          remote penalty%pos1% %self.id%
+        break
+        case 3
+          say %name2.cap% teleports! That has to be cheating, right? No? Everything is legal in Pixy Racing!
+          eval dist%pos2% %self.dist2% + 20
+          remote dist%pos2% %self.id%
+        break
+      done
+    end
+  end
 elseif %arg% == win
   * raceman win: announce victory
   if %self.winner1% && %self.winner2% && %self.winner3%
