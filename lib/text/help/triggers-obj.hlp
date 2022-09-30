@@ -227,7 +227,9 @@ When using field  - The variable returns:
 &cval1(num)&0 - Changes the value 1 of the object.
 &cval2&0 - Returns the current value 2 of the object, defined here.
 &cval2(num)&0 - Changes the value 2 of the object.
-&cvarexists()&0 - Returns 1 if global variable in subfield exists, 0 if not.
+&cvar(name,default)&0 - Gets the value of that var if it exists and gets
+   'default' if it doesn't. Default is optional; gets empty string if none.
+&cvarexists()&0 - Returns 1 if remote variable in subfield exists, 0 if not.
 &cvnum&0 - The virtual number of the object.
 &cwearable&0 - True if the object can be worn in any equipment slot.
 &cworn_by&0 - The id of the character wearing the object, or an empty return.

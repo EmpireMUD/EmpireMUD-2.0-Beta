@@ -221,7 +221,9 @@ When using field - The variable returns:
 &ctitle&0 - The room's title (shown on 'look').
 &cvehicles&0 - The id of the first vehicle in the room, if any
    (then %veh.next_in_room%).
-&cvarexists()&0 - Returns 1 if global variable in subfield exists, 0 if not.
+&cvar(name,default)&0 - Gets the value of that var if it exists and gets
+   'default' if it doesn't. Default is optional; gets empty string if none.
+&cvarexists()&0 - Returns 1 if remote variable in subfield exists, 0 if not.
 &cview_height&0 - The room's effective height including any buildings.
 &cvnum&0 - The room's vnum.
 &cweather&0 - current weather: sunny, cloudy, rainy, or lightning

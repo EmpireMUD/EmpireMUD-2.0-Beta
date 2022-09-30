@@ -135,7 +135,9 @@ When using field  - The variable returns:
 &cunlink_instance&0 - Disconnects the vehicle from any adventure, meaning it
    will not be cleaned up when the instance closes (e.g. player gets to keep
    a vehicle that was loaded inside an instance).
-&cvarexists()&0 - Returns 1 if global variable in subfield exists, 0 if not.
+&cvar(name,default)&0 - Gets the value of that var if it exists and gets
+   'default' if it doesn't. Default is optional; gets empty string if none.
+&cvarexists()&0 - Returns 1 if remote variable in subfield exists, 0 if not.
 &cvnum&0 - The vehicle's vnum.
 
 See also: EMPIRE VARS, VEDIT FLAGS, FUNCTION FLAGS
