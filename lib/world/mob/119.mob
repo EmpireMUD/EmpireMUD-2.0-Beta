@@ -598,7 +598,9 @@ into middle age. His black and violet robes drape from his tall chair over the
 race track, where he can see ever turn. His high vantage point also gives you
 an uneasy view of the thicket of long hairs that protrude from the nostrils of
 his bulbous nose.
-   To check the status of the race, just type 'race'.
+   To check the status of the race, just type 'race'. To enter your own pixy,
+type 'race <pixy name>'. To choose or change which pixy you're watching, you
+can type 'watch <pixy name>' at any time.
 ~
 T 11912
 T 11916

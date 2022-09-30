@@ -496,78 +496,122 @@ while %pos% <= 3
   eval winner%place% %%self.winner%pos%%%
   eval prev_place%place% %%self.prev_place%pos%%%
   eval prev_gap%place% %%self.prev_gap%pos%%%
-  *
-  eval temp1 %%name%place%%%
-  eval temp2 %%pos%place%%%
-  %echo% Debug A: pos=%pos%, name=%temp1%, posplace=%temp2%, place=%place%
   eval pos %pos% + 1
 done
-* 1. announce changes/position
-  ** build in parts and assemble a whole call?
-* prepare location string like "as they head into"
-* were there no changes and no tie?
-if %prev_place1% == 1 && %prev_place2% == 2 && %gap1% > 0
-  if %random.2% == 2
-    %echo% Race: %name1% holds the lead
-  else
-    %echo% Race: %name1% is still out in front
-  end
-end
-* build first-place section
-if %gap1% == 0 && %gap2% == 0
-  %echo% Race: It's a three-way tie with all three pixies wing to wing
-elseif %prev_place1% != 1
-  %echo% Race: %name1% overtakes the lead
-elseif %prev_place2% == 3
-  %echo% Race: %name2% has overtaken %name3% for second place
-else
-  * %echo% Race: %name1% is still out in front
-  * if they're in a special part of the path, that can replace the 1st-place thing here?
-end
-* second-place portion
-if %gap1% == 0
-  %echo% Race: %name2% is right behind, it's wind-and-wing
-elseif %gap1% < 10
-  if %place2% == %prev_place2% && %gap1% != %prev_gap1%
-    if %prev_gap1% < %gap1%
-      %echo% Race: but %name2% is gaining fast
-    elseif %prev_gap1% > %gap1%
-      %echo% Race: and %name1% is opening up that lead
+* see who's being watched
+set need1 0
+set need2 0
+set need3 0
+set ch %self.room.people%
+while %ch%
+  if %ch.is_pc%
+    set varname watching_%ch.id%
+    if %self.varexists(%varname%)%
+      eval watching %%self.%varname%%%
+      if %watching% > 0
+        eval watching %%self.place%watching%%%
+        set need%watching% 1
+      end
     end
-  else
-    %echo% Race: %name2% is right behind
   end
-elseif %gap1% > 20
-  %echo% Race: and has an incredible lead
+  set ch %ch.next_in_room%
+done
+set str1
+set str2
+set str3
+set says
+* 1. start strings: position w/changes
+if %gap1% == 0 && %gap2% == 0
+  set say %say% It's a three-way tie with all three pixies wing to wing!
+  set str1 All three pixies are tied
+  set str2 %str1%
+  set str3 %str1%
 end
-* third-place portion
-if %gap2% == 0
-  %echo% Race: second and third place are wing to wing
-elseif %gap2% < 10
-  %echo% Race: %name3% is in a close third
-elseif %gap2% > 20
-  %echo% Race: with %name3% in a distant third
+if %gap1% == 0 && %str1.empty%
+  set say %say% %name1.cap% and %name2% are tied for the lead!
+  set str1 %name1.cap% is wing-and-wing with %name2%
+  set str2 %name2.cap% is wing-and-wing with %name1%
 end
+if %gap2% == 0 && %str2.empty%
+  set say %say% %name2.cap% and %name3% are tied for second!
+  set str2 %name2.cap% is wing-and-wing with %name3%
+  set str3 %name3.cap% is wing-and-wing with %name2%
+end
+if %need1% && %str1.empty%
+  if %prev_place1% == 1
+    set str1 %name1.cap% is out in front
+  else
+    set str1 %name1.cap% takes the lead
+    set say %say% %name1.cap% has taken the lead!
+  end
+  if %gap1% < 8
+    set str1 %str1% with %name2% right behind
+    if %prev_gap1% < %gap1%
+      set str1 %str1% and gaining fast
+    end
+  elseif %gap1% > 20
+    set str1 %str1% and has a strong lead
+  end
+end
+if %need2% && %str2.empty%
+  if %prev_place2% == 2
+    if %gap1% < 10
+      set hf a close second
+    elseif %gap1% > 25
+      set hf a distant second
+    else
+      set hf second
+    end
+    set str2 %name2.cap% is in %hf% place
+  if %gap2% < 7
+    set str2 %str2% with %name3% right behind
+  end
+  elseif %prev_place2% == 3
+    set str2 %name2.cap% has overtaken %name3% for second place
+    set say %say% %name1.cap% has overtaken second!
+  elseif %prev_place2% == 1
+    set str2 %name2.cap% has fallen back to second place
+  end
+end
+if %need3% && %str3.empty%
+  if %prev_place3% != 3
+    set str3 %name3.cap% has fallen to last place
+  elseif %gap2% < 10
+    set str3 %name3.cap% is holding on in last place
+  elseif %gap2% > 25
+    set str3 %name3.cap% is far behind in last place
+  else
+    set str3 %name3.cap% remains in last place
+  end
+end
+
+* 2. "as they enter AREA"?
+
+* idea: if say length is long enough, add "it's an exciting race" or similar
+
 	* else: gaps widened/shrunk
 		* else: just current positions
 * part-of-the-track messages (track to have several obstacles around certain spots
 	* may have to track progress through obstacles on each pix to avoid echoing about it twice
 * location parts
-	* TODO: once per dome per round, a pixy can hit the obstacle
+
 set forestdome 0
 set lavadome 0
 set thunderdome 0
 set place 1
 while %place% <= 3
+  eval need %%need%place%%%
+  set strname str%place%
   eval area %%area%place%%%
   eval prev_area %%prev_area%place%%%
   eval rand_luck %%random.luck%place%%%
   eval area_name %%area_name%area%%%
   eval pix_name %%name%place%%%
-  if %area% > %prev_area%
-    %echo% Race: %pix_name% enters %area_name%
+  eval temp_str %%%strname%%%
+  if %need% && %area% > %prev_area%
+    set %strname% %temp_str% entering %area_name%
   else
-    %echo% Race: %pix_name% still in %area_name%
+    set %strname% %temp_str% in %area_name%
   end
   * hazards
   eval penalty_var penalty%%pos%place%%%
@@ -575,20 +619,32 @@ while %place% <= 3
     %echo% Debug error: Missing self.%penalty_var%, place=%place%, name=%pix_name%
   end
   eval current_penalty %%self.%penalty_var%%%
-  if %current_penalty% == 0
+  if %current_penalty% == 0 && %area% == %prev_area%
     set penalty 0
     if %area% == 1 && !%forestdome% && %rand_luck% < 2
-      %echo% Race: %pix_name% is grabbed by a dryad in %area_name%!
       set penalty 2
       set forestdome 1
+      if %need%
+        eval temp %%%strname%%%
+        set %strname% %temp% and is grabbed by a dryad
+        * in %area_name%
+      end
     elseif %area% == 3 && !%lavadome% && %rand_luck% < 3
-      %echo% Race: %pix_name% takes a lava ball to the face from a fire sprite in %area_name%!
       set penalty 4
       set lavadome 1
+      if %need%
+        eval temp %%%strname%%%
+        set %strname% %temp% and takes a lava ball to the face from a fire sprite
+        * in %area_name%
+      end
     elseif %area% == 5 && !%thunderdome% && %rand_luck% < 4
-      %echo% Race: %pix_name% is blasted by a thunderling in %area_name%!
       set penalty 6
       set thunderdome 1
+      if %need%
+        eval temp %%%strname%%%
+        set %strname% %temp% and is blasted by a thunderling
+        * in %area_name%
+      end
     end
     if %penalty%
       set %penalty_var% %penalty%
@@ -597,62 +653,28 @@ while %place% <= 3
   end
   eval place %place% + 1
 done
-* 2. apply dirty tricks
-eval guile_roll %%random.%guile2%%%
-eval guile_def %%random.%guile1%%%
-if %guile_roll% > %guile_def%
-  wait 1
-  if %gap1% < 20
-    * small gap
-    switch %guile_roll%
-      case 1
-        say %name2.cap% slams into %name1%! There's no penalty for that in this sport!
-        eval penalty%pos1% %penalty1% + 2
-        remote penalty%pos1% %self.id%
-      break
-      case 2
-        say %name2.cap% sprinkles %name1% with pixy dust! Dirty tricks!
-        eval penalty%pos1% %penalty1% + 3
-        remote penalty%pos1% %self.id%
-      break
-      case 3
-        say %name2.cap% blasts %name1% with pixy dust! That scoundrel!
-        eval penalty%pos1% %penalty1% + 5
-        remote penalty%pos1% %self.id%
-      break
-      case 4
-        say %name2.cap% hurls an acorn at %name1%'s head! That had to hurt!
-        eval penalty%pos1% %penalty1% + 7
-        remote penalty%pos1% %self.id%
-      break
-      case 5
-        say %name2.cap% hurls a fireball at %name1%! That's going to leave a scorchmark!
-        eval penalty%pos1% %penalty1% + 8
-        remote penalty%pos1% %self.id%
-      break
-    done
-  else
-    * large gap
-    switch %random.3%
-      case 1
-        say %name2.cap% hurls a spiked blue shell at %name1%! That has to sting!
-        eval penalty%pos1% %penalty1% + 10
-        remote penalty%pos1% %self.id%
-      break
-      case 2
-        say %name2.cap% calls a lightningbolt down through the window! It hits %name1% with a loud sizzle!
-        eval penalty%pos1% %penalty1% + 14
-        remote penalty%pos1% %self.id%
-      break
-      case 3
-        say %name2.cap% teleports! That has to be cheating, right? No? Everything is legal in Pixy Racing!
-        eval dist%pos2% %self.dist2% + 20
-        remote dist%pos2% %self.id%
-      break
-    done
-  end
+* 2. send messages?
+if !%say.empty%
+  say %say%
 end
-%echo% Debug: 1 %self.name1% (d=%self.dist1%, p=%self.penalty1%), 2 %self.name2% (d=%self.dist2%, p=%self.penalty2%), 3 %self.name3% (d=%self.dist3%, p=%self.penalty3%)
+set ch %self.room.people%
+while %ch%
+  if %ch.is_pc%
+    set varname watching_%ch.id%
+    if %self.varexists(%varname%)%
+      eval watching %%self.%varname%%%
+      if %watching% > 0
+        eval watching %%self.place%watching%%%
+        eval send_str %%str%watching%%%
+        if !%send_str.empty%
+          %send% %ch% %send_str%.
+        end
+      end
+    end
+  end
+  set ch %ch.next_in_room%
+done
+* %echo% Debug: %self.name1%, %self.name2%, %self.name3% %self.dist1%-%self.dist2%-%self.dist3% %self.penalty1%/%self.penalty2%/%self.penalty3%
 ~
 #11912
 Pixy Races: Greet triggers upcoming race~
@@ -915,117 +937,145 @@ end
 #11916
 Pixy Races: Race command for players~
 0 c 0
-race~
-* Check status or enter a pixy
-* usage: race [jar]
-* 1. no-arg: just show status
-if !%arg%
-  %send% %actor% == Pixy Races ==
-  if %self.state% == 1
-    * not started
-    set pos 1
-    while %pos% <= 3
-      if %pos% <= %self.count%
+race watch~
+* Check status or enter a pixy, or choose who to watch
+return 1
+if race /= %cmd% && %actor.is_pc%
+  * usage 1: race [jar]
+  * 1. no-arg: just show status
+  if !%arg%
+    %send% %actor% == Pixy Races ==
+    if %self.state% == 1
+      * not started
+      set pos 1
+      while %pos% <= 3
+        if %pos% <= %self.count%
+          eval name %%self.name%pos%%%
+          eval owner %%self.owner%pos%%%
+          if %owner% > 0
+            makeuid owner %owner%
+          end
+          if %owner%
+            set owner_name (%owner.name%)
+          else
+            set owner_name
+          end
+          %send% %actor% %pos%. %name% %owner_name%
+        else
+          %send% %actor% %pos%. <open>
+        end
+        eval pos %pos% + 1
+      done
+      if %self.count% < 3 && %actor.inventory(11914)% && %actor.id% != %self.owner1% && %actor.id% != %self.owner2%
+        %send% %actor% Type 'race <jar>' to enter your pixy!
+      end
+    elseif %state% == 2
+      * race running
+      set pos 1
+      while %pos% <= 3
         eval name %%self.name%pos%%%
         eval owner %%self.owner%pos%%%
+        eval place %%self.place%pos%%%
         if %owner% > 0
           makeuid owner %owner%
         end
         if %owner%
-          set owner_name (%owner.name%)
+          set owner_name (%owner.name%) -
         else
-          set owner_name
+          set owner_name -
         end
-        %send% %actor% %pos%. %name% %owner_name%
-      else
-        %send% %actor% %pos%. <open>
-      end
-      eval pos %pos% + 1
-    done
-    if %self.count% < 3 && %actor.inventory(11914)% && %actor.id% != %self.owner1% && %actor.id% != %self.owner2%
-      %send% %actor% Type 'race <jar>' to enter your pixy!
+        if %place% == 1
+          set place 1st place
+        elseif %place% == 2
+          set place 2nd place
+        else
+          set place 3rd place
+        end
+        %send% %actor% %pos%. %name% %owner_name% %place%
+        eval pos %pos% + 1
+      done
+    else
+      %send% %actor% The track is being cleaned.
     end
-  elseif %state% == 2
-    * race running
-    set pos 1
-    while %pos% <= 3
-      eval name %%self.name%pos%%%
-      eval owner %%self.owner%pos%%%
-      eval place %%self.place%pos%%%
-      if %owner% > 0
-        makeuid owner %owner%
-      end
-      if %owner%
-        set owner_name (%owner.name%) -
-      else
-        set owner_name -
-      end
-      if %place% == 1
-        set place 1st place
-      elseif %place% == 2
-        set place 2nd place
-      else
-        set place 3rd place
-      end
-      %send% %actor% %pos%. %name% %owner_name% %place%
-      eval pos %pos% + 1
-    done
-  else
-    %send% %actor% The track is being cleaned.
+    halt
+    * end of no-arg version
   end
-  halt
-  * end of no-arg version
-end
-* 2. basic targeting w/arg
-set jar %actor.obj_target_inv(%arg%)%
-if %self.state% != 1
-  %send% %actor% You can't enter any pixies right now.
-  halt
-elseif !%jar%
-  %send% %actor% You don't seem to have %arg.ana% %arg%.
-  halt
-elseif %jar.vnum% != 11914
-  %send% %actor% You can't race @%jar%.
-  halt
-elseif %self.count% >= 3
-  %send% %actor% Three pixies are already racing. You'll have to wait for next time.
-  halt
-elseif %self.owner1% == %actor.id% || %self.owner2% == %actor.id% || %self.owner3% == %actor.id%
-  %send% %actor% You already have a pixy in this race.
-  halt
-end
-* should be ok!
-%send% %actor% You enter %jar.pixy% in the race!
-%echoaround% %actor% ~%actor% enters %jar.pixy% in the race!
-eval count %self.count% + 1
-remote count %self.id%
-* store pixy stats
-set name%count% %jar.pixy%
-set speed%count% %jar.speed%
-set guile%count% %jar.guile%
-set luck%count% %jar.luck%
-set owner%count% %actor.id%
-set jar%count% %jar.id%
-remote name%count% %self.id%
-remote speed%count% %self.id%
-remote guile%count% %self.id%
-remote luck%count% %self.id%
-remote owner%count% %self.id%
-remote jar%count% %self.id%
-* update pixy race time
-set last_race %timestamp%
-remote last_race %jar.id%
-* start race early if we have max pixies
-if %count% >= 3
-  wait 1
-  eval next_race_time %timestamp%
-  remote next_race_time %self.id%
-  say The race is getting ready to start...
-elseif %self.next_race_time% > (%timestamp% + 60)
-  * if not, set a max wait time of 1m
-  eval next_race_time %timestamp% + 60
-  remote next_race_time %self.id%
-  say Last call for more racers.
+  * 2. basic targeting w/arg
+  set jar %actor.obj_target_inv(%arg%)%
+  if %self.state% != 1
+    %send% %actor% You can't enter any pixies right now.
+    halt
+  elseif !%jar%
+    %send% %actor% You don't seem to have %arg.ana% %arg%.
+    halt
+  elseif %jar.vnum% != 11914
+    %send% %actor% You can't race @%jar%.
+    halt
+  elseif %self.count% >= 3
+    %send% %actor% Three pixies are already racing. You'll have to wait for next time.
+    halt
+  elseif %self.owner1% == %actor.id% || %self.owner2% == %actor.id% || %self.owner3% == %actor.id%
+    %send% %actor% You already have a pixy in this race.
+    halt
+  end
+  * should be ok!
+  %send% %actor% You enter %jar.pixy% in the race!
+  %echoaround% %actor% ~%actor% enters %jar.pixy% in the race!
+  eval count %self.count% + 1
+  remote count %self.id%
+  * store pixy stats
+  set name%count% %jar.pixy%
+  set speed%count% %jar.speed%
+  set guile%count% %jar.guile%
+  set luck%count% %jar.luck%
+  set owner%count% %actor.id%
+  set jar%count% %jar.id%
+  remote name%count% %self.id%
+  remote speed%count% %self.id%
+  remote guile%count% %self.id%
+  remote luck%count% %self.id%
+  remote owner%count% %self.id%
+  remote jar%count% %self.id%
+  * store watching
+  set watching_%actor.id% %count%
+  remote watching_%actor.id% %self.id%
+  * update pixy race time
+  set last_race %timestamp%
+  remote last_race %jar.id%
+  * start race early if we have max pixies
+  if %count% >= 3
+    wait 1
+    eval next_race_time %timestamp%
+    remote next_race_time %self.id%
+    say The race is getting ready to start...
+  elseif %self.next_race_time% > (%timestamp% + 60)
+    * if not, set a max wait time of 1m
+    eval next_race_time %timestamp% + 60
+    remote next_race_time %self.id%
+    say Last call for more racers.
+  end
+elseif watch /= %cmd% && %actor.is_pc%
+  * usage 2: watch [pixy name]
+  if !%arg%
+    %send% %actor% Watch which pixy?
+    halt
+  end
+  if %self.count% >= 1 && %self.name1% /= %arg%
+    set found 1
+  elseif %self.count% >= 2 && %self.name2% /= %arg%
+    set found 2
+  elseif %self.count% >= 3 && %self.name3% /= %arg%
+    set found 3
+  else
+    %send% %actor% No pixy called '%arg%' is racing right now.
+    halt
+  end
+  set watching_%actor.id% %found%
+  remote watching_%actor.id% %self.id%
+  eval show_name %%self.name%found%%%
+  %send% %actor% You will now watch %show_name% in the race.
+else
+  return 0
 end
 ~
 #11917
@@ -1238,7 +1288,7 @@ elseif %mode% == places
   remote place1 %self.id%
   remote place2 %self.id%
   remote place3 %self.id%
-  %echo% Debug store places: %place1% %place2% %place3%, %best_pos%(%best_dist%) %sec_pos%(%sec_dist%) %third_pos%(%third_dist%)
+  * %echo% Debug store places: %place1% %place2% %place3%, %best_pos%(%best_dist%) %sec_pos%(%sec_dist%) %third_pos%(%third_dist%)
   * store gaps
   eval gap%best_pos% %best_dist% - %sec_dist%
   eval gap%sec_pos% %sec_dist% - %third_dist%
@@ -1262,7 +1312,7 @@ elseif %mode% == places
   set debug1 %self.place1%/%self.prev_place1%, %self.gap1%/%self.prev_gap1%, %self.area1%/%self.prev_area1%
   set debug2 %self.place2%/%self.prev_place2%, %self.gap2%/%self.prev_gap2%, %self.area2%/%self.prev_area2%
   set debug3 %self.place3%/%self.prev_place3%, %self.gap3%/%self.prev_gap3%, %self.area3%/%self.prev_area3%
-  %echo% Debug (places, gaps, areas; cur/prev): 1 (%debug1%), 2 (%debug2%), 3 (%debug3%)
+  * %echo% Debug (places, gaps, areas; cur/prev): 1 (%debug1%), 2 (%debug2%), 3 (%debug3%)
 elseif %mode% == round
   * one round: update distances and penalties
   set pos 1
@@ -1349,10 +1399,6 @@ while %pos% <= 3
   eval winner%place% %%self.winner%pos%%%
   eval prev_place%place% %%self.prev_place%pos%%%
   eval prev_gap%place% %%self.prev_gap%pos%%%
-  *
-  eval temp1 %%name%place%%%
-  eval temp2 %%pos%place%%%
-  %echo% Debug B: pos=%pos%, name=%temp1%, posplace=%temp2%, place=%place%
   eval pos %pos% + 1
 done
 if %arg% == start
@@ -1449,6 +1495,15 @@ elseif %arg% == win
     end
     eval pos %pos% + 1
   done
+  * clear watching here
+  set ch %self.room.people%
+  while %ch%
+    if %ch.is_pc%
+      set watching_%ch.id% 0
+      remote watching_%ch.id% %self.id%
+    end
+    set ch %ch.next_in_room%
+  done
 end
 ~
 #11920
@@ -1476,12 +1531,15 @@ elseif %self.state% == 1
       remote dist%pos% %self.id%
       eval pos %pos% + 1
     done
+    set count 3
+    remote count %self.id%
     * announce the start
     say The race is ready to start! In lane 1, we have %self.name1%! In lane 2, it's %self.name2%! And in lane 3, give it up for %self.name3%!
     wait 1 sec
     * determine and announce initial places
     racework places
     %echo% There's a loud BANG! sound, and the gate opens!
+    %echo% Type 'watch <pixy name>' if you're not already watching one.
     wait 1
     raceman start
     * update the state to start the race
