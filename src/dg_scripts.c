@@ -4435,7 +4435,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						if (*arg1 && SCRIPT(c)) {
 							LL_FOREACH(SCRIPT(c)->global_vars, remote_vd) {
 								if (!str_cmp(remote_vd->name, arg1)) {
-									snprintf(str, slen, "%s", vd->value);
+									snprintf(str, slen, "%s", remote_vd->value);
 									found = TRUE;
 									break;
 								}
@@ -4900,7 +4900,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 							if (*arg1 && SCRIPT(o)) {
 								LL_FOREACH(SCRIPT(o)->global_vars, remote_vd) {
 									if (!str_cmp(remote_vd->name, arg1)) {
-										snprintf(str, slen, "%s", vd->value);
+										snprintf(str, slen, "%s", remote_vd->value);
 										found = TRUE;
 										break;
 									}
@@ -5555,7 +5555,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						if (*arg1 && SCRIPT(r)) {
 							LL_FOREACH(SCRIPT(r)->global_vars, remote_vd) {
 								if (!str_cmp(remote_vd->name, arg1)) {
-									snprintf(str, slen, "%s", vd->value);
+									snprintf(str, slen, "%s", remote_vd->value);
 									found = TRUE;
 									break;
 								}
@@ -6029,7 +6029,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						if (*arg1 && SCRIPT(v)) {
 							LL_FOREACH(SCRIPT(v)->global_vars, remote_vd) {
 								if (!str_cmp(remote_vd->name, arg1)) {
-									snprintf(str, slen, "%s", vd->value);
+									snprintf(str, slen, "%s", remote_vd->value);
 									found = TRUE;
 									break;
 								}
@@ -6357,7 +6357,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						if (*arg1 && SCRIPT(e)) {
 							LL_FOREACH(SCRIPT(e)->global_vars, remote_vd) {
 								if (!str_cmp(remote_vd->name, arg1)) {
-									snprintf(str, slen, "%s", vd->value);
+									snprintf(str, slen, "%s", remote_vd->value);
 									found = TRUE;
 									break;
 								}
