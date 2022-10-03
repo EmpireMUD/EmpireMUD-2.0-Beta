@@ -536,7 +536,17 @@ S
 bell mausoleum walking~
 a walking mausoleum bell~
 The bell from a walking mausoleum is lying here.~
-tba
+   This gleaming iron bell intones a mournful knell when struck. It has been
+cast with intricate lettering and images all along its circumference. You can't
+read the writing (and there is a lot of it) but the images seem to be
+instructions for building a walking mausoleum.
+   This bell allows you to build a walking mausoleum. It requires a level 150
+Architect and must be built at a carpenter. Afterwards, lead the mausoleum to
+move it.
+   When Waltur Wright came to Skycleave, it was as a refugee, having fled his
+master's cartwright shop in the dark of night. His skill with a hammer was
+measured below only his skill with a staff and his ceaseless imagination. Soon,
+the wise professors of the black tower put him to work using all three.
 ~
 3 0 a 0 1
 0 0 0
@@ -548,7 +558,19 @@ S
 effigy sorcery tower walking~
 a walking sorcery tower effigy~
 An effigy of a walking sorcery tower is lying here.~
-tba
+   The stone effigy is in the shape of a sorcery tower with long legs -- a
+curious sight, to be sure. It's complete with a little door and tiny windows,
+through which you can see a tiny cluttered workshop and an enchanting little
+bedroom, both carved from stone.
+   This effigy allows you to build a walking sorcery tower. It requires a level
+150 Architect and must be built at a carpenter. Afterwards, enter the walking
+tower and drive it out of the carpenter. You can drive it from any interior
+room; look out a window to see where you are.
+   The Tower Skycleave has existed in many forms over the years, from Abaris's
+original clay brick tower to Wong's legendary stone tower. When he arrived at
+Skycleave, Waltur had the same dream: to build a greater Skycleave; one that
+the world would never stop talking about. When he became Chief Magineer, he
+immediately set to work building prototypes for a new tower.
 ~
 3 0 a 0 1
 0 0 0

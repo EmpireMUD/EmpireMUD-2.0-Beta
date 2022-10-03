@@ -2,7 +2,13 @@
 mausoleum walking~
 a walking mausoleum~
 A mausoleum on legs towers over you!~
-tba
+   The mausoleum towers over you on four enormous stone legs, moving almost
+like a spider, such that you can hardly see the building on top. Grass
+overhangs the edge of the platform, swaying in the breeze as the mausoleum
+moves.
+   Climbing the legs shouldn't be too difficult (enter mausoleum), nor should
+it be hard to get it moving (lead mausoleum). The inside of the mausoleum can
+be used as a tomb.
 ~
 @.&0XX@.~
 bo 0 16 0 0 0 2 0 3 0
@@ -12,7 +18,8 @@ D
 11937 0 0
 E
 legs~
-tba
+   The mausoleum's legs are enormous columns of articulated stone. Though there
+are only four of them, they give the impression of a giant spider as they move.
 ~
 P
 0
@@ -21,7 +28,12 @@ S
 sorcery tower sorcerer's sorcerers~
 the sorcery tower~
 A sorcerer's tower on legs rises high above you.~
-tba
+   The sight of a walking sorcery tower is something to behold. The brick tower
+stands upon two enormous stone legs with the posture and poise of a large
+person. The windows give the impression of eyes, almost as if the tower is
+watching you.
+   You can drive this tower from any room inside, as its controls are magical,
+but you'll have to look out a window to see where you're going.
 ~
 @.&0||@.~
 beuw 26 128 0 0 0 10 0 3 0
@@ -31,7 +43,11 @@ D
 11938 0 0
 E
 legs~
-tba
+The legs of the sorcery tower almost look human, but they're made of stone.
+~
+E
+windows~
+The windows of the tower are too high to see.
 ~
 I 30 5007 100.00 1  # RUINS-TO-VEH: ruins of #n
 P
