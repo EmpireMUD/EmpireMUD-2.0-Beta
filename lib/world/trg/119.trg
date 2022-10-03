@@ -352,13 +352,13 @@ if %actor.on_quest(11908)%
 end
 ~
 #11909
-Skycleave: Skycleaver trinket 2.0~
+Skycleave: Skycleaver trinket 2.0 (and warpstone)~
 1 c 2
 use~
 * will teleport the actor if used within this distance without a cooldown
+set always_teleport_vnum 11910
 set max_distance 100
 set cooldown_time 1800
-set cooldown_vnum 11909
 * basics
 if %actor.obj_target(%arg%)% != %self%
   return 0
@@ -367,26 +367,43 @@ end
 return 1
 set loc %instance.nearest_rmt(11800)%
 set room %actor.room%
+set name %self.custom(script1)%
 if !%loc% || %ch.plr_flagged(ADV-SUMMON)%
-  %send% %actor% The trinket just spins and spins.
-  %echoaround% %actor% ~%actor% holds up a trinket, which spins in the air.
+  %send% %actor% The %name% just spins and spins.
+  %echoaround% %actor% ~%actor% holds up %name.ana% %name%, which spins in the air.
   halt
 end
 * if we're too far or the cooldown is too high, we just show direction
 set distance %room.distance(%loc%)%
 if %distance% == 0
-  %send% %actor% The trinket just spins and spins.
-  %echoaround% %actor% ~%actor% holds up a trinket, which spins in the air.
+  %send% %actor% The %name% just spins and spins.
+  %echoaround% %actor% ~%actor% holds up %name.ana% %name%, which spins in the air.
   halt
 end
-* we at least get a direction...
-set direction %room.direction(%loc%)%
-%send% %actor% You hold up @%self%, which spins and points to the %direction%, toward %loc.coords%!
-%echoaround% %actor% ~%actor% holds up a trinket, which spins and points to the %direction%!
-* check if they qualify for a teleport
-if %distance% > %max_distance% || %actor.cooldown(%cooldown_vnum%)%
-  halt
-elseif %actor.position% != Standing || %actor.action% || %actor.fighting% || !%actor.can_teleport_room% || !%actor.canuseroom_guest%
+* direction portion
+if %self.vnum% != %always_teleport_vnum%
+  set direction %room.direction(%loc%)%
+  %send% %actor% You hold up @%self%, which spins and points to the %direction%, toward %loc.coords%!
+  %echoaround% %actor% ~%actor% holds up a trinket, which spins and points to the %direction%!
+  * trinket checks
+  if %distance% > %max_distance% || %actor.cooldown(%self.vnum%)%
+    halt
+  end
+else
+  * always-teleport version
+  if %actor.cooldown(%self.vnum%)%
+    %send% %actor% Your warpstone is depleted. Try again in a little while.
+    halt
+  end
+  * works?
+  %send% %actor% You hold up @%self%...
+  %echoaround% %actor% ~%actor% holds up @%self%...
+end
+* checks for both
+if %actor.position% != Standing || %actor.action% || %actor.fighting% || !%actor.can_teleport_room% || !%actor.canuseroom_guest%
+  if %self.vnum% == %always_teleport_vnum%
+    %send% %actor% ... but nothing happens.
+  end
   halt
 end
 * teleport portion: if we got here, they qualify for a teleport
@@ -416,7 +433,7 @@ while %cycle% < 3
     break
     case 1
       %send% %actor% The violet glow from @%self% envelops you!
-      %echoaround% %actor% |%actor% skycleaver trinket glows a stunning violet and the light envelops *%actor%!
+      %echoaround% %actor% |%actor% skycleaver %name% glows a stunning violet and the light envelops *%actor%!
       wait 5 sec
     break
     case 2
@@ -429,7 +446,7 @@ while %cycle% < 3
   eval cycle %cycle% + 1
 done
 * cleanup
-nop %actor.set_cooldown(%cooldown_vnum%, %cooldown_time%)%
+nop %actor.set_cooldown(%self.vnum%,%cooldown_time%)%
 nop %actor.cancel_adventure_summon%
 %force% %actor% stop cleardata
 ~
@@ -582,17 +599,13 @@ if %need3% && %str3.empty%
     set str3 %name3.cap% remains in last place
   end
 end
-
 * 2. "as they enter AREA"?
-
 * idea: if say length is long enough, add "it's an exciting race" or similar
-
 	* else: gaps widened/shrunk
 		* else: just current positions
 * part-of-the-track messages (track to have several obstacles around certain spots
 	* may have to track progress through obstacles on each pix to avoid echoing about it twice
 * location parts
-
 set forestdome 0
 set lavadome 0
 set thunderdome 0
@@ -1592,7 +1605,6 @@ elseif %self.state% == 1
       end
       set ch %ch.next_in_room%
     done
-    %echo% Type 'watch <pixy name>' if you're not already watching one.
     wait 1
     raceman start
     * update the state to start the race
@@ -2396,6 +2408,29 @@ wait 3 sec
 if %target.room% == %self.room% && %target.is_npc% && %response_mobs% ~= %target.vnum% && %rumor2_text%
   %force% %target% say Oh? %rumor2_text%
 end
+~
+#11938
+Skycleave: Walking Sorcery Tower setup~
+5 n 100
+~
+set inter %self.interior%
+if !%inter%
+  detach 11938 %self.id%
+  halt
+end
+if !%inter.up(room)%
+  %door% %inter% up add 11940
+end
+set upper %inter.up(room)%
+if %upper%
+  if !%upper.east(room)%
+    %door% %upper% east add 11941
+  end
+  if !%upper.west(room)%
+    %door% %upper% west add 11942
+  end
+end
+detach 11938 %self.id%
 ~
 #11939
 Goef the Oreonic: Attune skystone~

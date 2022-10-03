@@ -164,9 +164,37 @@ its earliest wooden tower to the magnificent stone structure of today. The
 tower's blocks were cut from the powerful standing stones of an unknown ancient
 culture.
 ~
-3 p a 0 5
+3 p a 0 7
 0 0 0
 12 0
+M
+21
+trinket~
+T 11909
+T 9806
+S
+#11910
+skycleaver warpstone~
+a skycleaver warpstone~
+A skycleaver warpstone is glowing here.~
+   The warpstone is pale blue with a milky swirl through it that catches the
+light when you hold it up. The surface is slightly rough and pockmarked, like a
+natural rock, though the shape of it is distinctly that of the Tower Skycleave
+itself. Perhaps they've found a way to grow rocks in this shape?
+   You can 'use' this warpstone to teleport yourself to the Tower Skycleave,
+even from across the world, though it doesn't seem to have enough power to
+perform this amazing feat very often.
+   The black tower is known to house a truly priceless amount of magical power,
+but its masters manage to put a price on it nonetheless. And as the key to
+selling magic is bringing in customers, the tower has devised many clever ways
+to bring people back over and over again.
+~
+3 p a 0 7
+0 0 0
+12 0
+M
+22
+warpstone~
 T 11909
 T 9806
 S
@@ -472,6 +500,59 @@ breadcrumbs form a clear trail on the ground.
 3 0 0 0 1
 0 0 0
 7 48
+S
+#11935
+shard crafting skycleaver~
+a skycleaver crafting shard~
+A skycleaver crafting shard is sitting on the ground.~
+   You turn the little shard over and over in your hands, watching light catch
+and refract through it like a milky gemstone that has captured a rainbow. As
+you do, a thin prismatic blade slides forward then retreats; the gem then
+flattens like a yarn shuttle; then it seems to form a hammer. This clever
+little innovation will make crafting a breeze!
+~
+3 p ao cefgjm 3
+0 0 0
+12 0
+C
+150 250
+S
+#11936
+shard tedium magichanical~
+a magichanical tedium shard~
+A magichanical tedium shard is lying here.~
+   The odd little tool is made of many layered and folded sheets of metal that
+fit together so tightly it can be placed in a pocket. But with a shake, the
+tedium shard unfolds into an axe, shovel, scythe, saw, and more! If only you
+could afford enough of these to equip an empire, it might rule the trade world.
+~
+3 p ao adfhlo 4
+0 0 0
+2 0
+C
+150 250
+S
+#11937
+bell mausoleum walking~
+a walking mausoleum bell~
+The bell from a walking mausoleum is lying here.~
+tba
+~
+3 0 a 0 1
+0 0 0
+2 0
+C
+150 250
+S
+#11938
+effigy sorcery tower walking~
+a walking sorcery tower effigy~
+An effigy of a walking sorcery tower is lying here.~
+tba
+~
+3 0 a 0 1
+0 0 0
+1 0
 S
 #11939
 cornerstone stone hanging garden~

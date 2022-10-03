@@ -1,3 +1,47 @@
+#11937
+mausoleum walking~
+a walking mausoleum~
+A mausoleum on legs towers over you!~
+tba
+~
+@.&0XX@.~
+bo 0 16 0 0 0 2 0 3 0
+C
+150 250
+D
+11937 0 0
+E
+legs~
+tba
+~
+P
+0
+S
+#11938
+sorcery tower sorcerer's sorcerers~
+the sorcery tower~
+A sorcerer's tower on legs rises high above you.~
+tba
+~
+@.&0||@.~
+beuw 26 128 0 0 0 10 0 3 0
+C
+150 250
+D
+11938 0 0
+E
+legs~
+tba
+~
+I 30 5007 100.00 1  # RUINS-TO-VEH: ruins of #n
+P
+0
+R
+1002 1 5 0
+R
+1010 1 5 0
+T 11938
+S
 #11939
 gardens hanging beautiful~
 the hanging gardens~
@@ -12,7 +56,7 @@ A small pond next to the walkway reflects the beautiful gardens.
 hF 19 30 0 0 F 10 0 4 0
 E
 trees~
-   Trees of all types hang over you from the raised terraces of the garden. 
+   Trees of all types hang over you from the raised terraces of the garden.
 Each has been expertly manicured and trained to grow out over the walkways to
 provide shade.
 ~
