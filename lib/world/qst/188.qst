@@ -38,11 +38,12 @@ your citizens and deck them out in festive costumes.
    Your citizens are costumed and now the holiday festivities can begin! You
 have earned a goody bag!
 ~
-20 dej 0 0 -1
+21 dej 0 0 -1
 A
 2 18806
 A
 2 18811
+D 18819
 P
 9 6 0 1 a
 P
@@ -384,6 +385,38 @@ T 18820
 W+
 11 0 0 1 -
 Win at bobbing for apples~
+S
+#18860
+Halloween: Bylda Terror~
+   The city is eager to try out a newly discovered folk festival, believed to
+be long forgotten because of old taboos against saying the name of a bear. The
+Feast of Bylda takes place during the Halloween season, and your kingdom's
+subjects are sure to enjoy it.
+   Take this set of plans and build a mighty bear in your city from wood and
+leather, then enchant it to bring it to life. It'll be a fright to die for.
+See 'build info Bylda' for more information on what it will require.
+~
+   As you finish the magic words, the Bylda comes to life! As it stomps around
+the city, you begin to ask yourself: Did I think this plan through all the way?
+~
+12 ej 0 0 -1
+A
+2 18806
+A
+2 18811
+D 18819
+P
+9 6 0 1 a
+P
+36 18800 0 1 a
+R
+2 18829 1
+R
+9 18800 10
+T 18820
+W+
+11 0 0 1 -
+Hold the Bylda Festival in your city~
 S
 #18861
 Halloween: Delegation of Demons~

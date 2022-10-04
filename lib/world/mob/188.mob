@@ -361,6 +361,21 @@ M
 0
 $n leaps into the air with fright as it sees a shadow on the ground.~
 S
+#18860
+Bylda bear~
+the Bylda~
+A Bylda is rampaging!
+~
+25 400 dyzD c 6
+0 0 26 24
+D
+   The enormous bear looks cobbled together from leather and bad magic, and
+it's not happy about it! You duck as the Bylda swipes its mighty paw at you,
+narrowly avoiding its impressive reach but nearly soiling your pants in the
+process.
+~
+T 18851
+S
 #18861
 demon small basic~
 a small demon~

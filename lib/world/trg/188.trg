@@ -502,6 +502,9 @@ switch %questvnum%
     set owner %actor%
     remote owner %actor.inventory().id%
   break
+  case 18860
+    %load% obj 18860 %actor% inv
+  break
   case 18861
     %load% obj 18861 %actor% inv
   break
@@ -976,6 +979,38 @@ nop %self.val0(%sacrifices_left%)%
 if %sacrifices_left% == 0
   %quest% %actor% trigger %qvnum%
   %quest% %actor% finish %qvnum%
+end
+~
+#18850
+Halloween: Bylda Bear finish~
+5 n 100
+~
+wait 1
+%echo% The Bylda lets out a powerful roar as it comes to life and smashes out of its frame!
+set ch %self.room.people%
+while %ch%
+  if %ch.is_pc% && %ch.on_quest(18860)%
+    %quest% %ch% trigger 18860
+    %send% %ch% \&0
+    %quest% %ch% finish 18860
+  end
+  set ch %ch.next_in_room%
+done
+%load% mob 18860
+set mob %self.room.people(18860)%
+if %mob%
+  set day %dailycycle%
+  remote day %mob.id%
+end
+%purge% %self%
+~
+#18851
+Halloween: Purge Bylda at the end of the day~
+0 ab 10
+~
+if %self.var(day,%dailycycle%)% != %dailycycle%
+  %echo% ~%self% lets out one last roar and then disolves into wisps of glittering dust!
+  %purge% %self%
 end
 ~
 #18852
