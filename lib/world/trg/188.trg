@@ -981,6 +981,49 @@ if %sacrifices_left% == 0
   %quest% %actor% finish %qvnum%
 end
 ~
+#18849
+Halloween: Bylda Bear behavior~
+0 bw 10
+~
+if %self.fighting% || %self.disabled%
+  halt
+end
+set fright_list 200 201 202 203 222 223
+set react_list 206 207 208 209 210 211 212 213 214 215 216 217 218 219 220 221 224 225 226 227 229 231 232 254 256 257 258 259 260 262 263 266 267 268 269 270 271 272 273 274 275 276 277 278 279 280 281 282 283 284 285
+set eat_list 204 228 230 233 234 235 236 237 238 239 240 241 242 243 244 245 246 247 248 249 250 251 252 253 255 264 265 18841 18885
+*
+set room %self.room%
+%regionecho% %room% 10 A Bylda lets out a FEARSOME ROAR!!!
+wait 1
+set eaten 0
+set ch %room.people%
+while %ch%
+  set next_ch %ch.next_in_room%
+  if %ch.is_pc%
+    * do nothing
+  elseif (%fright_list%) ~= %ch.vnum%
+    %force% %ch% flee
+  elseif (%react_list%) ~= %ch.vnum%
+    set type %random.4%
+    if %type% == 1
+      %echo% ~%ch% quivers with fear!
+    elseif %type% == 2
+      %echo% ~%ch% ducks in terror!
+    elseif %type% == 3
+      %echo% ~%ch% winces.
+    else
+      %echo% ~%ch% gulps nervously.
+    end
+  elseif !%eaten%
+    if (%eat_list%) ~= %ch.vnum%
+      set eaten 1
+      %echo% ~%self% grabs ~%ch%, tosses *%ch% into the air, and eats *%ch% whole!
+      %purge% %ch%
+    end
+  end
+  set ch %next_ch%
+done
+~
 #18850
 Halloween: Bylda Bear finish~
 5 n 100
