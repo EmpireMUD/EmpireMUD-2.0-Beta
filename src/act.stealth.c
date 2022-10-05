@@ -228,7 +228,7 @@ void perform_escape(char_data *ch) {
 	if (!to_room) {
 		msg_to_char(ch, "But you can't seem to escape from here...\r\n");
 	}
-	else if (!pre_greet_mtrigger(ch, to_room, NO_DIR)) {
+	else if (!pre_greet_mtrigger(ch, to_room, NO_DIR, "ability")) {
 		return;
 	}
 	else {
@@ -238,11 +238,11 @@ void perform_escape(char_data *ch) {
 		
 		GET_LAST_DIR(ch) = NO_DIR;
 		
-		enter_wtrigger(IN_ROOM(ch), ch, NO_DIR);
+		enter_wtrigger(IN_ROOM(ch), ch, NO_DIR, "ability");
 		entry_memory_mtrigger(ch);
-		greet_mtrigger(ch, NO_DIR);
+		greet_mtrigger(ch, NO_DIR, "ability");
 		greet_memory_mtrigger(ch);
-		greet_vtrigger(ch, NO_DIR);
+		greet_vtrigger(ch, NO_DIR, "ability");
 		msdp_update_room(ch);
 		
 		act("$n dives out a window and lands before you!", TRUE, ch, NULL, NULL, TO_ROOM);
@@ -996,7 +996,7 @@ ACMD(do_infiltrate) {
 		if (!has_player_tech(ch, PTECH_INFILTRATE_UPGRADE) && !player_tech_skill_check(ch, PTECH_INFILTRATE, (emp && EMPIRE_HAS_TECH(emp, TECH_LOCKS)) ? DIFF_RARELY : DIFF_HARD)) {
 			msg_to_char(ch, "You fail.\r\n");
 		}
-		else if (!pre_greet_mtrigger(ch, to_room, dir)) {
+		else if (!pre_greet_mtrigger(ch, to_room, dir, "move")) {
 			// no message
 		}
 		else {
@@ -1008,11 +1008,11 @@ ACMD(do_infiltrate) {
 			
 			GET_LAST_DIR(ch) = dir;
 			
-			enter_wtrigger(IN_ROOM(ch), ch, NO_DIR);
+			enter_wtrigger(IN_ROOM(ch), ch, NO_DIR, "move");
 			entry_memory_mtrigger(ch);
-			greet_mtrigger(ch, NO_DIR);
+			greet_mtrigger(ch, NO_DIR, "move");
 			greet_memory_mtrigger(ch);
-			greet_vtrigger(ch, NO_DIR);
+			greet_vtrigger(ch, NO_DIR, "move");
 			msdp_update_room(ch);	// once we're sure we're staying
 		}
 
@@ -1534,7 +1534,7 @@ ACMD(do_shadowstep) {
 		if (infil && !has_player_tech(ch, PTECH_INFILTRATE_UPGRADE) && !player_tech_skill_check(ch, PTECH_INFILTRATE, DIFF_HARD)) {
 			msg_to_char(ch, "You fail to shadowstep to that location.\r\n");
 		}
-		else if (!pre_greet_mtrigger(ch, IN_ROOM(vict), NO_DIR)) {
+		else if (!pre_greet_mtrigger(ch, IN_ROOM(vict), NO_DIR, "ability")) {
 			// no message
 		}
 		else {
@@ -1547,11 +1547,11 @@ ACMD(do_shadowstep) {
 			
 			GET_LAST_DIR(ch) = NO_DIR;
 			
-			enter_wtrigger(IN_ROOM(ch), ch, NO_DIR);
+			enter_wtrigger(IN_ROOM(ch), ch, NO_DIR, "ability");
 			entry_memory_mtrigger(ch);
-			greet_mtrigger(ch, NO_DIR);
+			greet_mtrigger(ch, NO_DIR, "ability");
 			greet_memory_mtrigger(ch);
-			greet_vtrigger(ch, NO_DIR);
+			greet_vtrigger(ch, NO_DIR, "ability");
 			msdp_update_room(ch);	// once we're sure we're staying
 		}
 

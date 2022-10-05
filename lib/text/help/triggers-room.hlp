@@ -115,6 +115,7 @@ magically can't usually be prevented.
 Variables:
   &c%actor%&0 - The character entering the room.
   &c%direction%&0 - The direction the character came from, if any.
+  &c%method%&0 - Type of movement (see METHOD LIST).
   &c%room%&0 - The room being entered.
 
 You can add the "Player-in-Room" modifier.

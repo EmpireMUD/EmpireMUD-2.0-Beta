@@ -1665,7 +1665,7 @@ RITUAL_FINISH_FUNC(perform_ritual_of_teleportation) {
 	else if (!can_teleport_to(ch, map, FALSE)) {
 		msg_to_char(ch, "Teleportation failed: you can't seem to teleport there right now.\r\n");
 	}
-	else if (!pre_greet_mtrigger(ch, to_room, NO_DIR)) {
+	else if (!pre_greet_mtrigger(ch, to_room, NO_DIR, "ability")) {
 		// hopefully it sent a message
 	}
 	else {
@@ -1684,11 +1684,11 @@ RITUAL_FINISH_FUNC(perform_ritual_of_teleportation) {
 		}
 
 		// trigger block	
-		enter_wtrigger(IN_ROOM(ch), ch, NO_DIR);
+		enter_wtrigger(IN_ROOM(ch), ch, NO_DIR, "ability");
 		entry_memory_mtrigger(ch);
-		greet_mtrigger(ch, NO_DIR);
+		greet_mtrigger(ch, NO_DIR, "ability");
 		greet_memory_mtrigger(ch);
-		greet_vtrigger(ch, NO_DIR);
+		greet_vtrigger(ch, NO_DIR, "ability");
 		msdp_update_room(ch);	// once we're sure we're staying
 	
 		gain_ability_exp(ch, ABIL_RITUAL_OF_TELEPORTATION, 50);

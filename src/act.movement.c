@@ -212,16 +212,16 @@ bool can_enter_portal(char_data *ch, obj_data *portal, bool allow_infiltrate, bo
 	}
 	
 	// leave trigger section (the was_in check is in case the player was teleported by the script)
-	else if (!leave_mtrigger(ch, NO_DIR, "portal") || IN_ROOM(ch) != was_in) {
+	else if (!leave_mtrigger(ch, NO_DIR, "portal", "portal") || IN_ROOM(ch) != was_in) {
 		// sends own message
 	}
-	else if (!leave_wtrigger(IN_ROOM(ch), ch, NO_DIR, "portal") || IN_ROOM(ch) != was_in) {
+	else if (!leave_wtrigger(IN_ROOM(ch), ch, NO_DIR, "portal", "portal") || IN_ROOM(ch) != was_in) {
 		// sends own message
 	}
-	else if (!leave_vtrigger(ch, NO_DIR, "portal") || IN_ROOM(ch) != was_in) {
+	else if (!leave_vtrigger(ch, NO_DIR, "portal", "portal") || IN_ROOM(ch) != was_in) {
 		// sends own message
 	}
-	else if (!leave_otrigger(IN_ROOM(ch), ch, NO_DIR, "portal") || IN_ROOM(ch) != was_in) {
+	else if (!leave_otrigger(IN_ROOM(ch), ch, NO_DIR, "portal", "portal") || IN_ROOM(ch) != was_in) {
 		// sends own message
 	}
 	else {
@@ -690,6 +690,29 @@ void mark_move_time(char_data *ch) {
 }
 
 
+
+/**
+* Gets a movement method from a set of MOVE_ flags.
+*
+* @param bitvector_t flags The MOVE_ flags for this movement.
+* @return char* The movement method, for triggers.
+*/
+inline char *move_flags_to_method(bitvector_t flags) {
+	if (IS_SET(flags, MOVE_ENTER_VEH)) {
+		return "enter";
+	}
+	else if (IS_SET(flags, MOVE_EXIT)) {
+		return "exit";
+	}
+	else if (IS_SET(flags, MOVE_ENTER_PORTAL)) {
+		return "portal";
+	}
+	else {
+		return "move";
+	}
+}
+
+
 /**
 * This function attempts to find the next combination of a direction and
 * distance ("40 west" or "east 15"). It will remove them from the string,
@@ -828,16 +851,16 @@ void perform_transport(char_data *ch, room_data *to_room) {
 	char_to_room(ch, to_room);
 	qt_visit_room(ch, to_room);
 	GET_LAST_DIR(ch) = NO_DIR;
-	pre_greet_mtrigger(ch, IN_ROOM(ch), NO_DIR);	// cannot pre-greet for transport
+	pre_greet_mtrigger(ch, IN_ROOM(ch), NO_DIR, "transport");	// cannot pre-greet for transport
 	look_at_room(ch);
 
 	act("$n materializes in front of you!", TRUE, ch, 0, 0, TO_ROOM);
 	
-	enter_wtrigger(IN_ROOM(ch), ch, NO_DIR);
+	enter_wtrigger(IN_ROOM(ch), ch, NO_DIR, "transport");
 	entry_memory_mtrigger(ch);
-	greet_mtrigger(ch, NO_DIR);
+	greet_mtrigger(ch, NO_DIR, "transport");
 	greet_memory_mtrigger(ch);
-	greet_vtrigger(ch, NO_DIR);
+	greet_vtrigger(ch, NO_DIR, "transport");
 	msdp_update_room(ch);	// once we're sure we're staying
 
 	for (k = ch->followers; k; k = k->next) {
@@ -1000,7 +1023,7 @@ bool char_can_move(char_data *ch, int dir, room_data *to_room, bitvector_t flags
 	}
 
 	// check leave triggers (ideally this is last)
-	if (triggers && (!leave_mtrigger(ch, dir, NULL) || !leave_wtrigger(IN_ROOM(ch), ch, dir, NULL) || !leave_vtrigger(ch, dir, NULL) || !leave_otrigger(IN_ROOM(ch), ch, dir, NULL))) {
+	if (triggers && (!leave_mtrigger(ch, dir, NULL, move_flags_to_method(flags)) || !leave_wtrigger(IN_ROOM(ch), ch, dir, NULL, move_flags_to_method(flags)) || !leave_vtrigger(ch, dir, NULL, move_flags_to_method(flags)) || !leave_otrigger(IN_ROOM(ch), ch, dir, NULL, move_flags_to_method(flags)))) {
 		// script should have sent message
 		return FALSE;
 	}
@@ -1377,7 +1400,7 @@ void char_through_portal(char_data *ch, obj_data *portal, bool following) {
 	
 	// move them first, then move them back if they aren't allowed to go.
 	// see if an entry trigger disallows the move
-	if (!entry_mtrigger(ch) || !enter_wtrigger(IN_ROOM(ch), ch, NO_DIR)) {
+	if (!entry_mtrigger(ch, "portal") || !enter_wtrigger(IN_ROOM(ch), ch, NO_DIR, "portal")) {
 		char_from_room(ch);
 		char_to_room(ch, was_in);
 		return;
@@ -1433,7 +1456,7 @@ void char_through_portal(char_data *ch, obj_data *portal, bool following) {
 	
 	// trigger section
 	entry_memory_mtrigger(ch);
-	if (!pre_greet_mtrigger(ch, IN_ROOM(ch), NO_DIR) || !greet_mtrigger(ch, NO_DIR) || !greet_vtrigger(ch, NO_DIR)) {
+	if (!pre_greet_mtrigger(ch, IN_ROOM(ch), NO_DIR, "portal") || !greet_mtrigger(ch, NO_DIR, "portal") || !greet_vtrigger(ch, NO_DIR, "portal")) {
 		char_from_room(ch);
 		char_to_room(ch, was_in);
 		look_at_room(ch);
@@ -1493,7 +1516,7 @@ bool do_simple_move(char_data *ch, int dir, room_data *to_room, bitvector_t flag
 	REMOVE_BIT(AFF_FLAGS(ch), AFF_HIDE);
 	
 	// lastly, check pre-greet trigs
-	if (!pre_greet_mtrigger(ch, to_room, dir)) {
+	if (!pre_greet_mtrigger(ch, to_room, dir, move_flags_to_method(flags))) {
 		return FALSE;
 	}
 	
@@ -1504,7 +1527,7 @@ bool do_simple_move(char_data *ch, int dir, room_data *to_room, bitvector_t flag
 
 	/* move them first, then move them back if they aren't allowed to go. */
 	/* see if an entry trigger disallows the move */
-	if (!entry_mtrigger(ch) || !enter_wtrigger(IN_ROOM(ch), ch, dir)) {
+	if (!entry_mtrigger(ch, move_flags_to_method(flags)) || !enter_wtrigger(IN_ROOM(ch), ch, dir, move_flags_to_method(flags))) {
 		char_from_room(ch);
 		char_to_room(ch, was_in);
 		return FALSE;
@@ -1525,7 +1548,7 @@ bool do_simple_move(char_data *ch, int dir, room_data *to_room, bitvector_t flag
 	}
 	
 	// greet trigger section: this can send the player back
-	if (!greet_mtrigger(ch, dir) || !greet_vtrigger(ch, dir)) {
+	if (!greet_mtrigger(ch, dir, move_flags_to_method(flags)) || !greet_vtrigger(ch, dir, move_flags_to_method(flags))) {
 		char_from_room(ch);
 		char_to_room(ch, was_in);
 		look_at_room(ch);
@@ -2081,7 +2104,7 @@ ACMD(do_circle) {
 	}
 	
 	// lastly, check pre-greet trigs
-	if (!pre_greet_mtrigger(ch, found_room, dir)) {
+	if (!pre_greet_mtrigger(ch, found_room, dir, "move")) {
 		return;
 	}
 	
@@ -2119,7 +2142,7 @@ ACMD(do_circle) {
 	command_lag(ch, WAIT_MOVEMENT);
 	
 	// triggers?
-	if (!enter_wtrigger(IN_ROOM(ch), ch, dir) || !greet_mtrigger(ch, dir) || !greet_vtrigger(ch, dir)) {
+	if (!enter_wtrigger(IN_ROOM(ch), ch, dir, "move") || !greet_mtrigger(ch, dir, "move") || !greet_vtrigger(ch, dir, "move")) {
 		char_from_room(ch);
 		char_to_room(ch, was_in);
 		if (ch->desc) {

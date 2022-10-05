@@ -1024,7 +1024,7 @@ ACMD(do_mgoto) {
 
 	char_from_room(ch);
 	char_to_room(ch, location);
-	enter_wtrigger(IN_ROOM(ch), ch, NO_DIR);
+	enter_wtrigger(IN_ROOM(ch), ch, NO_DIR, "script");
 	msdp_update_room(ch);
 }
 
@@ -1290,7 +1290,7 @@ ACMD(do_mteleport) {
 				GET_LAST_DIR(vict) = NO_DIR;
 				char_from_room(vict);
 				char_to_room(vict, target);
-				enter_wtrigger(IN_ROOM(vict), vict, NO_DIR);
+				enter_wtrigger(IN_ROOM(vict), vict, NO_DIR, "script");
 				qt_visit_room(vict, IN_ROOM(vict));
 				msdp_update_room(vict);
 			}
@@ -1316,7 +1316,7 @@ ACMD(do_mteleport) {
 						char_from_room(vict);
 						char_to_room(vict, target);
 						GET_LAST_DIR(vict) = NO_DIR;
-						enter_wtrigger(IN_ROOM(vict), ch, NO_DIR);
+						enter_wtrigger(IN_ROOM(vict), ch, NO_DIR, "script");
 						qt_visit_room(vict, IN_ROOM(vict));
 						msdp_update_room(vict);
 					}
@@ -1330,7 +1330,7 @@ ACMD(do_mteleport) {
 				GET_LAST_DIR(vict) = NO_DIR;
 				char_from_room(vict);
 				char_to_room(vict, target);
-				enter_wtrigger(IN_ROOM(vict), vict, NO_DIR);
+				enter_wtrigger(IN_ROOM(vict), vict, NO_DIR, "script");
 				qt_visit_room(vict, IN_ROOM(vict));
 				msdp_update_room(vict);
 			}
@@ -1338,7 +1338,7 @@ ACMD(do_mteleport) {
 		else if ((*arg1 == UID_CHAR && (veh = get_vehicle(arg1))) || (veh = get_vehicle_in_room_vis(ch, arg1, NULL))) {
 			vehicle_from_room(veh);
 			vehicle_to_room(veh, target);
-			entry_vtrigger(veh);
+			entry_vtrigger(veh, "script");
 		}
 		else if ((*arg1 == UID_CHAR && (obj = get_obj(arg1))) || (obj = get_obj_vis(ch, arg1, NULL))) {
 			obj_to_room(obj, target);
