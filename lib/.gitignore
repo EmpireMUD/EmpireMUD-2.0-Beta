@@ -1,9 +1,11 @@
 channels/*
 !channels/index
 players/*/*.plr
+players/*/*.mem
 players/*/*.delay
 players/accounts/*.acct
 players/deleted/*/*.plr
+players/deleted/*/*.mem
 players/deleted/*/*.delay
 plralias/*/*.alias
 plrlore/*/*.lore
