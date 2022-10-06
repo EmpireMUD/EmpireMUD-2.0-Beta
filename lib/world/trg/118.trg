@@ -128,7 +128,7 @@ end
 ~
 #11806
 Skycleave: One-time greetings using script1~
-0 gn 100
+0 gnw 100
 ~
 * Uses mob custom script1 to for one-time greetings, with each script1 line
 *   sent every %line_gap% (9 sec) until it runs out of strings. The mob will
@@ -184,6 +184,11 @@ end
 set pos 0
 set msg %self.custom(script1,%pos%)%
 while !%msg.empty%
+  * check early end
+  if %self.disabled% || %self.fighting%
+    halt
+  end
+  * next message
   set mode %msg.car%
   set msg %msg.cdr%
   if %mode% == say
@@ -255,42 +260,125 @@ if %self.varexists(no_silent)%
 end
 ~
 #11807
-Skycleave: Bribe goblins to leave~
+Skycleave: Shared receive trigger (Goblins, Pixy Queen, pixies, Ravinder)~
 0 j 100
 ~
-set goblin_vnums 11815 11816 11817
-if %self.vnum% == 11818
-  say Venjer cannot be bribed!
-  %aggro% %actor%
+if %self.vnum% >= 11815 && %self.vnum% <= 11818
+  * goblins
   return 0
-elseif %object.vnum% != 11976 && (!(%object.keywords% ~= goblin) || (%object.keywords% ~= wrangler))
-  say Goblin doesn't want %object.shortdesc%, stupid human!
-  return 0
-else
-  * actor has given a goblin object
-  %send% %actor% You give ~%self% @%object%...
-  %echoaround% %actor% ~%actor% gives ~%self% @%object%...
-  if %object.vnum% == 11976
-    say This is what we came for! These is not belonging to you! But thanks, you, for returning.
+  set goblin_vnums 11815 11816 11817
+  if %self.vnum% == 11818
+    say Venjer cannot be bribed!
+    %aggro% %actor%
+  elseif %object.vnum% != 11976 && (!(%object.keywords% ~= goblin) || (%object.keywords% ~= wrangler))
+    say Goblin doesn't want %object.shortdesc%, stupid human!
   else
-    say Not what goblin items we came for but still a good prize...
-  end
-  * despawn other goblins here
-  set ch %self.room.people%
-  while %ch%
-    set next_ch %ch.next_in_room%
-    if %ch.is_npc% && %goblin_vnums% ~= %ch.vnum%
-      %echo% ~%ch% leaves.
-      if %ch% != %self%
-        %purge% %ch%
-      end
+    * actor has given a goblin object
+    %send% %actor% You give ~%self% @%object%...
+    %echoaround% %actor% ~%actor% gives ~%self% @%object%...
+    if %object.vnum% == 11976
+      say This is what we came for! These is not belonging to you! But thanks, you, for returning.
+    else
+      say Not what goblin items we came for but still a good prize...
     end
-    set ch %next_ch%
-  done
-  * and leave
+    * despawn other goblins here
+    set ch %self.room.people%
+    while %ch%
+      set next_ch %ch.next_in_room%
+      if %ch.is_npc% && %goblin_vnums% ~= %ch.vnum%
+        %echo% ~%ch% leaves.
+        if %ch% != %self%
+          %purge% %ch%
+        end
+      end
+      set ch %next_ch%
+    done
+    * and leave
+    %purge% %object%
+    %purge% %self%
+  end
+elseif %self.vnum% == 11819
+  * Pixy Queen's gift
   return 0
-  %purge% %object%
-  %purge% %self%
+  if !%actor.varexists(skycleave_queen)%
+    %send% %actor% You try to give @%object% to ~%self% but &%self% rebuffs you.
+    %echoaround% %actor% ~%actor% tries to give something to ~%self% but &%self% rebuffs &%actor%.
+  elseif %object.vnum% != 1206
+    %send% %actor% ~%self% politely refuses @%object%.
+  else
+    * actor has given queen back a flower
+    %send% %actor% You give the queen @%object%...
+    %echoaround% %actor% ~%actor% gives the queen @%object%...
+    say Oh my! I thought you had forgotten! Oh dear, how very sweet. For you, I will open the maze.
+    * open the maze
+    makeuid maze room i11825
+    set shield %maze.contents(11887)%
+    if %shield%
+      %at% %maze% %echo% %shield.shortdesc% flickers and fades!
+      %purge% %shield%
+    end
+    * mark player as having visited on this cycle
+    set skycleave_queen %dailycycle%
+    remote skycleave_queen %actor.id%
+    * get rid of iris
+    %purge% %object%
+  end
+elseif %self.vnum% == 11820
+  * trash pixies: if the player has met the queen in the Pixy's Dream, an iris will despawn a guard pixy
+  return 0
+  if !%actor.varexists(skycleave_queen)%
+    %send% %actor% You try to give @%object% to ~%self% but &%self% rebuffs you.
+    %echoaround% %actor% ~%actor% tries to give something to ~%self% but &%self% rebuffs &%actor%.
+  elseif %object.vnum% != 1206
+    %send% %actor% ~%self% politely refuses @%object%.
+  else
+    %send% %actor% You give @%object% to ~%self%, who looks puzzled for a moment, then smiles...
+    %echoaround% %actor% ~%actor% gives @%object% to ~%self%, who looks puzzled for a moment, then smiles...
+    switch %random.5%
+      case 1
+        say I am as surprised as I am honored, giant.
+      break
+      case 2
+        say You know a surprising amount about pixies.
+      break
+      case 3
+        say Truly a special gift. Thank you.
+      break
+      case 4
+        say Just like the queen's!
+      break
+      case 5
+        say This is magnificent! I shall treasure it.
+      break
+    done
+    %echo% ~%self% flies off with the iris.
+    %purge% %object%
+    %purge% %self%
+  end
+elseif %self.vnum% == 11825 || %self.vnum% == 11925
+  * Ravinder: will not keep any item; purges a good jar
+  return 0
+  if %object.vnum% != 11914
+    * wrong item
+    %send% %actor% You try to give @%object% to ~%self%, but &%self% doesn't seem to want it.
+    %echoaround% %actor% ~%actor% tries to give @%object% to ~%self% but &%self% hands it right back.
+    halt
+  elseif !%actor.on_quest(11915)%
+    %echo% ~%self% refuses |%actor% jar.
+    say I don't want your filthy pixy. I'm trying to win on my own merits here.
+  elseif (%object.luck% + %object.guile% + %object.speed%) < 13
+    * low stats
+    %send% %actor% You hand @%object% to ~%self% and &%self% examines it carefully and hands it back...
+    %echoaround% %actor% ~%actor% hands @%object% to ~%self%, who examines it carefully and hands it back...
+    say This seems like a perfectly good pixy, but it just isn't championship material. I'm looking to win, not place.
+  else
+    * ok!
+    %echo% ~%self% eagerly takes @%object% from %actor%.
+    say Oh, splendid, really. This is exactly the sort of pixy I was looking for. O racing world, prepare to tremble!
+    %quest% %actor% trigger 11915
+    %quest% %actor% finish 11915
+    %purge% %object%
+  end
 end
 ~
 #11808
@@ -660,7 +748,9 @@ if %random.2% == 1
       %send% %target% &&r%chosen_object% bonks you in the head!
       %echoaround% %target% %chosen_object% bonks ~%target% in the head!
       %damage% %target% 100 physical
-      dg_affect #11851 %target% HARD-STUNNED on 5
+      if %self.difficulty% >= 3
+        dg_affect #11851 %target% HARD-STUNNED on 5
+      end
     break
     case 2
       %send% %target% &&r%chosen_object% explodes in your face, blinding you!
@@ -678,7 +768,7 @@ if %random.2% == 1
       %send% %target% &&rYou feel %chosen_object% drain your energy as it bounces off you!
       %echoaround% %target% ~%target% looks tired as %chosen_object% bounces off *%target%.
       %damage% %target% 50
-      set magnitude %self.level%/10
+      eval magnitude %self.level% * %self.difficulty% / 10
       nop %target.mana(-%magnitude%)%
       nop %target.move(-%magnitude%)%
     break
@@ -1069,7 +1159,7 @@ rdelete drinking %self.id%
 nop %self.set_cooldown(11800, 15)%
 ~
 #11823
-Skycleave: Boss Deaths (Pixy, Kara, Barrosh, Shade)~
+Skycleave: Boss Deaths (Pixy, Kara, Rojjer, Barrosh, Shade)~
 0 f 100
 ~
 switch %self.vnum%
@@ -1093,6 +1183,22 @@ switch %self.vnum%
       %mod% %sanjiv% longdesc An apprentice is kneeling on the floor, heaving.
       %mod% %sanjiv% lookdesc The young apprentice is on his knees, dirtying his white kurta. His wavy brown hair is matted with sweat and he heaves as if he might vomit again.
     end
+    * check Trixton's attackability
+    if !%instance.mob(11848)%
+      set trixton %instance.mob(11849)%
+      if %trixton% && %trixton.aff_flagged(!ATTACK)%
+        %at% %trixton.room% %echo% ~%trixton% has lost ^%trixton% protection!
+        dg_affect %trixton% !ATTACK off
+      end
+  break
+  case 11848
+    * Bleak Rojjer: check Trixton's attackability
+    if !%instance.mob(11847)%
+      set trixton %instance.mob(11849)%
+      if %trixton% && %trixton.aff_flagged(!ATTACK)%
+        %at% %trixton.room% %echo% ~%trixton% has lost ^%trixton% protection!
+        dg_affect %trixton% !ATTACK off
+      end
   break
   case 11863
     * Shadow Ascendant
@@ -1113,7 +1219,7 @@ switch %self.vnum%
     set ch %self.room.people%
     while %ch%
       if %ch% != %self%
-        dg_affect %ch% HARD-STUNNED on 15
+        dg_affect #11867 %ch% HARD-STUNNED on 15
       end
       set ch %ch.next_in_room%
     done
@@ -1165,7 +1271,7 @@ done
 set varname %self.vnum%_name
 set spirit %instance.mob(11900)%
 if %spirit.varexists(%varname%)%
-  eval pos %%spirit.%varname%%% + 1
+  eval pos %spirit.var(%varname%)% + 1
 else
   set pos 1
 end
@@ -1327,7 +1433,7 @@ if %room.varexists(speak_time)%
 end
 set varname last_%room.template%
 if %self.varexists(%varname%)%
-  eval last %%self.%varname%%%
+  eval last %self.var(%varname%)%
   if %last% + 150 > %timestamp%
     halt
   end
@@ -1910,17 +2016,6 @@ elseif %self.vnum% == 11927
   end
   * shhh
   return 0
-end
-~
-#11837
-Mercenary Leader no-fight~
-0 h 100
-~
-if %self.aff_flagged(!ATTACK) && !%instance.mob(11848)% && !%instance.mob(11847)%
-  wait 1
-  %echo% ~%self% has lost ^%self% protection!
-  dg_affect %self% !ATTACK off
-  detach 11837 %self.id%
 end
 ~
 #11838
@@ -2871,7 +2966,7 @@ done
 set spirit %instance.mob(11900)%
 set varname merc%self.vnum%
 if %spirit.varexists(%varname%)%
-  eval %varname% %%spirit.%varname%%% + 1
+  eval %varname% %spirit.var(%varname%)% + 1
   eval pos %%%varname%%%
 else
   set %varname% 1
@@ -3534,7 +3629,7 @@ set ch %room.people%
 while %ch%
   set next_ch %ch.next_in_room%
   if %ch% != %self%
-    dg_affect %ch% HARD-STUNNED on 5
+    dg_affect #11867 %ch% HARD-STUNNED on 5
     %teleport% %ch% %vortex%
   end
   set ch %next_ch%
@@ -3568,7 +3663,7 @@ set ch %room.people%
 while %ch%
   set next_ch %ch.next_in_room%
   if %ch% != %self%
-    dg_affect %ch% HARD-STUNNED on 5
+    dg_affect #11867 %ch% HARD-STUNNED on 5
     %teleport% %ch% %vortex%
   end
   set ch %next_ch%
@@ -3969,7 +4064,7 @@ end
 ~
 #11876
 Smol Nes-Pik: Reset comment count on move~
-0 i 100
+0 iw 100
 ~
 * pairs with trigger 11880 etc to reset their commentary when they move
 set comment 0
@@ -4185,7 +4280,7 @@ wait 20 s
 ~
 #11878
 Smol Nes-Pik: Keeper Bastain greeting~
-0 g 90
+0 gw 90
 ~
 if %direction% == none
   halt
@@ -4216,7 +4311,7 @@ end
 ~
 #11879
 Great Tree: Broken Ladder Drop~
-2 g 100
+2 gw 100
 ~
 * always returns 1
 return 1
@@ -5312,6 +5407,7 @@ else
   %at% i11964 %load% mob 11965  * Office Cleaner
   %at% i11968 %load% mob 11969  * GHS Celiya
   %at% i11968 %load% obj 11969  * Celiya's desk
+  %at% i11922 %load% obj 11923  * Celiya's unfinished portrait
   * shout
   set mob %instance.mob(11969)%
   if %mob%

@@ -598,7 +598,9 @@ into middle age. His black and violet robes drape from his tall chair over the
 race track, where he can see ever turn. His high vantage point also gives you
 an uneasy view of the thicket of long hairs that protrude from the nostrils of
 his bulbous nose.
-   To check the status of the race, just type 'race'.
+   To check the status of the race, just type 'race'. To enter your own pixy,
+type 'race <pixy name>'. To choose or change which pixy you're watching, you
+can type 'watch <pixy name>' at any time.
 ~
 T 11912
 T 11916
@@ -752,6 +754,7 @@ M
 1
 I swear if someone says 'zenith' one more time I'm going to crack.~
 T 11810
+T 11807
 S
 #11926
 sponge giant~
@@ -1115,7 +1118,12 @@ Magineer Waltur is here. (list)
 0 0 bdvxAI n 3
 1 0 0 15
 D
-tba
+   Waltur is a young man, not over the age of 25, and apparently so busy he has
+no time to brush his hair. It sticks out at various angles behind his multi-
+colored gemstone goggles, which are pushed up above his bright blue eyes. In
+place of robes, he's dressed in a black jumpsuit which gleams and shimmers in
+places where it's stained with grease.
+   Waltur sells items in his lab. Type 'list', 'list id', or 'buy'.
 ~
 F 11800
 M
@@ -1177,7 +1185,7 @@ M
 A crack on the wall seals itself and the dented panel pops out.~
 M
 0
-$n hums to $mself, '... and every task you undertake becomes a peace of cake...'~
+$n hums to $mself, '... and every task you undertake becomes a piece of cake...'~
 M
 0
 $n bangs on the side of $s arcane contraption as the light flickers.~
@@ -1949,6 +1957,20 @@ M
 1
 Got moths in my brain.~
 T 11810
+S
+#11963
+renegade pixy~
+a renegade pixy~
+A pixy renegade swoops down from above!
+~
+100 150 dxzA 0 1
+2 0 2 28
+D
+   The moth-like little imp won't seem to leave you alone. You duck as it flies
+straight for your eye, getting a glimpse at its sadistic, crooked little smile
+as it nearly blinds you!
+~
+I 4 1206 100.00 1 g  # LOOT: iridescent blue iris
 S
 #11964
 celiya high sorcerer~
@@ -3212,7 +3234,7 @@ S
 #11991
 toaster brave little~
 a brave little toaster~
-A liberated wand floats here.
+A brave little toaster is hopping around.
 ~
 1 1 bdoD n 1
 0 0 15 15

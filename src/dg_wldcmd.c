@@ -613,7 +613,7 @@ WCMD(do_wteleport) {
 			GET_LAST_DIR(ch) = NO_DIR;
 			char_from_room(ch);
 			char_to_room(ch, target);
-			enter_wtrigger(IN_ROOM(ch), ch, NO_DIR);
+			enter_wtrigger(IN_ROOM(ch), ch, NO_DIR, "script");
 			qt_visit_room(ch, IN_ROOM(ch));
 			msdp_update_room(ch);	// once we're sure we're staying
 		}
@@ -638,7 +638,7 @@ WCMD(do_wteleport) {
 						char_from_room(ch);
 						char_to_room(ch, target);
 						GET_LAST_DIR(ch) = NO_DIR;
-						enter_wtrigger(IN_ROOM(ch), ch, NO_DIR);
+						enter_wtrigger(IN_ROOM(ch), ch, NO_DIR, "script");
 						qt_visit_room(ch, IN_ROOM(ch));
 						msdp_update_room(ch);	// once we're sure we're staying
 					}
@@ -652,7 +652,7 @@ WCMD(do_wteleport) {
 				GET_LAST_DIR(ch) = NO_DIR;
 				char_from_room(ch);
 				char_to_room(ch, target);
-				enter_wtrigger(IN_ROOM(ch), ch, NO_DIR);
+				enter_wtrigger(IN_ROOM(ch), ch, NO_DIR, "script");
 				qt_visit_room(ch, IN_ROOM(ch));
 				msdp_update_room(ch);	// once we're sure we're staying
 			}
@@ -660,7 +660,7 @@ WCMD(do_wteleport) {
 		else if ((*arg1 == UID_CHAR && (veh = get_vehicle(arg1))) || (veh = get_vehicle_room(room, arg1, NULL))) {
 			vehicle_from_room(veh);
 			vehicle_to_room(veh, target);
-			entry_vtrigger(veh);
+			entry_vtrigger(veh, "script");
 		}
 		else if ((*arg1 == UID_CHAR && (obj = get_obj(arg1))) || (obj = get_obj_by_room(room, arg1))) {
 			obj_to_room(obj, target);

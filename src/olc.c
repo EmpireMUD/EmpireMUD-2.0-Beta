@@ -5427,11 +5427,11 @@ bool olc_parse_requirement_args(char_data *ch, int type, char *argument, bool fi
 	argument = any_one_arg(argument, arg);
 	if (*arg && str_cmp(arg, "none") && *arg != '-') {	// ignore a "none" or "-" here, for "no group"
 		if (strlen(arg) != 1 || !isalpha(*arg)) {
-			msg_to_char(ch, "Group must be a letter (or may be blank).\r\n");
+			msg_to_char(ch, "Group must be a letter (or may be blank or -).\r\n");
 			return FALSE;
 		}
 		else {
-			*group = *argument;
+			*group = *arg;
 		}
 	}
 	

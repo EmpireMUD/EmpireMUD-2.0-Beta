@@ -361,6 +361,65 @@ M
 0
 $n leaps into the air with fright as it sees a shadow on the ground.~
 S
+#18860
+Bylda bear~
+the Bylda~
+A Bylda is rampaging!
+~
+25 400 dyz c 6
+0 0 26 24
+D
+   The enormous bear looks cobbled together from leather and bad magic, and
+it's not happy about it! You duck as the Bylda swipes its mighty paw at you,
+narrowly avoiding its impressive reach but nearly soiling your pants in the
+process.
+~
+I 4 125 33.33 4  # LOOT: stack of lumber
+I 4 125 33.33 2  # LOOT: stack of lumber
+I 4 125 33.33 2  # LOOT: stack of lumber
+I 4 125 33.33 1  # LOOT: stack of lumber
+I 4 125 33.33 1  # LOOT: stack of lumber
+I 4 1357 33.33 4  # LOOT: large piece of leather
+I 4 1357 33.33 2  # LOOT: large piece of leather
+I 4 1357 33.33 2  # LOOT: large piece of leather
+I 4 1357 33.33 1  # LOOT: large piece of leather
+I 4 1357 33.33 1  # LOOT: large piece of leather
+I 4 6600 50.00 1  # LOOT: magic gem
+I 4 6420 33.33 4  # LOOT: plant fibers
+I 4 6420 33.33 2  # LOOT: plant fibers
+I 4 6420 33.33 2  # LOOT: plant fibers
+I 4 6420 33.33 1  # LOOT: plant fibers
+I 4 6420 33.33 1  # LOOT: plant fibers
+M
+0
+$n roars in your face! Its breath smells like rotten straw.~
+M
+0
+$n stands on its hind legs and lets out a low, rumbling roar.~
+M
+0
+$n rolls over, nearly crushing you!~
+M
+0
+$n paws at the ground, causing it to shake!~
+M
+0
+$n snaps at you, narrowly missing you with its wooden jaws!~
+M
+0
+$n swipes at you with its enormous claw, but it doesn't seem to judge the distance very well.~
+M
+0
+$n roars!~
+M
+0
+$n roars!~
+M
+0
+$n roars!~
+T 18851
+T 18849
+S
 #18861
 demon small basic~
 a small demon~
@@ -387,8 +446,8 @@ The smell of fetted breath preceeds the glow of $n's eyes.~
 M
 0
 A snorting snuffling sound clearly indicates $n is looking for something, or someone.~
-T 18853
 T 18852
+T 18853
 S
 #18862
 demon nether massive~

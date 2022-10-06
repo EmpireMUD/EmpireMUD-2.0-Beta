@@ -190,6 +190,8 @@ When using field - The variable returns:
    also immediately auto-complete if tasks are already complete. Otherwise, it
    will behave like a normal goal.
 &cterritory&0 - The amount of land claimed.
+&cvar(name,default)&0 - Gets the value of that var if it exists and gets
+   'default' if it doesn't. Default is optional; gets empty string if none.
 &cvarexists()&0 - Returns 1 if global variable in subfield exists, 0 if not.
    Useful when dealing with remote vars on empires.
 &cvnum&0 - The empire's vnum.
@@ -303,8 +305,11 @@ Note: Greet and Greet-All will only catch a person AFTER they enter the room.
 Variables:
   &c%actor%&0 - The character entering the room.
   &c%direction%&0 - The direction the character came from, or 'none'.
-  
-See also: MTRIG CHARMED, MTRIG PRE-GREET-ALL
+  &c%method%&0 - Type of movement (see METHOD LIST).
+
+You can add the "Player-in-Room" modifier.
+
+See also: MTRIG CHARMED, MTRIG PRE-GREET-ALL, PLAYER-IN-ROOM TRIGGER
 #d
 "KILL TRIGGER" "MTRIG KILL" "OTRIG KILL" "VTRIG KILL" TRIGEDIT-MOB-KILL TRIGEDIT-OBJ-KILL TRIGEDIT-VEH-KILL
 
@@ -348,8 +353,11 @@ Variables:
   &c%actor%&0 - The character trying to leave the room.
   &c%direction%&0 - The direction the character is leaving to, or "portal" if
      they are leaving through a portal.
+  &c%method%&0 - Type of movement (see METHOD LIST).
 
-See also: MTRIG LEAVE
+You can add the "Player-in-Room" modifier.
+
+See also: PLAYER-IN-ROOM TRIGGER
 #d
 "LOAD TRIGGER" "MTRIG LOAD" "OTRIG LOAD" "RTRIG LOAD" "VTRIG LOAD" TRIGEDIT-MOB-LOAD TRIGEDIT-OBJ-LOAD TRIGEDIT-VEH-LOAD TRIGEDIT-ROOM-LOAD TRIGEDIT-LOAD TRIG-LOAD
 
@@ -372,6 +380,31 @@ Allow-Multiple type.
 
 See also: RTRIG COMPLETE, ALLOW-MULTIPLE
 #d
+"METHOD LIST" "METHODS LIST"
+
+Methods of Movement (Enter, Entry, Greet, and Leave triggers)
+
+All enter, entry, greet, and leave triggers provide the %method% variable to
+indicate how the person (or vehicle) moved.
+
+Basic methods:
+  ability - any player ability such as shadowstep
+  enter - entering a vehicle or vehicle-style building, including "load"
+  exit - exiting a vehicle or vehicle-style building, including "unload"
+  login - player entering the game
+  move - normal player movement
+  portal - entered using a portal
+  respawn - player died and respawned
+  summon - including adventure summon, but excluding summon abilities
+
+Uncommon methods:
+  system - person was moved because a vehicle or instance was deleted
+  transport - teleports players between starting locations
+
+Immortal methods:
+  goto - immortal moved themself
+  transfer - immortal moved someone else
+#d
 "MTRIG ENTRY" "VTRIG ENTRY" "MTRIG ENTER" "VTRIG ENTER" TRIGEDIT-MOB-ENTRY TRIGEDIT-VEH-ENTRY TRIGEDIT-ENTRY TRIGGER-ENTRY 
 
 Entry (trigger)
@@ -392,7 +425,12 @@ things that should happen after someone enters, consider adding a 'wait 1'.
 Note: Entry triggers attached to charmed mobs will not fire unless the trigger
    also has the Charmed type.
 
-See also: WAIT, MTRIG CHARMED
+Variables:
+  &c%method%&0 - Type of movement (see METHOD LIST).
+
+You can add the "Player-in-Room" modifier.
+
+See also: WAIT, MTRIG CHARMED, PLAYER-IN-ROOM TRIGGER
 #d
 MUDCOMMAND CMD.MUDCOMMAND %CMD.MUDCOMMAND% %MUDCOMMAND%
 
@@ -419,6 +457,15 @@ This generally reduces the number of triggers running when they don't need to.
 
 Supported types:
   Random
+  Greet, Greet-All
+  Entry
+  Enter
+  Leave
+  Speech
+  Act
+
+Partially-supported types:
+  Pre-Greet-All: Trigger will only fire if a player is ALREADY in the room.
 
 See also: RANDOM TRIGGER
 #d
@@ -444,8 +491,12 @@ Note: Players entering magically (or via something other than a normal room
 Variables:
   &c%actor%&0 - The character entering the room.
   &c%direction%&0 - The direction the character came from, or 'none'.
-  
-See also: MTRIG CHARMED, MTRIG GREET
+  &c%method%&0 - Type of movement (see METHOD LIST).
+
+You can add the "Player-in-Room" modifier. However, this will make the trigger
+fire only when a player is ALREADY in the room with the pre-greet trigger.
+
+See also: MTRIG CHARMED, MTRIG GREET, PLAYER-IN-ROOM TRIGGER
 #d
 "RANDOM TRIGGER" "MTRIG RANDOM" "OTRIG RANDOM" "RTRIG RANDOM" "VTRIG RANDOM" TRIGEDIT-MOB-RANDOM TRIGEDIT-OBJ-RANDOM TRIGEDIT-ROOM-RANDOM TRIGEDIT-VEH-RANDOM RANDOM-TIMING TIMING
 
@@ -605,7 +656,9 @@ Variables:
   &c%actor%&0 - The character whose speech activated the trigger.
   &c%speech%&0 - The entire phrase spoken.
 
-See also: MTRIG CHARMED
+You can add the "Player-in-Room" modifier.
+
+See also: MTRIG CHARMED, PLAYER-IN-ROOM TRIGGER
 #d
 "START QUEST TRIGGER" "MTRIG START-QUEST" "OTRIG START-QUEST" "RTRIG START-QUEST" "VTRIG START-QUEST" TRIGEDIT-MOB-START-QUEST TRIGEDIT-OBJ-START-QUEST TRIGEDIT-ROOM-START-QUEST TRIGEDIT-VEH-START-QUEST "START-QUEST TRIGGER"
 

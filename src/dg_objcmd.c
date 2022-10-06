@@ -983,7 +983,7 @@ OCMD(do_oteleport) {
 			char_from_room(ch);
 			char_to_room(ch, target);
 			GET_LAST_DIR(ch) = NO_DIR;
-			enter_wtrigger(IN_ROOM(ch), ch, NO_DIR);
+			enter_wtrigger(IN_ROOM(ch), ch, NO_DIR, "script");
 			qt_visit_room(ch, IN_ROOM(ch));
 			msdp_update_room(ch);
 		}
@@ -1008,7 +1008,7 @@ OCMD(do_oteleport) {
 						char_from_room(ch);
 						char_to_room(ch, target);
 						GET_LAST_DIR(ch) = NO_DIR;
-						enter_wtrigger(IN_ROOM(ch), ch, NO_DIR);
+						enter_wtrigger(IN_ROOM(ch), ch, NO_DIR, "script");
 						qt_visit_room(ch, IN_ROOM(ch));
 						msdp_update_room(ch);
 					}
@@ -1022,7 +1022,7 @@ OCMD(do_oteleport) {
 				char_from_room(ch);
 				char_to_room(ch, target);
 				GET_LAST_DIR(ch) = NO_DIR;
-				enter_wtrigger(IN_ROOM(ch), ch, NO_DIR);
+				enter_wtrigger(IN_ROOM(ch), ch, NO_DIR, "script");
 				qt_visit_room(ch, IN_ROOM(ch));
 				msdp_update_room(ch);
 			}
@@ -1030,7 +1030,7 @@ OCMD(do_oteleport) {
 		else if ((veh = get_vehicle_near_obj(obj, arg1))) {
 			vehicle_from_room(veh);
 			vehicle_to_room(veh, target);
-			entry_vtrigger(veh);
+			entry_vtrigger(veh, "script");
 		}
 		else if ((tobj = get_obj_by_obj(obj, arg1))) {
 			obj_to_room(tobj, target);

@@ -6198,7 +6198,7 @@ void relocate_players(room_data *room, room_data *to_room) {
 			GET_LAST_DIR(ch) = NO_DIR;
 			look_at_room(ch);
 			act("$n arrives.", TRUE, ch, NULL, NULL, TO_ROOM);
-			enter_wtrigger(IN_ROOM(ch), ch, NO_DIR);
+			enter_wtrigger(IN_ROOM(ch), ch, NO_DIR, "system");
 			msdp_update_room(ch);
 		}
 	}

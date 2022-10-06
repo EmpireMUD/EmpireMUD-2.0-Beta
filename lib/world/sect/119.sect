@@ -54,6 +54,8 @@ I 5 102 9.00 1 d  # DIG: flint stone
 I 5 100 83.00 1 d  # DIG: rock
 I 6 11999 100.00 1  # FORAGE: piece of jade cheese
 I 20 11995 100.00 1  # CHOP: calamander tree
+M
+11963 10.00 c
 S
 #11990
 Calamander Grove~
@@ -90,6 +92,8 @@ I 5 102 9.00 1 d  # DIG: flint stone
 I 5 100 83.00 1 d  # DIG: rock
 I 6 11999 100.00 1  # FORAGE: piece of jade cheese
 I 20 11995 100.00 1  # CHOP: calamander tree
+M
+11963 10.00 c
 S
 #11991
 Calamander Jungle~
@@ -145,6 +149,8 @@ I 5 102 9.00 1 d  # DIG: flint stone
 I 5 100 83.00 1 d  # DIG: rock
 I 6 11999 100.00 1  # FORAGE: piece of jade cheese
 I 20 11995 100.00 1  # CHOP: calamander tree
+M
+11963 10.00 c
 S
 #11992
 Dead Calamanders~

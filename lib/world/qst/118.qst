@@ -91,7 +91,7 @@ Z
 S
 #11810
 Skycleave: Past Pixies and Goblins~
-   High Sorceress Celiya wipes her brow with her sleeve and sighs. 'It's not
+   High Sorcerer Celiya wipes her brow with her sleeve and sighs. 'It's not
 looking good up there, sugar,' she says, her eyes flitting upward.
    'If it's not one thing, it's another. Half of the second floor is overrun by
 goblins and the other half is overgrown with some kind of pixy maze. We have
@@ -309,7 +309,7 @@ and tries to disappear back into the crowd.
 somewhere between surprise and delight. He takes the trinkets from you and
 looks down into his oversized coat...
 ~
-10 di 125 250 -1
+11 di 125 250 -1
 A
 1 11821
 P
@@ -318,8 +318,6 @@ P
 16 11800 0 7 a
 P
 0 11975 0 1 a
-R
-7 11800 10
 T 11830
 W
 2 11976 0 1 -
@@ -501,7 +499,7 @@ allowed free. After you defeat it, look for someone in the tower who is
 interested in discussing it.
    This quest cannot be completed if the fourth floor has already been rescued.
 ~
-   You stop Grand High Sorceress Celiya and begin to tell her about your
+   You stop Grand High Sorcerer Celiya and begin to tell her about your
 fateful encounter with the Shadow Ascendant.
    'I've been researching it, too, sugar,' she says. 'I spent most of my life
 in the shadow of Jozef Knezz. Can't imagine him being murdered by a wizard's

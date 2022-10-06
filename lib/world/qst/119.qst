@@ -24,6 +24,178 @@ W
 Z
 1 11906
 S
+#11907
+Skycleave: Win a Prize from the Claw Game~
+   'Things are hectic in here, but be sure to find some time to play the claw
+game,' Mageina says to you, over the counter, making a claw motion with her
+hand. 'Never know what you're going to get from that. Let me know.'
+~
+   Mageina sees what you won from the claw game and breathes out a half-laugh
+through her nose.
+   'Yeah, I've seen those before,' she says. 'Maybe I've seen them all, but
+every once in a while, someone comes in with a new one. At least you managed to
+find the machine while it was working. It keeps breaking and I can never keep
+track of where we are in the...'
+   Mageina looks over your shoulder and then leans in close to say, 'Or rather,
+WHEN we are, in the time loop.'
+~
+10 0 125 250 -1
+A
+1 11805
+A
+1 11905
+R
+7 11800 10
+W+
+11 0 0 1 -
+Win a prize from the claw game~
+Z
+1 11905
+S
+#11908
+Skycleave: Win a Prize from the Claw Game~
+   Another day, another trip through the time loop. What does the claw game
+have in store this time? The only way to find out is to play it. Win another
+prize from the claw game -- if it's in working condition, that is. Otherwise,
+you'll need to aid the rescue of the tower in order to give its residents time
+to fix it.
+~
+   'What did you get?' the shopkeeper shouts from behind the counter. He
+stretches his neck to peer over, eyes wide and eyebrows up, but his face falls
+when he sees your prize.
+   'Oh, yeah,' he says. 'It's giving out a lot of those today. Maybe they fixed
+it wrong. I tried hitting it a few times, erm, with a bucket, but it didn't
+really help much. Still, enjoy your prize... Oh! And thank you for your
+established patronage at Towrinkel's, erm, Gift Shop.'
+~
+23 e 125 250 -1
+A
+1 11900
+P
+16 11800 0 6 a
+P
+0 11907 0 1 a
+R
+7 11800 10
+W+
+11 0 0 1 -
+Win a prize from the claw game~
+Z
+4 11908
+S
+#11913
+Skycleave: Off to the Races~
+   You roll the purple and brown clay jar back and forth. It doesn't feel like
+much in your hands, but your heart is practically beating out of your chest as
+you imagine catching your own pixy and training it for the Pixy Races!
+   Find a pixy, if you can, and catch it in the jar. The salesman suggested
+they can be found in enchanted forests but in a pinch, any escaped pixy might
+do. If you really want to bond with your pixy, give it a good, quick name. Then
+race it at Skycleave's Pixy Races and see how it fares. The more you race, the
+better your pixy will get!
+~
+   'Amazing little thing,' Warden Chicanders says as you load your pixy back
+into the jar. 'Well, it could have done better, but it really did show a lot of
+promise.'
+   The warden rubs the sweat from his long forehead with his palm and then
+grabs a parchment to write down the race results. He peers back and forth
+across the race domes, scribbling some notes to himself.
+   'Oh,' he says at last, looking back down at you. 'Well that was all, unless
+you're racing again. Got to get that little pixy into tip-top shape if you want
+to be the best there ever was.'
+~
+12 0 125 250 -1
+A
+2 11913
+A
+2 11914
+R
+7 11800 10
+W+
+11 0 0 1 -
+Race your own pixy at the Pixy Races~
+Z
+1 11918
+S
+#11914
+Skycleave: Victory Lap~
+   The Tower Skycleave's Pixy Races are rarely open to the public, but your
+assistance to its sorcerers has earned you a permanent invitation. What's more,
+they've seen you race and are eager to see more. Pick your favorite pixy and
+race -- more than race; pick your favorite pixy and win! Show those stuffed
+aubergine robes how it's really done.
+~
+   'I dare say, you seem to know what you're doing,' Warden Chicanders says as
+you load your pixy back into the jar. 'Putting the house pixies to shame. Well,
+rather a good thing we don't let guests bet on the races anymore.'
+   He takes the jar from you for a moment and holds it to the light. You can't
+see through it -- it's made of clay, after all -- but the warden seems to be
+examinining it. He tosses it back to you, nearly missing, and pulls a parchment
+from the sleeve of his robe to scribble some notes.
+   'Might have to run mine like that,' he says. 'In some circuits, those moves
+might be considered cheating. Old rules, new rules; you could go round and
+round about it till the end of time. I say the dirty tricks make it
+interesting. Might have to copy some of yours.'
+~
+13 e 125 250 -1
+A
+1 11900
+A
+1 11918
+P
+16 11800 0 6 a
+P
+0 11913 0 1 a
+R
+7 11800 10
+W+
+11 0 0 1 -
+Win with your own pixy at the Pixy Races~
+Z
+1 11918
+S
+#11915
+Skycleave: Best There Ever Was~
+   Apprentice Ravinder pulls you aside and peers past you before leaning in
+close. His eyes flit back and forth over your shoulder, never on you, and his
+volume drops whenever someone moves into earshot.
+   'I've heard you're quite the racer. Got a pretty good pixy. Thorley said
+you're the best in our generation, although he's not in his proper mind, if you
+catch my meaning,' Ravinder says under his breath.
+   'Let's not mince words. I'm trying to win and I haven't got all the time in
+the world to train a good one. So let's see yours. If it's any good, I'll pay
+you for it. Simple transaction. I'm sure I can make it worth your time.'
+   Train a high-level pixy in a novelty jar and, when it's strong enough, bring
+it to Ravinder and type 'give <pixy> Ravinder'.
+~
+   Apprentice Ravinder tosses the purple and brown jar in the air and catches
+it with a childlike grin. He's almost hugging it as he says, 'You cannot fathom
+how much I look forward to the sweet taste of victory with this little guy.
+Honestly. Take your reward. Oh, this pixy will be worth so much more. Just,
+truly, from the bottom of my heart, thank you. I'll get started in tomorrow's
+race.'
+~
+14 0 125 250 -1
+A
+1 11825
+A
+1 11925
+P
+0 11914 0 1 a
+P
+16 11800 0 6 a
+P
+0 11913 0 1 a
+R
+7 11800 10
+W+
+11 0 0 1 -
+Offer Ravinder a high-level racing pixy~
+Z
+1 11825
+Z
+1 11925
+S
 #11918
 Skycleave: The Championship Tour~
    You scrutinize the time-traveler's list of villains, looking for more clues.
@@ -153,6 +325,46 @@ Z
 3 11908
 Z
 3 11808
+S
+#11928
+Skycleave: Test of Water~
+   As you once again find yourself underwater and all but trapped by the
+magical boundaries of the elemental plane. Sure, escape is just above you,
+through the portal back to the fountain. But you were never one to shy away
+from a challenge like this.
+   Defeat the First Water again, if you can. And be quick about it; it may be
+impossible to defeat it for good, but it's known to drown anyone who tries.
+Even a brief victory against the First Water would be worthy of celebration.
+Defeat it, then speak to the Oreonic in the Attunement Lab.
+~
+   'Ah, little human, a pleasure to see you again. You are looking particularly
+acceptable today,' Goef says as you enter, still dripping from your encounter
+with the First Water.
+   Goef taps one of its spindly upper arms at your head, lightly, making a
+resonant pinging noise as it hits you. The ping echoes off of something in the
+room, though you don't see what; it is beyond cluttered in here. Goef seems to
+be listening to the sound as it bounces back, though he doesn't necessarily
+seem to have ears.
+   'I have added your worthiness... to my own,' Goef says at last. 'I have been
+unable to defeat the First Water, you see. Once, we were locked in combat for a
+week, but even as I could not drown, I also could not... prevail. Next time,
+however, I will try it... your way.'
+   You stare blankly at the bulky stone creature for a moment before he adds:
+   'Not in this body, of course. From time to time, I loose myself from it and
+travel the aether... alone.'
+~
+11 e 125 250 -1
+A
+3 11972
+P
+0 11972 0 1 -
+R
+7 11800 10
+W+
+3 11928 0 1 -
+Defeat the First Water~
+Z
+1 11941
 S
 #11970
 Skycleave: Secret Niamh~

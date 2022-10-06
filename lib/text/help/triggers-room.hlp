@@ -115,7 +115,12 @@ magically can't usually be prevented.
 Variables:
   &c%actor%&0 - The character entering the room.
   &c%direction%&0 - The direction the character came from, if any.
+  &c%method%&0 - Type of movement (see METHOD LIST).
   &c%room%&0 - The room being entered.
+
+You can add the "Player-in-Room" modifier.
+
+See also: PLAYER-IN-ROOM TRIGGER
 #d
 "RTRIG TYPES" TRIGEDIT-ROOM-TYPES "ROOM TRIGGER TYPES" "WORLD TRIGGER TYPES"
 
@@ -165,6 +170,8 @@ When using field - The variable returns:
 &ccrop_flagged(FLG)&0 - True if it's a crop and a given crop flag is present.
 &ccrop_vnum&0 - The vnum of the crop on the map room, if any.
 &cdedicated_to&0 - If the room/building is dedicated to someone, gets the name.
+&cdepletion(type)&0 - Get the current depletion amount (OLC DEPLETION) for the
+   room, or change it with %room.depletion(type,amount)%; 0 is not-depleted.
 &cdirection(target)&0 - The approximate direction to the target.
 &cdistance(target)&0 - The distance between this room and the target.
 &cempire&0 - The empire that owns the room, if any.
@@ -201,7 +208,7 @@ When using field - The variable returns:
 &cpeople&0 - The id of the first character in the room, or an empty return.
    Note that this will skip !SEE mobs.
 &cpeople(VNUM)&0 - The id of the first instance of that mob vnum in the room.
-&cplayers_present&0 - True if there's at least 1 player in the room.
+&cplayers_present&0 - Number of players in the room; 0/false if none.
 &crmt_flagged(AFF)&0 - True if the room has a room template flag on it.
    If called with no argument, lists current flags instead.
 &cseason&0 - The local season (spring, summer, autumn, winter).
@@ -215,7 +222,9 @@ When using field - The variable returns:
 &ctitle&0 - The room's title (shown on 'look').
 &cvehicles&0 - The id of the first vehicle in the room, if any
    (then %veh.next_in_room%).
-&cvarexists()&0 - Returns 1 if global variable in subfield exists, 0 if not.
+&cvar(name,default)&0 - Gets the value of that var if it exists and gets
+   'default' if it doesn't. Default is optional; gets empty string if none.
+&cvarexists()&0 - Returns 1 if remote variable in subfield exists, 0 if not.
 &cview_height&0 - The room's effective height including any buildings.
 &cvnum&0 - The room's vnum.
 &cweather&0 - current weather: sunny, cloudy, rainy, or lightning

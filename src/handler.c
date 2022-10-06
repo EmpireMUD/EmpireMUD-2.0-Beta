@@ -8583,29 +8583,29 @@ void remove_depletion(room_data *room, int type) {
 
 
 /**
-* Sets a room's depletion to a specific value.
+* Sets a depletion to a specific value.
 *
-* @param room_data *room The room to set depletion on.
+* @param struct depletion_data **list A pointer to the depletion list (ROOM_DEPLETION, etc).
 * @param int type DPLTN_ const
 * @param int value How much to set the depletion to.
 */
-void set_depletion(room_data *room, int type, int value) {
+void set_depletion(struct depletion_data **list, int type, int value) {
 	struct depletion_data *dep;
 	bool found = FALSE;
 	
-	// shortcut: oceans are undepletable
-	if (SHARED_DATA(room) == &ocean_shared_data) {
+	// safety first
+	if (!list) {
 		return;
 	}
 	
 	// shortcut
 	if (value <= 0) {
-		remove_depletion(room, type);
+		remove_depletion_from_list(list, type);
 		return;
 	}
 	
 	// existing?
-	LL_FOREACH(ROOM_DEPLETION(room), dep) {
+	LL_FOREACH(*list, dep) {
 		if (dep->type == type) {
 			dep->count = value;
 			found = TRUE;
@@ -8619,10 +8619,8 @@ void set_depletion(room_data *room, int type, int value) {
 		dep->type = type;
 		dep->count = value;
 		
-		LL_PREPEND(ROOM_DEPLETION(room), dep);
+		LL_PREPEND(*list, dep);
 	}
-	
-	request_world_save(GET_ROOM_VNUM(room), WSAVE_ROOM);
 }
 
 

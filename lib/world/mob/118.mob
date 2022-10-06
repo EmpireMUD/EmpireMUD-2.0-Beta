@@ -532,11 +532,11 @@ I+ 5 0  # Group
 I 4 11900 100.00 2  # LOOT: unattuned skystone
 I+ 6 0  # Boss
 T 11948
-T 11949
 T 11813
 T 11819
 T 11821
 T 11823
+T 11807
 S
 #11820
 pixy~
@@ -570,8 +570,8 @@ M
 6
 A pixy is flying around.~
 T 11801
-T 11950
 T 11820
+T 11807
 S
 #11821
 Hugh Mann~
@@ -725,6 +725,7 @@ though he doesn't seem to be trying to sleep.
 ~
 F 11800
 T 11810
+T 11807
 S
 #11826
 #n~
@@ -999,8 +1000,12 @@ Magineer Waltur is here.
 0 0 bdvxAI n 3
 1 0 0 15
 D
-He's hiding out in his lab in 3A.
-tba
+   Waltur is a young man, not over the age of 25, and apparently so busy he has
+no time to brush his hair. It sticks out at various angles behind his multi-
+colored gemstone goggles, which are pushed up above his bright blue eyes. In
+place of robes, he's dressed in a black jumpsuit which gleams and shimmers in
+places where it's stained with grease.
+   Waltur sells items in his lab. Type 'list', 'list id', or 'buy'.
 ~
 F 11800
 M
@@ -1291,6 +1296,7 @@ I+ 6 0  # Boss
 T 11928
 T 11813
 T 11848
+T 11823
 S
 #11849
 Trixton Vye~
@@ -1354,7 +1360,6 @@ M
 7
 say All this loot is ours. Mezvienne doesn't want to be bothered. Why don't you leave while you're ahead?~
 T 11885
-T 11837
 T 11849
 T 11850
 T 11808
@@ -1747,8 +1752,87 @@ blanches to stark white, then back to brown. Though she sounds like she's in
 agony, you can see she's getting stronger as she draws from the heartwood.
    There isn't much time left to stop her!
 ~
+M
+7
+skip~
+M
+7
+emote Glimmering wisps of mana stream from the heartwood to $n...~
+M
+7
+emote $n screams as the mana cuts into her, the cackles as her power grows...~
+M
+7
+emote You watch as $n grows older and older, to the point of death and beyond, and back again...~
+M
+7
+emote And suddenly, $n is young again, nearly a child, and she screams again!~
+M
+7
+emote Streamer after streamer of mana shoots into $n, over and over, as her age whips back and forth between young and old.~
+M
+7
+skip~
+M
+7
+emote $n spins faster and faster around the heartwood as she drains its power...~
+M
+7
+skip~
+M
+7
+skip~
+M
+7
+emote $n spins faster and faster around the heartwood as she drains its power...~
+M
+7
+skip~
+M
+7
+skip~
+M
+7
+skip~
+M
+7
+emote $n spins faster and faster around the heartwood as she drains its power...~
+M
+7
+skip~
+M
+7
+skip~
+M
+7
+skip~
+M
+7
+skip~
+M
+7
+emote $n spins faster and faster around the heartwood as she drains its power...~
+M
+7
+skip~
+M
+7
+skip~
+M
+7
+skip~
+M
+7
+skip~
+M
+7
+skip~
+M
+7
+emote $n spins faster and faster around the heartwood as she drains its power...~
 T 11871
 T 11872
+T 11806
 S
 #11872
 lion time skithe ler-wyn lerwyn~

@@ -32,7 +32,9 @@ Variables:
   &c%target%&0 - The target object of the action, if any.
   &c%arg%&0 - The entire action phrase that was seen.
 
-See also: MTRIG CHARMED
+You can add the "Player-in-Room" modifier.
+
+See also: MTRIG CHARMED, PLAYER-IN-ROOM TRIGGER
 #d
 "BRIBE TRIGGER" "MTRIG BRIBE" TRIGEDIT-MOB-BRIBE
 
@@ -158,8 +160,10 @@ Note: Memory triggers attached to charmed mobs will not fire unless the trigger
 
 Variables:
   &c%actor%&0 - The character being remembered.
-  
-See also: MTRIG CHARMED
+
+You can add the "Player-in-Room" modifier.
+
+See also: MTRIG CHARMED, PLAYER-IN-ROOM TRIGGER
 #d
 MAGGRO %AGGRO%
 
@@ -590,7 +594,9 @@ When using field  - The variable returns:
 &cunlink_instance&0 - Disconnects the mob from any adventure instance, meaning
    it will not be cleaned up when the instance closes (e.g. player gets to keep
    a mob that was loaded inside an instance).
-&cvarexists()&0 - Returns 1 if global variable in subfield exists, 0 if not.
+&cvar(name,default)&0 - Gets the value of that var if it exists and gets
+   'default' if it doesn't. Default is optional; gets empty string if none.
+&cvarexists()&0 - Returns 1 if remote variable in subfield exists, 0 if not.
    Useful when dealing with remote vars on players.
 &cvampire(on/off)&0 - Can change whether a player/mob is a vampire if on/off
    provided; without those, just returns whether they are one or not.

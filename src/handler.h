@@ -367,7 +367,19 @@ int get_depletion_amount(struct depletion_data *list, int type);
 void perform_add_depletion(struct depletion_data **list, int type, bool multiple);
 bool remove_depletion_from_list(struct depletion_data **list, int type);
 void remove_depletion(room_data *room, int type);
-void set_depletion(room_data *room, int type, int value);
+void set_depletion(struct depletion_data **list, int type, int value);
+#define set_room_depletion(room, type, amount) {	\
+		if (room && SHARED_DATA(room) != &ocean_shared_data) {	\
+			set_depletion(&ROOM_DEPLETION(room), (type), (amount));	\
+			request_world_save(GET_ROOM_VNUM(room), WSAVE_ROOM);	\
+		}	\
+	}
+#define set_vehicle_depletion(veh, type, amount) {	\
+		if (veh) {	\
+			set_depletion(&VEH_DEPLETION(veh), (type), (amount));	\
+			request_vehicle_save_in_world(veh);	\
+		}	\
+	}
 
 // room handlers
 void attach_building_to_room(bld_data *bld, room_data *room, bool with_triggers);

@@ -4423,7 +4423,28 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						*/
 							strcpy(str, "-1");
 					}    
+					
+					else if (!str_cmp(field, "var")) {
+						struct trig_var_data *remote_vd;
+						char arg1[256], arg2[256];
+						bool found = FALSE;
 
+						comma_args(subfield, arg1, arg2);
+						*str = '\0';
+
+						if (*arg1 && SCRIPT(c)) {
+							LL_FOREACH(SCRIPT(c)->global_vars, remote_vd) {
+								if (!str_cmp(remote_vd->name, arg1)) {
+									snprintf(str, slen, "%s", remote_vd->value);
+									found = TRUE;
+									break;
+								}
+							}
+						}
+						if (!found && *arg2) {
+							snprintf(str, slen, "%s", arg2);
+						}
+					}
 					else if (!str_cmp(field, "varexists")) {
 						struct trig_var_data *remote_vd;
 						snprintf(str, slen, "0");
@@ -4868,7 +4889,28 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					break;
 				}
 				case 'v': {	// obj.v*
-					if (!str_cmp(field, "varexists")) {
+						if (!str_cmp(field, "var")) {
+							struct trig_var_data *remote_vd;
+							char arg1[256], arg2[256];
+							bool found = FALSE;
+
+							comma_args(subfield, arg1, arg2);
+							*str = '\0';
+
+							if (*arg1 && SCRIPT(o)) {
+								LL_FOREACH(SCRIPT(o)->global_vars, remote_vd) {
+									if (!str_cmp(remote_vd->name, arg1)) {
+										snprintf(str, slen, "%s", remote_vd->value);
+										found = TRUE;
+										break;
+									}
+								}
+							}
+							if (!found && *arg2) {
+								snprintf(str, slen, "%s", arg2);
+							}
+						}
+					else if (!str_cmp(field, "varexists")) {
 						struct trig_var_data *remote_vd;
 						snprintf(str, slen, "0");
 						if (SCRIPT(o)) {
@@ -5106,6 +5148,27 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 							*str = '\0';
 						}
 					}
+					else if (!str_cmp(field, "depletion")) {
+						// usage: %room.depletion(TYPE)% to get
+						//        %room.depletion(TYPE,AMOUNT)% to set
+						char arg1[256], arg2[256];
+						int type;
+						comma_args(subfield, arg1, arg2);
+						
+						if (!*arg1 || (type = search_block(arg1, depletion_type, FALSE)) == NOTHING) {
+							// missing type?
+							*str = '\0';
+						}
+						else if (!*arg2 || !isdigit(*arg2)) {
+							// just getting
+							snprintf(str, slen, "%d", get_depletion(r, type));
+						}
+						else {
+							// setting
+							set_room_depletion(r, type, atoi(arg2));
+							snprintf(str, slen, "%d", get_depletion(r, type));
+						}
+					}
 					else if (!str_cmp(field, "direction")) {
 						room_data *targ;
 						int dir;
@@ -5330,7 +5393,14 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						}
 					}
 					else if (!str_cmp(field, "players_present")) {
-						snprintf(str, slen, "%d", any_players_in_room(r) ? 1 : 0);
+						char_data *chit;
+						int num = 0;
+						DL_FOREACH2(ROOM_PEOPLE(r), chit, next_in_room) {
+							if (!IS_NPC(chit)) {
+								++num;
+							}
+						}
+						snprintf(str, slen, "%d", num);
 					}
 					else if (!str_cmp(field, "people")) {
 						char_data *temp_ch = NULL;
@@ -5474,7 +5544,28 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					break;
 				}
 				case 'v': {	// room.v*
-					if (!str_cmp(field, "varexists")) {
+					if (!str_cmp(field, "var")) {
+						struct trig_var_data *remote_vd;
+						char arg1[256], arg2[256];
+						bool found = FALSE;
+
+						comma_args(subfield, arg1, arg2);
+						*str = '\0';
+
+						if (*arg1 && SCRIPT(r)) {
+							LL_FOREACH(SCRIPT(r)->global_vars, remote_vd) {
+								if (!str_cmp(remote_vd->name, arg1)) {
+									snprintf(str, slen, "%s", remote_vd->value);
+									found = TRUE;
+									break;
+								}
+							}
+						}
+						if (!found && *arg2) {
+							snprintf(str, slen, "%s", arg2);
+						}
+					}
+					else if (!str_cmp(field, "varexists")) {
 						struct trig_var_data *remote_vd;
 						snprintf(str, slen, "0");
 						if (SCRIPT(r)) {
@@ -5621,6 +5712,27 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						}
 						else {
 							*str = '\0';
+						}
+					}
+					else if (!str_cmp(field, "depletion")) {
+						// usage: %veh.depletion(TYPE)% to get
+						//        %veh.depletion(TYPE,AMOUNT)% to set
+						char arg1[256], arg2[256];
+						int type;
+						comma_args(subfield, arg1, arg2);
+						
+						if (!*arg1 || (type = search_block(arg1, depletion_type, FALSE)) == NOTHING) {
+							// missing type?
+							*str = '\0';
+						}
+						else if (!*arg2 || !isdigit(*arg2)) {
+							// just getting
+							snprintf(str, slen, "%d", get_vehicle_depletion(v, type));
+						}
+						else {
+							// setting
+							set_vehicle_depletion(v, type, atoi(arg2));
+							snprintf(str, slen, "%d", get_vehicle_depletion(v, type));
 						}
 					}
 					else if (!str_cmp(field, "driver")) {
@@ -5906,7 +6018,28 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					break;
 				}
 				case 'v': {	// veh.v*
-					if (!str_cmp(field, "varexists")) {
+					if (!str_cmp(field, "var")) {
+						struct trig_var_data *remote_vd;
+						char arg1[256], arg2[256];
+						bool found = FALSE;
+
+						comma_args(subfield, arg1, arg2);
+						*str = '\0';
+
+						if (*arg1 && SCRIPT(v)) {
+							LL_FOREACH(SCRIPT(v)->global_vars, remote_vd) {
+								if (!str_cmp(remote_vd->name, arg1)) {
+									snprintf(str, slen, "%s", remote_vd->value);
+									found = TRUE;
+									break;
+								}
+							}
+						}
+						if (!found && *arg2) {
+							snprintf(str, slen, "%s", arg2);
+						}
+					}
+					else if (!str_cmp(field, "varexists")) {
 						struct trig_var_data *remote_vd;
 						snprintf(str, slen, "0");
 						if (SCRIPT(v)) {
@@ -6213,7 +6346,28 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					break;
 				}
 				case 'v': {	// emp.v*
-					if (!str_cmp(field, "varexists")) {
+					if (!str_cmp(field, "var")) {
+						struct trig_var_data *remote_vd;
+						char arg1[256], arg2[256];
+						bool found = FALSE;
+
+						comma_args(subfield, arg1, arg2);
+						*str = '\0';
+
+						if (*arg1 && SCRIPT(e)) {
+							LL_FOREACH(SCRIPT(e)->global_vars, remote_vd) {
+								if (!str_cmp(remote_vd->name, arg1)) {
+									snprintf(str, slen, "%s", remote_vd->value);
+									found = TRUE;
+									break;
+								}
+							}
+						}
+						if (!found && *arg2) {
+							snprintf(str, slen, "%s", arg2);
+						}
+					}
+					else if (!str_cmp(field, "varexists")) {
 						struct trig_var_data *remote_vd;
 						snprintf(str, slen, "0");
 						if (SCRIPT(e)) {

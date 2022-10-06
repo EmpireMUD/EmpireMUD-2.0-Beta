@@ -164,11 +164,58 @@ its earliest wooden tower to the magnificent stone structure of today. The
 tower's blocks were cut from the powerful standing stones of an unknown ancient
 culture.
 ~
-3 p a 0 5
+3 p a 0 7
 0 0 0
 12 0
+M
+21
+trinket~
 T 11909
 T 9806
+S
+#11910
+skycleaver warpstone~
+a skycleaver warpstone~
+A skycleaver warpstone is glowing here.~
+   The warpstone is pale blue with a milky swirl through it that catches the
+light when you hold it up. The surface is slightly rough and pockmarked, like a
+natural rock, though the shape of it is distinctly that of the Tower Skycleave
+itself. Perhaps they've found a way to grow rocks in this shape?
+   You can 'use' this warpstone to teleport yourself to the Tower Skycleave,
+even from across the world, though it doesn't seem to have enough power to
+perform this amazing feat very often.
+   The black tower is known to house a truly priceless amount of magical power,
+but its masters manage to put a price on it nonetheless. And as the key to
+selling magic is bringing in customers, the tower has devised many clever ways
+to bring people back over and over again.
+~
+3 p a 0 7
+0 0 0
+12 0
+M
+22
+warpstone~
+T 11909
+T 9806
+S
+#11911
+bug fire elegant jar~
+an elegant fire bug~
+An elegant fire bug is stuck in a jar.~
+   The fire bug is rather similar to a scarab beetle that has been set ablaze!
+Where its wings and elytra should be, there is only a shining, crackling flame.
+The bug seems no worse for the wear as it skitters around its glass jar on its
+scarlet red legs.
+   The Tower Skycleave is home to a great many wonders, which it proudly shares
+with all the world, for a small fee. The tower's sorcerers often enchant
+mundane objects and simple animals to create extraordinary tools which are
+unparalleled in even the most extraordinary shops.
+~
+18 p a 0 2
+-1 0 0
+8 0
+C
+150 150
 S
 #11913
 jar pixy novelty empty~
@@ -178,8 +225,8 @@ An empty novelty pixy jar is lying here.~
 with the outline of the Tower Skycleave painted on the side. A blue easy-seal
 wax cover is sitting inside the jar, to be used when you catch a pixy and want
 to seal it in.
-   You can 'catch' a pixy with this jar if you want to train it for the pixy
-races in Skycleave.
+   You can 'catch' a pixy with this jar if you want to train it for the Pixy
+Races in Skycleave.
    Skycleave had long raced creatures of all sizes for entertainment, but in
 the end, none is ever faster than a pixy, nor half as portable.
 ~
@@ -368,6 +415,68 @@ inside. It looks like you can pull it.
 0 0
 T 11922
 S
+#11923
+brush paintbrush enchanted~
+the enchanted paintbrush~
+An enchanted paintbrush is working on the final portrait.~
+   The shimmering paintbrush twirls back and forth across the canvas like an
+ice dancer, sometimes spinning with such vigor that you find yourself amazed no
+stray droplets of paint have ruined the wall or floor.
+   As it breathes life into the portrait detail by detail, slowly bringing
+Grand High Sorcerer Celiya's likeness into view, the brush pauses only to dunk
+itself in one of the pots of paint that sit on the floor.
+~
+3 0 0 0 1
+0 0 0
+0 0
+E
+celiya canvas unfinished current sorcerer grand final~
+   At the end of the walkway, just before the stairs, Grand High Sorcerer
+Celiya's half-finished likeness is the last -- and latest -- portrait in the
+sequence. An enchanted paintbrush pirouettes across the canvas, stopping only
+to dip into one of the pots of paint on the floor below it. Miraculously, none
+of the paint seems to drip on the pristine floor.
+   Though the portrait is still rough, Celiya's form is already taking shape in
+a pose that's almost grandmotherly, as if she's welcoming you in from the cold.
+The exaggerated cloud of white hair around her head nearly fills the top of the
+frame; also exaggerated are the twirling stripes of black and gold in her hair,
+far more intricate than the colors Celiya has recently added.
+   Below the sorcerer's round, brown, motherly face, most of the portrait is in
+shades of violet, unfinished but surely depicting Celiya's flowing robes. The
+background, too, is unfinished, but the shining new nameplate reads:
+                 +--------------------------------------+
+                 |      Grand High Sorcerer Celiya      |
+                 |                                      |
+                 |   Sixteenth Master, Tower Skycleave  |
+                 +--------------------------------------+
+~
+E
+paint paints pots~
+   Dozens of small pots of paint are clustered along the wall beneath the
+unfinished portrait of Grand High Sorcerer Celiya. Shades of brown and violet
+fill many of the pots, with gold, black, white, blue, green, and red for good
+measure.
+~
+E
+portraits paintings masters~
+   The ebony-framed portraits that line the long curve of the second floor
+hallway end here with the current master, Celiya, her immediate predecessor,
+Knezz, and Grand High Sorcerers Kofi and Wong.
+~
+E
+knezz~
+   Grand High Sorcerer Knezz's portrait, near the end, depicts him in a
+thougtful pose, meditating outdoors in deep violet robes. He looks young in the
+portrait, which is painted from a low angle so as to make him look almost like
+a giant next to the tower. The expression on his face is serene and confident.
+The nameplate below the portrait reads:
+                 +-----------------------------------------+
+                 |        Grand High Sorcerer Knezz        |
+                 |  Master of Time, Died Saving the Tower  |
+                 |    Fifteenth Master, Tower Skycleave    |
+                 +-----------------------------------------+
+~
+S
 #11927
 body corpse henri declaire~
 the body of Henri DeClaire~
@@ -410,6 +519,81 @@ breadcrumbs form a clear trail on the ground.
 3 0 0 0 1
 0 0 0
 7 48
+S
+#11935
+shard crafting skycleaver~
+a skycleaver crafting shard~
+A skycleaver crafting shard is sitting on the ground.~
+   You turn the little shard over and over in your hands, watching light catch
+and refract through it like a milky gemstone that has captured a rainbow. As
+you do, a thin prismatic blade slides forward then retreats; the gem then
+flattens like a yarn shuttle; then it seems to form a hammer. This clever
+little innovation will make crafting a breeze!
+~
+3 p ao cefgjm 3
+0 0 0
+12 0
+C
+150 250
+S
+#11936
+shard tedium magichanical~
+a magichanical tedium shard~
+A magichanical tedium shard is lying here.~
+   The odd little tool is made of many layered and folded sheets of metal that
+fit together so tightly it can be placed in a pocket. But with a shake, the
+tedium shard unfolds into an axe, shovel, scythe, saw, and more! If only you
+could afford enough of these to equip an empire, it might rule the trade world.
+~
+3 p ao adfhlo 4
+0 0 0
+2 0
+C
+150 250
+S
+#11937
+bell mausoleum walking~
+a walking mausoleum bell~
+The bell from a walking mausoleum is lying here.~
+   This gleaming iron bell intones a mournful knell when struck. It has been
+cast with intricate lettering and images all along its circumference. You can't
+read the writing (and there is a lot of it) but the images seem to be
+instructions for building a walking mausoleum.
+   This bell allows you to build a walking mausoleum. It requires a level 150
+Architect and must be built at a carpenter. Afterwards, lead the mausoleum to
+move it.
+   When Waltur Wright came to Skycleave, it was as a refugee, having fled his
+master's cartwright shop in the dark of night. His skill with a hammer was
+measured below only his skill with a staff and his ceaseless imagination. Soon,
+the wise professors of the black tower put him to work using all three.
+~
+3 e a 0 2
+0 0 0
+2 0
+C
+150 250
+S
+#11938
+effigy sorcery tower walking~
+a walking sorcery tower effigy~
+An effigy of a walking sorcery tower is lying here.~
+   The stone effigy is in the shape of a sorcery tower with long legs -- a
+curious sight, to be sure. It's complete with a little door and tiny windows,
+through which you can see a tiny cluttered workshop and an enchanting little
+bedroom, both carved from stone.
+   This effigy allows you to build a walking sorcery tower. It requires a level
+150 Architect and must be built at a carpenter. Afterwards, enter the walking
+tower and drive it out of the carpenter. You can drive it from any interior
+room; look out a window to see where you are.
+   The Tower Skycleave has existed in many forms over the years, from Abaris's
+original clay brick tower to Wong's legendary stone tower. When he arrived at
+Skycleave, Waltur had the same dream: to build a greater Skycleave; one that
+the world would never stop talking about. When he became Chief Magineer, he
+immediately set to work building prototypes for a new tower.
+~
+3 0 a 0 1
+0 0 0
+1 0
 S
 #11939
 cornerstone stone hanging garden~
@@ -1168,15 +1352,15 @@ M
 $n glimmers in the light.~
 S
 #11992
-tree stone striped~
-a striped stone tree~
-A striped stone tree has been dropped here.~
+seedling stone striped~
+a striped stone seedling~
+A striped stone seedling has been dropped here.~
    This little stone statuette is expertly carved, with long stripes cut into
-it to resemble the wood of a calamander tree. The tree is fragile and cris-
+it to resemble the wood of a calamander tree. The seedling is fragile and cris-
 crossed with cracks that glow with a faint brown light. There's serious magic
 at play here.
-   According to instructions etched in the bottom of the tree, if you 'smash'
-it in a jungle, the magic will take root and transform the jungle into
+   According to instructions etched in the bottom of the seedling, if you
+'smash' it in a jungle, the magic will take root and transform the jungle into
 enchanted calamander trees. Be sure to claim the tile first -- and keep it
 claimed.
    Calamander forests are cultivated by certain schools of sorcery because the

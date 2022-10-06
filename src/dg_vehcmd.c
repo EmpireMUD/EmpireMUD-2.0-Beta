@@ -787,7 +787,7 @@ VCMD(do_vteleport) {
 			char_from_room(ch);
 			char_to_room(ch, target);
 			GET_LAST_DIR(ch) = NO_DIR;
-			enter_wtrigger(IN_ROOM(ch), ch, NO_DIR);
+			enter_wtrigger(IN_ROOM(ch), ch, NO_DIR, "script");
 			qt_visit_room(ch, IN_ROOM(ch));
 			msdp_update_room(ch);	// once we're sure we're staying
 		}
@@ -812,7 +812,7 @@ VCMD(do_vteleport) {
 						char_from_room(ch);
 						char_to_room(ch, target);
 						GET_LAST_DIR(ch) = NO_DIR;
-						enter_wtrigger(IN_ROOM(ch), ch, NO_DIR);
+						enter_wtrigger(IN_ROOM(ch), ch, NO_DIR, "script");
 						qt_visit_room(ch, IN_ROOM(ch));
 						msdp_update_room(ch);	// once we're sure we're staying
 					}
@@ -826,7 +826,7 @@ VCMD(do_vteleport) {
 				char_from_room(ch);
 				char_to_room(ch, target);
 				GET_LAST_DIR(ch) = NO_DIR;
-				enter_wtrigger(IN_ROOM(ch), ch, NO_DIR);
+				enter_wtrigger(IN_ROOM(ch), ch, NO_DIR, "script");
 				qt_visit_room(ch, IN_ROOM(ch));
 				msdp_update_room(ch);	// once we're sure we're staying
 			}
@@ -834,7 +834,7 @@ VCMD(do_vteleport) {
 		else if ((v = get_vehicle_near_vehicle(veh, arg1))) {
 			vehicle_from_room(v);
 			vehicle_to_room(v, target);
-			entry_vtrigger(v);
+			entry_vtrigger(v, "script");
 		}
 		else if ((obj = get_obj_by_vehicle(veh, arg1))) {
 			obj_to_room(obj, target);
