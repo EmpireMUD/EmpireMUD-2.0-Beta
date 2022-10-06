@@ -15,3 +15,5 @@ plrobjs/*/*.objs
 plrvars/*/*.mem
 world/binary_map
 world/binary_world_index
+world/wld/binary_map
+world/wld/binary_world_index
