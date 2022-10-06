@@ -5,7 +5,5 @@ badsites - Ban data.
 daily_quests - Which cycled dailies are 'turned on'.
 exp_cycle - The timestamp of the last daily skill reset.
 instances - Data for all current adventure instances (ascii).
-players - The player file. Be careful with this one.
-plrmail - In-game pigeon mail.
 time - The timestamp from the mud's first boot, for computing the year.
 version - Last good boot version (triggers auto-updates).
