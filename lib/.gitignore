@@ -1,6 +1,7 @@
 channels/*
 !channels/index
 equipment.csv
+misc/game_data
 players/*/*.plr
 players/*/*.mem
 players/*/*.delay
