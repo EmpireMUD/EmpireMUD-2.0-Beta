@@ -991,7 +991,6 @@ end
 set fright_list 200 201 202 203 222 223
 set react_list 206 207 208 209 210 211 212 213 214 215 216 217 218 219 220 221 224 225 226 227 229 231 232 254 256 257 258 259 260 262 263 266 267 268 269 270 271 272 273 274 275 276 277 278 279 280 281 282 283 284 285
 set eat_list 204 228 230 233 234 235 236 237 238 239 240 241 242 243 244 245 246 247 248 249 250 251 252 253 255 264 265 18841 18885 18861
-*
 set room %self.room%
 %regionecho% %room% 10 A Bylda lets out a FEARSOME ROAR!!!
 wait 1
@@ -1077,18 +1076,23 @@ if %banish% == 1
 end
 ~
 #18853
-dress up the small demon~
+dressing up the small demons~
 0 n 100
 ~
-set on_head %random.6%
-if %on_head% == 1
-  set lead leads
-else
-  set lead lead
-end
-switch %on_head%
+* switch and random set:
+switch %random.2%
+  case 1
+    set sex male
+  break
+  case 2
+    set sex female
+  break
+done
+set lead lead
+switch %random.9%
   case 1
     set on_head singular black horn
+    set lead leads
   break
   case 2
     set on_head two curving ram's horns
@@ -1101,86 +1105,78 @@ switch %on_head%
   break
   case 5
     set on_head patch of writhing tentacles
+    set lead leads
   break
   case 6
     set on_head hair made of flames
+    set lead leads
+  break
+  case 7
+    set on_head cap of bone
+    set lead leads
+  break
+  case 8
+    set on_head ridge of bone
+    set lead leads
+  break
+  case 9
+    set on_head crown of thorns
+    set lead leads
   break
 done
-set skin_color %random.6%
-switch %skin_color%
-  case 1
-    set skin_color red
-  break
-  case 2
-    set skin_color black
-  break
-  case 3
-    set skin_color gray
-  break
-  case 4
-    set skin_color blue
-  break
-  case 5
-    set skin_color green
-  break
-  case 6
-    set skin_color orange
-  break
+* configs:
+set skin_color_list black blue bronze brown gold green orange pink purple red silver white yellow
+set skin_color_count 13
+set eye_color_list black gold green red violet white yellow
+set eye_color_count 7
+set skin_type1_list feathered furred scaled skinned
+set skin_type2_list feathers fur scales skin
+set skin_type_count 4
+set body_type_list brawny bulky chunky lean lithe muscular scrawny skeletal skinny stocky thin
+set body_type_count 11
+eval random_pos %%random.%skin_color_count%%%
+while %random_pos% > 0
+  set skin_color %skin_color_list.car%
+  set skin_color_list %skin_color_list.cdr%
+  eval random_pos %random_pos% - 1
 done
-set eye_color %random.3%
-switch %eye_color%
-  case 1
-    set eye_color red
-  break
-  case 2
-    set eye_color black
-  break
-  case 3
-    set eye_color yellow
-  break
+if !%skin_color%
+  * somehow?
+  set skin_color black
+end
+eval random_pos %%random.%eye_color_count%%%
+while %random_pos% > 0
+  set eye_color %eye_color_list.car%
+  set eye_color_list %eye_color_list.cdr%
+  eval random_pos %random_pos% - 1
 done
-set skin_type %random.3%
-switch %skin_type%
-  case 1
-    set skin_type1 furred
-    set skin_type2 fur
-  break
-  case 2
-    set skin_type1 scaled
-    set skin_type2 scales
-  break
-  case 3
-    set skin_type1 skinned
-    set skin_type2 skin
-  break
+if !%eye_color%
+  * somehow?
+  set eye_color white
+end
+eval random_pos %%random.%body_type_count%%%
+while %random_pos% > 0
+  set body_type %body_type_list.car%
+  set body_type_list %body_type_list.cdr%
+  eval random_pos %random_pos% - 1
 done
-set sex %random.2%
-switch %sex%
-  case 1
-    set sex male
-  break
-  case 2
-    set sex female
-  break
+if !%body_type%
+  * somehow?
+  set body_type stocky
+end
+eval random_pos %%random.%skin_type_count%%%
+while %random_pos% > 0
+  set skin_type1 %skin_type1_list.car%
+  set skin_type1_list %skin_type1_list.cdr%
+  set skin_type2 %skin_type2_list.car%
+  set skin_type2_list %skin_type2_list.cdr%
+  eval random_pos %random_pos% - 1
 done
-set body_type %random.5%
-switch %body_type%
-  case 1
-    set body_type bulky
-  break
-  case 2
-    set body_type scrawny
-  break
-  case 3
-    set body_type lean
-  break
-  case 4
-    set body_type lithe
-  break
-  case 5
-    set body_type muscular
-  break
-done
+if !%skin_type1%
+  * somehow?
+  set skin_type1 skinned
+  set skin_type2 skin
+end
 %mod% %self% shortdesc a %eye_color%-eyed demon
 %mod% %self% longdesc A small %skin_color%-%skin_type1% demon with %eye_color% eyes crouches to spring!
 %mod% %self% keyword demon small %skin_color%

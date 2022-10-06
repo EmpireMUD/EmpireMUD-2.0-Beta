@@ -2988,6 +2988,15 @@ if %fail%
   say On the oath we swore -- on the honor of the moon -- you shall proceed no further!
 end
 ~
+#11949
+Walking mausoleum death knell~
+2 g 100
+~
+if %method% == respawn
+  %regionecho% %room% 50 A booming death knell echoes from %room.coords%.
+  wait 1
+end
+~
 #11951
 Smol Nes-Pik: Block abilities in the jar~
 2 p 100
