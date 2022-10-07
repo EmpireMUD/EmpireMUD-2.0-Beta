@@ -6119,6 +6119,9 @@ ACMD(do_list) {
 			msg_to_char(ch, "There's nothing for sale here%s.\r\n", (*argument ? " by that name" : ""));
 		}
 	}
+	else if (id && number > 0) {
+		msg_to_char(ch, "You don't see anything like that here.\r\n");
+	}
 
 	free_shop_temp_list(shop_list);
 	
