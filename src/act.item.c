@@ -5919,8 +5919,8 @@ ACMD(do_list) {
 	obj_data *obj;
 	any_vnum vnum;
 	size_t size;
-	bool ok, id;
-	int amt;
+	bool ok, id, all;
+	int amt, number;
 	
 	// helper type for displaying currencies at the end
 	struct cur_t {
@@ -5944,6 +5944,13 @@ ACMD(do_list) {
 	}
 	
 	skip_spaces(&argument);	// optional filter (remaining args)
+	if (isdigit(*argument)) {
+		number = get_number(&argument);	// x.name syntax
+	}
+	else {
+		number = -1;
+	}
+	all = (number <= 0);
 	
 	// find shops
 	shop_list = build_available_shop_list(ch);
@@ -5985,6 +5992,9 @@ ACMD(do_list) {
 				if (!ok) {
 					continue;	// search option
 				}
+			}
+			if (!all && --number != 0) {
+				continue;
 			}
 			
 			if (id) {	// just identifying -- show shop id then exit the loop early
