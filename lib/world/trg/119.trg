@@ -4070,6 +4070,50 @@ while %count% < 12
 done
 dg_affect #11961 %actor% off
 ~
+#11966
+Skycleave: Time-traveler's diary replacement~
+1 g 100
+~
+* gives the pages in order if not owned, or at random if owned
+set diary_list 11918 11920 11919
+set list_size 3
+return 1
+wait 0
+set ch %self.carried_by%
+* check owned list
+set list %diary_list%
+while %list%
+  set vnum %list.car%
+  set list %list.cdr%
+  if !%actor.inventory(%vnum%)% && !%actor.on_quest(%vnum%)% && !%actor.completed_quest(%vnum%)%
+    if %ch%
+      %load% obj %vnum% %ch% inv
+      set obj %ch.inventory(%vnum%)%
+      if %obj% && %obj.vnum% == %vnum%
+        nop %obj.bind(%self%)%
+      end
+      %purge% %self%
+      halt
+    end
+  end
+done
+* just give a random one
+eval pos %%random.%list_size%%%
+while %pos% > 0
+  set vnum %diary_list.car%
+  set diary_list %diary_list.cdr%
+  eval pos %pos% - 1
+done
+if %vnum% && %ch%
+  %load% obj %vnum% %ch% inv
+  set obj %ch.inventory(%vnum%)%
+  if %obj% && %obj.vnum% == %vnum%
+    nop %obj.bind(%self%)%
+  end
+  %purge% %self%
+  halt
+end
+~
 #11969
 Skycleave: Hendecagon fountain summoned NPC run~
 0 ab 100

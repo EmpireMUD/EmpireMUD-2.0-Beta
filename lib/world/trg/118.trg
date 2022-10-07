@@ -687,7 +687,7 @@ if %self.vnum% == 11837
   * BoE item list
   set roll %random.100%
   if %roll% == 1
-    set loot_list 11918 11919 11920
+    set loot_list 11916
   elseif %roll% <= 16
     set loot_list 11801 11802 11804 11806 11807
   else
