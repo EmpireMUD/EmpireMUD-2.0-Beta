@@ -2997,6 +2997,19 @@ if %method% == respawn
   wait 1
 end
 ~
+#11950
+Skycleave: Long potion consume handler~
+1 s 100
+~
+* handles long-duration skycleave potions
+switch %self.vnum%
+  case 11912
+    dg_affect #%self.vnum% %actor% off
+    dg_affect #%self.vnum% %actor% WATERWALK on 86400
+    %send% %actor% # Your feet start to tingle!
+  break
+done
+~
 #11951
 Smol Nes-Pik: Block abilities in the jar~
 2 p 100
