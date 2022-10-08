@@ -2923,6 +2923,21 @@ if !%self.fighting%
   end
 end
 ~
+#11851
+Skycleave: Shared mob speech trigger~
+0 d 1
+zenith~
+switch %self.vnum%
+  case 11825
+    case 11925
+      * Ravinders
+      if %speech% ~= zenith
+        wait 1
+        emote $n winces.
+      end
+    break
+  done
+~
 #11857
 Skycleave: Mercenary name setup~
 0 n 100

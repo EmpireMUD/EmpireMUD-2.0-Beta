@@ -3008,6 +3008,16 @@ switch %self.vnum%
     dg_affect #%self.vnum% %actor% WATERWALK on 86400
     %send% %actor% # Your feet start to tingle!
   break
+  case 11924
+    dg_affect #%self.vnum% %actor% off
+    dg_affect #%self.vnum% %actor% INFRA on 86400
+    %send% %actor% # Everything seems so much brighter!
+  break
+  case 11925
+    dg_affect #%self.vnum% %actor% off
+    dg_affect #%self.vnum% %actor% INVENTORY 35 86400
+    %send% %actor% # That's a weight off your shoulders.
+  break
 done
 ~
 #11951
