@@ -176,6 +176,9 @@ void complete_quest(char_data *ch, struct player_quest *pq, empire_data *giver_e
 	give_quest_rewards(ch, QUEST_REWARDS(quest), level, giver_emp, pq->instance_id);
 	
 	// remove from player's tracker
+	if (pq == global_next_player_quest) {
+		global_next_player_quest = global_next_player_quest->next;
+	}
 	LL_DELETE(GET_QUESTS(ch), pq);
 	pq->next = NULL;	// freed as list
 	free_player_quests(pq);
@@ -446,6 +449,9 @@ void drop_quest(char_data *ch, struct player_quest *pq) {
 	qt_lose_quest(ch, pq->vnum);
 	remove_quest_items_by_quest(ch, pq->vnum);
 	
+	if (pq == global_next_player_quest) {
+		global_next_player_quest = global_next_player_quest->next;
+	}
 	LL_DELETE(GET_QUESTS(ch), pq);
 	pq->next = NULL;	// freed as list
 	free_player_quests(pq);
@@ -668,7 +674,7 @@ bool qcmd_finish_one(char_data *ch, struct player_quest *pq, bool show_errors) {
 
 
 QCMD(qcmd_finish) {
-	struct player_quest *pq, *next_pq;
+	struct player_quest *pq;
 	struct instance_data *inst = NULL;
 	quest_data *qst;
 	bool all, any;
@@ -691,9 +697,10 @@ QCMD(qcmd_finish) {
 		// do it
 		if (all) {
 			any = FALSE;
-			LL_FOREACH_SAFE(GET_QUESTS(ch), pq, next_pq) {
+			LL_FOREACH_SAFE(GET_QUESTS(ch), pq, global_next_player_quest) {
 				any |= qcmd_finish_one(ch, pq, FALSE);
 			}
+			global_next_player_quest = NULL;
 			if (any) {
 				queue_delayed_update(ch, CDU_SAVE);
 			}
