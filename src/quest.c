@@ -524,7 +524,7 @@ int count_quest_objects(char_data *ch, obj_vnum vnum, bool skip_keep) {
 * @param struct instance_data *inst The instance to check quests for.
 */
 void expire_instance_quests(struct instance_data *inst) {
-	struct player_quest *pq, *next_pq;
+	struct player_quest *pq;
 	descriptor_data *desc;
 	quest_data *quest;
 	char_data *ch;
@@ -534,7 +534,7 @@ void expire_instance_quests(struct instance_data *inst) {
 			continue;
 		}
 		
-		LL_FOREACH_SAFE(GET_QUESTS(ch), pq, next_pq) {
+		LL_FOREACH_SAFE(GET_QUESTS(ch), pq, global_next_player_quest) {
 			if (pq->instance_id != INST_ID(inst) || pq->adventure != GET_ADV_VNUM(INST_ADVENTURE(inst))) {
 				continue;
 			}
@@ -549,6 +549,7 @@ void expire_instance_quests(struct instance_data *inst) {
 			drop_quest(ch, pq);
 		}
 	}
+	global_next_player_quest = NULL;
 }
 
 
@@ -1165,7 +1166,7 @@ void refresh_one_quest_tracker(char_data *ch, struct player_quest *pq) {
 */
 void refresh_all_quests(char_data *ch) {
 	struct player_completed_quest *pcq, *next_pcq;
-	struct player_quest *pq, *next_pq;
+	struct player_quest *pq;
 	struct instance_data *inst;
 	struct req_data *old;
 	quest_data *quest;
@@ -1175,7 +1176,7 @@ void refresh_all_quests(char_data *ch) {
 	}
 	
 	// current quests
-	LL_FOREACH_SAFE(GET_QUESTS(ch), pq, next_pq) {
+	LL_FOREACH_SAFE(GET_QUESTS(ch), pq, global_next_player_quest) {
 		// remove entirely
 		if (!(quest = quest_proto(pq->vnum)) || (QUEST_FLAGGED(quest, QST_IN_DEVELOPMENT) && !IS_IMMORTAL(ch))) {
 			drop_quest(ch, pq);
@@ -1198,6 +1199,7 @@ void refresh_all_quests(char_data *ch) {
 		// check tracker tasks now
 		refresh_one_quest_tracker(ch, pq);
 	}
+	global_next_player_quest = NULL;
 	
 	// completed quests
 	HASH_ITER(hh, GET_COMPLETED_QUESTS(ch), pcq, next_pcq) {

@@ -10716,7 +10716,7 @@ ACMD(do_unprogress) {
 
 ACMD(do_unquest) {
 	struct player_completed_quest *pcq, *next_pcq;
-	struct player_quest *pq, *next_pq;
+	struct player_quest *pq;
 	char arg[MAX_INPUT_LENGTH];
 	quest_data *quest;
 	char_data *vict;
@@ -10741,12 +10741,13 @@ ACMD(do_unquest) {
 		found = FALSE;
 		
 		// remove from active quests
-		LL_FOREACH_SAFE(GET_QUESTS(vict), pq, next_pq) {
+		LL_FOREACH_SAFE(GET_QUESTS(vict), pq, global_next_player_quest) {
 			if (pq->vnum == QUEST_VNUM(quest)) {
 				drop_quest(vict, pq);
 				found = TRUE;
 			}
 		}
+		global_next_player_quest = NULL;
 		
 		// remove from completed quests
 		HASH_ITER(hh, GET_COMPLETED_QUESTS(vict), pcq, next_pcq) {

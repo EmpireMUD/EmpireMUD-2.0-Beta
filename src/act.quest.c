@@ -179,6 +179,9 @@ void complete_quest(char_data *ch, struct player_quest *pq, empire_data *giver_e
 	if (pq == global_next_player_quest) {
 		global_next_player_quest = global_next_player_quest->next;
 	}
+	if (pq == global_next_player_quest_2) {
+		global_next_player_quest_2 = global_next_player_quest_2->next;
+	}
 	LL_DELETE(GET_QUESTS(ch), pq);
 	pq->next = NULL;	// freed as list
 	free_player_quests(pq);
@@ -304,7 +307,7 @@ void count_quest_tasks(struct req_data *list, int *complete, int *total) {
 * @return bool TRUE if any quests were failed, FALSE if there were none.
 */
 bool fail_daily_quests(char_data *ch, bool event) {
-	struct player_quest *pq, *next_pq;
+	struct player_quest *pq;
 	quest_data *quest;
 	int found = 0;
 	
@@ -312,7 +315,7 @@ bool fail_daily_quests(char_data *ch, bool event) {
 		return FALSE;
 	}
 	
-	LL_FOREACH_SAFE(GET_QUESTS(ch), pq, next_pq) {
+	LL_FOREACH_SAFE(GET_QUESTS(ch), pq, global_next_player_quest_2) {
 		if (!(quest = quest_proto(pq->vnum))) {	// somehow?
 			continue;
 		}
@@ -329,6 +332,7 @@ bool fail_daily_quests(char_data *ch, bool event) {
 		drop_quest(ch, pq);
 		++found;
 	}
+	global_next_player_quest_2 = NULL;
 	
 	return (found > 0);
 }
@@ -451,6 +455,9 @@ void drop_quest(char_data *ch, struct player_quest *pq) {
 	
 	if (pq == global_next_player_quest) {
 		global_next_player_quest = global_next_player_quest->next;
+	}
+	if (pq == global_next_player_quest_2) {
+		global_next_player_quest_2 = global_next_player_quest_2->next;
 	}
 	LL_DELETE(GET_QUESTS(ch), pq);
 	pq->next = NULL;	// freed as list
