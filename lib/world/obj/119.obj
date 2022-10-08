@@ -218,14 +218,22 @@ C
 150 150
 S
 #11912
-potion waterwalking black tower walking~
-a Black Tower waterwalking potion~
-A Black Tower waterwalking potion is lying here.~
-tba
+phial waterwalking blacktower walking~
+a Blacktower waterwalking phial~
+A Blacktower waterwalking phial is lying here.~
+   You watch an emerald green liquid swirl around in the smoked glass phial as
+you hold it up to the light. The stylized logo of the Tower Skycleave is etched
+into the side, barely visible until the light catches it.
+   "Quaffing this phial will grant you the long-lasting buoyancy you need to
+deal with the aquatic challenges of the modern world," according to the paper
+tag.
+   Towerwinkel's Gift Shoppe prides itself on providing unique treasures unlike
+any found elsewhere in the world. Among them, the long-lasting potions are a
+perennial favorite that draw even experienced adventurers to the store.
 ~
-25 0 a 0 2
+25 0 a 0 3
 -1 0 -1
-6 0
+8 0
 T 11950
 S
 #11913
@@ -500,6 +508,46 @@ The nameplate below the portrait reads:
                  |    Fifteenth Master, Tower Skycleave    |
                  +-----------------------------------------+
 ~
+S
+#11924
+phial blacktower perfect sight~
+a Blacktower phial of perfect sight~
+A Blacktower phial of perfect sight is lying here.~
+   A golden liquid shines through the black glass phial, catching any stray ray
+of light and sending it back out twice as bright. On the side, the Tower
+Skycleave's logo is etched into the glass.
+   "Quaffing this phial will grant you the long-lasting night vision you need
+to deal with the nocturnal threats that plague our times," according to the
+paper tag.
+   The sorcerers at Skycleave have sold a great variety of products over the
+years in their unending search to create the simplest, most marketable magical
+products money can buy. In an era of desperately short life expectancies, the
+sorcerers were surprised to find a strong market for potions of great duration.
+~
+25 0 a 0 3
+-1 0 -1
+8 0
+T 11950
+S
+#11925
+phial blacktower lighter burdens~
+a Blacktower phial of lighter burdens~
+A Blacktower phial of lighter burdens lies here.~
+   The phial glimmers like a ruby when you hold it toward the light; the deep
+red liquid inside practically bursts through the black glass at the first hint
+of illumination. The side of the phial is etched with the simple logo of the
+Tower Skycleave, and a tag is attached.
+   "Quaffing this phial will grant you the long-lasting relief you need to
+carry all of life's burdens," according to the paper tag.
+   The flowing robes at Skycleave disguise the sheer number of trinkets, tools,
+and tidbits the sorcerers carry on their persons. A combination of spells and
+potions allows them to carry fantastical amounts often exceeding their own
+weight.
+~
+25 0 a 0 4
+-1 0 -1
+8 0
+T 11950
 S
 #11927
 body corpse henri declaire~
