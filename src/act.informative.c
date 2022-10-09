@@ -1229,7 +1229,7 @@ void list_vehicles_to_char(vehicle_data *list, char_data *ch) {
 		if (VEH_IS_EXTRACTED(veh) || !CAN_SEE_VEHICLE(ch, veh)) {
 			continue;	// should we show a "something" ?
 		}
-		if (VEH_SITTING_ON(veh) && VEH_SITTING_ON(veh) != ch) {
+		if (VEH_SITTING_ON(veh) && VEH_SITTING_ON(veh) != ch && !VEH_FLAGGED(veh, VEH_BUILDING)) {
 			continue;	// don't show vehicles someone else is sitting on
 		}
 		
