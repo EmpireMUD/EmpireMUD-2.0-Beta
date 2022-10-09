@@ -2942,15 +2942,20 @@ ACMD(do_look) {
 				// extra desc takes priority
 				send_to_char(exdesc, ch);
 			}
+			else if (!IS_IMMORTAL(ch) && !ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_LOOK_OUT) && !RMT_FLAGGED(IN_ROOM(ch), RMT_LOOK_OUT)) {
+				msg_to_char(ch, "You can't do that from here.\r\n");
+			}
+			else if (GET_ROOM_VEHICLE(IN_ROOM(ch))) {
+				// look out from vehicle
+				clear_recent_moves(ch);
+				look_at_room_by_loc(ch, IN_ROOM(GET_ROOM_VEHICLE(IN_ROOM(ch))), LRR_LOOK_OUT);
+			}
 			else if (!(map = (GET_MAP_LOC(IN_ROOM(ch)) ? real_room(GET_MAP_LOC(IN_ROOM(ch))->vnum) : NULL))) {
 				msg_to_char(ch, "You can't do that from here.\r\n");
 			}
 			else if (map == IN_ROOM(ch) && !ROOM_IS_CLOSED(IN_ROOM(ch))) {
 				clear_recent_moves(ch);
 				look_at_room_by_loc(ch, map, LRR_LOOK_OUT);
-			}
-			else if (!IS_IMMORTAL(ch) && !ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_LOOK_OUT) && !RMT_FLAGGED(IN_ROOM(ch), RMT_LOOK_OUT)) {
-				msg_to_char(ch, "You can't do that from here.\r\n");
 			}
 			else {
 				clear_recent_moves(ch);
