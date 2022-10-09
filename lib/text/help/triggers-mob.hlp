@@ -397,6 +397,8 @@ When using field  - The variable returns:
 &calias&0 - The list of aliases (keywords) of the mob or the player name.
 &callegiance(faction)&0 - Returns a mob's faction vnum, or changes the faction
    to a different one (or 'none').
+&cbiting&0 - For vampires, the person they are currently biting, if any.
+&cbitten_by&0 - The vampire currently being bitten by, if any.
 &cblock&0 - Player's block rating.
 &cblood(amt)&0 - Returns current blood, or adds/removes blood if amt is set.
 &cbonus_exp(amt)&0 - Returns the player's bonus exp (adds to it if amt given)

@@ -2983,7 +2983,23 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					break;
 				}
 				case 'b': {	// char.b*
-					if (!str_cmp(field, "block")) {
+					if (!str_cmp(field, "biting")) {
+						if (GET_FEEDING_FROM(c)) {
+							snprintf(str, slen, "%c%d", UID_CHAR, char_script_id(GET_FEEDING_FROM(c)));
+						}
+						else {
+							*str = '\0';
+						}
+					}
+					else if (!str_cmp(field, "bitten_by")) {
+						if (GET_FED_ON_BY(c)) {
+							snprintf(str, slen, "%c%d", UID_CHAR, char_script_id(GET_FED_ON_BY(c)));
+						}
+						else {
+							*str = '\0';
+						}
+					}
+					else if (!str_cmp(field, "block")) {
 						snprintf(str, slen, "%d", get_block_rating(c, FALSE));
 					}
 					else if (!str_cmp(field, "blood")) {
