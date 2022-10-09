@@ -373,8 +373,9 @@ elseif %self.vnum% == 11825 || %self.vnum% == 11925
     say This seems like a perfectly good pixy, but it just isn't championship material. I'm looking to win, not place.
   else
     * ok!
-    %echo% ~%self% eagerly takes @%object% from %actor%.
+    %echo% ~%self% eagerly takes @%object% from ~%actor%.
     say Oh, splendid, really. This is exactly the sort of pixy I was looking for. O racing world, prepare to tremble!
+    %send% %actor% \&0
     %quest% %actor% trigger 11915
     %quest% %actor% finish 11915
     %purge% %object%
