@@ -231,7 +231,7 @@ tag.
 any found elsewhere in the world. Among them, the long-lasting potions are a
 perennial favorite that draw even experienced adventurers to the store.
 ~
-25 0 a 0 3
+25 p a 0 4
 -1 0 -1
 8 0
 T 11950
@@ -524,7 +524,7 @@ years in their unending search to create the simplest, most marketable magical
 products money can buy. In an era of desperately short life expectancies, the
 sorcerers were surprised to find a strong market for potions of great duration.
 ~
-25 0 a 0 3
+25 p a 0 4
 -1 0 -1
 8 0
 T 11950
@@ -544,7 +544,7 @@ and tidbits the sorcerers carry on their persons. A combination of spells and
 potions allows them to carry fantastical amounts often exceeding their own
 weight.
 ~
-25 0 a 0 4
+25 p a 0 5
 -1 0 -1
 8 0
 T 11950
