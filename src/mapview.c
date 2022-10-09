@@ -1199,7 +1199,7 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options) {
 	}
 
 	// check for ship
-	if (!look_out && !ship_partial && show_on_ship) {
+	if (!look_out && !ship_partial && show_on_ship && !IS_SET(options, LRR_LOOK_OUT_INSIDE)) {
 		look_at_room_by_loc(ch, IN_ROOM(GET_ROOM_VEHICLE(IN_ROOM(ch))), LRR_SHIP_PARTIAL);
 	}
 
