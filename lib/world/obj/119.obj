@@ -549,6 +549,21 @@ weight.
 8 0
 T 11950
 S
+#11926
+teacup cup~
+a teacup~
+A teacup is lying here.~
+   The blue ceramic teacup is almost impossibly dainty, thinner in places than
+the flower petals it was sculpted to resemble. On the side, a stylized version
+of the Tower Skycleave is painted in fine white lines.
+   After the restoration of the tower, Mageina transmuted all the leftover soup
+and spoiled food into a tea so hearty that the sorcerers often live on nothing
+else.
+~
+5 0 a 0 4
+4 4 11926
+6 0
+S
 #11927
 body corpse henri declaire~
 the body of Henri DeClaire~

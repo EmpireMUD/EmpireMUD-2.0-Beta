@@ -1207,6 +1207,20 @@ This mob is restringed on load.
 ~
 T 11967
 S
+#11944
+guard headless ghostly~
+a headless guard~
+A ghostly, headless guard stands with his sword ready.
+~
+75 100 bdhoqt 0 3
+1 0 0 1
+D
+   The ghost stands in full armor and regalia. Indeed, he's dressed in
+everything but the helmet, as his ephemeral form ends abruptly just above the
+collar. The ghost is too faded to see the color of his tabard or even the crest
+on his shield. Nevertheless, he stands guard.
+~
+S
 #11945
 Amets page~
 Page Amets~

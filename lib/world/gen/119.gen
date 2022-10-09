@@ -69,6 +69,15 @@ Blacktower burdens~
 T0
 You feel your lighter burdens phial wear off and things seem heavier again.~
 S
+#11926
+Skycleaver Tea~
+1 0
+-8 8 8 0
+T0
+temporal mint tea~
+T1
+murky blue~
+S
 #11936
 cursed~
 4 0
@@ -79,6 +88,33 @@ T2
 The spirit passes through you... you are cursed!~
 T3
 The spirit passes through $n, who glows briefly.~
+S
+#11937
+magic words~
+2 0
+0 0 0 0
+T2
+The walking mausoleam stirs and begins to stand.~
+T3
+The walking mausoleam stirs and begins to stand.~
+S
+#11938
+magic words~
+2 0
+0 0 0 0
+T2
+The sorcery tower twitches and starts to stand.~
+T3
+The sorcery tower twitches and starts to stand.~
+S
+#11939
+magic words~
+2 0
+0 0 0 0
+T2
+You shout the magic words, 'By the Tower of Skycleave!'~
+T3
+$n shouts the magic words, 'By the Tower of Skycleave!'~
 S
 #11943
 drowsy~

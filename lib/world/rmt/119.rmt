@@ -383,10 +383,11 @@ menuboard board~
 elegant, flowing script, the board currently reads:
 
                           == Cafe Fendreciel ==
-                      Skycleaver Coffee..........25
-                      Violet Skycleaver Wine.....50
-                      Mutton Pasty..............100
-                      Turquoise Cheese..........100
+                      Skycleaver Coffee.........120
+                      Temporal Mint Tea.........243
+                      Violet Skycleaver Wine....322
+                      Mutton Pasty..............199
+                      Turquoise Cheese..........199
 ~
 E
 bar cups bowls plates mess~
@@ -438,7 +439,7 @@ D2
 ~
 0 11903
 E
-blackboard board chalkboard words writing~
+blackboard board chalkboard words writing words~
    The blackboard is a large piece of slate attached to the wall. It is covered
 in eraser smears and stray chalk dust. There are words written on the board,
 but you don't understand them, if they're really words at all.
@@ -1012,6 +1013,10 @@ his layered robes. Beneath his portrait, the nameplate reads:
                  |   Eighth Master, Tower Skycleave  |
                  +-----------------------------------+
 ~
+E
+plates nameplates~
+There are nameplates under the portraits.
+~
 S
 #11913
 The Second Floor Walkway of the Tower Skycleave~
@@ -1180,6 +1185,10 @@ the portrait, the nameplate reads:
                  |     Reconstructionist, Plague     |
                  |  Twelfth Master, Tower Skycleave  |
                  +-----------------------------------+
+~
+E
+plates nameplates~
+There are nameplates under the portraits.
 ~
 S
 #11914
@@ -1533,7 +1542,7 @@ west~
 The hallway continues to the west.
 ~
 E
-portraits pictures~
+portraits pictures watchers~
    A collection of portraits of Watchers going back through the years. Each
 portrait has a small plaque under it with the name and years -- or months -- of
 service. Every face seems to be set in a stern expression. The only one you
@@ -1771,6 +1780,10 @@ portrait reads:
                  |  Fifteenth Master, Tower Skycleave  |
                  +-------------------------------------+
 ~
+E
+plates nameplates~
+There are nameplates under the portraits.
+~
 M 1 11831 100.00 5
 T 11825
 T 11921
@@ -1972,6 +1985,10 @@ there's only the clean floor.
 E
 walls~
 The walls are made from black ebony panels, like most of the tower.
+~
+E
+window~
+The small window lets you look out on the countryside.
 ~
 S
 #11930
@@ -2584,7 +2601,7 @@ D1
 ~
 0 11938
 E
-blackboard board slate projects instructions~
+blackboard board slate projects instructions words message~
 A large slate blackboard hangs on one of the walls. It has two lists:
 
                       PROJECTS
@@ -2825,7 +2842,7 @@ floors down~
 The gray slate floor is scattered with piles of household items.
 ~
 E
-painting bagel visuals~
+painting picture bagel visuals~
 You examine the painting on the wavering wall:
    The upper section of this painting is three people standing around a platter
 made of a silvery metal. The first man looks like a disapproving old mentor.
@@ -2836,6 +2853,14 @@ drooling. The bagel itself is sliced cleanly into an upper and lower half with
 the upper half set askew to expose the fluffy inside. The top of the bagel is
 sprinkled with seeds, flakes, and a fine greenish-white dust. Set beside it are
 small tubs of various condiments. At the bottom, the nameplate says:
+
+                  +---------------------------------+
+                  |   'Behold, Everything Bagel!'   |
+                  +---------------------------------+
+~
+E
+plate nameplate~
+The nameplate below the painting says:
 
                   +---------------------------------+
                   |   'Behold, Everything Bagel!'   |
@@ -3022,6 +3047,10 @@ D7
 ~
 0 11961
 E
+offices~
+This floor contains the offices of the high sorcerers.
+~
+E
 floor shapes pattern~
    The floor is made of woods in various shades and intricately laid out of
 differently shaped panels, with varying textures. The pattern it makes is
@@ -3061,7 +3090,7 @@ down through the center of the chamber. The door handles, too, are made from
 the rare metal. This price of this tower must have been astronomical.
 ~
 E
-railing handrail chandelier tree trunk~
+railing handrail chandelier tree trunk sculpture~
    The striped handrail curves around the walkway that hugs the wall of the
 grand chamber. Across the railing, the trunk of the grand chandelier twists
 downward. Looking over the rail, you see that it branches out into an inverted
@@ -3165,7 +3194,7 @@ down through the center of the chamber. The door handles, too, are made from
 the rare metal. This price of this tower must have been astronomical.
 ~
 E
-railing handrail chandelier tree trunk~
+railing handrail chandelier tree trunk sculpture~
    The striped handrail curves around the walkway that hugs the wall of the
 grand chamber. Across the railing, the trunk of the grand chandelier twists
 downward. Looking over the rail, you see that it branches out into an inverted
@@ -3180,7 +3209,7 @@ of the tower's high masters, and it is from here that they look down on the
 apprentices below.
 ~
 E
-doorway south~
+doorway south office~
 The dark wooden door leads to an office labeled only 'High Sorcerer'.
 ~
 E
@@ -3302,7 +3331,7 @@ down through the center of the chamber. The door handles, too, are made from
 the rare metal. This price of this tower must have been astronomical.
 ~
 E
-railing handrail chandelier tree trunk~
+railing handrail chandelier tree trunk sculpture~
    The striped handrail curves around the walkway that hugs the wall of the
 grand chamber. Across the railing, the trunk of the grand chandelier twists
 downward. Looking over the rail, you see that it branches out into an inverted
@@ -3338,7 +3367,7 @@ countless tiny flames on its branches that light the floors below. Below it,
 you can see all the way down to the fountain on the ground level.
 ~
 E
-doorway east~
+doorway east office~
 The dark wooden door leads to an office labeled 'High Sorcerer Barrosh'.
 ~
 S
@@ -3400,7 +3429,7 @@ outside the office door. Filigree work along the sides gives them an uncommon
 look that was certainly ludicrously expensive.
 ~
 E
-doorway double-door north~
+doorway double-door north office~
    The door is made of heavy ebony wood and polished to a dull sheen. It is
 decorated with engravings that are so delicate that at first glance it is
 impossible to make them out in the wood. Every time you look at them, however,
@@ -3949,6 +3978,10 @@ could almost swear that you can see them move if you watch, though they seem
 rooted in place.
 ~
 E
+trees~
+Shade trees around the top of the tower make this the perfect spot to sit.
+~
+E
 unicorn~
    This rearing unicorn sculpture is made of inky black stone that has been
 polished to a high shine. It has a crystal clear horn that spirals several feet
@@ -4035,6 +4068,17 @@ walls painted paintings vignettes~
 domestic scenes such as washing clothes and lying in bed. The figures are drawn
 with black, square eyes. One scene shows chopping wood, and another looks like
 a person building a square house.
+   Near the bed, a square dreamcatcher hangs on the wall.
+~
+E
+dreamcatcher catcher~
+   A square dreamcatcher hangs on the wall, crisscrossed by gossamer threads
+with leaves and stones intertwined.
+~
+E
+leaves stones~
+   Leaves and stones have been tangled into the web of the dreamcatcher on the
+wall.
 ~
 E
 reed mats~
@@ -5172,6 +5216,11 @@ D8
 ~
 0 11988
 E
+frame~
+   The frame of the great gate is made mostly from rock. The rest is built from
+huge, sturdy timbers that make the city unassailable.
+~
+E
 stairway stairs steps~
    The steps are made of hefty wooden posts which stick out of the cliffs like
 pegs. In the event of an attack, the posts can be removed, or even burned, to
@@ -5333,6 +5382,10 @@ D3
 D2
 ~
 0 11992
+E
+tube~
+A small tube protrudes from the floor, leading down into the building below.
+~
 E
 ladder~
 The wooden ladder descends down into the building beneath the standing stone.
