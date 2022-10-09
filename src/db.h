@@ -671,6 +671,7 @@ obj_data *Obj_load_from_file(FILE *fl, obj_vnum vnum, int *location, char_data *
 void objpack_load_room(room_data *room, bool use_pre_b5_116_dir);
 
 // players
+extern struct player_quest *global_next_player_quest, *global_next_player_quest_2;
 extern struct group_data *group_list;
 extern struct int_hash *inherent_ptech_hash;
 extern int max_inventory_size;

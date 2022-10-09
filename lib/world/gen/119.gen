@@ -39,6 +39,13 @@ skycleaver warpstone~
 T0
 Your skycleaver warpstone is no longer depleted.~
 S
+#11912
+Blacktower waterwalking~
+4 0
+0 0 0 0
+T0
+You feel your waterwalking phial fade.~
+S
 #11921
 Violet Tea~
 1 0
@@ -47,6 +54,20 @@ T0
 violet tea~
 T1
 swirling violet~
+S
+#11924
+Blacktower sight~
+4 0
+0 0 0 0
+T0
+Everything seems to dim as your perfect sight phial wears off.~
+S
+#11925
+Blacktower burdens~
+4 0
+0 0 0 0
+T0
+You feel your lighter burdens phial wear off and things seem heavier again.~
 S
 #11936
 cursed~

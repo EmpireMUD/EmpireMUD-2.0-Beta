@@ -755,6 +755,7 @@ M
 I swear if someone says 'zenith' one more time I'm going to crack.~
 T 11810
 T 11807
+T 11851
 S
 #11926
 sponge giant~
@@ -1193,6 +1194,18 @@ M
 0
 $n walks along the wall, passing the light from $s contraption over it.~
 T 11810
+S
+#11943
+visitor gardens hanging~
+hanging gardens visitor~
+A hanging gardens visitor is here.
+~
+20 50 bdov 0 3
+2 0 0 15
+D
+This mob is restringed on load.
+~
+T 11967
 S
 #11945
 Amets page~

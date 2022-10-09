@@ -62,7 +62,7 @@ CHOP
 Chop (Scavenging ability)
 
 Usage:  chop
-Speed boosts:  Work ethic bonus, haste, higher axe damage, higher Strength
+Speed boosts:  Work ethic bonus, haste, higher level axe, superior axe
 
 This command allows you to chop trees in the forest. Beware, trees are a
 limited resource. Different types of forest give different qualities and
@@ -305,7 +305,7 @@ MINE MINES
 Mine (Primitive Crafts ability)
 
 Building:  &y/&0[]&y\&0  Mine  (Build ability)
-Speed boosts:  Work ethic bonus, haste, higher pick damage, higher Strength
+Speed boosts:  Work ethic bonus, haste, higher level pick, superior pick
 Command:  mine
 
 "Mine" is both a building type, and the command to work in that building. Mines

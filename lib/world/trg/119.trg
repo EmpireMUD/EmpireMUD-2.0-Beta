@@ -2997,6 +2997,29 @@ if %method% == respawn
   wait 1
 end
 ~
+#11950
+Skycleave: Long potion consume handler~
+1 s 100
+~
+* handles long-duration skycleave potions
+switch %self.vnum%
+  case 11912
+    dg_affect #%self.vnum% %actor% off
+    dg_affect #%self.vnum% %actor% WATERWALK on 86400
+    %send% %actor% # Your feet start to tingle!
+  break
+  case 11924
+    dg_affect #%self.vnum% %actor% off
+    dg_affect #%self.vnum% %actor% INFRA on 86400
+    %send% %actor% # Everything seems so much brighter!
+  break
+  case 11925
+    dg_affect #%self.vnum% %actor% off
+    dg_affect #%self.vnum% %actor% INVENTORY 35 86400
+    %send% %actor% # That's a weight off your shoulders.
+  break
+done
+~
 #11951
 Smol Nes-Pik: Block abilities in the jar~
 2 p 100
@@ -4056,6 +4079,146 @@ while %count% < 12
   eval count %count% + 1
 done
 dg_affect #11961 %actor% off
+~
+#11966
+Skycleave: Time-traveler's diary replacement~
+1 g 100
+~
+* gives the pages in order if not owned, or at random if owned
+set diary_list 11918 11920 11919
+set list_size 3
+return 1
+wait 0
+set ch %self.carried_by%
+* check owned list
+set list %diary_list%
+while %list%
+  set vnum %list.car%
+  set list %list.cdr%
+  if !%actor.inventory(%vnum%)% && !%actor.on_quest(%vnum%)% && !%actor.completed_quest(%vnum%)%
+    if %ch%
+      %load% obj %vnum% %ch% inv
+      set obj %ch.inventory(%vnum%)%
+      if %obj% && %obj.vnum% == %vnum%
+        nop %obj.bind(%self%)%
+      end
+      %purge% %self%
+      halt
+    end
+  end
+done
+* just give a random one
+eval pos %%random.%list_size%%%
+while %pos% > 0
+  set vnum %diary_list.car%
+  set diary_list %diary_list.cdr%
+  eval pos %pos% - 1
+done
+if %vnum% && %ch%
+  %load% obj %vnum% %ch% inv
+  set obj %ch.inventory(%vnum%)%
+  if %obj% && %obj.vnum% == %vnum%
+    nop %obj.bind(%self%)%
+  end
+  %purge% %self%
+  halt
+end
+~
+#11967
+Hanging gardens visitor restring~
+0 n 100
+~
+set vnum 11943
+set female_list Maria Ana Mary Anna Elena Marie Fatima Olga Sandra Rita Xin Sri Yu Lei Hui Ying Yan Nushi
+set female_size 18
+set male_list Muhammed Jose Ahmed Ali John David Li Abdul Juan Jean Robert Daniel Luis Carlos James Antonio Joseph Francisco Hong Ibrahim
+set male_size 20
+* pick sex
+if %random.2% == 1
+  set list %female_list%
+  set size %female_size%
+  set sex female
+else
+  set list %male_list%
+  set size %male_size%
+  set sex male
+end
+* pick name
+eval pos %%random.%size%%%
+while %list% && %pos% > 0
+  set name %list.car%
+  set list %list.cdr%
+  eval pos %pos% - 1
+done
+* basic strings
+%mod% %self% sex %sex%
+%mod% %self% keywords %name% tourist
+%mod% %self% shortdesc %name%
+%mod% %self% lookdesc %name% is enjoying the hanging gardens.
+* random look
+set heshe %self.heshe%
+switch %random.8%
+  case 1
+    %mod% %self% append-lookdesc %heshe.cap% isn't dressed like the locals but %heshe% seems to be getting along just fine
+  break
+  case 2
+    %mod% %self% append-lookdesc %heshe.cap% seems to be looking around at the city in wonder
+  break
+  case 3
+    %mod% %self% append-lookdesc %heshe.cap% strikes up a conversation with everyone who passes by
+  break
+  case 4
+    %mod% %self% append-lookdesc %heshe.cap% fans %self.himher%self
+  break
+  case 5
+    %mod% %self% append-lookdesc %heshe.cap% eats a handful of berries
+  break
+  case 6
+    %mod% %self% append-lookdesc %heshe.cap% sips wine from a glass
+  break
+  case 7
+    %mod% %self% append-lookdesc %heshe.cap% smokes from a long pipe
+  break
+  case 8
+    %mod% %self% append-lookdesc %heshe.cap% seems to count the bricks
+  break
+done
+* random placement
+switch %random.8%
+  case 1
+    %mod% %self% append-lookdesc as %heshe% sits under a tree.
+    %mod% %self% longdesc %name% is sitting under a tree.
+  break
+  case 2
+    %mod% %self% append-lookdesc while %heshe% sits by some flowers.
+    %mod% %self% longdesc %name% is sitting by some flowers.
+  break
+  case 3
+    %mod% %self% append-lookdesc while dangling %self.hisher% feet from a terrace.
+    %mod% %self% longdesc %name% sits on the edge of one of the terraces.
+  break
+  case 4
+    %mod% %self% append-lookdesc as %heshe% sits on a large stone.
+    %mod% %self% longdesc %name% is sitting on a large stone.
+  break
+  case 5
+    %mod% %self% append-lookdesc as %heshe% relaxes by the pond.
+    %mod% %self% longdesc %name% is relaxing by the pond.
+  break
+  case 6
+    %mod% %self% append-lookdesc as %heshe% sits in the shade.
+    %mod% %self% longdesc %name% is sitting in the shade.
+  break
+  case 7
+    %mod% %self% append-lookdesc as %heshe% strolls through the gardens.
+    %mod% %self% longdesc %name% is strolling through the gardens.
+  break
+  case 8
+    %mod% %self% append-lookdesc as %heshe% reflects on the pond.
+    %mod% %self% longdesc %name% is reflecting on the pond.
+  break
+done
+detach 11967 %self.id%
 ~
 #11969
 Skycleave: Hendecagon fountain summoned NPC run~

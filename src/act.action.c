@@ -10,6 +10,8 @@
 *  CircleMUD is based on DikuMUD, Copyright (C) 1990, 1991.               *
 ************************************************************************ */
 
+#include <math.h>
+
 #include "conf.h"
 #include "sysdep.h"
 
@@ -1452,6 +1454,9 @@ void process_chop(char_data *ch) {
 	bool got_any = FALSE;
 	char_data *ch_iter;
 	obj_data *axe;
+	int amt;
+	
+	const int min_progress_per_chop = 3;	// TODO this could be a config or related to the 'chop_timer' config; prevents it from taking too long
 	
 	if (!(axe = has_tool(ch, TOOL_AXE))) {
 		send_to_char("You need to be using an axe to chop.\r\n", ch);
@@ -1464,7 +1469,10 @@ void process_chop(char_data *ch) {
 		return;
 	}
 
-	add_to_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_CHOP_PROGRESS, -1 * (GET_STRENGTH(ch) + 3 * (axe ? get_base_dps(axe) : 0)));
+	amt = round(GET_OBJ_CURRENT_SCALE_LEVEL(axe) / 10.0) * (OBJ_FLAGGED(axe, OBJ_SUPERIOR) ? 2 : 1);
+	amt = MAX(min_progress_per_chop, amt);
+
+	add_to_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_CHOP_PROGRESS, -1 * amt);
 	act("You swing $p hard!", FALSE, ch, axe, NULL, TO_CHAR | TO_SPAMMY);
 	act("$n swings $p hard!", FALSE, ch, axe, NULL, TO_ROOM | TO_SPAMMY);
 	
@@ -2081,10 +2089,12 @@ void process_maintenance(char_data *ch) {
 */
 void process_mining(char_data *ch) {	
 	struct global_data *glb;
-	int count, total;
+	int count, total, amt;
 	room_data *in_room;
 	obj_data *tool;
 	bool success;
+	
+	int min_progress_per_mine = 4;	// TODO this could be a config or related to the 'mining_timer' config; prevents it from taking too long
 	
 	if (!room_has_function_and_city_ok(GET_LOYALTY(ch), IN_ROOM(ch), FNC_MINE)) {
 		msg_to_char(ch, "You can't mine here.\r\n");
@@ -2114,7 +2124,10 @@ void process_mining(char_data *ch) {
 			cancel_action(ch);
 			break;
 		}
-
+		
+		amt = round(GET_OBJ_CURRENT_SCALE_LEVEL(tool) / 6.66) * (OBJ_FLAGGED(tool, OBJ_SUPERIOR) ? 2 : 1);
+		amt = MAX(min_progress_per_mine, amt);
+		
 		GET_ACTION_TIMER(ch) -= GET_STRENGTH(ch) + 3 * (tool ? get_base_dps(tool) : 0);
 
 		act("You pick at the walls with $p, looking for ore.", FALSE, ch, tool, 0, TO_CHAR | TO_SPAMMY);

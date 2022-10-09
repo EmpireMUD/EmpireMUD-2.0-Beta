@@ -784,6 +784,19 @@ Loads a bind-on-pickup item.
 0 0
 T 11814
 S
+#11839
+tower little~
+the little tower~
+A little tower stands on two legs in the corner.~
+   An odd little tower stands in the corner -- odder, still, because it's
+standing on legs. The tower and legs are both made of stone, though the tower
+is a bit crooked and doesn't form a perfect cylinder. In all regards except for
+the legs, it resembles a little sorcery tower.
+~
+3 0 0 0 1
+0 0 0
+1 0
+S
 #11840
 greaves skycleaver magitanium set~
 magitanium skycleaver greaves~
@@ -1326,6 +1339,26 @@ A
 C
 150 275
 T 11940
+S
+#11860
+cultivator shard~
+a shard cultivator~
+A shard cultivator is stuck in the ground.~
+   The shard cultivator is, itself, a gem shard; in your hands, it is
+translucent and slightly glowing. Instructions are written along one side in
+gold ink and an elegant script:
+
+                         Skycleave Shard Cultivator
+                  1. Obtain crafting shard or tedium shard
+              2. Type 'cultivate crafting' or 'cultivate tedium'
+              3. Receive upgraded crafting shard or tedium shard
+                        4. Cultivator is single-use
+                5. Skycleave does not warrant against death
+~
+3 gp a 0 1
+0 0 0
+12 0
+T 11860
 S
 #11862
 dagger shadow~

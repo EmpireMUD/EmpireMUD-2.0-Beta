@@ -2673,14 +2673,14 @@ T 11921
 S
 #11840
 The Magichanical Laboratory~
-   A small kiosk is placed just inside the entry to this room. Behind the kiosk
-the room opens up into a wide expanse of worktables and strange apparatuses
-lining the walls. A partially constructed vehicle is currently taking up the
-majority of the center of the area. A large transparent funnel shaped bin with
-long flexible tubing hanging from it, floats near the high ceiling.
-NOTE: This description is to be rewritten/finalized when the rewards are complete.
+   You are greeted by a small kiosk at the entrance to this well and truly
+cluttered laboratory. The long, narrow room follows the curve of the tower, but
+there is little room to walk between worktables, shelves, and prototypes of all
+manner of strange apparatuses. The center of the area is filled with a three-
+legged stone tortoise. Vines and shrubs are growing down from the high shelves,
+dangling into bins of glowing blue stones.
 ~
-ch 0 0
+c 0 M
 D3
 ~
 0 11839
@@ -2689,6 +2689,52 @@ west~
    The doorway in the west wall is semi-transparent and leads back to the main
 enchanting lab.
 ~
+E
+kiosk~
+   The golden kiosk partially blocks the entrance to the laboratory. It looks
+as if it's meant to advertize and sell the strange wonders produced here, but
+it doesn't do much good up here, where the public can't get to it.
+~
+E
+worktables strange apparatuses~
+   While all the worktables look similar, they each seem to deal in a different
+thing. Nothing on any of the worktables could ever make sense to anyone except
+a magineer. The strange apparatuses above each table are even more confusing.
+Some have dangling tubes that seem to writhe, leading to strangely-designed
+tools, each different and hard to look at. Disconcerting noises come from each
+apparatus on the walls, combining with voices and other sounds to make a
+horrendous cacophony.
+~
+E
+clutter mess~
+   There's too much going on for you to figure out what most of this is. It
+would seem this lab operates beyond the reach of the high sorcerers and,
+equally, beyond the reach of the cleaning staff.
+~
+E
+shelves vines shrubs~
+   Shelves line the walls, some stacked with gem shards, others with glass
+domes, and still others with miniature towers. But the strangest shelves are
+the higher ones, from which drape vines and shrubs and plants of all types.
+There isn't nearly enough light in here for this much foliage -- the windows
+are all but blocked -- but the plants don't seem to mind.
+~
+E
+bins stones glowing~
+Bins of glowing blue stones sit between some of the workstations.
+~
+E
+windows out~
+The room has several large windows, but they are blocked by the clutter.
+~
+E
+tortoise turtle three-legged~
+   The center of the room is blocked by a three-legged stone tortoise, or, at
+least, something that resembles one. It appears to be made from small stone
+blocks, with a flat top that could hold objects if it could stand up straight.
+It appears to be missing its fourth leg.
+~
+M 1 11839 100.00 2
 S
 #11841
 The Attunement Lab~

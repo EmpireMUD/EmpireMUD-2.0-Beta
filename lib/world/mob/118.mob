@@ -168,6 +168,7 @@ slept in some time.
 ~
 F 11800
 T 11810
+T 11837
 S
 #11806
 Huberus master sorcerer instructor~
@@ -224,6 +225,7 @@ M
 say We're not, uh, open yet. It's a crisis, if you haven't noticed.~
 T 11806
 T 11810
+T 11837
 S
 #11808
 #n young lady~
@@ -392,6 +394,7 @@ of the tower, but he seems to give little notice to you or anyone else in here.
 ~
 F 11800
 T 11810
+T 11837
 S
 #11815
 goblin uncaged~
@@ -726,6 +729,7 @@ though he doesn't seem to be trying to sleep.
 F 11800
 T 11810
 T 11807
+T 11851
 S
 #11826
 #n~
@@ -865,6 +869,7 @@ youthful appearance. Her dark purple and black robes are dusty, but she seems
 to have other priorities.
 ~
 F 11800
+T 11837
 S
 #11832
 mohammed resident~
@@ -975,6 +980,7 @@ back and forth through the walls, listless.
 F 11800
 T 11838
 T 11810
+T 11837
 S
 #11839
 Annelise~
@@ -1012,6 +1018,7 @@ M
 7
 say You fool, we were hiding in here. Next time leave the wall shut.~
 T 11806
+T 11837
 S
 #11841
 mercenary rogue~
@@ -1502,6 +1509,7 @@ fully uncomfortable to hang upside-down, but she seems to be unconscious --
 almost serene.
 ~
 F 11800
+T 11837
 S
 #11861
 barrosh high sorcerer~
@@ -1673,6 +1681,7 @@ him, sometimes passing through his chest. When it does, his body twitches and
 jolts, but no sound escapes his lips and his eyes never waver.
 ~
 F 11800
+T 11837
 S
 #11869
 Mezvienne shade shadow~
@@ -1736,6 +1745,7 @@ He sits hunched over, letting his violet and gold robes drape.
 ~
 F 11800
 T 11865
+T 11837
 S
 #11871
 Mezvienne enchantress~

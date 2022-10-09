@@ -485,6 +485,11 @@ if %self.aff_flagged(!ATTACK)%
           %send% %actor% When you approach Trixton Vye, you're pushed back by a cold force... Something -- or someone -- is protecting him.
         elseif %instance.mob(11848)%
           %send% %actor% Trixton Vye ignores all attempts to harm him as he wounds instantly seal themselves. The magic comes from elsewhere; something -- or someone -- is protecting him.
+        else
+          * nobody protecting him?
+          dg_affect %self% !ATTACK off
+          return 1
+          halt
         end
       break
       default
@@ -682,7 +687,7 @@ if %self.vnum% == 11837
   * BoE item list
   set roll %random.100%
   if %roll% == 1
-    set loot_list 11918 11919 11920
+    set loot_list 11916
   elseif %roll% <= 16
     set loot_list 11801 11802 11804 11806 11807
   else
@@ -2018,6 +2023,13 @@ elseif %self.vnum% == 11927
   return 0
 end
 ~
+#11837
+Skycleave: List command in wrong phase~
+0 c 0
+list buy~
+%send% %actor% They don't seem to be selling anything right now. The tower is still under siege!
+return 1
+~
 #11838
 Skycleave: Weyonomon wanders through walls in 1A~
 0 b 15
@@ -2911,6 +2923,21 @@ if !%self.fighting%
   end
 end
 ~
+#11851
+Skycleave: Shared mob speech trigger~
+0 d 1
+zenith~
+switch %self.vnum%
+  case 11825
+    case 11925
+      * Ravinders
+      if %speech% ~= zenith
+        wait 1
+        emote $n winces.
+      end
+    break
+  done
+~
 #11857
 Skycleave: Mercenary name setup~
 0 n 100
@@ -3028,6 +3055,39 @@ switch %self.vnum%
 done
 * and detach
 detach 11857 %self.id%
+~
+#11860
+Skycleave: Shard cultivator / upgrade shard tool~
+1 c 2
+cultivate~
+return 1
+if !%arg%
+  %send% %actor% Cultivate which shard?
+  halt
+end
+set target %actor.obj_target_inv(%arg%)%
+if !%target%
+  %send% %actor% You don't seem to have a '%arg%'. (You can only use @%self% on items in your inventory.)
+  halt
+end
+if %target.vnum% != 11935 && %target.vnum% != 11936
+  %send% %actor% You can only use @%self% to upgrade the skycleaver crafting shard or magichanical tedium shard.
+  halt
+end
+if %target.is_flagged(SUPERIOR)%
+  %send% %actor% @%target% is already upgraded; using @%self% would have no benefit.
+  halt
+end
+%send% %actor% You carefully touch @%self% to @%target%...
+%echoaround% %actor% ~%actor% touches @%self% to @%target%...
+%echo% @%target% takes on a sky-blue glow!
+nop %target.flag(SUPERIOR)%
+if %target.level% > 0
+  %scale% %target% %target.level%
+else
+  %scale% %target% 1
+end
+%purge% %self%
 ~
 #11861
 Skycleave: Barrosh mind-control struggle scene~
