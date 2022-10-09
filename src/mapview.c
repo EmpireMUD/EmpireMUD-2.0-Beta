@@ -1562,33 +1562,35 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options) {
 	}
 	
 	// commands: only show if the first entry is not a \0, which terminates the list
-	if (GET_BUILDING(room)) {
-		if (GET_BLD_COMMANDS(GET_BUILDING(room)) && *GET_BLD_COMMANDS(GET_BUILDING(room))) {
-			msg_to_char(ch, "Commands: &c%s&0\r\n", GET_BLD_COMMANDS(GET_BUILDING(room)));
+	if (!IS_SET(options, LRR_LOOK_OUT_INSIDE)) {
+		if (GET_BUILDING(room)) {
+			if (GET_BLD_COMMANDS(GET_BUILDING(room)) && *GET_BLD_COMMANDS(GET_BUILDING(room))) {
+				msg_to_char(ch, "Commands: &c%s&0\r\n", GET_BLD_COMMANDS(GET_BUILDING(room)));
+			}
 		}
-	}
-	else if (GET_SECT_COMMANDS(SECT(room)) && *GET_SECT_COMMANDS(SECT(room))) {
-		msg_to_char(ch, "Commands: &c%s&0\r\n", GET_SECT_COMMANDS(SECT(room)));
-	}
-	else if (ROOM_SECT_FLAGGED(room, SECTF_CROP)) {
-		*locbuf = '\0';
-		if (can_interact_room(IN_ROOM(ch), INTERACT_CHOP)) {
-			sprintf(locbuf + strlen(locbuf), "%schop", (*locbuf ? ", " : ""));
+		else if (GET_SECT_COMMANDS(SECT(room)) && *GET_SECT_COMMANDS(SECT(room))) {
+			msg_to_char(ch, "Commands: &c%s&0\r\n", GET_SECT_COMMANDS(SECT(room)));
 		}
-		if (can_interact_room(IN_ROOM(ch), INTERACT_DIG)) {
-			sprintf(locbuf + strlen(locbuf), "%sdig", (*locbuf ? ", " : ""));
-		}
-		if (can_interact_room(IN_ROOM(ch), INTERACT_GATHER)) {
-			sprintf(locbuf + strlen(locbuf), "%sgather", (*locbuf ? ", " : ""));
-		}
-		if (can_interact_room(IN_ROOM(ch), INTERACT_HARVEST)) {
-			sprintf(locbuf + strlen(locbuf), "%sharvest", (*locbuf ? ", " : ""));
-		}
-		if (can_interact_room(IN_ROOM(ch), INTERACT_PICK)) {
-			sprintf(locbuf + strlen(locbuf), "%spick", (*locbuf ? ", " : ""));
-		}
-		if (*locbuf) {
-			msg_to_char(ch, "Commands: &c%s&0\r\n", locbuf);
+		else if (ROOM_SECT_FLAGGED(room, SECTF_CROP)) {
+			*locbuf = '\0';
+			if (can_interact_room(IN_ROOM(ch), INTERACT_CHOP)) {
+				sprintf(locbuf + strlen(locbuf), "%schop", (*locbuf ? ", " : ""));
+			}
+			if (can_interact_room(IN_ROOM(ch), INTERACT_DIG)) {
+				sprintf(locbuf + strlen(locbuf), "%sdig", (*locbuf ? ", " : ""));
+			}
+			if (can_interact_room(IN_ROOM(ch), INTERACT_GATHER)) {
+				sprintf(locbuf + strlen(locbuf), "%sgather", (*locbuf ? ", " : ""));
+			}
+			if (can_interact_room(IN_ROOM(ch), INTERACT_HARVEST)) {
+				sprintf(locbuf + strlen(locbuf), "%sharvest", (*locbuf ? ", " : ""));
+			}
+			if (can_interact_room(IN_ROOM(ch), INTERACT_PICK)) {
+				sprintf(locbuf + strlen(locbuf), "%spick", (*locbuf ? ", " : ""));
+			}
+			if (*locbuf) {
+				msg_to_char(ch, "Commands: &c%s&0\r\n", locbuf);
+			}
 		}
 	}
 	
@@ -1723,13 +1725,20 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options) {
 			msg_to_char(ch, "\tA...you can turn in a quest here!\t0\r\n");
 		}
 	
-		/* now list characters & objects */
-		send_to_char("&g", ch);
-		list_obj_to_char(ROOM_CONTENTS(room), ch, OBJ_DESC_LONG, FALSE);
+		/* now list characters, vehicles, & objects */
+		if (!IS_SET(options, LRR_LOOK_OUT_INSIDE)) {
+			send_to_char("&g", ch);
+			list_obj_to_char(ROOM_CONTENTS(room), ch, OBJ_DESC_LONG, FALSE);
+		}
+		// show vehicles anyway
 		send_to_char("&w", ch);
 		list_vehicles_to_char(ROOM_VEHICLES(room), ch, FALSE, NULL);
-		send_to_char("&y", ch);
-		list_char_to_char(ROOM_PEOPLE(room), ch);
+		
+		if (!IS_SET(options, LRR_LOOK_OUT_INSIDE)) {
+			send_to_char("&y", ch);
+			list_char_to_char(ROOM_PEOPLE(room), ch);
+		}
+		
 		send_to_char("&0", ch);
 	}
 
