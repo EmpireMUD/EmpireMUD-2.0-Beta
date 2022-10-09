@@ -2948,7 +2948,7 @@ ACMD(do_look) {
 			else if (GET_ROOM_VEHICLE(IN_ROOM(ch))) {
 				// look out from vehicle
 				clear_recent_moves(ch);
-				look_at_room_by_loc(ch, IN_ROOM(GET_ROOM_VEHICLE(IN_ROOM(ch))), LRR_LOOK_OUT);
+				look_at_room_by_loc(ch, IN_ROOM(GET_ROOM_VEHICLE(IN_ROOM(ch))), LRR_SHIP_PARTIAL);
 			}
 			else if (!(map = (GET_MAP_LOC(IN_ROOM(ch)) ? real_room(GET_MAP_LOC(IN_ROOM(ch))->vnum) : NULL))) {
 				msg_to_char(ch, "You can't do that from here.\r\n");
