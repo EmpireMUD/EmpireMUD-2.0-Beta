@@ -2794,7 +2794,10 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						}
 					}
 					else if (!str_cmp(field, "action")) {
-						if (IS_NPC(c) || GET_ACTION(c) == ACT_NONE) {
+						if (GET_FEEDING_FROM(ch)) {
+							snprintf(str, slen, "feeding");
+						}
+						else if (IS_NPC(c) || GET_ACTION(c) == ACT_NONE) {
 							strcpy(str, "");	// none
 						}
 						else if (GET_ACTION(c) == ACT_GEN_CRAFT) {
