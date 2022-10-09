@@ -1175,7 +1175,7 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options) {
 	bool look_out = IS_SET(options, LRR_LOOK_OUT) ? TRUE : FALSE;
 	bool has_ship = (GET_ROOM_VEHICLE(IN_ROOM(ch)) && !VEH_FLAGGED(GET_ROOM_VEHICLE(IN_ROOM(ch)), VEH_BUILDING)) ? TRUE : FALSE;
 	bool show_on_ship = has_ship && ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_LOOK_OUT);
-	bool show_title = !show_on_ship || ship_partial || look_out;
+	bool show_title = !show_on_ship || ship_partial || look_out || IS_SET(options, LRR_LOOK_OUT_INSIDE);
 
 	// begin with the sanity check
 	if (!ch || !ch->desc)
