@@ -1977,7 +1977,7 @@ char *get_obj_desc(obj_data *obj, char_data *ch, int mode);
 void get_player_skill_string(char_data *ch, char *buffer, bool abbrev);
 void list_char_to_char(char_data *list, char_data *ch);
 void list_obj_to_char(obj_data *list, char_data *ch, int mode, int show);
-void list_vehicles_to_char(vehicle_data *list, char_data *ch, bool large_only);
+void list_vehicles_to_char(vehicle_data *list, char_data *ch, bool large_only, vehicle_data *exclude);
 char *obj_color_by_quality(obj_data *obj, char_data *ch);
 char *obj_desc_for_char(obj_data *obj, char_data *ch, int mode);
 struct custom_message *pick_custom_longdesc(char_data *ch);

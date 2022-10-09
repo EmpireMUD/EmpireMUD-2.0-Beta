@@ -1216,8 +1216,9 @@ void list_one_vehicle_to_char(vehicle_data *veh, char_data *ch) {
 * @param vehicle_data *list Pointer to the start of the list of vehicles.
 * @param vehicle_data *ch Person to send the output to.
 * @param bool large_only If TRUE, skips small vehicles like furniture
+* @param vehicle_data *exclude Optional: Don't show a specific vehicle (usually the one you're in); may be NULL.
 */
-void list_vehicles_to_char(vehicle_data *list, char_data *ch, bool large_only) {
+void list_vehicles_to_char(vehicle_data *list, char_data *ch, bool large_only, vehicle_data *exclude) {
 	vehicle_data *veh;
 	
 	bitvector_t large_veh_flags = VEH_BUILDING | VEH_NO_BUILDING | VEH_SIEGE_WEAPONS | VEH_ON_FIRE | VEH_VISIBLE_IN_DARK | VEH_OBSCURE_VISION;
@@ -2416,7 +2417,7 @@ ACMD(do_contents) {
 		send_to_char("&g", ch);
 		list_obj_to_char(ROOM_CONTENTS(IN_ROOM(ch)), ch, OBJ_DESC_LONG, FALSE);
 		send_to_char("&w", ch);
-		list_vehicles_to_char(ROOM_VEHICLES(IN_ROOM(ch)), ch, FALSE);
+		list_vehicles_to_char(ROOM_VEHICLES(IN_ROOM(ch)), ch, FALSE, NULL);
 		send_to_char("&0", ch);
 	}
 	else {	// can see nothing

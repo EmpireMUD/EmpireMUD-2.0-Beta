@@ -1546,7 +1546,7 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options) {
 	// ship-partial ends here with some vehicles
 	if (ship_partial) {
 		send_to_char("\tw", ch);
-		list_vehicles_to_char(ROOM_VEHICLES(room), ch, TRUE);
+		list_vehicles_to_char(ROOM_VEHICLES(room), ch, TRUE, GET_ROOM_VEHICLE(IN_ROOM(ch)));
 		send_to_char("\t0", ch);
 		return;
 	}
@@ -1727,7 +1727,7 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options) {
 		send_to_char("&g", ch);
 		list_obj_to_char(ROOM_CONTENTS(room), ch, OBJ_DESC_LONG, FALSE);
 		send_to_char("&w", ch);
-		list_vehicles_to_char(ROOM_VEHICLES(room), ch, FALSE);
+		list_vehicles_to_char(ROOM_VEHICLES(room), ch, FALSE, NULL);
 		send_to_char("&y", ch);
 		list_char_to_char(ROOM_PEOPLE(room), ch);
 		send_to_char("&0", ch);
