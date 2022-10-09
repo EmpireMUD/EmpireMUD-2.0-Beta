@@ -1230,6 +1230,9 @@ void list_vehicles_to_char(vehicle_data *list, char_data *ch, bool large_only, v
 	
 	DL_FOREACH2(list, veh, next_in_room) {
 		// conditions to show
+		if (veh == exclude) {	
+			continue;
+		}
 		if (VEH_IS_EXTRACTED(veh) || !CAN_SEE_VEHICLE(ch, veh)) {
 			continue;	// should we show a "something" ?
 		}
