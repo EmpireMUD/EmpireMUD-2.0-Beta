@@ -2794,7 +2794,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						}
 					}
 					else if (!str_cmp(field, "action")) {
-						if (GET_FEEDING_FROM(ch)) {
+						if (GET_FEEDING_FROM(c)) {
 							snprintf(str, slen, "feeding");
 						}
 						else if (IS_NPC(c) || GET_ACTION(c) == ACT_NONE) {
