@@ -83,21 +83,6 @@ end
 %send% %actor% You can't seem to get past ~%self%!
 return 0
 ~
-#11803
-Skycleave mob blocking: Aggro~
-0 s 100
-~
-* One quick trick to get the target room
-set room_var %self.room%
-eval tricky %%room_var.%direction%(room)%%
-* Compare template ids to figure out if they're going forward or back
-if (%actor.nohassle% || !%tricky% || %tricky.template% < %room_var.template%)
-  halt
-end
-%send% %actor% You can't seem to get past ~%self%, and &%self% doesn't look happy...
-%aggro% %actor%
-return 0
-~
 #11804
 Everflowing flagon (free refills)~
 1 bw 10
@@ -1457,7 +1442,6 @@ elseif %self.vnum% == 11801
   * Dylane wanders until he finds the cafe
   if %room.template% == 11905
     nop %self.add_mob_flag(SENTINEL)%
-    nop %self.remove_mob_flag(SILENT)%
     detach 11828 %self.id%
   end
   halt
@@ -1745,6 +1729,9 @@ Skycleave: Conditional mob visibility~
 0 iC 100
 ~
 * toggles silent, !see
+if %actor.is_npc%
+  halt
+end
 * activated on greet or when moving
 set see 0
 set not 0
@@ -1946,13 +1933,13 @@ switch %self.room.template%
   break
   case 11803
     * Ground Floor N (1A)
-    %mod% %self% keywords crates wall stacked wooden makeshift
+    %mod% %self% keywords crates wall stacked wooden makeshift boxes
     %mod% %self% longdesc A makeshift wall of crates blocks off the center of the chamber.
     %mod% %self% lookdesc A wall of stacked crates blocks access to the center of the chamber and its magnificent stone fountain.
   break
   case 11804
     * Ground Floor W (1A)
-    %mod% %self% keywords crates wall piled stacked wooden makeshift
+    %mod% %self% keywords crates wall piled stacked wooden makeshift boxes
     %mod% %self% longdesc Crates have been piled to form a wall blocking the chamber's central fountain to the east.
     %mod% %self% lookdesc Stacks of crates create a makeshift wall that blocks off the center of the great chamber and its grand stone fountain.
   break
@@ -2158,6 +2145,11 @@ if %target%
   %slay% %target%
   if %done%
     * last one?
+    if %self.room.template% != 11836
+      %echo% Scaldorran twists and whirls until his tattered wrappings fold in on themselves and he vanishes!
+      mgoto i11836
+      %echo% Your blood freezes as the air cracks open and the Lich Scaldorran crawls out of the void!
+    end
     %mod% %self% longdesc The Lich Scaldorran is drawing power from the tower.
     detach 11839 %self.id%
   end
@@ -2176,6 +2168,11 @@ while %merc_list%
   end
 done
 * nobody left?
+if %self.room.template% != 11836
+  %echo% Scaldorran twists and whirls until his tattered wrappings fold in on themselves and he vanishes!
+  mgoto i11836
+  %echo% Your blood freezes as the air cracks open and the Lich Scaldorran crawls out of the void!
+end
 %mod% %self% longdesc The Lich Scaldorran is drawing power from the tower.
 detach 11839 %self.id%
 ~
