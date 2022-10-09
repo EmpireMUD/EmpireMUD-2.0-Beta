@@ -3899,6 +3899,16 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 							GET_ADVENTURE_SUMMON_INSTANCE_ID(c) = inst ? INST_ID(inst) : NOTHING;
 						}
 					}
+					else if (!str_cmp(field, "linked_to_instance")) {
+						struct instance_data *inst;
+						room_data *froom = (subfield && *subfield) ? get_room(IN_ROOM(c), subfield) : IN_ROOM(c);
+						if (IS_NPC(c) && froom && (inst = find_instance_by_room(froom, FALSE, TRUE)) && MOB_INSTANCE_ID(c) == inst->id) {
+							snprintf(str, slen, "1");
+						}
+						else {
+							snprintf(str, slen, "0");
+						}
+					}
 					else if (!str_cmp(field, "longdesc")) {
 						snprintf(str, slen, "%s", GET_LONG_DESC(c));
 						// trim trailing CRLFs

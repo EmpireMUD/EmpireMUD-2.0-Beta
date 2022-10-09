@@ -527,6 +527,8 @@ When using field  - The variable returns:
    first if they were not already summoned.
 &clink_instance&0 - Marks this mob as belonging to the adventure instance of
    the room it's currently in.
+&clinked_to_instance(room)&0 - True if the mob is linked as part of the
+   instance. Room is optional; will check the room the mob is in if empty.
 &clongdesc&0 - The mob's long description.
 &cmana&0 - The current mana points of the actor.
 &cmana(amount)&0 - Add/subtract mana on the actor.
