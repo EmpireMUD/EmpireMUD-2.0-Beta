@@ -1732,7 +1732,7 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options) {
 		}
 		// show vehicles anyway
 		send_to_char("&w", ch);
-		list_vehicles_to_char(ROOM_VEHICLES(room), ch, FALSE, NULL);
+		list_vehicles_to_char(ROOM_VEHICLES(room), ch, FALSE, IS_SET(options, LRR_LOOK_OUT_INSIDE) ? GET_ROOM_VEHICLE(IN_ROOM(ch)) : NULL);
 		
 		if (!IS_SET(options, LRR_LOOK_OUT_INSIDE)) {
 			send_to_char("&y", ch);
