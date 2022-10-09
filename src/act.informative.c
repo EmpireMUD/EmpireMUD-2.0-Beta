@@ -1182,7 +1182,7 @@ void list_one_vehicle_to_char(vehicle_data *veh, char_data *ch) {
 		size += snprintf(buf + size, sizeof(buf) - size, "...you are %s %s it.\r\n", part, IN_OR_ON(veh));
 	}
 	else if (VEH_SITTING_ON(veh)) {
-		// this is PROBABLY not shown to players
+		// only shown to players when it's a building
 		snprintf(part, sizeof(part), "%s", position_types[GET_POS(VEH_SITTING_ON(veh))]);
 		*part = LOWER(*part);
 		size += snprintf(buf + size, sizeof(buf) - size, "...%s is %s %s it.\r\n", PERS(VEH_SITTING_ON(veh), ch, FALSE), part, IN_OR_ON(veh));
