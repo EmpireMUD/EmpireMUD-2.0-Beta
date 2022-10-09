@@ -2799,13 +2799,13 @@ ACMD(do_exits) {
 		}
 		
 		// can disembark/exit here?
-		if (ROOM_CAN_EXIT(IN_ROOM(ch))) {
+		if (ROOM_CAN_EXIT(room)) {
 			// 'disembark'
 			if ((veh = GET_ROOM_VEHICLE(room)) && IN_ROOM(veh) && !VEH_FLAGGED(veh, VEH_BUILDING)) {
 				size += snprintf(buf + size, sizeof(buf) - size, "%s%s\r\n", (cmd != -1 ? " " : ""), exit_description(ch, IN_ROOM(veh), "Disembark"));
 			}
 			// 'exit'
-			else if ((to_room = get_exit_room(IN_ROOM(ch))) && to_room != IN_ROOM(ch)) {
+			else if ((to_room = get_exit_room(room)) && to_room != room) {
 				size += snprintf(buf + size, sizeof(buf) - size, "%s%s\r\n", (cmd != -1 ? " " : ""), exit_description(ch, to_room, "Exit"));
 			}
 		}
