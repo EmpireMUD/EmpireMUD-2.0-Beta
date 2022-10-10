@@ -996,7 +996,212 @@ protect it as she eats. She's dressed in a loose-fitting gray sweater and
 an old skirt, from under which peaks a shining bronze leg.
 ~
 F 11800
+M
+7
+echo Annelise stirs her bowl slowly.~
+M
+7
+skip~
+M
+7
+echo Annelise stares off into space, idly watching the walls.~
+M
+7
+skip~
+M
+7
+echo Mageina brings Annelise a hot bowl and sets the cold one on the counter.~
+M
+7
+say Thank you, dear. How is your mother?~
+M
+7
+vforce 11805 say Oh, she passed. I thought I told you.~
+M
+7
+skip~
+M
+7
+say Oh, I'm so sorry, Mageina, I don't recall you saying. Are you doing alright?~
+M
+7
+vforce 11805 say Don't worry yourself; it was probably last time. She's been gone a while.~
+M
+7
+skip~
+M
+7
+vforce 11805 say And besides, we have more pressing issues to deal with.~
+M
+7
+skip~
+M
+7
+say Let me know if I can do anything.~
+M
+7
+skip~
+M
+7
+echo Annelise sips her soup.~
+M
+7
+skip~
+M
+7
+echo Annelise sips her soup.~
+M
+8
+echo Mageina flicks her wand toward a pot of soup, which starts stirring itself.~
+M
+8
+echo One of the pots of soup makes a loud pop and splatters everywhere, but Mageina catches it with her wand and casts it back into the pot.~
+M
+8
+say Good catch. I'd have been a mess.~
+M
+8
+vforce 11805 say Saw it coming.~
+M
+8
+skip~
+M
+8
+say What do you suppose is going on up there?~
+M
+8
+vforce 11805 say You've heard of Trixton Vye?~
+M
+8
+skip~
+M
+8
+say Oh my, yes, he was so handsome. I saw him once at a tournament at Reddanne, before he went mercenary.~
+M
+8
+vforce 11805 say He's hired Lady Virduke and a thief named Rojjer; they've taken the third floor.~
+M
+8
+skip~
+M
+8
+say They had better not be in my lab. If they make a mess...~
+M
+8
+vforce 11805 say Lise, your lab could not possibly be a bigger mess. You're giving Goef a run for his money.~
+M
+8
+skip~
+M
+8
+say I'm going to let that slide.~
+M
+8
+echo Mageina grabs a clean spoon, tastes one of the soups, then jabs her wand into it.~
+M
+8
+vforce 11805 say By the damn power of Skycleave, turn this goop in-to some soup.~
+M
+8
+skip~
+M
+8
+echo There's a burbling noise from the pot. Mageina tastes the soup again and makes a happier face.~
+M
+8
+vforce 11805 say I can never remember which one is the bad soup.~
+M
+8
+skip~
+M
+8
+vforce 11805 say Anyway, they were hired by Mezvienne. She brought them in disguised as her retinue.~
+M
+8
+skip~
+M
+8
+say No! I thought she was on our side. Josef invited her himself, didn't he?~
+M
+8
+vforce 11805 say That he did. They had planned to study the so-called heartwood of time.~
+M
+8
+skip~
+M
+8
+say I hate that thing. It's always given me the willies.~
+M
+8
+vforce 11805 say Well, I'm sure we'll be okay so long as it doesn't trap us in a permanent time loop, right?~
+M
+8
+skip~
+M
+8
+say Don't even joke about that.~
+M
+8
+vforce 11805 say I would never. Unfortunately it's deathly serious. More soup?~
+M
+8
+skip~
+M
+8
+say Yes, please. The good one.~
+M
+8
+vforce 11805 say They're all good now.~
+M
+9
+echo Mageina stacks some dirty bowls on the counter.~
+M
+9
+skip~
+M
+9
+vforce 11805 say Do you ever think about the old apprentices, Lise?~
+M
+9
+skip~
+M
+9
+say Oh, some of them.~
+M
+9
+vforce 11805 say Even the ones who didn't make it?~
+M
+9
+skip~
+M
+9
+say Especially those. Oh my.~
+M
+9
+say Why do you ask?~
+M
+9
+vforce 11805 say Oh, just thinking about the Trense boy. You remember him?~
+M
+9
+skip~
+M
+9
+say I always did feel terribly about that one. I owed him a favor.~
+M
+9
+vforce 11805 say Maybe there's still time.~
+M
+9
+skip~
+M
+9
+say Oh...~
+M
+9
+echo Annelise seems to fall silent.~
 T 11810
+T 11840
 S
 #11840
 Waltur walter magineer~
