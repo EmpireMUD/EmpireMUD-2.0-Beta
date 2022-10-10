@@ -1128,6 +1128,21 @@ sheet, allowing it to move effortlessly with its curved, boneless arms and legs.
 come from. The only thing you're sure about is that it doesn't want to be here.
 Perhaps you could free it, though there's no way to tell if it's friend or foe.
 ~
+M
+0
+$n roars and pulls at its chains.~
+M
+0
+$n rattles its chains.~
+M
+0
+You wince as $n pulls so hard at its chains its hands turn purple.~
+M
+0
+$n yanks at its chains.~
+M
+0
+$n wails loudly.~
 T 11834
 S
 #11835
@@ -1193,10 +1208,11 @@ Annelise is seated at one of the tables.
 0 0 bdvxA n 3
 2 0 0 15
 D
-   Annelise is seated at a bistro table with her back tucked into the corner
-of the cafe. She hugs her soup bowl in front of her with her arm, as if to
-protect it as she eats. She's dressed in a loose-fitting gray sweater and
-an old skirt, from under which peaks a shining bronze leg.
+   Annelise, the youngest sorcerer you've met in the tower, is seated at a
+bistro table with her back tucked into the corner of the cafe. She hugs her
+soup bowl in front of her with her arm, as if to protect it as she eats. She's
+dressed in a loose-fitting gray sweater and an old skirt, from under which
+peeks a shining bronze leg.
 ~
 F 11800
 M
@@ -1675,6 +1691,24 @@ mod longdesc Kara Virduke is holding her staff in the air, channeling mana from 
 M
 7
 emote $n raises her staff and begins channeling mana.~
+M
+1
+Well, are you just going to stand there?~
+M
+1
+This is where you end.~
+M
+1
+I've killed dozens that look just like you.~
+M
+1
+You cannot honestly think you're getting out of this.~
+M
+0
+$n seems to be channeling mana from the cabinets.~
+M
+0
+Waves of mana pulse toward $n.~
 T 11813
 T 11847
 T 11823

@@ -920,6 +920,21 @@ could receive the best education. But when the younger Dylane couldn't stop
 spilling potions on the fine ebony floors, he amounted to little more than a
 disappointment to the tower.
 ~
+M
+0
+$n swishes around.~
+M
+0
+$n wrings itself out.~
+M
+0
+$n spins around the floors.~
+M
+0
+$n shakes itself off.~
+M
+0
+$n sounds like it's crying.~
 T 11902
 T 11934
 T 11810
@@ -942,6 +957,12 @@ sheet, allowing it to move effortlessly with its curved, boneless arms and legs.
    There's no way to tell which of the many worlds this creature might have
 come from. The only thing you're sure about is that it doesn't want to be here.
 ~
+M
+0
+$n rattles its chains.~
+M
+0
+$n pulls at its chains.~
 T 11834
 T 11810
 S
@@ -1142,6 +1163,9 @@ $n zaps a cobweb and then tucks it into her pocket.~
 M
 0
 $n blasts at a bit of dust but it just seems to settle elsewhere.~
+M
+0
+$n makes a clunking noise as she walks.~
 T 11810
 S
 #11940

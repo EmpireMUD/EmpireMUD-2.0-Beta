@@ -1816,6 +1816,7 @@ if %self.vnum% == 11933
   set annelise %self.room.people(11939)%
   nop %self.add_mob_flag(SILENT)%
   nop %self.add_mob_flag(SENTINEL)%
+  nop %annelise.add_mob_flag(SILENT)%
   wait 1
   %echo% ~%self% marches in from the north.
   wait 3 sec
@@ -1853,6 +1854,7 @@ if %self.vnum% == 11933
   %force% %annelise% say Okay, on with you, get out of here before the grand high sorcerer catches you lacking.
   wait 3 sec
   %echo% The boy wastes no more time and darts out of the room. The last you hear of him is clambering down the stairs.
+  nop %annelise.remove_mob_flag(SILENT)%
   %purge% %self%
 end
 ~
