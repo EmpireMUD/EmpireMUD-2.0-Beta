@@ -185,7 +185,26 @@ are in short supply in Skycleave. As she tidies the room, you notice most of
 her left hand has been replaced with intricate nocturnium filigree.
 ~
 F 11800
+M
+7
+say Oh no, no more people. We are full positively to the roof.~
+M
+7
+say Not an inch of space.~
+M
+0
+$n shuffles across the room trying to keep things in order.~
+M
+0
+$n folds a sheet.~
+M
+0
+$n waves $s wand and sweeps some dust away.~
+M
+0
+$n makes a harrumph sound.~
 T 11810
+T 11806
 S
 #11807
 #n~
@@ -727,6 +746,144 @@ himself haphazardly, such that it's only covering part of his robed body,
 though he doesn't seem to be trying to sleep.
 ~
 F 11800
+M
+0
+$n coughs.~
+M
+7
+skip~
+M
+7
+skip~
+M
+7
+say So I was walking along this rooftop, and all the buildings are interconnected...~
+M
+7
+say And I'm walking up and down ramps when I realize I'm just completely surrounded by goblins.~
+M
+7
+vforce 11813 say In your dream?~
+M
+7
+say Right. Anyway, I duck down into one of the buildings, and it's this ugly little white house.~
+M
+7
+say And as I get inside, I see this fox, and it sees me, and I freeze, and it keeps watching at me, just snarling...~
+M
+7
+say A real mean thing. I climbed halfway back up the ladder by the time it got over to me, barking mad.~
+M
+7
+vforce 11813 say Stuck between a fox and a goblin? If only you were a wizard, Ravi.~
+M
+7
+say Haw, haw. I didn't have my wand or my staff. I ended up sprinting across the rooftops, but I couldn't get away from the goblins.~
+M
+7
+skip~
+M
+7
+vforce 11806 say Well, skip to it, lad, what did you do?~
+M
+7
+vforce 11813 say Don't make us suffer.~
+M
+7
+say I tripped and fell off the edge of the city and pinched myself awake before I hit rock bottom.~
+M
+8
+skip~
+M
+8
+skip~
+M
+8
+say There was another one where I was in a pit fight against a trio of real nasty goblins.~
+M
+8
+vforce 11813 say Nother dream?~
+M
+8
+say It seemed so real. Thousands of goblins looking down, chanting and cheering as I was forced to fight for my life.~
+M
+8
+vforce 11813 say Were these giant goblins, Rav?~
+M
+8
+say Regular size, but there were three of them. Hammer-Goblin came at me first...~
+M
+8
+say I was just, left, right, left, right, dodging the hammers... Got a lucky trip in and down he went.~
+M
+8
+vforce 11813 say But leaving two vicious little goblins and just you, one lone sorcerer.~
+M
+8
+say Without my wand.~
+M
+8
+vforce 11813 say Without your wand.~
+M
+8
+say So the next one, Axe-Goblin, comes flying at me out of nowhere, and I duck and she goes straight into the sand...~
+M
+8
+vforce 11813 say She?~
+M
+8
+say Meanwhile the third one, Whip-Goblin, is coming fierce, whip left, whip right, cutting me up...~
+M
+8
+vforce 11813 say And did you beat her?~
+M
+8
+say I woke up.~
+M
+8
+vforce 11813 say You ever consider whether anybody wants to hear about your dreams in the first place?~
+M
+8
+echo Ravinder just rolls his eyes.~
+M
+9
+skip~
+M
+9
+skip~
+M
+9
+vforce 11806 say I actually had a dream about two leprechauns and a dracosaur.~
+M
+9
+vforce 11813 say See what you've done, Rav?~
+M
+9
+echo Instructor Huberus goes back to what she was doing.~
+M
+10
+skip~
+M
+10
+skip~
+M
+10
+say The funny thing is, I haven't had the dream since we've been down here.~
+M
+10
+vforce 11813 say Hasn't stopped you from talking about it.~
+M
+10
+say It's been a bit of a relief. I was having it every single night.~
+M
+10
+vforce 11806 say Couldn't help but overheard that, lad. You might try a dreamcatcher.~
+M
+10
+say Have one handy?~
+M
+10
+vforce 11806 say Well I'm sure we can scrounge one up once all this to-do is to-done.~
 T 11810
 T 11807
 T 11851
