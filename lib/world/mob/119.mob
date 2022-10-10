@@ -1109,6 +1109,39 @@ large eyes. There's a slight clunking sound as she walks around the lab owing
 to her bronze leg.
 ~
 F 11800
+M
+0
+$n zaps a small fan, which flies up into the air and starts waving at $m.~
+M
+0
+$n tries to fix a pile of rubbish with her foot.~
+M
+1
+Oh, fiddlesticks...~
+M
+1
+Oh, bother...~
+M
+1
+Oh, dear...~
+M
+0
+$n pushes some old toasters into the corner.~
+M
+0
+$n starts straightening up the lab, but quickly becomes frazzled.~
+M
+1
+Back in my day we kept things clean.~
+M
+0
+$n jumps at the sight of a mouse in the corner. She shoots a bolt of blue light at it and it turns into a doorstop.~
+M
+0
+$n zaps a cobweb and then tucks it into her pocket.~
+M
+0
+$n blasts at a bit of dust but it just seems to settle elsewhere.~
 T 11810
 S
 #11940
@@ -1130,6 +1163,33 @@ F 11800
 M
 7
 say Now that all that nastiness is done, I have some things that might interest you. (list)~
+M
+0
+A little tower turns toward you.~
+M
+0
+There's a loud pop and a shattering noise from one of the bins.~
+M
+0
+You feel a tap on the shoulder, but when you look there's nothing there but a vine.~
+M
+0
+$n etches a piece of glass with a strange shard.~
+M
+0
+$n taps the small tower with $s wand; it shrinks almost an inch.~
+M
+0
+$n carefully measures a pair of shards.~
+M
+1
+Hmm...~
+M
+1
+Hmm...~
+M
+1
+Hmm...~
 T 11806
 T 11810
 S

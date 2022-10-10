@@ -1201,8 +1201,8 @@ switch %self.vnum%
     end
     %echo% ~%self% dissolves as the shadows are cast out!
     * set room desc back
-    %mod% %self.room% description This windowed office is the highest in the tower, a place for the greatest sorcerer to watch over their charges. It has a massive calamander bookshelf along one wall and plush rugs
-    %mod% %self.room% append-description cover the checkerboard marble floor. An extravagant nocturnium chandelier hangs from the ceiling. Near the door, a painting of three sorcerers hangs in a gold frame.
+    %mod% %self.room% description This dimly-lit office, the highest in the tower, reeks of decay. Little light filters in through the doorway; if there are any windows here, they must
+    %mod% %self.room% append-description be closed; you can't even see them through the shadows. The wooden corners of furniture peek out from the shadows, but you can see few distinct shapes.
     return 0
   break
   case 11867
@@ -1226,6 +1226,9 @@ switch %self.vnum%
       %purge% %shadow%
     end
     %echo% ~%self% dissolves as the shadows are cast out!
+    * clean room desc
+    %mod% %self.room% description This dimly-lit office, the highest in the tower, reeks of decay. Little light filters in through the doorway; if there are any windows here, they must
+    %mod% %self.room% append-description be closed; you can't even see them through the shadows. The wooden corners of furniture peek out from the shadows, but you can see few distinct shapes.
     * swap Knezzes
     set knezz %instance.mob(11868)%
     if %knezz%
@@ -3432,9 +3435,9 @@ end
 set ch %room.people%
 while %ch%
   set next_ch %ch.next_in_room%
-  if %ch.nohassle% || (%ch.vnum% >= 11890 && %ch.vnum% <= 11899)
-    * nothing (11890-11899 are mobs involved in phase change)
-  elseif %ch.is_pc% || %ch.vnum% < 11800 || %ch.vnum% > 11999 || %ch.aff_flagged(*CHARM)%
+  if %ch.nohassle% || (%ch.vnum% >= 11894 && %ch.vnum% <= 11899)
+    * nothing (11894-11899 are mobs involved in phase change)
+  elseif %ch.is_pc% || !%ch.linked_to_instance% || %ch.aff_flagged(*CHARM)%
     * Move ch
     %teleport% %ch% %to_room%
     %load% obj 11805 %ch%
@@ -5167,10 +5170,10 @@ done
 set ch %room.people%
 while %ch%
   set next_ch %ch.next_in_room%
-  if %ch.nohassle% || (%ch.vnum% >= 11890 && %ch.vnum% <= 11899)
-    * nothing (11890-11899 are mobs involved in phase change)
-  elseif %ch.is_pc% || %ch.vnum% < 11800 || %ch.vnum% > 11988
-    * Move ch (stops at 11988 because of minipets from this adventure)
+  if %ch.nohassle% || (%ch.vnum% >= 11894 && %ch.vnum% <= 11899)
+    * nothing (11894-11899 are mobs involved in phase change)
+  elseif %ch.is_pc% || !%ch.linked_to_instance%
+    * Move ch
     %teleport% %ch% %to_room%
     %load% obj 11805 %ch%
     * check quest completion
