@@ -706,12 +706,12 @@ void update_biting_char(char_data *ch) {
 			add_lore(victim, LORE_PLAYER_DEATH, "Slain by %s", PERS(ch, ch, TRUE));
 		}
 
-		GET_FED_ON_BY(victim) = NULL;
-		GET_FEEDING_FROM(ch) = NULL;
-
 		check_scaling(victim, ch);	// ensure scaling
 		tag_mob(victim, ch);	// ensures loot binding if applicable
 		corpse = die(victim, ch);
+		
+		GET_FED_ON_BY(victim) = NULL;
+		GET_FEEDING_FROM(ch) = NULL;
 		
 		// tag corpse
 		if (corpse && !IS_NPC(ch)) {
