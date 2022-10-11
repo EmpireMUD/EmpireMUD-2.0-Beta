@@ -1526,13 +1526,9 @@ elseif %self.vnum% == 11827
   if !%djon%
     halt
   end
-  if %self.varexists(line)%
-    eval line %self.line% + 1
-  else
-    set line 1
-  end
+  eval line %self.var(line,0)% + 1
   if %line% > 2
-    set line 2
+    set line 1
   end
   remote line %self.id%
   switch %line%
