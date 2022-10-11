@@ -70,13 +70,19 @@ wrapped in a pastry shell and baked until golden. Once the traditional meal of
 miners across the land, it's now enjoyed mainly in bourgeois cafes and
 gentrified food carts.
 ~
-6 m a 0 4
+6 m a 0 5
 24 0 0
 7 336
 A
 15 1 0
 C
 50 50
+M
+4
+You bite into the pasty and realize it's not just mutton and vegetables, it's a full meal! You even taste blueberry pie as you swallow.~
+M
+5
+$n's eyes roll back into $s head as $e eats $p.~
 S
 #11905
 cheese turquoise exotic~
@@ -92,13 +98,19 @@ animals, something usually seen as the vulgar purview of nature magic. Some
 sorcerers are eager to create new products or conveniences, with little regard
 for traditional ethics.
 ~
-6 m a 0 6
+6 m a 0 7
 24 0 0
 7 336
 A
 16 1 0
 C
 50 50
+M
+4
+You pop the turquoise cheese in your mouth and suddenly live an entire life as a goat on a farm by the sea, grazing on grass, living your best life. For a moment, at least.~
+M
+5
+$n's face goes blank and $e seems to space out for a moment as $e eats $p.~
 S
 #11906
 fountain stone~
@@ -590,11 +602,17 @@ trail of crumbs behind you.
 two children are abandoned by their parents and leave a trail of breadcrumbs to
 find their way through the forest.
 ~
-6 p a 0 4
+6 p a 0 5
 12 0 0
 7 48
 C
 50 50
+M
+4
+You spend an eternity trying to chew and swallow the crummy bread, as it absorbs any moisture that was in your mouth.~
+M
+5
+$n chews and chews and chews some crummy bread.~
 S
 #11930
 breadcrumbs crumbs trail~
@@ -1139,7 +1157,7 @@ some steamed mussels~
 Some steamed mussles are lying on the ground.~
 The mussels have a fragrant riparian smell.
 ~
-6 m a 0 5
+6 m a 0 6
 24 0 0
 7 48
 A
@@ -1148,6 +1166,12 @@ A
 6 2 0
 C
 1 100
+M
+4
+You pry open some steamed mussels and eat them.~
+M
+5
+$n pries open $p and eats them.~
 O+ 1 6220
 S
 #11978
@@ -1157,9 +1181,12 @@ Some mussels have been left on the ground.~
    The mussels are small shellfish with blue-black shells. They smell like the
 river but you could certainly cook them up.
 ~
-6 0 a 0 4
+6 0 a 0 5
 6 0 0
 7 48
+M
+4
+You eat some slimy mussels fresh from the shells.~
 O+ 1 6200
 S
 #11979
@@ -1201,9 +1228,15 @@ Piles of clams, oysters, and scallops are stacked around the cauldrons.~
 here. Though you can see oysters, scallops, and even mussels, by far the most
 numerous piles here are clams.
 ~
-6 0 0 0 5
+6 0 0 0 7
 500 0 0
 7 0
+M
+4
+You take a sample of clams, oysters, and scallops from the pile and eat them one by one.~
+M
+5
+$n eats some shellfish from the pile.~
 S
 #11981
 barrel water ladle~
@@ -1627,10 +1660,16 @@ A piece of jade cheese is lying on the ground.~
 a distinctly marbled jade color, but it tastes like a slightly funky cheese.
 tba flavor text
 ~
-6 g a 0 6
+6 g a 0 7
 6 0 0
 7 12
 B
 L
+M
+4
+You pop $p in your mouth and the world seems to turn green for a second as you swallow it.~
+M
+5
+$n pops $P in $s mouth and flashes green for a second.~
 S
 $

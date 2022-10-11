@@ -1531,8 +1531,8 @@ elseif %self.vnum% == 11827
   else
     set line 1
   end
-  if %line% > 1
-    set line 1
+  if %line% > 2
+    set line 2
   end
   remote line %self.id%
   switch %line%
@@ -1565,7 +1565,44 @@ elseif %self.vnum% == 11827
       wait 9 s
       %echo% ~%self% and ~%djon% sip their tea.
     break
-    *** HERE
+    case 2
+      say Did you see Regin with the mercs?
+      wait 9 s
+      %force% %djon% say No! Wait, Regin Dall?
+      wait 9 s
+      say Didn't you two used to date?
+      wait 9 s
+      %force% %djon% say  Barely. Honestly he doesn't even count.
+      wait 9 s
+      say Wasn't it for three months?
+      wait 9 s
+      %force% %djon% say Honestly, Marina, you remember the most trivial things.
+      wait 9 s
+      %force% %djon% say And honestly, I'm not counting any dalliances before I came to the tower.
+      wait 9 s
+      say Okay, but that's still a lot of dalliances.
+      wait 9 s
+      %force% %djon% say New topic! Did I or did I not see you and Tyrone studying in the bunkroom three nights ago?
+      wait 9 s
+      say New topic! Are you keeping your hair like that or was that an accident?
+      wait 9 s
+      %force% %djon% say Wow, okay, new topic. Wait, what's wrong with my hair?
+      wait 9 s
+      say It looks like you got hit by a rebounding flow-bee charm.
+      wait 9 s
+      %force% %djon% say Okay, I wasn't going to say anything, but your eyebrows are uneven.
+      wait 9 s
+      say At least I know how to fix it.
+      wait 9 s
+      %echo% ~%self% points her wand at her forehead and her eyebrows even themselves out.
+      wait 9 s
+      %force% %djon% say Well I like it like this.
+      wait 9 s
+      %echo% ~%djon% waits until the barista turns her back and then twirls his wand in his teacup, which quickly refills itself.
+      wait 3 s
+      %echo% ~%djon% holds a finger to his lips and makes a shushing sound.
+    break
+    *** TODO more here
   done
 end
 * enforce a short wait on the room with a var
