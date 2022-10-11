@@ -151,7 +151,7 @@ The barista seems to be daydreaming behind the bar. (list)
 2 0 0 16
 D
    Mageina hardly spares you a glance as she leans behind the bar, idly
-spinning her cinnamon wand. Her hat, a comically oversized black cone with a
+spinning her gnarled old wand. Her hat, a comically oversized black cone with a
 wide brim, droops over her brown and violet hair, which is pinned up in loose
 curls. Her black apron matches the hat, but for its stylized Tower Skycleave
 logo.
@@ -160,7 +160,7 @@ logo.
 F 11800
 M
 0
-$n points a stick of cinnamon at a mug and heats it with a wild, cackling flame!~
+$n points her gnarled old wand at a mug and heats it with a wild, cackling flame!~
 M
 0
 $n twirls her wand idly.~
@@ -2259,8 +2259,9 @@ sported by many a powerful sorcerer who spent more time over a book than a wash
 basin. The long years hang off his face. Between his bushy eyebrows and thick
 crescent glasses, his eyes have the milky blue color of age. He stands tall
 despite it, in violet and gold robes, with two nocturnium studs in his ear and
-several nocturnium beads in his beard. If he carries anything else on his
-person, it's covered by the robes.
+several nocturnium beads in his beard. Aside from the gnarled wooden wand
+dangling from his belt, if he carries anything else on his person, it's covered
+by the robes.
    Type 'list', 'list id', or 'buy' to see and purchase caster equipment
 patterns.
 ~
@@ -2337,7 +2338,8 @@ D
 violet, lavender, and lilac. She has dyed a pair of stripes in black and gold
 in the cloud of gray hair surrounding her rounded, brown face. A trio of violet
 gems hovers beneath each of her ears and she wears a nocturnium stud on the
-right side of her short, rounded nose.
+right side of her short, rounded nose. Tucked into her sash, she has a gnarled
+old wand.
 ~
 F 11800
 M
