@@ -1136,7 +1136,7 @@ EVENTFUNC(trig_wait_event) {
 
 void do_stat_trigger(char_data *ch, trig_data *trig) {
 	struct cmdlist_element *cmd_list;
-	char sb[MAX_STRING_LENGTH], buf[MAX_STRING_LENGTH];
+	char sb[MAX_STRING_LENGTH * 2], buf[MAX_STRING_LENGTH], temp[MAX_STRING_LENGTH];
 	int len = 0;
 
 	if (!trig) {
@@ -1184,12 +1184,15 @@ void do_stat_trigger(char_data *ch, trig_data *trig) {
 
 	cmd_list = trig->cmdlist;
 	while (cmd_list) {
-		if (cmd_list->cmd)
-			len += snprintf(sb + len, sizeof(sb)-len, "%s\r\n", show_color_codes(cmd_list->cmd));
-
-		if (len > MAX_CMD_LENGTH) {
-			len += snprintf(sb + len, sizeof(sb)-len, "*** Overflow - script too long! ***\r\n");
-			break;
+		if (cmd_list->cmd) {
+			strcpy(temp, show_color_codes(cmd_list->cmd));
+			if (len + strlen(temp) + 2 < sizeof(sb)) {
+				len += snprintf(sb + len, sizeof(sb)-len, "%s\r\n", temp);
+			}
+			else {
+				len += snprintf(sb + len, sizeof(sb)-len, "*** Overflow - script too long! ***\r\n");
+				break;
+			}
 		}
 		
 		cmd_list = cmd_list->next;
