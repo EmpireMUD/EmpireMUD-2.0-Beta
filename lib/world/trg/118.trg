@@ -1415,22 +1415,16 @@ Skycleave: Floor 1B tourist dialogue~
 0 bw 20
 ~
 set room %self.room%
-wait 2 sec
+wait 2 s
 if %self.room% != %room%
   halt
 end
 * check time limits
-if %room.varexists(speak_time)%
-  if %room.speak_time% + 30 > %timestamp%
-    halt
-  end
-end
 set varname last_%room.template%
-if %self.varexists(%varname%)%
-  eval last %self.var(%varname%)%
-  if %last% + 150 > %timestamp%
-    halt
-  end
+if %self.var(%varname%,0)% + 150 > %timestamp%
+  halt
+elseif %room.var(speak_time,0)% + 30 > %timestamp%
+  halt
 end
 * by mob vnum
 if %self.vnum% == 11824 || %self.vnum% == 11826
@@ -1521,13 +1515,13 @@ elseif %self.vnum% == 11822
     break
   done
 elseif %self.vnum% == 11827
-  * Chatty couple: Apprentices Marina 11827 + Djon 11828
+  * Marina 11827 + Djon 11828 / cafe
   set djon %room.people(11828)%
   if !%djon%
     halt
   end
   eval line %self.var(line,0)% + 1
-  if %line% > 2
+  if %line% > 3
     set line 1
   end
   remote line %self.id%
@@ -1597,11 +1591,53 @@ elseif %self.vnum% == 11827
       %echo% ~%djon% waits until the barista turns her back and then twirls his wand in his teacup, which quickly refills itself.
       wait 3 s
       %echo% ~%djon% holds a finger to his lips and makes a shushing sound.
+      wait 9 s
+      %force% %djon% say So are you still sneaking off with Alastair?
+      wait 9 s
+      say No, oh my god, you didn't hear?
+      wait 9 s
+      %force% %djon% say Oh no, did he die in the invasion?
+      wait 9 s
+      say No, they turned him into a feather duster!
+      wait 9 s
+      %force% %djon% say They did not! At least he'll be quieter, though. He was a real know-it-all.
+      wait 9 s
+      say That's not funny, Djon. What if he was my soulmate?
+      wait 9 s
+      %force% %djon% say Just sprinkle some dust on yourself.
     break
-    *** TODO more here
+    case 3
+      set wright %instance.mob(11914)%
+      say I'm glad they're getting the tower cleaned up. I did not come to study in some run-down old heap.
+      wait 9 s
+      %force% %djon% say Right? Floor 2 was a wreck. The pixies totally overran it. We're lucky they didn't get out of the tower.
+      wait 9 s
+      if %wright%
+        say I saw Old Wright helping the warden wrangle them. Where were they when the whole thing was overrun?
+        wait 9 s
+        %force% %djon% say Glad I missed it.
+        wait 9 s
+        say He took care of the goblins, too. He's worked here for like 50 years.
+      else
+        say I heard Old Wright couldn't round up even a single goblin afterward.
+        wait 9 s
+        %force% %djon% say They are going to fire him.
+        wait 9 s
+        say They turned him into a sponge!
+        wait 9 s
+        %force% %djon% say They did not! He's worked here for like 50 years.
+      end
+      wait 9 s
+      set mageina %room.people(11905)5
+      %force% %mageina% say More like 100 at this point.
+      wait 9 s
+      %force% %djon% say Wow, rude.
+      wait 9 s
+      say Rude.
+    break
   done
 end
-* enforce a short wait on the room with a var
+* short wait on room with var
 set speak_time %timestamp%
 remote speak_time %room.id%
 set last_%room.template% %timestamp%
