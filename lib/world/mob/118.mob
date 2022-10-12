@@ -727,6 +727,24 @@ You can buy a pixy jar!~
 M
 0
 $n picks up a skycleaver trinket but it starts to glow and $e puts it back down fast.~
+M
+0
+$n picks up a phial from the Blacktower rack and opens it, but quickly puts the cork back in and sets it down.~
+M
+0
+$n shakes a couple of pixy jars, but they sound empty.~
+M
+0
+$n watches a pair of fire bugs nestle in a tinderbox.~
+M
+1
+Wow, is this calamander?~
+M
+1
+I've always wanted to try the Blacktower phials but they make me nervous.~
+M
+1
+Where do I even get skystones?~
 T 11828
 T 11810
 S
@@ -966,6 +984,18 @@ The old skycleaver trinket was better.~
 M
 0
 $n mills around the shop.~
+M
+1
+These Blacktower potions are madly overpriced.~
+M
+1
+I saw the fire bugs. Are you also selling home insurance?~
+M
+1
+The pixy thing seems cruel.~
+M
+1
+As if we need any of this.~
 T 11828
 T 11810
 S

@@ -2197,9 +2197,9 @@ if %actor.char_target(%arg.car%)% == %self%
 end
 ~
 #11936
-Skycleave: Room commands (Lich Labs, Goblin Cages, Gate)~
+Skycleave: Room commands (Lich Labs, Goblin Cages, Gate, Ossuary)~
 2 c 0
-touch open disturb wake awaken search attune~
+touch open disturb wake awaken search attune look~
 set lich_cmds touch open disturb wake awaken search
 return 0
 if attune /= %cmd% && %room.template% == 11841
@@ -2239,6 +2239,16 @@ elseif (%lich_cmds% ~= %cmd%) && (%room.template% == 11836 || %room.template% ==
       set ch %next_ch%
     done
     %echo% The spirit returns to the desk, which slams shut with a thud!
+  end
+elseif look /= %cmd% && %room.template% == 11981
+  return 0
+  wait 0
+  if skulls /= %arg% || shelves /= %arg%
+    %force% %actor% scriptwake skulls
+  elseif walls /= %arg% || alcoves /= %arg%
+    %force% %actor% scriptwake alcoves
+  elseif bones /= %arg% || ribs /= %arg% || femurs /= %arg% || piles /= %arg%
+    %force% %actor% scriptwake bones
   end
 end
 ~
@@ -2808,14 +2818,14 @@ end
 #11945
 Skycleave Dreams: Triple Wake or Pinch Self to Exit~
 2 c 0
-wake pinch~
+wake pinch scriptwake~
 * Teleports the player home if they type 'wake' 3 times while already awake
-* also accepts 'pinch <me/self/name>'
+* also accepts 'pinch <me/self/name>' or 'scriptwake MODE'
 if !%actor.is_pc%
   return 0
   halt
 end
-if %actor.position% == Standing || %actor.position% == Resting || %actor.position% == Sitting
+if %actor.position% == Standing || %actor.position% == Resting || %actor.position% == Sitting || %cmd% == scriptwake
   * separate behavior for pinch vs wake:
   if %cmd.mudcommand% == wake
     * 'wake': first two times fail
@@ -2835,7 +2845,7 @@ if %actor.position% == Standing || %actor.position% == Resting || %actor.positio
       %send% %actor% You wake up with the hazy feeling you were just somewhere else.
       %echoaround% %actor% ~%actor% lets out a snore and then fades away until &%actor% vanishes!
     end
-  else
+  elseif pinch /= %cmd%
     * 'pinch': must target self/me/name
     if !%arg% || (%arg% != me && %arg% != self && %actor.char_target(%arg%)% != %actor%)
       * if they aren't pinching themselves, let the pinch social handle it
@@ -2845,6 +2855,28 @@ if %actor.position% == Standing || %actor.position% == Resting || %actor.positio
       %send% %actor% You pinch yourself -- OUCH -- and suddenly wake up!
       %echoaround% %actor% ~%actor% pinches *%actor%self, lets out a short gasp, and vanishes!
     end
+  elseif %cmd% == scriptwake
+  set scare_kws skulls shelves walls alcoves bones ribs femurs piles
+    switch %arg%
+      case skulls
+        %echoaround% %actor% ~%actor% jumps backwards, bumps into the wall, and vanishes!
+      break
+      case bones
+        %echoaround% %actor% ~%actor% falls into a pile of bones and vanishes!
+      break
+      case alcoves
+        %echoaround% %actor% ~%actor% jumps suddenly and vanishes!
+      break
+      default
+        * unknown
+        return 0
+        halt
+      break
+    done
+    %send% %actor% You wake up in a cold sweat!
+  else
+    return 0
+    halt
   end
   * If we made it this far, we teleport them:
   set room %actor.room%
@@ -4569,14 +4601,18 @@ if %cmd.mudcommand% == adventure
   %send% %actor% \&0 time you want.
   %send% %actor% (type 'adventure skycleave' to see the description for the main adventure)
 elseif %cmd.mudcommand% == time
-  if %indoor_list% ~= %room.template%
+  if %room.template% == 11981
+    %send% %actor% It's hard to tell what time it is with so little light making it down here.
+  elseif %indoor_list% ~= %room.template%
     %send% %actor% It's roughly noon, with the sun streaming in through the roof.
   else
     %send% %actor% It's roughly noon, with the sun high in the sky.
   end
   return 1
 elseif %cmd.mudcommand% == weather
-  if %indoor_list% ~= %room.template%
+  if %room.template% == 11981
+    %send% %actor% It's hard to tell the weather from in here.
+  else if %indoor_list% ~= %room.template%
     %send% %actor% It's hard to tell the weather from in here, but a lot of sun is coming from above.
   else
     %send% %actor% The sky is cloudless and sunny.

@@ -511,6 +511,31 @@ E
 east archway doorway stairs stairway~
 To the east, the archway leads out to central chamber and the stairs.
 ~
+E
+jars pixy pixies novelty~
+   There is a shelf that's covered end to end with brown and purple pixy jars.
+They seem to be a mere novelty, as none of them contain actual pixies.
+~
+E
+trinkets skycleaver~
+Bins full of little blue tower-shaped stones sit on several shelves.
+~
+E
+phials potions blacktower waterwalking perfect sight lighter burdens rack~
+   A large display rack shows off rows of black glass phials sold under the
+Blacktower imprint. They come in three varieties: waterwalking, perfect sight,
+and lighter burdens.
+~
+E
+bugs beetles fire tinderbox box scarabs~
+   Some of the shelves are covered in tinderboxes, each with a fire bug nestled
+comfortably inside. They look rather like scarab beetles that have been set on
+fire, but it doesn't seem to bother them.
+~
+E
+seedling stone calamander striped~
+There are striped stone seedlings for sale.
+~
 M 1 11908 100.00 1
 S
 #11908
@@ -4606,6 +4631,9 @@ skulls shelves~
    The skulls are small and severe, with oddly square eye sockets. Strangely,
 the teeth have been removed. They are packed tightly on long shelves that cover
 one of the walls.
+   As you look at the shelves, you turn your head and find yourself inches from
+a skull with its eye socket shattered and caved in! You jump backwards, bumping
+into something sharp, and a chill runs down your spine!
 ~
 E
 teeth tooth~
@@ -4614,7 +4642,10 @@ There are no teeth here, not in any of the skulls.
 E
 bones ribs femurs piles~
    The bones have been sorted, organized, and stacked. Not a single skeleton
-remains intact anywhere in the ossuary.
+remains intact anywhere in the ossuary. As you examine one of the piles, you
+bump something hanging on the wall and a bony hand falls onto your shoulder!
+   A chill runs down your spine as you fall into another pile of bones, unable
+to catch yourself!
 ~
 E
 goblins~
@@ -4629,11 +4660,14 @@ The rock floor is covered in thick dust.
 E
 walls alcoves~
    The walls are cut from the rock itself, including the skull shelves and
-alcoves that hold sorted piles of bones.
+alcoves that hold sorted piles of bones. As you feel around in one of the
+barely-lit alcoves, something bites down on your hand and you jump three feet
+in the air!
 ~
 T 11945
 T 11946
 T 11976
+T 11936
 S
 #11982
 The Central Plaza of the Eastern Rooftop Walkway~
