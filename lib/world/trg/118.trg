@@ -1419,7 +1419,6 @@ wait 2 s
 if %self.room% != %room%
   halt
 end
-* check time limits
 set varname last_%room.template%
 if %self.var(%varname%,0)% + 150 > %timestamp%
   halt
@@ -1428,7 +1427,6 @@ elseif %room.var(speak_time,0)% + 30 > %timestamp%
 end
 * by mob vnum
 if %self.vnum% == 11824 || %self.vnum% == 11826
-  * shop patrons wander until they find the shop
   if %room.template% == 11907
     nop %self.add_mob_flag(SENTINEL)%
     nop %self.remove_mob_flag(SILENT)%
@@ -1443,7 +1441,6 @@ elseif %self.vnum% == 11801
   end
   halt
 elseif %self.vnum% == 11803
-  * self-proclaimed expert
   switch %room.template%
     case 11905
       say Ah, the famous Fendreciel Cafe... They are positively known for their cocoa van.
@@ -1468,7 +1465,6 @@ elseif %self.vnum% == 11803
     break
   done
 elseif %self.vnum% == 11809
-  * thinks he's somewhere else
   switch %room.template%
     case 11905
       say Oh wow, I've never been to a Gordon Ram's Head restaurant before!
@@ -1493,7 +1489,6 @@ elseif %self.vnum% == 11809
     break
   done
 elseif %self.vnum% == 11822
-  * casing the joint for next time
   switch %room.template%
     case 11902
       %echo% ~%self% pulls out a small notebook and sketches the stairs and walkway from across the chamber.
@@ -1515,7 +1510,6 @@ elseif %self.vnum% == 11822
     break
   done
 elseif %self.vnum% == 11827
-  * Marina 11827 + Djon 11828 / cafe
   set djon %room.people(11828)%
   if !%djon%
     halt
