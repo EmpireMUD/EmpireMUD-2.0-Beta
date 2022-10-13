@@ -8757,21 +8757,25 @@ int wordcount_extra_descriptions(struct extra_descr_data *list) {
 
 
 /**
-* Counts the number of words in a string, separated by whitespace.
+* Counts the number of words in a string, separated by whitespace. Only words
+* containing alpha/numeric characters are counted; pure punctuation is ignored.
 *
 * @param const char *string The string to count words in.
 * @return int The number of words in the string.
 */
 int wordcount_string(const char *string) {
 	int pos, count = 0;
+	bool counted_word = FALSE;
+	
 	if (string) {
 		for (pos = 0; string[pos]; ++pos) {
 			if (isspace(string[pos]) && string[pos+1] && !isspace(string[pos+1])) {
-				++count;
+				counted_word = FALSE;
 			}
-		}
-		if (*string) {
-			++count;	// to include the first word
+			else if (!counted_word && (isalpha(string[pos]) || isdigit(string[pos]))) {
+				++count;
+				counted_word = TRUE;
+			}
 		}
 	}
 	return count;
