@@ -1405,6 +1405,23 @@ void smart_copy_quest_rewards(struct quest_reward **to_list, struct quest_reward
 }
 
 
+/**
+* Counts the words of text in a quest's strings.
+*
+* @param quest_data *quest The quest whose strings to count.
+* @return int The number of words in the quest's strings.
+*/
+int wordcount_quest(quest_data *quest) {
+	int count = 0;
+	
+	count += wordcount_string(QUEST_NAME(quest));
+	count += wordcount_string(QUEST_DESCRIPTION(quest));
+	count += wordcount_string(QUEST_COMPLETE_MSG(quest));
+		
+	return count;
+}
+
+
  //////////////////////////////////////////////////////////////////////////////
 //// LOOKUP HANDLERS /////////////////////////////////////////////////////////
 

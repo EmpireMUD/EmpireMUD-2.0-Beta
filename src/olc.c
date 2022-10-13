@@ -4204,7 +4204,6 @@ OLC_MODULE(olc_wordcount) {
 				}
 				break;
 			}
-/*
 			case OLC_PROGRESS: {
 				progress_data *prg, *next_prg;
 				HASH_ITER(hh, progress_table, prg, next_prg) {
@@ -4244,6 +4243,7 @@ OLC_MODULE(olc_wordcount) {
 				}
 				break;
 			}
+			/*
 			case OLC_SECTOR: {
 				sector_data *sect, *next_sect;
 				HASH_ITER(hh, sector_table, sect, next_sect) {

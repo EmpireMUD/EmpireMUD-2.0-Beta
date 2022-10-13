@@ -784,6 +784,23 @@ bool valid_room_template_vnum(rmt_vnum vnum) {
 }
 
 
+/**
+* Counts the words of text in a room template's strings.
+*
+* @param room_template *rmt The room template whose strings to count.
+* @return int The number of words in the room template's strings.
+*/
+int wordcount_room_template(room_template *rmt) {
+	int count = 0;
+	
+	count += wordcount_string(GET_RMT_TITLE(rmt));
+	count += wordcount_string(GET_RMT_DESC(rmt));
+	count += wordcount_extra_descriptions(GET_RMT_EX_DESCS(rmt));
+	
+	return count;
+}
+
+
  //////////////////////////////////////////////////////////////////////////////
 //// DISPLAYS ////////////////////////////////////////////////////////////////
 

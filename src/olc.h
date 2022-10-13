@@ -306,6 +306,9 @@ int wordcount_generic(generic_data *gen);
 int wordcount_global(struct global_data *glb);
 int wordcount_mobile(char_data *ch);
 int wordcount_morph(morph_data *mph);
+int wordcount_progress(progress_data *prg);
+int wordcount_quest(quest_data *quest);
+int wordcount_room_template(room_template *rmt);
 int wordcount_object(obj_data *obj);
 
 // helpers from other systems
