@@ -281,6 +281,25 @@ bool valid_default_rank(char_data *ch, char *argument) {
 }
 
 
+/**
+* Counts the words of text in an archetype's strings.
+*
+* @param archetype_data *arch The archetype whose strings to count.
+* @return int The number of words in the archetype's strings.
+*/
+int wordcount_archetype(archetype_data *arch) {
+	int count = 0;
+	
+	count += wordcount_string(GET_ARCH_NAME(arch));
+	count += wordcount_string(GET_ARCH_DESC(arch));
+	count += wordcount_string(GET_ARCH_MALE_RANK(arch));
+	count += wordcount_string(GET_ARCH_FEMALE_RANK(arch));
+	count += wordcount_string(GET_ARCH_LORE(arch));
+	
+	return count;
+}
+
+
  //////////////////////////////////////////////////////////////////////////////
 //// UTILITIES ///////////////////////////////////////////////////////////////
 

@@ -358,6 +358,24 @@ void perform_morph(char_data *ch, morph_data *morph) {
 }
 
 
+/**
+* Counts the words of text in a morph's strings.
+*
+* @param morph_data *mph The morph whose strings to count.
+* @return int The number of words in the morph's strings.
+*/
+int wordcount_morph(morph_data *mph) {
+	int count = 0;
+	
+	count += wordcount_string(MORPH_KEYWORDS(mph));
+	count += wordcount_string(MORPH_SHORT_DESC(mph));
+	count += wordcount_string(MORPH_LONG_DESC(mph));
+	count += wordcount_string(MORPH_LOOK_DESC(mph));
+	
+	return count;
+}
+
+
  //////////////////////////////////////////////////////////////////////////////
 //// UTILITIES ///////////////////////////////////////////////////////////////
 

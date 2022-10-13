@@ -153,6 +153,22 @@ faction_data *find_faction_by_vnum(any_vnum vnum) {
 }
 
 
+/**
+* Counts the words of text in a faction's strings.
+*
+* @param faction_data *fct The faction whose strings to count.
+* @return int The number of words in the faction's strings.
+*/
+int wordcount_faction(faction_data *fct) {
+	int count = 0;
+	
+	count += wordcount_string(FCT_NAME(fct));
+	count += wordcount_string(FCT_DESCRIPTION(fct));
+	
+	return count;
+}
+
+
  //////////////////////////////////////////////////////////////////////////////
 //// UTILITIES ///////////////////////////////////////////////////////////////
 

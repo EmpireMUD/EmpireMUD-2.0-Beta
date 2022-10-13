@@ -1158,6 +1158,25 @@ char_data *setup_olc_mobile(char_data *input) {
 }
 
 
+/**
+* Counts the words of text in a mobile's strings.
+*
+* @param char_data *ch The mobile whose strings to count.
+* @return int The number of words in the mobile's strings.
+*/
+int wordcount_mobile(char_data *ch) {
+	int count = 0;
+	
+	count += wordcount_string(GET_PC_NAME(ch));
+	count += wordcount_string(GET_SHORT_DESC(ch));
+	count += wordcount_string(GET_LONG_DESC(ch));
+	count += wordcount_string(GET_LOOK_DESC(ch));
+	count += wordcount_custom_messages(MOB_CUSTOM_MSGS(ch));
+	
+	return count;
+}
+
+
  //////////////////////////////////////////////////////////////////////////////
 //// DISPLAYS ////////////////////////////////////////////////////////////////
 

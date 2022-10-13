@@ -1292,6 +1292,23 @@ double standard_ability_scale(char_data *ch, ability_data *abil, int level, bitv
 }
 
 
+/**
+* Counts the words of text in an ability's strings.
+*
+* @param ability_data *abil The ability whose strings to count.
+* @return int The number of words in the ability's strings.
+*/
+int wordcount_ability(ability_data *abil) {
+	int count = 0;
+	
+	count += wordcount_string(ABIL_NAME(abil));
+	count += wordcount_string(ABIL_COMMAND(abil));
+	count += wordcount_custom_messages(ABIL_CUSTOM_MSGS(abil));
+	
+	return count;
+}
+
+
  //////////////////////////////////////////////////////////////////////////////
 //// ABILITY COMMANDS ////////////////////////////////////////////////////////
 

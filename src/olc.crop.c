@@ -550,6 +550,22 @@ crop_data *setup_olc_crop(crop_data *input) {
 }
 
 
+/**
+* Counts the words of text in a crop's strings.
+*
+* @param crop_data *crop The crop whose strings to count.
+* @return int The number of words in the crop's strings.
+*/
+int wordcount_crop(crop_data *crop) {
+	int count = 0;
+	
+	count += wordcount_string(GET_CROP_NAME(crop));
+	count += wordcount_string(GET_CROP_TITLE(crop));
+	
+	return count;
+}
+
+
  //////////////////////////////////////////////////////////////////////////////
 //// DISPLAYS ////////////////////////////////////////////////////////////////
 

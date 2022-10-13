@@ -128,6 +128,21 @@ bool validate_augment_target(char_data *ch, obj_data *obj, augment_data *aug, bo
 }
 
 
+/**
+* Counts the words of text in an augment's strings.
+*
+* @param augment_data *aug The augment whose strings to count.
+* @return int The number of words in the augment's strings.
+*/
+int wordcount_augment(augment_data *aug) {
+	int count = 0;
+	
+	count += wordcount_string(GET_AUG_NAME(aug));
+	
+	return count;
+}
+
+
  //////////////////////////////////////////////////////////////////////////////
 //// UTILITIES ///////////////////////////////////////////////////////////////
 

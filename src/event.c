@@ -327,6 +327,25 @@ void start_event(event_data *event) {
 }
 
 
+/**
+* Counts the words of text in an event's strings.
+*
+* NOTE: Excludes notes.
+*
+* @param event_data *evt The event whose strings to count.
+* @return int The number of words in the event's strings.
+*/
+int wordcount_event(event_data *evt) {
+	int count = 0;
+	
+	count += wordcount_string(EVT_NAME(evt));
+	count += wordcount_string(EVT_DESCRIPTION(evt));
+	count += wordcount_string(EVT_COMPLETE_MSG(evt));
+	
+	return count;
+}
+
+
  //////////////////////////////////////////////////////////////////////////////
 //// LEADERBOARD HELPERS /////////////////////////////////////////////////////
 

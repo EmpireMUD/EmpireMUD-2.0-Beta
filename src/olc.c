@@ -3996,9 +3996,7 @@ OLC_MODULE(olc_wordcount) {
 		
 		// OLC_x:
 		switch (type) {
-/*
 			case OLC_ABILITY: {
-				char *list_one_ability(ability_data *abil, bool detail);
 				ability_data *abil, *next_abil;
 				HASH_ITER(hh, ability_table, abil, next_abil) {
 					if (len >= sizeof(buf)) {
@@ -4006,13 +4004,12 @@ OLC_MODULE(olc_wordcount) {
 					}
 					if (ABIL_VNUM(abil) >= from_vnum && ABIL_VNUM(abil) <= to_vnum) {
 						++count;
-						len += snprintf(buf + len, sizeof(buf) - len, "%s\r\n", list_one_ability(abil, show_details));
+						wordcount += wordcount_ability(abil);
 					}
 				}
 				break;
 			}
 			case OLC_ADVENTURE: {
-				char *list_one_adventure(adv_data *adv, bool detail);
 				adv_data *adv, *next_adv;
 				HASH_ITER(hh, adventure_table, adv, next_adv) {
 					if (len >= sizeof(buf)) {
@@ -4020,27 +4017,25 @@ OLC_MODULE(olc_wordcount) {
 					}
 					if (GET_ADV_VNUM(adv) >= from_vnum && GET_ADV_VNUM(adv) <= to_vnum) {
 						++count;
-						len += snprintf(buf + len, sizeof(buf) - len, "%s\r\n", list_one_adventure(adv, show_details));
+						wordcount += wordcount_adventure(adv);
 					}
 				}
 				break;
 			}
 			case OLC_ARCHETYPE: {
-				char *list_one_archetype(archetype_data *arch, bool detail);
-				struct archetype_data *arch, *next_arch;
+				archetype_data *arch, *next_arch;
 				HASH_ITER(hh, archetype_table, arch, next_arch) {
 					if (len >= sizeof(buf)) {
 						break;
 					}
 					if (GET_ARCH_VNUM(arch) >= from_vnum && GET_ARCH_VNUM(arch) <= to_vnum) {
 						++count;
-						len += snprintf(buf + len, sizeof(buf) - len, "%s\r\n", list_one_archetype(arch, show_details));
+						wordcount += wordcount_archetype(arch);
 					}
 				}
 				break;
 			}
 			case OLC_AUGMENT: {
-				char *list_one_augment(augment_data *aug, bool detail);
 				struct augment_data *aug, *next_aug;
 				HASH_ITER(hh, augment_table, aug, next_aug) {
 					if (len >= sizeof(buf)) {
@@ -4048,13 +4043,12 @@ OLC_MODULE(olc_wordcount) {
 					}
 					if (GET_AUG_VNUM(aug) >= from_vnum && GET_AUG_VNUM(aug) <= to_vnum) {
 						++count;
-						len += snprintf(buf + len, sizeof(buf) - len, "%s\r\n", list_one_augment(aug, show_details));
+						wordcount += wordcount_augment(aug);
 					}
 				}
 				break;
 			}
 			case OLC_BOOK: {
-				char *list_one_book(book_data *book, bool detail);
 				book_data *book, *next_book;
 				HASH_ITER(hh, book_table, book, next_book) {
 					if (len >= sizeof(buf)) {
@@ -4062,13 +4056,12 @@ OLC_MODULE(olc_wordcount) {
 					}
 					if (book->vnum >= from_vnum && book->vnum <= to_vnum) {
 						++count;
-						len += snprintf(buf + len, sizeof(buf) - len, "%s\r\n", list_one_book(book, show_details));
+						wordcount += wordcount_book(book);
 					}
 				}
 				break;
 			}
 			case OLC_BUILDING: {
-				char *list_one_building(bld_data *bld, bool detail);
 				bld_data *bld, *next_bld;
 				HASH_ITER(hh, building_table, bld, next_bld) {
 					if (len >= sizeof(buf)) {
@@ -4076,13 +4069,12 @@ OLC_MODULE(olc_wordcount) {
 					}
 					if (GET_BLD_VNUM(bld) >= from_vnum && GET_BLD_VNUM(bld) <= to_vnum) {
 						++count;
-						len += snprintf(buf + len, sizeof(buf) - len, "%s\r\n", list_one_building(bld, show_details));
+						wordcount += wordcount_building(bld);
 					}
 				}
 				break;
 			}
 			case OLC_CLASS: {
-				char *list_one_class(class_data *cls, bool detail);
 				class_data *cls, *next_cls;
 				HASH_ITER(hh, class_table, cls, next_cls) {
 					if (len >= sizeof(buf)) {
@@ -4090,13 +4082,12 @@ OLC_MODULE(olc_wordcount) {
 					}
 					if (CLASS_VNUM(cls) >= from_vnum && CLASS_VNUM(cls) <= to_vnum) {
 						++count;
-						len += snprintf(buf + len, sizeof(buf) - len, "%s\r\n", list_one_class(cls, show_details));
+						wordcount += wordcount_class(cls);
 					}
 				}
 				break;
 			}
 			case OLC_CRAFT: {
-				char *list_one_craft(craft_data *craft, bool detail);
 				craft_data *craft, *next_craft;
 				HASH_ITER(hh, craft_table, craft, next_craft) {
 					if (len >= sizeof(buf)) {
@@ -4104,13 +4095,12 @@ OLC_MODULE(olc_wordcount) {
 					}
 					if (GET_CRAFT_VNUM(craft) >= from_vnum && GET_CRAFT_VNUM(craft) <= to_vnum) {
 						++count;
-						len += snprintf(buf + len, sizeof(buf) - len, "%s\r\n", list_one_craft(craft, show_details));
+						wordcount += wordcount_craft(craft);
 					}
 				}
 				break;
 			}
 			case OLC_CROP: {
-				char *list_one_crop(crop_data *crop, bool detail);
 				crop_data *crop, *next_crop;
 				HASH_ITER(hh, crop_table, crop, next_crop) {
 					if (len >= sizeof(buf)) {
@@ -4118,13 +4108,12 @@ OLC_MODULE(olc_wordcount) {
 					}
 					if (GET_CROP_VNUM(crop) >= from_vnum && GET_CROP_VNUM(crop) <= to_vnum) {
 						++count;
-						len += snprintf(buf + len, sizeof(buf) - len, "%s\r\n", list_one_crop(crop, show_details));
+						wordcount += wordcount_crop(crop);
 					}
 				}
 				break;
 			}
 			case OLC_EVENT: {
-				char *list_one_event(event_data *event, bool detail);
 				event_data *event, *next_event;
 				HASH_ITER(hh, event_table, event, next_event) {
 					if (len >= sizeof(buf)) {
@@ -4132,13 +4121,12 @@ OLC_MODULE(olc_wordcount) {
 					}
 					if (EVT_VNUM(event) >= from_vnum && EVT_VNUM(event) <= to_vnum) {
 						++count;
-						len += snprintf(buf + len, sizeof(buf) - len, "%s\r\n", list_one_event(event, show_details));
+						wordcount += wordcount_event(event);
 					}
 				}
 				break;
 			}
 			case OLC_FACTION: {
-				char *list_one_faction(faction_data *fct, bool detail);
 				faction_data *fct, *next_fct;
 				HASH_ITER(hh, faction_table, fct, next_fct) {
 					if (len >= sizeof(buf)) {
@@ -4146,13 +4134,12 @@ OLC_MODULE(olc_wordcount) {
 					}
 					if (FCT_VNUM(fct) >= from_vnum && FCT_VNUM(fct) <= to_vnum) {
 						++count;
-						len += snprintf(buf + len, sizeof(buf) - len, "%s\r\n", list_one_faction(fct, show_details));
+						wordcount += wordcount_faction(fct);
 					}
 				}
 				break;
 			}
 			case OLC_GENERIC: {
-				char *list_one_generic(generic_data *gen, bool detail);
 				generic_data *gen, *next_gen;
 				HASH_ITER(hh, generic_table, gen, next_gen) {
 					if (len >= sizeof(buf)) {
@@ -4160,13 +4147,12 @@ OLC_MODULE(olc_wordcount) {
 					}
 					if (GEN_VNUM(gen) >= from_vnum && GEN_VNUM(gen) <= to_vnum) {
 						++count;
-						len += snprintf(buf + len, sizeof(buf) - len, "%s\r\n", list_one_generic(gen, show_details));
+						wordcount += wordcount_generic(gen);
 					}
 				}
 				break;
 			}
 			case OLC_GLOBAL: {
-				char *list_one_global(struct global_data *glb, bool detail);
 				struct global_data *glb, *next_glb;
 				HASH_ITER(hh, globals_table, glb, next_glb) {
 					if (len >= sizeof(buf)) {
@@ -4174,13 +4160,12 @@ OLC_MODULE(olc_wordcount) {
 					}
 					if (GET_GLOBAL_VNUM(glb) >= from_vnum && GET_GLOBAL_VNUM(glb) <= to_vnum) {
 						++count;
-						len += snprintf(buf + len, sizeof(buf) - len, "%s\r\n", list_one_global(glb, show_details));
+						wordcount += wordcount_global(glb);
 					}
 				}
 				break;
 			}
 			case OLC_MOBILE: {
-				char *list_one_mobile(char_data *mob, bool detail);
 				char_data *mob, *next_mob;
 				HASH_ITER(hh, mobile_table, mob, next_mob) {
 					if (len >= sizeof(buf)) {
@@ -4188,13 +4173,12 @@ OLC_MODULE(olc_wordcount) {
 					}
 					if (GET_MOB_VNUM(mob) >= from_vnum && GET_MOB_VNUM(mob) <= to_vnum) {
 						++count;
-						len += snprintf(buf + len, sizeof(buf) - len, "%s\r\n", list_one_mobile(mob, show_details));
+						wordcount += wordcount_mobile(mob);
 					}
 				}
 				break;
 			}
 			case OLC_MORPH: {
-				char *list_one_morph(morph_data *morph, bool detail);
 				morph_data *morph, *next_morph;
 				HASH_ITER(hh, morph_table, morph, next_morph) {
 					if (len >= sizeof(buf)) {
@@ -4202,12 +4186,11 @@ OLC_MODULE(olc_wordcount) {
 					}
 					if (MORPH_VNUM(morph) >= from_vnum && MORPH_VNUM(morph) <= to_vnum) {
 						++count;
-						len += snprintf(buf + len, sizeof(buf) - len, "%s\r\n", list_one_morph(morph, show_details));
+						wordcount += wordcount_morph(morph);
 					}
 				}
 				break;
 			}
-*/
 			case OLC_OBJECT: {
 				obj_data *obj, *next_obj;
 				HASH_ITER(hh, object_table, obj, next_obj) {
@@ -4223,7 +4206,6 @@ OLC_MODULE(olc_wordcount) {
 			}
 /*
 			case OLC_PROGRESS: {
-				char *list_one_progress(progress_data *prg, bool detail);
 				progress_data *prg, *next_prg;
 				HASH_ITER(hh, progress_table, prg, next_prg) {
 					if (len >= sizeof(buf)) {
@@ -4231,13 +4213,12 @@ OLC_MODULE(olc_wordcount) {
 					}
 					if (PRG_VNUM(prg) >= from_vnum && PRG_VNUM(prg) <= to_vnum) {
 						++count;
-						len += snprintf(buf + len, sizeof(buf) - len, "%s\r\n", list_one_progress(prg, show_details));
+						wordcount += wordcount_progress(prg);
 					}
 				}
 				break;
 			}
 			case OLC_QUEST: {
-				char *list_one_quest(quest_data *quest, bool detail);
 				quest_data *quest, *next_quest;
 				HASH_ITER(hh, quest_table, quest, next_quest) {
 					if (len >= sizeof(buf)) {
@@ -4245,13 +4226,12 @@ OLC_MODULE(olc_wordcount) {
 					}
 					if (QUEST_VNUM(quest) >= from_vnum && QUEST_VNUM(quest) <= to_vnum) {
 						++count;
-						len += snprintf(buf + len, sizeof(buf) - len, "%s\r\n", list_one_quest(quest, show_details));
+						wordcount += wordcount_quest(quest);
 					}
 				}
 				break;
 			}
 			case OLC_ROOM_TEMPLATE: {
-				char *list_one_room_template(room_template *rmt, bool detail);
 				room_template *rmt, *next_rmt;
 				HASH_ITER(hh, room_template_table, rmt, next_rmt) {
 					if (len >= sizeof(buf)) {
@@ -4259,13 +4239,12 @@ OLC_MODULE(olc_wordcount) {
 					}
 					if (GET_RMT_VNUM(rmt) >= from_vnum && GET_RMT_VNUM(rmt) <= to_vnum) {
 						++count;
-						len += snprintf(buf + len, sizeof(buf) - len, "%s\r\n", list_one_room_template(rmt, show_details));
+						wordcount += wordcount_room_template(rmt);
 					}
 				}
 				break;
 			}
 			case OLC_SECTOR: {
-				char *list_one_sector(sector_data *sect, bool detail);
 				sector_data *sect, *next_sect;
 				HASH_ITER(hh, sector_table, sect, next_sect) {
 					if (len >= sizeof(buf)) {
@@ -4273,13 +4252,12 @@ OLC_MODULE(olc_wordcount) {
 					}
 					if (GET_SECT_VNUM(sect) >= from_vnum && GET_SECT_VNUM(sect) <= to_vnum) {
 						++count;
-						len += snprintf(buf + len, sizeof(buf) - len, "%s\r\n", list_one_sector(sect, show_details));
+						wordcount += wordcount_sector(sect);
 					}
 				}
 				break;
 			}
 			case OLC_SHOP: {
-				char *list_one_shop(shop_data *shop, bool detail);
 				shop_data *shop, *next_shop;
 				HASH_ITER(hh, shop_table, shop, next_shop) {
 					if (len >= sizeof(buf)) {
@@ -4287,13 +4265,12 @@ OLC_MODULE(olc_wordcount) {
 					}
 					if (SHOP_VNUM(shop) >= from_vnum && SHOP_VNUM(shop) <= to_vnum) {
 						++count;
-						len += snprintf(buf + len, sizeof(buf) - len, "%s\r\n", list_one_shop(shop, show_details));
+						wordcount += wordcount_shop(shop);
 					}
 				}
 				break;
 			}
 			case OLC_SKILL: {
-				char *list_one_skill(skill_data *skill, bool detail);
 				skill_data *skill, *next_skill;
 				HASH_ITER(hh, skill_table, skill, next_skill) {
 					if (len >= sizeof(buf)) {
@@ -4301,13 +4278,12 @@ OLC_MODULE(olc_wordcount) {
 					}
 					if (SKILL_VNUM(skill) >= from_vnum && SKILL_VNUM(skill) <= to_vnum) {
 						++count;
-						len += snprintf(buf + len, sizeof(buf) - len, "%s\r\n", list_one_skill(skill, show_details));
+						wordcount += wordcount_skill(skill);
 					}
 				}
 				break;
 			}
 			case OLC_SOCIAL: {
-				char *list_one_social(social_data *soc, bool detail);
 				social_data *soc, *next_soc;
 				HASH_ITER(hh, social_table, soc, next_soc) {
 					if (len >= sizeof(buf)) {
@@ -4315,13 +4291,12 @@ OLC_MODULE(olc_wordcount) {
 					}
 					if (SOC_VNUM(soc) >= from_vnum && SOC_VNUM(soc) <= to_vnum) {
 						++count;
-						len += snprintf(buf + len, sizeof(buf) - len, "%s\r\n", list_one_social(soc, show_details));
+						wordcount += wordcount_social(soc);
 					}
 				}
 				break;
 			}
 			case OLC_TRIGGER: {
-				char *list_one_trigger(trig_data *trig, bool detail);
 				trig_data *trig, *next_trig;
 				HASH_ITER(hh, trigger_table, trig, next_trig) {
 					if (len >= sizeof(buf)) {
@@ -4329,13 +4304,12 @@ OLC_MODULE(olc_wordcount) {
 					}
 					if (GET_TRIG_VNUM(trig) >= from_vnum && GET_TRIG_VNUM(trig) <= to_vnum) {
 						++count;
-						len += snprintf(buf + len, sizeof(buf) - len, "%s\r\n", list_one_trigger(trig, show_details));
+						wordcount += wordcount_trigger(trig);
 					}
 				}
 				break;
 			}
 			case OLC_VEHICLE: {
-				char *list_one_vehicle(vehicle_data *veh, bool detail);
 				vehicle_data *veh, *next_veh;
 				HASH_ITER(hh, vehicle_table, veh, next_veh) {
 					if (len >= sizeof(buf)) {
@@ -4343,7 +4317,7 @@ OLC_MODULE(olc_wordcount) {
 					}
 					if (VEH_VNUM(veh) >= from_vnum && VEH_VNUM(veh) <= to_vnum) {
 						++count;
-						len += snprintf(buf + len, sizeof(buf) - len, "%s\r\n", list_one_vehicle(veh, show_details));
+						wordcount += wordcount_vehicle(veh);
 					}
 				}
 				break;

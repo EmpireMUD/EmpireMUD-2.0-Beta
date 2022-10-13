@@ -291,6 +291,21 @@ int wordcount_extra_descriptions(struct extra_descr_data *list);
 int wordcount_string(const char *string);
 
 // word count: types
+int wordcount_ability(ability_data *abil);
+int wordcount_adventure(struct adventure_data *adv);
+int wordcount_archetype(archetype_data *arch);
+int wordcount_augment(augment_data *aug);
+int wordcount_book(book_data *book);
+int wordcount_building(bld_data *bld);
+int wordcount_class(class_data *cls);
+int wordcount_craft(craft_data *craft);
+int wordcount_crop(crop_data *crop);
+int wordcount_event(event_data *evt);
+int wordcount_faction(faction_data *fct);
+int wordcount_generic(generic_data *gen);
+int wordcount_global(struct global_data *glb);
+int wordcount_mobile(char_data *ch);
+int wordcount_morph(morph_data *mph);
 int wordcount_object(obj_data *obj);
 
 // helpers from other systems

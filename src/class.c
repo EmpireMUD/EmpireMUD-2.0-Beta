@@ -458,6 +458,22 @@ void update_class(char_data *ch) {
 }
 
 
+/**
+* Counts the words of text in a class's strings.
+*
+* @param class_data *cls The class whose strings to count.
+* @return int The number of words in the class's strings.
+*/
+int wordcount_class(class_data *cls) {
+	int count = 0;
+	
+	count += wordcount_string(CLASS_NAME(cls));
+	count += wordcount_string(CLASS_ABBREV(cls));
+	
+	return count;
+}
+
+
  //////////////////////////////////////////////////////////////////////////////
 //// UTILITIES ///////////////////////////////////////////////////////////////
 
