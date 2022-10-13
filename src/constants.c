@@ -2206,42 +2206,27 @@ const char *mob_custom_types[] = {
 // MOB_MOVE_x: mob/vehicle move types
 const char *mob_move_types[] = {
 	"walks",
-	"climbs",
-	"flies",
-	"paddles",
-	"rides",
-	"slithers",
-	"swims",
-	"scurries",
-	"skitters",
-	"creeps",
-	"oozes",
-	"runs",
-	"gallops",
-	"shambles",
-	"trots",
-	"hops",
-	"waddles",
-	"crawls",
-	"flutters",
-	"drives",
-	"sails",
-	"rolls",
-	"rattles",
-	"skis",
-	"slides",
-	"soars",
-	"lumbers",
-	"floats",
-	"lopes",
-	"blows",
-	"drifts",
-	"bounces",
-	"flows",
-	"leaves",
-	"shuffles",
-	"marches",
-	"sweeps",
+	"climbs",	"flies",	"paddles",	"rides",	"slithers",		// 1 - 5
+	"swims",	"scurries",	"skitters",	"creeps",	"oozes",	// 6 - 10
+	"runs",	"gallops",	"shambles",	"trots",	"hops",	// 11 - 15
+	"waddles",	"crawls",	"flutters",	"drives",	"sails",	// 16 - 20
+	"rolls",	"rattles",	"skis",	"slides",	"soars",	// 21 - 25
+	"lumbers",	"floats",	"lopes",	"blows",	"drifts",	// 26 - 30
+	"bounces",	"flows",	"leaves",	"shuffles",	"marches",	// 31 - 35
+	"sweeps",	"barges",	"bolts",	"charges",	"clambers",	// 36 - 40
+	"coasts",	"darts",	"dashes",	"draws",	"flits",	// 41 - 45
+	"glides",	"goes",	"hikes",	"hobbles",	"hurries",	// 46 - 50
+	"inches",	"jogs",	"journeys",	"jumps",	"leaps",	// 51 - 55
+	"limps",	"lurches",	"meanders",	"moseys",	"parades",	// 56 - 60
+	"plods",	"prances",	"prowls",	"races",	"roams",	// 61 - 65
+	"romps",	"roves",	"rushes",	"sashays",	"saunters",	// 66 - 70
+	"scampers",	"scoots",	"scrambles",	"scutters",	"sidles",	// 71 - 75
+	"skips",	"skulks",	"sleepwalks",	"slinks",	"slogs",	// 76 - 80
+	"sneaks",	"staggers",	"stomps",	"streaks",	"strides",	// 81 - 85
+	"strolls",	"struts",	"stumbles",	"swims",	"tacks",	// 86 - 90
+	"tears",	"tiptoes",	"toddles",	"totters",	"traipses",	// 91 - 95
+	"tramps",	"travels",	"treks",	"trudges",	"vaults",	// 96 - 100
+	"wades",	"wanders",	"whizzes",	"zigzags",	"zooms",	// 101 - 105
 	"\n"
 };
 
