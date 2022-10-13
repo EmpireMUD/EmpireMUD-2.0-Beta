@@ -285,6 +285,14 @@ void get_template_spawns_display(struct adventure_spawn *list, char *save_buffer
 const char *get_interaction_target(int type, any_vnum vnum);
 char **get_weapon_types_string();
 
+// word count: core functions
+int wordcount_custom_messages(struct custom_message *list);
+int wordcount_extra_descriptions(struct extra_descr_data *list);
+int wordcount_string(const char *string);
+
+// word count: types
+int wordcount_object(obj_data *obj);
+
 // helpers from other systems
 bool find_event_reward_in_list(struct event_reward *list, int type, any_vnum vnum);
 bool find_shop_item_in_list(struct shop_item *list, any_vnum vnum);

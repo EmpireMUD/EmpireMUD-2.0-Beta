@@ -6576,6 +6576,16 @@ Example vehicle settings:
 
 See also: BUILDING-VEHICLES, OLC, OLC ABORT, OLC EDIT, OLC EDITOR, OLC SAVE
 #d
+"OLC WORDCOUNT" "OLC WORD COUNT" WORDCOUNT "WORD COUNT"
+
+Usage:  .<type> wordcount <from vnum> [to vnum]
+
+This command counts all the words in the text for the various OLC types. For
+example, an object counts all the words in its keywords, short desc, long desc,
+look desc, extra descriptions, and custom messages.
+
+See also: OLC LIST, VNUM
+#d
 "OLC WORKFORCE" "WORKFORCE OLC"
 
 There are several ways to make an empire's workforce work a building:
