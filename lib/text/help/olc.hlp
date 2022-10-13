@@ -6584,6 +6584,9 @@ This command counts all the words in the text for the various OLC types. For
 example, an object counts all the words in its keywords, short desc, long desc,
 look desc, extra descriptions, and custom messages.
 
+If you use this on a single adventure, it will count all parts of the
+adventure and provide a total.
+
 See also: OLC LIST, VNUM
 #d
 "OLC WORKFORCE" "WORKFORCE OLC"

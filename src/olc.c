@@ -3935,9 +3935,10 @@ OLC_MODULE(olc_set_min_vnum) {
 // Usage: olc mob wordcount <from vnum> [to vnum]
 OLC_MODULE(olc_wordcount) {
 	char temp[256], arg[MAX_INPUT_LENGTH];
-	any_vnum from_vnum = NOTHING, to_vnum = NOTHING, iter;
+	any_vnum from_vnum = NOTHING, to_vnum = NOTHING;
 	bool found_from = FALSE, found_to = FALSE;
-	int count = 0, wordcount = 0, len;
+	int count, wordcount, total, totalwords, iter;
+	adv_data *whole_adv = NULL;
 	
 	skip_spaces(&argument);
 	
@@ -3982,26 +3983,41 @@ OLC_MODULE(olc_wordcount) {
 	
 	if (!found_from) {	// no useful args
 		msg_to_char(ch, "Usage: list <from vnum> [to vnum]\r\n");
+		return;
 	}
 	else if (from_vnum < 0) {
 		msg_to_char(ch, "Invalid vnum range.\r\n");
+		return;
 	}
-	else {
-		// 2nd vnum optional
-		if (to_vnum == NOTHING) {
-			to_vnum = from_vnum;
-		}
 	
-		len = 0;
+	// 2nd vnum optional
+	if (to_vnum == NOTHING) {
+		to_vnum = from_vnum;
+	}
+	
+	// special case: audit whole adventure:
+	if (to_vnum == from_vnum && type == OLC_ADVENTURE && (whole_adv = adventure_proto(from_vnum))) {
+		from_vnum = GET_ADV_START_VNUM(whole_adv);
+		to_vnum = GET_ADV_END_VNUM(whole_adv);
+	}
+	
+	// ready
+	total = totalwords = 0;
+
+	// do for each type (or just the requested type)
+	for (iter = 0; iter < NUM_OLC_TYPES; ++iter) {
+		if (!whole_adv && BIT(iter) != type) {
+			continue;	// skip type, unless doing the whole adventure
+		}
+		
+		// reset for type
+		count = wordcount = 0;
 		
 		// OLC_x:
-		switch (type) {
+		switch (BIT(iter)) {
 			case OLC_ABILITY: {
 				ability_data *abil, *next_abil;
 				HASH_ITER(hh, ability_table, abil, next_abil) {
-					if (len >= sizeof(buf)) {
-						break;
-					}
 					if (ABIL_VNUM(abil) >= from_vnum && ABIL_VNUM(abil) <= to_vnum) {
 						++count;
 						wordcount += wordcount_ability(abil);
@@ -4010,14 +4026,17 @@ OLC_MODULE(olc_wordcount) {
 				break;
 			}
 			case OLC_ADVENTURE: {
-				adv_data *adv, *next_adv;
-				HASH_ITER(hh, adventure_table, adv, next_adv) {
-					if (len >= sizeof(buf)) {
-						break;
-					}
-					if (GET_ADV_VNUM(adv) >= from_vnum && GET_ADV_VNUM(adv) <= to_vnum) {
-						++count;
-						wordcount += wordcount_adventure(adv);
+				if (whole_adv) {
+					count = 1;
+					wordcount = wordcount_adventure(whole_adv);
+				}
+				else {
+					adv_data *adv, *next_adv;
+					HASH_ITER(hh, adventure_table, adv, next_adv) {
+						if (GET_ADV_VNUM(adv) >= from_vnum && GET_ADV_VNUM(adv) <= to_vnum) {
+							++count;
+							wordcount += wordcount_adventure(adv);
+						}
 					}
 				}
 				break;
@@ -4025,9 +4044,6 @@ OLC_MODULE(olc_wordcount) {
 			case OLC_ARCHETYPE: {
 				archetype_data *arch, *next_arch;
 				HASH_ITER(hh, archetype_table, arch, next_arch) {
-					if (len >= sizeof(buf)) {
-						break;
-					}
 					if (GET_ARCH_VNUM(arch) >= from_vnum && GET_ARCH_VNUM(arch) <= to_vnum) {
 						++count;
 						wordcount += wordcount_archetype(arch);
@@ -4038,9 +4054,6 @@ OLC_MODULE(olc_wordcount) {
 			case OLC_AUGMENT: {
 				struct augment_data *aug, *next_aug;
 				HASH_ITER(hh, augment_table, aug, next_aug) {
-					if (len >= sizeof(buf)) {
-						break;
-					}
 					if (GET_AUG_VNUM(aug) >= from_vnum && GET_AUG_VNUM(aug) <= to_vnum) {
 						++count;
 						wordcount += wordcount_augment(aug);
@@ -4051,9 +4064,6 @@ OLC_MODULE(olc_wordcount) {
 			case OLC_BOOK: {
 				book_data *book, *next_book;
 				HASH_ITER(hh, book_table, book, next_book) {
-					if (len >= sizeof(buf)) {
-						break;
-					}
 					if (book->vnum >= from_vnum && book->vnum <= to_vnum) {
 						++count;
 						wordcount += wordcount_book(book);
@@ -4064,9 +4074,6 @@ OLC_MODULE(olc_wordcount) {
 			case OLC_BUILDING: {
 				bld_data *bld, *next_bld;
 				HASH_ITER(hh, building_table, bld, next_bld) {
-					if (len >= sizeof(buf)) {
-						break;
-					}
 					if (GET_BLD_VNUM(bld) >= from_vnum && GET_BLD_VNUM(bld) <= to_vnum) {
 						++count;
 						wordcount += wordcount_building(bld);
@@ -4077,9 +4084,6 @@ OLC_MODULE(olc_wordcount) {
 			case OLC_CLASS: {
 				class_data *cls, *next_cls;
 				HASH_ITER(hh, class_table, cls, next_cls) {
-					if (len >= sizeof(buf)) {
-						break;
-					}
 					if (CLASS_VNUM(cls) >= from_vnum && CLASS_VNUM(cls) <= to_vnum) {
 						++count;
 						wordcount += wordcount_class(cls);
@@ -4090,9 +4094,6 @@ OLC_MODULE(olc_wordcount) {
 			case OLC_CRAFT: {
 				craft_data *craft, *next_craft;
 				HASH_ITER(hh, craft_table, craft, next_craft) {
-					if (len >= sizeof(buf)) {
-						break;
-					}
 					if (GET_CRAFT_VNUM(craft) >= from_vnum && GET_CRAFT_VNUM(craft) <= to_vnum) {
 						++count;
 						wordcount += wordcount_craft(craft);
@@ -4103,9 +4104,6 @@ OLC_MODULE(olc_wordcount) {
 			case OLC_CROP: {
 				crop_data *crop, *next_crop;
 				HASH_ITER(hh, crop_table, crop, next_crop) {
-					if (len >= sizeof(buf)) {
-						break;
-					}
 					if (GET_CROP_VNUM(crop) >= from_vnum && GET_CROP_VNUM(crop) <= to_vnum) {
 						++count;
 						wordcount += wordcount_crop(crop);
@@ -4116,9 +4114,6 @@ OLC_MODULE(olc_wordcount) {
 			case OLC_EVENT: {
 				event_data *event, *next_event;
 				HASH_ITER(hh, event_table, event, next_event) {
-					if (len >= sizeof(buf)) {
-						break;
-					}
 					if (EVT_VNUM(event) >= from_vnum && EVT_VNUM(event) <= to_vnum) {
 						++count;
 						wordcount += wordcount_event(event);
@@ -4129,9 +4124,6 @@ OLC_MODULE(olc_wordcount) {
 			case OLC_FACTION: {
 				faction_data *fct, *next_fct;
 				HASH_ITER(hh, faction_table, fct, next_fct) {
-					if (len >= sizeof(buf)) {
-						break;
-					}
 					if (FCT_VNUM(fct) >= from_vnum && FCT_VNUM(fct) <= to_vnum) {
 						++count;
 						wordcount += wordcount_faction(fct);
@@ -4142,9 +4134,6 @@ OLC_MODULE(olc_wordcount) {
 			case OLC_GENERIC: {
 				generic_data *gen, *next_gen;
 				HASH_ITER(hh, generic_table, gen, next_gen) {
-					if (len >= sizeof(buf)) {
-						break;
-					}
 					if (GEN_VNUM(gen) >= from_vnum && GEN_VNUM(gen) <= to_vnum) {
 						++count;
 						wordcount += wordcount_generic(gen);
@@ -4155,9 +4144,6 @@ OLC_MODULE(olc_wordcount) {
 			case OLC_GLOBAL: {
 				struct global_data *glb, *next_glb;
 				HASH_ITER(hh, globals_table, glb, next_glb) {
-					if (len >= sizeof(buf)) {
-						break;
-					}
 					if (GET_GLOBAL_VNUM(glb) >= from_vnum && GET_GLOBAL_VNUM(glb) <= to_vnum) {
 						++count;
 						wordcount += wordcount_global(glb);
@@ -4168,9 +4154,6 @@ OLC_MODULE(olc_wordcount) {
 			case OLC_MOBILE: {
 				char_data *mob, *next_mob;
 				HASH_ITER(hh, mobile_table, mob, next_mob) {
-					if (len >= sizeof(buf)) {
-						break;
-					}
 					if (GET_MOB_VNUM(mob) >= from_vnum && GET_MOB_VNUM(mob) <= to_vnum) {
 						++count;
 						wordcount += wordcount_mobile(mob);
@@ -4181,9 +4164,6 @@ OLC_MODULE(olc_wordcount) {
 			case OLC_MORPH: {
 				morph_data *morph, *next_morph;
 				HASH_ITER(hh, morph_table, morph, next_morph) {
-					if (len >= sizeof(buf)) {
-						break;
-					}
 					if (MORPH_VNUM(morph) >= from_vnum && MORPH_VNUM(morph) <= to_vnum) {
 						++count;
 						wordcount += wordcount_morph(morph);
@@ -4194,9 +4174,6 @@ OLC_MODULE(olc_wordcount) {
 			case OLC_OBJECT: {
 				obj_data *obj, *next_obj;
 				HASH_ITER(hh, object_table, obj, next_obj) {
-					if (len >= sizeof(buf)) {
-						break;
-					}
 					if (GET_OBJ_VNUM(obj) >= from_vnum && GET_OBJ_VNUM(obj) <= to_vnum) {
 						++count;
 						wordcount += wordcount_object(obj);
@@ -4207,9 +4184,6 @@ OLC_MODULE(olc_wordcount) {
 			case OLC_PROGRESS: {
 				progress_data *prg, *next_prg;
 				HASH_ITER(hh, progress_table, prg, next_prg) {
-					if (len >= sizeof(buf)) {
-						break;
-					}
 					if (PRG_VNUM(prg) >= from_vnum && PRG_VNUM(prg) <= to_vnum) {
 						++count;
 						wordcount += wordcount_progress(prg);
@@ -4220,9 +4194,6 @@ OLC_MODULE(olc_wordcount) {
 			case OLC_QUEST: {
 				quest_data *quest, *next_quest;
 				HASH_ITER(hh, quest_table, quest, next_quest) {
-					if (len >= sizeof(buf)) {
-						break;
-					}
 					if (QUEST_VNUM(quest) >= from_vnum && QUEST_VNUM(quest) <= to_vnum) {
 						++count;
 						wordcount += wordcount_quest(quest);
@@ -4233,9 +4204,6 @@ OLC_MODULE(olc_wordcount) {
 			case OLC_ROOM_TEMPLATE: {
 				room_template *rmt, *next_rmt;
 				HASH_ITER(hh, room_template_table, rmt, next_rmt) {
-					if (len >= sizeof(buf)) {
-						break;
-					}
 					if (GET_RMT_VNUM(rmt) >= from_vnum && GET_RMT_VNUM(rmt) <= to_vnum) {
 						++count;
 						wordcount += wordcount_room_template(rmt);
@@ -4246,9 +4214,6 @@ OLC_MODULE(olc_wordcount) {
 			case OLC_SECTOR: {
 				sector_data *sect, *next_sect;
 				HASH_ITER(hh, sector_table, sect, next_sect) {
-					if (len >= sizeof(buf)) {
-						break;
-					}
 					if (GET_SECT_VNUM(sect) >= from_vnum && GET_SECT_VNUM(sect) <= to_vnum) {
 						++count;
 						wordcount += wordcount_sector(sect);
@@ -4259,9 +4224,6 @@ OLC_MODULE(olc_wordcount) {
 			case OLC_SHOP: {
 				shop_data *shop, *next_shop;
 				HASH_ITER(hh, shop_table, shop, next_shop) {
-					if (len >= sizeof(buf)) {
-						break;
-					}
 					if (SHOP_VNUM(shop) >= from_vnum && SHOP_VNUM(shop) <= to_vnum) {
 						++count;
 						wordcount += wordcount_shop(shop);
@@ -4272,9 +4234,6 @@ OLC_MODULE(olc_wordcount) {
 			case OLC_SKILL: {
 				skill_data *skill, *next_skill;
 				HASH_ITER(hh, skill_table, skill, next_skill) {
-					if (len >= sizeof(buf)) {
-						break;
-					}
 					if (SKILL_VNUM(skill) >= from_vnum && SKILL_VNUM(skill) <= to_vnum) {
 						++count;
 						wordcount += wordcount_skill(skill);
@@ -4285,9 +4244,6 @@ OLC_MODULE(olc_wordcount) {
 			case OLC_SOCIAL: {
 				social_data *soc, *next_soc;
 				HASH_ITER(hh, social_table, soc, next_soc) {
-					if (len >= sizeof(buf)) {
-						break;
-					}
 					if (SOC_VNUM(soc) >= from_vnum && SOC_VNUM(soc) <= to_vnum) {
 						++count;
 						wordcount += wordcount_social(soc);
@@ -4298,9 +4254,6 @@ OLC_MODULE(olc_wordcount) {
 			case OLC_TRIGGER: {
 				trig_data *trig, *next_trig;
 				HASH_ITER(hh, trigger_table, trig, next_trig) {
-					if (len >= sizeof(buf)) {
-						break;
-					}
 					if (GET_TRIG_VNUM(trig) >= from_vnum && GET_TRIG_VNUM(trig) <= to_vnum) {
 						++count;
 						wordcount += wordcount_trigger(trig);
@@ -4311,9 +4264,6 @@ OLC_MODULE(olc_wordcount) {
 			case OLC_VEHICLE: {
 				vehicle_data *veh, *next_veh;
 				HASH_ITER(hh, vehicle_table, veh, next_veh) {
-					if (len >= sizeof(buf)) {
-						break;
-					}
 					if (VEH_VNUM(veh) >= from_vnum && VEH_VNUM(veh) <= to_vnum) {
 						++count;
 						wordcount += wordcount_vehicle(veh);
@@ -4323,8 +4273,14 @@ OLC_MODULE(olc_wordcount) {
 			}
 		}
 		
-		sprintbit(type, olc_type_bits, temp, FALSE);
+		sprintbit(BIT(iter), olc_type_bits, temp, FALSE);
 		msg_to_char(ch, "%d %s%s: %d word%s\r\n", count, temp, PLURAL(count), wordcount, PLURAL(wordcount));
+		total += count;
+		totalwords += wordcount;
+	}
+	
+	if (whole_adv) {
+		msg_to_char(ch, "Total: %d thing%s, %d word%s\r\n", total, PLURAL(total), totalwords, PLURAL(totalwords));
 	}
 }
 
