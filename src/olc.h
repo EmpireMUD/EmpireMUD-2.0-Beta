@@ -306,10 +306,16 @@ int wordcount_generic(generic_data *gen);
 int wordcount_global(struct global_data *glb);
 int wordcount_mobile(char_data *ch);
 int wordcount_morph(morph_data *mph);
+int wordcount_object(obj_data *obj);
 int wordcount_progress(progress_data *prg);
 int wordcount_quest(quest_data *quest);
 int wordcount_room_template(room_template *rmt);
-int wordcount_object(obj_data *obj);
+int wordcount_sector(sector_data *sect);
+int wordcount_shop(shop_data *shop);
+int wordcount_skill(skill_data *skill);
+int wordcount_social(social_data *soc);
+int wordcount_trigger(trig_data *trig);
+int wordcount_vehicle(vehicle_data *veh);
 
 // helpers from other systems
 bool find_event_reward_in_list(struct event_reward *list, int type, any_vnum vnum);

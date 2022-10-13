@@ -85,6 +85,28 @@ bool validate_social_requirements(char_data *ch, social_data *soc) {
 }
 
 
+/**
+* Counts the words of text in a social's strings.
+*
+* @param social_data *soc The social whose strings to count.
+* @return int The number of words in the social's strings.
+*/
+int wordcount_social(social_data *soc) {
+	int count = 0, iter;
+	
+	count += wordcount_string(SOC_NAME(soc));
+	count += wordcount_string(SOC_COMMAND(soc));
+	
+	for (iter = 0; iter < NUM_SOCM_MESSAGES; ++iter) {
+		if (SOC_MESSAGE(soc, iter)) {
+			count += wordcount_string(SOC_MESSAGE(soc, iter));
+		}
+	}
+	
+	return count;
+}
+
+
  //////////////////////////////////////////////////////////////////////////////
 //// UTILITIES ///////////////////////////////////////////////////////////////
 

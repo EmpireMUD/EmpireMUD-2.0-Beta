@@ -4243,7 +4243,6 @@ OLC_MODULE(olc_wordcount) {
 				}
 				break;
 			}
-			/*
 			case OLC_SECTOR: {
 				sector_data *sect, *next_sect;
 				HASH_ITER(hh, sector_table, sect, next_sect) {
@@ -4322,7 +4321,6 @@ OLC_MODULE(olc_wordcount) {
 				}
 				break;
 			}
-*/
 		}
 		
 		sprintbit(type, olc_type_bits, temp, FALSE);

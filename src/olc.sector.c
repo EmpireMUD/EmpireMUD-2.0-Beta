@@ -794,6 +794,23 @@ int sort_evolutions(struct evolution_data *a, struct evolution_data *b) {
 }
 
 
+/**
+* Counts the words of text in a sector's strings.
+*
+* @param sector_data *sect The sector whose strings to count.
+* @return int The number of words in the sector's strings.
+*/
+int wordcount_sector(sector_data *sect) {
+	int count = 0;
+	
+	count += wordcount_string(GET_SECT_NAME(sect));
+	count += wordcount_string(GET_SECT_COMMANDS(sect));
+	count += wordcount_string(GET_SECT_TITLE(sect));
+	
+	return count;
+}
+
+
  //////////////////////////////////////////////////////////////////////////////
 //// DISPLAYS ////////////////////////////////////////////////////////////////
 
