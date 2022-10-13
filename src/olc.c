@@ -4273,8 +4273,10 @@ OLC_MODULE(olc_wordcount) {
 			}
 		}
 		
-		sprintbit(BIT(iter), olc_type_bits, temp, FALSE);
-		msg_to_char(ch, "%d %s%s: %d word%s\r\n", count, temp, PLURAL(count), wordcount, PLURAL(wordcount));
+		if (count > 0 || !whole_adv) {
+			sprintbit(BIT(iter), olc_type_bits, temp, FALSE);
+			msg_to_char(ch, "%d %s%s: %d word%s\r\n", count, temp, PLURAL(count), wordcount, PLURAL(wordcount));
+		}
 		total += count;
 		totalwords += wordcount;
 	}
