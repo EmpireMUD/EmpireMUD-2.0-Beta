@@ -936,7 +936,7 @@ int wordcount_trigger(trig_data *trig) {
 	LL_FOREACH(trig->cmdlist, cmd) {
 		for (iter = 0; *accept_list[iter] != '\n'; ++iter) {
 			if (cmd->cmd && strstr(cmd->cmd, accept_list[iter])) {
-				count += wordcount_string(cmd->cmd);
+				count += wordcount_string(cmd->cmd) - 1;
 				break;
 			}
 		}
