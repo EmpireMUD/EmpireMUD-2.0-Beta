@@ -1248,7 +1248,7 @@ const char *affected_bits[] = {
 	"EARTHMELD",
 	"MUMMIFY",
 	"SOULMASK",
-	"*",	// formerly !NATURAL-MAGIC; merged with IMMUNE-MAGICAL-DEBUFFS
+	"NO-TRACKS",
 	"IMMUNE-POISON-DEBUFFS",
 	"IMMUNE-MENTAL-DEBUFFS",
 	"!STUN",
@@ -1291,7 +1291,7 @@ const char *affected_bits_consider[] = {
 	"",	// earthmeld
 	"",	// 25 - mummify
 	"$E is soulmasked.",	// soulmask
-	"",	// * unused
+	"",	// no-tracks
 	"$E is immune to poison debuffs.",	// immune-poison-debuffs
 	"$E is immune to mental debuffs.",	// immune-mental-debuffs
 	"$E is immune to stuns.",	// 30 - !stun
@@ -3596,6 +3596,7 @@ const char *room_aff_bits[] = {
 	"NO-WORKFORCE-EVOS",
 	"HIDE-REAL-NAME",
 	"MAPOUT-BUILDING",
+	"NO-TRACKS",	// 25
 	"\n"
 };
 

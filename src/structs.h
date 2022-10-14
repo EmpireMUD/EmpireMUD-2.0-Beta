@@ -994,7 +994,7 @@ typedef struct vehicle_data vehicle_data;
 #define AFF_EARTHMELD  BIT(24)	// y. interred in the earth
 #define AFF_MUMMIFY  BIT(25)	// z. mummified
 #define AFF_SOULMASK  BIT(26)	// A. soulmask
-	#define AFF_UNUSED  BIT(27)	// B. formerly !natural-magic
+#define AFF_NO_TRACKS  BIT(27)	// B. leaves no tracks
 #define AFF_IMMUNE_POISON_DEBUFFS  BIT(28)	// C. Immune to any 'poison' debuffs
 #define AFF_IMMUNE_MENTAL_DEBUFFS  BIT(29)	// D. Immune to any 'mental' debuffs
 #define AFF_IMMUNE_STUN  BIT(30)	// E. Cannot be hit by stun effects
@@ -2891,6 +2891,7 @@ typedef enum {
 #define ROOM_AFF_NO_WORKFORCE_EVOS  BIT(22)	// w. workforce chores that would evolve the tile don't run
 #define ROOM_AFF_HIDE_REAL_NAME  BIT(23)	// x. won't show the real name after a custom name, like Ruins of a House (Ruins)
 #define ROOM_AFF_MAPOUT_BUILDING  BIT(24)	// y. shows as a building on the mapout (set automatically)
+#define ROOM_AFF_NO_TRACKS  BIT(25)		// z. nobody leaves tracks and you cannot track
 // NOTE: limit BIT(31) -- This is currently an unsigned int, to save space since there are a lot of rooms in the world
 
 
