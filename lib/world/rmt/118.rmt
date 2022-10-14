@@ -4785,6 +4785,10 @@ E
 sap~
 Chunks of dried, crystallized sap are poking through rotten bits of wood.
 ~
+E
+splinters tiny~
+Bits of splintered, rotten wood lie all over the hollow.
+~
 M 0 11887 100.00 1
 M 0 11886 100.00 1
 T 11945

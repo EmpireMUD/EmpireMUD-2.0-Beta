@@ -2073,9 +2073,9 @@ done
 * ensure a player has loot permission
 if %actor.is_pc% && %actor.level% >= %min_level% && %self.is_tagged_by(%actor%)%
   set varname pc%actor.id%
-  if %room.var(%varname%,0)% < %pos%
+  if %room.var(%varname%,0)% < 1
     * actor qualifies
-    set %varname% %pos%
+    set %varname% 1
     remote %varname% %room.id%
     nop %self.remove_mob_flag(!LOOT)%
     set any_ok 1
@@ -2086,9 +2086,9 @@ set ch %room.people%
 while %ch% && !%any_ok%
   if %ch.is_pc% && %ch.level% >= %min_level% && %self.is_tagged_by(%ch%)%
     set varname pc%ch.id%
-    if %room.var(%varname%,0)% < %pos%
+    if %room.var(%varname%,0)% < 1
       * ch qualifies
-      set %varname% %pos%
+      set %varname% 1
       remote %varname% %room.id%
       nop %self.remove_mob_flag(!LOOT)%
       set any_ok 1

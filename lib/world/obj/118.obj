@@ -111,11 +111,17 @@ a way of encouraging guests to become clients -- or even patrons. Self-filling
 vessels such as this one are difficult to find outside, however, as the
 sorcerers usually enchant them to be unpilferable.
 ~
-5 ep a 0 9
+5 ep a 0 11
 72 72 11804
 3 0
 C
 150 250
+M
+4
+You take a swig of $T from $p.~
+M
+5
+$n takes a swig from $p.~
 T 11804
 S
 #11805
@@ -1434,9 +1440,15 @@ you take care not to trip into it as there's no railing or step around it. The
 viridescent light from the glowing shell shimmers off of the water, dancing
 around on the ceiling.
 ~
-5 0 0 0 4
+5 0 0 0 6
 1000000 1000000 11885
 12 0
+M
+4
+You kneel down and drink the $T from the pool.~
+M
+5
+$n kneels down and drinks the $T from the pool.~
 T 11910
 S
 #11885
@@ -1448,9 +1460,15 @@ avoid falling in. Each one is almost as wide as your armspan, and round in
 shape, but none of them is very deep. The pools closer to the stairs are
 well-lit, while the ones in the back of the grotto are difficult to see.
 ~
-5 0 0 0 3
+5 0 0 0 4
 1000000 1000000 11885
 12 0
+M
+4
+You kneel down and drink the $T from one of the pools.~
+M
+5
+$n kneels down and drinks the $T from one of the pools.~
 T 11910
 S
 #11886
@@ -1505,6 +1523,18 @@ M
 18
 The sap dries up and crystallizes.~
 T 11884
+S
+#11889
+splinters tiny~
+the splinters~
+Thousands of tiny splinters hover in the air!~
+   Countless splinters of rotten wood swirl in the air on unseen eddies,
+drawing more and more wood from the sides of the hollow, until the air is so
+full of them you can hardly breathe!
+~
+3 0 0 0 1
+0 0 0
+0 0
 S
 #11891
 sap~

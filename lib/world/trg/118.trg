@@ -3879,6 +3879,7 @@ switch %cycle%
     say Fras kee selmo tagra tyewa...
     wait 1 sec
     %echo% Thousands of tiny splinters of rotted wood rise from the trunk and hover in the air...
+    %load% obj 11889 room
   break
   case 3
     say Fras kee selmo tagra tyewa...
@@ -3892,6 +3893,10 @@ switch %cycle%
     say Ickor carzo a kee selmo, vadur, eydur Tagra Nes!
     wait 1 sec
     %echo% ~%self% stabs the rotten tree with a flint knife as the splinters of wood fall out of the air...
+    set splint %room.contents(11889)%
+    if %splint%
+      %purge% %splint%
+    end
   break
   case 4
     if !%skip%

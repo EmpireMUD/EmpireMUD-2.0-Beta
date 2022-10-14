@@ -41,9 +41,15 @@ wizard's hat and surrounded in a wavy purple line.
    Even after Skycleave became locked in time, the souvenir mugs helped spread
 its legend across the land.
 ~
-5 0 a 0 4
+5 0 a 0 5
 8 8 11902
 6 0
+M
+4
+You tip your mug and sip $T.~
+M
+5
+$n tips $s mug and takes a sip.~
 S
 #11903
 glass tall~
@@ -54,9 +60,15 @@ high precipice, framed by rays from the setting sun.
    Skycleave notoriously reverse-distilled its wine from vinegar in a process
 not well-understood by outsiders.
 ~
-5 0 a 0 2
+5 0 a 0 3
 4 4 11903
 8 0
+M
+4
+You drink $T from $p.~
+M
+5
+$n drinks from $p.~
 S
 #11904
 pasty mutton~
@@ -90,13 +102,12 @@ exotic turquoise cheese~
 Some exotic turquoise cheese has fallen here.~
    This cheese is pale yellow in color, striped with bands of turquoise in a
 pattern not unlike the stripes of a tiger. The yellow part is firm, almost
-bouncy, while the turqoise streaks are soft enough to spread. The label
-indicates that the cheese is made from milk from an un-stable, from something
-that isn't a cow.
-   Rumors circle in the Tower Skycleave of magical experimentation with live
+bouncy, while the turqoise streaks are soft enough to spread. The cheese is
+carved with the shape of a goat's head.
+   Rumors circle in the Tower Skycleave of unstable experimentation with live
 animals, something usually seen as the vulgar purview of nature magic. Some
 sorcerers are eager to create new products or conveniences, with little regard
-for traditional ethics.
+for traditional ethics. And none of them are afraid to mislabel a product.
 ~
 6 m a 0 7
 24 0 0
@@ -121,9 +132,15 @@ miraculously, there's no sign of any water splashing outside the stone rim.
 It looks like some people have tossed coins into the water, perhaps for luck.
 Around the fountain, a long round bench provides ample seating.
 ~
-5 j 0 0 6
+5 j 0 0 7
 1000000 1000000 0
 1 0
+M
+4
+You drink a handful of water from the fountain, but it's not very good.~
+M
+5
+$n drinks a handful of water from the fountain.~
 T 11910
 S
 #11907
@@ -223,11 +240,17 @@ with all the world, for a small fee. The tower's sorcerers often enchant
 mundane objects and simple animals to create extraordinary tools which are
 unparalleled in even the most extraordinary shops.
 ~
-18 p a 0 2
+18 p a 0 3
 -1 0 0
 8 0
 C
 150 150
+M
+4
+You place $p on $P and watch it catch fire!~
+M
+5
+$n places $p on $P and watches it catch fire!~
 S
 #11912
 phial waterwalking blacktower walking~
@@ -243,9 +266,15 @@ tag.
 any found elsewhere in the world. Among them, the long-lasting potions are a
 perennial favorite that draw even experienced adventurers to the store.
 ~
-25 p a 0 4
+25 p a 0 5
 -1 0 -1
 8 0
+M
+4
+You pull the cork and chug the waterwalking phial...~
+M
+5
+$n pulls the cork from a Blacktower phial and chugs it!~
 T 11950
 S
 #11913
@@ -442,9 +471,15 @@ who live in these quarters. The dispenser is made of fine porcelain, shaped
 like a tall kettle, and always cool to the touch despite the piping hot tea
 that pours out. Unfortunately the only cups around here appear to be dirty.
 ~
-5 0 0 0 11
+5 0 0 0 12
 1000 1000 11921
 6 0
+M
+4
+You drink a small cup of $T from $p.~
+M
+5
+$n drinks a small cup of $T from $p.~
 T 11910
 S
 #11922
@@ -536,9 +571,15 @@ years in their unending search to create the simplest, most marketable magical
 products money can buy. In an era of desperately short life expectancies, the
 sorcerers were surprised to find a strong market for potions of great duration.
 ~
-25 p a 0 4
+25 p a 0 5
 -1 0 -1
 8 0
+M
+4
+You pull the cork and chug the perfect sight phial...~
+M
+5
+$n pulls the cork from a Blacktower phial and chugs it!~
 T 11950
 S
 #11925
@@ -556,9 +597,15 @@ and tidbits the sorcerers carry on their persons. A combination of spells and
 potions allows them to carry fantastical amounts often exceeding their own
 weight.
 ~
-25 p a 0 5
+25 p a 0 6
 -1 0 -1
 8 0
+M
+4
+You pull the cork and chug the lighter burdens phial...~
+M
+5
+$n pulls the cork from a Blacktower phial and chugs it!~
 T 11950
 S
 #11926
@@ -572,9 +619,15 @@ of the Tower Skycleave is painted in fine white lines.
 and spoiled food into a tea so hearty that the sorcerers often live on nothing
 else.
 ~
-5 0 a 0 4
+5 0 a 0 5
 4 4 11926
 6 0
+M
+4
+You sip $T from the teacup.~
+M
+5
+$n sips from $s teacup.~
 S
 #11927
 body corpse henri declaire~
@@ -1079,9 +1132,15 @@ water. Every once in a while, one or more of the animal shapes will leap into
 the air and escape the confines of the fountain for a time, before returning to
 splash into the water and disappear.
 ~
-5 j 0 0 5
+5 j 0 0 6
 1000000 1000000 0
 1 0
+M
+4
+You catch a bubble of water in your mouth as it flies from the fountain.~
+M
+5
+$n catches a bubble of water in $s mouth as it flies from the fountain.~
 T 11974
 T 11910
 S
@@ -1245,9 +1304,15 @@ There is a barrel of water with a ladle.~
    The oak barrel is bound with wooden hoops and sealed with pitch. The top is
 open, with a wooden ladle hanging from the rim.
 ~
-5 0 0 0 7
+5 0 0 0 8
 1000 1000 0
 0 0
+M
+4
+You drink a ladle of water from the barrel.~
+M
+5
+$n drinks a ladle of water from the barrel.~
 T 11910
 S
 #11982
@@ -1658,7 +1723,9 @@ a piece of jade cheese~
 A piece of jade cheese is lying on the ground.~
    This little bit of cheese has a stem, almost like it grew on a tree. It has
 a distinctly marbled jade color, but it tastes like a slightly funky cheese.
-tba flavor text
+   Though no cheese truly grows from a plant in nature, the magineers at
+Skycleave have been extraordinarily successful at grafting unusual foods onto
+magical trees.
 ~
 6 g a 0 7
 6 0 0
