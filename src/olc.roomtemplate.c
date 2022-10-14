@@ -914,7 +914,7 @@ void get_template_spawns_display(struct adventure_spawn *list, char *save_buffer
 */
 void olc_show_room_template(char_data *ch) {
 	room_template *rmt = GET_OLC_ROOM_TEMPLATE(ch->desc);
-	char lbuf[MAX_STRING_LENGTH];
+	char lbuf[MAX_STRING_LENGTH*2];
 	
 	adv_data *adv = get_adventure_for_vnum(GET_OLC_VNUM(ch->desc));
 	
