@@ -6,7 +6,7 @@ bottom of the ever-spiraling walkway forms a circular rim around the inside of
 the chamber through which a magnificent nocturnium tree reaches down, bearing
 the flickering flames that light the whole of the interior.
 ~
-cd 0 0
+cd z 0
 D2
 ~
 0 11800
@@ -79,7 +79,7 @@ fountain across from the cafe drowns out the bustle of the crowd. Above, the
 great nocturnium chandelier stretches down through the center of the spiral
 walkway, through which you can see across to the railing of the second floor.
 ~
-c 0 0
+c z 0
 D6
 ~
 0 11901
@@ -169,7 +169,7 @@ even the underside of the second-floor walkway above you are immaculate. A sign
 hangs on the wall next to a large door, opposite a hanging sculpture made from
 metal and wood.
 ~
-c 0 0
+c z 0
 D7
 ~
 0 11902
@@ -263,7 +263,7 @@ follow the curve of the grand chamber's wall up to the second floor and beyond.
 At the base of the stairs is the archway to the gift shop. A colorful sign
 adorns the side of the entrance.
 ~
-c 0 0
+c z 0
 D5
 ~
 0 11903
@@ -345,7 +345,7 @@ it seem like a smaller, more comfortable space. The walls have been papered
 over with pictures of birds and flowers. A menu board floats above the stacks
 of cups, plates, and bowls that cover the long bar along the north wall.
 ~
-c 0 0
+c z 0
 D3
 ~
 0 11902
@@ -434,7 +434,7 @@ wooden desks. The room is quite stark, with one large blackboard making up one
 wall, and another sporting a large bookcase. The walls are paneled with
 polished ebony, but the desks and chairs appear to be oak.
 ~
-cd 0 0
+cd z 0
 D2
 ~
 0 11903
@@ -483,7 +483,7 @@ the brightly-colored shelves displaying wares. The ebony wood of the walls
 vanishes behind all the bubbles and bright colors, making the room feel like
 it goes on forever.
 ~
-c 0 0
+c z 0
 D1
 ~
 0 11904
@@ -546,7 +546,7 @@ the way to the top of the tower. The vast ground floor sprawls out around you,
 with the stairs and gift shop to the west, the cafe to the east, and the study
 hall to the north.
 ~
-c 0 F
+c z F
 D2
 ~
 0 11901
@@ -614,7 +614,7 @@ your reach over the railing. Below, you can see the fountain and people
 meandering around it. Above, through the tree-like chandlier, you can see
 across to the railing of the third floor.
 ~
-cd 0 0
+cd z 0
 D9
 ~
 0 11804
@@ -696,7 +696,7 @@ The Second Floor Walkway of the Tower Skycleave~
 the Tower Skycleave's old masters, with nocturnium light fixtures seperated
 evenly to either side of each portrait.
 ~
-c 0 0
+c z 0
 D4
 ~
 0 11910
@@ -869,7 +869,7 @@ spots around it, marring the usually-spotless interior. The portraits of the
 Tower Skycleave's former masters continue along the walls, alternating with
 nocturnium light fixtures.
 ~
-c 0 0
+c z 0
 D6
 ~
 0 11911
@@ -969,7 +969,7 @@ are smaller light fixtures on the wall between the portraits of the old masters
 of the tower.
 ~
 E
-portraits paintings masters plates~
+portraits paintings masters~
    The portraits of former masters of the Tower Skycleave continue around the
 curve of the hallway, each one framed in ebony wood, with a nocturnium plate
 underneath inscribed with the name in a uniform, elegant script.
@@ -1051,7 +1051,7 @@ walls continue with former masters of the Tower Skycleave, lit by the thousand
 flickering lights of the grand chandelier. The door on the north wall leads to
 quarters for the apprentices and students.
 ~
-c 0 0
+c z 0
 D7
 ~
 0 11912
@@ -1224,7 +1224,7 @@ in some time. One corner of the room has a small desk with a nocturnium lamp
 sitting atop it. The floor is mostly clear, with a small platform with a ring
 bolted to it in the middle.
 ~
-cdh 0 0
+cdh z 0
 D0
 ~
 0 11911
@@ -1302,7 +1302,7 @@ One or two cages are in front of windows, but most of the inhabitants don't get
 a lot of light. The room's aroma is far from pleasant, but a truly disturbing
 odor emanates from a large bin situated in the corner.
 ~
-ch 0 0
+ch z 0
 D3
 ~
 0 11914
@@ -1427,7 +1427,7 @@ windows, covered in a fine mesh, take up most of the east wall, allowing for an
 excellent view and lots of light. A workbench is tucked off to one side, behind
 the track.
 ~
-ch 0 0
+ch z 0
 D3
 ~
 0 11912
@@ -1544,7 +1544,7 @@ please. Stray teacups, books, and various minor magical items are spread around
 the room. The polished mahogany walls, upon which hang a large collection of
 portraits, reflect the soft glow of the lamps.
 ~
-c 0 0
+c z 0
 D2
 ~
 0 11913
@@ -1608,7 +1608,7 @@ yet sturdy door leads off to a bedroom, while the hallway itself curves around
 the tower's central column. The walls are exposed stone blocks here, almost
 like a dungeon, lit only by oil lamps.
 ~
-c 0 0
+c z 0
 D0
 ~
 0 11924
@@ -1639,7 +1639,7 @@ The Apprentice Dormitories~
 off to more bedrooms from here. The cold stone walls hold oil lamps to light
 the hall at night, but this part of the tower is otherwise rather spartan.
 ~
-ch 0 0
+ch z 0
 D5
 ~
 0 11920
@@ -1683,7 +1683,7 @@ Elegant nocturnium fixtures on the walls accompany the grand chandelier to
 light the portraits and the walkway. Over the railing, you can see people
 sitting around the fountain down below.
 ~
-c 0 0
+c z 0
 D5
 ~
 0 11913
@@ -1822,7 +1822,7 @@ landscape painting hangs on one wall and a smaller portrait sits on the desk.
 Curtains are tied back to expose a vast window looking out over the land beyond
 the tower.
 ~
-ch 0 d
+ch z d
 D2
 ~
 0 11919
@@ -1888,7 +1888,7 @@ right next to each bed. Small but elaborately carved chests are positioned side
 by side at the foot of each bed, nearest the walkway. One of the beds has an
 old dreamcatcher over it.
 ~
-ch 0 d
+ch z d
 D2
 ~
 0 11920
@@ -1928,7 +1928,7 @@ Indeed, the room might once have been spacious, but the apprentices have been
 packed in like potted fish. The wall by the door has been painted with a large
 mural.
 ~
-ch 0 d
+ch z d
 D2
 ~
 0 11921
@@ -1968,7 +1968,7 @@ covering the hardwood floors. Rich mahogany panels cover the side walls, while
 the door and window are set in walls of stone block. Precisely tied curtains
 are pulled back to expose the view through the window.
 ~
-ch 0 d
+ch z d
 D0
 ~
 0 11921
@@ -2024,7 +2024,7 @@ grand chamber, the wall is paneled with black ebony that curves around the
 great spiral of the walkway, lit by the enormous nocturnium tree that dangles
 down the center of the chamber, just out of reach over the railing.
 ~
-cd 0 0
+cd z 0
 D9
 ~
 0 11922
@@ -2118,7 +2118,7 @@ Many doors line the walkway on this floor, though most are shut, locked, and
 more than likely magically muffled; however, one open door stands apart from
 the others, with an enchanting little sign over it.
 ~
-c 0 0
+c z 0
 D4
 ~
 0 11930
@@ -2230,7 +2230,7 @@ the Eruditorium, marked by a bright yellow sign. Light from the thousands of
 lamps on the enormous chandelier flickers across an odd painting that hangs
 next to the door.
 ~
-c 0 0
+c z 0
 D6
 ~
 0 11931
@@ -2358,7 +2358,7 @@ to emanate from one of the doors here, marked by an ichor-green sign. It seems
 to be the only door that's not locked shut in this part of the tower and it
 sounds like someone is inside; the rest are magically muffled.
 ~
-c 0 0
+c z 0
 D7
 ~
 0 11932
@@ -2476,7 +2476,7 @@ seem to connect to nothing but the paneled wall. Between the steps, you have
 a clear view of the second floor walkway and the first floor fountain far
 below you.
 ~
-c 0 0
+c z 0
 D5
 ~
 0 11933
@@ -2554,7 +2554,7 @@ and some of the light fixtures are bent out of shape. What looks to be debris
 from a workstation is piled up in a corner awaiting the cleaning service. You
 can see some cabinets through a small archway on the south wall.
 ~
-c 0 0
+c z 0
 D3
 ~
 0 11932
@@ -2615,7 +2615,7 @@ toppled over behind it. A slate blackboard on one wall lists projects and
 instructions. The room is partitioned on the east side and there is a heavy
 door on the west side.
 ~
-c 0 0
+c z 0
 D2
 ~
 0 11933
@@ -2726,7 +2726,7 @@ hidden from what little light spills from the lamp fixtures set high on the
 wall. The chamber has one window, but it's boarded over. A stone table in the
 center of the chamber has leather straps and no small number of stains.
 ~
-c 0 0
+c z 0
 D1
 ~
 0 11936
@@ -2791,7 +2791,7 @@ under glass domes, others locked in cases; one is chained to a large metal post
 which appears to be rattling and shaking. Some of the objects hover above their
 shelves, as if possessed by some unearthly soul.
 ~
-c 0 0
+c z 0
 D3
 ~
 0 11936
@@ -2844,7 +2844,7 @@ piles of household items in the corners, stacked on tables, and generally
 dispersed all over the lab. A portion of the east wall seems to waver like
 the air over a fire, disturbing the visuals of a large painting of a bagel.
 ~
-ch 0 0
+ch z 0
 D0
 ~
 0 11931
@@ -2968,7 +2968,7 @@ manner of strange apparatuses. The center of the area is filled with a three-
 legged stone tortoise. Vines and shrubs are growing down from the high shelves,
 dangling into bins of glowing blue stones.
 ~
-c 0 M
+c z M
 D3
 ~
 0 11939
@@ -3033,7 +3033,7 @@ path to the center dais is from the door. The large windows along the curved
 wall are blocked by the stacks of clutter, so most of the light comes from
 nocturnium lamp fixtures.
 ~
-c 0 0
+c z 0
 D1
 ~
 0 11939
@@ -3097,7 +3097,7 @@ The top floor of the Tower Skycleave is the home of the masters and it shows in
 its elegance and charm. Over the railing, you can see down through the branches
 of the great nocturnium chandelier, all the way to the fountain at the bottom.
 ~
-cd 0 0
+cd z 0
 D9
 ~
 0 11934
@@ -3201,7 +3201,7 @@ plush rug adorns the middle of the wide spiral walkway. A dark wooden door here
 leads to a high sorcerer's office. Across the center of the chamber, two more
 doors lead to the other offices.
 ~
-c 0 0
+c z 0
 D4
 ~
 0 11960
@@ -3321,7 +3321,7 @@ sculptures. Across the calamander railing, the trunk of the tower's enormous
 chandelier grows downward, where it branches into a tree that glimmers with the
 light of a thousand tiny oil lamps.
 ~
-c 0 0
+c z 0
 D6
 ~
 0 11961
@@ -3389,7 +3389,7 @@ down through the center of the chamber. The door handles, too, are made from
 the rare metal. This price of this tower must have been astronomical.
 ~
 E
-railing handrail chandelier tree trunk sculpture~
+railing handrail chandelier tree trunk~
    The striped handrail curves around the walkway that hugs the wall of the
 grand chamber. Across the railing, the trunk of the grand chandelier twists
 downward. Looking over the rail, you see that it branches out into an inverted
@@ -3442,7 +3442,7 @@ by the nocturnium sculpture that serves as the tower's grand chandelier, its
 countless branches lighting the floors below. This floor is instead lit by
 lanterns that hang on chains from the arching ebony beams of the high ceiling.
 ~
-c 0 0
+c z 0
 D7
 ~
 0 11962
@@ -3585,7 +3585,7 @@ entire wall and, with the chairs and desk, leaves very little room to move. The
 wall next to the exit features an inspirational painting. The other doorway, to
 the side, leads to a private apartment.
 ~
-ch 0 0
+ch z 0
 D0
 ~
 0 11961
@@ -3629,7 +3629,7 @@ provides a place to cook, although it looks as if it doesn't get much use.
 White marble floors seem to light the room from below as they reflect light
 from the nocturnium chandelier onto the dark walls.
 ~
-cdh 0 dG
+cdh z dG
 D3
 ~
 0 11964
@@ -3690,7 +3690,7 @@ large window looks out over a desert canyon. A raised dais near the window is
 surrounded by a tightly-woven rug and a small nocturnium chandelier hangs from
 the ceiling.
 ~
-cd 0 0
+cd z 0
 D3
 ~
 0 11962
@@ -3777,7 +3777,7 @@ are more tightly packed near the counter. A rather stately bed rests behind
 gossamer curtains and another curtain exposes an area where High Sorcerer
 Barrosh can make his ablutions.
 ~
-ch 0 dG
+ch z dG
 D2
 ~
 0 11966
@@ -3831,7 +3831,7 @@ along one wall; plush rugs cover the checkerboard marble floor and a painting
 hangs in a gold frame near the door. An extravagant nocturnium chandelier
 strung across lights the office with a soft violet glow.
 ~
-ch 0 0
+ch z 0
 D2
 ~
 0 11963
@@ -3892,7 +3892,7 @@ hang in mid-air. Rugs so plush and thick they could be used as beds themselves
 cover most of the alternating white and black marble flooring. Several
 scintillating curtains of pure energy obscure the private areas behind them.
 ~
-cdh 0 dG
+cdh z dG
 D1
 ~
 0 11968
@@ -3956,7 +3956,7 @@ The Upper Walkway of the Tower Skycleave~
 climbing to a round hatch in the ceiling. The stairway is dimly lit by only a
 couple of simple nocturnium light fixtures.
 ~
-c 0 0
+c z 0
 D5
 ~
 0 11963
@@ -4003,7 +4003,7 @@ wall circles the round roof of the tower, from which you can look out over the
 whole countryside. Dark marble benches and leafy shade trees provide ample
 space for reflection.
 ~
-cdh 0 F
+cdh z F
 D9
 ~
 0 11970
@@ -4063,7 +4063,7 @@ plane of water. The light that spills down from the round fountain far above
 you vanishes in all directions; there is nothing here but water and you quickly
 realize you cannot breathe.
 ~
-ci 0 F
+ci z F
 D8
 ~
 0 11908

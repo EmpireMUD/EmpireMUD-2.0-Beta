@@ -1997,7 +1997,6 @@ end
 %load% mob 11928
 set mob %room.people%
 if %mob.vnum% == 11928
-  dg_affect %mob% !ATTACK on -1
   if %room.varexists(spawned)%
     eval spawned %room.spawned% + 1
   else
@@ -2185,15 +2184,25 @@ while %obj%
 done
 ~
 #11935
-Skycleave: Detect quest interaction~
+Skycleave: Detect look interaction~
 0 c 0
 look~
 return 0
 * detects looking at character
 if %actor.char_target(%arg.car%)% == %self%
-  if %actor.on_quest(11801)%
-    %quest% %actor% trigger 11801
-  end
+  * looking at me
+  switch %self.vnum%
+    case 11933
+      * the mop / Dylane Jr
+      if %actor.on_quest(11801)%
+        %quest% %actor% trigger 11801
+      end
+    break
+  done
+elseif %self.vnum% == 11888 && %arg% == knezz
+  * Iskip of Rot and Ruin easter egg
+  %send% %actor% You can't get a good look at him from down here.
+  return 1
 end
 ~
 #11936
@@ -2562,6 +2571,7 @@ Iskip: Only drops loot for unique fighters~
 * Iskip only loses his !LOOT flag if a unique person over min_level has tagged him
 set room %self.room%
 set min_level 150
+set done 0
 if %actor.is_pc% && %actor.level% >= %min_level% && %self.is_tagged_by(%actor%)%
   set varname pc%actor.id%
   if !%room.var(%varname%,0)%
@@ -2569,12 +2579,12 @@ if %actor.is_pc% && %actor.level% >= %min_level% && %self.is_tagged_by(%actor%)%
     set %varname% %dailycycle%
     remote %varname% %room.id%
     nop %self.remove_mob_flag(!LOOT)%
-    halt
+    set done 1
   end
 end
 * actor didn't qualify -- find anyone present who does
 set ch %room.people%
-while %ch%
+while %ch% && !%done%
   if %ch.is_pc% && %ch.level% >= %min_level% && %self.is_tagged_by(%ch%)%
     set varname pc%ch.id%
     if !%room.var(%varname%,0)%
@@ -2582,11 +2592,18 @@ while %ch%
       set %varname% %dailycycle%
       remote %varname% %room.id%
       nop %self.remove_mob_flag(!LOOT)%
-      halt
+      set done 1
     end
   end
   set ch %ch.next_in_room%
 done
+* and message
+if %self.mob_flagged(!LOOT)%
+  %echo% The giant, Iskip, turns to ash as he falls and blows away on the breeze.
+else
+  %echo% The giant, Iskip, turns to ash as he falls, dropping some items on the stump as he blows away on the breeze.
+end
+return 0
 ~
 #11942
 Iskip: Re-spawn boss when new player arrives~
@@ -3061,11 +3078,21 @@ Smol Nes-Pik: Block abilities in the jar~
 return 0
 ~
 #11952
-Smol Nes-Pik: Block look at room~
+Smol Nes-Pik: Inside the sap: catch look and skip~
 2 c 0
-look~
-if !%arg%
+look skip~
+if %cmd.mudcommand% == look && !%arg%
   %send% %actor% You can't see much of anything through the thick sap.
+  return 1
+elseif skip /= %cmd%
+  %send% %actor% You skip the cutscene.
+  if %actor.var(last_iskip_intro,0)% == %dailycycle%
+    %send% %actor% (It may take a few seconds to finish the cutscene anyway.)
+  end
+  set last_iskip_intro %dailycycle%
+  remote last_iskip_intro %actor.id%
+else
+  return 0
 end
 ~
 #11953
