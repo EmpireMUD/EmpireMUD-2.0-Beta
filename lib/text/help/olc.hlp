@@ -5388,8 +5388,8 @@ Message types:
  &cbuild-to-room&0 - Shown to the room when the item is built into a building.
  &cinstrument-to-char&0 - Shown every few seconds to the person playing the instrument.
  &cinstrument-to-room&0 - Shown every few seconds to the room when someone is playing an instrument.
- &ceat-to-char&0 - Shown to the person when they eat the item.
- &ceat-to-room&0 - Shown to the room when a person eats an item.
+ &cconsume-to-char&0 - Shown to the person when they eat/drink the item ($p for container, $T for liquid).
+ &cconsume-to-room&0 - Shown to the room when a person eats/drinks an item ($p for container, $T for liquid).
  &ccraft-to-char&0 - Shown to the actor when building a vehicle ($V for vehicle).
  &ccraft-to-room&0 - Shown to the room when building a vehicle ($V for vehicle).
  &cwear-to-char&0 - Shown to the person when they wear an item ($p for item).

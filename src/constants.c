@@ -2727,8 +2727,8 @@ const char *obj_custom_types[] = {
 	"build-to-room",
 	"instrument-to-char",
 	"instrument-to-room",
-	"eat-to-char",
-	"eat-to-room",	// 5
+	"consume-to-char",
+	"consume-to-room",	// 5
 	"craft-to-char",
 	"craft-to-room",
 	"wear-to-char",
