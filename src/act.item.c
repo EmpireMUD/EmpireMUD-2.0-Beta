@@ -5905,8 +5905,21 @@ ACMD(do_light) {
 			gain_player_tech_exp(ch, PTECH_LIGHT_FIRE, 15);
 		}
 		else if (lighter) {
-			act("You use $p to light $P.", FALSE, ch, lighter, obj, TO_CHAR);
-			act("$n uses $p to light $P.", FALSE, ch, lighter, obj, TO_ROOM);
+			// obj message to char
+			if (obj_has_custom_message(lighter, OBJ_CUSTOM_CONSUME_TO_CHAR)) {
+				act(obj_get_custom_message(lighter, OBJ_CUSTOM_CONSUME_TO_CHAR), FALSE, ch, lighter, obj, TO_CHAR);
+			}
+			else {
+				act("You use $p to light $P.", FALSE, ch, lighter, obj, TO_CHAR);
+			}
+			
+			// obj message to room
+			if (obj_has_custom_message(lighter, OBJ_CUSTOM_CONSUME_TO_ROOM)) {
+				act(obj_get_custom_message(lighter, OBJ_CUSTOM_CONSUME_TO_ROOM), TRUE, ch, lighter, obj, TO_ROOM);
+			}
+			else {
+				act("$n uses $p to light $P.", FALSE, ch, lighter, obj, TO_ROOM);
+			}
 		}
 		else { // somehow?
 			act("You light $P.", FALSE, ch, NULL, obj, TO_CHAR);
