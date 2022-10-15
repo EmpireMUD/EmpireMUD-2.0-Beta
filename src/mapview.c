@@ -2558,6 +2558,11 @@ void perform_mortal_where(char_data *ch, char *arg) {
 			if ((dist = compute_distance(IN_ROOM(ch), IN_ROOM(i))) > max_distance)
 				continue;
 			
+			if (NO_LOCATION(IN_ROOM(ch)) != NO_LOCATION(IN_ROOM(i))) {
+				// if one is no-location and the other isn't, they definitely can't see each other
+				continue;
+			}
+			
 			ch_inst = find_instance_by_room(IN_ROOM(ch), FALSE, FALSE);
 			i_inst = find_instance_by_room(IN_ROOM(i), FALSE, FALSE);
 			if (ch_inst != i_inst || IS_ADVENTURE_ROOM(IN_ROOM(i)) != !IS_ADVENTURE_ROOM(IN_ROOM(ch))) {
@@ -2605,7 +2610,12 @@ void perform_mortal_where(char_data *ch, char *arg) {
 				continue;
 			if ((dist = compute_distance(IN_ROOM(ch), IN_ROOM(i))) > max_distance)
 				continue;
-				
+			
+			if (NO_LOCATION(IN_ROOM(ch)) != NO_LOCATION(IN_ROOM(i))) {
+				// if one is no-location and the other isn't, they definitely can't see each other
+				continue;
+			}
+			
 			ch_inst = find_instance_by_room(IN_ROOM(ch), FALSE, FALSE);
 			i_inst = find_instance_by_room(IN_ROOM(i), FALSE, FALSE);
 			if (i_inst != ch_inst || find_instance_by_room(IN_ROOM(ch), FALSE, FALSE) != find_instance_by_room(IN_ROOM(i), FALSE, FALSE)) {
