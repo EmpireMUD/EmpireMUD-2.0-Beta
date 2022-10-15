@@ -129,6 +129,19 @@ end
 * mark time for despawn trig
 set loadtime %timestamp%
 remote loadtime %self.id%
+* custom text
+if %self.vnum% == 11837 && %self.room.template% == 11910
+  %mod% %self% append-lookdesc-noformat &0   The black tower houses many of the most erudite sorcerers from across the
+  %mod% %self% append-lookdesc-noformat world, though their admission standards are not as high as one might expect.
+  %mod% %self% append-lookdesc-noformat Indeed, the tower is often willing to take on any eager apprentice. Some can
+  %mod% %self% append-lookdesc-noformat be molded into powerful magic users. Others, unfortunately, wash out.
+elseif %self.vnum% == 11837 && %self.room.template% == 11930
+  %mod% %self% append-lookdesc-noformat &0   The Tower Skycleave is kept spotless at all times by the many apprentices
+  %mod% %self% append-lookdesc-noformat who have come seeking power. The beauty and perfection of the tower are of such
+  %mod% %self% append-lookdesc-noformat importance to the high sorcerers that they sometimes recruit more students than
+  %mod% %self% append-lookdesc-noformat they need. The brightest ones rise to the top, while the rest are given their
+  %mod% %self% append-lookdesc-noformat walking papers.
+end
 ~
 #11903
 Spirit of Skycleave setup~
@@ -1967,14 +1980,15 @@ end
 * check for existing tracks in that dir, and bump the new ones up in the list
 set iter %room.contents(11930)%
 while %iter%
+  set next %iter.next_in_list%
   if %iter.vnum% == 11930
     if %iter.direction% == %direction%
-      * found match: teleport to same room to bump them up in the list
-      %teleport% %iter% %room%
-      halt
+      * found match: purge it to put a fresh one at the top
+      %purge% %iter%
+      * formerly: %teleport% %iter% %room%
     end
   end
-  set iter %iter.next_in_list%
+  set iter %next%
 done
 * Success: has breadcrumbs item, is a player, and there are no crumbs in the room
 %load% obj 11930
@@ -2172,16 +2186,23 @@ Skycleave: Janitor cleanup service~
 ~
 set purge_list 1000 11929 11930
 wait 2 sec
+set done 0
 set obj %self.room.contents%
-while %obj%
+while %obj% && !%done%
   set next_obj %obj.next_in_list%
   if %purge_list% ~= %obj.vnum%
     %echo% ~%self% cleans up @%obj%.
     nop %obj.empty%
     %purge% %obj%
+    set done 1
   end
   set obj %next_obj%
 done
+if !%done% && %self.vnum% == 11837
+  * didn't find any?
+  %echo% The swarm of rags scatters, with each rag tucking itself away out of sight.
+  %purge% %self%
+end
 ~
 #11935
 Skycleave: Detect look interaction~

@@ -448,9 +448,9 @@ T 11824
 T 11807
 S
 #11817
-bruiser goblin~
-a goblin bruiser~
-Goblin bruiser is here.
+miner goblin~
+a goblin miner~
+Goblin miner is here.
 ~
 0 0 abdI 0 2
 0 0 0 2
@@ -1046,6 +1046,7 @@ that appears as thin as a sheet, allowing it to move effortlessly with its
 curved, boneless arms and legs. Its four wide-set black eyes narrow to vertical
 slits as it considers its chances of escape in each direction.
 ~
+I 4 11830 100.00 1  # LOOT: otherworldly bodysuit
 T 11829
 S
 #11830
@@ -1210,6 +1211,45 @@ M
 emote $n comes screaming toward you, lashing at you with snake-like wrappings, before realizing you aren't $s enemy.~
 T 11839
 T 11806
+S
+#11837
+rags swarm~
+the swarm of rags~
+A swarm of rags is cleaning the walkway.
+~
+50 50 bdh nG 2
+0 0 2 7
+D
+   The cloud of flying rags is in a cleaning frenzy, wiping, scrubbing, and
+polishing everything from the floor and handrails to the paneled walls, to the
+enormous chandelier. The rags come in all shades from light to dark, though
+they move so fast it's hard to focus on any one of them.
+~
+M
+0
+The rags swirl around the floor...~
+M
+0
+The rags whoosh over the walls...~
+M
+0
+The rags twirl around every rail and surface...~
+M
+0
+The rags swarm over you, leaving you feeling a little smothered but polished.~
+M
+0
+The rags polish your boots.~
+M
+0
+The rags whip and spin into a little tornado, sucking dust up with them...~
+M
+0
+You swat at a rag as it nearly flies into your face.~
+T 11902
+T 11904
+T 11934
+T 11810
 S
 #11838
 Weyonomon spirit apprentice~

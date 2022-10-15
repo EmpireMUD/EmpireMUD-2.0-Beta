@@ -1256,7 +1256,7 @@ switch %self.vnum%
     set sex_list  male   female male male female male male  female male male    male male male female
   break
   case 11817
-    * goblin bruiser
+    * goblin miner
     set name_list Vyle Grosk Brang  Fance  Byth   Slansh Fonk Rong Shyf   Myte   Vrack Rend Worze  Chum
     set sex_list  male male  female female female male   male male female female male  male female male
   break
@@ -1305,9 +1305,9 @@ switch %self.vnum%
     %mod% %self% lookdesc Armed with dozens of tiny knives, this forest-green goblin has come ready for war.
   break
   case 11817
-    * goblin bruiser
-    %mod% %self% longdesc %name% is punching a wall.
-    %mod% %self% lookdesc All muscle and no quit, this green little goblin looks like %self.heshe% means business. With a war axe in one hand and a spear in the other, %self.heshe% paces back and forth, just waiting for you to make your move.
+    * goblin miner
+    %mod% %self% longdesc %name% is swinging a pickaxe at the wall.
+    %mod% %self% lookdesc All muscle and no quit, this green little goblin looks like %self.heshe% means business. With a pickaxe in one hand and a shovel in the other, %self.heshe% paces back and forth, looking for the right place to strike.
   break
 done
 detach 11824 %self.id%
@@ -5407,6 +5407,7 @@ end
 %at% i11918 %load% mob 11918  * Race Caller
 %at% i11919 %load% mob 11921  * Broom
 %at% i11912 %load% mob 11922  * Duster
+%at% i11910 %load% mob 11837  * Swarm of Rags
 * 4. Move people from the old rooms
 set vnum %start_room%
 while %vnum% <= %end_room%
@@ -5474,6 +5475,7 @@ if %waltur%
   %at% i11940 %load% mob 11940  * Magineer Waltur (if he survived)
 end
 %at% i11932 %load% mob 11933  * Walking Mop
+%at% i11930 %load% mob 11837  * Swarm of Rags
 skydel 11833 0  * Goef the shimmer
 %at% i11941 %load% mob 11941  * Goef the Attuner
 * 4. Move people from the old rooms
