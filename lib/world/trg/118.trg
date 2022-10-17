@@ -3285,13 +3285,13 @@ if %seconds% > 60
   * messaging
   %echo% A blast of dark energy throws you backwards as a shadow claws its way out of Knezz's mouth and joins the Shade above him.
   wait 6 sec
-  %echo% The Shade of Mezvienne drops Knezz's lifeless body in the chair and snatches his nocturnium wand.
+  %echo% The Shade of Mezvienne drops Knezz's lifeless body in the chair and snatches his wand.
   set knezz %room.people(11868)%
   if %knezz%
     %slay% %knezz%
   end
   wait 6 sec
-  %echo% The Shade holds the wand high in the air and shouts, 'By the power of Skycleave... I HAVE THE POWER!'
+  %echo% The Shade holds the gnarled wand high in the air and shouts, 'By the power of Skycleave... I HAVE THE POWER!'
   wait 3 sec
   %echo% The Shade of Mezvienne grows and transforms as it ascends into a higher being!
   %load% mob 11863
@@ -3371,7 +3371,7 @@ switch %line%
   case 1
     say Ah... that was perilously close. Give me a moment to collect myself. She took a lot out of me.
     wait 9 sec
-    %echo% Knezz draws an elegant nocturnium wand from the sleeve of his robe and turns it toward himself.
+    %echo% Knezz draws a gnarled old wand from the sleeve of his robe and turns it toward himself.
     wait 1
     say On my authority, I cast out the shadow!
     wait 8 sec
@@ -5520,11 +5520,18 @@ if %instance.mob(11861)%
   %at% i11933 %load% mob 11929  * page Paige
 end
 %at% i11967 %load% mob 11967  * Barrosh
-if %instance.mob(11868)% || %instance.mob(11870)%
+* check knezz
+set knezz %instance.mob(11868)%
+if !%knezz%
+  * backup knezz
+  set knezz %instance.mob(11870)%
+end
+if %knezz%
   * Knezz survived
   %at% i11964 %load% mob 11964  * HS Celiya
   %at% i11964 %load% obj 11969  * Celiya's desk
-  %at% i11968 %load% mob 11968  * GHS Knezz
+  eval knezz_room %knezz.room.template% + 100
+  %at% i%knezz_room% %load% mob 11968  * GHS Knezz
   %at% i11968 %load% obj 11968  * Knezz's desk
   * Mark for claw game
   set spirit %instance.mob(11900)%

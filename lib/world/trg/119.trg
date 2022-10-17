@@ -2287,7 +2287,20 @@ Skycleave: Gossipping pages~
 0 bw 50
 ~
 set spirit %instance.mob(11900)%
-* find a random human to speak to
+* page sheila: chance to jump the no-mob barrier
+if %self.vnum% == 11959 && %self.var(barrier_jump,0)% + 120 < %timestamp%
+  if %self.room.template% == 11961
+    northeast
+    set barrier_jump %timestamp%
+    remote barrier_jump %self.id%
+    halt
+  elseif %self.room.template% == 11963
+    southeast
+    set barrier_jump %timestamp%
+    remote barrier_jump %self.id%
+    halt
+  end
+end
 set count 0
 set target 0
 while %count% < 10 && !%target%

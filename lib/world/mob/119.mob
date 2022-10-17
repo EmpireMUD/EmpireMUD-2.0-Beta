@@ -123,7 +123,7 @@ Page Corwin~
 Corwin is bustling about.
 ~
 0 0 dvxAH n 3
-1 0 0 15
+1 0 68 15
 D
    Corwin is a young man of perhaps 16 years. He keeps his hair cropped short
 so it's off his neck and forehead while he bustles around the tower in his
@@ -658,7 +658,7 @@ the feather duster~
 A feather duster swishes as it flies across every surface.
 ~
 50 50 dh nG 2
-0 0 2 21
+0 0 103 21
 D
    This elegant little plume of fluffy red feathers is bound by a strap of
 inky shadowhide. It flits and dances over shelves, chairs, railings, and even
@@ -839,7 +839,7 @@ Paige~
 A page is bustling past you.
 ~
 0 0 dvxAH n 3
-2 0 0 15
+2 0 50 15
 D
    Paige is a young woman with her brown and blonde hair in a jaw-length bob.
 She's wearing the same plain jute robe as the other pages, but she's stitched
@@ -1311,7 +1311,7 @@ Page Amets~
 A page is bustling around.
 ~
 0 0 dvxAH n 3
-1 0 0 15
+1 0 64 15
 D
    Amets is a portly man with a bright red sash over his plain jute robe. He's
 still fairly young, though his age is betrayed by heavy bags under his eyes.
@@ -1334,7 +1334,7 @@ the gray fox~
 There is a gray fox sniffing around.
 ~
 0 0 dj n 3
-0 0 14 15
+0 0 102 15
 D
    The curious fox isn't much larger than a cat, with an ashen-silver coat, a
 white belly, and red fur in between. It has an adorable little pointed face
@@ -1656,7 +1656,7 @@ Orkhan~
 There's a boy sitting on one of the taller houses.
 ~
 0 0 d n 3
-1 0 0 15
+1 0 86 15
 D
    Orkhan, a slight boy with verdant jade skin, is sitting on the edge of one
 of the taller houses with his spindly green legs hanging down, just watching
@@ -1940,7 +1940,7 @@ Page Sheila~
 Sheila is bustling about, getting things in order.
 ~
 0 0 dvxAH n 3
-2 0 0 15
+2 0 99 15
 D
    Sheila is dressed in a plain jute robe, like all the pages in the tower. She
 has dyed her fingertip-short black hair with a streak of lavender that stands
@@ -1957,7 +1957,7 @@ the filing cabinet~
 A filing cabinet is standing here.
 ~
 50 50 dh nG 2
-0 0 15 5
+0 0 93 5
 D
    The wooden cabinet is mahogany, stained with a slight violet tinge, with
 three sliding drawers that clatter open and shut as it hops along. Though it
@@ -1999,7 +1999,7 @@ the bookshelf~
 An ebony bookshelf is standing here.
 ~
 50 50 dh nG 3
-0 0 15 5
+0 0 61 5
 D
    The bookshelf is made from dark ebony wood with striped calamander accents
 on the front. It's taller than you, and wider, and looks quite heavy. The floor
@@ -2075,7 +2075,7 @@ a renegade pixy~
 A pixy renegade swoops down from above!
 ~
 100 150 dxzA 0 1
-2 0 2 28
+2 0 45 28
 D
    The moth-like little imp won't seem to leave you alone. You duck as it flies
 straight for your eye, getting a glimpse at its sadistic, crooked little smile
@@ -3056,7 +3056,7 @@ Ryke~
 Ryke is out for a walk.
 ~
 0 0 d n 3
-1 0 0 15
+1 0 86 15
 D
    Ryke strolls along at a leisurely pace, looking at everyone he passes, and
 casting the occasional smile. He's young, tall (for a goblin), and his skin
@@ -3389,7 +3389,7 @@ the loyal footstool~
 A loyal footstool is hopping around.
 ~
 1 1 bdoD n 1
-0 0 0 15
+0 0 14 15
 D
    The footstool is a plus little square with deep purple fabric and mahogany
 legs. The corners are set with little tassles that wave as it hops around like

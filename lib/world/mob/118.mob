@@ -18,7 +18,7 @@ Dylane~
 Dylane of Trense is here, looking around.
 ~
 0 0 dvAH n 3
-1 0 0 15
+1 0 86 15
 D
    Dressed unmistakably in the finery of a nobleman and making no efforts to
 hide his wealth, Dylane is making himself as conspicuous as possible. His face
@@ -109,7 +109,7 @@ Page Corwin~
 Corwin is bustling about.
 ~
 0 0 dvxA n 3
-1 0 0 15
+1 0 68 15
 D
    Corwin is sweating under his heavy jute page robe. He's bustling around
 trying to organize the refugees down here on the first floor. He looks young,
@@ -252,7 +252,7 @@ S
 A young lady is standing here.
 ~
 0 0 dvA n 3
-2 0 0 15
+2 0 102 15
 D
    She's young, not past her second decade, and it looks as if she's been
 crying. She wears a simple white dress and silver jewelry; she's constantly
@@ -601,7 +601,7 @@ Hugh~
 Hugh Mann stands here in a low hat and full-length coat.
 ~
 0 0 dvA n 3
-1 0 0 15
+1 0 88 15
 D
    It's hard to get a good look at his face since his hat is pulled low. You're
 not really sure he can see you, either -- it might be below his eyes. He's
@@ -1920,7 +1920,7 @@ a fluidic alpaca~
 A fluidic alpaca sloshes past you!
 ~
 0 0 bd n 3
-0 0 11 15
+0 0 14 15
 D
    The fluffy alpaca is made of pure water; you can see right through it! It
 bounds along, spritzing everyone it passes with a fine mist.
@@ -1950,7 +1950,7 @@ a liquiform hawk~
 A liquiform hawk soars past you!
 ~
 0 0 bd mn 3
-0 0 2 15
+0 0 25 15
 D
    The elegant hawk is transparent, made only of water. Behind it, the wall
 seems to wave as you watch it through the hawk's body. It swoops and turns,
@@ -2460,7 +2460,7 @@ Joiago~
 Joiago is standing here.
 ~
 0 0 dx n 3
-1 0 0 15
+1 0 86 15
 D
    Joiago stands a full head taller than you, with blue-black hair and hazel
 eyes that sit beneath high-arching eyebrows. He's dressed in a green silk tunic

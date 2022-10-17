@@ -1,26 +1,31 @@
 #11906
 High Sorcery Instruction~
-   Instructor Huberus is teaching a class on High Sorcery. However, your brain
-doesn't seem to be able to process any of the information. Perhaps you have to
-pay him first...
-(Make sure you don't have High Sorcery no-skilled.)
+   Instructor Huberus shuffles back and forth across the classroom, loudly
+pontificating on topics you can't seem to comprehend. It seems to be a High
+Sorcery lesson, but the words are all jumbled.
+   Perhaps you have to pay her first... This daily quest will raise your High
+Sorcery by at least 1 point if it's under 50. (Make sure you don't have High
+Sorcery no-skilled.)
 ~
-   You pay Instructor Huberus and sit down for a lesson. You can feel your mind
-expand almost instantly...
+   You pay the fee and sit for Instructor Huberus's lesson. Comprehension comes
+quickly as you feel your mind expand. For a moment, you can almost see the
+magic that underpins reality.
 ~
-2 de 0 0 -1
+4 de 0 0 -1
 A
 1 11906
 P
 9 2 0 1 a
 P
 10 2 0 49 a
+P
+16 11800 0 6 a
 R
 5 2 1
 R
 4 2 50
 W
-21 0 0 100 -
+21 0 0 500 -
 Z
 1 11906
 S
@@ -68,9 +73,13 @@ it wrong. I tried hitting it a few times, erm, with a bucket, but it didn't
 really help much. Still, enjoy your prize... Oh! And thank you for your
 established patronage at Towrinkel's, erm, Gift Shop.'
 ~
-23 e 125 250 -1
+25 e 125 250 -1
 A
 1 11900
+A
+2 11908
+A
+2 11907
 P
 16 11800 0 6 a
 P
@@ -386,9 +395,10 @@ getting answers.'
    You try to discuss it further, but Niamh seems lost in her own thoughts and
 she soon wanders off.
 ~
-17 ei 125 250 -1
+18 ei 125 250 -1
 A
 1 11900
+D 11863
 P
 16 11800 0 6 a
 P

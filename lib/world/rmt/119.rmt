@@ -3022,6 +3022,11 @@ least, something that resembles one. It appears to be made from small stone
 blocks, with a flat top that could hold objects if it could stand up straight.
 It appears to be missing its fourth leg.
 ~
+E
+lenses glass array~
+   Some of the workbenches have an array of glass lenses that seem to magnify
+items placed under them.
+~
 M 1 11839 100.00 2
 S
 #11941
@@ -3321,7 +3326,7 @@ sculptures. Across the calamander railing, the trunk of the tower's enormous
 chandelier grows downward, where it branches into a tree that glimmers with the
 light of a thousand tiny oil lamps.
 ~
-c z 0
+cd z 0
 D6
 ~
 0 11961
@@ -3629,7 +3634,7 @@ provides a place to cook, although it looks as if it doesn't get much use.
 White marble floors seem to light the room from below as they reflect light
 from the nocturnium chandelier onto the dark walls.
 ~
-cdh z dG
+ch z dG
 D3
 ~
 0 11964
@@ -3777,7 +3782,7 @@ are more tightly packed near the counter. A rather stately bed rests behind
 gossamer curtains and another curtain exposes an area where High Sorcerer
 Barrosh can make his ablutions.
 ~
-ch z dG
+cdh z dG
 D2
 ~
 0 11966
@@ -3892,7 +3897,7 @@ hang in mid-air. Rugs so plush and thick they could be used as beds themselves
 cover most of the alternating white and black marble flooring. Several
 scintillating curtains of pure energy obscure the private areas behind them.
 ~
-cdh z dG
+ch z dG
 D1
 ~
 0 11968

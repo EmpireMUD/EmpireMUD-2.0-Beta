@@ -76,13 +76,15 @@ frown. 'But we certainly can't have the boy running around here. Fine, fine,
 I'm sure I owe you this much. Bring him up here. Just promise me he will leave
 the tower before the headmaster finds out.'
 ~
-12 0 125 250 -1
+13 0 125 250 -1
 A
 1 11801
 P
 16 11800 0 8 a
 P
 0 11801 0 1 a
+R
+2 11861 1
 T 11830
 W
 13 11939 0 1 -
@@ -204,9 +206,10 @@ goblins swore up and down there wasn't a secret passage but they've been
 playing stupid pranks on me for months using it.'
    She fumes and stomps off without thanking you.
 ~
-22 ei 125 250 -1
+23 ei 125 250 -1
 A
 1 11900
+D 11816
 P
 16 11800 0 6 a
 P
@@ -240,9 +243,10 @@ without a good reason.'
 interesting indeed.'
    She trails off, completely forgetting you're even here.
 ~
-22 ei 125 250 -1
+23 ei 125 250 -1
 A
 1 11900
+D 11816
 P
 16 11800 0 6 a
 P
@@ -273,9 +277,10 @@ thinks on it for a moment.
    'The pixies never seem to try to escape. I plum thought they liked it here,'
 she says. 'And what did she mean by that last part... 'in time'?'
 ~
-23 ei 125 250 -1
+24 ei 125 250 -1
 A
 1 11900
+D 11816
 P
 16 11800 0 6 a
 P
@@ -288,6 +293,52 @@ Z
 1 11910
 Z
 1 11891
+S
+#11820
+Skycleave: The Queen's Way Out~
+   As you approach, the tiny queen flies right up to your face, almost too
+close to focus on her tiny shape, and looks you square in the eye.
+   'We have seen you in this tower before, not to conquer but to save,' she
+says. 'Very curious, for one dressed in such a manner. Banish any notion that
+we are here to assist you, but do heed these words:
+   'The whole of this tower is trapped in a time loop from which it may never
+escape. This is our fate as surely as it will become yours. But there remains
+one glimmer of hope. There is a singular creature that sometimes dwells in this
+tower, one unlike any we have ever seen. And in its dark heart may lie the key
+to the entire thing.'
+   The queen turns away from you and flies slowly across the room as she
+continues, 'It is a shadow -- a shade, in truth. It is a tiny fragment of the
+enchantress called Mezvienne, but it is capable of so much more. It consumes
+mana with a voracity we have never witnessed. You must rile it and then allow
+it to consume enough energy to ascend. Once it has done so, it may be able to
+absorb enough energy from the time loop to break us free. Defeat the ascended
+shadow to dispel the stolen energy and break us all free.'
+~
+   Grand High Sorcerer Celiya listens intently as you tell her first what the
+pixy queen said, then about the shade killing Professor Knezz, and then about
+your life-and-death struggle against the Shadow Ascendant.
+   'Oh, sugar,' the sorcerer says, wiping her eyes. 'Oh, oh, sugar. That man
+was the greatest sorcerer I've ever known. If there was a way out of this time
+loop, he's the only one who could have found it. We are good and stuck now.
+I've only just learned of the loop and you're the first person I've met who
+isn't bound to it.'
+   Celiya puts a hand on your shoulder.
+   'You have to get out of here before the loop restarts, then you absolutely
+must find us again, fight your way to the top, and save Josef Knezz. It is the
+only hope we have left.'
+~
+24 i 125 250 -1
+A
+1 11819
+P
+0 11812 0 1 a
+R
+7 11800 10
+W+
+3 11863 0 1 -
+Defeat the Shadow Ascendant to end the time loop~
+Z
+1 11969
 S
 #11821
 Skycleave: Need It For A Friend~
@@ -342,9 +393,10 @@ near the racetrack stalls.
    'Those pixies really get into your head; that maze was worse than the Forest
 dome. I had the strangest dreams in there.'
 ~
-24 ei 125 250 -1
+25 ei 125 250 -1
 A
 1 11900
+D 11816
 P
 16 11800 0 6 a
 P
@@ -381,9 +433,10 @@ as she taps her fingernails against each other. She turns back toward you.
 And for what? The pursuit of magic. Are there no limits to what we destroy for
 power?'
 ~
-20 e 125 250 -1
+21 e 125 250 -1
 A
 1 11900
+D 11834
 P
 16 11800 0 6 a
 P
@@ -421,9 +474,10 @@ chuckle burbles out of the old lich as he sets his repository back down.
    'The only ones who could read were the spellcasters and, to my unending
 chagrin, they were smart enough not to open the thing. Alas.'
 ~
-20 ei 125 250 -1
+21 ei 125 250 -1
 A
 1 11900
+D 11834
 P
 16 11800 0 6 a
 P
@@ -437,6 +491,79 @@ Z
 1 11836
 Z
 1 11936
+S
+#11839
+Skycleave: Where's Waltur~
+   'Excuse me,' says Enchanter Annelise, as you walk up to her table. 'Have you
+seen Magineer Waltur? He didn't make it down here with the other refugees. Oh,
+one moment, he looks like this...'
+   The fresh-faced enchanter pulls a pinch of dust from an unseen pocket and
+tosses it into the air. It shimmers in the light and, for a split second, you
+see the image of an unkempt young man in a black jumpsuit.
+   'Do locate him if you have the time. Hopefully he's just shut himself up in
+his lab, but with those dreadful mercenaries up there, I've become quite
+concerned.'
+~
+   You find Waltur at his workbench, tinkering with something so delicate it
+requires an array of glass lenses. He looks up as you make your way through the
+cluttered lab and stands up, leaving his work on the table.
+   'Annelise is far too worried,' the young magineer says as you tell him why
+you were looking for him. 'I was, at all times, perfectly safe here in the
+laboratory. That bleak-brained bully couldn't even read; he was never going to
+get through the door.'
+   Waltur brushes himself off and shakes you hand.
+   'All the same,' he says, 'It was kind of you to look in on me and put poor
+Annelise's mind at ease. You're a good friend to the tower.'
+~
+11 0 125 250 -1
+A
+1 11839
+P
+0 11811 0 1 a
+P
+0 11812 0 1 a
+R
+7 11800 10
+W
+13 11840 0 1 a
+W
+13 11940 0 1 a
+Z
+1 11840
+Z
+1 11940
+S
+#11840
+Skycleave: Magichanical Wonders~
+   Among the many cryptic secrets of the Tower Skycleave, there is a hidden
+laboratory of Magichanics and Magineering. Seek it out and speak with Magineer
+Waltur at his workbench. The lab is reputed to sell strange and unusual
+creations.
+~
+   'Oh, yes, hello,' Magineer Waltur says as he gets up from his workbench.
+'You must be rather clever to have found your way in. Not like those oafish
+soldiers of fortune.'
+   The young magineer turns back to his task, but not before saying, 'Feel free
+to have a look around but of course we do charge for the merchandise.'
+~
+25 e 125 250 -1
+A
+1 11900
+D 11834
+P
+16 11800 0 6 a
+P
+0 11839 0 1 a
+R
+7 11800 10
+W
+13 11840 0 1 a
+W
+13 11940 0 1 a
+Z
+1 11840
+Z
+1 11940
 S
 #11849
 Skycleave: Mercenary Threat~
@@ -469,9 +596,10 @@ common thief. Did you see how his lust for power corrupted and withered him so
 far beyond his years? It's good you put an end to it; on that path he'd soon
 have nothing left but his linens.'
 ~
-18 ei 125 250 -1
+19 ei 125 250 -1
 A
 1 11900
+D 11834
 P
 16 11800 0 6 a
 P
@@ -511,13 +639,14 @@ rose-colored glass from a pocket inside her robe and holds it up to one eye.
 time loop. I guess by now you've noticed we didn't get free of it. Next time
 maybe you can save Knezz. He might actually know how to get us out of it.'
 ~
-17 ei 125 250 -1
+19 ei 125 250 -1
 A
 1 11900
+D 11863
 P
 16 11800 0 6 a
 P
-0 11812 0 1 a
+0 11820 0 1 a
 R
 7 11800 10
 W
@@ -544,9 +673,10 @@ here-after.'
    Knezz chuckles to himself.
    'Can you imagine?' he says. 'The hells full to the gills with Jozef Knezz!'
 ~
-18 ei 125 250 -1
+19 ei 125 250 -1
 A
 1 11900
+D 11863
 P
 16 11800 0 6 a
 P
@@ -592,9 +722,10 @@ a children's story. Your story hinges on a magic lion possessing one of the
 cleverest sorcerers of our time and defeating several of the strongest. If what
 you say is true, then we are definitely not getting out of this time loop.'
 ~
-21 ei 125 250 -1
+22 ei 125 250 -1
 A
 1 11900
+D 11863
 P
 16 11800 0 6 a
 P
