@@ -375,6 +375,65 @@ Defeat the First Water~
 Z
 1 11941
 S
+#11941
+Skycleave: In Tune With the Tower~
+   'Ah, a little human. Greetings,' the oreonic, Goef, says as you approach.
+You hesitate a moment, trying to grasp the notion that you are talking to an
+intelligent, thinking being made from nocturnium ore.
+   Goef explains that no one else in the Tower Skycleave is capable of attuning
+skystones because a person in possession of a soul almost always taints the
+process. A soulless intermediary increases the reliability of the process, and
+in this regard, Goef is well-practiced. But the oreonic does warn you that the
+more skystones you attune, the harder it will become to attune more.
+   Lastly, Goef offers to demonstrate the process. You will only need an
+unattuned skystone to proceed. Type 'attune unattuned skystone' to start the
+process.
+~
+   'See, little human, it is completely painless,' Goef says, handing back your
+skystone. 'Now that the stone has been attuned, the other humans will trade for
+it around the tower. Allow me to recommend the tedium shard. It doubles as a
+deep back-scratcher.'
+~
+13 0 125 250 -1
+A
+1 11941
+R
+7 11800 10
+W+
+20 11900 0 1 -
+Successfully attune a skystone~
+Z
+1 11941
+S
+#11942
+Skycleave: Attune a Skystone~
+   As you attune skystones, the process becomes more and more difficult, even
+with the assistance of the oreonic master, Goef. Nevertheless, the treasures
+for sale in the Tower Skycleave's shops require the precious stones -- and they
+are certainly worth the cost.
+   Attune another skystone successfully, no matter how many tries it takes.
+~
+   'It was good to see you again, little human,' Goef says, handing back your
+skystone with one of its long, spindly arms. 'I have come to look forward to
+your visits, although it is with regret that I must admit I cannot recall your
+name. Unfortunately, all humans have roughly the same number of eyes and ears
+and mouths and arms, and it makes you very difficult to tell apart.'
+~
+14 e 125 250 -1
+A
+1 11941
+A
+1 11900
+P
+0 11941 0 1 -
+R
+7 11800 10
+W+
+11 0 0 1 -
+Successfully attune a skystone~
+Z
+1 11941
+S
 #11970
 Skycleave: Secret Niamh~
    Amongst the Skycleave variations, there is a hidden thread in the time loop

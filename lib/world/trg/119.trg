@@ -2492,7 +2492,7 @@ attune~
 * attunes skystones for the user
 set allow_list 11900 11899 10036 10037
 * targeting
-set obj %actor.obj_target_inv(%arg%)%
+set obj %actor.obj_target_inv(%arg.car%)%
 if !%arg%
   %send% %actor% Which stone you like to attune?
   halt
@@ -2532,6 +2532,9 @@ if %skystone_progress% > %skystone_finished%
   nop %actor.give_currency(11900,1)%
   eval skystone_progress 0
   eval skystone_finished %skystone_finished% + 1
+  if %actor.on_quest(11942)%
+    %quest% %actor% trigger 11942
+  end
 else
   * 'failure' -- it will take more
   %send% %actor% You feel stronger as the glow from the stone passes into you, but the skystone goes dark.
