@@ -6328,12 +6328,23 @@ argument, more information is shown per line.
 
 Information provided by the -d flag:
  abilities: mastery
+ adventure: mob/object/room count
  archetypes: skills, skill point total, and attribute total
  augments: ability/skill, applies
+ book: byline
+ class: skill requirements
+ craft: shows craft type
+ generic: info based on generic type
+ global: info based on global type
  mobiles: level range and many flags
+ morph: ability/skill requirement
  objects: level range and some flags (quality, enchanted, scalable, binding)
+ progress: type
  quests: level range and some flags (in-dev, daily, event, tutorial, group)
  rooms: some flags (outdoor, dark/light, no mob/teleport/loc, look out)
+ sectors: climate and build-on flags
+ skill: skill description
+ social: shows in-dev and requirements, if any
 
 To look up items by name, use the 'vnum' command.
 
