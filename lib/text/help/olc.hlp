@@ -6326,6 +6326,15 @@ This command lists all objects (or mobs, or whatever) between two vnums
 again with a narrower range of vnums. If you provide the -d (--details)
 argument, more information is shown per line.
 
+Information provided by the -d flag:
+ abilities: mastery
+ archetypes: skills, skill point total, and attribute total
+ augments: ability/skill, applies
+ mobiles: level range and many flags
+ objects: level range and some flags (quality, enchanted, scalable, binding)
+ quests: level range and some flags (in-dev, daily, event, tutorial, group)
+ rooms: some flags (outdoor, dark/light, no mob/teleport/loc, look out)
+
 To look up items by name, use the 'vnum' command.
 
 To find unused vnums in a given range, use '.<type> free'.
