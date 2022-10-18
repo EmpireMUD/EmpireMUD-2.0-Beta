@@ -4205,7 +4205,13 @@ remote comment %self.id%
 Smol Nes-Pik: Joiago gossip and mirth driver~
 0 bw 50
 ~
-* pairs with trigger 11876 and 11875
+* pairs with trigger 11876, 11875, 11883
+* check pickpocket
+if %self.mob_flagged(*PICKPOCKETED)%
+  attach 11883 %self.id%
+  detach 11877 %self.id%
+  halt
+end
 set max_comment 4
 * determine position in the comment loop
 if %self.varexists(comment)%
@@ -4265,6 +4271,12 @@ if %comment% == 3
   set music %random.3%
   set loop 1
   while %loop% < 10
+    * check pickpocket again
+    if %self.mob_flagged(*PICKPOCKETED)%
+      attach 11883 %self.id%
+      detach 11877 %self.id%
+      halt
+    end
     if %tresydion% && %tresydion.varexists(talking)%
       * always play along if the tresydion is talking
       switch %random.3%
@@ -4748,6 +4760,153 @@ end
 * turn off oration
 rdelete talking %self.id%
 wait 30 sec
+~
+#11883
+Smol Nes-Pik: Joiago gossip and humming driver, when pickpocketed~
+0 bw 50
+~
+* pairs with trigger 11876, 11875, 11877
+set max_comment 4
+* determine position in the comment loop
+if %self.varexists(comment)%
+  eval comment %self.comment% + 1
+else
+  set comment 1
+end
+if %comment% > %max_comment%
+  halt
+end
+remote comment %self.id%
+* the comments don't use 'elseif' because some comments will skip to later ones
+set room %self.room%
+set template %room.template%
+if %comment% == 1
+  * 1: location-based
+  if %template% == 11879
+    * [11879] Atop the Glimmering Stair
+    say Fancy meeting you up here. I hope you're enjoying Smol Nes-Pik. The views up here are beyond compare.
+  elseif %template% == 11880
+    * [11880] Grand Overlook: fall through to comment 3
+    set comment 3
+  elseif %template% == 11881
+    * [11881] Outside the Seashell
+    switch %random.3%
+      case 1
+        say Ah, our most famous feature...
+        emote $n gestures broadly toward the seashell.
+      break
+      case 2
+        say If you look down, you can see the palace from here.
+      break
+    done
+  elseif %template% == 11882
+    * [11882] Great Glowing Seashell: fall through to comment 2
+    set comment 2
+  elseif %template% == 11883
+    * [11883] Outside Obsidian Palace
+    say Can't recommend going below here. The stair is broken, the tree is ill, and those bleak-brained rot worshippers are praising both.
+  end
+end
+* store the comment again, in case it changed
+remote comment %self.id%
+* continuing...
+if %comment% == 2
+  * 2. gossip with someone present
+  joiago gossip
+end
+if %comment% == 3
+  * 3. humming along: this one can actually change rooms
+  * must check if the Tresydion is orating
+  set tresydion %instance.mob(11882)%
+  * begin musical loop
+  set music %random.2%
+  set loop 1
+  while %loop% < 10
+    if %tresydion% && %tresydion.varexists(talking)%
+      * always play along if the tresydion is talking
+      switch %random.3%
+        case 1
+          %echo% ~%self% hums quietly to *%self%self.
+        break
+        case 2
+          %echo% ~%self% hums along in time with the tresydion's speech.
+        break
+        case 3
+          %echo% ~%self% hums to *%self%self.
+        break
+      done
+    elseif %music% == 1
+      * song 1: soft, sad melody
+      switch %random.4%
+        case 1
+          %echo% ~%self% hums a soft, sad melody.
+        break
+        case 2
+          %echo% ~%self% skips along slowly as &%self% hums.
+        break
+        case 3
+          %echo% ~%self% looks around wistfully as &%self% hums.
+        break
+        case 4
+          %echo% You find yourself humming along with ~%self%.
+        break
+      done
+    elseif %music% == 2
+      * song 2: jaunty dance
+      switch %loop%
+        case 1
+          %echo% ~%self% starts humming jaunty tune...
+        break
+        case 2
+          %echo% ~%self% begins to dance about as &%self% hums...
+        break
+        case 3
+          %echo% ~%self% whistles a staccato tune...
+        break
+        case 4
+          %echo% ~%self% dances back and forth as &%self% whistles...
+        break
+        case 5
+          %echo% The merry melody makes your legs tingle and pull, as if they want to move...
+        break
+        case 6
+          %echo% ~%self% twirls around, whistling, dancing in circles...
+        break
+        case 7
+          %echo% You find yourself dancing with ~%self% as &%self% whistles...
+        break
+        case 8
+          %echo% ~%self% begins moving faster and faster, whistling almost too fast to keep up!
+        break
+        case 9
+          %echo% ~%self% twirls into a full bow as the tune comes to a dramatic end.
+        break
+      done
+    end
+    eval loop %loop% + 1
+    wait 3 sec
+  done
+  %echo% ~%self% slides the flute back into ^%self% pocket.
+end
+if %comment% == 4
+  * 4. sleep hints
+  switch %random.4%
+    case 1
+      say Think of us when you wake up, will you?
+    break
+    case 2
+      say This may be your dream, but it was our nightmare.
+    break
+    case 3
+      say Things weren't good before Iskip came, but at least we were free.
+    break
+    case 4
+      say Remember to dance occasionally, when you're awake. It's no good if you only do it in dreams.
+    break
+  done
+end
+* force a delay at the end
+wait 20 s
 ~
 #11884
 Smol Nes-Pik: Taste putrid sap to teleport~

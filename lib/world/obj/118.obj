@@ -1677,6 +1677,141 @@ thin enough to slide between ribs and long enough to pierce the heart.
 0 1 4
 1 0
 S
+#11877
+flute gemstone stone little~
+a little gemstone flute~
+A little gemstone flute has been left here.~
+   The flute is carved from a single piece of iridescent gemstone which
+glitters in every color of the rainbow as the light strikes it. Nineteen tiny
+holes run the length of the flute. It's difficult to play, but the music is
+transcendental.
+   Hold the flute to play it.
+   flavor text tba
+~
+22 0 ao 0 3
+1 0 0
+12 0
+M
+2
+You play a soft, sad melody on the flute...~
+M
+3
+$n plays a soft, sad melody on $s flute...~
+M
+2
+The melancholy notes from your gemstone flute dance around the air...~
+M
+3
+The melancholy notes from $n's gemstone flute dance around the air...~
+M
+2
+The music makes you close your eyes for a moment, and imagine yourself floating on a bed of clouds...~
+M
+3
+$n's music makes you close your eyes for a moment, and imagine yourself floating on a bed of clouds...~
+M
+2
+The world around you seems to disappear for a moment...~
+M
+3
+The world around you seems to disappear for a moment...~
+M
+2
+The music from your gemstone flute rises in the air like a rainbow spiral...~
+M
+3
+The music from $n's gemstone flute rises in the air like a rainbow spiral...~
+M
+2
+The music from your flute dissolves into dissonant notes, dissolving into haze...~
+M
+3
+The music from $n's flute dissolves into dissonant notes, dissolving into haze...~
+M
+2
+The soft, sad music wells up from below, louder, brighter, and faster, until it seems to stream back into your gemstone flute...~
+M
+3
+The soft, sad music wells up from below, louder, brighter, and faster, until it seems to stream back into $n's gemstone flute...~
+M
+2
+You dance backward slowly as you plays the flute...~
+M
+3
+$n dances backward slowly as $e plays a gemstone flute...~
+M
+2
+The tune ends with a flourish and you take a little bow.~
+M
+3
+The tune ends with a flourish and $n takes a little bow.~
+M
+2
+You pause to clean the little flute.~
+M
+3
+$n pauses to clean $s flute.~
+M
+2
+You start a jaunty tune on the gemstone flute...~
+M
+3
+$n starts a jaunty tune on $s gemstone flute...~
+M
+2
+You begin to dance about as you plays...~
+M
+3
+$n begins to dance about as $e plays...~
+M
+2
+The staccato notes seem to escape your flute and begin to dance about on their own...~
+M
+3
+The staccato notes seem to escape $n's flute and begin to dance about on their own...~
+M
+2
+The world lights up as the music notes dance around on them...~
+M
+3
+The world lights up as the music notes dance around on them...~
+M
+2
+The merry melody floats on the air...~
+M
+3
+The merry melody from $n's flute makes your legs tingle and pull, as if they want to move...~
+M
+2
+You twirl around, playing the flute, but the music has taken on a life beyond its instrument...~
+M
+3
+$n twirls around, playing the flute, but the music has taken on a life beyond its instrument...~
+M
+2
+The music notes flit around you, pulling you in circles, making everyone dance...~
+M
+3
+The music notes flit around you, pulling you in circles, making everyone dance...~
+M
+2
+You begin moving faster and faster, pursuing each escaped note and pulling it back into the flute...~
+M
+3
+$n begins moving faster and faster, pursuing each escaped note and pulling it back into the flute...~
+M
+2
+You twirl into a full bow as the music dances back into the gemstone flute at long last.~
+M
+3
+$n twirls into a full bow as the music dances back into the gemstone flute at long last.~
+M
+2
+You pause to clean the little flute.~
+M
+3
+$n pauses to clean $s flute.~
+S
 #11882
 pool shimmering water dew~
 the dew pool~
