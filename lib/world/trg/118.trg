@@ -4590,6 +4590,17 @@ end
 * force a delay at the end
 wait 20 s
 ~
+#11881
+Block morph and fastmorph commands~
+1 c 1
+morph fastmorph~
+if %arg.car%
+  %send% %actor% You can't seem to morph! Something must be preventing it.
+  return 1
+else
+  return 0
+end
+~
 #11882
 Smol Nes-Pik: Tresydion orations~
 0 bw 25

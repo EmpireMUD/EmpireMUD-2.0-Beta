@@ -453,7 +453,7 @@ a goblin miner~
 Goblin miner is here.
 ~
 0 0 abdI 0 2
-0 0 0 2
+0 0 0 8
 D
 Strings set by trig 11824.
 ~
@@ -2877,6 +2877,50 @@ T 11892
 T 11899
 T 11810
 T 11806
+S
+#11893
+fox gray~
+a gray fox~
+A gray fox is sitting on the ground.
+~
+1 1 bdoD n 2
+0 0 14 9
+D
+   The loyal little fox isn't much larger than a housecat. It has an ashen-
+silver coat with big white spots and red around the edges of its white belly.
+Its pointed little face and floppy ears make it look almost like a puppy, and
+it never takes its big, brown eyes off of you as you walk around.
+~
+M
+0
+$n wags its tail.~
+M
+0
+$n wags its tail happily.~
+M
+0
+$n sniffs at your feet.~
+M
+0
+$n trots around in a circle.~
+M
+0
+$n tilts its head at you.~
+M
+0
+$n smiles with its tongue out.~
+M
+0
+$n's tongue hangs out as it pants.~
+M
+0
+$n barks.~
+M
+0
+$n chases its tail in a circle.~
+M
+0
+$n rolls around on the ground.~
 S
 #11894
 progress sense phase changer~

@@ -44,7 +44,7 @@ track of where we are in the...'
    Mageina looks over your shoulder and then leans in close to say, 'Or rather,
 WHEN we are, in the time loop.'
 ~
-10 0 125 250 -1
+11 0 150 250 -1
 A
 1 11805
 A
@@ -73,7 +73,7 @@ it wrong. I tried hitting it a few times, erm, with a bucket, but it didn't
 really help much. Still, enjoy your prize... Oh! And thank you for your
 established patronage at Towrinkel's, erm, Gift Shop.'
 ~
-25 e 125 250 -1
+26 e 150 250 -1
 A
 1 11900
 A
@@ -113,7 +113,7 @@ across the race domes, scribbling some notes to himself.
 you're racing again. Got to get that little pixy into tip-top shape if you want
 to be the best there ever was.'
 ~
-12 0 125 250 -1
+13 0 150 250 -1
 A
 2 11913
 A
@@ -146,7 +146,7 @@ might be considered cheating. Old rules, new rules; you could go round and
 round about it till the end of time. I say the dirty tricks make it
 interesting. Might have to copy some of yours.'
 ~
-13 e 125 250 -1
+14 e 150 250 -1
 A
 1 11900
 A
@@ -184,7 +184,7 @@ Honestly. Take your reward. Oh, this pixy will be worth so much more. Just,
 truly, from the bottom of my heart, thank you. I'll get started in tomorrow's
 race.'
 ~
-14 0 125 250 -1
+15 0 150 250 -1
 A
 1 11825
 A
@@ -220,7 +220,7 @@ tower's many villains as you watch the countless twinkling lights from the
 tree overhead reflect off of the softly burbling water. Surely this was the
 tower's most difficult challenge.
 ~
-7 0 125 250 -1
+8 0 150 250 -1
 A
 2 11918
 P
@@ -273,7 +273,7 @@ the enormous tree above you meander around the room in the surface of the
 fountain. The tower held so many secrets, a person could spend a lifetime
 plumbing its depths.
 ~
-5 0 125 250 -1
+6 0 150 250 -1
 A
 2 11919
 P
@@ -320,7 +320,7 @@ fall to its base. This must be how it felt to be trapped in the time loop,
 staring into the pit you can never escape from. At least the sorcerers are, on
 the whole, unaware of their dark fate.
 ~
-8 0 125 250 -1
+9 0 150 250 -1
 A
 2 11920
 P
@@ -362,7 +362,7 @@ however, I will try it... your way.'
    'Not in this body, of course. From time to time, I loose myself from it and
 travel the aether... alone.'
 ~
-11 e 125 250 -1
+12 e 150 250 -1
 A
 3 11972
 P
@@ -394,7 +394,7 @@ skystone. 'Now that the stone has been attuned, the other humans will trade for
 it around the tower. Allow me to recommend the tedium shard. It doubles as a
 deep back-scratcher.'
 ~
-13 0 125 250 -1
+14 0 150 250 -1
 A
 1 11941
 R
@@ -419,7 +419,7 @@ your visits, although it is with regret that I must admit I cannot recall your
 name. Unfortunately, all humans have roughly the same number of eyes and ears
 and mouths and arms, and it makes you very difficult to tell apart.'
 ~
-14 e 125 250 -1
+15 e 150 250 -1
 A
 1 11941
 A
@@ -454,7 +454,7 @@ getting answers.'
    You try to discuss it further, but Niamh seems lost in her own thoughts and
 she soon wanders off.
 ~
-18 ei 125 250 -1
+19 ei 150 250 -1
 A
 1 11900
 D 11863
@@ -496,7 +496,7 @@ put up a sign... which seems to have gone missing.
 where. But it's a great test of an adventurer's mettle. Be sure to fight it
 again when you get the chance.'
 ~
-14 0 125 250 -1
+15 0 150 250 -1
 A
 3 11972
 P
@@ -531,7 +531,7 @@ wonder if it even... well...'
 it as he marvels.
    'I need to compare it's, er, properties. To the other one. Thanks!'
 ~
-10 d 125 250 -1
+11 d 150 250 -1
 A
 3 11982
 A
@@ -582,7 +582,7 @@ slowly, a chant builds among the spectators, louder and louder, until it grows
 into a cheer. You can't make out what they're saying -- or you can't understand
 it -- but they seem thrilled at your performance in the arena.
 ~
-12 ei 125 250 -1
+13 ei 150 250 -1
 A
 1 11974
 P
@@ -615,7 +615,7 @@ endless fishing river.
 things weren't stressful enough here already. I almost got merc'd by that
 stylish archmage just trying... just trying to do my job.'
 ~
-11 0 125 250 -1
+12 0 150 250 -1
 A
 3 11993
 P
@@ -646,7 +646,7 @@ gods. After all, we were created by the wizards of Man -- a creator neither
 safe to worship, nor ever worthy of it. I would surely like to meet a god some
 day. Perhaps it would give us something Mankind could not.'
 ~
-13 0 125 250 -1
+14 0 150 250 -1
 A
 3 11994
 P
