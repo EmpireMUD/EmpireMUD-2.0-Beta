@@ -1446,6 +1446,115 @@ nearby.
 10 0
 T 11887
 S
+#11864
+deconfabulator mana~
+a mana deconfabulator~
+Someone has left their mana deconfabulator on the ground.~
+   The oversized device is bulky and difficult to even lift, though it isn't
+particularly heavy. It's made from striped magewood and nocturnium straps, with
+a crystal orb on one end and an eventide horn on the other. You don't see a way
+to turn it on; or, perhaps it isn't working any more.
+   flavor text tba
+~
+15 e a 0 4
+1 0 0
+2 0
+C
+150 150
+R
+4 5193 0
+S
+#11865
+condenser ether~
+an ether condenser~
+An ether condenser is humming on the ground.~
+   The odd black metal box is inscribed all over with golden letters in a
+script you don't read. It makes a low hum and is, at all times, cold to the
+touch, but you can't figure out how to open it, nor what it's doing.
+   flavor text tba
+~
+15 e a 0 4
+1 0 0
+2 0
+C
+150 150
+R
+4 5193 0
+S
+#11866
+knickknack knicknack enchanted~
+an enchanted knickknack~
+An enchanted knickknack has been knocked over.~
+   The odd knickknack is lightly damaged on one side, but otherwise still in
+good shape. It seems rather old, even if you can't tell exactly what it's meant
+to be. The tower was full of them, so perhaps it's important.
+   flavor text tba
+~
+15 j a 0 4
+1 0 0
+2 0
+C
+150 150
+R
+4 5193 0
+S
+#11867
+reconfabulator dynamic~
+a dynamic reconfabulator~
+There is a dynamic reconfabulator on the ground.~
+   The odd tool is little more than an oversized crystal ball with a magewood
+ring around it and a nocturnium stake through the center. You have no knowledge
+of how to use it -- if, indeed, it serves some function or purpose at all. But
+you do notice that it's ice cold to the touch.
+   flavor text tba
+~
+15 e a 0 4
+1 0 0
+2 0
+C
+150 150
+R
+4 5193 0
+S
+#11868
+prototype wellstone miniature~
+a miniature wellstone prototype~
+A prototype for a miniature wellstone is lying on the ground.~
+   The odd little rainbow wellstone seems to have been made from a dozen
+smaller gems and minerals, as if they were fused together and then carved to
+resemble a smooth, round rock, almost like a skipping stone. It seems to be a
+prototype; you can't figure out how to make it do anything.
+   flavor text tba
+~
+15 0 a 0 5
+1 0 0
+1 0
+C
+150 150
+R
+4 5193 0
+S
+#11869
+pen self-writing writing~
+a self-writing pen~
+A self-writing pen is twitching on the ground.~
+   The elegant tower pen is made from black metal, perhaps nocturnium as there
+is no sign of rust. The top half of the pen is encircled with magic words you
+cannot read, as they scoot around to the other side of the pen whenever you try
+to look at them.
+   Unfortunately, you can't seem to figure out how the self-writing pen works.
+When it's too close to any blank surface, it starts scribbling on its own. But
+nothing you do or say seems to control it.
+   flavor text tba
+~
+15 0 a 0 6
+1 0 0
+2 0
+C
+150 150
+R
+4 5193 0
+S
 #11870
 vortex swirling top stairs~
 the swirling vortex~
@@ -1476,6 +1585,97 @@ ending the cycle and rescuing the sorcerers from this odious time loop.
 0 0 0
 12 0
 T 11971
+S
+#11872
+note hand-written handwritten written~
+a hand-written note~
+A hand-written note is lying here.~
+You read the writing on the piece of parchment:
+
+             Amor,
+
+                Though it was but a few fleeting moments, the
+             evening we spent together meant the world to me.
+             Your eyes captivate me like the chandelier; your
+             mind is as deep as the Milky Way, and twice as
+             enchanting.
+                I can't get our encounter out of my head. Meet
+             me again. Soon.
+
+                                              xo D.
+
+             P.S. -- Do NOT tell Marina.
+~
+3 0 a 0 6
+0 0 0
+7 0
+C
+150 150
+S
+#11873
+potion red glittering~
+a glittering red potion~
+A glittering red potion is sitting on the ground.~
+   The red potion swirls as you hold it up to the light, glittering with swirls
+of yellow like pixy dust in caught in a whirlpool. There's no label on the
+flask and no way to tell what effect it will have but to quaff it.
+   flavor text tba
+~
+25 m a 0 6
+-1 0 3030
+8 0
+A
+8 1 0
+C
+150 150
+I 26 800 100.00 1  # DECAYS-TO: glass flask
+I 27 800 100.00 1  # CONSUMES-TO: glass flask
+R
+4 5130 0
+S
+#11874
+charm stasis filigreed~
+a filigreed stasis charm~
+A filigreed stasis charm is lying on the ground.~
+   The charm is made entirely from nocturnium filigree, expertly crafted to
+look like knitted metal. At the center of the charm, the negative space between
+the filigree forms the outline of a person. The whole thing dangles from a
+thin gold chain, tarnished at the back from heavy wear.
+   flavor text tba
+~
+2 0 ac 0 6
+0 0 0
+2 0
+C
+100 100
+T 11881
+S
+#11875
+pick hardstone stone~
+a hardstone pick~
+A hardstone pick is lying here.~
+   The small pick has short wooden handle and a triangular stone head, bound
+together by pitch and leather. Scratch-marks run the length of the handle but
+though the head of the pick is slightly worn, there are no signs of cracks.
+   flavor text tba
+~
+1 imo an h 3
+0 1 8
+1 0
+S
+#11876
+stabber obsidian~
+an obsidian stabber~
+An obsidian stabber has been dropped here.~
+   The little obsidian shiv is surprisingly well-shaped. The blade is almost
+wafer-thin, with tiny serrations along both sides. A simple strap of leather
+around the base serves as a simple handle. It may be small, but this thing is
+thin enough to slide between ribs and long enough to pierce the heart.
+   flavor text tba
+~
+1 imo ano f 4
+0 1 4
+1 0
 S
 #11882
 pool shimmering water dew~
@@ -1596,6 +1796,22 @@ M
 18
 Sap drips onto you.~
 T 11954
+S
+#11893
+leash fox leather fine~
+a fine leather fox leash~
+A fine leather fox leash has been left behind.~
+   The leash is made from a braided strand of purple leather, no longer than
+your arm. It's lightly worn at both ends, especially the handle, and it looks
+as though someone has been carrying it around in their mouth.
+   You can 'use leash' to add a new minipet to your list.
+   flavor text tba
+~
+19 o a 0 7
+11893 0 0
+0 0
+C
+1 1
 S
 #11898
 skystone stone depleted~

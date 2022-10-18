@@ -26,7 +26,7 @@ no doubt? Those monsters turned him into a... into a mop?'
    The man's eyes redden and begin to well up with tears. He slides a small
 purse of money across to you, and turns away.
 ~
-9 0 125 250 -1
+10 0 150 250 -1
 A
 1 11801
 P
@@ -76,7 +76,7 @@ frown. 'But we certainly can't have the boy running around here. Fine, fine,
 I'm sure I owe you this much. Bring him up here. Just promise me he will leave
 the tower before the headmaster finds out.'
 ~
-13 0 125 250 -1
+14 0 150 250 -1
 A
 1 11801
 P
@@ -106,7 +106,7 @@ Watcher Annaca on the second floor when it's done.
 out that pixy maze. Nothing to it, eh? We could use a few more like you around
 here for when things get messy.'
 ~
-5 0 125 250 -1
+6 0 150 250 -1
 A
 1 11864
 A
@@ -142,7 +142,7 @@ stops and looks you up and down.
    'Seems you had the virtue to see them gone, however,' he says. 'We are in
 your debt.'
 ~
-7 0 125 250 -1
+8 0 150 250 -1
 A
 1 11891
 A
@@ -176,7 +176,7 @@ Sorcerer Barrosh in his office when it's done.
 ~
 'Fine, what do you want, a cookie?' Master Barrosh says without looking at you.
 ~
-6 0 125 250 -1
+7 0 150 250 -1
 A
 1 11892
 A
@@ -206,7 +206,7 @@ goblins swore up and down there wasn't a secret passage but they've been
 playing stupid pranks on me for months using it.'
    She fumes and stomps off without thanking you.
 ~
-23 ei 125 250 -1
+24 ei 150 250 -1
 A
 1 11900
 D 11816
@@ -243,7 +243,7 @@ without a good reason.'
 interesting indeed.'
    She trails off, completely forgetting you're even here.
 ~
-23 ei 125 250 -1
+24 ei 150 250 -1
 A
 1 11900
 D 11816
@@ -277,7 +277,7 @@ thinks on it for a moment.
    'The pixies never seem to try to escape. I plum thought they liked it here,'
 she says. 'And what did she mean by that last part... 'in time'?'
 ~
-24 ei 125 250 -1
+25 ei 150 250 -1
 A
 1 11900
 D 11816
@@ -327,7 +327,7 @@ isn't bound to it.'
 must find us again, fight your way to the top, and save Josef Knezz. It is the
 only hope we have left.'
 ~
-24 i 125 250 -1
+25 i 150 250 -1
 A
 1 11819
 P
@@ -360,7 +360,7 @@ and tries to disappear back into the crowd.
 somewhere between surprise and delight. He takes the trinkets from you and
 looks down into his oversized coat...
 ~
-11 di 125 250 -1
+12 di 150 250 -1
 A
 1 11821
 P
@@ -393,7 +393,7 @@ near the racetrack stalls.
    'Those pixies really get into your head; that maze was worse than the Forest
 dome. I had the strangest dreams in there.'
 ~
-25 ei 125 250 -1
+26 ei 150 250 -1
 A
 1 11900
 D 11816
@@ -433,7 +433,7 @@ as she taps her fingernails against each other. She turns back toward you.
 And for what? The pursuit of magic. Are there no limits to what we destroy for
 power?'
 ~
-21 e 125 250 -1
+22 e 150 250 -1
 A
 1 11900
 D 11834
@@ -474,7 +474,7 @@ chuckle burbles out of the old lich as he sets his repository back down.
    'The only ones who could read were the spellcasters and, to my unending
 chagrin, they were smart enough not to open the thing. Alas.'
 ~
-21 ei 125 250 -1
+22 ei 150 250 -1
 A
 1 11900
 D 11834
@@ -515,7 +515,7 @@ get through the door.'
    'All the same,' he says, 'It was kind of you to look in on me and put poor
 Annelise's mind at ease. You're a good friend to the tower.'
 ~
-11 0 125 250 -1
+13 0 150 250 -1
 A
 1 11839
 P
@@ -527,7 +527,7 @@ R
 W
 13 11840 0 1 a
 W
-13 11940 0 1 a
+13 11940 0 1 b
 Z
 1 11840
 Z
@@ -546,7 +546,7 @@ soldiers of fortune.'
    The young magineer turns back to his task, but not before saying, 'Feel free
 to have a look around but of course we do charge for the merchandise.'
 ~
-25 e 125 250 -1
+27 e 150 250 -1
 A
 1 11900
 D 11834
@@ -559,7 +559,7 @@ R
 W
 13 11840 0 1 a
 W
-13 11940 0 1 a
+13 11940 0 1 b
 Z
 1 11840
 Z
@@ -596,7 +596,7 @@ common thief. Did you see how his lust for power corrupted and withered him so
 far beyond his years? It's good you put an end to it; on that path he'd soon
 have nothing left but his linens.'
 ~
-19 ei 125 250 -1
+20 ei 150 250 -1
 A
 1 11900
 D 11834
@@ -639,7 +639,7 @@ rose-colored glass from a pocket inside her robe and holds it up to one eye.
 time loop. I guess by now you've noticed we didn't get free of it. Next time
 maybe you can save Knezz. He might actually know how to get us out of it.'
 ~
-19 ei 125 250 -1
+20 ei 150 250 -1
 A
 1 11900
 D 11863
@@ -673,7 +673,7 @@ here-after.'
    Knezz chuckles to himself.
    'Can you imagine?' he says. 'The hells full to the gills with Jozef Knezz!'
 ~
-19 ei 125 250 -1
+20 ei 150 250 -1
 A
 1 11900
 D 11863
@@ -722,7 +722,7 @@ a children's story. Your story hinges on a magic lion possessing one of the
 cleverest sorcerers of our time and defeating several of the strongest. If what
 you say is true, then we are definitely not getting out of this time loop.'
 ~
-22 ei 125 250 -1
+23 ei 150 250 -1
 A
 1 11900
 D 11863
@@ -756,7 +756,7 @@ think it did. It was more like a dream.'
    'Sugar, this could be the discovery of a lifetime! I'll be sure to put one
 of the residents on this. You did good.'
 ~
-9 d 125 250 -1
+10 d 150 250 -1
 A
 3 11875
 A
@@ -825,7 +825,7 @@ your own.
    'Thank you,' she says again. 'I only wish you had been our champion when rot
 and ruin came for us. I shall not forget you, even when you have forgotten me.'
 ~
-9 e 125 250 -1
+10 e 150 250 -1
 A
 1 11884
 P
@@ -852,7 +852,7 @@ being trapped in a jar.
 says as he rubs his long forehead with a handkerchief. Lucky for you and me,
 nobody makes jars big enough.'
 ~
-12 0 125 250 -1
+13 0 150 250 -1
 A
 3 11890
 P
