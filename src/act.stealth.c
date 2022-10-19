@@ -1152,7 +1152,7 @@ ACMD(do_pickpocket) {
 	else if (run_ability_triggers_by_player_tech(ch, PTECH_PICKPOCKET, vict, NULL)) {
 		return;
 	}
-	else if (MOB_FLAGGED(vict, MOB_PICKPOCKETED | MOB_NO_LOOT) || (AFF_FLAGGED(vict, AFF_NO_ATTACK) && !has_interaction(vict->interactions, INTERACT_PICKPOCKET))) {
+	else if (MOB_FLAGGED(vict, MOB_PICKPOCKETED | MOB_NO_LOOT) || (!MOB_FLAGGED(vict, MOB_COINS) && AFF_FLAGGED(vict, AFF_NO_ATTACK) && !has_interaction(vict->interactions, INTERACT_PICKPOCKET))) {
 		act("$E doesn't appear to be carrying anything in $S pockets.", FALSE, ch, NULL, vict, TO_CHAR);
 	}
 	else {
