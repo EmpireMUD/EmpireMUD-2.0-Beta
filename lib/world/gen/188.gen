@@ -26,6 +26,18 @@ neck chop~
 T0
 You are no longer bleeding from the headless centaur's neck chop.~
 S
+#18811
+infected bite~
+4 0
+0 0 0 0
+T0
+Your bite seems to close up.~
+S
+#18812
+risen guard cooldown~
+3 0
+0 0 0 0
+S
 #18819
 costume citizen~
 3 0

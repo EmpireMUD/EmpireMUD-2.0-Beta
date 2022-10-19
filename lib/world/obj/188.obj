@@ -747,6 +747,21 @@ A
 A
 5 1 3
 S
+#18848
+pillowcase case pillaging~
+a pillaging pillowcase~
+A pillaging pillowcase is standing up on its own!~
+   If you are seeing this, it is broken. Please report to an immortal via the
+bug command.
+~
+3 p a 0 9
+0 0 0
+7 0
+Q 18808
+T 18809
+T 18808
+T 18810
+S
 #18849
 dead spirits~
 the spirits of the dead~
@@ -873,6 +888,21 @@ T 18858
 T 18859
 T 18860
 S
+#18858
+wheel wagon skeletal~
+a skeletal wagon wheel~
+A wheel made up of dismantled skeleton lays here.~
+This macabre wheel was clearly once part of some form of wagon. It is made up
+of various bones, human from the look of them.
+~
+3 e a 0 2
+0 0 0
+14 0
+C
+1 400
+R
+4 5139 0
+S
 #18859
 whistle bone fading~
 a fading bone whistle~
@@ -925,6 +955,20 @@ This just makes it impossible to maintain the nether portal.
 0 0 0
 0 0
 S
+#18866
+blood feed tracking~
+blood feed tracking object~
+A new object is sitting here.~
+~
+3 k a 0 7
+0 0 0
+10 0
+C
+1 1
+Q 18866
+T 18866
+T 18867
+S
 #18869
 sheet music~
 some sheet music~
@@ -971,6 +1015,20 @@ soothe the fallen adventurer into his final rest by playing some music.
 C
 1 1
 Q 18873
+S
+#18875
+whistle tooth hollow~
+a tooth whistle~
+A hollowed out tooth has been shaped into a whistle.~
+   Use this whistle to call a special zombie mount, whom this tooth was
+originally ripped from.
+~
+3 p a 0 3
+18875 0 0
+14 0
+C
+1 1
+T 9910
 S
 #18876
 block butcher's butchers reddened~
@@ -1074,13 +1132,14 @@ A portrait of grandmother is lying here.~
 her family home. It's obvious the artist took great care in creating this
 loving image.
 ~
-3 p a 0 2
+3 p a 0 3
 0 0 0
 0 0
 C
 1 1
 Q 18880
 T 18881
+T 18880
 S
 #18882
 portrait grandmother~

@@ -177,6 +177,7 @@ end
 nop %self.set_cooldown(18801, 30)%
 set heroic_mode %self.mob_flagged(GROUP)%
 %echo% ~%self% rears up and prances!
+set verify_target %actor.id%
 wait 2 sec
 if %heroic_mode%
   %echo% &&r~%self% slams ^%self% hooves down on the ground, creating a shockwave!
@@ -189,6 +190,9 @@ if %heroic_mode%
     set person %person.next_in_room%
   done
 else
+  if %actor.id% != %verify_target%
+    set actor %random.enemy%
+  end
   %send% %actor% &&r|%self% hooves crash down on you!
   %echoaround% %actor% |%self% hooves crash down on ~%actor%!
   %damage% %actor% 100
@@ -296,6 +300,203 @@ else
   %aoe% 50 magical
 end
 ~
+#18808
+put candy in pillowcase~
+1 c 2
+look examine put~
+set Needs 31
+if %actor.aff_flagged(blind)%
+  return 0
+  halt
+end
+if !%actor.on_quest(18808)% && (%actor.obj_target(%arg.cdr%)% == %self% || %actor.obj_target(%arg.car%)% == %self%)
+  %send% %actor% @%self% suddenly vanishes!
+  %purge% %self%
+  halt
+end
+set Candy18802 %self.Candy18802%
+set Candy18803 %self.Candy18803%
+set Candy18804 %self.Candy18804%
+set Candy18805 %self.Candy18805%
+set Candy18806 %self.Candy18806%
+set Candy18807 %self.Candy18807%
+set Candy18808 %self.Candy18808%
+set Candy18809 %self.Candy18809%
+set Candy18810 %self.Candy18810%
+set Candy18811 %self.Candy18811%
+* only looking at it?
+if %cmd% == look || %cmd% == examine
+  if %arg.car% == in
+    set arg %arg.cdr%
+  end
+  if %actor.obj_target(%arg.car%)% != %self%
+    return 0
+    halt
+  end
+  eval Need18802 %Needs% - %Candy18802%
+  eval Need18803 %Needs% - %Candy18803%
+  eval Need18804 %Needs% - %Candy18804%
+  eval Need18805 %Needs% - %Candy18805%
+  eval Need18806 %Needs% - %Candy18806%
+  eval Need18807 %Needs% - %Candy18807%
+  eval Need18808 %Needs% - %Candy18808%
+  eval Need18809 %Needs% - %Candy18809%
+  eval Need18810 %Needs% - %Candy18810%
+  eval Need18811 %Needs% - %Candy18811%
+  eval tot %Need18802% + %Need18803% + %Need18804% + %Need18805% + %Need18806% + %Need18807% + %Need18808% + %Need18809% + %Need18810% + %Need18811%
+  if %tot% > 1
+    set tot candies
+  else
+    set tot candy
+  end
+  %send% %actor% As you look into @%self%, you realize you still need the following %tot% to fill it:
+  if %Need18802% > 0
+    %send% %actor% &&0 %Need18802% jammy dodgers
+  end
+  if %Need18803% > 0
+    %send% %actor% &&0 %Need18803% candy bonkers
+  end
+  if %Need18804% > 0
+    %send% %actor% &&0 %Need18804% handfuls of smarties
+  end
+  if %Need18805% > 0
+    %send% %actor% &&0 %Need18805% full-size candy bars
+  end
+  if %Need18806% > 0
+    %send% %actor% &&0 %Need18806% stolen candies
+  end
+  if %Need18807% > 0
+    %send% %actor% &&0 %Need18807% pixy sticks
+  end
+  if %Need18808% > 0
+    %send% %actor% &&0 %Need18808% sour demon heads
+  end
+  if %Need18809% > 0
+    %send% %actor% &&0 %Need18809% everlasting goblin stoppers
+  end
+  if %Need18810% > 0
+    %send% %actor% &&0 %Need18810% manatomic fireball candies
+  end
+  if %Need18811% > 0
+    %send% %actor% &&0 %Need18811% necro wafers
+  end
+  halt
+end
+* otherwise the command was 'put'
+if %actor.obj_target(%arg.cdr%)% != %self%
+  return 0
+  halt
+end
+* detect arg
+set PutObj %arg.car%
+* check for "all" arg
+if (%PutObj% == all || %PutObj% == all.Candies || %putObj% == all.Candy)
+  set all 1
+else
+  set all 0
+end
+set CandyCount 0
+eval Needs %Needs% * 10
+* and loop
+eval CandyTotal %Candy18802% + %Candy18803% + %Candy18804% + %Candy18805% + %Candy18806% + %Candy18807% + %Candy18808% + %Candy18809% + %Candy18810% + %Candy18811%
+set item %actor.inventory%
+eval ActorItem %actor.obj_target_inv(%PutObj%)%
+while (%item% && (%all% || %CandyCount% == 0) && %CandyTotal% < %Needs%)
+  set next_item %item.next_in_list%
+  * use %ok% to control what we do in this loop
+  if %all%
+    set ok 1
+  else
+    * single-target: make sure this was the target
+    if %ActorItem% == %item%
+      set ok 1
+    else
+      set ok 0
+    end
+  end
+  * next check the obj type if we got the ok
+  if %ok%
+    if %item.vnum% < 18802 || %item.vnum% > 18811
+      if %all%
+        set ok 0
+      else
+        %send% %actor% You can't put @%item% in @%self%... Only Halloween candy can be collected in your @%self%!
+        * Break out of the loop early since it was a single-target fail
+        halt
+      end
+    end
+  end
+  * still ok? see if we need one of these
+  if %ok%
+    set WhatCandy Candy%item.vnum%
+    eval myCandy %%self.Candy%item.vnum%%%
+    if %MyCandy% < 31
+      eval CandyCount %CandyCount% + 1
+      %send% %actor% # You stash @%item% in @%self%.
+      %echoaround% %actor% # ~%actor% puts @%item% in @%self%.
+      eval %WhatCandy% %%self.%WhatCandy%%% + 1
+      remote %WhatCandy% %self.id%
+      %purge% %item%
+      eval CandyTotal %CandyTotal% + 1
+    else
+      set SpecificCandy @%item%
+    end
+  end
+  * and repeat the loop
+  set item %next_item%
+done
+* did we fail?
+if !%CandyCount%
+  if %all%
+    %send% %actor% You didn't have anything you could put into @%self%.
+  elseif %SpecificCandy%
+    %send% %actor% You can't fit %SpecificCandy% in @%self%.
+  else
+    %send% %actor% You don't seem to have a %PutObj%.
+  end
+end
+* get a candy total and see if the quest is over
+if %CandyTotal% >= %Needs%
+  %quest% %actor% finish 18808
+  %purge% %self%
+end
+~
+#18809
+set variables on the pillowcase~
+1 n 100
+~
+set Candy18802 0
+set Candy18803 0
+set Candy18804 0
+set Candy18805 0
+set Candy18806 0
+set Candy18807 0
+set Candy18808 0
+set Candy18809 0
+set Candy18810 0
+set Candy18811 0
+set target %self.id%
+remote Candy18802 %target%
+remote Candy18803 %target%
+remote Candy18804 %target%
+remote Candy18805 %target%
+remote Candy18806 %target%
+remote Candy18807 %target%
+remote Candy18808 %target%
+remote Candy18809 %target%
+remote Candy18810 %target%
+remote Candy18811 %target%
+~
+#18810
+randomly trash the candy pillowcase if event isn't running~
+1 b 20
+~
+if %event.running(18800)%
+  halt
+end
+%send% %actor% @%self% suddenly vanishes!
+%purge% %self%
+~
 #18811
 risen guard combat~
 0 k 75
@@ -325,17 +526,17 @@ if %atk% == 1
 end
 switch %atk%
   case 1
-    if %self.level% >= 125
+    if %self.level% >= 150
       set duration 90
-    elseif %self.level% >= 115
+    elseif %self.level% >= 140
       set duration 80
-    elseif %self.level% >= 105
+    elseif %self.level% >= 130
       set duration 70
-    elseif %self.level% >= 95
+    elseif %self.level% >= 120
       set duration 60
-    elseif %self.level% >= 85
+    elseif %self.level% >= 110
       set duration 50
-    elseif %self.level% >= 75
+    elseif %self.level% >= 100
       set duration 40
     else
       set duration 30
@@ -362,7 +563,20 @@ switch %atk%
     end
   break
 done
-nop %self.set_cooldown(18812, 30)%
+nop %self.set_cooldown(18812, 25)%
+~
+#18812
+corpse wagon is destroyed~
+5 f 100
+~
+%load% veh 18859 %self.level%
+if %self.empire%
+  set burnt %self.room.vehicles%
+  %own% %burnt% %self.empire%
+end
+return 0
+%echo% The scent of burning flesh fills the air as the wagon's assortment of corpses is destroyed!
+%purge% %self%
 ~
 #18818
 Learn Halloween Costumes~
@@ -522,6 +736,9 @@ switch %questvnum%
   break
   case 18808
     %load% obj 18848 %actor% inv
+  break
+  case 18866
+    %load% obj 18866 %actor% inv
   break
 done
 ~
@@ -696,6 +913,14 @@ if %room.max_citizens% < 1
   %send% %actor% You can only use @%self% inside a house.
   halt
 end
+set person %self.room.people%
+while %person%
+  if %person.vnum% == 18824 || %person.vnum% == 251 || %person.vnum% == 252 || %person.vnum% == 254
+    %force% %person% shout Halt %actor.name%! What do you think you're doing?
+    halt
+  end
+  set person %person.next_in_room%
+done
 %send% %actor% You start applying @%self% to the walls of the building...
 %echoaround% %actor% ~%actor% starts applying @%self% to the walls of the building...
 wait 1 sec
@@ -757,14 +982,21 @@ if %target.is_pc%
   %send% %target% ~%actor% stalks towards you, fangs bared in a terrifying snarl!
   %echoneither% %actor% %target% ~%actor% bares ^%actor% fangs and stalks towards ~%target%, who cowers in fear!
   halt
-elseif %target.vnum% != 202 && %target.vnum% != 203
+elseif %target.vnum% != 200 && %target.vnum% != 201 && %target.vnum% != 237 && %target.vnum% != 203 && %target.vnum% != 204
   * wrong target
   %send% %actor% You bare your fangs and snarl at ~%target%, who flinches away.
   %echoaround% %actor% ~%actor% bares ^%actor% fangs and snarls at ~%target%, who flinches away.
 else
   %send% %actor% Bats swirl around you as you spread your flowing cape dramatically, bare your fangs, and snarl at ~%target%!
   %echoaround% %actor% Bats swirl around ~%actor% as &%actor% spreads ^%actor% flowing cape dramatically, bares ^%actor% fangs, and snarls at ~%target%!
+  if %target.varexists(VampFear)%
+    %echo% ~%target% immediately clutches ^%target% chest and drops to the ground, dead!
+    %slay% %target%
+    halt
+  end
   %echo% ~%target% panics, and attempts to flee!
+  set VampFear 1
+  remote VampFear %target.id%
   %force% %target% mmove
   %force% %target% mmove
   %force% %target% mmove
@@ -1237,6 +1469,7 @@ if %stealth_roll% > 10
   nop %target.add_mob_flag(*PICKPOCKETED)%
   %load% obj 18855 %actor% inv
   set item %actor.inventory()%
+  nop %actor.set_cooldown(18854,20)%
   %send% %actor% You find @%item%!
   return 1
 else
@@ -1843,6 +2076,74 @@ switch %how_many%
   break
 done
 ~
+#18866
+track the blood feeding~
+1 c 2
+bite stop~
+* make sure action is feeding
+if %actor.action% != feeding
+  return 0
+  halt
+end
+set bitten %actor.biting%
+return 0
+if !%bitten.mob_flagged(human)% || %bitten.empire% != %actor.empire%
+  halt
+end
+wait 0
+* Did they let go?
+if %actor.action% == feeding
+  halt
+end
+if !%self.varexists(BiteList)%
+  set BiteList %bitten.id%
+  remote BiteList %self.id%
+  %send% %actor% You managed to feed on ~%bitten% without killing *%bitten%. First one down!
+  halt
+end
+set BiteList %self.BiteList%
+set id %bitten.id%
+set count 1
+while %BiteList%
+  set who %BiteList.car%
+  if %who% == %id%
+    halt
+  end
+  set BiteList %BiteList.cdr%
+  eval count %count% + 1
+done
+set BiteList %self.BiteList% %id%
+remote BiteList %self.id%
+if %count% == 5
+  %quest% %actor% trigger 18866
+  %quest% %actor% finish 18866
+else
+  %send% %actor% You're up to %count% of 5 citizens now.
+end
+~
+#18867
+did the vampire kill them~
+1 z 100
+~
+if !%killer.action(feeding)%
+  halt
+end
+if !%self.varexists(BiteList)%
+  halt
+end
+set BiteList %self.BiteList%
+set bitten %actor.id%
+while %BiteList%
+  set check %BiteList.car%
+  if %check% != %bitten%
+    set hold %hold% %check%
+  end
+  set BiteList %BiteList.cdr%
+done
+set BiteList %hold%
+remote BiteList %self.id%
+%send% %killer% Well, ~%actor% doesn't count anymore.
+~
 #18869
 play them off johny~
 1 c 2
@@ -2016,7 +2317,7 @@ else
   done
   %mod% %self% shortdesc a ghostly %target.pc_name%
   %mod% %self% longdesc A ghostly %target.pc_name% floats above the ground.
-  %mod% %self% keywords ghostly
+  %mod% %self% keywords ghostly %actor.name%
   %mod% %self% lookdesc this ghostly version of %target.pc_name% is a citizen of %self.room.empire_name% the same as the living one.
 end
 %echo% A chill comes over you as ~%self% fades into view.
@@ -2209,23 +2510,29 @@ end
 Ancestor's Offering: Invoke/Paint Ancestor~
 1 c 2
 invoke paint~
-set room %actor.room%
-* determine random name?
-if %actor.varexists(halloween_grandma)%
-  set halloween_grandma %actor.halloween_grandma%
-else
-  * pick a random name
-  set names Agnes Ethel Martha Gertrude Esther Lottie Nannie Beulah Flossie Gladys Mildred Mamie Myrtle Bertha Irma Edith Ruth Carol Muriel
-  eval pos %random.19% - 1
-  while %pos% > 0
-    set names %names.cdr%
-    eval pos %pos% - 1
-  done
-  set halloween_grandma %names.car%
-  remote halloween_grandma %actor.id%
+if %self.vnum% == 18880
+  set room %actor.room%
+  * determine random name?
+  if %actor.varexists(halloween_grandma)%
+    set halloween_grandma %actor.halloween_grandma%
+  else
+    * pick a random name
+    set names Agnes Ethel Martha Gertrude Esther Lottie Nannie Beulah Flossie Gladys Mildred Mamie Myrtle Bertha Irma Edith Ruth Carol Muriel
+    eval pos %random.19% - 1
+    while %pos% > 0
+      set names %names.cdr%
+      eval pos %pos% - 1
+    done
+    set halloween_grandma %names.car%
+    remote halloween_grandma %actor.id%
+  end
 end
 * ok: which command?
 if invoke /= %cmd%
+  if %self.vnum% == 18881
+    %send% %actor% You've already invoked your grandmother and painted her. Just go place the portrait!
+    halt
+  end
   *** INVOKE COMMAND: Validate arg
   if !(ancestor /= %arg%)
     %send% %actor% Invoke whom?
@@ -2262,6 +2569,10 @@ elseif paint /= %cmd%
   set mob %actor.char_target(%arg.car%)%
   if !%arg% || !%mob% || %mob.vnum% != 18880
     return 0
+    halt
+  end
+  if %self.vnum% == 18881
+    %send% %actor% You've already got a nice portrait of your grandmother painted. Just go place it at her tomb!
     halt
   end
   if %mob.leader% != %actor%
@@ -2406,10 +2717,10 @@ Halloween: Dropped flower buff~
 1 h 100
 ~
 set room %actor.room%
-dg_affect #18887 %actor% off
 %send% %actor% You drop @%self%, which crumbles to dust as it falls.
 %echoaround% %actor% ~%actor% drops @%self%, which crumbles to dust as it falls.
 if %room.function(TOMB)%
+  dg_affect #18887 %actor% off
   switch %self.vnum%
     case 18887
       dg_affect #18887 %actor% INVENTORY 15 3600

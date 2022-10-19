@@ -4195,7 +4195,7 @@ end
 ~
 #11876
 Smol Nes-Pik: Reset comment count on move~
-0 iw 100
+0 i 100
 ~
 * pairs with trigger 11880 etc to reset their commentary when they move
 set comment 0
@@ -4263,7 +4263,7 @@ end
 if %comment% == 3
   * 3. musical instrument: this one can actually change rooms
   %echo% ~%self% pulls a little gemstone flute from ^%self% pocket and begins to play...
-  wait 3 sec
+  wait 7 sec
   * must check if the Tresydion is orating
   set tresydion %instance.mob(11882)%
   set dance_list 11878 11880 11881
@@ -4397,7 +4397,7 @@ if %comment% == 3
       done
     end
     eval loop %loop% + 1
-    wait 3 sec
+    wait 7 sec
   done
   %echo% ~%self% slides the flute back into ^%self% pocket.
 end
@@ -4884,9 +4884,8 @@ if %comment% == 3
       done
     end
     eval loop %loop% + 1
-    wait 3 sec
+    wait 7 sec
   done
-  %echo% ~%self% slides the flute back into ^%self% pocket.
 end
 if %comment% == 4
   * 4. sleep hints

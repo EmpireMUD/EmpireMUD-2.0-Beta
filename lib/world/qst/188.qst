@@ -27,6 +27,43 @@ W
 W
 3 18801 0 1 a
 S
+#18808
+Halloween: Pillage for Candy~
+   You peer into your goody bag and are knocked back as a spirit flies out with
+a huge smile on its face!
+   'Hi!' it says in a friendly voice. 'I bet you weren't expecting that. If you
+are interested, I have a pillowcase here for you. I always did like the idea of
+getting free candy, but I can't exactly collect it myself.
+   'If you can get me 31 of each type out there, I'd be happy to make it worth
+your while.'
+   The spirit waves back at you as it flies off toward the moon, fading until
+you can only see its big eyes and wide grin, then just the grin, and then, at
+last, nothing at all. When you look down, you notice you're holding a pillaging
+pillowcase.
+   Fill the pillowcase with 31 of each candy before the event ends!
+~
+   As you put the last piece of candy into your pillaging pillowcase, that same
+smiling spirit pops out!
+   'Thank you so much for the candy, friend,' it says. 'Here, have this
+skeletal old wagon wheel for your trouble. I bet you can make something
+interesting from that.'
+   And with a POP! the spirit and the pillowcase both vanish. But when you look
+down, you realize you're holding a wagon wheel.
+~
+10 j 0 0 86400
+A
+2 18829
+P
+36 18800 0 1 -
+R
+2 18858 1
+T 18820
+W+
+11 0 0 1 -
+Fill your pillaging pillowcase with halloween candy~
+Z
+4 18808
+S
 #18819
 Halloween: Costume the Town~
    A restless spirit appears to tell you: It seems your city has become rather
@@ -160,11 +197,12 @@ blood pumping.
    The citizens' hearts are definitely pumping now. You have earned a goody
 bag!
 ~
-16 ej 0 0 -1
+17 ej 0 0 -1
 A
 2 18808
 A
 2 18806
+D 18827
 P
 36 18800 0 1 a
 P
@@ -448,6 +486,36 @@ T 18820
 W+
 11 0 0 1 -
 Perform the ritual of demons to open 3 portals~
+S
+#18866
+Halloween: Keep the Blood Pumping~
+   Halloween is a vampire's favorite time of year, when the veil between the
+living and the dead is at its thinnest. A chance encounter with a vampire can
+leave a person's heart pounding -- at least, if the vampire doesn't kill them.
+And after all, a good fright makes them all the tastier next time.
+   Feed from the blood of five people around your city, but don't kill any of
+them! Take just enough to give them a fright.
+~
+And that's five! They'll be having nightmares for weeks.
+~
+5 ej 0 0 -1
+A
+2 18808
+A
+2 18806
+D 18827
+P
+36 18800 0 1 a
+P
+9 7 0 1 a
+R
+9 18800 10
+R
+2 18829 1
+T 18820
+W+
+11 0 0 1 -
+Feed from 5 people without killing them~
 S
 #18869
 Halloween: Songs for the Deaths Yet to Come~
