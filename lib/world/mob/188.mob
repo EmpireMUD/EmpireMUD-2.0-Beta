@@ -82,7 +82,7 @@ A risen city guard hunts for intruders.
 1 0 13 10
 D
    This guard was clearly more dedicated than any before him. Even in death, he
-patrols the empire, hunting down intruders. Never mind the gray coloration of
+patrols the empire, hunting down intruders. Don't mind the gray coloration of
 his skin, the straw-like feel of his remaining hair, or the smell that wafts
 from him with the slightest breeze.
 ~
@@ -90,7 +90,7 @@ I 4 18875 5.00 1  # LOOT: tooth whistle
 I 12 18875 5.00 1  # PICKPOCKET: tooth whistle
 M
 0
-A faint russling comes from $n, as the wind blows.~
+A faint rustling comes from $n, as the wind blows.~
 M
 5
 $n tries to flex as $e prepares for combat.~
