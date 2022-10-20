@@ -193,6 +193,7 @@ classroom through thick glasses. The fingers of her left hand, made of
 nocturnium filigree, tap slowly on the desk.
 ~
 F 11800
+I 12 11873 100.00 1 p  # PICKPOCKET: glittering red potion
 M
 1
 Alright, settle down.~
@@ -1184,6 +1185,7 @@ places where it's stained with grease.
    Waltur sells items in his lab. Type 'list', 'list id', or 'buy'.
 ~
 F 11800
+I 12 11868 100.00 1 p  # PICKPOCKET: miniature wellstone prototype
 M
 7
 say Now that all that nastiness is done, I have some things that might interest you. (list)~
@@ -1403,6 +1405,7 @@ head is entirely bald, with brown splotches on his dark green skin. He trembles
 a little bit when he pushes himself back up after each bow, but he never makes
 a noise.
 ~
+I 12 11897 100.00 1 p  # PICKPOCKET: good rock
 M
 0
 $n coughs.~
@@ -1425,6 +1428,7 @@ and he frequently steps to the edge of the walkway for a better view. He's
 dressed in a forest green robe that's a little too large, always draping behind
 him as he walks.
 ~
+I 12 11895 100.00 1 p  # PICKPOCKET: iridescent pearl
 M
 0
 $n looks out over the edge.~
@@ -1461,6 +1465,7 @@ Ortimer would disappear into a forest or even tall grassland. At almost five
 feet tall and half as wide, he's large for a goblin, especially as he sprawls
 out on the small bed.
 ~
+I 12 11897 100.00 1  # PICKPOCKET: good rock
 M
 0
 $n coughs.~
@@ -1633,6 +1638,7 @@ green gown. She's a heavy-set woman with a ruddy glow to the juniper skin of
 her cheeks. She makes little notice of you, but she looks back at Ortimer
 rather often.
 ~
+I 12 11895 100.00 1 p  # PICKPOCKET: iridescent pearl
 M
 0
 $n coughs.~
@@ -1664,6 +1670,7 @@ people pass. He pays close attention to the people in green robes, but he
 watches others, too. His wild brown hair covers his head like a mop, so you're
 not sure how much he's seeing anyway.
 ~
+I 12 11893 100.00 1 p  # PICKPOCKET: fine leather fox leash
 T 11810
 S
 #11953
@@ -1680,6 +1687,7 @@ unceremoniously chucks the shell over the side of the city. His jade green skin
 sparkles with bits of leftover clam as he's not very good at eating while
 walking. The meal has stained his purple tunic as well.
 ~
+I 12 11977 100.00 1 p  # PICKPOCKET: steamed mussels
 M
 0
 $n shucks a clam and eats it.~
@@ -1713,6 +1721,7 @@ seems to be enjoying the hot day, as he isn't seeking shade on the rooftops.
 He's dressed in a fine white shirt and purple trousers, with a pair of wooden
 shoes that clack as he walks.
 ~
+I 12 11894 100.00 1 p  # PICKPOCKET: wooden Venus figurine
 M
 0
 $n holds up a hand to shield $s eyes and looks at the sun.~
@@ -1750,6 +1759,7 @@ down to her waist, which is sinched with a black belt between her lavender
 blouse and deep purple skirt. Her ears both have wide shell discs stretching
 the lobes, which hang down to her shoulders.
 ~
+I 12 11977 100.00 1 p  # PICKPOCKET: steamed mussels
 M
 7
 emote $n stacks baskets and pushes them into the store room.~
@@ -2768,6 +2778,7 @@ robe, Celles looks to be the oldest goblin in the city. Her skin, perhaps
 chartreuse once, has faded almost to gray. Her eyes are milky white to match
 her hair, and she stares off toward the horizon as she speaks.
 ~
+I 12 11894 100.00 1 p  # PICKPOCKET: wooden Venus figurine
 M
 7
 say All are welcome.~
@@ -2841,6 +2852,7 @@ close a hole.
 resemble your version of comfort. She is dressed in a simple green gown that
 covers her feet even as she reclines.
 ~
+I 12 11977 100.00 1 p  # PICKPOCKET: steamed mussels
 M
 0
 $n makes a 'tsk' sound as she accidentally jabs her own finger.~
@@ -2874,6 +2886,7 @@ discs stretch her chartreuse earlobes into thin bands, and a small cylindrical
 stone pierces the bridge of her nose. Futile though it may be, she is busy
 collecting the clutter and sorting it into baskets.
 ~
+I 12 11977 100.00 1 p  # PICKPOCKET: steamed mussels
 M
 0
 $n picks up a sock, folds it, and puts it away.~
@@ -2960,6 +2973,7 @@ D
    This NPC is loaded and renamed dynamically as part of the scenery for the
 Altar Below.
 ~
+I 12 11895 100.00 1 p  # PICKPOCKET: iridescent pearl
 T 11978
 T 11810
 S
@@ -2978,6 +2992,7 @@ nearly the same gray as his hair. His drooping nose has a hole in the side that
 might once have held jewelry, but he wears only a necklace made from shell
 beads over his violet tunic and pants.
 ~
+I 12 11896 100.00 1 p  # PICKPOCKET: leather bladder
 M
 0
 The footsteps above echo down through the chamber.~
@@ -3064,6 +3079,7 @@ glows a healthy jade tone in the midday sun. He's dressed in fine black pants,
 a violet shirt, and a black vest. But curiously, he's barefoot and seems
 happier for it.
 ~
+I 12 11977 100.00 1 p  # PICKPOCKET: steamed mussels
 T 11810
 S
 #11984
@@ -3079,6 +3095,7 @@ up in a thick braid. She's dressed in a simple green gown that drapes to the
 ground, covering her legs and feet completely. Around her neck, she wears a
 string of iridescent shell beads.
 ~
+I 12 11895 100.00 1 p  # PICKPOCKET: iridescent pearl
 M
 0
 $n coughs.~
@@ -3110,6 +3127,7 @@ the great standing stone. He wears a plain green robe, nearly the same color as
 his jade skin, and his nose has small iridescent plugs through piercings on
 both sides.
 ~
+I 12 11895 100.00 1 p  # PICKPOCKET: iridescent pearl
 M
 0
 $n coughs.~
@@ -3141,6 +3159,7 @@ In both ears, she wears large abalone shell discs that stretch her earlobes
 larger than your palm. She expertly wields a long wooden spoon as she churns
 the shellfish in the cauldron.
 ~
+I 12 11894 100.00 1 p  # PICKPOCKET: wooden Venus figurine
 M
 0
 $n fishes cooked clams from the cauldron with a wicker strainer.~
@@ -3178,6 +3197,7 @@ shirt is draped over a damaged roof beam. He has a set of tools laid out next
 to him including a stone hammer, a bone hammer, a wooden mallet, several stone
 chisels, and some bits and bobs you don't recognize.
 ~
+I 12 11894 100.00 1 p  # PICKPOCKET: wooden Venus figurine
 M
 7
 emote $n chisels a hole in a beam.~

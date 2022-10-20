@@ -4740,17 +4740,30 @@ switch %seq%
     end
   break
   case 3
-    %echo% ~%self% sits up and pulls a pearl from ^%self% pocket.
+    if %self.mob_flagged(*PICKPOCKETED)%
+      %echo% ~%self% reaches into ^%self% pocket and makes a perplexed look.
+      set lost_pearl 1
+      remote lost_pearl %self.id%
+    else
+      %echo% ~%self% sits up and pulls a pearl from ^%self% pocket.
+    end
+    * disable pickpocket now if not already
+    nop %self.add_mob_flag(*PICKPOCKETED)%
   break
   case 4
-    if %random.2% == 1
+    if %self.varexists(lost_pearl)%
+      %echo% ~%self% pats ^%self% pocket trying to find something.
+    elseif %random.2% == 1
       %echo% ~%self% sets the pearl on the altar.
     else
       %echo% ~%self% gently places the pearl on the altar.
     end
   break
   case 5
-    * skip
+    * skip; long delay here if the player stole the pearl
+    if %self.varexists(lost_pearl)%
+      wait 360 s
+    end
   break
   case 6
     %echo% ~%self% stands up and brushes *%self%self off.

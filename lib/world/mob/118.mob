@@ -185,6 +185,7 @@ are in short supply in Skycleave. As she tidies the room, you notice most of
 her left hand has been replaced with intricate nocturnium filigree.
 ~
 F 11800
+I 12 11873 100.00 1 p  # PICKPOCKET: glittering red potion
 M
 7
 say Oh no, no more people. We are full positively to the roof.~
@@ -211,7 +212,7 @@ S
 #n~
 #n is organizing the supplies.
 ~
-0 0 bdvA n 3
+0 0 bdvAI n 3
 1 0 0 16
 D
    Though he looks like he's new here, he has set right to work sorting and
@@ -442,6 +443,7 @@ D
 Strings set by trig 11824.
 ~
 I 4 11929 90.00 1  # LOOT: very crummy bread
+I 4 11876 66.66 1  # LOOT: obsidian stabber
 T 11801
 T 11816
 T 11824
@@ -458,6 +460,7 @@ D
 Strings set by trig 11824.
 ~
 I 4 11929 90.00 1  # LOOT: very crummy bread
+I 4 11875 66.66 1  # LOOT: hardstone pick
 T 11801
 T 11817
 T 11824
@@ -609,6 +612,7 @@ wearing a long coat that's buttoned all the way down; perhaps that's why he
 seems to shuffle when he walks. He seems to be spending a lot of effort to stay
 perfectly upright.
 ~
+I 12 11876 100.00 1 p  # PICKPOCKET: obsidian stabber
 M
 0
 $n stumbles a little and almost folds in half at the middle before catching $mself.~
@@ -1030,6 +1034,7 @@ Marina's leg under the table. Djon is wearing a plain white apprentice robe. He
 has shaved the sides of his head and has short, curly black hair piled on top.
 ~
 F 11800
+I 12 11869 100.00 1 p  # PICKPOCKET: self-writing pen
 T 11810
 S
 #11829
@@ -1508,6 +1513,7 @@ places where it's stained with grease.
    Waltur sells items in his lab. Type 'list', 'list id', or 'buy'.
 ~
 F 11800
+I 12 11868 100.00 1 p  # PICKPOCKET: miniature wellstone prototype
 M
 7
 say You fool, we were hiding in here. Next time leave the wall shut.~
@@ -2402,6 +2408,7 @@ instead of stars, it is dotted with bits of dust and the dried crumbs of many
 meals. Moneryl's triangular silver cape, however, is as stiff and perfect as
 everyone else's.
 ~
+I 12 11879 100.00 1  # PICKPOCKET: glowing sapphire bud
 T 11810
 S
 #11874
@@ -2418,6 +2425,7 @@ high-arching eyebrows pulled down in a furrow. She stands almost at attention,
 though not quite like a soldier, with a triangular silver cape hanging stiffly
 on her back.
 ~
+I 12 11878 100.00 1  # PICKPOCKET: gemstone knife
 T 11810
 S
 #11875
@@ -2436,6 +2444,7 @@ red and violet glimstone. In shadow, they seem to emit a faint glow. The armor
 is tied together through holes in the wood with brown silk ribbons. On his
 back, Nayyul wears a stiff, silvery cape in the shape of a peaked triangle.
 ~
+I 12 11878 100.00 1  # PICKPOCKET: gemstone knife
 T 11810
 S
 #11876
@@ -2452,6 +2461,7 @@ people you've met in Smol Nes-Pik. His violet silk double-robe hangs open,
 underneath which he's wearing a white floor-length silk cassock. Behind him,
 his stiff triangular cape sticks out backwards to follow his crooked posture.
 ~
+I 12 11880 100.00 1  # PICKPOCKET: ruby rock candy
 T 11810
 S
 #11877
@@ -2491,6 +2501,7 @@ such that you can hardly imagine how he can stand after a long day of this.
    Still, he greets everyone he sees with a lopsided smile and kind words as
 he plods up and down the glimmering staircase.
 ~
+I 12 11878 100.00 1  # PICKPOCKET: gemstone knife
 T 11878
 T 11810
 S
@@ -2510,6 +2521,7 @@ is as intricately carved as the palace around you, and inlaid with smaller red
 and blue gems. On his back, he bears a stiff, triangular cape in silver and
 yellow.
 ~
+I 12 11880 100.00 1  # PICKPOCKET: ruby rock candy
 T 11810
 S
 #11880
@@ -2530,6 +2542,7 @@ in silver and yellow that can be seen on the back of everyone here.
 the buildings, and every carving or sculpture she passes. She shows a keen,
 almost childlike interest in every facet of the city.
 ~
+I 12 11880 100.00 1  # PICKPOCKET: ruby rock candy
 T 11876
 T 11880
 T 11810
@@ -2550,6 +2563,7 @@ triangular cape on her back, adorned with patterns of silver and yellow, stays
 perfectly still as she moves with the elegance of a trained dancer. She gives
 you a crooked smile as you pass her.
 ~
+I 12 11879 100.00 1  # PICKPOCKET: glowing sapphire bud
 T 11810
 S
 #11882
@@ -2565,6 +2579,7 @@ double-crown and layers of brown, beige, and black silk robes. His draping
 ears and chins hang in contrast to the tight, youthful features of the other
 residents of Smol Nes-Pik.
 ~
+I 12 11880 100.00 1  # PICKPOCKET: ruby rock candy
 T 11882
 T 11810
 S
@@ -2584,6 +2599,7 @@ over his shoulders covers an otherwise plain green tunic and pants.
 make out any of the words. Most of the time, he takes little notice of what you
 or the tresydion are doing.
 ~
+I 12 11880 100.00 1  # PICKPOCKET: ruby rock candy
 M
 0
 $n rocks back and forth.~
@@ -2684,6 +2700,7 @@ blue under the triangular silver and yellow cape of Smol Nes-Pik. She kneels by
 each pool in turn, touching the surface with her long, delicate fingers,
 swirling it around, then touching her fingers to her closed lips.
 ~
+I 12 11879 100.00 1  # PICKPOCKET: glowing sapphire bud
 T 11810
 S
 #11886
@@ -2703,6 +2720,7 @@ seems to have lost her cape. In fact, these are the only people you've found
 here not wearing one.
    You can type 'skip' to skip to the important part of this cutscene.
 ~
+I 12 11880 100.00 1  # PICKPOCKET: ruby rock candy
 T 11874
 T 11866
 T 11810
@@ -2722,6 +2740,7 @@ short, but soaked at the back with blood that has flowed from his wounds. He
 seems to have taken off his cape, or lost it somewhere.
    You can type 'skip' to skip to the important part of this cutscene.
 ~
+I 12 11878 100.00 1  # PICKPOCKET: gemstone knife
 T 11810
 S
 #11888

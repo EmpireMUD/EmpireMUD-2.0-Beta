@@ -5464,20 +5464,45 @@ nop %self.link_instance%
 * 3. Mobs: Any checks based on surviving mobs go here (step 4 will purge them)
 %at% i11800 %load% mob 11901  * Gossipper
 %at% i11800 %load% mob 11901  * Additional Gossipper
-%at% i11903 %load% mob 11904  * Page Corwin
-%at% i11905 %load% mob 11905  * Barista
-%at% i11905 %load% mob 11827  * chatty couple
-%at% i11905 %load% mob 11828  * chatty couple
-%at% i11906 %load% mob 11906  * Instructor
+%at% i11905 %load% mob 11827  * Marina
+%at% i11905 %load% mob 11828  * Djon
 %at% i11906 %load% mob 11908  * Student Elamm
 %at% i11906 %load% mob 11909  * Student Akeldama
-%at% i11907 %load% mob 11907  * Gift Shop Keeper
+%at% i11904 %load% mob 11902  * Bucket (and sponge)
+* Page Corwin
+set corwin %instance.mob(11804)%
+if %corwin%
+  eval temp %corwin.room.template% + 100
+  %at% i%temp% %load% mob 11904  * Page Corwin, was room i11903
+  if %corwin.mob_flagged(*PICKPOCKETED)%
+    set mob %instance.mob(11904)%
+    nop %mob.add_mob_flag(*PICKPOCKETED)%
+  end
+end
+* Barista Mageina
+set barista %instance.mob(11805)%
+%at% i11905 %load% mob 11905  * Barista Mageina
+if %barista.mob_flagged(*PICKPOCKETED)%
+  set mob %instance.mob(11905)%
+  nop %mob.add_mob_flag(*PICKPOCKETED)%
+end
+* Instructor Huberus
+set huberus %instance.mob(11806)%
+%at% i11906 %load% mob 11906  * Instructor Huberus
+if %huberus.mob_flagged(*PICKPOCKETED)%
+  set mob %instance.mob(11906)%
+  nop %mob.add_mob_flag(*PICKPOCKETED)%
+end
+* Gift Shop Keeper
 set shopkeep %instance.mob(11807)%
+%at% i11907 %load% mob 11907  * Gift Shop Keeper
 set newshop %instance.mob(11907)%
 if %shopkeep% && %newshop%
   nop %newshop.namelist(%shopkeep.namelist%)%
+  if %shopkeep.mob_flagged(*PICKPOCKETED)%
+    nop %newshop.add_mob_flag(*PICKPOCKETED)%
+  end
 end
-%at% i11904 %load% mob 11902  * Bucket (and sponge)
 * attach some trigs
 set 11937_list 11945 11929
 while %11937_list%
