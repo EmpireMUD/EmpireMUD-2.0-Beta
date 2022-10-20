@@ -4131,7 +4131,7 @@ SHOW(show_dailycycle) {
 	char arg[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH];
 	quest_data *qst, *next_qst;
 	size_t size;
-	int num;
+	int num, count;
 	
 	one_argument(argument, arg);
 	
@@ -4142,6 +4142,19 @@ SHOW(show_dailycycle) {
 		msg_to_char(ch, "Invalid cycle number.\r\n");
 	}
 	else {
+		// see if ANY quests have that cycle
+		count = 0;
+		HASH_ITER(hh, quest_table, qst, next_qst) {
+			if (!IS_DAILY_QUEST(qst) || QUEST_DAILY_CYCLE(qst) != num) {
+				continue;
+			}
+			++count;
+		}
+		// if we didn't find any, try 1 more thing
+		if (count == 0 && (qst = quest_proto(num)) && QUEST_DAILY_CYCLE(qst) != QUEST_VNUM(qst)) {
+			num = QUEST_DAILY_CYCLE(qst);
+		}
+		
 		size = snprintf(buf, sizeof(buf), "Daily quests with cycle id %d:\r\n", num);
 		HASH_ITER(hh, quest_table, qst, next_qst) {
 			if (!IS_DAILY_QUEST(qst) || QUEST_DAILY_CYCLE(qst) != num) {
