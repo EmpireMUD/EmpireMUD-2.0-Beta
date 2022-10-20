@@ -455,6 +455,7 @@ if !%CandyCount%
     %send% %actor% You don't seem to have a %PutObj%.
   end
 end
+wait 0
 * get a candy total and see if the quest is over
 if %CandyTotal% >= %Needs%
   %quest% %actor% finish 18808

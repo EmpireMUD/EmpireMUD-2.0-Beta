@@ -110,7 +110,7 @@ R
 6751 6 1 0
 S
 #18858
-a corpse wagon~
+corpse wagon~
 18858 1
 11 198 nt 1 18858 0 0
 R
@@ -123,9 +123,9 @@ R
 6000 50 1 0
 S
 #18859
-corpse wagon~
+repair corpse wagon~
 18858 1
-11 -1 kn 1 -1 0 0
+11 198 kn 1 -1 0 0
 R
 1000 100 0 0
 S
