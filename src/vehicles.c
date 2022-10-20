@@ -1420,6 +1420,26 @@ bool vehicle_is_chameleon(vehicle_data *veh, room_data *from) {
 }
 
 
+/**
+* Counts the words of text in a vehicle's strings.
+*
+* @param vehicle_data *veh The vehicle whose strings to count.
+* @return int The number of words in the vehicle's strings.
+*/
+int wordcount_vehicle(vehicle_data *veh) {
+	int count = 0;
+	
+	count += wordcount_string(VEH_KEYWORDS(veh));
+	count += wordcount_string(VEH_SHORT_DESC(veh));
+	count += wordcount_string(VEH_LONG_DESC(veh));
+	count += wordcount_string(VEH_LOOK_DESC(veh));
+	count += wordcount_extra_descriptions(VEH_EX_DESCS(veh));
+	count += wordcount_custom_messages(VEH_CUSTOM_MSGS(veh));
+	
+	return count;
+}
+
+
  //////////////////////////////////////////////////////////////////////////////
 //// UTILITIES ///////////////////////////////////////////////////////////////
 

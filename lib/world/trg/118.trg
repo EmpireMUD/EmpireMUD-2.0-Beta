@@ -83,21 +83,6 @@ end
 %send% %actor% You can't seem to get past ~%self%!
 return 0
 ~
-#11803
-Skycleave mob blocking: Aggro~
-0 s 100
-~
-* One quick trick to get the target room
-set room_var %self.room%
-eval tricky %%room_var.%direction%(room)%%
-* Compare template ids to figure out if they're going forward or back
-if (%actor.nohassle% || !%tricky% || %tricky.template% < %room_var.template%)
-  halt
-end
-%send% %actor% You can't seem to get past ~%self%, and &%self% doesn't look happy...
-%aggro% %actor%
-return 0
-~
 #11804
 Everflowing flagon (free refills)~
 1 bw 10
@@ -373,8 +358,9 @@ elseif %self.vnum% == 11825 || %self.vnum% == 11925
     say This seems like a perfectly good pixy, but it just isn't championship material. I'm looking to win, not place.
   else
     * ok!
-    %echo% ~%self% eagerly takes @%object% from %actor%.
+    %echo% ~%self% eagerly takes @%object% from ~%actor%.
     say Oh, splendid, really. This is exactly the sort of pixy I was looking for. O racing world, prepare to tremble!
+    %send% %actor% \&0
     %quest% %actor% trigger 11915
     %quest% %actor% finish 11915
     %purge% %object%
@@ -1215,8 +1201,8 @@ switch %self.vnum%
     end
     %echo% ~%self% dissolves as the shadows are cast out!
     * set room desc back
-    %mod% %self.room% description This windowed office is the highest in the tower, a place for the greatest sorcerer to watch over their charges. It has a massive calamander bookshelf along one wall and plush rugs
-    %mod% %self.room% append-description cover the checkerboard marble floor. An extravagant nocturnium chandelier hangs from the ceiling. Near the door, a painting of three sorcerers hangs in a gold frame.
+    %mod% %self.room% description This dimly-lit office, the highest in the tower, reeks of decay. Little light filters in through the doorway; if there are any windows here, they must
+    %mod% %self.room% append-description be closed; you can't even see them through the shadows. The wooden corners of furniture peek out from the shadows, but you can see few distinct shapes.
     return 0
   break
   case 11867
@@ -1240,6 +1226,9 @@ switch %self.vnum%
       %purge% %shadow%
     end
     %echo% ~%self% dissolves as the shadows are cast out!
+    * clean room desc
+    %mod% %self.room% description This dimly-lit office, the highest in the tower, reeks of decay. Little light filters in through the doorway; if there are any windows here, they must
+    %mod% %self.room% append-description be closed; you can't even see them through the shadows. The wooden corners of furniture peek out from the shadows, but you can see few distinct shapes.
     * swap Knezzes
     set knezz %instance.mob(11868)%
     if %knezz%
@@ -1267,7 +1256,7 @@ switch %self.vnum%
     set sex_list  male   female male male female male male  female male male    male male male female
   break
   case 11817
-    * goblin bruiser
+    * goblin miner
     set name_list Vyle Grosk Brang  Fance  Byth   Slansh Fonk Rong Shyf   Myte   Vrack Rend Worze  Chum
     set sex_list  male male  female female female male   male male female female male  male female male
   break
@@ -1316,9 +1305,9 @@ switch %self.vnum%
     %mod% %self% lookdesc Armed with dozens of tiny knives, this forest-green goblin has come ready for war.
   break
   case 11817
-    * goblin bruiser
-    %mod% %self% longdesc %name% is punching a wall.
-    %mod% %self% lookdesc All muscle and no quit, this green little goblin looks like %self.heshe% means business. With a war axe in one hand and a spear in the other, %self.heshe% paces back and forth, just waiting for you to make your move.
+    * goblin miner
+    %mod% %self% longdesc %name% is swinging a pickaxe at the wall.
+    %mod% %self% lookdesc All muscle and no quit, this green little goblin looks like %self.heshe% means business. With a pickaxe in one hand and a shovel in the other, %self.heshe% paces back and forth, looking for the right place to strike.
   break
 done
 detach 11824 %self.id%
@@ -1426,26 +1415,18 @@ Skycleave: Floor 1B tourist dialogue~
 0 bw 20
 ~
 set room %self.room%
-wait 2 sec
+wait 2 s
 if %self.room% != %room%
   halt
 end
-* check time limits
-if %room.varexists(speak_time)%
-  if %room.speak_time% + 30 > %timestamp%
-    halt
-  end
-end
 set varname last_%room.template%
-if %self.varexists(%varname%)%
-  eval last %self.var(%varname%)%
-  if %last% + 150 > %timestamp%
-    halt
-  end
+if %self.var(%varname%,0)% + 150 > %timestamp%
+  halt
+elseif %room.var(speak_time,0)% + 30 > %timestamp%
+  halt
 end
 * by mob vnum
 if %self.vnum% == 11824 || %self.vnum% == 11826
-  * shop patrons wander until they find the shop
   if %room.template% == 11907
     nop %self.add_mob_flag(SENTINEL)%
     nop %self.remove_mob_flag(SILENT)%
@@ -1456,12 +1437,10 @@ elseif %self.vnum% == 11801
   * Dylane wanders until he finds the cafe
   if %room.template% == 11905
     nop %self.add_mob_flag(SENTINEL)%
-    nop %self.remove_mob_flag(SILENT)%
     detach 11828 %self.id%
   end
   halt
 elseif %self.vnum% == 11803
-  * self-proclaimed expert
   switch %room.template%
     case 11905
       say Ah, the famous Fendreciel Cafe... They are positively known for their cocoa van.
@@ -1486,7 +1465,6 @@ elseif %self.vnum% == 11803
     break
   done
 elseif %self.vnum% == 11809
-  * thinks he's somewhere else
   switch %room.template%
     case 11905
       say Oh wow, I've never been to a Gordon Ram's Head restaurant before!
@@ -1511,7 +1489,6 @@ elseif %self.vnum% == 11809
     break
   done
 elseif %self.vnum% == 11822
-  * casing the joint for next time
   switch %room.template%
     case 11902
       %echo% ~%self% pulls out a small notebook and sketches the stairs and walkway from across the chamber.
@@ -1533,17 +1510,12 @@ elseif %self.vnum% == 11822
     break
   done
 elseif %self.vnum% == 11827
-  * Chatty couple: Apprentices Marina 11827 + Djon 11828
   set djon %room.people(11828)%
   if !%djon%
     halt
   end
-  if %self.varexists(line)%
-    eval line %self.line% + 1
-  else
-    set line 1
-  end
-  if %line% > 1
+  eval line %self.var(line,0)% + 1
+  if %line% > 3
     set line 1
   end
   remote line %self.id%
@@ -1577,10 +1549,89 @@ elseif %self.vnum% == 11827
       wait 9 s
       %echo% ~%self% and ~%djon% sip their tea.
     break
-    *** HERE
+    case 2
+      say Did you see Regin with the mercs?
+      wait 9 s
+      %force% %djon% say No! Wait, Regin Dall?
+      wait 9 s
+      say Didn't you two used to date?
+      wait 9 s
+      %force% %djon% say  Barely. Honestly he doesn't even count.
+      wait 9 s
+      say Wasn't it for three months?
+      wait 9 s
+      %force% %djon% say Honestly, Marina, you remember the most trivial things.
+      wait 9 s
+      %force% %djon% say And honestly, I'm not counting any dalliances before I came to the tower.
+      wait 9 s
+      say Okay, but that's still a lot of dalliances.
+      wait 9 s
+      %force% %djon% say New topic! Did I or did I not see you and Tyrone studying in the bunkroom three nights ago?
+      wait 9 s
+      say New topic! Are you keeping your hair like that or was that an accident?
+      wait 9 s
+      %force% %djon% say Wow, okay, new topic. Wait, what's wrong with my hair?
+      wait 9 s
+      say It looks like you got hit by a rebounding flow-bee charm.
+      wait 9 s
+      %force% %djon% say Okay, I wasn't going to say anything, but your eyebrows are uneven.
+      wait 9 s
+      say At least I know how to fix it.
+      wait 9 s
+      %echo% ~%self% points her wand at her forehead and her eyebrows even themselves out.
+      wait 9 s
+      %force% %djon% say Well I like it like this.
+      wait 9 s
+      %echo% ~%djon% waits until the barista turns her back and then twirls his wand in his teacup, which quickly refills itself.
+      wait 3 s
+      %echo% ~%djon% holds a finger to his lips and makes a shushing sound.
+      wait 9 s
+      %force% %djon% say So are you still sneaking off with Alastair?
+      wait 9 s
+      say No, oh my god, you didn't hear?
+      wait 9 s
+      %force% %djon% say Oh no, did he die in the invasion?
+      wait 9 s
+      say No, they turned him into a feather duster!
+      wait 9 s
+      %force% %djon% say They did not! At least he'll be quieter, though. He was a real know-it-all.
+      wait 9 s
+      say That's not funny, Djon. What if he was my soulmate?
+      wait 9 s
+      %force% %djon% say Just sprinkle some dust on yourself.
+    break
+    case 3
+      set wright %instance.mob(11914)%
+      say I'm glad they're getting the tower cleaned up. I did not come to study in some run-down old heap.
+      wait 9 s
+      %force% %djon% say Right? Floor 2 was a wreck. The pixies totally overran it. We're lucky they didn't get out of the tower.
+      wait 9 s
+      if %wright%
+        say I saw Old Wright helping the warden wrangle them. Where were they when the whole thing was overrun?
+        wait 9 s
+        %force% %djon% say Glad I missed it.
+        wait 9 s
+        say He took care of the goblins, too. He's worked here for like 50 years.
+      else
+        say I heard Old Wright couldn't round up even a single goblin afterward.
+        wait 9 s
+        %force% %djon% say They are going to fire him.
+        wait 9 s
+        say They turned him into a sponge!
+        wait 9 s
+        %force% %djon% say They did not! He's worked here for like 50 years.
+      end
+      wait 9 s
+      set mageina %room.people(11905)5
+      %force% %mageina% say More like 100 at this point.
+      wait 9 s
+      %force% %djon% say Wow, rude.
+      wait 9 s
+      say Rude.
+    break
   done
 end
-* enforce a short wait on the room with a var
+* short wait on room with var
 set speak_time %timestamp%
 remote speak_time %room.id%
 set last_%room.template% %timestamp%
@@ -1744,6 +1795,9 @@ Skycleave: Conditional mob visibility~
 0 iC 100
 ~
 * toggles silent, !see
+if %actor.is_npc%
+  halt
+end
 * activated on greet or when moving
 set see 0
 set not 0
@@ -1825,6 +1879,7 @@ if %self.vnum% == 11933
   set annelise %self.room.people(11939)%
   nop %self.add_mob_flag(SILENT)%
   nop %self.add_mob_flag(SENTINEL)%
+  nop %annelise.add_mob_flag(SILENT)%
   wait 1
   %echo% ~%self% marches in from the north.
   wait 3 sec
@@ -1862,6 +1917,7 @@ if %self.vnum% == 11933
   %force% %annelise% say Okay, on with you, get out of here before the grand high sorcerer catches you lacking.
   wait 3 sec
   %echo% The boy wastes no more time and darts out of the room. The last you hear of him is clambering down the stairs.
+  nop %annelise.remove_mob_flag(SILENT)%
   %purge% %self%
 end
 ~
@@ -1945,13 +2001,13 @@ switch %self.room.template%
   break
   case 11803
     * Ground Floor N (1A)
-    %mod% %self% keywords crates wall stacked wooden makeshift
+    %mod% %self% keywords crates wall stacked wooden makeshift boxes
     %mod% %self% longdesc A makeshift wall of crates blocks off the center of the chamber.
     %mod% %self% lookdesc A wall of stacked crates blocks access to the center of the chamber and its magnificent stone fountain.
   break
   case 11804
     * Ground Floor W (1A)
-    %mod% %self% keywords crates wall piled stacked wooden makeshift
+    %mod% %self% keywords crates wall piled stacked wooden makeshift boxes
     %mod% %self% longdesc Crates have been piled to form a wall blocking the chamber's central fountain to the east.
     %mod% %self% lookdesc Stacks of crates create a makeshift wall that blocks off the center of the great chamber and its grand stone fountain.
   break
@@ -2157,6 +2213,11 @@ if %target%
   %slay% %target%
   if %done%
     * last one?
+    if %self.room.template% != 11836
+      %echo% Scaldorran twists and whirls until his tattered wrappings fold in on themselves and he vanishes!
+      mgoto i11836
+      %echo% Your blood freezes as the air cracks open and the Lich Scaldorran crawls out of the void!
+    end
     %mod% %self% longdesc The Lich Scaldorran is drawing power from the tower.
     detach 11839 %self.id%
   end
@@ -2175,6 +2236,11 @@ while %merc_list%
   end
 done
 * nobody left?
+if %self.room.template% != 11836
+  %echo% Scaldorran twists and whirls until his tattered wrappings fold in on themselves and he vanishes!
+  mgoto i11836
+  %echo% Your blood freezes as the air cracks open and the Lich Scaldorran crawls out of the void!
+end
 %mod% %self% longdesc The Lich Scaldorran is drawing power from the tower.
 detach 11839 %self.id%
 ~
@@ -3219,13 +3285,13 @@ if %seconds% > 60
   * messaging
   %echo% A blast of dark energy throws you backwards as a shadow claws its way out of Knezz's mouth and joins the Shade above him.
   wait 6 sec
-  %echo% The Shade of Mezvienne drops Knezz's lifeless body in the chair and snatches his nocturnium wand.
+  %echo% The Shade of Mezvienne drops Knezz's lifeless body in the chair and snatches his wand.
   set knezz %room.people(11868)%
   if %knezz%
     %slay% %knezz%
   end
   wait 6 sec
-  %echo% The Shade holds the wand high in the air and shouts, 'By the power of Skycleave... I HAVE THE POWER!'
+  %echo% The Shade holds the gnarled wand high in the air and shouts, 'By the power of Skycleave... I HAVE THE POWER!'
   wait 3 sec
   %echo% The Shade of Mezvienne grows and transforms as it ascends into a higher being!
   %load% mob 11863
@@ -3305,7 +3371,7 @@ switch %line%
   case 1
     say Ah... that was perilously close. Give me a moment to collect myself. She took a lot out of me.
     wait 9 sec
-    %echo% Knezz draws an elegant nocturnium wand from the sleeve of his robe and turns it toward himself.
+    %echo% Knezz draws a gnarled old wand from the sleeve of his robe and turns it toward himself.
     wait 1
     say On my authority, I cast out the shadow!
     wait 8 sec
@@ -3434,9 +3500,9 @@ end
 set ch %room.people%
 while %ch%
   set next_ch %ch.next_in_room%
-  if %ch.nohassle% || (%ch.vnum% >= 11890 && %ch.vnum% <= 11899)
-    * nothing (11890-11899 are mobs involved in phase change)
-  elseif %ch.is_pc% || %ch.vnum% < 11800 || %ch.vnum% > 11999 || %ch.aff_flagged(*CHARM)%
+  if %ch.nohassle% || (%ch.vnum% >= 11894 && %ch.vnum% <= 11899)
+    * nothing (11894-11899 are mobs involved in phase change)
+  elseif %ch.is_pc% || !%ch.linked_to_instance% || %ch.aff_flagged(*CHARM)%
     * Move ch
     %teleport% %ch% %to_room%
     %load% obj 11805 %ch%
@@ -3813,6 +3879,7 @@ switch %cycle%
     say Fras kee selmo tagra tyewa...
     wait 1 sec
     %echo% Thousands of tiny splinters of rotted wood rise from the trunk and hover in the air...
+    %load% obj 11889 room
   break
   case 3
     say Fras kee selmo tagra tyewa...
@@ -3826,6 +3893,10 @@ switch %cycle%
     say Ickor carzo a kee selmo, vadur, eydur Tagra Nes!
     wait 1 sec
     %echo% ~%self% stabs the rotten tree with a flint knife as the splinters of wood fall out of the air...
+    set splint %self.room.contents(11889)%
+    if %splint%
+      %purge% %splint%
+    end
   break
   case 4
     if !%skip%
@@ -4124,7 +4195,7 @@ end
 ~
 #11876
 Smol Nes-Pik: Reset comment count on move~
-0 iw 100
+0 i 100
 ~
 * pairs with trigger 11880 etc to reset their commentary when they move
 set comment 0
@@ -4134,7 +4205,13 @@ remote comment %self.id%
 Smol Nes-Pik: Joiago gossip and mirth driver~
 0 bw 50
 ~
-* pairs with trigger 11876 and 11875
+* pairs with trigger 11876, 11875, 11883
+* check pickpocket
+if %self.mob_flagged(*PICKPOCKETED)%
+  attach 11883 %self.id%
+  detach 11877 %self.id%
+  halt
+end
 set max_comment 4
 * determine position in the comment loop
 if %self.varexists(comment)%
@@ -4186,7 +4263,7 @@ end
 if %comment% == 3
   * 3. musical instrument: this one can actually change rooms
   %echo% ~%self% pulls a little gemstone flute from ^%self% pocket and begins to play...
-  wait 3 sec
+  wait 7 sec
   * must check if the Tresydion is orating
   set tresydion %instance.mob(11882)%
   set dance_list 11878 11880 11881
@@ -4194,6 +4271,12 @@ if %comment% == 3
   set music %random.3%
   set loop 1
   while %loop% < 10
+    * check pickpocket again
+    if %self.mob_flagged(*PICKPOCKETED)%
+      attach 11883 %self.id%
+      detach 11877 %self.id%
+      halt
+    end
     if %tresydion% && %tresydion.varexists(talking)%
       * always play along if the tresydion is talking
       switch %random.3%
@@ -4314,7 +4397,7 @@ if %comment% == 3
       done
     end
     eval loop %loop% + 1
-    wait 3 sec
+    wait 7 sec
   done
   %echo% ~%self% slides the flute back into ^%self% pocket.
 end
@@ -4519,6 +4602,17 @@ end
 * force a delay at the end
 wait 20 s
 ~
+#11881
+Block morph and fastmorph commands~
+1 c 1
+morph fastmorph~
+if %arg.car%
+  %send% %actor% You can't seem to morph! Something must be preventing it.
+  return 1
+else
+  return 0
+end
+~
 #11882
 Smol Nes-Pik: Tresydion orations~
 0 bw 25
@@ -4666,6 +4760,152 @@ end
 * turn off oration
 rdelete talking %self.id%
 wait 30 sec
+~
+#11883
+Smol Nes-Pik: Joiago gossip and humming driver, when pickpocketed~
+0 bw 50
+~
+* pairs with trigger 11876, 11875, 11877
+set max_comment 4
+* determine position in the comment loop
+if %self.varexists(comment)%
+  eval comment %self.comment% + 1
+else
+  set comment 1
+end
+if %comment% > %max_comment%
+  halt
+end
+remote comment %self.id%
+* the comments don't use 'elseif' because some comments will skip to later ones
+set room %self.room%
+set template %room.template%
+if %comment% == 1
+  * 1: location-based
+  if %template% == 11879
+    * [11879] Atop the Glimmering Stair
+    say Fancy meeting you up here. I hope you're enjoying Smol Nes-Pik. The views up here are beyond compare.
+  elseif %template% == 11880
+    * [11880] Grand Overlook: fall through to comment 3
+    set comment 3
+  elseif %template% == 11881
+    * [11881] Outside the Seashell
+    switch %random.3%
+      case 1
+        say Ah, our most famous feature...
+        emote $n gestures broadly toward the seashell.
+      break
+      case 2
+        say If you look down, you can see the palace from here.
+      break
+    done
+  elseif %template% == 11882
+    * [11882] Great Glowing Seashell: fall through to comment 2
+    set comment 2
+  elseif %template% == 11883
+    * [11883] Outside Obsidian Palace
+    say Can't recommend going below here. The stair is broken, the tree is ill, and those bleak-brained rot worshippers are praising both.
+  end
+end
+* store the comment again, in case it changed
+remote comment %self.id%
+* continuing...
+if %comment% == 2
+  * 2. gossip with someone present
+  joiago gossip
+end
+if %comment% == 3
+  * 3. humming along: this one can actually change rooms
+  * must check if the Tresydion is orating
+  set tresydion %instance.mob(11882)%
+  * begin musical loop
+  set music %random.2%
+  set loop 1
+  while %loop% < 10
+    if %tresydion% && %tresydion.varexists(talking)%
+      * always play along if the tresydion is talking
+      switch %random.3%
+        case 1
+          %echo% ~%self% hums quietly to *%self%self.
+        break
+        case 2
+          %echo% ~%self% hums along in time with the tresydion's speech.
+        break
+        case 3
+          %echo% ~%self% hums to *%self%self.
+        break
+      done
+    elseif %music% == 1
+      * song 1: soft, sad melody
+      switch %random.4%
+        case 1
+          %echo% ~%self% hums a soft, sad melody.
+        break
+        case 2
+          %echo% ~%self% skips along slowly as &%self% hums.
+        break
+        case 3
+          %echo% ~%self% looks around wistfully as &%self% hums.
+        break
+        case 4
+          %echo% You find yourself humming along with ~%self%.
+        break
+      done
+    elseif %music% == 2
+      * song 2: jaunty dance
+      switch %loop%
+        case 1
+          %echo% ~%self% starts humming jaunty tune...
+        break
+        case 2
+          %echo% ~%self% begins to dance about as &%self% hums...
+        break
+        case 3
+          %echo% ~%self% whistles a staccato tune...
+        break
+        case 4
+          %echo% ~%self% dances back and forth as &%self% whistles...
+        break
+        case 5
+          %echo% The merry melody makes your legs tingle and pull, as if they want to move...
+        break
+        case 6
+          %echo% ~%self% twirls around, whistling, dancing in circles...
+        break
+        case 7
+          %echo% You find yourself dancing with ~%self% as &%self% whistles...
+        break
+        case 8
+          %echo% ~%self% begins moving faster and faster, whistling almost too fast to keep up!
+        break
+        case 9
+          %echo% ~%self% twirls into a full bow as the tune comes to a dramatic end.
+        break
+      done
+    end
+    eval loop %loop% + 1
+    wait 7 sec
+  done
+end
+if %comment% == 4
+  * 4. sleep hints
+  switch %random.4%
+    case 1
+      say Think of us when you wake up, will you?
+    break
+    case 2
+      say This may be your dream, but it was our nightmare.
+    break
+    case 3
+      say Things weren't good before Iskip came, but at least we were free.
+    break
+    case 4
+      say Remember to dance occasionally, when you're awake. It's no good if you only do it in dreams.
+    break
+  done
+end
+* force a delay at the end
+wait 20 s
 ~
 #11884
 Smol Nes-Pik: Taste putrid sap to teleport~
@@ -5169,10 +5409,10 @@ done
 set ch %room.people%
 while %ch%
   set next_ch %ch.next_in_room%
-  if %ch.nohassle% || (%ch.vnum% >= 11890 && %ch.vnum% <= 11899)
-    * nothing (11890-11899 are mobs involved in phase change)
-  elseif %ch.is_pc% || %ch.vnum% < 11800 || %ch.vnum% > 11988
-    * Move ch (stops at 11988 because of minipets from this adventure)
+  if %ch.nohassle% || (%ch.vnum% >= 11894 && %ch.vnum% <= 11899)
+    * nothing (11894-11899 are mobs involved in phase change)
+  elseif %ch.is_pc% || !%ch.linked_to_instance%
+    * Move ch
     %teleport% %ch% %to_room%
     %load% obj 11805 %ch%
     * check quest completion
@@ -5336,6 +5576,7 @@ end
 %at% i11918 %load% mob 11918  * Race Caller
 %at% i11919 %load% mob 11921  * Broom
 %at% i11912 %load% mob 11922  * Duster
+%at% i11910 %load% mob 11837  * Swarm of Rags
 * 4. Move people from the old rooms
 set vnum %start_room%
 while %vnum% <= %end_room%
@@ -5403,6 +5644,7 @@ if %waltur%
   %at% i11940 %load% mob 11940  * Magineer Waltur (if he survived)
 end
 %at% i11932 %load% mob 11933  * Walking Mop
+%at% i11930 %load% mob 11837  * Swarm of Rags
 skydel 11833 0  * Goef the shimmer
 %at% i11941 %load% mob 11941  * Goef the Attuner
 * 4. Move people from the old rooms
@@ -5447,11 +5689,18 @@ if %instance.mob(11861)%
   %at% i11933 %load% mob 11929  * page Paige
 end
 %at% i11967 %load% mob 11967  * Barrosh
-if %instance.mob(11868)% || %instance.mob(11870)%
+* check knezz
+set knezz %instance.mob(11868)%
+if !%knezz%
+  * backup knezz
+  set knezz %instance.mob(11870)%
+end
+if %knezz%
   * Knezz survived
   %at% i11964 %load% mob 11964  * HS Celiya
   %at% i11964 %load% obj 11969  * Celiya's desk
-  %at% i11968 %load% mob 11968  * GHS Knezz
+  eval knezz_room %knezz.room.template% + 100
+  %at% i%knezz_room% %load% mob 11968  * GHS Knezz
   %at% i11968 %load% obj 11968  * Knezz's desk
   * Mark for claw game
   set spirit %instance.mob(11900)%

@@ -1136,7 +1136,7 @@ EVENTFUNC(trig_wait_event) {
 
 void do_stat_trigger(char_data *ch, trig_data *trig) {
 	struct cmdlist_element *cmd_list;
-	char sb[MAX_STRING_LENGTH], buf[MAX_STRING_LENGTH];
+	char sb[MAX_STRING_LENGTH * 2], buf[MAX_STRING_LENGTH], temp[MAX_STRING_LENGTH];
 	int len = 0;
 
 	if (!trig) {
@@ -1184,12 +1184,15 @@ void do_stat_trigger(char_data *ch, trig_data *trig) {
 
 	cmd_list = trig->cmdlist;
 	while (cmd_list) {
-		if (cmd_list->cmd)
-			len += snprintf(sb + len, sizeof(sb)-len, "%s\r\n", show_color_codes(cmd_list->cmd));
-
-		if (len > MAX_CMD_LENGTH) {
-			len += snprintf(sb + len, sizeof(sb)-len, "*** Overflow - script too long! ***\r\n");
-			break;
+		if (cmd_list->cmd) {
+			strcpy(temp, show_color_codes(cmd_list->cmd));
+			if (len + strlen(temp) + 2 < sizeof(sb)) {
+				len += snprintf(sb + len, sizeof(sb)-len, "%s\r\n", temp);
+			}
+			else {
+				len += snprintf(sb + len, sizeof(sb)-len, "*** Overflow - script too long! ***\r\n");
+				break;
+			}
 		}
 		
 		cmd_list = cmd_list->next;
@@ -2794,7 +2797,10 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						}
 					}
 					else if (!str_cmp(field, "action")) {
-						if (IS_NPC(c) || GET_ACTION(c) == ACT_NONE) {
+						if (GET_FEEDING_FROM(c)) {
+							snprintf(str, slen, "feeding");
+						}
+						else if (IS_NPC(c) || GET_ACTION(c) == ACT_NONE) {
 							strcpy(str, "");	// none
 						}
 						else if (GET_ACTION(c) == ACT_GEN_CRAFT) {
@@ -2983,7 +2989,23 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					break;
 				}
 				case 'b': {	// char.b*
-					if (!str_cmp(field, "block")) {
+					if (!str_cmp(field, "biting")) {
+						if (GET_FEEDING_FROM(c)) {
+							snprintf(str, slen, "%c%d", UID_CHAR, char_script_id(GET_FEEDING_FROM(c)));
+						}
+						else {
+							*str = '\0';
+						}
+					}
+					else if (!str_cmp(field, "bitten_by")) {
+						if (GET_FED_ON_BY(c)) {
+							snprintf(str, slen, "%c%d", UID_CHAR, char_script_id(GET_FED_ON_BY(c)));
+						}
+						else {
+							*str = '\0';
+						}
+					}
+					else if (!str_cmp(field, "block")) {
 						snprintf(str, slen, "%d", get_block_rating(c, FALSE));
 					}
 					else if (!str_cmp(field, "blood")) {
@@ -3878,6 +3900,16 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						if (!IS_NPC(c) && PLR_FLAGGED(c, PLR_ADVENTURE_SUMMONED)) {
 							struct instance_data *inst = find_instance_by_room(IN_ROOM(c), FALSE, FALSE);
 							GET_ADVENTURE_SUMMON_INSTANCE_ID(c) = inst ? INST_ID(inst) : NOTHING;
+						}
+					}
+					else if (!str_cmp(field, "linked_to_instance")) {
+						struct instance_data *inst;
+						room_data *froom = (subfield && *subfield) ? get_room(IN_ROOM(c), subfield) : IN_ROOM(c);
+						if (IS_NPC(c) && froom && (inst = find_instance_by_room(froom, FALSE, TRUE)) && MOB_INSTANCE_ID(c) == inst->id) {
+							snprintf(str, slen, "1");
+						}
+						else {
+							snprintf(str, slen, "0");
 						}
 					}
 					else if (!str_cmp(field, "longdesc")) {

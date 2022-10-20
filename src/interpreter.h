@@ -303,6 +303,7 @@ struct alias_data {
 #define LRR_SHIP_PARTIAL  BIT(0)	// shows only part of the room, for use on ships.
 #define LRR_SHOW_DARK  BIT(1)	// for passing to show_map_to_char
 #define LRR_LOOK_OUT  BIT(2)	// show map even indoors
+#define LRR_LOOK_OUT_INSIDE  BIT(3)	// show an interior outside the vehicle
 
 
  //////////////////////////////////////////////////////////////////////////////

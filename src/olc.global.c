@@ -350,6 +350,21 @@ struct global_data *setup_olc_global(struct global_data *input) {
 }
 
 
+/**
+* Counts the words of text in a global's strings.
+*
+* @param struct global_data *glb The global whose strings to count.
+* @return int The number of words in the global's strings.
+*/
+int wordcount_global(struct global_data *glb) {
+	int count = 0;
+	
+	count += wordcount_string(GET_GLOBAL_NAME(glb));
+	
+	return count;
+}
+
+
  //////////////////////////////////////////////////////////////////////////////
 //// DISPLAYS ////////////////////////////////////////////////////////////////
 

@@ -1782,6 +1782,7 @@ The following affect flags are available:
  EARTHMELD - Submerged in the earth and can't take normal actions -- do not use this on items.
  MUMMIFY - Immune to attack and cannot act -- do not use this on items.
  SOULMASK - Immune to soulsight.
+ NO-TRACKS - Does not leave tracks.
  IMMUNE-POISON-DEBUFFS - Immune to any 'poison' debuffs.
  IMMUNE-MENTAL-DEBUFFS - Immune to any 'mental' debuffs.
  !STUN - Immune to stun effects.
@@ -2110,6 +2111,7 @@ Available affects:
  REPEL-ANIMALS - animal npcs won't wander in
  NO-WORKFORCE-EVOS - workforce won't do chores that would change the tile type
  MAPOUT-BUILDING - appears as a building on the graphical map
+ NO-TRACKS - characters do not leave tracks here and the track command fails
 
 Some affects are managed by live data and commands (do not set affects with *):
  *HAS-INSTANCE - an adventure is linked here
@@ -5388,8 +5390,9 @@ Message types:
  &cbuild-to-room&0 - Shown to the room when the item is built into a building.
  &cinstrument-to-char&0 - Shown every few seconds to the person playing the instrument.
  &cinstrument-to-room&0 - Shown every few seconds to the room when someone is playing an instrument.
- &ceat-to-char&0 - Shown to the person when they eat the item.
- &ceat-to-room&0 - Shown to the room when a person eats an item.
+ &cconsume-to-char&0 - Shown to the person when they eat/drink/quaff/light the item.
+   ($p for food/drink/potion/lighter; $T for liquid; $P for thing lit on fire)
+ &cconsume-to-room&0 - Shown to the room when a person eats/drinks/quaffs/lights an item.
  &ccraft-to-char&0 - Shown to the actor when building a vehicle ($V for vehicle).
  &ccraft-to-room&0 - Shown to the room when building a vehicle ($V for vehicle).
  &cwear-to-char&0 - Shown to the person when they wear an item ($p for item).
@@ -6323,6 +6326,26 @@ This command lists all objects (or mobs, or whatever) between two vnums
 again with a narrower range of vnums. If you provide the -d (--details)
 argument, more information is shown per line.
 
+Information provided by the -d flag:
+ abilities: mastery
+ adventure: mob/object/room count
+ archetypes: skills, skill point total, and attribute total
+ augments: ability/skill, applies
+ book: byline
+ class: skill requirements
+ craft: shows craft type
+ generic: info based on generic type
+ global: info based on global type
+ mobiles: level range and many flags
+ morph: ability/skill requirement
+ objects: level range and some flags (quality, enchanted, scalable, binding)
+ progress: type
+ quests: level range and some flags (in-dev, daily, event, tutorial, group)
+ rooms: some flags (outdoor, dark/light, no mob/teleport/loc, look out)
+ sectors: climate and build-on flags
+ skill: skill description
+ social: shows in-dev and requirements, if any
+
 To look up items by name, use the 'vnum' command.
 
 To find unused vnums in a given range, use '.<type> free'.
@@ -6575,6 +6598,19 @@ Example vehicle settings:
  catapult: LEADABLE SIEGE-WEAPONS, animals required: 2
 
 See also: BUILDING-VEHICLES, OLC, OLC ABORT, OLC EDIT, OLC EDITOR, OLC SAVE
+#d
+"OLC WORDCOUNT" "OLC WORD COUNT" WORDCOUNT "WORD COUNT"
+
+Usage:  .<type> wordcount <from vnum> [to vnum]
+
+This command counts all the words in the text for the various OLC types. For
+example, an object counts all the words in its keywords, short desc, long desc,
+look desc, extra descriptions, and custom messages.
+
+If you use this on a single adventure, it will count all parts of the
+adventure and provide a total.
+
+See also: OLC LIST, VNUM
 #d
 "OLC WORKFORCE" "WORKFORCE OLC"
 

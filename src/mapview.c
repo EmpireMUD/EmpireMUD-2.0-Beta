@@ -1175,7 +1175,7 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options) {
 	bool look_out = IS_SET(options, LRR_LOOK_OUT) ? TRUE : FALSE;
 	bool has_ship = (GET_ROOM_VEHICLE(IN_ROOM(ch)) && !VEH_FLAGGED(GET_ROOM_VEHICLE(IN_ROOM(ch)), VEH_BUILDING)) ? TRUE : FALSE;
 	bool show_on_ship = has_ship && ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_LOOK_OUT);
-	bool show_title = !show_on_ship || ship_partial || look_out;
+	bool show_title = !show_on_ship || ship_partial || look_out || IS_SET(options, LRR_LOOK_OUT_INSIDE);
 
 	// begin with the sanity check
 	if (!ch || !ch->desc)
@@ -1199,7 +1199,7 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options) {
 	}
 
 	// check for ship
-	if (!look_out && !ship_partial && show_on_ship) {
+	if (!look_out && !ship_partial && show_on_ship && !IS_SET(options, LRR_LOOK_OUT_INSIDE)) {
 		look_at_room_by_loc(ch, IN_ROOM(GET_ROOM_VEHICLE(IN_ROOM(ch))), LRR_SHIP_PARTIAL);
 	}
 
@@ -1543,8 +1543,11 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options) {
 	}
 	free(mappc);
 	
-	// ship-partial ends here
+	// ship-partial ends here with some vehicles
 	if (ship_partial) {
+		send_to_char("\tw", ch);
+		list_vehicles_to_char(ROOM_VEHICLES(room), ch, TRUE, GET_ROOM_VEHICLE(IN_ROOM(ch)));
+		send_to_char("\t0", ch);
 		return;
 	}
 	
@@ -1559,33 +1562,35 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options) {
 	}
 	
 	// commands: only show if the first entry is not a \0, which terminates the list
-	if (GET_BUILDING(room)) {
-		if (GET_BLD_COMMANDS(GET_BUILDING(room)) && *GET_BLD_COMMANDS(GET_BUILDING(room))) {
-			msg_to_char(ch, "Commands: &c%s&0\r\n", GET_BLD_COMMANDS(GET_BUILDING(room)));
+	if (!IS_SET(options, LRR_LOOK_OUT_INSIDE)) {
+		if (GET_BUILDING(room)) {
+			if (GET_BLD_COMMANDS(GET_BUILDING(room)) && *GET_BLD_COMMANDS(GET_BUILDING(room))) {
+				msg_to_char(ch, "Commands: &c%s&0\r\n", GET_BLD_COMMANDS(GET_BUILDING(room)));
+			}
 		}
-	}
-	else if (GET_SECT_COMMANDS(SECT(room)) && *GET_SECT_COMMANDS(SECT(room))) {
-		msg_to_char(ch, "Commands: &c%s&0\r\n", GET_SECT_COMMANDS(SECT(room)));
-	}
-	else if (ROOM_SECT_FLAGGED(room, SECTF_CROP)) {
-		*locbuf = '\0';
-		if (can_interact_room(IN_ROOM(ch), INTERACT_CHOP)) {
-			sprintf(locbuf + strlen(locbuf), "%schop", (*locbuf ? ", " : ""));
+		else if (GET_SECT_COMMANDS(SECT(room)) && *GET_SECT_COMMANDS(SECT(room))) {
+			msg_to_char(ch, "Commands: &c%s&0\r\n", GET_SECT_COMMANDS(SECT(room)));
 		}
-		if (can_interact_room(IN_ROOM(ch), INTERACT_DIG)) {
-			sprintf(locbuf + strlen(locbuf), "%sdig", (*locbuf ? ", " : ""));
-		}
-		if (can_interact_room(IN_ROOM(ch), INTERACT_GATHER)) {
-			sprintf(locbuf + strlen(locbuf), "%sgather", (*locbuf ? ", " : ""));
-		}
-		if (can_interact_room(IN_ROOM(ch), INTERACT_HARVEST)) {
-			sprintf(locbuf + strlen(locbuf), "%sharvest", (*locbuf ? ", " : ""));
-		}
-		if (can_interact_room(IN_ROOM(ch), INTERACT_PICK)) {
-			sprintf(locbuf + strlen(locbuf), "%spick", (*locbuf ? ", " : ""));
-		}
-		if (*locbuf) {
-			msg_to_char(ch, "Commands: &c%s&0\r\n", locbuf);
+		else if (ROOM_SECT_FLAGGED(room, SECTF_CROP)) {
+			*locbuf = '\0';
+			if (can_interact_room(IN_ROOM(ch), INTERACT_CHOP)) {
+				sprintf(locbuf + strlen(locbuf), "%schop", (*locbuf ? ", " : ""));
+			}
+			if (can_interact_room(IN_ROOM(ch), INTERACT_DIG)) {
+				sprintf(locbuf + strlen(locbuf), "%sdig", (*locbuf ? ", " : ""));
+			}
+			if (can_interact_room(IN_ROOM(ch), INTERACT_GATHER)) {
+				sprintf(locbuf + strlen(locbuf), "%sgather", (*locbuf ? ", " : ""));
+			}
+			if (can_interact_room(IN_ROOM(ch), INTERACT_HARVEST)) {
+				sprintf(locbuf + strlen(locbuf), "%sharvest", (*locbuf ? ", " : ""));
+			}
+			if (can_interact_room(IN_ROOM(ch), INTERACT_PICK)) {
+				sprintf(locbuf + strlen(locbuf), "%spick", (*locbuf ? ", " : ""));
+			}
+			if (*locbuf) {
+				msg_to_char(ch, "Commands: &c%s&0\r\n", locbuf);
+			}
 		}
 	}
 	
@@ -1720,13 +1725,20 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options) {
 			msg_to_char(ch, "\tA...you can turn in a quest here!\t0\r\n");
 		}
 	
-		/* now list characters & objects */
-		send_to_char("&g", ch);
-		list_obj_to_char(ROOM_CONTENTS(room), ch, OBJ_DESC_LONG, FALSE);
+		/* now list characters, vehicles, & objects */
+		if (!IS_SET(options, LRR_LOOK_OUT_INSIDE)) {
+			send_to_char("&g", ch);
+			list_obj_to_char(ROOM_CONTENTS(room), ch, OBJ_DESC_LONG, FALSE);
+		}
+		// show vehicles anyway
 		send_to_char("&w", ch);
-		list_vehicles_to_char(ROOM_VEHICLES(room), ch);
-		send_to_char("&y", ch);
-		list_char_to_char(ROOM_PEOPLE(room), ch);
+		list_vehicles_to_char(ROOM_VEHICLES(room), ch, FALSE, IS_SET(options, LRR_LOOK_OUT_INSIDE) ? GET_ROOM_VEHICLE(IN_ROOM(ch)) : NULL);
+		
+		if (!IS_SET(options, LRR_LOOK_OUT_INSIDE)) {
+			send_to_char("&y", ch);
+			list_char_to_char(ROOM_PEOPLE(room), ch);
+		}
+		
 		send_to_char("&0", ch);
 	}
 
@@ -2546,6 +2558,11 @@ void perform_mortal_where(char_data *ch, char *arg) {
 			if ((dist = compute_distance(IN_ROOM(ch), IN_ROOM(i))) > max_distance)
 				continue;
 			
+			if (NO_LOCATION(IN_ROOM(ch)) != NO_LOCATION(IN_ROOM(i))) {
+				// if one is no-location and the other isn't, they definitely can't see each other
+				continue;
+			}
+			
 			ch_inst = find_instance_by_room(IN_ROOM(ch), FALSE, FALSE);
 			i_inst = find_instance_by_room(IN_ROOM(i), FALSE, FALSE);
 			if (ch_inst != i_inst || IS_ADVENTURE_ROOM(IN_ROOM(i)) != !IS_ADVENTURE_ROOM(IN_ROOM(ch))) {
@@ -2593,7 +2610,12 @@ void perform_mortal_where(char_data *ch, char *arg) {
 				continue;
 			if ((dist = compute_distance(IN_ROOM(ch), IN_ROOM(i))) > max_distance)
 				continue;
-				
+			
+			if (NO_LOCATION(IN_ROOM(ch)) != NO_LOCATION(IN_ROOM(i))) {
+				// if one is no-location and the other isn't, they definitely can't see each other
+				continue;
+			}
+			
 			ch_inst = find_instance_by_room(IN_ROOM(ch), FALSE, FALSE);
 			i_inst = find_instance_by_room(IN_ROOM(i), FALSE, FALSE);
 			if (i_inst != ch_inst || find_instance_by_room(IN_ROOM(ch), FALSE, FALSE) != find_instance_by_room(IN_ROOM(i), FALSE, FALSE)) {
@@ -2787,13 +2809,13 @@ ACMD(do_exits) {
 		}
 		
 		// can disembark/exit here?
-		if (ROOM_CAN_EXIT(IN_ROOM(ch))) {
+		if (ROOM_CAN_EXIT(room)) {
 			// 'disembark'
 			if ((veh = GET_ROOM_VEHICLE(room)) && IN_ROOM(veh) && !VEH_FLAGGED(veh, VEH_BUILDING)) {
 				size += snprintf(buf + size, sizeof(buf) - size, "%s%s\r\n", (cmd != -1 ? " " : ""), exit_description(ch, IN_ROOM(veh), "Disembark"));
 			}
 			// 'exit'
-			else if ((to_room = get_exit_room(IN_ROOM(ch))) && to_room != IN_ROOM(ch)) {
+			else if ((to_room = get_exit_room(room)) && to_room != room) {
 				size += snprintf(buf + size, sizeof(buf) - size, "%s%s\r\n", (cmd != -1 ? " " : ""), exit_description(ch, to_room, "Exit"));
 			}
 		}

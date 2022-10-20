@@ -428,6 +428,22 @@ void get_progress_perks_display(struct progress_perk *list, char *save_buffer, b
 }
 
 
+/**
+* Counts the words of text in a progression's strings.
+*
+* @param progress_data *prg The progression whose strings to count.
+* @return int The number of words in the progression's strings.
+*/
+int wordcount_progress(progress_data *prg) {
+	int count = 0;
+	
+	count += wordcount_string(PRG_NAME(prg));
+	count += wordcount_string(PRG_DESCRIPTION(prg));
+	
+	return count;
+}
+
+
  //////////////////////////////////////////////////////////////////////////////
 //// EMPIRE HELPERS //////////////////////////////////////////////////////////
 

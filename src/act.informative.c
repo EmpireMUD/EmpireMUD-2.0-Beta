@@ -1182,7 +1182,7 @@ void list_one_vehicle_to_char(vehicle_data *veh, char_data *ch) {
 		size += snprintf(buf + size, sizeof(buf) - size, "...you are %s %s it.\r\n", part, IN_OR_ON(veh));
 	}
 	else if (VEH_SITTING_ON(veh)) {
-		// this is PROBABLY not shown to players
+		// only shown to players when it's a building
 		snprintf(part, sizeof(part), "%s", position_types[GET_POS(VEH_SITTING_ON(veh))]);
 		*part = LOWER(*part);
 		size += snprintf(buf + size, sizeof(buf) - size, "...%s is %s %s it.\r\n", PERS(VEH_SITTING_ON(veh), ch, FALSE), part, IN_OR_ON(veh));
@@ -1215,9 +1215,13 @@ void list_one_vehicle_to_char(vehicle_data *veh, char_data *ch) {
 *
 * @param vehicle_data *list Pointer to the start of the list of vehicles.
 * @param vehicle_data *ch Person to send the output to.
+* @param bool large_only If TRUE, skips small vehicles like furniture
+* @param vehicle_data *exclude Optional: Don't show a specific vehicle (usually the one you're in); may be NULL.
 */
-void list_vehicles_to_char(vehicle_data *list, char_data *ch) {
+void list_vehicles_to_char(vehicle_data *list, char_data *ch, bool large_only, vehicle_data *exclude) {
 	vehicle_data *veh;
+	
+	bitvector_t large_veh_flags = VEH_BUILDING | VEH_NO_BUILDING | VEH_SIEGE_WEAPONS | VEH_ON_FIRE | VEH_VISIBLE_IN_DARK | VEH_OBSCURE_VISION;
 	
 	// no work
 	if (!list || !ch || !ch->desc) {
@@ -1226,10 +1230,16 @@ void list_vehicles_to_char(vehicle_data *list, char_data *ch) {
 	
 	DL_FOREACH2(list, veh, next_in_room) {
 		// conditions to show
+		if (veh == exclude) {	
+			continue;
+		}
 		if (VEH_IS_EXTRACTED(veh) || !CAN_SEE_VEHICLE(ch, veh)) {
 			continue;	// should we show a "something" ?
 		}
-		if (VEH_SITTING_ON(veh) && VEH_SITTING_ON(veh) != ch) {
+		if (large_only && !VEH_FLAGGED(veh, large_veh_flags)) {
+			continue;	// missing required flags
+		}
+		if (VEH_SITTING_ON(veh) && VEH_SITTING_ON(veh) != ch && !VEH_FLAGGED(veh, VEH_BUILDING)) {
 			continue;	// don't show vehicles someone else is sitting on
 		}
 		
@@ -2410,7 +2420,7 @@ ACMD(do_contents) {
 		send_to_char("&g", ch);
 		list_obj_to_char(ROOM_CONTENTS(IN_ROOM(ch)), ch, OBJ_DESC_LONG, FALSE);
 		send_to_char("&w", ch);
-		list_vehicles_to_char(ROOM_VEHICLES(IN_ROOM(ch)), ch);
+		list_vehicles_to_char(ROOM_VEHICLES(IN_ROOM(ch)), ch, FALSE, NULL);
 		send_to_char("&0", ch);
 	}
 	else {	// can see nothing
@@ -2942,15 +2952,20 @@ ACMD(do_look) {
 				// extra desc takes priority
 				send_to_char(exdesc, ch);
 			}
+			else if (!IS_IMMORTAL(ch) && !ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_LOOK_OUT) && !RMT_FLAGGED(IN_ROOM(ch), RMT_LOOK_OUT)) {
+				msg_to_char(ch, "You can't do that from here.\r\n");
+			}
+			else if (GET_ROOM_VEHICLE(IN_ROOM(ch))) {
+				// look out from vehicle
+				clear_recent_moves(ch);
+				look_at_room_by_loc(ch, IN_ROOM(GET_ROOM_VEHICLE(IN_ROOM(ch))), LRR_LOOK_OUT_INSIDE);
+			}
 			else if (!(map = (GET_MAP_LOC(IN_ROOM(ch)) ? real_room(GET_MAP_LOC(IN_ROOM(ch))->vnum) : NULL))) {
 				msg_to_char(ch, "You can't do that from here.\r\n");
 			}
 			else if (map == IN_ROOM(ch) && !ROOM_IS_CLOSED(IN_ROOM(ch))) {
 				clear_recent_moves(ch);
 				look_at_room_by_loc(ch, map, LRR_LOOK_OUT);
-			}
-			else if (!IS_IMMORTAL(ch) && !ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_LOOK_OUT) && !RMT_FLAGGED(IN_ROOM(ch), RMT_LOOK_OUT)) {
-				msg_to_char(ch, "You can't do that from here.\r\n");
 			}
 			else {
 				clear_recent_moves(ch);

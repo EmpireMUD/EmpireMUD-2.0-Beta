@@ -1869,6 +1869,26 @@ obj_data *setup_olc_object(obj_data *input) {
 }
 
 
+/**
+* Counts the words of text in an object's strings.
+*
+* @param obj_data *obj The object whose strings to count.
+* @return int The number of words in the object's strings.
+*/
+int wordcount_object(obj_data *obj) {
+	int count = 0;
+	
+	count += wordcount_string(GET_OBJ_KEYWORDS(obj));
+	count += wordcount_string(GET_OBJ_SHORT_DESC(obj));
+	count += wordcount_string(GET_OBJ_LONG_DESC(obj));
+	count += wordcount_string(GET_OBJ_ACTION_DESC(obj));
+	count += wordcount_extra_descriptions(GET_OBJ_EX_DESCS(obj));
+	count += wordcount_custom_messages(GET_OBJ_CUSTOM_MSGS(obj));
+	
+	return count;
+}
+
+
  //////////////////////////////////////////////////////////////////////////////
 //// OBJECT SETTERS //////////////////////////////////////////////////////////
 

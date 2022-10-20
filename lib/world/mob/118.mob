@@ -18,7 +18,7 @@ Dylane~
 Dylane of Trense is here, looking around.
 ~
 0 0 dvAH n 3
-1 0 0 15
+1 0 86 15
 D
    Dressed unmistakably in the finery of a nobleman and making no efforts to
 hide his wealth, Dylane is making himself as conspicuous as possible. His face
@@ -109,7 +109,7 @@ Page Corwin~
 Corwin is bustling about.
 ~
 0 0 dvxA n 3
-1 0 0 15
+1 0 68 15
 D
    Corwin is sweating under his heavy jute page robe. He's bustling around
 trying to organize the refugees down here on the first floor. He looks young,
@@ -160,11 +160,11 @@ Mageina is managing several pots of soup.
 2 0 0 16
 D
    Mageina moves back and forth between pots of soup, which she heats with a
-spurt of cackling flames from her cinnamon stick wand. Her black apron,
-emblazoned with a stylized Tower Skycleave logo, is covered in bits of food
-and soup spatter. Her hair, brown with violet streaks, is pulled back in a
-curly bun. Her face, though young, looks absolutely exhausted, as if she hasn't
-slept in some time.
+spurt of cackling flames from her gnarled old wand. Her black apron, emblazoned
+with a stylized Tower Skycleave logo, is covered in bits of food and soup
+spatter. Her hair, brown with violet streaks, is pulled back in a curly bun.
+Her face, though young, looks absolutely exhausted, as if she hasn't slept in
+some time.
 ~
 F 11800
 T 11810
@@ -185,7 +185,26 @@ are in short supply in Skycleave. As she tidies the room, you notice most of
 her left hand has been replaced with intricate nocturnium filigree.
 ~
 F 11800
+M
+7
+say Oh no, no more people. We are full positively to the roof.~
+M
+7
+say Not an inch of space.~
+M
+0
+$n shuffles across the room trying to keep things in order.~
+M
+0
+$n folds a sheet.~
+M
+0
+$n waves $s wand and sweeps some dust away.~
+M
+0
+$n makes a harrumph sound.~
 T 11810
+T 11806
 S
 #11807
 #n~
@@ -233,7 +252,7 @@ S
 A young lady is standing here.
 ~
 0 0 dvA n 3
-2 0 0 15
+2 0 102 15
 D
    She's young, not past her second decade, and it looks as if she's been
 crying. She wears a simple white dress and silver jewelry; she's constantly
@@ -429,12 +448,12 @@ T 11824
 T 11807
 S
 #11817
-bruiser goblin~
-a goblin bruiser~
-Goblin bruiser is here.
+miner goblin~
+a goblin miner~
+Goblin miner is here.
 ~
 0 0 abdI 0 2
-0 0 0 2
+0 0 0 8
 D
 Strings set by trig 11824.
 ~
@@ -582,7 +601,7 @@ Hugh~
 Hugh Mann stands here in a low hat and full-length coat.
 ~
 0 0 dvA n 3
-1 0 0 15
+1 0 88 15
 D
    It's hard to get a good look at his face since his hat is pulled low. You're
 not really sure he can see you, either -- it might be below his eyes. He's
@@ -708,6 +727,24 @@ You can buy a pixy jar!~
 M
 0
 $n picks up a skycleaver trinket but it starts to glow and $e puts it back down fast.~
+M
+0
+$n picks up a phial from the Blacktower rack and opens it, but quickly puts the cork back in and sets it down.~
+M
+0
+$n shakes a couple of pixy jars, but they sound empty.~
+M
+0
+$n watches a pair of fire bugs nestle in a tinderbox.~
+M
+1
+Wow, is this calamander?~
+M
+1
+I've always wanted to try the Blacktower phials but they make me nervous.~
+M
+1
+Where do I even get skystones?~
 T 11828
 T 11810
 S
@@ -727,9 +764,193 @@ himself haphazardly, such that it's only covering part of his robed body,
 though he doesn't seem to be trying to sleep.
 ~
 F 11800
+M
+0
+$n coughs.~
+M
+7
+skip~
+M
+7
+skip~
+M
+7
+say So I was walking along this rooftop, and all the buildings are interconnected...~
+M
+7
+say And I'm walking up and down ramps when I realize I'm just completely surrounded by goblins.~
+M
+7
+vforce 11813 say In your dream?~
+M
+7
+skip~
+M
+7
+say Right. Anyway, I duck down into one of the buildings, and it's this ugly little white house.~
+M
+7
+say And as I get inside, I see this fox, and it sees me, and I freeze, and it keeps watching at me, just snarling...~
+M
+7
+say A real mean thing. I climbed halfway back up the ladder by the time it got over to me, barking mad.~
+M
+7
+vforce 11813 say Stuck between a fox and a goblin? If only you were a wizard, Ravi.~
+M
+7
+skip~
+M
+7
+say Haw, haw. I didn't have my wand or my staff. I ended up sprinting across the rooftops, but I couldn't get away from the goblins.~
+M
+7
+vforce 11806 say Well, skip to it, lad, what did you do?~
+M
+7
+skip~
+M
+7
+vforce 11813 say Don't make us suffer.~
+M
+7
+skip~
+M
+7
+say I tripped and fell off the edge of the city and pinched myself awake before I hit rock bottom.~
+M
+8
+skip~
+M
+8
+skip~
+M
+8
+say There was another one where I was in a pit fight against a trio of real nasty goblins.~
+M
+8
+vforce 11813 say Nother dream?~
+M
+8
+skip~
+M
+8
+say It seemed so real. Thousands of goblins looking down, chanting and cheering as I was forced to fight for my life.~
+M
+8
+vforce 11813 say Were these giant goblins, Rav?~
+M
+8
+skip~
+M
+8
+say Regular size, but there were three of them. Hammer-Goblin came at me first...~
+M
+8
+say I was just, left, right, left, right, dodging the hammers... Got a lucky trip in and down he went.~
+M
+8
+vforce 11813 say But leaving two vicious little goblins and just you, one lone sorcerer.~
+M
+8
+skip~
+M
+8
+say Without my wand.~
+M
+8
+vforce 11813 say Without your wand.~
+M
+8
+skip~
+M
+8
+say So the next one, Axe-Goblin, comes flying at me out of nowhere, and I duck and she goes straight into the sand...~
+M
+8
+vforce 11813 say She?~
+M
+8
+skip~
+M
+8
+say Meanwhile the third one, Whip-Goblin, is coming fierce, whip left, whip right, cutting me up...~
+M
+8
+vforce 11813 say And did you beat her?~
+M
+8
+skip~
+M
+8
+say I woke up.~
+M
+8
+vforce 11813 say You ever consider whether anybody wants to hear about your dreams in the first place?~
+M
+8
+skip~
+M
+8
+echo Ravinder just rolls his eyes.~
+M
+9
+skip~
+M
+9
+skip~
+M
+9
+vforce 11806 say I actually had a dream about two leprechauns and a dracosaur.~
+M
+9
+skip~
+M
+9
+vforce 11813 say See what you've done, Rav?~
+M
+9
+skip~
+M
+9
+echo Instructor Huberus goes back to what she was doing.~
+M
+10
+skip~
+M
+10
+skip~
+M
+10
+say The funny thing is, I haven't had the dream since we've been down here.~
+M
+10
+vforce 11813 say Hasn't stopped you from talking about it.~
+M
+10
+skip~
+M
+10
+say It's been a bit of a relief. I was having it every single night.~
+M
+10
+vforce 11806 say Couldn't help but overheard that, lad. You might try a dreamcatcher.~
+M
+10
+skip~
+M
+10
+say Have one handy?~
+M
+10
+vforce 11806 say Well I'm sure we can scrounge one up once all this to-do is to-done.~
+M
+10
+skip~
 T 11810
 T 11807
 T 11851
+T 11840
 S
 #11826
 #n~
@@ -763,6 +984,18 @@ The old skycleaver trinket was better.~
 M
 0
 $n mills around the shop.~
+M
+1
+These Blacktower potions are madly overpriced.~
+M
+1
+I saw the fire bugs. Are you also selling home insurance?~
+M
+1
+The pixy thing seems cruel.~
+M
+1
+As if we need any of this.~
 T 11828
 T 11810
 S
@@ -805,7 +1038,7 @@ an otherworlder~
 An escaped otherworlder is barreling through!
 ~
 0 0 bdz 0 3
-0 0 0 15
+0 0 37 15
 D
    The otherworlder hunches as it runs to avoid hitting its head. It's taller
 than a human, with dappled periwinkle skin. It wears some kind of scale armor
@@ -813,6 +1046,7 @@ that appears as thin as a sheet, allowing it to move effortlessly with its
 curved, boneless arms and legs. Its four wide-set black eyes narrow to vertical
 slits as it considers its chances of escape in each direction.
 ~
+I 4 11830 100.00 1  # LOOT: otherworldly bodysuit
 T 11829
 S
 #11830
@@ -925,6 +1159,21 @@ sheet, allowing it to move effortlessly with its curved, boneless arms and legs.
 come from. The only thing you're sure about is that it doesn't want to be here.
 Perhaps you could free it, though there's no way to tell if it's friend or foe.
 ~
+M
+0
+$n roars and pulls at its chains.~
+M
+0
+$n rattles its chains.~
+M
+0
+You wince as $n pulls so hard at its chains its hands turn purple.~
+M
+0
+$n yanks at its chains.~
+M
+0
+$n wails loudly.~
 T 11834
 S
 #11835
@@ -963,6 +1212,45 @@ emote $n comes screaming toward you, lashing at you with snake-like wrappings, b
 T 11839
 T 11806
 S
+#11837
+rags swarm~
+the swarm of rags~
+A swarm of rags is cleaning the walkway.
+~
+50 50 bdh nG 2
+0 0 2 7
+D
+   The cloud of flying rags is in a cleaning frenzy, wiping, scrubbing, and
+polishing everything from the floor and handrails to the paneled walls, to the
+enormous chandelier. The rags come in all shades from light to dark, though
+they move so fast it's hard to focus on any one of them.
+~
+M
+0
+The rags swirl around the floor...~
+M
+0
+The rags whoosh over the walls...~
+M
+0
+The rags twirl around every rail and surface...~
+M
+0
+The rags swarm over you, leaving you feeling a little smothered but polished.~
+M
+0
+The rags polish your boots.~
+M
+0
+The rags whip and spin into a little tornado, sucking dust up with them...~
+M
+0
+You swat at a rag as it nearly flies into your face.~
+T 11902
+T 11904
+T 11934
+T 11810
+S
 #11838
 Weyonomon spirit apprentice~
 the spirit of Weyonomon~
@@ -990,13 +1278,219 @@ Annelise is seated at one of the tables.
 0 0 bdvxA n 3
 2 0 0 15
 D
-   Annelise is seated at a bistro table with her back tucked into the corner
-of the cafe. She hugs her soup bowl in front of her with her arm, as if to
-protect it as she eats. She's dressed in a loose-fitting gray sweater and
-an old skirt, from under which peaks a shining bronze leg.
+   Annelise, the youngest sorcerer you've met in the tower, is seated at a
+bistro table with her back tucked into the corner of the cafe. She hugs her
+soup bowl in front of her with her arm, as if to protect it as she eats. She's
+dressed in a loose-fitting gray sweater and an old skirt, from under which
+peeks a shining bronze leg.
 ~
 F 11800
+M
+7
+echo Annelise stirs her bowl slowly.~
+M
+7
+skip~
+M
+7
+echo Annelise stares off into space, idly watching the walls.~
+M
+7
+skip~
+M
+7
+echo Mageina brings Annelise a hot bowl and sets the cold one on the counter.~
+M
+7
+say Thank you, dear. How is your mother?~
+M
+7
+vforce 11805 say Oh, she passed. I thought I told you.~
+M
+7
+skip~
+M
+7
+say Oh, I'm so sorry, Mageina, I don't recall you saying. Are you doing alright?~
+M
+7
+vforce 11805 say Don't worry yourself; it was probably last time. She's been gone a while.~
+M
+7
+skip~
+M
+7
+vforce 11805 say And besides, we have more pressing issues to deal with.~
+M
+7
+skip~
+M
+7
+say Let me know if I can do anything.~
+M
+7
+skip~
+M
+7
+echo Annelise sips her soup.~
+M
+7
+skip~
+M
+7
+echo Annelise sips her soup.~
+M
+8
+echo Mageina flicks her wand toward a pot of soup, which starts stirring itself.~
+M
+8
+echo One of the pots of soup makes a loud pop and splatters everywhere, but Mageina catches it with her wand and casts it back into the pot.~
+M
+8
+say Good catch. I'd have been a mess.~
+M
+8
+vforce 11805 say Saw it coming.~
+M
+8
+skip~
+M
+8
+say What do you suppose is going on up there?~
+M
+8
+vforce 11805 say You've heard of Trixton Vye?~
+M
+8
+skip~
+M
+8
+say Oh my, yes, he was so handsome. I saw him once at a tournament at Reddanne, before he went mercenary.~
+M
+8
+vforce 11805 say He's hired Lady Virduke and a thief named Rojjer; they've taken the third floor.~
+M
+8
+skip~
+M
+8
+say They had better not be in my lab. If they make a mess...~
+M
+8
+vforce 11805 say Lise, your lab could not possibly be a bigger mess. You're giving Goef a run for his money.~
+M
+8
+skip~
+M
+8
+say I'm going to let that slide.~
+M
+8
+echo Mageina grabs a clean spoon, tastes one of the soups, then jabs her wand into it.~
+M
+8
+vforce 11805 say By the damn power of Skycleave, turn this goop in-to some soup.~
+M
+8
+skip~
+M
+8
+echo There's a burbling noise from the pot. Mageina tastes the soup again and makes a happier face.~
+M
+8
+vforce 11805 say I can never remember which one is the bad soup.~
+M
+8
+skip~
+M
+8
+vforce 11805 say Anyway, they were hired by Mezvienne. She brought them in disguised as her retinue.~
+M
+8
+skip~
+M
+8
+say No! I thought she was on our side. Josef invited her himself, didn't he?~
+M
+8
+vforce 11805 say That he did. They had planned to study the so-called heartwood of time.~
+M
+8
+skip~
+M
+8
+say I hate that thing. It's always given me the willies.~
+M
+8
+vforce 11805 say Well, I'm sure we'll be okay so long as it doesn't trap us in a permanent time loop, right?~
+M
+8
+skip~
+M
+8
+say Don't even joke about that.~
+M
+8
+vforce 11805 say I would never. Unfortunately it's deathly serious. More soup?~
+M
+8
+skip~
+M
+8
+say Yes, please. The good one.~
+M
+8
+vforce 11805 say They're all good now.~
+M
+9
+echo Mageina stacks some dirty bowls on the counter.~
+M
+9
+skip~
+M
+9
+vforce 11805 say Do you ever think about the old apprentices, Lise?~
+M
+9
+skip~
+M
+9
+say Oh, some of them.~
+M
+9
+vforce 11805 say Even the ones who didn't make it?~
+M
+9
+skip~
+M
+9
+say Especially those. Oh my.~
+M
+9
+say Why do you ask?~
+M
+9
+vforce 11805 say Oh, just thinking about the Trense boy. You remember him?~
+M
+9
+skip~
+M
+9
+say I always did feel terribly about that one. I owed him a favor.~
+M
+9
+vforce 11805 say Maybe there's still time.~
+M
+9
+skip~
+M
+9
+say Oh...~
+M
+9
+echo Annelise seems to fall silent.~
 T 11810
+T 11840
 S
 #11840
 Waltur walter magineer~
@@ -1195,7 +1689,7 @@ M
 Shouldn't've brought so many of us. The pay is going to be lousy.~
 M
 1
-I hope she's not expecting to say thank you for this kind of money.~
+I hope she's not expecting us to say thank you for this kind of money.~
 T 11802
 T 11857
 T 11846
@@ -1267,6 +1761,24 @@ mod longdesc Kara Virduke is holding her staff in the air, channeling mana from 
 M
 7
 emote $n raises her staff and begins channeling mana.~
+M
+1
+Well, are you just going to stand there?~
+M
+1
+This is where you end.~
+M
+1
+I've killed dozens that look just like you.~
+M
+1
+You cannot honestly think you're getting out of this.~
+M
+0
+$n seems to be channeling mana from the cabinets.~
+M
+0
+Waves of mana pulse toward $n.~
 T 11813
 T 11847
 T 11823
@@ -1408,7 +1920,7 @@ a fluidic alpaca~
 A fluidic alpaca sloshes past you!
 ~
 0 0 bd n 3
-0 0 11 15
+0 0 14 15
 D
    The fluffy alpaca is made of pure water; you can see right through it! It
 bounds along, spritzing everyone it passes with a fine mist.
@@ -1438,7 +1950,7 @@ a liquiform hawk~
 A liquiform hawk soars past you!
 ~
 0 0 bd mn 3
-0 0 2 15
+0 0 25 15
 D
    The elegant hawk is transparent, made only of water. Behind it, the wall
 seems to wave as you watch it through the hawk's body. It swoops and turns,
@@ -1556,7 +2068,7 @@ The Shadow Ascendant looms over the chamber as it draws more and more power!
 D
    The shade, once merely a projection of the powerful enchantress Mezvienne,
 has become the shadow of its former self as it absorbs the full power of the
-Tower Skycleave. At the heart of the shadow, the nocturnium wand of the late
+Tower Skycleave. At the heart of the shadow, the gnarled wand of the late
 Grand High Sorcerer Knezz glows an inky purple.
    The formless shadow expands, sending smoky tentacles into every relic and
 artifact in the room. Tentacles stretch out the window, through cracks in the
@@ -1673,7 +2185,8 @@ Master Knezz is in his chair, with his head back, and his eyes and mouth wide op
 D
    Grand High Sorcerer Knezz doesn't seem to be conscious, splayed out such as
 he is, in his oversized chair. His violet and gold robes drape off the sides of
-the chair, unmoving, as his milky eyes stare up at the ceiling. His long black-
+the chair, unmoving, as his milky eyes stare up at the ceiling. His left hand,
+dangling to the side, still clutches his gnarled wooden wand. His long black-
 and-white hair blows slightly as a breeze comes through the window, but he
 doesn't stir.
    The Shade of Mezvienne hovers over Knezz like a vile cloud, swirling around
@@ -1947,7 +2460,7 @@ Joiago~
 Joiago is standing here.
 ~
 0 0 dx n 3
-1 0 0 15
+1 0 86 15
 D
    Joiago stands a full head taller than you, with blue-black hair and hazel
 eyes that sit beneath high-arching eyebrows. He's dressed in a green silk tunic
@@ -1957,6 +2470,7 @@ stiff triangular silver and yellow cape.
 meets his gaze, his mouth cuts into a crooked grin, and then he goes about his
 business.
 ~
+I 12 11877 100.00 1 x  # PICKPOCKET: little gemstone flute
 T 11877
 T 11875
 T 11876
@@ -2245,6 +2759,7 @@ T 11941
 T 11808
 T 11809
 T 11810
+T 11935
 S
 #11890
 Celiya high sorcerer difficulty~
@@ -2363,6 +2878,50 @@ T 11892
 T 11899
 T 11810
 T 11806
+S
+#11893
+fox gray~
+a gray fox~
+A gray fox is sitting on the ground.
+~
+1 1 bdoD n 2
+0 0 14 9
+D
+   The loyal little fox isn't much larger than a housecat. It has an ashen-
+silver coat with big white spots and red around the edges of its white belly.
+Its pointed little face and floppy ears make it look almost like a puppy, and
+it never takes its big, brown eyes off of you as you walk around.
+~
+M
+0
+$n wags its tail.~
+M
+0
+$n wags its tail happily.~
+M
+0
+$n sniffs at your feet.~
+M
+0
+$n trots around in a circle.~
+M
+0
+$n tilts its head at you.~
+M
+0
+$n smiles with its tongue out.~
+M
+0
+$n's tongue hangs out as it pants.~
+M
+0
+$n barks.~
+M
+0
+$n chases its tail in a circle.~
+M
+0
+$n rolls around on the ground.~
 S
 #11894
 progress sense phase changer~

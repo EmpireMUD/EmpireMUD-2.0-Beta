@@ -2361,18 +2361,33 @@ static void drink_message(char_data *ch, obj_data *obj, byte type, int subcmd, i
 	*liq = LIQ_WATER;
 
 	switch (type) {
-		case drink_OBJ:
-			sprintf(buf, "$n %s from $p.", subcmd == SCMD_SIP ? "sips" : "drinks");
-			act(buf, TRUE, ch, obj, 0, TO_ROOM);
-			msg_to_char(ch, "You %s the %s.\r\n", subcmd == SCMD_SIP ? "sip" : "drink", get_generic_string_by_vnum(GET_DRINK_CONTAINER_TYPE(obj), GENERIC_LIQUID, GSTR_LIQUID_NAME));
+		case drink_OBJ: {
+			// message to char
+			if (subcmd != SCMD_SIP && obj_has_custom_message(obj, OBJ_CUSTOM_CONSUME_TO_CHAR)) {
+				act(obj_get_custom_message(obj, OBJ_CUSTOM_CONSUME_TO_CHAR), FALSE, ch, obj, get_generic_string_by_vnum(GET_DRINK_CONTAINER_TYPE(obj), GENERIC_LIQUID, GSTR_LIQUID_NAME), TO_CHAR);
+			}
+			else {
+				msg_to_char(ch, "You %s the %s.\r\n", subcmd == SCMD_SIP ? "sip" : "drink", get_generic_string_by_vnum(GET_DRINK_CONTAINER_TYPE(obj), GENERIC_LIQUID, GSTR_LIQUID_NAME));
+			}
+			
+			// message to room
+			if (subcmd != SCMD_SIP && obj_has_custom_message(obj, OBJ_CUSTOM_CONSUME_TO_ROOM)) {
+				act(obj_get_custom_message(obj, OBJ_CUSTOM_CONSUME_TO_ROOM), TRUE, ch, obj, get_generic_string_by_vnum(GET_DRINK_CONTAINER_TYPE(obj), GENERIC_LIQUID, GSTR_LIQUID_NAME), TO_ROOM);
+			}
+			else {
+				sprintf(buf, "$n %s from $p.", subcmd == SCMD_SIP ? "sips" : "drinks");
+				act(buf, TRUE, ch, obj, NULL, TO_ROOM);
+			}
 
 			*liq = GET_DRINK_CONTAINER_TYPE(obj);
 			break;
+		}
 		case drink_ROOM:
-		default:
+		default: {
 			msg_to_char(ch, "You take a drink from the cool water.\r\n");
 			act("$n takes a drink from the cool water.", TRUE, ch, 0, 0, TO_ROOM);
 			break;
+		}
 	}
 
 	if (subcmd == SCMD_SIP) {
@@ -5150,8 +5165,8 @@ ACMD(do_eat) {
 	// 5. messaging
 	if (extract || subcmd == SCMD_EAT) {
 		// message to char
-		if (obj_has_custom_message(food, OBJ_CUSTOM_EAT_TO_CHAR)) {
-			act(obj_get_custom_message(food, OBJ_CUSTOM_EAT_TO_CHAR), FALSE, ch, food, NULL, TO_CHAR);
+		if (obj_has_custom_message(food, OBJ_CUSTOM_CONSUME_TO_CHAR)) {
+			act(obj_get_custom_message(food, OBJ_CUSTOM_CONSUME_TO_CHAR), FALSE, ch, food, NULL, TO_CHAR);
 		}
 		else {
 			snprintf(buf, sizeof(buf), "You eat %s$p.", (extract ? "" : "some of "));
@@ -5159,8 +5174,8 @@ ACMD(do_eat) {
 		}
 
 		// message to room
-		if (obj_has_custom_message(food, OBJ_CUSTOM_EAT_TO_ROOM)) {
-			act(obj_get_custom_message(food, OBJ_CUSTOM_EAT_TO_ROOM), FALSE, ch, food, NULL, TO_ROOM);
+		if (obj_has_custom_message(food, OBJ_CUSTOM_CONSUME_TO_ROOM)) {
+			act(obj_get_custom_message(food, OBJ_CUSTOM_CONSUME_TO_ROOM), FALSE, ch, food, NULL, TO_ROOM);
 		}
 		else {
 			snprintf(buf, sizeof(buf), "$n eats %s$p.", (extract ? "" : "some of "));
@@ -5890,8 +5905,21 @@ ACMD(do_light) {
 			gain_player_tech_exp(ch, PTECH_LIGHT_FIRE, 15);
 		}
 		else if (lighter) {
-			act("You use $p to light $P.", FALSE, ch, lighter, obj, TO_CHAR);
-			act("$n uses $p to light $P.", FALSE, ch, lighter, obj, TO_ROOM);
+			// obj message to char
+			if (obj_has_custom_message(lighter, OBJ_CUSTOM_CONSUME_TO_CHAR)) {
+				act(obj_get_custom_message(lighter, OBJ_CUSTOM_CONSUME_TO_CHAR), FALSE, ch, lighter, obj, TO_CHAR);
+			}
+			else {
+				act("You use $p to light $P.", FALSE, ch, lighter, obj, TO_CHAR);
+			}
+			
+			// obj message to room
+			if (obj_has_custom_message(lighter, OBJ_CUSTOM_CONSUME_TO_ROOM)) {
+				act(obj_get_custom_message(lighter, OBJ_CUSTOM_CONSUME_TO_ROOM), TRUE, ch, lighter, obj, TO_ROOM);
+			}
+			else {
+				act("$n uses $p to light $P.", FALSE, ch, lighter, obj, TO_ROOM);
+			}
 		}
 		else { // somehow?
 			act("You light $P.", FALSE, ch, NULL, obj, TO_CHAR);

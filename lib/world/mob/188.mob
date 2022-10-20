@@ -78,8 +78,37 @@ guard cityguard risen~
 a risen city guard~
 A risen city guard hunts for intruders.
 ~
-75 125 dhqtuvAI cG 3
-0 0 13 10
+75 175 dhqtuA cG 3
+1 0 13 10
+D
+   This guard was clearly more dedicated than any before him. Even in death, he
+patrols the empire, hunting down intruders. Don't mind the gray coloration of
+his skin, the straw-like feel of his remaining hair, or the smell that wafts
+from him with the slightest breeze.
+~
+I 4 18875 5.00 1  # LOOT: tooth whistle
+I 12 18875 5.00 1  # PICKPOCKET: tooth whistle
+M
+0
+A faint rustling comes from $n, as the wind blows.~
+M
+5
+$n tries to flex as $e prepares for combat.~
+M
+4
+$n blinks $s eyes hard against the light.~
+M
+0
+$n watches you with dead eyes.~
+M
+5
+$n groans aggressively.~
+M
+4
+$n groans softly.~
+M
+0
+A light creaking can be heard.~
 T 251
 T 18811
 S
@@ -528,17 +557,29 @@ T 18873
 T 18876
 S
 #18875
-t-rex zombie~
+t-rex zombie sue~
 a zombie t-rex~
 A dragon sized zombie stomps about.
 ~
-1 100 dehk c 4
+1 100 deghk c 5
 2 0 26 9
 D
    This former queen of the primeval world has a rough pebbled hide, colored
 similar to a jaguar's pelt. Solid muscle ripples under the desiccated flesh as
-she moves about.
+she moves about. As you look up at her, the name Sue pops into your mind.
 ~
+M
+0
+$n reaches down and plucks up a snack with $s mouth!~
+M
+4
+The sun highlights the zombified state of $n.~
+M
+5
+You can hear $n, but aren't certain just where it is.~
+M
+0
+Stomping footsteps shake the ground!~
 S
 #18876
 pig~

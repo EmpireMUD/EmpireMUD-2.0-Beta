@@ -397,6 +397,8 @@ When using field  - The variable returns:
 &calias&0 - The list of aliases (keywords) of the mob or the player name.
 &callegiance(faction)&0 - Returns a mob's faction vnum, or changes the faction
    to a different one (or 'none').
+&cbiting&0 - For vampires, the person they are currently biting, if any.
+&cbitten_by&0 - The vampire currently being bitten by, if any.
 &cblock&0 - Player's block rating.
 &cblood(amt)&0 - Returns current blood, or adds/removes blood if amt is set.
 &cbonus_exp(amt)&0 - Returns the player's bonus exp (adds to it if amt given)
@@ -525,6 +527,8 @@ When using field  - The variable returns:
    first if they were not already summoned.
 &clink_instance&0 - Marks this mob as belonging to the adventure instance of
    the room it's currently in.
+&clinked_to_instance(room)&0 - True if the mob is linked as part of the
+   instance. Room is optional; will check the room the mob is in if empty.
 &clongdesc&0 - The mob's long description.
 &cmana&0 - The current mana points of the actor.
 &cmana(amount)&0 - Add/subtract mana on the actor.

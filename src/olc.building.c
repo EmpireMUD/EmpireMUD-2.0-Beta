@@ -1218,6 +1218,25 @@ void smart_copy_bld_relations(struct bld_relation **to_list, struct bld_relation
 }
 
 
+/**
+* Counts the words of text in a building's strings.
+*
+* @param bld_data *bld The building whose strings to count.
+* @return int The number of words in the building's strings.
+*/
+int wordcount_building(bld_data *bld) {
+	int count = 0;
+	
+	count += wordcount_string(GET_BLD_NAME(bld));
+	count += wordcount_string(GET_BLD_TITLE(bld));
+	count += wordcount_string(GET_BLD_COMMANDS(bld));
+	count += wordcount_string(GET_BLD_DESC(bld));
+	count += wordcount_extra_descriptions(GET_BLD_EX_DESCS(bld));
+		
+	return count;
+}
+
+
  //////////////////////////////////////////////////////////////////////////////
 //// DISPLAYS ////////////////////////////////////////////////////////////////
 

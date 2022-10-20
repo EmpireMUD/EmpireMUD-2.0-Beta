@@ -30,6 +30,7 @@
 *   Auditors
 *   Sorters
 *   Helpers
+*   Word Count Tools
 */
 
 // local modules
@@ -48,6 +49,7 @@ OLC_MODULE(olc_search);
 OLC_MODULE(olc_set_flags);
 OLC_MODULE(olc_set_max_vnum);
 OLC_MODULE(olc_set_min_vnum);
+OLC_MODULE(olc_wordcount);
 
 // ability modules
 OLC_MODULE(abiledit_affects);
@@ -529,6 +531,7 @@ const struct olc_command_data olc_data[] = {
 	{ "list", olc_list, OLC_ABILITY | OLC_ARCHETYPE | OLC_AUGMENT | OLC_BOOK | OLC_BUILDING | OLC_CLASS | OLC_CRAFT | OLC_CROP | OLC_EVENT | OLC_FACTION | OLC_GENERIC | OLC_GLOBAL | OLC_MOBILE | OLC_MORPH | OLC_OBJECT | OLC_PROGRESS | OLC_QUEST | OLC_SECTOR | OLC_SHOP | OLC_SKILL | OLC_SOCIAL | OLC_TRIGGER | OLC_ADVENTURE | OLC_ROOM_TEMPLATE | OLC_VEHICLE, NOBITS },
 	{ "save", olc_save, OLC_ABILITY | OLC_ARCHETYPE | OLC_AUGMENT | OLC_BOOK | OLC_BUILDING | OLC_CLASS | OLC_CRAFT | OLC_CROP | OLC_EVENT | OLC_FACTION | OLC_GENERIC | OLC_GLOBAL | OLC_MOBILE | OLC_MORPH | OLC_OBJECT | OLC_PROGRESS | OLC_QUEST | OLC_SECTOR | OLC_SHOP | OLC_SKILL | OLC_SOCIAL | OLC_TRIGGER | OLC_ADVENTURE | OLC_ROOM_TEMPLATE | OLC_VEHICLE, OLC_CF_EDITOR | OLC_CF_NO_ABBREV },
 	{ "search", olc_search, OLC_ABILITY | OLC_ARCHETYPE | OLC_AUGMENT | OLC_BUILDING | OLC_CLASS | OLC_CRAFT | OLC_CROP | OLC_EVENT | OLC_FACTION | OLC_GENERIC | OLC_GLOBAL | OLC_MOBILE | OLC_MORPH | OLC_OBJECT | OLC_PROGRESS | OLC_QUEST | OLC_SECTOR | OLC_SHOP | OLC_SKILL | OLC_SOCIAL | OLC_TRIGGER | OLC_ROOM_TEMPLATE | OLC_VEHICLE, NOBITS },
+	{ "wordcount", olc_wordcount, OLC_ABILITY | OLC_ARCHETYPE | OLC_AUGMENT | OLC_BOOK | OLC_BUILDING | OLC_CLASS | OLC_CRAFT | OLC_CROP | OLC_EVENT | OLC_FACTION | OLC_GENERIC | OLC_GLOBAL | OLC_MOBILE | OLC_MORPH | OLC_OBJECT | OLC_PROGRESS | OLC_QUEST | OLC_SECTOR | OLC_SHOP | OLC_SKILL | OLC_SOCIAL | OLC_TRIGGER | OLC_ADVENTURE | OLC_ROOM_TEMPLATE | OLC_VEHICLE, NOBITS },
 	
 	// admin
 	{ "removeindev", olc_removeindev, NOBITS, NOBITS },
@@ -3925,6 +3928,361 @@ OLC_MODULE(olc_set_min_vnum) {
 	
 	if (vict && file) {
 		free_char(vict);
+	}
+}
+
+
+// Usage: olc mob wordcount <from vnum> [to vnum]
+OLC_MODULE(olc_wordcount) {
+	char temp[256], arg[MAX_INPUT_LENGTH];
+	any_vnum from_vnum = NOTHING, to_vnum = NOTHING;
+	bool found_from = FALSE, found_to = FALSE;
+	int count, wordcount, total, totalwords, iter;
+	adv_data *whole_adv = NULL;
+	
+	skip_spaces(&argument);
+	
+	// allow - or : before the first space
+	for (iter = 0; iter < strlen(argument); ++iter) {
+		if (argument[iter] == '-' || argument[iter] == ':') {
+			argument[iter] = ' ';
+		}
+		else if (argument[iter] == ' ') {
+			break;
+		}
+	}
+	
+	// process argument
+	while (*argument) {
+		argument = any_one_arg(argument, arg);
+		
+		// first argument must be a "from" vnum
+		if (!found_from) {
+			if (!isdigit(*arg)) {
+				msg_to_char(ch, "Invalid vnum.\r\n");
+				return;
+			}
+			from_vnum = atoi(arg);
+			found_from = TRUE;
+			continue;
+		}
+		
+		if (!found_to && isdigit(*arg)) {
+			to_vnum = atoi(arg);
+			found_to = TRUE;
+			continue;
+		}
+		
+		// other types of args:
+		// - none
+		
+		// reached an error
+		msg_to_char(ch, "Usage: wordcount <from vnum> [to vnum]\r\n");
+		return;
+	}
+	
+	if (!found_from) {	// no useful args
+		msg_to_char(ch, "Usage: list <from vnum> [to vnum]\r\n");
+		return;
+	}
+	else if (from_vnum < 0) {
+		msg_to_char(ch, "Invalid vnum range.\r\n");
+		return;
+	}
+	
+	// 2nd vnum optional
+	if (to_vnum == NOTHING) {
+		to_vnum = from_vnum;
+	}
+	
+	// special case: audit whole adventure:
+	if (to_vnum == from_vnum && type == OLC_ADVENTURE && (whole_adv = adventure_proto(from_vnum))) {
+		from_vnum = GET_ADV_START_VNUM(whole_adv);
+		to_vnum = GET_ADV_END_VNUM(whole_adv);
+	}
+	
+	// ready
+	total = totalwords = 0;
+
+	// do for each type (or just the requested type)
+	for (iter = 0; iter < NUM_OLC_TYPES; ++iter) {
+		if (!whole_adv && BIT(iter) != type) {
+			continue;	// skip type, unless doing the whole adventure
+		}
+		
+		// reset for type
+		count = wordcount = 0;
+		
+		// OLC_x:
+		switch (BIT(iter)) {
+			case OLC_ABILITY: {
+				ability_data *abil, *next_abil;
+				HASH_ITER(hh, ability_table, abil, next_abil) {
+					if (ABIL_VNUM(abil) >= from_vnum && ABIL_VNUM(abil) <= to_vnum) {
+						++count;
+						wordcount += wordcount_ability(abil);
+					}
+				}
+				break;
+			}
+			case OLC_ADVENTURE: {
+				if (whole_adv) {
+					count = 1;
+					wordcount = wordcount_adventure(whole_adv);
+				}
+				else {
+					adv_data *adv, *next_adv;
+					HASH_ITER(hh, adventure_table, adv, next_adv) {
+						if (GET_ADV_VNUM(adv) >= from_vnum && GET_ADV_VNUM(adv) <= to_vnum) {
+							++count;
+							wordcount += wordcount_adventure(adv);
+						}
+					}
+				}
+				break;
+			}
+			case OLC_ARCHETYPE: {
+				archetype_data *arch, *next_arch;
+				HASH_ITER(hh, archetype_table, arch, next_arch) {
+					if (GET_ARCH_VNUM(arch) >= from_vnum && GET_ARCH_VNUM(arch) <= to_vnum) {
+						++count;
+						wordcount += wordcount_archetype(arch);
+					}
+				}
+				break;
+			}
+			case OLC_AUGMENT: {
+				struct augment_data *aug, *next_aug;
+				HASH_ITER(hh, augment_table, aug, next_aug) {
+					if (GET_AUG_VNUM(aug) >= from_vnum && GET_AUG_VNUM(aug) <= to_vnum) {
+						++count;
+						wordcount += wordcount_augment(aug);
+					}
+				}
+				break;
+			}
+			case OLC_BOOK: {
+				book_data *book, *next_book;
+				HASH_ITER(hh, book_table, book, next_book) {
+					if (book->vnum >= from_vnum && book->vnum <= to_vnum) {
+						++count;
+						wordcount += wordcount_book(book);
+					}
+				}
+				break;
+			}
+			case OLC_BUILDING: {
+				bld_data *bld, *next_bld;
+				HASH_ITER(hh, building_table, bld, next_bld) {
+					if (GET_BLD_VNUM(bld) >= from_vnum && GET_BLD_VNUM(bld) <= to_vnum) {
+						++count;
+						wordcount += wordcount_building(bld);
+					}
+				}
+				break;
+			}
+			case OLC_CLASS: {
+				class_data *cls, *next_cls;
+				HASH_ITER(hh, class_table, cls, next_cls) {
+					if (CLASS_VNUM(cls) >= from_vnum && CLASS_VNUM(cls) <= to_vnum) {
+						++count;
+						wordcount += wordcount_class(cls);
+					}
+				}
+				break;
+			}
+			case OLC_CRAFT: {
+				craft_data *craft, *next_craft;
+				HASH_ITER(hh, craft_table, craft, next_craft) {
+					if (GET_CRAFT_VNUM(craft) >= from_vnum && GET_CRAFT_VNUM(craft) <= to_vnum) {
+						++count;
+						wordcount += wordcount_craft(craft);
+					}
+				}
+				break;
+			}
+			case OLC_CROP: {
+				crop_data *crop, *next_crop;
+				HASH_ITER(hh, crop_table, crop, next_crop) {
+					if (GET_CROP_VNUM(crop) >= from_vnum && GET_CROP_VNUM(crop) <= to_vnum) {
+						++count;
+						wordcount += wordcount_crop(crop);
+					}
+				}
+				break;
+			}
+			case OLC_EVENT: {
+				event_data *event, *next_event;
+				HASH_ITER(hh, event_table, event, next_event) {
+					if (EVT_VNUM(event) >= from_vnum && EVT_VNUM(event) <= to_vnum) {
+						++count;
+						wordcount += wordcount_event(event);
+					}
+				}
+				break;
+			}
+			case OLC_FACTION: {
+				faction_data *fct, *next_fct;
+				HASH_ITER(hh, faction_table, fct, next_fct) {
+					if (FCT_VNUM(fct) >= from_vnum && FCT_VNUM(fct) <= to_vnum) {
+						++count;
+						wordcount += wordcount_faction(fct);
+					}
+				}
+				break;
+			}
+			case OLC_GENERIC: {
+				generic_data *gen, *next_gen;
+				HASH_ITER(hh, generic_table, gen, next_gen) {
+					if (GEN_VNUM(gen) >= from_vnum && GEN_VNUM(gen) <= to_vnum) {
+						++count;
+						wordcount += wordcount_generic(gen);
+					}
+				}
+				break;
+			}
+			case OLC_GLOBAL: {
+				struct global_data *glb, *next_glb;
+				HASH_ITER(hh, globals_table, glb, next_glb) {
+					if (GET_GLOBAL_VNUM(glb) >= from_vnum && GET_GLOBAL_VNUM(glb) <= to_vnum) {
+						++count;
+						wordcount += wordcount_global(glb);
+					}
+				}
+				break;
+			}
+			case OLC_MOBILE: {
+				char_data *mob, *next_mob;
+				HASH_ITER(hh, mobile_table, mob, next_mob) {
+					if (GET_MOB_VNUM(mob) >= from_vnum && GET_MOB_VNUM(mob) <= to_vnum) {
+						++count;
+						wordcount += wordcount_mobile(mob);
+					}
+				}
+				break;
+			}
+			case OLC_MORPH: {
+				morph_data *morph, *next_morph;
+				HASH_ITER(hh, morph_table, morph, next_morph) {
+					if (MORPH_VNUM(morph) >= from_vnum && MORPH_VNUM(morph) <= to_vnum) {
+						++count;
+						wordcount += wordcount_morph(morph);
+					}
+				}
+				break;
+			}
+			case OLC_OBJECT: {
+				obj_data *obj, *next_obj;
+				HASH_ITER(hh, object_table, obj, next_obj) {
+					if (GET_OBJ_VNUM(obj) >= from_vnum && GET_OBJ_VNUM(obj) <= to_vnum) {
+						++count;
+						wordcount += wordcount_object(obj);
+					}
+				}
+				break;
+			}
+			case OLC_PROGRESS: {
+				progress_data *prg, *next_prg;
+				HASH_ITER(hh, progress_table, prg, next_prg) {
+					if (PRG_VNUM(prg) >= from_vnum && PRG_VNUM(prg) <= to_vnum) {
+						++count;
+						wordcount += wordcount_progress(prg);
+					}
+				}
+				break;
+			}
+			case OLC_QUEST: {
+				quest_data *quest, *next_quest;
+				HASH_ITER(hh, quest_table, quest, next_quest) {
+					if (QUEST_VNUM(quest) >= from_vnum && QUEST_VNUM(quest) <= to_vnum) {
+						++count;
+						wordcount += wordcount_quest(quest);
+					}
+				}
+				break;
+			}
+			case OLC_ROOM_TEMPLATE: {
+				room_template *rmt, *next_rmt;
+				HASH_ITER(hh, room_template_table, rmt, next_rmt) {
+					if (GET_RMT_VNUM(rmt) >= from_vnum && GET_RMT_VNUM(rmt) <= to_vnum) {
+						++count;
+						wordcount += wordcount_room_template(rmt);
+					}
+				}
+				break;
+			}
+			case OLC_SECTOR: {
+				sector_data *sect, *next_sect;
+				HASH_ITER(hh, sector_table, sect, next_sect) {
+					if (GET_SECT_VNUM(sect) >= from_vnum && GET_SECT_VNUM(sect) <= to_vnum) {
+						++count;
+						wordcount += wordcount_sector(sect);
+					}
+				}
+				break;
+			}
+			case OLC_SHOP: {
+				shop_data *shop, *next_shop;
+				HASH_ITER(hh, shop_table, shop, next_shop) {
+					if (SHOP_VNUM(shop) >= from_vnum && SHOP_VNUM(shop) <= to_vnum) {
+						++count;
+						wordcount += wordcount_shop(shop);
+					}
+				}
+				break;
+			}
+			case OLC_SKILL: {
+				skill_data *skill, *next_skill;
+				HASH_ITER(hh, skill_table, skill, next_skill) {
+					if (SKILL_VNUM(skill) >= from_vnum && SKILL_VNUM(skill) <= to_vnum) {
+						++count;
+						wordcount += wordcount_skill(skill);
+					}
+				}
+				break;
+			}
+			case OLC_SOCIAL: {
+				social_data *soc, *next_soc;
+				HASH_ITER(hh, social_table, soc, next_soc) {
+					if (SOC_VNUM(soc) >= from_vnum && SOC_VNUM(soc) <= to_vnum) {
+						++count;
+						wordcount += wordcount_social(soc);
+					}
+				}
+				break;
+			}
+			case OLC_TRIGGER: {
+				trig_data *trig, *next_trig;
+				HASH_ITER(hh, trigger_table, trig, next_trig) {
+					if (GET_TRIG_VNUM(trig) >= from_vnum && GET_TRIG_VNUM(trig) <= to_vnum) {
+						++count;
+						wordcount += wordcount_trigger(trig);
+					}
+				}
+				break;
+			}
+			case OLC_VEHICLE: {
+				vehicle_data *veh, *next_veh;
+				HASH_ITER(hh, vehicle_table, veh, next_veh) {
+					if (VEH_VNUM(veh) >= from_vnum && VEH_VNUM(veh) <= to_vnum) {
+						++count;
+						wordcount += wordcount_vehicle(veh);
+					}
+				}
+				break;
+			}
+		}
+		
+		if (count > 0 || !whole_adv) {
+			sprintbit(BIT(iter), olc_type_bits, temp, FALSE);
+			msg_to_char(ch, "%d %s%s: %d word%s\r\n", count, temp, PLURAL(count), wordcount, PLURAL(wordcount));
+		}
+		total += count;
+		totalwords += wordcount;
+	}
+	
+	if (whole_adv) {
+		msg_to_char(ch, "Total: %d thing%s, %d word%s\r\n", total, PLURAL(total), totalwords, PLURAL(totalwords));
 	}
 }
 
@@ -8286,4 +8644,69 @@ bool validate_icon(char *icon) {
 	else {
 		return TRUE;
 	}
+}
+
+ //////////////////////////////////////////////////////////////////////////////
+//// WORD COUNT TOOLS ////////////////////////////////////////////////////////
+
+/**
+* Counts the number of words in all custom messages.
+*
+* @param struct custom_message *list The list of custom messages.
+* @return int The number of words in all custom messages.
+*/
+int wordcount_custom_messages(struct custom_message *list) {
+	struct custom_message *iter;
+	int count = 0;
+	
+	LL_FOREACH(list, iter) {
+		count += wordcount_string(iter->msg);
+	}
+	
+	return count;
+}
+
+
+/**
+* Counts the number of words in all extra descriptions.
+*
+* @param struct extra_descr_data *list The list of extra descriptions.
+* @return int The number of words in all extra descriptions.
+*/
+int wordcount_extra_descriptions(struct extra_descr_data *list) {
+	struct extra_descr_data *iter;
+	int count = 0;
+	
+	LL_FOREACH(list, iter) {
+		count += wordcount_string(iter->keyword);
+		count += wordcount_string(iter->description);
+	}
+	
+	return count;
+}
+
+
+/**
+* Counts the number of words in a string, separated by whitespace. Only words
+* containing alpha/numeric characters are counted; pure punctuation is ignored.
+*
+* @param const char *string The string to count words in.
+* @return int The number of words in the string.
+*/
+int wordcount_string(const char *string) {
+	int pos, count = 0;
+	bool counted_word = FALSE;
+	
+	if (string) {
+		for (pos = 0; string[pos]; ++pos) {
+			if (isspace(string[pos]) && string[pos+1] && !isspace(string[pos+1])) {
+				counted_word = FALSE;
+			}
+			else if (!counted_word && (isalpha(string[pos]) || isdigit(string[pos]))) {
+				++count;
+				counted_word = TRUE;
+			}
+		}
+	}
+	return count;
 }

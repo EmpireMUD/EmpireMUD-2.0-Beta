@@ -640,6 +640,22 @@ craft_data *setup_olc_craft(craft_data *input) {
 }
 
 
+/**
+* Counts the words of text in a craft's strings.
+*
+* @param craft_data *craft The craft whose strings to count.
+* @return int The number of words in the craft's strings.
+*/
+int wordcount_craft(craft_data *craft) {
+	int count = 0;
+	
+	count += wordcount_string(GET_CRAFT_NAME(craft));
+	
+	return count;
+}
+
+
+
  //////////////////////////////////////////////////////////////////////////////
 //// DISPLAYS ////////////////////////////////////////////////////////////////
 

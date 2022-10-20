@@ -477,10 +477,11 @@ converted into a mess hall for the tower's bedraggled wizards. Written in an
 elegant, flowing script, the board reads:
 
                           == Cafe Fendreciel ==
-                      Skycleaver Coffee..........25
-                      Violet Skycleaver Wine.....50
-                      Mutton Pasty..............100
-                      Turquoise Cheese..........100
+                      Skycleaver Coffee..........99
+                      Camolometer Tea...........125
+                      Violet Skycleaver Wine....199
+                      Mutton Pasty..............125
+                      Turquoise Cheese..........125
 ~
 E
 bar cups bowls plates mess~
@@ -529,7 +530,7 @@ walls~
 The paneled black walls are made from ebony.
 ~
 E
-chalkboard blackboard writing~
+chalkboard blackboard writing words~
    In an orderly grid, yet in almost completely incomprehensible writing, what
 looks like a bunch of names with numbers next to them cover the slate. Perhaps
 this is some sort of attempt to organize who sleeps where, and when. In all
@@ -948,6 +949,10 @@ of iridescent abalone shell. Her hair is gray-white and braided back. Her robes
 are deep purple and many-layered. Her staff is rough wood with a green gem,
 perhaps jade, on the end. A mustache has been drawn on her face in crude
 charcoal. The nameplate is missing from the bottom of the portrait.
+~
+E
+plates nameplates~
+There are nameplates under the portraits.
 ~
 S
 #11812
@@ -1479,6 +1484,10 @@ cg 0 0
 D1
 ~
 0 11826
+E
+plates nameplates~
+There are nameplates under the portraits.
+~
 E
 southeast se~
    It looks like there might be a secret passage hidden in the wall... You
@@ -2445,7 +2454,7 @@ D3
 ~
 0 11837
 E
-blackboard board slate projects instructions~
+blackboard board slate projects instructions doom message~
 The blackboard just says, in large letters:
 
                   DOOOOOOOOOOOOOOM
@@ -2616,7 +2625,7 @@ which disturbs the pattern of light when you look at it just right. Centered in
 the wavering area is an unusual painting.
 ~
 E
-painting bagel visuals~
+painting picture bagel visuals~
 You examine the painting on the wavering wall:
    The upper section of this painting is three people standing around a platter
 made of a silvery metal. The first man looks like a disapproving old mentor.
@@ -2627,6 +2636,14 @@ drooling. The bagel itself is sliced cleanly into an upper and lower half with
 the upper half set askew to expose the fluffy inside. The top of the bagel is
 sprinkled with seeds, flakes, and a fine greenish-white dust. Set beside it are
 small tubs of various condiments. At the bottom, the nameplate says:
+
+                  +---------------------------------+
+                  |   'Behold, Everything Bagel!'   |
+                  +---------------------------------+
+~
+E
+plate nameplate~
+The nameplate below the painting says:
 
                   +---------------------------------+
                   |   'Behold, Everything Bagel!'   |
@@ -2666,6 +2683,35 @@ The north door leads back out onto the walkway.
 E
 floors down~
 The gray slate floor is scattered with piles of household items.
+~
+E
+doorstops stops~
+   There's a fairly unremarkable metal doorstop next to each of the two doors.
+When you pick one up to look at it, it seems a little squeaky.
+~
+E
+fans~
+Fans made of wood and paper are stacked haphazardly on one table.
+~
+E
+rubbish~
+If we're being honest, everything in here looks like rubbish.
+~
+E
+mouse mice~
+You think you see a mouse dart from one pile of rubbish to the next!
+~
+E
+cobwebs webs~
+Cobwebs fill every spare corner and decorate every table.
+~
+E
+dust~
+There's dust on everything.
+~
+E
+toasters~
+There are a bunch of old iron toasters -- the type you set next to the fire.
 ~
 T 11926
 T 11927
@@ -2733,6 +2779,11 @@ tortoise turtle three-legged~
 least, something that resembles one. It appears to be made from small stone
 blocks, with a flat top that could hold objects if it could stand up straight.
 It appears to be missing its fourth leg.
+~
+E
+lenses glass array~
+   Some of the workbenches have an array of glass lenses that seem to magnify
+items placed under them.
 ~
 M 1 11839 100.00 2
 S
@@ -2804,6 +2855,10 @@ D9
 ~
 0 11934
 E
+offices~
+This floor contains the offices of the high sorcerers.
+~
+E
 books papers debris~
    Books, papers, and debris are strewn along the walkway. Someone was looking
 for something, or perhaps just throwing books.
@@ -2847,7 +2902,7 @@ down through the center of the chamber. The door handles, too, are made from
 the rare metal. This price of this tower must have been astronomical.
 ~
 E
-railing handrail chandelier tree trunk~
+railing handrail chandelier tree trunk sculpture~
    The striped handrail curves around the walkway that hugs the wall of the
 grand chamber. Across the railing, the trunk of the grand chandelier twists
 downward. Looking over the rail, you see that it branches out into an inverted
@@ -2955,7 +3010,7 @@ down through the center of the chamber. The door handles, too, are made from
 the rare metal. This price of this tower must have been astronomical.
 ~
 E
-railing handrail chandelier tree trunk~
+railing handrail chandelier tree trunk sculpture~
    The striped handrail curves around the walkway that hugs the wall of the
 grand chamber. Across the railing, the trunk of the grand chandelier twists
 downward. Looking over the rail, you see that it branches out into an inverted
@@ -2970,7 +3025,7 @@ of the tower's high masters, and it is from here that they look down on the
 apprentices below.
 ~
 E
-doorway south~
+doorway south office~
    The lock is broken and the door frame splintered on the wooden door that
 leads to a high sorcerer's office.
 ~
@@ -3051,7 +3106,7 @@ perhaps by the same thing that left the ashy scorch across its once-polished
 ebony facade.
 ~
 E
-scorc-hmark~
+scorch-mark scorchmark mark~
 There is a large scorch-mark across the door that's lying on the ground.
 ~
 E
@@ -3144,7 +3199,7 @@ countless tiny flames on its branches that light the floors below. Below it,
 you can see all the way down to the fountain on the ground level.
 ~
 E
-doorway east~
+doorway east office~
 The office is labeled 'High Sorcerer Barrosh'.
 ~
 S
@@ -3203,7 +3258,7 @@ outside the office door. Filigree work along the sides gives them an uncommon
 look that was certainly ludicrously expensive.
 ~
 E
-doorway double-door wide north~
+doorway double-door wide north office~
 The doors to the head office are open, but it's too dark to see inside.
 ~
 E
@@ -3728,6 +3783,10 @@ bread to huge, towering ones that provide much shade. Every time you glance at
 the shrubs they seem to be in a slightly different position than before and you
 could almost swear that you can see them move if you watch, though they seem
 rooted in place.
+~
+E
+trees~
+Shade trees around the top of the tower make this the perfect spot to sit.
 ~
 E
 unicorn~
@@ -4730,6 +4789,10 @@ back out.
 E
 sap~
 Chunks of dried, crystallized sap are poking through rotten bits of wood.
+~
+E
+splinters tiny~
+Bits of splintered, rotten wood lie all over the hollow.
 ~
 M 0 11887 100.00 1
 M 0 11886 100.00 1

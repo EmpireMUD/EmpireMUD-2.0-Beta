@@ -918,6 +918,34 @@ trig_data *setup_olc_trigger(trig_data *input, char **cmdlist_storage) {
 }
 
 
+/**
+* Counts the words of text in a trigger's strings.
+*
+* @param trigger_data *trig The trigger whose strings to count.
+* @return int The number of words in the trigger's strings.
+*/
+int wordcount_trigger(trig_data *trig) {
+	int count = 0, iter;
+	struct cmdlist_element *cmd;
+	
+	const char *accept_list[] = { "%echo", "%send%", "%mod%", "%regionecho", "%vehicleecho", "%buildingecho", "say ", "emote ", "shout ", "\n" };
+	
+	count += wordcount_string(GET_TRIG_NAME(trig));
+	count += wordcount_string(GET_TRIG_ARG(trig));
+	
+	LL_FOREACH(trig->cmdlist, cmd) {
+		for (iter = 0; *accept_list[iter] != '\n'; ++iter) {
+			if (cmd->cmd && strstr(cmd->cmd, accept_list[iter])) {
+				count += wordcount_string(cmd->cmd) - 1;
+				break;
+			}
+		}
+	}
+	
+	return count;
+}
+
+
  //////////////////////////////////////////////////////////////////////////////
 //// DISPLAYS ////////////////////////////////////////////////////////////////
 

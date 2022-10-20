@@ -994,7 +994,7 @@ typedef struct vehicle_data vehicle_data;
 #define AFF_EARTHMELD  BIT(24)	// y. interred in the earth
 #define AFF_MUMMIFY  BIT(25)	// z. mummified
 #define AFF_SOULMASK  BIT(26)	// A. soulmask
-	#define AFF_UNUSED  BIT(27)	// B. formerly !natural-magic
+#define AFF_NO_TRACKS  BIT(27)	// B. leaves no tracks
 #define AFF_IMMUNE_POISON_DEBUFFS  BIT(28)	// C. Immune to any 'poison' debuffs
 #define AFF_IMMUNE_MENTAL_DEBUFFS  BIT(29)	// D. Immune to any 'mental' debuffs
 #define AFF_IMMUNE_STUN  BIT(30)	// E. Cannot be hit by stun effects
@@ -1661,6 +1661,75 @@ typedef struct vehicle_data vehicle_data;
 #define MOB_MOVE_SHUFFLES  34
 #define MOB_MOVE_MARCHES  35
 #define MOB_MOVE_SWEEPS  36
+#define MOB_MOVE_BARGES  37
+#define MOB_MOVE_BOLTS  38
+#define MOB_MOVE_CHARGES  39
+#define MOB_MOVE_CLAMBERS  40
+#define MOB_MOVE_COASTS  41
+#define MOB_MOVE_DARTS  42
+#define MOB_MOVE_DASHES  43
+#define MOB_MOVE_DRAWS  44
+#define MOB_MOVE_FLITS  45
+#define MOB_MOVE_GLIDES  46
+#define MOB_MOVE_GOES  47
+#define MOB_MOVE_HIKES  48
+#define MOB_MOVE_HOBBLES  49
+#define MOB_MOVE_HURRIES  50
+#define MOB_MOVE_INCHES  51
+#define MOB_MOVE_JOGS  52
+#define MOB_MOVE_JOURNEYS  53
+#define MOB_MOVE_JUMPS  54
+#define MOB_MOVE_LEAPS  55
+#define MOB_MOVE_LIMPS  56
+#define MOB_MOVE_LURCHES  57
+#define MOB_MOVE_MEANDERS  58
+#define MOB_MOVE_MOSEYS  59
+#define MOB_MOVE_PARADES  60
+#define MOB_MOVE_PLODS  61
+#define MOB_MOVE_PRANCES  62
+#define MOB_MOVE_PROWLS  63
+#define MOB_MOVE_RACES  64
+#define MOB_MOVE_ROAMS  65
+#define MOB_MOVE_ROMPS  66
+#define MOB_MOVE_ROVES  67
+#define MOB_MOVE_RUSHES  68
+#define MOB_MOVE_SASHAYS  69
+#define MOB_MOVE_SAUNTERS  70
+#define MOB_MOVE_SCAMPERS  71
+#define MOB_MOVE_SCOOTS  72
+#define MOB_MOVE_SCRAMBLES  73
+#define MOB_MOVE_SCUTTERS  74
+#define MOB_MOVE_SIDLES  75
+#define MOB_MOVE_SKIPS  76
+#define MOB_MOVE_SKULKS  77
+#define MOB_MOVE_SLEEPWALKS  78
+#define MOB_MOVE_SLINKS  79
+#define MOB_MOVE_SLOGS  80
+#define MOB_MOVE_SNEAKS  81
+#define MOB_MOVE_STAGGERS  82
+#define MOB_MOVE_STOMPS  83
+#define MOB_MOVE_STREAKS  84
+#define MOB_MOVE_STRIDES  85
+#define MOB_MOVE_STROLLS  86
+#define MOB_MOVE_STRUTS  87
+#define MOB_MOVE_STUMBLES  88
+#define MOB_MOVE_SWIMS  89
+#define MOB_MOVE_TACKS  90
+#define MOB_MOVE_TEARS  91
+#define MOB_MOVE_TIPTOES  92
+#define MOB_MOVE_TODDLES  93
+#define MOB_MOVE_TOTTERS  94
+#define MOB_MOVE_TRAIPSES  95
+#define MOB_MOVE_TRAMPS  96
+#define MOB_MOVE_TRAVELS  97
+#define MOB_MOVE_TREKS  98
+#define MOB_MOVE_TRUDGES  99
+#define MOB_MOVE_VAULTS  100
+#define MOB_MOVE_WADES  101
+#define MOB_MOVE_WANDERS  102
+#define MOB_MOVE_WHIZZES  103
+#define MOB_MOVE_ZIGZAGS  104
+#define MOB_MOVE_ZOOMS  105
 
 
 // NAMES_x: name sets: add matching files in lib/text/names/
@@ -1841,8 +1910,8 @@ typedef enum {
 #define OBJ_CUSTOM_BUILD_TO_ROOM  1
 #define OBJ_CUSTOM_INSTRUMENT_TO_CHAR  2
 #define OBJ_CUSTOM_INSTRUMENT_TO_ROOM  3
-#define OBJ_CUSTOM_EAT_TO_CHAR  4
-#define OBJ_CUSTOM_EAT_TO_ROOM  5
+#define OBJ_CUSTOM_CONSUME_TO_CHAR  4
+#define OBJ_CUSTOM_CONSUME_TO_ROOM  5
 #define OBJ_CUSTOM_CRAFT_TO_CHAR  6
 #define OBJ_CUSTOM_CRAFT_TO_ROOM  7
 #define OBJ_CUSTOM_WEAR_TO_CHAR  8
@@ -2822,6 +2891,7 @@ typedef enum {
 #define ROOM_AFF_NO_WORKFORCE_EVOS  BIT(22)	// w. workforce chores that would evolve the tile don't run
 #define ROOM_AFF_HIDE_REAL_NAME  BIT(23)	// x. won't show the real name after a custom name, like Ruins of a House (Ruins)
 #define ROOM_AFF_MAPOUT_BUILDING  BIT(24)	// y. shows as a building on the mapout (set automatically)
+#define ROOM_AFF_NO_TRACKS  BIT(25)		// z. nobody leaves tracks and you cannot track
 // NOTE: limit BIT(31) -- This is currently an unsigned int, to save space since there are a lot of rooms in the world
 
 

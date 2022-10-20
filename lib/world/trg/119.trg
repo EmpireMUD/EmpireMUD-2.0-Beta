@@ -129,6 +129,19 @@ end
 * mark time for despawn trig
 set loadtime %timestamp%
 remote loadtime %self.id%
+* custom text
+if %self.vnum% == 11837 && %self.room.template% == 11910
+  %mod% %self% append-lookdesc-noformat &0   The black tower houses many of the most erudite sorcerers from across the
+  %mod% %self% append-lookdesc-noformat world, though their admission standards are not as high as one might expect.
+  %mod% %self% append-lookdesc-noformat Indeed, the tower is often willing to take on any eager apprentice. Some can
+  %mod% %self% append-lookdesc-noformat be molded into powerful magic users. Others, unfortunately, wash out.
+elseif %self.vnum% == 11837 && %self.room.template% == 11930
+  %mod% %self% append-lookdesc-noformat &0   The Tower Skycleave is kept spotless at all times by the many apprentices
+  %mod% %self% append-lookdesc-noformat who have come seeking power. The beauty and perfection of the tower are of such
+  %mod% %self% append-lookdesc-noformat importance to the high sorcerers that they sometimes recruit more students than
+  %mod% %self% append-lookdesc-noformat they need. The brightest ones rise to the top, while the rest are given their
+  %mod% %self% append-lookdesc-noformat walking papers.
+end
 ~
 #11903
 Spirit of Skycleave setup~
@@ -1967,14 +1980,15 @@ end
 * check for existing tracks in that dir, and bump the new ones up in the list
 set iter %room.contents(11930)%
 while %iter%
+  set next %iter.next_in_list%
   if %iter.vnum% == 11930
     if %iter.direction% == %direction%
-      * found match: teleport to same room to bump them up in the list
-      %teleport% %iter% %room%
-      halt
+      * found match: purge it to put a fresh one at the top
+      %purge% %iter%
+      * formerly: %teleport% %iter% %room%
     end
   end
-  set iter %iter.next_in_list%
+  set iter %next%
 done
 * Success: has breadcrumbs item, is a player, and there are no crumbs in the room
 %load% obj 11930
@@ -1997,7 +2011,6 @@ end
 %load% mob 11928
 set mob %room.people%
 if %mob.vnum% == 11928
-  dg_affect %mob% !ATTACK on -1
   if %room.varexists(spawned)%
     eval spawned %room.spawned% + 1
   else
@@ -2073,9 +2086,9 @@ done
 * ensure a player has loot permission
 if %actor.is_pc% && %actor.level% >= %min_level% && %self.is_tagged_by(%actor%)%
   set varname pc%actor.id%
-  if %room.var(%varname%,0)% < %pos%
+  if %room.var(%varname%,0)% < 1
     * actor qualifies
-    set %varname% %pos%
+    set %varname% 1
     remote %varname% %room.id%
     nop %self.remove_mob_flag(!LOOT)%
     set any_ok 1
@@ -2086,9 +2099,9 @@ set ch %room.people%
 while %ch% && !%any_ok%
   if %ch.is_pc% && %ch.level% >= %min_level% && %self.is_tagged_by(%ch%)%
     set varname pc%ch.id%
-    if %room.var(%varname%,0)% < %pos%
+    if %room.var(%varname%,0)% < 1
       * ch qualifies
-      set %varname% %pos%
+      set %varname% 1
       remote %varname% %room.id%
       nop %self.remove_mob_flag(!LOOT)%
       set any_ok 1
@@ -2173,33 +2186,50 @@ Skycleave: Janitor cleanup service~
 ~
 set purge_list 1000 11929 11930
 wait 2 sec
+set done 0
 set obj %self.room.contents%
-while %obj%
+while %obj% && !%done%
   set next_obj %obj.next_in_list%
   if %purge_list% ~= %obj.vnum%
     %echo% ~%self% cleans up @%obj%.
     nop %obj.empty%
     %purge% %obj%
+    set done 1
   end
   set obj %next_obj%
 done
+if !%done% && %self.vnum% == 11837
+  * didn't find any?
+  %echo% The swarm of rags scatters, with each rag tucking itself away out of sight.
+  %purge% %self%
+end
 ~
 #11935
-Skycleave: Detect quest interaction~
+Skycleave: Detect look interaction~
 0 c 0
 look~
 return 0
 * detects looking at character
 if %actor.char_target(%arg.car%)% == %self%
-  if %actor.on_quest(11801)%
-    %quest% %actor% trigger 11801
-  end
+  * looking at me
+  switch %self.vnum%
+    case 11933
+      * the mop / Dylane Jr
+      if %actor.on_quest(11801)%
+        %quest% %actor% trigger 11801
+      end
+    break
+  done
+elseif %self.vnum% == 11888 && %arg% == knezz
+  * Iskip of Rot and Ruin easter egg
+  %send% %actor% You can't get a good look at him from down here.
+  return 1
 end
 ~
 #11936
-Skycleave: Room commands (Lich Labs, Goblin Cages, Gate)~
+Skycleave: Room commands (Lich Labs, Goblin Cages, Gate, Ossuary)~
 2 c 0
-touch open disturb wake awaken search attune~
+touch open disturb wake awaken search attune look~
 set lich_cmds touch open disturb wake awaken search
 return 0
 if attune /= %cmd% && %room.template% == 11841
@@ -2240,6 +2270,16 @@ elseif (%lich_cmds% ~= %cmd%) && (%room.template% == 11836 || %room.template% ==
     done
     %echo% The spirit returns to the desk, which slams shut with a thud!
   end
+elseif look /= %cmd% && %room.template% == 11981
+  return 0
+  wait 0
+  if skulls /= %arg% || shelves /= %arg%
+    %force% %actor% scriptwake skulls
+  elseif walls /= %arg% || alcoves /= %arg%
+    %force% %actor% scriptwake alcoves
+  elseif bones /= %arg% || ribs /= %arg% || femurs /= %arg% || piles /= %arg%
+    %force% %actor% scriptwake bones
+  end
 end
 ~
 #11937
@@ -2247,7 +2287,20 @@ Skycleave: Gossipping pages~
 0 bw 50
 ~
 set spirit %instance.mob(11900)%
-* find a random human to speak to
+* page sheila: chance to jump the no-mob barrier
+if %self.vnum% == 11959 && %self.var(barrier_jump,0)% + 120 < %timestamp%
+  if %self.room.template% == 11961
+    northeast
+    set barrier_jump %timestamp%
+    remote barrier_jump %self.id%
+    halt
+  elseif %self.room.template% == 11963
+    southeast
+    set barrier_jump %timestamp%
+    remote barrier_jump %self.id%
+    halt
+  end
+end
 set count 0
 set target 0
 while %count% < 10 && !%target%
@@ -2439,7 +2492,7 @@ attune~
 * attunes skystones for the user
 set allow_list 11900 11899 10036 10037
 * targeting
-set obj %actor.obj_target_inv(%arg%)%
+set obj %actor.obj_target_inv(%arg.car%)%
 if !%arg%
   %send% %actor% Which stone you like to attune?
   halt
@@ -2479,6 +2532,9 @@ if %skystone_progress% > %skystone_finished%
   nop %actor.give_currency(11900,1)%
   eval skystone_progress 0
   eval skystone_finished %skystone_finished% + 1
+  if %actor.on_quest(11942)%
+    %quest% %actor% trigger 11942
+  end
 else
   * 'failure' -- it will take more
   %send% %actor% You feel stronger as the glow from the stone passes into you, but the skystone goes dark.
@@ -2552,6 +2608,7 @@ Iskip: Only drops loot for unique fighters~
 * Iskip only loses his !LOOT flag if a unique person over min_level has tagged him
 set room %self.room%
 set min_level 150
+set done 0
 if %actor.is_pc% && %actor.level% >= %min_level% && %self.is_tagged_by(%actor%)%
   set varname pc%actor.id%
   if !%room.var(%varname%,0)%
@@ -2559,12 +2616,12 @@ if %actor.is_pc% && %actor.level% >= %min_level% && %self.is_tagged_by(%actor%)%
     set %varname% %dailycycle%
     remote %varname% %room.id%
     nop %self.remove_mob_flag(!LOOT)%
-    halt
+    set done 1
   end
 end
 * actor didn't qualify -- find anyone present who does
 set ch %room.people%
-while %ch%
+while %ch% && !%done%
   if %ch.is_pc% && %ch.level% >= %min_level% && %self.is_tagged_by(%ch%)%
     set varname pc%ch.id%
     if !%room.var(%varname%,0)%
@@ -2572,11 +2629,18 @@ while %ch%
       set %varname% %dailycycle%
       remote %varname% %room.id%
       nop %self.remove_mob_flag(!LOOT)%
-      halt
+      set done 1
     end
   end
   set ch %ch.next_in_room%
 done
+* and message
+if %self.mob_flagged(!LOOT)%
+  %echo% The giant, Iskip, turns to ash as he falls and blows away on the breeze.
+else
+  %echo% The giant, Iskip, turns to ash as he falls, dropping some items on the stump as he blows away on the breeze.
+end
+return 0
 ~
 #11942
 Iskip: Re-spawn boss when new player arrives~
@@ -2808,14 +2872,14 @@ end
 #11945
 Skycleave Dreams: Triple Wake or Pinch Self to Exit~
 2 c 0
-wake pinch~
+wake pinch scriptwake~
 * Teleports the player home if they type 'wake' 3 times while already awake
-* also accepts 'pinch <me/self/name>'
+* also accepts 'pinch <me/self/name>' or 'scriptwake MODE'
 if !%actor.is_pc%
   return 0
   halt
 end
-if %actor.position% == Standing || %actor.position% == Resting || %actor.position% == Sitting
+if %actor.position% == Standing || %actor.position% == Resting || %actor.position% == Sitting || %cmd% == scriptwake
   * separate behavior for pinch vs wake:
   if %cmd.mudcommand% == wake
     * 'wake': first two times fail
@@ -2835,7 +2899,7 @@ if %actor.position% == Standing || %actor.position% == Resting || %actor.positio
       %send% %actor% You wake up with the hazy feeling you were just somewhere else.
       %echoaround% %actor% ~%actor% lets out a snore and then fades away until &%actor% vanishes!
     end
-  else
+  elseif pinch /= %cmd%
     * 'pinch': must target self/me/name
     if !%arg% || (%arg% != me && %arg% != self && %actor.char_target(%arg%)% != %actor%)
       * if they aren't pinching themselves, let the pinch social handle it
@@ -2845,6 +2909,28 @@ if %actor.position% == Standing || %actor.position% == Resting || %actor.positio
       %send% %actor% You pinch yourself -- OUCH -- and suddenly wake up!
       %echoaround% %actor% ~%actor% pinches *%actor%self, lets out a short gasp, and vanishes!
     end
+  elseif %cmd% == scriptwake
+  set scare_kws skulls shelves walls alcoves bones ribs femurs piles
+    switch %arg%
+      case skulls
+        %echoaround% %actor% ~%actor% jumps backwards, bumps into the wall, and vanishes!
+      break
+      case bones
+        %echoaround% %actor% ~%actor% falls into a pile of bones and vanishes!
+      break
+      case alcoves
+        %echoaround% %actor% ~%actor% jumps suddenly and vanishes!
+      break
+      default
+        * unknown
+        return 0
+        halt
+      break
+    done
+    %send% %actor% You wake up in a cold sweat!
+  else
+    return 0
+    halt
   end
   * If we made it this far, we teleport them:
   set room %actor.room%
@@ -3029,11 +3115,21 @@ Smol Nes-Pik: Block abilities in the jar~
 return 0
 ~
 #11952
-Smol Nes-Pik: Block look at room~
+Smol Nes-Pik: Inside the sap: catch look and skip~
 2 c 0
-look~
-if !%arg%
+look skip~
+if %cmd.mudcommand% == look && !%arg%
   %send% %actor% You can't see much of anything through the thick sap.
+  return 1
+elseif skip /= %cmd%
+  %send% %actor% You skip the cutscene.
+  if %actor.var(last_iskip_intro,0)% == %dailycycle%
+    %send% %actor% (It may take a few seconds to finish the cutscene anyway.)
+  end
+  set last_iskip_intro %dailycycle%
+  remote last_iskip_intro %actor.id%
+else
+  return 0
 end
 ~
 #11953
@@ -4569,14 +4665,18 @@ if %cmd.mudcommand% == adventure
   %send% %actor% \&0 time you want.
   %send% %actor% (type 'adventure skycleave' to see the description for the main adventure)
 elseif %cmd.mudcommand% == time
-  if %indoor_list% ~= %room.template%
+  if %room.template% == 11981
+    %send% %actor% It's hard to tell what time it is with so little light making it down here.
+  elseif %indoor_list% ~= %room.template%
     %send% %actor% It's roughly noon, with the sun streaming in through the roof.
   else
     %send% %actor% It's roughly noon, with the sun high in the sky.
   end
   return 1
 elseif %cmd.mudcommand% == weather
-  if %indoor_list% ~= %room.template%
+  if %room.template% == 11981
+    %send% %actor% It's hard to tell the weather from in here.
+  else if %indoor_list% ~= %room.template%
     %send% %actor% It's hard to tell the weather from in here, but a lot of sun is coming from above.
   else
     %send% %actor% The sky is cloudless and sunny.

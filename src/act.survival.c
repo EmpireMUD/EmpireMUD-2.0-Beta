@@ -893,6 +893,10 @@ ACMD(do_track) {
 	else if (ABILITY_TRIGGERS(ch, NULL, NULL, ABIL_TRACK)) {
 		return;
 	}
+	else if (ROOM_AFF_FLAGGED(IN_ROOM(ch), ROOM_AFF_NO_TRACKS)) {
+		msg_to_char(ch, "You can't seem to find a trail.\r\n");
+		return;
+	}
 	
 	HASH_ITER(hh, ROOM_TRACKS(IN_ROOM(ch)), track, next_track) {
 		// skip already-expired tracks

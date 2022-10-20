@@ -7,9 +7,15 @@ foul), crisps, crackers, carrots, cuts of fish and game, brightly colored
 birds, and pots set into the table that hold soup. It has an inviting aroma
 that feels like it's exactly what you need right now.
 ~
-6 0 0 0 2
+6 0 0 0 3
 1000 0 0
 7 0
+M
+4
+You eat some fruits and cheeses from the buffet.~
+M
+5
+$n samples some of the delicacies from the buffet.~
 S
 #11801
 shoes pair bustling~
@@ -105,11 +111,17 @@ a way of encouraging guests to become clients -- or even patrons. Self-filling
 vessels such as this one are difficult to find outside, however, as the
 sorcerers usually enchant them to be unpilferable.
 ~
-5 ep a 0 9
+5 ep a 0 11
 72 72 11804
 3 0
 C
 150 250
+M
+4
+You take a swig of $T from $p.~
+M
+5
+$n takes a swig from $p.~
 T 11804
 S
 #11805
@@ -666,6 +678,30 @@ A
 A
 5 1 6
 S
+#11830
+bodysuit suit otherworldly worldly~
+an otherworldly bodysuit~
+An otherwordly bodysuit is lying crumpled on the ground.~
+   The paper-thin bodysuit has the look of scale armor, with many dazzling tiny
+shapes that seem to reinforce it even if they don't make it thicker. Every
+square inch of it catches and reflects light like nothing you've ever seen!
+   The Shadow Hide found the otherworlder in the burning wreckage of a round
+metal carriage at the bottom of a steep crater. To the erudite lords of
+Skycleave, this was an unparalleled prize and it earned her high acclaim.
+~
+2 mp ad 0 7
+0 0 0
+11 0
+A
+5 1 0
+A
+5 1 6
+C
+1 1
+M
+12
+$n dazzles with an otherworldly presence.~
+S
 #11831
 ward magical shimmering~
 the magical ward~
@@ -681,7 +717,7 @@ proceeding.
 10 0
 S
 #11832
-crates wall stacked wooden~
+crates wall stacked wooden boxes~
 the wall of stacked crates~
 Wooden crates are stacked around the fountain, walling off part of the chamber.~
    A wall of crates blocks the north and west, stacked high enough that you
@@ -1360,6 +1396,28 @@ gold ink and an elegant script:
 12 0
 T 11860
 S
+#11861
+peacock golden trense~
+the Golden Peacock of Trense~
+The Golden Peacock of Trense is sitting on the ground.~
+   The peacock is nearly life-size with dozens of paper-thin, jewel-encrusted
+tail feathers fanning out over it. Every detail is molded in gold and gems,
+from the smallest feathers to the noble grimace on its beak. This is the world-
+renowned Golden Peacock, prized heirloom of Trense, envy of the seven baronies.
+   The first lords of Trense wore such bright and ostentatious silks that their
+peers accused them of peacocking. When Stane of Skour presented a stuffed
+peacock to Marquel of Trense and Lady Gorgea as a wedding gift, it was meant as
+a slight. But Lord Marquel had the bird replicated in gold and placed above the
+mantle.
+~
+15 0 a 0 1
+100 0 0
+4 0
+C
+1 1
+R
+4 5193 0
+S
 #11862
 dagger shadow~
 the shadow dagger~
@@ -1387,6 +1445,115 @@ nearby.
 0 0 0
 10 0
 T 11887
+S
+#11864
+deconfabulator mana~
+a mana deconfabulator~
+Someone has left their mana deconfabulator on the ground.~
+   The oversized device is bulky and difficult to even lift, though it isn't
+particularly heavy. It's made from striped magewood and nocturnium straps, with
+a crystal orb on one end and an eventide horn on the other. You don't see a way
+to turn it on; or, perhaps it isn't working any more.
+   flavor text tba
+~
+15 e a 0 4
+1 0 0
+2 0
+C
+150 150
+R
+4 5193 0
+S
+#11865
+condenser ether~
+an ether condenser~
+An ether condenser is humming on the ground.~
+   The odd black metal box is inscribed all over with golden letters in a
+script you don't read. It makes a low hum and is, at all times, cold to the
+touch, but you can't figure out how to open it, nor what it's doing.
+   flavor text tba
+~
+15 e a 0 4
+1 0 0
+2 0
+C
+150 150
+R
+4 5193 0
+S
+#11866
+knickknack knicknack enchanted~
+an enchanted knickknack~
+An enchanted knickknack has been knocked over.~
+   The odd knickknack is lightly damaged on one side, but otherwise still in
+good shape. It seems rather old, even if you can't tell exactly what it's meant
+to be. The tower was full of them, so perhaps it's important.
+   flavor text tba
+~
+15 j a 0 4
+1 0 0
+2 0
+C
+150 150
+R
+4 5193 0
+S
+#11867
+reconfabulator dynamic~
+a dynamic reconfabulator~
+There is a dynamic reconfabulator on the ground.~
+   The odd tool is little more than an oversized crystal ball with a magewood
+ring around it and a nocturnium stake through the center. You have no knowledge
+of how to use it -- if, indeed, it serves some function or purpose at all. But
+you do notice that it's ice cold to the touch.
+   flavor text tba
+~
+15 e a 0 4
+1 0 0
+2 0
+C
+150 150
+R
+4 5193 0
+S
+#11868
+prototype wellstone miniature~
+a miniature wellstone prototype~
+A prototype for a miniature wellstone is lying on the ground.~
+   The odd little rainbow wellstone seems to have been made from a dozen
+smaller gems and minerals, as if they were fused together and then carved to
+resemble a smooth, round rock, almost like a skipping stone. It seems to be a
+prototype; you can't figure out how to make it do anything.
+   flavor text tba
+~
+15 0 a 0 5
+1 0 0
+1 0
+C
+150 150
+R
+4 5193 0
+S
+#11869
+pen self-writing writing~
+a self-writing pen~
+A self-writing pen is twitching on the ground.~
+   The elegant tower pen is made from black metal, perhaps nocturnium as there
+is no sign of rust. The top half of the pen is encircled with magic words you
+cannot read, as they scoot around to the other side of the pen whenever you try
+to look at them.
+   Unfortunately, you can't seem to figure out how the self-writing pen works.
+When it's too close to any blank surface, it starts scribbling on its own. But
+nothing you do or say seems to control it.
+   flavor text tba
+~
+15 0 a 0 6
+1 0 0
+2 0
+C
+150 150
+R
+4 5193 0
 S
 #11870
 vortex swirling top stairs~
@@ -1419,6 +1586,291 @@ ending the cycle and rescuing the sorcerers from this odious time loop.
 12 0
 T 11971
 S
+#11872
+note hand-written handwritten written~
+a hand-written note~
+A hand-written note is lying here.~
+You read the writing on the piece of parchment:
+
+             Amor,
+
+                Though it was but a few fleeting moments, the
+             evening we spent together meant the world to me.
+             Your eyes captivate me like the chandelier; your
+             mind is as deep as the Milky Way, and twice as
+             enchanting.
+                I can't get our encounter out of my head. Meet
+             me again. Soon.
+
+                                              xo D.
+
+             P.S. -- Do NOT tell Marina.
+~
+3 k a 0 7
+0 0 0
+7 0
+C
+150 150
+S
+#11873
+potion red glittering~
+a glittering red potion~
+A glittering red potion is sitting on the ground.~
+   The red potion swirls as you hold it up to the light, glittering with swirls
+of yellow like pixy dust in caught in a whirlpool. There's no label on the
+flask and no way to tell what effect it will have but to quaff it.
+   flavor text tba
+~
+25 m a 0 6
+-1 0 3030
+8 0
+A
+8 1 0
+C
+150 150
+I 26 800 100.00 1  # DECAYS-TO: glass flask
+I 27 800 100.00 1  # CONSUMES-TO: glass flask
+R
+4 5130 0
+S
+#11874
+charm stasis filigreed~
+a filigreed stasis charm~
+A filigreed stasis charm is lying on the ground.~
+   The charm is made entirely from nocturnium filigree, expertly crafted to
+look like knitted metal. At the center of the charm, the negative space between
+the filigree forms the outline of a person. The whole thing dangles from a
+thin gold chain, tarnished at the back from heavy wear.
+   flavor text tba
+~
+2 0 ac 0 6
+0 0 0
+2 0
+C
+100 100
+T 11881
+S
+#11875
+pick hardstone stone~
+a hardstone pick~
+A hardstone pick is lying here.~
+   The small pick has short wooden handle and a triangular stone head, bound
+together by pitch and leather. Scratch-marks run the length of the handle, but
+though the head of the pick is slightly worn, there are no signs of cracks.
+   flavor text tba
+~
+1 imo an h 4
+0 1 8
+1 0
+S
+#11876
+stabber obsidian~
+an obsidian stabber~
+An obsidian stabber has been dropped here.~
+   The little obsidian shiv is surprisingly well-shaped. The blade is almost
+wafer-thin, with tiny serrations along both sides. A simple strap of leather
+around the base serves as a simple handle. It may be small, but this thing is
+thin enough to slide between ribs and long enough to pierce the heart.
+   flavor text tba
+~
+1 imo ano f 4
+0 1 4
+1 0
+S
+#11877
+flute gemstone stone little~
+a little gemstone flute~
+A little gemstone flute has been left here.~
+   The flute is carved from a single piece of iridescent gemstone which
+glitters in every color of the rainbow as the light strikes it. Nineteen tiny
+holes run the length of the flute. It's difficult to play, but the music is
+transcendental.
+   Hold the flute to play it.
+   flavor text tba
+~
+22 0 ao 0 3
+1 0 0
+12 0
+M
+2
+You play a soft, sad melody on the flute...~
+M
+3
+$n plays a soft, sad melody on $s flute...~
+M
+2
+The melancholy notes from your gemstone flute dance around the air...~
+M
+3
+The melancholy notes from $n's gemstone flute dance around the air...~
+M
+2
+The music makes you close your eyes for a moment, and imagine yourself floating on a bed of clouds...~
+M
+3
+$n's music makes you close your eyes for a moment, and imagine yourself floating on a bed of clouds...~
+M
+2
+The world around you seems to disappear for a moment...~
+M
+3
+The world around you seems to disappear for a moment...~
+M
+2
+The music from your gemstone flute rises in the air like a rainbow spiral...~
+M
+3
+The music from $n's gemstone flute rises in the air like a rainbow spiral...~
+M
+2
+The music from your flute dissolves into dissonant notes, dissolving into haze...~
+M
+3
+The music from $n's flute dissolves into dissonant notes, dissolving into haze...~
+M
+2
+The soft, sad music wells up from below, louder, brighter, and faster, until it seems to stream back into your gemstone flute...~
+M
+3
+The soft, sad music wells up from below, louder, brighter, and faster, until it seems to stream back into $n's gemstone flute...~
+M
+2
+You dance backward slowly as you play the flute...~
+M
+3
+$n dances backward slowly as $e plays a gemstone flute...~
+M
+2
+The tune ends with a flourish and you take a little bow.~
+M
+3
+The tune ends with a flourish and $n takes a little bow.~
+M
+2
+You pause to clean the little flute.~
+M
+3
+$n pauses to clean $s flute.~
+M
+2
+You start a jaunty tune on the gemstone flute...~
+M
+3
+$n starts a jaunty tune on $s gemstone flute...~
+M
+2
+You begin to dance about as you play...~
+M
+3
+$n begins to dance about as $e plays...~
+M
+2
+The staccato notes seem to escape your flute and begin to dance about on their own...~
+M
+3
+The staccato notes seem to escape $n's flute and begin to dance about on their own...~
+M
+2
+The world lights up as the music notes dance around on them...~
+M
+3
+The world lights up as the music notes dance around on them...~
+M
+2
+The merry melody floats on the air...~
+M
+3
+The merry melody from $n's flute makes your legs tingle and pull, as if they want to move...~
+M
+2
+You twirl around, playing the flute, but the music has taken on a life beyond its instrument...~
+M
+3
+$n twirls around, playing the flute, but the music has taken on a life beyond its instrument...~
+M
+2
+The music notes flit around you, pulling you in circles, making everyone dance...~
+M
+3
+The music notes flit around you, pulling you in circles, making everyone dance...~
+M
+2
+You begin moving faster and faster, pursuing each escaped note and pulling it back into the flute...~
+M
+3
+$n begins moving faster and faster, pursuing each escaped note and pulling it back into the flute...~
+M
+2
+You twirl into a full bow as the music dances back into the gemstone flute at long last.~
+M
+3
+$n twirls into a full bow as the music dances back into the gemstone flute at long last.~
+M
+2
+You pause to clean the little flute.~
+M
+3
+$n pauses to clean $s flute.~
+S
+#11878
+knife gemstone stone~
+a gemstone knife~
+A gemstone knife is stabbed into the ground.~
+   The blade of the short, thin knife is near-transparent sapphire with an edge
+that could split the hair on a moth. At its base, it swirls into a jade handle
+no seam or joint; the two minerals seem to flow into each other. At the base
+of the handle, the knife is finished with opal that equally has no boundary.
+   flavor text tba
+~
+1 mo ano f 6
+0 1 4
+1 0
+A
+22 2 0
+S
+#11879
+bud sapphire glowing~
+a glowing sapphire bud~
+A glowing sapphire bud is lying on the ground.~
+   A soft azure light casts out from the oversized tree bud. Though its petals
+are unimaginably thin, they are as hard as sapphire. But as you watch the bud
+glow, you find that its edges are slowly turning to ash; its brilliance is as
+ephemeral as the setting sun.
+   flavor text tba
+~
+3 c a 0 9
+0 0 0
+0 96
+C
+150 150
+S
+#11880
+candy ruby rock~
+some ruby rock candy~
+Some ruby rock candy is scattered on the ground.~
+   The handful of candy looks, at first, like precious gems. Even in the light,
+it can be hard to tell them apart from the real thing. But these are sweet to
+the tongue, evoking the taste of maple syrup or honey as the initial crunch
+melts away into cloying sweetness.
+   flavor text tba
+~
+6 m a 0 7
+24 0 0
+12 168
+A
+16 1 0
+A
+7 1 0
+C
+50 50
+M
+4
+You crunch into the ruby rock candy, which melts in your mouth.~
+M
+5
+$n crunches into some ruby rock candy.~
+O+ 1 6340
+S
 #11882
 pool shimmering water dew~
 the dew pool~
@@ -1428,9 +1880,15 @@ you take care not to trip into it as there's no railing or step around it. The
 viridescent light from the glowing shell shimmers off of the water, dancing
 around on the ceiling.
 ~
-5 0 0 0 4
+5 0 0 0 6
 1000000 1000000 11885
 12 0
+M
+4
+You kneel down and drink the $T from the pool.~
+M
+5
+$n kneels down and drinks the $T from the pool.~
 T 11910
 S
 #11885
@@ -1442,13 +1900,19 @@ avoid falling in. Each one is almost as wide as your armspan, and round in
 shape, but none of them is very deep. The pools closer to the stairs are
 well-lit, while the ones in the back of the grotto are difficult to see.
 ~
-5 0 0 0 3
+5 0 0 0 4
 1000000 1000000 11885
 12 0
+M
+4
+You kneel down and drink the $T from one of the pools.~
+M
+5
+$n kneels down and drinks the $T from one of the pools.~
 T 11910
 S
 #11886
-sculpture statue glass~
+sculpture statue glass me self~
 the glass sculpture~
 A glass sculpture of YOU stands in the middle of the viney maze.~
    You walk all the way around the sculpture, stunned by its nose, its hair,
@@ -1500,6 +1964,18 @@ M
 The sap dries up and crystallizes.~
 T 11884
 S
+#11889
+splinters tiny~
+the splinters~
+Thousands of tiny splinters hover in the air!~
+   Countless splinters of rotten wood swirl in the air on unseen eddies,
+drawing more and more wood from the sides of the hollow, until the air is so
+full of them you can hardly breathe!
+~
+3 0 0 0 1
+0 0 0
+0 0
+S
 #11891
 sap~
 the sap~
@@ -1514,6 +1990,92 @@ M
 18
 Sap drips onto you.~
 T 11954
+S
+#11893
+leash fox leather fine~
+a fine leather fox leash~
+A fine leather fox leash has been left behind.~
+   The leash is made from a braided strand of purple leather, no longer than
+your arm. It's lightly worn at both ends, especially the handle, and it looks
+as though someone has been carrying it around in their mouth.
+   You can 'use leash' to add a new minipet to your list.
+   flavor text tba
+~
+19 o a 0 7
+11893 0 0
+0 0
+C
+1 1
+S
+#11894
+figurine venus wooden~
+a wooden Venus figurine~
+A wooden Venus figurine is lying here.~
+   The smooth wooden figurine is in the shape of a voluptuous woman with wide
+hips and large breasts; aside from a prominent belly button, there is little
+detail beyond that. Her face is smooth and undetailed except for two square
+impressions where her eyes would be.
+   flavor text tba
+~
+15 0 a 0 8
+1 0 0
+0 0
+C
+150 150
+R
+4 5193 0
+S
+#11895
+pearl iridescent~
+an iridescent pearl~
+An iridescent pearl has been left here.~
+   The solitary little pearl isn't perfectly round, but it's well-polished and
+when it catches the light, its lustrous surface shimmers like a pastel rainbow.
+   flavor text tba
+~
+15 0 a 0 9
+1 0 0
+14 0
+C
+150 150
+R
+4 5193 0
+S
+#11896
+bladder leather~
+a leather bladder~
+A leather bladder is lying on the ground.~
+   The small bladder has been stretched and tanned to make it into a canteen.
+No smell remains except the salt of the ocean, but this was once the bladder of
+some unfortunate creature. The mouthpiece is kept shut tight by a leather
+string tied securely around it.
+   flavor text tba
+~
+5 0 a 0 11
+48 48 11896
+14 0
+C
+150 150
+S
+#11897
+rock good~
+a good rock~
+A good rock is lying on the ground.~
+   It's an ordinary, common rock of the sort you find everywhere in the ground.
+The rock is unremarkable. It's small, relatively round, not very smooth, and
+mostly gray.
+   It was once a common tradition for a traveler to pick up a rock as they left
+one city and deposit it in a pile in the next city, carrying it with them as
+protection on the road.
+~
+3 m a e 10
+0 0 0
+1 0
+C
+150 150
+O+ 1 6050
+R
+4 5117 0
 S
 #11898
 skystone stone depleted~

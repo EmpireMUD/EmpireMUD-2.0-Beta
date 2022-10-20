@@ -285,6 +285,38 @@ void get_template_spawns_display(struct adventure_spawn *list, char *save_buffer
 const char *get_interaction_target(int type, any_vnum vnum);
 char **get_weapon_types_string();
 
+// word count: core functions
+int wordcount_custom_messages(struct custom_message *list);
+int wordcount_extra_descriptions(struct extra_descr_data *list);
+int wordcount_string(const char *string);
+
+// word count: types
+int wordcount_ability(ability_data *abil);
+int wordcount_adventure(struct adventure_data *adv);
+int wordcount_archetype(archetype_data *arch);
+int wordcount_augment(augment_data *aug);
+int wordcount_book(book_data *book);
+int wordcount_building(bld_data *bld);
+int wordcount_class(class_data *cls);
+int wordcount_craft(craft_data *craft);
+int wordcount_crop(crop_data *crop);
+int wordcount_event(event_data *evt);
+int wordcount_faction(faction_data *fct);
+int wordcount_generic(generic_data *gen);
+int wordcount_global(struct global_data *glb);
+int wordcount_mobile(char_data *ch);
+int wordcount_morph(morph_data *mph);
+int wordcount_object(obj_data *obj);
+int wordcount_progress(progress_data *prg);
+int wordcount_quest(quest_data *quest);
+int wordcount_room_template(room_template *rmt);
+int wordcount_sector(sector_data *sect);
+int wordcount_shop(shop_data *shop);
+int wordcount_skill(skill_data *skill);
+int wordcount_social(social_data *soc);
+int wordcount_trigger(trig_data *trig);
+int wordcount_vehicle(vehicle_data *veh);
+
 // helpers from other systems
 bool find_event_reward_in_list(struct event_reward *list, int type, any_vnum vnum);
 bool find_shop_item_in_list(struct shop_item *list, any_vnum vnum);

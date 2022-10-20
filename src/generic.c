@@ -217,6 +217,27 @@ bool has_generic_relation(struct generic_relation *list, any_vnum vnum) {
 }
 
 
+/**
+* Counts the words of text in a generic's strings.
+*
+* @param generic_data *gen The generic whose strings to count.
+* @return int The number of words in the generic's strings.
+*/
+int wordcount_generic(generic_data *gen) {
+	int count = 0, iter;
+	
+	count += wordcount_string(GEN_NAME(gen));
+	
+	for (iter = 0; iter < NUM_GENERIC_STRINGS; ++iter) {
+		if (GEN_STRING(gen, iter)) {
+			count += wordcount_string(GEN_STRING(gen, iter));
+		}
+	}
+	
+	return count;
+}
+
+
  //////////////////////////////////////////////////////////////////////////////
 //// UTILITIES ///////////////////////////////////////////////////////////////
 

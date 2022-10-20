@@ -978,10 +978,24 @@ ACMD(do_quaff) {
 		if (!consume_otrigger(obj, ch, OCMD_QUAFF, NULL)) {
 			return;	// check trigger last
 		}
-		
-		act("You quaff $p!", FALSE, ch, obj, NULL, TO_CHAR);
-		act("$n quaffs $p!", TRUE, ch, obj, NULL, TO_ROOM);
 
+
+		// message to char
+		if (obj_has_custom_message(obj, OBJ_CUSTOM_CONSUME_TO_CHAR)) {
+			act(obj_get_custom_message(obj, OBJ_CUSTOM_CONSUME_TO_CHAR), FALSE, ch, obj, NULL, TO_CHAR);
+		}
+		else {
+			act("You quaff $p!", FALSE, ch, obj, NULL, TO_CHAR);
+		}
+		
+		// message to room
+		if (obj_has_custom_message(obj, OBJ_CUSTOM_CONSUME_TO_ROOM)) {
+			act(obj_get_custom_message(obj, OBJ_CUSTOM_CONSUME_TO_ROOM), TRUE, ch, obj, NULL, TO_ROOM);
+		}
+		else {
+			act("$n quaffs $p!", TRUE, ch, obj, NULL, TO_ROOM);
+		}
+		
 		apply_potion(obj, ch);
 		
 		run_interactions(ch, GET_OBJ_INTERACTIONS(obj), INTERACT_CONSUMES_TO, IN_ROOM(ch), NULL, obj, NULL, consumes_or_decays_interact);

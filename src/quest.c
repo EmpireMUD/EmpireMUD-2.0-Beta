@@ -1405,6 +1405,23 @@ void smart_copy_quest_rewards(struct quest_reward **to_list, struct quest_reward
 }
 
 
+/**
+* Counts the words of text in a quest's strings.
+*
+* @param quest_data *quest The quest whose strings to count.
+* @return int The number of words in the quest's strings.
+*/
+int wordcount_quest(quest_data *quest) {
+	int count = 0;
+	
+	count += wordcount_string(QUEST_NAME(quest));
+	count += wordcount_string(QUEST_DESCRIPTION(quest));
+	count += wordcount_string(QUEST_COMPLETE_MSG(quest));
+		
+	return count;
+}
+
+
  //////////////////////////////////////////////////////////////////////////////
 //// LOOKUP HANDLERS /////////////////////////////////////////////////////////
 
@@ -3505,25 +3522,41 @@ bool find_quest_reward_in_list(struct quest_reward *list, int type, any_vnum vnu
 */
 char *list_one_quest(quest_data *quest, bool detail) {
 	static char output[MAX_STRING_LENGTH];
-	char typestr[128];
+	char typestr[128], levels[128];
 	
-	if (IS_EVENT_DAILY(quest)) {
-		snprintf(typestr, sizeof(typestr), " (event daily)");
-	}
-	else if (IS_DAILY_QUEST(quest)) {
-		snprintf(typestr, sizeof(typestr), " (daily)");
-	}
-	else if (IS_EVENT_QUEST(quest)) {
-		snprintf(typestr, sizeof(typestr), " (event)");
-	}
-	else {
-		*typestr = '\0';
-	}
+	// if it's detailed view
+	bitvector_t show_flags = QST_IN_DEVELOPMENT | QST_DAILY | QST_EVENT | QST_TUTORIAL | QST_GROUP_COMPLETION;
 	
 	if (detail) {
-		snprintf(output, sizeof(output), "[%5d] %s%s", QUEST_VNUM(quest), QUEST_NAME(quest), typestr);
+		if (QUEST_MIN_LEVEL(quest) > 0 || QUEST_MAX_LEVEL(quest) > 0) {
+			snprintf(levels, sizeof(levels), " [%d-%d]", QUEST_MIN_LEVEL(quest), QUEST_MAX_LEVEL(quest));
+		}
+		else {
+			*levels = '\0';
+		}
+		
+		if (IS_SET(QUEST_FLAGS(quest), show_flags)) {
+			sprintbit(QUEST_FLAGS(quest) & show_flags, quest_flags, typestr, TRUE);
+		}
+		else {
+			*typestr = '\0';
+		}
+		snprintf(output, sizeof(output), "[%5d] %s%s %s", QUEST_VNUM(quest), QUEST_NAME(quest), levels, typestr);
 	}
 	else {
+		if (IS_EVENT_DAILY(quest)) {
+			snprintf(typestr, sizeof(typestr), " (event daily)");
+		}
+		else if (IS_DAILY_QUEST(quest)) {
+			snprintf(typestr, sizeof(typestr), " (daily)");
+		}
+		else if (IS_EVENT_QUEST(quest)) {
+			snprintf(typestr, sizeof(typestr), " (event)");
+		}
+		else {
+			*typestr = '\0';
+		}
+		
 		snprintf(output, sizeof(output), "[%5d] %s%s", QUEST_VNUM(quest), QUEST_NAME(quest), typestr);
 	}
 		

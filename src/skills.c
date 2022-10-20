@@ -2547,6 +2547,23 @@ void perform_npc_tie(char_data *ch, char_data *victim, int subcmd) {
 }
 
 
+/**
+* Counts the words of text in a skill's strings.
+*
+* @param skill_data *skill The skill whose strings to count.
+* @return int The number of words in the skill's strings.
+*/
+int wordcount_skill(skill_data *skill) {
+	int count = 0;
+	
+	count += wordcount_string(SKILL_NAME(skill));
+	count += wordcount_string(SKILL_ABBREV(skill));
+	count += wordcount_string(SKILL_DESC(skill));
+	
+	return count;
+}
+
+
  //////////////////////////////////////////////////////////////////////////////
 //// UTILITIES ///////////////////////////////////////////////////////////////
 

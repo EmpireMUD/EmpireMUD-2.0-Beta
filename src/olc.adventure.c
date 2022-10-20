@@ -637,6 +637,23 @@ adv_data *setup_olc_adventure(adv_data *input) {
 }
 
 
+/**
+* Counts the words of text in an adventure's strings.
+*
+* @param struct adventure_data *adv The adventure whose strings to count.
+* @return int The number of words in the adventure's strings.
+*/
+int wordcount_adventure(struct adventure_data *adv) {
+	int count = 0;
+	
+	count += wordcount_string(GET_ADV_NAME(adv));
+	count += wordcount_string(GET_ADV_AUTHOR(adv));
+	count += wordcount_string(GET_ADV_DESCRIPTION(adv));
+	
+	return count;
+}
+
+
  //////////////////////////////////////////////////////////////////////////////
 //// DISPLAYS ////////////////////////////////////////////////////////////////
 

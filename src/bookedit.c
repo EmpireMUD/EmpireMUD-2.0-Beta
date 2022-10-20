@@ -419,6 +419,29 @@ int sort_book_table(book_data *a, book_data *b) {
 }
 
 
+/**
+* Counts the words of text in a book's strings.
+*
+* @param book_data *book The book whose strings to count.
+* @return int The number of words in the book's strings.
+*/
+int wordcount_book(book_data *book) {
+	int count = 0;
+	struct paragraph_data *para;
+	
+	count += wordcount_string(book->title);
+	count += wordcount_string(book->byline);
+	count += wordcount_string(book->item_name);
+	count += wordcount_string(book->item_description);
+	
+	LL_FOREACH(book->paragraphs, para) {
+		count += wordcount_string(para->text);
+	}
+	
+	return count;
+}
+
+
  ///////////////////////////////////////////////////////////////////////////////
 //// DISPLAYS /////////////////////////////////////////////////////////////////
 
