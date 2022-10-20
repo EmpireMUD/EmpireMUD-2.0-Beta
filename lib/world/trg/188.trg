@@ -430,7 +430,7 @@ while (%item% && (%all% || %CandyCount% == 0) && %CandyTotal% < %Needs%)
   if %ok%
     set WhatCandy Candy%item.vnum%
     eval myCandy %%self.Candy%item.vnum%%%
-    if %MyCandy% < 31
+    if %MyCandy% < 31 && !%item.is_flagged(*KEEP)%
       eval CandyCount %CandyCount% + 1
       %send% %actor% # You stash @%item% in @%self%.
       %echoaround% %actor% # ~%actor% puts @%item% in @%self%.
