@@ -3892,7 +3892,7 @@ switch %cycle%
     wait 7 sec
     say Ickor carzo a kee selmo, vadur, eydur Tagra Nes!
     wait 1 sec
-    %echo% ~%self% stabs the rotten tree with a flint knife as the splinters of wood fall out of the air...
+    %echo% ~%self% stabs the rotten tree with a gemstone knife as the splinters of wood fall out of the air...
     set splint %self.room.contents(11889)%
     if %splint%
       %purge% %splint%
