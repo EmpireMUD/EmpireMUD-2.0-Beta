@@ -207,9 +207,13 @@ switch %self.vnum%
     set niamh %instance.mob(11931)%
     if %niamh%
       %at% %niamh.room% %echo% ~%niamh% heads upstairs.
-      %purge% %niamh%
       %load% mob 11970
       %echo% Niamh walks in from the north.
+      if %niamh.mob_flagged(*PICKPOCKETED)%
+        set mob %instance.mob(11970)%
+        nop %mob.add_mob_flag(*PICKPOCKETED)%
+      end
+      %purge% %niamh%
       wait 3 sec
     end
   break

@@ -341,6 +341,7 @@ shuffles through the halls. Her golden brown hair almost forms a mane as it
 seems to have stacked itself curl-upon-curl.
 ~
 F 11800
+I 12 11864 100.00 1 p  # PICKPOCKET: mana deconfabulator
 T 11810
 S
 #11911
@@ -358,6 +359,7 @@ but Skycleave's selection process is notoriously difficult, so she has surely
 earned her spot.
 ~
 F 11800
+I 12 11873 100.00 1 p  # PICKPOCKET: glittering red potion
 T 11810
 S
 #11912
@@ -374,6 +376,7 @@ grown hair up in a sweeping modern style, with a stubbly chin that almost
 resembles a beard.
 ~
 F 11800
+I 12 11874 100.00 1 p  # PICKPOCKET: filigreed stasis charm
 T 11810
 S
 #11913
@@ -390,6 +393,7 @@ tower. But he walks with confidence and speaks with authority like many of the
 older, wiser sorcerers.
 ~
 F 11800
+I 12 11872 100.00 1 p  # PICKPOCKET: hand-written note
 M
 1
 Red touch blue, no good for you. Red touch green, need new spleen. Or was it the other way around?~
@@ -430,6 +434,7 @@ and a gray shirt.
 patterns.
 ~
 F 11800
+I 12 11876 100.00 1 p  # PICKPOCKET: obsidian stabber
 M
 1
 I'm going to lose my job...~
@@ -733,6 +738,7 @@ bracelet on his wrist and a curved kirpan knife on his waist. There is a small
 bruise on his forehead.
 ~
 F 11800
+I 12 11897 100.00 1 p  # PICKPOCKET: good rock
 M
 1
 I had Annelise make a dreamcatcher for me but I keep having that goblin dream...~
@@ -867,6 +873,7 @@ bronzed complexion, aquiline nose, choice of clothing, and short imperial hair
 style give the impression of a Roman patrician.
 ~
 F 11800
+I 12 11865 100.00 1 p  # PICKPOCKET: ether condenser
 T 11810
 S
 #11931
@@ -884,6 +891,7 @@ black robes. She looks rather young compared to many of the sorcerers here.
 patterns.
 ~
 F 11800
+I 12 11872 100.00 1 p  # PICKPOCKET: hand-written note
 T 11810
 S
 #11932
@@ -899,6 +907,7 @@ thobe with a violet ghutra headscarf and black egal band. He smiles at you
 through a short, neat beard.
 ~
 F 11800
+I 12 11873 100.00 1 p  # PICKPOCKET: glittering red potion
 T 11810
 S
 #11933
@@ -982,6 +991,7 @@ otherworlder as light streams from the contraption, illuminating the other-
 worlder with bright white light.
 ~
 F 11800
+I 12 11872 100.00 1 p  # PICKPOCKET: hand-written note
 M
 1
 Interesting...~
@@ -1131,6 +1141,7 @@ large eyes. There's a slight clunking sound as she walks around the lab owing
 to her bronze leg.
 ~
 F 11800
+I 12 11874 100.00 1 p  # PICKPOCKET: filigreed stasis charm
 M
 0
 $n zaps a small fan, which flies up into the air and starts waving at $m.~
@@ -1261,6 +1272,7 @@ holds some kind of arcane contraption in both hands, illuminating the cracked
 ebony wall with streams of violet and silver light.
 ~
 F 11800
+I 12 11872 100.00 1 p  # PICKPOCKET: hand-written note
 M
 0
 $n waves $s light contraption over the walls...~
@@ -1319,6 +1331,7 @@ D
 still fairly young, though his age is betrayed by heavy bags under his eyes.
 ~
 F 11800
+I 12 1206 100.00 1 p  # PICKPOCKET: iridescent blue iris
 M
 1
 I got lost deep in that pixy maze and fell asleep and you would not believe the dream I had.~
@@ -1958,6 +1971,7 @@ out in stark contrast to her dark brown skin. She doesn't spare a single glance
 in your direction as she stays focused on her work.
 ~
 F 11800
+I 12 11872 100.00 1 p  # PICKPOCKET: hand-written note
 T 11810
 T 11937
 S
@@ -2107,6 +2121,7 @@ A trio of blue gems hovers beneath each of her ears and she wears a nocturnium
 stud on the right side of her short, rounded nose.
 ~
 F 11800
+I 12 11865 100.00 1 p  # PICKPOCKET: ether condenser
 M
 7
 say You ever hear the story about how I met old Knezz? Oh, sugar...~
@@ -2237,6 +2252,7 @@ with her lips and then goes back to what she was doing.
 patterns.
 ~
 F 11800
+I 12 11869 100.00 1 p  # PICKPOCKET: self-writing pen
 T 11810
 S
 #11967
@@ -2276,6 +2292,7 @@ by the robes.
 patterns.
 ~
 F 11800
+I 12 11873 100.00 1 p  # PICKPOCKET: glittering red potion
 M
 7
 say Did I ever tell you about how they built this tower? Ah, now there's a story.~
@@ -2352,6 +2369,7 @@ right side of her short, rounded nose. Tucked into her sash, she has a gnarled
 old wand.
 ~
 F 11800
+I 12 11865 100.00 1 p  # PICKPOCKET: ether condenser
 M
 7
 say You ever hear the story about how I met old Knezz?~
@@ -2394,6 +2412,7 @@ black robes. She looks rather young compared to many of the sorcerers here.
 patterns.
 ~
 F 11800
+I 12 11872 100.00 1 p  # PICKPOCKET: hand-written note
 T 11810
 S
 #11971

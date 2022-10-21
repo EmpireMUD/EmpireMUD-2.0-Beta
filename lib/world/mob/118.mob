@@ -323,6 +323,7 @@ making it impossible to see what she might have stashed underneath.
    You must finish rescuing the second floor to get to the staircase.
 ~
 F 11800
+I 12 11864 100.00 1 p  # PICKPOCKET: mana deconfabulator
 M
 7
 say Oh, not another... oh, you're not goblins. Finally some good news.~
@@ -361,6 +362,7 @@ who hasn't slept right in some time. Her dark hair is worn in chunky, uneven
 braids tied back behind her head.
 ~
 F 11800
+I 12 11873 100.00 1 p  # PICKPOCKET: glittering red potion
 T 11810
 S
 #11812
@@ -376,6 +378,7 @@ dusty and disheveled, presumably from hiding in the secret passage. On his face
 he bears a long scar that clips the left side of his lips.
 ~
 F 11800
+I 12 11874 100.00 1 p  # PICKPOCKET: filigreed stasis charm
 M
 7
 say Keep quiet and they won't find us in here.~
@@ -398,6 +401,7 @@ fire-orange hair.
 ~
 F 11800
 T 11810
+T 11803
 S
 #11814
 wright old~
@@ -415,6 +419,7 @@ of the tower, but he seems to give little notice to you or anyone else in here.
 F 11800
 T 11810
 T 11837
+T 11803
 S
 #11815
 goblin uncaged~
@@ -524,6 +529,7 @@ T 11818
 T 11822
 T 11807
 T 11806
+T 11803
 S
 #11819
 pixy queen majestic~
@@ -768,6 +774,7 @@ himself haphazardly, such that it's only covering part of his robed body,
 though he doesn't seem to be trying to sleep.
 ~
 F 11800
+I 12 11897 100.00 1 p  # PICKPOCKET: good rock
 M
 0
 $n coughs.~
@@ -1017,6 +1024,7 @@ as she laughs. She's one of the youngest apprentices here, and you notice the
 table sparks as she taps it with her fingers.
 ~
 F 11800
+I 12 11872 100.00 1 p  # PICKPOCKET: hand-written note
 T 11828
 T 11810
 S
@@ -1073,6 +1081,7 @@ style give the impression of a Roman patrician.
 upstairs.
 ~
 F 11800
+I 12 11865 100.00 1 p  # PICKPOCKET: ether condenser
 M
 7
 emote $n struggles to hold up the magical ward...~
@@ -1099,7 +1108,7 @@ Niamh resident~
 Resident Niamh~
 Resident Niamh is guarding the entrance.
 ~
-0 0 bdvxAI n 3
+0 0 bdvxA n 3
 2 0 0 15
 D
    The slump of Niamh's posture, the bags under her eyes, and the red roots
@@ -1108,6 +1117,8 @@ youthful appearance. Her dark purple and black robes are dusty, but she seems
 to have other priorities.
 ~
 F 11800
+I 4 11867 100.00 1 p  # LOOT: dynamic reconfabulator
+I 12 11867 100.00 1 p  # PICKPOCKET: dynamic reconfabulator
 T 11837
 S
 #11832
@@ -1123,6 +1134,7 @@ thobe with a violet ghutra headscarf and black egal band. He seems busy helping
 the new shopkeeper organize supplies.
 ~
 F 11800
+I 12 11873 100.00 1 p  # PICKPOCKET: glittering red potion
 T 11810
 S
 #11833
@@ -1196,6 +1208,7 @@ best to remain hidden. He gives you a wide-eyed face and nudges his head toward
 the door.
 ~
 F 11800
+T 11803
 S
 #11836
 scaldorran lich~
@@ -1290,6 +1303,7 @@ dressed in a loose-fitting gray sweater and an old skirt, from under which
 peeks a shining bronze leg.
 ~
 F 11800
+I 12 11874 100.00 1 p  # PICKPOCKET: filigreed stasis charm
 M
 7
 echo Annelise stirs her bowl slowly.~
@@ -1513,6 +1527,7 @@ places where it's stained with grease.
    Waltur sells items in his lab. Type 'list', 'list id', or 'buy'.
 ~
 F 11800
+I 4 11868 100.00 1 p  # LOOT: miniature wellstone prototype
 I 12 11868 100.00 1 p  # PICKPOCKET: miniature wellstone prototype
 M
 7
@@ -1562,6 +1577,10 @@ Caster mercenary is studying the books.
 D
 This mob is loaded by trig 11900/skymerc and named by 11857.
 ~
+I 4 11865 5.00 1 p  # LOOT: ether condenser
+I 4 11867 5.00 1 p  # LOOT: dynamic reconfabulator
+I 12 11865 33.33 1 p  # PICKPOCKET: ether condenser
+I 12 11867 33.33 1 p  # PICKPOCKET: dynamic reconfabulator
 M
 0
 $n flips through an open tome.~
@@ -1623,6 +1642,10 @@ Nature mage mercenary is playing with fire.
 D
 This mob is loaded by trig 11900/skymerc and named by 11857.
 ~
+I 4 11864 5.00 1 p  # LOOT: mana deconfabulator
+I 4 11865 5.00 1 p  # LOOT: ether condenser
+I 12 11864 33.33 1 p  # PICKPOCKET: mana deconfabulator
+I 12 11865 33.33 1 p  # PICKPOCKET: ether condenser
 M
 0
 $n forms a thick layer of mana over $s body, and it hardens to solid stone!~
@@ -2011,6 +2034,7 @@ black hair, in stark contrast to her dark brown skin. Her unembellished jute
 robe and distinctive shoes identify her as one of the tower's pages.
 ~
 F 11800
+T 11803
 S
 #11860
 Grace woman old helpless~
@@ -2045,6 +2069,7 @@ carved yellow lightning stone.
 ~
 F 11800
 T 11864
+T 11803
 S
 #11862
 thorley apprentice~
@@ -2063,6 +2088,7 @@ M
 7
 say Oh, thank the Wyrd, you're not with that you-know-what of an enchantress.~
 T 11806
+T 11803
 S
 #11863
 shadow ascendant mezvienne~
@@ -2121,6 +2147,7 @@ the cloud-like halo of gray hair that surrounds her rounded, brown face. It's
 clear she hasn't slept in quite some time.
 ~
 F 11800
+I 12 11865 100.00 1 p  # PICKPOCKET: ether condenser
 T 11810
 S
 #11865
@@ -2186,7 +2213,7 @@ knezz master~
 Knezz~
 Master Knezz is in his chair, with his head back, and his eyes and mouth wide open.
 ~
-0 0 bdvxEI n 3
+0 0 bdvxE n 3
 1 0 0 15
 D
    Grand High Sorcerer Knezz doesn't seem to be conscious, splayed out such as
@@ -2797,6 +2824,7 @@ ready. Set a difficulty to continue the adventure. This difficulty only applies
 to the second floor.
 Usage: difficulty <normal | hard | group | boss>
 ~
+I 12 11865 100.00 1 p  # PICKPOCKET: ether condenser
 M
 7
 say It's rather a good thing you're here...~
@@ -2843,6 +2871,7 @@ difficulty to continue the adventure. This difficulty only applies to the
 third floor.
 Usage: difficulty <normal | hard | group | boss>
 ~
+I 12 11864 100.00 1 p  # PICKPOCKET: mana deconfabulator
 M
 7
 say It looks like you did it...~
@@ -2884,6 +2913,7 @@ ready. Set a difficulty to continue the adventure. This difficulty applies to
 the rest of the tower above you.
 Usage: difficulty <normal | hard | group | boss>
 ~
+I 12 11865 100.00 1 p  # PICKPOCKET: ether condenser
 M
 7
 emote $n struggles to hold up the magical ward...~
