@@ -421,7 +421,7 @@ void olc_fullsearch_sector(char_data *ch, char *argument) {
 	bitvector_t find_interacts = NOBITS, found_interacts, only_build = NOBITS;
 	bitvector_t find_evos = NOBITS, found_evos;
 	bitvector_t not_flagged = NOBITS, only_flags = NOBITS, only_climate = NOBITS;
-	int count, only_mapout = NOTHING;
+	int count, only_mapout = NOTHING, vmin = NOTHING, vmax = NOTHING;
 	char only_roadside = '\0';
 	struct interaction_item *inter;
 	struct evolution_data *evo;
@@ -455,6 +455,8 @@ void olc_fullsearch_sector(char_data *ch, char *argument) {
 		FULLSEARCH_LIST("mapout", only_mapout, mapout_color_names)
 		FULLSEARCH_CHAR("roadsideicon", only_roadside)
 		FULLSEARCH_FLAGS("unflagged", not_flagged, sector_flags)
+		FULLSEARCH_INT("vmin", vmin, 0, INT_MAX)
+		FULLSEARCH_INT("vmax", vmax, 0, INT_MAX)
 		
 		else {	// not sure what to do with it? treat it like a keyword
 			sprintf(find_keywords + strlen(find_keywords), "%s%s", *find_keywords ? " " : "", type_arg);
@@ -469,6 +471,9 @@ void olc_fullsearch_sector(char_data *ch, char *argument) {
 	
 	// okay now look up sects
 	HASH_ITER(hh, sector_table, sect, next_sect) {
+		if ((vmin != NOTHING && GET_SECT_VNUM(sect) < vmin) || (vmax != NOTHING && GET_SECT_VNUM(sect) > vmax)) {
+			continue;	// vnum range
+		}
 		if (only_build != NOBITS && (GET_SECT_BUILD_FLAGS(sect) & only_build) != only_build) {
 			continue;
 		}

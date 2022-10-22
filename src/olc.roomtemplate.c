@@ -416,6 +416,7 @@ void olc_fullsearch_room_template(char_data *ch, char *argument) {
 	
 	bitvector_t only_flags = NOBITS, only_functions = NOBITS, only_affs = NOBITS;;
 	bitvector_t find_interacts = NOBITS, not_flagged = NOBITS, found_interacts = NOBITS;
+	int vmin = NOTHING, vmax = NOTHING;
 	
 	struct interaction_item *inter;
 	room_template *rmt, *next_rmt;
@@ -442,6 +443,8 @@ void olc_fullsearch_room_template(char_data *ch, char *argument) {
 		FULLSEARCH_FLAGS("unflagged", not_flagged, room_template_flags)
 		FULLSEARCH_FLAGS("functions", only_functions, function_flags)
 		FULLSEARCH_FLAGS("interaction", find_interacts, interact_types)
+		FULLSEARCH_INT("vmin", vmin, 0, INT_MAX)
+		FULLSEARCH_INT("vmax", vmax, 0, INT_MAX)
 		
 		else {	// not sure what to do with it? treat it like a keyword
 			sprintf(find_keywords + strlen(find_keywords), "%s%s", *find_keywords ? " " : "", type_arg);
@@ -456,6 +459,9 @@ void olc_fullsearch_room_template(char_data *ch, char *argument) {
 	
 	// okay now look up templates
 	HASH_ITER(hh, room_template_table, rmt, next_rmt) {
+		if ((vmin != NOTHING && GET_RMT_VNUM(rmt) < vmin) || (vmax != NOTHING && GET_RMT_VNUM(rmt) > vmax)) {
+			continue;	// vnum range
+		}
 		if (only_affs != NOBITS && (GET_RMT_BASE_AFFECTS(rmt) & only_affs) != only_affs) {
 			continue;
 		}

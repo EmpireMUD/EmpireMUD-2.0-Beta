@@ -645,7 +645,7 @@ void olc_fullsearch_building(char_data *ch, char *argument) {
 	int only_hitpoints = NOTHING, hitpoints_over = NOTHING, hitpoints_under = NOTHING;
 	int only_military = NOTHING, military_over = NOTHING, military_under = NOTHING;
 	int only_rooms = NOTHING, rooms_over = NOTHING, rooms_under = NOTHING;
-	int only_depletion = NOTHING;
+	int only_depletion = NOTHING, vmin = NOTHING, vmax = NOTHING;
 	
 	struct interaction_item *inter;
 	struct interact_restriction *inter_res;
@@ -698,6 +698,8 @@ void olc_fullsearch_building(char_data *ch, char *argument) {
 		FULLSEARCH_INT("military", only_military, 0, INT_MAX)
 		FULLSEARCH_INT("militaryover", military_over, 0, INT_MAX)
 		FULLSEARCH_INT("militaryunder", military_under, 0, INT_MAX)
+		FULLSEARCH_INT("vmin", vmin, 0, INT_MAX)
+		FULLSEARCH_INT("vmax", vmax, 0, INT_MAX)
 		
 		else {	// not sure what to do with it? treat it like a keyword
 			sprintf(find_keywords + strlen(find_keywords), "%s%s", *find_keywords ? " " : "", type_arg);
@@ -712,6 +714,9 @@ void olc_fullsearch_building(char_data *ch, char *argument) {
 	
 	// okay now look up items
 	HASH_ITER(hh, building_table, bld, next_bld) {
+		if ((vmin != NOTHING && GET_BLD_VNUM(bld) < vmin) || (vmax != NOTHING && GET_BLD_VNUM(bld) > vmax)) {
+			continue;	// vnum range
+		}
 		if (only_affs != NOBITS && (GET_BLD_BASE_AFFECTS(bld) & only_affs) != only_affs) {
 			continue;
 		}

@@ -622,7 +622,7 @@ void olc_fullsearch_mob(char_data *ch, char *argument) {
 	bitvector_t  find_interacts = NOBITS, found_interacts, find_custom = NOBITS, found_custom;
 	bitvector_t not_flagged = NOBITS, only_flags = NOBITS, only_affs = NOBITS;
 	int only_attack = NOTHING, only_move = NOTHING, only_nameset = NOTHING;
-	int count, only_level = NOTHING, only_sex = NOTHING, only_size = NOTHING;
+	int count, only_level = NOTHING, only_sex = NOTHING, only_size = NOTHING, vmin = NOTHING, vmax = NOTHING;
 	faction_data *only_fct = NULL;
 	struct interaction_item *inter;
 	struct custom_message *cust;
@@ -658,6 +658,8 @@ void olc_fullsearch_mob(char_data *ch, char *argument) {
 		FULLSEARCH_LIST("gender", only_sex, genders)
 		FULLSEARCH_LIST("size", only_size, size_types)
 		FULLSEARCH_FLAGS("unflagged", not_flagged, action_bits)
+		FULLSEARCH_INT("vmin", vmin, 0, INT_MAX)
+		FULLSEARCH_INT("vmax", vmax, 0, INT_MAX)
 		
 		else {	// not sure what to do with it? treat it like a keyword
 			sprintf(find_keywords + strlen(find_keywords), "%s%s", *find_keywords ? " " : "", type_arg);
@@ -672,6 +674,9 @@ void olc_fullsearch_mob(char_data *ch, char *argument) {
 	
 	// okay now look up mobs
 	HASH_ITER(hh, mobile_table, mob, next_mob) {
+		if ((vmin != NOTHING && GET_MOB_VNUM(mob) < vmin) || (vmax != NOTHING && GET_MOB_VNUM(mob) > vmax)) {
+			continue;	// vnum range
+		}
 		if (only_level != NOTHING) {	// level-based checks
 			if (GET_MAX_SCALE_LEVEL(mob) != 0 && only_level > GET_MAX_SCALE_LEVEL(mob)) {
 				continue;

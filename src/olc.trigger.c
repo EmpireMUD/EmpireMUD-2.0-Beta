@@ -481,7 +481,7 @@ void olc_delete_trigger(char_data *ch, trig_vnum vnum) {
 */
 void olc_fullsearch_trigger(char_data *ch, char *argument) {
 	char buf[MAX_STRING_LENGTH * 2], line[MAX_STRING_LENGTH], type_arg[MAX_INPUT_LENGTH], val_arg[MAX_INPUT_LENGTH], find_keywords[MAX_INPUT_LENGTH];
-	int count, lookup, only_attaches = NOTHING;
+	int count, lookup, only_attaches = NOTHING, vmin = NOTHING, vmax = NOTHING;
 	bitvector_t mob_types = NOBITS, obj_types = NOBITS, wld_types = NOBITS, veh_types = NOBITS;
 	trig_data *trig, *next_trig;
 	struct cmdlist_element *cmd;
@@ -504,6 +504,8 @@ void olc_fullsearch_trigger(char_data *ch, char *argument) {
 		}
 		
 		FULLSEARCH_LIST("attaches", only_attaches, trig_attach_types)
+		FULLSEARCH_INT("vmin", vmin, 0, INT_MAX)
+		FULLSEARCH_INT("vmax", vmax, 0, INT_MAX)
 		
 		// custom:
 		else if (is_abbrev(type_arg, "-types")) {
@@ -544,6 +546,9 @@ void olc_fullsearch_trigger(char_data *ch, char *argument) {
 	
 	// okay now look up items
 	HASH_ITER(hh, trigger_table, trig, next_trig) {
+		if ((vmin != NOTHING && GET_TRIG_VNUM(trig) < vmin) || (vmax != NOTHING && GET_TRIG_VNUM(trig) > vmax)) {
+			continue;	// vnum range
+		}
 		if (only_attaches != NOTHING && trig->attach_type != only_attaches) {
 			continue;
 		}

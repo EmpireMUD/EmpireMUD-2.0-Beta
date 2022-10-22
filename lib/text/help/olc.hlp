@@ -851,11 +851,12 @@ Fields:
   &c-targets&0 - see HELP ABILEDIT TARGETS
   &c-type&0 - see HELP ABILEDIT TYPE
   &c-waittype&0 - see HELP ABILEDIT WAIT TYPE
+  &c-vmin&0, &c-vmax&0 - VNUM range limits
 
 Examples:
  > .abil fullsearch -type PLAYER-TECH -ptech Swimming
  > .abil fullsearch -flagged RANGED -flagged RANGED-ONLY
- > .abil fullsearch -scaleover 50 -scaleunder 99
+ > .abil fullsearch -scaleover 50 -scaleunder 99 -vmin 10000 -vmax 10099
 
 To search other fields, you can generally use the normal "search" option for
 other OLC types. For example, to find all abilities with a certain cooldown,
@@ -2325,11 +2326,12 @@ Fields:
   &c-hitpoints -hitpointsover -hitpointsunder&0 - specific hitpoint amount
   &c-military -militaryover -militaryunder&0 - specific military value
   &c-rooms -roomsover -roomsunder&0 - specific extra rooms value
+  &c-vmin&0, &c-vmax&0 - VNUM range limits
 
 Examples:
  > .b fullsearch -hitpointsover 50
  > .b fullsearch -unflagged ROOM -function FORGE
- > .b fullsearch -flagged ROOM -citizensover 1
+ > .b fullsearch -flagged ROOM -citizensover 1 -vmin 10000 -vmax 10099
 
 To search other fields, you can generally use the normal "search" option for
 other OLC types. For example, to find all buildings that have a certain artisan
@@ -2763,11 +2765,12 @@ Fields:
   &c-requiresobject&0 - requires any object
   &c-requiresfunction&0 - requires a function flag
   &c-time -timeover -timeunder&0 - specific craft time (in action ticks)
+  &c-vmin&0, &c-vmax&0 - VNUM range limits
 
 Examples:
  > .craft fullsearch -type FORGE -levelover 1
  > .craft fullsearch -type COOK -flagged FIRE
- > .craft fullsearch -levelover 50 sword
+ > .craft fullsearch -levelover 50 sword -vmin 10000 -vmax 10099
 
 To search other fields, you can generally use the normal "search" option for
 other OLC types. For example, to find all crafts that require the 'Cook'
@@ -3123,11 +3126,12 @@ Fields:
   &c-interaction&0 - has a specific type, see HELP CROPEDIT INTERACTION
   &c-mapout&0 - color name, see HELP CROPEDIT MAPOUT
   &c-x&0, &c-y&0 - is within a certain x or y coordinate range (only wild crops)
+  &c-vmin&0, &c-vmax&0 - VNUM range limits
 
 Examples:
  > .crop fullsearch -x 25 -y 25 potato
  > .crop fullsearch -flagged NEWBIE-ONLY -flagged ORCHARD
- > .crop fullsearch -interaction CHOP
+ > .crop fullsearch -interaction CHOP -vmin 10000 -vmax 10099
 
 To search other fields, you can generally use the normal "search" option for
 other OLC types. For example, to find all crops that spawn a certain mob,
@@ -4532,11 +4536,12 @@ Fields:
   &c-sex&0 - male, female, neutral
   &c-size&0 - see HELP MOB SIZE
   &c-attack&0 - see HELP MEDIT ATTACK
+  &c-vmin&0, &c-vmax&0 - VNUM range limits
 
 Examples:
  > .m fullsearch -sex male -attack slash
  > .m fullsearch -flagged SENTINEL -flagged PURSUE
- > .m fullsearch -level 100 guard
+ > .m fullsearch -level 100 guard -vmin 10000 -vmax 10099
 
 To search other fields, you can generally use the normal "search" option for
 other OLC types. For example, to find all mobs with the "Dismissable"
@@ -5538,11 +5543,12 @@ Fields:
   &c-type&0 - see HELP OEDIT TYPE
   &c-weapontype&0 - see HELP OEDIT WEAPONTYPE
   &c-wear&0 - see HELP OEDIT WEAR
+  &c-vmin&0, &c-vmax&0 - VNUM range limits
 
 Examples:
  > .o fullsearch -type WEAPON -wear HOLD
  > .o fullsearch -flagged LARGE -flagged BOP
- > .o fullsearch -level 50 sword
+ > .o fullsearch -level 50 sword -vmin 10000 -vmax 10099
 
 To search other fields, you can generally use the normal "search" option for
 other OLC types. For example, to find all objects with the "Minipet Use"
@@ -6722,9 +6728,10 @@ Fields:
   &c-tasks&0 - see HELP REQUIREMENTS / HELP PROGEDIT TASKS
   &c-type&0 - see HELP PROGEDIT TYPE
   &c-value&0 - match a specific value
+  &c-vmin&0, &c-vmax&0 - VNUM range limits
 
 Examples:
- > .prog fullsearch -type PLAYER-TECH -ptech Swimming
+ > .prog fullsearch -type PLAYER-TECH -ptech Swimming -vmin 10000 -vmax 10099
  > .prog fullsearch -flagged RANGED -flagged RANGED-ONLY
 
 To search other fields, you can generally use the normal "search" option for
@@ -7056,11 +7063,12 @@ Fields:
   &c-flagged -unflagged&0 - see HELP REDIT FLAGS
   &c-functions&0 - see HELP REDIT FUNCTIONS
   &c-interactions&0 - has a specific type, see HELP REDIT INTERACTION
+  &c-vmin&0, &c-vmax&0 - VNUM range limits
 
 Examples:
  > .r fullsearch -interactions DIG
  > .r fullsearch -unflagged LIGHT -function FORGE
- > .r fullsearch -flagged !MOB -flagged DARK
+ > .r fullsearch -flagged !MOB -flagged DARK -vmin 10000 -vmax 10099
 
 To search other fields, you can generally use the normal "search" option for
 other OLC types. For example, to find all templates that spawn a certain mob
@@ -7347,11 +7355,12 @@ Fields:
   &c-interaction&0 - has a specific type, see HELP SECTEDIT INTERACTION
   &c-mapout&0 - color name, see HELP SECTEDIT MAPOUT
   &c-roadsideicon&0 - has a certain icon letter - HELP SECTEDIT ROADSIDEICON
+  &c-vmin&0, &c-vmax&0 - VNUM range limits
 
 Examples:
  > .sect fullsearch -climate forest -evolution CHOPPED-DOWN
  > .sect fullsearch -flagged CHORE -flagged ROUGH
- > .sect fullsearch -interaction CHOP
+ > .sect fullsearch -interaction CHOP -vmin 10000 -vmax 10099
 
 To search other fields, you can generally use the normal "search" option for
 other OLC types. For example, to find all sectors that spawn a certain mob,
@@ -7873,10 +7882,11 @@ the trigger's name and command text.
 Fields:
   &c-attaches&0 - see HELP TRIGEDIT ATTACHES
   &c-type&0 - see HELP MTRIG TYPES, etc.
+  &c-vmin&0, &c-vmax&0 - VNUM range limits
 
 Examples:
  > .t fullsearch -type Random -type Global
- > .t fullsearch i11234
+ > .t fullsearch i11234 -vmin 11200 -vmax 11299
  > .t fullsearch %force%
 #d
 "TRIGEDIT NAME"
@@ -8525,10 +8535,11 @@ Fields:
   &c-rooms -roomsover -roomsunder&0 - specific extra rooms value
   &c-sizeunder -sizeover&0 - check a range of sizes (inclusive)
   &c-speed&0 - see HELP VEDIT SPEED
+  &c-vmin&0, &c-vmax&0 - VNUM range limits
 
 Examples:
  > .veh fullsearch -level 125 -hitpointsover 50
- > .veh fullsearch wood -flagged BURNABLE
+ > .veh fullsearch wood -flagged BURNABLE -vmin 10000 -vmax 10099
 
 To search other fields, you can generally use the normal "search" option for
 other OLC types. For example, to find all vehicles that have a certain interior

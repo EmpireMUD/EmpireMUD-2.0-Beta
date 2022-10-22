@@ -269,7 +269,7 @@ void olc_fullsearch_crop(char_data *ch, char *argument) {
 	char buf[MAX_STRING_LENGTH * 2], line[MAX_STRING_LENGTH], type_arg[MAX_INPUT_LENGTH], val_arg[MAX_INPUT_LENGTH], find_keywords[MAX_INPUT_LENGTH];
 	bitvector_t  find_interacts = NOBITS, found_interacts;
 	bitvector_t not_flagged = NOBITS, only_flags = NOBITS, only_climate = NOBITS;
-	int count, only_mapout = NOTHING, only_x = NOTHING, only_y = NOTHING;
+	int count, only_mapout = NOTHING, only_x = NOTHING, only_y = NOTHING, vmin = NOTHING, vmax = NOTHING;
 	struct interaction_item *inter;
 	crop_data *crop, *next_crop;
 	struct icon_data *icon;
@@ -299,6 +299,8 @@ void olc_fullsearch_crop(char_data *ch, char *argument) {
 		FULLSEARCH_FLAGS("unflagged", not_flagged, crop_flags)
 		FULLSEARCH_INT("x", only_x, 0, 100)
 		FULLSEARCH_INT("y", only_y, 0, 100)
+		FULLSEARCH_INT("vmin", vmin, 0, INT_MAX)
+		FULLSEARCH_INT("vmax", vmax, 0, INT_MAX)
 		
 		else {	// not sure what to do with it? treat it like a keyword
 			sprintf(find_keywords + strlen(find_keywords), "%s%s", *find_keywords ? " " : "", type_arg);
@@ -313,6 +315,9 @@ void olc_fullsearch_crop(char_data *ch, char *argument) {
 	
 	// okay now look up crpos
 	HASH_ITER(hh, crop_table, crop, next_crop) {
+		if ((vmin != NOTHING && GET_CROP_VNUM(crop) < vmin) || (vmax != NOTHING && GET_CROP_VNUM(crop) > vmax)) {
+			continue;	// vnum range
+		}
 		if ((only_x != NOTHING || only_y != NOTHING) && CROP_FLAGGED(crop, CROPF_NOT_WILD)) {
 			continue;	// can't search x/y on not-wild crops
 		}
