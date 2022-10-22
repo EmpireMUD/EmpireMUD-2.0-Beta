@@ -4911,6 +4911,24 @@ if %old_name% != %self.name%
   done
 break
 ~
+#11982
+Goblin's Dream: Arena fight script (Elver, Nailbokh, Biksi)~
+0 k 0
+~
+* tba
+~
+#11983
+Smol Nes-Pik: Iskip of Rot and Ruin fight~
+0 k 0
+~
+* tba
+~
+#11984
+Elemental Plane of Water: First Water fight~
+0 k 0
+~
+* tba
+~
 #11989
 Goblin's Dream: Guard patrol~
 0 b 50

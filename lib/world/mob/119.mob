@@ -48,6 +48,7 @@ M
 1
 I can't believe the Tower Skycleave is finally here!~
 T 11905
+T 11852
 S
 #11902
 bucket wooden~
@@ -177,6 +178,7 @@ M
 0
 $n hums a little tune.~
 T 11810
+T 11852
 S
 #11906
 Huberus instructor~
@@ -204,6 +206,7 @@ M
 1
 Please pay attention.~
 T 11810
+T 11852
 S
 #11907
 #n shopkeep shopkeeper~
@@ -247,6 +250,7 @@ M
 say Hello, erm, and welcome to Towerwin, erm, Towerinkel's Gift Shop, your one shop stop for, erm, your one stop shop for all your, erm, gifts. Oh, that's not right.~
 T 11806
 T 11810
+T 11852
 S
 #11908
 Elamm man young eager~
@@ -288,6 +292,7 @@ M
 1
 Do you think it's possible to teleport the contents of a small vial into a very specific place?~
 T 11810
+T 11852
 S
 #11909
 Akeldama student pale~
@@ -326,6 +331,7 @@ M
 1
 When do they let us upstairs? It feels like I've been studying down here for ages.~
 T 11810
+T 11852
 S
 #11910
 Annaca watcher~
@@ -343,6 +349,7 @@ seems to have stacked itself curl-upon-curl.
 F 11800
 I 12 11864 100.00 1 p  # PICKPOCKET: mana deconfabulator
 T 11810
+T 11852
 S
 #11911
 apprentice kayla~
@@ -361,6 +368,7 @@ earned her spot.
 F 11800
 I 12 11873 100.00 1 p  # PICKPOCKET: glittering red potion
 T 11810
+T 11852
 S
 #11912
 cosimo apprentice~
@@ -378,6 +386,7 @@ resembles a beard.
 F 11800
 I 12 11874 100.00 1 p  # PICKPOCKET: filigreed stasis charm
 T 11810
+T 11852
 S
 #11913
 tyrone apprentice~
@@ -416,6 +425,7 @@ M
 0
 $n clicks his fingers and a little fire drake bursts into existence. But it spits at Tyrone and costs $m half an eyebrow.~
 T 11810
+T 11852
 S
 #11914
 Wright wrangler~
@@ -464,6 +474,7 @@ M
 $n climbs on a chair and tries to clean something brown from the ceiling.~
 T 11934
 T 11810
+T 11852
 S
 #11915
 goblin caged cages~
@@ -615,6 +626,7 @@ T 11919
 T 11920
 T 11911
 T 11810
+T 11852
 S
 #11921
 broom~
@@ -763,6 +775,7 @@ I swear if someone says 'zenith' one more time I'm going to crack.~
 T 11810
 T 11807
 T 11851
+T 11852
 S
 #11926
 sponge giant~
@@ -839,6 +852,7 @@ T 11931
 T 11932
 T 11933
 T 11808
+T 11984
 S
 #11929
 Paige page~
@@ -875,6 +889,7 @@ style give the impression of a Roman patrician.
 F 11800
 I 12 11865 100.00 1 p  # PICKPOCKET: ether condenser
 T 11810
+T 11852
 S
 #11931
 Niamh resident~
@@ -893,6 +908,7 @@ patterns.
 F 11800
 I 12 11872 100.00 1 p  # PICKPOCKET: hand-written note
 T 11810
+T 11852
 S
 #11932
 mohammed resident~
@@ -909,6 +925,7 @@ through a short, neat beard.
 F 11800
 I 12 11873 100.00 1 p  # PICKPOCKET: glittering red potion
 T 11810
+T 11852
 S
 #11933
 mop bucket~
@@ -1011,6 +1028,7 @@ M
 0
 $n bangs in the contraption in $s hands.~
 T 11810
+T 11852
 S
 #11936
 scaldorran lich~
@@ -1179,6 +1197,7 @@ M
 0
 $n makes a clunking noise as she walks.~
 T 11810
+T 11852
 S
 #11940
 Waltur walter magineer~
@@ -1229,6 +1248,7 @@ M
 Hmm...~
 T 11806
 T 11810
+T 11852
 S
 #11941
 goef oreonic rock creature pitch black~
@@ -1292,6 +1312,7 @@ M
 0
 $n walks along the wall, passing the light from $s contraption over it.~
 T 11810
+T 11852
 S
 #11943
 visitor gardens hanging~
@@ -1342,6 +1363,7 @@ M
 1
 The queen gave me an iris. What does that mean?~
 T 11810
+T 11852
 S
 #11946
 fox gray~
@@ -1426,6 +1448,7 @@ M
 0
 $n bows low and touches $s head to the ground.~
 T 11810
+T 11852
 S
 #11949
 Raek goblin~
@@ -1464,6 +1487,7 @@ M
 1
 Wake up.~
 T 11810
+T 11852
 S
 #11950
 Ortimer goblin~
@@ -1637,6 +1661,7 @@ M
 emote $n makes a harrumph sound.~
 T 11810
 T 11840
+T 11852
 S
 #11951
 Meyina goblin~
@@ -1668,6 +1693,7 @@ M
 0
 $n coughs heavily.~
 T 11810
+T 11852
 S
 #11952
 Orkhan goblin boy~
@@ -1685,6 +1711,7 @@ not sure how much he's seeing anyway.
 ~
 I 12 11893 100.00 1 p  # PICKPOCKET: fine leather fox leash
 T 11810
+T 11852
 S
 #11953
 Khoab goblin~
@@ -1720,6 +1747,7 @@ M
 1
 It's a shame to sleep through this.~
 T 11810
+T 11852
 S
 #11954
 Zelen goblin~
@@ -1757,6 +1785,7 @@ M
 1
 Too bad you're asleep.~
 T 11810
+T 11852
 S
 #11955
 Pimmi goblin~
@@ -1859,6 +1888,7 @@ M
 $n hums to $mself.~
 T 11810
 T 11840
+T 11852
 S
 #11956
 Elver worthy goblin~
@@ -1896,6 +1926,8 @@ T 11973
 T 11808
 T 11809
 T 11810
+T 11982
+T 11803
 S
 #11957
 Nailbokh axe goblin~
@@ -1924,6 +1956,8 @@ M
 0
 $n waves $s huge axe in the air.~
 T 11973
+T 11982
+T 11803
 S
 #11958
 Biksi champion orka goblin~
@@ -1956,6 +1990,8 @@ M
 0
 $n drags $s whips to create a big circle in the sand.~
 T 11973
+T 11982
+T 11803
 S
 #11959
 sheila page~
@@ -1974,6 +2010,7 @@ F 11800
 I 12 11872 100.00 1 p  # PICKPOCKET: hand-written note
 T 11810
 T 11937
+T 11852
 S
 #11960
 cabinet filing~
@@ -2178,6 +2215,7 @@ M
 say I kept him around almost a month, till he started to fall apart. Rest him. He was a good man.~
 T 11810
 T 11840
+T 11852
 S
 #11965
 trolley cleaning~
@@ -2254,6 +2292,7 @@ patterns.
 F 11800
 I 12 11869 100.00 1 p  # PICKPOCKET: self-writing pen
 T 11810
+T 11852
 S
 #11967
 barrosh high sorcerer~
@@ -2352,6 +2391,7 @@ M
 Glad to be free of that time loop.~
 T 11810
 T 11840
+T 11852
 S
 #11969
 celiya grand high sorcerer~
@@ -2396,6 +2436,7 @@ M
 say I owe a lot to old Knezz, rest him.~
 T 11810
 T 11840
+T 11852
 S
 #11970
 Niamh acting high sorcerer~
@@ -2414,6 +2455,7 @@ patterns.
 F 11800
 I 12 11872 100.00 1 p  # PICKPOCKET: hand-written note
 T 11810
+T 11852
 S
 #11971
 Gron goblin~
@@ -2745,6 +2787,7 @@ D
 arena. Some are eating clams, others chit-chatting, still others just patiently
 waiting to see the combat.
 ~
+T 11803
 S
 #11973
 Broker captain guard goblin~
@@ -2760,6 +2803,7 @@ wooden shoes that clack as he walks. Over his left shoulder, a thrice-coiled
 purple rope signifies his station as captain of the guard. A small, iridescent
 seashell disc fills a pierced hole in the left side of his jade-green nose.
 ~
+I 12 11866 100.00 1 p  # PICKPOCKET: carved wooden man
 M
 1
 Hello.~
@@ -2783,6 +2827,7 @@ M
 Praise the god today.~
 T 11989
 T 11810
+T 11852
 S
 #11974
 Celles voice goblin~
@@ -2854,6 +2899,7 @@ M
 say Our arena is down on the cliffside.~
 T 11810
 T 11840
+T 11852
 S
 #11975
 Filliks goblin~
@@ -2891,6 +2937,7 @@ M
 0
 $n holds a sock up close to $s face for a second and then starts pulling a stitch out.~
 T 11810
+T 11852
 S
 #11976
 Pim goblin~
@@ -2922,6 +2969,7 @@ M
 0
 $n stops and scratches $s head for a moment.~
 T 11810
+T 11852
 S
 #11977
 fox gray~
@@ -2995,6 +3043,7 @@ Altar Below.
 I 12 11895 100.00 1 p  # PICKPOCKET: iridescent pearl
 T 11978
 T 11810
+T 11852
 S
 #11980
 Ryken elder goblin~
@@ -3028,6 +3077,7 @@ M
 0
 You feel a cold breeze blow through the sepulcher.~
 T 11810
+T 11852
 S
 #11981
 crowd~
@@ -3044,6 +3094,7 @@ click-clack of their shoes creates its own din as they walk, almost louder than
 the gossip as it fills the air.
 ~
 T 11810
+T 11803
 S
 #11982
 pixy little~
@@ -3100,6 +3151,7 @@ happier for it.
 ~
 I 12 11977 100.00 1 p  # PICKPOCKET: steamed mussels
 T 11810
+T 11852
 S
 #11984
 Yena goblin~
@@ -3131,6 +3183,7 @@ M
 1
 I should have brought my ma.~
 T 11810
+T 11852
 S
 #11985
 Ballen goblin~
@@ -3163,6 +3216,7 @@ M
 1
 Should've been born in a gobbrabakh.~
 T 11810
+T 11852
 S
 #11986
 Orkonna goblin~
@@ -3201,6 +3255,7 @@ M
 1
 There's more than enough for everyone.~
 T 11810
+T 11852
 S
 #11987
 Orlin goblin repairman~
@@ -3252,6 +3307,7 @@ M
 $n wipes sweat from $s brow.~
 T 11810
 T 11840
+T 11852
 S
 #11988
 guards pair alivva rink~
@@ -3350,6 +3406,7 @@ M
 echo Alivva says, 'Idiot.'~
 T 11810
 T 11840
+T 11803
 S
 #11989
 shoes walking pair~

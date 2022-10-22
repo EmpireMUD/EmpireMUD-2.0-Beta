@@ -90,8 +90,22 @@ Can't get close enough to pickpocket~
 if %ability% != 142
   * not pickpocket
   return 1
+  halt
 end
 switch %self.vnum%
+  case 11888
+    * Iskip
+    %send% %actor% Even if you could get up to his pockets, anything in there would be enormous.
+  break
+  case 11972
+  case 11981
+    * goblin crowds
+    %send% %actor% They don't have anything interesting in their pockets.
+  break
+  case 11988
+    * plural mob
+    %send% %actor% There's no way to get close enough to pickpocket them without them noticing.
+  break
   default
     %send% %actor% There's no way to get close enough to pickpocket ~%self% without *%self% noticing.
   break
@@ -3019,6 +3033,60 @@ switch %self.vnum%
     break
   done
 ~
+#11852
+Single-try pickpocket~
+0 p 100
+~
+* Only allows each player to attempt to pickpocket this mob 1 time
+if %ability% != 142
+  * not pickpocket ability
+  return 1
+  halt
+elseif %self.mob_flagged(*PICKPOCKETED)% || !%self.can_see(%actor%)%
+  * done already or can't see them
+  return 1
+  halt
+end
+set varname pickpocket_%actor.id%
+if %self.varexists(pickpocket_%actor.id%)%
+  * tried this before
+  switch %self.vnum%
+    default
+      %send% %actor% ~%self% is watching you now; you can't get close enough to pick ^%self% pocket.
+    break
+  done
+  return 0
+else
+  * ok to try
+  set %varname% 1
+  remote %varname% %self.id%
+  return 1
+end
+~
+#11853
+Skycleave: Escaped Otherworlder fight~
+0 k 0
+~
+* tba
+~
+#11854
+Skycleave: Skithe Ler-Wyn fight~
+0 k 0
+~
+* tba
+~
+#11855
+Skycleave: Mezvienne the Enchantress fight~
+0 k 0
+~
+* tba
+~
+#11856
+Skycleave: Shadow Ascendant fight~
+0 k 0
+~
+* tba
+~
 #11857
 Skycleave: Mercenary name setup~
 0 n 100
@@ -3136,6 +3204,18 @@ switch %self.vnum%
 done
 * and detach
 detach 11857 %self.id%
+~
+#11858
+Skycleave: Shade of Mezvienne fight~
+0 k 0
+~
+* tba
+~
+#11859
+Skycleave: MC Barrosh fight~
+0 k 0
+~
+* tba
 ~
 #11860
 Skycleave: Shard cultivator / upgrade shard tool~

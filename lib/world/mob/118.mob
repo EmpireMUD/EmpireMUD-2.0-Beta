@@ -206,6 +206,7 @@ M
 $n makes a harrumph sound.~
 T 11810
 T 11806
+T 11852
 S
 #11807
 #n~
@@ -246,6 +247,7 @@ say We're not, uh, open yet. It's a crisis, if you haven't noticed.~
 T 11806
 T 11810
 T 11837
+T 11852
 S
 #11808
 #n young lady~
@@ -347,6 +349,7 @@ M
 say You'll have to be the one to find it. I can't leave this post until it's done.~
 T 11893
 T 11806
+T 11852
 S
 #11811
 apprentice kayla~
@@ -364,6 +367,7 @@ braids tied back behind her head.
 F 11800
 I 12 11873 100.00 1 p  # PICKPOCKET: glittering red potion
 T 11810
+T 11852
 S
 #11812
 cosimo apprentice~
@@ -385,6 +389,7 @@ say Keep quiet and they won't find us in here.~
 T 11906
 T 11806
 T 11810
+T 11852
 S
 #11813
 tyrone~
@@ -453,6 +458,7 @@ T 11801
 T 11816
 T 11824
 T 11807
+T 11852
 S
 #11817
 miner goblin~
@@ -470,6 +476,7 @@ T 11801
 T 11817
 T 11824
 T 11807
+T 11852
 S
 #11818
 Venjer fox goblin~
@@ -530,6 +537,7 @@ T 11822
 T 11807
 T 11806
 T 11803
+T 11852
 S
 #11819
 pixy queen majestic~
@@ -603,6 +611,7 @@ A pixy is flying around.~
 T 11801
 T 11820
 T 11807
+T 11852
 S
 #11821
 Hugh Mann~
@@ -644,6 +653,7 @@ M
 0
 $n seems to be arguing with $mself inside $s coat.~
 T 11810
+T 11852
 S
 #11822
 #n~
@@ -962,6 +972,7 @@ T 11810
 T 11807
 T 11851
 T 11840
+T 11852
 S
 #11826
 #n~
@@ -1027,6 +1038,7 @@ F 11800
 I 12 11872 100.00 1 p  # PICKPOCKET: hand-written note
 T 11828
 T 11810
+T 11852
 S
 #11828
 Djon apprentice~
@@ -1044,6 +1056,7 @@ has shaved the sides of his head and has short, curly black hair piled on top.
 F 11800
 I 12 11869 100.00 1 p  # PICKPOCKET: self-writing pen
 T 11810
+T 11852
 S
 #11829
 otherworlder~
@@ -1061,6 +1074,7 @@ slits as it considers its chances of escape in each direction.
 ~
 I 4 11830 100.00 1  # LOOT: otherworldly bodysuit
 T 11829
+T 11853
 S
 #11830
 Caius sirensbane high master~
@@ -1102,6 +1116,7 @@ M
 say Defeat them first and he should be vulnerable.~
 T 11893
 T 11806
+T 11852
 S
 #11831
 Niamh resident~
@@ -1120,6 +1135,7 @@ F 11800
 I 4 11867 100.00 1 p  # LOOT: dynamic reconfabulator
 I 12 11867 100.00 1 p  # PICKPOCKET: dynamic reconfabulator
 T 11837
+T 11852
 S
 #11832
 mohammed resident~
@@ -1136,6 +1152,7 @@ the new shopkeeper organize supplies.
 F 11800
 I 12 11873 100.00 1 p  # PICKPOCKET: glittering red potion
 T 11810
+T 11852
 S
 #11833
 shimmer slight goef~
@@ -1510,6 +1527,7 @@ M
 echo Annelise seems to fall silent.~
 T 11810
 T 11840
+T 11852
 S
 #11840
 Waltur walter magineer~
@@ -1534,6 +1552,7 @@ M
 say You fool, we were hiding in here. Next time leave the wall shut.~
 T 11806
 T 11837
+T 11852
 S
 #11841
 mercenary rogue~
@@ -1566,6 +1585,7 @@ Could get more selling these fixtures than they pay us.~
 T 11802
 T 11841
 T 11857
+T 11852
 S
 #11842
 mercenary caster~
@@ -1579,8 +1599,10 @@ This mob is loaded by trig 11900/skymerc and named by 11857.
 ~
 I 4 11865 5.00 1 p  # LOOT: ether condenser
 I 4 11867 5.00 1 p  # LOOT: dynamic reconfabulator
+I 4 11864 5.00 1 p  # LOOT: mana deconfabulator
 I 12 11865 33.33 1 p  # PICKPOCKET: ether condenser
 I 12 11867 33.33 1 p  # PICKPOCKET: dynamic reconfabulator
+I 12 11864 33.33 1 p  # PICKPOCKET: mana deconfabulator
 M
 0
 $n flips through an open tome.~
@@ -1602,6 +1624,7 @@ $n re-casts $s mana shield.~
 T 11802
 T 11857
 T 11842
+T 11852
 S
 #11843
 mercenary archer~
@@ -1631,6 +1654,7 @@ $n cleans $s nails with a knife.~
 T 11802
 T 11857
 T 11843
+T 11852
 S
 #11844
 mercenary nature mage~
@@ -1642,10 +1666,6 @@ Nature mage mercenary is playing with fire.
 D
 This mob is loaded by trig 11900/skymerc and named by 11857.
 ~
-I 4 11864 5.00 1 p  # LOOT: mana deconfabulator
-I 4 11865 5.00 1 p  # LOOT: ether condenser
-I 12 11864 33.33 1 p  # PICKPOCKET: mana deconfabulator
-I 12 11865 33.33 1 p  # PICKPOCKET: ether condenser
 M
 0
 $n forms a thick layer of mana over $s body, and it hardens to solid stone!~
@@ -1664,6 +1684,7 @@ She don't pay enough for towers.~
 T 11802
 T 11857
 T 11844
+T 11852
 S
 #11845
 mercenary vampire~
@@ -1693,6 +1714,7 @@ Go stab yourself in the neck for me.~
 T 11802
 T 11857
 T 11845
+T 11852
 S
 #11846
 mercenary armored~
@@ -1722,6 +1744,7 @@ I hope she's not expecting us to say thank you for this kind of money.~
 T 11802
 T 11857
 T 11846
+T 11852
 S
 #11847
 Kara Virduke~
@@ -1812,6 +1835,7 @@ T 11813
 T 11847
 T 11823
 T 11806
+T 11852
 S
 #11848
 Rojjer bleak~
@@ -1845,6 +1869,7 @@ T 11928
 T 11813
 T 11848
 T 11823
+T 11852
 S
 #11849
 Trixton Vye~
@@ -1913,6 +1938,7 @@ T 11850
 T 11808
 T 11810
 T 11806
+T 11852
 S
 #11850
 prism focusing~
@@ -2091,7 +2117,7 @@ T 11806
 T 11803
 S
 #11863
-shadow ascendant mezvienne~
+shadow ascendant mezvienne shade~
 the Shadow Ascendant~
 The Shadow Ascendant looms over the chamber as it draws more and more power!
 ~
@@ -2132,6 +2158,7 @@ M
 echo You feel your own power being drained by the Shadow Ascendant as it absorbs everything in sight.~
 T 11823
 T 11806
+T 11856
 S
 #11864
 Celiya high sorcerer~
@@ -2149,6 +2176,7 @@ clear she hasn't slept in quite some time.
 F 11800
 I 12 11865 100.00 1 p  # PICKPOCKET: ether condenser
 T 11810
+T 11852
 S
 #11865
 vortex enormous~
@@ -2178,6 +2206,7 @@ own back, trying to get something out. You can only watch in horror...
 ~
 T 11870
 T 11866
+T 11852
 S
 #11867
 barrosh high sorcerer~
@@ -2207,6 +2236,7 @@ I 4 11900 100.00 2  # LOOT: unattuned skystone
 I+ 6 0  # Boss
 T 11861
 T 11823
+T 11859
 S
 #11868
 knezz master~
@@ -2273,6 +2303,7 @@ say Let's find out together. Open your mind, Jozef, let us plumb its depths... t
 T 11823
 T 11863
 T 11806
+T 11858
 S
 #11870
 knezz grand high sorcerer~
@@ -2389,6 +2420,8 @@ emote $n spins faster and faster around the heartwood as she drains its power...
 T 11871
 T 11872
 T 11806
+T 11855
+T 11852
 S
 #11872
 lion time skithe ler-wyn lerwyn~
@@ -2419,6 +2452,7 @@ T 11869
 T 11868
 T 11873
 T 11866
+T 11854
 S
 #11873
 Moneryl astrologer royal~
@@ -2437,6 +2471,7 @@ everyone else's.
 ~
 I 12 11879 100.00 1  # PICKPOCKET: glowing sapphire bud
 T 11810
+T 11852
 S
 #11874
 envoy~
@@ -2454,6 +2489,7 @@ on her back.
 ~
 I 12 11878 100.00 1  # PICKPOCKET: gemstone knife
 T 11810
+T 11852
 S
 #11875
 Nayyul messenger young~
@@ -2473,6 +2509,7 @@ back, Nayyul wears a stiff, silvery cape in the shape of a peaked triangle.
 ~
 I 12 11878 100.00 1  # PICKPOCKET: gemstone knife
 T 11810
+T 11852
 S
 #11876
 Pelet urborist royal~
@@ -2490,6 +2527,7 @@ his stiff triangular cape sticks out backwards to follow his crooked posture.
 ~
 I 12 11880 100.00 1  # PICKPOCKET: ruby rock candy
 T 11810
+T 11852
 S
 #11877
 Joiago~
@@ -2512,6 +2550,7 @@ T 11877
 T 11875
 T 11876
 T 11810
+T 11852
 S
 #11878
 Bastain keeper~
@@ -2531,6 +2570,7 @@ he plods up and down the glimmering staircase.
 I 12 11878 100.00 1  # PICKPOCKET: gemstone knife
 T 11878
 T 11810
+T 11852
 S
 #11879
 Veloryan royal guard~
@@ -2550,6 +2590,7 @@ yellow.
 ~
 I 12 11880 100.00 1  # PICKPOCKET: ruby rock candy
 T 11810
+T 11852
 S
 #11880
 Lotte~
@@ -2573,6 +2614,7 @@ I 12 11880 100.00 1  # PICKPOCKET: ruby rock candy
 T 11876
 T 11880
 T 11810
+T 11852
 S
 #11881
 Kym~
@@ -2592,6 +2634,7 @@ you a crooked smile as you pass her.
 ~
 I 12 11879 100.00 1  # PICKPOCKET: glowing sapphire bud
 T 11810
+T 11852
 S
 #11882
 tresydion high~
@@ -2609,6 +2652,7 @@ residents of Smol Nes-Pik.
 I 12 11880 100.00 1  # PICKPOCKET: ruby rock candy
 T 11882
 T 11810
+T 11852
 S
 #11883
 Meket black~
@@ -2688,6 +2732,7 @@ M
 0
 $n looks up at you and says, 'Wake up.'~
 T 11810
+T 11852
 S
 #11884
 Queen image queen's Vehl somber~
@@ -2729,6 +2774,7 @@ swirling it around, then touching her fingers to her closed lips.
 ~
 I 12 11879 100.00 1  # PICKPOCKET: glowing sapphire bud
 T 11810
+T 11852
 S
 #11886
 Torru~
@@ -2751,6 +2797,7 @@ I 12 11880 100.00 1  # PICKPOCKET: ruby rock candy
 T 11874
 T 11866
 T 11810
+T 11852
 S
 #11887
 Nayyur~
@@ -2769,6 +2816,7 @@ seems to have taken off his cape, or lost it somewhere.
 ~
 I 12 11878 100.00 1  # PICKPOCKET: gemstone knife
 T 11810
+T 11852
 S
 #11888
 Iskip giant~
@@ -2806,6 +2854,8 @@ T 11808
 T 11809
 T 11810
 T 11935
+T 11983
+T 11803
 S
 #11890
 Celiya high sorcerer difficulty~
@@ -2851,6 +2901,7 @@ T 11899
 T 11888
 T 11810
 T 11806
+T 11852
 S
 #11891
 Annaca watcher difficulty~
@@ -2892,6 +2943,7 @@ T 11899
 T 11900
 T 11810
 T 11806
+T 11852
 S
 #11892
 Caius sirensbane high master difficulty~
@@ -2927,6 +2979,7 @@ T 11892
 T 11899
 T 11810
 T 11806
+T 11852
 S
 #11893
 fox gray~

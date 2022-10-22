@@ -1482,17 +1482,19 @@ R
 4 5193 0
 S
 #11866
-knickknack knicknack enchanted~
-an enchanted knickknack~
-An enchanted knickknack has been knocked over.~
-   The odd knickknack is lightly damaged on one side, but otherwise still in
-good shape. It seems rather old, even if you can't tell exactly what it's meant
-to be. The tower was full of them, so perhaps it's important.
+man wooden carved~
+a carved wooden man~
+A carved wooden man lies on the ground.~
+   The angular wooden figurine resembles a man, at least from the waist up;
+there are no legs. The figurine's head is bald and the details on the face are
+poorly defined, except for a pair of jade squares stuck in for eyes. A
+double-chevron collar is the only hint of clothing, but the sculpture has
+distinct arms and hands that join near its waist.
    flavor text tba
 ~
-15 j a 0 4
+15 0 a 0 5
 1 0 0
-2 0
+0 0
 C
 150 150
 R
