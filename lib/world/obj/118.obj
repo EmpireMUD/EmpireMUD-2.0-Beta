@@ -1820,11 +1820,12 @@ a gemstone knife~
 A gemstone knife is stabbed into the ground.~
    The blade of the short, thin knife is near-transparent sapphire with an edge
 that could split the hair on a moth. At its base, it swirls into a jade handle
-no seam or joint; the two minerals seem to flow into each other. At the base
-of the handle, the knife is finished with opal that equally has no boundary.
+with no seam or joint; the two minerals seem to flow into each other. At the
+base of the handle, the knife is finished with opal that equally has no
+boundary.
    flavor text tba
 ~
-1 mo ano f 6
+1 mo ano f 7
 0 1 4
 1 0
 A
@@ -1840,11 +1841,17 @@ glow, you find that its edges are slowly turning to ash; its brilliance is as
 ephemeral as the setting sun.
    flavor text tba
 ~
-3 c a 0 9
+3 c a 0 10
 0 0 0
 0 96
 C
 150 150
+M
+17
+$p crumbles away to ash.~
+M
+18
+$p crumbles away to ash on the ground.~
 S
 #11880
 candy ruby rock~
@@ -1856,7 +1863,7 @@ the tongue, evoking the taste of maple syrup or honey as the initial crunch
 melts away into cloying sweetness.
    flavor text tba
 ~
-6 m a 0 7
+6 m a 0 9
 24 0 0
 12 168
 A
@@ -1871,7 +1878,34 @@ You crunch into the ruby rock candy, which melts in your mouth.~
 M
 5
 $n crunches into some ruby rock candy.~
-O+ 1 6340
+M
+17
+$p breaks into little pieces and blows away.~
+M
+18
+$p breaks into little pieces and blows away.~
+O+ 1 11880
+S
+#11881
+flask lightning~
+a flask of lightning~
+A flask of lightning is sputtering on the ground.~
+tba
+   flavor text tba
+~
+25 m a 0 7
+-1 0 3030
+8 0
+A
+6 1 0
+B
+q
+C
+150 150
+I 26 800 100.00 1  # DECAYS-TO: glass flask
+I 27 800 100.00 1  # CONSUMES-TO: glass flask
+R
+4 5130 0
 S
 #11882
 pool shimmering water dew~

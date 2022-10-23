@@ -82,7 +82,7 @@ wrapped in a pastry shell and baked until golden. Once the traditional meal of
 miners across the land, it's now enjoyed mainly in bourgeois cafes and
 gentrified food carts.
 ~
-6 m a 0 5
+6 m a 0 6
 24 0 0
 7 336
 A
@@ -95,6 +95,12 @@ You bite into the pasty and realize it's not just mutton and vegetables, it's a 
 M
 5
 $n's eyes roll back into $s head as $e eats $p.~
+M
+17
+$p has gone bad and you throw it out.~
+M
+18
+$p rots away to nothing.~
 S
 #11905
 cheese turquoise exotic~
@@ -109,7 +115,7 @@ animals, something usually seen as the vulgar purview of nature magic. Some
 sorcerers are eager to create new products or conveniences, with little regard
 for traditional ethics. And none of them are afraid to mislabel a product.
 ~
-6 m a 0 7
+6 m a 0 8
 24 0 0
 7 336
 A
@@ -122,6 +128,12 @@ You pop the turquoise cheese in your mouth and suddenly live an entire life as a
 M
 5
 $n's face goes blank and $e seems to space out for a moment as $e eats $p.~
+M
+17
+There's nothing left of $p but mold, and you throw it out.~
+M
+18
+$p molds until there's nothing left.~
 S
 #11906
 fountain stone~
@@ -655,7 +667,7 @@ trail of crumbs behind you.
 two children are abandoned by their parents and leave a trail of breadcrumbs to
 find their way through the forest.
 ~
-6 p a 0 5
+6 p a 0 6
 12 0 0
 7 48
 C
@@ -666,6 +678,12 @@ You spend an eternity trying to chew and swallow the crummy bread, as it absorbs
 M
 5
 $n chews and chews and chews some crummy bread.~
+M
+17
+Your crummy bread has dissolved completely into crumbs.~
+M
+18
+$p on the ground blows away on a light breeze.~
 S
 #11930
 breadcrumbs crumbs trail~
@@ -1216,7 +1234,7 @@ some steamed mussels~
 Some steamed mussles are lying on the ground.~
 The mussels have a fragrant riparian smell.
 ~
-6 m a 0 6
+6 m a 0 7
 24 0 0
 7 48
 A
@@ -1231,6 +1249,12 @@ You pry open some steamed mussels and eat them.~
 M
 5
 $n pries open $p and eats them.~
+M
+17
+The steamed mussels go bad and you throw them out.~
+M
+18
+$p go bad and rot.~
 O+ 1 6220
 S
 #11978
@@ -1240,12 +1264,18 @@ Some mussels have been left on the ground.~
    The mussels are small shellfish with blue-black shells. They smell like the
 river but you could certainly cook them up.
 ~
-6 0 a 0 5
+6 0 a 0 6
 6 0 0
 7 48
 M
 4
 You eat some slimy mussels fresh from the shells.~
+M
+17
+$p begin to smell worse and you throw them out.~
+M
+18
+$p rot.~
 O+ 1 6200
 S
 #11979
@@ -1727,7 +1757,7 @@ a distinctly marbled jade color, but it tastes like a slightly funky cheese.
 Skycleave have been extraordinarily successful at grafting unusual foods onto
 magical trees.
 ~
-6 g a 0 7
+6 g a 0 8
 6 0 0
 7 12
 B
@@ -1738,5 +1768,11 @@ You pop $p in your mouth and the world seems to turn green for a second as you s
 M
 5
 $n pops $P in $s mouth and flashes green for a second.~
+M
+17
+$p sprouts little legs, hops down to the ground, and runs away!~
+M
+18
+$p sprouts little legs and runs away!~
 S
 $

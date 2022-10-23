@@ -116,6 +116,7 @@ trying to organize the refugees down here on the first floor. He looks young,
 perhaps 16, but he's putting in twice as much work as everyone else around him.
 ~
 F 11800
+I 12 11881 100.00 1 p  # PICKPOCKET: flask of lightning
 M
 0
 Corwin tries in vain to tidy things up.~
@@ -150,6 +151,7 @@ M
 0
 Corwin puts his hands on his hips and looks around at the mess.~
 T 11810
+T 11852
 S
 #11805
 Mageina barista~
@@ -167,8 +169,35 @@ Her face, though young, looks absolutely exhausted, as if she hasn't slept in
 some time.
 ~
 F 11800
+I 12 11902 5.00 1 p  # PICKPOCKET: mug
+I 12 11926 5.00 1 p  # PICKPOCKET: teacup
+I 12 11903 5.00 1 p  # PICKPOCKET: tall glass
+I 12 11904 5.00 1 p  # PICKPOCKET: mutton pasty
+I 12 11905 5.00 1 p  # PICKPOCKET: exotic turquoise cheese
+I 12 11869 5.00 1 p  # PICKPOCKET: self-writing pen
+I 12 11867 5.00 1 p  # PICKPOCKET: dynamic reconfabulator
+I 12 11865 5.00 1 p  # PICKPOCKET: ether condenser
+I 12 11864 5.00 1 p  # PICKPOCKET: mana deconfabulator
+I 12 11894 5.00 1 p  # PICKPOCKET: wooden Venus figurine
+I 12 11868 1.00 1 p  # PICKPOCKET: miniature wellstone prototype
+I 12 11917 1.00 1 p  # PICKPOCKET: page 2413 of the time-traveler's diary
+I 12 11918 2.00 1 p  # PICKPOCKET: page 91 of the time-traveler's diary
+I 12 11919 2.00 1 p  # PICKPOCKET: page 214 of the time-traveler's diary
+I 12 11920 2.00 1 p  # PICKPOCKET: page 86 of the time-traveler's diary
+I 12 11893 2.00 1 p  # PICKPOCKET: fine leather fox leash
+I 12 11896 2.00 1 p  # PICKPOCKET: leather bladder
+I 12 11877 3.00 1 p  # PICKPOCKET: little gemstone flute
+I 12 11878 4.00 1 p  # PICKPOCKET: gemstone knife
+I 12 11977 6.00 1 p  # PICKPOCKET: steamed mussels
+I 12 1206 5.00 1 p  # PICKPOCKET: iridescent blue iris
+I 12 11879 4.00 1 p  # PICKPOCKET: glowing sapphire bud
+I 12 11880 4.00 1 p  # PICKPOCKET: ruby rock candy
+I 12 11895 4.00 1 p  # PICKPOCKET: iridescent pearl
+I 12 11897 4.00 1 p  # PICKPOCKET: good rock
+I 12 11866 4.00 1 p  # PICKPOCKET: carved wooden man
 T 11810
 T 11837
+T 11852
 S
 #11806
 Huberus master sorcerer instructor~
@@ -447,7 +476,7 @@ goblin commando~
 the goblin commando~
 The goblin commando is here.
 ~
-0 0 abdI 0 2
+0 0 abd 0 2
 0 0 0 4
 D
 Strings set by trig 11824.
@@ -458,7 +487,6 @@ T 11801
 T 11816
 T 11824
 T 11807
-T 11852
 S
 #11817
 miner goblin~
@@ -1564,6 +1592,13 @@ Rogue mercenary is skulking around.
 D
 This mob is loaded by trig 11900/skymerc and named by 11857.
 ~
+I 12 11881 15.00 1 p  # PICKPOCKET: flask of lightning
+I 12 11874 15.00 1 p  # PICKPOCKET: filigreed stasis charm
+I 12 11873 15.00 1 p  # PICKPOCKET: glittering red potion
+I 12 11869 15.00 1 p  # PICKPOCKET: self-writing pen
+I 12 11867 5.00 1 p  # PICKPOCKET: dynamic reconfabulator
+I 12 11865 5.00 1 p  # PICKPOCKET: ether condenser
+I 12 11864 5.00 1 p  # PICKPOCKET: mana deconfabulator
 M
 0
 $n flips and catches $s dagger.~
@@ -2195,7 +2230,7 @@ Mezvienne enchantress~
 Mezvienne~
 Mezvienne the Enchantress clasps her head and doubles over in pain.
 ~
-0 0 bdvxEI n 3
+0 0 bdvxE n 3
 2 0 0 15
 D
    Mezvienne screams as she clasps her head, her body twirling almost aimlessly
@@ -2207,6 +2242,7 @@ own back, trying to get something out. You can only watch in horror...
 T 11870
 T 11866
 T 11852
+T 11803
 S
 #11867
 barrosh high sorcerer~
@@ -2329,7 +2365,7 @@ Mezvienne enchantress~
 Mezvienne the Enchantress~
 Mezvienne the Enchantress hovers above the tower as she channels the heartwood.
 ~
-0 0 bdhvxyDI 0 3
+0 0 bdhvxyD 0 3
 2 0 0 21
 D
    The enchantress's long gossamer gown blows madly in the wind as she floats
@@ -2422,6 +2458,7 @@ T 11872
 T 11806
 T 11855
 T 11852
+T 11803
 S
 #11872
 lion time skithe ler-wyn lerwyn~
@@ -2453,6 +2490,7 @@ T 11868
 T 11873
 T 11866
 T 11854
+T 11803
 S
 #11873
 Moneryl astrologer royal~

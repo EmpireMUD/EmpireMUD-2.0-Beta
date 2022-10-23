@@ -93,6 +93,15 @@ if %ability% != 142
   halt
 end
 switch %self.vnum%
+  case 11866
+  case 11871
+    * Mezvienne
+    %send% %actor% She's floating; it would be very difficult to pickpocket her.
+  break
+  case 11872
+    * Skithe
+    %send% %actor% The Lion of Time definitely does not have pockets.
+  break
   case 11888
     * Iskip
     %send% %actor% Even if you could get up to his pockets, anything in there would be enormous.
