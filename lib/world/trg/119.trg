@@ -4320,6 +4320,29 @@ switch %random.8%
 done
 detach 11967 %self.id%
 ~
+#11968
+Skycleave: Gnarled old wand of power~
+1 c 1
+say ' shout whisper~
+set phrase by the power of skycleave
+* basic things that could prevent them speaking
+set valid_pos Standing Fighting Sitting Resting
+if !(%valid_pos% ~= %actor.position%)
+  return 0
+  halt
+end
+if !(%arg% ~= %phrase%)
+  return 0
+  halt
+end
+wait 1
+if %actor.is_immortal%
+  %echo% A bolt of lightning comes out of nowhere and strikes |%actor% wand!
+else
+  %echo% A bolt of lightning from nowhere strikes ~%actor% right in the chest!
+  %slay% %actor%
+end
+~
 #11969
 Skycleave: Hendecagon fountain summoned NPC run~
 0 ab 100

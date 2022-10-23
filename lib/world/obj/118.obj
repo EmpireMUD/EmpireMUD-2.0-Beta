@@ -1890,8 +1890,13 @@ S
 flask lightning~
 a flask of lightning~
 A flask of lightning is sputtering on the ground.~
-tba
-   flavor text tba
+   A bolt of lightning flickers back and forth inside the tightly-corked flask.
+At times, it's so bright it becomes difficult to look at. The flask is packaged
+like a potion, but there's no way to tell what effect it will have except to
+quaff it.
+   The pages of Skycleave are notoriously quick on their feet, in no small part
+due to heavy dependence on potions. It never pays to fall behind in the black
+tower.
 ~
 25 m a 0 7
 -1 0 3030
@@ -1926,6 +1931,31 @@ M
 5
 $n kneels down and drinks the $T from the pool.~
 T 11910
+S
+#11883
+wand gnarled old~
+a gnarled old wand~
+A gnarled old wand lies on the ground.~
+   If not for the raw power flowing off of the old wand, it might look like a
+fallen twig. It is perhaps a foot and a half long, lightly discolored around
+the base, and otherwise the only notable feature is the initials carved into
+the end.
+   Sophisticated magic users fall broadly into two categories: those who prefer
+staves and those who prefer wands. While a staff is larger and therefore easier
+to channel mana through, a wand is more easily concealed and capable of a much
+finer focus.
+~
+1 mpwx ano 0 5
+0 1 22
+0 0
+A
+5 2 0
+E
+initials~
+   The end of the gnarled wand has the letters 'JK' crossed out and replaced by
+'MM'.
+~
+T 11968
 S
 #11885
 pool pools dew~
