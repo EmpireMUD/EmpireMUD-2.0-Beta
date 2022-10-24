@@ -3088,10 +3088,10 @@ if %method% == respawn
 end
 ~
 #11950
-Skycleave: Long potion consume handler~
+Skycleave: Consume handler (long potions and other consumables)~
 1 s 100
 ~
-* handles long-duration skycleave potions
+* handles long-duration skycleave potions plus other consumables
 switch %self.vnum%
   case 11912
     dg_affect #%self.vnum% %actor% off
@@ -3107,6 +3107,16 @@ switch %self.vnum%
     dg_affect #%self.vnum% %actor% off
     dg_affect #%self.vnum% %actor% INVENTORY 35 86400
     %send% %actor% # That's a weight off your shoulders.
+  break
+  * non-potions:
+  case 11884
+    * poison mushroom
+    %send% %actor% You eat the little white mushroom but you don't feel so good...
+    %send% %actor% Oh no... the world goes black and the last thing you feel is your head hitting something hard.
+    %echoaround% %actor% ~%actor% eats a little white mushroom...
+    %slay% %actor%
+    return 0
+    %purge% %self%
   break
 done
 ~
@@ -4324,15 +4334,14 @@ detach 11967 %self.id%
 Skycleave: Gnarled old wand of power~
 1 c 1
 say ' shout whisper~
+return 0
 set phrase by the power of skycleave
 * basic things that could prevent them speaking
 set valid_pos Standing Fighting Sitting Resting
 if !(%valid_pos% ~= %actor.position%)
-  return 0
   halt
 end
 if !(%arg% ~= %phrase%)
-  return 0
   halt
 end
 wait 1

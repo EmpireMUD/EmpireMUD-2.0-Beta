@@ -1454,7 +1454,9 @@ Someone has left their mana deconfabulator on the ground.~
 particularly heavy. It's made from striped magewood and nocturnium straps, with
 a crystal orb on one end and an eventide horn on the other. You don't see a way
 to turn it on; or, perhaps it isn't working any more.
-   flavor text tba
+   Magical energy, often called mana, is a tangled thing, often tainted by the
+stray thoughts and dreams of wizards and sorcerers. Purifying mana is nearly
+impossible, but deconfabulating it can be done with the right equipment.
 ~
 15 e a 0 4
 1 0 0
@@ -1471,7 +1473,7 @@ An ether condenser is humming on the ground.~
    The odd black metal box is inscribed all over with golden letters in a
 script you don't read. It makes a low hum and is, at all times, cold to the
 touch, but you can't figure out how to open it, nor what it's doing.
-   flavor text tba
+   Some mages have posited that the ether can be used as a source of mana.
 ~
 15 e a 0 4
 1 0 0
@@ -1490,7 +1492,8 @@ there are no legs. The figurine's head is bald and the details on the face are
 poorly defined, except for a pair of jade squares stuck in for eyes. A
 double-chevron collar is the only hint of clothing, but the sculpture has
 distinct arms and hands that join near its waist.
-   flavor text tba
+   Many cultures practice woodcarving to create ornaments, dolls, and religious
+sculptures.
 ~
 15 0 a 0 5
 1 0 0
@@ -1508,7 +1511,8 @@ There is a dynamic reconfabulator on the ground.~
 ring around it and a nocturnium stake through the center. You have no knowledge
 of how to use it -- if, indeed, it serves some function or purpose at all. But
 you do notice that it's ice cold to the touch.
-   flavor text tba
+   When mana becomes too pure, it sometimes becomes explosive. As this can be a
+side-effect of deconfabulation, the proper solution is a reconfabulator.
 ~
 15 e a 0 4
 1 0 0
@@ -1526,7 +1530,8 @@ A prototype for a miniature wellstone is lying on the ground.~
 smaller gems and minerals, as if they were fused together and then carved to
 resemble a smooth, round rock, almost like a skipping stone. It seems to be a
 prototype; you can't figure out how to make it do anything.
-   flavor text tba
+   The magineers at Skycleave design far more gizmos than they ever create.
+Some take years of research and experimentation and, of those, many still fail.
 ~
 15 0 a 0 5
 1 0 0
@@ -1547,7 +1552,8 @@ to look at them.
    Unfortunately, you can't seem to figure out how the self-writing pen works.
 When it's too close to any blank surface, it starts scribbling on its own. But
 nothing you do or say seems to control it.
-   flavor text tba
+   A good self-writing pen can save a person a lot of time writing class notes,
+thank-you notes, and Dear John letters.
 ~
 15 0 a 0 6
 1 0 0
@@ -1621,7 +1627,7 @@ A glittering red potion is sitting on the ground.~
    The red potion swirls as you hold it up to the light, glittering with swirls
 of yellow like pixy dust in caught in a whirlpool. There's no label on the
 flask and no way to tell what effect it will have but to quaff it.
-   flavor text tba
+   Potions are a quick way to shore up one's particular deficiencies.
 ~
 25 m a 0 6
 -1 0 3030
@@ -1643,7 +1649,9 @@ A filigreed stasis charm is lying on the ground.~
 look like knitted metal. At the center of the charm, the negative space between
 the filigree forms the outline of a person. The whole thing dangles from a
 thin gold chain, tarnished at the back from heavy wear.
-   flavor text tba
+   The Tower Skycleave is a notoriously high-performing school of magic. Part
+of their excellent grade point average, and equally notorious, is low tolerance
+for under-achievers.
 ~
 2 0 ac 0 6
 0 0 0
@@ -1659,7 +1667,7 @@ A hardstone pick is lying here.~
    The small pick has short wooden handle and a triangular stone head, bound
 together by pitch and leather. Scratch-marks run the length of the handle, but
 though the head of the pick is slightly worn, there are no signs of cracks.
-   flavor text tba
+   Using stone to mine ore is far from ideal. In fact, it's nearly impossible.
 ~
 1 imo an h 4
 0 1 8
@@ -1673,7 +1681,7 @@ An obsidian stabber has been dropped here.~
 wafer-thin, with tiny serrations along both sides. A simple strap of leather
 around the base serves as a simple handle. It may be small, but this thing is
 thin enough to slide between ribs and long enough to pierce the heart.
-   flavor text tba
+   Goblin tools are, as a rule, simple and 'to the point'.
 ~
 1 imo ano f 4
 0 1 4
@@ -1688,7 +1696,9 @@ glitters in every color of the rainbow as the light strikes it. Nineteen tiny
 holes run the length of the flute. It's difficult to play, but the music is
 transcendental.
    Hold the flute to play it.
-   flavor text tba
+   Joiago learned to play the flute at a young age from his grandmother, who
+gifted him one made by pixies. In the right hands, it has the power to evoke
+powerful emotions and draw listeners into an enchanted dance.
 ~
 22 0 ao 0 3
 1 0 0
@@ -1823,7 +1833,8 @@ that could split the hair on a moth. At its base, it swirls into a jade handle
 with no seam or joint; the two minerals seem to flow into each other. At the
 base of the handle, the knife is finished with opal that equally has no
 boundary.
-   flavor text tba
+   The magic required to fuse dissimilar gemstones is deeply rooted in Tagra
+Nes, where the ancestral grandmothers, the Ebru, guard it from beyond death.
 ~
 1 mo ano f 7
 0 1 4
@@ -1839,7 +1850,8 @@ A glowing sapphire bud is lying on the ground.~
 are unimaginably thin, they are as hard as sapphire. But as you watch the bud
 glow, you find that its edges are slowly turning to ash; its brilliance is as
 ephemeral as the setting sun.
-   flavor text tba
+   Tresydions tended Tagra Nes and its people for thousands of years, growing
+the community as well as the tree.
 ~
 3 c a 0 10
 0 0 0
@@ -1861,7 +1873,9 @@ Some ruby rock candy is scattered on the ground.~
 it can be hard to tell them apart from the real thing. But these are sweet to
 the tongue, evoking the taste of maple syrup or honey as the initial crunch
 melts away into cloying sweetness.
-   flavor text tba
+   Tagra Nes once performed the noble task of drawing up mana from deep beneath
+the world and releasing it into the world, a task it performed ceaselessly day
+and night for 8200 years, but not a day longer.
 ~
 6 m a 0 9
 24 0 0
@@ -1956,6 +1970,29 @@ initials~
 'MM'.
 ~
 T 11968
+S
+#11884
+mushroom white~
+a white mushroom~
+A white mushroom is lying here.~
+   The small mushroom is white with a slightly yellowish tinge to its cap.
+Mushrooms like this grow all over.
+   Mushrooms have been eaten since before recorded history, though it's
+important to correctly identify them first. Many mushrooms are difficult to
+distinguish when they're small.
+~
+6 km a 0 1
+6 0 0
+0 0
+C
+150 150
+M
+17
+$p rots and you throw it out.~
+M
+18
+$p rots on the ground.~
+T 11950
 S
 #11885
 pool pools dew~
@@ -2065,7 +2102,8 @@ A fine leather fox leash has been left behind.~
 your arm. It's lightly worn at both ends, especially the handle, and it looks
 as though someone has been carrying it around in their mouth.
    You can 'use leash' to add a new minipet to your list.
-   flavor text tba
+   Though housepets began as working companions, aiding in hunting, guarding,
+and carrying, they quickly discovered it's easier to be pampered and overfed.
 ~
 19 o a 0 7
 11893 0 0
@@ -2081,7 +2119,8 @@ A wooden Venus figurine is lying here.~
 hips and large breasts; aside from a prominent belly button, there is little
 detail beyond that. Her face is smooth and undetailed except for two square
 impressions where her eyes would be.
-   flavor text tba
+   Many types of statuette with women's forms are described as Venus figurines,
+though they rarely relate to the Greek goddess.
 ~
 15 0 a 0 8
 1 0 0
@@ -2097,7 +2136,8 @@ an iridescent pearl~
 An iridescent pearl has been left here.~
    The solitary little pearl isn't perfectly round, but it's well-polished and
 when it catches the light, its lustrous surface shimmers like a pastel rainbow.
-   flavor text tba
+   Pearls often symbolize beauty, wisdom, and luxury. But to a person whose
+diet is made of shellfish, they can instead represent abundance.
 ~
 15 0 a 0 9
 1 0 0
@@ -2114,8 +2154,9 @@ A leather bladder is lying on the ground.~
    The small bladder has been stretched and tanned to make it into a canteen.
 No smell remains except the salt of the ocean, but this was once the bladder of
 some unfortunate creature. The mouthpiece is kept shut tight by a leather
-string tied securely around it.
-   flavor text tba
+string tied securely around it, but even when it's closed, it smells of lilac.
+   The light, lilac wine, sweet and heady, is said to dull the deep pain of
+losing a lover.
 ~
 5 0 a 0 11
 48 48 11896

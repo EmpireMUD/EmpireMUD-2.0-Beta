@@ -287,13 +287,14 @@ Elamm man young eager~
 Elamm~
 An eager young man is seated at a desk.
 ~
-0 0 bdvxAI n 3
+0 0 bdvxA n 3
 1 0 0 16
 D
    Elamm is dressed in well-pressed black slacks and a crisp white shirt. He
 wears his brown hair long but tied back. Over his left eye, he wears a monocle
 of black glass, while the right eye, brown, is uncovered.
 ~
+I 12 11884 100.00 1 p  # PICKPOCKET: white mushroom
 M
 1
 If I cast a silence spell over a whole room, does that work on screams?~
