@@ -230,11 +230,11 @@ but its masters manage to put a price on it nonetheless. And as the key to
 selling magic is bringing in customers, the tower has devised many clever ways
 to bring people back over and over again.
 ~
-3 p a 0 7
+3 p a 0 8
 0 0 0
 12 0
 M
-22
+21
 warpstone~
 T 11909
 T 9806
@@ -1232,7 +1232,9 @@ S
 mussels steamed~
 some steamed mussels~
 Some steamed mussles are lying on the ground.~
-The mussels have a fragrant riparian smell.
+   The mussels have a fragrant riparian smell.
+   Since time immemorial, people have gathered and cooked shellfish as a simple
+and bountiful food source.
 ~
 6 m a 0 7
 24 0 0
@@ -1263,6 +1265,8 @@ some mussels~
 Some mussels have been left on the ground.~
    The mussels are small shellfish with blue-black shells. They smell like the
 river but you could certainly cook them up.
+   Rivers provide a plentiful and sustainable food source as much for the
+shellfish as for the fisherman.
 ~
 6 0 a 0 6
 6 0 0

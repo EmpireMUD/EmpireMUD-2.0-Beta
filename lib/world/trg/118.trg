@@ -115,6 +115,15 @@ switch %self.vnum%
     * plural mob
     %send% %actor% There's no way to get close enough to pickpocket them without them noticing.
   break
+  case 11915
+    * prevents global pickpocket
+    %send% %actor% Who knows why the caged goblin sings -- but it might be because his pockets are empty.
+  break
+  case 11916
+  case 11917
+    * prevents global pickpocket
+    %send% %actor% Someone has already emptied the goblin's pockets.
+  break
   default
     %send% %actor% There's no way to get close enough to pickpocket ~%self% without *%self% noticing.
   break
@@ -1592,7 +1601,7 @@ elseif %self.vnum% == 11827
       wait 9 s
       %force% %djon% say No! Wait, Regin Dall?
       wait 9 s
-      say Didn't you two used to date?
+      say Didn't you two used to date? He looked awful.
       wait 9 s
       %force% %djon% say  Barely. Honestly he doesn't even count.
       wait 9 s

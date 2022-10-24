@@ -48,7 +48,6 @@ M
 1
 I can't believe the Tower Skycleave is finally here!~
 T 11905
-T 11852
 S
 #11902
 bucket wooden~
@@ -123,7 +122,7 @@ corwin page~
 Page Corwin~
 Corwin is bustling about.
 ~
-0 0 dvxAH n 3
+0 0 dvxH n 3
 1 0 68 15
 D
    Corwin is a young man of perhaps 16 years. He keeps his hair cropped short
@@ -150,7 +149,7 @@ Mageina barista~
 Mageina the barista~
 The barista seems to be daydreaming behind the bar. (list)
 ~
-0 0 bdvxAI n 3
+0 0 bdvxI n 3
 2 0 0 16
 D
    Mageina hardly spares you a glance as she leans behind the bar, idly
@@ -215,7 +214,7 @@ Huberus instructor~
 Instructor Huberus~
 Instructor Huberus is seated atop her desk.
 ~
-0 0 bdvxAI n 3
+0 0 bdvxI n 3
 2 0 0 16
 D
    Instructor Huberus is a gruff sort of woman, well-dressed in overflowing
@@ -287,7 +286,7 @@ Elamm man young eager~
 Elamm~
 An eager young man is seated at a desk.
 ~
-0 0 bdvxA n 3
+0 0 bdvx n 3
 1 0 0 16
 D
    Elamm is dressed in well-pressed black slacks and a crisp white shirt. He
@@ -330,7 +329,7 @@ Akeldama student pale~
 Akeldama~
 A pale student is seated in the back.
 ~
-0 0 bdvxAI n 3
+0 0 bdvxI n 3
 2 0 0 16
 D
    Akeldama has chosen a seat in the corner, barely touched by the flickering
@@ -369,7 +368,7 @@ Annaca watcher~
 Watcher Annaca~
 Annaca is watching over the apprentices.
 ~
-0 0 dvxA n 3
+0 0 dvx n 3
 2 0 0 15
 D
    Annaca looks bedraggled in her loose midnight blue robes. The toll that
@@ -387,7 +386,7 @@ apprentice kayla~
 Apprentice Kayla~
 Apprentice Kayla is here.
 ~
-0 0 dvxA n 3
+0 0 dvx n 3
 2 0 0 15
 D
    Kayla is dressed in simple white apprentice robes. She wears her hair in
@@ -406,7 +405,7 @@ cosimo apprentice~
 Apprentice Cosimo~
 Apprentice Cosimo is here.
 ~
-0 0 dvxA n 3
+0 0 dvx n 3
 1 0 0 15
 D
    Cosimo is clad in white apprentice robes with fiery red trim. On his face
@@ -424,7 +423,7 @@ tyrone apprentice~
 Apprentice Tyrone~
 Apprentice Tyrone is standing here.
 ~
-0 0 dvxA n 3
+0 0 dvx n 3
 1 0 0 15
 D
    Tyrone is tall, with soft features and black eyes. His face bears no creases
@@ -463,7 +462,7 @@ Wright wrangler~
 Wrangler Wright~
 The goblin wrangler is cleaning up the mess. (list)
 ~
-0 0 bdvxA n 3
+0 0 bdvx n 3
 1 0 0 15
 D
    Though he's old and more than a little scarred, Wrangler Wright seems to be
@@ -512,7 +511,7 @@ goblin caged cages~
 the caged goblin~
 A goblin sits with its arms and legs dangling out of its cage.
 ~
-0 0 bd 0 3
+0 0 bd n 3
 1 0 0 15
 D
    The cages aren't large enough to stand in, so this poor goblin is dangling
@@ -572,13 +571,14 @@ M
 0
 $n sings, 'Desperate goblin... Why don't you come to your senses? You've been out ridin' fences for so long now...'~
 T 11810
+T 11803
 S
 #11916
 goblin caged cages~
 a caged goblin~
 A goblin is laying on the dirty floor of her cage.
 ~
-0 0 bd 0 3
+0 0 bd n 3
 2 0 0 15
 D
    The cages have not been cleaned in some time, but one hapless goblin has
@@ -602,13 +602,14 @@ M
 0
 One of the goblins cries quietly in the cage.~
 T 11810
+T 11803
 S
 #11917
 goblin caged cages~
 a caged goblin~
 One of the goblins is trying to climb the bars of its cage.
 ~
-0 0 bd 0 3
+0 0 bd n 3
 1 0 0 15
 D
    One of the goblins has become restless and is trying to climb the bars of
@@ -632,13 +633,14 @@ M
 1
 Goblins' day is coming!~
 T 11810
+T 11803
 S
 #11918
 Chicanders warden ~
 the warden~
 The warden, Chicanders, is overseeing the track. (race)
 ~
-0 0 bdvAI n 3
+0 0 bdvI n 3
 1 0 0 15
 D
    With his hair receding and his gut protruding, Warden Chicanders has settled
@@ -771,7 +773,7 @@ ravinder apprentice~
 Apprentice Ravinder~
 Apprentice Ravinder is here.
 ~
-0 0 dvxA n 3
+0 0 dvx n 3
 1 0 0 15
 D
    Ravinder Singh is not a tall man, but he stands tall in his violet dastar,
@@ -890,7 +892,7 @@ Paige page~
 Paige~
 A page is bustling past you.
 ~
-0 0 dvxAH n 3
+0 0 dvxH n 3
 2 0 50 15
 D
    Paige is a young woman with her brown and blonde hair in a jaw-length bob.
@@ -911,7 +913,7 @@ caius sirensbane high master~
 Caius Sirensbane~
 High Master Caius Sirensbane is supervising the residents.
 ~
-0 0 dvxA n 3
+0 0 dvx n 3
 1 0 0 15
 D
    Where the other sorcerers would wear a robe, Caius is draped in a white
@@ -929,7 +931,7 @@ Niamh resident~
 Resident Niamh~
 Resident Niamh is standing here. (list)
 ~
-0 0 dvxA n 3
+0 0 dvx n 3
 2 0 0 15
 D
    Niamh's black hair shows fiery red roots as she stoops to pick up a book.
@@ -948,7 +950,7 @@ mohammed resident~
 Resident Mohammed~
 Resident Mohammed is standing here.
 ~
-0 0 dvxA n 3
+0 0 dvx n 3
 1 0 0 15
 D
    Mohammed stands like a beanpole, tall and thin, wearing a long, slim, gray
@@ -1005,7 +1007,7 @@ otherworlder tall blue person~
 the otherworlder~
 A tall, blue person is pulling at the chains that hold it to the floor.
 ~
-0 0 bdvxA n 3
+0 0 bdvx n 3
 2 0 0 15
 D
    The otherworlder is taller than a human, with periwinkle skin dappled with
@@ -1031,7 +1033,7 @@ Sanjiv apprentice~
 Apprentice Sanjiv~
 Apprentice Sanjiv is using an arcane contraption on the otherworlder.
 ~
-0 0 bdvxA n 3
+0 0 bdvx n 3
 1 0 0 15
 D
    Sanjiv is dressed in a white kurta with a violet hem along the bottom. He's
@@ -1068,7 +1070,7 @@ scaldorran lich~
 the Lich Scaldorran~
 Scaldorran the Lich twists and curls in the air.
 ~
-0 0 bdvxA n 3
+0 0 bdvx n 3
 1 0 0 15
 D
    Scaldorran is a mass of tattered gray linen wraps, slithering and writhing
@@ -1183,7 +1185,7 @@ Annelise enchanter~
 Enchanter Annelise~
 Enchanter Annelise is working on something.
 ~
-0 0 bdvxA n 3
+0 0 bdvx n 3
 2 0 0 15
 D
    Annelise is strikingly young for a woman wearing the many purple robes of
@@ -1237,7 +1239,7 @@ Waltur walter magineer~
 Magineer Waltur~
 Magineer Waltur is here. (list)
 ~
-0 0 bdvxAI n 3
+0 0 bdvxI n 3
 1 0 0 15
 D
    Waltur is a young man, not over the age of 25, and apparently so busy he has
@@ -1316,7 +1318,7 @@ Sanjiv apprentice~
 Apprentice Sanjiv~
 Apprentice Sanjiv is using an arcane contraption on the walls.
 ~
-0 0 bdvxA n 3
+0 0 bdvx n 3
 1 0 0 15
 D
    Sanjiv is dressed in a white kurta with a violet hem along the bottom. He's
@@ -1378,7 +1380,7 @@ Amets page~
 Page Amets~
 A page is bustling around.
 ~
-0 0 dvxAH n 3
+0 0 dvxH n 3
 1 0 64 15
 D
    Amets is a portly man with a bright red sash over his plain jute robe. He's
@@ -2031,7 +2033,7 @@ sheila page~
 Page Sheila~
 Sheila is bustling about, getting things in order.
 ~
-0 0 dvxAH n 3
+0 0 dvxH n 3
 2 0 99 15
 D
    Sheila is dressed in a plain jute robe, like all the pages in the tower. She
@@ -2131,7 +2133,7 @@ thorley apprentice~
 Apprentice Thorley~
 Apprentice Thorley is leaning against the wall.
 ~
-0 0 dvxA n 3
+0 0 dvx n 3
 1 0 0 15
 D
    Thorley is a young apprentice, not more than fourteen by the look of him.
@@ -2182,7 +2184,7 @@ celiya high sorcerer~
 High Sorcerer Celiya~
 High Sorcerer Celiya is rushing from task to task.
 ~
-0 0 dvxA n 3
+0 0 dvx n 3
 2 0 0 15
 D
    Celiya strikes an elegant figure in robes of violet, lavender, lilac, and
@@ -2255,7 +2257,7 @@ trolley cleaning~
 the cleaning trolley~
 A cleaning trolley is parked in the middle of the office.
 ~
-0 0 bdA n 3
+0 0 bd n 3
 0 0 0 15
 D
    The little trolley is equipped with a bucket and mob, some sponges, a large
@@ -2311,7 +2313,7 @@ Grace sorcerer assistant~
 Grace~
 The sorcerer's assistant, Grace, is sorting papers. (list)
 ~
-0 0 bdvxA n 3
+0 0 bdvx n 3
 2 0 0 15
 D
    Grace, with her white hair up in a high beehive and her blue witchglass
@@ -2332,7 +2334,7 @@ barrosh high sorcerer~
 Barrosh~
 High Sorcerer Barrosh sits with his head in his hands.
 ~
-0 0 bdvxA n 3
+0 0 bdvx n 3
 1 0 0 15
 D
    Barrosh has shed his violet high sorcerer robes in the corner and now sits
@@ -2349,7 +2351,7 @@ knezz grand high sorcerer~
 Grand High Sorcerer Knezz~
 Grand High Sorcerer Knezz is standing here. (list)
 ~
-0 0 dvxA n 3
+0 0 dvx n 3
 1 0 0 15
 D
    Knezz has the characteristic long, unkempt salt-and-pepper hair and beard
@@ -2431,7 +2433,7 @@ celiya grand high sorcerer~
 Grand High Sorcerer Celiya~
 Grand High Sorcerer Celiya is here.
 ~
-0 0 dvxA n 3
+0 0 dvx n 3
 2 0 0 15
 D
    Grand High Sorcerer Celiya strikes an elegant figure in robes of gold,
@@ -2476,7 +2478,7 @@ Niamh acting high sorcerer~
 Acting High Sorcerer Niamh~
 Acting High Sorcerer Niamh is standing here. (list)
 ~
-0 0 dvxA n 3
+0 0 dvx n 3
 2 0 0 15
 D
    Niamh's black hair shows fiery red roots as she stoops to pick up a book.

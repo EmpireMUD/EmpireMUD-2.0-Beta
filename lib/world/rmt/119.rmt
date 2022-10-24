@@ -5649,6 +5649,10 @@ E
 voice~
 The god's presence is everywhere, but without form or shape.
 ~
+E
+north south east west northeast southeast northwest southwest up down~
+It's the same in all directions.
+~
 T 11945
 T 11946
 T 11994

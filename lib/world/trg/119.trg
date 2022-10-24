@@ -1895,9 +1895,9 @@ Skycleave Enchanting Lab noises~
 ~
 if %self.template% == 11839
   * Phase A
-  set rogue %instance.mob(11848)%
-  if !%rogue%
-    * No messages in phase A unless the Rogue Boss is present.
+  set rogue %room.people(11848)%
+  if !%rogue% || %rogue.fighting% || %rogue.disabled%
+    * No messages in phase A unless the Rogue Boss is present and free
     halt
   end
   if %rogue.room% != %room% || %rogue.fighting%
@@ -2188,7 +2188,7 @@ end
 Skycleave: Janitor cleanup service~
 0 bi 20
 ~
-set purge_list 1000 11929 11930
+set purge_list 1000 11864 11865 11867 11875 11876 11929 11930
 wait 2 sec
 set done 0
 set obj %self.room.contents%

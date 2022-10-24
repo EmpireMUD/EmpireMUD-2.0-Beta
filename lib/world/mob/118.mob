@@ -3,7 +3,7 @@
 #n~
 #n is standing here.
 ~
-0 0 dvA n 3
+0 0 dv n 3
 2 0 0 15
 D
    She's dressed in traveling pants and wears a hat that clearly identifies her
@@ -17,7 +17,7 @@ Dylane trense~
 Dylane~
 Dylane of Trense is here, looking around.
 ~
-0 0 dvAH n 3
+0 0 dvH n 3
 1 0 86 15
 D
    Dressed unmistakably in the finery of a nobleman and making no efforts to
@@ -58,7 +58,7 @@ S
 #n~
 #n is looking up at everything.
 ~
-0 0 dvA n 3
+0 0 dv n 3
 1 0 0 15
 D
    He seems to have a keen interest in architecture as he walks around looking
@@ -93,7 +93,7 @@ S
 #n~
 #n talks with his hands as he walks.
 ~
-0 0 dvA n 3
+0 0 dv n 3
 1 0 0 15
 D
    He seems to be very knowledgeable about the tower as he's giving a lot of
@@ -108,7 +108,7 @@ corwin page~
 Page Corwin~
 Corwin is bustling about.
 ~
-0 0 dvxA n 3
+0 0 dvx n 3
 1 0 68 15
 D
    Corwin is sweating under his heavy jute page robe. He's bustling around
@@ -158,7 +158,7 @@ Mageina barista~
 Mageina~
 Mageina is managing several pots of soup.
 ~
-0 0 bdvxA n 3
+0 0 bdvx n 3
 2 0 0 16
 D
    Mageina moves back and forth between pots of soup, which she heats with a
@@ -205,7 +205,7 @@ Huberus master sorcerer instructor~
 Master Sorcerer Huberus~
 Master Sorcerer Huberus is making one of the beds.
 ~
-0 0 bdvxA n 3
+0 0 bdvx n 3
 2 0 0 16
 D
    Huberus is a gruff sort, barely casting a glance from underneath the gnarly
@@ -243,7 +243,7 @@ S
 #n~
 #n is organizing the supplies.
 ~
-0 0 bdvAI n 3
+0 0 bdvI n 3
 1 0 0 16
 D
    Though he looks like he's new here, he has set right to work sorting and
@@ -284,13 +284,14 @@ S
 #n~
 A young lady is standing here.
 ~
-0 0 dvA n 3
+0 0 dv n 3
 2 0 102 15
 D
    She's young, not past her second decade, and it looks as if she's been
 crying. She wears a simple white dress and silver jewelry; she's constantly
 fidgeting with a locket around her neck.
 ~
+I 12 11872 100.00 1 p  # PICKPOCKET: hand-written note
 M
 1
 Oh...~
@@ -322,13 +323,14 @@ M
 1
 What lust has rent, mayhap sorcery can repair.~
 T 11810
+T 11852
 S
 #11809
 #n~
 #n~
 #n walks around with a huge grin on his face.
 ~
-0 0 dvA n 3
+0 0 dv n 3
 1 0 0 15
 D
    The young man is dressed in white shirt and dark wool trousers with
@@ -343,7 +345,7 @@ Annaca watcher~
 Annaca~
 Watcher Annaca is struggling to hold a mana shield over the staircase.
 ~
-0 0 bdvxA n 3
+0 0 bdvx n 3
 2 0 0 15
 D
    Though Annaca's face is strained and contorted as she struggles to hold the
@@ -386,7 +388,7 @@ apprentice kayla~
 Kayla~
 Apprentice Kayla is standing here.
 ~
-0 0 dvxA n 3
+0 0 dvx n 3
 2 0 0 15
 D
    Kayla's white robes have turned gray below the shins and the back side isn't
@@ -404,7 +406,7 @@ cosimo apprentice~
 Cosimo~
 Apprentice Cosimo is lurking in the passage.
 ~
-0 0 bdvxA n 3
+0 0 bdvx n 3
 1 0 0 15
 D
    Cosimo is clad in dingy white apprentice robes with red trim. His hair is
@@ -426,7 +428,7 @@ tyrone~
 Tyrone~
 Tyrone is relaxing on one of the bunks.
 ~
-0 0 bdvxA n 3
+0 0 bdvx n 3
 1 0 0 15
 D
    Tyrone looks almost at ease compared to the rest of the tower. His white
@@ -443,7 +445,7 @@ wright old~
 Old Wright~
 Old Wright is reading on his bunk.
 ~
-0 0 bdvxA n 3
+0 0 bdvx n 3
 1 0 0 15
 D
    Even in the dim light of the bunk room, Wright's advanced age is such that
@@ -452,9 +454,10 @@ dressing gown is a far cry from the layers of sorcerer robes worn around most
 of the tower, but he seems to give little notice to you or anyone else in here.
 ~
 F 11800
+I 12 11874 100.00 1 p  # PICKPOCKET: filigreed stasis charm
 T 11810
 T 11837
-T 11803
+T 11852
 S
 #11815
 goblin uncaged~
@@ -647,7 +650,7 @@ Hugh Mann~
 Hugh~
 Hugh Mann stands here in a low hat and full-length coat.
 ~
-0 0 dvA n 3
+0 0 dv n 3
 1 0 88 15
 D
    It's hard to get a good look at his face since his hat is pulled low. You're
@@ -689,7 +692,7 @@ S
 #n~
 #n seems to be studying the tower.
 ~
-0 0 dvA n 3
+0 0 dv n 3
 2 0 0 15
 D
    She walks slowly, with her hands behind her back, watching everyone and
@@ -699,13 +702,14 @@ nobody else seems to notice her.
 ~
 T 11828
 T 11810
+T 11803
 S
 #11823
 #n~
 #n~
 #n is walking around.
 ~
-0 0 dvA n 3
+0 0 dvI n 3
 1 0 0 15
 D
    He's middle-aged, perhaps past his prime as he stands with a hunch. He's
@@ -736,13 +740,14 @@ M
 0
 $n looks around.~
 T 11810
+T 11852
 S
 #11824
 #n~
 #n~
 #n is looking around.
 ~
-0 0 dvAH n 3
+0 0 dvHI n 3
 2 0 0 15
 D
    She's dressed like any young village woman; her clothes aren't in fashion
@@ -796,13 +801,14 @@ M
 Where do I even get skystones?~
 T 11828
 T 11810
+T 11852
 S
 #11825
 ravinder apprentice~
 Apprentice Ravinder~
 Ravinder is reclining on a bunk.
 ~
-0 0 bdvxA n 3
+0 0 bdvx n 3
 1 0 0 15
 D
    Ravinder looks positively exhausted. His apprentice robes are dirty from
@@ -1008,7 +1014,7 @@ S
 #n~
 #n is standing here.
 ~
-0 0 dvAH n 3
+0 0 dvHI n 3
 2 0 0 15
 D
    She's a young woman sporting a gold wedding ring, perhaps just married. She
@@ -1049,13 +1055,14 @@ M
 As if we need any of this.~
 T 11828
 T 11810
+T 11852
 S
 #11827
 Marina apprentice~
 Marina~
 Marina is sitting with Djon.
 ~
-0 0 bdvA n 3
+0 0 bdv n 3
 2 0 0 15
 D
    Marina is dressed in white apprentice robes with a bright blue margin. Her
@@ -1074,7 +1081,7 @@ Djon apprentice~
 Djon~
 Djon is seated at a table in the corner.
 ~
-0 0 bdvA n 3
+0 0 bdv n 3
 1 0 0 15
 D
    Djon leans back, with one arm propped up on an empty chair. His legs are
@@ -1110,7 +1117,7 @@ Caius sirensbane high master~
 Caius Sirensbane~
 High Master Caius Sirensbane is warding the staircase!
 ~
-0 0 bdvxA n 3
+0 0 bdvx n 3
 1 0 0 15
 D
    High Master Caius strains against the shining red ward he has placed over
@@ -1152,7 +1159,7 @@ Niamh resident~
 Resident Niamh~
 Resident Niamh is guarding the entrance.
 ~
-0 0 bdvxA n 3
+0 0 bdvx n 3
 2 0 0 15
 D
    The slump of Niamh's posture, the bags under her eyes, and the red roots
@@ -1171,7 +1178,7 @@ mohammed resident~
 Resident Mohammed~
 Resident Mohammed is helping out.
 ~
-0 0 bdvxA n 3
+0 0 bdvx n 3
 1 0 0 15
 D
    Mohammed stands like a beanpole, tall and thin, wearing a long, slim, gray
@@ -1244,7 +1251,7 @@ Sanjiv apprentice~
 Apprentice Sanjiv~
 An apprentice is poorly camouflaged against the wall.
 ~
-0 0 bdvxA n 3
+0 0 bdvx n 3
 1 0 0 15
 D
    A young apprentice is magically camouflaged against the wall. From most
@@ -1261,7 +1268,7 @@ scaldorran lich~
 the Lich Scaldorran~
 The Lich Scaldorran howls as he twists and writhes in the air!
 ~
-0 0 bdvxA n 3
+0 0 bdvx n 3
 1 0 0 15
 D
    A bone-chilling howl trickles from your ears, down your spine, into your
@@ -1339,7 +1346,7 @@ Annelise~
 Annelise~
 Annelise is seated at one of the tables.
 ~
-0 0 bdvxA n 3
+0 0 bdvx n 3
 2 0 0 15
 D
    Annelise, the youngest sorcerer you've met in the tower, is seated at a
@@ -1563,7 +1570,7 @@ Waltur walter magineer~
 Magineer Waltur~
 Magineer Waltur is here.
 ~
-0 0 bdvxAI n 3
+0 0 bdvx n 3
 1 0 0 15
 D
    Waltur is a young man, not over the age of 25, and apparently so busy he has
@@ -1571,7 +1578,6 @@ no time to brush his hair. It sticks out at various angles behind his multi-
 colored gemstone goggles, which are pushed up above his bright blue eyes. In
 place of robes, he's dressed in a black jumpsuit which gleams and shimmers in
 places where it's stained with grease.
-   Waltur sells items in his lab. Type 'list', 'list id', or 'buy'.
 ~
 F 11800
 I 4 11868 100.00 1 p  # LOOT: miniature wellstone prototype
@@ -1994,7 +2000,7 @@ Paige page~
 the page~
 A page hovers motionlessly in the air, her head down.
 ~
-0 0 bdvxA n 3
+0 0 bdvx n 3
 2 0 0 15
 D
    You walk in a circle around the young page as she hovers there, perfectly
@@ -2086,7 +2092,7 @@ sheila~
 Sheila~
 Sheila is sitting behind the bed's canopy.
 ~
-0 0 bdvxA n 3
+0 0 bdvx n 3
 2 0 0 15
 D
    Sheila has taken refuge behind the canopy of the bed, where she can't be
@@ -2103,7 +2109,7 @@ Grace woman old helpless~
 Grace~
 A helpless old woman floats upside-down near the wardrobe.
 ~
-0 0 bdvxA n 3
+0 0 bdvx n 3
 2 0 0 15
 D
    The old woman appears to be Grace, assistant to High Sorcerer Barrosh. Her
@@ -2138,7 +2144,7 @@ thorley apprentice~
 Apprentice Thorley~
 Thorley is hiding behind a chair.
 ~
-0 0 bdvxA n 3
+0 0 bdvx n 3
 1 0 0 15
 D
    Young Thorley is tucked behind a chair, peeking out at every sound. Already
@@ -2201,7 +2207,7 @@ Celiya high sorcerer~
 High Sorcerer Celiya~
 High Sorcerer Celiya is coordinating the defense of the tower.
 ~
-0 0 dvxA n 3
+0 0 dvx n 3
 2 0 0 17
 D
    Celiya looks downright exhausted as she hurries about in high sorcerer robes
@@ -2242,7 +2248,6 @@ own back, trying to get something out. You can only watch in horror...
 ~
 T 11870
 T 11866
-T 11852
 T 11803
 S
 #11867
@@ -2347,7 +2352,7 @@ knezz grand high sorcerer~
 Knezz~
 Grand High Sorcerer Knezz is sitting in the chair.
 ~
-0 0 bdvxA n 3
+0 0 bdvx n 3
 1 0 0 15
 D
    The old sorcerer looks exhausted, even drained, as he sits in his chair,
@@ -2458,7 +2463,6 @@ T 11871
 T 11872
 T 11806
 T 11855
-T 11852
 T 11803
 S
 #11872
@@ -2901,7 +2905,7 @@ Celiya high sorcerer difficulty~
 High Sorcerer Celiya~
 High Sorcerer Celiya is shielding the staircase with a powerful spell! (difficulty)
 ~
-0 0 bdvxA n 3
+0 0 bdvx n 3
 2 0 0 17
 D
    The high sorcerer looks bedraggled, almost exhausted, in her layered purple
@@ -2947,7 +2951,7 @@ Annaca watcher difficulty~
 Watcher Annaca~
 Watcher Annaca is struggling to hold a mana shield over the staircase. (difficulty)
 ~
-0 0 bdvxA n 3
+0 0 bdvx n 3
 2 0 0 15
 D
    Though Annaca's face is strained and contorted as she struggles to hold the
@@ -2989,7 +2993,7 @@ Caius sirensbane high master difficulty~
 Caius Sirensbane~
 High Master Caius Sirensbane is warding the staircase! (difficulty)
 ~
-0 0 bdvxA n 3
+0 0 bdvx n 3
 1 0 0 15
 D
    High Master Caius strains against the shining red ward he has placed over
