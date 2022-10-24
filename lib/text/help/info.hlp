@@ -1485,7 +1485,6 @@ have the same base inventory size).
 Strength is used for:
  - A core attribute for the melee group role.
  - Increasing melee DPS (damage per second) from physical weapons.
- - Chopping and mining faster.
  - Wearing heavy armor (tank armor sometimes has -STRENGTH).
 
 See also: ATTRIBUTES, MELEE DPS, CHOP, MINE
