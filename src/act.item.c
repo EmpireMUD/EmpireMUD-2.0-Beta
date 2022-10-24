@@ -1024,7 +1024,7 @@ static int perform_put(char_data *ch, obj_data *obj, obj_data *cont) {
 		return 0;
 	}
 	if (GET_OBJ_REQUIRES_QUEST(obj) != NOTHING && !IS_NPC(ch) && !IS_IMMORTAL(ch)) {
-		act("$p: you can't drop quest items.", FALSE, ch, obj, NULL, TO_CHAR);
+		act("$p: you can't put quest items in there.", FALSE, ch, obj, NULL, TO_CHAR);
 		return 0;
 	}
 	
