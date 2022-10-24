@@ -1197,7 +1197,7 @@ rdelete drinking %self.id%
 nop %self.set_cooldown(11800, 15)%
 ~
 #11823
-Skycleave: Boss Deaths (Pixy, Kara, Rojjer, Barrosh, Shade)~
+Skycleave: Boss Deaths: Pixy, Kara, Rojjer, Trixton, Barrosh, Shade~
 0 f 100
 ~
 switch %self.vnum%
@@ -1220,6 +1220,7 @@ switch %self.vnum%
       %echo% The camouflage around Apprentice Sanjiv fades as he collapses to his knees and vomits on the floor.
       %mod% %sanjiv% longdesc An apprentice is kneeling on the floor, heaving.
       %mod% %sanjiv% lookdesc The young apprentice is on his knees, dirtying his white kurta. His wavy brown hair is matted with sweat and he heaves as if he might vomit again.
+      detach 11803 %sanjiv.id%
     end
     * check Trixton's attackability
     if !%instance.mob(11848)%
@@ -1237,6 +1238,10 @@ switch %self.vnum%
         %at% %trixton.room% %echo% ~%trixton% has lost ^%trixton% protection!
         dg_affect %trixton% !ATTACK off
       end
+  break
+  case 11849
+    * Trixton Vye: complete floor
+    %load% mob 11897
   break
   case 11863
     * Shadow Ascendant
@@ -5086,12 +5091,6 @@ if %self.room.template% == 11887
   otimer 4
 end
 ~
-#11885
-Mercenary Leader Death: Floor 3 completer~
-0 f 100
-~
-%load% mob 11897
-~
 #11886
 Statue combat~
 1 c 4
@@ -5825,11 +5824,17 @@ skydel 11839 1  * Enchanter Annelise
 if %instance.mob(11834)%
   %at% i11935 %load% mob 11934  * Chained Otherworlder (if it survived/stayed)
 end
-if %instance.mob(11835)%
+set sanjiv %instance.mob(11835)%
+if %sanjiv%
   if %instance.mob(11834)%
     %at% i11935 %load% mob 11935  * Apprentice Sanjiv, scanning
+    set mob %instance.mob(11935)%
   else
     %at% i11935 %load% mob 11942  * Apprentice Sanjiv, no otherworlder
+    set mob %instance.mob(11942)%
+  end
+  if %mob% && %sanjiv.mob_flagged(*PICKPOCKETED)%
+    nop %mob.add_mob_flag(*PICKPOCKETED)%
   end
 end
 %at% i11936 %load% mob 11936  * Scaldorran

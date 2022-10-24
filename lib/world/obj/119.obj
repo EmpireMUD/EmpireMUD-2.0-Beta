@@ -1382,7 +1382,7 @@ shining gold embellishments.
 last leaves fell from the great tree, Sparo Vehl sat resolute on the obsidian
 throne as the beacon hope for her people.
 ~
-2 mp ad 0 5
+2 mp ad 0 6
 0 0 0
 11 0
 A
@@ -1394,6 +1394,12 @@ C
 M
 12
 $n cuts a fine figure in $s shimmering suit.~
+M
+8
+You don $p.~
+M
+9
+$n dons $p.~
 S
 #11984
 robes treesilk silk set~
@@ -1431,7 +1437,7 @@ gives it a strong elegance, like a tree beside a pond.
 she little imagined the splendor she would find in the world. Nor could she
 conceive of the somber truth that she would never return home again.
 ~
-2 mp ad 0 6
+2 mp ad 0 7
 0 0 0
 11 0
 A
@@ -1443,6 +1449,12 @@ C
 M
 12
 $n is here, dressed in the finest brown silk.~
+M
+8
+You don $p.~
+M
+9
+$n dons $p.~
 S
 #11986
 tunic silk green~
@@ -1457,7 +1469,7 @@ by artisans born and raised on the great tree, and from silk spun in its crown.
 The green dye was sourced from the tree's very sap. Wearing the tree, as it was
 sometimes called, showed both pride and piety.
 ~
-2 mp ad 0 7
+2 mp ad 0 8
 0 0 0
 11 0
 A
@@ -1469,6 +1481,12 @@ C
 M
 12
 $n is here, dressed in fine green silks.~
+M
+8
+You don $p.~
+M
+9
+$n dons $p.~
 S
 #11987
 robes lich tattered~
@@ -1540,7 +1558,7 @@ fingers make fine clothing.
    No goblins that has entered Skycleave has ever left again. The sorcerers can
 little comprehend why, then, the goblins continue to invade it.
 ~
-2 o ad 0 3
+2 o ad 0 4
 -1 -1 -1
 11 0
 A
@@ -1548,6 +1566,12 @@ A
 M
 12
 $n is standing here, squeezed into a very small vest.~
+M
+8
+You squeeze into $p.~
+M
+9
+$n squeezes into $p.~
 S
 #11991
 doublet glimmering~
@@ -1561,7 +1585,7 @@ seems to be magical, impossible clothing is a simple feat for such powerful
 sorcerers. Before long, the villagers usually realize the clothing is gaudy and
 impractical. But not before emptying their purses for it.
 ~
-2 o ad 0 3
+2 o ad 0 4
 -1 -1 -1
 10 0
 A
@@ -1569,6 +1593,12 @@ A
 M
 12
 $n glimmers in the light.~
+M
+8
+You cast glimmering light around the room as you put on the doublet.~
+M
+9
+$n casts glimmering light around the room as $e puts on a doublet.~
 S
 #11992
 seedling stone striped~

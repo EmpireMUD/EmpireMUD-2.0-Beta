@@ -3108,15 +3108,22 @@ switch %self.vnum%
     dg_affect #%self.vnum% %actor% INVENTORY 35 86400
     %send% %actor% # That's a weight off your shoulders.
   break
+  *
   * non-potions:
   case 11884
     * poison mushroom
-    %send% %actor% You eat the little white mushroom but you don't feel so good...
-    %send% %actor% Oh no... the world goes black and the last thing you feel is your head hitting something hard.
-    %echoaround% %actor% ~%actor% eats a little white mushroom...
-    %slay% %actor%
-    return 0
-    %purge% %self%
+    if %command% == taste
+      %send% %actor% You taste the little white mushroom, which gives your lips and tongue a pleasant tingle.
+      %echoaround% %actor% ~%actor% tastes a little white mushroom.
+      return 0
+    else
+      %send% %actor% You eat the little white mushroom but you don't feel so good...
+      %send% %actor% Oh no... the world goes black and the last thing you feel is your head hitting something hard.
+      %echoaround% %actor% ~%actor% eats a little white mushroom...
+      %slay% %actor%
+      return 0
+      %purge% %self%
+    end
   break
 done
 ~
@@ -4335,13 +4342,14 @@ Skycleave: Gnarled old wand of power~
 1 c 1
 say ' shout whisper~
 return 0
-set phrase by the power of skycleave
+set phrase1 by the power
+set phrase2 skycleave
 * basic things that could prevent them speaking
 set valid_pos Standing Fighting Sitting Resting
 if !(%valid_pos% ~= %actor.position%)
   halt
 end
-if !(%arg% ~= %phrase%)
+if !(%arg% ~= %phrase1%) || !(%arg% ~= %phrase2%)
   halt
 end
 wait 1

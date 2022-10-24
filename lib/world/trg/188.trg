@@ -657,7 +657,7 @@ else
     %quest% %actor% finish 18819
   else
     nop %self.val0(%costume_vnum%)%
-    nop %actor.set_cooldown(18819,30)%
+    nop %actor.set_cooldown(18819,20)%
   end
 end
 ~
@@ -790,7 +790,7 @@ else
     %quest% %actor% finish 18821
   else
     nop %self.val0(%charges%)%
-    nop %actor.set_cooldown(18821,30)%
+    nop %actor.set_cooldown(18821,20)%
   end
 end
 ~
@@ -950,7 +950,7 @@ else
   else
     eval charges %charges% - 1
     nop %self.val0(%charges%)%
-    nop %actor.set_cooldown(18824,30)%
+    nop %actor.set_cooldown(18824,20)%
   end
 end
 ~
@@ -1008,7 +1008,7 @@ else
     %quest% %actor% finish 18827
   else
     nop %self.val0(%times%)%
-    nop %actor.set_cooldown(18827,30)%
+    nop %actor.set_cooldown(18827,20)%
   end
 end
 ~

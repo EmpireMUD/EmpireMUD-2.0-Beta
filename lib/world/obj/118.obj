@@ -27,7 +27,7 @@ the Tower Skycleave on the heel.
 they walk up and down the tower's long spiral staircase. One thing is certain:
 These shoes were made for walking.
 ~
-2 mo ag 0 3
+2 mo ag 0 5
 -1 -1 -1
 11 0
 A
@@ -38,6 +38,12 @@ A
 5 1 6
 C
 150 250
+M
+8
+You slip on some bustling shoes and feel faster already.~
+M
+9
+$n slips on some bustling shoes and seems to speed up.~
 S
 #11802
 aura experimental~
@@ -47,7 +53,7 @@ There's... sort of an aura hovering here.~
 the sorcerers of the Tower Skycleave, notorious for its unusual magics and
 well-funded research and development.
 ~
-2 mo ak 0 4
+2 mo ak 0 6
 -1 -1 -1
 10 0
 A
@@ -58,6 +64,12 @@ A
 6 1 0
 A
 5 1 6
+M
+9
+$n starts to glow, somewhat.~
+M
+8
+You start to glow, somewhat.~
 S
 #11803
 manual user claw machine~
@@ -147,7 +159,7 @@ creatures, granting some degree of night vision.
 though most of these are created ad hoc by sorcerers looking to shortcut
 whatever difficult task they're working on at the moment.
 ~
-2 mo ae 0 16
+2 mo ae 0 17
 0 0 0
 7 0
 A
@@ -156,6 +168,12 @@ A
 5 1 6
 C
 150 150
+M
+8
+You wear the crystal analysis piece on your eye.~
+M
+9
+$n wears a crystal analysis device on $s eye.~
 S
 #11807
 jar demerits skycleaver~
@@ -689,7 +707,7 @@ square inch of it catches and reflects light like nothing you've ever seen!
 metal carriage at the bottom of a steep crater. To the erudite lords of
 Skycleave, this was an unparalleled prize and it earned her high acclaim.
 ~
-2 mp ad 0 7
+2 mp ad 0 8
 0 0 0
 11 0
 A
@@ -701,6 +719,12 @@ C
 M
 12
 $n dazzles with an otherworldly presence.~
+M
+8
+You squeeze into $p.~
+M
+9
+$n squeezes into $p.~
 S
 #11831
 ward magical shimmering~
@@ -1249,7 +1273,7 @@ relics that line Skycleave's shelves. But her true genius was trading for the
 secrets to make them as well, and the process for crafting magitanium was her
 crowning achievement.
 ~
-2 mp am 0 25
+2 mp am 0 26
 0 0 0
 4 0
 A
@@ -1262,6 +1286,18 @@ A
 5 1 3
 C
 150 275
+M
+8
+You put some $p through your ears.~
+M
+9
+$n puts some $p through $s ears.~
+M
+8
+You put $p in your ears.~
+M
+9
+$n puts $p in $s ears.~
 T 11940
 S
 #11856
@@ -1304,7 +1340,7 @@ earrings, it doesn't make that characteristic crackle as it does.
 trees, where lightning is at its closest. Their caterpillars have furry backs
 that crisp and sizzle as stray sparks in the air are caught and channeled.
 ~
-2 mp am 0 25
+2 mp am 0 26
 0 0 0
 4 0
 A
@@ -1317,6 +1353,12 @@ A
 5 1 3
 C
 150 275
+M
+8
+You put $p in your ears.~
+M
+9
+$n puts $p in $s ears.~
 T 11940
 S
 #11858
@@ -1331,7 +1373,7 @@ does when you disturb it.
 single bolt of the stuff is often split into many smaller pieces, at the cost
 of fragmenting the soul held within.
 ~
-2 mp am 0 25
+2 mp am 0 26
 0 0 0
 4 0
 A
@@ -1344,6 +1386,12 @@ A
 5 1 3
 C
 150 275
+M
+8
+You put $p in your ears.~
+M
+9
+$n puts $p in $s ears.~
 T 11940
 S
 #11859
@@ -1359,7 +1407,7 @@ even after the Moxie Witch was twice abducted by envious ironmongers who forced
 the secret out of her. Both abductors vanished within a fortnight of her
 release.
 ~
-2 mp am 0 27
+2 mp am 0 28
 0 0 0
 4 0
 A
@@ -1374,6 +1422,12 @@ A
 5 1 3
 C
 150 275
+M
+8
+You put $p in your ears.~
+M
+9
+$n puts $p in $s ears.~
 T 11940
 S
 #11860
@@ -1651,11 +1705,14 @@ thin gold chain, tarnished at the back from heavy wear.
 of their excellent grade point average, and equally notorious, is low tolerance
 for under-achievers.
 ~
-2 0 ac 0 6
+2 0 ac 0 7
 0 0 0
 2 0
 C
 100 100
+M
+8
+You put $p around your neck and feel more... stable.~
 T 11881
 S
 #11875

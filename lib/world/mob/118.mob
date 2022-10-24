@@ -1261,6 +1261,7 @@ best to remain hidden. He gives you a wide-eyed face and nudges his head toward
 the door.
 ~
 F 11800
+I 12 11872 100.00 1 p  # PICKPOCKET: hand-written note
 T 11803
 S
 #11836
@@ -1974,13 +1975,13 @@ say Wait, how did you even get in here?~
 M
 7
 say All this loot is ours. Mezvienne doesn't want to be bothered. Why don't you leave while you're ahead?~
-T 11885
 T 11849
 T 11850
 T 11808
 T 11810
 T 11806
 T 11852
+T 11823
 S
 #11850
 prism focusing~
