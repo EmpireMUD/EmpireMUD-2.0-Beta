@@ -1622,8 +1622,8 @@ S
 potion red glittering~
 a glittering red potion~
 A glittering red potion is sitting on the ground.~
-   The red potion swirls as you hold it up to the light, glittering with swirls
-of yellow like pixy dust in caught in a whirlpool. There's no label on the
+   The red potion swirls as you hold it up to the light, glittering with flecks
+of yellow, like pixy dust in caught in a whirlpool. There's no label on the
 flask and no way to tell what effect it will have but to quaff it.
    Potions are a quick way to shore up one's particular deficiencies.
 ~
@@ -1663,7 +1663,7 @@ pick hardstone stone~
 a hardstone pick~
 A hardstone pick is lying here.~
    The small pick has short wooden handle and a triangular stone head, bound
-together by pitch and leather. Scratch-marks run the length of the handle, but
+together by pitch and leather. Scratch-marks run the length of the handle; but,
 though the head of the pick is slightly worn, there are no signs of cracks.
    Using stone to mine ore is far from ideal. In fact, it's nearly impossible.
 ~
