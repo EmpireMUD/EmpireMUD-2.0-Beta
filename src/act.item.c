@@ -1467,7 +1467,7 @@ bool used_lighter(char_data *ch, obj_data *obj) {
  //////////////////////////////////////////////////////////////////////////////
 //// DROP HELPERS ////////////////////////////////////////////////////////////
 
-#define VANISH(mode) (mode == SCMD_JUNK ? "  It vanishes in a puff of smoke!" : "")
+#define VANISH(mode) (mode == SCMD_JUNK ? " It vanishes in a puff of smoke!" : "")
 
 /**
 * Attempts to complete a drop/junk.
