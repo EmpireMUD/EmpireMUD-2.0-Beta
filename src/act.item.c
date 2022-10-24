@@ -5947,7 +5947,7 @@ ACMD(do_list) {
 	obj_data *obj;
 	any_vnum vnum;
 	size_t size;
-	bool ok, id, all;
+	bool ok, id, all, found_id = FALSE;
 	int amt, number;
 	
 	// helper type for displaying currencies at the end
@@ -6027,6 +6027,7 @@ ACMD(do_list) {
 			
 			if (id) {	// just identifying -- show shop id then exit the loop early
 				do_shop_identify(ch, obj);
+				found_id = TRUE;
 				break;
 			}
 			
@@ -6147,7 +6148,7 @@ ACMD(do_list) {
 			msg_to_char(ch, "There's nothing for sale here%s.\r\n", (*argument ? " by that name" : ""));
 		}
 	}
-	else if (id && number > 0) {
+	else if (id && !found_id) {
 		msg_to_char(ch, "You don't see anything like that here.\r\n");
 	}
 
