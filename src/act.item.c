@@ -4825,7 +4825,7 @@ ACMD(do_drink) {
 	}
 
 	/* check trigger */
-	if (obj && !consume_otrigger(obj, ch, OCMD_DRINK, NULL)) {
+	if (obj && !consume_otrigger(obj, ch, (subcmd == SCMD_SIP) ? OCMD_SIP : OCMD_DRINK, NULL)) {
 		return;
 	}
 
@@ -5133,7 +5133,7 @@ ACMD(do_eat) {
 	}
 
 	/* check trigger */
-	if (!consume_otrigger(food, ch, OCMD_EAT, NULL)) {
+	if (!consume_otrigger(food, ch, (subcmd == SCMD_TASTE) ? OCMD_TASTE : OCMD_EAT, NULL)) {
 		return;
 	}
 	
