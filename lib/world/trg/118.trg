@@ -3997,7 +3997,7 @@ switch %cycle%
   case 3
     say Fras kee selmo tagra tyewa...
     wait 1 sec
-    %echo% More and more splinters rise into the air until you can scarcely breath!
+    %echo% More and more splinters rise into the air until you can scarcely breathe!
     wait 8 sec
     say Badur eydur a wo owri...
     wait 1 sec
