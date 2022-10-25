@@ -195,6 +195,15 @@ momentarily stunned~
 T0
 You're no longer stunned.~
 S
+#11880
+magic rock candy~
+6 0
+0 11880 0 0
+R 6600
+R 6340
+T0
+magic rock candies~
+S
 #11885
 pure morning dew~
 1 0

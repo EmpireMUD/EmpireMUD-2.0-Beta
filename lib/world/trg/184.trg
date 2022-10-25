@@ -87,7 +87,7 @@ Unstable Portal setup~
 2 n 100
 ~
 * Pick a random room for the inside of the portal
-eval room_vnum 18461 + %random.11%
+eval room_vnum 18461 + %random.12%
 makeuid new_room room i%room_vnum%
 %door% %room% down room %new_room%
 * Move the inside portal object to the other room
@@ -358,6 +358,32 @@ switch %random.6%
   break
 done
 ~
+#18470
+Spirit Steed: Only leader may mount~
+0 ct 0
+mount harness~
+if %actor.char_target(%arg.car%)% != %self%
+  return 0
+  halt
+end
+if !%self.leader% || %actor% != %self.leader%
+  if %cmd.mudcommand% == mount
+    %send% %actor% You try to get onto the spirit steed, but it double-jumps out of the way!
+    %echoaround% %actor% ~%actor% tries to climb up onto ~%self% but it double-jumps out of the way at the last second!
+  else
+    %send% %actor% You try to get harness the spirit steed, but it double-jumps out of the way!
+    %echoaround% %actor% ~%actor% tries harness ~%self% but it double-jumps out of the way at the last second!
+  end
+  return 1
+  halt
+end
+* made it?
+nop %self.add_mob_flag(MOUNTABLE)%
+return 0
+* check and remove mountable if mount failed
+wait 1
+nop %self.remove_mob_flag(MOUNTABLE)%
+~
 #18471
 Sparkle sparkle~
 2 bw 10
@@ -412,6 +438,32 @@ else
   end
   %scale% instance %level%
   %dot% %person% 2000 20 poison 1
+end
+~
+#18473
+Unstable Portal: Precipice: Spawn scion~
+2 bw 50
+~
+wait 15 sec
+if %room.people(18495)%
+  * already present
+  halt
+end
+set any 0
+set ch %room.people%
+* check for people not killed here
+while %ch% && !%any%
+  if %ch.is_pc% && !%ch.is_immortal% && !%room.varexists(killed_%ch.id%)%
+    set any 1
+  end
+  set ch %ch.next_in_room%
+done
+* load if needed
+if %any%
+  %echo% A shadow appears over the circle at the center of the precipice...
+  wait 3 sec
+  %load% mob 18495
+  %echo% A many-armed scion drops from above!
 end
 ~
 #18482
@@ -867,6 +919,7 @@ set closet 18469
 set vault 18470
 set modern 18471
 set trail 18472
+set precipice 18473
 eval test %%%arg%%%
 if %test%
   eval arg %test%
@@ -932,5 +985,30 @@ Unstable portal block where~
 where~
 %send% %actor% You don't even know where YOU are!
 return 1
+~
+#18497
+Unstable Portal: Precipice: Grafted scion kill~
+0 z 100
+~
+* mark player killed
+if %actor.is_pc% && %self.room.template% == 18473
+  set killed_%actor.id% 1
+  remote killed_%actor.id% %self.room.id%
+end
+* check for more players
+set valid_pos Standing Fighting Sitting Resting Sleeping
+set ch %self.room.people%
+set found 0
+while %ch% && !%found%
+  if %ch.is_pc% && %valid_pos% ~= %ch.position%
+    set found 1
+  end
+  set ch %ch.next_in_room%
+done
+if !%found%
+  wait 5 sec
+  %echo% ~%self% skitters out of sight.
+  %purge% %self%
+end
 ~
 $

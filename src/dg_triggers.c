@@ -1521,15 +1521,26 @@ int consume_otrigger(obj_data *obj, char_data *actor, int cmd, char_data *target
 			}
 			
 			switch (cmd) {
-				case OCMD_EAT:
+				case OCMD_EAT: {
 					add_var(&GET_TRIG_VARS(t), "command", "eat", 0);
 					break;
-				case OCMD_DRINK:
+				}
+				case OCMD_TASTE: {
+					add_var(&GET_TRIG_VARS(t), "command", "taste", 0);
+					break;
+				}
+				case OCMD_DRINK: {
 					add_var(&GET_TRIG_VARS(t), "command", "drink", 0);
 					break;
-				case OCMD_QUAFF:
+				}
+				case OCMD_SIP: {
+					add_var(&GET_TRIG_VARS(t), "command", "sip", 0);
+					break;
+				}
+				case OCMD_QUAFF: {
 					add_var(&GET_TRIG_VARS(t), "command", "quaff", 0);
 					break;
+				}
 				case OCMD_READ: {
 					add_var(&GET_TRIG_VARS(t), "command", "read", 0);
 					break;

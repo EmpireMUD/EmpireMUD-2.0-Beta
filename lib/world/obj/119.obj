@@ -82,7 +82,7 @@ wrapped in a pastry shell and baked until golden. Once the traditional meal of
 miners across the land, it's now enjoyed mainly in bourgeois cafes and
 gentrified food carts.
 ~
-6 m a 0 5
+6 m a 0 6
 24 0 0
 7 336
 A
@@ -95,6 +95,12 @@ You bite into the pasty and realize it's not just mutton and vegetables, it's a 
 M
 5
 $n's eyes roll back into $s head as $e eats $p.~
+M
+17
+$p has gone bad and you throw it out.~
+M
+18
+$p rots away to nothing.~
 S
 #11905
 cheese turquoise exotic~
@@ -109,7 +115,7 @@ animals, something usually seen as the vulgar purview of nature magic. Some
 sorcerers are eager to create new products or conveniences, with little regard
 for traditional ethics. And none of them are afraid to mislabel a product.
 ~
-6 m a 0 7
+6 m a 0 8
 24 0 0
 7 336
 A
@@ -122,6 +128,12 @@ You pop the turquoise cheese in your mouth and suddenly live an entire life as a
 M
 5
 $n's face goes blank and $e seems to space out for a moment as $e eats $p.~
+M
+17
+There's nothing left of $p but mold, and you throw it out.~
+M
+18
+$p molds until there's nothing left.~
 S
 #11906
 fountain stone~
@@ -218,11 +230,11 @@ but its masters manage to put a price on it nonetheless. And as the key to
 selling magic is bringing in customers, the tower has devised many clever ways
 to bring people back over and over again.
 ~
-3 p a 0 7
+3 p a 0 8
 0 0 0
 12 0
 M
-22
+21
 warpstone~
 T 11909
 T 9806
@@ -655,7 +667,7 @@ trail of crumbs behind you.
 two children are abandoned by their parents and leave a trail of breadcrumbs to
 find their way through the forest.
 ~
-6 p a 0 5
+6 p a 0 6
 12 0 0
 7 48
 C
@@ -666,6 +678,12 @@ You spend an eternity trying to chew and swallow the crummy bread, as it absorbs
 M
 5
 $n chews and chews and chews some crummy bread.~
+M
+17
+Your crummy bread has dissolved completely into crumbs.~
+M
+18
+$p on the ground blows away on a light breeze.~
 S
 #11930
 breadcrumbs crumbs trail~
@@ -1214,9 +1232,11 @@ S
 mussels steamed~
 some steamed mussels~
 Some steamed mussles are lying on the ground.~
-The mussels have a fragrant riparian smell.
+   The mussels have a fragrant riparian smell.
+   Since time immemorial, people have gathered and cooked shellfish as a simple
+and bountiful food source.
 ~
-6 m a 0 6
+6 m a 0 7
 24 0 0
 7 48
 A
@@ -1231,6 +1251,12 @@ You pry open some steamed mussels and eat them.~
 M
 5
 $n pries open $p and eats them.~
+M
+17
+The steamed mussels go bad and you throw them out.~
+M
+18
+$p go bad and rot.~
 O+ 1 6220
 S
 #11978
@@ -1239,13 +1265,21 @@ some mussels~
 Some mussels have been left on the ground.~
    The mussels are small shellfish with blue-black shells. They smell like the
 river but you could certainly cook them up.
+   Rivers provide a plentiful and sustainable food source as much for the
+shellfish as for the fisherman.
 ~
-6 0 a 0 5
+6 0 a 0 6
 6 0 0
 7 48
 M
 4
 You eat some slimy mussels fresh from the shells.~
+M
+17
+$p begin to smell worse and you throw them out.~
+M
+18
+$p rot.~
 O+ 1 6200
 S
 #11979
@@ -1348,7 +1382,7 @@ shining gold embellishments.
 last leaves fell from the great tree, Sparo Vehl sat resolute on the obsidian
 throne as the beacon hope for her people.
 ~
-2 mp ad 0 5
+2 mp ad 0 6
 0 0 0
 11 0
 A
@@ -1360,6 +1394,12 @@ C
 M
 12
 $n cuts a fine figure in $s shimmering suit.~
+M
+8
+You don $p.~
+M
+9
+$n dons $p.~
 S
 #11984
 robes treesilk silk set~
@@ -1372,7 +1412,7 @@ around the bottom of the robes, but the torso and sleeves are undecorated.
    When the last of their great trees fell, the tresydions chose to follow them
 into history, such is the cost of the vow they once took.
 ~
-2 mp ad 0 6
+2 mp ad 0 7
 0 0 0
 11 0
 A
@@ -1384,6 +1424,12 @@ C
 M
 12
 $n stands solemly in robes of dark silk.~
+M
+8
+You put on layer after layer of treesilk robes.~
+M
+9
+$n puts on layer after layer of treesilk robes.~
 S
 #11985
 suit silk brown~
@@ -1397,7 +1443,7 @@ gives it a strong elegance, like a tree beside a pond.
 she little imagined the splendor she would find in the world. Nor could she
 conceive of the somber truth that she would never return home again.
 ~
-2 mp ad 0 6
+2 mp ad 0 7
 0 0 0
 11 0
 A
@@ -1409,6 +1455,12 @@ C
 M
 12
 $n is here, dressed in the finest brown silk.~
+M
+8
+You don $p.~
+M
+9
+$n dons $p.~
 S
 #11986
 tunic silk green~
@@ -1423,7 +1475,7 @@ by artisans born and raised on the great tree, and from silk spun in its crown.
 The green dye was sourced from the tree's very sap. Wearing the tree, as it was
 sometimes called, showed both pride and piety.
 ~
-2 mp ad 0 7
+2 mp ad 0 8
 0 0 0
 11 0
 A
@@ -1435,6 +1487,12 @@ C
 M
 12
 $n is here, dressed in fine green silks.~
+M
+8
+You don $p.~
+M
+9
+$n dons $p.~
 S
 #11987
 robes lich tattered~
@@ -1447,7 +1505,7 @@ the magic of the fabric of the world does not easily fade. A lich is,
 therefore, not exactly the sorcerer, nor is it a ghost. It is something new,
 something different; something not shackled by the doubts or mores of mankind.
 ~
-2 p ad 0 5
+2 p ad 0 6
 0 0 0
 11 0
 A
@@ -1455,6 +1513,12 @@ A
 M
 12
 The lich $n drifts before you.~
+M
+8
+You wrap yourself in the tattered lich robes and begin to feel the part.~
+M
+9
+$n wraps $mself in tattered lich robes and takes on a deathly hollow appearance.~
 S
 #11988
 robes set page~
@@ -1467,7 +1531,7 @@ advertise only humility and low station.
 magical talent to speak of. Instead, the pages usually rely on enchanted
 trinkets to simplify their work.
 ~
-2 p ad 0 4
+2 p ad 0 5
 0 0 0
 11 0
 A
@@ -1475,6 +1539,12 @@ A
 M
 12
 $n is bustling about.~
+M
+8
+You slip into the page robes.~
+M
+9
+$n slips into some page robes.~
 S
 #11989
 robes set apprentice~
@@ -1488,7 +1558,7 @@ them with the highest expectations. Every high sorcerer in the tower began
 their storied career as an apprentice who outshone their peers, the more
 disappointing of whom now line the tower's cupboards and cabinets.
 ~
-2 p ad 0 4
+2 p ad 0 5
 0 0 0
 11 0
 A
@@ -1496,6 +1566,12 @@ A
 M
 12
 Apprentice $n is standing here.~
+M
+8
+You put on the layered white apprentice robes.~
+M
+9
+$n puts on layers of white apprentice robes.~
 S
 #11990
 vest goblin's goblins~
@@ -1506,7 +1582,7 @@ fingers make fine clothing.
    No goblins that has entered Skycleave has ever left again. The sorcerers can
 little comprehend why, then, the goblins continue to invade it.
 ~
-2 o ad 0 3
+2 o ad 0 4
 -1 -1 -1
 11 0
 A
@@ -1514,6 +1590,12 @@ A
 M
 12
 $n is standing here, squeezed into a very small vest.~
+M
+8
+You squeeze into $p.~
+M
+9
+$n squeezes into $p.~
 S
 #11991
 doublet glimmering~
@@ -1527,7 +1609,7 @@ seems to be magical, impossible clothing is a simple feat for such powerful
 sorcerers. Before long, the villagers usually realize the clothing is gaudy and
 impractical. But not before emptying their purses for it.
 ~
-2 o ad 0 3
+2 o ad 0 4
 -1 -1 -1
 10 0
 A
@@ -1535,6 +1617,12 @@ A
 M
 12
 $n glimmers in the light.~
+M
+8
+You cast glimmering light around the room as you put on the doublet.~
+M
+9
+$n casts glimmering light around the room as $e puts on a doublet.~
 S
 #11992
 seedling stone striped~
@@ -1674,7 +1762,7 @@ a collection of calamander trinkets is a conspicuous way of showing off wealth.
 appearance. It is exceedingly rare, found only in the most remote jungles, and
 it makes the finest woodwork.
 ~
-3 e a 0 6
+3 e a 0 7
 0 0 0
 0 0
 I 11 617 100.00 1  # LIGHT: magical fire
@@ -1686,10 +1774,10 @@ M
 $n positions some calamander boards and ties them into place.~
 M
 6
-You position some calamander boards onto the frame of $V.~
+You position some calamander boards onto $V.~
 M
 7
-$n positions some calamander boards onto the frame of $V.~
+$n positions some calamander boards onto $V.~
 O+ 1 6001
 R
 4 5118 0
@@ -1727,7 +1815,7 @@ a distinctly marbled jade color, but it tastes like a slightly funky cheese.
 Skycleave have been extraordinarily successful at grafting unusual foods onto
 magical trees.
 ~
-6 g a 0 7
+6 g a 0 8
 6 0 0
 7 12
 B
@@ -1738,5 +1826,11 @@ You pop $p in your mouth and the world seems to turn green for a second as you s
 M
 5
 $n pops $P in $s mouth and flashes green for a second.~
+M
+17
+$p sprouts little legs, hops down to the ground, and runs away!~
+M
+18
+$p sprouts little legs and runs away!~
 S
 $

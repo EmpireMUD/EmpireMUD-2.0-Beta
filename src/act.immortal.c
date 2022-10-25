@@ -4151,7 +4151,7 @@ SHOW(show_dailycycle) {
 			++count;
 		}
 		// if we didn't find any, try 1 more thing
-		if (count == 0 && (qst = quest_proto(num)) && QUEST_DAILY_CYCLE(qst) != QUEST_VNUM(qst)) {
+		if (count == 0 && (qst = quest_proto(num)) && QUEST_DAILY_CYCLE(qst) != NOTHING && QUEST_DAILY_CYCLE(qst) != QUEST_VNUM(qst)) {
 			num = QUEST_DAILY_CYCLE(qst);
 		}
 		

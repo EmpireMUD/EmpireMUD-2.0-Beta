@@ -83,6 +83,53 @@ end
 %send% %actor% You can't seem to get past ~%self%!
 return 0
 ~
+#11803
+Can't get close enough to pickpocket~
+0 p 100
+~
+if %ability% != 142
+  * not pickpocket
+  return 1
+  halt
+end
+switch %self.vnum%
+  case 11866
+  case 11871
+    * Mezvienne
+    %send% %actor% She's floating; it would be very difficult to pickpocket her.
+  break
+  case 11872
+    * Skithe
+    %send% %actor% The Lion of Time definitely does not have pockets.
+  break
+  case 11888
+    * Iskip
+    %send% %actor% Even if you could get up to his pockets, anything in there would be enormous.
+  break
+  case 11972
+  case 11981
+    * goblin crowds
+    %send% %actor% They don't have anything interesting in their pockets.
+  break
+  case 11988
+    * plural mob
+    %send% %actor% There's no way to get close enough to pickpocket them without them noticing.
+  break
+  case 11915
+    * prevents global pickpocket
+    %send% %actor% Who knows why the caged goblin sings -- but it might be because his pockets are empty.
+  break
+  case 11916
+  case 11917
+    * prevents global pickpocket
+    %send% %actor% Someone has already emptied the goblin's pockets.
+  break
+  default
+    %send% %actor% There's no way to get close enough to pickpocket ~%self% without *%self% noticing.
+  break
+done
+return 0
+~
 #11804
 Everflowing flagon (free refills)~
 1 bw 10
@@ -1150,7 +1197,7 @@ rdelete drinking %self.id%
 nop %self.set_cooldown(11800, 15)%
 ~
 #11823
-Skycleave: Boss Deaths (Pixy, Kara, Rojjer, Barrosh, Shade)~
+Skycleave: Boss Deaths: Pixy, Kara, Rojjer, Trixton, Barrosh, Shade~
 0 f 100
 ~
 switch %self.vnum%
@@ -1173,6 +1220,7 @@ switch %self.vnum%
       %echo% The camouflage around Apprentice Sanjiv fades as he collapses to his knees and vomits on the floor.
       %mod% %sanjiv% longdesc An apprentice is kneeling on the floor, heaving.
       %mod% %sanjiv% lookdesc The young apprentice is on his knees, dirtying his white kurta. His wavy brown hair is matted with sweat and he heaves as if he might vomit again.
+      detach 11803 %sanjiv.id%
     end
     * check Trixton's attackability
     if !%instance.mob(11848)%
@@ -1190,6 +1238,10 @@ switch %self.vnum%
         %at% %trixton.room% %echo% ~%trixton% has lost ^%trixton% protection!
         dg_affect %trixton% !ATTACK off
       end
+  break
+  case 11849
+    * Trixton Vye: complete floor
+    %load% mob 11897
   break
   case 11863
     * Shadow Ascendant
@@ -1369,7 +1421,7 @@ if %room.varexists(vnum_list)%
   set vnum_list %room.vnum_list%
   set list_size %room.list_size%
 else
-  set vnum_list 11800 11801 11802 11803 11808 11809 11821 11822 11823 11824 11826
+  set vnum_list 11800 11802 11803 11808 11809 11821 11822 11823 11824 11826
   set list_size 11
 end
 * pick a spot in the list
@@ -1391,18 +1443,10 @@ if %vnum%
   %load% mob %vnum%
   set mob %room.people%
   if %mob.vnum% == %vnum%
-    if %mob.vnum% == 11801
-      * special handling for dylane: spawns on silent mode
-      dg_affect #11832 %mob% !SEE on -1
-      dg_affect #11832 %mob% !TARGET on -1
-      dg_affect #11832 %mob% SNEAK on -1
-      nop %mob.add_mob_flag(SILENT)%
-    else
-      * all other mobs
-      %echo% ~%mob% walks in from the foyer.
-      makeuid foyer room i11800
-      %at% %foyer% %echo% ~%mob% walks through the foyer and into the tower.
-    end
+    * all other mobs
+    %echo% ~%mob% walks in from the foyer.
+    makeuid foyer room i11800
+    %at% %foyer% %echo% ~%mob% walks through the foyer and into the tower.
   end
 end
 * and detach if the list is empty
@@ -1430,13 +1474,6 @@ if %self.vnum% == 11824 || %self.vnum% == 11826
   if %room.template% == 11907
     nop %self.add_mob_flag(SENTINEL)%
     nop %self.remove_mob_flag(SILENT)%
-    detach 11828 %self.id%
-  end
-  halt
-elseif %self.vnum% == 11801
-  * Dylane wanders until he finds the cafe
-  if %room.template% == 11905
-    nop %self.add_mob_flag(SENTINEL)%
     detach 11828 %self.id%
   end
   halt
@@ -1554,7 +1591,7 @@ elseif %self.vnum% == 11827
       wait 9 s
       %force% %djon% say No! Wait, Regin Dall?
       wait 9 s
-      say Didn't you two used to date?
+      say Didn't you two used to date? He looked awful.
       wait 9 s
       %force% %djon% say  Barely. Honestly he doesn't even count.
       wait 9 s
@@ -1792,7 +1829,7 @@ done
 ~
 #11832
 Skycleave: Conditional mob visibility~
-0 iC 100
+0 C 100
 ~
 * toggles silent, !see
 if %actor.is_npc%
@@ -1813,10 +1850,13 @@ end
 * determine if anyone should/shouldn't see me
 while %ch%
   if %ch.is_pc%
+    set varname %ch.id%_can_see
+    set %varname% 0
     if %self.vnum% == 11900
       * intro spirit: shows when any floor quest complete
       if %ch.completed_quest(11810)% || %ch.completed_quest(11811)% || %ch.completed_quest(11812)%
         set see 1
+        set %varname% 1
       else
         set not 1
       end
@@ -1825,9 +1865,11 @@ while %ch%
       if %ch.completed_quest(11802)%
         set not 1
       else
-       set see 1
+        set see 1
+        set %varname% 1
       end
     end
+    remote %varname% %self.id%
   end
   if %spec%
     set spec 0
@@ -1852,17 +1894,28 @@ done
 * and make visible
 if %vis% && %self.affect(11832)%
   dg_affect #11832 %self% off
-  if %self.vnum% != 11801 || %self.room.template% == 11905
-    * 11801 Dylane does not remove silent unless he's in the cafe
-    nop %self.remove_mob_flag(SILENT)%
-  end
-  %echo% ~%self% arrives.
+  nop %self.remove_mob_flag(SILENT)%
+  set arrives 1
 elseif !%vis% && !%self.affect(11832)%
   dg_affect #11832 %self% !SEE on -1
   dg_affect #11832 %self% !TARGET on -1
   dg_affect #11832 %self% SNEAK on -1
   nop %self.add_mob_flag(SILENT)%
-  %echo% ~%self% leaves.
+  set leaves 1
+end
+* messaging?
+if %arrives% || %leaves%
+  set ch %self.room.people%
+  while %ch%
+    if %ch.is_pc%
+      if %arrives%
+        %send% %ch% ~%self% arrives.
+      elseif %leaves% && %self.var(%ch.id%_can_see)%
+        %send% %ch% ~%self% leaves.
+      end
+    end
+    set ch %ch.next_in_room%
+  done
 end
 ~
 #11833
@@ -3004,6 +3057,60 @@ switch %self.vnum%
     break
   done
 ~
+#11852
+Single-try pickpocket~
+0 p 100
+~
+* Only allows each player to attempt to pickpocket this mob 1 time
+if %ability% != 142
+  * not pickpocket ability
+  return 1
+  halt
+elseif %self.mob_flagged(*PICKPOCKETED)% || !%self.can_see(%actor%)%
+  * done already or can't see them
+  return 1
+  halt
+end
+set varname pickpocket_%actor.id%
+if %self.varexists(pickpocket_%actor.id%)%
+  * tried this before
+  switch %self.vnum%
+    default
+      %send% %actor% ~%self% is watching you now; you can't get close enough to pick ^%self% pocket.
+    break
+  done
+  return 0
+else
+  * ok to try
+  set %varname% 1
+  remote %varname% %self.id%
+  return 1
+end
+~
+#11853
+Skycleave: Escaped Otherworlder fight~
+0 k 0
+~
+* tba
+~
+#11854
+Skycleave: Skithe Ler-Wyn fight~
+0 k 0
+~
+* tba
+~
+#11855
+Skycleave: Mezvienne the Enchantress fight~
+0 k 0
+~
+* tba
+~
+#11856
+Skycleave: Shadow Ascendant fight~
+0 k 0
+~
+* tba
+~
 #11857
 Skycleave: Mercenary name setup~
 0 n 100
@@ -3121,6 +3228,18 @@ switch %self.vnum%
 done
 * and detach
 detach 11857 %self.id%
+~
+#11858
+Skycleave: Shade of Mezvienne fight~
+0 k 0
+~
+* tba
+~
+#11859
+Skycleave: MC Barrosh fight~
+0 k 0
+~
+* tba
 ~
 #11860
 Skycleave: Shard cultivator / upgrade shard tool~
@@ -3884,7 +4003,7 @@ switch %cycle%
   case 3
     say Fras kee selmo tagra tyewa...
     wait 1 sec
-    %echo% More and more splinters rise into the air until you can scarcely breath!
+    %echo% More and more splinters rise into the air until you can scarcely breathe!
     wait 8 sec
     say Badur eydur a wo owri...
     wait 1 sec
@@ -3892,7 +4011,7 @@ switch %cycle%
     wait 7 sec
     say Ickor carzo a kee selmo, vadur, eydur Tagra Nes!
     wait 1 sec
-    %echo% ~%self% stabs the rotten tree with a flint knife as the splinters of wood fall out of the air...
+    %echo% ~%self% stabs the rotten tree with a gemstone knife as the splinters of wood fall out of the air...
     set splint %self.room.contents(11889)%
     if %splint%
       %purge% %splint%
@@ -4973,12 +5092,6 @@ if %self.room.template% == 11887
   otimer 4
 end
 ~
-#11885
-Mercenary Leader Death: Floor 3 completer~
-0 f 100
-~
-%load% mob 11897
-~
 #11886
 Statue combat~
 1 c 4
@@ -5242,6 +5355,10 @@ remote diff2 %spirit.id%
 %at% i11824 skygobpix %difficulty% a  * trash mob
 %at% i11825 skyload 11818 %difficulty%  * Goblin Boss
 %load% mob 11864  * Replacement Celiya
+if %self.mob_flagged(*PICKPOCKETED)%
+  set mob %instance.mob(11864)%
+  nop %mob.add_mob_flag(*PICKPOCKETED)%
+end
 %purge% %self%
 ~
 #11891
@@ -5304,6 +5421,10 @@ remote diff3 %spirit.id%
 %at% i11840 %load% mob 11831  * Resident Niamh
 %at% i11840 %load% mob 11840  * Magineer
 %load% mob 11910  * Replacement Watcher
+if %self.mob_flagged(*PICKPOCKETED)%
+  set mob %instance.mob(11910)%
+  nop %mob.add_mob_flag(*PICKPOCKETED)%
+end
 %purge% %self%
 ~
 #11892
@@ -5360,7 +5481,11 @@ remote diff4 %spirit.id%
 %at% i11868 skyload 11869 %difficulty%  * Shade of Mezvienne
 %at% i11868 %load% mob 11868  * Injured Knezz
 %at% i11871 skyload 11871 %difficulty%  * Mezvienne the Enchantress
-%load% mob 11930  * Replacement High Master
+%load% mob 11930  * Replacement Caius
+if %self.mob_flagged(*PICKPOCKETED)%
+  set mob %instance.mob(11930)%
+  nop %mob.add_mob_flag(*PICKPOCKETED)%
+end
 %purge% %self%
 ~
 #11893
@@ -5464,20 +5589,46 @@ nop %self.link_instance%
 * 3. Mobs: Any checks based on surviving mobs go here (step 4 will purge them)
 %at% i11800 %load% mob 11901  * Gossipper
 %at% i11800 %load% mob 11901  * Additional Gossipper
-%at% i11903 %load% mob 11904  * Page Corwin
-%at% i11905 %load% mob 11905  * Barista
-%at% i11905 %load% mob 11827  * chatty couple
-%at% i11905 %load% mob 11828  * chatty couple
-%at% i11906 %load% mob 11906  * Instructor
+%at% i11905 %load% mob 11827  * Marina
+%at% i11905 %load% mob 11828  * Djon
+%at% i11905 %load% mob 11801  * Dylane
 %at% i11906 %load% mob 11908  * Student Elamm
 %at% i11906 %load% mob 11909  * Student Akeldama
-%at% i11907 %load% mob 11907  * Gift Shop Keeper
+%at% i11904 %load% mob 11902  * Bucket (and sponge)
+* Page Corwin
+set corwin %instance.mob(11804)%
+if %corwin%
+  eval temp %corwin.room.template% + 100
+  %at% i%temp% %load% mob 11904  * Page Corwin, was room i11903
+  if %corwin.mob_flagged(*PICKPOCKETED)%
+    set mob %instance.mob(11904)%
+    nop %mob.add_mob_flag(*PICKPOCKETED)%
+  end
+end
+* Barista Mageina
+set barista %instance.mob(11805)%
+%at% i11905 %load% mob 11905  * Barista Mageina
+if %barista.mob_flagged(*PICKPOCKETED)%
+  set mob %instance.mob(11905)%
+  nop %mob.add_mob_flag(*PICKPOCKETED)%
+end
+* Instructor Huberus
+set huberus %instance.mob(11806)%
+%at% i11906 %load% mob 11906  * Instructor Huberus
+if %huberus.mob_flagged(*PICKPOCKETED)%
+  set mob %instance.mob(11906)%
+  nop %mob.add_mob_flag(*PICKPOCKETED)%
+end
+* Gift Shop Keeper
 set shopkeep %instance.mob(11807)%
+%at% i11907 %load% mob 11907  * Gift Shop Keeper
 set newshop %instance.mob(11907)%
 if %shopkeep% && %newshop%
   nop %newshop.namelist(%shopkeep.namelist%)%
+  if %shopkeep.mob_flagged(*PICKPOCKETED)%
+    nop %newshop.add_mob_flag(*PICKPOCKETED)%
+  end
 end
-%at% i11904 %load% mob 11902  * Bucket (and sponge)
 * attach some trigs
 set 11937_list 11945 11929
 while %11937_list%
@@ -5524,16 +5675,40 @@ nop %self.link_instance%
 %door% i11804 up room i11910
 * 3. Mobs: Any checks based on surviving mobs go here (step 4 will purge them)
 set spirit %instance.mob(11900)%
-skydel 11811 1  * Apprentice Kayla 1A
-skydel 11812 2  * Apprentice Cosimo 2A
 skydel 11813 1  * Apprentice Tyrone 1A
-skydel 11825 1  * Apprentice Ravinder 1A
-%at% i11922 %load% mob 11891  * Watcher (difficulty selector version)
-%at% i11911 %load% mob 11911  * Apprentice Kayla
-%at% i11912 %load% mob 11912  * Apprentice Cosimo
 %at% i11918 %load% mob 11945  * Page Amets
 %at% i11921 %load% mob 11913  * Apprentice Tyrone
+* Apprentice Cosimo
+set cos %instance.mob(11812)%
+%at% i11912 %load% mob 11912  * Apprentice Cosimo
+if %cos.mob_flagged(*PICKPOCKETED)%
+  set mob %instance.mob(11912)%
+  nop %mob.add_mob_flag(*PICKPOCKETED)%
+end
+skydel 11812 2  * Apprentice Cosimo 2A
+* Apprentice Kayla
+set kayla %instance.mob(11811)%
+%at% i11911 %load% mob 11911  * Apprentice Kayla
+if %kayla.mob_flagged(*PICKPOCKETED)%
+  set mob %instance.mob(11911)%
+  nop %mob.add_mob_flag(*PICKPOCKETED)%
+end
+skydel 11811 1  * Apprentice Kayla 1A
+* Apprentice Ravinder
+set rav %instance.mob(11825)%
 %at% i11925 %load% mob 11925  * Apprentice Ravinder
+if %rav.mob_flagged(*PICKPOCKETED)%
+  set mob %instance.mob(11925)%
+  nop %mob.add_mob_flag(*PICKPOCKETED)%
+end
+skydel 11825 1  * Apprentice Ravinder 1A
+* Watcher Annaca
+set annaca %instance.mob(11810)%
+%at% i11922 %load% mob 11891  * Watcher Annaca diff-sel
+if %annaca.mob_flagged(*PICKPOCKETED)%
+  set mob %instance.mob(11891)%
+  nop %mob.add_mob_flag(*PICKPOCKETED)%
+end
 * check for any remaining goblins
 set goblin_11815 0
 set goblin_11816 0
@@ -5616,37 +5791,66 @@ nop %self.link_instance%
 * 2. Re-link 'up' exit from floor 2
 %door% i11922 up room i11930
 * 3. Mobs: Any checks based on surviving mobs go here (step 4 will purge them)
-%at% i11934 %load% mob 11892  * High Master difficulty selector
+%at% i11932 %load% mob 11933  * Walking Mop
+%at% i11930 %load% mob 11837  * Swarm of Rags
+skydel 11833 0  * Goef the shimmer
+%at% i11941 %load% mob 11941  * Goef the Attuner
 set niamh %instance.mob(11831)%
 if %niamh%
   %at% i11931 %load% mob 11931  * Resident Niamh (if she survived)
 end
 %at% i11932 %load% mob 11978  * moth
-skydel 11832 1  * Resident Mohammed
+* High Master Caius
+set caius %instance.mob(11830)%
+%at% i11934 %load% mob 11892  * High Master Caius diff-sel
+if %caius.mob_flagged(*PICKPOCKETED)%
+  set mob %instance.mob(11892)%
+  nop %mob.add_mob_flag(*PICKPOCKETED)%
+end
+* Resident Mohammed
+set moh %instance.mob(11832)%
 %at% i11935 %load% mob 11932  * Resident Mohammed
+if %moh.mob_flagged(*PICKPOCKETED)%
+  set mob %instance.mob(11932)%
+  nop %mob.add_mob_flag(*PICKPOCKETED)%
+end
+skydel 11832 1  * Resident Mohammed
+* Enchanter Annelise
+set lise %instance.mob(11839)%
+%at% i11939 %load% mob 11939  * Enchanter Annelise
+if %lise.mob_flagged(*PICKPOCKETED)%
+  set mob %instance.mob(11939)%
+  nop %mob.add_mob_flag(*PICKPOCKETED)%
+end
+skydel 11839 1  * Enchanter Annelise
 if %instance.mob(11834)%
   %at% i11935 %load% mob 11934  * Chained Otherworlder (if it survived/stayed)
 end
-if %instance.mob(11835)%
+set sanjiv %instance.mob(11835)%
+if %sanjiv%
   if %instance.mob(11834)%
     %at% i11935 %load% mob 11935  * Apprentice Sanjiv, scanning
+    set mob %instance.mob(11935)%
   else
     %at% i11935 %load% mob 11942  * Apprentice Sanjiv, no otherworlder
+    set mob %instance.mob(11942)%
+  end
+  if %mob% && %sanjiv.mob_flagged(*PICKPOCKETED)%
+    nop %mob.add_mob_flag(*PICKPOCKETED)%
   end
 end
 %at% i11936 %load% mob 11936  * Scaldorran
 skydel 11838 1  * Ghost
 %at% i11938 %load% mob 11938  * Ghost
-skydel 11839 1  * Enchanter Annelise
-%at% i11939 %load% mob 11939  * Enchanter Annelise
+* Magineer Waltur
 set waltur %instance.mob(11840)%
 if %waltur%
   %at% i11940 %load% mob 11940  * Magineer Waltur (if he survived)
+  if %waltur.mob_flagged(*PICKPOCKETED)%
+    set mob %instance.mob(11940)%
+    nop %mob.add_mob_flag(*PICKPOCKETED)%
+  end
 end
-%at% i11932 %load% mob 11933  * Walking Mop
-%at% i11930 %load% mob 11837  * Swarm of Rags
-skydel 11833 0  * Goef the shimmer
-%at% i11941 %load% mob 11941  * Goef the Attuner
 * 4. Move people from the old rooms
 set vnum %start_room%
 while %vnum% <= %end_room%
@@ -5679,7 +5883,6 @@ nop %self.link_instance%
 * 2. Re-link 'up' exit from floor 3
 %door% i11934 up room i11960
 * 3. Mobs: Any checks based on surviving mobs go here (step 4 will purge them)
-skydel 11864 1  * Celiya 1A
 skydel 11862 3  * Thorley 4A
 %at% i11924 %load% mob 11962  * Apprentice Thorley
 %at% i11965 %load% mob 11959  * Page Sheila
@@ -5690,6 +5893,7 @@ if %instance.mob(11861)%
 end
 %at% i11967 %load% mob 11967  * Barrosh
 * check knezz
+set celiya %instance.mob(11864)%
 set knezz %instance.mob(11868)%
 if !%knezz%
   * backup knezz
@@ -5698,6 +5902,10 @@ end
 if %knezz%
   * Knezz survived
   %at% i11964 %load% mob 11964  * HS Celiya
+  if %celiya.mob_flagged(*PICKPOCKETED)%
+    set mob %instance.mob(11964)%
+    nop %mob.add_mob_flag(*PICKPOCKETED)%
+  end
   %at% i11964 %load% obj 11969  * Celiya's desk
   eval knezz_room %knezz.room.template% + 100
   %at% i%knezz_room% %load% mob 11968  * GHS Knezz
@@ -5711,6 +5919,7 @@ if %knezz%
   if %mob%
     %force% %mob% shout By the power of Skycleave... I HAVE THE POWER!
   end
+  skydel 11864 1  * Celiya 1A
 else
   * Knezz died
   %at% i11964 %load% mob 11965  * Office Cleaner
@@ -5720,7 +5929,13 @@ else
   * shout
   set mob %instance.mob(11969)%
   if %mob%
+    if %celiya.mob_flagged(*PICKPOCKETED)%
+      nop %mob.add_mob_flag(*PICKPOCKETED)%
+    end
+    skydel 11864 1  * Celiya 1A
     %force% %mob% shout By the power of Skycleave... I HAVE THE POWER!
+  else
+    skydel 11864 1  * Celiya 1A
   end
 end
 %at% i11961 %load% mob 11960  * Filing Cabinet

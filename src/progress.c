@@ -2301,7 +2301,7 @@ void olc_fullsearch_progress(char_data *ch, char *argument) {
 	char buf[MAX_STRING_LENGTH * 2], line[MAX_STRING_LENGTH], type_arg[MAX_INPUT_LENGTH], val_arg[MAX_INPUT_LENGTH], find_keywords[MAX_INPUT_LENGTH];
 	bitvector_t not_flagged = NOBITS, only_flags = NOBITS;
 	bitvector_t  find_tasks = NOBITS, found_tasks, find_perks = NOBITS, found_perks;
-	int count, only_cost = NOTHING, only_value = NOTHING, only_type = NOTHING;
+	int count, only_cost = NOTHING, only_value = NOTHING, only_type = NOTHING, vmin = NOTHING, vmax = NOTHING;
 	progress_data *prg, *next_prg;
 	struct progress_perk *perk;
 	struct req_data *task;
@@ -2330,6 +2330,8 @@ void olc_fullsearch_progress(char_data *ch, char *argument) {
 		FULLSEARCH_LIST("type", only_type, progress_types)
 		FULLSEARCH_FLAGS("unflagged", not_flagged, progress_flags)
 		FULLSEARCH_INT("value", only_value, 0, INT_MAX)
+		FULLSEARCH_INT("vmin", vmin, 0, INT_MAX)
+		FULLSEARCH_INT("vmax", vmax, 0, INT_MAX)
 		
 		else {	// not sure what to do with it? treat it like a keyword
 			sprintf(find_keywords + strlen(find_keywords), "%s%s", *find_keywords ? " " : "", type_arg);
@@ -2344,6 +2346,9 @@ void olc_fullsearch_progress(char_data *ch, char *argument) {
 	
 	// okay now look up items
 	HASH_ITER(hh, progress_table, prg, next_prg) {
+		if ((vmin != NOTHING && PRG_VNUM(prg) < vmin) || (vmax != NOTHING && PRG_VNUM(prg) > vmax)) {
+			continue;	// vnum range
+		}
 		if (only_value != NOTHING && PRG_VALUE(prg) != only_value) {
 			continue;
 		}

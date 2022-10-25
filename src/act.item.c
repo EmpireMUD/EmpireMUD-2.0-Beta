@@ -1024,7 +1024,7 @@ static int perform_put(char_data *ch, obj_data *obj, obj_data *cont) {
 		return 0;
 	}
 	if (GET_OBJ_REQUIRES_QUEST(obj) != NOTHING && !IS_NPC(ch) && !IS_IMMORTAL(ch)) {
-		act("$p: you can't drop quest items.", FALSE, ch, obj, NULL, TO_CHAR);
+		act("$p: you can't put quest items in there.", FALSE, ch, obj, NULL, TO_CHAR);
 		return 0;
 	}
 	
@@ -1467,7 +1467,7 @@ bool used_lighter(char_data *ch, obj_data *obj) {
  //////////////////////////////////////////////////////////////////////////////
 //// DROP HELPERS ////////////////////////////////////////////////////////////
 
-#define VANISH(mode) (mode == SCMD_JUNK ? "  It vanishes in a puff of smoke!" : "")
+#define VANISH(mode) (mode == SCMD_JUNK ? " It vanishes in a puff of smoke!" : "")
 
 /**
 * Attempts to complete a drop/junk.
@@ -4825,7 +4825,7 @@ ACMD(do_drink) {
 	}
 
 	/* check trigger */
-	if (obj && !consume_otrigger(obj, ch, OCMD_DRINK, NULL)) {
+	if (obj && !consume_otrigger(obj, ch, (subcmd == SCMD_SIP) ? OCMD_SIP : OCMD_DRINK, NULL)) {
 		return;
 	}
 
@@ -5133,7 +5133,7 @@ ACMD(do_eat) {
 	}
 
 	/* check trigger */
-	if (!consume_otrigger(food, ch, OCMD_EAT, NULL)) {
+	if (!consume_otrigger(food, ch, (subcmd == SCMD_TASTE) ? OCMD_TASTE : OCMD_EAT, NULL)) {
 		return;
 	}
 	
@@ -5947,7 +5947,7 @@ ACMD(do_list) {
 	obj_data *obj;
 	any_vnum vnum;
 	size_t size;
-	bool ok, id, all;
+	bool ok, id, all, found_id = FALSE;
 	int amt, number;
 	
 	// helper type for displaying currencies at the end
@@ -6027,6 +6027,7 @@ ACMD(do_list) {
 			
 			if (id) {	// just identifying -- show shop id then exit the loop early
 				do_shop_identify(ch, obj);
+				found_id = TRUE;
 				break;
 			}
 			
@@ -6147,7 +6148,7 @@ ACMD(do_list) {
 			msg_to_char(ch, "There's nothing for sale here%s.\r\n", (*argument ? " by that name" : ""));
 		}
 	}
-	else if (id && number > 0) {
+	else if (id && !found_id) {
 		msg_to_char(ch, "You don't see anything like that here.\r\n");
 	}
 

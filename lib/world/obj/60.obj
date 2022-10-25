@@ -32,7 +32,7 @@ some fine lumber~
 Some fine lumber is stacked here.~
 This is high-quality lumber, perfect for building or crafting fine things.
 ~
-3 e a 0 12
+3 e a 0 13
 0 0 0
 0 0
 C
@@ -46,10 +46,10 @@ M
 $n positions $p and ties it in place.~
 M
 6
-You position $p on the frame of $V.~
+You position $p on $V.~
 M
 7
-$n positions $p on the frame of $V.~
+$n positions $p on $V.~
 O+ 1 6002
 R
 4 5118 0

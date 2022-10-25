@@ -725,7 +725,7 @@ Some fresh spruce lumber is piled here.~
    The pale, knotty wood is nevertheless strong. Lumber is used in building
 construction.
 ~
-3 e a 0 5
+3 e a 0 6
 0 0 0
 0 0
 I 11 1002 100.00 1  # LIGHT: roaring fire
@@ -737,10 +737,10 @@ M
 $n positions some lumber and ties it in place.~
 M
 6
-You position some lumber on the frame of $V.~
+You position $p on $V.~
 M
 7
-$n positions some lumber on the frame of $V.~
+$n positions $p on $V.~
 O+ 1 6000
 R
 4 5118 0

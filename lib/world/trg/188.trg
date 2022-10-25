@@ -657,7 +657,7 @@ else
     %quest% %actor% finish 18819
   else
     nop %self.val0(%costume_vnum%)%
-    nop %actor.set_cooldown(18819,30)%
+    nop %actor.set_cooldown(18819,20)%
   end
 end
 ~
@@ -790,7 +790,7 @@ else
     %quest% %actor% finish 18821
   else
     nop %self.val0(%charges%)%
-    nop %actor.set_cooldown(18821,30)%
+    nop %actor.set_cooldown(18821,20)%
   end
 end
 ~
@@ -950,7 +950,7 @@ else
   else
     eval charges %charges% - 1
     nop %self.val0(%charges%)%
-    nop %actor.set_cooldown(18824,30)%
+    nop %actor.set_cooldown(18824,20)%
   end
 end
 ~
@@ -983,7 +983,12 @@ if %target.is_pc%
   %send% %target% ~%actor% stalks towards you, fangs bared in a terrifying snarl!
   %echoneither% %actor% %target% ~%actor% bares ^%actor% fangs and stalks towards ~%target%, who cowers in fear!
   halt
-elseif %target.vnum% != 200 && %target.vnum% != 201 && %target.vnum% != 237 && %target.vnum% != 203 && %target.vnum% != 204
+elseif %target.vnum% == 251
+  %send% %actor% ~%actor% try to scare ~%target%, but take a gauntlet to the face for your effort!
+  %echoaround% %actor% ~%actor% tries to scare ~%target% and takes a gauntlet to the face for ^%actor% effort!
+  %damage% %actor% %random.20%
+  halt
+elseif %target.vnum% != 200 && %target.vnum% != 201 && %target.vnum% != 202 && %target.vnum% != 203 && %target.vnum% != 237
   * wrong target
   %send% %actor% You bare your fangs and snarl at ~%target%, who flinches away.
   %echoaround% %actor% ~%actor% bares ^%actor% fangs and snarls at ~%target%, who flinches away.
@@ -1008,7 +1013,7 @@ else
     %quest% %actor% finish 18827
   else
     nop %self.val0(%times%)%
-    nop %actor.set_cooldown(18827,30)%
+    nop %actor.set_cooldown(18827,20)%
   end
 end
 ~

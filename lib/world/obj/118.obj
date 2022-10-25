@@ -27,7 +27,7 @@ the Tower Skycleave on the heel.
 they walk up and down the tower's long spiral staircase. One thing is certain:
 These shoes were made for walking.
 ~
-2 mo ag 0 3
+2 mo ag 0 5
 -1 -1 -1
 11 0
 A
@@ -38,6 +38,12 @@ A
 5 1 6
 C
 150 250
+M
+8
+You slip on some bustling shoes and feel faster already.~
+M
+9
+$n slips on some bustling shoes and seems to speed up.~
 S
 #11802
 aura experimental~
@@ -47,7 +53,7 @@ There's... sort of an aura hovering here.~
 the sorcerers of the Tower Skycleave, notorious for its unusual magics and
 well-funded research and development.
 ~
-2 mo ak 0 4
+2 mo ak 0 7
 -1 -1 -1
 10 0
 A
@@ -58,6 +64,14 @@ A
 6 1 0
 A
 5 1 6
+C
+150 250
+M
+9
+$n starts to glow, somewhat.~
+M
+8
+You start to glow, somewhat.~
 S
 #11803
 manual user claw machine~
@@ -147,7 +161,7 @@ creatures, granting some degree of night vision.
 though most of these are created ad hoc by sorcerers looking to shortcut
 whatever difficult task they're working on at the moment.
 ~
-2 mo ae 0 16
+2 mo ae 0 17
 0 0 0
 7 0
 A
@@ -156,6 +170,12 @@ A
 5 1 6
 C
 150 150
+M
+8
+You wear the crystal analysis piece on your eye.~
+M
+9
+$n wears a crystal analysis device on $s eye.~
 S
 #11807
 jar demerits skycleaver~
@@ -218,13 +238,15 @@ began setting traps to capture any goblin who dared enter. But even caged --
 or perhaps even moreso when caged -- a goblin is a crafty sort, and it requires
 a skilled wrangler to keep them under control.
 ~
-1 hmo an 0 2
+1 hmo an 0 3
 0 1 7
 7 0
 A
 18 3 0
 A
 13 1 0
+C
+150 250
 S
 #11811
 spear goblin wrangler's wranglers~
@@ -239,13 +261,15 @@ have long faced what they euphemistically call "the goblin problem". It's a
 common occurrence for goblins to attempt to steal the tower's priceless relics,
 so wrangler spears are often stashed around the tower.
 ~
-1 ehmo an b 6
+1 ehmo an b 7
 0 1 3
 0 0
 A
 18 2 0
 A
 13 2 0
+C
+150 250
 M
 15
 You leap into the air and thrust your spear into the water. When you pull it out, you've caught $p!~
@@ -262,13 +286,15 @@ fine point that it requires no sharpening. The glass grip of the handle seems
 to fit your hand perfectly, such that the hatchet almost becomes an extension
 of your wrist.
 ~
-1 mo an a 5
+1 mo an a 6
 0 4 2
 8 0
 A
 1 1 0
 A
 17 2 0
+C
+150 250
 S
 #11813
 sword glowing glass great~
@@ -282,7 +308,7 @@ Grand High Sorcerer Kofi and though the tower no longer manufactures them, the
 artificers are still known to shape old glass ingots into tools and weapons
 from time to time.
 ~
-1 emno an 0 5
+1 emno an 0 6
 0 4 1
 8 0
 A
@@ -293,6 +319,8 @@ A
 9 1 0
 A
 21 1 0
+C
+150 250
 S
 #11814
 warstaff staff celiya's celiyas~
@@ -306,13 +334,15 @@ the great sorcerer Celiya, one of the famed leaders of Skycleave.
 history is strictly mythological -- and fantastical indeed -- it has produced
 so many High Sorcerers that few question its claims of descent from divinity.
 ~
-1 eimo an 0 6
+1 eimo an 0 7
 0 4 17
 0 0
 A
 8 1 0
 A
 17 2 0
+C
+150 250
 S
 #11815
 greatstaff staff apollus appollus~
@@ -326,13 +356,15 @@ staff, pulsing like a heartbeat.
 refers only to the current holder of the Apollus Chair, the sorcerer who
 oversees magics related to disease, poison, and healing.
 ~
-1 ehmo an 0 6
+1 ehmo an 0 7
 0 0 19
 0 0
 A
 8 1 0
 A
 23 2 0
+C
+150 250
 S
 #11816
 club bone scrimshawed~
@@ -350,7 +382,7 @@ flanks, the Wildermage Indrik summoned a thousand great beasts, from far and
 wide. The earth shook, the Galradians were trampled to dust, and what few
 beasts they felled were carved in celebration and honor by Indrik himself.
 ~
-1 emo an 0 9
+1 emo an 0 10
 0 3 5
 14 0
 A
@@ -359,6 +391,8 @@ A
 18 2 0
 A
 21 2 0
+C
+150 250
 S
 #11817
 staff bone scrimshawed~
@@ -372,7 +406,7 @@ they emanate in the dark tells you their purpose is to channel mana.
 of his greatest allies to celebrate the victory they seized from the tusks of
 defeat.
 ~
-1 emo an 0 9
+1 emo an 0 10
 0 3 18
 14 0
 A
@@ -381,6 +415,8 @@ A
 18 2 0
 A
 22 2 0
+C
+150 250
 S
 #11818
 bow rain rainbow goblin~
@@ -394,9 +430,11 @@ bow appears to be the goblin symbol for rain.
 called because they were shot off the gobbrabakhs during the driest months to
 strike water from clouds.
 ~
-20 emo ap 0 11
+20 emo ap 0 12
 29 1 0
 14 0
+C
+150 250
 S
 #11819
 armor otherworlder suit~
@@ -412,7 +450,7 @@ otherworlder's strange tools and inscrutible magics led the Tower Skycleaver to
 study him, that they might learn enough to stand their ground if an army of
 otherworlders should follow.
 ~
-27 emo aq 0 12
+27 emo aq 0 14
 3 0 0
 2 0
 A
@@ -423,6 +461,14 @@ A
 13 1 0
 A
 17 -3 0
+C
+150 250
+M
+8
+You equip yourself in the $p.~
+M
+9
+$n equips $mself in $p.~
 S
 #11820
 armor suit living skeleton~
@@ -437,7 +483,7 @@ life of its own when an errant spell from Scaldorran brought all the costumes
 to life. For his part, Scaldorran insisted he was only trying to liven up the
 party.
 ~
-27 emo aq 0 12
+27 emo aq 0 14
 1 0 0
 14 0
 A
@@ -448,6 +494,14 @@ A
 21 3 0
 A
 18 -3 0
+C
+150 250
+M
+8
+You equip yourself in the $p.~
+M
+9
+$n equips $mself in $p.~
 S
 #11821
 bindings lich~
@@ -463,7 +517,7 @@ image. For these sorcerers, living in death as a shadow of the spells they wove
 in life is still a form of immortality, but few erudite wizards would consider
 the lich to be the same person.
 ~
-27 emo aq 0 13
+27 emo aq 0 15
 0 0 0
 11 0
 A
@@ -474,6 +528,14 @@ A
 22 3 0
 A
 23 -3 0
+C
+150 250
+M
+8
+You equip yourself in the $p.~
+M
+9
+$n equips $mself in $p.~
 S
 #11822
 robes grand high sorcerer's sorcerers set~
@@ -490,7 +552,7 @@ stand the robes on their own soon became a complex animus spell. Perhaps
 growing tired of casting his own spells, Knezz eventually enchanted the long
 sleeves of the robe to move his arms for him.
 ~
-27 emo aq 0 14
+27 emo aq 0 16
 0 0 0
 11 0
 A
@@ -501,6 +563,14 @@ A
 23 3 0
 A
 22 -3 0
+C
+150 250
+M
+8
+You stretch out your arms and $p dress themselves onto your body.~
+M
+9
+$n stretches out $s arms and a set of violet robes dress themselves onto $s body.~
 S
 #11823
 armor goblin pleated set~
@@ -513,7 +583,7 @@ rogue.
    The goblins once traded for weapons and armor, but as their society fell,
 they began to imitate the crafts they had once purchased.
 ~
-27 emo aq 0 14
+27 emo aq 0 16
 2 0 0
 0 0
 A
@@ -522,6 +592,14 @@ A
 17 2 0
 A
 18 2 0
+C
+150 250
+M
+8
+You equip yourself in the $p.~
+M
+9
+$n equips $mself in $p.~
 S
 #11824
 shield tower glass~
@@ -535,7 +613,7 @@ takes blow after blow, ringing out like a bell but never shattering.
 since have become rather rare. The shield more closely resembles the tower as
 it looked during Kofi's tenure.
 ~
-23 emo ao 0 13
+23 emo ao 0 14
 0 0 0
 8 0
 A
@@ -546,6 +624,8 @@ A
 13 3 0
 A
 5 1 6
+C
+150 250
 S
 #11825
 dagger twisted arcane~
@@ -559,7 +639,7 @@ and pops the blade makes in the heat.
 Permafrost Wars, though most melted before High Sorcerer Chun devised a spell
 that could preserve them on our plane.
 ~
-1 imo ano f 15
+1 imo ano f 16
 0 1 4
 2 0
 A
@@ -570,6 +650,8 @@ A
 21 3 0
 A
 5 1 6
+C
+150 250
 S
 #11826
 grimoire barrosh's barroshs lost~
@@ -586,7 +668,7 @@ Barrad. Sorcery came rarely to their line, and it was necessary from the first
 generations to commit spells to text to ensure the family's fortune was not
 lost.
 ~
-3 emo ao 0 14
+3 emo ao 0 15
 0 0 0
 0 0
 A
@@ -597,6 +679,8 @@ A
 22 3 0
 A
 5 1 6
+C
+150 250
 S
 #11827
 focus prismatic Knezz's~
@@ -612,7 +696,7 @@ moves from target to target.
 of a magical beacon to a new source of magewood, helping secure his legacy and
 elevating him to the tower's top rank.
 ~
-3 mo ao 0 15
+3 mo ao 0 16
 0 0 0
 12 0
 A
@@ -623,6 +707,8 @@ A
 23 3 0
 A
 5 1 6
+C
+150 250
 S
 #11828
 shield starmetal metal freneticist's freneticists~
@@ -636,7 +722,7 @@ though its rough finish hardly scatters light.
 this, it is exceedingly rare to find the place where one has fallen, making
 starmetal one of the most sought-after minerals.
 ~
-23 emo ao 0 15
+23 emo ao 0 16
 0 0 0
 2 0
 A
@@ -649,6 +735,8 @@ A
 21 2 0
 A
 5 1 6
+C
+150 250
 S
 #11829
 shield mana stabilized manashield~
@@ -664,7 +752,7 @@ under the near-constant threat of invasion, burglary, and assault. Stabilized
 mana shields are de rigueur for the vanguard, which is often full of less-
 experienced students incapable of conjuring a shield of their own.
 ~
-23 emo ao 0 16
+23 emo ao 0 17
 0 0 0
 2 0
 A
@@ -677,6 +765,8 @@ A
 22 2 0
 A
 5 1 6
+C
+150 250
 S
 #11830
 bodysuit suit otherworldly worldly~
@@ -689,7 +779,7 @@ square inch of it catches and reflects light like nothing you've ever seen!
 metal carriage at the bottom of a steep crater. To the erudite lords of
 Skycleave, this was an unparalleled prize and it earned her high acclaim.
 ~
-2 mp ad 0 7
+2 mp ad 0 8
 0 0 0
 11 0
 A
@@ -701,6 +791,12 @@ C
 M
 12
 $n dazzles with an otherworldly presence.~
+M
+8
+You squeeze into $p.~
+M
+9
+$n squeezes into $p.~
 S
 #11831
 ward magical shimmering~
@@ -804,9 +900,11 @@ a skycleave BoE loot controller~
 A skycleave BoE loot controller is here.~
 Loads a bind-on-equip item.
 ~
-3 mo a 0 2
+3 mo a 0 3
 0 0 0
 0 0
+C
+150 250
 T 11814
 S
 #11838
@@ -815,9 +913,11 @@ a skycleave BoP loot controller~
 A skycleave BoP loot controller is here.~
 Loads a bind-on-pickup item.
 ~
-3 mp a 0 3
+3 mp a 0 4
 0 0 0
 0 0
+C
+150 250
 T 11814
 S
 #11839
@@ -919,7 +1019,7 @@ from the infinitely dark, unseeable void that lies at the heart of the fabric.
 When the cloth is done, it is boiled along with the weaver in a stone cauldron,
 trapping the weaver's soul within. This is considered the greatest honor.
 ~
-27 mp af 0 24
+27 mp af 0 25
 0 0 0
 11 0
 A
@@ -930,6 +1030,12 @@ A
 23 5 0
 C
 150 275
+M
+8
+$p wraps itself around your legs.~
+M
+9
+$p wraps itself around $n.~
 T 11940
 S
 #11844
@@ -1114,7 +1220,7 @@ the magitanium seem to follow every movement.
 Witch and though she didn't invent it, Itania is credited both with introducing
 the metal to Skycleave's artisan sorcerers, and with naming it.
 ~
-27 mp aj 0 22
+27 mp aj 0 23
 3 0 0
 2 0
 A
@@ -1125,6 +1231,12 @@ A
 2 1 0
 C
 150 275
+M
+8
+You snap $p onto your wrist.~
+M
+9
+$n snaps $p onto $s wrist.~
 T 11940
 S
 #11851
@@ -1167,7 +1279,7 @@ before.
 cities. There existed a particular technique for unraveling the coccoon while
 the pupa slept soundly, able to emerge without cutting the precious silk.
 ~
-27 mp aj 0 25
+27 mp aj 0 26
 0 0 0
 11 0
 A
@@ -1180,6 +1292,12 @@ A
 22 2 0
 C
 150 275
+M
+8
+You wrap $p onto your wrist.~
+M
+9
+$n wraps $p onto $s wrist.~
 T 11940
 S
 #11853
@@ -1194,7 +1312,7 @@ release an ear-piercing screech that leaves you momentarily stunned.
 placed into an ever-burning fire, of which few are known, and the sheer value
 of soulcloth is such that this has never been tested.
 ~
-27 mp aj 0 26
+27 mp aj 0 27
 0 0 0
 11 0
 A
@@ -1207,6 +1325,12 @@ A
 23 2 0
 C
 150 275
+M
+8
+You slide $p onto your wrist.~
+M
+9
+$n slides $p onto $s wrist.~
 T 11940
 S
 #11854
@@ -1221,7 +1345,7 @@ metallurgy. While cleaning her grandfather's tower as an adolescent, she fell
 into a barmy blue portal and returned laden with strange bottles filled with
 her namesake fizzy beverage.
 ~
-27 mp aj 0 24
+27 mp aj 0 25
 2 0 0
 2 0
 A
@@ -1234,6 +1358,12 @@ A
 13 1 0
 C
 150 275
+M
+8
+You snap $p onto your wrist.~
+M
+9
+$n snaps $p onto $s wrist.~
 T 11940
 S
 #11855
@@ -1249,7 +1379,7 @@ relics that line Skycleave's shelves. But her true genius was trading for the
 secrets to make them as well, and the process for crafting magitanium was her
 crowning achievement.
 ~
-2 mp am 0 25
+2 mp am 0 26
 0 0 0
 4 0
 A
@@ -1262,6 +1392,18 @@ A
 5 1 3
 C
 150 275
+M
+8
+You put some $p through your ears.~
+M
+9
+$n puts some $p through $s ears.~
+M
+8
+You put $p in your ears.~
+M
+9
+$n puts $p in $s ears.~
 T 11940
 S
 #11856
@@ -1304,7 +1446,7 @@ earrings, it doesn't make that characteristic crackle as it does.
 trees, where lightning is at its closest. Their caterpillars have furry backs
 that crisp and sizzle as stray sparks in the air are caught and channeled.
 ~
-2 mp am 0 25
+2 mp am 0 26
 0 0 0
 4 0
 A
@@ -1317,6 +1459,12 @@ A
 5 1 3
 C
 150 275
+M
+8
+You put $p in your ears.~
+M
+9
+$n puts $p in $s ears.~
 T 11940
 S
 #11858
@@ -1331,7 +1479,7 @@ does when you disturb it.
 single bolt of the stuff is often split into many smaller pieces, at the cost
 of fragmenting the soul held within.
 ~
-2 mp am 0 25
+2 mp am 0 26
 0 0 0
 4 0
 A
@@ -1344,6 +1492,12 @@ A
 5 1 3
 C
 150 275
+M
+8
+You put $p in your ears.~
+M
+9
+$n puts $p in $s ears.~
 T 11940
 S
 #11859
@@ -1359,7 +1513,7 @@ even after the Moxie Witch was twice abducted by envious ironmongers who forced
 the secret out of her. Both abductors vanished within a fortnight of her
 release.
 ~
-2 mp am 0 27
+2 mp am 0 28
 0 0 0
 4 0
 A
@@ -1374,6 +1528,12 @@ A
 5 1 3
 C
 150 275
+M
+8
+You put $p in your ears.~
+M
+9
+$n puts $p in $s ears.~
 T 11940
 S
 #11860
@@ -1454,7 +1614,9 @@ Someone has left their mana deconfabulator on the ground.~
 particularly heavy. It's made from striped magewood and nocturnium straps, with
 a crystal orb on one end and an eventide horn on the other. You don't see a way
 to turn it on; or, perhaps it isn't working any more.
-   flavor text tba
+   Magical energy, often called mana, is a tangled thing, often tainted by the
+stray thoughts and dreams of wizards and sorcerers. Purifying mana is nearly
+impossible, but deconfabulating it can be done with the right equipment.
 ~
 15 e a 0 4
 1 0 0
@@ -1471,7 +1633,7 @@ An ether condenser is humming on the ground.~
    The odd black metal box is inscribed all over with golden letters in a
 script you don't read. It makes a low hum and is, at all times, cold to the
 touch, but you can't figure out how to open it, nor what it's doing.
-   flavor text tba
+   Some mages have posited that the ether can be used as a source of mana.
 ~
 15 e a 0 4
 1 0 0
@@ -1482,17 +1644,20 @@ R
 4 5193 0
 S
 #11866
-knickknack knicknack enchanted~
-an enchanted knickknack~
-An enchanted knickknack has been knocked over.~
-   The odd knickknack is lightly damaged on one side, but otherwise still in
-good shape. It seems rather old, even if you can't tell exactly what it's meant
-to be. The tower was full of them, so perhaps it's important.
-   flavor text tba
+man wooden carved~
+a carved wooden man~
+A carved wooden man lies on the ground.~
+   The angular wooden figurine resembles a man, at least from the waist up;
+there are no legs. The figurine's head is bald and the details on the face are
+poorly defined, except for a pair of jade squares stuck in for eyes. A
+double-chevron collar is the only hint of clothing, but the sculpture has
+distinct arms and hands that join near its waist.
+   Many cultures practice woodcarving to create ornaments, dolls, and religious
+sculptures.
 ~
-15 j a 0 4
+15 0 a 0 5
 1 0 0
-2 0
+0 0
 C
 150 150
 R
@@ -1506,7 +1671,8 @@ There is a dynamic reconfabulator on the ground.~
 ring around it and a nocturnium stake through the center. You have no knowledge
 of how to use it -- if, indeed, it serves some function or purpose at all. But
 you do notice that it's ice cold to the touch.
-   flavor text tba
+   When mana becomes too pure, it sometimes becomes explosive. As this can be a
+side-effect of deconfabulation, the proper solution is a reconfabulator.
 ~
 15 e a 0 4
 1 0 0
@@ -1524,7 +1690,8 @@ A prototype for a miniature wellstone is lying on the ground.~
 smaller gems and minerals, as if they were fused together and then carved to
 resemble a smooth, round rock, almost like a skipping stone. It seems to be a
 prototype; you can't figure out how to make it do anything.
-   flavor text tba
+   The magineers at Skycleave design far more gizmos than they ever create.
+Some take years of research and experimentation and, of those, many still fail.
 ~
 15 0 a 0 5
 1 0 0
@@ -1545,7 +1712,8 @@ to look at them.
    Unfortunately, you can't seem to figure out how the self-writing pen works.
 When it's too close to any blank surface, it starts scribbling on its own. But
 nothing you do or say seems to control it.
-   flavor text tba
+   A good self-writing pen can save a person a lot of time writing class notes,
+thank-you notes, and Dear John letters.
 ~
 15 0 a 0 6
 1 0 0
@@ -1590,8 +1758,6 @@ S
 note hand-written handwritten written~
 a hand-written note~
 A hand-written note is lying here.~
-You read the writing on the piece of parchment:
-
              Amor,
 
                 Though it was but a few fleeting moments, the
@@ -1616,10 +1782,10 @@ S
 potion red glittering~
 a glittering red potion~
 A glittering red potion is sitting on the ground.~
-   The red potion swirls as you hold it up to the light, glittering with swirls
-of yellow like pixy dust in caught in a whirlpool. There's no label on the
+   The red potion swirls as you hold it up to the light, glittering with flecks
+of yellow, like pixy dust in caught in a whirlpool. There's no label on the
 flask and no way to tell what effect it will have but to quaff it.
-   flavor text tba
+   Potions are a quick way to shore up one's particular deficiencies.
 ~
 25 m a 0 6
 -1 0 3030
@@ -1641,13 +1807,18 @@ A filigreed stasis charm is lying on the ground.~
 look like knitted metal. At the center of the charm, the negative space between
 the filigree forms the outline of a person. The whole thing dangles from a
 thin gold chain, tarnished at the back from heavy wear.
-   flavor text tba
+   The Tower Skycleave is a notoriously high-performing school of magic. Part
+of their excellent grade point average, and equally notorious, is low tolerance
+for under-achievers.
 ~
-2 0 ac 0 6
+2 0 ac 0 7
 0 0 0
 2 0
 C
 100 100
+M
+8
+You put $p around your neck and feel more... stable.~
 T 11881
 S
 #11875
@@ -1655,13 +1826,15 @@ pick hardstone stone~
 a hardstone pick~
 A hardstone pick is lying here.~
    The small pick has short wooden handle and a triangular stone head, bound
-together by pitch and leather. Scratch-marks run the length of the handle, but
+together by pitch and leather. Scratch-marks run the length of the handle; but,
 though the head of the pick is slightly worn, there are no signs of cracks.
-   flavor text tba
+   Using stone to mine ore is far from ideal. In fact, it's nearly impossible.
 ~
-1 imo an h 4
+1 imo an h 5
 0 1 8
 1 0
+C
+150 250
 S
 #11876
 stabber obsidian~
@@ -1671,11 +1844,13 @@ An obsidian stabber has been dropped here.~
 wafer-thin, with tiny serrations along both sides. A simple strap of leather
 around the base serves as a simple handle. It may be small, but this thing is
 thin enough to slide between ribs and long enough to pierce the heart.
-   flavor text tba
+   Goblin tools are, as a rule, simple and 'to the point'.
 ~
-1 imo ano f 4
+1 imo ano f 5
 0 1 4
 1 0
+C
+150 250
 S
 #11877
 flute gemstone stone little~
@@ -1686,7 +1861,9 @@ glitters in every color of the rainbow as the light strikes it. Nineteen tiny
 holes run the length of the flute. It's difficult to play, but the music is
 transcendental.
    Hold the flute to play it.
-   flavor text tba
+   Joiago learned to play the flute at a young age from his grandmother, who
+gifted him one made by pixies. In the right hands, it has the power to evoke
+powerful emotions and draw listeners into an enchanted dance.
 ~
 22 0 ao 0 3
 1 0 0
@@ -1818,15 +1995,19 @@ a gemstone knife~
 A gemstone knife is stabbed into the ground.~
    The blade of the short, thin knife is near-transparent sapphire with an edge
 that could split the hair on a moth. At its base, it swirls into a jade handle
-no seam or joint; the two minerals seem to flow into each other. At the base
-of the handle, the knife is finished with opal that equally has no boundary.
-   flavor text tba
+with no seam or joint; the two minerals seem to flow into each other. At the
+base of the handle, the knife is finished with opal that equally has no
+boundary.
+   The magic required to fuse dissimilar gemstones is deeply rooted in Tagra
+Nes, where the ancestral grandmothers, the Ebru, guard it from beyond death.
 ~
-1 mo ano f 6
+1 mo ano f 8
 0 1 4
 1 0
 A
 22 2 0
+C
+150 250
 S
 #11879
 bud sapphire glowing~
@@ -1836,13 +2017,20 @@ A glowing sapphire bud is lying on the ground.~
 are unimaginably thin, they are as hard as sapphire. But as you watch the bud
 glow, you find that its edges are slowly turning to ash; its brilliance is as
 ephemeral as the setting sun.
-   flavor text tba
+   Tresydions tended Tagra Nes and its people for thousands of years, growing
+the community as well as the tree.
 ~
-3 c a 0 9
+3 c a 0 10
 0 0 0
 0 96
 C
 150 150
+M
+17
+$p crumbles away to ash.~
+M
+18
+$p crumbles away to ash on the ground.~
 S
 #11880
 candy ruby rock~
@@ -1852,9 +2040,11 @@ Some ruby rock candy is scattered on the ground.~
 it can be hard to tell them apart from the real thing. But these are sweet to
 the tongue, evoking the taste of maple syrup or honey as the initial crunch
 melts away into cloying sweetness.
-   flavor text tba
+   Tagra Nes once performed the noble task of drawing up mana from deep beneath
+the earth and releasing it into the world, a task it performed ceaselessly day
+and night for 8200 years, but not a day longer.
 ~
-6 m a 0 7
+6 m a 0 9
 24 0 0
 12 168
 A
@@ -1869,7 +2059,39 @@ You crunch into the ruby rock candy, which melts in your mouth.~
 M
 5
 $n crunches into some ruby rock candy.~
-O+ 1 6340
+M
+17
+$p breaks into little pieces and blows away.~
+M
+18
+$p breaks into little pieces and blows away.~
+O+ 1 11880
+S
+#11881
+flask lightning~
+a flask of lightning~
+A flask of lightning is sputtering on the ground.~
+   A bolt of lightning flickers back and forth inside the tightly-corked flask.
+At times, it's so bright it becomes difficult to look at. The flask is packaged
+like a potion, but there's no way to tell what effect it will have except to
+quaff it.
+   The pages of Skycleave are notoriously quick on their feet, in no small part
+due to heavy dependence on potions. It never pays to fall behind in the black
+tower.
+~
+25 m a 0 7
+-1 0 3030
+8 0
+A
+6 1 0
+B
+q
+C
+150 150
+I 26 800 100.00 1  # DECAYS-TO: glass flask
+I 27 800 100.00 1  # CONSUMES-TO: glass flask
+R
+4 5130 0
 S
 #11882
 pool shimmering water dew~
@@ -1890,6 +2112,56 @@ M
 5
 $n kneels down and drinks the $T from the pool.~
 T 11910
+S
+#11883
+wand gnarled old~
+a gnarled old wand~
+A gnarled old wand lies on the ground.~
+   If not for the raw power flowing off of the old wand, it might look like a
+fallen twig. It is perhaps a foot and a half long, lightly discolored around
+the base, and otherwise the only notable feature is the initials carved into
+the end.
+   Sophisticated magic users fall broadly into two categories: those who prefer
+staves and those who prefer wands. While a staff is larger and therefore easier
+to channel mana through, a wand is more easily concealed and capable of a much
+finer focus.
+~
+1 mpwx ano 0 6
+0 1 22
+0 0
+A
+5 2 0
+C
+150 250
+E
+initials~
+   The end of the gnarled wand has the letters 'JK' crossed out and replaced by
+'MM'.
+~
+T 11968
+S
+#11884
+mushroom white~
+a white mushroom~
+A white mushroom is lying here.~
+   The small mushroom is white with a slightly yellowish tinge to its cap.
+Mushrooms like this grow all over.
+   Mushrooms have been eaten since before recorded history, though it's
+important to correctly identify them first. Many mushrooms are difficult to
+distinguish when they're small.
+~
+6 km a 0 1
+6 0 0
+0 0
+C
+150 150
+M
+17
+$p rots and you throw it out.~
+M
+18
+$p rots on the ground.~
+T 11950
 S
 #11885
 pool pools dew~
@@ -1999,7 +2271,8 @@ A fine leather fox leash has been left behind.~
 your arm. It's lightly worn at both ends, especially the handle, and it looks
 as though someone has been carrying it around in their mouth.
    You can 'use leash' to add a new minipet to your list.
-   flavor text tba
+   Though housepets began as working companions, aiding in hunting, guarding,
+and carrying, they quickly discovered it's easier to be pampered and overfed.
 ~
 19 o a 0 7
 11893 0 0
@@ -2015,7 +2288,8 @@ A wooden Venus figurine is lying here.~
 hips and large breasts; aside from a prominent belly button, there is little
 detail beyond that. Her face is smooth and undetailed except for two square
 impressions where her eyes would be.
-   flavor text tba
+   Many types of statuette with women's forms are described as Venus figurines,
+though they rarely relate to the Greek goddess.
 ~
 15 0 a 0 8
 1 0 0
@@ -2031,7 +2305,8 @@ an iridescent pearl~
 An iridescent pearl has been left here.~
    The solitary little pearl isn't perfectly round, but it's well-polished and
 when it catches the light, its lustrous surface shimmers like a pastel rainbow.
-   flavor text tba
+   Pearls often symbolize beauty, wisdom, and luxury. But to a person whose
+diet is made of shellfish, they can instead represent abundance.
 ~
 15 0 a 0 9
 1 0 0
@@ -2048,8 +2323,9 @@ A leather bladder is lying on the ground.~
    The small bladder has been stretched and tanned to make it into a canteen.
 No smell remains except the salt of the ocean, but this was once the bladder of
 some unfortunate creature. The mouthpiece is kept shut tight by a leather
-string tied securely around it.
-   flavor text tba
+string tied securely around it, but even when it's closed, it smells of lilac.
+   The light, lilac wine, sweet and heady, is said to dull the deep pain of
+losing a lover.
 ~
 5 0 a 0 11
 48 48 11896
@@ -2068,11 +2344,17 @@ mostly gray.
 one city and deposit it in a pile in the next city, carrying it with them as
 protection on the road.
 ~
-3 m a e 10
+3 m a e 11
 0 0 0
 1 0
 C
 150 150
+M
+6
+You place $p into $V.~
+M
+7
+$n places $p into $V.~
 O+ 1 6050
 R
 4 5117 0

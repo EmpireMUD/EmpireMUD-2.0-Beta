@@ -3489,7 +3489,7 @@ void olc_fullsearch_vehicle(char_data *ch, char *argument) {
 	int only_hitpoints = NOTHING, hitpoints_over = NOTHING, hitpoints_under = NOTHING, only_level = NOTHING;
 	int only_military = NOTHING, military_over = NOTHING, military_under = NOTHING;
 	int only_rooms = NOTHING, rooms_over = NOTHING, rooms_under = NOTHING, only_move = NOTHING;
-	int size_under = NOTHING, size_over = NOTHING, only_depletion = NOTHING;
+	int size_under = NOTHING, size_over = NOTHING, only_depletion = NOTHING, vmin = NOTHING, vmax = NOTHING;
 	struct custom_message *cust;
 	bool needs_animals = FALSE;
 	
@@ -3551,6 +3551,8 @@ void olc_fullsearch_vehicle(char_data *ch, char *argument) {
 		FULLSEARCH_INT("sizeover", size_over, 0, INT_MAX)
 		FULLSEARCH_INT("sizeunder", size_under, 0, INT_MAX)
 		FULLSEARCH_LIST("speed", only_speed, vehicle_speed_types)
+		FULLSEARCH_INT("vmin", vmin, 0, INT_MAX)
+		FULLSEARCH_INT("vmax", vmax, 0, INT_MAX)
 		
 		else {	// not sure what to do with it? treat it like a keyword
 			sprintf(find_keywords + strlen(find_keywords), "%s%s", *find_keywords ? " " : "", type_arg);
@@ -3565,6 +3567,9 @@ void olc_fullsearch_vehicle(char_data *ch, char *argument) {
 	
 	// okay now look up items
 	HASH_ITER(hh, vehicle_table, veh, next_veh) {
+		if ((vmin != NOTHING && VEH_VNUM(veh) < vmin) || (vmax != NOTHING && VEH_VNUM(veh) > vmax)) {
+			continue;	// vnum range
+		}
 		if (only_affs != NOBITS && (VEH_ROOM_AFFECTS(veh) & only_affs) != only_affs) {
 			continue;
 		}

@@ -165,6 +165,8 @@
 #define OCMD_POISON  8
 #define OCMD_PAINT  9
 #define OCMD_LIGHT  10
+#define OCMD_TASTE  11
+#define OCMD_SIP  12
 
 #define TRIG_NEW                0	     /* trigger starts from top  */
 #define TRIG_RESTART            1	     /* trigger restarting       */

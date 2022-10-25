@@ -347,7 +347,7 @@ void olc_fullsearch_craft(char_data *ch, char *argument) {
 	bitvector_t only_buildon = NOBITS, only_buildfacing = NOBITS;
 	int only_type = NOTHING, only_level = NOTHING, only_quantity = NOTHING, only_time = NOTHING;
 	int quantity_over = NOTHING, level_over = NOTHING, time_over = NOTHING;
-	int quantity_under = NOTHING, level_under = NOTHING, time_under = NOTHING;
+	int quantity_under = NOTHING, level_under = NOTHING, time_under = NOTHING, vmin = NOTHING, vmax = NOTHING;
 	bool requires_obj = FALSE;
 	
 	craft_data *craft, *next_craft;
@@ -386,6 +386,8 @@ void olc_fullsearch_craft(char_data *ch, char *argument) {
 		FULLSEARCH_INT("timesover", time_over, 0, INT_MAX)
 		FULLSEARCH_INT("timeunder", time_under, 0, INT_MAX)
 		FULLSEARCH_FLAGS("tools", only_tools, tool_flags)
+		FULLSEARCH_INT("vmin", vmin, 0, INT_MAX)
+		FULLSEARCH_INT("vmax", vmax, 0, INT_MAX)
 		
 		else {	// not sure what to do with it? treat it like a keyword
 			sprintf(find_keywords + strlen(find_keywords), "%s%s", *find_keywords ? " " : "", type_arg);
@@ -400,6 +402,9 @@ void olc_fullsearch_craft(char_data *ch, char *argument) {
 	
 	// okay now look up crafts
 	HASH_ITER(hh, craft_table, craft, next_craft) {
+		if ((vmin != NOTHING && GET_CRAFT_VNUM(craft) < vmin) || (vmax != NOTHING && GET_CRAFT_VNUM(craft) > vmax)) {
+			continue;	// vnum range
+		}
 		if (requires_obj && GET_CRAFT_REQUIRES_OBJ(craft) == NOTHING) {
 			continue;
 		}

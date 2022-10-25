@@ -1341,6 +1341,12 @@ E
 cages~
 The cages are made of iron bars, most bent out of shape from years of abuse.
 ~
+E
+scrapes~
+   The scrapes next to the bin don't seem to belong to anything in here. It
+looks more like the wall slides out, but you don't see how to open it. You'd
+have to search around.
+~
 T 11921
 T 11936
 S
@@ -2191,7 +2197,7 @@ Plush chairs and small tables make the third floor walkway more of a parlour.
 E
 door south~
    The door just in front of you is open. The moulding around it is intricately
-crafte with tiny staves and wands. These little details really set the third
+crafted with tiny staves and wands. These little details really set the third
 floor apart from the second one.
 ~
 E
@@ -2950,6 +2956,15 @@ E
 dust~
    There's more dust in here than the rest of the tower. Perhaps the piles are
 just hard to clean.
+~
+E
+bunnies bunny dustbunny dustbunnies~
+   You don't see any dust bunnies in here, but some of the piles of junk look
+like they might have burrows.
+~
+E
+burrows burrow~
+It definitely looks like something has been burrowing in the piles.
 ~
 E
 toasters~
@@ -5648,6 +5663,10 @@ The brilliant golden light suffuses through every part of you.
 E
 voice~
 The god's presence is everywhere, but without form or shape.
+~
+E
+north south east west northeast southeast northwest southwest up down~
+It's the same in all directions.
 ~
 T 11945
 T 11946

@@ -392,11 +392,17 @@ a large piece of leather~
 A pile of large pieces of leather is sitting here.~
 Leather can be sewn into armor.
 ~
-3 l a 0 4
+3 l a 0 5
 0 0 0
 7 0
 C
 1 1
+M
+6
+You stretch $p onto $V.~
+M
+7
+$n stretches $p onto $V.~
 O+ 1 6530
 R
 4 5120 0

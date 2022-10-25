@@ -1,10 +1,13 @@
 #11800
 The Grand Foyer of the Tower Skycleave~
-   The ebony double doors open into a large foyer, perhaps too large for the
-tower you saw outside. With all the nocturnium construction, it's possible the
-inside is simply larger than the outside. The striped wooden statue of a robed
-sorcerer stands in the center of the hall. Certainly a fortune has been spent
-on all the nocturnium, and a second fortune on the ebony and calamander wood.
+   The tremendous entrance hall is lavishly appointed with ebony-paneled walls,
+polished flagstone floors, and velvet curtains that flank the high windows. The
+ceiling rises impossibly high above you, giving the impression that the foyer
+is as large as the entirety of the tower.
+   The room's centerpiece is a lifesize statue of a sorcerer carved in striped
+wood, his hand outstretched as if to welcome you. Across the foyer, Grand High
+Sorcerer Knezz watches you from an oversized portrait near the black double
+doors of the entrance.
 ~
 cdh 0 0
 D0
@@ -15,11 +18,16 @@ north~
 This is just the foyer. The grand central chamber is to the north.
 ~
 E
-statue striped~
+south~
+The long grand foyer continues to the south.
+~
+E
+statue striped centerpiece~
    The statue is lifesize and rather lifelike, of a sorcerer pontificating with
 his hand held out, draped in robes that give the impression of flowing fabric
 even as they are made from solid wood. The wood itself is striped black and
 brown, made from rare calamander. At the base, a nocturnium plate reads:
+
                  +-------------------------------------+
                  |    Integrity  -  Honor  -  Power    |
                  |   Never Boastful, Never Ambitious   |
@@ -27,12 +35,24 @@ brown, made from rare calamander. At the base, a nocturnium plate reads:
                  +-------------------------------------+
 ~
 E
+curtains velvet~
+Long violet velvet curtains drape on either side of the high windows.
+~
+E
+windows~
+High windows let light into the enormous chamber.
+~
+E
 ebony wood~
    Virtually all of the wood in the tower is expensive black ebony, polished to
 a near-mirror finish.
 ~
 E
-nocturnium~
+black~
+Virtually everything in here is black, from the walls to the lamps.
+~
+E
+nocturnium handles knobs~
    Every knob, handle, and light fixture in the tower seems to be made from
 nocturnium. You wouldn't be surprised if the nails in the beams are nocturnium
 as well. This place must have cost a fortune.
@@ -48,12 +68,34 @@ walls paneled paneling~
 The walls are paneled with beautiful black ebony wood.
 ~
 E
-floors~
-The floor is made from stunning white marble.
+ceilings up~
+The ceiling is dizzingly high above you.
+~
+E
+fireplace fire violet~
+   Across the foyer, a violet fire burns in the large fireplace at teh head of
+the room.
+~
+E
+floors down flagstone~
+The floor is made from stunning flagstone, polished and spotless.
 ~
 E
 fixtures lights lamps~
 The room is lit by nocturnium oil lamps in fixtures on the walls.
+~
+E
+doorway doors entrance double~
+   The grand entrance to the tower, across the foyer to the sourth, has two
+enormous black doors.
+~
+E
+portrait knezz larger-than-life~
+   The portrait of Grand High Sorcerer Knezz is downright gigantic. Indeed, it
+is painted from a low angle, with a great deal of space devoted to his long
+salt-and-pepper gray beard, decorated with nocturnium beads. His bushy eyebrows
+rest atop thick crescent glasses; his large blue eyes look at you with an
+almost fatherly gaze.
 ~
 M 1 11800 100.00 2
 M 0 11900 100.00 1
@@ -174,7 +216,7 @@ arrow with blue, cheerful letters on it that reads:
    However, a parchment scroll has been affixed over the sign, reading:
 
          Let it be known among the Tower: The Cafe is henceforth
-         to be opene all the Hours of the day and night, to serve
+         to be open all the Hours of the day and night, to serve
          Soups and other Vital Refreshments to whomsoever shall
          require it in defence of the Tower Skycleave, may she
          stand for All Time.
@@ -1199,6 +1241,12 @@ E
 floors~
 The dirty floor is made from large slabs of flagstone.
 ~
+E
+scrapes~
+   The scrapes next to the bin don't seem to belong to anything in here. It
+looks more like the wall slides out, but you don't see how to open it. You'd
+have to search around.
+~
 T 11921
 T 11936
 S
@@ -2007,7 +2055,7 @@ Tea tables and plush chairs are broken and overturned.
 E
 door south~
    The door just in front of you is open. The moulding around it is intricately
-crafte with tiny staves and wands. These little details really set the third
+crafted with tiny staves and wands. These little details really set the third
 floor apart from the second one.
 ~
 E
@@ -2708,6 +2756,15 @@ Cobwebs fill every spare corner and decorate every table.
 E
 dust~
 There's dust on everything.
+~
+E
+bunnies bunny dustbunny dustbunnies~
+   You don't see any dust bunnies in here, but some of the piles of junk look
+like they might have burrows.
+~
+E
+burrows burrow~
+It definitely looks like something has been burrowing in the piles.
 ~
 E
 toasters~

@@ -3047,6 +3047,7 @@ void olc_fullsearch_abil(char_data *ch, char *argument) {
 	int count, only_cost_type = NOTHING, only_type = NOTHING, only_scale = NOTHING, scale_over = NOTHING, scale_under = NOTHING, min_pos = POS_DEAD, max_pos = POS_STANDING;
 	int min_cost = NOTHING, max_cost = NOTHING, min_cost_per = NOTHING, max_cost_per = NOTHING, min_cd = NOTHING, max_cd = NOTHING, min_dur = FAKE_DUR, max_dur = FAKE_DUR;
 	int only_wait = NOTHING, only_linked = NOTHING, only_diff = NOTHING, only_attack = NOTHING, only_damage = NOTHING, only_ptech = NOTHING;
+	int vmin = NOTHING, vmax = NOTHING;
 	struct ability_data_list *data;
 	ability_data *abil, *next_abil;
 	struct custom_message *cust;
@@ -3101,6 +3102,8 @@ void olc_fullsearch_abil(char_data *ch, char *argument) {
 		FULLSEARCH_LIST("type", only_type, ability_type_flags)
 		FULLSEARCH_FLAGS("unflagged", not_flagged, ability_flags)
 		FULLSEARCH_LIST("waittype", only_wait, wait_types)
+		FULLSEARCH_INT("vmin", vmin, 0, INT_MAX)
+		FULLSEARCH_INT("vmax", vmax, 0, INT_MAX)
 		
 		// custom:
 		else if (is_abbrev(type_arg, "-maxduration")) {
@@ -3137,6 +3140,9 @@ void olc_fullsearch_abil(char_data *ch, char *argument) {
 	
 	// okay now look up items
 	HASH_ITER(hh, ability_table, abil, next_abil) {
+		if ((vmin != NOTHING && ABIL_VNUM(abil) < vmin) || (vmax != NOTHING && ABIL_VNUM(abil) > vmax)) {
+			continue;	// vnum range
+		}
 		if (ABIL_MIN_POS(abil) < min_pos || ABIL_MIN_POS(abil) > max_pos) {
 			continue;
 		}

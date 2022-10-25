@@ -207,9 +207,13 @@ switch %self.vnum%
     set niamh %instance.mob(11931)%
     if %niamh%
       %at% %niamh.room% %echo% ~%niamh% heads upstairs.
-      %purge% %niamh%
       %load% mob 11970
       %echo% Niamh walks in from the north.
+      if %niamh.mob_flagged(*PICKPOCKETED)%
+        set mob %instance.mob(11970)%
+        nop %mob.add_mob_flag(*PICKPOCKETED)%
+      end
+      %purge% %niamh%
       wait 3 sec
     end
   break
@@ -223,6 +227,13 @@ Skycleave: Shared load script~
 0 n 100
 ~
 switch %self.vnum%
+  case 11801
+    * Dylane 1B
+    dg_affect #11832 %self% !SEE on -1
+    dg_affect #11832 %self% !TARGET on -1
+    dg_affect #11832 %self% SNEAK on -1
+    nop %self.add_mob_flag(SILENT)%
+  break
   case 11901
     * gossippers in 1B
     south
@@ -1891,9 +1902,9 @@ Skycleave Enchanting Lab noises~
 ~
 if %self.template% == 11839
   * Phase A
-  set rogue %instance.mob(11848)%
-  if !%rogue%
-    * No messages in phase A unless the Rogue Boss is present.
+  set rogue %room.people(11848)%
+  if !%rogue% || %rogue.fighting% || %rogue.disabled%
+    * No messages in phase A unless the Rogue Boss is present and free
     halt
   end
   if %rogue.room% != %room% || %rogue.fighting%
@@ -2184,7 +2195,7 @@ end
 Skycleave: Janitor cleanup service~
 0 bi 20
 ~
-set purge_list 1000 11929 11930
+set purge_list 1000 11864 11865 11867 11875 11876 11929 11930
 wait 2 sec
 set done 0
 set obj %self.room.contents%
@@ -2596,7 +2607,7 @@ else
   * in case
   nop %self.bind(nobody)%
 end
-if %rescale%
+if %rescale% && %self.level%
   wait 0
   %scale% %self% %self.level%
 end
@@ -3084,10 +3095,10 @@ if %method% == respawn
 end
 ~
 #11950
-Skycleave: Long potion consume handler~
+Skycleave: Consume handler (long potions and other consumables)~
 1 s 100
 ~
-* handles long-duration skycleave potions
+* handles long-duration skycleave potions plus other consumables
 switch %self.vnum%
   case 11912
     dg_affect #%self.vnum% %actor% off
@@ -3103,6 +3114,23 @@ switch %self.vnum%
     dg_affect #%self.vnum% %actor% off
     dg_affect #%self.vnum% %actor% INVENTORY 35 86400
     %send% %actor% # That's a weight off your shoulders.
+  break
+  *
+  * non-potions:
+  case 11884
+    * poison mushroom
+    if %command% == taste
+      %send% %actor% You taste the little white mushroom, which gives your lips and tongue a pleasant tingle.
+      %echoaround% %actor% ~%actor% tastes a little white mushroom.
+      return 0
+    else
+      %send% %actor% You eat the little white mushroom but you don't feel so good...
+      %send% %actor% Oh no... the world goes black and the last thing you feel is your head hitting something hard.
+      %echoaround% %actor% ~%actor% eats a little white mushroom...
+      %slay% %actor%
+      return 0
+      %purge% %self%
+    end
   break
 done
 ~
@@ -4316,6 +4344,29 @@ switch %random.8%
 done
 detach 11967 %self.id%
 ~
+#11968
+Skycleave: Gnarled old wand of power~
+1 c 1
+say ' shout whisper~
+return 0
+set phrase1 by the power
+set phrase2 skycleave
+* basic things that could prevent them speaking
+set valid_pos Standing Fighting Sitting Resting
+if !(%valid_pos% ~= %actor.position%)
+  halt
+end
+if !(%arg% ~= %phrase1%) || !(%arg% ~= %phrase2%)
+  halt
+end
+wait 1
+if %actor.is_immortal%
+  %echo% A bolt of lightning comes out of nowhere and strikes |%actor% wand!
+else
+  %echo% A bolt of lightning from nowhere strikes ~%actor% right in the chest!
+  %slay% %actor%
+end
+~
 #11969
 Skycleave: Hendecagon fountain summoned NPC run~
 0 ab 100
@@ -4740,17 +4791,30 @@ switch %seq%
     end
   break
   case 3
-    %echo% ~%self% sits up and pulls a pearl from ^%self% pocket.
+    if %self.mob_flagged(*PICKPOCKETED)%
+      %echo% ~%self% reaches into ^%self% pocket and makes a perplexed look.
+      set lost_pearl 1
+      remote lost_pearl %self.id%
+    else
+      %echo% ~%self% sits up and pulls a pearl from ^%self% pocket.
+    end
+    * disable pickpocket now if not already
+    nop %self.add_mob_flag(*PICKPOCKETED)%
   break
   case 4
-    if %random.2% == 1
+    if %self.varexists(lost_pearl)%
+      %echo% ~%self% pats ^%self% pocket trying to find something.
+    elseif %random.2% == 1
       %echo% ~%self% sets the pearl on the altar.
     else
       %echo% ~%self% gently places the pearl on the altar.
     end
   break
   case 5
-    * skip
+    * skip; long delay here if the player stole the pearl
+    if %self.varexists(lost_pearl)%
+      wait 360 s
+    end
   break
   case 6
     %echo% ~%self% stands up and brushes *%self%self off.
@@ -4893,6 +4957,24 @@ if %old_name% != %self.name%
     break
   done
 break
+~
+#11982
+Goblin's Dream: Arena fight script (Elver, Nailbokh, Biksi)~
+0 k 0
+~
+* tba
+~
+#11983
+Smol Nes-Pik: Iskip of Rot and Ruin fight~
+0 k 0
+~
+* tba
+~
+#11984
+Elemental Plane of Water: First Water fight~
+0 k 0
+~
+* tba
 ~
 #11989
 Goblin's Dream: Guard patrol~

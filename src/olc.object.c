@@ -1088,7 +1088,7 @@ void olc_fullsearch_obj(char_data *ch, char *argument) {
 	bitvector_t find_interacts = NOBITS, found_interacts, find_custom = NOBITS, found_custom;
 	bitvector_t only_tools = NOBITS;
 	int count, only_level = NOTHING, only_type = NOTHING, only_mat = NOTHING;
-	int only_weapontype = NOTHING;
+	int only_weapontype = NOTHING, vmin = NOTHING, vmax = NOTHING;
 	bool only_storable = FALSE, not_storable = FALSE;
 	struct interaction_item *inter;
 	struct custom_message *cust;
@@ -1130,6 +1130,8 @@ void olc_fullsearch_obj(char_data *ch, char *argument) {
 		FULLSEARCH_FUNC("weapontype", only_weapontype, get_attack_type_by_name(val_arg))
 		FULLSEARCH_FLAGS("wear", only_worn, wear_bits)
 		FULLSEARCH_FLAGS("worn", only_worn, wear_bits)
+		FULLSEARCH_INT("vmin", vmin, 0, INT_MAX)
+		FULLSEARCH_INT("vmax", vmax, 0, INT_MAX)
 		
 		else {	// not sure what to do with it? treat it like a keyword
 			sprintf(find_keywords + strlen(find_keywords), "%s%s", *find_keywords ? " " : "", type_arg);
@@ -1144,6 +1146,9 @@ void olc_fullsearch_obj(char_data *ch, char *argument) {
 	
 	// okay now look up items
 	HASH_ITER(hh, object_table, obj, next_obj) {
+		if ((vmin != NOTHING && GET_OBJ_VNUM(obj) < vmin) || (vmax != NOTHING && GET_OBJ_VNUM(obj) > vmax)) {
+			continue;	// vnum range
+		}
 		if (only_level != NOTHING) {	// level-based checks
 			if (GET_OBJ_MAX_SCALE_LEVEL(obj) != 0 && only_level > GET_OBJ_MAX_SCALE_LEVEL(obj)) {
 				continue;
