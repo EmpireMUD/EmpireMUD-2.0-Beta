@@ -176,6 +176,19 @@ Type 'use whistle' to summon it.
 18472 0 0
 2 0
 S
+#18473
+bell spirit calling~
+a spirit calling bell~
+A spirit callin bell is lying here.~
+   The old metal bell is tall and thin, with a braided handle that resembles
+roots. Words have been etched into the hexagonal bell, but you cannot read
+them.
+   Use this bell to gain a spirit steed minipet.
+~
+19 p a 0 9
+18473 0 0
+2 0
+S
 #18484
 popcorn handful fluffy~
 a handful of popcorn~
@@ -185,7 +198,7 @@ If you add salt and butter to it, it tastes like salty butter.
 6 0 a 0 2
 1 0 0
 7 336
-I 14 18485 100.00 4  # COMBINE: a bag of popcorn
+I 14 18485 100.00 4  # COMBINE: bag of popcorn
 M
 4
 You munch on the popcorn.~
@@ -205,7 +218,7 @@ plant.
 6 bl a 0 7
 4 18485 0
 7 336
-I 15 18484 100.00 4  # SEPARATE: a handful of popcorn
+I 15 18484 100.00 4  # SEPARATE: handful of popcorn
 M
 4
 You eat a handful of the popcorn.~
@@ -213,7 +226,7 @@ M
 5
 $n eats a handful of popcorn.~
 R
-5116 0
+4 5116 0
 S
 #18486
 axe little dwarf's dwarfs~
@@ -318,6 +331,7 @@ Destination names (cannot be abbreviated):
  vault: Vault 111
  modern: Modern Era
  trail: Oregon Trail
+ precipice: Elden Ring
 ~
 3 0 a 0 6
 0 0 0

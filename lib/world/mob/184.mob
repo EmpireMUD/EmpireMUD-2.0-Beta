@@ -270,6 +270,21 @@ You feel like you might be running a fever.~
 T 9901
 T 9902
 S
+#18473
+steed spirit~
+a spirit steed~
+A spirit steed gallops along.
+~
+1 1 bdeoD n 3
+0 0 12 9
+D
+   The spirit steed looks like a small horse, though it has long, curved horns
+perhaps like a goat. It's gray hair is capped by a shaggy white mane, the white
+tufts above its hooves, and a long, white tail. Though it's called a spirit
+steed, it's quite solid.
+~
+T 18470
+S
 #18482
 keeper peacekeeper~
 the Peacekeeper~
@@ -611,6 +626,35 @@ The thing about happiness is that you only know you had it when it's gone.~
 M
 1
 You may think to yourself that you're happy. But you don't really believe it. It's only looking back by comparison with what comes after that you really understand, that's what happiness felt like.~
+S
+#18495
+scion grafted creature armed many-armed~
+a grafted scion~
+A many-armed creature sidles back and forth, keeping its shields toward you!
+~
+500 0 bcdyzABD choqCD 5
+0 0 0 1
+D
+   The huge creature -- if it can even be called that -- appears as a mass of
+arms and legs, though you can hardly get a good look at it behind the great
+shields it holds in your direction. Between the edges of the shields, swords
+and spears protrude, and when you're particularly unlucky, you get a glimpse of
+a long, pale, sullen face. Or two. Whatever this thing is, it is considerably
+larger than you and it's skittering toward you on dozens of all-too-human feet.
+~
+M
+0
+$n walks back and forth on the precipice.~
+M
+0
+The grafted scion spins its sword at you.~
+M
+0
+The grafted scion lets out a terrible howl.~
+M
+0
+The grafted scion is looking right at you.~
+T 18497
 S
 #18497
 lion time~
