@@ -986,9 +986,24 @@ return 1
 Unstable Portal: Precipice: Grafted scion kill~
 0 z 100
 ~
+* mark player killed
 if %actor.is_pc% && %self.room.template% == 18473
   set killed_%actor.id% 1
   remote killed_%actor.id% %self.room.id%
+end
+* check for more players
+set ch %self.room.people%
+set found 0
+while %ch% && !%found%
+  if %ch.is_pc% && %ch.health% > 0
+    set found 1
+  end
+  set ch %ch.next_in_room%
+done
+if !%found%
+  wait 5 sec
+  %echo ~%self% skitters out of sight.
+  %purge% %self%
 end
 ~
 $
