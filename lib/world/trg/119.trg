@@ -2172,7 +2172,7 @@ while %ch%
         %teleport% %ch% %exit%
         %load% obj 11805 %ch%
       else
-        %slay% %ch%
+        %slay% %ch% %ch.name% has drowned at %room.coords%!
       end
     elseif %left% < 50
       %send% %ch% &&rYour nose and throat HURT as water presses its way in...&&0
@@ -4364,7 +4364,7 @@ if %actor.is_immortal%
   %echo% A bolt of lightning comes out of nowhere and strikes |%actor% wand!
 else
   %echo% A bolt of lightning from nowhere strikes ~%actor% right in the chest!
-  %slay% %actor%
+  %slay% %actor% %actor.name% has died of hubris at %actor.room.coords%!
 end
 ~
 #11969
