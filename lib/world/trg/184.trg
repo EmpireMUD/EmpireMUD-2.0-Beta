@@ -996,17 +996,18 @@ if %actor.is_pc% && %self.room.template% == 18473
   remote killed_%actor.id% %self.room.id%
 end
 * check for more players
+set valid_pos Standing Fighting Sitting Resting Sleeping
 set ch %self.room.people%
 set found 0
 while %ch% && !%found%
-  if %ch.is_pc% && %ch.health% > 0
+  if %ch.is_pc% && %valid_pos% ~= %ch.position%
     set found 1
   end
   set ch %ch.next_in_room%
 done
 if !%found%
   wait 5 sec
-  %echo ~%self% skitters out of sight.
+  %echo% ~%self% skitters out of sight.
   %purge% %self%
 end
 ~
