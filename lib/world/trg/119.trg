@@ -227,6 +227,13 @@ Skycleave: Shared load script~
 0 n 100
 ~
 switch %self.vnum%
+  case 11801
+    * Dylane 1B
+    dg_affect #11832 %self% !SEE on -1
+    dg_affect #11832 %self% !TARGET on -1
+    dg_affect #11832 %self% SNEAK on -1
+    nop %self.add_mob_flag(SILENT)%
+  break
   case 11901
     * gossippers in 1B
     south
@@ -2600,7 +2607,7 @@ else
   * in case
   nop %self.bind(nobody)%
 end
-if %rescale%
+if %rescale% && %self.level%
   wait 0
   %scale% %self% %self.level%
 end

@@ -1421,7 +1421,7 @@ if %room.varexists(vnum_list)%
   set vnum_list %room.vnum_list%
   set list_size %room.list_size%
 else
-  set vnum_list 11800 11801 11802 11803 11808 11809 11821 11822 11823 11824 11826
+  set vnum_list 11800 11802 11803 11808 11809 11821 11822 11823 11824 11826
   set list_size 11
 end
 * pick a spot in the list
@@ -1443,18 +1443,10 @@ if %vnum%
   %load% mob %vnum%
   set mob %room.people%
   if %mob.vnum% == %vnum%
-    if %mob.vnum% == 11801
-      * special handling for dylane: spawns on silent mode
-      dg_affect #11832 %mob% !SEE on -1
-      dg_affect #11832 %mob% !TARGET on -1
-      dg_affect #11832 %mob% SNEAK on -1
-      nop %mob.add_mob_flag(SILENT)%
-    else
-      * all other mobs
-      %echo% ~%mob% walks in from the foyer.
-      makeuid foyer room i11800
-      %at% %foyer% %echo% ~%mob% walks through the foyer and into the tower.
-    end
+    * all other mobs
+    %echo% ~%mob% walks in from the foyer.
+    makeuid foyer room i11800
+    %at% %foyer% %echo% ~%mob% walks through the foyer and into the tower.
   end
 end
 * and detach if the list is empty
@@ -1482,13 +1474,6 @@ if %self.vnum% == 11824 || %self.vnum% == 11826
   if %room.template% == 11907
     nop %self.add_mob_flag(SENTINEL)%
     nop %self.remove_mob_flag(SILENT)%
-    detach 11828 %self.id%
-  end
-  halt
-elseif %self.vnum% == 11801
-  * Dylane wanders until he finds the cafe
-  if %room.template% == 11905
-    nop %self.add_mob_flag(SENTINEL)%
     detach 11828 %self.id%
   end
   halt
@@ -1844,7 +1829,7 @@ done
 ~
 #11832
 Skycleave: Conditional mob visibility~
-0 iC 100
+0 C 100
 ~
 * toggles silent, !see
 if %actor.is_npc%
@@ -1865,10 +1850,13 @@ end
 * determine if anyone should/shouldn't see me
 while %ch%
   if %ch.is_pc%
+    set varname %ch.id%_can_see
+    set %varname% 0
     if %self.vnum% == 11900
       * intro spirit: shows when any floor quest complete
       if %ch.completed_quest(11810)% || %ch.completed_quest(11811)% || %ch.completed_quest(11812)%
         set see 1
+        set %varname% 1
       else
         set not 1
       end
@@ -1877,9 +1865,11 @@ while %ch%
       if %ch.completed_quest(11802)%
         set not 1
       else
-       set see 1
+        set see 1
+        set %varname% 1
       end
     end
+    remote %varname% %self.id%
   end
   if %spec%
     set spec 0
@@ -1904,17 +1894,28 @@ done
 * and make visible
 if %vis% && %self.affect(11832)%
   dg_affect #11832 %self% off
-  if %self.vnum% != 11801 || %self.room.template% == 11905
-    * 11801 Dylane does not remove silent unless he's in the cafe
-    nop %self.remove_mob_flag(SILENT)%
-  end
-  %echo% ~%self% arrives.
+  nop %self.remove_mob_flag(SILENT)%
+  set arrives 1
 elseif !%vis% && !%self.affect(11832)%
   dg_affect #11832 %self% !SEE on -1
   dg_affect #11832 %self% !TARGET on -1
   dg_affect #11832 %self% SNEAK on -1
   nop %self.add_mob_flag(SILENT)%
-  %echo% ~%self% leaves.
+  set leaves 1
+end
+* messaging?
+if %arrives% || %leaves%
+  set ch %self.room.people%
+  while %ch%
+    if %ch.is_pc%
+      if %arrives%
+        %send% %ch% ~%self% arrives.
+      elseif %leaves% && %self.var(%ch.id%_can_see)%
+        %send% %ch% ~%self% leaves.
+      end
+    end
+    set ch %ch.next_in_room%
+  done
 end
 ~
 #11833
@@ -5590,6 +5591,7 @@ nop %self.link_instance%
 %at% i11800 %load% mob 11901  * Additional Gossipper
 %at% i11905 %load% mob 11827  * Marina
 %at% i11905 %load% mob 11828  * Djon
+%at% i11905 %load% mob 11801  * Dylane
 %at% i11906 %load% mob 11908  * Student Elamm
 %at% i11906 %load% mob 11909  * Student Akeldama
 %at% i11904 %load% mob 11902  * Bucket (and sponge)
