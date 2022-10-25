@@ -430,7 +430,7 @@ otherworlder's strange tools and inscrutible magics led the Tower Skycleaver to
 study him, that they might learn enough to stand their ground if an army of
 otherworlders should follow.
 ~
-27 emo aq 0 12
+27 emo aq 0 13
 3 0 0
 2 0
 A
@@ -441,6 +441,12 @@ A
 13 1 0
 A
 17 -3 0
+M
+8
+You equip yourself in the $p.~
+M
+9
+$n equips $mself in $p.~
 S
 #11820
 armor suit living skeleton~
@@ -455,7 +461,7 @@ life of its own when an errant spell from Scaldorran brought all the costumes
 to life. For his part, Scaldorran insisted he was only trying to liven up the
 party.
 ~
-27 emo aq 0 12
+27 emo aq 0 13
 1 0 0
 14 0
 A
@@ -466,6 +472,12 @@ A
 21 3 0
 A
 18 -3 0
+M
+8
+You equip yourself in the $p.~
+M
+9
+$n equips $mself in $p.~
 S
 #11821
 bindings lich~
@@ -481,7 +493,7 @@ image. For these sorcerers, living in death as a shadow of the spells they wove
 in life is still a form of immortality, but few erudite wizards would consider
 the lich to be the same person.
 ~
-27 emo aq 0 13
+27 emo aq 0 14
 0 0 0
 11 0
 A
@@ -492,6 +504,12 @@ A
 22 3 0
 A
 23 -3 0
+M
+8
+You equip yourself in the $p.~
+M
+9
+$n equips $mself in $p.~
 S
 #11822
 robes grand high sorcerer's sorcerers set~
@@ -508,7 +526,7 @@ stand the robes on their own soon became a complex animus spell. Perhaps
 growing tired of casting his own spells, Knezz eventually enchanted the long
 sleeves of the robe to move his arms for him.
 ~
-27 emo aq 0 14
+27 emo aq 0 15
 0 0 0
 11 0
 A
@@ -519,6 +537,12 @@ A
 23 3 0
 A
 22 -3 0
+M
+8
+You stretch out your arms and $p dress themselves onto your body.~
+M
+9
+$n stretches out $s arms and a set of violet robes dress themselves onto $s body.~
 S
 #11823
 armor goblin pleated set~
@@ -531,7 +555,7 @@ rogue.
    The goblins once traded for weapons and armor, but as their society fell,
 they began to imitate the crafts they had once purchased.
 ~
-27 emo aq 0 14
+27 emo aq 0 15
 2 0 0
 0 0
 A
@@ -540,6 +564,12 @@ A
 17 2 0
 A
 18 2 0
+M
+8
+You equip yourself in the $p.~
+M
+9
+$n equips $mself in $p.~
 S
 #11824
 shield tower glass~
@@ -943,7 +973,7 @@ from the infinitely dark, unseeable void that lies at the heart of the fabric.
 When the cloth is done, it is boiled along with the weaver in a stone cauldron,
 trapping the weaver's soul within. This is considered the greatest honor.
 ~
-27 mp af 0 24
+27 mp af 0 25
 0 0 0
 11 0
 A
@@ -954,6 +984,12 @@ A
 23 5 0
 C
 150 275
+M
+8
+$p wraps itself around your legs.~
+M
+9
+$p wraps itself around $n.~
 T 11940
 S
 #11844
@@ -1138,7 +1174,7 @@ the magitanium seem to follow every movement.
 Witch and though she didn't invent it, Itania is credited both with introducing
 the metal to Skycleave's artisan sorcerers, and with naming it.
 ~
-27 mp aj 0 22
+27 mp aj 0 23
 3 0 0
 2 0
 A
@@ -1149,6 +1185,12 @@ A
 2 1 0
 C
 150 275
+M
+8
+You snap $p onto your wrist.~
+M
+9
+$n snaps $p onto $s wrist.~
 T 11940
 S
 #11851
@@ -1191,7 +1233,7 @@ before.
 cities. There existed a particular technique for unraveling the coccoon while
 the pupa slept soundly, able to emerge without cutting the precious silk.
 ~
-27 mp aj 0 25
+27 mp aj 0 26
 0 0 0
 11 0
 A
@@ -1204,6 +1246,12 @@ A
 22 2 0
 C
 150 275
+M
+8
+You wrap $p onto your wrist.~
+M
+9
+$n wraps $p onto $s wrist.~
 T 11940
 S
 #11853
@@ -1218,7 +1266,7 @@ release an ear-piercing screech that leaves you momentarily stunned.
 placed into an ever-burning fire, of which few are known, and the sheer value
 of soulcloth is such that this has never been tested.
 ~
-27 mp aj 0 26
+27 mp aj 0 27
 0 0 0
 11 0
 A
@@ -1231,6 +1279,12 @@ A
 23 2 0
 C
 150 275
+M
+8
+You slide $p onto your wrist.~
+M
+9
+$n slides $p onto $s wrist.~
 T 11940
 S
 #11854
@@ -1245,7 +1299,7 @@ metallurgy. While cleaning her grandfather's tower as an adolescent, she fell
 into a barmy blue portal and returned laden with strange bottles filled with
 her namesake fizzy beverage.
 ~
-27 mp aj 0 24
+27 mp aj 0 25
 2 0 0
 2 0
 A
@@ -1258,6 +1312,12 @@ A
 13 1 0
 C
 150 275
+M
+8
+You snap $p onto your wrist.~
+M
+9
+$n snaps $p onto $s wrist.~
 T 11940
 S
 #11855
@@ -2230,11 +2290,17 @@ mostly gray.
 one city and deposit it in a pile in the next city, carrying it with them as
 protection on the road.
 ~
-3 m a e 10
+3 m a e 11
 0 0 0
 1 0
 C
 150 150
+M
+6
+You place $p into $V.~
+M
+7
+$n places $p into $V.~
 O+ 1 6050
 R
 4 5117 0

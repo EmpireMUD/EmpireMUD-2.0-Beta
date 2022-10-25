@@ -1412,7 +1412,7 @@ around the bottom of the robes, but the torso and sleeves are undecorated.
    When the last of their great trees fell, the tresydions chose to follow them
 into history, such is the cost of the vow they once took.
 ~
-2 mp ad 0 6
+2 mp ad 0 7
 0 0 0
 11 0
 A
@@ -1424,6 +1424,12 @@ C
 M
 12
 $n stands solemly in robes of dark silk.~
+M
+8
+You put on layer after layer of treesilk robes.~
+M
+9
+$n puts on layer after layer of treesilk robes.~
 S
 #11985
 suit silk brown~
@@ -1499,7 +1505,7 @@ the magic of the fabric of the world does not easily fade. A lich is,
 therefore, not exactly the sorcerer, nor is it a ghost. It is something new,
 something different; something not shackled by the doubts or mores of mankind.
 ~
-2 p ad 0 5
+2 p ad 0 6
 0 0 0
 11 0
 A
@@ -1507,6 +1513,12 @@ A
 M
 12
 The lich $n drifts before you.~
+M
+8
+You wrap yourself in the tattered lich robes and begin to feel the part.~
+M
+9
+$n wraps $mself in tattered lich robes and takes on a deathly hollow appearance.~
 S
 #11988
 robes set page~
@@ -1519,7 +1531,7 @@ advertise only humility and low station.
 magical talent to speak of. Instead, the pages usually rely on enchanted
 trinkets to simplify their work.
 ~
-2 p ad 0 4
+2 p ad 0 5
 0 0 0
 11 0
 A
@@ -1527,6 +1539,12 @@ A
 M
 12
 $n is bustling about.~
+M
+8
+You slip into the page robes.~
+M
+9
+$n slips into some page robes.~
 S
 #11989
 robes set apprentice~
@@ -1540,7 +1558,7 @@ them with the highest expectations. Every high sorcerer in the tower began
 their storied career as an apprentice who outshone their peers, the more
 disappointing of whom now line the tower's cupboards and cabinets.
 ~
-2 p ad 0 4
+2 p ad 0 5
 0 0 0
 11 0
 A
@@ -1548,6 +1566,12 @@ A
 M
 12
 Apprentice $n is standing here.~
+M
+8
+You put on the layered white apprentice robes.~
+M
+9
+$n puts on layers of white apprentice robes.~
 S
 #11990
 vest goblin's goblins~
@@ -1738,7 +1762,7 @@ a collection of calamander trinkets is a conspicuous way of showing off wealth.
 appearance. It is exceedingly rare, found only in the most remote jungles, and
 it makes the finest woodwork.
 ~
-3 e a 0 6
+3 e a 0 7
 0 0 0
 0 0
 I 11 617 100.00 1  # LIGHT: magical fire
@@ -1750,10 +1774,10 @@ M
 $n positions some calamander boards and ties them into place.~
 M
 6
-You position some calamander boards onto the frame of $V.~
+You position some calamander boards onto $V.~
 M
 7
-$n positions some calamander boards onto the frame of $V.~
+$n positions some calamander boards onto $V.~
 O+ 1 6001
 R
 4 5118 0
