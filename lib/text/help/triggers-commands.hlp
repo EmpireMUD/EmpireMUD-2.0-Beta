@@ -753,9 +753,14 @@ Examples:
 #d
 %SLAY% MSLAY OSLAY VSLAY WSLAY
 
-Usage:  %slay% <target>
+Usage:  %slay% <target> [log message]
 
-This command instantly kills a mob or player.
+This command instantly kills a mob or player. When used on a player, it will
+also log the death to the syslog and to the death slash-channel. You can
+provide a custom message as an optional argument.
+
+The default death log is:
+%person.name% has died at %person.room.coords%!
 #d
 "SWITCH STATEMENT" "CASE STATEMENT" "BREAK STATEMENT" "DEFAULT STATEMENT" CASE DEFAULT BREAK TRIG-SWITCH TRIGEDIT-SWITCH
 

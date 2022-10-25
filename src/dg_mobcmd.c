@@ -1941,6 +1941,17 @@ ACMD(do_mslay) {
 		msg_to_char(vict, "Being the cool immortal you are, you sidestep a trap, obviously placed to kill you.\r\n");
 	}
 	else {
+		// log
+		if (*argument && !IS_NPC(vict)) {
+			// custom death log?
+			log_to_slash_channel_by_name(DEATH_LOG_CHANNEL, vict, "%s", argument);
+		}
+		else if (!IS_NPC(vict)) {
+			// basic death log
+			log_to_slash_channel_by_name(DEATH_LOG_CHANNEL, vict, "%s has died at (%d, %d)!", PERS(vict, vict, TRUE), X_COORD(IN_ROOM(vict)), Y_COORD(IN_ROOM(vict)));
+		}
+		syslog(SYS_DEATH, 0, TRUE, "DEATH: %s has been killed by a script at %s (mob %d)", GET_NAME(vict), room_log_identifier(IN_ROOM(vict)), GET_MOB_VNUM(ch));
+		
 		die(vict, ch);
 	}
 }
