@@ -983,7 +983,7 @@ if %target.is_pc%
   %send% %target% ~%actor% stalks towards you, fangs bared in a terrifying snarl!
   %echoneither% %actor% %target% ~%actor% bares ^%actor% fangs and stalks towards ~%target%, who cowers in fear!
   halt
-elseif %target.vnum% == 204
+elseif %target.vnum% == 251
   %send% %actor% ~%actor% try to scare ~%target%, but take a gauntlet to the face for your effort!
   %echoaround% %actor% ~%actor% tries to scare ~%target% and takes a gauntlet to the face for ^%actor% effort!
   %damage% %actor% %random.20%
