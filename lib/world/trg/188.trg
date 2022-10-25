@@ -983,7 +983,12 @@ if %target.is_pc%
   %send% %target% ~%actor% stalks towards you, fangs bared in a terrifying snarl!
   %echoneither% %actor% %target% ~%actor% bares ^%actor% fangs and stalks towards ~%target%, who cowers in fear!
   halt
-elseif %target.vnum% != 200 && %target.vnum% != 201 && %target.vnum% != 237 && %target.vnum% != 203 && %target.vnum% != 204
+elseif %target.vnum% == 204
+  %send% %actor% ~%actor% try to scare ~%target%, but take a gauntlet to the face for your effort!
+  %echoaround% %actor% ~%actor% tries to scare ~%target% and takes a gauntlet to the face for ^%actor% effort!
+  %damage% %actor% %random.20%
+  halt
+elseif %target.vnum% != 200 && %target.vnum% != 201 && %target.vnum% != 202 && %target.vnum% != 203 && %target.vnum% != 237
   * wrong target
   %send% %actor% You bare your fangs and snarl at ~%target%, who flinches away.
   %echoaround% %actor% ~%actor% bares ^%actor% fangs and snarls at ~%target%, who flinches away.
