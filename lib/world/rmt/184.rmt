@@ -413,7 +413,7 @@ glowing tree lights up the sky.
    The few trees that once grew on this precipice are small and dead. The uncut
 grass off the path has turned brown. The faded yellow remains of flowers
 cluster in patches here and there, sometimes covered in piles of golden leaves.
-   Behind you lies the ruin of a great mausoleum; to the west, the path leads
+   Behind you lies the ruin of a great mausoleum; to the east, the path leads
 through an archway in a broken wall and across a wooden bridge. In all other
 directions, the cliff falls off precipitously and the sea is far, far below.
 In the distance, clouds block your view of everything except the glowing tree.
@@ -685,11 +685,9 @@ archway to the east.
 ~
 E
 out distance haze fog north west northwest southwest~
-   You can't see much in the distance because of the fog and haze. A great,
-glowing tree stands over the northeast and lights up the sky. It is, by far,
-the most distinct feature you can see in the distance. To the east, through an
-archway in the wall, you can see a large castle in the distance. In all other
-directions, there is only fog.
+   You can't see much in the distance because of the fog and haze. Over the
+cliff, there is a steep drop, beneath which you can barely make out choppy
+waves.
 ~
 E
 clouds~
