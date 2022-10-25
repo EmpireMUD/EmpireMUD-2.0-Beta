@@ -360,7 +360,7 @@ done
 ~
 #18470
 Spirit Steed: Only leader may mount~
-0 c 0
+0 ct 0
 mount harness~
 if %actor.char_target(%arg.car%)% != %self%
   return 0
@@ -378,7 +378,11 @@ if !%self.leader% || %actor% != %self.leader%
   halt
 end
 * made it?
+nop %self.add_mob_flag(MOUNTABLE)%
 return 0
+* check and remove mountable if mount failed
+wait 1
+nop %self.remove_mob_flag(MOUNTABLE)%
 ~
 #18471
 Sparkle sparkle~
