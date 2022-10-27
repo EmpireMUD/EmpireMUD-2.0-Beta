@@ -1169,32 +1169,174 @@ else
 end
 ~
 #11821
-Pixy Queen: interrupt spellcasting~
+Skycleave: Setup dodge, interrupt, struggle~
 0 c 0
-interrupt~
-if !%self.varexists(casting)%
-  %send% %actor% You don't need to do that right now.
+skyfight~
+* To initialize or clear data:
+*    skyfight clear <all | dodge | interrupt | struggle>
+* To set up players for a response command:
+*    skyfight setup <dodge | interrupt | struggle> <all | player>
+if %actor% != %self%
+  return 0
   halt
 end
-%send% %actor% You knock the wand out of |%self% hand!
-%echoaround% %actor% ~%actor% knocks the wand out of |%self% hand!
-%echo% The glittering wand dissolves in a cloud of sparkles and ~%self% lets out a cry of rage.
-rdelete casting %self.id%
-nop %self.set_cooldown(11800, 15)%
+return 1
+set mode %arg.car%
+set arg %arg.cdr%
+if %mode% == clear
+  * Clear data
+  * usage: skyfight clear <all | dodge | interrupt | struggle>
+  set ch %self.room.people%
+  while %ch%
+    if %arg% == dodge || %arg% == all
+      rdelete did_skyfight_dodge %ch.id%
+      rdelete needs_skyfight_dodge %ch.id%
+    end
+    if %arg% == interrupt || %arg% == all
+      rdelete did_skyfight_interrupt %ch.id%
+      rdelete needs_skyfight_interrupt %ch.id%
+    end
+    if %arg% == struggle || %arg% == all
+      rdelete did_skyfight_struggle %ch.id%
+      rdelete needs_skyfight_struggle %ch.id%
+    end
+    set ch %ch.next_in_room%
+  done
+  if %arg% == dodge || %arg% == all
+    set skyfight_dodge_count 0
+    set wants_skyfight_dodge 0
+    remote skyfight_dodge_count %self.id%
+    remote wants_skyfight_dodge %self.id%
+  end
+  if %arg% == interrupt || %arg% == all
+    set skyfight_interrupt_count 0
+    set wants_skyfight_interrupt 0
+    remote skyfight_interrupt_count %self.id%
+    remote wants_skyfight_interrupt %self.id%
+  end
+  if %arg% == struggle || %arg% == all
+    set skyfight_struggle_count 0
+    set wants_skyfight_struggle 0
+    remote skyfight_struggle_count %self.id%
+    remote wants_skyfight_struggle %self.id%
+  end
+elseif %mode% == setup
+  * Prepare for a response
+  * usage: skyfight setup <dodge | interrupt | struggle> <all | player>
+  set type %arg.car%
+  set target %arg.cdr%
+  * self vars
+  set wants_varname wants_skyfight_%type%
+  set %wants_varname% 1
+  remote %wants_varname% %self.id%
+  * target vars
+  set needs_varname needs_skyfight_%type%
+  set did_varname did_skyfight_%type%
+  if %target% == all
+    set all 1
+    set ch %self.room.people%
+  else
+    set all 0
+    set ch %target%
+  end
+  while %ch%
+    set %needs_varname% 1
+    set %did_varname% 0
+    remote %needs_varname% %ch.id%
+    remote %did_varname% %ch.id%
+    if %all%
+      set ch %ch.next_in_room%
+    else
+      set ch 0
+    end
+  done
+end
 ~
 #11822
-Goblin Blastmaster: interrupt drinking~
+Skycleave: Dodge, Interrupt commands for fights~
 0 c 0
-interrupt~
-if !%self.varexists(drinking)%
-  %send% %actor% You don't need to do that right now.
+dodge interrupt~
+* handles dodge, interrupt
+return 0
+if dodge /= %cmd%
+  set type dodge
+  set past dodged
+elseif interrupt /= %cmd%
+  set type interrupt
+  set past interrupted
+else
   halt
 end
-%send% %actor% You knock the elixir out of |%self% hand before &%self% can drink it!
-%echoaround% %actor% ~%actor% knocks the elixir out of |%self% hand before &%self% can drink it!
-%echo% The elixir shatters on the floor and ~%self% lets out a screech of rage.
-rdelete drinking %self.id%
-nop %self.set_cooldown(11800, 15)%
+* check already done?
+if %actor.var(did_skyfight_%type%,0)%
+  %send% %actor% You already %type%ed.
+  return 1
+  halt
+end
+* check 'cooldown'
+if %actor.affect(11812)%
+  %send% %actor% You're still recovering from that last dodge.
+  return 1
+  halt
+elseif %actor.affect(11813)%
+  %send% %actor% You're still distracted from that last interrupt.
+  return 1
+  halt
+end
+* setup
+set no_need 0
+* does the actor even need it
+if !%actor.var(needs_skyfight_%type%,0)%
+  set no_need 1
+elseif !%self.var(wants_skyfight_%type%,0)%
+  * see if this mob needs it, or see if someone else here does
+  * not me...
+  set ch %self.room.people%
+  set any 0
+  while %ch% && !%any%
+    if %ch.var(wants_skyfight_%type%,0)%
+      set any 1
+    end
+    set ch %ch.next_in_room%
+  done
+  if %any%
+    * let them handle it
+    halt
+  else
+    set no_need 1
+  end
+end
+* failure?
+if %no_need%
+  * ensure no var
+  rdelete needs_skyfight_%type% %actor.id%
+  eval penalty %self.level% * %self.difficulty% / 20
+  * messaging
+  if %type% == dodge
+    %send% %actor% You dodge out of the way... of nothing!
+    %echoaround% %actor% ~%actor% leaps out of the way of nothing in particular.
+    dg_affect #11812 %actor% DODGE -%penalty% 30
+  elseif %type% == interrupt
+    %send% %actor% You look for something to interrupt...
+    %echoaround% %actor% ~%actor% looks around for something...
+    dg_affect #11813 %actor% DODGE -%penalty% 30
+  end
+  return 1
+  halt
+end
+* success
+return 1
+set did_skyfight_%type% 1
+remote did_skyfight_%type% %actor.id%
+eval skyfight_%type%_count %self.var(skyfight_%type%_count,0)% + 1
+remote skyfight_%type%_count %self.id%
+if %type% == dodge
+  %send% %actor% You leap out of the way!
+  %echoaround% %actor% ~%actor% leaps out of the way!
+elseif %type% == interrupt
+  %send% %actor% You prepare to interrupt ~%self%...
+  %echoaround% %actor% ~%actor% prepares to interrupt ~%self%...
+end
 ~
 #11823
 Skycleave: Boss Deaths: Pixy, Kara, Rojjer, Trixton, Barrosh, Shade~
@@ -3231,7 +3373,7 @@ detach 11857 %self.id%
 ~
 #11858
 Skycleave: Shade of Mezvienne fight~
-0 k 0
+0 k 100
 ~
 * tba
 ~

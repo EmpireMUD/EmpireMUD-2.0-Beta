@@ -3127,7 +3127,7 @@ switch %self.vnum%
       %send% %actor% You eat the little white mushroom but you don't feel so good...
       %send% %actor% Oh no... the world goes black and the last thing you feel is your head hitting something hard.
       %echoaround% %actor% ~%actor% eats a little white mushroom...
-      %slay% %actor%
+      %slay% %actor% %actor.name% has accidentally died at %actor.room.coords%!
       return 0
       %purge% %self%
     end
@@ -4874,11 +4874,11 @@ eval sex %self.seq% // 2
 switch %sex%
   case 0
     %mod% %mob% sex female
-    %mod% %mob% lookdesc %name% seems thoughtful as she kneels and wipes her forehead with the green sleeve of her long gown.
+    %mod% %mob% lookdesc %name% seems thoughtful as she kneels and wipes her green forehead with the matching sleeve of her long gown.
   break
   case 1
     %mod% %mob% sex male
-    %mod% %mob% lookdesc %name% has a solemn look as he kneels in front of the altar, his long green robe splayed out around him on the rocky floor.
+    %mod% %mob% lookdesc %name% has a solemn look as he kneels in front of the altar with his long green robe, nearly the same shade as his skin, splayed out around him on the rocky floor.
   break
 done
 * announce
@@ -4966,9 +4966,66 @@ Goblin's Dream: Arena fight script (Elver, Nailbokh, Biksi)~
 ~
 #11983
 Smol Nes-Pik: Iskip of Rot and Ruin fight~
-0 k 0
+0 k 100
 ~
 * tba
+* config
+set num_phases 3
+set response_time 10
+* prelim setup
+set difficulty 2
+remote difficulty %self.id%
+%echo% Debug: Hard difficutly
+* rotate through types
+eval phase %self.var(phase,0)% + 1
+if %phase% > %num_phases%
+  set phase 1
+end
+remote phase %self.id%
+* prepare
+skyfight clear all
+switch %phase%
+  case 1
+    %echo% Debug: Dodge Phase: Type dodge (all players)
+    skyfight setup dodge all
+    %echo% Debug: Begin dodge wait...
+    wait 10 s
+    %echo% Debug: End dodge wait
+    set ch %self.room.people%
+    while %ch%
+      %echo% - ~%ch%: %ch.var(did_skyfight_dodge,0)%/%ch.var(needs_skyfight_dodge,0)%
+      set ch %ch.next_in_room%
+    done
+  break
+  case 2
+    %echo% Debug: Dodge Phase: Type dodge (random player)
+    set targ %random.enemy%
+    set targ_id %targ.id%
+    %echo% Debug: Targeting ~%targ%
+    skyfight setup dodge %targ%
+    %echo% Debug: Begin dodge wait...
+    wait 10 s
+    %echo% Debug: End dodge wait
+    if !%targ% || %targ.id% != %targ_id%
+      %echo% - target is gone
+    else
+      %echo% - ~%targ%: %targ.var(did_skyfight_dodge,0)%/%targ.var(needs_skyfight_dodge,0)%
+    end
+  break
+  case 3
+    %echo% Debug: Interrupt Phase: Type interrupt (all players)
+    skyfight setup interrupt all
+    %echo% Debug: Begin interrupt wait...
+    wait 10 s
+    %echo% Debug: End interrupt wait: %self.var(skyfight_interrupt_count,0)% interrupts
+    set ch %self.room.people%
+    while %ch%
+      %echo% - ~%ch%: %ch.var(did_skyfight_interrupt,0)%/%ch.var(needs_skyfight_interrupt,0)%
+      set ch %ch.next_in_room%
+    done
+  break
+done
+wait 10 s
 ~
 #11984
 Elemental Plane of Water: First Water fight~

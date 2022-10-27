@@ -515,7 +515,7 @@ Venjer fox goblin~
 Venjer the Fox~
 Venjer the Fox is prodding at the vines with a staff.
 ~
-150 250 abdEI 0 2
+150 250 abdE 0 2
 2 0 0 17
 D
    Venjer is a small woman, though she stands tall and proud, light on her feet
@@ -569,7 +569,6 @@ T 11822
 T 11807
 T 11806
 T 11803
-T 11852
 S
 #11819
 pixy queen majestic~
@@ -2354,7 +2353,7 @@ Knezz~
 Grand High Sorcerer Knezz is sitting in the chair.
 ~
 150 250 bdvx n 3
-1 0 0 15
+1 0 49 15
 D
    The old sorcerer looks exhausted, even drained, as he sits in his chair,
 clutching his knee. Knezz has the characteristic long, unkempt salt-and-pepper
@@ -2900,6 +2899,8 @@ T 11810
 T 11935
 T 11983
 T 11803
+T 11821
+T 11822
 S
 #11890
 Celiya high sorcerer difficulty~
