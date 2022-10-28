@@ -947,15 +947,17 @@ OCMD(do_oslay) {
 	}
 	else {
 		// log
-		if (*argument && !IS_NPC(vict)) {
-			// custom death log?
-			log_to_slash_channel_by_name(DEATH_LOG_CHANNEL, vict, "%s", argument);
+		if (!IS_NPC(vict)) {
+			if (*argument) {
+				// custom death log?
+				log_to_slash_channel_by_name(DEATH_LOG_CHANNEL, vict, "%s", argument);
+			}
+			else {
+				// basic death log
+				log_to_slash_channel_by_name(DEATH_LOG_CHANNEL, vict, "%s has died at (%d, %d)!", PERS(vict, vict, TRUE), X_COORD(IN_ROOM(vict)), Y_COORD(IN_ROOM(vict)));
+			}
+			syslog(SYS_DEATH, 0, TRUE, "DEATH: %s has been killed by a script at %s (obj %d)", GET_NAME(vict), room_log_identifier(IN_ROOM(vict)), GET_OBJ_VNUM(obj));
 		}
-		else if (!IS_NPC(vict)) {
-			// basic death log
-			log_to_slash_channel_by_name(DEATH_LOG_CHANNEL, vict, "%s has died at (%d, %d)!", PERS(vict, vict, TRUE), X_COORD(IN_ROOM(vict)), Y_COORD(IN_ROOM(vict)));
-		}
-		syslog(SYS_DEATH, 0, TRUE, "DEATH: %s has been killed by a script at %s (obj %d)", GET_NAME(vict), room_log_identifier(IN_ROOM(vict)), GET_OBJ_VNUM(obj));
 		
 		die(vict, vict);
 	}
