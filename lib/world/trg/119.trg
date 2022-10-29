@@ -4567,6 +4567,8 @@ if %next_vnum%
   %load% mob %next_vnum%
   set mob %self.room.people%
   if %mob.vnum% == %next_vnum%
+    set difficulty %self.var(difficulty,1)%
+    remote difficulty %mob.id%
     * setup flags
     if %self.mob_flagged(HARD)%
       nop %mob.add_mob_flag(HARD)%
@@ -4960,7 +4962,7 @@ break
 ~
 #11982
 Goblin's Dream: Arena fight script (Elver, Nailbokh, Biksi)~
-0 k 0
+0 k 100
 ~
 * tba
 ~
@@ -5025,11 +5027,12 @@ switch %phase%
     done
   break
 done
+skyfight clear all
 wait 10 s
 ~
 #11984
 Elemental Plane of Water: First Water fight~
-0 k 0
+0 k 100
 ~
 * tba
 ~

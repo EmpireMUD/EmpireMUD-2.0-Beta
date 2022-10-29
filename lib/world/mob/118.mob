@@ -565,7 +565,6 @@ say Not yours. Never yours. Never theirs. Never theirs!~
 T 11801
 T 11813
 T 11818
-T 11822
 T 11807
 T 11806
 T 11803
@@ -604,7 +603,6 @@ I+ 6 0  # Boss
 T 11948
 T 11813
 T 11819
-T 11821
 T 11823
 T 11807
 S
@@ -2464,6 +2462,8 @@ T 11872
 T 11806
 T 11855
 T 11803
+T 11821
+T 11822
 S
 #11872
 lion time skithe ler-wyn lerwyn~

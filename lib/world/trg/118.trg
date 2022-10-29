@@ -452,6 +452,7 @@ end
 %send% %actor% You set the difficulty...
 %echoaround% %actor% ~%actor% sets the difficulty...
 * Clear existing difficulty flags and set new ones.
+remote difficulty %self.id%
 set mob %self%
 nop %mob.remove_mob_flag(HARD)%
 nop %mob.remove_mob_flag(GROUP)%
@@ -1172,6 +1173,7 @@ end
 Skycleave: Setup dodge, interrupt, struggle~
 0 c 0
 skyfight~
+* Also requires trigger 11822
 * To initialize or clear data:
 *    skyfight clear <all | dodge | interrupt | struggle>
 * To set up players for a response command:
@@ -1256,31 +1258,43 @@ end
 Skycleave: Dodge, Interrupt commands for fights~
 0 c 0
 dodge interrupt~
+* Also requires trigger 11821
 * handles dodge, interrupt
-return 0
+return 1
 if dodge /= %cmd%
   set type dodge
   set past dodged
 elseif interrupt /= %cmd%
+  if %actor.is_npc%
+    %send% %actor% NPCs cannot interrupt.
+    halt
+  end
   set type interrupt
   set past interrupted
 else
+  return 0
   halt
 end
-* check already done?
+* check things that prevent it
 if %actor.var(did_skyfight_%type%,0)%
-  %send% %actor% You already %type%ed.
-  return 1
+  %send% %actor% You already %past%.
+  halt
+elseif %actor.disabled%
+  %send% %actor% You can't do that right now!
+  halt
+elseif %actor.position% != Fighting && %actor.position% != Standing
+  %send% %actor% You need to get on your feet first!
+  halt
+elseif %actor.aff_flagged(IMMOBILIZED)%
+  %send% %actor% You can't do that right now... you're stuck!
   halt
 end
 * check 'cooldown'
 if %actor.affect(11812)%
   %send% %actor% You're still recovering from that last dodge.
-  return 1
   halt
 elseif %actor.affect(11813)%
   %send% %actor% You're still distracted from that last interrupt.
-  return 1
   halt
 end
 * setup
@@ -1301,6 +1315,7 @@ elseif !%self.var(wants_skyfight_%type%,0)%
   done
   if %any%
     * let them handle it
+    return 0
     halt
   else
     set no_need 1
@@ -1321,11 +1336,10 @@ if %no_need%
     %echoaround% %actor% ~%actor% looks around for something...
     dg_affect #11813 %actor% DODGE -%penalty% 30
   end
-  return 1
   halt
 end
 * success
-return 1
+nop %actor.command_lag(COMBAT-ABILITY)%
 set did_skyfight_%type% 1
 remote did_skyfight_%type% %actor.id%
 eval skyfight_%type%_count %self.var(skyfight_%type%_count,0)% + 1
@@ -3231,25 +3245,159 @@ end
 ~
 #11853
 Skycleave: Escaped Otherworlder fight~
-0 k 0
+0 k 100
 ~
 * tba
 ~
 #11854
 Skycleave: Skithe Ler-Wyn fight~
-0 k 0
+0 k 100
 ~
 * tba
 ~
 #11855
 Skycleave: Mezvienne the Enchantress fight~
-0 k 0
+0 k 100
 ~
-* tba
+if %self.cooldown(11800)% || %self.disabled%
+  halt
+end
+* check move order
+set moves_left %self.var(moves_left)%
+set num_moves_left %self.var(num_moves_left,0)%
+if !%moves_left% || !%num_moves_left%
+  * will do moves randomly from this set then repeat
+  * set moves_left 1 2 3 4 1 2 3 4
+  * set num_moves_left 8
+  set moves_left 1 2
+  set num_moves_left 2
+end
+* pick a move
+eval which %%random.%num_moves_left%%%
+set old_list %moves_left%
+set moves_left
+set move 0
+while %which% > 0
+  set move %old_list.car%
+  if %which% != 1
+    set moves_left %moves_left% %move%
+  end
+  set old_list %old_list.cdr%
+  eval which %which% - 1
+done
+set moves_left %moves_left% %old_list%
+* store vars back
+eval num_moves_left %num_moves_left% - 1
+remote moves_left %self.id%
+remote num_moves_left %self.id%
+* perform move
+nop %self.set_cooldown(11800, 30)%
+if %move% == 1
+  * Baleful Polymorph: Warthog
+  skyfight clear dodge
+  set target %random.enemy%
+  if !%target%
+    set target %actor%
+  end
+  if %target.morph% == 11855
+    * already morphed
+    nop %self.set_cooldown(11800, 0)%
+    halt
+  end
+  * wait?
+  set fail 0
+  if %difficulty% <= 2
+    %echo% ~%self% waves her hands... An eerie green light casts out toward ~%target%... (dodge)
+    skyfight setup dodge %target%
+    wait 10 s
+    if %target.did_skyfight_dodge%
+      set fail 1
+    else
+      %send% %target% You are enveloped in the green light...
+    end
+  else
+    %echo% ~%self% waves her hands as an eerie green light casts out over the tower...
+  end
+  if !%fail%
+    set old_shortdesc %target.name%
+    %morph% %target% 11855
+    %echoaround% %target% %old_shortdesc% is suddenly transformed into ~%target%!
+    %send% %target% You are suddenly transformed into %target.name%!
+    %send% %target% (Type 'fastmorph normal' to transform yourself back.)
+    if %self.difficulty% == 4
+      dg_affect #11867 %target% STUNNED on 5
+    elseif %self.difficulty% >= 2
+      nop %target.command_lag(ABILITY)%
+    end
+  end
+elseif %move% == 2
+  * Blinding Light of Dawn
+  %echo% ~%self% flies up any begins channeling the dawn...
+  %echo% A bright light erupts from the sky, swirling past Mezvienne... (interrupt)
+  if %self.difficulty% == 1
+    * normal: prevent her attack
+    nop %self.add_mob_flag(NO-ATTACK)%
+  end
+  skyfight clear interrupt
+  skyfight setup interrupt all
+  set cycle 0
+  set broke 0
+  while !%broke% && %cycle% < 5
+    wait 4 s
+    if %self.skyfight_interrupt_count% >= 1 && %self.skyfight_interrupt_count% >= %self.difficulty% / 2
+      set broke 1
+      set ch %self.room.people%
+      while %ch%
+        if %ch.var(did_skyfight_interrupt,0)%
+          %send% %ch% You trick the enchantress into shining the light at the fountain...
+        end
+        set ch %ch.next_in_room%
+      done
+      %echo% ~%self% seems distracted as the blinding light of dawn ricochets off the hendecagon fountain and strikes her in the face!
+      eval amount 60 / %self.difficulty%
+      %damage% %self% %amount% magical
+      if %self.difficulty% == 1
+        dg_affect #11851 %self% STUNNED on 10
+      end
+    else
+      set ch %self.room.people%
+      while %ch%
+        set next_ch %ch.next_in_room%
+        eval skip %%skip_%ch.id%%%
+        if !%skip% && %self.is_enemy(%ch%)%
+          if %ch.trigger_counterspell%
+            set skip_%ch.id% 1
+            %send% %ch% A shield forms in front of you as you masterfully counterspell the blinding light of dawn!
+            %echoaround% %ch% A shield forms in front of ~%ch% as &%ch% masterfully counterspells the blinding light!
+            eval skyfight_interrupt_count %self.var(skyfight_interrupt_count,0)% + 1
+            remote skyfight_interrupt_count %self.id%
+          else
+            * hit and no counterspell
+            %send% %ch% The blinding light of dawn burns you!
+            %echoaround% %ch% ~%ch% recoils as the light burns *%ch%!
+            eval amount %self.difficulty% * 15
+            %damage% %ch% %amount% magical
+            if %cycle% == 4 && %self.difficulty% == 4
+              dg_affect #11841 %ch% BLIND on 10
+            end
+          end
+        end
+        set ch %next_ch%
+      done
+    end
+    eval cycle %cycle% + 1
+  done
+elseif %move% == 3
+  * Belt of Venus
+elseif %move% == 4
+  * Gash of Cronus
+end
+* cleanup: in case
+nop %self.remove_mob_flag(NO-ATTACK)%
 ~
 #11856
 Skycleave: Shadow Ascendant fight~
-0 k 0
+0 k 100
 ~
 * tba
 ~
@@ -3379,7 +3527,7 @@ Skycleave: Shade of Mezvienne fight~
 ~
 #11859
 Skycleave: MC Barrosh fight~
-0 k 0
+0 k 100
 ~
 * tba
 ~
@@ -3558,6 +3706,8 @@ if %seconds% > 60
   %load% mob 11863
   set mob %room.people%
   if %mob.vnum% == 11863
+    set difficulty %self.var(difficulty,1)%
+    remote difficulty %mob.id%
     if %self.mob_flagged(HARD)%
       nop %mob.add_mob_flag(HARD)%
     end
@@ -3817,6 +3967,8 @@ end
 %at% i11871 %load% mob 11871
 set mez %instance.mob(11871)%
 if %mez%
+  set difficulty %self.var(difficulty,1)%
+  remote difficulty %mez.id%
   set spirit %instance.mob(11900)%
   if (%spirit.diff4% // 2) == 0
     nop %mez.add_mob_flag(HARD)%
@@ -3976,6 +4128,8 @@ switch %line%
     %load% mob 11872
     set mob %self.room.people%
     if %mob.vnum% == 11872
+      set difficulty %self.var(difficulty,1)%
+      remote difficulty %mob.id%
       if %self.varexists(skip)%
         set skip 1
         remote skip %mob.id%
@@ -4011,6 +4165,9 @@ while %mob%
 done
 * load 2nd version
 %at% %vortex% %load% mob 11866
+set mez %instance.mob(11866)%
+set difficulty %self.var(difficulty,1)%
+remote difficulty %mez.id%
 * relocate and stun everyone
 set ch %room.people%
 while %ch%
@@ -4045,6 +4202,9 @@ while %mob%
 done
 * load 2nd version
 %at% %vortex% %load% mob 11866
+set mez %instance.mob(11866)%
+set difficulty %self.var(difficulty,1)%
+remote difficulty %mez.id%
 * relocate and stun everyone
 set ch %room.people%
 while %ch%
@@ -6105,8 +6265,8 @@ if %actor% != %self%
 end
 set vnum %arg.car%
 set temp %arg.cdr%
-set diff %temp.car%
-if !(%vnum) || !(%diff%)
+set difficulty %temp.car%
+if !(%vnum) || !(%difficulty%)
   halt
 end
 %load% mob %vnum%
@@ -6116,13 +6276,14 @@ if %mob.vnum% != %vnum%
 end
 nop %mob.remove_mob_flag(HARD)%
 nop %mob.remove_mob_flag(GROUP)%
-if %diff% == 1
+remote difficulty %mob.id%
+if %difficulty% == 1
   * Then we don't need to do anything
-elseif %diff% == 2
+elseif %difficulty% == 2
   nop %mob.add_mob_flag(HARD)%
-elseif %diff% == 3
+elseif %difficulty% == 3
   nop %mob.add_mob_flag(GROUP)%
-elseif %diff% == 4
+elseif %difficulty% == 4
   nop %mob.add_mob_flag(HARD)%
   nop %mob.add_mob_flag(GROUP)%
 end
