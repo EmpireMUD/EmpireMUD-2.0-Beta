@@ -432,6 +432,8 @@ When using field  - The variable returns:
 &ccharge_coins(amt)&0 - Charges the actor a number of coins.
 &ccharge_currency(vnum, amt)&0 - Takes away an amount of adventure currency.
 &cclass&0 - The actor's class, as a string.
+&ccommand_lag(type)&0 - Without type, true if person is in a 'wait state' from
+   typing a command. With type, gives command lag (HELP WAIT TYPES)
 &ccompanion&0 - For a PC, their current companion. For the companion, its player.
 &ccompleted_quest(vnum)&0 - Whether or not the player has completed and
    turned in that quest vnum.
