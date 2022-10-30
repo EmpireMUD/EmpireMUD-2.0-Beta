@@ -3269,8 +3269,8 @@ if !%moves_left% || !%num_moves_left%
   * will do moves randomly from this set then repeat
   * set moves_left 1 2 3 4 1 2 3 4
   * set num_moves_left 8
-  set moves_left 1 2
-  set num_moves_left 2
+  set moves_left 1 2 3
+  set num_moves_left 3
 end
 * pick a move
 eval which %%random.%num_moves_left%%%
@@ -3299,19 +3299,36 @@ if %move% == 1
   if !%target%
     set target %actor%
   end
-  if %target.morph% == 11855
+  if %self.difficulty% == 1
+    set vnum 11854
+  else
+    set vnum 11855
+  end
+  if %target.morph% == %vnum%
     * already morphed
     nop %self.set_cooldown(11800, 0)%
     halt
   end
   * wait?
+  set target_id %target.id%
   set fail 0
-  if %difficulty% <= 2
-    %echo% ~%self% waves her hands... An eerie green light casts out toward ~%target%... (dodge)
+  if %self.difficulty% <= 2
+    %send% %target% ~%self% waves her hands... An eerie green light casts out toward you... (dodge)
+    %echoaround% %target% ~%self% waves her hands... An eerie green light casts out toward ~%target%...
     skyfight setup dodge %target%
     wait 10 s
-    if %target.did_skyfight_dodge%
+    if !%target% || %target.id% != %target_id%
+      * lost target
       set fail 1
+    elseif %target.did_skyfight_dodge%
+      set fail 1
+      %echo% The green scatters into the distance as Mezvienne's spell misses.
+      if %self.difficulty% == 1
+        dg_affect #11856 %ch% TO-HIT 25 20
+      end
+    elseif %target.trigger_counterspell%
+      set fail 2
+      %echo% The green light rebounds and smacks Mezvienne in the face -- she looks stunned!
     else
       %send% %target% You are enveloped in the green light...
     end
@@ -3320,16 +3337,18 @@ if %move% == 1
   end
   if !%fail%
     set old_shortdesc %target.name%
-    %morph% %target% 11855
+    %morph% %target% %vnum%
     %echoaround% %target% %old_shortdesc% is suddenly transformed into ~%target%!
-    %send% %target% You are suddenly transformed into %target.name%!
-    %send% %target% (Type 'fastmorph normal' to transform yourself back.)
-    if %self.difficulty% == 4
+    %send% %target% You are suddenly transformed into %target.name%! (fastmorph normal)
+    if %self.difficulty% == 4 && (%self.level% + 100) > %target.level%
       dg_affect #11867 %target% STUNNED on 5
     elseif %self.difficulty% >= 2
       nop %target.command_lag(ABILITY)%
     end
+  elseif %fail% == 2 || %self.difficulty% == 1
+    dg_affect #11851 %self% HARD-STUNNED on 10
   end
+  skyfight clear dodge
 elseif %move% == 2
   * Blinding Light of Dawn
   %echo% ~%self% flies up any begins channeling the dawn...
@@ -3357,7 +3376,7 @@ elseif %move% == 2
       eval amount 60 / %self.difficulty%
       %damage% %self% %amount% magical
       if %self.difficulty% == 1
-        dg_affect #11851 %self% STUNNED on 10
+        dg_affect #11851 %self% HARD-STUNNED on 10
       end
     else
       set ch %self.room.people%
@@ -3387,8 +3406,44 @@ elseif %move% == 2
     end
     eval cycle %cycle% + 1
   done
+  skyfight clear interrupt
 elseif %move% == 3
-  * Belt of Venus
+  * Belt of Venus / rosy pink light
+  skyfight clear dodge
+  %echo% Mezvienne spins in the air as rosy pink mana streaming off of the heartwood of time whips around her...
+  if %self.difficulty% == 1
+    * normal: prevent her attack
+    nop %self.add_mob_flag(NO-ATTACK)%
+  end
+  skyfight setup dodge all
+  wait 1 s
+  %echo% The ribbon of rosy pink light streams toward you... (dodge)
+  wait 10 s
+  set ch %self.room.people%
+  while %ch%
+    set next_ch %ch.next_in_room%
+    if %self.is_enemy(%ch%)%
+      if %ch.did_skyfight_dodge%
+        if %self.difficulty% == 1
+          dg_affect #11856 %ch% TO-HIT 25 20
+        end
+      else
+        %echo% The rosy pink light strikes ~%ch% in the chest and streams right through *%ch%!
+        if %self.difficulty% == 4 && (%self.level% + 100) > %ch.level%
+          dg_affect #11867 %ch% STUNNED on 10
+        end
+        if %self.difficulty% >= 3
+          dg_affect #11857 %ch% SLOW on 20
+        end
+        if %self.difficulty% >= 2
+          eval amount %self.difficulty% * -20
+          dg_affect #11857 %ch% TO-HIT %amount% on 20
+        end
+      end
+    end
+    set ch %next_ch%
+  done
+  skyfight clear dodge
 elseif %move% == 4
   * Gash of Cronus
 end
