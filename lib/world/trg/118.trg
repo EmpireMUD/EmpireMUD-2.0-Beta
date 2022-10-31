@@ -1199,6 +1199,7 @@ if %mode% == clear
       rdelete needs_skyfight_interrupt %ch.id%
     end
     if %arg% == struggle || %arg% == all
+      dg_affect #11822 %ch% off
       rdelete did_skyfight_struggle %ch.id%
       rdelete needs_skyfight_struggle %ch.id%
     end
@@ -1225,8 +1226,11 @@ if %mode% == clear
 elseif %mode% == setup
   * Prepare for a response
   * usage: skyfight setup <dodge | interrupt | struggle> <all | player>
+  set difficulty %self.var(difficulty,1)%
   set type %arg.car%
-  set target %arg.cdr%
+  set arg %arg.cdr%
+  set target %arg.car%
+  set value %arg.cdr%
   * self vars
   set wants_varname wants_skyfight_%type%
   set %wants_varname% 1
@@ -1242,10 +1246,24 @@ elseif %mode% == setup
     set ch %target%
   end
   while %ch%
-    set %needs_varname% 1
-    set %did_varname% 0
-    remote %needs_varname% %ch.id%
-    remote %did_varname% %ch.id%
+    if !%all% || %self.is_enemy(%ch%)%
+      set %needs_varname% 1
+      set %did_varname% 0
+      remote %needs_varname% %ch.id%
+      remote %did_varname% %ch.id%
+      if %type% == struggle
+        if !%value%
+          * default
+          set value 10
+        end
+        dg_affect #11822 %ch% STUNNED on %value%
+        %load% obj 11890 %ch% inv
+        set obj %ch.inventory(11890)%
+        if %obj%
+          remote difficulty %obj.id%
+        end
+      end
+    end
     if %all%
       set ch %ch.next_in_room%
     else
@@ -3269,8 +3287,8 @@ if !%moves_left% || !%num_moves_left%
   * will do moves randomly from this set then repeat
   * set moves_left 1 2 3 4 1 2 3 4
   * set num_moves_left 8
-  set moves_left 1 2 3
-  set num_moves_left 3
+  set moves_left 4 3 2 1
+  set num_moves_left 4
 end
 * pick a move
 eval which %%random.%num_moves_left%%%
@@ -3313,8 +3331,8 @@ if %move% == 1
   set target_id %target.id%
   set fail 0
   if %self.difficulty% <= 2
-    %send% %target% ~%self% waves her hands... An eerie green light casts out toward you... (dodge)
-    %echoaround% %target% ~%self% waves her hands... An eerie green light casts out toward ~%target%...
+    %send% %target% &&m~%self% waves her hands... An eerie green light casts out toward you... (dodge)&&0
+    %echoaround% %target% &&m~%self% waves her hands... An eerie green light casts out toward ~%target%...&&0
     skyfight setup dodge %target%
     wait 10 s
     if !%target% || %target.id% != %target_id%
@@ -3322,24 +3340,24 @@ if %move% == 1
       set fail 1
     elseif %target.did_skyfight_dodge%
       set fail 1
-      %echo% The green scatters into the distance as Mezvienne's spell misses.
+      %echo% &&mThe green scatters into the distance as Mezvienne's spell misses.&&0
       if %self.difficulty% == 1
         dg_affect #11856 %ch% TO-HIT 25 20
       end
     elseif %target.trigger_counterspell%
       set fail 2
-      %echo% The green light rebounds and smacks Mezvienne in the face -- she looks stunned!
+      %echo% &&mThe green light rebounds and smacks Mezvienne in the face -- she looks stunned!&&0
     else
-      %send% %target% You are enveloped in the green light...
+      %send% %target% &&mYou are enveloped in the green light...&&0
     end
   else
-    %echo% ~%self% waves her hands as an eerie green light casts out over the tower...
+    %echo% &&m~%self% waves her hands as an eerie green light casts out over the tower...&&0
   end
   if !%fail%
     set old_shortdesc %target.name%
     %morph% %target% %vnum%
-    %echoaround% %target% %old_shortdesc% is suddenly transformed into ~%target%!
-    %send% %target% You are suddenly transformed into %target.name%! (fastmorph normal)
+    %echoaround% %target% &&m%old_shortdesc% is suddenly transformed into ~%target%!&&0
+    %send% %target% &&mYou are suddenly transformed into %target.name%! (fastmorph normal)&&0
     if %self.difficulty% == 4 && (%self.level% + 100) > %target.level%
       dg_affect #11867 %target% STUNNED on 5
     elseif %self.difficulty% >= 2
@@ -3351,8 +3369,8 @@ if %move% == 1
   skyfight clear dodge
 elseif %move% == 2
   * Blinding Light of Dawn
-  %echo% ~%self% flies up any begins channeling the dawn...
-  %echo% A bright light erupts from the sky, swirling past Mezvienne... (interrupt)
+  %echo% &&m~%self% flies up any begins channeling the dawn...&&0
+  %echo% &&mA bright light erupts from the sky, swirling past Mezvienne... (interrupt)&&0
   if %self.difficulty% == 1
     * normal: prevent her attack
     nop %self.add_mob_flag(NO-ATTACK)%
@@ -3368,11 +3386,11 @@ elseif %move% == 2
       set ch %self.room.people%
       while %ch%
         if %ch.var(did_skyfight_interrupt,0)%
-          %send% %ch% You trick the enchantress into shining the light at the fountain...
+          %send% %ch% &&mYou trick the enchantress into shining the light at the fountain...&&0
         end
         set ch %ch.next_in_room%
       done
-      %echo% ~%self% seems distracted as the blinding light of dawn ricochets off the hendecagon fountain and strikes her in the face!
+      %echo% &&m~%self% seems distracted as the blinding light of dawn ricochets off the hendecagon fountain and strikes her in the face!&&0
       eval amount 60 / %self.difficulty%
       %damage% %self% %amount% magical
       if %self.difficulty% == 1
@@ -3386,14 +3404,14 @@ elseif %move% == 2
         if !%skip% && %self.is_enemy(%ch%)%
           if %ch.trigger_counterspell%
             set skip_%ch.id% 1
-            %send% %ch% A shield forms in front of you as you masterfully counterspell the blinding light of dawn!
-            %echoaround% %ch% A shield forms in front of ~%ch% as &%ch% masterfully counterspells the blinding light!
+            %send% %ch% &&mA shield forms in front of you as you masterfully counterspell the blinding light of dawn!&&0
+            %echoaround% %ch% &&mA shield forms in front of ~%ch% as &%ch% masterfully counterspells the blinding light!&&0
             eval skyfight_interrupt_count %self.var(skyfight_interrupt_count,0)% + 1
             remote skyfight_interrupt_count %self.id%
           else
             * hit and no counterspell
-            %send% %ch% The blinding light of dawn burns you!
-            %echoaround% %ch% ~%ch% recoils as the light burns *%ch%!
+            %send% %ch% &&mThe blinding light of dawn burns you!&&0
+            %echoaround% %ch% &&m~%ch% recoils as the light burns *%ch%!&&0
             eval amount %self.difficulty% * 15
             %damage% %ch% %amount% magical
             if %cycle% == 4 && %self.difficulty% == 4
@@ -3410,16 +3428,17 @@ elseif %move% == 2
 elseif %move% == 3
   * Belt of Venus / rosy pink light
   skyfight clear dodge
-  %echo% Mezvienne spins in the air as rosy pink mana streaming off of the heartwood of time whips around her...
+  %echo% &&m~%self% spins in the air as rosy pink mana streaming off of the heartwood of time whips around her...&&0
   if %self.difficulty% == 1
     * normal: prevent her attack
     nop %self.add_mob_flag(NO-ATTACK)%
   end
   skyfight setup dodge all
   wait 1 s
-  %echo% The ribbon of rosy pink light streams toward you... (dodge)
+  %echo% &&mThe ribbon of rosy pink light streams toward you... (dodge)&&0
   wait 10 s
   set ch %self.room.people%
+  set any 0
   while %ch%
     set next_ch %ch.next_in_room%
     if %self.is_enemy(%ch%)%
@@ -3428,7 +3447,8 @@ elseif %move% == 3
           dg_affect #11856 %ch% TO-HIT 25 20
         end
       else
-        %echo% The rosy pink light strikes ~%ch% in the chest and streams right through *%ch%!
+        set any 1
+        %echo% &&mThe rosy pink light strikes ~%ch% in the chest and streams right through *%ch%!&&0
         if %self.difficulty% == 4 && (%self.level% + 100) > %ch.level%
           dg_affect #11867 %ch% STUNNED on 10
         end
@@ -3437,15 +3457,45 @@ elseif %move% == 3
         end
         if %self.difficulty% >= 2
           eval amount %self.difficulty% * -20
-          dg_affect #11857 %ch% TO-HIT %amount% on 20
+          dg_affect #11857 %ch% TO-HIT %amount% 20
         end
       end
     end
     set ch %next_ch%
   done
+  if !%any%
+    %echo% &&mThe rosy pink light of the belt of Venus swirls back and hits Mezvienne herself!&&0
+    if %difficulty% == 1
+      dg_affect #11851 %self% HARD-STUNNED on 10
+    else
+      eval amount 100 - (%self.difficulty% * 20)
+      dg_affect #11854 %self% DODGE -%amount% 10
+    end
+  end
   skyfight clear dodge
 elseif %move% == 4
-  * Gash of Cronus
+  * Struggle test
+  * skyfight clear struggle
+  %echo% &&mMezvienne: Prepare for struggle - 5 seconds...&&0
+  wait 5 sec
+  %echo% &&mStruggle phase! (struggle)&&0
+  skyfight setup struggle all 20
+  set ch %self.room.people%
+  while %ch%
+    set bug %ch.inventory(11890)%
+    if %bug%
+      set struggle_char You struggle a bit...
+      set struggle_room ~%%actor%% struggles a bit...
+      remote struggle_char %bug.id%
+      remote struggle_room %bug.id%
+      set breakout_char You manage to struggle out!
+      set breakout_room ~%%actor%% struggles and manages to struggle out!
+      remote breakout_char %bug.id%
+      remote breakout_room %bug.id%
+    end
+    set ch %ch.next_in_room%
+  done
+  wait 20 s
 end
 * cleanup: in case
 nop %self.remove_mob_flag(NO-ATTACK)%
@@ -5447,6 +5497,54 @@ done
 * 6. If in room 11887, also set a decay timer on this sap
 if %self.room.template% == 11887
   otimer 4
+end
+~
+#11885
+Skycleave: Struggle to escape~
+1 c 2
+*~
+* runs on an obj in inventory; strength/intelligence help break out faster
+* uses optional string vars: struggle_char, struggle_room, breakout_char, breakout_room
+return 1
+if !%actor.affect(11822)%
+  * check on ANY command
+  if struggle /= %cmd%
+    %send% %actor% You don't need to struggle right now.
+  else
+    return 0
+  end
+  %purge% %self%
+  halt
+elseif !(%cmd% /= struggle)
+  return 0
+  halt
+end
+* stats
+if %actor.strength% > %actor.intelligence%
+  set amount %actor.strength%
+else
+  set amount %actor.intelligence%
+end
+eval struggle_counter %self.var(struggle_counter,0)% + %amount% + 1
+eval needed 4 + (4 * %self.var(difficulty,1)%)
+* I want to break free...
+if %struggle_counter% >= %needed%
+  * free!
+  set char_msg %self.var(breakout_char,You manage to break out!)%
+  %send% %actor% %char_msg.process%
+  set room_msg %self.var(breakout_room,~%actor% struggles and manages to break out!)%
+  %echoaround% %actor% %room_msg.process%
+  set did_skycleave_struggle 1
+  remote did_skycleave_struggle %self.id%
+  dg_affect #11822 %actor% off
+  %purge% %self%
+else
+  * the struggle continues
+  set char_msg %self.var(struggle_char,You struggle to break free...)%
+  %send% %actor% %char_msg.process%
+  set room_msg %self.var(struggle_room,~%actor% struggles, trying to break free...)%
+  %echoaround% %actor% %room_msg.process%
+  remote struggle_counter %self.id%
 end
 ~
 #11886

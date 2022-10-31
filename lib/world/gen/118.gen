@@ -80,6 +80,13 @@ miniaturized~
 4 0
 0 0 0 0
 S
+#11822
+struggling~
+4 0
+0 0 0 0
+T0
+You're finally free!~
+S
 #11823
 blinding bomb~
 4 0
@@ -160,6 +167,11 @@ chain lightning~
 T0
 The lightning shock wears off.~
 S
+#11854
+dodged penalty~
+4 0
+0 0 0 0
+S
 #11855
 arcane tattoos~
 4 0
@@ -169,6 +181,13 @@ S
 timely dodge~
 4 0
 0 0 0 0
+S
+#11857
+belt of Venus~
+4 0
+0 0 0 0
+T0
+You are no longer affected by the belt of Venus.~
 S
 #11858
 deadly poison~
