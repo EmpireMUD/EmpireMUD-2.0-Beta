@@ -3285,9 +3285,7 @@ set moves_left %self.var(moves_left)%
 set num_moves_left %self.var(num_moves_left,0)%
 if !%moves_left% || !%num_moves_left%
   * will do moves randomly from this set then repeat
-  * set moves_left 1 2 3 4 1 2 3 4
-  * set num_moves_left 8
-  set moves_left 4 3 2 1
+  set moves_left 1 2 3 4
   set num_moves_left 4
 end
 * pick a move
@@ -3474,28 +3472,50 @@ elseif %move% == 3
   end
   skyfight clear dodge
 elseif %move% == 4
-  * Struggle test
-  * skyfight clear struggle
-  %echo% &&mMezvienne: Prepare for struggle - 5 seconds...&&0
-  wait 5 sec
-  %echo% &&mStruggle phase! (struggle)&&0
+  * Dark Fate
+  skyfight clear struggle
+  %echo% &&m~%self% rises up into the air and begins plucking unseen strands...&&0
+  if %self.difficulty% == 1
+    nop %self.add_mob_flag(NO-ATTACK)%
+  end
+  wait 3 sec
+  %echo% &&mYou are gripped by a dark fate! (struggle)&&0
   skyfight setup struggle all 20
   set ch %self.room.people%
   while %ch%
     set bug %ch.inventory(11890)%
     if %bug%
-      set struggle_char You struggle a bit...
-      set struggle_room ~%%actor%% struggles a bit...
+      set struggle_char You struggle against your dark fate...
+      set struggle_room ~%%actor%% struggles against ^%%actor%% dark fate...
       remote struggle_char %bug.id%
       remote struggle_room %bug.id%
-      set breakout_char You manage to struggle out!
-      set breakout_room ~%%actor%% struggles and manages to struggle out!
+      set breakout_char You struggle out of your dark fate!
+      set breakout_room ~%%actor%% manages to free *%%actor%%self!
       remote breakout_char %bug.id%
       remote breakout_room %bug.id%
     end
     set ch %ch.next_in_room%
   done
-  wait 20 s
+  * damage
+  if %self.difficulty% > 1
+    set cycle 0
+    while %cycle% < 5
+      wait 4 s
+      set ch %self.room.people%
+      while %ch%
+        set next_ch %ch.next_in_room%
+        if %ch.affect(11822)%
+          eval amount %self.difficulty% * 15
+          %damage% %ch% %amount% magical
+        end
+        set ch %next_ch%
+      eval cycle %cycle% + 1
+    done
+  else
+    wait 10 s
+    nop %self.remove_mob_flag(NO-ATTACK)%
+    wait 10 s
+  end
 end
 * cleanup: in case
 nop %self.remove_mob_flag(NO-ATTACK)%
