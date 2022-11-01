@@ -926,6 +926,8 @@ void list_lore_to_char(char_data *ch, char_data *to) {
 void list_one_char(char_data *i, char_data *ch, int num) {
 	char buf[MAX_STRING_LENGTH], buf1[MAX_STRING_LENGTH], part[256];
 	struct custom_message *ocm;
+	struct affected_type *aff;
+	generic_data *gen;
 	
 	// POS_x
 	const char *positions[] = {
@@ -1109,18 +1111,27 @@ void list_one_char(char_data *i, char_data *ch, int num) {
 		act("...$s fingers are mutated into giant, hideous claws!", FALSE, i, 0, ch, TO_VICT);
 	if (AFF_FLAGGED(i, AFF_MAJESTY))
 		act("...$e has a majestic aura about $m!", FALSE, i, 0, ch, TO_VICT);
+	
+	// strings from affects
+	LL_FOREACH(i->affected, aff) {
+		if ((gen = real_generic(aff->type)) && GET_AFFECT_LOOK_AT_ROOM(gen)) {
+			act(GET_AFFECT_LOOK_AT_ROOM(gen), FALSE, i, NULL, ch, TO_VICT);
+		}
+	}
+	
 	if (GET_FED_ON_BY(i)) {
 		sprintf(buf, "...$e is held tightly by %s!", PERS(GET_FED_ON_BY(i), ch, 0));
 		act(buf, FALSE, i, 0, ch, TO_VICT);
-		}
+	}
 	if (GET_FEEDING_FROM(i)) {
 		sprintf(buf, "...$e has $s teeth firmly implanted in %s!", PERS(GET_FEEDING_FROM(i), ch, 0));
 		act(buf, FALSE, i, 0, ch, TO_VICT);
-		}
-	if (!IS_NPC(i) && GET_ACTION(i) == ACT_MORPHING)
-		act("...$e is undergoing a hideous transformation!", FALSE, i, 0, ch, TO_VICT);
+	}
+	if (!IS_NPC(i) && GET_ACTION(i) == ACT_MORPHING) {
+		act("...$e is undergoing a hideous transformation!", FALSE, i, FALSE, ch, TO_VICT);
+	}
 	if ((IS_MORPHED(i) || IS_DISGUISED(i)) && CAN_RECOGNIZE(ch, i) && !CHAR_MORPH_FLAGGED(i, MORPHF_HIDE_REAL_NAME)) {
-		act("...this appears to be $o.", FALSE, i, 0, ch, TO_VICT);
+		act("...this appears to be $o.", FALSE, i, FALSE, ch, TO_VICT);
 	}
 	
 	// these 
@@ -1259,6 +1270,8 @@ void look_at_char(char_data *i, char_data *ch, bool show_eq) {
 	char buf[MAX_STRING_LENGTH];
 	bool disguise;
 	int j, found;
+	struct affected_type *aff;
+	generic_data *gen;
 	
 	if (!i || !ch || !ch->desc)
 		return;
@@ -1323,6 +1336,13 @@ void look_at_char(char_data *i, char_data *ch, bool show_eq) {
 		}
 		if (AFF_FLAGGED(i, AFF_MUMMIFY)) {
 			act("$E is mummified in a hard, dark substance!", FALSE, ch, NULL, i, TO_CHAR);
+		}
+	}
+	
+	// generic affs -- npc or disguise do not affect this
+	LL_FOREACH(i->affected, aff) {
+		if ((gen = real_generic(aff->type)) && GET_AFFECT_LOOK_AT_CHAR(gen)) {
+			act(GET_AFFECT_LOOK_AT_CHAR(gen), FALSE, i, NULL, ch, TO_VICT);
 		}
 	}
 	

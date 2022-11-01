@@ -1638,6 +1638,8 @@ void do_stat_generic(char_data *ch, generic_data *gen) {
 			size += snprintf(buf + size, sizeof(buf) - size, "Apply to-room: %s\r\n", GET_AFFECT_APPLY_TO_ROOM(gen) ? GET_AFFECT_APPLY_TO_ROOM(gen) : "(none)");
 			size += snprintf(buf + size, sizeof(buf) - size, "Wear-off: %s\r\n", GET_AFFECT_WEAR_OFF_TO_CHAR(gen) ? GET_AFFECT_WEAR_OFF_TO_CHAR(gen) : "(none)");
 			size += snprintf(buf + size, sizeof(buf) - size, "Wear-off to room: %s\r\n", GET_AFFECT_WEAR_OFF_TO_ROOM(gen) ? GET_AFFECT_WEAR_OFF_TO_ROOM(gen) : "(none)");
+			size += snprintf(buf + size, sizeof(buf) - size, "Look at char: %s\r\n", GET_AFFECT_LOOK_AT_CHAR(gen) ? GET_AFFECT_LOOK_AT_CHAR(gen) : "(none)");
+			size += snprintf(buf + size, sizeof(buf) - size, "Look at room: %s\r\n", GET_AFFECT_LOOK_AT_ROOM(gen) ? GET_AFFECT_LOOK_AT_ROOM(gen) : "(none)");
 			break;
 		}
 		case GENERIC_CURRENCY: {
@@ -1718,6 +1720,8 @@ void olc_show_generic(char_data *ch) {
 			sprintf(buf + strlen(buf), "<%swearoff\t0> %s\r\n", OLC_LABEL_STR(GEN_STRING(gen, GSTR_AFFECT_WEAR_OFF_TO_CHAR), ""), GET_AFFECT_WEAR_OFF_TO_CHAR(gen) ? GET_AFFECT_WEAR_OFF_TO_CHAR(gen) : "(none)");
 			sprintf(buf + strlen(buf), "<%sstandardwearoff\t0> (to add a basic wear-off message based on the name)\r\n", OLC_LABEL_STR(GEN_STRING(gen, GSTR_AFFECT_WEAR_OFF_TO_CHAR), ""));
 			sprintf(buf + strlen(buf), "<%swearoff2room\t0> %s\r\n", OLC_LABEL_STR(GEN_STRING(gen, GSTR_AFFECT_WEAR_OFF_TO_ROOM), ""), GET_AFFECT_WEAR_OFF_TO_ROOM(gen) ? GET_AFFECT_WEAR_OFF_TO_ROOM(gen) : "(none)");
+			sprintf(buf + strlen(buf), "<%slookatchar\t0> %s\r\n", OLC_LABEL_STR(GEN_STRING(gen, GSTR_AFFECT_LOOK_AT_CHAR), ""), GET_AFFECT_LOOK_AT_CHAR(gen) ? GET_AFFECT_LOOK_AT_CHAR(gen) : "(none)");
+			sprintf(buf + strlen(buf), "<%slookatroom\t0> %s\r\n", OLC_LABEL_STR(GEN_STRING(gen, GSTR_AFFECT_LOOK_AT_ROOM), ""), GET_AFFECT_LOOK_AT_ROOM(gen) ? GET_AFFECT_LOOK_AT_ROOM(gen) : "(none)");
 			break;
 		}
 		case GENERIC_CURRENCY: {
@@ -2051,6 +2055,61 @@ OLC_MODULE(genedit_apply2room) {
 	}
 	else {
 		olc_process_string(ch, argument, "apply2room", &GEN_STRING(gen, pos));
+	}
+}
+
+OLC_MODULE(genedit_lookatchar) {
+	generic_data *gen = GET_OLC_GENERIC(ch->desc);
+	int pos = 0;
+	
+	switch (GEN_TYPE(gen)) {
+		case GENERIC_AFFECT: {
+			pos = GSTR_AFFECT_LOOK_AT_CHAR;
+			break;
+		}
+		default: {
+			msg_to_char(ch, "You can only change that on an AFFECT generic.\r\n");
+			return;
+		}
+	}
+	
+	if (!str_cmp(argument, "none")) {
+		if (GEN_STRING(gen, pos)) {
+			free(GEN_STRING(gen, pos));
+		}
+		GEN_STRING(gen, pos) = NULL;
+		msg_to_char(ch, "Look-at-char message removed.\r\n");
+	}
+	else {
+		olc_process_string(ch, argument, "lookatchar", &GEN_STRING(gen, pos));
+	}
+}
+
+
+OLC_MODULE(genedit_lookatroom) {
+	generic_data *gen = GET_OLC_GENERIC(ch->desc);
+	int pos = 0;
+	
+	switch (GEN_TYPE(gen)) {
+		case GENERIC_AFFECT: {
+			pos = GSTR_AFFECT_LOOK_AT_ROOM;
+			break;
+		}
+		default: {
+			msg_to_char(ch, "You can only change that on an AFFECT generic.\r\n");
+			return;
+		}
+	}
+	
+	if (!str_cmp(argument, "none")) {
+		if (GEN_STRING(gen, pos)) {
+			free(GEN_STRING(gen, pos));
+		}
+		GEN_STRING(gen, pos) = NULL;
+		msg_to_char(ch, "Look-at-room message removed.\r\n");
+	}
+	else {
+		olc_process_string(ch, argument, "lookatroom", &GEN_STRING(gen, pos));
 	}
 }
 

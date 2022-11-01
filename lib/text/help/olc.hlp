@@ -3565,6 +3565,8 @@ Affects have 4 properties:
     applied.
   <&ywearoff&0> An optional message shown to the character when the affect ends.
   <&ywearoff2room&0> An optional message shown to the rest of the room.
+  <&ylookatchar&0> An optional message shown after description on 'look name'.
+  <&ylookatroom&0> An optional message shown after the character on 'look'.
 
 You can use <&ystandardwearoff&0> to add the normal wear-off message. This only
 adds a message for the character -- normal effects don't show anything to the
@@ -3589,6 +3591,36 @@ This message is sent to the room when a person gains this affect. It will
 only be shown to players who can see that person. This message is optional.
 
 See also: OLC GENERICS, GENERIC AFFECTS
+#d
+"GENEDIT LOOKATCHAR" "GENEDIT LOOK-AT-CHAR" "GENEDIT LOOK AT CHAR"
+
+Usage:  .lookatchar <message | none>
+
+This message is shown below the character description when another person looks
+at them while this affect is on them. This message is optional.
+
+Can use $n, $e, $s, and $m tokens.
+
+Example:
+You look at Albert:
+You notice a distinct, red glint in his eyes.
+
+See also: OLC GENERICS, GENERIC AFFECTS, DOLLAR SIGN CODES
+#d
+"GENEDIT LOOKATROOM" "GENEDIT LOOK-AT-ROOM" "GENEDIT LOOK AT ROOM"
+
+Usage:  .lookatroom <message | none>
+
+This messages is shown below the character when a person looks at the room they
+are in while they have this affect. This message is optional.
+
+Can use $n, $e, $s, and $m tokens. Messages usually start with "...$e".
+
+Example:
+<Queen> Victoria stands before you in full regalia.
+...she has a majestic aura about her!
+
+See also: OLC GENERICS, GENERIC AFFECTS, DOLLAR SIGN CODES
 #d
 "GENERIC COMPONENTS" "COMPONENT GENERICS" "COMPONENT EDITOR"
 
