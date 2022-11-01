@@ -346,7 +346,7 @@ bool audit_generic(generic_data *gen, char_data *ch) {
 		}
 		case GENERIC_AFFECT: {
 			if (GET_AFFECT_LOOK_AT_ROOM(gen)) {
-				strcpy(temp, NULSAFE(GET_AFFECT_LOOK_AT_ROOM(gen)));
+				strcpy(temp, NULLSAFE(GET_AFFECT_LOOK_AT_ROOM(gen)));
 				// only if present...
 				if (strncmp(temp, "...", 3)) {
 					olc_audit_msg(ch, GEN_VNUM(gen), "Look-at-room string does not begin with '...'");
