@@ -935,8 +935,9 @@ int wordcount_trigger(trig_data *trig) {
 	
 	const char *accept_list[] = { "%echo", "%send%", "%mod%", "%regionecho", "%vehicleecho", "%buildingecho", "say ", "emote ", "shout ", "\n" };
 	
-	count += wordcount_string(GET_TRIG_NAME(trig));
-	count += wordcount_string(GET_TRIG_ARG(trig));
+	// not player-facing
+	// count += wordcount_string(GET_TRIG_NAME(trig));
+	// count += wordcount_string(GET_TRIG_ARG(trig));
 	
 	LL_FOREACH(trig->cmdlist, cmd) {
 		for (iter = 0; *accept_list[iter] != '\n'; ++iter) {

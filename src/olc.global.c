@@ -359,7 +359,8 @@ struct global_data *setup_olc_global(struct global_data *input) {
 int wordcount_global(struct global_data *glb) {
 	int count = 0;
 	
-	count += wordcount_string(GET_GLOBAL_NAME(glb));
+	// not player-facing
+	// count += wordcount_string(GET_GLOBAL_NAME(glb));
 	
 	return count;
 }
