@@ -4970,65 +4970,94 @@ Goblin's Dream: Arena fight script (Elver, Nailbokh, Biksi)~
 Smol Nes-Pik: Iskip of Rot and Ruin fight~
 0 k 100
 ~
-* tba
-* config
-set num_phases 3
-set response_time 10
-* prelim setup
-set difficulty 2
-remote difficulty %self.id%
-%echo% Debug: Hard difficutly
-* rotate through types
-eval phase %self.var(phase,0)% + 1
-if %phase% > %num_phases%
-  set phase 1
+if %self.cooldown(11800)% || %self.disabled%
+  halt
 end
-remote phase %self.id%
-* prepare
-skyfight clear all
-switch %phase%
-  case 1
-    %echo% Debug: Dodge Phase: Type dodge (all players)
-    skyfight setup dodge all
-    %echo% Debug: Begin dodge wait...
-    wait 10 s
-    %echo% Debug: End dodge wait
-    set ch %self.room.people%
-    while %ch%
-      %echo% - ~%ch%: %ch.var(did_sfdodge,0)%/%ch.var(needs_sfdodge,0)%
-      set ch %ch.next_in_room%
-    done
-  break
-  case 2
-    %echo% Debug: Dodge Phase: Type dodge (random player)
-    set targ %random.enemy%
-    set targ_id %targ.id%
-    %echo% Debug: Targeting ~%targ%
-    skyfight setup dodge %targ%
-    %echo% Debug: Begin dodge wait...
-    wait 10 s
-    %echo% Debug: End dodge wait
-    if !%targ% || %targ.id% != %targ_id%
-      %echo% - target is gone
-    else
-      %echo% - ~%targ%: %targ.var(did_sfdodge,0)%/%targ.var(needs_sfdodge,0)%
-    end
-  break
-  case 3
-    %echo% Debug: Interrupt Phase: Type interrupt (all players)
-    skyfight setup interrupt all
-    %echo% Debug: Begin interrupt wait...
-    wait 10 s
-    %echo% Debug: End interrupt wait: %self.var(sfinterrupt_count,0)% interrupts
-    set ch %self.room.people%
-    while %ch%
-      %echo% - ~%ch%: %ch.var(did_sfinterrupt,0)%/%ch.var(needs_sfinterrupt,0)%
-      set ch %ch.next_in_room%
-    done
-  break
+* order
+set moves_left %self.var(moves_left)%
+set num_left %self.var(num_left,0)%
+if !%moves_left% || !%num_left%
+  set moves_left 1
+  set num_left 1
+end
+* pick
+eval which %%random.%num_left%%%
+set old %moves_left%
+set moves_left
+set move 0
+while %which% > 0
+  set move %old.car%
+  if %which% != 1
+    set moves_left %moves_left% %move%
+  end
+  set old %old.cdr%
+  eval which %which% - 1
 done
-skyfight clear all
-wait 10 s
+set moves_left %moves_left% %old%
+* store
+eval num_left %num_left% - 1
+remote moves_left %self.id%
+remote num_left %self.id%
+* perform move
+nop %self.set_cooldown(11800, 30)%
+if %move% == 1
+  * Jar
+  skyfight clear free
+  %echo% &&mThe Iskip pulls out an enormous clay jar and swoops down toward you...&&0
+  wait 3 s
+  set targ %random.enemy%
+  if !%targ%
+    halt
+  end
+  set targ_id %targ.id%
+  if %self.fighting% == %targ% && %self.difficulty% < 4
+    dg_affect #11852 %self% HARD-STUNNED on 20
+  end
+  if %self.difficulty% <= 2 || (%self.level% + 100) <= %targ.level%
+    %send% %targ% &&m\*\* The jar comes down on your head! You have to break free! \*\*&&0 (struggle)
+    %echoaround% %targ% &&mThe jar comes down on ~%targ%, trapping *%targ%!&&0
+    skyfight setup struggle %targ% 20
+    set bug %targ.inventory(11890)%
+    if %bug%
+      set struggle_char You try to break out of the jar...
+      set struggle_room You hear ~%%actor%% trying to break out of the jar...
+      remote struggle_char %bug.id%
+      remote struggle_room %bug.id%
+      set breakout_char You break out of the jar!
+      set breakout_room ~%%actor%% manages to break out of the jar!
+      remote breakout_char %bug.id%
+      remote breakout_room %bug.id%
+    end
+    wait 10 s
+  else
+    %send% %targ% &&mThe jar comes down on your head! There's nothing you can do!&&0
+    %echoaround% %targ% &&m\*\* The jar comes down on ~%targ%, trapping *%targ%! \*\*&&0 (free %targ.pc_name.car%)
+    skyfight setup free %targ%
+    eval time %self.difficulty% * 15
+    dg_affect #11888 %targ% HARD-STUNNED on %time%
+    * wait and clear
+    set done 0
+    while !%done% && %time% > 0
+      wait 5 s
+      eval time %time% - 5
+      if %targ_id% != %targ.id%
+        set done 1
+      elseif !%targ.affect(11888)%
+        set done 1
+      end
+    done
+    skyfight clear free
+  end
+  dg_affect #11852 %self% off
+elseif %move% == 2
+  * 
+elseif %move% == 3
+  * 
+elseif %move% == 4
+  * 
+end
+* in case
+nop %self.remove_mob_flag(NO-ATTACK)%
 ~
 #11984
 Elemental Plane of Water: First Water fight~

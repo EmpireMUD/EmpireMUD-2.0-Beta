@@ -1170,14 +1170,14 @@ else
 end
 ~
 #11821
-Skycleave: Setup dodge, interrupt, struggle~
+Skycleave: Setup dodge, interrupt, struggle, free~
 0 c 0
 skyfight~
 * Also requires trigger 11822
 * To initialize or clear data:
-*    skyfight clear <all | dodge | interrupt | struggle>
+*    skyfight clear <all | dodge | interrupt | struggle | free>
 * To set up players for a response command:
-*    skyfight setup <dodge | interrupt | struggle> <all | player>
+*    skyfight setup <dodge | interrupt | struggle | free> <all | player>
 if %actor% != %self%
   return 0
   halt
@@ -1187,7 +1187,7 @@ set mode %arg.car%
 set arg %arg.cdr%
 if %mode% == clear
   * Clear data
-  * usage: skyfight clear <all | dodge | interrupt | struggle>
+  * usage: skyfight clear <all | dodge | interrupt | struggle | free>
   set ch %self.room.people%
   while %ch%
     if %arg% == dodge || %arg% == all
@@ -1202,6 +1202,11 @@ if %mode% == clear
       dg_affect #11822 %ch% off
       rdelete did_sfstruggle %ch.id%
       rdelete needs_sfstruggle %ch.id%
+    end
+    if %arg% == free || %arg% == all
+      dg_affect #11888 %ch% off
+      rdelete did_sffree %ch.id%
+      rdelete needs_sffree %ch.id%
     end
     set ch %ch.next_in_room%
   done
@@ -1223,9 +1228,15 @@ if %mode% == clear
     remote sfstruggle_count %self.id%
     remote wants_sfstruggle %self.id%
   end
+  if %arg% == free || %arg% == all
+    set sffree_count 0
+    set wants_sffree 0
+    remote sffree_count %self.id%
+    remote wants_sffree %self.id%
+  end
 elseif %mode% == setup
   * Prepare for a response
-  * usage: skyfight setup <dodge | interrupt | struggle> <all | player>
+  * usage: skyfight setup <dodge | interrupt | struggle | free> <all | player>
   set difficulty %self.var(difficulty,1)%
   set type %arg.car%
   set arg %arg.cdr%
@@ -1273,11 +1284,11 @@ elseif %mode% == setup
 end
 ~
 #11822
-Skycleave: Dodge, Interrupt commands for fights~
+Skycleave: Dodge, Interrupt, Free commands for fights~
 0 c 0
-dodge interrupt~
+dodge interrupt free~
 * Also requires trigger 11821
-* handles dodge, interrupt
+* handles dodge, interrupt, free
 return 1
 if dodge /= %cmd%
   set type dodge
@@ -1289,12 +1300,27 @@ elseif interrupt /= %cmd%
   end
   set type interrupt
   set past interrupted
+elseif free /= %cmd%
+  set type free
+  set past freed
+  * target?
+  set targ %actor.char_target(%arg.car%)%
+  if !%targ%
+    %send% %actor% Free whom?
+    halt
+  elseif %targ% == %actor%
+    %send% %actor% You can't free yourself.
+    halt
+  elseif !%targ.var(needs_sffree,0)% || %targ.var(did_sffree,0)%
+    %send% %actor% &%targ% doesn't need to be freed.
+    halt
+  end
 else
   return 0
   halt
 end
 * check things that prevent it
-if %actor.var(did_sf%type%,0)%
+if %actor.var(did_sf%type%,0)% && %type% != free
   %send% %actor% You already %past%.
   halt
 elseif %actor.disabled%
@@ -1318,9 +1344,9 @@ end
 * setup
 set no_need 0
 * does the actor even need it
-if !%actor.var(needs_sf%type%,0)%
+if !%actor.var(needs_sf%type%,0)% && %type% != free
   set no_need 1
-elseif !%self.var(wants_sf%type%,0)%
+elseif !%self.var(wants_sf%type%,0)% && %type% != free
   * see if this mob needs it, or see if someone else here does
   * not me...
   set ch %self.room.people%
@@ -1359,7 +1385,11 @@ end
 * success
 nop %actor.command_lag(COMBAT-ABILITY)%
 set did_sf%type% 1
-remote did_sf%type% %actor.id%
+if %type% == free
+  remote did_sf%type% %targ.id%
+else
+  remote did_sf%type% %actor.id%
+end
 eval sf%type%_count %self.var(sf%type%_count,0)% + 1
 remote sf%type%_count %self.id%
 if %type% == dodge
@@ -1368,6 +1398,10 @@ if %type% == dodge
 elseif %type% == interrupt
   %send% %actor% You prepare to interrupt ~%self%...
   %echoaround% %actor% ~%actor% prepares to interrupt ~%self%...
+elseif %type% == free
+  %send% %actor% You free ~%targ%!
+  %echoaround% %actor% ~%actor% frees ~%targ%!
+  dg_affect #11888 %targ% off
 end
 ~
 #11823
@@ -3289,18 +3323,18 @@ if !%moves_left% || !%num_left%
 end
 * pick
 eval which %%random.%num_left%%%
-set old_list %moves_left%
+set old %moves_left%
 set moves_left
 set move 0
 while %which% > 0
-  set move %old_list.car%
+  set move %old.car%
   if %which% != 1
     set moves_left %moves_left% %move%
   end
-  set old_list %old_list.cdr%
+  set old %old.cdr%
   eval which %which% - 1
 done
-set moves_left %moves_left% %old_list%
+set moves_left %moves_left% %old%
 * store
 eval num_left %num_left% - 1
 remote moves_left %self.id%
@@ -3356,12 +3390,12 @@ if %move% == 1
     %echoaround% %target% &&m%old_shortdesc% is suddenly transformed into ~%target%!&&0
     %send% %target% &&m\*\* You are suddenly transformed into %target.name%! \*\*&&0 (fastmorph normal)
     if %self.difficulty% == 4 && (%self.level% + 100) > %target.level%
-      dg_affect #11867 %target% STUNNED on 5
+      dg_affect #11851 %target% STUNNED on 5
     elseif %self.difficulty% >= 2
       nop %target.command_lag(ABILITY)%
     end
   elseif %fail% == 2 || %self.difficulty% == 1
-    dg_affect #11851 %self% HARD-STUNNED on 10
+    dg_affect #11852 %self% HARD-STUNNED on 10
   end
   skyfight clear dodge
 elseif %move% == 2
@@ -3391,7 +3425,7 @@ elseif %move% == 2
       eval amount 60 / %self.difficulty%
       %damage% %self% %amount% magical
       if %self.difficulty% == 1
-        dg_affect #11851 %self% HARD-STUNNED on 10
+        dg_affect #11852 %self% HARD-STUNNED on 10
       end
     else
       set ch %self.room.people%
@@ -3447,7 +3481,7 @@ elseif %move% == 3
         set any 1
         %echo% &&mThe rosy pink light strikes ~%ch% in the chest and streams right through *%ch%!&&0
         if %self.difficulty% == 4 && (%self.level% + 100) > %ch.level%
-          dg_affect #11867 %ch% STUNNED on 10
+          dg_affect #11851 %ch% STUNNED on 10
         end
         if %self.difficulty% >= 3
           dg_affect #11857 %ch% SLOW on 20
@@ -3463,7 +3497,7 @@ elseif %move% == 3
   if !%any%
     %echo% &&mThe rosy pink light of the belt of Venus swirls back and hits Mezvienne herself!&&0
     if %difficulty% == 1
-      dg_affect #11851 %self% HARD-STUNNED on 10
+      dg_affect #11852 %self% HARD-STUNNED on 10
     else
       eval amount 100 - (%self.difficulty% * 20)
       dg_affect #11854 %self% DODGE -%amount% 10

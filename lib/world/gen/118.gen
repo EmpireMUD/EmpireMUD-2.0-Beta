@@ -188,6 +188,13 @@ You are no longer stunned.~
 T5
 ...$e seems stunned!~
 S
+#11852
+boss stunned~
+4 0
+0 0 0 0
+T5
+...$e's stunned -- now is the time to strike!~
+S
 #11853
 chain lightning~
 4 0
@@ -280,6 +287,15 @@ T0
 pure morning dew~
 T1
 crystal clear~
+S
+#11888
+trapped in a jar~
+4 0
+0 0 0 0
+T4
+$e is trapped in a jar -- free $m!~
+T5
+...$e is trapped in a jar -- free $m!~
 S
 #11891
 crystallized sap~
