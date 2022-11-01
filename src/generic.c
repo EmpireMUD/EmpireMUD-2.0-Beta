@@ -343,7 +343,20 @@ bool audit_generic(generic_data *gen, char_data *ch) {
 			}
 			break;
 		}
-		case GENERIC_AFFECT:
+		case GENERIC_AFFECT: {
+			if (GET_AFFECT_LOOK_AT_ROOM(gen)) {
+				// only if present...
+				if (strncmp(GET_AFFECT_LOOK_AT_ROOM(gen), "...", 3)) {
+					olc_audit_msg(ch, GEN_VNUM(gen), "Look-at-room string does not begin with '...'");
+					problem = TRUE;
+				}
+				else if (!strncmp(GET_AFFECT_LOOK_AT_ROOM(gen), "... ", 4)) {
+					olc_audit_msg(ch, GEN_VNUM(gen), "Look-at-room should not have a space after the '...'");
+					problem = TRUE;
+				}
+			}
+			break;
+		}
 		case GENERIC_COOLDOWN: {
 			// everything here is optional
 			break;
