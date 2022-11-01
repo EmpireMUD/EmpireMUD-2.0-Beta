@@ -250,6 +250,7 @@ int wordcount_generic(generic_data *gen) {
 */
 bool audit_generic(generic_data *gen, char_data *ch) {
 	struct generic_relation *rel, *next_rel;
+	char temp[MAX_STRING_LENGTH];
 	bool problem = FALSE;
 	generic_data *alt;
 	obj_data *proto;
@@ -345,12 +346,13 @@ bool audit_generic(generic_data *gen, char_data *ch) {
 		}
 		case GENERIC_AFFECT: {
 			if (GET_AFFECT_LOOK_AT_ROOM(gen)) {
+				strcpy(temp, GET_AFFECT_LOOK_AT_ROOM(gen));
 				// only if present...
-				if (strncmp(NULLSAFE(GET_AFFECT_LOOK_AT_ROOM(gen)), "...", 3)) {
+				if (strncmp(temp, "...", 3)) {
 					olc_audit_msg(ch, GEN_VNUM(gen), "Look-at-room string does not begin with '...'");
 					problem = TRUE;
 				}
-				else if (!strncmp(NULLSAFE(GET_AFFECT_LOOK_AT_ROOM(gen)), "... ", 4)) {
+				else if (!strncmp(temp, "... ", 4)) {
 					olc_audit_msg(ch, GEN_VNUM(gen), "Look-at-room should not have a space after the '...'");
 					problem = TRUE;
 				}
