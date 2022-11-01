@@ -1191,37 +1191,37 @@ if %mode% == clear
   set ch %self.room.people%
   while %ch%
     if %arg% == dodge || %arg% == all
-      rdelete did_skyfight_dodge %ch.id%
-      rdelete needs_skyfight_dodge %ch.id%
+      rdelete did_sfdodge %ch.id%
+      rdelete needs_sfdodge %ch.id%
     end
     if %arg% == interrupt || %arg% == all
-      rdelete did_skyfight_interrupt %ch.id%
-      rdelete needs_skyfight_interrupt %ch.id%
+      rdelete did_sfinterrupt %ch.id%
+      rdelete needs_sfinterrupt %ch.id%
     end
     if %arg% == struggle || %arg% == all
       dg_affect #11822 %ch% off
-      rdelete did_skyfight_struggle %ch.id%
-      rdelete needs_skyfight_struggle %ch.id%
+      rdelete did_sfstruggle %ch.id%
+      rdelete needs_sfstruggle %ch.id%
     end
     set ch %ch.next_in_room%
   done
   if %arg% == dodge || %arg% == all
-    set skyfight_dodge_count 0
-    set wants_skyfight_dodge 0
-    remote skyfight_dodge_count %self.id%
-    remote wants_skyfight_dodge %self.id%
+    set sfdodge_count 0
+    set wants_sfdodge 0
+    remote sfdodge_count %self.id%
+    remote wants_sfdodge %self.id%
   end
   if %arg% == interrupt || %arg% == all
-    set skyfight_interrupt_count 0
-    set wants_skyfight_interrupt 0
-    remote skyfight_interrupt_count %self.id%
-    remote wants_skyfight_interrupt %self.id%
+    set sfinterrupt_count 0
+    set wants_sfinterrupt 0
+    remote sfinterrupt_count %self.id%
+    remote wants_sfinterrupt %self.id%
   end
   if %arg% == struggle || %arg% == all
-    set skyfight_struggle_count 0
-    set wants_skyfight_struggle 0
-    remote skyfight_struggle_count %self.id%
-    remote wants_skyfight_struggle %self.id%
+    set sfstruggle_count 0
+    set wants_sfstruggle 0
+    remote sfstruggle_count %self.id%
+    remote wants_sfstruggle %self.id%
   end
 elseif %mode% == setup
   * Prepare for a response
@@ -1232,12 +1232,12 @@ elseif %mode% == setup
   set target %arg.car%
   set value %arg.cdr%
   * self vars
-  set wants_varname wants_skyfight_%type%
+  set wants_varname wants_sf%type%
   set %wants_varname% 1
   remote %wants_varname% %self.id%
   * target vars
-  set needs_varname needs_skyfight_%type%
-  set did_varname did_skyfight_%type%
+  set needs_varname needs_sf%type%
+  set did_varname did_sf%type%
   if %target% == all
     set all 1
     set ch %self.room.people%
@@ -1294,7 +1294,7 @@ else
   halt
 end
 * check things that prevent it
-if %actor.var(did_skyfight_%type%,0)%
+if %actor.var(did_sf%type%,0)%
   %send% %actor% You already %past%.
   halt
 elseif %actor.disabled%
@@ -1318,15 +1318,15 @@ end
 * setup
 set no_need 0
 * does the actor even need it
-if !%actor.var(needs_skyfight_%type%,0)%
+if !%actor.var(needs_sf%type%,0)%
   set no_need 1
-elseif !%self.var(wants_skyfight_%type%,0)%
+elseif !%self.var(wants_sf%type%,0)%
   * see if this mob needs it, or see if someone else here does
   * not me...
   set ch %self.room.people%
   set any 0
   while %ch% && !%any%
-    if %ch.var(wants_skyfight_%type%,0)%
+    if %ch.var(wants_sf%type%,0)%
       set any 1
     end
     set ch %ch.next_in_room%
@@ -1342,7 +1342,7 @@ end
 * failure?
 if %no_need%
   * ensure no var
-  rdelete needs_skyfight_%type% %actor.id%
+  rdelete needs_sf%type% %actor.id%
   eval penalty %self.level% * %self.difficulty% / 20
   * messaging
   if %type% == dodge
@@ -1358,10 +1358,10 @@ if %no_need%
 end
 * success
 nop %actor.command_lag(COMBAT-ABILITY)%
-set did_skyfight_%type% 1
-remote did_skyfight_%type% %actor.id%
-eval skyfight_%type%_count %self.var(skyfight_%type%_count,0)% + 1
-remote skyfight_%type%_count %self.id%
+set did_sf%type% 1
+remote did_sf%type% %actor.id%
+eval sf%type%_count %self.var(sf%type%_count,0)% + 1
+remote sf%type%_count %self.id%
 if %type% == dodge
   %send% %actor% You leap out of the way!
   %echoaround% %actor% ~%actor% leaps out of the way!
@@ -3280,15 +3280,15 @@ Skycleave: Mezvienne the Enchantress fight~
 if %self.cooldown(11800)% || %self.disabled%
   halt
 end
-* move order
+* order
 set moves_left %self.var(moves_left)%
-set num_moves_left %self.var(num_moves_left,0)%
-if !%moves_left% || !%num_moves_left%
+set num_left %self.var(num_left,0)%
+if !%moves_left% || !%num_left%
   set moves_left 1 2 3 4
-  set num_moves_left 4
+  set num_left 4
 end
 * pick
-eval which %%random.%num_moves_left%%%
+eval which %%random.%num_left%%%
 set old_list %moves_left%
 set moves_left
 set move 0
@@ -3302,9 +3302,9 @@ while %which% > 0
 done
 set moves_left %moves_left% %old_list%
 * store
-eval num_moves_left %num_moves_left% - 1
+eval num_left %num_left% - 1
 remote moves_left %self.id%
-remote num_moves_left %self.id%
+remote num_left %self.id%
 * perform move
 nop %self.set_cooldown(11800, 30)%
 if %move% == 1
@@ -3335,7 +3335,7 @@ if %move% == 1
     if !%target% || %target.id% != %target_id%
       * lost target
       set fail 1
-    elseif %target.did_skyfight_dodge%
+    elseif %target.did_sfdodge%
       set fail 1
       %echo% &&mThe green scatters into the distance as Mezvienne's spell misses.&&0
       if %self.difficulty% == 1
@@ -3378,11 +3378,11 @@ elseif %move% == 2
   set broke 0
   while !%broke% && %cycle% < 5
     wait 4 s
-    if %self.skyfight_interrupt_count% >= 1 && %self.skyfight_interrupt_count% >= %self.difficulty% / 2
+    if %self.sfinterrupt_count% >= 1 && %self.sfinterrupt_count% >= %self.difficulty% / 2
       set broke 1
       set ch %self.room.people%
       while %ch%
-        if %ch.var(did_skyfight_interrupt,0)%
+        if %ch.var(did_sfinterrupt,0)%
           %send% %ch% &&mYou trick the enchantress into shining the light at the fountain...&&0
         end
         set ch %ch.next_in_room%
@@ -3403,8 +3403,8 @@ elseif %move% == 2
             set skip_%ch.id% 1
             %send% %ch% &&mA shield forms in front of you as you masterfully counterspell the blinding light of dawn!&&0
             %echoaround% %ch% &&mA shield forms in front of ~%ch% as &%ch% masterfully counterspells the blinding light!&&0
-            eval skyfight_interrupt_count %self.var(skyfight_interrupt_count,0)% + 1
-            remote skyfight_interrupt_count %self.id%
+            eval sfinterrupt_count %self.var(sfinterrupt_count,0)% + 1
+            remote sfinterrupt_count %self.id%
           else
             * hit and no counterspell
             %send% %ch% &&mThe blinding light of dawn burns you!&&0
@@ -3439,7 +3439,7 @@ elseif %move% == 3
   while %ch%
     set next_ch %ch.next_in_room%
     if %self.is_enemy(%ch%)%
-      if %ch.did_skyfight_dodge%
+      if %ch.did_sfdodge%
         if %self.difficulty% == 1
           dg_affect #11856 %ch% TO-HIT 25 20
         end

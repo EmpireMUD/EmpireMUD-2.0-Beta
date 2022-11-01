@@ -4995,7 +4995,7 @@ switch %phase%
     %echo% Debug: End dodge wait
     set ch %self.room.people%
     while %ch%
-      %echo% - ~%ch%: %ch.var(did_skyfight_dodge,0)%/%ch.var(needs_skyfight_dodge,0)%
+      %echo% - ~%ch%: %ch.var(did_sfdodge,0)%/%ch.var(needs_sfdodge,0)%
       set ch %ch.next_in_room%
     done
   break
@@ -5011,7 +5011,7 @@ switch %phase%
     if !%targ% || %targ.id% != %targ_id%
       %echo% - target is gone
     else
-      %echo% - ~%targ%: %targ.var(did_skyfight_dodge,0)%/%targ.var(needs_skyfight_dodge,0)%
+      %echo% - ~%targ%: %targ.var(did_sfdodge,0)%/%targ.var(needs_sfdodge,0)%
     end
   break
   case 3
@@ -5019,10 +5019,10 @@ switch %phase%
     skyfight setup interrupt all
     %echo% Debug: Begin interrupt wait...
     wait 10 s
-    %echo% Debug: End interrupt wait: %self.var(skyfight_interrupt_count,0)% interrupts
+    %echo% Debug: End interrupt wait: %self.var(sfinterrupt_count,0)% interrupts
     set ch %self.room.people%
     while %ch%
-      %echo% - ~%ch%: %ch.var(did_skyfight_interrupt,0)%/%ch.var(needs_skyfight_interrupt,0)%
+      %echo% - ~%ch%: %ch.var(did_sfinterrupt,0)%/%ch.var(needs_sfinterrupt,0)%
       set ch %ch.next_in_room%
     done
   break
