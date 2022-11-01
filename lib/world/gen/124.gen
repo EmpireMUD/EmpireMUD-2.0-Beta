@@ -55,6 +55,8 @@ pocket sand~
 0 0 0 0
 T0
 You are no longer blinded by pocket sand.~
+T5
+...$e's trying to get sand out of $s eyes!~
 S
 #12422
 parrot attack~
@@ -64,6 +66,8 @@ T0
 You stop covering your eyes as the parrot flies away.~
 T1
 $n stops covering $s eyes as the parrot flies away.~
+T5
+...$e is covering $s eyes!~
 S
 #12423
 parrot attack~
@@ -113,6 +117,8 @@ T0
 You are no longer held in a crushing grip.~
 T1
 $n is no longer held in a crushing grip.~
+T5
+...$e is held in a crushing grip!~
 S
 #12431
 struggle~

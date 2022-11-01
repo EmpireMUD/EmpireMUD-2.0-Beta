@@ -45,6 +45,8 @@ Blacktower waterwalking~
 0 0 0 0
 T0
 You feel your waterwalking phial fade.~
+T4
+You notice $s feet have a faint purple mist coming off of them.~
 S
 #11921
 Violet Tea~
@@ -61,6 +63,8 @@ Blacktower sight~
 0 0 0 0
 T0
 Everything seems to dim as your perfect sight phial wears off.~
+T4
+$s eyes have a faint purple glow in the middle.~
 S
 #11925
 Blacktower burdens~
@@ -68,6 +72,8 @@ Blacktower burdens~
 0 0 0 0
 T0
 You feel your lighter burdens phial wear off and things seem heavier again.~
+T4
+Some of $s items just seem to be floating around $m.~
 S
 #11926
 Skycleaver Tea~
@@ -122,6 +128,8 @@ drowsy~
 0 0 0 0
 T0
 You're no longer drowsy.~
+T5
+...$e looks really drowsy.~
 S
 #11961
 crystalline dew~

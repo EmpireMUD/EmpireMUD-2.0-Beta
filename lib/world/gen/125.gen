@@ -23,6 +23,8 @@ lightning punch~
 0 0 0 0
 T0
 You are no longer affected by the colossus's lightning punch.~
+T5
+...$e seems stunned by the lightning punch.~
 S
 #12506
 rending strike~
@@ -44,6 +46,8 @@ mighty boot~
 0 0 0 0
 T0
 You recover from the colossus's mighty boot.~
+T5
+...$e seems dazed.~
 S
 #12510
 clockwork magpie whistle~
@@ -58,5 +62,7 @@ colossal beam~
 0 0 0 0
 T0
 You recover from the effects of the colossal beam.~
+T5
+...$e is stumbling around, blind!~
 S
 $

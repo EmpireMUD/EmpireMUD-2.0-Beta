@@ -20,6 +20,8 @@ pestle smash~
 0 0 0 0
 T0
 You are no longer stunned by the pestle smash.~
+T5
+...$e is stunned!~
 S
 #19003
 phantom wounds~
@@ -34,6 +36,8 @@ insect swarm~
 0 0 0 0
 T0
 You are no longer blinded by the insect swarm.~
+T5
+...$e is blinded by the insect swarm!~
 S
 #19007
 swamp rat whistle~
@@ -50,6 +54,8 @@ T0
 The swamp hag's bindings fade away.~
 T1
 $n is no longer bound.~
+T5
+...$e is struggling to break free of the tendrils!~
 S
 #19010
 struggle~

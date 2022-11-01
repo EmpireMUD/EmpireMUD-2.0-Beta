@@ -20,6 +20,10 @@ perfect freeze~
 0 0 0 0
 T0
 You are no longer frozen.~
+T4
+$e is frozen solid!~
+T5
+...$e is frozen solid!~
 S
 #10553
 comet~
@@ -27,6 +31,8 @@ comet~
 0 0 0 0
 T0
 You are no longer stunned by the comet impact.~
+T5
+...$e is stunned by the comet!~
 S
 #10554
 blizzard~
@@ -41,6 +47,8 @@ icy burial~
 0 0 0 0
 T0
 You manage to dig yourself out of the snowdrift.~
+T5
+...$e is buried in the snowdrift!~
 S
 #10556
 freezing touch~

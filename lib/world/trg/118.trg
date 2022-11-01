@@ -3280,15 +3280,14 @@ Skycleave: Mezvienne the Enchantress fight~
 if %self.cooldown(11800)% || %self.disabled%
   halt
 end
-* check move order
+* move order
 set moves_left %self.var(moves_left)%
 set num_moves_left %self.var(num_moves_left,0)%
 if !%moves_left% || !%num_moves_left%
-  * will do moves randomly from this set then repeat
   set moves_left 1 2 3 4
   set num_moves_left 4
 end
-* pick a move
+* pick
 eval which %%random.%num_moves_left%%%
 set old_list %moves_left%
 set moves_left
@@ -3302,14 +3301,14 @@ while %which% > 0
   eval which %which% - 1
 done
 set moves_left %moves_left% %old_list%
-* store vars back
+* store
 eval num_moves_left %num_moves_left% - 1
 remote moves_left %self.id%
 remote num_moves_left %self.id%
 * perform move
 nop %self.set_cooldown(11800, 30)%
 if %move% == 1
-  * Baleful Polymorph: Warthog
+  * Baleful Polymorph
   skyfight clear dodge
   set target %random.enemy%
   if !%target%
@@ -3329,7 +3328,7 @@ if %move% == 1
   set target_id %target.id%
   set fail 0
   if %self.difficulty% <= 2
-    %send% %target% &&m~%self% waves her hands... An eerie green light casts out toward you... (dodge)&&0
+    %send% %target% &&m\*\* ~%self% waves her hands... An eerie green light casts out toward you... \*\*&&0 (dodge)
     %echoaround% %target% &&m~%self% waves her hands... An eerie green light casts out toward ~%target%...&&0
     skyfight setup dodge %target%
     wait 10 s
@@ -3355,7 +3354,7 @@ if %move% == 1
     set old_shortdesc %target.name%
     %morph% %target% %vnum%
     %echoaround% %target% &&m%old_shortdesc% is suddenly transformed into ~%target%!&&0
-    %send% %target% &&mYou are suddenly transformed into %target.name%! (fastmorph normal)&&0
+    %send% %target% &&m\*\* You are suddenly transformed into %target.name%! \*\*&&0 (fastmorph normal)
     if %self.difficulty% == 4 && (%self.level% + 100) > %target.level%
       dg_affect #11867 %target% STUNNED on 5
     elseif %self.difficulty% >= 2
@@ -3367,8 +3366,8 @@ if %move% == 1
   skyfight clear dodge
 elseif %move% == 2
   * Blinding Light of Dawn
-  %echo% &&m~%self% flies up any begins channeling the dawn...&&0
-  %echo% &&mA bright light erupts from the sky, swirling past Mezvienne... (interrupt)&&0
+  %echo% &&m~%self% flies up and begins channeling the dawn...&&0
+  %echo% &&m\*\* A bright light erupts from the sky, swirling past Mezvienne... \*\*&&0 (interrupt)
   if %self.difficulty% == 1
     * normal: prevent her attack
     nop %self.add_mob_flag(NO-ATTACK)%
@@ -3433,7 +3432,7 @@ elseif %move% == 3
   end
   skyfight setup dodge all
   wait 1 s
-  %echo% &&mThe ribbon of rosy pink light streams toward you... (dodge)&&0
+  %echo% &&m\*\* The ribbon of rosy pink light streams toward you... \*\*&&0 (dodge)
   wait 10 s
   set ch %self.room.people%
   set any 0
@@ -3479,7 +3478,7 @@ elseif %move% == 4
     nop %self.add_mob_flag(NO-ATTACK)%
   end
   wait 3 sec
-  %echo% &&mYou are gripped by a dark fate! (struggle)&&0
+  %echo% &&m\*\* You are gripped by a dark fate! \*\*&&0 (struggle)
   skyfight setup struggle all 20
   set ch %self.room.people%
   while %ch%
@@ -3505,6 +3504,7 @@ elseif %move% == 4
       while %ch%
         set next_ch %ch.next_in_room%
         if %ch.affect(11822)%
+          %send% %ch% &&m\*\* You burn from the inside out as you face your dark fate! \*\*&&0 (struggle)
           eval amount %self.difficulty% * 15
           %damage% %ch% %amount% magical
         end
@@ -3517,7 +3517,7 @@ elseif %move% == 4
     wait 10 s
   end
 end
-* cleanup: in case
+* in case
 nop %self.remove_mob_flag(NO-ATTACK)%
 ~
 #11856
@@ -5556,6 +5556,7 @@ if %struggle_counter% >= %needed%
   %echoaround% %actor% %room_msg.process%
   set did_skycleave_struggle 1
   remote did_skycleave_struggle %self.id%
+  nop %actor.command_lag(COMBAT-ABILITY)%
   dg_affect #11822 %actor% off
   %purge% %self%
 else
@@ -5564,6 +5565,7 @@ else
   %send% %actor% %char_msg.process%
   set room_msg %self.var(struggle_room,~%actor% struggles, trying to break free...)%
   %echoaround% %actor% %room_msg.process%
+  nop %actor.command_lag(COMBAT-ABILITY)%
   remote struggle_counter %self.id%
 end
 ~

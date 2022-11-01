@@ -28,6 +28,8 @@ prone~
 0 0 0 0
 T0
 You get up.~
+T5
+...$e is lying prone on the ground.~
 S
 #11815
 disarmed~
@@ -35,6 +37,8 @@ disarmed~
 0 0 0 0
 T0
 You recover your weapon.~
+T5
+...$e has lost $s weapon!~
 S
 #11816
 ankle stab~
@@ -42,6 +46,8 @@ ankle stab~
 0 0 0 0
 T0
 You recover from your leg wound.~
+T4
+$e is bleeding from $s ankle.~
 S
 #11817
 embiggened~
@@ -61,6 +67,8 @@ S
 spellcasting~
 4 0
 0 0 0 0
+T5
+...$e is casting a spell -- this is your time to strike!~
 S
 #11820
 miniaturized~
@@ -86,6 +94,8 @@ struggling~
 0 0 0 0
 T0
 You're finally free!~
+T5
+...$e is struggling to get free!~
 S
 #11823
 blinding bomb~
@@ -93,6 +103,8 @@ blinding bomb~
 0 0 0 0
 T0
 You can see again.~
+T5
+...$e has been blinded by the bomb!~
 S
 #11824
 blinding bomb~
@@ -100,6 +112,8 @@ blinding bomb~
 0 0 0 0
 T0
 You are no longer stunned by the blinding bomb.~
+T5
+...$e seems stunned!~
 S
 #11832
 conditional visibility~
@@ -112,6 +126,8 @@ blind~
 0 0 0 0
 T0
 You can see again.~
+T5
+...$e is stumbling around blindly!~
 S
 #11842
 bleeding~
@@ -119,6 +135,10 @@ bleeding~
 0 0 0 0
 T0
 You are no longer bleeding.~
+T4
+$e is bleeding badly!~
+T5
+...$e is bleeding badly!~
 S
 #11843
 flame brand~
@@ -128,6 +148,10 @@ T0
 The flame brand on your arm burns out.~
 T1
 The flaming brand on $n's arm burns out.~
+T4
+$s arm is on fire!~
+T5
+...$s arm is on fire!~
 S
 #11844
 enchanted weapon~
@@ -138,6 +162,8 @@ S
 weapon sheathed~
 4 0
 0 0 0 0
+T5
+...$e is focused on a big attack -- this is your chance to strike!~
 S
 #11848
 poisoned~
@@ -159,6 +185,8 @@ stunned~
 0 0 0 0
 T0
 You are no longer stunned.~
+T5
+...$e seems stunned!~
 S
 #11853
 chain lightning~
@@ -202,11 +230,15 @@ complete darkness~
 0 0 0 0
 T0
 You can see again!~
+T5
+...$e is swinging wildly, unable to see!~
 S
 #11861
 pinned shadow~
 4 0
 0 0 0 0
+T5
+...$s shadow is pinned to the ground!~
 S
 #11865
 flying~
@@ -216,6 +248,8 @@ T0
 Your flying wears off.~
 T1
 $n stops flying.~
+T5
+...$e is flying on winged boots!~
 S
 #11866
 magic sword~
