@@ -84,7 +84,7 @@ end
 return 0
 ~
 #11803
-Can't get close enough to pickpocket~
+Skycleave: Custom pickpocket rejection~
 0 p 100
 ~
 if %ability% != 142
@@ -93,6 +93,12 @@ if %ability% != 142
   halt
 end
 switch %self.vnum%
+  case 11833
+  case 11838
+  case 11938
+    * shimmer and spirits
+    %send% %actor% You can't pickpocket someone who doesn't even have a body.
+  break
   case 11866
   case 11871
     * Mezvienne
@@ -3253,17 +3259,87 @@ end
 #11851
 Skycleave: Shared mob speech trigger~
 0 d 1
-zenith~
+zenith Maureen Eloise Heather Alastair Marina John Wright Dylane Ametnik Boghylda~
 switch %self.vnum%
-  case 11825
-    case 11925
-      * Ravinders
-      if %speech% ~= zenith
-        wait 1
-        emote $n winces.
+  case 11902
+    * bucket
+    if %speech% ~= Maureen
+      wait 1
+      %echo% You hear a soft sobbing sound as the bucket slowly refills.
+    end
+  break
+  case 11903
+    * sponge
+    if %speech% ~= Eloise
+      wait 1
+      %echo% The sponge seems to sob for a moment, then squeezes itself out.
+    end
+  break
+  case 11921
+    * broom
+    if %speech% ~= Heather
+      wait 1
+      %echo% The broom drops a little and makes a sniffling noise.
+    end
+  break
+  case 11922
+    * duster
+      wait 1
+    if %speech% ~= Alastair
+      %echo% The feather duster makes a sobbing noise but then shakes itself out and goes back to cleaning.
+    elseif %speech% ~= Marina
+      %echo% The feather duster sounds like it's crying as it slowly cleans around you.
+    end
+  break
+  case 11926
+    * sponge wrangler
+    if %speech% ~= John || %speech% ~= Wright
+      wait 1
+      %echo% The sponge sits in one of the cages and grumbles.
+    end
+  break
+  case 11933
+    * mop
+    if %speech% ~= Dylane
+      wait 1
+      if %actor.room% == %self.room%
+        %send% %actor% The mop marches over to you.
+        %echoaround% %actor% The mop marches over to ~%actor%.
+        if %actor.on_quest(11801)%
+          %quest% %actor% trigger 11801
+        end
       end
-    break
-  done
+    end
+  break
+  case 11960
+    * filing cabinet
+    if %speech% ~= Ametnik
+      wait 1
+      if %actor.room% == %self.room%
+        %send% %actor% The filing cabient turns toward you.
+        %echoaround% %actor% The filing cabinet turns toward ~%actor%.
+      end
+    end
+  break
+  case 11961
+    * bookshelf
+    if %speech% ~= Boghylda
+      wait 1
+      if %actor.room% == %self.room%
+        %send% %actor% The bookshelf waddles over to you.
+        %echoaround% %actor% The bookshelf waddles over to ~%actor%.
+      end
+    end
+  break
+  case 11825
+  case 11925
+    * Ravinders
+    if %speech% ~= zenith
+      wait 1
+      emote $n winces.
+    end
+  break
+done
 ~
 #11852
 Single-try pickpocket~
@@ -3371,7 +3447,7 @@ if %move% == 1
       set fail 1
     elseif %target.did_sfdodge%
       set fail 1
-      %echo% &&mThe green scatters into the distance as Mezvienne's spell misses.&&0
+      %echo% &&mThe green light scatters into the distance as Mezvienne's spell misses.&&0
       if %self.difficulty% == 1
         dg_affect #11856 %ch% TO-HIT 25 20
       end

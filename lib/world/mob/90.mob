@@ -489,14 +489,14 @@ T 9117
 T 9121
 S
 #9024
-pigeon grey~
+pigeon gray grey~
 a pigeon~
-A grey pigeon is pecking near your feet.
+A gray pigeon is pecking near your feet.
 ~
 1 5 djo m 1
 0 0 2 9
 D
-   The pigeon is fat from eating every crumb dropped by the villagers.
+The pigeon is fat from eating every crumb dropped by the villagers.
 ~
 I 0 3200 100.00 1  # BUTCHER: cut of poultry
 I 0 9025 75.00 1  # BUTCHER: bird feathers

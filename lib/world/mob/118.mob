@@ -190,7 +190,7 @@ I 12 11877 3.00 1 p  # PICKPOCKET: little gemstone flute
 I 12 11878 4.00 1 p  # PICKPOCKET: gemstone knife
 I 12 11977 6.00 1 p  # PICKPOCKET: steamed mussels
 I 12 1206 5.00 1 p  # PICKPOCKET: iridescent blue iris
-I 12 11879 4.00 1 p  # PICKPOCKET: glowing sapphire bud
+I 12 11879 4.00 1 p  # PICKPOCKET: glowing emerald bud
 I 12 11880 4.00 1 p  # PICKPOCKET: ruby rock candy
 I 12 11895 4.00 1 p  # PICKPOCKET: iridescent pearl
 I 12 11897 4.00 1 p  # PICKPOCKET: good rock
@@ -1207,6 +1207,7 @@ watching them.
 ~
 F 11800
 T 11810
+T 11803
 S
 #11834
 otherworlder person tall blue~
@@ -1338,6 +1339,7 @@ F 11800
 T 11838
 T 11810
 T 11837
+T 11803
 S
 #11839
 Annelise~
@@ -2512,7 +2514,7 @@ instead of stars, it is dotted with bits of dust and the dried crumbs of many
 meals. Moneryl's triangular silver cape, however, is as stiff and perfect as
 everyone else's.
 ~
-I 12 11879 100.00 1  # PICKPOCKET: glowing sapphire bud
+I 12 11879 100.00 1  # PICKPOCKET: glowing emerald bud
 T 11810
 T 11852
 S
@@ -2675,7 +2677,7 @@ triangular cape on her back, adorned with patterns of silver and yellow, stays
 perfectly still as she moves with the elegance of a trained dancer. She gives
 you a crooked smile as you pass her.
 ~
-I 12 11879 100.00 1  # PICKPOCKET: glowing sapphire bud
+I 12 11879 100.00 1  # PICKPOCKET: glowing emerald bud
 T 11810
 T 11852
 S
@@ -2815,7 +2817,7 @@ blue under the triangular silver and yellow cape of Smol Nes-Pik. She kneels by
 each pool in turn, touching the surface with her long, delicate fingers,
 swirling it around, then touching her fingers to her closed lips.
 ~
-I 12 11879 100.00 1  # PICKPOCKET: glowing sapphire bud
+I 12 11879 100.00 1  # PICKPOCKET: glowing emerald bud
 T 11810
 T 11852
 S
@@ -3027,7 +3029,7 @@ T 11806
 T 11852
 S
 #11893
-fox gray~
+fox gray grey~
 a gray fox~
 A gray fox is sitting on the ground.
 ~
@@ -3069,6 +3071,7 @@ $n chases its tail in a circle.~
 M
 0
 $n rolls around on the ground.~
+T 11985
 S
 #11894
 progress sense phase changer~

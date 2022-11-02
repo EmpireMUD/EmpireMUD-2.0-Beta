@@ -3257,18 +3257,18 @@ switch %cycle%
     * done: teleport the character
     set target %instance.nearest_rmt(11888)%
     %teleport% %person% %target%
+    dg_affect #11891 %person% off
     %force% %person% look
     %echoaround% %person% ~%person% emerges from the putrid sap.
-    dg_affect #11891 %person% off
     * Teleport followers
     set ch %self.room.people%
     while %ch%
       set next_ch %ch.next_in_room%
       if %ch.is_npc% && %ch.leader% == %person% && !%ch.fighting% && !%ch.disabled%
         %teleport% %ch% %target%
+        dg_affect #11891 %ch% off
         %force% %ch% look
         %echoaround% %ch% ~%ch% emerges from the putrid sap.
-        dg_affect #11891 %ch% off
       end
       set ch %next_ch%
     done
@@ -5050,11 +5050,11 @@ if %move% == 1
   end
   dg_affect #11852 %self% off
 elseif %move% == 2
-  * 
+  *
 elseif %move% == 3
-  * 
+  *
 elseif %move% == 4
-  * 
+  *
 end
 * in case
 nop %self.remove_mob_flag(NO-ATTACK)%
@@ -5064,6 +5064,57 @@ Elemental Plane of Water: First Water fight~
 0 k 100
 ~
 * tba
+~
+#11985
+Gray fox pet behavior~
+0 bt 25
+~
+set list 11893 11946 11947 11977
+set room %self.room%
+set ch %room.people%
+set any 0
+while %ch% && !%any%
+  if %ch% != %self% && %ch.is_npc% && %list% ~= %ch.vnum%
+    set any 1
+    switch %random.9%
+      case 1
+        %echo% One of the foxes yips and plays with the other one.
+      break
+      case 2
+        %echo% One of the foxes sniffs at the other.
+      break
+      case 3
+        %echo% One of the foxes chases the other one in a little circle.
+      break
+      case 4
+        %echo% The two foxes roll around on the ground.
+      break
+      case 5
+        %echo% One fox bites the other one on the tail.
+      break
+      case 6
+        %echo% The foxes tumble around, playing.
+      break
+      case 7
+        %echo% One of the foxes sneaks up on the other one, who leaps into the air!
+      break
+      case 8
+        %echo% A fox nips at the other one.
+      break
+      case 9
+        %echo% The two foxes chase each other back and forth.
+      break
+    done
+  end
+  set ch %ch.next_in_room%
+done
+if %any%
+  nop %self.add_mob_flag(SILENT)%
+else
+  nop %self.remove_mob_flag(SILENT)%
+end
+* short delay
+wait 30 s
 ~
 #11989
 Goblin's Dream: Guard patrol~

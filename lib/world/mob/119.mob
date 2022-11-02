@@ -95,6 +95,7 @@ M
 You hear a soft sobbing sound as the bucket slowly refills.~
 T 11902
 T 11904
+T 11851
 S
 #11903
 sponge~
@@ -116,6 +117,7 @@ M
 0
 $n slides around, scrubbing the floor.~
 T 11934
+T 11851
 S
 #11904
 corwin page~
@@ -181,7 +183,7 @@ I 12 11877 3.00 1 p  # PICKPOCKET: little gemstone flute
 I 12 11878 4.00 1 p  # PICKPOCKET: gemstone knife
 I 12 11977 5.00 1 p  # PICKPOCKET: steamed mussels
 I 12 1206 5.00 1 p  # PICKPOCKET: iridescent blue iris
-I 12 11879 4.00 1 p  # PICKPOCKET: glowing sapphire bud
+I 12 11879 4.00 1 p  # PICKPOCKET: glowing emerald bud
 I 12 11880 4.00 1 p  # PICKPOCKET: ruby rock candy
 I 12 11895 4.00 1 p  # PICKPOCKET: iridescent pearl
 I 12 11897 4.00 1 p  # PICKPOCKET: good rock
@@ -702,6 +704,7 @@ T 11902
 T 11904
 T 11934
 T 11810
+T 11851
 S
 #11922
 duster feather~
@@ -736,11 +739,12 @@ M
 The feather duster dances about.~
 M
 0
-The feather duster pauses in the morning and seems to sob.~
+The feather duster pauses for a moment and seems to sob.~
 T 11902
 T 11904
 T 11934
 T 11810
+T 11851
 S
 #11923
 goblin secret passage opener~
@@ -846,9 +850,10 @@ M
 $n brushes uncomfortably close to your leg as it tries to clean.~
 M
 0
-$n makes the occasional sobbing sound as it cleans.~
+$n almost seems to grumble as it cleans.~
 T 11934
 T 11810
+T 11851
 S
 #11927
 Henri DeClaire~
@@ -1001,6 +1006,7 @@ T 11902
 T 11934
 T 11810
 T 11935
+T 11851
 S
 #11934
 otherworlder tall blue person~
@@ -1179,6 +1185,7 @@ M
 0
 You start to open a small box, but it howls and you shut it fast.~
 T 11810
+T 11803
 S
 #11939
 Annelise enchanter~
@@ -1404,7 +1411,7 @@ T 11810
 T 11852
 S
 #11946
-fox gray~
+fox gray grey~
 the gray fox~
 There is a gray fox sniffing around.
 ~
@@ -1449,7 +1456,7 @@ $n rolls around on the ground.~
 T 11810
 S
 #11947
-fox gray~
+fox gray grey~
 the gray fox~
 A gray fox is sitting by the gate.
 ~
@@ -2091,6 +2098,7 @@ T 11902
 T 11904
 T 11934
 T 11810
+T 11851
 S
 #11961
 bookshelf shelf ebony~
@@ -2130,6 +2138,7 @@ T 11902
 T 11904
 T 11934
 T 11810
+T 11851
 S
 #11962
 thorley apprentice~
@@ -3010,7 +3019,7 @@ T 11810
 T 11852
 S
 #11977
-fox gray~
+fox gray grey fermin~
 the gray fox~
 A gray fox is sitting by the oven.
 ~
