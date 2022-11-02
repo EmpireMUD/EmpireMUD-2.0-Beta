@@ -920,7 +920,7 @@ void get_template_spawns_display(struct adventure_spawn *list, char *save_buffer
 */
 void olc_show_room_template(char_data *ch) {
 	room_template *rmt = GET_OLC_ROOM_TEMPLATE(ch->desc);
-	char lbuf[MAX_STRING_LENGTH*2];
+	char buf[MAX_STRING_LENGTH*4], lbuf[MAX_STRING_LENGTH*4];
 	
 	adv_data *adv = get_adventure_for_vnum(GET_OLC_VNUM(ch->desc));
 	
@@ -954,14 +954,14 @@ void olc_show_room_template(char_data *ch) {
 	// exdesc
 	sprintf(buf + strlen(buf), "Extra descriptions: <%sextra\t0>\r\n", OLC_LABEL_PTR(GET_RMT_EX_DESCS(rmt)));
 	if (GET_RMT_EX_DESCS(rmt)) {
-		get_extra_desc_display(GET_RMT_EX_DESCS(rmt), buf1);
-		strcat(buf, buf1);
+		get_extra_desc_display(GET_RMT_EX_DESCS(rmt), lbuf, sizeof(lbuf));
+		strcat(buf, lbuf);
 	}
 	
 	sprintf(buf + strlen(buf), "Interactions: <%sinteraction\t0>\r\n", OLC_LABEL_PTR(GET_RMT_INTERACTIONS(rmt)));
 	if (GET_RMT_INTERACTIONS(rmt)) {
-		get_interaction_display(GET_RMT_INTERACTIONS(rmt), buf1);
-		strcat(buf, buf1);
+		get_interaction_display(GET_RMT_INTERACTIONS(rmt), lbuf);
+		strcat(buf, lbuf);
 	}
 	
 	// spawns

@@ -271,7 +271,7 @@ void olc_show_vehicle(char_data *ch);
 void get_adventure_linking_display(struct adventure_link_rule *list, char *save_buffer);
 void get_archetype_gear_display(struct archetype_gear *list, char *save_buffer);
 void get_bld_relations_display(struct bld_relation *list, char *save_buffer);
-void get_extra_desc_display(struct extra_descr_data *list, char *save_buffer);
+void get_extra_desc_display(struct extra_descr_data *list, char *save_buffer, size_t buf_size);
 void get_generic_relation_display(struct generic_relation *list, bool show_vnums, char *save_buf, char *prefix);
 char *get_interaction_restriction_display(struct interact_restriction *list, bool whole_list);
 void get_evolution_display(struct evolution_data *list, char *save_buffer);
