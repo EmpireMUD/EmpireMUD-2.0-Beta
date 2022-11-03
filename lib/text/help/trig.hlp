@@ -396,6 +396,7 @@ Basic methods:
   portal - entered using a portal
   respawn - player died and respawned
   summon - including adventure summon, but excluding summon abilities
+  script - moved by %teleport% or mgoto
 
 Uncommon methods:
   system - person was moved because a vehicle or instance was deleted
