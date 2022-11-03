@@ -17,9 +17,9 @@ bump into the buffet as the spirit reaches out toward you. A soul-chilling wave
 passes through you, from your head to your neck, down your spine, filling you
 so completely that even your shadow seems to shiver.
 ~
-T 11903
 T 11832
 T 11810
+T 11905
 S
 #11901
 gossiper #n~
@@ -93,9 +93,9 @@ $n hops around.~
 M
 0
 You hear a soft sobbing sound as the bucket slowly refills.~
-T 11902
 T 11904
 T 11851
+T 11905
 S
 #11903
 sponge~
@@ -167,8 +167,8 @@ I 12 11926 5.00 1 p  # PICKPOCKET: teacup
 I 12 11903 5.00 1 p  # PICKPOCKET: tall glass
 I 12 11904 5.00 1 p  # PICKPOCKET: mutton pasty
 I 12 11905 5.00 1 p  # PICKPOCKET: exotic turquoise cheese
-I 12 11869 5.00 1 p  # PICKPOCKET: self-writing pen
-I 12 11867 5.00 1 p  # PICKPOCKET: dynamic reconfabulator
+I 12 11869 4.00 1 p  # PICKPOCKET: self-writing pen
+I 12 11867 4.00 1 p  # PICKPOCKET: dynamic reconfabulator
 I 12 11865 5.00 1 p  # PICKPOCKET: ether condenser
 I 12 11864 5.00 1 p  # PICKPOCKET: mana deconfabulator
 I 12 11894 5.00 1 p  # PICKPOCKET: wooden Venus figurine
@@ -187,9 +187,9 @@ I 12 11879 4.00 1 p  # PICKPOCKET: glowing emerald bud
 I 12 11880 4.00 1 p  # PICKPOCKET: ruby rock candy
 I 12 11895 4.00 1 p  # PICKPOCKET: iridescent pearl
 I 12 11897 4.00 1 p  # PICKPOCKET: good rock
-I 12 11866 4.00 1 p  # PICKPOCKET: carved wooden man
+I 12 11866 3.00 1 p  # PICKPOCKET: carved wooden man
 I 12 11872 1.00 1 p  # PICKPOCKET: hand-written note
-I 12 11883 1.00 1 p  # PICKPOCKET: gnarled old wand
+I 12 11883 4.00 1 p  # PICKPOCKET: gnarled old wand
 M
 0
 $n points her gnarled old wand at a mug and heats it with a wild, cackling flame!~
@@ -759,11 +759,11 @@ The broom makes a sniffling noise.~
 M
 0
 The broom stops for a moment and looks out into the distance, almost somberly.~
-T 11902
 T 11904
 T 11934
 T 11810
 T 11851
+T 11905
 S
 #11922
 duster feather~
@@ -799,11 +799,11 @@ The feather duster dances about.~
 M
 0
 The feather duster pauses for a moment and seems to sob.~
-T 11902
 T 11904
 T 11934
 T 11810
 T 11851
+T 11905
 S
 #11923
 goblin secret passage opener~
@@ -1061,11 +1061,11 @@ $n shakes itself off.~
 M
 0
 $n sounds like it's crying.~
-T 11902
 T 11934
 T 11810
 T 11935
 T 11851
+T 11905
 S
 #11934
 otherworlder tall blue person~
@@ -2160,11 +2160,11 @@ You yelp as the filing cabinet accidentally hops onto your foot.~
 M
 0
 The filing cabinet sounds like it's crying in the corner.~
-T 11902
 T 11904
 T 11934
 T 11810
 T 11851
+T 11905
 S
 #11961
 bookshelf shelf ebony~
@@ -2200,11 +2200,11 @@ The bookshelf falls foward onto a book with a THUD! When it gets back up, the bo
 M
 0
 The bookshelf falls foward onto a book with a THUD! When it gets back up, the book is on one of the shelves.~
-T 11902
 T 11904
 T 11934
 T 11810
 T 11851
+T 11905
 S
 #11962
 thorley apprentice~
@@ -2382,9 +2382,9 @@ The trolley cleans the office.~
 M
 0
 The trolley cleans the office.~
-T 11902
 T 11904
 T 11810
+T 11905
 S
 #11966
 Grace sorcerer assistant~

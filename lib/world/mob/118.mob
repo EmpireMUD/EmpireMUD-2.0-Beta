@@ -1316,10 +1316,10 @@ The rags whip and spin into a little tornado, sucking dust up with them...~
 M
 0
 You swat at a rag as it nearly flies into your face.~
-T 11902
 T 11904
 T 11934
 T 11810
+T 11905
 S
 #11838
 Weyonomon spirit apprentice~
@@ -2157,8 +2157,8 @@ he's been crying. When he turns, you see his other eye has been replaced by a
 carved yellow lightning stone.
 ~
 F 11800
-T 11864
 T 11803
+T 11905
 S
 #11862
 thorley apprentice~

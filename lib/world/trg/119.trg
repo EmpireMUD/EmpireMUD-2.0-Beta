@@ -28,7 +28,7 @@ while %iter% < %amount%
 done
 ~
 #11901
-Skycleave controller~
+Skycleave: Immortal controller / skycleave command~
 1 c 2
 skycleave~
 if !%actor.is_immortal%
@@ -118,67 +118,6 @@ else
   %send% %actor% Invalid command.
 end
 ~
-#11902
-Skycleave: Cleaning crew load trigger~
-0 n 100
-~
-* load assistant if bucket
-if %self.vnum% == 11902
-  %load% mob 11903 ally
-end
-* mark time for despawn trig
-set loadtime %timestamp%
-remote loadtime %self.id%
-* custom text
-if %self.vnum% == 11837 && %self.room.template% == 11910
-  %mod% %self% append-lookdesc-noformat &0   The black tower houses many of the most erudite sorcerers from across the
-  %mod% %self% append-lookdesc-noformat world, though their admission standards are not as high as one might expect.
-  %mod% %self% append-lookdesc-noformat Indeed, the tower is often willing to take on any eager apprentice. Some can
-  %mod% %self% append-lookdesc-noformat be molded into powerful magic users. Others, unfortunately, wash out.
-elseif %self.vnum% == 11837 && %self.room.template% == 11930
-  %mod% %self% append-lookdesc-noformat &0   The Tower Skycleave is kept spotless at all times by the many apprentices
-  %mod% %self% append-lookdesc-noformat who have come seeking power. The beauty and perfection of the tower are of such
-  %mod% %self% append-lookdesc-noformat importance to the high sorcerers that they sometimes recruit more students than
-  %mod% %self% append-lookdesc-noformat they need. The brightest ones rise to the top, while the rest are given their
-  %mod% %self% append-lookdesc-noformat walking papers.
-end
-~
-#11903
-Spirit of Skycleave setup~
-0 n 100
-~
-* initialize vars
-set phase1 0
-set phase2 0
-set phase3 0
-set phase4 0
-set diff1 0
-set diff2 0
-set diff3 0
-set diff4 0
-set claw1 0
-set claw2 0
-set claw3 0
-set claw4 0
-set lab_open 0
-set lich_released 0
-remote lich_released %self.id%
-remote lab_open %self.id%
-remote claw4 %self.id%
-remote claw3 %self.id%
-remote claw2 %self.id%
-remote claw1 %self.id%
-remote diff4 %self.id%
-remote diff3 %self.id%
-remote diff2 %self.id%
-remote diff1 %self.id%
-remote phase4 %self.id%
-remote phase3 %self.id%
-remote phase2 %self.id%
-remote phase1 %self.id%
-* and remove
-detach 11903 %self.id%
-~
 #11904
 Skycleave: Cleaning crew despawn~
 0 b 33
@@ -223,8 +162,8 @@ done
 %purge% %self%
 ~
 #11905
-Skycleave: Shared load script~
-0 n 100
+Skycleave: Shared load script for mobs~
+0 nA 100
 ~
 switch %self.vnum%
   case 11801
@@ -233,6 +172,37 @@ switch %self.vnum%
     dg_affect #11832 %self% !TARGET on -1
     dg_affect #11832 %self% SNEAK on -1
     nop %self.add_mob_flag(SILENT)%
+  break
+  case 11900
+    * spirit of skycleave: init vars
+    set phase1 0
+    set phase2 0
+    set phase3 0
+    set phase4 0
+    set diff1 0
+    set diff2 0
+    set diff3 0
+    set diff4 0
+    set claw1 0
+    set claw2 0
+    set claw3 0
+    set claw4 0
+    set lab_open 0
+    set lich_released 0
+    remote lich_released %self.id%
+    remote lab_open %self.id%
+    remote claw4 %self.id%
+    remote claw3 %self.id%
+    remote claw2 %self.id%
+    remote claw1 %self.id%
+    remote diff4 %self.id%
+    remote diff3 %self.id%
+    remote diff2 %self.id%
+    remote diff1 %self.id%
+    remote phase4 %self.id%
+    remote phase3 %self.id%
+    remote phase2 %self.id%
+    remote phase1 %self.id%
   break
   case 11901
     * gossippers in 1B
@@ -244,7 +214,56 @@ switch %self.vnum%
       eval iter %iter% + 1
     done
   break
+  case 11902
+    * bucket
+    %load% mob 11903 ally
+  break
+  case 11837
+    * swarm of rag
+    if %self.room.template% == 11910
+      %mod% %self% append-lookdesc-noformat &0   The black tower houses many of the most erudite sorcerers from across the
+      %mod% %self% append-lookdesc-noformat world, though their admission standards are not as high as one might expect.
+      %mod% %self% append-lookdesc-noformat Indeed, the tower is often willing to take on any eager apprentice. Some can
+      %mod% %self% append-lookdesc-noformat be molded into powerful magic users. Others, unfortunately, wash out.
+    elseif %self.room.template% == 11930
+      %mod% %self% append-lookdesc-noformat &0   The Tower Skycleave is kept spotless at all times by the many apprentices
+      %mod% %self% append-lookdesc-noformat who have come seeking power. The beauty and perfection of the tower are of such
+      %mod% %self% append-lookdesc-noformat importance to the high sorcerers that they sometimes recruit more students than
+      %mod% %self% append-lookdesc-noformat they need. The brightest ones rise to the top, while the rest are given their
+      %mod% %self% append-lookdesc-noformat walking papers.
+    end
+  break
+  case 11861
+    * Barrosh post-fight
+    wait 0
+    %echo% Time moves backwards for a second as High Sorcerer Barrosh composes himself and holds his staff to the sky, dropping some things in the process...
+    wait 9 sec
+    say For the honor of Skycleave!
+    wait 4 sec
+    %echo% Glass flies everywhere as a bolt of lightning streaks through the window, momentarily blinding you as it strikes the gem on Barrosh's staff!
+    wait 9 sec
+    say By the power invested in me by the Tower Skycleave, I cast out the shadow!
+    wait 9 sec
+    %echo% Barrosh's eyes turn pitch black and he drops to his knees and screams as he throws his head back...
+    wait 9 sec
+    %echo% A thick, smoky shadow streams from Barrosh's eyes with a coarse, sputtering sound...
+    wait 9 sec
+    %echo% The shadow is caught by the light of Barrosh's staff and it evaporates with an agonizing hiss!
+    wait 9 sec
+    say There. It is done. My mind is free. I hate to think of what horrors I committed in that state.
+    wait 9 sec
+    if %instance.mob(11868)%
+      say You have got to free the Grand High Sorcerer. He's the only one who will be able to stop all this.
+    else
+      say You have got to find a way to save the tower. I'm afraid I will not be any further use.
+    end
+  break
 done
+* mark time for despawn trig (if applicable)
+set loadtime %timestamp%
+remote loadtime %self.id%
+* detach me
+detach 11905 %self.id%
 ~
 #11906
 Skycleave: Secret Passage Detection~
@@ -503,7 +522,7 @@ switch %self.vnum%
 done
 ~
 #11911
-Pixy Races: racecall helper command~
+Pixy Races: Racecall (command)~
 0 c 0
 racecall~
 * announces the race in current positions
@@ -858,54 +877,19 @@ remote last_race %jar.id%
 %purge% %self%
 ~
 #11914
-Pixy Races: Check pixy jar command~
+Pixy Races: Check, name, or release pixy jar (command)~
 1 c 2
-check~
+check name release~
+* vars
 set race_time 180
-if %actor.obj_target(%arg.car%)% != %self%
-  return 0
-  halt
-end
 return 1
-* check vnum
-if %self.vnum% == 11913
-  %send% %actor% There's no pixy in the jar. Try catching one.
-  halt
-end
-* check racing
-%send% %actor% You check the pixy jar. It contains: %self.pixy%
-%send% %actor% Wins: %self.wins%, Losses: %self.losses%
-* show stats
-set stat_list speed guile luck
-while %stat_list%
-  set stat %stat_list.car%
-  set stat_list %stat_list.cdr%
-  set value %self.var(%stat%,1)%
-  if %stat% == luck
-    set stat %stat% \&0
-  end
-  if %value% >= 5
-    %send% %actor% %stat%: \*\*\*\*\* 5
-  elseif %value% == 4
-    %send% %actor% %stat%:  \*\*\*\* 4
-  elseif %value% == 3
-    %send% %actor% %stat%:   \*\*\* 3
-  elseif %value% == 2
-    %send% %actor% %stat%:    \*\* 2
-  else
-    %send% %actor% %stat%:     \* 1
-  end
-done
-~
-#11915
-Skycleave: Name or Release pixy jar~
-1 c 2
-name release~
-* covers both 'name <jar> <name>' and 'release <jar>'
+* args
 set arg1 %arg.car%
 set arg2 %arg.cdr%
 if !%arg1%
-  if release /= %cmd%
+  if check /= %cmd%
+    %send% %actor% Usage: check <jar>
+  elseif release /= %cmd%
     %send% %actor% Usage: release <jar>
   else
     %send% %actor% Usage: name <jar> <name>
@@ -924,22 +908,54 @@ elseif %obj.vnum% == 11836 && release /= %cmd%
 elseif %obj% != %self%
   %send% %actor% You can't do that with @%obj%.
   halt
-elseif %obj.last_race% + 180 > %timestamp%
-  %send% %actor% You can't do that while your pixy is racing.
+end
+* check vnum
+if %self.vnum% == 11913
+  %send% %actor% There's no pixy in the jar. Try catching one.
   halt
 end
-if release /= %cmd%
-  if !%arg2% || %arg2% != CONFIRM
+* which command?
+if check /= %cmd%
+  * check racing
+  %send% %actor% You check the pixy jar. It contains: %self.pixy%
+  %send% %actor% Wins: %self.wins%, Losses: %self.losses%
+  * show stats
+  set stat_list speed guile luck
+  while %stat_list%
+    set stat %stat_list.car%
+    set stat_list %stat_list.cdr%
+    set value %self.var(%stat%,1)%
+    if %stat% == luck
+      set stat %stat% \&0
+    end
+    if %value% >= 5
+      %send% %actor% %stat%: \*\*\*\*\* 5
+    elseif %value% == 4
+      %send% %actor% %stat%:  \*\*\*\* 4
+    elseif %value% == 3
+      %send% %actor% %stat%:   \*\*\* 3
+    elseif %value% == 2
+      %send% %actor% %stat%:    \*\* 2
+    else
+      %send% %actor% %stat%:     \* 1
+    end
+  done
+elseif release /= %cmd%
+  if %obj.last_race% + %race_time% > %timestamp%
+    %send% %actor% You can't do that while your pixy is racing.
+  elseif !%arg2% || %arg2% != CONFIRM
     %send% %actor% Are you sure? You must type 'release jar CONFIRM' to do this.
   else
     %send% %actor% You release %self.pixy%, who flies away!
     %echoaround% %actor% ~%actor% releases %self.pixy% from a jar and it flies away!
     %purge% %self%
   end
-else
+elseif name /= %cmd%
   * name
   if %self.varexists(named)% && %self.pixy% != %arg2%
     %send% %actor% It's already named %self.pixy%.
+  elseif %obj.last_race% + %race_time% > %timestamp%
+    %send% %actor% You can't do that while your pixy is racing.
   elseif !%arg2%
     %send% %actor% Name it what?
   elseif %arg2.strlen% > 18
@@ -960,6 +976,8 @@ else
     %mod% %self% keywords pixy jar %pixy%'s
     %mod% %self% shortdesc %pixy%'s pixy jar
   end
+else
+  return 0
 end
 ~
 #11916
@@ -1139,7 +1157,7 @@ end
 * don't announce it... anyone who didn't see it the first time just "didn't notice"
 ~
 #11918
-Pixy Races: racework helper command~
+Pixy Races: Racework (command)~
 0 c 0
 racework~
 * configure:
@@ -1400,7 +1418,7 @@ elseif %mode% == round
 end
 ~
 #11919
-Pixy Races: raceman helper command~
+Pixy Races: Raceman (command)~
 0 c 0
 raceman~
 * manages the 'start', 'win', and 'tricks' messages/etc argument gives different messages
@@ -1931,7 +1949,7 @@ wait 1
 %purge% %self%
 ~
 #11929
-Leave breadcrumbs~
+Skycleave: Leave breadcrumbs in the pixy maze~
 2 q 100
 ~
 return 1
@@ -2433,7 +2451,7 @@ if %target.room% == %self.room% && %target.is_npc% && %response_mobs% ~= %target
 end
 ~
 #11938
-Skycleave: Walking Sorcery Tower setup~
+Walking Sorcery Tower: interior setup~
 5 n 100
 ~
 set inter %self.interior%
@@ -2456,7 +2474,7 @@ end
 detach 11938 %self.id%
 ~
 #11939
-Goef the Oreonic: Attune skystone~
+Skycleave: Attune skystone at Goef the Oreonic~
 0 c 0
 attune~
 * attunes skystones for the user
@@ -2518,7 +2536,7 @@ remote skystone_progress %actor.id%
 remote skystone_finished %actor.id%
 ~
 #11940
-Skycleave craftables: Craft-or-Drop: Set BoE/BoP and loot quality flags~
+Skycleave: Craft-or-Drop: Set BoE/BoP and loot quality flags~
 1 n 100
 ~
 * This script makes loot BOP when dropped by a mob but BOE when crafted.
@@ -2572,7 +2590,7 @@ if %rescale% && %self.level%
 end
 ~
 #11941
-Iskip: Only drops loot for unique fighters~
+Rot and Ruin: Only drops loot for unique fighters~
 0 f 100
 ~
 * Iskip only loses his !LOOT flag if a unique person over min_level has tagged him
@@ -2613,7 +2631,7 @@ end
 return 0
 ~
 #11942
-Iskip: Re-spawn boss when new player arrives~
+Rot and Ruin: Re-spawn boss when new player arrives~
 2 g 100
 ~
 * Iskip of Rot and Ruin (11888) respawns if any player arrives
@@ -2627,7 +2645,7 @@ if !%mob%
 end
 ~
 #11943
-Skycleave Pixy Maze: Dreams of Smol Nes-Pik~
+Skycleave: Dreams of Smol Nes-Pik~
 2 bw 100
 ~
 * Gives sleeping players dreams -- non-teleporting version
@@ -2734,7 +2752,7 @@ if %sleepy%
 end
 ~
 #11944
-Skycleave Pixy Maze: Pixy's Dream teleporter~
+Smol Nes-Pik: Main entrance dream teleporter~
 2 bw 100
 ~
 * Sleeping players and their NPC followers teleport to Smol Nes-Pik
@@ -2967,7 +2985,7 @@ Skycleave Dreams: Reset wake on poof-in~
 * 'wake' count. Typing 'wake' 3 times exits the area using trigger 11945.
 * This also clears their wake-room, which will be set by another script.
 set dir_list north east south west northwest northeast southwest southeast up down
-if %actor.is_pc% && (%direction% == none || !(%dir_list% ~= %direction%))
+if %actor.is_pc% && %method% != script && (%direction% == none || !(%dir_list% ~= %direction%))
   set skycleave_wake 0
   remote skycleave_wake %actor.id%
   set skycleave_wake_room 0
@@ -3094,7 +3112,7 @@ switch %self.vnum%
 done
 ~
 #11951
-Smol Nes-Pik: Block abilities in the jar~
+Queen's Nightmare: Block abilities in the jar~
 2 p 100
 ~
 %send% %actor% None of your abilities have any effect in this jar. What a nightmare!
@@ -3102,7 +3120,7 @@ Smol Nes-Pik: Block abilities in the jar~
 return 0
 ~
 #11952
-Smol Nes-Pik: Inside the sap: catch look and skip~
+Rot and Ruin: Inside the sap: catch look and skip~
 2 c 0
 look skip~
 if %cmd.mudcommand% == look && !%arg%
@@ -3120,7 +3138,7 @@ else
 end
 ~
 #11953
-Smol Nes-Pik: Sap teleport manager (room)~
+Rot and Ruin: Sap teleport manager (room)~
 2 bgw 100
 ~
 * this runs both at random and on enter
@@ -3172,7 +3190,7 @@ if %sap.vnum% == 11891
 end
 ~
 #11954
-Smol Nes-Pik: Rot and Ruin intro/teleport~
+Rot and Ruin: Sap intro/teleport~
 1 b 100
 ~
 * fetch cycle
@@ -3936,9 +3954,9 @@ done
 dg_affect #11961 %actor% off
 ~
 #11962
-broken mirror portal~
+Skycleave: Knezz's broken mirror portal~
 1 c 4
-enter look~
+enter look examine~
 if (%actor.obj_target(%arg%)% != %self%)
   return 0
   halt
@@ -3946,13 +3964,14 @@ end
 set destination_floor %random.4%
 switch %destination_floor%
   case 1
-    eval destination_room 11800 + %random.8% - 1
+    eval destination_room 11800 + %random.9% - 1
   break
   case 2
     eval destination_room 11910 + %random.17% - 1
   break
   case 3
-    eval destination_room 11930 + %random.11% - 1
+    eval destination_room 11930 + %random.12% - 1
+    * note that this can go to the magichanical lab even if closed
   break
   case 4
     eval destination_room 11860 + %random.12% - 1
@@ -4304,7 +4323,7 @@ done
 detach 11967 %self.id%
 ~
 #11968
-Skycleave: Gnarled old wand of power~
+Gnarled old wand: By the Power of Skycleave~
 1 c 1
 say ' shout whisper~
 return 0
@@ -4349,9 +4368,10 @@ else
 end
 ~
 #11969
-Skycleave: Hendecagon fountain summoned NPC run~
+Elemental Plane of Water: Hendecagon fountain summoned NPC run~
 0 ab 100
 ~
+* Runs down the tower and into the Elemental Plane of Water
 set down_rooms 11971 11960 11930 11910
 set ne_rooms 11970 11934 11922 11904
 set se_rooms 11963 11933 11913 11903
@@ -4637,7 +4657,7 @@ elseif %room.people%
 end
 ~
 #11975
-Skycleave: Goblin's Dream telepoter~
+Goblin's Dream: Main entrance dream telepoter~
 2 bw 100
 ~
 * Sleeping players and their NPC followers teleport to Gobbrabakh of Orka
@@ -4948,7 +4968,7 @@ Goblin's Dream: Arena fight script (Elver, Nailbokh, Biksi)~
 * tba
 ~
 #11983
-Smol Nes-Pik: Iskip of Rot and Ruin fight~
+Iskip of Rot and Ruin: giant sorcerer combat script~
 0 k 100
 ~
 if %self.cooldown(11800)% || %self.disabled%
@@ -5153,7 +5173,7 @@ switch %self.room.template%
 done
 ~
 #11990
-Skycleave: Liberated wand~
+Liberated wand casts spells on leader~
 0 bt 5
 ~
 set verb_list flicks swishes taps twirls waves
@@ -5241,7 +5261,7 @@ dg_affect #11990 %ch% %type% %amount% 300
 %echoaround% %ch% ~%self% %verb% itself toward ~%ch%... &%ch% takes on a %glow% glow.
 ~
 #11992
-Skycleave: Smash calamander statuette to create forest~
+Smash striped stone seedling to create calamander forest~
 1 c 2
 smash~
 * smash <self>
@@ -5270,7 +5290,7 @@ end
 %purge% %self%
 ~
 #11993
-Clingy cloak~
+Clingy cloak wears itself on uncloaked people~
 0 btw 20
 ~
 set pers %random.char%
@@ -5286,7 +5306,7 @@ end
 %purge% %self%
 ~
 #11994
-Skycleave Hidden Areas: Fake movement~
+Skycleave: Fake movement in hidden areas~
 2 q 100
 ~
 * for rooms with fake exits: you can't actually leave
@@ -5328,7 +5348,7 @@ set comment 0
 remote comment %self.id%
 ~
 #11996
-Goblin's Dream: Presence of the god~
+Priest's Dream: Presence of the god~
 2 bw 100
 ~
 * dream cutscene: player meets the god of Orka
@@ -5377,7 +5397,7 @@ switch %comment%
 done
 ~
 #11997
-Skycleave: the adoring fan~
+Adoring fan idle animations~
 0 bt 8
 ~
 * ensure leader
@@ -5457,7 +5477,7 @@ switch %random.10%
 done
 ~
 #11999
-Skycleave: Crystal ball visions~
+Crystal ball visions~
 0 ct 0
 look examine~
 * looking at me?

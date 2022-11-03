@@ -1,5 +1,5 @@
 #11800
-Tower Skycleave announcement~
+Skycleave: Tower global announcement spammer~
 2 ab 1
 ~
 if %random.3% == 3
@@ -65,7 +65,7 @@ end
 return 0
 ~
 #11802
-Skycleave mob blocking: Sneakable~
+Skycleave: Mob blocking: sneakable~
 0 q 100
 ~
 * One quick trick to get the target room
@@ -155,17 +155,22 @@ if %self.val2% == 11804 && %self.val1% < %self.val0%
 end
 ~
 #11805
-Looker: force look on load~
+Skycleave: Shared load trigger for objects~
 1 n 100
 ~
-wait 1
-if %self.carried_by% && %self.carried_by.position% != Sleeping
-  %force% %self.carried_by% look
-end
-%purge% %self%
+switch %self.vnum%
+  case 11805
+    * looker: force look on load
+    wait 1
+    if %self.carried_by% && %self.carried_by.position% != Sleeping
+      %force% %self.carried_by% look
+    end
+    %purge% %self%
+  break
+done
 ~
 #11806
-Skycleave: One-time greetings using script1~
+One-time greetings using script1~
 0 gnw 100
 ~
 * Uses mob custom script1 to for one-time greetings, with each script1 line
@@ -363,7 +368,7 @@ elseif %self.vnum% == 11819
     %purge% %object%
   end
 elseif %self.vnum% == 11820
-  * trash pixies: if the player has met the queen in the Pixy's Dream, an iris will despawn a guard pixy
+  * trash pixies: if the player has met the queen in SNP, an iris will despawn a guard pixy
   return 0
   if !%actor.varexists(skycleave_queen)%
     %send% %actor% You try to give @%object% to ~%self% but &%self% rebuffs you.
@@ -423,7 +428,7 @@ end
 ~
 #11808
 Skycleave: Mob gains no-attack on load~
-0 n 100
+0 nA 100
 ~
 * turn on no-attack (until diff-sel)
 dg_affect %self% !ATTACK on -1
@@ -651,7 +656,7 @@ else
 end
 ~
 #11812
-Skycleave 2.0 summoned monster despawn~
+Skycleave: Summoned monster despawn for boss minions~
 0 ab 100
 ~
 if !%self.fighting%
@@ -659,7 +664,7 @@ if !%self.fighting%
 end
 ~
 #11813
-Skycleave Bosses: Summon Minions~
+Skycleave: Summon minions for boss combat~
 0 k 20
 ~
 if %self.cooldown(11800)%
@@ -769,7 +774,7 @@ wait 0
 %purge% %self%
 ~
 #11815
-Escaped Goblin combat~
+Escaped Goblin: combat script~
 0 k 100
 ~
 if %self.cooldown(11800)%
@@ -848,7 +853,7 @@ else
 end
 ~
 #11816
-Goblin Commando combat~
+Goblin Commando: combat script~
 0 k 100
 ~
 if %self.cooldown(11800)%
@@ -890,9 +895,10 @@ else
 end
 ~
 #11817
-Goblin Bruiser combat~
+Goblin Miner: combat script~
 0 k 100
 ~
+* NOTE: this was for a goblin miner
 if %self.cooldown(11800)%
   halt
 end
@@ -926,7 +932,7 @@ else
 end
 ~
 #11818
-Venjer the Fox: Goblin Blastmaster combat~
+Venjer the Fox: Goblin blastmaster combat script~
 0 k 100
 ~
 if %self.cooldown(11800)%
@@ -1033,7 +1039,7 @@ elseif %type% == 4
 end
 ~
 #11819
-Skycleave Pixy Queen combat~
+Pixy Queen (Skycleave): combat script~
 0 k 100
 ~
 if %self.cooldown(11800)%
@@ -1140,7 +1146,7 @@ elseif %type% == 4
 end
 ~
 #11820
-Escaped Pixy combat~
+Escaped Pixy (Skycleave): combat script~
 0 k 100
 ~
 if %self.cooldown(11800)%
@@ -2516,7 +2522,7 @@ end
 detach 11839 %self.id%
 ~
 #11840
-Skycleave: Storytime using custom strings~
+Storytime using script1-5~
 0 bw 100
 ~
 * uses mob custom strings script1-script5 to tell short stories
@@ -2625,7 +2631,7 @@ end
 wait %story_gap%
 ~
 #11841
-Mercenary Rogue combat~
+Mercenary Rogue (Skycleave): combat script~
 0 k 100
 ~
 if %self.cooldown(11800)%
@@ -2675,7 +2681,7 @@ else
 end
 ~
 #11842
-Mercenary Sorcerer combat~
+Mercenary Sorcerer (Skycleave): combat script~
 0 k 100
 ~
 if %self.cooldown(11800)%
@@ -2728,7 +2734,7 @@ else
 end
 ~
 #11843
-Mercenary Archer combat~
+Mercenary Archer (Skycleave): combat script~
 0 k 100
 ~
 if %self.cooldown(11800)%
@@ -2773,7 +2779,7 @@ else
 end
 ~
 #11844
-Mercenary Nature Mage combat~
+Mercenary Nature Mage (Skycleave): combat script~
 0 k 100
 ~
 if %self.cooldown(11800)%
@@ -2825,7 +2831,7 @@ else
 end
 ~
 #11845
-Mercenary Vampire combat~
+Mercenary Vampire (Skycleave): combat script~
 0 k 100
 ~
 if %self.cooldown(11800)%
@@ -2877,7 +2883,7 @@ else
 end
 ~
 #11846
-Mercenary Tank combat~
+Mercenary Tank (Skycleave): combat script~
 0 k 100
 ~
 if %self.cooldown(11800)%
@@ -2925,7 +2931,7 @@ else
 done
 ~
 #11847
-Kara Virduke: Mercenary archmage combat~
+Kara Virduke: Mercenary archmage combat script~
 0 k 100
 ~
 if %self.cooldown(11800)%
@@ -3075,7 +3081,7 @@ elseif %type% == 4 && %self.mob_flagged(GROUP)%
 end
 ~
 #11848
-Bleak Rojjer: Mercenary assassin boss combat~
+Bleak Rojjer: Mercenary assassin combat script~
 0 k 100
 ~
 if %self.cooldown(11800)%
@@ -3164,7 +3170,7 @@ elseif %type% == 4 && %self.mob_flagged(GROUP)%
 end
 ~
 #11849
-Trixton Vye: Mercenary leader combat~
+Trixton Vye: Mercenary leader combat script~
 0 k 100
 ~
 * General cooldown
@@ -3791,7 +3797,7 @@ Skycleave: MC Barrosh fight~
 * tba
 ~
 #11860
-Skycleave: Shard cultivator / upgrade shard tool~
+Shard cultivator: upgrade shard tools~
 1 c 2
 cultivate~
 return 1
@@ -3994,33 +4000,6 @@ elseif %seconds% > 60
 elseif %seconds% > 30
   %echo% The Shade of Mezvienne grows as it draws Knezz's life force.
   dg_affect %self% BONUS-MAGICAL 5 -1
-end
-~
-#11864
-Skycleave: Barrosh post-fight cutscene~
-0 n 100
-~
-wait 0
-%echo% Time moves backwards for a second as High Sorcerer Barrosh composes himself and holds his staff to the sky, dropping some things in the process...
-wait 9 sec
-say For the honor of Skycleave!
-wait 4 sec
-%echo% Glass flies everywhere as a bolt of lightning streaks through the window, momentarily blinding you as it strikes the gem on Barrosh's staff!
-wait 9 sec
-say By the power invested in me by the Tower Skycleave, I cast out the shadow!
-wait 9 sec
-%echo% Barrosh's eyes turn pitch black and he drops to his knees and screams as he throws his head back...
-wait 9 sec
-%echo% A thick, smoky shadow streams from Barrosh's eyes with a coarse, sputtering sound...
-wait 9 sec
-%echo% The shadow is caught by the light of Barrosh's staff and it evaporates with an agonizing hiss!
-wait 9 sec
-say There. It is done. My mind is free. I hate to think of what horrors I committed in that state.
-wait 9 sec
-if %instance.mob(11868)%
-  say You have got to free the Grand High Sorcerer. He's the only one who will be able to stop all this.
-else
-  say You have got to find a way to save the tower. I'm afraid I will not be any further use.
 end
 ~
 #11865
@@ -5133,7 +5112,7 @@ if %actor.room% == %self.room%
 end
 ~
 #11879
-Great Tree: Broken Ladder Drop~
+Smol Nes-Pik: Broken ladder drop~
 2 gw 100
 ~
 * always returns 1
@@ -5283,7 +5262,7 @@ end
 wait 20 s
 ~
 #11881
-Block morph and fastmorph commands~
+Stasis charm: Block morph and fastmorph commands when worn~
 1 c 1
 morph fastmorph~
 if %arg.car%
@@ -5588,7 +5567,7 @@ end
 wait 20 s
 ~
 #11884
-Smol Nes-Pik: Taste putrid sap to teleport~
+Rot and Ruin: Taste putrid sap to teleport~
 1 c 4
 taste eat drink sip lick~
 * This teleports players between templates 11887 and 11891
@@ -5704,9 +5683,9 @@ else
 end
 ~
 #11886
-Statue combat~
+Skycleave: Attack the statue to destroy it~
 1 c 4
-break kill destroy shatter hit kick bash smash stab jab backstab~
+break kill destroy shatter hit kick bash smash stab jab backstab attack~
 set target %actor.obj_target(%arg%)%
 if !%target%
   %send% %actor% Break what?
@@ -6100,7 +6079,7 @@ end
 %purge% %self%
 ~
 #11893
-Skycleave dummy difficulty selector~
+Skycleave: Dummy difficulty selector~
 0 c 0
 difficulty~
 %send% %actor% You must complete this floor before you can select a difficulty for the next one.

@@ -4,8 +4,6 @@ the teapot~
 A large, talking teapot is standing here.~
 cil 5 15 100 nrG 3
 1 0 -1 11807
-A
-11 -5
 D
    This oversized teapot is pearly white with a purple base and curved purple
 lid. The teapot's spout forms the enormous nose of the face on the side of the
@@ -16,7 +14,7 @@ S
 donkey confused~
 a confused donkey~
 A confused donkey stands nearby.~
-bcj 11 0 0 0 3
+bcj 11 14 0 0 3
 0 0 -1 -1
 A
 21 -25
@@ -31,21 +29,19 @@ A
 A
 17 -5
 D
-It seems awfully intelligent for a donkey...
+   The old, gray donkey stands there, befuddled, looking at its hooves, then at
+you, then back at the situation, then back at its hooves.
 ~
 S
 #11848
 viper pit mercenary mage~
 a pit viper~
 A pit viper is coiled and ready to strike!~
-bj 15 5 0 0 2
+bj 9 5 0 0 3
 0 0 -1 -1
-A
-21 -1
-A
-17 1
 D
-Staring into the serpent's eyes, you detect a hint of intelligence.
+   The pit viper is as big as you are! It flicks its long, forked tongue in and
+out of its mouth as it twists and coils in preparation for a strike!
 ~
 S
 #11854
