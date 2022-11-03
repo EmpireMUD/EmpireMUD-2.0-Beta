@@ -2770,8 +2770,12 @@ E
 toasters~
 There are a bunch of old iron toasters -- the type you set next to the fire.
 ~
+E
+bookshelf bookshelves shelf shelves chains spine~
+   Several bookshelves grace the east side of the room, covered with countless
+books on enchanting. Each and every book is chained to the shelf by its spine.
+~
 T 11926
-T 11927
 T 11921
 S
 #11840

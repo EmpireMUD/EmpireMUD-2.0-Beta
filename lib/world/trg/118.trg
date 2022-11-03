@@ -305,16 +305,17 @@ if %self.vnum% >= 11815 && %self.vnum% <= 11818
   * goblins
   return 0
   set goblin_vnums 11815 11816 11817
+  set trinket_vnums 11976 11893 11894 11896
   if %self.vnum% == 11818
     say Venjer cannot be bribed!
     %aggro% %actor%
-  elseif %object.vnum% != 11976 && (!(%object.keywords% ~= goblin) || (%object.keywords% ~= wrangler))
+  elseif !(%trinket_vnums% ~= %object.vnum%) && (!(%object.keywords% ~= goblin) || (%object.keywords% ~= wrangler))
     say Goblin doesn't want %object.shortdesc%, stupid human!
   else
     * actor has given a goblin object
     %send% %actor% You give ~%self% @%object%...
     %echoaround% %actor% ~%actor% gives ~%self% @%object%...
-    if %object.vnum% == 11976
+    if %trinket_vnums% ~= %object.vnum%
       say This is what we came for! These is not belonging to you! But thanks, you, for returning.
     else
       say Not what goblin items we came for but still a good prize...
@@ -2144,6 +2145,9 @@ end
 if %self.vnum% == 11933
   * mop 11933, Dylane quest 11802
   set annelise %self.room.people(11939)%
+  if !%annelise%
+    set annelise %self.room.people(11919)%
+  end
   nop %self.add_mob_flag(SILENT)%
   nop %self.add_mob_flag(SENTINEL)%
   nop %annelise.add_mob_flag(SILENT)%
@@ -3259,7 +3263,7 @@ end
 #11851
 Skycleave: Shared mob speech trigger~
 0 d 1
-zenith Maureen Eloise Heather Alastair Marina John Wright Dylane Ametnik Boghylda~
+zenith Maureen Eloise Heather Alastair Marina John Wright Dylane Ametnik Boghylda mice mouse waltur~
 switch %self.vnum%
   case 11902
     * bucket
@@ -3337,6 +3341,26 @@ switch %self.vnum%
     if %speech% ~= zenith
       wait 1
       emote $n winces.
+    end
+  break
+  case 11919
+    * Annelise
+    wait 1
+    if %speech% ~= mice
+      say Oh deary, did you say mice?
+    elseif %speech% ~= mouse
+      say Oh deary, did you say mouse?
+    elseif %speech% ~= waltur
+      emote seems to have started crying.
+    end
+  break
+  case 11939
+    * Annelise
+    wait 1
+    if %speech% ~= mice
+      say Oh deary, did you say mice?
+    elseif %speech% ~= mouse
+      say Oh deary, did you say mouse?
     end
   break
 done
@@ -5682,7 +5706,7 @@ end
 #11886
 Statue combat~
 1 c 4
-break kill destroy shatter hit kick bash smash~
+break kill destroy shatter hit kick bash smash stab jab backstab~
 set target %actor.obj_target(%arg%)%
 if !%target%
   %send% %actor% Break what?
@@ -6402,14 +6426,7 @@ if %moh.mob_flagged(*PICKPOCKETED)%
   nop %mob.add_mob_flag(*PICKPOCKETED)%
 end
 skydel 11832 1  * Resident Mohammed
-* Enchanter Annelise
-set lise %instance.mob(11839)%
-%at% i11939 %load% mob 11939  * Enchanter Annelise
-if %lise.mob_flagged(*PICKPOCKETED)%
-  set mob %instance.mob(11939)%
-  nop %mob.add_mob_flag(*PICKPOCKETED)%
-end
-skydel 11839 1  * Enchanter Annelise
+* Otherworlder and Sanjiv
 if %instance.mob(11834)%
   %at% i11935 %load% mob 11934  * Chained Otherworlder (if it survived/stayed)
 end
@@ -6429,15 +6446,26 @@ end
 %at% i11936 %load% mob 11936  * Scaldorran
 skydel 11838 1  * Ghost
 %at% i11938 %load% mob 11938  * Ghost
-* Magineer Waltur
+* Magineer Waltur and Enchanter Annelise
 set waltur %instance.mob(11840)%
+set lise %instance.mob(11839)%
 if %waltur%
   %at% i11940 %load% mob 11940  * Magineer Waltur (if he survived)
   if %waltur.mob_flagged(*PICKPOCKETED)%
     set mob %instance.mob(11940)%
     nop %mob.add_mob_flag(*PICKPOCKETED)%
   end
+  %at% i11939 %load% mob 11939  * Enchanter Annelise
+  set new_lise %instance.mob(11939)%
+else
+  * no waltur
+  %at% i11939 %load% mob 11919  * Enchanter Annelise
+  set new_lise %instance.mob(11919)%
 end
+if %lise.mob_flagged(*PICKPOCKETED)%
+  nop %new_lise.add_mob_flag(*PICKPOCKETED)%
+end
+skydel 11839 1  * Enchanter Annelise
 * 4. Move people from the old rooms
 set vnum %start_room%
 while %vnum% <= %end_room%

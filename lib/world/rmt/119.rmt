@@ -1541,6 +1541,7 @@ west doorway hall walkway~
    The second-floor walkway is out the door to the west. A large glass tube
 arches over the doorway as part of the final stretch of the racetrack.
 ~
+T 11936
 S
 #11919
 The Apprentice Dormitories~
@@ -2970,8 +2971,12 @@ E
 toasters~
 There are a bunch of old iron toasters -- the type you set next to the fire.
 ~
+E
+bookshelf bookshelves shelf shelves chains spine~
+   Several bookshelves grace the east side of the room, covered with countless
+books on enchanting. Each and every book is chained to the shelf by its spine.
+~
 T 11926
-T 11927
 T 11921
 S
 #11940

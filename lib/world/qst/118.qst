@@ -76,7 +76,7 @@ frown. 'But we certainly can't have the boy running around here. Fine, fine,
 I'm sure I owe you this much. Bring him up here. Just promise me he will leave
 the tower before the headmaster finds out.'
 ~
-14 0 150 250 -1
+15 0 150 250 -1
 A
 1 11801
 P
@@ -90,6 +90,8 @@ W
 13 11939 0 1 -
 Z
 1 11939
+Z
+1 11919
 S
 #11810
 Skycleave: Past Pixies and Goblins~
@@ -433,7 +435,7 @@ as she taps her fingernails against each other. She turns back toward you.
 And for what? The pursuit of magic. Are there no limits to what we destroy for
 power?'
 ~
-22 e 150 250 -1
+23 e 150 250 -1
 A
 1 11900
 D 11834
@@ -448,6 +450,8 @@ W+
 Free the otherworlder~
 Z
 1 11939
+Z
+1 11919
 S
 #11836
 Skycleave: The Greatest Treasure~

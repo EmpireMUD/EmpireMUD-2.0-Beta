@@ -1896,51 +1896,6 @@ if %rogue% && !%rogue.fighting% && !%rogue.disabled%
   %force% %rogue% skyrogueslay
 end
 ~
-#11927
-Skycleave Enchanting Lab noises~
-2 bw 15
-~
-if %self.template% == 11839
-  * Phase A
-  set rogue %room.people(11848)%
-  if !%rogue% || %rogue.fighting% || %rogue.disabled%
-    * No messages in phase A unless the Rogue Boss is present and free
-    halt
-  end
-  if %rogue.room% != %room% || %rogue.fighting%
-    * Rogue Boss is not in this room or is fighting
-    halt
-  end
-  switch %random.3%
-    case 1
-      %echo% ~%rogue% pulls slightly on one book after another, with a look of disappointment each time.
-    break
-    case 2
-      %echo% ~%rogue% feels along the base of the east wall, looking for something.
-    break
-    case 3
-      %echo% ~%rogue% stabes ^%rogue% dagger into a crack in the east wall, but is unable to pry anything loose.
-    break
-  done
-else
-  * Phase B
-  if !%instance.mob(11940)%
-    * No messages in phase B unless the Magineer is present.
-    halt
-  end
-  switch %random.3%
-    case 1
-      %echo% A strange whirring sound comes from the east.
-    break
-    case 2
-      %echo% It sounds like someone is hammering something to the east.
-    break
-    case 3
-      %echo% You hear a loud thud and then indistinct shouting from the east.
-    break
-  done
-end
-~
 #11928
 Skycleave: skyrogueslay command for floor 3~
 0 c 0
@@ -2238,14 +2193,18 @@ elseif %self.vnum% == 11888 && %arg% == knezz
 end
 ~
 #11936
-Skycleave: Room commands (Lich Labs, Goblin Cages, Gate, Ossuary)~
+Skycleave: Room commands (Pixy Races, Lich Labs, Goblin Cages, Gate, Ossuary)~
 2 c 0
-touch open disturb wake awaken search attune look~
+touch open disturb wake awaken search attune look bet wager~
 set lich_cmds touch open disturb wake awaken search
 return 0
 if attune /= %cmd% && %room.template% == 11841
   * attunement lab: wrong phase
   %send% %actor% You seem to be in the right place, but the wrong time. There's nobody here to attune skystones for you.
+  return 1
+elseif (bet /= %cmd% || wager /= %cmd%) && %room.template% == 11918
+  * pixy races
+  %send% %actor% It looks like they don't let guests bet on the races.
   return 1
 elseif open /= %cmd% && %room.template% == 11989
   * gobbrabakh of orka gate: can't open it
@@ -4360,8 +4319,30 @@ if !(%arg% ~= %phrase1%) || !(%arg% ~= %phrase2%)
   halt
 end
 wait 1
+* look for mageina
+set mageina %self.room.people(11905)%
+if !%mageina%
+  set mageina %self.room.people(11805)%
+end
+* messaging
 if %actor.is_immortal%
   %echo% A bolt of lightning comes out of nowhere and strikes |%actor% wand!
+elseif %mageina%
+  %echo% A bolt of lightning streaks out of nowhere...
+  %echo% ... Mageina whips a gnarled old wand out of her sleeve and catches the lightning!
+  wait 1
+  %force% %mageina% say No!
+  wait 1
+  if %actor.room% != %mageina.room%
+    halt
+  end
+  wait 1
+   %force% %mageina% say Expeliarmus!
+  %send% %actor% Before you can even blink, the wand flips out of your hand!
+  %echoaround% %actor% |%actor% wand flips out of ^%actor% hand!
+  wait 1
+  %echo% Mageina catches the wand and puts it away.
+  %purge% %self%
 else
   %echo% A bolt of lightning from nowhere strikes ~%actor% right in the chest!
   %slay% %actor% %actor.name% has died of hubris at %actor.room.coords%!
