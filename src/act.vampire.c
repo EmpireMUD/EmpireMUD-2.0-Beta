@@ -1188,7 +1188,7 @@ ACMD(do_command) {
 	}
 	else if (!MOB_FLAGGED(victim, MOB_HUMAN))
 		msg_to_char(ch, "You can only give commands to humans.\r\n");
-	else if (MOB_FLAGGED(victim, MOB_HARD | MOB_GROUP) || AFF_FLAGGED(victim, AFF_NO_ATTACK)) {
+	else if (MOB_FLAGGED(victim, MOB_HARD | MOB_GROUP | MOB_NO_COMMAND) || AFF_FLAGGED(victim, AFF_NO_ATTACK)) {
 		act("You can't command $N.", FALSE, ch, NULL, victim, TO_CHAR);
 	}
 	else if (IS_VAMPIRE(victim) && (IS_NPC(victim) || has_skill_flagged(victim, SKILLF_VAMPIRE) > has_skill_flagged(ch, SKILLF_VAMPIRE)))

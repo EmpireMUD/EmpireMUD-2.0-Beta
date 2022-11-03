@@ -3174,8 +3174,12 @@ ACMD(do_order) {
 		send_to_char("Order who to do what?\r\n", ch);
 	else if (!(vict = get_char_vis(ch, name, NULL, FIND_CHAR_ROOM)) && !is_abbrev(name, "followers"))
 		send_to_char("That person isn't here.\r\n", ch);
-	else if (ch == vict)
-		send_to_char("You obviously suffer from schizophrenia.\r\n", ch);
+	else if (ch == vict) {
+		send_to_char("You can order yourself around all you want.\r\n", ch);
+	}
+	else if (vict && MOB_FLAGGED(vict, MOB_NO_COMMAND)) {
+		act("You can't command $M.", FALSE, ch, NULL, vict, TO_CHAR);
+	}
 	else {
 		if (AFF_FLAGGED(ch, AFF_CHARM)) {
 			send_to_char("Your superior would not approve of you giving orders.\r\n", ch);
@@ -3203,7 +3207,7 @@ ACMD(do_order) {
 
 			for (k = ch->followers; k; k = k->next) {
 				if (org_room == IN_ROOM(k->follower))
-					if (AFF_FLAGGED(k->follower, AFF_CHARM)) {
+					if (AFF_FLAGGED(k->follower, AFF_CHARM) && !MOB_FLAGGED(k->follower, MOB_NO_COMMAND)) {
 						found = TRUE;
 						SET_BIT(AFF_FLAGS(k->follower), AFF_ORDERED);
 						command_interpreter(k->follower, message);

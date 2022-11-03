@@ -4549,6 +4549,7 @@ Available mob flags:
     the first time, so ensure that it is scaled before changing attributes.
  SILENT - Mob will not display custom strings while this flag is on.
  COINS - Mob will drop coins on death/pickpocket.
+ NO-COMMAND - Cannot be commanded/ordered.
 
 See also: OLC MOBILES
 #d
