@@ -5073,8 +5073,8 @@ set diff %self.difficulty%
 set moves_left %self.var(moves_left)%
 set num_left %self.var(num_left,0)%
 if !%moves_left% || !%num_left%
-  set moves_left 1 2 3
-  set num_left 3
+  set moves_left 1 2 3 4
+  set num_left 4
 end
 * pick
 eval which %%random.%num_left%%%
@@ -5106,7 +5106,7 @@ if %move% == 1
   wait 3 sec
   %echo% &&A\*\* You are frozen solid as the water around you turns to ice! \*\*&&0 (struggle)
   skyfight setup struggle all 20
-  set ch %self.room.people%
+  set ch %room.people%
   while %ch%
     set bug %ch.inventory(11890)%
     if %bug%
@@ -5125,7 +5125,7 @@ if %move% == 1
   set cycle 0
   while %cycle% < 4
     wait 5 s
-    set ch %self.room.people%
+    set ch %room.people%
     while %ch%
       set next_ch %ch.next_in_room%
       if %ch.affect(11822)%
@@ -5133,8 +5133,8 @@ if %move% == 1
           * final
           %send% %ch% &&AYou're unfrozen but desperately need air...&&0
           if %diff% >= 3
-            eval enter_%ch.id% %self.room.var(enter_%ch.id%,%timestamp%)% - (%diff% * 5)
-            remote enter_%ch.id% %self.room.id%
+            eval enter_%ch.id% %room.var(enter_%ch.id%,%timestamp%)% - (%diff% * 5)
+            remote enter_%ch.id% %room.id%
           end
           dg_affect #11822 %ch% off
         else
@@ -5165,13 +5165,13 @@ elseif %move% == 2
   while %cycle% <= %diff%
     skyfight setup dodge all
     wait %wait% s
-    set ch %self.room.people%
+    set ch %room.people%
     while %ch%
       set next_ch %ch.next_in_room%
       if %self.is_enemy(%ch%)%
         if !%ch.var(did_sfdodge)%
           %echo% &&AThere's a blinding flash as a bubble implodes right next to ~%ch%!&&0
-          if %cycle% == %diff% && %diff% >= 3
+          if %cycle% == %diff% && %diff% >= 3 && (%self.level% + 100) > %ch.level%
             dg_affect #11851 %ch% STUNNED on 5
           end
           eval amt %diff% * 33
@@ -5206,7 +5206,7 @@ elseif %move% == 3
     wait 4 s
     if %self.sfinterrupt_count% >= 1 && (%self.sfinterrupt_count% >= %needed% || %self.sfinterrupt_count% == 4)
       set broke 1
-      set ch %self.room.people%
+      set ch %room.people%
       while %ch%
         if %ch.var(did_sfinterrupt,0)%
           %send% %ch% &&AYou manage to interrupt the First Water before another bolt can come down!&&0
@@ -5223,7 +5223,7 @@ elseif %move% == 3
       end
     else
       %echo% &&AA bolt strikes the water above you, triggering a lightning wave!&&0
-      set ch %self.room.people%
+      set ch %room.people%
       while %ch%
         set next_ch %ch.next_in_room%
         if %self.is_enemy(%ch%)%
@@ -5232,7 +5232,7 @@ elseif %move% == 3
           %echoaround% %ch% &&A~%ch% gurgles in pain as the wave passes through *%ch%!&&0
           eval amount %diff% * 20
           %damage% %ch% %amount% physical
-          if %cycle% == 4 && %self.difficulty% == 4
+          if %cycle% == 4 && %self.difficulty% == 4 && (%self.level% + 100) > %ch.level%
             dg_affect #11851 %ch% STUNNED on 10
           end
         end
@@ -5243,7 +5243,61 @@ elseif %move% == 3
   done
   skyfight clear interrupt
 elseif %move% == 4
-  *
+  * Under Pressure
+  skyfight clear struggle
+  %echo% &&AThe water goes still for a moment -- too still...&&0
+  nop %self.add_mob_flag(NO-ATTACK)%
+  wait 3 sec
+  %echo% &&A\*\* You are trapped in a pressure wave! \*\*&&0 (struggle)
+  skyfight setup struggle all 20
+  set ch %room.people%
+  while %ch%
+    set bug %ch.inventory(11890)%
+    if %bug%
+      set struggle_char You struggle to escape the pressure wave...
+      set struggle_room ~%%actor%% struggles against the pressure wave...
+      remote struggle_char %bug.id%
+      remote struggle_room %bug.id%
+      set breakout_char You manage to get out of the pressure wave!
+      set breakout_room ~%%actor%% manages to get out of the pressure wave!
+      remote breakout_char %bug.id%
+      remote breakout_room %bug.id%
+    end
+    set ch %ch.next_in_room%
+  done
+  * messages
+  set cycle 0
+  eval time_pain (%diff% - 1) * 7.5
+  eval dodge_pain %diff% * 10
+  while %cycle% < 4
+    wait 5 s
+    set ch %room.people%
+    while %ch%
+      set next_ch %ch.next_in_room%
+      if %ch.affect(11822)%
+        if %diff% >= 2
+          eval enter_%ch.id% %room.var(enter_%ch.id%,%timestamp%)% - %time_pain%
+          remote enter_%ch.id% %room.id%
+        end
+        if %cycle% == 3
+          * final
+          %send% %ch% &&AYou're no longer under pressure but your lungs ache badly!&&0
+          dg_affect #11822 %ch% off
+          * penalty
+          dg_affect #11972 %ch% DODGE -%dodge_pain% 25
+        else
+          %send% %ch% &&A\*\* You are trapped stuck in the pressure wave! \*\*&&0 (struggle)
+        end
+      end
+      set ch %next_ch%
+    done
+    if %cycle% >= (5 - %diff%)
+      nop %self.remove_mob_flag(NO-ATTACK)%
+    end
+    eval cycle %cycle% + 1
+  done
+  nop %self.remove_mob_flag(NO-ATTACK)%
+  skyfight clear struggle
 end
 * in case
 nop %self.remove_mob_flag(NO-ATTACK)%
