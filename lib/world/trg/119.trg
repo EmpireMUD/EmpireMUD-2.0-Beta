@@ -5064,7 +5064,196 @@ nop %self.remove_mob_flag(NO-ATTACK)%
 Elemental Plane of Water: First Water fight~
 0 k 100
 ~
-* tba
+if %self.cooldown(11800)% || %self.disabled%
+  halt
+end
+* order
+set moves_left %self.var(moves_left)%
+set num_left %self.var(num_left,0)%
+if !%moves_left% || !%num_left%
+  set moves_left 1 2 3
+  set num_left 3
+end
+* pick
+eval which %%random.%num_left%%%
+set old %moves_left%
+set moves_left
+set move 0
+while %which% > 0
+  set move %old.car%
+  if %which% != 1
+    set moves_left %moves_left% %move%
+  end
+  set old %old.cdr%
+  eval which %which% - 1
+done
+set moves_left %moves_left% %old%
+* store
+eval num_left %num_left% - 1
+remote moves_left %self.id%
+remote num_left %self.id%
+* perform move
+nop %self.set_cooldown(11800, 30)%
+if %move% == 1
+  * Frozen Solid
+  skyfight clear struggle
+  %echo% &&AThe water around you is suddenly bitter cold... and getting colder by the second!&&0
+  if %self.difficulty% <= 3
+    nop %self.add_mob_flag(NO-ATTACK)%
+  end
+  wait 3 sec
+  %echo% &&A\*\* You are frozen solid as the water around you turns to ice! \*\*&&0 (struggle)
+  skyfight setup struggle all 20
+  set ch %self.room.people%
+  while %ch%
+    set bug %ch.inventory(11890)%
+    if %bug%
+      set struggle_char You struggle to break free of the ice...
+      set struggle_room ~%%actor%% struggles to break free...
+      remote struggle_char %bug.id%
+      remote struggle_room %bug.id%
+      set breakout_char You manage to get out of the ice!
+      set breakout_room ~%%actor%% manages to get out of the ice!
+      remote breakout_char %bug.id%
+      remote breakout_room %bug.id%
+    end
+    set ch %ch.next_in_room%
+  done
+  * messages
+  set cycle 0
+  while %cycle% < 4
+    wait 5 s
+    set ch %self.room.people%
+    while %ch%
+      set next_ch %ch.next_in_room%
+      if %ch.affect(11822)%
+        if %cycle% == 3
+          * final
+          %send% %ch% &&AYou're unfrozen but desperately need air...&&0
+          if %self.difficulty% >= 3
+            eval enter_%ch.id% %self.room.var(enter_%ch.id%,%timestamp%)% - (%self.difficulty% * 5)
+            remote enter_%ch.id% %self.room.id%
+          end
+          dg_affect #11822 %ch% off
+        else
+          %send% %ch% &&A\*\* You are still frozen solid! \*\*&&0 (struggle)
+        end
+      end
+      set ch %next_ch%
+    done
+    if %cycle% >= (4 - %self.difficulty%)
+      nop %self.remove_mob_flag(NO-ATTACK)%
+    end
+    eval cycle %cycle% + 1
+  done
+  nop %self.remove_mob_flag(NO-ATTACK)%
+  skyfight clear struggle
+elseif %move% == 2
+  * Cavitation Cascade
+  skyfight clear dodge
+  %echo% &&AThe water calms for the briefest moment before large bubbles start to appear around you...&&0
+  if %self.difficulty% <= 2
+    nop %self.add_mob_flag(NO-ATTACK)%
+  end
+  skyfight setup dodge all
+  wait 3 s
+  %echo% &&A\*\* Suddenly the bubbles around you begin to implode! \*\*&&0 (dodge)
+  set cycle 1
+  set diff %self.difficulty%
+  eval wait 12 - %diff%
+  while %cycle% <= %diff%
+    skyfight setup dodge all
+    wait %wait% s
+    set ch %self.room.people%
+    while %ch%
+      set next_ch %ch.next_in_room%
+      if %self.is_enemy(%ch%)%
+        if !%ch.var(did_sfdodge)%
+          %echo% &&AThere's a blinding flash as a bubble implodes right next to ~%ch%!&&0
+          if %cycle% == %diff% && %diff% >= 3
+            dg_affect #11851 %ch% STUNNED on 5
+          end
+          eval amt %self.difficulty% * 33
+          %damage% %ch% %amt% physical
+        elseif %ch.is_pc%
+          %send% %ch% &&AYou cover your eyes as you swim out of the way of an imploding bubble!&&0
+        end
+        if %cycle% < %diff%
+          %send% %ch% &&A\*\* Here comes another one... \*\*&&0 (dodge)
+        end
+      end
+      set ch %next_ch%
+    done
+    eval cycle %cycle% + 1
+  done
+  skyfight clear dodge
+  wait 8 s
+  nop %self.remove_mob_flag(NO-ATTACK)%
+elseif %move% == 3
+  * Lightning Wave
+  %echo% &&AA terrifying clap thunder shakes you to the core, even down here...&&0
+  %echo% &&A\*\* The First Water seems to be drawing down the lightning! \*\*&&0 (interrupt)
+  if %self.difficulty% == 1
+    nop %self.add_mob_flag(NO-ATTACK)%
+  end
+  skyfight clear interrupt
+  skyfight setup interrupt all
+  set cycle 0
+  set broke 0
+  while !%broke% && %cycle% < 5
+    wait 4 s
+    if %self.sfinterrupt_count% >= 1 && %self.sfinterrupt_count% >= (%self.difficulty% + 1) / 2
+      set broke 1
+      set ch %self.room.people%
+      while %ch%
+        if %ch.var(did_sfinterrupt,0)%
+          %send% %ch% &&AYou manage to interrupt the First Water before another bolt can come down!&&0
+        end
+        set ch %ch.next_in_room%
+      done
+      %echo% &&AThe water is still for a moment...&&0
+      if %self.difficulty% == 1
+        dg_affect #11852 %self% HARD-STUNNED on 10
+        wait 10 s
+      elseif %self.difficulty% < 4
+        dg_affect #11852 %self% HARD-STUNNED on 5
+        wait 5 s
+      end
+    else
+      %echo% &&AA bolt strikes the water above you, triggering a lightning wave!&&0
+      set ch %self.room.people%
+      while %ch%
+        set next_ch %ch.next_in_room%
+        eval skip %%skip_%ch.id%%%
+        if !%skip% && %self.is_enemy(%ch%)%
+          if %ch.trigger_counterspell%
+            set skip_%ch.id% 1
+            %send% %ch% &&AThe lightning wave was deflected!&&0
+            %echoaround% %ch% &&AThere's a bright flash from ~%ch% as the wave is deflected around *%ch%!&&0
+            eval sfinterrupt_count %self.var(sfinterrupt_count,0)% + 1
+            remote sfinterrupt_count %self.id%
+          else
+            * hit and no counterspell
+            %send% %ch% &&AYou gurgle in pain as the wave passes through you!&&0
+            %echoaround% %ch% &&A~%ch% gurgles in pain as the wave passes through *%ch%!&&0
+            eval amount %self.difficulty% * 20
+            %damage% %ch% %amount% physical
+            if %cycle% == 4 && %self.difficulty% == 4
+              dg_affect #11851 %ch% STUNNED on 10
+            end
+          end
+        end
+        set ch %next_ch%
+      done
+    end
+    eval cycle %cycle% + 1
+  done
+  skyfight clear interrupt
+elseif %move% == 4
+  *
+end
+* in case
+nop %self.remove_mob_flag(NO-ATTACK)%
 ~
 #11985
 Gray fox pet behavior~

@@ -3518,7 +3518,7 @@ elseif %move% == 2
   set broke 0
   while !%broke% && %cycle% < 5
     wait 4 s
-    if %self.sfinterrupt_count% >= 1 && %self.sfinterrupt_count% >= %self.difficulty% / 2
+    if %self.sfinterrupt_count% >= 1 && %self.sfinterrupt_count% >= (%self.difficulty% + 1) / 2
       set broke 1
       set ch %self.room.people%
       while %ch%
