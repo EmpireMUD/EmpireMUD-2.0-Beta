@@ -5067,6 +5067,8 @@ Elemental Plane of Water: First Water fight~
 if %self.cooldown(11800)% || %self.disabled%
   halt
 end
+set room %self.room%
+set diff %self.difficulty%
 * order
 set moves_left %self.var(moves_left)%
 set num_left %self.var(num_left,0)%
@@ -5098,7 +5100,7 @@ if %move% == 1
   * Frozen Solid
   skyfight clear struggle
   %echo% &&AThe water around you is suddenly bitter cold... and getting colder by the second!&&0
-  if %self.difficulty% <= 3
+  if %diff% <= 3
     nop %self.add_mob_flag(NO-ATTACK)%
   end
   wait 3 sec
@@ -5130,8 +5132,8 @@ if %move% == 1
         if %cycle% == 3
           * final
           %send% %ch% &&AYou're unfrozen but desperately need air...&&0
-          if %self.difficulty% >= 3
-            eval enter_%ch.id% %self.room.var(enter_%ch.id%,%timestamp%)% - (%self.difficulty% * 5)
+          if %diff% >= 3
+            eval enter_%ch.id% %self.room.var(enter_%ch.id%,%timestamp%)% - (%diff% * 5)
             remote enter_%ch.id% %self.room.id%
           end
           dg_affect #11822 %ch% off
@@ -5141,7 +5143,7 @@ if %move% == 1
       end
       set ch %next_ch%
     done
-    if %cycle% >= (4 - %self.difficulty%)
+    if %cycle% >= (4 - %diff%)
       nop %self.remove_mob_flag(NO-ATTACK)%
     end
     eval cycle %cycle% + 1
@@ -5152,14 +5154,13 @@ elseif %move% == 2
   * Cavitation Cascade
   skyfight clear dodge
   %echo% &&AThe water calms for the briefest moment before large bubbles start to appear around you...&&0
-  if %self.difficulty% <= 2
+  if %diff% <= 2
     nop %self.add_mob_flag(NO-ATTACK)%
   end
   skyfight setup dodge all
   wait 3 s
   %echo% &&A\*\* Suddenly the bubbles around you begin to implode! \*\*&&0 (dodge)
   set cycle 1
-  set diff %self.difficulty%
   eval wait 12 - %diff%
   while %cycle% <= %diff%
     skyfight setup dodge all
@@ -5173,7 +5174,7 @@ elseif %move% == 2
           if %cycle% == %diff% && %diff% >= 3
             dg_affect #11851 %ch% STUNNED on 5
           end
-          eval amt %self.difficulty% * 33
+          eval amt %diff% * 33
           %damage% %ch% %amt% physical
         elseif %ch.is_pc%
           %send% %ch% &&AYou cover your eyes as you swim out of the way of an imploding bubble!&&0
@@ -5191,18 +5192,19 @@ elseif %move% == 2
   nop %self.remove_mob_flag(NO-ATTACK)%
 elseif %move% == 3
   * Lightning Wave
-  %echo% &&AA terrifying clap thunder shakes you to the core, even down here...&&0
+  %echo% &&AA terrifying clap of thunder shakes you to the core, even down here...&&0
   %echo% &&A\*\* The First Water seems to be drawing down the lightning! \*\*&&0 (interrupt)
-  if %self.difficulty% == 1
+  if %diff% == 1
     nop %self.add_mob_flag(NO-ATTACK)%
   end
   skyfight clear interrupt
   skyfight setup interrupt all
   set cycle 0
   set broke 0
+  set needed %room.players_present%
   while !%broke% && %cycle% < 5
     wait 4 s
-    if %self.sfinterrupt_count% >= 1 && %self.sfinterrupt_count% >= (%self.difficulty% + 1) / 2
+    if %self.sfinterrupt_count% >= 1 && (%self.sfinterrupt_count% >= %needed% || %self.sfinterrupt_count% == 4)
       set broke 1
       set ch %self.room.people%
       while %ch%
@@ -5212,10 +5214,10 @@ elseif %move% == 3
         set ch %ch.next_in_room%
       done
       %echo% &&AThe water is still for a moment...&&0
-      if %self.difficulty% == 1
+      if %diff% == 1
         dg_affect #11852 %self% HARD-STUNNED on 10
         wait 10 s
-      elseif %self.difficulty% < 4
+      elseif %diff% < 4
         dg_affect #11852 %self% HARD-STUNNED on 5
         wait 5 s
       end
@@ -5224,23 +5226,14 @@ elseif %move% == 3
       set ch %self.room.people%
       while %ch%
         set next_ch %ch.next_in_room%
-        eval skip %%skip_%ch.id%%%
-        if !%skip% && %self.is_enemy(%ch%)%
-          if %ch.trigger_counterspell%
-            set skip_%ch.id% 1
-            %send% %ch% &&AThe lightning wave was deflected!&&0
-            %echoaround% %ch% &&AThere's a bright flash from ~%ch% as the wave is deflected around *%ch%!&&0
-            eval sfinterrupt_count %self.var(sfinterrupt_count,0)% + 1
-            remote sfinterrupt_count %self.id%
-          else
-            * hit and no counterspell
-            %send% %ch% &&AYou gurgle in pain as the wave passes through you!&&0
-            %echoaround% %ch% &&A~%ch% gurgles in pain as the wave passes through *%ch%!&&0
-            eval amount %self.difficulty% * 20
-            %damage% %ch% %amount% physical
-            if %cycle% == 4 && %self.difficulty% == 4
-              dg_affect #11851 %ch% STUNNED on 10
-            end
+        if %self.is_enemy(%ch%)%
+          * hit and no counterspell
+          %send% %ch% &&AYou gurgle in pain as the wave passes through you!&&0
+          %echoaround% %ch% &&A~%ch% gurgles in pain as the wave passes through *%ch%!&&0
+          eval amount %diff% * 20
+          %damage% %ch% %amount% physical
+          if %cycle% == 4 && %self.difficulty% == 4
+            dg_affect #11851 %ch% STUNNED on 10
           end
         end
         set ch %next_ch%
