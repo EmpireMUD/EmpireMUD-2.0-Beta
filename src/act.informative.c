@@ -1107,7 +1107,7 @@ void list_one_char(char_data *i, char_data *ch, int num) {
 		}
 	}
 	LL_FOREACH(i->over_time_effects, dot) {
-		if ((gen = real_generic(aff->type)) && GET_AFFECT_LOOK_AT_ROOM(gen)) {
+		if ((gen = real_generic(dot->type)) && GET_AFFECT_LOOK_AT_ROOM(gen)) {
 			add_string_hash(&str_hash, GET_AFFECT_LOOK_AT_ROOM(gen), 1);
 		}
 	}
@@ -1329,7 +1329,7 @@ void look_at_char(char_data *i, char_data *ch, bool show_eq) {
 		}
 	}
 	LL_FOREACH(i->over_time_effects, dot) {
-		if ((gen = real_generic(aff->type)) && GET_AFFECT_LOOK_AT_CHAR(gen)) {
+		if ((gen = real_generic(dot->type)) && GET_AFFECT_LOOK_AT_CHAR(gen)) {
 			add_string_hash(&str_hash, GET_AFFECT_LOOK_AT_CHAR(gen), 1);
 		}
 	}
