@@ -896,7 +896,7 @@ elseif %move% == 2
     %echo% &&m~%self% whips a fistful of sand out of ^%self% pocket and throws it at... the air.&&0
   else
     * hit
-    %send% %targ% &&m~%self% whips a fistful of sand from ^%self% pocket into |%targ% eyes!&&0
+    %echo% &&m~%self% whips a fistful of sand from ^%self% pocket into |%targ% eyes!&&0
     dg_affect #11841 %targ% BLIND on 10
     %damage% %targ% 5 physical
   end
@@ -1021,7 +1021,7 @@ elseif %move% == 2
   done
   if !%any%
     * full miss
-    %echo% &&~%self% looks dizzy as &%self% throws the last knife.&0
+    %echo% &&m~%self% looks dizzy as &%self% throws the last knife.&&0
     dg_affect #11852 %self% HARD-STUNNED on 5
   end
   skyfight clear dodge
@@ -1135,7 +1135,7 @@ elseif %move% == 2
   done
   if !%any%
     * full miss
-    %echo% &&~%self% whirls around for a second and spins *%self%self out.&0
+    %echo% &&m~%self% whirls around for a second and spins *%self%self out.&&0
     dg_affect #11852 %self% HARD-STUNNED on 5
   end
   skyfight clear dodge
@@ -1144,111 +1144,196 @@ end
 nop %self.remove_mob_flag(NO-ATTACK)%
 ~
 #11818
-Venjer the Fox: Goblin blastmaster combat script~
+Venjer the Fox combat: Pixycraft Embiggening Elixir, Blinding Barrage, Tower Quake, Blastmaster Fox~
 0 k 100
 ~
-if %self.cooldown(11800)%
+if %self.cooldown(11800)% || %self.disabled%
   halt
 end
-set type %random.4%
-if %type% == 1
+set room %self.room%
+set diff %self.difficulty%
+* order
+set moves_left %self.var(moves_left)%
+set num_left %self.var(num_left,0)%
+if !%moves_left% || !%num_left%
+  set moves_left 1 2 3 4
+  set num_left 4
+end
+* pick
+eval which %%random.%num_left%%%
+set old %moves_left%
+set moves_left
+set move 0
+while %which% > 0
+  set move %old.car%
+  if %which% != 1
+    set moves_left %moves_left% %move%
+  end
+  set old %old.cdr%
+  eval which %which% - 1
+done
+set moves_left %moves_left% %old%
+* store
+eval num_left %num_left% - 1
+remote moves_left %self.id%
+remote num_left %self.id%
+* perform move
+nop %self.set_cooldown(11800, 30)%
+if %move% == 1
   * Pixycraft Embiggening Elixir
-  nop %self.set_cooldown(11800, 30)%
-  %echo% ~%self% takes a pixycraft embiggening elixir from ^%self% belt.
-  %echo% (You should probably 'interrupt' *%self% before &%self% drinks it.)
-  set drinking 1
-  remote drinking %self.id%
-  wait 3 sec
-  if !%self.varexists(drinking)%
-    halt
+  skyfight clear interrupt
+  %echo% &&m**** Venjer takes a pixycraft embiggening elixir from her belt... ****&&0 (interrupt)
+  skyfight setup interrupt all
+  wait 4 s
+  if %self.var(sfinterrupt_count,0)% < (%diff% + 1) / 2
+    %echo% &&m**** Venjer uncorks the pixycraft embiggening elixir and licks her lips... ****&&0 (interrupt)
   end
-  %echo% ~%self% uncorks the pixycraft embiggening elixir and licks ^%self% lips.
-  wait 3 sec
-  if !%self.varexists(drinking)%
-    halt
-  end
-  %echo% ~%self% tips ^%self% head back and downs the pixycraft embiggening elixir in one go!
-  %echo% ~%self% suddenly doubles in size!
-  dg_affect #11817 %self% BONUS-MAGICAL 100 30
-  rdelete drinking %self.id%
-elseif %type% == 2
-  * Staff Bolts
-  nop %self.set_cooldown(11800, 30)%
-  %echo% ~%self% spins ^%self% staff in a circle, and a ball of light starts to grow at its tip...
-  wait 5 sec
-  if %actor.room% != %self.room%
-    set actor %self.fighting%
-  end
-  if !%actor%
-    halt
-  end
-  %echo% ~%self% sweeps ^%self% staff in an arc and screams, 'Banish!'
-  if %self.mob_flagged(GROUP)%
-    %echo% &&rA luminous storm of energy bolts rains down upon you!
-    %aoe% 200 magical
+  wait 4 s
+  if %self.var(sfinterrupt_count,0)% >= (%diff% + 1) / 2
+    %echo% &&mVenjer is interrupted and drops the elixir, which smashes on the ground!&&0
+    if %diff% == 1
+      dg_affect #11852 %self% HARD-STUNNED on 10
+    end
   else
-    if %actor.trigger_counterspell%
-      %send% %actor% A luminous energy bolt crashes into your counterspell and explodes!
-      %send% %actor% &&rYou are caught in the blast!
+    %echo% &&mVenjer quaffs the pixycraft embiggening elixir in one go... and doubles in size!&&0
+    eval amount %diff% * 15
+    dg_affect #11817 %self% BONUS-MAGICAL %amount% 30
+  end
+  skyfight clear interrupt
+elseif %move% == 2
+  * Blinding Barrage
+  skyfight clear dodge
+  %echo% &&mVenjer steps back and begins shaking her staff, making an ominous rattle...&&0
+  if %diff% <= 2
+    nop %self.add_mob_flag(NO-ATTACK)%
+  end
+  skyfight setup dodge all
+  wait 3 s
+  say Blinding Barrage!
+  %echo% &&m**** There's a loud POP and a BANG as the air begins to explode around you! ****&&0 (dodge)
+  set cycle 1
+  set broke 0
+  eval wait 10 - %diff%
+  while %cycle% <= %diff% && !%broke%
+    skyfight setup dodge all
+    wait %wait% s
+    set ch %room.people%
+    while %ch%
+      set next_ch %ch.next_in_room%
+      if %self.is_enemy(%ch%)%
+        if !%ch.var(did_sfdodge)%
+          if %ch.trigger_counterspell%
+            %echo% &&mThe blinding barrage blows back in Venjer's face as it hits |%ch% counterspell!&&0
+            set broke 1
+          else
+            %echo% &&mThere's a blinding flash as the air explodes right next to ~%ch%!&&0
+            if %cycle% == %diff% && %diff% >= 2
+              dg_affect #11823 %ch% BLIND on 10
+            end
+            eval amt %diff% * 33
+            %damage% %ch% %amt% magical
+          end
+        elseif %ch.is_pc%
+          %send% %ch% &&mYou cover your eyes as you dodge out of the way of the blinding barrage!&&0
+        end
+        if %cycle% < %diff%
+          %send% %ch% &&m**** Here comes another one... ****&&0 (dodge)
+        end
+      end
+      set ch %next_ch%
+    done
+    eval cycle %cycle% + 1
+  done
+  skyfight clear dodge
+  if %broke% && %diff% < 4
+    dg_affect #11852 %self% HARD-STUNNED on 10
+  end
+  wait 8 s
+elseif %move% == 3
+  * Tower Quake
+  skyfight clear dodge
+  %echo% &&mVenjer raises her staff high in the air and slams it into the floor!&&0
+  if %diff% <= 2
+    nop %self.add_mob_flag(NO-ATTACK)%
+  end
+  wait 3 s
+  %echo% &&mA large glowing sigil spreads across the floor from the impact of Venjer's staff...&&0
+  wait 3 s
+  skyfight setup dodge all
+  say TOWER QUAKE!
+  %echo% &&m**** There's a low rumble as the tower begins to shake... ****&&0 (dodge)
+  set cycle 1
+  eval wait 10 - %diff%
+  eval debuff %self.level% / 8
+  while %cycle% <= %diff%
+    skyfight setup dodge all
+    wait %wait% s
+    %regionecho% %room% 1 The Tower Skycleave quakes on its foundation!
+    set ch %room.people%
+    while %ch%
+      set next_ch %ch.next_in_room%
+      if %self.is_enemy(%ch%)%
+        if !%ch.var(did_sfdodge)%
+          %echo% &&mThe shaking floor knocks ~%ch% to the floor!&&0
+          if %cycle% == %diff% && %diff% >= 3 && (%self.level% + 100) > %ch.level%
+            dg_affect #11814 %ch% STUNNED on 5
+          end
+          dg_affect #11818 %ch% TO-HIT -%debuff% 15
+          dg_affect #11818 %ch% DODGE -%debuff% 15
+          eval amt %diff% * 33
+          %damage% %ch% %amt% physical
+        elseif %ch.is_pc%
+          %send% %ch% &&mYou jump at just the right time and avoid the tower quake!&&0
+        end
+        if %cycle% < %diff%
+          %send% %ch% &&m**** Here comes another quake... ****&&0 (dodge)
+        end
+      end
+      set ch %next_ch%
+    done
+    eval cycle %cycle% + 1
+  done
+  skyfight clear dodge
+  wait 8 s
+elseif %move% == 4
+  * Blastmaster Fox
+  if %diff% <= 2
+    nop %self.add_mob_flag(NO-ATTACK)%
+  end
+  skyfight clear interrupt
+  set targ %self.fighting%
+  set id %targ.id%
+  %send% %targ% &&m**** Venjer spins her staff in a circle, and a ball of light starts to grow at its tip... ****&&0 (interrupt)
+  %echoaround% %targ% &&mVenjer spins her staff in a circle, and a ball of light starts to grow at its tip...&&0
+  skyfight setup interrupt %targ%
+  set cycle 1
+  while %cycle% <= %diff%
+    wait 4 s
+    say Blastmaster Fox!
+    if !%targ% || %targ.id% != %id%
+      * gone
+      %echo% &&mLuminous bolts from Venjer's staff crash all over the room and explode!&&0
+    elseif %targ.var(did_sfinterrupt)%
+      %send% %targ% &&mYou knock Venjer's staff sideways and luminous bolts fly every which way, crashing all around you, but they all miss!&&0
+      %echo% &&m~%targ% knocks Venjer's staff sideways and luminous bolts fly every which way, crashing around ~%targ%, but they all miss!&&0
     else
-      %send% %actor% &&rA luminous energy bolt crashes into you and explodes!
+      * hit
+      %send% %targ% &&mLuminous bolts from Venjer's staff crash into ~%targ% and explode!&&0
+      dg_affect #11841 %targ% BLIND on 10
       %damage% %actor% 100 magical
     end
-    %echoaround% %actor% A luminous energy bolt crashes into ~%actor% and explodes!
-    %echoaround% %actor% &&rYou are caught in the blast!
-    %aoe% 50 magical
-  end
-elseif %type% == 3
-  * Blinding Bomb
-  nop %self.set_cooldown(11800, 30)%
-  %send% %actor% ~%self% pulls out a bomb and hurls it at you!
-  %echoaround% %actor% ~%self% pulls out a bomb and hurls it at ~%actor%!
-  if %self.mob_flagged(GROUP)%
-    %echo% &&r|%self% bomb explodes with a deafening bang and a blinding flash!
-  else
-    %echo% &&r|%self% bomb explodes with a blinding flash!
-  end
-  %aoe% 25 physical
-  %aoe% 25 fire
-  set person %self.room.people%
-  while %person%
-    if %person.is_enemy(%self%)%
-      if %self.mob_flagged(GROUP)%
-        %send% %person% You are briefly stunned by the deafening sound!
-        dg_affect #11824 %person% STUNNED on 5
-      end
-      dg_affect #11823 %person% BLIND on 10
+    %echo% &&mYou're caught in the explosion!&&0
+    %aoe% 25 magical
+    if %cycle% < %diff% && %targ% && %targ.id% == %id%
+      %send% %targ% &&m**** Here comes another blast... ****&&0 (interrupt)
+      skyfight setup interrupt %targ%
     end
-    set person %person.next_in_room%
+    eval cycle %cycle% + 1
   done
-elseif %type% == 4
-  * Earthquake
-  nop %self.set_cooldown(11800, 30)%
-  %echo% ~%self% raises ^%self% staff high in the air and slams it into the floor!
-  wait 3 sec
-  %echo% A large glowing sigil spreads across the floor from the impact of |%self% staff...
-  wait 3 sec
-  %echo% |%self% sigil flares brightly!
-  %regionecho% %self.room% 5 The earth shakes beneath you!
-  set person %self.room.people%
-  while %person%
-    if %person.is_enemy(%self%)%
-      eval magnitude %self.level% / 8
-      if %self.mob_flagged(GROUP)%
-        eval magnitude %magnitude% * 2
-      end
-      if %self.mob_flagged(GROUP)%
-        %send% %person% The earthquake knocks you off your feet!
-        dg_affect #11814 %person% STUNNED on 5
-      else
-        %send% %person% The earthquake knocks you off-balance!
-      end
-      dg_affect #11818 %person% TO-HIT -%magnitude% 15
-      dg_affect #11818 %person% DODGE -%magnitude% 15
-    end
-    set person %person.next_in_room%
-  done
+  skyfight clear interrupt
 end
+* in case
+nop %self.remove_mob_flag(NO-ATTACK)%
 ~
 #11819
 Pixy Queen (Skycleave): combat script~

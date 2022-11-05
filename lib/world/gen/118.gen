@@ -69,6 +69,8 @@ embiggened~
 0 0 0 0
 T1
 $n returns to normal size.~
+T5
+...$e is huge!~
 S
 #11818
 off-balance~
@@ -118,7 +120,7 @@ blinding bomb~
 T0
 You can see again.~
 T5
-...$e has been blinded by the bomb!~
+...$e has been blinded by the barrage!~
 S
 #11824
 blinding bomb~

@@ -5189,7 +5189,6 @@ elseif %move% == 2
   done
   skyfight clear dodge
   wait 8 s
-  nop %self.remove_mob_flag(NO-ATTACK)%
 elseif %move% == 3
   * Lightning Wave
   %echo% &&AA terrifying clap of thunder shakes you to the core, even down here...&&0
