@@ -12,6 +12,20 @@ enchanted water~
 T1
 crystal clear~
 S
+#11810
+rolling~
+4 0
+0 0 0 0
+T5
+...$e is rolling on the floor!~
+S
+#11811
+fan of knives~
+4 0
+0 0 0 0
+T0
+You pull a knife out of your chest.~
+S
 #11812
 recovering~
 4 0
@@ -45,7 +59,7 @@ ankle stab~
 4 0
 0 0 0 0
 T0
-You recover from your leg wound.~
+Your ankle wound starts to feel better.~
 T4
 $e is bleeding from $s ankle.~
 S

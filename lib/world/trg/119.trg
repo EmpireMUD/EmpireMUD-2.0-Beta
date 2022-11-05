@@ -4968,7 +4968,7 @@ Goblin's Dream: Arena fight script (Elver, Nailbokh, Biksi)~
 * tba
 ~
 #11983
-Iskip of Rot and Ruin: giant sorcerer combat script~
+Iskip combat: Jar of Captivity~
 0 k 100
 ~
 if %self.cooldown(11800)% || %self.disabled%
@@ -5002,7 +5002,7 @@ remote num_left %self.id%
 * perform move
 nop %self.set_cooldown(11800, 30)%
 if %move% == 1
-  * Jar
+  * Jar of Captivity
   skyfight clear free
   %echo% &&mThe Iskip pulls out an enormous clay jar and swoops down toward you...&&0
   wait 3 s
@@ -5061,7 +5061,7 @@ end
 nop %self.remove_mob_flag(NO-ATTACK)%
 ~
 #11984
-Elemental Plane of Water: First Water fight~
+First Water combat: Frozen Solid, Cavitation Cascade, Lightning Wave, Under Pressure~
 0 k 100
 ~
 if %self.cooldown(11800)% || %self.disabled%

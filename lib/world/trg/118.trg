@@ -774,162 +774,374 @@ wait 0
 %purge% %self%
 ~
 #11815
-Escaped Goblin: combat script~
+Escaped Goblin combat: Throw Object, Pocket Sand~
 0 k 100
 ~
-if %self.cooldown(11800)%
+if %self.cooldown(11800)% || %self.disabled%
   halt
 end
-if %random.2% == 1
-  * Throw Object
-  nop %self.set_cooldown(11800, 20)%
-  set target %random.enemy%
-  if !%target%
-    set target %actor%
+set room %self.room%
+set diff %self.difficulty%
+* order
+set moves_left %self.var(moves_left)%
+set num_left %self.var(num_left,0)%
+if !%moves_left% || !%num_left%
+  set moves_left 1 2
+  set num_left 2
+end
+* pick
+eval which %%random.%num_left%%%
+set old %moves_left%
+set moves_left
+set move 0
+while %which% > 0
+  set move %old.car%
+  if %which% != 1
+    set moves_left %moves_left% %move%
   end
+  set old %old.cdr%
+  eval which %which% - 1
+done
+set moves_left %moves_left% %old%
+* store
+eval num_left %num_left% - 1
+remote moves_left %self.id%
+remote num_left %self.id%
+* perform move
+nop %self.set_cooldown(11800, 20)%
+if %move% == 1
+  * Throw Object
+  if %diff% <= 2
+    nop %self.add_mob_flag(NO-ATTACK)%
+  end
+  skyfight clear dodge
+  set targ %random.enemy%
+  if !%targ%
+    set targ %actor%
+  end
+  set id %targ.id%
+  * random obj
   set object_1 a mana deconfabulator
   set object_2 an ether condenser
   set object_3 an enchanted knickknack
   set object_4 a dynamic reconfabulator
-  eval chosen_object %%object_%random.4%%%
-  %send% %target% ~%self% grabs %chosen_object% off the floor and throws it at you!
-  %echoaround% %target% ~%self% grabs %chosen_object% off the floor and throws it at ~%target%!
-  switch %random.4%
-    case 1
-      %send% %target% &&r%chosen_object% bonks you in the head!
-      %echoaround% %target% %chosen_object% bonks ~%target% in the head!
-      %damage% %target% 100 physical
-      if %self.difficulty% >= 3
-        dg_affect #11851 %target% HARD-STUNNED on 5
-      end
-    break
-    case 2
-      %send% %target% &&r%chosen_object% explodes in your face, blinding you!
-      %echoaround% %target% %chosen_object% explodes in |%target% face, blinding *%target%!
-      %damage% %target% 100 magical
-      dg_affect #11841 %target% BLIND on 10
-    break
-    case 3
-      if %target.trigger_counterspell%
-        %send% %target% Your counterspell prevents %chosen_object% from draining your energy.
-        %send% %target% %chosen_object% bounces harmlessly off you.
-        %echoaround% %target% %chosen_object% bounces harmlessly off ~%target%.
-        halt
-      end
-      %send% %target% &&rYou feel %chosen_object% drain your energy as it bounces off you!
-      %echoaround% %target% ~%target% looks tired as %chosen_object% bounces off *%target%.
-      %damage% %target% 50
-      eval magnitude %self.level% * %self.difficulty% / 10
-      nop %target.mana(-%magnitude%)%
-      nop %target.move(-%magnitude%)%
-    break
-    case 4
-      %send% %target% %chosen_object% flies harmlessly past your head.
-      %echoaround% %target% %chosen_object% flies harmlessly past |%target% head.
-    break
-  done
-else
+  eval obj %%object_%random.4%%%
+  * start
+  say Goose!
+  %send% %targ% &&m\*\* ~%self% grabs %obj% off the floor and throws it at you! \*\*&&0 (dodge)
+  %echoaround% %targ% &&m~%self% grabs %obj% off the floor and throws it at ~%targ%!&&0
+  skyfight setup dodge %targ%
+  wait 5 sec
+  nop %self.remove_mob_flag(NO-ATTACK)%
+  wait 5 sec
+  if !%targ% || %targ.id% != %id%
+    * gone
+    %echo% &&m%obj.cap% smashes into the far wall.&&0
+    unset targ
+  elseif %targ.var(did_sfdodge)%
+    * dodged: switch targ
+    %echo% &&m%obj.cap% bounces off the wall and rebounds towards ~%self%!&&0
+    set targ %self%
+  end
+  * hit either them or me
+  if %targ%
+    * hit
+    switch %random.3%
+      case 1
+        %echo% %targ% &&m%obj% bonks ~%targ% in the head!&&0
+        %damage% %targ% 100 physical
+        if %diff% == 4
+          dg_affect #11851 %targ% HARD-STUNNED on 5
+        end
+      break
+      case 2
+        %echo% &&m%obj% explodes in |%targ% face, blinding *%targ%!&&0
+        %damage% %targ% 50 magical
+        dg_affect #11841 %targ% BLIND on 5
+      break
+      case 3
+        if %targ.trigger_counterspell%
+          %send% %targ% &&mYour counterspell prevents %obj% from draining your energy.&&0
+          %echo% &&m%obj% bounces harmlessly off ~%targ%.&&0
+        else
+          %send% %targ% &&mYou feel %obj% drain your energy as it bounces off you!&&0
+          %echoaround% %targ% &&m~%targ% looks tired as %obj% bounces off *%targ%.&&0
+          %damage% %targ% 50
+          eval mag %self.level% * %diff% / 10
+          nop %targ.mana(-%mag%)%
+          nop %targ.move(-%mag%)%
+        end
+      break
+    done
+  end
+  skyfight clear dodge
+elseif %move% == 2
   * Pocket Sand
-  nop %self.set_cooldown(11800, 20)%
-  if %actor.aff_flagged(BLIND)%
-    set target %random.enemy%
-    if %target% == %actor%
-      * Try one more time
-      set target %random.enemy%
-    end
-    if !%target% || %target% == %actor%
-      nop %self.set_cooldown(11800, 0)%
-      halt
-    end
+  if %diff% == 1
+    nop %self.add_mob_flag(NO-ATTACK)%
+  end
+  skyfight clear dodge
+  set targ %self.fighting%
+  set id %targ.id%
+  say Pocket sand!
+  %send% %targ% &&m\*\* ~%self% sticks ^%self% hand into ^%self% pocket... \*\*&&0 (dodge)
+  %echoaround% %targ% &&m~%self% sticks ^%self% hand into ^%self% pocket...&&0
+  skyfight setup dodge %targ%
+  wait 8 sec
+  if !%targ% || %targ.id% != %id%
+    * gone
+    %echo% &&m~%self% just laughs and throws sand into the air.&&0
+  elseif %targ.var(did_sfdodge)%
+    * miss
+    %echo% &&m~%self% whips a fistful of sand out of ^%self% pocket and throws it at... the air.&&0
   else
-    set target %actor%
+    * hit
+    %send% %targ% &&m~%self% whips a fistful of sand from ^%self% pocket into |%targ% eyes!&&0
+    dg_affect #11841 %targ% BLIND on 10
+    %damage% %targ% 5 physical
   end
-  if %target%
-    %send% %target% ~%self% tosses a handful of sand into your eyes!
-    %echoaround% %target% ~%self% tosses a handful of sand into |%target% eyes!
-    dg_affect #11841 %target% BLIND on 20
-    dg_affect #11841 %target% TO-HIT -10 20
-  end
+  skyfight clear dodge
 end
+* in case
+nop %self.remove_mob_flag(NO-ATTACK)%
 ~
 #11816
-Goblin Commando: combat script~
+Goblin Commando combat: Goblinball, Slay the Griffin~
 0 k 100
 ~
-if %self.cooldown(11800)%
+if %self.cooldown(11800)% || %self.disabled%
   halt
 end
-if %random.2% == 1
-  * Shadow Strike
-  nop %self.set_cooldown(11800, 20)%
-  set target %random.enemy%
-  if !%target%
-    set target %actor%
-  end
-  %echo% ~%self% steps into the shadows and vanishes...
-  %send% %target% &&r~%self% suddenly appears behind you and stabs you in the back!
-  %echoaround% %target% &&r~%self% suddenly appears behind ~%target% and stabs *%target% in the back!
-  %damage% %target% 150 physical
-  if %self.difficulty% == 4
-    %send% %target% |%self% unexpected attack leaves you off-balance!
-    %echoaround% %target% |%self% unexpected attack leaves ~%target% off-balance!
-    dg_affect #11818 %target% TO-HIT -15 10
-    dg_affect #11818 %target% DODGE -15 10
-  end
-else
-  * Ankle Stab
-  nop %self.set_cooldown(11800, 20)%
-  set bleed 50
-  if %self.difficulty% == 4
-    set bleed 100
-  end
-  %send% %actor% &&r~%self% stabs you in the ankle with ^%self% shortsword!
-  %echoaround% %actor% ~%self% stabs ~%actor% in the ankle with ^%self% shortsword!
-  %damage% %actor% 75
-  %dot% #11816 %actor% %bleed% 20 physical
-  if %self.difficulty% == 4
-    %send% %actor% Your leg wound slows your movement!
-    %echoaround% %actor% |%actor% leg wound slows ^%actor% movement.
-    dg_affect #11816 %actor% SLOW on 20
-  end
+set room %self.room%
+set diff %self.difficulty%
+* order
+set moves_left %self.var(moves_left)%
+set num_left %self.var(num_left,0)%
+if !%moves_left% || !%num_left%
+  set moves_left 1 2
+  set num_left 2
 end
+* pick
+eval which %%random.%num_left%%%
+set old %moves_left%
+set moves_left
+set move 0
+while %which% > 0
+  set move %old.car%
+  if %which% != 1
+    set moves_left %moves_left% %move%
+  end
+  set old %old.cdr%
+  eval which %which% - 1
+done
+set moves_left %moves_left% %old%
+* store
+eval num_left %num_left% - 1
+remote moves_left %self.id%
+remote num_left %self.id%
+* perform move
+nop %self.set_cooldown(11800, 20)%
+if %move% == 1
+  * Goblinball / Ankle Stab
+  if %diff% <= 2
+    nop %self.add_mob_flag(NO-ATTACK)%
+  end
+  eval dodge %diff% * 20
+  dg_affect #11810 %self% DODGE %dodge% 10
+  skyfight clear dodge
+  set targ %self.fighting%
+  set id %targ.id%
+  say Goblinbaaaaaaaaaall!
+  %send% %targ% &&m\*\* ~%self% ducks and rolls toward you! \*\*&&0 (dodge)
+  %echoaround% %targ% &&m~%self% ducks and rolls toward ~%targ%!&&0
+  skyfight setup dodge %targ%
+  wait 8 sec
+  dg_affect #11810 %self% off
+  if !%targ% || %targ.id% != %id%
+    * gone
+    %echo% &&m~%self% quickly gets back up.&&0
+  elseif %targ.var(did_sfdodge)%
+    * miss
+    %echo% &&m~%self% goes crashing into the wall as &%self% misses ~%targ%!&&0
+    if %diff% < 3
+      dg_affect #11852 %self% HARD-STUNNED on 5
+    end
+    if %diff% < 2
+      %damage% %self% 10 physical
+    end
+  else
+    * hit
+    %send% %targ% &&m~%self% stabs ^%self% knife into |%targ% ankle as &%self% pops up behind *%targ%!&&0
+    eval dam 10 + (%diff% * 20)
+    %damage% %targ% %dam% physical
+    %dot% #11816 %actor% %dam% 15 physical
+    if %diff% >= 3
+      %send% %actor% &&mYour ankle wound slows your movement!&&0
+      dg_affect #11816 %actor% SLOW on 15
+    end
+  end
+  skyfight clear dodge
+elseif %move% == 2
+  * Slay the Griffin / Fan of Knives
+  if %diff% < 3
+    nop %self.add_mob_flag(NO-ATTACK)%
+  end
+  skyfight clear dodge
+  say Slay the Griffin!
+  %echo% &&m\*\* ~%self% starts pulling out knives and throwing them in all directions! \*\*&&0 (dodge)
+  skyfight setup dodge all
+  set any 0
+  set cycle 0
+  set max (%diff% + 2) / 2
+  while %cycle% < %max%
+    wait 5 sec
+    set this 0
+    set ch %room.people%
+    while %ch%
+      set next_ch %ch.next_in_room%
+      if %self.is_enemy(%ch%)%
+        if %ch.did_sfdodge%
+          dg_affect #11856 %ch% TO-HIT 25 20
+        else
+          set any 1
+          set this 1
+          %echo% &&m|%self% knife slices through the air and straight into |%ch% chest!&&0
+          set dam %diff% * 10
+          set ouch %diff% * 20
+          %dot% #11811 %ch% %ouch% 10 physical 3
+          %damage% %ch% %dam% physical
+        end
+      end
+      set ch %next_ch%
+    done
+    if !%this%
+      %echo% &&mKnives hit the wall with a dull thud.&&0
+    end
+    eval cycle %cycle% + 1
+  done
+  if !%any%
+    * full miss
+    %echo% &&~%self% looks dizzy as &%self% throws the last knife.&0
+    dg_affect #11852 %self% HARD-STUNNED on 5
+  end
+  skyfight clear dodge
+end
+* in case
+nop %self.remove_mob_flag(NO-ATTACK)%
 ~
 #11817
-Goblin Miner: combat script~
+Goblin Miner combat: Leaping Strike and All Mine~
 0 k 100
 ~
-* NOTE: this was for a goblin miner
-if %self.cooldown(11800)%
+if %self.cooldown(11800)% || %self.disabled%
   halt
 end
-if %random.2% == 1
-  * Flail Wildly
-  say slay the griffin!
-  nop %self.set_cooldown(11800, 20)%
-  set loops 1
-  if %self.difficulty% == 4
-    set loops 3
-  end
-  while %loops%
-    %echo% &&r~%self% flails wildly, striking everyone around *%self%!
-    %aoe% 50 physical
-    if %loops%
-      wait 3 sec
-    end
-    eval loops %loops% - 1
-  done
-else
-  * Leaping Strike
-  nop %self.set_cooldown(11800, 20)%
-  %send% %actor% &&r~%self% leaps into the air and strikes you with a powerful flying smash!
-  %echoaround% %actor% ~%self% leaps into the air and strikes ~%actor% with a powerful flying smash!
-  if %self.difficulty% == 4
-    %damage% %actor% 200 physical
-  else
-    %damage% %actor% 100 physical
-  end
-  dg_affect #11851 %actor% STUNNED on 5
+set room %self.room%
+set diff %self.difficulty%
+* order
+set moves_left %self.var(moves_left)%
+set num_left %self.var(num_left,0)%
+if !%moves_left% || !%num_left%
+  set moves_left 1 2
+  set num_left 2
 end
+* pick
+eval which %%random.%num_left%%%
+set old %moves_left%
+set moves_left
+set move 0
+while %which% > 0
+  set move %old.car%
+  if %which% != 1
+    set moves_left %moves_left% %move%
+  end
+  set old %old.cdr%
+  eval which %which% - 1
+done
+set moves_left %moves_left% %old%
+* store
+eval num_left %num_left% - 1
+remote moves_left %self.id%
+remote num_left %self.id%
+* perform move
+nop %self.set_cooldown(11800, 20)%
+if %move% == 1
+  * Leaping Strike
+  if %diff% == 1
+    nop %self.add_mob_flag(NO-ATTACK)%
+  end
+  skyfight clear dodge
+  set targ %self.fighting%
+  set id %targ.id%
+  say You got a miner problem!
+  %send% %targ% &&m\*\* ~%self% leaps high into the air with ^%self% pick over ^%self% head! \*\*&&0 (dodge)
+  %echoaround% %targ% &&m~%self% leaps high into the air with ^%self% pick over ^%self% head!&&0
+  skyfight setup dodge %targ%
+  wait 8 sec
+  if !%targ% || %targ.id% != %id%
+    * gone
+    %echo% &&m~%self% lands hard with ^%self% pick embedded deep in the floor!&&0
+  elseif %targ.var(did_sfdodge)%
+    * miss
+    %echo% &&m~%self% goes crashing into the wall as &%self% misses ^%self% leaping strike!&&0
+    if %diff% < 3
+      dg_affect #11852 %self% HARD-STUNNED on 5
+    end
+    if %diff% < 2
+      %damage% %self% 10 physical
+    end
+  else
+    * hit
+    %send% %targ% &&m~%self% knocks ~%targ% to the ground as &%self% lands with ^%self% pick in |%targ% chest!&&0
+    eval dam 80 + (%diff% * 20)
+    %damage% %targ% %dam% physical
+  end
+  skyfight clear dodge
+elseif %move% == 2
+  * All Mine
+  if %diff% < 3
+    nop %self.add_mob_flag(NO-ATTACK)%
+  end
+  skyfight clear dodge
+  say Mine! Allllllll miiiiiiiiiiiiine!
+  %echo% &&m\*\* ~%self% holds out ^%self% pick and begins spinning wildly! \*\*&&0 (dodge)
+  skyfight setup dodge all
+  set any 0
+  set cycle 0
+  set max (%diff% + 2) / 2
+  while %cycle% < %max%
+    wait 5 sec
+    set this 0
+    set ch %room.people%
+    while %ch%
+      set next_ch %ch.next_in_room%
+      if %self.is_enemy(%ch%)%
+        if %ch.did_sfdodge%
+          dg_affect #11856 %ch% TO-HIT 25 20
+        else
+          set any 1
+          set this 1
+          %echo% &&m|%self% wild spin strikes ~%ch% hard!&&0
+          set dam %diff% 40 + (20 * %diff%)
+          %damage% %ch% %dam% physical
+        end
+      end
+      set ch %next_ch%
+    done
+    if !%this%
+      %echo% &&m~%self% spins wildly around the room!&&0
+    end
+    eval cycle %cycle% + 1
+  done
+  if !%any%
+    * full miss
+    %echo% &&~%self% whirls around for a second and spins *%self%self out.&0
+    dg_affect #11852 %self% HARD-STUNNED on 5
+  end
+  skyfight clear dodge
+end
+* in case
+nop %self.remove_mob_flag(NO-ATTACK)%
 ~
 #11818
 Venjer the Fox: Goblin blastmaster combat script~
@@ -3414,7 +3626,7 @@ Skycleave: Skithe Ler-Wyn fight~
 * tba
 ~
 #11855
-Skycleave: Mezvienne the Enchantress fight~
+Mezvienne combat: Baleful Polymorph, Blinding Light of Dawn, Belt of Venus, Dark Fate~
 0 k 100
 ~
 if %self.cooldown(11800)% || %self.disabled%
