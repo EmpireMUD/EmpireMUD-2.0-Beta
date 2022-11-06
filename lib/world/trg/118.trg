@@ -1464,41 +1464,170 @@ elseif %type% == 4
 end
 ~
 #11820
-Escaped Pixy (Skycleave): combat script~
+Escaped Pixy (Skycleave) combat: Pixy Trip, Dangling Vine/Weapon Steal~
 0 k 100
 ~
-if %self.cooldown(11800)%
+if %self.cooldown(11800)% || %self.disabled%
   halt
 end
-if %random.2% == 1
-  * Trip
-  nop %self.set_cooldown(11800, 20)%
-  if %self.difficulty%==4
-    %send% %actor% ~%self% bites you on the ankle!
-    %echoaround% %actor% ~%self% bites ~%actor% on the ankle!
-    %damage% %actor% 50 physical
-  else
-    %send% %actor% ~%self% dives towards your legs!
-    %echoaround% %actor% ~%self% dives towards |%actor% legs!
-  end
-  %send% %actor% You trip and fall!
-  %echoaround% %actor% ~%actor% trips and falls!
-  dg_affect #11814 %actor% HARD-STUNNED on 5
-else
-  * Steal Weapon
-  nop %self.set_cooldown(11800, 20)%
-  if %self.difficulty%==4
-    %send% %actor% &&r~%self% zaps you with a tiny bolt of lightning!
-    %echoaround% %actor% ~%self% zaps ~%actor% with a tiny bolt of lightning!
-    %damage% %actor% 50 magical
-  else
-    %send% %actor% ~%self% flies circles around your head...
-    %echoaround% %actor% ~%self% flies circles around |%actor% head...
-  end
-  %send% %actor% ~%self% snatches your weapon while you're distracted!
-  %echoaround% %actor% ~%self% snatches |%actor% weapon while &%actor%'s distracted!
-  dg_affect #11815 %actor% DISARMED on 20
+set room %self.room%
+set diff %self.difficulty%
+* order
+set moves_left %self.var(moves_left)%
+set num_left %self.var(num_left,0)%
+if !%moves_left% || !%num_left%
+  set moves_left 1 2
+  set num_left 2
 end
+* pick
+eval which %%random.%num_left%%%
+set old %moves_left%
+set moves_left
+set move 0
+while %which% > 0
+  set move %old.car%
+  if %which% != 1
+    set moves_left %moves_left% %move%
+  end
+  set old %old.cdr%
+  eval which %which% - 1
+done
+set moves_left %moves_left% %old%
+* store
+eval num_left %num_left% - 1
+remote moves_left %self.id%
+remote num_left %self.id%
+* perform move
+nop %self.set_cooldown(11800, 20)%
+if %move% == 1 && !%self.aff_flagged(BLIND)%
+  * Pixy Trip
+  if %diff% <= 2
+    nop %self.add_mob_flag(NO-ATTACK)%
+  end
+  skyfight clear dodge
+  set targ %random.enemy%
+  if !%targ%
+    set targ %actor%
+  end
+  set id %targ.id%
+  * random form
+  set form %random.2%
+  if %form% == 1
+    %send% %targ% &&m**** ~%self% swoops toward your legs! ****&&0 (dodge)
+    %echoaround% %targ% &&m~%self% swoops toward |%targ% legs!&&0
+  else
+    %send% %targ% &&m**** A vine creeps toward your feet! ****&&0 (dodge)
+    %echoaround% %targ% &&mA vine creeps toward |%targ% feet!&&0
+  end
+  * start
+  set miss 0
+  skyfight setup dodge %targ%
+  wait 5 sec
+  nop %self.remove_mob_flag(NO-ATTACK)%
+  wait 5 sec
+  if !%targ% || %targ.id% != %id%
+    * gone
+    set miss 1
+  elseif %targ.var(did_sfdodge)%
+    set miss 1
+  end
+  * hit either them or me
+  if %miss%
+    if %form% == 1
+      %echo% &&m~%self% goes careening into a sapling and rebounds into a wall!&&0
+    else
+      %echo% &&mThe vine misses and whips back toward the ceiling, knocking ~%self% into the wall!&&0
+    end
+    dg_affect #11852 %self% HARD-STUNNED on 10
+  else
+    * hit
+    if %form% == 1
+      if %diff% > 1
+        %echo% &&m~%self% bites ~%targ% on the ankle!&&0
+        eval dam 60 + (%diff% * 20)
+        %damage% %actor% %dam% physical
+      else
+        %echo% &&m~%self% dives towards |%targ% legs!&&0
+      end
+    else
+      %echo% &&mA vine wraps itself around |%targ% ankle and tugs hard!&&0
+    end
+    %send% %actor% &&mYou trip and fall!&&0
+    %echoaround% %actor% &&m~%actor% trips and falls!&&0
+    if %diff% > 2
+      dg_affect #11814 %actor% STUNNED on 10
+      eval dam 40 + (%diff% * 20)
+      %damage% %actor% %dam% physical
+    elseif %diff% > 1
+      dg_affect #11814 %actor% IMMOBILIZED on 20
+      %damage% %actor% 80 physical
+    else
+      dg_affect #11814 %actor% IMMOBILIZED on 20
+    end
+  end
+  skyfight clear dodge
+elseif %move% == 2 && !%self.aff_flagged(BLIND)%
+  * Dangling Vine/Weapon Steal
+  skyfight clear dodge
+  set targ %self.fighting%
+  if !%targ.eq(wield)%
+    set targ %random.enemy%
+    if !%targ.eq(wield)%
+      halt
+    end
+  end
+  set id %targ.id%
+  if %diff% == 1
+    nop %self.add_mob_flag(NO-ATTACK)%
+  end
+  %send% %targ% &&m**** A dangling vine reaches down toward you... ****&&0 (dodge)
+  %echoaround% %targ% &&mA dangling vine reaches down toward ~%targ%...&&0
+  skyfight setup dodge %targ%
+  wait 8 sec
+  set miss 0
+  if !%targ% || %targ.id% != %id%
+    * gone
+    %echo% &&m~%self% isn't paying attention and runs straight into the dangling vine!&&0
+    set miss 1
+  elseif %targ.var(did_sfdodge)%
+    * miss
+    %echo% &&mThe dangling vine whips up suddenly, but hits ~%self% by mistake!&&0
+    set miss 1
+  else
+    * hit
+    switch %random.3%
+      case 1
+        %echo% &&mThe dangling vine whips up suddenly and snatches |%targ% weapon!&&0
+      break
+      case 2
+        %send% %targ% While you're distracted by the dangling vine, ~%self% circles around you and grabs your weapon!&&0
+        %echoaround% %targ% While ~%targ% is distracted by the dangling vine, ~%self% circles around and grabs ^%targ% weapon!&&0
+      break
+      case 3
+        %send% %targ% &&mThe dangling vine taps you on the shoulder and when you turn, a second vine steals your weapon!&&0
+        %echoaround% %targ% &&mThe dangling vine taps ~%targ% on the shoulder and when &%targ% turns, a second vine steals ^%targ% weapon!&&0
+      break
+    done
+    dg_affect #11815 %targ% DISARMED on 20
+    if %diff% >= 3
+      %send% %targ% &&m... and worse, ~%self% stabs you with a tiny knife while you're distracted!&&0
+      %echoaround% %targ% &&m... and ~%self% stabs *%targ% with a tiny knife while *%targ%'s distracted!&&0
+      %damage% %targ% 100 physical
+    end
+  end
+  if %miss%
+    * already messaged
+    if %diff% == 1 && %targ% && %targ.id% == %id%
+      dg_affect #11856 %targ% TO-HIT 25 20
+    end
+    if %diff% < 3
+      dg_affect #11852 %self% HARD-STUNNED on 10
+    end
+  end
+  skyfight clear dodge
+end
+* in case
+nop %self.remove_mob_flag(NO-ATTACK)%
 ~
 #11821
 Skycleave: Setup dodge, interrupt, struggle, free~
