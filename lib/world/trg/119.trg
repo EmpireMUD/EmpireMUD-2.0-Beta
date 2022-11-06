@@ -5001,7 +5001,7 @@ remote moves_left %self.id%
 remote num_left %self.id%
 * perform move
 nop %self.set_cooldown(11800, 30)%
-if %move% == 1
+if %move% == 1 && !%self.aff_flagged(BLIND)%
   * Jar of Captivity
   skyfight clear free
   %echo% &&mThe Iskip pulls out an enormous clay jar and swoops down toward you...&&0
@@ -5015,7 +5015,7 @@ if %move% == 1
     dg_affect #11852 %self% HARD-STUNNED on 20
   end
   if %self.difficulty% <= 2 || (%self.level% + 100) <= %targ.level%
-    %send% %targ% &&m\*\* The jar comes down on your head! You have to break free! \*\*&&0 (struggle)
+    %send% %targ% &&m**** The jar comes down on your head! You have to break free! ****&&0 (struggle)
     %echoaround% %targ% &&mThe jar comes down on ~%targ%, trapping *%targ%!&&0
     skyfight setup struggle %targ% 20
     set bug %targ.inventory(11890)%
@@ -5032,7 +5032,7 @@ if %move% == 1
     wait 10 s
   else
     %send% %targ% &&mThe jar comes down on your head! There's nothing you can do!&&0
-    %echoaround% %targ% &&m\*\* The jar comes down on ~%targ%, trapping *%targ%! \*\*&&0 (free %targ.pc_name.car%)
+    %echoaround% %targ% &&m**** The jar comes down on ~%targ%, trapping *%targ%! ****&&0 (free %targ.pc_name.car%)
     skyfight setup free %targ%
     eval time %self.difficulty% * 15
     dg_affect #11888 %targ% HARD-STUNNED on %time%
@@ -5104,7 +5104,7 @@ if %move% == 1
     nop %self.add_mob_flag(NO-ATTACK)%
   end
   wait 3 sec
-  %echo% &&A\*\* You are frozen solid as the water around you turns to ice! \*\*&&0 (struggle)
+  %echo% &&A**** You are frozen solid as the water around you turns to ice! ****&&0 (struggle)
   skyfight setup struggle all 20
   set ch %room.people%
   while %ch%
@@ -5138,7 +5138,7 @@ if %move% == 1
           end
           dg_affect #11822 %ch% off
         else
-          %send% %ch% &&A\*\* You are still frozen solid! \*\*&&0 (struggle)
+          %send% %ch% &&A**** You are still frozen solid! ****&&0 (struggle)
         end
       end
       set ch %next_ch%
@@ -5159,7 +5159,7 @@ elseif %move% == 2
   end
   skyfight setup dodge all
   wait 3 s
-  %echo% &&A\*\* Suddenly the bubbles around you begin to implode! \*\*&&0 (dodge)
+  %echo% &&A**** Suddenly the bubbles around you begin to implode! ****&&0 (dodge)
   set cycle 1
   eval wait 12 - %diff%
   while %cycle% <= %diff%
@@ -5180,7 +5180,7 @@ elseif %move% == 2
           %send% %ch% &&AYou cover your eyes as you swim out of the way of an imploding bubble!&&0
         end
         if %cycle% < %diff%
-          %send% %ch% &&A\*\* Here comes another one... \*\*&&0 (dodge)
+          %send% %ch% &&A**** Here comes another one... ****&&0 (dodge)
         end
       end
       set ch %next_ch%
@@ -5192,7 +5192,7 @@ elseif %move% == 2
 elseif %move% == 3
   * Lightning Wave
   %echo% &&AA terrifying clap of thunder shakes you to the core, even down here...&&0
-  %echo% &&A\*\* The First Water seems to be drawing down the lightning! \*\*&&0 (interrupt)
+  %echo% &&A**** The First Water seems to be drawing down the lightning! ****&&0 (interrupt)
   if %diff% == 1
     nop %self.add_mob_flag(NO-ATTACK)%
   end
@@ -5247,7 +5247,7 @@ elseif %move% == 4
   %echo% &&AThe water goes still for a moment -- too still...&&0
   nop %self.add_mob_flag(NO-ATTACK)%
   wait 3 sec
-  %echo% &&A\*\* You are trapped in a pressure wave! \*\*&&0 (struggle)
+  %echo% &&A**** You are trapped in a pressure wave! ****&&0 (struggle)
   skyfight setup struggle all 20
   set ch %room.people%
   while %ch%
@@ -5285,7 +5285,7 @@ elseif %move% == 4
           * penalty
           dg_affect #11972 %ch% DODGE -%dodge_pain% 25
         else
-          %send% %ch% &&A\*\* You are trapped stuck in the pressure wave! \*\*&&0 (struggle)
+          %send% %ch% &&A**** You are trapped stuck in the pressure wave! ****&&0 (struggle)
         end
       end
       set ch %next_ch%

@@ -122,15 +122,6 @@ You can see again.~
 T5
 ...$e has been blinded by the barrage!~
 S
-#11824
-blinding bomb~
-4 0
-0 0 0 0
-T0
-You are no longer stunned by the blinding bomb.~
-T5
-...$e seems stunned!~
-S
 #11832
 conditional visibility~
 4 0

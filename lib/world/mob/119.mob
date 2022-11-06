@@ -2161,7 +2161,7 @@ M
 You yelp as the filing cabinet accidentally hops onto your foot.~
 M
 0
-The filing cabinet sounds like it's crying in the corner.~
+The filing cabinet clatters its drawers at you when you get in the way.~
 T 11904
 T 11934
 T 11810
@@ -2192,9 +2192,6 @@ M
 The bookshelf shakes itself to straighten the books.~
 M
 0
-The bookshelf seems to whimper when it thinks you aren't looking.~
-M
-0
 The bookshelf falls foward onto a book with a THUD! When it gets back up, the book is on one of the shelves.~
 M
 0
@@ -2202,6 +2199,9 @@ The bookshelf falls foward onto a book with a THUD! When it gets back up, the bo
 M
 0
 The bookshelf falls foward onto a book with a THUD! When it gets back up, the book is on one of the shelves.~
+M
+0
+The bookshelf makes a sort of grumbling noise.~
 T 11904
 T 11934
 T 11810

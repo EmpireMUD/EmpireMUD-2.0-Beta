@@ -809,7 +809,7 @@ remote moves_left %self.id%
 remote num_left %self.id%
 * perform move
 nop %self.set_cooldown(11800, 20)%
-if %move% == 1
+if %move% == 1 && !%self.aff_flagged(BLIND)%
   * Throw Object
   if %diff% <= 2
     nop %self.add_mob_flag(NO-ATTACK)%
@@ -827,8 +827,8 @@ if %move% == 1
   set object_4 a dynamic reconfabulator
   eval obj %%object_%random.4%%%
   * start
-  say Goose!
-  %send% %targ% &&m\*\* ~%self% grabs %obj% off the floor and throws it at you! \*\*&&0 (dodge)
+  %regionecho% %room% 1 &&y~%self% shouts, 'Goose!'&&0
+  %send% %targ% &&m**** ~%self% grabs %obj% off the floor and throws it at you! ****&&0 (dodge)
   %echoaround% %targ% &&m~%self% grabs %obj% off the floor and throws it at ~%targ%!&&0
   skyfight setup dodge %targ%
   wait 5 sec
@@ -848,7 +848,7 @@ if %move% == 1
     * hit
     switch %random.3%
       case 1
-        %echo% %targ% &&m%obj% bonks ~%targ% in the head!&&0
+        %echo% &&m%obj% bonks ~%targ% in the head!&&0
         %damage% %targ% 100 physical
         if %diff% == 4
           dg_affect #11851 %targ% HARD-STUNNED on 5
@@ -875,7 +875,7 @@ if %move% == 1
     done
   end
   skyfight clear dodge
-elseif %move% == 2
+elseif %move% == 2 && !%self.aff_flagged(BLIND)%
   * Pocket Sand
   if %diff% == 1
     nop %self.add_mob_flag(NO-ATTACK)%
@@ -883,8 +883,8 @@ elseif %move% == 2
   skyfight clear dodge
   set targ %self.fighting%
   set id %targ.id%
-  say Pocket sand!
-  %send% %targ% &&m\*\* ~%self% sticks ^%self% hand into ^%self% pocket... \*\*&&0 (dodge)
+  %regionecho% %room% 1 &&y~%self% shouts, 'Pocket sand!'&&0
+  %send% %targ% &&m**** ~%self% sticks ^%self% hand into ^%self% pocket... ****&&0 (dodge)
   %echoaround% %targ% &&m~%self% sticks ^%self% hand into ^%self% pocket...&&0
   skyfight setup dodge %targ%
   wait 8 sec
@@ -893,7 +893,11 @@ elseif %move% == 2
     %echo% &&m~%self% just laughs and throws sand into the air.&&0
   elseif %targ.var(did_sfdodge)%
     * miss
-    %echo% &&m~%self% whips a fistful of sand out of ^%self% pocket and throws it at... the air.&&0
+    %echo% &&m~%self% whips a fistful of sand out of ^%self% pocket and throws it at... but it blows back in ^%self% face.&&0
+    if %self.difficulty% == 1
+      dg_affect #11856 %ch% TO-HIT 25 20
+    end
+    dg_affect #11841 %self% BLIND on 5
   else
     * hit
     %echo% &&m~%self% whips a fistful of sand from ^%self% pocket into |%targ% eyes!&&0
@@ -941,7 +945,7 @@ remote moves_left %self.id%
 remote num_left %self.id%
 * perform move
 nop %self.set_cooldown(11800, 20)%
-if %move% == 1
+if %move% == 1 && !%self.aff_flagged(BLIND)%
   * Goblinball / Ankle Stab
   if %diff% <= 2
     nop %self.add_mob_flag(NO-ATTACK)%
@@ -951,8 +955,8 @@ if %move% == 1
   skyfight clear dodge
   set targ %self.fighting%
   set id %targ.id%
-  say Goblinbaaaaaaaaaall!
-  %send% %targ% &&m\*\* ~%self% ducks and rolls toward you! \*\*&&0 (dodge)
+  %regionecho% %room% 1 &&y~%self% shouts, 'Goblinbaaaaaaaaaall!'&&0
+  %send% %targ% &&m**** ~%self% ducks and rolls toward you! ****&&0 (dodge)
   %echoaround% %targ% &&m~%self% ducks and rolls toward ~%targ%!&&0
   skyfight setup dodge %targ%
   wait 8 sec
@@ -987,12 +991,12 @@ elseif %move% == 2
     nop %self.add_mob_flag(NO-ATTACK)%
   end
   skyfight clear dodge
-  say Slay the Griffin!
-  %echo% &&m\*\* ~%self% starts pulling out knives and throwing them in all directions! \*\*&&0 (dodge)
+  %regionecho% %room% 1 &&y~%self% shouts, 'Slay the Griffin!'&&0
+  %echo% &&m**** ~%self% starts pulling out knives and throwing them in all directions! ****&&0 (dodge)
   skyfight setup dodge all
   set any 0
   set cycle 0
-  set max (%diff% + 2) / 2
+  eval max (%diff% + 2) / 2
   while %cycle% < %max%
     wait 5 sec
     set this 0
@@ -1001,13 +1005,15 @@ elseif %move% == 2
       set next_ch %ch.next_in_room%
       if %self.is_enemy(%ch%)%
         if %ch.did_sfdodge%
-          dg_affect #11856 %ch% TO-HIT 25 20
+          if %self.difficulty% == 1
+            dg_affect #11856 %ch% TO-HIT 25 20
+          end
         else
           set any 1
           set this 1
           %echo% &&m|%self% knife slices through the air and straight into |%ch% chest!&&0
-          set dam %diff% * 10
-          set ouch %diff% * 20
+          eval dam %diff% * 10
+          eval ouch %diff% * 20
           %dot% #11811 %ch% %ouch% 10 physical 3
           %damage% %ch% %dam% physical
         end
@@ -1065,7 +1071,7 @@ remote moves_left %self.id%
 remote num_left %self.id%
 * perform move
 nop %self.set_cooldown(11800, 20)%
-if %move% == 1
+if %move% == 1 && !%self.aff_flagged(BLIND)%
   * Leaping Strike
   if %diff% == 1
     nop %self.add_mob_flag(NO-ATTACK)%
@@ -1073,8 +1079,8 @@ if %move% == 1
   skyfight clear dodge
   set targ %self.fighting%
   set id %targ.id%
-  say You got a miner problem!
-  %send% %targ% &&m\*\* ~%self% leaps high into the air with ^%self% pick over ^%self% head! \*\*&&0 (dodge)
+  %regionecho% %room% 1 &&y~%self% shouts, 'You got a miner problem!'&&0
+  %send% %targ% &&m**** ~%self% leaps high into the air with ^%self% pick over ^%self% head! ****&&0 (dodge)
   %echoaround% %targ% &&m~%self% leaps high into the air with ^%self% pick over ^%self% head!&&0
   skyfight setup dodge %targ%
   wait 8 sec
@@ -1103,12 +1109,12 @@ elseif %move% == 2
     nop %self.add_mob_flag(NO-ATTACK)%
   end
   skyfight clear dodge
-  say Mine! Allllllll miiiiiiiiiiiiine!
-  %echo% &&m\*\* ~%self% holds out ^%self% pick and begins spinning wildly! \*\*&&0 (dodge)
+  %regionecho% %room% 1 &&y~%self% shouts, 'Mine! Allllllll miiiiiiiiiiiiine!'&&0
+  %echo% &&m**** ~%self% holds out ^%self% pick and begins spinning wildly! ****&&0 (dodge)
   skyfight setup dodge all
   set any 0
   set cycle 0
-  set max (%diff% + 2) / 2
+  eval max (%diff% + 2) / 2
   while %cycle% < %max%
     wait 5 sec
     set this 0
@@ -1117,12 +1123,14 @@ elseif %move% == 2
       set next_ch %ch.next_in_room%
       if %self.is_enemy(%ch%)%
         if %ch.did_sfdodge%
-          dg_affect #11856 %ch% TO-HIT 25 20
+          if %self.difficulty% == 1
+            dg_affect #11856 %ch% TO-HIT 25 20
+          end
         else
           set any 1
           set this 1
           %echo% &&m|%self% wild spin strikes ~%ch% hard!&&0
-          set dam %diff% 40 + (20 * %diff%)
+          eval dam %diff% 40 + (20 * %diff%)
           %damage% %ch% %dam% physical
         end
       end
@@ -1209,7 +1217,7 @@ elseif %move% == 2
   end
   skyfight setup dodge all
   wait 3 s
-  say Blinding Barrage!
+  %regionecho% %room% 1 &&y~%self% shouts, 'Blinding Barrage!'&&0
   %echo% &&m**** There's a loud POP and a BANG as the air begins to explode around you! ****&&0 (dodge)
   set cycle 1
   set broke 0
@@ -1224,6 +1232,7 @@ elseif %move% == 2
         if !%ch.var(did_sfdodge)%
           if %ch.trigger_counterspell%
             %echo% &&mThe blinding barrage blows back in Venjer's face as it hits |%ch% counterspell!&&0
+            dg_affect #11823 %self% BLIND on 10
             set broke 1
           else
             %echo% &&mThere's a blinding flash as the air explodes right next to ~%ch%!&&0
@@ -1245,8 +1254,11 @@ elseif %move% == 2
     eval cycle %cycle% + 1
   done
   skyfight clear dodge
-  if %broke% && %diff% < 4
-    dg_affect #11852 %self% HARD-STUNNED on 10
+  if %broke%
+    if %diff% < 3
+      dg_affect #11852 %self% HARD-STUNNED on 10
+    end
+    %damage% %self% 100 magical
   end
   wait 8 s
 elseif %move% == 3
@@ -1260,7 +1272,7 @@ elseif %move% == 3
   %echo% &&mA large glowing sigil spreads across the floor from the impact of Venjer's staff...&&0
   wait 3 s
   skyfight setup dodge all
-  say TOWER QUAKE!
+  %regionecho% %room% 1 &&y~%self% shouts, 'TOWER QUAKE!'&&0
   %echo% &&m**** There's a low rumble as the tower begins to shake... ****&&0 (dodge)
   set cycle 1
   eval wait 10 - %diff%
@@ -1284,6 +1296,9 @@ elseif %move% == 3
           %damage% %ch% %amt% physical
         elseif %ch.is_pc%
           %send% %ch% &&mYou jump at just the right time and avoid the tower quake!&&0
+          if %self.difficulty% == 1
+            dg_affect #11856 %ch% TO-HIT 25 20
+          end
         end
         if %cycle% < %diff%
           %send% %ch% &&m**** Here comes another quake... ****&&0 (dodge)
@@ -1295,7 +1310,7 @@ elseif %move% == 3
   done
   skyfight clear dodge
   wait 8 s
-elseif %move% == 4
+elseif %move% == 4 && !%self.aff_flagged(BLIND)%
   * Blastmaster Fox
   if %diff% <= 2
     nop %self.add_mob_flag(NO-ATTACK)%
@@ -1307,23 +1322,29 @@ elseif %move% == 4
   %echoaround% %targ% &&mVenjer spins her staff in a circle, and a ball of light starts to grow at its tip...&&0
   skyfight setup interrupt %targ%
   set cycle 1
-  while %cycle% <= %diff%
+  set broke 0
+  while %cycle% <= %diff% && !%broke%
     wait 4 s
-    say Blastmaster Fox!
+    %regionecho% %room% 1 &&y~%self% shouts, 'Blastmaster Fox!'&&0
     if !%targ% || %targ.id% != %id%
       * gone
       %echo% &&mLuminous bolts from Venjer's staff crash all over the room and explode!&&0
     elseif %targ.var(did_sfinterrupt)%
       %send% %targ% &&mYou knock Venjer's staff sideways and luminous bolts fly every which way, crashing all around you, but they all miss!&&0
-      %echo% &&m~%targ% knocks Venjer's staff sideways and luminous bolts fly every which way, crashing around ~%targ%, but they all miss!&&0
+      %echoaround% %targ% &&m~%targ% knocks Venjer's staff sideways and luminous bolts fly every which way, crashing around ~%targ%, but they all miss!&&0
+    elseif %targ.trigger_counterspell%
+      %echo% &&mVenjer's luminous bolt explodes against |%targ% counterspell!&&0
+      set broke 1
     else
       * hit
       %send% %targ% &&mLuminous bolts from Venjer's staff crash into ~%targ% and explode!&&0
       dg_affect #11841 %targ% BLIND on 10
       %damage% %actor% 100 magical
     end
-    %echo% &&mYou're caught in the explosion!&&0
-    %aoe% 25 magical
+    if %diff% > 1
+      %echo% &&mYou're caught in the explosion!&&0
+      %aoe% 25 magical
+    end
     if %cycle% < %diff% && %targ% && %targ.id% == %id%
       %send% %targ% &&m**** Here comes another blast... ****&&0 (interrupt)
       skyfight setup interrupt %targ%
@@ -1360,7 +1381,7 @@ if %type% == 1
     halt
   end
   %echo% ~%self% whips the glittering wand in your direction and a jet of sparkles shoots out!
-  set scale %self.level%/4
+  eval scale %self.level%/4
   set person %self.room.people%
   while %person%
     if %person.is_enemy(%self%)%
@@ -3744,7 +3765,7 @@ remote moves_left %self.id%
 remote num_left %self.id%
 * perform move
 nop %self.set_cooldown(11800, 30)%
-if %move% == 1
+if %move% == 1 && !%self.aff_flagged(BLIND)%
   * Baleful Polymorph
   skyfight clear dodge
   set target %random.enemy%
@@ -3765,7 +3786,7 @@ if %move% == 1
   set target_id %target.id%
   set fail 0
   if %self.difficulty% <= 2
-    %send% %target% &&m\*\* ~%self% waves her hands... An eerie green light casts out toward you... \*\*&&0 (dodge)
+    %send% %target% &&m**** ~%self% waves her hands... An eerie green light casts out toward you... ****&&0 (dodge)
     %echoaround% %target% &&m~%self% waves her hands... An eerie green light casts out toward ~%target%...&&0
     skyfight setup dodge %target%
     wait 10 s
@@ -3791,7 +3812,7 @@ if %move% == 1
     set old_shortdesc %target.name%
     %morph% %target% %vnum%
     %echoaround% %target% &&m%old_shortdesc% is suddenly transformed into ~%target%!&&0
-    %send% %target% &&m\*\* You are suddenly transformed into %target.name%! \*\*&&0 (fastmorph normal)
+    %send% %target% &&m**** You are suddenly transformed into %target.name%! ****&&0 (fastmorph normal)
     if %self.difficulty% == 4 && (%self.level% + 100) > %target.level%
       dg_affect #11851 %target% STUNNED on 5
     elseif %self.difficulty% >= 2
@@ -3804,7 +3825,7 @@ if %move% == 1
 elseif %move% == 2
   * Blinding Light of Dawn
   %echo% &&m~%self% flies up and begins channeling the dawn...&&0
-  %echo% &&m\*\* A bright light erupts from the sky, swirling past Mezvienne... \*\*&&0 (interrupt)
+  %echo% &&m**** A bright light erupts from the sky, swirling past Mezvienne... ****&&0 (interrupt)
   if %self.difficulty% == 1
     * normal: prevent her attack
     nop %self.add_mob_flag(NO-ATTACK)%
@@ -3869,7 +3890,7 @@ elseif %move% == 3
   end
   skyfight setup dodge all
   wait 1 s
-  %echo% &&m\*\* The ribbon of rosy pink light streams toward you... \*\*&&0 (dodge)
+  %echo% &&m**** The ribbon of rosy pink light streams toward you... ****&&0 (dodge)
   wait 10 s
   set ch %self.room.people%
   set any 0
@@ -3915,7 +3936,7 @@ elseif %move% == 4
     nop %self.add_mob_flag(NO-ATTACK)%
   end
   wait 3 sec
-  %echo% &&m\*\* You are gripped by a dark fate! \*\*&&0 (struggle)
+  %echo% &&m**** You are gripped by a dark fate! ****&&0 (struggle)
   skyfight setup struggle all 20
   set ch %self.room.people%
   while %ch%
@@ -3941,7 +3962,7 @@ elseif %move% == 4
       while %ch%
         set next_ch %ch.next_in_room%
         if %ch.affect(11822)%
-          %send% %ch% &&m\*\* You burn from the inside out as you face your dark fate! \*\*&&0 (struggle)
+          %send% %ch% &&m**** You burn from the inside out as you face your dark fate! ****&&0 (struggle)
           eval amount %self.difficulty% * 15
           %damage% %ch% %amount% magical
         end
