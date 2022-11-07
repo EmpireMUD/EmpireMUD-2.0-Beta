@@ -608,10 +608,11 @@ I+ 5 0  # Group
 I 4 11900 100.00 2  # LOOT: unattuned skystone
 I+ 6 0  # Boss
 T 11948
-T 11813
 T 11819
 T 11823
 T 11807
+T 11821
+T 11822
 S
 #11820
 pixy~

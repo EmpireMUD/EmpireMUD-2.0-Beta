@@ -6,11 +6,11 @@ skymerc~
 if %actor% != %self%
   halt
 end
-set difficulty %arg.car%
-if !(%difficulty%)
-  set difficulty 1
+set diff %arg.car%
+if !(%diff%)
+  set diff 1
 end
-set amount %difficulty%
+set amount %diff%
 if %amount% > 3
   * cap at 3 mobs
   set amount 3
@@ -22,7 +22,7 @@ while %iter% < %amount%
   %load% mob %vnum%
   set mob %self.room.people%
   if %mob.vnum% == %vnum%
-    remote difficulty %mob.id%
+    remote diff %mob.id%
   end
   eval iter %iter% + 1
 done
@@ -2106,26 +2106,28 @@ if !%self.varexists(scaled)%
   halt
 end
 * determine difficulty and limit
-set difficulty 1
-set limit 120
-if %self.mob_flagged(HARD)%
-  eval difficulty %difficulty% + 1
-  eval limit %limit% + 120
-end
-if %self.mob_flagged(GROUP)%
-  eval difficulty %difficulty% + 2
-  eval limit %limit% + 240
-end
-if %difficulty% == 1
-  * no drowning on normal
-  halt
-end
+set diff %self.var(diff,1)%
+switch %diff%
+  case 2
+    set limit 240
+  break
+  case 3
+    set limit 360
+  break
+  case 4
+    set limit 480
+  break
+  default
+    * no drowning on normal
+    halt
+  break
+done
 set room %self.room%
 set ch %room.people%
 set aggro 0
 while %ch%
   set next_ch %ch.next_in_room%
-  if %ch.is_pc% && !%ch.nohassle%
+  if %ch.is_pc% && !%ch.nohassle% && %ch.position% != Dead
     set varname enter_%ch.id%
     if %room.varexists(%varname%)%
       set time %room.var(%varname%)%
@@ -4568,8 +4570,8 @@ if %next_vnum%
   %load% mob %next_vnum%
   set mob %self.room.people%
   if %mob.vnum% == %next_vnum%
-    set difficulty %self.var(difficulty,1)%
-    remote difficulty %mob.id%
+    set diff %self.var(diff,1)%
+    remote diff %mob.id%
     * setup flags
     if %self.mob_flagged(HARD)%
       nop %mob.add_mob_flag(HARD)%
@@ -4974,6 +4976,8 @@ Iskip combat: Jar of Captivity~
 if %self.cooldown(11800)% || %self.disabled%
   halt
 end
+set room %self.room%
+set diff %self.diff%
 * order
 set moves_left %self.var(moves_left)%
 set num_left %self.var(num_left,0)%
@@ -5004,37 +5008,40 @@ skyfight lockout 30 30
 if %move% == 1 && !%self.aff_flagged(BLIND)%
   * Jar of Captivity
   skyfight clear free
-  %echo% &&mThe Iskip pulls out an enormous clay jar and swoops down toward you...&&0
+  %echo% &&m~%self% pulls out an enormous clay jar and swoops down toward you...&&0
   wait 3 s
+  if %self.disabled%
+    halt
+  end
   set targ %random.enemy%
   if !%targ%
     halt
   end
   set targ_id %targ.id%
-  if %self.fighting% == %targ% && %self.difficulty% < 4
+  if %self.fighting% == %targ% && %diff% < 4
     dg_affect #11852 %self% HARD-STUNNED on 20
   end
-  if %self.difficulty% <= 2 || (%self.level% + 100) <= %targ.level%
+  if %diff% <= 2 || (%self.level% + 100) <= %targ.level%
     %send% %targ% &&m**** The jar comes down on your head! You have to break free! ****&&0 (struggle)
     %echoaround% %targ% &&mThe jar comes down on ~%targ%, trapping *%targ%!&&0
     skyfight setup struggle %targ% 20
     set bug %targ.inventory(11890)%
     if %bug%
-      set struggle_char You try to break out of the jar...
-      set struggle_room You hear ~%%actor%% trying to break out of the jar...
-      remote struggle_char %bug.id%
-      remote struggle_room %bug.id%
-      set breakout_char You break out of the jar!
-      set breakout_room ~%%actor%% manages to break out of the jar!
-      remote breakout_char %bug.id%
-      remote breakout_room %bug.id%
+      set strug_char You try to break out of the jar...
+      set strug_room You hear ~%%actor%% trying to break out of the jar...
+      remote strug_char %bug.id%
+      remote strug_room %bug.id%
+      set free_char You break out of the jar!
+      set free_room ~%%actor%% manages to break out of the jar!
+      remote free_char %bug.id%
+      remote free_room %bug.id%
     end
     wait 10 s
   else
     %send% %targ% &&mThe jar comes down on your head! There's nothing you can do!&&0
     %echoaround% %targ% &&m**** The jar comes down on ~%targ%, trapping *%targ%! ****&&0 (free %targ.pc_name.car%)
     skyfight setup free %targ%
-    eval time %self.difficulty% * 15
+    eval time %diff% * 15
     dg_affect #11888 %targ% HARD-STUNNED on %time%
     * wait and clear
     set done 0
@@ -5068,7 +5075,7 @@ if %self.cooldown(11800)% || %self.disabled%
   halt
 end
 set room %self.room%
-set diff %self.difficulty%
+set diff %self.diff%
 * order
 set moves_left %self.var(moves_left)%
 set num_left %self.var(num_left,0)%
@@ -5103,21 +5110,21 @@ if %move% == 1
   if %diff% <= 3
     nop %self.add_mob_flag(NO-ATTACK)%
   end
-  wait 3 sec
+  wait 3 s
   %echo% &&A**** You are frozen solid as the water around you turns to ice! ****&&0 (struggle)
   skyfight setup struggle all 20
   set ch %room.people%
   while %ch%
     set bug %ch.inventory(11890)%
     if %bug%
-      set struggle_char You struggle to break free of the ice...
-      set struggle_room ~%%actor%% struggles to break free...
-      remote struggle_char %bug.id%
-      remote struggle_room %bug.id%
-      set breakout_char You manage to get out of the ice!
-      set breakout_room ~%%actor%% manages to get out of the ice!
-      remote breakout_char %bug.id%
-      remote breakout_room %bug.id%
+      set strug_char You struggle to break free of the ice...
+      set strug_room ~%%actor%% struggles to break free...
+      remote strug_char %bug.id%
+      remote strug_room %bug.id%
+      set free_char You manage to get out of the ice!
+      set free_room ~%%actor%% manages to get out of the ice!
+      remote free_char %bug.id%
+      remote free_room %bug.id%
     end
     set ch %ch.next_in_room%
   done
@@ -5231,7 +5238,7 @@ elseif %move% == 3
           %echoaround% %ch% &&A~%ch% gurgles in pain as the wave passes through *%ch%!&&0
           eval amount %diff% * 20
           %damage% %ch% %amount% physical
-          if %cycle% == 4 && %self.difficulty% == 4 && (%self.level% + 100) > %ch.level%
+          if %cycle% == 4 && %diff% == 4 && (%self.level% + 100) > %ch.level%
             dg_affect #11851 %ch% STUNNED on 10
           end
         end
@@ -5253,14 +5260,14 @@ elseif %move% == 4
   while %ch%
     set bug %ch.inventory(11890)%
     if %bug%
-      set struggle_char You struggle to escape the pressure wave...
-      set struggle_room ~%%actor%% struggles against the pressure wave...
-      remote struggle_char %bug.id%
-      remote struggle_room %bug.id%
-      set breakout_char You manage to get out of the pressure wave!
-      set breakout_room ~%%actor%% manages to get out of the pressure wave!
-      remote breakout_char %bug.id%
-      remote breakout_room %bug.id%
+      set strug_char You struggle to escape the pressure wave...
+      set strug_room ~%%actor%% struggles against the pressure wave...
+      remote strug_char %bug.id%
+      remote strug_room %bug.id%
+      set free_char You manage to get out of the pressure wave!
+      set free_room ~%%actor%% manages to get out of the pressure wave!
+      remote free_char %bug.id%
+      remote free_room %bug.id%
     end
     set ch %ch.next_in_room%
   done

@@ -448,13 +448,13 @@ if %self.fighting%
   halt
 end
 if normal /= %arg%
-  set difficulty 1
+  set diff 1
 elseif hard /= %arg%
-  set difficulty 2
+  set diff 2
 elseif group /= %arg%
-  set difficulty 3
+  set diff 3
 elseif boss /= %arg%
-  set difficulty 4
+  set diff 4
 else
   %send% %actor% That is not a valid difficulty level for this encounter. (Normal, Hard, Group, or Boss)
   return 1
@@ -464,19 +464,19 @@ end
 %send% %actor% You set the difficulty...
 %echoaround% %actor% ~%actor% sets the difficulty...
 * Clear existing difficulty flags and set new ones.
-remote difficulty %self.id%
+remote diff %self.id%
 set mob %self%
 nop %mob.remove_mob_flag(HARD)%
 nop %mob.remove_mob_flag(GROUP)%
-if %difficulty% == 1
+if %diff% == 1
   * Then we don't need to do anything
-elseif %difficulty% == 2
+elseif %diff% == 2
   %echo% ~%self% has been set to Hard.
   nop %mob.add_mob_flag(HARD)%
-elseif %difficulty% == 3
+elseif %diff% == 3
   %echo% ~%self% has been set to Group.
   nop %mob.add_mob_flag(GROUP)%
-elseif %difficulty% == 4
+elseif %diff% == 4
   %echo% ~%self% has been set to Boss.
   nop %mob.add_mob_flag(HARD)%
   nop %mob.add_mob_flag(GROUP)%
@@ -670,14 +670,14 @@ Skycleave: Summon minions for boss combat~
 if %self.cooldown(11800)%
   halt
 end
-set difficulty 1
+set diff 1
 if %self.mob_flagged(HARD)%
-  eval difficulty %difficulty% + 1
+  eval diff %diff% + 1
 end
 if %self.mob_flagged(GROUP)%
-  eval difficulty %difficulty% + 2
+  eval diff %diff% + 2
 end
-if %difficulty% < 3
+if %diff% < 3
   return 0
   halt
 end
@@ -706,7 +706,7 @@ end
 set summon %self.room.people%
 if %summon.vnum% == %summon_vnum%
   attach 11812 %summon.id%
-  remote difficulty %summon.id%
+  remote diff %summon.id%
   nop %summon.add_mob_flag(!LOOT)%
   nop %summon.add_mob_flag(NO-CORPSE)%
   %send% %actor% ~%summon% rushes into the room and attacks you!
@@ -781,7 +781,7 @@ if %self.cooldown(11800)% || %self.disabled%
   halt
 end
 set room %self.room%
-set diff %self.difficulty%
+set diff %self.diff%
 * order
 set moves_left %self.var(moves_left)%
 set num_left %self.var(num_left,0)%
@@ -834,6 +834,9 @@ if %move% == 1 && !%self.aff_flagged(BLIND)%
   wait 5 s
   nop %self.remove_mob_flag(NO-ATTACK)%
   wait 3 s
+  if %self.disabled%
+    halt
+  end
   if !%targ% || %targ.id% != %id%
     * gone
     %echo% &&m%obj.cap% smashes into the far wall.&&0
@@ -888,13 +891,16 @@ elseif %move% == 2 && !%self.aff_flagged(BLIND)%
   %echoaround% %targ% &&m~%self% sticks ^%self% hand into ^%self% pocket...&&0
   skyfight setup dodge %targ%
   wait 8 s
+  if %self.disabled%
+    halt
+  end
   if !%targ% || %targ.id% != %id%
     * gone
     %echo% &&m~%self% just laughs and throws sand into the air.&&0
   elseif %targ.var(did_sfdodge)%
     * miss
-    %echo% &&m~%self% whips a fistful of sand out of ^%self% pocket and throws it at... but it blows back in ^%self% face.&&0
-    if %self.difficulty% == 1
+    %echo% &&m~%self% whips a fistful of sand out of ^%self% pocket and throws it toward ~%targ%... but it blows back in ^%self% face.&&0
+    if %diff% == 1
       dg_affect #11856 %ch% TO-HIT 25 20
     end
     dg_affect #11841 %self% BLIND on 5
@@ -917,7 +923,7 @@ if %self.cooldown(11800)% || %self.disabled%
   halt
 end
 set room %self.room%
-set diff %self.difficulty%
+set diff %self.diff%
 * order
 set moves_left %self.var(moves_left)%
 set num_left %self.var(num_left,0)%
@@ -961,6 +967,9 @@ if %move% == 1 && !%self.aff_flagged(BLIND)%
   skyfight setup dodge %targ%
   wait 8 s
   dg_affect #11810 %self% off
+  if %self.disabled%
+    halt
+  end
   if !%targ% || %targ.id% != %id%
     * gone
     %echo% &&m~%self% quickly gets back up.&&0
@@ -978,10 +987,10 @@ if %move% == 1 && !%self.aff_flagged(BLIND)%
     %send% %targ% &&m~%self% stabs ^%self% knife into |%targ% ankle as &%self% pops up behind *%targ%!&&0
     eval dam 10 + (%diff% * 20)
     %damage% %targ% %dam% physical
-    %dot% #11816 %actor% %dam% 15 physical
+    %dot% #11816 %targ% %dam% 15 physical
     if %diff% >= 3
-      %send% %actor% &&mYour ankle wound slows your movement!&&0
-      dg_affect #11816 %actor% SLOW on 15
+      %send% %targ% &&mYour ankle wound slows your movement!&&0
+      dg_affect #11816 %targ% SLOW on 15
     end
   end
   skyfight clear dodge
@@ -999,13 +1008,16 @@ elseif %move% == 2
   eval max (%diff% + 2) / 2
   while %cycle% < %max%
     wait 5 s
+    if %self.disabled%
+      halt
+    end
     set this 0
     set ch %room.people%
     while %ch%
       set next_ch %ch.next_in_room%
       if %self.is_enemy(%ch%)%
         if %ch.var(did_sfdodge)%
-          if %self.difficulty% == 1
+          if %diff% == 1
             dg_affect #11856 %ch% TO-HIT 25 20
           end
         else
@@ -1043,7 +1055,7 @@ if %self.cooldown(11800)% || %self.disabled%
   halt
 end
 set room %self.room%
-set diff %self.difficulty%
+set diff %self.diff%
 * order
 set moves_left %self.var(moves_left)%
 set num_left %self.var(num_left,0)%
@@ -1084,6 +1096,9 @@ if %move% == 1 && !%self.aff_flagged(BLIND)%
   %echoaround% %targ% &&m~%self% leaps high into the air with ^%self% pick over ^%self% head!&&0
   skyfight setup dodge %targ%
   wait 8 s
+  if %self.disabled%
+    halt
+  end
   if !%targ% || %targ.id% != %id%
     * gone
     %echo% &&m~%self% lands hard with ^%self% pick embedded deep in the floor!&&0
@@ -1117,13 +1132,16 @@ elseif %move% == 2
   eval max (%diff% + 2) / 2
   while %cycle% < %max%
     wait 5 s
+    if %self.disabled%
+      halt
+    end
     set this 0
     set ch %room.people%
     while %ch%
       set next_ch %ch.next_in_room%
       if %self.is_enemy(%ch%)%
         if %ch.var(did_sfdodge)%
-          if %self.difficulty% == 1
+          if %diff% == 1
             dg_affect #11856 %ch% TO-HIT 25 20
           end
         else
@@ -1152,20 +1170,20 @@ end
 nop %self.remove_mob_flag(NO-ATTACK)%
 ~
 #11818
-Venjer the Fox combat: Pixycraft Embiggening Elixir, Blinding Barrage, Tower Quake, Blastmaster Fox~
+Venjer the Fox combat: Pixycraft Embiggening Elixir, Blinding Barrage, Tower Quake, Blastmaster Fox, Summon~
 0 k 100
 ~
 if %self.cooldown(11800)% || %self.disabled%
   halt
 end
 set room %self.room%
-set diff %self.difficulty%
+set diff %self.diff%
 * order
 set moves_left %self.var(moves_left)%
 set num_left %self.var(num_left,0)%
 if !%moves_left% || !%num_left%
-  set moves_left 1 2 3 4
-  set num_left 4
+  set moves_left 1 2 3 4 5
+  set num_left 5
 end
 * pick
 eval which %%random.%num_left%%%
@@ -1193,10 +1211,16 @@ if %move% == 1
   %echo% &&m**** Venjer takes a pixycraft embiggening elixir from her belt... ****&&0 (interrupt)
   skyfight setup interrupt all
   wait 4 s
+  if %self.disabled%
+    halt
+  end
   if %self.var(sfinterrupt_count,0)% < (%diff% + 1) / 2
     %echo% &&m**** Venjer uncorks the pixycraft embiggening elixir and licks her lips... ****&&0 (interrupt)
   end
   wait 4 s
+  if %self.disabled%
+    halt
+  end
   if %self.var(sfinterrupt_count,0)% >= (%diff% + 1) / 2
     %echo% &&mVenjer is interrupted and drops the elixir, which smashes on the ground!&&0
     if %diff% == 1
@@ -1217,6 +1241,9 @@ elseif %move% == 2
   end
   skyfight setup dodge all
   wait 3 s
+  if %self.disabled%
+    halt
+  end
   %regionecho% %room% 1 &&y~%self% shouts, 'Blinding Barrage!'&&0
   %echo% &&m**** There's a loud POP and a BANG as the air begins to explode around you! ****&&0 (dodge)
   set cycle 1
@@ -1269,8 +1296,14 @@ elseif %move% == 3
     nop %self.add_mob_flag(NO-ATTACK)%
   end
   wait 3 s
+  if %self.disabled%
+    halt
+  end
   %echo% &&mA large glowing sigil spreads across the floor from the impact of Venjer's staff...&&0
   wait 3 s
+  if %self.disabled%
+    halt
+  end
   skyfight setup dodge all
   %regionecho% %room% 1 &&y~%self% shouts, 'TOWER QUAKE!'&&0
   %echo% &&m**** There's a low rumble as the tower begins to shake... ****&&0 (dodge)
@@ -1296,7 +1329,7 @@ elseif %move% == 3
           %damage% %ch% %amt% physical
         elseif %ch.is_pc%
           %send% %ch% &&mYou jump at just the right time and avoid the tower quake!&&0
-          if %self.difficulty% == 1
+          if %diff% == 1
             dg_affect #11856 %ch% TO-HIT 25 20
           end
         end
@@ -1325,6 +1358,9 @@ elseif %move% == 4 && !%self.aff_flagged(BLIND)%
   set broke 0
   while %cycle% <= %diff% && !%broke%
     wait 4 s
+    if %self.disabled%
+      halt
+    end
     %regionecho% %room% 1 &&y~%self% shouts, 'Blastmaster Fox!'&&0
     if !%targ% || %targ.id% != %id%
       * gone
@@ -1339,129 +1375,290 @@ elseif %move% == 4 && !%self.aff_flagged(BLIND)%
       * hit
       %send% %targ% &&mLuminous bolts from Venjer's staff crash into ~%targ% and explode!&&0
       dg_affect #11841 %targ% BLIND on 10
-      %damage% %actor% 100 magical
+      %damage% %targ% 100 magical
     end
     if %diff% > 1
       %echo% &&mYou're caught in the explosion!&&0
       %aoe% 25 magical
     end
-    if %cycle% < %diff% && %targ% && %targ.id% == %id%
+    if %cycle% < %diff% && %targ% && %targ.id% == %id% && !%broke%
       %send% %targ% &&m**** Here comes another blast... ****&&0 (interrupt)
       skyfight setup interrupt %targ%
     end
     eval cycle %cycle% + 1
   done
   skyfight clear interrupt
+elseif %move% == 5
+  * Summon Goblins
+  %regionecho% %room% 1 &&y~%self% shouts, 'Gaaaaableeeeeeeeeeens!'&&0
+  wait 4 sec
+  if %diff% > 2
+    %load% m 11817 ally %self.level%
+    set gob %room.people%
+    if %gob.vnum% == 11817
+      nop %gob.add_mob_flag(!LOOT)%
+      set diff %diff%
+      remote diff %gob.id%
+      %echo% &&m~%gob% comes running in!&&0
+      %force% %gob% mkill %actor%
+    end
+  end
 end
 * in case
 nop %self.remove_mob_flag(NO-ATTACK)%
 ~
 #11819
-Pixy Queen (Skycleave): combat script~
+Pixy Queen (Skycleave) combat: Baleful Polymorph, Creeping Vines, Shrinking Dust, Shimmering Glare, Summon~
 0 k 100
 ~
-if %self.cooldown(11800)%
+if %self.cooldown(11800)% || %self.disabled%
   halt
 end
-set type %random.4%
-if %type% == 1
-  * Shrinking Spell
-  nop %self.set_cooldown(11800, 30)%
-  %echo% ~%self% draws a glittering wand from a pocket in ^%self% gown.
-  %echo% (You should probably 'interrupt' *%self% before &%self% uses it.)
-  set casting 1
-  remote casting %self.id%
-  wait 3 sec
-  if !%self.varexists(casting)%
-    halt
-  end
-  %echo% ~%self% swirls the glittering wand in wide circles, sending sparkles everywhere.
-  wait 3 sec
-  if !%self.varexists(casting)%
-    halt
-  end
-  %echo% ~%self% whips the glittering wand in your direction and a jet of sparkles shoots out!
-  eval scale %self.level%/4
-  set person %self.room.people%
-  while %person%
-    if %person.is_enemy(%self%)%
-      dg_affect #11820 %person% BONUS-PHYSICAL -%scale% 30
-      dg_affect #11821 %person% BONUS-MAGICAL -%scale% 30
-    end
-    set person %person.next_in_room%
-  done
-  rdelete casting %self.id%
-elseif %type% == 2
-  * Thunderbolt
-  nop %self.set_cooldown(11800, 30)%
-  %send% %actor% ~%self% points a tiny hand at you, lightning crackling around ^%self% fingertips!
-  %echoaround% %actor% ~%self% points a tiny hand at ~%actor%, lightning crackling around ^%self% fingertips!
-  wait 3 sec
-  if %actor.room% != %self.room%
-    set actor %self.fighting%
-  end
-  if !%actor%
-    halt
-  end
-  if %actor.trigger_counterspell%
-    %send% %actor% A bolt of lightning leaps from |%self% fingertips, but your counterspell deflects it!
-    %echoaround% %actor% A bolt of lightning leaps from |%self% fingertips, striking the floor in front of ~%actor%.
-    wait 2 sec
-    %echo% ~%self% screams with fury.
-    nop %self.set_cooldown(11800, 15)%
-    halt
-  end
-  %send% %actor% &&rA bolt of lightning leaps from |%self% fingertips, striking you!
-  %echoaround% %actor% &&rA bolt of lightning leaps from |%self% fingertips, striking ~%actor%!
-  %damage% %actor% 200 magical
-  %send% %actor% You collapse to the floor, twitching.
-  %echoaround% %actor% ~%actor% collapses to the floor, twitching.
-  dg_affect #11851 %actor% HARD-STUNNED on 10
-  wait 2 sec
-  %echo% ~%self% folds her arms and cackles maniacally.
-elseif %type% == 3
-  * Pixy Gale
-  nop %self.set_cooldown(11800, 30)%
-  dg_affect #11819 %self% HARD-STUNNED on 10
-  %echo% ~%self% raises ^%self% arms into the air and wind begins to swirl around *%self%...
-  wait 3 sec
-  %echo% A howling gale fills the entire chamber!
-  wait 2 sec
-  set difficulty 1
-  if %self.mob_flagged(HARD)%
-    eval difficulty %difficulty% + 1
-  end
-  if %self.mob_flagged(GROUP)%
-    eval difficulty %difficulty% + 2
-  end
-  eval loops 2 + %difficulty%
-  while %loops%
-    %echo% &&rInvisible blades of wind slash at you!
-    %aoe% 75 magical
-    eval loops %loops% - 1
-    if %loops%
-      wait 5 sec
-    end
-  done
-  %echo% |%self% pixy gale fades away.
-elseif %type% == 4
-  * Baleful Polymorph
-  nop %self.set_cooldown(11800, 15)%
-  set target %random.enemy%
-  if !%target%
-    set target %actor%
-  end
-  if %target.morph% == 11827
-    nop %self.set_cooldown(11800, 0)%
-    halt
-  end
-  %echo% ~%self% snaps ^%self% fingers...
-  set old_shortdesc %target.name%
-  %morph% %target% 11827
-  %echoaround% %target% %old_shortdesc% is suddenly transformed into ~%target%!
-  %send% %target% You are suddenly transformed into %target.name%!
-  %send% %target% (Type 'fastmorph normal' to transform yourself back.)
+set room %self.room%
+set diff %self.diff%
+* order
+set moves_left %self.var(moves_left)%
+set num_left %self.var(num_left,0)%
+if !%moves_left% || !%num_left%
+  set moves_left 1 2 3 4 5
+  set num_left 5
 end
+* pick
+eval which %%random.%num_left%%%
+set old %moves_left%
+set moves_left
+set move 0
+while %which% > 0
+  set move %old.car%
+  if %which% != 1
+    set moves_left %moves_left% %move%
+  end
+  set old %old.cdr%
+  eval which %which% - 1
+done
+set moves_left %moves_left% %old%
+* store
+eval num_left %num_left% - 1
+remote moves_left %self.id%
+remote num_left %self.id%
+* perform move
+skyfight lockout 30 30
+if %move% == 1 && !%self.aff_flagged(BLIND)%
+  * Baleful Polymorph
+  skyfight clear dodge
+  set targ %random.enemy%
+  if !%targ%
+    set targ %actor%
+  end
+  if %diff% == 1
+    set vnum 11826
+  else
+    set vnum 11827
+  end
+  if %targ.morph% == %vnum%
+    * already morphed
+    nop %self.set_cooldown(11800,0)%
+    halt
+  end
+  * wait?
+  set targ_id %targ.id%
+  set fail 0
+  if %diff% <= 2
+    %send% %targ% &&m**** ~%self% focuses a rainbow beam toward you... ****&&0 (dodge)
+    %echoaround% %targ% &&m~%self% focuses a rainbow beam toward ~%targ%...&&0
+    skyfight setup dodge %targ%
+    wait 8 s
+    if %self.disabled%
+      halt
+    end
+    if !%targ% || %targ.id% != %targ_id%
+      * lost targ
+      set fail 1
+    elseif %targ.var(did_sfdodge)%
+      set fail 1
+      %echo% &&mThe rainbow beam misses and scatters like a prism as it hits the vines.&&0
+      if %diff% == 1
+        dg_affect #11856 %ch% TO-HIT 25 20
+      end
+    elseif %targ.trigger_counterspell%
+      set fail 2
+      %echo% &&mThe rainbow beam cascades off of |%targ% counterspell and ricochets back at ~%self%!&&0
+    else
+      %send% %targ% &&mYou're picked up by the swirling rainbow light...&&0
+      %echoaround% %targ% &&m~%targ% is picked up by the swirling rainbow light...&&0
+    end
+  else
+    %echo% &&m~%self% blasts ~%targ% with a rainbow beam... it picks *%targ% right up off the ground...&&0
+  end
+  if !%fail%
+    set old_shortdesc %targ.name%
+    %morph% %targ% %vnum%
+    %echoaround% %targ% &&m%old_shortdesc% grows long ears and a tail... and becomes ~%targ%!&&0
+    %send% %targ% &&m**** You are suddenly transformed into %targ.name%! ****&&0 (fastmorph normal)
+    if %diff% == 4 && (%self.level% + 100) > %targ.level%
+      dg_affect #11851 %targ% STUNNED on 5
+    elseif %diff% >= 2
+      nop %targ.command_lag(ABILITY)%
+    end
+  elseif %fail% == 2 || %diff% == 1
+    dg_affect #11852 %self% HARD-STUNNED on 10
+  end
+  skyfight clear dodge
+elseif %move% == 2
+  * Creeping Vines
+  skyfight clear struggle
+  %echo% &&m~%self% shoots rainbow streamers into the foliage... which starts to stir!&&0
+  if %diff% == 1
+    nop %self.add_mob_flag(NO-ATTACK)%
+  end
+  wait 3 sec
+  %echo% &&m**** Creeping vines ensnare your arms and legs! ****&&0 (struggle)
+  skyfight setup struggle all 20
+  set ch %room.people%
+  while %ch%
+    set bug %ch.inventory(11890)%
+    if %bug%
+      set strug_char You struggle against the vines...
+      set strug_room ~%%actor%% struggles against the vines...
+      remote strug_char %bug.id%
+      remote strug_room %bug.id%
+      set free_char You get a hand loose and are able to escape the vines!
+      set free_room ~%%actor%% manages to free *%%actor%%self!
+      remote free_char %bug.id%
+      remote free_room %bug.id%
+    end
+    set ch %ch.next_in_room%
+  done
+  * damage
+  if %diff% > 1
+    set cycle 0
+    while %cycle% < 5
+      wait 4 s
+      set ch %room.people%
+      while %ch%
+        set next_ch %ch.next_in_room%
+        if %ch.affect(11822)%
+          %send% %ch% &&m**** You bleed from your arms and legs as the thorny vines cut into you! ****&&0 (struggle)
+          eval amount %diff% * 15
+          %damage% %ch% %amount% magical
+        end
+        set ch %next_ch%
+      eval cycle %cycle% + 1
+    done
+  else
+    wait 10 s
+    nop %self.remove_mob_flag(NO-ATTACK)%
+    wait 10 s
+  end
+elseif %move% == 3
+  * Shimmering Glare
+  if %diff% == 1
+    nop %self.add_mob_flag(NO-ATTACK)%
+  end
+  skyfight clear dodge
+  set targ %self.fighting%
+  set id %targ.id%
+  %send% %targ% &&m**** ~%self% begins to shimmer as &%self% glares at you... ****&&0 (dodge)
+  %echoaround% %targ% &&m~%self% begins to shimmer as &%self% glares at ~%targ%...&&0
+  skyfight setup dodge %targ%
+  wait 8 s
+  if %self.disabled%
+    halt
+  end
+  if !%targ% || %targ.id% != %id%
+    * gone
+  elseif %targ.var(did_sfdodge)%
+    * miss
+    %echo% &&mA shimmering beam of light from ~%self% ricochets off a pair of saplings and smacks the queen in the face!&&0
+    if %diff% == 1
+      dg_affect #11856 %ch% TO-HIT 25 20
+    end
+    dg_affect #11841 %self% BLIND on 5
+  elseif %targ.trigger_counterspell%
+    %echo% &&mA shimmering beam of light from ~%self% ricochets off |%targ% counterspell and zaps the queen in the face!&&0
+    dg_affect #11841 %self% BLIND on 10
+  else
+    * hit
+    %echo% &&mAs ~%self% glares at ~%targ%, a shimmering beam of light blasts *%targ% right in the eyes!&&0
+    dg_affect #11841 %targ% BLIND on 20
+    if %diff% > 1
+      eval dam %diff% * 15
+      %damage% %targ% %dam% magical
+    end
+  end
+  skyfight clear dodge
+elseif %move% == 4
+  * Shrinking Dust
+  skyfight clear dodge
+  %echo% &&m~%self% pulls out a tiny bag...&&0
+  if %diff% == 1
+    * normal: prevent her attack
+    nop %self.add_mob_flag(NO-ATTACK)%
+  end
+  skyfight setup dodge all
+  wait 1 s
+  if %self.disabled%
+    halt
+  end
+  %echo% &&m**** ~%self% starts throwing handfuls of pixy dust around the room... ****&&0 (dodge)
+  wait 8 s
+  if %self.disabled%
+    halt
+  end
+  set ch %self.room.people%
+  set any 0
+  eval penalty %self.level%/7
+  while %ch%
+    set next_ch %ch.next_in_room%
+    if %self.is_enemy(%ch%)%
+      if %ch.var(did_sfdodge)%
+        if %diff% == 1
+          dg_affect #11856 %ch% TO-HIT 25 20
+        end
+      else
+        set any 1
+        %send% %ch% &&mYou're hit by pixy dust... and you're shrinking!&&0
+        %echo% &&m~%ch% is hit by pixy dust and starts to shrink!&&0
+        dg_affect #11820 %ch% BONUS-PHYSICAL -%penalty% 30
+        dg_affect #11821 %ch% BONUS-MAGICAL -%penalty% 30
+        if %diff% == 4 && (%self.level% + 100) > %ch.level%
+          dg_affect #11851 %ch% STUNNED on 10
+        end
+        if %diff% >= 2
+          dg_affect #11857 %ch% SLOW on 20
+        end
+      end
+    end
+    set ch %next_ch%
+  done
+  if !%any%
+    %echo% &&m~%self% flies through a cloud of pixy dust and starts hacking and coughing!&&0
+    if %diff% == 1
+      dg_affect #11852 %self% HARD-STUNNED on 10
+    else
+      eval amount 100 - (%diff% * 20)
+      dg_affect #11854 %self% DODGE -%amount% 10
+    end
+  end
+  skyfight clear dodge
+elseif %move% == 5
+  * Summon pixy
+  %regionecho% %room% 1 &&y~%self% shouts, 'To me, my child!'&&0
+  wait 2 sec
+  if %diff% > 2
+    %load% m 11820 ally %self.level%
+    set pix %room.people%
+    if %pix.vnum% == 11820
+      nop %pix.add_mob_flag(!LOOT)%
+      set diff %diff%
+      remote diff %pix.id%
+      %echo% &&mThere's a flash a BANG! And ~%pix% comes flying out of nowhere!&&0
+      %force% %pix% mkill %actor%
+    end
+  end
+end
+* in case
+nop %self.remove_mob_flag(NO-ATTACK)%
 ~
 #11820
 Escaped Pixy (Skycleave) combat: Pixy Trip, Dangling Vine/Weapon Steal~
@@ -1471,7 +1668,7 @@ if %self.cooldown(11800)% || %self.disabled%
   halt
 end
 set room %self.room%
-set diff %self.difficulty%
+set diff %self.diff%
 * order
 set moves_left %self.var(moves_left)%
 set num_left %self.var(num_left,0)%
@@ -1525,6 +1722,9 @@ if %move% == 1 && !%self.aff_flagged(BLIND)%
   wait 5 s
   nop %self.remove_mob_flag(NO-ATTACK)%
   wait 3 s
+  if %self.disabled%
+    halt
+  end
   if !%targ% || %targ.id% != %id%
     * gone
     set miss 1
@@ -1545,24 +1745,26 @@ if %move% == 1 && !%self.aff_flagged(BLIND)%
       if %diff% > 1
         %echo% &&m~%self% bites ~%targ% on the ankle!&&0
         eval dam 60 + (%diff% * 20)
-        %damage% %actor% %dam% physical
+        %damage% %targ% %dam% physical
       else
         %echo% &&m~%self% dives towards |%targ% legs!&&0
       end
     else
       %echo% &&mA vine wraps itself around |%targ% ankle and tugs hard!&&0
     end
-    %send% %actor% &&mYou trip and fall!&&0
-    %echoaround% %actor% &&m~%actor% trips and falls!&&0
+    %send% %targ% &&mYou trip and fall!&&0
+    %echoaround% %targ% &&m~%targ% trips and falls!&&0
     if %diff% > 2
-      dg_affect #11814 %actor% STUNNED on 10
+      if (%self.level% + 100) > %targ.level%
+        dg_affect #11814 %targ% STUNNED on 10
+      end
       eval dam 40 + (%diff% * 20)
-      %damage% %actor% %dam% physical
+      %damage% %targ% %dam% physical
     elseif %diff% > 1
-      dg_affect #11814 %actor% IMMOBILIZED on 20
-      %damage% %actor% 80 physical
+      dg_affect #11814 %targ% IMMOBILIZED on 20
+      %damage% %targ% 80 physical
     else
-      dg_affect #11814 %actor% IMMOBILIZED on 20
+      dg_affect #11814 %targ% IMMOBILIZED on 20
     end
   end
   skyfight clear dodge
@@ -1699,7 +1901,7 @@ if %mode% == clear
 elseif %mode% == setup
   * Prepare for a response
   * usage: skyfight setup <dodge | interrupt | struggle | free> <all | player>
-  set difficulty %self.var(difficulty,1)%
+  set diff %self.var(diff,1)%
   set type %arg.car%
   set arg %arg.cdr%
   set target %arg.car%
@@ -1733,7 +1935,7 @@ elseif %mode% == setup
         %load% obj 11890 %ch% inv
         set obj %ch.inventory(11890)%
         if %obj%
-          remote difficulty %obj.id%
+          remote diff %obj.id%
         end
       end
     end
@@ -1847,7 +2049,7 @@ end
 if %no_need%
   * ensure no var
   rdelete needs_sf%type% %actor.id%
-  eval penalty %self.level% * %self.difficulty% / 20
+  eval penalty %self.level% * %self.var(diff,1)% / 20
   * messaging
   if %type% == dodge
     %send% %actor% You dodge out of the way... of nothing!
@@ -1871,8 +2073,13 @@ end
 eval sf%type%_count %self.var(sf%type%_count,0)% + 1
 remote sf%type%_count %self.id%
 if %type% == dodge
-  %send% %actor% You leap out of the way!
-  %echoaround% %actor% ~%actor% leaps out of the way!
+  if %self.room.template% == 11972
+    %send% %actor% You swim out of the way!
+    %echoaround% %actor% ~%actor% swims out of the way!
+  else
+    %send% %actor% You leap out of the way!
+    %echoaround% %actor% ~%actor% leaps out of the way!
+  end
 elseif %type% == interrupt
   %send% %actor% You prepare to interrupt ~%self%...
   %echoaround% %actor% ~%actor% prepares to interrupt ~%self%...
@@ -1995,8 +2202,8 @@ switch %self.vnum%
   break
   case 11817
     * goblin miner
-    set name_list Vyle Grosk Brang  Fance  Byth   Slansh Fonk Rong Shyf   Myte   Vrack Rend Worze  Chum
-    set sex_list  male male  female female female male   male male female female male  male female male
+    set name_list Vyle Grosk Brang  Fance  Byth   Slansh Fonk Rong Shyf   Myte   Vrack Rend Worze  Chum Bamf Shad   Orry   Grast Dornt Onner  Rixen
+    set sex_list  male male  female female female male   male male female female male  male female male male female female male  male  female female
   break
 done
 * get list pos
@@ -3105,7 +3312,7 @@ end
 if %random.2% == 1
   * Blind
   nop %self.set_cooldown(11800, 30)%
-  if %self.difficulty%==4
+  if %self.diff%==4
     %send% %actor% &&r~%self% slashes your forehead, opening a bleeding wound!
     %send% %actor% Blood trickles down into your eyes, blinding you!
     %echoaround% %actor% ~%self% slashes |%actor% forehead, opening a bleeding wound!
@@ -3121,7 +3328,7 @@ if %random.2% == 1
 else
   * Dagger Throw
   nop %self.set_cooldown(11800, 30)%
-  if %self.difficulty% == 4
+  if %self.diff% == 4
     set loops 3
     %echo% ~%self% draws a brace of throwing knives from a concealed pouch.
   else
@@ -3163,7 +3370,7 @@ if %random.2% == 1
     halt
   end
   wait 1 sec
-  if %self.difficulty%==4
+  if %self.diff%==4
     if %actor.affect(11843)%
       %send% %actor% &&rThe flames surrounding you grow more intense!
       %echoaround% %actor% The flames surrounding ~%actor% grow more intense!
@@ -3187,7 +3394,7 @@ else
   while %person%
     if %person.is_ally(%self%)%
       %echo% |%person% weapon glows silver.
-      if %self.difficulty% == 4
+      if %self.diff% == 4
         dg_affect #11844 %person% HASTE on 30
       end
       eval magnitude %self.level%/10
@@ -3210,7 +3417,7 @@ if %random.2% == 1
   nop %self.set_cooldown(11800, 30)%
   dg_affect #11845 %self% HARD-STUNNED on 30
   %echo% ~%self% draws ^%self% bow.
-  if %self.difficulty%==4
+  if %self.diff%==4
     set loops 7
   else
     set loops 3
@@ -3265,7 +3472,7 @@ if %random.2% == 1
     if %person.is_ally(%self%)%
       if %person.health% < %person.maxhealth%
         set magnitude 100
-        if %self.difficulty% == 4
+        if %self.diff% == 4
           set magnitude 200
         end
         %heal% %person% health %magnitude%
@@ -3289,7 +3496,7 @@ else
   %echoaround% %actor% ~%actor% doesn't look so good...
   %damage% %actor% 50 physical
   %dot% #11848 %actor% 100 15 poison
-  if %self.difficulty% == 4
+  if %self.diff% == 4
     %damage% %actor% 50 poison
     dg_affect #11848 %actor% SLOW on 15
   end
@@ -3307,7 +3514,7 @@ if %random.2% == 1
   nop %self.set_cooldown(11800, 30)%
   eval magnitude %self.level%/10
   %echo% ~%self% makes a cut on the palm of ^%self% palm.
-  if %self.difficulty% == 4
+  if %self.diff% == 4
     %echo% ~%self% presses %self.her% palm to the floor.
     %echo% A crimson glow fills the room, and you feel weaker.
     set person %self.room.people%
@@ -3337,7 +3544,7 @@ else
   while %person%
     if %person.is_enemy(%self%)%
       %damage% %person% 10
-      if %self.difficulty% == 4
+      if %self.diff% == 4
         %dot% #11842 %person% 125 30 physical
       else
         %dot% #11842 %person% 100 15 physical
@@ -3361,7 +3568,7 @@ if %random.2% == 1
   %echoaround% %actor% ~%self% clubs ~%actor% over the head with ^%self% weapon!
   %echoaround% %actor% ~%actor% looks dazed.
   %damage% %actor% 100 physical
-  if %self.difficulty% == 4
+  if %self.diff% == 4
     %send% %actor% The force of the blow leaves you stunned!
     dg_affect #11851 %actor% STUNNED on 10
   else
@@ -3376,7 +3583,7 @@ else
   %echo% ~%self% sheathes ^%self% weapon and begins to bandage ^%self% injuries...
   %heal% %self% health 50
   wait 3 sec
-  if %self.difficulty%==4
+  if %self.diff%==4
     set loops 4
   else
     set loops 2
@@ -3885,6 +4092,8 @@ Mezvienne combat: Baleful Polymorph, Blinding Light of Dawn, Belt of Venus, Dark
 if %self.cooldown(11800)% || %self.disabled%
   halt
 end
+set room %self.room%
+set diff %self.diff%
 * order
 set moves_left %self.var(moves_left)%
 set num_left %self.var(num_left,0)%
@@ -3919,7 +4128,7 @@ if %move% == 1 && !%self.aff_flagged(BLIND)%
   if !%target%
     set target %actor%
   end
-  if %self.difficulty% == 1
+  if %diff% == 1
     set vnum 11854
   else
     set vnum 11855
@@ -3932,23 +4141,26 @@ if %move% == 1 && !%self.aff_flagged(BLIND)%
   * wait?
   set target_id %target.id%
   set fail 0
-  if %self.difficulty% <= 2
+  if %diff% <= 2
     %send% %target% &&m**** ~%self% waves her hands... An eerie green light casts out toward you... ****&&0 (dodge)
     %echoaround% %target% &&m~%self% waves her hands... An eerie green light casts out toward ~%target%...&&0
     skyfight setup dodge %target%
     wait 8 s
+    if %self.disabled%
+      halt
+    end
     if !%target% || %target.id% != %target_id%
       * lost target
       set fail 1
     elseif %target.var(did_sfdodge)%
       set fail 1
       %echo% &&mThe green light scatters into the distance as Mezvienne's spell misses.&&0
-      if %self.difficulty% == 1
+      if %diff% == 1
         dg_affect #11856 %ch% TO-HIT 25 20
       end
     elseif %target.trigger_counterspell%
       set fail 2
-      %echo% &&mThe green light rebounds and smacks Mezvienne in the face -- she looks stunned!&&0
+      %echo% &&mThe green light rebounds and smacks ~%self% in the face -- she looks stunned!&&0
     else
       %send% %target% &&mYou are enveloped in the green light...&&0
     end
@@ -3960,12 +4172,12 @@ if %move% == 1 && !%self.aff_flagged(BLIND)%
     %morph% %target% %vnum%
     %echoaround% %target% &&m%old_shortdesc% is suddenly transformed into ~%target%!&&0
     %send% %target% &&m**** You are suddenly transformed into %target.name%! ****&&0 (fastmorph normal)
-    if %self.difficulty% == 4 && (%self.level% + 100) > %target.level%
+    if %diff% == 4 && (%self.level% + 100) > %target.level%
       dg_affect #11851 %target% STUNNED on 5
-    elseif %self.difficulty% >= 2
+    elseif %diff% >= 2
       nop %target.command_lag(ABILITY)%
     end
-  elseif %fail% == 2 || %self.difficulty% == 1
+  elseif %fail% == 2 || %diff% == 1
     dg_affect #11852 %self% HARD-STUNNED on 10
   end
   skyfight clear dodge
@@ -3973,7 +4185,7 @@ elseif %move% == 2
   * Blinding Light of Dawn
   %echo% &&m~%self% flies up and begins channeling the dawn...&&0
   %echo% &&m**** A bright light erupts from the sky, swirling past Mezvienne... ****&&0 (interrupt)
-  if %self.difficulty% == 1
+  if %diff% == 1
     * normal: prevent her attack
     nop %self.add_mob_flag(NO-ATTACK)%
   end
@@ -3983,9 +4195,12 @@ elseif %move% == 2
   set broke 0
   while !%broke% && %cycle% < 5
     wait 4 s
-    if %self.sfinterrupt_count% >= 1 && %self.sfinterrupt_count% >= (%self.difficulty% + 1) / 2
+    if %self.disabled%
+      halt
+    end
+    if %self.sfinterrupt_count% >= 1 && %self.sfinterrupt_count% >= (%diff% + 1) / 2
       set broke 1
-      set ch %self.room.people%
+      set ch %room.people%
       while %ch%
         if %ch.var(did_sfinterrupt,0)%
           %send% %ch% &&mYou trick the enchantress into shining the light at the fountain...&&0
@@ -3993,13 +4208,13 @@ elseif %move% == 2
         set ch %ch.next_in_room%
       done
       %echo% &&m~%self% seems distracted as the blinding light of dawn ricochets off the hendecagon fountain and strikes her in the face!&&0
-      eval amount 60 / %self.difficulty%
+      eval amount 60 / %diff%
       %damage% %self% %amount% magical
-      if %self.difficulty% == 1
+      if %diff% == 1
         dg_affect #11852 %self% HARD-STUNNED on 10
       end
     else
-      set ch %self.room.people%
+      set ch %room.people%
       while %ch%
         set next_ch %ch.next_in_room%
         eval skip %%skip_%ch.id%%%
@@ -4014,9 +4229,9 @@ elseif %move% == 2
             * hit and no counterspell
             %send% %ch% &&mThe blinding light of dawn burns you!&&0
             %echoaround% %ch% &&m~%ch% recoils as the light burns *%ch%!&&0
-            eval amount %self.difficulty% * 15
+            eval amount %diff% * 15
             %damage% %ch% %amount% magical
-            if %cycle% == 4 && %self.difficulty% == 4
+            if %cycle% == 4 && %diff% == 4
               dg_affect #11841 %ch% BLIND on 10
             end
           end
@@ -4031,7 +4246,7 @@ elseif %move% == 3
   * Belt of Venus / rosy pink light
   skyfight clear dodge
   %echo% &&m~%self% spins in the air as rosy pink mana streaming off of the heartwood of time whips around her...&&0
-  if %self.difficulty% == 1
+  if %diff% == 1
     * normal: prevent her attack
     nop %self.add_mob_flag(NO-ATTACK)%
   end
@@ -4039,26 +4254,26 @@ elseif %move% == 3
   wait 1 s
   %echo% &&m**** The ribbon of rosy pink light streams toward you... ****&&0 (dodge)
   wait 8 s
-  set ch %self.room.people%
+  set ch %room.people%
   set any 0
   while %ch%
     set next_ch %ch.next_in_room%
     if %self.is_enemy(%ch%)%
       if %ch.var(did_sfdodge)%
-        if %self.difficulty% == 1
+        if %diff% == 1
           dg_affect #11856 %ch% TO-HIT 25 20
         end
       else
         set any 1
         %echo% &&mThe rosy pink light strikes ~%ch% in the chest and streams right through *%ch%!&&0
-        if %self.difficulty% == 4 && (%self.level% + 100) > %ch.level%
+        if %diff% == 4 && (%self.level% + 100) > %ch.level%
           dg_affect #11851 %ch% STUNNED on 10
         end
-        if %self.difficulty% >= 3
+        if %diff% >= 3
           dg_affect #11857 %ch% SLOW on 20
         end
-        if %self.difficulty% >= 2
-          eval amount %self.difficulty% * -20
+        if %diff% >= 2
+          eval amount %diff% * -20
           dg_affect #11857 %ch% TO-HIT %amount% 20
         end
       end
@@ -4067,10 +4282,10 @@ elseif %move% == 3
   done
   if !%any%
     %echo% &&mThe rosy pink light of the belt of Venus swirls back and hits Mezvienne herself!&&0
-    if %difficulty% == 1
+    if %diff% == 1
       dg_affect #11852 %self% HARD-STUNNED on 10
     else
-      eval amount 100 - (%self.difficulty% * 20)
+      eval amount 100 - (%diff% * 20)
       dg_affect #11854 %self% DODGE -%amount% 10
     end
   end
@@ -4079,38 +4294,38 @@ elseif %move% == 4
   * Dark Fate
   skyfight clear struggle
   %echo% &&m~%self% rises up into the air and begins plucking unseen strands...&&0
-  if %self.difficulty% == 1
+  if %diff% == 1
     nop %self.add_mob_flag(NO-ATTACK)%
   end
   wait 3 sec
   %echo% &&m**** You are gripped by a dark fate! ****&&0 (struggle)
   skyfight setup struggle all 20
-  set ch %self.room.people%
+  set ch %room.people%
   while %ch%
     set bug %ch.inventory(11890)%
     if %bug%
-      set struggle_char You struggle against your dark fate...
-      set struggle_room ~%%actor%% struggles against ^%%actor%% dark fate...
-      remote struggle_char %bug.id%
-      remote struggle_room %bug.id%
-      set breakout_char You struggle out of your dark fate!
-      set breakout_room ~%%actor%% manages to free *%%actor%%self!
-      remote breakout_char %bug.id%
-      remote breakout_room %bug.id%
+      set strug_char You struggle against your dark fate...
+      set strug_room ~%%actor%% struggles against ^%%actor%% dark fate...
+      remote strug_char %bug.id%
+      remote strug_room %bug.id%
+      set free_char You struggle out of your dark fate!
+      set free_room ~%%actor%% manages to free *%%actor%%self!
+      remote free_char %bug.id%
+      remote free_room %bug.id%
     end
     set ch %ch.next_in_room%
   done
   * damage
-  if %self.difficulty% > 1
+  if %diff% > 1
     set cycle 0
     while %cycle% < 5
       wait 4 s
-      set ch %self.room.people%
+      set ch %room.people%
       while %ch%
         set next_ch %ch.next_in_room%
         if %ch.affect(11822)%
           %send% %ch% &&m**** You burn from the inside out as you face your dark fate! ****&&0 (struggle)
-          eval amount %self.difficulty% * 15
+          eval amount %diff% * 15
           %damage% %ch% %amount% magical
         end
         set ch %next_ch%
@@ -4436,8 +4651,8 @@ if %seconds% > 60
   %load% mob 11863
   set mob %room.people%
   if %mob.vnum% == 11863
-    set difficulty %self.var(difficulty,1)%
-    remote difficulty %mob.id%
+    set diff %self.var(diff,1)%
+    remote diff %mob.id%
     if %self.mob_flagged(HARD)%
       nop %mob.add_mob_flag(HARD)%
     end
@@ -4670,8 +4885,8 @@ end
 %at% i11871 %load% mob 11871
 set mez %instance.mob(11871)%
 if %mez%
-  set difficulty %self.var(difficulty,1)%
-  remote difficulty %mez.id%
+  set diff %self.var(diff,1)%
+  remote diff %mez.id%
   set spirit %instance.mob(11900)%
   if (%spirit.diff4% // 2) == 0
     nop %mez.add_mob_flag(HARD)%
@@ -4831,8 +5046,8 @@ switch %line%
     %load% mob 11872
     set mob %self.room.people%
     if %mob.vnum% == 11872
-      set difficulty %self.var(difficulty,1)%
-      remote difficulty %mob.id%
+      set diff %self.var(diff,1)%
+      remote diff %mob.id%
       if %self.varexists(skip)%
         set skip 1
         remote skip %mob.id%
@@ -4869,8 +5084,8 @@ done
 * load 2nd version
 %at% %vortex% %load% mob 11866
 set mez %instance.mob(11866)%
-set difficulty %self.var(difficulty,1)%
-remote difficulty %mez.id%
+set diff %self.var(diff,1)%
+remote diff %mez.id%
 * relocate and stun everyone
 set ch %room.people%
 while %ch%
@@ -4906,8 +5121,8 @@ done
 * load 2nd version
 %at% %vortex% %load% mob 11866
 set mez %instance.mob(11866)%
-set difficulty %self.var(difficulty,1)%
-remote difficulty %mez.id%
+set diff %self.var(diff,1)%
+remote diff %mez.id%
 * relocate and stun everyone
 set ch %room.people%
 while %ch%
@@ -6102,7 +6317,7 @@ Skycleave: Struggle to escape~
 1 c 2
 *~
 * runs on an obj in inventory; strength/intelligence help break out faster
-* uses optional string vars: struggle_char, struggle_room, breakout_char, breakout_room
+* uses optional string vars: strug_char, strug_room, free_char, free_room
 return 1
 if !%actor.affect(11822)%
   * check on ANY command
@@ -6124,13 +6339,13 @@ else
   set amount %actor.intelligence%
 end
 eval struggle_counter %self.var(struggle_counter,0)% + %amount% + 1
-eval needed 4 + (4 * %self.var(difficulty,1)%)
+eval needed 4 + (4 * %self.var(diff,1)%)
 * I want to break free...
 if %struggle_counter% >= %needed%
   * free!
-  set char_msg %self.var(breakout_char,You manage to break out!)%
+  set char_msg %self.var(free_char,You manage to break out!)%
   %send% %actor% %char_msg.process%
-  set room_msg %self.var(breakout_room,~%actor% struggles and manages to break out!)%
+  set room_msg %self.var(free_room,~%actor% struggles and manages to break out!)%
   %echoaround% %actor% %room_msg.process%
   set did_skycleave_struggle 1
   remote did_skycleave_struggle %self.id%
@@ -6139,9 +6354,9 @@ if %struggle_counter% >= %needed%
   %purge% %self%
 else
   * the struggle continues
-  set char_msg %self.var(struggle_char,You struggle to break free...)%
+  set char_msg %self.var(strug_char,You struggle to break free...)%
   %send% %actor% %char_msg.process%
-  set room_msg %self.var(struggle_room,~%actor% struggles, trying to break free...)%
+  set room_msg %self.var(strug_room,~%actor% struggles, trying to break free...)%
   %echoaround% %actor% %room_msg.process%
   nop %actor.command_lag(COMBAT-ABILITY)%
   remote struggle_counter %self.id%
@@ -6268,13 +6483,13 @@ skygobpix~
 if %actor% != %self%
   halt
 end
-set difficulty %arg.car%
+set diff %arg.car%
 set temp %arg.cdr%
 set type %temp.car%
-if !(%difficulty%)
-  set difficulty 1
+if !(%diff%)
+  set diff 1
 end
-if %difficulty% > 2
+if %diff% > 2
   set amount 2
 else
   set amount 1
@@ -6295,7 +6510,7 @@ switch %type%
       %load% mob %vnum%
       set mob %self.room.people%
       if %mob.vnum% == %vnum%
-        remote difficulty %mob.id%
+        remote diff %mob.id%
       end
       eval iter %iter% + 1
     done
@@ -6307,7 +6522,7 @@ switch %type%
       %load% mob 11820
       set mob %self.room.people%
       if %mob.vnum% == 11820
-        remote difficulty %mob.id%
+        remote diff %mob.id%
       end
       eval iter %iter% + 1
     done
@@ -6365,16 +6580,16 @@ elseif !%arg%
 end
 if normal /= %arg%
   %echo% Setting difficulty to Normal...
-  set difficulty 1
+  set diff 1
 elseif hard /= %arg%
   %echo% Setting difficulty to Hard...
-  set difficulty 2
+  set diff 2
 elseif group /= %arg%
   %echo% Setting difficulty to Group...
-  set difficulty 3
+  set diff 3
 elseif boss /= %arg%
   %echo% Setting difficulty to Boss...
-  set difficulty 4
+  set diff 4
 else
   %send% %actor% That is not a valid difficulty level for this adventure.
   halt
@@ -6392,23 +6607,23 @@ if %ward%
 end
 * Store difficulty
 set spirit %instance.mob(11900)%
-set diff2 %difficulty%
+set diff2 %diff%
 remote diff2 %spirit.id%
 * Load mobs
-%at% i11810 skygobpix %difficulty% g  * trash mob
-%at% i11811 skygobpix %difficulty% g  * trash mob
-%at% i11812 skygobpix %difficulty% a  * trash mob
-%at% i11813 skygobpix %difficulty% g  * trash mob
-%at% i11814 skygobpix %difficulty% g  * trash mob
+%at% i11810 skygobpix %diff% g  * trash mob
+%at% i11811 skygobpix %diff% g  * trash mob
+%at% i11812 skygobpix %diff% a  * trash mob
+%at% i11813 skygobpix %diff% g  * trash mob
+%at% i11814 skygobpix %diff% g  * trash mob
 %at% i11816 %load% mob 11812  * Apprentice Cosimo (hiding)
-%at% i11818 skyload 11819 %difficulty%  * Pixy Boss
-%at% i11819 skygobpix %difficulty% a  * trash mob
-%at% i11820 skygobpix %difficulty% p  * trash mob
-%at% i11821 skygobpix %difficulty% a  * trash mob
+%at% i11818 skyload 11819 %diff%  * Pixy Boss
+%at% i11819 skygobpix %diff% a  * trash mob
+%at% i11820 skygobpix %diff% p  * trash mob
+%at% i11821 skygobpix %diff% a  * trash mob
 %at% i11822 %load% mob 11810  * Watcher Annaca (phase A dummy)
-%at% i11823 skygobpix %difficulty% p  * trash mob
-%at% i11824 skygobpix %difficulty% a  * trash mob
-%at% i11825 skyload 11818 %difficulty%  * Goblin Boss
+%at% i11823 skygobpix %diff% p  * trash mob
+%at% i11824 skygobpix %diff% a  * trash mob
+%at% i11825 skyload 11818 %diff%  * Goblin Boss
 %load% mob 11864  * Replacement Celiya
 if %self.mob_flagged(*PICKPOCKETED)%
   set mob %instance.mob(11864)%
@@ -6432,16 +6647,16 @@ elseif !%arg%
 end
 if normal /= %arg%
   %echo% Setting difficulty to Normal...
-  set difficulty 1
+  set diff 1
 elseif hard /= %arg%
   %echo% Setting difficulty to Hard...
-  set difficulty 2
+  set diff 2
 elseif group /= %arg%
   %echo% Setting difficulty to Group...
-  set difficulty 3
+  set diff 3
 elseif boss /= %arg%
   %echo% Setting difficulty to Boss...
-  set difficulty 4
+  set diff 4
 else
   %send% %actor% That is not a valid difficulty level for this adventure.
   halt
@@ -6459,20 +6674,20 @@ if %ward%
 end
 * Store difficulty
 set spirit %instance.mob(11900)%
-set diff3 %difficulty%
+set diff3 %diff%
 remote diff3 %spirit.id%
 * Load mobs
 %at% i11834 %load% mob 11830  * High Master Caius (phase A dummy)
 %at% i11835 %load% mob 11834  * Otherworlder (chained)
 %at% i11835 %load% mob 11835  * Lab assistant
-%at% i11835 skyload 11847 %difficulty%  * Merc Caster boss
-%at% i11839 skyload 11848 %difficulty%  * Merc Rogue boss
-%at% i11837 skyload 11849 %difficulty%  * Merc Leader boss
-%at% i11830 skymerc %difficulty%  * Load set of mercenaries: hall
-%at% i11831 skymerc %difficulty%  *   hall
-%at% i11832 skymerc %difficulty%  *   hall
-%at% i11833 skymerc %difficulty%  *   hall
-%at% i11836 skymerc %difficulty%  *   Lich Labs
+%at% i11835 skyload 11847 %diff%  * Merc Caster boss
+%at% i11839 skyload 11848 %diff%  * Merc Rogue boss
+%at% i11837 skyload 11849 %diff%  * Merc Leader boss
+%at% i11830 skymerc %diff%  * Load set of mercenaries: hall
+%at% i11831 skymerc %diff%  *   hall
+%at% i11832 skymerc %diff%  *   hall
+%at% i11833 skymerc %diff%  *   hall
+%at% i11836 skymerc %diff%  *   Lich Labs
 %at% i11840 %load% mob 11831  * Resident Niamh
 %at% i11840 %load% mob 11840  * Magineer
 %load% mob 11910  * Replacement Watcher
@@ -6498,16 +6713,16 @@ elseif !%arg%
 end
 if normal /= %arg%
   %echo% Setting difficulty to Normal...
-  set difficulty 1
+  set diff 1
 elseif hard /= %arg%
   %echo% Setting difficulty to Hard...
-  set difficulty 2
+  set diff 2
 elseif group /= %arg%
   %echo% Setting difficulty to Group...
-  set difficulty 3
+  set diff 3
 elseif boss /= %arg%
   %echo% Setting difficulty to Boss...
-  set difficulty 4
+  set diff 4
 else
   %send% %actor% That is not a valid difficulty level for this adventure.
   halt
@@ -6525,17 +6740,17 @@ if %ward%
 end
 * Store difficulty
 set spirit %instance.mob(11900)%
-set diff4 %difficulty%
+set diff4 %diff%
 remote diff4 %spirit.id%
 * Load mobs
 %at% i11865 %load% mob 11859  * Page Sheila
 %at% i11865 %load% mob 11862  * Apprentice Thorley
-%at% i11866 skyload 11867 %difficulty%  * Mind-controlled Barrosh
+%at% i11866 skyload 11867 %diff%  * Mind-controlled Barrosh
 %at% i11867 %load% mob 11860  * Captive assistant
 %at% i11867 %load% mob 11851  * Captive page Paige
-%at% i11868 skyload 11869 %difficulty%  * Shade of Mezvienne
+%at% i11868 skyload 11869 %diff%  * Shade of Mezvienne
 %at% i11868 %load% mob 11868  * Injured Knezz
-%at% i11871 skyload 11871 %difficulty%  * Mezvienne the Enchantress
+%at% i11871 skyload 11871 %diff%  * Mezvienne the Enchantress
 %load% mob 11930  * Replacement Caius
 if %self.mob_flagged(*PICKPOCKETED)%
   set mob %instance.mob(11930)%
@@ -7022,8 +7237,8 @@ if %actor% != %self%
 end
 set vnum %arg.car%
 set temp %arg.cdr%
-set difficulty %temp.car%
-if !(%vnum) || !(%difficulty%)
+set diff %temp.car%
+if !(%vnum) || !(%diff%)
   halt
 end
 %load% mob %vnum%
@@ -7033,14 +7248,14 @@ if %mob.vnum% != %vnum%
 end
 nop %mob.remove_mob_flag(HARD)%
 nop %mob.remove_mob_flag(GROUP)%
-remote difficulty %mob.id%
-if %difficulty% == 1
+remote diff %mob.id%
+if %diff% == 1
   * Then we don't need to do anything
-elseif %difficulty% == 2
+elseif %diff% == 2
   nop %mob.add_mob_flag(HARD)%
-elseif %difficulty% == 3
+elseif %diff% == 3
   nop %mob.add_mob_flag(GROUP)%
-elseif %difficulty% == 4
+elseif %diff% == 4
   nop %mob.add_mob_flag(HARD)%
   nop %mob.add_mob_flag(GROUP)%
 end
