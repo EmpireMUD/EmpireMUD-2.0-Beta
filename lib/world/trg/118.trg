@@ -808,7 +808,7 @@ eval num_left %num_left% - 1
 remote moves_left %self.id%
 remote num_left %self.id%
 * perform move
-nop %self.set_cooldown(11800, 20)%
+skyfight lockout 20 10
 if %move% == 1 && !%self.aff_flagged(BLIND)%
   * Throw Object
   if %diff% <= 2
@@ -831,9 +831,9 @@ if %move% == 1 && !%self.aff_flagged(BLIND)%
   %send% %targ% &&m**** ~%self% grabs %obj% off the floor and throws it at you! ****&&0 (dodge)
   %echoaround% %targ% &&m~%self% grabs %obj% off the floor and throws it at ~%targ%!&&0
   skyfight setup dodge %targ%
-  wait 5 sec
+  wait 5 s
   nop %self.remove_mob_flag(NO-ATTACK)%
-  wait 5 sec
+  wait 3 s
   if !%targ% || %targ.id% != %id%
     * gone
     %echo% &&m%obj.cap% smashes into the far wall.&&0
@@ -887,7 +887,7 @@ elseif %move% == 2 && !%self.aff_flagged(BLIND)%
   %send% %targ% &&m**** ~%self% sticks ^%self% hand into ^%self% pocket... ****&&0 (dodge)
   %echoaround% %targ% &&m~%self% sticks ^%self% hand into ^%self% pocket...&&0
   skyfight setup dodge %targ%
-  wait 8 sec
+  wait 8 s
   if !%targ% || %targ.id% != %id%
     * gone
     %echo% &&m~%self% just laughs and throws sand into the air.&&0
@@ -944,7 +944,7 @@ eval num_left %num_left% - 1
 remote moves_left %self.id%
 remote num_left %self.id%
 * perform move
-nop %self.set_cooldown(11800, 20)%
+skyfight lockout 20 20
 if %move% == 1 && !%self.aff_flagged(BLIND)%
   * Goblinball / Ankle Stab
   if %diff% <= 2
@@ -959,7 +959,7 @@ if %move% == 1 && !%self.aff_flagged(BLIND)%
   %send% %targ% &&m**** ~%self% ducks and rolls toward you! ****&&0 (dodge)
   %echoaround% %targ% &&m~%self% ducks and rolls toward ~%targ%!&&0
   skyfight setup dodge %targ%
-  wait 8 sec
+  wait 8 s
   dg_affect #11810 %self% off
   if !%targ% || %targ.id% != %id%
     * gone
@@ -998,13 +998,13 @@ elseif %move% == 2
   set cycle 0
   eval max (%diff% + 2) / 2
   while %cycle% < %max%
-    wait 5 sec
+    wait 5 s
     set this 0
     set ch %room.people%
     while %ch%
       set next_ch %ch.next_in_room%
       if %self.is_enemy(%ch%)%
-        if %ch.did_sfdodge%
+        if %ch.var(did_sfdodge)%
           if %self.difficulty% == 1
             dg_affect #11856 %ch% TO-HIT 25 20
           end
@@ -1070,7 +1070,7 @@ eval num_left %num_left% - 1
 remote moves_left %self.id%
 remote num_left %self.id%
 * perform move
-nop %self.set_cooldown(11800, 20)%
+skyfight lockout 20 20
 if %move% == 1 && !%self.aff_flagged(BLIND)%
   * Leaping Strike
   if %diff% == 1
@@ -1083,7 +1083,7 @@ if %move% == 1 && !%self.aff_flagged(BLIND)%
   %send% %targ% &&m**** ~%self% leaps high into the air with ^%self% pick over ^%self% head! ****&&0 (dodge)
   %echoaround% %targ% &&m~%self% leaps high into the air with ^%self% pick over ^%self% head!&&0
   skyfight setup dodge %targ%
-  wait 8 sec
+  wait 8 s
   if !%targ% || %targ.id% != %id%
     * gone
     %echo% &&m~%self% lands hard with ^%self% pick embedded deep in the floor!&&0
@@ -1116,13 +1116,13 @@ elseif %move% == 2
   set cycle 0
   eval max (%diff% + 2) / 2
   while %cycle% < %max%
-    wait 5 sec
+    wait 5 s
     set this 0
     set ch %room.people%
     while %ch%
       set next_ch %ch.next_in_room%
       if %self.is_enemy(%ch%)%
-        if %ch.did_sfdodge%
+        if %ch.var(did_sfdodge)%
           if %self.difficulty% == 1
             dg_affect #11856 %ch% TO-HIT 25 20
           end
@@ -1186,7 +1186,7 @@ eval num_left %num_left% - 1
 remote moves_left %self.id%
 remote num_left %self.id%
 * perform move
-nop %self.set_cooldown(11800, 30)%
+skyfight lockout 30 30
 if %move% == 1
   * Pixycraft Embiggening Elixir
   skyfight clear interrupt
@@ -1498,7 +1498,7 @@ eval num_left %num_left% - 1
 remote moves_left %self.id%
 remote num_left %self.id%
 * perform move
-nop %self.set_cooldown(11800, 20)%
+skyfight lockout 20 10
 if %move% == 1 && !%self.aff_flagged(BLIND)%
   * Pixy Trip
   if %diff% <= 2
@@ -1522,9 +1522,9 @@ if %move% == 1 && !%self.aff_flagged(BLIND)%
   * start
   set miss 0
   skyfight setup dodge %targ%
-  wait 5 sec
+  wait 5 s
   nop %self.remove_mob_flag(NO-ATTACK)%
-  wait 5 sec
+  wait 3 s
   if !%targ% || %targ.id% != %id%
     * gone
     set miss 1
@@ -1583,7 +1583,7 @@ elseif %move% == 2 && !%self.aff_flagged(BLIND)%
   %send% %targ% &&m**** A dangling vine reaches down toward you... ****&&0 (dodge)
   %echoaround% %targ% &&mA dangling vine reaches down toward ~%targ%...&&0
   skyfight setup dodge %targ%
-  wait 8 sec
+  wait 8 s
   set miss 0
   if !%targ% || %targ.id% != %id%
     * gone
@@ -1638,6 +1638,8 @@ skyfight~
 *    skyfight clear <all | dodge | interrupt | struggle | free>
 * To set up players for a response command:
 *    skyfight setup <dodge | interrupt | struggle | free> <all | player>
+* To ensure nobody else is also acting:
+*    skyfight lockout <my cooldown> <everyone else's cooldown>
 if %actor% != %self%
   return 0
   halt
@@ -1740,6 +1742,22 @@ elseif %mode% == setup
     else
       set ch 0
     end
+  done
+elseif %mode% == lockout
+  * Starts a cooldown on everyone
+  * usage: skyfight lockout <my cooldown> <everyone else's cooldown>
+  set my_cd %arg.car%
+  set them_cd %arg.cdr%
+  set ch %self.room.people%
+  while %ch%
+    if %ch% == %self%
+      if %my_cd%
+        nop %self.set_cooldown(11800,%my_cd%)%
+      end
+    elseif %them_cd% && %ch.is_npc% && %ch.has_trigger(11821)%
+      nop %ch.set_cooldown(11800,%them_cd%)%
+    end
+    set ch %ch.next_in_room%
   done
 end
 ~
@@ -3893,7 +3911,7 @@ eval num_left %num_left% - 1
 remote moves_left %self.id%
 remote num_left %self.id%
 * perform move
-nop %self.set_cooldown(11800, 30)%
+skyfight lockout 30 30
 if %move% == 1 && !%self.aff_flagged(BLIND)%
   * Baleful Polymorph
   skyfight clear dodge
@@ -3908,7 +3926,7 @@ if %move% == 1 && !%self.aff_flagged(BLIND)%
   end
   if %target.morph% == %vnum%
     * already morphed
-    nop %self.set_cooldown(11800, 0)%
+    nop %self.set_cooldown(11800,0)%
     halt
   end
   * wait?
@@ -3918,11 +3936,11 @@ if %move% == 1 && !%self.aff_flagged(BLIND)%
     %send% %target% &&m**** ~%self% waves her hands... An eerie green light casts out toward you... ****&&0 (dodge)
     %echoaround% %target% &&m~%self% waves her hands... An eerie green light casts out toward ~%target%...&&0
     skyfight setup dodge %target%
-    wait 10 s
+    wait 8 s
     if !%target% || %target.id% != %target_id%
       * lost target
       set fail 1
-    elseif %target.did_sfdodge%
+    elseif %target.var(did_sfdodge)%
       set fail 1
       %echo% &&mThe green light scatters into the distance as Mezvienne's spell misses.&&0
       if %self.difficulty% == 1
@@ -4020,13 +4038,13 @@ elseif %move% == 3
   skyfight setup dodge all
   wait 1 s
   %echo% &&m**** The ribbon of rosy pink light streams toward you... ****&&0 (dodge)
-  wait 10 s
+  wait 8 s
   set ch %self.room.people%
   set any 0
   while %ch%
     set next_ch %ch.next_in_room%
     if %self.is_enemy(%ch%)%
-      if %ch.did_sfdodge%
+      if %ch.var(did_sfdodge)%
         if %self.difficulty% == 1
           dg_affect #11856 %ch% TO-HIT 25 20
         end

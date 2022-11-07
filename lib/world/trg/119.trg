@@ -5000,7 +5000,7 @@ eval num_left %num_left% - 1
 remote moves_left %self.id%
 remote num_left %self.id%
 * perform move
-nop %self.set_cooldown(11800, 30)%
+skyfight lockout 30 30
 if %move% == 1 && !%self.aff_flagged(BLIND)%
   * Jar of Captivity
   skyfight clear free
@@ -5095,7 +5095,7 @@ eval num_left %num_left% - 1
 remote moves_left %self.id%
 remote num_left %self.id%
 * perform move
-nop %self.set_cooldown(11800, 30)%
+skyfight lockout 30 30
 if %move% == 1
   * Frozen Solid
   skyfight clear struggle
