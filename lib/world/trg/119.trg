@@ -1982,7 +1982,8 @@ while %count% < 12
       set ch %next_ch%
     done
     set teleported 1
-    * it's actually ok to continue the loop and show the dreams
+    dg_affect #11927 %actor% off
+    halt
   end
   * next while loop
   eval count %count% + 1

@@ -4174,7 +4174,8 @@ them: your hand is stopped by an invisible barrier.
 E
 rugs plush~
    The rugs are made of high-piled, plush yarn. You've seen nobles sleep on
-less. You lift up a rug, but it's just more rugs underneath.
+less. You lift up a rug, but it's just more rugs underneath; a puff of magenta
+glitter flies loose as you do.
 ~
 E
 chandelier nocturnium extravagant~
@@ -4202,6 +4203,15 @@ comfortably, but it has just one chair. It is carved from ebony, inlaid with
 ivory lettering in an ancient language you can't decipher. The writing covers
 all visible portions of the desk, perhaps as an enchantment to protect the desk
 or tower.
+~
+E
+glitter magenta~
+On closer inspection, there's flecks of magenta glitter on almost everything!
+~
+E
+furniture chairs~
+   The desk, chairs, bookshelf, and the rest of the lot are all made from fine
+ebony, calamander, or magewood.
 ~
 T 11945
 T 11946
