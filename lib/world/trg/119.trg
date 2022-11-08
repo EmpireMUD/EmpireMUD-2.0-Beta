@@ -1914,6 +1914,81 @@ if %rogue% && !%rogue.fighting% && !%rogue.disabled%
   %force% %rogue% skyrogueslay
 end
 ~
+#11927
+Skycleave: Drink Teacup~
+1 s 100
+~
+dg_affect #11927 %actor% off
+dg_affect #11927 %actor% MANA-REGEN -1 30
+set teleported 0
+* begin loop to wait for sleep
+set count 0
+while %count% < 12
+  wait 5 sec
+  set room %actor.room%
+  set to_room 0
+  * see where we're at
+  if %actor.position% != Sleeping || !%room.function(BEDROOM)%
+    * still awake or no bedroom? nothing to do
+  else
+    * Sleeping AND in a bedroom: set a target
+    set to_room %instance.nearest_rmt(11973)%
+  end
+  * did we find a teleport target?
+  if %to_room%
+    * determine where to send them back to
+    if (%room.template% >= 11800 && %room.template% <= 11874) || (%room.template% >= 11900 && %room.template% <= 11974)
+      set skycleave_wake_room %room.template%
+    elseif %actor.varexists(skycleave_wake_room)%
+      set skycleave_wake_room %actor.skycleave_wake_room%
+    else
+      set skycleave_wake_room 0
+    end
+    if !%actor.plr_flagged(ADV-SUMMON)% && !%room.template%
+      nop %actor.mark_adventure_summoned_from%
+    end
+    * ensure boss is spawned
+    set boss %to_room.people(11920)%
+    if !%boss%
+      %at% %to_room% %load% mob 11920
+      %at% %to_room% %echo% You suddenly notice the Grand High Sorceress sitting on her desk.
+    end
+    * move player
+    %echoaround% %actor% ~%actor% lets out a raucous snore and then vanishes into ^%actor% dream.
+    %teleport% %actor% %to_room%
+    nop %actor.link_adventure_summon%
+    %echoaround% %actor% ~%actor% appears out of nowhere, asleep on the floor!
+    %send% %actor% You dream you're flying -- and it feels so real!
+    remote skycleave_wake_room %actor.id%
+    * teleport fellows
+    set ch %room.people%
+    while %ch%
+      set next_ch %ch.next_in_room%
+      if %ch.leader% == %actor% && !%ch.fighting%
+        if %ch.is_pc% && !%ch.plr_flagged(ADV-SUMMON)% && !%room.template%
+          nop %ch.mark_adventure_summoned_from%
+        end
+        %echoaround% %ch% ~%ch% vanishes into thin air!
+        %teleport% %ch% %to_room%
+        if %ch.is_pc%
+          nop %ch.link_adventure_summon%
+          remote skycleave_wake_room %ch.id%
+        end
+        %echoaround% %ch% ~%ch% appears out of nowhere!
+        if %ch.position% != Sleeping
+          %force% %ch% look
+        end
+      end
+      set ch %next_ch%
+    done
+    set teleported 1
+    * it's actually ok to continue the loop and show the dreams
+  end
+  * next while loop
+  eval count %count% + 1
+done
+dg_affect #11927 %actor% off
+~
 #11928
 Skycleave: skyrogueslay command for floor 3~
 0 c 0
@@ -2209,6 +2284,10 @@ if %actor.char_target(%arg.car%)% == %self%
 elseif %self.vnum% == 11888 && %arg% == knezz
   * Iskip of Rot and Ruin easter egg
   %send% %actor% You can't get a good look at him from down here.
+  return 1
+elseif %self.vnum% == 11920 && (%arg% == mageina || %arg% == barista || %arg% == face)
+  * Grand High Sorceress easter egg
+  %send% %actor% She keeps her head tilted so her hat blocks her face.
   return 1
 end
 ~
@@ -2592,10 +2671,11 @@ if %rescale% && %self.level%
 end
 ~
 #11941
-Rot and Ruin: Only drops loot for unique fighters~
+Skycleave: Only drops loot for unique fighters~
 0 f 100
 ~
-* Iskip only loses his !LOOT flag if a unique person over min_level has tagged him
+* mob only loses !LOOT flag if a unique person over min_level has tagged it
+* can also work in reverse, adding it
 set room %self.room%
 set min_level 150
 set done 0
@@ -2624,12 +2704,27 @@ while %ch% && !%done%
   end
   set ch %ch.next_in_room%
 done
-* and message
-if %self.mob_flagged(!LOOT)%
-  %echo% The giant, Iskip, turns to ash as he falls and blows away on the breeze.
-else
-  %echo% The giant, Iskip, turns to ash as he falls, dropping some items on the stump as he blows away on the breeze.
+* ensure !LOOT otherwise
+if !%done%
+  nop %self.add_mob_flag(!LOOT)%
 end
+* and message
+switch %self.vnum%
+  case 11888
+    if %self.mob_flagged(!LOOT)%
+      %echo% The giant, Iskip, turns to ash as he falls and blows away on the breeze.
+    else
+      %echo% The giant, Iskip, turns to ash as he falls, dropping some items on the stump as he blows away on the breeze.
+    end
+  break
+  case 11920
+    if %self.mob_flagged(!LOOT)%
+      %echo% The Grand High Sorceress gives you a coy smile as she disappears in a burst of purple glitter!
+    else
+      %echo% The Grand High Sorceress gives you a coy smile as she disappears in a burst of purple glitter, dropping something as she vanishes!
+    end
+  break
+done
 return 0
 ~
 #11942
@@ -2987,7 +3082,8 @@ Skycleave Dreams: Reset wake on poof-in~
 * 'wake' count. Typing 'wake' 3 times exits the area using trigger 11945.
 * This also clears their wake-room, which will be set by another script.
 set dir_list north east south west northwest northeast southwest southeast up down
-if %actor.is_pc% && %method% != script && (%direction% == none || !(%dir_list% ~= %direction%))
+set ok_methods script login
+if %actor.is_pc% && !(%ok_methods% ~= %method%) && (%direction% == none || !(%dir_list% ~= %direction%))
   set skycleave_wake 0
   remote skycleave_wake %actor.id%
   set skycleave_wake_room 0
@@ -5359,6 +5455,177 @@ end
 * short delay
 wait 30 s
 ~
+#11986
+Grand High Sorceress combat: untitled~
+0 k 100
+~
+if %self.cooldown(11800)% || %self.disabled%
+  halt
+end
+set room %self.room%
+set diff %self.diff%
+* order
+set moves_left %self.var(moves_left)%
+set num_left %self.var(num_left,0)%
+if !%moves_left% || !%num_left%
+  set moves_left 1 2
+  set num_left 2
+end
+* pick
+eval which %%random.%num_left%%%
+set old %moves_left%
+set moves_left
+set move 0
+while %which% > 0
+  set move %old.car%
+  if %which% != 1
+    set moves_left %moves_left% %move%
+  end
+  set old %old.cdr%
+  eval which %which% - 1
+done
+set moves_left %moves_left% %old%
+* store
+eval num_left %num_left% - 1
+remote moves_left %self.id%
+remote num_left %self.id%
+* perform move
+skyfight lockout 20 10
+if %move% == 1 && !%self.aff_flagged(BLIND)%
+  * Pixy Trip
+  if %diff% <= 2
+    nop %self.add_mob_flag(NO-ATTACK)%
+  end
+  skyfight clear dodge
+  set targ %random.enemy%
+  if !%targ%
+    set targ %actor%
+  end
+  set id %targ.id%
+  * random form
+  set form %random.2%
+  if %form% == 1
+    %send% %targ% &&m**** &&Z~%self% swoops toward your legs! ****&&0 (dodge)
+    %echoaround% %targ% &&m~%self% swoops toward |%targ% legs!&&0
+  else
+    %send% %targ% &&m**** A vine creeps toward your feet! ****&&0 (dodge)
+    %echoaround% %targ% &&mA vine creeps toward |%targ% feet!&&0
+  end
+  * start
+  set miss 0
+  skyfight setup dodge %targ%
+  wait 5 s
+  nop %self.remove_mob_flag(NO-ATTACK)%
+  wait 3 s
+  if %self.disabled%
+    halt
+  end
+  if !%targ% || %targ.id% != %id%
+    * gone
+    set miss 1
+  elseif %targ.var(did_sfdodge)%
+    set miss 1
+  end
+  * hit either them or me
+  if %miss%
+    if %form% == 1
+      %echo% &&m~%self% goes careening into a sapling and rebounds into a wall!&&0
+    else
+      %echo% &&mThe vine misses and whips back toward the ceiling, knocking ~%self% into the wall!&&0
+    end
+    dg_affect #11852 %self% HARD-STUNNED on 10
+  else
+    * hit
+    if %form% == 1
+      if %diff% > 1
+        %echo% &&m~%self% bites ~%targ% on the ankle!&&0
+        eval dam 60 + (%diff% * 20)
+        %damage% %targ% %dam% physical
+      else
+        %echo% &&m~%self% dives towards |%targ% legs!&&0
+      end
+    else
+      %echo% &&mA vine wraps itself around |%targ% ankle and tugs hard!&&0
+    end
+    %send% %targ% &&mYou trip and fall!&&0
+    %echoaround% %targ% &&m~%targ% trips and falls!&&0
+    if %diff% > 2
+      if (%self.level% + 100) > %targ.level%
+        dg_affect #11814 %targ% STUNNED on 10
+      end
+      eval dam 40 + (%diff% * 20)
+      %damage% %targ% %dam% physical
+    elseif %diff% > 1
+      dg_affect #11814 %targ% IMMOBILIZED on 20
+      %damage% %targ% 80 physical
+    else
+      dg_affect #11814 %targ% IMMOBILIZED on 20
+    end
+  end
+  skyfight clear dodge
+elseif %move% == 2 && !%self.aff_flagged(BLIND)%
+  * Dangling Vine/Weapon Steal
+  skyfight clear dodge
+  set targ %self.fighting%
+  if !%targ.eq(wield)%
+    set targ %random.enemy%
+    if !%targ.eq(wield)%
+      halt
+    end
+  end
+  set id %targ.id%
+  if %diff% == 1
+    nop %self.add_mob_flag(NO-ATTACK)%
+  end
+  %send% %targ% &&m**** A dangling vine reaches down toward you... ****&&0 (dodge)
+  %echoaround% %targ% &&mA dangling vine reaches down toward ~%targ%...&&0
+  skyfight setup dodge %targ%
+  wait 8 s
+  set miss 0
+  if !%targ% || %targ.id% != %id%
+    * gone
+    %echo% &&m~%self% isn't paying attention and runs straight into the dangling vine!&&0
+    set miss 1
+  elseif %targ.var(did_sfdodge)%
+    * miss
+    %echo% &&mThe dangling vine whips up suddenly, but hits ~%self% by mistake!&&0
+    set miss 1
+  else
+    * hit
+    switch %random.3%
+      case 1
+        %echo% &&mThe dangling vine whips up suddenly and snatches |%targ% weapon!&&0
+      break
+      case 2
+        %send% %targ% While you're distracted by the dangling vine, ~%self% circles around you and grabs your weapon!&&0
+        %echoaround% %targ% While ~%targ% is distracted by the dangling vine, ~%self% circles around and grabs ^%targ% weapon!&&0
+      break
+      case 3
+        %send% %targ% &&mThe dangling vine taps you on the shoulder and when you turn, a second vine steals your weapon!&&0
+        %echoaround% %targ% &&mThe dangling vine taps ~%targ% on the shoulder and when &%targ% turns, a second vine steals ^%targ% weapon!&&0
+      break
+    done
+    dg_affect #11815 %targ% DISARMED on 20
+    if %diff% >= 3
+      %send% %targ% &&m... and worse, ~%self% stabs you with a tiny knife while you're distracted!&&0
+      %echoaround% %targ% &&m... and ~%self% stabs *%targ% with a tiny knife while *%targ%'s distracted!&&0
+      %damage% %targ% 100 physical
+    end
+  end
+  if %miss%
+    * already messaged
+    if %diff% == 1 && %targ% && %targ.id% == %id%
+      dg_affect #11856 %targ% TO-HIT 25 20
+    end
+    if %diff% < 3
+      dg_affect #11852 %self% HARD-STUNNED on 10
+    end
+  end
+  skyfight clear dodge
+end
+* in case
+nop %self.remove_mob_flag(NO-ATTACK)%
+~
 #11989
 Goblin's Dream: Guard patrol~
 0 b 50
@@ -5557,9 +5824,9 @@ set valid_dirs north south east west northeast northwest southeast southwest up 
 if !(%valid_dirs% ~= %direction%)
   halt
 end
-* test if it's a real exit that doesn't go here
+* test if it's a real exit that doesn't go here or to 11974
 eval real_test %%room.%direction%(room)%%
-if %real_test% != %room%
+if %real_test% != %room% && %real_test.template% != 11974
   halt
 end
 * prevent leaving
@@ -5578,6 +5845,10 @@ switch %self.template%
     %send% %actor% You swim %direction%.
     %echoaround% %actor% ~%actor% swims %direction%.
     %force% %actor% look
+  break
+  case 11973
+    %send% %actor% You walk through the cold fog, but find yourself in the same room again on the other side.
+    %echoaround% %actor% ~%actor% walks through the %direction% fog door, but comes back out the other one.
   break
 done
 ~

@@ -383,7 +383,8 @@ before the loop begins again.
    Well, no way to break free and tell the tale. The lich, Scaldorran, has
 instructed me in the creation of a poison, of pixy origin in ages past, capable
 of killing a man's soul.
-   Surely that will free me from this endless living nightmare.
+   Surely that will free me from this endless living nightmare. With apologies
+to my dearest Em.
 
    x Henri DeClaire
 ~
@@ -625,12 +626,13 @@ a teacup~
 A teacup is lying here.~
    The blue ceramic teacup is almost impossibly dainty, thinner in places than
 the flower petals it was sculpted to resemble. On the side, a stylized version
-of the Tower Skycleave is painted in fine white lines.
+of the Tower Skycleave is painted in fine white lines in front of the letters
+MM in magenta.
    After the restoration of the tower, Mageina transmuted all the leftover soup
 and spoiled food into a tea so hearty that the sorcerers often live on nothing
 else.
 ~
-5 0 a 0 5
+5 0 a 0 6
 4 4 11926
 6 0
 M
@@ -639,6 +641,7 @@ You sip $T from the teacup.~
 M
 5
 $n sips from $s teacup.~
+T 11927
 S
 #11927
 body corpse henri declaire~

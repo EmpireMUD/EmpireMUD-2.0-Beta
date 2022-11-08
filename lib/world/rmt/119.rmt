@@ -3854,7 +3854,7 @@ The Headmaster's Palatial Office~
 sorcerer to watch over their charges. It has a massive calamander bookshelf
 along one wall; plush rugs cover the checkerboard marble floor and a painting
 hangs in a gold frame near the door. An extravagant nocturnium chandelier
-strung across lights the office with a soft violet glow.
+strung the ceiling across lights the office with a soft violet glow.
 ~
 ch z 0
 D2
@@ -4129,6 +4129,98 @@ even there. From down here, you can't even see them.
 T 11977
 T 11930
 T 11994
+S
+#11973
+The Headmistress's Palatial Office~
+   This windowed office is the highest in the tower, a place for the greatest
+sorcerer to watch over their charges. It has a massive calamander bookshelf
+along one wall; plush rugs cover the checkerboard marble floor and a painting
+hangs in a gold frame near the door. An extravagant nocturnium chandelier
+strung across the ceiling lights the office with a soft violet glow.
+~
+chi z 0
+D2
+~
+0 11974
+D3
+~
+0 11974
+E
+south~
+   The south door normally leads back out to the central chamber, but it's
+covered in thick fog and you can't see through.
+~
+E
+west quarters bedroom~
+   The door to the west usually leads to the living quarters, but it's covered
+in thick fog and you can't see anything beyond it.
+~
+E
+doors doorway fog~
+   Both doorways are covered in a thick fog and you cannot see the other side.
+It's cold to the touch, though your hand passes easily through it.
+~
+E
+window north~
+You can see the whole countryside from the window. (look out)
+~
+E
+bookshelf shelf calamander~
+   The bookshelf, carved from black and brown striped calamander wood, is truly
+massive. If it were laid on the ground, it would be larger than any bed you've
+slept in. It holds dozens upon dozens of tomes, though you find you can't touch
+them: your hand is stopped by an invisible barrier.
+~
+E
+rugs plush~
+   The rugs are made of high-piled, plush yarn. You've seen nobles sleep on
+less. You lift up a rug, but it's just more rugs underneath.
+~
+E
+chandelier nocturnium extravagant~
+   The black chandelier hangs from the ceiling by a hundred impossibly light
+chains, giving it the appearance of a shadow creeping across the ceiling. It
+casts a soft light over the entire room from hundreds of small oil burners.
+~
+E
+floor checkerboard marble~
+The floor is made from white and black marble in an alternating pattern.
+~
+E
+painting frame~
+   The painting shows a young couple in the middle of a dance in a beautiful
+open field, at sunrise. On the right, a smiling, smooth-faced man with short
+salt-and-pepper hair, has his right hand high, holding a woman's hand as she
+spins, her back to you, with her long wavy brown-and-violet hair caught in
+motion. Both are dressed in white: him in an open dress shirt and linen pants;
+her in an airy dress.
+~
+E
+desk~
+   The desk is expansive enough for two, perhaps three people to sit and work
+comfortably, but it has just one chair. It is carved from ebony, inlaid with
+ivory lettering in an ancient language you can't decipher. The writing covers
+all visible portions of the desk, perhaps as an enchantment to protect the desk
+or tower.
+~
+T 11945
+T 11946
+T 11994
+S
+#11974
+Beyond the Fog~
+There is nothing but fog.
+~
+cdgi 0 0
+D0
+~
+0 11973
+D1
+~
+0 11973
+M 1 11979 100.00 1
+T 11945
+T 11946
 S
 #11975
 A Cozy Little House~
