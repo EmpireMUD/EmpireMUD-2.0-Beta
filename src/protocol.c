@@ -947,7 +947,7 @@ const char *ProtocolOutput(descriptor_t *apDescriptor, const char *apData, int *
 				case '-':
 					bColourOn = false;
 					break;
-				case '^': {
+				case '!': {
 					want_cap = TRUE;
 					break;
 				}
@@ -1139,7 +1139,7 @@ const char *ProtocolOutput(descriptor_t *apDescriptor, const char *apData, int *
 					break;
 				}
 				
-				case '^': {
+				case '!': {
 					want_cap = TRUE;
 					break;
 				}
