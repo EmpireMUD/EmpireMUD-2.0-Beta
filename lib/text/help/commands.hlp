@@ -205,8 +205,8 @@ Bright colors:
  &W&&W White&0
 
 Additional codes:
- &&! Next letter will be capitalized (useful in scripts)
- &&_ Next letter will be lowercase
+ &&Z Next letter will be capitalized (useful in scripts)
+ &&z Next letter will be lowercase
 
 See also: BANNER, INFORMATIVE, POLITICAL, RECOLOR, TOGGLE
 #
