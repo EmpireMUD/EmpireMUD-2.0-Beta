@@ -828,7 +828,7 @@ if %move% == 1 && !%self.aff_flagged(BLIND)%
   eval obj %%object_%random.4%%%
   * start
   %regionecho% %room% 1 &&y~%self% shouts, 'Goose!'&&0
-  %send% %targ% &&m**** ~%self% grabs %obj% off the floor and throws it at you! ****&&0 (dodge)
+  %send% %targ% &&m**** &&Z~%self% grabs %obj% off the floor and throws it at you! ****&&0 (dodge)
   %echoaround% %targ% &&m~%self% grabs %obj% off the floor and throws it at ~%targ%!&&0
   skyfight setup dodge %targ%
   wait 5 s
@@ -887,7 +887,7 @@ elseif %move% == 2 && !%self.aff_flagged(BLIND)%
   set targ %self.fighting%
   set id %targ.id%
   %regionecho% %room% 1 &&y~%self% shouts, 'Pocket sand!'&&0
-  %send% %targ% &&m**** ~%self% sticks ^%self% hand into ^%self% pocket... ****&&0 (dodge)
+  %send% %targ% &&m**** &&Z~%self% sticks ^%self% hand into ^%self% pocket... ****&&0 (dodge)
   %echoaround% %targ% &&m~%self% sticks ^%self% hand into ^%self% pocket...&&0
   skyfight setup dodge %targ%
   wait 8 s
@@ -962,7 +962,7 @@ if %move% == 1 && !%self.aff_flagged(BLIND)%
   set targ %self.fighting%
   set id %targ.id%
   %regionecho% %room% 1 &&y~%self% shouts, 'Goblinbaaaaaaaaaall!'&&0
-  %send% %targ% &&m**** ~%self% ducks and rolls toward you! ****&&0 (dodge)
+  %send% %targ% &&m**** &&Z~%self% ducks and rolls toward you! ****&&0 (dodge)
   %echoaround% %targ% &&m~%self% ducks and rolls toward ~%targ%!&&0
   skyfight setup dodge %targ%
   wait 8 s
@@ -1001,7 +1001,7 @@ elseif %move% == 2
   end
   skyfight clear dodge
   %regionecho% %room% 1 &&y~%self% shouts, 'Slay the Griffin!'&&0
-  %echo% &&m**** ~%self% starts pulling out knives and throwing them in all directions! ****&&0 (dodge)
+  %echo% &&m**** &&Z~%self% starts pulling out knives and throwing them in all directions! ****&&0 (dodge)
   skyfight setup dodge all
   set any 0
   set cycle 0
@@ -1092,7 +1092,7 @@ if %move% == 1 && !%self.aff_flagged(BLIND)%
   set targ %self.fighting%
   set id %targ.id%
   %regionecho% %room% 1 &&y~%self% shouts, 'You got a miner problem!'&&0
-  %send% %targ% &&m**** ~%self% leaps high into the air with ^%self% pick over ^%self% head! ****&&0 (dodge)
+  %send% %targ% &&m**** &&Z~%self% leaps high into the air with ^%self% pick over ^%self% head! ****&&0 (dodge)
   %echoaround% %targ% &&m~%self% leaps high into the air with ^%self% pick over ^%self% head!&&0
   skyfight setup dodge %targ%
   wait 8 s
@@ -1125,7 +1125,7 @@ elseif %move% == 2
   end
   skyfight clear dodge
   %regionecho% %room% 1 &&y~%self% shouts, 'Mine! Allllllll miiiiiiiiiiiiine!'&&0
-  %echo% &&m**** ~%self% holds out ^%self% pick and begins spinning wildly! ****&&0 (dodge)
+  %echo% &&m**** &&Z~%self% holds out ^%self% pick and begins spinning wildly! ****&&0 (dodge)
   skyfight setup dodge all
   set any 0
   set cycle 0
@@ -1208,14 +1208,14 @@ skyfight lockout 30 30
 if %move% == 1
   * Pixycraft Embiggening Elixir
   skyfight clear interrupt
-  %echo% &&m**** Venjer takes a pixycraft embiggening elixir from her belt... ****&&0 (interrupt)
+  %echo% &&m**** &&Z~%self% takes a pixycraft embiggening elixir from her belt... ****&&0 (interrupt)
   skyfight setup interrupt all
   wait 4 s
   if %self.disabled%
     halt
   end
   if %self.var(sfinterrupt_count,0)% < (%diff% + 1) / 2
-    %echo% &&m**** Venjer uncorks the pixycraft embiggening elixir and licks her lips... ****&&0 (interrupt)
+    %echo% &&m**** &&Z~%self% uncorks the pixycraft embiggening elixir and licks her lips... ****&&0 (interrupt)
   end
   wait 4 s
   if %self.disabled%
@@ -1351,8 +1351,8 @@ elseif %move% == 4 && !%self.aff_flagged(BLIND)%
   skyfight clear interrupt
   set targ %self.fighting%
   set id %targ.id%
-  %send% %targ% &&m**** Venjer spins her staff in a circle, and a ball of light starts to grow at its tip... ****&&0 (interrupt)
-  %echoaround% %targ% &&mVenjer spins her staff in a circle, and a ball of light starts to grow at its tip...&&0
+  %send% %targ% &&m**** &&Z~%self% spins her staff in a circle, and a ball of light starts to grow at its tip... ****&&0 (interrupt)
+  %echoaround% %targ% &&m~%self% spins her staff in a circle, and a ball of light starts to grow at its tip...&&0
   skyfight setup interrupt %targ%
   set cycle 1
   set broke 0
@@ -1464,7 +1464,7 @@ if %move% == 1 && !%self.aff_flagged(BLIND)%
   set targ_id %targ.id%
   set fail 0
   if %diff% <= 2
-    %send% %targ% &&m**** ~%self% focuses a rainbow beam toward you... ****&&0 (dodge)
+    %send% %targ% &&m**** &&Z~%self% focuses a rainbow beam toward you... ****&&0 (dodge)
     %echoaround% %targ% &&m~%self% focuses a rainbow beam toward ~%targ%...&&0
     skyfight setup dodge %targ%
     wait 8 s
@@ -1558,7 +1558,7 @@ elseif %move% == 3
   skyfight clear dodge
   set targ %self.fighting%
   set id %targ.id%
-  %send% %targ% &&m**** ~%self% begins to shimmer as &%self% glares at you... ****&&0 (dodge)
+  %send% %targ% &&m**** &&Z~%self% begins to shimmer as &%self% glares at you... ****&&0 (dodge)
   %echoaround% %targ% &&m~%self% begins to shimmer as &%self% glares at ~%targ%...&&0
   skyfight setup dodge %targ%
   wait 8 s
@@ -1600,7 +1600,7 @@ elseif %move% == 4
   if %self.disabled%
     halt
   end
-  %echo% &&m**** ~%self% starts throwing handfuls of pixy dust around the room... ****&&0 (dodge)
+  %echo% &&m**** &&Z~%self% starts throwing handfuls of pixy dust around the room... ****&&0 (dodge)
   wait 8 s
   if %self.disabled%
     halt
@@ -1710,7 +1710,7 @@ if %move% == 1 && !%self.aff_flagged(BLIND)%
   * random form
   set form %random.2%
   if %form% == 1
-    %send% %targ% &&m**** ~%self% swoops toward your legs! ****&&0 (dodge)
+    %send% %targ% &&m**** &&Z~%self% swoops toward your legs! ****&&0 (dodge)
     %echoaround% %targ% &&m~%self% swoops toward |%targ% legs!&&0
   else
     %send% %targ% &&m**** A vine creeps toward your feet! ****&&0 (dodge)
@@ -4142,7 +4142,7 @@ if %move% == 1 && !%self.aff_flagged(BLIND)%
   set target_id %target.id%
   set fail 0
   if %diff% <= 2
-    %send% %target% &&m**** ~%self% waves her hands... An eerie green light casts out toward you... ****&&0 (dodge)
+    %send% %target% &&m**** &&Z~%self% waves her hands... An eerie green light casts out toward you... ****&&0 (dodge)
     %echoaround% %target% &&m~%self% waves her hands... An eerie green light casts out toward ~%target%...&&0
     skyfight setup dodge %target%
     wait 8 s

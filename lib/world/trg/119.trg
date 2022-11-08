@@ -4025,10 +4025,10 @@ if %cmd.mudcommand% == adventure
   %send% %actor% A Hundred Thousand Moons (inside the Tower Skycleave)
   %send% %actor% by Paul S. Clarke
   %send% %actor% \&0    Discover the lost city of Smol Nes-Pik, meet the people who live there, and
-  %send% %actor% \&0 unravel their fate in this highly-detailed hidden area. For players who enjoy
-  %send% %actor% \&0 an immersive reading experience, each room is filled with extra descriptions
-  %send% %actor% \&0 and many of the characters are animated with vignettes and cutscenes. And
-  %send% %actor% \&0 remember, you can wake up any time.
+  %send% %actor% \&zunravel their fate in this highly-detailed hidden area. For players who enjoy
+  %send% %actor% \&zan immersive reading experience, each room is filled with extra descriptions
+  %send% %actor% \&zand many of the characters are animated with vignettes and cutscenes. And
+  %send% %actor% \&zremember, you can wake up any time.
   %send% %actor% (type 'adventure skycleave' to see the description for the main adventure)
 elseif %cmd.mudcommand% == time
   if %indoor_list% ~= %room.template%
@@ -4715,10 +4715,10 @@ if %cmd.mudcommand% == adventure
   %send% %actor% Zenith of the Gobbrabakhs (inside the Tower Skycleave)
   %send% %actor% by Paul S. Clarke
   %send% %actor% \&0   Venture back into the Goblin's Dream to experience a culture lost to history
-  %send% %actor% \&0 in this highly-detailed hidden area. For players who enjoy an immersive
-  %send% %actor% \&0 reading experience, each room is filled with extra descriptions and many of
-  %send% %actor% \&0 the characters are animated with vignettes and cutscenes. You can wake up any
-  %send% %actor% \&0 time you want.
+  %send% %actor% \&zin this highly-detailed hidden area. For players who enjoy an immersive
+  %send% %actor% \&zreading experience, each room is filled with extra descriptions and many of
+  %send% %actor% \&zthe characters are animated with vignettes and cutscenes. You can wake up any
+  %send% %actor% \&ztime you want.
   %send% %actor% (type 'adventure skycleave' to see the description for the main adventure)
 elseif %cmd.mudcommand% == time
   if %room.template% == 11981
