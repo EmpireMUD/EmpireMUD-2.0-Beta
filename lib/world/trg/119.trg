@@ -118,6 +118,38 @@ else
   %send% %actor% Invalid command.
 end
 ~
+#11902
+Skycleave: BoE loot quality flags~
+1 n 100
+~
+* Inherit hard/group flags from an NPC and rescale itself, on NON-CRAFTED BOE
+* first ensure there's a person
+set actor %self.carried_by%
+if !%actor%
+  set actor %self.worn_by%
+end
+if !%actor%
+  halt
+end
+set rescale 0
+* next check pc/npc
+if %actor.is_npc%
+  if !%self.is_flagged(GENERIC-DROP)%
+    if %actor.mob_flagged(HARD)% && !%self.is_flagged(HARD-DROP)%
+      nop %self.flag(HARD-DROP)%
+      set rescale 1
+    end
+    if %actor.mob_flagged(GROUP)% && !%self.is_flagged(GROUP-DROP)%
+      nop %self.flag(GROUP-DROP)%
+      set rescale 1
+    end
+  end
+end
+if %rescale% && %self.level%
+  wait 0
+  %scale% %self% %self.level%
+end
+~
 #11904
 Skycleave: Cleaning crew despawn~
 0 b 33
@@ -2673,6 +2705,7 @@ if %rescale% && %self.level%
   wait 0
   %scale% %self% %self.level%
 end
+detach 11902 %self.id%
 ~
 #11941
 Skycleave: Only drops loot for unique fighters~
@@ -4440,29 +4473,32 @@ if !(%arg% ~= %phrase1%) || !(%arg% ~= %phrase2%)
   halt
 end
 wait 1
-* look for mageina
-set mageina %self.room.people(11905)%
-if !%mageina%
-  set mageina %self.room.people(11805)%
+* look for mm
+set mm %self.room.people(11905)%
+if !%mm%
+  set mm %self.room.people(11805)%
+end
+if !%mm%
+  set mm %self.room.people(11920)%
 end
 * messaging
 if %actor.is_immortal%
   %echo% A bolt of lightning comes out of nowhere and strikes |%actor% wand!
-elseif %mageina%
+elseif %mm%
   %echo% A bolt of lightning streaks out of nowhere...
-  %echo% ... Mageina whips a gnarled old wand out of her sleeve and catches the lightning!
+  %echo% ... ~%mm% whips a gnarled old wand out of her sleeve and catches the lightning!
   wait 1
-  %force% %mageina% say No!
+  %force% %mm% say No!
   wait 1
-  if %actor.room% != %mageina.room%
+  if %actor.room% != %mm.room%
     halt
   end
   wait 1
-   %force% %mageina% say Expeliarmus!
+   %force% %mm% say Expeliarmus!
   %send% %actor% Before you can even blink, the wand flips out of your hand!
   %echoaround% %actor% |%actor% wand flips out of ^%actor% hand!
   wait 1
-  %echo% Mageina catches the wand and puts it away.
+  %echo% ~%mm% catches the wand and puts it away.
   %purge% %self%
 else
   %echo% A bolt of lightning from nowhere strikes ~%actor% right in the chest!
@@ -5602,18 +5638,23 @@ elseif %move% == 3
           switch %random.5%
             case 1
               dg_affect #11920 %ch% BLIND on 30
+              %send% %ch% You're blind!
             break
             case 2
               dg_affect #11920 %ch% DODGE -50 30
+              %send% %ch% You're distracted by sparkles in your eyes!
             break
             case 3
               dg_affect #11920 %ch% IMMOBILIZED on 30
+              %send% %ch% Your legs don't seem to work right!
             break
             case 4
               dg_affect #11920 %ch% TO-HIT -50 30
+              %send% %ch% Your arms don't seem to work right!
             break
             case 5
               dg_affect #11920 %ch% SLOW on 30
+              %send% %ch% You're having trouble moving!
             break
           done
           eval dam %diff% * 10
@@ -5694,8 +5735,8 @@ elseif %move% == 5
     end
     %load% m %vnum% ally %self.level%
     set mob %room.people%
-    if %gob.vnum% == %vnum%
-      nop %gob.add_mob_flag(!LOOT)%
+    if %mob.vnum% == %vnum%
+      nop %mob.add_mob_flag(!LOOT)%
       set diff %diff%
       remote diff %mob.id%
       if %mob.vnum% == 11820

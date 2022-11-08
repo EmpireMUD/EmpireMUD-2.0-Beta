@@ -2012,6 +2012,9 @@ elseif %actor.position% != Fighting && %actor.position% != Standing
 elseif %actor.aff_flagged(IMMOBILIZED)%
   %send% %actor% You can't do that right now... you're stuck!
   halt
+elseif %actor.aff_flagged(BLIND)%
+  %send% %actor% You can't see anything!
+  halt
 end
 * check 'cooldown'
 if %actor.affect(11812)%
