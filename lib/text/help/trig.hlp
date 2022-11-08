@@ -64,7 +64,7 @@ running it.
 The following trigger types are supported:
 
 Mobs: ability, act, death, entry, leave, load, speech
-Rooms: ability, door, drop, enter, leave, load, reset, speech
+Rooms: ability, door, drop, enter, leave, load, speech, zone reset
 
 Support for this can be added to more trigger types on request.
 
