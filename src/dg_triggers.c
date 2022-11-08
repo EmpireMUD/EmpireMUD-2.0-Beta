@@ -389,12 +389,16 @@ void entry_memory_mtrigger(char_data *ch) {
 int entry_mtrigger(char_data *ch, char *method) {
 	union script_driver_data_u sdd;
 	trig_data *t, *next_t;
-	int any_in_room = -1;
+	int any_in_room = -1, val;
+	bool multi = FALSE;
 
 	if (!SCRIPT_CHECK(ch, MTRIG_ENTRY))
 		return 1;
 	
 	LL_FOREACH_SAFE(TRIGGERS(SCRIPT(ch)), t, next_t) {
+		if (multi && !IS_SET(GET_TRIG_TYPE(t), MTRIG_ALLOW_MULTIPLE)) {
+			continue;	// already did an allow-multi
+		}
 		if (AFF_FLAGGED(ch, AFF_CHARM) && !TRIGGER_CHECK(t, MTRIG_CHARMED)) {
 			continue;
 		}
@@ -414,8 +418,14 @@ int entry_mtrigger(char_data *ch, char *method) {
 		// ok:
 		add_var(&GET_TRIG_VARS(t), "method", method ? method : "none", 0);
 		sdd.c = ch;
-		return script_driver(&sdd, t, MOB_TRIGGER, TRIG_NEW);
-		break;
+		val = script_driver(&sdd, t, MOB_TRIGGER, TRIG_NEW);
+		
+		if (!val || !IS_SET(GET_TRIG_TYPE(t), MTRIG_ALLOW_MULTIPLE)) {
+			return val;
+		}
+		else {
+			multi = TRUE;
+		}
 	}
 
 	return 1;
@@ -549,10 +559,17 @@ void speech_mtrigger(char_data *actor, char *str) {
 	trig_data *t, *next_t;
 	char buf[MAX_INPUT_LENGTH];
 	int any_in_room = -1;
+	bool multi;
 	
 	DL_FOREACH_SAFE2(ROOM_PEOPLE(IN_ROOM(actor)), ch, ch_next, next_in_room) {
+		// multi is per-char
+		multi = FALSE;
+		
 		if (SCRIPT_CHECK(ch, MTRIG_SPEECH) && AWAKE(ch) && (actor!=ch)) {
 			LL_FOREACH_SAFE(TRIGGERS(SCRIPT(ch)), t, next_t) {
+				if (multi && IS_SET(GET_TRIG_TYPE(t), MTRIG_ALLOW_MULTIPLE)) {
+					continue;	// already did an allow-multi
+				}
 				if (AFF_FLAGGED(ch, AFF_CHARM) && !TRIGGER_CHECK(t, MTRIG_CHARMED)) {
 					continue;
 				}
@@ -579,7 +596,13 @@ void speech_mtrigger(char_data *actor, char *str) {
 					add_var(&GET_TRIG_VARS(t), "speech", str, 0);
 					sdd.c = ch;
 					script_driver(&sdd, t, MOB_TRIGGER, TRIG_NEW);
-					break;
+					
+					if (!IS_SET(GET_TRIG_TYPE(t), MTRIG_ALLOW_MULTIPLE)) {
+						break;
+					}
+					else {
+						multi = TRUE;
+					}
 				}
 			}
 		}
@@ -591,9 +614,13 @@ void act_mtrigger(const char_data *ch, char *str, char_data *actor, char_data *v
 	trig_data *t, *next_t;
 	char buf[MAX_INPUT_LENGTH];
 	int any_in_room = -1;
+	bool multi = FALSE;
 
 	if (SCRIPT_CHECK(ch, MTRIG_ACT) && (actor!=ch)) {
 		LL_FOREACH_SAFE(TRIGGERS(SCRIPT(ch)), t, next_t) {
+			if (multi && IS_SET(GET_TRIG_TYPE(t), MTRIG_ALLOW_MULTIPLE)) {
+				continue;	// already did an allow-multi
+			}
 			if (AFF_FLAGGED(ch, AFF_CHARM) && !TRIGGER_CHECK(t, MTRIG_CHARMED)) {
 				continue;
 			}
@@ -635,7 +662,13 @@ void act_mtrigger(const char_data *ch, char *str, char_data *actor, char_data *v
 				}	  
 				sdd.c = (char_data*)ch;
 				script_driver(&sdd, t, MOB_TRIGGER, TRIG_NEW);
-				break;
+				
+				if (!IS_SET(GET_TRIG_TYPE(t), MTRIG_ALLOW_MULTIPLE)) {
+					break;
+				}
+				else {
+					multi = TRUE;
+				}
 			}	
 		}
 	}
@@ -730,11 +763,15 @@ int death_mtrigger(char_data *ch, char_data *actor) {
 	trig_data *t, *next_t;
 	char buf[MAX_INPUT_LENGTH];
 	int val = 1;
+	bool multi = FALSE;
 
 	if (!SCRIPT_CHECK(ch, MTRIG_DEATH))
 		return val;
 
 	LL_FOREACH_SAFE(TRIGGERS(SCRIPT(ch)), t, next_t) {
+		if (multi && IS_SET(GET_TRIG_TYPE(t), MTRIG_ALLOW_MULTIPLE)) {
+			continue;	// already did an allow-multi
+		}
 		if (AFF_FLAGGED(ch, AFF_CHARM) && !TRIGGER_CHECK(t, MTRIG_CHARMED)) {
 			continue;
 		}
@@ -749,6 +786,9 @@ int death_mtrigger(char_data *ch, char_data *actor) {
 			if (!IS_SET(GET_TRIG_TYPE(t), MTRIG_ALLOW_MULTIPLE)) {
 				// the first non-multiple breaks the loop
 				break;
+			}
+			else {
+				multi = TRUE;
 			}
 		}
 	}
@@ -831,11 +871,15 @@ int can_fight_mtrigger(char_data *ch, char_data *actor) {
 
 void load_mtrigger(char_data *ch) {
 	trig_data *t, *next_t;
+	bool multi = FALSE;
 
 	if (!SCRIPT_CHECK(ch, MTRIG_LOAD))
 		return;
 
 	LL_FOREACH_SAFE(TRIGGERS(SCRIPT(ch)), t, next_t) {
+		if (multi && IS_SET(GET_TRIG_TYPE(t), MTRIG_ALLOW_MULTIPLE)) {
+			continue;	// already did an allow-multi
+		}
 		if (TRIGGER_CHECK(t, MTRIG_LOAD) &&  (number(1, 100) <= GET_TRIG_NARG(t))) {
 			union script_driver_data_u sdd;
 			sdd.c = ch;
@@ -844,6 +888,9 @@ void load_mtrigger(char_data *ch) {
 			if (!IS_SET(GET_TRIG_TYPE(t), MTRIG_ALLOW_MULTIPLE)) {
 				// the first non-multiple breaks the loop
 				break;
+			}
+			else {
+				multi = TRUE;
 			}
 		}
 	}
@@ -854,6 +901,8 @@ int ability_mtrigger(char_data *actor, char_data *ch, any_vnum abil) {
 	trig_data *t, *next_t;
 	char buf[MAX_INPUT_LENGTH];
 	ability_data *ab;
+	int val;
+	bool multi = FALSE;
 
 	if (ch == NULL || !(ab = find_ability_by_vnum(abil))) {
 		return 1;
@@ -863,6 +912,9 @@ int ability_mtrigger(char_data *actor, char_data *ch, any_vnum abil) {
 		return 1;
 
 	LL_FOREACH_SAFE(TRIGGERS(SCRIPT(ch)), t, next_t) {
+		if (multi && !IS_SET(GET_TRIG_TYPE(t), MTRIG_ALLOW_MULTIPLE)) {
+			continue;	// already did an allow-multi
+		}
 		if (AFF_FLAGGED(ch, AFF_CHARM) && !TRIGGER_CHECK(t, MTRIG_CHARMED)) {
 			continue;
 		}
@@ -874,7 +926,14 @@ int ability_mtrigger(char_data *actor, char_data *ch, any_vnum abil) {
 			add_var(&GET_TRIG_VARS(t), "ability", buf, 0);
 			add_var(&GET_TRIG_VARS(t), "abilityname", ABIL_NAME(ab), 0);
 			sdd.c = ch;
-			return script_driver(&sdd, t, MOB_TRIGGER, TRIG_NEW);
+			val = script_driver(&sdd, t, MOB_TRIGGER, TRIG_NEW);
+			
+			if (!val || !IS_SET(GET_TRIG_TYPE(t), MTRIG_ALLOW_MULTIPLE)) {
+				return val;
+			}
+			else {
+				multi = TRUE;
+			}
 		}
 	}
 
@@ -893,7 +952,8 @@ int leave_mtrigger(char_data *actor, int dir, char *custom_dir, char *method) {
 	trig_data *t, *next_t;
 	char_data *ch;
 	char buf[MAX_INPUT_LENGTH];
-	int any_in_room = -1;
+	int any_in_room = -1, val;
+	bool multi = FALSE;
 	
 	if (IS_IMMORTAL(actor) && (GET_INVIS_LEV(actor) > LVL_MORTAL || PRF_FLAGGED(actor, PRF_WIZHIDE))) {
 		return 1;
@@ -908,6 +968,9 @@ int leave_mtrigger(char_data *actor, int dir, char *custom_dir, char *method) {
 		}
 
 		LL_FOREACH_SAFE(TRIGGERS(SCRIPT(ch)), t, next_t) {
+			if (multi && !IS_SET(GET_TRIG_TYPE(t), MTRIG_ALLOW_MULTIPLE)) {
+				continue;	// already did an allow-multi
+			}
 			if (AFF_FLAGGED(ch, AFF_CHARM) && !TRIGGER_CHECK(t, MTRIG_CHARMED)) {
 				continue;
 			}
@@ -933,7 +996,14 @@ int leave_mtrigger(char_data *actor, int dir, char *custom_dir, char *method) {
 				ADD_UID_VAR(buf, t, char_script_id(actor), "actor", 0);
 				add_var(&GET_TRIG_VARS(t), "method", method ? method : "none", 0);
 				sdd.c = ch;
-				return script_driver(&sdd, t, MOB_TRIGGER, TRIG_NEW);
+				val = script_driver(&sdd, t, MOB_TRIGGER, TRIG_NEW);
+				
+				if (!val || !IS_SET(GET_TRIG_TYPE(t), MTRIG_ALLOW_MULTIPLE)) {
+					return val;
+				}
+				else {
+					multi = TRUE;
+				}
 			}
 		}
 	}
@@ -945,8 +1015,13 @@ int door_mtrigger(char_data *actor, int subcmd, int dir) {
 	trig_data *t, *next_t;
 	char_data *ch;
 	char buf[MAX_INPUT_LENGTH];
+	int val;
+	bool multi = FALSE;
 	
 	DL_FOREACH2(ROOM_PEOPLE(IN_ROOM(actor)), ch, next_in_room) {
+		if (multi && !IS_SET(GET_TRIG_TYPE(t), MTRIG_ALLOW_MULTIPLE)) {
+			continue;	// already did an allow-multi
+		}
 		if (!SCRIPT_CHECK(ch, MTRIG_DOOR) || !AWAKE(ch) || FIGHTING(ch) || (ch == actor))
 			continue;
 
@@ -963,7 +1038,14 @@ int door_mtrigger(char_data *actor, int subcmd, int dir) {
 					add_var(&GET_TRIG_VARS(t), "direction", "none", 0);
 				ADD_UID_VAR(buf, t, char_script_id(actor), "actor", 0);
 				sdd.c = ch;
-				return script_driver(&sdd, t, MOB_TRIGGER, TRIG_NEW);
+				val = script_driver(&sdd, t, MOB_TRIGGER, TRIG_NEW);
+				
+				if (!val || !IS_SET(GET_TRIG_TYPE(t), MTRIG_ALLOW_MULTIPLE)) {
+					return val;
+				}
+				else {
+					multi = TRUE;
+				}
 			}
 		}
 	}
@@ -1743,17 +1825,27 @@ int dismantle_wtrigger(room_data *room, char_data *actor, bool preventable) {
 void load_wtrigger(room_data *room) {
 	char buf[MAX_INPUT_LENGTH];
 	trig_data *t, *next_t;
+	int val = 0;
+	bool multi = FALSE;
 
 	if (!SCRIPT_CHECK(room, WTRIG_LOAD))
 		return;
 
 	LL_FOREACH_SAFE(TRIGGERS(SCRIPT(room)), t, next_t) {
+		if (multi && !IS_SET(GET_TRIG_TYPE(t), WTRIG_ALLOW_MULTIPLE)) {
+			continue;	// already did an allow-multi
+		}
 		if (TRIGGER_CHECK(t, WTRIG_LOAD) && (number(1, 100) <= GET_TRIG_NARG(t))) {
 			union script_driver_data_u sdd;
 			ADD_UID_VAR(buf, t, room_script_id(room), "room", 0);
 			sdd.r = room;
-			if (script_driver(&sdd, t, WLD_TRIGGER, TRIG_NEW)) {
+			val = script_driver(&sdd, t, WLD_TRIGGER, TRIG_NEW);
+			
+			if (!val || !IS_SET(GET_TRIG_TYPE(t), WTRIG_ALLOW_MULTIPLE)) {
 				break;
+			}
+			else {
+				multi = TRUE;
 			}
 		}
 	}
@@ -1763,17 +1855,27 @@ void load_wtrigger(room_data *room) {
 void reset_wtrigger(room_data *room) {
 	char buf[MAX_INPUT_LENGTH];
 	trig_data *t, *next_t;
+	bool multi = FALSE;
 
 	if (!SCRIPT_CHECK(room, WTRIG_RESET))
 		return;
 
 	LL_FOREACH_SAFE(TRIGGERS(SCRIPT(room)), t, next_t) {
+		if (multi && !IS_SET(GET_TRIG_TYPE(t), WTRIG_ALLOW_MULTIPLE)) {
+			continue;	// already did an allow-multi
+		}
 		if (TRIGGER_CHECK(t, WTRIG_RESET) && (number(1, 100) <= GET_TRIG_NARG(t))) {
 			union script_driver_data_u sdd;
 			ADD_UID_VAR(buf, t, room_script_id(room), "room", 0);
 			sdd.r = room;
 			script_driver(&sdd, t, WLD_TRIGGER, TRIG_NEW);
-			break;
+			
+			if (IS_SET(GET_TRIG_TYPE(t), WTRIG_ALLOW_MULTIPLE)) {
+				multi = TRUE;
+			}
+			else {
+				break;
+			}
 		}
 	}
 }
@@ -1783,7 +1885,8 @@ int enter_wtrigger(room_data *room, char_data *actor, int dir, char *method) {
 	union script_driver_data_u sdd;
 	trig_data *t, *next_t;
 	char buf[MAX_INPUT_LENGTH];
-	int any_in_room = -1;
+	int any_in_room = -1, val = 1, this;
+	bool multi = FALSE;
 	
 	if (IS_IMMORTAL(actor) && (GET_INVIS_LEV(actor) > LVL_MORTAL || PRF_FLAGGED(actor, PRF_WIZHIDE))) {
 		return TRUE;
@@ -1793,6 +1896,9 @@ int enter_wtrigger(room_data *room, char_data *actor, int dir, char *method) {
 		return 1;
 
 	LL_FOREACH_SAFE(TRIGGERS(SCRIPT(room)), t, next_t) {
+		if (multi && !IS_SET(GET_TRIG_TYPE(t), WTRIG_ALLOW_MULTIPLE)) {
+			continue;	// alread did an allow-multi
+		}
 		if (!TRIGGER_CHECK(t, WTRIG_ENTER) || (number(1, 100) > GET_TRIG_NARG(t))) {
 			continue;
 		}
@@ -1814,10 +1920,18 @@ int enter_wtrigger(room_data *room, char_data *actor, int dir, char *method) {
 		ADD_UID_VAR(buf, t, char_script_id(actor), "actor", 0);
 		add_var(&GET_TRIG_VARS(t), "method", method ? method : "none", 0);
 		sdd.r = room;
-		return script_driver(&sdd, t, WLD_TRIGGER, TRIG_NEW);
+		this = script_driver(&sdd, t, WLD_TRIGGER, TRIG_NEW);
+		val = MIN(val, this);
+		
+		if (!val || !IS_SET(GET_TRIG_TYPE(t), WTRIG_ALLOW_MULTIPLE)) {
+			return val;
+		}
+		else {
+			multi = TRUE;
+		}
 	}
 
-	return 1;
+	return val;
 }
 
 
@@ -1923,7 +2037,9 @@ int command_wtrigger(char_data *actor, char *cmd, char *argument, int mode) {
 			add_var(&GET_TRIG_VARS(t), "cmd", cmd, 0);
 
 			sdd.r = room;
-			return script_driver(&sdd, t, WLD_TRIGGER, TRIG_NEW);
+			if (script_driver(&sdd, t, WLD_TRIGGER, TRIG_NEW)) {
+				return 1;
+			}
 		}
 	}
 
@@ -1936,12 +2052,16 @@ void speech_wtrigger(char_data *actor, char *str) {
 	trig_data *t, *next_t;
 	char buf[MAX_INPUT_LENGTH];
 	int any_in_room = -1;
+	bool multi = FALSE;
 
 	if (!actor || !SCRIPT_CHECK(IN_ROOM(actor), WTRIG_SPEECH))
 		return;
 
 	room = IN_ROOM(actor);
 	LL_FOREACH_SAFE(TRIGGERS(SCRIPT(room)), t, next_t) {
+		if (multi && !IS_SET(GET_TRIG_TYPE(t), WTRIG_ALLOW_MULTIPLE)) {
+			continue;	// already did an allow-multi
+		}
 		if (!TRIGGER_CHECK(t, WTRIG_SPEECH)) {
 			continue;
 		}
@@ -1966,7 +2086,13 @@ void speech_wtrigger(char_data *actor, char *str) {
 			add_var(&GET_TRIG_VARS(t), "speech", str, 0);
 			sdd.r = room;
 			script_driver(&sdd, t, WLD_TRIGGER, TRIG_NEW);
-			break;
+			
+			if (IS_SET(GET_TRIG_TYPE(t), WTRIG_ALLOW_MULTIPLE)) {
+				multi = TRUE;
+			}
+			else {
+				break;
+			}
 		}
 	}
 }
@@ -1982,12 +2108,16 @@ int drop_wtrigger(obj_data *obj, char_data *actor, int mode) {
 	trig_data *t, *next_t;
 	char buf[MAX_INPUT_LENGTH];
 	int ret_val;
+	bool multi = FALSE;
 
 	if (!actor || !SCRIPT_CHECK(IN_ROOM(actor), WTRIG_DROP))
 		return 1;
 
 	room = IN_ROOM(actor);
 	LL_FOREACH_SAFE(TRIGGERS(SCRIPT(room)), t, next_t) {
+		if (multi && !IS_SET(GET_TRIG_TYPE(t), WTRIG_ALLOW_MULTIPLE)) {
+			continue;	// already did an allow-multi
+		}
 		if (TRIGGER_CHECK(t, WTRIG_DROP) && (number(1, 100) <= GET_TRIG_NARG(t))) {	
 			union script_driver_data_u sdd;
 
@@ -2020,11 +2150,15 @@ int drop_wtrigger(obj_data *obj, char_data *actor, int mode) {
 			
 			sdd.r = room;
 			ret_val = script_driver(&sdd, t, WLD_TRIGGER, TRIG_NEW);
-			if (ret_val && obj->carried_by != actor)
+			if (!ret_val || obj->carried_by != actor) {
 				return 0;
-			else
+			}
+			else if (IS_SET(GET_TRIG_TYPE(t), WTRIG_ALLOW_MULTIPLE)) {
+				multi = TRUE;
+			}
+			else {
 				return ret_val;
-			break;
+			}
 		}
 	}
 
@@ -2036,12 +2170,17 @@ int ability_wtrigger(char_data *actor, char_data *vict, obj_data *obj, any_vnum 
 	trig_data *t, *next_t;
 	char buf[MAX_INPUT_LENGTH];
 	ability_data *ab;
+	int val;
+	bool multi = FALSE;
 
 	if (!actor || !(ab = find_ability_by_vnum(abil)) || !SCRIPT_CHECK(IN_ROOM(actor), WTRIG_ABILITY))
 		return 1;
 
 	room = IN_ROOM(actor);
 	LL_FOREACH_SAFE(TRIGGERS(SCRIPT(room)), t, next_t) {
+		if (multi && !IS_SET(GET_TRIG_TYPE(t), WTRIG_ALLOW_MULTIPLE)) {
+			continue;	// already did an allow-multi
+		}
 		if (TRIGGER_CHECK(t, WTRIG_ABILITY) && (number(1, 100) <= GET_TRIG_NARG(t))) {
 			union script_driver_data_u sdd;
 
@@ -2055,7 +2194,13 @@ int ability_wtrigger(char_data *actor, char_data *vict, obj_data *obj, any_vnum 
 			add_var(&GET_TRIG_VARS(t), "ability", buf, 0);
 			add_var(&GET_TRIG_VARS(t), "abilityname", ABIL_NAME(ab), 0);
 			sdd.r = room;
-			return script_driver(&sdd, t, WLD_TRIGGER, TRIG_NEW);
+			val = script_driver(&sdd, t, WLD_TRIGGER, TRIG_NEW);
+			if (!val || !IS_SET(GET_TRIG_TYPE(t), WTRIG_ALLOW_MULTIPLE)) {
+				return val;
+			}
+			else {
+				multi = TRUE;
+			}
 		}
 	}
 
@@ -2074,7 +2219,8 @@ int ability_wtrigger(char_data *actor, char_data *vict, obj_data *obj, any_vnum 
 int leave_wtrigger(room_data *room, char_data *actor, int dir, char *custom_dir, char *method) {
 	trig_data *t, *next_t;
 	char buf[MAX_INPUT_LENGTH];
-	int any_in_room = -1;
+	int any_in_room = -1, val;
+	bool multi = FALSE;
 
 	if (!SCRIPT_CHECK(room, WTRIG_LEAVE))
 		return 1;
@@ -2083,6 +2229,9 @@ int leave_wtrigger(room_data *room, char_data *actor, int dir, char *custom_dir,
 	}
 	
 	LL_FOREACH_SAFE(TRIGGERS(SCRIPT(room)), t, next_t) {
+		if (multi && !IS_SET(GET_TRIG_TYPE(t), WTRIG_ALLOW_MULTIPLE)) {
+			continue;	// already did an allow-multi
+		}
 		if (!TRIGGER_CHECK(t, WTRIG_LEAVE)) {
 			continue;
 		}
@@ -2106,7 +2255,13 @@ int leave_wtrigger(room_data *room, char_data *actor, int dir, char *custom_dir,
 			ADD_UID_VAR(buf, t, char_script_id(actor), "actor", 0);
 			add_var(&GET_TRIG_VARS(t), "method", method ? method : "none", 0);
 			sdd.r = room;
-			return script_driver(&sdd, t, WLD_TRIGGER, TRIG_NEW);
+			val = script_driver(&sdd, t, WLD_TRIGGER, TRIG_NEW);
+			if (!val || !IS_SET(GET_TRIG_TYPE(t), WTRIG_ALLOW_MULTIPLE)) {
+				return val;
+			}
+			else {
+				multi = TRUE;
+			}
 		}
 	}
 
@@ -2117,12 +2272,17 @@ int door_wtrigger(char_data *actor, int subcmd, int dir) {
 	room_data *room;
 	trig_data *t, *next_t;
 	char buf[MAX_INPUT_LENGTH];
+	int val;
+	bool multi = FALSE;
 
 	if (!actor || !SCRIPT_CHECK(IN_ROOM(actor), WTRIG_DOOR))
 		return 1;
 
 	room = IN_ROOM(actor);
 	LL_FOREACH_SAFE(TRIGGERS(SCRIPT(room)), t, next_t) {
+		if (multi && !IS_SET(GET_TRIG_TYPE(t), WTRIG_ALLOW_MULTIPLE)) {
+			continue;	// already did an allow-multi
+		}
 		if (TRIGGER_CHECK(t, WTRIG_DOOR) && (number(1, 100) <= GET_TRIG_NARG(t))) {
 			union script_driver_data_u sdd;
 			ADD_UID_VAR(buf, t, room_script_id(room), "room", 0);
@@ -2133,7 +2293,13 @@ int door_wtrigger(char_data *actor, int subcmd, int dir) {
 				add_var(&GET_TRIG_VARS(t), "direction", "none", 0);
 			ADD_UID_VAR(buf, t, char_script_id(actor), "actor", 0);
 			sdd.r = room;
-			return script_driver(&sdd, t, WLD_TRIGGER, TRIG_NEW);
+			val = script_driver(&sdd, t, WLD_TRIGGER, TRIG_NEW);
+			if (!val || !IS_SET(GET_TRIG_TYPE(t), WTRIG_ALLOW_MULTIPLE)) {
+				return 0;
+			}
+			else {
+				multi = TRUE;
+			}
 		}
 	}
 

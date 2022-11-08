@@ -1,6 +1,6 @@
 DG-SCRIPTS DG_SCRIPTS DGSCRIPTS TRIGGERS
 
-DG Scripts 1.0.12 e2
+DG Scripts 1.0.12 e3
 
 Stands for Death Gate scripts and are named after the original MUD they came
 from. DG Scripts is a popular CircleMUD snippet and is also included with
@@ -28,6 +28,9 @@ replace, or prevent player abilities. Rooms will trigger on any ability
 performed in them, but mobs and objects only execute Ability triggers if they
 are the target of the ability.
 
+Only the FIRST ability trigger will run on a given mob (or room, etc) unless it
+also has the Allow-Multiple type. This is only supported for mobs and rooms.
+
 Note: Ability triggers attached to charmed mobs will not fire unless the trigger
    also has the Charmed type.
 
@@ -43,20 +46,29 @@ Room triggers also provide:
 Mob and object triggers also provide:
   &c%self%&0 - Ability triggers only execute when the target is self.
 
-See also: MTRIG CHARMED
+See also: MTRIG CHARMED, ALLOW-MULTIPLE
 #d
 ALLOW-MULTIPLE "ALLOW-MULTIPLE TRIGGER" "ALLOW MULTIPLE TRIGGER" "MTRIG ALLOW-MULTIPLE" TRIGEDIT-MOB-ALLOW-MULTIPLE
 
 Allow-Multiple (trigger type)
 
-This type of trigger is set in conjunction with Load or Death on a mob trigger
-to allow multiple scripts of the same type to run. Normally, any successful
-Load or Death trigger will prevent further ones from running.
+This type of trigger is set in conjunction with some other triggers to allow
+multiple scripts of the same type to run. Some types of triggers normally only
+allow 1 script to run, even if it returns 0.
 
-Be sure not to set Allow-Multiple is the trigger will kill or purge the mob
+For two triggers to both run, BOTH must have Allow-Multiple set.
+
+Be sure not to set Allow-Multiple if the trigger will kill or purge a mob
 running it.
 
-See also: MTRIG DEATH, MTRIG LOAD
+The following trigger types are supported:
+
+Mobs: ability, act, death, entry, leave, load, speech
+Rooms: ability, door, drop, enter, leave, load, reset, speech
+
+Support for this can be added to more trigger types on request.
+
+See also: MTRIG <type>, RTRIG <type>
 #d
 "BUY TRIGGER" "MTRIG BUY" "OTRIG BUY" "RTRIG BUY" "VTRIG BUY" TRIGEDIT-MOB-BUY TRIGEDIT-OBJ-BUY TRIGEDIT-ROOM-BUY TRIGEDIT-VEH-BUY
 
@@ -126,6 +138,9 @@ Return value:  return 0 to prevent the door command
 Activated when a player uses the door-specific commands: 'close, open' on a
 door (not on objects). This can be used to require keys or other restrictions.
 
+Only the FIRST door trigger on a mob or room will run unless it also has the
+Allow-Multiple type.
+
 Note: Door triggers attached to charmed mobs will not fire unless the trigger
    also has the Charmed type.
 
@@ -134,7 +149,7 @@ Variables:
   &c%direction%&0 - The direction the command is used on.
   &c%cmd%&0 - The specific command activating the trigger.
 
-See also: MTRIG CHARMED
+See also: MTRIG CHARMED, ALLOW-MULTIPLE
 #d
 "DROP TRIGGER" "OTRIG DROP" "RTRIG DROP" TRIGEDIT-OBJ-DROP TRIGEDIT-ROOM-DROP DROP-TRIGGER TRIG-OBJ-DROP TRIG-ROOM-DROP
 
@@ -149,11 +164,16 @@ room. This trigger also fires on put, junk, and sacrifice.
 
 The object trigger includes putting the object into a container or vehicle.
 
+Only the FIRST drop trigger on a room will run unless it also has the
+Allow-Multiple type. This is not supported for object triggers yet.
+
 Variables:
   &c%actor%&0 - The character attempting to drop the object.
   &c%object%&0 - The object the character is attempting to drop (room trigger).\
   &c%command%&0 - drop, junk, put, sacrifice.
   &c%self%&0 - The item being dropped (object trigger).
+
+See also: ALLOW-MULTIPLE
 #d
 "EMPIRE VARS" "EMPIRE VARIABLES" EMP-VARS EMPIRE-VARS TRIGEDIT-EMP-VAR TRIGEDIT-VARIABLES-EMPIRES
 
@@ -346,6 +366,9 @@ objects, and vehicles, it is the room they are currently in.
 Mobs can only execute Leave triggers on people they can see. You can use the
 Leave-All version to also stop sneaky or invisible people.
 
+Only the FIRST leave trigger on a mob (or room, etc) will run unless it also
+has the Allow-Multiple type. This is only supported for mobs and rooms so far.
+
 Note: Leave triggers attached to charmed mobs will not fire unless the trigger
    also has the Charmed type.
 
@@ -357,7 +380,7 @@ Variables:
 
 You can add the "Player-in-Room" modifier.
 
-See also: PLAYER-IN-ROOM TRIGGER
+See also: PLAYER-IN-ROOM TRIGGER, ALLOW-MULTIPLE
 #d
 "LOAD TRIGGER" "MTRIG LOAD" "OTRIG LOAD" "RTRIG LOAD" "VTRIG LOAD" TRIGEDIT-MOB-LOAD TRIGEDIT-OBJ-LOAD TRIGEDIT-VEH-LOAD TRIGEDIT-ROOM-LOAD TRIGEDIT-LOAD TRIG-LOAD
 
@@ -375,8 +398,8 @@ the mob and set off its load triggers.
 Buildings call their load triggers when first constructed, even before they
 are complete.
 
-Only the FIRST successful load trigger on a mob will run unless it also has the
-Allow-Multiple type.
+Only the FIRST load trigger on a mob or room will run unless it also has the
+Allow-Multiple type. This is not implemented for objects or vehicles.
 
 See also: RTRIG COMPLETE, ALLOW-MULTIPLE
 #d
@@ -423,6 +446,9 @@ if it returns 0, that message is not sent. Consider using a # on any echoes or
 sends that should appear after the person enters and auto-looks. For other
 things that should happen after someone enters, consider adding a 'wait 1'.
 
+Only the FIRST entry trigger on a mob will run unless it also has the
+Allow-Multiple type. This is not supported for vehicles yet.
+
 Note: Entry triggers attached to charmed mobs will not fire unless the trigger
    also has the Charmed type.
 
@@ -431,7 +457,7 @@ Variables:
 
 You can add the "Player-in-Room" modifier.
 
-See also: WAIT, MTRIG CHARMED, PLAYER-IN-ROOM TRIGGER
+See also: WAIT, MTRIG CHARMED, PLAYER-IN-ROOM TRIGGER, ALLOW-MULTIPLE
 #d
 MUDCOMMAND CMD.MUDCOMMAND %CMD.MUDCOMMAND% %MUDCOMMAND%
 
@@ -649,6 +675,10 @@ words in a word list) using the normal "say" command. This is can be used to
 add riddle quests, to make doors activate on command ("open sesame"), or to
 add other types of interactions to the game.
 
+Only the FIRST matching speech trigger on each mob will run unless it also has
+the Allow-Multiple type. Additonal mobs can each run 1 speech trigger without
+Allow-Multiple; this trigger is per-mob. Vehicles do not support this flag yet.
+
 Note: Objects cannot have speech triggers, but mobs, rooms, and vehicles can.
 Note: Speech triggers attached to charmed mobs will not fire unless the trigger
    also has the Charmed type.
@@ -659,7 +689,7 @@ Variables:
 
 You can add the "Player-in-Room" modifier.
 
-See also: MTRIG CHARMED, PLAYER-IN-ROOM TRIGGER
+See also: MTRIG CHARMED, PLAYER-IN-ROOM TRIGGER, ALLOW-MULTIPLE
 #d
 "START QUEST TRIGGER" "MTRIG START-QUEST" "OTRIG START-QUEST" "RTRIG START-QUEST" "VTRIG START-QUEST" TRIGEDIT-MOB-START-QUEST TRIGEDIT-OBJ-START-QUEST TRIGEDIT-ROOM-START-QUEST TRIGEDIT-VEH-START-QUEST "START-QUEST TRIGGER"
 

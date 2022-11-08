@@ -141,6 +141,7 @@
 #define WTRIG_REBOOT           BIT(23)	// after the mud reboots
 #define WTRIG_BUY              BIT(24)	// attempting a purchase
 // unused 25: rooms cannot kill
+#define WTRIG_ALLOW_MULTIPLE   BIT(26)	// for triggers that block other triggers, allows multiple to run
 
 
 // list of global trigger types (for random_triggers linked list)

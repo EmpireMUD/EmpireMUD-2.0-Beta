@@ -4052,6 +4052,8 @@ const char *wtrig_types[] = {
 	"Player-in-Room",
 	"Reboot",
 	"Buy",	// 24
+	"*",
+	"Allow-Multiple",
 	"\n"
 };
 
@@ -4082,6 +4084,8 @@ const bitvector_t wtrig_argument_types[] = {
 	NOBITS,	// player-in-room
 	NOBITS,	// reboot
 	NOBITS,	// buy
+	NOBITS,	//
+	NOBITS,	// allow-multiple
 };
 
 
