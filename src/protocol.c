@@ -685,7 +685,7 @@ const char *ProtocolOutput(descriptor_t *apDescriptor, const char *apData, int *
 		const char ColourChar[] = { COLOUR_CHAR, '\0' };
 		bool_t bColourOn = true;	// always default to true, or many parts of the code won't work correctly -- TODO change all instances of & in the code to \t so this can be a config
 	#endif /* COLOUR_CHAR */
-	bool_t bTerminate = false, bUseMXP = false, bUseMSP = false;
+	bool_t bTerminate = false, bUseMXP = false, bUseMSP = false, want_cap = FALSE, want_lower = FALSE;
 	int i = 0, j = 0; /* Index values */
 
 	protocol_t *pProtocol = apDescriptor ? apDescriptor->pProtocol : NULL;
@@ -806,7 +806,7 @@ const char *ProtocolOutput(descriptor_t *apDescriptor, const char *apData, int *
 						pCopyFrom = LinkStop;
 					pProtocol->bBlockMXP = false;
 					break;
-				case '<':
+				case '<': {
 					if (!pProtocol->bBlockMXP && pProtocol->pVariables[eMSDP_MXP]->ValueInt) {
 						pCopyFrom = MXPStart;
 						bUseMXP = true;
@@ -818,7 +818,8 @@ const char *ProtocolOutput(descriptor_t *apDescriptor, const char *apData, int *
 					}
 					pProtocol->bBlockMXP = false;
 					break;
-				case '[':
+				}
+				case '[': {
 					if (tolower(apData[++j]) == 'u') {
 						char Buffer[8] = {'\0'}, BugString[256];
 						int Index = 0;
@@ -934,6 +935,7 @@ const char *ProtocolOutput(descriptor_t *apDescriptor, const char *apData, int *
 						bTerminate = !bDone;
 					}
 					break;
+				}
 				case '!': /* Used for in-band MSP sound triggers */
 					pCopyFrom = MSP;
 					break;
@@ -945,6 +947,14 @@ const char *ProtocolOutput(descriptor_t *apDescriptor, const char *apData, int *
 				case '-':
 					bColourOn = false;
 					break;
+				case '^': {
+					want_cap = TRUE;
+					break;
+				}
+				case '_': {
+					want_lower = TRUE;
+					break;
+				}
 				case COLOUR_CHAR: {	// allows \t& to guarantee a printed & whether COLOUR_CHAR is on or off, unlike && which displays both & if COLOUR_CHAR is undefined
 					pCopyFrom = ColourChar;
 					break;
@@ -968,7 +978,16 @@ const char *ProtocolOutput(descriptor_t *apDescriptor, const char *apData, int *
 				
 				// requested output
 				while (*pCopyFrom != '\0' && i < MAX_OUTPUT_BUFFER) {
-					Result[i++] = *pCopyFrom++;
+					if (want_cap) {
+						Result[i++] = UPPER(*pCopyFrom++);
+					}
+					else if (want_lower) {
+						Result[i++] = LOWER(*pCopyFrom++);
+					}
+					else {
+						Result[i++] = *pCopyFrom++;
+					}
+					want_cap = want_lower = FALSE;
 				}
 			}
 		}
@@ -1119,6 +1138,15 @@ const char *ProtocolOutput(descriptor_t *apDescriptor, const char *apData, int *
 					}
 					break;
 				}
+				
+				case '^': {
+					want_cap = TRUE;
+					break;
+				}
+				case '_': {
+					want_lower = TRUE;
+					break;
+				}
 
 				default:
 					#ifdef DISPLAY_INVALID_COLOUR_CODES
@@ -1138,7 +1166,16 @@ const char *ProtocolOutput(descriptor_t *apDescriptor, const char *apData, int *
 				
 				// show requested output
 				while (*pCopyFrom != '\0' && i < MAX_OUTPUT_BUFFER) {
-					Result[i++] = *pCopyFrom++;
+					if (want_cap) {
+						Result[i++] = UPPER(*pCopyFrom++);
+					}
+					else if (want_lower) {
+						Result[i++] = LOWER(*pCopyFrom++);
+					}
+					else {
+						Result[i++] = *pCopyFrom++;
+					}
+					want_cap = want_lower = FALSE;
 				}
 			}
 		}
@@ -1146,8 +1183,18 @@ const char *ProtocolOutput(descriptor_t *apDescriptor, const char *apData, int *
 
 		else if (bUseMXP && apData[j] == '>') {
 			const char *pCopyFrom = MXPStop;
-			while (*pCopyFrom != '\0' && i < MAX_OUTPUT_BUFFER)
-				Result[i++] = *pCopyFrom++;
+			while (*pCopyFrom != '\0' && i < MAX_OUTPUT_BUFFER) {
+				if (want_cap) {
+					Result[i++] = UPPER(*pCopyFrom++);
+				}
+				else if (want_lower) {
+					Result[i++] = LOWER(*pCopyFrom++);
+				}
+				else {
+					Result[i++] = *pCopyFrom++;
+				}
+				want_cap = want_lower = FALSE;
+			}
 			bUseMXP = false;
 		}
 		else if (bUseMSP && j > 0 && apData[j-1] == '!' && apData[j] == '!' && PrefixString("SOUND(", &apData[j+1])) {
@@ -1162,7 +1209,16 @@ const char *ProtocolOutput(descriptor_t *apDescriptor, const char *apData, int *
 			}
 			
 			// copy the character
-			Result[i++] = apData[j];
+			if (want_cap) {
+				Result[i++] = UPPER(apData[j]);
+			}
+			else if (want_lower) {
+				Result[i++] = LOWER(apData[j]);
+			}
+			else {
+				Result[i++] = apData[j];
+			}
+			want_cap = want_lower = FALSE;
 		}
 	}
 
