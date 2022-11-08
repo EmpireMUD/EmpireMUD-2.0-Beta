@@ -3365,12 +3365,13 @@ switch %cycle%
     %send% %person% As the tree comes crashing down, so too falls a fatal stillness. For a moment, nothing moves. The giant stands mid-swing. Shards of rotten wood hang like a cloud around the trunk.
   break
   default
-    %send% %person% Slowly, inch by inch, time resumes again, and for the first time in ages, you almost feel like you can breathe again.
     * done: teleport the character
     set target %instance.nearest_rmt(11888)%
     %teleport% %person% %target%
     dg_affect #11891 %person% off
     %force% %person% look
+    %send% %person% &&0
+    %send% %person% Slowly, inch by inch, time resumes again, and for the first time in ages, you almost feel like you can breathe again.
     %echoaround% %person% ~%person% emerges from the putrid sap.
     * Teleport followers
     set ch %self.room.people%

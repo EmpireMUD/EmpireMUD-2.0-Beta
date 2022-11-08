@@ -843,7 +843,7 @@ if %move% == 1 && !%self.aff_flagged(BLIND)%
     unset targ
   elseif %targ.var(did_sfdodge)%
     * dodged: switch targ
-    %echo% &&m%obj.cap% bounces off the wall and rebounds towards ~%self%!&&0
+    %echo% &&m%obj.cap% bounces off the wall and rebounds toward ~%self%!&&0
     set targ %self%
   end
   * hit either them or me
@@ -1747,7 +1747,7 @@ if %move% == 1 && !%self.aff_flagged(BLIND)%
         eval dam 60 + (%diff% * 20)
         %damage% %targ% %dam% physical
       else
-        %echo% &&m~%self% dives towards |%targ% legs!&&0
+        %echo% &&m~%self% dives toward |%targ% legs!&&0
       end
     else
       %echo% &&mA vine wraps itself around |%targ% ankle and tugs hard!&&0
@@ -1931,7 +1931,7 @@ elseif %mode% == setup
           * default
           set value 10
         end
-        dg_affect #11822 %ch% STUNNED on %value%
+        dg_affect #11822 %ch% HARD-STUNNED on %value%
         %load% obj 11890 %ch% inv
         set obj %ch.inventory(11890)%
         if %obj%
@@ -2459,7 +2459,10 @@ elseif %self.vnum% == 11827
       %force% %djon% say I know, right? I heard she was possessed by a time lion.
       wait 9 s
       say Please don't tell me you believe in time lions now.
-      wait 9 s
+      wait 2 s
+      set mm %room.people(11905)%
+      %force% %mm% emote coughs.
+      wait 7 s
       %force% %djon% say Ok, how does a rank amateur of modest reputation...
       wait 3 s
       say Modest?
