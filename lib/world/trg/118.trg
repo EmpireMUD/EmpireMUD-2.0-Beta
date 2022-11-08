@@ -5793,7 +5793,7 @@ end
 ~
 #11879
 Smol Nes-Pik: Broken ladder drop~
-2 gw 100
+2 gwA 100
 ~
 * always returns 1
 return 1

@@ -1125,7 +1125,7 @@ end
 ~
 #11917
 Skycleave: Time traveler's corpse~
-2 gw 100
+2 gwA 100
 ~
 * loads a corpse only if a person visits after having been here on a previous day
 set corpse_vnum 11927
@@ -2634,7 +2634,7 @@ return 0
 ~
 #11942
 Rot and Ruin: Re-spawn boss when new player arrives~
-2 g 100
+2 gA 100
 ~
 * Iskip of Rot and Ruin (11888) respawns if any player arrives
 if %actor.is_npc%
@@ -2981,7 +2981,7 @@ end
 ~
 #11946
 Skycleave Dreams: Reset wake on poof-in~
-2 gw 100
+2 gwA 100
 ~
 * When a player enters by any means OTHER than normal walking, reset their
 * 'wake' count. Typing 'wake' 3 times exits the area using trigger 11945.
@@ -3141,7 +3141,7 @@ end
 ~
 #11953
 Rot and Ruin: Sap teleport manager (room)~
-2 bgw 100
+2 bgwA 100
 ~
 * this runs both at random and on enter
 if %actor%
@@ -4747,7 +4747,7 @@ end
 ~
 #11977
 Elemental Plane of Water: Enter resets breath timer~
-2 g 100
+2 gA 100
 ~
 if !%actor.is_pc%
   halt
@@ -5583,7 +5583,7 @@ done
 ~
 #11995
 Skycleave: Reset comment count on enter (room version)~
-2 g 100
+2 gA 100
 ~
 * pairs with triggers like 11996 to reset comments when a player arrives
 set comment 0
