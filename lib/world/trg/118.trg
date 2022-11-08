@@ -1652,7 +1652,7 @@ elseif %move% == 5
       nop %pix.add_mob_flag(!LOOT)%
       set diff %diff%
       remote diff %pix.id%
-      %echo% &&mThere's a flash a BANG! And ~%pix% comes flying out of nowhere!&&0
+      %echo% &&mThere's a flash and a BANG! And ~%pix% comes flying out of nowhere!&&0
       %force% %pix% mkill %actor%
     end
   end

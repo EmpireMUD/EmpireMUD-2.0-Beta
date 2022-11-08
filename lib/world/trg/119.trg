@@ -2086,7 +2086,7 @@ if %mob.vnum% == 11928
 end
 ~
 #11931
-Elemental Plane of Water: Despawn boss and empty room when alone~
+Skycleave: Despawn boss and empty room when alone~
 0 ab 50
 ~
 if %self.fighting%
@@ -2101,28 +2101,31 @@ while %ch%
   set ch %ch.next_in_room%
 done
 * nobody here: reset the whole room
-makeuid exit room i11908
-* move any items
-set obj %room.contents%
-while %obj%
-  set next_obj %obj.next_in_list%
-  if %obj.can_wear(TAKE)%
-    %teleport% %obj% %exit%
-    %at% %exit% %echo% # @%obj% rises from the fountain.
-  end
-  set obj %next_obj%
-done
-* move mobs out
-set ch %room.people%
-while %ch%
-  set next_ch %ch.next_in_room%
-  if %ch% != %self%
-    %teleport% %ch% %exit%
-    %at% %exit% %echoaround% %ch% ~%ch% rises from the fountain.
-  end
-  set ch %next_ch%
-done
-* and me
+if %room.template% == 11972
+  * Elemental Plane of Water: empty room
+  makeuid exit room i11908
+  * move any items
+  set obj %room.contents%
+  while %obj%
+    set next_obj %obj.next_in_list%
+    if %obj.can_wear(TAKE)%
+      %teleport% %obj% %exit%
+      %at% %exit% %echo% # @%obj% rises from the fountain.
+    end
+    set obj %next_obj%
+  done
+  * move mobs out
+  set ch %room.people%
+  while %ch%
+    set next_ch %ch.next_in_room%
+    if %ch% != %self%
+      %teleport% %ch% %exit%
+      %at% %exit% %echoaround% %ch% ~%ch% rises from the fountain.
+    end
+    set ch %next_ch%
+  done
+end
+* always: remove me
 %purge% %self%
 ~
 #11932
@@ -2719,9 +2722,9 @@ switch %self.vnum%
   break
   case 11920
     if %self.mob_flagged(!LOOT)%
-      %echo% The Grand High Sorceress gives you a coy smile as she disappears in a burst of purple glitter!
+      %echo% The Grand High Sorceress gives you a coy smile as she disappears in a burst of magenta glitter!
     else
-      %echo% The Grand High Sorceress gives you a coy smile as she disappears in a burst of purple glitter, dropping something as she vanishes!
+      %echo% The Grand High Sorceress gives you a coy smile as she disappears in a burst of magenta glitter, dropping something as she vanishes!
     end
   break
 done
@@ -5456,7 +5459,7 @@ end
 wait 30 s
 ~
 #11986
-Grand High Sorceress combat: untitled~
+Grand High Sorceress combat: Creeping Vines, Cavitation Cascade, Pocket Glitter, Scalding Air, Summon Frens~
 0 k 100
 ~
 if %self.cooldown(11800)% || %self.disabled%
@@ -5468,8 +5471,8 @@ set diff %self.diff%
 set moves_left %self.var(moves_left)%
 set num_left %self.var(num_left,0)%
 if !%moves_left% || !%num_left%
-  set moves_left 1 2
-  set num_left 2
+  set moves_left 1 1 2 2 3 3 4 4 5
+  set num_left 9
 end
 * pick
 eval which %%random.%num_left%%%
@@ -5490,141 +5493,219 @@ eval num_left %num_left% - 1
 remote moves_left %self.id%
 remote num_left %self.id%
 * perform move
-skyfight lockout 20 10
-if %move% == 1 && !%self.aff_flagged(BLIND)%
-  * Pixy Trip
-  if %diff% <= 2
-    nop %self.add_mob_flag(NO-ATTACK)%
-  end
-  skyfight clear dodge
-  set targ %random.enemy%
-  if !%targ%
-    set targ %actor%
-  end
-  set id %targ.id%
-  * random form
-  set form %random.2%
-  if %form% == 1
-    %send% %targ% &&m**** &&Z~%self% swoops toward your legs! ****&&0 (dodge)
-    %echoaround% %targ% &&m~%self% swoops toward |%targ% legs!&&0
+skyfight lockout 30 30
+if %move% == 1
+  * Creeping Vines
+  skyfight clear struggle
+  %echo% &&y~%self% shouts, 'By the power of Skycleave!'&&0
+  wait 3 sec
+  %echo% &&m**** Creeping vines come out of the woodwork, ensnaring your arms and legs! ****&&0 (struggle)
+  skyfight setup struggle all 20
+  set ch %room.people%
+  while %ch%
+    set bug %ch.inventory(11890)%
+    if %bug%
+      set strug_char You struggle against the vines...
+      set strug_room ~%%actor%% struggles against the vines...
+      remote strug_char %bug.id%
+      remote strug_room %bug.id%
+      set free_char You get a hand loose and are able to escape the vines!
+      set free_room ~%%actor%% manages to free *%%actor%%self!
+      remote free_char %bug.id%
+      remote free_room %bug.id%
+    end
+    set ch %ch.next_in_room%
+  done
+  * damage
+  if %diff% > 1
+    set cycle 0
+    while %cycle% < 5
+      wait 4 s
+      set ch %room.people%
+      while %ch%
+        set next_ch %ch.next_in_room%
+        if %ch.affect(11822)%
+          %send% %ch% &&m**** You bleed from your arms and legs as the thorny vines cut into you! ****&&0 (struggle)
+          eval amount %diff% * 20
+          %damage% %ch% %amount% magical
+        end
+        set ch %next_ch%
+      eval cycle %cycle% + 1
+    done
   else
-    %send% %targ% &&m**** A vine creeps toward your feet! ****&&0 (dodge)
-    %echoaround% %targ% &&mA vine creeps toward |%targ% feet!&&0
+    wait 20 s
   end
-  * start
-  set miss 0
-  skyfight setup dodge %targ%
-  wait 5 s
-  nop %self.remove_mob_flag(NO-ATTACK)%
-  wait 3 s
-  if %self.disabled%
-    halt
-  end
-  if !%targ% || %targ.id% != %id%
-    * gone
-    set miss 1
-  elseif %targ.var(did_sfdodge)%
-    set miss 1
-  end
-  * hit either them or me
-  if %miss%
-    if %form% == 1
-      %echo% &&m~%self% goes careening into a sapling and rebounds into a wall!&&0
-    else
-      %echo% &&mThe vine misses and whips back toward the ceiling, knocking ~%self% into the wall!&&0
-    end
-    dg_affect #11852 %self% HARD-STUNNED on 10
-  else
-    * hit
-    if %form% == 1
-      if %diff% > 1
-        %echo% &&m~%self% bites ~%targ% on the ankle!&&0
-        eval dam 60 + (%diff% * 20)
-        %damage% %targ% %dam% physical
-      else
-        %echo% &&m~%self% dives towards |%targ% legs!&&0
-      end
-    else
-      %echo% &&mA vine wraps itself around |%targ% ankle and tugs hard!&&0
-    end
-    %send% %targ% &&mYou trip and fall!&&0
-    %echoaround% %targ% &&m~%targ% trips and falls!&&0
-    if %diff% > 2
-      if (%self.level% + 100) > %targ.level%
-        dg_affect #11814 %targ% STUNNED on 10
-      end
-      eval dam 40 + (%diff% * 20)
-      %damage% %targ% %dam% physical
-    elseif %diff% > 1
-      dg_affect #11814 %targ% IMMOBILIZED on 20
-      %damage% %targ% 80 physical
-    else
-      dg_affect #11814 %targ% IMMOBILIZED on 20
-    end
-  end
+elseif %move% == 2
+  * Cavitation Cascade
   skyfight clear dodge
-elseif %move% == 2 && !%self.aff_flagged(BLIND)%
-  * Dangling Vine/Weapon Steal
+  %echo% &&y~%self% shouts, 'By the power of Skycleave!'&&0
+  wait 3 sec
+  %echo% &&m**** Suddenly the air around you begin explode with violent blasts! ****&&0 (dodge)
+  set cycle 1
+  eval wait 12 - %diff%
+  while %cycle% <= %diff%
+    skyfight setup dodge all
+    wait %wait% s
+    set ch %room.people%
+    while %ch%
+      set next_ch %ch.next_in_room%
+      if %self.is_enemy(%ch%)%
+        if !%ch.var(did_sfdodge)%
+          %echo% &&mThere's a blinding flash as the air explodes right next to ~%ch%!&&0
+          if %cycle% == %diff% && %diff% >= 3 && (%self.level% + 100) > %ch.level%
+            dg_affect #11851 %ch% STUNNED on 5
+          end
+          eval amt %diff% * 33
+          %damage% %ch% %amt% physical
+        elseif %ch.is_pc%
+          %send% %ch% &&mYou duck behind the furniture as the air explodes!&&0
+        end
+        if %cycle% < %diff%
+          %send% %ch% &&m**** Here comes another one... ****&&0 (dodge)
+        end
+      end
+      set ch %next_ch%
+    done
+    eval cycle %cycle% + 1
+  done
   skyfight clear dodge
-  set targ %self.fighting%
-  if !%targ.eq(wield)%
-    set targ %random.enemy%
-    if !%targ.eq(wield)%
+  wait 8 s
+elseif %move% == 3
+  * Pocket Glitter
+  skyfight clear dodge
+  say Pocket Glitter!
+  wait 1
+  %echo% &&m**** &&Z~%self% pulls a handful of magenta glitter from her pocket and throws it across the room! ****&&0 (dodge)
+  skyfight setup dodge all
+  set any 0
+  set cycle 0
+  eval max (%diff% + 2) / 2
+  while %cycle% < %max%
+    wait 5 s
+    if %self.disabled%
       halt
     end
-  end
-  set id %targ.id%
-  if %diff% == 1
-    nop %self.add_mob_flag(NO-ATTACK)%
-  end
-  %send% %targ% &&m**** A dangling vine reaches down toward you... ****&&0 (dodge)
-  %echoaround% %targ% &&mA dangling vine reaches down toward ~%targ%...&&0
-  skyfight setup dodge %targ%
-  wait 8 s
-  set miss 0
-  if !%targ% || %targ.id% != %id%
-    * gone
-    %echo% &&m~%self% isn't paying attention and runs straight into the dangling vine!&&0
-    set miss 1
-  elseif %targ.var(did_sfdodge)%
-    * miss
-    %echo% &&mThe dangling vine whips up suddenly, but hits ~%self% by mistake!&&0
-    set miss 1
-  else
-    * hit
-    switch %random.3%
-      case 1
-        %echo% &&mThe dangling vine whips up suddenly and snatches |%targ% weapon!&&0
-      break
-      case 2
-        %send% %targ% While you're distracted by the dangling vine, ~%self% circles around you and grabs your weapon!&&0
-        %echoaround% %targ% While ~%targ% is distracted by the dangling vine, ~%self% circles around and grabs ^%targ% weapon!&&0
-      break
-      case 3
-        %send% %targ% &&mThe dangling vine taps you on the shoulder and when you turn, a second vine steals your weapon!&&0
-        %echoaround% %targ% &&mThe dangling vine taps ~%targ% on the shoulder and when &%targ% turns, a second vine steals ^%targ% weapon!&&0
-      break
+    set this 0
+    set ch %room.people%
+    while %ch%
+      set next_ch %ch.next_in_room%
+      if %self.is_enemy(%ch%)%
+        if %ch.var(did_sfdodge)%
+          if %diff% == 1
+            dg_affect #11856 %ch% TO-HIT 25 20
+          end
+        else
+          set any 1
+          set this 1
+          %echo% &&mThe glitter gets into |%ch% eyes and nose!&&0
+          switch %random.5%
+            case 1
+              dg_affect #11920 %ch% BLIND on 30
+            break
+            case 2
+              dg_affect #11920 %ch% DODGE -50 30
+            break
+            case 3
+              dg_affect #11920 %ch% IMMOBILIZED on 30
+            break
+            case 4
+              dg_affect #11920 %ch% TO-HIT -50 30
+            break
+            case 5
+              dg_affect #11920 %ch% SLOW on 30
+            break
+          done
+          eval dam %diff% * 10
+          %damage% %ch% %dam% physical
+        end
+      end
+      set ch %next_ch%
     done
-    dg_affect #11815 %targ% DISARMED on 20
-    if %diff% >= 3
-      %send% %targ% &&m... and worse, ~%self% stabs you with a tiny knife while you're distracted!&&0
-      %echoaround% %targ% &&m... and ~%self% stabs *%targ% with a tiny knife while *%targ%'s distracted!&&0
-      %damage% %targ% 100 physical
+    if !%this%
+      %echo% &&mThe magenta glitter falls harmlessly to the floor.&&0
     end
-  end
-  if %miss%
-    * already messaged
-    if %diff% == 1 && %targ% && %targ.id% == %id%
-      dg_affect #11856 %targ% TO-HIT 25 20
-    end
-    if %diff% < 3
-      dg_affect #11852 %self% HARD-STUNNED on 10
-    end
+    eval cycle %cycle% + 1
+  done
+  if !%any%
+    * full miss
+    %echo% &&m~%self% looks dizzy as &%self% throws the last knife.&&0
+    dg_affect #11852 %self% HARD-STUNNED on 5
   end
   skyfight clear dodge
+elseif %move% == 4
+  * Scalding Air
+  skyfight clear interrupt
+  %echo% &&y~%self% shouts, 'By the power of Skycleave!'&&0
+  wait 3 sec
+  set targ %self.fighting%
+  set id %targ.id%
+  %echo% &&m**** &&Z~%self% holds her gnarled wand high and the air starts to heat up FAST... ****&&0 (interrupt)
+  skyfight setup interrupt all
+  set cycle 0
+  set broke 0
+  while !%broke% && %cycle% < 5
+    wait 4 s
+    if %self.disabled%
+      halt
+    end
+    if %self.sfinterrupt_count% >= 1 && %self.sfinterrupt_count% >= (%diff% + 1) / 2
+      set broke 1
+      set ch %room.people%
+      while %ch%
+        if %ch.var(did_sfinterrupt,0)%
+          %send% %ch% &&mYou manage to distract the sorceress!&&0
+        end
+        set ch %ch.next_in_room%
+      done
+      %echo% &&m~%self% seems distracted, if only for a moment, and the air starts to cool back down.&&0
+      if %diff% == 1
+        dg_affect #11852 %self% HARD-STUNNED on 10
+      end
+    else
+      set ch %room.people%
+      while %ch%
+        set next_ch %ch.next_in_room%
+        if %self.is_enemy(%ch%)%
+          if %ch.trigger_counterspell%
+            %send% %ch% &&m... your counterspell does nothing against the scalding air!&&0
+          end
+          * hit!
+          %send% %ch% &&mThe scalding air burns your skin, eyes, and lungs!&&0
+          %echoaround% %ch% &&m~%ch% screams as the air scalds *%ch%!&&0
+          eval amount %diff% * 25
+          %damage% %ch% %amount% magical
+        end
+        set ch %next_ch%
+      done
+    end
+    eval cycle %cycle% + 1
+  done
+  skyfight clear interrupt
+elseif %move% == 5
+  * Summon Frens
+  if %diff% > 2
+    if %random.2% == 1
+      %echo% &&y~%self% shouts, 'Gaaaaableeeeeeeeeeens!'&&0
+      set vnum 11817
+    else
+      %echo% &&y~%self% shouts, 'To me, my little friend!'&&0
+      set vnum 11820
+    end
+    %load% m %vnum% ally %self.level%
+    set mob %room.people%
+    if %gob.vnum% == %vnum%
+      nop %gob.add_mob_flag(!LOOT)%
+      set diff %diff%
+      remote diff %mob.id%
+      if %mob.vnum% == 11820
+        %echo% &&mThere's a flash and a BANG! And ~%mob% comes flying out of nowhere!&&0
+      else
+        %echo% &&m~%mob% comes running in!&&0
+      end
+      %force% %mob% mkill %actor%
+    end
+  end
 end
-* in case
-nop %self.remove_mob_flag(NO-ATTACK)%
 ~
 #11989
 Goblin's Dream: Guard patrol~

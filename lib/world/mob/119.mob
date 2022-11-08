@@ -727,7 +727,7 @@ sorceress grand high~
 the Grand High Sorceress~
 The Grand High Sorceress sits on her desk, legs crossed. (difficulty)
 ~
-150 250 bdhxyJ 0 3
+150 250 bdhxyJ oDE 3
 2 0 0 22
 D
    The sorceress sits on top of her desk, legs crossed in front of her,
@@ -775,6 +775,7 @@ T 11821
 T 11822
 T 11986
 T 11852
+T 11931
 S
 #11921
 broom~
