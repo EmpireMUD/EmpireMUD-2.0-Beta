@@ -5145,6 +5145,7 @@ skyfight lockout 30 30
 if %move% == 1 && !%self.aff_flagged(BLIND)%
   * Jar of Captivity
   skyfight clear free
+  skyfight clear struggle
   %echo% &&m~%self% pulls out an enormous clay jar and swoops down toward you...&&0
   wait 3 s
   if %self.disabled%
@@ -5173,7 +5174,8 @@ if %move% == 1 && !%self.aff_flagged(BLIND)%
       remote free_char %bug.id%
       remote free_room %bug.id%
     end
-    wait 10 s
+    wait 20 s
+    skyfight clear struggle
   else
     %send% %targ% &&mThe jar comes down on your head! There's nothing you can do!&&0
     %echoaround% %targ% &&m**** The jar comes down on ~%targ%, trapping *%targ%! ****&&0 (free %targ.pc_name.car%)
@@ -5696,11 +5698,11 @@ elseif %move% == 4
       set ch %room.people%
       while %ch%
         if %ch.var(did_sfinterrupt,0)%
-          %send% %ch% &&mYou manage to distract the sorceress!&&0
+          %send% %ch% &&mYou manage to distract the sorceress by throwing knickknacks at her!&&0
         end
         set ch %ch.next_in_room%
       done
-      %echo% &&m~%self% seems distracted, if only for a moment, and the air starts to cool back down.&&0
+      %echo% &&m~%self% is hit in the head with a knickknack; the air starts to cool back down as her spell breaks.&&0
       if %diff% == 1
         dg_affect #11852 %self% HARD-STUNNED on 10
       end
@@ -5734,6 +5736,7 @@ elseif %move% == 5
       %echo% &&y~%self% shouts, 'To me, my little friend!'&&0
       set vnum 11820
     end
+    wait 4 s
     %load% m %vnum% ally %self.level%
     set mob %room.people%
     if %mob.vnum% == %vnum%
@@ -5741,9 +5744,9 @@ elseif %move% == 5
       set diff %diff%
       remote diff %mob.id%
       if %mob.vnum% == 11820
-        %echo% &&mThere's a flash and a BANG! And ~%mob% comes flying out of nowhere!&&0
+        %echo% &&mThere's a flash and a BANG! And ~%mob% comes flying through the fog door!&&0
       else
-        %echo% &&m~%mob% comes running in!&&0
+        %echo% &&m~%mob% comes running in from the fog door!&&0
       end
       %force% %mob% mkill %actor%
     end

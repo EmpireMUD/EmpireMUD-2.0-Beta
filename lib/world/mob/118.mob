@@ -501,7 +501,7 @@ miner goblin~
 a goblin miner~
 Goblin miner is here.
 ~
-150 250 abdIJ 0 2
+150 250 abdIJ E 2
 0 0 0 8
 D
 Strings set by trig 11824.
@@ -1894,7 +1894,7 @@ Rojjer bleak~
 Bleak Rojjer~
 Bleak Rojjer is searching for something on the left side of the room.
 ~
-150 250 bdvzEIJ 0 3
+150 250 bdvEIJ CE 3
 1 0 0 4
 D
    Bleak Rojjer's back is to you as you enter. He must think you're one of his
@@ -1939,10 +1939,11 @@ M
 0
 $n stands back and stares at the painting for a moment.~
 T 11928
-T 11813
 T 11848
 T 11823
 T 11852
+T 11821
+T 11822
 S
 #11849
 Trixton Vye~
@@ -3064,7 +3065,7 @@ fox gray grey~
 a gray fox~
 A gray fox is sitting on the ground.
 ~
-1 1 bdoDJ n 2
+1 1 bdoD n 2
 0 0 14 9
 D
    The loyal little fox isn't much larger than a housecat. It has an ashen-

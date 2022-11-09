@@ -1601,20 +1601,6 @@ C
 R
 4 5193 0
 S
-#11862
-dagger shadow~
-the shadow dagger~
-A shadow dagger is sticking out of someone's shadow!~
-   This dagger seems to be paralyzing your ally somehow! You should probably
-take it out.
-~
-1 0 a f 5
-0 1 4
-10 0
-C
-1 1
-T 11862
-S
 #11863
 shadow wall~
 the wall of shadow~

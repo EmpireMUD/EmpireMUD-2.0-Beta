@@ -232,18 +232,18 @@ T0
 You are no longer affected by the belt of Venus.~
 S
 #11858
-deadly poison~
+venomous jab~
 4 0
 0 0 0 0
 T0
-You recover from the poison.~
+The venom burns itself out of your system.~
 S
 #11860
 complete darkness~
 4 0
 0 0 0 0
 T0
-You can see again!~
+The darkness fades and you can see again!~
 T5
 ...$e is swinging wildly, unable to see!~
 S
@@ -251,6 +251,8 @@ S
 pinned shadow~
 4 0
 0 0 0 0
+T0
+You're no longer pinned down by the shadow dagger!~
 T5
 ...$s shadow is pinned to the ground!~
 S

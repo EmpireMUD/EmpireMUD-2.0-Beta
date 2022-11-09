@@ -1391,7 +1391,7 @@ elseif %move% == 4 && !%self.aff_flagged(BLIND)%
 elseif %move% == 5
   * Summon Goblins
   %regionecho% %room% 1 &&y~%self% shouts, 'Gaaaaableeeeeeeeeeens!'&&0
-  wait 4 sec
+  wait 4 s
   if %diff% > 2
     %load% m 11817 ally %self.level%
     set gob %room.people%
@@ -1595,17 +1595,17 @@ elseif %move% == 4
     * normal: prevent her attack
     nop %self.add_mob_flag(NO-ATTACK)%
   end
-  skyfight setup dodge all
   wait 1 s
   if %self.disabled%
     halt
   end
+  skyfight setup dodge all
   %echo% &&m**** &&Z~%self% starts throwing handfuls of pixy dust around the room... ****&&0 (dodge)
   wait 8 s
   if %self.disabled%
     halt
   end
-  set ch %self.room.people%
+  set ch %room.people%
   set any 0
   eval penalty %self.level%/7
   while %ch%
@@ -2090,6 +2090,7 @@ elseif %type% == free
   %send% %actor% You free ~%targ%!
   %echoaround% %actor% ~%actor% frees ~%targ%!
   dg_affect #11888 %targ% off
+  dg_affect #11861 %targ% off
 end
 ~
 #11823
@@ -2205,21 +2206,22 @@ switch %self.vnum%
   break
   case 11817
     * goblin miner
-    set name_list Vyle Grosk Brang  Fance  Byth   Slansh Fonk Rong Shyf   Myte   Vrack Rend Worze  Chum Bamf Shad   Orry   Grast Dornt Onner  Rixen
-    set sex_list  male male  female female female male   male male female female male  male female male male female female male  male  female female
+    set name_list Vyle Grosk Brang  Fance  Byth   Slansh Fonk Rong Shyf   Myte   Vrack Rend Worze  Chum Bamf Shad   Orry   Grast Dornt Onner  Rixen  Vyler Groshk Brank  Fancee  Bythe   Slange Fonke
+    set sex_list  male male  female female female male   male male female female male  male female male male female female male  male  female female male  male   female female  female  male   male
+    * note: list size is used below in the room 11973 section
   break
 done
 * get list pos
-set varname %self.vnum%_name
-set spirit %instance.mob(11900)%
-if %spirit.varexists(%varname%)%
-  eval pos %spirit.var(%varname%)% + 1
+if %self.room.template% == 11973
+  set pos %random.28%
 else
-  set pos 1
+  set varname %self.vnum%_name
+  set spirit %instance.mob(11900)%
+  eval pos %spirit.var(%varname%,0)% + 1
+  * store back to spirit
+  set %varname% %pos%
+  remote %varname% %spirit.id%
 end
-* store back to spirit
-set %varname% %pos%
-remote %varname% %spirit.id%
 * determine random name and sex
 while %pos% > 0 && %name_list%
   set name %name_list.car%
@@ -2229,11 +2231,10 @@ while %pos% > 0 && %name_list%
   eval pos %pos% - 1
 done
 * ensure data
-if !%name%
-  set name Nilbog
-end
-if !%sex%
-  set sex female
+if %pos% > 0% || !%name%
+  * ran out
+  set name another goblin
+  set sex male
 end
 * and apply
 %mod% %self% sex %sex%
@@ -2243,19 +2244,20 @@ end
 switch %self.vnum%
   case 11815
     * uncaged goblin
-    %mod% %self% longdesc %name% is resting here.
+    %mod% %self% longdesc %name.cap% is resting here.
     %mod% %self% lookdesc This little goblin looks positively malnourished as %self.hisher% bony frame protrudes through %self.hisher%
     %mod% %self% append-lookdesc pale green skin. Dressed only in rags and shaking as %self.heshe% stands, %self.heshe% somehow raises %self.hisher% fists to fight.
   break
   case 11816
     * goblin commando
-    %mod% %self% longdesc %name% is searching around for something.
+    %mod% %self% longdesc %name.cap% is searching around for something.
     %mod% %self% lookdesc Armed with dozens of tiny knives, this forest-green goblin has come ready for war.
   break
   case 11817
     * goblin miner
-    %mod% %self% longdesc %name% is swinging a pickaxe at the wall.
-    %mod% %self% lookdesc All muscle and no quit, this green little goblin looks like %self.heshe% means business. With a pickaxe in one hand and a shovel in the other, %self.heshe% paces back and forth, looking for the right place to strike.
+    %mod% %self% longdesc %name.cap% is swinging a pickaxe at the wall.
+    %mod% %self% lookdesc All muscle and no quit, this helmeted green little goblin looks like %self.heshe% means business. With a pickaxe in one hand and a shovel in
+    %mod% %self% append-lookdesc the other, %self.heshe% paces back and forth, looking for the right place to strike.
   break
 done
 detach 11824 %self.id%
@@ -2611,9 +2613,23 @@ elseif %room.template% == 11832 || %room.template% == 11833
         * overboard them
         makeuid downstairs room i11808
         %echo% ~%self% grabs ~%ch% and throws *%ch% over the railing!
+        switch %random.4%
+          case 1
+            %regionecho% %room% 1 &&y~%ch% shouts, 'Aaaaaaaaaaaaaaah!'&&0
+          break
+          case 2
+            %regionecho% %room% 1 &&y~%ch% shouts, 'Nooooooooooooooo!'&&0
+          break
+          case 3
+            %regionecho% %room% 1 &&y~%ch% shouts, 'Heeeeeeeeeeeeelp!'&&0
+          break
+          case 4
+            %regionecho% %room% 1 &&y~%ch% shouts, 'I don't get paid enough for thiiiiiiiiis!'&&0
+          break
+        done
         %echo% Your blood freezes as you hear a death cry and a splat!
         %teleport% %ch% %downstairs%
-        %at% %downstairs% %echo% There's a loud scream as ~%ch% falls down from one of the floors above and splats on the tile floor!
+        %at% %downstairs% %echo% ~%ch% falls down from one of the floors above and splats on the tile floor!
         %at% %downstairs% %slay% %ch%
         set overboard 1
         remote overboard %room.id%
@@ -3759,92 +3775,239 @@ elseif %type% == 4 && %self.mob_flagged(GROUP)%
 end
 ~
 #11848
-Bleak Rojjer: Mercenary assassin combat script~
+Bleak Rojjer merc-ssassin combat: Shadow Assassin, Venomous Jab, Complete Darkness, Pin the Shadow, Summon Mercs~
 0 k 100
 ~
-if %self.cooldown(11800)%
+if %self.cooldown(11800)% || %self.disabled%
   halt
 end
-* random move
-set type %random.4%
-if %type% == 1
-  nop %self.set_cooldown(11800, 30)%
-  %send% %actor% &&r~%self% stabs you with a small knife held in ^%self% free hand!
-  %echoaround% %actor% ~%self% stabs ~%actor% with a small knife held in ^%self% free hand!
-  %send% %actor% The wound burns! The knife must have been poisoned...
-  %echoaround% %actor% ~%actor% looks seriously ill!
-  %damage% %actor% 100 physical
-  %dot% #11858 %actor% 500 15 poison
-elseif %type% == 2
-  * Shadow Strike
-  nop %self.set_cooldown(11800, 30)%
-  set loops 1
-  if %self.mob_flagged(GROUP)%
-    set loops 3
+set room %self.room%
+set diff %self.diff%
+* order
+set moves_left %self.var(moves_left)%
+set num_left %self.var(num_left,0)%
+if !%moves_left% || !%num_left%
+  set moves_left 1 2 3 4 5
+  set num_left 5
+end
+* pick
+eval which %%random.%num_left%%%
+set old %moves_left%
+set moves_left
+set move 0
+while %which% > 0
+  set move %old.car%
+  if %which% != 1
+    set moves_left %moves_left% %move%
   end
-  while %loops%
-    set target %random.enemy%
-    if !%target%
-      set target %actor%
+  set old %old.cdr%
+  eval which %which% - 1
+done
+set moves_left %moves_left% %old%
+* store
+eval num_left %num_left% - 1
+remote moves_left %self.id%
+remote num_left %self.id%
+* perform move
+skyfight lockout 30 30
+if %move% == 1
+  * Shadow Assassin
+  skyfight clear dodge
+  %echo% &&m|%self% shadow salutes *%self% and then vanishes into the dark corners of the lab...&&0
+  if %diff% == 1
+    nop %self.add_mob_flag(NO-ATTACK)%
+  end
+  wait 1
+  set cycle 1
+  eval wait 8 - %diff%
+  while %cycle% <= (2 * %diff%)
+    set targ %random.enemy%
+    set targ_id %targ.id%
+    skyfight setup dodge targ
+    %send% %targ% &&m**** The hairs on your neck stand up... ****&&0 (dodge)
+    wait %wait% s
+    if %targ.id% != %targ_id% || %targ.position% == Dead
+      * gone
+    elseif %targ.var(did_sfdodge)%
+      %echo% &&mA shadow assasssin slices through the air, just past ~%targ%, and vanishes as it hits the floor!&&0
+    else
+      * hit
+      %echo% &&mA shadow assassin stabs from the dark, cutting into ~%targ% out of nowhere!&&0
+      eval pain 40 + (%diff% * 40)
+      %damage% %targ% %pain% physical
+      if %diff% > 2
+        %send% %targ% &&mYou're knocked off balance by the surprise attack!&&0
+        dg_affect #11818 %targ% TO-HIT -15 30
+        dg_affect #11818 %targ% DODGE -15 30
+      end
     end
-    %echo% ~%self% steps into the shadows and vanishes...
-    %send% %target% &&r~%self% suddenly appears behind you and stabs you in the back!
-    %echoaround% %target% &&r~%self% suddenly appears behind ~%target% and stabs *%target% in the back!
-    %damage% %target% 150 physical
-    dg_affect #11818 %target% TO-HIT -15 10
-    dg_affect #11818 %target% DODGE -15 10
-    if %loops%
-      wait 3 sec
-    end
-    eval loops %loops% - 1
+    skyfight clear dodge
+    eval cycle %cycle% + 1
   done
-  if %random.10% == 10
-    wait 3 sec
-    say I learned that one from a goblin.
+  skyfight clear dodge
+  wait 8 s
+elseif %move% == 2
+  * Venomous Jab
+  skyfight clear dodge
+  set targ %actor%
+  set id %targ.id%
+  if %diff% < 3
+    if %diff% == 1
+      nop %self.add_mob_flag(NO-ATTACK)%
+    end
+    %send% %targ% &&m**** You notice ~%self% pull a knife from ^%self% belt with ^%self% free hand... ****&&0 (dodge)
+    skyfight setup dodge %targ%
+    wait 5 s
+    nop %self.remove_mob_flag(NO-ATTACK)%
+    wait 3 s
+    if %self.disabled%
+      halt
+    end
+    if !%targ% || %targ.id% != %id%
+      * gone
+      unset targ
+    elseif %targ.var(did_sfdodge)%
+      %send% %targ% &&mYou bend out of the way as ~%self% tries to jab you with the knife!&&0
+      %echoaround% %targ% ~%targ% bends out of the way just as ~%self% tries to jab *%targ% with a knife!
+      unset targ
+    end
   end
-elseif %type% == 3
+  if %targ%
+    * hit
+    %send% %targ% &&m~%self% stabs you with a small knife held in ^%self% free hand!&&0
+    %echoaround% %targ% &&m~%self% stabs ~%targ% with a small knife held in ^%self% free hand!&&0
+    if %diff% > 1
+      %send% %targ% &&mThe wound burns! The knife must have been coated in venom...&&0
+      %echoaround% %targ% &&m~%targ% looks seriously ill!&&0
+      eval ouch %diff% * 125
+      %dot% #11858 %targ% %ouch% 15 poison
+    end
+    %damage% %targ% 100 physical
+  end
+  skyfight clear dodge
+elseif %move% == 3
   * Complete Darkness
-  nop %self.set_cooldown(11800, 30)%
-  %echo% ~%self% closes ^%self% eyes and every light in the room dims...
-  wait 5 sec
-  %echo% |%self% eyes snap open, and you are suddenly plunged into complete darkness!
-  set person %self.room.people%
-  while %person%
-    if %person.is_enemy(%self%)%
-      dg_affect #11860 %person% BLIND on 25
-    end
-    set person %person.next_in_room%
-  done
-elseif %type% == 4 && %self.mob_flagged(GROUP)%
-  * Pin the Shadow
-  nop %self.set_cooldown(11800, 30)%
-  wait 1 sec
-  %echo% ~%self% sheathes ^%self% weapon and draws a dagger made of shadows from the folds of ^%self% cloak...
-  dg_affect #11845 %self% HARD-STUNNED on 10
-  wait 3 sec
-  set actor %self.fighting%
-  %send% %actor% ~%self% throws the shadow dagger at you, but it passes through you and strikes your shadow!
-  %echoaround% %actor% ~%self% throws the shadow dagger at ~%actor%, but it passes through *%actor% and strikes ^%actor% shadow!
-  %send% %actor% You can't move!
-  %echoaround% %actor% ~%actor% suddenly freezes!
-  %load% obj 11862 room
-  dg_affect #11861 %actor% HARD-STUNNED on 25
-  dg_affect #11861 %actor% DODGE -999 25
-  dg_affect #11861 %actor% BLOCK -999 25
-  wait 1 sec
-  %echo% ~%self% draws ^%self% weapon.
-  dg_affect #11845 %self% off
-  wait 20 sec
-  set dagger %self.room.contents(11862)%
-  if %dagger%
-    %echo% %dagger.shortdesc% dissolves into nothing!
-    %purge% %dagger%
-    %send% %actor% You can move again!
-    %echoaround% %actor% ~%actor% starts moving again!
-    * Extra cooldown time if the attack timed out
-    nop %self.set_cooldown(11800, 30)%
+  skyfight clear interrupt
+  if %diff% == 1
+    * normal: prevent his attack			-> TODO change this to a debuff
+    nop %self.add_mob_flag(NO-ATTACK)%
   end
-  dg_affect #11861 %actor% off
+  skyfight setup interrupt all
+  %echo% &&m**** &&Z~%self% closes ^%self% eyes and every light in the room starts to dim... ****&&0 (interrupt)
+  wait 8 s
+  if %self.disabled%
+    skyfight clear interrupt
+    halt
+  end
+  if %self.sfinterrupt_count% >= 1 && %self.sfinterrupt_count% >= (%diff% + 1) / 2
+    set broke 1
+    set ch %room.people%
+    while %ch%
+      if %ch.var(did_sfinterrupt,0)%
+        %send% %ch% &&mYou manage to throw a broken toaster at ~%self% at just the right second!&&0
+      end
+      set ch %ch.next_in_room%
+    done
+    %echo% &&m~%self% is hit in the head and loses focus... the lights start to glow again.&&0
+    if %diff% == 1
+      dg_affect #11852 %self% HARD-STUNNED on 5
+    end
+  else
+    %echo% &&m|%self% eyes snap open, and you are suddenly plunged into complete darkness!&&0
+    set ch %room.people%
+    while %ch%
+      if %self.is_enemy(%ch%)%
+        if %ch.ability(Darkness)%
+          %send% %ch% Luckily you can still see!
+        else
+          dg_affect #11860 %ch% BLIND on 25
+        end
+      end
+      set ch %ch.next_in_room%
+    done
+  end
+elseif %move% == 4
+  * Pin the Shadow
+  skyfight clear free
+  skyfight clear struggle
+  %echo% &&m~%self% draws a dagger made of shadows from the folds of ^%self% cloak...&&0
+  wait 3 s
+  if %self.disabled%
+    halt
+  end
+  set targ %random.enemy%
+  if !%targ%
+    halt
+  end
+  set targ_id %targ.id%
+  if %self.fighting% == %targ% && %diff% < 4
+    dg_affect #11845 %self% HARD-STUNNED on 20
+  end
+  %send% %targ% &&m~%self% throws the shadow dagger at you, but it passes through you and strikes your shadow!&&0
+  %echoaround% %targ% &&m~%self% throws the shadow dagger at ~%actor%, but it passes through *%actor% and strikes ^%actor% shadow!&&0
+  if %diff% <= 2 || (%self.level% + 100) <= %targ.level%
+    %send% %targ% &&m**** The dagger has you stuck fast... You can't move! ****&&0 (struggle)
+    %echoaround% %targ% &&m~%targ% suddenly freezes!&&0
+    skyfight setup struggle %targ% 20
+    set bug %targ.inventory(11890)%
+    if %bug%
+      set strug_char You struggle to try to get to the shadow dagger...
+      set strug_room ~%%actor%% struggles to get to the shadow dagger...
+      remote strug_char %bug.id%
+      remote strug_room %bug.id%
+      set free_char You manage to reach the shadow dagger and pull it out!
+      set free_room ~%%actor%% manages to pull out the shadow dagger!
+      remote free_char %bug.id%
+      remote free_room %bug.id%
+    end
+    wait 20 s
+    skyfight clear struggle
+  else
+    %send% %targ% &&mThe dagger has you stuck fast... You can't move!&&0
+    %echoaround% %targ% &&m**** &&Z~%targ% suddenly freezes! You have to pull the dagger out! ****&&0 (free %targ.pc_name.car%)
+    skyfight setup free %targ%
+    eval time %diff% * 15
+    dg_affect #11861 %targ% HARD-STUNNED on %time%
+    if %diff% == 4
+      dg_affect #11861 %targ% DODGE -999 %time%
+      dg_affect #11861 %targ% BLOCK -999 %time%
+    end
+    * wait and clear
+    set done 0
+    while !%done% && %time% > 0
+      wait 5 s
+      eval time %time% - 5
+      if %targ_id% != %targ.id%
+        set done 1
+      elseif !%targ.affect(11861)%
+        set done 1
+      end
+    done
+    skyfight clear free
+    dg_affect #11861 %targ% off
+  end
+  dg_affect #11845 %self% off
+elseif %move% == 5
+  * Summon Mercs
+  %regionecho% %room% 1 &&y~%self% shouts, 'In 'ere you lots!'&&0
+  if %diff% == 1
+    wait 5 sec
+    %echo% &&m...nobody seems to respond to Rojjer's call.&&0
+  else
+    wait 1
+    if %random.2% == 1
+      set vnum 11841
+    else
+      set vnum 11845
+    end
+    set ally %instance.mob(%vnum%)%
+    if %ally% && !%ally.disabled% && !%ally.fighting%
+      %at% %ally.room% %echo% ~%ally% heads to see what Rojjer wants.
+      %teleport% %ally% %self.room%
+      %echo% &&m~%ally% runs in!&&0
+      %force% %mob% mkill %actor%
+    end
+  end
 end
 ~
 #11849
@@ -4574,31 +4737,6 @@ switch %line%
     remote line %self.id%
   break
 done
-~
-#11862
-Bleak Rojjer: Get shadow dagger / unpin ally~
-1 g 100
-~
-set person %self.room.people%
-while %person%
-  if %person.affect(11861)%
-    set target %person%
-  end
-done
-if !%target%
-  %send% %actor% You pull %self.shortdesc% out of the ground, but it dissolves in your hand.
-  %echoaround% %actor% ~%actor% pulls %self.shortdesc% out of the ground, but it dissolves in ^%actor% hand.
-  %purge% %self%
-  halt
-else
-  %send% %actor% You pull %self.shortdesc% out of |%target% shadow! ~%target% starts moving again!
-  %send% %target% ~%actor% pulls %self.shortdesc% out of your's shadow! You can move again!
-  %echoneither% %actor% %target% ~%actor% pulls %self.shortdesc% out of |%target% shadow! ~%target% starts moving again!
-  dg_affect #11861 %target% off
-  %echo% %self.shortdesc% dissolves into nothing.
-  %purge% %self%
-  halt
-end
 ~
 #11863
 Skycleave: Shade ascension / Death of Knezz~
