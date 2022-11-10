@@ -76,7 +76,7 @@ bool audit_trigger(trig_data *trig, char_data *ch) {
 	// look for a 'percent' type with a 0%
 	for (pos = 0, bits = GET_TRIG_TYPE(trig); bits; ++pos, bits >>= 1) {
 		if (IS_SET(bits, BIT(0)) && trig_argument_type_list[trig->attach_type][pos] == TRIG_ARG_PERCENT && GET_TRIG_NARG(trig) == 0) {
-			olc_audit_msg(ch, GET_TRIG_VNUM(trig), "Trigger has 0% chance");
+			olc_audit_msg(ch, GET_TRIG_VNUM(trig), "Trigger has 0%% chance");
 			problem = TRUE;
 		}
 	}
