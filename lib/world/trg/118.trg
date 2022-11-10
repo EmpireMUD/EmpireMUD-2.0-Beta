@@ -171,7 +171,7 @@ done
 ~
 #11806
 One-time greetings using script1~
-0 gnw 100
+0 gnwA 100
 ~
 * Uses mob custom script1 to for one-time greetings, with each script1 line
 *   sent every %line_gap% (9 sec) until it runs out of strings. The mob will
@@ -303,7 +303,7 @@ if %self.varexists(no_silent)%
 end
 ~
 #11807
-Skycleave: Shared receive trigger (Goblins, Pixy Queen, pixies, Ravinder)~
+Skycleave: Shared receive trigger (Goblins, Queen, pixies, sorcerers)~
 0 j 100
 ~
 if %self.vnum% >= 11815 && %self.vnum% <= 11818
@@ -423,6 +423,27 @@ elseif %self.vnum% == 11825 || %self.vnum% == 11925
     %quest% %actor% trigger 11915
     %quest% %actor% finish 11915
     %purge% %object%
+  end
+elseif %self.vnum% == 11827
+  * Marina
+  return 0
+  if %object.vnum% == 11872
+    %echo% ~%self% politely refuses |%actor% note.
+    say No thank you, I've already seen it.
+  else
+    %echo% ~%self% refuses @%object% from ~%actor%.
+    say I have a boyfriend.
+  end
+elseif %self.vnum% == 11828
+  * Djon
+  return 0
+  if %object.vnum% == 11872
+    say Incendior! Oh, oops...
+    %echo% As ~%self% speaks, the note in |%actor% hand goes up in a burst of flame and a puff of smoke.
+    %purge% %object%
+  else
+    %echo% ~%self% refuses @%object% from ~%actor%.
+    say This is an A and B conversation so please C your way out. Door's to your left. Thank you. Bye.
   end
 end
 ~
@@ -592,7 +613,7 @@ if %spirit.phase2%
   %mod% %self% append-lookdesc-noformat - Second Floor: Apprentice Level
   %mod% %self% append-lookdesc-noformat &0   - Goblin Cages
   %mod% %self% append-lookdesc-noformat &0   - Pixy Races
-  %mod% %self% append-lookdesc-noformat &0   - Mage Quarters
+  %mod% %self% append-lookdesc-noformat &0   - Apprentice Dormatories
 else
   %mod% %self% append-lookdesc-noformat - Second Floor: Danger!
   %mod% %self% append-lookdesc-noformat &0   - Goblins Everywhere
@@ -619,13 +640,17 @@ else
 end
 * floor 4
 if %spirit.phase4%
+  %mod% %self% append-lookdesc-noformat - Fourth Floor: High Sorcerers of Skycleave
   if %instance.mob(11968)%
-    %mod% %self% append-lookdesc-noformat - Fourth Floor: High Sorcerers of Skycleave
     %mod% %self% append-lookdesc-noformat &0   - Office of High Sorcerer Celiya
     %mod% %self% append-lookdesc-noformat &0   - Office of High Sorcerer Barrosh
     %mod% %self% append-lookdesc-noformat &0   - Office of Grand High Sorcerer Knezz
   else
-    %mod% %self% append-lookdesc-noformat &0   - Empty Office
+    if %instance.mob(11970)%
+      %mod% %self% append-lookdesc-noformat &0   - Office of High Sorcerer Niamh
+    else
+      %mod% %self% append-lookdesc-noformat &0   - Empty Office
+    end
     %mod% %self% append-lookdesc-noformat &0   - Office of High Sorcerer Barrosh
     %mod% %self% append-lookdesc-noformat &0   - Office of Grand High Sorcerer Celiya
   end
@@ -661,59 +686,6 @@ Skycleave: Summoned monster despawn for boss minions~
 ~
 if !%self.fighting%
   %purge% %self% $n leaves.
-end
-~
-#11813
-Skycleave: Summon minions for boss combat~
-0 k 20
-~
-if %self.cooldown(11800)%
-  halt
-end
-set diff 1
-if %self.mob_flagged(HARD)%
-  eval diff %diff% + 1
-end
-if %self.mob_flagged(GROUP)%
-  eval diff %diff% + 2
-end
-if %diff% < 3
-  return 0
-  halt
-end
-nop %self.set_cooldown(11800, 30)%
-switch %self.vnum%
-  case 11819
-    * Pixy queen
-    set summon_vnum 11820
-    %echo% ~%self% makes an eerie whistling sound...
-  break
-  case 11818
-    * Goblin boss
-    eval summon_vnum 11814+%random.3%
-    %echo% ~%self% waves ^%self% staff in the air and shouts incoherently...
-  break
-  default
-    * Mercenary bosses
-    eval summon_vnum 11840 + %random.6%
-    %echo% ~%self% whistles loudly...
-  break
-done
-if !%summon_vnum%
-  halt
-end
-%load% mob %summon_vnum% ally %self.level%
-set summon %self.room.people%
-if %summon.vnum% == %summon_vnum%
-  attach 11812 %summon.id%
-  remote diff %summon.id%
-  nop %summon.add_mob_flag(!LOOT)%
-  nop %summon.add_mob_flag(NO-CORPSE)%
-  %send% %actor% ~%summon% rushes into the room and attacks you!
-  %echoaround% %actor% ~%summon% rushes into the room and attacks ~%actor%!
-  %force% %summon% mkill %actor%
-else
-  %echo% Something strange happened. Please report this bug.
 end
 ~
 #11814
@@ -2103,10 +2075,10 @@ switch %self.vnum%
     makeuid maze room i11825
     set shield %maze.contents(11887)%
     if %shield%
-      %at% %maze% %echo% %shield.shortdesc% flickers and fades!
+      %at% %maze% %echo% &&m%shield.shortdesc% flickers and fades!&&0
       %purge% %shield%
     end
-    %echo% The pixy queen sputters as her power fades and a look of shock -- and peace -- crosses her face.
+    %echo% &&0The pixy queen sputters as her power fades and a look of shock -- and peace -- crosses her face.&&0
     say Thank you for this release, be it ever so brief. We shall meet... again... in time.
     * dies with death-cry
   break
@@ -2123,7 +2095,7 @@ switch %self.vnum%
     if !%instance.mob(11848)%
       set trixton %instance.mob(11849)%
       if %trixton% && %trixton.aff_flagged(!ATTACK)%
-        %at% %trixton.room% %echo% ~%trixton% has lost ^%trixton% protection!
+        %at% %trixton.room% %echo% &&m~%trixton% has lost ^%trixton% protection!&&0
         dg_affect %trixton% !ATTACK off
       end
   break
@@ -2132,7 +2104,7 @@ switch %self.vnum%
     if !%instance.mob(11847)%
       set trixton %instance.mob(11849)%
       if %trixton% && %trixton.aff_flagged(!ATTACK)%
-        %at% %trixton.room% %echo% ~%trixton% has lost ^%trixton% protection!
+        %at% %trixton.room% %echo% &&m~%trixton% has lost ^%trixton% protection!&&0
         dg_affect %trixton% !ATTACK off
       end
   break
@@ -2145,10 +2117,10 @@ switch %self.vnum%
     makeuid hall room i11870
     set shadow %hall.contents(11863)%
     if %shadow%
-      %at% %hall% %echo% @%shadow% fades and dissipates.
+      %at% %hall% %echo% &&m@%shadow% fades and dissipates.&&0
       %purge% %shadow%
     end
-    %echo% ~%self% dissolves as the shadows are cast out!
+    %echo% &&m~%self% dissolves as the shadows are cast out!&&0
     * set room desc back
     %mod% %self.room% description This dimly-lit office, the highest in the tower, reeks of decay. Little light filters in through the doorway; if there are any windows here, they must
     %mod% %self.room% append-description be closed; you can't even see them through the shadows. The wooden corners of furniture peek out from the shadows, but you can see few distinct shapes.
@@ -2171,10 +2143,16 @@ switch %self.vnum%
     makeuid hall room i11870
     set shadow %hall.contents(11863)%
     if %shadow%
-      %at% %hall% %echo% @%shadow% fades and dissipates.
+      %at% %hall% %echo% &&m@%shadow% fades and dissipates.&&0
       %purge% %shadow%
     end
-    %echo% ~%self% dissolves as the shadows are cast out!
+    %echo% &&m~%self% dissolves as the shadows are cast out!&&0
+    if %self.diff% >= 3
+      set dropped some skystones
+    else
+      set dropped a skystone
+    end
+    %echo% Knezz coughs and sits up, dropping %dropped%.
     * clean room desc
     %mod% %self.room% description This dimly-lit office, the highest in the tower, reeks of decay. Little light filters in through the doorway; if there are any windows here, they must
     %mod% %self.room% append-description be closed; you can't even see them through the shadows. The wooden corners of furniture peek out from the shadows, but you can see few distinct shapes.
@@ -2190,7 +2168,7 @@ done
 ~
 #11824
 Skycleave: 2A Goblin names~
-0 n 100
+0 nA 100
 ~
 * Names the goblins sequentially - 14 max each
 switch %self.vnum%
@@ -4517,7 +4495,7 @@ Skycleave: Shadow Ascendant fight~
 ~
 #11857
 Skycleave: Mercenary name setup~
-0 n 100
+0 nA 100
 ~
 * Mercenaries are spawned by trig 11900/skymerc, called in 5 rooms.
 * Up to 3 mercenaries spawn in each room, for a total of 15.
@@ -4781,7 +4759,7 @@ if %seconds% > 60
     set ch %ch.next_in_room%
   done
   * messaging
-  %echo% A blast of dark energy throws you backwards as a shadow claws its way out of Knezz's mouth and joins the Shade above him.
+  %echo% &&mA blast of dark energy throws you backwards as a shadow claws its way out of Knezz's mouth and joins the Shade above him.&&0
   wait 6 sec
   %echo% The Shade of Mezvienne drops Knezz's lifeless body in the chair and snatches his wand.
   set knezz %room.people(11868)%
@@ -4912,7 +4890,7 @@ end
 ~
 #11867
 Skycleave: Boss room relocator~
-0 hn 100
+0 hnA 100
 ~
 set no_purge_list 11871 11872
 * Teleports people/items out of a room that's restricted while the mob is there
@@ -5046,7 +5024,7 @@ end
 ~
 #11869
 Skycleave: Skithe Ler-Wyn load trigger~
-0 n 100
+0 nA 100
 ~
 wait 0
 set room %self.room%
@@ -5253,8 +5231,8 @@ Skycleave: Mezvienne starts phase transition (death)~
 ~
 set room %self.room%
 * messaging
-%echo% \&0
-%echo% ~%self% screams and flies up into the air as the whole tower is engulfed in an enormous vortex!
+%echo% &&0
+%echo% &&m~%self% screams and flies up into the air as the whole tower is engulfed in an enormous vortex!&&0
 * remove relocator if present
 makeuid vortex room i11872
 set mob %vortex.people(11899)%
@@ -5289,12 +5267,12 @@ Skithe Ler-Wyn death~
 0 f 100
 ~
 * message
-%echo% Skithe Ler-Wyn, Lion of Time, dissolves into the air above you with one final roar!
+%echo% &&mSkithe Ler-Wyn, Lion of Time, dissolves into the air above you with one final roar!&&0
 makeuid tower room i11871
 * remove the relocator vortex
 set vortex %instance.mob(11865)%
 if %vortex%
-  %at% %tower% %echo% The swirling time vortex on top of the tower dissipates.
+  %at% %tower% %echo% &&mThe swirling time vortex on top of the tower dissipates.&&0
   %purge% %vortex%
 end
 * remove move-blocking vortex
@@ -5302,7 +5280,7 @@ makeuid hall room i11870
 while %hall.contents(11870)%
   %purge% %hall.contents(11870)%
 done
-%at% %hall% %echo% The swirling time vortex on top of the tower dissipates.
+%at% %hall% %echo% &&mThe swirling time vortex on top of the tower dissipates.&&0
 * place a relocator here
 %load% mob 11899
 * move self

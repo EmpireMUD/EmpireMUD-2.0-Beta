@@ -1564,12 +1564,12 @@ elseif %arg% == win
   set pos 1
   while %pos% <= 3
     * message owner
-    set owner %self.var(owner%pos%)%
+    set owner_id %self.var(owner%pos%)%
     set name %self.var(name%pos%)%
     set winner %self.var(winner%pos%)%
-    if %owner% > 0
-      makeuid owner %owner%
-      if %owner% && %owner.is_pc%
+    if %owner_id% > 0
+      makeuid owner %owner_id%
+      if %owner% && %owner.is_pc% && %owner.id% == %owner_id%
         if %winner%
           %send% %owner% Your pixy, %name%, won the race!
           if %owner.on_quest(11914)%
@@ -1581,6 +1581,9 @@ elseif %arg% == win
         if %owner.on_quest(11913)%
           %quest% %owner% trigger 11913
         end
+      else
+        * did not find
+        unset owner
       end
     end
     * try finding the jar
@@ -2205,7 +2208,7 @@ while %ch% && !%any_ok%
   set ch %ch.next_in_room%
 done
 * and some messaging
-%echo% You manage to defeat the First Water and everything seems to calm around you...
+%echo% &&AYou manage to defeat the First Water and everything seems to calm around you...&&0
 %echo% You grab a breath while you can, but you can't shake the unsettling feeling that the First Water can never be defeated.
 return 0
 ~
@@ -2749,16 +2752,16 @@ end
 switch %self.vnum%
   case 11888
     if %self.mob_flagged(!LOOT)%
-      %echo% The giant, Iskip, turns to ash as he falls and blows away on the breeze.
+      %echo% &&mThe giant, Iskip, turns to ash as he falls and blows away on the breeze.&&0
     else
-      %echo% The giant, Iskip, turns to ash as he falls, dropping some items on the stump as he blows away on the breeze.
+      %echo% &&mThe giant, Iskip, turns to ash as he falls, dropping some items on the stump as he blows away on the breeze.&&0
     end
   break
   case 11920
     if %self.mob_flagged(!LOOT)%
-      %echo% The Grand High Sorceress gives you a coy smile as she disappears in a burst of magenta glitter!
+      %echo% &&mThe Grand High Sorceress gives you a coy smile as she disappears in a burst of magenta glitter!&&0
     else
-      %echo% The Grand High Sorceress gives you a coy smile as she disappears in a burst of magenta glitter, dropping something as she vanishes!
+      %echo% &&mThe Grand High Sorceress gives you a coy smile as she disappears in a burst of magenta glitter, dropping something as she vanishes!&&0
     end
   break
 done
@@ -4680,19 +4683,19 @@ return 0
 switch %self.vnum%
   case 11956
     * Elver
-    %echo% ~%self% trudges away to tend to ^%self% wounds.
+    %echo% &&j~%self% trudges away to tend to ^%self% wounds.&&0
     set next_vnum 11957
     set pos 1
   break
   case 11957
     * Nailbokh
-    %echo% ~%self% congratulates you and steps out of the arena.
+    %echo% &&j~%self% congratulates you and steps out of the arena.&&0
     set next_vnum 11958
     set pos 2
   break
   case 11958
     * Biksi
-    %echo% ~%self% cheers for you and exits the arena.
+    %echo% &&j~%self% cheers for you and exits the arena.&&0
     set next_vnum 0
     set pos 3
   break
@@ -4718,7 +4721,7 @@ if %next_vnum%
     end
     %scale% %mob% %self.level%
     * message
-    %echo% ~%mob% steps into the arena!
+    %echo% &&j~%mob% steps into the arena!&&0
   end
   * and load a timer obj to ensure promptness
   %load% obj %must_fight_timer_obj% room

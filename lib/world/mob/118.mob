@@ -1082,6 +1082,7 @@ I 12 11872 100.00 1 p  # PICKPOCKET: hand-written note
 T 11828
 T 11810
 T 11852
+T 11807
 S
 #11828
 Djon apprentice~
@@ -1100,6 +1101,7 @@ F 11800
 I 12 11869 100.00 1 p  # PICKPOCKET: self-writing pen
 T 11810
 T 11852
+T 11807
 S
 #11829
 otherworlder~
@@ -1883,11 +1885,12 @@ $n seems to be channeling mana from the cabinets.~
 M
 0
 Waves of mana pulse toward $n.~
-T 11813
 T 11847
 T 11823
 T 11806
 T 11852
+T 11821
+T 11822
 S
 #11848
 Rojjer bleak~
