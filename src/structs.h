@@ -2540,6 +2540,7 @@ typedef enum {
 #define PRG_SCRIPT_ONLY  BIT(2)	// c. cannot buy/achieve it
 #define PRG_HIDDEN  BIT(3)	// d. progress does not show up
 #define PRG_NO_ANNOUNCE  BIT(4)	// e. never announces when this goal is achieved
+#define PRG_NO_PREVIEW  BIT(5)	// f. cannot view it until you're on it
 
 
 // PRG_PERK_x: progress perks

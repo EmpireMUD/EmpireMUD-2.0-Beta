@@ -6209,7 +6209,7 @@ ACMD(do_pledge) {
 
 ACMD(do_progress) {
 	bool imm_access = (GET_ACCESS_LEVEL(ch) >= LVL_CIMPL || IS_GRANTED(ch, GRANT_EMPIRES));
-	char buf[MAX_STRING_LENGTH * 2], line[MAX_STRING_LENGTH], arg[MAX_INPUT_LENGTH], vstr[256], *arg2, *ptr;
+	char buf[MAX_STRING_LENGTH * 2], line[MAX_STRING_LENGTH], arg[MAX_INPUT_LENGTH], vstr[256], fstr[256], temp[256], *arg2, *ptr;
 	int counts[NUM_PROGRESS_TYPES], compl[NUM_PROGRESS_TYPES], buy[NUM_PROGRESS_TYPES];
 	empire_data *emp = GET_LOYALTY(ch);
 	struct empire_completed_goal *ecg, *next_ecg;
@@ -6521,15 +6521,24 @@ ACMD(do_progress) {
 		}
 	}
 	else if ((prg = find_current_progress_goal_by_name(emp, argument)) || (prg = find_progress_goal_by_name(argument)) || (!str_cmp(arg, "info") && ((prg = find_current_progress_goal_by_name(emp, arg2)) || (prg = find_progress_goal_by_name(arg2))))) {
+		// check if they can view it
+		if (PRG_FLAGGED(prg, PRG_NO_PREVIEW) && !IS_IMMORTAL(ch) && !get_current_goal(emp, PRG_VNUM(prg)) && !empire_has_completed_goal(emp, PRG_VNUM(prg))) {
+			msg_to_char(ch, "You can't view %s until your empire has started it.\r\n", PRG_NAME(prg));
+			return;
+		}
+		
 		// show 1 goal
 		if (PRF_FLAGGED(ch, PRF_ROOMFLAGS)) {
 			sprintf(vstr, "[%d] ", PRG_VNUM(prg));
+			sprintbit(PRG_FLAGS(prg), progress_flags, temp, TRUE);
+			snprintf(fstr, sizeof(fstr), " [ %s]", temp);
 		}
 		else {
 			*vstr = '\0';
+			*fstr = '\0';
 		}
 		
-		msg_to_char(ch, "%s%s%s\t0%s\r\n%s", vstr, empire_has_completed_goal(emp, PRG_VNUM(prg)) ? "\tg" : (PRG_FLAGGED(prg, PRG_PURCHASABLE) ? "\tc" : "\ty"), PRG_NAME(prg), PRG_FLAGGED(prg, PRG_HIDDEN) ? " (hidden)" : "", NULLSAFE(PRG_DESCRIPTION(prg)));
+		msg_to_char(ch, "%s%s%s\t0%s\r\n%s", vstr, empire_has_completed_goal(emp, PRG_VNUM(prg)) ? "\tg" : (PRG_FLAGGED(prg, PRG_PURCHASABLE) ? "\tc" : "\ty"), PRG_NAME(prg), fstr, NULLSAFE(PRG_DESCRIPTION(prg)));
 		
 		if (PRG_VALUE(prg) > 0) {
 			msg_to_char(ch, "Value: %d point%s\r\n", PRG_VALUE(prg), PLURAL(PRG_VALUE(prg)));

@@ -2891,6 +2891,7 @@ const char *progress_flags[] = {
 	"SCRIPT-ONLY",
 	"HIDDEN",
 	"NO-ANNOUNCE",
+	"NO-PREVIEW",
 	"\n"
 };
 
