@@ -1417,6 +1417,8 @@ int wordcount_quest(quest_data *quest) {
 	count += wordcount_string(QUEST_NAME(quest));
 	count += wordcount_string(QUEST_DESCRIPTION(quest));
 	count += wordcount_string(QUEST_COMPLETE_MSG(quest));
+	count += wordcount_requirements(QUEST_PREREQS(quest));
+	count += wordcount_requirements(QUEST_TASKS(quest));
 		
 	return count;
 }

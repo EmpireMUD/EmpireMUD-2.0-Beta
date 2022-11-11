@@ -8705,6 +8705,24 @@ int wordcount_extra_descriptions(struct extra_descr_data *list) {
 
 
 /**
+* Counts the number of words in quest/progress requirements.
+*
+* @param struct req_data *list The list of requirement.
+* @return int The number of words in the requirements.
+*/
+int wordcount_requirements(struct req_data *list) {
+	struct req_data *iter;
+	int count = 0;
+	
+	LL_FOREACH(list, iter) {
+		count += wordcount_string(iter->custom);
+	}
+	
+	return count;
+}
+
+
+/**
 * Counts the number of words in a string, separated by whitespace. Only words
 * containing alpha/numeric characters are counted; pure punctuation is ignored.
 *

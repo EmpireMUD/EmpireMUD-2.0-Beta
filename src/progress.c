@@ -439,6 +439,7 @@ int wordcount_progress(progress_data *prg) {
 	
 	count += wordcount_string(PRG_NAME(prg));
 	count += wordcount_string(PRG_DESCRIPTION(prg));
+	count += wordcount_requirements(PRG_TASKS(prg));
 	
 	return count;
 }

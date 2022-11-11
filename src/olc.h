@@ -288,6 +288,7 @@ char **get_weapon_types_string();
 // word count: core functions
 int wordcount_custom_messages(struct custom_message *list);
 int wordcount_extra_descriptions(struct extra_descr_data *list);
+int wordcount_requirements(struct req_data *list);
 int wordcount_string(const char *string);
 
 // word count: types
