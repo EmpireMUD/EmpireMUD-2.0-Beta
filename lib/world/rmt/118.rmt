@@ -99,6 +99,7 @@ almost fatherly gaze.
 ~
 M 1 11800 100.00 2
 M 0 11900 100.00 1
+T 11813
 S
 #11801
 The Central Chamber of the Tower Skycleave~
@@ -184,6 +185,7 @@ clutter~
 looks like people have been sleeping around it.
 ~
 M 1 11809 100.00 8
+T 11813
 S
 #11802
 The Central Chamber of the Tower Skycleave~
@@ -286,6 +288,7 @@ northwest southwest nw sw~
 The central chamber of the ground floor is huge!
 ~
 M 0 11811 100.00 1
+T 11813
 S
 #11803
 The Central Chamber of the Tower Skycleave~
@@ -390,6 +393,7 @@ The stairs and gift shop are to the southwest.
 ~
 M 0 11804 100.00 1
 M 1 11832 100.00 3
+T 11813
 S
 #11804
 The Central Chamber of the Tower Skycleave~
@@ -471,6 +475,7 @@ M 0 11890 100.00 1
 M 0 11838 100.00 1
 M 1 11832 100.00 3
 M 1 11831 100.00 5
+T 11813
 S
 #11805
 Cafe Fendreciel~
@@ -729,6 +734,7 @@ The distant walls are paneled with black ebony wood.
 M 0 11833 100.00 1
 M 1 11906 100.00 2
 M 1 11832 100.00 3
+T 11813
 S
 #11810
 The Second Floor Walkway of the Tower Skycleave~
