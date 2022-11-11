@@ -331,13 +331,14 @@ Akeldama student pale~
 Akeldama~
 A pale student is seated in the back.
 ~
-150 250 bdvxIJ n 3
+150 250 bdvxJ n 3
 2 0 0 16
 D
    Akeldama has chosen a seat in the corner, barely touched by the flickering
 lamplight from the front. Her skin has a pale, almost ashy color, perhaps due
 to the hardships the tower has recently suffered.
 ~
+I 12 11862 100.00 1 p  # PICKPOCKET: handbook of hexes and curses
 M
 1
 Is blood an element?~
