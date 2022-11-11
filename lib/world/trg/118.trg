@@ -2679,6 +2679,18 @@ switch %questvnum%
     if !%actor.has_reputation(11800,Liked)%
       nop %actor.set_reputation(11800,Liked)%
     end
+    * check progress
+    set emp %actor.empire%
+    if %emp%
+      if !%emp.is_on_progress(11800)% && !%emp.has_progress(11800)%
+        %send% %actor% Your empire begins The Tower Skycleave (progress goal).
+        nop %emp.start_progress(11800)%
+        if %questvnum% == 11812
+          * finish now
+          nop %emp.add_progress(11800)%
+        end
+      end
+    end
   break
   case 11821
     * Hugh Mann
@@ -6950,6 +6962,13 @@ while %ch%
       * Floor 4
       if %ch.on_quest(11812)%
         %quest% %ch% trigger 11812
+      end
+      * check progress
+      set emp %ch.empire%
+      if %emp%
+        if !%emp.has_progress(11800)%
+          nop %emp.add_progress(11800)%
+        end
       end
     end
   elseif %ch% != %self%
