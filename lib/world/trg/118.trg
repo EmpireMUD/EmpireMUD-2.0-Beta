@@ -688,6 +688,18 @@ if !%self.fighting%
   %purge% %self% $n leaves.
 end
 ~
+#11813
+Skycleave: Shared enter trigger~
+2 gwA 100
+~
+* ensure they're on the first progress goal
+set emp %actor.empire%
+if %emp%
+  if !%emp.is_on_progress(11800)% && !%emp.has_progress(11800)%
+    nop %emp.start_progress(11800)%
+  end
+end
+~
 #11814
 Skycleave: Loot controller~
 1 n 100
@@ -5379,7 +5391,7 @@ switch %cycle%
       say Iskip sal-ash Tagra Nes.
       wait 2 sec
     end
-    %echo% Sap begins to trickle from the rotting tree.
+    %echo% Putrid sap begins to trickle from the rotting tree.
     * load putrid sap now
     if !%self.room.contents(11888)%
       %load% obj 11888 room
