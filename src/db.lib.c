@@ -2432,7 +2432,7 @@ void parse_empire(FILE *fl, empire_vnum vnum) {
 	room_data *room;
 	double dbl_in;
 	long long_in;
-	char *tmp, c_in;
+	char *tmp, c_in[2];
 	
 	sprintf(buf2, "empire #%d", vnum);
 	
@@ -2646,11 +2646,16 @@ void parse_empire(FILE *fl, empire_vnum vnum) {
 						break;
 					}
 					case 'T': {	// GT: tracker for last goal
-						if (last_egoal && sscanf(line, "GT %d %d %lld %d %d %c", &t[0], &t[1], &bit_in, &t[2], &t[3], &c_in) == 6) {
-							// found group
+						if (last_egoal && sscanf(line, "GT %d %d %lld %d %d %c %c", &t[0], &t[1], &bit_in, &t[2], &t[3], &c_in[0], &c_in[1]) == 7) {
+							// found everything
+						}
+						else if (last_egoal && sscanf(line, "GT %d %d %lld %d %d %c", &t[0], &t[1], &bit_in, &t[2], &t[3], &c_in[0]) == 6) {
+							// found group but no custom
+							c_in[1] = 0;
 						}
 						else if (last_egoal && sscanf(line, "GT %d %d %lld %d %d", &t[0], &t[1], &bit_in, &t[2], &t[3]) == 5) {
-							c_in = 0;	// no group given
+							c_in[0] = 0;	// no group given
+							c_in[1] = 0;	// no custom given
 						}
 						else {
 							log("SYSERR: Format error in GT line of empire %d", vnum);
@@ -2667,8 +2672,12 @@ void parse_empire(FILE *fl, empire_vnum vnum) {
 						task->misc = bit_in;
 						task->needed = t[2];
 						task->current = t[3];
-						task->group = c_in;
-					
+						task->group = c_in[0];
+						
+						if (c_in[1] == '+') {
+							task->custom = fread_string(fl, buf2);
+						}
+						
 						LL_APPEND(last_egoal->tracker, task);
 						break;
 					}
@@ -2981,7 +2990,10 @@ void write_empire_to_file(FILE *fl, empire_data *emp) {
 		
 		// GT goal tracker
 		LL_FOREACH(egoal->tracker, task) {
-			fprintf(fl, "GT %d %d %lld %d %d %c\n", task->type, task->vnum, task->misc, task->needed, task->current, task->group);
+			fprintf(fl, "GT %d %d %lld %d %d %c%s\n", task->type, task->vnum, task->misc, task->needed, task->current, task->group, (task->custom && *task->custom) ? " +" : "");
+			if (task->custom && *task->custom) {
+				fprintf(fl, "%s~\n", task->custom);
+			}
 		}
 	}
 	HASH_ITER(hh, EMPIRE_COMPLETED_GOALS(emp), ecg, next_ecg) {
