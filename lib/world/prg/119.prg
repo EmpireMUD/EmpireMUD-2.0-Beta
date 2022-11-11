@@ -1,20 +1,12 @@
 #11992
-Calamander Progress 1~
-tba
+Variegated Magewood~
+   Your empire has amassed a reputation for its production of those black and
+brown striped magewood boards! Though all magewood is exceptionally rare and
+preeminently valuable, few varieties are so beautiful as calamander.
 ~
-1 4 0 5 d
+3 4 0 5 d
 K 7 5
 W
-34 11997 0 1
-S
-#11993
-Calamander Progress 2~
-tba
-~
-2 4 0 5 0
-K 5 5
-P 11992
-W
-34 11997 0 500
+34 11997 0 250 -
 S
 $
