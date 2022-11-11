@@ -63,4 +63,26 @@ W+
 3 11872 0 1 a
 Defeat the one pulling the strings~
 S
+#11802
+Legacy of Skycleave~
+   The high sorcerers of Skycleave made a monumental impact on the world and
+their legacy can be felt across the land. Show off your empire's place in this
+lasting legacy by constructing the tremendous buildings designed by its
+incomparable magineers and growing one of its rare and magical forests.
+~
+2 4 0 5 f
+P 11800
+W+
+8 11939 0 1 a
+Build the most amazing hanging gardens~
+W+
+8 11937 0 1 a
+Build a tomb people can look up to~
+W+
+8 11938 0 1 a
+Build an unbelievable walking tower~
+W+
+25 11991 0 1 a
+Grow a legendary magical forest~
+S
 $
