@@ -210,7 +210,7 @@ int count_empire_objects(empire_data *emp, obj_vnum vnum) {
 */
 progress_data *find_current_progress_goal_by_name(empire_data *emp, char *name) {
 	struct empire_goal *goal, *next_goal;
-	progress_data *prg, *partial = NULL;
+	progress_data *prg, *partial = NULL, *multi = NULL;
 	
 	if (!emp || !*name) {
 		return NULL;
@@ -227,9 +227,12 @@ progress_data *find_current_progress_goal_by_name(empire_data *emp, char *name) 
 		else if (!partial && is_multiword_abbrev(name, PRG_NAME(prg))) {
 			partial = prg;
 		}
+		else if (!multi && multi_isname(name, PRG_NAME(prg))) {
+			multi = prg;
+		}
 	}
 	
-	return partial;	// if any
+	return partial ? partial : multi;	// if any
 }
 
 
@@ -240,7 +243,7 @@ progress_data *find_current_progress_goal_by_name(empire_data *emp, char *name) 
 * @param char *name The name to look for.
 */
 progress_data *find_progress_goal_by_name(char *name) {
-	progress_data *prg, *next_prg, *partial = NULL;
+	progress_data *prg, *next_prg, *partial = NULL, *multi = NULL;
 	
 	if (!*name) {
 		return NULL;
@@ -257,9 +260,12 @@ progress_data *find_progress_goal_by_name(char *name) {
 		else if (!partial && is_multiword_abbrev(name, PRG_NAME(prg))) {
 			partial = prg;
 		}
+		else if (!multi && multi_isname(name, PRG_NAME(prg))) {
+			multi = prg;
+		}
 	}
 	
-	return partial;	// if any
+	return partial ? partial : multi;	// if any
 }
 
 
@@ -271,7 +277,7 @@ progress_data *find_progress_goal_by_name(char *name) {
 * @param char *name The name to look for.
 */
 progress_data *find_purchasable_goal_by_name(empire_data *emp, char *name) {
-	progress_data *prg, *next_prg, *partial = NULL;
+	progress_data *prg, *next_prg, *partial = NULL, *multi = NULL;
 	
 	if (!emp || !*name) {
 		return NULL;
@@ -294,9 +300,12 @@ progress_data *find_purchasable_goal_by_name(empire_data *emp, char *name) {
 		else if (!partial && is_multiword_abbrev(name, PRG_NAME(prg))) {
 			partial = prg;
 		}
+		else if (!multi && multi_isname(name, PRG_NAME(prg))) {
+			multi = prg;
+		}
 	}
 	
-	return partial;	// if any
+	return partial ? partial : multi;	// if any
 }
 
 
