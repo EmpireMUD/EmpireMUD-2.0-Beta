@@ -658,6 +658,104 @@ W
 Z
 1 11969
 S
+#11864
+Skycleave: Pickpocket Quest needs a name~
+   What's this? A curious thing, to be sure. It seems there's more hidden in
+the Black Tower than expected. Find more of the tower's secrets -- and there
+are certainly a lot of them. Afterwards, visit the one person who knows what's
+going on. If you've been paying attention, you'll know who that is.
+~
+You have completed the quest.
+tba
+~
+3 0 150 0 -1
+A
+2 11877
+A
+2 11878
+A
+2 11879
+A
+2 11880
+A
+2 11883
+A
+2 11893
+A
+2 11894
+A
+2 11895
+A
+2 11896
+A
+2 11897
+W+
+2 11893 0 1 p
+Find a lost pet~
+W+
+2 11865 0 1 p
+Find a condenser~
+W+
+2 11867 0 1 p
+Find a confabulator~
+W+
+2 11864 0 1 p
+Find a deconfabulator~
+W+
+2 11868 0 1 p
+Find a project never finished~
+W+
+2 11884 0 1 p
+Find an assassin's tool~
+W+
+2 11862 0 1 p
+Find a cursive primer~
+W+
+2 11873 0 1 p
+Find a sorcerer's crutch~
+W+
+2 11872 0 1 p
+Find a scandalous letter~
+W+
+2 11869 0 1 p
+Find the one who wrote it~
+W+
+2 11880 0 1 p
+Find a gemstone you can eat~
+W+
+2 11896 0 1 p
+Find an unpleasant drink~
+W+
+2 11894 0 1 p
+Find a carving of a woman~
+W+
+2 11866 0 1 p
+Find a carving of a man~
+W+
+2 11878 0 1 p
+Find a glimmering knife~
+W+
+2 11874 0 1 p
+Find a futile shield~
+W+
+2 11897 0 1 p
+Find something lucky~
+W+
+2 11895 0 1 p
+Find something sacred~
+W+
+2 11877 0 1 p
+Find what brings both joy and sorrow~
+W+
+2 11879 0 1 p
+Find hope in an unexpected place~
+W+
+2 11881 0 1 p
+Find lightning in a bottle~
+W+
+2 11883 0 1 p
+Find the most powerful thing of all~
+S
 #11870
 Skycleave: Save Grand High Sorcerer Knezz~
    The tower's headmaster is in grave peril. When the mercenaries took the
