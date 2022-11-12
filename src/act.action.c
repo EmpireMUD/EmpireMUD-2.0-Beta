@@ -486,7 +486,7 @@ obj_data *has_tool(char_data *ch, bitvector_t flags) {
 		}
 		
 		// ok! try to see if it's better
-		if (!best_tool || OBJ_FLAGGED(tool, OBJ_SUPERIOR) || (!OBJ_FLAGGED(best_tool, OBJ_SUPERIOR) && GET_OBJ_CURRENT_SCALE_LEVEL(tool) > GET_OBJ_CURRENT_SCALE_LEVEL(best_tool))) {
+		if (!best_tool || (OBJ_FLAGGED(tool, OBJ_SUPERIOR) && !OBJ_FLAGGED(best_tool, OBJ_SUPERIOR)) || (!OBJ_FLAGGED(best_tool, OBJ_SUPERIOR) && GET_OBJ_CURRENT_SCALE_LEVEL(tool) > GET_OBJ_CURRENT_SCALE_LEVEL(best_tool))) {
 			best_tool = tool;	// it seems better
 		}
 	}
