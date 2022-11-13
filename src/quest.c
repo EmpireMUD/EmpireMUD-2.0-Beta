@@ -5099,7 +5099,7 @@ void get_quest_reward_display(struct quest_reward *list, char *save_buffer) {
 * @param quest_data *quest The quest to display.
 */
 void do_stat_quest(char_data *ch, quest_data *quest) {
-	char buf[MAX_STRING_LENGTH], part[MAX_STRING_LENGTH];
+	char buf[MAX_STRING_LENGTH * 4], part[MAX_STRING_LENGTH];
 	size_t size;
 	
 	if (!quest) {
@@ -5166,7 +5166,7 @@ void do_stat_quest(char_data *ch, quest_data *quest) {
 */
 void olc_show_quest(char_data *ch) {
 	quest_data *quest = GET_OLC_QUEST(ch->desc);
-	char buf[MAX_STRING_LENGTH], lbuf[MAX_STRING_LENGTH];
+	char buf[MAX_STRING_LENGTH * 4], lbuf[MAX_STRING_LENGTH];
 	
 	if (!quest) {
 		return;
