@@ -96,6 +96,7 @@ switch %self.vnum%
   case 11833
   case 11838
   case 11938
+  case 11900
     * shimmer and spirits
     %send% %actor% You can't pickpocket someone who doesn't even have a body.
   break
@@ -4215,17 +4216,30 @@ switch %self.vnum%
 done
 ~
 #11852
-Single-try pickpocket~
+Skycleave: Single-try pickpocket~
 0 p 100
 ~
+return 1
 * Only allows each player to attempt to pickpocket this mob 1 time
 if %ability% != 142
   * not pickpocket ability
-  return 1
   halt
-elseif %self.mob_flagged(*PICKPOCKETED)% || !%self.can_see(%actor%)%
+elseif %self.mob_flagged(*PICKPOCKETED)%
   * done already or can't see them
-  return 1
+  halt
+elseif %self.vnum% == 11920
+  * special cast for the GHSs: stored to room not mob (also ignores can-see)
+  set room %self.room%
+  set varname pickpocket_%actor.id%
+  if %room.var(%varname%,0)%
+    %send% %actor% ~%self% is watching you closely; you can't get close enough to pick ^%self% pocket.
+    return 0
+  else
+    set %varname% 1
+    remote %varname% %room.id%
+  end
+elseif !%self.can_see(%actor%)%
+  * done already or can't see them
   halt
 end
 set varname pickpocket_%actor.id%
@@ -4241,7 +4255,6 @@ else
   * ok to try
   set %varname% 1
   remote %varname% %self.id%
-  return 1
 end
 ~
 #11853
