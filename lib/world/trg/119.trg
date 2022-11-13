@@ -172,6 +172,18 @@ switch %self.vnum%
     * bookshelf: load the skeleton in the lich labs
     %at% i11937 %load% mob 11937
     %at% i11937 %echo% A skeleton sits up on the work bench.
+    * if Knezz and Niamh didn't die, also do the wrangler now
+    if %instance.mob(11968)% && %instance.mob(11931)%
+      set wright %instance.mob(11889)%
+      if %wright%
+        * oh no: Niamh survived and John caught no goblins
+        %at% %wright.room% %echo% ~%wright% trudges out of the room.
+        %purge% %wright%
+        wait 20 s
+        %at% i11914 %load% mob 11926
+        %at% i11914 %echo% A sponge comes rolling in through the doorway.
+      end
+    end
   break
   case 11965
     * trolley: possible replacement for the missing high sorcerer
