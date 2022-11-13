@@ -1052,7 +1052,7 @@ S
 #11931
 Niamh resident~
 Resident Niamh~
-Resident Niamh is standing here. (list)
+Resident Niamh is pacing. (list)
 ~
 150 250 dvxJ n 3
 2 0 0 15
@@ -1065,8 +1065,39 @@ patterns.
 ~
 F 11800
 I 12 11872 100.00 1 p  # PICKPOCKET: hand-written note
+M
+7
+set line_gap 30 s~
+M
+7
+emote $n paces across the room.~
+M
+7
+emote $n taps her fingers together.~
+M
+7
+emote $n taps her foot.~
+M
+7
+emote $n paces back across the room.~
+M
+7
+set line_gap 9 s~
+M
+8
+emote $n fidgets with the rings on her fingers, spinning them back and forth.~
+M
+8
+say People rather need to mind their own business.~
+M
+8
+emote $n glares at you.~
+M
+8
+say That includes you.~
 T 11810
 T 11852
+T 11840
 S
 #11932
 mohammed resident~
@@ -2618,9 +2649,11 @@ Acting High Sorcerer Niamh is standing here. (list)
 150 250 dvxJ n 3
 2 0 0 15
 D
-   Niamh's black hair shows fiery red roots as she stoops to pick up a book.
-Her pale face and hands stick out in stark contrast to her dark purple and
-black robes. She looks rather young compared to many of the sorcerers here.
+   Niamh stands tall in her freshly-pressed purple and black robes. In the
+right light, you can barely make out nocturnium stitching up and down the full
+length of the robes. It looks like tiny writing has been embroidered into them.
+Niamh's inky black hair is pulled up into a tightly coiled braid above her
+pale, youthful -- but severe -- face. She rarely smiles, least of all at you.
    Type 'list', 'list id', or 'buy' to see and purchase melee equipment
 patterns.
 ~
@@ -2671,6 +2704,54 @@ emote A sad look crosses $n's face.~
 M
 7
 say As quickly as I set it free, the poor thing dies. Perhaps it never truly lived.~
+M
+8
+say I have been investigating where we might find another otherworlder.~
+M
+8
+say Attempts to locate the realm or plane of their origin have proved... futile.~
+M
+8
+say Nevertheless, we have gained a considerable amount of knowledge from it.~
+M
+8
+say There's no way to determine whether or not it's intelligent, or even aware of its surroundings...~
+M
+8
+say That is among the many questions that might be answered by a second one.~
+M
+8
+say I have been working on a new type of mana potion made from its blood or lymph or whatever that ooze might turn out to be.~
+M
+8
+say Sadly, we shall require a second one to continue that research as well.~
+M
+9
+say I must admit I am enjoying this promotion to High Sorcerer.~
+M
+9
+say I will, of course, have to replace the decor in the suite. Celiya and I have, shall we say, different tastes.~
+M
+9
+say I might never leave the fourth floor. I have always enjoyed looking down on the little people.~
+M
+9
+say There were plenty along the way who didn't believe in me. My own brother teased me about my powers.~
+M
+9
+say He was as jealous as the lot of them. I only wish he was here to see me now...~
+M
+9
+say Some day I'll be master of this whole tower, and they'll all be scrubbing it.~
+M
+9
+say There are a fair lot of them who could do with the humility of a little cleaning.~
+M
+9
+say I dare say I'll start with Djon, the layabout. He could use a good humbling.~
+M
+9
+emote $n seems to trail off into her own thoughts with little more than the clever grin on her face.~
 T 11810
 T 11852
 T 11840

@@ -7181,7 +7181,7 @@ if %any_goblin% || %goblin_11815%
   %at% i11914 %load% mob 11915  * Caged Goblin
 else
   * no goblins at all?
-  %at% i11914 %load% mob 11926  * Goblin Wrangler turned into sponge
+  %at% i11914 %load% mob 11889  * Goblin Wrangler, briefly
   %at% i11914 %load% obj 11915  * empty cage
 end
 %at% i11918 %load% mob 11918  * Race Caller

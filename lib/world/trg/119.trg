@@ -185,7 +185,16 @@ switch %self.vnum%
         nop %mob.add_mob_flag(*PICKPOCKETED)%
       end
       %purge% %niamh%
-      wait 3 sec
+      wait 3 s
+      set wright %instance.mob(11889)%
+      if %wright%
+        * oh no: Niamh survived and John caught no goblins
+        %at% %wright.room% %echo% ~%wright% trudges out of the room.
+        %purge% %wright%
+        wait 20 s
+        %at% i11914 %load% mob 11926
+        %at% i11914 %echo% A sponge comes rolling in through the doorway.
+      end
     end
   break
 done

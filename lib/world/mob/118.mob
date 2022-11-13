@@ -2939,6 +2939,47 @@ T 11803
 T 11821
 T 11822
 S
+#11889
+Wright wrangler~
+Wrangler Wright~
+The goblin wrangler is cleaning up the mess. (list)
+~
+150 250 bdvxJ n 3
+1 0 0 15
+D
+   Though he's old and more than a little scarred, Wrangler Wright seems to be
+enjoying himself as he picks up debris and straightens the room. His skin has
+grown translucent with time, showing every blue vein beneath dark age spots.
+Unlike most of the tower's occupants, he wears no robes -- only simple overalls
+and a gray shirt.
+   Type 'list', 'list id', or 'buy' to see and purchase pvp/solo equipment
+patterns.
+~
+F 11800
+M
+1
+I'm going to lose my job...~
+M
+1
+I'm getting too old for this crap.~
+M
+1
+They're going to blame me for the goblins getting loose in the first place.~
+M
+0
+$n sweeps the debris into the corners.~
+M
+0
+$n cleans the front of a cage.~
+M
+0
+$n struggles in futility to clean the grime out from under $s nails.~
+M
+0
+$n climbs on a chair and tries to clean something brown from the ceiling.~
+T 11934
+T 11810
+S
 #11890
 Celiya high sorcerer difficulty~
 High Sorcerer Celiya~
