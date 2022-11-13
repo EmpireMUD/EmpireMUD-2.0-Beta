@@ -2626,8 +2626,54 @@ patterns.
 ~
 F 11800
 I 12 11872 100.00 1 p  # PICKPOCKET: hand-written note
+M
+7
+say Ah, there you are. Are you the one who fought off the enchantress, Mezvienne?~
+M
+7
+say I have been studying that most curious phenomenon, regarding her shadow.~
+M
+7
+say I could sense a disturbance in darkness itself when the shadow ascended, as if it was alive for the first time.~
+M
+7
+say Such a thing should never have been possible. A shadow is an inarticulate tool.~
+M
+7
+emote $n twists her hand in the air as her own shadow roils up onto it and lashes out with little tentacles.~
+M
+7
+say If we have truly become mired in this... time loop, as they're calling it...~
+M
+7
+say Perhaps whatever strange power brought animus to Mezvienne's shadow could also be the key to our salvation.~
+M
+7
+emote $n moves her fingers like a puppeteer as her shadow drops to the floor and begins to dance.~
+M
+7
+emote The little shadow grows in fits and spurts as $n nurtures and caresses it.~
+M
+7
+say But alas, when I give it the dark gift and try to set it free...~
+M
+7
+emote There's a flash of darkness from $n's hands and the shadow stops its tenebrous dance.~
+M
+7
+echo The little shadow turns toward you, then toward its maker, then back to you, reaching out...~
+M
+7
+echo And then, with a poof, the shadow is gone, dissipated in the lamplight.~
+M
+7
+emote A sad look crosses $n's face.~
+M
+7
+say As quickly as I set it free, the poor thing dies. Perhaps it never truly lived.~
 T 11810
 T 11852
+T 11840
 S
 #11971
 Gron goblin~
