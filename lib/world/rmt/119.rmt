@@ -4873,10 +4873,8 @@ Ramps connect spots where pairs of houses are at slightly different levels.
 E
 ladders~
    Some of the houses whose roofs form the walkway have ladders sticking out of
-their openings, but many don't. Perhaps the ones with ladders are an invitation
-to enter.
-   Short ladders also connect some of the uneven rooftops of the houses, with
-others connected by ramps instead.
+their openings, but many don't. Short ladders also connect some of the uneven
+rooftops of the houses, with others connected by ramps instead.
 ~
 M 0 11981 100.00 1
 M 1 11981 100.00 3
