@@ -4753,6 +4753,39 @@ switch %line%
   break
 done
 ~
+#11862
+Skycleave: skymote conversation helper~
+0 c 0
+skymote~
+* Manages bits of conversations that otherwise use '11840 Storytime' but need
+* minor script-based information.
+if %actor% != %self%
+  return 0
+  halt
+end
+set spirit %instance.mob(11900)%
+set room %self.room%
+if %arg% == scaldopen
+  set rescuer %spirit.var(lich_released,0)%
+  if !%rescuer%
+    say I should have known none of those unlettered louts would open it.
+  else
+    set found 0
+    set ch %room.people%
+    while %ch% && !%found%
+      if %ch.id% == %rescuer%
+        set found %ch.name%
+      end
+      set ch %ch.next_in_room%
+    done
+    if %found%
+      say My gratitude that you released me is... eternal.
+    else
+      say Lucky someone had the good sense to release me.
+    end
+  end
+end
+~
 #11863
 Skycleave: Shade ascension / Death of Knezz~
 0 b 100

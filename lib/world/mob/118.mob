@@ -1291,6 +1291,24 @@ F 11800
 M
 7
 emote $n comes screaming toward you, lashing at you with snake-like wrappings, before realizing you aren't $s enemy.~
+M
+0
+A low hissing sound from Scaldorran has you worried.~
+M
+0
+You feel painfully cold.~
+M
+0
+Your breath freezes in the air.~
+M
+0
+There's a disturbing chittering noise coming from the lich.~
+M
+0
+You jump as one of Scaldorran's wrappings brushes against your leg.~
+M
+0
+There's a distant scream, perhaps from somewhere inside the lich.~
 T 11839
 T 11806
 S
@@ -2412,7 +2430,7 @@ M
 say That vile witch.~
 M
 8
-emote $n's bones creak more than the chair as he shifts is weight.~
+emote $n's bones creak more than the chair as he shifts his weight.~
 M
 8
 say I'm not as young as I used to be.~

@@ -1234,7 +1234,183 @@ back apart. And he is so much more than that. As a lich, he wields vast power
 over death -- and he has a reputation for sharing it.
 ~
 F 11800
+M
+7
+emote There's an icy, distant, echoing howl as $n yawns.~
+M
+7
+say Far too long spent inside that cold stone repository.~
+M
+7
+do skymote scaldopen~
+M
+7
+skip~
+M
+7
+say The things they don't tell you about being dead...~
+M
+7
+say Weyonomon makes it look so... blissful.~
+M
+7
+say I loathe that repository.~
+M
+7
+say Should've bound myself to a feather pillow or a warm blanket.~
+M
+7
+say SO COLD.~
+M
+7
+echo You shiver as your breath freezes in the air.~
+M
+8
+say Did you win a prize from my claw game?~
+M
+8
+say I heard it was broken again, but that barista -- Magey or something -- she offered to fix it.~
+M
+8
+say I don't remember every warm-blooded person's name in the tower. Do you know how many servants have come and gone over the years?~
+M
+8
+say Frankly I can't be bothered with the apprentice names, either, at the rate Niamh goes through them.~
+M
+8
+say Always did like her, though. Niamh. She has a healthy respect for the DARK ARTS.~
+M
+8
+emote $n coils in the air as a howling scream escapes his bandages.~
+M
+8
+echo The lamps sputter and flicker.~
+M
+9
+say That claw game was of my own devising.~
+M
+9
+say The original model used a manticore claw but it kept poisoning the patrons.~
+M
+9
+say Frankly, that one was on me. Should have known it would do that.~
+M
+9
+say One of those filthy goblins must have broken it. We should have exterminated the lot of them.~
+M
+9
+say But at least they didn't get up to the third floor.~
+M
+9
+say Imagine the ETERNAL RAGE of having their disgusting fingers all over my precious CHAMBER OF DEATH.~
+M
+9
+emote $n seems to explode, sending bandages out in all directions, nearly slicing through you!~
+M
+9
+emote $n comes back together, parts of him spinning wildly in the air.~
+M
+9
+say Their hideous little skeletons aren't even worth using as toothpicks.~
+M
+9
+say Our useless goblin wrangler isn't worth the green effluent we pay him to scrub.~
+M
+9
+say Don't even get me started on which staff members are pulling their weight and which ones are disposable.~
+M
+10
+say Oh, you're still here. I hardly noticed aside from that HORRIBLE thudding sound your chest makes.~
+M
+10
+say If you ever want someone to help with that, I am a first-class expert at transitions.~
+M
+10
+say The easy way, of course, is to just step out the window. Three floors and that should do the trick.~
+M
+10
+emote $n seems to relax a little.~
+M
+10
+say This one time, there was a duchess who came to me to get out of a marriage that was just torture for her...~
+M
+10
+say I arranged for her to haunt that abusive husband until it drove him over the edge.~
+M
+10
+say LITERALLY.~
+M
+10
+say Another time, I wrapped up some vulgar dirtmage while it was trying to transform...~
+M
+10
+say It popped like a blister! Actually... you might have been there for that one.~
+M
+10
+say You look very familiar.~
+M
+10
+say But everyone basically looks the same on the physical plane. Same number of noses, never more than two eyes.~
+M
+10
+say Usually two or fewer arms.~
+M
+10
+say Eventually you all start to look the same.~
+M
+10
+say Have we talked about this before?~
+M
+10
+say Tried to ghost an oreonic once. Marline was its name; wanted to see if an oreonic could become a lich.~
+M
+10
+say TOTAL FAILURE. It died too much. Sad case.~
+M
+10
+say Mind you, I only help people cross over when the goal is self-improvement.~
+M
+10
+say Never for suicides. Awful business.~
+M
+10
+say But if you wanted to be an ETERNAL LICH, we can remove all that ugly, bulging, fleshy rot from you.~
+M
+10
+say It only hurts a LOT for a little while.~
+M
+10
+say Still, though, I did once concoct a poison that could kill a person's not-so-immortal soul.~
+M
+10
+say Used it on a nasty sky-worshipper who was diddling children. It takes hours. I sat and counted.~
+M
+10
+say Out loud.~
+M
+10
+emote $n lets out a hollow, bone-chilling laugh as he coils around the room.~
+M
+0
+A low hissing sound from Scaldorran has you worried.~
+M
+0
+You feel painfully cold.~
+M
+0
+Your breath freezes in the air.~
+M
+0
+There's a disturbing chittering noise coming from the lich.~
+M
+0
+You jump as one of Scaldorran's wrappings brushes against your leg.~
+M
+0
+There's a distant scream, perhaps from somewhere inside the lich.~
 T 11810
+T 11862
+T 11840
 S
 #11937
 skeleton~
