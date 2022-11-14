@@ -3717,7 +3717,7 @@ east doorway~
 The door leads back out into the office.
 ~
 E
-furniture bespoke calamander~
+furniture bespoke calamander chairs~
    The chairs and tables here are finely crafted from striped black and brown
 calamander, one of the finest and rarest woods. Many of them bear the initials
 J.A.K. in stylized letters.
@@ -3763,6 +3763,11 @@ E
 closet~
    You open the askew closet door and nearly fall over when you find a skeleton
 inside. You swing the door shut and back away slowly.
+~
+E
+chair easychair~
+   The overstuffed easy chair sits low to the ground. The purple upholstery is
+striped in two shades, just like the calamander wood of the feet.
 ~
 M 1 11962 100.00 1
 S

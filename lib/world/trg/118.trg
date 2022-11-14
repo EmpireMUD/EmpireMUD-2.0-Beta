@@ -307,7 +307,7 @@ end
 Skycleave: Shared receive trigger (Goblins, Queen, pixies, sorcerers)~
 0 j 100
 ~
-if %self.vnum% >= 11815 && %self.vnum% <= 11818
+if (%self.vnum% >= 11815 && %self.vnum% <= 11818) || %self.vnum% == 11821
   * goblins
   return 0
   set goblin_vnums 11815 11816 11817
@@ -316,7 +316,13 @@ if %self.vnum% >= 11815 && %self.vnum% <= 11818
     say Venjer cannot be bribed!
     %aggro% %actor%
   elseif !(%trinket_vnums% ~= %object.vnum%) && (!(%object.keywords% ~= goblin) || (%object.keywords% ~= wrangler))
-    say Goblin doesn't want %object.shortdesc%, stupid human!
+    if %self.vnum% == 11821
+      say Hugh Mann don't want %object.shortdesc%, stupid person!
+    else
+      say Goblin doesn't want %object.shortdesc%, stupid human!
+    end
+  elseif %self.vnum% == 11821 && %actor.on_quest(11821)% && %object.vnum% == 11976
+    %send% %actor% Use 'quest finish Need It For A Friend' instead.
   else
     * actor has given a goblin object
     %send% %actor% You give ~%self% @%object%...
@@ -324,23 +330,25 @@ if %self.vnum% >= 11815 && %self.vnum% <= 11818
     if %trinket_vnums% ~= %object.vnum%
       say This is what we came for! These is not belonging to you! But thanks, you, for returning.
     else
-      say Not what goblin items we came for but still a good prize...
+      say Not what items we came for but still a good prize...
     end
-    * despawn other goblins here
-    set ch %self.room.people%
-    while %ch%
-      set next_ch %ch.next_in_room%
-      if %ch.is_npc% && %goblin_vnums% ~= %ch.vnum%
-        %echo% ~%ch% leaves.
-        if %ch% != %self%
-          %purge% %ch%
-        end
-      end
-      set ch %next_ch%
-    done
-    * and leave
     %purge% %object%
-    %purge% %self%
+    * despawn goblins here EXCEPT if it's Hugh
+    if %self.vnum% != 11821
+      set ch %self.room.people%
+      while %ch%
+        set next_ch %ch.next_in_room%
+        if %ch.is_npc% && %goblin_vnums% ~= %ch.vnum%
+          %echo% ~%ch% leaves.
+          if %ch% != %self%
+            %purge% %ch%
+          end
+        end
+        set ch %next_ch%
+      done
+      * and leave
+      %purge% %self%
+    end
   end
 elseif %self.vnum% == 11819
   * Pixy Queen's gift
@@ -1975,6 +1983,10 @@ elseif free /= %cmd%
     halt
   elseif %targ% == %actor%
     %send% %actor% You can't free yourself.
+    halt
+  elseif %targ.vnum% == 11834
+    * special handling
+    return 0
     halt
   elseif !%targ.var(needs_sffree,0)% || %targ.var(did_sffree,0)%
     %send% %actor% &%targ% doesn't need to be freed.
@@ -4872,6 +4884,28 @@ elseif %seconds% > 60
 elseif %seconds% > 30
   %echo% The Shade of Mezvienne grows as it draws Knezz's life force.
   dg_affect %self% BONUS-MAGICAL 5 -1
+end
+~
+#11864
+Skycleave: Shared mob command trigger (Mez transition, water creatures)~
+0 c 0
+diagnose mount ride~
+set mount_vnums 11854 11855 11856 11857 11858
+* modes
+if diagnose /= %cmd% && %self.vnum% == 11866
+  * Mez 11866 during phase transition
+  %send% %actor% ~%self% doesn't look very good.
+elseif (mount /= %cmd% || ride /= %cmd%) && %mount_vnums% ~= %self.vnum%
+  * fake aquatic mounts
+  set arg %arg.car%
+  if %actor.has_tech(Riding)% && %arg% && %actor.char_target(%arg%)% == %self%
+    %send% %actor% You leap onto |%self% back... and splash right through!
+    %echoaround% %actor% ~%actor% leaps onto |%self% back... and splashes right through!
+  else
+    return 0
+  end
+else
+  return 0
 end
 ~
 #11865

@@ -1,0 +1,24 @@
+#11983
+bow~
+bow~
+b 8 5
+L
+18 11983 0 1 -
+M0
+You twirl around and give a deep bow.~
+M1
+$n twirls around and gives a deep bow.~
+M2
+You twirl and bow before $N.~
+M3
+$n twirls and bows before $N.~
+M4
+$n twirls and bows before you.~
+M5
+They seem to have bowed out.~
+M6
+You twirl around and bow as low as you can.~
+M7
+$n twirls around and bows as low as $e can.~
+S
+$

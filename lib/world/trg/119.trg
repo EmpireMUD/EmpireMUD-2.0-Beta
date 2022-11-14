@@ -289,7 +289,7 @@ switch %self.vnum%
   case 11861
     * Barrosh post-fight
     wait 0
-    %echo% Time moves backwards for a second as High Sorcerer Barrosh composes himself and holds his staff to the sky, dropping some things in the process...
+    %echo% &&mTime moves backwards for a second as High Sorcerer Barrosh composes himself and holds his staff to the sky, dropping some things in the process...&&0
     wait 9 sec
     say For the honor of Skycleave!
     wait 4 sec
@@ -4534,6 +4534,7 @@ end
 Elemental Plane of Water: Hendecagon fountain summoned NPC run~
 0 ab 100
 ~
+wait 3 sec
 * Runs down the tower and into the Elemental Plane of Water
 set down_rooms 11971 11960 11930 11910
 set ne_rooms 11970 11934 11922 11904
