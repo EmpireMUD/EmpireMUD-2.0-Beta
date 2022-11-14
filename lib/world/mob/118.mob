@@ -2398,6 +2398,30 @@ eyebrows and thick crescent glasses, his eyes have the milky blue color of age.
 He sits hunched over, letting his violet and gold robes drape.
 ~
 F 11800
+M
+7
+say Pardon me a moment while I rest.~
+M
+7
+say Just trying to catch my breath.~
+M
+7
+say That sort of thing takes a lot out of a body.~
+M
+7
+say That vile witch.~
+M
+8
+emote $n's bones creak more than the chair as he shifts is weight.~
+M
+8
+say I'm not as young as I used to be.~
+M
+8
+say Just need some time to rest.~
+M
+8
+say I'll be back on my feet in no time.~
 T 11865
 T 11837
 S

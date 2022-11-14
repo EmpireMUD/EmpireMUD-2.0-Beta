@@ -4907,7 +4907,10 @@ switch %line%
     say What are you waiting for? You need to burn the heartwood before the time loop repeats again.
   break
   default
-    * done -- just remove script
+    * done
+    if !%self.has_trigger(11840)%
+      attach 11840 %self.id%
+    end
     detach 11865 %self.id%
   break
 done

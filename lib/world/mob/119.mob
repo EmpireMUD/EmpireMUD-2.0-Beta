@@ -2592,6 +2592,21 @@ It's a good thing we have the magic. Imagine the repair costs after that invasio
 M
 1
 Glad to be free of that time loop.~
+M
+9
+say When little Niamh suggested a conference with her aunt, I must admit I was skeptical.~
+M
+9
+say It isn't really our sort of magic, if you know what I mean. Certainly we dabble here and there...~
+M
+9
+say Well, anyhow, I thought she might have some insight. Even thought to offer her a classroom if it worked out.~
+M
+9
+say Bit of an ambush, though, as you saw. Bit of an ambush indeed.~
+M
+9
+say Now where was I going with that...~
 T 11810
 T 11840
 T 11852
@@ -2652,8 +2667,9 @@ D
    Niamh stands tall in her freshly-pressed purple and black robes. In the
 right light, you can barely make out nocturnium stitching up and down the full
 length of the robes. It looks like tiny writing has been embroidered into them.
-Niamh's inky black hair is pulled up into a tightly coiled braid above her
-pale, youthful -- but severe -- face. She rarely smiles, least of all at you.
+Niamh's inky black hair, dyed with a purple streak, is pulled up into a tightly
+coiled braid above her pale, youthful -- but severe -- face. She rarely smiles,
+least of all at you.
    Type 'list', 'list id', or 'buy' to see and purchase melee equipment
 patterns.
 ~
@@ -2752,6 +2768,21 @@ say I dare say I'll start with Djon, the layabout. He could use a good humbling.
 M
 9
 emote $n seems to trail off into her own thoughts with little more than the clever grin on her face.~
+M
+10
+say Now that I have reached the top floor, I shall be instituting some changes.~
+M
+10
+say This tower has devolved into a cult of personality. We used to hold skill and power paramount.~
+M
+10
+say Perhaps Jozef's death, tragic though it was, is for the best.~
+M
+10
+say Under his leadership the tower fell into chaos.~
+M
+10
+say Celiya and I will return this tower to greatness, if she can be convinced to see reason.~
 T 11810
 T 11852
 T 11840
