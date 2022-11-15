@@ -7370,7 +7370,7 @@ obj_vnum get_obj_vnum_by_name(char *name, bool storable_only) {
 obj_data *get_obj_vis(char_data *ch, char *name, int *number) {
 	char copy[MAX_INPUT_LENGTH], *tmp = copy;
 	obj_data *i;
-	int num;
+	int num, store;
 	
 	if (!number) {
 		strcpy(tmp, name);
@@ -7384,6 +7384,9 @@ obj_data *get_obj_vis(char_data *ch, char *name, int *number) {
 		return NULL;
 	}
 	
+	// temporary
+	store = *number;
+	
 	/* scan items carried */
 	if ((i = get_obj_in_list_vis(ch, tmp, number, ch->carrying)) != NULL)
 		return (i);
@@ -7391,6 +7394,9 @@ obj_data *get_obj_vis(char_data *ch, char *name, int *number) {
 	/* scan room */
 	if ((i = get_obj_in_list_vis(ch, tmp, number, ROOM_CONTENTS(IN_ROOM(ch)))) != NULL)
 		return (i);
+	
+	// if we got here, restore the number
+	*number = store;
 	
 	/* ok.. no luck yet. scan the entire obj list   */
 	DL_FOREACH(object_list, i) {
