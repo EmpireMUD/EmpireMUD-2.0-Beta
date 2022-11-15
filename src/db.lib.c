@@ -2672,7 +2672,7 @@ void parse_empire(FILE *fl, empire_vnum vnum) {
 						task->misc = bit_in;
 						task->needed = t[2];
 						task->current = t[3];
-						task->group = c_in[0];
+						task->group = isalpha(c_in[0]) ? c_in[0] : 0;
 						
 						if (c_in[1] == '+') {
 							task->custom = fread_string(fl, buf2);
@@ -2990,7 +2990,7 @@ void write_empire_to_file(FILE *fl, empire_data *emp) {
 		
 		// GT goal tracker
 		LL_FOREACH(egoal->tracker, task) {
-			fprintf(fl, "GT %d %d %lld %d %d %c%s\n", task->type, task->vnum, task->misc, task->needed, task->current, task->group, (task->custom && *task->custom) ? " +" : "");
+			fprintf(fl, "GT %d %d %lld %d %d %c%s\n", task->type, task->vnum, task->misc, task->needed, task->current, task->group ? task->group : '-', (task->custom && *task->custom) ? " +" : "");
 			if (task->custom && *task->custom) {
 				fprintf(fl, "%s~\n", task->custom);
 			}
