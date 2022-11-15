@@ -1513,7 +1513,7 @@ M
 skip~
 M
 8
-say No! I thought she was on our side. Josef invited her himself, didn't he?~
+say No! I thought she was on our side. Jozef invited her himself, didn't he?~
 M
 8
 vforce 11805 say That he did. They had planned to study the so-called heartwood of time.~
@@ -2276,8 +2276,45 @@ clear she hasn't slept in quite some time.
 ~
 F 11800
 I 12 11865 100.00 1 p  # PICKPOCKET: ether condenser
+M
+7
+emote $n sighs to herself.~
+M
+7
+say I'm just worried about Professor Knezz, sugar.~
+M
+8
+emote $n glances upward with a worried glance.~
+M
+8
+say I hope Waltur is okay up there, is all.~
+M
+9
+emote $n wipes her forehead and leans against the wall.~
+M
+9
+say Nobody has heard from Niamh or her assistant, Sanjiv. Niamh can handle herself, you know, but poor Sanjiv.~
+M
+10
+emote $n takes a deep breath and then breathes out hard.~
+M
+10
+say I heard Professor Barrosh shouting earlier, and hon, that ain't good. That man is a rock.~
+M
+11
+emote $n pulls a small wand from her sleeve and points it at her face.~
+M
+11
+say Refrez!~
+M
+11
+emote $n's eyes relax and the tension in her face fades, if only for a moment.~
+M
+11
+say Worth a try, sugar.~
 T 11810
 T 11852
+T 11840
 S
 #11865
 vortex enormous~
@@ -2449,6 +2486,7 @@ M
 say I'll be back on my feet in no time.~
 T 11865
 T 11837
+T 11840
 S
 #11871
 Mezvienne enchantress~

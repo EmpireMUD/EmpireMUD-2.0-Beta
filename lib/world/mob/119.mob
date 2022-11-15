@@ -382,8 +382,54 @@ seems to have stacked itself curl-upon-curl.
 ~
 F 11800
 I 12 11864 100.00 1 p  # PICKPOCKET: mana deconfabulator
+M
+7
+say Well, the tower is looking good again.~
+M
+7
+say Every last vine and leaf is finally gone.~
+M
+7
+emote $n makes a puzzled look and reaches into her stacks of curly hair.~
+M
+7
+say Son of a goblin...~
+M
+7
+emote $n pulls a blue leaf from her hair and tears it up.~
+M
+8
+say Maybe things will get back to normal soon.~
+M
+8
+say I mean, of course they will. This is all just temporary.~
+M
+9
+set line_gap 3 s~
+M
+9
+say Oops, missed a spot. Reparera!~
+M
+9
+echo Part of the wall seamlessly stitches itself back together.~
+M
+10
+set line_gap 3 s~
+M
+10
+say Oops, missed a bit. Damma!~
+M
+10
+echo Bits of dust and debris are blasted into the air and vanish with a sparkle!~
+M
+11
+say Soon it'll start to feel like home again.~
+M
+11
+say I'm sure of it.~
 T 11810
 T 11852
+T 11840
 S
 #11911
 apprentice kayla~
@@ -1046,8 +1092,45 @@ style give the impression of a Roman patrician.
 ~
 F 11800
 I 12 11865 100.00 1 p  # PICKPOCKET: ether condenser
+M
+7
+say Provincial mercenaries. Commoners, the lot. Rabble trying to bring us to ruin.~
+M
+7
+say Most certainly brought the goblins with them. Filth keeps its own company.~
+M
+8
+emote $n looks you up and down.~
+M
+8
+say I suppose you shall have to do, if you are possessed of any talent.~
+M
+8
+say Mind you, you should be downstairs and in a proper uniform.~
+M
+9
+say Racing the lesser life forms for the spectacle of it all is unbecoming of a sorcerer and a scholar.~
+M
+9
+say Games of chance are hardly befitting an establishment of such grandeur. Why, if I were Grand High...~
+M
+9
+say Well, betwixt the two of us, I would do away with the whole of the second floor.~
+M
+10
+say Now this, here, is respectable work. Scientia propter se.~
+M
+10
+say Where the Tower Skycleave goes, so follows the world.~
+M
+11
+say Madame Niamh and I have been discussing where we might locate a second otherworlder.~
+M
+11
+say If you should stumble across burning wreckage of a round silver chariot, please alert us.~
 T 11810
 T 11852
+T 11840
 S
 #11931
 Niamh resident~
@@ -1200,25 +1283,50 @@ worlder with bright white light.
 F 11800
 I 12 11872 100.00 1 p  # PICKPOCKET: hand-written note
 M
-1
-Interesting...~
+7
+say Interesting...~
 M
-1
-Fascinating...~
+7
+emote $n circles the otherworlder slowly.~
 M
-1
-In sheer defiance of logic...~
+7
+say I think it has four hearts.~
 M
-1
-Amaze-balls...~
+8
+say Fascinating...~
 M
-0
-$n circles the otherworlder slowly.~
+8
+emote $n circles around the otherworlder.~
 M
-0
-$n bangs in the contraption in $s hands.~
+8
+say I don't think it has a gender.~
+M
+9
+emote $n bangs in the contraption in $s hands.~
+M
+9
+say This thing doesn't seem to be working.~
+M
+9
+say It says the otherworlder is breathing the mephitic air. That can't be right.~
+M
+10
+emote $n circles the otherworlder slowly.~
+M
+10
+say Amaze-balls...~
+M
+10
+say Professor Scaldorran thinks it's a plant but I'm not so sure.~
+M
+11
+say In sheer defiance of logic...~
+M
+11
+say What even is this thing?~
 T 11810
 T 11852
+T 11840
 S
 #11936
 scaldorran lich~
@@ -2592,6 +2700,48 @@ say Anyway, Rackney was protected from the conflagration by the sewage and only 
 M
 7
 say I kept him around almost a month, till he started to fall apart. Rest him. He was a good man.~
+M
+8
+say The old girl cleans up nicely, doesn't she?~
+M
+8
+say It'll take more sellswords than that to cut down old Skycleave and Jozef Knezz.~
+M
+8
+say What I just do not understand is Mezvienne. We've worked with her before.~
+M
+8
+say I thought of her as a friend. Well, you know, sugar, a distant friend.~
+M
+8
+say Tsk. Power drives a person to do strange things.~
+M
+8
+say She paid her price for it, though, didn't she, sugar. Real sad case.~
+M
+8
+say In another lifetime, a lady with her gifts, well, she might have run this tower.~
+M
+8
+say Just a sad, sad case. You know she's rotting now.~
+M
+8
+say Always thus to those who would cross the Tower Skycleave.~
+M
+9
+say Some days I think ma was right, sugar.~
+M
+9
+emote $n looks off wistfully.~
+M
+9
+say Should've just been a seamstress.~
+M
+9
+say Miss you, Ma.~
+M
+10
+say This old tower is just full of stories.~
 T 11810
 T 11840
 T 11852
@@ -2806,28 +2956,103 @@ F 11800
 I 12 11865 100.00 1 p  # PICKPOCKET: ether condenser
 M
 7
+say I just will not be getting used to this.~
+M
+7
+say These old robes may hold themselves up, but there's a whole lot o' weight to being the GHS.~
+M
+7
+say Makes you really appreciate what old Knezz went through.~
+M
+8
 say You ever hear the story about how I met old Knezz?~
 M
-7
+8
 say Well, I had just buried my first husband, rest him. Rackney. Real good man.~
 M
-7
+8
 say Anyway, I was on this hot streak, burning necros and taking names. Some real vendetta stuff.~
 M
-7
+8
 say Well, that kind of fury attracts some attention. Both good and bad.~
 M
-7
+8
 say Knezz found me hunting necromancers way down south and offered to teach me at the tower.~
 M
-7
+8
 say And really, the rest is history. That old man saved my life.~
 M
-7
+8
 say I'd have burnt down half the world and myself with it. I've been here ever since.~
 M
-7
+8
 say I owe a lot to old Knezz, rest him.~
+M
+9
+set line_gap 3 s~
+M
+9
+say My own ma wanted to be a royal seamstress.~
+M
+9
+set line_gap 9 s~
+M
+9
+emote $n bursts out with a huge laugh.~
+M
+9
+say Can you imagine, sugar? Me?~
+M
+9
+say If she could see me now...~
+M
+9
+say Oh, how I do miss her.~
+M
+10
+say I like to think they'd accept me as Grand High, in time.~
+M
+10
+emote $n turns to you, but pauses for a long moment.~
+M
+10
+say I just don't have the power in me to get us out of this loop. That would have taken Knezz.~
+M
+10
+say Barry was next in line for the big job but he doesn't have it in him anymore.~
+M
+10
+say Between you and me, sugar, if this loop wasn't about to reset, I think he'd end up quitting.~
+M
+10
+say But I like to think I could have led the tower, in better times.~
+M
+10
+say We could be Skycleave as she was always meant to be. Not legends; heroes.~
+M
+10
+say Oh, how we could help people. There's enough magic in the old thing to light up the world.~
+M
+10
+say And how bright we could be. Put the past behind us. Oh, just imagine.~
+M
+10
+emote $n looks wistful... and then sad.~
+M
+10
+say But that's not in our stars, is it, sugar? You've been outside the loop. You know our fate better than I do.~
+M
+10
+say The goblins have it right in the end, don't they? They're the only ones who see us for what we are.~
+M
+10
+say Oh, sugar. That's too sad. This day cannot end fast enough.~
+M
+10
+emote $n blows her nose on a handkerchief and then tucks it up her sleeve.~
+M
+11
+emote $n stares off at nothing in particular with a melancholy look on her face.~
 T 11810
 T 11840
 T 11852
