@@ -2056,6 +2056,11 @@ ACMD(do_lead) {
 	one_argument(argument, arg);
 	
 	if (GET_LEADING_MOB(ch)) {
+		// update spawn time: delay despawn due to interaction
+		if (MOB_FLAGGED(GET_LEADING_MOB(ch), MOB_SPAWNED)) {
+			MOB_SPAWN_TIME(GET_LEADING_MOB(ch)) = time(0);
+		}
+		
 		act("You stop leading $N.", FALSE, ch, NULL, GET_LEADING_MOB(ch), TO_CHAR);
 		act("$n stops leading $N.", FALSE, ch, NULL, GET_LEADING_MOB(ch), TO_ROOM);
 		GET_LED_BY(GET_LEADING_MOB(ch)) = NULL;
@@ -2104,6 +2109,11 @@ ACMD(do_lead) {
 			act("$n begins to lead $N.", TRUE, ch, NULL, mob, TO_ROOM);
 			GET_LEADING_MOB(ch) = mob;
 			GET_LED_BY(mob) = ch;
+			
+			// update spawn time: delay despawn due to interaction
+			if (MOB_FLAGGED(mob, MOB_SPAWNED)) {
+				MOB_SPAWN_TIME(mob) = time(0);
+			}
 		}
 	}
 	else if ((veh = get_vehicle_in_room_vis(ch, arg, NULL))) {

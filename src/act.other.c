@@ -565,6 +565,11 @@ void perform_herd(char_data *ch, char_data *mob, room_data *to_room, int dir, ve
 		was_in = IN_ROOM(ch);
 		out = (dir == NO_DIR && !into_veh);
 		
+		// update spawn time: delay despawn due to interaction
+		if (MOB_FLAGGED(mob, MOB_SPAWNED)) {
+			MOB_SPAWN_TIME(mob) = time(0);
+		}
+		
 		if (perform_move(mob, dir, to_room, MOVE_HERD | (out ? MOVE_EXIT : (into_veh ? (MOVE_ENTER_VEH | MOVE_NO_COST) : NOBITS)))) {
 			if (into_veh) {
 				act("You skillfully herd $N into $v.", FALSE, ch, into_veh, mob, TO_CHAR | ACT_VEHICLE_OBJ);
