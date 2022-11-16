@@ -1,10 +1,10 @@
 #11800
 The Tower Skycleave~
-   The Tower Skycleave, an infamous school of sorcery with the enough power to
+   The Tower Skycleave, an infamous school of sorcery with enough power to
 ensure it stands for all time, faces imminent peril! The tower's vast tools and
 treasures are under the control of mercenaries, pixies, goblins... and worse.
 There's no telling what will happen if Skycleave is allowed to fall into the
-wrong hands. You must rescue the tower in time!
+wrong hands. You must rescue the tower in time, for the glory of the empire!
 ~
 1 4 0 5 c
 K 7 5
@@ -14,11 +14,12 @@ Rescue the Tower Skycleave~
 S
 #11801
 The Skycleave Variations~
-   The Tower Skycleave, an infamous school of sorcery with the enough power to
-ensure it stands for all time, faces imminent peril! The tower's vast tools and
-treasures are under the control of mercenaries, pixies, goblins... and worse.
-There's no telling what will happen if Skycleave is allowed to fall into the
-wrong hands. You must rescue the tower in time!
+   The Tower Skycleave is stuck in a time loop, where the same events play out
+over and over, seemingly without end. But not everything in the tower is set in
+stone. Small ripples lead to subtle variations, perhaps even changing the fate
+of the tower and its occupants. Seek them out -- the villains, foes, and
+adversaries that hide in the tower alike -- and defeat them... for the glory
+of the empire!
 ~
 5 4 0 5 f
 K 7 5

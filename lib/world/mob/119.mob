@@ -2380,7 +2380,7 @@ Elver worthy goblin~
 Elver the Worthy~
 Elver the Worthy stands in the center of the arena. (difficulty)
 ~
-150 250 bdhDJ 0 3
+150 250 bdhDJ E 3
 1 0 0 5
 D
    Elver is on the small side, even for a goblin, nearly outsized by his own
@@ -2413,6 +2413,8 @@ T 11809
 T 11810
 T 11982
 T 11803
+T 11821
+T 11822
 S
 #11957
 Nailbokh axe goblin~
@@ -2441,8 +2443,10 @@ M
 0
 $n waves $s huge axe in the air.~
 T 11973
-T 11982
 T 11803
+T 11987
+T 11821
+T 11822
 S
 #11958
 Biksi champion orka goblin~
@@ -2475,8 +2479,10 @@ M
 0
 $n drags $s whips to create a big circle in the sand.~
 T 11973
-T 11982
 T 11803
+T 11988
+T 11821
+T 11822
 S
 #11959
 sheila page~

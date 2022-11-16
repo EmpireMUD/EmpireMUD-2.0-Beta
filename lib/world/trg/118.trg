@@ -540,6 +540,12 @@ if %self.longdesc% ~= %test%
     %mod% %self% longdesc %replace%
   end
 end
+* special handling: Elver the Worthy
+if %self.vnum% == 11956
+  wait 0
+  %echo% &&j~%self% cuts his palm with a small jade knife and spatters blood across the sand.
+  %load% obj 11972
+end
 ~
 #11810
 Skycleave: Message when no-attack mob is attacked~
@@ -885,6 +891,7 @@ elseif %move% == 2 && !%self.aff_flagged(BLIND)%
   skyfight setup dodge %targ%
   wait 8 s
   if %self.disabled%
+    nop %self.remove_mob_flag(NO-ATTACK)%
     halt
   end
   if !%targ% || %targ.id% != %id%
@@ -961,6 +968,7 @@ if %move% == 1 && !%self.aff_flagged(BLIND)%
   wait 8 s
   dg_affect #11810 %self% off
   if %self.disabled%
+    nop %self.remove_mob_flag(NO-ATTACK)%
     halt
   end
   if !%targ% || %targ.id% != %id%
@@ -978,13 +986,13 @@ if %move% == 1 && !%self.aff_flagged(BLIND)%
   else
     * hit
     %send% %targ% &&m~%self% stabs ^%self% knife into |%targ% ankle as &%self% pops up behind *%targ%!&&0
-    eval dam 10 + (%diff% * 20)
-    %damage% %targ% %dam% physical
-    %dot% #11816 %targ% %dam% 15 physical
     if %diff% >= 3
       %send% %targ% &&mYour ankle wound slows your movement!&&0
       dg_affect #11816 %targ% SLOW on 15
     end
+    eval dam 10 + (%diff% * 20)
+    %damage% %targ% %dam% physical
+    %dot% #11816 %targ% %dam% 15 physical
   end
   skyfight clear dodge
 elseif %move% == 2
@@ -1002,6 +1010,7 @@ elseif %move% == 2
   while %cycle% < %max%
     wait 5 s
     if %self.disabled%
+      nop %self.remove_mob_flag(NO-ATTACK)%
       halt
     end
     set this 0
@@ -1090,6 +1099,7 @@ if %move% == 1 && !%self.aff_flagged(BLIND)%
   skyfight setup dodge %targ%
   wait 8 s
   if %self.disabled%
+    nop %self.remove_mob_flag(NO-ATTACK)%
     halt
   end
   if !%targ% || %targ.id% != %id%
@@ -1126,6 +1136,7 @@ elseif %move% == 2
   while %cycle% < %max%
     wait 5 s
     if %self.disabled%
+      nop %self.remove_mob_flag(NO-ATTACK)%
       halt
     end
     set this 0
@@ -1235,6 +1246,7 @@ elseif %move% == 2
   skyfight setup dodge all
   wait 3 s
   if %self.disabled%
+    nop %self.remove_mob_flag(NO-ATTACK)%
     halt
   end
   %regionecho% %room% 1 &&y~%self% shouts, 'Blinding Barrage!'&&0
@@ -1265,7 +1277,7 @@ elseif %move% == 2
         elseif %ch.is_pc%
           %send% %ch% &&mYou cover your eyes as you dodge out of the way of the blinding barrage!&&0
         end
-        if %cycle% < %diff%
+        if %cycle% < %diff% && !%broke%
           %send% %ch% &&m**** Here comes another one... ****&&0 (dodge)
         end
       end
@@ -1290,11 +1302,13 @@ elseif %move% == 3
   end
   wait 3 s
   if %self.disabled%
+    nop %self.remove_mob_flag(NO-ATTACK)%
     halt
   end
   %echo% &&mA large glowing sigil spreads across the floor from the impact of Venjer's staff...&&0
   wait 3 s
   if %self.disabled%
+    nop %self.remove_mob_flag(NO-ATTACK)%
     halt
   end
   skyfight setup dodge all
@@ -1352,6 +1366,7 @@ elseif %move% == 4 && !%self.aff_flagged(BLIND)%
   while %cycle% <= %diff% && !%broke%
     wait 4 s
     if %self.disabled%
+      nop %self.remove_mob_flag(NO-ATTACK)%
       halt
     end
     %regionecho% %room% 1 &&y~%self% shouts, 'Blastmaster Fox!'&&0
@@ -1556,6 +1571,7 @@ elseif %move% == 3
   skyfight setup dodge %targ%
   wait 8 s
   if %self.disabled%
+    nop %self.remove_mob_flag(NO-ATTACK)%
     halt
   end
   if !%targ% || %targ.id% != %id%
@@ -1590,12 +1606,14 @@ elseif %move% == 4
   end
   wait 1 s
   if %self.disabled%
+    nop %self.remove_mob_flag(NO-ATTACK)%
     halt
   end
   skyfight setup dodge all
   %echo% &&m**** &&Z~%self% starts throwing handfuls of pixy dust around the room... ****&&0 (dodge)
   wait 8 s
   if %self.disabled%
+    nop %self.remove_mob_flag(NO-ATTACK)%
     halt
   end
   set ch %room.people%

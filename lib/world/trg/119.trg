@@ -1974,7 +1974,7 @@ end
 Skycleave: Drink Teacup~
 1 s 100
 ~
-dg_affect #11927 %actor% off
+dg_affect #11927 %actor% off silent
 dg_affect #11927 %actor% MANA-REGEN -1 30
 set teleported 0
 * begin loop to wait for sleep
@@ -2038,13 +2038,13 @@ while %count% < 12
       set ch %next_ch%
     done
     set teleported 1
-    dg_affect #11927 %actor% off
+    dg_affect #11927 %actor% off silent
     halt
   end
   * next while loop
   eval count %count% + 1
 done
-dg_affect #11927 %actor% off
+dg_affect #11927 %actor% off silent
 ~
 #11928
 Skycleave: skyrogueslay command for floor 3~
@@ -3237,17 +3237,17 @@ Skycleave: Consume handler (long potions and other consumables)~
 * handles long-duration skycleave potions plus other consumables
 switch %self.vnum%
   case 11912
-    dg_affect #%self.vnum% %actor% off
+    dg_affect #%self.vnum% %actor% off silent
     dg_affect #%self.vnum% %actor% WATERWALK on 86400
     %send% %actor% # Your feet start to tingle!
   break
   case 11924
-    dg_affect #%self.vnum% %actor% off
+    dg_affect #%self.vnum% %actor% off silent
     dg_affect #%self.vnum% %actor% INFRA on 86400
     %send% %actor% # Everything seems so much brighter!
   break
   case 11925
-    dg_affect #%self.vnum% %actor% off
+    dg_affect #%self.vnum% %actor% off silent
     dg_affect #%self.vnum% %actor% INVENTORY 35 86400
     %send% %actor% # That's a weight off your shoulders.
   break
@@ -4111,7 +4111,7 @@ while %count% < 12
   * next while loop
   eval count %count% + 1
 done
-dg_affect #11961 %actor% off
+dg_affect #11961 %actor% off silent
 ~
 #11962
 Skycleave: Knezz's broken mirror portal~
@@ -4340,7 +4340,7 @@ while %count% < 12
   * next while loop
   eval count %count% + 1
 done
-dg_affect #11961 %actor% off
+dg_affect #11961 %actor% off silent
 ~
 #11966
 Skycleave: Time-traveler's diary replacement~
@@ -5126,10 +5126,205 @@ if %old_name% != %self.name%
 break
 ~
 #11982
-Goblin's Dream: Arena fight script (Elver, Nailbokh, Biksi)~
+Elver the Worthy combat: Hammer Dance, Ring Your Bell, Prayer of Thunder, Hammer Throw~
 0 k 100
 ~
-* tba
+if %self.cooldown(11800)% || %self.disabled%
+  halt
+end
+set room %self.room%
+set diff %self.diff%
+* order
+set moves_left %self.var(moves_left)%
+set num_left %self.var(num_left,0)%
+if !%moves_left% || !%num_left%
+  set moves_left 1 2 3 4
+  set num_left 4
+end
+* pick
+eval which %%random.%num_left%%%
+set old %moves_left%
+set moves_left
+set move 0
+while %which% > 0
+  set move %old.car%
+  if %which% != 1
+    set moves_left %moves_left% %move%
+  end
+  set old %old.cdr%
+  eval which %which% - 1
+done
+set moves_left %moves_left% %old%
+* store
+eval num_left %num_left% - 1
+remote moves_left %self.id%
+remote num_left %self.id%
+* perform move
+skyfight lockout 30 30
+if %move% == 1
+  * Hammer Dance
+  skyfight clear dodge
+  %echo% &&j~%self% starts dancing around wildly with his hammers out...&&0
+  if %diff% == 1
+    nop %self.add_mob_flag(NO-ATTACK)%
+  end
+  skyfight setup dodge all
+  wait 3 s
+  if %self.disabled%
+  	nop %self.remove_mob_flag(NO-ATTACK)%
+    halt
+  end
+  %echo% &&j**** ~%self% is dancing toward you with his hammers swinging! ****&&0 (dodge)
+  set cycle 1
+  set hit 0
+  eval wait 10 - %diff%
+  while %cycle% <= %diff%
+    skyfight setup dodge all
+    wait %wait% s
+    set ch %room.people%
+    while %ch%
+      set next_ch %ch.next_in_room%
+      if %self.is_enemy(%ch%)%
+        if !%ch.var(did_sfdodge)%
+          set hit 1
+          %echo% &&j|%self% hammers hit ~%ch% as he dances wildly around the arena!&&0
+          if %cycle% == %diff% && %diff% >= 2
+            %send% %ch% That really hurt! Your leg is immobilized.
+            dg_affect #11956 %ch% off silent
+            dg_affect #11956 %ch% IMMOBILIZE on 10
+          end
+          eval amt %diff% * 33
+          %damage% %ch% %amt% physical
+        elseif %ch.is_pc%
+          %send% %ch% &&jYou narrowly avoid the hammer dance!&&0
+        end
+        if %cycle% < %diff%
+          %send% %ch% &&j**** He's whirling back around again... ****&&0 (dodge)
+        end
+      end
+      set ch %next_ch%
+    done
+    eval cycle %cycle% + 1
+  done
+  skyfight clear dodge
+  if !%hit%
+    if %diff% < 3
+      %echo% &&j~%self% spins himself out doing the hammer dance.&&0
+      dg_affect #11852 %self% HARD-STUNNED on 10
+    end
+  end
+  wait 8 s
+elseif %move% == 2
+  * Ring Your Bell
+  if %diff% <= 2
+    nop %self.add_mob_flag(NO-ATTACK)%
+  end
+  eval dodge %diff% * 20
+  dg_affect #11955 %self% DODGE %dodge% 10
+  skyfight clear dodge
+  set targ %self.fighting%
+  set id %targ.id%
+  %send% %targ% &&j**** &&Z~%self% leaps high into the air! ****&&0 (dodge)
+  %echoaround% %targ% &&j~%self% leaps high into the air!&&0
+  skyfight setup dodge %targ%
+  wait 8 s
+  dg_affect #11955 %self% off
+  if %self.disabled%
+    nop %self.remove_mob_flag(NO-ATTACK)%
+    halt
+  end
+  if !%targ% || %targ.id% != %id%
+    * gone
+    %echo% &&j~%self% lands with a little roll.&&0
+  elseif %targ.var(did_sfdodge)%
+    * miss
+    %echo% &&j~%self% goes crashing into the arena sand as he misses ~%targ%!&&0
+    if %diff% < 3
+      dg_affect #11852 %self% HARD-STUNNED on 5
+    end
+    if %diff% < 2
+      %damage% %self% 10 physical
+    end
+  else
+    * hit
+    %send% %targ% &&j~%self% lands on |%targ% chest and clangs both hammers together on ^%targ% head!&&0
+    if %diff% >= 3 && (%self.level% + 100) > %targ.level%
+      %send% %targ% &&jYou're seeing stars!&&0
+      dg_affect #11851 %targ% STUNNED on 15
+    end
+    eval dam 60 + (%diff% * 20)
+    %damage% %targ% %dam% physical
+  end
+  skyfight clear dodge
+elseif %move% == 3
+  * Prayer of Thunder
+  skyfight clear interrupt
+  %echo% &&j**** &&Z~%self% takes a brief respite to pray... ****&&0 (interrupt)
+  skyfight setup interrupt all
+  if %self.diff% < 3 || %room.players_present% < 2
+    set requires 1
+  else
+    set requires 2
+  end
+  wait 4 s
+  if %self.disabled%
+    halt
+  end
+  if %self.var(sfinterrupt_count,0)% < %requires%
+    %echo% &&j**** &&Z~%self% prays toward the standing stone... ****&&0 (interrupt)
+  end
+  wait 4 s
+  if %self.disabled%
+    halt
+  end
+  if %self.var(sfinterrupt_count,0)% >= %requires%
+    %echo% &&j~%self% is interrupted during the prayer... he looks furious!&&0
+    if %diff% == 1
+      dg_affect #11852 %self% HARD-STUNNED on 5
+    end
+    wait 30 s
+  else
+    %echo% &&j~%self% finishes his prayer and holds his hammers to the sky... there is a tremendous crack of thunder!&&0
+    eval amount %diff% * 15
+    dg_affect #11954 %self% BONUS-PHYSICAL %amount% 300
+  end
+  skyfight clear interrupt
+elseif %move% == 4
+  * Hammer Throw
+  skyfight clear dodge
+  set targ %self.fighting%
+  set id %targ.id%
+  %send% %targ% &&j**** &&Z~%self% goes to throw his hammers... and he's aiming at you! ****&&0 (dodge)
+  %echoaround% %targ% &&j~%self% goes to throw his hammers...&&0
+  skyfight setup dodge %targ%
+  wait 8 s
+  if %self.disabled% || %self.aff_flagged(DISARMED)%
+    halt
+  end
+  dg_affect #11953 %self% DISARMED on 30
+  if !%targ% || %targ.id% != %id%
+    * gone
+    dg_affect #11953 %self% off silent
+  elseif %targ.var(did_sfdodge)%
+    * miss
+    %echo% &&j|%self% hammers plunk into the sand as he misses ~%targ%!&&0
+  else
+    * hit
+    %send% %targ% &&j|%self% hammers soar through the air and hit |%targ% head one after the other!&&0
+    if %diff% >= 3 && (%self.level% + 100) > %targ.level%
+      %send% %targ% &&jYou're seeing stars!&&0
+      dg_affect #11851 %targ% STUNNED on 15
+    elseif %diff% >= 2
+      %send% %targ% &&jYou're seeing stars!&&0
+      dg_affect #11952 %targ% IMMOBILIZED on 30
+    end
+    eval dam 60 + (%diff% * 20)
+    %damage% %targ% %dam% physical
+    wait 10 2 s
+    dg_affect #11953 %self% off
+  end
+  skyfight clear dodge
+end
 ~
 #11983
 Iskip combat: Jar of Captivity~
@@ -5307,7 +5502,7 @@ if %move% == 1
             eval enter_%ch.id% %room.var(enter_%ch.id%,%timestamp%)% - (%diff% * 5)
             remote enter_%ch.id% %room.id%
           end
-          dg_affect #11822 %ch% off
+          dg_affect #11822 %ch% off silent
         else
           %send% %ch% &&A**** You are still frozen solid! ****&&0 (struggle)
         end
@@ -5452,7 +5647,7 @@ elseif %move% == 4
         if %cycle% == 3
           * final
           %send% %ch% &&AYou're no longer under pressure but your lungs ache badly!&&0
-          dg_affect #11822 %ch% off
+          dg_affect #11822 %ch% off silent
           * penalty
           dg_affect #11972 %ch% DODGE -%dodge_pain% 25
         else
@@ -5778,6 +5973,18 @@ elseif %move% == 5
   end
 end
 ~
+#11987
+Nailbokh combat: tba~
+0 k 100
+~
+tba
+~
+#11988
+Biksi combat: tba~
+0 k 100
+~
+tba
+~
 #11989
 Goblin's Dream: Guard patrol~
 0 b 50
@@ -5845,7 +6052,7 @@ if !%ch% || !%leader% || %ch.is_enemy(%leader%)% || %self.room% != %leader.room%
   halt
 end
 if %ch.affect(11990)%
-  dg_affect #11990 %ch% off
+  dg_affect #11990 %ch% off silent
 end
 switch %random.12%
   case 1
