@@ -2047,7 +2047,7 @@ enchant) if he doesn't have the item.
 The required object will not be consumed unless it is also in the resource
 list. An example non-consumable augment might require a spellbook object, so
 the effect is that having the spellbook allows the player to enchant weapons
-with extra mana.  An example consumable augment might be a grindstone that
+with extra mana. An example consumable augment might be a grindstone that
 lets a player "hone" a sword with additional to-hit.
 
 See also: OLC AUGMENTS, VNUM

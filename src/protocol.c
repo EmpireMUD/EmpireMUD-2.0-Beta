@@ -850,7 +850,7 @@ const char *ProtocolOutput(descriptor_t *apDescriptor, const char *apData, int *
 							ReportBug(BugString);
 						}
 						else if (!bValid) {
-							sprintf(BugString, "BUG: Unicode substitute '%s' truncated.  Missing ']'?\n", Buffer);
+							sprintf(BugString, "BUG: Unicode substitute '%s' truncated. Missing ']'?\n", Buffer);
 							ReportBug(BugString);
 						}
 						else if (pProtocol->pVariables[eMSDP_UTF_8]->ValueInt) {
@@ -920,7 +920,7 @@ const char *ProtocolOutput(descriptor_t *apDescriptor, const char *apData, int *
 							ReportBug(BugString);
 						}
 						else if (!bValid) {
-							sprintf(BugString, "BUG: Required MXP version '%s' too long.  Missing ']'?\n", Buffer);
+							sprintf(BugString, "BUG: Required MXP version '%s' too long. Missing ']'?\n", Buffer);
 							ReportBug(BugString);
 						}
 						else if (!strcmp(pProtocol->pMXPVersion, "Unknown") || strcmp(pProtocol->pMXPVersion, Buffer) < 0) {
