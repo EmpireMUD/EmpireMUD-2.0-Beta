@@ -1327,7 +1327,7 @@ elseif %move% == 3
       if %self.is_enemy(%ch%)%
         if !%ch.var(did_sfdodge)%
           %echo% &&mThe shaking floor knocks ~%ch% to the floor!&&0
-          if %cycle% == %diff% && %diff% >= 3 && (%self.level% + 100) > %ch.level%
+          if %cycle% == %diff% && %diff% >= 3 && (%self.level% + 100) > %ch.level% && !%ch.aff_flagged(!STUN)%
             dg_affect #11814 %ch% STUNNED on 5
           end
           dg_affect #11818 %ch% TO-HIT -%debuff% 15
@@ -1503,7 +1503,7 @@ if %move% == 1 && !%self.aff_flagged(BLIND)%
     %morph% %targ% %vnum%
     %echoaround% %targ% &&m%old_shortdesc% grows long ears and a tail... and becomes ~%targ%!&&0
     %send% %targ% &&m**** You are suddenly transformed into %targ.name%! ****&&0 (fastmorph normal)
-    if %diff% == 4 && (%self.level% + 100) > %targ.level%
+    if %diff% == 4 && (%self.level% + 100) > %targ.level% && !%targ.aff_flagged(!STUN)%
       dg_affect #11851 %targ% STUNNED on 5
     elseif %diff% >= 2
       nop %targ.command_lag(ABILITY)%
@@ -1632,7 +1632,7 @@ elseif %move% == 4
         %echo% &&m~%ch% is hit by pixy dust and starts to shrink!&&0
         dg_affect #11820 %ch% BONUS-PHYSICAL -%penalty% 30
         dg_affect #11821 %ch% BONUS-MAGICAL -%penalty% 30
-        if %diff% == 4 && (%self.level% + 100) > %ch.level%
+        if %diff% == 4 && (%self.level% + 100) > %ch.level% && !%ch.aff_flagged(!STUN)%
           dg_affect #11851 %ch% STUNNED on 10
         end
         if %diff% >= 2
@@ -1766,7 +1766,7 @@ if %move% == 1 && !%self.aff_flagged(BLIND)%
     %send% %targ% &&mYou trip and fall!&&0
     %echoaround% %targ% &&m~%targ% trips and falls!&&0
     if %diff% > 2
-      if (%self.level% + 100) > %targ.level%
+      if (%self.level% + 100) > %targ.level% && !%targ.aff_flagged(!STUN)%
         dg_affect #11814 %targ% STUNNED on 10
       end
       eval dam 40 + (%diff% * 20)
@@ -1880,6 +1880,8 @@ if %mode% == clear
     end
     if %arg% == free || %arg% == all
       dg_affect #11888 %ch% off
+      dg_affect #11861 %targ% off
+      dg_affect #11949 %ch% off
       rdelete did_sffree %ch.id%
       rdelete needs_sffree %ch.id%
     end
@@ -2106,6 +2108,7 @@ elseif %type% == free
   %echoaround% %actor% ~%actor% frees ~%targ%!
   dg_affect #11888 %targ% off
   dg_affect #11861 %targ% off
+  dg_affect #11949 %targ% off
 end
 ~
 #11823
@@ -3924,7 +3927,7 @@ elseif %move% == 3
   * Complete Darkness
   skyfight clear interrupt
   if %diff% == 1
-    * normal: prevent his attack			-> TODO change this to a debuff
+    * normal: prevent his attack      -> TODO change this to a debuff?
     nop %self.add_mob_flag(NO-ATTACK)%
   end
   skyfight setup interrupt all
@@ -4044,6 +4047,7 @@ elseif %move% == 5
     end
   end
 end
+nop %self.remove_mob_flag(NO-ATTACK)%
 ~
 #11849
 Trixton Vye: Mercenary leader combat script~
@@ -4388,7 +4392,7 @@ if %move% == 1 && !%self.aff_flagged(BLIND)%
     %morph% %target% %vnum%
     %echoaround% %target% &&m%old_shortdesc% is suddenly transformed into ~%target%!&&0
     %send% %target% &&m**** You are suddenly transformed into %target.name%! ****&&0 (fastmorph normal)
-    if %diff% == 4 && (%self.level% + 100) > %target.level%
+    if %diff% == 4 && (%self.level% + 100) > %target.level% && !%target.aff_flagged(!STUN)%
       dg_affect #11851 %target% STUNNED on 5
     elseif %diff% >= 2
       nop %target.command_lag(ABILITY)%
@@ -4482,7 +4486,7 @@ elseif %move% == 3
       else
         set any 1
         %echo% &&mThe rosy pink light strikes ~%ch% in the chest and streams right through *%ch%!&&0
-        if %diff% == 4 && (%self.level% + 100) > %ch.level%
+        if %diff% == 4 && (%self.level% + 100) > %ch.level% && !%ch.aff_flagged(!STUN)%
           dg_affect #11851 %ch% STUNNED on 10
         end
         if %diff% >= 3
