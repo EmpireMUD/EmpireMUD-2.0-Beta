@@ -1124,13 +1124,17 @@ M
 say Where the Tower Skycleave goes, so follows the world.~
 M
 11
-say Madame Niamh and I have been discussing where we might locate a second otherworlder.~
+do skymote caiusniamh~
+M
+11
+skip~
 M
 11
 say If you should stumble across burning wreckage of a round silver chariot, please alert us.~
 T 11810
 T 11852
 T 11840
+T 11862
 S
 #11931
 Niamh resident~
@@ -1383,10 +1387,16 @@ M
 say I don't remember every warm-blooded person's name in the tower. Do you know how many servants have come and gone over the years?~
 M
 8
-say Frankly I can't be bothered with the apprentice names, either, at the rate Niamh goes through them.~
+do skymote scaldniamh1~
 M
 8
-say Always did like her, though. Niamh. She has a healthy respect for the DARK ARTS.~
+skip~
+M
+8
+do skymote scaldniamh2~
+M
+8
+skip~
 M
 8
 emote $n coils in the air as a howling scream escapes his bandages.~

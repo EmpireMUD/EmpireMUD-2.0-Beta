@@ -188,6 +188,13 @@ Your leg recovers from the hammer dance.~
 T5
 ...$e has been hit by the hammer dance!~
 S
+#11957
+axe wound~
+4 0
+0 0 0 0
+T0
+The axe wound stops bleeding.~
+S
 #11961
 crystalline dew~
 4 0

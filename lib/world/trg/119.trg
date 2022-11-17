@@ -4768,7 +4768,7 @@ set ch %room.people%
 while %ch%
   if %ch.is_pc% && %ch.level% >= %min_level% && %self.is_tagged_by(%ch%)%
     set varname pc%ch.id%
-    if !room.var(%varname%,0)% < %pos%
+    if %room.var(%varname%,0)% < %pos%
       * ch qualifies
       set %varname% %pos%
       remote %varname% %room.id%
@@ -5188,7 +5188,7 @@ if %move% == 1
         if !%ch.var(did_sfdodge)%
           set hit 1
           %echo% &&j|%self% hammers hit ~%ch% as he dances wildly around the arena!&&0
-          if %cycle% == %diff% && %diff% >= 2
+          if %diff% >= 2
             %send% %ch% That really hurt! Your leg is immobilized.
             dg_affect #11956 %ch% off silent
             dg_affect #11956 %ch% IMMOBILIZE on 10

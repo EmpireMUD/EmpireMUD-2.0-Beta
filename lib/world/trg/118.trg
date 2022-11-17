@@ -3260,6 +3260,8 @@ Storytime using script1-5~
 * NOTE: waits for %line_gap% (9 sec) after all commands EXCEPT do/vforce/set
 set line_gap 9 sec
 set story_gap 180 sec
+* random wait to offset competing scripts slightly
+wait %random.30%
 * find story number
 if %self.varexists(story)%
   eval story %self.story% + 1
@@ -4795,7 +4797,25 @@ if %actor% != %self%
 end
 set spirit %instance.mob(11900)%
 set room %self.room%
-if %arg% == scaldopen
+if %arg% == caiusniamh
+  if %room.people(11931)%
+    say I have been discussing the otherworlder with Niamh here. Specifically, where we might locate a second one.
+  else
+    say Madame Niamh and I have been discussing where we might locate a second otherworlder.
+  end
+elseif %arg% == scaldniamh1
+  if %room.people(11931)%
+    say Little Niamh here goes through apprentices so fast I can't be bothered with their names.
+  else
+    say Frankly I can't be bothered with the apprentice names, either, at the rate Niamh goes through them.
+  end
+elseif %arg% == scaldniamh2
+  if %room.people(11931)%
+    say Healthy appreciation for the DARK ARTS, eh, Niamh?
+  else
+    say Always did like her, though. Niamh. She has a healthy respect for the DARK ARTS.
+  end
+elseif %arg% == scaldopen
   set rescuer %spirit.var(lich_released,0)%
   if !%rescuer%
     say I should have known none of those unlettered louts would open it.
