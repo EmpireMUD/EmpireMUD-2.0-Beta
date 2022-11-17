@@ -6,11 +6,11 @@ skymerc~
 if %actor% != %self%
   halt
 end
-set difficulty %arg.car%
-if !(%difficulty%)
-  set difficulty 1
+set diff %arg.car%
+if !(%diff%)
+  set diff 1
 end
-set amount %difficulty%
+set amount %diff%
 if %amount% > 3
   * cap at 3 mobs
   set amount 3
@@ -22,13 +22,13 @@ while %iter% < %amount%
   %load% mob %vnum%
   set mob %self.room.people%
   if %mob.vnum% == %vnum%
-    remote difficulty %mob.id%
+    remote diff %mob.id%
   end
   eval iter %iter% + 1
 done
 ~
 #11901
-Skycleave controller~
+Skycleave: Immortal controller / skycleave command~
 1 c 2
 skycleave~
 if !%actor.is_immortal%
@@ -119,65 +119,36 @@ else
 end
 ~
 #11902
-Skycleave: Cleaning crew load trigger~
-0 n 100
+Skycleave: BoE loot quality flags~
+1 n 100
 ~
-* load assistant if bucket
-if %self.vnum% == 11902
-  %load% mob 11903 ally
+* Inherit hard/group flags from an NPC and rescale itself, on NON-CRAFTED BOE
+* first ensure there's a person
+set actor %self.carried_by%
+if !%actor%
+  set actor %self.worn_by%
 end
-* mark time for despawn trig
-set loadtime %timestamp%
-remote loadtime %self.id%
-* custom text
-if %self.vnum% == 11837 && %self.room.template% == 11910
-  %mod% %self% append-lookdesc-noformat &0   The black tower houses many of the most erudite sorcerers from across the
-  %mod% %self% append-lookdesc-noformat world, though their admission standards are not as high as one might expect.
-  %mod% %self% append-lookdesc-noformat Indeed, the tower is often willing to take on any eager apprentice. Some can
-  %mod% %self% append-lookdesc-noformat be molded into powerful magic users. Others, unfortunately, wash out.
-elseif %self.vnum% == 11837 && %self.room.template% == 11930
-  %mod% %self% append-lookdesc-noformat &0   The Tower Skycleave is kept spotless at all times by the many apprentices
-  %mod% %self% append-lookdesc-noformat who have come seeking power. The beauty and perfection of the tower are of such
-  %mod% %self% append-lookdesc-noformat importance to the high sorcerers that they sometimes recruit more students than
-  %mod% %self% append-lookdesc-noformat they need. The brightest ones rise to the top, while the rest are given their
-  %mod% %self% append-lookdesc-noformat walking papers.
+if !%actor%
+  halt
 end
-~
-#11903
-Spirit of Skycleave setup~
-0 n 100
-~
-* initialize vars
-set phase1 0
-set phase2 0
-set phase3 0
-set phase4 0
-set diff1 0
-set diff2 0
-set diff3 0
-set diff4 0
-set claw1 0
-set claw2 0
-set claw3 0
-set claw4 0
-set lab_open 0
-set lich_released 0
-remote lich_released %self.id%
-remote lab_open %self.id%
-remote claw4 %self.id%
-remote claw3 %self.id%
-remote claw2 %self.id%
-remote claw1 %self.id%
-remote diff4 %self.id%
-remote diff3 %self.id%
-remote diff2 %self.id%
-remote diff1 %self.id%
-remote phase4 %self.id%
-remote phase3 %self.id%
-remote phase2 %self.id%
-remote phase1 %self.id%
-* and remove
-detach 11903 %self.id%
+set rescale 0
+* next check pc/npc
+if %actor.is_npc%
+  if !%self.is_flagged(GENERIC-DROP)%
+    if %actor.mob_flagged(HARD)% && !%self.is_flagged(HARD-DROP)%
+      nop %self.flag(HARD-DROP)%
+      set rescale 1
+    end
+    if %actor.mob_flagged(GROUP)% && !%self.is_flagged(GROUP-DROP)%
+      nop %self.flag(GROUP-DROP)%
+      set rescale 1
+    end
+  end
+end
+if %rescale% && %self.level%
+  wait 0
+  %scale% %self% %self.level%
+end
 ~
 #11904
 Skycleave: Cleaning crew despawn~
@@ -201,6 +172,18 @@ switch %self.vnum%
     * bookshelf: load the skeleton in the lich labs
     %at% i11937 %load% mob 11937
     %at% i11937 %echo% A skeleton sits up on the work bench.
+    * if Knezz and Niamh didn't die, also do the wrangler now
+    if %instance.mob(11968)% && %instance.mob(11931)%
+      set wright %instance.mob(11889)%
+      if %wright%
+        * oh no: Niamh survived and John caught no goblins
+        %at% %wright.room% %echo% ~%wright% trudges out of the room.
+        %purge% %wright%
+        wait 20 s
+        %at% i11914 %load% mob 11926
+        %at% i11914 %echo% A sponge comes rolling in through the doorway.
+      end
+    end
   break
   case 11965
     * trolley: possible replacement for the missing high sorcerer
@@ -214,7 +197,16 @@ switch %self.vnum%
         nop %mob.add_mob_flag(*PICKPOCKETED)%
       end
       %purge% %niamh%
-      wait 3 sec
+      wait 3 s
+      set wright %instance.mob(11889)%
+      if %wright%
+        * oh no: Niamh survived and John caught no goblins
+        %at% %wright.room% %echo% ~%wright% trudges out of the room.
+        %purge% %wright%
+        wait 20 s
+        %at% i11914 %load% mob 11926
+        %at% i11914 %echo% A sponge comes rolling in through the doorway.
+      end
     end
   break
 done
@@ -223,8 +215,8 @@ done
 %purge% %self%
 ~
 #11905
-Skycleave: Shared load script~
-0 n 100
+Skycleave: Shared load script for mobs~
+0 nA 100
 ~
 switch %self.vnum%
   case 11801
@@ -233,6 +225,37 @@ switch %self.vnum%
     dg_affect #11832 %self% !TARGET on -1
     dg_affect #11832 %self% SNEAK on -1
     nop %self.add_mob_flag(SILENT)%
+  break
+  case 11900
+    * spirit of skycleave: init vars
+    set phase1 0
+    set phase2 0
+    set phase3 0
+    set phase4 0
+    set diff1 0
+    set diff2 0
+    set diff3 0
+    set diff4 0
+    set claw1 0
+    set claw2 0
+    set claw3 0
+    set claw4 0
+    set lab_open 0
+    set lich_released 0
+    remote lich_released %self.id%
+    remote lab_open %self.id%
+    remote claw4 %self.id%
+    remote claw3 %self.id%
+    remote claw2 %self.id%
+    remote claw1 %self.id%
+    remote diff4 %self.id%
+    remote diff3 %self.id%
+    remote diff2 %self.id%
+    remote diff1 %self.id%
+    remote phase4 %self.id%
+    remote phase3 %self.id%
+    remote phase2 %self.id%
+    remote phase1 %self.id%
   break
   case 11901
     * gossippers in 1B
@@ -244,7 +267,56 @@ switch %self.vnum%
       eval iter %iter% + 1
     done
   break
+  case 11902
+    * bucket
+    %load% mob 11903 ally
+  break
+  case 11837
+    * swarm of rag
+    if %self.room.template% == 11910
+      %mod% %self% append-lookdesc-noformat &0   The black tower houses many of the most erudite sorcerers from across the
+      %mod% %self% append-lookdesc-noformat world, though their admission standards are not as high as one might expect.
+      %mod% %self% append-lookdesc-noformat Indeed, the tower is often willing to take on any eager apprentice. Some can
+      %mod% %self% append-lookdesc-noformat be molded into powerful magic users. Others, unfortunately, wash out.
+    elseif %self.room.template% == 11930
+      %mod% %self% append-lookdesc-noformat &0   The Tower Skycleave is kept spotless at all times by the many apprentices
+      %mod% %self% append-lookdesc-noformat who have come seeking power. The beauty and perfection of the tower are of such
+      %mod% %self% append-lookdesc-noformat importance to the high sorcerers that they sometimes recruit more students than
+      %mod% %self% append-lookdesc-noformat they need. The brightest ones rise to the top, while the rest are given their
+      %mod% %self% append-lookdesc-noformat walking papers.
+    end
+  break
+  case 11861
+    * Barrosh post-fight
+    wait 0
+    %echo% &&mTime moves backwards for a second as High Sorcerer Barrosh composes himself and holds his staff to the sky, dropping some things in the process...&&0
+    wait 9 sec
+    say For the honor of Skycleave!
+    wait 4 sec
+    %echo% Glass flies everywhere as a bolt of lightning streaks through the window, momentarily blinding you as it strikes the gem on Barrosh's staff!
+    wait 9 sec
+    say By the power invested in me by the Tower Skycleave, I cast out the shadow!
+    wait 9 sec
+    %echo% Barrosh's eyes turn pitch black and he drops to his knees and screams as he throws his head back...
+    wait 9 sec
+    %echo% A thick, smoky shadow streams from Barrosh's eyes with a coarse, sputtering sound...
+    wait 9 sec
+    %echo% The shadow is caught by the light of Barrosh's staff and it evaporates with an agonizing hiss!
+    wait 9 sec
+    say There. It is done. My mind is free. I hate to think of what horrors I committed in that state.
+    wait 9 sec
+    if %instance.mob(11868)%
+      say You have got to free the Grand High Sorcerer. He's the only one who will be able to stop all this.
+    else
+      say You have got to find a way to save the tower. I'm afraid I will not be any further use.
+    end
+  break
 done
+* mark time for despawn trig (if applicable)
+set loadtime %timestamp%
+remote loadtime %self.id%
+* detach me
+detach 11905 %self.id%
 ~
 #11906
 Skycleave: Secret Passage Detection~
@@ -503,7 +575,7 @@ switch %self.vnum%
 done
 ~
 #11911
-Pixy Races: racecall helper command~
+Pixy Races: Racecall (command)~
 0 c 0
 racecall~
 * announces the race in current positions
@@ -858,54 +930,19 @@ remote last_race %jar.id%
 %purge% %self%
 ~
 #11914
-Pixy Races: Check pixy jar command~
+Pixy Races: Check, name, or release pixy jar (command)~
 1 c 2
-check~
+check name release~
+* vars
 set race_time 180
-if %actor.obj_target(%arg.car%)% != %self%
-  return 0
-  halt
-end
 return 1
-* check vnum
-if %self.vnum% == 11913
-  %send% %actor% There's no pixy in the jar. Try catching one.
-  halt
-end
-* check racing
-%send% %actor% You check the pixy jar. It contains: %self.pixy%
-%send% %actor% Wins: %self.wins%, Losses: %self.losses%
-* show stats
-set stat_list speed guile luck
-while %stat_list%
-  set stat %stat_list.car%
-  set stat_list %stat_list.cdr%
-  set value %self.var(%stat%,1)%
-  if %stat% == luck
-    set stat %stat% \&0
-  end
-  if %value% >= 5
-    %send% %actor% %stat%: \*\*\*\*\* 5
-  elseif %value% == 4
-    %send% %actor% %stat%:  \*\*\*\* 4
-  elseif %value% == 3
-    %send% %actor% %stat%:   \*\*\* 3
-  elseif %value% == 2
-    %send% %actor% %stat%:    \*\* 2
-  else
-    %send% %actor% %stat%:     \* 1
-  end
-done
-~
-#11915
-Skycleave: Name or Release pixy jar~
-1 c 2
-name release~
-* covers both 'name <jar> <name>' and 'release <jar>'
+* args
 set arg1 %arg.car%
 set arg2 %arg.cdr%
 if !%arg1%
-  if release /= %cmd%
+  if check /= %cmd%
+    %send% %actor% Usage: check <jar>
+  elseif release /= %cmd%
     %send% %actor% Usage: release <jar>
   else
     %send% %actor% Usage: name <jar> <name>
@@ -924,22 +961,54 @@ elseif %obj.vnum% == 11836 && release /= %cmd%
 elseif %obj% != %self%
   %send% %actor% You can't do that with @%obj%.
   halt
-elseif %obj.last_race% + 180 > %timestamp%
-  %send% %actor% You can't do that while your pixy is racing.
+end
+* check vnum
+if %self.vnum% == 11913
+  %send% %actor% There's no pixy in the jar. Try catching one.
   halt
 end
-if release /= %cmd%
-  if !%arg2% || %arg2% != CONFIRM
+* which command?
+if check /= %cmd%
+  * check racing
+  %send% %actor% You check the pixy jar. It contains: %self.pixy%
+  %send% %actor% Wins: %self.wins%, Losses: %self.losses%
+  * show stats
+  set stat_list speed guile luck
+  while %stat_list%
+    set stat %stat_list.car%
+    set stat_list %stat_list.cdr%
+    set value %self.var(%stat%,1)%
+    if %stat% == luck
+      set stat %stat% \&0
+    end
+    if %value% >= 5
+      %send% %actor% %stat%: \*\*\*\*\* 5
+    elseif %value% == 4
+      %send% %actor% %stat%:  \*\*\*\* 4
+    elseif %value% == 3
+      %send% %actor% %stat%:   \*\*\* 3
+    elseif %value% == 2
+      %send% %actor% %stat%:    \*\* 2
+    else
+      %send% %actor% %stat%:     \* 1
+    end
+  done
+elseif release /= %cmd%
+  if %obj.last_race% + %race_time% > %timestamp%
+    %send% %actor% You can't do that while your pixy is racing.
+  elseif !%arg2% || %arg2% != CONFIRM
     %send% %actor% Are you sure? You must type 'release jar CONFIRM' to do this.
   else
     %send% %actor% You release %self.pixy%, who flies away!
     %echoaround% %actor% ~%actor% releases %self.pixy% from a jar and it flies away!
     %purge% %self%
   end
-else
+elseif name /= %cmd%
   * name
   if %self.varexists(named)% && %self.pixy% != %arg2%
     %send% %actor% It's already named %self.pixy%.
+  elseif %obj.last_race% + %race_time% > %timestamp%
+    %send% %actor% You can't do that while your pixy is racing.
   elseif !%arg2%
     %send% %actor% Name it what?
   elseif %arg2.strlen% > 18
@@ -960,6 +1029,8 @@ else
     %mod% %self% keywords pixy jar %pixy%'s
     %mod% %self% shortdesc %pixy%'s pixy jar
   end
+else
+  return 0
 end
 ~
 #11916
@@ -1107,7 +1178,7 @@ end
 ~
 #11917
 Skycleave: Time traveler's corpse~
-2 gw 100
+2 gwA 100
 ~
 * loads a corpse only if a person visits after having been here on a previous day
 set corpse_vnum 11927
@@ -1139,7 +1210,7 @@ end
 * don't announce it... anyone who didn't see it the first time just "didn't notice"
 ~
 #11918
-Pixy Races: racework helper command~
+Pixy Races: Racework (command)~
 0 c 0
 racework~
 * configure:
@@ -1400,7 +1471,7 @@ elseif %mode% == round
 end
 ~
 #11919
-Pixy Races: raceman helper command~
+Pixy Races: Raceman (command)~
 0 c 0
 raceman~
 * manages the 'start', 'win', and 'tricks' messages/etc argument gives different messages
@@ -1514,12 +1585,12 @@ elseif %arg% == win
   set pos 1
   while %pos% <= 3
     * message owner
-    set owner %self.var(owner%pos%)%
+    set owner_id %self.var(owner%pos%)%
     set name %self.var(name%pos%)%
     set winner %self.var(winner%pos%)%
-    if %owner% > 0
-      makeuid owner %owner%
-      if %owner% && %owner.is_pc%
+    if %owner_id% > 0
+      makeuid owner %owner_id%
+      if %owner% && %owner.is_pc% && %owner.id% == %owner_id%
         if %winner%
           %send% %owner% Your pixy, %name%, won the race!
           if %owner.on_quest(11914)%
@@ -1531,6 +1602,9 @@ elseif %arg% == win
         if %owner.on_quest(11913)%
           %quest% %owner% trigger 11913
         end
+      else
+        * did not find
+        unset owner
       end
     end
     * try finding the jar
@@ -1897,49 +1971,80 @@ if %rogue% && !%rogue.fighting% && !%rogue.disabled%
 end
 ~
 #11927
-Skycleave Enchanting Lab noises~
-2 bw 15
+Skycleave: Drink Teacup~
+1 s 100
 ~
-if %self.template% == 11839
-  * Phase A
-  set rogue %room.people(11848)%
-  if !%rogue% || %rogue.fighting% || %rogue.disabled%
-    * No messages in phase A unless the Rogue Boss is present and free
+dg_affect #11927 %actor% off silent
+dg_affect #11927 %actor% MANA-REGEN -1 30
+set teleported 0
+* begin loop to wait for sleep
+set count 0
+while %count% < 12
+  wait 5 sec
+  set room %actor.room%
+  set to_room 0
+  * see where we're at
+  if %actor.position% != Sleeping || !%room.function(BEDROOM)%
+    * still awake or no bedroom? nothing to do
+  else
+    * Sleeping AND in a bedroom: set a target
+    set to_room %instance.nearest_rmt(11973)%
+  end
+  * did we find a teleport target?
+  if %to_room%
+    * determine where to send them back to
+    if (%room.template% >= 11800 && %room.template% <= 11874) || (%room.template% >= 11900 && %room.template% <= 11974)
+      set skycleave_wake_room %room.template%
+    elseif %actor.varexists(skycleave_wake_room)%
+      set skycleave_wake_room %actor.skycleave_wake_room%
+    else
+      set skycleave_wake_room 0
+    end
+    if !%actor.plr_flagged(ADV-SUMMON)% && !%room.template%
+      nop %actor.mark_adventure_summoned_from%
+    end
+    * ensure boss is spawned
+    set boss %to_room.people(11920)%
+    if !%boss%
+      %at% %to_room% %load% mob 11920
+      %at% %to_room% %echo% You suddenly notice the Grand High Sorceress sitting on her desk.
+    end
+    * move player
+    %echoaround% %actor% ~%actor% lets out a raucous snore and then vanishes into ^%actor% dream.
+    %teleport% %actor% %to_room%
+    nop %actor.link_adventure_summon%
+    %echoaround% %actor% ~%actor% appears out of nowhere, asleep on the floor!
+    %send% %actor% You dream you're flying -- and it feels so real!
+    remote skycleave_wake_room %actor.id%
+    * teleport fellows
+    set ch %room.people%
+    while %ch%
+      set next_ch %ch.next_in_room%
+      if %ch.leader% == %actor% && !%ch.fighting%
+        if %ch.is_pc% && !%ch.plr_flagged(ADV-SUMMON)% && !%room.template%
+          nop %ch.mark_adventure_summoned_from%
+        end
+        %echoaround% %ch% ~%ch% vanishes into thin air!
+        %teleport% %ch% %to_room%
+        if %ch.is_pc%
+          nop %ch.link_adventure_summon%
+          remote skycleave_wake_room %ch.id%
+        end
+        %echoaround% %ch% ~%ch% appears out of nowhere!
+        if %ch.position% != Sleeping
+          %force% %ch% look
+        end
+      end
+      set ch %next_ch%
+    done
+    set teleported 1
+    dg_affect #11927 %actor% off silent
     halt
   end
-  if %rogue.room% != %room% || %rogue.fighting%
-    * Rogue Boss is not in this room or is fighting
-    halt
-  end
-  switch %random.3%
-    case 1
-      %echo% ~%rogue% pulls slightly on one book after another, with a look of disappointment each time.
-    break
-    case 2
-      %echo% ~%rogue% feels along the base of the east wall, looking for something.
-    break
-    case 3
-      %echo% ~%rogue% stabes ^%rogue% dagger into a crack in the east wall, but is unable to pry anything loose.
-    break
-  done
-else
-  * Phase B
-  if !%instance.mob(11940)%
-    * No messages in phase B unless the Magineer is present.
-    halt
-  end
-  switch %random.3%
-    case 1
-      %echo% A strange whirring sound comes from the east.
-    break
-    case 2
-      %echo% It sounds like someone is hammering something to the east.
-    break
-    case 3
-      %echo% You hear a loud thud and then indistinct shouting from the east.
-    break
-  done
-end
+  * next while loop
+  eval count %count% + 1
+done
+dg_affect #11927 %actor% off silent
 ~
 #11928
 Skycleave: skyrogueslay command for floor 3~
@@ -1976,7 +2081,7 @@ wait 1
 %purge% %self%
 ~
 #11929
-Leave breadcrumbs~
+Skycleave: Leave breadcrumbs in the pixy maze~
 2 q 100
 ~
 return 1
@@ -2038,7 +2143,7 @@ if %mob.vnum% == 11928
 end
 ~
 #11931
-Elemental Plane of Water: Despawn boss and empty room when alone~
+Skycleave: Despawn boss and empty room when alone~
 0 ab 50
 ~
 if %self.fighting%
@@ -2053,28 +2158,31 @@ while %ch%
   set ch %ch.next_in_room%
 done
 * nobody here: reset the whole room
-makeuid exit room i11908
-* move any items
-set obj %room.contents%
-while %obj%
-  set next_obj %obj.next_in_list%
-  if %obj.can_wear(TAKE)%
-    %teleport% %obj% %exit%
-    %at% %exit% %echo% # @%obj% rises from the fountain.
-  end
-  set obj %next_obj%
-done
-* move mobs out
-set ch %room.people%
-while %ch%
-  set next_ch %ch.next_in_room%
-  if %ch% != %self%
-    %teleport% %ch% %exit%
-    %at% %exit% %echoaround% %ch% ~%ch% rises from the fountain.
-  end
-  set ch %next_ch%
-done
-* and me
+if %room.template% == 11972
+  * Elemental Plane of Water: empty room
+  makeuid exit room i11908
+  * move any items
+  set obj %room.contents%
+  while %obj%
+    set next_obj %obj.next_in_list%
+    if %obj.can_wear(TAKE)%
+      %teleport% %obj% %exit%
+      %at% %exit% %echo% # @%obj% rises from the fountain.
+    end
+    set obj %next_obj%
+  done
+  * move mobs out
+  set ch %room.people%
+  while %ch%
+    set next_ch %ch.next_in_room%
+    if %ch% != %self%
+      %teleport% %ch% %exit%
+      %at% %exit% %echoaround% %ch% ~%ch% rises from the fountain.
+    end
+    set ch %next_ch%
+  done
+end
+* always: remove me
 %purge% %self%
 ~
 #11932
@@ -2121,7 +2229,7 @@ while %ch% && !%any_ok%
   set ch %ch.next_in_room%
 done
 * and some messaging
-%echo% You manage to defeat the First Water and everything seems to calm around you...
+%echo% &&AYou manage to defeat the First Water and everything seems to calm around you...&&0
 %echo% You grab a breath while you can, but you can't shake the unsettling feeling that the First Water can never be defeated.
 return 0
 ~
@@ -2133,26 +2241,28 @@ if !%self.varexists(scaled)%
   halt
 end
 * determine difficulty and limit
-set difficulty 1
-set limit 120
-if %self.mob_flagged(HARD)%
-  eval difficulty %difficulty% + 1
-  eval limit %limit% + 120
-end
-if %self.mob_flagged(GROUP)%
-  eval difficulty %difficulty% + 2
-  eval limit %limit% + 240
-end
-if %difficulty% == 1
-  * no drowning on normal
-  halt
-end
+set diff %self.var(diff,1)%
+switch %diff%
+  case 2
+    set limit 240
+  break
+  case 3
+    set limit 360
+  break
+  case 4
+    set limit 480
+  break
+  default
+    * no drowning on normal
+    halt
+  break
+done
 set room %self.room%
 set ch %room.people%
 set aggro 0
 while %ch%
   set next_ch %ch.next_in_room%
-  if %ch.is_pc% && !%ch.nohassle%
+  if %ch.is_pc% && !%ch.nohassle% && %ch.position% != Dead
     set varname enter_%ch.id%
     if %room.varexists(%varname%)%
       set time %room.var(%varname%)%
@@ -2172,7 +2282,7 @@ while %ch%
         %teleport% %ch% %exit%
         %load% obj 11805 %ch%
       else
-        %slay% %ch%
+        %slay% %ch% %ch.name% has drowned at %room.coords%!
       end
     elseif %left% < 50
       %send% %ch% &&rYour nose and throat HURT as water presses its way in...&&0
@@ -2235,17 +2345,25 @@ elseif %self.vnum% == 11888 && %arg% == knezz
   * Iskip of Rot and Ruin easter egg
   %send% %actor% You can't get a good look at him from down here.
   return 1
+elseif %self.vnum% == 11920 && (%arg% == mageina || %arg% == barista || %arg% == face)
+  * Grand High Sorceress easter egg
+  %send% %actor% She keeps her head tilted so her hat blocks her face.
+  return 1
 end
 ~
 #11936
-Skycleave: Room commands (Lich Labs, Goblin Cages, Gate, Ossuary)~
+Skycleave: Room commands (Pixy Races, Lich Labs, Goblin Cages, Gate, Ossuary)~
 2 c 0
-touch open disturb wake awaken search attune look~
+touch open disturb wake awaken search attune look bet wager~
 set lich_cmds touch open disturb wake awaken search
 return 0
 if attune /= %cmd% && %room.template% == 11841
   * attunement lab: wrong phase
   %send% %actor% You seem to be in the right place, but the wrong time. There's nobody here to attune skystones for you.
+  return 1
+elseif (bet /= %cmd% || wager /= %cmd%) && %room.template% == 11918
+  * pixy races
+  %send% %actor% It looks like they don't let guests bet on the races.
   return 1
 elseif open /= %cmd% && %room.template% == 11989
   * gobbrabakh of orka gate: can't open it
@@ -2474,7 +2592,7 @@ if %target.room% == %self.room% && %target.is_npc% && %response_mobs% ~= %target
 end
 ~
 #11938
-Skycleave: Walking Sorcery Tower setup~
+Walking Sorcery Tower: interior setup~
 5 n 100
 ~
 set inter %self.interior%
@@ -2497,7 +2615,7 @@ end
 detach 11938 %self.id%
 ~
 #11939
-Goef the Oreonic: Attune skystone~
+Skycleave: Attune skystone at Goef the Oreonic~
 0 c 0
 attune~
 * attunes skystones for the user
@@ -2559,7 +2677,7 @@ remote skystone_progress %actor.id%
 remote skystone_finished %actor.id%
 ~
 #11940
-Skycleave craftables: Craft-or-Drop: Set BoE/BoP and loot quality flags~
+Skycleave: Craft-or-Drop: Set BoE/BoP and loot quality flags~
 1 n 100
 ~
 * This script makes loot BOP when dropped by a mob but BOE when crafted.
@@ -2611,12 +2729,14 @@ if %rescale% && %self.level%
   wait 0
   %scale% %self% %self.level%
 end
+detach 11902 %self.id%
 ~
 #11941
-Iskip: Only drops loot for unique fighters~
+Skycleave: Only drops loot for unique fighters~
 0 f 100
 ~
-* Iskip only loses his !LOOT flag if a unique person over min_level has tagged him
+* mob only loses !LOOT flag if a unique person over min_level has tagged it
+* can also work in reverse, adding it
 set room %self.room%
 set min_level 150
 set done 0
@@ -2645,17 +2765,32 @@ while %ch% && !%done%
   end
   set ch %ch.next_in_room%
 done
-* and message
-if %self.mob_flagged(!LOOT)%
-  %echo% The giant, Iskip, turns to ash as he falls and blows away on the breeze.
-else
-  %echo% The giant, Iskip, turns to ash as he falls, dropping some items on the stump as he blows away on the breeze.
+* ensure !LOOT otherwise
+if !%done%
+  nop %self.add_mob_flag(!LOOT)%
 end
+* and message
+switch %self.vnum%
+  case 11888
+    if %self.mob_flagged(!LOOT)%
+      %echo% &&mThe giant, Iskip, turns to ash as he falls and blows away on the breeze.&&0
+    else
+      %echo% &&mThe giant, Iskip, turns to ash as he falls, dropping some items on the stump as he blows away on the breeze.&&0
+    end
+  break
+  case 11920
+    if %self.mob_flagged(!LOOT)%
+      %echo% &&mThe Grand High Sorceress gives you a coy smile as she disappears in a burst of magenta glitter!&&0
+    else
+      %echo% &&mThe Grand High Sorceress gives you a coy smile as she disappears in a burst of magenta glitter, dropping something as she vanishes!&&0
+    end
+  break
+done
 return 0
 ~
 #11942
-Iskip: Re-spawn boss when new player arrives~
-2 g 100
+Rot and Ruin: Re-spawn boss when new player arrives~
+2 gA 100
 ~
 * Iskip of Rot and Ruin (11888) respawns if any player arrives
 if %actor.is_npc%
@@ -2668,7 +2803,7 @@ if !%mob%
 end
 ~
 #11943
-Skycleave Pixy Maze: Dreams of Smol Nes-Pik~
+Skycleave: Dreams of Smol Nes-Pik~
 2 bw 100
 ~
 * Gives sleeping players dreams -- non-teleporting version
@@ -2775,7 +2910,7 @@ if %sleepy%
 end
 ~
 #11944
-Skycleave Pixy Maze: Pixy's Dream teleporter~
+Smol Nes-Pik: Main entrance dream teleporter~
 2 bw 100
 ~
 * Sleeping players and their NPC followers teleport to Smol Nes-Pik
@@ -3002,13 +3137,14 @@ end
 ~
 #11946
 Skycleave Dreams: Reset wake on poof-in~
-2 gw 100
+2 gwA 100
 ~
 * When a player enters by any means OTHER than normal walking, reset their
 * 'wake' count. Typing 'wake' 3 times exits the area using trigger 11945.
 * This also clears their wake-room, which will be set by another script.
 set dir_list north east south west northwest northeast southwest southeast up down
-if %actor.is_pc% && (%direction% == none || !(%dir_list% ~= %direction%))
+set ok_methods script login
+if %actor.is_pc% && !(%ok_methods% ~= %method%) && (%direction% == none || !(%dir_list% ~= %direction%))
   set skycleave_wake 0
   remote skycleave_wake %actor.id%
   set skycleave_wake_room 0
@@ -3101,17 +3237,17 @@ Skycleave: Consume handler (long potions and other consumables)~
 * handles long-duration skycleave potions plus other consumables
 switch %self.vnum%
   case 11912
-    dg_affect #%self.vnum% %actor% off
+    dg_affect #%self.vnum% %actor% off silent
     dg_affect #%self.vnum% %actor% WATERWALK on 86400
     %send% %actor% # Your feet start to tingle!
   break
   case 11924
-    dg_affect #%self.vnum% %actor% off
+    dg_affect #%self.vnum% %actor% off silent
     dg_affect #%self.vnum% %actor% INFRA on 86400
     %send% %actor% # Everything seems so much brighter!
   break
   case 11925
-    dg_affect #%self.vnum% %actor% off
+    dg_affect #%self.vnum% %actor% off silent
     dg_affect #%self.vnum% %actor% INVENTORY 35 86400
     %send% %actor% # That's a weight off your shoulders.
   break
@@ -3127,7 +3263,7 @@ switch %self.vnum%
       %send% %actor% You eat the little white mushroom but you don't feel so good...
       %send% %actor% Oh no... the world goes black and the last thing you feel is your head hitting something hard.
       %echoaround% %actor% ~%actor% eats a little white mushroom...
-      %slay% %actor%
+      %slay% %actor% %actor.name% has accidentally died at %actor.room.coords%!
       return 0
       %purge% %self%
     end
@@ -3135,7 +3271,7 @@ switch %self.vnum%
 done
 ~
 #11951
-Smol Nes-Pik: Block abilities in the jar~
+Queen's Nightmare: Block abilities in the jar~
 2 p 100
 ~
 %send% %actor% None of your abilities have any effect in this jar. What a nightmare!
@@ -3143,7 +3279,7 @@ Smol Nes-Pik: Block abilities in the jar~
 return 0
 ~
 #11952
-Smol Nes-Pik: Inside the sap: catch look and skip~
+Rot and Ruin: Inside the sap: catch look and skip~
 2 c 0
 look skip~
 if %cmd.mudcommand% == look && !%arg%
@@ -3161,8 +3297,8 @@ else
 end
 ~
 #11953
-Smol Nes-Pik: Sap teleport manager (room)~
-2 bgw 100
+Rot and Ruin: Sap teleport manager (room)~
+2 bgwA 100
 ~
 * this runs both at random and on enter
 if %actor%
@@ -3213,7 +3349,7 @@ if %sap.vnum% == 11891
 end
 ~
 #11954
-Smol Nes-Pik: Rot and Ruin intro/teleport~
+Rot and Ruin: Sap intro/teleport~
 1 b 100
 ~
 * fetch cycle
@@ -3253,22 +3389,23 @@ switch %cycle%
     %send% %person% As the tree comes crashing down, so too falls a fatal stillness. For a moment, nothing moves. The giant stands mid-swing. Shards of rotten wood hang like a cloud around the trunk.
   break
   default
-    %send% %person% Slowly, inch by inch, time resumes again, and for the first time in ages, you almost feel like you can breathe again.
     * done: teleport the character
     set target %instance.nearest_rmt(11888)%
     %teleport% %person% %target%
-    %force% %person% look
-    %echoaround% %person% ~%person% emerges from the putrid sap.
     dg_affect #11891 %person% off
+    %force% %person% look
+    %send% %person% &&0
+    %send% %person% Slowly, inch by inch, time resumes again, and for the first time in ages, you almost feel like you can breathe again.
+    %echoaround% %person% ~%person% emerges from the putrid sap.
     * Teleport followers
     set ch %self.room.people%
     while %ch%
       set next_ch %ch.next_in_room%
       if %ch.is_npc% && %ch.leader% == %person% && !%ch.fighting% && !%ch.disabled%
         %teleport% %ch% %target%
+        dg_affect #11891 %ch% off
         %force% %ch% look
         %echoaround% %ch% ~%ch% emerges from the putrid sap.
-        dg_affect #11891 %ch% off
       end
       set ch %next_ch%
     done
@@ -3974,12 +4111,12 @@ while %count% < 12
   * next while loop
   eval count %count% + 1
 done
-dg_affect #11961 %actor% off
+dg_affect #11961 %actor% off silent
 ~
 #11962
-broken mirror portal~
+Skycleave: Knezz's broken mirror portal~
 1 c 4
-enter look~
+enter look examine~
 if (%actor.obj_target(%arg%)% != %self%)
   return 0
   halt
@@ -3987,13 +4124,14 @@ end
 set destination_floor %random.4%
 switch %destination_floor%
   case 1
-    eval destination_room 11800 + %random.8% - 1
+    eval destination_room 11800 + %random.9% - 1
   break
   case 2
     eval destination_room 11910 + %random.17% - 1
   break
   case 3
-    eval destination_room 11930 + %random.11% - 1
+    eval destination_room 11930 + %random.12% - 1
+    * note that this can go to the magichanical lab even if closed
   break
   case 4
     eval destination_room 11860 + %random.12% - 1
@@ -4045,10 +4183,10 @@ if %cmd.mudcommand% == adventure
   %send% %actor% A Hundred Thousand Moons (inside the Tower Skycleave)
   %send% %actor% by Paul S. Clarke
   %send% %actor% \&0    Discover the lost city of Smol Nes-Pik, meet the people who live there, and
-  %send% %actor% \&0 unravel their fate in this highly-detailed hidden area. For players who enjoy
-  %send% %actor% \&0 an immersive reading experience, each room is filled with extra descriptions
-  %send% %actor% \&0 and many of the characters are animated with vignettes and cutscenes. And
-  %send% %actor% \&0 remember, you can wake up any time.
+  %send% %actor% \&zunravel their fate in this highly-detailed hidden area. For players who enjoy
+  %send% %actor% \&zan immersive reading experience, each room is filled with extra descriptions
+  %send% %actor% \&zand many of the characters are animated with vignettes and cutscenes. And
+  %send% %actor% \&zremember, you can wake up any time.
   %send% %actor% (type 'adventure skycleave' to see the description for the main adventure)
 elseif %cmd.mudcommand% == time
   if %indoor_list% ~= %room.template%
@@ -4202,7 +4340,7 @@ while %count% < 12
   * next while loop
   eval count %count% + 1
 done
-dg_affect #11961 %actor% off
+dg_affect #11961 %actor% off silent
 ~
 #11966
 Skycleave: Time-traveler's diary replacement~
@@ -4345,7 +4483,7 @@ done
 detach 11967 %self.id%
 ~
 #11968
-Skycleave: Gnarled old wand of power~
+Gnarled old wand: By the Power of Skycleave~
 1 c 1
 say ' shout whisper~
 return 0
@@ -4360,17 +4498,44 @@ if !(%arg% ~= %phrase1%) || !(%arg% ~= %phrase2%)
   halt
 end
 wait 1
+* look for mm
+set mm %self.room.people(11905)%
+if !%mm%
+  set mm %self.room.people(11805)%
+end
+if !%mm%
+  set mm %self.room.people(11920)%
+end
+* messaging
 if %actor.is_immortal%
   %echo% A bolt of lightning comes out of nowhere and strikes |%actor% wand!
+elseif %mm%
+  %echo% A bolt of lightning streaks out of nowhere...
+  %echo% ... ~%mm% whips a gnarled old wand out of her sleeve and catches the lightning!
+  wait 1
+  %force% %mm% say No!
+  wait 1
+  if %actor.room% != %mm.room%
+    halt
+  end
+  wait 1
+   %force% %mm% say Expeliarmus!
+  %send% %actor% Before you can even blink, the wand flips out of your hand!
+  %echoaround% %actor% |%actor% wand flips out of ^%actor% hand!
+  wait 1
+  %echo% ~%mm% catches the wand and puts it away.
+  %purge% %self%
 else
   %echo% A bolt of lightning from nowhere strikes ~%actor% right in the chest!
-  %slay% %actor%
+  %slay% %actor% %actor.name% has died of hubris at %actor.room.coords%!
 end
 ~
 #11969
-Skycleave: Hendecagon fountain summoned NPC run~
+Elemental Plane of Water: Hendecagon fountain summoned NPC run~
 0 ab 100
 ~
+wait 3 sec
+* Runs down the tower and into the Elemental Plane of Water
 set down_rooms 11971 11960 11930 11910
 set ne_rooms 11970 11934 11922 11904
 set se_rooms 11963 11933 11913 11903
@@ -4540,19 +4705,19 @@ return 0
 switch %self.vnum%
   case 11956
     * Elver
-    %echo% ~%self% trudges away to tend to ^%self% wounds.
+    %echo% &&j~%self% trudges away to tend to ^%self% wounds.&&0
     set next_vnum 11957
     set pos 1
   break
   case 11957
     * Nailbokh
-    %echo% ~%self% congratulates you and steps out of the arena.
+    %echo% &&j~%self% congratulates you and steps out of the arena.&&0
     set next_vnum 11958
     set pos 2
   break
   case 11958
     * Biksi
-    %echo% ~%self% cheers for you and exits the arena.
+    %echo% &&j~%self% cheers for you and exits the arena.&&0
     set next_vnum 0
     set pos 3
   break
@@ -4567,6 +4732,8 @@ if %next_vnum%
   %load% mob %next_vnum%
   set mob %self.room.people%
   if %mob.vnum% == %next_vnum%
+    set diff %self.var(diff,1)%
+    remote diff %mob.id%
     * setup flags
     if %self.mob_flagged(HARD)%
       nop %mob.add_mob_flag(HARD)%
@@ -4576,7 +4743,7 @@ if %next_vnum%
     end
     %scale% %mob% %self.level%
     * message
-    %echo% ~%mob% steps into the arena!
+    %echo% &&j~%mob% steps into the arena!&&0
   end
   * and load a timer obj to ensure promptness
   %load% obj %must_fight_timer_obj% room
@@ -4654,7 +4821,7 @@ elseif %room.people%
 end
 ~
 #11975
-Skycleave: Goblin's Dream telepoter~
+Goblin's Dream: Main entrance dream telepoter~
 2 bw 100
 ~
 * Sleeping players and their NPC followers teleport to Gobbrabakh of Orka
@@ -4710,10 +4877,10 @@ if %cmd.mudcommand% == adventure
   %send% %actor% Zenith of the Gobbrabakhs (inside the Tower Skycleave)
   %send% %actor% by Paul S. Clarke
   %send% %actor% \&0   Venture back into the Goblin's Dream to experience a culture lost to history
-  %send% %actor% \&0 in this highly-detailed hidden area. For players who enjoy an immersive
-  %send% %actor% \&0 reading experience, each room is filled with extra descriptions and many of
-  %send% %actor% \&0 the characters are animated with vignettes and cutscenes. You can wake up any
-  %send% %actor% \&0 time you want.
+  %send% %actor% \&zin this highly-detailed hidden area. For players who enjoy an immersive
+  %send% %actor% \&zreading experience, each room is filled with extra descriptions and many of
+  %send% %actor% \&zthe characters are animated with vignettes and cutscenes. You can wake up any
+  %send% %actor% \&ztime you want.
   %send% %actor% (type 'adventure skycleave' to see the description for the main adventure)
 elseif %cmd.mudcommand% == time
   if %room.template% == 11981
@@ -4742,7 +4909,7 @@ end
 ~
 #11977
 Elemental Plane of Water: Enter resets breath timer~
-2 g 100
+2 gA 100
 ~
 if !%actor.is_pc%
   halt
@@ -4874,11 +5041,11 @@ eval sex %self.seq% // 2
 switch %sex%
   case 0
     %mod% %mob% sex female
-    %mod% %mob% lookdesc %name% seems thoughtful as she kneels and wipes her forehead with the green sleeve of her long gown.
+    %mod% %mob% lookdesc %name% seems thoughtful as she kneels and wipes her green forehead with the matching sleeve of her long gown.
   break
   case 1
     %mod% %mob% sex male
-    %mod% %mob% lookdesc %name% has a solemn look as he kneels in front of the altar, his long green robe splayed out around him on the rocky floor.
+    %mod% %mob% lookdesc %name% has a solemn look as he kneels in front of the altar with his long green robe, nearly the same shade as his skin, splayed out around him on the rocky floor.
   break
 done
 * announce
@@ -4959,22 +5126,864 @@ if %old_name% != %self.name%
 break
 ~
 #11982
-Goblin's Dream: Arena fight script (Elver, Nailbokh, Biksi)~
-0 k 0
+Elver the Worthy combat: Hammer Dance, Ring Your Bell, Prayer of Thunder, Hammer Throw~
+0 k 100
 ~
-* tba
+if %self.cooldown(11800)% || %self.disabled%
+  halt
+end
+set room %self.room%
+set diff %self.diff%
+* order
+set moves_left %self.var(moves_left)%
+set num_left %self.var(num_left,0)%
+if !%moves_left% || !%num_left%
+  set moves_left 1 2 3 4
+  set num_left 4
+end
+* pick
+eval which %%random.%num_left%%%
+set old %moves_left%
+set moves_left
+set move 0
+while %which% > 0
+  set move %old.car%
+  if %which% != 1
+    set moves_left %moves_left% %move%
+  end
+  set old %old.cdr%
+  eval which %which% - 1
+done
+set moves_left %moves_left% %old%
+* store
+eval num_left %num_left% - 1
+remote moves_left %self.id%
+remote num_left %self.id%
+* perform move
+skyfight lockout 30 30
+if %move% == 1
+  * Hammer Dance
+  skyfight clear dodge
+  %echo% &&j~%self% starts dancing around wildly with his hammers out...&&0
+  if %diff% == 1
+    nop %self.add_mob_flag(NO-ATTACK)%
+  end
+  skyfight setup dodge all
+  wait 3 s
+  if %self.disabled%
+  	nop %self.remove_mob_flag(NO-ATTACK)%
+    halt
+  end
+  %echo% &&j**** ~%self% is dancing toward you with his hammers swinging! ****&&0 (dodge)
+  set cycle 1
+  set hit 0
+  eval wait 10 - %diff%
+  while %cycle% <= %diff%
+    skyfight setup dodge all
+    wait %wait% s
+    set ch %room.people%
+    while %ch%
+      set next_ch %ch.next_in_room%
+      if %self.is_enemy(%ch%)%
+        if !%ch.var(did_sfdodge)%
+          set hit 1
+          %echo% &&j|%self% hammers hit ~%ch% as he dances wildly around the arena!&&0
+          if %cycle% == %diff% && %diff% >= 2
+            %send% %ch% That really hurt! Your leg is immobilized.
+            dg_affect #11956 %ch% off silent
+            dg_affect #11956 %ch% IMMOBILIZE on 10
+          end
+          eval amt %diff% * 33
+          %damage% %ch% %amt% physical
+        elseif %ch.is_pc%
+          %send% %ch% &&jYou narrowly avoid the hammer dance!&&0
+        end
+        if %cycle% < %diff%
+          %send% %ch% &&j**** He's whirling back around again... ****&&0 (dodge)
+        end
+      end
+      set ch %next_ch%
+    done
+    eval cycle %cycle% + 1
+  done
+  skyfight clear dodge
+  if !%hit%
+    if %diff% < 3
+      %echo% &&j~%self% spins himself out doing the hammer dance.&&0
+      dg_affect #11852 %self% HARD-STUNNED on 10
+    end
+  end
+  wait 8 s
+elseif %move% == 2
+  * Ring Your Bell
+  if %diff% <= 2
+    nop %self.add_mob_flag(NO-ATTACK)%
+  end
+  eval dodge %diff% * 20
+  dg_affect #11955 %self% DODGE %dodge% 10
+  skyfight clear dodge
+  set targ %self.fighting%
+  set id %targ.id%
+  %send% %targ% &&j**** &&Z~%self% leaps high into the air! ****&&0 (dodge)
+  %echoaround% %targ% &&j~%self% leaps high into the air!&&0
+  skyfight setup dodge %targ%
+  wait 8 s
+  dg_affect #11955 %self% off
+  if %self.disabled%
+    nop %self.remove_mob_flag(NO-ATTACK)%
+    halt
+  end
+  if !%targ% || %targ.id% != %id%
+    * gone
+    %echo% &&j~%self% lands with a little roll.&&0
+  elseif %targ.var(did_sfdodge)%
+    * miss
+    %echo% &&j~%self% goes crashing into the arena sand as he misses ~%targ%!&&0
+    if %diff% < 3
+      dg_affect #11852 %self% HARD-STUNNED on 5
+    end
+    if %diff% < 2
+      %damage% %self% 10 physical
+    end
+  else
+    * hit
+    %send% %targ% &&j~%self% lands on |%targ% chest and clangs both hammers together on ^%targ% head!&&0
+    if %diff% >= 3 && (%self.level% + 100) > %targ.level%
+      %send% %targ% &&jYou're seeing stars!&&0
+      dg_affect #11851 %targ% STUNNED on 15
+    end
+    eval dam 60 + (%diff% * 20)
+    %damage% %targ% %dam% physical
+  end
+  skyfight clear dodge
+elseif %move% == 3
+  * Prayer of Thunder
+  skyfight clear interrupt
+  %echo% &&j**** &&Z~%self% takes a brief respite to pray... ****&&0 (interrupt)
+  skyfight setup interrupt all
+  if %self.diff% < 3 || %room.players_present% < 2
+    set requires 1
+  else
+    set requires 2
+  end
+  wait 4 s
+  if %self.disabled%
+    halt
+  end
+  if %self.var(sfinterrupt_count,0)% < %requires%
+    %echo% &&j**** &&Z~%self% prays toward the standing stone... ****&&0 (interrupt)
+  end
+  wait 4 s
+  if %self.disabled%
+    halt
+  end
+  if %self.var(sfinterrupt_count,0)% >= %requires%
+    %echo% &&j~%self% is interrupted during the prayer... he looks furious!&&0
+    if %diff% == 1
+      dg_affect #11852 %self% HARD-STUNNED on 5
+    end
+    wait 30 s
+  else
+    %echo% &&j~%self% finishes his prayer and holds his hammers to the sky... there is a tremendous crack of thunder!&&0
+    eval amount %diff% * 15
+    dg_affect #11954 %self% BONUS-PHYSICAL %amount% 300
+  end
+  skyfight clear interrupt
+elseif %move% == 4
+  * Hammer Throw
+  skyfight clear dodge
+  set targ %self.fighting%
+  set id %targ.id%
+  %send% %targ% &&j**** &&Z~%self% goes to throw his hammers... and he's aiming at you! ****&&0 (dodge)
+  %echoaround% %targ% &&j~%self% goes to throw his hammers...&&0
+  skyfight setup dodge %targ%
+  wait 8 s
+  if %self.disabled% || %self.aff_flagged(DISARMED)%
+    halt
+  end
+  dg_affect #11953 %self% DISARMED on 30
+  if !%targ% || %targ.id% != %id%
+    * gone
+    dg_affect #11953 %self% off silent
+  elseif %targ.var(did_sfdodge)%
+    * miss
+    %echo% &&j|%self% hammers plunk into the sand as he misses ~%targ%!&&0
+  else
+    * hit
+    %send% %targ% &&j|%self% hammers soar through the air and hit |%targ% head one after the other!&&0
+    if %diff% >= 3 && (%self.level% + 100) > %targ.level%
+      %send% %targ% &&jYou're seeing stars!&&0
+      dg_affect #11851 %targ% STUNNED on 15
+    elseif %diff% >= 2
+      %send% %targ% &&jYou're seeing stars!&&0
+      dg_affect #11952 %targ% IMMOBILIZED on 30
+    end
+    eval dam 60 + (%diff% * 20)
+    %damage% %targ% %dam% physical
+    wait 10 2 s
+    dg_affect #11953 %self% off
+  end
+  skyfight clear dodge
+end
 ~
 #11983
-Smol Nes-Pik: Iskip of Rot and Ruin fight~
-0 k 0
+Iskip combat: Jar of Captivity~
+0 k 100
 ~
-* tba
+if %self.cooldown(11800)% || %self.disabled%
+  halt
+end
+set room %self.room%
+set diff %self.diff%
+* order
+set moves_left %self.var(moves_left)%
+set num_left %self.var(num_left,0)%
+if !%moves_left% || !%num_left%
+  set moves_left 1
+  set num_left 1
+end
+* pick
+eval which %%random.%num_left%%%
+set old %moves_left%
+set moves_left
+set move 0
+while %which% > 0
+  set move %old.car%
+  if %which% != 1
+    set moves_left %moves_left% %move%
+  end
+  set old %old.cdr%
+  eval which %which% - 1
+done
+set moves_left %moves_left% %old%
+* store
+eval num_left %num_left% - 1
+remote moves_left %self.id%
+remote num_left %self.id%
+* perform move
+skyfight lockout 30 30
+if %move% == 1 && !%self.aff_flagged(BLIND)%
+  * Jar of Captivity
+  skyfight clear free
+  skyfight clear struggle
+  %echo% &&m~%self% pulls out an enormous clay jar and swoops down toward you...&&0
+  wait 3 s
+  if %self.disabled%
+    halt
+  end
+  set targ %random.enemy%
+  if !%targ%
+    halt
+  end
+  set targ_id %targ.id%
+  if %self.fighting% == %targ% && %diff% < 4
+    dg_affect #11852 %self% HARD-STUNNED on 20
+  end
+  if %diff% <= 2 || (%self.level% + 100) <= %targ.level%
+    %send% %targ% &&m**** The jar comes down on your head! You have to break free! ****&&0 (struggle)
+    %echoaround% %targ% &&mThe jar comes down on ~%targ%, trapping *%targ%!&&0
+    skyfight setup struggle %targ% 20
+    set bug %targ.inventory(11890)%
+    if %bug%
+      set strug_char You try to break out of the jar...
+      set strug_room You hear ~%%actor%% trying to break out of the jar...
+      remote strug_char %bug.id%
+      remote strug_room %bug.id%
+      set free_char You break out of the jar!
+      set free_room ~%%actor%% manages to break out of the jar!
+      remote free_char %bug.id%
+      remote free_room %bug.id%
+    end
+    wait 20 s
+    skyfight clear struggle
+  else
+    %send% %targ% &&mThe jar comes down on your head! There's nothing you can do!&&0
+    %echoaround% %targ% &&m**** The jar comes down on ~%targ%, trapping *%targ%! ****&&0 (free %targ.pc_name.car%)
+    skyfight setup free %targ%
+    eval time %diff% * 15
+    dg_affect #11888 %targ% HARD-STUNNED on %time%
+    * wait and clear
+    set done 0
+    while !%done% && %time% > 0
+      wait 5 s
+      eval time %time% - 5
+      if %targ_id% != %targ.id%
+        set done 1
+      elseif !%targ.affect(11888)%
+        set done 1
+      end
+    done
+    skyfight clear free
+  end
+  dg_affect #11852 %self% off
+elseif %move% == 2
+  *
+elseif %move% == 3
+  *
+elseif %move% == 4
+  *
+end
+* in case
+nop %self.remove_mob_flag(NO-ATTACK)%
 ~
 #11984
-Elemental Plane of Water: First Water fight~
-0 k 0
+First Water combat: Frozen Solid, Cavitation Cascade, Lightning Wave, Under Pressure~
+0 k 100
 ~
-* tba
+if %self.cooldown(11800)% || %self.disabled%
+  halt
+end
+set room %self.room%
+set diff %self.diff%
+* order
+set moves_left %self.var(moves_left)%
+set num_left %self.var(num_left,0)%
+if !%moves_left% || !%num_left%
+  set moves_left 1 2 3 4
+  set num_left 4
+end
+* pick
+eval which %%random.%num_left%%%
+set old %moves_left%
+set moves_left
+set move 0
+while %which% > 0
+  set move %old.car%
+  if %which% != 1
+    set moves_left %moves_left% %move%
+  end
+  set old %old.cdr%
+  eval which %which% - 1
+done
+set moves_left %moves_left% %old%
+* store
+eval num_left %num_left% - 1
+remote moves_left %self.id%
+remote num_left %self.id%
+* perform move
+skyfight lockout 30 30
+if %move% == 1
+  * Frozen Solid
+  skyfight clear struggle
+  %echo% &&AThe water around you is suddenly bitter cold... and getting colder by the second!&&0
+  if %diff% <= 3
+    nop %self.add_mob_flag(NO-ATTACK)%
+  end
+  wait 3 s
+  %echo% &&A**** You are frozen solid as the water around you turns to ice! ****&&0 (struggle)
+  skyfight setup struggle all 20
+  set ch %room.people%
+  while %ch%
+    set bug %ch.inventory(11890)%
+    if %bug%
+      set strug_char You struggle to break free of the ice...
+      set strug_room ~%%actor%% struggles to break free...
+      remote strug_char %bug.id%
+      remote strug_room %bug.id%
+      set free_char You manage to get out of the ice!
+      set free_room ~%%actor%% manages to get out of the ice!
+      remote free_char %bug.id%
+      remote free_room %bug.id%
+    end
+    set ch %ch.next_in_room%
+  done
+  * messages
+  set cycle 0
+  while %cycle% < 4
+    wait 5 s
+    set ch %room.people%
+    while %ch%
+      set next_ch %ch.next_in_room%
+      if %ch.affect(11822)%
+        if %cycle% == 3
+          * final
+          %send% %ch% &&AYou're unfrozen but desperately need air...&&0
+          if %diff% >= 3
+            eval enter_%ch.id% %room.var(enter_%ch.id%,%timestamp%)% - (%diff% * 5)
+            remote enter_%ch.id% %room.id%
+          end
+          dg_affect #11822 %ch% off silent
+        else
+          %send% %ch% &&A**** You are still frozen solid! ****&&0 (struggle)
+        end
+      end
+      set ch %next_ch%
+    done
+    if %cycle% >= (4 - %diff%)
+      nop %self.remove_mob_flag(NO-ATTACK)%
+    end
+    eval cycle %cycle% + 1
+  done
+  nop %self.remove_mob_flag(NO-ATTACK)%
+  skyfight clear struggle
+elseif %move% == 2
+  * Cavitation Cascade
+  skyfight clear dodge
+  %echo% &&AThe water calms for the briefest moment before large bubbles start to appear around you...&&0
+  if %diff% <= 2
+    nop %self.add_mob_flag(NO-ATTACK)%
+  end
+  skyfight setup dodge all
+  wait 3 s
+  %echo% &&A**** Suddenly the bubbles around you begin to implode! ****&&0 (dodge)
+  set cycle 1
+  eval wait 12 - %diff%
+  while %cycle% <= %diff%
+    skyfight setup dodge all
+    wait %wait% s
+    set ch %room.people%
+    while %ch%
+      set next_ch %ch.next_in_room%
+      if %self.is_enemy(%ch%)%
+        if !%ch.var(did_sfdodge)%
+          %echo% &&AThere's a blinding flash as a bubble implodes right next to ~%ch%!&&0
+          if %cycle% == %diff% && %diff% >= 3 && (%self.level% + 100) > %ch.level%
+            dg_affect #11851 %ch% STUNNED on 5
+          end
+          eval amt %diff% * 33
+          %damage% %ch% %amt% physical
+        elseif %ch.is_pc%
+          %send% %ch% &&AYou cover your eyes as you swim out of the way of an imploding bubble!&&0
+        end
+        if %cycle% < %diff%
+          %send% %ch% &&A**** Here comes another one... ****&&0 (dodge)
+        end
+      end
+      set ch %next_ch%
+    done
+    eval cycle %cycle% + 1
+  done
+  skyfight clear dodge
+  wait 8 s
+elseif %move% == 3
+  * Lightning Wave
+  %echo% &&AA terrifying clap of thunder shakes you to the core, even down here...&&0
+  %echo% &&A**** The First Water seems to be drawing down the lightning! ****&&0 (interrupt)
+  if %diff% == 1
+    nop %self.add_mob_flag(NO-ATTACK)%
+  end
+  skyfight clear interrupt
+  skyfight setup interrupt all
+  set cycle 0
+  set broke 0
+  set needed %room.players_present%
+  while !%broke% && %cycle% < 5
+    wait 4 s
+    if %self.sfinterrupt_count% >= 1 && (%self.sfinterrupt_count% >= %needed% || %self.sfinterrupt_count% == 4)
+      set broke 1
+      set ch %room.people%
+      while %ch%
+        if %ch.var(did_sfinterrupt,0)%
+          %send% %ch% &&AYou manage to interrupt the First Water before another bolt can come down!&&0
+        end
+        set ch %ch.next_in_room%
+      done
+      %echo% &&AThe water is still for a moment...&&0
+      if %diff% == 1
+        dg_affect #11852 %self% HARD-STUNNED on 10
+        wait 10 s
+      elseif %diff% < 4
+        dg_affect #11852 %self% HARD-STUNNED on 5
+        wait 5 s
+      end
+    else
+      %echo% &&AA bolt strikes the water above you, triggering a lightning wave!&&0
+      set ch %room.people%
+      while %ch%
+        set next_ch %ch.next_in_room%
+        if %self.is_enemy(%ch%)%
+          * hit and no counterspell
+          %send% %ch% &&AYou gurgle in pain as the wave passes through you!&&0
+          %echoaround% %ch% &&A~%ch% gurgles in pain as the wave passes through *%ch%!&&0
+          eval amount %diff% * 20
+          %damage% %ch% %amount% physical
+          if %cycle% == 4 && %diff% == 4 && (%self.level% + 100) > %ch.level%
+            dg_affect #11851 %ch% STUNNED on 10
+          end
+        end
+        set ch %next_ch%
+      done
+    end
+    eval cycle %cycle% + 1
+  done
+  skyfight clear interrupt
+elseif %move% == 4
+  * Under Pressure
+  skyfight clear struggle
+  %echo% &&AThe water goes still for a moment -- too still...&&0
+  nop %self.add_mob_flag(NO-ATTACK)%
+  wait 3 sec
+  %echo% &&A**** You are trapped in a pressure wave! ****&&0 (struggle)
+  skyfight setup struggle all 20
+  set ch %room.people%
+  while %ch%
+    set bug %ch.inventory(11890)%
+    if %bug%
+      set strug_char You struggle to escape the pressure wave...
+      set strug_room ~%%actor%% struggles against the pressure wave...
+      remote strug_char %bug.id%
+      remote strug_room %bug.id%
+      set free_char You manage to get out of the pressure wave!
+      set free_room ~%%actor%% manages to get out of the pressure wave!
+      remote free_char %bug.id%
+      remote free_room %bug.id%
+    end
+    set ch %ch.next_in_room%
+  done
+  * messages
+  set cycle 0
+  eval time_pain (%diff% - 1) * 7.5
+  eval dodge_pain %diff% * 10
+  while %cycle% < 4
+    wait 5 s
+    set ch %room.people%
+    while %ch%
+      set next_ch %ch.next_in_room%
+      if %ch.affect(11822)%
+        if %diff% >= 2
+          eval enter_%ch.id% %room.var(enter_%ch.id%,%timestamp%)% - %time_pain%
+          remote enter_%ch.id% %room.id%
+        end
+        if %cycle% == 3
+          * final
+          %send% %ch% &&AYou're no longer under pressure but your lungs ache badly!&&0
+          dg_affect #11822 %ch% off silent
+          * penalty
+          dg_affect #11972 %ch% DODGE -%dodge_pain% 25
+        else
+          %send% %ch% &&A**** You are trapped stuck in the pressure wave! ****&&0 (struggle)
+        end
+      end
+      set ch %next_ch%
+    done
+    if %cycle% >= (5 - %diff%)
+      nop %self.remove_mob_flag(NO-ATTACK)%
+    end
+    eval cycle %cycle% + 1
+  done
+  nop %self.remove_mob_flag(NO-ATTACK)%
+  skyfight clear struggle
+end
+* in case
+nop %self.remove_mob_flag(NO-ATTACK)%
+~
+#11985
+Gray fox pet behavior~
+0 bt 25
+~
+set list 11893 11946 11947 11977
+set room %self.room%
+set ch %room.people%
+set any 0
+while %ch% && !%any%
+  if %ch% != %self% && %ch.is_npc% && %list% ~= %ch.vnum%
+    set any 1
+    switch %random.9%
+      case 1
+        %echo% One of the foxes yips and plays with the other one.
+      break
+      case 2
+        %echo% One of the foxes sniffs at the other.
+      break
+      case 3
+        %echo% One of the foxes chases the other one in a little circle.
+      break
+      case 4
+        %echo% The two foxes roll around on the ground.
+      break
+      case 5
+        %echo% One fox bites the other one on the tail.
+      break
+      case 6
+        %echo% The foxes tumble around, playing.
+      break
+      case 7
+        %echo% One of the foxes sneaks up on the other one, who leaps into the air!
+      break
+      case 8
+        %echo% A fox nips at the other one.
+      break
+      case 9
+        %echo% The two foxes chase each other back and forth.
+      break
+    done
+  end
+  set ch %ch.next_in_room%
+done
+if %any%
+  nop %self.add_mob_flag(SILENT)%
+else
+  nop %self.remove_mob_flag(SILENT)%
+end
+* short delay
+wait 30 s
+~
+#11986
+Grand High Sorceress combat: Creeping Vines, Cavitation Cascade, Pocket Glitter, Scalding Air, Summon Frens~
+0 k 100
+~
+if %self.cooldown(11800)% || %self.disabled%
+  halt
+end
+set room %self.room%
+set diff %self.diff%
+* order
+set moves_left %self.var(moves_left)%
+set num_left %self.var(num_left,0)%
+if !%moves_left% || !%num_left%
+  set moves_left 1 1 2 2 3 3 4 4 5
+  set num_left 9
+end
+* pick
+eval which %%random.%num_left%%%
+set old %moves_left%
+set moves_left
+set move 0
+while %which% > 0
+  set move %old.car%
+  if %which% != 1
+    set moves_left %moves_left% %move%
+  end
+  set old %old.cdr%
+  eval which %which% - 1
+done
+set moves_left %moves_left% %old%
+* store
+eval num_left %num_left% - 1
+remote moves_left %self.id%
+remote num_left %self.id%
+* perform move
+skyfight lockout 30 30
+if %move% == 1
+  * Creeping Vines
+  skyfight clear struggle
+  %echo% &&y~%self% shouts, 'By the power of Skycleave!'&&0
+  wait 3 sec
+  %echo% &&m**** Creeping vines come out of the woodwork, ensnaring your arms and legs! ****&&0 (struggle)
+  skyfight setup struggle all 20
+  set ch %room.people%
+  while %ch%
+    set bug %ch.inventory(11890)%
+    if %bug%
+      set strug_char You struggle against the vines...
+      set strug_room ~%%actor%% struggles against the vines...
+      remote strug_char %bug.id%
+      remote strug_room %bug.id%
+      set free_char You get a hand loose and are able to escape the vines!
+      set free_room ~%%actor%% manages to free *%%actor%%self!
+      remote free_char %bug.id%
+      remote free_room %bug.id%
+    end
+    set ch %ch.next_in_room%
+  done
+  * damage
+  if %diff% > 1
+    set cycle 0
+    while %cycle% < 5
+      wait 4 s
+      set ch %room.people%
+      while %ch%
+        set next_ch %ch.next_in_room%
+        if %ch.affect(11822)%
+          %send% %ch% &&m**** You bleed from your arms and legs as the thorny vines cut into you! ****&&0 (struggle)
+          eval amount %diff% * 20
+          %damage% %ch% %amount% magical
+        end
+        set ch %next_ch%
+      eval cycle %cycle% + 1
+    done
+  else
+    wait 20 s
+  end
+elseif %move% == 2
+  * Cavitation Cascade
+  skyfight clear dodge
+  %echo% &&y~%self% shouts, 'By the power of Skycleave!'&&0
+  wait 3 sec
+  %echo% &&m**** Suddenly the air around you begin explode with violent blasts! ****&&0 (dodge)
+  set cycle 1
+  eval wait 12 - %diff%
+  while %cycle% <= %diff%
+    skyfight setup dodge all
+    wait %wait% s
+    set ch %room.people%
+    while %ch%
+      set next_ch %ch.next_in_room%
+      if %self.is_enemy(%ch%)%
+        if !%ch.var(did_sfdodge)%
+          %echo% &&mThere's a blinding flash as the air explodes right next to ~%ch%!&&0
+          if %cycle% == %diff% && %diff% >= 3 && (%self.level% + 100) > %ch.level%
+            dg_affect #11851 %ch% STUNNED on 5
+          end
+          eval amt %diff% * 33
+          %damage% %ch% %amt% physical
+        elseif %ch.is_pc%
+          %send% %ch% &&mYou duck behind the furniture as the air explodes!&&0
+        end
+        if %cycle% < %diff%
+          %send% %ch% &&m**** Here comes another one... ****&&0 (dodge)
+        end
+      end
+      set ch %next_ch%
+    done
+    eval cycle %cycle% + 1
+  done
+  skyfight clear dodge
+  wait 8 s
+elseif %move% == 3
+  * Pocket Glitter
+  skyfight clear dodge
+  say Pocket Glitter!
+  wait 1
+  %echo% &&m**** &&Z~%self% pulls a handful of magenta glitter from her pocket and throws it across the room! ****&&0 (dodge)
+  skyfight setup dodge all
+  set any 0
+  set cycle 0
+  eval max (%diff% + 2) / 2
+  while %cycle% < %max%
+    wait 5 s
+    if %self.disabled%
+      halt
+    end
+    set this 0
+    set ch %room.people%
+    while %ch%
+      set next_ch %ch.next_in_room%
+      if %self.is_enemy(%ch%)%
+        if %ch.var(did_sfdodge)%
+          if %diff% == 1
+            dg_affect #11856 %ch% TO-HIT 25 20
+          end
+        else
+          set any 1
+          set this 1
+          %echo% &&mThe glitter gets into |%ch% eyes and nose!&&0
+          switch %random.5%
+            case 1
+              dg_affect #11920 %ch% BLIND on 30
+              %send% %ch% You're blind!
+            break
+            case 2
+              dg_affect #11920 %ch% DODGE -50 30
+              %send% %ch% You're distracted by sparkles in your eyes!
+            break
+            case 3
+              dg_affect #11920 %ch% IMMOBILIZED on 30
+              %send% %ch% Your legs don't seem to work right!
+            break
+            case 4
+              dg_affect #11920 %ch% TO-HIT -50 30
+              %send% %ch% Your arms don't seem to work right!
+            break
+            case 5
+              dg_affect #11920 %ch% SLOW on 30
+              %send% %ch% You're having trouble moving!
+            break
+          done
+          eval dam %diff% * 10
+          %damage% %ch% %dam% physical
+        end
+      end
+      set ch %next_ch%
+    done
+    if !%this%
+      %echo% &&mThe magenta glitter falls harmlessly to the floor.&&0
+    end
+    eval cycle %cycle% + 1
+  done
+  if !%any%
+    * full miss
+    %echo% &&m~%self% looks dizzy as &%self% throws the last knife.&&0
+    dg_affect #11852 %self% HARD-STUNNED on 5
+  end
+  skyfight clear dodge
+elseif %move% == 4
+  * Scalding Air
+  skyfight clear interrupt
+  %echo% &&y~%self% shouts, 'By the power of Skycleave!'&&0
+  wait 3 sec
+  set targ %self.fighting%
+  set id %targ.id%
+  %echo% &&m**** &&Z~%self% holds her gnarled wand high and the air starts to heat up FAST... ****&&0 (interrupt)
+  skyfight setup interrupt all
+  set cycle 0
+  set broke 0
+  while !%broke% && %cycle% < 5
+    wait 4 s
+    if %self.disabled%
+      halt
+    end
+    if %self.sfinterrupt_count% >= 1 && %self.sfinterrupt_count% >= (%diff% + 1) / 2
+      set broke 1
+      set ch %room.people%
+      while %ch%
+        if %ch.var(did_sfinterrupt,0)%
+          %send% %ch% &&mYou manage to distract the sorceress by throwing knickknacks at her!&&0
+        end
+        set ch %ch.next_in_room%
+      done
+      %echo% &&m~%self% is hit in the head with a knickknack; the air starts to cool back down as her spell breaks.&&0
+      if %diff% == 1
+        dg_affect #11852 %self% HARD-STUNNED on 10
+      end
+    else
+      set ch %room.people%
+      while %ch%
+        set next_ch %ch.next_in_room%
+        if %self.is_enemy(%ch%)%
+          if %ch.trigger_counterspell%
+            %send% %ch% &&m... your counterspell does nothing against the scalding air!&&0
+          end
+          * hit!
+          %send% %ch% &&mThe scalding air burns your skin, eyes, and lungs!&&0
+          %echoaround% %ch% &&m~%ch% screams as the air scalds *%ch%!&&0
+          eval amount %diff% * 25
+          %damage% %ch% %amount% magical
+        end
+        set ch %next_ch%
+      done
+    end
+    eval cycle %cycle% + 1
+  done
+  skyfight clear interrupt
+elseif %move% == 5
+  * Summon Frens
+  if %diff% > 2
+    if %random.2% == 1
+      %echo% &&y~%self% shouts, 'Gaaaaableeeeeeeeeeens!'&&0
+      set vnum 11817
+    else
+      %echo% &&y~%self% shouts, 'To me, my little friend!'&&0
+      set vnum 11820
+    end
+    wait 4 s
+    %load% m %vnum% ally %self.level%
+    set mob %room.people%
+    if %mob.vnum% == %vnum%
+      nop %mob.add_mob_flag(!LOOT)%
+      set diff %diff%
+      remote diff %mob.id%
+      if %mob.vnum% == 11820
+        %echo% &&mThere's a flash and a BANG! And ~%mob% comes flying through the fog door!&&0
+      else
+        %echo% &&m~%mob% comes running in from the fog door!&&0
+      end
+      %force% %mob% mkill %actor%
+    end
+  end
+end
+~
+#11987
+Nailbokh combat: tba~
+0 k 100
+~
+tba
+~
+#11988
+Biksi combat: tba~
+0 k 100
+~
+tba
 ~
 #11989
 Goblin's Dream: Guard patrol~
@@ -5032,7 +6041,7 @@ switch %self.room.template%
 done
 ~
 #11990
-Skycleave: Liberated wand~
+Liberated wand casts spells on leader~
 0 bt 5
 ~
 set verb_list flicks swishes taps twirls waves
@@ -5043,7 +6052,7 @@ if !%ch% || !%leader% || %ch.is_enemy(%leader%)% || %self.room% != %leader.room%
   halt
 end
 if %ch.affect(11990)%
-  dg_affect #11990 %ch% off
+  dg_affect #11990 %ch% off silent
 end
 switch %random.12%
   case 1
@@ -5120,7 +6129,7 @@ dg_affect #11990 %ch% %type% %amount% 300
 %echoaround% %ch% ~%self% %verb% itself toward ~%ch%... &%ch% takes on a %glow% glow.
 ~
 #11992
-Skycleave: Smash calamander statuette to create forest~
+Smash striped stone seedling to create calamander forest~
 1 c 2
 smash~
 * smash <self>
@@ -5149,7 +6158,7 @@ end
 %purge% %self%
 ~
 #11993
-Clingy cloak~
+Clingy cloak wears itself on uncloaked people~
 0 btw 20
 ~
 set pers %random.char%
@@ -5165,7 +6174,7 @@ end
 %purge% %self%
 ~
 #11994
-Skycleave Hidden Areas: Fake movement~
+Skycleave: Fake movement in hidden areas~
 2 q 100
 ~
 * for rooms with fake exits: you can't actually leave
@@ -5174,9 +6183,9 @@ set valid_dirs north south east west northeast northwest southeast southwest up 
 if !(%valid_dirs% ~= %direction%)
   halt
 end
-* test if it's a real exit that doesn't go here
+* test if it's a real exit that doesn't go here or to 11974
 eval real_test %%room.%direction%(room)%%
-if %real_test% != %room%
+if %real_test% != %room% && %real_test.template% != 11974
   halt
 end
 * prevent leaving
@@ -5196,18 +6205,22 @@ switch %self.template%
     %echoaround% %actor% ~%actor% swims %direction%.
     %force% %actor% look
   break
+  case 11973
+    %send% %actor% You walk through the cold fog, but find yourself in the same room again on the other side.
+    %echoaround% %actor% ~%actor% walks through the %direction% fog door, but comes back out the other one.
+  break
 done
 ~
 #11995
 Skycleave: Reset comment count on enter (room version)~
-2 g 100
+2 gA 100
 ~
 * pairs with triggers like 11996 to reset comments when a player arrives
 set comment 0
 remote comment %self.id%
 ~
 #11996
-Goblin's Dream: Presence of the god~
+Priest's Dream: Presence of the god~
 2 bw 100
 ~
 * dream cutscene: player meets the god of Orka
@@ -5256,7 +6269,7 @@ switch %comment%
 done
 ~
 #11997
-Skycleave: the adoring fan~
+Adoring fan idle animations~
 0 bt 8
 ~
 * ensure leader
@@ -5336,7 +6349,7 @@ switch %random.10%
 done
 ~
 #11999
-Skycleave: Crystal ball visions~
+Crystal ball visions~
 0 ct 0
 look examine~
 * looking at me?

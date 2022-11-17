@@ -1253,7 +1253,7 @@ int wordcount_building(bld_data *bld) {
 */
 void olc_show_building(char_data *ch) {
 	bld_data *bdg = GET_OLC_BUILDING(ch->desc);
-	char lbuf[MAX_STRING_LENGTH], buf1[MAX_STRING_LENGTH];
+	char buf[MAX_STRING_LENGTH*4], lbuf[MAX_STRING_LENGTH*4];
 	bool is_room = IS_SET(GET_BLD_FLAGS(bdg), BLD_ROOM) ? TRUE : FALSE;
 	struct spawn_info *spawn;
 	int count;
@@ -1300,28 +1300,28 @@ void olc_show_building(char_data *ch) {
 	
 	sprintf(buf + strlen(buf), "Relationships: <%srelations\t0>\r\n", OLC_LABEL_PTR(GET_BLD_RELATIONS(bdg)));
 	if (GET_BLD_RELATIONS(bdg)) {
-		get_bld_relations_display(GET_BLD_RELATIONS(bdg), buf1);
-		strcat(buf, buf1);
+		get_bld_relations_display(GET_BLD_RELATIONS(bdg), lbuf);
+		strcat(buf, lbuf);
 	}
 
 	// exdesc
 	sprintf(buf + strlen(buf), "Extra descriptions: <%sextra\t0>\r\n", OLC_LABEL_PTR(GET_BLD_EX_DESCS(bdg)));
 	if (GET_BLD_EX_DESCS(bdg)) {
-		get_extra_desc_display(GET_BLD_EX_DESCS(bdg), buf1);
-		strcat(buf, buf1);
+		get_extra_desc_display(GET_BLD_EX_DESCS(bdg), lbuf, sizeof(lbuf));
+		strcat(buf, lbuf);
 	}
 
 	sprintf(buf + strlen(buf), "Interactions: <%sinteraction\t0>\r\n", OLC_LABEL_PTR(GET_BLD_INTERACTIONS(bdg)));
 	if (GET_BLD_INTERACTIONS(bdg)) {
-		get_interaction_display(GET_BLD_INTERACTIONS(bdg), buf1);
-		strcat(buf, buf1);
+		get_interaction_display(GET_BLD_INTERACTIONS(bdg), lbuf);
+		strcat(buf, lbuf);
 	}
 	
 	// maintenance resources
 	sprintf(buf + strlen(buf), "Yearly maintenance resources required: <%sresource\t0>\r\n", OLC_LABEL_PTR(GET_BLD_YEARLY_MAINTENANCE(bdg)));
 	if (GET_BLD_YEARLY_MAINTENANCE(bdg)) {
-		get_resource_display(GET_BLD_YEARLY_MAINTENANCE(bdg), buf1);
-		strcat(buf, buf1);
+		get_resource_display(GET_BLD_YEARLY_MAINTENANCE(bdg), lbuf);
+		strcat(buf, lbuf);
 	}
 
 	// scripts

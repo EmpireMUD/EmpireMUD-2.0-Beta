@@ -1209,7 +1209,9 @@ ACMD(do_pickpocket) {
 			act("$n tries to pick your pocket, but you catch $m in the act!", FALSE, ch, NULL, vict, TO_VICT);
 			act("$n tries to pickpocket $N, but is caught!", FALSE, ch, NULL, vict, TO_NOTVICT);
 			
-			engage_combat(ch, vict, TRUE);
+			if (!AFF_FLAGGED(vict, AFF_NO_ATTACK)) {
+				engage_combat(ch, vict, TRUE);
+			}
 		}
 		
 		if (vict_emp && vict_emp != ch_emp) {
@@ -1218,7 +1220,7 @@ ACMD(do_pickpocket) {
 		}
 		
 		// gain either way
-		if (can_gain_exp_from(ch, vict)) {
+		if (can_gain_exp_from(ch, vict) && !AFF_FLAGGED(vict, AFF_NO_ATTACK)) {
 			gain_player_tech_exp(ch, PTECH_PICKPOCKET, 25);
 		}
 		command_lag(ch, WAIT_ABILITY);

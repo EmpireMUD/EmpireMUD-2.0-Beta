@@ -3,7 +3,7 @@
 #n~
 #n is standing here.
 ~
-150 250 dv n 3
+150 250 dvJ n 3
 2 0 0 15
 D
    She's dressed in traveling pants and wears a hat that clearly identifies her
@@ -17,7 +17,7 @@ Dylane trense~
 Dylane~
 Dylane of Trense is here, looking around.
 ~
-150 250 bdvH nK 3
+150 250 bdvHJ nK 3
 1 0 86 15
 D
    Dressed unmistakably in the finery of a nobleman and making no efforts to
@@ -58,7 +58,7 @@ S
 #n~
 #n is looking up at everything.
 ~
-150 250 dv n 3
+150 250 dvJ n 3
 1 0 0 15
 D
    He seems to have a keen interest in architecture as he walks around looking
@@ -93,7 +93,7 @@ S
 #n~
 #n talks with his hands as he walks.
 ~
-150 250 dv n 3
+150 250 dvJ n 3
 1 0 0 15
 D
    He seems to be very knowledgeable about the tower as he's giving a lot of
@@ -108,7 +108,7 @@ corwin page~
 Page Corwin~
 Corwin is bustling about.
 ~
-150 250 dvx n 3
+150 250 dvxJ n 3
 1 0 68 15
 D
    Corwin is sweating under his heavy jute page robe. He's bustling around
@@ -158,7 +158,7 @@ Mageina barista~
 Mageina~
 Mageina is managing several pots of soup.
 ~
-150 250 bdvx n 3
+150 250 bdvxJ n 3
 2 0 0 16
 D
    Mageina moves back and forth between pots of soup, which she heats with a
@@ -190,7 +190,7 @@ I 12 11877 3.00 1 p  # PICKPOCKET: little gemstone flute
 I 12 11878 4.00 1 p  # PICKPOCKET: gemstone knife
 I 12 11977 6.00 1 p  # PICKPOCKET: steamed mussels
 I 12 1206 5.00 1 p  # PICKPOCKET: iridescent blue iris
-I 12 11879 4.00 1 p  # PICKPOCKET: glowing sapphire bud
+I 12 11879 4.00 1 p  # PICKPOCKET: glowing emerald bud
 I 12 11880 4.00 1 p  # PICKPOCKET: ruby rock candy
 I 12 11895 4.00 1 p  # PICKPOCKET: iridescent pearl
 I 12 11897 4.00 1 p  # PICKPOCKET: good rock
@@ -205,7 +205,7 @@ Huberus master sorcerer instructor~
 Master Sorcerer Huberus~
 Master Sorcerer Huberus is making one of the beds.
 ~
-150 250 bdvx n 3
+150 250 bdvxJ n 3
 2 0 0 16
 D
    Huberus is a gruff sort, barely casting a glance from underneath the gnarly
@@ -243,7 +243,7 @@ S
 #n~
 #n is organizing the supplies.
 ~
-150 250 bdvI n 3
+150 250 bdvIJ n 3
 1 0 0 16
 D
    Though he looks like he's new here, he has set right to work sorting and
@@ -284,7 +284,7 @@ S
 #n~
 A young lady is standing here.
 ~
-150 250 dv n 3
+150 250 dvJ n 3
 2 0 102 15
 D
    She's young, not past her second decade, and it looks as if she's been
@@ -330,7 +330,7 @@ S
 #n~
 #n walks around with a huge grin on his face.
 ~
-150 250 dv n 3
+150 250 dvJ n 3
 1 0 0 15
 D
    The young man is dressed in white shirt and dark wool trousers with
@@ -345,7 +345,7 @@ Annaca watcher~
 Annaca~
 Watcher Annaca is struggling to hold a mana shield over the staircase.
 ~
-150 250 bdvx n 3
+150 250 bdvxJ n 3
 2 0 0 15
 D
    Though Annaca's face is strained and contorted as she struggles to hold the
@@ -366,7 +366,7 @@ M
 say I can't hold this shield much longer. The mercenaries are contained on the upper levels.~
 M
 7
-say Which is not necessarily a good thing. All out most powerful artifacts are up there.~
+say Which is not necessarily a good thing. All our most powerful artifacts are up there.~
 M
 7
 say I'm pretty sure masters Knezz and Barrosh are up there, so they may already have it handled...~
@@ -388,7 +388,7 @@ apprentice kayla~
 Kayla~
 Apprentice Kayla is standing here.
 ~
-150 250 dvx n 3
+150 250 dvxJ n 3
 2 0 0 15
 D
    Kayla's white robes have turned gray below the shins and the back side isn't
@@ -406,7 +406,7 @@ cosimo apprentice~
 Cosimo~
 Apprentice Cosimo is lurking in the passage.
 ~
-150 250 bdvx n 3
+150 250 bdvxJ n 3
 1 0 0 15
 D
    Cosimo is clad in dingy white apprentice robes with red trim. His hair is
@@ -428,7 +428,7 @@ tyrone~
 Tyrone~
 Tyrone is relaxing on one of the bunks.
 ~
-150 250 bdvx n 3
+150 250 bdvxJ n 3
 1 0 0 15
 D
    Tyrone looks almost at ease compared to the rest of the tower. His white
@@ -445,7 +445,7 @@ wright old~
 Old Wright~
 Old Wright is reading on his bunk.
 ~
-150 250 bdvx n 3
+150 250 bdvxJ n 3
 1 0 0 15
 D
    Even in the dim light of the bunk room, Wright's advanced age is such that
@@ -464,7 +464,7 @@ goblin uncaged~
 uncaged goblin~
 Uncaged goblin is here.
 ~
-150 250 abd 0 2
+150 250 abdJ 0 2
 0 0 0 15
 D
 Strings set by trig 11824.
@@ -474,13 +474,15 @@ T 11801
 T 11815
 T 11824
 T 11807
+T 11821
+T 11822
 S
 #11816
 goblin commando~
 the goblin commando~
 The goblin commando is here.
 ~
-150 250 abd 0 2
+150 250 abdJ 0 2
 0 0 0 4
 D
 Strings set by trig 11824.
@@ -491,13 +493,15 @@ T 11801
 T 11816
 T 11824
 T 11807
+T 11821
+T 11822
 S
 #11817
 miner goblin~
 a goblin miner~
 Goblin miner is here.
 ~
-150 250 abdI 0 2
+150 250 abdIJ E 2
 0 0 0 8
 D
 Strings set by trig 11824.
@@ -509,13 +513,15 @@ T 11817
 T 11824
 T 11807
 T 11852
+T 11821
+T 11822
 S
 #11818
 Venjer fox goblin~
 Venjer the Fox~
 Venjer the Fox is prodding at the vines with a staff.
 ~
-150 250 abdEI 0 2
+150 250 abdEJ 0 2
 2 0 0 17
 D
    Venjer is a small woman, though she stands tall and proud, light on her feet
@@ -563,20 +569,19 @@ M
 7
 say Not yours. Never yours. Never theirs. Never theirs!~
 T 11801
-T 11813
 T 11818
-T 11822
 T 11807
 T 11806
 T 11803
-T 11852
+T 11821
+T 11822
 S
 #11819
 pixy queen majestic~
 the pixy queen~
 A majestic pixy queen dazzles you with blinding sparkles!
 ~
-150 250 abdE 0 3
+150 250 abdEJ 0 3
 2 0 0 28
 D
    The pixy queen is scarcely more than a colorful sparkle of light. As your
@@ -603,18 +608,18 @@ I+ 5 0  # Group
 I 4 11900 100.00 2  # LOOT: unattuned skystone
 I+ 6 0  # Boss
 T 11948
-T 11813
 T 11819
-T 11821
 T 11823
 T 11807
+T 11821
+T 11822
 S
 #11820
 pixy~
 a pixy~
 A pixy has escaped!
 ~
-150 250 abdxI 0 1
+150 250 abdxIJ 0 1
 0 0 0 28
 D
    The little pixy is no larger than a mouse. It flies on silvery butterfly
@@ -644,13 +649,15 @@ T 11801
 T 11820
 T 11807
 T 11852
+T 11821
+T 11822
 S
 #11821
 Hugh Mann~
 Hugh~
 Hugh Mann stands here in a low hat and full-length coat.
 ~
-150 250 dv n 3
+150 250 dvJ n 3
 1 0 88 15
 D
    It's hard to get a good look at his face since his hat is pulled low. You're
@@ -686,13 +693,14 @@ M
 $n seems to be arguing with $mself inside $s coat.~
 T 11810
 T 11852
+T 11807
 S
 #11822
 #n~
 #n~
 #n seems to be studying the tower.
 ~
-150 250 dv n 3
+150 250 dvJ n 3
 2 0 0 15
 D
    She walks slowly, with her hands behind her back, watching everyone and
@@ -709,7 +717,7 @@ S
 #n~
 #n is walking around.
 ~
-150 250 dvI n 3
+150 250 dvIJ n 3
 1 0 0 15
 D
    He's middle-aged, perhaps past his prime as he stands with a hunch. He's
@@ -747,7 +755,7 @@ S
 #n~
 #n is looking around.
 ~
-150 250 dvHI n 3
+150 250 dvHIJ n 3
 2 0 0 15
 D
    She's dressed like any young village woman; her clothes aren't in fashion
@@ -808,7 +816,7 @@ ravinder apprentice~
 Apprentice Ravinder~
 Ravinder is reclining on a bunk.
 ~
-150 250 bdvx n 3
+150 250 bdvxJ n 3
 1 0 0 15
 D
    Ravinder looks positively exhausted. His apprentice robes are dirty from
@@ -1014,7 +1022,7 @@ S
 #n~
 #n is standing here.
 ~
-150 250 dvHI n 3
+150 250 dvHIJ n 3
 2 0 0 15
 D
    She's a young woman sporting a gold wedding ring, perhaps just married. She
@@ -1062,7 +1070,7 @@ Marina apprentice~
 Marina~
 Marina is sitting with Djon.
 ~
-150 250 bdv n 3
+150 250 bdvJ n 3
 2 0 0 15
 D
    Marina is dressed in white apprentice robes with a bright blue margin. Her
@@ -1075,13 +1083,14 @@ I 12 11872 100.00 1 p  # PICKPOCKET: hand-written note
 T 11828
 T 11810
 T 11852
+T 11807
 S
 #11828
 Djon apprentice~
 Djon~
 Djon is seated at a table in the corner.
 ~
-150 250 bdv n 3
+150 250 bdvJ n 3
 1 0 0 15
 D
    Djon leans back, with one arm propped up on an empty chair. His legs are
@@ -1093,13 +1102,14 @@ F 11800
 I 12 11869 100.00 1 p  # PICKPOCKET: self-writing pen
 T 11810
 T 11852
+T 11807
 S
 #11829
 otherworlder~
 an otherworlder~
 An escaped otherworlder is barreling through!
 ~
-150 250 bdz 0 3
+150 250 bdzJ 0 3
 0 0 37 15
 D
    The otherworlder hunches as it runs to avoid hitting its head. It's taller
@@ -1117,7 +1127,7 @@ Caius sirensbane high master~
 Caius Sirensbane~
 High Master Caius Sirensbane is warding the staircase!
 ~
-150 250 bdvx n 3
+150 250 bdvxJ n 3
 1 0 0 15
 D
    High Master Caius strains against the shining red ward he has placed over
@@ -1159,7 +1169,7 @@ Niamh resident~
 Resident Niamh~
 Resident Niamh is guarding the entrance.
 ~
-150 250 bdvx n 3
+150 250 bdvxJ n 3
 2 0 0 15
 D
    The slump of Niamh's posture, the bags under her eyes, and the red roots
@@ -1178,7 +1188,7 @@ mohammed resident~
 Resident Mohammed~
 Resident Mohammed is helping out.
 ~
-150 250 bdvx n 3
+150 250 bdvxJ n 3
 1 0 0 15
 D
    Mohammed stands like a beanpole, tall and thin, wearing a long, slim, gray
@@ -1195,7 +1205,7 @@ shimmer slight goef~
 the shimmer~
 There's a slight shimmer in the air.
 ~
-150 250 dx dn 3
+150 250 dxJ dn 3
 0 0 27 5
 D
    You first catch the shimmer out of the corner of your eye and almost dismiss
@@ -1210,13 +1220,14 @@ watching them.
 ~
 F 11800
 T 11810
+T 11803
 S
 #11834
 otherworlder person tall blue~
 an otherworlder~
 A tall, blue person is pulling at the chains that hold it to the floor!
 ~
-150 250 bd n 3
+150 250 bdJ n 3
 0 0 0 15
 D
    The otherworlder is taller than a human, with periwinkle skin dappled with
@@ -1251,7 +1262,7 @@ Sanjiv apprentice~
 Apprentice Sanjiv~
 An apprentice is poorly camouflaged against the wall.
 ~
-150 250 bdvx n 3
+150 250 bdvxJ n 3
 1 0 0 15
 D
    A young apprentice is magically camouflaged against the wall. From most
@@ -1269,7 +1280,7 @@ scaldorran lich~
 the Lich Scaldorran~
 The Lich Scaldorran howls as he twists and writhes in the air!
 ~
-150 250 bdvx n 3
+150 250 bdvxJ n 3
 1 0 0 15
 D
    A bone-chilling howl trickles from your ears, down your spine, into your
@@ -1281,6 +1292,24 @@ F 11800
 M
 7
 emote $n comes screaming toward you, lashing at you with snake-like wrappings, before realizing you aren't $s enemy.~
+M
+0
+A low hissing sound from Scaldorran has you worried.~
+M
+0
+You feel painfully cold.~
+M
+0
+Your breath freezes in the air.~
+M
+0
+There's a disturbing chittering noise coming from the lich.~
+M
+0
+You jump as one of Scaldorran's wrappings brushes against your leg.~
+M
+0
+There's a distant scream, perhaps from somewhere inside the lich.~
 T 11839
 T 11806
 S
@@ -1289,7 +1318,7 @@ rags swarm~
 the swarm of rags~
 A swarm of rags is cleaning the walkway.
 ~
-50 50 bdh nG 2
+50 50 bdhJ nG 2
 0 0 2 7
 D
    The cloud of flying rags is in a cleaning frenzy, wiping, scrubbing, and
@@ -1318,17 +1347,17 @@ The rags whip and spin into a little tornado, sucking dust up with them...~
 M
 0
 You swat at a rag as it nearly flies into your face.~
-T 11902
 T 11904
 T 11934
 T 11810
+T 11905
 S
 #11838
 Weyonomon spirit apprentice~
 the spirit of Weyonomon~
 The spirit of Apprentice Weyonomon is wandering, listless.
 ~
-150 250 d n 3
+150 250 dJ n 3
 1 0 27 15
 D
    Weyonomon is -- or rather, was -- a promising young apprentice. He still
@@ -1341,13 +1370,14 @@ F 11800
 T 11838
 T 11810
 T 11837
+T 11803
 S
 #11839
 Annelise~
 Annelise~
 Annelise is seated at one of the tables.
 ~
-150 250 bdvx n 3
+150 250 bdvxJ n 3
 2 0 0 15
 D
    Annelise, the youngest sorcerer you've met in the tower, is seated at a
@@ -1483,7 +1513,7 @@ M
 skip~
 M
 8
-say No! I thought she was on our side. Josef invited her himself, didn't he?~
+say No! I thought she was on our side. Jozef invited her himself, didn't he?~
 M
 8
 vforce 11805 say That he did. They had planned to study the so-called heartwood of time.~
@@ -1571,7 +1601,7 @@ Waltur walter magineer~
 Magineer Waltur~
 Magineer Waltur is here.
 ~
-150 250 bdvx n 3
+150 250 bdvxEJ n 3
 1 0 0 15
 D
    Waltur is a young man, not over the age of 25, and apparently so busy he has
@@ -1595,7 +1625,7 @@ mercenary rogue~
 rogue mercenary~
 Rogue mercenary is skulking around.
 ~
-150 250 abdvI 0 3
+150 250 abdvIJ 0 3
 0 0 0 4
 D
 This mob is loaded by trig 11900/skymerc and named by 11857.
@@ -1635,7 +1665,7 @@ mercenary caster~
 caster mercenary~
 Caster mercenary is studying the books.
 ~
-150 250 abdvxI 0 3
+150 250 abdvxIJ 0 3
 0 0 0 18
 D
 This mob is loaded by trig 11900/skymerc and named by 11857.
@@ -1674,7 +1704,7 @@ mercenary archer~
 archer mercenary~
 Archery mercenary is fletching an arrow.
 ~
-150 250 abdvI 0 3
+150 250 abdvIJ 0 3
 0 0 0 29
 D
 This mob is loaded by trig 11900/skymerc and named by 11857.
@@ -1704,7 +1734,7 @@ mercenary nature mage~
 nature mage mercenary~
 Nature mage mercenary is playing with fire.
 ~
-150 250 abdvI 0 3
+150 250 abdvIJ 0 3
 0 0 0 16
 D
 This mob is loaded by trig 11900/skymerc and named by 11857.
@@ -1734,7 +1764,7 @@ mercenary vampire~
 vampire mercenary~
 Vampire mercenary watches you carefully.
 ~
-150 250 abdvwI 0 3
+150 250 abdvwIJ 0 3
 0 0 0 1
 D
 This mob is loaded by trig 11900/skymerc and named by 11857.
@@ -1764,7 +1794,7 @@ mercenary armored~
 armored mercenary~
 Armored mercenary is spoiling for a fight.
 ~
-150 250 abdvyI s 3
+150 250 abdvyIJ s 3
 0 0 0 5
 D
 This mob is loaded by trig 11900/skymerc and named by 11857.
@@ -1794,7 +1824,7 @@ Kara Virduke~
 Kara Virduke~
 Kara Virduke is digging through cabinets.
 ~
-150 250 bdvxEI 0 3
+150 250 bdvxEIJ 0 3
 2 0 0 17
 D
    Kara Virduke is nearly seven feet tall, such that she must stoop to work in
@@ -1874,18 +1904,19 @@ $n seems to be channeling mana from the cabinets.~
 M
 0
 Waves of mana pulse toward $n.~
-T 11813
 T 11847
 T 11823
 T 11806
 T 11852
+T 11821
+T 11822
 S
 #11848
 Rojjer bleak~
 Bleak Rojjer~
 Bleak Rojjer is searching for something on the left side of the room.
 ~
-150 250 bdvzEI 0 3
+150 250 bdvEIJ CE 3
 1 0 0 4
 D
    Bleak Rojjer's back is to you as you enter. He must think you're one of his
@@ -1908,18 +1939,40 @@ I 4 11900 100.00 1  # LOOT: unattuned skystone
 I+ 5 0  # Group
 I 4 11900 100.00 2  # LOOT: unattuned skystone
 I+ 6 0  # Boss
+M
+0
+$n pulls slightly on one book after another, with a look of disappointment each time.~
+M
+0
+$n feels along the base of the east wall, looking for something.~
+M
+0
+$n stabs $s dagger into a crack in the east wall, but is unable to pry anything loose.~
+M
+1
+Must be in 'ere somewheres...~
+M
+0
+$n kicks the east wall with a hard thud.~
+M
+1
+Opens says me.~
+M
+0
+$n stands back and stares at the painting for a moment.~
 T 11928
-T 11813
 T 11848
 T 11823
 T 11852
+T 11821
+T 11822
 S
 #11849
 Trixton Vye~
 Trixton Vye~
 Trixton Vye is searching for something.
 ~
-150 250 bdvyEI 0 3
+150 250 bdvyEIJ 0 3
 1 0 0 1
 D
    When you enter the room, you do not initially notice Trixton Vye. It's not
@@ -1988,7 +2041,7 @@ prism focusing~
 a focusing prism~
 A focusing prism is floating in the air here.
 ~
-150 250 dhnyD G 1
+150 250 dhnyDJ G 1
 0 0 27 22
 D
    This strange, angular transparent crystal has a steadily growing flicker of
@@ -2001,7 +2054,7 @@ Paige page~
 the page~
 A page hovers motionlessly in the air, her head down.
 ~
-150 250 bdvx n 3
+150 250 bdvxJ n 3
 2 0 0 15
 D
    You walk in a circle around the young page as she hovers there, perfectly
@@ -2017,7 +2070,7 @@ alpaca fluidic~
 a fluidic alpaca~
 A fluidic alpaca sloshes past you!
 ~
-150 250 bd n 3
+150 250 bdJ n 3
 0 0 14 15
 D
    The fluffy alpaca is made of pure water; you can see right through it! It
@@ -2025,13 +2078,14 @@ bounds along, spritzing everyone it passes with a fine mist.
 ~
 T 11969
 T 11810
+T 11864
 S
 #11855
 dragon water~
 a water dragon~
 A dragon made of water flows past you!
 ~
-150 250 bd n 3
+150 250 bdJ n 3
 0 0 5 15
 D
    The water dragon is nearly the height of a pony but the length of a sailing
@@ -2041,13 +2095,14 @@ the way.
 ~
 T 11969
 T 11810
+T 11864
 S
 #11856
 hawk liquiform~
 a liquiform hawk~
 A liquiform hawk soars past you!
 ~
-150 250 bd mn 3
+150 250 bdJ mn 3
 0 0 25 15
 D
    The elegant hawk is transparent, made only of water. Behind it, the wall
@@ -2057,13 +2112,14 @@ then flattens back into a hawk as it glides.
 ~
 T 11969
 T 11810
+T 11864
 S
 #11857
 lion aqueous~
 an aqueous lion~
 An aqueous lion is running through!
 ~
-150 250 bd n 3
+150 250 bdJ n 3
 0 0 11 15
 D
    This majestic lion is made of pure water, sloshing as it runs down
@@ -2072,13 +2128,14 @@ unperturbed by the jaunt outside the fountain.
 ~
 T 11969
 T 11810
+T 11864
 S
 #11858
 unicorn water sparkling~
 a unicorn of sparkling water~
 A unicorn made of sparkling water is running through!
 ~
-150 250 bd n 3
+150 250 bdJ n 3
 0 0 12 15
 D
    This stunning unicorn is made of nothing but sparkling water! It would be a
@@ -2087,13 +2144,14 @@ through the tower, leaving only effervescent bubbles in its wake.
 ~
 T 11969
 T 11810
+T 11864
 S
 #11859
 sheila~
 Sheila~
 Sheila is sitting behind the bed's canopy.
 ~
-150 250 bdvx n 3
+150 250 bdvxJ n 3
 2 0 0 15
 D
    Sheila has taken refuge behind the canopy of the bed, where she can't be
@@ -2110,7 +2168,7 @@ Grace woman old helpless~
 Grace~
 A helpless old woman floats upside-down near the wardrobe.
 ~
-150 250 bdvx n 3
+150 250 bdvxJ n 3
 2 0 0 15
 D
    The old woman appears to be Grace, assistant to High Sorcerer Barrosh. Her
@@ -2127,7 +2185,7 @@ barrosh high sorcerer~
 Barrosh~
 High Sorcerer Barrosh is kneeling on the floor.
 ~
-150 250 bdvxE n 3
+150 250 bdvxEJ n 3
 1 0 0 15
 D
    Barrosh looks disheveled, kneeling on the floor in his violet high sorcerer
@@ -2137,15 +2195,15 @@ he's been crying. When he turns, you see his other eye has been replaced by a
 carved yellow lightning stone.
 ~
 F 11800
-T 11864
 T 11803
+T 11905
 S
 #11862
 thorley apprentice~
 Apprentice Thorley~
 Thorley is hiding behind a chair.
 ~
-150 250 bdvx n 3
+150 250 bdvxJ n 3
 1 0 0 15
 D
    Young Thorley is tucked behind a chair, peeking out at every sound. Already
@@ -2164,7 +2222,7 @@ shadow ascendant mezvienne shade~
 the Shadow Ascendant~
 The Shadow Ascendant looms over the chamber as it draws more and more power!
 ~
-150 250 bdhxy 0 3
+150 250 bdhxyJ 0 3
 0 0 0 20
 D
    The shade, once merely a projection of the powerful enchantress Mezvienne,
@@ -2208,7 +2266,7 @@ Celiya high sorcerer~
 High Sorcerer Celiya~
 High Sorcerer Celiya is coordinating the defense of the tower.
 ~
-150 250 dvx n 3
+150 250 dvxJ n 3
 2 0 0 17
 D
    Celiya looks downright exhausted as she hurries about in high sorcerer robes
@@ -2218,8 +2276,45 @@ clear she hasn't slept in quite some time.
 ~
 F 11800
 I 12 11865 100.00 1 p  # PICKPOCKET: ether condenser
+M
+7
+emote $n sighs to herself.~
+M
+7
+say I'm just worried about Professor Knezz, sugar.~
+M
+8
+emote $n glances upward with a worried glance.~
+M
+8
+say I hope Waltur is okay up there, is all.~
+M
+9
+emote $n wipes her forehead and leans against the wall.~
+M
+9
+say Nobody has heard from Niamh or her assistant, Sanjiv. Niamh can handle herself, you know, but poor Sanjiv.~
+M
+10
+emote $n takes a deep breath and then breathes out hard.~
+M
+10
+say I heard Professor Barrosh shouting earlier, and hon, that ain't good. That man is a rock.~
+M
+11
+emote $n pulls a small wand from her sleeve and points it at her face.~
+M
+11
+say Refrez!~
+M
+11
+emote $n's eyes relax and the tension in her face fades, if only for a moment.~
+M
+11
+say Worth a try, sugar.~
 T 11810
 T 11852
+T 11840
 S
 #11865
 vortex enormous~
@@ -2238,7 +2333,7 @@ Mezvienne enchantress~
 Mezvienne~
 Mezvienne the Enchantress clasps her head and doubles over in pain.
 ~
-150 250 bdvxE n 3
+150 250 bdvxEJ n 3
 2 0 0 15
 D
    Mezvienne screams as she clasps her head, her body twirling almost aimlessly
@@ -2250,13 +2345,14 @@ own back, trying to get something out. You can only watch in horror...
 T 11870
 T 11866
 T 11803
+T 11864
 S
 #11867
 barrosh high sorcerer~
 High Sorcerer Barrosh~
 High Sorcerer Barrosh stands with his staff raised high and an anguished look.
 ~
-150 250 bdhvxy 0 3
+150 250 bdhvxyJ 0 3
 1 0 0 15
 D
    Barrosh takes a menacing position as you enter and seems to be muttering
@@ -2286,7 +2382,7 @@ knezz master~
 Knezz~
 Master Knezz is in his chair, with his head back, and his eyes and mouth wide open.
 ~
-150 250 bdvxE n 3
+150 250 bdvxEJ n 3
 1 0 0 15
 D
    Grand High Sorcerer Knezz doesn't seem to be conscious, splayed out such as
@@ -2307,7 +2403,7 @@ Mezvienne shade shadow~
 the Shade of Mezvienne~
 The Shade of Mezvienne surrounds Knezz like a phantom.
 ~
-150 250 bdhy 0 3
+150 250 bdhyJ 0 3
 0 0 0 7
 D
    The Shade is lithe, feminine, even graceful as it swirls back and forth
@@ -2353,8 +2449,8 @@ knezz grand high sorcerer~
 Knezz~
 Grand High Sorcerer Knezz is sitting in the chair.
 ~
-150 250 bdvx n 3
-1 0 0 15
+150 250 bdvxJ n 3
+1 0 49 15
 D
    The old sorcerer looks exhausted, even drained, as he sits in his chair,
 clutching his knee. Knezz has the characteristic long, unkempt salt-and-pepper
@@ -2364,15 +2460,40 @@ eyebrows and thick crescent glasses, his eyes have the milky blue color of age.
 He sits hunched over, letting his violet and gold robes drape.
 ~
 F 11800
+M
+7
+say Pardon me a moment while I rest.~
+M
+7
+say Just trying to catch my breath.~
+M
+7
+say That sort of thing takes a lot out of a body.~
+M
+7
+say That vile witch.~
+M
+8
+emote $n's bones creak more than the chair as he shifts his weight.~
+M
+8
+say I'm not as young as I used to be.~
+M
+8
+say Just need some time to rest.~
+M
+8
+say I'll be back on my feet in no time.~
 T 11865
 T 11837
+T 11840
 S
 #11871
 Mezvienne enchantress~
 Mezvienne the Enchantress~
 Mezvienne the Enchantress hovers above the tower as she channels the heartwood.
 ~
-150 250 bdhvxyD 0 3
+150 250 bdhvxyDJ 0 3
 2 0 0 21
 D
    The enchantress's long gossamer gown blows madly in the wind as she floats
@@ -2465,13 +2586,15 @@ T 11872
 T 11806
 T 11855
 T 11803
+T 11821
+T 11822
 S
 #11872
 lion time skithe ler-wyn lerwyn~
 the Lion of Time~
 Skithe Ler-Wyn, the Lion of Time, has erupted from Mezvienne's limp body!
 ~
-150 250 bdhyzE 0 3
+150 250 bdhyzEJ 0 3
 2 0 0 10
 D
    Mezvienne the Enchantress floats limp and bloody in the time stream, her
@@ -2503,7 +2626,7 @@ Moneryl astrologer royal~
 the astrologer~
 The royal astrologer is kneeling before the throne.
 ~
-150 250 bdox n 3
+150 250 bdoxJ n 3
 1 0 0 15
 D
    Though the drape of his face shows that days have come and gone since he
@@ -2513,7 +2636,7 @@ instead of stars, it is dotted with bits of dust and the dried crumbs of many
 meals. Moneryl's triangular silver cape, however, is as stiff and perfect as
 everyone else's.
 ~
-I 12 11879 100.00 1  # PICKPOCKET: glowing sapphire bud
+I 12 11879 100.00 1  # PICKPOCKET: glowing emerald bud
 T 11810
 T 11852
 S
@@ -2522,7 +2645,7 @@ envoy~
 the envoy~
 An envoy from Smol Sul-Pik stands before the queen.
 ~
-150 250 bdox n 3
+150 250 bdoxJ n 3
 2 0 0 15
 D
    The envoy is a short, stout woman, clad in rugged green tree-bast traveling
@@ -2540,7 +2663,7 @@ Nayyul messenger young~
 the young messenger~
 A young messenger stands at attention before the queen.
 ~
-150 250 bdox n 3
+150 250 bdoxJ n 3
 1 0 0 15
 D
    Even in his wood and glimstone armor, Nayyul looks young, with sharp, smooth
@@ -2560,7 +2683,7 @@ Pelet urborist royal~
 the urborist~
 The royal urborist stands before the queen.
 ~
-150 250 bdox n 3
+150 250 bdoxJ n 3
 1 0 0 15
 D
    Pelet stands with the hunch of a wizened sage and his voice has a raspy,
@@ -2578,7 +2701,7 @@ Joiago~
 Joiago~
 Joiago is standing here.
 ~
-150 250 dx n 3
+150 250 dxJ n 3
 1 0 86 15
 D
    Joiago stands a full head taller than you, with blue-black hair and hazel
@@ -2601,7 +2724,7 @@ Bastain keeper~
 Keeper Bastain~
 Keeper Bastain is patrolling.
 ~
-150 250 dx n 3
+150 250 dxJ n 3
 1 0 0 15
 D
    Bastain is tall but hunched as he bears a heavy wooden shield over the cape
@@ -2621,7 +2744,7 @@ Veloryan royal guard~
 Veloryan of the Royal Guard~
 Veloryan stands firm in glistering gemstone armor.
 ~
-150 250 bdx n 3
+150 250 bdxJ n 3
 1 0 0 15
 D
    Veloryan stands tall at the left hand of the obsidian throne, unflinching,
@@ -2641,7 +2764,7 @@ Lotte~
 Lotte~
 Lotte is standing here, admiring the city.
 ~
-150 250 dx n 3
+150 250 dxJ n 3
 2 0 0 15
 D
    Lotte is rather short, though she wears stark white hair in a tall beehive
@@ -2665,7 +2788,7 @@ Kym~
 Kym~
 Kym is standing here.
 ~
-150 250 dx n 3
+150 250 dxJ n 3
 2 0 0 15
 D
    Kym is tall and lean, even in the slightly-oversized teal blouse and slacks
@@ -2676,7 +2799,7 @@ triangular cape on her back, adorned with patterns of silver and yellow, stays
 perfectly still as she moves with the elegance of a trained dancer. She gives
 you a crooked smile as you pass her.
 ~
-I 12 11879 100.00 1  # PICKPOCKET: glowing sapphire bud
+I 12 11879 100.00 1  # PICKPOCKET: glowing emerald bud
 T 11810
 T 11852
 S
@@ -2685,7 +2808,7 @@ tresydion high~
 the High Tresydion~
 The High Tresydion stands with his hands folded.
 ~
-150 250 bdx n 3
+150 250 bdxJ n 3
 1 0 0 15
 D
    The tresydion strikes a large and imposing figure in his leaf-like green
@@ -2703,7 +2826,7 @@ Meket black~
 Black Meket~
 Black Meket is kneeling next to the pool.
 ~
-150 250 bdx n 3
+150 250 bdxJ n 3
 1 0 0 15
 D
    Black Meket rocks back and forth slightly as he leans over the shimmering
@@ -2783,7 +2906,7 @@ Queen image queen's Vehl somber~
 the Queen's image~
 The somber image of Queen Vehl sits atop the throne.
 ~
-150 250 bdx n 3
+150 250 bdxJ n 3
 2 0 0 15
 D
    Though she is blessed with the delicate features of a young maiden, Queen
@@ -2807,7 +2930,7 @@ Tyewa~
 Tyewa~
 Tyewa is kneeling by one of the pools.
 ~
-150 250 bdx n 3
+150 250 bdxJ n 3
 2 0 0 15
 D
    Though she's as tall as anyone you've met here, Tyewa has the soft, young
@@ -2816,7 +2939,7 @@ blue under the triangular silver and yellow cape of Smol Nes-Pik. She kneels by
 each pool in turn, touching the surface with her long, delicate fingers,
 swirling it around, then touching her fingers to her closed lips.
 ~
-I 12 11879 100.00 1  # PICKPOCKET: glowing sapphire bud
+I 12 11879 100.00 1  # PICKPOCKET: glowing emerald bud
 T 11810
 T 11852
 S
@@ -2825,7 +2948,7 @@ Torru~
 Torru~
 Torru stands with her arms up and her hands touching the rotted ceiling.
 ~
-150 250 bdx n 3
+150 250 bdxJ n 3
 2 0 0 15
 D
    Torru's face is contorted into a sort of crooked grimace as blood drips from
@@ -2848,7 +2971,7 @@ Nayyur~
 Nayyur~
 Nayyur is kneeling with his head bent low.
 ~
-150 250 bdx n 3
+150 250 bdxJ n 3
 1 0 0 15
 D
    Blood trickles from vicious wounds across Nayyur's back as he slowly rocks
@@ -2867,7 +2990,7 @@ Iskip giant~
 Iskip of Rot and Ruin~
 The giant stands knee-deep in the water, turned away from you. (difficulty)
 ~
-150 250 bdhxyD 0 6
+150 250 bdhxyDJ 0 6
 1 0 0 19
 D
    The giant Iskip is truly huge -- you'd scarcely reach his ankles if he were
@@ -2900,13 +3023,56 @@ T 11810
 T 11935
 T 11983
 T 11803
+T 11821
+T 11822
+S
+#11889
+Wright wrangler~
+Wrangler Wright~
+The goblin wrangler is cleaning up the mess. (list)
+~
+150 250 bdvxJ n 3
+1 0 0 15
+D
+   Though he's old and more than a little scarred, Wrangler Wright seems to be
+enjoying himself as he picks up debris and straightens the room. His skin has
+grown translucent with time, showing every blue vein beneath dark age spots.
+Unlike most of the tower's occupants, he wears no robes -- only simple overalls
+and a gray shirt.
+   Type 'list', 'list id', or 'buy' to see and purchase pvp/solo equipment
+patterns.
+~
+F 11800
+M
+1
+I'm going to lose my job...~
+M
+1
+I'm getting too old for this crap.~
+M
+1
+They're going to blame me for the goblins getting loose in the first place.~
+M
+0
+$n sweeps the debris into the corners.~
+M
+0
+$n cleans the front of a cage.~
+M
+0
+$n struggles in futility to clean the grime out from under $s nails.~
+M
+0
+$n climbs on a chair and tries to clean something brown from the ceiling.~
+T 11934
+T 11810
 S
 #11890
 Celiya high sorcerer difficulty~
 High Sorcerer Celiya~
 High Sorcerer Celiya is shielding the staircase with a powerful spell! (difficulty)
 ~
-150 250 bdvx n 3
+150 250 bdvxJ n 3
 2 0 0 17
 D
    The high sorcerer looks bedraggled, almost exhausted, in her layered purple
@@ -2952,7 +3118,7 @@ Annaca watcher difficulty~
 Watcher Annaca~
 Watcher Annaca is struggling to hold a mana shield over the staircase. (difficulty)
 ~
-150 250 bdvx n 3
+150 250 bdvxJ n 3
 2 0 0 15
 D
    Though Annaca's face is strained and contorted as she struggles to hold the
@@ -2994,7 +3160,7 @@ Caius sirensbane high master difficulty~
 Caius Sirensbane~
 High Master Caius Sirensbane is warding the staircase! (difficulty)
 ~
-150 250 bdvx n 3
+150 250 bdvxJ n 3
 1 0 0 15
 D
    High Master Caius strains against the shining red ward he has placed over
@@ -3026,7 +3192,7 @@ T 11806
 T 11852
 S
 #11893
-fox gray~
+fox gray grey~
 a gray fox~
 A gray fox is sitting on the ground.
 ~
@@ -3068,6 +3234,7 @@ $n chases its tail in a circle.~
 M
 0
 $n rolls around on the ground.~
+T 11985
 S
 #11894
 progress sense phase changer~

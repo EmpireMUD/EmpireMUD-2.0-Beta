@@ -1225,7 +1225,7 @@ See also: OLC ABILITIES, BUFF ABILITY, CRAFT ABILITY, DAMAGE ABILITY,
    DOT ABILITY, PLAYER-TECH ABILITY, PASSIVE-BUFF ABILITY,
    READY-WEAPONS ABILITY, COMPANION ABILITY, SUMMON ABILITY
 #d
-"ABILEDIT WAITTYPE" "ABILEDIT WAIT TYPE"
+"ABILEDIT WAITTYPE" "ABILEDIT WAIT TYPE" "WAIT TYPES"
 
 Usage:  .waittype <type>
 
@@ -1233,7 +1233,14 @@ The wait type is how long the character has "command lag" after using this
 ability. These are standardized wait times, so you select them from a list
 based on what type of ability you're making.
 
-Choose the wait type that best fits your ability.
+Choose the wait type that best fits your ability:
+  &cNONE&0 - no wait
+  &cABILITY&0 - basic ability (not combat)
+  &cCOMBAT-ABILITY&0 - combat ability (like kick)
+  &cCOMBAT-SPELL&0 - combat spell
+  &cMOVEMENT&0 - basic movement, based on riding etc
+  &cSPELL&0 - a basic spell (not a combat spell)
+  &cOTHER&0 - anything else that needs a wait
 
 See also: COMMAND LAG, OLC ABILITIES
 #d
@@ -3558,6 +3565,8 @@ Affects have 4 properties:
     applied.
   <&ywearoff&0> An optional message shown to the character when the affect ends.
   <&ywearoff2room&0> An optional message shown to the rest of the room.
+  <&ylookatchar&0> An optional message shown after description on 'look name'.
+  <&ylookatroom&0> An optional message shown after the character on 'look'.
 
 You can use <&ystandardwearoff&0> to add the normal wear-off message. This only
 adds a message for the character -- normal effects don't show anything to the
@@ -3582,6 +3591,36 @@ This message is sent to the room when a person gains this affect. It will
 only be shown to players who can see that person. This message is optional.
 
 See also: OLC GENERICS, GENERIC AFFECTS
+#d
+"GENEDIT LOOKATCHAR" "GENEDIT LOOK-AT-CHAR" "GENEDIT LOOK AT CHAR"
+
+Usage:  .lookatchar <message | none>
+
+This message is shown below the character description when another person looks
+at them while this affect is on them. This message is optional.
+
+Can use $n, $e, $s, and $m tokens.
+
+Example:
+You look at Albert:
+You notice a distinct, red glint in his eyes.
+
+See also: OLC GENERICS, GENERIC AFFECTS, DOLLAR SIGN CODES
+#d
+"GENEDIT LOOKATROOM" "GENEDIT LOOK-AT-ROOM" "GENEDIT LOOK AT ROOM"
+
+Usage:  .lookatroom <message | none>
+
+This messages is shown below the character when a person looks at the room they
+are in while they have this affect. This message is optional.
+
+Can use $n, $e, $s, and $m tokens. Messages usually start with "...$e".
+
+Example:
+<Queen> Victoria stands before you in full regalia.
+...she has a majestic aura about her!
+
+See also: OLC GENERICS, GENERIC AFFECTS, DOLLAR SIGN CODES
 #d
 "GENERIC COMPONENTS" "COMPONENT GENERICS" "COMPONENT EDITOR"
 
@@ -4510,6 +4549,7 @@ Available mob flags:
     the first time, so ensure that it is scaled before changing attributes.
  SILENT - Mob will not display custom strings while this flag is on.
  COINS - Mob will drop coins on death/pickpocket.
+ NO-COMMAND - Cannot be commanded/ordered.
 
 See also: OLC MOBILES
 #d
@@ -6710,6 +6750,7 @@ The following progress goal flags are available:
                script starts it first.
  &cHIDDEN&0 - Will not show up in lists until completed.
  &cNO-ANNOUNCE&0 - Does not announce/log completion.
+ &cNO-PREVIEW&0 - Mortals can't view this goal before starting it.
 
 See also: OLC PROGRESS
 #d

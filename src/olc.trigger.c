@@ -65,13 +65,21 @@ const char *default_trig_name = "new trigger";
 bool audit_trigger(trig_data *trig, char_data *ch) {
 	struct cmdlist_element *cmd;
 	bool problem = FALSE;
+	bitvector_t bits;
+	int pos;
 		
 	if (!str_cmp(GET_TRIG_NAME(trig), default_trig_name)) {
 		olc_audit_msg(ch, GET_TRIG_VNUM(trig), "Name not set");
 		problem = TRUE;
 	}
 	
-	// TODO look for a 'percent' type with a 0%
+	// look for a 'percent' type with a 0%
+	for (pos = 0, bits = GET_TRIG_TYPE(trig); bits; ++pos, bits >>= 1) {
+		if (IS_SET(bits, BIT(0)) && trig_argument_type_list[trig->attach_type][pos] == TRIG_ARG_PERCENT && GET_TRIG_NARG(trig) == 0) {
+			olc_audit_msg(ch, GET_TRIG_VNUM(trig), "Trigger has 0%% chance");
+			problem = TRUE;
+		}
+	}
 	
 	LL_FOREACH(trig->cmdlist, cmd) {
 		if (strlen(cmd->cmd) > 255) {
@@ -935,8 +943,9 @@ int wordcount_trigger(trig_data *trig) {
 	
 	const char *accept_list[] = { "%echo", "%send%", "%mod%", "%regionecho", "%vehicleecho", "%buildingecho", "say ", "emote ", "shout ", "\n" };
 	
-	count += wordcount_string(GET_TRIG_NAME(trig));
-	count += wordcount_string(GET_TRIG_ARG(trig));
+	// not player-facing
+	// count += wordcount_string(GET_TRIG_NAME(trig));
+	// count += wordcount_string(GET_TRIG_ARG(trig));
 	
 	LL_FOREACH(trig->cmdlist, cmd) {
 		for (iter = 0; *accept_list[iter] != '\n'; ++iter) {

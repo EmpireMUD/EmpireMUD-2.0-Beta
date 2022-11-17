@@ -36,6 +36,8 @@ energy blast~
 0 0 0 0
 T0
 You are no longer stunned by the energy blast.~
+T5
+...$e is stunned!~
 S
 #18505
 word of power~
@@ -43,6 +45,8 @@ word of power~
 0 0 0 0
 T0
 You are no longer stunned by the word of power.~
+T5
+...$e doesn't seem to be able to move.~
 S
 #18506
 word of power~
@@ -57,6 +61,8 @@ naga venom~
 0 0 0 0
 T0
 The pain of the naga's bite returns!~
+T5
+...$e is barely moving.~
 S
 #18508
 naga venom~
@@ -71,6 +77,8 @@ powerful blow~
 0 0 0 0
 T0
 You are no longer stunned by the powerful blow.~
+T5
+...$e is stunned!~
 S
 #18510
 powerful blow~
@@ -78,6 +86,8 @@ powerful blow~
 0 0 0 0
 T0
 You recover and are no longer disarmed by the powerful blow.~
+T5
+...$e has lost $s weapon!~
 S
 #18511
 blinding flash~
@@ -85,6 +95,8 @@ blinding flash~
 0 0 0 0
 T0
 You are no longer blinded by the flash.~
+T5
+...$e is blinded by the flash!~
 S
 #18512
 wind dance~
@@ -101,6 +113,8 @@ west wind~
 0 0 0 0
 T0
 You are no longer disarmed by the gale.~
+T5
+...$e has lost $s weapon.~
 S
 #18514
 west wind~

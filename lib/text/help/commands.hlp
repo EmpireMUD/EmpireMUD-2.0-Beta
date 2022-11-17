@@ -203,7 +203,11 @@ Bright colors:
  &G&&G Green&0      &L&&L Lime&0        &J&&J Jade&0
  &Y&&Y Yellow&0     &O&&O Orange&0      &T&&T Tan&0
  &W&&W White&0
- 
+
+Additional codes:
+ &&Z Next letter will be capitalized (useful in scripts)
+ &&z Next letter will be lowercase
+
 See also: BANNER, INFORMATIVE, POLITICAL, RECOLOR, TOGGLE
 #
 APPROACH

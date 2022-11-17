@@ -108,6 +108,9 @@ that should happen after someone enters, consider adding a 'wait 1'; however,
 a wait will keep the script running and prevent it from running for a second
 person until the first one finishes.
 
+Only the FIRST enter trigger on a room will run unless it also has the
+Allow-Multiple type.
+
 Note: Enter triggers can only prevent people from entering the room if they
 enter normally (usually through an exit from another room). People who appear
 magically can't usually be prevented.
@@ -120,7 +123,7 @@ Variables:
 
 You can add the "Player-in-Room" modifier.
 
-See also: PLAYER-IN-ROOM TRIGGER
+See also: PLAYER-IN-ROOM TRIGGER, ALLOW-MULTIPLE
 #d
 "RTRIG TYPES" TRIGEDIT-ROOM-TYPES "ROOM TRIGGER TYPES" "WORLD TRIGGER TYPES"
 
@@ -232,7 +235,7 @@ When using field - The variable returns:
 See also: EMPIRE VARS, REDIT AFFECTS, REDIT FLAGS, BEDIT FLAGS,
   SECTEDIT BUILDFLAGS, FUNCTION FLAGS
 #d
-"ZONE RESET TRIGGER" "RTRIG ZONE RESET" TRIGEDIT-ROOM-ZONE-RESET TRIGEDIT-ROOM-ZRESET TRIGEDIT-ROOM-LOAD
+"ZONE RESET TRIGGER" "RTRIG ZONE RESET" TRIGEDIT-ROOM-ZONE-RESET TRIGEDIT-ROOM-ZRESET TRIGEDIT-ROOM-LOAD "RESET TRIGGER"
 
 Zone Reset (room trigger)
 
@@ -241,7 +244,12 @@ Argument type:  percent chance to execute
 Activated when the adventure zone this room belongs to is reset. For rooms
 out on the map, reset triggers are called every few minutes.
 
+Only the FIRST zone reset trigger on a room will run unless it also has
+the Allow-Multiple type.
+
 Variables:
   &c%room%&0 - The room it was activated on.
+
+See also: ALLOW-MULTIPLE
 #d
 $~

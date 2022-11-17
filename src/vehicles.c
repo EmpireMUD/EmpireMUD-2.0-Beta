@@ -4190,7 +4190,7 @@ void look_at_vehicle(vehicle_data *veh, char_data *ch) {
 */
 void olc_show_vehicle(char_data *ch) {
 	vehicle_data *veh = GET_OLC_VEHICLE(ch->desc);
-	char buf[MAX_STRING_LENGTH], lbuf[MAX_STRING_LENGTH];
+	char buf[MAX_STRING_LENGTH*4], lbuf[MAX_STRING_LENGTH*4];
 	struct custom_message *custm;
 	struct spawn_info *spawn;
 	int count;
@@ -4253,7 +4253,7 @@ void olc_show_vehicle(char_data *ch) {
 	// exdesc
 	sprintf(buf + strlen(buf), "Extra descriptions: <%sextra\t0>\r\n", OLC_LABEL_PTR(VEH_EX_DESCS(veh)));
 	if (VEH_EX_DESCS(veh)) {
-		get_extra_desc_display(VEH_EX_DESCS(veh), lbuf);
+		get_extra_desc_display(VEH_EX_DESCS(veh), lbuf, sizeof(lbuf));
 		strcat(buf, lbuf);
 	}
 

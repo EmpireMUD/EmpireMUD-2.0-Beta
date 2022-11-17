@@ -4258,6 +4258,13 @@ void frequent_combat(unsigned long pulse) {
 			continue;
 		}
 		
+		// ready for combat:
+		
+		// update spawn time: delay despawn due to recent fighting
+		if (MOB_FLAGGED(ch, MOB_SPAWNED)) {
+			MOB_SPAWN_TIME(ch) = time(0);
+		}
+		
 		switch (FIGHT_MODE(ch)) {
 			case FMODE_WAITING: {
 				if ((pulse % (1 RL_SEC)) == 0) {

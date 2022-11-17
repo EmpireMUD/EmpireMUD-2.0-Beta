@@ -237,6 +237,8 @@ OLC_MODULE(genedit_build2char);
 OLC_MODULE(genedit_build2room);
 OLC_MODULE(genedit_craft2char);
 OLC_MODULE(genedit_craft2room);
+OLC_MODULE(genedit_lookatchar);
+OLC_MODULE(genedit_lookatroom);
 OLC_MODULE(genedit_repair2char);
 OLC_MODULE(genedit_repair2room);
 OLC_MODULE(genedit_quick_cooldown);
@@ -725,9 +727,11 @@ const struct olc_command_data olc_data[] = {
 	{ "craft2room", genedit_craft2room, OLC_GENERIC, OLC_CF_EDITOR },
 	{ "repair2char", genedit_repair2char, OLC_GENERIC, OLC_CF_EDITOR },
 	{ "repair2room", genedit_repair2room, OLC_GENERIC, OLC_CF_EDITOR },
-	// generic: cooldowns
+	// generic: affects
 	{ "apply2char", genedit_apply2char, OLC_GENERIC, OLC_CF_EDITOR },
 	{ "apply2room", genedit_apply2room, OLC_GENERIC, OLC_CF_EDITOR },
+	{ "lookatchar", genedit_lookatchar, OLC_GENERIC, OLC_CF_EDITOR },
+	{ "lookatroom", genedit_lookatroom, OLC_GENERIC, OLC_CF_EDITOR },
 	{ "quickcooldown", genedit_quick_cooldown, OLC_GENERIC, NOBITS },
 	{ "standardwearoff", genedit_standardwearoff, OLC_GENERIC, OLC_CF_EDITOR },
 	{ "wearoff", genedit_wearoff, OLC_GENERIC, OLC_CF_EDITOR },
@@ -4331,17 +4335,31 @@ void get_evolution_display(struct evolution_data *list, char *save_buffer) {
 *
 * @param struct extra_descr_data *list Pointer to the start of a list of decriptions.
 * @param char *save_buffer A buffer to store the result to.
+* @param size_t buf_size How large the save_buffer is.
 */
-void get_extra_desc_display(struct extra_descr_data *list, char *save_buffer) {
+void get_extra_desc_display(struct extra_descr_data *list, char *save_buffer, size_t buf_size) {
 	struct extra_descr_data *ex;
+	char temp[MAX_STRING_LENGTH];
 	int count = 0;
+	size_t size, tsize;
 	
 	*save_buffer = '\0';
+	size = 0;
+	
 	for (ex = list; ex; ex = ex->next) {
-		sprintf(save_buffer + strlen(save_buffer), " &y%d&0. %s\r\n%s", ++count, (ex->keyword ? ex->keyword : "(null)"), (ex->description ? ex->description : "(null)\n"));
+		tsize = snprintf(temp, sizeof(temp), " &y%d&0. %s\r\n%s", ++count, (ex->keyword ? ex->keyword : "(null)"), (ex->description ? ex->description : "(null)\r\n"));
+		
+		if (size + tsize < buf_size) {
+			strcat(save_buffer, temp);
+			size += tsize;
+		}
+		else {
+			size += snprintf(save_buffer + size, buf_size - size, "** OVERFLOW **\r\n");
+			break;
+		}
 	}
 	if (count == 0) {
-		strcat(save_buffer, " none\r\n");
+		snprintf(save_buffer, buf_size, " none\r\n");
 	}
 }
 
@@ -8680,6 +8698,24 @@ int wordcount_extra_descriptions(struct extra_descr_data *list) {
 	LL_FOREACH(list, iter) {
 		count += wordcount_string(iter->keyword);
 		count += wordcount_string(iter->description);
+	}
+	
+	return count;
+}
+
+
+/**
+* Counts the number of words in quest/progress requirements.
+*
+* @param struct req_data *list The list of requirement.
+* @return int The number of words in the requirements.
+*/
+int wordcount_requirements(struct req_data *list) {
+	struct req_data *iter;
+	int count = 0;
+	
+	LL_FOREACH(list, iter) {
+		count += wordcount_string(iter->custom);
 	}
 	
 	return count;

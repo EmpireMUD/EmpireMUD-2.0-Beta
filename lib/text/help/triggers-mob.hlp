@@ -18,6 +18,9 @@ The Act trigger occurs when someone performs a matching action in the same room
 as the mob who has the trigger. It can match either a phrase (which must be
 contained in the action text), or match any word from a word list.
 
+Only the FIRST matching act trigger will run unless it also has the
+Allow-Multiple type.
+
 Note: Act triggers can only match things passed through the code's act()
    function, which includes MOST game text that gets sent to the room. If you
    find that you can't get a trigger to respond to action text, consult a
@@ -34,7 +37,7 @@ Variables:
 
 You can add the "Player-in-Room" modifier.
 
-See also: MTRIG CHARMED, PLAYER-IN-ROOM TRIGGER
+See also: MTRIG CHARMED, PLAYER-IN-ROOM TRIGGER, ALLOW-MULTIPLE
 #d
 "BRIBE TRIGGER" "MTRIG BRIBE" TRIGEDIT-MOB-BRIBE
 
@@ -100,9 +103,8 @@ Return value:  return 0 to prevent the mob's death cry
 
 This type of trigger fires when the mob dies (but not when if it is purged).
 
-Only the FIRST successful death trigger on a mob will run unless it also has
-the Allow-Multiple type. Be careful about purging the mob if Allow-Multiple is
-set.
+Only the FIRST death trigger on a mob will run unless it also has the
+Allow-Multiple type. Be careful about purging the mob if Allow-Multiple is set.
 
 Note: Death triggers attached to charmed mobs will not fire unless the trigger
    also has the Charmed type.
@@ -432,6 +434,8 @@ When using field  - The variable returns:
 &ccharge_coins(amt)&0 - Charges the actor a number of coins.
 &ccharge_currency(vnum, amt)&0 - Takes away an amount of adventure currency.
 &cclass&0 - The actor's class, as a string.
+&ccommand_lag(type)&0 - Without type, true if person is in a 'wait state' from
+   typing a command. With type, gives command lag (HELP WAIT TYPES)
 &ccompanion&0 - For a PC, their current companion. For the companion, its player.
 &ccompleted_quest(vnum)&0 - Whether or not the player has completed and
    turned in that quest vnum.

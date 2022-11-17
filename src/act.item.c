@@ -4788,7 +4788,7 @@ ACMD(do_drink) {
 	}
 
 	if (obj && GET_OBJ_TYPE(obj) != ITEM_DRINKCON) {
-		send_to_char("You can't drink from that!\r\n", ch);
+		act("$p: You can't drink from that!", FALSE, ch, obj, FALSE, TO_CHAR);
 		return;
 	}
 	if (obj && !bind_ok(obj, ch)) {

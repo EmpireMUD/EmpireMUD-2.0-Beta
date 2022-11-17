@@ -58,6 +58,8 @@ S
 grinchy pole impact~
 4 0
 0 0 0 0
+T5
+...$e seems stunned.~
 S
 #16617
 Max summon~
@@ -70,6 +72,8 @@ pixy curse~
 0 0 0 0
 T0
 The curse of the pixy fades.~
+T5
+...$e is holding perfectly still.~
 S
 #16635
 scared pet~

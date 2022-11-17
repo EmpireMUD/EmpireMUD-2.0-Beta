@@ -1541,6 +1541,7 @@ west doorway hall walkway~
    The second-floor walkway is out the door to the west. A large glass tube
 arches over the doorway as part of the final stretch of the racetrack.
 ~
+T 11936
 S
 #11919
 The Apprentice Dormitories~
@@ -2970,8 +2971,12 @@ E
 toasters~
 There are a bunch of old iron toasters -- the type you set next to the fire.
 ~
+E
+bookshelf bookshelves shelf shelves chains spine~
+   Several bookshelves grace the east side of the room, covered with countless
+books on enchanting. Each and every book is chained to the shelf by its spine.
+~
 T 11926
-T 11927
 T 11921
 S
 #11940
@@ -3849,7 +3854,7 @@ The Headmaster's Palatial Office~
 sorcerer to watch over their charges. It has a massive calamander bookshelf
 along one wall; plush rugs cover the checkerboard marble floor and a painting
 hangs in a gold frame near the door. An extravagant nocturnium chandelier
-strung across lights the office with a soft violet glow.
+strung the ceiling across lights the office with a soft violet glow.
 ~
 ch z 0
 D2
@@ -3921,7 +3926,7 @@ east doorway~
 The door leads back out into the office.
 ~
 E
-furniture bespoke calamander~
+furniture bespoke calamander chairs~
    The chairs and tables here are finely crafted from striped black and brown
 calamander, one of the finest and rarest woods. Many of them bear the initials
 J.A.K. in stylized letters.
@@ -3967,6 +3972,11 @@ E
 closet~
    You open the askew closet door and nearly fall over when you find a skeleton
 inside. You swing the door shut and back away slowly.
+~
+E
+chair easychair~
+   The overstuffed easy chair sits low to the ground. The purple upholstery is
+striped in two shades, just like the calamander wood of the feet.
 ~
 M 1 11963 100.00 1
 S
@@ -4124,6 +4134,114 @@ even there. From down here, you can't even see them.
 T 11977
 T 11930
 T 11994
+S
+#11973
+The Headmistress's Palatial Office~
+   This windowed office is the highest in the tower, a place for the greatest
+sorcerer to watch over their charges. It has a massive calamander bookshelf
+along one wall; plush rugs cover the checkerboard marble floor and a painting
+hangs in a gold frame near the door. An extravagant nocturnium chandelier
+strung across the ceiling lights the office with a soft violet glow.
+~
+chi z 0
+D2
+~
+0 11974
+D3
+~
+0 11974
+E
+south~
+   The south door normally leads back out to the central chamber, but it's
+covered in thick fog and you can't see through.
+~
+E
+west quarters bedroom~
+   The door to the west usually leads to the living quarters, but it's covered
+in thick fog and you can't see anything beyond it.
+~
+E
+doors doorway fog~
+   Both doorways are covered in a thick fog and you cannot see the other side.
+It's cold to the touch, though your hand passes easily through it.
+~
+E
+window north~
+You can see the whole countryside from the window. (look out)
+~
+E
+bookshelf shelf calamander~
+   The bookshelf, carved from black and brown striped calamander wood, is truly
+massive. If it were laid on the ground, it would be larger than any bed you've
+slept in. It holds dozens upon dozens of tomes, though you find you can't touch
+them: your hand is stopped by an invisible barrier.
+~
+E
+rugs plush~
+   The rugs are made of high-piled, plush yarn. You've seen nobles sleep on
+less. You lift up a rug, but it's just more rugs underneath; a puff of magenta
+glitter flies loose as you do.
+~
+E
+chandelier nocturnium extravagant~
+   The black chandelier hangs from the ceiling by a hundred impossibly light
+chains, giving it the appearance of a shadow creeping across the ceiling. It
+casts a soft light over the entire room from hundreds of small oil burners.
+~
+E
+floor checkerboard marble~
+The floor is made from white and black marble in an alternating pattern.
+~
+E
+painting frame~
+   The painting shows a young couple in the middle of a dance in a beautiful
+open field, at sunrise. On the right, a smiling, smooth-faced man with short
+salt-and-pepper hair, has his right hand high, holding a woman's hand as she
+spins, her back to you, with her long wavy brown-and-violet hair caught in
+motion. Both are dressed in white: him in an open dress shirt and linen pants;
+her in an airy dress.
+~
+E
+desk~
+   The desk is expansive enough for two, perhaps three people to sit and work
+comfortably, but it has just one chair. It is carved from ebony, inlaid with
+ivory lettering in an ancient language you can't decipher. The writing covers
+all visible portions of the desk, perhaps as an enchantment to protect the desk
+or tower.
+   The nameplate on the desk reads:
+
+           +---------------------------------------------------+
+           |          Merrily Merrily Merrily Merrily          |
+           |                THIS IS BUT A DREAM                |
+           +---------------------------------------------------+
+~
+E
+glitter magenta~
+On closer inspection, there's flecks of magenta glitter on almost everything!
+~
+E
+furniture chairs~
+   The desk, chairs, bookshelf, and the rest of the lot are all made from fine
+ebony, calamander, or magewood.
+~
+T 11945
+T 11946
+T 11994
+S
+#11974
+Beyond the Fog~
+There is nothing but fog.
+~
+cdgi 0 0
+D0
+~
+0 11973
+D1
+~
+0 11973
+M 1 11979 100.00 1
+T 11945
+T 11946
 S
 #11975
 A Cozy Little House~
@@ -4760,10 +4878,8 @@ Ramps connect spots where pairs of houses are at slightly different levels.
 E
 ladders~
    Some of the houses whose roofs form the walkway have ladders sticking out of
-their openings, but many don't. Perhaps the ones with ladders are an invitation
-to enter.
-   Short ladders also connect some of the uneven rooftops of the houses, with
-others connected by ramps instead.
+their openings, but many don't. Short ladders also connect some of the uneven
+rooftops of the houses, with others connected by ramps instead.
 ~
 M 0 11981 100.00 1
 M 1 11981 100.00 3

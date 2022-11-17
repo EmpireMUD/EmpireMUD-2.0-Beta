@@ -2224,6 +2224,7 @@ void olc_get_values_display(char_data *ch, char *storage) {
 */
 void olc_show_object(char_data *ch) {
 	obj_data *obj = GET_OLC_OBJECT(ch->desc);
+	char buf[MAX_STRING_LENGTH*4], buf1[MAX_STRING_LENGTH*4];
 	struct obj_storage_type *store;
 	struct custom_message *ocm;
 	struct obj_apply *apply;
@@ -2296,7 +2297,7 @@ void olc_show_object(char_data *ch) {
 	// exdesc
 	sprintf(buf + strlen(buf), "Extra descriptions: <%sextra\t0>\r\n", OLC_LABEL_PTR(GET_OBJ_EX_DESCS(obj)));
 	if (GET_OBJ_EX_DESCS(obj)) {
-		get_extra_desc_display(GET_OBJ_EX_DESCS(obj), buf1);
+		get_extra_desc_display(GET_OBJ_EX_DESCS(obj), buf1, sizeof(buf1));
 		strcat(buf, buf1);
 	}
 

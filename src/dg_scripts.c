@@ -3238,6 +3238,14 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 							*str = '\0';
 						}
 					}
+					else if (!str_cmp(field, "command_lag")) {
+						// true/false if the character is in a "wait", OR sets a wait
+						int wait_type;
+						if (subfield && *subfield && (wait_type = search_block(subfield, wait_types, FALSE)) != NOTHING) {
+							command_lag(c, wait_type);
+						}
+						snprintf(str, slen, "%d", (GET_WAIT_STATE(c) > 0 ? 1 : 0));
+					}
 					else if (!str_cmp(field, "completed_quest")) {
 						if (subfield && *subfield && isdigit(*subfield)) {
 							any_vnum vnum = atoi(subfield);

@@ -25,6 +25,8 @@ dust cloud~
 0 0 0 0
 T0
 You are no longer blinded by the cloud of dust.~
+T5
+...$e is blinded by the cloud of dust!~
 S
 #12604
 enveloped~
@@ -32,6 +34,8 @@ enveloped~
 0 0 0 0
 T0
 The elemental releases you.~
+T5
+...$e is being crushed by the elemental and can't move!~
 S
 #12605
 Elemental attack~
@@ -44,6 +48,8 @@ stunned~
 0 0 0 0
 T0
 You are no longer stunned.~
+T5
+...$e is stunned!~
 S
 #12607
 enveloping~
@@ -171,6 +177,8 @@ swoop~
 0 0 0 0
 T0
 You recover your weapon.~
+T5
+...$e seems to have lost $s weapon.~
 S
 #12668
 tiny wildling pet~
@@ -188,16 +196,24 @@ S
 spellcasting~
 4 0
 0 0 0 0
+T5
+...$e's casting a spell -- now is your chance to strike!~
 S
 #12671
 stomped~
 4 0
 0 0 0 0
+T5
+...$e looks dazed -- now is your chance to strike!~
 S
 #12673
 tranquil~
 4 0
 0 0 0 0
+T4
+$e has a tranquil, peaceful look about $m.~
+T5
+...$e looks very tranquil.~
 S
 #12678
 Grove seeker stone~

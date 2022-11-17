@@ -217,6 +217,11 @@ ACMD(do_consider) {
 		if (!any) {
 			msg_to_char(ch, "You seem to be an even match.\r\n");
 		}
+		
+		// update spawn time: delay despawn due to interaction
+		if (MOB_FLAGGED(vict, MOB_SPAWNED)) {
+			MOB_SPAWN_TIME(vict) = time(0);
+		}
 	}
 }
 

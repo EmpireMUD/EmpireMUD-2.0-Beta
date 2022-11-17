@@ -76,7 +76,7 @@ frown. 'But we certainly can't have the boy running around here. Fine, fine,
 I'm sure I owe you this much. Bring him up here. Just promise me he will leave
 the tower before the headmaster finds out.'
 ~
-14 0 150 250 -1
+15 0 150 250 -1
 A
 1 11801
 P
@@ -90,6 +90,8 @@ W
 13 11939 0 1 -
 Z
 1 11939
+Z
+1 11919
 S
 #11810
 Skycleave: Past Pixies and Goblins~
@@ -324,7 +326,7 @@ I've only just learned of the loop and you're the first person I've met who
 isn't bound to it.'
    Celiya puts a hand on your shoulder.
    'You have to get out of here before the loop restarts, then you absolutely
-must find us again, fight your way to the top, and save Josef Knezz. It is the
+must find us again, fight your way to the top, and save Jozef Knezz. It is the
 only hope we have left.'
 ~
 25 i 150 250 -1
@@ -433,7 +435,7 @@ as she taps her fingernails against each other. She turns back toward you.
 And for what? The pursuit of magic. Are there no limits to what we destroy for
 power?'
 ~
-22 e 150 250 -1
+23 e 150 250 -1
 A
 1 11900
 D 11834
@@ -448,6 +450,8 @@ W+
 Free the otherworlder~
 Z
 1 11939
+Z
+1 11919
 S
 #11836
 Skycleave: The Greatest Treasure~
@@ -653,6 +657,180 @@ W
 3 11863 0 1 -
 Z
 1 11969
+S
+#11864
+Skycleave: Collection of Secrets~
+   What's this? A curious thing, to be sure. It seems there's more hidden in
+the Black Tower than expected. Find more of the tower's secrets -- and there
+are certainly a lot of them. Afterwards, visit the one person who knows what's
+going on. If you've been paying attention, you'll know who that is.
+~
+   You walk into the cafe and spot Djon sitting in the corner, chatting with
+another apprentice. You start to pull some of the items out of your pocket as
+you approach their table, but a sharp whistle draws your attention to the
+counter on the other side of the room. Mageina, the barista, waves you over.
+   'Yes, you,' she says as squeeze between chairs in the tightly-packed cafe to
+get to her. 'Oh, you have amassed quite the collection. You must've plumbed the
+tower for its deepest secrets to find all this. Puts you in rare company,
+indeed. Did you eat the mushroom? Henri ate the mushroom the first time.'
+   Mageina sweeps her gnarled wand -- the same one you've got -- in a broad arc
+and a pair of chairs scoot themselves over. You take a seat with her as she
+knits her story.
+   'I was hardly a hedge witch when I got this job and I didn't know five
+spells,' she says between sips of mint tea. 'The grand plan was to glean what
+I could from the apprentices while earning enough money to send back to my dear
+mother, with a mind to enroll as an apprentice. Can you imagine? But we didn't
+know anything about the Black Tower except its reputation.
+   'I had been here two years, give or take, when old Skithe severed the spell
+Knezz used to unbind the tree from its original time loop, ending any ambitions
+I might have had. But I was as blissfully ignorant as the rest of them. Stirred
+the soup, warmed the spirits, hid behind the counter when the goblins started
+shouting, got the cafe cleaned up, and then woke up to repeat it all again.'
+   Mageina pauses for a moment to refill her tea with her wand. She cradles the
+teacup in both hands and gently blows the steam away from the top before taking
+a long drink.
+   'And then a strange thing happened,' she says. 'A dashing young hero asked
+for my help rescuing the tower. Me, the hedge witch scullery maid with the big
+hat. Well, how could I resist? We fought Venjer and Vehl, Kara and Trixton,
+Professor Barrosh, the shade... and then a strange thing happened. The shade
+snatched Professor Knezz's wand and started to channel its power, but Henri
+knocked it into the air with a well-timed sunshock and, it what would be the
+defining moment of my entire life, I caught it.
+   'And wouldn't you know, by the power of Skycleave' -- there's a low rumble
+from the foundation of the tower as she says it -- 'I woke up. Not like you
+wake from the dreams, like I was waking up for the very first time. Like my
+eyes had been shut my entire life. I was overwhelmed, dumbstruck, and the shade
+shot out a cold tentacle, straight through my heart, and I died for the very
+first time.
+   'You can imagine what happened next. I woke up here, right here, at this
+table, where I always do. Only, I could remember the whole thing, every moment.
+I tried to talk to Professor Celiya and Instructor Huberus but they told me I
+must be dreaming. I told everyone who would listen, but nobody took me
+seriously. And just as I was ready to collapse from the weight of it all...
+   'He walked into the cafe. My Henri. Oh, the adventures we had. We danced up
+and down the tower, picnicked on the gobbrabakh, fought Mez and Knezz alike as
+we studied the deep, dark magicks of the tower. Whether it was a year or a
+century, I honestly could not tell you. It was forever. We were the only two
+who seemed to hold onto our memories, and we cherished each other for it.'
+   Mageina sets down her teacup as the light fades from her face. 'Well, it was
+MY forever. Henri was trapped so much longer than I had been. I didn't realize
+it at first, but by the time I woke up, he had already been through the tower
+a thousand times. The burden of forever weighed on him and he began to conspire
+to leave me here, alone, until that wretched lion has had her fill.
+   'And so you see, here I sit, older and more powerful than any sorcerer who
+has darkened these doors, unable to deal a lasting defeat to Skithe Ler-Wyn and
+unable to leave the tower, at least not for long. So I make the soup, I comfort
+Annelise, I listen to that vapid couple -- who, I assure you, would both be
+cleaning the tower before long if not for the blessed time loop... But I take
+my fate seriously. I feed them and watch over them. And when a new adventurer,
+like yourself, arrives, I subtly guide them to Skycleave's secrets in hope that
+some day, against all odds, a hero will arrive who can break the loop once and
+for all.
+   'But it's not you. I'm sorry. Your adventures in the tower have been nothing
+short of legendary. But Skithe Ler-Wyn is already too powerful. I fear our only
+chance to stop her has long passed, and her power still grows. Somehow you are
+not bound to the loop. I have seen days without you here; I know you can still
+leave. So do it. Leave while you can. Leave us to our dark fate. Don't worry,
+I'll watch over them.'
+   Mageina sits for a moment longer, placing her warm hand on yours, and then
+standing to return to her eternal task, leaving behind an attuned soulstone for
+you without a further word.
+~
+4 0 150 0 -1
+A
+2 11877
+A
+2 11878
+A
+2 11879
+A
+2 11880
+A
+2 11883
+A
+2 11893
+A
+2 11894
+A
+2 11895
+A
+2 11896
+A
+2 11897
+P
+9 4 0 1 a
+R
+7 11800 100
+R
+8 11900 1
+W+
+2 11893 0 1 p
+Find a lost pet~
+W+
+2 11865 0 1 p
+Find a condenser~
+W+
+2 11867 0 1 p
+Find a confabulator~
+W+
+2 11864 0 1 p
+Find a deconfabulator~
+W+
+2 11868 0 1 p
+Find a project never finished~
+W+
+2 11884 0 1 p
+Find an assassin's tool~
+W+
+2 11862 0 1 p
+Find a cursive primer~
+W+
+2 11873 0 1 p
+Find a sorcerer's crutch~
+W+
+2 11872 0 1 p
+Find a scandalous letter~
+W+
+2 11869 0 1 p
+Find the one who wrote it~
+W+
+2 11880 0 1 p
+Find a gemstone you can eat~
+W+
+2 11896 0 1 p
+Find an unpleasant drink~
+W+
+2 11894 0 1 p
+Find a carving of a woman~
+W+
+2 11866 0 1 p
+Find a carving of a man~
+W+
+2 11878 0 1 p
+Find a glimmering knife~
+W+
+2 11874 0 1 p
+Find a futile shield~
+W+
+2 11897 0 1 p
+Find something lucky~
+W+
+2 11895 0 1 p
+Find something sacred~
+W+
+2 11877 0 1 p
+Find what brings both joy and sorrow~
+W+
+2 11879 0 1 p
+Find hope in an unexpected place~
+W+
+2 11881 0 1 p
+Find lightning in a bottle~
+W+
+2 11883 0 1 p
+Find the most powerful thing of all~
+Z
+1 11828
 S
 #11870
 Skycleave: Save Grand High Sorcerer Knezz~

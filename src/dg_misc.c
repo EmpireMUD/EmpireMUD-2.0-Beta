@@ -81,7 +81,7 @@ void do_dg_affect(void *go, struct script_data *sc, trig_data *trig, int script_
 	any_vnum atype = ATYPE_DG_AFFECT;
 	bitvector_t i = 0, type = 0;
 	struct affected_type af;
-	bool all_off = FALSE;
+	bool all_off = FALSE, silent = FALSE;
 
 	half_chop(cmd, junk, temp);
 	half_chop(temp, charname, cmd);
@@ -107,6 +107,11 @@ void do_dg_affect(void *go, struct script_data *sc, trig_data *trig, int script_
 	
 	if (!str_cmp(property, "off")) {
 		all_off = TRUE;
+		
+		if (!str_cmp(value_p, "silent")) {
+			silent = TRUE;
+		}
+		
 		// this is good -- no mor args
 	}
 	else {
@@ -160,19 +165,24 @@ void do_dg_affect(void *go, struct script_data *sc, trig_data *trig, int script_
 		return;
 	}
 	
+	// check for silent-off
+	if (!str_cmp(value_p, "off") && !str_cmp(duration_p, "silent")) {
+		silent = TRUE;
+	}
+	
 	// are we just removing the whole thing?
 	if (all_off) {
-		affect_from_char(ch, atype, TRUE);
+		affect_from_char(ch, atype, !silent);
 		return;
 	}
 	
 	// removing one type?
 	if (!str_cmp(value_p, "off")) {
 		if (type == APPLY_TYPE) {
-			affect_from_char_by_apply(ch, atype, i, TRUE);
+			affect_from_char_by_apply(ch, atype, i, !silent);
 		}
 		else {
-			affect_from_char_by_bitvector(ch, atype, BIT(i), TRUE);
+			affect_from_char_by_bitvector(ch, atype, BIT(i), !silent);
 		}
 		return;
 	}
@@ -863,6 +873,12 @@ void script_damage(char_data *vict, char_data *killer, int level, int dam_type, 
 	dam = level / 7.0;
 	if (level > 100) {
 		dam *= 1.0 + ((level - 100) / 40.0);
+	}
+	if (MOB_FLAGGED(killer, MOB_HARD)) {
+		dam *= 1.5;
+	}
+	if (MOB_FLAGGED(killer, MOB_GROUP)) {
+		dam *= 2.0;
 	}
 	dam *= modifier;
 	

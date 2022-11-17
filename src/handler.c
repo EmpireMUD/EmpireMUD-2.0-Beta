@@ -1841,7 +1841,7 @@ char_data *get_char_room_vis(char_data *ch, char *name, int *number) {
 char_data *get_char_vis(char_data *ch, char *name, int *number, bitvector_t where) {
 	char copy[MAX_INPUT_LENGTH], *tmp = copy;
 	char_data *i;
-	int num;
+	int num, store;
 	
 	if (!number) {
 		strcpy(tmp, name);
@@ -1859,9 +1859,13 @@ char_data *get_char_vis(char_data *ch, char *name, int *number, bitvector_t wher
 	if (IS_SET(where, FIND_CHAR_ROOM))
 		return get_char_room_vis(ch, tmp, number);
 	else if (IS_SET(where, FIND_CHAR_WORLD)) {
+		store = *number;
 		if ((i = get_char_room_vis(ch, tmp, number)) != NULL) {
 			return (i);
 		}
+		
+		// if we didn't find it, restore the number, because otherwise it counts the same person twice
+		*number = store;
 		
 		DL_FOREACH(character_list, i) {
 			if (IS_SET(where, FIND_NPC_ONLY) && !IS_NPC(i)) {	

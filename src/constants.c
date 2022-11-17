@@ -2181,6 +2181,7 @@ const char *action_bits[] = {
 	"!RESCALE",
 	"SILENT",
 	"COINS",
+	"NO-COMMAND",	// 35
 	"\n"
 };
 
@@ -2890,6 +2891,7 @@ const char *progress_flags[] = {
 	"SCRIPT-ONLY",
 	"HIDDEN",
 	"NO-ANNOUNCE",
+	"NO-PREVIEW",
 	"\n"
 };
 
@@ -4051,6 +4053,8 @@ const char *wtrig_types[] = {
 	"Player-in-Room",
 	"Reboot",
 	"Buy",	// 24
+	"*",
+	"Allow-Multiple",
 	"\n"
 };
 
@@ -4081,6 +4085,8 @@ const bitvector_t wtrig_argument_types[] = {
 	NOBITS,	// player-in-room
 	NOBITS,	// reboot
 	NOBITS,	// buy
+	NOBITS,	//
+	NOBITS,	// allow-multiple
 };
 
 

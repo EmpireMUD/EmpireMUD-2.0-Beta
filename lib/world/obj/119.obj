@@ -326,13 +326,12 @@ glass. But sorcerers preferring not to see the little creatures banging against
 the glass as they tried to break free and eventually clay jars took over. Kofi,
 in a violent stroke of irony, was felled by pixies in the end.
 ~
-3 0 a 0 4
+3 0 a 0 5
 0 0 0
 6 0
 C
 1 1
 T 11914
-T 11915
 S
 #11915
 cages goblin empty~
@@ -384,7 +383,8 @@ before the loop begins again.
    Well, no way to break free and tell the tale. The lich, Scaldorran, has
 instructed me in the creation of a poison, of pixy origin in ages past, capable
 of killing a man's soul.
-   Surely that will free me from this endless living nightmare.
+   Surely that will free me from this endless living nightmare. With apologies
+to my dearest Em.
 
    x Henri DeClaire
 ~
@@ -626,12 +626,13 @@ a teacup~
 A teacup is lying here.~
    The blue ceramic teacup is almost impossibly dainty, thinner in places than
 the flower petals it was sculpted to resemble. On the side, a stylized version
-of the Tower Skycleave is painted in fine white lines.
+of the Tower Skycleave is painted in fine white lines in front of the letters
+MM in magenta.
    After the restoration of the tower, Mageina transmuted all the leftover soup
 and spoiled food into a tea so hearty that the sorcerers often live on nothing
 else.
 ~
-5 0 a 0 5
+5 0 a 0 6
 4 4 11926
 6 0
 M
@@ -640,6 +641,7 @@ You sip $T from the teacup.~
 M
 5
 $n sips from $s teacup.~
+T 11927
 S
 #11927
 body corpse henri declaire~
@@ -705,6 +707,8 @@ and refract through it like a milky gemstone that has captured a rainbow. As
 you do, a thin prismatic blade slides forward then retreats; the gem then
 flattens like a yarn shuttle; then it seems to form a hammer. This clever
 little innovation will make crafting a breeze!
+   Waltur eventually grew impatient with having to set down and pick up tool
+after tool after tool, and began inventing his own.
 ~
 3 p ao cefgjm 3
 0 0 0
@@ -720,6 +724,8 @@ A magichanical tedium shard is lying here.~
 fit together so tightly it can be placed in a pocket. But with a shake, the
 tedium shard unfolds into an axe, shovel, scythe, saw, and more! If only you
 could afford enough of these to equip an empire, it might rule the trade world.
+   Inspired by the popularity of his own crafting shard, Waltur began creating
+new tools for an eager market.
 ~
 3 p ao adfhlo 4
 0 0 0
@@ -1380,7 +1386,7 @@ style is hard to place, this suit would turn heads in any court with its
 shining gold embellishments.
    As the golden age of Smol Nes-Pik was tarnished into rot and ruin and the
 last leaves fell from the great tree, Sparo Vehl sat resolute on the obsidian
-throne as the beacon hope for her people.
+throne as the beacon of hope for her people.
 ~
 2 mp ad 0 6
 0 0 0

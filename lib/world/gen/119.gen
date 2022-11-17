@@ -45,6 +45,17 @@ Blacktower waterwalking~
 0 0 0 0
 T0
 You feel your waterwalking phial fade.~
+T4
+You notice $s feet have a faint purple mist coming off of them.~
+S
+#11920
+glitter everywhere~
+4 0
+0 0 0 0
+T0
+You finally get some of the glitter out of your eyes and nose.~
+T4
+$e's covered in sparkly magenta glitter.~
 S
 #11921
 Violet Tea~
@@ -61,6 +72,8 @@ Blacktower sight~
 0 0 0 0
 T0
 Everything seems to dim as your perfect sight phial wears off.~
+T4
+$s eyes have a faint purple glow in the middle.~
 S
 #11925
 Blacktower burdens~
@@ -68,6 +81,8 @@ Blacktower burdens~
 0 0 0 0
 T0
 You feel your lighter burdens phial wear off and things seem heavier again.~
+T4
+Some of $s items just seem to be floating around $m.~
 S
 #11926
 Skycleaver Tea~
@@ -77,6 +92,13 @@ T0
 temporal mint tea~
 T1
 murky blue~
+S
+#11927
+tired~
+4 0
+0 0 0 0
+T0
+You feel more awake.~
 S
 #11936
 cursed~
@@ -122,6 +144,49 @@ drowsy~
 0 0 0 0
 T0
 You're no longer drowsy.~
+T5
+...$e looks really drowsy.~
+S
+#11952
+hammer throw~
+4 0
+0 0 0 0
+T0
+You're no longer dazed by the hammer throw.~
+T5
+...$e seems dazed from the hammer throw.~
+S
+#11953
+hammer thrown~
+4 0
+0 0 0 0
+T1
+$n grabs $s hammers and leaps back into the fray!~
+T5
+...$e is throwing $s hammers.~
+S
+#11954
+prayer of thunder~
+4 0
+0 0 0 0
+T5
+...$s hammers have a faint glow.~
+S
+#11955
+leaping~
+4 0
+0 0 0 0
+T5
+...$e is leaping through the air!~
+S
+#11956
+hammer dance~
+4 0
+0 0 0 0
+T0
+Your leg recovers from the hammer dance.~
+T5
+...$e has been hit by the hammer dance!~
 S
 #11961
 crystalline dew~
@@ -130,6 +195,11 @@ crystalline dew~
 S
 #11965
 jade tear~
+4 0
+0 0 0 0
+S
+#11972
+under pressure~
 4 0
 0 0 0 0
 S

@@ -18,6 +18,8 @@ powerful blow~
 0 0 0 0
 T0
 You are no longer stunned by the powerful blow.~
+T5
+...$e is stunned!~
 S
 #10203
 bleeding wounds~
@@ -48,6 +50,8 @@ knockout punch~
 0 0 0 0
 T0
 You are no longer stunned by Zelkab's punch.~
+T5
+...$e looks stunned!~
 S
 #10207
 regeneration~
@@ -71,6 +75,8 @@ explosion~
 0 0 0 0
 T0
 You are no longer stunned by the explosion.~
+T5
+...$e is stunned!~
 S
 #10210
 shield block~

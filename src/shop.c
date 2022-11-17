@@ -169,7 +169,8 @@ void smart_copy_shop_items(struct shop_item **to_list, struct shop_item *from_li
 int wordcount_shop(shop_data *shop) {
 	int count = 0;
 	
-	count += wordcount_string(SHOP_NAME(shop));
+	// not player-facing
+	// count += wordcount_string(SHOP_NAME(shop));
 	
 	return count;
 }

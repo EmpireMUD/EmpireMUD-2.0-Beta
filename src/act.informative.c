@@ -926,6 +926,10 @@ void list_lore_to_char(char_data *ch, char_data *to) {
 void list_one_char(char_data *i, char_data *ch, int num) {
 	char buf[MAX_STRING_LENGTH], buf1[MAX_STRING_LENGTH], part[256];
 	struct custom_message *ocm;
+	struct affected_type *aff;
+	generic_data *gen;
+	struct over_time_effect_type *dot;
+	struct string_hash *str_iter, *next_str, *str_hash = NULL;
 	
 	// POS_x
 	const char *positions[] = {
@@ -1078,9 +1082,6 @@ void list_one_char(char_data *i, char_data *ch, int num) {
 	if (can_turn_quest_in_to_mob(ch, i, NULL)) {
 		act("...you can finish a quest here!", FALSE, i, NULL, ch, TO_VICT);
 	}
-	if (affected_by_spell(i, ATYPE_FLY)) {
-		act("...$e is flying with gossamer mana wings!", FALSE, i, 0, ch, TO_VICT);
-	}
 	if (IS_RIDING(i)) {
 		sprintf(buf, "...$E is %s upon %s.", (MOUNT_FLAGGED(i, MOUNT_FLYING) ? "flying" : "mounted"), get_mob_name_by_proto(GET_MOUNT_VNUM(i), TRUE));
 		act(buf, FALSE, ch, 0, i, TO_CHAR);
@@ -1091,36 +1092,43 @@ void list_one_char(char_data *i, char_data *ch, int num) {
 	}
 	if (MOB_FLAGGED(i, MOB_TIED))
 		act("...$e is tied up here.", FALSE, i, 0, ch, TO_VICT);
-	if (AFF_FLAGGED(i, AFF_STUNNED | AFF_HARD_STUNNED)) {
-		act("...$e is stunned!", FALSE, i, 0, ch, TO_VICT);
-	}
 	if (AFF_FLAGGED(i, AFF_HIDE)) {
 		act("...$e has attempted to hide $mself.", FALSE, i, 0, ch, TO_VICT);
 	}
-	if (AFF_FLAGGED(i, AFF_BLIND))
-		act("...$e is groping around blindly!", FALSE, i, 0, ch, TO_VICT);
 	if (IS_INJURED(i, INJ_TIED))
 		act("...$e is bound and gagged!", FALSE, i, 0, ch, TO_VICT);
 	if (IS_INJURED(i, INJ_STAKED))
 		act("...$e has a stake through $s heart!", FALSE, i, 0, ch, TO_VICT);
-	if (AFF_FLAGGED(i, AFF_MUMMIFY))
-		act("...$e is mummified in a hard outer covering!", FALSE, i, 0, ch, TO_VICT);
-	if (AFF_FLAGGED(i, AFF_CLAWS))
-		act("...$s fingers are mutated into giant, hideous claws!", FALSE, i, 0, ch, TO_VICT);
-	if (AFF_FLAGGED(i, AFF_MAJESTY))
-		act("...$e has a majestic aura about $m!", FALSE, i, 0, ch, TO_VICT);
+	
+	// strings from affects
+	LL_FOREACH(i->affected, aff) {
+		if ((gen = real_generic(aff->type)) && GET_AFFECT_LOOK_AT_ROOM(gen)) {
+			add_string_hash(&str_hash, GET_AFFECT_LOOK_AT_ROOM(gen), 1);
+		}
+	}
+	LL_FOREACH(i->over_time_effects, dot) {
+		if ((gen = real_generic(dot->type)) && GET_AFFECT_LOOK_AT_ROOM(gen)) {
+			add_string_hash(&str_hash, GET_AFFECT_LOOK_AT_ROOM(gen), 1);
+		}
+	}
+	HASH_ITER(hh, str_hash, str_iter, next_str) {
+		act(str_iter->str, FALSE, i, NULL, ch, TO_VICT);
+	}
+	free_string_hash(&str_hash);
+	
 	if (GET_FED_ON_BY(i)) {
 		sprintf(buf, "...$e is held tightly by %s!", PERS(GET_FED_ON_BY(i), ch, 0));
 		act(buf, FALSE, i, 0, ch, TO_VICT);
-		}
+	}
 	if (GET_FEEDING_FROM(i)) {
 		sprintf(buf, "...$e has $s teeth firmly implanted in %s!", PERS(GET_FEEDING_FROM(i), ch, 0));
 		act(buf, FALSE, i, 0, ch, TO_VICT);
-		}
-	if (!IS_NPC(i) && GET_ACTION(i) == ACT_MORPHING)
-		act("...$e is undergoing a hideous transformation!", FALSE, i, 0, ch, TO_VICT);
+	}
+	if (!IS_NPC(i) && GET_ACTION(i) == ACT_MORPHING) {
+		act("...$e is undergoing a hideous transformation!", FALSE, i, FALSE, ch, TO_VICT);
+	}
 	if ((IS_MORPHED(i) || IS_DISGUISED(i)) && CAN_RECOGNIZE(ch, i) && !CHAR_MORPH_FLAGGED(i, MORPHF_HIDE_REAL_NAME)) {
-		act("...this appears to be $o.", FALSE, i, 0, ch, TO_VICT);
+		act("...this appears to be $o.", FALSE, i, FALSE, ch, TO_VICT);
 	}
 	
 	// these 
@@ -1259,6 +1267,10 @@ void look_at_char(char_data *i, char_data *ch, bool show_eq) {
 	char buf[MAX_STRING_LENGTH];
 	bool disguise;
 	int j, found;
+	struct affected_type *aff;
+	generic_data *gen;
+	struct over_time_effect_type *dot;
+	struct string_hash *str_iter, *next_str, *str_hash = NULL;
 	
 	if (!i || !ch || !ch->desc)
 		return;
@@ -1310,21 +1322,21 @@ void look_at_char(char_data *i, char_data *ch, bool show_eq) {
 		act(size_data[GET_SIZE(i)].show_on_look, FALSE, ch, NULL, i, TO_CHAR);
 	}
 	
-	// non-npc, non-disguised info (disguise 'counts' as NPC)
-	if (!IS_NPC(i) && !disguise) {
-		if (HAS_INFRA(i)) {
-			act("You notice a distinct, red glint in $S eyes.", FALSE, ch, NULL, i, TO_CHAR);
-		}
-		if (AFF_FLAGGED(i, AFF_CLAWS)) {
-			act("$N's hands are huge, distorted, and very sharp!", FALSE, ch, NULL, i, TO_CHAR);
-		}
-		if (AFF_FLAGGED(i, AFF_MAJESTY)) {
-			act("$N has an aura of majesty about $M.", FALSE, ch, NULL, i, TO_CHAR);
-		}
-		if (AFF_FLAGGED(i, AFF_MUMMIFY)) {
-			act("$E is mummified in a hard, dark substance!", FALSE, ch, NULL, i, TO_CHAR);
+	// generic affs -- npc or disguise do not affect this
+	LL_FOREACH(i->affected, aff) {
+		if ((gen = real_generic(aff->type)) && GET_AFFECT_LOOK_AT_CHAR(gen)) {
+			add_string_hash(&str_hash, GET_AFFECT_LOOK_AT_CHAR(gen), 1);
 		}
 	}
+	LL_FOREACH(i->over_time_effects, dot) {
+		if ((gen = real_generic(dot->type)) && GET_AFFECT_LOOK_AT_CHAR(gen)) {
+			add_string_hash(&str_hash, GET_AFFECT_LOOK_AT_CHAR(gen), 1);
+		}
+	}
+	HASH_ITER(hh, str_hash, str_iter, next_str) {
+		act(str_iter->str, FALSE, i, NULL, ch, TO_VICT);
+	}
+	free_string_hash(&str_hash);
 	
 	if (IS_NPC(i) && !disguise && MOB_FLAGGED(i, MOB_MOUNTABLE) && CAN_RIDE_MOUNT(ch, i)) {
 		act("You can ride on $M.", FALSE, ch, NULL, i, TO_CHAR);

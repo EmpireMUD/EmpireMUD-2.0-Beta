@@ -3,7 +3,7 @@ spirit faded~
 the faded spirit~
 A faded spirit lingers in the air.
 ~
-150 250 bd n 3
+150 250 bdJ n 3
 0 0 0 15
 D
    The spirit fades in and out as moves around the room, visible against the
@@ -17,9 +17,10 @@ bump into the buffet as the spirit reaches out toward you. A soul-chilling wave
 passes through you, from your head to your neck, down your spine, filling you
 so completely that even your shadow seems to shiver.
 ~
-T 11903
 T 11832
 T 11810
+T 11905
+T 11803
 S
 #11901
 gossiper #n~
@@ -54,7 +55,7 @@ bucket wooden~
 the bucket~
 A wooden bucket is sitting here, filled with water.
 ~
-50 50 dh nG 2
+50 50 dhJ nG 2
 0 0 15 5
 D
    The sudsy little wooden bucket hops along, sloshing water on the floor as
@@ -93,15 +94,16 @@ $n hops around.~
 M
 0
 You hear a soft sobbing sound as the bucket slowly refills.~
-T 11902
 T 11904
+T 11851
+T 11905
 S
 #11903
 sponge~
 a sponge~
 A sponge is scrubbing the floor.
 ~
-50 50 bdh nG 1
+50 50 bdhJ nG 1
 0 0 24 21
 D
    The sponge zigs and zags across the floors as it chases the hopping bucket
@@ -116,13 +118,14 @@ M
 0
 $n slides around, scrubbing the floor.~
 T 11934
+T 11851
 S
 #11904
 corwin page~
 Page Corwin~
 Corwin is bustling about.
 ~
-150 250 dvxH n 3
+150 250 dvxHJ n 3
 1 0 68 15
 D
    Corwin is a young man of perhaps 16 years. He keeps his hair cropped short
@@ -146,10 +149,10 @@ T 11852
 S
 #11905
 Mageina barista~
-Mageina the barista~
+Mageina~
 The barista seems to be daydreaming behind the bar. (list)
 ~
-150 250 bdvxI n 3
+150 250 bdvxIJ n 3
 2 0 0 16
 D
    Mageina hardly spares you a glance as she leans behind the bar, idly
@@ -165,8 +168,8 @@ I 12 11926 5.00 1 p  # PICKPOCKET: teacup
 I 12 11903 5.00 1 p  # PICKPOCKET: tall glass
 I 12 11904 5.00 1 p  # PICKPOCKET: mutton pasty
 I 12 11905 5.00 1 p  # PICKPOCKET: exotic turquoise cheese
-I 12 11869 5.00 1 p  # PICKPOCKET: self-writing pen
-I 12 11867 5.00 1 p  # PICKPOCKET: dynamic reconfabulator
+I 12 11869 4.00 1 p  # PICKPOCKET: self-writing pen
+I 12 11867 4.00 1 p  # PICKPOCKET: dynamic reconfabulator
 I 12 11865 5.00 1 p  # PICKPOCKET: ether condenser
 I 12 11864 5.00 1 p  # PICKPOCKET: mana deconfabulator
 I 12 11894 5.00 1 p  # PICKPOCKET: wooden Venus figurine
@@ -181,13 +184,13 @@ I 12 11877 3.00 1 p  # PICKPOCKET: little gemstone flute
 I 12 11878 4.00 1 p  # PICKPOCKET: gemstone knife
 I 12 11977 5.00 1 p  # PICKPOCKET: steamed mussels
 I 12 1206 5.00 1 p  # PICKPOCKET: iridescent blue iris
-I 12 11879 4.00 1 p  # PICKPOCKET: glowing sapphire bud
+I 12 11879 4.00 1 p  # PICKPOCKET: glowing emerald bud
 I 12 11880 4.00 1 p  # PICKPOCKET: ruby rock candy
 I 12 11895 4.00 1 p  # PICKPOCKET: iridescent pearl
 I 12 11897 4.00 1 p  # PICKPOCKET: good rock
-I 12 11866 4.00 1 p  # PICKPOCKET: carved wooden man
+I 12 11866 3.00 1 p  # PICKPOCKET: carved wooden man
 I 12 11872 1.00 1 p  # PICKPOCKET: hand-written note
-I 12 11883 1.00 1 p  # PICKPOCKET: gnarled old wand
+I 12 11883 4.00 1 p  # PICKPOCKET: gnarled old wand
 M
 0
 $n points her gnarled old wand at a mug and heats it with a wild, cackling flame!~
@@ -214,7 +217,7 @@ Huberus instructor~
 Instructor Huberus~
 Instructor Huberus is seated atop her desk.
 ~
-150 250 bdvxI n 3
+150 250 bdvxIJ n 3
 2 0 0 16
 D
    Instructor Huberus is a gruff sort of woman, well-dressed in overflowing
@@ -242,7 +245,7 @@ S
 #n the shopkeep~
 #n is behind the counter, wearing an apron. (list)
 ~
-150 250 bdvAI n 3
+150 250 bdvAIJ n 3
 1 0 0 15
 D
    He's dressed in black slacks, a gray shirt, and a purple vest with the Hazel
@@ -286,7 +289,7 @@ Elamm man young eager~
 Elamm~
 An eager young man is seated at a desk.
 ~
-150 250 bdvx n 3
+150 250 bdvxJ n 3
 1 0 0 16
 D
    Elamm is dressed in well-pressed black slacks and a crisp white shirt. He
@@ -329,13 +332,14 @@ Akeldama student pale~
 Akeldama~
 A pale student is seated in the back.
 ~
-150 250 bdvxI n 3
+150 250 bdvxJ n 3
 2 0 0 16
 D
    Akeldama has chosen a seat in the corner, barely touched by the flickering
 lamplight from the front. Her skin has a pale, almost ashy color, perhaps due
 to the hardships the tower has recently suffered.
 ~
+I 12 11862 100.00 1 p  # PICKPOCKET: handbook of hexes and curses
 M
 1
 Is blood an element?~
@@ -368,7 +372,7 @@ Annaca watcher~
 Watcher Annaca~
 Annaca is watching over the apprentices.
 ~
-150 250 dvx n 3
+150 250 dvxJ n 3
 2 0 0 15
 D
    Annaca looks bedraggled in her loose midnight blue robes. The toll that
@@ -378,15 +382,61 @@ seems to have stacked itself curl-upon-curl.
 ~
 F 11800
 I 12 11864 100.00 1 p  # PICKPOCKET: mana deconfabulator
+M
+7
+say Well, the tower is looking good again.~
+M
+7
+say Every last vine and leaf is finally gone.~
+M
+7
+emote $n makes a puzzled look and reaches into her stacks of curly hair.~
+M
+7
+say Son of a goblin...~
+M
+7
+emote $n pulls a blue leaf from her hair and tears it up.~
+M
+8
+say Maybe things will get back to normal soon.~
+M
+8
+say I mean, of course they will. This is all just temporary.~
+M
+9
+set line_gap 3 s~
+M
+9
+say Oops, missed a spot. Reparera!~
+M
+9
+echo Part of the wall seamlessly stitches itself back together.~
+M
+10
+set line_gap 3 s~
+M
+10
+say Oops, missed a bit. Damma!~
+M
+10
+echo Bits of dust and debris are blasted into the air and vanish with a sparkle!~
+M
+11
+say Soon it'll start to feel like home again.~
+M
+11
+say I'm sure of it.~
 T 11810
 T 11852
+T 11840
 S
 #11911
 apprentice kayla~
 Apprentice Kayla~
 Apprentice Kayla is here.
 ~
-150 250 dvx n 3
+150 250 dvxJ n 3
 2 0 0 15
 D
    Kayla is dressed in simple white apprentice robes. She wears her hair in
@@ -405,7 +455,7 @@ cosimo apprentice~
 Apprentice Cosimo~
 Apprentice Cosimo is here.
 ~
-150 250 dvx n 3
+150 250 dvxJ n 3
 1 0 0 15
 D
    Cosimo is clad in white apprentice robes with fiery red trim. On his face
@@ -423,7 +473,7 @@ tyrone apprentice~
 Apprentice Tyrone~
 Apprentice Tyrone is standing here.
 ~
-150 250 dvx n 3
+150 250 dvxJ n 3
 1 0 0 15
 D
    Tyrone is tall, with soft features and black eyes. His face bears no creases
@@ -462,7 +512,7 @@ Wright wrangler~
 Wrangler Wright~
 The goblin wrangler is cleaning up the mess. (list)
 ~
-150 250 bdvx n 3
+150 250 bdvxJ n 3
 1 0 0 15
 D
    Though he's old and more than a little scarred, Wrangler Wright seems to be
@@ -511,7 +561,7 @@ goblin caged cages~
 the caged goblin~
 A goblin sits with its arms and legs dangling out of its cage.
 ~
-150 250 bd n 3
+150 250 bdJ n 3
 1 0 0 15
 D
    The cages aren't large enough to stand in, so this poor goblin is dangling
@@ -578,7 +628,7 @@ goblin caged cages~
 a caged goblin~
 A goblin is laying on the dirty floor of her cage.
 ~
-150 250 bd n 3
+150 250 bdJ n 3
 2 0 0 15
 D
    The cages have not been cleaned in some time, but one hapless goblin has
@@ -609,7 +659,7 @@ goblin caged cages~
 a caged goblin~
 One of the goblins is trying to climb the bars of its cage.
 ~
-150 250 bd n 3
+150 250 bdJ n 3
 1 0 0 15
 D
    One of the goblins has become restless and is trying to climb the bars of
@@ -640,7 +690,7 @@ Chicanders warden ~
 the warden~
 The warden, Chicanders, is overseeing the track. (race)
 ~
-150 250 bdvI n 3
+150 250 bdvIJ n 3
 1 0 0 15
 D
    With his hair receding and his gut protruding, Warden Chicanders has settled
@@ -652,6 +702,7 @@ his bulbous nose.
 type 'race <pixy name>'. To choose or change which pixy you're watching, you
 can type 'watch <pixy name>' at any time.
 ~
+I 12 1206 100.00 1 p  # PICKPOCKET: iridescent blue iris
 T 11912
 T 11916
 T 11918
@@ -661,12 +712,125 @@ T 11911
 T 11810
 T 11852
 S
+#11919
+Annelise enchanter~
+Enchanter Annelise~
+Enchanter Annelise is leaning on a table.
+~
+150 250 bdvxJ n 3
+2 0 0 15
+D
+   Annelise is strikingly young for a woman wearing the many purple robes of a
+Skycleave master. In truth, she barely looks 15, with baby-smooth skin and
+large eyes which, at all times, have sad, longing quality to them as she stares
+off into space.
+~
+F 11800
+I 12 11874 100.00 1 p  # PICKPOCKET: filigreed stasis charm
+M
+0
+$n tries to fix a pile of rubbish with her foot.~
+M
+1
+Oh, fiddlesticks...~
+M
+1
+Oh, bother...~
+M
+1
+Oh, dear...~
+M
+0
+$n pushes some old toasters into the corner.~
+M
+0
+$n starts straightening up the lab, but quickly becomes frazzled.~
+M
+0
+$n jumps at the sight of a mouse in the corner. She shoots a bolt of blue light at it and it turns into a doorstop.~
+M
+0
+$n zaps a cobweb and then tucks it into her pocket.~
+M
+0
+$n blasts at a bit of dust but it just seems to settle elsewhere.~
+M
+0
+$n blasts at a dust bunny as it pokes its head out from a pile, but misses.~
+M
+0
+$n makes a clunking noise as she walks.~
+M
+1
+Oh that poor Waltur...~
+M
+0
+$n glances toward the east doorway for a long moment.~
+T 11810
+T 11852
+T 11851
+S
+#11920
+sorceress grand high~
+the Grand High Sorceress~
+The Grand High Sorceress sits on her desk, legs crossed. (difficulty)
+~
+150 250 bdhxyJ oDE 3
+2 0 0 22
+D
+   The sorceress sits on top of her desk, legs crossed in front of her,
+supported by her arms. Her head is tilted forward and down, with her wide-
+brimmed, conical black hat blocking your view of her face. Her wavy brown hair
+spills out to the sides, highlighted with streaks of violet, cascading over her
+shoulders onto her intricately-embroidered violet and gold robes.
+   To fight her, type: difficulty <Normal | Hard | Group | Boss>
+~
+I 4 11900 100.00 1  # LOOT: unattuned skystone
+I 12 11902 3.00 1 p  # PICKPOCKET: mug
+I 12 11926 3.00 1 p  # PICKPOCKET: teacup
+I 12 11903 3.00 1 p  # PICKPOCKET: tall glass
+I 12 11904 3.00 1 p  # PICKPOCKET: mutton pasty
+I 12 11905 3.00 1 p  # PICKPOCKET: exotic turquoise cheese
+I 12 11869 3.00 1 p  # PICKPOCKET: self-writing pen
+I 12 11867 3.00 1 p  # PICKPOCKET: dynamic reconfabulator
+I 12 11865 3.00 1 p  # PICKPOCKET: ether condenser
+I 12 11864 3.00 1 p  # PICKPOCKET: mana deconfabulator
+I 12 11894 4.00 1 p  # PICKPOCKET: wooden Venus figurine
+I 12 11868 1.00 1 p  # PICKPOCKET: miniature wellstone prototype
+I 12 11917 1.00 1 p  # PICKPOCKET: page 2413 of the time-traveler's diary
+I 12 11918 2.00 1 p  # PICKPOCKET: page 91 of the time-traveler's diary
+I 12 11919 2.00 1 p  # PICKPOCKET: page 214 of the time-traveler's diary
+I 12 11920 2.00 1 p  # PICKPOCKET: page 86 of the time-traveler's diary
+I 12 11893 1.00 1 p  # PICKPOCKET: fine leather fox leash
+I 12 11896 2.00 1 p  # PICKPOCKET: leather bladder
+I 12 11877 3.00 1 p  # PICKPOCKET: little gemstone flute
+I 12 11878 4.00 1 p  # PICKPOCKET: gemstone knife
+I 12 11977 3.00 1 p  # PICKPOCKET: steamed mussels
+I 12 1206 3.00 1 p  # PICKPOCKET: iridescent blue iris
+I 12 11879 4.00 1 p  # PICKPOCKET: glowing emerald bud
+I 12 11880 4.00 1 p  # PICKPOCKET: ruby rock candy
+I 12 11895 4.00 1 p  # PICKPOCKET: iridescent pearl
+I 12 11897 4.00 1 p  # PICKPOCKET: good rock
+I 12 11866 3.00 1 p  # PICKPOCKET: carved wooden man
+I 12 11872 1.00 1 p  # PICKPOCKET: hand-written note
+I 12 11883 25.00 1 p  # PICKPOCKET: gnarled old wand
+T 11941
+T 11808
+T 11809
+T 11810
+T 11935
+T 11821
+T 11822
+T 11986
+T 11852
+T 11931
+S
 #11921
 broom~
 the broom~
 A broom is sweeping up the remaining debris.
 ~
-50 50 dh nG 2
+50 50 dhJ nG 2
 0 0 36 5
 D
    With its short heather pole and twiggy end, this old besom broom would be
@@ -698,17 +862,18 @@ The broom makes a sniffling noise.~
 M
 0
 The broom stops for a moment and looks out into the distance, almost somberly.~
-T 11902
 T 11904
 T 11934
 T 11810
+T 11851
+T 11905
 S
 #11922
 duster feather~
 the feather duster~
 A feather duster swishes as it flies across every surface.
 ~
-50 50 dh nG 2
+50 50 dhJ nG 2
 0 0 103 21
 D
    This elegant little plume of fluffy red feathers is bound by a strap of
@@ -736,18 +901,19 @@ M
 The feather duster dances about.~
 M
 0
-The feather duster pauses in the morning and seems to sob.~
-T 11902
+The feather duster pauses for a moment and seems to sob.~
 T 11904
 T 11934
 T 11810
+T 11851
+T 11905
 S
 #11923
 goblin secret passage opener~
 the goblin passage opener~
 The goblin secret passage opener is here.
 ~
-250 250 bd ln 3
+250 250 bdJ ln 3
 0 0 0 15
 D
 This mob opens the secret passage on the goblin side.
@@ -760,7 +926,7 @@ hall secret passage opener~
 the hall passage opener~
 The hall secret passage opener is here.
 ~
-250 250 bd ln 3
+250 250 bdJ ln 3
 0 0 0 15
 D
 This mob opens the secret passage on the hallway side.
@@ -773,7 +939,7 @@ ravinder apprentice~
 Apprentice Ravinder~
 Apprentice Ravinder is here.
 ~
-150 250 dvx n 3
+150 250 dvxJ n 3
 1 0 0 15
 D
    Ravinder Singh is not a tall man, but he stands tall in his violet dastar,
@@ -815,7 +981,7 @@ sponge giant~
 the sponge~
 A giant sponge tries in futility to clean the empty cages.
 ~
-50 50 bdh nG 2
+50 50 bdhJ nG 2
 0 0 24 15
 D
    The oversized sponge looks old and worn, discolored from years spent in
@@ -846,16 +1012,17 @@ M
 $n brushes uncomfortably close to your leg as it tries to clean.~
 M
 0
-$n makes the occasional sobbing sound as it cleans.~
+$n almost seems to grumble as it cleans.~
 T 11934
 T 11810
+T 11851
 S
 #11927
 Henri DeClaire~
 Henri DeClaire~
 Henri DeClaire is lying here.
 ~
-150 250 bdh 0 3
+150 250 bdhJ 0 3
 1 0 0 15
 D
    This character represents a person stuck in the Tower Skycleave's time loop
@@ -869,7 +1036,7 @@ water first embodiment living~
 the First Water~
 You are surrounded by the living embodiment of the First Water! (difficulty)
 ~
-150 250 bdhyD 0 5
+150 250 bdhyDJ hD 5
 0 0 0 14
 D
    The water on all sides of you is alive! You have found yourself trapped in
@@ -886,13 +1053,15 @@ T 11932
 T 11933
 T 11808
 T 11984
+T 11821
+T 11822
 S
 #11929
 Paige page~
 Paige~
 A page is bustling past you.
 ~
-150 250 dvxH n 3
+150 250 dvxHJ n 3
 2 0 50 15
 D
    Paige is a young woman with her brown and blonde hair in a jaw-length bob.
@@ -913,7 +1082,7 @@ caius sirensbane high master~
 Caius Sirensbane~
 High Master Caius Sirensbane is supervising the residents.
 ~
-150 250 dvx n 3
+150 250 dvxJ n 3
 1 0 0 15
 D
    Where the other sorcerers would wear a robe, Caius is draped in a white
@@ -923,15 +1092,52 @@ style give the impression of a Roman patrician.
 ~
 F 11800
 I 12 11865 100.00 1 p  # PICKPOCKET: ether condenser
+M
+7
+say Provincial mercenaries. Commoners, the lot. Rabble trying to bring us to ruin.~
+M
+7
+say Most certainly brought the goblins with them. Filth keeps its own company.~
+M
+8
+emote $n looks you up and down.~
+M
+8
+say I suppose you shall have to do, if you are possessed of any talent.~
+M
+8
+say Mind you, you should be downstairs and in a proper uniform.~
+M
+9
+say Racing the lesser life forms for the spectacle of it all is unbecoming of a sorcerer and a scholar.~
+M
+9
+say Games of chance are hardly befitting an establishment of such grandeur. Why, if I were Grand High...~
+M
+9
+say Well, betwixt the two of us, I would do away with the whole of the second floor.~
+M
+10
+say Now this, here, is respectable work. Scientia propter se.~
+M
+10
+say Where the Tower Skycleave goes, so follows the world.~
+M
+11
+say Madame Niamh and I have been discussing where we might locate a second otherworlder.~
+M
+11
+say If you should stumble across burning wreckage of a round silver chariot, please alert us.~
 T 11810
 T 11852
+T 11840
 S
 #11931
 Niamh resident~
 Resident Niamh~
-Resident Niamh is standing here. (list)
+Resident Niamh is pacing. (list)
 ~
-150 250 dvx n 3
+150 250 dvxJ n 3
 2 0 0 15
 D
    Niamh's black hair shows fiery red roots as she stoops to pick up a book.
@@ -942,16 +1148,47 @@ patterns.
 ~
 F 11800
 I 12 11872 100.00 1 p  # PICKPOCKET: hand-written note
+M
+7
+set line_gap 30 s~
+M
+7
+emote $n paces across the room.~
+M
+7
+emote $n taps her fingers together.~
+M
+7
+emote $n taps her foot.~
+M
+7
+emote $n paces back across the room.~
+M
+7
+set line_gap 9 s~
+M
+8
+emote $n fidgets with the rings on her fingers, spinning them back and forth.~
+M
+8
+say People rather need to mind their own business.~
+M
+8
+emote $n glares at you.~
+M
+8
+say That includes you.~
 T 11810
 T 11852
+T 11840
 S
 #11932
 mohammed resident~
 Resident Mohammed~
 Resident Mohammed is standing here.
 ~
-150 250 dvx n 3
-1 0 0 15
+150 250 dvxJ n 3
+1 0 83 15
 D
    Mohammed stands like a beanpole, tall and thin, wearing a long, slim, gray
 thobe with a violet ghutra headscarf and black egal band. He smiles at you
@@ -967,7 +1204,7 @@ mop bucket~
 the mop~
 A mop carries a bucket past you.
 ~
-50 50 dh nG 2
+50 50 dhJ nG 2
 0 0 35 5
 D
    The mop has a pale handle, perhaps made from poplar, with the yarn of the
@@ -997,17 +1234,18 @@ $n shakes itself off.~
 M
 0
 $n sounds like it's crying.~
-T 11902
 T 11934
 T 11810
 T 11935
+T 11851
+T 11905
 S
 #11934
 otherworlder tall blue person~
 the otherworlder~
 A tall, blue person is pulling at the chains that hold it to the floor.
 ~
-150 250 bdvx n 3
+150 250 bdvxJ n 3
 2 0 0 15
 D
    The otherworlder is taller than a human, with periwinkle skin dappled with
@@ -1033,7 +1271,7 @@ Sanjiv apprentice~
 Apprentice Sanjiv~
 Apprentice Sanjiv is using an arcane contraption on the otherworlder.
 ~
-150 250 bdvx n 3
+150 250 bdvxJ n 3
 1 0 0 15
 D
    Sanjiv is dressed in a white kurta with a violet hem along the bottom. He's
@@ -1045,32 +1283,57 @@ worlder with bright white light.
 F 11800
 I 12 11872 100.00 1 p  # PICKPOCKET: hand-written note
 M
-1
-Interesting...~
+7
+say Interesting...~
 M
-1
-Fascinating...~
+7
+emote $n circles the otherworlder slowly.~
 M
-1
-In sheer defiance of logic...~
+7
+say I think it has four hearts.~
 M
-1
-Amaze-balls...~
+8
+say Fascinating...~
 M
-0
-$n circles the otherworlder slowly.~
+8
+emote $n circles around the otherworlder.~
 M
-0
-$n bangs in the contraption in $s hands.~
+8
+say I don't think it has a gender.~
+M
+9
+emote $n bangs in the contraption in $s hands.~
+M
+9
+say This thing doesn't seem to be working.~
+M
+9
+say It says the otherworlder is breathing the mephitic air. That can't be right.~
+M
+10
+emote $n circles the otherworlder slowly.~
+M
+10
+say Amaze-balls...~
+M
+10
+say Professor Scaldorran thinks it's a plant but I'm not so sure.~
+M
+11
+say In sheer defiance of logic...~
+M
+11
+say What even is this thing?~
 T 11810
 T 11852
+T 11840
 S
 #11936
 scaldorran lich~
 the Lich Scaldorran~
 Scaldorran the Lich twists and curls in the air.
 ~
-150 250 bdvx n 3
+150 250 bdvxJ n 3
 1 0 0 15
 D
    Scaldorran is a mass of tattered gray linen wraps, slithering and writhing
@@ -1079,14 +1342,190 @@ back apart. And he is so much more than that. As a lich, he wields vast power
 over death -- and he has a reputation for sharing it.
 ~
 F 11800
+M
+7
+emote There's an icy, distant, echoing howl as $n yawns.~
+M
+7
+say Far too long spent inside that cold stone repository.~
+M
+7
+do skymote scaldopen~
+M
+7
+skip~
+M
+7
+say The things they don't tell you about being dead...~
+M
+7
+say Weyonomon makes it look so... blissful.~
+M
+7
+say I loathe that repository.~
+M
+7
+say Should've bound myself to a feather pillow or a warm blanket.~
+M
+7
+say SO COLD.~
+M
+7
+echo You shiver as your breath freezes in the air.~
+M
+8
+say Did you win a prize from my claw game?~
+M
+8
+say I heard it was broken again, but that barista -- Magey or something -- she offered to fix it.~
+M
+8
+say I don't remember every warm-blooded person's name in the tower. Do you know how many servants have come and gone over the years?~
+M
+8
+say Frankly I can't be bothered with the apprentice names, either, at the rate Niamh goes through them.~
+M
+8
+say Always did like her, though. Niamh. She has a healthy respect for the DARK ARTS.~
+M
+8
+emote $n coils in the air as a howling scream escapes his bandages.~
+M
+8
+echo The lamps sputter and flicker.~
+M
+9
+say That claw game was of my own devising.~
+M
+9
+say The original model used a manticore claw but it kept poisoning the patrons.~
+M
+9
+say Frankly, that one was on me. Should have known it would do that.~
+M
+9
+say One of those filthy goblins must have broken it. We should have exterminated the lot of them.~
+M
+9
+say But at least they didn't get up to the third floor.~
+M
+9
+say Imagine the ETERNAL RAGE of having their disgusting fingers all over my precious CHAMBER OF DEATH.~
+M
+9
+emote $n seems to explode, sending bandages out in all directions, nearly slicing through you!~
+M
+9
+emote $n comes back together, parts of him spinning wildly in the air.~
+M
+9
+say Their hideous little skeletons aren't even worth using as toothpicks.~
+M
+9
+say Our useless goblin wrangler isn't worth the green effluent we pay him to scrub.~
+M
+9
+say Don't even get me started on which staff members are pulling their weight and which ones are disposable.~
+M
+10
+say Oh, you're still here. I hardly noticed aside from that HORRIBLE thudding sound your chest makes.~
+M
+10
+say If you ever want someone to help with that, I am a first-class expert at transitions.~
+M
+10
+say The easy way, of course, is to just step out the window. Three floors and that should do the trick.~
+M
+10
+emote $n seems to relax a little.~
+M
+10
+say This one time, there was a duchess who came to me to get out of a marriage that was just torture for her...~
+M
+10
+say I arranged for her to haunt that abusive husband until it drove him over the edge.~
+M
+10
+say LITERALLY.~
+M
+10
+say Another time, I wrapped up some vulgar dirtmage while it was trying to transform...~
+M
+10
+say It popped like a blister! Actually... you might have been there for that one.~
+M
+10
+say You look very familiar.~
+M
+10
+say But everyone basically looks the same on the physical plane. Same number of noses, never more than two eyes.~
+M
+10
+say Usually two or fewer arms.~
+M
+10
+say Eventually you all start to look the same.~
+M
+10
+say Have we talked about this before?~
+M
+10
+say Tried to ghost an oreonic once. Marline was its name; wanted to see if an oreonic could become a lich.~
+M
+10
+say TOTAL FAILURE. It died too much. Sad case.~
+M
+10
+say Mind you, I only help people cross over when the goal is self-improvement.~
+M
+10
+say Never for suicides. Awful business.~
+M
+10
+say But if you wanted to be an ETERNAL LICH, we can remove all that ugly, bulging, fleshy rot from you.~
+M
+10
+say It only hurts a LOT for a little while.~
+M
+10
+say Still, though, I did once concoct a poison that could kill a person's not-so-immortal soul.~
+M
+10
+say Used it on a nasty sky-worshipper who was diddling children. It takes hours. I sat and counted.~
+M
+10
+say Out loud.~
+M
+10
+emote $n lets out a hollow, bone-chilling laugh as he coils around the room.~
+M
+0
+A low hissing sound from Scaldorran has you worried.~
+M
+0
+You feel painfully cold.~
+M
+0
+Your breath freezes in the air.~
+M
+0
+There's a disturbing chittering noise coming from the lich.~
+M
+0
+You jump as one of Scaldorran's wrappings brushes against your leg.~
+M
+0
+There's a distant scream, perhaps from somewhere inside the lich.~
 T 11810
+T 11862
+T 11840
 S
 #11937
 skeleton~
 the skeleton~
 A skeleton is picking bits of flesh off its bones.
 ~
-150 250 bd n 3
+150 250 bdJ n 3
 0 0 0 15
 D
    The skeleton is seated on top of a work bench, perplexed by several spare
@@ -1130,7 +1569,7 @@ Weyonomon spirit apprentice~
 the spirit of Weyonomon~
 The spirit of Apprentice Weyonomon is channeling a spell. (list)
 ~
-150 250 bd n 3
+150 250 bdJ n 3
 1 0 0 15
 D
    Weyonomon is -- or rather, was -- a promising young apprentice. He still
@@ -1179,13 +1618,14 @@ M
 0
 You start to open a small box, but it howls and you shut it fast.~
 T 11810
+T 11803
 S
 #11939
 Annelise enchanter~
 Enchanter Annelise~
 Enchanter Annelise is working on something.
 ~
-150 250 bdvx n 3
+150 250 bdvxJ n 3
 2 0 0 15
 D
    Annelise is strikingly young for a woman wearing the many purple robes of
@@ -1224,9 +1664,6 @@ M
 $n jumps at the sight of a mouse in the corner. She shoots a bolt of blue light at it and it turns into a doorstop.~
 M
 0
-$n zaps a cobweb and then tucks it into her pocket.~
-M
-0
 $n blasts at a bit of dust but it just seems to settle elsewhere.~
 M
 0
@@ -1234,15 +1671,25 @@ $n blasts at a dust bunny as it pokes its head out from a pile, but misses.~
 M
 0
 $n makes a clunking noise as she walks.~
+M
+0
+A strange whirring sound comes from the east.~
+M
+0
+It sounds like someone is hammering something to the east.~
+M
+0
+You hear a loud thud and then indistinct shouting from the east.~
 T 11810
 T 11852
+T 11851
 S
 #11940
 Waltur walter magineer~
 Magineer Waltur~
 Magineer Waltur is here. (list)
 ~
-150 250 bdvxI n 3
+150 250 bdvxIJ n 3
 1 0 0 15
 D
    Waltur is a young man, not over the age of 25, and apparently so busy he has
@@ -1293,7 +1740,7 @@ goef oreonic rock creature pitch black~
 Goef the Oreonic~
 A pitch black rock creature stands in the center of the room. (attune)
 ~
-150 250 bdx n 3
+150 250 bdxJ n 3
 0 0 0 5
 D
    It stands in the center of the room, sometimes so still that it looks like a
@@ -1321,7 +1768,7 @@ Sanjiv apprentice~
 Apprentice Sanjiv~
 Apprentice Sanjiv is using an arcane contraption on the walls.
 ~
-150 250 bdvx n 3
+150 250 bdvxJ n 3
 1 0 0 15
 D
    Sanjiv is dressed in a white kurta with a violet hem along the bottom. He's
@@ -1383,7 +1830,7 @@ Amets page~
 Page Amets~
 A page is bustling around.
 ~
-150 250 dvxH n 3
+150 250 dvxHJ n 3
 1 0 64 15
 D
    Amets is a portly man with a bright red sash over his plain jute robe. He's
@@ -1404,11 +1851,11 @@ T 11810
 T 11852
 S
 #11946
-fox gray~
+fox gray grey~
 the gray fox~
 There is a gray fox sniffing around.
 ~
-150 250 dj n 3
+150 250 djJ n 3
 0 0 102 15
 D
    The curious fox isn't much larger than a cat, with an ashen-silver coat, a
@@ -1449,11 +1896,11 @@ $n rolls around on the ground.~
 T 11810
 S
 #11947
-fox gray~
+fox gray grey~
 the gray fox~
 A gray fox is sitting by the gate.
 ~
-150 250 bdj n 3
+150 250 bdjJ n 3
 0 0 14 15
 D
    The loyal fox isn't much larger than a cat, with an ashen-silver coat, a
@@ -1468,7 +1915,7 @@ Loern goblin~
 Loern~
 Beneath the stone, Loern kneels on a reed mat.
 ~
-150 250 bd n 3
+150 250 bdJ n 3
 1 0 0 15
 D
    Except for the rare bow where he touches his head to the ground, you can
@@ -1493,7 +1940,7 @@ Raek goblin~
 Raek~
 Raek is looking at everything.
 ~
-150 250 d n 3
+150 250 dJ n 3
 1 0 0 15
 D
    Raek's gray-green skin is lighter than most of the goblins here, and his
@@ -1532,7 +1979,7 @@ Ortimer goblin~
 Ortimer~
 Ortimer is laying on the higher bed.
 ~
-150 250 bd n 3
+150 250 bdJ n 3
 1 0 0 15
 D
    Dressed in a green robe that nearly matches his moss-green skin, you suppose
@@ -1706,7 +2153,7 @@ Meyina goblin~
 Meyina~
 Meyina sits by the fire.
 ~
-150 250 bd n 3
+150 250 bdJ n 3
 2 0 0 15
 D
    Meyina stokes the fire with a piece of wood, then brushes ashes from her
@@ -1738,7 +2185,7 @@ Orkhan goblin boy~
 Orkhan~
 There's a boy sitting on one of the taller houses.
 ~
-150 250 d n 3
+150 250 dJ n 3
 1 0 86 15
 D
    Orkhan, a slight boy with verdant jade skin, is sitting on the edge of one
@@ -1756,7 +2203,7 @@ Khoab goblin~
 Khoab~
 Khoab is snacking as he walks.
 ~
-150 250 d n 3
+150 250 dJ n 3
 1 0 0 15
 D
    Khoab has a sack of boiled clams tucked under his arm and every so often,
@@ -1792,7 +2239,7 @@ Zelen goblin~
 Zelen~
 Zelen is standing here.
 ~
-150 250 d n 3
+150 250 dJ n 3
 1 0 0 15
 D
    Zelen's bright green skin is all the brighter as he sweats in the sun. He
@@ -1830,7 +2277,7 @@ Pimmi goblin~
 Pimmi~
 Pimmi is organizing the store room.
 ~
-150 250 bd n 3
+150 250 bdJ n 3
 2 0 0 15
 D
    Pimmi's bright hazel eyes are undimmed by their place on her deeply creased,
@@ -1933,7 +2380,7 @@ Elver worthy goblin~
 Elver the Worthy~
 Elver the Worthy stands in the center of the arena. (difficulty)
 ~
-150 250 bdhD 0 3
+150 250 bdhDJ E 3
 1 0 0 5
 D
    Elver is on the small side, even for a goblin, nearly outsized by his own
@@ -1966,13 +2413,15 @@ T 11809
 T 11810
 T 11982
 T 11803
+T 11821
+T 11822
 S
 #11957
 Nailbokh axe goblin~
 Nailbokh the Axe~
 Nailbokh the Axe stands in the center of the arena.
 ~
-150 250 bdhzD 0 3
+150 250 bdhzDJ 0 3
 2 0 0 2
 D
    Nailbokh drags her giant stone axe across the arena sand, drawing a line
@@ -1994,15 +2443,17 @@ M
 0
 $n waves $s huge axe in the air.~
 T 11973
-T 11982
 T 11803
+T 11987
+T 11821
+T 11822
 S
 #11958
 Biksi champion orka goblin~
 Biksi, Champion of Orka~
 Biksi, Champion of Orka, stands in the center of the arena.
 ~
-150 250 bdhyD 0 3
+150 250 bdhyDJ 0 3
 2 0 0 7
 D
    The Champion of Orka stands in the center of the arena, readying a pair of
@@ -2028,15 +2479,17 @@ M
 0
 $n drags $s whips to create a big circle in the sand.~
 T 11973
-T 11982
 T 11803
+T 11988
+T 11821
+T 11822
 S
 #11959
 sheila page~
 Page Sheila~
 Sheila is bustling about, getting things in order.
 ~
-150 250 dvxH n 3
+150 250 dvxHJ n 3
 2 0 99 15
 D
    Sheila is dressed in a plain jute robe, like all the pages in the tower. She
@@ -2055,7 +2508,7 @@ cabinet filing~
 the filing cabinet~
 A filing cabinet is standing here.
 ~
-50 50 dh nG 2
+50 50 dhJ nG 2
 0 0 93 5
 D
    The wooden cabinet is mahogany, stained with a slight violet tinge, with
@@ -2086,18 +2539,19 @@ M
 You yelp as the filing cabinet accidentally hops onto your foot.~
 M
 0
-The filing cabinet sounds like it's crying in the corner.~
-T 11902
+The filing cabinet clatters its drawers at you when you get in the way.~
 T 11904
 T 11934
 T 11810
+T 11851
+T 11905
 S
 #11961
 bookshelf shelf ebony~
 the bookshelf~
 An ebony bookshelf is standing here.
 ~
-50 50 dh nG 3
+50 50 dhJ nG 3
 0 0 61 5
 D
    The bookshelf is made from dark ebony wood with striped calamander accents
@@ -2116,9 +2570,6 @@ M
 The bookshelf shakes itself to straighten the books.~
 M
 0
-The bookshelf seems to whimper when it thinks you aren't looking.~
-M
-0
 The bookshelf falls foward onto a book with a THUD! When it gets back up, the book is on one of the shelves.~
 M
 0
@@ -2126,17 +2577,21 @@ The bookshelf falls foward onto a book with a THUD! When it gets back up, the bo
 M
 0
 The bookshelf falls foward onto a book with a THUD! When it gets back up, the book is on one of the shelves.~
-T 11902
+M
+0
+The bookshelf makes a sort of grumbling noise.~
 T 11904
 T 11934
 T 11810
+T 11851
+T 11905
 S
 #11962
 thorley apprentice~
 Apprentice Thorley~
 Apprentice Thorley is leaning against the wall.
 ~
-150 250 dvx n 3
+150 250 dvxJ n 3
 1 0 0 15
 D
    Thorley is a young apprentice, not more than fourteen by the look of him.
@@ -2187,7 +2642,7 @@ celiya high sorcerer~
 High Sorcerer Celiya~
 High Sorcerer Celiya is rushing from task to task.
 ~
-150 250 dvx n 3
+150 250 dvxJ n 3
 2 0 0 15
 D
    Celiya strikes an elegant figure in robes of violet, lavender, lilac, and
@@ -2251,6 +2706,48 @@ say Anyway, Rackney was protected from the conflagration by the sewage and only 
 M
 7
 say I kept him around almost a month, till he started to fall apart. Rest him. He was a good man.~
+M
+8
+say The old girl cleans up nicely, doesn't she?~
+M
+8
+say It'll take more sellswords than that to cut down old Skycleave and Jozef Knezz.~
+M
+8
+say What I just do not understand is Mezvienne. We've worked with her before.~
+M
+8
+say I thought of her as a friend. Well, you know, sugar, a distant friend.~
+M
+8
+say Tsk. Power drives a person to do strange things.~
+M
+8
+say She paid her price for it, though, didn't she, sugar. Real sad case.~
+M
+8
+say In another lifetime, a lady with her gifts, well, she might have run this tower.~
+M
+8
+say Just a sad, sad case. You know she's rotting now.~
+M
+8
+say Always thus to those who would cross the Tower Skycleave.~
+M
+9
+say Some days I think ma was right, sugar.~
+M
+9
+emote $n looks off wistfully.~
+M
+9
+say Should've just been a seamstress.~
+M
+9
+say Miss you, Ma.~
+M
+10
+say This old tower is just full of stories.~
 T 11810
 T 11840
 T 11852
@@ -2260,7 +2757,7 @@ trolley cleaning~
 the cleaning trolley~
 A cleaning trolley is parked in the middle of the office.
 ~
-150 250 bd n 3
+150 250 bdJ n 3
 0 0 0 15
 D
    The little trolley is equipped with a bucket and mob, some sponges, a large
@@ -2307,16 +2804,16 @@ The trolley cleans the office.~
 M
 0
 The trolley cleans the office.~
-T 11902
 T 11904
 T 11810
+T 11905
 S
 #11966
 Grace sorcerer assistant~
 Grace~
 The sorcerer's assistant, Grace, is sorting papers. (list)
 ~
-150 250 bdvx n 3
+150 250 bdvxJ n 3
 2 0 0 15
 D
    Grace, with her white hair up in a high beehive and her blue witchglass
@@ -2337,7 +2834,7 @@ barrosh high sorcerer~
 Barrosh~
 High Sorcerer Barrosh sits with his head in his hands.
 ~
-150 250 bdvx n 3
+150 250 bdvxJ n 3
 1 0 0 15
 D
    Barrosh has shed his violet high sorcerer robes in the corner and now sits
@@ -2354,8 +2851,8 @@ knezz grand high sorcerer~
 Grand High Sorcerer Knezz~
 Grand High Sorcerer Knezz is standing here. (list)
 ~
-150 250 dvx n 3
-1 0 0 15
+150 250 dvxJ n 3
+1 0 49 15
 D
    Knezz has the characteristic long, unkempt salt-and-pepper hair and beard
 sported by many a powerful sorcerer who spent more time over a book than a wash
@@ -2427,6 +2924,21 @@ It's a good thing we have the magic. Imagine the repair costs after that invasio
 M
 1
 Glad to be free of that time loop.~
+M
+9
+say When little Niamh suggested a conference with her aunt, I must admit I was skeptical.~
+M
+9
+say It isn't really our sort of magic, if you know what I mean. Certainly we dabble here and there...~
+M
+9
+say Well, anyhow, I thought she might have some insight. Even thought to offer her a classroom if it worked out.~
+M
+9
+say Bit of an ambush, though, as you saw. Bit of an ambush indeed.~
+M
+9
+say Now where was I going with that...~
 T 11810
 T 11840
 T 11852
@@ -2436,7 +2948,7 @@ celiya grand high sorcerer~
 Grand High Sorcerer Celiya~
 Grand High Sorcerer Celiya is here.
 ~
-150 250 dvx n 3
+150 250 dvxJ n 3
 2 0 0 15
 D
    Grand High Sorcerer Celiya strikes an elegant figure in robes of gold,
@@ -2450,28 +2962,103 @@ F 11800
 I 12 11865 100.00 1 p  # PICKPOCKET: ether condenser
 M
 7
+say I just will not be getting used to this.~
+M
+7
+say These old robes may hold themselves up, but there's a whole lot o' weight to being the GHS.~
+M
+7
+say Makes you really appreciate what old Knezz went through.~
+M
+8
 say You ever hear the story about how I met old Knezz?~
 M
-7
+8
 say Well, I had just buried my first husband, rest him. Rackney. Real good man.~
 M
-7
+8
 say Anyway, I was on this hot streak, burning necros and taking names. Some real vendetta stuff.~
 M
-7
+8
 say Well, that kind of fury attracts some attention. Both good and bad.~
 M
-7
+8
 say Knezz found me hunting necromancers way down south and offered to teach me at the tower.~
 M
-7
+8
 say And really, the rest is history. That old man saved my life.~
 M
-7
+8
 say I'd have burnt down half the world and myself with it. I've been here ever since.~
 M
-7
+8
 say I owe a lot to old Knezz, rest him.~
+M
+9
+set line_gap 3 s~
+M
+9
+say My own ma wanted to be a royal seamstress.~
+M
+9
+set line_gap 9 s~
+M
+9
+emote $n bursts out with a huge laugh.~
+M
+9
+say Can you imagine, sugar? Me?~
+M
+9
+say If she could see me now...~
+M
+9
+say Oh, how I do miss her.~
+M
+10
+say I like to think they'd accept me as Grand High, in time.~
+M
+10
+emote $n turns to you, but pauses for a long moment.~
+M
+10
+say I just don't have the power in me to get us out of this loop. That would have taken Knezz.~
+M
+10
+say Barry was next in line for the big job but he doesn't have it in him anymore.~
+M
+10
+say Between you and me, sugar, if this loop wasn't about to reset, I think he'd end up quitting.~
+M
+10
+say But I like to think I could have led the tower, in better times.~
+M
+10
+say We could be Skycleave as she was always meant to be. Not legends; heroes.~
+M
+10
+say Oh, how we could help people. There's enough magic in the old thing to light up the world.~
+M
+10
+say And how bright we could be. Put the past behind us. Oh, just imagine.~
+M
+10
+emote $n looks wistful... and then sad.~
+M
+10
+say But that's not in our stars, is it, sugar? You've been outside the loop. You know our fate better than I do.~
+M
+10
+say The goblins have it right in the end, don't they? They're the only ones who see us for what we are.~
+M
+10
+say Oh, sugar. That's too sad. This day cannot end fast enough.~
+M
+10
+emote $n blows her nose on a handkerchief and then tucks it up her sleeve.~
+M
+11
+emote $n stares off at nothing in particular with a melancholy look on her face.~
 T 11810
 T 11840
 T 11852
@@ -2481,26 +3068,138 @@ Niamh acting high sorcerer~
 Acting High Sorcerer Niamh~
 Acting High Sorcerer Niamh is standing here. (list)
 ~
-150 250 dvx n 3
+150 250 dvxJ n 3
 2 0 0 15
 D
-   Niamh's black hair shows fiery red roots as she stoops to pick up a book.
-Her pale face and hands stick out in stark contrast to her dark purple and
-black robes. She looks rather young compared to many of the sorcerers here.
+   Niamh stands tall in her freshly-pressed purple and black robes. In the
+right light, you can barely make out nocturnium stitching up and down the full
+length of the robes. It looks like tiny writing has been embroidered into them.
+Niamh's inky black hair, dyed with a purple streak, is pulled up into a tightly
+coiled braid above her pale, youthful -- but severe -- face. She rarely smiles,
+least of all at you.
    Type 'list', 'list id', or 'buy' to see and purchase melee equipment
 patterns.
 ~
 F 11800
 I 12 11872 100.00 1 p  # PICKPOCKET: hand-written note
+M
+7
+say Ah, there you are. Are you the one who fought off the enchantress, Mezvienne?~
+M
+7
+say I have been studying that most curious phenomenon, regarding her shadow.~
+M
+7
+say I could sense a disturbance in darkness itself when the shadow ascended, as if it was alive for the first time.~
+M
+7
+say Such a thing should never have been possible. A shadow is an inarticulate tool.~
+M
+7
+emote $n twists her hand in the air as her own shadow roils up onto it and lashes out with little tentacles.~
+M
+7
+say If we have truly become mired in this... time loop, as they're calling it...~
+M
+7
+say Perhaps whatever strange power brought animus to Mezvienne's shadow could also be the key to our salvation.~
+M
+7
+emote $n moves her fingers like a puppeteer as her shadow drops to the floor and begins to dance.~
+M
+7
+emote The little shadow grows in fits and spurts as $n nurtures and caresses it.~
+M
+7
+say But alas, when I give it the dark gift and try to set it free...~
+M
+7
+emote There's a flash of darkness from $n's hands and the shadow stops its tenebrous dance.~
+M
+7
+echo The little shadow turns toward you, then toward its maker, then back to you, reaching out...~
+M
+7
+echo And then, with a poof, the shadow is gone, dissipated in the lamplight.~
+M
+7
+emote A sad look crosses $n's face.~
+M
+7
+say As quickly as I set it free, the poor thing dies. Perhaps it never truly lived.~
+M
+8
+say I have been investigating where we might find another otherworlder.~
+M
+8
+say Attempts to locate the realm or plane of their origin have proved... futile.~
+M
+8
+say Nevertheless, we have gained a considerable amount of knowledge from it.~
+M
+8
+say There's no way to determine whether or not it's intelligent, or even aware of its surroundings...~
+M
+8
+say That is among the many questions that might be answered by a second one.~
+M
+8
+say I have been working on a new type of mana potion made from its blood or lymph or whatever that ooze might turn out to be.~
+M
+8
+say Sadly, we shall require a second one to continue that research as well.~
+M
+9
+say I must admit I am enjoying this promotion to High Sorcerer.~
+M
+9
+say I will, of course, have to replace the decor in the suite. Celiya and I have, shall we say, different tastes.~
+M
+9
+say I might never leave the fourth floor. I have always enjoyed looking down on the little people.~
+M
+9
+say There were plenty along the way who didn't believe in me. My own brother teased me about my powers.~
+M
+9
+say He was as jealous as the lot of them. I only wish he was here to see me now...~
+M
+9
+say Some day I'll be master of this whole tower, and they'll all be scrubbing it.~
+M
+9
+say There are a fair lot of them who could do with the humility of a little cleaning.~
+M
+9
+say I dare say I'll start with Djon, the layabout. He could use a good humbling.~
+M
+9
+emote $n seems to trail off into her own thoughts with little more than the clever grin on her face.~
+M
+10
+say Now that I have reached the top floor, I shall be instituting some changes.~
+M
+10
+say This tower has devolved into a cult of personality. We used to hold skill and power paramount.~
+M
+10
+say Perhaps Jozef's death, tragic though it was, is for the best.~
+M
+10
+say Under his leadership the tower fell into chaos.~
+M
+10
+say Celiya and I will return this tower to greatness, if she can be convinced to see reason.~
 T 11810
 T 11852
+T 11840
 S
 #11971
 Gron goblin~
 Gron~
 Gron is passing through the plaza.
 ~
-150 250 bd n 3
+150 250 bdJ n 3
 1 0 0 15
 D
    Gron's olive green skin nearly matches the shade of his oversized robe,
@@ -2818,7 +3517,7 @@ crowd~
 the crowd~
 A crowd has gathered on the adjoining rooftops.
 ~
-150 250 bd n 3
+150 250 bdJ n 3
 0 0 0 15
 D
    A crowd of eager goblins has gathered on the rooftops that overlook the
@@ -2832,7 +3531,7 @@ Broker captain guard goblin~
 Captain Broker~
 Captain Broker is doing the rounds.
 ~
-150 250 bd n 3
+150 250 bdJ n 3
 1 0 0 15
 D
    Broker is clad in a purple quilted cloth doublet that gives him an almost
@@ -2872,7 +3571,7 @@ Celles voice goblin~
 Celles~
 Celles, Voice of Orka, stands before the stone.
 ~
-150 250 bd n 3
+150 250 bdJ n 3
 2 0 0 15
 D
    With long, straight, translucent white hair that flows over her deep purple
@@ -2944,7 +3643,7 @@ Filliks goblin~
 Filliks~
 On the lower bed, Filliks is mending some socks.
 ~
-150 250 bd n 3
+150 250 bdJ n 3
 2 0 0 15
 D
    Though she's small even for a goblin, Filliks has an old woman's fine white
@@ -2982,7 +3681,7 @@ Pim goblin~
 Pim~
 Pim is tidying up.
 ~
-150 250 bd n 3
+150 250 bdJ n 3
 2 0 0 15
 D
    Pim wears a pleated purple skirt and a gray blouse. Two large white shell
@@ -3010,11 +3709,11 @@ T 11810
 T 11852
 S
 #11977
-fox gray~
+fox gray grey fermin~
 the gray fox~
 A gray fox is sitting by the oven.
 ~
-150 250 bdj n 3
+150 250 bdjJ n 3
 0 0 14 15
 D
    The curious fox isn't much larger than a cat, with an ashen-silver coat, a
@@ -3072,7 +3771,7 @@ pilgrim altar~
 an altar pilgrim~
 A pilgrim is here.
 ~
-150 250 bd n 3
+150 250 bdJ n 3
 0 0 0 15
 D
    This NPC is loaded and renamed dynamically as part of the scenery for the
@@ -3088,7 +3787,7 @@ Ryken elder goblin~
 Ryken the Elder~
 Ryken the Elder is on his knees in front of one of the bodies.
 ~
-150 250 bd n 3
+150 250 bdJ n 3
 1 0 0 15
 D
    You can hear Ryken's bones creaking as he moves. He's an old man, surely not
@@ -3122,7 +3821,7 @@ crowd~
 the crowd~
 There is a large crowd of people around the plaza.
 ~
-150 250 bd n 3
+150 250 bdJ n 3
 0 0 0 15
 D
    The plaza is a sea of green, with dozens of goblins, many of whom are
@@ -3178,7 +3877,7 @@ Ryke goblin~
 Ryke~
 Ryke is out for a walk.
 ~
-150 250 d n 3
+150 250 dJ n 3
 1 0 86 15
 D
    Ryke strolls along at a leisurely pace, looking at everyone he passes, and
@@ -3196,7 +3895,7 @@ Yena goblin~
 Yena~
 Yena is standing here.
 ~
-150 250 d n 3
+150 250 dJ n 3
 2 0 0 15
 D
    Yena is young, with fair chartreuse skin and long, straight, brown hair tied
@@ -3228,7 +3927,7 @@ Ballen goblin~
 Ballen~
 Ballen is out for a stroll.
 ~
-150 250 d n 3
+150 250 dJ n 3
 1 0 0 15
 D
    Though he just seems to be out for a walk, Ballen seems to be sight-seeing
@@ -3261,7 +3960,7 @@ Orkonna goblin~
 Orkonna~
 Orkonna is stirring one of the cauldrons.
 ~
-150 250 bd n 3
+150 250 bdJ n 3
 2 0 0 15
 D
    Orkonna is big, for a goblin, both in height and in weight. Her head is
@@ -3300,7 +3999,7 @@ Orlin goblin repairman~
 Orlin~
 A repairman is working on the damage.
 ~
-150 250 bd n 3
+150 250 bdJ n 3
 1 0 0 15
 D
    Orlan's jade skin glistens in the sun as he works, shirtless, on repairing
@@ -3352,7 +4051,7 @@ guards pair alivva rink~
 the guards~
 A pair of guards stand at attention inside the gate.
 ~
-150 250 bd n 3
+150 250 bdJ n 3
 0 0 0 15
 D
    Both of the little green guards are wearing quilted armor in deep purple and

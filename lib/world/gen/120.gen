@@ -48,6 +48,8 @@ impaled~
 0 0 0 0
 T0
 You are no longer impaled upon Anat's spear.~
+T5
+...$e is impaled upon Anat's spear!~
 S
 #12010
 earthshatter~
@@ -55,6 +57,8 @@ earthshatter~
 0 0 0 0
 T0
 You finally recover from the shockwave from Anat's hammer.~
+T5
+...$e is stunned from the shockwave!~
 S
 #12011
 hawk dive~
@@ -69,6 +73,8 @@ hawk dive~
 0 0 0 0
 T0
 You recover your weapon after Yatpan's dive attack.~
+T5
+...$e has lost $s weapon!~
 S
 #12013
 hawk dive~
@@ -76,6 +82,8 @@ hawk dive~
 0 0 0 0
 T0
 You are no longer stunned by Yatpan's dive attack.~
+T5
+...$e seems stunned!~
 S
 #12030
 Ba'al Hadad attack cooldown~
@@ -93,6 +101,8 @@ sonic roar~
 0 0 0 0
 T0
 You are no longer stunned by Ba'al Hadad's sonic roar.~
+T5
+...$e seems stunned by the roar!~
 S
 #12036
 bull charge~
@@ -100,6 +110,8 @@ bull charge~
 0 0 0 0
 T0
 You recover from the effects of Ba'al Hadad's charge.~
+T5
+...$e seems stunned by the charge!~
 S
 #12037
 thunderbolt~
@@ -112,6 +124,8 @@ thunderbolt~
 0 0 0 0
 T0
 You are no longer blinded by Ba'al Hadad's thunderbolt.~
+T5
+...$e seems blinded!~
 S
 #12039
 bolt from the blue~
@@ -119,6 +133,8 @@ bolt from the blue~
 0 0 0 0
 T0
 You are no longer affected by that bolt from the blue.~
+T5
+...$e seems stunned by that bolt!~
 S
 #12040
 sonic roar~

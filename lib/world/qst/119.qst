@@ -451,8 +451,8 @@ you nod. She ponders it for a moment.
    'My word,' she says at last. 'I shall set myself to researching this odd
 phenomenon at once. Perhaps my new station in the Tower will prove useful in
 getting answers.'
-   You try to discuss it further, but Niamh seems lost in her own thoughts and
-she soon wanders off.
+   You try to discuss it further, but Niamh seems preoccupied with her own
+thoughts and she soon wanders off.
 ~
 19 ei 150 250 -1
 A
@@ -496,7 +496,7 @@ put up a sign... which seems to have gone missing.
 where. But it's a great test of an adventurer's mettle. Be sure to fight it
 again when you get the chance.'
 ~
-15 0 150 250 -1
+16 0 150 250 -1
 A
 3 11972
 P
@@ -510,6 +510,8 @@ Z
 1 11839
 Z
 1 11939
+Z
+1 11919
 S
 #11975
 Gobbrabakh of Orka: Where Am I?~
