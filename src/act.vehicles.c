@@ -539,6 +539,11 @@ void perform_load_mob(char_data *ch, char_data *mob, vehicle_data *cont, room_da
 		look_at_room(mob);
 	}
 	
+	// update spawn time: delay despawn due to interaction
+	if (MOB_FLAGGED(mob, MOB_SPAWNED)) {
+		MOB_SPAWN_TIME(mob) = time(0);
+	}
+	
 	snprintf(buf, sizeof(buf), "$n is loaded %sto $V.", IN_OR_ON(cont));
 	act(buf, FALSE, mob, NULL, cont, TO_ROOM);
 	
@@ -591,6 +596,11 @@ void perform_unload_mob(char_data *ch, char_data *mob, vehicle_data *cont) {
 	pre_greet_mtrigger(mob, IN_ROOM(mob), NO_DIR, "exit");	// cannot pre-greet for this
 	if (mob->desc) {
 		look_at_room(mob);
+	}
+	
+	// update spawn time: delay despawn due to interaction
+	if (MOB_FLAGGED(mob, MOB_SPAWNED)) {
+		MOB_SPAWN_TIME(mob) = time(0);
 	}
 	
 	act("$n is unloaded from $V.", FALSE, mob, NULL, cont, TO_ROOM);
