@@ -1880,7 +1880,7 @@ if %mode% == clear
     end
     if %arg% == free || %arg% == all
       dg_affect #11888 %ch% off
-      dg_affect #11861 %targ% off
+      dg_affect #11861 %ch% off
       dg_affect #11949 %ch% off
       rdelete did_sffree %ch.id%
       rdelete needs_sffree %ch.id%

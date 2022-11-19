@@ -5333,7 +5333,7 @@ end
 nop %self.remove_mob_flag(NO-ATTACK)%
 ~
 #11983
-Iskip combat: Jar of Captivity~
+Iskip combat: Jar of Captivity, Lightning Torrent, Buff Blitz~
 0 k 100
 ~
 if %self.cooldown(11800)% || %self.disabled%
@@ -5341,12 +5341,14 @@ if %self.cooldown(11800)% || %self.disabled%
 end
 set room %self.room%
 set diff %self.diff%
+* always be countering
+dg_affect #3021 %self% SOULMASK on 15
 * order
 set moves_left %self.var(moves_left)%
 set num_left %self.var(num_left,0)%
 if !%moves_left% || !%num_left%
-  set moves_left 1
-  set num_left 1
+  set moves_left 1 2 3
+  set num_left 3
 end
 * pick
 eval which %%random.%num_left%%%
@@ -5372,7 +5374,7 @@ if %move% == 1 && !%self.aff_flagged(BLIND)%
   * Jar of Captivity
   skyfight clear free
   skyfight clear struggle
-  %echo% &&m~%self% pulls out an enormous clay jar and swoops down toward you...&&0
+  %echo% &&mThe Iskip pulls out an enormous clay jar and swoops down toward you...&&0
   wait 3 s
   if %self.disabled%
     halt
@@ -5385,7 +5387,7 @@ if %move% == 1 && !%self.aff_flagged(BLIND)%
   if %self.fighting% == %targ% && %diff% < 4
     dg_affect #11852 %self% HARD-STUNNED on 20
   end
-  if %diff% <= 2 || (%self.level% + 100) <= %targ.level%
+  if %diff% <= 2 || (%self.level% + 100) <= %targ.level% || %room.players_present% == 1
     %send% %targ% &&m**** The jar comes down on your head! You have to break free! ****&&0 (struggle)
     %echoaround% %targ% &&mThe jar comes down on ~%targ%, trapping *%targ%!&&0
     skyfight setup struggle %targ% 20
@@ -5423,9 +5425,125 @@ if %move% == 1 && !%self.aff_flagged(BLIND)%
   end
   dg_affect #11852 %self% off
 elseif %move% == 2
-  *
+  * Lightning Torrent
+  %echo% &&mThe Iskip holds his hands out to the side as sparks crackle around his fingers...&&0
+  %echo% &&m**** He seems to be drawing lighting up from the water! ****&&0 (interrupt and dodge)
+  if %diff% == 1
+    nop %self.add_mob_flag(NO-ATTACK)%
+  end
+  skyfight clear dodge
+  skyfight clear interrupt
+  skyfight setup interrupt all
+  set cycle 0
+  set broke 0
+  while !%broke% && %cycle% <= 4
+    skyfight setup dodge all
+    wait 4 s
+    if %self.sfinterrupt_count% >= 1 && %self.sfinterrupt_count% >= (%diff% + 1) / 2
+      set broke 1
+      set ch %room.people%
+      while %ch%
+        if %ch.var(did_sfinterrupt,0)%
+          %send% %ch% &&mYou somehow manage to interrupt the Iskip before another lightning torrent!&&0
+        end
+        set ch %ch.next_in_room%
+      done
+      %echo% &&mThe Iskip seems distracted, if only for a moment.&&0
+      if %diff% == 1
+        dg_affect #11852 %self% HARD-STUNNED on 10
+        wait 10 s
+      elseif %diff% < 4
+        dg_affect #11852 %self% HARD-STUNNED on 5
+        wait 5 s
+      end
+    else
+      %echo% &&mThe Iskip's fingers crackle as a torrent of lightning bolts stream up from the water...&&0
+      set ch %room.people%
+      while %ch%
+        set next_ch %ch.next_in_room%
+        if %self.is_enemy(%ch%)%
+          if %ch.var(did_sfdodge)%
+            %send% %ch% &&mYou manage to narrowly dodge the lightning bolts!&&0
+          else
+            if %ch.trigger_counterspell%
+              %send% %ch% Your counterspell does nothing against the Iskip!
+            end
+            * hit
+            %send% %ch% &&mA lightning bolt strikes you right in the chest!&&0
+            %echoaround% %ch% &&m~%ch% screams as a lightning bolt strikes *%ch%!&&0
+            eval amount %diff% * 30
+            %damage% %ch% %amount% physical
+            if %cycle% == 4 && %diff% == 4 && (%self.level% + 100) > %ch.level% && !%ch.aff_flagged(!STUN)%
+              dg_affect #11851 %ch% STUNNED on 10
+            end
+          end
+        end
+        set ch %next_ch%
+      done
+    end
+    if !%broke% && %cycle% < 4
+      %echo% &&m**** Here comes another lightning torrent... ****&&0 (interrupt and dodge)
+    end
+    eval cycle %cycle% + 1
+  done
+  skyfight clear dodge
+  skyfight clear interrupt
 elseif %move% == 3
-  *
+  * Buff Blitz
+  %echo% &&mThe Iskip raises his hands to the sky and begins chanting something you don't understand...&&0
+  %echo% &&m**** He seems to be casting spells... on himself! ****&&0 (interrupt)
+  if %diff% == 1
+    nop %self.add_mob_flag(NO-ATTACK)%
+  end
+  set cycle 1
+  set needed %room.players_present%
+  if %needed% > 4
+    set needed 4
+  end
+  set which 0
+  while %cycle% <= 4
+    skyfight clear interrupt
+    skyfight setup interrupt all
+    wait 5 s
+    if %self.sfinterrupt_count% >= %needed%
+      set ch %room.people%
+      while %ch%
+        if %ch.var(did_sfinterrupt,0)%
+          %send% %ch% &&mYou somehow manage to interrupt the Iskip's spells!&&0
+        end
+        set ch %ch.next_in_room%
+      done
+      %echo% &&mThe Iskip seems distracted, if only for a moment.&&0
+      if %diff% == 1
+        dg_affect #11852 %self% HARD-STUNNED on 10
+      elseif %diff% < 4
+        dg_affect #11852 %self% HARD-STUNNED on 5
+      end
+    else
+      * 4 buffs in order:
+      eval which %which% + 1
+      if %which% == 1
+        %echo% &&mRays of moonlight bathe the Iskip from above... he seems stronger!&&0
+        eval amt %diff% * 15
+        dg_affect #11889 %self% BONUS-MAGICAL %amt% 30
+      elseif %which% == 2
+        %echo% &&mA rush of water swirls up around the Iskip from the sea... he's gone to be hard to hit!&&0
+        eval amt %diff% * 20
+        dg_affect #11890 %self% DODGE %amt% 30
+      elseif %which% == 3
+        %echo% &&mA lightning bolt strikes the Iskip from out of the blue... he seems faster!&&0
+        dg_affect #11892 %self% HASTE on 30
+      elseif %which% == 4
+        %echo% &&mMana streams out of the enormous stump and into the Iskip, healing him!&&0
+        %heal% %self% health
+      end
+    end
+    if %cycle% < 4
+      %echo% &&m**** He's casting another one... ****&&0 (interrupt)
+    end
+    eval cycle %cycle% + 1
+  done
+  skyfight clear interrupt
 elseif %move% == 4
   *
 end
@@ -5737,8 +5855,8 @@ set diff %self.diff%
 set moves_left %self.var(moves_left)%
 set num_left %self.var(num_left,0)%
 if !%moves_left% || !%num_left%
-  set moves_left 1 1 2 2 3 3 4 4 5
-  set num_left 9
+  set moves_left 1 2 3 4 5
+  set num_left 5
 end
 * pick
 eval which %%random.%num_left%%%
