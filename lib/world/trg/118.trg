@@ -1881,6 +1881,7 @@ if %mode% == clear
     if %arg% == free || %arg% == all
       dg_affect #11888 %ch% off
       dg_affect #11861 %ch% off
+      dg_affect #11863 %ch% off
       dg_affect #11949 %ch% off
       rdelete did_sffree %ch.id%
       rdelete needs_sffree %ch.id%
@@ -2108,6 +2109,7 @@ elseif %type% == free
   %echoaround% %actor% ~%actor% frees ~%targ%!
   dg_affect #11888 %targ% off
   dg_affect #11861 %targ% off
+  dg_affect #11863 %targ% off
   dg_affect #11949 %targ% off
 end
 ~
@@ -4561,10 +4563,254 @@ end
 nop %self.remove_mob_flag(NO-ATTACK)%
 ~
 #11856
-Skycleave: Shadow Ascendant fight~
+Shadow Ascendant fight: Shadow Cage, Shadow Torrent, Freezing Air, Shadow Slice~
 0 k 100
 ~
-* tba
+if %self.cooldown(11800)% || %self.disabled%
+  halt
+end
+set room %self.room%
+set diff %self.diff%
+* order
+set moves_left %self.var(moves_left)%
+set num_left %self.var(num_left,0)%
+if !%moves_left% || !%num_left%
+  set moves_left 1 2 3 4
+  set num_left 4
+end
+* pick
+eval which %%random.%num_left%%%
+set old %moves_left%
+set moves_left
+set move 0
+while %which% > 0
+  set move %old.car%
+  if %which% != 1
+    set moves_left %moves_left% %move%
+  end
+  set old %old.cdr%
+  eval which %which% - 1
+done
+set moves_left %moves_left% %old%
+* store
+eval num_left %num_left% - 1
+remote moves_left %self.id%
+remote num_left %self.id%
+skyfight lockout 30 30
+if %move% == 1 && !%self.aff_flagged(BLIND)%
+  skyfight clear free
+  skyfight clear struggle
+  %echo% &&mThe Shadow seems to be growing...&&0
+  wait 3 s
+  if %self.disabled%
+    halt
+  end
+  set targ %random.enemy%
+  if !%targ%
+    halt
+  end
+  set targ_id %targ.id%
+  if %self.fighting% == %targ% && %diff% < 4
+    dg_affect #11852 %self% HARD-STUNNED on 20
+  end
+  if %targ.trigger_counterspell%
+    %echo% &&m~%self% sparks with primordial energy as it consumes |%targ% counterspell!&&0
+    dg_affect #11864 %self% BONUS-MAGICAL 10 on -1
+  end
+  if %diff% <= 2 || (%self.level% + 100) <= %targ.level% || %room.players_present% == 1
+    %send% %targ% &&m**** The Shadow envelops you like a cage! You have to break free! ****&&0 (struggle)
+    %echoaround% %targ% &&mThe Shadow envelops ~%targ%, trapping *%targ%!&&0
+    skyfight setup struggle %targ% 20
+    set bug %targ.inventory(11890)%
+    if %bug%
+      set strug_char You try to get free out of the shadow cage...
+      set strug_room You hear ~%%actor%% trying to get free of the shadow cage...
+      remote strug_char %bug.id%
+      remote strug_room %bug.id%
+      set free_char You fight your way out of the shadow cage!
+      set free_room ~%%actor%% manages to get out of the shadow cage!
+      remote free_char %bug.id%
+      remote free_room %bug.id%
+    end
+    wait 20 s
+    skyfight clear struggle
+  else
+    %send% %targ% &&mThe Shadow envelops you like a cage! There's nothing you can do!&&0
+    %echoaround% %targ% &&m**** The Shadow envelops ~%targ% like a cage, trapping *%targ%! ****&&0 (free %targ.pc_name.car%)
+    skyfight setup free %targ%
+    eval time %diff% * 15
+    dg_affect #11863 %targ% HARD-STUNNED on %time%
+    * wait and clear
+    set done 0
+    while !%done% && %time% > 0
+      wait 5 s
+      eval time %time% - 5
+      if %targ_id% != %targ.id%
+        set done 1
+      elseif !%targ.affect(11863)%
+        set done 1
+      end
+    done
+    skyfight clear free
+  end
+  dg_affect #11852 %self% off
+elseif %move% == 2
+  %echo% &&mThe Shadow cracks and swirls as the office seems to darken...&&0
+  %echo% &&m**** It seems to be drawing smaller shadows into itself! ****&&0 (interrupt and dodge)
+  if %diff% == 1
+    nop %self.add_mob_flag(NO-ATTACK)%
+  end
+  skyfight clear dodge
+  skyfight clear interrupt
+  skyfight setup interrupt all
+  set cycle 0
+  set broke 0
+  while !%broke% && %cycle% <= 4
+    skyfight setup dodge all
+    wait 4 s
+    if %self.sfinterrupt_count% >= 1 && %self.sfinterrupt_count% >= (%diff% + 1) / 2
+      set broke 1
+      set ch %room.people%
+      while %ch%
+        if %ch.var(did_sfinterrupt,0)%
+          %send% %ch% &&mYou manage to distract the Ascendant before another shadow torrent!&&0
+        end
+        set ch %ch.next_in_room%
+      done
+      %echo% &&mThe Shadow seems distracted, if only for a moment.&&0
+      if %diff% == 1
+        dg_affect #11852 %self% HARD-STUNNED on 10
+        wait 10 s
+      elseif %diff% < 4
+        dg_affect #11852 %self% HARD-STUNNED on 5
+        wait 5 s
+      end
+    else
+      %echo% &&mThe Shadow cracks and swirls as a torrent of smaller shadows stream into it from around the tower...&&0
+      set ch %room.people%
+      while %ch%
+        set next_ch %ch.next_in_room%
+        if %self.is_enemy(%ch%)%
+          if %ch.var(did_sfdodge)%
+            %send% %ch% &&mYou manage to narrowly dodge the streaming shadows!&&0
+          else
+            if %ch.trigger_counterspell%
+              %echo% &&mThe Shadow Ascendant sparks with primordial energy as it consumes |%ch% counterspell!&&0
+              dg_affect #11864 %self% BONUS-MAGICAL 10 on -1
+            end
+            * hit
+            %echo% &&mA shadow cuts straight ~%ch% as it streams into the Ascendant!&&0
+            eval amount %diff% * 30
+            %damage% %ch% %amount% physical
+            if %cycle% == 4 && %diff% == 4 && (%self.level% + 100) > %ch.level% && !%ch.aff_flagged(!STUN)%
+              dg_affect #11851 %ch% STUNNED on 10
+            end
+          end
+        end
+        set ch %next_ch%
+      done
+    end
+    if !%broke% && %cycle% < 4
+      %echo% &&m**** Here comes another shadow torrent... ****&&0 (interrupt and dodge)
+    end
+    eval cycle %cycle% + 1
+  done
+  skyfight clear dodge
+  skyfight clear interrupt
+elseif %move% == 3
+  skyfight clear interrupt
+  %regionecho% %room% 1 &&y~%self% shouts, 'By the power of Skycleave!'&&0
+  wait 3 sec
+  set targ %self.fighting%
+  set id %targ.id%
+  %echo% &&m**** &&ZThe shadow holds its gnarled wand high and the air starts to freeze FAST... ****&&0 (interrupt)
+  skyfight setup interrupt all
+  set cycle 0
+  set broke 0
+  while !%broke% && %cycle% < 5
+    wait 4 s
+    if %self.disabled%
+      halt
+    end
+    if %self.sfinterrupt_count% >= 1 && %self.sfinterrupt_count% >= (%diff% + 1) / 2
+      set broke 1
+      set ch %room.people%
+      while %ch%
+        if %ch.var(did_sfinterrupt,0)%
+          %send% %ch% &&mYou manage to distract the Shadow by throwing knickknacks at it!&&0
+        end
+        set ch %ch.next_in_room%
+      done
+      %echo% &&m~%self% is hit with a knickknack; the air starts to warm up down as the spell breaks.&&0
+      if %diff% == 1
+        dg_affect #11852 %self% HARD-STUNNED on 10
+      end
+    else
+      set ch %room.people%
+      while %ch%
+        set next_ch %ch.next_in_room%
+        if %self.is_enemy(%ch%)%
+          if %ch.trigger_counterspell%
+            %echo% &&m~%self% sparks with primordial energy as it consumes |%ch% counterspell!&&0
+            dg_affect #11864 %self% BONUS-MAGICAL 10 on -1
+          end
+          * hit!
+          %send% %ch% &&mThe freezing air stings your skin, eyes, and lungs!&&0
+          %echoaround% %ch% &&m~%ch% cries out as the air freezes *%ch%!&&0
+          eval amount %diff% * 25
+          %damage% %ch% %amount% magical
+        end
+        set ch %next_ch%
+      done
+    end
+    eval cycle %cycle% + 1
+  done
+  skyfight clear interrupt
+elseif %move% == 4
+  skyfight clear dodge
+  %echo% &&mThe Shadow lets out a low rumble as it twists and contorts...&&0
+  wait 3 s
+  %echo% &&m**** The Shadow's sinuous tendrils sharpen into a vicious axe! ****&&0 (dodge)
+  if %diff% == 1
+    nop %self.add_mob_flag(NO-ATTACK)%
+  end
+  skyfight setup dodge all
+  wait 8 s
+  if %self.disabled%
+    nop %self.remove_mob_flag(NO-ATTACK)%
+    halt
+  end
+  set hit 0
+  set ch %room.people%
+  while %ch%
+    set next_ch %ch.next_in_room%
+    if %self.is_enemy(%ch%)%
+      if !%ch.var(did_sfdodge)%
+        if %ch.trigger_counterspell%
+          %echo% &&m~%self% sparks with primordial energy as it consumes |%ch% counterspell!&&0
+          dg_affect #11864 %self% BONUS-MAGICAL 10 on -1
+        end
+        set hit 1
+        %echo% &&mThe shadow axe slices right through ~%ch%!&&0
+        eval amt %diff% * 50
+        %damage% %ch% %amt% magical
+      elseif %ch.is_pc%
+        %send% %ch% &&mYou narrowly avoid a slice from the shadow axe!&&0
+      end
+    end
+    set ch %next_ch%
+  done
+  skyfight clear dodge
+  if !%hit%
+    if %diff% < 3
+      %echo% &&mThe Shadow disperses for a second as it fails to slice through the stone wall!&&0
+      dg_affect #11852 %self% HARD-STUNNED on 10
+    end
+  end
+  wait 8 s
+end
+* in case
+nop %self.remove_mob_flag(NO-ATTACK)%
 ~
 #11857
 Skycleave: Mercenary name setup~

@@ -256,6 +256,20 @@ You're no longer pinned down by the shadow dagger!~
 T5
 ...$s shadow is pinned to the ground!~
 S
+#11863
+shadow cage~
+4 0
+0 0 0 0
+T4
+$e is trapped in a shadow cage -- free $m!~
+T5
+...$e is trapped in a shadow cage -- free $m!~
+S
+#11864
+absorbed spell~
+4 0
+0 0 0 0
+S
 #11865
 flying~
 4 0

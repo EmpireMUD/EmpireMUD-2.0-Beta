@@ -5333,7 +5333,7 @@ end
 nop %self.remove_mob_flag(NO-ATTACK)%
 ~
 #11983
-Iskip combat: Jar of Captivity, Lightning Torrent, Buff Blitz~
+Iskip combat: Jar of Captivity, Lightning Torrent, Buff Blitz, Radiant Axe~
 0 k 100
 ~
 if %self.cooldown(11800)% || %self.disabled%
@@ -5347,8 +5347,8 @@ dg_affect #3021 %self% SOULMASK on 15
 set moves_left %self.var(moves_left)%
 set num_left %self.var(num_left,0)%
 if !%moves_left% || !%num_left%
-  set moves_left 1 2 3
-  set num_left 3
+  set moves_left 1 2 3 4
+  set num_left 4
 end
 * pick
 eval which %%random.%num_left%%%
@@ -5545,7 +5545,44 @@ elseif %move% == 3
   done
   skyfight clear interrupt
 elseif %move% == 4
-  *
+  * Radiant Axe
+  skyfight clear dodge
+  %echo% &&mThe Iskip speaks a few words in a language you don't understand...&&0
+  wait 3 s
+  %echo% &&m**** A gleaming, radiant axe forms from the haze itself and the giant grabs it! ****&&0 (dodge)
+  if %diff% == 1
+    nop %self.add_mob_flag(NO-ATTACK)%
+  end
+  skyfight setup dodge all
+  wait 8 s
+  if %self.disabled%
+    nop %self.remove_mob_flag(NO-ATTACK)%
+    halt
+  end
+  set hit 0
+  set ch %room.people%
+  while %ch%
+    set next_ch %ch.next_in_room%
+    if %self.is_enemy(%ch%)%
+      if !%ch.var(did_sfdodge)%
+        set hit 1
+        %echo% &&mThe giant's radiant axe slices through ~%ch%!&&0
+        eval amt %diff% * 50
+        %damage% %ch% %amt% physical
+      elseif %ch.is_pc%
+        %send% %ch% &&mYou narrowly avoid the giant's radiant axe!&&0
+      end
+    end
+    set ch %next_ch%
+  done
+  skyfight clear dodge
+  if !%hit%
+    if %diff% < 3
+      %echo% &&mThe Iskip stumbles as his radiant axe misses!&&0
+      dg_affect #11852 %self% HARD-STUNNED on 10
+    end
+  end
+  wait 8 s
 end
 * in case
 nop %self.remove_mob_flag(NO-ATTACK)%
