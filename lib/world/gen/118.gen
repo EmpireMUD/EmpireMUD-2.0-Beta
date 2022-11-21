@@ -293,6 +293,18 @@ momentarily stunned~
 T0
 You're no longer stunned.~
 S
+#11869
+shadow flail~
+4 0
+0 0 0 0
+T5
+...it's flailing wildly around the office!~
+S
+#11870
+shadow flail~
+4 0
+0 0 0 0
+S
 #11880
 magic rock candy~
 6 0
@@ -339,6 +351,8 @@ S
 lightning struck~
 4 0
 0 0 0 0
+T1
+The Iskip slows back down.~
 S
 #11896
 Lilac Goblin Wine~

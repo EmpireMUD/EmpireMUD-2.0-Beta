@@ -4673,7 +4673,7 @@ elseif %move% == 2
       set ch %room.people%
       while %ch%
         if %ch.var(did_sfinterrupt,0)%
-          %send% %ch% &&mYou manage to distract the Ascendant before another shadow torrent!&&0
+          %send% %ch% &&mYou manage to interrupt the Ascendant before another shadow torrent!&&0
         end
         set ch %ch.next_in_room%
       done
@@ -4931,10 +4931,201 @@ done
 detach 11857 %self.id%
 ~
 #11858
-Skycleave: Shade of Mezvienne fight~
+Shade of Mezvienne fight: Shadow Whip, Shadow Flail, Total Darkness, Shade's Grasp~
 0 k 100
 ~
-* tba
+if %self.cooldown(11800)% || %self.disabled%
+  halt
+end
+set room %self.room%
+set diff %self.diff%
+* order
+set moves_left %self.var(moves_left)%
+set num_left %self.var(num_left,0)%
+if !%moves_left% || !%num_left%
+  set moves_left 1 2 3 4
+  set num_left 4
+end
+* pick
+eval which %%random.%num_left%%%
+set old %moves_left%
+set moves_left
+set move 0
+while %which% > 0
+  set move %old.car%
+  if %which% != 1
+    set moves_left %moves_left% %move%
+  end
+  set old %old.cdr%
+  eval which %which% - 1
+done
+set moves_left %moves_left% %old%
+* store
+eval num_left %num_left% - 1
+remote moves_left %self.id%
+remote num_left %self.id%
+* perform move
+skyfight lockout 30 30
+if %move% == 1
+  * Shadow Whip
+  skyfight clear dodge
+  %echo% &&mThe Shade spins itself into a ball...&&0
+  if %diff% == 1
+    nop %self.add_mob_flag(NO-ATTACK)%
+  end
+  wait 1
+  set cycle 1
+  eval wait 8 - %diff%
+  while %cycle% <= (2 * %diff%)
+    set targ %random.enemy%
+    set targ_id %targ.id%
+    skyfight setup dodge %targ%
+    %send% %targ% &&m**** The shadows gather around you... ****&&0 (dodge)
+    wait %wait% s
+    if %targ.id% != %targ_id% || %targ.position% == Dead
+      * gone
+    elseif %targ.var(did_sfdodge)%
+      %echo% &&mA tendril whips out from the Shade but misses ~%targ%!&&0
+    else
+      * hit
+      %echo% &&mA shadow tendril whips out from the Shade and flogs ~%targ%!&&0
+      dg_affect #11815 %targ% off silent
+      dg_affect #11815 %targ% DISARMED on 20
+      if %diff% > 1
+        %send% %targ% That really hurt!
+        eval pain 40 + (%diff% * 40)
+        %damage% %targ% %pain% physical
+      end
+    end
+    skyfight clear dodge
+    eval cycle %cycle% + 1
+  done
+elseif %move% == 2
+  * Shadow Flail
+  skyfight clear dodge
+  %echo% &&mThe Shade spins, flailing its tendrils in all directions...&&0
+  eval dodge %diff% * 40
+  dg_affect #11869 %self% DODGE %dodge% 20
+  if %diff% == 1
+    nop %self.add_mob_flag(NO-ATTACK)%
+  end
+  skyfight setup dodge all
+  wait 3 s
+  %echo% &&m**** If you're going to dodge the Shade's flailing tendrils, now is the time! ****&&0 (dodge)
+  set cycle 1
+  set hit 0
+  eval wait 10 - %diff%
+  while %cycle% <= %diff%
+    skyfight setup dodge all
+    wait %wait% s
+    set ch %room.people%
+    while %ch%
+      set next_ch %ch.next_in_room%
+      if %self.is_enemy(%ch%)%
+        if !%ch.var(did_sfdodge)%
+          set hit 1
+          %echo% &&mThe Shade hits ~%ch% with a flailing tendril!&&0
+          if %diff% > 1
+            dg_affect #11870 %ch% TO-HIT -15 30
+          end
+          eval amt %diff% * 20
+          %damage% %ch% %amt% physical
+        elseif %ch.is_pc%
+          %send% %ch% &&mYou narrowly avoid a flailing tendril!&&0
+        end
+        if %cycle% < %diff%
+          %send% %ch% &&m**** The Shade is still flailing! ****&&0 (dodge)
+        end
+      end
+      set ch %next_ch%
+    done
+    eval cycle %cycle% + 1
+  done
+  skyfight clear dodge
+  dg_affect #11869 %self% off
+  if !%hit%
+    if %diff% < 3
+      %echo% &&m~%self% slowly spins back down.&&0
+      dg_affect #11852 %self% HARD-STUNNED on 10
+    end
+  end
+  wait 8 s
+elseif %move% == 3
+  * Total Darkness
+  skyfight clear interrupt
+  if %diff% == 1
+    nop %self.add_mob_flag(NO-ATTACK)%
+  end
+  skyfight setup interrupt all
+  %echo% &&m**** The office grows dimmer as the shadows gather... ****&&0 (interrupt)
+  wait 8 s
+  if %self.sfinterrupt_count% >= 1 && %self.sfinterrupt_count% >= (%diff% + 1) / 2
+    set broke 1
+    set ch %room.people%
+    while %ch%
+      if %ch.var(did_sfinterrupt,0)%
+        %send% %ch% &&mYou somehow manage to interrupt the Shade!&&0
+      end
+      set ch %ch.next_in_room%
+    done
+    %echo% &&mThe darkness scatters for a moment as the Shade is distracted.&&0
+    if %diff% == 1
+      dg_affect #11852 %self% HARD-STUNNED on 5
+    end
+  else
+    %echo% &&mThe last light fades and the office is plunged into total darkness!&&0
+    set ch %room.people%
+    while %ch%
+      if %self.is_enemy(%ch%)%
+        if %ch.ability(Darkness)%
+          %send% %ch% Luckily you can still see!
+        else
+          dg_affect #11860 %ch% BLIND on 25
+        end
+      end
+      set ch %ch.next_in_room%
+    done
+  end
+elseif %move% == 4
+  * Shade's Grasp
+  eval time %diff% * 6
+  if %diff% <= 2
+    dg_affect #11852 %self% HARD-STUNNED on %time%
+  end
+  set targ 0
+  set targ_id 0
+  while %time% > 0
+    if !%targ% || %targ.id% != %targ_id% || !%targ.affect(11822)%
+      skyfight clear struggle
+      set targ %random.enemy%
+      if !%targ%
+        halt
+      end
+      set targ_id %targ.id%
+      %send% %targ% &&m**** The Shade wraps itself around you! ****&&0 (struggle)
+      %echoaround% %targ% &&mThe Shade wraps itself around ~%targ%!&&0
+      skyfight setup struggle %targ% %time%
+      set bug %targ.inventory(11890)%
+      if %bug%
+        set strug_char You try to struggle free of the Shade's grasp...
+        set strug_room ~%%actor%% struggles to get free of the Shade's grasp...
+        remote strug_char %bug.id%
+        remote strug_room %bug.id%
+        set free_char You manage to wiggle out of the Shade's grasp!
+        set free_room ~%%actor%% manages to wiggle out of the Shade's grasp!
+        remote free_char %bug.id%
+        remote free_room %bug.id%
+      end
+    else
+      %send% %targ% &&m**** You're still caught in the Shade's grasp! ****&0 (struggle)
+    end
+    eval time %time% - 3
+    wait 3 s
+  done
+  skyfight clear struggle
+  dg_affect #11852 %self% off
+end
+nop %self.remove_mob_flag(NO-ATTACK)%
 ~
 #11859
 Skycleave: MC Barrosh fight~

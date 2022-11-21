@@ -2262,6 +2262,7 @@ T 11806
 T 11856
 T 11821
 T 11822
+T 11903
 S
 #11864
 Celiya high sorcerer~
@@ -2405,7 +2406,7 @@ Mezvienne shade shadow~
 the Shade of Mezvienne~
 The Shade of Mezvienne surrounds Knezz like a phantom.
 ~
-150 250 bdhyJ 0 3
+150 250 bdhyJ hCDE 3
 0 0 0 7
 D
    The Shade is lithe, feminine, even graceful as it swirls back and forth
@@ -2445,6 +2446,8 @@ T 11823
 T 11863
 T 11806
 T 11858
+T 11821
+T 11822
 S
 #11870
 knezz grand high sorcerer~
@@ -3027,6 +3030,7 @@ T 11983
 T 11803
 T 11821
 T 11822
+T 11903
 S
 #11889
 Wright wrangler~

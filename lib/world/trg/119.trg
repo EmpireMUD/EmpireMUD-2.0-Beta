@@ -150,6 +150,20 @@ if %rescale% && %self.level%
   %scale% %self% %self.level%
 end
 ~
+#11903
+Skycleave: Reset buffs when out of combat~
+0 bw 100
+~
+* Resets "permanent" buffs when the mob is out of combat
+if %self.fighting% || %self.disabled%
+  halt
+end
+dg_affect #11864 %self% off silent
+dg_affect #11889 %self% off silent
+dg_affect #11890 %self% off silent
+dg_affect #11892 %self% off silent
+%heal% %self% health 10000
+~
 #11904
 Skycleave: Cleaning crew despawn~
 0 b 33
@@ -5524,12 +5538,12 @@ elseif %move% == 3
       eval which %which% + 1
       if %which% == 1
         %echo% &&mRays of moonlight bathe the Iskip from above... he seems stronger!&&0
-        eval amt %diff% * 15
-        dg_affect #11889 %self% BONUS-MAGICAL %amt% 30
+        eval amt %diff% * 5
+        dg_affect #11889 %self% BONUS-MAGICAL %amt% -1
       elseif %which% == 2
         %echo% &&mA rush of water swirls up around the Iskip from the sea... he's gone to be hard to hit!&&0
-        eval amt %diff% * 20
-        dg_affect #11890 %self% DODGE %amt% 30
+        eval amt %diff% * 10
+        dg_affect #11890 %self% DODGE %amt% -1
       elseif %which% == 3
         %echo% &&mA lightning bolt strikes the Iskip from out of the blue... he seems faster!&&0
         dg_affect #11892 %self% HASTE on 30
