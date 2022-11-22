@@ -2836,8 +2836,72 @@ patterns.
 ~
 F 11800
 I 12 11869 100.00 1 p  # PICKPOCKET: self-writing pen
+M
+7
+set line_gap 6 s~
+M
+7
+say I keep telling him I don't remember a thing.~
+M
+7
+emote $n stops and looks over at you.~
+M
+7
+set line_gap 9 s~
+M
+7
+say Oh dear, just talking to meself as I work.~
+M
+7
+say Keeps you sane, I always say.~
+M
+7
+emote $n hums quietly as she attempts to organize the desk.~
+M
+8
+say The thing is, he has a lot on his mind.~
+M
+8
+say Blames himself, I think, but we know it was that shadow getting in his head.~
+M
+8
+say Nothing at all he could have done differently.~
+M
+9
+say Has it in his mind he's going to retire.~
+M
+9
+say Nonsense.~
+M
+9
+say This tower needs him, now more than ever.~
+M
+9
+emote $n makes a tsk sound with her tongue.~
+M
+0
+$n shuffles some papers around.~
+M
+0
+$n tries to polish a stubborn spot on the desk.~
+M
+0
+From time to time, $n glances toward the north door.~
+M
+0
+$n fans herself as a hot breeze comes in through the window.~
+M
+0
+$n hums as she works.~
+M
+0
+$n hums as she works.~
+M
+0
+$n hums as she works.~
 T 11810
 T 11852
+T 11840
 S
 #11967
 barrosh high sorcerer~

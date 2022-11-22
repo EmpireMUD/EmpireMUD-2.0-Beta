@@ -6762,7 +6762,7 @@ Skycleave: Barrosh storytime using script1-3~
 0 bw 100
 ~
 * variant of 11840/Storytime:
-* script1: Knezz and Grace died
+* script1: Grace died
 * script2: Knezz died but Grace lived
 * script3: Both lived
 set line_gap 9 s
