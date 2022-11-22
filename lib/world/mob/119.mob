@@ -2854,7 +2854,80 @@ plumps at the sides. He doesn't even look up at you -- you aren't sure he's
 even aware you're here.
 ~
 F 11800
+M
+7
+say I am in no mood to talk.~
+M
+7
+set line_gap 180 s~
+M
+7
+say That was a euphemism for Go Away.~
+M
+7
+set line_gap 9 s~
+M
+7
+say What a fool was I, trusting those shadow witches.~
+M
+7
+say I'll be out of here by week's end. They can give the office to the mop for all I care.~
+M
+8
+say I am in no mood to talk.~
+M
+8
+set line_gap 180 s~
+M
+8
+say That was a euphemism for Go Away.~
+M
+8
+set line_gap 9 s~
+M
+8
+say What a fool was I, trusting those shadow witches.~
+M
+8
+set line_gap 24 s~
+M
+8
+say I'll be out of here by week's end. They can give the office to the mop for all I care.~
+M
+8
+say And to think they're promoting her.~
+M
+9
+say I am in no mood to talk.~
+M
+9
+set line_gap 180 s~
+M
+9
+say That was a euphemism for Go Away.~
+M
+9
+set line_gap 9 s~
+M
+9
+say I feel like such a fool, letting myself be seduced like that.~
+M
+9
+say Almost cost us everything. I've half a mind to resign in disgrace.~
+M
+9
+say Last sorcerer of my line, I dare say. And deservedly so.~
+M
+9
+emote $n holds his head in his hands.~
+M
+9
+say With any luck we're still stuck in the time loop and there's a better end to this day.~
+M
+9
+say Nice to imagine I won't have to live with this guilt.~
 T 11810
+T 11991
 S
 #11968
 knezz grand high sorcerer~
@@ -3517,7 +3590,7 @@ M
 say I pledge to compose three more by next Zenith.~
 M
 8
-echo $n takes a deep bow.~
+emote $n takes a deep bow.~
 T 11810
 T 11840
 T 11981

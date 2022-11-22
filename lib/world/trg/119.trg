@@ -6757,6 +6757,97 @@ dg_affect #11990 %ch% %type% %amount% 300
 %send% %ch% ~%self% %verb% itself toward you... you take on a %glow% glow.
 %echoaround% %ch% ~%self% %verb% itself toward ~%ch%... &%ch% takes on a %glow% glow.
 ~
+#11991
+Skycleave: Barrosh storytime using script1-3~
+0 bw 100
+~
+* variant of 11840/Storytime:
+* script1: Knezz and Grace died
+* script2: Knezz died but Grace lived
+* script3: Both lived
+set line_gap 9 s
+set story_gap 360 s
+* random wait to offset competing scripts slightly
+wait %random.30%
+* determine story number
+set knezz %instance.mob(11968)%
+set grace %instance.mob(11966)%
+if %knezz% && %grace%
+  set story 3
+elseif %grace%
+  set story 2
+else
+  set story 1
+end
+* story detected: prepare (storing as variables prevents reboot issues)
+if !%self.mob_flagged(SENTINEL)%
+  set no_sentinel 1
+  remote no_sentinel %self.id%
+  nop %self.add_mob_flag(SENTINEL)%
+end
+if !%self.mob_flagged(SILENT)%
+  set no_silent 1
+  remote no_silent %self.id%
+  nop %self.add_mob_flag(SILENT)%
+end
+* tell story
+set pos 0
+set done 0
+while !%done%
+  set msg %self.custom(script%story%,%pos%)%
+  if %msg%
+    set mode %msg.car%
+    set msg %msg.cdr%
+    if %mode% == say
+      say %msg%
+      wait %line_gap%
+    elseif %mode% == do
+      %msg.process%
+      * no wait
+    elseif %mode% == echo
+      %echo% %msg.process%
+      wait %line_gap%
+    elseif %mode% == vforce
+      set vnum %msg.car%
+      set msg %msg.cdr%
+      set targ %self.room.people(%vnum%)%
+      if %targ%
+        %force% %targ% %msg.process%
+      end
+    elseif %mode% == emote
+      emote %msg%
+      wait %line_gap%
+    elseif %mode% == set
+      set subtype %msg.car%
+      set msg %msg.cdr%
+      if %subtype% == line_gap
+        set line_gap %msg%
+      elseif %subtype% == story_gap
+        set story_gap %msg%
+      else
+        %echo% ~%self%: Invalid set type '%subtype%' in storytime script.
+      end
+    elseif %mode% == skip
+      * nothing this round
+      wait %line_gap%
+    else
+      %echo% %self.name%: Invalid script message type '%mode%'.
+    end
+  else
+    set done 1
+  end
+  eval pos %pos% + 1
+done
+* cancel sentinel/silent
+if %self.varexists(no_sentinel)%
+  nop %self.remove_mob_flag(SENTINEL)%
+end
+if %self.varexists(no_silent)%
+  nop %self.remove_mob_flag(SILENT)%
+end
+* wait between stories
+wait %story_gap%
+~
 #11992
 Smash striped stone seedling to create calamander forest~
 1 c 2

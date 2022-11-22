@@ -4931,7 +4931,7 @@ done
 detach 11857 %self.id%
 ~
 #11858
-Shade of Mezvienne fight: Shadow Whip, Shadow Flail, Total Darkness, Shade's Grasp~
+Shade of Mezvienne fight: Shadow Whip, Shadow Flail, Total Darkness, Shade's Grasp, Drain Knezz~
 0 k 100
 ~
 if %self.cooldown(11800)% || %self.disabled%
@@ -4943,8 +4943,8 @@ set diff %self.diff%
 set moves_left %self.var(moves_left)%
 set num_left %self.var(num_left,0)%
 if !%moves_left% || !%num_left%
-  set moves_left 1 2 3 4
-  set num_left 4
+  set moves_left 1 2 3 4 5
+  set num_left 5
 end
 * pick
 eval which %%random.%num_left%%%
@@ -5095,7 +5095,14 @@ elseif %move% == 4
   set targ 0
   set targ_id 0
   while %time% > 0
-    if !%targ% || %targ.id% != %targ_id% || !%targ.affect(11822)%
+    if !%targ% || %targ.id% != %targ_id%
+      set need 1
+    elseif !%targ.affect(11822)%
+      set need 1
+    else
+      set need 0
+    end
+    if %need%
       skyfight clear struggle
       set targ %random.enemy%
       if !%targ%
@@ -5124,6 +5131,28 @@ elseif %move% == 4
   done
   skyfight clear struggle
   dg_affect #11852 %self% off
+elseif %move% == 5 && %diff% > 1
+  * Drain Knezz
+  skyfight clear interrupt
+  skyfight setup interrupt all
+  %echo% &&m**** The Shade is draining more power from the Grand High Sorcerer! ****&&0 (interrupt)
+  wait 8 s
+  if %self.sfinterrupt_count% >= 1 && %self.sfinterrupt_count% >= (%diff% + 1) / 2
+    set broke 1
+    set ch %room.people%
+    while %ch%
+      if %ch.var(did_sfinterrupt,0)%
+        %send% %ch% &&mYou somehow manage to interrupt the Shade!&&0
+      end
+      set ch %ch.next_in_room%
+    done
+    %echo% &&mThe Shade is distracted, if only for a moment.&&0
+    dg_affect #11852 %self% HARD-STUNNED on 5
+  else
+    %echo% &&mKnezz lets out an anguished groan as the Shade drains his life force!&&0  
+    eval knezz_timer %self.var(knezz_timer,%timestamp%)% - 30
+    remote knezz_timer %self.id%
+  end
 end
 nop %self.remove_mob_flag(NO-ATTACK)%
 ~

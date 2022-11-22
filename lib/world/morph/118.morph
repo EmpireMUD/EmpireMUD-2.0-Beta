@@ -107,4 +107,126 @@ snout and lean, mean little legs. At least, they'd be mean if it knew what to
 do with them. As it is, the poor warthog is just standing there looking dumb.
 ~
 S
+#11867
+broom useless~
+a useless broom~
+A useless broom stands here, doing nothing.~
+bcj 5 36 0 pr 3
+0 0 -1 -1
+A
+21 -5
+A
+22 -5
+A
+23 -5
+D
+   With its short heather pole and twiggy end, this old besom broom would be
+difficult for a person to use.
+~
+S
+#11868
+rag threadbare bare~
+a threadbare rag~
+A threadbare rag is lying on the floor.~
+bcj 7 72 0 pr 3
+0 0 -1 -1
+A
+21 -5
+A
+22 -5
+A
+23 -5
+D
+   The old rag is threadbare and tattered; surely it has seen better days. It
+seems to be moving on its own, albeit not very well.
+~
+S
+#11869
+beater rug~
+a rug beater~
+A rug beater is spinning in place.~
+bcj 5 21 0 pr 3
+0 0 -1 -1
+A
+21 -5
+A
+22 -5
+A
+23 -5
+D
+   The rug beater is hardly more than an old rattan stick with one end bent
+into a flat head. Though they're used to beat the dust out of rugs and carpets,
+this one is just spinning in place.
+~
+S
+#11877
+broom useless~
+a useless broom~
+A useless broom stands here, doing nothing.~
+bcj 5 36 0 pr 3
+0 0 -1 -1
+A
+21 -25
+A
+22 -25
+A
+23 -25
+A
+13 -5
+A
+18 -5
+A
+17 -5
+D
+   With its short heather pole and twiggy end, this old besom broom would be
+difficult for a person to use.
+~
+S
+#11878
+rag threadbare bare~
+a threadbare rag~
+A threadbare rag is lying on the floor.~
+bcj 7 72 0 pr 3
+0 0 -1 -1
+A
+21 -25
+A
+22 -25
+A
+23 -25
+A
+13 -5
+A
+18 -5
+A
+17 -5
+D
+   The old rag is threadbare and tattered; surely it has seen better days. It
+seems to be moving on its own, albeit not very well.
+~
+S
+#11879
+beater rug~
+a rug beater~
+A rug beater is spinning in place.~
+bcj 5 21 0 pr 3
+0 0 -1 -1
+A
+21 -25
+A
+22 -25
+A
+23 -25
+A
+13 -5
+A
+18 -5
+A
+17 -5
+D
+   The rug beater is hardly more than an old rattan stick with one end bent
+into a flat head. Though they're used to beat the dust out of rugs and carpets,
+this one is just spinning in place.
+~
+S
 $
