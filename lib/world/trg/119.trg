@@ -6348,7 +6348,7 @@ elseif %move% == 4
         if !%ch.var(did_sfdodge)%
           set hit 1
           %echo% &&jA hatchet comes down on |%ch% head!&&0
-          set pain (%diff% * 25) + 25
+          eval pain (%diff% * 25) + 25
           %damage% %ch% %pain% physical
         elseif %ch.is_pc%
           %send% %ch% &&jA hatchet just misses you as it falls!&&0

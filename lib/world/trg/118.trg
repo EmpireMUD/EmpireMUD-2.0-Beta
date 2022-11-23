@@ -5157,10 +5157,232 @@ end
 nop %self.remove_mob_flag(NO-ATTACK)%
 ~
 #11859
-Skycleave: MC Barrosh fight~
+Mind-Controlled HS Barrosh fight: Baleful Polymorph, Devastation Ritual, Wave of Guilt, Deathbolt~
 0 k 100
 ~
-* tba
+if %self.cooldown(11800)% || %self.disabled%
+  halt
+end
+set room %self.room%
+set diff %self.diff%
+* order
+set moves_left %self.var(moves_left)%
+set num_left %self.var(num_left,0)%
+if !%moves_left% || !%num_left%
+  set moves_left 1 2 3 4
+  set num_left 4
+end
+* pick
+eval which %%random.%num_left%%%
+set old %moves_left%
+set moves_left
+set move 0
+while %which% > 0
+  set move %old.car%
+  if %which% != 1
+    set moves_left %moves_left% %move%
+  end
+  set old %old.cdr%
+  eval which %which% - 1
+done
+set moves_left %moves_left% %old%
+* store
+eval num_left %num_left% - 1
+remote moves_left %self.id%
+remote num_left %self.id%
+* perform move
+skyfight lockout 30 30
+if %move% == 1 && !%self.aff_flagged(BLIND)%
+  * Baleful Polymorph
+  set targ %random.enemy%
+  if !%targ%
+    set targ %actor%
+  end
+  eval vnum 11866 + %random.3%
+  if %diff% > 1
+    eval vnum %vnum% + 10
+  end
+  if %targ.morph% == %vnum%
+    * already morphed
+    nop %self.set_cooldown(11800,0)%
+    halt
+  end
+  * wait?
+  set targ_id %targ.id%
+  set fail 0
+  if %diff% <= 2
+    skyfight clear interrupt
+    %send% %targ% &&m**** ~%self% stamps his staff three times... in your direction! ****&&0 (interrupt)
+    %echoaround% %targ% &&m~%self% stamps his staff three times...&&0
+    skyfight setup interrupt %targ%
+    wait 8 s
+    if %self.disabled%
+      halt
+    end
+    if !%targ% || %targ.id% != %targ_id%
+      * lost
+      set fail 1
+    elseif %targ.var(did_sfinterrupt)%
+      set fail 1
+      %echo% &&mThe spell from Barrosh's staff bounces around the room but hits nothing.&&0
+      if %diff% == 1
+        dg_affect #11856 %ch% TO-HIT 25 20
+      end
+    elseif %targ.trigger_counterspell%
+      set fail 2
+      %echo% &&mThe spell rebounds and smacks ~%self% in the face -- he looks stunned!&&0
+    else
+      %send% %targ% &&mYou are enveloped in an eerie violet light from the staff...&&0
+    end
+    skyfight clear interrupt
+  else
+    %echo% &&m~%self% stamps his staff three times...&&0
+  end
+  if !%fail%
+    set old_shortdesc %targ.name%
+    %morph% %targ% %vnum%
+    %echoaround% %targ% &&m%old_shortdesc% is suddenly transformed into ~%targ%!&&0
+    %send% %targ% &&m**** You are suddenly transformed into %targ.name%! ****&&0 (fastmorph normal)
+    if %diff% == 4 && (%self.level% + 100) > %targ.level% && !%targ.aff_flagged(!STUN)%
+      dg_affect #11851 %targ% STUNNED on 5
+    elseif %diff% >= 2
+      nop %targ.command_lag(ABILITY)%
+    end
+  elseif %fail% == 2 || %diff% == 1
+    dg_affect #11852 %self% HARD-STUNNED on 10
+  end
+elseif %move% == 2
+  * Devastation Ritual
+  %echo% &&m**** ~%self% plants his staff hard into the floor and begins drawing mana toward himself... ****&&0 (interrupt)
+  if %diff% == 1
+    nop %self.add_mob_flag(NO-ATTACK)%
+  end
+  set cycle 1
+  while %cycle% <= 4
+    skyfight clear interrupt
+    skyfight setup interrupt all
+    wait 5 s
+    if %self.disabled%
+      halt
+    end
+    set needed %room.players_present%
+    if %needed% > 4
+      set needed 4
+    end
+    if %self.sfinterrupt_count% >= %needed%
+      %echo% &&mYou manage to disrupt Barrosh's intricate ritual, at least for now!&&0
+      if %diff% == 1
+        dg_affect #11868 %self% BONUS-MAGICAL -10 30
+      end
+    else
+      %echo% &&mA wave of devastation pulses out from Barrosh's staff!&&0
+      set ch %room.people%
+      while %ch%
+        set next_ch %ch.next_in_room%
+        if %self.is_enemy(%ch%)%
+          if %ch.trigger_counterspell%
+            %echo% &&mA shield forms in front of ~%ch% to block the devastation ritual!&&0
+          else
+            %echo% &&mThe wave cuts through ~%ch%!&&0
+            eval amount %diff% * 20
+            %damage% %ch% %amount% magical
+          end
+        end
+        set ch %next_ch%
+      done
+    end
+    if %cycle% < 4
+      %echo% &&m**** Here comes another wave! ****&&0 (interrupt)
+    end
+    eval cycle %cycle% + 1
+  done
+  skyfight clear interrupt
+elseif %move% == 3
+  * Wave of Guilt
+  %echo% &&m**** ~%self% plants his staff hard into the floor and starts to pulse out dark energy... ****&&0 (interrupt)
+  if %diff% == 1
+    nop %self.add_mob_flag(NO-ATTACK)%
+  end
+  skyfight clear interrupt
+  skyfight setup interrupt all
+  wait 8 s
+  if %self.disabled%
+    halt
+  end
+  if %self.sfinterrupt_count% >= 1 && %self.sfinterrupt_count% >= (%diff% + 1) / 2
+    %echo% &&mYou manage to disrupt Barrosh's ritual in time!&&0
+    if %diff% == 1
+      dg_affect #11868 %self% BONUS-MAGICAL -10 30
+    end
+  else
+    %echo% &&mA dark pulse emanates from Barrosh's staff...&&0
+    eval debuff %diff% * 15
+    set ch %room.people%
+    while %ch%
+      set next_ch %ch.next_in_room%
+      if %self.is_enemy(%ch%)%
+        if %ch.trigger_counterspell%
+          %echo% &&mA shield forms in front of ~%ch% to block the wave!&&0
+        else
+          %send% %ch% &&mYou feel a wave of guilt as it passes through you!&&0
+          %echoaround% %ch% &&mThe wave passes through ~%ch%!&&0
+          dg_affect #11871 %ch% DODGE -%debuff% 30
+          dg_affect #11871 %ch% TO-HIT -%debuff% 30
+          dg_affect #11871 %ch% RESIST-MAGICAL -%debuff% 30
+          if %diff% >= 3
+            eval amount %diff% * 20
+            %damage% %ch% %amount% magical
+          end
+        end
+      end
+      set ch %next_ch%
+    done
+  end
+  skyfight clear interrupt
+elseif %move% == 4
+  * Deathbolt
+  skyfight clear interrupt
+  %echo% &&m~%self% holds up his glowing staff...&&0
+  if %diff% == 1
+    nop %self.add_mob_flag(NO-ATTACK)%
+  end
+  wait 1
+  eval resist %diff% * 20
+  eval pain 20 + (%diff% * 40)
+  set cycle 1
+  eval wait 10 - %diff%
+  while %cycle% <= %diff%
+    set targ %random.enemy%
+    set targ_id %targ.id%
+    skyfight setup interrupt %targ%
+    %send% %targ% &&m**** |%self% staff is aimed at you! ****&&0 (interrupt)
+    wait %wait% s
+    if %targ.id% != %targ_id% || %targ.position% == Dead
+      * gone
+    elseif %targ.var(did_sfinterrupt)%
+      if %random.2% == 1
+        %echo% &&m~%self% is distracted by |%targ% quick reflexes and a flying knickknack!&&0
+      else
+        %echo% &&m|%self% deathbolt flies wide as ~%targ% knocks some papers into the air!&&0
+      end
+      if %diff% == 1
+        dg_affect #11873 %self% TO-HIT -15 20
+      end
+    else
+      * hit
+      %echo% &&mA powerful deathbolt rockets out of |%self% staff and slams into ~%targ%!&&0
+      %damage% %targ% %pain% magical
+      if %diff% > 1
+        dg_affect #11872 %targ% off silent
+        dg_affect #11872 %targ% RESIST-MAGICAL -%resist% 20
+      end
+    end
+    skyfight clear interrupt
+    eval cycle %cycle% + 1
+  done
+end
+* in case
+nop %self.remove_mob_flag(NO-ATTACK)%
 ~
 #11860
 Shard cultivator: upgrade shard tools~
