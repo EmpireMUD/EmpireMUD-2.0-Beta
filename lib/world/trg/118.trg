@@ -807,7 +807,7 @@ eval num_left %num_left% - 1
 remote moves_left %self.id%
 remote num_left %self.id%
 * perform move
-skyfight lockout 20 10
+skyfight lockout 25 20
 if %move% == 1 && !%self.aff_flagged(BLIND)%
   * Throw Object
   if %diff% <= 2
@@ -950,7 +950,7 @@ eval num_left %num_left% - 1
 remote moves_left %self.id%
 remote num_left %self.id%
 * perform move
-skyfight lockout 20 20
+skyfight lockout 25 20
 if %move% == 1 && !%self.aff_flagged(BLIND)%
   * Goblinball / Ankle Stab
   if %diff% <= 2
@@ -1084,7 +1084,7 @@ eval num_left %num_left% - 1
 remote moves_left %self.id%
 remote num_left %self.id%
 * perform move
-skyfight lockout 20 20
+skyfight lockout 25 20
 if %move% == 1 && !%self.aff_flagged(BLIND)%
   * Leaping Strike
   if %diff% == 1
@@ -1208,7 +1208,7 @@ eval num_left %num_left% - 1
 remote moves_left %self.id%
 remote num_left %self.id%
 * perform move
-skyfight lockout 30 30
+skyfight lockout 30 35
 if %move% == 1
   * Pixycraft Embiggening Elixir
   skyfight clear interrupt
@@ -1450,7 +1450,7 @@ eval num_left %num_left% - 1
 remote moves_left %self.id%
 remote num_left %self.id%
 * perform move
-skyfight lockout 30 30
+skyfight lockout 30 35
 if %move% == 1 && !%self.aff_flagged(BLIND)%
   * Baleful Polymorph
   skyfight clear dodge
@@ -1706,7 +1706,7 @@ eval num_left %num_left% - 1
 remote moves_left %self.id%
 remote num_left %self.id%
 * perform move
-skyfight lockout 20 10
+skyfight lockout 25 20
 if %move% == 1 && !%self.aff_flagged(BLIND)%
   * Pixy Trip
   if %diff% <= 2
@@ -3365,54 +3365,122 @@ end
 wait %story_gap%
 ~
 #11841
-Mercenary Rogue (Skycleave): combat script~
+Mercenary Rogue combat: Vicious Blind, Knife Throw~
 0 k 100
 ~
-if %self.cooldown(11800)%
+Mercenary Rogue combat: Vicious Blind, Knife Throwif %self.cooldown(11800)% || %self.disabled%
   halt
 end
-if %random.2% == 1
-  * Blind
-  nop %self.set_cooldown(11800, 30)%
-  if %self.diff%==4
-    %send% %actor% &&r~%self% slashes your forehead, opening a bleeding wound!
-    %send% %actor% Blood trickles down into your eyes, blinding you!
-    %echoaround% %actor% ~%self% slashes |%actor% forehead, opening a bleeding wound!
-    %echoaround% %actor% Blood trickles down into |%actor% eyes!
-    %damage% %actor% 50 physical
-    %dot% #11842 %actor% 75 15 physical
-    dg_affect #11841 %actor% BLIND on 15
-  else
-    %send% %actor% ~%self% grabs a handful of sand and throws it in your face, blinding you!
-    %echoaround% %actor% ~%self% grabs a handful of sand and throws it in |%actor% face, blinding *%actor%!
-    dg_affect #11841 %actor% BLIND on 15
+set room %self.room%
+set diff %self.difficulty%
+* order
+set moves_left %self.var(moves_left)%
+set num_left %self.var(num_left,0)%
+if !%moves_left% || !%num_left%
+  set moves_left 1 2
+  set num_left 2
+end
+* pick
+eval which %%random.%num_left%%%
+set old %moves_left%
+set moves_left
+set move 0
+while %which% > 0
+  set move %old.car%
+  if %which% != 1
+    set moves_left %moves_left% %move%
   end
-else
-  * Dagger Throw
-  nop %self.set_cooldown(11800, 30)%
-  if %self.diff% == 4
-    set loops 3
-    %echo% ~%self% draws a brace of throwing knives from a concealed pouch.
-  else
-    set loops 1
-    %echo% ~%self% draws a throwing knife from a concealed pouch.
+  set old %old.cdr%
+  eval which %which% - 1
+done
+set moves_left %moves_left% %old%
+* store
+eval num_left %num_left% - 1
+remote moves_left %self.id%
+remote num_left %self.id%
+* perform move
+skyfight lockout 25 20
+if %move% == 1
+  * Vicious Blind
+  if %diff% == 1
+    nop %self.add_mob_flag(NO-ATTACK)%
   end
-  while %loops%
-    set target %random.enemy%
-    if !%target%
-      set target %actor%
+  skyfight clear dodge
+  set targ %self.fighting%
+  set id %targ.id%
+  %send% %targ% &&m**** &&Z~%self% feints low and goes for your eyes... ****&&0 (dodge)
+  %echoaround% %targ% &&m~%self% feints low and goes for |%targ% eyes...&&0
+  skyfight setup dodge %targ%
+  eval time 8 - %diff%
+  wait %time% s
+  if %self.disabled%
+    nop %self.remove_mob_flag(NO-ATTACK)%
+    halt
+  end
+  if !%targ% || %targ.id% != %id%
+    * gone
+  elseif %targ.var(did_sfdodge)%
+    * miss
+    if %diff% > 2
+      %echo% &&m~%self% lunges toward |%targ% face with ^%self% dagger, but misses!&&0
+    else
+      %echo% &&m~%self% lunges toward |%targ% face with some kind of slime, but misses... and gets it in in ^%self% own eyes!&&0
+      eval dur 10 / %diff%
+      dg_affect #11841 %self% BLIND on %dur%
     end
-    if %target.room% == %self.room%
-      %send% %target% &&r~%self% flings a knife at you!
-      %echoaround% %target% ~%self% flings a knife at ~%target%!
-      %damage% %target% 100 physical
+  else
+    * hit
+    if %diff% > 2
+      %echo% &&m~%self% slashes |%targ% forehead, opening a vicious wound!&&0
+      %send% %targ% &&mBlood trickles down into your eyes, blinding you!&&0
+      eval dur 6 * %diff%
+      dg_affect #11841 %targ% BLIND on %dur%
+      %dot% #11842 %targ% 100 %dur% physical
+      %damage% %targ% 100 physical
+    else
+      %echo% &&m~%self% smears a vicious concoction on |%targ% eyes!&&0
+      %send% %targ% &&mYou're blind!&&0
+      eval dur 10 * %diff%
+      dg_affect #11841 %targ% BLIND on %dur%
+      %damage% %targ% 5 physical
     end
-    eval loops %loops%-1
-    if %loops%
-      wait 3 sec
+  end
+  skyfight clear dodge
+elseif %move% == 2
+  * Knife Throw
+  skyfight clear dodge
+  %echo% &&m~%self% draws a brace of throwing knives from a concealed pouch...&&0
+  if %diff% == 1
+    nop %self.add_mob_flag(NO-ATTACK)%
+  end
+  wait 1
+  set cycle 1
+  eval wait 8 - %diff%
+  while %cycle% <= %diff%
+    set targ %random.enemy%
+    set targ_id %targ.id%
+    skyfight setup dodge %targ%
+    %send% %targ% &&m**** &&Z~%self% is aiming a knife at you! ****&&0 (dodge)
+    wait %wait% s
+    if %targ.id% != %targ_id% || %targ.position% == Dead
+      * gone
+    elseif %targ.var(did_sfdodge)%
+      %echo% &&m~%self% flings a knife at ~%targ%, but misses!&&0
+    else
+      * hit
+      %echo% &&m~%self% flings a knife at ~%targ%!&&0
+      eval dam 25 + (25 * %diff%)
+      if %dam% > 1
+        %dot% #11842 %targ% %dam% 20 physical 5
+      end
+      %damage% %targ% %dam% physical
     end
+    skyfight clear dodge
+    eval cycle %cycle% + 1
   done
 end
+* in case
+nop %self.remove_mob_flag(NO-ATTACK)%
 ~
 #11842
 Mercenary Sorcerer (Skycleave): combat script~
@@ -3849,7 +3917,7 @@ eval num_left %num_left% - 1
 remote moves_left %self.id%
 remote num_left %self.id%
 * perform move
-skyfight lockout 30 30
+skyfight lockout 30 35
 if %move% == 1
   * Shadow Assassin
   skyfight clear dodge
@@ -4342,7 +4410,7 @@ eval num_left %num_left% - 1
 remote moves_left %self.id%
 remote num_left %self.id%
 * perform move
-skyfight lockout 30 30
+skyfight lockout 30 35
 if %move% == 1 && !%self.aff_flagged(BLIND)%
   * Baleful Polymorph
   skyfight clear dodge
@@ -4596,7 +4664,7 @@ set moves_left %moves_left% %old%
 eval num_left %num_left% - 1
 remote moves_left %self.id%
 remote num_left %self.id%
-skyfight lockout 30 30
+skyfight lockout 30 35
 if %move% == 1 && !%self.aff_flagged(BLIND)%
   skyfight clear free
   skyfight clear struggle
@@ -4822,42 +4890,54 @@ Skycleave: Mercenary name setup~
 switch %self.vnum%
   case 11841
     * rogue mercenary
-    set name_list Mac  Iniko Trixie Eleanor Shada  Foster Gatlin Brielle Cassina Sage
-    set sex_list  male male  female female  female male   male   female  male    female
+    set name_list Mac    Iniko Trixie Trusty  Shada  Foster Ol'    Brielle Cassina Sage
+    set mid_list  the    0     0      Eleanor Redd   0      Gatlin 0       0       0
+    set last_list Dagger 0     0      0       0      0      0      0       0       0
+    set sex_list  male   male  female female  female male   male   female  male    female
     set name_size 10
     set verbiage is skulking around.
   break
   case 11842
     * caster mercenary
     set name_list Eris   Borak Shabina Sophia Magnus Regin Calista Beatrice Mirabel Booker
+    set mid_list  Darke  0     Darke   0      0      Dall  Darke   0        0       0
+    set last_list 0      0     0       0      0      0     0       0        0       0
     set sex_list  female male  female  female male   male  female  female   female  male
     set name_size 10
     set verbiage is studying the books.
   break
   case 11843
     * archer mercenary
-    set name_list Alvin Gunnar Rebel  Jack Kerenza Florian Maude  Dakarai Huntley Winnow
-    set sex_list  male  male   female male female  male    female male    male    female
+    set name_list Alvin  Gunnar Rebel  Jack  Kerenza Florian Easy   Dakarai Huntley Winnow
+    set mid_list  Greene 0      0      Swift 0       the     Maude  0       0       0
+    set last_list 0      0      0      0     0       Tall    0      0       0       0
+    set sex_list  male   male   female male female  male    female male    male    female
     set name_size 10
     set verbiage is fletching an arrow.
   break
   case 11844
     * nature mage mercenary
-    set name_list Aella  Oriana Faron Aiden Blaise Briar Ariadne Aislinn Daphne Ellis Bruin
+    set name_list Aella  Green  Faron Aiden Bright Briar Ariadne Aislinn Daphne Ellis Bruin
+    set mid_list  0      Oriana 0     0     Blaise 0     0       0       0      0     0
+    set last_list 0      0      0     0     0      0     0       0       0      0     0
     set sex_list  female female male  male  female male  female  female  female male  male
     set name_size 11
     set verbiage is playing with fire.
   break
   case 11845
     * vampire mercenary
-    set name_list Osman Draco Raven  Jareth Calypso Faye   Reina  Lucia  Sebastian Ledger
-    set sex_list  male  male  female male   female  female female female male      male
+    set name_list Baron Draco Lady   Jareth Countess Faye   Reina  Lucia  Sebastian Ledger
+    set mid_list  Osman the   Raven  0      Calypso  0      0      0      of        0
+    set last_list 0     White 0      0      0        0      0      0      0         0
+    set sex_list  male  male  female male   female   female female female male      male
     set name_size 10
     set verbiage watches you carefully.
   break
   case 11846
     * armored mercenary
-    set name_list Humphrey George Roxie  Edward Gellert Titania Mabel  Wolf Saskia Ansel
+    set name_list Sir      George Lady   Edward Gellert Titania Mad    Wolf Saskia Ansel
+    set mid_list  Humphrey 0      Roxie  0      Gorr    0       Mabel  0    0      0
+    set last_list 0        0      0      0      0       0       0      0    0      0
     set sex_list  male     male   female male   male    female  female male female male
     set name_size 10
     set verbiage is spoiling for a fight.
@@ -4884,16 +4964,32 @@ set sex male
 while %name_list% && %pos% > 0
   set name %name_list.car%
   set name_list %name_list.cdr%
-  if %sex_list%
+  if %mid_list.strlen%
+    set mid %mid_list.car%
+    set mid_list %mid_list.cdr%
+  end
+  if %last_list.strlen%
+    set last %last_list.car%
+    set last_list %last_list.cdr%
+  end
+  if %sex_list.strlen%
     set sex %sex_list.car%
     set sex_list %sex_list.cdr%
   end
   eval pos %pos% - 1
 done
+* build name
+set full %name%
+if %mid%
+  set full %full% %mid%
+end
+if %last%
+  set full %full% %last%
+end
 * variable setup
-%mod% %self% keywords %name% %self.alias%
-%mod% %self% shortdesc %name%
-%mod% %self% longdesc %name% %verbiage%
+%mod% %self% keywords %full% %self.alias%
+%mod% %self% shortdesc %full%
+%mod% %self% longdesc %full% %verbiage%
 %mod% %self% sex %sex%
 * look descs are done in a separate switch as they require the mods be done
 switch %self.vnum%
@@ -4965,7 +5061,7 @@ eval num_left %num_left% - 1
 remote moves_left %self.id%
 remote num_left %self.id%
 * perform move
-skyfight lockout 30 30
+skyfight lockout 30 35
 if %move% == 1
   * Shadow Whip
   skyfight clear dodge
@@ -5191,7 +5287,7 @@ eval num_left %num_left% - 1
 remote moves_left %self.id%
 remote num_left %self.id%
 * perform move
-skyfight lockout 30 30
+skyfight lockout 30 35
 if %move% == 1 && !%self.aff_flagged(BLIND)%
   * Baleful Polymorph
   set targ %random.enemy%

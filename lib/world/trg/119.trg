@@ -5174,7 +5174,7 @@ eval num_left %num_left% - 1
 remote moves_left %self.id%
 remote num_left %self.id%
 * perform move
-skyfight lockout 30 30
+skyfight lockout 30 35
 if %move% == 1
   * Hammer Dance
   skyfight clear dodge
@@ -5383,7 +5383,7 @@ eval num_left %num_left% - 1
 remote moves_left %self.id%
 remote num_left %self.id%
 * perform move
-skyfight lockout 30 30
+skyfight lockout 30 35
 if %move% == 1 && !%self.aff_flagged(BLIND)%
   * Jar of Captivity
   skyfight clear free
@@ -5636,7 +5636,7 @@ eval num_left %num_left% - 1
 remote moves_left %self.id%
 remote num_left %self.id%
 * perform move
-skyfight lockout 30 30
+skyfight lockout 30 35
 if %move% == 1
   * Frozen Solid
   skyfight clear struggle
@@ -5928,7 +5928,7 @@ eval num_left %num_left% - 1
 remote moves_left %self.id%
 remote num_left %self.id%
 * perform move
-skyfight lockout 30 30
+skyfight lockout 30 35
 if %move% == 1
   * Creeping Vines
   skyfight clear struggle
@@ -6184,7 +6184,7 @@ eval num_left %num_left% - 1
 remote moves_left %self.id%
 remote num_left %self.id%
 * perform move
-skyfight lockout 30 30
+skyfight lockout 30 35
 if %move% == 1
   * Axe-nado
   skyfight clear dodge
@@ -6407,7 +6407,7 @@ eval num_left %num_left% - 1
 remote moves_left %self.id%
 remote num_left %self.id%
 * perform move
-skyfight lockout 30 30
+skyfight lockout 30 35
 if %move% == 1
   * Thornlash
   skyfight clear dodge
