@@ -3368,7 +3368,7 @@ wait %story_gap%
 Mercenary Rogue combat: Vicious Blind, Knife Throw~
 0 k 100
 ~
-Mercenary Rogue combat: Vicious Blind, Knife Throwif %self.cooldown(11800)% || %self.disabled%
+if %self.cooldown(11800)% || %self.disabled%
   halt
 end
 set room %self.room%
@@ -3456,7 +3456,7 @@ elseif %move% == 2
   wait 1
   set cycle 1
   eval wait 8 - %diff%
-  while %cycle% <= %diff%
+  while %cycle% <= %diff% + 1
     set targ %random.enemy%
     set targ_id %targ.id%
     skyfight setup dodge %targ%
@@ -3466,6 +3466,10 @@ elseif %move% == 2
       * gone
     elseif %targ.var(did_sfdodge)%
       %echo% &&m~%self% flings a knife at ~%targ%, but misses!&&0
+      if %diff% == 1
+        dg_affect #11856 %targ% off silent
+        dg_affect #11856 %targ% TO-HIT 25 20
+      end
     else
       * hit
       %echo% &&m~%self% flings a knife at ~%targ%!&&0
@@ -3483,102 +3487,239 @@ end
 nop %self.remove_mob_flag(NO-ATTACK)%
 ~
 #11842
-Mercenary Sorcerer (Skycleave): combat script~
+Mercenary Caster combat: Firebrand, Enchant Weapons~
 0 k 100
 ~
-if %self.cooldown(11800)%
+if %self.cooldown(11800)% || %self.disabled%
   halt
 end
-if %random.2% == 1
+set room %self.room%
+set diff %self.difficulty%
+* order
+set moves_left %self.var(moves_left)%
+set num_left %self.var(num_left,0)%
+if !%moves_left% || !%num_left%
+  set moves_left 1 2
+  set num_left 2
+end
+* pick
+eval which %%random.%num_left%%%
+set old %moves_left%
+set moves_left
+set move 0
+while %which% > 0
+  set move %old.car%
+  if %which% != 1
+    set moves_left %moves_left% %move%
+  end
+  set old %old.cdr%
+  eval which %which% - 1
+done
+set moves_left %moves_left% %old%
+* store
+eval num_left %num_left% - 1
+remote moves_left %self.id%
+remote num_left %self.id%
+* perform move
+skyfight lockout 25 20
+if %move% == 1
   * Firebrand
-  nop %self.set_cooldown(11800, 30)%
-  %send% %actor% ~%self% mutters an incantation and taps your arm with ^%self% staff...
-  %echoaround% %actor% ~%self% mutters an incantation and taps |%actor% arm with ^%self% staff...
-  if %actor.trigger_counterspell%
-    %send% %actor% A vortex of smoke swirls harmlessly around your arm for a few moments.
-    %echoaround% %actor% A vortex of smoke swirls briefly around |%actor% arm.
+  skyfight clear interrupt
+  set targ %random.enemy%
+  if !%targ%
     halt
   end
-  wait 1 sec
-  if %self.diff%==4
-    if %actor.affect(11843)%
-      %send% %actor% &&rThe flames surrounding you grow more intense!
-      %echoaround% %actor% The flames surrounding ~%actor% grow more intense!
-    else
-      %send% %actor% &&rA fiery rune appears on your arm, and you burst into flames!
-      %echoaround% %actor% A fiery rune appears on |%actor% arm, and &%actor% bursts into flames!
-    end
-    %damage% %actor% 100 fire
-    %dot% #11843 %actor% 100 45 fire 3
-  else
-    %send% %actor% &&rA fiery rune appears on your arm, searing your flesh!
-    %echoaround% %actor% &&rA fiery rune appears on |%actor% arm, searing ^%actor% flesh!
-    %damage% %actor% 50 fire
-    %dot% #11843 %actor% 75 30 fire
+  set targ_id %targ.id%
+  %echo% &&m**** &&Z~%self% mutters an incantation and taps |%targ% arm with ^%self% staff... ****&&0 (interrupt)
+  skyfight setup interrupt all
+  if %diff% == 1
+    nop %self.add_mob_flag(NO-ATTACK)%
   end
-else
-  * Enchant Weapons
-  nop %self.set_cooldown(11800, 30)%
-  %echo% ~%self% thrusts ^%self% staff into the air and shouts a magic word!
-  set person %self.room.people%
-  while %person%
-    if %person.is_ally(%self%)%
-      %echo% |%person% weapon glows silver.
-      if %self.diff% == 4
-        dg_affect #11844 %person% HASTE on 30
-      end
-      eval magnitude %self.level%/10
-      dg_affect #11844 %person% BONUS-PHYSICAL %magnitude% 30
-      dg_affect #11844 %person% BONUS-MAGICAL %magnitude% 30
+  wait 8 s
+  if %targ.id% != %targ_id% || %targ.position% == Dead
+    * gone
+  elseif %self.sfinterrupt_count% >= 1 && %self.sfinterrupt_count% >= (%diff% + 1) / 2
+    %echo% &&mThe firebrand blasts back in |%self% face as &%self% is interrupted in the middle of the spell!
+    if %diff% == 1
+      dg_affect #11873 %self% TO-HIT -15 20
     end
-    set person %person.next_in_room%
-  done
+    %damage% %self% 50 magical
+  elseif %targ.trigger_counterspell%
+    %echo% A vortex of smoke swirls briefly around |%targ% arm as ^%targ% counterspell breaks the magic.
+  else
+    * hit
+    if %targ.affect(11843)%
+      %echo% &&mThe flames around ~%targ% grow more intense as the firebrand bursts into flame!&&0
+    elseif %diff% > 1
+      %echo% &&mThe firebrand on |%targ% arm grows into a fiery rune and envelops *%targ%!
+    else
+      %echo% &&mA fiery rune appears on |%targ% arm, searing ^%targ% flesh!
+    end
+    * effect
+    if %diff% > 1
+      %dot% #11843 %targ% 100 45 fire 3
+      %damage% %targ% 100 fire
+    else
+      %dot% #11843 %targ% 75 15 fire
+      %damage% %targ% 50 fire
+    end
+  end
+  skyfight clear interrupt
+elseif %move% == 2
+  * Enchant Weapons
+  skyfight clear interrupt
+  %echo% &&m**** &&Z~%self% thrusts ^%self% staff into the air and starts shouting magic words... ****&&0 (interrupt)
+  skyfight setup interrupt all
+  if %diff% == 1
+    nop %self.add_mob_flag(NO-ATTACK)%
+  end
+  wait 8 s
+  if %self.sfinterrupt_count% >= 1 && %self.sfinterrupt_count% >= (%diff% + 1) / 2
+    %echo% &&m~%self% is distracted and misspeaks, and the spell explodes in ^%self% face!
+    dg_affect #11852 %self% HARD-STUNNED on 10
+    if %diff% == 1
+      %damage% %self% 50 magical
+    end
+  else
+    set ch %room.people%
+    eval amt %diff% * 5
+    while %ch%
+      if %self.is_ally(%ch%)%
+        %echo% &&m|%ch% weapon glows silver.&&0
+        if %self.diff% == 4
+          dg_affect #11844 %ch% HASTE on 30
+        end
+        dg_affect #11844 %ch% BONUS-PHYSICAL %amt% 30
+        dg_affect #11844 %ch% BONUS-MAGICAL %amt% 30
+      end
+      set ch %ch.next_in_room%
+    done
+  end
+  skyfight clear interrupt
 end
+* in case
+nop %self.remove_mob_flag(NO-ATTACK)%
 ~
 #11843
-Mercenary Archer (Skycleave): combat script~
+Mercenary Archer combat: Rapid Fire, Rain of Arrows~
 0 k 100
 ~
-if %self.cooldown(11800)%
+if %self.cooldown(11800)% || %self.disabled%
   halt
 end
-if %random.2% == 1
-  * Rapid Fire
-  nop %self.set_cooldown(11800, 30)%
-  dg_affect #11845 %self% HARD-STUNNED on 30
-  %echo% ~%self% draws ^%self% bow.
-  if %self.diff%==4
-    set loops 7
-  else
-    set loops 3
-  end
-  while %loops%
-    set target %random.enemy%
-    if !%target%
-      set target %actor%
-    end
-    if %target.room% == %self.room%
-      %send% %target% &&r~%self% fires an arrow at you!
-      %echoaround% %target% ~%self% fires an arrow at ~%target%!
-      %damage% %target% 65 physical
-    end
-    eval loops %loops%-1
-    wait 3 sec
-  done
-  %echo% ~%self% returns ^%self% bow to ^%self% back.
-  dg_affect #11845 %self% off
-else
-  * Rain of Arrows
-  nop %self.set_cooldown(11800, 30)%
-  dg_affect #11845 %self% HARD-STUNNED on 30
-  %echo% ~%self% draws ^%self% bow and fires a barrage of arrows upward.
-  wait 3 sec
-  %echo% &&r|%self% arrows rain down upon you!
-  %aoe% 75 physical
-  wait 3 sec
-  %echo% ~%self% returns ^%self% bow to ^%self% back.
-  dg_affect #11845 %self% off
+set room %self.room%
+set diff %self.difficulty%
+* order
+set moves_left %self.var(moves_left)%
+set num_left %self.var(num_left,0)%
+if !%moves_left% || !%num_left%
+  set moves_left 1 2
+  set num_left 2
 end
+* pick
+eval which %%random.%num_left%%%
+set old %moves_left%
+set moves_left
+set move 0
+while %which% > 0
+  set move %old.car%
+  if %which% != 1
+    set moves_left %moves_left% %move%
+  end
+  set old %old.cdr%
+  eval which %which% - 1
+done
+set moves_left %moves_left% %old%
+* store
+eval num_left %num_left% - 1
+remote moves_left %self.id%
+remote num_left %self.id%
+* perform move
+skyfight lockout 25 20
+if %move% == 1
+  * Rapid Fire
+  skyfight clear dodge
+  %echo% &&m~%self% draws ^%self% bow and a fistful of arrows...&&0
+  if %diff% == 1
+    nop %self.add_mob_flag(NO-ATTACK)%
+  end
+  wait 1
+  set cycle 1
+  eval wait 8 - %diff%
+  while %cycle% <= %diff% + 1
+    set targ %random.enemy%
+    set targ_id %targ.id%
+    skyfight setup dodge %targ%
+    %send% %targ% &&m**** &&Z~%self% is aiming straight at you! ****&&0 (dodge)
+    wait %wait% s
+    if %targ.id% != %targ_id% || %targ.position% == Dead
+      * gone
+    elseif %targ.var(did_sfdodge)%
+      %echo% &&m~%self% looses an arrow at ~%targ%, but it thuds into the far wall!&&0
+    else
+      * hit
+      %echo% &&m~%self% fires an arrow at ~%targ%!&&0
+      eval dam 25 + (25 * %diff%)
+      if %dam% > 1
+        %dot% #11842 %targ% %dam% 20 physical 5
+      end
+      %damage% %targ% %dam% physical
+    end
+    skyfight clear dodge
+    eval cycle %cycle% + 1
+  done
+elseif %move% == 2
+  * Rain of Arrows
+  if %diff% == 1
+    nop %self.add_mob_flag(NO-ATTACK)%
+  end
+  skyfight clear dodge
+  %echo% &&m**** &&Z~%self% leans back and fires a barrage of arrows into the air! ****&&0 (dodge)
+  skyfight setup dodge all
+  eval dam %diff% * 20
+  eval ouch %diff% * 25
+  set any 0
+  set cycle 0
+  eval max (%diff% + 2) / 2
+  while %cycle% < %max%
+    wait 5 s
+    if %self.disabled%
+      nop %self.remove_mob_flag(NO-ATTACK)%
+      halt
+    end
+    set this 0
+    set ch %room.people%
+    while %ch%
+      set next_ch %ch.next_in_room%
+      if %self.is_enemy(%ch%)%
+        if %ch.var(did_sfdodge)%
+          if %diff% == 1
+            dg_affect #11856 %ch% TO-HIT 25 20
+          end
+        else
+          set any 1
+          set this 1
+          %echo% &&m|%self% arrows rain down on ~%ch%!&&0
+          %dot% #11824 %ch% %ouch% 15 physical 3
+          %damage% %ch% %dam% physical
+        end
+      end
+      set ch %next_ch%
+    done
+    if !%this%
+      %echo% &&mArrows rain down around you!&&0
+    end
+    eval cycle %cycle% + 1
+  done
+  if !%any%
+    * full miss
+    %echo% &&m~%self% looks exhausted as &%self% lowers ^%self% bow.&&0
+    dg_affect #11852 %self% HARD-STUNNED on 5
+  end
+  skyfight clear dodge
+end
+* in case
+nop %self.remove_mob_flag(NO-ATTACK)%
 ~
 #11844
 Mercenary Nature Mage (Skycleave): combat script~
@@ -3938,6 +4079,10 @@ if %move% == 1
       * gone
     elseif %targ.var(did_sfdodge)%
       %echo% &&mA shadow assasssin slices through the air, just past ~%targ%, and vanishes as it hits the floor!&&0
+      if %diff% == 1
+         dg_affect #11856 %targ% off silent
+         dg_affect #11856 %targ% TO-HIT 25 20
+     end
     else
       * hit
       %echo% &&mA shadow assassin stabs from the dark, cutting into ~%targ% out of nowhere!&&0

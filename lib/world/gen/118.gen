@@ -122,6 +122,13 @@ You can see again.~
 T5
 ...$e has been blinded by the barrage!~
 S
+#11824
+rain of arrows~
+4 0
+0 0 0 0
+T0
+You pull an arrow from your chest.~
+S
 #11832
 conditional visibility~
 4 0
@@ -148,7 +155,7 @@ T5
 ...$e is bleeding badly!~
 S
 #11843
-flame brand~
+firebrand~
 4 0
 0 0 0 0
 T0
