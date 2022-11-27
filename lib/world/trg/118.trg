@@ -3372,7 +3372,7 @@ if %self.cooldown(11800)% || %self.disabled%
   halt
 end
 set room %self.room%
-set diff %self.difficulty%
+set diff %self.diff%
 * order
 set moves_left %self.var(moves_left)%
 set num_left %self.var(num_left,0)%
@@ -3426,6 +3426,9 @@ if %move% == 1
     else
       %echo% &&m~%self% lunges toward |%targ% face with some kind of slime, but misses... and gets it in in ^%self% own eyes!&&0
       eval dur 10 / %diff%
+      if %dur% < 1
+        set dur 1
+      end
       dg_affect #11841 %self% BLIND on %dur%
     end
   else
@@ -3494,7 +3497,7 @@ if %self.cooldown(11800)% || %self.disabled%
   halt
 end
 set room %self.room%
-set diff %self.difficulty%
+set diff %self.diff%
 * order
 set moves_left %self.var(moves_left)%
 set num_left %self.var(num_left,0)%
@@ -3575,7 +3578,7 @@ elseif %move% == 2
   end
   wait 8 s
   if %self.sfinterrupt_count% >= 1 && %self.sfinterrupt_count% >= (%diff% + 1) / 2
-    %echo% &&m~%self% is distracted and misspeaks, and the spell explodes in ^%self% face!
+    %echo% &&m~%self% is distracted and misspeaks, and the spell explodes in ^%self% face!&&0
     dg_affect #11852 %self% HARD-STUNNED on 10
     if %diff% == 1
       %damage% %self% 50 magical
@@ -3608,7 +3611,7 @@ if %self.cooldown(11800)% || %self.disabled%
   halt
 end
 set room %self.room%
-set diff %self.difficulty%
+set diff %self.diff%
 * order
 set moves_left %self.var(moves_left)%
 set num_left %self.var(num_left,0)%
@@ -3722,56 +3725,152 @@ end
 nop %self.remove_mob_flag(NO-ATTACK)%
 ~
 #11844
-Mercenary Nature Mage (Skycleave): combat script~
+Mercenary Nature Mage combat: Healing Wave, Snake Form, Bite~
 0 k 100
 ~
-if %self.cooldown(11800)%
+if %self.cooldown(11800)% || %self.disabled%
   halt
 end
-if %random.2% == 1
-  * Mass Heal
-  nop %self.set_cooldown(11800, 30)%
-  if %self.morph%
-    set current %self.name%
-    %morph% %self% normal
-    %echo% %current% rapidly morphs into ~%self%!
-    wait 1 sec
+set room %self.room%
+set diff %self.diff%
+* order
+set moves_left %self.var(moves_left)%
+set num_left %self.var(num_left,0)%
+if !%moves_left% || !%num_left%
+  set moves_left 1 2
+  set num_left 2
+end
+* pick
+eval which %%random.%num_left%%%
+set old %moves_left%
+set moves_left
+set move 0
+while %which% > 0
+  set move %old.car%
+  if %which% != 1
+    set moves_left %moves_left% %move%
   end
-  %echo% ~%self% thrusts ^%self% hands skyward and sends out a wave of healing light.
-  set person %self.room.people%
-  while %person%
-    if %person.is_ally(%self%)%
-      if %person.health% < %person.maxhealth%
-        set magnitude 100
-        if %self.diff% == 4
-          set magnitude 200
-        end
-        %heal% %person% health %magnitude%
-        %echo% ~%person% is healed!
-      end
+  set old %old.cdr%
+  eval which %which% - 1
+done
+set moves_left %moves_left% %old%
+* store
+eval num_left %num_left% - 1
+remote moves_left %self.id%
+remote num_left %self.id%
+* perform move
+skyfight lockout 25 20
+if %move% == 1
+  * Healing Wave
+  skyfight clear interrupt
+  %echo% &&m**** &&Z~%self% thrusts ^%self% hands skyward... ****&&0 (interrupt)
+  skyfight setup interrupt all
+  if %diff% == 1
+    nop %self.add_mob_flag(NO-ATTACK)%
+  end
+  wait 8 s
+  if %self.disabled% || (%self.sfinterrupt_count% >= 1 && %self.sfinterrupt_count% >= (%diff% + 1) / 2)
+    %echo% &&m~%self% is distracted and the healing spell goes wild!&&0
+    set fail 1
+    eval amt 100 / %diff%
+    if %diff% == 1
+      dg_affect #11852 %self% HARD-STUNNED on 10
     end
-    set person %person.next_in_room%
+  else
+    %echo% &&m~%self% sends out a wave of healing light!&&0
+    set fail 0
+    eval amt %diff% * 25
+  end
+  set ch %room.people%
+  eval amt %diff% * 5
+  while %ch%
+    if %fail%
+      set ok %self.is_enemy(%ch%)%
+    elseif %ch% == %self%
+      set ok 1
+    else
+      set ok %self.is_ally(%ch%)%
+    end
+    if %ok%
+      %echo% &&mThe healing wave passes through ~%ch%!&&0
+      %send% %ch% You're healed!
+      if %self.diff% == 4 && !%fail%
+        dg_affect #11844 %ch% HASTE on 5
+      end
+      %heal% %ch% health %amt%
+    end
+    set ch %ch.next_in_room%
   done
-else
-  * Snake Morph / Bite
-  nop %self.set_cooldown(11800, 30)%
-  if !%self.morph%
+  skyfight clear interrupt
+elseif %move% == 2
+  * Snake Form / Bite
+  if %self.morph% != 11848
+    * Snake Form
+    skyfight clear interrupt
+    %echo% &&m**** &&Z~%self% begins to twist and coil... ****&&0 (interrupt)
+    skyfight setup interrupt all
+    if %diff% == 1
+      nop %self.add_mob_flag(NO-ATTACK)%
+    end
+    wait 8 s
+    if %self.disabled% || (%self.sfinterrupt_count% >= 1 && %self.sfinterrupt_count% >= (%diff% + 1) / 2)
+      %echo% &&m~%self% is interrupted and can't finish morphing!&&0
+      nop %self.remove_mob_flag(NO-ATTACK)%
+      if %diff% == 1
+        dg_affect #11852 %self% HARD-STUNNED on 10
+      end
+      halt
+    end
+    * morph ok
+    skyfight clear interrupt
     set current %self.name%
     %morph% %self% 11848
     %echo% %current% rapidly morphs into ~%self%!
-    wait 1 sec
+    dg_affect #3062 %self% HASTE on -1
+    eval amt %diff% * 5
+    dg_affect #3062 %self% BONUS-PHYSICAL %amt% -1
+    dg_affect #3062 %self% DODGE %amt% -1
+    if %diff% > 1
+      %heal% %self% 50
+    end
+    wait 8 s
   end
-  %send% %actor% &&r~%self% sinks ^%self% fangs into your leg!
-  %echoaround% %actor% ~%self% sinks ^%self% fangs into |%actor% leg!
-  %send% %actor% You don't feel so good...
-  %echoaround% %actor% ~%actor% doesn't look so good...
-  %damage% %actor% 50 physical
-  %dot% #11848 %actor% 100 15 poison
-  if %self.diff% == 4
-    %damage% %actor% 50 poison
-    dg_affect #11848 %actor% SLOW on 15
+  * Bite:
+  skyfight clear dodge
+  set targ %actor%
+  set id %targ.id%
+  if %diff% == 1
+    nop %self.add_mob_flag(NO-ATTACK)%
   end
+  %send% %targ% &&m**** &&Z~%self% coils and pulls ^%self% head back... ****&&0 (dodge)
+  skyfight setup dodge %targ%
+  wait 5 s
+  nop %self.remove_mob_flag(NO-ATTACK)%
+  wait 3 s
+  if %self.disabled%
+    halt
+  end
+  if !%targ% || %targ.id% != %id%
+    * gone
+  elseif %targ.var(did_sfdodge)%
+    %echo% &&m~%self% lunges forward with gnashing fangs and narrowly misses ~%self% with the strike!&&0
+  else
+    * hit
+    %echo% &&m~%self% lunges foward and bites right into ~%targ% with ^%self% enormous fangs!&&0
+    if %diff% > 1
+      %send% %targ% You don't feel so good...
+      if %diff% > 2
+        dg_affect #11848 %targ% SLOW on 15
+      end
+      %dot% #11848 %targ% 100 15 poison
+    end
+    eval amt %diff% * 33
+    %damage% %targ% %amt% physical
+  end
+  skyfight clear dodge
 end
+* in case
+nop %self.remove_mob_flag(NO-ATTACK)%
 ~
 #11845
 Mercenary Vampire (Skycleave): combat script~
@@ -5592,8 +5691,8 @@ elseif %move% == 4
   eval pain 20 + (%diff% * 40)
   set cycle 1
   eval wait 10 - %diff%
-  while %cycle% <= %diff%
-    set targ %random.enemy%
+  set targ %random.enemy%
+  while %cycle% <= %diff% && %targ%
     set targ_id %targ.id%
     skyfight setup interrupt %targ%
     %send% %targ% &&m**** |%self% staff is aimed at you! ****&&0 (interrupt)
@@ -5620,6 +5719,8 @@ elseif %move% == 4
     end
     skyfight clear interrupt
     eval cycle %cycle% + 1
+    * new targ
+    set targ %random.enemy%
   done
 end
 * in case
