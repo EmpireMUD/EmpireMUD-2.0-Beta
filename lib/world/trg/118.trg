@@ -3737,8 +3737,8 @@ set diff %self.diff%
 set moves_left %self.var(moves_left)%
 set num_left %self.var(num_left,0)%
 if !%moves_left% || !%num_left%
-  set moves_left 1 2
-  set num_left 2
+  set moves_left 1 2 2
+  set num_left 3
 end
 * pick
 eval which %%random.%num_left%%%
@@ -3761,7 +3761,13 @@ remote num_left %self.id%
 * perform move
 skyfight lockout 25 20
 if %move% == 1
-  * Healing Wave
+  * Healing Wave / Morph Back
+  if %self.morph%
+    set current %self.name%
+    %morph% %self% normal
+    %echo% &&m%current% rapidly morphs back into ~%self%!&&0
+    wait 2 s
+  end
   skyfight clear interrupt
   %echo% &&m**** &&Z~%self% thrusts ^%self% hands skyward... ****&&0 (interrupt)
   skyfight setup interrupt all
@@ -3873,56 +3879,116 @@ end
 nop %self.remove_mob_flag(NO-ATTACK)%
 ~
 #11845
-Mercenary Vampire (Skycleave): combat script~
+Mercenary Vampire combat: Blood Curse, Exsanguinate~
 0 k 100
 ~
-if %self.cooldown(11800)%
+if %self.cooldown(11800)% || %self.disabled%
   halt
 end
-if %random.2% == 1
-  * Blood Curse
-  nop %self.set_cooldown(11800, 30)%
-  eval magnitude %self.level%/10
-  %echo% ~%self% makes a cut on the palm of ^%self% palm.
-  if %self.diff% == 4
-    %echo% ~%self% presses %self.her% palm to the floor.
-    %echo% A crimson glow fills the room, and you feel weaker.
-    set person %self.room.people%
-    while %person%
-      if %person.is_enemy(%self%)%
-        dg_affect #11849 %person% BONUS-PHYSICAL -%magnitude% 30
-        dg_affect #11849 %person% BONUS-MAGICAL -%magnitude% 30
-        dg_affect #11849 %person% BONUS-HEALING -%magnitude% 30
-      end
-      set person %person.next_in_room%
-    done
-  else
-    %send% %actor% ~%self% smears you with ^%self% blood.
-    %echoaround% %actor% ~%self% smears ~%actor% with ^%self% blood.
-    %send% %actor% It glows crimson, and you feel weakened.
-    %echoaround% %actor% |%self% blood glows crimson, and ~%actor% flinches.
-    dg_affect #11849 %actor% BONUS-PHYSICAL -%magnitude% 30
-    dg_affect #11849 %actor% BONUS-MAGICAL -%magnitude% 30
-    dg_affect #11849 %actor% BONUS-HEALING -%magnitude% 30
-  end
-else
-  * Exsanguinate
-  nop %self.set_cooldown(11800, 30)%
-  %echo% ~%self% thrusts ^%self% hand into the sky, and it glows crimson!
-  %echo% &&rOld injuries all over your body suddenly begin to bleed!
-  set person %self.room.people%
-  while %person%
-    if %person.is_enemy(%self%)%
-      %damage% %person% 10
-      if %self.diff% == 4
-        %dot% #11842 %person% 125 30 physical
-      else
-        %dot% #11842 %person% 100 15 physical
-      end
-    end
-    set person %person.next_in_room%
-  done
+set room %self.room%
+set diff %self.diff%
+* order
+set moves_left %self.var(moves_left)%
+set num_left %self.var(num_left,0)%
+if !%moves_left% || !%num_left%
+  set moves_left 1 2
+  set num_left 2
 end
+* pick
+eval which %%random.%num_left%%%
+set old %moves_left%
+set moves_left
+set move 0
+while %which% > 0
+  set move %old.car%
+  if %which% != 1
+    set moves_left %moves_left% %move%
+  end
+  set old %old.cdr%
+  eval which %which% - 1
+done
+set moves_left %moves_left% %old%
+* store
+eval num_left %num_left% - 1
+remote moves_left %self.id%
+remote num_left %self.id%
+* perform move
+skyfight lockout 25 20
+if %move% == 1
+  * Blood Curse
+  skyfight clear interrupt
+  %echo% &&m**** &&Z~%self% makes a cut on the palm of ^%self% hand... ****&&0 (interrupt)
+  skyfight setup interrupt all
+  if %diff% == 1
+    nop %self.add_mob_flag(NO-ATTACK)%
+  end
+  wait 8 s
+  if %self.disabled% || (%self.sfinterrupt_count% >= 1 && %self.sfinterrupt_count% >= (%diff% + 1) / 2)
+    %echo% &&m~%self% can't seem to finish the blood ritual!&&0
+    if %diff% == 1
+      dg_affect #11852 %self% HARD-STUNNED on 10
+    end
+  elseif %diff% < 3
+    * 1 target
+    %echo% &&m~%self% smears ~%actor% with ^%self% blood, which glows bright crimson!
+    eval amt %self.level%/15
+    %send% %actor% &&mYou feel weaker!&&0
+    dg_affect #11849 %actor% BONUS-PHYSICAL -%amt% 30
+    dg_affect #11849 %actor% BONUS-MAGICAL -%amt% 30
+    dg_affect #11849 %actor% BONUS-HEALING -%amt% 30
+  else
+    * high diff
+    %echo% &&m~%self% presses ^%self% palm to the floor... a bright crimson glow fills the room!&&0
+    set ch %room.people%
+    eval amt %self.level%/10
+    while %ch%
+      if %self.is_enemy(%ch%)%
+        %send% %ch% &&mYou feel weaker!&&0
+        dg_affect #11849 %ch% BONUS-PHYSICAL -%amt% 30
+        dg_affect #11849 %ch% BONUS-MAGICAL -%amt% 30
+        dg_affect #11849 %ch% BONUS-HEALING -%amt% 30
+      end
+      set ch %ch.next_in_room%
+    done
+  end
+  skyfight clear interrupt
+elseif %move% == 2
+  * Exsanguinate
+  skyfight clear interrupt
+  %echo% &&m**** &&Z~%self% makes a cut on the palm of ^%self% hand... ****&&0 (interrupt)
+  skyfight setup interrupt all
+  if %diff% == 1
+    nop %self.add_mob_flag(NO-ATTACK)%
+  end
+  wait 8 s
+  if %self.disabled% || (%self.sfinterrupt_count% >= 1 && %self.sfinterrupt_count% >= (%diff% + 1) / 2)
+    %echo% &&m~%self% can't seem to finish the blood ritual!&&0
+    if %diff% == 1
+      dg_affect #11852 %self% HARD-STUNNED on 10
+    end
+  elseif %diff% < 3
+    * 1 target
+    %echo% &&m~%self% smears ~%actor% with ^%self% blood, which glows deep crimson!
+    %echo% &&mOld injuries all over |%actor% body suddenly begin to bleed!&&0
+    eval amt %diff% * 50
+    %dot% #11842 %actor% %amt% 20 physical
+  else
+    * high diff
+    %echo% &&m~%self% thrusts ^%self% hand into the air, which starts to glow deep crimson!&&0
+    set ch %room.people%
+    eval amt %diff% * 33
+    while %ch%
+      if %self.is_enemy(%ch%)%
+        %echo% &&mOld injuries all over |%ch% body suddenly begin to bleed!&&0
+        %dot% #11842 %ch% %amt% 20 physical
+      end
+      set ch %ch.next_in_room%
+    done
+  end
+  skyfight clear interrupt
+end
+* in case
+nop %self.remove_mob_flag(NO-ATTACK)%
 ~
 #11846
 Mercenary Tank (Skycleave): combat script~
@@ -8569,3 +8635,4 @@ elseif %diff% == 4
 end
 ~
 $
+

@@ -191,7 +191,9 @@ blood curse~
 4 0
 0 0 0 0
 T0
-Your blood curse wears off.~
+The blood curse ends.~
+T5
+...$e is afflicted by a blood curse!~
 S
 #11851
 stunned~
