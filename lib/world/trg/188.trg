@@ -191,9 +191,10 @@ if %heroic_mode%
   done
 else
   if %actor.id% != %verify_target%
-    set actor %random.enemy%
+    %echo% ~%self% shrugs and lands ^%self% hooves back on the ground.
+    halt
   end
-  %send% %actor% &&r|%self% hooves crash down on you!
+  %send% %actor% &&r |%self% hooves crash down on you!
   %echoaround% %actor% |%self% hooves crash down on ~%actor%!
   %damage% %actor% 100
 end
@@ -495,7 +496,9 @@ randomly trash the candy pillowcase if event isn't running~
 if %event.running(18800)%
   halt
 end
-%send% %actor% @%self% suddenly vanishes!
+if %self.carried_by%
+  %send% %self.carried_by% @%self% suddenly vanishes!
+end
 %purge% %self%
 ~
 #18811
@@ -998,6 +1001,7 @@ else
   if %target.varexists(VampFear)%
     %echo% ~%target% immediately clutches ^%target% chest and drops to the ground, dead!
     %slay% %target%
+    nop %actor.set_cooldown(18827,20)%
     halt
   end
   %echo% ~%target% panics, and attempts to flee!

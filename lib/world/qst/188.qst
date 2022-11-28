@@ -107,11 +107,12 @@ normal in no time.
 think of the holiday joy you've brought to your city. You have earned a goody
 bag!
 ~
-17 ej 0 0 -1
+18 ej 0 0 -1
 A
 2 18810
 A
 2 18805
+D 18821
 P
 36 18800 0 1 a
 P
@@ -529,11 +530,11 @@ target can't be a member.
    Seems that music really can soothe the savage soul... Or at least, failing
 that, it can get them dancing!
 ~
-14 ej 0 0 -1
-A
-2 18809
+15 ej 0 0 -1
 A
 2 18808
+A
+2 18809
 D 18870
 P
 36 18800 0 1 -

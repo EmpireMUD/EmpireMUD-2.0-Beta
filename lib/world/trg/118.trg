@@ -4237,7 +4237,7 @@ if %move% == 1
   while %cycle% <= (2 * %diff%)
     set targ %random.enemy%
     set targ_id %targ.id%
-    skyfight setup dodge targ
+    skyfight setup dodge %targ%
     %send% %targ% &&m**** The hairs on your neck stand up... ****&&0 (dodge)
     wait %wait% s
     if %targ.id% != %targ_id% || %targ.position% == Dead
@@ -4423,7 +4423,7 @@ elseif %move% == 5
       %at% %ally.room% %echo% ~%ally% heads to see what Rojjer wants.
       %teleport% %ally% %self.room%
       %echo% &&m~%ally% runs in!&&0
-      %force% %mob% mkill %actor%
+      %force% %ally% mkill %actor%
     end
   end
 end
