@@ -3837,7 +3837,7 @@ elseif %move% == 2
     dg_affect #3062 %self% BONUS-PHYSICAL %amt% -1
     dg_affect #3062 %self% DODGE %amt% -1
     if %diff% > 1
-      %heal% %self% 50
+      %heal% %self% health 50
     end
     wait 8 s
   end
@@ -3991,52 +3991,124 @@ end
 nop %self.remove_mob_flag(NO-ATTACK)%
 ~
 #11846
-Mercenary Tank (Skycleave): combat script~
+Mercenary Tank combat: Shield Bash, Big Kick~
 0 k 100
 ~
-if %self.cooldown(11800)%
+if %self.cooldown(11800)% || %self.disabled%
   halt
 end
-if %random.2% == 1
-  * Bash
-  nop %self.set_cooldown(11800, 30)%
-  %send% %actor% &&r~%self% clubs you over the head with ^%self% weapon!
-  %echoaround% %actor% ~%self% clubs ~%actor% over the head with ^%self% weapon!
-  %echoaround% %actor% ~%actor% looks dazed.
-  %damage% %actor% 100 physical
-  if %self.diff% == 4
-    %send% %actor% The force of the blow leaves you stunned!
-    dg_affect #11851 %actor% STUNNED on 10
-  else
-    %send% %actor% The force of the blow leaves you briefly stunned!
-    dg_affect #11851 %actor% STUNNED on 5
+set room %self.room%
+set diff %self.diff%
+* order
+set moves_left %self.var(moves_left)%
+set num_left %self.var(num_left,0)%
+if !%moves_left% || !%num_left%
+  set moves_left 1 2
+  set num_left 2
+end
+* pick
+eval which %%random.%num_left%%%
+set old %moves_left%
+set moves_left
+set move 0
+while %which% > 0
+  set move %old.car%
+  if %which% != 1
+    set moves_left %moves_left% %move%
   end
-else
-  * First Aid
-  nop %self.set_cooldown(11800, 30)%
-  dg_affect #11845 %self% HARD-STUNNED on 30
-  wait 1 sec
-  %echo% ~%self% sheathes ^%self% weapon and begins to bandage ^%self% injuries...
-  %heal% %self% health 50
-  wait 3 sec
-  if %self.diff%==4
-    set loops 4
-  else
-    set loops 2
-  end
-  while %loops%
-    set target %random.enemy%
-    if !%target%
-      set target %actor%
-    end
-    %echo% ~%self% continues to bandage ^%self% injuries...
-    %heal% %self% health 75
-    eval loops %loops%-1
-    wait 3 sec
-  done
-  %echo% ~%self% draws ^%self% weapon.
-  dg_affect #11845 %self% off
+  set old %old.cdr%
+  eval which %which% - 1
 done
+set moves_left %moves_left% %old%
+* store
+eval num_left %num_left% - 1
+remote moves_left %self.id%
+remote num_left %self.id%
+* perform move
+skyfight lockout 25 20
+if %move% == 1
+  * Shield Bash
+  if %diff% == 1
+    nop %self.add_mob_flag(NO-ATTACK)%
+  end
+  skyfight clear dodge
+  set targ %self.fighting%
+  set id %targ.id%
+  %send% %targ% &&m**** &&Z~%self% holds up ^%self% shield and moves toward you... ****&&0 (dodge)
+  %echoaround% %targ% &&m~%self% holds up ^%self% shield and moves toward ~%targ%...&&0
+  skyfight setup dodge %targ%
+  eval time 8 - %diff%
+  wait %time% s
+  if !%targ% || %targ.id% != %id%
+    * gone
+  elseif %self.disabled% || %targ.var(did_sfdodge)%
+    * miss
+    %echo% &&m~%self% tries to bash ~%targ% with ^%self% shield, but misses and loses ^%self% footing!&&0
+    if %diff% < 3
+      dg_affect #11852 %self% HARD-STUNNED on 10
+    end
+    if %diff% == 1
+      dg_affect #11856 %targ% TO-HIT 25 20
+    end
+  else
+    %echo% &&m~%self% bashes ~%targ% with ^%self% shield!
+    eval dur %diff% * 5
+    dg_affect #11851 %actor% STUNNED on %dur%
+    if %diff% > 1
+      %send% %targ% That really hurt!
+      eval amt %diff% * 50
+      %damage% %targ% %amt% physical
+    end
+  end
+  skyfight clear dodge
+elseif %move% == 2
+  * Big Kick
+  set death_rooms 11830 11831 11832 11833 11834
+  if %diff% == 1
+    nop %self.add_mob_flag(NO-ATTACK)%
+  end
+  skyfight clear dodge
+  set targ %self.fighting%
+  set id %targ.id%
+  %send% %targ% &&m**** &&Z~%self% plants ^%self% feet and checks ^%self% balance... ****&&0 (dodge)
+  %echoaround% %targ% &&m~%self% plants ^%self% feet and checks ^%self% balance...&&0
+  skyfight setup dodge %targ%
+  eval time 8 - %diff%
+  wait %time% s
+  if !%targ% || %targ.id% != %id%
+    * gone
+  elseif %self.disabled% || %targ.var(did_sfdodge)%
+    * miss
+    %echo% &&m~%self% tries to kick ~%targ%, but misses and falls!&&0
+    if %diff% < 3
+      dg_affect #11852 %self% HARD-STUNNED on 10
+    end
+    if %diff% == 1
+      dg_affect #11856 %targ% TO-HIT 25 20
+    end
+  else
+    %echo% &&m~%self% lets loose all of ^%self% might and kicks ~%targ% across the room!
+    if %diff% > 1
+      %send% %targ% You fly into the wall and hit your head! That hurt!
+      eval dur %diff% * 5
+      dg_affect #11851 %actor% STUNNED on %dur%
+    end
+    if %diff% == 4 && %death_rooms% ~= %room.template%
+      %send% %targ% You go sailing over the railing! Oh no...
+      %echoaround% %targ% ~%targ% goes sailing over the railing and vanishes down the central column!
+      %teleport% %targ% i11808
+      %force% %targ% shout Aaaaaaahhhhhhhhhhhhh!
+      %send% %targ% You splat on the floor next to the fountain!
+      %slay% %targ%
+    else
+      eval amt %diff% * 50
+      %damage% %targ% %amt% physical
+    end
+  end
+  skyfight clear dodge
+end
+* in case
+nop %self.remove_mob_flag(NO-ATTACK)%
 ~
 #11847
 Kara Virduke: Mercenary archmage combat script~
