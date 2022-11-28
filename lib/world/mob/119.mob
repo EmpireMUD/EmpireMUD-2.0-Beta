@@ -610,7 +610,7 @@ M
 $n sings, 'As $e came into the window, was the sound of, a crash-end-o, $e came into giant tower, $e left bloodstains, on the parapet...'~
 M
 0
-$n sings, 'They headed down to, oooh, old Elk Castle, that's where they ran into a great big hassle. Gobly Jo shot a man while robbin' his castle, Gobly Sue took the money and run...  Hoo-hoo-hoo, go on, take the money and run...'~
+$n sings, 'They headed down to, oooh, old Elk Castle, that's where they ran into a great big hassle. Gobly Jo shot a man while robbin' his castle, Gobly Sue took the money and run... Hoo-hoo-hoo, go on, take the money and run...'~
 M
 0
 $n sings, 'Oh, there ain't no rest for the wicked, goblins don't grow on trees. I got guys to pay, I got mouths to feed, there ain't nothin' in this world for free...'~
@@ -1124,13 +1124,17 @@ M
 say Where the Tower Skycleave goes, so follows the world.~
 M
 11
-say Madame Niamh and I have been discussing where we might locate a second otherworlder.~
+do skymote caiusniamh~
+M
+11
+skip~
 M
 11
 say If you should stumble across burning wreckage of a round silver chariot, please alert us.~
 T 11810
 T 11852
 T 11840
+T 11862
 S
 #11931
 Niamh resident~
@@ -1383,10 +1387,16 @@ M
 say I don't remember every warm-blooded person's name in the tower. Do you know how many servants have come and gone over the years?~
 M
 8
-say Frankly I can't be bothered with the apprentice names, either, at the rate Niamh goes through them.~
+do skymote scaldniamh1~
 M
 8
-say Always did like her, though. Niamh. She has a healthy respect for the DARK ARTS.~
+skip~
+M
+8
+do skymote scaldniamh2~
+M
+8
+skip~
 M
 8
 emote $n coils in the air as a howling scream escapes his bandages.~
@@ -2453,7 +2463,7 @@ Biksi champion orka goblin~
 Biksi, Champion of Orka~
 Biksi, Champion of Orka, stands in the center of the arena.
 ~
-150 250 bdhyDJ 0 3
+150 250 bdhyDJ E 3
 2 0 0 7
 D
    The Champion of Orka stands in the center of the arena, readying a pair of
@@ -2826,8 +2836,72 @@ patterns.
 ~
 F 11800
 I 12 11869 100.00 1 p  # PICKPOCKET: self-writing pen
+M
+7
+set line_gap 6 s~
+M
+7
+say I keep telling him I don't remember a thing.~
+M
+7
+emote $n stops and looks over at you.~
+M
+7
+set line_gap 9 s~
+M
+7
+say Oh dear, just talking to meself as I work.~
+M
+7
+say Keeps you sane, I always say.~
+M
+7
+emote $n hums quietly as she attempts to organize the desk.~
+M
+8
+say The thing is, he has a lot on his mind.~
+M
+8
+say Blames himself, I think, but we know it was that shadow getting in his head.~
+M
+8
+say Nothing at all he could have done differently.~
+M
+9
+say Has it in his mind he's going to retire.~
+M
+9
+say Nonsense.~
+M
+9
+say This tower needs him, now more than ever.~
+M
+9
+emote $n makes a tsk sound with her tongue.~
+M
+0
+$n shuffles some papers around.~
+M
+0
+$n tries to polish a stubborn spot on the desk.~
+M
+0
+From time to time, $n glances toward the north door.~
+M
+0
+$n fans herself as a hot breeze comes in through the window.~
+M
+0
+$n hums as she works.~
+M
+0
+$n hums as she works.~
+M
+0
+$n hums as she works.~
 T 11810
 T 11852
+T 11840
 S
 #11967
 barrosh high sorcerer~
@@ -2844,7 +2918,80 @@ plumps at the sides. He doesn't even look up at you -- you aren't sure he's
 even aware you're here.
 ~
 F 11800
+M
+7
+say I am in no mood to talk.~
+M
+7
+set line_gap 180 s~
+M
+7
+say That was a euphemism for Go Away.~
+M
+7
+set line_gap 9 s~
+M
+7
+say What a fool was I, trusting those shadow witches.~
+M
+7
+say I'll be out of here by week's end. They can give the office to the mop for all I care.~
+M
+8
+say I am in no mood to talk.~
+M
+8
+set line_gap 180 s~
+M
+8
+say That was a euphemism for Go Away.~
+M
+8
+set line_gap 9 s~
+M
+8
+say What a fool was I, trusting those shadow witches.~
+M
+8
+set line_gap 24 s~
+M
+8
+say I'll be out of here by week's end. They can give the office to the mop for all I care.~
+M
+8
+say And to think they're promoting her.~
+M
+9
+say I am in no mood to talk.~
+M
+9
+set line_gap 180 s~
+M
+9
+say That was a euphemism for Go Away.~
+M
+9
+set line_gap 9 s~
+M
+9
+say I feel like such a fool, letting myself be seduced like that.~
+M
+9
+say Almost cost us everything. I've half a mind to resign in disgrace.~
+M
+9
+say Last sorcerer of my line, I dare say. And deservedly so.~
+M
+9
+emote $n holds his head in his hands.~
+M
+9
+say With any luck we're still stuck in the time loop and there's a better end to this day.~
+M
+9
+say Nice to imagine I won't have to live with this guilt.~
 T 11810
+T 11991
 S
 #11968
 knezz grand high sorcerer~
@@ -2998,7 +3145,7 @@ M
 set line_gap 3 s~
 M
 9
-say My own ma wanted to be a royal seamstress.~
+say My own ma wanted me to be a royal seamstress.~
 M
 9
 set line_gap 9 s~
@@ -3507,7 +3654,7 @@ M
 say I pledge to compose three more by next Zenith.~
 M
 8
-echo $n takes a deep bow.~
+emote $n takes a deep bow.~
 T 11810
 T 11840
 T 11981

@@ -874,10 +874,10 @@ void script_damage(char_data *vict, char_data *killer, int level, int dam_type, 
 	if (level > 100) {
 		dam *= 1.0 + ((level - 100) / 40.0);
 	}
-	if (MOB_FLAGGED(killer, MOB_HARD)) {
+	if (killer && MOB_FLAGGED(killer, MOB_HARD)) {
 		dam *= 1.5;
 	}
-	if (MOB_FLAGGED(killer, MOB_GROUP)) {
+	if (killer && MOB_FLAGGED(killer, MOB_GROUP)) {
 		dam *= 2.0;
 	}
 	dam *= modifier;

@@ -1233,13 +1233,16 @@ The wait type is how long the character has "command lag" after using this
 ability. These are standardized wait times, so you select them from a list
 based on what type of ability you're making.
 
+Most waits are currently 1.25 seconds.
+
 Choose the wait type that best fits your ability:
   &cNONE&0 - no wait
   &cABILITY&0 - basic ability (not combat)
   &cCOMBAT-ABILITY&0 - combat ability (like kick)
   &cCOMBAT-SPELL&0 - combat spell
-  &cMOVEMENT&0 - basic movement, based on riding etc
-  &cSPELL&0 - a basic spell (not a combat spell)
+  &cMOVEMENT&0 - basic movement, based on riding etc; wait time based on
+     terrain, abilities, and traits
+  &cSPELL&0 - a basic spell (not a combat spell); Fastcasting reduces this wait
   &cOTHER&0 - anything else that needs a wait
 
 See also: COMMAND LAG, OLC ABILITIES
@@ -2047,7 +2050,7 @@ enchant) if he doesn't have the item.
 The required object will not be consumed unless it is also in the resource
 list. An example non-consumable augment might require a spellbook object, so
 the effect is that having the spellbook allows the player to enchant weapons
-with extra mana.  An example consumable augment might be a grindstone that
+with extra mana. An example consumable augment might be a grindstone that
 lets a player "hone" a sword with additional to-hit.
 
 See also: OLC AUGMENTS, VNUM

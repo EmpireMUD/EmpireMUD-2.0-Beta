@@ -150,6 +150,20 @@ if %rescale% && %self.level%
   %scale% %self% %self.level%
 end
 ~
+#11903
+Skycleave: Reset buffs when out of combat~
+0 bw 100
+~
+* Resets "permanent" buffs when the mob is out of combat
+if %self.fighting% || %self.disabled%
+  halt
+end
+dg_affect #11864 %self% off silent
+dg_affect #11889 %self% off silent
+dg_affect #11890 %self% off silent
+dg_affect #11892 %self% off silent
+%heal% %self% health 10000
+~
 #11904
 Skycleave: Cleaning crew despawn~
 0 b 33
@@ -697,10 +711,10 @@ if %need3% && %str3.empty%
 end
 * 2. "as they enter AREA"?
 * idea: if say length is long enough, add "it's an exciting race" or similar
-	* else: gaps widened/shrunk
-		* else: just current positions
+  * else: gaps widened/shrunk
+    * else: just current positions
 * part-of-the-track messages (track to have several obstacles around certain spots
-	* may have to track progress through obstacles on each pix to avoid echoing about it twice
+  * may have to track progress through obstacles on each pix to avoid echoing about it twice
 * location parts
 set forestdome 0
 set lavadome 0
@@ -4768,7 +4782,7 @@ set ch %room.people%
 while %ch%
   if %ch.is_pc% && %ch.level% >= %min_level% && %self.is_tagged_by(%ch%)%
     set varname pc%ch.id%
-    if !room.var(%varname%,0)% < %pos%
+    if %room.var(%varname%,0)% < %pos%
       * ch qualifies
       set %varname% %pos%
       remote %varname% %room.id%
@@ -5160,21 +5174,21 @@ eval num_left %num_left% - 1
 remote moves_left %self.id%
 remote num_left %self.id%
 * perform move
-skyfight lockout 30 30
+skyfight lockout 30 35
 if %move% == 1
   * Hammer Dance
   skyfight clear dodge
-  %echo% &&j~%self% starts dancing around wildly with his hammers out...&&0
+  %echo% &&j~%self% starts singing and dancing around wildly with his hammers out...&&0
   if %diff% == 1
     nop %self.add_mob_flag(NO-ATTACK)%
   end
   skyfight setup dodge all
   wait 3 s
   if %self.disabled%
-  	nop %self.remove_mob_flag(NO-ATTACK)%
+    nop %self.remove_mob_flag(NO-ATTACK)%
     halt
   end
-  %echo% &&j**** ~%self% is dancing toward you with his hammers swinging! ****&&0 (dodge)
+  %echo% &&j**** ~%self% sings as he dances toward you with his hammers swinging! ****&&0 (dodge)
   set cycle 1
   set hit 0
   eval wait 10 - %diff%
@@ -5188,7 +5202,7 @@ if %move% == 1
         if !%ch.var(did_sfdodge)%
           set hit 1
           %echo% &&j|%self% hammers hit ~%ch% as he dances wildly around the arena!&&0
-          if %cycle% == %diff% && %diff% >= 2
+          if %diff% >= 2
             %send% %ch% That really hurt! Your leg is immobilized.
             dg_affect #11956 %ch% off silent
             dg_affect #11956 %ch% IMMOBILIZE on 10
@@ -5199,7 +5213,7 @@ if %move% == 1
           %send% %ch% &&jYou narrowly avoid the hammer dance!&&0
         end
         if %cycle% < %diff%
-          %send% %ch% &&j**** He's whirling back around again... ****&&0 (dodge)
+          %send% %ch% &&j**** He's whirling back around again and bellowing in a deep voice... ****&&0 (dodge)
         end
       end
       set ch %next_ch%
@@ -5224,8 +5238,8 @@ elseif %move% == 2
   skyfight clear dodge
   set targ %self.fighting%
   set id %targ.id%
-  %send% %targ% &&j**** &&Z~%self% leaps high into the air! ****&&0 (dodge)
-  %echoaround% %targ% &&j~%self% leaps high into the air!&&0
+  %send% %targ% &&j**** &&Z~%self% shouts as he leaps high into the air! ****&&0 (dodge)
+  %echoaround% %targ% &&j~%self% shouts as he leaps high into the air!&&0
   skyfight setup dodge %targ%
   wait 8 s
   dg_affect #11955 %self% off
@@ -5247,8 +5261,8 @@ elseif %move% == 2
     end
   else
     * hit
-    %send% %targ% &&j~%self% lands on |%targ% chest and clangs both hammers together on ^%targ% head!&&0
-    if %diff% >= 3 && (%self.level% + 100) > %targ.level%
+    %echo% &&j~%self% lands on |%targ% chest and clangs both hammers together on ^%targ% head, shouting the whole time!&&0
+    if %diff% >= 3 && (%self.level% + 100) > %targ.level% && !%targ.aff_flagged(!STUN)%
       %send% %targ% &&jYou're seeing stars!&&0
       dg_affect #11851 %targ% STUNNED on 15
     end
@@ -5260,6 +5274,9 @@ elseif %move% == 3
   * Prayer of Thunder
   skyfight clear interrupt
   %echo% &&j**** &&Z~%self% takes a brief respite to pray... ****&&0 (interrupt)
+  if %diff% == 1
+    nop %self.add_mob_flag(NO-ATTACK)%
+  end
   skyfight setup interrupt all
   if %self.diff% < 3 || %room.players_present% < 2
     set requires 1
@@ -5268,6 +5285,7 @@ elseif %move% == 3
   end
   wait 4 s
   if %self.disabled%
+    nop %self.remove_mob_flag(NO-ATTACK)%
     halt
   end
   if %self.var(sfinterrupt_count,0)% < %requires%
@@ -5275,6 +5293,7 @@ elseif %move% == 3
   end
   wait 4 s
   if %self.disabled%
+    nop %self.remove_mob_flag(NO-ATTACK)%
     halt
   end
   if %self.var(sfinterrupt_count,0)% >= %requires%
@@ -5284,7 +5303,7 @@ elseif %move% == 3
     end
     wait 30 s
   else
-    %echo% &&j~%self% finishes his prayer and holds his hammers to the sky... there is a tremendous crack of thunder!&&0
+    %echo% &&j~%self% finishes his prayer and holds his hammers to the sky... there is a tremendous crack of thunder and the hammer starts to glow!&&0
     eval amount %diff% * 15
     dg_affect #11954 %self% BONUS-PHYSICAL %amount% 300
   end
@@ -5311,7 +5330,7 @@ elseif %move% == 4
   else
     * hit
     %send% %targ% &&j|%self% hammers soar through the air and hit |%targ% head one after the other!&&0
-    if %diff% >= 3 && (%self.level% + 100) > %targ.level%
+    if %diff% >= 3 && (%self.level% + 100) > %targ.level% && !%targ.aff_flagged(!STUN)%
       %send% %targ% &&jYou're seeing stars!&&0
       dg_affect #11851 %targ% STUNNED on 15
     elseif %diff% >= 2
@@ -5325,9 +5344,10 @@ elseif %move% == 4
   end
   skyfight clear dodge
 end
+nop %self.remove_mob_flag(NO-ATTACK)%
 ~
 #11983
-Iskip combat: Jar of Captivity~
+Iskip combat: Jar of Captivity, Lightning Torrent, Buff Blitz, Radiant Axe~
 0 k 100
 ~
 if %self.cooldown(11800)% || %self.disabled%
@@ -5335,12 +5355,14 @@ if %self.cooldown(11800)% || %self.disabled%
 end
 set room %self.room%
 set diff %self.diff%
+* always be countering
+dg_affect #3021 %self% SOULMASK on 15
 * order
 set moves_left %self.var(moves_left)%
 set num_left %self.var(num_left,0)%
 if !%moves_left% || !%num_left%
-  set moves_left 1
-  set num_left 1
+  set moves_left 1 2 3 4
+  set num_left 4
 end
 * pick
 eval which %%random.%num_left%%%
@@ -5361,12 +5383,12 @@ eval num_left %num_left% - 1
 remote moves_left %self.id%
 remote num_left %self.id%
 * perform move
-skyfight lockout 30 30
+skyfight lockout 30 35
 if %move% == 1 && !%self.aff_flagged(BLIND)%
   * Jar of Captivity
   skyfight clear free
   skyfight clear struggle
-  %echo% &&m~%self% pulls out an enormous clay jar and swoops down toward you...&&0
+  %echo% &&mThe Iskip pulls out an enormous clay jar and swoops down toward you...&&0
   wait 3 s
   if %self.disabled%
     halt
@@ -5379,7 +5401,7 @@ if %move% == 1 && !%self.aff_flagged(BLIND)%
   if %self.fighting% == %targ% && %diff% < 4
     dg_affect #11852 %self% HARD-STUNNED on 20
   end
-  if %diff% <= 2 || (%self.level% + 100) <= %targ.level%
+  if %diff% <= 2 || (%self.level% + 100) <= %targ.level% || %room.players_present% == 1
     %send% %targ% &&m**** The jar comes down on your head! You have to break free! ****&&0 (struggle)
     %echoaround% %targ% &&mThe jar comes down on ~%targ%, trapping *%targ%!&&0
     skyfight setup struggle %targ% 20
@@ -5417,11 +5439,164 @@ if %move% == 1 && !%self.aff_flagged(BLIND)%
   end
   dg_affect #11852 %self% off
 elseif %move% == 2
-  *
+  * Lightning Torrent
+  %echo% &&mThe Iskip holds his hands out to the side as sparks crackle around his fingers...&&0
+  %echo% &&m**** He seems to be drawing lighting up from the water! ****&&0 (interrupt and dodge)
+  if %diff% == 1
+    nop %self.add_mob_flag(NO-ATTACK)%
+  end
+  skyfight clear dodge
+  skyfight clear interrupt
+  skyfight setup interrupt all
+  set cycle 0
+  set broke 0
+  while !%broke% && %cycle% <= 4
+    skyfight setup dodge all
+    wait 4 s
+    if %self.sfinterrupt_count% >= 1 && %self.sfinterrupt_count% >= (%diff% + 1) / 2
+      set broke 1
+      set ch %room.people%
+      while %ch%
+        if %ch.var(did_sfinterrupt,0)%
+          %send% %ch% &&mYou somehow manage to interrupt the Iskip before another lightning torrent!&&0
+        end
+        set ch %ch.next_in_room%
+      done
+      %echo% &&mThe Iskip seems distracted, if only for a moment.&&0
+      if %diff% == 1
+        dg_affect #11852 %self% HARD-STUNNED on 10
+        wait 10 s
+      elseif %diff% < 4
+        dg_affect #11852 %self% HARD-STUNNED on 5
+        wait 5 s
+      end
+    else
+      %echo% &&mThe Iskip's fingers crackle as a torrent of lightning bolts stream up from the water...&&0
+      set ch %room.people%
+      while %ch%
+        set next_ch %ch.next_in_room%
+        if %self.is_enemy(%ch%)%
+          if %ch.var(did_sfdodge)%
+            %send% %ch% &&mYou manage to narrowly dodge the lightning bolts!&&0
+          else
+            if %ch.trigger_counterspell%
+              %send% %ch% Your counterspell does nothing against the Iskip!
+            end
+            * hit
+            %send% %ch% &&mA lightning bolt strikes you right in the chest!&&0
+            %echoaround% %ch% &&m~%ch% screams as a lightning bolt strikes *%ch%!&&0
+            eval amount %diff% * 30
+            %damage% %ch% %amount% physical
+            if %cycle% == 4 && %diff% == 4 && (%self.level% + 100) > %ch.level% && !%ch.aff_flagged(!STUN)%
+              dg_affect #11851 %ch% STUNNED on 10
+            end
+          end
+        end
+        set ch %next_ch%
+      done
+    end
+    if !%broke% && %cycle% < 4
+      %echo% &&m**** Here comes another lightning torrent... ****&&0 (interrupt and dodge)
+    end
+    eval cycle %cycle% + 1
+  done
+  skyfight clear dodge
+  skyfight clear interrupt
 elseif %move% == 3
-  *
+  * Buff Blitz
+  %echo% &&mThe Iskip raises his hands to the sky and begins chanting something you don't understand...&&0
+  %echo% &&m**** He seems to be casting spells... on himself! ****&&0 (interrupt)
+  if %diff% == 1
+    nop %self.add_mob_flag(NO-ATTACK)%
+  end
+  set cycle 1
+  set needed %room.players_present%
+  if %needed% > 4
+    set needed 4
+  end
+  set which 0
+  while %cycle% <= 4
+    skyfight clear interrupt
+    skyfight setup interrupt all
+    wait 5 s
+    if %self.sfinterrupt_count% >= %needed%
+      set ch %room.people%
+      while %ch%
+        if %ch.var(did_sfinterrupt,0)%
+          %send% %ch% &&mYou somehow manage to interrupt the Iskip's spells!&&0
+        end
+        set ch %ch.next_in_room%
+      done
+      %echo% &&mThe Iskip seems distracted, if only for a moment.&&0
+      if %diff% == 1
+        dg_affect #11852 %self% HARD-STUNNED on 10
+      elseif %diff% < 4
+        dg_affect #11852 %self% HARD-STUNNED on 5
+      end
+    else
+      * 4 buffs in order:
+      eval which %which% + 1
+      if %which% == 1
+        %echo% &&mRays of moonlight bathe the Iskip from above... he seems stronger!&&0
+        eval amt %diff% * 5
+        dg_affect #11889 %self% BONUS-MAGICAL %amt% -1
+      elseif %which% == 2
+        %echo% &&mA rush of water swirls up around the Iskip from the sea... he's gone to be hard to hit!&&0
+        eval amt %diff% * 10
+        dg_affect #11890 %self% DODGE %amt% -1
+      elseif %which% == 3
+        %echo% &&mA lightning bolt strikes the Iskip from out of the blue... he seems faster!&&0
+        dg_affect #11892 %self% HASTE on 30
+      elseif %which% == 4
+        %echo% &&mMana streams out of the enormous stump and into the Iskip, healing him!&&0
+        %heal% %self% health
+      end
+    end
+    if %cycle% < 4
+      %echo% &&m**** He's casting another one... ****&&0 (interrupt)
+    end
+    eval cycle %cycle% + 1
+  done
+  skyfight clear interrupt
 elseif %move% == 4
-  *
+  * Radiant Axe
+  skyfight clear dodge
+  %echo% &&mThe Iskip speaks a few words in a language you don't understand...&&0
+  wait 3 s
+  %echo% &&m**** A gleaming, radiant axe forms from the haze itself and the giant grabs it! ****&&0 (dodge)
+  if %diff% == 1
+    nop %self.add_mob_flag(NO-ATTACK)%
+  end
+  skyfight setup dodge all
+  wait 8 s
+  if %self.disabled%
+    nop %self.remove_mob_flag(NO-ATTACK)%
+    halt
+  end
+  set hit 0
+  set ch %room.people%
+  while %ch%
+    set next_ch %ch.next_in_room%
+    if %self.is_enemy(%ch%)%
+      if !%ch.var(did_sfdodge)%
+        set hit 1
+        %echo% &&mThe giant's radiant axe slices through ~%ch%!&&0
+        eval amt %diff% * 50
+        %damage% %ch% %amt% physical
+      elseif %ch.is_pc%
+        %send% %ch% &&mYou narrowly avoid the giant's radiant axe!&&0
+      end
+    end
+    set ch %next_ch%
+  done
+  skyfight clear dodge
+  if !%hit%
+    if %diff% < 3
+      %echo% &&mThe Iskip stumbles as his radiant axe misses!&&0
+      dg_affect #11852 %self% HARD-STUNNED on 10
+    end
+  end
+  wait 8 s
 end
 * in case
 nop %self.remove_mob_flag(NO-ATTACK)%
@@ -5461,7 +5636,7 @@ eval num_left %num_left% - 1
 remote moves_left %self.id%
 remote num_left %self.id%
 * perform move
-skyfight lockout 30 30
+skyfight lockout 30 35
 if %move% == 1
   * Frozen Solid
   skyfight clear struggle
@@ -5537,7 +5712,7 @@ elseif %move% == 2
       if %self.is_enemy(%ch%)%
         if !%ch.var(did_sfdodge)%
           %echo% &&AThere's a blinding flash as a bubble implodes right next to ~%ch%!&&0
-          if %cycle% == %diff% && %diff% >= 3 && (%self.level% + 100) > %ch.level%
+          if %cycle% == %diff% && %diff% >= 3 && (%self.level% + 100) > %ch.level% && !%ch.aff_flagged(!STUN)%
             dg_affect #11851 %ch% STUNNED on 5
           end
           eval amt %diff% * 33
@@ -5597,7 +5772,7 @@ elseif %move% == 3
           %echoaround% %ch% &&A~%ch% gurgles in pain as the wave passes through *%ch%!&&0
           eval amount %diff% * 20
           %damage% %ch% %amount% physical
-          if %cycle% == 4 && %diff% == 4 && (%self.level% + 100) > %ch.level%
+          if %cycle% == 4 && %diff% == 4 && (%self.level% + 100) > %ch.level% && !%ch.aff_flagged(!STUN)%
             dg_affect #11851 %ch% STUNNED on 10
           end
         end
@@ -5731,8 +5906,8 @@ set diff %self.diff%
 set moves_left %self.var(moves_left)%
 set num_left %self.var(num_left,0)%
 if !%moves_left% || !%num_left%
-  set moves_left 1 1 2 2 3 3 4 4 5
-  set num_left 9
+  set moves_left 1 2 3 4 5
+  set num_left 5
 end
 * pick
 eval which %%random.%num_left%%%
@@ -5753,7 +5928,7 @@ eval num_left %num_left% - 1
 remote moves_left %self.id%
 remote num_left %self.id%
 * perform move
-skyfight lockout 30 30
+skyfight lockout 30 35
 if %move% == 1
   * Creeping Vines
   skyfight clear struggle
@@ -5812,7 +5987,7 @@ elseif %move% == 2
       if %self.is_enemy(%ch%)%
         if !%ch.var(did_sfdodge)%
           %echo% &&mThere's a blinding flash as the air explodes right next to ~%ch%!&&0
-          if %cycle% == %diff% && %diff% >= 3 && (%self.level% + 100) > %ch.level%
+          if %cycle% == %diff% && %diff% >= 3 && (%self.level% + 100) > %ch.level% && !%ch.aff_flagged(!STUN)%
             dg_affect #11851 %ch% STUNNED on 5
           end
           eval amt %diff% * 33
@@ -5972,18 +6147,472 @@ elseif %move% == 5
     end
   end
 end
+nop %self.remove_mob_flag(NO-ATTACK)%
 ~
 #11987
-Nailbokh combat: tba~
+Nailbokh the Axe combat: Axe-nado, Sand Slash, Whirling Storm, Rain of Hatchets~
 0 k 100
 ~
-tba
+if %self.cooldown(11800)% || %self.disabled%
+  halt
+end
+set room %self.room%
+set diff %self.diff%
+* order
+set moves_left %self.var(moves_left)%
+set num_left %self.var(num_left,0)%
+if !%moves_left% || !%num_left%
+  set moves_left 1 2 3 4
+  set num_left 4
+end
+* pick
+eval which %%random.%num_left%%%
+set old %moves_left%
+set moves_left
+set move 0
+while %which% > 0
+  set move %old.car%
+  if %which% != 1
+    set moves_left %moves_left% %move%
+  end
+  set old %old.cdr%
+  eval which %which% - 1
+done
+set moves_left %moves_left% %old%
+* store
+eval num_left %num_left% - 1
+remote moves_left %self.id%
+remote num_left %self.id%
+* perform move
+skyfight lockout 30 35
+if %move% == 1
+  * Axe-nado
+  skyfight clear dodge
+  %echo% &&j~%self% winds up and lets out a war cry as she starts to spin with her axe out...&&0
+  eval dodge %diff% * 40
+  dg_affect #11958 %self% DODGE %dodge% 20
+  if %diff% == 1
+    nop %self.add_mob_flag(NO-ATTACK)%
+  end
+  skyfight setup dodge all
+  wait 3 s
+  if %self.disabled%
+    dg_affect #11958 %self% off
+    nop %self.remove_mob_flag(NO-ATTACK)%
+    halt
+  end
+  %echo% &&j**** ~%self% screams as she whirls right toward you with her axe out! ****&&0 (dodge)
+  set cycle 1
+  set hit 0
+  eval wait 10 - %diff%
+  while %cycle% <= %diff%
+    skyfight setup dodge all
+    wait %wait% s
+    set ch %room.people%
+    while %ch%
+      set next_ch %ch.next_in_room%
+      if %self.is_enemy(%ch%)%
+        if !%ch.var(did_sfdodge)%
+          set hit 1
+          %echo% &&j~%self% slices ~%ch% as she whirls around the arena!&&0
+          eval amt 60 + (%diff% * 20)
+          %dot% #11957 %ch% %amt% 15 physical 4
+        elseif %ch.is_pc%
+          %send% %ch% &&jYou narrowly avoid the axe-nado!&&0
+        end
+        if %cycle% < %diff%
+          %send% %ch% &&j**** She's still spinning... ****&&0 (dodge)
+        end
+      end
+      set ch %next_ch%
+    done
+    eval cycle %cycle% + 1
+  done
+  skyfight clear dodge
+  dg_affect #11958 %self% off
+  if !%hit%
+    if %diff% < 3
+      %echo% &&j~%self% spins herself out and bobbles to a stop.&&0
+      dg_affect #11852 %self% HARD-STUNNED on 10
+    end
+  end
+  wait 8 s
+elseif %move% == 2
+  * Sand Slash
+  if %diff% <= 2
+    nop %self.add_mob_flag(NO-ATTACK)%
+  end
+  skyfight clear dodge
+  set targ %self.fighting%
+  set id %targ.id%
+  %send% %targ% &&j**** &&Z~%self% shouts triumphantly as she slashes at the sand in front of you! ****&&0 (dodge)
+  %echoaround% %targ% &&j~%self% shouts triumphantly as she slashes at the sand!&&0
+  skyfight setup dodge %targ%
+  wait 8 s
+  if %self.disabled%
+    nop %self.remove_mob_flag(NO-ATTACK)%
+    halt
+  end
+  if !%targ% || %targ.id% != %id%
+    * gone
+    %echo% &&jThe slash of sand flies off the side of the arena.&&0
+  elseif %targ.var(did_sfdodge)%
+    * miss
+    %echo% &&jThe sand from |%self% sand slash misses ~%targ%!&&0
+  else
+    * hit
+    %echo% &&jThe sand flies into |%targ% eyes!&&0
+    if %diff% >= 3 && (%self.level% + 100) > %targ.level% && !%targ.aff_flagged(!STUN)%
+      %send% %targ% &&jThat really hurt! You can't do anything but try to get the sand out of your eyes.&&0
+      dg_affect #11851 %targ% STUNNED on 15
+    else
+      %send% %targ% &&jYou're blind!&&0
+      dg_affect #11959 %ch% BLIND on 10
+    end
+    if %diff% >= 3
+      eval dam 20 + (%diff% * 20)
+      %damage% %targ% %dam% physical
+    end
+  end
+  skyfight clear dodge
+elseif %move% == 3
+  * Whirling Storm
+  skyfight clear interrupt
+  %echo% &&j**** &&Z~%self% leans her huge axe into the arena sand and starts to whirl in a circle! ****&&0 (interrupt)
+  eval dodge %diff% * 40
+  dg_affect #11958 %self% DODGE %dodge% 20
+  skyfight setup interrupt all
+  set requires %room.players_present%
+  if %requires% > 4
+    set requires 4
+  end
+  wait 4 s
+  if %self.disabled%
+    dg_affect #11958 %self% off
+    halt
+  end
+  if %self.var(sfinterrupt_count,0)% < %requires%
+    %echo% &&j**** Sand is flying everywhere as ~%self% whirls around with her axe, screaming... ****&&0 (interrupt)
+  end
+  wait 4 s
+  if %self.disabled%
+    dg_affect #11958 %self% off
+    halt
+  end
+  if %self.var(sfinterrupt_count,0)% >= %requires%
+    %echo% &&jYou manage to interrupt ~%self% before the whirling storm gets too big!&&0
+    if %diff% <= 2
+      %echo% &&j~%self% is spun out!&&0
+      dg_affect #11852 %self% HARD-STUNNED on 5
+    end
+    wait 30 s
+  else
+    %echo% &&j~%self% whirls up a sandstorm and it blows right into your face!&&0
+    dg_affect #11958 %self% off
+    set ch %room.people%
+    while %ch%
+      set next_ch %ch.next_in_room%
+      if %self.is_enemy(%ch%)%
+        dg_affect #11959 %ch% BLIND on 20
+        eval pain %diff% * 25
+        %dot% #11960 %ch% %pain% 10 physical
+      end
+      set ch %next_ch%
+    done
+  end
+  skyfight clear interrupt
+elseif %move% == 4
+  * Rain of Hatchets
+  skyfight clear dodge
+  %echo% &&j~%self% lets out a piercing war cry as she throws hatchet after hatchet into the air... this won't be good.&&0
+  if %diff% == 1
+    nop %self.add_mob_flag(NO-ATTACK)%
+  end
+  skyfight setup dodge all
+  wait 3 s
+  if %self.disabled%
+    nop %self.remove_mob_flag(NO-ATTACK)%
+    halt
+  end
+  %echo% &&j**** Oh no... it's raining hatchets! Watch out! ****&&0 (dodge)
+  set cycle 1
+  set hit 0
+  eval wait 10 - %diff%
+  while %cycle% <= %diff%
+    skyfight setup dodge all
+    wait %wait% s
+    set ch %room.people%
+    while %ch%
+      set next_ch %ch.next_in_room%
+      if %self.is_enemy(%ch%)%
+        if !%ch.var(did_sfdodge)%
+          set hit 1
+          %echo% &&jA hatchet comes down on |%ch% head!&&0
+          eval pain (%diff% * 25) + 25
+          %damage% %ch% %pain% physical
+        elseif %ch.is_pc%
+          %send% %ch% &&jA hatchet just misses you as it falls!&&0
+        end
+        if %cycle% < %diff%
+          %send% %ch% &&j**** There are still more hatchets coming down! ****&&0 (dodge)
+        end
+      end
+      set ch %next_ch%
+    done
+    eval cycle %cycle% + 1
+  done
+  skyfight clear dodge
+  if !%hit%
+    if %diff% < 3
+      %echo% &&jA stray hatchet hits ~%self% on the head, handle-first!&&0
+      dg_affect #11852 %self% HARD-STUNNED on 10
+    end
+  end
+  wait 8 s
+end
+nop %self.remove_mob_flag(NO-ATTACK)%
 ~
 #11988
-Biksi combat: tba~
+Biksi, Champion of Orka combat: Thornlash, Thornbound, Triplash, Crown of Thorns~
 0 k 100
 ~
-tba
+if %self.cooldown(11800)% || %self.disabled%
+  halt
+end
+set room %self.room%
+set diff %self.diff%
+* order
+set moves_left %self.var(moves_left)%
+set num_left %self.var(num_left,0)%
+if !%moves_left% || !%num_left%
+  set moves_left 1 2 3 4
+  set num_left 4
+end
+* pick
+eval which %%random.%num_left%%%
+set old %moves_left%
+set moves_left
+set move 0
+while %which% > 0
+  set move %old.car%
+  if %which% != 1
+    set moves_left %moves_left% %move%
+  end
+  set old %old.cdr%
+  eval which %which% - 1
+done
+set moves_left %moves_left% %old%
+* store
+eval num_left %num_left% - 1
+remote moves_left %self.id%
+remote num_left %self.id%
+* perform move
+skyfight lockout 30 35
+if %move% == 1
+  * Thornlash
+  skyfight clear dodge
+  %echo% &&j~%self% screams as she furiously lashes both her thorny whips around the arena!&&0
+  eval dodge %diff% * 40
+  dg_affect #11950 %self% DODGE %dodge% 20
+  if %diff% == 1
+    nop %self.add_mob_flag(NO-ATTACK)%
+  end
+  skyfight setup dodge all
+  wait 3 s
+  if %self.disabled%
+    dg_affect #11950 %self% off
+    nop %self.remove_mob_flag(NO-ATTACK)%
+    halt
+  end
+  %echo% &&j**** If you're hoping to avoid |%self% lashing whips, now is the time! ****&&0 (dodge)
+  set cycle 1
+  set hit 0
+  eval wait 10 - %diff%
+  while %cycle% <= %diff%
+    skyfight setup dodge all
+    wait %wait% s
+    set ch %room.people%
+    while %ch%
+      set next_ch %ch.next_in_room%
+      if %self.is_enemy(%ch%)%
+        if !%ch.var(did_sfdodge)%
+          set hit 1
+          %echo% &&j~%self% lashes ~%ch% with her thorny whips!&&0
+          eval amt %diff% * 25
+          %dot% #11951 %ch% %amt% 40 physical 25
+        elseif %ch.is_pc%
+          %send% %ch% &&jThe lashing whip hits the sand near your feet!&&0
+        end
+        if %cycle% < %diff%
+          %send% %ch% &&j**** Here come the whips again... ****&&0 (dodge)
+        end
+      end
+      set ch %next_ch%
+    done
+    eval cycle %cycle% + 1
+  done
+  skyfight clear dodge
+  dg_affect #11950 %self% off
+  if !%hit%
+    if %diff% < 3
+      %echo% &&j~%self% seems to exhaust herself from the thornlash.&&0
+      dg_affect #11852 %self% HARD-STUNNED on 10
+    end
+  end
+  wait 8 s
+elseif %move% == 2
+  * Thornbound
+  skyfight clear free
+  skyfight clear struggle
+  %echo% &&j~%self% pulls one of her whips back and takes aim...&&0
+  wait 3 s
+  if %self.disabled%
+    halt
+  end
+  set targ %random.enemy%
+  if !%targ%
+    halt
+  end
+  set targ_id %targ.id%
+  if %self.fighting% == %targ% && %diff% < 4
+    dg_affect #11852 %self% HARD-STUNNED on 20
+  end
+  if %diff% <= 2 || (%self.level% + 100) <= %targ.level%
+    %send% %targ% &&j**** ~%self% lashes her thorny whip around you! You can't move! ****&&0 (struggle)
+    %echoaround% %targ% &&j~%self% lashes her thorny whip around ~%targ%, trapping *%targ%!&&0
+    skyfight setup struggle %targ% 20
+    set bug %targ.inventory(11890)%
+    if %bug%
+      set strug_char You try to wiggle out of the thorny whip...
+      set strug_room You hear ~%%actor%% tries to wiggle free of the thorny whip...
+      remote strug_char %bug.id%
+      remote strug_room %bug.id%
+      set free_char You wiggle out of the thorny whip!
+      set free_room ~%%actor%% manages to wiggle free of the thorny whip!
+      remote free_char %bug.id%
+      remote free_room %bug.id%
+    end
+    set cycle 0
+    set done 0
+    while %cycle% < 5 && !%done%
+      wait 4 s
+      if %targ.id% == %targ_id% && %targ.affect(11822)% && %diff% > 1
+        %send% %targ% &&jThe thorns press into you! That really hurts!&&0
+        eval amt %diff% * 25
+        %dot% #11951 %ch% %amt% 40 physical 25
+      else
+        set done 1
+      end
+      eval cycle %cycle% + 1
+    done
+    skyfight clear struggle
+  else
+    %send% %targ% &&j~%self% lashes her thorny whip around you! You can't move!&&0
+    %echoaround% %targ% &&j**** ~%self% lashes her thorny whip around ~%targ%, trapping *%targ%! ****&&0 (free %targ.pc_name.car%)
+    skyfight setup free %targ%
+    eval time %diff% * 15
+    dg_affect #11949 %targ% HARD-STUNNED on %time%
+    * wait and clear
+    set done 0
+    while !%done% && %time% > 0
+      wait 5 s
+      eval time %time% - 5
+      if %targ_id% != %targ.id%
+        set done 1
+      elseif !%targ.affect(11888)%
+        set done 1
+      else
+        %send% %targ% &&jThe thorns press into you! That really hurts!&&0
+        eval amt %diff% * 25
+        %dot% #11951 %ch% %amt% 40 physical 25
+      end
+    done
+    skyfight clear free
+  end
+  dg_affect #11852 %self% off
+elseif %move% == 3
+  * Triplash
+  skyfight clear dodge
+  %echo% &&j**** ~%self% lets out a wicked war cry as she lashes her thorny whips wildly around the arena! ****&&0 (dodge)
+  eval dodge %diff% * 40
+  dg_affect #11950 %self% DODGE %dodge% 10
+  if %diff% == 1
+    nop %self.add_mob_flag(NO-ATTACK)%
+  end
+  skyfight setup dodge all
+  wait 8 s
+  set ch %room.people%
+  while %ch%
+    set next_ch %ch.next_in_room%
+    if %self.is_enemy(%ch%)%
+      if !%ch.var(did_sfdodge)%
+        set hit 1
+        %echo% &&j~%self% trips ~%ch% with her thorny whip!&&0
+        if %diff% >= 3 && (%self.level% + 100) <= %ch.level%
+          dg_affect #11814 %ch% STUNNED on 10
+        else
+          dg_affect #11814 %ch% DISARMED on 10
+          dg_affect #11814 %ch% IMMOBILIZED on 10
+        end
+        if %diff% > 1
+          eval amt %diff% * 25
+          %dot% #11951 %ch% %amt% 40 physical 25
+        end
+      elseif %ch.is_pc%
+        %send% %ch% &&jThe whip sends sand spraying as it narrowly misses your feet!&&0
+      end
+    end
+    set ch %next_ch%
+  done
+  skyfight clear dodge
+  dg_affect #11950 %self% off
+  if !%hit%
+    if %diff% < 3
+      %echo% &&j~%self% seems to exhaust herself from the triplash.&&0
+      dg_affect #11852 %self% HARD-STUNNED on 10
+    end
+  end
+  wait 8 s
+elseif %move% == 4
+  * Crown of Thorns
+  skyfight clear interrupt
+  %echo% &&j**** &&Z~%self% seems to be wrapping her whip around her own head! ****&&0 (interrupt)
+  if %diff% == 1
+    nop %self.add_mob_flag(NO-ATTACK)%
+  end
+  skyfight setup interrupt all
+  if %self.diff% < 3 || %room.players_present% < 2
+    set requires 1
+  else
+    set requires 2
+  end
+  wait 4 s
+  if %self.disabled%
+    nop %self.remove_mob_flag(NO-ATTACK)%
+    halt
+  end
+  if %self.var(sfinterrupt_count,0)% < %requires%
+    %echo% &&j**** &&Z~%self% is screaming something you can't understand as blood trickles down her face... ****&&0 (interrupt)
+  end
+  wait 4 s
+  if %self.disabled%
+    nop %self.remove_mob_flag(NO-ATTACK)%
+    halt
+  end
+  if %self.var(sfinterrupt_count,0)% >= %requires%
+    %echo% &&j~%self% is interrupted during whatever she was doing with those thorns... thankfully!&&0
+    if %diff% == 1
+      dg_affect #11852 %self% HARD-STUNNED on 5
+    end
+    wait 30 s
+  else
+    %echo% &&jBlood trickles down |%self% as she lets out a fearsome war cry!&&0
+    eval amount %diff% * 20
+    dg_affect #11948 %self% BONUS-PHYSICAL %amount% 300
+  end
+  skyfight clear interrupt
+end
+nop %self.remove_mob_flag(NO-ATTACK)%
 ~
 #11989
 Goblin's Dream: Guard patrol~
@@ -6127,6 +6756,97 @@ done
 dg_affect #11990 %ch% %type% %amount% 300
 %send% %ch% ~%self% %verb% itself toward you... you take on a %glow% glow.
 %echoaround% %ch% ~%self% %verb% itself toward ~%ch%... &%ch% takes on a %glow% glow.
+~
+#11991
+Skycleave: Barrosh storytime using script1-3~
+0 bw 100
+~
+* variant of 11840/Storytime:
+* script1: Grace died
+* script2: Knezz died but Grace lived
+* script3: Both lived
+set line_gap 9 s
+set story_gap 360 s
+* random wait to offset competing scripts slightly
+wait %random.30%
+* determine story number
+set knezz %instance.mob(11968)%
+set grace %instance.mob(11966)%
+if %knezz% && %grace%
+  set story 3
+elseif %grace%
+  set story 2
+else
+  set story 1
+end
+* story detected: prepare (storing as variables prevents reboot issues)
+if !%self.mob_flagged(SENTINEL)%
+  set no_sentinel 1
+  remote no_sentinel %self.id%
+  nop %self.add_mob_flag(SENTINEL)%
+end
+if !%self.mob_flagged(SILENT)%
+  set no_silent 1
+  remote no_silent %self.id%
+  nop %self.add_mob_flag(SILENT)%
+end
+* tell story
+set pos 0
+set done 0
+while !%done%
+  set msg %self.custom(script%story%,%pos%)%
+  if %msg%
+    set mode %msg.car%
+    set msg %msg.cdr%
+    if %mode% == say
+      say %msg%
+      wait %line_gap%
+    elseif %mode% == do
+      %msg.process%
+      * no wait
+    elseif %mode% == echo
+      %echo% %msg.process%
+      wait %line_gap%
+    elseif %mode% == vforce
+      set vnum %msg.car%
+      set msg %msg.cdr%
+      set targ %self.room.people(%vnum%)%
+      if %targ%
+        %force% %targ% %msg.process%
+      end
+    elseif %mode% == emote
+      emote %msg%
+      wait %line_gap%
+    elseif %mode% == set
+      set subtype %msg.car%
+      set msg %msg.cdr%
+      if %subtype% == line_gap
+        set line_gap %msg%
+      elseif %subtype% == story_gap
+        set story_gap %msg%
+      else
+        %echo% ~%self%: Invalid set type '%subtype%' in storytime script.
+      end
+    elseif %mode% == skip
+      * nothing this round
+      wait %line_gap%
+    else
+      %echo% %self.name%: Invalid script message type '%mode%'.
+    end
+  else
+    set done 1
+  end
+  eval pos %pos% + 1
+done
+* cancel sentinel/silent
+if %self.varexists(no_sentinel)%
+  nop %self.remove_mob_flag(SENTINEL)%
+end
+if %self.varexists(no_silent)%
+  nop %self.remove_mob_flag(SILENT)%
+end
+* wait between stories
+wait %story_gap%
 ~
 #11992
 Smash striped stone seedling to create calamander forest~

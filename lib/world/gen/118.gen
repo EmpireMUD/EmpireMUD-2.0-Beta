@@ -122,6 +122,13 @@ You can see again.~
 T5
 ...$e has been blinded by the barrage!~
 S
+#11824
+rain of arrows~
+4 0
+0 0 0 0
+T0
+You pull an arrow from your chest.~
+S
 #11832
 conditional visibility~
 4 0
@@ -148,7 +155,7 @@ T5
 ...$e is bleeding badly!~
 S
 #11843
-flame brand~
+firebrand~
 4 0
 0 0 0 0
 T0
@@ -173,18 +180,20 @@ T5
 ...$e is focused on a big attack -- this is your chance to strike!~
 S
 #11848
-poisoned~
+viper venom~
 4 0
 0 0 0 0
 T0
-You are no longer poisoned.~
+The viper venom no longer stings.~
 S
 #11849
 blood curse~
 4 0
 0 0 0 0
 T0
-Your blood curse wears off.~
+The blood curse ends.~
+T5
+...$e is afflicted by a blood curse!~
 S
 #11851
 stunned~
@@ -256,6 +265,20 @@ You're no longer pinned down by the shadow dagger!~
 T5
 ...$s shadow is pinned to the ground!~
 S
+#11863
+shadow cage~
+4 0
+0 0 0 0
+T4
+$e is trapped in a shadow cage -- free $m!~
+T5
+...$e is trapped in a shadow cage -- free $m!~
+S
+#11864
+absorbed spell~
+4 0
+0 0 0 0
+S
 #11865
 flying~
 4 0
@@ -278,6 +301,42 @@ momentarily stunned~
 0 0 0 0
 T0
 You're no longer stunned.~
+S
+#11868
+blowback~
+4 0
+0 0 0 0
+S
+#11869
+shadow flail~
+4 0
+0 0 0 0
+T5
+...it's flailing wildly around the office!~
+S
+#11870
+shadow flail~
+4 0
+0 0 0 0
+S
+#11871
+wave of guilt~
+4 0
+0 0 0 0
+T0
+The wave of guilt fades.~
+S
+#11872
+deathbolt~
+4 0
+0 0 0 0
+T0
+The deathbolt fades, at least for now.~
+S
+#11873
+slightly drained~
+4 0
+0 0 0 0
 S
 #11880
 magic rock candy~
@@ -306,10 +365,27 @@ $e is trapped in a jar -- free $m!~
 T5
 ...$e is trapped in a jar -- free $m!~
 S
+#11889
+rays of moonlight~
+4 0
+0 0 0 0
+S
+#11890
+swirling seas~
+4 0
+0 0 0 0
+S
 #11891
 crystallized sap~
 4 0
 0 0 0 0
+S
+#11892
+lightning struck~
+4 0
+0 0 0 0
+T1
+The Iskip slows back down.~
 S
 #11896
 Lilac Goblin Wine~

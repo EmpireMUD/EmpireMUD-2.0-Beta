@@ -1659,6 +1659,8 @@ T 11802
 T 11841
 T 11857
 T 11852
+T 11821
+T 11822
 S
 #11842
 mercenary caster~
@@ -1698,6 +1700,8 @@ T 11802
 T 11857
 T 11842
 T 11852
+T 11821
+T 11822
 S
 #11843
 mercenary archer~
@@ -1728,6 +1732,8 @@ T 11802
 T 11857
 T 11843
 T 11852
+T 11822
+T 11821
 S
 #11844
 mercenary nature mage~
@@ -1758,6 +1764,8 @@ T 11802
 T 11857
 T 11844
 T 11852
+T 11821
+T 11822
 S
 #11845
 mercenary vampire~
@@ -1788,6 +1796,8 @@ T 11802
 T 11857
 T 11845
 T 11852
+T 11821
+T 11822
 S
 #11846
 mercenary armored~
@@ -1818,6 +1828,8 @@ T 11802
 T 11857
 T 11846
 T 11852
+T 11841
+T 11842
 S
 #11847
 Kara Virduke~
@@ -2035,6 +2047,8 @@ T 11810
 T 11806
 T 11852
 T 11823
+T 11821
+T 11822
 S
 #11850
 prism focusing~
@@ -2222,7 +2236,7 @@ shadow ascendant mezvienne shade~
 the Shadow Ascendant~
 The Shadow Ascendant looms over the chamber as it draws more and more power!
 ~
-150 250 bdhxyJ 0 3
+150 250 bdhxyzJ hoE 3
 0 0 0 20
 D
    The shade, once merely a projection of the powerful enchantress Mezvienne,
@@ -2260,6 +2274,9 @@ echo You feel your own power being drained by the Shadow Ascendant as it absorbs
 T 11823
 T 11806
 T 11856
+T 11821
+T 11822
+T 11903
 S
 #11864
 Celiya high sorcerer~
@@ -2352,8 +2369,8 @@ barrosh high sorcerer~
 High Sorcerer Barrosh~
 High Sorcerer Barrosh stands with his staff raised high and an anguished look.
 ~
-150 250 bdhvxyJ 0 3
-1 0 0 15
+150 250 bdhvxyzJ DE 3
+1 0 0 19
 D
    Barrosh takes a menacing position as you enter and seems to be muttering
 spells under his breath. His stubbled face is turned toward you at all times
@@ -2376,6 +2393,8 @@ I+ 6 0  # Boss
 T 11861
 T 11823
 T 11859
+T 11821
+T 11822
 S
 #11868
 knezz master~
@@ -2403,7 +2422,7 @@ Mezvienne shade shadow~
 the Shade of Mezvienne~
 The Shade of Mezvienne surrounds Knezz like a phantom.
 ~
-150 250 bdhyJ 0 3
+150 250 bdhyJ hCDE 3
 0 0 0 7
 D
    The Shade is lithe, feminine, even graceful as it swirls back and forth
@@ -2443,6 +2462,8 @@ T 11823
 T 11863
 T 11806
 T 11858
+T 11821
+T 11822
 S
 #11870
 knezz grand high sorcerer~
@@ -2493,7 +2514,7 @@ Mezvienne enchantress~
 Mezvienne the Enchantress~
 Mezvienne the Enchantress hovers above the tower as she channels the heartwood.
 ~
-150 250 bdhvxyDJ 0 3
+150 250 bdhvxyDJ DE 3
 2 0 0 21
 D
    The enchantress's long gossamer gown blows madly in the wind as she floats
@@ -3025,6 +3046,7 @@ T 11983
 T 11803
 T 11821
 T 11822
+T 11903
 S
 #11889
 Wright wrangler~

@@ -147,6 +147,38 @@ You're no longer drowsy.~
 T5
 ...$e looks really drowsy.~
 S
+#11948
+crown of thorns~
+4 0
+0 0 0 0
+T5
+...$e's bleeding badly from the thorns in her forehead!~
+S
+#11949
+thornbound~
+4 0
+0 0 0 0
+T4
+$e is bound up in the thorny whip -- free $m!~
+T5
+...$e is bound up in the thorny whip -- free $m!~
+S
+#11950
+thornlash~
+4 0
+0 0 0 0
+T5
+...$e's lashing those whips furiously around the arena!~
+S
+#11951
+ritual bloodshed~
+4 0
+0 0 0 0
+T0
+The ritual bleeding stops.~
+T5
+...$e's bleeding on the sand.~
+S
 #11952
 hammer throw~
 4 0
@@ -187,6 +219,36 @@ T0
 Your leg recovers from the hammer dance.~
 T5
 ...$e has been hit by the hammer dance!~
+S
+#11957
+axe wound~
+4 0
+0 0 0 0
+T0
+The axe wound stops bleeding.~
+S
+#11958
+whirling storm~
+4 0
+0 0 0 0
+T5
+...$e's whirling up a storm with that axe!~
+S
+#11959
+sandblind~
+4 0
+0 0 0 0
+T0
+You finally get the sand out of your eyes!~
+T5
+...$e is trying to get the sand out of $s eyes!~
+S
+#11960
+choking on sand~
+4 0
+0 0 0 0
+T0
+You're no longer choking on sand.~
 S
 #11961
 crystalline dew~

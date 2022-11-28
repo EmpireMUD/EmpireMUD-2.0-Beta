@@ -895,13 +895,11 @@ A wheel made up of dismantled skeleton lays here.~
 This macabre wheel was clearly once part of some form of wagon. It is made up
 of various bones, human from the look of them.
 ~
-3 e a 0 2
+3 e a 0 3
 0 0 0
 14 0
 C
 1 400
-R
-4 5139 0
 S
 #18859
 whistle bone fading~
@@ -956,11 +954,14 @@ This just makes it impossible to maintain the nether portal.
 0 0
 S
 #18866
-blood feed tracking~
-blood feed tracking object~
-A new object is sitting here.~
+charm blooddrop~
+a blooddrop charm~
+A blooddrop-shaped charm rolls about here.~
+   Shaped like a blooddrop, this charm is slightly sticky to the touch. You
+feel it would have something to do with being a vampire, but aren't quite sure
+what.
 ~
-3 k a 0 7
+3 k a 0 8
 0 0 0
 10 0
 C

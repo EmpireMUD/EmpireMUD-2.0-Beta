@@ -1084,17 +1084,30 @@ T 11965
 T 11963
 S
 #11967
-desk oak tall Barrosh's~
-Barrosh's desk~
+desk oak tall austere~
+the austere desk~
 A tall oak desk sits on a dais in the center of the office.~
    This desk is austere, brutal, almost uncarved. Its height requires that its
 occupant stand and, indeed, there is no chair. As if that weren't imposing
-enough, the desk stands on a raised dais. No name adorns the desk, but the
-papers atop it indicate it belongs to High Sorcerer Barrosh.
+enough, the desk stands on a raised dais. No name adorns the desk, which is
+covered in loose papers that nearly cover an old ink stain.
 ~
 3 0 0 0 2
 0 0 0
 0 0
+E
+spot stain~
+It looks like someone has spilled shimmering ink on the desk.
+~
+E
+ink shimmering~
+The shimmering violet stain might be new or old, there's no way to tell.
+~
+E
+papers~
+   The papers on the desk seem like they're written in English, but each time
+you try to read them, the letters seem to rearrange themselves.
+~
 S
 #11968
 desk ebony ornate knezz's~
