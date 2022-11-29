@@ -4460,6 +4460,7 @@ struct player_special_data {
 	char *fight_prompt;	// fight prompt
 	char *poofin;	// shown when immortal appears
 	char *poofout;	// shown when immortal disappears
+	struct pronoun_data *pronouns; // optional customization, shown when referring to a player
 	
 	// preferences
 	bitvector_t pref;	// preference flags for PCs.
