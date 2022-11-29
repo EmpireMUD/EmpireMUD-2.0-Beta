@@ -1772,7 +1772,7 @@ mercenary vampire~
 vampire mercenary~
 Vampire mercenary watches you carefully.
 ~
-150 250 abdvwIJ 0 3
+150 250 abdvwIJ D 3
 0 0 0 1
 D
 This mob is loaded by trig 11900/skymerc and named by 11857.
@@ -1804,7 +1804,7 @@ mercenary armored~
 armored mercenary~
 Armored mercenary is spoiling for a fight.
 ~
-150 250 abdvyIJ s 3
+150 250 abdvyIJ sE 3
 0 0 0 5
 D
 This mob is loaded by trig 11900/skymerc and named by 11857.
@@ -1836,7 +1836,7 @@ Kara Virduke~
 Kara Virduke~
 Kara Virduke is digging through cabinets.
 ~
-150 250 bdvxEIJ 0 3
+150 250 bdvxEIJ oE 3
 2 0 0 17
 D
    Kara Virduke is nearly seven feet tall, such that she must stoop to work in
@@ -2049,19 +2049,6 @@ T 11852
 T 11823
 T 11821
 T 11822
-S
-#11850
-prism focusing~
-a focusing prism~
-A focusing prism is floating in the air here.
-~
-150 250 dhnyDJ G 1
-0 0 27 22
-D
-   This strange, angular transparent crystal has a steadily growing flicker of
-rainbow light forming at its core.
-~
-T 11812
 S
 #11851
 Paige page~

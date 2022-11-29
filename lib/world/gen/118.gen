@@ -179,6 +179,15 @@ weapon sheathed~
 T5
 ...$e is focused on a big attack -- this is your chance to strike!~
 S
+#11847
+arcane tattoos~
+4 0
+0 0 0 0
+T1
+The golden tattoos on $n's arms stop glowing.~
+T5
+...$s arms are covered in glowing gold tattoos!~
+S
 #11848
 viper venom~
 4 0
@@ -227,6 +236,10 @@ S
 arcane tattoos~
 4 0
 0 0 0 0
+T1
+The silver tattoos on $n's arms stop glowing.~
+T5
+...$s arms are covered in glowing silver tattoos!~
 S
 #11856
 timely dodge~

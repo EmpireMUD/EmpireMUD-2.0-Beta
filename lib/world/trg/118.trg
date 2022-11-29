@@ -695,14 +695,6 @@ else
   %mod% %self% append-lookdesc-noformat Have a safe and uneventful visit to the Tower Skycleave.
 end
 ~
-#11812
-Skycleave: Summoned monster despawn for boss minions~
-0 ab 100
-~
-if !%self.fighting%
-  %purge% %self% $n leaves.
-end
-~
 #11813
 Skycleave: Shared enter trigger~
 2 gwA 100
@@ -853,7 +845,7 @@ if %move% == 1 && !%self.aff_flagged(BLIND)%
         %echo% &&m%obj% bonks ~%targ% in the head!&&0
         %damage% %targ% 100 physical
         if %diff% == 4
-          dg_affect #11851 %targ% HARD-STUNNED on 5
+          dg_affect #11851 %targ% STUNNED on 5
         end
       break
       case 2
@@ -4053,7 +4045,7 @@ if %move% == 1
   else
     %echo% &&m~%self% bashes ~%targ% with ^%self% shield!
     eval dur %diff% * 5
-    dg_affect #11851 %actor% STUNNED on %dur%
+    dg_affect #11851 %targ% STUNNED on %dur%
     if %diff% > 1
       %send% %targ% That really hurt!
       eval amt %diff% * 50
@@ -4088,19 +4080,20 @@ elseif %move% == 2
     end
   else
     %echo% &&m~%self% lets loose all of ^%self% might and kicks ~%targ% across the room!
-    if %diff% > 1
-      %send% %targ% You fly into the wall and hit your head! That hurt!
-      eval dur %diff% * 5
-      dg_affect #11851 %actor% STUNNED on %dur%
-    end
     if %diff% == 4 && %death_rooms% ~= %room.template%
       %send% %targ% You go sailing over the railing! Oh no...
       %echoaround% %targ% ~%targ% goes sailing over the railing and vanishes down the central column!
       %teleport% %targ% i11808
       %force% %targ% shout Aaaaaaahhhhhhhhhhhhh!
       %send% %targ% You splat on the floor next to the fountain!
+      %at% %targ.room% %echoaround% %targ% ~%targ% flies in from above and splats next to the fountain!
       %slay% %targ%
     else
+      if %diff% > 1
+        %send% %targ% You fly into the wall and hit your head! That hurt!
+        eval dur %diff% * 3
+        dg_affect #11851 %targ% STUNNED on %dur%
+      end
       eval amt %diff% * 50
       %damage% %targ% %amt% physical
     end
@@ -4111,153 +4104,252 @@ end
 nop %self.remove_mob_flag(NO-ATTACK)%
 ~
 #11847
-Kara Virduke: Mercenary archmage combat script~
+Kara Virduke Mercenary Archmage combat: Chain Lightning, Arcane Tattoos, Rainbow Beam, Summon Minions~
 0 k 100
 ~
-if %self.cooldown(11800)%
+if %self.cooldown(11800)% || %self.disabled%
   halt
 end
-set type %random.4%
-if %type% == 1
-  * Chain Lightning - Shorter cooldown
-  nop %self.set_cooldown(11800, 20)%
-  %send% %actor% &&r~%self% points ^%self% staff at you and blasts you with a bolt of lightning!
-  %damage% %actor% 150 magical
-  %echoaround% %actor% ~%self% points ^%self% staff at ~%actor% and blasts *%actor% with a bolt of lightning!
-  %echoaround% %actor% &&rThe lightning bolt arcs from ~%actor% to you!
-  %aoe% 50 magical
-elseif %type% == 2
-  * Chromatic Bolts
-  set bolt_1 red
-  set bolt_2 orange
-  set bolt_3 yellow
-  set bolt_4 green
-  set bolt_5 blue
-  set bolt_6 indigo
-  set bolt_7 violet
-  nop %self.set_cooldown(11800, 30)%
-  %echo% ~%self% points ^%self% staff in your direction and seven chromatic bolts of light fly from its tip!
-  wait 3 sec
-  set bolt_number 1
-  while %bolt_number% <= 7
-    set target %random.enemy%
-    if %target%
-      eval bolt_color %%bolt_%bolt_number%%%
-      if %target.trigger_counterspell%
-        %send% %target% |%self% %bolt_color% bolt is deflected away from you by your counterspell.
-        %echoaround% %target% |%self% %bolt_color% bolt bounces off ~%target%.
-      else
-        %send% %target% &&rYou are struck by |%self% %bolt_color% bolt!
-        %echoaround% %target% ~%target% is struck by |%self% %bolt_color% bolt!
-        %damage% %target% 100 magical
-        switch %bolt_number%
-          case 1
-            %send% %target% The bolt leaves behind a bleeding wound!
-            %dot% #11842 %target% 100 15 physical
-          break
-          case 2
-            %send% %target% You burst into flames!
-            %dot% #11843 %target% 150 10 fire
-          break
-          case 3
-            %send% %target% Lightning courses through your body, stunning you!
-            dg_affect #11851 %target% STUNNED on 5
-          break
-          case 4
-            %send% %target% Poison courses through your veins!
-            %dot% #11858 %target% 75 30 poison
-          break
-          case 5
-            %send% %target% You are struck by a deep chill, slowing your reflexes!
-            dg_affect #11851 %target% SLOW on 15
-          break
-          case 6
-            %send% %target% You are engulfed in darkness, blinding you!
-            dg_affect #11841 %target% BLIND on 10
-          break
-          case 7
-            %echo% &&rThe violet bolt explodes, filling the room with lances of violet light!
-            %aoe% 85 magical
-          break
-        done
+set room %self.room%
+set diff %self.diff%
+* order
+set moves_left %self.var(moves_left)%
+set num_left %self.var(num_left,0)%
+if !%moves_left% || !%num_left%
+  set moves_left 1 2 3 4
+  set num_left 4
+end
+* pick
+eval which %%random.%num_left%%%
+set old %moves_left%
+set moves_left
+set move 0
+while %which% > 0
+  set move %old.car%
+  if %which% != 1
+    set moves_left %moves_left% %move%
+  end
+  set old %old.cdr%
+  eval which %which% - 1
+done
+set moves_left %moves_left% %old%
+* store
+eval num_left %num_left% - 1
+remote moves_left %self.id%
+remote num_left %self.id%
+* perform move
+skyfight lockout 30 35
+if %move% == 1
+  * Chain Lightning
+  %echo% &&m**** ~%self% holds out her staff as sparks crackle across the floor... ****&&0 (interrupt and dodge)
+  if %diff% == 1
+    nop %self.add_mob_flag(NO-ATTACK)%
+  end
+  skyfight clear dodge
+  skyfight clear interrupt
+  skyfight setup interrupt all
+  set cycle 0
+  set broke 0
+  while !%broke% && %cycle% <= 4
+    skyfight setup dodge all
+    wait 4 s
+    if %self.sfinterrupt_count% >= 1 && %self.sfinterrupt_count% >= (%diff% + 1) / 2
+      set broke 1
+      set ch %room.people%
+      while %ch%
+        if %ch.var(did_sfinterrupt,0)%
+          %send% %ch% &&mYou manage to interrupt Lady Virduke before another chain of lightning!&&0
+        end
+        set ch %ch.next_in_room%
+      done
+      %echo% &&m~%self% seems momentarily distracted.&&0
+      if %diff% == 1
+        dg_affect #11852 %self% HARD-STUNNED on 10
+        wait 10 s
+      elseif %diff% < 4
+        dg_affect #11852 %self% HARD-STUNNED on 5
+        wait 5 s
       end
+    else
+      %echo% &&m|%self% calamander staff hisses and cracks as it focuses the lightning into a chain...&&0
+      set ch %room.people%
+      while %ch%
+        set next_ch %ch.next_in_room%
+        if %self.is_enemy(%ch%)%
+          if %ch.var(did_sfdodge)%
+            %send% %ch% &&mYou manage to narrowly dodge the chain lightning!&&0
+          elseif %ch.trigger_counterspell%
+            %echo% &&m|%ch% counterspell deflects a bolt of lightning back at Lady Virduke!&&0
+            eval amt 200 / %diff%
+            %damage% %self% %amt% magical
+          else
+            * hit
+            %send% %ch% &&mThe chain lightning hits ~%ch%!&&0
+            eval amount %diff% * 30
+            %damage% %ch% %amount% physical
+            if %cycle% == 4 && %diff% == 4 && (%self.level% + 100) > %ch.level% && !%ch.aff_flagged(!STUN)%
+              dg_affect #11851 %ch% STUNNED on 10
+            end
+          end
+        end
+        set ch %next_ch%
+      done
     end
-    eval bolt_number %bolt_number% + 1
-    if %bolt_number% <= 7
-      wait 3 sec
+    if !%broke% && %cycle% < 4
+      %echo% &&m**** Here comes more chain lightning... ****&&0 (interrupt and dodge)
     end
+    eval cycle %cycle% + 1
   done
-elseif %type% == 3
+  skyfight clear dodge
+  skyfight clear interrupt
+elseif %move% == 2
   * Arcane Tattoos
-  if %self.health% == %self.maxhealth%
+  skyfight clear interrupt
+  %echo% &&m**** ~%self% mutters an incantation... ****&&0 (interrupt)
+  if %diff% == 1
+    nop %self.add_mob_flag(NO-ATTACK)%
+  end
+  skyfight setup interrupt all
+  if %self.diff% < 3 || %room.players_present% < 2
+    set requires 1
+  else
+    set requires 2
+  end
+  wait 4 s
+  if %self.disabled%
+    nop %self.remove_mob_flag(NO-ATTACK)%
     halt
   end
-  nop %self.set_cooldown(11800, 30)%
-  %echo% ~%self% mutters an incantation...
-  %echo% Arcane tattoos all over |%self% body glow gold, and ^%self% wounds begin to close!
-  %heal% %self% health
-  dg_affect #12425 %self% HEAL-OVER-TIME %self.level% 30
-  wait 5 sec
-  %echo% ~%self% mutters another incantation...
-  %echo% |%self% arcane tattoos glow silver, and &%self% seems to speed up!
-  dg_affect #11855 %self% HASTE on 25
-elseif %type% == 4 && %self.mob_flagged(GROUP)%
+  if %self.var(sfinterrupt_count,0)% < %requires%
+    %echo% &&m**** ~%self% rolls up her sleeves as arcane tattoos all over her body glow gold! ****&&0 (interrupt)
+    dg_affect #11847 %self% HEAL-OVER-TIME %self.level% 30
+  end
+  wait 4 s
+  if %self.disabled%
+    nop %self.remove_mob_flag(NO-ATTACK)%
+    halt
+  end
+  if %self.var(sfinterrupt_count,0)% >= %requires%
+    %echo% &&m~%self% is interrupted before she can finish the spell!&&0
+    dg_affect #11847 %self% off
+    if %diff% == 1
+      dg_affect #11852 %self% HARD-STUNNED on 5
+    end
+    wait 30 s
+  else
+    %echo% &&m~%self% finishes another incantation as more tattoos on her arms light up in silver!&&0
+    eval amount %diff% * 5
+    dg_affect #11855 %self% BONUS-MAGICAL %amount% 60
+    dg_affect #11855 %self% HASTE on 25
+  end
+  skyfight clear interrupt
+elseif %move% == 3
   * Rainbow Beam
-  nop %self.set_cooldown(11800, 30)%
-  set room %self.room%
-  set cycles_left 5
-  set prism_vnum 11850
-  * This fake ritual is interrupted if combat ends or the focusing prism is destroyed
-  while %cycles_left% >= 0
-    set person %self.room.people%
-    while %person%
-      if %person.vnum% == %prism_vnum%
-        set prism %person%
-        unset person
+  %echo% &&m~%self% raises her staff high and slams it down!&&0
+  %echo% &&m**** An iridescent sigil etches itself across the floor as ~%self% begins to chant! ****&&0 (interrupt)
+  if %diff% == 1
+    nop %self.add_mob_flag(NO-ATTACK)%
+  end
+  set needed %room.players_present%
+  if %needed% > 4
+    set needed 4
+  end
+  set pain 0
+  set cycle 1
+  while %cycle% <= 5
+    skyfight clear interrupt
+    skyfight setup interrupt all
+    wait 5 s
+    if %self.sfinterrupt_count% >= %needed%
+      set ch %room.people%
+      while %ch%
+        if %ch.var(did_sfinterrupt,0)%
+          %send% %ch% &&mYou manage to interrupt |%self% spell, if only briefly!&&0
+        end
+        set ch %ch.next_in_room%
+      done
+      %echo% &&m~%self% seems distracted from her chant.&&0
+    else
+      eval pain %pain% + 1
+      if %cycle% == 1
+        %echo% &&m~%self% chants, 'Sun meets rain, illuminates the air...'&&0
+      elseif %which% == 2
+        %echo% &&m~%self% chants, 'Thus is shown your countenance fair...'&&0
+      elseif %which% == 3
+        %echo% &&m~%self% chants, 'Iris of the rainbow, I implore thee...'&&0
+      elseif %which% == 4
+        %echo% &&m~%self% chants, 'Annihilate all who stand before me!'&&0
       else
-        set person %person.next_in_room%
+        %echo% &&m**** ~%self% shouts, 'Victory is mine at last... RAINBOW BEAM!' ****&&0
       end
-    done
-    if !%self.fighting% || !%prism%
-      if %cycles_left% < 3
-        %echoaround% %actor% |%actor% ritual chant is interrupted.
-      else
-        * combat, stun, sitting down, etc
-      end
-      halt
     end
-    * Fake ritual messages
-    switch %cycles_left%
-      case 5
-        %echo% ~%self% raises ^%self% staff high and slams it down!
-        %load% mob %prism_vnum% ally
-        set summon %self.room.people%
-        %echo% ~%summon% appears above |%self% shoulder with a flash of light!
-      break
-      case 4
-        %echo% ~%self% chants, 'Sun meets rain, illuminates the air...'
-      break
-      case 3
-        %echo% ~%self% chants, 'Thus is shown your countenance fair...'
-      break
-      case 2
-        %echo% ~%self% chants, 'Iris of the rainbow, I implore thee...'
-      break
-      case 1
-        %echo% ~%self% chants, 'Annihilate all who stand before me!'
-      break
-      case 0
-        shout Victory is mine! Rainbow Beam!
-        %echo% &&rThere is an all-consuming flash of chromatic radiance, then everything goes black.
-        %aoe% 9999 magical
-        %purge% %prism%
-      break
-    done
-    if %cycles_left% > 0
-      wait 5 sec
+    if %cycle% < 5
+      %echo% &&m**** She's still chanting... ****&&0 (interrupt)
     end
-    eval cycles_left %cycles_left% - 1
+    eval cycle %cycle% + 1
   done
+  skyfight clear interrupt
+  nop %self.remove_mob_flag(NO-ATTACK)%
+  if %pain% > 0
+    wait 1
+    skyfight clear dodge
+    %echo% &m**** A blinding rainbow forms in the air over the iridescent sigil, spinning like a wild ribbon.... ****&0 (dodge)
+    set cycle 1
+    eval wait 10 - %diff%
+    while %cycle% <= %diff%
+      skyfight setup dodge all
+      wait %wait% s
+      eval ouch %diff% * 20 * %cycle%
+      set ch %room.people%
+      while %ch%
+        set next_ch %ch.next_in_room%
+        if %self.is_enemy(%ch%)%
+          if !%ch.var(did_sfdodge)%
+            set hit 1
+            %echo% &&mA rainbow streamer cuts through ~%ch%!&&0
+            if %diff% > 1 && %cycle% == %diff%
+              %send% %ch% You're blinded! All you can see is rainbows!
+              dg_affect #11841 %ch% BLIND on 5
+            end
+            %damage% %ch% %ouch% magical
+          elseif %ch.is_pc%
+            %send% %ch% &&mYou narrowly avoid a rainbow beam!&&0
+          end
+          if %cycle% < %diff%
+            %send% %ch% &&m**** The rainbow is still spinning wildly... ****&&0 (dodge)
+          end
+        end
+        set ch %next_ch%
+      done
+      eval cycle %cycle% + 1
+    done
+    skyfight clear dodge
+    if !%hit% && %diff% == 1
+      %echo% &&m~%self% is hit by a stray rainbow beam!&&0
+      dg_affect #11852 %self% HARD-STUNNED on 10
+    end
+    wait 10 s
+elseif %move% == 4
+  * Summon Mercs
+  %regionecho% %room% 1 &&y~%self% shouts, 'I could use some help in the Eruditorium!'&&0
+  if %diff% == 1
+    wait 5 sec
+    %echo% &&m...nobody seems to respond to Lady Virduke's call.&&0
+  else
+    wait 1
+    if %random.2% == 1
+      set vnum 11842
+    else
+      set vnum 11846
+    end
+    set ally %instance.mob(%vnum%)%
+    if %ally% && !%ally.disabled% && !%ally.fighting%
+      %at% %ally.room% %echo% ~%ally% heads to assist Lady Virduke.
+      %teleport% %ally% %self.room%
+      %echo% &&m~%ally% rushes in!&&0
+      %force% %ally% mkill %actor%
+    end
+  end
 end
 ~
 #11848
@@ -4536,7 +4628,7 @@ elseif %type% == 2
   %send% %actor% &&r~%self% strikes you with such force that you go flying through the air!
   %echoaround% %actor% ~%self% strikes ~%actor% with such force that &%actor% goes flying through the air!
   %damage% %actor% 200 physical
-  dg_affect #11814 %actor% HARD-STUNNED on 10
+  dg_affect #11814 %actor% STUNNED on 10
   wait 2 sec
   %send% %actor% &&rYou crash painfully to the floor, stunned!
   %echoaround% %actor% ~%actor% crashes to the floor, stunned!
@@ -5627,7 +5719,7 @@ elseif %move% == 5 && %diff% > 1
     %echo% &&mThe Shade is distracted, if only for a moment.&&0
     dg_affect #11852 %self% HARD-STUNNED on 5
   else
-    %echo% &&mKnezz lets out an anguished groan as the Shade drains his life force!&&0  
+    %echo% &&mKnezz lets out an anguished groan as the Shade drains his life force!&&0
     eval knezz_timer %self.var(knezz_timer,%timestamp%)% - 30
     remote knezz_timer %self.id%
   end
@@ -8707,4 +8799,3 @@ elseif %diff% == 4
 end
 ~
 $
-
