@@ -2604,13 +2604,22 @@ set room %self.room%
 if %room.template% == 11835
   %echo% The otherworlder whips its left arm against its chest and shouts, 'Bok jel thet!'
   wait 6 sec
+  if %self.fighting% || %self.disabled%
+    halt
+  end
   %echo% A shrill, disembodied voice says, 'Mu cha shah ka pah ka.'
   wait 6 sec
+  if %self.fighting% || %self.disabled%
+    halt
+  end
   set kara %room.people(11847)%
   if %kara%
     %echo% The otherworlder shrieks and whips one of its long arms at ~%kara%, who is hit in the head and stunned!
     dg_affect %kara% STUNNED on 30
     wait 3 sec
+    if %self.fighting% || %self.disabled%
+      halt
+    end
   end
   %echo% The otherworlder swishes past you and darts out of the room!
   mgoto i11832
@@ -3651,9 +3660,11 @@ if %move% == 1
     set targ %random.enemy%
     set targ_id %targ.id%
     skyfight setup dodge %targ%
-    %send% %targ% &&m**** &&Z~%self% is aiming straight at you! ****&&0 (dodge)
+    if %targ%
+      %send% %targ% &&m**** &&Z~%self% is aiming straight at you! ****&&0 (dodge)
+    end
     wait %wait% s
-    if %targ.id% != %targ_id% || %targ.position% == Dead
+    if !%targ% || %targ.id% != %targ_id% || %targ.position% == Dead
       * gone
     elseif %targ.var(did_sfdodge)%
       %echo% &&m~%self% looses an arrow at ~%targ%, but it thuds into the far wall!&&0
@@ -4299,7 +4310,7 @@ elseif %move% == 3
   if %pain% > 0
     wait 1
     skyfight clear dodge
-    %echo% &m**** A blinding rainbow forms in the air over the iridescent sigil, spinning like a wild ribbon.... ****&0 (dodge)
+    %echo% &&m**** A blinding rainbow forms in the air over the iridescent sigil, spinning like a wild ribbon.... ****&&0 (dodge)
     set cycle 1
     eval wait 10 - %diff%
     while %cycle% <= %diff%
@@ -5064,7 +5075,7 @@ if %move% == 1
     elseif !%targ.affect(11822)%
       set time 0
     else
-      %send% %targ% &&m**** You're caught tight in the otherworlder's arms! ****&0 (struggle)
+      %send% %targ% &&m**** You're caught tight in the otherworlder's arms! ****&&0 (struggle)
       eval time %time% - 4
       wait 4 s
     end
@@ -6009,7 +6020,7 @@ elseif %move% == 4
         remote free_room %bug.id%
       end
     else
-      %send% %targ% &&m**** You're still caught in the Shade's grasp! ****&0 (struggle)
+      %send% %targ% &&m**** You're still caught in the Shade's grasp! ****&&0 (struggle)
     end
     eval time %time% - 3
     wait 3 s
