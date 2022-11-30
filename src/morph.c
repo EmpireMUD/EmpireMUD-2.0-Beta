@@ -347,9 +347,9 @@ void perform_morph(char_data *ch, morph_data *morph) {
 	add_morph_affects(ch);
 
 	// set new pools
-	GET_HEALTH(ch) = (sh_int) (GET_MAX_HEALTH(ch) * health_mod);
-	GET_MOVE(ch) = (sh_int) (GET_MAX_MOVE(ch) * move_mod);
-	GET_MANA(ch) = (sh_int) (GET_MAX_MANA(ch) * mana_mod);
+	GET_HEALTH(ch) = (int) (GET_MAX_HEALTH(ch) * health_mod);
+	GET_MOVE(ch) = (int) (GET_MAX_MOVE(ch) * move_mod);
+	GET_MANA(ch) = (int) (GET_MAX_MANA(ch) * mana_mod);
 	
 	// in case this is called by something else while they're already morphing
 	if (!IS_NPC(ch) && GET_ACTION(ch) == ACT_MORPHING) {
