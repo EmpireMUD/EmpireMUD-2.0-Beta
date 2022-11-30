@@ -3416,7 +3416,7 @@ if %move% == 1
     if %diff% > 2
       %echo% &&m~%self% lunges toward |%targ% face with ^%self% dagger, but misses!&&0
     else
-      %echo% &&m~%self% lunges toward |%targ% face with some kind of slime, but misses... and gets it in in ^%self% own eyes!&&0
+      %echo% &&m~%self% lunges toward |%targ% face with some kind of slime, but misses... and gets it in ^%self% own eyes!&&0
       eval dur 10 / %diff%
       if %dur% < 1
         set dur 1
@@ -3851,7 +3851,7 @@ elseif %move% == 2
   if !%targ% || %targ.id% != %id%
     * gone
   elseif %targ.var(did_sfdodge)%
-    %echo% &&m~%self% lunges forward with gnashing fangs and narrowly misses ~%self% with the strike!&&0
+    %echo% &&m~%self% lunges forward with gnashing fangs and narrowly misses ~%targ% with the strike!&&0
   else
     * hit
     %echo% &&m~%self% lunges foward and bites right into ~%targ% with ^%self% enormous fangs!&&0
@@ -4299,7 +4299,7 @@ elseif %move% == 3
     while %cycle% <= %diff%
       skyfight setup dodge all
       wait %wait% s
-      eval ouch %diff% * 20 * %cycle%
+      eval ouch %diff% * 20 * %pain%
       set ch %room.people%
       while %ch%
         set next_ch %ch.next_in_room%
@@ -4594,101 +4594,254 @@ end
 nop %self.remove_mob_flag(NO-ATTACK)%
 ~
 #11849
-Trixton Vye: Mercenary leader combat script~
+Trixton Vye Mercenary Leader combat: Hurricane Stone, Dancing Cane, Deathstone, Corpse's Grasp, Animate Corpse~
 0 k 100
 ~
-* General cooldown
-if %self.cooldown(11800)%
+if %self.cooldown(11800)% || %self.disabled%
   halt
 end
-* random move
-set type %random.4%
-if %type% == 1
-  * Hurricane Slash
-  nop %self.set_cooldown(11800, 30)%
-  %echo% ~%self% thrusts ^%self% sword into the air and a gust of wind howls through the room!
-  wait 3 sec
-  %echo% ~%self% starts spinning in a circle, forming a miniature tornado with *%self%self at the base!
-  wait 3 sec
-  set loops 3
-  while %loops%
-    %echo% &&r~%self% spins furiously, battering you with gusts of wind!
-    %aoe% 100 physical
-    if %loops%
-      wait 3 sec
+set room %self.room%
+set diff %self.difficulty%
+* order
+set moves_left %self.var(moves_left)%
+set num_left %self.var(num_left,0)%
+if !%moves_left% || !%num_left%
+  set moves_left 1 2 3 4 5 5
+  set num_left 6
+end
+* pick
+eval which %%random.%num_left%%%
+set old %moves_left%
+set moves_left
+set move 0
+while %which% > 0
+  set move %old.car%
+  if %which% != 1
+    set moves_left %moves_left% %move%
+  end
+  set old %old.cdr%
+  eval which %which% - 1
+done
+set moves_left %moves_left% %old%
+* store
+eval num_left %num_left% - 1
+remote moves_left %self.id%
+remote num_left %self.id%
+* perform move
+skyfight lockout 30 35
+if %move% == 1
+  * Hurricane Stone
+  %echo% &&m**** ~%self% pulls a glowing gray stone from ^%self% pocket and holds it out... ****&&0 (interrupt)
+  if %diff% == 1
+    nop %self.add_mob_flag(NO-ATTACK)%
+  end
+  skyfight clear interrupt
+  skyfight setup interrupt all
+  set cycle 0
+  set broke 0
+  set needed %room.players_present%
+  if %needed% > 4
+    set needed 4
+  end
+  eval dam %diff% * 25
+  while !%broke% && %cycle% < 5
+    wait 4 s
+    if %self.sfinterrupt_count% >= %needed%
+      set broke 1
+      set ch %room.people%
+      while %ch%
+        if %ch.var(did_sfinterrupt,0)%
+          %send% %ch% &&mYou manage to interrupt the mercenary!&&0
+        end
+        set ch %ch.next_in_room%
+      done
+      %echo% &&m~%self% fumbles the hurricane stone.&&0
+      if %diff% == 1
+        dg_affect #11852 %self% HARD-STUNNED on 10
+        wait 10 s
+      end
+    else
+      %echo% &&mHurricane winds whip around the room, throwing coffins and tools into the air!&&0
+      set ch %room.people%
+      while %ch%
+        set next_ch %ch.next_in_room%
+        if %self.is_enemy(%ch%)%
+          %echo% &&mFlying debris slams into ~%ch%!&&0
+          %damage% %ch% %dam% physical
+          if %cycle% == 4 && %diff% == 4 && (%self.level% + 100) > %ch.level% && !%ch.aff_flagged(!STUN)%
+            dg_affect #11851 %ch% STUNNED on 10
+          end
+        end
+        set ch %next_ch%
+      done
     end
-    eval loops %loops% - 1
+    eval cycle %cycle% + 1
   done
-  %echo% ~%self% stops spinning.
-elseif %type% == 2
-  * Awesome Blow
-  nop %self.set_cooldown(11800, 30)%
-  %echo% ~%self% lets out a mighty shout as &%self% gathers all of ^%self% strength!
-  wait 3 sec
-  %send% %actor% &&r~%self% strikes you with such force that you go flying through the air!
-  %echoaround% %actor% ~%self% strikes ~%actor% with such force that &%actor% goes flying through the air!
-  %damage% %actor% 200 physical
-  dg_affect #11814 %actor% STUNNED on 10
-  wait 2 sec
-  %send% %actor% &&rYou crash painfully to the floor, stunned!
-  %echoaround% %actor% ~%actor% crashes to the floor, stunned!
-  %damage% %actor% 100 physical
-elseif %type% == 3
-  * Winged Boots
-  nop %self.set_cooldown(11800, 30)%
-  %echo% ~%self% crouches down, and feathered wings spring from ^%self% boots!
-  wait 3 sec
-  %echo% ~%self% leaps into the air and begins weaving gracefully around your attacks!
-  dg_affect #11865 %self% HASTE on 30
-  dg_affect #11865 %self% DODGE 50 30
-elseif %type% == 4
-  * Magic Sword
-  nop %self.set_cooldown(11800, 30)%
-  * Apply or refresh Counterspell affect
-  if %self.affect(3021)%
-    dg_affect #3021 %self% off
-  else
-    %echo% ~%self% flourishes ^%self% sword and flickers momentarily with a blue-white aura.
+  skyfight clear interrupt
+elseif %move% == 2
+  * Dancing Cane
+  skyfight clear dodge
+  %echo% &&m~%self% laughs as he draws a slender sword from out of his cane and tosses it into the air!&&0
+  if %diff% == 1
+    nop %self.add_mob_flag(NO-ATTACK)%
   end
-  dg_affect #3021 %self% RESIST-MAGICAL 1 35
-  wait 1 sec
-  * Get and increment the variable that tracks magic sword stacks
-  if %self.varexists(magic_sword_stacks)%
-    set magic_sword_stacks %self.magic_sword_stacks%
-  else
-    set magic_sword_stacks 0
-  end
-  eval magic_sword_stacks %magic_sword_stacks% + 1
-  remote magic_sword_stacks %self.id%
-  * Apply the magic sword buffs
-  if !%self.affect(11866)%
-    %echo% ~%self% thrusts ^%self% sword into the air, and it shines brightly!
-  else
-    dg_affect #11866 %self% off
-    %echo% ~%self% seems to be getting stronger the longer you fight *%self%!
-  end
-  eval magnitude %magic_sword_stacks% * 30
-  dg_affect #11866 %self% BONUS-PHYSICAL %magnitude% -1
-  if %magic_sword_stacks% >= 3
-    if %magic_sword_stacks == 3
-      %echo% |%self% attacks begin to strike with deadly accuracy!
+  skyfight setup dodge all
+  wait 3 s
+  %echo% &&m**** The cane sword dances through the air... and it's dancing right toward you! ****&&0 (dodge)
+  set cycle 1
+  set hit 0
+  eval dam %diff% * 20
+  eval wait 10 - %diff%
+  while %cycle% <= %diff%
+    skyfight setup dodge all
+    wait %wait% s
+    set ch %room.people%
+    while %ch%
+      set next_ch %ch.next_in_room%
+      if %self.is_enemy(%ch%)%
+        if !%ch.var(did_sfdodge)%
+          set hit 1
+          %echo% &&mThe dancing cane sword slashes at ~%ch%!&&0
+          if %diff% > 2
+            %dot% #11842 %ch% 50 20 physical 4
+          end
+          %damage% %ch% %dam% physical
+        elseif %ch.is_pc%
+          %send% %ch% &&mYou manage to dodge the dancing cane sword!&&0
+        end
+        if %cycle% < %diff%
+          %send% %ch% &&m**** The cane sword is still dancing through the air! ****&&0 (dodge)
+        end
+      end
+      set ch %next_ch%
+    done
+    eval cycle %cycle% + 1
+  done
+  skyfight clear dodge
+  if !%hit%
+    if %diff% < 3
+      %echo% &&m~%self% stoops to retrieve the cane sword as it falls out of the air.&&0
+      dg_affect #11852 %self% HARD-STUNNED on 10
     end
-    eval magnitude (%magic_sword_stacks% - 2) * 15
-    dg_affect #11866 %self% TO-HIT %magnitude% -1
+  end
+  wait 8 s
+elseif %move% == 3
+  * Deathstone
+  %echo% &&m**** ~%self% draws an inscribed rock from ^%self% pocket and bites down on it... ****&&0 (interrupt)
+  if %diff% == 1
+    nop %self.add_mob_flag(NO-ATTACK)%
+  end
+  skyfight clear interrupt
+  skyfight setup interrupt all
+  set cycle 0
+  set broke 0
+  set needed %room.players_present%
+  if %needed% > 4
+    set needed 4
+  end
+  eval dam %diff% * 25
+  eval heal %diff% * 15
+  while !%broke% && %cycle% < 5
+    wait 4 s
+    if %self.sfinterrupt_count% >= %needed%
+      set broke 1
+      set ch %room.people%
+      while %ch%
+        if %ch.var(did_sfinterrupt,0)%
+          %send% %ch% &&mYou manage to interrupt the mercenary!&&0
+        end
+        set ch %ch.next_in_room%
+      done
+      %echo% &&m~%self% drops the deathstone.&&0
+      if %diff% == 1
+        dg_affect #11852 %self% HARD-STUNNED on 10
+        wait 10 s
+      end
+    else
+      %echo% &&mThe lamps flicker as an icy chill drains all the heat from the room!&&0
+      set ch %room.people%
+      while %ch%
+        set next_ch %ch.next_in_room%
+        if %self.is_enemy(%ch%)%
+          %echo% &&m~%self% seems invigorated as he saps life from ~%ch%!&&0
+          if %diff% > 1
+            %heal% %self% health %heal%
+          end
+          %damage% %ch% %dam% physical
+        end
+        set ch %next_ch%
+      done
+    end
+    eval cycle %cycle% + 1
+  done
+  skyfight clear interrupt
+elseif %move% == 4
+  * Corpse's Grasp
+  skyfight clear struggle
+  %echo% &&m~%self% pulls an inky black sphere from his pocket and holds it up...&&0
+  if %diff% == 1
+    nop %self.add_mob_flag(NO-ATTACK)%
+  end
+  wait 3 sec
+  %echo% &&m**** The caskets creak as corpses lurch out of them... One grabs onto you! ****&&0 (struggle)
+  skyfight setup struggle all 20
+  set ch %room.people%
+  while %ch%
+    set bug %ch.inventory(11890)%
+    if %bug%
+      set strug_char You struggle to escape the corpse's grasp...
+      set strug_room ~%%actor%% struggles against the corpse's grasp...
+      remote strug_char %bug.id%
+      remote strug_room %bug.id%
+      set free_char You manage to slip out of the corpse's grasp!
+      set free_room ~%%actor%% manages to slip out of the corpse's grasp!
+      remote free_char %bug.id%
+      remote free_room %bug.id%
+    end
+    set ch %ch.next_in_room%
+  done
+  * messages
+  set cycle 0
+  while %cycle% < 4
+    wait 5 s
+    set ch %room.people%
+    while %ch%
+      set next_ch %ch.next_in_room%
+      if %ch.affect(11822)%
+        if %cycle% == 3
+          * final
+          %send% %ch% &&mThe corpse loses its hold on you and falls back into the casket, dead.&&0
+          dg_affect #11822 %ch% off silent
+          * penalty
+          dg_affect #11850 %ch% SLOW on 25
+        else
+          %send% %ch% &&m**** You have to get free of the corpse's grasp! ****&&0 (struggle)
+        end
+      end
+      set ch %next_ch%
+    done
+    eval cycle %cycle% + 1
+  done
+  nop %self.remove_mob_flag(NO-ATTACK)%
+  skyfight clear struggle
+elseif %move% == 5
+  * Animate Corpse
+  nop %self.set_cooldown(11800,5)%
+  if %diff% == 1
+    halt
+  end
+  %echo% &&m~%self% tosses a vial toward an open coffin -- it shatters all over the corpse!&&0
+  wait 2 s
+  eval lev %self.level% - 50
+  %load% mob 11850 ally %lev%
+  set mob %room.people%
+  if %mob.vnum% == 11850
+    %echo% &&mA corpse climbs out of its coffin and joins the fray!&&0
+    %force% %mob% mkill %self.fighting%
   end
 end
-~
-#11850
-Trixton Vye: Mercenary leader magic sword reset~
-0 bw 100
-~
-if !%self.fighting%
-  if %self.affect(11866)%
-    dg_affect #11866 %self% off
-    %echo% |%self% sword stops glowing.
-    rdelete magic_sword_stacks %self.id%
-  end
-end
+* in case
+nop %self.remove_mob_flag(NO-ATTACK)%
 ~
 #11851
 Skycleave: Shared mob speech trigger~
@@ -5241,7 +5394,7 @@ elseif %move% == 2
               dg_affect #11864 %self% BONUS-MAGICAL 10 on -1
             end
             * hit
-            %echo% &&mA shadow cuts straight ~%ch% as it streams into the Ascendant!&&0
+            %echo% &&mA shadow cuts straight through ~%ch% as it streams into the Ascendant!&&0
             eval amount %diff% * 30
             %damage% %ch% %amount% physical
             if %cycle% == 4 && %diff% == 4 && (%self.level% + 100) > %ch.level% && !%ch.aff_flagged(!STUN)%
@@ -6816,7 +6969,7 @@ switch %cycle%
     %echo% ~%nayyur% scoops up a fistful of rotted splinters and cradles them in both hands.
   break
   case 12
-    %echo% Blood from |%self% hands drips onto the rotted splinters in |%nayyur%.
+    %echo% Blood from |%self% hands drips onto the rotted splinters in |%nayyur% hands.
     wait 3 sec
     %echo% The bloody splinters in |%nayyur% hands burst into jet-black flames, releasing choking smoke.
   break

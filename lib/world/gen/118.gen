@@ -204,6 +204,15 @@ The blood curse ends.~
 T5
 ...$e is afflicted by a blood curse!~
 S
+#11850
+corpse's touch~
+4 0
+0 0 0 0
+T0
+The deathly pallor of the corpse's touch wears off.~
+T5
+...$e looks deathly pale.~
+S
 #11851
 stunned~
 4 0
@@ -289,22 +298,6 @@ T5
 S
 #11864
 absorbed spell~
-4 0
-0 0 0 0
-S
-#11865
-flying~
-4 0
-0 0 0 0
-T0
-Your flying wears off.~
-T1
-$n stops flying.~
-T5
-...$e is flying on winged boots!~
-S
-#11866
-magic sword~
 4 0
 0 0 0 0
 S

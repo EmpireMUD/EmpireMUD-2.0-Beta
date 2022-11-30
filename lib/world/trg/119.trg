@@ -151,13 +151,20 @@ if %rescale% && %self.level%
 end
 ~
 #11903
-Skycleave: Reset buffs when out of combat~
+Skycleave: Reset mobs when out of combat~
 0 bw 100
 ~
 * Resets "permanent" buffs when the mob is out of combat
 if %self.fighting% || %self.disabled%
   halt
 end
+if %self.vnum% == 11850
+  * just despawn
+  %echo% ~%self% lies down in one of the coffins and dies.
+  %purge% %self%
+  halt
+end
+* otherwise:
 dg_affect #11864 %self% off silent
 dg_affect #11889 %self% off silent
 dg_affect #11890 %self% off silent
@@ -5826,7 +5833,7 @@ elseif %move% == 4
           * penalty
           dg_affect #11972 %ch% DODGE -%dodge_pain% 25
         else
-          %send% %ch% &&A**** You are trapped stuck in the pressure wave! ****&&0 (struggle)
+          %send% %ch% &&A**** You are still trapped in the pressure wave! ****&&0 (struggle)
         end
       end
       set ch %next_ch%
@@ -5975,7 +5982,7 @@ elseif %move% == 2
   skyfight clear dodge
   %echo% &&y~%self% shouts, 'By the power of Skycleave!'&&0
   wait 3 sec
-  %echo% &&m**** Suddenly the air around you begin explode with violent blasts! ****&&0 (dodge)
+  %echo% &&m**** Suddenly the air around you begins to explode with violent blasts! ****&&0 (dodge)
   set cycle 1
   eval wait 12 - %diff%
   while %cycle% <= %diff%
