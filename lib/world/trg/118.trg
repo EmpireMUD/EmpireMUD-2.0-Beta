@@ -2664,7 +2664,11 @@ elseif %room.template% == 11832 || %room.template% == 11833
     end
   end
 elseif %room.template% == 11836
-  %echo% The otherworlder barrels through, flailing ^%self% arms wildly, and jumps out the window!
+  if %self.morph%
+    %echo% The otherworlder barrels through, rapidly shrinking back to its original size, and jumps out the window!
+  else
+    %echo% The otherworlder barrels through, flailing ^%self% arms wildly, and jumps out the window!
+  end
   wait 0
   %echo% The otherworlder shouts, 'Bok jel thet far mesh bek tol cha... Shaw!
   %echo% You watch out the window as the otherworlder is enveloped in shimmering blue light and vanishes in midair!
@@ -2949,10 +2953,12 @@ end
 set mob %self.room.people%
 if %mob.vnum% == 11829
   set spirit %instance.mob(11900)%
-  if (%spirit.diff3% // 2) == 0
+  set diff %spirit.diff3%
+  remote diff %mob.id%
+  if (%diff% // 2) == 0
     nop %mob.add_mob_flag(HARD)%
   end
-  if %spirit.diff3% >= 3
+  if %diff% >= 3
     nop %mob.add_mob_flag(GROUP)%
   end
 end
@@ -4601,7 +4607,7 @@ if %self.cooldown(11800)% || %self.disabled%
   halt
 end
 set room %self.room%
-set diff %self.difficulty%
+set diff %self.diff%
 * order
 set moves_left %self.var(moves_left)%
 set num_left %self.var(num_left,0)%
@@ -4991,10 +4997,166 @@ else
 end
 ~
 #11853
-Skycleave: Escaped Otherworlder fight~
+Escaped Otherworlder fight: Arm Grapple, Battle Form, Laser Clap~
 0 k 100
 ~
-* tba
+if %self.cooldown(11800)% || %self.disabled%
+  halt
+end
+set room %self.room%
+set diff %self.diff%
+* order
+set moves_left %self.var(moves_left)%
+set num_left %self.var(num_left,0)%
+if !%moves_left% || !%num_left%
+  set moves_left 1 2 3
+  set num_left 3
+end
+* pick
+eval which %%random.%num_left%%%
+set old %moves_left%
+set moves_left
+set move 0
+while %which% > 0
+  set move %old.car%
+  if %which% != 1
+    set moves_left %moves_left% %move%
+  end
+  set old %old.cdr%
+  eval which %which% - 1
+done
+set moves_left %moves_left% %old%
+* store
+eval num_left %num_left% - 1
+remote moves_left %self.id%
+remote num_left %self.id%
+* perform move
+skyfight lockout 25 30
+if %move% == 1
+  * Arm Grapple
+  set time 30
+  if %diff% == 1
+    dg_affect #11852 %self% HARD-STUNNED on %time%
+  end
+  skyfight clear struggle
+  set targ %random.enemy%
+  if !%targ%
+    halt
+  end
+  set targ_id %targ.id%
+  %send% %targ% &&m**** &&Z~%self% rushes up to you and grapples you with its long arms! ****&&0 (struggle)
+  %echoaround% %targ% &&m~%self% wraps its long arms around ~%targ%!&&0
+  skyfight setup struggle %targ% %time%
+  set bug %targ.inventory(11890)%
+  if %bug%
+    set strug_char You try to struggle out of the otherworlder's arms...
+    set strug_room ~%%actor%% struggles to get out of the otherworlder's arms...
+    remote strug_char %bug.id%
+    remote strug_room %bug.id%
+    set free_char You manage to wriggle out of the otherworlder's arms!
+    set free_room ~%%actor%% manages to wriggle out of the otherworlder's arms!
+    remote free_char %bug.id%
+    remote free_room %bug.id%
+  end
+  while %time% > 0
+    if !%targ% || %targ.id% != %targ_id%
+      set time 0
+    elseif !%targ.affect(11822)%
+      set time 0
+    else
+      %send% %targ% &&m**** You're caught tight in the otherworlder's arms! ****&0 (struggle)
+      eval time %time% - 4
+      wait 4 s
+    end
+  done
+  skyfight clear struggle
+  dg_affect #11852 %self% off
+elseif %move% == 2
+  * Battle Form
+  set f_list 11829 11830 11835 11836
+  if %self.morph% == 11831 || %self.morph% == 11837
+    set form 0
+  elseif %f_list% ~= %self.morph%
+    eval form %self.morph% + 1
+  elseif %diff% == 1
+    set form 11829
+  else
+    set form 11835
+  end
+  if !%form%
+    nop %self.set_cooldown(11800,0)%
+    halt
+  end
+  * will morph
+  skyfight clear interrupt
+  %echo% &&m**** &&Z~%self% begins burbling and growing... ****&&0 (interrupt)
+  if %diff% == 1
+    nop %self.add_mob_flag(NO-ATTACK)%
+  end
+  skyfight setup interrupt all
+  wait 4 s
+  if %self.disabled%
+    nop %self.remove_mob_flag(NO-ATTACK)%
+    halt
+  end
+  if %self.var(sfinterrupt_count,0)% < (%diff% + 1) / 2
+    %echo% &&m**** &&Z~%self% twists and contorts as it grows... ****&&0 (interrupt)
+  end
+  wait 4 s
+  if %self.disabled%
+    nop %self.remove_mob_flag(NO-ATTACK)%
+    halt
+  end
+  if %self.var(sfinterrupt_count,0)% >= (%diff% + 1) / 2
+    %echo% &&m~%self% is interrupted and shrinks back to its previous shape!&&0
+    if %diff% == 1
+      dg_affect #11852 %self% HARD-STUNNED on 5
+    end
+    wait 30 s
+  else
+    set old %self.name%
+    %morph% %self% %form%
+    %echo% &&m%old% has grown into ~%self%!&&0
+  end
+  skyfight clear interrupt
+elseif %move% == 3
+  * Laser Clap
+  skyfight clear dodge
+  %echo% &&m~%self% holds its arms wide like it's preparing to clap its hands...&&0
+  if %diff% == 1
+    nop %self.add_mob_flag(NO-ATTACK)%
+  end
+  wait 1
+  set cycle 1
+  eval pain 40 + (%diff% * 40)
+  eval wait 8 - %diff%
+  set last 0
+  while %cycle% <= (2 * %diff%)
+    set targ %random.enemy%
+    set targ_id %targ.id%
+    skyfight setup dodge %targ%
+    if %targ% == %last%
+      %send% %targ% &&m**** Looks like ~%self% is going to clap at you again... ****&&0 (dodge)
+    else
+      %send% %targ% &&m**** &&Z~%self% turns toward you with its arms outstretched... ****&&0 (dodge)
+    end
+    set last %targ%
+    wait %wait% s
+    if %targ.id% != %targ_id% || %targ.position% == Dead
+      * gone
+    elseif %targ.var(did_sfdodge)%
+      %echo% &&m~%self% claps its hands together, blasting a beam of light that narrowly misses ~%targ%!&&0
+    else
+      * hit
+      %echo% &&m~%self% claps its hands together, blasting a beam of light that hits ~%targ% square in the chest!&&0
+      %damage% %targ% %pain% direct
+    end
+    skyfight clear dodge
+    eval cycle %cycle% + 1
+  done
+end
+* in case
+nop %self.remove_mob_flag(NO-ATTACK)%
 ~
 #11854
 Skycleave: Skithe Ler-Wyn fight~

@@ -1121,6 +1121,8 @@ slits as it considers its chances of escape in each direction.
 I 4 11830 100.00 1  # LOOT: otherworldly bodysuit
 T 11829
 T 11853
+T 11821
+T 11822
 S
 #11830
 Caius sirensbane high master~
@@ -2642,6 +2644,8 @@ T 11873
 T 11866
 T 11854
 T 11803
+T 11821
+T 11822
 S
 #11873
 Moneryl astrologer royal~
