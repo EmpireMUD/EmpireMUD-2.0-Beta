@@ -3484,9 +3484,7 @@ elseif %move% == 2
       * hit
       %echo% &&m~%self% flings a knife at ~%targ%!&&0
       eval dam 25 + (25 * %diff%)
-      if %dam% > 1
-        %dot% #11842 %targ% %dam% 20 physical 5
-      end
+      %dot% #11842 %targ% %dam% 20 physical 5
       %damage% %targ% %dam% physical
     end
     skyfight clear dodge
@@ -4201,7 +4199,7 @@ if %move% == 1
             %damage% %self% %amt% magical
           else
             * hit
-            %send% %ch% &&mThe chain lightning hits ~%ch%!&&0
+            %echo% &&mThe chain lightning hits ~%ch%!&&0
             eval amount %diff% * 30
             %damage% %ch% %amount% physical
             if %cycle% == 4 && %diff% == 4 && (%self.level% + 100) > %ch.level% && !%ch.aff_flagged(!STUN)%
@@ -5170,10 +5168,232 @@ end
 nop %self.remove_mob_flag(NO-ATTACK)%
 ~
 #11854
-Skycleave: Skithe Ler-Wyn fight~
+Skithe Ler-Wyn combat: Echoes of Dancing Cane, Slay the Griffin, Chain Lightning, Freezing Air~
 0 k 100
 ~
-* tba
+if %self.cooldown(11800)% || %self.disabled%
+  halt
+end
+set room %self.room%
+set diff %self.diff%
+* order
+set moves_left %self.var(moves_left)%
+set num_left %self.var(num_left,0)%
+if !%moves_left% || !%num_left%
+  set moves_left 1 2 3 4
+  set num_left 4
+end
+* pick
+eval which %%random.%num_left%%%
+set old %moves_left%
+set moves_left
+set move 0
+while %which% > 0
+  set move %old.car%
+  if %which% != 1
+    set moves_left %moves_left% %move%
+  end
+  set old %old.cdr%
+  eval which %which% - 1
+done
+set moves_left %moves_left% %old%
+* store
+eval num_left %num_left% - 1
+remote moves_left %self.id%
+remote num_left %self.id%
+* perform move
+skyfight lockout 30 35
+if %move% == 1
+  * Dancing Cane
+  skyfight clear dodge
+  %echo% &&mTrixton Vye laughs as he draws a slender sword from out of his cane and tosses it into the vortex!&&0
+  if %diff% == 1
+    nop %self.add_mob_flag(NO-ATTACK)%
+  end
+  skyfight setup dodge all
+  wait 3 s
+  %echo% &&m**** The cane sword dances through the vortex... and it's dancing right toward you! ****&&0 (dodge)
+  set cycle 1
+  eval dam %diff% * 20
+  eval wait 10 - %diff%
+  while %cycle% <= %diff%
+    skyfight setup dodge all
+    wait %wait% s
+    set ch %room.people%
+    while %ch%
+      set next_ch %ch.next_in_room%
+      if %self.is_enemy(%ch%)%
+        if !%ch.var(did_sfdodge)%
+          %echo% &&mThe dancing cane sword slashes at ~%ch%!&&0
+          if %diff% > 2
+            %dot% #11842 %ch% 50 20 physical 4
+          end
+          %damage% %ch% %dam% physical
+        elseif %ch.is_pc%
+          %send% %ch% &&mYou manage to dodge the dancing cane sword!&&0
+        end
+        if %cycle% < %diff%
+          %send% %ch% &&m**** The cane sword is still dancing through the vortex! ****&&0 (dodge)
+        end
+      end
+      set ch %next_ch%
+    done
+    eval cycle %cycle% + 1
+  done
+  skyfight clear dodge
+elseif %move% == 2
+  * Slay the Griffin / Fan of Knives
+  if %diff% == 1
+    nop %self.add_mob_flag(NO-ATTACK)%
+  end
+  skyfight clear dodge
+  %regionecho% %room% 1 &&yA tiny voice in the vortex shouts, 'Slay the Griffin!'&&0
+  %echo% &&m**** The goblin starts pulling out knives and throwing them in all directions! ****&&0 (dodge)
+  skyfight setup dodge all
+  set cycle 0
+  eval max (%diff% + 2) / 2
+  while %cycle% < %max%
+    wait 5 s
+    if %self.disabled%
+      nop %self.remove_mob_flag(NO-ATTACK)%
+      halt
+    end
+    set this 0
+    set ch %room.people%
+    while %ch%
+      set next_ch %ch.next_in_room%
+      if %self.is_enemy(%ch%)%
+        if %ch.var(did_sfdodge)%
+          if %diff% == 1
+            dg_affect #11856 %ch% TO-HIT 25 20
+          end
+        else
+          set this 1
+          %echo% &&mA throwing knife slices through the air and straight into |%ch% chest!&&0
+          eval dam %diff% * 10
+          eval ouch %diff% * 20
+          %dot% #11811 %ch% %ouch% 10 physical 3
+          %damage% %ch% %dam% physical
+        end
+      end
+      set ch %next_ch%
+    done
+    if !%this%
+      %echo% &&mStray knives fly off into the vortex.&&0
+    end
+    eval cycle %cycle% + 1
+  done
+  skyfight clear dodge
+elseif %move% == 3
+  * Chain Lightning
+  %echo% &&m**** Kara Virduke holds out her staff as sparks crackle across the vortex... ****&&0 (interrupt and dodge)
+  if %diff% == 1
+    nop %self.add_mob_flag(NO-ATTACK)%
+  end
+  skyfight clear dodge
+  skyfight clear interrupt
+  skyfight setup interrupt all
+  set cycle 0
+  set broke 0
+  while !%broke% && %cycle% <= 4
+    skyfight setup dodge all
+    wait 4 s
+    if %self.sfinterrupt_count% >= 1 && %self.sfinterrupt_count% >= (%diff% + 1) / 2
+      set broke 1
+      set ch %room.people%
+      while %ch%
+        if %ch.var(did_sfinterrupt,0)%
+          %send% %ch% &&mYou manage to interrupt Lady Virduke before another chain of lightning!&&0
+        end
+        set ch %ch.next_in_room%
+      done
+      %echo% &&mKara Virduke seems momentarily distracted.&&0
+      if %diff% == 1
+        dg_affect #11852 %self% HARD-STUNNED on 10
+        wait 10 s
+      end
+    else
+      %echo% &&mKara Virduke's calamander staff hisses and cracks as it focuses the lightning into a chain...&&0
+      set ch %room.people%
+      while %ch%
+        set next_ch %ch.next_in_room%
+        if %self.is_enemy(%ch%)%
+          if %ch.var(did_sfdodge)%
+            %send% %ch% &&mYou manage to narrowly dodge the chain lightning!&&0
+          elseif %ch.trigger_counterspell%
+            %echo% &&m|%ch% counterspell deflects a bolt of lightning toward ~%self%!&&0
+            if %diff% == 1
+              %damage% %self% 100 magical
+            end
+          else
+            * hit
+            %echo% &&mThe chain lightning hits ~%ch%!&&0
+            eval amount %diff% * 30
+            %damage% %ch% %amount% physical
+            if %cycle% == 4 && %diff% == 4 && (%self.level% + 100) > %ch.level% && !%ch.aff_flagged(!STUN)%
+              dg_affect #11851 %ch% STUNNED on 10
+            end
+          end
+        end
+        set ch %next_ch%
+      done
+    end
+    if !%broke% && %cycle% < 4
+      %echo% &&m**** Here comes more chain lightning... ****&&0 (interrupt and dodge)
+    end
+    eval cycle %cycle% + 1
+  done
+  skyfight clear dodge
+  skyfight clear interrupt
+elseif %move% == 4
+  * Freezing Air
+  skyfight clear interrupt
+  %echo% &&yA voice beyond the vortex shouts, 'By the power of Skycleave!'&&0
+  wait 3 sec
+  set targ %self.fighting%
+  set id %targ.id%
+  %echo% &&m**** A gnarled wand appears high in the air and the vortex starts to freeze FAST... ****&&0 (interrupt)
+  skyfight setup interrupt all
+  set cycle 0
+  set broke 0
+  while !%broke% && %cycle% < 5
+    wait 4 s
+    if %self.disabled%
+      halt
+    end
+    if %self.sfinterrupt_count% >= 1 && %self.sfinterrupt_count% >= (%diff% + 1) / 2
+      set broke 1
+      set ch %room.people%
+      while %ch%
+        if %ch.var(did_sfinterrupt,0)%
+          %send% %ch% &&mYou manage to stop the freezing spell!&&0
+        end
+        set ch %ch.next_in_room%
+      done
+      %echo% &&mThe gnarled wand is interrupted before it can finish the freezing spell.&&0
+      if %diff% == 1
+        dg_affect #11852 %self% HARD-STUNNED on 10
+      end
+    else
+      set ch %room.people%
+      while %ch%
+        set next_ch %ch.next_in_room%
+        if %self.is_enemy(%ch%)%
+          * hit!
+          %send% %ch% &&mThe freezing air stings your skin, eyes, and lungs!&&0
+          %echoaround% %ch% &&m~%ch% cries out as the air freezes *%ch%!&&0
+          eval amount %diff% * 25
+          %damage% %ch% %amount% magical
+        end
+        set ch %next_ch%
+      done
+    end
+    eval cycle %cycle% + 1
+  done
+  skyfight clear interrupt
+end
+* in case
+nop %self.remove_mob_flag(NO-ATTACK)%
 ~
 #11855
 Mezvienne combat: Baleful Polymorph, Blinding Light of Dawn, Belt of Venus, Dark Fate~
@@ -5363,8 +5583,8 @@ elseif %move% == 3
           dg_affect #11857 %ch% SLOW on 20
         end
         if %diff% >= 2
-          eval amount %diff% * -20
-          dg_affect #11857 %ch% TO-HIT %amount% 20
+          eval amount %diff% * 20
+          dg_affect #11857 %ch% TO-HIT -%amount% 20
         end
       end
     end

@@ -1054,6 +1054,235 @@ else
   return 0
 end
 ~
+#11915
+Skithe Ler-Wyn combat: Gash of Cronus, Forsaken Fate, Cut Short, Skithe Variations~
+0 k 50
+~
+if %self.cooldown(11800)% || %self.disabled%
+  halt
+end
+set room %self.room%
+set diff %self.diff%
+* order
+set moves_r %self.var(moves_r)%
+set num_r %self.var(num_r,0)%
+if !%moves_r% || !%num_r%
+  set moves_r 1 2 3 4
+  set num_r 4
+end
+* pick
+eval which %%random.%num_r%%%
+set old %moves_r%
+set moves_r
+set move 0
+while %which% > 0
+  set move %old.car%
+  if %which% != 1
+    set moves_r %moves_r% %move%
+  end
+  set old %old.cdr%
+  eval which %which% - 1
+done
+set moves_r %moves_r% %old%
+* store
+eval num_r %num_r% - 1
+remote moves_r %self.id%
+remote num_r %self.id%
+* perform move
+skyfight lockout 30 35
+if %move% == 1
+  * Gash of Cronus / rosy red light
+  skyfight clear dodge
+  %echo% &&m~%self% cuts a brutal gash across the sky as rosy red mana streaming off of the heartwood of time whips around the vortex...&&0
+  if %diff% == 1
+    nop %self.add_mob_flag(NO-ATTACK)%
+  end
+  skyfight setup dodge all
+  wait 1 s
+  %echo% &&m**** The ribbon of rosy red light streams toward you... ****&&0 (dodge)
+  wait 8 s
+  set ch %room.people%
+  eval hit %diff% * 20
+  set any 0
+  while %ch%
+    set next_ch %ch.next_in_room%
+    if %self.is_enemy(%ch%)%
+      if %ch.var(did_sfdodge)%
+        if %diff% == 1
+          dg_affect #11856 %ch% TO-HIT 25 20
+        end
+      else
+        set any 1
+        %echo% &&mThe rosy red light strikes ~%ch% in the chest and cuts right through *%ch%!&&0
+        if %diff% == 4 && (%self.level% + 100) > %ch.level% && !%ch.aff_flagged(!STUN)%
+          dg_affect #11851 %ch% STUNNED on 10
+        end
+        if %diff% >= 3
+          dg_affect #11859 %ch% SLOW on 20
+        end
+        if %diff% >= 2
+          dg_affect #11859 %ch% TO-HIT -%hit% 20
+        end
+        %damage% %ch% %hit% magical
+      end
+    end
+    set ch %next_ch%
+  done
+  if !%any%
+    %echo% &&mThe rosy red light of the gash of Cronus swirls back and cuts deeply into the vortex!&&0
+    if %diff% == 1
+      dg_affect #11852 %self% HARD-STUNNED on 10
+    else
+      eval amount 100 - (%diff% * 10)
+      dg_affect #11854 %self% DODGE -%amount% 10
+    end
+  end
+  skyfight clear dodge
+elseif %move% == 2
+  * Forsaken Fate
+  skyfight clear struggle
+  %echo% &&m~%self% slashes the strands of fate with her claws...&&0
+  if %diff% == 1
+    nop %self.add_mob_flag(NO-ATTACK)%
+  end
+  wait 3 sec
+  %echo% &&m**** You are bound by the strands of your own forsaken fate! ****&&0 (struggle)
+  skyfight setup struggle all 20
+  set ch %room.people%
+  while %ch%
+    set bug %ch.inventory(11890)%
+    if %bug%
+      set strug_char You struggle against your forsaken fate...
+      set strug_room ~%%actor%% struggles against ^%%actor%% forsaken fate...
+      remote strug_char %bug.id%
+      remote strug_room %bug.id%
+      set free_char You struggle against your forsaken fate!
+      set free_room ~%%actor%% manages to free *%%actor%%self!
+      remote free_char %bug.id%
+      remote free_room %bug.id%
+    end
+    set ch %ch.next_in_room%
+  done
+  * damage
+  if %diff% > 1
+    set cycle 0
+    while %cycle% < 5
+      wait 4 s
+      set ch %room.people%
+      while %ch%
+        set next_ch %ch.next_in_room%
+        if %ch.affect(11822)%
+          %send% %ch% &&m**** You feel your very being as it's ripped apart by your forsaken fate! ****&&0 (struggle)
+          eval amount %diff% * 25
+          %damage% %ch% %amount% magical
+        end
+        set ch %next_ch%
+      eval cycle %cycle% + 1
+    done
+  else
+    wait 10 s
+    nop %self.remove_mob_flag(NO-ATTACK)%
+    wait 10 s
+  end
+elseif %move% == 3
+  * Cut Short
+  skyfight clear dodge
+  %echo% &&m~%self% grows in size a hundredfold as she prepares to strike...&&0
+  wait 3 s
+  %echo% &&m**** &&Z~%self% reaches across the vortex and swipes with her enormous paw! ****&&0 (dodge)
+  if %diff% == 1
+    nop %self.add_mob_flag(NO-ATTACK)%
+  end
+  skyfight setup dodge all
+  wait 8 s
+  if %self.disabled%
+    nop %self.remove_mob_flag(NO-ATTACK)%
+    halt
+  end
+  set hit 0
+  set ch %room.people%
+  while %ch%
+    set next_ch %ch.next_in_room%
+    if %self.is_enemy(%ch%)%
+      if !%ch.var(did_sfdodge)%
+        set hit 1
+        %echo% &&mThere's a scream from ~%ch% as ^%ch% years are cut short by ~%self%!&&0
+        eval amt %diff% * 50
+        %damage% %ch% %amt% magical
+      elseif %ch.is_pc%
+        %send% %ch% &&mYou narrowly avoid the lion's massive paw!&&0
+      end
+    end
+    set ch %next_ch%
+  done
+  skyfight clear dodge
+  if !%hit%
+    if %diff% == 1
+      %echo% &&m~%self% slowly shrinks back to her original size.&&0
+      dg_affect #11852 %self% HARD-STUNNED on 10
+    end
+  end
+  wait 8 s
+elseif %move% == 4
+  * Skithe Variations
+  %echo% &&m**** &&Z~%self% begins to recite the deep magic... this won't be good! ****&&0 (interrupt and dodge)
+  if %diff% == 1
+    nop %self.add_mob_flag(NO-ATTACK)%
+  end
+  skyfight clear dodge
+  skyfight clear interrupt
+  skyfight setup interrupt all
+  eval dam 25 + (25 * %diff%)
+  set cycle 0
+  set broke 0
+  while !%broke% && %cycle% <= 4
+    skyfight setup dodge all
+    wait 4 s
+    if %self.sfinterrupt_count% >= 1 && %self.sfinterrupt_count% >= (%diff% + 1) / 2
+      set broke 1
+      set ch %room.people%
+      while %ch%
+        if %ch.var(did_sfinterrupt,0)%
+          %send% %ch% &&mYou somehow manage to interrupt the Lion of Time... and not a moment too soon!&&0
+        end
+        set ch %ch.next_in_room%
+      done
+      %echo% &&m~%self% becomes distracted and starts garbling the words as the spell fades.&&0
+      if %diff% == 1
+        dg_affect #11852 %self% HARD-STUNNED on 10
+        wait 10 s
+      end
+    else
+      %echo% &&m~%self% roars ancient words not heard since the dawn of time..&&0
+      set ch %room.people%
+      while %ch%
+        set next_ch %ch.next_in_room%
+        if %self.is_enemy(%ch%)%
+          if %ch.var(did_sfdodge)%
+            %send% %ch% &&mYou move just in time as Skithe Ler-Wyn appears behind you, slashing at the air where you just stood!&&0
+          else
+            %send% %ch% &&mA lion appears behind you, cutting a deep slash with her claws!&&0
+            %echoaround% %ch% &&m~%ch% shouts out in pain as a time lion appears behind *%ch% and cuts deep!&&0
+            if %diff% > 1
+              %dot% #11842 %ch% %dam% 20 physical 5
+            end
+            %damage% %ch% %dam% physica
+          end
+        end
+        set ch %next_ch%
+      done
+    end
+    if !%broke% && %cycle% < 4
+      %echo% &&m**** The lion is still casting... ****&&0 (interrupt and dodge)
+    end
+    eval cycle %cycle% + 1
+  done
+  skyfight clear dodge
+  skyfight clear interrupt
+end
+* in case
+nop %self.remove_mob_flag(NO-ATTACK)%
+~
 #11916
 Pixy Races: Race command for players~
 0 c 0
