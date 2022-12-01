@@ -171,6 +171,22 @@ I 1 1351 100.00 1  # SKIN: large skin
 I 3 9176 100.00 1  # BARDE: barded reindeer
 T 10715
 S
+#10706
+present little~
+a little present~
+A little present is hopping around.
+~
+1 1 bdoD n 2
+0 0 15 11
+D
+   The quaint little present is wrapped in paper with a bow tied on top. It
+seems to be hopping around on its own.
+~
+M
+0
+Holiday music plays in the background.~
+T 10706
+S
 #10709
 elf cheerful~
 a cheerful elf~
