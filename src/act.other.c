@@ -3170,24 +3170,28 @@ ACMD(do_order) {
 	char name[MAX_INPUT_LENGTH], message[MAX_INPUT_LENGTH];
 	bool found = FALSE;
 	room_data *org_room;
-	char_data *vict;
+	char_data *vict = NULL;
 	struct follow_type *k;
 
 	half_chop(argument, name, message);
 
-	if (!*name || !*message)
-		send_to_char("Order who to do what?\r\n", ch);
-	else if (!(vict = get_char_vis(ch, name, NULL, FIND_CHAR_ROOM)) && !is_abbrev(name, "followers") && !is_abbrev(name, "companion")) {
-		send_to_char("That person isn't here.\r\n", ch);
+	if (!*name || !*message) {
+		send_to_char("Order whom to do what?\r\n", ch);
 	}
 	else if (!vict && is_abbrev(name, "companion") && !(vict = GET_COMPANION(ch))) {
 		msg_to_char(ch, "You don't have a companion to order.\r\n");
+	}
+	else if (!vict && !(vict = get_char_vis(ch, name, NULL, FIND_CHAR_ROOM)) && !is_abbrev(name, "followers")) {
+		send_to_char("That person isn't here.\r\n", ch);
 	}
 	else if (ch == vict) {
 		send_to_char("You can order yourself around all you want.\r\n", ch);
 	}
 	else if (vict && MOB_FLAGGED(vict, MOB_NO_COMMAND)) {
 		act("You can't command $M.", FALSE, ch, NULL, vict, TO_CHAR);
+	}
+	else if (vict && IN_ROOM(ch) != IN_ROOM(vict)) {
+		msg_to_char(ch, "You can't order someone who's not here.\r\n");
 	}
 	else {
 		if (AFF_FLAGGED(ch, AFF_CHARM)) {
