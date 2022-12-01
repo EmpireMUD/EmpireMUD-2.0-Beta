@@ -3128,7 +3128,7 @@ if %actor.quest_finished(%questid%)%
 end
 ~
 #16678
-Open Stocking (winter wonderland dailies) 2021~
+Open Stocking (winter wonderland dailies) 2021-2022~
 1 c 2
 open~
 if !%arg% || %actor.obj_target(%arg.car%)% != %self%
