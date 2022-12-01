@@ -3003,13 +3003,15 @@ ACMD(do_morph) {
 	int count;
 	char *tmp;
 	
+	skip_spaces(&argument);
+	fast = (subcmd == SCMD_FASTMORPH || FIGHTING(ch) || GET_POS(ch) == POS_FIGHTING);
+	normal = (!str_cmp(argument, "normal") | !str_cmp(argument, "norm"));
+	
 	// safety first: mobs must use %morph%
-	if (IS_NPC(ch)) {
+	if (IS_NPC(ch) && (!fast || !normal)) {
 		msg_to_char(ch, "You can't morph.\r\n");
 		return;
 	}
-	
-	skip_spaces(&argument);
 	
 	if (!*argument) {
 		count = 1;	// counting 'normal'
@@ -3071,14 +3073,12 @@ ACMD(do_morph) {
 	
 	// initialize
 	morph = NULL;
-	fast = (subcmd == SCMD_FASTMORPH || FIGHTING(ch) || GET_POS(ch) == POS_FIGHTING);
-	normal = (!str_cmp(argument, "normal") | !str_cmp(argument, "norm"));
 	multiplier = fast ? 3.0 : 1.0;
 	
 	if (normal && !IS_MORPHED(ch)) {
 		msg_to_char(ch, "You aren't morphed.\r\n");
 	}
-	else if (GET_ACTION(ch) != ACT_NONE) {
+	else if (!IS_NPC(ch) && GET_ACTION(ch) != ACT_NONE) {
 		msg_to_char(ch, "You're too busy to morph now!\r\n");
 	}
 	else if (!normal && !(morph = find_morph_by_name(ch, argument))) {
