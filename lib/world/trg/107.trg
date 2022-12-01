@@ -167,6 +167,28 @@ Completer~
 * This formerly completed the adventure at the end of the frost elf fight.
 %adventurecomplete%
 ~
+#10706
+Christmas present minipet: Open present~
+0 ct 0
+open~
+if %actor.obj_target(%arg.car%)%
+  return 0
+  halt
+end
+if %actor.char_target(%arg.car%)% != %self%
+  return 0
+  halt
+end
+return 1
+if %actor% != %self.leader%
+  %send% %actor% You'd like to open the present but it's not for you, and you shouldn't.
+  halt
+end
+* ok
+%send% %actor% You open the little present and find... another present inside, exactly the same as the first!
+%echoaround% %actor% ~%actor% has a look of childlike joy as &%actor% opens a little present and finds another identical present inside!
+nop %actor.command_lag(ABILITY)%
+~
 #10710
 Faster Hestian Trinket (snowglobe)~
 1 c 2
@@ -445,11 +467,11 @@ if (%mob% && %mob.vnum% == %self.val0%)
 end
 ~
 #10729
-Winter Wonderland minipet whistle (random order) 2021~
+Winter Wonderland minipet whistle (random order) 2021-2022~
 1 c 2
 use~
 * List of vnums granted by this whistle (minipet mobs)
-set list 10709 16657 16658 10723 10724 10725 10726 16653 16654 16655 16656 16666 16667 16668 16669
+set list 10709 16657 16658 10723 10724 10725 10726 16653 16654 16655 16656 16666 16667 16668 16669 10706
 * length is used to shuffle the start point of the list
 set length 15
 * Check targeting

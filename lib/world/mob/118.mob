@@ -1121,6 +1121,8 @@ slits as it considers its chances of escape in each direction.
 I 4 11830 100.00 1  # LOOT: otherworldly bodysuit
 T 11829
 T 11853
+T 11821
+T 11822
 S
 #11830
 Caius sirensbane high master~
@@ -1772,7 +1774,7 @@ mercenary vampire~
 vampire mercenary~
 Vampire mercenary watches you carefully.
 ~
-150 250 abdvwIJ 0 3
+150 250 abdvwIJ D 3
 0 0 0 1
 D
 This mob is loaded by trig 11900/skymerc and named by 11857.
@@ -1804,7 +1806,7 @@ mercenary armored~
 armored mercenary~
 Armored mercenary is spoiling for a fight.
 ~
-150 250 abdvyIJ s 3
+150 250 abdvyIJ sE 3
 0 0 0 5
 D
 This mob is loaded by trig 11900/skymerc and named by 11857.
@@ -1828,15 +1830,15 @@ T 11802
 T 11857
 T 11846
 T 11852
-T 11841
-T 11842
+T 11821
+T 11822
 S
 #11847
 Kara Virduke~
 Kara Virduke~
 Kara Virduke is digging through cabinets.
 ~
-150 250 bdvxEIJ 0 3
+150 250 bdvxEIJ oE 3
 2 0 0 17
 D
    Kara Virduke is nearly seven feet tall, such that she must stoop to work in
@@ -1985,17 +1987,18 @@ Trixton Vye~
 Trixton Vye is searching for something.
 ~
 150 250 bdvyEIJ 0 3
-1 0 0 1
+1 0 0 5
 D
    When you enter the room, you do not initially notice Trixton Vye. It's not
 until he picks up a disembodied arm that he comes into focus. He holds up the
 fleshy, half-rotted arm and whistles, and what flesh remains on the bones turns
 to ash and blows toward Vye himself, apparently absorbed as it touches the skin
 of his face and neck.
-   Trixton Vye is decrepit, hunched like an old man, with thin white hair and
-yellow teeth. He dresses as a noble in silk and fur and finery, but he has the
-visage of a ghoul. His milky eyes turn ice blue only while he absorbs the
-corpse-flesh; the rest of the time, you're not sure he can even see you.
+   Trixton Vye is decrepit, hunched over his cane like an old man, with thin
+white hair and yellow teeth. He dresses as a noble in silk and fur and finery,
+but he has the visage of a ghoul. His milky eyes turn ice blue only while he
+absorbs the corpse-flesh; the rest of the time, you're not sure he can even see
+you.
 ~
 I 4 11837 100.00 1  # LOOT: skycleave BoE loot controller
 I 4 11838 100.00 1  # LOOT: skycleave BoP loot controller
@@ -2041,7 +2044,6 @@ M
 7
 say All this loot is ours. Mezvienne doesn't want to be bothered. Why don't you leave while you're ahead?~
 T 11849
-T 11850
 T 11808
 T 11810
 T 11806
@@ -2051,17 +2053,18 @@ T 11821
 T 11822
 S
 #11850
-prism focusing~
-a focusing prism~
-A focusing prism is floating in the air here.
+corpse reanimated~
+a reanimated corpse~
+A reanimated corpse is stumbling around the lab.
 ~
-150 250 dhnyDJ G 1
-0 0 27 22
+100 250 abdhzJ 0 3
+0 0 0 15
 D
-   This strange, angular transparent crystal has a steadily growing flicker of
-rainbow light forming at its core.
+   The corpse is dirty, but well-dressed. At least, the parts of it that are
+still wearing clothes. This poor fool has seen better days. It seems confused
+as it stumbles around the room.
 ~
-T 11812
+T 11903
 S
 #11851
 Paige page~
@@ -2639,8 +2642,11 @@ T 11869
 T 11868
 T 11873
 T 11866
-T 11854
 T 11803
+T 11821
+T 11822
+T 11915
+T 11854
 S
 #11873
 Moneryl astrologer royal~

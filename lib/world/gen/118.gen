@@ -179,6 +179,15 @@ weapon sheathed~
 T5
 ...$e is focused on a big attack -- this is your chance to strike!~
 S
+#11847
+arcane tattoos~
+4 0
+0 0 0 0
+T1
+The golden tattoos on $n's arms stop glowing.~
+T5
+...$s arms are covered in glowing gold tattoos!~
+S
 #11848
 viper venom~
 4 0
@@ -194,6 +203,15 @@ T0
 The blood curse ends.~
 T5
 ...$e is afflicted by a blood curse!~
+S
+#11850
+corpse's touch~
+4 0
+0 0 0 0
+T0
+The deathly pallor of the corpse's touch wears off.~
+T5
+...$e looks deathly pale.~
 S
 #11851
 stunned~
@@ -227,6 +245,10 @@ S
 arcane tattoos~
 4 0
 0 0 0 0
+T1
+The silver tattoos on $n's arms stop glowing.~
+T5
+...$s arms are covered in glowing silver tattoos!~
 S
 #11856
 timely dodge~
@@ -246,6 +268,13 @@ venomous jab~
 0 0 0 0
 T0
 The venom burns itself out of your system.~
+S
+#11859
+gash of Cronus~
+4 0
+0 0 0 0
+T0
+The gash of Cronus fades.~
 S
 #11860
 complete darkness~
@@ -276,22 +305,6 @@ T5
 S
 #11864
 absorbed spell~
-4 0
-0 0 0 0
-S
-#11865
-flying~
-4 0
-0 0 0 0
-T0
-Your flying wears off.~
-T1
-$n stops flying.~
-T5
-...$e is flying on winged boots!~
-S
-#11866
-magic sword~
 4 0
 0 0 0 0
 S

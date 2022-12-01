@@ -2347,7 +2347,7 @@ end
 if %self.vnum% == 18881
   %echo% ~%self% returns to the realm of the dead.
 else
-  %echo% ~%self% whipsers, 'Thank you for this time to make peace,' and then fades away.
+  %echo% ~%self% whispers, 'Thank you for this time to make peace,' and then fades away.
 end
 %purge% %self%
 ~

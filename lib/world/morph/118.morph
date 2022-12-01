@@ -50,6 +50,142 @@ D
 you, then back at the situation, then back at its hooves.
 ~
 S
+#11829
+otherworlder four-armed armed~
+a four-armed otherworlder~
+A four-armed otherworlder is barreling through!~
+bn 15 37 0 0 4
+0 0 -1 -1
+A
+21 1
+D
+   The otherworlder hunches low as it runs, occasionally hitting its head. It's
+a lot taller than a human, with dappled periwinkle skin. It wears some kind of
+scale armor that appears as thin as a sheet, allowing it to move effortlessly
+with its four curved, boneless arms and legs. It narrows all four of its black
+eyes to vertical slits as it considers its chances of escape in each direction.
+~
+S
+#11830
+otherworlder spiked~
+a spiked otherworlder~
+A spiked otherworlder is barreling through!~
+bn 15 37 0 0 4
+0 0 -1 -1
+A
+21 2
+A
+17 1
+A
+18 -5
+D
+   The periwinkle blue otherworlder has long spikes protruding from its back
+and from its upper pair of arms. The lower pair, thankfully, is smooth. It's
+rather large, struggling at times to move without getting stuck. Its thin scale
+armor appears undamaged by the spikes. It turns furiously as it considers the
+best way to escape the tower.
+~
+S
+#11831
+otherworlder gargantuan~
+a gargantuan otherworlder~
+A gargantuan otherworlder takes up all the space as it tries to get through!~
+bn 15 37 0 0 5
+0 0 -1 -1
+A
+21 3
+A
+17 1
+A
+18 10
+D
+   The enormous, perwinkle blue otherworlder scarcely fits as it struggles to
+find a way out of the tower. It has grown considerably since it was released,
+and stretches its paper-thin scale armor almost to the limit. The otherworlder
+has two legs and four arms, though at times it seems to prefer to run on all
+sixes. Its head is covered in small, narrow black eyes that dart in different
+directions as it considers its escape.
+~
+S
+#11835
+otherworlder four-armed armed~
+a four-armed otherworlder~
+A four-armed otherworlder is barreling through!~
+bn 15 37 0 0 4
+0 0 -1 -1
+A
+21 3
+A
+17 1
+A
+12 1
+A
+24 1
+A
+18 -5
+D
+   The otherworlder hunches low as it runs, occasionally hitting its head. It's
+a lot taller than a human, with dappled periwinkle skin. It wears some kind of
+scale armor that appears as thin as a sheet, allowing it to move effortlessly
+with its four curved, boneless arms and legs. It narrows all four of its black
+eyes to vertical slits as it considers its chances of escape in each direction.
+~
+S
+#11836
+otherworlder spiked~
+a spiked otherworlder~
+A spiked otherworlder is barreling through!~
+bn 15 37 0 0 4
+0 0 -1 -1
+A
+21 5
+A
+17 1
+A
+12 1
+A
+24 1
+A
+22 -5
+A
+18 -10
+D
+   The periwinkle blue otherworlder has long spikes protruding from its back
+and from its upper pair of arms. The lower pair, thankfully, is smooth. It's
+rather large, struggling at times to move without getting stuck. Its thin scale
+armor appears undamaged by the spikes. It turns furiously as it considers the
+best way to escape the tower.
+~
+S
+#11837
+otherworlder gargantuan~
+a gargantuan otherworlder~
+A gargantuan otherworlder takes up all the space as it tries to get through!~
+bn 15 37 0 0 5
+0 0 -1 -1
+A
+21 5
+A
+17 1
+A
+12 1
+A
+24 1
+A
+22 -5
+A
+23 -5
+A
+18 -10
+D
+   The enormous, perwinkle blue otherworlder scarcely fits as it struggles to
+find a way out of the tower. It has grown considerably since it was released,
+and stretches its paper-thin scale armor almost to the limit. The otherworlder
+has two legs and four arms, though at times it seems to prefer to run on all
+sixes. Its head is covered in small, narrow black eyes that dart in different
+directions as it considers its escape.
+~
+S
 #11848
 viper pit mercenary mage~
 a pit viper~
