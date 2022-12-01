@@ -2306,6 +2306,25 @@ M
 Sap drips onto you.~
 T 11954
 S
+#11892
+jelly protium blob~
+some protium jelly~
+There is a blob of protium jelly here.~
+   It seems like water. In your hands, it even feels like water. But somehow,
+it holds itself together. This is an odd curiosity indeed, sure to be of great
+interest to scholars and sorcerers alike.
+   Skycleave once held the keys to many elemental planes. But over the years,
+as apprentices repeatedly unleashed primordial horrors upon the world, those
+keys were melted, one by one, until only water and shadow remained.
+~
+15 0 a 0 6
+1 0 0
+10 0
+C
+150 150
+R
+4 5193 0
+S
 #11893
 leash fox leather fine~
 a fine leather fox leash~

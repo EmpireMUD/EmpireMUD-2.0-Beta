@@ -1046,6 +1046,7 @@ Slowly, the burn creeps in. You'll have to defeat it quickly!
 To fight the First Water, type: difficulty <Normal | Hard | Group | Boss>
 ~
 I 4 11900 100.00 1  # LOOT: unattuned skystone
+I 4 11892 5.00 1  # LOOT: protium jelly
 T 11809
 T 11810
 T 11931

@@ -6746,7 +6746,7 @@ if diagnose /= %cmd% && %self.vnum% == 11866
   %send% %actor% ~%self% doesn't look very good.
 elseif (mount /= %cmd% || ride /= %cmd%) && %self.vnum% == 11852
   * flying throne
-  if %actor.completed_quest(11918)% || %actor.completed_quest(11919)% || %actor.completed_quest(11920)% || %actor.completed_quest(11864)%
+  if %actor.completed_quest(11918)% || %actor.completed_quest(11919)% || %actor.completed_quest(11864)%
     * allow
     return 0
   else
@@ -6757,8 +6757,13 @@ elseif (mount /= %cmd% || ride /= %cmd%) && %aqua_vnums% ~= %self.vnum%
   * fake aquatic mounts
   set arg %arg.car%
   if %actor.has_tech(Riding)% && %arg% && %actor.char_target(%arg%)% == %self%
-    %send% %actor% You leap onto |%self% back... and splash right through!
-    %echoaround% %actor% ~%actor% leaps onto |%self% back... and splashes right through!
+    if %actor.inventory(11892)% && %actor.completed_quest(11972)%
+      nop %self.add_mob_flag(MOUNTABLE)%
+      return 0
+    else
+      %send% %actor% You leap onto |%self% back... and splash right through!
+      %echoaround% %actor% ~%actor% leaps onto |%self% back... and splashes right through!
+    end
   else
     return 0
   end

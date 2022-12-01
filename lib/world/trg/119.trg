@@ -4844,6 +4844,10 @@ elseif %sw_rooms% ~= %template%
   southwest
 elseif %nw_rooms% ~= %template%
   northwest
+else
+  * unknown room?
+  %echo% ~%self% splashes to the ground and soaks in.
+  %purge% %self%
 end
 ~
 #11970
