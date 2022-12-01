@@ -6736,15 +6736,24 @@ elseif %seconds% > 30
 end
 ~
 #11864
-Skycleave: Shared mob command trigger (Mez transition, water creatures)~
+Skycleave: Shared mob command trigger (Mez transition, tower mounts)~
 0 c 0
 diagnose mount ride~
-set mount_vnums 11854 11855 11856 11857 11858
+set aqua_vnums 11854 11855 11856 11857 11858
 * modes
 if diagnose /= %cmd% && %self.vnum% == 11866
   * Mez 11866 during phase transition
   %send% %actor% ~%self% doesn't look very good.
-elseif (mount /= %cmd% || ride /= %cmd%) && %mount_vnums% ~= %self.vnum%
+elseif (mount /= %cmd% || ride /= %cmd%) && %self.vnum% == 11852
+  * flying throne
+  if %actor.completed_quest(11918)% || %actor.completed_quest(11919)% || %actor.completed_quest(11920)% || %actor.completed_quest(11864)%
+    * allow
+    return 0
+  else
+    %send% %actor% You leap onto the flying throne but it dumps you on the ground!
+    %echoaround% %actor% ~%actor% leaps onto the flying throne but it dumps *%actor% on the ground.
+  end
+elseif (mount /= %cmd% || ride /= %cmd%) && %aqua_vnums% ~= %self.vnum%
   * fake aquatic mounts
   set arg %arg.car%
   if %actor.has_tech(Riding)% && %arg% && %actor.char_target(%arg%)% == %self%

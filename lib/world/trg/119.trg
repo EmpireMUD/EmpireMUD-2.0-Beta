@@ -3033,6 +3033,10 @@ switch %self.vnum%
       %echo% &&mThe Grand High Sorceress gives you a coy smile as she disappears in a burst of magenta glitter!&&0
     else
       %echo% &&mThe Grand High Sorceress gives you a coy smile as she disappears in a burst of magenta glitter, dropping something as she vanishes!&&0
+      * chance of mount:
+      if !%room.people(11852)% && %random.100% <= 5
+        %load% mob 11852
+      end
     end
   break
 done
@@ -3153,7 +3157,7 @@ if %sleepy%
   set ch %room.people%
   while %ch%
     if %ch.is_pc%
-      dg_affect #11943 %ch% IMMOBILIZED on 30
+      dg_affect #11943 %ch% IMMOBILIZED on 10
     end
     set ch %ch.next_in_room%
   done
@@ -3259,7 +3263,7 @@ if %sleepy%
   set ch %room.people%
   while %ch%
     if %ch.is_pc%
-      dg_affect #11943 %ch% IMMOBILIZED on 30
+      dg_affect #11943 %ch% IMMOBILIZED on 10
     end
     set ch %ch.next_in_room%
   done

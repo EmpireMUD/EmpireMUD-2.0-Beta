@@ -21,4 +21,27 @@ You twirl around and bow as low as you can.~
 M7
 $n twirls around and bows as low as $e can.~
 S
+#11984
+cheer~
+cheer~
+0 5 0
+L
+18 11984 0 1 -
+M0
+You cheer stoically.~
+M1
+$n cheers stoically.~
+M2
+You give $N a subdued cheer.~
+M3
+$n gives $N a subdued cheer.~
+M4
+$n gives you a subdued cheer.~
+M5
+Cheer for whom?~
+M6
+You let out an unenthused cheer.~
+M7
+$n lets out an unenthused cheer.~
+S
 $

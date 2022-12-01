@@ -2082,6 +2082,26 @@ hand, but it's cold and stiff. Still, she has a faint heartbeat.
 ~
 F 11800
 S
+#11852
+throne flying~
+a flying throne~
+A flying throne flaps just above the ground.
+~
+50 50 den 0 3
+0 0 27 10
+D
+   The ancient wooden throne is made mostly from pitch black ebony, though the
+armrests and accents are striped calamander, as are the four enormous wings
+that creak ever so slightly as they flap in perfect measure. The seat is padded
+with plush violet upholstery stitched with hundreds of tiny wands crossed with
+hazel branches.
+   Every sorcerer imagines themselves king of the world; greatest in the land;
+powerful beyond the reach of dreams. And every so often, one is born who
+fulfills those aspirations, at immense cost, and brings rot and ruin to many a
+land.
+~
+T 11864
+S
 #11854
 alpaca fluidic~
 a fluidic alpaca~
