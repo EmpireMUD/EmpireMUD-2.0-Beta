@@ -5202,7 +5202,7 @@ switch %seq%
   break
   case 2
     if %random.2% == 1
-      %echo% ~%self% leans forward and presses ^%self% head to altar.
+      %echo% ~%self% leans forward and presses ^%self% head to the altar.
     else
       %echo% ~%self% bows low to the ground.
     end

@@ -6697,7 +6697,8 @@ if %seconds% > 60
     %slay% %knezz%
   end
   wait 6 sec
-  %echo% The Shade holds the gnarled wand high in the air and shouts, 'By the power of Skycleave... I HAVE THE POWER!'
+  %echo% The Shade holds the gnarled wand high in the air...
+  %regionecho% %room% 1 &&yThe Shade of Mezvienne shouts, 'By the power of Skycleave... I HAVE THE POWER!'&&0
   wait 3 sec
   %echo% The Shade of Mezvienne grows and transforms as it ascends into a higher being!
   %load% mob 11863
