@@ -497,12 +497,6 @@ void look_at_target(char_data *ch, char *arg, char *more_args) {
 		found = look_at_moon(ch, arg, &fnum);
 	}
 	
-	// try sky
-	if (!found && !str_cmp(arg, "sky")) {
-		do_weather(ch, "", 0, 0);
-		found = TRUE;
-	}
-	
 	/* If an object was found back in generic_find */
 	if (bits) {
 		if (!found) {
@@ -522,9 +516,18 @@ void look_at_target(char_data *ch, char *arg, char *more_args) {
 				page_string(ch->desc, obj_desc_for_char(found_obj, ch, OBJ_DESC_LOOK_AT), TRUE);	/* Show no-description */
 			}
 			act("$n looks at $p.", TRUE, ch, found_obj, NULL, TO_ROOM);
+			found = TRUE;
 		}
 	}
-	else if (!found) {
+	
+	// try sky
+	if (!found && !str_cmp(arg, "sky")) {
+		do_weather(ch, "", 0, 0);
+		found = TRUE;
+	}
+	
+	// finally
+	if (!found) {
 		send_to_char("You do not see that here.\r\n", ch);
 	}
 }
