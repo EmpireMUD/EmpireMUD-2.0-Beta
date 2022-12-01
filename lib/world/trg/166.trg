@@ -3487,7 +3487,7 @@ end
 * and loop
 eval CookieTotal %Cookie16660% + %Cookie16661% + %Cookie16662%
 set item %actor.inventory%
-while (%item% && (%all% || %CookieCount% == 0))
+while (%item% && (%all% || %CookieCount% == 0) && %CookieTotal% < %Needs%)
   set next_item %item.next_in_list%
   * use %ok% to control what we do in this loop
   if %all%
@@ -3513,7 +3513,7 @@ while (%item% && (%all% || %CookieCount% == 0))
     end
   end
   * still ok? see if we need one of these
-  if %ok%
+  if %ok% && !%item.is_flagged(*KEEP)%
     set WhatCookie Cookie%item.vnum%
     eval CookieCount %CookieCount% + 1
     %send% %actor% # You stash @%item% in @%self%.
@@ -3522,9 +3522,6 @@ while (%item% && (%all% || %CookieCount% == 0))
     remote %WhatCookie% %self.id%
     %purge% %item%
     eval CookieTotal %CookieTotal% + 1
-    if %CookieTotal% >= %Needs%
-      break
-    end
   end
   * and repeat the loop
   set item %next_item%
