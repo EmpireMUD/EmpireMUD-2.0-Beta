@@ -1543,6 +1543,7 @@ Examples:
 ORDER
 
 Usage:  order <character> <command>
+        order companion <command>
         order followers <command>
 
 Used for ordering pets and charmed people to do your evil bidding. You can

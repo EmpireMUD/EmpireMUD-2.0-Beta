@@ -3177,8 +3177,12 @@ ACMD(do_order) {
 
 	if (!*name || !*message)
 		send_to_char("Order who to do what?\r\n", ch);
-	else if (!(vict = get_char_vis(ch, name, NULL, FIND_CHAR_ROOM)) && !is_abbrev(name, "followers"))
+	else if (!(vict = get_char_vis(ch, name, NULL, FIND_CHAR_ROOM)) && !is_abbrev(name, "followers") && !is_abbrev(name, "companion")) {
 		send_to_char("That person isn't here.\r\n", ch);
+	}
+	else if (!vict && is_abbrev(name, "companion") && !(vict = GET_COMPANION(ch))) {
+		msg_to_char(ch, "You don't have a companion to order.\r\n");
+	}
 	else if (ch == vict) {
 		send_to_char("You can order yourself around all you want.\r\n", ch);
 	}
