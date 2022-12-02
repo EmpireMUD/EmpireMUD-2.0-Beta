@@ -5303,7 +5303,7 @@ elseif %move% == 3
       set ch %room.people%
       while %ch%
         if %ch.var(did_sfinterrupt,0)%
-          %send% %ch% &&mYou manage to interrupt Lady Virduke before another chain of lightning!&&0
+          %send% %ch% &&mYou manage to interrupt Skithe Ler-Wyn before another chain of lightning!&&0
         end
         set ch %ch.next_in_room%
       done
@@ -5366,11 +5366,11 @@ elseif %move% == 4
       set ch %room.people%
       while %ch%
         if %ch.var(did_sfinterrupt,0)%
-          %send% %ch% &&mYou manage to stop the freezing spell!&&0
+          %send% %ch% &&mYou manage to interrupt Skithe Ler-Wyn!&&0
         end
         set ch %ch.next_in_room%
       done
-      %echo% &&mThe gnarled wand is interrupted before it can finish the freezing spell.&&0
+      %echo% &&mThe gnarled wand is stopped before it can finish the freezing spell.&&0
       if %diff% == 1
         dg_affect #11852 %self% HARD-STUNNED on 10
       end
@@ -5703,7 +5703,7 @@ if %move% == 1 && !%self.aff_flagged(BLIND)%
   end
   if %targ.trigger_counterspell%
     %echo% &&m~%self% sparks with primordial energy as it consumes |%targ% counterspell!&&0
-    dg_affect #11864 %self% BONUS-MAGICAL 10 on -1
+    dg_affect #11864 %self% BONUS-MAGICAL 10 -1
   end
   if %diff% <= 2 || (%self.level% + 100) <= %targ.level% || %room.players_present% == 1
     %send% %targ% &&m**** The Shadow envelops you like a cage! You have to break free! ****&&0 (struggle)
@@ -5784,7 +5784,7 @@ elseif %move% == 2
           else
             if %ch.trigger_counterspell%
               %echo% &&mThe Shadow Ascendant sparks with primordial energy as it consumes |%ch% counterspell!&&0
-              dg_affect #11864 %self% BONUS-MAGICAL 10 on -1
+              dg_affect #11864 %self% BONUS-MAGICAL 10 -1
             end
             * hit
             %echo% &&mA shadow cuts straight through ~%ch% as it streams into the Ascendant!&&0
@@ -5829,7 +5829,7 @@ elseif %move% == 3
         end
         set ch %ch.next_in_room%
       done
-      %echo% &&m~%self% is hit with a knickknack; the air starts to warm up down as the spell breaks.&&0
+      %echo% &&m~%self% is hit with a knickknack; the air starts to warm back up as the spell breaks.&&0
       if %diff% == 1
         dg_affect #11852 %self% HARD-STUNNED on 10
       end
@@ -5840,7 +5840,7 @@ elseif %move% == 3
         if %self.is_enemy(%ch%)%
           if %ch.trigger_counterspell%
             %echo% &&m~%self% sparks with primordial energy as it consumes |%ch% counterspell!&&0
-            dg_affect #11864 %self% BONUS-MAGICAL 10 on -1
+            dg_affect #11864 %self% BONUS-MAGICAL 10 -1
           end
           * hit!
           %send% %ch% &&mThe freezing air stings your skin, eyes, and lungs!&&0
@@ -5876,7 +5876,7 @@ elseif %move% == 4
       if !%ch.var(did_sfdodge)%
         if %ch.trigger_counterspell%
           %echo% &&m~%self% sparks with primordial energy as it consumes |%ch% counterspell!&&0
-          dg_affect #11864 %self% BONUS-MAGICAL 10 on -1
+          dg_affect #11864 %self% BONUS-MAGICAL 10 -1
         end
         set hit 1
         %echo% &&mThe shadow axe slices right through ~%ch%!&&0
@@ -6479,7 +6479,8 @@ elseif %move% == 4
       if %random.2% == 1
         %echo% &&m~%self% is distracted by |%targ% quick reflexes and a flying knickknack!&&0
       else
-        %echo% &&m|%self% deathbolt flies wide as ~%targ% knocks some papers into the air!&&0
+        %send% %ch% &&m|%self% deathbolt flies wide as you knock some papers into the air!&&0
+        %echoaround% %ch% &&m|%self% deathbolt flies wide as ~%targ% knocks some papers into the air!&&0
       end
       if %diff% == 1
         dg_affect #11873 %self% TO-HIT -15 20

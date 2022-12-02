@@ -2234,7 +2234,7 @@ while %count% < 12
   set room %actor.room%
   set to_room 0
   * see where we're at
-  if %actor.position% != Sleeping || !%room.function(BEDROOM)%
+  if %actor.position% != Sleeping || !%room.function(BEDROOM)% || !%actor.can_teleport_room% || !%actor.canuseroom_guest%
     * still awake or no bedroom? nothing to do
   else
     * Sleeping AND in a bedroom: set a target
@@ -2245,7 +2245,7 @@ while %count% < 12
     * determine where to send them back to
     if (%room.template% >= 11800 && %room.template% <= 11874) || (%room.template% >= 11900 && %room.template% <= 11974)
       set skycleave_wake_room %room.template%
-    elseif %actor.varexists(skycleave_wake_room)%
+    elseif %actor.varexists(skycleave_wake_room)% && (%room.template% >= 11800 && %room.template% <= 11999)
       set skycleave_wake_room %actor.skycleave_wake_room%
     else
       set skycleave_wake_room 0
@@ -2327,7 +2327,7 @@ while %ch%
   set ch %next_ch%
 done
 wait 1
-%echo% ~%self% grabs a strange device from the table and then vanishes into the shadows!
+%echo% ~%self% grabs something from the table and then vanishes into the shadows!
 %purge% %self%
 ~
 #11929
@@ -4278,8 +4278,8 @@ while %count% < 12
     if (%count% // 4) == 1 && !%teleported%
       %send% %actor% You feel tired.
     end
-  elseif !%room.function(BEDROOM)%
-    * Sleeping but not in a bedroom: just reveal a dream.
+  elseif !%room.function(BEDROOM)% || !%actor.can_teleport_room% || !%actor.canuseroom_guest%
+    * Sleeping but not in a bedroom they can use: just reveal a dream.
     switch %random.10%
       case 1
         %send% %actor% You dream of an incredible tree with a tiny rainbow staircase spiraling around it.
@@ -4324,7 +4324,7 @@ while %count% < 12
     * determine where to send them back to
     if (%room.template% >= 11800 && %room.template% <= 11874) || (%room.template% >= 11900 && %room.template% <= 11974)
       set skycleave_wake_room %room.template%
-    elseif %actor.varexists(skycleave_wake_room)%
+    elseif %actor.varexists(skycleave_wake_room)% && (%room.template% >= 11800 && %room.template% <= 11999)
       set skycleave_wake_room %actor.skycleave_wake_room%
     else
       set skycleave_wake_room 0
@@ -4498,7 +4498,7 @@ while %count% < 12
     if (%count% // 4) == 1 && !%teleported%
       %send% %actor% You feel tired.
     end
-  elseif !%room.function(BEDROOM)% || %room.template% == 11975
+  elseif !%room.function(BEDROOM)% || %room.template% == 11975 || !%actor.can_teleport_room% || !%actor.canuseroom_guest%
     * Sleeping but not in a bedroom: just reveal a dream.
     switch %random.10%
       case 1
@@ -4553,7 +4553,7 @@ while %count% < 12
     * determine where to send them back to
     if (%room.template% >= 11800 && %room.template% <= 11874) || (%room.template% >= 11900 && %room.template% <= 11974)
       set skycleave_wake_room %room.template%
-    elseif %actor.varexists(skycleave_wake_room)%
+    elseif %actor.varexists(skycleave_wake_room)% && (%room.template% >= 11800 && %room.template% <= 11999)
       set skycleave_wake_room %actor.skycleave_wake_room%
     else
       set skycleave_wake_room 0
