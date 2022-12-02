@@ -2087,7 +2087,7 @@ throne flying~
 a flying throne~
 A flying throne flaps just above the ground.
 ~
-50 50 den 0 3
+50 50 den m 3
 0 0 27 10
 D
    The ancient wooden throne is made mostly from pitch black ebony, though the
@@ -2126,9 +2126,8 @@ A dragon made of water flows past you!
 0 0 5 15
 D
    The water dragon is nearly the height of a pony but the length of a sailing
-ship. It slithers and flows as it races down the length of the tower's spiral
-walkway, sparing not a single thought for the people it sloshes through along
-the way.
+ship. It slithers and flows at high speed as it races along, sparing not a
+single thought for the people it sloshes through along the way.
 ~
 T 11969
 T 11810
@@ -2159,9 +2158,9 @@ An aqueous lion is running through!
 150 250 bdJ n 3
 0 0 11 15
 D
-   This majestic lion is made of pure water, sloshing as it runs down
-Skycleave's spiraling walkway. A fish is swimming around the lion's stomach,
-unperturbed by the jaunt outside the fountain.
+   This majestic lion is made of pure water, sloshing as it ambles along,
+paying little attention to its surroundings. A fish is swimming around the
+lion's stomach, unperturbed by the jaunt outside the fountain.
 ~
 T 11969
 T 11810
@@ -2177,7 +2176,7 @@ A unicorn made of sparkling water is running through!
 D
    This stunning unicorn is made of nothing but sparkling water! It would be a
 stunning sculpture if it held still, but it never does -- it's galloping
-through the tower, leaving only effervescent bubbles in its wake.
+through, leaving only effervescent bubbles in its wake.
 ~
 T 11969
 T 11810

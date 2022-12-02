@@ -3034,7 +3034,7 @@ switch %self.vnum%
     else
       %echo% &&mThe Grand High Sorceress gives you a coy smile as she disappears in a burst of magenta glitter, dropping something as she vanishes!&&0
       * chance of mount:
-      if !%room.people(11852)% && %random.100% <= 5
+      if !%room.people(11852)% && %random.100% <= 4
         %load% mob 11852
       end
     end
@@ -3634,7 +3634,7 @@ switch %cycle%
     %send% %person% The primordial mana that once surged through the veins of the tree now flows like blood down its rotten trunk.
   break
   case 2
-    %send% %person% Slowly from the haze, a great giant arises, clad all in violet...
+    %send% %person% Slowly from the haze, a great giant arises, clad in robes like the night...
     wait 9 sec
     %send% %person% The giant waves his enormous hand and speaks a few words in a language you've never heard. A gleaming, radiant axe forms in midair from the haze itself, and the giant grabs it in both hands.
     wait 9 sec

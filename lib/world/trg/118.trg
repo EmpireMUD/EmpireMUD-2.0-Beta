@@ -6757,8 +6757,10 @@ elseif (mount /= %cmd% || ride /= %cmd%) && %aqua_vnums% ~= %self.vnum%
   * fake aquatic mounts
   set arg %arg.car%
   if %actor.has_tech(Riding)% && %arg% && %actor.char_target(%arg%)% == %self%
-    if %actor.inventory(11892)% && %actor.completed_quest(11972)%
+    set jelly %actor.inventory(11892)%
+    if %jelly% && %actor.completed_quest(11972)%
       nop %self.add_mob_flag(MOUNTABLE)%
+      %purge% %jelly%
       return 0
     else
       %send% %actor% You leap onto |%self% back... and splash right through!
