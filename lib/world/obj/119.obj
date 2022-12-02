@@ -659,6 +659,29 @@ poisoned!
 7 0
 T 11836
 S
+#11928
+box configuration moonshadow shadowy puzzle~
+the Moonshadow Configuration~
+A shadowy puzzle box lies on the ground.~
+   As you touch the strange shadow box, your head is filled with images of
+a pitch black, freeze-you-to-the-bone winter night. Though it's not large, the
+box is lighter than it looks. But as it drains all heat from your fingers, it
+seems to grow heavy, and its square sides begin to grow with pale blue lines
+like intricate filigree. This is the Moonshadow Configuration, the puzzle box
+that holds the key to the dark gate of the shadow realms.
+   Use the Moonshadow Configuration to gain a minipet from the elemental plane
+of shadow.
+   The Shadow Hide plumbed the darkest depths of the shadow realm. It was one
+of only two places she ever felt at home. Her mastery over the darkness was her
+path to power and prestige, and in her unwavering determination, she left her
+the timidness and humanity of her youth in the shadows.
+~
+19 o a 0 8
+11853 0 0
+10 0
+C
+1 1
+S
 #11929
 bread crummy crumby very~
 some very crummy bread~
@@ -1397,6 +1420,7 @@ carefully you can see not a single stitch or thread, even when you pull at the
 seams. The cut of the suit is sleek and androgynous, and though the foreign
 style is hard to place, this suit would turn heads in any court with its
 shining gold embellishments.
+   This suit grants a new 'bow' social to the wearer.
    As the golden age of Smol Nes-Pik was tarnished into rot and ruin and the
 last leaves fell from the great tree, Sparo Vehl sat resolute on the obsidian
 throne as the beacon of hope for her people.
@@ -1428,6 +1452,7 @@ A set of treesilk robes hang in the air.~
 thick silhouette as they pad layer upon layer. The silk is quite fine, showing
 neither hem nor stitch. Golden threadwork and filigree shape root-like tendrils
 around the bottom of the robes, but the torso and sleeves are undecorated.
+   This suit grants a new 'cheer' social to the wearer.
    When the last of their great trees fell, the tresydions chose to follow them
 into history, such is the cost of the vow they once took.
 ~
@@ -1458,6 +1483,7 @@ A brown silk suit is neatly folded on the ground.~
 craftsmanship is such that no stitch or hem is visible. The reddish-brown color
 is like a clay brick or a tree trunk, and the wide, straight cut of the suit
 gives it a strong elegance, like a tree beside a pond.
+   This suit grants a new 'comfort' social to the wearer.
    When Lotte left Smol Kai-Pik for the first time at the age of sixty-three,
 she little imagined the splendor she would find in the world. Nor could she
 conceive of the somber truth that she would never return home again.
@@ -1489,6 +1515,7 @@ A green silk tunic is hanging in the air.~
 not a single stitch can be seen. The silk is dyed a verdant green, at home in
 the canopy of any great tree, embellished with golden needlework in the shape
 of leaves.
+   This suit grants a new 'dance' social to the wearer.
    Fine clothing such as this were common at all levels of Smol Nes-Pik, woven
 by artisans born and raised on the great tree, and from silk spun in its crown.
 The green dye was sourced from the tree's very sap. Wearing the tree, as it was
@@ -1519,6 +1546,7 @@ tattered lich robes~
 Some tattered lich robes are hanging here.~
    These robes are tattered and torn, and it will surely make you look like a
 lich to wear them.
+   These robes grant a new 'greet' social to the wearer.
    Liches are born when a great sorcerer dies, as the impression they made in
 the magic of the fabric of the world does not easily fade. A lich is,
 therefore, not exactly the sorcerer, nor is it a ghost. It is something new,
@@ -1546,6 +1574,7 @@ A set of page robes is lying on the ground.~
    These plain jute robes are commonly worn by Skycleave pages. They spare
 hardly a stitch for fashion or embellishment. Like a monk's robe, they
 advertise only humility and low station.
+   These robes grant a new 'nod' social to the wearer.
    The Tower Skycleave employs a great number of pages, many of whom possess no
 magical talent to speak of. Instead, the pages usually rely on enchanted
 trinkets to simplify their work.
@@ -1572,6 +1601,7 @@ A set of apprentice robes has been left here.~
    The layered cotton robes are airy and light, though the workmanship on them
 suggests they were made at low cost. The layers are made in various shades of
 white and gray, with simple stitching on the seams and hems.
+   These robes grant a new 'shrug' social to the wearer.
    The Tower Skycleave invests a great deal into its apprentices and saddles
 them with the highest expectations. Every high sorcerer in the tower began
 their storied career as an apprentice who outshone their peers, the more
@@ -1598,6 +1628,7 @@ a goblin's vest~
 A goblin has left its vest here, perhaps.~
    This vest is small, and slightly too snug. Nevertheless, those tiny green
 fingers make fine clothing.
+   This vest grants a new 'tap' social to the wearer.
    No goblins that has entered Skycleave has ever left again. The sorcerers can
 little comprehend why, then, the goblins continue to invade it.
 ~
@@ -1623,6 +1654,7 @@ A glimmering doublet is lying on the ground.~
    The doublet is close-fitting and brilliantly embellished with hazel leaves
 set against a background pattern that reminds you of bricks. The garment shines
 in every color, all at once.
+   This doublet grants a new 'wave' social to the wearer.
    The Tower Skycleave creates a fashion craze from time to time because what
 seems to be magical, impossible clothing is a simple feat for such powerful
 sorcerers. Before long, the villagers usually realize the clothing is gaudy and

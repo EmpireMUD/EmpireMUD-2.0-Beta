@@ -736,7 +736,7 @@ I'll watch over them.'
 standing to return to her eternal task, leaving behind an attuned soulstone for
 you without a further word.
 ~
-4 0 150 0 -1
+5 0 150 0 -1
 A
 2 11877
 A
@@ -757,6 +757,8 @@ A
 2 11896
 A
 2 11897
+A
+2 11928
 P
 9 4 0 1 a
 R
@@ -808,6 +810,9 @@ Find a carving of a man~
 W+
 2 11878 0 1 p
 Find a glimmering knife~
+W+
+2 11928 0 1 p
+Find what the assassin seeks~
 W+
 2 11874 0 1 p
 Find a futile shield~

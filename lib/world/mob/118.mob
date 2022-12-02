@@ -1180,8 +1180,7 @@ youthful appearance. Her dark purple and black robes are dusty, but she seems
 to have other priorities.
 ~
 F 11800
-I 4 11867 100.00 1 p  # LOOT: dynamic reconfabulator
-I 12 11867 100.00 1 p  # PICKPOCKET: dynamic reconfabulator
+I 12 11928 100.00 1 p  # PICKPOCKET: Moonshadow Configuration
 T 11837
 T 11852
 S
@@ -2101,6 +2100,44 @@ fulfills those aspirations, at immense cost, and brings rot and ruin to many a
 land.
 ~
 T 11864
+S
+#11853
+shadow elemental gloomspring spring~
+a gloomspring elemental~
+A shadow casts on the ground from nowhere in particular.
+~
+1 1 bdoD n 2
+0 0 30 28
+D
+   At first glance, there seems to be an extra person -- one shadow that
+belongs to no one at all. But as you step back and forth across it, you realize
+it's watching you. It's alive! It seems to be a gloomspring elemental, a living
+shadow, or perhaps shadow mimic. Luckily, it seems playful.
+~
+M
+0
+One of the shadows seems to be playing with your shadow.~
+M
+0
+One of the shadows looks like it's dancing.~
+M
+0
+You catch a shadow waving at you... or at your shadow.~
+M
+0
+It seems cold in here.~
+M
+0
+It's kind of a gloomy day.~
+M
+0
+You think you see the shadow of a griffin, but then it's gone.~
+M
+0
+You think you see the shadow of a manticore, but when you look there's nothing.~
+M
+0
+You think you see the shadow of a hydra, but you turn and nothing is there.~
 S
 #11854
 alpaca fluidic~
