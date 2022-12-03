@@ -1316,7 +1316,7 @@ void look_at_char(char_data *i, char_data *ch, bool show_eq) {
 	}
 	if (IS_NPC(i) && MOB_FACTION(i)) {
 		struct player_faction_data *pfd = get_reputation(ch, FCT_VNUM(MOB_FACTION(i)), FALSE);
-		int idx = rep_const_to_index(pfd ? pfd->rep : NOTHING);
+		int idx = rep_const_to_index(pfd ? pfd->rep : FCT_STARTING_REP(MOB_FACTION(i)));
 		sprintf(buf, "$E is a member of %s%s\t0.", (idx != NOTHING ? reputation_levels[idx].color : ""), FCT_NAME(MOB_FACTION(i)));
 		act(buf, FALSE, ch, NULL, i, TO_CHAR);
 	}
@@ -2548,9 +2548,7 @@ ACMD(do_factions) {
 			msg_to_char(ch, "You have not encountered that faction.\r\n");
 		}
 		else {
-			if (pfd) {
-				idx = rep_const_to_index(pfd->rep);
-			}
+			idx = rep_const_to_index(pfd ? pfd->rep : FCT_STARTING_REP(fct));
 			
 			msg_to_char(ch, "%s%s\t0\r\n", (idx != NOTHING ? reputation_levels[idx].color : ""), FCT_NAME(fct));
 			if (pfd && idx != NOTHING) {
