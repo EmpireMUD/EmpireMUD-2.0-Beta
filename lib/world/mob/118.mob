@@ -1631,6 +1631,7 @@ Rogue mercenary is skulking around.
 D
 This mob is loaded by trig 11900/skymerc and named by 11857.
 ~
+F 11849
 I 12 11881 15.00 1 p  # PICKPOCKET: flask of lightning
 I 12 11874 15.00 1 p  # PICKPOCKET: filigreed stasis charm
 I 12 11873 15.00 1 p  # PICKPOCKET: glittering red potion
@@ -1673,6 +1674,7 @@ Caster mercenary is studying the books.
 D
 This mob is loaded by trig 11900/skymerc and named by 11857.
 ~
+F 11849
 I 4 11865 5.00 1 p  # LOOT: ether condenser
 I 4 11867 5.00 1 p  # LOOT: dynamic reconfabulator
 I 4 11864 5.00 1 p  # LOOT: mana deconfabulator
@@ -1714,6 +1716,7 @@ Archery mercenary is fletching an arrow.
 D
 This mob is loaded by trig 11900/skymerc and named by 11857.
 ~
+F 11849
 M
 0
 $n splits some feathers down the middle for fletching.~
@@ -1746,6 +1749,7 @@ Nature mage mercenary is playing with fire.
 D
 This mob is loaded by trig 11900/skymerc and named by 11857.
 ~
+F 11849
 M
 0
 $n forms a thick layer of mana over $s body, and it hardens to solid stone!~
@@ -1778,6 +1782,7 @@ Vampire mercenary watches you carefully.
 D
 This mob is loaded by trig 11900/skymerc and named by 11857.
 ~
+F 11849
 M
 0
 $n picks at $s teeth with a thin dagger.~
@@ -1810,6 +1815,7 @@ Armored mercenary is spoiling for a fight.
 D
 This mob is loaded by trig 11900/skymerc and named by 11857.
 ~
+F 11849
 M
 0
 $n cleans $s hammer with a rag.~
@@ -1847,6 +1853,7 @@ thin, gnarled calamander staff. Her flame-orange hair rolls off her head,
 cascading over the shoulders of her silver-accented red gown like a wild
 waterfall at sunset.
 ~
+F 11849
 I 4 11837 100.00 1  # LOOT: skycleave BoE loot controller
 I 4 11838 100.00 1  # LOOT: skycleave BoP loot controller
 I+ 5 0  # Group
@@ -1939,6 +1946,7 @@ down, revealing cropped soot-black hair and pale skin. His inky black cloak
 is too dark and too loose for you to make out any part of his body or see what
 he might be carrying.
 ~
+F 11849
 I 4 11837 100.00 1  # LOOT: skycleave BoE loot controller
 I 4 11838 100.00 1  # LOOT: skycleave BoP loot controller
 I+ 5 0  # Group
@@ -1999,6 +2007,7 @@ but he has the visage of a ghoul. His milky eyes turn ice blue only while he
 absorbs the corpse-flesh; the rest of the time, you're not sure he can even see
 you.
 ~
+F 11849
 I 4 11837 100.00 1  # LOOT: skycleave BoE loot controller
 I 4 11838 100.00 1  # LOOT: skycleave BoP loot controller
 I+ 5 0  # Group
