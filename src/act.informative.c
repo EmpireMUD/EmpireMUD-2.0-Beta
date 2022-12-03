@@ -2554,6 +2554,9 @@ ACMD(do_factions) {
 			if (pfd && idx != NOTHING) {
 				msg_to_char(ch, "Reputation: %s / %d\r\n", reputation_levels[idx].name, pfd->value);
 			}
+			else if (idx != NOTHING) {
+				msg_to_char(ch, "Reputation: %s\r\n", reputation_levels[idx].name);
+			}
 			else {
 				msg_to_char(ch, "Reputation: none\r\n");
 			}
