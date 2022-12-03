@@ -2544,8 +2544,11 @@ ACMD(do_factions) {
 		if (!(fct = find_faction_by_name(argument)) || FACTION_FLAGGED(fct, FCT_IN_DEVELOPMENT)) {
 			msg_to_char(ch, "Unknown faction '%s'.\r\n", argument);
 		}
+		else if (!(pfd = get_reputation(ch, FCT_VNUM(fct), FALSE)) && !IS_IMMORTAL(ch)) {
+			msg_to_char(ch, "You have not encountered that faction.\r\n");
+		}
 		else {
-			if ((pfd = get_reputation(ch, FCT_VNUM(fct), FALSE))) {
+			if (pfd) {
 				idx = rep_const_to_index(pfd->rep);
 			}
 			
