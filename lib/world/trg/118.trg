@@ -5068,14 +5068,14 @@ if %move% == 1
     remote free_room %bug.id%
   end
   while %time% > 0
+    eval time %time% - 4
+    wait 4 s
     if !%targ% || %targ.id% != %targ_id%
       set time 0
     elseif !%targ.affect(11822)%
       set time 0
     else
       %send% %targ% &&m**** You're caught tight in the otherworlder's arms! ****&&0 (struggle)
-      eval time %time% - 4
-      wait 4 s
     end
   done
   skyfight clear struggle
@@ -5247,7 +5247,7 @@ elseif %move% == 2
     nop %self.add_mob_flag(NO-ATTACK)%
   end
   skyfight clear dodge
-  %regionecho% %room% 1 &&yA tiny voice in the vortex shouts, 'Slay the Griffin!'&&0
+  %echo% &&yA tiny voice in the vortex shouts, 'Slay the Griffin!'&&0
   %echo% &&m**** The goblin starts pulling out knives and throwing them in all directions! ****&&0 (dodge)
   skyfight setup dodge all
   set cycle 0
@@ -5466,7 +5466,7 @@ if %move% == 1 && !%self.aff_flagged(BLIND)%
       set fail 1
       %echo% &&mThe green light scatters into the distance as Mezvienne's spell misses.&&0
       if %diff% == 1
-        dg_affect #11856 %ch% TO-HIT 25 20
+        dg_affect #11856 %target% TO-HIT 25 20
       end
     elseif %target.trigger_counterspell%
       set fail 2
