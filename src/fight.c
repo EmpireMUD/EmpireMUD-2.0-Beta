@@ -2883,8 +2883,8 @@ void check_auto_assist(char_data *ch) {
 			assist = TRUE;
 		}
 		else if (IS_NPC(ch) && IS_NPC(ch_iter) && !AFF_FLAGGED(ch_iter, AFF_CHARM) && !AFF_FLAGGED(ch, AFF_CHARM)) {
-			// BAF (if both are NPCs and neither is charmed)
-			if (MOB_FLAGGED(ch_iter, MOB_BRING_A_FRIEND)) {
+			// BAF (if both are NPCs and neither is charmed, and they are members of the same faction or no faction)
+			if (MOB_FLAGGED(ch_iter, MOB_BRING_A_FRIEND) && MOB_FACTION(ch) == MOB_FACTION(ch_iter)) {
 				assist = TRUE;
 			}
 			else if (GET_LEADER(ch) || GET_LEADER(ch_iter)) {	// if not BAF, still assist if in the same follow chain without players

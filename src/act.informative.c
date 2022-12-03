@@ -2586,10 +2586,13 @@ ACMD(do_factions) {
 			if (!(fct = find_faction_by_vnum(pfd->vnum))) {
 				continue;
 			}
+			if (FACTION_FLAGGED(fct, FCT_HIDE_IN_LIST) && !IS_IMMORTAL(ch)) {
+				continue;
+			}
 			
 			++count;
 			idx = rep_const_to_index(pfd->rep);
-			size += snprintf(buf + size, sizeof(buf) - size, " %s %s(%s / %d)\t0\r\n", FCT_NAME(fct), reputation_levels[idx].color, reputation_levels[idx].name, pfd->value);
+			size += snprintf(buf + size, sizeof(buf) - size, " %s %s(%s / %d)\t0%s\r\n", FCT_NAME(fct), reputation_levels[idx].color, reputation_levels[idx].name, pfd->value, (FACTION_FLAGGED(fct, FCT_HIDE_IN_LIST) ? " (hidden)" : ""));
 		}
 		
 		if (!count) {

@@ -2959,7 +2959,7 @@ SHOW(show_factions) {
 			
 			++count;
 			idx = rep_const_to_index(pfd->rep);
-			size += snprintf(buf + size, sizeof(buf) - size, "[%5d] %s %s(%s / %d)\t0\r\n", pfd->vnum, FCT_NAME(fct), reputation_levels[idx].color, reputation_levels[idx].name, pfd->value);
+			size += snprintf(buf + size, sizeof(buf) - size, "[%5d] %s %s(%s / %d)\t0%s\r\n", pfd->vnum, FCT_NAME(fct), reputation_levels[idx].color, reputation_levels[idx].name, pfd->value, (FACTION_FLAGGED(fct, FCT_HIDE_IN_LIST) ? " (hidden)" : ""));
 		}
 		
 		if (!count) {

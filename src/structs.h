@@ -1418,6 +1418,7 @@ typedef struct vehicle_data vehicle_data;
 // FCT_x: Faction flags
 #define FCT_IN_DEVELOPMENT  BIT(0)	// a. not live
 #define FCT_REP_FROM_KILLS  BIT(1)	// b. killing mobs affects faction rating
+#define FCT_HIDE_IN_LIST  BIT(2)	// c. not shown in player's list
 
 
 // FCTR_x: Relationship flags
