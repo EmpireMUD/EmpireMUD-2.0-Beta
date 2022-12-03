@@ -6738,12 +6738,12 @@ elseif %move% == 2
     end
     set cycle 0
     set done 0
+    eval amt %diff% * 25
     while %cycle% < 5 && !%done%
       wait 4 s
       if %targ.id% == %targ_id% && %targ.affect(11822)% && %diff% > 1
         %send% %targ% &&jThe thorns press into you! That really hurts!&&0
-        eval amt %diff% * 25
-        %dot% #11951 %ch% %amt% 40 physical 25
+        %dot% #11951 %targ% %amt% 40 physical 25
       else
         set done 1
       end
