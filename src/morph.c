@@ -219,7 +219,7 @@ morph_data *find_morph_by_name(char_data *ch, char *name) {
 			if (had_number && --number == 0) {
 				return morph;
 			}
-			else if (!had_number) {
+			else if (!had_number && !partial) {
 				partial = morph;
 			}
 		}
