@@ -187,6 +187,13 @@ void end_morph(char_data *ch) {
 morph_data *find_morph_by_name(char_data *ch, char *name) {
 	morph_data *morph, *next_morph, *partial = NULL;
 	char temp[MAX_STRING_LENGTH];
+	int number;
+	bool had_number = isdigit(*name) ? TRUE : FALSE;
+	
+	number = get_number(&name);
+	if (number == 0) {
+		return NULL;	// 0.morph has no meaning
+	}
 	
 	HASH_ITER(sorted_hh, sorted_morphs, morph, next_morph) {
 		if (MORPH_FLAGGED(morph, MORPHF_IN_DEVELOPMENT | MORPHF_SCRIPT_ONLY) && !IS_IMMORTAL(ch)) {
@@ -203,11 +210,18 @@ morph_data *find_morph_by_name(char_data *ch, char *name) {
 		strcpy(temp, skip_filler(MORPH_SHORT_DESC(morph)));
 		if (!str_cmp(name, temp)) {
 			// perfect match
-			return morph;
+			if (--number == 0) {
+				return morph;
+			}
 		}
 		if (!partial && multi_isname(name, MORPH_KEYWORDS(morph))) {
 			// probable match
-			partial = morph;
+			if (had_number && --number == 0) {
+				return morph;
+			}
+			else {
+				partial = morph;
+			}
 		}
 	}
 	
