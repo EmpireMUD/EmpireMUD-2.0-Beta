@@ -77,6 +77,15 @@ void add_morph_affects(char_data *ch) {
 	points_available = scale / 100.0 * config_get_double("scale_points_at_100");
 	points_available = MAX(points_available, 1.0);
 	
+	// weight by mob flags
+	// TODO should this be configured somewhere? these are based on obj flag scaling -pc
+	if (MOB_FLAGGED(ch, MOB_HARD)) {
+		points_available *= 1.2;
+	}
+	if (MOB_FLAGGED(ch, MOB_GROUP)) {
+		points_available *= 1.3333;
+	}
+	
 	// figure out how many total weight points are used
 	total_weight = 0;
 	LL_FOREACH(MORPH_APPLIES(morph), app) {
