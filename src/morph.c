@@ -214,12 +214,12 @@ morph_data *find_morph_by_name(char_data *ch, char *name) {
 				return morph;
 			}
 		}
-		if (!partial && multi_isname(name, MORPH_KEYWORDS(morph))) {
+		if ((!partial || had_number) && multi_isname(name, MORPH_KEYWORDS(morph))) {
 			// probable match
 			if (had_number && --number == 0) {
 				return morph;
 			}
-			else {
+			else if (!had_number) {
 				partial = morph;
 			}
 		}
