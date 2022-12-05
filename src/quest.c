@@ -897,7 +897,7 @@ char *quest_reward_string(struct quest_reward *reward, bool show_vnums) {
 	switch (reward->type) {
 		case QR_BONUS_EXP: {
 			// has no vnum
-			snprintf(output, sizeof(output), "%d bonus exp", reward->amount);
+			snprintf(output, sizeof(output), "%d bonus experience", reward->amount);
 			break;
 		}
 		case QR_COINS: {
@@ -914,24 +914,24 @@ char *quest_reward_string(struct quest_reward *reward, bool show_vnums) {
 			break;
 		}
 		case QR_SET_SKILL: {
-			snprintf(output, sizeof(output), "%s%d %s", vnum, reward->amount, get_skill_name_by_vnum(reward->vnum));
+			snprintf(output, sizeof(output), "%sGives level %d %s", vnum, reward->amount, get_skill_name_by_vnum(reward->vnum));
 			break;
 		}
 		case QR_SKILL_EXP: {
-			snprintf(output, sizeof(output), "%s%d%% %s", vnum, reward->amount, get_skill_name_by_vnum(reward->vnum));
+			snprintf(output, sizeof(output), "%s%+d%% %s", vnum, reward->amount, get_skill_name_by_vnum(reward->vnum));
 			break;
 		}
 		case QR_SKILL_LEVELS: {
-			snprintf(output, sizeof(output), "%s%dx %s", vnum, reward->amount, get_skill_name_by_vnum(reward->vnum));
+			snprintf(output, sizeof(output), "%s%+d %s", vnum, reward->amount, get_skill_name_by_vnum(reward->vnum));
 			break;
 		}
 		case QR_QUEST_CHAIN: {
-			snprintf(output, sizeof(output), "%s%s", vnum, get_quest_name_by_proto(reward->vnum));
+			snprintf(output, sizeof(output), "%sLeads to %s", vnum, get_quest_name_by_proto(reward->vnum));
 			break;
 		}
 		case QR_REPUTATION: {
 			faction_data *fct = find_faction_by_vnum(reward->vnum);
-			snprintf(output, sizeof(output), "%s%+d rep to %s", vnum, reward->amount, (fct ? FCT_NAME(fct) : "UNKNOWN"));
+			snprintf(output, sizeof(output), "%s%+d reputation to %s", vnum, reward->amount, (fct ? FCT_NAME(fct) : "UNKNOWN"));
 			break;
 		}
 		case QR_EVENT_POINTS: {
@@ -940,7 +940,7 @@ char *quest_reward_string(struct quest_reward *reward, bool show_vnums) {
 			break;
 		}
 		default: {
-			snprintf(output, sizeof(output), "%s%dx UNKNOWN", vnum, reward->amount);
+			snprintf(output, sizeof(output), "%s%dx Unknown", vnum, reward->amount);
 			break;
 		}
 	}
@@ -5085,8 +5085,14 @@ void get_quest_reward_display(struct quest_reward *list, char *save_buffer, bool
 	int count = 0;
 	
 	*save_buffer = '\0';
-	LL_FOREACH(list, reward) {		
-		sprintf(save_buffer + strlen(save_buffer), "%2d. %s: %s\r\n", ++count, quest_reward_types[reward->type], quest_reward_string(reward, show_vnums));
+	LL_FOREACH(list, reward) {
+		if (show_vnums) {
+			sprintf(save_buffer + strlen(save_buffer), "%2d. %s: %s\r\n", ++count, quest_reward_types[reward->type], quest_reward_string(reward, show_vnums));
+		}
+		else {
+			++count;
+			sprintf(save_buffer + strlen(save_buffer), " %s\r\n", quest_reward_string(reward, show_vnums));
+		}
 	}
 	
 	// empty list not shown

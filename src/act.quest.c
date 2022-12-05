@@ -910,7 +910,7 @@ QCMD(qcmd_info) {
 			size += snprintf(output + size, sizeof(output) - size, "--\r\n%s", NULLSAFE(QUEST_COMPLETE_MSG(qst)));
 			get_quest_reward_display(QUEST_REWARDS(qst), buf, FALSE);
 			if (*buf) {
-				size += snprintf(output + size, sizeof(output) - size, "%s", buf);
+				size += snprintf(output + size, sizeof(output) - size, "Quest Rewards:\r\n%s", buf);
 			}
 		}
 		
