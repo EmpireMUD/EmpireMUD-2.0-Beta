@@ -501,7 +501,7 @@ miner goblin~
 a goblin miner~
 Goblin miner is here.
 ~
-150 250 abdIJ E 2
+150 250 abdIJ cE 2
 0 0 0 8
 D
 Strings set by trig 11824.
@@ -521,7 +521,7 @@ Venjer fox goblin~
 Venjer the Fox~
 Venjer the Fox is prodding at the vines with a staff.
 ~
-150 250 abdEJ 0 2
+150 250 abdEJ c 2
 2 0 0 17
 D
    Venjer is a small woman, though she stands tall and proud, light on her feet
@@ -581,7 +581,7 @@ pixy queen majestic~
 the pixy queen~
 A majestic pixy queen dazzles you with blinding sparkles!
 ~
-150 250 abdEJ 0 3
+150 250 abdEJ c 3
 2 0 0 28
 D
    The pixy queen is scarcely more than a colorful sparkle of light. As your
@@ -619,7 +619,7 @@ pixy~
 a pixy~
 A pixy has escaped!
 ~
-150 250 abdxIJ 0 1
+150 250 abdxIJ c 1
 0 0 0 28
 D
    The little pixy is no larger than a mouse. It flies on silvery butterfly
@@ -1744,7 +1744,7 @@ mercenary nature mage~
 nature mage mercenary~
 Nature mage mercenary is playing with fire.
 ~
-150 250 abdvIJ 0 3
+150 250 abdvIJ c 3
 0 0 0 16
 D
 This mob is loaded by trig 11900/skymerc and named by 11857.
@@ -1777,7 +1777,7 @@ mercenary vampire~
 vampire mercenary~
 Vampire mercenary watches you carefully.
 ~
-150 250 abdvwIJ D 3
+150 250 abdvwIJ cD 3
 0 0 0 1
 D
 This mob is loaded by trig 11900/skymerc and named by 11857.
@@ -1843,7 +1843,7 @@ Kara Virduke~
 Kara Virduke~
 Kara Virduke is digging through cabinets.
 ~
-150 250 bdvxEIJ oE 3
+150 250 bdvxEIJ coE 3
 2 0 0 17
 D
    Kara Virduke is nearly seven feet tall, such that she must stoop to work in
@@ -1936,7 +1936,7 @@ Rojjer bleak~
 Bleak Rojjer~
 Bleak Rojjer is searching for something on the left side of the room.
 ~
-150 250 bdvEIJ CE 3
+150 250 bdvEIJ cCE 3
 1 0 0 4
 D
    Bleak Rojjer's back is to you as you enter. He must think you're one of his
@@ -1993,7 +1993,7 @@ Trixton Vye~
 Trixton Vye~
 Trixton Vye is searching for something.
 ~
-150 250 bdvyEIJ 0 3
+150 250 bdvyEIJ c 3
 1 0 0 5
 D
    When you enter the room, you do not initially notice Trixton Vye. It's not
@@ -2304,7 +2304,7 @@ shadow ascendant mezvienne shade~
 the Shadow Ascendant~
 The Shadow Ascendant looms over the chamber as it draws more and more power!
 ~
-150 250 bdhxyzJ hoE 3
+150 250 bdhxyzJ choE 3
 0 0 0 20
 D
    The shade, once merely a projection of the powerful enchantress Mezvienne,
@@ -2437,7 +2437,7 @@ barrosh high sorcerer~
 High Sorcerer Barrosh~
 High Sorcerer Barrosh stands with his staff raised high and an anguished look.
 ~
-150 250 bdhvxyzJ DE 3
+150 250 bdhvxyzJ cDE 3
 1 0 0 19
 D
    Barrosh takes a menacing position as you enter and seems to be muttering
@@ -2490,7 +2490,7 @@ Mezvienne shade shadow~
 the Shade of Mezvienne~
 The Shade of Mezvienne surrounds Knezz like a phantom.
 ~
-150 250 bdhyJ hCDE 3
+150 250 bdhyJ chCDE 3
 0 0 0 7
 D
    The Shade is lithe, feminine, even graceful as it swirls back and forth
@@ -2582,7 +2582,7 @@ Mezvienne enchantress~
 Mezvienne the Enchantress~
 Mezvienne the Enchantress hovers above the tower as she channels the heartwood.
 ~
-150 250 bdhvxyDJ DE 3
+150 250 bdhvxyDJ cDE 3
 2 0 0 21
 D
    The enchantress's long gossamer gown blows madly in the wind as she floats
@@ -2683,7 +2683,7 @@ lion time skithe ler-wyn lerwyn~
 the Lion of Time~
 Skithe Ler-Wyn, the Lion of Time, has erupted from Mezvienne's limp body!
 ~
-150 250 bdhyzEJ 0 3
+150 250 bdhyzEJ c 3
 2 0 0 10
 D
    Mezvienne the Enchantress floats limp and bloody in the time stream, her
@@ -3082,7 +3082,7 @@ Iskip giant~
 Iskip of Rot and Ruin~
 The giant stands knee-deep in the water, turned away from you. (difficulty)
 ~
-150 250 bdhxyDJ 0 6
+150 250 bdhxyDJ c 6
 1 0 0 19
 D
    The giant Iskip is truly huge -- you'd scarcely reach his ankles if he were

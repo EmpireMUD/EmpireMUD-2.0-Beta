@@ -25,16 +25,22 @@ fan of knives~
 0 0 0 0
 T0
 You pull a knife out of your chest.~
+T5
+...$e has a knife sticking out of $m!~
 S
 #11812
 recovering~
 4 0
 0 0 0 0
+T0
+You recover from that poorly-timed dodge.~
 S
 #11813
 distracted~
 4 0
 0 0 0 0
+T0
+You refocus on the fight.~
 S
 #11814
 prone~
@@ -62,6 +68,8 @@ T0
 Your ankle wound starts to feel better.~
 T4
 $e is bleeding from $s ankle.~
+T5
+...$e is bleeding from the ankle.~
 S
 #11817
 embiggened~
@@ -78,13 +86,8 @@ off-balance~
 0 0 0 0
 T0
 You regain your balance.~
-S
-#11819
-spellcasting~
-4 0
-0 0 0 0
 T5
-...$e is casting a spell -- this is your time to strike!~
+...$e is off-balance.~
 S
 #11820
 miniaturized~
@@ -98,6 +101,8 @@ T2
 You suddenly shrink to the size of a pixy!~
 T3
 $n suddenly shrinks to the size of a pixy!~
+T5
+...$e has shrunk to the size of a pixy!~
 S
 #11821
 miniaturized~
@@ -114,7 +119,7 @@ T5
 ...$e is struggling to get free!~
 S
 #11823
-blinding bomb~
+blinding barrage~
 4 0
 0 0 0 0
 T0
@@ -128,6 +133,8 @@ rain of arrows~
 0 0 0 0
 T0
 You pull an arrow from your chest.~
+T5
+...$e has arrows sticking out of $m.~
 S
 #11832
 conditional visibility~
@@ -171,6 +178,8 @@ S
 enchanted weapon~
 4 0
 0 0 0 0
+T5
+...$s weapon is glowing!~
 S
 #11845
 weapon sheathed~
@@ -194,6 +203,8 @@ viper venom~
 0 0 0 0
 T0
 The viper venom no longer stings.~
+T5
+...$e looks a bit ill.~
 S
 #11849
 blood curse~
@@ -229,17 +240,12 @@ boss stunned~
 T5
 ...$e's stunned -- now is the time to strike!~
 S
-#11853
-chain lightning~
-4 0
-0 0 0 0
-T0
-The lightning shock wears off.~
-S
 #11854
 dodged penalty~
 4 0
 0 0 0 0
+T5
+...this is your chance to strike!~
 S
 #11855
 arcane tattoos~
@@ -261,6 +267,8 @@ belt of Venus~
 0 0 0 0
 T0
 You are no longer affected by the belt of Venus.~
+T5
+...$e seems to be moving very slowly.~
 S
 #11858
 venomous jab~
@@ -268,6 +276,8 @@ venomous jab~
 0 0 0 0
 T0
 The venom burns itself out of your system.~
+T5
+...$e looks like $e's going to be sick.~
 S
 #11859
 gash of Cronus~
@@ -275,6 +285,8 @@ gash of Cronus~
 0 0 0 0
 T0
 The gash of Cronus fades.~
+T5
+...$e seems to be moving slowly.~
 S
 #11860
 complete darkness~
@@ -307,6 +319,8 @@ S
 absorbed spell~
 4 0
 0 0 0 0
+T5
+...$e has absorbed some power!~
 S
 #11867
 momentarily stunned~
@@ -319,6 +333,8 @@ S
 blowback~
 4 0
 0 0 0 0
+T5
+...$e seems to be weakened!~
 S
 #11869
 shadow flail~
@@ -331,6 +347,10 @@ S
 shadow flail~
 4 0
 0 0 0 0
+T0
+You recover from the flailing tendril.~
+T5
+...$e seems off-balance from the tendril.~
 S
 #11871
 wave of guilt~
@@ -338,6 +358,8 @@ wave of guilt~
 0 0 0 0
 T0
 The wave of guilt fades.~
+T5
+...$e has a guilty look.~
 S
 #11872
 deathbolt~
@@ -345,6 +367,8 @@ deathbolt~
 0 0 0 0
 T0
 The deathbolt fades, at least for now.~
+T5
+...$e is glowing from the deathbolt.~
 S
 #11873
 slightly drained~

@@ -1253,7 +1253,7 @@ elseif %move% == 4
         wait 10 s
       end
     else
-      %echo% &&m~%self% roars ancient words not heard since the dawn of time..&&0
+      %echo% &&m~%self% roars ancient words not heard since the dawn of time...&&0
       set ch %room.people%
       while %ch%
         set next_ch %ch.next_in_room%
@@ -2520,6 +2520,8 @@ while %ch%
       set time %timestamp%
       set %varname% %time%
       remote %varname% %room.id%
+      * warn
+      %send% %ch% You quickly realize it's impossible to breathe in here. Whatever you're here to do, do it quickly.
     end
     * how long is left
     eval left %time% + %limit% - %timestamp%

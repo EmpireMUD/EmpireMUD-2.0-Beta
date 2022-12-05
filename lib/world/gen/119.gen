@@ -56,6 +56,8 @@ T0
 You finally get some of the glitter out of your eyes and nose.~
 T4
 $e's covered in sparkly magenta glitter.~
+T5
+...$e is covered in magenta glitter!~
 S
 #11921
 Violet Tea~
@@ -226,6 +228,8 @@ axe wound~
 0 0 0 0
 T0
 The axe wound stops bleeding.~
+T5
+...$e is bleeding from an axe wound!~
 S
 #11958
 whirling storm~
@@ -249,6 +253,8 @@ choking on sand~
 0 0 0 0
 T0
 You're no longer choking on sand.~
+T5
+...$e is choking on sand!~
 S
 #11961
 crystalline dew~
@@ -264,12 +270,141 @@ S
 under pressure~
 4 0
 0 0 0 0
+T0
+The effects of the pressure wave fade.~
+T5
+...$e is struggling under pressure.~
 S
-#11990
-wand glow~
+#11988
+blurry glow~
 4 0
 0 0 0 0
 T0
-The glow around you fades.~
+The blurry glow around you fades.~
+T4
+$e has an blurry glow about $m.~
+T5
+...$e has an blurry glow about $m.~
+S
+#11989
+light glow~
+4 0
+0 0 0 0
+T0
+The light glow around you fades.~
+T4
+$e has an light glow about $m.~
+T5
+...$e has an light glow about $m.~
+S
+#11990
+amber glow~
+4 0
+0 0 0 0
+T0
+The amber glow around you fades.~
+T4
+$e has an amber glow about $m.~
+T5
+...$e has an amber glow about $m.~
+S
+#11991
+cerulean glow~
+4 0
+0 0 0 0
+T0
+The cerulean glow around you fades.~
+T4
+$e has an cerulean glow about $m.~
+T5
+...$e has an cerulean glow about $m.~
+S
+#11992
+ghastly glow~
+4 0
+0 0 0 0
+T0
+The ghastly glow around you fades.~
+T4
+$e has an ghastly glow about $m.~
+T5
+...$e has an ghastly glow about $m.~
+S
+#11993
+powdery glow~
+4 0
+0 0 0 0
+T0
+The powdery glow around you fades.~
+T4
+$e has an powdery glow about $m.~
+T5
+...$e has an powdery glow about $m.~
+S
+#11994
+flaxen glow~
+4 0
+0 0 0 0
+T0
+The flaxen glow around you fades.~
+T4
+$e has an flaxen glow about $m.~
+T5
+...$e has an flaxen glow about $m.~
+S
+#11995
+fluvial glow~
+4 0
+0 0 0 0
+T0
+The fluvial glow around you fades.~
+T4
+$e has an fluvial glow about $m.~
+T5
+...$e has an fluvial glow about $m.~
+S
+#11996
+ruby glow~
+4 0
+0 0 0 0
+T0
+The ruby glow around you fades.~
+T4
+$e has an ruby glow about $m.~
+T5
+...$e has an ruby glow about $m.~
+S
+#11997
+sanguine glow~
+4 0
+0 0 0 0
+T0
+The sanguine glow around you fades.~
+T4
+$e has an sanguine glow about $m.~
+T5
+...$e has an sanguine glow about $m.~
+S
+#11998
+mahogany glow~
+4 0
+0 0 0 0
+T0
+The mahogany glow around you fades.~
+T4
+$e has an mahogany glow about $m.~
+T5
+...$e has an mahogany glow about $m.~
+S
+#11999
+maple glow~
+4 0
+0 0 0 0
+T0
+The maple glow around you fades.~
+T4
+$e has an maple glow about $m.~
+T5
+...$e has an maple glow about $m.~
 S
 $

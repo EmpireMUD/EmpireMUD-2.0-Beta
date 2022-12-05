@@ -1,6 +1,6 @@
 #11902
 bucket wooden~
-the bucket~
+a bucket~
 A wooden bucket is sitting here, filled with water.~
 cil 5 24 100 nrG 3
 1 0 -1 11807
@@ -32,7 +32,7 @@ The broom is made from heather wood and bound by a twisted old string.
 S
 #11933
 mop~
-the mop~
+a mop~
 There is a mop here.~
 cil 5 24 100 nrG 3
 1 0 -1 11807

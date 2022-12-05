@@ -5104,24 +5104,15 @@ elseif %move% == 2
   end
   skyfight setup interrupt all
   wait 4 s
-  if %self.disabled%
-    nop %self.remove_mob_flag(NO-ATTACK)%
-    halt
-  end
   if %self.var(sfinterrupt_count,0)% < (%diff% + 1) / 2
     %echo% &&m**** &&Z~%self% twists and contorts as it grows... ****&&0 (interrupt)
   end
   wait 4 s
-  if %self.disabled%
-    nop %self.remove_mob_flag(NO-ATTACK)%
-    halt
-  end
-  if %self.var(sfinterrupt_count,0)% >= (%diff% + 1) / 2
+  if %self.disabled% || %self.var(sfinterrupt_count,0)% >= (%diff% + 1) / 2
     %echo% &&m~%self% is interrupted and shrinks back to its previous shape!&&0
     if %diff% == 1
       dg_affect #11852 %self% HARD-STUNNED on 5
     end
-    wait 30 s
   else
     set old %self.name%
     %morph% %self% %form%
@@ -5151,7 +5142,7 @@ elseif %move% == 3
     end
     set last %targ%
     wait %wait% s
-    if %targ.id% != %targ_id% || %targ.position% == Dead
+    if %self.disabled% || %targ.id% != %targ_id% || %targ.position% == Dead
       * gone
     elseif %targ.var(did_sfdodge)%
       %echo% &&m~%self% claps its hands together, blasting a beam of light that narrowly misses ~%targ%!&&0
