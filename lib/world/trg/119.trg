@@ -6926,68 +6926,84 @@ set leader %self.leader%
 if !%ch% || !%leader% || %ch.is_enemy(%leader%)% || %self.room% != %leader.room%
   halt
 end
-if %ch.affect(11990)%
-  dg_affect #11990 %ch% off silent
-end
+* remove first
+set aff_list 11990
+while %aff_list%
+  set vnum %aff_list.car%
+  set aff_list %aff_list.cdr%
+  dg_affect #%vnum% %ch% off silent
+done
 switch %random.12%
   case 1
     set type MOVE-REGEN
     set amount 1
+    set vnum 11990
     set glow amber
   break
   case 2
     set type MANA-REGEN
     set amount 1
+    set vnum 11991
     set glow cerulean
   break
   case 3
     set type AGE
     set amount 1
+    set vnum 11992
     set glow ghastly
   break
   case 4
     set type AGE
     set amount -1
+    set vnum 11993
     set glow powdery
   break
   case 5
     set type MAX-MOVE
     set amount 10
+    set vnum 11994
     set glow flaxen
   break
   case 6
     set type MAX-MANA
     set amount 10
+    set vnum 11995
     set glow fluvial
   break
   case 7
     set type MAX-HEALTH
     set amount 10
+    set vnum 11996
     set glow ruby
   break
   case 8
     set type MAX-BLOOD
     set amount 10
+    set vnum 11997
     set glow sanguine
   break
   case 9
     set type RESIST-PHYSICAL
     set amount 5
+    set vnum 11998
     set glow mahogany
   break
   case 10
     set type RESIST-MAGICAL
     set amount 5
+    set vnum 11999
     set glow maple
   break
   case 11
     set type INVENTORY
     set amount 5
+    set vnum 11989
     set glow light
   break
   default
     set type DODGE
     set amount 5
+    set vnum 11988
     set glow blurry
   break
 done
@@ -6999,7 +7015,7 @@ while %pos% > 0
   eval pos %pos% - 1
 done
 * message
-dg_affect #11990 %ch% %type% %amount% 300
+dg_affect #%vnum% %ch% %type% %amount% 300
 %send% %ch% ~%self% %verb% itself toward you... you take on a %glow% glow.
 %echoaround% %ch% ~%self% %verb% itself toward ~%ch%... &%ch% takes on a %glow% glow.
 ~
