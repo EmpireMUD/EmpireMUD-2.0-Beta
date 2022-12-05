@@ -7,9 +7,11 @@ foul), crisps, crackers, carrots, cuts of fish and game, brightly colored
 birds, and pots set into the table that hold soup. It has an inviting aroma
 that feels like it's exactly what you need right now.
 ~
-6 0 0 0 3
+6 0 0 0 4
 1000 0 0
 7 0
+C
+100 100
 M
 4
 You eat some fruits and cheeses from the buffet.~
@@ -107,9 +109,11 @@ phase of their respective floors.
                           &cC&0---  liberated wand
                           ----  walking shoes
 ~
-3 p a 0 2
+3 p a 0 3
 0 0 0
 0 0
+C
+1 1
 S
 #11804
 flagon everflowing flowing~
@@ -146,9 +150,11 @@ a looker~
 A looker is here.~
 This item causes the player to 'look' when it loads, then vanishes.
 ~
-3 0 a 0 2
+3 0 a 0 3
 0 0 0
 0 1
+C
+1 1
 T 11805
 S
 #11806
@@ -193,9 +199,11 @@ anthropomorphic household items: teapot, broom, sponge, bucket, mop
 Skycleave, punitive transformation is nevertheless a longstanding tradition for
 pupils who prove disappointing.
 ~
-3 o a 0 2
+3 o a 0 3
 0 0 0
 0 0
+C
+50 50
 S
 #11808
 sapling blue~
@@ -224,9 +232,11 @@ the directory~
 There is a directory engraved on a stone slab.~
 This look description is updated by a script.
 ~
-3 0 0 0 3
+3 0 0 0 4
 0 0 0
 1 0
+C
+100 100
 T 11811
 S
 #11810
@@ -832,9 +842,11 @@ keeping whatever is up there at bay.
    Use the 'difficulty' command to set the difficulty for the next floor before
 proceeding.
 ~
-3 0 0 0 4
+3 0 0 0 5
 0 0 0
 10 0
+C
+250 250
 S
 #11832
 crates wall stacked wooden boxes~
@@ -846,9 +858,11 @@ labeled as precious relics, dangerous artifacts, and irreplaceable books. All
 of the crates are nailed shut. The floor around and under the crates looks
 scorched.
 ~
-3 0 0 0 3
+3 0 0 0 4
 0 0 0
 0 0
+C
+50 50
 T 11835
 S
 #11833
@@ -867,9 +881,11 @@ to have a thick brow ridge above where the eyes would be.
    The sculpture is warded by a shimmering wall of light that surrounds the
 dais and prevents you from getting too close.
 ~
-3 0 0 0 2
+3 0 0 0 3
 0 0 0
 2 0
+C
+250 250
 S
 #11834
 table overturned heavy barricade~
@@ -880,9 +896,11 @@ unceremoniously onto its side and one of the legs is cracked. Still, this
 hefty mahogany table provides a safe spot to fling spells -- or arrows -- at
 any threat.
 ~
-3 0 0 0 2
+3 0 0 0 3
 0 0 0
 0 0
+C
+50 50
 I 11 11835 100.00 1 b  # LIGHT: burning barricade
 T 11835
 S
@@ -895,9 +913,11 @@ against intruders or rescuers, you cannot tell. The makeshift barricade has
 collapsed as it burns. Luckily, it doesn't seem to catch any of the tower's
 rare and expensive ebony paneling on fire.
 ~
-3 c 0 0 3
+3 c 0 0 4
 0 0 0
 0 12
+C
+50 50
 S
 #11836
 repository rough-worked worked pedestal scaldorran's scaldorrans lich~
@@ -913,9 +933,11 @@ the death of a sorcerer. But when a sorcerer commands vast power and abundant
 cleverness, it is possible to prepare a repository to anchor their magic to the
 mortal plane after their body has rotted and their soul has moved on.
 ~
-3 0 0 0 4
+3 0 0 0 5
 0 0 0
 4 0
+C
+250 250
 T 11836
 S
 #11837
@@ -953,9 +975,11 @@ standing on legs. The tower and legs are both made of stone, though the tower
 is a bit crooked and doesn't form a perfect cylinder. In all regards except for
 the legs, it resembles a little sorcery tower.
 ~
-3 0 0 0 1
+3 0 0 0 2
 0 0 0
 1 0
+C
+150 150
 S
 #11840
 greaves skycleaver magitanium set~
@@ -1575,9 +1599,11 @@ gold ink and an elegant script:
                         4. Cultivator is single-use
                 5. Skycleave does not warrant against death
 ~
-3 gp a 0 1
+3 gp a 0 2
 0 0 0
 12 0
+C
+50 50
 T 11860
 S
 #11861
@@ -1628,9 +1654,11 @@ touch it, but it's solid. You can't force your arm through and it seems to be
 impervious to magic. This powerful shadow magic must be coming from somewhere
 nearby.
 ~
-3 0 0 0 3
+3 0 0 0 4
 0 0 0
 10 0
+C
+250 250
 T 11887
 S
 #11864
@@ -1759,9 +1787,11 @@ A swirling vortex atop the tower keeps you from climbing the stairs.~
 can't even climb the stairs. It sounds like somebody is locked in mortal combat
 above you and you won't be able to climb the stairs until someone has died.
 ~
-3 0 0 0 4
+3 0 0 0 5
 0 0 0
 10 0
+C
+250 250
 T 11887
 S
 #11871
@@ -1777,9 +1807,11 @@ in an endless cycle. Surely this is what is responsible for the sorry state of
 the Tower Skycleave. Your only hope now is to burn the heartwood in hopes of
 ending the cycle and rescuing the sorcerers from this odious time loop.
 ~
-3 j 0 0 5
+3 j 0 0 6
 0 0 0
 12 0
+C
+250 250
 T 11971
 S
 #11872
@@ -1893,9 +1925,11 @@ transcendental.
 gifted him one made by pixies. In the right hands, it has the power to evoke
 powerful emotions and draw listeners into an enchanted dance.
 ~
-22 0 ao 0 3
+22 0 ao 0 4
 1 0 0
 12 0
+C
+1 1
 M
 2
 You play a soft, sad melody on the flute...~
@@ -2130,9 +2164,11 @@ you take care not to trip into it as there's no railing or step around it. The
 viridescent light from the glowing shell shimmers off of the water, dancing
 around on the ceiling.
 ~
-5 0 0 0 6
+5 0 0 0 7
 1000000 1000000 11885
 12 0
+C
+100 100
 M
 4
 You kneel down and drink the $T from the pool.~
@@ -2200,9 +2236,11 @@ avoid falling in. Each one is almost as wide as your armspan, and round in
 shape, but none of them is very deep. The pools closer to the stairs are
 well-lit, while the ones in the back of the grotto are difficult to see.
 ~
-5 0 0 0 4
+5 0 0 0 5
 1000000 1000000 11885
 12 0
+C
+100 100
 M
 4
 You kneel down and drink the $T from one of the pools.~
@@ -2223,9 +2261,11 @@ nevertheless a great work of art.
    Destroying the sculpture is the furthest thing from your mind. Or, it was,
 until just now. Vanity and narcissism are common pitfalls of great sorcerers.
 ~
-3 0 0 0 4
+3 0 0 0 5
 0 0 0
 8 0
+C
+150 150
 T 11886
 S
 #11887
@@ -2238,9 +2278,11 @@ reach through it. As you try, you see visions of the pixy queen in your mind.
 A crooked grin breaks on her face as she laughs -- cackles, even -- at your
 attempt to pass her impenetrable shield.
 ~
-3 c 0 0 2
+3 c 0 0 3
 0 0 0
 10 0
+C
+250 250
 T 11887
 S
 #11888
@@ -2255,9 +2297,11 @@ revolting urge to taste it.
    To the people of Smol Nes-Pik, wasting the tree's sap is a great crime, as
 every last pint of it is precious.
 ~
-3 0 0 0 3
+3 0 0 0 4
 0 0 0
 0 0
+C
+1 1
 M
 18
 The sap dries up and crystallizes.~
@@ -2271,9 +2315,11 @@ Thousands of tiny splinters hover in the air!~
 drawing more and more wood from the sides of the hollow, until the air is so
 full of them you can hardly breathe!
 ~
-3 0 0 0 1
+3 0 0 0 2
 0 0 0
 0 0
+C
+1 1
 S
 #11890
 struggle~
@@ -2281,9 +2327,11 @@ the struggle~
 The struggle is real.~
 You're struggling to get free! (struggle)
 ~
-3 p a 0 2
+3 p a 0 3
 0 0 0
 0 5
+C
+150 150
 M
 17
 Your struggle ends.~
@@ -2299,9 +2347,11 @@ Sap is flowing from the tree.~
    The sap has totally encased you! You can do little else but watch the Great
 Tree fall into rot and ruin.
 ~
-3 0 0 0 2
+3 0 0 0 3
 0 0 0
 0 10
+C
+1 1
 M
 18
 Sap drips onto you.~
@@ -2432,9 +2482,11 @@ of the person the stone is attuned to. The process rarely succeeds at enriching
 the stone as the stone's power is easily absorbed by an injured soul rather
 than the other way around.
 ~
-15 0 a 0 8
+15 0 a 0 9
 1 0 0
 1 0
+C
+1 1
 R
 4 5193 0
 S
@@ -2448,8 +2500,10 @@ and knapped into a rough circle.
    All colors of jade are prized by goblins, light blue most of all for its
 resemblance to the sky.
 ~
-3 p a 0 8
+3 p a 0 9
 0 0 0
 1 0
+C
+1 1
 S
 $
