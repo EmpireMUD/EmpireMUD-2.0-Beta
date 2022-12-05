@@ -1299,7 +1299,7 @@ void do_sstat_room(char_data *ch) {
 
 
 void do_sstat_object(char_data *ch, obj_data *j) {
-	msg_to_char(ch, "Script information (id %d):\r\n", j->script_id);
+	msg_to_char(ch, "Script information (id %d):\r\n", SCRIPT(j) ? obj_script_id(j) : j->script_id);
 	if (!SCRIPT(j)) {
 		msg_to_char(ch, "  None.\r\n");
 		return;
@@ -1310,7 +1310,7 @@ void do_sstat_object(char_data *ch, obj_data *j) {
 
 
 void do_sstat_character(char_data *ch, char_data *k) {
-	msg_to_char(ch, "Script information (id %d):\r\n", k->script_id);
+	msg_to_char(ch, "Script information (id %d):\r\n", SCRIPT(k) ? char_script_id(k) : k->script_id);
 	if (!SCRIPT(k)) {
 		msg_to_char(ch, "  None.\r\n");
 		return;
