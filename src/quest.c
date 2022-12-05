@@ -5078,14 +5078,15 @@ void get_quest_giver_display(struct quest_giver *list, char *save_buffer) {
 *
 * @param struct quest_reward *list Pointer to the start of a list of quest rewards.
 * @param char *save_buffer A buffer to store the result to.
+* @param bool show_vnums If TRUE, shows vnums with any applicable rewards. If FALSE, does not.
 */
-void get_quest_reward_display(struct quest_reward *list, char *save_buffer) {
+void get_quest_reward_display(struct quest_reward *list, char *save_buffer, bool show_vnums) {
 	struct quest_reward *reward;
 	int count = 0;
 	
 	*save_buffer = '\0';
 	LL_FOREACH(list, reward) {		
-		sprintf(save_buffer + strlen(save_buffer), "%2d. %s: %s\r\n", ++count, quest_reward_types[reward->type], quest_reward_string(reward, TRUE));
+		sprintf(save_buffer + strlen(save_buffer), "%2d. %s: %s\r\n", ++count, quest_reward_types[reward->type], quest_reward_string(reward, show_vnums));
 	}
 	
 	// empty list not shown
@@ -5147,7 +5148,7 @@ void do_stat_quest(char_data *ch, quest_data *quest) {
 	get_requirement_display(QUEST_TASKS(quest), part);
 	size += snprintf(buf + size, sizeof(buf) - size, "Tasks:\r\n%s", *part ? part : " none\r\n");
 	
-	get_quest_reward_display(QUEST_REWARDS(quest), part);
+	get_quest_reward_display(QUEST_REWARDS(quest), part, TRUE);
 	size += snprintf(buf + size, sizeof(buf) - size, "Rewards:\r\n%s", *part ? part : " none\r\n");
 	
 	// scripts
@@ -5226,7 +5227,7 @@ void olc_show_quest(char_data *ch) {
 	get_requirement_display(QUEST_TASKS(quest), lbuf);
 	sprintf(buf + strlen(buf), "Tasks: <%stasks\t0>\r\n%s", OLC_LABEL_PTR(QUEST_TASKS(quest)), lbuf);
 	
-	get_quest_reward_display(QUEST_REWARDS(quest), lbuf);
+	get_quest_reward_display(QUEST_REWARDS(quest), lbuf, TRUE);
 	sprintf(buf + strlen(buf), "Rewards: <%srewards\t0>\r\n%s", OLC_LABEL_PTR(QUEST_REWARDS(quest)), lbuf);
 	
 	// scripts
