@@ -836,6 +836,9 @@ if %move% == 1 && !%self.aff_flagged(BLIND)%
     * dodged: switch targ
     %echo% &&m%obj.cap% bounces off the wall and rebounds toward ~%self%!&&0
     set targ %self%
+    if %diff% == 1
+      dg_affect #11856 %targ% TO-HIT 25 20
+    end
   end
   * hit either them or me
   if %targ%
@@ -844,7 +847,7 @@ if %move% == 1 && !%self.aff_flagged(BLIND)%
       case 1
         %echo% &&m%obj% bonks ~%targ% in the head!&&0
         %damage% %targ% 100 physical
-        if %diff% == 4
+        if %diff% == 4 && (%self.level% + 100) > %targ.level% && !%targ.aff_flagged(!STUN)%
           dg_affect #11851 %targ% STUNNED on 5
         end
       break
@@ -893,7 +896,7 @@ elseif %move% == 2 && !%self.aff_flagged(BLIND)%
     * miss
     %echo% &&m~%self% whips a fistful of sand out of ^%self% pocket and throws it toward ~%targ%... but it blows back in ^%self% face.&&0
     if %diff% == 1
-      dg_affect #11856 %ch% TO-HIT 25 20
+      dg_affect #11856 %targ% TO-HIT 25 20
     end
     dg_affect #11841 %self% BLIND on 5
   else
@@ -972,7 +975,8 @@ if %move% == 1 && !%self.aff_flagged(BLIND)%
     if %diff% < 3
       dg_affect #11852 %self% HARD-STUNNED on 5
     end
-    if %diff% < 2
+    if %diff% == 1
+      dg_affect #11856 %targ% TO-HIT 25 20
       %damage% %self% 10 physical
     end
   else
@@ -1103,7 +1107,8 @@ if %move% == 1 && !%self.aff_flagged(BLIND)%
     if %diff% < 3
       dg_affect #11852 %self% HARD-STUNNED on 5
     end
-    if %diff% < 2
+    if %diff% == 1
+      dg_affect #11856 %targ% TO-HIT 25 20
       %damage% %self% 10 physical
     end
   else
@@ -1267,6 +1272,9 @@ elseif %move% == 2
           end
         elseif %ch.is_pc%
           %send% %ch% &&mYou cover your eyes as you dodge out of the way of the blinding barrage!&&0
+          if %diff% == 1
+            dg_affect #11856 %ch% TO-HIT 25 20
+          end
         end
         if %cycle% < %diff% && !%broke%
           %send% %ch% &&m**** Here comes another one... ****&&0 (dodge)
@@ -1476,17 +1484,20 @@ if %move% == 1 && !%self.aff_flagged(BLIND)%
       set fail 1
       %echo% &&mThe rainbow beam misses and scatters like a prism as it hits the vines.&&0
       if %diff% == 1
-        dg_affect #11856 %ch% TO-HIT 25 20
+        dg_affect #11856 %targ% TO-HIT 25 20
       end
-    elseif %targ.trigger_counterspell%
-      set fail 2
-      %echo% &&mThe rainbow beam cascades off of |%targ% counterspell and ricochets back at ~%self%!&&0
     else
       %send% %targ% &&mYou're picked up by the swirling rainbow light...&&0
       %echoaround% %targ% &&m~%targ% is picked up by the swirling rainbow light...&&0
     end
   else
     %echo% &&m~%self% blasts ~%targ% with a rainbow beam... it picks *%targ% right up off the ground...&&0
+  end
+  if !%fail%
+    if %targ.trigger_counterspell%
+      set fail 2
+      %echo% &&mThe rainbow beam cascades off of |%targ% counterspell and ricochets back at ~%self%!&&0
+    end
   end
   if !%fail%
     set old_shortdesc %targ.name%
@@ -1569,7 +1580,7 @@ elseif %move% == 3
     * miss
     %echo% &&mA shimmering beam of light from ~%self% ricochets off a pair of saplings and smacks the queen in the face!&&0
     if %diff% == 1
-      dg_affect #11856 %ch% TO-HIT 25 20
+      dg_affect #11856 %targ% TO-HIT 25 20
     end
     dg_affect #11841 %self% BLIND on 5
   elseif %targ.trigger_counterspell%
@@ -1729,6 +1740,9 @@ if %move% == 1 && !%self.aff_flagged(BLIND)%
     set miss 1
   elseif %targ.var(did_sfdodge)%
     set miss 1
+    if %diff% == 1
+      dg_affect #11856 %targ% TO-HIT 25 20
+    end
   end
   * hit either them or me
   if %miss%
@@ -1794,6 +1808,9 @@ elseif %move% == 2 && !%self.aff_flagged(BLIND)%
     * miss
     %echo% &&mThe dangling vine whips up suddenly, but hits ~%self% by mistake!&&0
     set miss 1
+    if %diff% == 1
+      dg_affect #11856 %targ% TO-HIT 25 20
+    end
   else
     * hit
     switch %random.3%
@@ -2623,7 +2640,7 @@ if %room.template% == 11835
   set kara %room.people(11847)%
   if %kara%
     %echo% The otherworlder shrieks and whips one of its long arms at ~%kara%, who is hit in the head and stunned!
-    dg_affect %kara% STUNNED on 30
+    dg_affect #11852 %kara% STUNNED on 30
     wait 3 sec
     if %self.fighting% || %self.disabled%
       halt
@@ -3445,6 +3462,9 @@ if %move% == 1
         set dur 1
       end
       dg_affect #11841 %self% BLIND on %dur%
+      if %diff% == 1
+        dg_affect #11856 %targ% TO-HIT 25 20
+      end
     end
   else
     * hit
@@ -3674,6 +3694,9 @@ if %move% == 1
       * gone
     elseif %targ.var(did_sfdodge)%
       %echo% &&m~%self% looses an arrow at ~%targ%, but it thuds into the far wall!&&0
+      if %diff% == 1
+        dg_affect #11856 %targ% TO-HIT 25 20
+      end
     else
       * hit
       %echo% &&m~%self% fires an arrow at ~%targ%!&&0
@@ -3875,6 +3898,9 @@ elseif %move% == 2
     * gone
   elseif %targ.var(did_sfdodge)%
     %echo% &&m~%self% lunges forward with gnashing fangs and narrowly misses ~%targ% with the strike!&&0
+    if %diff% == 1
+      dg_affect #11856 %targ% TO-HIT 25 20
+    end
   else
     * hit
     %echo% &&m~%self% lunges foward and bites right into ~%targ% with ^%self% enormous fangs!&&0
@@ -4068,7 +4094,9 @@ if %move% == 1
   else
     %echo% &&m~%self% bashes ~%targ% with ^%self% shield!
     eval dur %diff% * 5
-    dg_affect #11851 %targ% STUNNED on %dur%
+    if (%self.level% + 100) > %targ.level% && !%targ.aff_flagged(!STUN)%
+      dg_affect #11851 %targ% STUNNED on %dur%
+    end
     if %diff% > 1
       %send% %targ% That really hurt!
       eval amt %diff% * 50
@@ -4112,7 +4140,7 @@ elseif %move% == 2
       %at% %targ.room% %echoaround% %targ% ~%targ% flies in from above and splats next to the fountain!
       %slay% %targ%
     else
-      if %diff% > 1
+      if %diff% > 1 && (%self.level% + 100) > %targ.level% && !%targ.aff_flagged(!STUN)%
         %send% %targ% You fly into the wall and hit your head! That hurt!
         eval dur %diff% * 3
         dg_affect #11851 %targ% STUNNED on %dur%
@@ -4201,6 +4229,10 @@ if %move% == 1
         if %self.is_enemy(%ch%)%
           if %ch.var(did_sfdodge)%
             %send% %ch% &&mYou manage to narrowly dodge the chain lightning!&&0
+            if %diff% == 1
+              dg_affect #11856 %ch% off
+              dg_affect #11856 %ch% TO-HIT 25 20
+            end
           elseif %ch.trigger_counterspell%
             %echo% &&m|%ch% counterspell deflects a bolt of lightning back at Lady Virduke!&&0
             eval amt 200 / %diff%
@@ -4336,6 +4368,9 @@ elseif %move% == 3
             %damage% %ch% %ouch% magical
           elseif %ch.is_pc%
             %send% %ch% &&mYou narrowly avoid a rainbow beam!&&0
+            if %diff% == 1
+              dg_affect #11856 %ch% TO-HIT 25 20
+            end
           end
           if %cycle% < %diff%
             %send% %ch% &&m**** The rainbow is still spinning wildly... ****&&0 (dodge)
@@ -4431,7 +4466,7 @@ if %move% == 1
     elseif %targ.var(did_sfdodge)%
       %echo% &&mA shadow assasssin slices through the air, just past ~%targ%, and vanishes as it hits the floor!&&0
       if %diff% == 1
-         dg_affect #11856 %targ% off silent
+         dg_affect #11856 %targ% off
          dg_affect #11856 %targ% TO-HIT 25 20
      end
     else
@@ -4472,6 +4507,9 @@ elseif %move% == 2
     elseif %targ.var(did_sfdodge)%
       %send% %targ% &&mYou bend out of the way as ~%self% tries to jab you with the knife!&&0
       %echoaround% %targ% ~%targ% bends out of the way just as ~%self% tries to jab *%targ% with a knife!
+      if %diff% == 1
+        dg_affect #11856 %targ% TO-HIT 25 20
+      end
       unset targ
     end
   end
@@ -4726,6 +4764,9 @@ elseif %move% == 2
           %damage% %ch% 80 physical
         elseif %ch.is_pc%
           %send% %ch% &&mYou manage to dodge the dancing cane sword!&&0
+          if %diff% == 1
+            dg_affect #11856 %ch% TO-HIT 25 20
+          end
         end
         if %cycle% < %diff%
           %send% %ch% &&m**** The cane sword is still dancing through the air! ****&&0 (dodge)
@@ -4889,6 +4930,12 @@ end
 switch %self.vnum%
   case 11864
     * mana deconfabulator: counterspell
+    if %actor.fighting%
+      if %actor.fighting.is_pc%
+        %send% %actor% You can't use @%self% in PVP.
+        halt
+      end
+    end
     %send% %actor% You seem to have broken @%self% but not before it protects you with some kind of counterspell!
     %echoaround% %actor% ~%actor% breaks @%self% and starts to glow, slightly.
     dg_affect #3021 %actor% MANA-REGEN -1 1800
@@ -4901,6 +4948,9 @@ switch %self.vnum%
     if !%targ%
       %send% %actor% You're not even fighting anybody.
       halt
+    elseif %targ.is_pc%
+      %send% %actor% You can't use @%self% in PVP.
+      halt
     end
     %send% %actor% You hurl @%self% at ~%targ%... it hits *%targ% in the head!
     dg_affect #11865 %targ% SLOW on 30
@@ -4910,6 +4960,9 @@ switch %self.vnum%
     * dynamic reconfabulator: stuns mob
     if !%targ%
       %send% %actor% You're not even fighting anybody.
+      halt
+    elseif %targ.is_pc%
+      %send% %actor% You can't use @%self% in PVP.
       halt
     end
     %send% %actor% You throw @%self% at ~%targ%... it hits *%targ% in the head!
@@ -5212,6 +5265,9 @@ elseif %move% == 3
       * gone
     elseif %targ.var(did_sfdodge)%
       %echo% &&m~%self% claps its hands together, blasting a beam of light that narrowly misses ~%targ%!&&0
+      if %diff% == 1
+        dg_affect #11856 %targ% TO-HIT 25 20
+      end
     else
       * hit
       %echo% &&m~%self% claps its hands together, blasting a beam of light that hits ~%targ% square in the chest!&&0
@@ -5287,6 +5343,9 @@ if %move% == 1
           %damage% %ch% 100 physical
         elseif %ch.is_pc%
           %send% %ch% &&mYou manage to dodge the dancing cane sword!&&0
+          if %diff% == 1
+            dg_affect #11856 %ch% TO-HIT 25 20
+          end
         end
         if %cycle% < %diff%
           %send% %ch% &&m**** The cane sword is still dancing through the vortex! ****&&0 (dodge)
@@ -5374,6 +5433,10 @@ elseif %move% == 3
         if %self.is_enemy(%ch%)%
           if %ch.var(did_sfdodge)%
             %send% %ch% &&mYou manage to narrowly dodge the chain lightning!&&0
+            if %diff% == 1
+              dg_affect #11856 %ch% off
+              dg_affect #11856 %ch% TO-HIT 25 20
+            end
           elseif %ch.trigger_counterspell%
             %echo% &&m|%ch% counterspell deflects a bolt of lightning toward ~%self%!&&0
             if %diff% == 1
@@ -5486,58 +5549,61 @@ skyfight lockout 30 35
 if %move% == 1 && !%self.aff_flagged(BLIND)%
   * Baleful Polymorph
   skyfight clear dodge
-  set target %random.enemy%
-  if !%target%
-    set target %actor%
+  set targ %random.enemy%
+  if !%targ%
+    set targ %actor%
   end
   if %diff% == 1
     set vnum 11854
   else
     set vnum 11855
   end
-  if %target.morph% == %vnum%
+  if %targ.morph% == %vnum%
     * already morphed
     nop %self.set_cooldown(11800,0)%
     halt
   end
   * wait?
-  set target_id %target.id%
+  set targ_id %targ.id%
   set fail 0
   if %diff% <= 2
-    %send% %target% &&m**** &&Z~%self% waves her hands... An eerie green light casts out toward you... ****&&0 (dodge)
-    %echoaround% %target% &&m~%self% waves her hands... An eerie green light casts out toward ~%target%...&&0
-    skyfight setup dodge %target%
+    %send% %targ% &&m**** &&Z~%self% waves her hands... An eerie green light casts out toward you... ****&&0 (dodge)
+    %echoaround% %targ% &&m~%self% waves her hands... An eerie green light casts out toward ~%targ%...&&0
+    skyfight setup dodge %targ%
     wait 8 s
     if %self.disabled%
       halt
     end
-    if !%target% || %target.id% != %target_id%
-      * lost target
+    if !%targ% || %targ.id% != %targ_id%
+      * lost targ
       set fail 1
-    elseif %target.var(did_sfdodge)%
+    elseif %targ.var(did_sfdodge)%
       set fail 1
       %echo% &&mThe green light scatters into the distance as Mezvienne's spell misses.&&0
       if %diff% == 1
-        dg_affect #11856 %target% TO-HIT 25 20
+        dg_affect #11856 %targ% TO-HIT 25 20
       end
-    elseif %target.trigger_counterspell%
-      set fail 2
-      %echo% &&mThe green light rebounds and smacks ~%self% in the face -- she looks stunned!&&0
     else
-      %send% %target% &&mYou are enveloped in the green light...&&0
+      %send% %targ% &&mYou are enveloped in the green light...&&0
     end
   else
     %echo% &&m~%self% waves her hands as an eerie green light casts out over the tower...&&0
   end
   if !%fail%
-    set old_shortdesc %target.name%
-    %morph% %target% %vnum%
-    %echoaround% %target% &&m%old_shortdesc% is suddenly transformed into ~%target%!&&0
-    %send% %target% &&m**** You are suddenly transformed into %target.name%! ****&&0 (fastmorph normal)
-    if %diff% == 4 && (%self.level% + 100) > %target.level% && !%target.aff_flagged(!STUN)%
-      dg_affect #11851 %target% STUNNED on 5
+    if %targ.trigger_counterspell%
+      set fail 2
+      %echo% &&mThe green light rebounds and smacks ~%self% in the face -- she looks stunned!&&0
+    end
+  end
+  if !%fail%
+    set old_shortdesc %targ.name%
+    %morph% %targ% %vnum%
+    %echoaround% %targ% &&m%old_shortdesc% is suddenly transformed into ~%targ%!&&0
+    %send% %targ% &&m**** You are suddenly transformed into %targ.name%! ****&&0 (fastmorph normal)
+    if %diff% == 4 && (%self.level% + 100) > %targ.level% && !%targ.aff_flagged(!STUN)%
+      dg_affect #11851 %targ% STUNNED on 5
     elseif %diff% >= 2
-      nop %target.command_lag(ABILITY)%
+      nop %targ.command_lag(ABILITY)%
     end
   elseif %fail% == 2 || %diff% == 1
     dg_affect #11852 %self% HARD-STUNNED on 10
@@ -5709,31 +5775,28 @@ if %self.cooldown(11800)% || %self.disabled%
 end
 set room %self.room%
 set diff %self.diff%
-* order
-set moves_left %self.var(moves_left)%
-set num_left %self.var(num_left,0)%
-if !%moves_left% || !%num_left%
-  set moves_left 1 2 3 4
-  set num_left 4
+set m_l %self.var(m_l)%
+set n_m %self.var(n_m,0)%
+if !%m_l% || !%n_m%
+  set m_l 1 2 3 4
+  set n_m 4
 end
-* pick
-eval which %%random.%num_left%%%
-set old %moves_left%
-set moves_left
+eval which %%random.%n_m%%%
+set old %m_l%
+set m_l
 set move 0
 while %which% > 0
   set move %old.car%
   if %which% != 1
-    set moves_left %moves_left% %move%
+    set m_l %m_l% %move%
   end
   set old %old.cdr%
   eval which %which% - 1
 done
-set moves_left %moves_left% %old%
-* store
-eval num_left %num_left% - 1
-remote moves_left %self.id%
-remote num_left %self.id%
+set m_l %m_l% %old%
+eval n_m %n_m% - 1
+remote m_l %self.id%
+remote n_m %self.id%
 skyfight lockout 30 35
 if %move% == 1 && !%self.aff_flagged(BLIND)%
   skyfight clear free
@@ -5778,7 +5841,6 @@ if %move% == 1 && !%self.aff_flagged(BLIND)%
     skyfight setup free %targ%
     eval time %diff% * 15
     dg_affect #11863 %targ% HARD-STUNNED on %time%
-    * wait and clear
     set done 0
     while !%done% && %time% > 0
       wait 5 s
@@ -5831,12 +5893,15 @@ elseif %move% == 2
         if %self.is_enemy(%ch%)%
           if %ch.var(did_sfdodge)%
             %send% %ch% &&mYou manage to narrowly dodge the streaming shadows!&&0
+            if %diff% == 1
+              dg_affect #11856 %ch% off
+              dg_affect #11856 %ch% TO-HIT 25 20
+            end
           else
             if %ch.trigger_counterspell%
               %echo% &&mThe Shadow Ascendant sparks with primordial energy as it consumes |%ch% counterspell!&&0
               dg_affect #11864 %self% BONUS-MAGICAL 10 -1
             end
-            * hit
             %echo% &&mA shadow cuts straight through ~%ch% as it streams into the Ascendant!&&0
             %damage% %ch% 120 physical
             if %cycle% == 4 && %diff% == 4 && (%self.level% + 100) > %ch.level% && !%ch.aff_flagged(!STUN)%
@@ -5891,7 +5956,6 @@ elseif %move% == 3
             %echo% &&m~%self% sparks with primordial energy as it consumes |%ch% counterspell!&&0
             dg_affect #11864 %self% BONUS-MAGICAL 10 -1
           end
-          * hit!
           %send% %ch% &&mThe freezing air stings your skin, eyes, and lungs!&&0
           %echoaround% %ch% &&m~%ch% cries out as the air freezes *%ch%!&&0
           %damage% %ch% 100 magical
@@ -5931,6 +5995,9 @@ elseif %move% == 4
         %damage% %ch% 200 magical
       elseif %ch.is_pc%
         %send% %ch% &&mYou narrowly avoid a slice from the shadow axe!&&0
+        if %diff% == 1
+          dg_affect #11856 %ch% TO-HIT 25 20
+        end
       end
     end
     set ch %next_ch%
@@ -5944,7 +6011,6 @@ elseif %move% == 4
   end
   wait 8 s
 end
-* in case
 nop %self.remove_mob_flag(NO-ATTACK)%
 ~
 #11857
@@ -6149,6 +6215,9 @@ if %move% == 1
       * gone
     elseif %targ.var(did_sfdodge)%
       %echo% &&mA tendril whips out from the Shade but misses ~%targ%!&&0
+      if %diff% == 1
+        dg_affect #11856 %targ% TO-HIT 25 20
+      end
     else
       * hit
       %echo% &&mA shadow tendril whips out from the Shade and flogs ~%targ%!&&0
@@ -6193,6 +6262,9 @@ elseif %move% == 2
           %damage% %ch% 100 physical
         elseif %ch.is_pc%
           %send% %ch% &&mYou narrowly avoid a flailing tendril!&&0
+          if %diff% == 1
+            dg_affect #11856 %ch% TO-HIT 25 20
+          end
         end
         if %cycle% < %diff%
           %send% %ch% &&m**** The Shade is still flailing! ****&&0 (dodge)
@@ -6387,17 +6459,20 @@ if %move% == 1 && !%self.aff_flagged(BLIND)%
       set fail 1
       %echo% &&mThe spell from Barrosh's staff bounces around the room but hits nothing.&&0
       if %diff% == 1
-        dg_affect #11856 %ch% TO-HIT 25 20
+        dg_affect #11856 %targ% TO-HIT 25 20
       end
-    elseif %targ.trigger_counterspell%
-      set fail 2
-      %echo% &&mThe spell rebounds and smacks ~%self% in the face -- he looks stunned!&&0
     else
       %send% %targ% &&mYou are enveloped in an eerie violet light from the staff...&&0
     end
     skyfight clear interrupt
   else
     %echo% &&m~%self% stamps his staff three times...&&0
+  end
+  if !%fail%
+    if %targ.trigger_counterspell%
+      set fail 2
+      %echo% &&mThe spell rebounds off of |%targ% counterspell and smacks ~%self% in the face -- he looks stunned!&&0
+    end
   end
   if !%fail%
     set old_shortdesc %targ.name%

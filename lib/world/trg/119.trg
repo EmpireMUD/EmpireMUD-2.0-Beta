@@ -1209,6 +1209,9 @@ elseif %move% == 3
         %damage% %ch% 200 magical
       elseif %ch.is_pc%
         %send% %ch% &&mYou narrowly avoid the lion's massive paw!&&0
+        if %diff% == 1
+          dg_affect #11856 %ch% TO-HIT 25 20
+        end
       end
     end
     set ch %next_ch%
@@ -1257,6 +1260,10 @@ elseif %move% == 4
         if %self.is_enemy(%ch%)%
           if %ch.var(did_sfdodge)%
             %send% %ch% &&mYou move just in time as Skithe Ler-Wyn appears behind you, slashing at the air where you just stood!&&0
+            if %diff% == 1
+              dg_affect #11856 %ch% off
+              dg_affect #11856 %ch% TO-HIT 25 20
+            end
           else
             %send% %ch% &&mA lion appears behind you, cutting a deep slash with her claws!&&0
             %echoaround% %ch% &&m~%ch% shouts out in pain as a time lion appears behind *%ch% and cuts deep!&&0
@@ -5453,6 +5460,9 @@ if %move% == 1
           %damage% %ch% 100 physical
         elseif %ch.is_pc%
           %send% %ch% &&jYou narrowly avoid the hammer dance!&&0
+          if %diff% == 1
+            dg_affect #11856 %ch% TO-HIT 25 20
+          end
         end
         if %cycle% < %diff%
           %send% %ch% &&j**** He's whirling back around again and bellowing in a deep voice... ****&&0 (dodge)
@@ -5498,8 +5508,9 @@ elseif %move% == 2
     if %diff% < 3
       dg_affect #11852 %self% HARD-STUNNED on 5
     end
-    if %diff% < 2
+    if %diff% == 1
       %damage% %self% 10 physical
+      dg_affect #11856 %targ% TO-HIT 25 20
     end
   else
     * hit
@@ -5568,6 +5579,9 @@ elseif %move% == 4
   elseif %targ.var(did_sfdodge)%
     * miss
     %echo% &&j|%self% hammers plunk into the sand as he misses ~%targ%!&&0
+    if %diff% == 1
+      dg_affect #11856 %targ% TO-HIT 25 20
+    end
   else
     * hit
     %send% %targ% &&j|%self% hammers soar through the air and hit |%targ% head one after the other!&&0
@@ -5595,34 +5609,29 @@ if %self.cooldown(11800)% || %self.disabled%
 end
 set room %self.room%
 set diff %self.diff%
-* always be countering
 dg_affect #3021 %self% SOULMASK on 15
-* order
-set moves_left %self.var(moves_left)%
-set num_left %self.var(num_left,0)%
-if !%moves_left% || !%num_left%
-  set moves_left 1 2 3 4
-  set num_left 4
+set m_l %self.var(m_l)%
+set n_m %self.var(n_m,0)%
+if !%m_l% || !%n_m%
+  set m_l 1 2 3 4
+  set n_m 4
 end
-* pick
-eval which %%random.%num_left%%%
-set old %moves_left%
-set moves_left
+eval which %%random.%n_m%%%
+set old %m_l%
+set m_l
 set move 0
 while %which% > 0
   set move %old.car%
   if %which% != 1
-    set moves_left %moves_left% %move%
+    set m_l %m_l% %move%
   end
   set old %old.cdr%
   eval which %which% - 1
 done
-set moves_left %moves_left% %old%
-* store
-eval num_left %num_left% - 1
-remote moves_left %self.id%
-remote num_left %self.id%
-* perform move
+set m_l %m_l% %old%
+eval n_m %n_m% - 1
+remote m_l %self.id%
+remote n_m %self.id%
 skyfight lockout 30 35
 if %move% == 1 && !%self.aff_flagged(BLIND)%
   * Jar of Captivity
@@ -5718,6 +5727,10 @@ elseif %move% == 2
         if %self.is_enemy(%ch%)%
           if %ch.var(did_sfdodge)%
             %send% %ch% &&mYou manage to narrowly dodge the lightning bolts!&&0
+            if %diff% == 1
+              dg_affect #11856 %ch% off
+              dg_affect #11856 %ch% TO-HIT 25 20
+            end
           else
             if %ch.trigger_counterspell%
               %send% %ch% Your counterspell does nothing against the Iskip!
@@ -5823,6 +5836,9 @@ elseif %move% == 4
         %damage% %ch% 200 physical
       elseif %ch.is_pc%
         %send% %ch% &&mYou narrowly avoid the giant's radiant axe!&&0
+        if %diff% == 1
+          dg_affect #11856 %ch% TO-HIT 25 20
+        end
       end
     end
     set ch %next_ch%
@@ -5956,6 +5972,9 @@ elseif %move% == 2
           %damage% %ch% 130 physical
         elseif %ch.is_pc%
           %send% %ch% &&AYou cover your eyes as you swim out of the way of an imploding bubble!&&0
+          if %diff% == 1
+            dg_affect #11856 %ch% TO-HIT 25 20
+          end
         end
         if %cycle% < %diff%
           %send% %ch% &&A**** Here comes another one... ****&&0 (dodge)
@@ -6228,6 +6247,9 @@ elseif %move% == 2
           %damage% %ch% 150 physical
         elseif %ch.is_pc%
           %send% %ch% &&mYou duck behind the furniture as the air explodes!&&0
+          if %diff% == 1
+            dg_affect #11856 %ch% TO-HIT 25 20
+          end
         end
         if %cycle% < %diff%
           %send% %ch% &&m**** Here comes another one... ****&&0 (dodge)
@@ -6450,6 +6472,9 @@ if %move% == 1
           %dot% #11957 %ch% 100 15 physical 4
         elseif %ch.is_pc%
           %send% %ch% &&jYou narrowly avoid the axe-nado!&&0
+          if %diff% == 1
+            dg_affect #11856 %ch% TO-HIT 25 20
+          end
         end
         if %cycle% < %diff%
           %send% %ch% &&j**** She's still spinning... ****&&0 (dodge)
@@ -6490,6 +6515,9 @@ elseif %move% == 2
   elseif %targ.var(did_sfdodge)%
     * miss
     %echo% &&jThe sand from |%self% sand slash misses ~%targ%!&&0
+    if %diff% == 1
+      dg_affect #11856 %targ% TO-HIT 25 20
+    end
   else
     * hit
     %echo% &&jThe sand flies into |%targ% eyes!&&0
@@ -6580,6 +6608,9 @@ elseif %move% == 4
           %damage% %ch% 100 physical
         elseif %ch.is_pc%
           %send% %ch% &&jA hatchet just misses you as it falls!&&0
+          if %diff% == 1
+            dg_affect #11856 %ch% TO-HIT 25 20
+          end
         end
         if %cycle% < %diff%
           %send% %ch% &&j**** There are still more hatchets coming down! ****&&0 (dodge)
@@ -6669,6 +6700,9 @@ if %move% == 1
           %dot% #11951 %ch% 100 40 physical 25
         elseif %ch.is_pc%
           %send% %ch% &&jThe lashing whip hits the sand near your feet!&&0
+          if %diff% == 1
+            dg_affect #11856 %ch% TO-HIT 25 20
+          end
         end
         if %cycle% < %diff%
           %send% %ch% &&j**** Here come the whips again... ****&&0 (dodge)
@@ -6773,7 +6807,7 @@ elseif %move% == 3
       if !%ch.var(did_sfdodge)%
         set hit 1
         %echo% &&j~%self% trips ~%ch% with her thorny whip!&&0
-        if %diff% >= 3 && (%self.level% + 100) <= %ch.level%
+        if %diff% >= 3 && (%self.level% + 100) <= %ch.level% && !%ch.aff_flagged(!STUN)%
           dg_affect #11814 %ch% STUNNED on 10
         else
           dg_affect #11814 %ch% DISARMED on 10
@@ -6784,6 +6818,9 @@ elseif %move% == 3
         end
       elseif %ch.is_pc%
         %send% %ch% &&jThe whip sends sand spraying as it narrowly misses your feet!&&0
+        if %diff% == 1
+          dg_affect #11856 %ch% TO-HIT 25 20
+        end
       end
     end
     set ch %next_ch%

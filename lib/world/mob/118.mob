@@ -464,7 +464,7 @@ goblin uncaged~
 uncaged goblin~
 Uncaged goblin is here.
 ~
-150 250 abdJ 0 2
+150 250 abdJ s 2
 0 0 0 15
 D
 Strings set by trig 11824.
@@ -521,7 +521,7 @@ Venjer fox goblin~
 Venjer the Fox~
 Venjer the Fox is prodding at the vines with a staff.
 ~
-150 250 abdEJ c 2
+150 250 abdxEJ c 2
 2 0 0 17
 D
    Venjer is a small woman, though she stands tall and proud, light on her feet
@@ -581,7 +581,7 @@ pixy queen majestic~
 the pixy queen~
 A majestic pixy queen dazzles you with blinding sparkles!
 ~
-150 250 abdEJ c 3
+150 250 abdxEJ c 3
 2 0 0 28
 D
    The pixy queen is scarcely more than a colorful sparkle of light. As your
@@ -1744,7 +1744,7 @@ mercenary nature mage~
 nature mage mercenary~
 Nature mage mercenary is playing with fire.
 ~
-150 250 abdvIJ c 3
+150 250 abdvxIJ c 3
 0 0 0 16
 D
 This mob is loaded by trig 11900/skymerc and named by 11857.
@@ -1936,7 +1936,7 @@ Rojjer bleak~
 Bleak Rojjer~
 Bleak Rojjer is searching for something on the left side of the room.
 ~
-150 250 bdvEIJ cCE 3
+150 250 bdvzEIJ cCE 3
 1 0 0 4
 D
    Bleak Rojjer's back is to you as you enter. He must think you're one of his
@@ -1993,7 +1993,7 @@ Trixton Vye~
 Trixton Vye~
 Trixton Vye is searching for something.
 ~
-150 250 bdvyEIJ c 3
+150 250 bdvyEIJ chE 3
 1 0 0 5
 D
    When you enter the room, you do not initially notice Trixton Vye. It's not
@@ -2304,7 +2304,7 @@ shadow ascendant mezvienne shade~
 the Shadow Ascendant~
 The Shadow Ascendant looms over the chamber as it draws more and more power!
 ~
-150 250 bdhxyzJ choE 3
+150 250 bdhxyJ choE 3
 0 0 0 20
 D
    The shade, once merely a projection of the powerful enchantress Mezvienne,
@@ -2490,7 +2490,7 @@ Mezvienne shade shadow~
 the Shade of Mezvienne~
 The Shade of Mezvienne surrounds Knezz like a phantom.
 ~
-150 250 bdhyJ chCDE 3
+150 250 bdhJ cCDE 3
 0 0 0 7
 D
    The Shade is lithe, feminine, even graceful as it swirls back and forth
@@ -2682,7 +2682,7 @@ lion time skithe ler-wyn lerwyn~
 the Lion of Time~
 Skithe Ler-Wyn, the Lion of Time, has erupted from Mezvienne's limp body!
 ~
-150 250 bdhyzEJ c 3
+150 250 bdhyzEJ cE 3
 2 0 0 10
 D
    Mezvienne the Enchantress floats limp and bloody in the time stream, her
@@ -3081,7 +3081,7 @@ Iskip giant~
 Iskip of Rot and Ruin~
 The giant stands knee-deep in the water, turned away from you. (difficulty)
 ~
-150 250 bdhxyDJ c 6
+150 250 bdhvxyzDJ chDE 6
 1 0 0 19
 D
    The giant Iskip is truly huge -- you'd scarcely reach his ankles if he were

@@ -50,14 +50,14 @@ spinning a long whip made from Christmas lights, and not just any Who can stop
 him! Drive him off before it's too late.
 ~
 I 4 16663 14.00 1 l  # LOOT: rocking horse saddle
-I 4 16670 14.00 1 l  # LOOT: hearty Christmas spirit
-I 4 16671 14.00 1 l  # LOOT: generous Christmas spirit
-I 4 16672 14.00 1 l  # LOOT: serene Christmas spirit
-I 4 16673 14.00 1 l  # LOOT: warm Christmas spirit
-I 4 16674 14.00 1 l  # LOOT: anxious Christmas spirit
-I 4 16675 14.00 1 l  # LOOT: nostalgic Christmas spirit
-I 4 16664 1.00 1 l  # LOOT: mini-grinchy pet whistle
-I 4 16665 1.00 1 l  # LOOT: reindeer dog minipet whistle
+I 4 16670 13.00 1 l  # LOOT: hearty Christmas spirit
+I 4 16671 13.00 1 l  # LOOT: generous Christmas spirit
+I 4 16672 13.00 1 l  # LOOT: serene Christmas spirit
+I 4 16673 13.00 1 l  # LOOT: warm Christmas spirit
+I 4 16674 13.00 1 l  # LOOT: anxious Christmas spirit
+I 4 16675 13.00 1 l  # LOOT: nostalgic Christmas spirit
+I 4 16664 4.00 1 l  # LOOT: mini-grinchy pet whistle
+I 4 16665 4.00 1 l  # LOOT: reindeer dog minipet whistle
 T 16603
 T 16614
 T 16615
@@ -780,14 +780,14 @@ a normal human foot. His wrists and ankles each drag chains behind them, and a
 birch switch is strapped across his back.
 ~
 I 4 16663 14.00 1 l  # LOOT: rocking horse saddle
-I 4 16670 14.00 1 l  # LOOT: hearty Christmas spirit
-I 4 16671 14.00 1 l  # LOOT: generous Christmas spirit
-I 4 16672 14.00 1 l  # LOOT: serene Christmas spirit
-I 4 16673 14.00 1 l  # LOOT: warm Christmas spirit
-I 4 16674 14.00 1 l  # LOOT: anxious Christmas spirit
-I 4 16675 14.00 1 l  # LOOT: nostalgic Christmas spirit
-I 4 16679 1.00 1 l  # LOOT: tiny krampus whistle
-I 4 16685 1.00 1 l  # LOOT: burning straw goat whistle
+I 4 16670 13.00 1 l  # LOOT: hearty Christmas spirit
+I 4 16671 13.00 1 l  # LOOT: generous Christmas spirit
+I 4 16672 13.00 1 l  # LOOT: serene Christmas spirit
+I 4 16673 13.00 1 l  # LOOT: warm Christmas spirit
+I 4 16674 13.00 1 l  # LOOT: anxious Christmas spirit
+I 4 16675 13.00 1 l  # LOOT: nostalgic Christmas spirit
+I 4 16679 4.00 1 l  # LOOT: tiny krampus whistle
+I 4 16685 4.00 1 l  # LOOT: burning straw goat whistle
 T 16681
 T 16682
 T 16603
