@@ -4881,13 +4881,13 @@ end
 return 1
 set arg %arg.cdr%
 if !%arg%
-  set targ %self.fighting%
+  set targ %actor.fighting%
 else
   set targ %actor.char_target(%arg.car%)%
   if !%targ%
     %send% %actor% You don't see %arg.car% here.
     halt
-  elseif !%self.is_enemy(%targ%)%
+  elseif !%actor.is_enemy(%targ%)%
     %send% %actor% You can't use that on *%targ% right now.
     halt
   elseif %targ.aff_flagged(!ATTACK)%
