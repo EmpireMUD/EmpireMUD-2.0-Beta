@@ -1927,7 +1927,19 @@ elseif %mode% == setup
     set ch %target%
   end
   while %ch%
-    if !%all% || %self.is_enemy(%ch%)%
+    set ok 0
+    if %all%
+      if %self.is_enemy(%ch%)% || %self.is_pc%
+        set ok 1
+      elseif %self.leader%
+        if %self.leader.is_pc%
+          set ok 1
+        end
+      end
+    else
+      set ok 1
+    end
+    if %ok%
       set %needs_varname% 1
       set %did_varname% 0
       remote %needs_varname% %ch.id%
@@ -4857,6 +4869,71 @@ elseif %move% == 5
 end
 * in case
 nop %self.remove_mob_flag(NO-ATTACK)%
+~
+#11850
+Skycleave: Use magical items~
+1 c 2
+use~
+if %actor.obj_target_inv(%arg.car%)% != %self%
+  return 0
+  halt
+end
+return 1
+set arg %arg.cdr%
+if !%arg%
+  set targ %self.fighting%
+else
+  set targ %actor.char_target(%arg.car%)%
+  if !%targ%
+    %send% %actor% You don't see %arg.car% here.
+    halt
+  elseif !%self.is_enemy(%targ%)%
+    %send% %actor% You can't use that on *%targ% right now.
+    halt
+  elseif %targ.aff_flagged(!ATTACK)%
+    %send% %actor% You can't use that on *%targ%.
+    halt
+  end
+end
+* vnum-based
+switch %self.vnum%
+  case 11864
+    * mana deconfabulator: counterspell
+    %send% %actor% You seem to have broken @%self% but not before it protects you with some kind of counterspell!
+    %echoaround% %actor% ~%actor% breaks @%self% and starts to glow, slightly.
+    dg_affect #3021 %actor% MANA-REGEN -1 1800
+    %purge% %self%
+    * do not fall through
+    halt
+  break
+  case 11865
+    * ether condenser: slow and lower to-hit
+    if !%targ%
+      %send% %actor% You're not even fighting anybody.
+      halt
+    end
+    %send% %actor% You hurl @%self% at ~%targ%... it hits *%targ% in the head!
+    dg_affect #11865 %targ% SLOW on 30
+    dg_affect #11865 %targ% TO-HIT -50 30
+  break
+  case 11867
+    * dynamic reconfabulator: stuns mob
+    if !%targ%
+      %send% %actor% You're not even fighting anybody.
+      halt
+    end
+    %send% %actor% You throw @%self% at ~%targ%... it hits *%targ% in the head!
+    if !%targ.aff_flagged(!STUN)%
+      %echoaround% %targ% ...&%targ% seems stunned.
+      dg_affect #11851 %targ% STUNNED on 9
+    end
+  break
+done
+* if we made it this far, ensure we're fighting
+if !%targ.fighting%
+  %force% %targ% maggro %actor%
+end
+%purge% %self%
 ~
 #11851
 Skycleave: Shared mob speech trigger~

@@ -322,6 +322,15 @@ absorbed spell~
 T5
 ...$e has absorbed some power!~
 S
+#11865
+condensed ether~
+4 0
+0 0 0 0
+T0
+The condensed ether fades and you can move again.~
+T5
+...$e's being slowed by condensed ether!~
+S
 #11867
 momentarily stunned~
 4 0

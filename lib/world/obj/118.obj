@@ -1669,17 +1669,19 @@ Someone has left their mana deconfabulator on the ground.~
 particularly heavy. It's made from striped magewood and nocturnium straps, with
 a crystal orb on one end and an eventide horn on the other. You don't see a way
 to turn it on; or, perhaps it isn't working any more.
+   You can 'use' this deconfabulator to cast a temporary counterspell.
    Magical energy, often called mana, is a tangled thing, often tainted by the
 stray thoughts and dreams of wizards and sorcerers. Purifying mana is nearly
 impossible, but deconfabulating it can be done with the right equipment.
 ~
-15 e a 0 4
+15 e a 0 5
 1 0 0
 2 0
 C
 150 150
 R
 4 5193 0
+T 11850
 S
 #11865
 condenser ether~
@@ -1688,15 +1690,17 @@ An ether condenser is humming on the ground.~
    The odd black metal box is inscribed all over with golden letters in a
 script you don't read. It makes a low hum and is, at all times, cold to the
 touch, but you can't figure out how to open it, nor what it's doing.
+   You can 'use' this condenser to throw it at an enemy in combat.
    Some mages have posited that the ether can be used as a source of mana.
 ~
-15 e a 0 4
+15 e a 0 5
 1 0 0
 2 0
 C
 150 150
 R
 4 5193 0
+T 11850
 S
 #11866
 man wooden carved~
@@ -1726,16 +1730,18 @@ There is a dynamic reconfabulator on the ground.~
 ring around it and a nocturnium stake through the center. You have no knowledge
 of how to use it -- if, indeed, it serves some function or purpose at all. But
 you do notice that it's ice cold to the touch.
+   You can 'use' this reconfabulator to throw it at an enemy in combat.
    When mana becomes too pure, it sometimes becomes explosive. As this can be a
 side-effect of deconfabulation, the proper solution is a reconfabulator.
 ~
-15 e a 0 4
+15 e a 0 5
 1 0 0
 2 0
 C
 150 150
 R
 4 5193 0
+T 11850
 S
 #11868
 prototype wellstone miniature~
