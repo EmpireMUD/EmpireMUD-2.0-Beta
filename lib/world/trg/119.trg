@@ -1123,7 +1123,7 @@ if %move% == 1
         if %diff% >= 2
           dg_affect #11859 %ch% TO-HIT -%hit% 20
         end
-        %damage% %ch% %hit% magical
+        %damage% %ch% 80 magical
       end
     end
     set ch %next_ch%
@@ -1173,8 +1173,7 @@ elseif %move% == 2
         set next_ch %ch.next_in_room%
         if %ch.affect(11822)%
           %send% %ch% &&m**** You feel your very being as it's ripped apart by your forsaken fate! ****&&0 (struggle)
-          eval amount %diff% * 25
-          %damage% %ch% %amount% magical
+          %damage% %ch% 100 magical
         end
         set ch %next_ch%
       eval cycle %cycle% + 1
@@ -1207,8 +1206,7 @@ elseif %move% == 3
       if !%ch.var(did_sfdodge)%
         set hit 1
         %echo% &&mThere's a scream from ~%ch% as ^%ch% years are cut short by ~%self%!&&0
-        eval amt %diff% * 50
-        %damage% %ch% %amt% magical
+        %damage% %ch% 200 magical
       elseif %ch.is_pc%
         %send% %ch% &&mYou narrowly avoid the lion's massive paw!&&0
       end
@@ -1232,7 +1230,6 @@ elseif %move% == 4
   skyfight clear dodge
   skyfight clear interrupt
   skyfight setup interrupt all
-  eval dam 25 + (25 * %diff%)
   set cycle 0
   set broke 0
   while !%broke% && %cycle% <= 4
@@ -1264,9 +1261,9 @@ elseif %move% == 4
             %send% %ch% &&mA lion appears behind you, cutting a deep slash with her claws!&&0
             %echoaround% %ch% &&m~%ch% shouts out in pain as a time lion appears behind *%ch% and cuts deep!&&0
             if %diff% > 1
-              %dot% #11842 %ch% %dam% 20 physical 5
+              %dot% #11842 %ch% 125 20 physical 5
             end
-            %damage% %ch% %dam% physica
+            %damage% %ch% 125 physical
           end
         end
         set ch %next_ch%
@@ -5453,8 +5450,7 @@ if %move% == 1
             dg_affect #11956 %ch% off silent
             dg_affect #11956 %ch% IMMOBILIZE on 10
           end
-          eval amt %diff% * 33
-          %damage% %ch% %amt% physical
+          %damage% %ch% 100 physical
         elseif %ch.is_pc%
           %send% %ch% &&jYou narrowly avoid the hammer dance!&&0
         end
@@ -5512,8 +5508,7 @@ elseif %move% == 2
       %send% %targ% &&jYou're seeing stars!&&0
       dg_affect #11851 %targ% STUNNED on 15
     end
-    eval dam 60 + (%diff% * 20)
-    %damage% %targ% %dam% physical
+    %damage% %targ% 150 physical
   end
   skyfight clear dodge
 elseif %move% == 3
@@ -5583,8 +5578,7 @@ elseif %move% == 4
       %send% %targ% &&jYou're seeing stars!&&0
       dg_affect #11952 %targ% IMMOBILIZED on 30
     end
-    eval dam 60 + (%diff% * 20)
-    %damage% %targ% %dam% physical
+    %damage% %targ% 150 physical
     wait 10 2 s
     dg_affect #11953 %self% off
   end
@@ -5731,8 +5725,7 @@ elseif %move% == 2
             * hit
             %send% %ch% &&mA lightning bolt strikes you right in the chest!&&0
             %echoaround% %ch% &&m~%ch% screams as a lightning bolt strikes *%ch%!&&0
-            eval amount %diff% * 30
-            %damage% %ch% %amount% physical
+            %damage% %ch% 120 physical
             if %cycle% == 4 && %diff% == 4 && (%self.level% + 100) > %ch.level% && !%ch.aff_flagged(!STUN)%
               dg_affect #11851 %ch% STUNNED on 10
             end
@@ -5827,8 +5820,7 @@ elseif %move% == 4
       if !%ch.var(did_sfdodge)%
         set hit 1
         %echo% &&mThe giant's radiant axe slices through ~%ch%!&&0
-        eval amt %diff% * 50
-        %damage% %ch% %amt% physical
+        %damage% %ch% 200 physical
       elseif %ch.is_pc%
         %send% %ch% &&mYou narrowly avoid the giant's radiant axe!&&0
       end
@@ -5961,8 +5953,7 @@ elseif %move% == 2
           if %cycle% == %diff% && %diff% >= 3 && (%self.level% + 100) > %ch.level% && !%ch.aff_flagged(!STUN)%
             dg_affect #11851 %ch% STUNNED on 5
           end
-          eval amt %diff% * 33
-          %damage% %ch% %amt% physical
+          %damage% %ch% 130 physical
         elseif %ch.is_pc%
           %send% %ch% &&AYou cover your eyes as you swim out of the way of an imploding bubble!&&0
         end
@@ -6016,8 +6007,7 @@ elseif %move% == 3
           * hit and no counterspell
           %send% %ch% &&AYou gurgle in pain as the wave passes through you!&&0
           %echoaround% %ch% &&A~%ch% gurgles in pain as the wave passes through *%ch%!&&0
-          eval amount %diff% * 20
-          %damage% %ch% %amount% physical
+          %damage% %ch% 100 physical
           if %cycle% == 4 && %diff% == 4 && (%self.level% + 100) > %ch.level% && !%ch.aff_flagged(!STUN)%
             dg_affect #11851 %ch% STUNNED on 10
           end
@@ -6207,8 +6197,7 @@ if %move% == 1
         set next_ch %ch.next_in_room%
         if %ch.affect(11822)%
           %send% %ch% &&m**** You bleed from your arms and legs as the thorny vines cut into you! ****&&0 (struggle)
-          eval amount %diff% * 20
-          %damage% %ch% %amount% magical
+          %damage% %ch% 100 magical
         end
         set ch %next_ch%
       eval cycle %cycle% + 1
@@ -6236,8 +6225,7 @@ elseif %move% == 2
           if %cycle% == %diff% && %diff% >= 3 && (%self.level% + 100) > %ch.level% && !%ch.aff_flagged(!STUN)%
             dg_affect #11851 %ch% STUNNED on 5
           end
-          eval amt %diff% * 33
-          %damage% %ch% %amt% physical
+          %damage% %ch% 150 physical
         elseif %ch.is_pc%
           %send% %ch% &&mYou duck behind the furniture as the air explodes!&&0
         end
@@ -6301,8 +6289,7 @@ elseif %move% == 3
               %send% %ch% You're having trouble moving!
             break
           done
-          eval dam %diff% * 10
-          %damage% %ch% %dam% physical
+          %damage% %ch% 50 physical
         end
       end
       set ch %next_ch%
@@ -6358,8 +6345,7 @@ elseif %move% == 4
           * hit!
           %send% %ch% &&mThe scalding air burns your skin, eyes, and lungs!&&0
           %echoaround% %ch% &&m~%ch% screams as the air scalds *%ch%!&&0
-          eval amount %diff% * 25
-          %damage% %ch% %amount% magical
+          %damage% %ch% 100 magical
         end
         set ch %next_ch%
       done
@@ -6461,8 +6447,7 @@ if %move% == 1
         if !%ch.var(did_sfdodge)%
           set hit 1
           %echo% &&j~%self% slices ~%ch% as she whirls around the arena!&&0
-          eval amt 60 + (%diff% * 20)
-          %dot% #11957 %ch% %amt% 15 physical 4
+          %dot% #11957 %ch% 100 15 physical 4
         elseif %ch.is_pc%
           %send% %ch% &&jYou narrowly avoid the axe-nado!&&0
         end
@@ -6516,8 +6501,7 @@ elseif %move% == 2
       dg_affect #11959 %ch% BLIND on 10
     end
     if %diff% >= 3
-      eval dam 20 + (%diff% * 20)
-      %damage% %targ% %dam% physical
+      %damage% %targ% 100 physical
     end
   end
   skyfight clear dodge
@@ -6560,8 +6544,7 @@ elseif %move% == 3
       set next_ch %ch.next_in_room%
       if %self.is_enemy(%ch%)%
         dg_affect #11959 %ch% BLIND on 20
-        eval pain %diff% * 25
-        %dot% #11960 %ch% %pain% 10 physical
+        %dot% #11960 %ch% 75 10 physical
       end
       set ch %next_ch%
     done
@@ -6594,8 +6577,7 @@ elseif %move% == 4
         if !%ch.var(did_sfdodge)%
           set hit 1
           %echo% &&jA hatchet comes down on |%ch% head!&&0
-          eval pain (%diff% * 25) + 25
-          %damage% %ch% %pain% physical
+          %damage% %ch% 100 physical
         elseif %ch.is_pc%
           %send% %ch% &&jA hatchet just misses you as it falls!&&0
         end
@@ -6684,8 +6666,7 @@ if %move% == 1
         if !%ch.var(did_sfdodge)%
           set hit 1
           %echo% &&j~%self% lashes ~%ch% with her thorny whips!&&0
-          eval amt %diff% * 25
-          %dot% #11951 %ch% %amt% 40 physical 25
+          %dot% #11951 %ch% 100 40 physical 25
         elseif %ch.is_pc%
           %send% %ch% &&jThe lashing whip hits the sand near your feet!&&0
         end
@@ -6740,12 +6721,11 @@ elseif %move% == 2
     end
     set cycle 0
     set done 0
-    eval amt %diff% * 25
     while %cycle% < 5 && !%done%
       wait 4 s
       if %targ.id% == %targ_id% && %targ.affect(11822)% && %diff% > 1
         %send% %targ% &&jThe thorns press into you! That really hurts!&&0
-        %dot% #11951 %targ% %amt% 40 physical 25
+        %dot% #11951 %targ% 100 40 physical 25
       else
         set done 1
       end
@@ -6769,8 +6749,7 @@ elseif %move% == 2
         set done 1
       else
         %send% %targ% &&jThe thorns press into you! That really hurts!&&0
-        eval amt %diff% * 25
-        %dot% #11951 %ch% %amt% 40 physical 25
+        %dot% #11951 %ch% 100 40 physical 25
       end
     done
     skyfight clear free
@@ -6801,8 +6780,7 @@ elseif %move% == 3
           dg_affect #11814 %ch% IMMOBILIZED on 10
         end
         if %diff% > 1
-          eval amt %diff% * 25
-          %dot% #11951 %ch% %amt% 40 physical 25
+          %dot% #11951 %ch% 100 40 physical 25
         end
       elseif %ch.is_pc%
         %send% %ch% &&jThe whip sends sand spraying as it narrowly misses your feet!&&0

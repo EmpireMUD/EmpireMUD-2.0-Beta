@@ -1263,8 +1263,7 @@ elseif %move% == 2
             if %cycle% == %diff% && %diff% >= 2
               dg_affect #11823 %ch% BLIND on 10
             end
-            eval amt %diff% * 33
-            %damage% %ch% %amt% magical
+            %damage% %ch% 150 magical
           end
         elseif %ch.is_pc%
           %send% %ch% &&mYou cover your eyes as you dodge out of the way of the blinding barrage!&&0
@@ -1324,8 +1323,7 @@ elseif %move% == 3
           end
           dg_affect #11818 %ch% TO-HIT -%debuff% 15
           dg_affect #11818 %ch% DODGE -%debuff% 15
-          eval amt %diff% * 33
-          %damage% %ch% %amt% physical
+          %damage% %ch% 100 physical
         elseif %ch.is_pc%
           %send% %ch% &&mYou jump at just the right time and avoid the tower quake!&&0
           if %diff% == 1
@@ -1539,8 +1537,7 @@ elseif %move% == 2
         set next_ch %ch.next_in_room%
         if %ch.affect(11822)%
           %send% %ch% &&m**** You bleed from your arms and legs as the thorny vines cut into you! ****&&0 (struggle)
-          eval amount %diff% * 15
-          %damage% %ch% %amount% magical
+          %damage% %ch% 100 magical
         end
         set ch %next_ch%
       eval cycle %cycle% + 1
@@ -1583,8 +1580,7 @@ elseif %move% == 3
     %echo% &&mAs ~%self% glares at ~%targ%, a shimmering beam of light blasts *%targ% right in the eyes!&&0
     dg_affect #11841 %targ% BLIND on 20
     if %diff% > 1
-      eval dam %diff% * 15
-      %damage% %targ% %dam% magical
+      %damage% %targ% 75 magical
     end
   end
   skyfight clear dodge
@@ -4212,8 +4208,7 @@ if %move% == 1
           else
             * hit
             %echo% &&mThe chain lightning hits ~%ch%!&&0
-            eval amount %diff% * 30
-            %damage% %ch% %amount% physical
+            %damage% %ch% 100 physical
             if %cycle% == 4 && %diff% == 4 && (%self.level% + 100) > %ch.level% && !%ch.aff_flagged(!STUN)%
               dg_affect #11851 %ch% STUNNED on 10
             end
@@ -4442,8 +4437,7 @@ if %move% == 1
     else
       * hit
       %echo% &&mA shadow assassin stabs from the dark, cutting into ~%targ% out of nowhere!&&0
-      eval pain 40 + (%diff% * 40)
-      %damage% %targ% %pain% physical
+      %damage% %targ% 200 physical
       if %diff% > 2
         %send% %targ% &&mYou're knocked off balance by the surprise attack!&&0
         dg_affect #11818 %targ% TO-HIT -15 30
@@ -4488,8 +4482,7 @@ elseif %move% == 2
     if %diff% > 1
       %send% %targ% &&mThe wound burns! The knife must have been coated in venom...&&0
       %echoaround% %targ% &&m~%targ% looks seriously ill!&&0
-      eval ouch %diff% * 125
-      %dot% #11858 %targ% %ouch% 15 poison
+      %dot% #11858 %targ% 200 15 poison
     end
     %damage% %targ% 100 physical
   end
@@ -4670,7 +4663,6 @@ if %move% == 1
   if %needed% > 4
     set needed 4
   end
-  eval dam %diff% * 25
   while !%broke% && %cycle% < 5
     wait 4 s
     if %self.sfinterrupt_count% >= %needed%
@@ -4694,7 +4686,7 @@ if %move% == 1
         set next_ch %ch.next_in_room%
         if %self.is_enemy(%ch%)%
           %echo% &&mFlying debris slams into ~%ch%!&&0
-          %damage% %ch% %dam% physical
+          %damage% %ch% 100 physical
           if %cycle% == 4 && %diff% == 4 && (%self.level% + 100) > %ch.level% && !%ch.aff_flagged(!STUN)%
             dg_affect #11851 %ch% STUNNED on 10
           end
@@ -4717,7 +4709,6 @@ elseif %move% == 2
   %echo% &&m**** The cane sword dances through the air... and it's dancing right toward you! ****&&0 (dodge)
   set cycle 1
   set hit 0
-  eval dam %diff% * 20
   eval wait 10 - %diff%
   while %cycle% <= %diff%
     skyfight setup dodge all
@@ -4732,7 +4723,7 @@ elseif %move% == 2
           if %diff% > 2
             %dot% #11842 %ch% 50 20 physical 4
           end
-          %damage% %ch% %dam% physical
+          %damage% %ch% 80 physical
         elseif %ch.is_pc%
           %send% %ch% &&mYou manage to dodge the dancing cane sword!&&0
         end
@@ -4766,7 +4757,6 @@ elseif %move% == 3
   if %needed% > 4
     set needed 4
   end
-  eval dam %diff% * 25
   eval heal %diff% * 15
   while !%broke% && %cycle% < 5
     wait 4 s
@@ -4794,7 +4784,7 @@ elseif %move% == 3
           if %diff% > 1
             %heal% %self% health %heal%
           end
-          %damage% %ch% %dam% physical
+          %damage% %ch% 100 physical
         end
         set ch %next_ch%
       done
@@ -5205,7 +5195,6 @@ elseif %move% == 3
   end
   wait 1
   set cycle 1
-  eval pain 40 + (%diff% * 40)
   eval wait 8 - %diff%
   set last 0
   while %cycle% <= (2 * %diff%)
@@ -5226,7 +5215,7 @@ elseif %move% == 3
     else
       * hit
       %echo% &&m~%self% claps its hands together, blasting a beam of light that hits ~%targ% square in the chest!&&0
-      %damage% %targ% %pain% direct
+      %damage% %targ% 200 direct
     end
     skyfight clear dodge
     eval cycle %cycle% + 1
@@ -5282,7 +5271,6 @@ if %move% == 1
   wait 3 s
   %echo% &&m**** The cane sword dances through the vortex... and it's dancing right toward you! ****&&0 (dodge)
   set cycle 1
-  eval dam %diff% * 20
   eval wait 10 - %diff%
   while %cycle% <= %diff%
     skyfight setup dodge all
@@ -5296,7 +5284,7 @@ if %move% == 1
           if %diff% > 2
             %dot% #11842 %ch% 50 20 physical 4
           end
-          %damage% %ch% %dam% physical
+          %damage% %ch% 100 physical
         elseif %ch.is_pc%
           %send% %ch% &&mYou manage to dodge the dancing cane sword!&&0
         end
@@ -5338,10 +5326,8 @@ elseif %move% == 2
         else
           set this 1
           %echo% &&mA throwing knife slices through the air and straight into |%ch% chest!&&0
-          eval dam %diff% * 10
-          eval ouch %diff% * 20
-          %dot% #11811 %ch% %ouch% 10 physical 3
-          %damage% %ch% %dam% physical
+          %dot% #11811 %ch% 80 10 physical 3
+          %damage% %ch% 100 physical
         end
       end
       set ch %next_ch%
@@ -5396,8 +5382,7 @@ elseif %move% == 3
           else
             * hit
             %echo% &&mThe chain lightning hits ~%ch%!&&0
-            eval amount %diff% * 30
-            %damage% %ch% %amount% physical
+            %damage% %ch% 120 physical
             if %cycle% == 4 && %diff% == 4 && (%self.level% + 100) > %ch.level% && !%ch.aff_flagged(!STUN)%
               dg_affect #11851 %ch% STUNNED on 10
             end
@@ -5450,8 +5435,7 @@ elseif %move% == 4
           * hit!
           %send% %ch% &&mThe freezing air stings your skin, eyes, and lungs!&&0
           %echoaround% %ch% &&m~%ch% cries out as the air freezes *%ch%!&&0
-          eval amount %diff% * 25
-          %damage% %ch% %amount% magical
+          %damage% %ch% 100 magical
         end
         set ch %next_ch%
       done
@@ -5607,8 +5591,7 @@ elseif %move% == 2
             * hit and no counterspell
             %send% %ch% &&mThe blinding light of dawn burns you!&&0
             %echoaround% %ch% &&m~%ch% recoils as the light burns *%ch%!&&0
-            eval amount %diff% * 15
-            %damage% %ch% %amount% magical
+            %damage% %ch% 100 magical
             if %cycle% == 4 && %diff% == 4
               dg_affect #11841 %ch% BLIND on 10
             end
@@ -5703,8 +5686,7 @@ elseif %move% == 4
         set next_ch %ch.next_in_room%
         if %ch.affect(11822)%
           %send% %ch% &&m**** You burn from the inside out as you face your dark fate! ****&&0 (struggle)
-          eval amount %diff% * 15
-          %damage% %ch% %amount% magical
+          %damage% %ch% 100 magical
         end
         set ch %next_ch%
       eval cycle %cycle% + 1
@@ -5856,8 +5838,7 @@ elseif %move% == 2
             end
             * hit
             %echo% &&mA shadow cuts straight through ~%ch% as it streams into the Ascendant!&&0
-            eval amount %diff% * 30
-            %damage% %ch% %amount% physical
+            %damage% %ch% 120 physical
             if %cycle% == 4 && %diff% == 4 && (%self.level% + 100) > %ch.level% && !%ch.aff_flagged(!STUN)%
               dg_affect #11851 %ch% STUNNED on 10
             end
@@ -5913,8 +5894,7 @@ elseif %move% == 3
           * hit!
           %send% %ch% &&mThe freezing air stings your skin, eyes, and lungs!&&0
           %echoaround% %ch% &&m~%ch% cries out as the air freezes *%ch%!&&0
-          eval amount %diff% * 25
-          %damage% %ch% %amount% magical
+          %damage% %ch% 100 magical
         end
         set ch %next_ch%
       done
@@ -5948,8 +5928,7 @@ elseif %move% == 4
         end
         set hit 1
         %echo% &&mThe shadow axe slices right through ~%ch%!&&0
-        eval amt %diff% * 50
-        %damage% %ch% %amt% magical
+        %damage% %ch% 200 magical
       elseif %ch.is_pc%
         %send% %ch% &&mYou narrowly avoid a slice from the shadow axe!&&0
       end
@@ -6177,8 +6156,7 @@ if %move% == 1
       dg_affect #11815 %targ% DISARMED on 20
       if %diff% > 1
         %send% %targ% That really hurt!
-        eval pain 40 + (%diff% * 40)
-        %damage% %targ% %pain% physical
+        %damage% %targ% 200 physical
       end
     end
     skyfight clear dodge
@@ -6212,8 +6190,7 @@ elseif %move% == 2
           if %diff% > 1
             dg_affect #11870 %ch% TO-HIT -15 30
           end
-          eval amt %diff% * 20
-          %damage% %ch% %amt% physical
+          %damage% %ch% 100 physical
         elseif %ch.is_pc%
           %send% %ch% &&mYou narrowly avoid a flailing tendril!&&0
         end
@@ -6468,8 +6445,7 @@ elseif %move% == 2
             %echo% &&mA shield forms in front of ~%ch% to block the devastation ritual!&&0
           else
             %echo% &&mThe wave cuts through ~%ch%!&&0
-            eval amount %diff% * 20
-            %damage% %ch% %amount% magical
+            %damage% %ch% 100 magical
           end
         end
         set ch %next_ch%
@@ -6514,8 +6490,7 @@ elseif %move% == 3
           dg_affect #11871 %ch% TO-HIT -%debuff% 30
           dg_affect #11871 %ch% RESIST-MAGICAL -%debuff% 30
           if %diff% >= 3
-            eval amount %diff% * 20
-            %damage% %ch% %amount% magical
+            %damage% %ch% 80 magical
           end
         end
       end
@@ -6532,7 +6507,6 @@ elseif %move% == 4
   end
   wait 1
   eval resist %diff% * 20
-  eval pain 20 + (%diff% * 40)
   set cycle 1
   eval wait 10 - %diff%
   set targ %random.enemy%
@@ -6556,7 +6530,7 @@ elseif %move% == 4
     else
       * hit
       %echo% &&mA powerful deathbolt rockets out of |%self% staff and slams into ~%targ%!&&0
-      %damage% %targ% %pain% magical
+      %damage% %targ% 200 magical
       if %diff% > 1
         dg_affect #11872 %targ% off silent
         dg_affect #11872 %targ% RESIST-MAGICAL -%resist% 20
