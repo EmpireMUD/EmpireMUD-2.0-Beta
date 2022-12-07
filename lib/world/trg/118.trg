@@ -7,13 +7,19 @@ if %random.3% == 3
 end
 ~
 #11801
-Skycleave: Floor 2A mobs: complex leave rules~
+Skycleave: Complex leave rules for floors 2 and 3~
 0 s 100
 ~
-* configs first
-set sneakable_vnums 11815 11816 11817
+set sneakable_vnums 11815 11816 11817 11841 11842 11843 11844 11845 11846
 set maze_vnums 11812 11813 11818 11819 11820 11821 11823 11824 11825 11826
 set pixy_vnums 11820
+* simple checks
+if %direction% == portal || %direction% == down
+  halt
+end
+if %self.var(bribed,0)%
+  halt
+end
 * One quick trick to get the target room
 set room_var %self.room%
 eval tricky %%room_var.%direction%(room)%%
@@ -28,20 +34,11 @@ if %pixy_vnums% ~= %self.vnum% && %actor.varexists(skycleave_queen)%
 end
 * check difficulty if sneakable (group/boss require players to stay behind)
 if %actor.aff_flagged(SNEAK)% && %sneakable_vnums% ~= %self.vnum%
-  set spirit %instance.mob(11900)%
-  if %spirit.diff2% < 3
-    * sneak ok
+  set diff %self.var(diff,1)%
+  eval skill_req 25 * %diff%
+  if %diff% == 1 || %actor.skill(Stealth)% >= %skill_req%
+    * allow sneak
     halt
-  else
-    * hard/group: check for another player staying here
-    set ch %room_var.people%
-    while %ch%
-      if %ch.is_pc% && !%ch.aff_flagged(SNEAK)%
-        * at least 1 player is not sneaking: allow the sneak
-        halt
-      end
-      set ch %ch.next_in_room%
-    done
   end
 end
 * check direction
@@ -65,23 +62,47 @@ end
 return 0
 ~
 #11802
-Skycleave: Mob blocking: sneakable~
-0 q 100
+Skycleave: Bribe mercenaries with coins~
+0 m 1
 ~
-* One quick trick to get the target room
-set room_var %self.room%
-eval tricky %%room_var.%direction%(room)%%
-* Compare template ids to figure out if they're going forward or back
-if (%actor.aff_flagged(SNEAK)% || %actor.nohassle% || !%tricky% || %tricky.template% < %room_var.template%)
+set required 500
+set given %self.var(given,0)%
+if %given% >= %required%
+  say Easy money.
   halt
 end
-* block higher template id only
-if (%tricky.template% < %room_var.template%)
-  halt
+eval given %given% + %amount%
+remote given %self.id%
+if %given% >= %required%
+  set bribed 1
+  remote bribed %self.id%
+  switch %self.vnum%
+    case 11841
+      * rogue mercenary
+      say Don't mind me, I'll just be over here checking the wall.
+    break
+    case 11842
+      * caster mercenary
+      say More than double what that cheap enchantress paid. Go on ahead.
+    break
+    case 11843
+      * archer mercenary
+      say I won't stop you, but just stay away from the boss.
+    break
+    case 11844
+      * nature mage mercenary
+      say Go on, then.
+    break
+    case 11845
+      * vampire mercenary
+      say My love for Vye is worth less than this. You may pass.
+    break
+    case 11846
+      * armored mercenary
+      say Hard to be a soldier of fortune for what they're paying us. This is the better deal. Go on through.
+    break
+  done
 end
-* blocked
-%send% %actor% You can't seem to get past ~%self%!
-return 0
 ~
 #11803
 Skycleave: Custom pickpocket rejection~
@@ -3241,6 +3262,7 @@ if %target%
     case 11846
       * armored merc
       %echo% Scaldorran appears behind ~%target% and silently slides his bandages into |%target% armor... You are forced to watch as ~%target% turns blue in the face and falls to the ground.
+      %regionecho% %room% 1 There's a loud, echoing clang from heavy armor hitting the floor.
     break
     case 11848
       * Bleak Rojjer

@@ -1657,12 +1657,13 @@ $n grits $s teeth.~
 M
 1
 Could get more selling these fixtures than they pay us.~
-T 11802
 T 11841
 T 11857
 T 11852
 T 11821
 T 11822
+T 11801
+T 11802
 S
 #11842
 mercenary caster~
@@ -1699,12 +1700,13 @@ All these books...~
 M
 0
 $n re-casts $s mana shield.~
-T 11802
 T 11857
 T 11842
 T 11852
 T 11821
 T 11822
+T 11801
+T 11802
 S
 #11843
 mercenary archer~
@@ -1732,12 +1734,13 @@ How is she gonna rob a sorcery tower and pay us in dirt?~
 M
 0
 $n cleans $s nails with a knife.~
-T 11802
 T 11857
 T 11843
 T 11852
 T 11822
 T 11821
+T 11801
+T 11802
 S
 #11844
 mercenary nature mage~
@@ -1765,12 +1768,13 @@ Don't like towers.~
 M
 1
 She don't pay enough for towers.~
-T 11802
 T 11857
 T 11844
 T 11852
 T 11821
 T 11822
+T 11801
+T 11802
 S
 #11845
 mercenary vampire~
@@ -1798,12 +1802,13 @@ At least food keeps coming up here on its own.~
 M
 1
 Go stab yourself in the neck for me.~
-T 11802
 T 11857
 T 11845
 T 11852
 T 11821
 T 11822
+T 11801
+T 11802
 S
 #11846
 mercenary armored~
@@ -1831,12 +1836,13 @@ Shouldn't've brought so many of us. The pay is going to be lousy.~
 M
 1
 I hope she's not expecting us to say thank you for this kind of money.~
-T 11802
 T 11857
 T 11846
 T 11852
 T 11821
 T 11822
+T 11801
+T 11802
 S
 #11847
 Kara Virduke~

@@ -2649,8 +2649,10 @@ elseif (%lich_cmds% ~= %cmd%) && (%room.template% == 11836 || %room.template% ==
     set ch %room.people%
     while %ch%
       set next_ch %ch.next_in_room%
-      %dot% #11936 %ch% 1000 30 magical
-      %damage% %ch% 100 magical
+      if !%ch.aff_flagged(!ATTACK)%
+        %dot% #11936 %ch% 1000 30 magical
+        %damage% %ch% 100 magical
+      end
       set ch %next_ch%
     done
     %echo% The spirit returns to the desk, which slams shut with a thud!
