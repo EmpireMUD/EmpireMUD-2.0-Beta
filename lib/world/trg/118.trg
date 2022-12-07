@@ -102,6 +102,8 @@ if %given% >= %required%
       say Hard to be a soldier of fortune for what they're paying us. This is the better deal. Go on through.
     break
   done
+else
+  say It's going to take more than that if you want me to betray Trixton Vye.
 end
 ~
 #11803
