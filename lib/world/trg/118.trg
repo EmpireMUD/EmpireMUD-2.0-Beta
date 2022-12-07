@@ -3198,9 +3198,11 @@ Skycleave: Scaldorran murder spree~
 * the last 3 are the bosses; killing any 1 of them will stop him (only kills 1 boss)
 set merc_list 11841 11842 11843 11844 11845 11846 11848 11847 11849
 * check room first
-set ch %self.room.people%
+set room %self.room%
+set ch %room.people%
 set target 0
 set done 0
+set final 0
 while %ch% && !%target%
   if %ch.is_npc% && %merc_list% ~= %ch.vnum%
     set target %ch%
@@ -3214,47 +3216,58 @@ if %target%
     case 11841
       * rogue merc
       %echo% Scaldorran flies in through |%target% mouth... ~%target% pulls out ^%target% dagger and stabs *%target%self in the heart!
+      %regionecho% %room% 1 &&y~%target% shouts, 'No! No! Nooooooooooo...'&&0
     break
     case 11842
       * caster merc
+      %regionecho% %room% 1 &&y~%target% shouts, 'Stay back, fiend!'&&0
       %echo% ~%target% panics and hurls a spell at Scaldorran, who expertly reflects it. ~%target% is hit in the head and falls to the ground!
     break
     case 11843
       * archer merc
       %echo% ~%target% shoots a dozen arrows into Scaldorran, who comes apart at the wrappings and envelops ~%target%, stabbing *%target% with every arrow!
+      %regionecho% %room% 1 &&y~%target% shouts, 'Aaaaaaaaaaaaaaagh!'&&0
     break
     case 11844
       * nature mage merc
       %echo% ~%target% starts to twist and morph into something enormous... until Scaldorran wraps his bandages around *%target%, whereupon &%target% dissolves into a sticky mess!
+      %regionecho% %room% 1 &&ySomething unrecognizable lets out an anguished shout and then a splattering sound!&&0
     break
     case 11845
       * vampire merc
+      %regionecho% %room% 1 &&y~%target% shouts, 'Face me, lich! I'm more than you can...'&&0
       %echo% Scaldorran twists and whirls and whips ~%target% over and over with his bandages, slicing open thousands of tiny cuts. You watch in horror as ~%target% bleeds out and crumples to the floor.
     break
     case 11846
       * armored merc
-      %echo% Scaldorran appears behind ~%target% and slides his bandages into |%target% armor... You are forced to watch as ~%target% turns blue and falls to the ground.
+      %echo% Scaldorran appears behind ~%target% and silently slides his bandages into |%target% armor... You are forced to watch as ~%target% turns blue in the face and falls to the ground.
     break
     case 11848
       * Bleak Rojjer
+      %regionecho% %room% 1 &&y~%target% shouts a truncated, 'Wha!?'&&0
       %echo% Linen wrappings whip out from the painting on the wall and you are forced to watch as Scaldorran strangles ~%target% and bashes his head against the floor.
       set done 1
     break
     case 11847
       * Kara Virduke
+      %regionecho% %room% 1 &&y~%target% shouts, 'Oh my wo...'&&0
       %echo% Scaldorran pops out of a cabinet just as ~%target% opens it and snakes one of his long linen wrappings down her throat. You watch in horror as she claws at her mouth, unable to stop it.
       set done 1
     break
     case 11849
       * Trixton Vye
-      %echo% Linen wrappings whip out from the painting on the wall and you are forced to watch as Scaldorran strangles ~%target% and bashes his head against the floor.
+      %regionecho% %room% 1 &&y~%target% shouts, 'Pathetic dead thing, face now your new master! By the Vy...'&&0
+      %echo% One of Scaldorran's bandages slices forward through the air, piercing Trixton Vye's decrepit throat above the collar.
+      %echo% Trixton's mouth continues to move, but no sound comes out as a red spot spreads from the top of his shirt.
       set done 1
+      set final 1
     break
   done
   %slay% %target%
-  if %done%
+  if %done% && !%final%
     * last one?
-    if %self.room.template% != 11836
+    if %room.template% != 11836
+      wait 1
       %echo% Scaldorran twists and whirls until his tattered wrappings fold in on themselves and he vanishes!
       mgoto i11836
       %echo% Your blood freezes as the air cracks open and the Lich Scaldorran crawls out of the void!
@@ -3269,7 +3282,7 @@ while %merc_list%
   set vnum %merc_list.car%
   set merc_list %merc_list.cdr%
   set mob %instance.mob(%vnum%)%
-  if %mob% && %mob.room% != %self.room%
+  if %mob% && %mob.room% != %room%
     %echo% Scaldorran twists and whirls until his tattered wrappings fold in on themselves and he vanishes!
     mgoto %mob.room%
     %echo% Your blood freezes as the air cracks open and the Lich Scaldorran crawls out of the void!
@@ -3277,7 +3290,7 @@ while %merc_list%
   end
 done
 * nobody left?
-if %self.room.template% != 11836
+if %room.template% != 11836
   %echo% Scaldorran twists and whirls until his tattered wrappings fold in on themselves and he vanishes!
   mgoto i11836
   %echo% Your blood freezes as the air cracks open and the Lich Scaldorran crawls out of the void!
