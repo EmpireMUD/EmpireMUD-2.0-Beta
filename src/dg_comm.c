@@ -78,30 +78,45 @@ void sub_write_to_char(char_data *ch, char *tokens[], void *otokens[], char type
 				break;
 			}
 			case '^': {
-				if (!otokens[i] || !CAN_SEE(ch, (char_data*) otokens[i]))
+				if (!otokens[i]) {
+					// formerly included: || !CAN_SEE(ch, (char_data*) otokens[i])
+					// TODO if we had plural pronoun support, !see people should be "their"
 					strcat(sb,"its");
-				else if ((char_data*)otokens[i] == ch)
+				}
+				else if ((char_data*)otokens[i] == ch) {
 					strcat(sb,"your");
-				else
+				}
+				else {
 					strcat(sb,HSHR((char_data*) otokens[i]));
+				}
 				break;
 			}
 			case '&': {
-				if (!otokens[i] || !CAN_SEE(ch, (char_data*) otokens[i]))
+				if (!otokens[i]) {
+					// formerly included: || !CAN_SEE(ch, (char_data*) otokens[i])
+					// TODO if we had plural pronoun support, !see people should be "they"
 					strcat(sb,"it");
-				else if ((char_data*)otokens[i] == ch)
+				}
+				else if ((char_data*)otokens[i] == ch) {
 					strcat(sb,"you");
-				else
+				}
+				else {
 					strcat(sb,HSSH((char_data*) otokens[i]));
+				}
 				break;
 			}
 			case '*': {
-				if (!otokens[i] || !CAN_SEE(ch, (char_data*) otokens[i]))
+				if (!otokens[i]) {
+					// formerly included: || !CAN_SEE(ch, (char_data*) otokens[i])
+					// TODO if we had plural pronoun support, !see people should be "them"
 					strcat(sb,"it");
-				else if ((char_data*)otokens[i] == ch)
+				}
+				else if ((char_data*)otokens[i] == ch) {
 					strcat(sb,"you");
-				else
+				}
+				else {
 					strcat(sb,HMHR((char_data*) otokens[i]));
+				}
 				break;
 			}
 			case '@': {

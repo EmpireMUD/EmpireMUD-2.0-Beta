@@ -339,6 +339,39 @@ bool fail_daily_quests(char_data *ch, bool event) {
 
 
 /**
+* Matches an argument to a quest the player has completed.
+*
+* @param char_data *ch The player.
+* @param char *argument The text they typed (will use a multi-keyword lookup and prefer exact matches).
+* @return quest_data* The matching quest, or NULL if none.
+*/
+quest_data *find_completed_quest_by_name(char_data *ch, char *argument) {
+	struct player_completed_quest *pcq, *next_pcq;
+	quest_data *quest, *abbrev = NULL;
+	
+	if (IS_NPC(ch)) {
+		return NULL;	// no quests for mobs
+	}
+	
+	HASH_ITER(hh, GET_COMPLETED_QUESTS(ch), pcq, next_pcq) {
+		if (!(quest = quest_proto(pcq->vnum))) {
+			continue;
+		}
+		
+		if (!str_cmp(argument, QUEST_NAME(quest))) {
+			// exact match
+			return quest;
+		}
+		else if (!abbrev && multi_isname(argument, QUEST_NAME(quest))) {
+			abbrev = quest;
+		}
+	}
+	
+	return abbrev;	// if any
+}
+
+
+/**
 * Matches a quest a character can see where he is (one he is on or one avail-
 * able in the room). This always prefers exact matches.
 *
@@ -780,21 +813,28 @@ QCMD(qcmd_group) {
 
 
 QCMD(qcmd_info) {
-	char buf[MAX_STRING_LENGTH], *buf2, vstr[128];
+	char buf[MAX_STRING_LENGTH], *buf2, vstr[128], output[MAX_STRING_LENGTH * 3];
 	struct instance_data *inst;
 	struct quest_giver *giver;
 	struct player_quest *pq;
+	struct player_completed_quest *pcq;
 	int complete, total;
 	quest_data *qst;
 	struct string_hash *str_iter, *next_str, *str_hash = NULL;
+	size_t size;
 	
-	if (!*argument) {
+	if (!ch->desc) {
+		// can't see it anyway
+	}
+	else if (!*argument) {
 		msg_to_char(ch, "Get info on which quest? You can use 'quest list' to list quests you're on, or\r\n'quest start' to see ones available here.\r\n");
 	}
-	else if (!(qst = find_local_quest_by_name(ch, argument, TRUE, TRUE, &inst))) {
+	else if (!(qst = find_local_quest_by_name(ch, argument, TRUE, TRUE, &inst)) && !(qst = find_completed_quest_by_name(ch, argument))) {
 		msg_to_char(ch, "You don't see a quest called '%s' here.\r\n", argument);
 	}
 	else {
+		pcq = has_completed_quest(ch, QUEST_VNUM(qst), NOTHING);
+		
 		if (PRF_FLAGGED(ch, PRF_ROOMFLAGS)) {
 			sprintf(vstr, "[%5d] ", QUEST_VNUM(qst));
 		}
@@ -803,21 +843,29 @@ QCMD(qcmd_info) {
 		}
 		
 		pq = is_on_quest(ch, QUEST_VNUM(qst));
+		size = 0;
+		*output = '\0';
 		
 		// title
 		if (pq) {
 			count_quest_tasks(pq->tracker, &complete, &total);
-			msg_to_char(ch, "%s%s%s\t0 (%d/%d task%s)\r\n", vstr, QUEST_LEVEL_COLOR(ch, qst), QUEST_NAME(qst), complete, total, PLURAL(total));
+			size += snprintf(output + size, sizeof(output) - size, "%s%s%s\t0 (%d/%d task%s)\r\n", vstr, QUEST_LEVEL_COLOR(ch, qst), QUEST_NAME(qst), complete, total, PLURAL(total));
+		}
+		else if (pcq) {
+			size += snprintf(output + size, sizeof(output) - size, "%s%s%s\t0 (completed)\r\n", vstr, QUEST_LEVEL_COLOR(ch, qst), QUEST_NAME(qst));
 		}
 		else {
-			msg_to_char(ch, "%s%s%s\t0 (not on quest)\r\n", vstr, QUEST_LEVEL_COLOR(ch, qst), QUEST_NAME(qst));
+			size += snprintf(output + size, sizeof(output) - size, "%s%s%s\t0 (not on quest)\r\n", vstr, QUEST_LEVEL_COLOR(ch, qst), QUEST_NAME(qst));
 		}
 		
-		send_to_char(NULLSAFE(QUEST_DESCRIPTION(qst)), ch);
+		size += snprintf(output + size, sizeof(output) - size, "%s", NULLSAFE(QUEST_DESCRIPTION(qst)));
 		
 		// tracker
 		if (pq) {
-			show_quest_tracker(ch, pq);
+			get_tracker_display(pq->tracker, buf);
+			if (*buf) {
+				size += snprintf(output + size, sizeof(output) - size, "Quest Tracker:\r\n%s", buf);
+			}
 		}
 		
 		// show quest giver: use a string hash to remove duplicates
@@ -850,12 +898,23 @@ QCMD(qcmd_info) {
 				free(buf2);
 			}
 			
-			msg_to_char(ch, "Turn in at: %s\r\n", buf);
+			size += snprintf(output + size, sizeof(output) - size, "Turn in at: %s\r\n", buf);
 		}
 		
 		if (QUEST_FLAGGED(qst, QST_GROUP_COMPLETION)) {
-			msg_to_char(ch, "Group completion: This quest will auto-complete if any member of your group completes it while you're present.\r\n");
+			size += snprintf(output + size, sizeof(output) - size, "Group completion: This quest will auto-complete if any member of your group completes it while you're present.\r\n");
 		}
+		
+		// completed?
+		if (pcq) {
+			size += snprintf(output + size, sizeof(output) - size, "--\r\n%s", NULLSAFE(QUEST_COMPLETE_MSG(qst)));
+			get_quest_reward_display(QUEST_REWARDS(qst), buf, FALSE);
+			if (*buf) {
+				size += snprintf(output + size, sizeof(output) - size, "Quest Rewards:\r\n%s", buf);
+			}
+		}
+		
+		page_string(ch->desc, output, TRUE);
 	}
 }
 

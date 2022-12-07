@@ -978,7 +978,7 @@ A festive tambourine is here.~
 song. Hold this tambourine and play it for 10 different citizens to complete
 the 'Cheer for the City' quest.
 ~
-22 0 ao 0 5
+22 0 ao 0 6
 0 0 0
 0 0
 C
@@ -987,44 +987,44 @@ M
 2
 You shake the tambourine!~
 M
-3
-$n shakes $p!~
+2
+You are filled with the holiday spirit!~
 M
 2
 You tap the tambourine!~
 M
-3
-$n taps $p!~
+2
+You dance around!~
 M
 2
 You tap the tambourine as you shake it!~
 M
-3
-$n taps $p as $e shakes it!~
+2
+You are filled with the winter cheer!~
 M
 2
 You dance around as you play the tambourine!~
 M
 3
+$n shakes $p!~
+M
+3
+You are filled with the holiday spirit!~
+M
+3
+$n taps $p!~
+M
+3
+You dance around!~
+M
+3
+$n taps $p as $e shakes it!~
+M
+3
+You are filled with the winter cheer!~
+M
+3
 $n dances around as $e plays $p!~
-M
-2
-You are filled with the holiday spirit!~
-M
-3
-You are filled with the holiday spirit!~
-M
-2
-You are filled with the winter cheer!~
-M
-3
-You are filled with the winter cheer!~
-M
-2
-You dance around!~
-M
-3
-You dance around!~
 Q 16676
 T 16676
 S
@@ -1036,7 +1036,7 @@ Some sleigh bells are here.~
 it. Hold the sleigh bells and play them at 4 different dedicate-able buildings
 (like shrines and statues) to complete the 'Charity Concert' quest.
 ~
-22 0 ao 0 7
+22 0 ao 0 8
 0 0 0
 0 0
 C
@@ -1045,44 +1045,44 @@ M
 2
 You shake the sleigh bells!~
 M
-3
-$n shakes $p!~
+2
+You are filled with the winter cheer!~
 M
 2
 You slap your knee and shake the sleigh bells!~
 M
-3
-$n slaps $s knee and shakes $p!~
+2
+You dance around!~
 M
 2
 You tap your foot as you shake the sleigh bells!~
 M
-3
-$n taps $s foot as $e shakes $p!~
+2
+You are filled with the holiday spirit!~
 M
 2
 You dance around as you shake the sleigh bells!~
 M
 3
+$n shakes $p!~
+M
+3
+You are filled with the winter cheer!~
+M
+3
+$n slaps $s knee and shakes $p!~
+M
+3
+You dance around!~
+M
+3
+$n taps $s foot as $e shakes $p!~
+M
+3
+You are filled with the holiday spirit!~
+M
+3
 $n dances around as $e shakes $p!~
-M
-2
-You are filled with the holiday spirit!~
-M
-3
-You are filled with the holiday spirit!~
-M
-2
-You are filled with the winter cheer!~
-M
-3
-You are filled with the winter cheer!~
-M
-2
-You dance around!~
-M
-3
-You dance around!~
 Q 16677
 T 16676
 S

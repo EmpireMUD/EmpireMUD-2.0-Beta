@@ -2876,7 +2876,7 @@ ACMD(do_minipets) {
 	struct minipet_data *mini, *next_mini;
 	char_data *mob, *to_summon;
 	size_t size;
-	int count;
+	int count, number;
 	
 	skip_spaces(&argument);
 	
@@ -2949,6 +2949,8 @@ ACMD(do_minipets) {
 		}
 	}
 	else {
+		number = get_number(&argument);
+		
 		to_summon = NULL;	// to find
 		HASH_ITER(hh, GET_MINIPETS(ch), mini, next_mini) {
 			if (!(mob = mob_proto(mini->vnum))) {
@@ -2957,7 +2959,7 @@ ACMD(do_minipets) {
 			else if (!multi_isname(argument, GET_PC_NAME(mob))) {
 				continue;	// no match
 			}
-			else {
+			else if (--number == 0) {
 				to_summon = mob;
 				break;	// FOUND!
 			}

@@ -497,12 +497,6 @@ void look_at_target(char_data *ch, char *arg, char *more_args) {
 		found = look_at_moon(ch, arg, &fnum);
 	}
 	
-	// try sky
-	if (!found && !str_cmp(arg, "sky")) {
-		do_weather(ch, "", 0, 0);
-		found = TRUE;
-	}
-	
 	/* If an object was found back in generic_find */
 	if (bits) {
 		if (!found) {
@@ -522,9 +516,18 @@ void look_at_target(char_data *ch, char *arg, char *more_args) {
 				page_string(ch->desc, obj_desc_for_char(found_obj, ch, OBJ_DESC_LOOK_AT), TRUE);	/* Show no-description */
 			}
 			act("$n looks at $p.", TRUE, ch, found_obj, NULL, TO_ROOM);
+			found = TRUE;
 		}
 	}
-	else if (!found) {
+	
+	// try sky
+	if (!found && !str_cmp(arg, "sky")) {
+		do_weather(ch, "", 0, 0);
+		found = TRUE;
+	}
+	
+	// finally
+	if (!found) {
 		send_to_char("You do not see that here.\r\n", ch);
 	}
 }
@@ -1313,7 +1316,7 @@ void look_at_char(char_data *i, char_data *ch, bool show_eq) {
 	}
 	if (IS_NPC(i) && MOB_FACTION(i)) {
 		struct player_faction_data *pfd = get_reputation(ch, FCT_VNUM(MOB_FACTION(i)), FALSE);
-		int idx = rep_const_to_index(pfd ? pfd->rep : NOTHING);
+		int idx = rep_const_to_index(pfd ? pfd->rep : FCT_STARTING_REP(MOB_FACTION(i)));
 		sprintf(buf, "$E is a member of %s%s\t0.", (idx != NOTHING ? reputation_levels[idx].color : ""), FCT_NAME(MOB_FACTION(i)));
 		act(buf, FALSE, ch, NULL, i, TO_CHAR);
 	}
@@ -2541,14 +2544,18 @@ ACMD(do_factions) {
 		if (!(fct = find_faction_by_name(argument)) || FACTION_FLAGGED(fct, FCT_IN_DEVELOPMENT)) {
 			msg_to_char(ch, "Unknown faction '%s'.\r\n", argument);
 		}
+		else if (!(pfd = get_reputation(ch, FCT_VNUM(fct), FALSE)) && !IS_IMMORTAL(ch)) {
+			msg_to_char(ch, "You have not encountered that faction.\r\n");
+		}
 		else {
-			if ((pfd = get_reputation(ch, FCT_VNUM(fct), FALSE))) {
-				idx = rep_const_to_index(pfd->rep);
-			}
+			idx = rep_const_to_index(pfd ? pfd->rep : FCT_STARTING_REP(fct));
 			
 			msg_to_char(ch, "%s%s\t0\r\n", (idx != NOTHING ? reputation_levels[idx].color : ""), FCT_NAME(fct));
 			if (pfd && idx != NOTHING) {
 				msg_to_char(ch, "Reputation: %s / %d\r\n", reputation_levels[idx].name, pfd->value);
+			}
+			else if (idx != NOTHING) {
+				msg_to_char(ch, "Reputation: %s\r\n", reputation_levels[idx].name);
 			}
 			else {
 				msg_to_char(ch, "Reputation: none\r\n");
@@ -2583,10 +2590,13 @@ ACMD(do_factions) {
 			if (!(fct = find_faction_by_vnum(pfd->vnum))) {
 				continue;
 			}
+			if (FACTION_FLAGGED(fct, FCT_HIDE_IN_LIST) && !IS_IMMORTAL(ch)) {
+				continue;
+			}
 			
 			++count;
 			idx = rep_const_to_index(pfd->rep);
-			size += snprintf(buf + size, sizeof(buf) - size, " %s %s(%s / %d)\t0\r\n", FCT_NAME(fct), reputation_levels[idx].color, reputation_levels[idx].name, pfd->value);
+			size += snprintf(buf + size, sizeof(buf) - size, " %s %s(%s / %d)\t0%s\r\n", FCT_NAME(fct), reputation_levels[idx].color, reputation_levels[idx].name, pfd->value, (FACTION_FLAGGED(fct, FCT_HIDE_IN_LIST) ? " (hidden)" : ""));
 		}
 		
 		if (!count) {

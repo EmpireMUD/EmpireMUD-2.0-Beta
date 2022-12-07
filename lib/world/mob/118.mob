@@ -464,7 +464,7 @@ goblin uncaged~
 uncaged goblin~
 Uncaged goblin is here.
 ~
-150 250 abdJ 0 2
+150 250 abdJ s 2
 0 0 0 15
 D
 Strings set by trig 11824.
@@ -501,7 +501,7 @@ miner goblin~
 a goblin miner~
 Goblin miner is here.
 ~
-150 250 abdIJ E 2
+150 250 abdIJ cE 2
 0 0 0 8
 D
 Strings set by trig 11824.
@@ -521,7 +521,7 @@ Venjer fox goblin~
 Venjer the Fox~
 Venjer the Fox is prodding at the vines with a staff.
 ~
-150 250 abdEJ 0 2
+150 250 abdxEJ c 2
 2 0 0 17
 D
    Venjer is a small woman, though she stands tall and proud, light on her feet
@@ -581,7 +581,7 @@ pixy queen majestic~
 the pixy queen~
 A majestic pixy queen dazzles you with blinding sparkles!
 ~
-150 250 abdEJ 0 3
+150 250 abdxEJ c 3
 2 0 0 28
 D
    The pixy queen is scarcely more than a colorful sparkle of light. As your
@@ -619,7 +619,7 @@ pixy~
 a pixy~
 A pixy has escaped!
 ~
-150 250 abdxIJ 0 1
+150 250 abdxIJ c 1
 0 0 0 28
 D
    The little pixy is no larger than a mouse. It flies on silvery butterfly
@@ -1180,8 +1180,7 @@ youthful appearance. Her dark purple and black robes are dusty, but she seems
 to have other priorities.
 ~
 F 11800
-I 4 11867 100.00 1 p  # LOOT: dynamic reconfabulator
-I 12 11867 100.00 1 p  # PICKPOCKET: dynamic reconfabulator
+I 12 11928 100.00 1 p  # PICKPOCKET: Moonshadow Configuration
 T 11837
 T 11852
 S
@@ -1632,6 +1631,7 @@ Rogue mercenary is skulking around.
 D
 This mob is loaded by trig 11900/skymerc and named by 11857.
 ~
+F 11849
 I 12 11881 15.00 1 p  # PICKPOCKET: flask of lightning
 I 12 11874 15.00 1 p  # PICKPOCKET: filigreed stasis charm
 I 12 11873 15.00 1 p  # PICKPOCKET: glittering red potion
@@ -1674,6 +1674,7 @@ Caster mercenary is studying the books.
 D
 This mob is loaded by trig 11900/skymerc and named by 11857.
 ~
+F 11849
 I 4 11865 5.00 1 p  # LOOT: ether condenser
 I 4 11867 5.00 1 p  # LOOT: dynamic reconfabulator
 I 4 11864 5.00 1 p  # LOOT: mana deconfabulator
@@ -1715,6 +1716,7 @@ Archery mercenary is fletching an arrow.
 D
 This mob is loaded by trig 11900/skymerc and named by 11857.
 ~
+F 11849
 M
 0
 $n splits some feathers down the middle for fletching.~
@@ -1742,11 +1744,12 @@ mercenary nature mage~
 nature mage mercenary~
 Nature mage mercenary is playing with fire.
 ~
-150 250 abdvIJ 0 3
+150 250 abdvxIJ c 3
 0 0 0 16
 D
 This mob is loaded by trig 11900/skymerc and named by 11857.
 ~
+F 11849
 M
 0
 $n forms a thick layer of mana over $s body, and it hardens to solid stone!~
@@ -1774,11 +1777,12 @@ mercenary vampire~
 vampire mercenary~
 Vampire mercenary watches you carefully.
 ~
-150 250 abdvwIJ D 3
+150 250 abdvwIJ cD 3
 0 0 0 1
 D
 This mob is loaded by trig 11900/skymerc and named by 11857.
 ~
+F 11849
 M
 0
 $n picks at $s teeth with a thin dagger.~
@@ -1811,6 +1815,7 @@ Armored mercenary is spoiling for a fight.
 D
 This mob is loaded by trig 11900/skymerc and named by 11857.
 ~
+F 11849
 M
 0
 $n cleans $s hammer with a rag.~
@@ -1838,7 +1843,7 @@ Kara Virduke~
 Kara Virduke~
 Kara Virduke is digging through cabinets.
 ~
-150 250 bdvxEIJ oE 3
+150 250 bdvxEIJ coE 3
 2 0 0 17
 D
    Kara Virduke is nearly seven feet tall, such that she must stoop to work in
@@ -1848,6 +1853,7 @@ thin, gnarled calamander staff. Her flame-orange hair rolls off her head,
 cascading over the shoulders of her silver-accented red gown like a wild
 waterfall at sunset.
 ~
+F 11849
 I 4 11837 100.00 1  # LOOT: skycleave BoE loot controller
 I 4 11838 100.00 1  # LOOT: skycleave BoP loot controller
 I+ 5 0  # Group
@@ -1930,7 +1936,7 @@ Rojjer bleak~
 Bleak Rojjer~
 Bleak Rojjer is searching for something on the left side of the room.
 ~
-150 250 bdvEIJ CE 3
+150 250 bdvzEIJ cCE 3
 1 0 0 4
 D
    Bleak Rojjer's back is to you as you enter. He must think you're one of his
@@ -1940,6 +1946,7 @@ down, revealing cropped soot-black hair and pale skin. His inky black cloak
 is too dark and too loose for you to make out any part of his body or see what
 he might be carrying.
 ~
+F 11849
 I 4 11837 100.00 1  # LOOT: skycleave BoE loot controller
 I 4 11838 100.00 1  # LOOT: skycleave BoP loot controller
 I+ 5 0  # Group
@@ -1986,7 +1993,7 @@ Trixton Vye~
 Trixton Vye~
 Trixton Vye is searching for something.
 ~
-150 250 bdvyEIJ 0 3
+150 250 bdvyEIJ chE 3
 1 0 0 5
 D
    When you enter the room, you do not initially notice Trixton Vye. It's not
@@ -2000,6 +2007,7 @@ but he has the visage of a ghoul. His milky eyes turn ice blue only while he
 absorbs the corpse-flesh; the rest of the time, you're not sure he can even see
 you.
 ~
+F 11849
 I 4 11837 100.00 1  # LOOT: skycleave BoE loot controller
 I 4 11838 100.00 1  # LOOT: skycleave BoP loot controller
 I+ 5 0  # Group
@@ -2082,6 +2090,64 @@ hand, but it's cold and stiff. Still, she has a faint heartbeat.
 ~
 F 11800
 S
+#11852
+throne flying~
+a flying throne~
+A flying throne flaps just above the ground.
+~
+50 50 den m 3
+0 0 27 10
+D
+   The ancient wooden throne is made mostly from pitch black ebony, though the
+armrests and accents are striped calamander, as are the four enormous wings
+that creak ever so slightly as they flap in perfect measure. The seat is padded
+with plush violet upholstery stitched with hundreds of tiny wands crossed with
+hazel branches.
+   Every sorcerer imagines themselves king of the world; greatest in the land;
+powerful beyond the reach of dreams. And every so often, one is born who
+fulfills those aspirations, at immense cost, and brings rot and ruin to many a
+land.
+~
+T 11864
+S
+#11853
+shadow elemental gloomspring spring~
+a gloomspring elemental~
+A shadow casts on the ground from nowhere in particular.
+~
+1 1 bdoD n 2
+0 0 30 28
+D
+   At first glance, there seems to be an extra person -- one shadow that
+belongs to no one at all. But as you step back and forth across it, you realize
+it's watching you. It's alive! It seems to be a gloomspring elemental, a living
+shadow, or perhaps shadow mimic. Luckily, it seems playful.
+~
+M
+0
+One of the shadows seems to be playing with your shadow.~
+M
+0
+One of the shadows looks like it's dancing.~
+M
+0
+You catch a shadow waving at you... or at your shadow.~
+M
+0
+It seems cold in here.~
+M
+0
+It's kind of a gloomy day.~
+M
+0
+You think you see the shadow of a griffin, but then it's gone.~
+M
+0
+You think you see the shadow of a manticore, but when you look there's nothing.~
+M
+0
+You think you see the shadow of a hydra, but you turn and nothing is there.~
+S
 #11854
 alpaca fluidic~
 a fluidic alpaca~
@@ -2106,9 +2172,8 @@ A dragon made of water flows past you!
 0 0 5 15
 D
    The water dragon is nearly the height of a pony but the length of a sailing
-ship. It slithers and flows as it races down the length of the tower's spiral
-walkway, sparing not a single thought for the people it sloshes through along
-the way.
+ship. It slithers and flows at high speed as it races along, sparing not a
+single thought for the people it sloshes through along the way.
 ~
 T 11969
 T 11810
@@ -2139,9 +2204,9 @@ An aqueous lion is running through!
 150 250 bdJ n 3
 0 0 11 15
 D
-   This majestic lion is made of pure water, sloshing as it runs down
-Skycleave's spiraling walkway. A fish is swimming around the lion's stomach,
-unperturbed by the jaunt outside the fountain.
+   This majestic lion is made of pure water, sloshing as it ambles along,
+paying little attention to its surroundings. A fish is swimming around the
+lion's stomach, unperturbed by the jaunt outside the fountain.
 ~
 T 11969
 T 11810
@@ -2157,7 +2222,7 @@ A unicorn made of sparkling water is running through!
 D
    This stunning unicorn is made of nothing but sparkling water! It would be a
 stunning sculpture if it held still, but it never does -- it's galloping
-through the tower, leaving only effervescent bubbles in its wake.
+through, leaving only effervescent bubbles in its wake.
 ~
 T 11969
 T 11810
@@ -2239,7 +2304,7 @@ shadow ascendant mezvienne shade~
 the Shadow Ascendant~
 The Shadow Ascendant looms over the chamber as it draws more and more power!
 ~
-150 250 bdhxyzJ hoE 3
+150 250 bdhxyJ choE 3
 0 0 0 20
 D
    The shade, once merely a projection of the powerful enchantress Mezvienne,
@@ -2372,7 +2437,7 @@ barrosh high sorcerer~
 High Sorcerer Barrosh~
 High Sorcerer Barrosh stands with his staff raised high and an anguished look.
 ~
-150 250 bdhvxyzJ DE 3
+150 250 bdhvxyzJ cDE 3
 1 0 0 19
 D
    Barrosh takes a menacing position as you enter and seems to be muttering
@@ -2425,7 +2490,7 @@ Mezvienne shade shadow~
 the Shade of Mezvienne~
 The Shade of Mezvienne surrounds Knezz like a phantom.
 ~
-150 250 bdhyJ hCDE 3
+150 250 bdhJ cCDE 3
 0 0 0 7
 D
    The Shade is lithe, feminine, even graceful as it swirls back and forth
@@ -2510,14 +2575,13 @@ M
 say I'll be back on my feet in no time.~
 T 11865
 T 11837
-T 11840
 S
 #11871
 Mezvienne enchantress~
 Mezvienne the Enchantress~
 Mezvienne the Enchantress hovers above the tower as she channels the heartwood.
 ~
-150 250 bdhvxyDJ DE 3
+150 250 bdhvxyDJ cDE 3
 2 0 0 21
 D
    The enchantress's long gossamer gown blows madly in the wind as she floats
@@ -2535,7 +2599,7 @@ M
 emote Glimmering wisps of mana stream from the heartwood to $n...~
 M
 7
-emote $n screams as the mana cuts into her, the cackles as her power grows...~
+emote $n screams as the mana cuts into her, then cackles as her power grows...~
 M
 7
 emote You watch as $n grows older and older, to the point of death and beyond, and back again...~
@@ -2618,7 +2682,7 @@ lion time skithe ler-wyn lerwyn~
 the Lion of Time~
 Skithe Ler-Wyn, the Lion of Time, has erupted from Mezvienne's limp body!
 ~
-150 250 bdhyzEJ 0 3
+150 250 bdhyzEJ cE 3
 2 0 0 10
 D
    Mezvienne the Enchantress floats limp and bloody in the time stream, her
@@ -3017,7 +3081,7 @@ Iskip giant~
 Iskip of Rot and Ruin~
 The giant stands knee-deep in the water, turned away from you. (difficulty)
 ~
-150 250 bdhxyDJ 0 6
+150 250 bdhvxyzDJ chDE 6
 1 0 0 19
 D
    The giant Iskip is truly huge -- you'd scarcely reach his ankles if he were

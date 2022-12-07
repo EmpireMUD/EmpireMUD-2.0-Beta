@@ -775,7 +775,7 @@ sorceress grand high~
 the Grand High Sorceress~
 The Grand High Sorceress sits on her desk, legs crossed. (difficulty)
 ~
-150 250 bdhxyJ oDE 3
+150 250 bdhxyzJ coDE 3
 2 0 0 22
 D
    The sorceress sits on top of her desk, legs crossed in front of her,
@@ -1036,7 +1036,7 @@ water first embodiment living~
 the First Water~
 You are surrounded by the living embodiment of the First Water! (difficulty)
 ~
-150 250 bdhyDJ hD 5
+150 250 bdhyzDJ chDE 5
 0 0 0 14
 D
    The water on all sides of you is alive! You have found yourself trapped in
@@ -1046,6 +1046,7 @@ Slowly, the burn creeps in. You'll have to defeat it quickly!
 To fight the First Water, type: difficulty <Normal | Hard | Group | Boss>
 ~
 I 4 11900 100.00 1  # LOOT: unattuned skystone
+I 4 11892 5.00 1  # LOOT: protium jelly
 T 11809
 T 11810
 T 11931
@@ -2390,7 +2391,7 @@ Elver worthy goblin~
 Elver the Worthy~
 Elver the Worthy stands in the center of the arena. (difficulty)
 ~
-150 250 bdhDJ E 3
+150 250 bdhDJ csE 3
 1 0 0 5
 D
    Elver is on the small side, even for a goblin, nearly outsized by his own
@@ -2431,7 +2432,7 @@ Nailbokh axe goblin~
 Nailbokh the Axe~
 Nailbokh the Axe stands in the center of the arena.
 ~
-150 250 bdhzDJ 0 3
+150 250 bdhzDJ c 3
 2 0 0 2
 D
    Nailbokh drags her giant stone axe across the arena sand, drawing a line
@@ -2463,7 +2464,7 @@ Biksi champion orka goblin~
 Biksi, Champion of Orka~
 Biksi, Champion of Orka, stands in the center of the arena.
 ~
-150 250 bdhyDJ E 3
+150 250 bdhyzDJ cE 3
 2 0 0 7
 D
    The Champion of Orka stands in the center of the arena, readying a pair of

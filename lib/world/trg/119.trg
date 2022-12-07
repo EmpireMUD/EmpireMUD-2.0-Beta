@@ -1123,7 +1123,7 @@ if %move% == 1
         if %diff% >= 2
           dg_affect #11859 %ch% TO-HIT -%hit% 20
         end
-        %damage% %ch% %hit% magical
+        %damage% %ch% 80 magical
       end
     end
     set ch %next_ch%
@@ -1173,8 +1173,7 @@ elseif %move% == 2
         set next_ch %ch.next_in_room%
         if %ch.affect(11822)%
           %send% %ch% &&m**** You feel your very being as it's ripped apart by your forsaken fate! ****&&0 (struggle)
-          eval amount %diff% * 25
-          %damage% %ch% %amount% magical
+          %damage% %ch% 100 magical
         end
         set ch %next_ch%
       eval cycle %cycle% + 1
@@ -1207,10 +1206,12 @@ elseif %move% == 3
       if !%ch.var(did_sfdodge)%
         set hit 1
         %echo% &&mThere's a scream from ~%ch% as ^%ch% years are cut short by ~%self%!&&0
-        eval amt %diff% * 50
-        %damage% %ch% %amt% magical
+        %damage% %ch% 200 magical
       elseif %ch.is_pc%
         %send% %ch% &&mYou narrowly avoid the lion's massive paw!&&0
+        if %diff% == 1
+          dg_affect #11856 %ch% TO-HIT 25 20
+        end
       end
     end
     set ch %next_ch%
@@ -1232,7 +1233,6 @@ elseif %move% == 4
   skyfight clear dodge
   skyfight clear interrupt
   skyfight setup interrupt all
-  eval dam 25 + (25 * %diff%)
   set cycle 0
   set broke 0
   while !%broke% && %cycle% <= 4
@@ -1253,20 +1253,24 @@ elseif %move% == 4
         wait 10 s
       end
     else
-      %echo% &&m~%self% roars ancient words not heard since the dawn of time..&&0
+      %echo% &&m~%self% roars ancient words not heard since the dawn of time...&&0
       set ch %room.people%
       while %ch%
         set next_ch %ch.next_in_room%
         if %self.is_enemy(%ch%)%
           if %ch.var(did_sfdodge)%
             %send% %ch% &&mYou move just in time as Skithe Ler-Wyn appears behind you, slashing at the air where you just stood!&&0
+            if %diff% == 1
+              dg_affect #11856 %ch% off
+              dg_affect #11856 %ch% TO-HIT 25 20
+            end
           else
             %send% %ch% &&mA lion appears behind you, cutting a deep slash with her claws!&&0
             %echoaround% %ch% &&m~%ch% shouts out in pain as a time lion appears behind *%ch% and cuts deep!&&0
             if %diff% > 1
-              %dot% #11842 %ch% %dam% 20 physical 5
+              %dot% #11842 %ch% 125 20 physical 5
             end
-            %damage% %ch% %dam% physica
+            %damage% %ch% 125 physical
           end
         end
         set ch %next_ch%
@@ -2234,7 +2238,7 @@ while %count% < 12
   set room %actor.room%
   set to_room 0
   * see where we're at
-  if %actor.position% != Sleeping || !%room.function(BEDROOM)%
+  if %actor.position% != Sleeping || !%room.function(BEDROOM)% || !%actor.can_teleport_room% || !%actor.canuseroom_guest%
     * still awake or no bedroom? nothing to do
   else
     * Sleeping AND in a bedroom: set a target
@@ -2245,7 +2249,7 @@ while %count% < 12
     * determine where to send them back to
     if (%room.template% >= 11800 && %room.template% <= 11874) || (%room.template% >= 11900 && %room.template% <= 11974)
       set skycleave_wake_room %room.template%
-    elseif %actor.varexists(skycleave_wake_room)%
+    elseif %actor.varexists(skycleave_wake_room)% && (%room.template% >= 11800 && %room.template% <= 11999)
       set skycleave_wake_room %actor.skycleave_wake_room%
     else
       set skycleave_wake_room 0
@@ -2327,7 +2331,7 @@ while %ch%
   set ch %next_ch%
 done
 wait 1
-%echo% ~%self% grabs a strange device from the table and then vanishes into the shadows!
+%echo% ~%self% grabs something from the table and then vanishes into the shadows!
 %purge% %self%
 ~
 #11929
@@ -2520,6 +2524,8 @@ while %ch%
       set time %timestamp%
       set %varname% %time%
       remote %varname% %room.id%
+      * warn
+      %send% %ch% You quickly realize it's impossible to breathe in here. Whatever you're here to do, do it quickly.
     end
     * how long is left
     eval left %time% + %limit% - %timestamp%
@@ -3033,6 +3039,10 @@ switch %self.vnum%
       %echo% &&mThe Grand High Sorceress gives you a coy smile as she disappears in a burst of magenta glitter!&&0
     else
       %echo% &&mThe Grand High Sorceress gives you a coy smile as she disappears in a burst of magenta glitter, dropping something as she vanishes!&&0
+      * chance of mount:
+      if !%room.people(11852)% && %random.100% <= 4
+        %load% mob 11852
+      end
     end
   break
 done
@@ -3153,7 +3163,7 @@ if %sleepy%
   set ch %room.people%
   while %ch%
     if %ch.is_pc%
-      dg_affect #11943 %ch% IMMOBILIZED on 30
+      dg_affect #11943 %ch% IMMOBILIZED on 10
     end
     set ch %ch.next_in_room%
   done
@@ -3259,7 +3269,7 @@ if %sleepy%
   set ch %room.people%
   while %ch%
     if %ch.is_pc%
-      dg_affect #11943 %ch% IMMOBILIZED on 30
+      dg_affect #11943 %ch% IMMOBILIZED on 10
     end
     set ch %ch.next_in_room%
   done
@@ -3630,7 +3640,7 @@ switch %cycle%
     %send% %person% The primordial mana that once surged through the veins of the tree now flows like blood down its rotten trunk.
   break
   case 2
-    %send% %person% Slowly from the haze, a great giant arises, clad all in violet...
+    %send% %person% Slowly from the haze, a great giant arises, clad in robes like the night...
     wait 9 sec
     %send% %person% The giant waves his enormous hand and speaks a few words in a language you've never heard. A gleaming, radiant axe forms in midair from the haze itself, and the giant grabs it in both hands.
     wait 9 sec
@@ -4274,8 +4284,8 @@ while %count% < 12
     if (%count% // 4) == 1 && !%teleported%
       %send% %actor% You feel tired.
     end
-  elseif !%room.function(BEDROOM)%
-    * Sleeping but not in a bedroom: just reveal a dream.
+  elseif !%room.function(BEDROOM)% || !%actor.can_teleport_room% || !%actor.canuseroom_guest%
+    * Sleeping but not in a bedroom they can use: just reveal a dream.
     switch %random.10%
       case 1
         %send% %actor% You dream of an incredible tree with a tiny rainbow staircase spiraling around it.
@@ -4320,7 +4330,7 @@ while %count% < 12
     * determine where to send them back to
     if (%room.template% >= 11800 && %room.template% <= 11874) || (%room.template% >= 11900 && %room.template% <= 11974)
       set skycleave_wake_room %room.template%
-    elseif %actor.varexists(skycleave_wake_room)%
+    elseif %actor.varexists(skycleave_wake_room)% && (%room.template% >= 11800 && %room.template% <= 11999)
       set skycleave_wake_room %actor.skycleave_wake_room%
     else
       set skycleave_wake_room 0
@@ -4494,7 +4504,7 @@ while %count% < 12
     if (%count% // 4) == 1 && !%teleported%
       %send% %actor% You feel tired.
     end
-  elseif !%room.function(BEDROOM)% || %room.template% == 11975
+  elseif !%room.function(BEDROOM)% || %room.template% == 11975 || !%actor.can_teleport_room% || !%actor.canuseroom_guest%
     * Sleeping but not in a bedroom: just reveal a dream.
     switch %random.10%
       case 1
@@ -4549,7 +4559,7 @@ while %count% < 12
     * determine where to send them back to
     if (%room.template% >= 11800 && %room.template% <= 11874) || (%room.template% >= 11900 && %room.template% <= 11974)
       set skycleave_wake_room %room.template%
-    elseif %actor.varexists(skycleave_wake_room)%
+    elseif %actor.varexists(skycleave_wake_room)% && (%room.template% >= 11800 && %room.template% <= 11999)
       set skycleave_wake_room %actor.skycleave_wake_room%
     else
       set skycleave_wake_room 0
@@ -4840,6 +4850,10 @@ elseif %sw_rooms% ~= %template%
   southwest
 elseif %nw_rooms% ~= %template%
   northwest
+else
+  * unknown room?
+  %echo% ~%self% splashes to the ground and soaks in.
+  %purge% %self%
 end
 ~
 #11970
@@ -5202,7 +5216,7 @@ switch %seq%
   break
   case 2
     if %random.2% == 1
-      %echo% ~%self% leans forward and presses ^%self% head to altar.
+      %echo% ~%self% leans forward and presses ^%self% head to the altar.
     else
       %echo% ~%self% bows low to the ground.
     end
@@ -5443,10 +5457,12 @@ if %move% == 1
             dg_affect #11956 %ch% off silent
             dg_affect #11956 %ch% IMMOBILIZE on 10
           end
-          eval amt %diff% * 33
-          %damage% %ch% %amt% physical
+          %damage% %ch% 100 physical
         elseif %ch.is_pc%
           %send% %ch% &&jYou narrowly avoid the hammer dance!&&0
+          if %diff% == 1
+            dg_affect #11856 %ch% TO-HIT 25 20
+          end
         end
         if %cycle% < %diff%
           %send% %ch% &&j**** He's whirling back around again and bellowing in a deep voice... ****&&0 (dodge)
@@ -5492,8 +5508,9 @@ elseif %move% == 2
     if %diff% < 3
       dg_affect #11852 %self% HARD-STUNNED on 5
     end
-    if %diff% < 2
+    if %diff% == 1
       %damage% %self% 10 physical
+      dg_affect #11856 %targ% TO-HIT 25 20
     end
   else
     * hit
@@ -5502,8 +5519,7 @@ elseif %move% == 2
       %send% %targ% &&jYou're seeing stars!&&0
       dg_affect #11851 %targ% STUNNED on 15
     end
-    eval dam 60 + (%diff% * 20)
-    %damage% %targ% %dam% physical
+    %damage% %targ% 150 physical
   end
   skyfight clear dodge
 elseif %move% == 3
@@ -5563,6 +5579,9 @@ elseif %move% == 4
   elseif %targ.var(did_sfdodge)%
     * miss
     %echo% &&j|%self% hammers plunk into the sand as he misses ~%targ%!&&0
+    if %diff% == 1
+      dg_affect #11856 %targ% TO-HIT 25 20
+    end
   else
     * hit
     %send% %targ% &&j|%self% hammers soar through the air and hit |%targ% head one after the other!&&0
@@ -5573,8 +5592,7 @@ elseif %move% == 4
       %send% %targ% &&jYou're seeing stars!&&0
       dg_affect #11952 %targ% IMMOBILIZED on 30
     end
-    eval dam 60 + (%diff% * 20)
-    %damage% %targ% %dam% physical
+    %damage% %targ% 150 physical
     wait 10 2 s
     dg_affect #11953 %self% off
   end
@@ -5591,34 +5609,29 @@ if %self.cooldown(11800)% || %self.disabled%
 end
 set room %self.room%
 set diff %self.diff%
-* always be countering
 dg_affect #3021 %self% SOULMASK on 15
-* order
-set moves_left %self.var(moves_left)%
-set num_left %self.var(num_left,0)%
-if !%moves_left% || !%num_left%
-  set moves_left 1 2 3 4
-  set num_left 4
+set m_l %self.var(m_l)%
+set n_m %self.var(n_m,0)%
+if !%m_l% || !%n_m%
+  set m_l 1 2 3 4
+  set n_m 4
 end
-* pick
-eval which %%random.%num_left%%%
-set old %moves_left%
-set moves_left
+eval which %%random.%n_m%%%
+set old %m_l%
+set m_l
 set move 0
 while %which% > 0
   set move %old.car%
   if %which% != 1
-    set moves_left %moves_left% %move%
+    set m_l %m_l% %move%
   end
   set old %old.cdr%
   eval which %which% - 1
 done
-set moves_left %moves_left% %old%
-* store
-eval num_left %num_left% - 1
-remote moves_left %self.id%
-remote num_left %self.id%
-* perform move
+set m_l %m_l% %old%
+eval n_m %n_m% - 1
+remote m_l %self.id%
+remote n_m %self.id%
 skyfight lockout 30 35
 if %move% == 1 && !%self.aff_flagged(BLIND)%
   * Jar of Captivity
@@ -5714,6 +5727,10 @@ elseif %move% == 2
         if %self.is_enemy(%ch%)%
           if %ch.var(did_sfdodge)%
             %send% %ch% &&mYou manage to narrowly dodge the lightning bolts!&&0
+            if %diff% == 1
+              dg_affect #11856 %ch% off
+              dg_affect #11856 %ch% TO-HIT 25 20
+            end
           else
             if %ch.trigger_counterspell%
               %send% %ch% Your counterspell does nothing against the Iskip!
@@ -5721,8 +5738,7 @@ elseif %move% == 2
             * hit
             %send% %ch% &&mA lightning bolt strikes you right in the chest!&&0
             %echoaround% %ch% &&m~%ch% screams as a lightning bolt strikes *%ch%!&&0
-            eval amount %diff% * 30
-            %damage% %ch% %amount% physical
+            %damage% %ch% 120 physical
             if %cycle% == 4 && %diff% == 4 && (%self.level% + 100) > %ch.level% && !%ch.aff_flagged(!STUN)%
               dg_affect #11851 %ch% STUNNED on 10
             end
@@ -5817,10 +5833,12 @@ elseif %move% == 4
       if !%ch.var(did_sfdodge)%
         set hit 1
         %echo% &&mThe giant's radiant axe slices through ~%ch%!&&0
-        eval amt %diff% * 50
-        %damage% %ch% %amt% physical
+        %damage% %ch% 200 physical
       elseif %ch.is_pc%
         %send% %ch% &&mYou narrowly avoid the giant's radiant axe!&&0
+        if %diff% == 1
+          dg_affect #11856 %ch% TO-HIT 25 20
+        end
       end
     end
     set ch %next_ch%
@@ -5951,10 +5969,12 @@ elseif %move% == 2
           if %cycle% == %diff% && %diff% >= 3 && (%self.level% + 100) > %ch.level% && !%ch.aff_flagged(!STUN)%
             dg_affect #11851 %ch% STUNNED on 5
           end
-          eval amt %diff% * 33
-          %damage% %ch% %amt% physical
+          %damage% %ch% 130 physical
         elseif %ch.is_pc%
           %send% %ch% &&AYou cover your eyes as you swim out of the way of an imploding bubble!&&0
+          if %diff% == 1
+            dg_affect #11856 %ch% TO-HIT 25 20
+          end
         end
         if %cycle% < %diff%
           %send% %ch% &&A**** Here comes another one... ****&&0 (dodge)
@@ -6006,8 +6026,7 @@ elseif %move% == 3
           * hit and no counterspell
           %send% %ch% &&AYou gurgle in pain as the wave passes through you!&&0
           %echoaround% %ch% &&A~%ch% gurgles in pain as the wave passes through *%ch%!&&0
-          eval amount %diff% * 20
-          %damage% %ch% %amount% physical
+          %damage% %ch% 100 physical
           if %cycle% == 4 && %diff% == 4 && (%self.level% + 100) > %ch.level% && !%ch.aff_flagged(!STUN)%
             dg_affect #11851 %ch% STUNNED on 10
           end
@@ -6197,8 +6216,7 @@ if %move% == 1
         set next_ch %ch.next_in_room%
         if %ch.affect(11822)%
           %send% %ch% &&m**** You bleed from your arms and legs as the thorny vines cut into you! ****&&0 (struggle)
-          eval amount %diff% * 20
-          %damage% %ch% %amount% magical
+          %damage% %ch% 100 magical
         end
         set ch %next_ch%
       eval cycle %cycle% + 1
@@ -6226,10 +6244,12 @@ elseif %move% == 2
           if %cycle% == %diff% && %diff% >= 3 && (%self.level% + 100) > %ch.level% && !%ch.aff_flagged(!STUN)%
             dg_affect #11851 %ch% STUNNED on 5
           end
-          eval amt %diff% * 33
-          %damage% %ch% %amt% physical
+          %damage% %ch% 150 physical
         elseif %ch.is_pc%
           %send% %ch% &&mYou duck behind the furniture as the air explodes!&&0
+          if %diff% == 1
+            dg_affect #11856 %ch% TO-HIT 25 20
+          end
         end
         if %cycle% < %diff%
           %send% %ch% &&m**** Here comes another one... ****&&0 (dodge)
@@ -6291,8 +6311,7 @@ elseif %move% == 3
               %send% %ch% You're having trouble moving!
             break
           done
-          eval dam %diff% * 10
-          %damage% %ch% %dam% physical
+          %damage% %ch% 50 physical
         end
       end
       set ch %next_ch%
@@ -6348,8 +6367,7 @@ elseif %move% == 4
           * hit!
           %send% %ch% &&mThe scalding air burns your skin, eyes, and lungs!&&0
           %echoaround% %ch% &&m~%ch% screams as the air scalds *%ch%!&&0
-          eval amount %diff% * 25
-          %damage% %ch% %amount% magical
+          %damage% %ch% 100 magical
         end
         set ch %next_ch%
       done
@@ -6451,10 +6469,12 @@ if %move% == 1
         if !%ch.var(did_sfdodge)%
           set hit 1
           %echo% &&j~%self% slices ~%ch% as she whirls around the arena!&&0
-          eval amt 60 + (%diff% * 20)
-          %dot% #11957 %ch% %amt% 15 physical 4
+          %dot% #11957 %ch% 100 15 physical 4
         elseif %ch.is_pc%
           %send% %ch% &&jYou narrowly avoid the axe-nado!&&0
+          if %diff% == 1
+            dg_affect #11856 %ch% TO-HIT 25 20
+          end
         end
         if %cycle% < %diff%
           %send% %ch% &&j**** She's still spinning... ****&&0 (dodge)
@@ -6495,6 +6515,9 @@ elseif %move% == 2
   elseif %targ.var(did_sfdodge)%
     * miss
     %echo% &&jThe sand from |%self% sand slash misses ~%targ%!&&0
+    if %diff% == 1
+      dg_affect #11856 %targ% TO-HIT 25 20
+    end
   else
     * hit
     %echo% &&jThe sand flies into |%targ% eyes!&&0
@@ -6506,8 +6529,7 @@ elseif %move% == 2
       dg_affect #11959 %ch% BLIND on 10
     end
     if %diff% >= 3
-      eval dam 20 + (%diff% * 20)
-      %damage% %targ% %dam% physical
+      %damage% %targ% 100 physical
     end
   end
   skyfight clear dodge
@@ -6550,8 +6572,7 @@ elseif %move% == 3
       set next_ch %ch.next_in_room%
       if %self.is_enemy(%ch%)%
         dg_affect #11959 %ch% BLIND on 20
-        eval pain %diff% * 25
-        %dot% #11960 %ch% %pain% 10 physical
+        %dot% #11960 %ch% 75 10 physical
       end
       set ch %next_ch%
     done
@@ -6584,10 +6605,12 @@ elseif %move% == 4
         if !%ch.var(did_sfdodge)%
           set hit 1
           %echo% &&jA hatchet comes down on |%ch% head!&&0
-          eval pain (%diff% * 25) + 25
-          %damage% %ch% %pain% physical
+          %damage% %ch% 100 physical
         elseif %ch.is_pc%
           %send% %ch% &&jA hatchet just misses you as it falls!&&0
+          if %diff% == 1
+            dg_affect #11856 %ch% TO-HIT 25 20
+          end
         end
         if %cycle% < %diff%
           %send% %ch% &&j**** There are still more hatchets coming down! ****&&0 (dodge)
@@ -6674,10 +6697,12 @@ if %move% == 1
         if !%ch.var(did_sfdodge)%
           set hit 1
           %echo% &&j~%self% lashes ~%ch% with her thorny whips!&&0
-          eval amt %diff% * 25
-          %dot% #11951 %ch% %amt% 40 physical 25
+          %dot% #11951 %ch% 100 40 physical 25
         elseif %ch.is_pc%
           %send% %ch% &&jThe lashing whip hits the sand near your feet!&&0
+          if %diff% == 1
+            dg_affect #11856 %ch% TO-HIT 25 20
+          end
         end
         if %cycle% < %diff%
           %send% %ch% &&j**** Here come the whips again... ****&&0 (dodge)
@@ -6734,8 +6759,7 @@ elseif %move% == 2
       wait 4 s
       if %targ.id% == %targ_id% && %targ.affect(11822)% && %diff% > 1
         %send% %targ% &&jThe thorns press into you! That really hurts!&&0
-        eval amt %diff% * 25
-        %dot% #11951 %ch% %amt% 40 physical 25
+        %dot% #11951 %targ% 100 40 physical 25
       else
         set done 1
       end
@@ -6759,8 +6783,7 @@ elseif %move% == 2
         set done 1
       else
         %send% %targ% &&jThe thorns press into you! That really hurts!&&0
-        eval amt %diff% * 25
-        %dot% #11951 %ch% %amt% 40 physical 25
+        %dot% #11951 %ch% 100 40 physical 25
       end
     done
     skyfight clear free
@@ -6784,18 +6807,20 @@ elseif %move% == 3
       if !%ch.var(did_sfdodge)%
         set hit 1
         %echo% &&j~%self% trips ~%ch% with her thorny whip!&&0
-        if %diff% >= 3 && (%self.level% + 100) <= %ch.level%
+        if %diff% >= 3 && (%self.level% + 100) <= %ch.level% && !%ch.aff_flagged(!STUN)%
           dg_affect #11814 %ch% STUNNED on 10
         else
           dg_affect #11814 %ch% DISARMED on 10
           dg_affect #11814 %ch% IMMOBILIZED on 10
         end
         if %diff% > 1
-          eval amt %diff% * 25
-          %dot% #11951 %ch% %amt% 40 physical 25
+          %dot% #11951 %ch% 100 40 physical 25
         end
       elseif %ch.is_pc%
         %send% %ch% &&jThe whip sends sand spraying as it narrowly misses your feet!&&0
+        if %diff% == 1
+          dg_affect #11856 %ch% TO-HIT 25 20
+        end
       end
     end
     set ch %next_ch%
@@ -6916,68 +6941,84 @@ set leader %self.leader%
 if !%ch% || !%leader% || %ch.is_enemy(%leader%)% || %self.room% != %leader.room%
   halt
 end
-if %ch.affect(11990)%
-  dg_affect #11990 %ch% off silent
-end
+* remove first
+set aff_list 11990
+while %aff_list%
+  set vnum %aff_list.car%
+  set aff_list %aff_list.cdr%
+  dg_affect #%vnum% %ch% off silent
+done
 switch %random.12%
   case 1
     set type MOVE-REGEN
     set amount 1
+    set vnum 11990
     set glow amber
   break
   case 2
     set type MANA-REGEN
     set amount 1
+    set vnum 11991
     set glow cerulean
   break
   case 3
     set type AGE
     set amount 1
+    set vnum 11992
     set glow ghastly
   break
   case 4
     set type AGE
     set amount -1
+    set vnum 11993
     set glow powdery
   break
   case 5
     set type MAX-MOVE
     set amount 10
+    set vnum 11994
     set glow flaxen
   break
   case 6
     set type MAX-MANA
     set amount 10
+    set vnum 11995
     set glow fluvial
   break
   case 7
     set type MAX-HEALTH
     set amount 10
+    set vnum 11996
     set glow ruby
   break
   case 8
     set type MAX-BLOOD
     set amount 10
+    set vnum 11997
     set glow sanguine
   break
   case 9
     set type RESIST-PHYSICAL
     set amount 5
+    set vnum 11998
     set glow mahogany
   break
   case 10
     set type RESIST-MAGICAL
     set amount 5
+    set vnum 11999
     set glow maple
   break
   case 11
     set type INVENTORY
     set amount 5
+    set vnum 11989
     set glow light
   break
   default
     set type DODGE
     set amount 5
+    set vnum 11988
     set glow blurry
   break
 done
@@ -6989,7 +7030,7 @@ while %pos% > 0
   eval pos %pos% - 1
 done
 * message
-dg_affect #11990 %ch% %type% %amount% 300
+dg_affect #%vnum% %ch% %type% %amount% 300
 %send% %ch% ~%self% %verb% itself toward you... you take on a %glow% glow.
 %echoaround% %ch% ~%self% %verb% itself toward ~%ch%... &%ch% takes on a %glow% glow.
 ~

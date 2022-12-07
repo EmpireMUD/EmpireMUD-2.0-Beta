@@ -3349,7 +3349,7 @@ done
 krampus low health recovery~
 0 l 20
 ~
-if %self.cooldown(16682)%
+if %self.cooldown(16683)%
   halt
 end
 if !%self.varexists(CatchAHeal)%

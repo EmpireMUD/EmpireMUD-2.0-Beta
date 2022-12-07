@@ -1040,6 +1040,8 @@ void remove_completed_goal(empire_data *emp, any_vnum vnum) {
 * @param progress_data *prg The progression goal being added.
 */
 void script_reward_goal(empire_data *emp, progress_data *prg) {
+	struct empire_goal *goal;
+	
 	if (!emp || !prg) {
 		return;	// nothing to do
 	}
@@ -1049,7 +1051,11 @@ void script_reward_goal(empire_data *emp, progress_data *prg) {
 	}
 	log_to_empire(emp, ELOG_PROGRESS, "Achieved: %s", PRG_NAME(prg));
 	
+	goal = get_current_goal(emp, PRG_VNUM(prg));
 	add_completed_goal(emp, PRG_VNUM(prg));
+	if (goal) {
+		cancel_empire_goal(emp, goal);
+	}
 	check_for_eligible_goals(emp);
 }
 

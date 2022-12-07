@@ -98,11 +98,14 @@ See also: QUEST
 Usage:  quest info <quest>
 
 This displays additional information about a quest, including the quest's full
-description. It works on both quests you're on, and ones available at your
-location.
+description. It works on quests you're on, ones available at your location, and
+ones you have already completed.
 
 When you use it on a quest you're on, you will also see the quest tracker. See
 the quest tracker help file for more information.
+
+When you use it on a quest you've already completed, it will show the
+completion message and the rewards as well.
 
 See also: QUEST, QUEST TRACKER
 #

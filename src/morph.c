@@ -77,6 +77,15 @@ void add_morph_affects(char_data *ch) {
 	points_available = scale / 100.0 * config_get_double("scale_points_at_100");
 	points_available = MAX(points_available, 1.0);
 	
+	// weight by mob flags
+	// TODO should this be configured somewhere? these are based on obj flag scaling -pc
+	if (MOB_FLAGGED(ch, MOB_HARD)) {
+		points_available *= 1.2;
+	}
+	if (MOB_FLAGGED(ch, MOB_GROUP)) {
+		points_available *= 1.3333;
+	}
+	
 	// figure out how many total weight points are used
 	total_weight = 0;
 	LL_FOREACH(MORPH_APPLIES(morph), app) {
@@ -187,6 +196,13 @@ void end_morph(char_data *ch) {
 morph_data *find_morph_by_name(char_data *ch, char *name) {
 	morph_data *morph, *next_morph, *partial = NULL;
 	char temp[MAX_STRING_LENGTH];
+	int number;
+	bool had_number = isdigit(*name) ? TRUE : FALSE;
+	
+	number = get_number(&name);
+	if (number == 0) {
+		return NULL;	// 0.morph has no meaning
+	}
 	
 	HASH_ITER(sorted_hh, sorted_morphs, morph, next_morph) {
 		if (MORPH_FLAGGED(morph, MORPHF_IN_DEVELOPMENT | MORPHF_SCRIPT_ONLY) && !IS_IMMORTAL(ch)) {
@@ -201,13 +217,20 @@ morph_data *find_morph_by_name(char_data *ch, char *name) {
 		
 		// matches:
 		strcpy(temp, skip_filler(MORPH_SHORT_DESC(morph)));
-		if (!str_cmp(name, temp)) {
+		if (!had_number && !str_cmp(name, temp)) {
 			// perfect match
-			return morph;
+			if (--number == 0) {
+				return morph;
+			}
 		}
-		if (!partial && multi_isname(name, MORPH_KEYWORDS(morph))) {
+		if ((!partial || had_number) && multi_isname(name, MORPH_KEYWORDS(morph))) {
 			// probable match
-			partial = morph;
+			if (had_number && --number == 0) {
+				return morph;
+			}
+			else if (!had_number && !partial) {
+				partial = morph;
+			}
 		}
 	}
 	

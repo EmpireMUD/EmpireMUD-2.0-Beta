@@ -1,0 +1,47 @@
+#11830
+applaud~
+applaud~
+0 5 5
+L
+18 11830 0 1 -
+M0
+Extra arms extend from your bodysuit and give a huge round of applause!~
+M1
+Extra arms extend from $n's bodysuit as $e gives a huge round of applause.~
+M2
+You give $N a huge round of applause.~
+M3
+$n gives $N a huge round of applause.~
+M4
+$n gives you a huge round of applause.~
+M5
+You look around for someone to applaud.~
+M6
+Extra arms extend from your bodysuit as you give yourself a huge round of applause.~
+M7
+Extra arms extend from $n's bodysuit as $e gives $mself a huge round of applause.~
+S
+#11831
+clap~
+clap~
+0 5 0
+L
+18 11830 0 1 -
+M0
+Extra arms extend from your bodysuit as you clap raucously.~
+M1
+Extra arms extend from $n's bodysuit as $e claps raucously.~
+M2
+You clap raucously for $N.~
+M3
+$n claps raucously for $N.~
+M4
+$n claps raucously for you.~
+M5
+If they were here, they would have dodged all your hands anyway.~
+M6
+Extra arms extend from your bodysuit as you clap raucously for yourself.~
+M7
+Extra arms extend from $n's bodysuit as $e claps raucously for $mself.~
+S
+$

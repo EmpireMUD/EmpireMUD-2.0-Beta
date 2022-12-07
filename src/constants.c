@@ -2059,6 +2059,7 @@ const char *event_status[] = {
 const char *faction_flags[] = {
 	"IN-DEVELOPMENT",
 	"REP-FROM-KILLS",
+	"HIDE-IN-LIST",
 	"\n"
 };
 
