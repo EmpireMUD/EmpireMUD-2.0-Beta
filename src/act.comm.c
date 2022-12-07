@@ -536,56 +536,69 @@ ACMD(do_pub_comm) {
 		}
 		
 		for (desc = descriptor_list; desc; desc = desc->next) {
-			// basic qualifications
-			if (STATE(desc) == CON_PLAYING && desc != ch->desc && desc->character && !is_ignoring(desc->character, ch) && GET_REAL_LEVEL(desc->character) >= level) {
-				// can hear the channel?
-				if (pub_comm[subcmd].ignore_flag == NOBITS || !PRF_FLAGGED(desc->character, pub_comm[subcmd].ignore_flag)) {
-					// distance?
-					if (pub_comm[subcmd].type != PUB_COMM_SHORT_RANGE || compute_distance(IN_ROOM(ch), IN_ROOM(desc->character)) <= 50) {
-						// quiet room?
-						if (pub_comm[subcmd].type == PUB_COMM_OOC || !ROOM_AFF_FLAGGED(IN_ROOM(desc->character), ROOM_AFF_SILENT)) {
-							// special color handling for non-ooc channels
-							if (pub_comm[subcmd].type != PUB_COMM_OOC) {
-								// use act() so that nobody gets the color code that wouldn't get the rest of the string
-								//act(pub_comm[subcmd].color, FALSE, ch, NULL, desc->character, TO_VICT | TO_SLEEP | TO_NODARK);
-								send_to_char(pub_comm[subcmd].color, desc->character);
-							}
-							
-							// channel history
-							clear_last_act_message(desc);
-							
-							// send message
-							if (CAN_SEE_NO_DARK(desc->character, ch)) {
-								if ((IS_MORPHED(ch) || IS_DISGUISED(ch)) && CAN_RECOGNIZE(desc->character, ch)) {
-									act(recog, FALSE, ch, NULL, desc->character, TO_VICT | TO_SLEEP | TO_NODARK);
-								}
-								else {
-									act(msgbuf, FALSE, ch, NULL, desc->character, TO_VICT | TO_SLEEP | TO_NODARK);
-								}
-							}
-							else {
-								act(someonebuf, FALSE, ch, NULL, desc->character, TO_VICT | TO_SLEEP | TO_NODARK);
-							}
-							
-							// get the message from act() and put it in history
-							if (desc->last_act_message && pub_comm[subcmd].history != NO_HISTORY) {
-								// color handling for history
-								if (pub_comm[subcmd].type != PUB_COMM_OOC) {
-									sprintf(lbuf, "%s%s", pub_comm[subcmd].color, desc->last_act_message);
-								}
-								else {
-									strcpy(lbuf, desc->last_act_message);
-								}
-								
-								add_to_channel_history(desc->character, pub_comm[subcmd].history, ch, lbuf);
-							}
-							else {
-								// color terminator if they somehow missed the rest of the string
-								send_to_char("\t0", desc->character);
-							}
-						}
-					}
+			if (STATE(desc) != CON_PLAYING || desc == ch->desc || !desc->character) {
+				continue;	// basic qualifications
+			}
+			if (GET_REAL_LEVEL(desc->character) < level) {
+				continue;	// too low
+			}
+			if (pub_comm[subcmd].ignore_flag != NOBITS && PRF_FLAGGED(desc->character, pub_comm[subcmd].ignore_flag)) {
+				continue;	// not on channel
+			}
+			if (pub_comm[subcmd].type != PUB_COMM_OOC && ROOM_AFF_FLAGGED(IN_ROOM(desc->character), ROOM_AFF_SILENT)) {
+				continue;	// quiet room?
+			}
+			if (IN_ROOM(ch) != IN_ROOM(desc->character) && (RMT_FLAGGED(IN_ROOM(ch), RMT_NO_LOCATION) || RMT_FLAGGED(IN_ROOM(desc->character), RMT_NO_LOCATION))) {
+				continue;	// either is !location but not the same room
+				// TODO room templates could have a 'subzone' id so shout/regionecho could work in the same subzone
+			}
+			if (is_ignoring(desc->character, ch)) {
+				continue;	// ignore: always no
+			}
+			if (pub_comm[subcmd].type == PUB_COMM_SHORT_RANGE && compute_distance(IN_ROOM(ch), IN_ROOM(desc->character)) > 50) {
+				continue;	// distance
+			}
+				
+			// ok:
+			
+			// special color handling for non-ooc channels
+			if (pub_comm[subcmd].type != PUB_COMM_OOC) {
+				// use act() so that nobody gets the color code that wouldn't get the rest of the string
+				//act(pub_comm[subcmd].color, FALSE, ch, NULL, desc->character, TO_VICT | TO_SLEEP | TO_NODARK);
+				send_to_char(pub_comm[subcmd].color, desc->character);
+			}
+			
+			// channel history
+			clear_last_act_message(desc);
+			
+			// send message
+			if (CAN_SEE_NO_DARK(desc->character, ch)) {
+				if ((IS_MORPHED(ch) || IS_DISGUISED(ch)) && CAN_RECOGNIZE(desc->character, ch)) {
+					act(recog, FALSE, ch, NULL, desc->character, TO_VICT | TO_SLEEP | TO_NODARK);
 				}
+				else {
+					act(msgbuf, FALSE, ch, NULL, desc->character, TO_VICT | TO_SLEEP | TO_NODARK);
+				}
+			}
+			else {
+				act(someonebuf, FALSE, ch, NULL, desc->character, TO_VICT | TO_SLEEP | TO_NODARK);
+			}
+			
+			// get the message from act() and put it in history
+			if (desc->last_act_message && pub_comm[subcmd].history != NO_HISTORY) {
+				// color handling for history
+				if (pub_comm[subcmd].type != PUB_COMM_OOC) {
+					sprintf(lbuf, "%s%s", pub_comm[subcmd].color, desc->last_act_message);
+				}
+				else {
+					strcpy(lbuf, desc->last_act_message);
+				}
+				
+				add_to_channel_history(desc->character, pub_comm[subcmd].history, ch, lbuf);
+			}
+			else {
+				// color terminator if they somehow missed the rest of the string
+				send_to_char("\t0", desc->character);
 			}
 		}
 	}
