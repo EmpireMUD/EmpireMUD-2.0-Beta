@@ -2262,6 +2262,7 @@ static void perform_give_coins(char_data *ch, char_data *vict, empire_data *type
 	char buf[MAX_STRING_LENGTH];
 	struct coin_data *coin = NULL;
 	int remaining, this;
+	obj_data *obj;
 
 	if (IS_NPC(ch)) {
 		msg_to_char(ch, "NPCs can't give coins.\r\n");
@@ -2287,18 +2288,30 @@ static void perform_give_coins(char_data *ch, char_data *vict, empire_data *type
 				
 		// try the "other" coins first
 		if ((coin = find_coin_entry(GET_PLAYER_COINS(ch), REAL_OTHER_COIN))) {
-			this = coin->amount;
-			decrease_coins(ch, REAL_OTHER_COIN, MIN(this, remaining));
-			increase_coins(vict, REAL_OTHER_COIN, MIN(this, remaining));
-			remaining -= MIN(this, remaining);
+			this = MIN(coin->amount, remaining);
+			decrease_coins(ch, REAL_OTHER_COIN, this);
+			if (IS_NPC(vict)) {
+				obj = create_money(REAL_OTHER_COIN, this);
+				obj_to_char(obj, vict);
+			}
+			else {
+				increase_coins(vict, REAL_OTHER_COIN, this);
+			}
+			remaining -= this;
 		}
 	
 		for (coin = GET_PLAYER_COINS(ch); coin && remaining > 0; coin = coin->next) {
 			if (coin->empire_id != OTHER_COIN) {
-				this = coin->amount;
-				decrease_coins(ch, real_empire(coin->empire_id), MIN(this, remaining));
-				increase_coins(vict, real_empire(coin->empire_id), MIN(this, remaining));
-				remaining -= MIN(this, remaining);
+				this = MIN(coin->amount, remaining);
+				decrease_coins(ch, real_empire(coin->empire_id), this);
+				if (IS_NPC(vict)) {
+					obj = create_money(real_empire(coin->empire_id), this);
+					obj_to_char(obj, vict);
+				}
+				else {
+					increase_coins(vict, real_empire(coin->empire_id), this);
+				}
+				remaining -= this;
 			}
 		}
 
