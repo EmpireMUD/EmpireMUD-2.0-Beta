@@ -451,7 +451,7 @@ S
 #11911
 apprentice kayla~
 Apprentice Kayla~
-Apprentice Kayla is here.
+Apprentice Kayla is on her bed, writing something.
 ~
 150 250 dvxJ n 3
 2 0 0 15
@@ -461,6 +461,9 @@ chunky braids, as there appears to be a lot of it to tame. Her eyes display a
 starry pink and purple pattern the swirls around her irises. Kayla is young,
 but Skycleave's selection process is notoriously difficult, so she has surely
 earned her spot.
+   Kayla is laying on her stomach on the bed, writing in a book. She pays no
+attention to you except to shift her position to block your view if you get too
+close.
 ~
 F 11800
 I 12 11873 100.00 1 p  # PICKPOCKET: glittering red potion
@@ -470,15 +473,16 @@ S
 #11912
 cosimo apprentice~
 Apprentice Cosimo~
-Apprentice Cosimo is here.
+Apprentice Cosimo reads from a book as he wanders around.
 ~
 150 250 dvxJ n 3
-1 0 0 15
+1 0 102 15
 D
-   Cosimo is clad in white apprentice robes with fiery red trim. On his face
-he bears a long scar that clips the left side of his lips. He wears his over-
+   Cosimo is clad in white apprentice robes with fiery red trim. On his face he
+bears a long scar that clips the left side of his lips. He wears his over-
 grown hair up in a sweeping modern style, with a stubbly chin that almost
-resembles a beard.
+resembles a beard. He appears to be wandering aimlessly as he studies the book
+in his hands.
 ~
 F 11800
 I 12 11874 100.00 1 p  # PICKPOCKET: filigreed stasis charm
@@ -2859,7 +2863,7 @@ with her lips and then goes back to what she was doing.
 patterns.
 ~
 F 11800
-I 12 11869 100.00 1 p  # PICKPOCKET: self-writing pen
+I 12 11867 100.00 1 p  # PICKPOCKET: dynamic reconfabulator
 M
 7
 set line_gap 6 s~

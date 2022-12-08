@@ -400,8 +400,39 @@ braids tied back behind her head.
 ~
 F 11800
 I 12 11873 100.00 1 p  # PICKPOCKET: glittering red potion
+M
+7
+emote $n rubs her hands together.~
+M
+7
+say I hope those filthy goblins aren't in my bunkroom.~
+M
+8
+emote $n chews on her lip a little.~
+M
+8
+say I hate it down here.~
+M
+9
+emote $n cracks her knuckles.~
+M
+9
+say I'm just glad I'm not trapped up there with those awful goblins.~
+M
+10
+emote $n rubs her hands together.~
+M
+10
+say I hope we catch those goblins before they ruin anything.~
+M
+11
+emote $n picks at her cuticles.~
+M
+11
+say I hope Coz is safe somewhere.~
 T 11810
 T 11852
+T 11840
 S
 #11812
 cosimo apprentice~
@@ -473,6 +504,27 @@ D
 Strings set by trig 11824.
 ~
 I 4 11929 90.00 1  # LOOT: very crummy bread
+M
+0
+$n shivers uncomfortably.~
+M
+0
+$n shivers.~
+M
+0
+$n rocks back and forth a little.~
+M
+0
+$n coughs.~
+M
+0
+You can hear $n's stomach grumbling.~
+M
+1
+Never going home.~
+M
+0
+$n rummages through some items but doesn't seem to find what $e's looking for.~
 T 11801
 T 11815
 T 11824
@@ -492,6 +544,30 @@ Strings set by trig 11824.
 ~
 I 4 11929 90.00 1  # LOOT: very crummy bread
 I 4 11876 66.66 1  # LOOT: obsidian stabber
+M
+0
+$n locks eyes with you as $e cleans under $s fingernails with a knife.~
+M
+1
+Human want some?~
+M
+0
+$n grits $s teeth.~
+M
+0
+$n watches you.~
+M
+1
+We was here first.~
+M
+1
+Venjer will get you if I doesn't get you first.~
+M
+0
+$n seems to be sizing you up.~
+M
+0
+$n considers $s chances against you.~
 T 11801
 T 11816
 T 11824
@@ -511,6 +587,27 @@ Strings set by trig 11824.
 ~
 I 4 11929 90.00 1  # LOOT: very crummy bread
 I 4 11875 66.66 1  # LOOT: hardstone pick
+M
+0
+$n swings $s pick into the wall.~
+M
+0
+$n wipes $s brow.~
+M
+0
+$n adjusts $s helmet.~
+M
+0
+$n swings $s pick back and nearly drops it.~
+M
+0
+There floor shakes a little as $n swings $s pick into the wall.~
+M
+0
+$n adjust $s pick.~
+M
+0
+$n taps at the wall with $s finger.~
 T 11801
 T 11817
 T 11824
@@ -610,6 +707,21 @@ I 4 11900 100.00 1  # LOOT: unattuned skystone
 I+ 5 0  # Group
 I 4 11900 100.00 2  # LOOT: unattuned skystone
 I+ 6 0  # Boss
+M
+0
+$n glimmers in the light.~
+M
+0
+You hear a donkey bray in the distance.~
+M
+0
+You scoot out of the way as a vine creeps along the floor and over your foot.~
+M
+0
+The maze seems to be growing larger and larger.~
+M
+0
+Pixy dust shimmers in the air.~
 T 11948
 T 11819
 T 11823

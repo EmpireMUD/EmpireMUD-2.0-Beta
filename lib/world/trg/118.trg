@@ -9278,7 +9278,7 @@ end
 skydel 11812 2  * Apprentice Cosimo 2A
 * Apprentice Kayla
 set kayla %instance.mob(11811)%
-%at% i11911 %load% mob 11911  * Apprentice Kayla
+%at% i11925 %load% mob 11911  * Apprentice Kayla
 if %kayla.mob_flagged(*PICKPOCKETED)%
   set mob %instance.mob(11911)%
   nop %mob.add_mob_flag(*PICKPOCKETED)%
