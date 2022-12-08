@@ -3644,6 +3644,14 @@ to find its footing. A panicked look from the lion tells you everything you
 need to know about its predicament. Text at the bottom reads:
                              'Hang in there.'
 ~
+E
+desk~
+The desk has been removed, though the floor is marked where it was.
+~
+E
+chairs~
+There is one chair for the office's occupant and two more for guests.
+~
 S
 #11965
 An Elegant Suite~
@@ -3926,6 +3934,11 @@ east doorway~
 The door leads back out into the office.
 ~
 E
+chair easychair~
+   The overstuffed easy chair sits low to the ground. The purple upholstery is
+striped in two shades, just like the calamander wood of the feet.
+~
+E
 furniture bespoke calamander chairs~
    The chairs and tables here are finely crafted from striped black and brown
 calamander, one of the finest and rarest woods. Many of them bear the initials
@@ -3972,11 +3985,6 @@ E
 closet~
    You open the askew closet door and nearly fall over when you find a skeleton
 inside. You swing the door shut and back away slowly.
-~
-E
-chair easychair~
-   The overstuffed easy chair sits low to the ground. The purple upholstery is
-striped in two shades, just like the calamander wood of the feet.
 ~
 M 1 11963 100.00 1
 S
@@ -4170,11 +4178,14 @@ window north~
 You can see the whole countryside from the window. (look out)
 ~
 E
-bookshelf shelf calamander~
+bookshelf shelf calamander books~
    The bookshelf, carved from black and brown striped calamander wood, is truly
 massive. If it were laid on the ground, it would be larger than any bed you've
-slept in. It holds dozens upon dozens of tomes, though you find you can't touch
-them: your hand is stopped by an invisible barrier.
+slept in. It holds dozens upon dozens of tomes, many of them older than you are
+and some, apparently, older than the tower. But each time you take a book from
+the shelf, you find yourself having trouble reading the words, which move
+around on the page. Even the letters seem unstuck from their words as they flip
+themselves and swap places.
 ~
 E
 rugs plush~

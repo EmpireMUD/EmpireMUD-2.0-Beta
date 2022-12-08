@@ -759,6 +759,37 @@ breadcrumbs form a clear trail on the ground.
 C
 1 1
 S
+#11931
+dress green~
+a green dress~
+A green dress is lying on the ground.~
+   The green dress is a bit tight in the middle, but it has a fashionable,
+modern cut that would look stylish on anyone. The color is, perhaps, somwhere
+between honeydew and laurel; it's rarely found on clothing because green dyes
+are notoriously ephemeral. Nevertheless, the dress has an even and unfaded tone
+that would stand out even in a summer meadow.
+   This dress grants a new 'dance' social to the wearer.
+   When traveling far afield, it is often safest to go unseen.
+~
+2 mp ad 0 8
+0 0 0
+11 0
+A
+5 1 0
+A
+5 1 6
+C
+1 1
+M
+12
+$n is dressed all in green.~
+M
+9
+$n squeezes into a little green dress.~
+M
+8
+You squeeze into the green dress, even if it's a little small.~
+S
 #11935
 shard crafting skycleaver~
 a skycleaver crafting shard~
@@ -1195,6 +1226,21 @@ C
 100 100
 T 11965
 T 11963
+S
+#11966
+desk somber niamhs niamh's~
+Niamh's desk~
+A somber desk stands near the center of the office.~
+   The desk is large and somewhat austere. It's pitch black, but unlike most of
+the black tower's ebony, there is no woodgrain, no knots, not even the
+slightest imperfection on the surface. It is well and truly black, almost as if
+it was carved from a shadow instead of a tree.
+~
+3 0 0 0 5
+0 0 0
+0 0
+C
+250 250
 S
 #11967
 desk oak tall austere~

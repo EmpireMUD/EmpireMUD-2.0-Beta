@@ -212,6 +212,7 @@ switch %self.vnum%
     if %niamh%
       %at% %niamh.room% %echo% ~%niamh% heads upstairs.
       %load% mob 11970
+      %load% obj 11966
       %echo% Niamh walks in from the north.
       if %niamh.mob_flagged(*PICKPOCKETED)%
         set mob %instance.mob(11970)%
@@ -2336,7 +2337,7 @@ wait 1
 ~
 #11929
 Skycleave: Leave breadcrumbs in the pixy maze~
-2 q 100
+2 qA 100
 ~
 return 1
 * basic checks
