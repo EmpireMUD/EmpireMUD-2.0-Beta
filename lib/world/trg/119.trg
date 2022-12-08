@@ -1280,9 +1280,9 @@ elseif %move% == 4
     if !%broke% && %cycle% < 4
       %echo% &&m**** The lion is still casting... ****&&0 (interrupt and dodge)
     end
+    skyfight clear dodge
     eval cycle %cycle% + 1
   done
-  skyfight clear dodge
   skyfight clear interrupt
 end
 * in case
@@ -5473,9 +5473,9 @@ if %move% == 1
       end
       set ch %next_ch%
     done
+    skyfight clear dodge
     eval cycle %cycle% + 1
   done
-  skyfight clear dodge
   if !%hit%
     if %diff% < 3
       %echo% &&j~%self% spins himself out doing the hammer dance.&&0
@@ -5483,7 +5483,7 @@ if %move% == 1
     end
   end
   wait 8 s
-elseif %move% == 2
+elseif %move% == 2 && !%self.aff_flagged(BLIND)%
   * Ring Your Bell
   if %diff% <= 2
     nop %self.add_mob_flag(NO-ATTACK)%
@@ -5563,7 +5563,7 @@ elseif %move% == 3
     dg_affect #11954 %self% BONUS-PHYSICAL %amount% 300
   end
   skyfight clear interrupt
-elseif %move% == 4
+elseif %move% == 4 && !%self.aff_flagged(BLIND)%
   * Hammer Throw
   skyfight clear dodge
   set targ %self.fighting%
@@ -5753,9 +5753,9 @@ elseif %move% == 2
     if !%broke% && %cycle% < 4
       %echo% &&m**** Here comes another lightning torrent... ****&&0 (interrupt and dodge)
     end
+    skyfight clear dodge
     eval cycle %cycle% + 1
   done
-  skyfight clear dodge
   skyfight clear interrupt
 elseif %move% == 3
   * Buff Blitz
@@ -5985,9 +5985,9 @@ elseif %move% == 2
       end
       set ch %next_ch%
     done
+    skyfight clear dodge
     eval cycle %cycle% + 1
   done
-  skyfight clear dodge
   wait 8 s
 elseif %move% == 3
   * Lightning Wave
@@ -6260,9 +6260,9 @@ elseif %move% == 2
       end
       set ch %next_ch%
     done
+    skyfight clear dodge
     eval cycle %cycle% + 1
   done
-  skyfight clear dodge
   wait 8 s
 elseif %move% == 3
   * Pocket Glitter
@@ -6485,9 +6485,9 @@ if %move% == 1
       end
       set ch %next_ch%
     done
+    skyfight clear dodge
     eval cycle %cycle% + 1
   done
-  skyfight clear dodge
   dg_affect #11958 %self% off
   if !%hit%
     if %diff% < 3
@@ -6621,9 +6621,9 @@ elseif %move% == 4
       end
       set ch %next_ch%
     done
+    skyfight clear dodge
     eval cycle %cycle% + 1
   done
-  skyfight clear dodge
   if !%hit%
     if %diff% < 3
       %echo% &&jA stray hatchet hits ~%self% on the head, handle-first!&&0
@@ -6713,9 +6713,9 @@ if %move% == 1
       end
       set ch %next_ch%
     done
+    skyfight clear dodge
     eval cycle %cycle% + 1
   done
-  skyfight clear dodge
   dg_affect #11950 %self% off
   if !%hit%
     if %diff% < 3
@@ -6724,7 +6724,7 @@ if %move% == 1
     end
   end
   wait 8 s
-elseif %move% == 2
+elseif %move% == 2 && !%self.aff_flagged(BLIND)%
   * Thornbound
   skyfight clear free
   skyfight clear struggle
