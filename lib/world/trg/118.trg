@@ -8,7 +8,7 @@ end
 ~
 #11801
 Skycleave: Complex leave rules for floors 2 and 3~
-0 s 100
+0 sA 100
 ~
 set sneakable_vnums 11815 11816 11817 11841 11842 11843 11844 11845 11846
 set maze_vnums 11812 11813 11818 11819 11820 11821 11823 11824 11825 11826
@@ -195,7 +195,7 @@ done
 ~
 #11806
 One-time greetings using script1~
-0 gnwA 100
+0 hnwA 100
 ~
 * Uses mob custom script1 to for one-time greetings, with each script1 line
 *   sent every %line_gap% (9 sec) until it runs out of strings. The mob will
@@ -477,6 +477,49 @@ elseif %self.vnum% == 11828
     %echo% ~%self% refuses @%object% from ~%actor%.
     say This is an A and B conversation so please C your way out. Door's to your left. Thank you. Bye.
   end
+elseif (%self.vnum% == 11835 || %self.vnum% == 11935 || %self.vnum% == 11942) && %object.vnum% == 11872
+  * Sanjiv
+  wait 1
+  %echo% ~%self% blushes and crumples up the note.
+  %purge% %object%
+elseif %self.vnum% == 11931 && %object.vnum% == 11872
+  * Resident Niamh 3B
+  return 0
+  %send% %actor% You try to give @%object% to ~%self% but she sighs and refuses it.
+  %echoaround% %actor% ~%actor% tries to give something to ~%self% but she sighs and refuses it.
+  wait 1
+  say Please don't show it to anyone else.
+elseif %self.vnum% == 11831 && %object.vnum% == 11872
+  * Resident Niamh 3A
+  wait 1
+  %echo% ~%self% reads the note and her eyes grow wide as it dissolves into inky shadows in her hands.
+  wait 1
+  say Well, I... I never. I shall look into this.
+  %purge% %object%
+elseif %self.vnum% == 11970 && %object.vnum% == 11872
+  * AHS Niamh 4B
+  wait 1
+  %echo% ~%self% sighs.
+  wait 1
+  say Well, we'll just sweep this under the rug. In fact, I'll have him do it himself.
+  %purge% %object%
+elseif (%self.vnum% == 11959 || || %self.vnum% == 11813 || %self.vnum% == 11913) && %object.vnum% == 11872
+  * Page Sheila and Apprentice Tyrone
+  wait 1
+  %echo% ~%self% just shrugs.
+  %purge% %object%
+elseif (%self.vnum% == 11805 || %self.vnum% == 11905) && %object.vnum% == 11872
+  * Mageina
+  return 0
+  %send% %actor% You try to give @%object% to ~%self% but she cackles and hands it back.
+  %echoaround% %actor% ~%actor% tries to give something to ~%self% but she cackles and hands it back.
+  wait 1
+  say I've got lots of these, you can keep it.
+elseif %self.vnum% == 11808 && %object.vnum% == 11872
+  * Unrequited young lady
+  wait 1
+  %echo% ~%self% doesn't even look at the note.
+  %purge% %object%
 end
 ~
 #11808

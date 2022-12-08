@@ -199,6 +199,7 @@ I 12 11883 1.00 1 p  # PICKPOCKET: gnarled old wand
 T 11810
 T 11837
 T 11852
+T 11807
 S
 #11806
 Huberus master sorcerer instructor~
@@ -324,6 +325,7 @@ M
 What lust has rent, mayhap sorcery can repair.~
 T 11810
 T 11852
+T 11807
 S
 #11809
 #n~
@@ -439,6 +441,7 @@ fire-orange hair.
 F 11800
 T 11810
 T 11803
+T 11807
 S
 #11814
 wright old~
@@ -1183,6 +1186,7 @@ F 11800
 I 12 11928 100.00 1 p  # PICKPOCKET: Moonshadow Configuration
 T 11837
 T 11852
+T 11807
 S
 #11832
 mohammed resident~
@@ -1275,6 +1279,7 @@ the door.
 F 11800
 I 12 11872 100.00 1 p  # PICKPOCKET: hand-written note
 T 11803
+T 11807
 S
 #11836
 scaldorran lich~
@@ -2044,7 +2049,10 @@ M
 say Sell the artifacts, she said.~
 M
 7
-say There's a fortune stocked away in the lich's lab, she said.~
+say Have to pay in cash, Mez. This lot would turn on their own mother for 500 quid.~
+M
+7
+say There's a fortune stocked away in the lich's lab, my arse.~
 M
 7
 say Just don't open the repository. Got it. Won't open it. But there's nothing in here I can sell.~

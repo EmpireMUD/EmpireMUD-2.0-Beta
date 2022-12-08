@@ -30,8 +30,9 @@ gossiper #n~
 30 50 dvI 0 3
 0 0 0 15
 D
-   This tourist is simply enamored with the Tower Skycleave. They won't stop
-talking about it!
+   Though dressed in finery, the mud around the tourist's shoes and the edges
+of their heavy clothing identifies them as travelers. They seem to be prattling
+at length about a recent adventure.
 ~
 I 4 2015 40.00 1  # LOOT: tunic
 I 4 2021 40.00 1  # LOOT: cloth mantle
@@ -48,6 +49,21 @@ I swear that Skycleave barista re-heated my coffee with a wand.~
 M
 1
 I can't believe the Tower Skycleave is finally here!~
+M
+1
+I've heard tales of Skycleave popping in and out ever since I was a kid.~
+M
+1
+That tower was just incredible. I wonder where they got all those stones. Never seen a tower so high.~
+M
+1
+I'll be going back to Skycleave as soon as I can afford one of those pixy jars.~
+M
+1
+You can just feel all the magic as soon as you see the Black Tower.~
+M
+1
+I still can't believe I saw Skycleave. Pinch me, I must be dreaming!~
 T 11905
 S
 #11902
@@ -211,6 +227,7 @@ M
 $n hums a little tune.~
 T 11810
 T 11852
+T 11807
 S
 #11906
 Huberus instructor~
@@ -506,6 +523,7 @@ M
 $n clicks his fingers and a little fire drake bursts into existence. But it spits at Tyrone and costs $m half an eyebrow.~
 T 11810
 T 11852
+T 11807
 S
 #11914
 Wright wrangler~
@@ -1186,6 +1204,7 @@ say That includes you.~
 T 11810
 T 11852
 T 11840
+T 11807
 S
 #11932
 mohammed resident~
@@ -1332,6 +1351,7 @@ say What even is this thing?~
 T 11810
 T 11852
 T 11840
+T 11807
 S
 #11936
 scaldorran lich~
@@ -1809,6 +1829,7 @@ M
 $n walks along the wall, passing the light from $s contraption over it.~
 T 11810
 T 11852
+T 11807
 S
 #11943
 visitor gardens hanging~
@@ -2477,6 +2498,7 @@ I 4 11965 100.00 1  # LOOT: jade tear of Gobbrabakh of Orka
 I 4 11977 100.00 1  # LOOT: steamed mussels
 I 4 11899 100.00 1  # LOOT: piece of rough-cut blue jade
 I 4 11976 100.00 1  # LOOT: goblin trinkets
+I 4 11931 4.00 1  # LOOT: green dress
 M
 0
 $n cracks $s thorn whips in the air.~
@@ -2513,6 +2535,7 @@ I 12 11872 100.00 1 p  # PICKPOCKET: hand-written note
 T 11810
 T 11937
 T 11852
+T 11807
 S
 #11960
 cabinet filing~
@@ -3341,6 +3364,7 @@ say Celiya and I will return this tower to greatness, if she can be convinced to
 T 11810
 T 11852
 T 11840
+T 11807
 S
 #11971
 Gron goblin~
@@ -3511,7 +3535,7 @@ M
 echo Someone shouts, 'What if they're here to take our land?'~
 M
 11
-say The land is large and the sea, eternal. These giants will have little use for our little precipice.~
+say The land is large and the sea, eternal. These giants will have little use for our rocky precipice.~
 M
 11
 echo Someone in the crowd asks, 'And if they do? We won't let them take our homes.'~
@@ -3520,10 +3544,13 @@ M
 say I hear your fears and stand beside you in the light of the god's hearth.~
 M
 11
-say Gobbrabakh of Orka is well-placed on these cliffs. No army has ever breeched it. By the god, no army ever will.~
+say Gobbrabakh of Orka is well-placed on these cliffs. No army has ever breached it. By the god, no army ever will.~
 M
 11
 echo Murmurs spread through agitated crowd as most of the people look to the priest.~
+M
+11
+say We will trust that the god has brought us together.~
 M
 11
 say The god will see us through this in peace or in victory. Since we were cut from the jade, no gobbrabakh has ever fallen.~
@@ -3532,22 +3559,46 @@ M
 echo One man in the crowd cheers, and the rest follow.~
 M
 11
-say We will trust that the god has brought us together.~
+echo One voice cuts through the cheers...~
+M
+11
+echo Someone says, 'How can we trust them? What do we even know of these giants?'~
 M
 11
 say We will trade with these newcomers and learn of their culture. We will learn whence they sail.~
 M
 11
-say We will learn who they are. We will taste sample fish and share with them our oysters.~
+echo Someone else says, 'What if they're not like us?'~
 M
 11
-say We will learn how they dance and how they sing. If they lack fire, we will cut flint for them.~
+say We will learn who they are. We will sample their fish and share with them our oysters.~
+M
+11
+echo The din grows as every goblin in the crowd tries to speak at once.~
+M
+11
+echo Someone from the back yells, 'I saw them at Gorannar. What do we even know about these giants, these so-called Hew Mons?'~
+M
+11
+say We may know nothing beyond their name, but we will not cower, afraid. We will learn everything about them...~
 M
 11
 say We will learn if they are called Hew Mons because of the great trees they hew for their ships.~
 M
 11
+say We will learn how they dance and how they sing. If they lack fire, we will cut flint for them.~
+M
+11
+say We will show them our kindness, our compassion, and our hearts. And if their hearts beat green as ours do, by the god we shall be fast friends!~
+M
+11
+echo A cautious cheer waves over the crowd.~
+M
+11
 say Be at peace on this holy day.~
+M
+11
+echo The crowd echoes, 'On this holy day.'~
 M
 11
 do restring janitor~
