@@ -480,7 +480,11 @@ elseif %self.vnum% == 11828
 elseif (%self.vnum% == 11835 || %self.vnum% == 11935 || %self.vnum% == 11942) && %object.vnum% == 11872
   * Sanjiv
   wait 1
-  %echo% ~%self% blushes and crumples up the note.
+  if %self.room.people(11847)%
+    %echo% ~%self% holds perfectly still, totally ignoring ~%actor%.
+  else
+    %echo% ~%self% blushes and crumples up the note.
+  end
   %purge% %object%
 elseif %self.vnum% == 11931 && %object.vnum% == 11872
   * Resident Niamh 3B
@@ -8373,7 +8377,7 @@ if %comment% == 0
       break
     done
     eval cycle %cycle% + 1
-    wait 4 sec
+    wait 9 sec
   done
 elseif %comment% == 1
   * doing the directions
@@ -8420,7 +8424,7 @@ elseif %comment% == 1
       break
     done
     eval cycle %cycle% + 1
-    wait 5 sec
+    wait 9 sec
   done
 elseif %comment% == 2
   * cleaning cycle (turn off oration; can be interrupted)
@@ -8454,7 +8458,7 @@ elseif %comment% == 2
       break
     done
     eval cycle %cycle% + 1
-    wait 8 sec
+    wait 9 sec
   done
 elseif %comment% == 3
   * just a pause (turn off oration; can be interrupted)

@@ -2230,7 +2230,11 @@ Skycleave: Drink Teacup~
 1 s 100
 ~
 dg_affect #11927 %actor% off silent
-dg_affect #11927 %actor% MANA-REGEN -1 30
+dg_affect #11927 %actor% MANA-REGEN -1 60
+* check eligibility
+if !%actor.completed_quest(11918)% && !%actor.completed_quest(11919)% && !%actor.completed_quest(11920)% && !%actor.completed_quest(11864)%
+  set dreams_only 1
+end
 set teleported 0
 * begin loop to wait for sleep
 set count 0
@@ -2241,6 +2245,30 @@ while %count% < 12
   * see where we're at
   if %actor.position% != Sleeping || !%room.function(BEDROOM)% || !%actor.can_teleport_room% || !%actor.canuseroom_guest%
     * still awake or no bedroom? nothing to do
+  elseif %dreams_only%
+    switch %random.7%
+      case 1
+        %send% %actor% You dream of fishing by a peaceful little river, alone with your thoughts.
+      break
+      case 2
+        %send% %actor% You dream you're stuck in a cold, dark cave with square eyes watching you on all sides.
+      break
+      case 3
+        %send% %actor% You dream of standing shoulder-to-shoulder with the smallest of heroes.
+      break
+      case 4
+        %send% %actor% You dream of an unexpected visit to the headmistress's office.
+      break
+      case 5
+        %send% %actor% You dream of being trapped in a cold, round, windowless cell.
+      break
+      case 6
+        %send% %actor% You dream of perfect serenity.
+      break
+      case 7
+        %send% %actor% You dream you're fighting a tremendous giant.
+      break
+    done
   else
     * Sleeping AND in a bedroom: set a target
     set to_room %instance.nearest_rmt(11973)%
@@ -7361,7 +7389,7 @@ elseif %actor.action% != playing
   halt
 end
 * lists
-set list1 11877 11878 11879 11880 11881 11882 11883 11885 11886 11887
+set list1 11873 11874 11875 11876 11877 11878 11879 11880 11881 11882 11883 11885 11886 11887
 set list2 615 616 10042 11520 11521 11522 11523 11524 11525 11526 11819 11820 11963 11982 11624 11625
 * loop
 set ch %actor.room.people%
@@ -7370,6 +7398,18 @@ while %ch%
     if %list1% ~= %ch.vnum% || %list2% ~= %ch.vnum%
       wait 1
       switch %ch.vnum%
+        case 11873
+          %echo% ~%ch% moves ^%ch% feet to the music.
+        break
+        case 11874
+          %echo% ~%ch% taps ^%ch% leg with ^%ch^ hand.
+        break
+        case 11875
+          %echo% The chamber echoes as ~%ch% snaps ^%ch% fingers to the music.
+        break
+        case 11876
+          %echo% ~%ch% hums along as the music plays.
+        break
         case 11878
           %echo% ~%ch% dances a little as &%ch% walks.
         break
