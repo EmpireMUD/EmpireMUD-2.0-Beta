@@ -2232,7 +2232,10 @@ Skycleave: Drink Teacup~
 dg_affect #11927 %actor% off silent
 dg_affect #11927 %actor% MANA-REGEN -1 60
 * check eligibility
-if !%actor.completed_quest(11918)% && !%actor.completed_quest(11919)% && !%actor.completed_quest(11920)% && !%actor.completed_quest(11864)%
+if (%actor.completed_quest(11918)% || %actor.completed_quest(11919)% || %actor.completed_quest(11920)% || %actor.completed_quest(11864)%)
+  * any of these quests are required for the real dream
+  set dreams_only 0
+else
   set dreams_only 1
 end
 set teleported 0

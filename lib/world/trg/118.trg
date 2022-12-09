@@ -524,6 +524,13 @@ elseif %self.vnum% == 11808 && %object.vnum% == 11872
   wait 1
   %echo% ~%self% doesn't even look at the note.
   %purge% %object%
+elseif %self.vnum% == 11920 && %object.vnum% == 11872
+  * GHSs
+  return 0
+  %send% %actor% You hand @%object% to ~%self% and she glances at it, but hands it back.
+  %echoaround% %actor% ~%actor% gives something to ~%self% and she glances at it, but hands it back.
+  wait 1
+  say Wow, you too?
 end
 ~
 #11808
