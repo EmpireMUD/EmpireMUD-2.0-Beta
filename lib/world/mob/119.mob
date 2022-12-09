@@ -4391,16 +4391,35 @@ the more civilized uses of mana.
 T 11990
 S
 #11991
-toaster brave little~
-a brave little toaster~
-A brave little toaster is hopping around.
+doorstop stop enchanted~
+an enchanted doorstop~
+An enchanted doorstop is scampering around.
 ~
 1 1 bdoD n 1
-0 0 15 15
+0 0 71 15
 D
-minipet
-tba
+   The doorstop is wedge-shaped and looks to be cast iron, though it's old and
+unpolished such that rust grows on it like fur. It seems to be scampering
+around on its own, stopping occasionally to investigate a crumb.
+   It is seen as a rare privilege to spend a lifetime studying at Skycleave.
+Annelise Larsen mastered the Deleon Enchantment and, for her genius, spent
+another two.
 ~
+M
+0
+$n sniffs around at the ground.~
+M
+0
+$n tries to hide.~
+M
+0
+$n rolls around on the ground.~
+M
+0
+$n squeaks.~
+M
+0
+$n squeaks like it needs to be oiled.~
 S
 #11992
 lamp hopping~
@@ -4483,16 +4502,71 @@ tba
 ~
 S
 #11996
-teapot pot piping~
-a piping teapot~
-A piping teapot is here.
+goblin caged~
+a caged goblin~
+A goblin in a cage is walking around.
 ~
 1 1 bdoD n 1
-0 0 15 15
+0 0 99 15
 D
-minipet
-tba
+   The tiny, green-skinned creature is trapped in an equally tiny cage, all
+except its feet, which stick down from the forward-tilting cage to let the
+poor thing walk on its own. It sings as it plods along, though it never seems
+to finish a song.
+   The goblin's knees have wooden pins through them and articulate like a
+hinge. On closer inspection, this goblin is a puppet!
 ~
+M
+0
+$n sings, 'No bodies known the trouble I seed...'~
+M
+0
+$n sings, 'Well I knows I had it comin', I knows I cain't be free, but those people keep a-whippin', and that's what tortures me.'~
+M
+0
+$n sings, 'Goblin threw a party in the tower jail, prison band was there and they began to wail. Band was jumpin' and the tower start to swing... You should've heard them goblins sing!'~
+M
+0
+$n sings, 'I saw goblins runnin' out, they looked like middleweights. Jumped onto a white horse with stolen silver plates...'~
+M
+0
+$n sings, 'Breakin' rocks in the hot sun, I fought the tower and the tower won...'~
+M
+0
+$n sings, 'Jailhouse get empty. Rusty get plenty. The baton stick get shorter... Rusty gets taller. Can't fight against the wand... Cause them rude, rude people...'~
+M
+0
+$n sings, 'Nothing I does, nothing I say, I tell them to go get plucked, they put me away...'~
+M
+0
+$n sings, 'There's some jewels in the skull that he could sell if he chose...'~
+M
+0
+$n sings, 'You can't run away from yourself, ay. Can't runaway from yourself, no, no...'~
+M
+0
+$n sings, 'Inna di street, tings ah get rougher than rough, inna di street...'~
+M
+0
+$n sings, 'Tonight there's gonna be trouble, some of us won't survive, see the Gobs and me mean business, bustin' out dead or alive...'~
+M
+0
+$n sings, 'And someone's sneakin' 'round the tower. Could that someone be Mack the Knife?'~
+M
+0
+$n sings, 'As $e came into the window, was the sound of, a crash-end-o, $e came into giant tower, $e left bloodstains, on the parapet...'~
+M
+0
+$n sings, 'They headed down to, oooh, old Elk Castle, that's where they ran into a great big hassle. Gobly Jo shot a man while robbin' his castle, Gobly Sue took the money and run... Hoo-hoo-hoo, go on, take the money and run...'~
+M
+0
+$n sings, 'Oh, there ain't no rest for the wicked, goblins don't grow on trees. I got guys to pay, I got mouths to feed, there ain't nothin' in this world for free...'~
+M
+0
+$n sings, 'Straight outta Goblin, crazy featherplucker named Filks, from the gang called Goblinz Wit Attitudes. When I'm called off, I get sawed off, pull the blade and the bodies are hauled off...'~
+M
+0
+$n sings, 'Desperate goblin... Why don't you come to your senses? You've been out ridin' fences for so long now...'~
 S
 #11997
 fan adoring~
