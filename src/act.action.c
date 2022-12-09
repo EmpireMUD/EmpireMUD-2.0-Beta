@@ -298,6 +298,10 @@ void update_actions(void) {
 			cancel_action(ch);
 			continue;
 		}
+		if (AFF_FLAGGED(ch, AFF_STUNNED | AFF_HARD_STUNNED)) {
+			cancel_action(ch);
+			continue;
+		}
 		if (action_data[GET_ACTION(ch)].process_function == NULL) {
 			// no way to process this action
 			cancel_action(ch);
