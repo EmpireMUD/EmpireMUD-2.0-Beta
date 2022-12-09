@@ -668,7 +668,6 @@ set template %self.room.template%
 %mod% %self% append-lookdesc-noformat &0
 %mod% %self% append-lookdesc-noformat &0      +-------------------------------------------------------+
 %mod% %self% append-lookdesc-noformat &0      |                                                       |`+
-
 if %template% == 11801 || %template% == 11901
   %mod% %self% append-lookdesc-noformat &0      | ============ The Tower Skycleave: Lobby ============= | |
 elseif %template% == 11810 || %template% == 11910
@@ -770,15 +769,68 @@ end
 %mod% %self% append-lookdesc-noformat &0      |                                                       |,+
 %mod% %self% append-lookdesc-noformat &0      +-------------------------------------------------------+
 ~
+#11812
+Gemstone flute: Play to activate dancing~
+1 c 1
+play~
+return 0
+wait 1
+if %self.worn_by% != %actor%
+  halt
+end
+if %actor.action% != playing
+  halt
+end
+if !%self.has_trigger(11998)%
+  * short pause to ensure it plays a music message
+  wait 6 s
+  attach 11998 %self.id%
+end
+~
 #11813
 Skycleave: Shared enter trigger~
 2 gwA 100
 ~
-* ensure they're on the first progress goal
-set emp %actor.empire%
-if %emp%
-  if !%emp.is_on_progress(11800)% && !%emp.has_progress(11800)%
-    nop %emp.start_progress(11800)%
+* based on room
+if %room.template% == 11908
+  * fountain 1B: react with awe
+  if %direction% == down && %actor.is_pc%
+    set awe_vnums 11904 11800 11802 11803 11808 11809 11822 11823 11824 11826
+    set ch %room.people%
+    set done 0
+    while %ch% && !%done%
+      if %ch.is_npc% && %ch.can_see(%actor%)% && %awe_vnums% ~= %ch.vnum%
+        wait 1
+        switch %random.4%
+          case 1
+            %force% %ch% say How did you get in the fountain?
+          break
+          case 2
+            %force% %ch% say Did you just come out of the fountain?
+          break
+          case 3
+            %send% %actor% ~%ch% jumps as you rise out of the fountain.
+            %echoaround% %actor% ~%ch% jumps as ~%actor% rises out of the fountain.
+          break
+          case 4
+            %send% %actor% ~%ch% stands there, mouth agape, as you rise from the fountain.
+            %echoaround% %actor% ~%ch% stands there, mouth agape, as ~%actor% rises from the fountain.
+          break
+        done
+        set done 1
+      end
+      set ch %ch.next_in_room%
+    done
+    * prevent commenting on everyone following
+    wait 1
+  end
+else
+  * All other rooms: ensure they're on the first progress goal
+  set emp %actor.empire%
+  if %emp%
+    if !%emp.is_on_progress(11800)% && !%emp.has_progress(11800)%
+      nop %emp.start_progress(11800)%
+    end
   end
 end
 ~

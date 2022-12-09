@@ -7348,6 +7348,65 @@ switch %random.10%
   break
 done
 ~
+#11998
+Gemstone flute: Everybody dance now~
+1 ab 100
+~
+set actor %self.worn_by%
+if !%actor%
+  detach 11998 %self.id%
+  halt
+elseif %actor.action% != playing
+  detach 11998 %self.id%
+  halt
+end
+* lists
+set list1 11877 11878 11879 11880 11881 11882 11883 11885 11886 11887
+set list2 615 616 10042 11520 11521 11522 11523 11524 11525 11526 11819 11820 11963 11982 11624 11625
+* loop
+set ch %actor.room.people%
+while %ch%
+  if %ch.is_npc% && !%ch.disabled% && %ch.position% == Standing
+    if %list1% ~= %ch.vnum% || %list2% ~= %ch.vnum%
+      wait 1
+      switch %ch.vnum%
+        case 11878
+          %echo% ~%ch% dances a little as &%ch% walks.
+        break
+        case 11879
+          %echo% ~%ch% taps ^%ch% foot to the music.
+        break
+        case 11882
+          %echo% ~%ch% moves with the music as &%ch% works.
+        break
+        case 11883
+          %echo% ~%ch% bobs ^%ch% head to the music.
+        break
+        case 11885
+          %echo% ~%ch% hums along to the music.
+        break
+        case 11886
+          %echo% ~%ch% sways to the music.
+        break
+        case 11887
+          %echo% ~%ch% sways along.
+        break
+        default
+          set rng %random.3%
+          if %rng% == 1
+            %echo% ~%ch% dances around.
+          elseif %rng% == 2
+            %echo% ~%ch% dances to the music.
+          else
+            %echo% ~%ch% dances along.
+          end
+        break
+      done
+    end
+  end
+  set ch %ch.next_in_room%
+done
+~
 #11999
 Crystal ball visions~
 0 ct 0

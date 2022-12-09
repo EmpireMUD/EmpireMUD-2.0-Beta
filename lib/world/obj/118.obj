@@ -1931,7 +1931,7 @@ transcendental.
 gifted him one made by pixies. In the right hands, it has the power to evoke
 powerful emotions and draw listeners into an enchanted dance.
 ~
-22 0 ao 0 4
+22 0 ao 0 5
 1 0 0
 12 0
 C
@@ -2056,6 +2056,7 @@ You pause to clean the little flute.~
 M
 3
 $n pauses to clean $s flute.~
+T 11812
 S
 #11878
 knife gemstone stone~
