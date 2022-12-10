@@ -4359,16 +4359,31 @@ T 11840
 T 11803
 S
 #11989
-shoes walking pair~
-a pair of walking shoes~
-A pair of walking shoes is here.
+swab souvenir~
+a souvenir swab~
+A souvenir swab is trying to clean the ground.
 ~
-1 1 bdoD n 1
-0 0 0 15
+1 1 bdoD n 2
+0 0 36 15
 D
-minipet
-tba
+   The swab is little more than a poplar handle and a dense mop of white yarn,
+though it has been animated to swoop around, persistently trying to clean any
+floor or ground beneath it. Miraculously, it never seems to get dirty. The
+headband around the yarn is checkered violet and white, with a tiny tower
+stitched in.
 ~
+M
+0
+$n swishes around.~
+M
+0
+$n wrings itself out.~
+M
+0
+$n spins around.~
+M
+0
+$n shakes itself off.~
 S
 #11990
 wand liberated~
@@ -4488,8 +4503,8 @@ legs. The corners are set with little tassles that wave as it hops around like
 a dog. This could be the perfect pet.
    Though the Tower Skycleave has acquired a reputation for frightening magical
 experiments, and deservedly so, it's very unlikely that the footstool's
-resemblance to a dog comes from it actually being a transmogrified dog. It's
-far more likely to be a former student.
+resemblance to a dog comes from it actually being a transmogrified dog. They
+rarely transform animals.
 ~
 M
 0
