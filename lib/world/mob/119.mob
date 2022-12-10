@@ -68,7 +68,7 @@ T 11905
 S
 #11902
 bucket wooden~
-the bucket~
+a bucket~
 A wooden bucket is sitting here, filled with water.
 ~
 50 50 dhJ nG 2
@@ -850,7 +850,7 @@ T 11807
 S
 #11921
 broom~
-the broom~
+a broom~
 A broom is sweeping up the remaining debris.
 ~
 50 50 dhJ nG 2
@@ -893,7 +893,7 @@ T 11905
 S
 #11922
 duster feather~
-the feather duster~
+a feather duster~
 A feather duster swishes as it flies across every surface.
 ~
 50 50 dhJ nG 2
@@ -1230,7 +1230,7 @@ T 11852
 S
 #11933
 mop bucket~
-the mop~
+a mop~
 A mop carries a bucket past you.
 ~
 50 50 dhJ nG 2
@@ -1889,7 +1889,7 @@ T 11852
 S
 #11946
 fox gray grey~
-the gray fox~
+a gray fox~
 There is a gray fox sniffing around.
 ~
 150 250 djJ n 3
@@ -2544,7 +2544,7 @@ T 11807
 S
 #11960
 cabinet filing~
-the filing cabinet~
+a filing cabinet~
 A filing cabinet is standing here.
 ~
 50 50 dhJ nG 2
@@ -2587,7 +2587,7 @@ T 11905
 S
 #11961
 bookshelf shelf ebony~
-the bookshelf~
+a bookshelf~
 An ebony bookshelf is standing here.
 ~
 50 50 dhJ nG 3
@@ -4039,7 +4039,7 @@ T 11803
 S
 #11982
 pixy little~
-the little pixy~
+a little pixy~
 A little pixy is fluttering about.
 ~
 1 1 bdoD mn 1
@@ -4372,7 +4372,7 @@ tba
 S
 #11990
 wand liberated~
-the liberated wand~
+a liberated wand~
 A liberated wand swishes and flicks in the air.
 ~
 1 1 bdoD n 1
@@ -4422,35 +4422,62 @@ M
 $n squeaks like it needs to be oiled.~
 S
 #11992
-lamp hopping~
-a hopping lamp~
-A hopping lamp is here.
+shadow hiding~
+the hiding shadow~
+A shadow is hiding here.
 ~
-1 1 bdoD n 1
-0 0 15 15
+1 1 bdoD dn 1
+0 0 24 15
 D
-minipet
-tba
+   You have managed to find a shadow that doesn't belong. It's small, it's
+rather dark, and you can't get an idea of its shape because it seems to change
+as it turns.
+   As you're looking at the shadow, it seems to shrink -- at least, at first.
+But it seems to grow curious as it realizes you aren't a threat, and it
+stretches a cautious tendril toward you, before yanking it back and shrinking
+down again.
 ~
 S
 #11993
 cloak clingy fancy~
-the clingy cloak~
+a clingy cloak~
 A fancy cloak is floating here.
 ~
 1 1 bdoD n 1
 0 0 27 15
 D
-   This pet will transform itself into a cloak worn by someone in the room, at
-random. Please add some good echoes to its custom strings as it attempts to
-wrap itself around people.
-Also update the look description of obj 11993 to match.
+   At first glance it looks to be a fairly ordinary traveling cloak. But they
+don't usually float in midair, so a better assessment would be to say this is
+an extraordinary and well-traveled cloak. It seems to follow along close behind
+you.
+   Clingy cloaks were originally envisioned as a rescue tool for villagers lost
+in the wilds. The cloaks are flung from the top of Skycleave, whereupon they
+seek out any uncloaked person and wrap them tightly. Unfortunately, they
+turned out to be unsafe for children.
 ~
+M
+0
+$n flies over to you.~
+M
+0
+$n seems to be following yuo.~
+M
+0
+$n spins around in a circle.~
+M
+0
+$n float around the area.~
+M
+0
+$n shakes itself out.~
+M
+0
+$n does a little twirl.~
 T 11993
 S
 #11994
 footstool loyal stool~
-the loyal footstool~
+a loyal footstool~
 A loyal footstool is hopping around.
 ~
 1 1 bdoD n 1
@@ -4570,7 +4597,7 @@ $n sings, 'Desperate goblin... Why don't you come to your senses? You've been ou
 S
 #11997
 fan adoring~
-the adoring fan~
+an adoring fan~
 An adoring fan is floating here.
 ~
 1 1 bdoD n 1

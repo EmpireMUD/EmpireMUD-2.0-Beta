@@ -357,7 +357,7 @@ Skycleave: Claw Game (broken)~
 1 c 4
 play~
 * play claw
-if !%arg.car% || %actor.obj_target(%arg.car%)% != %self%
+if !%arg.car% || !(%self.name% ~= %arg.car%)
   return 0
   halt
 end
@@ -379,7 +379,7 @@ Skycleave: Claw Game (fixed)~
 1 c 4
 play~
 * Usage: play claw
-if %actor.is_npc% || !%arg.car% || %actor.obj_target(%arg.car%)% != %self%
+if %actor.is_npc% || !%arg.car% || !(%self.name% ~= %arg.car%)
   return 0
   halt
 end
