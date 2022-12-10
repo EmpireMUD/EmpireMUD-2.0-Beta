@@ -4517,16 +4517,36 @@ M
 $n leaps up into the air and, upon landing, dashes in a circle.~
 S
 #11995
-mirror complimentary complementary~
-a complimentary mirror~
-A complimentary mirror is floating here.
+water bug waterbug large~
+a water bug~
+A large bug made of water pokes at you with its antennae.
 ~
-1 1 bdoD n 1
-0 0 27 15
+1 1 bdoD n 2
+0 0 2 9
 D
-minipet
-tba
+   It's hard to take your eyes off of the odd creature; it is both hideous and
+beautiful at the same time. It is large enough to be a small dog, with the
+strange articulated legs and bulbous eyes of an insect. Its six legs sprawl
+widely to the sides, supporting its weight close to the ground.
+   But the most curious part of the bug is that it's made entirely of water.
+You can watch the ground wave and ripple through the bug's carapace and when
+you get too close, it shakes a wing and splashes you with water.
 ~
+M
+0
+$n splashes you as it shakes out its wings.~
+M
+0
+$n taps at your ankle with a curious antenna.~
+M
+0
+$n makes a little puddle.~
+M
+0
+$n skates around on the ground.~
+M
+0
+$n cleans its legs.~
 S
 #11996
 goblin caged~
@@ -4613,16 +4633,39 @@ sorcerer upgraded the fans to dispense more than just cool air.
 T 11997
 S
 #11998
-hat singing~
-a singing hat~
-A singing hat is sitting on the ground.
+goblin little~
+a little goblin~
+A little goblin is out for a jaunt.
 ~
 1 1 bdoD n 1
-0 0 15 15
+1 0 95 15
 D
-minipet
-tba
+   The verdant little guy seems happy -- even mirthful -- as he walks around in
+circles. He seems small for a goblin, though, and when you kneel down to get
+a look at him, you find he's made of wood, with articulated joints and lovely
+little violet tunic with matching pants. The detail work is quite fine: the
+puppet has lifelike green eyes and even has a piece of shell jewelry in its
+nose. But just as you start to wonder how lifelike it really is, it bumps into
+you. Twice.
 ~
+M
+0
+$n skips in a circle.~
+M
+0
+$n walks around you.~
+M
+0
+$n bumps into your leg.~
+M
+0
+$n does a little cartwheel.~
+M
+0
+$n runs in a big circle.~
+M
+0
+$n does a little dance as $e walks.~
 S
 #11999
 ball crystal~
