@@ -413,31 +413,81 @@ if %spirit.claw4%
   eval id %id% + 8
 end
 * Determine reward
-if %id% < 11
+set mini 0
+set item 0
+switch %id%
+  case 0
+    set mini 11999
+  break
+  case 1
+    set mini 11990
+  break
+  case 2
+    set mini 11993
+  break
+  case 3
+    set mini 11992
+  break
+  case 4
+    set item 11987
+  break
+  case 5
+    set mini 11991
+  break
+  case 6
+    set item 11991
+  break
+  case 7
+    set mini 11998
+  break
+  case 8
+    set mini 11997
+  break
+  case 9
+    set mini 11995
+  break
+  case 10
+    set item 11989
+  break
+  case 11
+    set mini 11996
+  break
+  case 12
+    set item 11988
+  break
+  case 13
+    set mini 11989
+  break
+  case 14
+    set item 11990
+  break
+  case 15
+    set mini 11994
+  break
+done
+if %mini%
   * Minipet
-  eval vnum 11989 + %id%
-  %load% mob %vnum%
+  %load% mob %mini%
   set mob %self.room.people%
-  if %mob.vnum% != %vnum%
+  if %mob.vnum% != %mini%
     * Uh-oh.
     %echo% Something went horribly wrong while granting a minipet. Please bug-report this error.
     halt
   end
   set mob_string %mob.name%
   %purge% %mob%
-  if !%actor.has_minipet(%vnum%)%
+  if !%actor.has_minipet(%mini%)%
     %send% %actor% You win '%mob_string%' as a minipet! Use the minipets command to summon it.
     %echoaround% %actor% ~%actor% has won '%mob_string%'!
-    nop %actor.add_minipet(%vnum%)%
+    nop %actor.add_minipet(%mini%)%
   else
     %send% %actor% You win '%mob_string%' but you already have it as a minipet.
   end
-else
-  * Item reward: 11987, 11988, 11989, 11990, 11991
-  eval vnum 11987 + %id% - 11
-  %load% obj %vnum% %actor%
+end
+if %item%
+  %load% obj %item% %actor%
   set obj %actor.inventory%
-  if %obj.vnum% != %vnum%
+  if %obj.vnum% != %item%
     * Uh-oh.
     %echo% Something went horribly wrong while granting a reward. Please bug-report this error.
     halt
@@ -446,20 +496,6 @@ else
     %echoaround% %actor% ~%actor% has won '%obj.shortdesc%'!
   end
 end
-* Chance for rare reward
-* if %random.100% <= 1
-*   set vnum 11992
-*   %load% obj %vnum% %actor%
-*   set obj %actor.inventory%
-*   if %obj.vnum% != %vnum%
-*     * Uh-oh.
-*     %echo% Something went horribly wrong while granting a reward. Please bug-report this error.
-*     halt
-*   else
-*     %send% %actor% It's your lucky day! You also win '%obj.shortdesc%'!
-*     %echoaround% %actor% ~%actor% has won '%obj.shortdesc%'!
-*   end
-* end
 * and check quests:
 if %actor.on_quest(11907)%
   %quest% %actor% trigger 11907
