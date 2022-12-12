@@ -935,11 +935,6 @@ if %questvnum% >= 18280 && %questvnum% <= 18283 && !%actor.inventory(18280)%
   set item %actor.inventory(18280)%
   * %send% %actor% You receive @%item%.
 end
-if %questvnum% >= 18288 && %questvnum% <= 18291 && !%actor.inventory(18288)%
-  %load% obj 18288 %actor% inv
-  set item %actor.inventory(18288)%
-  * %send% %actor% You receive @%item%.
-end
 ~
 #18278
 Support quest progress checker~
@@ -1046,11 +1041,11 @@ end
 set room %self.room%
 if %self.val0%
   * Captured a dragon
-  if %room.template% < 10031 || %room.template% > 10099
-    %send% %actor% You have already captured a dragon. Now go to Skycleave and use @%self% to imagine a copy of it.
-    halt
-  elseif %room.template% == 10030
+  if %roomm.building_vnum% == 11800 || %room.template% == 11800
     %send% %actor% Move further in past the entrance first.
+    halt
+  elseif (%room.template% < 11800 || %room.template% >= 11875) && (%room.template% < 11900 || %room.template% >= 11975)
+    %send% %actor% You have already captured a dragon. Now go to Skycleave and use @%self% to imagine a copy of it.
     halt
   end
   %load% mob 18282
@@ -1186,9 +1181,12 @@ done
 %purge% %self%
 ~
 #18288
-Resurrect Scaldorran~
+Resurrect Scaldorran: DEPRECATED~
 1 c 2
 use~
+* This is deprecated with the new version of Skycleave (Ashes of History), which does not require it.
+return 0
+halt
 if %actor.obj_target(%arg%)% != %self%
   return 0
   halt
@@ -1258,34 +1256,56 @@ end
 %purge% %self%
 ~
 #18290
-Bug Knezz's Office~
+Bug the Grand High Sorcerer's Office~
 1 c 2
 plant~
 if %actor.obj_target(%arg%)% != %self%
   return 0
   halt
 end
-if %self.room.template% != 10047
-  %send% %actor% You need to plant this in Knezz's room while he's not watching.
+set room %self.room%
+return 1
+set bad_office 11864 11964 11866 11966 11973
+if %bad_office% ~= %room.template%
+  %send% %actor% This doesn't quite seem to be the right office.
+  halt
+elseif %room.template% != 11868 && %room.template% != 11968
+  if %room.template% >= 11800 && %room.template% <= 11999
+    %send% %actor% You need to plant this bug in the Grand High Sorcerer's office.
+  else
+    %send% %actor% You need to plant this bug in the Grand High Sorcerer's office in the Tower Skycleave.
+  end
   halt
 end
-set knezz %instance.mob(10054)%
-if %knezz%
-  * Knezz is still here...
-  if %actor.skill(Stealth)% > 50
-    %send% %actor% You use your Stealth skill to plant @%self% while ~%knezz% isn't watching.
-  elseif %knezz.aff_flagged(BLIND)%
-    %send% %actor% You quickly plant @%self%, taking advantage of |%knezz% temporary blindness.
-    dg_affect %actor% HARD-STUNNED on 10
-  elseif %knezz.aff_flagged(STUNNED)% && !%knezz.fighting%
+* check shade
+set shade %room.mob(11869)%
+if !%shade%
+  set shade %room.mob(11863)%
+end
+if %shade%
+  %send% %actor% ~%shade% prevents you from bugging the room.
+  halt
+end
+* check GHS
+set ghs %room.mob(11968)%
+if !%ghs%
+  set ghs %room.mob(11969)%
+end
+if %ghs%
+  * still here...
+  if %actor.skill(Stealth)% >= 75
+    %send% %actor% You use your Stealth skill to plant @%self% while ~%ghs% isn't watching.
+  elseif %ghs.aff_flagged(BLIND)%
+    %send% %actor% You quickly plant @%self%, taking advantage of |%ghs% temporary blindness.
+  elseif %ghs.aff_flagged(STUNNED)% && !%ghs.fighting%
     * Sap (presumably from an ally)
-    %send% %actor% You quickly plant the bug while ~%knezz% is stunned.
+    %send% %actor% You quickly plant the bug while ~%ghs% is stunned.
   else
-    %send% %actor% ~%knezz% would notice if you tried to plant the bug while he's watching...
+    %send% %actor% ~%ghs% would notice if you tried to plant the bug while &%ghs%'s watching...
     halt
   end
 else
-  %send% %actor% You plant @%self% in Knezz's office.
+  %send% %actor% You surreptitiously plant @%self% in the palatial office.
 end
 %quest% %actor% trigger 18290
 %purge% %self%
@@ -1564,39 +1584,46 @@ if !%actor.on_quest(18288)% || %actor.quest_triggered(18288)%
   %send% %actor% You don't need to give ~%self% the codeword now.
   halt
 end
+if %self.vnum% == 10048
+  %send% %actor% You seem to be in the wrong Skycleave.
+  halt
+end
 if %self.fighting% || %self.disabled%
   halt
 end
+* quiet me
 nop %self.add_mob_flag(SILENT)%
+detach 11806 %self.id%
+detach 11840 %self.id%
+if %self.has_trigger(11839)%
+  detach 11839 %self.id%
+  set murder 1
+else
+  set murder 0
+end
 set room %self.room%
 wait 1 sec
 set cycles_left 5
 while %cycles_left% >= 0
-  if %self.fighting% || %self.disabled%
-    * Combat interrupts the speech
-    %echo% |%self% monologue is interrupted.
-    nop %self.remove_mob_flag(SILENT)%
-    halt
-  end
   * Fake ritual messages
   switch %cycles_left%
     case 5
-      %echo% |%self% bony jaw hangs slack as he intones, 'Oh, you're from the which guild? Adventurers? That's the boring one.'
+      %echo% There is a howl from |%self% core as he intones, 'Oh, you're from the which guild? Adventurers? That's the boring one.'
     break
     case 4
-      say The guild hasn't been so good to me. I had a lot more face left before I started working with them, if you know what I mean.
+      say The guild hasn't been so good to me. I had a lot more FACE left before I started working with them, if you know what I mean.
     break
     case 3
-      %echo% ~%self% pulls a dangling bit of skin up into place, and staples it to his face with a spell from his wand.
+      %echo% |%self% linen wraps form a scowling face.
     break
     case 2
-      say I suppose I could be convinced to work with the guild again, if you could run some errands for me.
+      say I SUPPOSE I could be convinced to work with the guild again, if you could run some ERRANDS for me.
     break
     case 1
-      say I'll need a roc egg and I'll need some stealth work. Think you're up to it?
+      say I'll need a roc egg and I'll need some STEALTH WORK. Think you're up to it?
     break
     case 0
-      say Well!? Why are you just standing there? Get to it!
+      say Well!? Why are you just standing there? GET TO IT!
       wait 1 sec
       set person %room.people%
       while %person%
@@ -1607,6 +1634,18 @@ while %cycles_left% >= 0
         set person %person.next_in_room%
       done
       nop %self.remove_mob_flag(SILENT)%
+      * check trigger
+      if %self.vnum% == 11836
+        set trig 11806
+      else
+        set trig 11840
+      end
+      if !%self.has_trigger(%trig%)%
+        attach %trig% %self.id%
+      end
+      if %murder%
+        attach 11839 %self.id
+      end
       halt
     break
   done

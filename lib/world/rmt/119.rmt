@@ -4168,17 +4168,17 @@ D3
 E
 south~
    The south door normally leads back out to the central chamber, but it's
-covered in thick fog and you can't see through.
+covered in thick, dreamy fog and you can't see through.
 ~
 E
 west quarters bedroom~
    The door to the west usually leads to the living quarters, but it's covered
-in thick fog and you can't see anything beyond it.
+in thick, dreamy fog and you can't see anything beyond it.
 ~
 E
 doors doorway fog~
-   Both doorways are covered in a thick fog and you cannot see the other side.
-It's cold to the touch, though your hand passes easily through it.
+   Both doorways are covered in a thick, dreamy fog and you cannot see the
+other side. It's cold to the touch, though your hand passes easily through it.
 ~
 E
 window north~
@@ -4198,13 +4198,18 @@ E
 rugs plush~
    The rugs are made of high-piled, plush yarn. You've seen nobles sleep on
 less. You lift up a rug, but it's just more rugs underneath; a puff of magenta
-glitter flies loose as you do.
+glitter flies loose as you drop the rug again.
 ~
 E
 chandelier nocturnium extravagant~
    The black chandelier hangs from the ceiling by a hundred impossibly light
 chains, giving it the appearance of a shadow creeping across the ceiling. It
-casts a soft light over the entire room from hundreds of small oil burners.
+doesn't appear to be lit; it's not the source of the violet glow that lights
+the office.
+~
+E
+glow violet~
+The whole room is lit with a soft violet glow, but there's no apparent source.
 ~
 E
 floor checkerboard marble~
@@ -5746,7 +5751,8 @@ The forest is dense with huge trees and impenetrable undergrowth.
 ~
 E
 river north south~
-The river goes on as far as you can see both north and south.
+   The river goes on as far as you can see both north and south, but you always
+seem to end up back at the same spot.
 ~
 E
 water muddy~
@@ -5792,7 +5798,7 @@ You can feel his mighty presence, but he has no shape for you to look upon.
 ~
 E
 light radiant~
-The brilliant golden light suffuses through every part of you.
+The dreamy golden light suffuses through every part of you.
 ~
 E
 voice~
@@ -5800,7 +5806,8 @@ The god's presence is everywhere, but without form or shape.
 ~
 E
 north south east west northeast southeast northwest southwest up down~
-It's the same in all directions.
+   It's the same in all directions. When you move, you end up in the same spot,
+like a dream.
 ~
 T 11945
 T 11946

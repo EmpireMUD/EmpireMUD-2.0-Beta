@@ -98,7 +98,7 @@ S
 D
    He seems to be very knowledgeable about the tower as he's giving a lot of
 useful tidbits -- all of which you've never heard before -- as he tours the
-tower.
+lobby.
 ~
 T 11828
 T 11810
@@ -248,8 +248,8 @@ S
 1 0 0 16
 D
    Though he looks like he's new here, he has set right to work sorting and
-organizing the supplies that are stored in here. In a gray wool shirt and
-dark slacks, he doesn't look much like a sorcerer.
+organizing the supplies that are stored in here. He's dressed in a gray wool
+shirt and dark slacks that seem too large.
 ~
 M
 0
@@ -354,7 +354,7 @@ D
 mana shield, it bears few lines or creases of its own. Annaca is young,
 especially by Skycleave's standards. Her golden brown hair is pulled into a
 line of buns down the back of her head and what stray strands aren't tied back
-hang loose and wild. She wears a loose set of layered robes in midnight blue,
+hang loose and wild. She wears a flowing set of layered robes in midnight blue,
 making it impossible to see what she might have stashed underneath.
    You must finish rescuing the second floor to get to the staircase.
 ~
@@ -1430,6 +1430,7 @@ M
 There's a distant scream, perhaps from somewhere inside the lich.~
 T 11839
 T 11806
+T 18298
 S
 #11837
 rags swarm~

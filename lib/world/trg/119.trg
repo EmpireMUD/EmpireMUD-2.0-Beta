@@ -2945,7 +2945,8 @@ Skycleave: Attune skystone at Goef the Oreonic~
 0 c 0
 attune~
 * attunes skystones for the user
-set allow_list 11900 11899 10036 10037
+set allow_list 11900 11899
+set fake_list 10036 10037
 * targeting
 set obj %actor.obj_target_inv(%arg.car%)%
 if !%arg%
@@ -2959,6 +2960,10 @@ elseif !%obj%
   halt
 elseif %obj.vnum% == 11898
   %send% %actor% That skystone is already depleted. Try an unattuned stone.
+  halt
+elseif %fake_list% ~= %obj.vnum%
+  %echo% ~%self% takes @%obj% from ~%actor% and examines it, but hands it back.
+  say Alas, little human, I can't attune that one. Is it from a different timeline?
   halt
 elseif !(%allow_list% ~= %obj.vnum%)
   %send% %actor% You can't attune @%obj% here. Only skystones.

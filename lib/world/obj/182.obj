@@ -591,16 +591,16 @@ It sure squirms a lot.
 7 1152
 S
 #18288
-phylactery spare Scaldorran's Scaldorrans~
-Scaldorran's spare phylactery~
-Scaldorran's spare phylactery is lying here.~
-   You can 'use' this item in the Lich Labs to resummon Scaldorran to talk to
-him, if he's dead.
+lamp useless old~
+a useless old lamp~
+A useless old lamp is lying here.~
+   It looks like an old stone oil lamp, but it's cracked and totally useless
+now.
+(This item was part of an old quest and is no longer needed.)
 ~
-3 p a 0 2
+3 p a 0 3
 0 0 0
-10 0
-T 18288
+1 0
 S
 #18289
 sack padded empty~
@@ -620,8 +620,8 @@ scarab enchanted bug~
 an enchanted scarab~
 An enchanted scarab is here.~
    This strange little scarab has been imbued with a powerful enchantment.
-According to Scaldorran, you need to 'plant' this bug in Grand High Sorcerer
-Knezz's office while Knezz isn't looking.
+According to Scaldorran, you need to 'plant' this bug in Grand High Sorcerer's
+office while they aren't looking.
 ~
 3 0 a 0 5
 0 0 0
@@ -683,13 +683,13 @@ castle. Now it might provide enough lumber for an entire house.
 3 e a 0 5
 0 0 0
 0 0
-I 11 1002 100.00 1  # LIGHT: a roaring fire
-I 16 124 100.00 12  # SCRAPE: a heavy log
-I 16 121 100.00 60  # SCRAPE: some sticks and leaves
-I 17 125 100.00 24  # SAW: a stack of lumber
-I 17 121 100.00 60  # SAW: some sticks and leaves
+I 11 1002 100.00 1  # LIGHT: roaring fire
+I 16 124 100.00 12  # SCRAPE: heavy log
+I 16 121 100.00 60  # SCRAPE: sticks and leaves
+I 17 125 100.00 24  # SAW: stack of lumber
+I 17 121 100.00 60  # SAW: sticks and leaves
 O+ 1 6012
 R
-5118 0
+4 5118 0
 S
 $

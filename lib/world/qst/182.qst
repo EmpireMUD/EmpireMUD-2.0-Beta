@@ -137,7 +137,7 @@ skystones, and the essence of a molten fiend.
 light the whole thing ablaze with wild fire and molten essence! Now to wait for
 it to hatch...
 ~
-9 d 0 0 0
+10 d 0 0 0
 A
 5 18222
 P
@@ -150,7 +150,7 @@ W
 W
 2 10254 0 3 a
 W
-2 10037 0 2 a
+2 11900 0 2 a
 W
 2 18097 0 1 a
 Z
@@ -891,7 +891,7 @@ S
 Imagine Dragons~
    Archsorcerer Malfernes confides in you that he has a long-standing rivalry
 with High Sorceress Celiya after an incident involving a mutual former lover, a
-poorly-trained skeletal mammoth, and sixty -thousand barrels of manawine. But
+poorly-trained skeletal mammoth, and sixty-thousand barrels of manawine. But
 being trapped in the Primeval era, Malfernes is unable to continue this war of
 practical jokes. He hands you the Staff of Draconic Imagination and instructs
 you to seek out a flame dragon or a wandering dragon who has abandoned its
@@ -1063,13 +1063,11 @@ place to place. But it always announces its presence, so you may be able to
 find it by asking around. Find the High Lich, Scaldorran, in the Lich Labs and
 see if you can convince him to rally support behind our guildhall.
    You can let Scaldorran know you're from the guild by using his old codeword,
-'eternity'. Just say that to him when you find him. If you get to the Lich Labs
-and he's dead for some reason, just 'use' this spare phylactery to resurrect
-the old fool.
+'Eternity'. Just say that to him when you find him.
 ~
 High Lich Scaldorran seems convinced to let you prove your worth...
 ~
-12 0 0 0 -1
+14 0 0 0 -1
 A
 1 18217
 P
@@ -1078,14 +1076,15 @@ R
 6 18289 1
 R
 6 18290 1
-T 18277
 W
 13 10055 0 1 a
 W+
 11 0 0 1 a
 Speak to Scaldorran~
 Z
-1 10048
+1 11836
+Z
+1 11936
 S
 #18289
 Procure a Roc Egg~
@@ -1101,9 +1100,11 @@ Hints:
    Scaldorran slips the roc egg into his ethereal cloak as strands of ectoplasm
 drip from his gaping maw.
 ~
-7 d 0 0 -1
+9 d 0 0 -1
 A
-1 10048
+1 11836
+A
+1 11936
 P
 0 18288 0 1 -
 R
@@ -1112,25 +1113,28 @@ R
 8 18200 1
 R
 6 18291 1
-T 18277
 W
 2 18291 0 1 -
 Z
-1 10048
+1 11836
+Z
+1 11936
 S
 #18290
-Bugging Knezz~
+Bugging the Grand High Sorcerer~
    Scaldorran pulls you aside and casts a Cone of Silence around you. 'Between
-you and me,' he says, 'the Guild doesn't trust Grand High Sorcerer Knezz. I
-need you to take this enchanted bug up to his office, and plant it while he
-isn't looking. And be quick about it.'
+you and me,' he says, 'the Guild doesn't trust the Grand High Sorcerer. I need
+you to take this enchanted bug up to the office, and plant it while nobody is
+looking. And be quick about it.'
 ~
-   Scaldorran taps the tips of his fingerbones together and mutters
+   Scaldorran ends the tips of his bandages together and mutters
 'eeeeexcellent' to himself.
 ~
-8 0 0 0 -1
+10 0 0 0 -1
 A
-1 10048
+1 11836
+A
+1 11936
 P
 0 18288 0 1 -
 R
@@ -1139,12 +1143,13 @@ R
 8 18200 1
 R
 6 18291 1
-T 18277
 W+
 11 0 0 1 -
-Bug Knezz~
+Bug the Grand High Sorcerer~
 Z
-1 10048
+1 11836
+Z
+1 11936
 S
 #18291
 Support From Scaldorran~
@@ -1153,9 +1158,11 @@ to your local guildhall and inform your guildmage of your success.
 ~
 The guildhall appreciates your support.
 ~
-9 0 0 0 -1
+10 0 0 0 -1
 A
-1 10048
+1 11836
+A
+1 11936
 P
 0 18289 0 1 a
 P
