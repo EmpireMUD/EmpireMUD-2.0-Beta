@@ -1130,7 +1130,7 @@ looking. And be quick about it.'
    Scaldorran ends the tips of his bandages together and mutters
 'eeeeexcellent' to himself.
 ~
-10 0 0 0 -1
+11 0 0 0 -1
 A
 1 11836
 A
@@ -1143,6 +1143,7 @@ R
 8 18200 1
 R
 6 18291 1
+T 18277
 W+
 11 0 0 1 -
 Bug the Grand High Sorcerer~

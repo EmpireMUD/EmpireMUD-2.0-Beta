@@ -26,7 +26,7 @@ A pair of bustling shoes seem to be walking in circles.~
    These shoes are made from fine cloth and leather, and bear the imprint of
 the Tower Skycleave on the heel.
    The tower is renowned for sorcerers and their apprentices who never tire as
-they walk up and down the tower's long spiral staircase. One thing is certain:
+they trudge up and down the tower's long spiral walkway. One thing is certain:
 These shoes were made for walking.
 ~
 2 mo ag 0 6
@@ -55,6 +55,8 @@ There's... sort of an aura hovering here.~
    It glows with... something. Surely this experimental aura was cooked up by
 the sorcerers of the Tower Skycleave, notorious for its unusual magics and
 well-funded research and development.
+   Unbridled innovation is the skeleton key to progress -- at least, according
+to Professor Scaldorran.
 ~
 2 mo ak 0 8
 -1 -1 -1
@@ -195,9 +197,9 @@ seal are emblazoned with the coat of arms of the Tower Skycleave. There doesn't
 seem to be a way to open the jar, but you can hear beads rolling around inside.
    Possession of this jar allows you to morph into the following
 anthropomorphic household items: teapot, broom, sponge, bucket, mop
-   Though it has become an all-too common punishment for students at the Tower
-Skycleave, punitive transformation is nevertheless a longstanding tradition for
-pupils who prove disappointing.
+   Though it has become all-too common for students at the Tower Skycleave,
+punitive transformation is nevertheless a longstanding tradition for pupils who
+prove disappointing.
 ~
 3 o a 0 3
 0 0 0
@@ -230,7 +232,7 @@ S
 directory stone slab~
 the directory~
 There is a directory engraved on a stone slab.~
-This look description is updated by a script.
+This look description is updated by trigger 11811.
 ~
 3 0 0 0 4
 0 0 0
@@ -300,6 +302,9 @@ An intricate glass hatchet is sticking out of the ground.~
 fine point that it requires no sharpening. The glass grip of the handle seems
 to fit your hand perfectly, such that the hatchet almost becomes an extension
 of your wrist.
+   Glass is capable of forming an exceptional edge, far sharper than any bronze
+or iron, though natural glasses like obsidian are desperately fragile and
+ephemeral.
 ~
 1 mo an a 7
 0 4 2
@@ -447,7 +452,7 @@ A goblin rain bow is lying here.~
 durable with glue and bits of hide. The bow is relatively undecorated, but as
 you pull on the string you find it sturdy and strong. The only writing on the
 bow appears to be the goblin symbol for rain.
-   The goblins have long-forgotten the stories of the original rain bows, so
+   The goblins have long forgotten the stories of the original rain bows, so
 called because they were shot off the gobbrabakhs during the driest months to
 strike water from clouds.
 ~
@@ -574,8 +579,8 @@ they feel effortlessly light.
    After Knezz ascended as Grand High Sorcerer, he grew tired of relying on
 page boys to help him don his heavy robes. What began as a lazy enchantment to
 stand the robes on their own soon became a complex animus spell. Perhaps
-growing tired of casting his own spells, Knezz eventually enchanted the long
-sleeves of the robe to move his arms for him.
+thinking himself above casting his own spells, Knezz eventually enchanted the
+long sleeves of the robe to move his arms for him as well.
 ~
 27 emo aq 0 17
 0 0 0
@@ -637,8 +642,7 @@ strap and handle on the back, giving its bearer a superior view of the battle
 without compromising saftey. And despite being made from glass, the shield
 takes blow after blow, ringing out like a bell but never shattering.
    Glass armaments were the clear choice under Grand High Sorcerer Kofi, but
-since have become rather rare. The shield more closely resembles the tower as
-it looked during Kofi's tenure.
+since have become rather rare.
 ~
 23 emo ao 0 15
 0 0 0
@@ -991,8 +995,8 @@ it can catch even the tiniest glint of light. These greaves are truly a
 warrior's dream.
    For a brief time, dubbed "magitanium mania" by High Sorcerer Barrosh, every
 pen, clasp, button, and plate in Skycleave was made from magitanium. Still,
-among the innovations credited to the Tower, magitanium is most valued by
-smiths across the land.
+among the innovations credited to the Tower, magitanium is the one most valued
+by smiths across the land.
 ~
 27 mp af 0 21
 3 0 0
@@ -1040,8 +1044,8 @@ A pair of thundersilk skycleaver leggings is lying here.~
 material that channels every stray spark of static electricity in the air
 straight into a sorcerer's body to strengthen their offensive magic.
    Thundersilk was once made by pixies, masters of silk, from the coccoons of
-moths that pupated at the lightning-kissed tops of the pixy trees. No pixy
-cities yet remain that produce it.
+moths that pupated at the lightning-kissed tops of the trees. No pixy cities
+yet remain that produce it.
 ~
 27 mp af 0 23
 0 0 0
@@ -1691,7 +1695,7 @@ An ether condenser is humming on the ground.~
 script you don't read. It makes a low hum and is, at all times, cold to the
 touch, but you can't figure out how to open it, nor what it's doing.
    You can 'use' this condenser to throw it at an enemy in combat.
-   Some mages have posited that the ether can be used as a source of mana.
+   Magic scholars have posited that the ether can be used as a source of mana.
 ~
 15 e a 0 5
 1 0 0
@@ -1810,8 +1814,8 @@ red and blue light traveling from the heart to the top of the column and then
 back down again.
    Time itself is being drawn up into the heartwood, then echoed back on itself
 in an endless cycle. Surely this is what is responsible for the sorry state of
-the Tower Skycleave. Your only hope now is to burn the heartwood in hopes of
-ending the cycle and rescuing the sorcerers from this odious time loop.
+the Tower Skycleave. Your only recourse now is to burn the heartwood in hopes
+of ending the cycle and rescuing the sorcerers from this odious time loop.
 ~
 3 j 0 0 6
 0 0 0
@@ -1874,8 +1878,8 @@ look like knitted metal. At the center of the charm, the negative space between
 the filigree forms the outline of a person. The whole thing dangles from a
 thin gold chain, tarnished at the back from heavy wear.
    The Tower Skycleave is a notoriously high-performing school of magic. Part
-of their excellent grade point average, and equally notorious, is low tolerance
-for under-achievers.
+of the school's excellent grade point average, and equally notorious, is its
+low tolerance for under-achievers.
 ~
 2 0 ac 0 7
 0 0 0
@@ -1928,8 +1932,8 @@ holes run the length of the flute. It's difficult to play, but the music is
 transcendental.
    Hold the flute to play it.
    Joiago learned to play the flute at a young age from his grandmother, who
-gifted him one made by pixies. In the right hands, it has the power to evoke
-powerful emotions and draw listeners into an enchanted dance.
+gifted him one made by pixies in an earlier age. In the right hands, it has the
+power to evoke powerful emotions and draw listeners into an enchanted dance.
 ~
 22 0 ao 0 5
 1 0 0
@@ -2068,7 +2072,7 @@ with no seam or joint; the two minerals seem to flow into each other. At the
 base of the handle, the knife is finished with opal that equally has no
 boundary.
    The magic required to fuse dissimilar gemstones is deeply rooted in Tagra
-Nes, where the ancestral grandmothers, the Ebru, guard it from beyond death.
+Nes, whose ancestral grandmothers, the Ebru, guard it from beyond death.
 ~
 1 mo ano f 8
 0 1 4
@@ -2110,8 +2114,8 @@ it can be hard to tell them apart from the real thing. But these are sweet to
 the tongue, evoking the taste of maple syrup or honey as the initial crunch
 melts away into cloying sweetness.
    Tagra Nes once performed the noble task of drawing up mana from deep beneath
-the earth and releasing it into the world, a task it performed ceaselessly day
-and night for 8200 years, but not a day longer.
+the earth and releasing it into the world, a task it performed ceaselessly
+beneath both sun and stars for 8200 years, but not a day longer.
 ~
 6 m a 0 9
 24 0 0
@@ -2167,9 +2171,9 @@ pool shimmering water dew~
 the dew pool~
 A pool of shimmering water creates dancing patterns on the shell's curved ceiling.~
    The pool is cut into the floor of the seashell. It's wide, but shallow, and
-you take care not to trip into it as there's no railing or step around it. The
-viridescent light from the glowing shell shimmers off of the water, dancing
-around on the ceiling.
+you take care not to trip into it as there's no railing or step protecting it.
+The viridescent light from the glowing shell shimmers off of the water and
+dances around on the ceiling.
 ~
 5 0 0 0 7
 1000000 1000000 11885
@@ -2192,10 +2196,10 @@ A gnarled old wand lies on the ground.~
 fallen twig. It is perhaps a foot and a half long, lightly discolored around
 the base, and otherwise the only notable feature is the initials carved into
 the end.
-   Sophisticated magic users fall broadly into two categories: those who prefer
-staves and those who prefer wands. While a staff is larger and therefore easier
-to channel mana through, a wand is more easily concealed and capable of a much
-finer focus.
+   Though Skycleave is known for its towering staves, capable of channeling
+tremendous manaflows for enormous spells, it also contains a number of wands of
+true power. These relics of an earlier age have brought both renown and ruin to
+even the greatest wizards of myth and legend.
 ~
 1 mpwx ano 0 6
 0 1 22
@@ -2301,8 +2305,8 @@ the great tree. Something in the sap calls to you, like a siren. You touch it,
 almost unconsciously, and it starts to creep up your fingers. You recoil,
 equally unconsciously, but as you wipe it off your fingers, you feel a
 revolting urge to taste it.
-   To the people of Smol Nes-Pik, wasting the tree's sap is a great crime, as
-every last pint of it is precious.
+   In Smol Nes-Pik, wasting the tree's sap is a great crime, as every last
+pint of it is precious.
 ~
 3 0 0 0 4
 0 0 0
@@ -2408,8 +2412,8 @@ A wooden Venus figurine is lying here.~
 hips and large breasts; aside from a prominent belly button, there is little
 detail beyond that. Her face is smooth and undetailed except for two square
 impressions where her eyes would be.
-   Many types of statuette with women's forms are described as Venus figurines,
-though they rarely relate to the Greek goddess.
+   Many types of statuettes with women's forms are described as Venus
+figurines, though they rarely relate to the Greek goddess.
 ~
 15 0 a 0 8
 1 0 0
@@ -2483,7 +2487,8 @@ S
 skystone stone depleted~
 a depleted skystone~
 A depleted skystone has been tossed aside.~
-   The smooth, palm-sized stone has a light blue color to it.
+   The smooth, palm-sized stone has a light blue color to it. It seems to have
+lost its luster and doesn't quite reflect light the way most skystones do.
    Skystone attunement causes a terrible strain on the soul or natural essence
 of the person the stone is attuned to. The process rarely succeeds at enriching
 the stone as the stone's power is easily absorbed by an injured soul rather

@@ -37,10 +37,10 @@ hand. 'Never know what you're going to get from that. Let me know.'
 ~
    Mageina sees what you won from the claw game and breathes out a half-laugh
 through her nose.
-   'Yeah, I've seen those before,' she says. 'Maybe I've seen them all, but
-every once in a while, someone comes in with a new one. At least you managed to
-find the machine while it was working. It keeps breaking and I can never keep
-track of where we are in the...'
+   'That's a pretty good one,' she says. 'Maybe even my favorite. But I say
+that about all of them, don't I? At least you managed to find the machine while
+it was working. It keeps breaking and I can never keep track of where we are in
+the...'
    Mageina looks over your shoulder and then leans in close to say, 'Or rather,
 WHEN we are, in the time loop.'
 ~
@@ -213,7 +213,8 @@ Tower Skycleave and now you find yourself eager to duplicate the feat.
    With this checklist in hand, find and defeat every one of the Tower
 Skycleave's combatants. Be warned: like the time-traveler himself, it will take
 more than one trip through the tower to get them all. Be sure you're the one to
-kill them as well. If they die through some other misfortune, it doesn't count.
+kill them as well (or be part of the group that defeats them). If they die
+through some other misfortune, it doesn't count.
 ~
    You sit on the edge of the fountain and reflect on your battles against the
 tower's many villains as you watch the countless twinkling lights from the
@@ -271,7 +272,7 @@ must be visited AFTER the tower has been rescued to count.
    You stroll around the fountain several times, watching the reflection of
 the enormous tree above you meander around the room in the surface of the
 fountain. The tower held so many secrets, a person could spend a lifetime
-plumbing its depths.
+plumbing its depths. Surely there are a few more...
 ~
 6 0 150 250 -1
 A
@@ -337,14 +338,14 @@ Z
 S
 #11928
 Skycleave: Test of Water~
-   As you once again find yourself underwater and all but trapped by the
-magical boundaries of the elemental plane. Sure, escape is just above you,
-through the portal back to the fountain. But you were never one to shy away
-from a challenge like this.
+   You once again find yourself underwater and all but trapped by the magical
+boundaries of the elemental plane. Sure, escape is just above you, through the
+portal back to the fountain. But you were never one to shy away from a
+challenge like this.
    Defeat the First Water again, if you can. And be quick about it; it may be
 impossible to defeat it for good, but it's known to drown anyone who tries.
 Even a brief victory against the First Water would be worthy of celebration.
-Defeat it, then speak to the Oreonic in the Attunement Lab.
+Defeat it, then speak to the oreonic in the Attunement Lab.
 ~
    'Ah, little human, a pleasure to see you again. You are looking particularly
 acceptable today,' Goef says as you enter, still dripping from your encounter
@@ -379,15 +380,14 @@ S
 Skycleave: In Tune With the Tower~
    'Ah, a little human. Greetings,' the oreonic, Goef, says as you approach.
 You hesitate a moment, trying to grasp the notion that you are talking to an
-intelligent, thinking being made from nocturnium ore.
+intelligent, thinking chunk of nocturnium.
    Goef explains that no one else in the Tower Skycleave is capable of attuning
 skystones because a person in possession of a soul almost always taints the
-process. A soulless intermediary increases the reliability of the process, and
-in this regard, Goef is well-practiced. But the oreonic does warn you that the
-more skystones you attune, the harder it will become to attune more.
+process. A soulless intermediary increases the reliability of the attunement,
+and in this regard, Goef is well-practiced. But the oreonic does warn you that
+the more skystones you attune, the harder it will become to attune more.
    Lastly, Goef offers to demonstrate the process. You will only need an
-unattuned skystone to proceed. Type 'attune unattuned skystone' to start the
-process.
+unattuned skystone to proceed. Type 'attune unattuned skystone' to begin.
 ~
    'See, little human, it is completely painless,' Goef says, handing back your
 skystone. 'Now that the stone has been attuned, the other humans will trade for
@@ -475,8 +475,8 @@ Skycleave: Elemental Plane of Water~
 All you can see in every direction is water -- and it seems to be alive! The
 situation is as interesting as it is unexpected, and you vow to investigate it
 once you've defeated the living water.
-   After you defeat the living embodiment of the First Water, seek out someone
-in the Tower Skycleave who has more information.
+   After you claim victory against the living embodiment of the First Water,
+seek out someone in the Tower Skycleave who has more information.
 ~
    'Oh bother,' Annelise says as you interrupt her mending an old iron staff.
 She tosses it into the rubbish pile and ties her hair up out of her face. She
@@ -489,10 +489,10 @@ pressure in your lungs, about feeling like you were about to drown when the
 living water finally died. And, of course, you mention that it came right back
 to life afterward.
    'I do keep telling the headmaster we should lock that portal,' Annelise says
-when you finish the tale. 'It's an actual elemental plane, if you can believe
+when you finish the tale. 'It is a genuine elemental plane, if you can believe
 it. Frankly you're lucky to have made it out. We lost a lot of pages before we
 put up a sign... which seems to have gone missing.
-   'Anyway, you can't actually kill it. It's Water itself. All water. Every-
+   'Anyhow, you can't actually kill it. It's Water itself. All water. Every-
 where. But it's a great test of an adventurer's mettle. Be sure to fight it
 again when you get the chance.'
 ~
@@ -522,7 +522,7 @@ And where am I?' you wonder aloud as you look out over the city.
 you just in a tower somewhere? As you struggle to find the answer in your own
 memory, you're quickly distracted by someone walking by. You start to wonder if
 anyone is going to believe you about this place...
-   Find something tangible to take back to the tower. Perhaps you can find a
+   Find something tangible to take back to Skycleave. Perhaps you can find a
 sorcerer there who will be interested in it.
 ~
    Tyrone makes a puzzled face as he takes the jade tear from you and turns it

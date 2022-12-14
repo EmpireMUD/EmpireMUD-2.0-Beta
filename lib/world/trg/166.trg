@@ -887,6 +887,9 @@ switch %random.3%
         %damage% %actor% 100
       elseif %grinch_level% == 2
         set grinch_target %random.enemy%
+        if !%grinch_target%
+          set grinch_target %actor%
+        end
         %send% %grinch_target% ~%self% pulls out a gift and throws it at you!
         %echoaround% %grinch_target% ~%self% pulls out a gift and throws it at ~%grinch_target%!
         %damage% %grinch_target% 100

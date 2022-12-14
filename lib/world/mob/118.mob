@@ -482,8 +482,8 @@ Old Wright is reading on his bunk.
 150 250 bdvxJ n 3
 1 0 0 15
 D
-   Even in the dim light of the bunk room, Wright's advanced age is such that
-you can see blue veins through his age-spotted translucent skin. His gray
+   Even in the dim light of the bunk room, Wright's advanced years are such
+that you can see blue veins through his age-spotted translucent skin. His gray
 dressing gown is a far cry from the layers of sorcerer robes worn around most
 of the tower, but he seems to give little notice to you or anyone else in here.
 ~
@@ -684,12 +684,12 @@ A majestic pixy queen dazzles you with blinding sparkles!
 150 250 abdxEJ c 3
 2 0 0 28
 D
-   The pixy queen is scarcely more than a colorful sparkle of light. As your
-eyes adjust to her magnificence, you see that her iridescent clothing is
-reflecting and refracting every light source in the room, giving the queen her
-supernatural dazzle. If you focus, you can see her tall brown hair, silvery
-butterfly wings that glint with gold as she flies, a crooked little smile on
-her face as she watches you contemplate your next move.
+   The pixy queen is, at first, scarcely more than a colorful sparkle of light.
+As your eyes adjust to her magnificence, you see that her iridescent clothing
+is reflecting and refracting every light source in the room, giving the queen
+her supernatural dazzle. If you focus, you can see her tall brown hair, silvery
+butterfly wings that glint with gold as she flies, and a crooked little smile
+on her face as she watches you contemplate your next move.
 ~
 I 4 11837 100.00 1  # LOOT: skycleave BoE loot controller
 I+ 4 0  # Hard
@@ -739,8 +739,7 @@ A pixy has escaped!
 D
    The little pixy is no larger than a mouse. It flies on silvery butterfly
 wings that shine with yellow sparkles as it flies. When the pixy holds still
-enough, it looks like a little person with black hair, sharp features, and a
-crooked smile.
+enough, it looks like a little person with sharp features and a crooked smile.
 ~
 M
 6
@@ -3158,8 +3157,39 @@ each pool in turn, touching the surface with her long, delicate fingers,
 swirling it around, then touching her fingers to her closed lips.
 ~
 I 12 11879 100.00 1  # PICKPOCKET: glowing emerald bud
+M
+7
+emote $n gets up and moves to another pool.~
+M
+7
+emote $n kneels by the water.~
+M
+8
+emote $n touches her fingers to the surface of the pool and watches it ripple.~
+M
+8
+emote $n swirls the water a little bit.~
+M
+8
+emote $n touches her fingers to her lips.~
+M
+9
+emote $n stands and moves to another pool.~
+M
+9
+emote $n gently kneels by the water.~
+M
+10
+emote $n touches her fingers to the surface of the pool and watches the ripples.~
+M
+10
+emote $n swirls the water for a moment.~
+M
+10
+emote $n touches her fingers to her lips as water drips from them with a light plink.~
 T 11810
 T 11852
+T 11840
 S
 #11886
 Torru~

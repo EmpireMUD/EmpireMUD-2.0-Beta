@@ -24,8 +24,9 @@ a skycleave controller~
 A skycleave controller is lying here.~
 Usage:
   skycleave goto <template vnum>
-  skycleave secret passage
+  skycleave info
   skycleave phase <floor number>
+  skycleave secret passage
   skycleave status
 ~
 3 0 a 0 5
@@ -174,7 +175,7 @@ and clouded, and its light has gone out. Peering through the windows, you see
 dusty rolls of clothing beneath a tarnished metal claw.
    You can 'play' the claw game to win a prize.
    The claw machine was originally built to exploit the sunk cost fallacy and
-was merely a sorcery faire exhibit, but when it rapidly outpaced expectations,
+was merely a Sorcerie Faire exhibit, but when it rapidly outpaced expectations,
 it gained a permanent berth in the gift shop.
 ~
 3 0 0 0 5
@@ -266,7 +267,7 @@ Where its wings and elytra should be, there is only a shining, crackling flame.
 The bug seems no worse for the wear as it skitters around its glass jar on its
 scarlet red legs.
    The Tower Skycleave is home to a great many wonders, which it proudly shares
-with all the world, for a small fee. The tower's sorcerers often enchant
+with all the world -- for a small fee. The tower's sorcerers often enchant
 mundane objects and simple animals to create extraordinary tools which are
 unparalleled in even the most extraordinary shops.
 ~
@@ -342,9 +343,9 @@ Skycleave's pixy track.
 stats by racing it. You can also 'name jar <name>' to give the pixy a name or,
 if you're feeling benevolent, you can 'release' it, but you'll lose the jar.
    Pixy jars were first created by Grand High Sorcerer Kofi, who preferred
-glass. But sorcerers preferred not to see the little creatures banging against
-the glass as they tried to break free and eventually clay jars took over. Kofi,
-in a violent stroke of irony, was felled by pixies in the end.
+glass. But most sorcerers preferred not to see the little creatures banging
+against the glass as they tried to break free, and eventually clay jars took
+over. Kofi, in a violent stroke of irony, was felled by pixies in the end.
 ~
 3 0 a 0 5
 0 0 0
@@ -391,7 +392,7 @@ left, where parts are missing, but also along the edges. It reads, in part:
 
    ...cking Gobbrabakh of Orka again. Why is it every time I grasp at the dream
 of escaping this ill-fated tower, I find myself knee-deep in somebody else's
-problem. No time for any of that, ironically.
+problem? No time for any of that, ironically.
    Have been through these events 2413 times, give or take a missed tally, I
 find little hope remains for a way out. How foolish I feel that I spent that
 full week devising a way to bind myself to this wretched loop in hopes of
@@ -426,13 +427,14 @@ practiced hand. It reads:
    On this, my ninetieth (ninety-first?) voyage through this infernal time
 loop, I am astonished to have found myself in a most grueling combat against
 Jozef Knezz himself. I thought myself to have searched every rotten corner of
-this smol place; plundered every mote of conversation; seen all their was to see.
+this smol place; plundered every mote of conversation; seen all their was to
+see...
    More is trapped in the heartwood of time than I had yet realized. What
 follows here is my list of foes trapped herein:
-   * The pixy queen and her loyal kin.
-   * Venjer the Fox and her kin.
-   * Kara Virduke, Bleak Rojjer, Trixton Vye, and their like.
-   * High Sorcerer Barrosh, not in his right mind.
+   * The pixy queen and her loyal kin
+   * Venjer the Fox and her kin
+   * Kara Virduke, Bleak Rojjer, Trixton Vye, and their like
+   * High Sorcerer Barrosh, not in his right mind
    * The Shade of Mezvienne
    * The Shadow Ascendant
    * Mezvienne the Enchantress
@@ -860,8 +862,8 @@ bedroom, both carved from stone.
 tower and drive it out of the carpenter. You can drive it from any interior
 room; look out a window to see where you are.
    The Tower Skycleave has existed in many forms over the years, from Abaris's
-original clay brick tower to Wong's legendary stone tower. When he arrived at
-Skycleave, Waltur had the same dream: to build a greater Skycleave; one that
+original wooden tower to Wong's legendary stone tower. When he arrived at
+Skycleave, Waltur had the same dream: to build a greater Skycleave -- one that
 the world would never stop talking about. When he became Chief Magineer, he
 immediately set to work building prototypes for a new tower.
 ~
@@ -1428,7 +1430,8 @@ S
 mussels steamed~
 some steamed mussels~
 Some steamed mussles are lying on the ground.~
-   The mussels have a fragrant riparian smell.
+   The mussels have a fragrant riparian smell. The shells have opened slightly,
+making it easier to pry them apart.
    Since time immemorial, people have gathered and cooked shellfish as a simple
 and bountiful food source.
 ~
@@ -1488,7 +1491,7 @@ A fishing net is hanging nearby.~
 flow through while fish are trapped. The tiny knots show evidence of repair all
 over, a sign someone used this net for a long time.
    Agriculture is not the sole lifestyle that has led people to create cities.
-Fishing, too, can provide enough food for civilization to rise.
+Fishing, too, can provide enough food for civilization to arise.
 ~
 3 0 ao b 1
 0 0 0
@@ -1560,8 +1563,8 @@ keys painted on the side and a crossed hazel branch and wand stamped in the
 blue wax seal on top. The jar jingles when you shake it, then screams. It
 sounds like there's a pixy in there!
    You can 'use jar' to gain the little pixy as a minipet.
-   Skycleavers have long kept pixies, one of the few naturally occurring
-magically-attuned creatures, for use in advanced magic. Pixies were notoriously
+   Skycleavers have long kept pixies, one of the few naturally occurring,
+magically attuned creatures, for use in advanced magic. Pixies were notoriously
 difficult to contain until the sorcerers discovered a form of clay through
 which mana has been drawn over a long period of time. This clay, when fired,
 can hold even a pixy queen.
@@ -1770,8 +1773,8 @@ white and gray, with simple stitching on the seams and hems.
    These robes grant a new 'shrug' social to the wearer.
    The Tower Skycleave invests a great deal into its apprentices and saddles
 them with the highest expectations. Every high sorcerer in the tower began
-their storied career as an apprentice who outshone their peers, the more
-disappointing of whom now line the tower's cupboards and cabinets.
+their storied career as an apprentice who outshone their peers, though even the
+most disappointing among them find ways to contribute to the tower.
 ~
 2 p ad 0 6
 0 0 0
@@ -1826,7 +1829,7 @@ set against a background pattern that reminds you of bricks. The garment shines
 in every color, all at once.
    This doublet grants a new 'wave' social to the wearer.
    The Tower Skycleave creates a fashion craze from time to time because what
-seems to be magical, impossible clothing is a simple feat for such powerful
+appears to be magical, impossible clothing is a simple feat for such powerful
 sorcerers. Before long, the villagers usually realize the clothing is gaudy and
 impractical. But not before emptying their purses for it.
 ~
@@ -2043,8 +2046,8 @@ A piece of jade cheese is lying on the ground.~
    This little bit of cheese has a stem, almost like it grew on a tree. It has
 a distinctly marbled jade color, but it tastes like a slightly funky cheese.
    Though no cheese truly grows from a plant in nature, the magineers at
-Skycleave have been extraordinarily successful at grafting unusual foods onto
-magical trees.
+Skycleave have been extraordinarily successful at grafting unusual foods in
+magical arbors.
 ~
 6 g a 0 9
 6 0 0

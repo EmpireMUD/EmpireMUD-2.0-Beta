@@ -1278,18 +1278,24 @@ elseif %room.template% != 11868 && %room.template% != 11968
   halt
 end
 * check shade
-set shade %room.mob(11869)%
+set shade %room.people(11869)%
 if !%shade%
-  set shade %room.mob(11863)%
+  set shade %room.people(11863)%
 end
 if %shade%
-  %send% %actor% ~%shade% prevents you from bugging the room.
+  %send% %actor% ~%shade% covers too much of the room for you to plant the bug.
   halt
 end
 * check GHS
-set ghs %room.mob(11968)%
+set ghs %room.people(11968)%
 if !%ghs%
-  set ghs %room.mob(11969)%
+  set ghs %room.people(11868)%
+end
+if !%ghs%
+  set ghs %room.people(11870)%
+end
+if !%ghs%
+  set ghs %room.people(11969)%
 end
 if %ghs%
   * still here...

@@ -833,6 +833,12 @@ fixtures lights~
    Someone has pried one of the nocturnium light fixtures from the wall. The
 rest of the fixtures are askew but intact.
 ~
+E
+portraits pictures paintings masters~
+   The second-floor walkway is decorated with pictures of Skycleave's old
+masters, starting just ahead of you, though it looks as if some have fallen off
+the wall.
+~
 M 1 11809 100.00 8
 M 1 11834 100.00 5
 S

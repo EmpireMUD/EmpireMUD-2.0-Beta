@@ -1420,13 +1420,24 @@ if %random.3% == 3
 end
 ~
 #10079
-Skycleaver Trinket teleport~
+Old Skycleaver Trinket: Replace with new one~
 1 c 2
 use~
 if %actor.obj_target(%arg%)% != %self%
   return 0
   halt
 end
+* just replace trinket
+%load% obj 11909 %actor% inv
+if %actor.room.is_outdoors%
+  %send% %actor% A rainbow splits the sky in half and hits your skycleaver trinket...
+else
+  %send% %actor% Your skycleaver trinket glows and becomes startlingly hot...
+end
+%send% %actor% Your skycleaver trinket has received an update. Please try again.
+%purge% %self%
+halt
+* old trigger: teleported to skycleave
 set room_var %self.room%
 * once per 60 minutes
 if %actor.cooldown(10079)%

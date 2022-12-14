@@ -4516,12 +4516,12 @@ if %cmd.mudcommand% == adventure
   end
   * send fake adventure info
   %send% %actor% A Hundred Thousand Moons (inside the Tower Skycleave)
-  %send% %actor% by Paul S. Clarke
+  %send% %actor% \&zby Paul Clarke
   %send% %actor% \&0    Discover the lost city of Smol Nes-Pik, meet the people who live there, and
-  %send% %actor% \&zunravel their fate in this highly-detailed hidden area. For players who enjoy
-  %send% %actor% \&zan immersive reading experience, each room is filled with extra descriptions
-  %send% %actor% \&zand many of the characters are animated with vignettes and cutscenes. And
-  %send% %actor% \&zremember, you can wake up any time.
+  %send% %actor% \&zunravel their fate in this rich hidden environment. For players who enjoy an
+  %send% %actor% \&zimmersive reading experience, each room is filled with extra descriptions and
+  %send% %actor% \&zmany of the characters are animated with vignettes and cutscenes. And remember,
+  %send% %actor% \&zyou can wake up from this dreamy memory any time.
   %send% %actor% (type 'adventure skycleave' to see the description for the main adventure)
 elseif %cmd.mudcommand% == time
   if %indoor_list% ~= %room.template%
@@ -5214,12 +5214,12 @@ if %cmd.mudcommand% == adventure
   end
   * send fake adventure info
   %send% %actor% Zenith of the Gobbrabakhs (inside the Tower Skycleave)
-  %send% %actor% by Paul S. Clarke
+  %send% %actor% \&zby Paul Clarke
   %send% %actor% \&0   Venture back into the Goblin's Dream to experience a culture lost to history
-  %send% %actor% \&zin this highly-detailed hidden area. For players who enjoy an immersive
-  %send% %actor% \&zreading experience, each room is filled with extra descriptions and many of
-  %send% %actor% \&zthe characters are animated with vignettes and cutscenes. You can wake up any
-  %send% %actor% \&ztime you want.
+  %send% %actor% \&zin this lively hidden area. For players who enjoy an immersive reading
+  %send% %actor% \&zexperience, each room is filled with extra descriptions and many of the
+  %send% %actor% \&zcharacters are animated with vignettes and cutscenes. Whether it's a short
+  %send% %actor% \&zdream or a long one, you can wake up any time you want.
   %send% %actor% (type 'adventure skycleave' to see the description for the main adventure)
 elseif %cmd.mudcommand% == time
   if %room.template% == 11981

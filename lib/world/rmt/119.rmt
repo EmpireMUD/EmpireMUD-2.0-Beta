@@ -689,6 +689,12 @@ nocturnium~
    Every metal accent and sculpture here, including the enormous chandelier, is
 made from pitch black nocturnium.
 ~
+E
+portraits pictures paintings masters~
+   The long second-floor walkway is decorated with pictures of Skycleave's old
+masters. They start a little ahead of you, southeast of here, and continue all
+the way to the opposite stairs.
+~
 M 1 11809 100.00 8
 S
 #11911
@@ -5662,6 +5668,10 @@ Ramps connect spots where pairs of houses are at slightly different levels.
 E
 reed mats~
 Small reed mats have been placed around the standing stone.
+~
+E
+stool chair~
+There is a short wooden stool near the reed mats.
 ~
 M 0 11974 100.00 1
 M 1 11981 100.00 3
