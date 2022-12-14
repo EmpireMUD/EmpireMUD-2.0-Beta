@@ -3591,7 +3591,7 @@ switch %self.vnum%
   case 11884
     * poison mushroom
     if %command% == taste
-      %send% %actor% You taste the little white mushroom, which gives your lips and tongue a pleasant tingle.
+      %send% %actor% You taste the little white mushroom. It tastes earthy.
       %echoaround% %actor% ~%actor% tastes a little white mushroom.
       return 0
     else
