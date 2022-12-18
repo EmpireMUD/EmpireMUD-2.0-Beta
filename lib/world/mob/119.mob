@@ -750,7 +750,7 @@ large eyes which, at all times, have sad, longing quality to them as she stares
 off into space.
 ~
 F 11800
-I 12 11874 100.00 1 p  # PICKPOCKET: filigreed stasis charm
+I 12 11964 100.00 1 p  # PICKPOCKET: brilliant stone of eternal sunshine
 M
 0
 $n tries to fix a pile of rubbish with her foot.~
@@ -1677,7 +1677,7 @@ large eyes. There's a slight clunking sound as she walks around the lab owing
 to her bronze leg.
 ~
 F 11800
-I 12 11874 100.00 1 p  # PICKPOCKET: filigreed stasis charm
+I 12 11964 100.00 1 p  # PICKPOCKET: brilliant stone of eternal sunshine
 M
 0
 $n zaps a small fan, which flies up into the air and starts waving at $m.~
@@ -3030,6 +3030,7 @@ M
 say Nice to imagine I won't have to live with this guilt.~
 T 11810
 T 11991
+T 11803
 S
 #11968
 knezz grand high sorcerer~

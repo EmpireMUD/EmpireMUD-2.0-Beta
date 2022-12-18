@@ -6390,8 +6390,8 @@ if %move% == 1
   wait 1
   set cycle 1
   eval wait 8 - %diff%
-  while %cycle% <= (2 * %diff%)
-    set targ %random.enemy%
+  set targ %random.enemy%
+  while %cycle% <= (2 * %diff%) && %targ%
     set targ_id %targ.id%
     skyfight setup dodge %targ%
     %send% %targ% &&m**** The shadows gather around you... ****&&0 (dodge)
@@ -6415,6 +6415,7 @@ if %move% == 1
     end
     skyfight clear dodge
     eval cycle %cycle% + 1
+    set targ %random.enemy%
   done
 elseif %move% == 2
   * Shadow Flail
@@ -9511,22 +9512,16 @@ skydel 11838 1  * Ghost
 %at% i11938 %load% mob 11938  * Ghost
 * Magineer Waltur and Enchanter Annelise
 set waltur %instance.mob(11840)%
-set lise %instance.mob(11839)%
 if %waltur%
   %at% i11940 %load% mob 11940  * Magineer Waltur (if he survived)
   if %waltur.mob_flagged(*PICKPOCKETED)%
     set mob %instance.mob(11940)%
     nop %mob.add_mob_flag(*PICKPOCKETED)%
   end
-  %at% i11939 %load% mob 11939  * Enchanter Annelise
-  set new_lise %instance.mob(11939)%
+  %at% i11939 %load% mob 11939  * Enchanter Annelise (new pickpocket item)
 else
   * no waltur
-  %at% i11939 %load% mob 11919  * Enchanter Annelise
-  set new_lise %instance.mob(11919)%
-end
-if %lise.mob_flagged(*PICKPOCKETED)%
-  nop %new_lise.add_mob_flag(*PICKPOCKETED)%
+  %at% i11939 %load% mob 11919  * Enchanter Annelise (new pickpocket item)
 end
 skydel 11839 1  * Enchanter Annelise
 * 4. Move people from the old rooms
