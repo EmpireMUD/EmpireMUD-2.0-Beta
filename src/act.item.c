@@ -550,7 +550,7 @@ void identify_obj_to_char(obj_data *obj, char_data *ch) {
 		else if (library) {
 			msg_to_char(ch, "Storage location: Library\r\n");
 		}
-		else if (OBJ_FLAGGED(obj, OBJ_NO_STORE)) {
+		else if (OBJ_FLAGGED(obj, OBJ_NO_STORE) && (!proto || !OBJ_FLAGGED(proto, OBJ_NO_STORE))) {
 			msg_to_char(ch, "Storage location: none (modified object)\r\n");
 		}
 	}
