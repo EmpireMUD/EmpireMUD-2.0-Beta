@@ -191,6 +191,23 @@ switch %self.vnum%
     end
     %purge% %self%
   break
+  case 11960
+    * donation to the lab
+    set actor %self.carried_by%
+    set walt %self.room.people(11940)%
+    if %actor% && %actor.is_pc%
+      wait 1
+      if %actor.has_reputation(11800,Venerated)%
+        %send% %actor% You already have the maximum reputation with the tower.
+      else
+        nop %actor.gain_reputation(11800,20)%
+      end
+      if %walt%
+        %force% %walt% say Thanks for that.
+      end
+    end
+    %purge% %self%
+  break
 done
 ~
 #11806
@@ -5939,7 +5956,7 @@ Shadow Ascendant fight: Shadow Cage, Shadow Torrent, Freezing Air, Shadow Slice~
 if %self.cooldown(11800)% || %self.disabled%
   halt
 end
-set room %self.room%
+set rm %self.room%
 set diff %self.diff%
 set m_l %self.var(m_l)%
 set n_m %self.var(n_m,0)%
@@ -5969,9 +5986,6 @@ if %move% == 1
   skyfight clear struggle
   %echo% &&mThe Shadow seems to be growing...&&0
   wait 3 s
-  if %self.disabled%
-    halt
-  end
   set targ %random.enemy%
   if !%targ%
     halt
@@ -5984,7 +5998,7 @@ if %move% == 1
     %echo% &&m~%self% sparks with primordial energy as it consumes |%targ% counterspell!&&0
     dg_affect #11864 %self% BONUS-MAGICAL 10 -1
   end
-  if %diff% <= 2 || (%self.level% + 100) <= %targ.level% || %room.players_present% == 1
+  if %diff% <= 2 || (%self.level% + 100) <= %targ.level% || %rm.players_present% == 1
     %send% %targ% &&m**** The Shadow envelops you like a cage! You have to break free! ****&&0 (struggle)
     %echoaround% %targ% &&mThe Shadow envelops ~%targ%, trapping *%targ%!&&0
     skyfight setup struggle %targ% 20
@@ -5999,7 +6013,16 @@ if %move% == 1
       remote free_char %bug.id%
       remote free_room %bug.id%
     end
-    wait 20 s
+    set time 20
+    while %time% > 0
+      wait 5 s
+      if %targ.affect(11822)%
+        %send% %targ% &&m**** You have to break free of the cage! ****&&0 (struggle)
+        eval time %time% - 5
+      else
+        set time 0
+      end
+    done
     skyfight clear struggle
   else
     %send% %targ% &&mThe Shadow envelops you like a cage! There's nothing you can do!&&0
@@ -6036,7 +6059,7 @@ elseif %move% == 2
     wait 4 s
     if %self.sfinterrupt_count% >= 1 && %self.sfinterrupt_count% >= (%diff% + 1) / 2
       set broke 1
-      set ch %room.people%
+      set ch %rm.people%
       while %ch%
         if %ch.var(did_sfinterrupt,0)%
           %send% %ch% &&mYou manage to interrupt the Ascendant before another shadow torrent!&&0
@@ -6053,7 +6076,7 @@ elseif %move% == 2
       end
     else
       %echo% &&mThe Shadow cracks and swirls as a torrent of smaller shadows stream into it from around the tower...&&0
-      set ch %room.people%
+      set ch %rm.people%
       while %ch%
         set next_ch %ch.next_in_room%
         if %self.is_enemy(%ch%)%
@@ -6087,7 +6110,7 @@ elseif %move% == 2
   skyfight clear interrupt
 elseif %move% == 3
   skyfight clear interrupt
-  %regionecho% %room% 1 &&y~%self% shouts, 'By the power of Skycleave!'&&0
+  %regionecho% %rm% 1 &&y~%self% shouts, 'By the power of Skycleave!'&&0
   wait 3 sec
   set targ %self.fighting%
   set id %targ.id%
@@ -6102,7 +6125,7 @@ elseif %move% == 3
     end
     if %self.sfinterrupt_count% >= 1 && %self.sfinterrupt_count% >= (%diff% + 1) / 2
       set broke 1
-      set ch %room.people%
+      set ch %rm.people%
       while %ch%
         if %ch.var(did_sfinterrupt,0)%
           %send% %ch% &&mYou manage to distract the Shadow by throwing knickknacks at it!&&0
@@ -6114,7 +6137,7 @@ elseif %move% == 3
         dg_affect #11852 %self% HARD-STUNNED on 10
       end
     else
-      set ch %room.people%
+      set ch %rm.people%
       while %ch%
         set next_ch %ch.next_in_room%
         if %self.is_enemy(%ch%)%
@@ -6142,12 +6165,8 @@ elseif %move% == 4
   end
   skyfight setup dodge all
   wait 8 s
-  if %self.disabled%
-    nop %self.remove_mob_flag(NO-ATTACK)%
-    halt
-  end
   set hit 0
-  set ch %room.people%
+  set ch %rm.people%
   while %ch%
     set next_ch %ch.next_in_room%
     if %self.is_enemy(%ch%)%
@@ -6762,8 +6781,8 @@ elseif %move% == 4 && !%self.aff_flagged(BLIND)%
       if %random.2% == 1
         %echo% &&m~%self% is distracted by |%targ% quick reflexes and a flying knickknack!&&0
       else
-        %send% %ch% &&m|%self% deathbolt flies wide as you knock some papers into the air!&&0
-        %echoaround% %ch% &&m|%self% deathbolt flies wide as ~%targ% knocks some papers into the air!&&0
+        %send% %targ% &&m|%self% deathbolt flies wide as you knock some papers into the air!&&0
+        %echoaround% %targ% &&m|%self% deathbolt flies wide as ~%targ% knocks some papers into the air!&&0
       end
       if %diff% == 1
         dg_affect #11873 %self% TO-HIT -15 20

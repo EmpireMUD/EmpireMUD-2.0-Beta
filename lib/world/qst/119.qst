@@ -73,7 +73,7 @@ it wrong. I tried hitting it a few times, erm, with a bucket, but it didn't
 really help much. Still, enjoy your prize... Oh! And thank you for your
 established patronage at Towrinkel's, erm, Gift Shop.'
 ~
-26 e 150 250 -1
+27 e 150 250 -1
 A
 1 11900
 A
@@ -85,7 +85,7 @@ P
 P
 0 11907 0 1 a
 R
-7 11800 10
+7 11800 20
 W+
 11 0 0 1 -
 Win a prize from the claw game~
@@ -146,7 +146,7 @@ might be considered cheating. Old rules, new rules; you could go round and
 round about it till the end of time. I say the dirty tricks make it
 interesting. Might have to copy some of yours.'
 ~
-14 e 150 250 -1
+15 e 150 250 -1
 A
 1 11900
 A
@@ -156,7 +156,7 @@ P
 P
 0 11913 0 1 a
 R
-7 11800 10
+7 11800 20
 W+
 11 0 0 1 -
 Win with your own pixy at the Pixy Races~
@@ -371,13 +371,13 @@ however, I will try it... your way.'
    'Not in this body, of course. From time to time, I loose myself from it and
 travel the aether... alone.'
 ~
-12 e 150 250 -1
+13 e 150 250 -1
 A
 3 11972
 P
 0 11972 0 1 -
 R
-7 11800 10
+7 11800 20
 W+
 3 11928 0 1 -
 Defeat the First Water~
@@ -427,7 +427,7 @@ your visits, although it is with regret that I must admit I cannot recall your
 name. Unfortunately, all humans have roughly the same number of eyes and ears
 and mouths and arms, and it makes you very difficult to tell apart.'
 ~
-15 e 150 250 -1
+16 e 150 250 -1
 A
 1 11941
 A
@@ -435,7 +435,7 @@ A
 P
 0 11941 0 1 -
 R
-7 11800 10
+7 11800 20
 W+
 11 0 0 1 -
 Successfully attune a skystone~
@@ -462,7 +462,7 @@ getting answers.'
    You try to discuss it further, but Niamh seems preoccupied with her own
 thoughts and she soon wanders off.
 ~
-19 ei 150 250 -1
+20 ei 150 250 -1
 A
 1 11900
 D 11863
@@ -471,7 +471,7 @@ P
 P
 0 11812 0 1 a
 R
-7 11800 10
+7 11800 20
 W
 13 11964 0 1 -
 Z
@@ -592,13 +592,13 @@ slowly, a chant builds among the spectators, louder and louder, until it grows
 into a cheer. You can't make out what they're saying -- or you can't understand
 it -- but they seem thrilled at your performance in the arena.
 ~
-13 ei 150 250 -1
+14 ei 150 250 -1
 A
 1 11974
 P
 0 11975 0 1 -
 R
-7 11800 10
+7 11800 20
 W+
 3 11956 0 1 a
 Defeat the Worthy~

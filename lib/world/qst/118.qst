@@ -208,7 +208,7 @@ goblins swore up and down there wasn't a secret passage but they've been
 playing stupid pranks on me for months using it.'
    She fumes and stomps off without thanking you.
 ~
-24 ei 150 250 -1
+25 ei 150 250 -1
 A
 1 11900
 D 11816
@@ -217,7 +217,7 @@ P
 P
 0 11810 0 1 a
 R
-7 11800 10
+7 11800 20
 W
 13 11816 0 1 a
 W
@@ -245,7 +245,7 @@ without a good reason.'
 interesting indeed.'
    She trails off, completely forgetting you're even here.
 ~
-24 ei 150 250 -1
+25 ei 150 250 -1
 A
 1 11900
 D 11816
@@ -254,7 +254,7 @@ P
 P
 0 11810 0 1 a
 R
-7 11800 10
+7 11800 20
 W
 3 11818 0 1 -
 Z
@@ -279,7 +279,7 @@ thinks on it for a moment.
    'The pixies never seem to try to escape. I plum thought they liked it here,'
 she says. 'And what did she mean by that last part... 'in time'?'
 ~
-25 ei 150 250 -1
+26 ei 150 250 -1
 A
 1 11900
 D 11816
@@ -288,7 +288,7 @@ P
 P
 0 11810 0 1 a
 R
-7 11800 10
+7 11800 20
 W
 3 11819 0 1 -
 Z
@@ -397,7 +397,7 @@ near the racetrack stalls.
    'Those pixies really get into your head; that maze was worse than the Forest
 dome. I had the strangest dreams in there.'
 ~
-26 ei 150 250 -1
+27 ei 150 250 -1
 A
 1 11900
 D 11816
@@ -406,7 +406,7 @@ P
 P
 0 11810 0 1 a
 R
-7 11800 10
+7 11800 20
 W+
 11 0 0 1 -
 Break the illusion in the maze~
@@ -437,7 +437,7 @@ as she taps her fingernails against each other. She turns back toward you.
 And for what? The pursuit of magic. Are there no limits to what we destroy for
 power?'
 ~
-23 e 150 250 -1
+24 e 150 250 -1
 A
 1 11900
 D 11834
@@ -446,7 +446,7 @@ P
 P
 0 11811 0 1 a
 R
-7 11800 10
+7 11800 20
 W+
 11 0 0 1 -
 Free the otherworlder~
@@ -480,7 +480,7 @@ chuckle burbles out of the old lich as he sets his repository back down.
    'The only ones who could read were the spellcasters and, to my unending
 chagrin, they were smart enough not to open the thing. Alas.'
 ~
-22 ei 150 250 -1
+23 ei 150 250 -1
 A
 1 11900
 D 11834
@@ -489,7 +489,7 @@ P
 P
 0 11811 0 1 a
 R
-7 11800 10
+7 11800 20
 W+
 11 0 0 1 -
 Open the repository~
@@ -552,7 +552,7 @@ soldiers of fortune.'
    The young magineer turns back to his task, but not before saying, 'Feel free
 to have a look around but of course we do charge for the merchandise.'
 ~
-27 e 150 250 -1
+28 e 150 250 -1
 A
 1 11900
 D 11834
@@ -561,7 +561,7 @@ P
 P
 0 11839 0 1 a
 R
-7 11800 10
+7 11800 20
 W
 13 11840 0 1 a
 W
@@ -602,7 +602,7 @@ common thief. Did you see how his lust for it corrupted and withered him so
 far beyond his years? It's good you put an END to it; on that path he'd soon
 have nothing left but his linens.'
 ~
-20 ei 150 250 -1
+21 ei 150 250 -1
 A
 1 11900
 D 11834
@@ -611,7 +611,7 @@ P
 P
 0 11811 0 1 a
 R
-7 11800 10
+7 11800 20
 W
 3 11847 0 1 a
 W
@@ -645,7 +645,7 @@ rose-colored glass from a pocket inside her robe and holds it up to one eye.
 time loop. I guess by now you've noticed we didn't get free of it. Next time
 maybe you can save Knezz. He might actually know how to get us out of it.'
 ~
-20 ei 150 250 -1
+21 ei 150 250 -1
 A
 1 11900
 D 11863
@@ -654,7 +654,7 @@ P
 P
 0 11820 0 1 a
 R
-7 11800 10
+7 11800 20
 W
 3 11863 0 1 -
 Z
@@ -861,7 +861,7 @@ here-after.'
    Knezz chuckles to himself.
    'Can you imagine?' he says. 'The hells full to the gills with Jozef Knezz!'
 ~
-20 ei 150 250 -1
+21 ei 150 250 -1
 A
 1 11900
 D 11863
@@ -870,7 +870,7 @@ P
 P
 0 11812 0 1 a
 R
-7 11800 10
+7 11800 20
 W
 3 11869 0 1 -
 Z
@@ -912,7 +912,7 @@ the stuff of fables. Not a page has been written on how to defeat one. We may
 well be the first to try. But don't dare imagine your temporary victory will
 hold. I guarantee we have not escaped this loop.'
 ~
-23 ei 150 250 -1
+24 ei 150 250 -1
 A
 1 11900
 D 11863
@@ -921,7 +921,7 @@ P
 P
 0 11812 0 1 a
 R
-7 11800 10
+7 11800 20
 W
 3 11872 0 1 -
 Z
@@ -1015,13 +1015,13 @@ your own.
    'Thank you,' she says again. 'I only wish you had been our champion when rot
 and ruin came for us. I shall not forget you, even when you have forgotten me.'
 ~
-10 e 150 250 -1
+11 e 150 250 -1
 A
 1 11884
 P
 0 11875 0 1 -
 R
-7 11800 10
+7 11800 20
 W
 3 11888 0 1 -
 Z
