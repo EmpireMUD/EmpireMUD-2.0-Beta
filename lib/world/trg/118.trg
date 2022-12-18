@@ -442,6 +442,8 @@ elseif %self.vnum% == 11825 || %self.vnum% == 11925
   elseif !%actor.on_quest(11915)%
     %echo% ~%self% refuses |%actor% jar.
     say I don't want your filthy pixy. I'm trying to win on my own merits here.
+  elseif %object.var(last_race,0)% + 300 > %timestamp%
+    %send% %actor% You can't give @%object% to Ravinder right now (your pixy might still be racing).
   elseif (%object.luck% + %object.guile% + %object.speed%) < 13
     * low stats
     %send% %actor% You hand @%object% to ~%self% and &%self% examines it carefully and hands it back...

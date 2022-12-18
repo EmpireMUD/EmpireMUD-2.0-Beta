@@ -50,6 +50,10 @@ sap~
 0 0 0 0
 T0
 You are no longer stunned.~
+T1
+$n recovers from being sapped.~
+T5
+...$e has been hit over the head and looks stunned!~
 S
 #3008
 mana shield~

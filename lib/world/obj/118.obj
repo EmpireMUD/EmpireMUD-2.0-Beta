@@ -398,13 +398,10 @@ A scrimshawed bone club is lying here.~
 it's hard to imagine what it might have come from. The entire length of the
 club, save for the leather-wrapped handle, is carved in intricate scrimshaw,
 depicting the aftermath of a great war. In the scene on the club, a single hero
-stands over countless fallen foes, some of whom now serve the hero and others
+stands over countless fallen foes, some of whom now serve the hero while others
 merely fertilize their fields.
-   It is said one does not attack a feramancer in the field, a phrase oft-
-repeated since the Battle of Tuskrun Downs. As the Galradian army cut at his
-flanks, the Wildermage Indrik summoned a thousand great beasts, from far and
-wide. The earth shook, the Galradians were trampled to dust, and what few
-beasts they felled were carved in celebration and honor by Indrik himself.
+   Carving a great victory -- or defeat -- into the bones of the fallen is an
+ancient tradition.
 ~
 1 emo an 0 11
 0 3 5
@@ -427,9 +424,8 @@ A scrimshawed bone staff is lying here.~
 to tip, the entire staff has been carved with intricate scrimshaw. You lack the
 knowledge to understand the meaning behind the carvings, but the pale blue glow
 they emanate in the dark tells you their purpose is to channel mana.
-   When he had defeated the Galradian army, Wildermage Indrik carved the bones
-of his greatest allies to celebrate the victory they seized from the tusks of
-defeat.
+   When he had defeated his last foe, Wildermage Indrik carved the bones of his
+fallen allies to celebrate the victory they seized from the tusks of defeat.
 ~
 1 emo an 0 11
 0 3 18
@@ -1099,9 +1095,7 @@ legs. They're small, thin, and shockingly light. This is moxteel, a
 magic-infused metal that weighs less than any normal metal while deflecting
 blows even when they should be strong enough to pierce it.
    Moxteel was a late invention of Skycleave, after the fad for enchanted glass
-armor had started to wane. Though the name is commonly constructed as mocking
-steel-wearers, it was, in truth, invented by a sorcerer who fancied herself
-The Moxie Witch.
+armor had started to wane.
 ~
 27 mp af 0 22
 2 0 0
@@ -1268,9 +1262,8 @@ because it's made from magitanium and because of the honeycomb structure
 inside, where the magitanium has been shaped to disperse even the most powerful
 impacts. As you run your fingers over the wristguard, the iridescent swirls of
 the magitanium seem to follow every movement.
-   Magitanium originated in a rivalry between High Sorcerer Itania the Moxie
-Witch and though she didn't invent it, Itania is credited both with introducing
-the metal to Skycleave's artisan sorcerers, and with naming it.
+   Magitanium originated outside the tower, but it triggered a small feud when
+some sorcerers preferred it over moxteel.
 ~
 27 mp aj 0 23
 3 0 0
@@ -1392,10 +1385,8 @@ A moxteel skycleaver wristcuff is lying here.~
    This powerful, light, shimmering wristcuff is made from moxteel, an
 enchanted metal that sparkles like white glitter equally in sunlight or candle
 light.
-   The Moxie Witch came into her name long before she began to dabble in
-metallurgy. While cleaning her grandfather's tower as an adolescent, she fell
-into a barmy blue portal and returned laden with strange bottles filled with
-her namesake fizzy beverage.
+   Moxteel took its name from the way its thinness and exceptional durability
+make a mockery of traditional steel.
 ~
 27 mp aj 0 25
 2 0 0
@@ -1561,9 +1552,9 @@ magical metal so light you can barely feel them. The earrings have a red glint
 to them not native to the moxteel, suggesting they might carry a powerful
 enchantment.
    The process for creating moxteel is tightly guarded by the Tower Skycleave
-even after the Moxie Witch was twice abducted by envious ironmongers who forced
-the secret out of her. Both abductors vanished within a fortnight of her
-release.
+even after its sorcerers were twice abducted by envious ironmongers who forced
+the secret out by nefarious means. Both abductors vanished within a fortnight
+of the kidnappings.
 ~
 2 mp am 0 28
 0 0 0

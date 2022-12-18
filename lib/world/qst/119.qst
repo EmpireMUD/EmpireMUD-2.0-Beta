@@ -183,8 +183,10 @@ how much I look forward to the sweet taste of victory with this little guy.
 Honestly. Take your reward. Oh, this pixy will be worth so much more. Just,
 truly, from the bottom of my heart, thank you. I'll get started in tomorrow's
 race.'
+   Ravinder hardly looks at you as he hands you a delicate glass chrysanthemum
+from inside his white robe. His eyes don't leave his new pixy jar.
 ~
-15 0 150 250 -1
+16 0 150 250 -1
 A
 1 11825
 A
@@ -197,6 +199,8 @@ P
 0 11913 0 1 a
 R
 7 11800 10
+R
+2 11933 1
 W+
 11 0 0 1 -
 Offer Ravinder a high-level racing pixy~
@@ -320,14 +324,18 @@ this enormous chamber, looking down at the nocturnium tree and the tremendous
 fall to its base. This must be how it felt to be trapped in the time loop,
 staring into the pit you can never escape from. At least the sorcerers are, on
 the whole, unaware of their dark fate.
+   As you get up, you notice a black glint in the fountain. You reach in and
+find a strange nocturnium pocket watch at the bottom.
 ~
-9 0 150 250 -1
+10 0 150 250 -1
 A
 2 11920
 P
 16 11800 0 7 -
 R
 7 11800 25
+R
+2 11934 1
 W+
 11 0 0 1 -
 Find the time-traveler~

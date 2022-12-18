@@ -1444,6 +1444,7 @@ polishing everything from the floor and handrails to the paneled walls, to the
 enormous chandelier. The rags come in all shades from light to dark, though
 they move so fast it's hard to focus on any one of them.
 ~
+F 11800
 M
 0
 The rags swirl around the floor...~
@@ -3333,6 +3334,7 @@ ready. Set a difficulty to continue the adventure. This difficulty only applies
 to the second floor.
 Usage: difficulty <normal | hard | group | boss>
 ~
+F 11800
 I 12 11865 100.00 1 p  # PICKPOCKET: ether condenser
 M
 7
@@ -3381,6 +3383,7 @@ difficulty to continue the adventure. This difficulty only applies to the
 third floor.
 Usage: difficulty <normal | hard | group | boss>
 ~
+F 11800
 I 12 11864 100.00 1 p  # PICKPOCKET: mana deconfabulator
 M
 7
@@ -3424,6 +3427,7 @@ ready. Set a difficulty to continue the adventure. This difficulty applies to
 the rest of the tower above you.
 Usage: difficulty <normal | hard | group | boss>
 ~
+F 11800
 I 12 11865 100.00 1 p  # PICKPOCKET: ether condenser
 M
 7

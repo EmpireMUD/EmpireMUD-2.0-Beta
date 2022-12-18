@@ -792,6 +792,86 @@ M
 8
 You squeeze into the green dress, even if it's a little small.~
 S
+#11932
+coat hat suspicious hugh mann's manns~
+Hugh Mann's suspicious coat and hat~
+A suspicious coat and hat are lying on the ground.~
+   The coat is long enough to drape on the ground and although it's made of
+leather, it's lighter than it looks. The material is thin and has the faintest
+aroma of chicken. Hooks fasten it on the front with a flap to ensure the wearer
+is fully protected.
+   The rare goblin who returns from Skycleave with treasure earns a new name.
+~
+2 p ad 0 6
+-1 -1 -1
+10 0
+A
+5 1 0
+C
+1 1
+M
+8
+You don $p and conceal your identity as best you can.~
+M
+9
+$n dons a coat and hat and suddenly blends into the crowd.~
+M
+14
+A man stands here in a low hat and full-length coat.~
+M
+13
+A woman stands here in a low hat and a full-length coat.~
+S
+#11933
+chrysanthemum glass orange~
+an orange glass chrysanthemum~
+An orange glass chrysanthemum sits delicately on the floor.~
+   The delicate orange flower has dozens -- perhaps hundreds -- of tiny,
+translucent petals. It is, perhaps, larger than a real chrysanthemum bloom, and
+surprisingly cold to the touch. In low light, it glows as mana flows up through
+the petals.
+   Harinder felt in her bones when she had reached her final midwinter and
+died naked under the full moon with the glass chrysanthemum in her hands, just
+as her parents had done, in order to pass her impetus to the next generation.
+~
+3 mp ao 0 2
+0 0 0
+8 0
+A
+7 1 0
+A
+16 1 0
+A
+22 1 0
+A
+23 1 0
+A
+5 1 0
+C
+250 250
+S
+#11934
+watch pocket nocturnium~
+a nocturnium pocket watch~
+A nocturnium pocket watch is lying here.~
+   This curious little round device pops open when you squeeze it, revealing
+a face with the numbers 1 through 12 and a pair of pointing arrows that rotate
+slowly forward and then, without warning, they whir and spring backward,
+returning to their start.
+   When Henri realized he was in a time loop, he fashioned a device that would
+permit him to pass his memories forward from one instance of the loop to the
+next, in hopes of finding a way out.
+~
+3 mp ao 0 3
+0 0 0
+2 0
+A
+24 1 0
+A
+5 1 0
+C
+250 250
+S
 #11935
 shard crafting skycleaver~
 a skycleaver crafting shard~
@@ -1800,8 +1880,9 @@ A goblin has left its vest here, perhaps.~
    This vest is small, and slightly too snug. Nevertheless, those tiny green
 fingers make fine clothing.
    This vest grants a new 'tap' social to the wearer.
-   No goblins that has entered Skycleave has ever left again. The sorcerers can
-little comprehend why, then, the goblins continue to invade it.
+   According to Skycleave's staff, no goblins that has entered the tower has
+ever left again. The sorcerers can little comprehend why, then, the goblins
+continue to invade it.
 ~
 2 o ad 0 5
 -1 -1 -1
