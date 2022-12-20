@@ -3124,19 +3124,34 @@ end
 #11834
 Skycleave: Free the otherworlder~
 0 c 0
-free unchain unshackle~
+free unchain unshackle break smash~
 return 1
 * validate arg
 if %actor.fighting%
   %send% %actor% You're a little busy at the moment!
   halt
+end
+* 2 modes:
+if break /= %cmd% || smash /= %cmd%
+  * break/smash only
+  if !%arg%
+    %send% %actor% Break what?
+    halt
+  elseif %arg% /= chains || %arg% /= shackles || %arg% /= gems
+    * ok
+  else
+    %send% %actor% You can't break that.
+    halt
+  end
 elseif !%arg%
   %send% %actor% Free whom?
   halt
 elseif %actor.char_target(%arg%)% != %self%
   %send% %actor% You can't free that.
   halt
-elseif %self.vnum% == 11934
+end
+* more checks that apply to both modes
+if %self.vnum% == 11934
   %send% %actor% The shackles have been magically secured. You cannot free the otherworlder.
   halt
 end
@@ -7040,12 +7055,20 @@ elseif %seconds% > 30
 end
 ~
 #11864
-Skycleave: Shared mob command trigger (Mez transition, tower mounts)~
+Skycleave: Shared mob command trigger (Mez transition, tower mounts, Waltur)~
 0 c 0
-diagnose mount ride~
+diagnose mount ride donate~
 set aqua_vnums 11854 11855 11856 11857 11858
 * modes
-if diagnose /= %cmd% && %self.vnum% == 11866
+if donate /= %cmd% && %self.vnum% == 11840
+  * Waltur 3A
+  %send% %actor% You inquire about donating...
+  %echoaround% %actor% ~%actor% inquires about donating...
+  say This is not the time. We're in the middle of a crisis.
+elseif donate /= %cmd% && %self.vnum% == 11940
+  * Waltur 3B
+  %send% %actor% Use 'buy donation' to donate to the laboratory.
+elseif diagnose /= %cmd% && %self.vnum% == 11866
   * Mez 11866 during phase transition
   %send% %actor% ~%self% doesn't look very good.
 elseif (mount /= %cmd% || ride /= %cmd%) && %self.vnum% == 11852

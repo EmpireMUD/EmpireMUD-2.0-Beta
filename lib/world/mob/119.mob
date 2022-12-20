@@ -1777,6 +1777,7 @@ Hmm...~
 T 11806
 T 11810
 T 11852
+T 11864
 S
 #11941
 goef oreonic rock creature pitch black~
@@ -3628,6 +3629,9 @@ M
 say I present my newest poem, O Glorious Zenith.~
 M
 8
+echo The crowd falls silent.~
+M
+8
 say O glorious Zenith, you inspire me to speak.~
 M
 8
@@ -3640,7 +3644,16 @@ M
 say Always dreaming about the holy day.~
 M
 8
+echo Some of the members of the audience snap their fingers but the poet hushes them.~
+M
+8
+say It isn't over yet.~
+M
+8
 skip~
+M
+8
+emote $n clears $s throat.~
 M
 8
 say Let me compare you to a splendid clam?~
@@ -3658,7 +3671,13 @@ M
 skip~
 M
 8
-say This next poem is called Sunny Summertime.~
+echo There's a pause and then a few members of the audience start to snap their fingers again.~
+M
+8
+say Thank you, thanks, thank you. This next poem is called Sunny Summertime.~
+M
+8
+emote $n clears $s throat.~
 M
 8
 say Sunny summertime~
@@ -3671,6 +3690,9 @@ say Over the jade sea~
 M
 8
 skip~
+M
+8
+echo Some of the audience snaps their fingers.~
 M
 8
 say Thank you, thank you, you're too kind. This final poem is called Whose Sun Is It.~
@@ -3710,6 +3732,9 @@ say It shines to cast asunder dread,~
 M
 8
 say The Zenith's promise overhead.~
+M
+8
+emote $n gives a little bow as the audience snaps their fingers again.~
 M
 8
 skip~

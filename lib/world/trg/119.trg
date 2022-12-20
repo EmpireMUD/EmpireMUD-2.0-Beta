@@ -4822,6 +4822,7 @@ Gnarled old wand: By the Power of Skycleave~
 1 c 1
 say ' shout whisper~
 return 0
+set room %actor.room%
 set phrase1 by the power
 set phrase2 skycleave
 * basic things that could prevent them speaking
@@ -4834,15 +4835,28 @@ if !(%arg% ~= %phrase1%) || !(%arg% ~= %phrase2%)
 end
 wait 1
 * look for mm
-set mm %self.room.people(11905)%
+set mm %room.people(11905)%
 if !%mm%
-  set mm %self.room.people(11805)%
+  set mm %room.people(11805)%
 end
-if !%mm%
-  set mm %self.room.people(11920)%
+* see if ok
+if %room.template% >= 11875 && %room.template% <= 11899
+  set safe 1
+elseif %room.template% >= 11975 && %room.template% <= 11994
+  set safe 1
+elseif %room.template% == 11973
+  set safe 1
+else
+  set safe 0
 end
-* messaging
-if %actor.is_immortal%
+* messaging/action
+if %safe%
+  dg_affect #11883 %actor% off silent
+  %send% %actor% You hold up the gnarled old wand as a bolt of lightning from out of nowhere strikes it with a loud CRACK!
+  %echoaround% %actor% ~%actor% holds up ^%actor% gnarled old wand... a bolt of lightning out of nowhere strikes it with a loud CRACK!
+  eval amount %actor.level% / 15
+  dg_affect #11883 %actor% MANA-REGEN %amount% 60
+elseif %actor.is_immortal%
   %echo% A bolt of lightning comes out of nowhere and strikes |%actor% wand!
 elseif %mm%
   %echo% A bolt of lightning streaks out of nowhere...

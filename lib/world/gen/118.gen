@@ -393,6 +393,19 @@ R 6340
 T0
 magic rock candies~
 S
+#11883
+power of Skycleave~
+4 0
+0 0 0 0
+T0
+The power of Skycleave fades from you.~
+T2
+New power courses through your body!~
+T4
+$e has a strange violet glow about $m.~
+T5
+...$e has a strange violet glow!~
+S
 #11885
 pure morning dew~
 1 0
