@@ -207,7 +207,11 @@ remote hound %self.id%
 Liza the Hound combat~
 0 k 15
 ~
+set id %actor.id%
 wait 10
+if !%self.fighting% || %self.disabled% || %id% != %actor.id%
+  halt
+end
 switch %random.3%
   case 1
     set ch %self.room.people%

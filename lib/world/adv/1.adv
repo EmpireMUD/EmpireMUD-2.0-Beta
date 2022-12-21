@@ -401,16 +401,17 @@ L
 -1 0 0
 S
 #160
-The Tower Skycleave~
+OLD The Tower Skycleave~
 Paul Clarke~
    The Tower Skycleave is renowned throughout the land for its powerful
 sorcerers and unconventional research. It funds its discoveries through patents
 and tourism, and a sign out front eagerly encourages you to visit. Parts of the
 tower are designed for different level ranges, so use the 'consider' command
 judiciously before you attack things.
+   This adventure has been replaced by 11800.
 ~
 10030 10099 30-200
-1 240 kl 0
+1 240 akl 0
 L
 1 0
 10030 -1 -1 -1

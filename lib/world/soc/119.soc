@@ -1,3 +1,49 @@
+#11931
+dance~
+dance~
+b 8 8
+L
+18 11931 0 1 -
+M0
+You dance as if no one is watching.~
+M1
+$n closes $s eyes and dances around without a care in the world.~
+M2
+You grab $N and dance around with $M.~
+M3
+$n grabs $N and dances around with $M.~
+M4
+$n grabs you by the hand and dances around with you.~
+M5
+You'll have to dance by yourself; they're not here.~
+M6
+You might be by yourself, but you dance all the same.~
+M7
+$n dances around by $mself.~
+S
+#11932
+cough~
+cough~
+0 5 0
+L
+18 11932 0 1 -
+M0
+You cough suspiciously.~
+M1
+$n coughs suspiciously.~
+M2
+You cough at $N.~
+M3
+$n coughs in $N's direction.~
+M4
+$n coughs right at you!~
+M5
+You were hoping to spread the plague but they're not here.~
+M6
+You let out a cough inside your coat.~
+M7
+There's a cough from $n's midsection.~
+S
 #11983
 bow~
 bow~

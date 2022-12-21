@@ -539,39 +539,53 @@ Design for the bone crown of the primeval:
 
 Hint: Try digging for resources in the base camp or the clearing.
 #
-SKYCLEAVE "SKY CLEAVE" "TOWER SKYCLEAVE" "THE TOWER SKYCLEAVE"
+SKYCLEAVE "SKY CLEAVE" "TOWER SKYCLEAVE" "THE TOWER SKYCLEAVE" "ASHES OF HISTORY" "TOWER SKYCLEAVE: ASHES OF HISTORY" "THE TOWER SKYCLEAVE: ASHES OF HISTORY" "TOWER SKYCLEAVE ASHES OF HISTORY"
 
-The Tower Skycleave (adventure for various levels)
+The Tower Skycleave: Ashes of History (levels 150-250)
 
-   The Tower Skycleave is renowned throughout the land for its powerful
-sorcerers and unconventional research. It funds its discoveries through patents
-and tourism, and a sign out front eagerly encourages you to visit. Parts of the
-tower are designed for different level ranges, so use the 'consider' command
-judiciously before you attack things.
+Skycleave is a highly-detailed adventure with a lot to find -- and a lot to
+read. Many parts of this adventure have extra descriptions -- for example,
+'look portraits' on the walkway around floor 2 -- but you can also complete the
+adventure without any of this. It's up to you. See the 'adventure' command
+inside the tower for more information about what lies inside.
 
-The gift shoppe sells:
-  a skycleaver belt - +mana belt (30-50)
-  skycleaver gloves - +move gloves (30-50)
-  skycleaver armor - +hit/health medium armor (30-50)
-  a skycleaver rucksack - +intelligence pack (30-50)
-  an iridescent blue iris - gem
-  a yellow lightning stone - gem
-  a red bloodstone - gem
-  a glowing green seashell - gem
-  a skycleaver trinket - teleports you to Skycleave
- 
-The cafe sells:
-  mug of coffee
-  glass of red wine
+Each instance of Skycleave can only be rescued once; if you find the tower in
+need of rescue, ask around and see if other players want to join you. But there
+is still a lot more to do in this adventure once the rescue is complete. Can
+you uncover all of Skycleave's secrets?
 
-High Sorceress Celiya sells:
-  form-fitting backpack - +hit pack (30-100)
+The fights in Skycleave are interactive. Watch out for messages with these
+tags: (dodge), (interrupt), (dodge and interrupt), (struggle), (free <name>),
+and (fastmorph normal).
 
-High Sorcerer Barrosh sells:
-  armored backpack - resist-physical pack (30-100)
+Encounters in this adventure are designed for levels 150 to 250 and are
+available on Normal (solo), Hard (2-person), Group (3-person), and Boss (4-
+person) difficulty. Higher difficulty yields better rewards. Some of the gear
+found in this adventure can also be crafted using patterns from the shops. It
+has a level range of 150-275 when crafted, and will be bind-on-equip instead of
+bind-on-pickup.
 
-Grand High Sorcerer Knezz sells:
-  portable hole - mana-regen pack (30-100)
+Collect skystones by aiding the tower and attune them on floor 3. Once attuned,
+skystones can be found on the 'coins' command and can be spent in the shops.
+
+Shops in the tower sell crafting patterns for the ear, wrist, waist, and leg
+slots. The following people may sell these patterns after their section of the
+tower has been rescued:
+  Grace: magitanium tank patterns
+  Knezz: thundersilk caster patterns
+  Niamh: shadowhide melee patterns
+  Weyonomon: soulcloth healer patterns
+  Wright: moxteel pvp/solo patterns
+
+There are other shops in the tower as well. Use 'list' to see what's available
+in each shop and 'buy' to purchase them. The 'list id' command will give more
+information about items in the shop.
+
+Credits: Paul Clarke (design, text, most components), Domino (scripting),
+Owen Morris (scripting), Baethyn (text), Aelix (text), Wox (testing), Lilmike
+(testing)
+
+See also: COINS, EXTRA DESCRIPTIONS, SHOPS
 #
 "SWAMP HAG" "THE SWAMP HAG"
 

@@ -24,8 +24,9 @@ a skycleave controller~
 A skycleave controller is lying here.~
 Usage:
   skycleave goto <template vnum>
-  skycleave secret passage
+  skycleave info
   skycleave phase <floor number>
+  skycleave secret passage
   skycleave status
 ~
 3 0 a 0 5
@@ -174,7 +175,7 @@ and clouded, and its light has gone out. Peering through the windows, you see
 dusty rolls of clothing beneath a tarnished metal claw.
    You can 'play' the claw game to win a prize.
    The claw machine was originally built to exploit the sunk cost fallacy and
-was merely a sorcery faire exhibit, but when it rapidly outpaced expectations,
+was merely a Sorcerie Faire exhibit, but when it rapidly outpaced expectations,
 it gained a permanent berth in the gift shop.
 ~
 3 0 0 0 5
@@ -266,7 +267,7 @@ Where its wings and elytra should be, there is only a shining, crackling flame.
 The bug seems no worse for the wear as it skitters around its glass jar on its
 scarlet red legs.
    The Tower Skycleave is home to a great many wonders, which it proudly shares
-with all the world, for a small fee. The tower's sorcerers often enchant
+with all the world -- for a small fee. The tower's sorcerers often enchant
 mundane objects and simple animals to create extraordinary tools which are
 unparalleled in even the most extraordinary shops.
 ~
@@ -342,9 +343,9 @@ Skycleave's pixy track.
 stats by racing it. You can also 'name jar <name>' to give the pixy a name or,
 if you're feeling benevolent, you can 'release' it, but you'll lose the jar.
    Pixy jars were first created by Grand High Sorcerer Kofi, who preferred
-glass. But sorcerers preferred not to see the little creatures banging against
-the glass as they tried to break free and eventually clay jars took over. Kofi,
-in a violent stroke of irony, was felled by pixies in the end.
+glass. But most sorcerers preferred not to see the little creatures banging
+against the glass as they tried to break free, and eventually clay jars took
+over. Kofi, in a violent stroke of irony, was felled by pixies in the end.
 ~
 3 0 a 0 5
 0 0 0
@@ -391,7 +392,7 @@ left, where parts are missing, but also along the edges. It reads, in part:
 
    ...cking Gobbrabakh of Orka again. Why is it every time I grasp at the dream
 of escaping this ill-fated tower, I find myself knee-deep in somebody else's
-problem. No time for any of that, ironically.
+problem? No time for any of that, ironically.
    Have been through these events 2413 times, give or take a missed tally, I
 find little hope remains for a way out. How foolish I feel that I spent that
 full week devising a way to bind myself to this wretched loop in hopes of
@@ -426,13 +427,14 @@ practiced hand. It reads:
    On this, my ninetieth (ninety-first?) voyage through this infernal time
 loop, I am astonished to have found myself in a most grueling combat against
 Jozef Knezz himself. I thought myself to have searched every rotten corner of
-this smol place; plundered every mote of conversation; seen all their was to see.
+this smol place; plundered every mote of conversation; seen all their was to
+see...
    More is trapped in the heartwood of time than I had yet realized. What
 follows here is my list of foes trapped herein:
-   * The pixy queen and her loyal kin.
-   * Venjer the Fox and her kin.
-   * Kara Virduke, Bleak Rojjer, Trixton Vye, and their like.
-   * High Sorcerer Barrosh, not in his right mind.
+   * The pixy queen and her loyal kin
+   * Venjer the Fox and her kin
+   * Kara Virduke, Bleak Rojjer, Trixton Vye, and their like
+   * High Sorcerer Barrosh, not in his right mind
    * The Shade of Mezvienne
    * The Shadow Ascendant
    * Mezvienne the Enchantress
@@ -759,6 +761,115 @@ breadcrumbs form a clear trail on the ground.
 C
 1 1
 S
+#11931
+dress green~
+a green dress~
+A green dress is lying on the ground.~
+   The green dress is a bit tight in the middle, but it has a fashionable,
+modern cut that would look stylish on anyone. The color is, perhaps, somwhere
+between honeydew and laurel; it's rarely found on clothing because green dyes
+are notoriously ephemeral. Nevertheless, the dress has an even and unfaded tone
+that would stand out even in a summer meadow.
+   This dress grants a new 'dance' social to the wearer.
+   When traveling far afield, it is often safest to go unseen.
+~
+2 mp ad 0 8
+0 0 0
+11 0
+A
+5 1 0
+A
+5 1 6
+C
+1 1
+M
+12
+$n is dressed all in green.~
+M
+9
+$n squeezes into a little green dress.~
+M
+8
+You squeeze into the green dress, even if it's a little small.~
+S
+#11932
+coat hat suspicious hugh mann's manns~
+Hugh Mann's suspicious coat and hat~
+A suspicious coat and hat are lying on the ground.~
+   The coat is long enough to drape on the ground and although it's made of
+leather, it's lighter than it looks. The material is thin and has the faintest
+aroma of chicken. Hooks fasten it on the front with a flap to ensure the wearer
+is fully protected.
+   This coat and hat grant a new 'cough' social to the wearer.
+   The rare goblin who returns from Skycleave with treasure earns a new name.
+~
+2 p ad 0 7
+-1 -1 -1
+10 0
+A
+5 1 0
+C
+1 1
+M
+8
+You don $p and conceal your identity as best you can.~
+M
+9
+$n dons a coat and hat and suddenly blends into the crowd.~
+M
+12
+Someone is standing here in a low hat and full-length coat... it might be $n.~
+S
+#11933
+chrysanthemum glass orange~
+an orange glass chrysanthemum~
+An orange glass chrysanthemum sits delicately on the floor.~
+   The delicate orange flower has dozens -- perhaps hundreds -- of tiny,
+translucent petals. It is, perhaps, larger than a real chrysanthemum bloom, and
+surprisingly cold to the touch. In low light, it glows as mana flows up through
+the petals.
+   Harinder felt in her bones when she had reached her final midwinter and
+died naked under the full moon with the glass chrysanthemum in her hands, just
+as her parents had done, in order to pass her impetus to the next generation.
+~
+3 mp ao 0 2
+0 0 0
+8 0
+A
+7 1 0
+A
+16 1 0
+A
+22 1 0
+A
+23 1 0
+A
+5 1 0
+C
+250 250
+S
+#11934
+watch pocket nocturnium~
+a nocturnium pocket watch~
+A nocturnium pocket watch is lying here.~
+   This curious little round device pops open when you squeeze it, revealing
+a face with the numbers 1 through 12 and a pair of pointing arrows that rotate
+slowly forward and then, without warning, they whir and spring backward,
+returning to their start.
+   Upon discovering that Skycleave was trapped in a time loop, Henri fashioned
+a device that would permit him to pass his memories forward from one instance
+of the loop to the next, even after he had bound himself to the loop.
+~
+3 mp ao 0 3
+0 0 0
+2 0
+A
+24 1 0
+A
+5 1 0
+C
+250 250
+S
 #11935
 shard crafting skycleaver~
 a skycleaver crafting shard~
@@ -829,8 +940,8 @@ bedroom, both carved from stone.
 tower and drive it out of the carpenter. You can drive it from any interior
 room; look out a window to see where you are.
    The Tower Skycleave has existed in many forms over the years, from Abaris's
-original clay brick tower to Wong's legendary stone tower. When he arrived at
-Skycleave, Waltur had the same dream: to build a greater Skycleave; one that
+original wooden tower to Wong's legendary stone tower. When he arrived at
+Skycleave, Waltur had the same dream: to build a greater Skycleave -- one that
 the world would never stop talking about. When he became Chief Magineer, he
 immediately set to work building prototypes for a new tower.
 ~
@@ -1120,6 +1231,19 @@ These are a pvp/solo item worn on the ears.
 C
 1 1
 S
+#11960
+donation generous laboratory~
+a generous donation to the laboratory~
+A donation is lying here.~
+   Buy this to donate a skystone to Magineer Waltur and his laboratory. There
+are never enough attuned skystones to go around. This purchase grants you +20
+reputation with the Tower Skycleave, which caps at Venerated.
+~
+3 z a 0 3
+0 0 0
+12 0
+T 11805
+S
 #11961
 dew crystalline~
 the crystalline dew of Tagra Nes~
@@ -1174,6 +1298,24 @@ but instead reflects you standing in the great hall on the first floor!
 C
 100 100
 S
+#11964
+stone brilliant eternal sunshine~
+a brilliant stone of eternal sunshine~
+A brilliant stone shines on the ground.~
+   This little amber stone shines nearly as brightly with the sun, making it
+hard to look at. Curiously, if you enclose it in your hands or pocket, no light
+shines through.
+   You can use the stone of eternal sunshine to gain a reset in the skill tree
+of your choice. This will allow you to clear your purchased abilities in that
+skill at a later time.
+   Some find it helpful to free themselves from the memories that might other-
+wise distract from their insatiable quest for knowledge.
+~
+3 0 a 0 4
+0 0 0
+12 0
+T 263
+S
 #11965
 tear jade~
 the jade tear of Gobbrabakh of Orka~
@@ -1195,6 +1337,21 @@ C
 100 100
 T 11965
 T 11963
+S
+#11966
+desk somber niamhs niamh's~
+Niamh's desk~
+A somber desk stands near the center of the office.~
+   The desk is large and somewhat austere. It's pitch black, but unlike most of
+the black tower's ebony, there is no woodgrain, no knots, not even the
+slightest imperfection on the surface. It is well and truly black, almost as if
+it was carved from a shadow instead of a tree.
+~
+3 0 0 0 5
+0 0 0
+0 0
+C
+250 250
 S
 #11967
 desk oak tall austere~
@@ -1233,7 +1390,7 @@ comfortably, but it has just one chair. It is carved from ebony, inlaid with
 ivory lettering in an ancient language you can't decipher. The writing covers
 all visible portions of the desk, perhaps as an enchantment to protect the desk
 or tower. The nameplate on the desk, also made from ivory, displays the full
-name and title of Grand High Sorcerer Jozef Anton Knezz, Fifteenth Master of
+name and title of Grand High Sorcerer Jozef Robert Knezz, Fifteenth Master of
 the Tower Skycleave.
 ~
 3 0 0 0 5
@@ -1324,7 +1481,7 @@ S
 stains blood~
 the blood in the arena~
 Blood stains the shining sand of the arena.~
-Spatters of red and green blood crisscross the center of the arena.
+Spatters of blood crisscross the center of the arena.
 ~
 3 0 0 0 3
 0 0 0
@@ -1337,7 +1494,7 @@ S
 stains blood~
 the blood in the arena~
 Blood stains the shining sand of the arena.~
-Spatters of red and green blood crisscross the center of the arena.
+Spatters of blood crisscross the center of the arena.
 ~
 3 0 0 0 4
 0 0 0
@@ -1382,7 +1539,8 @@ S
 mussels steamed~
 some steamed mussels~
 Some steamed mussles are lying on the ground.~
-   The mussels have a fragrant riparian smell.
+   The mussels have a fragrant riparian smell. The shells have opened slightly,
+making it easier to pry them apart.
    Since time immemorial, people have gathered and cooked shellfish as a simple
 and bountiful food source.
 ~
@@ -1442,7 +1600,7 @@ A fishing net is hanging nearby.~
 flow through while fish are trapped. The tiny knots show evidence of repair all
 over, a sign someone used this net for a long time.
    Agriculture is not the sole lifestyle that has led people to create cities.
-Fishing, too, can provide enough food for civilization to rise.
+Fishing, too, can provide enough food for civilization to arise.
 ~
 3 0 ao b 1
 0 0 0
@@ -1514,8 +1672,8 @@ keys painted on the side and a crossed hazel branch and wand stamped in the
 blue wax seal on top. The jar jingles when you shake it, then screams. It
 sounds like there's a pixy in there!
    You can 'use jar' to gain the little pixy as a minipet.
-   Skycleavers have long kept pixies, one of the few naturally occurring
-magically-attuned creatures, for use in advanced magic. Pixies were notoriously
+   Skycleavers have long kept pixies, one of the few naturally occurring,
+magically attuned creatures, for use in advanced magic. Pixies were notoriously
 difficult to contain until the sorcerers discovered a form of clay through
 which mana has been drawn over a long period of time. This clay, when fired,
 can hold even a pixy queen.
@@ -1724,8 +1882,8 @@ white and gray, with simple stitching on the seams and hems.
    These robes grant a new 'shrug' social to the wearer.
    The Tower Skycleave invests a great deal into its apprentices and saddles
 them with the highest expectations. Every high sorcerer in the tower began
-their storied career as an apprentice who outshone their peers, the more
-disappointing of whom now line the tower's cupboards and cabinets.
+their storied career as an apprentice who outshone their peers, though even the
+most disappointing among them find ways to contribute to the tower.
 ~
 2 p ad 0 6
 0 0 0
@@ -1751,8 +1909,9 @@ A goblin has left its vest here, perhaps.~
    This vest is small, and slightly too snug. Nevertheless, those tiny green
 fingers make fine clothing.
    This vest grants a new 'tap' social to the wearer.
-   No goblins that has entered Skycleave has ever left again. The sorcerers can
-little comprehend why, then, the goblins continue to invade it.
+   According to Skycleave's staff, no goblins that has entered the tower has
+ever left again. The sorcerers can little comprehend why, then, the goblins
+continue to invade it.
 ~
 2 o ad 0 5
 -1 -1 -1
@@ -1780,7 +1939,7 @@ set against a background pattern that reminds you of bricks. The garment shines
 in every color, all at once.
    This doublet grants a new 'wave' social to the wearer.
    The Tower Skycleave creates a fashion craze from time to time because what
-seems to be magical, impossible clothing is a simple feat for such powerful
+appears to be magical, impossible clothing is a simple feat for such powerful
 sorcerers. Before long, the villagers usually realize the clothing is gaudy and
 impractical. But not before emptying their purses for it.
 ~
@@ -1997,8 +2156,8 @@ A piece of jade cheese is lying on the ground.~
    This little bit of cheese has a stem, almost like it grew on a tree. It has
 a distinctly marbled jade color, but it tastes like a slightly funky cheese.
    Though no cheese truly grows from a plant in nature, the magineers at
-Skycleave have been extraordinarily successful at grafting unusual foods onto
-magical trees.
+Skycleave have been extraordinarily successful at grafting unusual foods in
+magical arbors.
 ~
 6 g a 0 9
 6 0 0

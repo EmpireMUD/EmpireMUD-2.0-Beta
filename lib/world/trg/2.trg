@@ -419,7 +419,9 @@ if (%actor.obj_target(%item%)% != %self%) && (use /= %cmd%)
   halt
 end
 if !%sk%
-  %send% %actor% Usage: use icon <skill>
+  set name %self.name%
+  %send% %actor% You must specify which skill you want a reset for.
+  %send% %actor% Usage: use %name.car% <skill>
   halt
 end
 if (%actor.position% != Standing)

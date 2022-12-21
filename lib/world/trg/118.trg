@@ -7,13 +7,19 @@ if %random.3% == 3
 end
 ~
 #11801
-Skycleave: Floor 2A mobs: complex leave rules~
-0 s 100
+Skycleave: Complex leave rules for floors 2 and 3~
+0 sA 100
 ~
-* configs first
-set sneakable_vnums 11815 11816 11817
+set sneakable_vnums 11815 11816 11817 11841 11842 11843 11844 11845 11846
 set maze_vnums 11812 11813 11818 11819 11820 11821 11823 11824 11825 11826
 set pixy_vnums 11820
+* simple checks
+if %direction% == portal || %direction% == down
+  halt
+end
+if %self.var(bribed,0)%
+  halt
+end
 * One quick trick to get the target room
 set room_var %self.room%
 eval tricky %%room_var.%direction%(room)%%
@@ -28,20 +34,11 @@ if %pixy_vnums% ~= %self.vnum% && %actor.varexists(skycleave_queen)%
 end
 * check difficulty if sneakable (group/boss require players to stay behind)
 if %actor.aff_flagged(SNEAK)% && %sneakable_vnums% ~= %self.vnum%
-  set spirit %instance.mob(11900)%
-  if %spirit.diff2% < 3
-    * sneak ok
+  set diff %self.var(diff,1)%
+  eval skill_req 25 * %diff%
+  if %diff% == 1 || %actor.skill(Stealth)% >= %skill_req%
+    * allow sneak
     halt
-  else
-    * hard/group: check for another player staying here
-    set ch %room_var.people%
-    while %ch%
-      if %ch.is_pc% && !%ch.aff_flagged(SNEAK)%
-        * at least 1 player is not sneaking: allow the sneak
-        halt
-      end
-      set ch %ch.next_in_room%
-    done
   end
 end
 * check direction
@@ -65,23 +62,49 @@ end
 return 0
 ~
 #11802
-Skycleave: Mob blocking: sneakable~
-0 q 100
+Skycleave: Bribe mercenaries with coins~
+0 m 1
 ~
-* One quick trick to get the target room
-set room_var %self.room%
-eval tricky %%room_var.%direction%(room)%%
-* Compare template ids to figure out if they're going forward or back
-if (%actor.aff_flagged(SNEAK)% || %actor.nohassle% || !%tricky% || %tricky.template% < %room_var.template%)
+set required 500
+set given %self.var(given,0)%
+if %given% >= %required%
+  say Easy money.
   halt
 end
-* block higher template id only
-if (%tricky.template% < %room_var.template%)
-  halt
+eval given %given% + %amount%
+remote given %self.id%
+if %given% >= %required%
+  set bribed 1
+  remote bribed %self.id%
+  switch %self.vnum%
+    case 11841
+      * rogue mercenary
+      say Don't mind me, I'll just be over here checking the wall.
+    break
+    case 11842
+      * caster mercenary
+      say More than double what that cheap enchantress paid. Go on ahead.
+    break
+    case 11843
+      * archer mercenary
+      say I won't stop you, but just stay away from the boss.
+    break
+    case 11844
+      * nature mage mercenary
+      say Go on, then.
+    break
+    case 11845
+      * vampire mercenary
+      say My love for Vye is worth less than this. You may pass.
+    break
+    case 11846
+      * armored mercenary
+      say Hard to be a soldier of fortune for what they're paying us. This is the better deal. Go on through.
+    break
+  done
+else
+  say It's going to take more than that if you want me to betray Trixton Vye.
 end
-* blocked
-%send% %actor% You can't seem to get past ~%self%!
-return 0
 ~
 #11803
 Skycleave: Custom pickpocket rejection~
@@ -168,11 +191,28 @@ switch %self.vnum%
     end
     %purge% %self%
   break
+  case 11960
+    * donation to the lab
+    set actor %self.carried_by%
+    set walt %self.room.people(11940)%
+    if %actor% && %actor.is_pc%
+      wait 1
+      if %actor.has_reputation(11800,Venerated)%
+        %send% %actor% You already have the maximum reputation with the tower.
+      else
+        nop %actor.gain_reputation(11800,20)%
+      end
+      if %walt%
+        %force% %walt% say Thanks for that.
+      end
+    end
+    %purge% %self%
+  break
 done
 ~
 #11806
 One-time greetings using script1~
-0 gnwA 100
+0 hnwA 100
 ~
 * Uses mob custom script1 to for one-time greetings, with each script1 line
 *   sent every %line_gap% (9 sec) until it runs out of strings. The mob will
@@ -419,6 +459,8 @@ elseif %self.vnum% == 11825 || %self.vnum% == 11925
   elseif !%actor.on_quest(11915)%
     %echo% ~%self% refuses |%actor% jar.
     say I don't want your filthy pixy. I'm trying to win on my own merits here.
+  elseif %object.var(last_race,0)% + 300 > %timestamp%
+    %send% %actor% You can't give @%object% to Ravinder right now (your pixy might still be racing).
   elseif (%object.luck% + %object.guile% + %object.speed%) < 13
     * low stats
     %send% %actor% You hand @%object% to ~%self% and &%self% examines it carefully and hands it back...
@@ -454,6 +496,60 @@ elseif %self.vnum% == 11828
     %echo% ~%self% refuses @%object% from ~%actor%.
     say This is an A and B conversation so please C your way out. Door's to your left. Thank you. Bye.
   end
+elseif (%self.vnum% == 11835 || %self.vnum% == 11935 || %self.vnum% == 11942) && %object.vnum% == 11872
+  * Sanjiv
+  wait 1
+  if %self.room.people(11847)%
+    %echo% ~%self% holds perfectly still, totally ignoring ~%actor%.
+  else
+    %echo% ~%self% blushes and crumples up the note.
+  end
+  %purge% %object%
+elseif %self.vnum% == 11931 && %object.vnum% == 11872
+  * Resident Niamh 3B
+  return 0
+  %send% %actor% You try to give @%object% to ~%self% but she sighs and refuses it.
+  %echoaround% %actor% ~%actor% tries to give something to ~%self% but she sighs and refuses it.
+  wait 1
+  say Please don't show it to anyone else.
+elseif %self.vnum% == 11831 && %object.vnum% == 11872
+  * Resident Niamh 3A
+  wait 1
+  %echo% ~%self% reads the note and her eyes grow wide as it dissolves into inky shadows in her hands.
+  wait 1
+  say Well, I... I never. I shall look into this.
+  %purge% %object%
+elseif %self.vnum% == 11970 && %object.vnum% == 11872
+  * AHS Niamh 4B
+  wait 1
+  %echo% ~%self% sighs.
+  wait 1
+  say Well, we'll just sweep this under the rug. In fact, I'll have him do it himself.
+  %purge% %object%
+elseif (%self.vnum% == 11959 || || %self.vnum% == 11813 || %self.vnum% == 11913) && %object.vnum% == 11872
+  * Page Sheila and Apprentice Tyrone
+  wait 1
+  %echo% ~%self% just shrugs.
+  %purge% %object%
+elseif (%self.vnum% == 11805 || %self.vnum% == 11905) && %object.vnum% == 11872
+  * Mageina
+  return 0
+  %send% %actor% You try to give @%object% to ~%self% but she cackles and hands it back.
+  %echoaround% %actor% ~%actor% tries to give something to ~%self% but she cackles and hands it back.
+  wait 1
+  say I've got lots of these, you can keep it.
+elseif %self.vnum% == 11808 && %object.vnum% == 11872
+  * Unrequited young lady
+  wait 1
+  %echo% ~%self% doesn't even look at the note.
+  %purge% %object%
+elseif %self.vnum% == 11920 && %object.vnum% == 11872
+  * GHSs
+  return 0
+  %send% %actor% You pass @%object% to ~%self% and she glances at it, but hands it back.
+  %echoaround% %actor% ~%actor% gives something to ~%self% and she glances at it, but hands it back.
+  wait 1
+  say Wow, you too?
 end
 ~
 #11808
@@ -597,113 +693,174 @@ end
 set spirit %instance.mob(11900)%
 * detect location
 set template %self.room.template%
-if %template% == 11801 || %template% == 11901
-  set floor Lobby
-elseif %template% == 11810 || %template% == 11910
-  set floor Second Floor
-elseif %template% == 11830 || %template% == 11930
-  set floor Third Floor
-elseif %template% == 11860 || %template% == 11960
-  set floor Fourth Floor
-end
 * base text
 %mod% %self% lookdesc The directory is a standing slab of rough-cut stone with one smooth face engraved with information for each floor of the Tower Skycleave.
 %mod% %self% append-lookdesc-noformat &0
-%mod% %self% append-lookdesc-noformat == The Tower Skycleave: %floor% ==
-%mod% %self% append-lookdesc-noformat &0
+%mod% %self% append-lookdesc-noformat &0      +-------------------------------------------------------+
+%mod% %self% append-lookdesc-noformat &0      |                                                       |`+
+if %template% == 11801 || %template% == 11901
+  %mod% %self% append-lookdesc-noformat &0      | ============ The Tower Skycleave: Lobby ============= | |
+elseif %template% == 11810 || %template% == 11910
+  %mod% %self% append-lookdesc-noformat &0      | ========= The Tower Skycleave: Second Floor ========= | |
+elseif %template% == 11830 || %template% == 11930
+  %mod% %self% append-lookdesc-noformat &0      | ========= The Tower Skycleave: Third Floor ========== | |
+elseif %template% == 11860 || %template% == 11960
+  %mod% %self% append-lookdesc-noformat &0      | ========= The Tower Skycleave: Fourth Floor ========= | |
+end
+set blank &0      |                                                       | |
 * floor 1
+%mod% %self% append-lookdesc-noformat %blank%
 if %spirit.phase1%
-  %mod% %self% append-lookdesc-noformat - First Floor: Welcome Center
-  %mod% %self% append-lookdesc-noformat &0   - Cafe Fendreciel
-  %mod% %self% append-lookdesc-noformat &0   - Study Hall
-  %mod% %self% append-lookdesc-noformat &0   - Towerwinkel's Gift Shoppe
+  %mod% %self% append-lookdesc-noformat &0      |              First Floor: Welcome Center              | |
+  %mod% %self% append-lookdesc-noformat &0      |                    Cafe Fendreciel                    | |
+  %mod% %self% append-lookdesc-noformat &0      |                      Study Hall                       | |
+  %mod% %self% append-lookdesc-noformat &0      |               Towerwinkel's Gift Shoppe               | |
 else
-  %mod% %self% append-lookdesc-noformat - First Floor: Refuge Area
-  %mod% %self% append-lookdesc-noformat &0   - Mess Hall
-  %mod% %self% append-lookdesc-noformat &0   - Bunkroom
-  %mod% %self% append-lookdesc-noformat &0   - Supply Room
+  %mod% %self% append-lookdesc-noformat &0      |               First Floor: Refuge Area                | |
+  %mod% %self% append-lookdesc-noformat &0      |                       Mess Hall                       | |
+  %mod% %self% append-lookdesc-noformat &0      |                       Bunkroom                        | |
+  %mod% %self% append-lookdesc-noformat &0      |                      Supply Room                      | |
 end
 * floor 2
+%mod% %self% append-lookdesc-noformat %blank%
 if %spirit.phase2%
-  %mod% %self% append-lookdesc-noformat - Second Floor: Apprentice Level
-  %mod% %self% append-lookdesc-noformat &0   - Goblin Cages
-  %mod% %self% append-lookdesc-noformat &0   - Pixy Races
-  %mod% %self% append-lookdesc-noformat &0   - Apprentice Dormatories
+  %mod% %self% append-lookdesc-noformat &0      |            Second Floor: Apprentice Level             | |
+  %mod% %self% append-lookdesc-noformat &0      |                     Goblin Cages                      | |
+  %mod% %self% append-lookdesc-noformat &0      |                      Pixy Races                       | |
+  %mod% %self% append-lookdesc-noformat &0      |                Apprentice Dormatories                 | |
 else
-  %mod% %self% append-lookdesc-noformat - Second Floor: Danger!
-  %mod% %self% append-lookdesc-noformat &0   - Goblins Everywhere
-  %mod% %self% append-lookdesc-noformat &0   - Pixy Maze
+  %mod% %self% append-lookdesc-noformat &0      |                 Second Floor: Danger!                 | |
+  %mod% %self% append-lookdesc-noformat &0      |                  Goblins Everywhere                   | |
+  %mod% %self% append-lookdesc-noformat &0      |                       Pixy Maze                       | |
 end
 * floor 3
+%mod% %self% append-lookdesc-noformat %blank%
 if %spirit.phase3%
-  %mod% %self% append-lookdesc-noformat - Third Floor: Residents' Labs
-  %mod% %self% append-lookdesc-noformat &0   - Enchanting and Attunement Labs
+  %mod% %self% append-lookdesc-noformat &0      |             Third Floor: Residents' Labs              | |
+  %mod% %self% append-lookdesc-noformat &0      |            Enchanting and Attunement Labs             | |
   if %spirit.lab_open%
-    %mod% %self% append-lookdesc-noformat &0   - Magichanical Labs
+    %mod% %self% append-lookdesc-noformat &0      |                   Magichanical Labs                   | |
   end
-  %mod% %self% append-lookdesc-noformat &0   - Eruditorium
-  %mod% %self% append-lookdesc-noformat &0   - Lich Labs
+  %mod% %self% append-lookdesc-noformat &0      |                      Eruditorium                      | |
+  %mod% %self% append-lookdesc-noformat &0      |                       Lich Labs                       | |
 else
-  %mod% %self% append-lookdesc-noformat - Third Floor: Danger!
-  %mod% %self% append-lookdesc-noformat &0   - Mercenaries Detected
+  %mod% %self% append-lookdesc-noformat &0      |                 Third Floor: Danger!                  | |
+  %mod% %self% append-lookdesc-noformat &0      |                 Mercenaries Detected                  | |
   if %instance.mob(11829)%
-    %mod% %self% append-lookdesc-noformat &0   - Loose Otherworlder Detected
+    %mod% %self% append-lookdesc-noformat &0      |              Loose Otherworlder Detected              | |
   end
   if %spirit.lich_released% > 0
-    %mod% %self% append-lookdesc-noformat &0   - Loose Lich Detected
+    %mod% %self% append-lookdesc-noformat &0      |                  Loose Lich Detected                  | |
   end
 end
 * floor 4
+%mod% %self% append-lookdesc-noformat %blank%
 if %spirit.phase4%
-  %mod% %self% append-lookdesc-noformat - Fourth Floor: High Sorcerers of Skycleave
+  %mod% %self% append-lookdesc-noformat &0      |       Fourth Floor: High Sorcerers of Skycleave       | |
   if %instance.mob(11968)%
-    %mod% %self% append-lookdesc-noformat &0   - Office of High Sorcerer Celiya
-    %mod% %self% append-lookdesc-noformat &0   - Office of High Sorcerer Barrosh
-    %mod% %self% append-lookdesc-noformat &0   - Office of Grand High Sorcerer Knezz
+    %mod% %self% append-lookdesc-noformat &0      |             Office of High Sorcerer Celiya            | |
+    %mod% %self% append-lookdesc-noformat &0      |            Office of High Sorcerer Barrosh            | |
+    %mod% %self% append-lookdesc-noformat &0      |          Office of Grand High Sorcerer Knezz          | |
   else
     if %instance.mob(11970)%
-      %mod% %self% append-lookdesc-noformat &0   - Office of High Sorcerer Niamh
+      %mod% %self% append-lookdesc-noformat &0      |             Office of High Sorcerer Niamh             | |
     else
-      %mod% %self% append-lookdesc-noformat &0   - Empty Office
+      %mod% %self% append-lookdesc-noformat &0      |                     Empty Office                      | |
     end
-    %mod% %self% append-lookdesc-noformat &0   - Office of High Sorcerer Barrosh
-    %mod% %self% append-lookdesc-noformat &0   - Office of Grand High Sorcerer Celiya
+    %mod% %self% append-lookdesc-noformat &0      |            Office of High Sorcerer Barrosh            | |
+    %mod% %self% append-lookdesc-noformat &0      |          Office of Grand High Sorcerer Celiya         | |
   end
 else
-  %mod% %self% append-lookdesc-noformat - Fourth Floor: Danger!
-    %mod% %self% append-lookdesc-noformat &0   - Office of High Sorcerer Celiya
+  %mod% %self% append-lookdesc-noformat &0      |                 Fourth Floor: Danger!                 | |
+  %mod% %self% append-lookdesc-noformat &0      |             Office of High Sorcerer Celiya            | |
   if %instance.mob(11867)% || !%spirit.diff4%
-    %mod% %self% append-lookdesc-noformat &0   - Mind-Controlled High Sorcerer - WARNING
+    %mod% %self% append-lookdesc-noformat &0      |        Mind-Controlled High Sorcerer - WARNING        | |
   elseif %instance.mob(11861)%
-    %mod% %self% append-lookdesc-noformat &0   - Office of High Sorcerer Barrosh
+    %mod% %self% append-lookdesc-noformat &0      |            Office of High Sorcerer Barrosh            | |
   end
   if %instance.mob(11863)%
-    %mod% %self% append-lookdesc-noformat &0   - Office of the Shadow Ascendant - WARNING
+    %mod% %self% append-lookdesc-noformat &0      |       Office of the Shadow Ascendant - WARNING        | |
   elseif %instance.mob(11869)% || !%spirit.diff4%
-    %mod% %self% append-lookdesc-noformat &0   - Office of Grand High Sorcerer Knezz - WARNING
+    %mod% %self% append-lookdesc-noformat &0      |     Office of Grand High Sorcerer Knezz - WARNING     | |
   elseif %instance.mob(11870)%
-    %mod% %self% append-lookdesc-noformat &0   - Office of Grand High Sorcerer Knezz
+    %mod% %self% append-lookdesc-noformat &0      |          Office of Grand High Sorcerer Knezz          | |
   else
-    %mod% %self% append-lookdesc-noformat &0   - Empty Office
+    %mod% %self% append-lookdesc-noformat &0      |                     Empty Office                      | |
   end
 end
 * footer
-%mod% %self% append-lookdesc-noformat &0
+%mod% %self% append-lookdesc-noformat %blank%
+%mod% %self% append-lookdesc-noformat %blank%
 if %spirit.phase1%
-  %mod% %self% append-lookdesc-noformat Have a pleasant visit to the Tower Skycleave.
+  %mod% %self% append-lookdesc-noformat &0      |     Have a pleasant visit to the Tower Skycleave      | |
 else
-  %mod% %self% append-lookdesc-noformat Have a safe and uneventful visit to the Tower Skycleave.
+  %mod% %self% append-lookdesc-noformat &0      | Have a safe and peaceful visit to the Tower Skycleave | |
+end
+%mod% %self% append-lookdesc-noformat &0      |                                                       |,+
+%mod% %self% append-lookdesc-noformat &0      +-------------------------------------------------------+
+~
+#11812
+Gemstone flute: Play to activate dancing~
+1 c 1
+play~
+return 0
+wait 1
+if %self.worn_by% != %actor%
+  halt
+end
+if %actor.action% != playing
+  halt
+end
+if !%self.has_trigger(11998)%
+  * short pause to ensure it plays a music message
+  wait 6 s
+  attach 11998 %self.id%
 end
 ~
 #11813
 Skycleave: Shared enter trigger~
 2 gwA 100
 ~
-* ensure they're on the first progress goal
-set emp %actor.empire%
-if %emp%
-  if !%emp.is_on_progress(11800)% && !%emp.has_progress(11800)%
-    nop %emp.start_progress(11800)%
+* based on room
+if %room.template% == 11908
+  * fountain 1B: react with awe
+  if %direction% == down && %actor.is_pc%
+    set awe_vnums 11904 11800 11802 11803 11808 11809 11822 11823 11824 11826
+    set ch %room.people%
+    set done 0
+    while %ch% && !%done%
+      if %ch.is_npc% && %ch.can_see(%actor%)% && %awe_vnums% ~= %ch.vnum%
+        wait 1
+        switch %random.4%
+          case 1
+            %force% %ch% say How did you get in the fountain?
+          break
+          case 2
+            %force% %ch% say Did you just come out of the fountain?
+          break
+          case 3
+            %send% %actor% ~%ch% jumps as you rise out of the fountain.
+            %echoaround% %actor% ~%ch% jumps as ~%actor% rises out of the fountain.
+          break
+          case 4
+            %send% %actor% ~%ch% stands there, mouth agape, as you rise from the fountain.
+            %echoaround% %actor% ~%ch% stands there, mouth agape, as ~%actor% rises from the fountain.
+          break
+        done
+        set done 1
+      end
+      set ch %ch.next_in_room%
+    done
+    * prevent commenting on everyone following
+    wait 1
+  end
+else
+  * All other rooms: ensure they're on the first progress goal
+  set emp %actor.empire%
+  if %emp%
+    if !%emp.is_on_progress(11800)% && !%emp.has_progress(11800)%
+      nop %emp.start_progress(11800)%
+    end
   end
 end
 ~
@@ -846,14 +1003,16 @@ if %move% == 1 && !%self.aff_flagged(BLIND)%
     switch %random.3%
       case 1
         %echo% &&m%obj% bonks ~%targ% in the head!&&0
-        %damage% %targ% 100 physical
+        eval ouch 75 * %diff%
+        %damage% %targ% %ouch% physical
         if %diff% == 4 && (%self.level% + 100) > %targ.level% && !%targ.aff_flagged(!STUN)%
           dg_affect #11851 %targ% STUNNED on 5
         end
       break
       case 2
         %echo% &&m%obj% explodes in |%targ% face, blinding *%targ%!&&0
-        %damage% %targ% 50 magical
+        eval ouch 50 * %diff%
+        %damage% %targ% %ouch% magical
         dg_affect #11841 %targ% BLIND on 5
       break
       case 3
@@ -863,7 +1022,8 @@ if %move% == 1 && !%self.aff_flagged(BLIND)%
         else
           %send% %targ% &&mYou feel %obj% drain your energy as it bounces off you!&&0
           %echoaround% %targ% &&m~%targ% looks tired as %obj% bounces off *%targ%.&&0
-          %damage% %targ% 50
+          eval ouch 50 * %diff%
+          %damage% %targ% %ouch% magical
           eval mag %self.level% * %diff% / 10
           nop %targ.mana(-%mag%)%
           nop %targ.move(-%mag%)%
@@ -903,7 +1063,8 @@ elseif %move% == 2 && !%self.aff_flagged(BLIND)%
     * hit
     %echo% &&m~%self% whips a fistful of sand from ^%self% pocket into |%targ% eyes!&&0
     dg_affect #11841 %targ% BLIND on 10
-    %damage% %targ% 5 physical
+    eval ouch 5 * %diff%
+    %damage% %targ% %ouch% physical
   end
   skyfight clear dodge
 end
@@ -986,7 +1147,7 @@ if %move% == 1 && !%self.aff_flagged(BLIND)%
       %send% %targ% &&mYour ankle wound slows your movement!&&0
       dg_affect #11816 %targ% SLOW on 15
     end
-    eval dam 10 + (%diff% * 20)
+    eval dam 10 + (%diff% * 40)
     %damage% %targ% %dam% physical
     %dot% #11816 %targ% %dam% 15 physical
   end
@@ -1023,7 +1184,7 @@ elseif %move% == 2
           set this 1
           %echo% &&m|%self% knife slices through the air and straight into |%ch% chest!&&0
           eval dam %diff% * 10
-          eval ouch %diff% * 20
+          eval ouch %diff% * 30
           %dot% #11811 %ch% %ouch% 10 physical 3
           %damage% %ch% %dam% physical
         end
@@ -1114,7 +1275,7 @@ if %move% == 1 && !%self.aff_flagged(BLIND)%
   else
     * hit
     %send% %targ% &&m~%self% knocks ~%targ% to the ground as &%self% lands with ^%self% pick in |%targ% chest!&&0
-    eval dam 80 + (%diff% * 20)
+    eval dam 80 + (%diff% * 30)
     %damage% %targ% %dam% physical
   end
   skyfight clear dodge
@@ -1282,9 +1443,9 @@ elseif %move% == 2
       end
       set ch %next_ch%
     done
+    skyfight clear dodge
     eval cycle %cycle% + 1
   done
-  skyfight clear dodge
   if %broke%
     if %diff% < 3
       dg_affect #11852 %self% HARD-STUNNED on 10
@@ -1344,9 +1505,9 @@ elseif %move% == 3
       end
       set ch %next_ch%
     done
+    skyfight clear dodge
     eval cycle %cycle% + 1
   done
-  skyfight clear dodge
   wait 8 s
 elseif %move% == 4 && !%self.aff_flagged(BLIND)%
   * Blastmaster Fox
@@ -1387,13 +1548,13 @@ elseif %move% == 4 && !%self.aff_flagged(BLIND)%
       %echo% &&mYou're caught in the explosion!&&0
       %aoe% 25 magical
     end
+    skyfight clear interrupt
     if %cycle% < %diff% && %targ% && %targ.id% == %id% && !%broke%
       %send% %targ% &&m**** Here comes another blast... ****&&0 (interrupt)
       skyfight setup interrupt %targ%
     end
     eval cycle %cycle% + 1
   done
-  skyfight clear interrupt
 elseif %move% == 5
   * Summon Goblins
   %regionecho% %room% 1 &&y~%self% shouts, 'Gaaaaableeeeeeeeeeens!'&&0
@@ -1757,7 +1918,7 @@ if %move% == 1 && !%self.aff_flagged(BLIND)%
     if %form% == 1
       if %diff% > 1
         %echo% &&m~%self% bites ~%targ% on the ankle!&&0
-        eval dam 60 + (%diff% * 20)
+        eval dam 60 + (%diff% * 40)
         %damage% %targ% %dam% physical
       else
         %echo% &&m~%self% dives toward |%targ% legs!&&0
@@ -1771,17 +1932,17 @@ if %move% == 1 && !%self.aff_flagged(BLIND)%
       if (%self.level% + 100) > %targ.level% && !%targ.aff_flagged(!STUN)%
         dg_affect #11814 %targ% STUNNED on 10
       end
-      eval dam 40 + (%diff% * 20)
+      eval dam 40 + (%diff% * 40)
       %damage% %targ% %dam% physical
     elseif %diff% > 1
       dg_affect #11814 %targ% IMMOBILIZED on 20
-      %damage% %targ% 80 physical
+      %damage% %targ% 100 physical
     else
       dg_affect #11814 %targ% IMMOBILIZED on 20
     end
   end
   skyfight clear dodge
-elseif %move% == 2 && !%self.aff_flagged(BLIND)%
+elseif %move% == 2
   * Dangling Vine/Weapon Steal
   skyfight clear dodge
   set targ %self.fighting%
@@ -1830,7 +1991,7 @@ elseif %move% == 2 && !%self.aff_flagged(BLIND)%
     if %diff% >= 3
       %send% %targ% &&m... and worse, ~%self% stabs you with a tiny knife while you're distracted!&&0
       %echoaround% %targ% &&m... and ~%self% stabs *%targ% with a tiny knife while *%targ%'s distracted!&&0
-      %damage% %targ% 100 physical
+      %damage% %targ% 200 physical
     end
   end
   if %miss%
@@ -2963,19 +3124,34 @@ end
 #11834
 Skycleave: Free the otherworlder~
 0 c 0
-free unchain unshackle~
+free unchain unshackle break smash~
 return 1
 * validate arg
 if %actor.fighting%
   %send% %actor% You're a little busy at the moment!
   halt
+end
+* 2 modes:
+if break /= %cmd% || smash /= %cmd%
+  * break/smash only
+  if !%arg%
+    %send% %actor% Break what?
+    halt
+  elseif %arg% /= chains || %arg% /= shackles || %arg% /= gems
+    * ok
+  else
+    %send% %actor% You can't break that.
+    halt
+  end
 elseif !%arg%
   %send% %actor% Free whom?
   halt
 elseif %actor.char_target(%arg%)% != %self%
   %send% %actor% You can't free that.
   halt
-elseif %self.vnum% == 11934
+end
+* more checks that apply to both modes
+if %self.vnum% == 11934
   %send% %actor% The shackles have been magically secured. You cannot free the otherworlder.
   halt
 end
@@ -3198,9 +3374,11 @@ Skycleave: Scaldorran murder spree~
 * the last 3 are the bosses; killing any 1 of them will stop him (only kills 1 boss)
 set merc_list 11841 11842 11843 11844 11845 11846 11848 11847 11849
 * check room first
-set ch %self.room.people%
+set room %self.room%
+set ch %room.people%
 set target 0
 set done 0
+set final 0
 while %ch% && !%target%
   if %ch.is_npc% && %merc_list% ~= %ch.vnum%
     set target %ch%
@@ -3214,47 +3392,59 @@ if %target%
     case 11841
       * rogue merc
       %echo% Scaldorran flies in through |%target% mouth... ~%target% pulls out ^%target% dagger and stabs *%target%self in the heart!
+      %regionecho% %room% 1 &&y~%target% shouts, 'No! No! Nooooooooooo...'&&0
     break
     case 11842
       * caster merc
+      %regionecho% %room% 1 &&y~%target% shouts, 'Stay back, fiend!'&&0
       %echo% ~%target% panics and hurls a spell at Scaldorran, who expertly reflects it. ~%target% is hit in the head and falls to the ground!
     break
     case 11843
       * archer merc
       %echo% ~%target% shoots a dozen arrows into Scaldorran, who comes apart at the wrappings and envelops ~%target%, stabbing *%target% with every arrow!
+      %regionecho% %room% 1 &&y~%target% shouts, 'Aaaaaaaaaaaaaaagh!'&&0
     break
     case 11844
       * nature mage merc
       %echo% ~%target% starts to twist and morph into something enormous... until Scaldorran wraps his bandages around *%target%, whereupon &%target% dissolves into a sticky mess!
+      %regionecho% %room% 1 &&ySomething unrecognizable lets out an anguished shout and then a splattering sound!&&0
     break
     case 11845
       * vampire merc
+      %regionecho% %room% 1 &&y~%target% shouts, 'Face me, lich! I'm more than you can...'&&0
       %echo% Scaldorran twists and whirls and whips ~%target% over and over with his bandages, slicing open thousands of tiny cuts. You watch in horror as ~%target% bleeds out and crumples to the floor.
     break
     case 11846
       * armored merc
-      %echo% Scaldorran appears behind ~%target% and slides his bandages into |%target% armor... You are forced to watch as ~%target% turns blue and falls to the ground.
+      %echo% Scaldorran appears behind ~%target% and silently slides his bandages into |%target% armor... You are forced to watch as ~%target% turns blue in the face and falls to the ground.
+      %regionecho% %room% 1 There's a loud, echoing clang from heavy armor hitting the floor.
     break
     case 11848
       * Bleak Rojjer
+      %regionecho% %room% 1 &&y~%target% shouts a truncated, 'Wha!?'&&0
       %echo% Linen wrappings whip out from the painting on the wall and you are forced to watch as Scaldorran strangles ~%target% and bashes his head against the floor.
       set done 1
     break
     case 11847
       * Kara Virduke
+      %regionecho% %room% 1 &&y~%target% shouts, 'Oh my wo...'&&0
       %echo% Scaldorran pops out of a cabinet just as ~%target% opens it and snakes one of his long linen wrappings down her throat. You watch in horror as she claws at her mouth, unable to stop it.
       set done 1
     break
     case 11849
       * Trixton Vye
-      %echo% Linen wrappings whip out from the painting on the wall and you are forced to watch as Scaldorran strangles ~%target% and bashes his head against the floor.
+      %regionecho% %room% 1 &&y~%target% shouts, 'Pathetic dead thing, face now your new master! By the Vy...'&&0
+      %echo% One of Scaldorran's bandages slices forward through the air, piercing Trixton Vye's decrepit throat above the collar.
+      %echo% Trixton's mouth continues to move, but no sound comes out as a red spot spreads from the top of his shirt.
       set done 1
+      set final 1
     break
   done
   %slay% %target%
-  if %done%
+  if %done% && !%final%
     * last one?
-    if %self.room.template% != 11836
+    if %room.template% != 11836
+      wait 1
       %echo% Scaldorran twists and whirls until his tattered wrappings fold in on themselves and he vanishes!
       mgoto i11836
       %echo% Your blood freezes as the air cracks open and the Lich Scaldorran crawls out of the void!
@@ -3269,7 +3459,7 @@ while %merc_list%
   set vnum %merc_list.car%
   set merc_list %merc_list.cdr%
   set mob %instance.mob(%vnum%)%
-  if %mob% && %mob.room% != %self.room%
+  if %mob% && %mob.room% != %room%
     %echo% Scaldorran twists and whirls until his tattered wrappings fold in on themselves and he vanishes!
     mgoto %mob.room%
     %echo% Your blood freezes as the air cracks open and the Lich Scaldorran crawls out of the void!
@@ -3277,7 +3467,7 @@ while %merc_list%
   end
 done
 * nobody left?
-if %self.room.template% != 11836
+if %room.template% != 11836
   %echo% Scaldorran twists and whirls until his tattered wrappings fold in on themselves and he vanishes!
   mgoto i11836
   %echo% Your blood freezes as the air cracks open and the Lich Scaldorran crawls out of the void!
@@ -3432,7 +3622,7 @@ remote moves_left %self.id%
 remote num_left %self.id%
 * perform move
 skyfight lockout 25 20
-if %move% == 1
+if %move% == 1 && !%self.aff_flagged(BLIND)%
   * Vicious Blind
   if %diff% == 1
     nop %self.add_mob_flag(NO-ATTACK)%
@@ -3472,9 +3662,10 @@ if %move% == 1
       %echo% &&m~%self% slashes |%targ% forehead, opening a vicious wound!&&0
       %send% %targ% &&mBlood trickles down into your eyes, blinding you!&&0
       eval dur 6 * %diff%
+      eval ouch 75 * %diff%
       dg_affect #11841 %targ% BLIND on %dur%
-      %dot% #11842 %targ% 100 %dur% physical
-      %damage% %targ% 100 physical
+      %dot% #11842 %targ% %ouch% %dur% physical
+      %damage% %targ% %ouch% physical
     else
       %echo% &&m~%self% smears a vicious concoction on |%targ% eyes!&&0
       %send% %targ% &&mYou're blind!&&0
@@ -3484,7 +3675,7 @@ if %move% == 1
     end
   end
   skyfight clear dodge
-elseif %move% == 2
+elseif %move% == 2 && !%self.aff_flagged(BLIND)%
   * Knife Throw
   skyfight clear dodge
   %echo% &&m~%self% draws a brace of throwing knives from a concealed pouch...&&0
@@ -3500,7 +3691,7 @@ elseif %move% == 2
     skyfight setup dodge %targ%
     %send% %targ% &&m**** &&Z~%self% is aiming a knife at you! ****&&0 (dodge)
     wait %wait% s
-    if %targ.id% != %targ_id% || %targ.position% == Dead
+    if %targ.id% != %targ_id% || %targ.position% == Dead || %self.disabled%
       * gone
     elseif %targ.var(did_sfdodge)%
       %echo% &&m~%self% flings a knife at ~%targ%, but misses!&&0
@@ -3558,7 +3749,7 @@ remote moves_left %self.id%
 remote num_left %self.id%
 * perform move
 skyfight lockout 25 20
-if %move% == 1
+if %move% == 1 && !%self.aff_flagged(BLIND)%
   * Firebrand
   skyfight clear interrupt
   set targ %random.enemy%
@@ -3574,7 +3765,7 @@ if %move% == 1
   wait 8 s
   if %targ.id% != %targ_id% || %targ.position% == Dead
     * gone
-  elseif %self.sfinterrupt_count% >= 1 && %self.sfinterrupt_count% >= (%diff% + 1) / 2
+  elseif %self.disabled% || (%self.sfinterrupt_count% >= 1 && %self.sfinterrupt_count% >= (%diff% + 1) / 2)
     %echo% &&mThe firebrand blasts back in |%self% face as &%self% is interrupted in the middle of the spell!
     if %diff% == 1
       dg_affect #11873 %self% TO-HIT -15 20
@@ -3593,8 +3784,9 @@ if %move% == 1
     end
     * effect
     if %diff% > 1
-      %dot% #11843 %targ% 100 45 fire 3
-      %damage% %targ% 100 fire
+      eval ouch 75 * %diff%
+      %dot% #11843 %targ% %ouch% 45 fire 3
+      %damage% %targ% %ouch% fire
     else
       %dot% #11843 %targ% 75 15 fire
       %damage% %targ% 50 fire
@@ -3610,7 +3802,7 @@ elseif %move% == 2
     nop %self.add_mob_flag(NO-ATTACK)%
   end
   wait 8 s
-  if %self.sfinterrupt_count% >= 1 && %self.sfinterrupt_count% >= (%diff% + 1) / 2
+  if %self.disabled% || (%self.sfinterrupt_count% >= 1 && %self.sfinterrupt_count% >= (%diff% + 1) / 2)
     %echo% &&m~%self% is distracted and misspeaks, and the spell explodes in ^%self% face!&&0
     dg_affect #11852 %self% HARD-STUNNED on 10
     if %diff% == 1
@@ -3672,7 +3864,7 @@ remote moves_left %self.id%
 remote num_left %self.id%
 * perform move
 skyfight lockout 25 20
-if %move% == 1
+if %move% == 1 && !%self.aff_flagged(BLIND)%
   * Rapid Fire
   skyfight clear dodge
   %echo% &&m~%self% draws ^%self% bow and a fistful of arrows...&&0
@@ -3690,7 +3882,7 @@ if %move% == 1
       %send% %targ% &&m**** &&Z~%self% is aiming straight at you! ****&&0 (dodge)
     end
     wait %wait% s
-    if !%targ% || %targ.id% != %targ_id% || %targ.position% == Dead
+    if %self.disabled% || !%targ% || %targ.id% != %targ_id% || %targ.position% == Dead
       * gone
     elseif %targ.var(did_sfdodge)%
       %echo% &&m~%self% looses an arrow at ~%targ%, but it thuds into the far wall!&&0
@@ -3700,7 +3892,7 @@ if %move% == 1
     else
       * hit
       %echo% &&m~%self% fires an arrow at ~%targ%!&&0
-      eval dam 25 + (25 * %diff%)
+      eval dam 25 + (50 * %diff%)
       if %dam% > 1
         %dot% #11842 %targ% %dam% 20 physical 5
       end
@@ -3717,8 +3909,8 @@ elseif %move% == 2
   skyfight clear dodge
   %echo% &&m**** &&Z~%self% leans back and fires a barrage of arrows into the air! ****&&0 (dodge)
   skyfight setup dodge all
-  eval dam %diff% * 20
-  eval ouch %diff% * 25
+  eval dam %diff% * 30
+  eval ouch %diff% * 50
   set any 0
   set cycle 0
   eval max (%diff% + 2) / 2
@@ -3805,6 +3997,9 @@ if %move% == 1
     %morph% %self% normal
     %echo% &&m%current% rapidly morphs back into ~%self%!&&0
     wait 2 s
+    if %self.disabled%
+      halt
+    end
   end
   skyfight clear interrupt
   %echo% &&m**** &&Z~%self% thrusts ^%self% hands skyward... ****&&0 (interrupt)
@@ -3878,6 +4073,10 @@ elseif %move% == 2
       %heal% %self% health 50
     end
     wait 8 s
+    if %self.disabled%
+      nop %self.remove_mob_flag(NO-ATTACK)%
+      halt
+    end
   end
   * Bite:
   skyfight clear dodge
@@ -3909,10 +4108,10 @@ elseif %move% == 2
       if %diff% > 2
         dg_affect #11848 %targ% SLOW on 15
       end
-      %dot% #11848 %targ% 100 15 poison
+      eval ouch %diff% * 50
+      %dot% #11848 %targ% %ouch% 15 poison
     end
-    eval amt %diff% * 33
-    %damage% %targ% %amt% physical
+    %damage% %targ% %ouch% physical
   end
   skyfight clear dodge
 end
@@ -4017,7 +4216,7 @@ elseif %move% == 2
     * high diff
     %echo% &&m~%self% thrusts ^%self% hand into the air, which starts to glow deep crimson!&&0
     set ch %room.people%
-    eval amt %diff% * 33
+    eval amt %diff% * 50
     while %ch%
       if %self.is_enemy(%ch%)%
         %echo% &&mOld injuries all over |%ch% body suddenly begin to bleed!&&0
@@ -4067,7 +4266,7 @@ remote moves_left %self.id%
 remote num_left %self.id%
 * perform move
 skyfight lockout 25 20
-if %move% == 1
+if %move% == 1 && !%self.aff_flagged(BLIND)%
   * Shield Bash
   if %diff% == 1
     nop %self.add_mob_flag(NO-ATTACK)%
@@ -4104,7 +4303,7 @@ if %move% == 1
     end
   end
   skyfight clear dodge
-elseif %move% == 2
+elseif %move% == 2 && !%self.aff_flagged(BLIND)%
   * Big Kick
   set death_rooms 11830 11831 11832 11833 11834
   if %diff% == 1
@@ -4252,9 +4451,9 @@ if %move% == 1
     if !%broke% && %cycle% < 4
       %echo% &&m**** Here comes more chain lightning... ****&&0 (interrupt and dodge)
     end
+    skyfight clear dodge
     eval cycle %cycle% + 1
   done
-  skyfight clear dodge
   skyfight clear interrupt
 elseif %move% == 2
   * Arcane Tattoos
@@ -4378,9 +4577,9 @@ elseif %move% == 3
         end
         set ch %next_ch%
       done
+      skyfight clear dodge
       eval cycle %cycle% + 1
     done
-    skyfight clear dodge
     if !%hit% && %diff% == 1
       %echo% &&m~%self% is hit by a stray rainbow beam!&&0
       dg_affect #11852 %self% HARD-STUNNED on 10
@@ -4482,9 +4681,8 @@ if %move% == 1
     skyfight clear dodge
     eval cycle %cycle% + 1
   done
-  skyfight clear dodge
   wait 8 s
-elseif %move% == 2
+elseif %move% == 2 && !%self.aff_flagged(BLIND)%
   * Venomous Jab
   skyfight clear dodge
   set targ %actor%
@@ -4774,9 +4972,9 @@ elseif %move% == 2
       end
       set ch %next_ch%
     done
+    skyfight clear dodge
     eval cycle %cycle% + 1
   done
-  skyfight clear dodge
   if !%hit%
     if %diff% < 3
       %echo% &&m~%self% stoops to retrieve the cane sword as it falls out of the air.&&0
@@ -5239,7 +5437,7 @@ elseif %move% == 2
     %echo% &&m%old% has grown into ~%self%!&&0
   end
   skyfight clear interrupt
-elseif %move% == 3
+elseif %move% == 3 && !%self.aff_flagged(BLIND)%
   * Laser Clap
   skyfight clear dodge
   %echo% &&m~%self% holds its arms wide like it's preparing to clap its hands...&&0
@@ -5353,9 +5551,9 @@ if %move% == 1
       end
       set ch %next_ch%
     done
+    skyfight clear dodge
     eval cycle %cycle% + 1
   done
-  skyfight clear dodge
 elseif %move% == 2
   * Slay the Griffin / Fan of Knives
   if %diff% == 1
@@ -5457,9 +5655,9 @@ elseif %move% == 3
     if !%broke% && %cycle% < 4
       %echo% &&m**** Here comes more chain lightning... ****&&0 (interrupt and dodge)
     end
+    skyfight clear dodge
     eval cycle %cycle% + 1
   done
-  skyfight clear dodge
   skyfight clear interrupt
 elseif %move% == 4
   * Freezing Air
@@ -5773,7 +5971,7 @@ Shadow Ascendant fight: Shadow Cage, Shadow Torrent, Freezing Air, Shadow Slice~
 if %self.cooldown(11800)% || %self.disabled%
   halt
 end
-set room %self.room%
+set rm %self.room%
 set diff %self.diff%
 set m_l %self.var(m_l)%
 set n_m %self.var(n_m,0)%
@@ -5798,14 +5996,11 @@ eval n_m %n_m% - 1
 remote m_l %self.id%
 remote n_m %self.id%
 skyfight lockout 30 35
-if %move% == 1 && !%self.aff_flagged(BLIND)%
+if %move% == 1
   skyfight clear free
   skyfight clear struggle
   %echo% &&mThe Shadow seems to be growing...&&0
   wait 3 s
-  if %self.disabled%
-    halt
-  end
   set targ %random.enemy%
   if !%targ%
     halt
@@ -5818,7 +6013,7 @@ if %move% == 1 && !%self.aff_flagged(BLIND)%
     %echo% &&m~%self% sparks with primordial energy as it consumes |%targ% counterspell!&&0
     dg_affect #11864 %self% BONUS-MAGICAL 10 -1
   end
-  if %diff% <= 2 || (%self.level% + 100) <= %targ.level% || %room.players_present% == 1
+  if %diff% <= 2 || (%self.level% + 100) <= %targ.level% || %rm.players_present% == 1
     %send% %targ% &&m**** The Shadow envelops you like a cage! You have to break free! ****&&0 (struggle)
     %echoaround% %targ% &&mThe Shadow envelops ~%targ%, trapping *%targ%!&&0
     skyfight setup struggle %targ% 20
@@ -5833,7 +6028,16 @@ if %move% == 1 && !%self.aff_flagged(BLIND)%
       remote free_char %bug.id%
       remote free_room %bug.id%
     end
-    wait 20 s
+    set time 20
+    while %time% > 0
+      wait 5 s
+      if %targ.affect(11822)%
+        %send% %targ% &&m**** You have to break free of the cage! ****&&0 (struggle)
+        eval time %time% - 5
+      else
+        set time 0
+      end
+    done
     skyfight clear struggle
   else
     %send% %targ% &&mThe Shadow envelops you like a cage! There's nothing you can do!&&0
@@ -5870,7 +6074,7 @@ elseif %move% == 2
     wait 4 s
     if %self.sfinterrupt_count% >= 1 && %self.sfinterrupt_count% >= (%diff% + 1) / 2
       set broke 1
-      set ch %room.people%
+      set ch %rm.people%
       while %ch%
         if %ch.var(did_sfinterrupt,0)%
           %send% %ch% &&mYou manage to interrupt the Ascendant before another shadow torrent!&&0
@@ -5887,7 +6091,7 @@ elseif %move% == 2
       end
     else
       %echo% &&mThe Shadow cracks and swirls as a torrent of smaller shadows stream into it from around the tower...&&0
-      set ch %room.people%
+      set ch %rm.people%
       while %ch%
         set next_ch %ch.next_in_room%
         if %self.is_enemy(%ch%)%
@@ -5921,7 +6125,7 @@ elseif %move% == 2
   skyfight clear interrupt
 elseif %move% == 3
   skyfight clear interrupt
-  %regionecho% %room% 1 &&y~%self% shouts, 'By the power of Skycleave!'&&0
+  %regionecho% %rm% 1 &&y~%self% shouts, 'By the power of Skycleave!'&&0
   wait 3 sec
   set targ %self.fighting%
   set id %targ.id%
@@ -5936,7 +6140,7 @@ elseif %move% == 3
     end
     if %self.sfinterrupt_count% >= 1 && %self.sfinterrupt_count% >= (%diff% + 1) / 2
       set broke 1
-      set ch %room.people%
+      set ch %rm.people%
       while %ch%
         if %ch.var(did_sfinterrupt,0)%
           %send% %ch% &&mYou manage to distract the Shadow by throwing knickknacks at it!&&0
@@ -5948,7 +6152,7 @@ elseif %move% == 3
         dg_affect #11852 %self% HARD-STUNNED on 10
       end
     else
-      set ch %room.people%
+      set ch %rm.people%
       while %ch%
         set next_ch %ch.next_in_room%
         if %self.is_enemy(%ch%)%
@@ -5976,12 +6180,8 @@ elseif %move% == 4
   end
   skyfight setup dodge all
   wait 8 s
-  if %self.disabled%
-    nop %self.remove_mob_flag(NO-ATTACK)%
-    halt
-  end
   set hit 0
-  set ch %room.people%
+  set ch %rm.people%
   while %ch%
     set next_ch %ch.next_in_room%
     if %self.is_enemy(%ch%)%
@@ -6205,8 +6405,8 @@ if %move% == 1
   wait 1
   set cycle 1
   eval wait 8 - %diff%
-  while %cycle% <= (2 * %diff%)
-    set targ %random.enemy%
+  set targ %random.enemy%
+  while %cycle% <= (2 * %diff%) && %targ%
     set targ_id %targ.id%
     skyfight setup dodge %targ%
     %send% %targ% &&m**** The shadows gather around you... ****&&0 (dodge)
@@ -6230,6 +6430,7 @@ if %move% == 1
     end
     skyfight clear dodge
     eval cycle %cycle% + 1
+    set targ %random.enemy%
   done
 elseif %move% == 2
   * Shadow Flail
@@ -6272,9 +6473,9 @@ elseif %move% == 2
       end
       set ch %next_ch%
     done
+    skyfight clear dodge
     eval cycle %cycle% + 1
   done
-  skyfight clear dodge
   dg_affect #11869 %self% off
   if !%hit%
     if %diff% < 3
@@ -6573,7 +6774,7 @@ elseif %move% == 3
     done
   end
   skyfight clear interrupt
-elseif %move% == 4
+elseif %move% == 4 && !%self.aff_flagged(BLIND)%
   * Deathbolt
   skyfight clear interrupt
   %echo% &&m~%self% holds up his glowing staff...&&0
@@ -6596,8 +6797,8 @@ elseif %move% == 4
       if %random.2% == 1
         %echo% &&m~%self% is distracted by |%targ% quick reflexes and a flying knickknack!&&0
       else
-        %send% %ch% &&m|%self% deathbolt flies wide as you knock some papers into the air!&&0
-        %echoaround% %ch% &&m|%self% deathbolt flies wide as ~%targ% knocks some papers into the air!&&0
+        %send% %targ% &&m|%self% deathbolt flies wide as you knock some papers into the air!&&0
+        %echoaround% %targ% &&m|%self% deathbolt flies wide as ~%targ% knocks some papers into the air!&&0
       end
       if %diff% == 1
         dg_affect #11873 %self% TO-HIT -15 20
@@ -6854,12 +7055,20 @@ elseif %seconds% > 30
 end
 ~
 #11864
-Skycleave: Shared mob command trigger (Mez transition, tower mounts)~
+Skycleave: Shared mob command trigger (Mez transition, tower mounts, Waltur)~
 0 c 0
-diagnose mount ride~
+diagnose mount ride donate~
 set aqua_vnums 11854 11855 11856 11857 11858
 * modes
-if diagnose /= %cmd% && %self.vnum% == 11866
+if donate /= %cmd% && %self.vnum% == 11840
+  * Waltur 3A
+  %send% %actor% You inquire about donating...
+  %echoaround% %actor% ~%actor% inquires about donating...
+  say This is not the time. We're in the middle of a crisis.
+elseif donate /= %cmd% && %self.vnum% == 11940
+  * Waltur 3B
+  %send% %actor% Use 'buy donation' to donate to the laboratory.
+elseif diagnose /= %cmd% && %self.vnum% == 11866
   * Mez 11866 during phase transition
   %send% %actor% ~%self% doesn't look very good.
 elseif (mount /= %cmd% || ride /= %cmd%) && %self.vnum% == 11852
@@ -8220,7 +8429,7 @@ if %comment% == 0
       break
     done
     eval cycle %cycle% + 1
-    wait 4 sec
+    wait 9 sec
   done
 elseif %comment% == 1
   * doing the directions
@@ -8267,7 +8476,7 @@ elseif %comment% == 1
       break
     done
     eval cycle %cycle% + 1
-    wait 5 sec
+    wait 9 sec
   done
 elseif %comment% == 2
   * cleaning cycle (turn off oration; can be interrupted)
@@ -8301,7 +8510,7 @@ elseif %comment% == 2
       break
     done
     eval cycle %cycle% + 1
-    wait 8 sec
+    wait 9 sec
   done
 elseif %comment% == 3
   * just a pause (turn off oration; can be interrupted)
@@ -9177,7 +9386,7 @@ end
 skydel 11812 2  * Apprentice Cosimo 2A
 * Apprentice Kayla
 set kayla %instance.mob(11811)%
-%at% i11911 %load% mob 11911  * Apprentice Kayla
+%at% i11925 %load% mob 11911  * Apprentice Kayla
 if %kayla.mob_flagged(*PICKPOCKETED)%
   set mob %instance.mob(11911)%
   nop %mob.add_mob_flag(*PICKPOCKETED)%
@@ -9326,22 +9535,16 @@ skydel 11838 1  * Ghost
 %at% i11938 %load% mob 11938  * Ghost
 * Magineer Waltur and Enchanter Annelise
 set waltur %instance.mob(11840)%
-set lise %instance.mob(11839)%
 if %waltur%
   %at% i11940 %load% mob 11940  * Magineer Waltur (if he survived)
   if %waltur.mob_flagged(*PICKPOCKETED)%
     set mob %instance.mob(11940)%
     nop %mob.add_mob_flag(*PICKPOCKETED)%
   end
-  %at% i11939 %load% mob 11939  * Enchanter Annelise
-  set new_lise %instance.mob(11939)%
+  %at% i11939 %load% mob 11939  * Enchanter Annelise (new pickpocket item)
 else
   * no waltur
-  %at% i11939 %load% mob 11919  * Enchanter Annelise
-  set new_lise %instance.mob(11919)%
-end
-if %lise.mob_flagged(*PICKPOCKETED)%
-  nop %new_lise.add_mob_flag(*PICKPOCKETED)%
+  %at% i11939 %load% mob 11919  * Enchanter Annelise (new pickpocket item)
 end
 skydel 11839 1  * Enchanter Annelise
 * 4. Move people from the old rooms

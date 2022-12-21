@@ -212,6 +212,7 @@ switch %self.vnum%
     if %niamh%
       %at% %niamh.room% %echo% ~%niamh% heads upstairs.
       %load% mob 11970
+      %load% obj 11966
       %echo% Niamh walks in from the north.
       if %niamh.mob_flagged(*PICKPOCKETED)%
         set mob %instance.mob(11970)%
@@ -356,7 +357,7 @@ Skycleave: Claw Game (broken)~
 1 c 4
 play~
 * play claw
-if !%arg.car% || %actor.obj_target(%arg.car%)% != %self%
+if !%arg.car% || !(%self.name% ~= %arg.car%)
   return 0
   halt
 end
@@ -378,7 +379,7 @@ Skycleave: Claw Game (fixed)~
 1 c 4
 play~
 * Usage: play claw
-if %actor.is_npc% || !%arg.car% || %actor.obj_target(%arg.car%)% != %self%
+if %actor.is_npc% || !%arg.car% || !(%self.name% ~= %arg.car%)
   return 0
   halt
 end
@@ -412,31 +413,81 @@ if %spirit.claw4%
   eval id %id% + 8
 end
 * Determine reward
-if %id% < 11
+set mini 0
+set item 0
+switch %id%
+  case 0
+    set mini 11999
+  break
+  case 1
+    set mini 11990
+  break
+  case 2
+    set mini 11993
+  break
+  case 3
+    set mini 11992
+  break
+  case 4
+    set item 11987
+  break
+  case 5
+    set mini 11991
+  break
+  case 6
+    set item 11991
+  break
+  case 7
+    set mini 11998
+  break
+  case 8
+    set mini 11997
+  break
+  case 9
+    set mini 11995
+  break
+  case 10
+    set item 11989
+  break
+  case 11
+    set mini 11996
+  break
+  case 12
+    set item 11988
+  break
+  case 13
+    set mini 11989
+  break
+  case 14
+    set item 11990
+  break
+  case 15
+    set mini 11994
+  break
+done
+if %mini%
   * Minipet
-  eval vnum 11989 + %id%
-  %load% mob %vnum%
+  %load% mob %mini%
   set mob %self.room.people%
-  if %mob.vnum% != %vnum%
+  if %mob.vnum% != %mini%
     * Uh-oh.
     %echo% Something went horribly wrong while granting a minipet. Please bug-report this error.
     halt
   end
   set mob_string %mob.name%
   %purge% %mob%
-  if !%actor.has_minipet(%vnum%)%
+  if !%actor.has_minipet(%mini%)%
     %send% %actor% You win '%mob_string%' as a minipet! Use the minipets command to summon it.
     %echoaround% %actor% ~%actor% has won '%mob_string%'!
-    nop %actor.add_minipet(%vnum%)%
+    nop %actor.add_minipet(%mini%)%
   else
     %send% %actor% You win '%mob_string%' but you already have it as a minipet.
   end
-else
-  * Item reward: 11987, 11988, 11989, 11990, 11991
-  eval vnum 11987 + %id% - 11
-  %load% obj %vnum% %actor%
+end
+if %item%
+  %load% obj %item% %actor%
   set obj %actor.inventory%
-  if %obj.vnum% != %vnum%
+  if %obj.vnum% != %item%
     * Uh-oh.
     %echo% Something went horribly wrong while granting a reward. Please bug-report this error.
     halt
@@ -445,20 +496,6 @@ else
     %echoaround% %actor% ~%actor% has won '%obj.shortdesc%'!
   end
 end
-* Chance for rare reward
-* if %random.100% <= 1
-*   set vnum 11992
-*   %load% obj %vnum% %actor%
-*   set obj %actor.inventory%
-*   if %obj.vnum% != %vnum%
-*     * Uh-oh.
-*     %echo% Something went horribly wrong while granting a reward. Please bug-report this error.
-*     halt
-*   else
-*     %send% %actor% It's your lucky day! You also win '%obj.shortdesc%'!
-*     %echoaround% %actor% ~%actor% has won '%obj.shortdesc%'!
-*   end
-* end
 * and check quests:
 if %actor.on_quest(11907)%
   %quest% %actor% trigger 11907
@@ -652,22 +689,26 @@ set str1
 set str2
 set str3
 set says
+set tie 0
 * 1. start strings: position w/changes
 if %gap1% == 0 && %gap2% == 0
   set say %say% It's a three-way tie with all three pixies wing to wing!
   set str1 All three pixies are tied
   set str2 %str1%
   set str3 %str1%
+  set tie 3
 end
 if %gap1% == 0 && %str1.empty%
   set say %say% %name1.cap% and %name2% are tied for the lead!
   set str1 %name1.cap% is wing-and-wing with %name2%
   set str2 %name2.cap% is wing-and-wing with %name1%
+  set tie 2
 end
 if %gap2% == 0 && %str2.empty%
   set say %say% %name2.cap% and %name3% are tied for second!
   set str2 %name2.cap% is wing-and-wing with %name3%
   set str3 %name3.cap% is wing-and-wing with %name2%
+  set tie 2
 end
 if %need1% && %str1.empty%
   if %prev_place1% == 1
@@ -700,7 +741,7 @@ if %need2% && %str2.empty%
   end
   elseif %prev_place2% == 3
     set str2 %name2.cap% has overtaken %name3% for second place
-    set say %say% %name1.cap% has overtaken second!
+    set say %say% %name2.cap% has overtaken second!
   elseif %prev_place2% == 1
     set str2 %name2.cap% has fallen back to second place
   end
@@ -743,7 +784,7 @@ while %place% <= 3
   end
   * hazards
   eval penalty_var penalty%%pos%place%%%
-  if %self.var(%penalty_var%,0)% == 0 && %area% == %prev_area%
+  if %self.var(%penalty_var%,0)% == 0 && %area% == %prev_area% && !%tie%
     set penalty 0
     if %area% == 1 && !%forestdome% && %rand_luck% < 2
       set penalty 2
@@ -799,7 +840,6 @@ while %ch%
   set ch %ch.next_in_room%
 done
 raceman tricks
-* %echo% Debug: %self.name1%, %self.name2%, %self.name3% %self.dist1%-%self.dist2%-%self.dist3% %self.penalty1%/%self.penalty2%/%self.penalty3%
 ~
 #11912
 Pixy Races: Greet triggers upcoming race~
@@ -1279,9 +1319,9 @@ elseif %move% == 4
     if !%broke% && %cycle% < 4
       %echo% &&m**** The lion is still casting... ****&&0 (interrupt and dodge)
     end
+    skyfight clear dodge
     eval cycle %cycle% + 1
   done
-  skyfight clear dodge
   skyfight clear interrupt
 end
 * in case
@@ -1631,8 +1671,6 @@ elseif %mode% == places
     end
     eval pos %pos% + 1
   done
-  * debug: something might be wrong HERE when 2 people are in the same spot
-    * sec_pos and third_pos must be the same, resulting in an empty place
   * store places
   set place%best_pos% 1
   set place%sec_pos% 2
@@ -1640,7 +1678,6 @@ elseif %mode% == places
   remote place1 %self.id%
   remote place2 %self.id%
   remote place3 %self.id%
-  * %echo% Debug store places: %place1% %place2% %place3%, %best_pos%(%best_dist%) %sec_pos%(%sec_dist%) %third_pos%(%third_dist%)
   * store gaps
   eval gap%best_pos% %best_dist% - %sec_dist%
   eval gap%sec_pos% %sec_dist% - %third_dist%
@@ -1661,10 +1698,6 @@ elseif %mode% == places
       remote winner%third_pos% %self.id%
     end
   end
-  set debug1 %self.place1%/%self.prev_place1%, %self.gap1%/%self.prev_gap1%, %self.area1%/%self.prev_area1%
-  set debug2 %self.place2%/%self.prev_place2%, %self.gap2%/%self.prev_gap2%, %self.area2%/%self.prev_area2%
-  set debug3 %self.place3%/%self.prev_place3%, %self.gap3%/%self.prev_gap3%, %self.area3%/%self.prev_area3%
-  * %echo% Debug (places, gaps, areas; cur/prev): 1 (%debug1%), 2 (%debug2%), 3 (%debug3%)
 elseif %mode% == round
   * one round: update distances and penalties
   set pos 1
@@ -2229,7 +2262,14 @@ Skycleave: Drink Teacup~
 1 s 100
 ~
 dg_affect #11927 %actor% off silent
-dg_affect #11927 %actor% MANA-REGEN -1 30
+dg_affect #11927 %actor% MANA-REGEN -1 60
+* check eligibility
+if (%actor.completed_quest(11918)% || %actor.completed_quest(11919)% || %actor.completed_quest(11920)% || %actor.completed_quest(11864)%)
+  * any of these quests are required for the real dream
+  set dreams_only 0
+else
+  set dreams_only 1
+end
 set teleported 0
 * begin loop to wait for sleep
 set count 0
@@ -2240,6 +2280,30 @@ while %count% < 12
   * see where we're at
   if %actor.position% != Sleeping || !%room.function(BEDROOM)% || !%actor.can_teleport_room% || !%actor.canuseroom_guest%
     * still awake or no bedroom? nothing to do
+  elseif %dreams_only%
+    switch %random.7%
+      case 1
+        %send% %actor% You dream of fishing by a peaceful little river, alone with your thoughts.
+      break
+      case 2
+        %send% %actor% You dream you're stuck in a cold, dark cave with square eyes watching you on all sides.
+      break
+      case 3
+        %send% %actor% You dream of standing shoulder-to-shoulder with the smallest of heroes.
+      break
+      case 4
+        %send% %actor% You dream of an unexpected visit to the headmistress's office.
+      break
+      case 5
+        %send% %actor% You dream of being trapped in a cold, round, windowless cell.
+      break
+      case 6
+        %send% %actor% You dream of perfect serenity.
+      break
+      case 7
+        %send% %actor% You dream you're fighting a tremendous giant.
+      break
+    done
   else
     * Sleeping AND in a bedroom: set a target
     set to_room %instance.nearest_rmt(11973)%
@@ -2336,7 +2400,7 @@ wait 1
 ~
 #11929
 Skycleave: Leave breadcrumbs in the pixy maze~
-2 q 100
+2 qA 100
 ~
 return 1
 * basic checks
@@ -2649,8 +2713,10 @@ elseif (%lich_cmds% ~= %cmd%) && (%room.template% == 11836 || %room.template% ==
     set ch %room.people%
     while %ch%
       set next_ch %ch.next_in_room%
-      %dot% #11936 %ch% 1000 30 magical
-      %damage% %ch% 100 magical
+      if !%ch.aff_flagged(!ATTACK)%
+        %dot% #11936 %ch% 1000 30 magical
+        %damage% %ch% 100 magical
+      end
       set ch %next_ch%
     done
     %echo% The spirit returns to the desk, which slams shut with a thud!
@@ -2875,7 +2941,8 @@ Skycleave: Attune skystone at Goef the Oreonic~
 0 c 0
 attune~
 * attunes skystones for the user
-set allow_list 11900 11899 10036 10037
+set allow_list 11900 11899
+set fake_list 10036 10037
 * targeting
 set obj %actor.obj_target_inv(%arg.car%)%
 if !%arg%
@@ -2889,6 +2956,10 @@ elseif !%obj%
   halt
 elseif %obj.vnum% == 11898
   %send% %actor% That skystone is already depleted. Try an unattuned stone.
+  halt
+elseif %fake_list% ~= %obj.vnum%
+  %echo% ~%self% takes @%obj% from ~%actor% and examines it, but hands it back.
+  say Alas, little human, I can't attune that one. Is it from a different timeline?
   halt
 elseif !(%allow_list% ~= %obj.vnum%)
   %send% %actor% You can't attune @%obj% here. Only skystones.
@@ -3516,7 +3587,7 @@ switch %self.vnum%
   case 11884
     * poison mushroom
     if %command% == taste
-      %send% %actor% You taste the little white mushroom, which gives your lips and tongue a pleasant tingle.
+      %send% %actor% You taste the little white mushroom. It tastes earthy.
       %echoaround% %actor% ~%actor% tastes a little white mushroom.
       return 0
     else
@@ -4441,12 +4512,12 @@ if %cmd.mudcommand% == adventure
   end
   * send fake adventure info
   %send% %actor% A Hundred Thousand Moons (inside the Tower Skycleave)
-  %send% %actor% by Paul S. Clarke
+  %send% %actor% \&zby Paul Clarke
   %send% %actor% \&0    Discover the lost city of Smol Nes-Pik, meet the people who live there, and
-  %send% %actor% \&zunravel their fate in this highly-detailed hidden area. For players who enjoy
-  %send% %actor% \&zan immersive reading experience, each room is filled with extra descriptions
-  %send% %actor% \&zand many of the characters are animated with vignettes and cutscenes. And
-  %send% %actor% \&zremember, you can wake up any time.
+  %send% %actor% \&zunravel their fate in this rich hidden environment. For players who enjoy an
+  %send% %actor% \&zimmersive reading experience, each room is filled with extra descriptions and
+  %send% %actor% \&zmany of the characters are animated with vignettes and cutscenes. And remember,
+  %send% %actor% \&zyou can wake up from this dreamy memory any time.
   %send% %actor% (type 'adventure skycleave' to see the description for the main adventure)
 elseif %cmd.mudcommand% == time
   if %indoor_list% ~= %room.template%
@@ -4747,6 +4818,7 @@ Gnarled old wand: By the Power of Skycleave~
 1 c 1
 say ' shout whisper~
 return 0
+set room %actor.room%
 set phrase1 by the power
 set phrase2 skycleave
 * basic things that could prevent them speaking
@@ -4759,15 +4831,28 @@ if !(%arg% ~= %phrase1%) || !(%arg% ~= %phrase2%)
 end
 wait 1
 * look for mm
-set mm %self.room.people(11905)%
+set mm %room.people(11905)%
 if !%mm%
-  set mm %self.room.people(11805)%
+  set mm %room.people(11805)%
 end
-if !%mm%
-  set mm %self.room.people(11920)%
+* see if ok
+if %room.template% >= 11875 && %room.template% <= 11899
+  set safe 1
+elseif %room.template% >= 11975 && %room.template% <= 11994
+  set safe 1
+elseif %room.template% == 11973
+  set safe 1
+else
+  set safe 0
 end
-* messaging
-if %actor.is_immortal%
+* messaging/action
+if %safe%
+  dg_affect #11883 %actor% off silent
+  %send% %actor% You hold up the gnarled old wand as a bolt of lightning from out of nowhere strikes it with a loud CRACK!
+  %echoaround% %actor% ~%actor% holds up ^%actor% gnarled old wand... a bolt of lightning out of nowhere strikes it with a loud CRACK!
+  eval amount %actor.level% / 15
+  dg_affect #11883 %actor% MANA-REGEN %amount% 60
+elseif %actor.is_immortal%
   %echo% A bolt of lightning comes out of nowhere and strikes |%actor% wand!
 elseif %mm%
   %echo% A bolt of lightning streaks out of nowhere...
@@ -5139,12 +5224,12 @@ if %cmd.mudcommand% == adventure
   end
   * send fake adventure info
   %send% %actor% Zenith of the Gobbrabakhs (inside the Tower Skycleave)
-  %send% %actor% by Paul S. Clarke
+  %send% %actor% \&zby Paul Clarke
   %send% %actor% \&0   Venture back into the Goblin's Dream to experience a culture lost to history
-  %send% %actor% \&zin this highly-detailed hidden area. For players who enjoy an immersive
-  %send% %actor% \&zreading experience, each room is filled with extra descriptions and many of
-  %send% %actor% \&zthe characters are animated with vignettes and cutscenes. You can wake up any
-  %send% %actor% \&ztime you want.
+  %send% %actor% \&zin this lively hidden area. For players who enjoy an immersive reading
+  %send% %actor% \&zexperience, each room is filled with extra descriptions and many of the
+  %send% %actor% \&zcharacters are animated with vignettes and cutscenes. Whether it's a short
+  %send% %actor% \&zdream or a long one, you can wake up any time you want.
   %send% %actor% (type 'adventure skycleave' to see the description for the main adventure)
 elseif %cmd.mudcommand% == time
   if %room.template% == 11981
@@ -5470,9 +5555,9 @@ if %move% == 1
       end
       set ch %next_ch%
     done
+    skyfight clear dodge
     eval cycle %cycle% + 1
   done
-  skyfight clear dodge
   if !%hit%
     if %diff% < 3
       %echo% &&j~%self% spins himself out doing the hammer dance.&&0
@@ -5480,7 +5565,7 @@ if %move% == 1
     end
   end
   wait 8 s
-elseif %move% == 2
+elseif %move% == 2 && !%self.aff_flagged(BLIND)%
   * Ring Your Bell
   if %diff% <= 2
     nop %self.add_mob_flag(NO-ATTACK)%
@@ -5560,7 +5645,7 @@ elseif %move% == 3
     dg_affect #11954 %self% BONUS-PHYSICAL %amount% 300
   end
   skyfight clear interrupt
-elseif %move% == 4
+elseif %move% == 4 && !%self.aff_flagged(BLIND)%
   * Hammer Throw
   skyfight clear dodge
   set targ %self.fighting%
@@ -5750,9 +5835,9 @@ elseif %move% == 2
     if !%broke% && %cycle% < 4
       %echo% &&m**** Here comes another lightning torrent... ****&&0 (interrupt and dodge)
     end
+    skyfight clear dodge
     eval cycle %cycle% + 1
   done
-  skyfight clear dodge
   skyfight clear interrupt
 elseif %move% == 3
   * Buff Blitz
@@ -5982,9 +6067,9 @@ elseif %move% == 2
       end
       set ch %next_ch%
     done
+    skyfight clear dodge
     eval cycle %cycle% + 1
   done
-  skyfight clear dodge
   wait 8 s
 elseif %move% == 3
   * Lightning Wave
@@ -6257,9 +6342,9 @@ elseif %move% == 2
       end
       set ch %next_ch%
     done
+    skyfight clear dodge
     eval cycle %cycle% + 1
   done
-  skyfight clear dodge
   wait 8 s
 elseif %move% == 3
   * Pocket Glitter
@@ -6482,9 +6567,9 @@ if %move% == 1
       end
       set ch %next_ch%
     done
+    skyfight clear dodge
     eval cycle %cycle% + 1
   done
-  skyfight clear dodge
   dg_affect #11958 %self% off
   if !%hit%
     if %diff% < 3
@@ -6618,9 +6703,9 @@ elseif %move% == 4
       end
       set ch %next_ch%
     done
+    skyfight clear dodge
     eval cycle %cycle% + 1
   done
-  skyfight clear dodge
   if !%hit%
     if %diff% < 3
       %echo% &&jA stray hatchet hits ~%self% on the head, handle-first!&&0
@@ -6710,9 +6795,9 @@ if %move% == 1
       end
       set ch %next_ch%
     done
+    skyfight clear dodge
     eval cycle %cycle% + 1
   done
-  skyfight clear dodge
   dg_affect #11950 %self% off
   if !%hit%
     if %diff% < 3
@@ -6721,7 +6806,7 @@ if %move% == 1
     end
   end
   wait 8 s
-elseif %move% == 2
+elseif %move% == 2 && !%self.aff_flagged(BLIND)%
   * Thornbound
   skyfight clear free
   skyfight clear struggle
@@ -7343,6 +7428,77 @@ switch %random.10%
       say I'm a lifelong fan.
     end
   break
+done
+~
+#11998
+Gemstone flute: Everybody dance now~
+1 ab 100
+~
+set actor %self.worn_by%
+if !%actor%
+  detach 11998 %self.id%
+  halt
+elseif %actor.action% != playing
+  detach 11998 %self.id%
+  halt
+end
+* lists
+set list1 11873 11874 11875 11876 11877 11878 11879 11880 11881 11882 11883 11885 11886 11887
+set list2 615 616 10042 11520 11521 11522 11523 11524 11525 11526 11819 11820 11963 11982 11624 11625
+* loop
+set ch %actor.room.people%
+while %ch%
+  if %ch.is_npc% && !%ch.disabled% && %ch.position% == Standing
+    if %list1% ~= %ch.vnum% || %list2% ~= %ch.vnum%
+      wait 1
+      switch %ch.vnum%
+        case 11873
+          %echo% ~%ch% moves ^%ch% feet to the music.
+        break
+        case 11874
+          %echo% ~%ch% taps ^%ch% leg with ^%ch^ hand.
+        break
+        case 11875
+          %echo% The chamber echoes as ~%ch% snaps ^%ch% fingers to the music.
+        break
+        case 11876
+          %echo% ~%ch% hums along as the music plays.
+        break
+        case 11878
+          %echo% ~%ch% dances a little as &%ch% walks.
+        break
+        case 11879
+          %echo% ~%ch% taps ^%ch% foot to the music.
+        break
+        case 11882
+          %echo% ~%ch% moves with the music as &%ch% works.
+        break
+        case 11883
+          %echo% ~%ch% bobs ^%ch% head to the music.
+        break
+        case 11885
+          %echo% ~%ch% hums along to the music.
+        break
+        case 11886
+          %echo% ~%ch% sways to the music.
+        break
+        case 11887
+          %echo% ~%ch% sways along.
+        break
+        default
+          set rng %random.3%
+          if %rng% == 1
+            %echo% ~%ch% dances around.
+          elseif %rng% == 2
+            %echo% ~%ch% dances to the music.
+          else
+            %echo% ~%ch% dances along.
+          end
+        break
+      done
+    end
+  end
+  set ch %ch.next_in_room%
 done
 ~
 #11999

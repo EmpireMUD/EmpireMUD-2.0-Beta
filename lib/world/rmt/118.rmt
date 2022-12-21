@@ -168,7 +168,7 @@ northeast ne~
 The cafe is to the northeast.
 ~
 E
-floors scorch down~
+floors scorch down marks~
 The white marble floors have long scorch marks. There was a battle here!
 ~
 E
@@ -454,7 +454,7 @@ east fountain crates makeshift~
 great chamber and its grand stone fountain.
 ~
 E
-floors down~
+floors down scorch marks~
    The floors are white marble. They bear scorch marks from a fight, especially
 around the stairs.
 ~
@@ -658,6 +658,10 @@ E
 crates~
 Crates are stacked around the shop.
 ~
+E
+boxes corner stacks~
+Mohammed is stacking boxes in the corner.
+~
 M 0 11807 100.00 1
 M 0 11832 100.00 1
 M 1 11907 100.00 1
@@ -832,6 +836,12 @@ E
 fixtures lights~
    Someone has pried one of the nocturnium light fixtures from the wall. The
 rest of the fixtures are askew but intact.
+~
+E
+portraits pictures paintings masters~
+   The second-floor walkway is decorated with pictures of Skycleave's old
+masters, starting just ahead of you, though it looks as if some have fallen off
+the wall.
 ~
 M 1 11809 100.00 8
 M 1 11834 100.00 5
@@ -1049,6 +1059,10 @@ pixies dancing~
    Tiny pixies dance atop the rainbow that crosses the room. But every time you
 try to get close to them, they seem further away.
 ~
+E
+dust~
+Pixy dust hangs in the air, lingering without ever fully settling.
+~
 I 20 11808 100.00 1  # CHOP: blue sapling
 T 11929
 T 11944
@@ -1099,6 +1113,10 @@ E
 pixies dancing~
    Tiny pixies dance atop the rainbow that crosses the room. But every time you
 try to get close to them, they seem further away.
+~
+E
+dust~
+Pixy dust hangs in the air, lingering without ever fully settling.
 ~
 I 20 11808 100.00 1  # CHOP: blue sapling
 T 11929
@@ -1366,6 +1384,10 @@ pixies dancing~
    Tiny pixies dance atop the rainbow that crosses the room. But every time you
 try to get close to them, they seem further away.
 ~
+E
+dust~
+Pixy dust hangs in the air, lingering without ever fully settling.
+~
 I 20 11808 100.00 1  # CHOP: blue sapling
 T 11929
 T 11943
@@ -1416,6 +1438,10 @@ E
 pixies dancing~
    Tiny pixies dance atop the rainbow that crosses the room. But every time you
 try to get close to them, they seem further away.
+~
+E
+dust~
+Pixy dust hangs in the air, lingering without ever fully settling.
 ~
 I 20 11808 100.00 1  # CHOP: blue sapling
 T 11929
@@ -1468,6 +1494,10 @@ pixies dancing~
    Tiny pixies dance atop the rainbow that crosses the room. But every time you
 try to get close to them, they seem further away.
 ~
+E
+dust~
+Pixy dust hangs in the air, lingering without ever fully settling.
+~
 I 20 11808 100.00 1  # CHOP: blue sapling
 T 11929
 T 11943
@@ -1518,6 +1548,10 @@ E
 pixies dancing~
    Tiny pixies dance atop the rainbow that crosses the room. But every time you
 try to get close to them, they seem further away.
+~
+E
+dust~
+Pixy dust hangs in the air, lingering without ever fully settling.
 ~
 I 20 11808 100.00 1  # CHOP: blue sapling
 T 11929
@@ -1713,6 +1747,10 @@ pixies dancing~
    Tiny pixies dance atop the rainbow that crosses the room. But every time you
 try to get close to them, they seem further away.
 ~
+E
+dust~
+Pixy dust hangs in the air, lingering without ever fully settling.
+~
 I 20 11808 100.00 1  # CHOP: blue sapling
 T 11929
 T 11943
@@ -1763,6 +1801,10 @@ E
 pixies dancing~
    Tiny pixies dance atop the rainbow that crosses the room. But every time you
 try to get close to them, they seem further away.
+~
+E
+dust~
+Pixy dust hangs in the air, lingering without ever fully settling.
 ~
 I 20 11808 100.00 1  # CHOP: blue sapling
 T 11929
@@ -1815,6 +1857,10 @@ pixies dancing~
    Tiny pixies dance atop the rainbow that crosses the room. But every time you
 try to get close to them, they seem further away.
 ~
+E
+dust~
+Pixy dust hangs in the air, lingering without ever fully settling.
+~
 I 20 11808 100.00 1  # CHOP: blue sapling
 M 1 11887 100.00 1
 T 11929
@@ -1864,6 +1910,10 @@ E
 pixies dancing~
    Tiny pixies dance atop the rainbow that crosses the room. But every time you
 try to get close to them, they seem further away.
+~
+E
+dust~
+Pixy dust hangs in the air, lingering without ever fully settling.
 ~
 I 20 11808 100.00 1  # CHOP: blue sapling
 M 1 11886 100.00 1
@@ -3456,6 +3506,10 @@ and even a desk are making their way to the portal and seem to be in hot
 pursuit of the young woman. Text at the bottom reads:
       'Even if you fall on your face, you're still moving forward.'
 ~
+E
+chairs~
+There is one chair for the office's occupant and two more for guests.
+~
 M 1 11969 100.00 1
 S
 #11865
@@ -3722,10 +3776,15 @@ east doorway~
 The door leads back out into the office.
 ~
 E
+chair easychair~
+   The overstuffed easy chair sits low to the ground. The purple upholstery is
+striped in two shades, just like the calamander wood of the feet.
+~
+E
 furniture bespoke calamander chairs~
    The chairs and tables here are finely crafted from striped black and brown
 calamander, one of the finest and rarest woods. Many of them bear the initials
-J.A.K. in stylized letters.
+J.R.K. in stylized letters.
 ~
 E
 walls stellar magewood reflection~
@@ -3768,11 +3827,6 @@ E
 closet~
    You open the askew closet door and nearly fall over when you find a skeleton
 inside. You swing the door shut and back away slowly.
-~
-E
-chair easychair~
-   The overstuffed easy chair sits low to the ground. The purple upholstery is
-striped in two shades, just like the calamander wood of the feet.
 ~
 M 1 11962 100.00 1
 S

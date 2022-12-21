@@ -37,10 +37,10 @@ hand. 'Never know what you're going to get from that. Let me know.'
 ~
    Mageina sees what you won from the claw game and breathes out a half-laugh
 through her nose.
-   'Yeah, I've seen those before,' she says. 'Maybe I've seen them all, but
-every once in a while, someone comes in with a new one. At least you managed to
-find the machine while it was working. It keeps breaking and I can never keep
-track of where we are in the...'
+   'That's a pretty good one,' she says. 'Maybe even my favorite. But I say
+that about all of them, don't I? At least you managed to find the machine while
+it was working. It keeps breaking and I can never keep track of where we are in
+the...'
    Mageina looks over your shoulder and then leans in close to say, 'Or rather,
 WHEN we are, in the time loop.'
 ~
@@ -73,7 +73,7 @@ it wrong. I tried hitting it a few times, erm, with a bucket, but it didn't
 really help much. Still, enjoy your prize... Oh! And thank you for your
 established patronage at Towrinkel's, erm, Gift Shop.'
 ~
-26 e 150 250 -1
+27 e 150 250 -1
 A
 1 11900
 A
@@ -85,7 +85,7 @@ P
 P
 0 11907 0 1 a
 R
-7 11800 10
+7 11800 20
 W+
 11 0 0 1 -
 Win a prize from the claw game~
@@ -146,7 +146,7 @@ might be considered cheating. Old rules, new rules; you could go round and
 round about it till the end of time. I say the dirty tricks make it
 interesting. Might have to copy some of yours.'
 ~
-14 e 150 250 -1
+15 e 150 250 -1
 A
 1 11900
 A
@@ -156,7 +156,7 @@ P
 P
 0 11913 0 1 a
 R
-7 11800 10
+7 11800 20
 W+
 11 0 0 1 -
 Win with your own pixy at the Pixy Races~
@@ -183,8 +183,10 @@ how much I look forward to the sweet taste of victory with this little guy.
 Honestly. Take your reward. Oh, this pixy will be worth so much more. Just,
 truly, from the bottom of my heart, thank you. I'll get started in tomorrow's
 race.'
+   Ravinder hardly looks at you as he hands you a delicate glass chrysanthemum
+from inside his white robe. His eyes don't leave his new pixy jar.
 ~
-15 0 150 250 -1
+16 0 150 250 -1
 A
 1 11825
 A
@@ -197,6 +199,8 @@ P
 0 11913 0 1 a
 R
 7 11800 10
+R
+2 11933 1
 W+
 11 0 0 1 -
 Offer Ravinder a high-level racing pixy~
@@ -213,7 +217,8 @@ Tower Skycleave and now you find yourself eager to duplicate the feat.
    With this checklist in hand, find and defeat every one of the Tower
 Skycleave's combatants. Be warned: like the time-traveler himself, it will take
 more than one trip through the tower to get them all. Be sure you're the one to
-kill them as well. If they die through some other misfortune, it doesn't count.
+kill them as well (or be part of the group that defeats them). If they die
+through some other misfortune, it doesn't count.
 ~
    You sit on the edge of the fountain and reflect on your battles against the
 tower's many villains as you watch the countless twinkling lights from the
@@ -271,7 +276,7 @@ must be visited AFTER the tower has been rescued to count.
    You stroll around the fountain several times, watching the reflection of
 the enormous tree above you meander around the room in the surface of the
 fountain. The tower held so many secrets, a person could spend a lifetime
-plumbing its depths.
+plumbing its depths. Surely there are a few more...
 ~
 6 0 150 250 -1
 A
@@ -319,14 +324,18 @@ this enormous chamber, looking down at the nocturnium tree and the tremendous
 fall to its base. This must be how it felt to be trapped in the time loop,
 staring into the pit you can never escape from. At least the sorcerers are, on
 the whole, unaware of their dark fate.
+   As you get up, you notice a black glint in the fountain. You reach in and
+find a strange nocturnium pocket watch at the bottom.
 ~
-9 0 150 250 -1
+10 0 150 250 -1
 A
 2 11920
 P
 16 11800 0 7 -
 R
 7 11800 25
+R
+2 11934 1
 W+
 11 0 0 1 -
 Find the time-traveler~
@@ -337,14 +346,14 @@ Z
 S
 #11928
 Skycleave: Test of Water~
-   As you once again find yourself underwater and all but trapped by the
-magical boundaries of the elemental plane. Sure, escape is just above you,
-through the portal back to the fountain. But you were never one to shy away
-from a challenge like this.
+   You once again find yourself underwater and all but trapped by the magical
+boundaries of the elemental plane. Sure, escape is just above you, through the
+portal back to the fountain. But you were never one to shy away from a
+challenge like this.
    Defeat the First Water again, if you can. And be quick about it; it may be
 impossible to defeat it for good, but it's known to drown anyone who tries.
 Even a brief victory against the First Water would be worthy of celebration.
-Defeat it, then speak to the Oreonic in the Attunement Lab.
+Defeat it, then speak to the oreonic in the Attunement Lab.
 ~
    'Ah, little human, a pleasure to see you again. You are looking particularly
 acceptable today,' Goef says as you enter, still dripping from your encounter
@@ -362,13 +371,13 @@ however, I will try it... your way.'
    'Not in this body, of course. From time to time, I loose myself from it and
 travel the aether... alone.'
 ~
-12 e 150 250 -1
+13 e 150 250 -1
 A
 3 11972
 P
 0 11972 0 1 -
 R
-7 11800 10
+7 11800 20
 W+
 3 11928 0 1 -
 Defeat the First Water~
@@ -379,15 +388,14 @@ S
 Skycleave: In Tune With the Tower~
    'Ah, a little human. Greetings,' the oreonic, Goef, says as you approach.
 You hesitate a moment, trying to grasp the notion that you are talking to an
-intelligent, thinking being made from nocturnium ore.
+intelligent, thinking chunk of nocturnium.
    Goef explains that no one else in the Tower Skycleave is capable of attuning
 skystones because a person in possession of a soul almost always taints the
-process. A soulless intermediary increases the reliability of the process, and
-in this regard, Goef is well-practiced. But the oreonic does warn you that the
-more skystones you attune, the harder it will become to attune more.
+process. A soulless intermediary increases the reliability of the attunement,
+and in this regard, Goef is well-practiced. But the oreonic does warn you that
+the more skystones you attune, the harder it will become to attune more.
    Lastly, Goef offers to demonstrate the process. You will only need an
-unattuned skystone to proceed. Type 'attune unattuned skystone' to start the
-process.
+unattuned skystone to proceed. Type 'attune unattuned skystone' to begin.
 ~
    'See, little human, it is completely painless,' Goef says, handing back your
 skystone. 'Now that the stone has been attuned, the other humans will trade for
@@ -419,7 +427,7 @@ your visits, although it is with regret that I must admit I cannot recall your
 name. Unfortunately, all humans have roughly the same number of eyes and ears
 and mouths and arms, and it makes you very difficult to tell apart.'
 ~
-15 e 150 250 -1
+16 e 150 250 -1
 A
 1 11941
 A
@@ -427,7 +435,7 @@ A
 P
 0 11941 0 1 -
 R
-7 11800 10
+7 11800 20
 W+
 11 0 0 1 -
 Successfully attune a skystone~
@@ -454,7 +462,7 @@ getting answers.'
    You try to discuss it further, but Niamh seems preoccupied with her own
 thoughts and she soon wanders off.
 ~
-19 ei 150 250 -1
+20 ei 150 250 -1
 A
 1 11900
 D 11863
@@ -463,7 +471,7 @@ P
 P
 0 11812 0 1 a
 R
-7 11800 10
+7 11800 20
 W
 13 11964 0 1 -
 Z
@@ -475,8 +483,8 @@ Skycleave: Elemental Plane of Water~
 All you can see in every direction is water -- and it seems to be alive! The
 situation is as interesting as it is unexpected, and you vow to investigate it
 once you've defeated the living water.
-   After you defeat the living embodiment of the First Water, seek out someone
-in the Tower Skycleave who has more information.
+   After you claim victory against the living embodiment of the First Water,
+seek out someone in the Tower Skycleave who has more information.
 ~
    'Oh bother,' Annelise says as you interrupt her mending an old iron staff.
 She tosses it into the rubbish pile and ties her hair up out of her face. She
@@ -489,10 +497,10 @@ pressure in your lungs, about feeling like you were about to drown when the
 living water finally died. And, of course, you mention that it came right back
 to life afterward.
    'I do keep telling the headmaster we should lock that portal,' Annelise says
-when you finish the tale. 'It's an actual elemental plane, if you can believe
+when you finish the tale. 'It is a genuine elemental plane, if you can believe
 it. Frankly you're lucky to have made it out. We lost a lot of pages before we
 put up a sign... which seems to have gone missing.
-   'Anyway, you can't actually kill it. It's Water itself. All water. Every-
+   'Anyhow, you can't actually kill it. It's Water itself. All water. Every-
 where. But it's a great test of an adventurer's mettle. Be sure to fight it
 again when you get the chance.'
 ~
@@ -522,7 +530,7 @@ And where am I?' you wonder aloud as you look out over the city.
 you just in a tower somewhere? As you struggle to find the answer in your own
 memory, you're quickly distracted by someone walking by. You start to wonder if
 anyone is going to believe you about this place...
-   Find something tangible to take back to the tower. Perhaps you can find a
+   Find something tangible to take back to Skycleave. Perhaps you can find a
 sorcerer there who will be interested in it.
 ~
    Tyrone makes a puzzled face as he takes the jade tear from you and turns it
@@ -584,13 +592,13 @@ slowly, a chant builds among the spectators, louder and louder, until it grows
 into a cheer. You can't make out what they're saying -- or you can't understand
 it -- but they seem thrilled at your performance in the arena.
 ~
-13 ei 150 250 -1
+14 ei 150 250 -1
 A
 1 11974
 P
 0 11975 0 1 -
 R
-7 11800 10
+7 11800 20
 W+
 3 11956 0 1 a
 Defeat the Worthy~

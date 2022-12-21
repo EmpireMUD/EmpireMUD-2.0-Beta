@@ -745,6 +745,16 @@ You can also sober up faster by sleeping it off.
 
 See also: CLEANSE, SLEEP, TAVERN
 #
+"EXTRA DESCRIPTIONS" EXDESC
+
+Some things have "extra descriptions" -- things to look at other than the
+object or room itself. For example, if a room describes a chair in the corner,
+it might be possible to "look chair" even if it's just part of the room's text.
+
+Objects, rooms, and vehicles can all have extra descriptions.
+
+See also: look
+#
 FARMING CROPS ORCHARDS AGRICULTURE APPLES WHEAT CORN HOPS COTTON BARLEY PEACHES CHERRIES ORANGES RICE OLIVES PEAS GOURDS PLANTAINS TOMATOES BANANAS COCONUTS GRAPES PEPPERS POTATOES PLUMS STRAWBERRIES MANGOES BLUEBERRIES COFFEE OATS WATERMELONS
 
 You can plant and manage crops in order to supply food and trade goods to your

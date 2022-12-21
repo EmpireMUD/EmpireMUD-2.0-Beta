@@ -1345,7 +1345,7 @@ Examples:
 Note that if you LOOK AT CORPSE you will not see its inventory.
 To see what's inside a container (i.e. a corpse) use LOOK IN <object>.
 
-See also: GET, MAP, READ, TAKE, SURVEY, CONTENTS, MAPSCAN
+See also: GET, MAP, READ, TAKE, SURVEY, CONTENTS, MAPSCAN, EXTRA DESCRIPTIONS
 #
 MAKE
 

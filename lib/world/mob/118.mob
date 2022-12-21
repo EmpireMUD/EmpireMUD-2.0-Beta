@@ -98,7 +98,7 @@ S
 D
    He seems to be very knowledgeable about the tower as he's giving a lot of
 useful tidbits -- all of which you've never heard before -- as he tours the
-tower.
+lobby.
 ~
 T 11828
 T 11810
@@ -199,6 +199,7 @@ I 12 11883 1.00 1 p  # PICKPOCKET: gnarled old wand
 T 11810
 T 11837
 T 11852
+T 11807
 S
 #11806
 Huberus master sorcerer instructor~
@@ -247,8 +248,8 @@ S
 1 0 0 16
 D
    Though he looks like he's new here, he has set right to work sorting and
-organizing the supplies that are stored in here. In a gray wool shirt and
-dark slacks, he doesn't look much like a sorcerer.
+organizing the supplies that are stored in here. He's dressed in a gray wool
+shirt and dark slacks that seem too large.
 ~
 M
 0
@@ -324,6 +325,7 @@ M
 What lust has rent, mayhap sorcery can repair.~
 T 11810
 T 11852
+T 11807
 S
 #11809
 #n~
@@ -352,7 +354,7 @@ D
 mana shield, it bears few lines or creases of its own. Annaca is young,
 especially by Skycleave's standards. Her golden brown hair is pulled into a
 line of buns down the back of her head and what stray strands aren't tied back
-hang loose and wild. She wears a loose set of layered robes in midnight blue,
+hang loose and wild. She wears a flowing set of layered robes in midnight blue,
 making it impossible to see what she might have stashed underneath.
    You must finish rescuing the second floor to get to the staircase.
 ~
@@ -398,8 +400,39 @@ braids tied back behind her head.
 ~
 F 11800
 I 12 11873 100.00 1 p  # PICKPOCKET: glittering red potion
+M
+7
+emote $n rubs her hands together.~
+M
+7
+say I hope those filthy goblins aren't in my bunkroom.~
+M
+8
+emote $n chews on her lip a little.~
+M
+8
+say I hate it down here.~
+M
+9
+emote $n cracks her knuckles.~
+M
+9
+say I'm just glad I'm not trapped up there with those awful goblins.~
+M
+10
+emote $n rubs her hands together.~
+M
+10
+say I hope we catch those goblins before they ruin anything.~
+M
+11
+emote $n picks at her cuticles.~
+M
+11
+say I hope Coz is safe somewhere.~
 T 11810
 T 11852
+T 11840
 S
 #11812
 cosimo apprentice~
@@ -439,6 +472,7 @@ fire-orange hair.
 F 11800
 T 11810
 T 11803
+T 11807
 S
 #11814
 wright old~
@@ -448,8 +482,8 @@ Old Wright is reading on his bunk.
 150 250 bdvxJ n 3
 1 0 0 15
 D
-   Even in the dim light of the bunk room, Wright's advanced age is such that
-you can see blue veins through his age-spotted translucent skin. His gray
+   Even in the dim light of the bunk room, Wright's advanced years are such
+that you can see blue veins through his age-spotted translucent skin. His gray
 dressing gown is a far cry from the layers of sorcerer robes worn around most
 of the tower, but he seems to give little notice to you or anyone else in here.
 ~
@@ -470,6 +504,27 @@ D
 Strings set by trig 11824.
 ~
 I 4 11929 90.00 1  # LOOT: very crummy bread
+M
+0
+$n shivers uncomfortably.~
+M
+0
+$n shivers.~
+M
+0
+$n rocks back and forth a little.~
+M
+0
+$n coughs.~
+M
+0
+You can hear $n's stomach grumbling.~
+M
+1
+Never going home.~
+M
+0
+$n rummages through some items but doesn't seem to find what $e's looking for.~
 T 11801
 T 11815
 T 11824
@@ -489,6 +544,30 @@ Strings set by trig 11824.
 ~
 I 4 11929 90.00 1  # LOOT: very crummy bread
 I 4 11876 66.66 1  # LOOT: obsidian stabber
+M
+0
+$n locks eyes with you as $e cleans under $s fingernails with a knife.~
+M
+1
+Human want some?~
+M
+0
+$n grits $s teeth.~
+M
+0
+$n watches you.~
+M
+1
+We was here first.~
+M
+1
+Venjer will get you if I doesn't get you first.~
+M
+0
+$n seems to be sizing you up.~
+M
+0
+$n considers $s chances against you.~
 T 11801
 T 11816
 T 11824
@@ -508,6 +587,27 @@ Strings set by trig 11824.
 ~
 I 4 11929 90.00 1  # LOOT: very crummy bread
 I 4 11875 66.66 1  # LOOT: hardstone pick
+M
+0
+$n swings $s pick into the wall.~
+M
+0
+$n wipes $s brow.~
+M
+0
+$n adjusts $s helmet.~
+M
+0
+$n swings $s pick back and nearly drops it.~
+M
+0
+There floor shakes a little as $n swings $s pick into the wall.~
+M
+0
+$n adjust $s pick.~
+M
+0
+$n taps at the wall with $s finger.~
 T 11801
 T 11817
 T 11824
@@ -584,12 +684,12 @@ A majestic pixy queen dazzles you with blinding sparkles!
 150 250 abdxEJ c 3
 2 0 0 28
 D
-   The pixy queen is scarcely more than a colorful sparkle of light. As your
-eyes adjust to her magnificence, you see that her iridescent clothing is
-reflecting and refracting every light source in the room, giving the queen her
-supernatural dazzle. If you focus, you can see her tall brown hair, silvery
-butterfly wings that glint with gold as she flies, a crooked little smile on
-her face as she watches you contemplate your next move.
+   The pixy queen is, at first, scarcely more than a colorful sparkle of light.
+As your eyes adjust to her magnificence, you see that her iridescent clothing
+is reflecting and refracting every light source in the room, giving the queen
+her supernatural dazzle. If you focus, you can see her tall brown hair, silvery
+butterfly wings that glint with gold as she flies, and a crooked little smile
+on her face as she watches you contemplate your next move.
 ~
 I 4 11837 100.00 1  # LOOT: skycleave BoE loot controller
 I+ 4 0  # Hard
@@ -607,6 +707,21 @@ I 4 11900 100.00 1  # LOOT: unattuned skystone
 I+ 5 0  # Group
 I 4 11900 100.00 2  # LOOT: unattuned skystone
 I+ 6 0  # Boss
+M
+0
+$n glimmers in the light.~
+M
+0
+You hear a donkey bray in the distance.~
+M
+0
+You scoot out of the way as a vine creeps along the floor and over your foot.~
+M
+0
+The maze seems to be growing larger and larger.~
+M
+0
+Pixy dust shimmers in the air.~
 T 11948
 T 11819
 T 11823
@@ -624,8 +739,7 @@ A pixy has escaped!
 D
    The little pixy is no larger than a mouse. It flies on silvery butterfly
 wings that shine with yellow sparkles as it flies. When the pixy holds still
-enough, it looks like a little person with black hair, sharp features, and a
-crooked smile.
+enough, it looks like a little person with sharp features and a crooked smile.
 ~
 M
 6
@@ -1183,6 +1297,7 @@ F 11800
 I 12 11928 100.00 1 p  # PICKPOCKET: Moonshadow Configuration
 T 11837
 T 11852
+T 11807
 S
 #11832
 mohammed resident~
@@ -1198,8 +1313,42 @@ the new shopkeeper organize supplies.
 ~
 F 11800
 I 12 11873 100.00 1 p  # PICKPOCKET: glittering red potion
+M
+7
+skip~
+M
+7
+emote $n picks up a heavy box.~
+M
+7
+emote $n strains as $e sets the box down in the corner.~
+M
+8
+skip~
+M
+8
+emote $n wipes $s brow and shakes out $s hands before picking up another box.~
+M
+8
+emote $n stacks boxes in the corner.~
+M
+9
+skip~
+M
+9
+emote $n taps a box three times with $s wand.~
+M
+9
+emote $n effortlessly picks up a large box.~
+M
+9
+emote $n sets the large box in the corner.~
+M
+9
+emote $n smiles to $mself.~
 T 11810
 T 11852
+T 11840
 S
 #11833
 shimmer slight goef~
@@ -1275,6 +1424,7 @@ the door.
 F 11800
 I 12 11872 100.00 1 p  # PICKPOCKET: hand-written note
 T 11803
+T 11807
 S
 #11836
 scaldorran lich~
@@ -1313,6 +1463,7 @@ M
 There's a distant scream, perhaps from somewhere inside the lich.~
 T 11839
 T 11806
+T 18298
 S
 #11837
 rags swarm~
@@ -1327,6 +1478,7 @@ polishing everything from the floor and handrails to the paneled walls, to the
 enormous chandelier. The rags come in all shades from light to dark, though
 they move so fast it's hard to focus on any one of them.
 ~
+F 11800
 M
 0
 The rags swirl around the floor...~
@@ -1620,6 +1772,7 @@ say You fool, we were hiding in here. Next time leave the wall shut.~
 T 11806
 T 11837
 T 11852
+T 11864
 S
 #11841
 mercenary rogue~
@@ -1657,12 +1810,13 @@ $n grits $s teeth.~
 M
 1
 Could get more selling these fixtures than they pay us.~
-T 11802
 T 11841
 T 11857
 T 11852
 T 11821
 T 11822
+T 11801
+T 11802
 S
 #11842
 mercenary caster~
@@ -1699,12 +1853,13 @@ All these books...~
 M
 0
 $n re-casts $s mana shield.~
-T 11802
 T 11857
 T 11842
 T 11852
 T 11821
 T 11822
+T 11801
+T 11802
 S
 #11843
 mercenary archer~
@@ -1732,12 +1887,13 @@ How is she gonna rob a sorcery tower and pay us in dirt?~
 M
 0
 $n cleans $s nails with a knife.~
-T 11802
 T 11857
 T 11843
 T 11852
 T 11822
 T 11821
+T 11801
+T 11802
 S
 #11844
 mercenary nature mage~
@@ -1765,12 +1921,13 @@ Don't like towers.~
 M
 1
 She don't pay enough for towers.~
-T 11802
 T 11857
 T 11844
 T 11852
 T 11821
 T 11822
+T 11801
+T 11802
 S
 #11845
 mercenary vampire~
@@ -1798,12 +1955,13 @@ At least food keeps coming up here on its own.~
 M
 1
 Go stab yourself in the neck for me.~
-T 11802
 T 11857
 T 11845
 T 11852
 T 11821
 T 11822
+T 11801
+T 11802
 S
 #11846
 mercenary armored~
@@ -1831,12 +1989,13 @@ Shouldn't've brought so many of us. The pay is going to be lousy.~
 M
 1
 I hope she's not expecting us to say thank you for this kind of money.~
-T 11802
 T 11857
 T 11846
 T 11852
 T 11821
 T 11822
+T 11801
+T 11802
 S
 #11847
 Kara Virduke~
@@ -2038,7 +2197,10 @@ M
 say Sell the artifacts, she said.~
 M
 7
-say There's a fortune stocked away in the lich's lab, she said.~
+say Have to pay in cash, Mez. This lot would turn on their own mother for 500 quid.~
+M
+7
+say There's a fortune stocked away in the lich's lab, my arse.~
 M
 7
 say Just don't open the repository. Got it. Won't open it. But there's nothing in here I can sell.~
@@ -2463,6 +2625,7 @@ T 11823
 T 11859
 T 11821
 T 11822
+T 11803
 S
 #11868
 knezz master~
@@ -3031,8 +3194,39 @@ each pool in turn, touching the surface with her long, delicate fingers,
 swirling it around, then touching her fingers to her closed lips.
 ~
 I 12 11879 100.00 1  # PICKPOCKET: glowing emerald bud
+M
+7
+emote $n gets up and moves to another pool.~
+M
+7
+emote $n kneels by the water.~
+M
+8
+emote $n touches her fingers to the surface of the pool and watches it ripple.~
+M
+8
+emote $n swirls the water a little bit.~
+M
+8
+emote $n touches her fingers to her lips.~
+M
+9
+emote $n stands and moves to another pool.~
+M
+9
+emote $n gently kneels by the water.~
+M
+10
+emote $n touches her fingers to the surface of the pool and watches the ripples.~
+M
+10
+emote $n swirls the water for a moment.~
+M
+10
+emote $n touches her fingers to her lips as water drips from them with a light plink.~
 T 11810
 T 11852
+T 11840
 S
 #11886
 Torru~
@@ -3176,6 +3370,7 @@ ready. Set a difficulty to continue the adventure. This difficulty only applies
 to the second floor.
 Usage: difficulty <normal | hard | group | boss>
 ~
+F 11800
 I 12 11865 100.00 1 p  # PICKPOCKET: ether condenser
 M
 7
@@ -3224,6 +3419,7 @@ difficulty to continue the adventure. This difficulty only applies to the
 third floor.
 Usage: difficulty <normal | hard | group | boss>
 ~
+F 11800
 I 12 11864 100.00 1 p  # PICKPOCKET: mana deconfabulator
 M
 7
@@ -3267,6 +3463,7 @@ ready. Set a difficulty to continue the adventure. This difficulty applies to
 the rest of the tower above you.
 Usage: difficulty <normal | hard | group | boss>
 ~
+F 11800
 I 12 11865 100.00 1 p  # PICKPOCKET: ether condenser
 M
 7

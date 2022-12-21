@@ -11,7 +11,7 @@ it be hard to get it moving (lead mausoleum). The inside of the mausoleum can
 be used as a tomb.
 ~
 @.&0XX@.~
-bow 0 16 0 0 0 2 0 3 0
+bouw 0 16 0 0 0 2 0 3 0
 C
 150 250
 D
@@ -74,7 +74,7 @@ of Sennacherib, they are sure to inspire legends for many generations to come.
 A small pond next to the walkway reflects the beautiful gardens.
 ~
 &g[%%]~
-fhwF 19 30 0 0 F 10 0 4 0
+fhuwF 19 30 0 0 F 10 0 4 0
 E
 trees~
    Trees of all types hang over you from the raised terraces of the garden.

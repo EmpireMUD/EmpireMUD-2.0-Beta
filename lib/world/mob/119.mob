@@ -30,8 +30,9 @@ gossiper #n~
 30 50 dvI 0 3
 0 0 0 15
 D
-   This tourist is simply enamored with the Tower Skycleave. They won't stop
-talking about it!
+   Though dressed in finery, the mud around the tourist's shoes and the edges
+of their heavy clothing identifies them as travelers. They seem to be prattling
+at length about a recent adventure.
 ~
 I 4 2015 40.00 1  # LOOT: tunic
 I 4 2021 40.00 1  # LOOT: cloth mantle
@@ -48,11 +49,26 @@ I swear that Skycleave barista re-heated my coffee with a wand.~
 M
 1
 I can't believe the Tower Skycleave is finally here!~
+M
+1
+I've heard tales of Skycleave popping in and out ever since I was a kid.~
+M
+1
+That tower was just incredible. I wonder where they got all those stones. Never seen a tower so high.~
+M
+1
+I'll be going back to Skycleave as soon as I can afford one of those pixy jars.~
+M
+1
+You can just feel all the magic as soon as you see the Black Tower.~
+M
+1
+I still can't believe I saw Skycleave. Pinch me, I must be dreaming!~
 T 11905
 S
 #11902
 bucket wooden~
-the bucket~
+a bucket~
 A wooden bucket is sitting here, filled with water.
 ~
 50 50 dhJ nG 2
@@ -64,6 +80,7 @@ its sponge dutifully glides along behind.
 talent to speak of. But when she couldn't pass the apprentice exam, the
 disappointed sorcerers put her to work.
 ~
+F 11800
 M
 0
 $n hops around, sloshing water as it goes.~
@@ -114,6 +131,7 @@ often seen crying into a bucket in the corner. Her studies suffered as she
 missed lesson after lesson. As disappointment mounted, her master saw fit to
 reunite the two friends.
 ~
+F 11800
 M
 0
 $n slides around, scrubbing the floor.~
@@ -211,6 +229,7 @@ M
 $n hums a little tune.~
 T 11810
 T 11852
+T 11807
 S
 #11906
 Huberus instructor~
@@ -434,7 +453,7 @@ S
 #11911
 apprentice kayla~
 Apprentice Kayla~
-Apprentice Kayla is here.
+Apprentice Kayla is on her bed, writing something.
 ~
 150 250 dvxJ n 3
 2 0 0 15
@@ -444,6 +463,9 @@ chunky braids, as there appears to be a lot of it to tame. Her eyes display a
 starry pink and purple pattern the swirls around her irises. Kayla is young,
 but Skycleave's selection process is notoriously difficult, so she has surely
 earned her spot.
+   Kayla is laying on her stomach on the bed, writing in a book. She pays no
+attention to you except to shift her position to block your view if you get too
+close.
 ~
 F 11800
 I 12 11873 100.00 1 p  # PICKPOCKET: glittering red potion
@@ -453,15 +475,16 @@ S
 #11912
 cosimo apprentice~
 Apprentice Cosimo~
-Apprentice Cosimo is here.
+Apprentice Cosimo reads from a book as he wanders around.
 ~
 150 250 dvxJ n 3
-1 0 0 15
+1 0 102 15
 D
-   Cosimo is clad in white apprentice robes with fiery red trim. On his face
-he bears a long scar that clips the left side of his lips. He wears his over-
+   Cosimo is clad in white apprentice robes with fiery red trim. On his face he
+bears a long scar that clips the left side of his lips. He wears his over-
 grown hair up in a sweeping modern style, with a stubbly chin that almost
-resembles a beard.
+resembles a beard. He appears to be wandering aimlessly as he studies the book
+in his hands.
 ~
 F 11800
 I 12 11874 100.00 1 p  # PICKPOCKET: filigreed stasis charm
@@ -506,6 +529,7 @@ M
 $n clicks his fingers and a little fire drake bursts into existence. But it spits at Tyrone and costs $m half an eyebrow.~
 T 11810
 T 11852
+T 11807
 S
 #11914
 Wright wrangler~
@@ -726,7 +750,7 @@ large eyes which, at all times, have sad, longing quality to them as she stares
 off into space.
 ~
 F 11800
-I 12 11874 100.00 1 p  # PICKPOCKET: filigreed stasis charm
+I 12 11964 100.00 1 p  # PICKPOCKET: brilliant stone of eternal sunshine
 M
 0
 $n tries to fix a pile of rubbish with her foot.~
@@ -824,10 +848,11 @@ T 11822
 T 11986
 T 11852
 T 11931
+T 11807
 S
 #11921
 broom~
-the broom~
+a broom~
 A broom is sweeping up the remaining debris.
 ~
 50 50 dhJ nG 2
@@ -841,6 +866,7 @@ children and nine grandchildren. Magic had come naturally to her in her youth,
 and she had determined to study it at her first opportunity. But opportunity
 knocked late, and she never excelled at her studies.
 ~
+F 11800
 M
 0
 The enchanted broom sweeps up little piles of dust.~
@@ -870,7 +896,7 @@ T 11905
 S
 #11922
 duster feather~
-the feather duster~
+a feather duster~
 A feather duster swishes as it flies across every surface.
 ~
 50 50 dhJ nG 2
@@ -884,6 +910,7 @@ long night excavating the bookshelves and cabinets, and he showed a great deal
 of promise. But he was never known to put a book away when he was done with it
 and his untidiness soon outweighed his inborn talent.
 ~
+F 11800
 M
 0
 The feather duster twirls across a shelf.~
@@ -992,6 +1019,7 @@ Goblin Crusade. Though he served the tower for his entire adult life, his
 inability to keep the goblins under control made him little more than a
 disappointment in the end.
 ~
+F 11800
 M
 0
 $n sloshes around inside one of the cages.~
@@ -1186,6 +1214,7 @@ say That includes you.~
 T 11810
 T 11852
 T 11840
+T 11807
 S
 #11932
 mohammed resident~
@@ -1206,7 +1235,7 @@ T 11852
 S
 #11933
 mop bucket~
-the mop~
+a mop~
 A mop carries a bucket past you.
 ~
 50 50 dhJ nG 2
@@ -1224,6 +1253,7 @@ could receive the best education. But when the younger Dylane couldn't stop
 spilling potions on the fine ebony floors, he amounted to little more than a
 disappointment to the tower.
 ~
+F 11800
 M
 0
 $n swishes around.~
@@ -1332,6 +1362,7 @@ say What even is this thing?~
 T 11810
 T 11852
 T 11840
+T 11807
 S
 #11936
 scaldorran lich~
@@ -1530,6 +1561,7 @@ There's a distant scream, perhaps from somewhere inside the lich.~
 T 11810
 T 11862
 T 11840
+T 18298
 S
 #11937
 skeleton~
@@ -1645,7 +1677,7 @@ large eyes. There's a slight clunking sound as she walks around the lab owing
 to her bronze leg.
 ~
 F 11800
-I 12 11874 100.00 1 p  # PICKPOCKET: filigreed stasis charm
+I 12 11964 100.00 1 p  # PICKPOCKET: brilliant stone of eternal sunshine
 M
 0
 $n zaps a small fan, which flies up into the air and starts waving at $m.~
@@ -1745,6 +1777,7 @@ Hmm...~
 T 11806
 T 11810
 T 11852
+T 11864
 S
 #11941
 goef oreonic rock creature pitch black~
@@ -1809,6 +1842,7 @@ M
 $n walks along the wall, passing the light from $s contraption over it.~
 T 11810
 T 11852
+T 11807
 S
 #11943
 visitor gardens hanging~
@@ -1863,7 +1897,7 @@ T 11852
 S
 #11946
 fox gray grey~
-the gray fox~
+a gray fox~
 There is a gray fox sniffing around.
 ~
 150 250 djJ n 3
@@ -2477,6 +2511,7 @@ I 4 11965 100.00 1  # LOOT: jade tear of Gobbrabakh of Orka
 I 4 11977 100.00 1  # LOOT: steamed mussels
 I 4 11899 100.00 1  # LOOT: piece of rough-cut blue jade
 I 4 11976 100.00 1  # LOOT: goblin trinkets
+I 4 11931 4.00 1  # LOOT: green dress
 M
 0
 $n cracks $s thorn whips in the air.~
@@ -2513,10 +2548,11 @@ I 12 11872 100.00 1 p  # PICKPOCKET: hand-written note
 T 11810
 T 11937
 T 11852
+T 11807
 S
 #11960
 cabinet filing~
-the filing cabinet~
+a filing cabinet~
 A filing cabinet is standing here.
 ~
 50 50 dhJ nG 2
@@ -2530,6 +2566,7 @@ have been strewn about.
 though he showed promise from a young age. But he was quicker to learn spells
 than perform them, and in the end, he was a disappointment to them.
 ~
+F 11800
 M
 0
 The filing cabinet opens its bottom draw and makes a clicking sound, and a couple of papers whoosh up into it.~
@@ -2559,7 +2596,7 @@ T 11905
 S
 #11961
 bookshelf shelf ebony~
-the bookshelf~
+a bookshelf~
 An ebony bookshelf is standing here.
 ~
 50 50 dhJ nG 3
@@ -2573,6 +2610,7 @@ reading. When she emerged, it was often carrying a stack of books so high that
 one could barely see her face. She often missed class, to be found wormed away
 in a book.
 ~
+F 11800
 M
 0
 The bookshelf waddles past you.~
@@ -2836,7 +2874,7 @@ with her lips and then goes back to what she was doing.
 patterns.
 ~
 F 11800
-I 12 11869 100.00 1 p  # PICKPOCKET: self-writing pen
+I 12 11867 100.00 1 p  # PICKPOCKET: dynamic reconfabulator
 M
 7
 set line_gap 6 s~
@@ -2993,6 +3031,7 @@ M
 say Nice to imagine I won't have to live with this guilt.~
 T 11810
 T 11991
+T 11803
 S
 #11968
 knezz grand high sorcerer~
@@ -3341,6 +3380,7 @@ say Celiya and I will return this tower to greatness, if she can be convinced to
 T 11810
 T 11852
 T 11840
+T 11807
 S
 #11971
 Gron goblin~
@@ -3511,7 +3551,7 @@ M
 echo Someone shouts, 'What if they're here to take our land?'~
 M
 11
-say The land is large and the sea, eternal. These giants will have little use for our little precipice.~
+say The land is large and the sea, eternal. These giants will have little use for our rocky precipice.~
 M
 11
 echo Someone in the crowd asks, 'And if they do? We won't let them take our homes.'~
@@ -3520,10 +3560,13 @@ M
 say I hear your fears and stand beside you in the light of the god's hearth.~
 M
 11
-say Gobbrabakh of Orka is well-placed on these cliffs. No army has ever breeched it. By the god, no army ever will.~
+say Gobbrabakh of Orka is well-placed on these cliffs. No army has ever breached it. By the god, no army ever will.~
 M
 11
 echo Murmurs spread through agitated crowd as most of the people look to the priest.~
+M
+11
+say We will trust that the god has brought us together.~
 M
 11
 say The god will see us through this in peace or in victory. Since we were cut from the jade, no gobbrabakh has ever fallen.~
@@ -3532,22 +3575,46 @@ M
 echo One man in the crowd cheers, and the rest follow.~
 M
 11
-say We will trust that the god has brought us together.~
+echo One voice cuts through the cheers...~
+M
+11
+echo Someone says, 'How can we trust them? What do we even know of these giants?'~
 M
 11
 say We will trade with these newcomers and learn of their culture. We will learn whence they sail.~
 M
 11
-say We will learn who they are. We will taste sample fish and share with them our oysters.~
+echo Someone else says, 'What if they're not like us?'~
 M
 11
-say We will learn how they dance and how they sing. If they lack fire, we will cut flint for them.~
+say We will learn who they are. We will sample their fish and share with them our oysters.~
+M
+11
+echo The din grows as every person in the crowd tries to speak at once.~
+M
+11
+echo Someone from the back yells, 'I saw them at Gorannar. What do we even know about these giants, these so-called Hew Mons?'~
+M
+11
+say We may know nothing beyond their name, but we will not cower, afraid. We will learn everything about them...~
 M
 11
 say We will learn if they are called Hew Mons because of the great trees they hew for their ships.~
 M
 11
+say We will learn how they dance and how they sing. If they lack fire, we will cut flint for them.~
+M
+11
+say We will show them our kindness, our compassion, and our hearts. And if their hearts beat green as ours do, by the god we shall be fast friends!~
+M
+11
+echo A cautious cheer waves over the crowd.~
+M
+11
 say Be at peace on this holy day.~
+M
+11
+echo The crowd echoes, 'On this holy day.'~
 M
 11
 do restring janitor~
@@ -3562,6 +3629,9 @@ M
 say I present my newest poem, O Glorious Zenith.~
 M
 8
+echo The crowd falls silent.~
+M
+8
 say O glorious Zenith, you inspire me to speak.~
 M
 8
@@ -3574,7 +3644,16 @@ M
 say Always dreaming about the holy day.~
 M
 8
+echo Some of the members of the audience snap their fingers but the poet hushes them.~
+M
+8
+say It isn't over yet.~
+M
+8
 skip~
+M
+8
+emote $n clears $s throat.~
 M
 8
 say Let me compare you to a splendid clam?~
@@ -3592,7 +3671,13 @@ M
 skip~
 M
 8
-say This next poem is called Sunny Summertime.~
+echo There's a pause and then a few members of the audience start to snap their fingers again.~
+M
+8
+say Thank you, thanks, thank you. This next poem is called Sunny Summertime.~
+M
+8
+emote $n clears $s throat.~
 M
 8
 say Sunny summertime~
@@ -3605,6 +3690,9 @@ say Over the jade sea~
 M
 8
 skip~
+M
+8
+echo Some of the audience snaps their fingers.~
 M
 8
 say Thank you, thank you, you're too kind. This final poem is called Whose Sun Is It.~
@@ -3644,6 +3732,9 @@ say It shines to cast asunder dread,~
 M
 8
 say The Zenith's promise overhead.~
+M
+8
+emote $n gives a little bow as the audience snaps their fingers again.~
 M
 8
 skip~
@@ -3983,7 +4074,7 @@ T 11803
 S
 #11982
 pixy little~
-the little pixy~
+a little pixy~
 A little pixy is fluttering about.
 ~
 1 1 bdoD mn 1
@@ -4067,6 +4158,9 @@ I do love this gobbrabakh.~
 M
 1
 I should have brought my ma.~
+M
+1
+What a dream.~
 T 11810
 T 11852
 S
@@ -4139,6 +4233,9 @@ First time to a gobbrabakh?~
 M
 1
 There's more than enough for everyone.~
+M
+1
+Just because you're dreaming don't mean you can't eat.~
 T 11810
 T 11852
 S
@@ -4184,6 +4281,9 @@ say I'm sure one of the folks under the eastern plaza will put you up for the ni
 M
 8
 say It'll all be fixed tomorrow.~
+M
+8
+say This place sure is a dream to live in.~
 M
 0
 $n hums a little tune as $e works.~
@@ -4294,20 +4394,38 @@ T 11840
 T 11803
 S
 #11989
-shoes walking pair~
-a pair of walking shoes~
-A pair of walking shoes is here.
+swab souvenir~
+a souvenir swab~
+A souvenir swab is trying to clean the ground.
 ~
-1 1 bdoD n 1
-0 0 0 15
+1 1 bdoD n 2
+0 0 36 15
 D
-minipet
-tba
+   The swab is little more than a poplar handle and a dense mop of white yarn,
+though it has been animated to swoop around, persistently trying to clean any
+floor or ground beneath it. Miraculously, it never seems to get dirty. The
+headband around the yarn is checkered violet and white, with a tiny tower
+stitched in.
+   Skycleave's claw game fell into disuse for many years as its original
+creator lost interest after his death and none of the other teachers were ever
+clever enough to repair it.
 ~
+M
+0
+$n swishes around.~
+M
+0
+$n wrings itself out.~
+M
+0
+$n spins around.~
+M
+0
+$n shakes itself off.~
 S
 #11990
 wand liberated~
-the liberated wand~
+a liberated wand~
 A liberated wand swishes and flicks in the air.
 ~
 1 1 bdoD n 1
@@ -4326,47 +4444,93 @@ the more civilized uses of mana.
 T 11990
 S
 #11991
-toaster brave little~
-a brave little toaster~
-A brave little toaster is hopping around.
+doorstop stop enchanted~
+an enchanted doorstop~
+An enchanted doorstop is scampering around.
 ~
 1 1 bdoD n 1
-0 0 15 15
+0 0 71 15
 D
-minipet
-tba
+   The doorstop is wedge-shaped and looks to be cast iron, though it's old and
+unpolished such that rust grows on it like fur. It seems to be scampering
+around on its own, stopping occasionally to investigate a crumb.
+   It is seen as a rare privilege to spend a lifetime studying at Skycleave.
+Annelise Larsen mastered the Deleon Enchantment and, for her genius, spent
+another two.
 ~
+M
+0
+$n sniffs around at the ground.~
+M
+0
+$n tries to hide.~
+M
+0
+$n rolls around on the ground.~
+M
+0
+$n squeaks.~
+M
+0
+$n squeaks like it needs to be oiled.~
 S
 #11992
-lamp hopping~
-a hopping lamp~
-A hopping lamp is here.
+shadow hiding~
+the hiding shadow~
+A shadow is hiding here.
 ~
-1 1 bdoD n 1
-0 0 15 15
+1 1 bdoD dn 1
+0 0 24 15
 D
-minipet
-tba
+   You have managed to find a shadow that doesn't belong. It's small, it's
+rather dark, and you can't get an idea of its shape because it seems to change
+as it turns.
+   As you're looking at the shadow, it seems to shrink -- at least, at first.
+But it seems to grow curious as it realizes you aren't a threat, and it
+stretches a cautious tendril toward you, before yanking it back and shrinking
+down again.
 ~
 S
 #11993
 cloak clingy fancy~
-the clingy cloak~
+a clingy cloak~
 A fancy cloak is floating here.
 ~
 1 1 bdoD n 1
 0 0 27 15
 D
-   This pet will transform itself into a cloak worn by someone in the room, at
-random. Please add some good echoes to its custom strings as it attempts to
-wrap itself around people.
-Also update the look description of obj 11993 to match.
+   At first glance it looks to be a fairly ordinary traveling cloak. But they
+don't usually float in midair, so a better assessment would be to say this is
+an extraordinary and well-traveled cloak. It seems to follow along close behind
+you.
+   Clingy cloaks were originally envisioned as a rescue tool for villagers lost
+in the wilds. The cloaks are flung from the top of Skycleave, whereupon they
+seek out any uncloaked person and wrap them tightly. Unfortunately, they
+turned out to be unsafe for children.
 ~
+M
+0
+$n flies over to you.~
+M
+0
+$n seems to be following yuo.~
+M
+0
+$n spins around in a circle.~
+M
+0
+$n float around the area.~
+M
+0
+$n shakes itself out.~
+M
+0
+$n does a little twirl.~
 T 11993
 S
 #11994
 footstool loyal stool~
-the loyal footstool~
+a loyal footstool~
 A loyal footstool is hopping around.
 ~
 1 1 bdoD n 1
@@ -4377,8 +4541,8 @@ legs. The corners are set with little tassles that wave as it hops around like
 a dog. This could be the perfect pet.
    Though the Tower Skycleave has acquired a reputation for frightening magical
 experiments, and deservedly so, it's very unlikely that the footstool's
-resemblance to a dog comes from it actually being a transmogrified dog. It's
-far more likely to be a former student.
+resemblance to a dog comes from it actually being a transmogrified dog. They
+rarely transform animals.
 ~
 M
 0
@@ -4406,32 +4570,111 @@ M
 $n leaps up into the air and, upon landing, dashes in a circle.~
 S
 #11995
-mirror complimentary complementary~
-a complimentary mirror~
-A complimentary mirror is floating here.
+water bug waterbug large~
+a water bug~
+A large bug made of water pokes at you with its antennae.
 ~
-1 1 bdoD n 1
-0 0 27 15
+1 1 bdoD n 2
+0 0 2 9
 D
-minipet
-tba
+   It's hard to take your eyes off of the odd creature; it is both hideous and
+beautiful at the same time. It is large enough to be a small dog, with the
+strange articulated legs and bulbous eyes of an insect. Its six legs sprawl
+widely to the sides, supporting its weight close to the ground.
+   But the most curious part of the bug is that it's made entirely of water.
+You can watch the ground wave and ripple through the bug's carapace and when
+you get too close, it shakes a wing and splashes you with water.
 ~
+M
+0
+$n splashes you as it shakes out its wings.~
+M
+0
+$n taps at your ankle with a curious antenna.~
+M
+0
+$n makes a little puddle.~
+M
+0
+$n skates around on the ground.~
+M
+0
+$n cleans its legs.~
 S
 #11996
-teapot pot piping~
-a piping teapot~
-A piping teapot is here.
+goblin caged~
+a caged goblin~
+A goblin in a cage is walking around.
 ~
 1 1 bdoD n 1
-0 0 15 15
+0 0 99 15
 D
-minipet
-tba
+   The tiny, green-skinned creature is trapped in an equally tiny cage, all
+except its feet, which stick down from the forward-tilting cage to let the
+poor thing walk on its own. It sings as it plods along, though it never seems
+to finish a song.
+   The goblin's knees have wooden pins through them and articulate like a
+hinge. On closer inspection, this goblin is a puppet!
+   For many years, a constant and endless supply of goblins have arrived on
+Skycleave's doorstep, its windowsills, and occasionally its sewer drains.
+The sorcerers have theorized that goblins are drawn to the tower's magic and
+have happily repurposed the little invaders.
 ~
+M
+0
+$n sings, 'No bodies known the trouble I seed...'~
+M
+0
+$n sings, 'Well I knows I had it comin', I knows I cain't be free, but those people keep a-whippin', and that's what tortures me.'~
+M
+0
+$n sings, 'Goblin threw a party in the tower jail, prison band was there and they began to wail. Band was jumpin' and the tower start to swing... You should've heard them goblins sing!'~
+M
+0
+$n sings, 'I saw goblins runnin' out, they looked like middleweights. Jumped onto a white horse with stolen silver plates...'~
+M
+0
+$n sings, 'Breakin' rocks in the hot sun, I fought the tower and the tower won...'~
+M
+0
+$n sings, 'Jailhouse get empty. Rusty get plenty. The baton stick get shorter... Rusty gets taller. Can't fight against the wand... Cause them rude, rude people...'~
+M
+0
+$n sings, 'Nothing I does, nothing I say, I tell them to go get plucked, they put me away...'~
+M
+0
+$n sings, 'There's some jewels in the skull that he could sell if he chose...'~
+M
+0
+$n sings, 'You can't run away from yourself, ay. Can't runaway from yourself, no, no...'~
+M
+0
+$n sings, 'Inna di street, tings ah get rougher than rough, inna di street...'~
+M
+0
+$n sings, 'Tonight there's gonna be trouble, some of us won't survive, see the Gobs and me mean business, bustin' out dead or alive...'~
+M
+0
+$n sings, 'And someone's sneakin' 'round the tower. Could that someone be Mack the Knife?'~
+M
+0
+$n sings, 'As $e came into the window, was the sound of, a crash-end-o, $e came into giant tower, $e left bloodstains, on the parapet...'~
+M
+0
+$n sings, 'They headed down to, oooh, old Elk Castle, that's where they ran into a great big hassle. Gobly Jo shot a man while robbin' his castle, Gobly Sue took the money and run... Hoo-hoo-hoo, go on, take the money and run...'~
+M
+0
+$n sings, 'Oh, there ain't no rest for the wicked, goblins don't grow on trees. I got guys to pay, I got mouths to feed, there ain't nothin' in this world for free...'~
+M
+0
+$n sings, 'Straight outta Goblin, crazy featherplucker named Filks, from the gang called Goblinz Wit Attitudes. When I'm called off, I get sawed off, pull the blade and the bodies are hauled off...'~
+M
+0
+$n sings, 'Desperate goblin... Why don't you come to your senses? You've been out ridin' fences for so long now...'~
 S
 #11997
 fan adoring~
-the adoring fan~
+an adoring fan~
 An adoring fan is floating here.
 ~
 1 1 bdoD n 1
@@ -4447,16 +4690,41 @@ sorcerer upgraded the fans to dispense more than just cool air.
 T 11997
 S
 #11998
-hat singing~
-a singing hat~
-A singing hat is sitting on the ground.
+goblin little~
+a little goblin~
+A little goblin is out for a jaunt.
 ~
 1 1 bdoD n 1
-0 0 15 15
+1 0 95 15
 D
-minipet
-tba
+   The verdant little guy seems happy -- even mirthful -- as he walks around in
+circles. He seems small for a goblin, though, and when you kneel down to get
+a look at him, you find he's made of wood, with articulated joints and lovely
+little violet tunic with matching pants. The detail work is quite fine: the
+puppet has lifelike green eyes and even has a piece of shell jewelry in its
+nose. But just as you start to wonder how lifelike it really is, it bumps into
+you. Twice.
+   Goblins have lived on the fringes of human society since time immemorial,
+often finding themselves in conflict over scraps and waste.
 ~
+M
+0
+$n skips in a circle.~
+M
+0
+$n walks around you.~
+M
+0
+$n bumps into your leg.~
+M
+0
+$n does a little cartwheel.~
+M
+0
+$n runs in a big circle.~
+M
+0
+$n does a little dance as $e walks.~
 S
 #11999
 ball crystal~
