@@ -1313,8 +1313,42 @@ the new shopkeeper organize supplies.
 ~
 F 11800
 I 12 11873 100.00 1 p  # PICKPOCKET: glittering red potion
+M
+7
+skip~
+M
+7
+emote $n picks up a heavy box.~
+M
+7
+emote $n strains as $e sets the box down in the corner.~
+M
+8
+skip~
+M
+8
+emote $n wipes $s brow and shakes out $s hands before picking up another box.~
+M
+8
+emote $n stacks boxes in the corner.~
+M
+9
+skip~
+M
+9
+emote $n taps a box three times with $s wand.~
+M
+9
+emote $n effortlessly picks up a large box.~
+M
+9
+emote $n sets the large box in the corner.~
+M
+9
+emote $n smiles to $mself.~
 T 11810
 T 11852
+T 11840
 S
 #11833
 shimmer slight goef~

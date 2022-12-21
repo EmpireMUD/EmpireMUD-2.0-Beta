@@ -689,22 +689,26 @@ set str1
 set str2
 set str3
 set says
+set tie 0
 * 1. start strings: position w/changes
 if %gap1% == 0 && %gap2% == 0
   set say %say% It's a three-way tie with all three pixies wing to wing!
   set str1 All three pixies are tied
   set str2 %str1%
   set str3 %str1%
+  set tie 3
 end
 if %gap1% == 0 && %str1.empty%
   set say %say% %name1.cap% and %name2% are tied for the lead!
   set str1 %name1.cap% is wing-and-wing with %name2%
   set str2 %name2.cap% is wing-and-wing with %name1%
+  set tie 2
 end
 if %gap2% == 0 && %str2.empty%
   set say %say% %name2.cap% and %name3% are tied for second!
   set str2 %name2.cap% is wing-and-wing with %name3%
   set str3 %name3.cap% is wing-and-wing with %name2%
+  set tie 2
 end
 if %need1% && %str1.empty%
   if %prev_place1% == 1
@@ -737,7 +741,7 @@ if %need2% && %str2.empty%
   end
   elseif %prev_place2% == 3
     set str2 %name2.cap% has overtaken %name3% for second place
-    set say %say% %name1.cap% has overtaken second!
+    set say %say% %name2.cap% has overtaken second!
   elseif %prev_place2% == 1
     set str2 %name2.cap% has fallen back to second place
   end
@@ -780,7 +784,7 @@ while %place% <= 3
   end
   * hazards
   eval penalty_var penalty%%pos%place%%%
-  if %self.var(%penalty_var%,0)% == 0 && %area% == %prev_area%
+  if %self.var(%penalty_var%,0)% == 0 && %area% == %prev_area% && !%tie%
     set penalty 0
     if %area% == 1 && !%forestdome% && %rand_luck% < 2
       set penalty 2
@@ -836,7 +840,6 @@ while %ch%
   set ch %ch.next_in_room%
 done
 raceman tricks
-* %echo% Debug: %self.name1%, %self.name2%, %self.name3% %self.dist1%-%self.dist2%-%self.dist3% %self.penalty1%/%self.penalty2%/%self.penalty3%
 ~
 #11912
 Pixy Races: Greet triggers upcoming race~
@@ -1668,8 +1671,6 @@ elseif %mode% == places
     end
     eval pos %pos% + 1
   done
-  * debug: something might be wrong HERE when 2 people are in the same spot
-    * sec_pos and third_pos must be the same, resulting in an empty place
   * store places
   set place%best_pos% 1
   set place%sec_pos% 2
@@ -1677,7 +1678,6 @@ elseif %mode% == places
   remote place1 %self.id%
   remote place2 %self.id%
   remote place3 %self.id%
-  * %echo% Debug store places: %place1% %place2% %place3%, %best_pos%(%best_dist%) %sec_pos%(%sec_dist%) %third_pos%(%third_dist%)
   * store gaps
   eval gap%best_pos% %best_dist% - %sec_dist%
   eval gap%sec_pos% %sec_dist% - %third_dist%
@@ -1698,10 +1698,6 @@ elseif %mode% == places
       remote winner%third_pos% %self.id%
     end
   end
-  set debug1 %self.place1%/%self.prev_place1%, %self.gap1%/%self.prev_gap1%, %self.area1%/%self.prev_area1%
-  set debug2 %self.place2%/%self.prev_place2%, %self.gap2%/%self.prev_gap2%, %self.area2%/%self.prev_area2%
-  set debug3 %self.place3%/%self.prev_place3%, %self.gap3%/%self.prev_gap3%, %self.area3%/%self.prev_area3%
-  * %echo% Debug (places, gaps, areas; cur/prev): 1 (%debug1%), 2 (%debug2%), 3 (%debug3%)
 elseif %mode% == round
   * one round: update distances and penalties
   set pos 1

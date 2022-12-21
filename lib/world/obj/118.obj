@@ -253,13 +253,15 @@ began setting traps to capture any goblin who dared enter. But even caged --
 or perhaps even moreso when caged -- a goblin is a crafty sort, and it requires
 a skilled wrangler to keep them under control.
 ~
-1 hmo an 0 4
+1 hmo an 0 5
 0 1 7
 7 0
 A
 18 3 0
 A
 13 1 0
+A
+5 1 6
 C
 150 250
 T 11902
@@ -277,13 +279,15 @@ have long faced what they euphemistically call "the goblin problem". It's a
 common occurrence for goblins to attempt to steal the tower's priceless relics,
 so wrangler spears are often stashed around the tower.
 ~
-1 ehmo an b 8
+1 ehmo an b 9
 0 1 3
 0 0
 A
 18 2 0
 A
 13 2 0
+A
+5 1 6
 C
 150 250
 M
@@ -306,13 +310,17 @@ of your wrist.
 or iron, though natural glasses like obsidian are desperately fragile and
 ephemeral.
 ~
-1 mo an a 7
+1 mo an a 10
 0 4 2
 8 0
 A
 1 1 0
 A
-17 2 0
+17 5 0
+A
+21 3 0
+A
+5 1 6
 C
 150 250
 T 11902
@@ -329,17 +337,19 @@ Grand High Sorcerer Kofi and though the tower no longer manufactures them, the
 artificers are still known to shape old glass ingots into tools and weapons
 from time to time.
 ~
-1 emno an 0 7
+1 emno an 0 12
 0 4 1
 8 0
 A
 1 1 0
 A
-17 1 0
-A
 9 1 0
 A
-21 1 0
+21 4 0
+A
+17 4 0
+A
+5 1 6
 C
 150 250
 T 11902
@@ -356,13 +366,19 @@ the great sorcerer Celiya, one of the famed leaders of Skycleave.
 history is strictly mythological -- and fantastical indeed -- it has produced
 so many High Sorcerers that few question its claims of descent from divinity.
 ~
-1 eimo an 0 8
+1 eimo an 0 11
 0 4 17
 0 0
 A
 8 1 0
 A
-17 2 0
+9 1 0
+A
+17 4 0
+A
+22 3 0
+A
+5 1 6
 C
 150 250
 T 11902
@@ -379,13 +395,15 @@ staff, pulsing like a heartbeat.
 refers only to the current holder of the Apollus Chair, the sorcerer who
 oversees magics related to disease, poison, and healing.
 ~
-1 ehmo an 0 8
+1 ehmo an 0 10
 0 0 19
 0 0
 A
 8 1 0
 A
-23 2 0
+23 8 0
+A
+5 1 6
 C
 150 250
 T 11902
@@ -403,15 +421,17 @@ merely fertilize their fields.
    Carving a great victory -- or defeat -- into the bones of the fallen is an
 ancient tradition.
 ~
-1 emo an 0 11
+1 emo an 0 13
 0 3 5
 14 0
 A
 2 1 0
 A
-18 2 0
+18 5 0
 A
-21 2 0
+21 3 0
+A
+5 1 6
 C
 150 250
 T 11902
@@ -427,15 +447,17 @@ they emanate in the dark tells you their purpose is to channel mana.
    When he had defeated his last foe, Wildermage Indrik carved the bones of his
 fallen allies to celebrate the victory they seized from the tusks of defeat.
 ~
-1 emo an 0 11
+1 emo an 0 13
 0 3 18
 14 0
 A
 2 1 0
 A
-18 2 0
+18 5 0
 A
-22 2 0
+22 3 0
+A
+5 1 6
 C
 150 250
 T 11902
@@ -473,15 +495,15 @@ otherworlder's strange tools and inscrutible magics led the Tower Skycleaver to
 study him, that they might learn enough to stand their ground if an army of
 otherworlders should follow.
 ~
-27 emo aq 0 15
+27 emo aq 0 17
 3 0 0
 2 0
 A
 2 1 0
 A
-18 4 0
+18 6 0
 A
-13 1 0
+13 4 0
 A
 17 -3 0
 C
@@ -507,15 +529,15 @@ life of its own when an errant spell from Scaldorran brought all the costumes
 to life. For his part, Scaldorran insisted he was only trying to liven up the
 party.
 ~
-27 emo aq 0 15
+27 emo aq 0 16
 1 0 0
 14 0
 A
 9 1 0
 A
-17 2 0
+17 4 0
 A
-21 3 0
+21 6 0
 A
 18 -3 0
 C
@@ -542,15 +564,15 @@ image. For these sorcerers, living in death as a shadow of the spells they wove
 in life is still a form of immortality, but few erudite wizards would consider
 the lich to be the same person.
 ~
-27 emo aq 0 16
+27 emo aq 0 17
 0 0 0
 11 0
 A
 9 1 0
 A
-17 2 0
+17 4 0
 A
-22 3 0
+22 6 0
 A
 23 -3 0
 C
@@ -578,15 +600,15 @@ stand the robes on their own soon became a complex animus spell. Perhaps
 thinking himself above casting his own spells, Knezz eventually enchanted the
 long sleeves of the robe to move his arms for him as well.
 ~
-27 emo aq 0 17
+27 emo aq 0 18
 0 0 0
 11 0
 A
 9 1 0
 A
-7 2 0
+7 4 0
 A
-23 3 0
+23 6 0
 A
 22 -3 0
 C
@@ -610,15 +632,15 @@ rogue.
    The goblins once traded for weapons and armor, but as their society fell,
 they began to imitate the crafts they had once purchased.
 ~
-27 emo aq 0 17
+27 emo aq 0 19
 2 0 0
 0 0
 A
 9 1 0
 A
-17 2 0
+17 4 0
 A
-18 2 0
+18 4 0
 C
 150 250
 M
@@ -667,7 +689,7 @@ and pops the blade makes in the heat.
 Permafrost Wars, though most melted before High Sorcerer Chun devised a spell
 that could preserve them on our plane.
 ~
-1 imo ano f 17
+1 imo ano f 19
 0 1 4
 2 0
 A
@@ -994,15 +1016,15 @@ pen, clasp, button, and plate in Skycleave was made from magitanium. Still,
 among the innovations credited to the Tower, magitanium is the one most valued
 by smiths across the land.
 ~
-27 mp af 0 21
+27 mp af 0 22
 3 0 0
 2 0
 A
 2 1 0
 A
-12 3 0
+12 4 0
 A
-24 3 0
+24 4 0
 C
 150 275
 T 11940
@@ -1019,7 +1041,7 @@ when rubbed together, while the inside is lined with the finest cloth.
 hiding from others. Though it was her brother who dubbed her "Niamh the Shadow
 Hide", she reclaimed the title for herself at Skycleave.
 ~
-27 mp af 0 22
+27 mp af 0 23
 1 0 0
 7 0
 A
@@ -1027,7 +1049,7 @@ A
 A
 9 1 0
 A
-21 5 0
+21 8 0
 C
 150 275
 T 11940
@@ -1043,7 +1065,7 @@ straight into a sorcerer's body to strengthen their offensive magic.
 moths that pupated at the lightning-kissed tops of the trees. No pixy cities
 yet remain that produce it.
 ~
-27 mp af 0 23
+27 mp af 0 24
 0 0 0
 11 0
 A
@@ -1051,7 +1073,7 @@ A
 A
 9 1 0
 A
-22 5 0
+22 8 0
 C
 150 275
 T 11940
@@ -1067,7 +1089,7 @@ from the infinitely dark, unseeable void that lies at the heart of the fabric.
 When the cloth is done, it is boiled along with the weaver in a stone cauldron,
 trapping the weaver's soul within. This is considered the greatest honor.
 ~
-27 mp af 0 25
+27 mp af 0 26
 0 0 0
 11 0
 A
@@ -1075,7 +1097,7 @@ A
 A
 9 1 0
 A
-23 5 0
+23 8 0
 C
 150 275
 M
@@ -1097,7 +1119,7 @@ blows even when they should be strong enough to pierce it.
    Moxteel was a late invention of Skycleave, after the fad for enchanted glass
 armor had started to wane.
 ~
-27 mp af 0 22
+27 mp af 0 23
 2 0 0
 2 0
 A
@@ -1105,9 +1127,9 @@ A
 A
 9 1 0
 A
-17 3 0
+17 5 0
 A
-18 2 0
+18 3 0
 C
 150 275
 T 11940
@@ -1296,7 +1318,7 @@ against other fabrics.
 Skycleave, the Shadow Hide immediately began infusing it into every jewel,
 trinket, device, and creature, and she found a different result with each.
 ~
-27 mp aj 0 24
+27 mp aj 0 25
 1 0 0
 7 0
 A
@@ -1304,9 +1326,9 @@ A
 A
 9 1 0
 A
-17 2 0
+17 4 0
 A
-21 2 0
+21 4 0
 C
 150 275
 T 11940
@@ -1324,7 +1346,7 @@ before.
 cities. There existed a particular technique for unraveling the coccoon while
 the pupa slept soundly, able to emerge without cutting the precious silk.
 ~
-27 mp aj 0 26
+27 mp aj 0 27
 0 0 0
 11 0
 A
@@ -1332,9 +1354,9 @@ A
 A
 9 1 0
 A
-17 2 0
+17 4 0
 A
-22 2 0
+22 4 0
 C
 150 275
 M
@@ -1357,7 +1379,7 @@ release an ear-piercing screech that leaves you momentarily stunned.
 placed into an ever-burning fire, of which few are known, and the sheer value
 of soulcloth is such that this has never been tested.
 ~
-27 mp aj 0 27
+27 mp aj 0 28
 0 0 0
 11 0
 A
@@ -1365,9 +1387,9 @@ A
 A
 9 1 0
 A
-7 2 0
+7 4 0
 A
-23 2 0
+23 4 0
 C
 150 275
 M
@@ -1388,17 +1410,17 @@ light.
    Moxteel took its name from the way its thinness and exceptional durability
 make a mockery of traditional steel.
 ~
-27 mp aj 0 25
+27 mp aj 0 26
 2 0 0
 2 0
 A
 2 1 0
 A
-17 2 0
+17 4 0
 A
-18 1 0
+18 3 0
 A
-13 1 0
+13 2 0
 C
 150 275
 M
@@ -2192,7 +2214,7 @@ tremendous manaflows for enormous spells, it also contains a number of wands of
 true power. These relics of an earlier age have brought both renown and ruin to
 even the greatest wizards of myth and legend.
 ~
-1 mpwx ano 0 6
+1 mpwx ao 0 7
 0 1 22
 0 0
 A
