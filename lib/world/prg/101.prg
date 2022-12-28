@@ -1,7 +1,7 @@
 #10105
-Clear the Banditos~
-   Scouts report banditos hiding out in the ruins. That poses a threat to the
-security of the empire. Clear out each of the banditos to secure your
+Clear the Bandits~
+   Scouts report bandits hiding out in the ruins. That poses a threat to the
+security of the empire. Clear out each of the bandits to secure your
 territory.
 ~
 1 4 0 5 c
