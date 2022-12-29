@@ -1400,6 +1400,84 @@ bool validate_spawn_location(room_data *room, bitvector_t spawn_flags, int x_coo
 //// MOB SCALING /////////////////////////////////////////////////////////////
 
 /**
+* Checks if a mob can be reset due to being out of combat (or when called by
+* a script). This involves healing it and, usually, un-scaling it.
+*
+* @char_data *ch The character to check for a reset/heal.
+* @param bool force If TRUE, will ignore combat and other factors that would otherwise prevent it.
+* @return bool TRUE if it was reset, FALSE if not.
+*/
+bool check_reset_mob(char_data *ch, bool force) {
+	struct instance_data *inst;
+	char_data *ch_iter;
+	bool found;
+	int lev;
+	
+	if (!IS_NPC(ch)) {
+		return FALSE;	// oops
+	}
+	
+	// things to check first (if not forced)
+	if (!force) {
+		if (GET_POS(ch) < POS_STUNNED || FIGHTING(ch) || GET_FED_ON_BY(ch)) {
+			return FALSE;	// do not reset
+		}
+	
+		// verify not fighting at all
+		found = FALSE;
+		DL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), ch_iter, next_in_room) {
+			if (FIGHTING(ch_iter) == ch) {
+				found = TRUE;
+				break;
+			}
+		}
+		if (found) {
+			return FALSE;	// do not reset: fighting
+		}
+	}
+	
+	// ok: reset me
+	free_mob_tags(&MOB_TAGGED_BY(ch));
+	GET_HEALTH(ch) = GET_MAX_HEALTH(ch);
+	GET_MOVE(ch) = GET_MAX_MOVE(ch);
+	GET_MANA(ch) = GET_MAX_MANA(ch);
+	if (GET_POS(ch) < POS_SLEEPING) {
+		GET_POS(ch) = POS_STANDING;
+	}
+	
+	// and reset scaling if possible:
+	if (GET_CURRENT_SCALE_LEVEL(ch) > 0) {
+		// check for instance
+		inst = get_instance_by_id(MOB_INSTANCE_ID(ch));
+		if (!inst && IS_ADVENTURE_ROOM(IN_ROOM(ch))) {
+			inst = find_instance_by_room(IN_ROOM(ch), FALSE, TRUE);
+		}
+	
+		// check for a level we should use
+		if (MOB_FLAGGED(ch, MOB_NO_RESCALE)) {
+			lev = GET_CURRENT_SCALE_LEVEL(ch);
+		}
+		else if (inst && INST_LEVEL(inst) > 0) {
+			lev = INST_LEVEL(inst);
+		}
+		else {
+			lev = 0;
+		}
+	
+		// always reset level to force re-scaling if flags changed
+		GET_CURRENT_SCALE_LEVEL(ch) = 0;
+	
+		// did we get a level to scale back to
+		if (lev > 0) {	
+			scale_mob_to_level(ch, lev);
+		}
+	}
+	
+	return TRUE;	// did reset
+}
+
+
+/**
 * This ensures that mobs are scaled correctly, and can be called any time
 * two Creatures are attacking each other. It will scale both of them, if they
 * are NPCs.

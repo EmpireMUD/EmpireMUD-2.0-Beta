@@ -2249,6 +2249,7 @@ char *get_informative_color(char_data *ch, bool dismantling, bool unfinished, bo
 
 // mobact.c
 void add_pursuit(char_data *ch, char_data *target);
+bool check_reset_mob(char_data *ch, bool force);
 bool check_scaling(char_data *mob, char_data *attacker);
 void despawn_mob(char_data *ch);
 int determine_best_scale_level(char_data *ch, bool check_group);
