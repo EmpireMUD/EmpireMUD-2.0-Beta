@@ -4416,7 +4416,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					}
 					else if (!str_cmp(field, "unscale_and_reset")) {
 						if (IS_NPC(c)) {
-							check_reset_mob(ch, TRUE);
+							check_reset_mob(c, TRUE);
 						}
 						* str = '\0';
 					}
