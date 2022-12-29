@@ -4414,6 +4414,12 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						}
 						*str = '\0';
 					}
+					else if (!str_cmp(field, "unscale_and_reset")) {
+						if (IS_NPC(c)) {
+							check_reset_mob(ch, TRUE);
+						}
+						* str = '\0';
+					}
 					break;
 				}
 				case 'v': {	// char.v*
