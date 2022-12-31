@@ -1068,6 +1068,7 @@ void delete_instance(struct instance_data *inst, bool run_cleanup) {
 			else {
 				act("$n leaves.", TRUE, mob, NULL, NULL, TO_ROOM);
 				char_to_room(mob, extraction_room);
+				extract_all_items(mob);
 				extract_char(mob);
 			}
 		}

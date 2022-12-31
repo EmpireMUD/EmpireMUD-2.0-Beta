@@ -81,7 +81,7 @@ Included Adventure Zones
 [  104] Magiterranean: Permafrost [10550-10599] (75-125) 18 mobs, 49 objs, 12 rooms
 [  120] Mountain Cave: Red Dragon [10006-10010] DEPRECATED (replaced by 128)
 [  121] The Swamp Hag [10100-10104] DEPRECATED (replaced by 19000)
-[  122] Ruins: Three Banditos [10105-10109] (100-200) 4 mobs, 5 objs, 1 room
+[  122] Ruins: Three Bandits [10105-10109] (100-200) 4 mobs, 5 objs, 1 room
 [  123] Ruins: Thieves [10110-10129] (25-75) 5 mobs, 17 objs, 1 room
 [  125] Ruins: The Goblin Challenge [10200-10224] (50-150) 10 mobs, 24 objs, 1 room
 [  126] Mountain Cave: Flame Dragon [10300-10329] (100-150) 8 mobs, 17 objs, 1 room

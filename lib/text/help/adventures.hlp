@@ -1,31 +1,3 @@
-"BIG LIST OF ADVENTURES THAT DON'T HAVE HELP FILES"
-
-adventures without helps:
-[   50] Tutorial: Royal Planning Office
-[   51] Tutorial: Museum of Early Man
-[   52] Tutorial Quests
-[  101] Magiterranean: The Hidden Garden
-[  102] Magiterranean: Interdimensional Whirlwind
-[  103] Magiterranean: Monsoon Rift
-[  122] Ruins: Three Banditos
-[  123] Ruins: Thieves
-[  125] Ruins: The Goblin Challenge
-[  126] Mountain Cave: Flame Dragon
-[  127] Abandoned Dragon Nest
-[  130] Volcano
-[  140] The Sewer: Ratskins
-[  170] Hamlet of the Undead
-[  180] Misplaced Mother Goose
-[  190] Winter Wonderland
-[  200] Burrow Canyons
-[  201] The Cursed Chalice of Mill Manor
-[  281] Mountain Valley: Molten Fiend
-[  282] Goblin Logging Camp
-[18300] Pyramid: Hidden Chamber of Neferkare
-[18350] Pyramid 2
-[18450] That Dammed River
-[18460] Unstable Portal
-#
 COLOSSUS "CLOCKWORK COLOSSUS" "CLOCK WORK COLOSSUS"
 
 Clockwork Colossus (level 100-200 adventure)
@@ -555,7 +527,7 @@ is still a lot more to do in this adventure once the rescue is complete. Can
 you uncover all of Skycleave's secrets?
 
 The fights in Skycleave are interactive. Watch out for messages with these
-tags: (dodge), (interrupt), (dodge and interrupt), (struggle), (free <name>),
+tags: (dodge), (interrupt), (interrupt and dodge), (struggle), (free <name>),
 and (fastmorph normal).
 
 Encounters in this adventure are designed for levels 150 to 250 and are

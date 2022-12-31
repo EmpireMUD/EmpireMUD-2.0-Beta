@@ -2351,7 +2351,7 @@ the struggle~
 The struggle is real.~
 You're struggling to get free! (struggle)
 ~
-3 p a 0 3
+3 p a 0 4
 0 0 0
 0 5
 C
@@ -2363,6 +2363,7 @@ M
 18
 The struggle ends.~
 T 11885
+T 11966
 S
 #11891
 sap~

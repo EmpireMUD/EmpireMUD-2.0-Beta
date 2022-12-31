@@ -602,6 +602,8 @@ When using field  - The variable returns:
 &cunlink_instance&0 - Disconnects the mob from any adventure instance, meaning
    it will not be cleaned up when the instance closes (e.g. player gets to keep
    a mob that was loaded inside an instance).
+&cunscale_and_reset&0 - Restores the mob to full health and unscales it; it
+   can still scale itself again normally.
 &cvar(name,default)&0 - Gets the value of that var if it exists and gets
    'default' if it doesn't. Default is optional; gets empty string if none.
 &cvarexists()&0 - Returns 1 if remote variable in subfield exists, 0 if not.

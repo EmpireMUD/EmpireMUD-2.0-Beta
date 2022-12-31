@@ -238,7 +238,7 @@ switch %random.3%
 done
 ~
 #10109
-Banditos Start Progression~
+Bandits Start Progression~
 2 g 100
 ~
 if %actor.is_pc% && %actor.empire%
@@ -381,7 +381,7 @@ end
 %purge% %self%
 ~
 #10116
-Banditos spawner~
+Bandits spawner~
 1 n 100
 ~
 * Warning: This script completely ignores spawn limits! Don't use it in instances that reset often
@@ -393,7 +393,7 @@ set Rand %random.100%
 set vnumBerk 10105
 set vnumJorr 10106
 set vnumTranc 10107
-* Probabilities of each number of banditos spawning
+* Probabilities of each number of bandits spawning
 * Treat this as an exclusive interaction list
 set Triple 4
 set Double 30
@@ -401,7 +401,7 @@ set Single 66
 * There is probably a way to do this with a loop...
 eval cumulative %cumulative% + %Triple%
 if (%Rand% <= %cumulative%) && %found% == 0
-  * Spawn all 3 banditos
+  * Spawn all 3 bandits
   %load% mob %vnumBerk%
   %echo% Berk arrives!
   %load% mob %vnumJorr%
@@ -413,7 +413,7 @@ if (%Rand% <= %cumulative%) && %found% == 0
 end
 eval cumulative %cumulative% + %Double%
 if (%Rand% <= %cumulative%) && %found% == 0
-  * Choose a bandito NOT to spawn
+  * Choose a bandit NOT to spawn
   switch %random.3%
     case 1
       * Berk + Jorr
@@ -442,7 +442,7 @@ if (%Rand% <= %cumulative%) && %found% == 0
 end
 eval cumulative %cumulative% + %Single%
 if (%Rand% <= %cumulative%) && %found% == 0
-  * Choose a bandito to spawn
+  * Choose a bandit to spawn
   switch %random.3%
     case 1
       * Berk

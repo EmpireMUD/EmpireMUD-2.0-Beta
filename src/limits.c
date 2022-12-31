@@ -385,9 +385,8 @@ int limit_crowd_control(char_data *victim, int atype) {
 */
 bool point_update_char(char_data *ch) {
 	struct cooldown_data *cool, *next_cool;
-	struct instance_data *inst;
 	obj_data *obj, *next_obj;
-	char_data *c, *chiter;
+	char_data *chiter;
 	bool found;
 	int count;
 	
@@ -493,40 +492,7 @@ bool point_update_char(char_data *ch) {
 	
 	// healing for NPCs -- pcs are in real_update
 	if (IS_NPC(ch)) {
-		if (GET_POS(ch) >= POS_STUNNED && !FIGHTING(ch) && !GET_FED_ON_BY(ch)) {
-			// verify not fighting at all
-			found = FALSE;
-			DL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), c, next_in_room) {
-				if (FIGHTING(c) == ch) {
-					found = TRUE;
-					break;
-				}
-			}
-			
-			if (!found) {
-				// not fighting for a tick? full health! (and reset tags)
-				free_mob_tags(&MOB_TAGGED_BY(ch));
-				GET_HEALTH(ch) = GET_MAX_HEALTH(ch);
-				GET_MOVE(ch) = GET_MAX_MOVE(ch);
-				GET_MANA(ch) = GET_MAX_MANA(ch);
-				if (GET_POS(ch) < POS_SLEEPING) {
-					GET_POS(ch) = POS_STANDING;
-				}
-				
-				// reset scaling if possible...
-				if (!MOB_FLAGGED(ch, MOB_NO_RESCALE)) {
-					inst = get_instance_by_id(MOB_INSTANCE_ID(ch));
-					if (!inst && IS_ADVENTURE_ROOM(IN_ROOM(ch))) {
-						inst = find_instance_by_room(IN_ROOM(ch), FALSE, TRUE);
-					}
-					// if no instance or not level-locked
-					if (!inst || INST_LEVEL(inst) <= 0) {
-						GET_CURRENT_SCALE_LEVEL(ch) = 0;
-					}
-				}
-			}
-		}
-		else if (GET_POS(ch) < POS_STUNNED) {
+		if (!check_reset_mob(ch, FALSE) && GET_POS(ch) < POS_STUNNED) {
 			GET_HEALTH(ch) -= 1;
 			update_pos(ch);
 			if (GET_POS(ch) == POS_DEAD) {

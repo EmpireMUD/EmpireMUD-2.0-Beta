@@ -232,8 +232,8 @@ Whatever draws them to the tower, they must be stopped before they find it. But
 by a stroke of luck, the goblin warchief is stuck in the pixy maze! Hunt down
 the one called 'The Fox' and ensure they don't make it out of that maze alive.
    Once you've washed the blood off your weapon, look for someone in the tower
-who wants to hear about this. This quest cannot be completed if the second
-floor has already been rescued.
+who wants to hear about this. To do this quest, you must find The Fox before
+the second floor has been rescued.
 ~
    'I dare say,' old Huberus says as she cleans her thick glasses on the edge
 of her robe. 'John, upstairs, is always telling me his theories on the goblins.
@@ -271,15 +271,15 @@ than flee the tower, she has created some sort of enchanted maze that blocks
 all access to the upper levels.
    The pixy queen, it seems, desperately wants freedom but cannot leave the
 tower. Once you have found a way to set her free, look for someone in the tower
-who wants to talk about it. This quest cannot be completed if the second floor
-has already been rescued.
+who wants to talk about it. To do this quest, you must find the pixy queen
+before the second floor has been rescued.
 ~
    You tell Watcher Annaca what the pixy queen said as she died and Annaca
 thinks on it for a moment.
    'The pixies never seem to try to escape. I plum thought they liked it here,'
 she says. 'And what did she mean by that last part... 'in time'?'
 ~
-26 ei 150 250 -1
+27 ei 150 250 -1
 A
 1 11900
 D 11816
@@ -295,6 +295,8 @@ Z
 1 11910
 Z
 1 11891
+Z
+1 11810
 S
 #11820
 Skycleave: Queen's Way~
@@ -465,7 +467,8 @@ repository sits unopened.
 mercenaries on the third floor. Share the treasure inside with them. After it's
 done and the third floor has been rescued, find someone in the Lich Labs who
 wants to discuss it.
-   This quest cannot be completed if the third floor has already been rescued.
+   To do this quest, you must find the unopened repository before the third
+floor has been rescued.
 ~
    'My ETERNAL gratitude,' Scaldorran howls, with just a little too much
 emphasis on eternal. He picks up the ancient stone lamp that serves as his
@@ -579,8 +582,7 @@ famous for being the sole survivor of many a street fight and duel. His assault
 on the tower cannot stand; he cannot be allowed to wield its magic.
    Reach the third floor of the tower and personally dispose of Trixton Vye and
 his two lieutenants, Bleak Rojjer and Lady Kara Virduke. After it's done, look
-for someone in the tower with more information. This quest cannot be completed
-if the third floor has already been rescued.
+for someone in the tower with more information.
 ~
    Scaldorran alights on the slate floor and his flailing linen wrappings
 tighten and settle until he looks more mummy than lich, though his eyes and
@@ -631,7 +633,8 @@ pure magic that thrives in the dark. And it is more dangerous than you know.
 tower. It is magic without form; life without limit. Such a thing must never be
 allowed free. After you defeat it, look for someone in the tower who is
 interested in discussing it.
-   This quest cannot be completed if the fourth floor has already been rescued.
+   To do this quest, you must face the Shadow Ascendant before the fourth floor
+has been rescued. Then, finish the rescue and find the Grand High Sorcerer.
 ~
    You stop Grand High Sorcerer Celiya and begin to tell her about your
 fateful encounter with the Shadow Ascendant.
@@ -852,9 +855,9 @@ third floor, Grand High Sorcerer Knezz remained above to protect the tower's
 greatest relics. But all contact with him was lost and there are dark portents
 regarding his fate. Whatever else happens, Knezz must survive.
    Reach the top floor of the Tower Skycleave, engage Knezz's attacker, and
-save the venerated sorcerer before it's too late. Speak to him after you finish
-rescuing the tower. This quest cannot be completed if the fourth floor has
-already been rescued.
+save the venerated sorcerer before it's too late. To do this quest, you must
+find Knezz before he has been rescued. Speak to him after you finish rescuing
+the tower.
 ~
    Knezz's voice shakes as much as his hands as he thanks you for your help.
    'I feel unimaginable gratitude that you have come to my rescue,' he says.
@@ -891,8 +894,10 @@ be lost that this can never be allowed to happen.
    Enter the tower, ascend its ever-spiraling walkway, defeat the shadow, and
 take on Mezvienne the Enchantress. After all that, engage the lion and see if
 you can end this threat for all time.
-   After it's done, find someone in the tower who would like to discuss it.
-This quest cannot be completed if the fourth floor has already been rescued.
+   To do this quest, you must find and face the lion before the fourth floor
+has been rescued. Afterwards, finish the rescue and then find someone in the
+tower who would like to discuss it (they will only discuss it once the rescue
+is complete).
 ~
    Mageina tilts the brim of her oversized black hat up with her wand and peeks
 out at you from underneath. She stands perfectly still for a second as her eyes

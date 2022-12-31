@@ -205,10 +205,10 @@ This item spawns 1-3 thieves then purges itself.
 T 10115
 S
 #10116
-spawner banditos~
-the banditos spawner~
-The banditos spawner isn't working properly.~
-This item spawns 1-3 banditos then purges itself.
+spawner bandits~
+the bandits spawner~
+The bandits spawner isn't working properly.~
+This item spawns 1-3 bandits then purges itself.
 ~
 3 0 0 0 4
 0 0 0

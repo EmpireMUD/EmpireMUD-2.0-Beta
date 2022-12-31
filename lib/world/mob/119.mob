@@ -3,7 +3,7 @@ spirit faded~
 the faded spirit~
 A faded spirit lingers in the air.
 ~
-150 250 bdJ n 3
+150 250 bdJ nG 3
 0 0 0 15
 D
    The spirit fades in and out as moves around the room, visible against the
@@ -455,7 +455,7 @@ apprentice kayla~
 Apprentice Kayla~
 Apprentice Kayla is on her bed, writing something.
 ~
-150 250 dvxJ n 3
+150 250 bdvxJ n 3
 2 0 0 15
 D
    Kayla is dressed in simple white apprentice robes. She wears her hair in
@@ -799,7 +799,7 @@ sorceress grand high~
 the Grand High Sorceress~
 The Grand High Sorceress sits on her desk, legs crossed. (difficulty)
 ~
-150 250 bdhxyzJ coDE 3
+150 250 bdhxyzJ coDEG 3
 2 0 0 22
 D
    The sorceress sits on top of her desk, legs crossed in front of her,
@@ -1064,7 +1064,7 @@ water first embodiment living~
 the First Water~
 You are surrounded by the living embodiment of the First Water! (difficulty)
 ~
-150 250 bdhyzDJ chDE 5
+150 250 bdhyzDJ chDEG 5
 0 0 0 14
 D
    The water on all sides of you is alive! You have found yourself trapped in
@@ -1280,8 +1280,8 @@ otherworlder tall blue person~
 the otherworlder~
 A tall, blue person is pulling at the chains that hold it to the floor.
 ~
-150 250 bdvxJ n 3
-2 0 0 15
+150 250 bdvxJ nG 3
+0 0 0 15
 D
    The otherworlder is taller than a human, with periwinkle skin dappled with
 white speckles. It has no hair or nose, but four wide-set round black eyes that
@@ -1369,7 +1369,7 @@ scaldorran lich~
 the Lich Scaldorran~
 Scaldorran the Lich twists and curls in the air.
 ~
-150 250 bdvxJ n 3
+150 250 bdvxJ nG 3
 1 0 0 15
 D
    Scaldorran is a mass of tattered gray linen wraps, slithering and writhing
@@ -1568,7 +1568,7 @@ skeleton~
 the skeleton~
 A skeleton is picking bits of flesh off its bones.
 ~
-150 250 bdJ n 3
+150 250 bdJ nG 3
 0 0 0 15
 D
    The skeleton is seated on top of a work bench, perplexed by several spare
@@ -1612,7 +1612,7 @@ Weyonomon spirit apprentice~
 the spirit of Weyonomon~
 The spirit of Apprentice Weyonomon is channeling a spell. (list)
 ~
-150 250 bdJ n 3
+150 250 bdJ nG 3
 1 0 0 15
 D
    Weyonomon is -- or rather, was -- a promising young apprentice. He still
@@ -1784,7 +1784,7 @@ goef oreonic rock creature pitch black~
 Goef the Oreonic~
 A pitch black rock creature stands in the center of the room. (attune)
 ~
-150 250 bdxJ n 3
+150 250 bdxJ nG 3
 0 0 0 5
 D
    It stands in the center of the room, sometimes so still that it looks like a
@@ -1861,7 +1861,7 @@ guard headless ghostly~
 a headless guard~
 A ghostly, headless guard stands with his sword ready.
 ~
-75 100 bdhoqt 0 3
+75 100 bdhoqt G 3
 1 0 0 1
 D
    The ghost stands in full armor and regalia. Indeed, he's dressed in
@@ -2677,7 +2677,7 @@ renegade pixy~
 a renegade pixy~
 A pixy renegade swoops down from above!
 ~
-100 150 dxzA 0 1
+100 150 dxzA G 1
 2 0 45 28
 D
    The moth-like little imp won't seem to leave you alone. You duck as it flies
@@ -2806,7 +2806,7 @@ trolley cleaning~
 the cleaning trolley~
 A cleaning trolley is parked in the middle of the office.
 ~
-150 250 bdJ n 3
+150 250 bdJ nG 3
 0 0 0 15
 D
    The little trolley is equipped with a bucket and mob, some sponges, a large
@@ -3750,6 +3750,7 @@ emote $n takes a deep bow.~
 T 11810
 T 11840
 T 11981
+T 11803
 S
 #11972
 crowd~
@@ -3997,7 +3998,7 @@ moth~
 the moth~
 There is a moth on the wall.
 ~
-1 1 bdj mn 3
+1 1 bdj mnG 3
 0 0 2 15
 D
    The small moth sits motionless on the wall, its silvery wings folded down in
@@ -4077,7 +4078,7 @@ pixy little~
 a little pixy~
 A little pixy is fluttering about.
 ~
-1 1 bdoD mn 1
+1 1 bdoD mnG 1
 0 0 2 15
 D
    When it moves, this little pixy is little more than a flutter of silvery
@@ -4398,7 +4399,7 @@ swab souvenir~
 a souvenir swab~
 A souvenir swab is trying to clean the ground.
 ~
-1 1 bdoD n 2
+1 1 bdoD nG 2
 0 0 36 15
 D
    The swab is little more than a poplar handle and a dense mop of white yarn,
@@ -4428,7 +4429,7 @@ wand liberated~
 a liberated wand~
 A liberated wand swishes and flicks in the air.
 ~
-1 1 bdoD n 1
+1 1 bdoD nG 1
 0 0 27 15
 D
    The wand has freed itself of its master and now makes its own decisions,
@@ -4448,7 +4449,7 @@ doorstop stop enchanted~
 an enchanted doorstop~
 An enchanted doorstop is scampering around.
 ~
-1 1 bdoD n 1
+1 1 bdoD nG 1
 0 0 71 15
 D
    The doorstop is wedge-shaped and looks to be cast iron, though it's old and
@@ -4479,7 +4480,7 @@ shadow hiding~
 the hiding shadow~
 A shadow is hiding here.
 ~
-1 1 bdoD dn 1
+1 1 bdoD dnG 1
 0 0 24 15
 D
    You have managed to find a shadow that doesn't belong. It's small, it's
@@ -4496,7 +4497,7 @@ cloak clingy fancy~
 a clingy cloak~
 A fancy cloak is floating here.
 ~
-1 1 bdoD n 1
+1 1 bdoD nG 1
 0 0 27 15
 D
    At first glance it looks to be a fairly ordinary traveling cloak. But they
@@ -4533,7 +4534,7 @@ footstool loyal stool~
 a loyal footstool~
 A loyal footstool is hopping around.
 ~
-1 1 bdoD n 1
+1 1 bdoD nG 1
 0 0 14 15
 D
    The footstool is a plus little square with deep purple fabric and mahogany
@@ -4574,7 +4575,7 @@ water bug waterbug large~
 a water bug~
 A large bug made of water pokes at you with its antennae.
 ~
-1 1 bdoD n 2
+1 1 bdoD nG 2
 0 0 2 9
 D
    It's hard to take your eyes off of the odd creature; it is both hideous and
@@ -4606,7 +4607,7 @@ goblin caged~
 a caged goblin~
 A goblin in a cage is walking around.
 ~
-1 1 bdoD n 1
+1 1 bdoD nG 1
 0 0 99 15
 D
    The tiny, green-skinned creature is trapped in an equally tiny cage, all
@@ -4671,13 +4672,19 @@ $n sings, 'Straight outta Goblin, crazy featherplucker named Filks, from the gan
 M
 0
 $n sings, 'Desperate goblin... Why don't you come to your senses? You've been out ridin' fences for so long now...'~
+M
+0
+$n sings, 'And I said, what about, the ashes of history, and I said, well that's, one thing we've got.'~
+M
+0
+$n sings, 'Gobbrabakh of Orka, I was a snowball in hell... Gobbrabakh of Orka, a jailer trapped in his cell.'~
 S
 #11997
 fan adoring~
 an adoring fan~
 An adoring fan is floating here.
 ~
-1 1 bdoD n 1
+1 1 bdoD nG 1
 0 0 27 15
 D
    This pretty little folded paper fan wafts around in the air, stopping on
@@ -4694,7 +4701,7 @@ goblin little~
 a little goblin~
 A little goblin is out for a jaunt.
 ~
-1 1 bdoD n 1
+1 1 bdoD nG 1
 1 0 95 15
 D
    The verdant little guy seems happy -- even mirthful -- as he walks around in
@@ -4731,7 +4738,7 @@ ball crystal~
 a crystal ball~
 A crystal ball is sitting on the ground.
 ~
-1 1 bdoD n 1
+1 1 bdoD nG 1
 0 0 21 15
 D
 The crystal ball shows you fantastic things when you look at it.
