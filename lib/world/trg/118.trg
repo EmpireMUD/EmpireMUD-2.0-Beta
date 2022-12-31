@@ -596,6 +596,7 @@ nop %mob.remove_mob_flag(HARD)%
 nop %mob.remove_mob_flag(GROUP)%
 if %diff% == 1
   * Then we don't need to do anything
+  %echo% ~%self% has been set to Normal.
 elseif %diff% == 2
   %echo% ~%self% has been set to Hard.
   nop %mob.add_mob_flag(HARD)%
@@ -612,10 +613,8 @@ end
 if %mob.aff_flagged(!ATTACK)%
   dg_affect %mob% !ATTACK off
 end
-* if I was scaled before, need to rescale me
-if %self.is_scaled%
-  %scale% %self% %self.level%
-end
+* unscale and restore me
+nop %self.unscale_and_reset%
 * mark me as scaled
 set scaled 1
 remote scaled %self.id%
@@ -2103,10 +2102,10 @@ elseif %mode% == setup
   while %ch%
     set ok 0
     if %all%
-      if %self.is_enemy(%ch%)% || %self.is_pc%
+      if %self.is_enemy(%ch%)% || %ch.is_pc%
         set ok 1
-      elseif %self.leader%
-        if %self.leader.is_pc%
+      elseif %ch.leader%
+        if %ch.leader.is_pc%
           set ok 1
         end
       end
@@ -2253,11 +2252,11 @@ if %no_need%
   if %type% == dodge
     %send% %actor% You dodge out of the way... of nothing!
     %echoaround% %actor% ~%actor% leaps out of the way of nothing in particular.
-    dg_affect #11812 %actor% DODGE -%penalty% 30
+    dg_affect #11812 %actor% DODGE -%penalty% 20
   elseif %type% == interrupt
     %send% %actor% You look for something to interrupt...
     %echoaround% %actor% ~%actor% looks around for something...
-    dg_affect #11813 %actor% DODGE -%penalty% 30
+    dg_affect #11813 %actor% DODGE -%penalty% 20
   end
   halt
 end
@@ -2304,8 +2303,8 @@ switch %self.vnum%
       %at% %maze% %echo% &&m%shield.shortdesc% flickers and fades!&&0
       %purge% %shield%
     end
-    %echo% &&0The pixy queen sputters as her power fades and a look of shock -- and peace -- crosses her face.&&0
-    say Thank you for this release, be it ever so brief. We shall meet... again... in time.
+    %echo% &&mThe pixy queen sputters as her power fades and a look of shock -- and peace -- crosses her face.&&0
+    %echo% As she dies, you hear the pixy queen say, 'Thank you for this release, be it ever so brief. We shall meet... again... in time.'
     * dies with death-cry
   break
   case 11847
@@ -2336,6 +2335,18 @@ switch %self.vnum%
   break
   case 11849
     * Trixton Vye: complete floor
+    set ch %actor%
+    if %ch%
+      if %ch.is_npc% && %ch.leader%
+        set ch %ch.leader%
+      end
+      if %ch.is_pc%
+        * mark who did this
+        set spirit %instance.mob(11900)%
+        set finish3 %ch.name%
+        remote finish3 %spirit.id%
+      end
+    end
     %load% mob 11897
   break
   case 11863
@@ -3093,12 +3104,13 @@ if %self.vnum% == 11933
   wait 9 sec
   %echo% ~%annelise% sighs.
   wait 3 sec
-  say By the Black Domain, by all humane, let him regain... Er, un-detain the plain Dylane!
+  %force% %annelise% say By the Black Domain, by all humane, let him regain... Er, un-detain the plain Dylane!
   wait 1
   %echo% There's a blinding flash from Annelise's staff as she hits it on the floor one last time...
   * convert to boy
   detach 11935 %self.id%
   detach 11934 %self.id%
+  %mod% %self% sex male
   %mod% %self% keywords Dylane younger boy apprentice
   %mod% %self% shortdesc Dylane the Younger
   %mod% %self% longdesc A boy of no more than fourteen stands in the center of the room.
@@ -3171,6 +3183,7 @@ if %mob.vnum% == 11829
   if %diff% >= 3
     nop %mob.add_mob_flag(GROUP)%
   end
+  nop %mob.unscale_and_reset%
 end
 * check triggers
 set ch %self.room.people%
@@ -3685,8 +3698,8 @@ elseif %move% == 2 && !%self.aff_flagged(BLIND)%
   wait 1
   set cycle 1
   eval wait 8 - %diff%
-  while %cycle% <= %diff% + 1
-    set targ %random.enemy%
+  set targ %random.enemy%
+  while %targ% && %cycle% <= %diff% + 1
     set targ_id %targ.id%
     skyfight setup dodge %targ%
     %send% %targ% &&m**** &&Z~%self% is aiming a knife at you! ****&&0 (dodge)
@@ -3708,6 +3721,7 @@ elseif %move% == 2 && !%self.aff_flagged(BLIND)%
     end
     skyfight clear dodge
     eval cycle %cycle% + 1
+    set targ %random.enemy%
   done
 end
 * in case
@@ -4654,8 +4668,8 @@ if %move% == 1
   wait 1
   set cycle 1
   eval wait 8 - %diff%
-  while %cycle% <= (2 * %diff%)
-    set targ %random.enemy%
+  set targ %random.enemy%
+  while %targ% && %cycle% <= (2 * %diff%)
     set targ_id %targ.id%
     skyfight setup dodge %targ%
     %send% %targ% &&m**** The hairs on your neck stand up... ****&&0 (dodge)
@@ -4680,6 +4694,7 @@ if %move% == 1
     end
     skyfight clear dodge
     eval cycle %cycle% + 1
+    set targ %random.enemy%
   done
   wait 8 s
 elseif %move% == 2 && !%self.aff_flagged(BLIND)%
@@ -6882,7 +6897,7 @@ switch %line%
   case 3
     %echo% A vase shatters as Barrosh throws it against the wall as hard as he can!
     %at% i11862 %echo% You hear the sound of something shattering against the wall from the office to the east.
-    %at% i11867 %echo% You hear the sound of something shattering against the wall out in the office.
+    %at% i11867 %echo% You hear the sound of something shattering against the wall in the office.
   break
   case 4
     say I... will... burn you all down!
@@ -8862,6 +8877,11 @@ while %cycles_left% >= 0
   end
   eval cycles_left %cycles_left% - 1
 done
+* mark who did this
+set spirit %instance.mob(11900)%
+set finish2 %actor.name%
+remote finish2 %spirit.id%
+* and phase transition
 %load% mob 11896
 %purge% %self%
 ~
@@ -9030,6 +9050,8 @@ end
 set spirit %instance.mob(11900)%
 set diff2 %diff%
 remote diff2 %spirit.id%
+set start2 %actor.name%
+remote start2 %spirit.id%
 * Load mobs
 %at% i11810 skygobpix %diff% g  * trash mob
 %at% i11811 skygobpix %diff% g  * trash mob
@@ -9097,6 +9119,8 @@ end
 set spirit %instance.mob(11900)%
 set diff3 %diff%
 remote diff3 %spirit.id%
+set start3 %actor.name%
+remote start3 %spirit.id%
 * Load mobs
 %at% i11834 %load% mob 11830  * High Master Caius (phase A dummy)
 %at% i11835 %load% mob 11834  * Otherworlder (chained)
@@ -9163,6 +9187,8 @@ end
 set spirit %instance.mob(11900)%
 set diff4 %diff%
 remote diff4 %spirit.id%
+set start4 %actor.name%
+remote start4 %spirit.id%
 * Load mobs
 %at% i11865 %load% mob 11859  * Page Sheila
 %at% i11865 %load% mob 11862  * Apprentice Thorley

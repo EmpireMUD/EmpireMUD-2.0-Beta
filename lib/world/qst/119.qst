@@ -592,7 +592,7 @@ slowly, a chant builds among the spectators, louder and louder, until it grows
 into a cheer. You can't make out what they're saying -- or you can't understand
 it -- but they seem thrilled at your performance in the arena.
 ~
-14 ei 150 250 -1
+15 ei 150 250 -1
 A
 1 11974
 P
@@ -609,7 +609,7 @@ W+
 3 11958 0 1 a
 Defeat the Champion of Orka~
 Z
-3 11991
+3 11992
 S
 #11993
 Skycleave: Endless River~

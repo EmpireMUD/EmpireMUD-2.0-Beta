@@ -14,7 +14,7 @@ T 11810
 S
 #11801
 Dylane trense~
-Dylane~
+Dylane of Trense~
 Dylane of Trense is here, looking around.
 ~
 150 250 bdvHJ nK 3
@@ -681,7 +681,7 @@ pixy queen majestic~
 the pixy queen~
 A majestic pixy queen dazzles you with blinding sparkles!
 ~
-150 250 abdxEJ c 3
+150 250 abdxEJ cG 3
 2 0 0 28
 D
    The pixy queen is, at first, scarcely more than a colorful sparkle of light.
@@ -734,7 +734,7 @@ pixy~
 a pixy~
 A pixy has escaped!
 ~
-150 250 abdxIJ c 1
+150 250 abdxIJ cG 1
 0 0 0 28
 D
    The little pixy is no larger than a mouse. It flies on silvery butterfly
@@ -1223,7 +1223,7 @@ otherworlder~
 an otherworlder~
 An escaped otherworlder is barreling through!
 ~
-150 250 bdzJ 0 3
+150 250 bdzJ G 3
 0 0 37 15
 D
    The otherworlder hunches as it runs to avoid hitting its head. It's taller
@@ -1355,7 +1355,7 @@ shimmer slight goef~
 the shimmer~
 There's a slight shimmer in the air.
 ~
-150 250 dxJ dn 3
+150 250 dxJ dnG 3
 0 0 27 5
 D
    You first catch the shimmer out of the corner of your eye and almost dismiss
@@ -1377,7 +1377,7 @@ otherworlder person tall blue~
 an otherworlder~
 A tall, blue person is pulling at the chains that hold it to the floor!
 ~
-150 250 bdJ n 3
+150 250 bdJ nG 3
 0 0 0 15
 D
    The otherworlder is taller than a human, with periwinkle skin dappled with
@@ -1431,7 +1431,7 @@ scaldorran lich~
 the Lich Scaldorran~
 The Lich Scaldorran howls as he twists and writhes in the air!
 ~
-150 250 bdvxJ n 3
+150 250 bdvxJ nG 3
 1 0 0 15
 D
    A bone-chilling howl trickles from your ears, down your spine, into your
@@ -1510,7 +1510,7 @@ Weyonomon spirit apprentice~
 the spirit of Weyonomon~
 The spirit of Apprentice Weyonomon is wandering, listless.
 ~
-150 250 dJ n 3
+150 250 dJ nG 3
 1 0 27 15
 D
    Weyonomon is -- or rather, was -- a promising young apprentice. He still
@@ -2152,7 +2152,7 @@ Trixton Vye~
 Trixton Vye~
 Trixton Vye is searching for something.
 ~
-150 250 bdvyEIJ chE 3
+150 250 bdvyEIJ chEG 3
 1 0 0 5
 D
    When you enter the room, you do not initially notice Trixton Vye. It's not
@@ -2227,7 +2227,7 @@ corpse reanimated~
 a reanimated corpse~
 A reanimated corpse is stumbling around the lab.
 ~
-100 250 abdhzJ 0 3
+100 250 abdhzJ G 3
 0 0 0 15
 D
    The corpse is dirty, but well-dressed. At least, the parts of it that are
@@ -2257,7 +2257,7 @@ throne flying~
 a flying throne~
 A flying throne flaps just above the ground.
 ~
-50 50 den m 3
+50 50 den mG 3
 0 0 27 10
 D
    The ancient wooden throne is made mostly from pitch black ebony, though the
@@ -2277,7 +2277,7 @@ shadow elemental gloomspring spring~
 a gloomspring elemental~
 A shadow casts on the ground from nowhere in particular.
 ~
-1 1 bdoD n 2
+1 1 bdoD nG 2
 0 0 30 28
 D
    At first glance, there seems to be an extra person -- one shadow that
@@ -2315,7 +2315,7 @@ alpaca fluidic~
 a fluidic alpaca~
 A fluidic alpaca sloshes past you!
 ~
-150 250 bdJ n 3
+150 250 bdJ nG 3
 0 0 14 15
 D
    The fluffy alpaca is made of pure water; you can see right through it! It
@@ -2330,7 +2330,7 @@ dragon water~
 a water dragon~
 A dragon made of water flows past you!
 ~
-150 250 bdJ n 3
+150 250 bdJ nG 3
 0 0 5 15
 D
    The water dragon is nearly the height of a pony but the length of a sailing
@@ -2346,7 +2346,7 @@ hawk liquiform~
 a liquiform hawk~
 A liquiform hawk soars past you!
 ~
-150 250 bdJ mn 3
+150 250 bdJ mnG 3
 0 0 25 15
 D
    The elegant hawk is transparent, made only of water. Behind it, the wall
@@ -2363,7 +2363,7 @@ lion aqueous~
 an aqueous lion~
 An aqueous lion is running through!
 ~
-150 250 bdJ n 3
+150 250 bdJ nG 3
 0 0 11 15
 D
    This majestic lion is made of pure water, sloshing as it ambles along,
@@ -2379,7 +2379,7 @@ unicorn water sparkling~
 a unicorn of sparkling water~
 A unicorn made of sparkling water is running through!
 ~
-150 250 bdJ n 3
+150 250 bdJ nG 3
 0 0 12 15
 D
    This stunning unicorn is made of nothing but sparkling water! It would be a
@@ -2429,7 +2429,7 @@ barrosh high sorcerer~
 Barrosh~
 High Sorcerer Barrosh is kneeling on the floor.
 ~
-150 250 bdvxEJ n 3
+150 250 bdvxEJ nG 3
 1 0 0 15
 D
    Barrosh looks disheveled, kneeling on the floor in his violet high sorcerer
@@ -2466,7 +2466,7 @@ shadow ascendant mezvienne shade~
 the Shadow Ascendant~
 The Shadow Ascendant looms over the chamber as it draws more and more power!
 ~
-150 250 bdhxyJ choE 3
+150 250 bdhxyJ choEG 3
 0 0 0 20
 D
    The shade, once merely a projection of the powerful enchantress Mezvienne,
@@ -2568,7 +2568,7 @@ vortex enormous~
 the vortex~
 An enormous vortex has engulfed the top of the tower!
 ~
-150 250 bd n 3
+150 250 bd nG 3
 0 0 0 15
 D
 You can't see into the vortex... it's too strong!
@@ -2580,7 +2580,7 @@ Mezvienne enchantress~
 Mezvienne~
 Mezvienne the Enchantress clasps her head and doubles over in pain.
 ~
-150 250 bdvxEJ n 3
+150 250 bdvxEJ nG 3
 2 0 0 15
 D
    Mezvienne screams as she clasps her head, her body twirling almost aimlessly
@@ -2599,7 +2599,7 @@ barrosh high sorcerer~
 High Sorcerer Barrosh~
 High Sorcerer Barrosh stands with his staff raised high and an anguished look.
 ~
-150 250 bdhvxyzJ cDE 3
+150 250 bdhvxyzJ cDEG 3
 1 0 0 19
 D
    Barrosh takes a menacing position as you enter and seems to be muttering
@@ -2653,7 +2653,7 @@ Mezvienne shade shadow~
 the Shade of Mezvienne~
 The Shade of Mezvienne surrounds Knezz like a phantom.
 ~
-150 250 bdhJ cCDE 3
+150 250 bdhJ cCDEG 3
 0 0 0 7
 D
    The Shade is lithe, feminine, even graceful as it swirls back and forth
@@ -2744,7 +2744,7 @@ Mezvienne enchantress~
 Mezvienne the Enchantress~
 Mezvienne the Enchantress hovers above the tower as she channels the heartwood.
 ~
-150 250 bdhvxyDJ cDE 3
+150 250 bdhvxyDJ cDEG 3
 2 0 0 21
 D
    The enchantress's long gossamer gown blows madly in the wind as she floats
@@ -2845,7 +2845,7 @@ lion time skithe ler-wyn lerwyn~
 the Lion of Time~
 Skithe Ler-Wyn, the Lion of Time, has erupted from Mezvienne's limp body!
 ~
-150 250 bdhyzEJ cE 3
+150 250 bdhyzEJ cEG 3
 2 0 0 10
 D
    Mezvienne the Enchantress floats limp and bloody in the time stream, her
@@ -2880,7 +2880,7 @@ Moneryl astrologer royal~
 the astrologer~
 The royal astrologer is kneeling before the throne.
 ~
-150 250 bdoxJ n 3
+150 250 bdoxJ nG 3
 1 0 0 15
 D
    Though the drape of his face shows that days have come and gone since he
@@ -2899,7 +2899,7 @@ envoy~
 the envoy~
 An envoy from Smol Sul-Pik stands before the queen.
 ~
-150 250 bdoxJ n 3
+150 250 bdoxJ nG 3
 2 0 0 15
 D
    The envoy is a short, stout woman, clad in rugged green tree-bast traveling
@@ -2917,7 +2917,7 @@ Nayyul messenger young~
 the young messenger~
 A young messenger stands at attention before the queen.
 ~
-150 250 bdoxJ n 3
+150 250 bdoxJ nG 3
 1 0 0 15
 D
    Even in his wood and glimstone armor, Nayyul looks young, with sharp, smooth
@@ -2937,7 +2937,7 @@ Pelet urborist royal~
 the urborist~
 The royal urborist stands before the queen.
 ~
-150 250 bdoxJ n 3
+150 250 bdoxJ nG 3
 1 0 0 15
 D
    Pelet stands with the hunch of a wizened sage and his voice has a raspy,
@@ -2955,7 +2955,7 @@ Joiago~
 Joiago~
 Joiago is standing here.
 ~
-150 250 dxJ n 3
+150 250 dxJ nG 3
 1 0 86 15
 D
    Joiago stands a full head taller than you, with blue-black hair and hazel
@@ -2978,7 +2978,7 @@ Bastain keeper~
 Keeper Bastain~
 Keeper Bastain is patrolling.
 ~
-150 250 dxJ n 3
+150 250 dxJ nG 3
 1 0 0 15
 D
    Bastain is tall but hunched as he bears a heavy wooden shield over the cape
@@ -2998,7 +2998,7 @@ Veloryan royal guard~
 Veloryan of the Royal Guard~
 Veloryan stands firm in glistering gemstone armor.
 ~
-150 250 bdxJ n 3
+150 250 bdxJ nG 3
 1 0 0 15
 D
    Veloryan stands tall at the left hand of the obsidian throne, unflinching,
@@ -3018,7 +3018,7 @@ Lotte~
 Lotte~
 Lotte is standing here, admiring the city.
 ~
-150 250 dxJ n 3
+150 250 dxJ nG 3
 2 0 0 15
 D
    Lotte is rather short, though she wears stark white hair in a tall beehive
@@ -3042,7 +3042,7 @@ Kym~
 Kym~
 Kym is standing here.
 ~
-150 250 dxJ n 3
+150 250 dxJ nG 3
 2 0 0 15
 D
    Kym is tall and lean, even in the slightly-oversized teal blouse and slacks
@@ -3062,7 +3062,7 @@ tresydion high~
 the High Tresydion~
 The High Tresydion stands with his hands folded.
 ~
-150 250 bdxJ n 3
+150 250 bdxJ nG 3
 1 0 0 15
 D
    The tresydion strikes a large and imposing figure in his leaf-like green
@@ -3080,7 +3080,7 @@ Meket black~
 Black Meket~
 Black Meket is kneeling next to the pool.
 ~
-150 250 bdxJ n 3
+150 250 bdxJ nG 3
 1 0 0 15
 D
    Black Meket rocks back and forth slightly as he leans over the shimmering
@@ -3160,7 +3160,7 @@ Queen image queen's Vehl somber~
 the Queen's image~
 The somber image of Queen Vehl sits atop the throne.
 ~
-150 250 bdxJ n 3
+150 250 bdxJ nG 3
 2 0 0 15
 D
    Though she is blessed with the delicate features of a young maiden, Queen
@@ -3184,7 +3184,7 @@ Tyewa~
 Tyewa~
 Tyewa is kneeling by one of the pools.
 ~
-150 250 bdxJ n 3
+150 250 bdxJ nG 3
 2 0 0 15
 D
    Though she's as tall as anyone you've met here, Tyewa has the soft, young
@@ -3233,7 +3233,7 @@ Torru~
 Torru~
 Torru stands with her arms up and her hands touching the rotted ceiling.
 ~
-150 250 bdxJ n 3
+150 250 bdxJ nG 3
 2 0 0 15
 D
    Torru's face is contorted into a sort of crooked grimace as blood drips from
@@ -3256,7 +3256,7 @@ Nayyur~
 Nayyur~
 Nayyur is kneeling with his head bent low.
 ~
-150 250 bdxJ n 3
+150 250 bdxJ nG 3
 1 0 0 15
 D
    Blood trickles from vicious wounds across Nayyur's back as he slowly rocks
@@ -3275,7 +3275,7 @@ Iskip giant~
 Iskip of Rot and Ruin~
 The giant stands knee-deep in the water, turned away from you. (difficulty)
 ~
-150 250 bdhvxyzDJ chDE 6
+150 250 bdhvxyzDJ chDEG 6
 1 0 0 19
 D
    The giant Iskip is truly huge -- you'd scarcely reach his ankles if he were
