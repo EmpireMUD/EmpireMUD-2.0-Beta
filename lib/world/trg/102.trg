@@ -755,31 +755,33 @@ while %vnum% <= %end_room%
     set last 0
     while %mob%
       set next_mob %mob.next_in_room%
-      if %mob.vnum% >= 10250 && %mob.vnum% <= 10299
-        * wipe difficulty flags
-        nop %mob.remove_mob_flag(HARD)%
-        nop %mob.remove_mob_flag(GROUP)%
-      end
-      if %boss_mobs% ~= %mob.vnum%
-        * scale as boss
-        if %difficulty% == 2
-          nop %mob.add_mob_flag(HARD)%
-        elseif %difficulty% == 3
-          nop %mob.add_mob_flag(GROUP)%
-        elseif %difficulty% == 4
-          nop %mob.add_mob_flag(HARD)%
-          nop %mob.add_mob_flag(GROUP)%
+      if %mob.is_npc%
+        if %mob.vnum% >= 10250 && %mob.vnum% <= 10299
+          * wipe difficulty flags
+          nop %mob.remove_mob_flag(HARD)%
+          nop %mob.remove_mob_flag(GROUP)%
         end
-      elseif %hard_mini% && %mini_mobs% ~= %mob.vnum%
-        * scale as miniboss
-        nop %mob.add_mob_flag(HARD)%
-      end
-      * on normal, remove duplicate mobs
-      if %difficulty% == 1
-        if %mob.vnum% == %last%
-          %purge% %mob%
-        else
-          set last %mob.vnum%
+        if %boss_mobs% ~= %mob.vnum%
+          * scale as boss
+          if %difficulty% == 2
+            nop %mob.add_mob_flag(HARD)%
+          elseif %difficulty% == 3
+            nop %mob.add_mob_flag(GROUP)%
+          elseif %difficulty% == 4
+            nop %mob.add_mob_flag(HARD)%
+            nop %mob.add_mob_flag(GROUP)%
+          end
+        elseif %hard_mini% && %mini_mobs% ~= %mob.vnum%
+          * scale as miniboss
+          nop %mob.add_mob_flag(HARD)%
+        end
+        * on normal, remove duplicate mobs
+        if %difficulty% == 1
+          if %mob.vnum% == %last%
+            %purge% %mob%
+          else
+            set last %mob.vnum%
+          end
         end
       end
       * and loop
