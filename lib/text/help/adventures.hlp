@@ -341,7 +341,7 @@ The Hidden Garden appears as a hole in an Oasis Garden or Shady Garden. You
 must complete some tasks for the gardener to get into the hidden garden, which
 has new crops.
 #
-WHIRLWIND "INTERDIMENSIONAL WHIRLWIND" "WHIRL WIND" "MAGITERRANEAN: INTERDIMENSIONAL WHIRLWIND" "MAGITERRANEAN INTERDIMENSIONAL WHIRLWIND"
+"INTERDIMENSIONAL WHIRLWIND" WHIRLWIND "WHIRL WIND" "MAGITERRANEAN: INTERDIMENSIONAL WHIRLWIND" "MAGITERRANEAN INTERDIMENSIONAL WHIRLWIND"
 
 Magiterranean: Interdimensional Whirlwind
 
@@ -374,6 +374,19 @@ The Professor sells:
   an eagle warrior armor pattern - caster armor
   a blue chameleon armor pattern - pvp/solo armor
 #
+"MISPLACED MOTHER GOOSE" "MOTHER GOOSE"
+
+Misplaced Mother Goose (level 1-25 adventure)
+
+Low-level mobs all over the world carry lost items from children's tales. When
+you find one of these items, start its quest ('quest start <name>'), 'use' the
+item to teleport back to a newbie island, then use the enchanted breadcrumbs
+you receive to return home.
+
+Be sure to set a home first! Use 'home set' in a house you built and own.
+
+See also: CLAIM, HOME, QUEST
+#
 "MONSOON RIFT" "MAGITERRANEAN: MONSOON RIFT" "MAGITERRANEAN MONSOON RIFT"
 
 Magiterranean: Monsoon Rift (level 75-100 adventure)
@@ -381,6 +394,14 @@ Magiterranean: Monsoon Rift (level 75-100 adventure)
 This adventure spawns in deserts and your first hint that it's nearby might be
 the vicious cacti it unleashes. There are multiple ways to solve this adventure
 and seal the rift.
+#
+"MOUNTAIN CAVE: FLAME DRAGON" "MOUNTAIN CAVE FLAME DRAGON" "FLAME DRAGON" "SCORCHED LAND" "SCORCHED TERRAIN"
+
+Mountain Cave: Flame Dragon (level 100-150 adventure)
+
+A flame dragon is burning the countryside! The only way to stop it is to slay
+the dragon. The scorched land will regrow over time, though it may be possible
+to speed it up with magic.
 #
 "OLD GODS" "BINDING CIRCLE"
 
@@ -535,6 +556,16 @@ Design for the bone crown of the primeval:
 
 Hint: Try digging for resources in the base camp or the clearing.
 #
+RATSKINS "RAT SKINS" "The Sewer: Ratskins" "The Sewer Ratskins" "Sewer: Ratskins" "Sewer Ratskins"
+
+The Sewer: Ratskins (level 1-50 adventure)
+
+Many cities have simple sewer systems to prevent waste. This adventure appears
+in any player city. Be sure to bring a light.
+
+This adventure predates the quest system. It has activities that are similar to
+quests, but do not use the quest command.
+#
 "RUINS: THE GOBLIN CHALLENGE" "RUINS THE GOBLIN CHALLENGE" "RUINS: GOBLIN CHALLENGE" "RUINS GOBLIN CHALLENGE" "GOBLIN CHALLENGE" "THE GOBLIN CHALLENGE"
 
 Ruins: The Goblin Challenge (level 50-150 adventure)
@@ -651,5 +682,19 @@ The spirits inside have one quest for each skill tree you've learned. You can
 come back when you learn new skills to complete their tutorials as well.
 
 See also: ADVENTURE, QUEST, TOWER OF SOULS
+#
+VOLCANO
+
+Volcanos form in the mountains. It's best to stay away.
+
+Although they are spawned by the adventure system, volcanos have no NPCs or
+loot.
+#
+"WANDERING DRAGON" "WANDERING WYVERN" "BULL DRAGON" "EMERALD DRAGON" "DRAGON GUARDIAN"
+
+Wandering Dragon (level 125-175 adventure)
+
+These dragons -- including the wandering wyvern, bull dragon, emerald dragon,
+and dragon guardian -- wander far and wide.
 #
 $
