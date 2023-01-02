@@ -333,6 +333,22 @@ on the Halloween candy drops, and disable that global when the holiday is over.
 Start event 18800 at the beginning of October 1; it runs 33 days (to end at the
 end of November 2).
 #
+"HIDDEN GARDEN" "THE HIDDEN GARDEN" "MAGITERRANEAN: THE HIDDEN GARDEN" "MAGITERRANEAN THE HIDDEN GARDEN" "HIDDEN GARDENS"
+
+Magiterranean: The Hidden Garden (level 15+ adventure)
+
+The Hidden Garden appears as a hole in an Oasis Garden or Shady Garden. You
+must complete some tasks for the gardener to get into the hidden garden, which
+has new crops.
+#
+WHIRLWIND "INTERDIMENSIONAL WHIRLWIND" "WHIRL WIND" "MAGITERRANEAN: INTERDIMENSIONAL WHIRLWIND" "MAGITERRANEAN INTERDIMENSIONAL WHIRLWIND"
+
+Magiterranean: Interdimensional Whirlwind
+
+The Interdimensional Whirlwind spreads new crops in a circle. A new one appears
+each month of the year. If you're lucky enough to come across this adventure,
+be sure to harvest some of the crops.
+#
 "LOST TEMPLE" "JUNGLE TEMPLE" "THE LOST TEMPLE"
 
 The Lost Temple (level 125-175 adventure)
@@ -357,6 +373,14 @@ The Professor sells:
   a feathered serpent armor pattern - healer armor
   an eagle warrior armor pattern - caster armor
   a blue chameleon armor pattern - pvp/solo armor
+#
+"MONSOON RIFT" "MAGITERRANEAN: MONSOON RIFT" "MAGITERRANEAN MONSOON RIFT"
+
+Magiterranean: Monsoon Rift (level 75-100 adventure)
+
+This adventure spawns in deserts and your first hint that it's nearby might be
+the vicious cacti it unleashes. There are multiple ways to solve this adventure
+and seal the rift.
 #
 "OLD GODS" "BINDING CIRCLE"
 
@@ -452,7 +476,7 @@ Craft patterns sold by the vendor outside the portal:
   Caster weapon: glacial staff of the Maelstrom pattern
 
 The vendor will only show up once you have at least 14 permafrost tokens and
-can affor his items.
+can afford his items.
 
 Hint: You can find multiple types of seeds when foraging outside the portal.
 #
@@ -510,6 +534,20 @@ Design for the bone crown of the primeval:
   bone crown of the primeval  (Greatness/Charisma, Head, Craft, Jewelry)
 
 Hint: Try digging for resources in the base camp or the clearing.
+#
+"RUINS: THE GOBLIN CHALLENGE" "RUINS THE GOBLIN CHALLENGE" "RUINS: GOBLIN CHALLENGE" "RUINS GOBLIN CHALLENGE" "GOBLIN CHALLENGE" "THE GOBLIN CHALLENGE"
+
+Ruins: The Goblin Challenge (level 50-150 adventure)
+
+Goblins often camp out in ruins. If you find the right ones, fight the goblins
+in order to win the Goblin Challenge.
+#
+"RUINS: THIEVES" "RUINS THIEVES" "THIEVES ADVENTURE"
+
+Ruins: Thieves (level 25-75 adventure)
+
+Thieves often camp out in ruined buildings that aren't patrolled (claimed) by
+any empires.
 #
 SKYCLEAVE "SKY CLEAVE" "TOWER SKYCLEAVE" "THE TOWER SKYCLEAVE" "ASHES OF HISTORY" "TOWER SKYCLEAVE: ASHES OF HISTORY" "THE TOWER SKYCLEAVE: ASHES OF HISTORY" "TOWER SKYCLEAVE ASHES OF HISTORY"
 
@@ -590,5 +628,28 @@ Footwear:
   Healer: hag's slippers pattern
   Caster: hag's pointe shoes pattern
   PVP/Solo: hag's shearling boots pattern
+#
+"TRADE TUTORIAL: MUSEUM OF EARLY MAN" "TRADE TUTORIAL" "MUSEUM OF EARLY MAN"
+
+Trade Tutorial: Museum of Early Man (level 1-50 adventure)
+
+Find this adventure in a cave on the newbie island using the 'nearby museum'
+command. In this adventure, you can learn to do quests, gather resources, and
+craft basic tools.
+
+See also: ADVENTURE, NEARBY, QUEST
+#
+"TUTORIAL QUESTS" "SOULSTREAM" "ENTER THE SOULSTREAM"
+
+Tutorial Quests ("Soulstream", level 1-50 adventure)
+
+This adventure has a short tutorial quest for each of the skill trees.
+
+When you first enter the game at a Tower of Souls, use 'quest start enter' to
+start the "Enter the Soulstream" quest, then 'enter soulstream' to get inside.
+The spirits inside have one quest for each skill tree you've learned. You can
+come back when you learn new skills to complete their tutorials as well.
+
+See also: ADVENTURE, QUEST, TOWER OF SOULS
 #
 $
