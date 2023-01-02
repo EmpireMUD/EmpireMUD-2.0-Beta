@@ -497,19 +497,20 @@ void affect_modify(char_data *ch, byte loc, sh_int mod, bitvector_t bitv, bool a
 					GET_MOVE(ch) = 0;
 				}
 				else if (GET_MOVE_DEFICIT(ch) > 0) {
-					diff = MIN(GET_MOVE_DEFICIT(ch), MAX(0, GET_MOVE(ch) - orig));
+					diff = MAX(0, GET_MOVE(ch) - orig);
+					diff = MIN(GET_MOVE_DEFICIT(ch), diff);
 					GET_MOVE_DEFICIT(ch) -= diff;
 					GET_MOVE(ch) -= diff;
 				}
 			}
 			break;
 		case APPLY_HEALTH:
+			// apply to max
 			SAFE_ADD(GET_MAX_HEALTH(ch), mod, INT_MIN, INT_MAX, TRUE);
 			
-			// prevent from going negative
+			// apply to current
 			orig = GET_HEALTH(ch);
 			SAFE_ADD(GET_HEALTH(ch), mod, INT_MIN, INT_MAX, TRUE);
-			GET_HEALTH(ch) = MAX(1, GET_HEALTH(ch));
 			
 			if (!IS_NPC(ch)) {
 				if (GET_HEALTH(ch) < 1) {	// min 1 on health
@@ -517,7 +518,8 @@ void affect_modify(char_data *ch, byte loc, sh_int mod, bitvector_t bitv, bool a
 					GET_HEALTH(ch) = 1;
 				}
 				else if (GET_HEALTH_DEFICIT(ch) > 0) {
-					diff = MIN(GET_HEALTH_DEFICIT(ch), MAX(0, GET_HEALTH(ch) - orig));
+					diff = MAX(0, GET_HEALTH(ch) - orig);
+					diff = MIN(diff, GET_HEALTH_DEFICIT(ch));
 					diff = MIN(diff, GET_HEALTH(ch)-1);
 					GET_HEALTH_DEFICIT(ch) -= diff;
 					GET_HEALTH(ch) -= diff;
@@ -541,7 +543,8 @@ void affect_modify(char_data *ch, byte loc, sh_int mod, bitvector_t bitv, bool a
 					GET_MANA(ch) = 0;
 				}
 				else if (GET_MANA_DEFICIT(ch) > 0) {
-					diff = MIN(GET_MANA_DEFICIT(ch), MAX(0, GET_MANA(ch) - orig));
+					diff = MAX(0, GET_MANA(ch) - orig);
+					diff = MIN(GET_MANA_DEFICIT(ch), diff);
 					GET_MANA_DEFICIT(ch) -= diff;
 					GET_MANA(ch) -= diff;
 				}

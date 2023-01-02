@@ -3296,11 +3296,13 @@ void heal(char_data *ch, char_data *vict, int amount) {
 	// no negative healing
 	amount = MAX(0, amount);
 	
-	combat_meter_heal_dealt(ch, amount);
-	combat_meter_heal_taken(vict, amount);
+	if (amount > 0) {
+		combat_meter_heal_dealt(ch, amount);
+		combat_meter_heal_taken(vict, amount);
 	
-	// apply heal
-	GET_HEALTH(vict) = MIN(GET_MAX_HEALTH(vict), GET_HEALTH(vict) + amount);
+		// apply heal
+		GET_HEALTH(vict) = MIN(GET_MAX_HEALTH(vict), GET_HEALTH(vict) + amount);
+	}
 	
 	if (GET_POS(vict) <= POS_STUNNED) {
 		update_pos(vict);
