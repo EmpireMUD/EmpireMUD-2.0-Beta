@@ -2010,7 +2010,7 @@ int perform_set(char_data *ch, char_data *vict, int mode, char *val_arg) {
 	int i, iter, on = 0, off = 0, value = 0;
 	empire_data *emp;
 	room_vnum rvnum;
-	char output[MAX_STRING_LENGTH], oldname[MAX_INPUT_LENGTH], newname[MAX_INPUT_LENGTH];
+	char output[MAX_STRING_LENGTH], oldname[MAX_INPUT_LENGTH], newname[MAX_INPUT_LENGTH], temp[MAX_STRING_LENGTH];
 	char_data *alt;
 	bool file = FALSE;
 
@@ -2052,7 +2052,7 @@ int perform_set(char_data *ch, char_data *vict, int mode, char *val_arg) {
 	}
 	else if (set_fields[mode].type == NUMBER) {
 		value = atoi(val_arg);
-		sprintf(output, "%s's %s set to %d.", GET_NAME(vict), set_fields[mode].cmd, value);
+		sprintf(output, "%s's %s set to %%d.", GET_NAME(vict), set_fields[mode].cmd);
 	}
 	else
 		strcpy(output, "Okay.");
@@ -2823,6 +2823,11 @@ int perform_set(char_data *ch, char_data *vict, int mode, char *val_arg) {
 	}
 	
 	if (*output) {
+		if (strstr(output, "%d")) {
+			// put value in now if a %d is in the output string
+			strcpy(temp, output);
+			sprintf(output, temp, value);
+		}
 		syslog(SYS_GC, GET_INVIS_LEV(ch), TRUE, "GC: %s used set: %s", GET_REAL_NAME(ch), output);
 		strcat(output, "\r\n");
 		send_to_char(CAP(output), ch);
