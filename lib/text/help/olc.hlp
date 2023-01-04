@@ -3698,8 +3698,11 @@ See also: OLC GENERICS
 
 Usage:  .flags [add | remove] <flags>
 
-This set of flags applies to the generic. There are currently no flags
-available.
+The following flags for generics are available:
+ &cBASIC&0 - For components, only basic components can substitute for simpler
+    component types (fine pillar will substitute for pillar because of BASIC).
+ &cIN-DEVELOPMENT&0 - Will not show up for players. This currently only applies
+    to MOON generics.
 
 See also: OLC GENERICS
 #d
@@ -6485,7 +6488,7 @@ The following types will have IN-DEVELOPMENT flags removed in the vnum range:
 - classes
 - crafts
 - factions
-- generics (moon)
+- generics (only used on MOON generics)
 - globals
 - morphs
 - progress goals
