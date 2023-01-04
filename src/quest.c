@@ -4109,6 +4109,12 @@ void qedit_process_quest_givers(char_data *ch, char *argument, struct quest_give
 }
 
 
+// Simple time sorter for player completed quests
+int sort_completed_quests_by_timestamp(struct player_completed_quest *a, struct player_completed_quest *b) {
+	return a->last_completed - b->last_completed;
+}
+
+
 // Simple vnum sorter for the quest hash
 int sort_quests(quest_data *a, quest_data *b) {
 	return QUEST_VNUM(a) - QUEST_VNUM(b);

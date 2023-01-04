@@ -2352,6 +2352,7 @@ void refresh_one_quest_tracker(char_data *ch, struct player_quest *pq);
 void remove_quest_items(char_data *ch);
 void remove_quest_items_by_quest(char_data *ch, any_vnum vnum);
 void setup_daily_quest_cycles(int only_cycle);
+int sort_completed_quests_by_timestamp(struct player_completed_quest *a, struct player_completed_quest *b);
 
 void qt_change_ability(char_data *ch, any_vnum abil);
 void qt_change_level(char_data *ch, int level);

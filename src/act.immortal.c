@@ -3459,6 +3459,9 @@ SHOW(show_quests) {
 			return;
 		}
 		
+		// sort now
+		HASH_SORT(GET_COMPLETED_QUESTS(vict), sort_completed_quests_by_timestamp);
+		
 		size = snprintf(buf, sizeof(buf), "%s's completed quests:\r\n", GET_NAME(vict));
 		HASH_ITER(hh, GET_COMPLETED_QUESTS(vict), pcq, next_pcq) {
 			if (size >= sizeof(buf)) {

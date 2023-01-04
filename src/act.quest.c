@@ -601,6 +601,9 @@ QCMD(qcmd_completed) {
 	struct player_completed_quest *pcq, *next_pcq;
 	size_t size;
 	
+	// sort now
+	HASH_SORT(GET_COMPLETED_QUESTS(ch), sort_completed_quests_by_timestamp);
+	
 	size = snprintf(buf, sizeof(buf), "Completed quests:\r\n");
 	HASH_ITER(hh, GET_COMPLETED_QUESTS(ch), pcq, next_pcq) {
 		size += snprintf(buf + size, sizeof(buf) - size, "  %s\r\n", get_quest_name_by_proto(pcq->vnum));
