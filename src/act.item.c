@@ -1657,7 +1657,7 @@ void do_eq_show_current(char_data *ch, bool show_all) {
 		}
 		else if (show_all) {
 			if (PRF_FLAGGED(ch, PRF_SCREEN_READER)) {
-				msg_to_char(ch, "%s (nothing)\r\n", wear_data[pos].eq_prompt);
+				msg_to_char(ch, "%s(nothing)\r\n", wear_data[pos].eq_prompt);
 			}
 			else {
 				msg_to_char(ch, "%s\r\n", wear_data[pos].eq_prompt);
