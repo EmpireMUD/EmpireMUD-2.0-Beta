@@ -2169,6 +2169,14 @@ ACMD(do_dismantle) {
 	}
 	
 	if (!COMPLEX_DATA(IN_ROOM(ch))) {
+		// also check for dismantle-able vehicles
+		DL_FOREACH2(ROOM_VEHICLES(IN_ROOM(ch)), veh, next_in_room) {
+			if (VEH_FLAGGED(veh, VEH_DISMANTLING) || !VEH_FLAGGED(veh, VEH_NEVER_DISMANTLE)) {
+				msg_to_char(ch, "Use 'dismantle <name>' to dismantle a vehicle or building in the room.\r\n");
+				return;
+			}
+		}
+		
 		msg_to_char(ch, "You can't start dismantling anything here.\r\n");
 		return;
 	}
