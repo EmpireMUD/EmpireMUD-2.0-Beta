@@ -117,6 +117,11 @@ A sacred cat is cleaning its paw.
 ~
 1 1 bdoD n 1
 0 0 0 10
+D
+   This elegant black cat sits with a haughty look, chin up, eyes closed,
+paying very little attention to lesser beings such as yourself. It wears a
+necklace of gold and precious stones, and one of its ears bears a gold loop.
+~
 M
 0
 You stoop to pet $n.~
@@ -129,8 +134,6 @@ $n licks its paw.~
 M
 0
 $n mews.~
-T 9901
-T 9902
 S
 #18327
 crocodile enormous~
@@ -139,6 +142,12 @@ An enormous crocodile practically surrounds you!
 ~
 100 125 dej 0 5
 0 0 9 9
+D
+   This beastly reptile is humongous! When it sits still, though, it quickly
+disappears into even the smallest amount of grass, muck, or water. Its long
+snout is lined with too many teeth to count, so it's safer not to be in front
+of that part.
+~
 S
 #18328
 falcon great~
@@ -147,5 +156,11 @@ A great falcon stands ready to fly.
 ~
 100 125 dej m 4
 0 0 2 27
+D
+   The falcon is enormous -- bigger than almost any bird you've ever seen --
+but with the distinctive short, curved beak and black eye stripe of any falcon.
+The back of its head is almost blue as it scatters the light, while the wings
+and back are dark grey.
+~
 S
 $
