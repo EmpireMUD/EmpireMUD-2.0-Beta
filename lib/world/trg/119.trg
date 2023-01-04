@@ -5584,7 +5584,7 @@ if %move% == 1
           if %diff% >= 2
             %send% %ch% That really hurt! Your leg is immobilized.
             dg_affect #11956 %ch% off silent
-            dg_affect #11956 %ch% IMMOBILIZE on 10
+            dg_affect #11956 %ch% IMMOBILIZED on 10
           end
           %damage% %ch% 100 physical
         elseif %ch.is_pc%
