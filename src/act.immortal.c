@@ -6307,7 +6307,7 @@ void do_stat_empire(char_data *ch, empire_data *emp) {
 	for (iter = 0, len = 0; iter < NUM_EMPIRE_ATTRIBUTES; ++iter) {
 		switch (iter) {
 			case EATT_TERRITORY_PER_GREATNESS: {
-				sprintf(line, "%s: [%d\tc%+d\t0]", empire_attributes[iter], config_get_int("land_per_greatness"), EMPIRE_ATTRIBUTE(emp, iter));
+				sprintf(line, "%s: [%d \tc%+d\t0]", empire_attributes[iter], config_get_int("land_per_greatness"), EMPIRE_ATTRIBUTE(emp, iter));
 				break;
 			}
 			default: {
