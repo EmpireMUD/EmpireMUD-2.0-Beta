@@ -550,6 +550,7 @@ void look_at_target(char_data *ch, char *arg, char *more_args, bool look_inside)
 * @param vehicle_data *veh Optional: A pre-validated vehicle to look in (may be NULL).
 */
 void look_in_obj(char_data *ch, char *arg, obj_data *obj, vehicle_data *veh) {
+	char buf[MAX_STRING_LENGTH];
 	char_data *dummy = NULL;
 	int amt, bits = 0;
 
@@ -566,7 +567,7 @@ void look_in_obj(char_data *ch, char *arg, obj_data *obj, vehicle_data *veh) {
 			act("$V isn't a container.", FALSE, ch, NULL, veh, TO_CHAR);
 		}
 		else {
-			sprintf(buf, "$V (%d/%d):", VEH_CARRYING_N(veh), VEH_CAPACITY(veh));
+			sprintf(buf, "You look inside $V (%d/%d):", VEH_CARRYING_N(veh), VEH_CAPACITY(veh));
 			act(buf, FALSE, ch, NULL, veh, TO_CHAR);
 			list_obj_to_char(VEH_CONTAINS(veh), ch, OBJ_DESC_CONTENTS, TRUE);
 		}
@@ -580,19 +581,7 @@ void look_in_obj(char_data *ch, char *arg, obj_data *obj, vehicle_data *veh) {
 			if (OBJVAL_FLAGGED(obj, CONT_CLOSED) && GET_OBJ_TYPE(obj) != ITEM_CORPSE)
 				send_to_char("It is closed.\r\n", ch);
 			else {
-				send_to_char(fname(GET_OBJ_KEYWORDS(obj)), ch);
-				switch (bits) {
-					case FIND_OBJ_INV:
-						send_to_char(" (carried): \r\n", ch);
-						break;
-					case FIND_OBJ_ROOM:
-						send_to_char(" (here): \r\n", ch);
-						break;
-					case FIND_OBJ_EQUIP:
-						send_to_char(" (used): \r\n", ch);
-						break;
-				}
-
+				msg_to_char(ch, "You look inside %s (%s):", get_obj_desc(obj, ch, OBJ_DESC_SHORT), (obj->worn_by ? "equipped" : (obj->carried_by ? "carried" : "here")));
 				list_obj_to_char(obj->contains, ch, OBJ_DESC_CONTENTS, TRUE);
 			}
 		}
