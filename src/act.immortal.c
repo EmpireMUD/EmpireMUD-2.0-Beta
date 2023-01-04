@@ -6885,17 +6885,16 @@ void do_stat_room(char_data *ch) {
 		sprintf(buf2, "%s %s(%s)", found++ ? "," : "", GET_NAME(k), (!IS_NPC(k) ? "PC" : (!IS_MOB(k) ? "NPC" : "MOB")));
 		strcat(buf, buf2);
 		if (strlen(buf) >= 62) {
-			if (k->next_in_room)
+			if (k->next_in_room) {
 				send_to_char(strcat(buf, ",\r\n"), ch);
-			else
+			}
+			else {
 				send_to_char(strcat(buf, "\r\n"), ch);
+			}
 			*buf = found = 0;
 		}
 	}
-	msg_to_char(ch, "&0");
-
-	if (*buf)
-		send_to_char(strcat(buf, "\r\n&0"), ch);
+	msg_to_char(ch, "%s&0", (*buf ? strcat(buf, "\r\n") : ""));
 	
 	if (ROOM_VEHICLES(IN_ROOM(ch))) {
 		sprintf(buf, "Vehicles:&w");
