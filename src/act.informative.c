@@ -3903,6 +3903,7 @@ ACMD(do_whereami) {
 	
 	// extra info:
 	if (IS_IMMORTAL(ch)) {
+		msg_to_char(ch, "VNum: [%d]\r\n", GET_ROOM_VNUM(IN_ROOM(ch)));
 		// sector (basically the same as stat room)
 		msg_to_char(ch, "Sector: [%d] %s", GET_SECT_VNUM(SECT(IN_ROOM(ch))), GET_SECT_NAME(SECT(IN_ROOM(ch))));
 		msg_to_char(ch, ", Base: [%d] %s", GET_SECT_VNUM(BASE_SECT(IN_ROOM(ch))), GET_SECT_NAME(BASE_SECT(IN_ROOM(ch))));
