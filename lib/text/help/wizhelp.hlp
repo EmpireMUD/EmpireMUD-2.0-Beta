@@ -628,6 +628,22 @@ grantable.
 
 See also: FLAGS, GRANT
 #d
+NATURALIZE "NATURAL SECTOR"
+
+'Naturalize' means return a map tile to its natural sector type. You can see
+what that is by using 'stat room' on the map. It shows a display like this:
+Sector: [10 - Building], Base: [0 - Plains], Natural: [4 - Overgrown Forest]
+
+Newbie islands will naturalize their unclaimed tiles each year if the world
+config 'naturalize_newbie_islands' is turned on.
+
+The map editor can be used to naturalize a tile, island, or the whole world
+via '.map naturalize'.
+
+You can change a tile's (or island's) natural sector with '.map remember'.
+
+See also: CONFIG, MAPEDIT NATURALIZE, MAPEDIT REMEMBER
+#d
 NOCUSTOMIZE !CUSTOMIZE "NO CUSTOMIZE"
 
 Usage:  set <name> nocustomize <on | off>

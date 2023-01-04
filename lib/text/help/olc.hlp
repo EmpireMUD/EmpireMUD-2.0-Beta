@@ -4335,7 +4335,7 @@ unclaimable or which have adventures.
 
 You can change a tile/island's natural state with: .map remember [island]
 
-See also: MAP OLC, MAPEDIT REMEMBER
+See also: MAP OLC, MAPEDIT REMEMBER, NATURALIZE
 #d
 "MAPEDIT PASSWALLS"
 
@@ -4361,7 +4361,7 @@ Building and adventure tiles are ignored during this command.
 The opposite command is .map naturalize, which restores a room/island/world
 to its original state.
 
-See also: MAP OLC, MAPEDIT NATURALIZE
+See also: MAP OLC, MAPEDIT NATURALIZE, NATURALIZE
 #d
 "MAPEDIT ROOMTYPE" "MAPEDIT ROOM TYPE"
 
