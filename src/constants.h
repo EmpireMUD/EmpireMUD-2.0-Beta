@@ -242,6 +242,7 @@ extern const char *shop_flags[];
 extern const char *damage_types[];
 extern const char *skill_check_difficulty[];
 extern const char *skill_flags[];
+extern const char *weapon_types[];
 
 // social constants
 extern const char *social_flags[];

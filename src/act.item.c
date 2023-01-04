@@ -619,11 +619,12 @@ void identify_obj_to_char(obj_data *obj, char_data *ch) {
 			msg_to_char(ch, "Teaches craft: %s (%s)\r\n", cft ? GET_CRAFT_NAME(cft) : "UNKNOWN", cft ? craft_types[GET_CRAFT_TYPE(cft)] : "?");
 			break;
 		}
-		case ITEM_WEAPON:
+		case ITEM_WEAPON: {
 			msg_to_char(ch, "Speed: %.2f\r\n", get_weapon_speed(obj));
 			msg_to_char(ch, "Damage: %d (%s+%.2f base dps)\r\n", GET_WEAPON_DAMAGE_BONUS(obj), (IS_MAGIC_ATTACK(GET_WEAPON_TYPE(obj)) ? "Intelligence" : "Strength"), get_base_dps(obj));
-			msg_to_char(ch, "Damage type is %s.\r\n", attack_hit_info[GET_WEAPON_TYPE(obj)].name);
+			msg_to_char(ch, "Damage type is %s (%s/%s).\r\n", attack_hit_info[GET_WEAPON_TYPE(obj)].name, weapon_types[attack_hit_info[GET_WEAPON_TYPE(obj)].weapon_type], damage_types[attack_hit_info[GET_WEAPON_TYPE(obj)].damage_type]);
 			break;
+		}
 		case ITEM_ARMOR:
 			msg_to_char(ch, "Armor type: %s\r\n", armor_types[GET_ARMOR_TYPE(obj)]);
 			break;
