@@ -1435,6 +1435,8 @@ Usage:  messages
 
 This displays any system messages from the last 24 hours, plus any messages
 that are set to show on login or on auto-repeat.
+
+See also: NEWS
 #
 METERS "COMBAT METERS"
 
@@ -1494,6 +1496,8 @@ Usage:  news
 
 Shows any recent news from the game staff. For example, updates or new
 adventures might appear here.
+
+See also: MESSAGES
 #
 NODISMANTLE NO-DISMANTLE "NO DISMANTLE"
 
