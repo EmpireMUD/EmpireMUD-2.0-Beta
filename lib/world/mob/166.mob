@@ -132,7 +132,7 @@ puppy~
 a puppy~
 A puppy sits here with a bow around its neck.
 ~
-1 25 doG cfmG 1
+1 25 dhoG cfmG 1
 0 0 0 9
 D
 This adorable little puppy has a bow around its neck.
@@ -150,7 +150,7 @@ dog~
 a dog~
 A dog sits here with a bow around its neck.
 ~
-1 75 doG cfmG 2
+1 75 dhoG cfmG 2
 0 0 0 9
 D
 This adorable dog has a bow around its neck.
@@ -168,7 +168,7 @@ dog heroic~
 a heroic dog~
 A heroic dog is sitting here.
 ~
-1 150 doG cfmG 2
+1 150 dhoG cfmG 2
 0 0 0 9
 D
 This heroic dog has all the poise of a champion.
@@ -185,7 +185,7 @@ kitten~
 a kitten~
 A kitten sits here with a bow around its neck.
 ~
-1 25 doG cfmG 1
+1 25 dhoG cfmG 1
 0 0 0 10
 D
 This adorable little kitten has a bow around its neck.
@@ -203,7 +203,7 @@ cat~
 a cat~
 A cat sits here with a bow around its neck.
 ~
-1 75 doG cfmG 2
+1 75 dhoG cfmG 2
 0 0 0 10
 D
 This adorable cat has a bow around its neck.
@@ -221,7 +221,7 @@ cat heroic~
 a heroic cat~
 A heroic cat is sitting here.
 ~
-1 150 doG cfmG 2
+1 150 dhoG cfmG 2
 0 0 0 10
 D
 This heroic cat has all the poise of a champion.

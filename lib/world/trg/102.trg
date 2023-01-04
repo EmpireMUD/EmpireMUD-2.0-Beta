@@ -19,6 +19,18 @@ if %actor.is_pc% && %actor.empire%
   nop %actor.empire.start_progress(10200)%
 end
 ~
+#10203
+Goblin Challenge: Better error message when attacking early~
+0 B 0
+~
+if %self.aff_flagged(!ATTACK)%
+  %send% %actor% You'll have to wait a moment. ~%self% is still getting ready.
+  return 0
+else
+  detach 10203 %self.id%
+  return 1
+end
+~
 #10204
 Zelkab Bruiser Combat~
 0 k 10
@@ -1237,7 +1249,7 @@ end
 * all other cases will return 1
 * switch MUST set vnum_list, abil_list, and name_list
 switch %self.vnum%
-  case 10269 
+  case 10269
     * book of primordial weapon schematics
     set vnum_list 10268 10270 10272 10282 10266
     set abil_list 196 196 170 170 196
