@@ -2536,7 +2536,7 @@ ACMD(do_group) {
 		send_to_group(NULL, GROUP(ch), "%s is now group leader.", GET_NAME(vict));
 		send_config_msg(ch, "ok_string");
 	}
-	else if (is_abbrev(buf, "option")) {
+	else if (is_abbrev(buf, "options")) {
 		skip_spaces(&argument);
 		if (!GROUP(ch)) {
 			msg_to_char(ch, "But you aren't part of a group!\r\n");

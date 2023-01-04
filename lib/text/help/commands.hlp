@@ -1028,6 +1028,7 @@ Usage:  group  -- see status on the group
         group leave  -- leave the group you're in
         group leader <name>  -- change leader
         group new -- create an empty group
+        group options -- set group options (leader only)
 
 Grouping allows multiple players to work on the same challenge, and gives them
 access to a private group channel. You can also type "group" by itself to see
@@ -1043,6 +1044,9 @@ balance game encounters against the number of players in the group.
 
 Inviting a player to a group automatically beckons them to follow, if they
 aren't already following someone.
+
+The leader can use 'group options anonymous' to prevent members from seeing
+each others' locations.
 
 See also: ADVENTURE SUMMON, GSAY
 #
