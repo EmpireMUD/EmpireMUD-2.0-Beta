@@ -581,7 +581,7 @@ void look_in_obj(char_data *ch, char *arg, obj_data *obj, vehicle_data *veh) {
 			if (OBJVAL_FLAGGED(obj, CONT_CLOSED) && GET_OBJ_TYPE(obj) != ITEM_CORPSE)
 				send_to_char("It is closed.\r\n", ch);
 			else {
-				msg_to_char(ch, "You look inside %s (%s):\r\n", get_obj_desc(obj, ch, OBJ_DESC_SHORT), (obj->worn_by ? "equipped" : (obj->carried_by ? "carried" : "here")));
+				msg_to_char(ch, "You look inside %s (%s):\r\n", get_obj_desc(obj, ch, OBJ_DESC_SHORT), (obj->worn_by ? "worn" : (obj->carried_by ? "inventory" : "in room")));
 				list_obj_to_char(obj->contains, ch, OBJ_DESC_CONTENTS, TRUE);
 			}
 		}
