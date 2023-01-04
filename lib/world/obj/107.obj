@@ -1002,9 +1002,11 @@ S
 replacer goblin raft~
 a goblin raft~
 A goblin raft replacer has bugged out.~
-This is supposed to purge itself and spawn a goblin raft. Evidently it didn't.
+   The raft is made from large sticks and some very worn-out twine. You can
+'drag' the raft to the edge of the water, then 'sit' on it and type 'sail
+<direction>'.
 ~
-3 0 0 0 2
+3 0 0 0 3
 0 0 0
 0 1
 T 10773
