@@ -1813,10 +1813,10 @@ void look_in_direction(char_data *ch, int dir) {
 					size = snprintf(buf, sizeof(buf), "You see ");
 					HASH_ITER(hh, str_hash, str_iter, next_str) {
 						if (str_iter->count == 1) {
-							snprintf(line, sizeof(line), "%s%s%s", (next_str && str_iter != str_hash) ? "" : "and ", str_iter->str, (next_str ? ", " : "."));
+							snprintf(line, sizeof(line), "%s%s%s", (next_str || str_iter == str_hash) ? "" : "and ", str_iter->str, (next_str ? ", " : "."));
 						}
 						else {
-							snprintf(line, sizeof(line), "%s%s (x%d)%s", (next_str && str_iter != str_hash) ? "" : "and ", str_iter->str, str_iter->count, (next_str ? ", " : "."));
+							snprintf(line, sizeof(line), "%s%s (x%d)%s", (next_str || str_iter == str_hash) ? "" : "and ", str_iter->str, str_iter->count, (next_str ? ", " : "."));
 						}
 						if (size + strlen(line) < sizeof(buf) - 14) {
 							strcat(buf, line);
@@ -1929,10 +1929,10 @@ void look_in_direction(char_data *ch, int dir) {
 			size = snprintf(buf, sizeof(buf), "You see ");
 			HASH_ITER(hh, str_hash, str_iter, next_str) {
 				if (str_iter->count == 1) {
-					snprintf(line, sizeof(line), "%s%s%s", (next_str && str_iter != str_hash) ? "" : "and ", str_iter->str, (next_str ? ", " : "."));
+					snprintf(line, sizeof(line), "%s%s%s", (next_str || str_iter == str_hash) ? "" : "and ", str_iter->str, (next_str ? ", " : "."));
 				}
 				else {
-					snprintf(line, sizeof(line), "%s%s (x%d)%s", (next_str && str_iter != str_hash) ? "" : "and ", str_iter->str, str_iter->count, (next_str ? ", " : "."));
+					snprintf(line, sizeof(line), "%s%s (x%d)%s", (next_str || str_iter == str_hash) ? "" : "and ", str_iter->str, str_iter->count, (next_str ? ", " : "."));
 				}
 				if (size + strlen(line) < sizeof(buf) - 14) {
 					strcat(buf, line);
