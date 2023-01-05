@@ -190,7 +190,7 @@ bool check_build_location_and_dir(char_data *ch, room_data *room, craft_data *ty
 	}
 	
 	// vehicle size/location checks
-	if (!is_upgrade && make_veh && GET_BUILDING(room) && VEH_FLAGGED(make_veh, VEH_NO_BUILDING)) {
+	if (!is_upgrade && make_veh && VEH_FLAGGED(make_veh, VEH_NO_BUILDING) && (ROOM_IS_CLOSED(room) || (GET_BUILDING(room) && !ROOM_BLD_FLAGGED(room, BLD_OPEN)))) {
 		if (ch) {
 			msg_to_char(ch, "You can't %s that in a building.\r\n", command);
 		}
