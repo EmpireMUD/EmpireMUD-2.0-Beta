@@ -484,7 +484,7 @@ void affect_modify(char_data *ch, byte loc, sh_int mod, bitvector_t bitv, bool a
 		case APPLY_AGE:
 			SAFE_ADD(GET_AGE_MODIFIER(ch), mod, INT_MIN, INT_MAX, TRUE);
 			break;
-		case APPLY_MOVE:
+		case APPLY_MOVE: {
 			SAFE_ADD(GET_MAX_MOVE(ch), mod, INT_MIN, INT_MAX, TRUE);
 			
 			// prevent from going negative
@@ -504,7 +504,8 @@ void affect_modify(char_data *ch, byte loc, sh_int mod, bitvector_t bitv, bool a
 				}
 			}
 			break;
-		case APPLY_HEALTH:
+		}
+		case APPLY_HEALTH: {
 			// apply to max
 			SAFE_ADD(GET_MAX_HEALTH(ch), mod, INT_MIN, INT_MAX, TRUE);
 			
@@ -513,11 +514,16 @@ void affect_modify(char_data *ch, byte loc, sh_int mod, bitvector_t bitv, bool a
 			SAFE_ADD(GET_HEALTH(ch), mod, INT_MIN, INT_MAX, TRUE);
 			
 			if (!IS_NPC(ch)) {
-				if (GET_HEALTH(ch) < 1) {	// min 1 on health
-					GET_HEALTH_DEFICIT(ch) -= (GET_HEALTH(ch)-1);
-					GET_HEALTH(ch) = 1;
+				if (GET_HEALTH(ch) < 1) {
+					if (GET_POS(ch) >= POS_SLEEPING) {
+						// min 1 on health unless unconscious
+						GET_HEALTH_DEFICIT(ch) -= (GET_HEALTH(ch)-1);
+						GET_HEALTH(ch) = 1;
+					}
+					// otherwise leave them dead/negative
 				}
 				else if (GET_HEALTH_DEFICIT(ch) > 0) {
+					// positive health plus a health deficit
 					diff = MAX(0, GET_HEALTH(ch) - orig);
 					diff = MIN(diff, GET_HEALTH_DEFICIT(ch));
 					diff = MIN(diff, GET_HEALTH(ch)-1);
@@ -530,7 +536,8 @@ void affect_modify(char_data *ch, byte loc, sh_int mod, bitvector_t bitv, bool a
 				GET_HEALTH(ch) = MAX(1, GET_HEALTH(ch));
 			}
 			break;
-		case APPLY_MANA:
+		}
+		case APPLY_MANA: {
 			SAFE_ADD(GET_MAX_MANA(ch), mod, INT_MIN, INT_MAX, TRUE);
 			
 			// prevent from going negative
@@ -550,6 +557,7 @@ void affect_modify(char_data *ch, byte loc, sh_int mod, bitvector_t bitv, bool a
 				}
 			}
 			break;
+		}
 		case APPLY_BLOOD: {
 			SAFE_ADD(GET_EXTRA_BLOOD(ch), mod, INT_MIN, INT_MAX, TRUE);
 			break;
