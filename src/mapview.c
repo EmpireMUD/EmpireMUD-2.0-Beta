@@ -1760,14 +1760,14 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options) {
 * @param int dir The direction they typed.
 */
 void look_in_direction(char_data *ch, int dir) {
-	char buf[MAX_STRING_LENGTH - 9], buf2[MAX_STRING_LENGTH - 9];	// save room for the "You see "
+	char buf[MAX_STRING_LENGTH], line[MAX_STRING_LENGTH];
 	char *exdesc;
 	vehicle_data *veh;
 	char_data *c;
 	room_data *to_room;
 	struct room_direction_data *ex;
-	int last_comma_pos, prev_comma_pos, num_commas;
-	size_t bufsize;
+	size_t size;
+	struct string_hash *str_iter, *next_str, *str_hash = NULL;
 	
 	// check first for an extra description that covers the direction
 	snprintf(buf, sizeof(buf), "%s", dirs[dir]);
@@ -1791,47 +1791,47 @@ void look_in_direction(char_data *ch, int dir) {
 				msg_to_char(ch, "The %s is open.\r\n", fname(ex->keyword));
 			}
 			if (!EXIT_FLAGGED(ex, EX_CLOSED)) {
-				*buf = '\0';
-				bufsize = 0;
-				last_comma_pos = prev_comma_pos = -1;
-				num_commas = 0;
-				
 				to_room = ex->room_ptr;
 				if (can_see_in_dark_room(ch, to_room, TRUE)) {
+					// find people
 					DL_FOREACH2(ROOM_PEOPLE(to_room), c, next_in_room) {
 						if (!AFF_FLAGGED(c, AFF_HIDE | AFF_NO_SEE_IN_ROOM) && CAN_SEE(ch, c) && WIZHIDE_OK(ch, c)) {
-							bufsize += snprintf(buf + bufsize, sizeof(buf) - bufsize, "%s, ", PERS(c, ch, FALSE));
-							if (last_comma_pos != -1) {
-								prev_comma_pos = last_comma_pos;
-							}
-							last_comma_pos = bufsize - 2;
-							++num_commas;
+							add_string_hash(&str_hash, PERS(c, ch, FALSE), 1);
 						}
 					}
 					
+					// find vehicles
 					DL_FOREACH2(ROOM_VEHICLES(to_room), veh, next_in_room) {
 						if (CAN_SEE_VEHICLE(ch, veh)) {
-							bufsize += snprintf(buf + bufsize, sizeof(buf) - bufsize, "%s, ", get_vehicle_short_desc(veh, ch));
-							if (last_comma_pos != -1) {
-								prev_comma_pos = last_comma_pos;
-							}
-							last_comma_pos = bufsize - 2;
-							++num_commas;
+							add_string_hash(&str_hash, get_vehicle_short_desc(veh, ch), 1);
 						}
 					}
 				}
-
-				/* Now, we clean up that buf */
-				if (*buf) {
-					if (last_comma_pos != -1) {
-						bufsize = last_comma_pos + snprintf(buf + last_comma_pos, sizeof(buf) - last_comma_pos, ".\r\n");
+				
+				// prepare for display
+				if (str_hash) {
+					size = snprintf(buf, sizeof(buf), "You see ");
+					HASH_ITER(hh, str_hash, str_iter, next_str) {
+						if (str_iter->count == 1) {
+							snprintf(line, sizeof(line), "%s%s%s", (next_str ? "" : "and "), str_iter->str, (next_str ? ", " : "."));
+						}
+						else {
+							snprintf(line, sizeof(line), "%s%s (x%d)%s", (next_str ? "" : "and "), str_iter->str, str_iter->count, (next_str ? ", " : "."));
+						}
+						if (size + strlen(line) < sizeof(buf) - 14) {
+							strcat(buf, line);
+							size += strlen(line);
+						}
+						else {
+							size += snprintf(buf + size, sizeof(buf) - size, "**OVERFLOW**");
+							break;
+						}
 					}
-					if (prev_comma_pos != -1) {
-						strcpy(buf2, buf + prev_comma_pos + 1);
-						bufsize = snprintf(buf + prev_comma_pos, sizeof(buf) - prev_comma_pos, "%s and%s", (num_commas > 2 ? "," : ""), buf2);
+					free_string_hash(&str_hash);
+					if (size < sizeof(buf) - 2) {
+						strcat(buf, "\r\n");
 					}
-
-					msg_to_char(ch, "You see %s", buf);
+					send_to_char(buf, ch);
 				}
 				else {
 					msg_to_char(ch, "You don't see anyone in that direction.\r\n");
@@ -1843,12 +1843,7 @@ void look_in_direction(char_data *ch, int dir) {
 		}
 	}
 	else {
-		// map look
-		bufsize = 0;
-		*buf = '\0';
-		last_comma_pos = prev_comma_pos = -1;
-		num_commas = 0;
-		
+		// map look:
 		// dirs not shown on map
 		if (dir == UP) {
 			do_weather(ch, "", 0, 0);
@@ -1895,23 +1890,13 @@ void look_in_direction(char_data *ch, int dir) {
 		if (can_see_in_dark_room(ch, to_room, FALSE)) {
 			DL_FOREACH2(ROOM_PEOPLE(to_room), c, next_in_room) {
 				if (CAN_SEE(ch, c) && WIZHIDE_OK(ch, c)) {
-					bufsize += snprintf(buf + bufsize, sizeof(buf) - bufsize, "%s, ", PERS(c, ch, FALSE));
-					if (last_comma_pos != -1) {
-						prev_comma_pos = last_comma_pos;
-					}
-					last_comma_pos = bufsize - 2;
-					++num_commas;
+					add_string_hash(&str_hash, PERS(c, ch, FALSE), 1);
 				}
 			}
 			
 			DL_FOREACH2(ROOM_VEHICLES(to_room), veh, next_in_room) {
 				if (CAN_SEE_VEHICLE(ch, veh)) {
-					bufsize += snprintf(buf + bufsize, sizeof(buf) - bufsize, "%s, ", get_vehicle_short_desc(veh, ch));
-					if (last_comma_pos != -1) {
-						prev_comma_pos = last_comma_pos;
-					}
-					last_comma_pos = bufsize - 2;
-					++num_commas;
+					add_string_hash(&str_hash, get_vehicle_short_desc(veh, ch), 1);
 				}
 			}
 		}
@@ -1922,12 +1907,7 @@ void look_in_direction(char_data *ch, int dir) {
 			if (can_see_in_dark_room(ch, to_room, FALSE)) {
 				DL_FOREACH2(ROOM_PEOPLE(to_room), c, next_in_room) {
 					if (CAN_SEE(ch, c) && WIZHIDE_OK(ch, c)) {
-						bufsize += snprintf(buf + bufsize, sizeof(buf) - bufsize, "%s, ", PERS(c, ch, FALSE));
-						if (last_comma_pos != -1) {
-							prev_comma_pos = last_comma_pos;
-						}
-						last_comma_pos = bufsize - 2;
-						++num_commas;
+						add_string_hash(&str_hash, PERS(c, ch, FALSE), 1);
 					}
 				}
 			}
@@ -1937,29 +1917,37 @@ void look_in_direction(char_data *ch, int dir) {
 				if (can_see_in_dark_room(ch, to_room, FALSE)) {
 					DL_FOREACH2(ROOM_PEOPLE(to_room), c, next_in_room) {
 						if (CAN_SEE(ch, c) && WIZHIDE_OK(ch, c)) {
-							bufsize += snprintf(buf + bufsize, sizeof(buf) - bufsize, "%s, ", PERS(c, ch, FALSE));
-							if (last_comma_pos != -1) {
-								prev_comma_pos = last_comma_pos;
-							}
-							last_comma_pos = bufsize - 2;
-							++num_commas;
+							add_string_hash(&str_hash, PERS(c, ch, FALSE), 1);
 						}
 					}
 				}
 			}
 		}
-
-		/* Now, we clean up that buf */
-		if (*buf) {
-			if (last_comma_pos != -1) {
-				bufsize = last_comma_pos + snprintf(buf + last_comma_pos, sizeof(buf) - last_comma_pos, ".\r\n");
+		
+		// prepare for display
+		if (str_hash) {
+			size = snprintf(buf, sizeof(buf), "You see ");
+			HASH_ITER(hh, str_hash, str_iter, next_str) {
+				if (str_iter->count == 1) {
+					snprintf(line, sizeof(line), "%s%s%s", (next_str ? "" : "and "), str_iter->str, (next_str ? ", " : "."));
+				}
+				else {
+					snprintf(line, sizeof(line), "%s%s (x%d)%s", (next_str ? "" : "and "), str_iter->str, str_iter->count, (next_str ? ", " : "."));
+				}
+				if (size + strlen(line) < sizeof(buf) - 14) {
+					strcat(buf, line);
+					size += strlen(line);
+				}
+				else {
+					size += snprintf(buf + size, sizeof(buf) - size, "**OVERFLOW**");
+					break;
+				}
 			}
-			if (prev_comma_pos != -1) {
-				strcpy(buf2, buf + prev_comma_pos + 1);
-				bufsize = snprintf(buf + prev_comma_pos, sizeof(buf) - prev_comma_pos, "%s and%s", (num_commas > 2 ? "," : ""), buf2);
+			free_string_hash(&str_hash);
+			if (size < sizeof(buf) - 2) {
+				strcat(buf, "\r\n");
 			}
-			
-			msg_to_char(ch, "You see %s", buf);
+			send_to_char(buf, ch);
 		}
 		else {
 			msg_to_char(ch, "You don't see anyone in that direction.\r\n");
