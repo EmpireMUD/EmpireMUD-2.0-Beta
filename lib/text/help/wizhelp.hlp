@@ -1311,6 +1311,18 @@ Usage:  show notes <player name>
 
 Shows immortal notes for the target player's account.
 #e
+"SHOW OCEANMOBS" "SHOW OCEAN MOBS"
+
+Usage:  show oceanmobs
+
+This looks for mobs that might be lost in the ocean. It lists mobs that are:
+- on true Ocean tiles (ones that share data)
+- are not SPAWNED
+- are not linked to an adventure
+
+These mobs usually include lost mounts that came from adventure rewards. Such
+mobs usually do not despawn on their own.
+#e
 "SHOW OLC"
 
 Usage:  show olc [vnum]
