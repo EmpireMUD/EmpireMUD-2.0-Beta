@@ -4215,29 +4215,25 @@ void olc_show_vehicle(char_data *ch) {
 	sprintf(buf + strlen(buf), "<%shitpoints\t0> %d\r\n", OLC_LABEL_VAL(VEH_MAX_HEALTH(veh), 1), VEH_MAX_HEALTH(veh));
 	sprintf(buf + strlen(buf), "<%smovetype\t0> %s\r\n", OLC_LABEL_VAL(VEH_MOVE_TYPE(veh), 0), mob_move_types[VEH_MOVE_TYPE(veh)]);
 	sprintf(buf + strlen(buf), "<%sspeed\t0> %s, <%ssize\t0> %d\r\n", OLC_LABEL_VAL(VEH_SPEED_BONUSES(veh), VSPEED_NORMAL), vehicle_speed_types[VEH_SPEED_BONUSES(veh)], OLC_LABEL_VAL(VEH_SIZE(veh), 0), VEH_SIZE(veh));
-	sprintf(buf + strlen(buf), "<%scapacity\t0> %d item%s\r\n", OLC_LABEL_VAL(VEH_CAPACITY(veh), 0), VEH_CAPACITY(veh), PLURAL(VEH_CAPACITY(veh)));
-	sprintf(buf + strlen(buf), "<%sanimalsrequired\t0> %d\r\n", OLC_LABEL_VAL(VEH_ANIMALS_REQUIRED(veh), 0), VEH_ANIMALS_REQUIRED(veh));
+	sprintf(buf + strlen(buf), "<%scapacity\t0> %d item%s, <%sanimalsrequired\t0> %d\r\n", OLC_LABEL_VAL(VEH_CAPACITY(veh), 0), VEH_CAPACITY(veh), PLURAL(VEH_CAPACITY(veh)), OLC_LABEL_VAL(VEH_ANIMALS_REQUIRED(veh), 0), VEH_ANIMALS_REQUIRED(veh));
 	
 	if (VEH_MIN_SCALE_LEVEL(veh) > 0) {
-		sprintf(buf + strlen(buf), "<%sminlevel\t0> %d\r\n", OLC_LABEL_CHANGED, VEH_MIN_SCALE_LEVEL(veh));
+		sprintf(lbuf, "<%sminlevel\t0> %d", OLC_LABEL_CHANGED, VEH_MIN_SCALE_LEVEL(veh));
 	}
 	else {
-		sprintf(buf + strlen(buf), "<%sminlevel\t0> none\r\n", OLC_LABEL_UNCHANGED);
+		sprintf(lbuf, "<%sminlevel\t0> none\r\n", OLC_LABEL_UNCHANGED);
 	}
 	if (VEH_MAX_SCALE_LEVEL(veh) > 0) {
-		sprintf(buf + strlen(buf), "<%smaxlevel\t0> %d\r\n", OLC_LABEL_CHANGED, VEH_MAX_SCALE_LEVEL(veh));
+		sprintf(buf + strlen(buf), "%s, <%smaxlevel\t0> %d\r\n", lbuf, OLC_LABEL_CHANGED, VEH_MAX_SCALE_LEVEL(veh));
 	}
 	else {
-		sprintf(buf + strlen(buf), "<%smaxlevel\t0> none\r\n", OLC_LABEL_UNCHANGED);
+		sprintf(buf + strlen(buf), "%s, <%smaxlevel\t0> none\r\n", lbuf, OLC_LABEL_UNCHANGED);
 	}
 
-	sprintf(buf + strlen(buf), "<%sinteriorroom\t0> %d - %s\r\n", OLC_LABEL_VAL(VEH_INTERIOR_ROOM_VNUM(veh), NOWHERE), VEH_INTERIOR_ROOM_VNUM(veh), building_proto(VEH_INTERIOR_ROOM_VNUM(veh)) ? GET_BLD_NAME(building_proto(VEH_INTERIOR_ROOM_VNUM(veh))) : "none");
-	sprintf(buf + strlen(buf), "<%sextrarooms\t0> %d\r\n", OLC_LABEL_VAL(VEH_MAX_ROOMS(veh), 0), VEH_MAX_ROOMS(veh));
+	sprintf(buf + strlen(buf), "<%sextrarooms\t0> %d, <%sinteriorroom\t0> %d - %s\r\n", OLC_LABEL_VAL(VEH_MAX_ROOMS(veh), 0), VEH_MAX_ROOMS(veh), OLC_LABEL_VAL(VEH_INTERIOR_ROOM_VNUM(veh), NOWHERE), VEH_INTERIOR_ROOM_VNUM(veh), building_proto(VEH_INTERIOR_ROOM_VNUM(veh)) ? GET_BLD_NAME(building_proto(VEH_INTERIOR_ROOM_VNUM(veh))) : "none");
 	sprintbit(VEH_DESIGNATE_FLAGS(veh), designate_flags, lbuf, TRUE);
 	sprintf(buf + strlen(buf), "<%sdesignate\t0> %s\r\n", OLC_LABEL_VAL(VEH_DESIGNATE_FLAGS(veh), NOBITS), lbuf);
-	sprintf(buf + strlen(buf), "<%sheight\t0> %d\r\n", OLC_LABEL_VAL(VEH_HEIGHT(veh), 0), VEH_HEIGHT(veh));
-	sprintf(buf + strlen(buf), "<%sfame\t0> %d\r\n", OLC_LABEL_VAL(VEH_FAME(veh), 0), VEH_FAME(veh));
-	sprintf(buf + strlen(buf), "<%smilitary\t0> %d\r\n", OLC_LABEL_VAL(VEH_MILITARY(veh), 0), VEH_MILITARY(veh));
+	sprintf(buf + strlen(buf), "<%sheight\t0> %d, <%sfame\t0> %d, <%smilitary\t0> %d\r\n", OLC_LABEL_VAL(VEH_HEIGHT(veh), 0), VEH_HEIGHT(veh), OLC_LABEL_VAL(VEH_FAME(veh), 0), VEH_FAME(veh), OLC_LABEL_VAL(VEH_MILITARY(veh), 0), VEH_MILITARY(veh));
 	
 	sprintbit(VEH_ROOM_AFFECTS(veh), room_aff_bits, lbuf, TRUE);
 	sprintf(buf + strlen(buf), "<%saffects\t0> %s\r\n", OLC_LABEL_VAL(VEH_ROOM_AFFECTS(veh), NOBITS), lbuf);
