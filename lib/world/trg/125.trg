@@ -1566,7 +1566,7 @@ end
 #12556
 Scrawled words -- colossus leg chant hint~
 1 c 4
-look~
+look examine~
 if %actor.obj_target(%arg%)% != %self%
   return 0
   halt

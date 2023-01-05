@@ -477,7 +477,7 @@ void identify_obj_to_char(obj_data *obj, char_data *ch) {
 		msg_to_char(ch, "&0");
 	}
 
-	if (GET_OBJ_STORAGE(obj) && !OBJ_FLAGGED(obj, OBJ_NO_STORE)) {
+	if (GET_OBJ_STORAGE(obj) && !OBJ_FLAGGED(obj, OBJ_NO_STORE) && OBJ_CAN_STORE(obj)) {
 		LL_FOREACH(GET_OBJ_STORAGE(obj), store) {
 			if (store->type == TYPE_BLD && (bld = building_proto(store->vnum))) {
 				add_string_hash(&str_hash, GET_BLD_NAME(bld), 1);
@@ -619,11 +619,12 @@ void identify_obj_to_char(obj_data *obj, char_data *ch) {
 			msg_to_char(ch, "Teaches craft: %s (%s)\r\n", cft ? GET_CRAFT_NAME(cft) : "UNKNOWN", cft ? craft_types[GET_CRAFT_TYPE(cft)] : "?");
 			break;
 		}
-		case ITEM_WEAPON:
+		case ITEM_WEAPON: {
 			msg_to_char(ch, "Speed: %.2f\r\n", get_weapon_speed(obj));
 			msg_to_char(ch, "Damage: %d (%s+%.2f base dps)\r\n", GET_WEAPON_DAMAGE_BONUS(obj), (IS_MAGIC_ATTACK(GET_WEAPON_TYPE(obj)) ? "Intelligence" : "Strength"), get_base_dps(obj));
-			msg_to_char(ch, "Damage type is %s.\r\n", attack_hit_info[GET_WEAPON_TYPE(obj)].name);
+			msg_to_char(ch, "Damage type is %s (%s/%s).\r\n", attack_hit_info[GET_WEAPON_TYPE(obj)].name, weapon_types[attack_hit_info[GET_WEAPON_TYPE(obj)].weapon_type], damage_types[attack_hit_info[GET_WEAPON_TYPE(obj)].damage_type]);
 			break;
+		}
 		case ITEM_ARMOR:
 			msg_to_char(ch, "Armor type: %s\r\n", armor_types[GET_ARMOR_TYPE(obj)]);
 			break;
@@ -731,7 +732,7 @@ void identify_obj_to_char(obj_data *obj, char_data *ch) {
 	// data that isn't type-based:
 	if (OBJ_FLAGGED(obj, OBJ_PLANTABLE) && (cp = crop_proto(GET_OBJ_VAL(obj, VAL_FOOD_CROP_TYPE)))) {
 		ordered_sprintbit(GET_CROP_CLIMATE(cp), climate_flags, climate_flags_order, CROP_FLAGGED(cp, CROPF_ANY_LISTED_CLIMATE) ? TRUE : FALSE, lbuf);
-		msg_to_char(ch, "Plants %s (%s).\r\n", GET_CROP_NAME(cp), GET_CROP_CLIMATE(cp) ? lbuf : "any climate");
+		msg_to_char(ch, "Plants %s (%s%s).\r\n", GET_CROP_NAME(cp), GET_CROP_CLIMATE(cp) ? lbuf : "any climate", (CROP_FLAGGED(cp, CROPF_REQUIRES_WATER) ? "; must be near water" : ""));
 	}
 	
 	if (has_interaction(GET_OBJ_INTERACTIONS(obj), INTERACT_COMBINE)) {
@@ -1656,7 +1657,12 @@ void do_eq_show_current(char_data *ch, bool show_all) {
 			}
 		}
 		else if (show_all) {
-			msg_to_char(ch, "%s\r\n", wear_data[pos].eq_prompt);
+			if (PRF_FLAGGED(ch, PRF_SCREEN_READER)) {
+				msg_to_char(ch, "%s(nothing)\r\n", wear_data[pos].eq_prompt);
+			}
+			else {
+				msg_to_char(ch, "%s\r\n", wear_data[pos].eq_prompt);
+			}
 			found = TRUE;
 		}
 	}

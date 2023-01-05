@@ -601,6 +601,9 @@ QCMD(qcmd_completed) {
 	struct player_completed_quest *pcq, *next_pcq;
 	size_t size;
 	
+	// sort now
+	HASH_SORT(GET_COMPLETED_QUESTS(ch), sort_completed_quests_by_timestamp);
+	
 	size = snprintf(buf, sizeof(buf), "Completed quests:\r\n");
 	HASH_ITER(hh, GET_COMPLETED_QUESTS(ch), pcq, next_pcq) {
 		size += snprintf(buf + size, sizeof(buf) - size, "  %s\r\n", get_quest_name_by_proto(pcq->vnum));
@@ -905,8 +908,8 @@ QCMD(qcmd_info) {
 			size += snprintf(output + size, sizeof(output) - size, "Group completion: This quest will auto-complete if any member of your group completes it while you're present.\r\n");
 		}
 		
-		// completed?
-		if (pcq) {
+		// completed AND not on it again?
+		if (pcq && !pq) {
 			size += snprintf(output + size, sizeof(output) - size, "--\r\n%s", NULLSAFE(QUEST_COMPLETE_MSG(qst)));
 			get_quest_reward_display(QUEST_REWARDS(qst), buf, FALSE);
 			if (*buf) {

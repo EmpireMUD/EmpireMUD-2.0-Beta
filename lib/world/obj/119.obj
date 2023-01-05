@@ -882,8 +882,8 @@ little innovation will make crafting a breeze!
    Waltur eventually grew impatient with having to set down and pick up tool
 after tool after tool, and began inventing his own.
 ~
-3 p ao cefgjm 3
-0 0 0
+1 p ano cefgjm 4
+0 1 21
 12 0
 C
 150 250
@@ -899,7 +899,7 @@ could afford enough of these to equip an empire, it might rule the trade world.
    Inspired by the popularity of his own crafting shard, Waltur began creating
 new tools for an eager market.
 ~
-1 p ao adfhlo 5
+1 p ano adfhlo 6
 0 1 4
 2 0
 C
@@ -1913,7 +1913,7 @@ fingers make fine clothing.
 ever left again. The sorcerers can little comprehend why, then, the goblins
 continue to invade it.
 ~
-2 o ad 0 5
+2 p ad 0 6
 -1 -1 -1
 11 0
 A
@@ -1943,7 +1943,7 @@ appears to be magical, impossible clothing is a simple feat for such powerful
 sorcerers. Before long, the villagers usually realize the clothing is gaudy and
 impractical. But not before emptying their purses for it.
 ~
-2 o ad 0 5
+2 p ad 0 6
 -1 -1 -1
 10 0
 A

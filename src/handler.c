@@ -484,7 +484,7 @@ void affect_modify(char_data *ch, byte loc, sh_int mod, bitvector_t bitv, bool a
 		case APPLY_AGE:
 			SAFE_ADD(GET_AGE_MODIFIER(ch), mod, INT_MIN, INT_MAX, TRUE);
 			break;
-		case APPLY_MOVE:
+		case APPLY_MOVE: {
 			SAFE_ADD(GET_MAX_MOVE(ch), mod, INT_MIN, INT_MAX, TRUE);
 			
 			// prevent from going negative
@@ -497,27 +497,35 @@ void affect_modify(char_data *ch, byte loc, sh_int mod, bitvector_t bitv, bool a
 					GET_MOVE(ch) = 0;
 				}
 				else if (GET_MOVE_DEFICIT(ch) > 0) {
-					diff = MIN(GET_MOVE_DEFICIT(ch), MAX(0, GET_MOVE(ch) - orig));
+					diff = MAX(0, GET_MOVE(ch) - orig);
+					diff = MIN(GET_MOVE_DEFICIT(ch), diff);
 					GET_MOVE_DEFICIT(ch) -= diff;
 					GET_MOVE(ch) -= diff;
 				}
 			}
 			break;
-		case APPLY_HEALTH:
+		}
+		case APPLY_HEALTH: {
+			// apply to max
 			SAFE_ADD(GET_MAX_HEALTH(ch), mod, INT_MIN, INT_MAX, TRUE);
 			
-			// prevent from going negative
+			// apply to current
 			orig = GET_HEALTH(ch);
 			SAFE_ADD(GET_HEALTH(ch), mod, INT_MIN, INT_MAX, TRUE);
-			GET_HEALTH(ch) = MAX(1, GET_HEALTH(ch));
 			
 			if (!IS_NPC(ch)) {
-				if (GET_HEALTH(ch) < 1) {	// min 1 on health
-					GET_HEALTH_DEFICIT(ch) -= (GET_HEALTH(ch)-1);
-					GET_HEALTH(ch) = 1;
+				if (GET_HEALTH(ch) < 1) {
+					if (GET_POS(ch) >= POS_SLEEPING) {
+						// min 1 on health unless unconscious
+						GET_HEALTH_DEFICIT(ch) -= (GET_HEALTH(ch)-1);
+						GET_HEALTH(ch) = 1;
+					}
+					// otherwise leave them dead/negative
 				}
 				else if (GET_HEALTH_DEFICIT(ch) > 0) {
-					diff = MIN(GET_HEALTH_DEFICIT(ch), MAX(0, GET_HEALTH(ch) - orig));
+					// positive health plus a health deficit
+					diff = MAX(0, GET_HEALTH(ch) - orig);
+					diff = MIN(diff, GET_HEALTH_DEFICIT(ch));
 					diff = MIN(diff, GET_HEALTH(ch)-1);
 					GET_HEALTH_DEFICIT(ch) -= diff;
 					GET_HEALTH(ch) -= diff;
@@ -528,7 +536,8 @@ void affect_modify(char_data *ch, byte loc, sh_int mod, bitvector_t bitv, bool a
 				GET_HEALTH(ch) = MAX(1, GET_HEALTH(ch));
 			}
 			break;
-		case APPLY_MANA:
+		}
+		case APPLY_MANA: {
 			SAFE_ADD(GET_MAX_MANA(ch), mod, INT_MIN, INT_MAX, TRUE);
 			
 			// prevent from going negative
@@ -541,12 +550,14 @@ void affect_modify(char_data *ch, byte loc, sh_int mod, bitvector_t bitv, bool a
 					GET_MANA(ch) = 0;
 				}
 				else if (GET_MANA_DEFICIT(ch) > 0) {
-					diff = MIN(GET_MANA_DEFICIT(ch), MAX(0, GET_MANA(ch) - orig));
+					diff = MAX(0, GET_MANA(ch) - orig);
+					diff = MIN(GET_MANA_DEFICIT(ch), diff);
 					GET_MANA_DEFICIT(ch) -= diff;
 					GET_MANA(ch) -= diff;
 				}
 			}
 			break;
+		}
 		case APPLY_BLOOD: {
 			SAFE_ADD(GET_EXTRA_BLOOD(ch), mod, INT_MIN, INT_MAX, TRUE);
 			break;
@@ -2660,7 +2671,10 @@ void add_cooldown(char_data *ch, any_vnum type, int seconds_duration) {
 	if (ch->desc) {
 		queue_delayed_update(ch, CDU_MSDP_COOLDOWNS);
 	}
-	request_char_save_in_world(ch);
+	if (IS_NPC(ch)) {
+		// only save mobs for this. players don't need it
+		request_char_save_in_world(ch);
+	}
 }
 
 
@@ -2699,7 +2713,10 @@ void remove_cooldown(char_data *ch, struct cooldown_data *cool) {
 	if (ch->desc) {
 		queue_delayed_update(ch, CDU_MSDP_COOLDOWNS);
 	}
-	request_char_save_in_world(ch);
+	if (IS_NPC(ch)) {
+		// only mobs need a save for this
+		request_char_save_in_world(ch);
+	}
 }
 
 

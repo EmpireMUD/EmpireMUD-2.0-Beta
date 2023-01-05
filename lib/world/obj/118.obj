@@ -2348,10 +2348,10 @@ S
 #11890
 struggle~
 the struggle~
-The struggle is real.~
-You're struggling to get free! (struggle)
+The remains of a struggle are evident all around.~
+Sometimes it's necessary to 'struggle' to get free.
 ~
-3 p a 0 4
+3 0 a 0 5
 0 0 0
 0 5
 C
@@ -2361,7 +2361,7 @@ M
 Your struggle ends.~
 M
 18
-The struggle ends.~
+The signs of struggle fade.~
 T 11885
 T 11966
 S

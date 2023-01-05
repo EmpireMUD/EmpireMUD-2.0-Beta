@@ -145,6 +145,14 @@ void perform_social(char_data *ch, social_data *soc, char *argument) {
 		send_low_pos_msg(ch);
 		return;
 	}
+	if (GET_FEEDING_FROM(ch) && SOC_MIN_CHAR_POS(soc) >= POS_SLEEPING) {
+		msg_to_char(ch, "You can't do that right now!\r\n");
+		return;
+	}
+	if (GET_FED_ON_BY(ch) && SOC_MIN_CHAR_POS(soc) >= POS_SLEEPING) {
+		msg_to_char(ch, "The fangs in your flesh prevent you from even moving.\r\n");
+		return;
+	}
 	
 	// clear last act messages for everyone in the room
 	DL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), c, next_in_room) {

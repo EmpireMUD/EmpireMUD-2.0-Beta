@@ -1028,6 +1028,7 @@ Usage:  group  -- see status on the group
         group leave  -- leave the group you're in
         group leader <name>  -- change leader
         group new -- create an empty group
+        group options -- set group options (leader only)
 
 Grouping allows multiple players to work on the same challenge, and gives them
 access to a private group channel. You can also type "group" by itself to see
@@ -1043,6 +1044,9 @@ balance game encounters against the number of players in the group.
 
 Inviting a player to a group automatically beckons them to follow, if they
 aren't already following someone.
+
+The leader can use 'group options anonymous' to prevent members from seeing
+each others' locations.
 
 See also: ADVENTURE SUMMON, GSAY
 #
@@ -1167,7 +1171,7 @@ good idea to read them every once in a while.
 INVENTORY
 
 Usage:  inventory
-        inventory [-i | -k | -n] <keywords>
+        inventory [-k | -n] <keywords>
         inventory -c <component type>
         inventory -w <wear location> [keywords]
         inventory -t <type> [keywords]
@@ -1177,12 +1181,12 @@ to check that no thieves have got to your backpack. When in a storage building,
 this also checks the stored items there.
 
 You can also search your inventory by keyword, or use the following flags:
-  &c-i&0 Identify items (e.g. levels).
   &c-k&0 Only show items marked (keep).
   &c-n&0 Omit items marked (keep).
   &c-c&0 Show items of component type (e.g. 'lumber', 'large, single block').
   &c-w&0 Show items which can be worn in a given slot (e.g. 'finger').
   &c-t&0 Show items of a given type (e.g. 'weapon').
+  &r-i&0 No longer supported. Use 'toggle item-details' instead.
 
 Items marked (large) take up two slots instead of one. If you equip an item
 to your "pack" slot, you can carry more items.
@@ -1191,7 +1195,8 @@ If you're trying to see what you're wearing instead, type EQUIPMENT. Items do
 not take up inventory space when equipped (except containers and their
 contents).
 
-See also: EQUIPMENT, GRAB, HOLD, REMOVE, WEAR, STORE, RETRIEVE, WIELD, SWAP
+See also: EQUIPMENT, GRAB, HOLD, REMOVE, WEAR, STORE, RETRIEVE, WIELD, SWAP,
+   TOGGLE
 #
 INTERLINK INTERLINKING
 
@@ -1435,6 +1440,8 @@ Usage:  messages
 
 This displays any system messages from the last 24 hours, plus any messages
 that are set to show on login or on auto-repeat.
+
+See also: NEWS
 #
 METERS "COMBAT METERS"
 
@@ -1494,6 +1501,8 @@ Usage:  news
 
 Shows any recent news from the game staff. For example, updates or new
 adventures might appear here.
+
+See also: MESSAGES
 #
 NODISMANTLE NO-DISMANTLE "NO DISMANTLE"
 

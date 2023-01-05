@@ -288,7 +288,7 @@ bool move_vehicle(char_data *ch, vehicle_data *veh, int dir, int subcmd) {
 	}
 	if (!IS_COMPLETE(to_room) && (!WATER_SECT(to_room) || !VEH_FLAGGED(veh, VEH_SAILING | VEH_FLYING))) {
 		if (ch) {
-			msg_to_char(ch, "You can't %s in there until it's complete.\r\n", drive_data[subcmd].command);
+			msg_to_char(ch, "You can't %s in there until it's %s.\r\n", drive_data[subcmd].command, IS_DISMANTLING(to_room) ? "fully dismantled" : "complete");
 		}
 		return FALSE;
 	}
@@ -1398,6 +1398,9 @@ ACMD(do_dispatch) {
 	// vehicle validation
 	else if (!(veh = find_ship_to_dispatch(ch, targ))) {
 		msg_to_char(ch, "You can't find any ship like that to dispatch on this island.\r\n");
+	}
+	else if (!VEH_OWNER(veh)) {
+		msg_to_char(ch, "You can't dispatch an unclaimed vessel.\r\n");
 	}
 	else if (!can_use_vehicle(ch, veh, MEMBERS_ONLY)) {
 		msg_to_char(ch, "You don't have permission to dispatch that.\r\n");

@@ -2289,8 +2289,14 @@ while %count% < 12
   set room %actor.room%
   set to_room 0
   * see where we're at
-  if %actor.position% != Sleeping || !%room.function(BEDROOM)% || !%actor.can_teleport_room% || !%actor.canuseroom_guest%
-    * still awake or no bedroom? nothing to do
+  if %actor.position% != Sleeping
+    if %teleported%
+      * already moved and woke up
+      dg_affect #11927 %actor% off silent
+      halt
+    end
+  elseif !%room.function(BEDROOM)% || !%actor.can_teleport_room% || !%actor.canuseroom_guest%
+    * no bedroom? nothing to do
   elseif %dreams_only%
     switch %random.7%
       case 1
@@ -4376,8 +4382,13 @@ while %count% < 12
   set to_room 0
   * see where we're at
   if %actor.position% != Sleeping
-    * still awake?
-    if (%count% // 4) == 1 && !%teleported%
+    * awake?
+    if %teleported%
+      * teleported and woke up
+      dg_affect #11961 %actor% off silent
+      halt
+    elseif (%count% // 4) == 1
+      * hasn't slept yet
       %send% %actor% You feel tired.
     end
   elseif !%room.function(BEDROOM)% || !%actor.can_teleport_room% || !%actor.canuseroom_guest%
@@ -4597,8 +4608,12 @@ while %count% < 12
   set to_room 0
   * see where we're at
   if %actor.position% != Sleeping
-    * still awake?
-    if (%count% // 4) == 1 && !%teleported%
+    * awake?
+    if %teleported%
+      * already moved and woke
+      dg_affect #11965 %actor% off silent
+      halt
+    elseif (%count% // 4) == 1
       %send% %actor% You feel tired.
     end
   elseif !%room.function(BEDROOM)% || %room.template% == 11975 || !%actor.can_teleport_room% || !%actor.canuseroom_guest%
@@ -5584,7 +5599,7 @@ if %move% == 1
           if %diff% >= 2
             %send% %ch% That really hurt! Your leg is immobilized.
             dg_affect #11956 %ch% off silent
-            dg_affect #11956 %ch% IMMOBILIZE on 10
+            dg_affect #11956 %ch% IMMOBILIZED on 10
           end
           %damage% %ch% 100 physical
         elseif %ch.is_pc%

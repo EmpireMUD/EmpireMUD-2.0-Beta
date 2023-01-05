@@ -498,6 +498,7 @@ int gain_event_points(char_data *ch, any_vnum event_vnum, int points) {
 	struct event_running_data *running;
 	struct player_event_data *ped;
 	char capstr[256];
+	int real_gain;
 	
 	if (!ch || !points) {
 		return 0;	// no work
@@ -514,7 +515,9 @@ int gain_event_points(char_data *ch, any_vnum event_vnum, int points) {
 		ped->level = GET_HIGHEST_KNOWN_LEVEL(ch);
 	}
 	SAFE_ADD(ped->points, points, 0, INT_MAX, FALSE);
+	real_gain = points;
 	if (EVT_MAX_POINTS(running->event) > 0 && ped->points > EVT_MAX_POINTS(running->event)) {
+		real_gain -= (ped->points - EVT_MAX_POINTS(running->event));
 		ped->points = EVT_MAX_POINTS(running->event);
 	}
 	update_player_leaderboard(ch, running, ped);
@@ -528,7 +531,7 @@ int gain_event_points(char_data *ch, any_vnum event_vnum, int points) {
 	}
 	
 	if (points > 0) {
-		msg_to_char(ch, "\tyYou gain %d point%s for '%s'! You now have %d%s point%s.\t0\r\n", points, PLURAL(points), running->event ? EVT_NAME(running->event) : "Unknown Event", ped->points, capstr, (ped->points != 1 || *capstr) ? "s" : "");
+		msg_to_char(ch, "\tyYou gain %d point%s for '%s'! You now have %d%s point%s.\t0\r\n", real_gain, PLURAL(real_gain), running->event ? EVT_NAME(running->event) : "Unknown Event", ped->points, capstr, (ped->points != 1 || *capstr) ? "s" : "");
 	}
 	else if (points < 0) {
 		msg_to_char(ch, "\tyYou lose %d point%s for '%s'! You now have %d%s point%s.\t0\r\n", ABSOLUTE(points), PLURAL(ABSOLUTE(points)), running->event ? EVT_NAME(running->event) : "Unknown Event", ped->points, capstr, (ped->points != 1 || *capstr) ? "s" : "");

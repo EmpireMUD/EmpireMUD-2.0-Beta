@@ -7009,6 +7009,11 @@ else
   * no knezz at all
   set seconds 99999
 end
+* ensure affect
+if !%self.affect(11874)%
+  dg_affect #11874 %self% INTELLIGENCE 1 120
+end
+* check timers
 if %seconds% > 60
   * 1 minute: Knezz dies
   nop %self.add_mob_flag(NO-ATTACK)%

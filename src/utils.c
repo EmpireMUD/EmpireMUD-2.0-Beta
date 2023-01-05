@@ -2957,6 +2957,35 @@ double rate_item(obj_data *obj) {
 //// PLAYER UTILS ////////////////////////////////////////////////////////////
 
 /**
+* Player's carry limit. This was formerly a macro.
+*
+* @param char_data *ch The player/character.
+* @return int The maximum number of items.
+*/
+int CAN_CARRY_N(char_data *ch) {
+	int bonus;
+	int total = 25;	// TODO: should this be a configurable base
+	
+	// contribution from gear
+	total += GET_BONUS_INVENTORY(ch);
+	if (GET_EQ(ch, WEAR_PACK)) {
+		total += GET_PACK_CAPACITY(GET_EQ(ch, WEAR_PACK));
+	}
+	
+	// players only:
+	if (!IS_NPC(ch)) {
+		// player's bonus trait
+		if (HAS_BONUS_TRAIT(ch, BONUS_INVENTORY)) {
+			bonus = GET_HIGHEST_KNOWN_LEVEL(ch) / 10;
+			total += MAX(5, bonus);
+		}
+	}
+	
+	return total;
+}
+
+
+/**
 * Determines if a character can see in a dark room. This replaces a shirt-load
 * of macros that were increasingly hard to read.
 *
@@ -6525,6 +6554,79 @@ void free_vnum_hash(struct vnum_hash **hash) {
 // easy alpha sorter
 int sort_string_hash(struct string_hash *a, struct string_hash *b) {
 	return strcmp(a->str, b->str);
+}
+
+
+/**
+* Builds a string from the contents of a string_hash. This does NOT free the
+* hash in the process.
+*
+* @param struct string_hash *str_hash The string hash to convert to a string.
+* @param char *to_string The buffer to save it to.
+* @param size_t string_size Limit for to_string, to prevent buffer overruns.
+* @param bool show_count If TRUE, shows (x123) after anything with a count over 1; if FALSE never shows the number.
+* @param bool use_commas If TRUE, puts commas between entries; if FALSE only shows spaces.
+* @param bool use_and If TRUE, puts an "and" before the last entry; if FALSE, just has a comma (or space if no commas).
+*/
+void string_hash_to_string(struct string_hash *str_hash, char *to_string, size_t string_size, bool show_count, bool use_commas, bool use_and) {
+	struct string_hash *str_iter, *next_str;
+	char entry[MAX_STRING_LENGTH];
+	size_t entry_size, cur_size;
+	
+	if (!to_string) {
+		return;	// baffling
+	}
+	
+	*to_string = '\0';
+	cur_size = 0;
+	
+	if (!str_hash) {
+		return;	// nothing else to do
+	}
+	
+	HASH_ITER(hh, str_hash, str_iter, next_str) {
+		// build one entry
+		*entry = '\0';
+		entry_size = 0;
+		
+		// start: leading and?
+		if (use_and && !next_str && str_iter != str_hash) {
+			// last entry and not the first entry
+			entry_size += snprintf(entry + entry_size, sizeof(entry) - entry_size, "and ");
+		}
+		
+		// name
+		entry_size += snprintf(entry + entry_size, sizeof(entry) - entry_size, "%s", str_iter->str);
+		
+		// count?
+		if (str_iter->count > 1 && show_count) {
+			entry_size += snprintf(entry + entry_size, sizeof(entry) - entry_size, " (x%d)", str_iter->count);
+		}
+		
+		// trailing comma?
+		if (use_commas && next_str && (!use_and || HASH_COUNT(str_hash) > 2)) {
+			if (entry_size + 2 < sizeof(entry)) {
+				strcat(entry, ", ");
+				entry_size += 2;
+			}
+		}
+		else if (next_str) {
+			if (entry_size + 1 < sizeof(entry)) {
+				strcat(entry, " ");
+				++entry_size;
+			}
+		}
+		
+		// now append?
+		if (cur_size + entry_size < string_size - 12) {
+			strcat(to_string, entry);
+			cur_size += entry_size;
+		}
+		else {
+			cur_size += snprintf(to_string + cur_size, string_size - cur_size, "**OVERFLOW**");
+			break;
+		}
+	}
 }
 
 

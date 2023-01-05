@@ -190,7 +190,7 @@ bool check_build_location_and_dir(char_data *ch, room_data *room, craft_data *ty
 	}
 	
 	// vehicle size/location checks
-	if (!is_upgrade && make_veh && GET_BUILDING(room) && VEH_FLAGGED(make_veh, VEH_NO_BUILDING)) {
+	if (!is_upgrade && make_veh && VEH_FLAGGED(make_veh, VEH_NO_BUILDING) && (ROOM_IS_CLOSED(room) || (GET_BUILDING(room) && !ROOM_BLD_FLAGGED(room, BLD_OPEN)))) {
 		if (ch) {
 			msg_to_char(ch, "You can't %s that in a building.\r\n", command);
 		}
@@ -2169,6 +2169,14 @@ ACMD(do_dismantle) {
 	}
 	
 	if (!COMPLEX_DATA(IN_ROOM(ch))) {
+		// also check for dismantle-able vehicles
+		DL_FOREACH2(ROOM_VEHICLES(IN_ROOM(ch)), veh, next_in_room) {
+			if (VEH_FLAGGED(veh, VEH_DISMANTLING) || !VEH_FLAGGED(veh, VEH_NEVER_DISMANTLE)) {
+				msg_to_char(ch, "Use 'dismantle <name>' to dismantle a vehicle or building in the room.\r\n");
+				return;
+			}
+		}
+		
 		msg_to_char(ch, "You can't start dismantling anything here.\r\n");
 		return;
 	}
@@ -2190,6 +2198,15 @@ ACMD(do_dismantle) {
 
 	if (!(type = find_building_list_entry(IN_ROOM(ch), FIND_BUILD_NORMAL))) {
 		if (!(type = find_building_list_entry(IN_ROOM(ch), FIND_BUILD_UPGRADE))) {
+			// also check for dismantle-able vehicles
+			DL_FOREACH2(ROOM_VEHICLES(IN_ROOM(ch)), veh, next_in_room) {
+				if (VEH_FLAGGED(veh, VEH_DISMANTLING) || !VEH_FLAGGED(veh, VEH_NEVER_DISMANTLE)) {
+					msg_to_char(ch, "Use 'dismantle <name>' to dismantle a vehicle or building in the room.\r\n");
+					return;
+				}
+			}
+			
+			// if we got here, there weren't any
 			msg_to_char(ch, "You can't dismantle anything here.\r\n");
 			return;
 		}

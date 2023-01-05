@@ -45,6 +45,7 @@ ACMD(do_weather);
 ACMD(do_affects);
 void list_one_char(char_data *i, char_data *ch, int num);
 void look_at_char(char_data *i, char_data *ch, bool show_eq);
+void look_in_obj(char_data *ch, char *arg, obj_data *obj, vehicle_data *veh);
 void show_one_stored_item_to_char(char_data *ch, empire_data *emp, struct empire_storage_data *store, bool show_zero);
 
 
@@ -426,8 +427,9 @@ int sort_chart_hash(struct chart_territory *a, struct chart_territory *b) {
 * @param char_data *ch The looker.
 * @param char *arg What the person typed to look at.
 * @param char *more_args Additional args they passed.
+* @param bool look_inside If TRUE, also shows contents (where applicable).
 */
-void look_at_target(char_data *ch, char *arg, char *more_args) {
+void look_at_target(char_data *ch, char *arg, char *more_args, bool look_inside) {
 	char targ_arg[MAX_INPUT_LENGTH];
 	int found = FALSE, fnum;
 	bitvector_t bits;
@@ -471,6 +473,9 @@ void look_at_target(char_data *ch, char *arg, char *more_args) {
 	if (found_veh != NULL) {
 		look_at_vehicle(found_veh, ch);
 		act("$n looks at $V.", TRUE, ch, NULL, found_veh, TO_ROOM);
+		if (look_inside && VEH_FLAGGED(found_veh, VEH_CONTAINER)) {
+			look_in_obj(ch, NULL, NULL, found_veh);
+		}
 		return;
 	}
 
@@ -517,6 +522,9 @@ void look_at_target(char_data *ch, char *arg, char *more_args) {
 			}
 			act("$n looks at $p.", TRUE, ch, found_obj, NULL, TO_ROOM);
 			found = TRUE;
+			if (look_inside && (IS_CONTAINER(found_obj) || IS_CORPSE(found_obj) || IS_DRINK_CONTAINER(found_obj))) {
+				look_in_obj(ch, NULL, found_obj, NULL);
+			}
 		}
 	}
 	
@@ -537,17 +545,19 @@ void look_at_target(char_data *ch, char *arg, char *more_args) {
 * Processes doing a "look in".
 *
 * @param char_data *ch The player doing the look-in.
-* @param char *arg The typed argument (usually obj name).
+* @param char *arg The typed argument (usually obj name) -- only if obj/veh are NULL.
+* @param obj_data *obj Optional: A pre-validated object to look in (may be NULL).
+* @param vehicle_data *veh Optional: A pre-validated vehicle to look in (may be NULL).
 */
-void look_in_obj(char_data *ch, char *arg) {
-	vehicle_data *veh = NULL;
-	obj_data *obj = NULL;
+void look_in_obj(char_data *ch, char *arg, obj_data *obj, vehicle_data *veh) {
+	char buf[MAX_STRING_LENGTH];
 	char_data *dummy = NULL;
-	int amt, bits;
+	int amt, bits = 0;
 
-	if (!*arg)
+	if (!obj && !veh && (!arg || !*arg)) {
 		send_to_char("Look in what?\r\n", ch);
-	else if (!(bits = generic_find(arg, NULL, FIND_OBJ_INV | FIND_OBJ_ROOM | FIND_OBJ_EQUIP | FIND_VEHICLE_ROOM | FIND_VEHICLE_INSIDE, ch, &dummy, &obj, &veh))) {
+	}
+	else if (!obj && !veh && !(bits = generic_find(arg, NULL, FIND_OBJ_INV | FIND_OBJ_ROOM | FIND_OBJ_EQUIP | FIND_VEHICLE_ROOM | FIND_VEHICLE_INSIDE, ch, &dummy, &obj, &veh))) {
 		sprintf(buf, "There doesn't seem to be %s %s here.\r\n", AN(arg), arg);
 		send_to_char(buf, ch);
 	}
@@ -557,32 +567,21 @@ void look_in_obj(char_data *ch, char *arg) {
 			act("$V isn't a container.", FALSE, ch, NULL, veh, TO_CHAR);
 		}
 		else {
-			sprintf(buf, "$V (%d/%d):", VEH_CARRYING_N(veh), VEH_CAPACITY(veh));
+			sprintf(buf, "You look inside $V (%d/%d):", VEH_CARRYING_N(veh), VEH_CAPACITY(veh));
 			act(buf, FALSE, ch, NULL, veh, TO_CHAR);
 			list_obj_to_char(VEH_CONTAINS(veh), ch, OBJ_DESC_CONTENTS, TRUE);
 		}
 	}
 	// the rest is objects:
-	else if ((GET_OBJ_TYPE(obj) != ITEM_DRINKCON) && (GET_OBJ_TYPE(obj) != ITEM_CORPSE) && (GET_OBJ_TYPE(obj) != ITEM_CONTAINER))
+	else if (obj && (GET_OBJ_TYPE(obj) != ITEM_DRINKCON) && (GET_OBJ_TYPE(obj) != ITEM_CORPSE) && (GET_OBJ_TYPE(obj) != ITEM_CONTAINER)) {
 		send_to_char("There's nothing inside that!\r\n", ch);
-	else {
+	}
+	else if (obj) {
 		if (GET_OBJ_TYPE(obj) == ITEM_CONTAINER || GET_OBJ_TYPE(obj) == ITEM_CORPSE) {
 			if (OBJVAL_FLAGGED(obj, CONT_CLOSED) && GET_OBJ_TYPE(obj) != ITEM_CORPSE)
 				send_to_char("It is closed.\r\n", ch);
 			else {
-				send_to_char(fname(GET_OBJ_KEYWORDS(obj)), ch);
-				switch (bits) {
-					case FIND_OBJ_INV:
-						send_to_char(" (carried): \r\n", ch);
-						break;
-					case FIND_OBJ_ROOM:
-						send_to_char(" (here): \r\n", ch);
-						break;
-					case FIND_OBJ_EQUIP:
-						send_to_char(" (used): \r\n", ch);
-						break;
-				}
-
+				msg_to_char(ch, "You look inside %s (%s):\r\n", get_obj_desc(obj, ch, OBJ_DESC_SHORT), (obj->worn_by ? "worn" : (obj->carried_by ? "inventory" : "in room")));
 				list_obj_to_char(obj->contains, ch, OBJ_DESC_CONTENTS, TRUE);
 			}
 		}
@@ -604,6 +603,10 @@ void look_in_obj(char_data *ch, char *arg) {
 		else {
 			msg_to_char(ch, "You can't look in that!\r\n");
 		}
+	}
+	else {
+		// probably unreachable, but in case:
+		msg_to_char(ch, "There's nothing in that.\r\n");
 	}
 }
 
@@ -2501,30 +2504,13 @@ ACMD(do_display) {
 
 
 ACMD(do_examine) {
-	vehicle_data *tmp_veh = NULL;
-	char_data *tmp_char;
-	obj_data *tmp_object;
-
 	argument = one_argument(argument, arg);
 
 	if (!*arg) {
 		send_to_char("Examine what?\r\n", ch);
 		return;
 	}
-	look_at_target(ch, arg, argument);
-
-	generic_find(arg, NULL, FIND_OBJ_INV | FIND_OBJ_ROOM | FIND_CHAR_ROOM | FIND_OBJ_EQUIP | FIND_VEHICLE_ROOM | FIND_VEHICLE_INSIDE, ch, &tmp_char, &tmp_object, &tmp_veh);
-
-	if (tmp_object) {
-		if ((GET_OBJ_TYPE(tmp_object) == ITEM_DRINKCON) || (GET_OBJ_TYPE(tmp_object) == ITEM_CONTAINER) || (GET_OBJ_TYPE(tmp_object) == ITEM_CORPSE)) {
-			send_to_char("When you look inside, you see:\r\n", ch);
-			look_in_obj(ch, arg);
-		}
-	}
-	if (tmp_veh && VEH_FLAGGED(tmp_veh, VEH_CONTAINER)) {
-		msg_to_char(ch, "When you look inside, you see:\r\n");
-		look_in_obj(ch, arg);
-	}
+	look_at_target(ch, arg, argument, TRUE);
 }
 
 
@@ -2785,7 +2771,7 @@ ACMD(do_informative) {
 }
 
 
-ACMD(do_inventory) {	
+ACMD(do_inventory) {
 	skip_spaces(&argument);
 	
 	if (!*argument) {	// no-arg: traditional inventory
@@ -2803,7 +2789,7 @@ ACMD(do_inventory) {
 	else {	// advanced inventory
 		char word[MAX_INPUT_LENGTH], heading[MAX_STRING_LENGTH], buf[MAX_STRING_LENGTH], temp[MAX_INPUT_LENGTH];
 		int wear_type = NOTHING, type_type = NOTHING;
-		bool kept = FALSE, not_kept = FALSE, identify = FALSE;
+		bool kept = FALSE, not_kept = FALSE;
 		generic_data *cmp = NULL;
 		obj_data *obj;
 		size_t size;
@@ -2879,7 +2865,7 @@ ACMD(do_inventory) {
 				case 'i': {
 					strcpy(word, argument+2);
 					strcpy(argument, word);
-					identify = TRUE;
+					msg_to_char(ch, "Note: inventory -i is no longer supported. Use 'toggle item-details' instead.\r\n");
 					break;
 				}
 			}
@@ -2926,12 +2912,7 @@ ACMD(do_inventory) {
 			}
 			
 			// looks okay
-			if (identify && GET_OBJ_CURRENT_SCALE_LEVEL(obj) > 0) {
-				size += snprintf(buf + size, sizeof(buf) - size, "%2d. %s (L-%d)\r\n", ++count, GET_OBJ_DESC(obj, ch, OBJ_DESC_SHORT), GET_OBJ_CURRENT_SCALE_LEVEL(obj));
-			}
-			else {
-				size += snprintf(buf + size, sizeof(buf) - size, "%2d. %s\r\n", ++count, GET_OBJ_DESC(obj, ch, OBJ_DESC_SHORT));
-			}
+			size += snprintf(buf + size, sizeof(buf) - size, "%2d. %s", ++count, obj_desc_for_char(obj, ch, OBJ_DESC_INVENTORY));
 		}
 		
 		if (ch->desc) {
@@ -2995,16 +2976,17 @@ ACMD(do_look) {
 			}
 		}
 		else if (is_abbrev(arg, "in"))
-			look_in_obj(ch, arg2);
+			look_in_obj(ch, arg2, NULL, NULL);
 		/* did the char type 'look <direction>?' */
 		else if ((look_type = parse_direction(ch, arg)) != NO_DIR)
 			look_in_direction(ch, look_type);
 		else if (is_abbrev(arg, "at")) {
 			half_chop(arg2, arg, arg3);
-			look_at_target(ch, arg, arg3);
+			look_at_target(ch, arg, arg3, FALSE);
 		}
-		else
-			look_at_target(ch, arg, arg2);
+		else {
+			look_at_target(ch, arg, arg2, FALSE);
+		}
 	}
 }
 
@@ -3903,6 +3885,7 @@ ACMD(do_whereami) {
 	
 	// extra info:
 	if (IS_IMMORTAL(ch)) {
+		msg_to_char(ch, "VNum: [%d]\r\n", GET_ROOM_VNUM(IN_ROOM(ch)));
 		// sector (basically the same as stat room)
 		msg_to_char(ch, "Sector: [%d] %s", GET_SECT_VNUM(SECT(IN_ROOM(ch))), GET_SECT_NAME(SECT(IN_ROOM(ch))));
 		msg_to_char(ch, ", Base: [%d] %s", GET_SECT_VNUM(BASE_SECT(IN_ROOM(ch))), GET_SECT_NAME(BASE_SECT(IN_ROOM(ch))));

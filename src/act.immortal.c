@@ -2010,7 +2010,7 @@ int perform_set(char_data *ch, char_data *vict, int mode, char *val_arg) {
 	int i, iter, on = 0, off = 0, value = 0;
 	empire_data *emp;
 	room_vnum rvnum;
-	char output[MAX_STRING_LENGTH], oldname[MAX_INPUT_LENGTH], newname[MAX_INPUT_LENGTH];
+	char output[MAX_STRING_LENGTH], oldname[MAX_INPUT_LENGTH], newname[MAX_INPUT_LENGTH], temp[MAX_STRING_LENGTH];
 	char_data *alt;
 	bool file = FALSE;
 
@@ -2052,7 +2052,7 @@ int perform_set(char_data *ch, char_data *vict, int mode, char *val_arg) {
 	}
 	else if (set_fields[mode].type == NUMBER) {
 		value = atoi(val_arg);
-		sprintf(output, "%s's %s set to %d.", GET_NAME(vict), set_fields[mode].cmd, value);
+		sprintf(output, "%s's %s set to %%d.", GET_NAME(vict), set_fields[mode].cmd);
 	}
 	else
 		strcpy(output, "Okay.");
@@ -2823,6 +2823,11 @@ int perform_set(char_data *ch, char_data *vict, int mode, char *val_arg) {
 	}
 	
 	if (*output) {
+		if (strstr(output, "%d")) {
+			// put value in now if a %d is in the output string
+			strcpy(temp, output);
+			sprintf(output, temp, value);
+		}
 		syslog(SYS_GC, GET_INVIS_LEV(ch), TRUE, "GC: %s used set: %s", GET_REAL_NAME(ch), output);
 		strcat(output, "\r\n");
 		send_to_char(CAP(output), ch);
@@ -3458,6 +3463,9 @@ SHOW(show_quests) {
 			}
 			return;
 		}
+		
+		// sort now
+		HASH_SORT(GET_COMPLETED_QUESTS(vict), sort_completed_quests_by_timestamp);
 		
 		size = snprintf(buf, sizeof(buf), "%s's completed quests:\r\n", GET_NAME(vict));
 		HASH_ITER(hh, GET_COMPLETED_QUESTS(vict), pcq, next_pcq) {
@@ -4860,6 +4868,55 @@ SHOW(show_notes) {
 			sprintf(buf, "account %d", acct->id);
 		}
 		msg_to_char(ch, "Admin notes for %s:\r\n%s", buf, acct->notes);
+	}
+}
+
+
+SHOW(show_oceanmobs) {
+	char buf[MAX_STRING_LENGTH], line[256];
+	size_t buf_size, line_size;
+	char_data *mob;
+	int count = 0;
+	
+	buf_size = snprintf(buf, sizeof(buf), "Mobs lost in the ocean:\r\n");
+	
+	DL_FOREACH(character_list, mob) {
+		if (!IS_NPC(mob)) {
+			continue;	// player
+		}
+		if (MOB_FLAGGED(mob, MOB_SPAWNED)) {
+			continue;	// is spawned
+		}
+		if (MOB_INSTANCE_ID(mob) != NOTHING) {
+			continue;	// adventure mob
+		}
+		if (!IN_ROOM(mob)) {
+			continue;	// somehow not in a room
+		}
+		if (!SHARED_DATA(IN_ROOM(mob)) || SHARED_DATA(IN_ROOM(mob)) != &ocean_shared_data) {
+			continue;	// not in the ocean
+		}
+		
+		// ok show it:
+		++count;
+		line_size = snprintf(line, sizeof(line), "[%5d] %s - %s\r\n", GET_MOB_VNUM(mob), GET_SHORT_DESC(mob), room_log_identifier(IN_ROOM(mob)));
+		if (line_size + buf_size < sizeof(buf) - 16) {
+			strcat(buf, line);
+			buf_size += line_size;
+		}
+		else {
+			buf_size += snprintf(buf + buf_size, sizeof(buf) - buf_size, "**OVERFLOW**\r\n");
+			break;
+		}
+	}
+	
+	if (!count) {
+		buf_size += snprintf(buf + buf_size, sizeof(buf) - buf_size, " none\r\n");
+	}
+	
+	// and send
+	if (ch->desc) {
+		page_string(ch->desc, buf, TRUE);
 	}
 }
 
@@ -6305,7 +6362,16 @@ void do_stat_empire(char_data *ch, empire_data *emp) {
 	
 	// attributes
 	for (iter = 0, len = 0; iter < NUM_EMPIRE_ATTRIBUTES; ++iter) {
-		sprintf(line, "%s: [\tc%+d\t0]", empire_attributes[iter], EMPIRE_ATTRIBUTE(emp, iter));
+		switch (iter) {
+			case EATT_TERRITORY_PER_GREATNESS: {
+				sprintf(line, "%s: [%d \tc%+d\t0]", empire_attributes[iter], config_get_int("land_per_greatness"), EMPIRE_ATTRIBUTE(emp, iter));
+				break;
+			}
+			default: {
+				sprintf(line, "%s: [\tc%+d\t0]", empire_attributes[iter], EMPIRE_ATTRIBUTE(emp, iter));
+				break;
+			}
+		}
 		
 		if (len > 0 && len + strlen(line) + 2 >= 80) {	// start new line
 			msg_to_char(ch, "\r\n%s", line);
@@ -6514,7 +6580,7 @@ void do_stat_object(char_data *ch, obj_data *j) {
 		}
 		case ITEM_WEAPON:
 			msg_to_char(ch, "Speed: %.2f, Damage: %d (%s+%.2f base dps)\r\n", get_weapon_speed(j), GET_WEAPON_DAMAGE_BONUS(j), (IS_MAGIC_ATTACK(GET_WEAPON_TYPE(j)) ? "Intelligence" : "Strength"), get_base_dps(j));
-			msg_to_char(ch, "Damage type: %s\r\n", attack_hit_info[GET_WEAPON_TYPE(j)].name);
+			msg_to_char(ch, "Damage type: %s (%s/%s)\r\n", attack_hit_info[GET_WEAPON_TYPE(j)].name, weapon_types[attack_hit_info[GET_WEAPON_TYPE(j)].weapon_type], damage_types[attack_hit_info[GET_WEAPON_TYPE(j)].damage_type]);
 			break;
 		case ITEM_ARMOR:
 			msg_to_char(ch, "Armor type: %s\r\n", armor_types[GET_ARMOR_TYPE(j)]);
@@ -6631,7 +6697,7 @@ void do_stat_object(char_data *ch, obj_data *j) {
 	// data that isn't type-based:
 	if (OBJ_FLAGGED(j, OBJ_PLANTABLE) && (cp = crop_proto(GET_OBJ_VAL(j, VAL_FOOD_CROP_TYPE)))) {
 		ordered_sprintbit(GET_CROP_CLIMATE(cp), climate_flags, climate_flags_order, CROP_FLAGGED(cp, CROPF_ANY_LISTED_CLIMATE) ? TRUE : FALSE, buf);
-		msg_to_char(ch, "Plants %s (%s).\r\n", GET_CROP_NAME(cp), GET_CROP_CLIMATE(cp) ? buf : "any climate");
+		msg_to_char(ch, "Plants %s (%s%s).\r\n", GET_CROP_NAME(cp), GET_CROP_CLIMATE(cp) ? buf : "any climate", (CROP_FLAGGED(cp, CROPF_REQUIRES_WATER) ? "; must be near water" : ""));
 	}
 
 	/*
@@ -6873,17 +6939,16 @@ void do_stat_room(char_data *ch) {
 		sprintf(buf2, "%s %s(%s)", found++ ? "," : "", GET_NAME(k), (!IS_NPC(k) ? "PC" : (!IS_MOB(k) ? "NPC" : "MOB")));
 		strcat(buf, buf2);
 		if (strlen(buf) >= 62) {
-			if (k->next_in_room)
+			if (k->next_in_room) {
 				send_to_char(strcat(buf, ",\r\n"), ch);
-			else
+			}
+			else {
 				send_to_char(strcat(buf, "\r\n"), ch);
+			}
 			*buf = found = 0;
 		}
 	}
-	msg_to_char(ch, "&0");
-
-	if (*buf)
-		send_to_char(strcat(buf, "\r\n&0"), ch);
+	msg_to_char(ch, "%s&0", (*buf ? strcat(buf, "\r\n") : ""));
 	
 	if (ROOM_VEHICLES(IN_ROOM(ch))) {
 		sprintf(buf, "Vehicles:&w");
@@ -10120,6 +10185,7 @@ ACMD(do_show) {
 		{ "homeless", LVL_START_IMM, show_homeless },
 		{ "companions", LVL_START_IMM, show_companions },
 		{ "lastnames", LVL_START_IMM, show_lastnames },
+		{ "oceanmobs", LVL_START_IMM, show_oceanmobs },
 
 		// last
 		{ "\n", 0, NULL }

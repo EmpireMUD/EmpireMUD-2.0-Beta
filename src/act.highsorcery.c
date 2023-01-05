@@ -482,6 +482,10 @@ void summon_materials(char_data *ch, char *argument) {
 		msg_to_char(ch, "You aren't high enough rank to retrieve from the empire inventory.\r\n");
 		return;
 	}
+	if (GET_POS(ch) < POS_RESTING) {
+		send_low_pos_msg(ch);
+		return;
+	}
 	
 	if (!GET_ISLAND(IN_ROOM(ch)) || !(isle = get_empire_island(emp, GET_ISLAND_ID(IN_ROOM(ch))))) {
 		msg_to_char(ch, "You can't summon materials here.\r\n");

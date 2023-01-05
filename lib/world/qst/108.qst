@@ -980,13 +980,11 @@ need to learn the Ritual of Burdens.
 ~
 You have performed a ritual and satisfied the Spirit of Order!
 ~
-11 0 0 25 -1
+12 0 0 25 -1
 A
 1 10851
 P
 0 10850 0 1 a
-P
-10 2 0 49 a
 P
 9 2 0 1 a
 R
@@ -999,8 +997,6 @@ R
 6 10859 1
 R
 6 10865 10865
-W
-10 2 0 49 a
 W+
 11 0 0 1 a
 Cast the ritual of burdens in the Soulstream~
@@ -1025,13 +1021,11 @@ most locations on the map. Follow these steps:
 ways to learn low-level Survival. When you reach Survival 5, use 'skill buy
 Navigation' to improve your map.
 ~
-10 d 0 25 -1
+11 d 0 25 -1
 A
 1 10852
 P
 0 10850 0 1 a
-P
-10 5 0 49 a
 P
 9 5 0 1 a
 R
@@ -1044,8 +1038,6 @@ R
 6 10859 1
 R
 6 10865 10865
-W
-10 5 0 49 a
 W
 2 100 0 1 a
 W
@@ -1074,13 +1066,11 @@ it to learn how to use it. Here are the steps for this quest:
 ~
 You have satisfied the Spirit of the Hunt!
 ~
-10 d 0 25 -1
+11 d 0 25 -1
 A
 1 10853
 P
 0 10850 0 1 a
-P
-10 0 0 49 a
 P
 9 0 0 1 a
 R
@@ -1094,8 +1084,6 @@ R
 R
 6 10865 10865
 T 10853
-W
-10 0 0 49 a
 W
 4 0 512 1 a
 W
@@ -1115,13 +1103,11 @@ Heal Friend), but the Spirit of Mana can be healed with the basic Heal.
    You have restored the Spirit of Mana! You can heal yourself after combat to
 raise your Natural Magic skill further.
 ~
-18 0 0 25 -1
+19 0 0 25 -1
 A
 1 10854
 P
 0 10850 0 1 a
-P
-10 3 0 49 a
 P
 9 3 0 1 a
 R
@@ -1134,8 +1120,6 @@ R
 6 10859 1
 R
 6 10865 10865
-W
-10 3 0 49 a
 W+
 11 0 0 1 a
 Heal the Spirit of Mana~
@@ -1159,13 +1143,11 @@ worry, you'll get better at it as you level up.
 ~
 You have satisfied the Spirit of Darkness with your stealth.
 ~
-15 0 0 25 -1
+16 0 0 25 -1
 A
 1 10855
 P
 0 10850 0 1 a
-P
-10 4 0 49 a
 P
 9 4 0 1 a
 R
@@ -1178,8 +1160,6 @@ R
 6 10859 1
 R
 6 10865 10865
-W
-10 4 0 49 a
 W+
 11 0 0 1 a
 Sneak into the hidden part of the Soulstream~
@@ -1204,13 +1184,11 @@ Note: This quest will not show as 'complete' until you re-enter the Soulstream.
    You have satisfied the Spirit of Blood! Buy and use more abilities from the
 Vampire skill tree to become a sanguine master!
 ~
-18 0 0 25 -1
+19 0 0 25 -1
 A
 1 10857
 P
 0 10850 0 1 a
-P
-10 7 0 49 a
 P
 9 7 0 1 a
 R
@@ -1224,8 +1202,6 @@ R
 R
 6 10865 10865
 T 10857
-W
-10 7 0 49 a
 W+
 11 0 0 1 a
 Drink blood and return to the Soulstream~
@@ -1249,13 +1225,11 @@ can be used like a knife for butchering and skinning. Try this:
    You have satisfied the Spirit of Innovation! That spear head can be used for
 butchering, scraping, skinning, and even sewing!
 ~
-14 0 0 25 -1
+15 0 0 25 -1
 A
 1 10858
 P
 0 10850 0 1 a
-P
-10 6 0 49 a
 P
 9 6 0 1 a
 R
@@ -1271,8 +1245,6 @@ R
 R
 6 10865 10865
 W
-10 6 0 49 a
-W
 2 186 0 1 a
 Z
 1 10858
@@ -1283,7 +1255,7 @@ Complete More Tutorials~
 spirit tokens for a special reward. There is a tutorial inside for each of the
 skill trees, but you need to have the skill in the 1-49 level range to get its
 tutorial quest.
-   Once you have four of the tokens, you can finish this quest at the
+   Once you have three of the tokens, you can finish this quest at the
 Soulstream portal, or at any city center. Type 'coins' to see how many of the
 spirit tokens you have right now.
 ~
@@ -1291,11 +1263,11 @@ spirit tokens you have right now.
 special companion! Use this spirit bell to add the 'companion spirit' to your
 minipet collection. Then you can type 'minipet companion spirit' to summon it.
 ~
-9 d 0 25 -1
+10 d 0 25 -1
 R
 2 10859 1
 W
-20 10852 0 4 -
+20 10852 0 3 -
 Z
 2 10850
 Z
@@ -1311,7 +1283,7 @@ and he will get you started. Try using 'where pageboy' to find him.
 ~
 You've found the pageboy...
 ~
-4 a 0 25 -1
+5 a 0 25 -1
 A
 1 10856
 P

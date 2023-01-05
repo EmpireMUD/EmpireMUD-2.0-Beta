@@ -229,7 +229,9 @@ mountable creatures or ones that are pulling carts, try 'lead' instead.
 
 Herd requires the Animal Husbandry ability.
 
-See also: ANIMAL HUSBANDRY, LEAD
+Use 'load' to move a herded animal into a ship or other vehicle.
+
+See also: ANIMAL HUSBANDRY, LEAD, LOAD
 #
 LEAD 
 
@@ -604,7 +606,9 @@ Players who reach level 100 can have two different sets of ability purchases
 for their skills. When you use "skill swap", all of your skills change from
 one set to the other.
 
-Swapping skill sets will reduce your moves and mana to 25% of your total.
+Swapping skill sets costs 75% of your mana and movement points; it will
+regenerate normally. This prevents you from swapping during short breaks in
+combat.
 
 When you first change to your alternate skill set, no abilities have been
 purchased. Resetting a skill only resets your current set, not the other set.

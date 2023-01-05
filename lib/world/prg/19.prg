@@ -3,8 +3,9 @@ Henge Construction~
    Like the druids of old, your empire has learned to construct henges from
 megalithic stones. These henges can be used to learn the secrets of the druids
 and the path of Natural Magic.
+   The henge requires 120x (large blocks).
 ~
-3 1 50 0 b
+4 1 50 0 b
 K 2 5142
 P 4001
 S
@@ -14,8 +15,10 @@ Sorcery Tower Construction~
 has earned this knowledge. You can build the Tower of Sorcery, which will
 attract a High Sorcerer and allow members of your empire to learn the arcane
 arts. Sorcery towers can only be built inside your cities.
+   The sorcery tower requires 80x (lumber), 40x (blocks), 5x ingot of
+nocturnium, and 4x gold ingot.
 ~
-4 1 50 0 b
+6 1 50 0 b
 K 2 5164
 P 4001
 S

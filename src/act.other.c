@@ -425,7 +425,7 @@ void perform_alternate(char_data *old, char_data *new) {
 	old_emp = GET_LOYALTY(old);
 	
 	// prepare logs
-	snprintf(sys, sizeof(sys), "%s used alternate to switch to %s at %s.", GET_NAME(old), GET_NAME(new), IN_ROOM(old) ? room_log_identifier(IN_ROOM(old)) : "an unknown location");
+	snprintf(sys, sizeof(sys), "%s used alternate at %s to switch to %s", GET_NAME(old), (IN_ROOM(old) ? room_log_identifier(IN_ROOM(old)) : "an unknown location"), GET_NAME(new));
 
 	strcpy(temp, PERS(new, new, TRUE));
 	snprintf(mort_alt, sizeof(mort_alt), "%s has switched to %s", PERS(old, old, TRUE), temp);
@@ -462,7 +462,6 @@ void perform_alternate(char_data *old, char_data *new) {
 	extract_all_items(old);
 	extract_char(old);
 	
-	syslog(SYS_LOGIN, invis_lev, TRUE, "%s", sys);
 	if (config_get_bool("public_logins")) {
 		if (GET_INVIS_LEV(new) == 0 && !PLR_FLAGGED(new, PLR_INVSTART)) {
 			mortlog("%s", mort_alt);
@@ -503,6 +502,10 @@ void perform_alternate(char_data *old, char_data *new) {
 			show_start = TRUE;
 		}
 	}
+	
+	// log late so we have a location
+	sprintf(sys + strlen(sys), " at %s.", room_log_identifier(IN_ROOM(new)));
+	syslog(SYS_LOGIN, invis_lev, TRUE, "%s", sys);
 	
 	if (AFF_FLAGGED(new, AFF_EARTHMELD)) {
 		msg_to_char(new, "You are earthmelded.\r\n");
@@ -2533,7 +2536,7 @@ ACMD(do_group) {
 		send_to_group(NULL, GROUP(ch), "%s is now group leader.", GET_NAME(vict));
 		send_config_msg(ch, "ok_string");
 	}
-	else if (is_abbrev(buf, "option")) {
+	else if (is_abbrev(buf, "options")) {
 		skip_spaces(&argument);
 		if (!GROUP(ch)) {
 			msg_to_char(ch, "But you aren't part of a group!\r\n");

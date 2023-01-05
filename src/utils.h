@@ -398,7 +398,7 @@ int GET_MAX_BLOOD(char_data *ch);	// this one is different than the other max po
 
 // definitions
 #define AWAKE(ch)  (GET_POS(ch) > POS_SLEEPING || GET_POS(ch) == POS_DEAD)
-#define CAN_CARRY_N(ch)  (25 + GET_BONUS_INVENTORY(ch) + (HAS_BONUS_TRAIT(ch, BONUS_INVENTORY) ? 5 : 0) + (GET_EQ((ch), WEAR_PACK) ? GET_PACK_CAPACITY(GET_EQ(ch, WEAR_PACK)) : 0))
+int CAN_CARRY_N(char_data *ch);	// formerly a macro
 #define CAN_CARRY_OBJ(ch,obj)  (FREE_TO_CARRY(obj) || (IS_CARRYING_N(ch) + obj_carry_size(obj)) <= CAN_CARRY_N(ch))
 #define CAN_GET_OBJ(ch, obj)  (CAN_WEAR((obj), ITEM_WEAR_TAKE) && CAN_CARRY_OBJ((ch),(obj)) && CAN_SEE_OBJ((ch),(obj)))
 #define CAN_RECOGNIZE(ch, vict)  (PRF_FLAGGED(ch, PRF_HOLYLIGHT) || (!AFF_FLAGGED(vict, AFF_NO_SEE_IN_ROOM) && ((GET_LOYALTY(ch) && GET_LOYALTY(ch) == GET_LOYALTY(vict)) || (GROUP(ch) && in_same_group(ch, vict)) || (!CHAR_MORPH_FLAGGED((vict), MORPHF_ANIMAL) && !IS_DISGUISED(vict)))))
@@ -939,7 +939,7 @@ int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_COORD(ge
 #define OBJ_CAN_STACK(obj)  (GET_OBJ_TYPE(obj) != ITEM_CONTAINER && !IS_AMMO(obj))
 #define OBJ_CAN_STORE(obj)  (GET_OBJ_STORAGE(obj) && GET_OBJ_REQUIRES_QUEST(obj) == NOTHING && !OBJ_BOUND_TO(obj) && !OBJ_FLAGGED((obj), OBJ_NO_STORE | OBJ_SUPERIOR | OBJ_ENCHANTED) && !IS_STOLEN(obj))
 #define UNIQUE_OBJ_CAN_STORE(obj, allow_bound)  ((allow_bound || !OBJ_BOUND_TO(obj)) && !OBJ_CAN_STORE(obj) && !OBJ_FLAGGED((obj), OBJ_NO_STORE | OBJ_JUNK) && GET_OBJ_TIMER(obj) == UNLIMITED && GET_OBJ_REQUIRES_QUEST(obj) == NOTHING && !IS_STOLEN(obj))
-#define OBJ_STACK_FLAGS  (OBJ_SUPERIOR | OBJ_KEEP | OBJ_ENCHANTED)
+#define OBJ_STACK_FLAGS  (OBJ_SUPERIOR | OBJ_KEEP | OBJ_ENCHANTED | OBJ_HARD_DROP | OBJ_GROUP_DROP | OBJ_BIND_ON_EQUIP | OBJ_BIND_ON_PICKUP)
 #define OBJS_ARE_SAME(o1, o2)  (GET_OBJ_VNUM(o1) == GET_OBJ_VNUM(o2) && GET_OBJ_CURRENT_SCALE_LEVEL(o1) == GET_OBJ_CURRENT_SCALE_LEVEL(o2) && ((GET_OBJ_EXTRA(o1) & OBJ_STACK_FLAGS) == (GET_OBJ_EXTRA(o2) & OBJ_STACK_FLAGS)) && (GET_OBJ_SHORT_DESC(o1) == GET_OBJ_SHORT_DESC(o2) || !strcmp(GET_OBJ_SHORT_DESC(o1), GET_OBJ_SHORT_DESC(o2))) && (GET_OBJ_LONG_DESC(o1) == GET_OBJ_LONG_DESC(o2) || !strcmp(GET_OBJ_LONG_DESC(o1), GET_OBJ_LONG_DESC(o2))) && (!IS_DRINK_CONTAINER(o1) || GET_DRINK_CONTAINER_TYPE(o1) == GET_DRINK_CONTAINER_TYPE(o2)) && (!IS_BOOK(o1) || !IS_BOOK(o2) || GET_BOOK_ID(o1) == GET_BOOK_ID(o2)) && (!IS_AMMO(o1) || !IS_AMMO(o2) || GET_AMMO_QUANTITY(o1) == GET_AMMO_QUANTITY(o2)) && (IS_STOLEN(o1) == IS_STOLEN(o2)) && identical_bindings((o1),(o2)))
 
 
@@ -1693,6 +1693,7 @@ void free_pair_hash(struct pair_hash **hash);
 void free_string_hash(struct string_hash **hash);
 void free_vnum_hash(struct vnum_hash **hash);
 int sort_string_hash(struct string_hash *a, struct string_hash *b);
+void string_hash_to_string(struct string_hash *str_hash, char *to_string, size_t string_size, bool show_count, bool use_commas, bool use_and);
 
 // adventure functions from utils.c
 adv_data *get_adventure_for_vnum(rmt_vnum vnum);
@@ -2352,6 +2353,7 @@ void refresh_one_quest_tracker(char_data *ch, struct player_quest *pq);
 void remove_quest_items(char_data *ch);
 void remove_quest_items_by_quest(char_data *ch, any_vnum vnum);
 void setup_daily_quest_cycles(int only_cycle);
+int sort_completed_quests_by_timestamp(struct player_completed_quest *a, struct player_completed_quest *b);
 
 void qt_change_ability(char_data *ch, any_vnum abil);
 void qt_change_level(char_data *ch, int level);
