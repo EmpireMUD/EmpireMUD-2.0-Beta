@@ -908,8 +908,8 @@ QCMD(qcmd_info) {
 			size += snprintf(output + size, sizeof(output) - size, "Group completion: This quest will auto-complete if any member of your group completes it while you're present.\r\n");
 		}
 		
-		// completed?
-		if (pcq) {
+		// completed AND not on it again?
+		if (pcq && !pq) {
 			size += snprintf(output + size, sizeof(output) - size, "--\r\n%s", NULLSAFE(QUEST_COMPLETE_MSG(qst)));
 			get_quest_reward_display(QUEST_REWARDS(qst), buf, FALSE);
 			if (*buf) {

@@ -2957,6 +2957,35 @@ double rate_item(obj_data *obj) {
 //// PLAYER UTILS ////////////////////////////////////////////////////////////
 
 /**
+* Player's carry limit. This was formerly a macro.
+*
+* @param char_data *ch The player/character.
+* @return int The maximum number of items.
+*/
+int CAN_CARRY_N(char_data *ch) {
+	int bonus;
+	int total = 25;	// TODO: should this be a configurable base
+	
+	// contribution from gear
+	total += GET_BONUS_INVENTORY(ch);
+	if (GET_EQ(ch, WEAR_PACK)) {
+		total += GET_PACK_CAPACITY(GET_EQ(ch, WEAR_PACK));
+	}
+	
+	// players only:
+	if (!IS_NPC(ch)) {
+		// player's bonus trait
+		if (HAS_BONUS_TRAIT(ch, BONUS_INVENTORY)) {
+			bonus = GET_HIGHEST_KNOWN_LEVEL(ch) / 10;
+			total += MAX(5, bonus);
+		}
+	}
+	
+	return total;
+}
+
+
+/**
 * Determines if a character can see in a dark room. This replaces a shirt-load
 * of macros that were increasingly hard to read.
 *
