@@ -1462,6 +1462,9 @@ bool check_autostore(obj_data *obj, bool force, empire_data *override_emp) {
 	top_obj = get_top_object(obj);
 	real_loc = IN_ROOM(top_obj);
 	in_veh = top_obj->in_vehicle;
+	if (in_veh) {
+		real_loc = IN_ROOM(in_veh);
+	}
 	
 	// follow up the chain of rooms until SOMETHING is claimed:
 	do {
