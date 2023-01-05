@@ -2912,7 +2912,7 @@ ACMD(do_inventory) {
 			}
 			
 			// looks okay
-			size += snprintf(buf + size, sizeof(buf) - size, "%2d. %s\r\n", ++count, obj_desc_for_char(obj, ch, OBJ_DESC_INVENTORY));
+			size += snprintf(buf + size, sizeof(buf) - size, "%2d. %s", ++count, obj_desc_for_char(obj, ch, OBJ_DESC_INVENTORY));
 		}
 		
 		if (ch->desc) {
