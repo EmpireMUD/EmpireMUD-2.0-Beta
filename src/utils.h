@@ -1693,6 +1693,7 @@ void free_pair_hash(struct pair_hash **hash);
 void free_string_hash(struct string_hash **hash);
 void free_vnum_hash(struct vnum_hash **hash);
 int sort_string_hash(struct string_hash *a, struct string_hash *b);
+void string_hash_to_string(struct string_hash *str_hash, char *to_string, size_t string_size, bool show_count, bool use_commas, bool use_and);
 
 // adventure functions from utils.c
 adv_data *get_adventure_for_vnum(rmt_vnum vnum);
