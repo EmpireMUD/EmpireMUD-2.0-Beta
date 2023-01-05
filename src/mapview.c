@@ -1760,14 +1760,13 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options) {
 * @param int dir The direction they typed.
 */
 void look_in_direction(char_data *ch, int dir) {
-	char buf[MAX_STRING_LENGTH], line[MAX_STRING_LENGTH];
+	char buf[MAX_STRING_LENGTH];
 	char *exdesc;
 	vehicle_data *veh;
 	char_data *c;
 	room_data *to_room;
 	struct room_direction_data *ex;
-	size_t size;
-	struct string_hash *str_iter, *next_str, *str_hash = NULL;
+	struct string_hash *str_hash = NULL;
 	
 	// check first for an extra description that covers the direction
 	snprintf(buf, sizeof(buf), "%s", dirs[dir]);
@@ -1810,28 +1809,9 @@ void look_in_direction(char_data *ch, int dir) {
 				
 				// prepare for display
 				if (str_hash) {
-					size = snprintf(buf, sizeof(buf), "You see ");
-					HASH_ITER(hh, str_hash, str_iter, next_str) {
-						if (str_iter->count == 1) {
-							snprintf(line, sizeof(line), "%s%s%s", (next_str || str_iter == str_hash) ? "" : "and ", str_iter->str, (next_str && HASH_COUNT(str_hash) > 2) ? ", " : "");
-						}
-						else {
-							snprintf(line, sizeof(line), "%s%s (x%d)%s", (next_str || str_iter == str_hash) ? "" : "and ", str_iter->str, str_iter->count, (next_str && HASH_COUNT(str_hash) > 2) ? ", " : "");
-						}
-						if (size + strlen(line) < sizeof(buf) - 14) {
-							strcat(buf, line);
-							size += strlen(line);
-						}
-						else {
-							size += snprintf(buf + size, sizeof(buf) - size, "**OVERFLOW**");
-							break;
-						}
-					}
+					string_hash_to_string(str_hash, buf, sizeof(buf) - 14, TRUE, TRUE, TRUE);
 					free_string_hash(&str_hash);
-					if (size < sizeof(buf) - 3) {
-						strcat(buf, ".\r\n");
-					}
-					send_to_char(buf, ch);
+					msg_to_char(ch, "You see %s.\r\n", buf);
 				}
 				else {
 					msg_to_char(ch, "You don't see anyone in that direction.\r\n");
@@ -1926,28 +1906,9 @@ void look_in_direction(char_data *ch, int dir) {
 		
 		// prepare for display
 		if (str_hash) {
-			size = snprintf(buf, sizeof(buf), "You see ");
-			HASH_ITER(hh, str_hash, str_iter, next_str) {
-				if (str_iter->count == 1) {
-					snprintf(line, sizeof(line), "%s%s%s", (next_str || str_iter == str_hash) ? "" : "and ", str_iter->str, (next_str && HASH_COUNT(str_hash) > 2) ? ", " : "");
-				}
-				else {
-					snprintf(line, sizeof(line), "%s%s (x%d)%s", (next_str || str_iter == str_hash) ? "" : "and ", str_iter->str, str_iter->count, (next_str && HASH_COUNT(str_hash) > 2) ? ", " : "");
-				}
-				if (size + strlen(line) < sizeof(buf) - 15) {
-					strcat(buf, line);
-					size += strlen(line);
-				}
-				else {
-					size += snprintf(buf + size, sizeof(buf) - size, "**OVERFLOW**");
-					break;
-				}
-			}
+			string_hash_to_string(str_hash, buf, sizeof(buf) - 14, TRUE, TRUE, TRUE);
 			free_string_hash(&str_hash);
-			if (size < sizeof(buf) - 3) {
-				strcat(buf, ".\r\n");
-			}
-			send_to_char(buf, ch);
+			msg_to_char(ch, "You see %s.\r\n", buf);
 		}
 		else {
 			msg_to_char(ch, "You don't see anyone in that direction.\r\n");
