@@ -6576,10 +6576,16 @@ void string_hash_to_string(struct string_hash *str_hash, char *to_string, size_t
 		
 		// trailing comma?
 		if (use_commas && next_str && (!use_and || HASH_COUNT(str_hash) > 2)) {
-			entry_size += snprintf(entry + entry_size, sizeof(entry) - entry_size, ", ");
+			if (entry_size + 2 < sizeof(entry)) {
+				strcat(entry, ", ");
+				entry_size += 2;
+			}
 		}
 		else if (next_str) {
-			entry_size += snprintf(entry + entry_size, sizeof(entry) - entry_size, " ");
+			if (entry_size + 1 < sizeof(entry)) {
+				strcat(entry, " ");
+				++entry_size;
+			}
 		}
 		
 		// now append?
