@@ -1399,6 +1399,9 @@ ACMD(do_dispatch) {
 	else if (!(veh = find_ship_to_dispatch(ch, targ))) {
 		msg_to_char(ch, "You can't find any ship like that to dispatch on this island.\r\n");
 	}
+	else if (!VEH_OWNER(veh)) {
+		msg_to_char(ch, "You can't dispatch an unclaimed vessel.\r\n");
+	}
 	else if (!can_use_vehicle(ch, veh, MEMBERS_ONLY)) {
 		msg_to_char(ch, "You don't have permission to dispatch that.\r\n");
 	}
