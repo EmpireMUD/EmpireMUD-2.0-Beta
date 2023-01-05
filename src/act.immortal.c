@@ -4872,6 +4872,55 @@ SHOW(show_notes) {
 }
 
 
+SHOW(show_oceanmobs) {
+	char buf[MAX_STRING_LENGTH], line[256];
+	size_t buf_size, line_size;
+	char_data *mob;
+	int count = 0;
+	
+	buf_size = snprintf(buf, sizeof(buf), "Mobs lost in the ocean:\r\n");
+	
+	DL_FOREACH(character_list, mob) {
+		if (!IS_NPC(mob)) {
+			continue;	// player
+		}
+		if (!MOB_FLAGGED(mob, MOB_SPAWNED)) {
+			continue;	// is spawned
+		}
+		if (MOB_INSTANCE_ID(mob) != NOTHING) {
+			continue;	// adventure mob
+		}
+		if (!IN_ROOM(mob)) {
+			continue;	// somehow not in a room
+		}
+		if (!SHARED_DATA(IN_ROOM(mob)) || SHARED_DATA(IN_ROOM(mob)) != &ocean_shared_data) {
+			continue;	// not in the ocean
+		}
+		
+		// ok show it:
+		++count;
+		line_size = snprintf(line, sizeof(line), "[%5d] %s - %s\r\n", GET_MOB_VNUM(mob), GET_SHORT_DESC(mob), room_log_identifier(IN_ROOM(mob)));
+		if (line_size + buf_size < sizeof(buf) - 16) {
+			strcat(buf, line);
+			buf_size += line_size;
+		}
+		else {
+			buf_size += snprintf(buf + buf_size, sizeof(buf) - buf_size, "**OVERFLOW**\r\n");
+			break;
+		}
+	}
+	
+	if (!count) {
+		buf_size += snprintf(buf + buf_size, sizeof(buf) - buf_size, " none\r\n");
+	}
+	
+	// and send
+	if (ch->desc) {
+		page_string(ch->desc, buf, TRUE);
+	}
+}
+
+
 SHOW(show_olc) {
 	char buf[MAX_STRING_LENGTH];
 	player_index_data *index, *next_index;
@@ -10136,6 +10185,7 @@ ACMD(do_show) {
 		{ "homeless", LVL_START_IMM, show_homeless },
 		{ "companions", LVL_START_IMM, show_companions },
 		{ "lastnames", LVL_START_IMM, show_lastnames },
+		{ "oceanmobs", LVL_START_IMM, show_oceanmobs },
 
 		// last
 		{ "\n", 0, NULL }

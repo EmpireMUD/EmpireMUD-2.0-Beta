@@ -1128,6 +1128,7 @@ minipets   Immort   Shows you minipets collected by a player.
 moons      Immort   Shows any moons and their current phases/positions.
 mounts     Immort   Shows you mounts owned by a player.
 notes      Immort   Show notes on a player.
+oceanmobs  Immort   Shows mobs lost in the ocean.
 olc        Immort   Shows all players with OLC access (vnum optional).
 player     Immort   Shows player summary information.
 players    Immort   Shows health and status for all current players.
