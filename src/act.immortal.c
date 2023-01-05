@@ -4884,7 +4884,7 @@ SHOW(show_oceanmobs) {
 		if (!IS_NPC(mob)) {
 			continue;	// player
 		}
-		if (!MOB_FLAGGED(mob, MOB_SPAWNED)) {
+		if (MOB_FLAGGED(mob, MOB_SPAWNED)) {
 			continue;	// is spawned
 		}
 		if (MOB_INSTANCE_ID(mob) != NOTHING) {
