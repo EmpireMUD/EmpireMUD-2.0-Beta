@@ -1813,10 +1813,10 @@ void look_in_direction(char_data *ch, int dir) {
 					size = snprintf(buf, sizeof(buf), "You see ");
 					HASH_ITER(hh, str_hash, str_iter, next_str) {
 						if (str_iter->count == 1) {
-							snprintf(line, sizeof(line), "%s%s%s", (next_str || str_iter == str_hash) ? "" : "and ", str_iter->str, (next_str ? ", " : "."));
+							snprintf(line, sizeof(line), "%s%s%s", (next_str || str_iter == str_hash) ? "" : "and ", str_iter->str, (next_str && HASH_COUNT(str_hash) > 2) ? ", " : "");
 						}
 						else {
-							snprintf(line, sizeof(line), "%s%s (x%d)%s", (next_str || str_iter == str_hash) ? "" : "and ", str_iter->str, str_iter->count, (next_str ? ", " : "."));
+							snprintf(line, sizeof(line), "%s%s (x%d)%s", (next_str || str_iter == str_hash) ? "" : "and ", str_iter->str, str_iter->count, (next_str && HASH_COUNT(str_hash) > 2) ? ", " : "");
 						}
 						if (size + strlen(line) < sizeof(buf) - 14) {
 							strcat(buf, line);
@@ -1828,8 +1828,8 @@ void look_in_direction(char_data *ch, int dir) {
 						}
 					}
 					free_string_hash(&str_hash);
-					if (size < sizeof(buf) - 2) {
-						strcat(buf, "\r\n");
+					if (size < sizeof(buf) - 3) {
+						strcat(buf, ".\r\n");
 					}
 					send_to_char(buf, ch);
 				}
@@ -1929,12 +1929,12 @@ void look_in_direction(char_data *ch, int dir) {
 			size = snprintf(buf, sizeof(buf), "You see ");
 			HASH_ITER(hh, str_hash, str_iter, next_str) {
 				if (str_iter->count == 1) {
-					snprintf(line, sizeof(line), "%s%s%s", (next_str || str_iter == str_hash) ? "" : "and ", str_iter->str, (next_str ? ", " : "."));
+					snprintf(line, sizeof(line), "%s%s%s", (next_str || str_iter == str_hash) ? "" : "and ", str_iter->str, (next_str && HASH_COUNT(str_hash) > 2) ? ", " : "");
 				}
 				else {
-					snprintf(line, sizeof(line), "%s%s (x%d)%s", (next_str || str_iter == str_hash) ? "" : "and ", str_iter->str, str_iter->count, (next_str ? ", " : "."));
+					snprintf(line, sizeof(line), "%s%s (x%d)%s", (next_str || str_iter == str_hash) ? "" : "and ", str_iter->str, str_iter->count, (next_str && HASH_COUNT(str_hash) > 2) ? ", " : "");
 				}
-				if (size + strlen(line) < sizeof(buf) - 14) {
+				if (size + strlen(line) < sizeof(buf) - 15) {
 					strcat(buf, line);
 					size += strlen(line);
 				}
@@ -1944,8 +1944,8 @@ void look_in_direction(char_data *ch, int dir) {
 				}
 			}
 			free_string_hash(&str_hash);
-			if (size < sizeof(buf) - 2) {
-				strcat(buf, "\r\n");
+			if (size < sizeof(buf) - 3) {
+				strcat(buf, ".\r\n");
 			}
 			send_to_char(buf, ch);
 		}
