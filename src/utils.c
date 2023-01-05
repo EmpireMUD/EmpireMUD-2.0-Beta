@@ -6581,9 +6581,6 @@ void string_hash_to_string(struct string_hash *str_hash, char *to_string, size_t
 		else if (next_str) {
 			entry_size += snprintf(entry + entry_size, sizeof(entry) - entry_size, " ");
 		}
-		else {
-			entry_size = snprintf(entry, sizeof(entry), "%s%s (x%d)%s", (next_str || str_iter == str_hash) ? "" : "and ", str_iter->str, str_iter->count, (next_str && HASH_COUNT(str_hash) > 2) ? ", " : "");
-		}
 		
 		// now append?
 		if (cur_size + entry_size < string_size - 12) {
