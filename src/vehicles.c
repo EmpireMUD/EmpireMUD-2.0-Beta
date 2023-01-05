@@ -4221,7 +4221,7 @@ void olc_show_vehicle(char_data *ch) {
 		sprintf(lbuf, "<%sminlevel\t0> %d", OLC_LABEL_CHANGED, VEH_MIN_SCALE_LEVEL(veh));
 	}
 	else {
-		sprintf(lbuf, "<%sminlevel\t0> none\r\n", OLC_LABEL_UNCHANGED);
+		sprintf(lbuf, "<%sminlevel\t0> none", OLC_LABEL_UNCHANGED);
 	}
 	if (VEH_MAX_SCALE_LEVEL(veh) > 0) {
 		sprintf(buf + strlen(buf), "%s, <%smaxlevel\t0> %d\r\n", lbuf, OLC_LABEL_CHANGED, VEH_MAX_SCALE_LEVEL(veh));
