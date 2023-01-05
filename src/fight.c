@@ -1179,7 +1179,7 @@ void death_cry(char_data *ch) {
 
 	if (ROOM_IS_CLOSED(IN_ROOM(ch)) && COMPLEX_DATA(IN_ROOM(ch))) {
 		for (ex = COMPLEX_DATA(IN_ROOM(ch))->exits; ex; ex = ex->next) {
-			if (ex->room_ptr) {
+			if (ex->room_ptr && ex->room_ptr != IN_ROOM(ch)) {
 				send_to_room("Your blood freezes as you hear someone's death cry.\r\n", ex->room_ptr);
 			}
 		}
@@ -1188,7 +1188,7 @@ void death_cry(char_data *ch) {
 		rl = HOME_ROOM(IN_ROOM(ch));
 		
 		for (iter = 0; iter < NUM_2D_DIRS; ++iter) {
-			if ((to_room = real_shift(rl, shift_dir[iter][0], shift_dir[iter][1]))) {
+			if ((to_room = real_shift(rl, shift_dir[iter][0], shift_dir[iter][1])) && to_room != IN_ROOM(ch)) {
 				send_to_room("Your blood freezes as you hear someone's death cry.\r\n", to_room);
 			}
 		}
