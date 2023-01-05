@@ -2771,7 +2771,7 @@ ACMD(do_informative) {
 }
 
 
-ACMD(do_inventory) {	
+ACMD(do_inventory) {
 	skip_spaces(&argument);
 	
 	if (!*argument) {	// no-arg: traditional inventory
@@ -2913,10 +2913,10 @@ ACMD(do_inventory) {
 			
 			// looks okay
 			if (identify && GET_OBJ_CURRENT_SCALE_LEVEL(obj) > 0) {
-				size += snprintf(buf + size, sizeof(buf) - size, "%2d. %s (L-%d)\r\n", ++count, GET_OBJ_DESC(obj, ch, OBJ_DESC_INVENTORY), GET_OBJ_CURRENT_SCALE_LEVEL(obj));
+				size += snprintf(buf + size, sizeof(buf) - size, "%2d. %s (L-%d)\r\n", ++count, obj_desc_for_char(obj, ch, OBJ_DESC_INVENTORY), GET_OBJ_CURRENT_SCALE_LEVEL(obj));
 			}
 			else {
-				size += snprintf(buf + size, sizeof(buf) - size, "%2d. %s\r\n", ++count, GET_OBJ_DESC(obj, ch, OBJ_DESC_INVENTORY));
+				size += snprintf(buf + size, sizeof(buf) - size, "%2d. %s\r\n", ++count, obj_desc_for_char(obj, ch, OBJ_DESC_INVENTORY));
 			}
 		}
 		
