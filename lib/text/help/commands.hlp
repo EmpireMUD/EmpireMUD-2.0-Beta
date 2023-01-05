@@ -1171,7 +1171,7 @@ good idea to read them every once in a while.
 INVENTORY
 
 Usage:  inventory
-        inventory [-i | -k | -n] <keywords>
+        inventory [-k | -n] <keywords>
         inventory -c <component type>
         inventory -w <wear location> [keywords]
         inventory -t <type> [keywords]
@@ -1181,12 +1181,12 @@ to check that no thieves have got to your backpack. When in a storage building,
 this also checks the stored items there.
 
 You can also search your inventory by keyword, or use the following flags:
-  &c-i&0 Identify items (e.g. levels).
   &c-k&0 Only show items marked (keep).
   &c-n&0 Omit items marked (keep).
   &c-c&0 Show items of component type (e.g. 'lumber', 'large, single block').
   &c-w&0 Show items which can be worn in a given slot (e.g. 'finger').
   &c-t&0 Show items of a given type (e.g. 'weapon').
+  &r-i&0 No longer supported. Use 'toggle item-details' instead.
 
 Items marked (large) take up two slots instead of one. If you equip an item
 to your "pack" slot, you can carry more items.
@@ -1195,7 +1195,8 @@ If you're trying to see what you're wearing instead, type EQUIPMENT. Items do
 not take up inventory space when equipped (except containers and their
 contents).
 
-See also: EQUIPMENT, GRAB, HOLD, REMOVE, WEAR, STORE, RETRIEVE, WIELD, SWAP
+See also: EQUIPMENT, GRAB, HOLD, REMOVE, WEAR, STORE, RETRIEVE, WIELD, SWAP,
+   TOGGLE
 #
 INTERLINK INTERLINKING
 

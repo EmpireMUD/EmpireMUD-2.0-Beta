@@ -2789,7 +2789,7 @@ ACMD(do_inventory) {
 	else {	// advanced inventory
 		char word[MAX_INPUT_LENGTH], heading[MAX_STRING_LENGTH], buf[MAX_STRING_LENGTH], temp[MAX_INPUT_LENGTH];
 		int wear_type = NOTHING, type_type = NOTHING;
-		bool kept = FALSE, not_kept = FALSE, identify = FALSE;
+		bool kept = FALSE, not_kept = FALSE;
 		generic_data *cmp = NULL;
 		obj_data *obj;
 		size_t size;
@@ -2865,7 +2865,7 @@ ACMD(do_inventory) {
 				case 'i': {
 					strcpy(word, argument+2);
 					strcpy(argument, word);
-					identify = TRUE;
+					msg_to_char(ch, "Note: inventory -i is no longer supported. Use 'toggle item-details' instead.\r\n");
 					break;
 				}
 			}
@@ -2912,12 +2912,7 @@ ACMD(do_inventory) {
 			}
 			
 			// looks okay
-			if (identify && GET_OBJ_CURRENT_SCALE_LEVEL(obj) > 0) {
-				size += snprintf(buf + size, sizeof(buf) - size, "%2d. %s (L-%d)\r\n", ++count, obj_desc_for_char(obj, ch, OBJ_DESC_INVENTORY), GET_OBJ_CURRENT_SCALE_LEVEL(obj));
-			}
-			else {
-				size += snprintf(buf + size, sizeof(buf) - size, "%2d. %s\r\n", ++count, obj_desc_for_char(obj, ch, OBJ_DESC_INVENTORY));
-			}
+			size += snprintf(buf + size, sizeof(buf) - size, "%2d. %s\r\n", ++count, obj_desc_for_char(obj, ch, OBJ_DESC_INVENTORY));
 		}
 		
 		if (ch->desc) {
