@@ -482,7 +482,7 @@ void summon_materials(char_data *ch, char *argument) {
 		msg_to_char(ch, "You aren't high enough rank to retrieve from the empire inventory.\r\n");
 		return;
 	}
-	if (GET_POS(ch) == POS_FIGHTING || GET_POS(ch) < POS_RESTING) {
+	if (GET_POS(ch) < POS_RESTING) {
 		send_low_pos_msg(ch);
 		return;
 	}
