@@ -1936,6 +1936,7 @@ void free_empire(empire_data *emp) {
 	struct empire_log_data *elog, *next_elog;
 	struct workforce_log *wf_log;
 	struct shipping_data *shipd, *next_shipd;
+	struct workforce_production_log *wplog, *next_wplog;
 	room_data *room;
 	int iter;
 	
@@ -1985,6 +1986,12 @@ void free_empire(empire_data *emp) {
 	HASH_ITER(hh, EMPIRE_PRODUCTION_LIMITS(emp), wpl, next_wpl) {
 		HASH_DEL(EMPIRE_PRODUCTION_LIMITS(emp), wpl);
 		free(wpl);
+	}
+	
+	// free production logs
+	LL_FOREACH_SAFE(EMPIRE_PRODUCTION_LOGS(emp), wplog, next_wplog) {
+		LL_DELETE(EMPIRE_PRODUCTION_LOGS(emp), wplog);
+		free(wplog);
 	}
 	
 	// free trades
