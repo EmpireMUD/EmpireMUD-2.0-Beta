@@ -3380,13 +3380,17 @@ end
 #11945
 Skycleave Dreams: Triple Wake or Pinch Self to Exit~
 2 c 0
-wake pinch scriptwake~
+wake pinch scriptwake run jump trip fall~
 * Teleports the player home if they type 'wake' 3 times while already awake
 * also accepts 'pinch <me/self/name>' or 'scriptwake MODE'
 if !%actor.is_pc%
   return 0
   halt
 end
+set room %actor.room%
+set fall_kws run jump trip fall
+set fall_rooms 11983 11984 11985 11986 11987 11988 11989 11991 11992
+set non_fall_rooms 11975 11976 11977 11978 11979 11980 11981 11982
 if %actor.position% == Standing || %actor.position% == Resting || %actor.position% == Sitting || %cmd% == scriptwake
   * separate behavior for pinch vs wake:
   if %cmd.mudcommand% == wake
@@ -3417,6 +3421,29 @@ if %actor.position% == Standing || %actor.position% == Resting || %actor.positio
       %send% %actor% You pinch yourself -- OUCH -- and suddenly wake up!
       %echoaround% %actor% ~%actor% pinches *%actor%self, lets out a short gasp, and vanishes!
     end
+  elseif (%fall_kws% ~= %cmd%) && (%fall_rooms% ~= %room.template%)
+    * fall ok
+    if jump /= %cmd% || fall /= %cmd%
+      %send% %actor% You feel dizzy as you look down over the edge but cannot bring yourself to jump.
+      return 1
+      halt
+    else
+      %send% %actor% You run along the top of the city but trip and fall off the edge!
+      %send% %actor% As you plummet toward the rocks, you pinch yourself and wake up sweating.
+      %echoaround% %actor% ~%actor% runs along the top of the city but trips and goes over the edge!
+    end
+  elseif (%fall_kws% ~= %cmd%) && (%non_fall_rooms% ~= %room.template%)
+    * non-fall room
+    if jump /= %cmd% || run /= %cmd%
+      %send% %actor% There's not really room to do that in here.
+    elseif trip /= %cmd%
+      %send% %actor% You trip over your own two feet.
+      %echoaround% %actor% ~%actor% trips over ^%actor% own two feet.
+    elseif fall /= %cmd%
+      %send% %actor% You can't really do that here.
+    end
+    return 1
+    halt
   elseif %cmd% == scriptwake
   set scare_kws skulls shelves walls alcoves bones ribs femurs piles
     switch %arg%
@@ -3437,11 +3464,11 @@ if %actor.position% == Standing || %actor.position% == Resting || %actor.positio
     done
     %send% %actor% You wake up in a cold sweat!
   else
+    * not a wake condition
     return 0
     halt
   end
   * If we made it this far, we teleport them:
-  set room %actor.room%
   * check stored room first
   set wake_room 0
   if %actor.varexists(skycleave_wake_room)%

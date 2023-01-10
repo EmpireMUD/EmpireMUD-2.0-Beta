@@ -3122,7 +3122,7 @@ if %self.vnum% == 11933
   wait 6 sec
   say What happened? Oh! I can speak again! I'm free! I'm free!
   wait 9 sec
-  %echo% ~%self% turns and sees ~%annelise% and his face turns sheet-white.
+  %echo% ~%self% turns and sees ~%annelise% and his face goes sheet-white.
   wait 9 sec
   %force% %annelise% say Yes, you're free, you're free. You shall find your father in the lobby. May I suggest you make a hasty escape?
   wait 9 sec
