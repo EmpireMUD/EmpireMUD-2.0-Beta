@@ -4358,7 +4358,9 @@ void warehouse_retrieve(char_data *ch, char *argument, int mode) {
 				obj_to_char(obj, ch);	// inventory size pre-checked
 				act("You retrieve $p.", FALSE, ch, obj, NULL, TO_CHAR | TO_QUEUE);
 				act("$n retrieves $p.", FALSE, ch, obj, NULL, TO_ROOM | TO_QUEUE);
-				load_otrigger(obj);
+				
+				// this should not be running load triggers
+				// load_otrigger(obj);
 			}
 		}
 		
