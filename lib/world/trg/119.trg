@@ -2795,21 +2795,43 @@ if !%target%
 end
 * per-person time limit (mobs and players both)
 set varname limit_%target.id%
-if %self.var(%varname%,0)% + 60 > %timestamp%
+if %self.var(%varname%,0)% + 29 > %timestamp%
   * too soon
   halt
 end
 set %varname% %timestamp%
 remote %varname% %self.id%
+* determine random rumor list
+if !%self.var(rumor_list)%
+  set rumor_list 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19
+  set rumor_count 19
+else
+  * attempt to pull lists
+  set rumor_list %self.var(rumor_list,1)%
+  set rumor_count %self.var(rumor_count,1)%
+end
 * pick 2 rumors
 set rumor1 0
 set rumor2 0
 set rumor1_text
 set rumor2_text
 set count 1
-while %count% <= 2
+while %count% <= 2 && %rumor_count% >= 1
   * This should be the number of cases in the switch below
-  set rumor %random.19%
+  eval pos %%random.%rumor_count%%%
+  set temp_list %rumor_list%
+  set rumor_list
+  while %temp_list%
+    set this %temp_list.car%
+    set temp_list %temp_list.cdr%
+    eval pos %pos% - 1
+    if %pos% == 0
+      set rumor %this%
+    else
+      set rumor_list %rumor% %rumor_list%
+    end
+  done
+  eval rumor_count %rumor_count% - 1
   if %count% == 1 || %rumor% != %rumor1%
     * found valid rumor
     set rumor%count% %rumor%
@@ -2924,22 +2946,27 @@ while %count% <= 2
           set rumor1_text %msg%
         end
       break
-      case 20
-          set rumor%count%_text I heard
-          set rumor%count%_text I heard
-        end
-      break
     done
     eval count %count% + 1
   else
     * did not find a valid rumor: repeat
   end
 done
+* store back
+if %rumor_list%
+  remote rumor_list %self.id%
+  remote rumor_count %self.id%
+else
+  rdelete rumor_list %self.id%
+  rdelete rumor_count %self.id%
+end
 * say the rumors
-say %rumor1_text%
-wait 3 sec
-if %target.room% == %self.room% && %target.is_npc% && %response_mobs% ~= %target.vnum% && %rumor2_text%
-  %force% %target% say Oh? %rumor2_text%
+if !%rumor1_text.empty%
+  say %rumor1_text%
+  wait 3 sec
+  if %target.room% == %self.room% && %target.is_npc% && %response_mobs% ~= %target.vnum% && !%rumor2_text.empty%
+    %force% %target% say Oh? %rumor2_text%
+  end
 end
 ~
 #11938
@@ -6701,7 +6728,7 @@ elseif %move% == 2
       dg_affect #11851 %targ% STUNNED on 15
     else
       %send% %targ% &&jYou're blind!&&0
-      dg_affect #11959 %ch% BLIND on 10
+      dg_affect #11959 %targ% BLIND on 10
     end
     if %diff% >= 3
       %damage% %targ% 100 physical
