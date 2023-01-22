@@ -2581,8 +2581,9 @@ ACMD(do_reforge) {
 			if (reforge_data[subcmd].ability != NO_ABIL) {
 				gain_ability_exp(ch, reforge_data[subcmd].ability, 50);
 			}
-
-			load_otrigger(obj);
+			
+			// this seems like it should not be running a load trigger
+			// load_otrigger(obj);
 		}
 	}
 	else if (is_abbrev(arg2, "superior")) {
