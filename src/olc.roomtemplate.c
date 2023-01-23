@@ -935,6 +935,14 @@ void olc_show_room_template(char_data *ch) {
 	sprintf(buf + strlen(buf), "<%stitle\t0> %s\r\n", OLC_LABEL_STR(GET_RMT_TITLE(rmt), default_rmt_title), NULLSAFE(GET_RMT_TITLE(rmt)));
 	sprintf(buf + strlen(buf), "<%sdescription\t0>\r\n%s", OLC_LABEL_STR(GET_RMT_DESC(rmt), ""), NULLSAFE(GET_RMT_DESC(rmt)));
 	
+	if (GET_RMT_SUBZONE(rmt) != NOWHERE) {
+		snprintf(lbuf, sizeof(lbuf), "%d", GET_RMT_SUBZONE(rmt));
+	}
+	else {
+		strcpy(lbuf, "none");
+	}
+	sprintf(buf + strlen(buf), "<%ssubzone\t0> %s\r\n", OLC_LABEL_VAL(GET_RMT_SUBZONE(rmt), NOWHERE), lbuf);
+	
 	sprintbit(GET_RMT_FLAGS(rmt), room_template_flags, lbuf, TRUE);
 	sprintf(buf + strlen(buf), "<%sflags\t0> %s\r\n", OLC_LABEL_VAL(GET_RMT_FLAGS(rmt), NOBITS), lbuf);
 	
@@ -1436,5 +1444,23 @@ OLC_MODULE(rmedit_spawns) {
 		msg_to_char(ch, "Usage: spawn change <number> <vnum | percent | limit> <value>\r\n");
 		msg_to_char(ch, "Usage: spawn copy <from type> <from vnum>\r\n");
 		msg_to_char(ch, "Usage: spawn remove <number | all>\r\n");
+	}
+}
+
+
+OLC_MODULE(rmedit_subzone) {
+	room_template *rmt = GET_OLC_ROOM_TEMPLATE(ch->desc);
+	
+	if (!str_cmp(argument, "none")) {
+		GET_RMT_SUBZONE(rmt) = NOWHERE;
+		if (PRF_FLAGGED(ch, PRF_NOREPEAT)) {
+			send_config_msg(ch, "ok_string");
+		}
+		else {
+			msg_to_char(ch, "It no longer has a subzone.\r\n");
+		}
+	}
+	else {
+		GET_RMT_SUBZONE(rmt) = olc_process_number(ch, argument, "subzone vnum", "subzone", 0, MAX_VNUM, GET_RMT_SUBZONE(rmt));
 	}
 }

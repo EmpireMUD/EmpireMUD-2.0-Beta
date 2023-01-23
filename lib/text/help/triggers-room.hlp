@@ -218,6 +218,7 @@ When using field - The variable returns:
 &csector&0 - The sector type of the room.
 &csector_flagged(FLG)&0 - True if a given sector flag is present.
 &csector_vnum&0 - The sector vnum of the room.
+&csubzone&0 - The subzone id of the room template, if any (-1 if none).
 &csun&0 - Sun status at the room (regardless of indoor/outdoor): dark, rising,
    light, setting (only 'dark' makes the room dark).
 &ctemplate&0 - The room template vnum, if any.

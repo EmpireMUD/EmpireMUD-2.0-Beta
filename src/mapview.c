@@ -2484,7 +2484,6 @@ void show_screenreader_room(char_data *ch, room_data *room, bitvector_t options)
 
 void perform_mortal_where(char_data *ch, char *arg) {
 	int closest, dir, dist, max_distance;
-	struct instance_data *ch_inst, *i_inst;
 	descriptor_data *d;
 	char_data *i, *found = NULL;
 	
@@ -2504,26 +2503,11 @@ void perform_mortal_where(char_data *ch, char *arg) {
 				continue;
 			if (!CAN_SEE(ch, i) || !CAN_RECOGNIZE(ch, i) || !WIZHIDE_OK(ch, i) || AFF_FLAGGED(i, AFF_NO_WHERE))
 				continue;
-			if ((dist = compute_distance(IN_ROOM(ch), IN_ROOM(i))) > max_distance)
-				continue;
-			
-			if (NO_LOCATION(IN_ROOM(ch)) != NO_LOCATION(IN_ROOM(i))) {
-				// if one is no-location and the other isn't, they definitely can't see each other
+			if ((dist = compute_distance(IN_ROOM(ch), IN_ROOM(i))) > max_distance) {
 				continue;
 			}
-			
-			ch_inst = find_instance_by_room(IN_ROOM(ch), FALSE, FALSE);
-			i_inst = find_instance_by_room(IN_ROOM(i), FALSE, FALSE);
-			if (ch_inst != i_inst || IS_ADVENTURE_ROOM(IN_ROOM(i)) != !IS_ADVENTURE_ROOM(IN_ROOM(ch))) {
-				// not in same adventure...
-				if (NO_LOCATION(IN_ROOM(ch)) || NO_LOCATION(IN_ROOM(i))) {
-					// one or the other is set no-location
-					continue;
-				}
-				if (i_inst && ADVENTURE_FLAGGED(INST_ADVENTURE(i_inst), ADV_NO_NEARBY)) {
-					// target's adventure is !nearby
-					continue;
-				}
+			if (!same_subzone(IN_ROOM(ch), IN_ROOM(i))) {
+				continue;
 			}
 			if (has_player_tech(i, PTECH_NO_TRACK_WILD) && valid_no_trace(IN_ROOM(i))) {
 				gain_player_tech_exp(i, PTECH_NO_TRACK_WILD, 10);
@@ -2557,26 +2541,11 @@ void perform_mortal_where(char_data *ch, char *arg) {
 				continue;
 			if (!multi_isname(arg, GET_PC_NAME(i)))
 				continue;
-			if ((dist = compute_distance(IN_ROOM(ch), IN_ROOM(i))) > max_distance)
-				continue;
-			
-			if (NO_LOCATION(IN_ROOM(ch)) != NO_LOCATION(IN_ROOM(i))) {
-				// if one is no-location and the other isn't, they definitely can't see each other
+			if ((dist = compute_distance(IN_ROOM(ch), IN_ROOM(i))) > max_distance) {
 				continue;
 			}
-			
-			ch_inst = find_instance_by_room(IN_ROOM(ch), FALSE, FALSE);
-			i_inst = find_instance_by_room(IN_ROOM(i), FALSE, FALSE);
-			if (i_inst != ch_inst || find_instance_by_room(IN_ROOM(ch), FALSE, FALSE) != find_instance_by_room(IN_ROOM(i), FALSE, FALSE)) {
-				// not in same adventure...
-				if (NO_LOCATION(IN_ROOM(ch)) || NO_LOCATION(IN_ROOM(i))) {
-					// one or the other is set no-location
-					continue;
-				}
-				if (i_inst && ADVENTURE_FLAGGED(INST_ADVENTURE(i_inst), ADV_NO_NEARBY)) {
-					// target's adventure is !nearby
-					continue;
-				}
+			if (!same_subzone(IN_ROOM(ch), IN_ROOM(i))) {
+				continue;
 			}
 			if (has_player_tech(i, PTECH_NO_TRACK_WILD) && valid_no_trace(IN_ROOM(i))) {
 				gain_player_tech_exp(i, PTECH_NO_TRACK_WILD, 10);

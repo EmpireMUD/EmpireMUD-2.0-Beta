@@ -421,6 +421,7 @@ OLC_MODULE(rmedit_matchexits);
 OLC_MODULE(rmedit_title);
 OLC_MODULE(rmedit_script);
 OLC_MODULE(rmedit_spawns);
+OLC_MODULE(rmedit_subzone);
 
 // sector modules
 OLC_MODULE(sectedit_buildflags);
@@ -925,6 +926,7 @@ const struct olc_command_data olc_data[] = {
 	{ "title", rmedit_title, OLC_ROOM_TEMPLATE, OLC_CF_EDITOR },
 	{ "script", rmedit_script, OLC_ROOM_TEMPLATE, OLC_CF_EDITOR },
 	{ "spawns", rmedit_spawns, OLC_ROOM_TEMPLATE, OLC_CF_EDITOR },
+	{ "subzone", rmedit_subzone, OLC_ROOM_TEMPLATE, OLC_CF_EDITOR },
 	
 	// sector commands	
 	{ "buildflags", sectedit_buildflags, OLC_SECTOR, OLC_CF_EDITOR },

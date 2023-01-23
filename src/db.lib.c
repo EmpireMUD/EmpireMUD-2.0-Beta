@@ -5850,6 +5850,8 @@ void free_room_template(room_template *rmt) {
 */
 void init_room_template(room_template *rmt) {
 	memset((char *)rmt, 0, sizeof(room_template));
+	
+	GET_RMT_SUBZONE(rmt) = NOWHERE;
 }
 
 
@@ -5885,12 +5887,18 @@ void parse_room_template(FILE *fl, rmt_vnum vnum) {
 	GET_RMT_TITLE(rmt) = fread_string(fl, buf2);
 	GET_RMT_DESC(rmt) = fread_string(fl, buf2);
 	
-	// line 3: flags base_affects [functions]
+	// line 3: flags base_affects [functions] [subzone]
 	if (!get_line(fl, line)) {
 		log("SYSERR: Missing line 3 of %s", buf2);
 		exit(1);
 	}
-	if (sscanf(line, "%s %s %s", str_in, str_in2, str_in3) == 3) {
+	if (sscanf(line, "%s %s %s %d", str_in, str_in2, str_in3, &int_in[0]) == 4) {
+		GET_RMT_FLAGS(rmt) = asciiflag_conv(str_in);
+		GET_RMT_BASE_AFFECTS(rmt) = asciiflag_conv(str_in2);
+		GET_RMT_FUNCTIONS(rmt) = asciiflag_conv(str_in3);
+		GET_RMT_SUBZONE(rmt) = int_in[0];
+	}
+	else if (sscanf(line, "%s %s %s", str_in, str_in2, str_in3) == 3) {
 		GET_RMT_FLAGS(rmt) = asciiflag_conv(str_in);
 		GET_RMT_BASE_AFFECTS(rmt) = asciiflag_conv(str_in2);
 		GET_RMT_FUNCTIONS(rmt) = asciiflag_conv(str_in3);
@@ -6001,7 +6009,7 @@ void write_room_template_to_file(FILE *fl, room_template *rmt) {
 	strcpy(temp, bitv_to_alpha(GET_RMT_FLAGS(rmt)));
 	strcpy(temp2, bitv_to_alpha(GET_RMT_BASE_AFFECTS(rmt)));
 	strcpy(temp3, bitv_to_alpha(GET_RMT_FUNCTIONS(rmt)));
-	fprintf(fl, "%s %s %s\n", temp, temp2, temp3);
+	fprintf(fl, "%s %s %s %d\n", temp, temp2, temp3, GET_RMT_SUBZONE(rmt));
 
 	// D: exits
 	for (ex = GET_RMT_EXITS(rmt); ex; ex = ex->next) {

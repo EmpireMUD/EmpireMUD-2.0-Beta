@@ -5541,6 +5541,15 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					else if (!str_cmp(field, "starboard")) {
 						direction_vars(r, STARBOARD, subfield, str, slen);
 					}
+					else if (!str_cmp(field, "subzone")) {
+						if (GET_ROOM_TEMPLATE(r) && GET_RMT_SUBZONE(GET_ROOM_TEMPLATE(r)) != NOWHERE) {
+							snprintf(str, slen, "%d", GET_RMT_SUBZONE(GET_ROOM_TEMPLATE(r)));
+						}
+						else {
+							// no valid subzone: show a -1
+							snprintf(str, slen, "-1");
+						}
+					}
 					else if (!str_cmp(field, "sun")) {
 						snprintf(str, slen, "%s", sun_types[get_sun_status(r)]);
 					}

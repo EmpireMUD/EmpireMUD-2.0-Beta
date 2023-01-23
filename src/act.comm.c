@@ -555,8 +555,8 @@ ACMD(do_pub_comm) {
 			if (is_ignoring(desc->character, ch)) {
 				continue;	// ignore: always no
 			}
-			if (pub_comm[subcmd].type == PUB_COMM_SHORT_RANGE && compute_distance(IN_ROOM(ch), IN_ROOM(desc->character)) > 50) {
-				continue;	// distance
+			if (pub_comm[subcmd].type == PUB_COMM_SHORT_RANGE && (!same_subzone(IN_ROOM(ch), IN_ROOM(desc->character)) || compute_distance(IN_ROOM(ch), IN_ROOM(desc->character)) > 50)) {
+				continue;	// distance/subzone
 			}
 				
 			// ok:
