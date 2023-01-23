@@ -7189,6 +7189,10 @@ place through a portal. All the room templates in the adventure are in the
 "same place" but that place is not "at the map location where the portal
 spawned".
 
+Note: Without a !LOCATION flag, a room with a subzone will still share the
+where/shout range of other areas around it as if it has no subzone. However,
+the %subecho% command will still work as expected without the !LOCATION flag.
+
 See also: REDIT FLAG, %SUBECHO%
 #d
 REQUIREMENTS "QEDIT TASKS" "QEDIT PREREQS" "QEDIT PREREQUISITES" "SOCEDIT REQUIREMENTS"
