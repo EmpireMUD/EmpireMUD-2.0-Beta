@@ -5,6 +5,12 @@ A giant atlasian tortoise plods past, carrying an inn on its back.
 ~
 300 300 dky n 6
 0 0 16 9
+D
+   The tortoise is gigantic! It's no wonder they call it atlasian -- it looks
+like it could carry the world on its back. Actually, from down here, it looks
+like there's a tavern up there. Perhaps you should 'board' the tortoise and
+find out.
+~
 T 18200
 T 18201
 T 18202
@@ -17,6 +23,9 @@ Tavern patron #n is carousing enthusiastically.
 ~
 0 0 bdvI nD 3
 0 0 0 15
+D
+Like everyone else here, this patron is having a great time!
+~
 M
 0
 $n quaffs $s tankard of ale.~
@@ -40,6 +49,10 @@ Leon is dusting off his fists.
 ~
 0 0 bdhyA G 3
 1 0 0 1
+D
+   Leon's muscles bulge as he warms up. He's shirtless, but has a blue cloth
+mask with large eye holes across his eyes.
+~
 M
 0
 $n takes off his mask, wipes his forehead with it, then throws it in your face!~
@@ -61,6 +74,10 @@ Raffee is ignoring you as he prepares for his fight.
 ~
 0 0 bdhyA G 3
 1 0 0 3
+D
+   Raffee is warming up for the fight, practicing jabs in the corner. He wears
+a red mask over his eyes.
+~
 M
 0
 $n takes off his mask, wipes his forehead with it, then throws it in your face!~
@@ -82,6 +99,11 @@ Donnet is whittling a large stick.
 ~
 0 0 bdhyA G 3
 1 0 0 5
+D
+   Donnet ignores you as he whittles a long, straight sapling into a fighting
+stick. He constantly seems to adjust his purple mask as it starts to block his
+view when he leans down toward the stick.
+~
 M
 0
 $n takes off his mask, wipes his forehead with it, then throws it in your face!~
@@ -103,6 +125,12 @@ Meek Langolo is showing off on the mat.
 ~
 0 0 bdhyA G 3
 1 0 0 11
+D
+   Meek Langolo is anything but. His muscles are as chiseled as the other
+fighters here. He kicks at the air, showing off his quick moves. As he works up
+a sweat, he takes the orange cloth mask off his eyes and wipes his forehead
+with it.
+~
 M
 0
 $n takes off his mask, wipes his forehead with it, then throws it in your face!~
@@ -124,6 +152,13 @@ S
 ~
 0 0 bd nD 3
 1 2 0 15
+D
+   Though his not-unhandsome face suggests a man in his thirties, his clothes
+are a much older style. His eyes have a pale yellow tone; one has a black
+tattoo beneath it. His hands and arms, too, are covered in tattoos and gold
+jewelry. He's working on something in his cauldron, though he won't let you get
+a good look at it.
+~
 F 18200
 M
 1
@@ -152,8 +187,8 @@ The shadows curl around #n, guild umbramancer.
 0 0 bdvI nD 3
 0 2 0 15
 D
-   Multiple varied forms can be seen in the shadows covering this being.
-Though no one is quite sure what its true shape looks like.
+   Multiple varied forms can be seen in the shadows covering this being, though
+no one is quite sure what its true shape looks like.
 ~
 F 18200
 M
@@ -179,6 +214,11 @@ S
 ~
 0 0 bdvI nD 3
 0 1 0 15
+D
+   The old tinker sits in the loft's best light, bespectacled in triple-lensed
+glasses and equipped with an array of tiny tools, working on a delicate
+contraption.
+~
 F 18200
 M
 1
@@ -218,6 +258,12 @@ An avatar of Nostrazak looms over you, more dragon than man.
 ~
 0 0 bd nD 4
 1 0 0 15
+D
+   Though he has the general shape of a man, Nostrazak the Incautious's scaly
+gray skin, horned head, and fiery belches suggest more than a little dragon
+lineage -- if that's what you would call it. He's exceptionally well-dressed
+and more than a little tipsy.
+~
 F 18200
 M
 1
@@ -254,6 +300,10 @@ A giant dwarf stands, arms crossed, in front of the door.
 ~
 0 0 bdvI nD 3
 1 0 0 15
+D
+   Though he's rather taller than the average man, he has the proportions of a
+little person. You begin to suspect magic is at work here.
+~
 F 18200
 T 18212
 S
@@ -264,6 +314,10 @@ Fancy #n stands here in a vest, hawking wares.
 ~
 100 150 bdvI nD 3
 0 0 0 19
+D
+   It's clear Fancy is a suitable nickname: the shopkeep is dressed all in fine
+silk and velvet. Clearly business is profitable.
+~
 F 18200
 S
 #18216
@@ -302,6 +356,10 @@ Guildmage #n stands at the window.
 ~
 100 150 bdqvI e 3
 0 2 0 19
+D
+   The old guildmage looks up at you over a pair of old spectacles, but seems
+busy working on spells.
+~
 M
 0
 $n coughs up a rat, who scurries into the bookshelf.~
@@ -341,6 +399,9 @@ S
 ~
 100 150 bdqvI e 3
 0 0 0 5
+D
+The librarian is rearranging books on the shelves.
+~
 M
 1
 Shh!~
@@ -362,6 +423,9 @@ The superintendant is sitting at the desk.
 ~
 100 150 bdqvI e 3
 1 0 0 1
+D
+The superintendant looks happy to see you.
+~
 M
 0
 $n sifts through papers on $s desk.~
@@ -396,6 +460,10 @@ S
 ~
 100 150 bdqvI e 3
 0 1 0 4
+D
+   The treasurer keeps moving to block your view of any treasure that might be
+stored here.
+~
 T 18218
 S
 #18225
@@ -405,6 +473,10 @@ A baby tortoise is munching around on the ground.
 ~
 1 1 bdoD n 1
 0 0 0 9
+D
+   This little shelled friend is tottering around, munching on anything small
+that it comes across.
+~
 M
 0
 $n rocks back and forth on its shell.~
@@ -427,6 +499,10 @@ A tiny ninja tortoise is lurking nearby.
 ~
 1 1 bdoD n 1
 0 0 0 9
+D
+   This tiny tortoise has an orange cloth mask over its eyes, plus orange pads
+on its arms and legs.
+~
 M
 0
 $n leaps from the shadows!~
@@ -452,6 +528,13 @@ A dragon turtle clacks its beak and puffs smoke from its nostrils.
 ~
 1 1 bdoD n 1
 0 0 0 9
+D
+   The gorgeous creature looks like a dragon that lives in a turtle shell. The
+shell is armored with thick plates and though it doesn't look like the dragon
+can retract fully inside, it is well-defended against attack. Fortunately, it's
+the size of a turtle rather than the size of a dragon, or surely you'd be it's
+lunch.
+~
 M
 0
 $n paddles through the air.~
@@ -474,6 +557,11 @@ A sanguine monstrosity is dripping along the ground.
 ~
 100 125 dej 0 4
 0 0 10 27
+D
+   This creature -- whose shape you're hesitant to look at, nevermind describe
+-- appears to be made of congealed blood. It oozes and sloshes along apparently
+unaware that it's leaving a red trail behind it.
+~
 T 18240
 S
 #18230
@@ -511,6 +599,9 @@ An imperium-clad bear rears up on its hind legs!
 ~
 100 125 dej 0 4
 0 0 26 10
+D
+This great grizzly bear is wearing shining white imperium armor!
+~
 T 18240
 S
 #18236
@@ -520,6 +611,11 @@ A group of patrons is huddled over a table with dice and strange documents.
 ~
 0 0 bd nD 4
 0 0 0 15
+D
+   The patrons have papers and books scattered across the table, along with
+small ivory cubes that bear odd markings on the sides. Perhaps they're studying
+the ivory artifacts. They seem excited about it.
+~
 M
 0
 One of the patrons at the table asks, 'Can I have some mountain dew?!'~
@@ -586,6 +682,10 @@ A rat-man in a robe is drowning his sorrows at the bar.
 ~
 0 0 bd nD 3
 1 0 0 15
+D
+   This man has the furry gray-brown head of a rat, but he's dressed like a
+person. He seems to be drinking a lot.
+~
 M
 0
 $n chops some peanuts open with his hand.~
@@ -612,6 +712,10 @@ A mysterious stranger in a hooded cloak is lurking in a dark corner.
 ~
 0 0 bd nD 3
 0 0 0 15
+D
+   .look The patron's cloak is finely woven; you can see much less of the
+person wearing it. They seem to be waiting for someone.
+~
 M
 1
 Have you seen a hobbit with a magic ring?~
@@ -645,6 +749,10 @@ A fearsome dragon coils through the halls and archways of the tower!
 ~
 0 200 dghnxA choCDEG 5
 0 0 5 16
+D
+   This dragon might be more than meets the eye, but from your perspective,
+it's all teeth!
+~
 I 4 18284 33.34 1 a  # LOOT: imaginary whistle
 I 4 18285 33.33 1 a  # LOOT: imaginary egg
 I 4 18293 33.33 1 a  # LOOT: imaginary seed
@@ -672,6 +780,9 @@ An imaginary dragon is (or isn't) flitting about.
 ~
 100 125 dej m 5
 0 0 2 10
+D
+Perhaps you're imagining things.
+~
 S
 #18285
 dragonling imaginary~
@@ -680,6 +791,10 @@ An imaginary dragonling might be flying around above your head.
 ~
 1 1 bdoD n 2
 0 0 0 9
+D
+   When you go to look at it, you realize that, no, that was just your
+imagination.
+~
 M
 0
 You imagine yourself fighting a great dragon.~
@@ -711,6 +826,9 @@ The dragon tree planter is supposed to be invisible.
 ~
 0 0 d dkln 3
 0 0 0 15
+D
+This mob sets up the dragon tree.
+~
 T 18291
 S
 #18296
@@ -720,6 +838,10 @@ The spirit of the tree floats nearby.
 ~
 25 50 bdo n 0
 0 0 0 15
+D
+   The spirit looks like a tree with no stump. Its bare canopy retains not a
+single leaf. The spirit floats silently, stalwart even now.
+~
 T 18287
 S
 #18297
@@ -729,6 +851,10 @@ A pen dragon flies around, trailing a stream of black ink.
 ~
 100 200 djoxA cm 5
 0 0 2 27
+D
+   The dragon has a black-blue sheen to its scales as it soars and, indeed,
+there's an inky black stream behind it in the air.
+~
 I 0 3012 100.00 4  # BUTCHER: fillet of raw meat
 I 1 10006 50.00 1  # SKIN: dragon scale
 I 1 1351 100.00 2  # SKIN: large skin
@@ -740,6 +866,11 @@ A dungeon dragon has gotten free!
 ~
 100 200 djoxA cm 5
 0 0 2 27
+D
+   This red dragon is big! It looks like it could eat you in a single bite. 
+Its red scales have faded a little, perhaps from too long in the dungeon, but
+remains every bit as fearsome as it ever was.
+~
 I 0 3012 100.00 4  # BUTCHER: fillet of raw meat
 I 1 10006 50.00 1  # SKIN: dragon scale
 I 1 1351 100.00 2  # SKIN: large skin
@@ -751,6 +882,12 @@ A little luck dragon twists and turns through the air.
 ~
 100 200 djoxA cm 2
 0 0 2 27
+D
+   The luck dragon is long -- almost unbelievably long -- with stark white fur
+and big, floppy ears. It looks a bit like a dog. It's large enough to carry a
+fully armored knight, but it doesn't seem tame enough. Oddly, it has no wings.
+You can't discern how it's staying aloft.
+~
 I 0 3012 100.00 4  # BUTCHER: fillet of raw meat
 I 1 10006 50.00 1  # SKIN: dragon scale
 I 1 1351 100.00 2  # SKIN: large skin

@@ -5,6 +5,12 @@ Anat, virgin war-goddess of old, stands fierce and bloody (difficulty).
 ~
 225 325 aduyB ciE 5
 2 0 35 1
+D
+   Anat is a beautiful young woman with light brown skin and wavy brown hair,
+dressed in a flowing white gown with a red sash... And she's enormous! This is
+no woman at all, but one of the Old Gods, somehow released upon the land again
+after so many centuries.
+~
 I 4 12004 16.67 1 a  # LOOT: golden chain of the old god Anat
 I 4 12006 16.67 1 a  # LOOT: vial of the blood of the old god Anat
 I 4 12008 16.67 1 a  # LOOT: idol of the old god Anat
@@ -58,6 +64,10 @@ The hawk Yatpan swoops in to attack!
 ~
 225 325 bdhozD q 3
 1 0 2 27
+D
+   Yatpan is a large hawk, easily big enough to pick up a man! It's brown on
+the back but lighter on the front, with a speckled breast.
+~
 T 12011
 T 12013
 S
@@ -68,6 +78,10 @@ A trained hawk circles overhead.
 ~
 1 1 bdoD mn 2
 0 0 0 10
+D
+   The hawk is brown on its wings and back. Its underside is lighter, though
+its breast is speckled brown and white.
+~
 M
 0
 $n circles overhead.~
@@ -93,6 +107,11 @@ The memory of Anat, warrior-goddess of old, barely lingers in the air.
 ~
 225 325 do dn 0
 0 0 27 15
+D
+   It calls to mind the memory of Anat, a virgin war-goddess of the ancient
+world. Anat was one of the main gods of Ugarit's pantheon, in what is Syria
+today. Though her reign eventually ended, her memory is never forgotten.
+~
 M
 0
 A hawk soars high overhead.~
@@ -113,6 +132,10 @@ The giant hawk Yatpan alights on the ground.
 ~
 100 125 dej m 3
 0 0 2 10
+D
+   Yatpan is a large hawk, easily big enough to pick up a man! It's brown on
+the back but lighter on the front, with a speckled breast.
+~
 S
 #12030
 hadad ba'al baal god~
@@ -121,6 +144,11 @@ The storm god Ba'al Hadad towers over you, lightning in his eyes (difficulty).
 ~
 225 325 aduyB ciE 5
 1 0 26 1
+D
+   Hadad is an enormous man, as tall as a tower and as strong as heard of oxen.
+On his head, he wears a four-horned crown. The ground and the heavens both
+thunder as he walks.
+~
 I 4 12034 16.67 1 a  # LOOT: bronze bull ring of Ba'al Hadad
 I 4 12036 16.67 1 a  # LOOT: clouded ring of Ba'al Hadad
 I 4 12038 16.67 1 a  # LOOT: lightning ring of Ba'al Hadad
@@ -174,6 +202,9 @@ A massive stormcloud envelops and suffocates you!
 ~
 225 325 bdnyA ci 5
 0 0 2 21
+D
+You can see little else but the storm!
+~
 T 12033
 T 12039
 T 12041
@@ -185,6 +216,10 @@ A little bronze bull stands with its horns held high.
 ~
 1 1 bdoD dn 2
 0 0 0 27
+D
+   It's a little bull cast in a single piece from bronze, though it runs around
+like a living creature. Every so often, smoke puffs from its nostrils.
+~
 M
 0
 Smoke puffs from $n's nostrils.~
@@ -198,6 +233,9 @@ A bolt of lightning in the shape of a horse appears before you.
 ~
 100 125 de m 0
 0 0 2 21
+D
+It's a bolt of lighting frozen into the shape of a horse!
+~
 S
 #12052
 worshipper~
@@ -206,6 +244,9 @@ A worshipper of the storm god bows low, begging for rain.
 ~
 40 60 dovI 0 3
 1 0 0 21
+D
+He wears only a cloth around his waist as he bows low to the ground.
+~
 M
 1
 Praise be to the Stormlord!~
