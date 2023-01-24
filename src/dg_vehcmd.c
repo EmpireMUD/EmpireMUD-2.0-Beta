@@ -303,7 +303,7 @@ VCMD(do_vregionecho) {
 		
 		if (center) {
 			DL_FOREACH(character_list, targ) {
-				if (NO_LOCATION(IN_ROOM(targ)) || compute_distance(center, IN_ROOM(targ)) > radius) {
+				if (!same_subzone(center, IN_ROOM(targ))) {
 					continue;
 				}
 				if (outdoor_only && !IS_OUTDOORS(targ)) {
@@ -313,6 +313,40 @@ VCMD(do_vregionecho) {
 				// send
 				sub_write(msg, targ, TRUE, TO_CHAR | (use_queue ? TO_QUEUE : 0));
 			}
+		}
+	}
+}
+
+
+VCMD(do_vsubecho) {
+	char room_number[MAX_INPUT_LENGTH], *msg;
+	bool use_queue;
+	room_data *where, *orm = IN_ROOM(veh);
+	char_data *targ;
+	
+	msg = any_one_word(argument, room_number);
+	use_queue = script_message_should_queue(&msg);
+
+	if (!*room_number || !*msg) {
+		veh_log(veh, "vsubecho called with too few args");
+	}
+	else if (!(where = get_room(orm, room_number))) {
+		veh_log(veh, "vsubecho called with invalid target");
+	}
+	else if (!ROOM_INSTANCE(where)) {
+		veh_log(veh, "vsubecho called outside an adventure");
+	}
+	else {
+		DL_FOREACH(character_list, targ) {
+			if (ROOM_INSTANCE(where) != ROOM_INSTANCE(IN_ROOM(targ))) {
+				continue;	// wrong instance
+			}
+			if (!same_subzone(where, IN_ROOM(targ))) {
+				continue;	// wrong subzone
+			}
+			
+			// send
+			sub_write(msg, targ, TRUE, TO_CHAR | (use_queue ? TO_QUEUE : 0));
 		}
 	}
 }
@@ -1656,6 +1690,7 @@ const struct vehicle_command_info veh_cmd_info[] = {
 	{ "vterraform", do_vterraform, NO_SCMD },
 	{ "vbuildingecho", do_vbuildingecho, NO_SCMD },
 	{ "vregionecho", do_vregionecho, NO_SCMD },
+	{ "vsubecho", do_vsubecho, NO_SCMD },
 	{ "vvehicleecho", do_vvehicleecho, NO_SCMD },
 
 	{ "\n", 0, 0 }        /* this must be last */

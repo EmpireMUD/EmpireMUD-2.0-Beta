@@ -318,6 +318,7 @@ are player-only), in addition to some special commands:
 &c%send%&0 - Sends a message to one person.
 &c%siege%&0 - Deals siege damage to a vehicle or building.
 &c%slay%&0 - Instantly kills the target.
+&c%subecho%&0 - Sends a message to everyone in a given subzone.
 &c%teleport%&0 - Moves players to a target room.
 &c%terracrop%&0 - Changes the terrain to a certain crop type.
 &c%terraform%&0 - Changes the terrain to a certain sector type.
