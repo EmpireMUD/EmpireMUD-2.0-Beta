@@ -3412,7 +3412,7 @@ SHOW(show_progression) {
 
 
 SHOW(show_quests) {
-	char name[MAX_INPUT_LENGTH], *arg2, buf[MAX_STRING_LENGTH], when[256];
+	char name[MAX_INPUT_LENGTH], *arg2, buf[MAX_STRING_LENGTH * 2], when[256];
 	struct player_completed_quest *pcq, *next_pcq;
 	bool file = FALSE, found = FALSE;
 	struct player_quest *pq;
@@ -5553,6 +5553,68 @@ SHOW(show_startlocs) {
 }
 
 
+SHOW(show_subzone) {
+	char buf[MAX_STRING_LENGTH], buf2[MAX_STRING_LENGTH + 80];
+	room_template *iter, *next_iter, *match;
+	rmt_vnum find;
+	size_t size;
+	
+	if (!*argument || !isdigit(*argument)) {
+		msg_to_char(ch, "Usage: show subzone <id/room>\r\n");
+		return;
+	}
+	if ((find = atoi(argument)) < 0) {
+		msg_to_char(ch, "Subzone id must be positive.\r\n");
+		return;
+	}
+	
+	// first try: exact match
+	size = 0;
+	*buf = '\0';
+	
+	HASH_ITER(hh, room_template_table, iter, next_iter) {
+		if (GET_RMT_SUBZONE(iter) == find) {
+			size += snprintf(buf + size, sizeof(buf) - size, "[%5d] %s\r\n", GET_RMT_VNUM(iter), GET_RMT_TITLE(iter));
+			if (size >= sizeof(buf)) {
+				break;
+			}
+		}
+	}
+	
+	if (size > 0) {
+		// found exact match(es)
+		snprintf(buf2, sizeof(buf2), "Room templates with subzone %d:\r\n%s", find, buf);
+		page_string(ch->desc, buf2, TRUE);
+		return;
+	}
+	
+	// no matches: try again with the rmt specfied
+	if (!(match = room_template_proto(find)) || GET_RMT_SUBZONE(match) == NOWHERE) {
+		msg_to_char(ch, "There were no matches for that subzone id.\r\n");
+		return;
+	}
+	
+	// if we get here, we have a subzone to look for
+	HASH_ITER(hh, room_template_table, iter, next_iter) {
+		if (GET_RMT_SUBZONE(iter) == GET_RMT_SUBZONE(match)) {
+			size += snprintf(buf + size, sizeof(buf) - size, "[%5d] %s\r\n", GET_RMT_VNUM(iter), GET_RMT_TITLE(iter));
+			if (size >= sizeof(buf)) {
+				break;
+			}
+		}
+	}
+	
+	if (size > 0) {
+		// found exact match(es)
+		snprintf(buf2, sizeof(buf2), "Room templates with subzone %d, matching room template %d:\r\n%s", GET_RMT_SUBZONE(match), GET_RMT_VNUM(match), buf);
+		page_string(ch->desc, buf2, TRUE);
+		return;
+	}
+	
+	msg_to_char(ch, "There were no matches for that subzone id.\r\n");
+}
+
+
 SHOW(show_spawns) {
 	char buf[MAX_STRING_LENGTH];
 	struct spawn_info *sp;
@@ -7121,7 +7183,13 @@ void do_stat_room_template(char_data *ch, room_template *rmt) {
 	msg_to_char(ch, "%s", NULLSAFE(GET_RMT_DESC(rmt)));
 
 	adv = get_adventure_for_vnum(GET_RMT_VNUM(rmt));
-	msg_to_char(ch, "Adventure: [&c%d %s&0]\r\n", !adv ? NOTHING : GET_ADV_VNUM(adv), !adv ? "NONE" : GET_ADV_NAME(adv));
+	msg_to_char(ch, "Adventure: [&c%d %s&0]", !adv ? NOTHING : GET_ADV_VNUM(adv), !adv ? "NONE" : GET_ADV_NAME(adv));
+	if (GET_RMT_SUBZONE(rmt) != NOWHERE) {
+		msg_to_char(ch, ", Subzone: [\ty%d\t0]\r\n", GET_RMT_SUBZONE(rmt));
+	}
+	else {
+		msg_to_char(ch, ", Subzone: [\tynone\t0]\r\n");
+	}
 	
 	sprintbit(GET_RMT_FLAGS(rmt), room_template_flags, lbuf, TRUE);
 	msg_to_char(ch, "Flags: &g%s&0\r\n", lbuf);
@@ -10186,6 +10254,7 @@ ACMD(do_show) {
 		{ "companions", LVL_START_IMM, show_companions },
 		{ "lastnames", LVL_START_IMM, show_lastnames },
 		{ "oceanmobs", LVL_START_IMM, show_oceanmobs },
+		{ "subzone", LVL_START_IMM, show_subzone },
 
 		// last
 		{ "\n", 0, NULL }

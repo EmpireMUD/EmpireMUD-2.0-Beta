@@ -1992,8 +1992,8 @@ This command allows you to set your character moving in a given direction, or
 along a path you specify. Paths must be pairs of directions and distances which
 your character will move in order.
 
-If you specify coordinates to run to, there must be continous roads all the way
-there (tunnels, gatehouses, and similar buildings are okay as well).
+If you specify coordinates to run to, there must be continuous roads all the
+way there (tunnels, gatehouses, and similar buildings are okay as well).
 
 You will run faster if you have the 'faster walking' bonus trait.
 

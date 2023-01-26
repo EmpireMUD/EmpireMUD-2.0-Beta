@@ -3369,7 +3369,7 @@ ACMD(do_upgrade) {
 		msg_to_char(ch, "You're already busy doing something else.\r\n");
 		return;
 	}
-	if (!check_can_craft(ch, to_craft)) {
+	if (!check_can_craft(ch, to_craft, FALSE)) {
 		// sends own messages
 		return;
 	}

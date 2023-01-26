@@ -318,6 +318,7 @@ are player-only), in addition to some special commands:
 &c%send%&0 - Sends a message to one person.
 &c%siege%&0 - Deals siege damage to a vehicle or building.
 &c%slay%&0 - Instantly kills the target.
+&c%subecho%&0 - Sends a message to everyone in a given subzone.
 &c%teleport%&0 - Moves players to a target room.
 &c%terracrop%&0 - Changes the terrain to a certain crop type.
 &c%terraform%&0 - Changes the terrain to a certain sector type.
@@ -492,6 +493,8 @@ When using field  - The variable returns:
 &chealth&0 - The current hit points of the actor.
 &cheshe&0 - Returns the correct pronoun (he/she/it). Use &%actor% for this in
    echoes and sends.
+&chighest_level&0 - Returns the highest-ever level for a player or maximum scale
+   level for NPCs.
 &chimher&0 - Returns the correct pronoun (him/her/it). Use *%actor% for this in
    echoes and sends.
 &chisher&0 - Returns the correct pronoun (his/her/its). Use ^%actor% for this
@@ -574,6 +577,7 @@ When using field  - The variable returns:
    tasks completed.
 &cquest_triggered(vnum)&0 - TRUE if the player is on the quest and that quest
    has a 'triggered' task that has already been completed.
+&creal_name&0 - Their real name (not morphed, not disguised).
 &cremove_companion(vnum)&0 - Takes away a companion mob. If it comes from an
    ability, the player will get a fresh copy of it automatically.
 &cremove_lastname(name)&0 - Removes a name from a player's lastname list.

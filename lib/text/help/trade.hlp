@@ -944,7 +944,8 @@ Superior: If the item is a crafted item that could have superior qualities,
 this adds those qualities and marks it (superior). You can only use this on
 the normal version of an item that can be made superior, and only if you have
 the correct Master ability. Requires 1 green seashell per 3 gear rating on the
-item.
+item. If the item came from a hard, group, or boss mob, it will lose this
+quality when you make it superior.
 
 An item must be in your inventory to reforge it. However, if another player
 "shares" an item, you can reforge that item by targeting that player by name

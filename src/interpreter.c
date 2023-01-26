@@ -501,6 +501,7 @@ ACMD(do_mtransform);
 ACMD(do_mbuildingecho);
 ACMD(do_mown);
 ACMD(do_mregionecho);
+ACMD(do_msubecho);
 ACMD(do_mvehicleecho);
 ACMD(do_vdelete);
 ACMD(do_mfollow);
@@ -1127,6 +1128,7 @@ cpp_extern const struct command_info cmd_info[] = {
 	STANDARD_CMD( "mbuildingecho", POS_DEAD, do_mbuildingecho, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_IMMORTAL, CMD_IMM_OR_MOB_ONLY | CMD_STAY_HIDDEN, NO_ABIL ),
 	STANDARD_CMD( "mvehicleecho", POS_DEAD, do_mvehicleecho, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_IMMORTAL, CMD_IMM_OR_MOB_ONLY | CMD_STAY_HIDDEN, NO_ABIL ),
 	STANDARD_CMD( "mregionecho", POS_DEAD, do_mregionecho, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_IMMORTAL, CMD_IMM_OR_MOB_ONLY | CMD_STAY_HIDDEN, NO_ABIL ),
+	STANDARD_CMD( "msubecho", POS_DEAD, do_msubecho, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_IMMORTAL, CMD_IMM_OR_MOB_ONLY | CMD_STAY_HIDDEN, NO_ABIL ),
 	STANDARD_CMD( "mfollow", POS_DEAD, do_mfollow, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_IMMORTAL, CMD_IMM_OR_MOB_ONLY | CMD_STAY_HIDDEN, NO_ABIL ),
 
 	/* this must be last */

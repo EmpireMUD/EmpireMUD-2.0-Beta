@@ -1870,11 +1870,11 @@ of yellow, like pixy dust caught in a whirlpool. There's no label on the flask
 and no way to tell what effect it will have but to quaff it.
    Potions are a quick way to shore up one's particular deficiencies.
 ~
-25 m a 0 6
+25 0 a 0 7
 -1 0 3030
 8 0
 A
-8 1 0
+8 2 0
 C
 150 150
 I 26 800 100.00 1  # DECAYS-TO: glass flask
@@ -2517,16 +2517,17 @@ R
 4 5193 0
 S
 #11899
-jade blue rough-cut cut piece~
+jade blue rough-cut cut piece unattuned~
 a piece of rough-cut blue jade~
 A rough-cut piece of blue jade is lying on the ground.~
    The little stone, smaller than your palm, has a soft light blue color that
 glimmers in the light. It looks like it's been cut or split from other rock
 and knapped into a rough circle.
    All colors of jade are prized by goblins, light blue most of all for its
-resemblance to the sky.
+resemblance to the sky. When properly attuned, blue jade can also hold a
+tremendous amount of mana.
 ~
-3 p a 0 9
+3 p a 0 10
 0 0 0
 1 0
 C

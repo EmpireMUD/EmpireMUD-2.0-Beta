@@ -6920,7 +6920,7 @@ obj_data *unequip_char(char_data *ch, int pos) {
 obj_data *unequip_char_to_inventory(char_data *ch, int pos) {
 	obj_data *obj = unequip_char(ch, pos);
 	
-	if (obj && OBJ_FLAGGED(obj, OBJ_SINGLE_USE)) {
+	if (obj && OBJ_FLAGGED(obj, OBJ_SINGLE_USE) && pos != WEAR_SHARE) {
 		extract_obj(obj);
 	}
 	else if (obj) {
@@ -6943,7 +6943,7 @@ obj_data *unequip_char_to_inventory(char_data *ch, int pos) {
 obj_data *unequip_char_to_room(char_data *ch, int pos) {
 	obj_data *obj = unequip_char(ch, pos);
 	
-	if (obj && OBJ_FLAGGED(obj, OBJ_SINGLE_USE)) {
+	if (obj && OBJ_FLAGGED(obj, OBJ_SINGLE_USE) && pos != WEAR_SHARE) {
 		extract_obj(obj);
 	}
 	else if (obj && IN_ROOM(ch)) {

@@ -941,7 +941,7 @@ int wordcount_trigger(trig_data *trig) {
 	int count = 0, iter;
 	struct cmdlist_element *cmd;
 	
-	const char *accept_list[] = { "%echo", "%send%", "%mod%", "%regionecho", "%vehicleecho", "%buildingecho", "say ", "emote ", "shout ", "\n" };
+	const char *accept_list[] = { "%echo", "%send%", "%mod%", "%regionecho", "%subecho%", "%vehicleecho", "%buildingecho", "say ", "emote ", "shout ", "\n" };
 	
 	// not player-facing
 	// count += wordcount_string(GET_TRIG_NAME(trig));

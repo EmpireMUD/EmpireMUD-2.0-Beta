@@ -76,7 +76,7 @@ frown. 'But we certainly can't have the boy running around here. Fine, fine,
 I'm sure I owe you this much. Bring him up here. Just promise me he will leave
 the tower before the headmaster finds out.'
 ~
-15 0 150 250 -1
+16 i 150 250 -1
 A
 1 11801
 P
@@ -108,7 +108,7 @@ Watcher Annaca on the second floor when it's done.
 out that pixy maze. Nothing to it, eh? We could use a few more like you around
 here for when things get messy.'
 ~
-6 0 150 250 -1
+7 i 150 250 -1
 A
 1 11864
 A
@@ -144,7 +144,7 @@ stops and looks you up and down.
    'Seems you had the virtue to see them gone, however,' he says. 'We are in
 your debt.'
 ~
-8 0 150 250 -1
+9 i 150 250 -1
 A
 1 11891
 A
@@ -178,7 +178,7 @@ Sorcerer Barrosh in his office when it's done.
 ~
 'Fine, what do you want, a cookie?' Master Barrosh says without looking at you.
 ~
-7 0 150 250 -1
+8 i 150 250 -1
 A
 1 11892
 A
@@ -208,7 +208,7 @@ goblins swore up and down there wasn't a secret passage but they've been
 playing stupid pranks on me for months using it.'
    She fumes and stomps off without thanking you.
 ~
-25 ei 150 250 -1
+26 e 150 250 -1
 A
 1 11900
 D 11816
@@ -245,7 +245,7 @@ without a good reason.'
 interesting indeed.'
    She trails off, completely forgetting you're even here.
 ~
-25 ei 150 250 -1
+26 e 150 250 -1
 A
 1 11900
 D 11816
@@ -279,7 +279,7 @@ thinks on it for a moment.
    'The pixies never seem to try to escape. I plum thought they liked it here,'
 she says. 'And what did she mean by that last part... 'in time'?'
 ~
-27 ei 150 250 -1
+28 e 150 250 -1
 A
 1 11900
 D 11816
@@ -399,7 +399,7 @@ near the racetrack stalls.
    'Those pixies really get into your head; that maze was worse than the Forest
 dome. I had the strangest dreams in there.'
 ~
-27 ei 150 250 -1
+28 e 150 250 -1
 A
 1 11900
 D 11816
@@ -483,7 +483,7 @@ chuckle burbles out of the old lich as he sets his repository back down.
    'The only ones who could read were the spellcasters and, to my unending
 chagrin, they were smart enough not to open the thing. Alas.'
 ~
-23 ei 150 250 -1
+24 e 150 250 -1
 A
 1 11900
 D 11834
@@ -604,7 +604,7 @@ common thief. Did you see how his lust for it corrupted and withered him so
 far beyond his years? It's good you put an END to it; on that path he'd soon
 have nothing left but his linens.'
 ~
-21 ei 150 250 -1
+22 e 150 250 -1
 A
 1 11900
 D 11834
@@ -648,7 +648,7 @@ rose-colored glass from a pocket inside her robe and holds it up to one eye.
 time loop. I guess by now you've noticed we didn't get free of it. Next time
 maybe you can save Knezz. He might actually know how to get us out of it.'
 ~
-21 ei 150 250 -1
+22 e 150 250 -1
 A
 1 11900
 D 11863
@@ -867,7 +867,7 @@ here-after.'
    Knezz chuckles to himself.
    'Can you imagine?' he says. 'The hells full to the gills with Jozef Knezz!'
 ~
-21 ei 150 250 -1
+22 e 150 250 -1
 A
 1 11900
 D 11863
@@ -920,7 +920,7 @@ the stuff of fables. Not a page has been written on how to defeat one. We may
 well be the first to try. But don't dare imagine your temporary victory will
 hold. I guarantee we have not escaped this loop.'
 ~
-24 ei 150 250 -1
+25 e 150 250 -1
 A
 1 11900
 D 11863

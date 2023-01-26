@@ -796,12 +796,18 @@ void identify_obj_to_char(obj_data *obj, char_data *ch) {
 		switch (ocm->type) {
 			case OBJ_CUSTOM_LONGDESC: {
 				sprintf(lbuf, "Gives long description: %s", ocm->msg);
+				temp = str_replace("$n", "$o", lbuf);
+				strcpy(lbuf, temp);
+				free(temp);
 				act(lbuf, FALSE, ch, NULL, NULL, TO_CHAR);
 				break;
 			}
 			case OBJ_CUSTOM_LONGDESC_FEMALE: {
 				if (GET_SEX(ch) == SEX_FEMALE) {
 					sprintf(lbuf, "Gives long description: %s", ocm->msg);
+					temp = str_replace("$n", "$o", lbuf);
+					strcpy(lbuf, temp);
+					free(temp);
 					act(lbuf, FALSE, ch, NULL, NULL, TO_CHAR);
 				}
 				break;
@@ -809,6 +815,9 @@ void identify_obj_to_char(obj_data *obj, char_data *ch) {
 			case OBJ_CUSTOM_LONGDESC_MALE: {
 				if (GET_SEX(ch) == SEX_MALE) {
 					sprintf(lbuf, "Gives long description: %s", ocm->msg);
+					temp = str_replace("$n", "$o", lbuf);
+					strcpy(lbuf, temp);
+					free(temp);
 					act(lbuf, FALSE, ch, NULL, NULL, TO_CHAR);
 				}
 				break;
@@ -4358,7 +4367,9 @@ void warehouse_retrieve(char_data *ch, char *argument, int mode) {
 				obj_to_char(obj, ch);	// inventory size pre-checked
 				act("You retrieve $p.", FALSE, ch, obj, NULL, TO_CHAR | TO_QUEUE);
 				act("$n retrieves $p.", FALSE, ch, obj, NULL, TO_ROOM | TO_QUEUE);
-				load_otrigger(obj);
+				
+				// this should not be running load triggers
+				// load_otrigger(obj);
 			}
 		}
 		
@@ -5845,7 +5856,7 @@ ACMD(do_keep) {
 				qt_keep_obj(ch, obj, FALSE);
 			}
 			sprintf(buf, "You %s $p.", sname);
-			act(buf, FALSE, ch, obj, NULL, TO_CHAR | TO_QUEUE);
+			act(buf, FALSE, ch, obj, NULL, TO_CHAR | TO_QUEUE | TO_SLEEP);
 			obj = next_obj;
 		}
 	}
@@ -5863,7 +5874,7 @@ ACMD(do_keep) {
 				qt_keep_obj(ch, obj, FALSE);
 			}
 			sprintf(buf, "You %s $p.", sname);
-			act(buf, FALSE, ch, obj, NULL, TO_CHAR);
+			act(buf, FALSE, ch, obj, NULL, TO_CHAR | TO_SLEEP);
 		}
 	}
 	

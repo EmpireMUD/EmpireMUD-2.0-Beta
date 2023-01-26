@@ -1467,6 +1467,7 @@ int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_COORD(ge
 #define GET_RMT_QUEST_LOOKUPS(rmt)  ((rmt)->quest_lookups)
 #define GET_RMT_SHOP_LOOKUPS(rmt)  ((rmt)->shop_lookups)
 #define GET_RMT_SCRIPTS(rmt)  ((rmt)->proto_script)
+#define GET_RMT_SUBZONE(rmt)  ((rmt)->subzone)
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -2061,7 +2062,7 @@ bool valid_no_trace(room_data *room);
 
 // act.trade.c
 void cancel_gen_craft(char_data *ch);
-bool check_can_craft(char_data *ch, craft_data *type);
+bool check_can_craft(char_data *ch, craft_data *type, bool continuing);
 bool find_and_bind(char_data *ch, obj_vnum vnum);
 int get_craft_scale_level(char_data *ch, craft_data *craft);
 int get_crafting_level(char_data *ch);
@@ -2209,6 +2210,7 @@ void mark_instance_completed(struct instance_data *inst);
 void prune_instances();
 void remove_instance_fake_loc(struct instance_data *inst);
 void reset_instance(struct instance_data *inst);
+bool same_subzone(room_data *a, room_data *b);
 void scale_instance_to_level(struct instance_data *inst, int level);
 void set_instance_fake_loc(struct instance_data *inst, room_data *loc);
 void unlink_instance_entrance(room_data *room, struct instance_data *inst, bool run_cleanup);

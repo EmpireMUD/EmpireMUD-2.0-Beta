@@ -7170,6 +7170,31 @@ This is different from the spawn data set on crops, sectors, and buildings.
 
 See also: OLC ROOM TEMPLATES, ADVEDIT RESET TIME, VNUM
 #d
+"REDIT SUBZONE" "REDIT SUB-ZONE" "REDIT SUB ZONE" SUBZONE SUB-ZONE "SUB ZONE"
+
+Usage:  .subzone <vnum | none>
+
+Room templates have an optional numerical property called subzone. This divides
+an adventure up for commands like "where", "shout", and also %subecho%. It is
+usually used with the !LOCATION flag, which indicates that a room is not "at"
+the map location where the adventure instance is linked.
+
+If you are using this property, you should set the subzone id to the vnum of a
+room template in that subzone. All room templates with the same subzone id are
+"in the same place". The same subzone can be used across multiple adventures,
+if they are all conceptually "in the same non-map place".
+
+An example of a subzone is the Portal to the Primeval adventure, which takes
+place through a portal. All the room templates in the adventure are in the
+"same place" but that place is not "at the map location where the portal
+spawned".
+
+Note: Without a !LOCATION flag, a room with a subzone will still share the
+where/shout range of other areas around it as if it has no subzone. However,
+the %subecho% command will still work as expected without the !LOCATION flag.
+
+See also: REDIT FLAG, %SUBECHO%
+#d
 REQUIREMENTS "QEDIT TASKS" "QEDIT PREREQS" "QEDIT PREREQUISITES" "SOCEDIT REQUIREMENTS"
 
 Usage:  .<field> add <type> <vnum> [group] [custom text]

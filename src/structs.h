@@ -3737,6 +3737,7 @@ struct room_template {
 	bitvector_t flags;	// RMT_
 	bitvector_t base_affects;	// ROOM_AFF_
 	bitvector_t functions;	// FNC_
+	rmt_vnum subzone;	// for subdividing where/shout/etc
 	
 	// lists
 	struct adventure_spawn *spawns;	// list of objs/mobs

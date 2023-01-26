@@ -186,10 +186,10 @@ I 12 11926 5.00 1 p  # PICKPOCKET: teacup
 I 12 11903 5.00 1 p  # PICKPOCKET: tall glass
 I 12 11904 5.00 1 p  # PICKPOCKET: mutton pasty
 I 12 11905 5.00 1 p  # PICKPOCKET: exotic turquoise cheese
-I 12 11869 4.00 1 p  # PICKPOCKET: self-writing pen
-I 12 11867 4.00 1 p  # PICKPOCKET: dynamic reconfabulator
-I 12 11865 5.00 1 p  # PICKPOCKET: ether condenser
-I 12 11864 5.00 1 p  # PICKPOCKET: mana deconfabulator
+I 12 11869 3.00 1 p  # PICKPOCKET: self-writing pen
+I 12 11867 3.00 1 p  # PICKPOCKET: dynamic reconfabulator
+I 12 11865 4.00 1 p  # PICKPOCKET: ether condenser
+I 12 11864 4.00 1 p  # PICKPOCKET: mana deconfabulator
 I 12 11894 5.00 1 p  # PICKPOCKET: wooden Venus figurine
 I 12 11868 1.00 1 p  # PICKPOCKET: miniature wellstone prototype
 I 12 11917 1.00 1 p  # PICKPOCKET: page 2413 of the time-traveler's diary
@@ -208,7 +208,7 @@ I 12 11895 4.00 1 p  # PICKPOCKET: iridescent pearl
 I 12 11897 4.00 1 p  # PICKPOCKET: good rock
 I 12 11866 3.00 1 p  # PICKPOCKET: carved wooden man
 I 12 11872 1.00 1 p  # PICKPOCKET: hand-written note
-I 12 11883 4.00 1 p  # PICKPOCKET: gnarled old wand
+I 12 11883 8.00 1 p  # PICKPOCKET: gnarled old wand
 M
 0
 $n points her gnarled old wand at a mug and heats it with a wild, cackling flame!~
@@ -3563,7 +3563,7 @@ M
 say Gobbrabakh of Orka is well-placed on these cliffs. No army has ever breached it. By the god, no army ever will.~
 M
 11
-echo Murmurs spread through agitated crowd as most of the people look to the priest.~
+echo Murmurs spread through the agitated crowd as most of the people look to the priest.~
 M
 11
 say We will trust that the god has brought us together.~

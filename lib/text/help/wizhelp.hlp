@@ -1143,6 +1143,7 @@ skills     Immort   Shows skill levels and abilities for a player.
 spawns     Immort   Shows where a mob spawns on the map, similar to ".mob search".
 startlocs  Immort   Shows the location of all starting location tiles.
 storage    Immort   Shows items that can be stored in a given building/room type.
+subzone    Immort   Shows room templates with a matching subzone id.
 technology Immort   Shows ability techs a player has.
 sectors    Immort   Shows tile counts for all sector types (vnum/name optional).
 terrain    Immort   Same as 'sectors' (for historical reasons).
@@ -1429,6 +1430,17 @@ Usage:  show storage <building | vehicle> <vnum>
 
 Lists objects which store in the building or vehicle. This does not include
 stores-like relationships, only items actually set to store there.
+#e
+"SHOW SUBZONE"
+
+Usage:  show subzone <id | vnum>
+
+This command lists all room templates that have the subzone id you provided.
+
+You can also specify a room template's vnum and it will show all rooms with a
+matching subzone to it. This mode only works if there were no exact matches for
+the id you entered, but there IS a room template with that vnum AND it has a
+subzone id.
 #e
 "SHOW TECHNOLOGY"
 

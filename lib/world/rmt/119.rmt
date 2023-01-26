@@ -6,7 +6,7 @@ bottom of the ever-spiraling walkway forms a circular rim around the inside of
 the chamber through which a magnificent nocturnium tree reaches down, bearing
 the flickering flames that light the whole of the interior.
 ~
-cd z 0
+cd z 0 -1
 D2
 ~
 0 11800
@@ -79,7 +79,7 @@ fountain across from the cafe drowns out the bustle of the crowd. Above, the
 great nocturnium chandelier stretches down through the center of the spiral
 walkway, through which you can see across to the railing of the second floor.
 ~
-c z 0
+c z 0 -1
 D6
 ~
 0 11901
@@ -169,7 +169,7 @@ even the underside of the second-floor walkway above you are immaculate. A sign
 hangs on the wall next to a large door, opposite a hanging sculpture made from
 metal and wood.
 ~
-c z 0
+c z 0 -1
 D7
 ~
 0 11902
@@ -263,7 +263,7 @@ follow the curve of the grand chamber's wall up to the second floor and beyond.
 At the base of the stairs is the archway to the gift shop. A colorful sign
 adorns the side of the entrance.
 ~
-c z 0
+c z 0 -1
 D5
 ~
 0 11903
@@ -345,7 +345,7 @@ it seem like a smaller, more comfortable space. The walls have been papered
 over with pictures of birds and flowers. A menu board floats above the stacks
 of cups, plates, and bowls that cover the long bar along the north wall.
 ~
-c z 0
+c z 0 -1
 D3
 ~
 0 11902
@@ -434,7 +434,7 @@ wooden desks. The room is quite stark, with one large blackboard making up one
 wall, and another sporting a large bookcase. The walls are paneled with
 polished ebony, but the desks and chairs appear to be oak.
 ~
-cd z 0
+cd z 0 -1
 D2
 ~
 0 11903
@@ -483,7 +483,7 @@ the brightly-colored shelves displaying wares. The ebony wood of the walls
 vanishes behind all the bubbles and bright colors, making the room feel like
 it goes on forever.
 ~
-c z 0
+c z 0 -1
 D1
 ~
 0 11904
@@ -546,7 +546,7 @@ the way to the top of the tower. The vast ground floor sprawls out around you,
 with the stairs and gift shop to the west, the cafe to the east, and the study
 hall to the north.
 ~
-c z F
+c z F -1
 D2
 ~
 0 11901
@@ -612,10 +612,10 @@ curving spiral walkway that slowly rises as it circles the inside of the tower.
 The ebony walls and floor are pristinely polished and reflect the glint of the
 enormous chandelier that hangs down through the central chamber, just beyond
 your reach over the railing. Below, you can see the fountain and people
-meandering around it. Above, through the tree-like chandlier, you can see
+meandering around it. Above, through the tree-like chandelier, you can see
 across to the railing of the third floor.
 ~
-cd z 0
+cd z 0 -1
 D9
 ~
 0 11804
@@ -703,7 +703,7 @@ The Second Floor Walkway of the Tower Skycleave~
 the Tower Skycleave's old masters, with nocturnium light fixtures seperated
 evenly to either side of each portrait.
 ~
-c z 0
+c z 0 -1
 D4
 ~
 0 11910
@@ -876,7 +876,7 @@ spots around it, marring the usually-spotless interior. The portraits of the
 Tower Skycleave's former masters continue along the walls, alternating with
 nocturnium light fixtures.
 ~
-c z 0
+c z 0 -1
 D6
 ~
 0 11911
@@ -1058,7 +1058,7 @@ walls continue with former masters of the Tower Skycleave, lit by the thousand
 flickering lights of the grand chandelier. The door on the north wall leads to
 quarters for the apprentices and students.
 ~
-c z 0
+c z 0 -1
 D7
 ~
 0 11912
@@ -1231,7 +1231,7 @@ in some time. One corner of the room has a small desk with a nocturnium lamp
 sitting atop it. The floor is mostly clear, with a small platform with a ring
 bolted to it in the middle.
 ~
-cdh z 0
+cdh z 0 -1
 D0
 ~
 0 11911
@@ -1309,7 +1309,7 @@ One or two cages are in front of windows, but most of the inhabitants don't get
 a lot of light. The room's aroma is far from pleasant, but a truly disturbing
 odor emanates from a large bin situated in the corner.
 ~
-ch z 0
+ch z 0 -1
 D3
 ~
 0 11914
@@ -1365,7 +1365,7 @@ cobwebs stretching to a darker corner. A thick layer of dust covers the floor
 all across the confined space. The low, sloped ceiling must mean you're inside
 the curving walkway of the central chamber.
 ~
-c 0 0
+c 0 0 -1
 D4
 ~
 0 11917
@@ -1400,7 +1400,7 @@ indicates you're underneath the curving walkway in the central chamber. Hefty
 oak beams support the chamber, but it's hard to move past them, especially with
 all the cobwebs.
 ~
-c 0 0
+c 0 0 -1
 D7
 ~
 0 11916
@@ -1440,7 +1440,7 @@ windows, covered in a fine mesh, take up most of the east wall, allowing for an
 excellent view and lots of light. A workbench is tucked off to one side, behind
 the track.
 ~
-ch z 0
+ch z 0 -1
 D3
 ~
 0 11912
@@ -1558,7 +1558,7 @@ please. Stray teacups, books, and various minor magical items are spread around
 the room. The polished mahogany walls, upon which hang a large collection of
 portraits, reflect the soft glow of the lamps.
 ~
-c z 0
+c z 0 -1
 D2
 ~
 0 11913
@@ -1622,7 +1622,7 @@ yet sturdy door leads off to a bedroom, while the hallway itself curves around
 the tower's central column. The walls are exposed stone blocks here, almost
 like a dungeon, lit only by oil lamps.
 ~
-c z 0
+c z 0 -1
 D0
 ~
 0 11924
@@ -1653,7 +1653,7 @@ The Apprentice Dormitories~
 off to more bedrooms from here. The cold stone walls hold oil lamps to light
 the hall at night, but this part of the tower is otherwise rather spartan.
 ~
-ch z 0
+ch z 0 -1
 D5
 ~
 0 11920
@@ -1697,7 +1697,7 @@ Elegant nocturnium fixtures on the walls accompany the grand chandelier to
 light the portraits and the walkway. Over the railing, you can see people
 sitting around the fountain down below.
 ~
-c z 0
+c z 0 -1
 D5
 ~
 0 11913
@@ -1836,7 +1836,7 @@ landscape painting hangs on one wall and a smaller portrait sits on the desk.
 Curtains are tied back to expose a vast window looking out over the land beyond
 the tower.
 ~
-ch z d
+ch z d -1
 D2
 ~
 0 11919
@@ -1902,7 +1902,7 @@ right next to each bed. Small but elaborately carved chests are positioned side
 by side at the foot of each bed, nearest the walkway. One of the beds has an
 old dreamcatcher over it.
 ~
-ch z d
+ch z d -1
 D2
 ~
 0 11920
@@ -1942,7 +1942,7 @@ Indeed, the room might once have been spacious, but the apprentices have been
 packed in like potted fish. The wall by the door has been painted with a large
 mural.
 ~
-ch z d
+ch z d -1
 D2
 ~
 0 11921
@@ -1972,7 +1972,7 @@ collection of beds and desks and move toward the back of the room, the painting
 seems to change. Now, instead of the tower, it depicts Grand High Sorcerer
 Knezz bent over, holding a half-eaten fire melon, belching a cloud of smoke,
 whilst farting a ball of fire in the other direction. A pair of pixies are
-depicted around the tower..
+depicted flying around the tower.
 ~
 E
 pixies pixy~
@@ -1988,7 +1988,7 @@ covering the hardwood floors. Rich mahogany panels cover the side walls, while
 the door and window are set in walls of stone block. Precisely tied curtains
 are pulled back to expose the view through the window.
 ~
-ch z d
+ch z d -1
 D0
 ~
 0 11921
@@ -2044,7 +2044,7 @@ grand chamber, the wall is paneled with black ebony that curves around the
 great spiral of the walkway, lit by the enormous nocturnium tree that dangles
 down the center of the chamber, just out of reach over the railing.
 ~
-cd z 0
+cd z 0 -1
 D9
 ~
 0 11922
@@ -2138,7 +2138,7 @@ Many doors line the walkway on this floor, though most are shut, locked, and
 more than likely magically muffled; however, one open door stands apart from
 the others, with an enchanting little sign over it.
 ~
-c z 0
+c z 0 -1
 D4
 ~
 0 11930
@@ -2250,7 +2250,7 @@ the Eruditorium, marked by a bright yellow sign. Light from the thousands of
 lamps on the enormous chandelier flickers across an odd painting that hangs
 next to the door.
 ~
-c z 0
+c z 0 -1
 D6
 ~
 0 11931
@@ -2276,16 +2276,11 @@ The sign is bright yellow with bold red lettering:
 ~
 E
 painting~
-   The painting is framed in honey-colored wood inlaid with gold, silver, and
-copper. It depicts a background of deepest blue and myriad stars, with a woman
-in profile in the foreground. The woman has long rich brown hair in a ponytail,
-a soft smile, freckles across her nose, and thoughtful golden eyes that stare
-from the painting. She wears a dark blue velvet robe and a silver pendant in
-the shape of a tiger head with sapphire eyes around her neck.
-
-                    +----------------------------+
-                    |   Tiger Lady of the Moon   |
-                    +----------------------------+
+   The painting next to the door is framed in honey-colored wood inlaid with
+gold, silver, and copper. It depicts a knight sinking into a watery abyss in
+myriad shades of blue with streamers of light reaching down from a small circle
+at the top. The water in the painting almost seems to have a face -- and an
+angry one -- as the hapless knight seems to flail against it.
 ~
 E
 staircases stairs steps floating~
@@ -2378,7 +2373,7 @@ to emanate from one of the doors here, marked by an ichor-green sign. It seems
 to be the only door that's not locked shut in this part of the tower and it
 sounds like someone is inside; the rest are magically muffled.
 ~
-c z 0
+c z 0 -1
 D7
 ~
 0 11932
@@ -2496,7 +2491,7 @@ seem to connect to nothing but the paneled wall. Between the steps, you have
 a clear view of the second floor walkway and the first floor fountain far
 below you.
 ~
-c z 0
+c z 0 -1
 D5
 ~
 0 11933
@@ -2574,7 +2569,7 @@ and some of the light fixtures are bent out of shape. What looks to be debris
 from a workstation is piled up in a corner awaiting the cleaning service. You
 can see some cabinets through a small archway on the south wall.
 ~
-c z 0
+c z 0 -1
 D3
 ~
 0 11932
@@ -2635,7 +2630,7 @@ toppled over behind it. A slate blackboard on one wall lists projects and
 instructions. The room is partitioned on the east side and there is a heavy
 door on the west side.
 ~
-c z 0
+c z 0 -1
 D2
 ~
 0 11933
@@ -2746,7 +2741,7 @@ hidden from what little light spills from the lamp fixtures set high on the
 wall. The chamber has one window, but it's boarded over. A stone table in the
 center of the chamber has leather straps and no small number of stains.
 ~
-c z 0
+c z 0 -1
 D1
 ~
 0 11936
@@ -2811,7 +2806,7 @@ under glass domes, others locked in cases; one is chained to a large metal post
 which appears to be rattling and shaking. Some of the objects hover above their
 shelves, as if possessed by some unearthly soul.
 ~
-c z 0
+c z 0 -1
 D3
 ~
 0 11936
@@ -2864,7 +2859,7 @@ piles of household items in the corners, stacked on tables, and generally
 dispersed all over the lab. A portion of the east wall seems to waver like
 the air over a fire, disturbing the visuals of a large painting of a bagel.
 ~
-ch z 0
+ch z 0 -1
 D0
 ~
 0 11931
@@ -3002,7 +2997,7 @@ manner of strange apparatuses. The center of the area is filled with a three-
 legged stone tortoise. Vines and shrubs are growing down from the high shelves,
 dangling into bins of glowing blue stones.
 ~
-c z M
+c z M -1
 D3
 ~
 0 11939
@@ -3072,7 +3067,7 @@ path to the center dais is from the door. The large windows along the curved
 wall are blocked by the stacks of clutter, so most of the light comes from
 nocturnium lamp fixtures.
 ~
-c z 0
+c z 0 -1
 D1
 ~
 0 11939
@@ -3136,7 +3131,7 @@ The top floor of the Tower Skycleave is the home of the masters and it shows in
 its elegance and charm. Over the railing, you can see down through the branches
 of the great nocturnium chandelier, all the way to the fountain at the bottom.
 ~
-cd z 0
+cd z 0 -1
 D9
 ~
 0 11934
@@ -3240,7 +3235,7 @@ plush rug adorns the middle of the wide spiral walkway. A dark wooden door here
 leads to a high sorcerer's office. Across the center of the chamber, two more
 doors lead to the other offices.
 ~
-c z 0
+c z 0 -1
 D4
 ~
 0 11960
@@ -3360,7 +3355,7 @@ sculptures. Across the calamander railing, the trunk of the tower's enormous
 chandelier grows downward, where it branches into a tree that glimmers with the
 light of a thousand tiny oil lamps.
 ~
-cd z 0
+cd z 0 -1
 D6
 ~
 0 11961
@@ -3481,7 +3476,7 @@ by the nocturnium sculpture that serves as the tower's grand chandelier, its
 countless branches lighting the floors below. This floor is instead lit by
 lanterns that hang on chains from the arching ebony beams of the high ceiling.
 ~
-c z 0
+c z 0 -1
 D7
 ~
 0 11962
@@ -3624,7 +3619,7 @@ entire wall and, with the chairs and desk, leaves very little room to move. The
 wall next to the exit features an inspirational painting. The other doorway, to
 the side, leads to a private apartment.
 ~
-ch z 0
+ch z 0 -1
 D0
 ~
 0 11961
@@ -3676,7 +3671,7 @@ provides a place to cook, although it looks as if it doesn't get much use.
 White marble floors seem to light the room from below as they reflect light
 from the nocturnium chandelier onto the dark walls.
 ~
-ch z dG
+ch z dG -1
 D3
 ~
 0 11964
@@ -3737,7 +3732,7 @@ large window looks out over a desert canyon. A raised dais near the window is
 surrounded by a tightly-woven rug and a small nocturnium chandelier hangs from
 the ceiling.
 ~
-cd z 0
+cd z 0 -1
 D3
 ~
 0 11962
@@ -3824,7 +3819,7 @@ are more tightly packed near the counter. A rather stately bed rests behind
 gossamer curtains and another curtain exposes an area where High Sorcerer
 Barrosh can make his ablutions.
 ~
-cdh z dG
+cdh z dG -1
 D2
 ~
 0 11966
@@ -3878,7 +3873,7 @@ along one wall; plush rugs cover the checkerboard marble floor and a painting
 hangs in a gold frame near the door. An extravagant nocturnium chandelier
 strung the ceiling across lights the office with a soft violet glow.
 ~
-ch z 0
+ch z 0 -1
 D2
 ~
 0 11963
@@ -3939,7 +3934,7 @@ hang in mid-air. Rugs so plush and thick they could be used as beds themselves
 cover most of the alternating white and black marble flooring. Several
 scintillating curtains of pure energy obscure the private areas behind them.
 ~
-ch z dG
+ch z dG -1
 D1
 ~
 0 11968
@@ -4008,7 +4003,7 @@ The Upper Walkway of the Tower Skycleave~
 climbing to a round hatch in the ceiling. The stairway is dimly lit by only a
 couple of simple nocturnium light fixtures.
 ~
-c z 0
+c z 0 -1
 D5
 ~
 0 11963
@@ -4055,7 +4050,7 @@ wall circles the round roof of the tower, from which you can look out over the
 whole countryside. Dark marble benches and leafy shade trees provide ample
 space for reflection.
 ~
-cdh z F
+cdh z F -1
 D9
 ~
 0 11970
@@ -4115,7 +4110,7 @@ plane of water. The light that spills down from the round fountain far above
 you vanishes in all directions; there is nothing here but water and you quickly
 realize you cannot breathe.
 ~
-ci z F
+ci z F 11972
 D8
 ~
 0 11908
@@ -4165,7 +4160,7 @@ along one wall; plush rugs cover the checkerboard marble floor and a painting
 hangs in a gold frame near the door. An extravagant nocturnium chandelier
 strung across the ceiling lights the office with a soft violet glow.
 ~
-chi z 0
+chi z 0 11973
 D2
 ~
 0 11974
@@ -4262,7 +4257,7 @@ S
 Beyond the Fog~
 There is nothing but fog.
 ~
-cdgi 0 0
+cdgi 0 0 11973
 D0
 ~
 0 11973
@@ -4284,7 +4279,7 @@ the ceiling, which also vents smoke from the clay oven. You can hear the
 footsteps and babble of many people walking above you, though you can't make
 out what they're saying.
 ~
-cdi 0 dGL
+cdi 0 dGL 11975
 D8
 ~
 0 11986
@@ -4372,7 +4367,7 @@ people wading in the water and shucking clams, as well as household scenes.
    A steep, narrow stair leads up to the hole in the ceiling that serves as
 both exit and smoke vent. Under the stairs is a small clay oven.
 ~
-cdi 0 dGL
+cdi 0 dGL 11975
 D8
 ~
 0 11983
@@ -4458,7 +4453,7 @@ a small column of smoke that escapes through the ladder hole. The walls are
 painted with both geometric patterns and village scenes; one wall has a low
 doorway.
 ~
-cdi 0 dGL
+cdi 0 dGL 11975
 D8
 ~
 0 11984
@@ -4551,7 +4546,7 @@ stylized people. Low platform beds, sitting mats, and baskets fill most of the
 available space in the room. The only open floor space is in front of the small
 oven under the ladder.
 ~
-cdi 0 dGL
+cdi 0 dGL 11975
 D8
 ~
 0 11985
@@ -4628,7 +4623,7 @@ hundreds of pearls in many colors, all unworked. The altar, like the walls, is
 undecorated and austere. The ground in front of it is worn away from many years
 of kneeling. Above the altar, a vertical tube protrudes through the ceiling.
 ~
-cdi 0 0
+cdi 0 0 11975
 D8
 ~
 0 11991
@@ -4706,7 +4701,7 @@ been placed over their eyes.
 chamber cut into the rock itself. No light or smoke comes from below, and you
 cannot see what's down there.
 ~
-cdi 0 0
+cdi 0 0 11975
 D8
 ~
 0 11982
@@ -4775,7 +4770,7 @@ shelves of skulls, piles of femurs, walls of ribs, and more. As your eyes
 adjust further, you find that the chamber is larger than you realized. There
 could be many dozens of generations down here.
 ~
-cdi 0 0
+cdi 0 0 11975
 D8
 ~
 0 11980
@@ -4845,7 +4840,7 @@ come to a low spot here, where several of the houses form a large plaza atop
 their roofs, beneath dozens of other houses from which hundreds of onlookers
 can view public events.
 ~
-ci 0 0
+ci 0 0 11975
 D0
 ~
 0 11983
@@ -4929,7 +4924,7 @@ a messy little house, though it's difficult to stand near the entrance for long
 because it also serves as the home's chimney. A wooden ladder descends through
 the smoke.
 ~
-ci 0 0
+ci 0 0 11975
 D9
 ~
 0 11976
@@ -5020,7 +5015,7 @@ all other directions beyond the cliffs, there is only the vast turquoise sea.
 also have ladders poking out. The walkway sprawls over every building, with
 sun shades, stools, and reed mats on some of the rooftops.
 ~
-ci 0 0
+ci 0 0 11975
 D9
 ~
 0 11977
@@ -5113,7 +5108,7 @@ slanted covers that can be seen across the city, situated on the south side of
 each roof, opening to the east. Beyond the stairs, to the south and east, you
 see only the vastness of the ocean, which stretches all the way to the horizon.
 ~
-ci 0 0
+ci 0 0 11975
 D9
 ~
 0 11978
@@ -5197,7 +5192,7 @@ the east, the city rises toward a towering monolith at the cliff's end. To the
 west, it sprawls as far as you can see. Just west of here, the walkway is at
 its narrowest, crossing a neck in the cliffside.
 ~
-ci 0 0
+ci 0 0 11975
 D9
 ~
 0 11975
@@ -5293,7 +5288,7 @@ progress by damage to the rooftop. It looks as if part of the cliffside fell
 into the sea below and took a house with it. The house that remains here has
 lost part of its roof and there is no way to cross.
 ~
-cdi 0 0
+cdi 0 0 11975
 D1
 ~
 0 11986
@@ -5373,7 +5368,7 @@ can barely be seen from down here, aside from the heavy logs that protrude from
 the ends. Above the houses, you can see the top of the towering monolith that
 watches over the city.
 ~
-cdi 0 0
+cdi 0 0 11975
 D0
 ~
 0 11985
@@ -5444,7 +5439,7 @@ twenty feet tall and blocks any view of what lies beyond.
 still peeks out from beyond the cliffs above. Indeed, the gate is situated at
 the very spot where the standing stone is no longer visible.
 ~
-cdi 0 0
+cdi 0 0 11975
 D8
 ~
 0 11988
@@ -5522,7 +5517,7 @@ and every seat provides a spectacular view of the entire gobbrabakh, which
 sprawls to the south and west. To the east, the horizon is dominated by the
 towering standing stone.
 ~
-ci 0 GL
+ci 0 GL 11975
 D2
 ~
 0 11983
@@ -5605,7 +5600,7 @@ the sea that surrounds it.
 a small tube protrudes from the walkway. A wooden ramp to the south leads down
 to the cliffside.
 ~
-ci 0 0
+ci 0 0 11975
 D9
 ~
 0 11979
@@ -5689,7 +5684,7 @@ arena on the north and west sides, providing lots of space for spectators.
    The city's towering standing stone is almost directly overhead, up the north
 ramp. Out below the cliffs, the turquoise sea stretches to the horizon.
 ~
-cdi 0 0
+cdi 0 0 11975
 D0
 ~
 0 11991
@@ -5744,7 +5739,7 @@ glinting off the rippling surface. The soothing babble of the river and the
 crackle of the campfire drown out every fret and fetter; you have all the time
 in the world to fish. This is the sort of dream you never want to wake up from.
 ~
-acdi 0 FG
+acdi 0 FG 11993
 D0
 ~
 0 11993
@@ -5786,7 +5781,7 @@ presence of the god. Though he is beyond body or form, his radiant light shines
 through your body and touches every part of you. For the first time in a long
 time, you feel at peace.
 ~
-cdi 0 0
+cdi 0 0 11994
 D0
 ~
 0 11994

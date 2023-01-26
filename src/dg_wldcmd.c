@@ -333,7 +333,7 @@ WCMD(do_wregionecho) {
 		
 		if (center) {
 			DL_FOREACH(character_list, targ) {
-				if (NO_LOCATION(IN_ROOM(targ)) || compute_distance(center, IN_ROOM(targ)) > radius) {
+				if (!same_subzone(center, IN_ROOM(targ))) {
 					continue;
 				}
 				if (outdoor_only && !IS_OUTDOORS(targ)) {
@@ -343,6 +343,40 @@ WCMD(do_wregionecho) {
 				// send
 				sub_write(msg, targ, TRUE, TO_CHAR | (use_queue ? TO_QUEUE : 0));
 			}
+		}
+	}
+}
+
+
+WCMD(do_wsubecho) {
+	char room_number[MAX_INPUT_LENGTH], *msg;
+	bool use_queue;
+	room_data *where;
+	char_data *targ;
+	
+	msg = any_one_word(argument, room_number);
+	use_queue = script_message_should_queue(&msg);
+
+	if (!*room_number || !*msg) {
+		wld_log(room, "wsubecho called with too few args");
+	}
+	else if (!(where = get_room(room, room_number))) {
+		wld_log(room, "wsubecho called with invalid target");
+	}
+	else if (!ROOM_INSTANCE(where)) {
+		wld_log(room, "wsubecho called outside an adventure");
+	}
+	else {
+		DL_FOREACH(character_list, targ) {
+			if (ROOM_INSTANCE(where) != ROOM_INSTANCE(IN_ROOM(targ))) {
+				continue;	// wrong instance
+			}
+			if (!same_subzone(where, IN_ROOM(targ))) {
+				continue;	// wrong subzone
+			}
+			
+			// send
+			sub_write(msg, targ, TRUE, TO_CHAR | (use_queue ? TO_QUEUE : 0));
 		}
 	}
 }
@@ -1585,6 +1619,7 @@ const struct wld_command_info wld_cmd_info[] = {
 	{ "wterraform", do_wterraform, NO_SCMD },
 	{ "wbuildingecho", do_wbuildingecho, NO_SCMD },
 	{ "wregionecho", do_wregionecho, NO_SCMD },
+	{ "wsubecho", do_wsubecho, NO_SCMD },
 	{ "wvehicleecho", do_wvehicleecho, NO_SCMD },
 	{ "wdamage", do_wdamage, NO_SCMD },
 	{ "waoe", do_waoe, NO_SCMD },

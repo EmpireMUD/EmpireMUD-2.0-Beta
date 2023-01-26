@@ -9,7 +9,7 @@ wood, his hand outstretched as if to welcome you. Across the foyer, Grand High
 Sorcerer Knezz watches you from an oversized portrait near the black double
 doors of the entrance.
 ~
-cdh 0 0
+cdh 0 0 -1
 D0
 ~
 0 11801
@@ -111,7 +111,7 @@ nocturnium tree reaches down. The chamber looks cluttered -- perhaps the
 sorcerers are redecorating. Or, perhaps the scorch marks on the marble floor
 portend something more sinister.
 ~
-cd 0 0
+cd 0 0 -1
 D2
 ~
 0 11800
@@ -195,7 +195,7 @@ indicates it's a cafe, but it's covered with a piece of parchment. A painting
 of the tower hangs on the other side of the archway. The tile floor is scuffed
 and scorched; it hasn't been polished recently.
 ~
-c 0 0
+c 0 0 -1
 D6
 ~
 0 11801
@@ -298,7 +298,7 @@ begun to accumulate on the underside of the second-floor walkway above you. A
 crooked sign hangs next to the door, opposite a hanging sculpture of metal and
 wood.
 ~
-c 0 0
+c 0 0 -1
 D0
 ~
 0 11806
@@ -404,7 +404,7 @@ the first step, the archway to the west leads to the gift shop; its sign is
 covered by a white cloth. The white marble floor has scorch marks around the
 stairs.
 ~
-c 0 0
+c 0 0 -1
 D5
 ~
 0 11803
@@ -485,7 +485,7 @@ Nocturnium fixtures let off a subdued light and the walls have stains and
 scuffmarks from all the traffic. The long bar against the wall is covered in
 stacks of dishes; above it, a menu board lists now-discontinued treats.
 ~
-c 0 G
+c 0 G -1
 D3
 ~
 0 11802
@@ -563,7 +563,7 @@ and not enough head space are crammed into orderly rows. The chalkboard along
 the wall is marked up with a complicated bunch of writing. Nocturnium fixtures
 along the walls give off a subdued light.
 ~
-c 0 d
+c 0 d -1
 D2
 ~
 0 11803
@@ -624,7 +624,7 @@ the middle of the room is covered in maps and papers, and crates of supplies
 are stacked around the room. The floor has quickly become worn from all the
 foot traffic in and out. It doesn't look like they're selling anything here.
 ~
-c 0 0
+c 0 0 -1
 D1
 ~
 0 11804
@@ -678,7 +678,7 @@ seems to grow down through the hole in the center of the ever-spiraling
 walkway, casting a warm, soft light over the entire chamber from thousands of
 tiny lamps.
 ~
-c 0 F
+c 0 F -1
 D2
 ~
 0 11801
@@ -752,7 +752,7 @@ wall are askew and extinguished; one is missing entirely. The walkway is lit
 by the enormous chandelier that hangs down through the center of the chamber.
 Unsettling and ominous sounds drift from further up the walkway.
 ~
-cd 0 0
+cd 0 0 -1
 D9
 ~
 0 11804
@@ -859,7 +859,7 @@ sturdy door hangs partially from its hinges. A yellow sign with red lettering
 has been splintered and hangs from the top of the doorway. To the northeast,
 vines and plants have grown over the walkway; you'll have to find a way past.
 ~
-c 0 0
+c 0 0 -1
 D4
 ~
 0 11810
@@ -1025,7 +1025,7 @@ through the tops of saplings and vines, is a collection of pixies that appear
 to be line dancing. Everywhere you look is the same baffling assortment of
 unnatural flora; you can't even tell what part of the tower you're in.
 ~
-cg 0 0
+cg 0 0 -1
 D2
 ~
 0 11811
@@ -1080,7 +1080,7 @@ through the tops of saplings and vines, is a collection of pixies that appear
 to be line dancing. Everywhere you look is the same baffling assortment of
 unnatural flora; you can't even tell what part of the tower you're in.
 ~
-cg 0 0
+cg 0 0 -1
 D2
 ~
 0 11811
@@ -1134,7 +1134,7 @@ desk off in one corner has been flipped over and papers are scattered every-
 where. The window is half boarded-over and with the lamp on the ground, shadows
 populate the empty cages.
 ~
-ch 0 0
+ch 0 0 -1
 D0
 ~
 0 11811
@@ -1218,7 +1218,7 @@ anymore. Aside from a foul-smelling bin in the corner, the room is furnished
 only by shadows and broken debris. Even with the cages empty, very little light
 makes it into the area.
 ~
-ch 0 0
+ch 0 0 -1
 D3
 ~
 0 11814
@@ -1284,7 +1284,7 @@ cobwebs stretching to a darker corner. A thick layer of dust covers the floor
 all across the confined space. The low, sloped ceiling must mean you're inside
 the curving walkway of the central chamber.
 ~
-c 0 0
+c 0 0 -1
 D4
 ~
 0 11817
@@ -1319,7 +1319,7 @@ indicates you're underneath the curving walkway in the central chamber. Hefty
 oak beams support the chamber, but it's hard to move past them, especially with
 all the cobwebs.
 ~
-c 0 0
+c 0 0 -1
 D7
 ~
 0 11816
@@ -1359,7 +1359,7 @@ through the tops of saplings and vines, is a collection of pixies that appear
 to be line dancing. Everywhere you look is the same baffling assortment of
 unnatural flora; you can't even tell what part of the tower you're in.
 ~
-cg 0 0
+cg 0 0 -1
 D3
 ~
 0 11813
@@ -1405,7 +1405,7 @@ through the tops of saplings and vines, is a collection of pixies that appear
 to be line dancing. Everywhere you look is the same baffling assortment of
 unnatural flora; you can't even tell what part of the tower you're in.
 ~
-cg 0 0
+cg 0 0 -1
 D2
 ~
 0 11811
@@ -1460,7 +1460,7 @@ through the tops of saplings and vines, is a collection of pixies that appear
 to be square dancing. Everywhere you look is the same baffling assortment of
 unnatural flora; you can't even tell what part of the tower you're in.
 ~
-cg 0 0
+cg 0 0 -1
 D2
 ~
 0 11811
@@ -1515,7 +1515,7 @@ through the tops of saplings and vines, is a collection of pixies that appear
 to be line dancing. Everywhere you look is the same baffling assortment of
 unnatural flora; you can't even tell what part of the tower you're in.
 ~
-cg 0 0
+cg 0 0 -1
 D2
 ~
 0 11811
@@ -1570,7 +1570,7 @@ heavily splintered frames hang with damaged nameplates beneath them. The tree-
 like chandelier dangles just out of reach beyond the railing, free from damage.
 To the east, a dense jungle of vines and saplings has grown over the walkway.
 ~
-cg 0 0
+cg 0 0 -1
 D1
 ~
 0 11826
@@ -1713,7 +1713,7 @@ through the tops of saplings and vines, is a collection of pixies that appear
 to be hula dancing. Everywhere you look is the same baffling assortment of
 unnatural flora; you can't even tell what part of the tower you're in.
 ~
-cg 0 0
+cg 0 0 -1
 D2
 ~
 0 11811
@@ -1768,7 +1768,7 @@ through the tops of saplings and vines, is a collection of pixies that appear
 to be line dancing. Everywhere you look is the same baffling assortment of
 unnatural flora; you can't even tell what part of the tower you're in.
 ~
-cg 0 0
+cg 0 0 -1
 D2
 ~
 0 11811
@@ -1823,7 +1823,7 @@ through the tops of saplings and vines, is a collection of pixies that appear
 to be dancing a jig. Everywhere you look is the same baffling assortment of
 unnatural flora; you can't even tell what part of the tower you're in.
 ~
-cg 0 0
+cg 0 0 -1
 D2
 ~
 0 11811
@@ -1877,7 +1877,7 @@ numerous saplings have sprung up throughout the area to further make progress
 difficult. The maze seems to end here, giving way to an ordinary part of the
 tower's spiraling walkway.
 ~
-cg 0 0
+cg 0 0 -1
 D2
 ~
 0 11811
@@ -1931,7 +1931,7 @@ a violent picture of the battle that must have happened here. There is also a
 shield dangling by its strap from the enormous nocturnium tree chandelier that
 hangs in the center of the great chamber. Things are not good on this floor.
 ~
-cd 0 0
+cd 0 0 -1
 D9
 ~
 0 11922
@@ -2042,7 +2042,7 @@ have been repurposed as barricades or left to smoulder. Most of the doors that
 line the round central chamber are closed, locked, and warded. One large door
 is cracked open, however; an enchanting little sign hangs over it.
 ~
-c 0 0
+c 0 0 -1
 D4
 ~
 0 11830
@@ -2151,11 +2151,10 @@ The Third Floor Walkway of the Tower Skycleave~
    A large blue stain mars the ceramic tile floor in front of a half-opened
 door whose handle and lock are boken. The walkway is badly damaged here, with
 part of the handrail missing. Someone has snapped a branch off of the great
-nocturnium chandelier and stabbed it through one of the ebony wall panels. As
-if to add insult to injury, the painting next to the door depicts a woman on
-fire.
+nocturnium chandelier and stabbed it through one of the ebony wall panels. A
+crooked painting hangs next to the door, depicting the fountain down below.
 ~
-c 0 0
+c 0 0 -1
 D6
 ~
 0 11831
@@ -2180,13 +2179,13 @@ The sign, hanging slightly crooked, is bright yellow with bold red lettering:
                 CAUTION: Advancement of knowledge in progress
 ~
 E
-painting woman fire~
-   The painting, hung in a honey-colored frame inlaid with gold, silver, and
-copper, shows a woman on fire! Her arms are up and it looks like she's running
-as flames consume her. The bright orange flames stand in artistic contrast to
-the midnight-blue starry background and the woman's blue velvet robe. The
-horrific scene has no nameplate or title to indicate why someone would paint
-such a thing.
+painting fountain~
+   The painting on the wall, hung in a honey-colored frame inlaid with gold,
+silver, and copper, depicts the grand fountain on the first floor, as seen from
+above. The painting is remarkably current: the benches have been pushed away
+and you can see the stacks of crates that have walled off part of the central
+chamber. You can even see flecks of color that might be the uncollected trash
+around the base of the round fountain.
 ~
 E
 staircases stairs steps floating~
@@ -2272,7 +2271,7 @@ nocturnium~
 from matte black nocturnium metal.
 ~
 E
-down fountain second~
+down second~
    Looking down over the railing, you can see the second floor walkway and the
 fountain way below on the ground floor.
 ~
@@ -2286,7 +2285,7 @@ spit the occasional spark from a pair of modified nocturnium light fixtures
 flanking the putrid door. Most of the other doors on this floor are locked and
 warded; perhaps the stench was too strong for the warding spell to take hold.
 ~
-c 0 0
+c 0 0 -1
 D7
 ~
 0 11832
@@ -2406,7 +2405,7 @@ and the debris is all that's left. The walkway transitions smoothly from flat
 tile to floating steps that ascend up to the top floor. Between the steps, you
 can see a lower walkway below and, beyond that, clear to the first floor.
 ~
-c 0 0
+c 0 0 -1
 D5
 ~
 0 11833
@@ -2485,7 +2484,7 @@ and some of the light fixtures are bent out of shape. Clay pots lay broken
 about the room, some smashed well beyond recognition. You can see some cabinets
 through a small archway on the south wall.
 ~
-c 0 0
+c 0 0 -1
 D3
 ~
 0 11832
@@ -2552,7 +2551,7 @@ desk in the corner, blocked off by a velvet rope; an old chair is toppled over
 behind it. A slate blackboard the wall has a message for the mercenaries, and
 it spells doom.
 ~
-c 0 0
+c 0 0 -1
 D2
 ~
 0 11833
@@ -2642,7 +2641,7 @@ hidden from what little light spills from the lamp fixtures set high on the
 wall. The chamber has one window, but it's boarded over. A stone table in the
 center of the chamber has leather straps and no small number of stains.
 ~
-c 0 0
+c 0 0 -1
 D1
 ~
 0 11836
@@ -2703,7 +2702,7 @@ S
 The Museum (3A)~
 The musuem is not available in phase 3A.
 ~
-c 0 0
+c 0 0 -1
 D3
 ~
 0 11836
@@ -2716,7 +2715,7 @@ household items in the corners, stacked on tables, and generally dispersed all
 over the lab. A portion of the east wall seems to waver, disturbing the visuals
 of a large painting of a bagel.
 ~
-ch 0 0
+ch 0 0 -1
 D0
 ~
 0 11831
@@ -2851,7 +2850,7 @@ manner of strange apparatuses. The center of the area is filled with a three-
 legged stone tortoise. Vines and shrubs are growing down from the high shelves,
 dangling into bins of glowing blue stones.
 ~
-c 0 M
+c 0 M -1
 D3
 ~
 0 11839
@@ -2920,7 +2919,7 @@ room is, you can't tell how much of this was already in such a state and how
 much of the mess was caused by the invaders. A dais near the center of the room
 is warded by a shimmering wall of light.
 ~
-c 0 0
+c 0 0 -1
 D1
 ~
 0 11839
@@ -2972,7 +2971,7 @@ The top floor of the Tower Skycleave is the home of the masters and it shows in
 its elegance and charm. Something seems amiss, though. Books are strewn about
 the walkway and you hear shouting coming from one of the rooms up ahead.
 ~
-cd 0 0
+cd 0 0 -1
 D7
 ~
 0 11861
@@ -3081,7 +3080,7 @@ plush rug adorns the middle of the wide spiral walkway. A dark wooden door here
 leads to a high sorcerer's office. Books and papers are strewn along the length
 of the walkway; someone has made quite a mess here.
 ~
-c 0 0
+c 0 0 -1
 D4
 ~
 0 11860
@@ -3210,7 +3209,7 @@ some of them splayed open where they landed. Angry shouting comes from the
 office, encouraging you to keep moving along the walkway that follows the
 curving ebony wall of the chamber.
 ~
-c 0 0
+c 0 0 -1
 D6
 ~
 0 11861
@@ -3338,7 +3337,7 @@ opening in the center of the chamber is pierced by the nocturnium sculpture
 that serves as the tower's grand chandelier, its countless branches lighting
 the floors below.
 ~
-c 0 0
+c 0 0 -1
 D7
 ~
 0 11862
@@ -3472,7 +3471,7 @@ entire wall and, with the chairs and desk, leaves very little room to move. The
 wall next to the exit features an inspirational painting. The other doorway, to
 the side, leads to a private apartment.
 ~
-ch 0 0
+ch 0 0 -1
 D0
 ~
 0 11861
@@ -3523,7 +3522,7 @@ provides a place to cook, although it looks as if it doesn't get much use.
 White marble floors seem to light the room from below as they reflect light
 from the nocturnium chandelier onto the dark walls.
 ~
-ch 0 dG
+ch 0 dG -1
 D3
 ~
 0 11864
@@ -3583,7 +3582,7 @@ A Cluttered Office~
 once hung on the walls now strewn about the floor. Burn marks scorch the walls
 and rug, and an upturned chair lies on the raised dais under the window.
 ~
-ch 0 0
+ch 0 0 -1
 D3
 ~
 0 11862
@@ -3650,7 +3649,7 @@ at the edges of the light. The stately bed is disheveled and the floor is
 strewn with pillows and stray rugs. The longer you stand here, the more you
 feel choked by apathy.
 ~
-ch 0 dG
+ch 0 dG -1
 D2
 ~
 0 11866
@@ -3707,7 +3706,7 @@ light filters in through the doorway; if there are any windows here, they must
 be closed; you can't even see them through the shadows. The wooden corners of
 furniture peek out from the shadows, but you can see few distinct shapes.
 ~
-c 0 0
+c 0 0 -1
 D2
 ~
 0 11863
@@ -3770,7 +3769,7 @@ hang in mid-air. Rugs so plush and thick they could be used as beds themselves
 cover most of the alternating white and black marble flooring. Several
 scintillating curtains of pure energy obscure the private areas behind them.
 ~
-ch 0 dG
+ch 0 dG -1
 D1
 ~
 0 11868
@@ -3839,7 +3838,7 @@ The Upper Walkway of the Tower Skycleave~
 climbing to a round hatch in the ceiling. The stairway is dimly lit by only a
 couple of simple nocturnium light fixtures.
 ~
-c 0 0
+c 0 0 -1
 D5
 ~
 0 11863
@@ -3886,7 +3885,7 @@ wall circles the round roof of the tower, from which you can look out over the
 whole countryside. Dark marble benches and leafy shade trees provide ample
 space for reflection.
 ~
-cdh 0 F
+cdh 0 F -1
 D9
 ~
 0 11870
@@ -3946,7 +3945,7 @@ Shards of white light spin all around you, refracting off hints of red or green
 or blue as they whirl. It takes you a moment to find your footing, as there is
 no ground to be seen here, though you eventually manage to stand.
 ~
-cgi 0 0
+cgi 0 0 11872
 E
 north east south west northeast ne northwest nw southeast se southwest sw up down~
 There's nothing here but the time stream! You can't even see the tower.
@@ -3960,7 +3959,7 @@ shoots the size of saplings bear tender young leaves that nearly block your
 view of the sky, while sapphire and ruby buds grow in their shadows. Below, you
 can see only endless mist.
 ~
-ci 0 0
+ci 0 0 11875
 D7
 ~
 0 11876
@@ -4018,7 +4017,7 @@ buds above, but the branch here is bare as it descends toward the great tree.
 You cleave tightly to the branch, unwilling to risk falling into the mist
 below.
 ~
-ci 0 0
+ci 0 0 11875
 D4
 ~
 0 11875
@@ -4085,7 +4084,7 @@ toward the glowing buds above. The branch is nearly level here, widening in the
 direction of the trunk. Lichens of all shapes and sizes grow from the bark here
 like shrubs, making traversal difficult.
 ~
-ci 0 0
+ci 0 0 11875
 D0
 ~
 0 11876
@@ -4156,7 +4155,7 @@ can't scale it even with the grooved texture of the bark. The branch stretches
 so far into the haze that you can't see the end. At its edge, near the trunk, a
 ladder descends toward a glimmering structure below.
 ~
-ci 0 0
+ci 0 0 11875
 D4
 ~
 0 11877
@@ -4240,7 +4239,7 @@ Looking over the edge, you see the steps spiral further down than you can see,
 as everything below fades into mist. Above you, the tree reaches forever
 upwards, cleaving the sky with its mighty branches.
 ~
-ci 0 0
+ci 0 0 11875
 D0
 ~
 0 11880
@@ -4324,7 +4323,7 @@ fantastical city attached to the endless staircase that encircles the great
 tree. Like the stairs, every building is made from brightly colored stone
 block, forming tremendous mosaics that cascade down into the mist below.
 ~
-ci 0 0
+ci 0 0 11875
 D2
 ~
 0 11879
@@ -4399,7 +4398,7 @@ an arching doorway has been cut in the end that meets the stairs. The
 seashell's glow lights up the haze that hangs in the air, making it hard to see
 anything aside from the tree itself.
 ~
-ci 0 0
+ci 0 0 11875
 D4
 ~
 0 11879
@@ -4485,7 +4484,7 @@ spills from every hand-carved inch of the walls of this enormous spiral shell.
 No chairs or benches, nor any other furniture have been placed inside, but the
 floor is well-worn and small rugs are arranged in a circle.
 ~
-ci 0 0
+ci 0 0 11875
 D3
 ~
 0 11881
@@ -4546,7 +4545,7 @@ palace would seem large if not attached to the great tree and the endless stone
 staircase. Sections of the block staircase are shinier here, as if some of it
 has been replaced.
 ~
-ci 0 0
+ci 0 0 11875
 D8
 ~
 0 11881
@@ -4641,7 +4640,7 @@ with each facet of the black glass reflecting dozens of oil lamps. Below,
 stairs lead down to the dew pools, which shimmer just as majestically as they
 reflect the lamplight back up.
 ~
-cdi 0 0
+cdi 0 0 11875
 D2
 ~
 0 11883
@@ -4753,7 +4752,7 @@ providing enough light to see, but there are no lamps down here. The ceiling is
 translucent such that you can see the shadows of the people in the main rotunda
 above.
 ~
-ci 0 0
+ci 0 0 11875
 D8
 ~
 0 11884
@@ -4804,7 +4803,7 @@ short, with its every-color stones dangling at the edge where a section has
 been destroyed. You can see more of the staircase spiraling down below, but
 there's no way to reach the next section from here.
 ~
-cdi 0 0
+cdi 0 0 11875
 D4
 ~
 0 11883
@@ -4887,7 +4886,7 @@ even than it was outside. The warm stench of decay lingers just underneath your
 nostrils as you catch your balance. Looking back, you can still reach the
 staircase from here.
 ~
-cdi 0 0
+cdi 0 0 11875
 D1
 ~
 0 11886
@@ -4946,7 +4945,7 @@ tree. Every step sinks into the wood as decay overtakes it. Beyond the enormous
 stump, there is an endless sea of calm, still water. Above, the full moon hangs
 in the cloudless sky.
 ~
-cdi 0 0
+cdi 0 0 11875
 E
 trunk stump tree decay wood~
    Whole castles could be built on top of this stump, if not for the rot that
@@ -5002,7 +5001,7 @@ grand canopy bed furnished all in gold. Like the rest of the palace, the
 obsidian walls, floor, and ceiling have been meticulously carved with the
 shapes of flowers and trees.
 ~
-ci 0 d
+ci 0 d 11875
 D9
 ~
 0 11884
@@ -5042,7 +5041,7 @@ Trapped in a Jar~
 and far too thick to break. High above you, the light glints off of the blue
 wax that seals the jar. It seems you're well and truly trapped.
 ~
-ci 0 0
+ci 0 0 11890
 E
 jar clay walls~
    The steep, curving walls of the jar are made from unglazed red clay. As you
@@ -5074,7 +5073,7 @@ Rot and Ruin~
    You are entombed in the putrid sap of the Great Tree, frozen, able to do
 nothing more than watch and witness as the tree dies.
 ~
-cegi 0 0
+cegi 0 0 11875
 E
 tree trunk stump~
 The tree is rotting apart before your eyes!

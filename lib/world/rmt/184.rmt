@@ -2,7 +2,7 @@
 Inside the Beaver Dam~
 You shouldn't be able to get in here.
 ~
-gi 0 0
+gi 0 0 -1
 M 0 18450 100.00 1
 M 0 18451 100.00 1
 S
@@ -12,14 +12,14 @@ An Unstable Portal~
 see where you are, or where you're going! You can still hear the sorcerers back
 in the tower, but you're not sure what lies beyond the portal.
 ~
-cdgi 0 0
+cdgi 0 0 18460
 T 18460
 S
 #18461
 Farther from the Portal~
 You've traveled too far from the portal and this reality is fading...
 ~
-cdgi 0 0
+cdgi 0 0 18461
 D8
 ~
 0 18460
@@ -31,7 +31,7 @@ suggests someone has been living here, and the shelves are decorated with small
 figurines and other items. The top of the cupboard is stepped, suggesting this
 cupboard is underneath a staircase.
 ~
-cgi 0 0
+cgi 0 0 18462
 D1
 ~
 0 18461
@@ -65,7 +65,7 @@ mound upon which the temple is built and ends on the temple square below.
 To the west, you see the Reading Room.  The donation room is in a small
 alcove to your east.
 ~
-cgi 0 0
+cgi 0 0 18463
 D0
 ~
 0 18461
@@ -104,7 +104,7 @@ wind, and the ears of corn have dried out and burst in the sun, littering the
 ground in a heavy snow of popped corn. In the distance you can faintly see a
 manor house.
 ~
-acgi 0 0
+acgi 0 0 18464
 D0
 ~
 0 18461
@@ -142,7 +142,7 @@ S
 Twisty Little Passages~
 You are in a maze of twisty little passages, all alike.
 ~
-cgi 0 0
+cgi 0 0 18465
 D0
 ~
 0 18461
@@ -176,7 +176,7 @@ from moment to moment. Bizarre beasts populate the stalls, and rather than
 running straight along the bottom, the straw-covered floor twists around to the
 ceiling like a corkscrew.
 ~
-cgi 0 w
+cgi 0 w 18466
 D2
 ~
 0 18461
@@ -201,7 +201,7 @@ stand. The doors and archways are perfectly round, like nothing you've ever
 seen before. The house is filled with knick knacks, tchotchkes, and kitsch of
 all kinds. The smell of pipe smoke wafts in from the garden.
 ~
-cgi 0 0
+cgi 0 0 18467
 D0
 ~
 0 18461
@@ -251,7 +251,7 @@ A Vast Field (88, 200)~
 |&b~~~~~~~~~~~~~~~~~~~~~~~~~~~~&0....&b~~~~~~~~~~~~~~~~~~~~~~~~~~~~&0|
 +------------------------------------------------------------+
 ~
-acgi 0 0
+acgi 0 0 18468
 D0
 ~
 0 18461
@@ -285,7 +285,7 @@ The closet is a dark, cramped space.  It appears  to be very crowded in here;
  bumbling about is a metal doorknob set at waist level into  what might be a
  door.  Next to it is a spring lever labeled 'QUIET!'.
 ~
-cgi 0 0
+cgi 0 0 18469
 E
 coat coats~
 A generic coat. Right out of the closet.
@@ -310,7 +310,7 @@ A Massive Steel Vault~
 stretches toward the exit: a huge steel gear painted with the number 111. You
 can see no way to open the gear, which is fixed firmly in place.
 ~
-cgi 0 0
+cgi 0 0 18470
 D0
 ~
 0 18461
@@ -335,7 +335,7 @@ which must have cost a fortune, as each pane is crystal clear and free from
 defects. The items in the shop window are like nothing you have ever seen, but
 the bustling crowd of people seem eager to buy them. (Type 'list')
 ~
-acgi 0 0
+acgi 0 0 18471
 D0
 ~
 0 18461
@@ -379,7 +379,7 @@ A Long, Dusty Trail~
    Next landmark: 22 miles
   Miles traveled: 736 miles
 ~
-cgi 0 0
+cgi 0 0 18472
 D1
 ~
 0 18461
@@ -418,7 +418,7 @@ through an archway in a broken wall and across a wooden bridge. In all other
 directions, the cliff falls off precipitously and the sea is far, far below.
 In the distance, clouds block your view of everything except the glowing tree.
 ~
-acgi 0 0
+acgi 0 0 18473
 D1
 ~
 0 18461
@@ -752,7 +752,7 @@ S
 Portal 13~
 tba
 ~
-cgi 0 0
+cgi 0 0 18474
 D0
 ~
 0 18461
@@ -773,7 +773,7 @@ S
 Portal 14~
 tba
 ~
-cgi 0 0
+cgi 0 0 18475
 D0
 ~
 0 18461
@@ -793,7 +793,7 @@ S
 Portal 15~
 tba
 ~
-cgi 0 0
+cgi 0 0 18476
 D0
 ~
 0 18461
@@ -813,7 +813,7 @@ S
 Portal 16~
 tba
 ~
-cgi 0 0
+cgi 0 0 18477
 D0
 ~
 0 18461
@@ -833,7 +833,7 @@ S
 Portal 17~
 tba
 ~
-cgi 0 0
+cgi 0 0 18478
 D0
 ~
 0 18461

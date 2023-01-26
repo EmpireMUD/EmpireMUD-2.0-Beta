@@ -601,7 +601,7 @@ ACMD(do_mregionecho) {
 		
 		if (center) {
 			DL_FOREACH(character_list, targ) {
-				if (NO_LOCATION(IN_ROOM(targ)) || compute_distance(center, IN_ROOM(targ)) > radius) {
+				if (!same_subzone(center, IN_ROOM(targ))) {
 					continue;
 				}
 				if (outdoor_only && !IS_OUTDOORS(targ)) {
@@ -611,6 +611,48 @@ ACMD(do_mregionecho) {
 				// send
 				sub_write(msg, targ, TRUE, TO_CHAR | (use_queue ? TO_QUEUE : 0));
 			}
+		}
+	}
+}
+
+
+ACMD(do_msubecho) {
+	char room_number[MAX_INPUT_LENGTH], *msg;
+	bool use_queue;
+	room_data *where;
+	char_data *targ;
+
+	if (!MOB_OR_IMPL(ch)) {
+		send_config_msg(ch, "huh_string");
+		return;
+	}
+
+	if (AFF_FLAGGED(ch, AFF_ORDERED))
+		return;
+
+	msg = any_one_word(argument, room_number);
+	use_queue = script_message_should_queue(&msg);
+
+	if (!*room_number || !*msg) {
+		mob_log(ch, "msubecho called with too few args");
+	}
+	else if (!(where = find_target_room(ch, room_number))) {
+		mob_log(ch, "msubecho called with invalid target");
+	}
+	else if (!ROOM_INSTANCE(where)) {
+		mob_log(ch, "msubecho called outside an adventure");
+	}
+	else {
+		DL_FOREACH(character_list, targ) {
+			if (ROOM_INSTANCE(where) != ROOM_INSTANCE(IN_ROOM(targ))) {
+				continue;	// wrong instance
+			}
+			if (!same_subzone(where, IN_ROOM(targ))) {
+				continue;	// wrong subzone
+			}
+			
+			// send
+			sub_write(msg, targ, TRUE, TO_CHAR | (use_queue ? TO_QUEUE : 0));
 		}
 	}
 }

@@ -289,7 +289,7 @@ set target %random.char%
 if (%target.is_pc% && %target.has_resources(10013,10)%)
   say Ah, %target.name%, you've done my job for me. Here, have some money.
   nop %target.give_coins(100)%
-  %send% %target% ~%actor% gives you 100 coins.
+  %send% %target% ~%self% gives you 100 coins.
   detach 10022 %self.id%
 end
 ~

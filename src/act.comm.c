@@ -548,15 +548,11 @@ ACMD(do_pub_comm) {
 			if (pub_comm[subcmd].type != PUB_COMM_OOC && ROOM_AFF_FLAGGED(IN_ROOM(desc->character), ROOM_AFF_SILENT)) {
 				continue;	// quiet room?
 			}
-			if (IN_ROOM(ch) != IN_ROOM(desc->character) && (RMT_FLAGGED(IN_ROOM(ch), RMT_NO_LOCATION) || RMT_FLAGGED(IN_ROOM(desc->character), RMT_NO_LOCATION))) {
-				continue;	// either is !location but not the same room
-				// TODO room templates could have a 'subzone' id so shout/regionecho could work in the same subzone
-			}
 			if (is_ignoring(desc->character, ch)) {
 				continue;	// ignore: always no
 			}
-			if (pub_comm[subcmd].type == PUB_COMM_SHORT_RANGE && compute_distance(IN_ROOM(ch), IN_ROOM(desc->character)) > 50) {
-				continue;	// distance
+			if (pub_comm[subcmd].type == PUB_COMM_SHORT_RANGE && (!same_subzone(IN_ROOM(ch), IN_ROOM(desc->character)) || compute_distance(IN_ROOM(ch), IN_ROOM(desc->character)) > 50)) {
+				continue;	// distance/subzone
 			}
 				
 			// ok:

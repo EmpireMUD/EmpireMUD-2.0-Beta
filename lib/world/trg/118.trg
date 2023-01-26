@@ -974,7 +974,7 @@ if %move% == 1 && !%self.aff_flagged(BLIND)%
   set object_4 a dynamic reconfabulator
   eval obj %%object_%random.4%%%
   * start
-  %regionecho% %room% 1 &&y~%self% shouts, 'Goose!'&&0
+  %subecho% %room% &&y~%self% shouts, 'Goose!'&&0
   %send% %targ% &&m**** &&Z~%self% grabs %obj% off the floor and throws it at you! ****&&0 (dodge)
   %echoaround% %targ% &&m~%self% grabs %obj% off the floor and throws it at ~%targ%!&&0
   skyfight setup dodge %targ%
@@ -1039,7 +1039,7 @@ elseif %move% == 2 && !%self.aff_flagged(BLIND)%
   skyfight clear dodge
   set targ %self.fighting%
   set id %targ.id%
-  %regionecho% %room% 1 &&y~%self% shouts, 'Pocket sand!'&&0
+  %subecho% %room% &&y~%self% shouts, 'Pocket sand!'&&0
   %send% %targ% &&m**** &&Z~%self% sticks ^%self% hand into ^%self% pocket... ****&&0 (dodge)
   %echoaround% %targ% &&m~%self% sticks ^%self% hand into ^%self% pocket...&&0
   skyfight setup dodge %targ%
@@ -1116,7 +1116,7 @@ if %move% == 1 && !%self.aff_flagged(BLIND)%
   skyfight clear dodge
   set targ %self.fighting%
   set id %targ.id%
-  %regionecho% %room% 1 &&y~%self% shouts, 'Goblinbaaaaaaaaaall!'&&0
+  %subecho% %room% &&y~%self% shouts, 'Goblinbaaaaaaaaaall!'&&0
   %send% %targ% &&m**** &&Z~%self% ducks and rolls toward you! ****&&0 (dodge)
   %echoaround% %targ% &&m~%self% ducks and rolls toward ~%targ%!&&0
   skyfight setup dodge %targ%
@@ -1157,7 +1157,7 @@ elseif %move% == 2
     nop %self.add_mob_flag(NO-ATTACK)%
   end
   skyfight clear dodge
-  %regionecho% %room% 1 &&y~%self% shouts, 'Slay the Griffin!'&&0
+  %subecho% %room% &&y~%self% shouts, 'Slay the Griffin!'&&0
   %echo% &&m**** &&Z~%self% starts pulling out knives and throwing them in all directions! ****&&0 (dodge)
   skyfight setup dodge all
   set any 0
@@ -1249,7 +1249,7 @@ if %move% == 1 && !%self.aff_flagged(BLIND)%
   skyfight clear dodge
   set targ %self.fighting%
   set id %targ.id%
-  %regionecho% %room% 1 &&y~%self% shouts, 'You got a miner problem!'&&0
+  %subecho% %room% &&y~%self% shouts, 'You got a miner problem!'&&0
   %send% %targ% &&m**** &&Z~%self% leaps high into the air with ^%self% pick over ^%self% head! ****&&0 (dodge)
   %echoaround% %targ% &&m~%self% leaps high into the air with ^%self% pick over ^%self% head!&&0
   skyfight setup dodge %targ%
@@ -1284,7 +1284,7 @@ elseif %move% == 2
     nop %self.add_mob_flag(NO-ATTACK)%
   end
   skyfight clear dodge
-  %regionecho% %room% 1 &&y~%self% shouts, 'Mine! Allllllll miiiiiiiiiiiiine!'&&0
+  %subecho% %room% &&y~%self% shouts, 'Mine! Allllllll miiiiiiiiiiiiine!'&&0
   %echo% &&m**** &&Z~%self% holds out ^%self% pick and begins spinning wildly! ****&&0 (dodge)
   skyfight setup dodge all
   set any 0
@@ -1406,7 +1406,7 @@ elseif %move% == 2
     nop %self.remove_mob_flag(NO-ATTACK)%
     halt
   end
-  %regionecho% %room% 1 &&y~%self% shouts, 'Blinding Barrage!'&&0
+  %subecho% %room% &&y~%self% shouts, 'Blinding Barrage!'&&0
   %echo% &&m**** There's a loud POP and a BANG as the air begins to explode around you! ****&&0 (dodge)
   set cycle 1
   set broke 0
@@ -1471,7 +1471,7 @@ elseif %move% == 3
     halt
   end
   skyfight setup dodge all
-  %regionecho% %room% 1 &&y~%self% shouts, 'TOWER QUAKE!'&&0
+  %subecho% %room% &&y~%self% shouts, 'TOWER QUAKE!'&&0
   %echo% &&m**** There's a low rumble as the tower begins to shake... ****&&0 (dodge)
   set cycle 1
   eval wait 10 - %diff%
@@ -1479,7 +1479,7 @@ elseif %move% == 3
   while %cycle% <= %diff%
     skyfight setup dodge all
     wait %wait% s
-    %regionecho% %room% 1 The Tower Skycleave quakes on its foundation!
+    %subecho% %room% The Tower Skycleave quakes on its foundation!
     set ch %room.people%
     while %ch%
       set next_ch %ch.next_in_room%
@@ -1527,7 +1527,7 @@ elseif %move% == 4 && !%self.aff_flagged(BLIND)%
       nop %self.remove_mob_flag(NO-ATTACK)%
       halt
     end
-    %regionecho% %room% 1 &&y~%self% shouts, 'Blastmaster Fox!'&&0
+    %subecho% %room% &&y~%self% shouts, 'Blastmaster Fox!'&&0
     if !%targ% || %targ.id% != %id%
       * gone
       %echo% &&mLuminous bolts from Venjer's staff crash all over the room and explode!&&0
@@ -1556,7 +1556,7 @@ elseif %move% == 4 && !%self.aff_flagged(BLIND)%
   done
 elseif %move% == 5
   * Summon Goblins
-  %regionecho% %room% 1 &&y~%self% shouts, 'Gaaaaableeeeeeeeeeens!'&&0
+  %subecho% %room% &&y~%self% shouts, 'Gaaaaableeeeeeeeeeens!'&&0
   wait 4 s
   if %diff% > 2
     %load% m 11817 ally %self.level%
@@ -1813,7 +1813,7 @@ elseif %move% == 4
   skyfight clear dodge
 elseif %move% == 5
   * Summon pixy
-  %regionecho% %room% 1 &&y~%self% shouts, 'To me, my child!'&&0
+  %subecho% %room% &&y~%self% shouts, 'To me, my child!'&&0
   wait 2 sec
   if %diff% > 2
     %load% m 11820 ally %self.level%
@@ -2343,7 +2343,7 @@ switch %self.vnum%
       if %ch.is_pc%
         * mark who did this
         set spirit %instance.mob(11900)%
-        set finish3 %ch.name%
+        set finish3 %ch.real_name%
         remote finish3 %spirit.id%
       end
     end
@@ -2357,7 +2357,7 @@ switch %self.vnum%
       %at% %hall% %echo% &&m@%shadow% fades and dissipates.&&0
       %purge% %shadow%
     end
-    %echo% &&m~%self% dissolves as the shadows are cast out!&&0
+    %echo% &&m~%self% dissolves as the shadows are cast out, dropping something as it fades away!&&0
     * set room desc back
     %mod% %self.room% description This dimly-lit office, the highest in the tower, reeks of decay. Little light filters in through the doorway; if there are any windows here, they must
     %mod% %self.room% append-description be closed; you can't even see them through the shadows. The wooden corners of furniture peek out from the shadows, but you can see few distinct shapes.
@@ -2839,16 +2839,16 @@ elseif %room.template% == 11832 || %room.template% == 11833
         %echo% ~%self% grabs ~%ch% and throws *%ch% over the railing!
         switch %random.4%
           case 1
-            %regionecho% %room% 1 &&y~%ch% shouts, 'Aaaaaaaaaaaaaaah!'&&0
+            %subecho% %room% &&y~%ch% shouts, 'Aaaaaaaaaaaaaaah!'&&0
           break
           case 2
-            %regionecho% %room% 1 &&y~%ch% shouts, 'Nooooooooooooooo!'&&0
+            %subecho% %room% &&y~%ch% shouts, 'Nooooooooooooooo!'&&0
           break
           case 3
-            %regionecho% %room% 1 &&y~%ch% shouts, 'Heeeeeeeeeeeeelp!'&&0
+            %subecho% %room% &&y~%ch% shouts, 'Heeeeeeeeeeeeelp!'&&0
           break
           case 4
-            %regionecho% %room% 1 &&y~%ch% shouts, 'I don't get paid enough for thiiiiiiiiis!'&&0
+            %subecho% %room% &&y~%ch% shouts, 'I don't get paid enough for thiiiiiiiiis!'&&0
           break
         done
         %echo% Your blood freezes as you hear a death cry and a splat!
@@ -3122,7 +3122,7 @@ if %self.vnum% == 11933
   wait 6 sec
   say What happened? Oh! I can speak again! I'm free! I'm free!
   wait 9 sec
-  %echo% ~%self% turns and sees ~%annelise% and his face turns sheet-white.
+  %echo% ~%self% turns and sees ~%annelise% and his face goes sheet-white.
   wait 9 sec
   %force% %annelise% say Yes, you're free, you're free. You shall find your father in the lobby. May I suggest you make a hasty escape?
   wait 9 sec
@@ -3405,48 +3405,48 @@ if %target%
     case 11841
       * rogue merc
       %echo% Scaldorran flies in through |%target% mouth... ~%target% pulls out ^%target% dagger and stabs *%target%self in the heart!
-      %regionecho% %room% 1 &&y~%target% shouts, 'No! No! Nooooooooooo...'&&0
+      %subecho% %room% &&y~%target% shouts, 'No! No! Nooooooooooo...'&&0
     break
     case 11842
       * caster merc
-      %regionecho% %room% 1 &&y~%target% shouts, 'Stay back, fiend!'&&0
+      %subecho% %room% &&y~%target% shouts, 'Stay back, fiend!'&&0
       %echo% ~%target% panics and hurls a spell at Scaldorran, who expertly reflects it. ~%target% is hit in the head and falls to the ground!
     break
     case 11843
       * archer merc
       %echo% ~%target% shoots a dozen arrows into Scaldorran, who comes apart at the wrappings and envelops ~%target%, stabbing *%target% with every arrow!
-      %regionecho% %room% 1 &&y~%target% shouts, 'Aaaaaaaaaaaaaaagh!'&&0
+      %subecho% %room% &&y~%target% shouts, 'Aaaaaaaaaaaaaaagh!'&&0
     break
     case 11844
       * nature mage merc
       %echo% ~%target% starts to twist and morph into something enormous... until Scaldorran wraps his bandages around *%target%, whereupon &%target% dissolves into a sticky mess!
-      %regionecho% %room% 1 &&ySomething unrecognizable lets out an anguished shout and then a splattering sound!&&0
+      %subecho% %room% &&ySomething unrecognizable lets out an anguished shout and then a splattering sound!&&0
     break
     case 11845
       * vampire merc
-      %regionecho% %room% 1 &&y~%target% shouts, 'Face me, lich! I'm more than you can...'&&0
+      %subecho% %room% &&y~%target% shouts, 'Face me, lich! I'm more than you can...'&&0
       %echo% Scaldorran twists and whirls and whips ~%target% over and over with his bandages, slicing open thousands of tiny cuts. You watch in horror as ~%target% bleeds out and crumples to the floor.
     break
     case 11846
       * armored merc
       %echo% Scaldorran appears behind ~%target% and silently slides his bandages into |%target% armor... You are forced to watch as ~%target% turns blue in the face and falls to the ground.
-      %regionecho% %room% 1 There's a loud, echoing clang from heavy armor hitting the floor.
+      %subecho% %room% There's a loud, echoing clang from heavy armor hitting the floor.
     break
     case 11848
       * Bleak Rojjer
-      %regionecho% %room% 1 &&y~%target% shouts a truncated, 'Wha!?'&&0
+      %subecho% %room% &&y~%target% shouts a truncated, 'Wha!?'&&0
       %echo% Linen wrappings whip out from the painting on the wall and you are forced to watch as Scaldorran strangles ~%target% and bashes his head against the floor.
       set done 1
     break
     case 11847
       * Kara Virduke
-      %regionecho% %room% 1 &&y~%target% shouts, 'Oh my wo...'&&0
+      %subecho% %room% &&y~%target% shouts, 'Oh my wo...'&&0
       %echo% Scaldorran pops out of a cabinet just as ~%target% opens it and snakes one of his long linen wrappings down her throat. You watch in horror as she claws at her mouth, unable to stop it.
       set done 1
     break
     case 11849
       * Trixton Vye
-      %regionecho% %room% 1 &&y~%target% shouts, 'Pathetic dead thing, face now your new master! By the Vy...'&&0
+      %subecho% %room% &&y~%target% shouts, 'Pathetic dead thing, face now your new master! By the Vy...'&&0
       %echo% One of Scaldorran's bandages slices forward through the air, piercing Trixton Vye's decrepit throat above the collar.
       %echo% Trixton's mouth continues to move, but no sound comes out as a red spot spreads from the top of his shirt.
       set done 1
@@ -4601,7 +4601,7 @@ elseif %move% == 3
     wait 10 s
 elseif %move% == 4
   * Summon Mercs
-  %regionecho% %room% 1 &&y~%self% shouts, 'I could use some help in the Eruditorium!'&&0
+  %subecho% %room% &&y~%self% shouts, 'I could use some help in the Eruditorium!'&&0
   if %diff% == 1
     wait 5 sec
     %echo% &&m...nobody seems to respond to Lady Virduke's call.&&0
@@ -4842,7 +4842,7 @@ elseif %move% == 4
   dg_affect #11845 %self% off
 elseif %move% == 5
   * Summon Mercs
-  %regionecho% %room% 1 &&y~%self% shouts, 'In 'ere you lots!'&&0
+  %subecho% %room% &&y~%self% shouts, 'In 'ere you lots!'&&0
   if %diff% == 1
     wait 5 sec
     %echo% &&m...nobody seems to respond to Rojjer's call.&&0
@@ -6140,7 +6140,7 @@ elseif %move% == 2
   skyfight clear interrupt
 elseif %move% == 3
   skyfight clear interrupt
-  %regionecho% %rm% 1 &&y~%self% shouts, 'By the power of Skycleave!'&&0
+  %subecho% %rm% &&y~%self% shouts, 'By the power of Skycleave!'&&0
   wait 3 sec
   set targ %self.fighting%
   set id %targ.id%
@@ -6862,11 +6862,8 @@ end
 %echoaround% %actor% ~%actor% touches @%self% to @%target%...
 %echo% @%target% takes on a sky-blue glow!
 nop %target.flag(SUPERIOR)%
-if %target.level% > 0
-  %scale% %target% %target.level%
-else
-  %scale% %target% 1
-end
+eval level %actor.highest_level% + 50
+%scale% %target% %level%
 %purge% %self%
 ~
 #11861
@@ -7013,9 +7010,11 @@ end
 if !%self.affect(11874)%
   dg_affect #11874 %self% INTELLIGENCE 1 120
 end
+* how long is allowed?
+eval allow_time 10 + (50 * %self.var(diff,1)%)
 * check timers
-if %seconds% > 60
-  * 1 minute: Knezz dies
+if %seconds% > %allow_time%
+  * Knezz dies
   nop %self.add_mob_flag(NO-ATTACK)%
   %restore% %self%
   * stun everyone
@@ -7037,7 +7036,7 @@ if %seconds% > 60
   end
   wait 6 sec
   %echo% The Shade holds the gnarled wand high in the air...
-  %regionecho% %room% 1 &&yThe Shade of Mezvienne shouts, 'By the power of Skycleave... I HAVE THE POWER!'&&0
+  %subecho% %room% &&yThe Shade of Mezvienne shouts, 'By the power of Skycleave... I HAVE THE POWER!'&&0
   wait 3 sec
   %echo% The Shade of Mezvienne grows and transforms as it ascends into a higher being!
   %load% mob 11863
@@ -7063,13 +7062,13 @@ if %seconds% > 60
   %mod% %room% append-description around your feet is free of it. The shadow seems to be alive... and worse, it appears to be drawing more power from Skycleave by the second.
   * and purge self
   %purge% %self%
-elseif %seconds% > 90
+elseif %seconds% > (%allow_time% - 10)
   %echo% Grand High Sorcerer Knezz goes limp as darkness begins to seep from his mouth and eyes.
   dg_affect %self% BONUS-MAGICAL 5 -1
-elseif %seconds% > 60
+elseif %seconds% > (%allow_time% - 30)
   %echo% The Shade of Mezvienne grows to fill the room as Knezz grows paler and paler.
   dg_affect %self% BONUS-MAGICAL 5 -1
-elseif %seconds% > 30
+elseif %seconds% > (%allow_time% - 60)
   %echo% The Shade of Mezvienne grows as it draws Knezz's life force.
   dg_affect %self% BONUS-MAGICAL 5 -1
 end
@@ -8884,7 +8883,7 @@ while %cycles_left% >= 0
 done
 * mark who did this
 set spirit %instance.mob(11900)%
-set finish2 %actor.name%
+set finish2 %actor.real_name%
 remote finish2 %spirit.id%
 * and phase transition
 %load% mob 11896
@@ -9399,7 +9398,7 @@ wait 0
 * Ensure part of the instance
 nop %self.link_instance%
 * 1. Announce
-%regionecho% %self.room% 0 # The second floor of the Tower Skycleave has been rescued!
+%subecho% %self.room% # The second floor of the Tower Skycleave has been rescued!
 * 2. Re-link 'up' exit from floor 1
 %door% i11804 up room i11910
 * 3. Mobs: Any checks based on surviving mobs go here (step 4 will purge them)
@@ -9516,7 +9515,7 @@ wait 0
 * Ensure part of the instance
 nop %self.link_instance%
 * 1. Announce
-%regionecho% %self.room% 0 # The third floor of the Tower Skycleave has been rescued!
+%subecho% %self.room% # The third floor of the Tower Skycleave has been rescued!
 * 2. Re-link 'up' exit from floor 2
 %door% i11922 up room i11930
 * 3. Mobs: Any checks based on surviving mobs go here (step 4 will purge them)
@@ -9606,7 +9605,7 @@ wait 0
 * Ensure part of the instance
 nop %self.link_instance%
 * 1. Announce
-%regionecho% %self.room% 0 # The fourth floor of the Tower Skycleave has been rescued!
+%subecho% %self.room% # The fourth floor of the Tower Skycleave has been rescued!
 * 2. Re-link 'up' exit from floor 3
 %door% i11934 up room i11960
 * 3. Mobs: Any checks based on surviving mobs go here (step 4 will purge them)

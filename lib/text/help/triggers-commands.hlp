@@ -42,7 +42,7 @@ any duplicate queued messages are stacked.
 Example:
   %asound% You hear a blood chilling howl from nearby.
 
-See also: %ECHO%, %REGIONECHO%
+See also: %ECHO%, %REGIONECHO%, %SUBECHO%
 #d
 %AT% MAT OAT VAT WAT
 
@@ -113,6 +113,9 @@ See also: %TERRAFORM%, %TERRACROP%
 &c%regionecho% <location> <radius> <message>&0
    Sends to a map region. See HELP %REGIONECHO% for details.
 
+&c%subecho% <location> <message>&0
+   Sends to people in the same instance and subzone. See HELP %SUBECHO%.
+
 &c%vehicleecho% <vehicle> <message>&0
    Sends a message to everyone on/in the target vehicle.
 
@@ -127,7 +130,7 @@ any duplicate queued messages are stacked.
 NOTE: When used with mobs make sure the mobs can see the players and vehicles,
 i.e not blind, set INFRA.
 
-See also: %ASOUND%, %REGIONECHO%
+See also: %ASOUND%, %REGIONECHO%, %SUBECHO%, SUBZONE
 #d
 COMMENT * "TRIGEDIT COMMENT"
 
@@ -639,6 +642,10 @@ adventure zone and it will find the map location associated with it.
 If you use a negative radius, it will only echo to people outdoors. Otherwise,
 all players in range will see the echo.
 
+If regionecho is used in a room template with a subzone, only players in the
+same subzone will see it. Other adventures (but not other instances of the same
+adventure) in range will also show the message if they have the same subzone.
+
 Using a # (hash sign) at the start of the message will queue the message, which
 causes it to be sent on a very short delay (after any non-queued messages) and
 any duplicate queued messages are stacked.
@@ -647,7 +654,7 @@ Examples:
   %regionecho% %self.room% 100 # The fair has come to town!
   %regionecho% %self.room% -50 A pegasus flies overhead.
 
-See also: %ECHO%
+See also: %ECHO%, %SUBECHO%, SUBZONE
 #d
 REMOTE
 
@@ -796,6 +803,24 @@ command, are executed.
 &ccase&0 - Used to begin a new conditional group in a switch block.
 &cdefault&0 - Similar to case but matches any condition not met.
 &cdone&0 - Used to terminate a switch (or while) block.
+#d
+%SUBECHO% MSUBECHO OSUBECHO WSUBECHO
+
+%subecho% <location> <message>
+
+Sends a message to everyone in the same adventure and subzone. This works
+whether or not you have the !LOCATION flag set on the subzone.
+
+To send messages to other adventures with the same subzone, use %regionecho%.
+
+Using a # (hash sign) at the start of the message will queue the message, which
+causes it to be sent on a very short delay (after any non-queued messages) and
+any duplicate queued messages are stacked.
+
+Examples:
+  %subecho% %self.room% You hear a howl in the distance.
+
+See also: %ECHO%, %REGIONECHO%, SUBZONE
 #d
 TATTACH
 

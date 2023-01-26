@@ -319,7 +319,7 @@ OCMD(do_oregionecho) {
 		
 		if (center) {
 			DL_FOREACH(character_list, targ) {
-				if (NO_LOCATION(IN_ROOM(targ)) || compute_distance(center, IN_ROOM(targ)) > radius) {
+				if (!same_subzone(center, IN_ROOM(targ))) {
 					continue;
 				}
 				if (outdoor_only && !IS_OUTDOORS(targ)) {
@@ -329,6 +329,40 @@ OCMD(do_oregionecho) {
 				// send
 				sub_write(msg, targ, TRUE, TO_CHAR | (use_queue ? TO_QUEUE : 0));
 			}
+		}
+	}
+}
+
+
+OCMD(do_osubecho) {
+	char room_number[MAX_INPUT_LENGTH], *msg;
+	bool use_queue;
+	room_data *where, *orm = obj_room(obj);
+	char_data *targ;
+	
+	msg = any_one_word(argument, room_number);
+	use_queue = script_message_should_queue(&msg);
+
+	if (!*room_number || !*msg) {
+		obj_log(obj, "osubecho called with too few args");
+	}
+	else if (!(where = get_room(orm, room_number))) {
+		obj_log(obj, "osubecho called with invalid target");
+	}
+	else if (!ROOM_INSTANCE(where)) {
+		obj_log(obj, "osubecho called outside an adventure");
+	}
+	else {
+		DL_FOREACH(character_list, targ) {
+			if (ROOM_INSTANCE(where) != ROOM_INSTANCE(IN_ROOM(targ))) {
+				continue;	// wrong instance
+			}
+			if (!same_subzone(where, IN_ROOM(targ))) {
+				continue;	// wrong subzone
+			}
+			
+			// send
+			sub_write(msg, targ, TRUE, TO_CHAR | (use_queue ? TO_QUEUE : 0));
 		}
 	}
 }
@@ -1758,6 +1792,7 @@ const struct obj_command_info obj_cmd_info[] = {
 	{ "otransform", do_otransform, NO_SCMD },
 	{ "obuildingecho", do_obuildingecho, NO_SCMD }, /* fix by Rumble */
 	{ "oregionecho", do_oregionecho, NO_SCMD },
+	{ "osubecho", do_osubecho, NO_SCMD },
 	{ "ovehicleecho", do_ovehicleecho, NO_SCMD },
 
 	{ "\n", 0, 0 }        /* this must be last */

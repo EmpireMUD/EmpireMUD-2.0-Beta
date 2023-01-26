@@ -2208,6 +2208,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 		"send",
 		"siege",
 		"slay",
+		"subecho",
 		"teleport",
 		"terracrop",
 		"terraform",
@@ -3717,6 +3718,16 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					else if (!str_cmp(field, "heshe"))
 						snprintf(str, slen, "%s", HSSH(c));
 
+					else if (!str_cmp(field, "highest_level")) {
+						if (IS_NPC(c)) {
+							int lev = get_approximate_level(c);
+							snprintf(str, slen, "%d", MAX(lev, GET_MAX_SCALE_LEVEL(c)));
+						}
+						else {
+							snprintf(str, slen, "%d", GET_HIGHEST_KNOWN_LEVEL(c));
+						}
+					}
+
 					else if (!str_cmp(field, "himher"))
 						snprintf(str, slen, "%s", HMHR(c));
 
@@ -4209,7 +4220,10 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					break;
 				}
 				case 'r': {	// char.r*
-					if (!str_cmp(field, "remove_companion")) {
+					if (!str_cmp(field, "real_name")) {
+						snprintf(str, slen, "%s", PERS(c, c, TRUE));
+					}
+					else if (!str_cmp(field, "remove_companion")) {
 						if (!IS_NPC(c) && subfield && *subfield && isdigit(*subfield)) {
 							remove_companion(c, atoi(subfield));
 						}
@@ -5540,6 +5554,15 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					}
 					else if (!str_cmp(field, "starboard")) {
 						direction_vars(r, STARBOARD, subfield, str, slen);
+					}
+					else if (!str_cmp(field, "subzone")) {
+						if (GET_ROOM_TEMPLATE(r) && GET_RMT_SUBZONE(GET_ROOM_TEMPLATE(r)) != NOWHERE) {
+							snprintf(str, slen, "%d", GET_RMT_SUBZONE(GET_ROOM_TEMPLATE(r)));
+						}
+						else {
+							// no valid subzone: show a -1
+							snprintf(str, slen, "-1");
+						}
 					}
 					else if (!str_cmp(field, "sun")) {
 						snprintf(str, slen, "%s", sun_types[get_sun_status(r)]);
