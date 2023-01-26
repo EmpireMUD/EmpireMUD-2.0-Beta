@@ -2062,7 +2062,7 @@ bool valid_no_trace(room_data *room);
 
 // act.trade.c
 void cancel_gen_craft(char_data *ch);
-bool check_can_craft(char_data *ch, craft_data *type);
+bool check_can_craft(char_data *ch, craft_data *type, bool continuing);
 bool find_and_bind(char_data *ch, obj_vnum vnum);
 int get_craft_scale_level(char_data *ch, craft_data *craft);
 int get_crafting_level(char_data *ch);

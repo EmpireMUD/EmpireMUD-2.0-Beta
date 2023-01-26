@@ -51,9 +51,10 @@ obj_data *find_water_container(char_data *ch, obj_data *list);
 *
 * @param char_data *ch The person crafting, or trying to.
 * @param craft_data *type The craft they are attempting.
+* @param bool continuing If TRUE, skips things that are only required to start a craft (like crafting level).
 * @return bool TRUE if okay, FALSE if not.
 */
-bool check_can_craft(char_data *ch, craft_data *type) {
+bool check_can_craft(char_data *ch, craft_data *type, bool continuing) {
 	char buf1[MAX_STRING_LENGTH], *str, *ptr;
 	vehicle_data *craft_veh;
 	bool wait, room_wait, makes_building;
@@ -66,7 +67,7 @@ bool check_can_craft(char_data *ch, craft_data *type) {
 	makes_building = (CRAFT_IS_BUILDING(type) || (craft_veh && VEH_FLAGGED(craft_veh, VEH_BUILDING)));
 	
 	// attribute-based checks
-	if (GET_CRAFT_MIN_LEVEL(type) > get_crafting_level(ch)) {
+	if (GET_CRAFT_MIN_LEVEL(type) > get_crafting_level(ch) && !continuing) {
 		msg_to_char(ch, "You need to have a crafting level of %d to %s that.\r\n", GET_CRAFT_MIN_LEVEL(type), command);
 	}
 	else if (!can_see_in_dark_room(ch, IN_ROOM(ch), TRUE)) {
@@ -1158,7 +1159,7 @@ void process_gen_craft_vehicle(char_data *ch, craft_data *type) {
 	char_data *vict;
 	
 	// basic setup
-	if (!type || !check_can_craft(ch, type) || !(veh = find_finishable_vehicle(ch, NULL, GET_ACTION_VNUM(ch, 1), &junk)) || VEH_IS_DISMANTLING(veh)) {
+	if (!type || !check_can_craft(ch, type, TRUE) || !(veh = find_finishable_vehicle(ch, NULL, GET_ACTION_VNUM(ch, 1), &junk)) || VEH_IS_DISMANTLING(veh)) {
 		cancel_gen_craft(ch);
 		return;
 	}
@@ -2053,7 +2054,7 @@ ACMD(do_gen_craft) {
 		// this should be unreachable
 		msg_to_char(ch, "You have not learned that recipe.\r\n");
 	}
-	else if (!check_can_craft(ch, type)) {
+	else if (!check_can_craft(ch, type, FALSE)) {
 		// sends its own messages
 	}
 	else if (CRAFT_IS_VEHICLE(type)) {
