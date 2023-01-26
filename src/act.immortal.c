@@ -3412,7 +3412,7 @@ SHOW(show_progression) {
 
 
 SHOW(show_quests) {
-	char name[MAX_INPUT_LENGTH], *arg2, buf[MAX_STRING_LENGTH], when[256];
+	char name[MAX_INPUT_LENGTH], *arg2, buf[MAX_STRING_LENGTH * 2], when[256];
 	struct player_completed_quest *pcq, *next_pcq;
 	bool file = FALSE, found = FALSE;
 	struct player_quest *pq;
