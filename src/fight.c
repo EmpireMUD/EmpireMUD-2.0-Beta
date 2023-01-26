@@ -4186,7 +4186,7 @@ void fight_wait_run(char_data *ch, double speed) {
 	}
 
 	// animals try to flee ranged combat
-	if (IS_NPC(ch) && !GET_LEADER(ch) && MOB_FLAGGED(ch, MOB_ANIMAL) && !number(0, 10)) {
+	if (IS_NPC(ch) && !GET_LEADER(ch) && MOB_FLAGGED(ch, MOB_ANIMAL) && !MOB_FLAGGED(ch, MOB_HARD | MOB_GROUP) && !number(0, 10)) {
 		do_flee(ch, "", 0, 0);
 	}
 	
