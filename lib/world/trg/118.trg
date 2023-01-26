@@ -7010,9 +7010,11 @@ end
 if !%self.affect(11874)%
   dg_affect #11874 %self% INTELLIGENCE 1 120
 end
+* how long is allowed?
+eval allow_time 10 + (50 * %self.var(diff,1)%)
 * check timers
-if %seconds% > 60
-  * 1 minute: Knezz dies
+if %seconds% > %allow_time%
+  * Knezz dies
   nop %self.add_mob_flag(NO-ATTACK)%
   %restore% %self%
   * stun everyone
@@ -7060,13 +7062,13 @@ if %seconds% > 60
   %mod% %room% append-description around your feet is free of it. The shadow seems to be alive... and worse, it appears to be drawing more power from Skycleave by the second.
   * and purge self
   %purge% %self%
-elseif %seconds% > 90
+elseif %seconds% > (%allow_time% - 10)
   %echo% Grand High Sorcerer Knezz goes limp as darkness begins to seep from his mouth and eyes.
   dg_affect %self% BONUS-MAGICAL 5 -1
-elseif %seconds% > 60
+elseif %seconds% > (%allow_time% - 30)
   %echo% The Shade of Mezvienne grows to fill the room as Knezz grows paler and paler.
   dg_affect %self% BONUS-MAGICAL 5 -1
-elseif %seconds% > 30
+elseif %seconds% > (%allow_time% - 60)
   %echo% The Shade of Mezvienne grows as it draws Knezz's life force.
   dg_affect %self% BONUS-MAGICAL 5 -1
 end
