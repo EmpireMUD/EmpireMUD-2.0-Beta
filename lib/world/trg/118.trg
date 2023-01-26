@@ -2357,7 +2357,7 @@ switch %self.vnum%
       %at% %hall% %echo% &&m@%shadow% fades and dissipates.&&0
       %purge% %shadow%
     end
-    %echo% &&m~%self% dissolves as the shadows are cast out!&&0
+    %echo% &&m~%self% dissolves as the shadows are cast out, dropping something as it fades away!&&0
     * set room desc back
     %mod% %self.room% description This dimly-lit office, the highest in the tower, reeks of decay. Little light filters in through the doorway; if there are any windows here, they must
     %mod% %self.room% append-description be closed; you can't even see them through the shadows. The wooden corners of furniture peek out from the shadows, but you can see few distinct shapes.

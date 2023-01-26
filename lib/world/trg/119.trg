@@ -2752,6 +2752,10 @@ elseif (%lich_cmds% ~= %cmd%) && (%room.template% == 11836 || %room.template% ==
   end
 elseif look /= %cmd% && %room.template% == 11981
   return 0
+  if %actor.obj_target(%arg.car%)% || %actor.char_target(%arg.car%)%
+    * probably hit something in inventory
+    halt
+  end
   wait 0
   if skulls /= %arg% || shelves /= %arg%
     %force% %actor% scriptwake skulls
