@@ -796,12 +796,18 @@ void identify_obj_to_char(obj_data *obj, char_data *ch) {
 		switch (ocm->type) {
 			case OBJ_CUSTOM_LONGDESC: {
 				sprintf(lbuf, "Gives long description: %s", ocm->msg);
+				temp = str_replace("$n", "$o", lbuf);
+				strcpy(lbuf, temp);
+				free(temp);
 				act(lbuf, FALSE, ch, NULL, NULL, TO_CHAR);
 				break;
 			}
 			case OBJ_CUSTOM_LONGDESC_FEMALE: {
 				if (GET_SEX(ch) == SEX_FEMALE) {
 					sprintf(lbuf, "Gives long description: %s", ocm->msg);
+					temp = str_replace("$n", "$o", lbuf);
+					strcpy(lbuf, temp);
+					free(temp);
 					act(lbuf, FALSE, ch, NULL, NULL, TO_CHAR);
 				}
 				break;
@@ -809,6 +815,9 @@ void identify_obj_to_char(obj_data *obj, char_data *ch) {
 			case OBJ_CUSTOM_LONGDESC_MALE: {
 				if (GET_SEX(ch) == SEX_MALE) {
 					sprintf(lbuf, "Gives long description: %s", ocm->msg);
+					temp = str_replace("$n", "$o", lbuf);
+					strcpy(lbuf, temp);
+					free(temp);
 					act(lbuf, FALSE, ch, NULL, NULL, TO_CHAR);
 				}
 				break;
