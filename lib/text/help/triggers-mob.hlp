@@ -577,6 +577,7 @@ When using field  - The variable returns:
    tasks completed.
 &cquest_triggered(vnum)&0 - TRUE if the player is on the quest and that quest
    has a 'triggered' task that has already been completed.
+&creal_name&0 - Their real name (not morphed, not disguised).
 &cremove_companion(vnum)&0 - Takes away a companion mob. If it comes from an
    ability, the player will get a fresh copy of it automatically.
 &cremove_lastname(name)&0 - Removes a name from a player's lastname list.

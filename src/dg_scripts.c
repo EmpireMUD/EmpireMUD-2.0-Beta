@@ -4220,7 +4220,10 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					break;
 				}
 				case 'r': {	// char.r*
-					if (!str_cmp(field, "remove_companion")) {
+					if (!str_cmp(field, "real_name")) {
+						snprintf(str, slen, "%s", PERS(c, c, TRUE));
+					}
+					else if (!str_cmp(field, "remove_companion")) {
 						if (!IS_NPC(c) && subfield && *subfield && isdigit(*subfield)) {
 							remove_companion(c, atoi(subfield));
 						}
