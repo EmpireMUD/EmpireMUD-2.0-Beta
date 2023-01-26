@@ -2343,7 +2343,7 @@ switch %self.vnum%
       if %ch.is_pc%
         * mark who did this
         set spirit %instance.mob(11900)%
-        set finish3 %ch.name%
+        set finish3 %ch.real_name%
         remote finish3 %spirit.id%
       end
     end
@@ -8881,7 +8881,7 @@ while %cycles_left% >= 0
 done
 * mark who did this
 set spirit %instance.mob(11900)%
-set finish2 %actor.name%
+set finish2 %actor.real_name%
 remote finish2 %spirit.id%
 * and phase transition
 %load% mob 11896

@@ -2151,9 +2151,8 @@ The Third Floor Walkway of the Tower Skycleave~
    A large blue stain mars the ceramic tile floor in front of a half-opened
 door whose handle and lock are boken. The walkway is badly damaged here, with
 part of the handrail missing. Someone has snapped a branch off of the great
-nocturnium chandelier and stabbed it through one of the ebony wall panels. As
-if to add insult to injury, the painting next to the door depicts a woman on
-fire.
+nocturnium chandelier and stabbed it through one of the ebony wall panels. A
+crooked painting hangs next to the door, depicting the fountain down below.
 ~
 c 0 0 -1
 D6
@@ -2180,13 +2179,13 @@ The sign, hanging slightly crooked, is bright yellow with bold red lettering:
                 CAUTION: Advancement of knowledge in progress
 ~
 E
-painting woman fire~
-   The painting, hung in a honey-colored frame inlaid with gold, silver, and
-copper, shows a woman on fire! Her arms are up and it looks like she's running
-as flames consume her. The bright orange flames stand in artistic contrast to
-the midnight-blue starry background and the woman's blue velvet robe. The
-horrific scene has no nameplate or title to indicate why someone would paint
-such a thing.
+painting fountain~
+   The painting on the wall, hung in a honey-colored frame inlaid with gold,
+silver, and copper, depicts the grand fountain on the first floor, as seen from
+above. The painting is remarkably current: the benches have been pushed away
+and you can see the stacks of crates that have walled off part of the central
+chamber. You can even see flecks of color that might be the uncollected trash
+around the base of the round fountain.
 ~
 E
 staircases stairs steps floating~
@@ -2272,7 +2271,7 @@ nocturnium~
 from matte black nocturnium metal.
 ~
 E
-down fountain second~
+down second~
    Looking down over the railing, you can see the second floor walkway and the
 fountain way below on the ground floor.
 ~

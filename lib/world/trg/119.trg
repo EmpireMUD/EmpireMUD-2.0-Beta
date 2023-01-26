@@ -585,7 +585,7 @@ remote needs_stop_command %actor.id%
 set cycle 0
 while %cycle% < 3
   set loc %instance.nearest_rmt(11800)%
-  if !%loc% || %actor.stop_command% || %actor.room% != %room% || %actor.fighting% || !%actor.home% || %self.carried_by% != %actor% || %actor.aff_flagged(DISTRACTED)% || %actor.action%
+  if !%loc% || %actor.stop_command% || %actor.room% != %room% || %actor.fighting% || %self.carried_by% != %actor% || %actor.aff_flagged(DISTRACTED)% || %actor.action%
     %force% %actor% stop cleardata
     %send% %actor% @%self% stops glowing.
     halt
@@ -5026,6 +5026,7 @@ while %count% < 2
           %echoaround% %ch% ~%ch% follows ~%self% into the fountain!
           %teleport% %ch% %water%
           %load% obj 11805 %ch%
+          %at% %water% %echoaround% %ch% ~%ch% dives in from above!
         end
       end
       set ch %next_ch%
@@ -5118,7 +5119,7 @@ done
 %echoaround% %actor% ~%actor% burns %self.shortdesc%!
 * mark who did this
 set spirit %instance.mob(11900)%
-set finish4 %actor.name%
+set finish4 %actor.real_name%
 remote finish4 %spirit.id%
 * and phase transition
 %load% mob 11898
