@@ -5057,7 +5057,7 @@ while %count% < 2
     halt
   end
   * only allow repeat with followers:
-  if %self.follower%
+  if %self.follower% && %count% == 0
     wait 6 s
   else
     halt
