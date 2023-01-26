@@ -150,6 +150,10 @@ end
 Iterative minipet reward~
 1 c 2
 use~
+if %actor.obj_target(%arg%)% != %self%
+  return 0
+  halt
+end
 set pet_found 0
 set vnum 9900
 while !%pet_found%
