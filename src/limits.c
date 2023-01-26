@@ -560,6 +560,12 @@ void real_update_char(char_data *ch) {
 		check_combat_end(ch);
 	}
 	
+	// players: check for auto-respawn
+	if (ch->desc && IS_DEAD(ch) && get_cooldown_time(ch, COOLDOWN_DEATH_RESPAWN) == 0) {
+		do_respawn(ch, "", 0, 0);
+		return;
+	}
+	
 	// first check location: this may move the player
 	if (PLR_FLAGGED(ch, PLR_ADVENTURE_SUMMONED) && (!(inst = find_instance_by_room(IN_ROOM(ch), FALSE, FALSE)) || INST_ID(inst) != GET_ADVENTURE_SUMMON_INSTANCE_ID(ch))) {
 		adventure_unsummon(ch);
@@ -899,11 +905,6 @@ void real_update_char(char_data *ch) {
 	// mob activity: if we're still here, run half the mobs each time
 	if (IS_NPC(ch) && (ABSOLUTE(GET_MOB_VNUM(ch)) % 2) == mobile_activity_cycle) {
 		run_mobile_activity(ch);
-	}
-	
-	// players: check for auto-respawn
-	if (ch->desc && IS_DEAD(ch) && get_cooldown_time(ch, COOLDOWN_DEATH_RESPAWN) == 0) {
-		do_respawn(ch, "", 0, 0);
 	}
 }
 
