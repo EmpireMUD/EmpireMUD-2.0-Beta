@@ -704,7 +704,7 @@ Nerf bat random debuffs~
 set effect %random.4%
 switch %effect%
   case 1
-    %echo% ~%self% brushes you with its wings. and you feel lethargic.
+    %echo% ~%self% brushes you with its wings, and you feel lethargic.
   break
   case 2
     %echo% ~%self% squeaks, and you feel your strength desert you.
