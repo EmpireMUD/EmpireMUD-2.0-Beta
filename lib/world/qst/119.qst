@@ -462,7 +462,7 @@ getting answers.'
    You try to discuss it further, but Niamh seems preoccupied with her own
 thoughts and she soon wanders off.
 ~
-20 ei 150 250 -1
+21 e 150 250 -1
 A
 1 11900
 D 11863
@@ -592,7 +592,7 @@ slowly, a chant builds among the spectators, louder and louder, until it grows
 into a cheer. You can't make out what they're saying -- or you can't understand
 it -- but they seem thrilled at your performance in the arena.
 ~
-15 ei 150 250 -1
+16 e 150 250 -1
 A
 1 11974
 P

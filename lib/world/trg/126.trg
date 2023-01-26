@@ -117,33 +117,75 @@ done
 Elemental Rift spawn~
 0 n 100
 ~
-set room %instance.location%
-if !%room%
-  halt
-end
-mgoto %room%
-if %self.vnum% != 12600
-  mmove
-  mmove
-  mmove
-  mmove
-  mmove
-  mmove
-  mmove
-  mmove
-  mmove
-  mmove
-end
 if %self.vnum% == 12602
   %load% obj 12611 %self% inv
+end
+if %self.room.template% == 12600
+  * normal spawn
+  set room %instance.location%
+  if !%room%
+    halt
+  end
+  mgoto %room%
+  if %self.vnum% != 12600
+    mmove
+    mmove
+    mmove
+    mmove
+    mmove
+    mmove
+    mmove
+    mmove
+    mmove
+    mmove
+  end
 end
 ~
 #12606
 Elemental Death~
 0 f 100
 ~
-if %instance.start%
-  %at% %instance.start% %load% obj 12610
+* check level limit
+if %actor.level% > 50
+  * over-leveled: no loot and instant respawn
+  nop %self.add_mob_flag(!LOOT)%
+  switch %self.vnum%
+    case 12601
+      %echo% ~%self% falls apart but imediately reassembles itself!
+    break
+    case 12602
+      %echo% ~%self% sputters for a moment but flares back to life!
+    break
+    case 12603
+      %echo% ~%self% disspates for a moment but stirs up again almost immediately!
+    break
+    case 12604
+      %echo% ~%self% splashes to the ground but rises again almost instantly!
+    break
+  done
+  %load% mob %self.vnum%
+  return 0
+else
+  * not over-leveled: die normally
+  nop %self.remove_mob_flag(!LOOT)%
+  if %instance.start%
+    %at% %instance.start% %load% obj 12610
+  end
+  switch %self.vnum%
+    case 12601
+      %echo% ~%self% drops into a little pile of earth essence.
+    break
+    case 12602
+      %echo% ~%self% drops to the ground as a burning bit of fire essence.
+    break
+    case 12603
+      %echo% ~%self% dissipates until it's no more than some blowing wind essence.
+    break
+    case 12604
+      %echo% ~%self% splashes to the ground as little more than water essence.
+    break
+  done
+  return 1
 end
 set obj %self.inventory%
 while %obj%

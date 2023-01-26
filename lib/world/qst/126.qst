@@ -10,11 +10,13 @@ of the earth elemental. You have earned favor with the apprentice. Use 'list'
 and 'buy' to spend this favor. You can also type 'coins' to see how much favor
 you have.
 ~
-4 d 0 25 60
+5 d 0 25 60
 A
 1 12600
 A
 2 12601
+P
+38 0 0 50 -
 R
 8 12600 1
 R
@@ -36,11 +38,13 @@ of the fire elemental. You have earned favor with the apprentice. Use 'list'
 and 'buy' to spend this favor. You can also type 'coins' to see how much favor
 you have.
 ~
-5 d 0 25 60
+6 d 0 25 60
 A
 1 12600
 A
 2 12602
+P
+38 0 0 50 -
 R
 8 12600 1
 R
@@ -62,11 +66,13 @@ of the wind elemental. You have earned favor with the apprentice. Use 'list'
 and 'buy' to spend this favor. You can also type 'coins' to see how much favor
 you have.
 ~
-6 d 0 25 60
+7 d 0 25 60
 A
 1 12600
 A
 2 12603
+P
+38 0 0 50 -
 R
 8 12600 1
 R
@@ -88,11 +94,13 @@ of the water elemental. You have earned favor with the apprentice. Use 'list'
 and 'buy' to spend this favor. You can also type 'coins' to see how much favor
 you have.
 ~
-7 d 0 25 60
+8 d 0 25 60
 A
 1 12600
 A
 2 12604
+P
+38 0 0 50 -
 R
 8 12600 1
 R

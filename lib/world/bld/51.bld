@@ -713,7 +713,7 @@ The Glass Blower~
 10 0 pR 0
 0 0 0 215
 C
-craft~
+craft, inventory, retrieve, store~
 D
    This hut is hot enough to be a forge, but it has a different purpose. Sand
 can be melted into molten glass here and then used to blow pots or panes for

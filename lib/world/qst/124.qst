@@ -6,7 +6,7 @@ pirates.
 ~
 Quartermaster Smeegle takes the lumber from you with a grin.
 ~
-5 bcd 50 150 -1
+6 bcdi 50 150 -1
 A
 1 12403
 P
@@ -31,7 +31,7 @@ promises of future gratitude.
 ~
 Smeegle grins from ear to green ear when you hand him the nails.
 ~
-5 bcd 50 150 -1
+6 bcdi 50 150 -1
 A
 1 12403
 P
@@ -57,7 +57,7 @@ has gone.
 ~
 You found Fathma! Now, how do you get out of here?
 ~
-5 bc 50 150 -1
+7 bci 50 150 -1
 A
 1 12403
 P
@@ -66,6 +66,14 @@ P
 0 12403 0 1 a
 P
 0 12404 0 1 a
+R
+6 12406 12406
+R
+6 12407 12407
+R
+6 12408 12408
+R
+6 12409 12409
 T 12411
 W
 13 12406 0 1 a
@@ -83,7 +91,7 @@ pay you for it.
 ~
 You hand Fathma the seaweed.
 ~
-5 bcd 50 150 -1
+6 bcdi 50 150 -1
 A
 1 12406
 P
@@ -108,7 +116,7 @@ each.
    Fathma whistles a raspy tune as she takes the reagents and dumps them into
 her cauldron.
 ~
-6 bcd 50 150 -1
+7 bcdi 50 150 -1
 A
 1 12406
 P
@@ -137,7 +145,7 @@ for Fathma, to keep her going through this spell.
    Fathma swallows the crispy fish whole, which makes you question why she
 needed you to cook it first.
 ~
-7 bcd 50 150 -1
+8 bcdi 50 150 -1
 A
 1 12406
 P
@@ -165,7 +173,7 @@ for her.
    Rather than thanking you, Fathma pays you and then begins plotting how she
 will tell the tale of her heroic conquest of the sea cavern.
 ~
-8 bc 50 150 -1
+9 bci 50 150 -1
 A
 1 12406
 P

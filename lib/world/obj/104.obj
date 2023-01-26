@@ -1319,9 +1319,11 @@ some wooden goblin pipes~
 A set of wooden goblin pipes is lying here.~
 You might be able to play these pipes like an instrument.
 ~
-22 0 ao 0 2
+22 0 ao 0 3
 1 0 0
 0 0
+C
+50 50
 M
 2
 You play a soft tune on $p.~
