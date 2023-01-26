@@ -5847,7 +5847,7 @@ ACMD(do_keep) {
 				qt_keep_obj(ch, obj, FALSE);
 			}
 			sprintf(buf, "You %s $p.", sname);
-			act(buf, FALSE, ch, obj, NULL, TO_CHAR | TO_QUEUE);
+			act(buf, FALSE, ch, obj, NULL, TO_CHAR | TO_QUEUE | TO_SLEEP);
 			obj = next_obj;
 		}
 	}
@@ -5865,7 +5865,7 @@ ACMD(do_keep) {
 				qt_keep_obj(ch, obj, FALSE);
 			}
 			sprintf(buf, "You %s $p.", sname);
-			act(buf, FALSE, ch, obj, NULL, TO_CHAR);
+			act(buf, FALSE, ch, obj, NULL, TO_CHAR | TO_SLEEP);
 		}
 	}
 	
