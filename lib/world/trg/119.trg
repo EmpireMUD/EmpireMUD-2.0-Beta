@@ -2719,6 +2719,7 @@ elseif open /= %cmd% && (%room.template% == 11839 || %room.template% == 11939)
       %send% %actor% The secret door is already open.
     else
       %send% %actor% No, that's not it...
+    end
     return 1
   end
 elseif search /= %cmd% && (%room.template% == 11815 || %room.template% == 11915)
