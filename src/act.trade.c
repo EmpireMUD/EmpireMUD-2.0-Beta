@@ -101,16 +101,16 @@ bool check_can_craft(char_data *ch, craft_data *type, bool continuing) {
 	}
 	
 	// building type checks
-	else if (makes_building && ROOM_AFF_FLAGGED(IN_ROOM(ch), ROOM_AFF_UNCLAIMABLE)) {
+	else if (makes_building && ROOM_AFF_FLAGGED(IN_ROOM(ch), ROOM_AFF_UNCLAIMABLE) && !continuing) {
 		msg_to_char(ch, "You can't %s that on unclaimable land.\r\n", command);
 	}
-	else if (makes_building && ROOM_AFF_FLAGGED(IN_ROOM(ch), ROOM_AFF_HAS_INSTANCE)) {
+	else if (makes_building && ROOM_AFF_FLAGGED(IN_ROOM(ch), ROOM_AFF_HAS_INSTANCE) && !continuing) {
 		msg_to_char(ch, "You can't %s here until the adventure is gone.\r\n", command);
 	}
-	else if (makes_building && !can_build_or_claim_at_war(ch, IN_ROOM(ch))) {
+	else if (makes_building && !can_build_or_claim_at_war(ch, IN_ROOM(ch)) && !continuing) {
 		msg_to_char(ch, "You can't %s that here while at war with the empire that controls this area.\r\n", command);
 	}
-	else if (makes_building && (!can_use_room(ch, IN_ROOM(ch), MEMBERS_ONLY) || !has_permission(ch, PRIV_BUILD, IN_ROOM(ch)))) {
+	else if (makes_building && (!can_use_room(ch, IN_ROOM(ch), MEMBERS_ONLY) || !has_permission(ch, PRIV_BUILD, IN_ROOM(ch))) && !continuing) {
 		msg_to_char(ch, "You don't have permission to %s that here.\r\n", command);
 	}
 	
