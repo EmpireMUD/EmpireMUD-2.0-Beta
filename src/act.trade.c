@@ -2594,9 +2594,6 @@ ACMD(do_reforge) {
 		if (OBJ_FLAGGED(obj, OBJ_SUPERIOR)) {
 			msg_to_char(ch, "It is already superior.\r\n");
 		}
-		else if (OBJ_FLAGGED(obj, OBJ_HARD_DROP | OBJ_GROUP_DROP)) {
-			msg_to_char(ch, "You cannot make an item superior if it came from a Hard, Group, or Boss mob.\r\n");
-		}
 		else if (!proto || !OBJ_FLAGGED(proto, OBJ_SCALABLE) || !(ctype = find_craft_for_obj_vnum(GET_OBJ_VNUM(obj)))) {
 			msg_to_char(ch, "It can't be made superior.\r\n");
 		}
@@ -2617,6 +2614,10 @@ ACMD(do_reforge) {
 			
 			new = read_object(GET_OBJ_VNUM(proto), TRUE);
 			GET_OBJ_EXTRA(new) |= GET_OBJ_EXTRA(obj) & preserve_flags;
+			
+			// ensure no hard/group
+			REMOVE_BIT(GET_OBJ_EXTRA(new), OBJ_HARD_DROP);
+			REMOVE_BIT(GET_OBJ_EXTRA(new), OBJ_GROUP_DROP);
 			
 			// transfer bindings
 			OBJ_BOUND_TO(new) = OBJ_BOUND_TO(obj);
