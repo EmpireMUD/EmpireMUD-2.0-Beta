@@ -5626,6 +5626,7 @@ skyfight lockout 30 35
 if %move% == 1
   * Hammer Dance
   skyfight clear dodge
+  %subecho% %room% &&y~%self% shouts, 'Time for the hammer dance!'&&0
   %echo% &&j~%self% starts singing and dancing around wildly with his hammers out...&&0
   if %diff% == 1
     nop %self.add_mob_flag(NO-ATTACK)%
@@ -5688,8 +5689,9 @@ elseif %move% == 2 && !%self.aff_flagged(BLIND)%
   skyfight clear dodge
   set targ %self.fighting%
   set id %targ.id%
-  %send% %targ% &&j**** &&Z~%self% shouts as he leaps high into the air! ****&&0 (dodge)
-  %echoaround% %targ% &&j~%self% shouts as he leaps high into the air!&&0
+  %subecho% %room% &&y~%self% shouts, 'I'm going to ring your bell!'&&0
+  %send% %targ% &&j**** &&Z~%self% leaps high into the air! ****&&0 (dodge)
+  %echoaround% %targ% &&j~%self% leaps high into the air!&&0
   skyfight setup dodge %targ%
   wait 8 s
   dg_affect #11955 %self% off
@@ -5771,6 +5773,7 @@ elseif %move% == 4 && !%self.aff_flagged(BLIND)%
     halt
   end
   dg_affect #11953 %self% DISARMED on 30
+  %subecho% %room% &&y~%self% shouts, 'Hammer throw!'&&0
   if !%targ% || %targ.id% != %id%
     * gone
     dg_affect #11953 %self% off silent
@@ -6644,7 +6647,8 @@ skyfight lockout 30 35
 if %move% == 1
   * Axe-nado
   skyfight clear dodge
-  %echo% &&j~%self% winds up and lets out a war cry as she starts to spin with her axe out...&&0
+  %subecho% %room% &&y~%self% shouts, 'Axe tornado!'&&0
+  %echo% &&j~%self% winds up and starts to spin with her axe out...&&0
   eval dodge %diff% * 40
   dg_affect #11958 %self% DODGE %dodge% 20
   if %diff% == 1
@@ -6657,7 +6661,8 @@ if %move% == 1
     nop %self.remove_mob_flag(NO-ATTACK)%
     halt
   end
-  %echo% &&j**** ~%self% screams as she whirls right toward you with her axe out! ****&&0 (dodge)
+  %subecho% %room% &&y~%self% shouts, 'Aaaaaaaaaaaahhhh!'&&0
+  %echo% &&j**** ~%self% whirls right toward you with her axe out! ****&&0 (dodge)
   set cycle 1
   set hit 0
   eval wait 10 - %diff%
@@ -6703,6 +6708,7 @@ elseif %move% == 2
   skyfight clear dodge
   set targ %self.fighting%
   set id %targ.id%
+  %subecho% %room% &&y~%self% shouts, 'Aha!'&&0
   %send% %targ% &&j**** &&Z~%self% shouts triumphantly as she slashes at the sand in front of you! ****&&0 (dodge)
   %echoaround% %targ% &&j~%self% shouts triumphantly as she slashes at the sand!&&0
   skyfight setup dodge %targ%
@@ -6751,6 +6757,7 @@ elseif %move% == 3
     dg_affect #11958 %self% off
     halt
   end
+  %subecho% %room% &&y~%self% shouts, 'Yaaaaaaaaaaaaaaaaaa!'&&0
   if %self.var(sfinterrupt_count,0)% < %requires%
     %echo% &&j**** Sand is flying everywhere as ~%self% whirls around with her axe, screaming... ****&&0 (interrupt)
   end
@@ -6783,6 +6790,7 @@ elseif %move% == 3
 elseif %move% == 4
   * Rain of Hatchets
   skyfight clear dodge
+  %subecho% %room% &&y~%self% shouts, 'Alalalalalalalalala!'&&0
   %echo% &&j~%self% lets out a piercing war cry as she throws hatchet after hatchet into the air... this won't be good.&&0
   if %diff% == 1
     nop %self.add_mob_flag(NO-ATTACK)%
@@ -6872,6 +6880,7 @@ skyfight lockout 30 35
 if %move% == 1
   * Thornlash
   skyfight clear dodge
+  %subecho% %room% &&y~%self% shouts, 'Time to dance!'&&0
   %echo% &&j~%self% screams as she furiously lashes both her thorny whips around the arena!&&0
   eval dodge %diff% * 40
   dg_affect #11950 %self% DODGE %dodge% 20
