@@ -3626,7 +3626,7 @@ set ch %self.room.people%
 set fail 0
 while %ch%
   if %ch.varexists(skycleave_queen)%
-    %send% %actor% You catch ~%self% cast a stray wink in your direction.
+    %send% %ch% You catch ~%self% cast a stray wink in your direction.
   elseif %ch.is_pc%
     set fail 1
   end
@@ -4992,60 +4992,72 @@ set ne_rooms 11970 11934 11922 11904
 set se_rooms 11963 11933 11913 11903
 set sw_rooms 11962 11932 11912 11902
 set nw_rooms 11961 11931 11911
-set template %self.room.template%
-if %template% == 11908
-  * final location
-  switch %self.vnum%
-    case 11854
-      %echo% ~%self% runs toward the fountain, trips, and rolls in!
-    break
-    case 11855
-      %echo% ~%self% flows its long liquid body into the fountain!
-    break
-    case 11856
-      %echo% ~%self% swoops upward and then dives into the fountain!
-    break
-    case 11857
-      %echo% ~%self% bounds straight into the fountain!
-    break
-    case 11858
-      %echo% ~%self% leaps into the air and lands in the fountain with a splash!
-    break
-  done
-  %echo% You watch as it joins with the fountain's water and vanishes.
-  * process followers
-  makeuid water room i11972
-  set ch %self.room.people%
-  while %ch%
-    set next_ch %ch.next_in_room%
-    if %ch.leader%
-      if %ch.leader% == %self% || %ch.leader.leader% == %self%
-        %send% %ch% You follow ~%self% into the fountain!
-        %echoaround% %ch% ~%ch% follows ~%self% into the fountain!
-        %teleport% %ch% %water%
-        %load% obj 11805 %ch%
+set count 0
+while %count% < 2
+  set template %self.room.template%
+  if %template% == 11908
+    * final location
+    switch %self.vnum%
+      case 11854
+        %echo% ~%self% runs toward the fountain, trips, and rolls in!
+      break
+      case 11855
+        %echo% ~%self% flows its long liquid body into the fountain!
+      break
+      case 11856
+        %echo% ~%self% swoops upward and then dives into the fountain!
+      break
+      case 11857
+        %echo% ~%self% bounds straight into the fountain!
+      break
+      case 11858
+        %echo% ~%self% leaps into the air and lands in the fountain with a splash!
+      break
+    done
+    %echo% You watch as it joins with the fountain's water and vanishes.
+    * process followers
+    makeuid water room i11972
+    set ch %self.room.people%
+    while %ch%
+      set next_ch %ch.next_in_room%
+      if %ch.leader%
+        if %ch.leader% == %self% || %ch.leader.leader% == %self%
+          %send% %ch% You follow ~%self% into the fountain!
+          %echoaround% %ch% ~%ch% follows ~%self% into the fountain!
+          %teleport% %ch% %water%
+          %load% obj 11805 %ch%
+        end
       end
-    end
-    set ch %next_ch%
-  done
-  %purge% %self%
-elseif %template% == 11901
-  north
-elseif %down_rooms% ~= %template%
-  down
-elseif %ne_rooms% ~= %template%
-  northeast
-elseif %se_rooms% ~= %template%
-  southeast
-elseif %sw_rooms% ~= %template%
-  southwest
-elseif %nw_rooms% ~= %template%
-  northwest
-else
-  * unknown room?
-  %echo% ~%self% splashes to the ground and soaks in.
-  %purge% %self%
-end
+      set ch %next_ch%
+    done
+    %purge% %self%
+    halt
+  elseif %template% == 11901
+    north
+  elseif %down_rooms% ~= %template%
+    down
+  elseif %ne_rooms% ~= %template%
+    northeast
+  elseif %se_rooms% ~= %template%
+    southeast
+  elseif %sw_rooms% ~= %template%
+    southwest
+  elseif %nw_rooms% ~= %template%
+    northwest
+  else
+    * unknown room?
+    %echo% ~%self% splashes to the ground and soaks in.
+    %purge% %self%
+    halt
+  end
+  * only allow repeat with followers:
+  if %self.follower%
+    wait 6 s
+  else
+    halt
+  end
+  eval count %count% + 1
+done
 ~
 #11970
 Goblin's Dream: Arena challenge spawner~

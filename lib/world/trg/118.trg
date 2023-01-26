@@ -6862,11 +6862,8 @@ end
 %echoaround% %actor% ~%actor% touches @%self% to @%target%...
 %echo% @%target% takes on a sky-blue glow!
 nop %target.flag(SUPERIOR)%
-if %target.level% > 0
-  %scale% %target% %target.level%
-else
-  %scale% %target% 1
-end
+eval level %actor.highest_level% + 50
+%scale% %target% %level%
 %purge% %self%
 ~
 #11861
