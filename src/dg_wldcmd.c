@@ -336,6 +336,9 @@ WCMD(do_wregionecho) {
 				if (!same_subzone(center, IN_ROOM(targ))) {
 					continue;
 				}
+				if (compute_distance(center, IN_ROOM(targ)) > radius) {
+					continue;
+				}
 				if (outdoor_only && !IS_OUTDOORS(targ)) {
 					continue;
 				}
