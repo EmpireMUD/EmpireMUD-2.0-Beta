@@ -3718,6 +3718,16 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					else if (!str_cmp(field, "heshe"))
 						snprintf(str, slen, "%s", HSSH(c));
 
+					else if (!str_cmp(field, "highest_level")) {
+						if (IS_NPC(c)) {
+							int lev = get_approximate_level(c);
+							snprintf(str, slen, "%d", MAX(lev, GET_MAX_SCALE_LEVEL(c)));
+						}
+						else {
+							snprintf(str, slen, "%d", GET_HIGHEST_KNOWN_LEVEL(c));
+						}
+					}
+
 					else if (!str_cmp(field, "himher"))
 						snprintf(str, slen, "%s", HMHR(c));
 
