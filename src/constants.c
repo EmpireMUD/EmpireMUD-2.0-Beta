@@ -2117,6 +2117,7 @@ const char *generic_types[] = {
 	"CURRENCY",	// 5
 	"COMPONENT",
 	"MOON",
+	"LANGUAGE",
 	"\n"
 };
 
@@ -2131,6 +2132,7 @@ const bool generic_types_uses_in_dev[] = {
 	FALSE,	// CURRENCY	// 5
 	FALSE,	// COMPONENT
 	TRUE,	// MOON
+	TRUE,	// LANGUAGE
 };
 
 
@@ -2138,6 +2140,15 @@ const bool generic_types_uses_in_dev[] = {
 const char *generic_flags[] = {
 	"BASIC",	// 0
 	"IN-DEVELOPMENT",
+	"\n"
+};
+
+
+// LANG_x: how well someone speaks a language
+const char *language_types[] = {
+	"unknown",	// 0
+	"can recognize",
+	"can speak",
 	"\n"
 };
 

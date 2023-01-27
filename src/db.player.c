@@ -34,6 +34,7 @@
 *   loaded_player_hash For Offline Players
 *   Autowiz Wizlist Generator
 *   Helpers
+*   Languages
 *   Map Memory
 *   Playtime Tracking
 *   Empire Member/Greatness Tracking
@@ -782,6 +783,7 @@ void free_char(char_data *ch) {
 	struct player_slash_channel *slash;
 	struct player_craft_data *pcd, *next_pcd;
 	struct player_currency *cur, *next_cur;
+	struct player_language *lang, *next_lang;
 	struct minipet_data *mini, *next_mini;
 	struct player_lastname *lastn;
 	struct player_eq_set *eq_set;
@@ -994,6 +996,10 @@ void free_char(char_data *ch) {
 		HASH_ITER(hh, GET_CURRENCIES(ch), cur, next_cur) {
 			HASH_DEL(GET_CURRENCIES(ch), cur);
 			free(cur);
+		}
+		HASH_ITER(hh, GET_LANGUAGES(ch), lang, next_lang) {
+			HASH_DEL(GET_LANGUAGES(ch), lang);
+			free(lang);
 		}
 		HASH_ITER(hh, GET_LEARNED_CRAFTS(ch), pcd, next_pcd) {
 			HASH_DEL(GET_LEARNED_CRAFTS(ch), pcd);
@@ -1735,7 +1741,12 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *c
 				break;
 			}
 			case 'L': {
-				if (!strn_cmp(line, "Largest Inventory: ", 19)) {
+				if (!strn_cmp(line, "Language: ", 10)) {
+					if (sscanf(line + 10, "%d %d", &i_in[0], &i_in[1]) == 2) {
+						add_language(ch, i_in[0], i_in[1]);
+					}
+				}
+				else if (!strn_cmp(line, "Largest Inventory: ", 19)) {
 					GET_LARGEST_INVENTORY(ch) = atoi(line + 19);
 				}
 				else if (!strn_cmp(line, "Lastname: ", 10)) {
@@ -2108,6 +2119,9 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *c
 						free(junk);
 					}
 				}
+				else if (!strn_cmp(line, "Speaking: ", 10)) {
+					GET_SPEAKING(ch) = atoi(line + 10);
+				}
 				else if (!strn_cmp(line, "Syslog Flags: ", 14)) {
 					SYSLOG_FLAGS(ch) = asciiflag_conv(line + 14);
 				}
@@ -2422,6 +2436,7 @@ void write_player_primary_data_to_file(FILE *fl, char_data *ch) {
 	struct player_skill_data *skill, *next_skill;
 	struct player_craft_data *pcd, *next_pcd;
 	struct player_currency *cur, *next_cur;
+	struct player_language *lang, *next_lang;
 	struct minipet_data *mini, *next_mini;
 	struct mount_data *mount, *next_mount;
 	struct player_slash_channel *slash;
@@ -2668,6 +2683,9 @@ void write_player_primary_data_to_file(FILE *fl, char_data *ch) {
 	}
 	
 	// 'L'
+	HASH_ITER(hh, GET_LANGUAGES(ch), lang, next_lang) {
+		fprintf(fl, "Language: %d %d\n", lang->vnum, lang->level);
+	}
 	fprintf(fl, "Largest Inventory: %d\n", GET_LARGEST_INVENTORY(ch));
 	if (GET_LAST_CORPSE_ID(ch) > 0) {
 		fprintf(fl, "Last Corpse Id: %d\n", GET_LAST_CORPSE_ID(ch));
@@ -2784,6 +2802,9 @@ void write_player_primary_data_to_file(FILE *fl, char_data *ch) {
 			// these are half-loaded slash channels and save in the same way
 			fprintf(fl, "Slash-channel: %s\n", loadslash->name);
 		}
+	}
+	if (GET_SPEAKING(ch) != NOTHING) {
+		fprintf(fl, "Speaking: %d\n", GET_SPEAKING(ch));
 	}
 	if (SYSLOG_FLAGS(ch)) {
 		fprintf(fl, "Syslog Flags: %s\n", bitv_to_alpha(SYSLOG_FLAGS(ch)));
@@ -3885,6 +3906,7 @@ void clear_player(char_data *ch) {
 	GET_TEMPORARY_ACCOUNT_ID(ch) = NOTHING;
 	GET_IMMORTAL_LEVEL(ch) = -1;	// Not an immortal
 	GET_LAST_VEHICLE(ch) = NOTHING;
+	GET_SPEAKING(ch) = NOTHING;
 }
 
 
@@ -4840,6 +4862,76 @@ void update_played_time(char_data *ch) {
 	if (!IS_NPC(ch) && GET_LOYALTY(ch)) {
 		track_empire_playtime(GET_LOYALTY(ch), amt);
 	}
+}
+
+
+ //////////////////////////////////////////////////////////////////////////////
+//// LANGUAGES ///////////////////////////////////////////////////////////////
+
+/**
+* Adds (or updates) a language for a player character. If the level is
+* LANG_UNKNOWN, it will delete the entry (this is the default).
+*
+* @param char_data *ch The player.
+* @param any_vnum vnum The vnum of the language (generic).
+* @param byte level Any LANG_ const to indicate how well they know it the language.
+*/
+void add_language(char_data *ch, any_vnum vnum, byte level) {
+	struct player_language *pl;
+	
+	if (!ch || IS_NPC(ch)) {
+		return;	// oops
+	}
+	
+	// find
+	HASH_FIND_INT(GET_LANGUAGES(ch), &vnum, pl);
+	
+	// add if necessary
+	if (!pl && level != LANG_UNKNOWN) {
+		CREATE(pl, struct player_language, 1);
+		pl->vnum = vnum;
+		HASH_ADD_INT(GET_LANGUAGES(ch), vnum, pl);
+	}
+	
+	// update
+	if (pl) {
+		pl->level = level;
+	}
+	
+	// delete if necessary?
+	if (pl && pl->level == LANG_UNKNOWN) {
+		HASH_DEL(GET_LANGUAGES(ch), pl);
+		free(pl);
+	}
+	
+	// mark for save
+	queue_delayed_update(ch, CDU_SAVE);
+}
+
+
+/**
+* Determines how well a character knows a language. NPCs always speak any
+* language.
+*
+* @param char_data *ch The player.
+* @param any_vnum vnum The vnum of the language (generic).
+* @return int A LANG_ constant indicating how well the player knows the language.
+*/
+int speaks_language(char_data *ch, any_vnum vnum) {
+	struct player_language *pl;
+	
+	if (!ch) {
+		// oops
+		return LANG_UNKNOWN;
+	}
+	if (IS_NPC(ch)) {
+		// npcs always speak a language
+		return LANG_SPEAK;
+	}
+	
+	// find
+	HASH_FIND_INT(GET_LANGUAGES(ch), &vnum, pl);
+	return pl ? pl->level : LANG_UNKNOWN;
 }
 
 

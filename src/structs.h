@@ -1554,6 +1554,7 @@ typedef struct vehicle_data vehicle_data;
 #define GENERIC_CURRENCY  5	// tokens, for shops
 #define GENERIC_COMPONENT  6	// types of generic objects
 #define GENERIC_MOON  7	// moon in the sky
+#define GENERIC_LANGUAGE  8	// language a player can speak
 
 
 // GEN_x: generic flags
@@ -1566,6 +1567,12 @@ typedef struct vehicle_data vehicle_data;
 
 // how many ints a generic stores (update write_generic_to_file if you change this)
 #define NUM_GENERIC_VALUES  4
+
+
+// LANG_x: how well someone speaks a language
+#define LANG_UNKNOWN  0	// default: does not speak it, cannot recognize it
+#define LANG_RECOGNIZE  1	// knows which language it is, but can't speak it
+#define LANG_SPEAK  2	// full comprehension and speaking
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -4387,6 +4394,14 @@ struct player_ability_data {
 };
 
 
+// languages a player knows
+struct player_language {
+	any_vnum vnum;	// vnum of the language (generic)
+	byte level;	// LANG_ constant for how well they speak it
+	UT_hash_handle hh;	// player's language hash
+};
+
+
 // remembers a tile a player has seen before
 struct player_map_memory {
 	room_vnum vnum;	// map loc
@@ -4547,6 +4562,8 @@ struct player_special_data {
 	ubyte class_progression;	// % of the way from SPECIALTY_SKILL_CAP to CLASS_SKILL_CAP
 	ubyte class_role;	// ROLE_ chosen by the player
 	class_data *character_class;  // character's class as determined by top skills
+	any_vnum speaking;	// current language
+	struct player_language *languages;	// languages the player speaks/recognizes
 	struct player_craft_data *learned_crafts;	// crafts learned from patterns
 	struct minipet_data *minipets;	// collection of summonable pets
 	struct ability_gain_hook *gain_hooks;	// hash table of when to gain ability xp

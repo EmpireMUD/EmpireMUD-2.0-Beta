@@ -1905,6 +1905,68 @@ ACMD(do_say) {
 }
 
 
+ACMD(do_speak) {
+	char buf[MAX_STRING_LENGTH], line[256];
+	struct player_language *lang, *next_lang;
+	generic_data *gen;
+	size_t size, lsize;
+	int count;
+	
+	skip_spaces(&argument);
+	
+	if (IS_NPC(ch)) {
+		msg_to_char(ch, "NPCs cannot use 'speak' and must specify a language on every say command.\r\n");
+		return;
+	}
+	
+	// no-arg: Just show languages I speak
+	if (!*argument) {
+		size = snprintf(buf, sizeof(buf), "You speak the following languages:\r\n");
+		
+		count = 0;
+		HASH_ITER(hh, GET_LANGUAGES(ch), lang, next_lang) {
+			if (lang->level <= LANG_UNKNOWN) {
+				continue;	// does not speak it
+			}
+			if (!(gen = real_generic(lang->vnum))) {
+				continue;
+			}
+			
+			// ok:
+			++count;
+			if (lang->level == LANG_RECOGNIZE) {
+				lsize = snprintf(line, sizeof(line), " %s (recognize only)%s\r\n", GEN_NAME(gen), (GET_SPEAKING(ch) == lang->vnum) ? " - \tgcurrently speaking\t0" : "");
+			}
+			else {
+				lsize = snprintf(line, sizeof(line), " %s%s\r\n", GEN_NAME(gen), (GET_SPEAKING(ch) == lang->vnum) ? " - \tgcurrently speaking)\t0" : "");
+			}
+			
+			// append
+			if (size + lsize + 17 < sizeof(buf)) {
+				strcat(buf, line);
+				size += lsize;
+			}
+			else {
+				// overflow somehow?
+				size += snprintf(buf + size, sizeof(buf) - size, "**OVERFLOW**\r\n");
+				break;
+			}
+		}
+		
+		if (!count) {
+			size += snprintf(buf + size, sizeof(buf) - size, " none\r\n");
+		}
+		if (ch->desc) {
+			page_string(ch->desc, buf, TRUE);
+		}
+		return;
+	}
+	
+	// with arg, try to change which language I speak
+	msg_to_char(ch, "This function is not yet implemented.\r\n");
+}
+
+
 ACMD(do_spec_comm) {
 	char buf[MAX_STRING_LENGTH], buf2[MAX_STRING_LENGTH];
 	char_data *vict;
