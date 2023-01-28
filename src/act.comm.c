@@ -1963,7 +1963,20 @@ ACMD(do_speak) {
 	}
 	
 	// with arg, try to change which language I speak
-	msg_to_char(ch, "This function is not yet implemented.\r\n");
+	if (!(gen = find_generic_no_spaces(GENERIC_LANGUAGE, arg))) {
+		msg_to_char(ch, "You don't know any '%s' language.\r\n", arg);
+	}
+	else if (speaks_language(ch, GEN_VNUM(gen)) != LANG_SPEAK) {
+		msg_to_char(ch, "You don't know how to speak that language.\r\n");
+	}
+	else if (GET_SPEAKING(ch) == GEN_VNUM(gen)) {
+		msg_to_char(ch, "You're already speaking %s.\r\n", GEN_NAME(gen));
+	}
+	else {
+		GET_SPEAKING(ch) = GEN_VNUM(gen);
+		msg_to_char(ch, "You will now speak %s.\r\n", GEN_NAME(gen));
+		queue_delayed_update(ch, CDU_SAVE);
+	}
 }
 
 

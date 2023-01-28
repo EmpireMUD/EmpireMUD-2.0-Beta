@@ -533,6 +533,7 @@ extern generic_data *sorted_generics;
 void free_generic(generic_data *gen);
 generic_data *find_generic(any_vnum vnum, int type);
 generic_data *find_generic_by_name(int type, char *name, bool exact);
+generic_data *find_generic_no_spaces(int type, char *name);
 generic_data *real_generic(any_vnum vnum);
 const char *get_generic_name_by_vnum(any_vnum vnum);
 const char *get_generic_string_by_vnum(any_vnum vnum, int type, int pos);

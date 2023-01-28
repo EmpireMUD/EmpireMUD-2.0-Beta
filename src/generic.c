@@ -882,6 +882,61 @@ generic_data *find_generic_by_name(int type, char *name, bool exact) {
 
 
 /**
+* Finds a generic by type and name while ignoring spaces, dashes, and
+* apostrophes. For example, "Guardian Tongue" would match "guardian-tongue" or
+* "guardiantongue". It also accepts abbrevs.
+*
+* @param int type Any GENERIC_ type.
+* @param char *name The name to search.
+* @return generic_data* The generic, or NULL if it doesn't exist.
+*/
+generic_data *find_generic_no_spaces(int type, char *name) {
+	generic_data *gen, *next_gen;
+	int gen_pos, name_pos;
+	char *skip = " -'";
+	
+	HASH_ITER(sorted_hh, sorted_generics, gen, next_gen) {
+		if (GEN_TYPE(gen) != type) {
+			continue;
+		}
+		
+		// compare names
+		for (gen_pos = name_pos = 0; name[name_pos] && GEN_NAME(gen)[gen_pos]; ++gen_pos, ++name_pos) {
+			// ensure we're not at a skippable char
+			while (name[name_pos] && strchr(skip, name[name_pos])) {
+				++name_pos;
+			}
+			while (GEN_NAME(gen)[gen_pos] && strchr(skip, GEN_NAME(gen)[gen_pos])) {
+				++gen_pos;
+			}
+			
+			// did we hit the end
+			if (!name[name_pos]) {
+				// end of name: successful abbrev
+				return gen;
+			}
+			else if (!GEN_NAME(gen)[gen_pos]) {
+				// end of generic's name: not a match
+				break;
+			}
+			else if (LOWER(name[name_pos]) != LOWER(GEN_NAME(gen)[gen_pos])) {
+				// not a match
+				break;
+			}
+		}
+		
+		// if we made it here, it's only a match if name reached the end
+		if (!name[name_pos]) {
+			return gen;
+		}
+		// otherwise, move on
+	}
+	
+	return NULL;	// did not find
+}
+
+
+/**
 * @param any_vnum vnum Any generic vnum
 * @return generic_data* The generic, or NULL if it doesn't exist
 */
