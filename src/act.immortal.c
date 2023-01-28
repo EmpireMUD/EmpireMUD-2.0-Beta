@@ -2573,15 +2573,15 @@ int perform_set(char_data *ch, char_data *vict, int mode, char *val_arg) {
 		
 		if (!str_cmp(onoff_arg, "on") || is_abbrev(onoff_arg, "speaks")) {
 			add_language(vict, GEN_VNUM(lang), LANG_SPEAK);
-			sprintf(output, "%s: now speaks language %d %s.", GET_NAME(vict), GEN_VNUM(lang), GEN_NAME(lang));
+			sprintf(output, "%s: now speaks language [%d] %s.", GET_NAME(vict), GEN_VNUM(lang), GEN_NAME(lang));
 		}
 		else if (is_abbrev(onoff_arg, "recognize")) {
 			add_language(vict, GEN_VNUM(lang), LANG_RECOGNIZE);
-			sprintf(output, "%s: now recognizes language %d %s.", GET_NAME(vict), GEN_VNUM(lang), GEN_NAME(lang));
+			sprintf(output, "%s: now recognizes language [%d] %s.", GET_NAME(vict), GEN_VNUM(lang), GEN_NAME(lang));
 		}
 		else if (!str_cmp(onoff_arg, "off") || is_abbrev(onoff_arg, "unknown")) {
 			add_language(vict, GEN_VNUM(lang), LANG_UNKNOWN);
-			sprintf(output, "%s: no longer speaks %d %s.", GET_NAME(vict), GEN_VNUM(lang), GEN_NAME(lang));
+			sprintf(output, "%s: no longer speaks [%d] %s.", GET_NAME(vict), GEN_VNUM(lang), GEN_NAME(lang));
 		}
 		else {
 			msg_to_char(ch, "Do you want to set it on/speak, recognize, or off/unknown?\r\n");
