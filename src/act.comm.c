@@ -1963,8 +1963,8 @@ ACMD(do_speak) {
 	}
 	
 	// with arg, try to change which language I speak
-	if (!(gen = find_generic_no_spaces(GENERIC_LANGUAGE, arg))) {
-		msg_to_char(ch, "You don't know any '%s' language.\r\n", arg);
+	if (!(gen = find_generic_no_spaces(GENERIC_LANGUAGE, argument))) {
+		msg_to_char(ch, "You don't know any '%s' language.\r\n", argument);
 	}
 	else if (speaks_language(ch, GEN_VNUM(gen)) != LANG_SPEAK) {
 		msg_to_char(ch, "You don't know how to speak that language.\r\n");
