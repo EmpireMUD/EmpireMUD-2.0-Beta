@@ -1581,6 +1581,11 @@ void save_olc_generic(descriptor_data *desc) {
 	if (GEN_TYPE(gen) == GENERIC_COMPONENT || GEN_RELATIONS(gen) || GEN_COMPUTED_RELATIONS(gen)) {
 		compute_generic_relations();
 	}
+	
+	// update player languages
+	if (GEN_TYPE(gen) == GENERIC_LANGUAGE) {
+		check_languages_all();
+	}
 }
 
 

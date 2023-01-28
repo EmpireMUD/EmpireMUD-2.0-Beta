@@ -6236,7 +6236,7 @@ void do_stat_character(char_data *ch, char_data *k) {
 
 	if (!IS_NPC(k)) {
 		msg_to_char(ch, "Hunger: %d, Thirst: %d, Drunk: %d\r\n", GET_COND(k, FULL), GET_COND(k, THIRST), GET_COND(k, DRUNK));
-		msg_to_char(ch, "Recent deaths: %d\r\n", GET_RECENT_DEATH_COUNT(k));
+		msg_to_char(ch, "Speaking: %s, Recent deaths: %d\r\n", get_generic_name_by_vnum(GET_SPEAKING(k)), GET_RECENT_DEATH_COUNT(k));
 	}
 	
 	if (IS_MORPHED(k)) {
@@ -9921,6 +9921,7 @@ ACMD(do_restore) {
 	ability_data *abil, *next_abil;
 	skill_data *skill, *next_skill;
 	struct cooldown_data *cool;
+	generic_data *gen, *next_gen;
 	vehicle_data *veh;
 	empire_data *emp;
 	char_data *vict;
@@ -10123,6 +10124,15 @@ ACMD(do_restore) {
 		// re-add abilities
 		if (emp) {
 			adjust_abilities_to_empire(vict, emp, TRUE);
+		}
+		
+		// languages
+		HASH_ITER(hh, generic_table, gen, next_gen) {
+			if (GEN_TYPE(gen) != GENERIC_LANGUAGE || GEN_FLAGGED(gen, GEN_IN_DEVELOPMENT)) {
+				continue;
+			}
+			
+			add_language(vict, GEN_VNUM(gen), LANG_SPEAK);
 		}
 	}
 	

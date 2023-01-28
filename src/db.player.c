@@ -4302,6 +4302,7 @@ void enter_player_game(descriptor_data *d, int dolog, bool fresh) {
 	check_learned_crafts(ch);
 	check_currencies(ch);
 	check_eq_sets(ch);
+	check_languages(ch);
 	check_minipets_and_companions(ch);
 	check_player_events(ch);
 	refresh_passive_buffs(ch);
@@ -4902,10 +4903,123 @@ void add_language(char_data *ch, any_vnum vnum, byte level) {
 	if (pl && pl->level == LANG_UNKNOWN) {
 		HASH_DEL(GET_LANGUAGES(ch), pl);
 		free(pl);
+		pl = NULL;
+	}
+	
+	// ensure character speaks SOMETHING
+	if (GET_SPEAKING(ch) == NOTHING && pl && pl->level == LANG_SPEAK) {
+		GET_SPEAKING(ch) = vnum;
 	}
 	
 	// mark for save
 	queue_delayed_update(ch, CDU_SAVE);
+}
+
+
+/**
+* This is called when a character logs in or when a language is saved in OLC
+* (under some circumstances) to ensure the character has the correct languages
+* in their list.
+*
+* @param char_data *ch The player.
+*/
+void check_languages(char_data *ch) {
+	struct player_language *lang, *next_lang;
+	generic_data *gen, *next_gen;
+	bool ok = FALSE, save = FALSE;
+	any_vnum backup_speaking = NOTHING, second_backup = NOTHING;
+	
+	if (IS_NPC(ch)) {
+		return;
+	}
+	
+	// check languages they know
+	HASH_ITER(hh, GET_LANGUAGES(ch), lang, next_lang) {
+		// audit it
+		if (!(gen = find_generic(lang->vnum, GENERIC_LANGUAGE))) {
+			ok = FALSE;	// deleted?
+		}
+		else if (GEN_FLAGGED(gen, GEN_IN_DEVELOPMENT)) {
+			ok = FALSE;	// in-dev
+		}
+		else if (lang->level == LANG_UNKNOWN) {
+			ok = FALSE;	// might as well delete these here
+		}
+		else {
+			// seems ok
+			ok = TRUE;
+		}
+		
+		// did we make it
+		if (ok) {
+			// try to store as a backup for later
+			if (backup_speaking == NOTHING && GEN_FLAGGED(gen, GEN_BASIC)) {
+				backup_speaking = lang->vnum;
+			}
+			else if (second_backup == NOTHING) {
+				// non-basic backup just in case
+				second_backup = lang->vnum;
+			}
+		}
+		else {
+			// remove
+			save = TRUE;
+			HASH_DEL(GET_LANGUAGES(ch), lang);
+			free(lang);
+		}
+	}
+	
+	// check for common languages
+	HASH_ITER(hh, generic_table, gen, next_gen) {
+		if (GEN_TYPE(gen) != GENERIC_LANGUAGE) {
+			continue;	// not a language
+		}
+		if (GEN_FLAGGED(gen, GEN_IN_DEVELOPMENT)) {
+			continue;	// can't be in-dev
+		}
+		if (!GEN_FLAGGED(gen, GEN_BASIC)) {
+			continue;	// must be basic
+		}
+		
+		// ok? ensure the player speaks it
+		if (speaks_language(ch, GEN_VNUM(gen)) != LANG_SPEAK) {
+			add_language(ch, GEN_VNUM(gen), LANG_SPEAK);
+			save = TRUE;
+		}
+		
+		// try to store as a backup for later
+		if (backup_speaking == NOTHING) {
+			backup_speaking = GEN_VNUM(gen);
+		}
+	}
+	
+	// ensure they have a valid 'speaking'
+	if (GET_SPEAKING(ch) == NOTHING || speaks_language(ch, GET_SPEAKING(ch)) != LANG_SPEAK) {
+		// this MAY still be 'NOTHING' but it should be a best choice either way
+		GET_SPEAKING(ch) = (backup_speaking != NOTHING ? backup_speaking : second_backup);
+		save = TRUE;
+	}
+	
+	// and save if requested
+	if (save) {
+		queue_delayed_update(ch, CDU_SAVE);
+	}
+}
+
+
+/**
+* Ensures all characters in the game have valid languages. This does not need
+* to hit players who are at menus rather than in-game because they will be
+* checked when they enter the game.
+*/
+void check_languages_all(void) {
+	char_data *ch;
+	
+	DL_FOREACH(character_list, ch) {
+		if (!IS_NPC(ch)) {
+			check_languages(ch);
+		}
+	}
 }
 
 

@@ -926,7 +926,8 @@ maintentance, and puts out any fire. It will complete the vehicle if it is
 incomplete.
 
 If a full restore (all) is performed on an immortal, it also sets all skill
-levels to 100 and gives all abilities (on the main skill set only).
+levels to 100, gives all abilities (on the main skill set only), and grants
+all languages.
 
 This command is grantable.
 

@@ -684,6 +684,8 @@ bool add_player_to_table(player_index_data *plr);
 void check_autowiz(char_data *ch);
 bool check_bonus_trait_reset(char_data *ch);
 void check_delayed_load(char_data *ch);
+void check_languages(char_data *ch);
+void check_languages_all(void);
 void delete_player_character(char_data *ch);
 void enter_player_game(descriptor_data *d, int dolog, bool fresh);
 room_data *find_home(char_data *ch);
