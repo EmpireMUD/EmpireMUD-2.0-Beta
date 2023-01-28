@@ -3720,6 +3720,21 @@ However, this is not required if you have a compelling reason not to.
 
 See also: GENERIC COMPONENTS
 #d
+"GENERIC LANGUAGE" "LANGUAGE GENERICS" "LANGUAGE EDITOR"
+
+The 'language' generic type creates languages that players and NPCs can speak.
+
+Languages only have a name and some flags. Players can refer to a langauge by
+its whole name, or can remove the spaces or replace spaces with dashes. For
+example, a language called "Old High Western" can also be referred to as
+"old-high-western" or "oldhighwestern".
+
+Flags used by languages:
+  BASIC - All players can speak this language.
+  IN-DEVELOPMENT - Language is not available.
+
+See also: OLC GENERICS, SPEAK, SET LANGUAGE, SHOW LANGUAGES
+#d
 "GENERIC MOON" "MOON GENERICS" "MOON EDITOR" "GENEDIT CYCLE"
 
 The 'moon' generic type controls what moons appear in the sky. These are shown

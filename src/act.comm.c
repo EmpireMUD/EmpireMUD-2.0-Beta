@@ -1928,7 +1928,7 @@ ACMD(do_speak) {
 			if (lang->level <= LANG_UNKNOWN) {
 				continue;	// does not speak it
 			}
-			if (!(gen = real_generic(lang->vnum))) {
+			if (!(gen = real_generic(lang->vnum)) || GEN_FLAGGED(gen, GEN_IN_DEVELOPMENT)) {
 				continue;
 			}
 			

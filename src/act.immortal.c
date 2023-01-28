@@ -2558,12 +2558,16 @@ int perform_set(char_data *ch, char_data *vict, int mode, char *val_arg) {
 		
 		half_chop(val_arg, vnum_arg, onoff_arg);
 		
-		if (!*vnum_arg || !isdigit(*vnum_arg) || !*onoff_arg) {
+		if (!*vnum_arg || !*onoff_arg) {
 			msg_to_char(ch, "Usage: set <name> language <vnum | language> <on/speak | recognize | off/unknown>\r\n");
 			return 0;
 		}
-		if ((isdigit(*vnum_arg) && !(lang = find_generic(atoi(vnum_arg), GENERIC_LANGUAGE))) && !(lang = find_generic_no_spaces(GENERIC_LANGUAGE, vnum_arg))) {
+		if (!((isdigit(*vnum_arg) && (lang = find_generic(atoi(vnum_arg), GENERIC_LANGUAGE))) || (lang = find_generic_no_spaces(GENERIC_LANGUAGE, vnum_arg)))) {
 			msg_to_char(ch, "Invalid language '%s'.\r\n", vnum_arg);
+			return 0;
+		}
+		if (GEN_FLAGGED(lang, GEN_IN_DEVELOPMENT)) {
+			msg_to_char(ch, "Language is set in-development.\r\n");
 			return 0;
 		}
 		
