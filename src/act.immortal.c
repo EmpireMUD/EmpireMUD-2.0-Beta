@@ -1985,6 +1985,7 @@ struct set_struct {
 		{ "maxlevel", LVL_START_IMM, PC, NUMBER },
 		{ "skill", LVL_START_IMM, PC, MISC },
 		{ "faction", LVL_START_IMM, PC, MISC },
+		{ "language", LVL_START_IMM, PC, MISC },
 		{ "learned", LVL_START_IMM, PC, MISC },
 		{ "minipet", LVL_START_IMM, PC, MISC },
 		{ "mount", LVL_START_IMM, PC, MISC },
@@ -2550,6 +2551,38 @@ int perform_set(char_data *ch, char_data *vict, int mode, char *val_arg) {
 		check_ability_levels(vict, SKILL_VNUM(skill));
 		assign_class_abilities(vict, NULL, NOTHING);
 		sprintf(output, "%s's %s set to %d.", GET_NAME(vict), SKILL_NAME(skill), level);
+	}
+	else if SET_CASE("language") {
+		char vnum_arg[MAX_INPUT_LENGTH], onoff_arg[MAX_INPUT_LENGTH];
+		generic_data *lang;
+		
+		half_chop(val_arg, vnum_arg, onoff_arg);
+		
+		if (!*vnum_arg || !isdigit(*vnum_arg) || !*onoff_arg) {
+			msg_to_char(ch, "Usage: set <name> language <vnum | language> <on/speak | recognize | off/unknown>\r\n");
+			return 0;
+		}
+		if ((isdigit(*vnum_arg) && !(lang = find_generic(atoi(vnum_arg), GENERIC_LANGUAGE))) && !(lang = find_generic_no_spaces(GENERIC_LANGUAGE, vnum_arg))) {
+			msg_to_char(ch, "Invalid language '%s'.\r\n", vnum_arg);
+			return 0;
+		}
+		
+		if (!str_cmp(onoff_arg, "on") || is_abbrev(onoff_arg, "speaks")) {
+			add_language(vict, GEN_VNUM(lang), LANG_SPEAK);
+			sprintf(output, "%s: now speaks language %d %s.", GET_NAME(vict), GEN_VNUM(lang), GEN_NAME(lang));
+		}
+		else if (is_abbrev(onoff_arg, "recognize")) {
+			add_language(vict, GEN_VNUM(lang), LANG_RECOGNIZE);
+			sprintf(output, "%s: now recognizes language %d %s.", GET_NAME(vict), GEN_VNUM(lang), GEN_NAME(lang));
+		}
+		else if (!str_cmp(onoff_arg, "off") || is_abbrev(onoff_arg, "unknown")) {
+			add_language(vict, GEN_VNUM(lang), LANG_UNKNOWN);
+			sprintf(output, "%s: no longer speaks %d %s.", GET_NAME(vict), GEN_VNUM(lang), GEN_NAME(lang));
+		}
+		else {
+			msg_to_char(ch, "Do you want to set it on/speak, recognize, or off/unknown?\r\n");
+			return 0;
+		}
 	}
 	else if SET_CASE("learned") {
 		char vnum_arg[MAX_INPUT_LENGTH], onoff_arg[MAX_INPUT_LENGTH];
@@ -5146,6 +5179,70 @@ SHOW(show_produced) {
 		if (ch->desc) {
 			page_string(ch->desc, output, TRUE);
 		}
+	}
+}
+
+
+SHOW(show_languages) {
+	char arg[MAX_INPUT_LENGTH], output[MAX_STRING_LENGTH], line[MAX_STRING_LENGTH];
+	struct player_language *lang, *next_lang;
+	generic_data *gen;
+	char_data *plr = NULL;
+	size_t size, count;
+	bool file = FALSE;
+	
+	argument = one_word(argument, arg);
+	skip_spaces(&argument);
+	
+	if (!*arg) {
+		msg_to_char(ch, "Usage: show languages <player> [keywords]\r\n");
+	}
+	else if (!(plr = find_or_load_player(arg, &file))) {
+		send_to_char("There is no such player.\r\n", ch);
+	}
+	else {
+		if (*argument) {
+			size = snprintf(output, sizeof(output), "Languages matching '%s' for %s:\r\n", argument, GET_NAME(plr));
+		}
+		else {
+			size = snprintf(output, sizeof(output), "Languages for %s:\r\n", GET_NAME(plr));
+		}
+		
+		count = 0;
+		HASH_ITER(hh, GET_LANGUAGES(plr), lang, next_lang) {
+			if (lang->level == LANG_UNKNOWN || !(gen = find_generic(lang->vnum, GENERIC_LANGUAGE))) {
+				continue;
+			}
+			if (*argument && !multi_isname(argument, GEN_NAME(gen))) {
+				continue;	// searched
+			}
+		
+			// show it
+			snprintf(line, sizeof(line), " [%5d] %s (%s)%s\r\n", GEN_VNUM(gen), GEN_NAME(gen), language_types[lang->level], (GET_SPEAKING(plr) == lang->vnum) ? " - \tgcurrently speaking\t0" : "");
+			if (size + strlen(line) < sizeof(output)) {
+				strcat(output, line);
+				size += strlen(line);
+				++count;
+			}
+			else {
+				if (size + 10 < sizeof(output)) {
+					strcat(output, "OVERFLOW\r\n");
+				}
+				break;
+			}
+		}
+	
+		if (!count) {
+			strcat(output, "  none\r\n");	// space reserved for this for sure
+		}
+	
+		if (ch->desc) {
+			page_string(ch->desc, output, TRUE);
+		}
+	}
+	
+	if (plr && file) {
+		free_char(plr);
 	}
 }
 
@@ -10239,6 +10336,7 @@ ACMD(do_show) {
 		{ "minipets", LVL_START_IMM, show_minipets },
 		{ "moons", LVL_START_IMM, show_moons },
 		{ "mounts", LVL_START_IMM, show_mounts },
+		{ "languages", LVL_START_IMM, show_languages },
 		{ "learned", LVL_START_IMM, show_learned },
 		{ "currency", LVL_START_IMM, show_currency },
 		{ "technology", LVL_START_IMM, show_technology },

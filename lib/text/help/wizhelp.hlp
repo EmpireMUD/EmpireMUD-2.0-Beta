@@ -981,6 +981,7 @@ eventdailyquests      PC  NUMBER    Number of event dailies they have completed
 faction        PC      MISC         Change faction reputations (SET FACTION)
 grants         PC      MISC         Set grants for player
 invstart       PC      BINARY       Invisible @ Start
+language       PC      STRING       Change which languages the player speaks
 lastname       PC      STRING       Player's last name, (SET LASTNAME)
 learned        PC      MISC         Turns learned recipes on/off
 maxlevel       PC      NUMBER       Sets the max-known-level, limiting EQ level
@@ -1059,6 +1060,14 @@ You can delete a reputation entirely by setting it to 'none'.
 
 See also: FACTION, SHOW FACTIONS
 #d
+"SET LANGUAGE"
+
+Usage:  set [file] <player> language <language | vnum> <speak | recognize | unknown>
+
+This lets you change which languages a player speaks.
+
+See also: SPEAK, SHOW LANGUAGES
+#d
 "SET LASTNAME" "SET LAST NAME"
 
 Usage:  set <name> lastname <new personal lastname | none>
@@ -1122,6 +1131,7 @@ homeless   Immort   Shows the homeless citizen list for an empire.
 ignoring   Immort   Shows you who a player has on their ignore list.
 inventory  Immort   Shows how many players have a certain item.
 islands    Immort   Shows you which island ids have empire storage (for MOVEEINV).
+languages  Immort   Shows which languages a player knows and is speaking.
 lastnames  Immort   Shows target player's lastname list.
 learned    Immort   Shows you learned recipes.
 minipets   Immort   Shows you minipets collected by a player.
@@ -1263,6 +1273,15 @@ The immortal version of the 'islands' command; useful for MOVEEINV. You can use
 an empire's leaderboard rank in place of its name, but not vnum.
 
 See also: ISLANDS, MOVEEINV
+#e
+"SHOW LANGUAGES"
+
+Usage:  show languages <player> [search phrase]
+
+Shows you languages known by a player, and what language they are currently
+speaking.
+
+See also: SET LANGUAGE, SPEAK
 #e
 "SHOW LASTNAMES" "SHOW LAST NAMES"
 
