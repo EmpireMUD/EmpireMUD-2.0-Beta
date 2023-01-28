@@ -2051,15 +2051,22 @@ This is not the type of game where you can re-load from past saves.
 SAY OOCSAY OSAY TELL ASK WHISPER ' ""
 
 Usage:  say <string>
+        say #<language> <string>
         oocsay <string>
         <tell | whisper | ask> <player> <string>
 
 If you consider communicating with other beings, you might be understood
 better if you start your sentences with either say, tell, whisper or shout.
 
+When you use say, you'll use whatever language your character is currently
+speaking. You can change this with the speak command, or you can start your
+say with #<language> to say one line in a specific language. For this, remove
+the spaces in the language name or use dashes.
+
 Examples:
 
   > say Hey, does anyone know how to get to Oz?
+  > say #low-goblish Hello!
   > tell catje hi, how are you?
 
 You can use ' as a shorthand for say, and " for oocsay, as in:
@@ -2279,7 +2286,8 @@ SPEAK LANGUAGE LANGUAGES
 Usage:  speak [language]
 
 This command changes which language your character will speak for in-character
-communication such as 'say' or 'shout'.
+communication such as 'say' or 'shout'. You can also specify a language for a
+single say/shout with #<language>. For example: say #low-goblish Hello!
 
 Typing 'speak' without an argument lists the languages you know and shows which
 one you're currently speaking.
