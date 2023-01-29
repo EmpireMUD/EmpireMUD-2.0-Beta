@@ -3730,8 +3730,11 @@ example, a language called "Old High Western" can also be referred to as
 "old-high-western" or "oldhighwestern".
 
 Flags used by languages:
-  BASIC - All players can speak this language.
+  BASIC - All players can automatically speak this language.
   IN-DEVELOPMENT - Language is not available.
+
+EmpireMUD comes with language [150] English and all characters start with this
+language. Add the IN-DEV flag to disable it.
 
 See also: OLC GENERICS, SPEAK, SET LANGUAGE, SHOW LANGUAGES
 #d

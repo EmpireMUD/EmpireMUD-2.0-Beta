@@ -127,6 +127,59 @@ void add_to_slash_channel_history(struct slash_channel *chan, char_data *speaker
 
 
 /**
+* Determines if the argument starts with #<language> and parses it out. If not,
+* it also determines the default language. If it returns FALSE, the player
+* received an error message.
+*
+* @param char_data *ch The player who typed a command such as say #lang
+* @param char **argument The argument as-typed. It will be advanced past the language arg.
+* @param generic_data **find_lang A pointer to a variable to bind the found language to. This COULD be NULL if the player speaks no languages.
+* @return bool Returns FALSE if the player received an error message, or TRUE in all other cases (even if it could not find a language).
+*/
+bool determine_language_from_string(char_data *ch, char **argument, generic_data **find_lang) {
+	char arg[MAX_INPUT_LENGTH];
+	
+	*find_lang = NULL;
+	skip_spaces(argument);
+	
+	if (**argument == '#') {
+		// split out #language to string
+		*argument = one_argument(*argument, arg);
+		skip_spaces(argument);
+		
+		if (!*(arg + 1)) {
+			msg_to_char(ch, "You must specify which language when your message begins with #.\r\n");
+			return FALSE;
+		}
+		
+		// try to find language
+		if ((IS_IMMORTAL(ch) || IS_NPC(ch)) && isdigit(*(arg + 1))) {
+			*find_lang = find_generic(atoi(arg + 1), GENERIC_LANGUAGE);
+		}
+		if (!*find_lang) {
+			// try by name
+			*find_lang = find_generic_no_spaces(GENERIC_LANGUAGE, arg + 1);
+		}
+		if (!*find_lang || speaks_language(ch, GEN_VNUM(*find_lang)) != LANG_SPEAK) {
+			msg_to_char(ch, "You don't speak %s.\r\n", (*find_lang ? GEN_NAME(*find_lang) : "such a language"));
+			return FALSE;
+		}
+		
+		// success: picked a language
+	}
+	if (!IS_NPC(ch) && !*find_lang) {
+		*find_lang = find_generic(GET_SPEAKING(ch), GENERIC_LANGUAGE);
+	}
+	if (IS_NPC(ch) && !*find_lang) {
+		*find_lang = find_generic(config_get_int("default_language_vnum"), GENERIC_LANGUAGE);
+	}
+	
+	// hopefully we found one... but either way, there was no error so:
+	return TRUE;
+}
+
+
+/**
 * Determines if the majority of online members of an empire are ignoring the
 * victim. If there's a tie, this counts as 'ignoring'. This can be used to
 * prevent spamming with things like diplomacy.
@@ -1828,46 +1881,19 @@ ACMD(do_reply) {
 
 ACMD(do_say) {
 	char_data *c;
-	char lbuf[MAX_STRING_LENGTH], buf[MAX_STRING_LENGTH], arg[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH];
+	char buf[MAX_STRING_LENGTH];
 	int ctype = (subcmd == SCMD_OOCSAY ? CUSTOM_COLOR_OOCSAY : CUSTOM_COLOR_SAY), mode;
 	generic_data *lang = NULL;
 	char color;
-	bool show_real_name;
+	bool show_real_name, res;
 	
 	skip_spaces(&argument);
 	
-	// check for #language arg
-	if (*argument == '#') {
-		// split out #language to string
-		half_chop(argument, arg, arg2);
-		argument = arg2;
-		
-		if (!*(arg + 1)) {
-			msg_to_char(ch, "You must specify which language when your message begins with #.\r\n");
-			return;
-		}
-		
-		// try to find language
-		if ((IS_IMMORTAL(ch) || IS_NPC(ch)) && isdigit(*(arg + 1))) {
-			lang = find_generic(atoi(arg + 1), GENERIC_LANGUAGE);
-		}
-		if (!lang) {
-			// try by name
-			lang = find_generic_no_spaces(GENERIC_LANGUAGE, arg + 1);
-		}
-		if (!lang || speaks_language(ch, GEN_VNUM(lang)) != LANG_SPEAK) {
-			msg_to_char(ch, "You don't speak %s.\r\n", (lang ? GEN_NAME(lang) : "such a language"));
-			return;
-		}
-		
-		// success: picked a language
-	}
-	else if (!IS_NPC(ch)) {
-		lang = find_generic(GET_SPEAKING(ch), GENERIC_LANGUAGE);
-	}
-	
-	if (!lang && IS_NPC(ch)) {
-		lang = find_generic(config_get_int("default_language_vnum"), GENERIC_LANGUAGE);
+	// determine language
+	res = determine_language_from_string(ch, &argument, &lang);
+	if (!res) {
+		// if we got here it sent an error
+		return;
 	}
 	
 	if (!*argument) {
@@ -1937,15 +1963,15 @@ ACMD(do_say) {
 			delete_doubledollar(argument);
 			color = (!IS_NPC(ch) && GET_CUSTOM_COLOR(ch, ctype)) ? GET_CUSTOM_COLOR(ch, ctype) : '0';
 			if (subcmd == SCMD_OOCSAY || !lang || GEN_VNUM(lang) == GET_SPEAKING(ch)) {
-				sprintf(lbuf, "\t%cYou say,%s '%s\t%c'\tn\r\n", color, (subcmd == SCMD_OOCSAY ? " out of character," : ""), argument, color);
+				sprintf(buf, "\t%cYou say,%s '%s\t%c'\tn\r\n", color, (subcmd == SCMD_OOCSAY ? " out of character," : ""), argument, color);
 			}
 			else {
-				sprintf(lbuf, "\t%cYou say, in %s, '%s\t%c'\tn\r\n", color, (lang ? GEN_NAME(lang) : "another language"), argument, color);
+				sprintf(buf, "\t%cYou say, in %s, '%s\t%c'\tn\r\n", color, (lang ? GEN_NAME(lang) : "another language"), argument, color);
 			}
-			send_to_char(lbuf, ch);
+			send_to_char(buf, ch);
 
 			if (ch->desc) {
-				add_to_channel_history(ch, CHANNEL_HISTORY_SAY, ch, lbuf);
+				add_to_channel_history(ch, CHANNEL_HISTORY_SAY, ch, buf);
 			}
 		}
 		
