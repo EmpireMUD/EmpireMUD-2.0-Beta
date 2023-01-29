@@ -2018,8 +2018,8 @@ int text_processed(char *field, char *subfield, struct trig_var_data *vd, char *
 			if (isspace(*p)) {
 				continue;
 			}
-			else if (*p == '&' && *(p + 1)) {
-				++p;	// skip one for &
+			else if (*p == COLOUR_CHAR && *(p + 1)) {
+				++p;	// skip one for & (color char)
 			}
 			else if (isdigit(*p) || isalpha(*p)) {
 				// found an alpha/numeric char? cap it and break

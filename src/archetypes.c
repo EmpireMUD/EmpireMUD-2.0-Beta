@@ -261,7 +261,7 @@ void smart_copy_gear(struct archetype_gear **list, struct archetype_gear *from) 
 * @return TRUE if it's ok, or FALSE if not.
 */
 bool valid_default_rank(char_data *ch, char *argument) {
-	if (color_code_length(argument) > 0 || strchr(argument, '&') != NULL) {
+	if (color_code_length(argument) > 0 || strchr(argument, COLOUR_CHAR) != NULL) {
 		msg_to_char(ch, "Default ranks may not contain color codes.\r\n");
 	}
 	else if (strchr(argument, '%')) {

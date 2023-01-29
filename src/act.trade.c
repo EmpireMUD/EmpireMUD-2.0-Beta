@@ -1415,8 +1415,8 @@ bool validate_item_rename(char_data *ch, obj_data *obj, char *name) {
 	else if (has_cap || ((proto = obj_proto(GET_OBJ_VNUM(obj))) && GET_OBJ_SHORT_DESC(obj) != GET_OBJ_SHORT_DESC(proto))) {
 		act("You can't rename $p.", FALSE, ch, obj, NULL, TO_CHAR);
 	}
-	else if (strchr(name, '&') || strchr(name, '%')) {
-		msg_to_char(ch, "Item names cannot contain the \t& or %% symbols.\r\n");
+	else if (strchr(name, COLOUR_CHAR) || strchr(name, '%')) {
+		msg_to_char(ch, "Item names cannot contain the \t%c or %% symbols.\r\n", COLOUR_CHAR);
 	}
 	else if (!str_str(name, must_have)) {
 		msg_to_char(ch, "The new name must contain '%s'.\r\n", must_have);

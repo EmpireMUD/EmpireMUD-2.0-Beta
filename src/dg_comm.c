@@ -134,7 +134,7 @@ void sub_write_to_char(char_data *ch, char *tokens[], void *otokens[], char type
 	
 	// find the first non-color-code and cap it
 	for (iter = 0; iter < strlen(sb); ++iter) {
-		if (sb[iter] == '&') {
+		if (sb[iter] == COLOUR_CHAR) {
 			// skip
 			++iter;
 		}

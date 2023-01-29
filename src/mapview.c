@@ -546,7 +546,7 @@ void replace_color_codes(char *string, char *new_color) {
 	*temp = '\0';
 	
 	while (string[iter]) {
-		if (string[iter] == '&' && string[iter+1] != '?') {
+		if (string[iter] == COLOUR_CHAR && string[iter+1] != '?') {
 			// copy over new color and skip this part of string
 			strcpy(temp + iter, new_color);
 			++iter;
@@ -2051,14 +2051,14 @@ static void show_map_to_char(char_data *ch, struct mappc_data_container *mappc, 
 			strcpy(show_icon, lbuf);
 		}
 		// need a leading color base color?
-		if (*show_icon != '&') {
+		if (*show_icon != COLOUR_CHAR) {
 			snprintf(lbuf, sizeof(lbuf), "%s%s", base_color, show_icon);
 			strcpy(show_icon, lbuf);
 		}
 	}
 	else {
 		// need a leading color base color?
-		if (*show_icon != '&') {
+		if (*show_icon != COLOUR_CHAR) {
 			snprintf(lbuf, sizeof(lbuf), "%s%s", base_color, show_icon);
 			strcpy(show_icon, lbuf);
 		}
@@ -2078,7 +2078,7 @@ static void show_map_to_char(char_data *ch, struct mappc_data_container *mappc, 
 		if (AFF_FLAGGED(ch, AFF_STONED)) {
 			// check all but the final char
 			for (iter = 0; show_icon[iter] != 0 && show_icon[iter+1] != 0; ++iter) {
-				if (show_icon[iter] == '&' || show_icon[iter] == '\t') {
+				if (show_icon[iter] == COLOUR_CHAR || show_icon[iter] == '\t') {
 					switch(show_icon[iter+1]) {
 						case 'r':	show_icon[iter+1] = 'b';	break;
 						case 'g':	show_icon[iter+1] = 'c';	break;

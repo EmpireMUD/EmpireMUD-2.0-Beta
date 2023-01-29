@@ -4868,7 +4868,7 @@ void replace_question_color(char *input, char *color, char *output) {
 	*output = '\0';
 	
 	for (ipos = 0, opos = 0; ipos < strlen(input); ++ipos) {
-		if (input[ipos] == '&' && input[ipos+1] == '?') {
+		if (input[ipos] == COLOUR_CHAR && input[ipos+1] == '?') {
 			// copy replacement color instead
 			strcpy(output + opos, color);
 			opos += strlen(color);
@@ -5205,8 +5205,8 @@ char *strip_color(char *input) {
 	int iter, pos;
 
 	for (iter = 0, pos = 0; pos < (MAX_STRING_LENGTH-1) && iter < strlen(input); ++iter) {
-		if (input[iter] == '&') {
-			if (input[iter+1] == '&') {
+		if (input[iter] == COLOUR_CHAR) {
+			if (input[iter+1] == COLOUR_CHAR) {
 				// double &: copy both
 				lbuf[pos++] = input[iter];
 				lbuf[pos++] = input[++iter];
@@ -5217,7 +5217,7 @@ char *strip_color(char *input) {
 			}
 		}
 		else if (input[iter] == '\t') {
-			if (input[iter+1] == '&' || input[iter+1] == '\t') {
+			if (input[iter+1] == COLOUR_CHAR || input[iter+1] == '\t') {
 				// double \t: copy both
 				lbuf[pos++] = input[iter];
 				lbuf[pos++] = input[++iter];

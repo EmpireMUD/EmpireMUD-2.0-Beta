@@ -65,7 +65,7 @@ bool check_banner_color_string(char *str, bool allow_neutral_color, bool allow_u
 	int pos, num_codes = 0;
 	
 	for (pos = 0; pos < strlen(str); ++pos) {
-		if (str[pos] == '&') {
+		if (str[pos] == COLOUR_CHAR) {
 			if (pos == (strlen(str)-1)) {
 				// trailing &
 				ok = FALSE;
@@ -153,7 +153,7 @@ bool valid_empire_name(char *newname) {
 	int iter;
 	
 	// check for illegal & codes (anything other than &&)
-	if ((ptr = strchr(newname, '&')) && *(ptr+1) != '&') {
+	if ((ptr = strchr(newname, COLOUR_CHAR)) && *(ptr+1) != COLOUR_CHAR) {
 		ok = FALSE;
 	}
 	
@@ -339,8 +339,8 @@ EEDIT(eedit_adjective) {
 	else if (!*argument) {
 		msg_to_char(ch, "Set the empire's adjective form to what?\r\n");
 	}
-	else if (color_code_length(argument) > 0 || strchr(argument, '&') != NULL) {
-		msg_to_char(ch, "Empire adjective forms may not contain color codes or ampersands. Set the banner instead.\r\n");
+	else if (color_code_length(argument) > 0 || strchr(argument, COLOUR_CHAR) != NULL) {
+		msg_to_char(ch, "Empire adjective forms may not contain color codes or \t%c. Set the banner instead.\r\n", COLOUR_CHAR);
 	}
 	else if (strstr(argument, "%") != NULL) {
 		msg_to_char(ch, "Empire adjective forms may not contain the percent sign (%%).\r\n");
@@ -590,8 +590,8 @@ EEDIT(eedit_name) {
 	else if (!isalpha(*argument)) {
 		msg_to_char(ch, "Empire names must begin with a letter.\r\n");
 	}
-	else if (color_code_length(argument) > 0 || strchr(argument, '&') != NULL) {
-		msg_to_char(ch, "Empire names may not contain color codes or ampersands. Set the banner instead.\r\n");
+	else if (color_code_length(argument) > 0 || strchr(argument, COLOUR_CHAR) != NULL) {
+		msg_to_char(ch, "Empire names may not contain color codes or \t%c. Set the banner instead.\r\n", COLOUR_CHAR);
 	}
 	else if (strchr(argument, '%')) {
 		msg_to_char(ch, "Empire names may not contain the percent sign (%%).\r\n");
