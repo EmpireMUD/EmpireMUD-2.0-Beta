@@ -2966,6 +2966,8 @@ const char *quest_reward_types[] = {
 	"REPUTATION",
 	"CURRENCY",
 	"EVENT-POINTS",
+	"SPEAK-LANGUAGE",	// 10
+	"RECOGNIZE-LANGUAGE",
 	"\n",
 };
 

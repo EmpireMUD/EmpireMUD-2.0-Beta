@@ -2599,6 +2599,8 @@ typedef enum {
 #define QR_REPUTATION  7
 #define QR_CURRENCY  8
 #define QR_EVENT_POINTS  9
+#define QR_SPEAK_LANGUAGE  10
+#define QR_RECOGNIZE_LANGUAGE  11
 
 
 // indicates empire (rather than misc) coins for a reward

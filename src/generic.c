@@ -1742,8 +1742,7 @@ void do_stat_generic(char_data *ch, generic_data *gen) {
 			break;
 		}
 		case GENERIC_LANGUAGE: {
-			// todo
-			// size += snprintf(buf + size, sizeof(buf) - size, "Wear-off: %s\r\n", GET_COOLDOWN_WEAR_OFF(gen) ? GET_COOLDOWN_WEAR_OFF(gen) : "(none)");
+			// no known properties
 			break;
 		}
 	}
@@ -1827,8 +1826,7 @@ void olc_show_generic(char_data *ch) {
 			break;
 		}
 		case GENERIC_LANGUAGE: {
-			// todo
-			// sprintf(buf + strlen(buf), "<%scycle\t0> %.2f day%s\r\n", OLC_LABEL_VAL(GET_MOON_CYCLE(gen), 0), GET_MOON_CYCLE_DAYS(gen), PLURAL(GET_MOON_CYCLE_DAYS(gen)));
+			// no properties
 			break;
 		}
 	}

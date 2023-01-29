@@ -797,6 +797,20 @@ void give_quest_rewards(char_data *ch, struct quest_reward *list, int reward_lev
 				gain_event_points(ch, reward->vnum, reward->amount);
 				break;
 			}
+			case QR_SPEAK_LANGUAGE: {
+				if (speaks_language(ch, reward->vnum) != LANG_SPEAK && real_generic(reward->vnum)) {
+					add_language(ch, reward->vnum, LANG_SPEAK);
+					msg_to_char(ch, "\tyYou can now speak %s!\t0\r\n", get_generic_name_by_vnum(reward->vnum));
+				}
+				break;
+			}
+			case QR_RECOGNIZE_LANGUAGE: {
+				if (speaks_language(ch, reward->vnum) == LANG_UNKNOWN && real_generic(reward->vnum)) {
+					add_language(ch, reward->vnum, LANG_RECOGNIZE);
+					msg_to_char(ch, "\tyYou can now recognize %s!\t0\r\n", get_generic_name_by_vnum(reward->vnum));
+				}
+				break;
+			}
 		}
 	}
 }
@@ -937,6 +951,14 @@ char *quest_reward_string(struct quest_reward *reward, bool show_vnums) {
 		case QR_EVENT_POINTS: {
 			event_data *event = find_event_by_vnum(reward->vnum);
 			snprintf(output, sizeof(output), "%+d event point%s to %s%s", reward->amount, PLURAL(reward->amount), vnum, (event ? EVT_NAME(event) : "UNKNOWN"));
+			break;
+		}
+		case QR_SPEAK_LANGUAGE: {
+			snprintf(output, sizeof(output), "%sSpeak %s", vnum, get_generic_name_by_vnum(reward->vnum));
+			break;
+		}
+		case QR_RECOGNIZE_LANGUAGE: {
+			snprintf(output, sizeof(output), "%sRecognize %s", vnum, get_generic_name_by_vnum(reward->vnum));
 			break;
 		}
 		default: {
@@ -3349,6 +3371,7 @@ bool audit_quest(quest_data *quest, char_data *ch) {
 	struct trig_proto_list *tpl;
 	struct quest_reward *rew;
 	struct req_data *task;
+	generic_data *gen;
 	trig_data *trig;
 	bool problem = FALSE;
 	int max_q = 0;
@@ -3420,6 +3443,22 @@ bool audit_quest(quest_data *quest, char_data *ch) {
 			case QR_BONUS_EXP:
 			case QR_OBJECT: {
 				max_q = MAX(max_q, rew->amount);
+				break;
+			}
+			case QR_SPEAK_LANGUAGE:
+			case QR_RECOGNIZE_LANGUAGE: {
+				if (!(gen = real_generic(rew->vnum))) {
+					olc_audit_msg(ch, QUEST_VNUM(quest), "Rewards non-existent language");
+					problem = TRUE;
+				}
+				else if (GEN_TYPE(gen) != GENERIC_LANGUAGE) {
+					olc_audit_msg(ch, QUEST_VNUM(quest), "Rewards non-language generic");
+					problem = TRUE;
+				}
+				else if (GEN_FLAGGED(gen, GEN_BASIC | GEN_IN_DEVELOPMENT)) {
+					olc_audit_msg(ch, QUEST_VNUM(quest), "Rewards language with BASIC or IN-DEV");
+					problem = TRUE;
+				}
 				break;
 			}
 		}
@@ -3696,6 +3735,7 @@ void olc_search_quest(char_data *ch, any_vnum vnum) {
 */
 any_vnum parse_quest_reward_vnum(char_data *ch, int type, char *vnum_arg, char *prev_arg) {
 	faction_data *fct;
+	generic_data *gen;
 	event_data *event;
 	any_vnum vnum = 0;
 	bool ok = FALSE;
@@ -3803,6 +3843,20 @@ any_vnum parse_quest_reward_vnum(char_data *ch, int type, char *vnum_arg, char *
 			}
 			vnum = EVT_VNUM(event);
 			ok = TRUE;
+			break;
+		}
+		case QR_SPEAK_LANGUAGE:
+		case QR_RECOGNIZE_LANGUAGE: {
+			if (!*vnum_arg) {
+				strcpy(vnum_arg, prev_arg);	// does not generally need 2 args
+			}
+			if (!*vnum_arg || !isdigit(*vnum_arg) || (vnum = atoi(vnum_arg)) < 0) {
+				msg_to_char(ch, "Invalid generic language vnum '%s'.\r\n", vnum_arg);
+				return PARSE_QRV_FAILED;
+			}
+			if ((gen = real_generic(vnum)) && GEN_TYPE(gen) == GENERIC_LANGUAGE) {
+				ok = TRUE;
+			}
 			break;
 		}
 	}
