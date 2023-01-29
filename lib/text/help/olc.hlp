@@ -1901,6 +1901,18 @@ The hold slot is generally a light, e.g. the newbie torch (2104).
 
 See also: OLC ARCHETYPES, OLC GLOBALS, GEDIT TYPE
 #d
+"ARCHEDIT LANGUAGE"
+
+Usage:  .language <vnum | name | none>
+
+This sets which language the player will start with, if any.
+
+If players have more than one archetype that give languages, they will speak
+all of those languages. If no archetypes provide a language, you should ensure
+you have at least one BASIC-flagged language for players to speak.
+
+See also: OLC ARCHETYPES, LANGUAGE, GENERIC LANGUAGE
+#d
 "ARCHEDIT LORE"
 
 Usage:  .lore <text | none>

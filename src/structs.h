@@ -3779,6 +3779,7 @@ struct archetype_data {
 	char *male_rank;
 	char *female_rank;
 	
+	generic_data *language;	// optional starting language (generic)
 	struct archetype_skill *skills;	// linked list
 	struct archetype_gear *gear;	// linked list
 	int attributes[NUM_ATTRIBUTES];	// starting attributes (default 1)

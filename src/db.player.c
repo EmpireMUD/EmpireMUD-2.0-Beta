@@ -4810,6 +4810,11 @@ void start_new_character(char_data *ch) {
 		for (gear = GET_ARCH_GEAR(arch); gear; gear = gear->next) {
 			give_newbie_gear(ch, gear->vnum, gear->wear);
 		}
+		
+		// language
+		if (GET_ARCH_LANGUAGE(arch) && GEN_TYPE(GET_ARCH_LANGUAGE(arch)) == GENERIC_LANGUAGE && !GEN_FLAGGED(GET_ARCH_LANGUAGE(arch), GEN_IN_DEVELOPMENT)) {
+			add_language(ch, GEN_VNUM(GET_ARCH_LANGUAGE(arch)), LANG_SPEAK);
+		}
 	}
 	
 	// guarantee minimum of 1 for active attributes

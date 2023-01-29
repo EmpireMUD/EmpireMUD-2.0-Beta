@@ -532,6 +532,22 @@ bool audit_archetype(archetype_data *arch, char_data *ch) {
 		}
 	}
 	
+	// language?
+	if (GET_ARCH_LANGUAGE(arch)) {
+		if (GEN_TYPE(GET_ARCH_LANGUAGE(arch)) != GENERIC_LANGUAGE) {
+			olc_audit_msg(ch, GET_ARCH_VNUM(arch), "Language is invalid (not a language generic)");
+			problem = TRUE;
+		}
+		else if (GEN_FLAGGED(GET_ARCH_LANGUAGE(arch), GEN_IN_DEVELOPMENT)) {
+			olc_audit_msg(ch, GET_ARCH_VNUM(arch), "Language is set IN-DEVELOPMENT");
+			problem = TRUE;
+		}
+		else if (GEN_FLAGGED(GET_ARCH_LANGUAGE(arch), GEN_BASIC)) {
+			olc_audit_msg(ch, GET_ARCH_VNUM(arch), "Language is set BASIC");
+			problem = TRUE;
+		}
+	}
+	
 	// check for overloaded gear slots
 	for (iter = 0; iter < NUM_WEARS; ++iter) {
 		gear_count[iter] = 0;
@@ -920,17 +936,23 @@ void parse_archetype(FILE *fl, any_vnum vnum) {
 	GET_ARCH_MALE_RANK(arch) = fread_string(fl, error);
 	GET_ARCH_FEMALE_RANK(arch) = fread_string(fl, error);
 	
-	// line 6: type flags 
-	// NOTE: prior to b4.33 this line was only 'flags'
+	// line 6: type flags language
 	if (!get_line(fl, line)) {
 		log("SYSERR: Format error: missing line 5 of %s", error);
 		exit(1);
 	}
+	else if (sscanf(line, "%d %s %d", &int_in[0], str_in, &int_in[1]) == 3) {
+		GET_ARCH_TYPE(arch) = int_in[0];
+		GET_ARCH_FLAGS(arch) = asciiflag_conv(str_in);
+		GET_ARCH_LANGUAGE(arch) = real_generic(int_in[1]);
+	}
 	else if (sscanf(line, "%d %s", &int_in[0], str_in) == 2) {
+		// NOTE: prior to b5.146 this line was only 'type flags'
 		GET_ARCH_TYPE(arch) = int_in[0];
 		GET_ARCH_FLAGS(arch) = asciiflag_conv(str_in);
 	}
 	else if (sscanf(line, "%s", str_in) == 1) {
+		// NOTE: prior to b4.33 this line was only 'flags'
 		GET_ARCH_TYPE(arch) = ARCHT_ORIGIN;
 		GET_ARCH_FLAGS(arch) = asciiflag_conv(str_in);
 	}
@@ -1048,8 +1070,8 @@ void write_archetype_to_file(FILE *fl, archetype_data *arch) {
 	fprintf(fl, "%s~\n", NULLSAFE(GET_ARCH_MALE_RANK(arch)));
 	fprintf(fl, "%s~\n", NULLSAFE(GET_ARCH_FEMALE_RANK(arch)));
 	
-	// 6. flags
-	fprintf(fl, "%d %s\n", GET_ARCH_TYPE(arch), bitv_to_alpha(GET_ARCH_FLAGS(arch)));
+	// 6. type flags language
+	fprintf(fl, "%d %s %d\n", GET_ARCH_TYPE(arch), bitv_to_alpha(GET_ARCH_FLAGS(arch)), GET_ARCH_LANGUAGE(arch) ? GEN_VNUM(GET_ARCH_LANGUAGE(arch)) : NOTHING);
 	
 	// 'A': attributes
 	for (iter = 0; iter < NUM_ATTRIBUTES; ++iter) {
@@ -1492,6 +1514,13 @@ void do_stat_archetype(char_data *ch, archetype_data *arch) {
 		size += snprintf(buf + size, sizeof(buf) - size, "Lore: \tcnone\t0\r\n");
 	}
 	
+	if (GET_ARCH_LANGUAGE(arch)) {
+		size += snprintf(buf + size, sizeof(buf) - size, "Language: [\ty%d\t0] \ty%s\t0\r\n", GEN_VNUM(GET_ARCH_LANGUAGE(arch)), GEN_NAME(GET_ARCH_LANGUAGE(arch)));
+	}
+	else {
+		size += snprintf(buf + size, sizeof(buf) - size, "Language: \tynone\t0\r\n");
+	}
+	
 	sprintbit(GET_ARCH_FLAGS(arch), archetype_flags, part, TRUE);
 	size += snprintf(buf + size, sizeof(buf) - size, "Flags: \tg%s\t0\r\n", part);
 		
@@ -1571,6 +1600,8 @@ void olc_show_archetype(char_data *ch) {
 	sprintf(buf + strlen(buf), "<%sname\t0> %s\r\n", OLC_LABEL_STR(GET_ARCH_NAME(arch), default_archetype_name), NULLSAFE(GET_ARCH_NAME(arch)));
 	sprintf(buf + strlen(buf), "<%sdescription\t0> %s\r\n", OLC_LABEL_STR(GET_ARCH_DESC(arch), default_archetype_desc), NULLSAFE(GET_ARCH_DESC(arch)));
 	sprintf(buf + strlen(buf), "<%slore\t0> %s [on Month Day, Year.]\r\n", OLC_LABEL_STR(GET_ARCH_LORE(arch), ""), (GET_ARCH_LORE(arch) && *GET_ARCH_LORE(arch)) ? GET_ARCH_LORE(arch) : "none");
+	
+	sprintf(buf + strlen(buf), "<%slanguage\t0> [%d] %s\r\n", OLC_LABEL_PTR(GET_ARCH_LANGUAGE(arch)), GET_ARCH_LANGUAGE(arch) ? GEN_VNUM(GET_ARCH_LANGUAGE(arch)) : NOTHING, GET_ARCH_LANGUAGE(arch) ? GEN_NAME(GET_ARCH_LANGUAGE(arch)) : "none");
 	
 	sprintbit(GET_ARCH_FLAGS(arch), archetype_flags, lbuf, TRUE);
 	sprintf(buf + strlen(buf), "<%sflags\t0> %s\r\n", OLC_LABEL_VAL(GET_ARCH_FLAGS(arch), ARCH_IN_DEVELOPMENT), lbuf);
@@ -1716,6 +1747,30 @@ OLC_MODULE(archedit_flags) {
 OLC_MODULE(archedit_gear) {
 	archetype_data *arch = GET_OLC_ARCHETYPE(ch->desc);
 	archedit_process_gear(ch, argument, &GET_ARCH_GEAR(arch));
+}
+
+
+OLC_MODULE(archedit_language) {
+	archetype_data *arch = GET_OLC_ARCHETYPE(ch->desc);
+	generic_data *gen;
+	
+	if (!*argument) {
+		msg_to_char(ch, "Set the language to which generic vnum (or name, or none)?\r\n");
+	}
+	else if (!str_cmp(argument, "none") || atoi(argument) == NOTHING) {
+		GET_ARCH_LANGUAGE(arch) = NULL;
+		msg_to_char(ch, "It now has no starting language.\r\n");
+	}
+	else if (!((gen = find_generic_no_spaces(GENERIC_LANGUAGE, argument)) || (gen = find_generic(atoi(argument), GENERIC_LANGUAGE)))) {
+		msg_to_char(ch, "Invalid language name or vnum '%s'.\r\n", argument);
+	}
+	else if (GEN_TYPE(gen) != GENERIC_LANGUAGE) {
+		msg_to_char(ch, "That is not a valid language.\r\n");
+	}
+	else {
+		GET_ARCH_LANGUAGE(arch) = gen;
+		msg_to_char(ch, "It now has [%d] %s as a starting language.\r\n", GEN_VNUM(gen), GEN_NAME(gen));
+	}
 }
 
 
