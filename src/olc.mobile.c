@@ -1147,6 +1147,8 @@ char_data *setup_olc_mobile(char_data *input) {
 		MOB_CUSTOM_MSGS(new) = copy_custom_messages(MOB_CUSTOM_MSGS(input));
 	}
 	else {
+		new->player_specials = &dummy_mob;
+		
 		// brand new
 		GET_PC_NAME(new) = str_dup(default_mob_keywords);
 		GET_SHORT_DESC(new) = str_dup(default_mob_short);
