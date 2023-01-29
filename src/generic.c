@@ -1513,6 +1513,8 @@ void olc_delete_generic(char_data *ch, any_vnum vnum) {
 			}
 		}
 	}
+	
+	check_languages_all();
 }
 
 
