@@ -612,7 +612,7 @@ ACMD(do_pub_comm) {
 					
 					// language
 					if (lang && !IS_NPC(desc->character) && GEN_VNUM(lang) != GET_SPEAKING(desc->character) && mode != LANG_UNKNOWN) {
-						sprintf(langbuf, " in %s,", GEN_NAME(lang));
+						sprintf(langbuf, " in %s", GEN_NAME(lang));
 					}
 					else {
 						*langbuf = '\0';
@@ -621,14 +621,14 @@ ACMD(do_pub_comm) {
 					// prefix
 					if (CAN_SEE_NO_DARK(desc->character, ch)) {
 						if ((IS_MORPHED(ch) || IS_DISGUISED(ch)) && CAN_RECOGNIZE(desc->character, ch)) {
-							sprintf(msgbuf, "%s$n ($o)%s %ss%s,%s ", pub_comm[subcmd].color, invis_string, pub_comm[subcmd].name, level_string, langbuf);
+							sprintf(msgbuf, "%s$n ($o)%s %ss%s%s, ", pub_comm[subcmd].color, invis_string, pub_comm[subcmd].name, level_string, langbuf);
 						}
 						else {
-							sprintf(msgbuf, "%s$n%s %ss%s,%s ", pub_comm[subcmd].color, invis_string, pub_comm[subcmd].name, level_string, langbuf);
+							sprintf(msgbuf, "%s$n%s %ss%s%s, ", pub_comm[subcmd].color, invis_string, pub_comm[subcmd].name, level_string, langbuf);
 						}
 					}
 					else {
-						sprintf(msgbuf, "%sSomeone %ss%s,%s ", pub_comm[subcmd].color, pub_comm[subcmd].name, level_string, langbuf);
+						sprintf(msgbuf, "%sSomeone %ss%s%s, ", pub_comm[subcmd].color, pub_comm[subcmd].name, level_string, langbuf);
 					}
 					
 					// message portion
