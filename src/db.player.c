@@ -4911,9 +4911,14 @@ void add_language(char_data *ch, any_vnum vnum, byte level) {
 		pl = NULL;
 	}
 	
-	// ensure character speaks SOMETHING
+	// ensure character speaks SOMETHING if this is a "speak"
 	if (GET_SPEAKING(ch) == NOTHING && pl && pl->level == LANG_SPEAK) {
 		GET_SPEAKING(ch) = vnum;
+	}
+	
+	// otherwise ensure they're not speaking it
+	if (GET_SPEAKING(ch) == vnum && pl && pl->level != LANG_SPEAK) {
+		GET_SPEAKING(ch) = NOTHING;
 	}
 	
 	// mark for save
