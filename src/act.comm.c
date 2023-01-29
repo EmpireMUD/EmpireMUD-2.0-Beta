@@ -2005,9 +2005,9 @@ ACMD(do_say) {
 		
 		/* trigger check */
 		if (subcmd != SCMD_OOCSAY) {
-			speech_mtrigger(ch, argument);
-			speech_wtrigger(ch, argument);
-			speech_vtrigger(ch, argument);
+			speech_mtrigger(ch, argument, lang);
+			speech_wtrigger(ch, argument, lang);
+			speech_vtrigger(ch, argument, lang);
 		}
 	}
 }

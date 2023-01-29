@@ -317,8 +317,8 @@ struct wld_command_info {
 /* function prototypes from dg_triggers.c (and others) */
 void adventure_cleanup_wtrigger(room_data *room);
 void act_mtrigger(const char_data *ch, char *str, char_data *actor, char_data *victim, obj_data *object, obj_data *target, char *arg);  
-void speech_mtrigger(char_data *actor, char *str);
-void speech_wtrigger(char_data *actor, char *str);
+void speech_mtrigger(char_data *actor, char *str, generic_data *language);
+void speech_wtrigger(char_data *actor, char *str, generic_data *language);
 void greet_memory_mtrigger(char_data *ch);
 int greet_mtrigger(char_data *actor, int dir, char *method);
 int pre_greet_mtrigger(char_data *actor, room_data *room, int dir, char *method);
@@ -379,7 +379,7 @@ int entry_vtrigger(vehicle_data *veh, char *method);
 int leave_vtrigger(char_data *actor, int dir, char *custom_dir, char *method);
 void load_vtrigger(vehicle_data *veh);
 int greet_vtrigger(char_data *actor, int dir, char *method);
-void speech_vtrigger(char_data *actor, char *str);
+void speech_vtrigger(char_data *actor, char *str, generic_data *language);
 
 void reboot_mtrigger(char_data *ch);
 void reboot_otrigger(obj_data *obj);
