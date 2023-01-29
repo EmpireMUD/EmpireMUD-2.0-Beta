@@ -1862,6 +1862,9 @@ ACMD(do_say) {
 		
 		// success: picked a language
 	}
+	else if (!IS_NPC(ch)) {
+		lang = find_generic(GET_SPEAKING(ch), GENERIC_LANGUAGE);
+	}
 	
 	if (!lang && IS_NPC(ch)) {
 		lang = find_generic(config_get_int("default_language_vnum"), GENERIC_LANGUAGE);
@@ -1933,7 +1936,12 @@ ACMD(do_say) {
 		else {
 			delete_doubledollar(argument);
 			color = (!IS_NPC(ch) && GET_CUSTOM_COLOR(ch, ctype)) ? GET_CUSTOM_COLOR(ch, ctype) : '0';
-			sprintf(lbuf, "\t%cYou say,%s '%s\t%c'\tn\r\n", color, (subcmd == SCMD_OOCSAY ? " out of character," : ""), argument, color);
+			if (subcmd == SCMD_OOCSAY || !lang || GEN_VNUM(lang) == GET_SPEAKING(ch)) {
+				sprintf(lbuf, "\t%cYou say,%s '%s\t%c'\tn\r\n", color, (subcmd == SCMD_OOCSAY ? " out of character," : ""), argument, color);
+			}
+			else {
+				sprintf(lbuf, "\t%cYou say, in %s, '%s\t%c'\tn\r\n", color, (lang ? GEN_NAME(lang) : "another language"), argument, color);
+			}
 			send_to_char(lbuf, ch);
 
 			if (ch->desc) {
