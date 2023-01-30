@@ -2375,6 +2375,7 @@ void qt_gain_building(char_data *ch, any_vnum vnum);
 void qt_gain_tile_sector(char_data *ch, sector_vnum vnum);
 void qt_change_coins(char_data *ch);
 void qt_change_currency(char_data *ch, any_vnum vnum, int total);
+void qt_change_language(char_data *ch, any_vnum vnum, int level);
 void qt_empire_wealth(char_data *ch, any_vnum amount);
 void qt_event_start_stop(any_vnum event_vnum);
 void qt_gain_vehicle(char_data *ch, vehicle_data *veh);

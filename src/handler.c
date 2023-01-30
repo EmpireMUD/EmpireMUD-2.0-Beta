@@ -8206,6 +8206,15 @@ bool meets_requirements(char_data *ch, struct req_data *list, struct instance_da
 				}
 				break;
 			}
+			case REQ_SPEAK_LANGUAGE: {
+				ok = (speaks_language(ch, req->vnum) == LANG_SPEAK);
+				break;
+			}
+			case REQ_RECOGNIZE_LANGUAGE: {
+				int level = speaks_language(ch, req->vnum);
+				ok = (level == LANG_RECOGNIZE || level == LANG_SPEAK);
+				break;
+			}
 			
 			// some types do not support pre-reqs
 			case REQ_KILL_MOB:
@@ -8451,6 +8460,14 @@ char *requirement_string(struct req_data *req, bool show_vnums, bool allow_custo
 		}
 		case REQ_LEVEL_OVER: {
 			snprintf(output, sizeof(output), "Level over %d", req->needed);
+			break;
+		}
+		case REQ_SPEAK_LANGUAGE: {
+			snprintf(output, sizeof(output), "Able to speak %s%s", vnum, get_generic_name_by_vnum(req->vnum));
+			break;
+		}
+		case REQ_RECOGNIZE_LANGUAGE: {
+			snprintf(output, sizeof(output), "Able to recognize or speak %s%s", vnum, get_generic_name_by_vnum(req->vnum));
 			break;
 		}
 		default: {

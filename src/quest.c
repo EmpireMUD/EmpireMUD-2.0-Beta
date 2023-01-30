@@ -1175,6 +1175,15 @@ void refresh_one_quest_tracker(char_data *ch, struct player_quest *pq) {
 				task->current = (get_approximate_level(ch) >= task->needed) ? task->needed : 0;
 				break;
 			}
+			case REQ_SPEAK_LANGUAGE: {
+				task->current = (speaks_language(ch, task->vnum) == LANG_SPEAK) ? task->needed : 0;
+				break;
+			}
+			case REQ_RECOGNIZE_LANGUAGE: {
+				int mode = speaks_language(ch, task->vnum);
+				task->current = (mode == LANG_RECOGNIZE || mode == LANG_SPEAK) ? task->needed : 0;
+				break;
+			}
 		}
 	}
 }
@@ -2660,6 +2669,34 @@ void qt_change_currency(char_data *ch, any_vnum vnum, int total) {
 		LL_FOREACH(pq->tracker, task) {
 			if (task->type == REQ_GET_CURRENCY && task->vnum == vnum) {
 				task->current = total;
+			}
+		}
+	}
+}
+
+
+/**
+* Quest Tracker: ch gains/loses a language
+*
+* @param char_data *ch The player.
+* @param any_vnum vnum The generic language vnum.
+* @param int mode The new LANG_ constant.
+*/
+void qt_change_language(char_data *ch, any_vnum vnum, int level) {
+	struct player_quest *pq;
+	struct req_data *task;
+	
+	if (IS_NPC(ch)) {
+		return;
+	}
+	
+	LL_FOREACH(GET_QUESTS(ch), pq) {
+		LL_FOREACH(pq->tracker, task) {
+			if (task->type == REQ_SPEAK_LANGUAGE && task->vnum == vnum) {
+				task->current = (level == LANG_SPEAK) ? task->needed : 0;
+			}
+			else if (task->type == REQ_RECOGNIZE_LANGUAGE && task->vnum == vnum) {
+				task->current = (level == LANG_RECOGNIZE || level == LANG_SPEAK) ? task->needed : 0;
 			}
 		}
 	}

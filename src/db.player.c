@@ -4921,7 +4921,8 @@ void add_language(char_data *ch, any_vnum vnum, byte level) {
 		GET_SPEAKING(ch) = NOTHING;
 	}
 	
-	// mark for save
+	// update quests and mark for save
+	qt_change_language(ch, vnum, level);
 	queue_delayed_update(ch, CDU_SAVE);
 }
 

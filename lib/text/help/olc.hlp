@@ -6888,7 +6888,8 @@ Task types that do not apply to empire progression:
  &rCOMPLETED-QUEST, NOT-COMPLETED-QUEST, NOT-ON-QUEST, SKILL-LEVEL-OVER,
  SKILL-LEVEL-UNDER, TRIGGERED, VISIT-BUILDING, VISIT-ROOM-TEMPLATE,
  VISIT-SECTOR, HAVE-ABILITY, REP-OVER, REP-UNDER, WEARING, WEARING-OR-HAS,
- GET-CURRENCY, CAN-GAIN-SKILL, LEVEL-UNDER, LEVEL-OVER&0
+ GET-CURRENCY, CAN-GAIN-SKILL, LEVEL-UNDER, LEVEL-OVER, SPEAK-LANGUAGE,
+ RECOGNIZE-LANGUAGE&0
 
 See also: OLC PROGRESS, REQUIREMENTS
 #d
@@ -7040,6 +7041,9 @@ Available reward types:
  REPUTATION - Gain/lose faction reputation.
  CURRENCY - Gives generic currency (e.g. tokens).
  EVENT-POINTS - Points toward an event (only happens if the event is running).
+ SPEAK-LANGUAGE - Can now speak a language.
+ RECOGNIZE-LANGUAGE - Can now recognize a language (will not override one the
+    player can already speak).
 
 Note: If you set empire coins as the reward, but the mob is not part of an
 empire, the player will receive misc coins instead.
@@ -7288,6 +7292,8 @@ Available tasks:
  &cEVENT-NOT-RUNNING&0 - Not available while the event is running.
  &cLEVEL-UNDER&0 - Composite/total level not higher than this.
  &cLEVEL-OVER&0 - Composite/total level not lower than this.
+ &cSPEAK-LANGUAGE&0 - Player knows how to speak a language.
+ &cRECOGNIZE-LANGUAGE&0 - Player can recognize or speak a language.
 
 &r*&0 Some types require a trackable quest, and cannot be used as prereqs.
 ^ If a type requires flags and you use more than one flag, you MUST put the

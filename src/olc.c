@@ -5485,7 +5485,7 @@ bool olc_parse_requirement_args(char_data *ch, int type, char *argument, bool fi
 	bool need_rmt = FALSE, need_sect = FALSE, need_skill = FALSE;
 	bool need_veh = FALSE, need_mob_flags = FALSE, need_faction = FALSE;
 	bool need_currency = FALSE, need_func_flags = FALSE, need_veh_flags = FALSE;
-	bool need_dip_flags = FALSE, need_event = FALSE;
+	bool need_dip_flags = FALSE, need_event = FALSE, need_language = FALSE;
 	
 	*amount = 1;
 	*vnum = 0;
@@ -5588,6 +5588,11 @@ bool olc_parse_requirement_args(char_data *ch, int type, char *argument, bool fi
 			need_event = TRUE;
 			break;
 		}
+		case REQ_SPEAK_LANGUAGE:
+		case REQ_RECOGNIZE_LANGUAGE: {
+			need_language = TRUE;
+			break;
+		}
 		case REQ_OWN_HOMES:
 		case REQ_CROP_VARIETY:
 		case REQ_EMPIRE_WEALTH:
@@ -5663,6 +5668,19 @@ bool olc_parse_requirement_args(char_data *ch, int type, char *argument, bool fi
 		}
 		if (!(gen = find_generic(atoi(arg), GENERIC_CURRENCY))) {
 			msg_to_char(ch, "Invalid generic currency '%s'.\r\n", arg);
+			return FALSE;
+		}
+		*vnum = GEN_VNUM(gen);
+	}
+	if (need_language) {
+		generic_data *gen;
+		argument = any_one_word(argument, arg);
+		if (!*arg) {
+			msg_to_char(ch, "You must provide a generic language vnum or name.\r\n");
+			return FALSE;
+		}
+		if (!((gen = find_generic(atoi(arg), GENERIC_LANGUAGE)) || (gen = find_generic_no_spaces(GENERIC_LANGUAGE, arg)))) {
+			msg_to_char(ch, "Invalid generic language '%s'.\r\n", arg);
 			return FALSE;
 		}
 		*vnum = GEN_VNUM(gen);

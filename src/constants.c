@@ -4433,6 +4433,8 @@ const char *requirement_types[] = {
 	"LEVEL-UNDER",
 	"LEVEL-OVER",
 	"OWN-VEHICLE-FUNCTION",	// 40
+	"SPEAK-LANGUAGE",
+	"RECOGNIZE-LANGUAGE",
 	"\n",
 };
 
@@ -4479,6 +4481,8 @@ const bool requirement_amt_type[] = {
 	REQ_AMT_NONE,	// event not running
 	REQ_AMT_THRESHOLD,	// level under
 	REQ_AMT_THRESHOLD,	// level over
+	REQ_AMT_NONE,	// speak-language
+	REQ_AMT_NONE,	// recognize-language
 };
 
 
@@ -4524,6 +4528,8 @@ const bool requirement_needs_tracker[] = {
 	FALSE,	// event not running
 	FALSE,	// level under
 	FALSE,	// level over
+	FALSE,	// speak-language
+	FALSE,	// recognize-language
 };
 
 
