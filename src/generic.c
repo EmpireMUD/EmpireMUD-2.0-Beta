@@ -507,6 +507,10 @@ void olc_search_generic(char_data *ch, any_vnum vnum) {
 		// QR_x: event rewards
 		any = find_event_reward_in_list(EVT_RANK_REWARDS(event), QR_CURRENCY, vnum);
 		any |= find_event_reward_in_list(EVT_THRESHOLD_REWARDS(event), QR_CURRENCY, vnum);
+		any |= find_event_reward_in_list(EVT_RANK_REWARDS(event), QR_SPEAK_LANGUAGE, vnum);
+		any |= find_event_reward_in_list(EVT_THRESHOLD_REWARDS(event), QR_SPEAK_LANGUAGE, vnum);
+		any |= find_event_reward_in_list(EVT_RANK_REWARDS(event), QR_RECOGNIZE_LANGUAGE, vnum);
+		any |= find_event_reward_in_list(EVT_THRESHOLD_REWARDS(event), QR_RECOGNIZE_LANGUAGE, vnum);
 		
 		if (any) {
 			++found;
@@ -571,6 +575,8 @@ void olc_search_generic(char_data *ch, any_vnum vnum) {
 		any |= find_requirement_in_list(QUEST_TASKS(quest), REQ_EMPIRE_PRODUCED_COMPONENT, vnum);
 		any |= find_requirement_in_list(QUEST_PREREQS(quest), REQ_EMPIRE_PRODUCED_COMPONENT, vnum);
 		any |= find_quest_reward_in_list(QUEST_REWARDS(quest), QR_CURRENCY, vnum);
+		any |= find_quest_reward_in_list(QUEST_REWARDS(quest), QR_SPEAK_LANGUAGE, vnum);
+		any |= find_quest_reward_in_list(QUEST_REWARDS(quest), QR_RECOGNIZE_LANGUAGE, vnum);
 		
 		if (any) {
 			++found;
@@ -1278,6 +1284,10 @@ void olc_delete_generic(char_data *ch, any_vnum vnum) {
 		// QR_x: event reward types
 		found = delete_event_reward_from_list(&EVT_RANK_REWARDS(event), QR_CURRENCY, vnum);
 		found |= delete_event_reward_from_list(&EVT_THRESHOLD_REWARDS(event), QR_CURRENCY, vnum);
+		found |= delete_event_reward_from_list(&EVT_RANK_REWARDS(event), QR_SPEAK_LANGUAGE, vnum);
+		found |= delete_event_reward_from_list(&EVT_THRESHOLD_REWARDS(event), QR_SPEAK_LANGUAGE, vnum);
+		found |= delete_event_reward_from_list(&EVT_RANK_REWARDS(event), QR_RECOGNIZE_LANGUAGE, vnum);
+		found |= delete_event_reward_from_list(&EVT_THRESHOLD_REWARDS(event), QR_RECOGNIZE_LANGUAGE, vnum);
 		
 		if (found) {
 			// SET_BIT(EVT_FLAGS(event), EVTF_IN_DEVELOPMENT);
@@ -1338,6 +1348,8 @@ void olc_delete_generic(char_data *ch, any_vnum vnum) {
 		found |= delete_requirement_from_list(&QUEST_PREREQS(quest), REQ_EMPIRE_PRODUCED_COMPONENT, vnum);
 		
 		found |= delete_quest_reward_from_list(&QUEST_REWARDS(quest), QR_CURRENCY, vnum);
+		found |= delete_quest_reward_from_list(&QUEST_REWARDS(quest), QR_SPEAK_LANGUAGE, vnum);
+		found |= delete_quest_reward_from_list(&QUEST_REWARDS(quest), QR_RECOGNIZE_LANGUAGE, vnum);
 		
 		if (found) {
 			any_quest = TRUE;
@@ -1426,10 +1438,14 @@ void olc_delete_generic(char_data *ch, any_vnum vnum) {
 			// QR_x: event reward types
 			found = delete_event_reward_from_list(&EVT_RANK_REWARDS(GET_OLC_EVENT(desc)), QR_CURRENCY, vnum);
 			found |= delete_event_reward_from_list(&EVT_THRESHOLD_REWARDS(GET_OLC_EVENT(desc)), QR_CURRENCY, vnum);
+			found |= delete_event_reward_from_list(&EVT_RANK_REWARDS(GET_OLC_EVENT(desc)), QR_SPEAK_LANGUAGE, vnum);
+			found |= delete_event_reward_from_list(&EVT_THRESHOLD_REWARDS(GET_OLC_EVENT(desc)), QR_SPEAK_LANGUAGE, vnum);
+			found |= delete_event_reward_from_list(&EVT_RANK_REWARDS(GET_OLC_EVENT(desc)), QR_RECOGNIZE_LANGUAGE, vnum);
+			found |= delete_event_reward_from_list(&EVT_THRESHOLD_REWARDS(GET_OLC_EVENT(desc)), QR_RECOGNIZE_LANGUAGE, vnum);
 		
 			if (found) {
 				// SET_BIT(EVT_FLAGS(GET_OLC_EVENT(desc)), EVTF_IN_DEVELOPMENT);
-				msg_to_desc(desc, "A generic currency used as a reward by the event you are editing was deleted.\r\n");
+				msg_to_desc(desc, "A generic used as a reward by the event you are editing was deleted.\r\n");
 			}
 		}
 		if (GET_OLC_OBJECT(desc)) {
@@ -1470,6 +1486,8 @@ void olc_delete_generic(char_data *ch, any_vnum vnum) {
 			found |= delete_requirement_from_list(&QUEST_PREREQS(GET_OLC_QUEST(desc)), REQ_EMPIRE_PRODUCED_COMPONENT, vnum);
 			
 			found |= delete_quest_reward_from_list(&QUEST_REWARDS(GET_OLC_QUEST(desc)), QR_CURRENCY, vnum);
+			found |= delete_quest_reward_from_list(&QUEST_REWARDS(GET_OLC_QUEST(desc)), QR_SPEAK_LANGUAGE, vnum);
+			found |= delete_quest_reward_from_list(&QUEST_REWARDS(GET_OLC_QUEST(desc)), QR_RECOGNIZE_LANGUAGE, vnum);
 		
 			if (found) {
 				SET_BIT(QUEST_FLAGS(GET_OLC_QUEST(desc)), QST_IN_DEVELOPMENT);
