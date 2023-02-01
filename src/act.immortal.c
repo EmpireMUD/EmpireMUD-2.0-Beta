@@ -5225,7 +5225,7 @@ SHOW(show_languages) {
 			}
 		
 			// show it
-			snprintf(line, sizeof(line), " [%5d] %s (%s)%s\r\n", GEN_VNUM(gen), GEN_NAME(gen), language_types[lang->level], (GET_SPEAKING(plr) == lang->vnum) ? " - \tgcurrently speaking\t0" : "");
+			snprintf(line, sizeof(line), " [%5d] %s (%s)%s%s\r\n", GEN_VNUM(gen), GEN_NAME(gen), language_types[lang->level], (GET_SPEAKING(plr) == lang->vnum) ? " - \tgcurrently speaking\t0" : "", (GET_LOYALTY(plr) && speaks_language_empire(GET_LOYALTY(plr), lang->vnum) == lang->level) ? ", from empire" : "");
 			if (size + strlen(line) < sizeof(output)) {
 				strcat(output, line);
 				size += strlen(line);

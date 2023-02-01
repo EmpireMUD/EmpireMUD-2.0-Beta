@@ -242,7 +242,6 @@ char *list_one_craft(craft_data *craft, bool detail) {
 * @param craft_vnum vnum The vnum to delete.
 */
 void olc_delete_craft(char_data *ch, craft_vnum vnum) {
-	struct progress_perk *perk, *next_perk;
 	progress_data *prg, *next_prg;
 	empire_data *emp, *next_emp;
 	obj_data *obj, *next_obj;
@@ -298,12 +297,8 @@ void olc_delete_craft(char_data *ch, craft_vnum vnum) {
 	
 	// update progression
 	HASH_ITER(hh, progress_table, prg, next_prg) {
-		LL_FOREACH_SAFE(PRG_PERKS(prg), perk, next_perk) {
-			if (perk->type == PRG_PERK_CRAFT && perk->value == vnum) {
-				LL_DELETE(PRG_PERKS(prg), perk);
-				free(perk);
-				save_library_file_for_vnum(DB_BOOT_PRG, PRG_VNUM(prg));
-			}
+		if (delete_progress_perk_from_list(&PRG_PERKS(prg), PRG_PERK_CRAFT, vnum)) {
+			save_library_file_for_vnum(DB_BOOT_PRG, PRG_VNUM(prg));
 		}
 	}
 	
@@ -316,12 +311,9 @@ void olc_delete_craft(char_data *ch, craft_vnum vnum) {
 			}
 		}
 		else if (GET_OLC_PROGRESS(desc)) {
-			LL_FOREACH_SAFE(PRG_PERKS(GET_OLC_PROGRESS(desc)), perk, next_perk) {
-				if (perk->type == PRG_PERK_CRAFT && perk->value == vnum) {
-					LL_DELETE(PRG_PERKS(GET_OLC_PROGRESS(desc)), perk);
-					free(perk);
-					save_library_file_for_vnum(DB_BOOT_PRG, PRG_VNUM(GET_OLC_PROGRESS(desc)));
-				}
+			if (delete_progress_perk_from_list(&PRG_PERKS(GET_OLC_PROGRESS(desc)), PRG_PERK_CRAFT, vnum)) {
+				save_library_file_for_vnum(DB_BOOT_PRG, PRG_VNUM(GET_OLC_PROGRESS(desc)));
+				msg_to_char(desc->character, "A craft used by the progress goal you're editing was deleted.\r\n");
 			}
 		}
 	}
@@ -495,7 +487,6 @@ void olc_fullsearch_craft(char_data *ch, char *argument) {
 void olc_search_craft(char_data *ch, craft_vnum vnum) {
 	char buf[MAX_STRING_LENGTH];
 	craft_data *craft = craft_proto(vnum);
-	struct progress_perk *perk, *next_perk;
 	progress_data *prg, *next_prg;
 	obj_data *obj, *next_obj;
 	int size, found;
@@ -518,12 +509,9 @@ void olc_search_craft(char_data *ch, craft_vnum vnum) {
 	
 	// progression
 	HASH_ITER(hh, progress_table, prg, next_prg) {
-		LL_FOREACH_SAFE(PRG_PERKS(prg), perk, next_perk) {
-			if (perk->type == PRG_PERK_CRAFT && perk->value == vnum) {
-				++found;
-				size += snprintf(buf + size, sizeof(buf) - size, "PRG [%5d] %s\r\n", PRG_VNUM(prg), PRG_NAME(prg));
-				break;
-			}
+		if (find_progress_perk_in_list(PRG_PERKS(prg), PRG_PERK_CRAFT, vnum)) {
+			++found;
+			size += snprintf(buf + size, sizeof(buf) - size, "PRG [%5d] %s\r\n", PRG_VNUM(prg), PRG_NAME(prg));
 		}
 	}
 	

@@ -2918,6 +2918,8 @@ const char *progress_perk_types[] = {
 	"Greatness-territory",
 	"Workforce-cap",
 	"Territory",
+	"Speak-language",
+	"Recognize-language",
 	"\n"
 };
 

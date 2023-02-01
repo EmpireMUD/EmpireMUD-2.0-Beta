@@ -576,6 +576,7 @@ int CAN_CARRY_N(char_data *ch);	// formerly a macro
 #define EMPIRE_TERRITORY(emp, type)  ((emp)->territory[(type)])
 #define EMPIRE_WEALTH(emp)  ((emp)->wealth)
 #define EMPIRE_POPULATION(emp)  ((emp)->population)
+#define EMPIRE_LANGUAGES(emp)  ((emp)->languages)
 #define EMPIRE_LEARNED_CRAFTS(emp)  ((emp)->learned_crafts)
 #define EMPIRE_MAPOUT_TOKEN(emp)  ((emp)->mapout_token)
 #define EMPIRE_MEMBER_ACCOUNTS(emp)  ((emp)->member_accounts)
@@ -2308,8 +2309,10 @@ void check_for_eligible_goals(empire_data *emp);
 void check_progress_refresh();
 int count_diplomacy(empire_data *emp, bitvector_t dip_flags);
 bool empire_meets_goal_prereqs(empire_data *emp, progress_data *prg);
+bool delete_progress_perk_from_list(struct progress_perk **list, int type, int value);
 progress_data *find_current_progress_goal_by_name(empire_data *emp, char *name);
 progress_data *find_progress_goal_by_name(char *name);
+bool find_progress_perk_in_list(struct progress_perk *list, int type, int value);
 progress_data *find_purchasable_goal_by_name(empire_data *emp, char *name);
 void full_reset_empire_progress(empire_data *only_emp);
 void purchase_goal(empire_data *emp, progress_data *prg, char_data *purchased_by);

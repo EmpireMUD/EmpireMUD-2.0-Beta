@@ -2290,7 +2290,8 @@ communication such as 'say' or 'shout'. You can also specify a language for a
 single say/shout with #<language>. For example: say #low-goblish Hello!
 
 Typing 'speak' without an argument lists the languages you know and shows which
-one you're currently speaking.
+one you're currently speaking. If a language is unlocked by your empire,
+usually from progress goals, it will be indicated here.
 
 See also: SAY, SHOUT
 #

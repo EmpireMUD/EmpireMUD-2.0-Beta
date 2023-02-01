@@ -558,6 +558,10 @@ void olc_search_generic(char_data *ch, any_vnum vnum) {
 		any |= find_requirement_in_list(PRG_TASKS(prg), REQ_SPEAK_LANGUAGE, vnum);
 		any |= find_requirement_in_list(PRG_TASKS(prg), REQ_RECOGNIZE_LANGUAGE, vnum);
 		
+		// PRG_PERK_x:
+		any |= find_progress_perk_in_list(PRG_PERKS(prg), PRG_PERK_SPEAK_LANGUAGE, vnum);
+		any |= find_progress_perk_in_list(PRG_PERKS(prg), PRG_PERK_RECOGNIZE_LANGUAGE, vnum);
+		
 		if (any) {
 			++found;
 			size += snprintf(buf + size, sizeof(buf) - size, "PRG [%5d] %s\r\n", PRG_VNUM(prg), PRG_NAME(prg));
@@ -1343,6 +1347,10 @@ void olc_delete_generic(char_data *ch, any_vnum vnum) {
 		found |= delete_requirement_from_list(&PRG_TASKS(prg), REQ_SPEAK_LANGUAGE, vnum);
 		found |= delete_requirement_from_list(&PRG_TASKS(prg), REQ_RECOGNIZE_LANGUAGE, vnum);
 		
+		// PRG_PERK_x: perks
+		found |= delete_progress_perk_from_list(&PRG_PERKS(prg), PRG_PERK_SPEAK_LANGUAGE, vnum);
+		found |= delete_progress_perk_from_list(&PRG_PERKS(prg), PRG_PERK_RECOGNIZE_LANGUAGE, vnum);
+		
 		if (found) {
 			any_progress = TRUE;
 			SET_BIT(PRG_FLAGS(prg), PRG_IN_DEVELOPMENT);
@@ -1495,6 +1503,9 @@ void olc_delete_generic(char_data *ch, any_vnum vnum) {
 			found |= delete_requirement_from_list(&PRG_TASKS(GET_OLC_PROGRESS(desc)), REQ_EMPIRE_PRODUCED_COMPONENT, vnum);
 			found |= delete_requirement_from_list(&PRG_TASKS(GET_OLC_PROGRESS(desc)), REQ_SPEAK_LANGUAGE, vnum);
 			found |= delete_requirement_from_list(&PRG_TASKS(GET_OLC_PROGRESS(desc)), REQ_RECOGNIZE_LANGUAGE, vnum);
+			
+			found |= delete_progress_perk_from_list(&PRG_PERKS(GET_OLC_PROGRESS(desc)), PRG_PERK_SPEAK_LANGUAGE, vnum);
+			found |= delete_progress_perk_from_list(&PRG_PERKS(GET_OLC_PROGRESS(desc)), PRG_PERK_RECOGNIZE_LANGUAGE, vnum);
 		
 			if (found) {
 				SET_BIT(QUEST_FLAGS(GET_OLC_PROGRESS(desc)), PRG_IN_DEVELOPMENT);

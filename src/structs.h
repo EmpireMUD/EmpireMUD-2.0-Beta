@@ -2562,6 +2562,8 @@ typedef enum {
 #define PRG_PERK_TERRITORY_PER_GREATNESS  5	// increases territory per greatness
 #define PRG_PERK_WORKFORCE_CAP  6	// higher workforce caps
 #define PRG_PERK_TERRITORY  7	// grants bonus territory (flat rate)
+#define PRG_PERK_SPEAK_LANGUAGE  8	// whole empire may speak
+#define PRG_PERK_RECOGNIZE_LANGUAGE  9	// whole empire may recognize
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -4399,7 +4401,7 @@ struct player_ability_data {
 };
 
 
-// languages a player knows
+// languages a player knows -- also used for empires
 struct player_language {
 	any_vnum vnum;	// vnum of the language (generic)
 	byte level;	// LANG_ constant for how well they speak it
@@ -5298,6 +5300,7 @@ struct empire_data {
 	struct offense_data *offenses;	// doubly-linked list
 	struct empire_goal *goals;	// current goal trackers (hash by vnum)
 	struct empire_completed_goal *completed_goals;	// actually a hash (vnum)
+	struct player_language *languages;	// languages available to the whole empire
 	struct player_craft_data *learned_crafts;	// crafts available to the whole empire
 	struct theft_log *theft_logs;	// recently stolen items
 	struct empire_production_total *production_totals;	// totals of items produced by the empire (hash by vnum)

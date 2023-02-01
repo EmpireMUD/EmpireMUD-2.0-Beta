@@ -2014,7 +2014,7 @@ ACMD(do_say) {
 
 
 ACMD(do_speak) {
-	char buf[MAX_STRING_LENGTH], line[256];
+	char buf[MAX_STRING_LENGTH], line[256], mods[256];
 	struct player_language *lang, *next_lang;
 	generic_data *gen;
 	size_t size, lsize;
@@ -2042,11 +2042,25 @@ ACMD(do_speak) {
 			
 			// ok:
 			++count;
+			
+			// build modifiers
+			*mods = '\0';
 			if (lang->level == LANG_RECOGNIZE) {
-				lsize = snprintf(line, sizeof(line), " %s (recognize only)%s\r\n", GEN_NAME(gen), (GET_SPEAKING(ch) == lang->vnum) ? " - \tgcurrently speaking\t0" : "");
+				sprintf(mods + strlen(mods), "%srecognize only", (*mods ? ", " : ""));
+			}
+			if (GET_LOYALTY(ch) && speaks_language_empire(GET_LOYALTY(ch), lang->vnum) == lang->level) {
+				sprintf(mods + strlen(mods), "%sempire", (*mods ? ", " : ""));
+			}
+			if (GET_SPEAKING(ch) == lang->vnum) {
+				sprintf(mods + strlen(mods), "%s\tgcurrently speaking\t0", (*mods ? ", " : ""));
+			}
+			
+			// build line
+			if (*mods) {
+				lsize = snprintf(line, sizeof(line), " %s (%s)\r\n", GEN_NAME(gen), mods);
 			}
 			else {
-				lsize = snprintf(line, sizeof(line), " %s%s\r\n", GEN_NAME(gen), (GET_SPEAKING(ch) == lang->vnum) ? " - \tgcurrently speaking\t0" : "");
+				lsize = snprintf(line, sizeof(line), " %s\r\n", GEN_NAME(gen));
 			}
 			
 			// append

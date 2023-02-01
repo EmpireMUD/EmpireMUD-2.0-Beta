@@ -3736,7 +3736,7 @@ See also: GENERIC COMPONENTS
 
 The 'language' generic type creates languages that players and NPCs can speak.
 
-Languages only have a name and some flags. Players can refer to a langauge by
+Languages only have a name and some flags. Players can refer to a language by
 its whole name, or can remove the spaces or replace spaces with dashes. For
 example, a language called "Old High Western" can also be referred to as
 "old-high-western" or "oldhighwestern".
@@ -6852,6 +6852,8 @@ Perk types:
  Greatness-territory - Increases territory per greatness point.
  Workforce-cap - Raises the maximum workforce cap.
  Territory - Directly adds to the total territory for an empire.
+ Speak-language - All members can speak this language.
+ Recognize-language - All members can recognize this language when spoken.
 
 Note: To grant progress points for a goal, set the 'value' field instead.
 

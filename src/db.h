@@ -679,6 +679,7 @@ extern int max_inventory_size;
 extern bool pause_affect_total;
 
 void add_language(char_data *ch, any_vnum vnum, byte level);
+void add_language_empire(empire_data *emp, any_vnum vnum, byte level);
 void add_lastname(char_data *ch, char *name);
 bool add_player_to_table(player_index_data *plr);
 void check_autowiz(char_data *ch);
@@ -706,6 +707,7 @@ void remove_lastname(char_data *ch, char *name);
 void remove_player_from_table(player_index_data *plr);
 void save_all_players(bool delay);
 int speaks_language(char_data *ch, any_vnum vnum);
+int speaks_language_empire(empire_data *emp, any_vnum vnum);
 void start_new_character(char_data *ch);
 int *summarize_weekly_playtime(empire_data *emp);
 void write_mail_to_file(FILE *fl, char_data *ch);

@@ -1937,6 +1937,7 @@ void free_empire(empire_data *emp) {
 	struct workforce_log *wf_log;
 	struct shipping_data *shipd, *next_shipd;
 	struct workforce_production_log *wplog, *next_wplog;
+	struct player_language *lang, *next_lang;
 	room_data *room;
 	int iter;
 	
@@ -1968,6 +1969,12 @@ void free_empire(empire_data *emp) {
 		
 		emp->city_list = city->next;
 		free(city);
+	}
+	
+	// free languages
+	HASH_ITER(hh, EMPIRE_LANGUAGES(emp), lang, next_lang) {
+		HASH_DEL(EMPIRE_LANGUAGES(emp), lang);
+		free(lang);
 	}
 	
 	// free learned crafts
@@ -2640,6 +2647,16 @@ void parse_empire(FILE *fl, empire_vnum vnum) {
 						}
 						break;
 					}
+					case 'M': {	// GM: languages
+						if (sscanf(line, "GM %d %d", &t[0], &t[1]) != 2) {
+							log("SYSERR: Format error in GM line of empire %d", vnum);
+							// not fatal
+							break;
+						}
+						
+						add_language_empire(emp, t[0], t[1]);
+						break;
+					}
 					case 'P': {	// GP: goal points (progress points)
 						if (sscanf(line, "GP %d %d", &t[0], &t[1]) != 2) {
 							log("SYSERR: Format error in GP line of empire %d", vnum);
@@ -2933,6 +2950,7 @@ void write_empire_to_file(FILE *fl, empire_data *emp) {
 	struct empire_territory_data *ter, *next_ter;
 	struct empire_completed_goal *ecg, *next_ecg;
 	struct player_craft_data *pcd, *next_pcd;
+	struct player_language *lang, *next_lang;
 	struct empire_goal *egoal, *next_egoal;
 	struct empire_needs *need, *next_need;
 	struct empire_homeless_citizen *ehc;
@@ -3010,6 +3028,10 @@ void write_empire_to_file(FILE *fl, empire_data *emp) {
 	HASH_ITER(hh, EMPIRE_LEARNED_CRAFTS(emp), pcd, next_pcd) {
 		// GL learned crafts
 		fprintf(fl, "GL %d %d\n", pcd->vnum, pcd->count);
+	}
+	// GM languages
+	HASH_ITER(hh, EMPIRE_LANGUAGES(emp), lang, next_lang) {
+		fprintf(fl, "GM %d %d\n", lang->vnum, lang->level);
 	}
 	for (iter = 0; iter < NUM_PROGRESS_TYPES; ++iter) {
 		// GP goal points (progress points)

@@ -4928,6 +4928,114 @@ void add_language(char_data *ch, any_vnum vnum, byte level) {
 
 
 /**
+* Adds (or updates) a language for an empires. If the level is LANG_UNKNOWN, it
+* will delete the entry (this is the default). Empire languages are only used
+* to give languages to members.
+*
+* @param empire_data *emp The empire.
+* @param any_vnum vnum The vnum of the language (generic).
+* @param byte level Any LANG_ const to indicate how well they know it the language.
+*/
+void add_language_empire(empire_data *emp, any_vnum vnum, byte level) {
+	struct player_language *pl;
+	
+	if (!emp) {
+		return;	// oops
+	}
+	
+	// find
+	HASH_FIND_INT(EMPIRE_LANGUAGES(emp), &vnum, pl);
+	
+	// add if necessary
+	if (!pl && level != LANG_UNKNOWN) {
+		CREATE(pl, struct player_language, 1);
+		pl->vnum = vnum;
+		HASH_ADD_INT(EMPIRE_LANGUAGES(emp), vnum, pl);
+	}
+	
+	// update
+	if (pl) {
+		pl->level = level;
+	}
+	
+	// delete if necessary?
+	if (pl && pl->level == LANG_UNKNOWN) {
+		HASH_DEL(EMPIRE_LANGUAGES(emp), pl);
+		free(pl);
+		pl = NULL;
+	}
+	
+	// update quests and mark for save
+	// et_change_language(emp, vnum, level);
+	EMPIRE_NEEDS_SAVE(emp) = TRUE;
+}
+
+
+/**
+* Grants a player all the languages their empire speaks. This is meant to be
+* called from within check_languages(), which immediately validates them all.
+*
+* @param char_data *ch The player.
+*/
+static void assign_empire_languages(char_data *ch) {
+	struct player_language *pl, *next_pl;
+	int level;
+	
+	if (!ch || IS_NPC(ch) || !GET_LOYALTY(ch)) {
+		return;	// no work
+	}
+	
+	HASH_ITER(hh, EMPIRE_LANGUAGES(GET_LOYALTY(ch)), pl, next_pl) {
+		level = speaks_language(ch, pl->vnum);
+		if (level < pl->level) {
+			add_language(ch, pl->vnum, pl->level);
+		}
+	}
+}
+
+
+void check_empire_languages(void) {
+	empire_data *emp, *next_emp;
+	generic_data *gen;
+	struct player_language *lang, *next_lang;
+	bool ok = FALSE, save;
+	
+	HASH_ITER(hh, empire_table, emp, next_emp) {
+		save = FALSE;
+		
+		HASH_ITER(hh, EMPIRE_LANGUAGES(emp), lang, next_lang) {
+			// audit it
+			if (!(gen = find_generic(lang->vnum, GENERIC_LANGUAGE))) {
+				ok = FALSE;	// deleted?
+			}
+			else if (GEN_FLAGGED(gen, GEN_IN_DEVELOPMENT)) {
+				ok = FALSE;	// in-dev
+			}
+			else if (lang->level == LANG_UNKNOWN) {
+				ok = FALSE;	// might as well delete these here
+			}
+			else {
+				// seems ok
+				ok = TRUE;
+			}
+		
+			// did we make it
+			if (!ok) {
+				// remove
+				save = TRUE;
+				HASH_DEL(EMPIRE_LANGUAGES(emp), lang);
+				free(lang);
+			}
+		}
+		
+		if (save) {
+			EMPIRE_NEEDS_SAVE(emp) = TRUE;
+		}
+	}
+}
+
+
+/**
 * This is called when a character logs in or when a language is saved in OLC
 * (under some circumstances) to ensure the character has the correct languages
 * in their list.
@@ -4943,6 +5051,8 @@ void check_languages(char_data *ch) {
 	if (IS_NPC(ch)) {
 		return;
 	}
+	
+	assign_empire_languages(ch);
 	
 	// check languages they know
 	HASH_ITER(hh, GET_LANGUAGES(ch), lang, next_lang) {
@@ -5031,6 +5141,8 @@ void check_languages_all(void) {
 			check_languages(ch);
 		}
 	}
+	
+	check_empire_languages();
 }
 
 
@@ -5056,6 +5168,28 @@ int speaks_language(char_data *ch, any_vnum vnum) {
 	
 	// find
 	HASH_FIND_INT(GET_LANGUAGES(ch), &vnum, pl);
+	return pl ? pl->level : LANG_UNKNOWN;
+}
+
+
+/**
+* Determines if an empire has unlocked a language at the empire level (usually
+* from progress goals).
+*
+* @param empire_data *emp The empire.
+* @param any_vnum vnum The vnum of the language (generic).
+* @return int A LANG_ constant indicating how well the empire knows the language.
+*/
+int speaks_language_empire(empire_data *emp, any_vnum vnum) {
+	struct player_language *pl;
+	
+	if (!emp) {
+		// oops
+		return LANG_UNKNOWN;
+	}
+	
+	// find
+	HASH_FIND_INT(EMPIRE_LANGUAGES(emp), &vnum, pl);
 	return pl ? pl->level : LANG_UNKNOWN;
 }
 
