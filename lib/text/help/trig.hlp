@@ -635,6 +635,9 @@ Special Variables When using field - The variable returns:
 &cinstance.set_location(room)&0 - Changes the map location of the instance, for
    example if the adventure appears to move.
 &cinstance.start&0 - The entry room of the instance, if any.
+&clanguage.name(vnum|short)&0 - Gets the full name of a language (Low Goblish).
+&clanguage.short(vnum|name)&0 - Gets the short name of a language (low-goblish).
+&clanguage.vnum(short|name)&0 - Gets the vnum of a language by name.
 &cpeople.<vnum>&0 - This variable returns the number of people in the room 
    specified via vnum.
 &crandom.<#>&0 - This returns a number between 1 and the field value. 

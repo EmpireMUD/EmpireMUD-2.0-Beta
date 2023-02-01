@@ -2147,8 +2147,8 @@ const char *generic_flags[] = {
 // LANG_x: how well someone speaks a language
 const char *language_types[] = {
 	"unknown",	// 0
-	"can recognize",
-	"can speak",
+	"recognizes",
+	"speaks",
 	"\n"
 };
 

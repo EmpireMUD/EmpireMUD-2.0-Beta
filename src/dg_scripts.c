@@ -2679,6 +2679,44 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					strcpy(str, "UNKNOWN");
 				}
 			}
+			else if (!str_cmp(var, "language")) {
+				generic_data *lang = NULL;
+				
+				// look up language
+				if (subfield && *subfield) {
+					if (isdigit(*subfield)) {
+						lang = find_generic(atoi(subfield), GENERIC_LANGUAGE);
+					}
+					if (!lang) {
+						lang = find_generic_no_spaces(GENERIC_LANGUAGE, subfield);
+					}
+				}
+				
+				if (!str_cmp(field, "name")) {
+					snprintf(str, slen, "%s", lang ? GEN_NAME(lang) : "");
+				}
+				else if (!str_cmp(field, "short")) {
+					char temp[1024];
+					int pos;
+					
+					strcpy(temp, lang ? GEN_NAME(lang) : "");
+					for (pos = 0; pos < strlen(temp); ++pos) {
+						if (temp[pos] == ' ') {
+							temp[pos] = '-';
+						}
+						else {
+							temp[pos] = LOWER(temp[pos]);
+						}
+					}
+					snprintf(str, slen, "%s", temp);
+				}
+				else if (!str_cmp(field, "vnum")) {
+					snprintf(str, slen, "%d", lang ? GEN_VNUM(lang) : -1);
+				}
+				else {
+					snprintf(str, slen, "UNKNOWN");
+				}
+			}
 			else if (!str_cmp(var, "random")) {
 				if (!str_cmp(field, "char") || !str_cmp(field, "ally") || !str_cmp(field, "enemy")) {
 					bool ally = (!str_cmp(field, "ally") ? TRUE : FALSE);
