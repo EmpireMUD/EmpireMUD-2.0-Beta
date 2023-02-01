@@ -594,9 +594,9 @@ void speech_mtrigger(char_data *actor, char *str, generic_data *language) {
 					union script_driver_data_u sdd;
 					ADD_UID_VAR(buf, t, char_script_id(actor), "actor", 0);
 					add_var(&GET_TRIG_VARS(t), "speech", str, 0);
-					add_var(&GET_TRIG_VARS(t), "language", language ? GEN_NAME(language) : "", 0);
+					add_var(&GET_TRIG_VARS(t), "lang", language ? GEN_NAME(language) : "", 0);
 					sprintf(buf, "%d", language ? GEN_VNUM(language) : NOTHING);
-					add_var(&GET_TRIG_VARS(t), "language_vnum", buf, 0);
+					add_var(&GET_TRIG_VARS(t), "lang_vnum", buf, 0);
 					sdd.c = ch;
 					script_driver(&sdd, t, MOB_TRIGGER, TRIG_NEW);
 					
@@ -2087,9 +2087,9 @@ void speech_wtrigger(char_data *actor, char *str, generic_data *language) {
 			ADD_UID_VAR(buf, t, room_script_id(room), "room", 0);
 			ADD_UID_VAR(buf, t, char_script_id(actor), "actor", 0);
 			add_var(&GET_TRIG_VARS(t), "speech", str, 0);
-			add_var(&GET_TRIG_VARS(t), "language", language ? GEN_NAME(language) : "", 0);
+			add_var(&GET_TRIG_VARS(t), "lang", language ? GEN_NAME(language) : "", 0);
 			sprintf(buf, "%d", language ? GEN_VNUM(language) : NOTHING);
-			add_var(&GET_TRIG_VARS(t), "language_vnum", buf, 0);
+			add_var(&GET_TRIG_VARS(t), "lang_vnum", buf, 0);
 			sdd.r = room;
 			script_driver(&sdd, t, WLD_TRIGGER, TRIG_NEW);
 			
@@ -2754,9 +2754,9 @@ void speech_vtrigger(char_data *actor, char *str, generic_data *language) {
 					union script_driver_data_u sdd;
 					ADD_UID_VAR(buf, t, char_script_id(actor), "actor", 0);
 					add_var(&GET_TRIG_VARS(t), "speech", str, 0);
-					add_var(&GET_TRIG_VARS(t), "language", language ? GEN_NAME(language) : "", 0);
+					add_var(&GET_TRIG_VARS(t), "lang", language ? GEN_NAME(language) : "", 0);
 					sprintf(buf, "%d", language ? GEN_VNUM(language) : NOTHING);
-					add_var(&GET_TRIG_VARS(t), "language_vnum", buf, 0);
+					add_var(&GET_TRIG_VARS(t), "lang_vnum", buf, 0);
 					sdd.v = veh;
 					script_driver(&sdd, t, VEH_TRIGGER, TRIG_NEW);
 					break;

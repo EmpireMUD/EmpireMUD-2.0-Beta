@@ -689,8 +689,8 @@ Note: Speech triggers attached to charmed mobs will not fire unless the trigger
 Variables:
   &c%actor%&0 - The character whose speech activated the trigger.
   &c%speech%&0 - The entire phrase spoken.
-  &c%language%&0 - The name of the language the person used, if any ("Low Goblish").
-  &c%language_vnum%&0 - The vnum of the language used, if any.
+  &c%lang%&0 - The name of the language the person used, if any ("Low Goblish").
+  &c%lang_vnum%&0 - The vnum of the language used, if any.
 
 You can add the "Player-in-Room" modifier.
 
