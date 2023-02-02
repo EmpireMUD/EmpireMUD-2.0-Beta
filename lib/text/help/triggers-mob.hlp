@@ -600,7 +600,7 @@ When using field  - The variable returns:
 &cset_skill(name,level)&0 - Change a player's skill level, also gain_skill()
 &csex&0 - The actor's sex, as a string: MALE, FEMALE, or NEUTRAL.
 &cskill(name)&0 - The player's level in the given skill.
-&cspeaking&0 - Which language the character is set to speak.
+&cspeaking&0 - Vnum of the language the character is set to speak.
 &cstr&0 - The actor's Strength.
 &cthirst&0 or &cthirst(hours)&0 - Returns how thirsty the player is, or makes
    them more or less thirsty (0 is not thirsty).
