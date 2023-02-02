@@ -173,7 +173,14 @@ bool determine_language_from_string(char_data *ch, char **argument, generic_data
 		*find_lang = find_generic(GET_SPEAKING(ch), GENERIC_LANGUAGE);
 	}
 	if (IS_NPC(ch) && (!*find_lang || AFF_FLAGGED(ch, AFF_ORDERED))) {
-		*find_lang = find_generic(config_get_int("default_language_vnum"), GENERIC_LANGUAGE);
+		*find_lang = NULL;	// in case it was ordered
+		if (MOB_LANGUAGE(ch) != NOTHING) {
+			*find_lang = find_generic(MOB_LANGUAGE(ch), GENERIC_LANGUAGE);
+		}
+		if (!*find_lang) {
+			// backup
+			*find_lang = find_generic(config_get_int("default_language_vnum"), GENERIC_LANGUAGE);
+		}
 	}
 	
 	// hopefully we found one... but either way, there was no error so:

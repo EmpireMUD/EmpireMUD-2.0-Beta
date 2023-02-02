@@ -4748,6 +4748,19 @@ Example:
 
 See also: MEDIT SHORTDESCRIPTION, MEDIT LONGDESCRIPTION
 #d
+"MEDIT LANGUAGE" "MOB LANGUAGE"
+
+Usage:  .language <vnum | name | default>
+
+This changes which language a mob will use for any say/shout actions it takes.
+Mobs can also use the #language tag at the start of any say/shout (unless they
+were ordered/commanded by a player).
+
+Mobs without this property will use the global default, set with the
+'default_language_vnum' mob config.
+
+See also: OLC MOBILES, SAY, SPEAK, MEDIT CUSTOM, CONFIG
+#d
 "MEDIT MAXLEVEL" "MEDIT MAX LEVEL"
 
 Usage:  .maxlevel <level>

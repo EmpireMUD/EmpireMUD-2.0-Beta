@@ -278,6 +278,7 @@ OLC_MODULE(medit_custom);
 OLC_MODULE(medit_flags);
 OLC_MODULE(medit_interaction);
 OLC_MODULE(medit_keywords);
+OLC_MODULE(medit_language);
 OLC_MODULE(medit_longdescription);
 OLC_MODULE(medit_lookdescription);
 OLC_MODULE(medit_maxlevel);
@@ -782,6 +783,7 @@ const struct olc_command_data olc_data[] = {
 	{ "flags", medit_flags, OLC_MOBILE, OLC_CF_EDITOR },
 	{ "interaction", medit_interaction, OLC_MOBILE, OLC_CF_EDITOR },
 	{ "keywords", medit_keywords, OLC_MOBILE, OLC_CF_EDITOR },
+	{ "language", medit_language, OLC_MOBILE, OLC_CF_EDITOR },
 	{ "longdescription", medit_longdescription, OLC_MOBILE, OLC_CF_EDITOR },
 	{ "lookdescription", medit_lookdescription, OLC_MOBILE, OLC_CF_EDITOR },
 	{ "maxlevel", medit_maxlevel, OLC_MOBILE, OLC_CF_EDITOR },

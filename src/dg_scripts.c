@@ -4495,7 +4495,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						}
 					}
 					else if (!str_cmp(field, "speaking")) {
-						snprintf(str, slen, "%d", IS_NPC(c) ? config_get_int("default_language_vnum") : GET_SPEAKING(c));
+						snprintf(str, slen, "%d", IS_NPC(c) ? (MOB_LANGUAGE(c) != NOTHING ? MOB_LANGUAGE(c) : config_get_int("default_language_vnum")) : GET_SPEAKING(c));
 					}
 					
 					break;

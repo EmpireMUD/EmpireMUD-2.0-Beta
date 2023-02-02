@@ -6195,6 +6195,7 @@ void do_stat_character(char_data *ch, char_data *k) {
 	if (IS_NPC(k)) {
 		sprintbit(MOB_FLAGS(k), action_bits, buf2, TRUE);
 		msg_to_char(ch, "NPC flags: &c%s&0\r\n", buf2);
+		msg_to_char(ch, "Nameset: \ty%s\t0, Language: [\tc%d\t0] \ty%s\t0\r\n", name_sets[MOB_NAME_SET(k)], MOB_LANGUAGE(k), get_generic_name_by_vnum(MOB_LANGUAGE(k)));
 	}
 	else {
 		msg_to_char(ch, "Idle Timer (in tics) [\tg%d\t0], View Height: [\tg%d\t0]\r\n", k->char_specials.timer, get_view_height(k, IN_ROOM(k)));
