@@ -131,6 +131,8 @@ void add_to_slash_channel_history(struct slash_channel *chan, char_data *speaker
 * it also determines the default language. If it returns FALSE, the player
 * received an error message.
 *
+* Note that ORDERED mobs will parse out the #lang but will ignore it.
+*
 * @param char_data *ch The player who typed a command such as say #lang
 * @param char **argument The argument as-typed. It will be advanced past the language arg.
 * @param generic_data **find_lang A pointer to a variable to bind the found language to. This COULD be NULL if the player speaks no languages.
@@ -170,7 +172,7 @@ bool determine_language_from_string(char_data *ch, char **argument, generic_data
 	if (!IS_NPC(ch) && !*find_lang) {
 		*find_lang = find_generic(GET_SPEAKING(ch), GENERIC_LANGUAGE);
 	}
-	if (IS_NPC(ch) && !*find_lang) {
+	if (IS_NPC(ch) && (!*find_lang || AFF_FLAGGED(ch, AFF_ORDERED))) {
 		*find_lang = find_generic(config_get_int("default_language_vnum"), GENERIC_LANGUAGE);
 	}
 	

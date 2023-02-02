@@ -2061,7 +2061,8 @@ better if you start your sentences with either say, tell, whisper or shout.
 When you use say, you'll use whatever language your character is currently
 speaking. You can change this with the speak command, or you can start your
 say with #<language> to say one line in a specific language. For this, remove
-the spaces in the language name or use dashes.
+the spaces in the language name or use dashes. Ordered mobs (such as pets)
+cannot use the #language syntax.
 
 Examples:
 
