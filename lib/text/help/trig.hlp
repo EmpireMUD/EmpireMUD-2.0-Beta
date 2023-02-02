@@ -682,6 +682,10 @@ Only the FIRST matching speech trigger on each mob will run unless it also has
 the Allow-Multiple type. Additonal mobs can each run 1 speech trigger without
 Allow-Multiple; this trigger is per-mob. Vehicles do not support this flag yet.
 
+The language used for this speech is provided as the %lang% and %lang_vnum%
+variables. This may be different from %actor.speaking% if the actor specified a
+different language for this speech.
+
 Note: Objects cannot have speech triggers, but mobs, rooms, and vehicles can.
 Note: Speech triggers attached to charmed mobs will not fire unless the trigger
    also has the Charmed type.

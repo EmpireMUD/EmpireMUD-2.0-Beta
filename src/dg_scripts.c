@@ -3096,7 +3096,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					/*
 					else if (!str_cmp(field, "coins")) {
 						// TODO possibly a way to specify coin type or do it by actor's loyalty?
-						// nop %ch.coins(10)%
+						// nop %c.coins(10)%
 						if (subfield && *subfield) {
 							int addition = atoi(subfield);
 							increase_coins(c, OTHER_COIN, addition);
@@ -4493,6 +4493,9 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						if (*str != '1') {							
 							snprintf(str, slen, "0");
 						}
+					}
+					else if (!str_cmp(field, "speaking")) {
+						snprintf(str, slen, "%d", IS_NPC(c) ? config_get_int("default_language_vnum") : GET_SPEAKING(c));
 					}
 					
 					break;
