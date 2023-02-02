@@ -566,6 +566,7 @@ switch %random.3%
     * Normal/Hard: Tank only
     * Group/Boss: Entire party
     %echo% ~%self% makes a sweeping arcane gesture, and hoar frost spreads over the cavern walls!
+    set actor_id %actor.id%
     wait 3 sec
     %echo% ~%self% releases a pulse of icy magic, and the hoar frost explodes off the walls!
     if %heroic_mode%
@@ -579,7 +580,7 @@ switch %random.3%
         end
         set person %person.next_in_room%
       done
-    else
+    else if %actor% && %actor.id% == %actor_id%
       %send% %actor% &&rThe rime blades slash you, opening dozens of painful, bleeding wounds!
       %echoaround% %actor% The rime blades slash ~%actor%, opening dozens of bleeding wounds!
       %damage% %actor% 150 physical
@@ -647,8 +648,9 @@ switch %random.3%
     if %self.vnum% == 10553
       %send% %actor% ~%self% puts its head down and charges you!
       %echoaround% %actor% ~%self% puts its head down and charges ~%actor%!
+      set actor_id %actor.id%
       wait 2 sec
-      if %self.aff_flagged(IMMOBILIZED)% || %self.aff_flagged(STUNNED)%
+      if %self.aff_flagged(IMMOBILIZED)% || %self.aff_flagged(STUNNED)% || !%actor% || %actor.id% != %actor_id%
         %echo% |%self% attack is interrupted.
         halt
       end
