@@ -411,7 +411,12 @@ When using field  - The variable returns:
 &ccan_act&0 - True if the character could take a timed action (not stunned, etc).
 &ccan_afford(amt)&0 - Checks if the actor has enough coins of any converted type.
 &ccan_gain_new_skills&0 - Checks if the character can gain a new skill from 0.
+&ccan_recognize_lang(lang,on|off)&0 - Whether the character can at least
+   recognize a language. Optional on/off 2nd arg grants/removes this from the
+   player. Cannot add/remove if the player speaks (instead of recognizes) it.
 &ccan_see(target)&0 - Whether the character can see a person/object/vehicle.
+&ccan_speak(lang,on|off)&0 - Whether the character can speak a language. Optional
+   on/off 2nd arg grants/removes this from the player.
 &ccan_start_quest(vnum)&0 - Whether or not the character can start a quest.
 &ccanbeseen&0 - True if the actor can be seen by the mob with the script
    (always true for non-mob triggers). See-also &ccan_see()&0
