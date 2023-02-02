@@ -4994,47 +4994,6 @@ static void assign_empire_languages(char_data *ch) {
 }
 
 
-void check_empire_languages(void) {
-	empire_data *emp, *next_emp;
-	generic_data *gen;
-	struct player_language *lang, *next_lang;
-	bool ok = FALSE, save;
-	
-	HASH_ITER(hh, empire_table, emp, next_emp) {
-		save = FALSE;
-		
-		HASH_ITER(hh, EMPIRE_LANGUAGES(emp), lang, next_lang) {
-			// audit it
-			if (!(gen = find_generic(lang->vnum, GENERIC_LANGUAGE))) {
-				ok = FALSE;	// deleted?
-			}
-			else if (GEN_FLAGGED(gen, GEN_IN_DEVELOPMENT)) {
-				ok = FALSE;	// in-dev
-			}
-			else if (lang->level == LANG_UNKNOWN) {
-				ok = FALSE;	// might as well delete these here
-			}
-			else {
-				// seems ok
-				ok = TRUE;
-			}
-		
-			// did we make it
-			if (!ok) {
-				// remove
-				save = TRUE;
-				HASH_DEL(EMPIRE_LANGUAGES(emp), lang);
-				free(lang);
-			}
-		}
-		
-		if (save) {
-			EMPIRE_NEEDS_SAVE(emp) = TRUE;
-		}
-	}
-}
-
-
 /**
 * This is called when a character logs in or when a language is saved in OLC
 * (under some circumstances) to ensure the character has the correct languages
@@ -5136,13 +5095,67 @@ void check_languages(char_data *ch) {
 void check_languages_all(void) {
 	char_data *ch;
 	
+	check_languages_all_empires();
+	
 	DL_FOREACH(character_list, ch) {
 		if (!IS_NPC(ch)) {
 			check_languages(ch);
 		}
 	}
+}
+
+
+/**
+* Checks languages for all empires.
+*/
+void check_languages_all_empires(void) {
+	empire_data *emp, *next_emp;
+	HASH_ITER(hh, empire_table, emp, next_emp) {
+		check_languages_empire(emp);
+	}
+}
+
+
+/**
+* Check languages for an empire to make sure they are all valid.
+*
+* @param empire_data *emp The empire.
+*/
+void check_languages_empire(empire_data *emp) {
+	generic_data *gen;
+	struct player_language *lang, *next_lang;
+	bool ok = FALSE, save = FALSE;
 	
-	check_empire_languages();
+	if (emp) {
+		HASH_ITER(hh, EMPIRE_LANGUAGES(emp), lang, next_lang) {
+			// audit it
+			if (!(gen = find_generic(lang->vnum, GENERIC_LANGUAGE))) {
+				ok = FALSE;	// deleted?
+			}
+			else if (GEN_FLAGGED(gen, GEN_IN_DEVELOPMENT)) {
+				ok = FALSE;	// in-dev
+			}
+			else if (lang->level == LANG_UNKNOWN) {
+				ok = FALSE;	// might as well delete these here
+			}
+			else {
+				// seems ok
+				ok = TRUE;
+			}
+		
+			// did we make it
+			if (!ok) {
+				// remove
+				save = TRUE;
+				HASH_DEL(EMPIRE_LANGUAGES(emp), lang);
+				free(lang);
+			}
+		}
+		
+		if (save) {
+			EMPIRE_NEEDS_SAVE(emp) = TRUE;
+		}
+	}
 }
 
 

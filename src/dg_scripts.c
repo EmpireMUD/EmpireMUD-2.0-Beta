@@ -6304,7 +6304,77 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					break;
 				}
 				case 'c': {	// emp.c*
-					if (!str_cmp(field, "coins")) {
+					if (!str_cmp(field, "can_recognize_lang")) {
+						// arg1: language name/vnum
+						// arg2: optional on/off to toggle recognize
+						char arg1[256], arg2[256];
+						int mode;
+						generic_data *lang = NULL;
+						
+						comma_args(subfield, arg1, arg2);
+						
+						// load language
+						if (*arg1) {
+							if (isdigit(*arg1)) {
+								lang = find_generic(atoi(arg1), GENERIC_LANGUAGE);
+							}
+							if (!lang) {
+								lang = find_generic_no_spaces(GENERIC_LANGUAGE, arg1);
+							}
+						}
+						
+						// optional toggle on/off
+						if (*arg2 && lang) {
+							if (!str_cmp(arg2, "1") || !str_cmp(arg2, "on")) {
+								if (speaks_language_empire(e, GEN_VNUM(lang)) != LANG_SPEAK) {
+									add_language_empire(e, GEN_VNUM(lang), LANG_RECOGNIZE);
+								}
+							}
+							else if (!str_cmp(arg2, "0") || !str_cmp(arg2, "off")) {
+								if (speaks_language_empire(e, GEN_VNUM(lang)) != LANG_SPEAK) {
+									add_language_empire(e, GEN_VNUM(lang), LANG_UNKNOWN);
+								}
+							}
+							check_languages_empire(e);
+						}
+						
+						// and show recognizability
+						mode = lang ? speaks_language_empire(e, GEN_VNUM(lang)) : LANG_UNKNOWN;
+						snprintf(str, slen, "%d", (mode == LANG_RECOGNIZE || mode == LANG_SPEAK) ? 1 : 0);
+					}
+					else if (!str_cmp(field, "can_speak")) {
+						// arg1: language name/vnum
+						// arg2: optional on/off to toggle speaking
+						char arg1[256], arg2[256];
+						generic_data *lang = NULL;
+						
+						comma_args(subfield, arg1, arg2);
+						
+						// load language
+						if (*arg1) {
+							if (isdigit(*arg1)) {
+								lang = find_generic(atoi(arg1), GENERIC_LANGUAGE);
+							}
+							if (!lang) {
+								lang = find_generic_no_spaces(GENERIC_LANGUAGE, arg1);
+							}
+						}
+						
+						// optional toggle on/off
+						if (*arg2 && lang) {
+							if (!str_cmp(arg2, "1") || !str_cmp(arg2, "on")) {
+								add_language_empire(e, GEN_VNUM(lang), LANG_SPEAK);
+							}
+							else if (!str_cmp(arg2, "0") || !str_cmp(arg2, "off")) {
+								add_language_empire(e, GEN_VNUM(lang), LANG_UNKNOWN);
+							}
+							check_languages_empire(e);
+						}
+						
+						// and show speakability
+						snprintf(str, slen, "%d", (lang && speaks_language_empire(e, GEN_VNUM(lang)) == LANG_SPEAK) ? 1 : 0);
+					}
+					else if (!str_cmp(field, "coins")) {
 						snprintf(str, slen, "%d", (int) EMPIRE_COINS(e));
 					}
 					break;

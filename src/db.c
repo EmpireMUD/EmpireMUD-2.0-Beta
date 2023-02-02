@@ -454,6 +454,7 @@ void boot_db(void) {
 	expire_old_politics();
 	check_learned_empire_crafts();
 	check_nowhere_einv_all();
+	check_languages_all_empires();
 	verify_empire_goals();
 	need_progress_refresh = TRUE;
 	

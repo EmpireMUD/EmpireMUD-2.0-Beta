@@ -687,6 +687,8 @@ bool check_bonus_trait_reset(char_data *ch);
 void check_delayed_load(char_data *ch);
 void check_languages(char_data *ch);
 void check_languages_all(void);
+void check_languages_all_empires(void);
+void check_languages_empire(empire_data *emp);
 void delete_player_character(char_data *ch);
 void enter_player_game(descriptor_data *d, int dolog, bool fresh);
 room_data *find_home(char_data *ch);

@@ -184,6 +184,12 @@ When using field - The variable returns:
 &cadd_progress(vnum)&0 - Grants a progression goal (preferably set SCRIPT-ONLY).
 &cadj&0 - Adjective form of the empire's name.
 &cbanner&0 - Empire's banner (as a color code).
+&ccan_recognize_lang(lang,on|off)&0 - Whether the empire can at least recognize
+   a language. Optional on/off 2nd arg grants/removes this from the empire but
+   NOT from members who already have it. Cannot add/remove if the empire speaks
+   (instead of recognizes) it.
+&ccan_speak(lang,on|off)&0 - Whether the empire can speak a language. Optional
+   on/off 2nd arg grants/removes this from the empire but NOT from members.
 &ccoins&0 - How many coins the empire has in its vaults.
 &cdescription&0 - The empire's full description.
 &cfame&0 - The empire's total fame value.
