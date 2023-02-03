@@ -927,6 +927,11 @@ static bool check_one_city_for_ruin(empire_data *emp, struct empire_city_data *c
 	vehicle_data *veh;
 	int x, y;
 	
+	// skip recently-founded cities
+	if (get_room_extra_data(city->location, ROOM_EXTRA_FOUND_TIME) + (12 * SECS_PER_REAL_HOUR) > time(0)) {
+		return FALSE;
+	}
+	
 	for (x = -1 * radius; x <= radius && !found_building; ++x) {
 		for (y = -1 * radius; y <= radius && !found_building; ++y) {
 			// skip 0,0 because that is the city center
