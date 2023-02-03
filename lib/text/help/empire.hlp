@@ -136,13 +136,16 @@ There is a 60-minute waiting period between when you found a city, and when it
 counts as a city for things like City Teleportation, certain buildings such as
 the Great Hall, for guard towers, and for some other game rules.
 
-EmpireMUD periodically checks if cities are completely empty and, if so,
+EmpireMUD periodically checks if cities have no claimed buildings and, if so,
 will remove the city center and refund the city point. This helps keep the map
 clean, and you can prevent it by making sure there is at least one claimed
-building in your city. You will also start to lose cities after 1 week if your
-empire shrinks and you no longer have enough city points available.
+building in your city. If a city is removed in this way, your elog will say the
+city was "abandoned as ruins".
 
-See also: CITY COMMANDS, CITY TRAITS, CITY TYPES, TECHNOLOGY, TERRITORY,
+You will also start to lose cities after 1 week if your empire shrinks and you
+no longer have enough city points available.
+
+See also: CITY COMMANDS, CITY TRAITS, CITY TYPES, ELOG, TECHNOLOGY, TERRITORY,
   WEALTH
 #
 "CITY TYPES" OUTPOST VILLAGE CAPITAL
