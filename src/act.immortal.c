@@ -2577,11 +2577,19 @@ int perform_set(char_data *ch, char_data *vict, int mode, char *val_arg) {
 			check_languages(vict);
 		}
 		else if (is_abbrev(onoff_arg, "recognize")) {
+			if (GET_LOYALTY(vict) && speaks_language_empire(GET_LOYALTY(vict), GEN_VNUM(lang)) == LANG_SPEAK) {
+				msg_to_char(ch, "You cannot turn off recognition for that langauge because that player's empire can speak it.\r\n");
+				return 0;
+			}
 			add_language(vict, GEN_VNUM(lang), LANG_RECOGNIZE);
 			sprintf(output, "%s: now recognizes language [%d] %s.", GET_NAME(vict), GEN_VNUM(lang), GEN_NAME(lang));
 			check_languages(vict);
 		}
 		else if (!str_cmp(onoff_arg, "off") || is_abbrev(onoff_arg, "unknown")) {
+			if (GET_LOYALTY(vict) && speaks_language_empire(GET_LOYALTY(vict), GEN_VNUM(lang)) != LANG_UNKNOWN) {
+				msg_to_char(ch, "You cannot turn off that langauge because that player's empire can speak it.\r\n");
+				return 0;
+			}
 			add_language(vict, GEN_VNUM(lang), LANG_UNKNOWN);
 			sprintf(output, "%s: no longer speaks [%d] %s.", GET_NAME(vict), GEN_VNUM(lang), GEN_NAME(lang));
 			check_languages(vict);
