@@ -1761,7 +1761,7 @@ void scale_mob_to_level(char_data *mob, int level) {
 	for (iter = 0; iter < NUM_POOLS; ++iter) {
 		mob->points.current_pools[iter] = mob->points.max_pools[iter] - pools_down[iter];
 		// ensure minimum of 1 after scaling:
-		mob->points.current_pools[iter] = MAX(1, MIN(mob->points.max_pools[iter], mob->points.current_pools[iter]));
+		mob->points.current_pools[iter] = MIN(mob->points.max_pools[iter], MAX(1, mob->points.current_pools[iter]));
 	}
 	for (iter = 0; iter < NUM_ATTRIBUTES; ++iter) {
 		mob->aff_attributes[iter] = mob->real_attributes[iter];
