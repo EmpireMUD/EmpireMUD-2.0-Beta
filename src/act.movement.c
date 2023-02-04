@@ -1215,17 +1215,24 @@ int move_cost(char_data *ch, room_data *from, room_data *to, int dir, bitvector_
 	}
 	
 	/* move points needed is avg. move loss for src and destination sect type */	
-	
-	// open buildings and incomplete non-closed buildings use average of current & original sect's move cost
-	if (!ROOM_IS_CLOSED(from)) {
+	if (!IS_INCOMPLETE(from)) {
+		// incomplte: full base cost
+		cost_from = GET_SECT_MOVE_LOSS(BASE_SECT(from));
+	}
+	else if (!ROOM_IS_CLOSED(from)) {
+		// open buildings: average of base/current
 		cost_from = (GET_SECT_MOVE_LOSS(SECT(from)) + GET_SECT_MOVE_LOSS(BASE_SECT(from))) / 2.0;
 	}
 	else {
+		// current sect cost
 		cost_from = GET_SECT_MOVE_LOSS(SECT(from));
 	}
 	
 	// cost for the space moving to
-	if (!ROOM_IS_CLOSED(to)) {
+	if (!IS_INCOMPLETE(to)) {
+		cost_to = GET_SECT_MOVE_LOSS(BASE_SECT(to));
+	}
+	else if (!ROOM_IS_CLOSED(to)) {
 		cost_to = (GET_SECT_MOVE_LOSS(SECT(to)) + GET_SECT_MOVE_LOSS(BASE_SECT(to))) / 2.0;
 	}
 	else {
