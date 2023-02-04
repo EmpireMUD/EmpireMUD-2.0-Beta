@@ -4,7 +4,7 @@ Zelkab, goblin bruiser~
 A goblin bruiser is guarding the nest.
 ~
 50 150 bd 0 2
-1 0 0 5
+1 0 0 5 -1
 D
    The scars and bruises on Zelkab tell of a short, rough life in the goblin
 fighting pits. For all that, he walks tall (for a goblin, at least) and carries
@@ -23,7 +23,7 @@ Garlgarl, goblin shaman~
 A goblin shaman is drawing symbols in the blood on the floor.
 ~
 50 150 bdxyA 0 2
-2 0 0 16
+2 0 0 16 -1
 D
    As she draws sigils and signs in the ash and blood on the floor, Garlgarl
 mutters strange words in goblinese. It's hard to tell what she's doing, but
@@ -43,7 +43,7 @@ Filks, goblin archer~
 A goblin archer is trying to fix her bow.
 ~
 50 150 abdzA 0 2
-2 0 0 1
+2 0 0 1 -1
 D
    Fliks is scrawny, even for a goblin, but it seems to make him more lithe.
 He's quicker than most.
@@ -62,7 +62,7 @@ Walts, goblin sapper~
 A goblin sapper is trying to light something on fire.
 ~
 50 150 abdyA s 2
-1 0 0 4
+1 0 0 4 -1
 D
    Walts is on the chubby side. At least, you hope that's pudge hiding under
 his shirt. If it's more bombs, you're in trouble.
@@ -81,7 +81,7 @@ Nilbog, goblin champion~
 The goblin champion is unpolishing her armor.
 ~
 50 150 bdB 0 2
-2 0 0 2
+2 0 0 2 -1
 D
    Nilbog is scrubbing her armor with a goblin polishing stone. It just looks
 like pumice, but telling her she's scratching her armor will only lead to a
@@ -101,7 +101,7 @@ Furl, war shaman~
 The goblin war shaman is raising his staff!
 ~
 50 150 bdxyAB 0 2
-1 0 0 18
+1 0 0 18 -1
 D
    Furl swirls his staff in the fire, drawing visions of battle from the fire.
 Every so often, one of the flaming visions swirls into Furl's mouth, and he
@@ -120,7 +120,7 @@ a goblin warg~
 A big, hairy goblin warg is snarling at you!
 ~
 50 50 dej 0 3
-0 0 0 10
+0 0 0 10 -1
 D
 It's like someone bred a back alley howler with a dire wolf.
 ~
@@ -135,7 +135,7 @@ an armored goblin warg~
 An armored goblin warg is here!
 ~
 100 100 bdej 0 3
-0 0 0 10
+0 0 0 10 -1
 D
 This mangy warg has been plated in green-tinged iron armor.
 ~
@@ -149,7 +149,7 @@ a goblin warg~
 A big, hairy goblin warg is snarling at you!
 ~
 50 50 dej 0 3
-0 0 0 10
+0 0 0 10 -1
 D
 It's like someone bred a back alley howler with a dire wolf.
 ~
@@ -164,7 +164,7 @@ a winged wolf~
 A winged wolf flaps around near the ground.
 ~
 100 125 dej m 3
-0 0 2 9
+0 0 2 9 -1
 D
    Astonishingly, someone has magically grafted condor wings to this poor wolf.
 It doesn't seem any worse for the wear, though, as it flies in circles chasing
@@ -177,7 +177,7 @@ the druid #n~
 #n is tending the gardens.
 ~
 50 50 bdvI nD 3
-0 2 0 15
+0 2 0 15 -1
 D
    The druid is wearing a cool white robe, stained from the waist down from
 working in the dirt.
@@ -192,7 +192,7 @@ the gardener~
 #n is tending the gardens.
 ~
 50 50 bdvI nD 3
-0 0 0 15
+0 0 0 15 -1
 D
 You can tell they take pride in these gardens.
 ~
@@ -204,7 +204,7 @@ an enchanted tumbleweed~
 An enchanted tumbleweed is blowing through.
 ~
 0 50 de G 2
-0 0 4 28
+0 0 4 28 -1
 D
 It's rolling around to its stem's content.
 ~
@@ -215,7 +215,7 @@ Chronomancer #n~
 A chronomancer is holding the portal open.
 ~
 0 0 bdvI cnD 3
-0 2 0 16
+0 2 0 16 -1
 D
    The chronomancer is well-dressed with stunning violet fur robes and perhaps
 a little too much nocturnium jewelry. There is noticeable concern every time a
@@ -232,7 +232,7 @@ the salesman~
 A salesman is running a booth that says 'list'.
 ~
 0 0 bdvI cnD 3
-1 0 0 15
+1 0 0 15 -1
 D
    From his clothes, he obviously works with the sorcerers. But the salesman
 seems more interested in profit than adventure -- even at his own peril. Use
@@ -248,7 +248,7 @@ the King of the Dracosaurs~
 The King of the Dracosaurs crushes trees as he approaches!
 ~
 0 0 bdjyzBE cCE 5
-1 0 0 9
+1 0 0 9 -1
 D
    This enormous beast seems to be part dragon, part bird, and part reptile --
 and it is certainly the king of all three. Even hunched over with its long tail
@@ -291,7 +291,7 @@ the Terrosaur~
 A fearsome Terrosaur swoops down from the sky!
 ~
 0 0 bdjyzBE cmCE 4
-0 0 0 27
+0 0 0 27 -1
 D
    Neither bird nor bat, the Terrosaur is in a class all its own as it swoops
 back and forth across the sky. Its enormous head is capped by a crest on the
@@ -336,7 +336,7 @@ Archsorcerer Malfernes~
 Archsorcerer Malfernes is here, and he looks like he's gone mad!
 ~
 0 0 bdvxzBEI cCE 3
-1 0 0 22
+1 0 0 22 -1
 D
    The Archsorcerer's silky violet robe drapes on the ground as he hovers
 around the clearing. The tall collar, towering mitre, and exaggerated sleeves
@@ -376,7 +376,7 @@ the three-horned dracosaur~
 A frilled, three-horned dracosaur is charging at you like a bull!
 ~
 0 0 bdjyAE ch 5
-0 0 0 27
+0 0 0 27 -1
 D
    This oversized creature looks like a land dragon, perhaps mixed with a bull.
 Three horns on its face point straight at you, and its neck and body are
@@ -417,7 +417,7 @@ a feathered dracosaur~
 A brightly feathered dracosaur raises its wings to ward you off.
 ~
 0 0 abdjzE c 4
-0 0 0 10
+0 0 0 10 -1
 D
    Feathered like a bird, the toothy grin of a crocodile, the ferocious claws
 of a lion... This dracosaur is in the midst of an identity crisis that it has
@@ -453,7 +453,7 @@ a small, feathered dracosaur~
 A small, feathered dracosaur begins to circle around you.
 ~
 0 0 abdjzE c 3
-0 0 0 9
+0 0 0 9 -1
 D
    The small dracosaur looks like it might just be a younger or subordinate
 member of the same species as the larger one. Its feathers are more green and
@@ -481,7 +481,7 @@ the druid #n~
 A druid is magically growing the foliage over the path.
 ~
 0 0 bdvxzAEI c 3
-1 3 0 16
+1 3 0 16 -1
 D
    The druid is clad in a simple brown robe with a mantle and hood. He seems
 equally surprised to have found you as he is to have found the trail again, as
@@ -530,7 +530,7 @@ the lead terror bird~
 A fierce terror bird is pacing toward you!
 ~
 0 0 abdjE c 3
-0 0 0 10
+0 0 0 10 -1
 D
    Like an ostrich's bad-neighborhood cousin, this enormous bird is taller than
 any human. Its tiny, useless wings are dwarfed by its enormous beak, which
@@ -559,7 +559,7 @@ a terror bird~
 A terror bird is eyeing you from the foliage.
 ~
 0 0 abdjE c 3
-0 0 0 9
+0 0 0 9 -1
 D
    Though it's only about as tall as you are, the terror bird's beak still
 looks large enough to fit your entire head in its crushing grasp. With tiny,
@@ -586,7 +586,7 @@ a swarm of ants~
 A swarm of ants is coming toward you!
 ~
 0 0 bdjyE cG 2
-0 0 0 9
+0 0 0 9 -1
 D
    These ants are only a little bit bigger than the ones you're familiar with,
 but they have arrived en masse and the mass is enormous. A veritable army of
@@ -605,7 +605,7 @@ the trophy hunter~
 A trophy hunter is crouching in the underbrush.
 ~
 0 0 bdvzEI c 3
-1 3 0 32
+1 3 0 32 -1
 D
    The trophy hunter is dressed in a strange shirt with small white buttons,
 rugged boots with strong soles, and an odd hat with two peaks and a wide brim.
@@ -647,7 +647,7 @@ a dracosaur~
 A dracosaur is sniffing around for food.
 ~
 75 100 dej 0 5
-0 0 0 27
+0 0 0 27 -1
 D
    The dracosaur almost looks like an oversized bull, if not for its scaly
 skin, frilled neck, and third horn.
@@ -660,12 +660,25 @@ an armored dracosaur~
 An armored dracosaur stands guard valiantly.
 ~
 75 175 bdej 0 5
-0 0 0 27
+0 0 0 27 -1
 D
    The dracosaur almost looks like an oversized bull, if not for its scaly
 skin, frilled neck, and third horn. It has been outfitted with modern battle
 armor and looks ready to ride to war.
 ~
+S
+#10276
+spirit time~
+a time spirit~
+A time spirit is floating in the air.
+~
+0 0 bdh kln 3
+0 0 0 15 -1
+D
+This invisible mob helps delay-despawn the adventure.
+~
+T 10276
+T 10277
 S
 #10285
 terrosaur flying armored~
@@ -673,7 +686,7 @@ a flying, armored terrosaur~
 An armored, flying terrosaur has perched here.
 ~
 75 100 bdej m 4
-0 0 0 27
+0 0 0 27 -1
 D
    This strange flying beast is straight out of the Primeval Portal. It is
 neither bat nor bird, nor in between, but somehow its own race of creature
@@ -686,7 +699,7 @@ a flying terrosaur~
 A flying terrosaur swoops low and lands.
 ~
 75 100 dej m 4
-0 0 0 27
+0 0 0 27 -1
 D
    This strange flying beast is straight out of the Primeval Portal. It is
 neither bat nor bird, nor in between, but somehow its own race of creature
@@ -700,7 +713,7 @@ a teeny terrosaur~
 A teeny terrosaur flaps around your head.
 ~
 1 1 bdo mn 1
-0 0 2 9
+0 0 2 9 -1
 D
    This fuzzy, beaky, adorable little creature is a clearly a terrosaur. But
 its teeny screech hardly strikes terror in your heart. Quite the opposite, in
