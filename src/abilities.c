@@ -1797,6 +1797,12 @@ DO_ABIL(do_buff_ability) {
 		}
 	}
 	
+	// check if it kills them
+	if (GET_POS(vict) == POS_INCAP && ABILITY_FLAGGED(abil, ABILF_VIOLENT)) {
+		perform_execute(ch, vict, TYPE_UNDEFINED, DAM_PHYSICAL);
+		data->stop = TRUE;
+	}
+	
 	data->success = TRUE;
 }
 
