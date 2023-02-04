@@ -4460,6 +4460,11 @@ void give_newbie_gear(char_data *ch, obj_vnum vnum, int pos) {
 	else {
 		equip_char(ch, obj, pos);
 	}
+	
+	// always bind immediately if BoE
+	if (OBJ_FLAGGED(obj, OBJ_BIND_FLAGS)) {
+		bind_obj_to_player(obj, ch);
+	}
 }
 
 
