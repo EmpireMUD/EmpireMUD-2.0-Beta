@@ -8289,22 +8289,24 @@ ACMD(do_dc) {
 
 // do_directions
 ACMD(do_distance) {
-	char arg[MAX_INPUT_LENGTH];
+	char arg[MAX_INPUT_LENGTH], *ptr;
 	room_data *target;
 	int dir, dist;
 	
 	one_word(argument, arg);
+	ptr = arg;
+	skip_spaces(&ptr);
 	
 	if (!IS_IMMORTAL(ch) && !IS_NPC(ch) && !HAS_NAVIGATION(ch)) {
 		msg_to_char(ch, "You don't know how to navigate or determine distances.\r\n");
 	}
-	else if (!*arg) {
+	else if (!*ptr) {
 		msg_to_char(ch, "Get the direction and distance to where?\r\n");
 	}
-	else if (!IS_IMMORTAL(ch) && (!isdigit(*arg) || !strchr(arg, ','))) {
+	else if (!IS_IMMORTAL(ch) && (!isdigit(*ptr) || !strchr(ptr, ','))) {
 		msg_to_char(ch, "You can only find distances to coordinates.\r\n");
 	}
-	else if (!(target = find_target_room(ch, arg))) {
+	else if (!(target = find_target_room(ch, ptr))) {
 		msg_to_char(ch, "Unknown target.\r\n");
 	}
 	else {	
