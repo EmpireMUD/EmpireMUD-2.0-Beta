@@ -1763,7 +1763,7 @@ been instantiated.
 
 See also: OLC ADVENTURES
 #d
-"AFFECT FLAGS"
+"AFFECT FLAGS" "AFF FLAGS" "AFFECT BITS" "AFF BITS"
 
 The following affect flags are available:
  BLIND - Unable to see.
@@ -1804,6 +1804,7 @@ The following affect flags are available:
  !WHERE - Cannot be found using the 'where' command.
  WATERWALK - Does not need to swim and doesn't drown. Unlike the AQUATIC mob
    flag, this allows it to move on both water and land.
+ LIGHT - Character provides light to the room.
 #d
 ARCHEDIT "OLC ARCHETYPES" "ARCHETYPE OLC" "ARCHETYPE EDITOR"
 

@@ -440,10 +440,26 @@ void affect_modify(char_data *ch, byte loc, sh_int mod, bitvector_t bitv, bool a
 	
 	if (add) {
 		SET_BIT(AFF_FLAGS(ch), bitv);
+		
+		// check lights
+		if (IS_SET(bitv, AFF_LIGHT)) {
+			++GET_LIGHTS(ch);
+			if (IN_ROOM(ch)) {
+				++ROOM_LIGHTS(IN_ROOM(ch));
+			}
+		}
 	}
 	else {
 		REMOVE_BIT(AFF_FLAGS(ch), bitv);
 		mod = -mod;
+		
+		// check lights
+		if (IS_SET(bitv, AFF_LIGHT)) {
+			--GET_LIGHTS(ch);
+			if (IN_ROOM(ch)) {
+				--ROOM_LIGHTS(IN_ROOM(ch));
+			}
+		}
 	}
 	
 	// APPLY_x:
@@ -8781,7 +8797,7 @@ void reset_light_count(room_data *room) {
 	vehicle_data *veh;
 	obj_data *obj;
 	char_data *ch;
-	int pos;
+	// int pos;
 	
 	ROOM_LIGHTS(room) = 0;
 	
@@ -8799,6 +8815,11 @@ void reset_light_count(room_data *room) {
 	
 	// people
 	DL_FOREACH2(ROOM_PEOPLE(room), ch, next_in_room) {
+		ROOM_LIGHTS(room) += GET_LIGHTS(ch);
+		/*
+		if (AFF_FLAGGED(ch, AFF_LIGHT)) {
+			++ROOM_LIGHTS(room);
+		}
 		for (pos = 0; pos < NUM_WEARS; ++pos) {
 			if (GET_EQ(ch, pos) && OBJ_FLAGGED(GET_EQ(ch, pos), OBJ_LIGHT)) {
 				++ROOM_LIGHTS(room);
@@ -8809,6 +8830,7 @@ void reset_light_count(room_data *room) {
 				++ROOM_LIGHTS(room);
 			}
 		}
+		*/
 	}
 	
 	// objects
