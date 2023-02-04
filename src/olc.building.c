@@ -464,8 +464,11 @@ void olc_delete_building(char_data *ch, bld_vnum vnum) {
 	
 	// quests
 	HASH_ITER(hh, quest_table, quest, next_quest) {
+		// QG_x:
 		found = delete_quest_giver_from_list(&QUEST_STARTS_AT(quest), QG_BUILDING, vnum);
 		found |= delete_quest_giver_from_list(&QUEST_ENDS_AT(quest), QG_BUILDING, vnum);
+		
+		// REQ_x:
 		found |= delete_requirement_from_list(&QUEST_TASKS(quest), REQ_OWN_BUILDING, vnum);
 		found |= delete_requirement_from_list(&QUEST_PREREQS(quest), REQ_OWN_BUILDING, vnum);
 		found |= delete_requirement_from_list(&QUEST_TASKS(quest), REQ_VISIT_BUILDING, vnum);
@@ -975,7 +978,18 @@ void olc_search_building(char_data *ch, bld_vnum vnum) {
 		if (size >= sizeof(buf)) {
 			break;
 		}
-		if (find_quest_giver_in_list(QUEST_STARTS_AT(quest), QG_BUILDING, vnum) || find_quest_giver_in_list(QUEST_ENDS_AT(quest), QG_BUILDING, vnum) || find_requirement_in_list(QUEST_TASKS(quest), REQ_OWN_BUILDING, vnum) || find_requirement_in_list(QUEST_PREREQS(quest), REQ_OWN_BUILDING, vnum) || find_requirement_in_list(QUEST_TASKS(quest), REQ_VISIT_BUILDING, vnum) || find_requirement_in_list(QUEST_PREREQS(quest), REQ_VISIT_BUILDING, vnum)) {
+		
+		// QG_x:
+		any = find_quest_giver_in_list(QUEST_STARTS_AT(quest), QG_BUILDING, vnum);
+		any |= find_quest_giver_in_list(QUEST_ENDS_AT(quest), QG_BUILDING, vnum);
+		
+		// REQ_x:
+		any |= find_requirement_in_list(QUEST_TASKS(quest), REQ_OWN_BUILDING, vnum);
+		any |= find_requirement_in_list(QUEST_PREREQS(quest), REQ_OWN_BUILDING, vnum);
+		any |= find_requirement_in_list(QUEST_TASKS(quest), REQ_VISIT_BUILDING, vnum);
+		any |= find_requirement_in_list(QUEST_PREREQS(quest), REQ_VISIT_BUILDING, vnum);
+		
+		if (any) {
 			++found;
 			size += snprintf(buf + size, sizeof(buf) - size, "QST [%5d] %s\r\n", QUEST_VNUM(quest), QUEST_NAME(quest));
 		}
