@@ -4788,7 +4788,7 @@ bool audit_interactions(any_vnum vnum, struct interaction_item *list, int attach
 	
 	HASH_ITER(hh, set, as, next_as) {
 		HASH_ITER(hh, as->set, at, next_at) {
-			if (at->percent > 100.0) {
+			if (at->percent > 100.001) {
 				olc_audit_msg(ch, vnum, "Interaction %s exclusion set '%c' totals %.2f%%", interact_types[as->type], (char)at->code, at->percent);
 				problem = TRUE;
 			}
