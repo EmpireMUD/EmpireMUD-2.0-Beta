@@ -3583,6 +3583,12 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 							snprintf(str, slen, "%s", GET_PC_NAME(c));
 						}
 					}
+					else if (!str_cmp(field, "flush_queue")) {
+						if (c->desc) {
+							send_stacked_msgs(c->desc);
+						}
+						*str = '\0';
+					}
 					else if (!str_cmp(field, "follower")) {
 						struct follow_type *fol;
 						bool fnd = FALSE;

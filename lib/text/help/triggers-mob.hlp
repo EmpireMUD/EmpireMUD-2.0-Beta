@@ -471,6 +471,7 @@ When using field  - The variable returns:
 &cfind_lighter&0 - Finds an available LIGHTER in the inventory, if one exists.
    Note: Players may also light things with %actor.has_tech(Light-Fire)%.
 &cfirstname&0 - The actor's first name (or first keyword, for mobs).
+&cflush_queue&0 - Use this to send messages queued with the # modifier (%ECHO%).
 &cfollower&0 - The first follower, if any, of the character.
 &cfollower(name)&0 - The follower of the actor (as an id) with name supplied.
 &cgain_skill(sk,amt)&0 - Gives the player points in a skill, or takes them.
