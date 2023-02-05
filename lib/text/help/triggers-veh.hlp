@@ -21,9 +21,12 @@ fire).
 Use the "return 0" option cautiously, as this may make the vehicle
 indestructible.
 
-When an adventure instance ends, any vehicles belonging to the instance will
-also fire their Destroy triggers before being purged. This destruction CANNOT
-be prevented.
+Variables: 
+  &c%method%&0 - How it was destroyed (siege, burning, ruins, despawn*).
+
+* When an adventure instance ends, any vehicles belonging to the instance will
+also fire their Destroy triggers before being purged with a "despawn" %method%.
+This destruction CANNOT be prevented.
 #d
 "VTRIG COMMANDS" "VEHICLE COMMANDS" TRIGEDIT-VEH-COMMANDS
 

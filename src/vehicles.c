@@ -928,7 +928,7 @@ void ruin_vehicle(vehicle_data *veh, char *message) {
 	room_data *room = IN_ROOM(veh);
 	struct vehicle_room_list *vrl;
 	
-	if (!destroy_vtrigger(veh)) {
+	if (!destroy_vtrigger(veh, "ruins")) {
 		VEH_HEALTH(veh) = MAX(1, VEH_HEALTH(veh));	// ensure health
 		return;
 	}

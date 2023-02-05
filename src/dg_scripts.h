@@ -374,7 +374,7 @@ int kill_otrigger(obj_data *obj, char_data *dying, char_data *killer);
 int run_kill_triggers(char_data *dying, char_data *killer, vehicle_data *veh_killer);
 
 int command_vtrigger(char_data *actor, char *cmd, char *argument, int mode);
-int destroy_vtrigger(vehicle_data *veh);
+int destroy_vtrigger(vehicle_data *veh, char *method);
 int entry_vtrigger(vehicle_data *veh, char *method);
 int leave_vtrigger(char_data *actor, int dir, char *custom_dir, char *method);
 void load_vtrigger(vehicle_data *veh);

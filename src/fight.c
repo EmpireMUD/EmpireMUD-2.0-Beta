@@ -2779,7 +2779,7 @@ bool besiege_vehicle(char_data *attacker, vehicle_data *veh, int damage, int sie
 	}
 	else {
 		// return 0 prevents the destruction
-		if (!destroy_vtrigger(veh)) {
+		if (!destroy_vtrigger(veh, (siege_type == SIEGE_BURNING ? "burning" : "siege"))) {
 			VEH_HEALTH(veh) = MAX(1, VEH_HEALTH(veh));	// ensure health
 			remove_vehicle_flags(veh, VEH_ON_FIRE);	// cancel fire
 			return TRUE;

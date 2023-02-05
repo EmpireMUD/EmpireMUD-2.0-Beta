@@ -1144,7 +1144,7 @@ void despawn_instance_vehicles(struct instance_data *inst) {
 		
 		// call destroy trig: if it returns 0, we won't try to echo
 		// but this purge CANNOT be prevented by the trigger
-		if (destroy_vtrigger(veh)) {		
+		if (destroy_vtrigger(veh, "despawn")) {		
 			if (ROOM_PEOPLE(IN_ROOM(veh))) {
 				act("$V is gone.", FALSE, ROOM_PEOPLE(IN_ROOM(veh)), NULL, veh, TO_CHAR | TO_ROOM);
 			}

@@ -2520,7 +2520,14 @@ int command_vtrigger(char_data *actor, char *cmd, char *argument, int mode) {
 }
 
 
-int destroy_vtrigger(vehicle_data *veh) {
+/**
+* Called when a vehicle is destroyed.
+*
+* @param vehicle_data *veh The vehicle being destroyed.
+* @param char *method What destroyed it ("burning", etc).
+* @return int 0 will prevent destruction of the vehicle; 1 is a normal result
+*/
+int destroy_vtrigger(vehicle_data *veh, char *method) {
 	trig_data *t, *next_t;
 
 	if (!SCRIPT_CHECK(veh, VTRIG_DESTROY)) {
@@ -2530,6 +2537,7 @@ int destroy_vtrigger(vehicle_data *veh) {
 	LL_FOREACH_SAFE(TRIGGERS(SCRIPT(veh)), t, next_t) {
 		if (TRIGGER_CHECK(t, VTRIG_DESTROY) && (number(1, 100) <= GET_TRIG_NARG(t))) {
 			union script_driver_data_u sdd;
+			add_var(&GET_TRIG_VARS(t), "method", method ? method : "none", 0);
 			sdd.v = veh;
 			return script_driver(&sdd, t, VEH_TRIGGER, TRIG_NEW);
 		}
