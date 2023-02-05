@@ -6009,16 +6009,7 @@ void do_stat_building(char_data *ch, bld_data *bdg) {
 	}
 	
 	msg_to_char(ch, "Hitpoints: [&g%d&0], Fame: [&g%d&0], Extra Rooms: [&g%d&0], Height: [&g%d&0]\r\n", GET_BLD_MAX_DAMAGE(bdg), GET_BLD_FAME(bdg), GET_BLD_EXTRA_ROOMS(bdg), GET_BLD_HEIGHT(bdg));
-	
-	// artisan?
-	if (GET_BLD_ARTISAN(bdg) != NOTHING) {
-		sprintf(buf, ", Artisan: &g%d&0 &c%s&0", GET_BLD_ARTISAN(bdg), get_mob_name_by_proto(GET_BLD_ARTISAN(bdg), FALSE));
-	}
-	else {
-		*buf = '\0';
-	}
-	
-	msg_to_char(ch, "Citizens: [&g%d&0], Military: [&g%d&0]%s\r\n", GET_BLD_CITIZENS(bdg), GET_BLD_MILITARY(bdg), buf);
+	msg_to_char(ch, "Citizens: [&g%d&0], Military: [&g%d&0], Artisan: [&g%d&0] &c%s&0\r\n", GET_BLD_CITIZENS(bdg), GET_BLD_MILITARY(bdg), GET_BLD_ARTISAN(bdg), GET_BLD_ARTISAN(bdg) != NOTHING ? get_mob_name_by_proto(GET_BLD_ARTISAN(bdg), FALSE) : "none");
 	
 	if (GET_BLD_RELATIONS(bdg)) {
 		get_bld_relations_display(GET_BLD_RELATIONS(bdg), lbuf);
