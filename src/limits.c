@@ -668,6 +668,9 @@ void real_update_char(char_data *ch) {
 			dot_remove(ch, dot);
 		}
 	}
+	if (took_dot) {
+		cancel_action(ch);
+	}
 	
 	// biting -- this is usually PC-only, but NPCs could learn to do it
 	if (GET_FEEDING_FROM(ch)) {

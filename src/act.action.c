@@ -205,7 +205,7 @@ const struct gen_interact_data_t gen_interact_data[] = {
 * @param char_data *ch The actor.
 */
 void cancel_action(char_data *ch) {
-	if (GET_ACTION(ch) != ACT_NONE) {
+	if (!IS_NPC(ch) && GET_ACTION(ch) != ACT_NONE) {
 		// is there a cancel function?
 		if (action_data[GET_ACTION(ch)].cancel_function != NULL) {
 			(action_data[GET_ACTION(ch)].cancel_function)(ch);
