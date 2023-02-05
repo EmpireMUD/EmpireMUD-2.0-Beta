@@ -1307,8 +1307,9 @@ ACMD(do_feed) {
 	else if (IS_DEAD(victim)) {
 		act("It would do no good for $M now -- $E's dead!", FALSE, ch, NULL, victim, TO_CHAR);
 	}
-	else if (IS_NPC(victim) || !PRF_FLAGGED(victim, PRF_BOTHERABLE))
+	else if (IS_NPC(victim) || (!PRF_FLAGGED(victim, PRF_BOTHERABLE) && GET_POS(victim) >= POS_SLEEPING)) {
 		act("$E refuses your blood.", FALSE, ch, 0, victim, TO_CHAR);
+	}
 	else {
 		act("You slice your wrist open and feed $N some blood!", FALSE, ch, 0, victim, TO_CHAR);
 		act("$n slices $s wrist open and feeds $N some blood!", TRUE, ch, 0, victim, TO_NOTVICT);
