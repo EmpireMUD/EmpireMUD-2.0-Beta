@@ -7701,7 +7701,7 @@ void olc_process_resources(char_data *ch, char *argument, struct resource_data *
 						msg_to_char(ch, "Usage: resource add component <quantity> <vnum/name>\r\n");
 						return;
 					}
-					if (!(cmp = find_generic_component(arg4))) {
+					if (!(cmp = find_generic_component(trim(arg4)))) {
 						msg_to_char(ch, "Unknown component type '%s'.\r\n", arg4);
 						return;
 					}
@@ -7914,7 +7914,7 @@ void olc_process_resources(char_data *ch, char *argument, struct resource_data *
 			switch (change->type) {
 				case RES_COMPONENT: {
 					generic_data *cmp;
-					if (!(cmp = find_generic_component(arg4))) {
+					if (!(cmp = find_generic_component(trim(arg4)))) {
 						msg_to_char(ch, "Unknown component type '%s'.\r\n", arg4);
 						return;
 					}
