@@ -2236,6 +2236,10 @@ ACMD(do_dismantle) {
 		msg_to_char(ch, "You can't dismantle this building (use 'manage no-dismantle' to toggle).\r\n");
 		return;
 	}
+	if (!can_see_in_dark_room(ch, IN_ROOM(ch), TRUE)) {
+		msg_to_char(ch, "It's too dark to start dismantling.\r\n");
+		return;
+	}
 	
 	if (!dismantle_wtrigger(IN_ROOM(ch), ch, TRUE)) {
 		return;	// this goes last
