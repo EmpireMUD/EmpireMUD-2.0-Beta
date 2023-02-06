@@ -4,7 +4,7 @@ a snarling wolf~
 A brown wolf snarls at you.
 ~
 20 40 djo c 3
-0 0 0 10
+0 0 0 10 -1
 D
    The wolf lowers its head, pulls back its ears, and bares its teeth and gums
 as it snarls at you. Its eyes follow you as you circle around it, but it holds
@@ -28,7 +28,7 @@ a brown wolf~
 A brown wolf is sitting here.
 ~
 10 20 djo c 3
-0 0 0 10
+0 0 0 10 -1
 D
    The wolf has a brown coat, though you recognize that it's actually a grey
 wolf. It keeps both eyes on you as it sniffs along the ground, looking for the
@@ -60,7 +60,7 @@ a small wolf~
 A small, brown wolf is resting here.
 ~
 5 15 bdjo c 2
-0 0 0 10
+0 0 0 10 -1
 D
    The wolf looks younger, probably an adolescent learning to hunt with its
 parents. It seems timid until you approach, and then it pulls its ears back and
@@ -91,7 +91,7 @@ a fluffy sheep~
 A fluffy sheep is frolicking around.
 ~
 5 15 djoy 0 3
-0 0 0 9
+0 0 0 9 -1
 D
    The sheep nibbles at the ground, then springs its head upwards and frolicks
 in a circle around you.
@@ -116,7 +116,7 @@ a mountain goat~
 A mountain goat is prancing about.
 ~
 10 20 djko 0 3
-0 0 0 11
+0 0 0 11 -1
 D
    The mountain goat is large, with strong muscles and white fur. Its small
 hooves are perfect for climbing the steep, craggy mountainsides.
@@ -130,7 +130,7 @@ a deer~
 A white-tailed deer is grazing here.
 ~
 10 20 djo 0 4
-0 0 0 27
+0 0 0 27 -1
 D
    The flecked brown deer strolls warily through the grass, keeping one eye on
 you as it slowly grazes.
@@ -147,7 +147,7 @@ a large buck~
 A large buck is standing here.
 ~
 10 20 djo 0 4
-0 0 0 11
+0 0 0 11 -1
 D
 This proud deer holds its antlers high as it watches you walk past.
 ~
@@ -162,7 +162,7 @@ a squirrel~
 A small squirrel sits on his haunches and stares at you.
 ~
 1 5 djko c 1
-0 0 0 9
+0 0 0 9 -1
 D
 This little red squirrel holds an acorn between its paws as it watches you.
 ~
@@ -181,7 +181,7 @@ a cow~
 A hefty cow is grazing here.
 ~
 10 20 dfjoy 0 4
-0 0 0 11
+0 0 0 11 -1
 D
 The cow doesn't seem interested in you.
 ~
@@ -202,7 +202,7 @@ a chicken~
 A chicken is pecking at the ground.
 ~
 1 5 djo 0 1
-2 0 0 10
+2 0 0 10 -1
 D
 The chicken is pecking at the ground, ignoring you.
 ~
@@ -228,7 +228,7 @@ a rooster~
 A rooster is crowing at you.
 ~
 1 5 djo 0 1
-1 0 0 10
+1 0 0 10 -1
 D
 The rooster struts proudly around the yard.
 ~
@@ -253,7 +253,7 @@ a dog~
 A large dog is lying in the sun.
 ~
 5 15 djoz c 2
-0 0 14 9
+0 0 14 9 -1
 D
 This old mutt seems happy just lying around.
 ~
@@ -289,7 +289,7 @@ a prairie dog~
 A small prairie dog pokes its head out of the ground.
 ~
 1 5 djo 0 1
-0 0 0 9
+0 0 0 9 -1
 D
    The fat little prairie dog stands up on its hind legs and looks at you
 warily. Its nose twitches as it catches your scent, but it doesn't move from
@@ -310,7 +310,7 @@ a wild sheep~
 A wild sheep chews slowly as it looks at you.
 ~
 10 20 djoy 0 3
-0 0 0 9
+0 0 0 9 -1
 D
 This wild sheep has short, course hair, totally unlike its domestic cousin.
 ~
@@ -333,7 +333,7 @@ a wildcat~
 A wildcat is stalking through the grass.
 ~
 5 15 djoz c 1
-0 0 0 10
+0 0 0 10 -1
 D
 Though it doesn't look so different from a tabby, this is clearly no housecat.
 ~
@@ -353,7 +353,7 @@ a tiger~
 A hungry tiger is crouched low to the ground!
 ~
 75 100 cdgjoz c 3
-0 0 0 10
+0 0 0 10 -1
 D
    The huge tiger is crouched low, perhaps hoping its bright orange fur and
 black stripes camouflage it against the green vegetation. Be careful! It looks
@@ -368,8 +368,8 @@ bear large~
 a large bear~
 A large bear is pawing at the ground.
 ~
-20 40 dgjkoy c 4
-0 0 0 10
+30 60 dgjkoy c 4
+0 0 0 10 -1
 D
    The bear sees you and stands up on its hind legs. You quickly realize the
 bear has more than a foot on you, and at least 100 pounds.
@@ -384,7 +384,7 @@ a hideous vulture~
 A hideous vulture circles over your head.
 ~
 5 15 djo m 2
-0 0 2 9
+0 0 2 9 -1
 D
 The vulture circles above you, eternally patient, waiting for you to pass on.
 ~
@@ -400,7 +400,7 @@ a shark~
 A huge shark circles below you!
 ~
 75 100 cdjlo 0 5
-0 0 6 9
+0 0 6 9 -1
 D
    The shark circles just below the surface, barely visible as its dark back
 disappears against the abyss.
@@ -414,7 +414,7 @@ a quail~
 A stout quail dashes past you.
 ~
 1 5 djo 0 1
-0 0 0 9
+0 0 0 9 -1
 D
    The little quail dashes from bush to bush, perhaps looking for a mate or for
 food.
@@ -437,7 +437,7 @@ a donkey~
 A grey donkey is standing here.
 ~
 10 20 dejo 0 4
-0 0 0 9
+0 0 0 9 -1
 D
    The old grey donkey looks like it's seen better days as it slowly walks in a
 circle around you. Still, it looks strong enough for farm work.
@@ -454,7 +454,7 @@ a black cat~
 A black cat is cleaning itself.
 ~
 5 15 djoz c 1
-0 0 0 10
+0 0 0 10 -1
 D
    The little cat is more shadow than beast and you're careful to avoid it as
 it chases every butterfly, beetle, and bug.
@@ -477,7 +477,7 @@ a rabbit~
 A white rabbit hops around.
 ~
 1 5 djo 0 1
-0 0 15 9
+0 0 15 9 -1
 D
    The rabbit is pure white, of the kind you rarely see in nature, so it has
 surely come from domestic ancestors. But rabbits are quick to breed, and will
@@ -494,7 +494,7 @@ a pigeon~
 A gray pigeon is pecking near your feet.
 ~
 1 5 djo m 1
-0 0 2 9
+0 0 2 9 -1
 D
 The pigeon is fat from eating every crumb dropped by the villagers.
 ~
@@ -507,7 +507,7 @@ a majestic eagle~
 A majestic eagle is soaring overhead.
 ~
 5 15 djoz m 2
-0 0 2 10
+0 0 2 10 -1
 D
    The eagle soars overhead, giving you a striking look at its brown and white
 wings. Occasionally it flaps once or twice, almost gripping the air with the
@@ -531,7 +531,7 @@ a camel~
 A camel is lumbering around.
 ~
 10 20 defjo 0 4
-0 0 0 9
+0 0 0 9 -1
 D
    The camel is large, slow, and ponderous. These single-humped camels are well
 known for their use as mounts and pack animals in the desert.
@@ -545,7 +545,7 @@ a wild camel~
 A wild camel is grazing on the bushes.
 ~
 10 20 djo 0 4
-0 0 0 9
+0 0 0 9 -1
 D
    The camel is shaggy and untamed. Perhaps if you could tame it, it would be a
 good beast of burden.
@@ -562,7 +562,7 @@ a wild horse~
 A wild horse dashes past you!
 ~
 10 20 djo 0 4
-0 0 14 11
+0 0 14 11 -1
 D
    This wild horse is as fast as the wind, and just as free. Its mane blows in
 the breeze as it gallops past you. You might be able to tame the horse, if you
@@ -596,7 +596,7 @@ a dirty man~
 A man is digging through the dirt.
 ~
 20 30 douvI 0 3
-1 0 0 15
+1 0 0 15 -1
 D
    The man is barely clothed, with ragged hair and deep creases in his face.
 He must live just beyond the edges of society.
@@ -609,7 +609,7 @@ a man~
 A man is walking around.
 ~
 20 30 douvI 0 3
-1 0 0 15
+1 0 0 15 -1
 D
    The man doesn't wear the colors of any empire. Perhaps he belongs to a free
 village?
@@ -622,7 +622,7 @@ a young woman~
 A young woman walks past you.
 ~
 20 30 douvI 0 3
-2 0 0 15
+2 0 0 15 -1
 D
 The young woman doesn't bear the colors of any empire.
 ~
@@ -634,7 +634,7 @@ a woman~
 A woman is standing here.
 ~
 20 30 douvI 0 3
-2 0 0 15
+2 0 0 15 -1
 D
 The woman doesn't bear the colors of any empire.
 ~
@@ -646,7 +646,7 @@ a brown horse~
 A brown horse is standing here.
 ~
 10 20 dejo 0 4
-0 0 14 11
+0 0 14 11 -1
 D
    The horse stands with its head high, ears alert for danger. Nevertheless, it
 looks tame, and you might be able to ride it.
@@ -670,7 +670,7 @@ a paint horse~
 A brown and white paint horse is standing here.
 ~
 10 20 dejo 0 4
-0 0 14 11
+0 0 14 11 -1
 D
    The horse wanders over to you, perhaps curious if you have a carrot for it.
 Its coat is blotched like a great canvas, and it's clear someone has cared for
@@ -695,7 +695,7 @@ a roan horse~
 A blue roan horse is standing here.
 ~
 10 20 dejo 0 4
-0 0 14 11
+0 0 14 11 -1
 D
    The horse's roan coat glimmers in the light. It wanders over to you as you
 admire it, and looks tame enough to ride.
@@ -719,7 +719,7 @@ an appaloosa horse~
 A spotted appaloosa horse is standing here.
 ~
 10 20 dejo 0 4
-0 0 14 11
+0 0 14 11 -1
 D
    The speckled horse stands still, cautiously watching you. But as you
 approach, it seems friendly enough to ride.
@@ -743,7 +743,7 @@ a golden palomino horse~
 A golden palomino horse is standing here.
 ~
 10 20 dejo 0 4
-0 0 14 11
+0 0 14 11 -1
 D
 This tall horse has a gorgeous palomino coat and luxurious blonde mane.
 ~
@@ -766,7 +766,7 @@ a chestnut horse~
 A stunning chestnut horse is standing here.
 ~
 10 20 dejo 0 4
-0 0 14 11
+0 0 14 11 -1
 D
    The horse has a beautiful chestnut coat and it seems friendly. You might be
 able to ride it.
@@ -790,7 +790,7 @@ a bay horse~
 A tall bay horse is standing here.
 ~
 10 20 dejo 0 4
-0 0 14 11
+0 0 14 11 -1
 D
    The horse has a brown body, with black legs and hair. It looks friendly
 enough to ride.
@@ -814,7 +814,7 @@ a majestic unicorn~
 A majestic white unicorn is standing here!
 ~
 100 125 dejox 0 4
-0 0 14 11
+0 0 14 11 -1
 D
    The unicorn glistens in the light, like something out of a fairy tale. Its
 coat is as white as the driven snow, with mane and tail to match. But the
@@ -832,7 +832,7 @@ a wild horse~
 A wild horse dashes past you!
 ~
 10 20 djo 0 4
-0 0 14 11
+0 0 14 11 -1
 D
    This wild horse is as fast as the wind, and just as free. Its mane blows in
 the breeze as it gallops past you. You might be able to tame the horse, if you
@@ -866,7 +866,7 @@ a wild ass~
 A wild ass brays loudly as it darts away from you.
 ~
 10 20 djo 0 4
-0 0 11 9
+0 0 11 9 -1
 D
    Although it's similar to domestic donkeys you've seen, the wild ass is
 nowhere near as friendly. It also has striped legs that almost resemble a
@@ -890,7 +890,7 @@ a wild jungle elephant~
 A wild jungle elephant is rummaging around.
 ~
 20 40 djoy 0 5
-0 0 0 27
+0 0 0 27 -1
 D
    The elephant is most brown, with some fine pink or orange spots. It stands
 over you, easily twice your height, but doesn't seem very interested in you.
@@ -909,7 +909,7 @@ a wild elephant~
 A wild elephant lumbers along slowly.
 ~
 20 40 djoy 0 5
-0 0 0 27
+0 0 0 27 -1
 D
    The elephant is enormous, powerful, and terrifying. Luckily, it doesn't seem
 very interested in something as small as you.
@@ -928,7 +928,7 @@ a wild llama~
 A wild llama darts away from you.
 ~
 10 20 djko 0 4
-0 0 0 9
+0 0 0 9 -1
 D
    Also called the wanaku or guanaco, the wild llama has short brown fur and is
 set atop lithe, nimble legs. You've heard of people domesticating these
@@ -946,7 +946,7 @@ a tame sheep~
 A tame sheep chews slowly as it looks at you.
 ~
 10 20 djoy 0 3
-0 0 0 9
+0 0 0 9 -1
 D
    This sheep is tame, but it still has the short, course hair of its wild
 brethren. Perhaps if you keep it in the stable long enough, it will evolve into
@@ -968,7 +968,7 @@ the jackalope~
 A horned jackalope is prancing about.
 ~
 50 75 djko 0 2
-0 0 0 27
+0 0 0 27 -1
 D
    The strange and previously-mythical jackalope sits on its haunches and looks
 at you warily, occasionally scratching one of its antlers with its paw.
@@ -983,7 +983,7 @@ the sasquatch~
 A hairy sasquatch is trying to escape.
 ~
 100 125 djkox 0 3
-0 0 0 15
+0 0 0 15 -1
 D
    The sasquatch is over eight feet tall, with unusually long arms and legs.
 It is covered in thick brown hair from head to foot, except its goatee, which
@@ -997,7 +997,7 @@ the yeti~
 The yeti is watching you carefully.
 ~
 100 125 djkox 0 4
-0 0 0 15
+0 0 0 15 -1
 D
    You can't believe your eyes! Like the son of a lumberjack and a mountain,
 the yeti is huge, broad, and covered in hair. You've never seen anything quite
@@ -1011,7 +1011,7 @@ a woolly mammoth~
 A huge woolly mammoth is standing over you!
 ~
 20 40 defjoy 0 5
-0 0 0 5
+0 0 0 5 -1
 D
    The mammoth is enormous -- bigger than any elephant you've ever seen. It has
 long, shaggy brown hair and tusks the size of trees, and its every step rattles
@@ -1033,7 +1033,7 @@ el chupacabras~
 Watch out! It's el chupacabras!
 ~
 100 125 dgjowz c 2
-0 0 0 10
+0 0 0 10 -1
 D
    El chupacabras is a strange, toothy demon that drinks blood from goats.
 It's known to stalk the southern deserts, where it sometimes mistakes children
@@ -1048,7 +1048,7 @@ a massive green dragon~
 A massive green dragon is here!
 ~
 200 200 cdjouxB c 6
-0 0 0 9
+0 0 0 9 -1
 D
    The enormous dragon is the size of a large keep or a small castle. Its
 forest green scales dance in the light, and you think you see the glimmer of
@@ -1066,7 +1066,7 @@ a hypnotoad~
 You seem to be staring at a hypnotoad!
 ~
 50 75 djo 0 1
-0 0 0 33
+0 0 0 33 -1
 D
    The hypnotoad drones a constant, peaceful sound as its eyes swirl and
 wobble. You're unable to break your gaze.
@@ -1080,7 +1080,7 @@ the mermaid~
 A mermaid swims along beside you!
 ~
 75 100 dlovxI 0 3
-2 0 6 16
+2 0 6 16 -1
 D
    The mermaid is ethereal, graceful, and fleeting as she dives beneath the
 surface and reemerges in the distance. Her top half is almost human, but the
@@ -1094,7 +1094,7 @@ a sea turtle~
 A green sea turtle swims up for a breath of air.
 ~
 10 20 dejlo 0 2
-0 0 6 9
+0 0 6 9 -1
 D
 The sea turtle is decorated with bits of decorative coral and pearls,
 apparently placed there by whoever tamed it. It looks friendly enough to ride.
@@ -1107,7 +1107,7 @@ S
 #n is standing here.
 ~
 30 50 dovwI c 3
-0 0 0 15
+0 0 0 15 -1
 D
 The wanderer looks a bit pale, almost sickly.
 ~
@@ -1121,7 +1121,7 @@ a feral vampire~
 A starving, feral vampire stalks through the shadows nearby.
 ~
 75 100 cduvwI c 3
-1 0 0 10
+1 0 0 10 -1
 D
    The vampire looks emaciated, perhaps near death -- again. It sees you and
 crouches low, preparing to strike.
@@ -1133,7 +1133,7 @@ a nerf bat~
 A nerf bat hovers menacingly overhead.
 ~
 1 5 djo m 1
-0 0 2 9
+0 0 2 9 -1
 D
    The little bat is black, almost blue in color. You know little of its
 original homeland of Nerf, but these bats are said to curse anyone whose path

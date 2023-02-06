@@ -596,6 +596,10 @@ if %mob.aff_flagged(!ATTACK)%
       * Haxaw
       say Human seems real brave for someone whose guts are worth so much copper.
     break
+    case 10455
+      * giant rat
+      %echo% ~%self% bares its sharp teeth!
+    break
     default
       say Oh! A challenger!
     break

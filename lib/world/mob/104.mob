@@ -4,7 +4,7 @@ the panicked guard~
 A panicked guard is fleeing the hamlet!
 ~
 0 0 bdvDI nD 3
-1 0 0 15
+1 0 0 15 -1
 D
    The guard is still dressed in his city colors, albeit streaked with red and
 slightly singed. He's pacing back and forth anxiously as he awaits news of
@@ -21,7 +21,7 @@ a crouching ghoul~
 A ghoul is crouched here, looking up at you.
 ~
 0 0 abdE s 3
-0 0 0 10
+0 0 0 10 -1
 D
    The ghoul looks like it was human, once. Part of its face is missing and its
 clothes are covered in dirt and dried blood. The ghoul sees you and licks its
@@ -58,7 +58,7 @@ a huge panther~
 A huge panther, surely a mage's familiar, is prowling the street.
 ~
 0 0 bdzE 0 4
-0 0 0 9
+0 0 0 9 -1
 D
    This panther is twice the size of any you've seen in the wild, with strange
 symbols branded into its violet-black fur.
@@ -97,7 +97,7 @@ a giant cobra~
 There is a giant cobra familiar coiled in the street.
 ~
 0 0 bdzE 0 4
-0 0 0 9
+0 0 0 9 -1
 D
    The cobra is larger than a cow with fangs that would embarrass a long-horned
 bull. It coils and rears back to strike at you!
@@ -136,7 +136,7 @@ the giant skeleton~
 The animated skeleton of a giant looms tall over the street!
 ~
 0 0 bdAE G 4
-0 0 0 5
+0 0 0 5 -1
 D
    The skeleton is twice your height and even without flesh and bones, it looks
 like it probably outweighs you. It wields a massive bone mace which can only
@@ -178,7 +178,7 @@ the skeletal mammoth~
 A skeletal mammoth blocks the entire street!
 ~
 0 0 bdyAE G 5
-0 0 0 27
+0 0 0 27 -1
 D
    Without its fur and flesh, the mammoth is still truly mammoth. Its long
 tusks give it a reach you can hardly contend with, and its trunk-like leg bones
@@ -218,7 +218,7 @@ the animated armor~
 An animated suit of armor swings its sword at you!
 ~
 0 0 abdzAE G 3
-0 0 0 1
+0 0 0 1 -1
 D
 The armor is empty!
 ~
@@ -253,7 +253,7 @@ a green imp~
 A green imp scampers down the shopfront!
 ~
 0 0 bdzAE G 2
-0 0 0 16
+0 0 0 16 -1
 D
 The little imp is scaly and green, but otherwise resembles a hunched child.
 ~
@@ -291,7 +291,7 @@ a ruddy demon~
 A big, ruddy demon blocks your path!
 ~
 0 0 bdyAE G 4
-0 0 0 24
+0 0 0 24 -1
 D
    The demon has bright red skin and a disproportionately large set of chest
 and arm muscles. You can't seem to get past it.
@@ -330,7 +330,7 @@ the necrofiend~
 A nine-legged necrofiend crawls over the blockade!
 ~
 0 0 bdBE G 4
-0 0 0 20
+0 0 0 20 -1
 D
    The necrofiend skitters back and forth, all the while looming over you and
 never taking any of its eyes off of you.
@@ -371,7 +371,7 @@ Infernomancer #n~
 Infernomancer #n drags waves of fire over the square!
 ~
 0 0 bdxzBE 0 3
-0 2 0 16
+0 2 0 16 -1
 D
    The infernomancer draws back the edge of their flame-red robes to reveal
 fire where their body should be! This isn't going to end well.
@@ -410,7 +410,7 @@ a risen watchman~
 A risen watchman shambles down the street.
 ~
 0 0 abdzAE G 3
-1 0 0 2
+1 0 0 2 -1
 D
    The watchman seems to think he's doing his duty, protecting the street.
 Since he's dead and you aren't, he seems to consider you a threat!
@@ -446,7 +446,7 @@ a risen monk~
 A risen monk is gnawing on his own arm.
 ~
 0 0 bdBE G 3
-1 0 0 9
+1 0 0 9 -1
 D
 The monk looks like he has taken asceticism to the extreme.
 ~
@@ -487,7 +487,7 @@ a risen temple guard~
 A risen temple guard lurches toward you!
 ~
 0 0 bdBE G 3
-1 0 0 5
+1 0 0 5 -1
 D
 The temple guard's hollow eyes follow you as you move.
 ~
@@ -528,7 +528,7 @@ Necromancer #n~
 A necromancer is preparing a dark spell over one of the corpses.
 ~
 0 0 bdxABE 0 3
-2 2 0 19
+2 2 0 19 -1
 D
    The necromancer's black robe stands out against the burning flames of the
 hamlet, as it reflects no light. The brighter the flame, the deeper the pit
@@ -579,7 +579,7 @@ Necromaster #n~
 Necromaster #n is shouting orders to the cultists!
 ~
 0 0 bdxABE 0 3
-0 2 0 21
+0 2 0 21 -1
 D
    The necromaster's midnight-black robe is highlighted by glimmering eventide
 accents, but what makes it most impressive is the icy mist falling from the
@@ -632,7 +632,7 @@ a fleeing citizen~
 A fleeing citizen looks absolutely panicked!
 ~
 40 80 dvDI 0 3
-2 0 0 15
+2 0 0 15 -1
 D
 She doesn't have time to stop.
 ~
@@ -655,7 +655,7 @@ a shambling zombie~
 The shambling zombie of a citizen stumbles toward you.
 ~
 40 80 dvDI G 3
-0 0 0 9
+0 0 0 9 -1
 D
 This former citizen has seen better days.
 ~
@@ -678,7 +678,7 @@ a skeletal horse~
 A skeletal horse munches fruitlessly at the turf.
 ~
 30 60 dej G 4
-0 0 14 11
+0 0 14 11 -1
 D
 This proud horse may have lost its life, but it stands ready.
 ~
@@ -690,7 +690,7 @@ a skeletal warhorse~
 A skeletal warhorse rears and kicks at the air.
 ~
 40 80 bdej G 4
-0 0 0 11
+0 0 0 11 -1
 D
    This proud horse may have lost its life, but it stands ready to charge into
 battle at a moment's notice.
@@ -702,7 +702,7 @@ a skeletal mammoth~
 A huge, bony skeletal mammoth stands over you.
 ~
 100 120 dejy G 5
-0 0 0 5
+0 0 0 5 -1
 D
 The mammoth is no less enormous without its fur and hide.
 ~
@@ -714,7 +714,7 @@ a skeletal warmammoth~
 A huge skeletal warmammoth looms down on you.
 ~
 100 120 dejy G 5
-0 0 0 5
+0 0 0 5 -1
 D
 This mammoth of a skeleton has been outfitted with fine iron armor.
 ~
@@ -725,7 +725,7 @@ a skeletal terrosaur~
 A skeletal terrosaur soars overhead.
 ~
 100 120 dej mG 5
-0 0 2 27
+0 0 2 27 -1
 D
    This enormous flying beast has died, rotted, and been brought back! The
 terrosaur's eyes glow a misty blue from the magic that holds its bones together
@@ -739,7 +739,7 @@ an armored skeletal terrosaur~
 An armored skeletal terrosaur swoops low overhead.
 ~
 100 120 dejy mG 5
-0 0 2 27
+0 0 2 27 -1
 D
    This enormous flying beast has died, rotted, and been brought back! The
 terrosaur's eyes glow a misty blue from the magic that holds its bones together
@@ -753,7 +753,7 @@ a mini skeletal mammoth~
 A mini skeletal mammoth is charging around.
 ~
 1 1 bdo n 3
-0 0 11 15
+0 0 11 15 -1
 D
    You can't tell if this was a miniature mammoth that died and was
 resurrected, or a full-size mammoth that was resurrected and shrunk. Either
@@ -787,7 +787,7 @@ a trained sewer rat~
 A trained rat scurries alongside you.
 ~
 0 75 adj c 1
-0 0 7 9
+0 0 7 9 -1
 D
    When the rat thinks you have cheese, it stands on its hind legs and then
 drops and rolls over. Then it realizes you don't actually have any cheese.
@@ -838,7 +838,7 @@ Dryleef, vanguard leader~
 Dryleef, leader of the goblin vanguard, is sitting on the throne.
 ~
 0 0 bdhy 0 2
-1 0 0 5
+1 0 0 5 -1
 D
    Dryleef's youthful face belies his years of experience at the head of the
 goblin vanguard. His shoulders are heavy with ratskin robes and green copper
@@ -908,7 +908,7 @@ Pimmin, goblin shaman~
 A goblin shaman is swirling a vial with a rat tail.
 ~
 0 0 bdhxy 0 2
-2 0 0 16
+2 0 0 16 -1
 D
    Pimmin is crouched over a pile of tiny bones and various balls of wax and
 lint. It's hard to tell what she's working on -- indeed, it's hard to discern
@@ -982,7 +982,7 @@ Shivsper, goblin assassin~
 Shivsper throws a dagger at a crude drawing of a human on the wall.
 ~
 0 0 bdhyz 0 2
-1 0 0 4
+1 0 0 4 -1
 D
    Shivsper leans against the sewer wall, casually tossing his collection of
 daggers, needles, shivs, spurs, thorns, and spines at the most sensitive areas
@@ -1041,7 +1041,7 @@ Wargreyn, goblin blacksmith~
 Wargreyn, the goblin smith, is resting by the forge.
 ~
 0 0 bdhy 0 2
-2 0 0 6
+2 0 0 6 -1
 D
    Wargreyn's face hangs heavy on her sharp green cheekbones, showing off years
 of work in front of the hot goblin forge. The life of a goblin smith is a long
@@ -1106,10 +1106,10 @@ S
 #10455
 rat war armored giant~
 a giant war rat~
-An giant, armored war rat bares its teeth at you!
+An giant, armored war rat bares its teeth at you! (difficulty)
 ~
 0 0 adjA c 2
-0 0 7 9
+0 0 7 9 -1
 D
    Whoever attached the plates of wood and brass to this oversized rat must
 have a sense of humor, and is probably also missing some fingers.
@@ -1150,20 +1150,24 @@ M
 0
 $n gnaws on a smaller rat carcass.~
 T 10014
+T 10455
+T 10457
+T 10458
 S
 #10457
 haxaw medicine goblin~
 Haxaw, medicine goblin~
 Haxaw is sitting here, stirring a small pot.
 ~
-0 0 bdhvxyI 0 3
-2 0 0 28
+0 0 bdhvxyI M 3
+2 0 0 28 -1
 D
    Haxaw is surprisingly tall and pink, for a goblin, but she has the
 unmistakable odor and characteristic fashion sense of the commonest goblin.
 Though she doesn't look any older than twenty (by human standards), her eyes
 have the milky haze of an old woman.
 ~
+I 4 184 100.00 1  # LOOT: torch
 I 4 10483 16.66 1 a  # LOOT: Haxaw's poison ring
 I 4 10484 16.66 1 a  # LOOT: goblin neck smile
 I 4 10485 16.67 1 a  # LOOT: flail of many blessings
