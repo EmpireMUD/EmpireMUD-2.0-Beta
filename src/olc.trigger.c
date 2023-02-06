@@ -819,9 +819,19 @@ void save_olc_trigger(descriptor_data *desc, char *script_text) {
 		if (live_trig->arglist == proto->arglist) {
 			live_trig->arglist = trig->arglist;
 		}
+		else if (!strcmp(live_trig->arglist, proto->arglist)) {
+			free(live_trig->arglist);
+			live_trig->arglist = trig->arglist ? str_dup(trig->arglist) : NULL;
+		}
 		if (live_trig->cmdlist == proto->cmdlist) {
 			live_trig->cmdlist = cmdlist;
 		}
+		
+		// check vars
+		live_trig->attach_type = trig->attach_type;
+		live_trig->trigger_type = trig->trigger_type;
+		live_trig->narg = trig->narg;
+		
 	}
 	
 	// free existing commands
