@@ -6610,6 +6610,7 @@ ACMD(do_retrieve) {
 		return;
 	}
 	
+	skip_spaces(&argument);
 	strcpy(original, argument);
 	half_chop(argument, arg, buf);
 
@@ -6698,12 +6699,12 @@ ACMD(do_retrieve) {
 		}
 
 		if (!found) {
-			if (room_has_function_and_city_ok(GET_LOYALTY(ch), IN_ROOM(ch), FNC_WAREHOUSE | FNC_VAULT)) {
+			if (room_has_function_and_city_ok(GET_LOYALTY(ch), IN_ROOM(ch), FNC_WAREHOUSE | FNC_VAULT) && str_cmp(original, "all")) {
 				// pass control to warehouse func
 				sprintf(buf, "retrieve %s", original);
 				do_warehouse(ch, buf, 0, 0);
 			}
-			else if (ROOM_PRIVATE_OWNER(HOME_ROOM(IN_ROOM(ch))) == GET_IDNUM(ch)) {
+			else if (ROOM_PRIVATE_OWNER(HOME_ROOM(IN_ROOM(ch))) == GET_IDNUM(ch) && str_cmp(original, "all")) {
 				// pass control to home store func
 				sprintf(buf, "retrieve %s", original);
 				do_home(ch, buf, 0, 0);
