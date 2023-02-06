@@ -815,8 +815,11 @@ ACMD(do_bite) {
 
 	one_argument(argument, arg);
 
-	if (cancel_biting(ch)) {
-		// sends own message
+	if (!*argument && cancel_biting(ch)) {
+		// skip this if they typed an arg; cancels if possible; sends own message if so
+	}
+	else if (GET_FEEDING_FROM(ch)) {
+		msg_to_char(ch, "You are already biting someone!\r\n");
 	}
 	else if (!IS_VAMPIRE(ch)) {
 		if ((soc = find_social(ch, "bite", TRUE))) {
