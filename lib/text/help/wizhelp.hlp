@@ -1129,6 +1129,7 @@ currency   Immort   Shows coins and adventure currencies for a player.
 dailycycle Immort   Shows daily quests with a given cycle id.
 dropped    Immort   Shows all items an empire has on the ground.
 factions   Immort   Shows a player's faction levels.
+home       Immort   Shows where a player's home is, if any.
 homeless   Immort   Shows the homeless citizen list for an empire.
 ignoring   Immort   Shows you who a player has on their ignore list.
 inventory  Immort   Shows how many players have a certain item.
@@ -1159,6 +1160,7 @@ subzone    Immort   Shows room templates with a matching subzone id.
 technology Immort   Shows ability techs a player has.
 sectors    Immort   Shows tile counts for all sector types (vnum/name optional).
 terrain    Immort   Same as 'sectors' (for historical reasons).
+tomb       Immort   Shows where a player's tomb is, if any.
 tools      Immort   Shows all objects with a given tool type.
 unlearnable Immrt   Shows stats on LEANRED crafts with no assignments.
 uses       Immort   Shows crafts (and vehicles, etc.) that use a component type.
@@ -1239,6 +1241,14 @@ This command shows you all of a player's faction reputation levels. It can
 be filtered by name.
 
 See also: FACTION, SET FACTION
+#e
+"SHOW HOME"
+
+Usage:  show home <player>
+
+This command shows where a player has set as their home, if anywhere.
+
+See also: HOME
 #e
 "SHOW HOMELESS"
 
@@ -1482,6 +1492,14 @@ see as many as fit in the text buffer.
 
 "Show sectors" was formerly called "show terrain", which is also included for
 immortals who still use the old version.
+#e
+"SHOW TOMB"
+
+Usage:  show tomb <player>
+
+Shows where a player has set as their tomb, if anywhere.
+
+See also: TOMB
 #e
 "SHOW TOOLS"
 

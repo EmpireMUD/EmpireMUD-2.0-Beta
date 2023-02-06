@@ -3041,6 +3041,37 @@ SHOW(show_factions) {
 }
 
 
+SHOW(show_home) {
+	char name[MAX_INPUT_LENGTH];
+	bool file = FALSE;
+	char_data *vict;
+	room_data *home;
+	
+	any_one_arg(argument, name);
+	
+	if (!(vict = find_or_load_player(name, &file))) {
+		msg_to_char(ch, "No player by that name.\r\n");
+	}
+	else if (GET_ACCESS_LEVEL(vict) > GET_ACCESS_LEVEL(ch)) {
+		msg_to_char(ch, "You can't do that.\r\n");
+	}
+	else {
+		home = find_home(vict);
+		
+		if (!home) {
+			msg_to_char(ch, "%s has no home set.\r\n", PERS(vict, ch, TRUE));
+		}
+		else {
+			msg_to_char(ch, "%s's home is at: %s%s\r\n", PERS(vict, ch, TRUE), get_room_name(home, FALSE), coord_display_room(ch, home, FALSE));
+		}
+	}
+	
+	if (file) {
+		free_char(vict);
+	}
+}
+
+
 SHOW(show_homeless) {
 	char arg[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH * 2], line[MAX_STRING_LENGTH];
 	struct empire_homeless_citizen *ehc;
@@ -4463,6 +4494,37 @@ SHOW(show_terrain) {
 		}
 		
 		page_string(ch->desc, buf, TRUE);
+	}
+}
+
+
+SHOW(show_tomb) {
+	char name[MAX_INPUT_LENGTH];
+	bool file = FALSE;
+	char_data *vict;
+	room_data *tomb;
+	
+	any_one_arg(argument, name);
+	
+	if (!(vict = find_or_load_player(name, &file))) {
+		msg_to_char(ch, "No player by that name.\r\n");
+	}
+	else if (GET_ACCESS_LEVEL(vict) > GET_ACCESS_LEVEL(ch)) {
+		msg_to_char(ch, "You can't do that.\r\n");
+	}
+	else {
+		tomb = real_room(GET_TOMB_ROOM(vict));
+		
+		if (!tomb) {
+			msg_to_char(ch, "%s has no tomb set.\r\n", PERS(vict, ch, TRUE));
+		}
+		else {
+			msg_to_char(ch, "%s's tomb is at: %s%s\r\n", PERS(vict, ch, TRUE), get_room_name(tomb, FALSE), coord_display_room(ch, tomb, FALSE));
+		}
+	}
+	
+	if (file) {
+		free_char(vict);
 	}
 }
 
@@ -10379,11 +10441,13 @@ ACMD(do_show) {
 		{ "produced", LVL_START_IMM, show_produced },
 		{ "resource", LVL_START_IMM, show_resource },
 		{ "olc", LVL_START_IMM, show_olc },
+		{ "home", LVL_START_IMM, show_home },
 		{ "homeless", LVL_START_IMM, show_homeless },
 		{ "companions", LVL_START_IMM, show_companions },
 		{ "lastnames", LVL_START_IMM, show_lastnames },
 		{ "oceanmobs", LVL_START_IMM, show_oceanmobs },
 		{ "subzone", LVL_START_IMM, show_subzone },
+		{ "tomb", LVL_START_IMM, show_tomb },
 
 		// last
 		{ "\n", 0, NULL }
