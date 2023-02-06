@@ -3122,9 +3122,10 @@ ACMD(do_mapsize) {
 
 ACMD(do_mark) {
 	int dist, dir;
-	room_data *mark;
+	room_data *mark, *here;
 	
 	skip_spaces(&argument);
+	here = get_map_location_for(IN_ROOM(ch));
 	
 	if (IS_NPC(ch)) {
 		msg_to_char(ch, "NPCs can't mark the map.\r\n");
@@ -3133,13 +3134,13 @@ ACMD(do_mark) {
 		GET_MARK_LOCATION(ch) = NOWHERE;
 		msg_to_char(ch, "You clear your marked location.\r\n");
 	}
-	else if (GET_ROOM_VNUM(IN_ROOM(ch)) >= MAP_SIZE) {
-		msg_to_char(ch, "You may only mark distances on the map or from the entry room of a building.\r\n");
+	else if (GET_ROOM_VNUM(here) >= MAP_SIZE || RMT_FLAGGED(IN_ROOM(ch), RMT_NO_LOCATION)) {
+		msg_to_char(ch, "You may only mark distances on the map.\r\n");
 	}
 	else {
 		if (*argument && !str_cmp(argument, "set")) {
-			GET_MARK_LOCATION(ch) = GET_ROOM_VNUM(IN_ROOM(ch));
-			msg_to_char(ch, "You have marked this location. Use 'mark' again to see the distance to it from any other map location.\r\n");
+			GET_MARK_LOCATION(ch) = GET_ROOM_VNUM(here);
+			msg_to_char(ch, "You have marked %s. Use 'mark' again to see the distance to it from any other map location.\r\n", (IN_ROOM(ch) == here ? "this location" : "this map location"));
 		}
 		else if (*argument) {
 			msg_to_char(ch, "Usage: mark [set | clear]\r\n");
