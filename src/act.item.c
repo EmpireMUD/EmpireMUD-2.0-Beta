@@ -7030,6 +7030,9 @@ ACMD(do_ship) {
 		
 		page_string(ch->desc, buf, TRUE);
 	}
+	else if (GET_POS(ch) < POS_RESTING) {
+		send_low_pos_msg(ch);
+	}
 	else if (GET_ISLAND_ID(IN_ROOM(ch)) == NO_ISLAND) {
 		msg_to_char(ch, "You can't ship anything from here.\r\n");
 	}
