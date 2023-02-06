@@ -1597,75 +1597,87 @@ void do_instance_delete_all(char_data *ch, char *argument) {
 void do_instance_info(char_data *ch, char *argument) {
 	struct instance_mob *mc, *next_mc;
 	char buf[MAX_STRING_LENGTH];
-	struct instance_data *inst;
-	int num;
+	struct instance_data *iter, *inst = NULL;
+	int num = 1;
 	
-	if (!*argument || !isdigit(*argument) || (num = atoi(argument)) < 1) {
+	// attempt to find instance here with no arg
+	if (!*argument) {
+		inst = find_instance_by_room(IN_ROOM(ch), FALSE, TRUE);
+	}
+	
+	// otherwise check arg
+	if (!inst && (!*argument || !isdigit(*argument) || (num = atoi(argument)) < 1)) {
 		msg_to_char(ch, "Invalid instance number '%s'.\r\n", *argument ? argument : "<blank>");
 		return;
 	}
 	
-	DL_FOREACH(instance_list, inst) {
-		if (--num == 0) {
-			msg_to_char(ch, "\tcInstance %d: [%d] %s\t0\r\n", atoi(argument), GET_ADV_VNUM(INST_ADVENTURE(inst)), GET_ADV_NAME(INST_ADVENTURE(inst)));
-			
-			if (INST_LOCATION(inst)) {
-				if (ROOM_OWNER(INST_LOCATION(inst))) {
-					sprintf(buf, " / %s%s\t0", EMPIRE_BANNER(ROOM_OWNER(INST_LOCATION(inst))), EMPIRE_NAME(ROOM_OWNER(INST_LOCATION(inst))));
-				}
-				else {
-					*buf = '\0';
-				}
-				msg_to_char(ch, "Location: [%d] %s%s%s\r\n", GET_ROOM_VNUM(INST_LOCATION(inst)), get_room_name(INST_LOCATION(inst), FALSE), coord_display_room(ch, INST_LOCATION(inst), FALSE), buf);
+	// look up by number if needed
+	if (!inst) {
+		DL_FOREACH(instance_list, iter) {
+			if (--num == 0) {
+				inst = iter;
+				break;
 			}
-			if (INST_FAKE_LOC(inst) && INST_FAKE_LOC(inst) != INST_LOCATION(inst)) {
-				if (ROOM_OWNER(INST_FAKE_LOC(inst))) {
-					sprintf(buf, " / %s%s\t0", EMPIRE_BANNER(ROOM_OWNER(INST_FAKE_LOC(inst))), EMPIRE_NAME(ROOM_OWNER(INST_FAKE_LOC(inst))));
-				}
-				else {
-					*buf = '\0';
-				}
-				msg_to_char(ch, "Fake Location: [%d] %s%s%s\r\n", GET_ROOM_VNUM(INST_FAKE_LOC(inst)), get_room_name(INST_FAKE_LOC(inst), FALSE), coord_display_room(ch, INST_FAKE_LOC(inst), FALSE), buf);
-			}
-			
-			if (INST_START(inst)) {
-				msg_to_char(ch, "First room: [%d] %s\r\n", GET_ROOM_VNUM(INST_START(inst)), get_room_name(INST_START(inst), FALSE));
-			}
-			
-			if (INST_LEVEL(inst) > 0) {
-				msg_to_char(ch, "Level: %d\r\n", INST_LEVEL(inst));
-			}
-			else {
-				msg_to_char(ch, "Level: unscaled\r\n");
-			}
-			
-			sprintbit(INST_FLAGS(inst), instance_flags, buf, TRUE);
-			msg_to_char(ch, "Flags: %s\r\n", buf);
-			
-			msg_to_char(ch, "Created: %-24.24s\r\n", (char *) asctime(localtime(&INST_CREATED(inst))));
-			if (INST_LAST_RESET(inst) != INST_CREATED(inst)) {
-				msg_to_char(ch, "Last reset: %-24.24s\r\n", (char *) asctime(localtime(&INST_LAST_RESET(inst))));
-			}
-			
-			if (INST_DIR(inst) != NO_DIR) {
-				msg_to_char(ch, "Facing: %s\r\n", dirs[INST_DIR(inst)]);
-			}
-			if (INST_ROTATION(inst) != NO_DIR && IS_SET(GET_ADV_FLAGS(INST_ADVENTURE(inst)), ADV_ROTATABLE)) {
-				msg_to_char(ch, "Rotation: %s\r\n", dirs[INST_ROTATION(inst)]);
-			}
-			
-			if (INST_MOB_COUNTS(inst)) {
-				msg_to_char(ch, "Mob counts:\r\n");
-				HASH_ITER(hh, INST_MOB_COUNTS(inst), mc, next_mc) {
-					msg_to_char(ch, "%3d %s\r\n", mc->count, skip_filler(get_mob_name_by_proto(mc->vnum, FALSE)));
-				}
-			}
-			
-			break;	// only show 1
 		}
 	}
 	
-	if (num > 0) {
+	// show if found
+	if (inst) {
+		msg_to_char(ch, "\tcInstance %d: [%d] %s\t0\r\n", atoi(argument), GET_ADV_VNUM(INST_ADVENTURE(inst)), GET_ADV_NAME(INST_ADVENTURE(inst)));
+		
+		if (INST_LOCATION(inst)) {
+			if (ROOM_OWNER(INST_LOCATION(inst))) {
+				sprintf(buf, " / %s%s\t0", EMPIRE_BANNER(ROOM_OWNER(INST_LOCATION(inst))), EMPIRE_NAME(ROOM_OWNER(INST_LOCATION(inst))));
+			}
+			else {
+				*buf = '\0';
+			}
+			msg_to_char(ch, "Location: [%d] %s%s%s\r\n", GET_ROOM_VNUM(INST_LOCATION(inst)), get_room_name(INST_LOCATION(inst), FALSE), coord_display_room(ch, INST_LOCATION(inst), FALSE), buf);
+		}
+		if (INST_FAKE_LOC(inst) && INST_FAKE_LOC(inst) != INST_LOCATION(inst)) {
+			if (ROOM_OWNER(INST_FAKE_LOC(inst))) {
+				sprintf(buf, " / %s%s\t0", EMPIRE_BANNER(ROOM_OWNER(INST_FAKE_LOC(inst))), EMPIRE_NAME(ROOM_OWNER(INST_FAKE_LOC(inst))));
+			}
+			else {
+				*buf = '\0';
+			}
+			msg_to_char(ch, "Fake Location: [%d] %s%s%s\r\n", GET_ROOM_VNUM(INST_FAKE_LOC(inst)), get_room_name(INST_FAKE_LOC(inst), FALSE), coord_display_room(ch, INST_FAKE_LOC(inst), FALSE), buf);
+		}
+		
+		if (INST_START(inst)) {
+			msg_to_char(ch, "First room: [%d] %s\r\n", GET_ROOM_VNUM(INST_START(inst)), get_room_name(INST_START(inst), FALSE));
+		}
+		
+		if (INST_LEVEL(inst) > 0) {
+			msg_to_char(ch, "Level: %d\r\n", INST_LEVEL(inst));
+		}
+		else {
+			msg_to_char(ch, "Level: unscaled\r\n");
+		}
+		
+		sprintbit(INST_FLAGS(inst), instance_flags, buf, TRUE);
+		msg_to_char(ch, "Flags: %s\r\n", buf);
+		
+		msg_to_char(ch, "Created: %-24.24s\r\n", (char *) asctime(localtime(&INST_CREATED(inst))));
+		if (INST_LAST_RESET(inst) != INST_CREATED(inst)) {
+			msg_to_char(ch, "Last reset: %-24.24s\r\n", (char *) asctime(localtime(&INST_LAST_RESET(inst))));
+		}
+		
+		if (INST_DIR(inst) != NO_DIR) {
+			msg_to_char(ch, "Facing: %s\r\n", dirs[INST_DIR(inst)]);
+		}
+		if (INST_ROTATION(inst) != NO_DIR && IS_SET(GET_ADV_FLAGS(INST_ADVENTURE(inst)), ADV_ROTATABLE)) {
+			msg_to_char(ch, "Rotation: %s\r\n", dirs[INST_ROTATION(inst)]);
+		}
+		
+		if (INST_MOB_COUNTS(inst)) {
+			msg_to_char(ch, "Mob counts:\r\n");
+			HASH_ITER(hh, INST_MOB_COUNTS(inst), mc, next_mc) {
+				msg_to_char(ch, "%3d %s\r\n", mc->count, skip_filler(get_mob_name_by_proto(mc->vnum, FALSE)));
+			}
+		}
+	}
+	else {
 		msg_to_char(ch, "Invalid instance number %d.\r\n", atoi(argument));
 	}
 }
