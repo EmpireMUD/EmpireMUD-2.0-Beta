@@ -1777,7 +1777,7 @@ ACMD(do_drive) {
 	else if (count_harnessed_animals(veh) < VEH_ANIMALS_REQUIRED(veh)) {
 		msg_to_char(ch, "You must harness %d more animal%s to it first.\r\n", (VEH_ANIMALS_REQUIRED(veh) - count_harnessed_animals(veh)), PLURAL(VEH_ANIMALS_REQUIRED(veh) - count_harnessed_animals(veh)));
 	}
-	else if (veh == GET_ROOM_VEHICLE(IN_ROOM(ch)) && !ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_LOOK_OUT)) {
+	else if (veh == GET_ROOM_VEHICLE(IN_ROOM(ch)) && !CAN_LOOK_OUT(IN_ROOM(ch))) {
 		msg_to_char(ch, "You can't %s here because you can't see outside.\r\n", drive_data[subcmd].command);
 	}
 	else if (!can_use_vehicle(ch, veh, MEMBERS_ONLY)) {

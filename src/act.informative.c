@@ -2955,7 +2955,7 @@ ACMD(do_look) {
 				// extra desc takes priority
 				send_to_char(exdesc, ch);
 			}
-			else if (!IS_IMMORTAL(ch) && !ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_LOOK_OUT) && !RMT_FLAGGED(IN_ROOM(ch), RMT_LOOK_OUT)) {
+			else if (!IS_IMMORTAL(ch) && !CAN_LOOK_OUT(IN_ROOM(ch))) {
 				msg_to_char(ch, "You can't do that from here.\r\n");
 			}
 			else if (GET_ROOM_VEHICLE(IN_ROOM(ch))) {
@@ -3839,7 +3839,7 @@ ACMD(do_weather) {
 	}
 	
 	// show sun/daytime
-	if (IS_OUTDOORS(ch) || ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_LOOK_OUT) || RMT_FLAGGED(IN_ROOM(ch), RMT_LOOK_OUT)) {
+	if (IS_OUTDOORS(ch) || CAN_LOOK_OUT(IN_ROOM(ch))) {
 		switch (get_sun_status(IN_ROOM(ch))) {
 			case SUN_DARK: {
 				msg_to_char(ch, "It's nighttime.\r\n");
@@ -3867,12 +3867,12 @@ ACMD(do_weather) {
 	}
 	
 	// show moons
-	if (IS_OUTDOORS(ch)) {
+	if (IS_OUTDOORS(ch) || CAN_LOOK_OUT(IN_ROOM(ch))) {
 		show_visible_moons(ch);
 	}
 	
 	// final message if not outdoors
-	if (!IS_OUTDOORS(ch)) {
+	if (!IS_OUTDOORS(ch) && !CAN_LOOK_OUT(IN_ROOM(ch))) {
 		msg_to_char(ch, "You can't see the sky from here.\r\n");
 	}
 }
