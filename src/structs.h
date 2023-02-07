@@ -469,6 +469,8 @@ typedef struct vehicle_data vehicle_data;
 #define REQ_LEVEL_UNDER  38
 #define REQ_LEVEL_OVER  39
 #define REQ_OWN_VEHICLE_FUNCTION  40
+#define REQ_SPEAK_LANGUAGE  41
+#define REQ_RECOGNIZE_LANGUAGE  42
 
 
 // REQ_AMT_x: How numbers displayed for different REQ_ types
@@ -1005,6 +1007,7 @@ typedef struct vehicle_data vehicle_data;
 #define AFF_IMMUNE_DAMAGE  BIT(35)	// J. Cannot take damage
 #define AFF_NO_WHERE  BIT(36)	// K. cannot be found using 'WHERE'
 #define AFF_WATERWALK  BIT(37)	// L. won't drown or be affected by water restrictions
+#define AFF_LIGHT  BIT(38)	// M. has a light (lights up the room)
 
 
 // Injury flags -- IS_INJURED
@@ -1554,6 +1557,7 @@ typedef struct vehicle_data vehicle_data;
 #define GENERIC_CURRENCY  5	// tokens, for shops
 #define GENERIC_COMPONENT  6	// types of generic objects
 #define GENERIC_MOON  7	// moon in the sky
+#define GENERIC_LANGUAGE  8	// language a player can speak
 
 
 // GEN_x: generic flags
@@ -1566,6 +1570,12 @@ typedef struct vehicle_data vehicle_data;
 
 // how many ints a generic stores (update write_generic_to_file if you change this)
 #define NUM_GENERIC_VALUES  4
+
+
+// LANG_x: how well someone speaks a language
+#define LANG_UNKNOWN  0	// default: does not speak it, cannot recognize it
+#define LANG_RECOGNIZE  1	// knows which language it is, but can't speak it
+#define LANG_SPEAK  2	// full comprehension and speaking
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -2553,6 +2563,8 @@ typedef enum {
 #define PRG_PERK_TERRITORY_PER_GREATNESS  5	// increases territory per greatness
 #define PRG_PERK_WORKFORCE_CAP  6	// higher workforce caps
 #define PRG_PERK_TERRITORY  7	// grants bonus territory (flat rate)
+#define PRG_PERK_SPEAK_LANGUAGE  8	// whole empire may speak
+#define PRG_PERK_RECOGNIZE_LANGUAGE  9	// whole empire may recognize
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -2592,6 +2604,8 @@ typedef enum {
 #define QR_REPUTATION  7
 #define QR_CURRENCY  8
 #define QR_EVENT_POINTS  9
+#define QR_SPEAK_LANGUAGE  10
+#define QR_RECOGNIZE_LANGUAGE  11
 
 
 // indicates empire (rather than misc) coins for a reward
@@ -3770,6 +3784,7 @@ struct archetype_data {
 	char *male_rank;
 	char *female_rank;
 	
+	generic_data *language;	// optional starting language (generic)
 	struct archetype_skill *skills;	// linked list
 	struct archetype_gear *gear;	// linked list
 	int attributes[NUM_ATTRIBUTES];	// starting attributes (default 1)
@@ -4008,6 +4023,7 @@ struct mob_special_data {
 	int max_scale_level;	// maximum level this mob may be scaled to
 	
 	int name_set;	// NAMES_x
+	any_vnum language;	// default language (NOTHING to use global default instead)
 	struct custom_message *custom_msgs;	// any custom messages
 	faction_data *faction;	// if any
 	
@@ -4387,6 +4403,14 @@ struct player_ability_data {
 };
 
 
+// languages a player knows -- also used for empires
+struct player_language {
+	any_vnum vnum;	// vnum of the language (generic)
+	byte level;	// LANG_ constant for how well they speak it
+	UT_hash_handle hh;	// player's language hash
+};
+
+
 // remembers a tile a player has seen before
 struct player_map_memory {
 	room_vnum vnum;	// map loc
@@ -4547,6 +4571,8 @@ struct player_special_data {
 	ubyte class_progression;	// % of the way from SPECIALTY_SKILL_CAP to CLASS_SKILL_CAP
 	ubyte class_role;	// ROLE_ chosen by the player
 	class_data *character_class;  // character's class as determined by top skills
+	any_vnum speaking;	// current language
+	struct player_language *languages;	// languages the player speaks/recognizes
 	struct player_craft_data *learned_crafts;	// crafts learned from patterns
 	struct minipet_data *minipets;	// collection of summonable pets
 	struct ability_gain_hook *gain_hooks;	// hash table of when to gain ability xp
@@ -5276,6 +5302,7 @@ struct empire_data {
 	struct offense_data *offenses;	// doubly-linked list
 	struct empire_goal *goals;	// current goal trackers (hash by vnum)
 	struct empire_completed_goal *completed_goals;	// actually a hash (vnum)
+	struct player_language *languages;	// languages available to the whole empire
 	struct player_craft_data *learned_crafts;	// crafts available to the whole empire
 	struct theft_log *theft_logs;	// recently stolen items
 	struct empire_production_total *production_totals;	// totals of items produced by the empire (hash by vnum)

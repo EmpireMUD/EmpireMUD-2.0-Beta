@@ -1937,6 +1937,7 @@ void free_empire(empire_data *emp) {
 	struct workforce_log *wf_log;
 	struct shipping_data *shipd, *next_shipd;
 	struct workforce_production_log *wplog, *next_wplog;
+	struct player_language *lang, *next_lang;
 	room_data *room;
 	int iter;
 	
@@ -1968,6 +1969,12 @@ void free_empire(empire_data *emp) {
 		
 		emp->city_list = city->next;
 		free(city);
+	}
+	
+	// free languages
+	HASH_ITER(hh, EMPIRE_LANGUAGES(emp), lang, next_lang) {
+		HASH_DEL(EMPIRE_LANGUAGES(emp), lang);
+		free(lang);
 	}
 	
 	// free learned crafts
@@ -2640,6 +2647,16 @@ void parse_empire(FILE *fl, empire_vnum vnum) {
 						}
 						break;
 					}
+					case 'M': {	// GM: languages
+						if (sscanf(line, "GM %d %d", &t[0], &t[1]) != 2) {
+							log("SYSERR: Format error in GM line of empire %d", vnum);
+							// not fatal
+							break;
+						}
+						
+						add_language_empire(emp, t[0], t[1]);
+						break;
+					}
 					case 'P': {	// GP: goal points (progress points)
 						if (sscanf(line, "GP %d %d", &t[0], &t[1]) != 2) {
 							log("SYSERR: Format error in GP line of empire %d", vnum);
@@ -2933,6 +2950,7 @@ void write_empire_to_file(FILE *fl, empire_data *emp) {
 	struct empire_territory_data *ter, *next_ter;
 	struct empire_completed_goal *ecg, *next_ecg;
 	struct player_craft_data *pcd, *next_pcd;
+	struct player_language *lang, *next_lang;
 	struct empire_goal *egoal, *next_egoal;
 	struct empire_needs *need, *next_need;
 	struct empire_homeless_citizen *ehc;
@@ -3010,6 +3028,10 @@ void write_empire_to_file(FILE *fl, empire_data *emp) {
 	HASH_ITER(hh, EMPIRE_LEARNED_CRAFTS(emp), pcd, next_pcd) {
 		// GL learned crafts
 		fprintf(fl, "GL %d %d\n", pcd->vnum, pcd->count);
+	}
+	// GM languages
+	HASH_ITER(hh, EMPIRE_LANGUAGES(emp), lang, next_lang) {
+		fprintf(fl, "GM %d %d\n", lang->vnum, lang->level);
 	}
 	for (iter = 0; iter < NUM_PROGRESS_TYPES; ++iter) {
 		// GP goal points (progress points)
@@ -4970,16 +4992,25 @@ void parse_mobile(FILE *mob_f, int nr) {
 	SET_BIT(MOB_FLAGS(mob), MOB_ISNPC);	// sanity
 	REMOVE_BIT(MOB_FLAGS(mob), MOB_EXTRACTED);	// sanity
 
-	// 2. sex name-list move-type attack-type
-	if (!get_line(mob_f, line) || sscanf(line, "%d %d %d %d", &t[0], &t[1], &t[2], &t[3]) != 4) {
-		log("SYSERR: Format in second numeric section of mob #%d\n...expecting line of form '# # # #'", nr);
+	// 2. sex name-list move-type attack-type language
+	if (!get_line(mob_f, line)) {
+		log("SYSERR: Missing second numeric section of mob #%d", nr);
 		exit(1);
+	}
+	else if (sscanf(line, "%d %d %d %d %d", &t[0], &t[1], &t[2], &t[3], &t[4]) != 5) {
+		// pre-b5.146 version
+		t[4] = NOTHING;	// no language
+		if (sscanf(line, "%d %d %d %d", &t[0], &t[1], &t[2], &t[3]) != 4) {
+			log("SYSERR: Format in second numeric section of mob #%d\n...expecting line of form '# # # # #'", nr);
+			exit(1);
+		}
 	}
 
 	mob->player.sex = t[0];
 	MOB_NAME_SET(mob) = t[1];
 	mob->mob_specials.move_type = t[2];
 	mob->mob_specials.attack_type = t[3];
+	mob->mob_specials.language = t[4];
 
 	// basic setup
 	mob->points.max_pools[HEALTH] = 10;
@@ -5070,8 +5101,8 @@ void write_mob_to_file(FILE *fl, char_data *mob) {
 	strcpy(temp2, bitv_to_alpha(AFF_FLAGS(mob)));
 	fprintf(fl, "%d %d %s %s %d\n", GET_MIN_SCALE_LEVEL(mob), GET_MAX_SCALE_LEVEL(mob), temp, temp2, SET_SIZE(mob));
 	
-	// sex name-list move-type attack-type
-	fprintf(fl, "%d %d %d %d\n", GET_SEX(mob), MOB_NAME_SET(mob), MOB_MOVE_TYPE(mob), MOB_ATTACK_TYPE(mob));
+	// sex name-list move-type attack-type language
+	fprintf(fl, "%d %d %d %d %d\n", GET_SEX(mob), MOB_NAME_SET(mob), MOB_MOVE_TYPE(mob), MOB_ATTACK_TYPE(mob), MOB_LANGUAGE(mob));
 
 	// optionals:
 	

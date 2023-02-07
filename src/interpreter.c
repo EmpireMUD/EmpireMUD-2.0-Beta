@@ -385,6 +385,7 @@ ACMD(do_sneak);
 ACMD(do_snoop);
 ACMD(do_socials);
 ACMD(do_soulsight);
+ACMD(do_speak);
 ACMD(do_spec_comm);
 ACMD(do_specialize);
 ACMD(do_split);
@@ -794,7 +795,7 @@ cpp_extern const struct command_info cmd_info[] = {
 	SIMPLE_CMD( "islands", POS_DEAD, do_islands, NO_MIN, CTYPE_EMPIRE ),
 
 	ABILITY_CMD( "jab", POS_FIGHTING, do_jab, NO_MIN, CTYPE_COMBAT, ABIL_JAB ),
-	SCMD_CMD( "junk", POS_RESTING, do_drop, NO_MIN, CTYPE_UTIL, SCMD_JUNK ),
+	STANDARD_CMD( "junk", POS_RESTING, do_drop, NO_MIN, NO_GRANTS, SCMD_JUNK, CTYPE_UTIL, CMD_NO_ABBREV, NO_ABIL ),
 
 	SIMPLE_CMD( "kill", POS_FIGHTING, do_hit, NO_MIN, CTYPE_COMBAT ),
 	SCMD_CMD( "keep", POS_DEAD, do_keep, NO_MIN, CTYPE_UTIL, SCMD_KEEP ),
@@ -967,7 +968,7 @@ cpp_extern const struct command_info cmd_info[] = {
 	ABILITY_CMD( "shadowstep", POS_STANDING, do_shadowstep, NO_MIN, CTYPE_MOVE, ABIL_SHADOWSTEP ),
 	STANDARD_CMD( "shear", POS_STANDING, do_shear, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_BUILD, CMD_NO_ANIMALS, NO_ABIL ),
 	SIMPLE_CMD( "sheathe", POS_RESTING, do_sheathe, NO_MIN, CTYPE_COMBAT ),
-	SIMPLE_CMD( "ship", POS_RESTING, do_ship, NO_MIN, CTYPE_EMPIRE ),
+	SIMPLE_CMD( "ship", POS_SLEEPING, do_ship, NO_MIN, CTYPE_EMPIRE ),
 	SIMPLE_CMD( "shoot", POS_FIGHTING, do_shoot, NO_MIN, CTYPE_COMBAT ),
 	SCMD_CMD( "shout", POS_RESTING, do_pub_comm, NO_MIN, CTYPE_COMM, SCMD_SHOUT ),
 	SIMPLE_CMD( "show", POS_DEAD, do_show, LVL_START_IMM, CTYPE_IMMORTAL ),
@@ -987,6 +988,7 @@ cpp_extern const struct command_info cmd_info[] = {
 	GRANT_CMD( "snoop", POS_DEAD, do_snoop, LVL_CIMPL, CTYPE_IMMORTAL, GRANT_SNOOP ),
 	SIMPLE_CMD( "socials", POS_DEAD, do_socials, NO_MIN, CTYPE_UTIL ),
 	ABILITY_CMD( "soulsight", POS_RESTING, do_soulsight, NO_MIN, CTYPE_SKILL, ABIL_SOULSIGHT ),
+	SIMPLE_CMD( "speak", POS_DEAD, do_speak, NO_MIN, CTYPE_UTIL ),
 	SIMPLE_CMD( "specialize", POS_STANDING, do_specialize, NO_MIN, CTYPE_UTIL ),
 	SIMPLE_CMD( "split", POS_RESTING, do_split, NO_MIN, CTYPE_UTIL ),
 	SIMPLE_CMD( "stand", POS_RESTING, do_stand, NO_MIN, CTYPE_MOVE ),

@@ -982,6 +982,8 @@ The swamp walk, though never very stable, makes travel through the swamp
 much easier. Swamp animals may still harass you, but you will avoid random
 attacks by crocodilians. This can also be built on marshes.
 
+Clay pits count as in-city territory when built in the outskirts (4x radius).
+
 See also: BUILDING
 #
 SWAMPHUT "SWAMP HUT"

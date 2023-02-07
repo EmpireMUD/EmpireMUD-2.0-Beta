@@ -317,8 +317,8 @@ struct wld_command_info {
 /* function prototypes from dg_triggers.c (and others) */
 void adventure_cleanup_wtrigger(room_data *room);
 void act_mtrigger(const char_data *ch, char *str, char_data *actor, char_data *victim, obj_data *object, obj_data *target, char *arg);  
-void speech_mtrigger(char_data *actor, char *str);
-void speech_wtrigger(char_data *actor, char *str);
+void speech_mtrigger(char_data *actor, char *str, generic_data *language);
+void speech_wtrigger(char_data *actor, char *str, generic_data *language);
 void greet_memory_mtrigger(char_data *ch);
 int greet_mtrigger(char_data *actor, int dir, char *method);
 int pre_greet_mtrigger(char_data *actor, room_data *room, int dir, char *method);
@@ -374,12 +374,12 @@ int kill_otrigger(obj_data *obj, char_data *dying, char_data *killer);
 int run_kill_triggers(char_data *dying, char_data *killer, vehicle_data *veh_killer);
 
 int command_vtrigger(char_data *actor, char *cmd, char *argument, int mode);
-int destroy_vtrigger(vehicle_data *veh);
+int destroy_vtrigger(vehicle_data *veh, char *method);
 int entry_vtrigger(vehicle_data *veh, char *method);
 int leave_vtrigger(char_data *actor, int dir, char *custom_dir, char *method);
 void load_vtrigger(vehicle_data *veh);
 int greet_vtrigger(char_data *actor, int dir, char *method);
-void speech_vtrigger(char_data *actor, char *str);
+void speech_vtrigger(char_data *actor, char *str, generic_data *language);
 
 void reboot_mtrigger(char_data *ch);
 void reboot_otrigger(obj_data *obj);

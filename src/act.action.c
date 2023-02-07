@@ -205,7 +205,7 @@ const struct gen_interact_data_t gen_interact_data[] = {
 * @param char_data *ch The actor.
 */
 void cancel_action(char_data *ch) {
-	if (GET_ACTION(ch) != ACT_NONE) {
+	if (!IS_NPC(ch) && GET_ACTION(ch) != ACT_NONE) {
 		// is there a cancel function?
 		if (action_data[GET_ACTION(ch)].cancel_function != NULL) {
 			(action_data[GET_ACTION(ch)].cancel_function)(ch);
@@ -3147,8 +3147,8 @@ ACMD(do_forage) {
 	else if (GET_ACTION(ch) != ACT_NONE) {
 		send_to_char("You're already busy.\r\n", ch);
 	}
-	else if (!IS_OUTDOORS(ch)) {
-		send_to_char("You can only forage for things outdoors!\r\n", ch);
+	else if (!IS_OUTDOORS(ch) && !can_interact_room(IN_ROOM(ch), INTERACT_FORAGE)) {
+		send_to_char("You don't see anything to forage for here.\r\n", ch);
 	}
 	else if (!can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED)) {
 		msg_to_char(ch, "You don't have permission to forage for anything here.\r\n");

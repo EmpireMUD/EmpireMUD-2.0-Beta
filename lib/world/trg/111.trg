@@ -677,7 +677,7 @@ end
 * Timer isn't up and chalice isn't done...
 if %random.4% == 4
   %echo% A darting dragonfly appears and attacks!
-  %load% mob 11137
+  %load% mob 11140
   makeuid dragonfly mob dragonfly
   if %self.carried_by%
     %force% %dragonfly% %aggro% %self.carried_by%

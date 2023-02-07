@@ -345,7 +345,7 @@ A pair of valiant dragon hunter vambraces have been left here.~
 Undernear, a mesh of argentine metal protects from the crushing bites of
 various enormous creatures.
 ~
-27 mp ai 0 5
+27 mp ai 0 6
 3 0 0
 2 0
 A
@@ -361,7 +361,7 @@ A
 A
 5 1 3
 C
-225 350
+225 375
 T 12315
 S
 #12321
@@ -629,7 +629,7 @@ A valiant dragon hunter bow is lying here.~
 steam from the intricate carvings that adorn its curves. Though it's no larger
 than any other bow, it is clearly built for hunting dragons.
 ~
-20 emp ap 0 7
+20 emp ap 0 8
 29 6 0
 0 0
 A
@@ -645,7 +645,7 @@ A
 A
 5 1 3
 C
-225 350
+225 375
 T 12315
 S
 #12332
@@ -656,7 +656,7 @@ A shadow virtuoso bow has been left behind.~
 even as a seedling. The carving on the bow makes it difficult to see in dim
 light, and many of the bow's victims are surprised to find themselves deceased.
 ~
-20 emp ap 0 9
+20 emp ap 0 10
 29 7 0
 0 0
 A
@@ -672,7 +672,7 @@ A
 A
 5 1 3
 C
-225 350
+225 375
 T 12315
 S
 #12333
@@ -682,7 +682,7 @@ A fiery dracomancer bow hovers in the air.~
    This burning bow looks as though it was carved from wood that was already
 ablaze. And, fueled by the mana inside, the wood has never gone out.
 ~
-20 emp ap 0 9
+20 emp ap 0 10
 29 3 0
 0 0
 A
@@ -698,7 +698,7 @@ A
 A
 5 1 3
 C
-225 350
+225 375
 T 12315
 S
 #12334
@@ -710,7 +710,7 @@ countless tiny arcane symbols that identify it as belonging to the Cult of
 Living Flame. Little is known about these dragon worshippers, but they might be
 looking for their bow.
 ~
-20 emp ap 0 11
+20 emp ap 0 12
 29 3 0
 0 0
 A
@@ -728,7 +728,7 @@ A
 A
 5 1 3
 C
-225 350
+225 375
 T 12315
 S
 #12335
@@ -739,7 +739,7 @@ Someone has left a dragon pit fighter bow here.~
 hopes of intimidating one in the dragon pits. Still, it looks like it can deal
 serious damage.
 ~
-20 emp ap 0 8
+20 emp ap 0 9
 29 6 0
 0 0
 A
@@ -757,7 +757,7 @@ A
 A
 5 1 3
 C
-225 350
+225 375
 T 12315
 S
 #12336
@@ -768,7 +768,7 @@ The righteous bow of the dragon king has been left behind.~
 covered with intricate carvings showing the life, ascension, and conquest of an
 unnamed dragon king from ages past.
 ~
-20 mp ap 0 10
+20 mp ap 0 11
 29 3 0
 0 0
 A
@@ -786,7 +786,7 @@ A
 A
 5 1 3
 C
-100 350
+100 375
 T 12315
 S
 #12337

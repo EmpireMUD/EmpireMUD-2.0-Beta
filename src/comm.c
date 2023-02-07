@@ -1432,7 +1432,7 @@ void perform_act(const char *orig, char_data *ch, const void *obj, const void *v
 	
 	// find the first non-color-code and cap it
 	for (iter = 0; iter < strlen(lbuf); ++iter) {
-		if (lbuf[iter] == '&') {
+		if (lbuf[iter] == COLOUR_CHAR || lbuf[iter] == '\t') {
 			// skip
 			++iter;
 		}

@@ -127,6 +127,21 @@ bool audit_mobile(char_data *mob, char_data *ch) {
 		olc_audit_msg(ch, GET_MOB_VNUM(mob), "Animal can't be butchered");
 		problem = TRUE;
 	}
+	if (MOB_LANGUAGE(mob) != NOTHING) {
+		generic_data *lang = real_generic(MOB_LANGUAGE(mob));
+		if (!lang) {
+			olc_audit_msg(ch, GET_MOB_VNUM(mob), "Mob language does not exist.");
+			problem = TRUE;
+		}
+		if (lang && GEN_TYPE(lang) != GENERIC_LANGUAGE) {
+			olc_audit_msg(ch, GET_MOB_VNUM(mob), "Language generic %d is not a language.", GEN_VNUM(lang));
+			problem = TRUE;
+		}
+		if (lang && GEN_FLAGGED(lang, GEN_IN_DEVELOPMENT)) {
+			olc_audit_msg(ch, GET_MOB_VNUM(mob), "Mob language is set IN-DEVELOPMENT.");
+			problem = TRUE;
+		}
+	}
 	
 	problem |= audit_interactions(GET_MOB_VNUM(mob), mob->interactions, TYPE_MOB, ch);
 	
@@ -1147,6 +1162,8 @@ char_data *setup_olc_mobile(char_data *input) {
 		MOB_CUSTOM_MSGS(new) = copy_custom_messages(MOB_CUSTOM_MSGS(input));
 	}
 	else {
+		new->player_specials = &dummy_mob;
+		
 		// brand new
 		GET_PC_NAME(new) = str_dup(default_mob_keywords);
 		GET_SHORT_DESC(new) = str_dup(default_mob_short);
@@ -1233,7 +1250,7 @@ void olc_show_mobile(char_data *ch) {
 	sprintf(buf + strlen(buf), "<%sattack\t0> %s\r\n", OLC_LABEL_VAL(MOB_ATTACK_TYPE(mob), TYPE_HIT), attack_hit_info[MOB_ATTACK_TYPE(mob)].name);
 	sprintf(buf + strlen(buf), "<%smovetype\t0> %s\r\n", OLC_LABEL_VAL(MOB_MOVE_TYPE(mob), 0), mob_move_types[(int) MOB_MOVE_TYPE(mob)]);
 	sprintf(buf + strlen(buf), "<%ssize\t0> %s\r\n", OLC_LABEL_VAL(SET_SIZE(mob), SIZE_NORMAL), size_types[(int)SET_SIZE(mob)]);
-	sprintf(buf + strlen(buf), "<%snameset\t0> %s\r\n", OLC_LABEL_VAL(MOB_NAME_SET(mob), 0), name_sets[MOB_NAME_SET(mob)]);
+	sprintf(buf + strlen(buf), "<%snameset\t0> %s, <%slanguage\t0> %d - %s\r\n", OLC_LABEL_VAL(MOB_NAME_SET(mob), 0), name_sets[MOB_NAME_SET(mob)], OLC_LABEL_VAL(MOB_LANGUAGE(mob), NOTHING), MOB_LANGUAGE(mob), (MOB_LANGUAGE(mob) == NOTHING ? "default" : get_generic_name_by_vnum(MOB_LANGUAGE(mob))));
 	sprintf(buf + strlen(buf), "<%sallegiance\t0> %s\r\n", OLC_LABEL_PTR(MOB_FACTION(mob)), MOB_FACTION(mob) ? FCT_NAME(MOB_FACTION(mob)) : "none");
 	
 	sprintf(buf + strlen(buf), "Interactions: <%sinteraction\t0>\r\n", OLC_LABEL_PTR(mob->interactions));
@@ -1319,6 +1336,30 @@ OLC_MODULE(medit_interaction) {
 OLC_MODULE(medit_keywords) {
 	char_data *mob = GET_OLC_MOBILE(ch->desc);
 	olc_process_string(ch, argument, "keywords", &GET_PC_NAME(mob));
+}
+
+
+OLC_MODULE(medit_language) {
+	char_data *mob = GET_OLC_MOBILE(ch->desc);
+	generic_data *gen;
+	
+	if (!*argument) {
+		msg_to_char(ch, "Set the language to which generic vnum (or name, or none)?\r\n");
+	}
+	else if (!str_cmp(argument, "none") || !str_cmp(argument, "default") || atoi(argument) == NOTHING) {
+		MOB_LANGUAGE(mob) = NOTHING;
+		msg_to_char(ch, "It now has no custom language (and will use the default language for mobs).\r\n");
+	}
+	else if (!((gen = find_generic_no_spaces(GENERIC_LANGUAGE, argument)) || (gen = find_generic(atoi(argument), GENERIC_LANGUAGE)))) {
+		msg_to_char(ch, "Invalid language name or vnum '%s'.\r\n", argument);
+	}
+	else if (GEN_TYPE(gen) != GENERIC_LANGUAGE) {
+		msg_to_char(ch, "That is not a valid language.\r\n");
+	}
+	else {
+		MOB_LANGUAGE(mob) = GEN_VNUM(gen);
+		msg_to_char(ch, "It now has [%d] %s as its default language.\r\n", GEN_VNUM(gen), GEN_NAME(gen));
+	}
 }
 
 

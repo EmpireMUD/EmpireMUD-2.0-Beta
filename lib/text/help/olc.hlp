@@ -1763,7 +1763,7 @@ been instantiated.
 
 See also: OLC ADVENTURES
 #d
-"AFFECT FLAGS"
+"AFFECT FLAGS" "AFF FLAGS" "AFFECT BITS" "AFF BITS"
 
 The following affect flags are available:
  BLIND - Unable to see.
@@ -1804,6 +1804,7 @@ The following affect flags are available:
  !WHERE - Cannot be found using the 'where' command.
  WATERWALK - Does not need to swim and doesn't drown. Unlike the AQUATIC mob
    flag, this allows it to move on both water and land.
+ LIGHT - Character provides light to the room.
 #d
 ARCHEDIT "OLC ARCHETYPES" "ARCHETYPE OLC" "ARCHETYPE EDITOR"
 
@@ -1900,6 +1901,18 @@ wield, hold.
 The hold slot is generally a light, e.g. the newbie torch (2104).
 
 See also: OLC ARCHETYPES, OLC GLOBALS, GEDIT TYPE
+#d
+"ARCHEDIT LANGUAGE"
+
+Usage:  .language <vnum | name | none>
+
+This sets which language the player will start with, if any.
+
+If players have more than one archetype that give languages, they will speak
+all of those languages. If no archetypes provide a language, you should ensure
+you have at least one BASIC-flagged language for players to speak.
+
+See also: OLC ARCHETYPES, LANGUAGE, GENERIC LANGUAGE
 #d
 "ARCHEDIT LORE"
 
@@ -3720,6 +3733,24 @@ However, this is not required if you have a compelling reason not to.
 
 See also: GENERIC COMPONENTS
 #d
+"GENERIC LANGUAGE" "LANGUAGE GENERICS" "LANGUAGE EDITOR"
+
+The 'language' generic type creates languages that players and NPCs can speak.
+
+Languages only have a name and some flags. Players can refer to a language by
+its whole name, or can remove the spaces or replace spaces with dashes. For
+example, a language called "Old High Western" can also be referred to as
+"old-high-western" or "oldhighwestern".
+
+Flags used by languages:
+  BASIC - All players can automatically speak this language.
+  IN-DEVELOPMENT - Language is not available.
+
+EmpireMUD comes with language [150] English and all characters start with this
+language. Add the IN-DEV flag to disable it.
+
+See also: OLC GENERICS, SPEAK, SET LANGUAGE, SHOW LANGUAGES
+#d
 "GENERIC MOON" "MOON GENERICS" "MOON EDITOR" "GENEDIT CYCLE"
 
 The 'moon' generic type controls what moons appear in the sky. These are shown
@@ -4717,6 +4748,19 @@ Example:
  keywords: dragon fiery huge red
 
 See also: MEDIT SHORTDESCRIPTION, MEDIT LONGDESCRIPTION
+#d
+"MEDIT LANGUAGE" "MOB LANGUAGE"
+
+Usage:  .language <vnum | name | default>
+
+This changes which language a mob will use for any say/shout actions it takes.
+Mobs can also use the #language tag at the start of any say/shout (unless they
+were ordered/commanded by a player).
+
+Mobs without this property will use the global default, set with the
+'default_language_vnum' mob config.
+
+See also: OLC MOBILES, SAY, SPEAK, MEDIT CUSTOM, CONFIG
 #d
 "MEDIT MAXLEVEL" "MEDIT MAX LEVEL"
 
@@ -6822,6 +6866,8 @@ Perk types:
  Greatness-territory - Increases territory per greatness point.
  Workforce-cap - Raises the maximum workforce cap.
  Territory - Directly adds to the total territory for an empire.
+ Speak-language - All members can speak this language.
+ Recognize-language - All members can recognize this language when spoken.
 
 Note: To grant progress points for a goal, set the 'value' field instead.
 
@@ -6858,7 +6904,8 @@ Task types that do not apply to empire progression:
  &rCOMPLETED-QUEST, NOT-COMPLETED-QUEST, NOT-ON-QUEST, SKILL-LEVEL-OVER,
  SKILL-LEVEL-UNDER, TRIGGERED, VISIT-BUILDING, VISIT-ROOM-TEMPLATE,
  VISIT-SECTOR, HAVE-ABILITY, REP-OVER, REP-UNDER, WEARING, WEARING-OR-HAS,
- GET-CURRENCY, CAN-GAIN-SKILL, LEVEL-UNDER, LEVEL-OVER&0
+ GET-CURRENCY, CAN-GAIN-SKILL, LEVEL-UNDER, LEVEL-OVER, SPEAK-LANGUAGE,
+ RECOGNIZE-LANGUAGE&0
 
 See also: OLC PROGRESS, REQUIREMENTS
 #d
@@ -7010,6 +7057,9 @@ Available reward types:
  REPUTATION - Gain/lose faction reputation.
  CURRENCY - Gives generic currency (e.g. tokens).
  EVENT-POINTS - Points toward an event (only happens if the event is running).
+ SPEAK-LANGUAGE - Can now speak a language.
+ RECOGNIZE-LANGUAGE - Can now recognize a language (will not override one the
+    player can already speak).
 
 Note: If you set empire coins as the reward, but the mob is not part of an
 empire, the player will receive misc coins instead.
@@ -7258,6 +7308,8 @@ Available tasks:
  &cEVENT-NOT-RUNNING&0 - Not available while the event is running.
  &cLEVEL-UNDER&0 - Composite/total level not higher than this.
  &cLEVEL-OVER&0 - Composite/total level not lower than this.
+ &cSPEAK-LANGUAGE&0 - Player knows how to speak a language.
+ &cRECOGNIZE-LANGUAGE&0 - Player can recognize or speak a language.
 
 &r*&0 Some types require a trackable quest, and cannot be used as prereqs.
 ^ If a type requires flags and you use more than one flag, you MUST put the

@@ -554,7 +554,7 @@ int command_mtrigger(char_data *actor, char *cmd, char *argument, int mode) {
 }
 
 
-void speech_mtrigger(char_data *actor, char *str) {
+void speech_mtrigger(char_data *actor, char *str, generic_data *language) {
 	char_data *ch, *ch_next;
 	trig_data *t, *next_t;
 	char buf[MAX_INPUT_LENGTH];
@@ -594,6 +594,9 @@ void speech_mtrigger(char_data *actor, char *str) {
 					union script_driver_data_u sdd;
 					ADD_UID_VAR(buf, t, char_script_id(actor), "actor", 0);
 					add_var(&GET_TRIG_VARS(t), "speech", str, 0);
+					add_var(&GET_TRIG_VARS(t), "lang", language ? GEN_NAME(language) : "", 0);
+					sprintf(buf, "%d", language ? GEN_VNUM(language) : NOTHING);
+					add_var(&GET_TRIG_VARS(t), "lang_vnum", buf, 0);
 					sdd.c = ch;
 					script_driver(&sdd, t, MOB_TRIGGER, TRIG_NEW);
 					
@@ -2047,7 +2050,7 @@ int command_wtrigger(char_data *actor, char *cmd, char *argument, int mode) {
 }
 
 
-void speech_wtrigger(char_data *actor, char *str) {
+void speech_wtrigger(char_data *actor, char *str, generic_data *language) {
 	room_data *room;
 	trig_data *t, *next_t;
 	char buf[MAX_INPUT_LENGTH];
@@ -2084,6 +2087,9 @@ void speech_wtrigger(char_data *actor, char *str) {
 			ADD_UID_VAR(buf, t, room_script_id(room), "room", 0);
 			ADD_UID_VAR(buf, t, char_script_id(actor), "actor", 0);
 			add_var(&GET_TRIG_VARS(t), "speech", str, 0);
+			add_var(&GET_TRIG_VARS(t), "lang", language ? GEN_NAME(language) : "", 0);
+			sprintf(buf, "%d", language ? GEN_VNUM(language) : NOTHING);
+			add_var(&GET_TRIG_VARS(t), "lang_vnum", buf, 0);
 			sdd.r = room;
 			script_driver(&sdd, t, WLD_TRIGGER, TRIG_NEW);
 			
@@ -2514,7 +2520,14 @@ int command_vtrigger(char_data *actor, char *cmd, char *argument, int mode) {
 }
 
 
-int destroy_vtrigger(vehicle_data *veh) {
+/**
+* Called when a vehicle is destroyed.
+*
+* @param vehicle_data *veh The vehicle being destroyed.
+* @param char *method What destroyed it ("burning", etc).
+* @return int 0 will prevent destruction of the vehicle; 1 is a normal result
+*/
+int destroy_vtrigger(vehicle_data *veh, char *method) {
 	trig_data *t, *next_t;
 
 	if (!SCRIPT_CHECK(veh, VTRIG_DESTROY)) {
@@ -2524,6 +2537,7 @@ int destroy_vtrigger(vehicle_data *veh) {
 	LL_FOREACH_SAFE(TRIGGERS(SCRIPT(veh)), t, next_t) {
 		if (TRIGGER_CHECK(t, VTRIG_DESTROY) && (number(1, 100) <= GET_TRIG_NARG(t))) {
 			union script_driver_data_u sdd;
+			add_var(&GET_TRIG_VARS(t), "method", method ? method : "none", 0);
 			sdd.v = veh;
 			return script_driver(&sdd, t, VEH_TRIGGER, TRIG_NEW);
 		}
@@ -2718,7 +2732,7 @@ void reboot_vtrigger(vehicle_data *veh) {
 }
 
 
-void speech_vtrigger(char_data *actor, char *str) {
+void speech_vtrigger(char_data *actor, char *str, generic_data *language) {
 	vehicle_data *veh, *next_veh;
 	char buf[MAX_INPUT_LENGTH];
 	trig_data *t, *next_t;
@@ -2748,6 +2762,9 @@ void speech_vtrigger(char_data *actor, char *str) {
 					union script_driver_data_u sdd;
 					ADD_UID_VAR(buf, t, char_script_id(actor), "actor", 0);
 					add_var(&GET_TRIG_VARS(t), "speech", str, 0);
+					add_var(&GET_TRIG_VARS(t), "lang", language ? GEN_NAME(language) : "", 0);
+					sprintf(buf, "%d", language ? GEN_VNUM(language) : NOTHING);
+					add_var(&GET_TRIG_VARS(t), "lang_vnum", buf, 0);
 					sdd.v = veh;
 					script_driver(&sdd, t, VEH_TRIGGER, TRIG_NEW);
 					break;

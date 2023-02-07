@@ -508,7 +508,8 @@ The 'delete' command deletes by number in the list.
 The 'deleteall' command removes all instances for a given adventure zone
 (by vnum). You can delete ALL instances in the game with 'inst deleteall all'.
 
-The 'info' command gets full details on a single instance.
+The 'info' command gets full details on a single instance (the one you're in,
+or any instance by id).
 
 The 'reset' command will force a zone reset on the instance you're in or the
 instance number you target.
@@ -926,7 +927,8 @@ maintentance, and puts out any fire. It will complete the vehicle if it is
 incomplete.
 
 If a full restore (all) is performed on an immortal, it also sets all skill
-levels to 100 and gives all abilities (on the main skill set only).
+levels to 100, gives all abilities (on the main skill set only), and grants
+all languages.
 
 This command is grantable.
 
@@ -981,6 +983,7 @@ eventdailyquests      PC  NUMBER    Number of event dailies they have completed
 faction        PC      MISC         Change faction reputations (SET FACTION)
 grants         PC      MISC         Set grants for player
 invstart       PC      BINARY       Invisible @ Start
+language       PC      STRING       Change which languages the player speaks
 lastname       PC      STRING       Player's last name, (SET LASTNAME)
 learned        PC      MISC         Turns learned recipes on/off
 maxlevel       PC      NUMBER       Sets the max-known-level, limiting EQ level
@@ -1059,6 +1062,14 @@ You can delete a reputation entirely by setting it to 'none'.
 
 See also: FACTION, SHOW FACTIONS
 #d
+"SET LANGUAGE"
+
+Usage:  set [file] <player> language <language | vnum> <speak | recognize | unknown>
+
+This lets you change which languages a player speaks.
+
+See also: SPEAK, SHOW LANGUAGES
+#d
 "SET LASTNAME" "SET LAST NAME"
 
 Usage:  set <name> lastname <new personal lastname | none>
@@ -1118,10 +1129,12 @@ currency   Immort   Shows coins and adventure currencies for a player.
 dailycycle Immort   Shows daily quests with a given cycle id.
 dropped    Immort   Shows all items an empire has on the ground.
 factions   Immort   Shows a player's faction levels.
+home       Immort   Shows where a player's home is, if any.
 homeless   Immort   Shows the homeless citizen list for an empire.
 ignoring   Immort   Shows you who a player has on their ignore list.
 inventory  Immort   Shows how many players have a certain item.
 islands    Immort   Shows you which island ids have empire storage (for MOVEEINV).
+languages  Immort   Shows which languages a player knows and is speaking.
 lastnames  Immort   Shows target player's lastname list.
 learned    Immort   Shows you learned recipes.
 minipets   Immort   Shows you minipets collected by a player.
@@ -1147,6 +1160,7 @@ subzone    Immort   Shows room templates with a matching subzone id.
 technology Immort   Shows ability techs a player has.
 sectors    Immort   Shows tile counts for all sector types (vnum/name optional).
 terrain    Immort   Same as 'sectors' (for historical reasons).
+tomb       Immort   Shows where a player's tomb is, if any.
 tools      Immort   Shows all objects with a given tool type.
 unlearnable Immrt   Shows stats on LEANRED crafts with no assignments.
 uses       Immort   Shows crafts (and vehicles, etc.) that use a component type.
@@ -1228,6 +1242,14 @@ be filtered by name.
 
 See also: FACTION, SET FACTION
 #e
+"SHOW HOME"
+
+Usage:  show home <player>
+
+This command shows where a player has set as their home, if anywhere.
+
+See also: HOME
+#e
 "SHOW HOMELESS"
 
 Usage:  show homeless <empire>
@@ -1263,6 +1285,15 @@ The immortal version of the 'islands' command; useful for MOVEEINV. You can use
 an empire's leaderboard rank in place of its name, but not vnum.
 
 See also: ISLANDS, MOVEEINV
+#e
+"SHOW LANGUAGES"
+
+Usage:  show languages <player> [search phrase]
+
+Shows you languages known by a player, and what language they are currently
+speaking. It will also indicate which languages come from the player's empire.
+
+See also: SET LANGUAGE, SPEAK
 #e
 "SHOW LASTNAMES" "SHOW LAST NAMES"
 
@@ -1461,6 +1492,14 @@ see as many as fit in the text buffer.
 
 "Show sectors" was formerly called "show terrain", which is also included for
 immortals who still use the old version.
+#e
+"SHOW TOMB"
+
+Usage:  show tomb <player>
+
+Shows where a player has set as their tomb, if anywhere.
+
+See also: TOMB
 #e
 "SHOW TOOLS"
 

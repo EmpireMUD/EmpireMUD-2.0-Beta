@@ -304,16 +304,14 @@ See also: CRAFTING LEVEL, COOK, RESOURCES, KEEP, BASIC CRAFTS, RECIPES
 #
 MINE MINES
 
-Mine (Primitive Crafts ability)
-
 Building:  &y/&0[]&y\&0  Mine  (Build ability)
 Speed boosts:  Work ethic bonus, haste, higher level pick, superior pick
 Command:  mine
 
 "Mine" is both a building type, and the command to work in that building. Mines
-must be built on mountains, and can only be entered from one side even before
-you complete them. To work in a mine, you need a pick of some kind, although a
-simple handaxe will also work.
+must be built on mountains. They have no interior; you can mine them from the
+outside. To work a mine, you need a pick of some kind, although a simple
+handaxe will also work.
 
 Mines have a limited amount of ore, and do not replenish. However, if you fully
 dismantle a mine, its mountain will reset when the MUD celebrates a new year
@@ -334,6 +332,9 @@ Types of mines:
   nocturnium - only found with Rare Metals
   imperium - only found with Rare Metals
   moonstone - only found with Rare Metals
+
+Mine types that require Rare Metals (or other abilities) will also grant
+experience for that ability when you mine ore.
 
 See also: DEPLETION, DEEP MINES, PROSPECT, RARE METALS
 #

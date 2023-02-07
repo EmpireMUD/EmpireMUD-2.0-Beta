@@ -440,10 +440,26 @@ void affect_modify(char_data *ch, byte loc, sh_int mod, bitvector_t bitv, bool a
 	
 	if (add) {
 		SET_BIT(AFF_FLAGS(ch), bitv);
+		
+		// check lights
+		if (IS_SET(bitv, AFF_LIGHT)) {
+			++GET_LIGHTS(ch);
+			if (IN_ROOM(ch)) {
+				++ROOM_LIGHTS(IN_ROOM(ch));
+			}
+		}
 	}
 	else {
 		REMOVE_BIT(AFF_FLAGS(ch), bitv);
 		mod = -mod;
+		
+		// check lights
+		if (IS_SET(bitv, AFF_LIGHT)) {
+			--GET_LIGHTS(ch);
+			if (IN_ROOM(ch)) {
+				--ROOM_LIGHTS(IN_ROOM(ch));
+			}
+		}
 	}
 	
 	// APPLY_x:
@@ -1644,6 +1660,11 @@ void char_to_room(char_data *ch, room_data *room) {
 		if (!IS_NPC(ch) && (inst = find_instance_by_room(room, FALSE, TRUE))) {
 			check_instance_is_loaded(inst);
 		}
+
+		// check npc spawns whenever a player is places in a room
+		if (!IS_NPC(ch)) {
+			spawn_mobs_from_center(room);
+		}
 		
 		// sanitation: remove them from the old room first
 		if (IN_ROOM(ch)) {
@@ -1658,11 +1679,6 @@ void char_to_room(char_data *ch, room_data *room) {
 		
 		if (!IS_NPC(ch) && !IS_IMMORTAL(ch)) {
 			check_island_levels(room, (int) GET_COMPUTED_LEVEL(ch));
-		}
-
-		// check npc spawns whenever a player is places in a room
-		if (!IS_NPC(ch)) {
-			spawn_mobs_from_center(IN_ROOM(ch));
 		}
 		
 		// look for an instance to lock
@@ -8206,6 +8222,15 @@ bool meets_requirements(char_data *ch, struct req_data *list, struct instance_da
 				}
 				break;
 			}
+			case REQ_SPEAK_LANGUAGE: {
+				ok = (speaks_language(ch, req->vnum) == LANG_SPEAK);
+				break;
+			}
+			case REQ_RECOGNIZE_LANGUAGE: {
+				int level = speaks_language(ch, req->vnum);
+				ok = (level == LANG_RECOGNIZE || level == LANG_SPEAK);
+				break;
+			}
 			
 			// some types do not support pre-reqs
 			case REQ_KILL_MOB:
@@ -8451,6 +8476,14 @@ char *requirement_string(struct req_data *req, bool show_vnums, bool allow_custo
 		}
 		case REQ_LEVEL_OVER: {
 			snprintf(output, sizeof(output), "Level over %d", req->needed);
+			break;
+		}
+		case REQ_SPEAK_LANGUAGE: {
+			snprintf(output, sizeof(output), "Able to speak %s%s", vnum, get_generic_name_by_vnum(req->vnum));
+			break;
+		}
+		case REQ_RECOGNIZE_LANGUAGE: {
+			snprintf(output, sizeof(output), "Able to recognize or speak %s%s", vnum, get_generic_name_by_vnum(req->vnum));
 			break;
 		}
 		default: {
@@ -8764,7 +8797,7 @@ void reset_light_count(room_data *room) {
 	vehicle_data *veh;
 	obj_data *obj;
 	char_data *ch;
-	int pos;
+	// int pos;
 	
 	ROOM_LIGHTS(room) = 0;
 	
@@ -8782,6 +8815,11 @@ void reset_light_count(room_data *room) {
 	
 	// people
 	DL_FOREACH2(ROOM_PEOPLE(room), ch, next_in_room) {
+		ROOM_LIGHTS(room) += GET_LIGHTS(ch);
+		/*
+		if (AFF_FLAGGED(ch, AFF_LIGHT)) {
+			++ROOM_LIGHTS(room);
+		}
 		for (pos = 0; pos < NUM_WEARS; ++pos) {
 			if (GET_EQ(ch, pos) && OBJ_FLAGGED(GET_EQ(ch, pos), OBJ_LIGHT)) {
 				++ROOM_LIGHTS(room);
@@ -8792,6 +8830,7 @@ void reset_light_count(room_data *room) {
 				++ROOM_LIGHTS(room);
 			}
 		}
+		*/
 	}
 	
 	// objects

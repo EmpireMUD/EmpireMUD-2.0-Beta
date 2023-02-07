@@ -1843,7 +1843,7 @@ void init_config_system(void) {
 	init_config(CONFIG_EMPIRE, "redesignate_time", CONFTYPE_INT, "minutes until you can redesignate a room again");
 
 	// items
-	init_config(CONFIG_MOBS, "auto_update_items", CONFTYPE_BOOL, "uses item version numbers to automatically update items");
+	init_config(CONFIG_ITEMS, "auto_update_items", CONFTYPE_BOOL, "uses item version numbers to automatically update items");
 	init_config(CONFIG_ITEMS, "autostore_time", CONFTYPE_INT, "minutes items last on the ground");
 	init_config(CONFIG_ITEMS, "bound_item_junk_time", CONFTYPE_INT, "minutes bound items last on the ground before being junked");
 	init_config(CONFIG_ITEMS, "long_autostore_time", CONFTYPE_INT, "minutes items last with the long-autostore bld flag");
@@ -1866,6 +1866,7 @@ void init_config_system(void) {
 	init_config(CONFIG_MAIL, "mail_send_message", CONFTYPE_SHORT_STRING, "text shown when player finishes writing mail");
 
 	// mobs
+	init_config(CONFIG_MOBS, "default_language_vnum", CONFTYPE_INT, "language (generic) mobs speak with by default");
 	init_config(CONFIG_MOBS, "max_npc_attribute", CONFTYPE_INT, "how high primary attributes go on mobs");
 	init_config(CONFIG_MOBS, "mob_spawn_interval", CONFTYPE_INT, "how often mobs spawn/last");
 	init_config(CONFIG_MOBS, "mob_spawn_radius", CONFTYPE_INT, "distance from players that mobs spawn");

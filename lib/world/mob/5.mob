@@ -4,7 +4,7 @@ a black cat~
 A black cat sits perfectly still, watching everything. (familiar)
 ~
 1 50 doG cfmG 2
-0 0 0 10
+0 0 0 10 -1
 D
    This appears on first glance to be an ordinary black housecat, but upon
 closer inspection, you detect a magical glint in its eye...
@@ -16,7 +16,7 @@ a saber-toothed cat~
 A saber-toothed cat glares around hungrily. (familiar)
 ~
 50 100 doG cfmG 4
-0 0 0 10
+0 0 0 10 -1
 D
    This is a large feline, about the size of a lion or tiger. It can be
 identified by the large, pronounced upper canine teeth that extend from its
@@ -30,7 +30,7 @@ a sphinx~
 A deadly sphinx paces back and forth. (familiar)
 ~
 75 100 dopG cfmG 4
-0 0 0 10
+0 0 0 10 -1
 D
    The sphinx is a strange beast with the head of a human, and the body of a
 lion. While they're best known as guardians of tombs, temples and crossroads,
@@ -45,7 +45,7 @@ a griffin~
 A griffin sits here, sharpening its talons on its beak. (familiar)
 ~
 100 0 dopyG cfmG 4
-0 0 0 10
+0 0 0 10 -1
 D
    The griffin is a powerful and majestic magical beast with the body of a
 lion, and the head and wings of an eagle. While traditionally known for
@@ -60,7 +60,7 @@ a dire wolf~
 A dire wolf hunches low and bares its fangs. (familiar)
 ~
 100 0 dozG cfmG 4
-0 0 0 9
+0 0 0 9 -1
 D
    This bulky, muscular wolf is a powerful fighter and a loyal companion.
 Judging by the magical glint in its eye, serves as a mage's familiar, perhaps
@@ -74,7 +74,7 @@ a moon rabbit~
 A little moon rabbit glows as it hops around. (familiar)
 ~
 100 0 dnoG cfmG 1
-0 0 15 10
+0 0 15 10 -1
 D
    This curious little creature, said to have once lived upon the moon, looks
 exactly like a normal rabbit, but bright white, and possessing a permanent,
@@ -92,7 +92,7 @@ a giant tortoise~
 A giant tortoise eyes you placidly. (familiar)
 ~
 100 0 dnopyG cfmG 3
-0 0 16 10
+0 0 16 10 -1
 D
    This man-sized, hard-shelled testudon makes up for what it lacks in ferocity
 with sheer implacable persistence. The glint of magic in its eye suggests that
@@ -107,7 +107,7 @@ a spirit wolf~
 A spirit wolf flitters in and out of sight as it leaps about. (familiar)
 ~
 100 0 dnoG cfmG 3
-0 0 0 10
+0 0 0 10 -1
 D
    Those who become greatly accomplished in spirit magic become capable of
 calling forth their own spirit animals. This pale blue spectral wolf is one
@@ -123,7 +123,7 @@ a huge manticore~
 A huge manticore is waving its dangerously spined tail. (familiar)
 ~
 100 0 dozG cfmG 4
-0 0 0 27
+0 0 0 27 -1
 D
    The manticore is a magical beast, and a more fearsome, predatory cousin of
 the sphinx. It has the head of a human, the body of a lion, and a tail bearing
@@ -137,7 +137,7 @@ a phoenix~
 A small phoenix flashes as it alights nearby. (familiar)
 ~
 100 0 dnoG cfmG 1
-0 0 2 10
+0 0 2 10 -1
 D
    A bird made entirely from flames, and associated with life, rebirth, and
 High Sorcery, phoenixes are intelligent, loyal, and powerful allies. This one
@@ -153,7 +153,7 @@ the scorpion shadow~
 Something is casting the shadow of a scorpion on the ground! (familiar)
 ~
 100 0 dnoG cfmG 0
-0 0 9 10
+0 0 9 10 -1
 D
    These strange shadow beings are created when a mage's command over shadows
 becomes so great that their shadow can move independently of their body, and no
@@ -171,7 +171,7 @@ the owl shadow~
 Something is casting the shadow of an owl on the ground! (familiar)
 ~
 100 0 dnoG cfmG 0
-0 0 9 10
+0 0 9 10 -1
 D
    These strange shadow beings are created when a mage's command over shadows
 becomes so great that their shadow can move independently of their body, and no
@@ -188,7 +188,7 @@ a basilisk~
 A basilisk curls around and hisses. (familiar)
 ~
 100 0 dnoG cfmG 2
-0 0 0 10
+0 0 0 10 -1
 D
    The basilisk is a cat-sized, grey-brown lizard with a crown-shaped crest.
 Its most famous and dangerous feature is not its venomous bite, but its bright
@@ -205,7 +205,7 @@ a salamander~
 A large salamander is smoldering nearby. (familiar)
 ~
 100 0 dnoG cfmG 1
-0 0 0 10
+0 0 0 10 -1
 D
    Tiny red lizards which store immense heat within their bodies and can
 transmute it into short-lived but powerful bursts of magical energy,
@@ -222,7 +222,7 @@ a skeletal hulk~
 A skeletal hulk looms over you. (familiar)
 ~
 100 0 dozG cfmG 4
-0 0 0 10
+0 0 0 10 -1
 D
    This skeletal monstrosity, clearly been assembled using bones from more than
 one corpse by a particularly creative and vicious necromancer, towers
@@ -237,7 +237,7 @@ a banshee~
 A banshee hovers ominously. (familiar)
 ~
 100 0 dnoG cfmG 3
-2 0 2 10
+2 0 2 10 -1
 D
    Dark spirits whose cries are said to announce (or perhaps cause) the deaths
 of those who hear them, banshees resemble ethereal human women formed from
@@ -254,7 +254,7 @@ a chicken~
 A chicken is pecking at the ground.
 ~
 1 15 djo 0 1
-2 0 0 10
+2 0 0 10 -1
 D
 The chicken is pecking at the ground, ignoring you.
 ~
@@ -278,7 +278,7 @@ a dog~
 A large dog is lying in the sun.
 ~
 1 15 djoz c 2
-0 0 14 9
+0 0 14 9 -1
 D
 This old mutt seems happy just lying around.
 ~
@@ -314,13 +314,13 @@ a quail~
 A stout quail dashes past you.
 ~
 1 15 djo 0 1
-0 0 0 9
+0 0 0 9 -1
 D
    The little quail dashes from bush to bush, perhaps looking for a mate or for
 food.
 ~
-I 0 3200 100.00 1  # BUTCHER: a cut of poultry
-I 0 9025 75.00 1  # BUTCHER: some bird feathers
+I 0 3200 100.00 1  # BUTCHER: cut of poultry
+I 0 9025 75.00 1  # BUTCHER: bird feathers
 M
 0
 $n calls, 'Bob, Bob, White'.~
@@ -338,7 +338,7 @@ a rabbit~
 A white rabbit hops around.
 ~
 1 15 djo 0 1
-0 0 15 9
+0 0 15 9 -1
 D
    The rabbit is pure white, of the kind you rarely see in nature, so it has
 surely come from domestic ancestors. But rabbits are quick to breed, and will
@@ -352,7 +352,7 @@ a red fox~
 A red fox is playing here.
 ~
 1 15 djo c 2
-0 0 0 9
+0 0 0 9 -1
 D
    The little fox has a bright orange coat, with a white tip on its tail. It
 moves low to the ground, stalking its prey behind tall plants.
@@ -365,7 +365,7 @@ a raccoon~
 A raccoon is cleaning its paws.
 ~
 1 15 djo c 2
-0 0 0 9
+0 0 0 9 -1
 D
 The sly little bandit sits on its rear feet, rubbing its paws together.
 ~
@@ -377,7 +377,7 @@ a bluebird~
 A bluebird is pecking at the ground.
 ~
 1 5 djo m 1
-0 0 2 26
+0 0 2 26 -1
 D
 This tiny bird has a gorgeous blue back, with a reddish brown belly.
 ~
@@ -392,10 +392,11 @@ a rat~
 A rat scurries by.
 ~
 1 15 bdjo c 1
-0 0 8 9
+0 0 8 9 -1
 D
 The rat is large and brown, with a scaly tail and a voracious appetite.
 ~
+I 1 10013 100.00 1  # SKIN: rat skin
 T 9805
 S
 #538
@@ -404,7 +405,7 @@ a large spider~
 A large spider creeps by.
 ~
 1 15 djo cG 1
-0 0 9 9
+0 0 9 9 -1
 D
    This spider is large enough -- and hairy enough -- to be a mouse. Instead,
 though, it's the thing mice see in their nightmares.
@@ -417,7 +418,7 @@ a hedgehog~
 A little hedgehog is sniffing around.
 ~
 1 15 djo c 1
-0 0 0 9
+0 0 0 9 -1
 D
    This spiny little creature is a hedgehog -- like a mix between a shrew and a
 porcupine.

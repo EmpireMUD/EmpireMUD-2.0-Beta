@@ -1318,7 +1318,7 @@ ACMD(do_sap) {
 	else if (AFF_FLAGGED(vict, AFF_IMMUNE_STUN | AFF_IMMUNE_PHYSICAL_DEBUFFS)) {
 		act("$E doesn't look like $E'd be affected by that.", FALSE, ch, NULL, vict, TO_CHAR);
 	}
-	else if (AFF_FLAGGED(vict, AFF_STUNNED)) {
+	else if (AFF_FLAGGED(vict, AFF_STUNNED) || GET_POS(vict) < POS_SLEEPING || GET_HEALTH(vict) <= 0) {
 		act("$E is already stunned!", FALSE, ch, NULL, vict, TO_CHAR);
 	}
 	else if (ABILITY_TRIGGERS(ch, vict, NULL, ABIL_SAP)) {

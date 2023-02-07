@@ -258,6 +258,10 @@ D4
 &j~
 E
 0 1 100.00 10564
+E
+17 4 0.01 10565
+E
+17 0 0.10 10562
 I 5 102 15.00 1 X  # DIG: flint stone
 I 5 100 100.00 1 X  # DIG: rock
 I 6 10552 75.00 1  # FORAGE: arctic brambleberries

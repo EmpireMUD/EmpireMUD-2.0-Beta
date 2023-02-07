@@ -6610,6 +6610,7 @@ ACMD(do_retrieve) {
 		return;
 	}
 	
+	skip_spaces(&argument);
 	strcpy(original, argument);
 	half_chop(argument, arg, buf);
 
@@ -6698,12 +6699,12 @@ ACMD(do_retrieve) {
 		}
 
 		if (!found) {
-			if (room_has_function_and_city_ok(GET_LOYALTY(ch), IN_ROOM(ch), FNC_WAREHOUSE | FNC_VAULT)) {
+			if (room_has_function_and_city_ok(GET_LOYALTY(ch), IN_ROOM(ch), FNC_WAREHOUSE | FNC_VAULT) && str_cmp(original, "all")) {
 				// pass control to warehouse func
 				sprintf(buf, "retrieve %s", original);
 				do_warehouse(ch, buf, 0, 0);
 			}
-			else if (ROOM_PRIVATE_OWNER(HOME_ROOM(IN_ROOM(ch))) == GET_IDNUM(ch)) {
+			else if (ROOM_PRIVATE_OWNER(HOME_ROOM(IN_ROOM(ch))) == GET_IDNUM(ch) && str_cmp(original, "all")) {
 				// pass control to home store func
 				sprintf(buf, "retrieve %s", original);
 				do_home(ch, buf, 0, 0);
@@ -7030,6 +7031,9 @@ ACMD(do_ship) {
 		
 		page_string(ch->desc, buf, TRUE);
 	}
+	else if (GET_POS(ch) < POS_RESTING) {
+		send_low_pos_msg(ch);
+	}
 	else if (GET_ISLAND_ID(IN_ROOM(ch)) == NO_ISLAND) {
 		msg_to_char(ch, "You can't ship anything from here.\r\n");
 	}
@@ -7184,6 +7188,7 @@ ACMD(do_store) {
 		return;
 	}
 
+	skip_spaces(&argument);
 	two_arguments(argument, arg1, arg2);
 
 	/* This goes first because I want it to move arg2 to arg1 */
@@ -7247,12 +7252,12 @@ ACMD(do_store) {
 			if (full) {
 				msg_to_char(ch, "It's full.\r\n");
 			}
-			else if (room_has_function_and_city_ok(GET_LOYALTY(ch), IN_ROOM(ch), FNC_WAREHOUSE | FNC_VAULT)) {
+			else if (room_has_function_and_city_ok(GET_LOYALTY(ch), IN_ROOM(ch), FNC_WAREHOUSE | FNC_VAULT) && str_cmp(argument, "all")) {
 				// pass control to warehouse func
 				sprintf(buf, "store %s", argument);
 				do_warehouse(ch, buf, 0, 0);
 			}
-			else if (ROOM_PRIVATE_OWNER(HOME_ROOM(IN_ROOM(ch))) == GET_IDNUM(ch)) {
+			else if (ROOM_PRIVATE_OWNER(HOME_ROOM(IN_ROOM(ch))) == GET_IDNUM(ch) && str_cmp(argument, "all")) {
 				// pass control to home store func
 				sprintf(buf, "store %s", argument);
 				do_home(ch, buf, 0, 0);

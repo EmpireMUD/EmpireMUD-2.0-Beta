@@ -1597,75 +1597,87 @@ void do_instance_delete_all(char_data *ch, char *argument) {
 void do_instance_info(char_data *ch, char *argument) {
 	struct instance_mob *mc, *next_mc;
 	char buf[MAX_STRING_LENGTH];
-	struct instance_data *inst;
-	int num;
+	struct instance_data *iter, *inst = NULL;
+	int num = 1;
 	
-	if (!*argument || !isdigit(*argument) || (num = atoi(argument)) < 1) {
+	// attempt to find instance here with no arg
+	if (!*argument) {
+		inst = find_instance_by_room(IN_ROOM(ch), FALSE, TRUE);
+	}
+	
+	// otherwise check arg
+	if (!inst && (!*argument || !isdigit(*argument) || (num = atoi(argument)) < 1)) {
 		msg_to_char(ch, "Invalid instance number '%s'.\r\n", *argument ? argument : "<blank>");
 		return;
 	}
 	
-	DL_FOREACH(instance_list, inst) {
-		if (--num == 0) {
-			msg_to_char(ch, "\tcInstance %d: [%d] %s\t0\r\n", atoi(argument), GET_ADV_VNUM(INST_ADVENTURE(inst)), GET_ADV_NAME(INST_ADVENTURE(inst)));
-			
-			if (INST_LOCATION(inst)) {
-				if (ROOM_OWNER(INST_LOCATION(inst))) {
-					sprintf(buf, " / %s%s\t0", EMPIRE_BANNER(ROOM_OWNER(INST_LOCATION(inst))), EMPIRE_NAME(ROOM_OWNER(INST_LOCATION(inst))));
-				}
-				else {
-					*buf = '\0';
-				}
-				msg_to_char(ch, "Location: [%d] %s%s%s\r\n", GET_ROOM_VNUM(INST_LOCATION(inst)), get_room_name(INST_LOCATION(inst), FALSE), coord_display_room(ch, INST_LOCATION(inst), FALSE), buf);
+	// look up by number if needed
+	if (!inst) {
+		DL_FOREACH(instance_list, iter) {
+			if (--num == 0) {
+				inst = iter;
+				break;
 			}
-			if (INST_FAKE_LOC(inst) && INST_FAKE_LOC(inst) != INST_LOCATION(inst)) {
-				if (ROOM_OWNER(INST_FAKE_LOC(inst))) {
-					sprintf(buf, " / %s%s\t0", EMPIRE_BANNER(ROOM_OWNER(INST_FAKE_LOC(inst))), EMPIRE_NAME(ROOM_OWNER(INST_FAKE_LOC(inst))));
-				}
-				else {
-					*buf = '\0';
-				}
-				msg_to_char(ch, "Fake Location: [%d] %s%s%s\r\n", GET_ROOM_VNUM(INST_FAKE_LOC(inst)), get_room_name(INST_FAKE_LOC(inst), FALSE), coord_display_room(ch, INST_FAKE_LOC(inst), FALSE), buf);
-			}
-			
-			if (INST_START(inst)) {
-				msg_to_char(ch, "First room: [%d] %s\r\n", GET_ROOM_VNUM(INST_START(inst)), get_room_name(INST_START(inst), FALSE));
-			}
-			
-			if (INST_LEVEL(inst) > 0) {
-				msg_to_char(ch, "Level: %d\r\n", INST_LEVEL(inst));
-			}
-			else {
-				msg_to_char(ch, "Level: unscaled\r\n");
-			}
-			
-			sprintbit(INST_FLAGS(inst), instance_flags, buf, TRUE);
-			msg_to_char(ch, "Flags: %s\r\n", buf);
-			
-			msg_to_char(ch, "Created: %-24.24s\r\n", (char *) asctime(localtime(&INST_CREATED(inst))));
-			if (INST_LAST_RESET(inst) != INST_CREATED(inst)) {
-				msg_to_char(ch, "Last reset: %-24.24s\r\n", (char *) asctime(localtime(&INST_LAST_RESET(inst))));
-			}
-			
-			if (INST_DIR(inst) != NO_DIR) {
-				msg_to_char(ch, "Facing: %s\r\n", dirs[INST_DIR(inst)]);
-			}
-			if (INST_ROTATION(inst) != NO_DIR && IS_SET(GET_ADV_FLAGS(INST_ADVENTURE(inst)), ADV_ROTATABLE)) {
-				msg_to_char(ch, "Rotation: %s\r\n", dirs[INST_ROTATION(inst)]);
-			}
-			
-			if (INST_MOB_COUNTS(inst)) {
-				msg_to_char(ch, "Mob counts:\r\n");
-				HASH_ITER(hh, INST_MOB_COUNTS(inst), mc, next_mc) {
-					msg_to_char(ch, "%3d %s\r\n", mc->count, skip_filler(get_mob_name_by_proto(mc->vnum, FALSE)));
-				}
-			}
-			
-			break;	// only show 1
 		}
 	}
 	
-	if (num > 0) {
+	// show if found
+	if (inst) {
+		msg_to_char(ch, "\tcInstance %d: [%d] %s\t0\r\n", atoi(argument), GET_ADV_VNUM(INST_ADVENTURE(inst)), GET_ADV_NAME(INST_ADVENTURE(inst)));
+		
+		if (INST_LOCATION(inst)) {
+			if (ROOM_OWNER(INST_LOCATION(inst))) {
+				sprintf(buf, " / %s%s\t0", EMPIRE_BANNER(ROOM_OWNER(INST_LOCATION(inst))), EMPIRE_NAME(ROOM_OWNER(INST_LOCATION(inst))));
+			}
+			else {
+				*buf = '\0';
+			}
+			msg_to_char(ch, "Location: [%d] %s%s%s\r\n", GET_ROOM_VNUM(INST_LOCATION(inst)), get_room_name(INST_LOCATION(inst), FALSE), coord_display_room(ch, INST_LOCATION(inst), FALSE), buf);
+		}
+		if (INST_FAKE_LOC(inst) && INST_FAKE_LOC(inst) != INST_LOCATION(inst)) {
+			if (ROOM_OWNER(INST_FAKE_LOC(inst))) {
+				sprintf(buf, " / %s%s\t0", EMPIRE_BANNER(ROOM_OWNER(INST_FAKE_LOC(inst))), EMPIRE_NAME(ROOM_OWNER(INST_FAKE_LOC(inst))));
+			}
+			else {
+				*buf = '\0';
+			}
+			msg_to_char(ch, "Fake Location: [%d] %s%s%s\r\n", GET_ROOM_VNUM(INST_FAKE_LOC(inst)), get_room_name(INST_FAKE_LOC(inst), FALSE), coord_display_room(ch, INST_FAKE_LOC(inst), FALSE), buf);
+		}
+		
+		if (INST_START(inst)) {
+			msg_to_char(ch, "First room: [%d] %s\r\n", GET_ROOM_VNUM(INST_START(inst)), get_room_name(INST_START(inst), FALSE));
+		}
+		
+		if (INST_LEVEL(inst) > 0) {
+			msg_to_char(ch, "Level: %d\r\n", INST_LEVEL(inst));
+		}
+		else {
+			msg_to_char(ch, "Level: unscaled\r\n");
+		}
+		
+		sprintbit(INST_FLAGS(inst), instance_flags, buf, TRUE);
+		msg_to_char(ch, "Flags: %s\r\n", buf);
+		
+		msg_to_char(ch, "Created: %-24.24s\r\n", (char *) asctime(localtime(&INST_CREATED(inst))));
+		if (INST_LAST_RESET(inst) != INST_CREATED(inst)) {
+			msg_to_char(ch, "Last reset: %-24.24s\r\n", (char *) asctime(localtime(&INST_LAST_RESET(inst))));
+		}
+		
+		if (INST_DIR(inst) != NO_DIR) {
+			msg_to_char(ch, "Facing: %s\r\n", dirs[INST_DIR(inst)]);
+		}
+		if (INST_ROTATION(inst) != NO_DIR && IS_SET(GET_ADV_FLAGS(INST_ADVENTURE(inst)), ADV_ROTATABLE)) {
+			msg_to_char(ch, "Rotation: %s\r\n", dirs[INST_ROTATION(inst)]);
+		}
+		
+		if (INST_MOB_COUNTS(inst)) {
+			msg_to_char(ch, "Mob counts:\r\n");
+			HASH_ITER(hh, INST_MOB_COUNTS(inst), mc, next_mc) {
+				msg_to_char(ch, "%3d %s\r\n", mc->count, skip_filler(get_mob_name_by_proto(mc->vnum, FALSE)));
+			}
+		}
+	}
+	else {
 		msg_to_char(ch, "Invalid instance number %d.\r\n", atoi(argument));
 	}
 }
@@ -1985,6 +1997,7 @@ struct set_struct {
 		{ "maxlevel", LVL_START_IMM, PC, NUMBER },
 		{ "skill", LVL_START_IMM, PC, MISC },
 		{ "faction", LVL_START_IMM, PC, MISC },
+		{ "language", LVL_START_IMM, PC, MISC },
 		{ "learned", LVL_START_IMM, PC, MISC },
 		{ "minipet", LVL_START_IMM, PC, MISC },
 		{ "mount", LVL_START_IMM, PC, MISC },
@@ -2551,6 +2564,53 @@ int perform_set(char_data *ch, char_data *vict, int mode, char *val_arg) {
 		assign_class_abilities(vict, NULL, NOTHING);
 		sprintf(output, "%s's %s set to %d.", GET_NAME(vict), SKILL_NAME(skill), level);
 	}
+	else if SET_CASE("language") {
+		char vnum_arg[MAX_INPUT_LENGTH], onoff_arg[MAX_INPUT_LENGTH];
+		generic_data *lang;
+		
+		half_chop(val_arg, vnum_arg, onoff_arg);
+		
+		if (!*vnum_arg || !*onoff_arg) {
+			msg_to_char(ch, "Usage: set <name> language <vnum | language> <on/speak | recognize | off/unknown>\r\n");
+			return 0;
+		}
+		if (!((isdigit(*vnum_arg) && (lang = find_generic(atoi(vnum_arg), GENERIC_LANGUAGE))) || (lang = find_generic_no_spaces(GENERIC_LANGUAGE, vnum_arg)))) {
+			msg_to_char(ch, "Invalid language '%s'.\r\n", vnum_arg);
+			return 0;
+		}
+		if (GEN_FLAGGED(lang, GEN_IN_DEVELOPMENT)) {
+			msg_to_char(ch, "Language is set in-development.\r\n");
+			return 0;
+		}
+		
+		if (!str_cmp(onoff_arg, "on") || is_abbrev(onoff_arg, "speaks")) {
+			add_language(vict, GEN_VNUM(lang), LANG_SPEAK);
+			sprintf(output, "%s: now speaks language [%d] %s.", GET_NAME(vict), GEN_VNUM(lang), GEN_NAME(lang));
+			check_languages(vict);
+		}
+		else if (is_abbrev(onoff_arg, "recognize")) {
+			if (GET_LOYALTY(vict) && speaks_language_empire(GET_LOYALTY(vict), GEN_VNUM(lang)) == LANG_SPEAK) {
+				msg_to_char(ch, "You cannot turn off recognition for that langauge because that player's empire can speak it.\r\n");
+				return 0;
+			}
+			add_language(vict, GEN_VNUM(lang), LANG_RECOGNIZE);
+			sprintf(output, "%s: now recognizes language [%d] %s.", GET_NAME(vict), GEN_VNUM(lang), GEN_NAME(lang));
+			check_languages(vict);
+		}
+		else if (!str_cmp(onoff_arg, "off") || is_abbrev(onoff_arg, "unknown")) {
+			if (GET_LOYALTY(vict) && speaks_language_empire(GET_LOYALTY(vict), GEN_VNUM(lang)) != LANG_UNKNOWN) {
+				msg_to_char(ch, "You cannot turn off that langauge because that player's empire can speak it.\r\n");
+				return 0;
+			}
+			add_language(vict, GEN_VNUM(lang), LANG_UNKNOWN);
+			sprintf(output, "%s: no longer speaks [%d] %s.", GET_NAME(vict), GEN_VNUM(lang), GEN_NAME(lang));
+			check_languages(vict);
+		}
+		else {
+			msg_to_char(ch, "Do you want to set it on/speak, recognize, or off/unknown?\r\n");
+			return 0;
+		}
+	}
 	else if SET_CASE("learned") {
 		char vnum_arg[MAX_INPUT_LENGTH], onoff_arg[MAX_INPUT_LENGTH];
 		craft_data *cft;
@@ -2972,6 +3032,37 @@ SHOW(show_factions) {
 		}
 		if (ch->desc) {
 			page_string(ch->desc, buf, TRUE);
+		}
+	}
+	
+	if (file) {
+		free_char(vict);
+	}
+}
+
+
+SHOW(show_home) {
+	char name[MAX_INPUT_LENGTH];
+	bool file = FALSE;
+	char_data *vict;
+	room_data *home;
+	
+	any_one_arg(argument, name);
+	
+	if (!(vict = find_or_load_player(name, &file))) {
+		msg_to_char(ch, "No player by that name.\r\n");
+	}
+	else if (GET_ACCESS_LEVEL(vict) > GET_ACCESS_LEVEL(ch)) {
+		msg_to_char(ch, "You can't do that.\r\n");
+	}
+	else {
+		home = find_home(vict);
+		
+		if (!home) {
+			msg_to_char(ch, "%s has no home set.\r\n", PERS(vict, ch, TRUE));
+		}
+		else {
+			msg_to_char(ch, "%s's home is at: %s%s\r\n", PERS(vict, ch, TRUE), get_room_name(home, FALSE), coord_display_room(ch, home, FALSE));
 		}
 	}
 	
@@ -4407,6 +4498,37 @@ SHOW(show_terrain) {
 }
 
 
+SHOW(show_tomb) {
+	char name[MAX_INPUT_LENGTH];
+	bool file = FALSE;
+	char_data *vict;
+	room_data *tomb;
+	
+	any_one_arg(argument, name);
+	
+	if (!(vict = find_or_load_player(name, &file))) {
+		msg_to_char(ch, "No player by that name.\r\n");
+	}
+	else if (GET_ACCESS_LEVEL(vict) > GET_ACCESS_LEVEL(ch)) {
+		msg_to_char(ch, "You can't do that.\r\n");
+	}
+	else {
+		tomb = real_room(GET_TOMB_ROOM(vict));
+		
+		if (!tomb) {
+			msg_to_char(ch, "%s has no tomb set.\r\n", PERS(vict, ch, TRUE));
+		}
+		else {
+			msg_to_char(ch, "%s's tomb is at: %s%s\r\n", PERS(vict, ch, TRUE), get_room_name(tomb, FALSE), coord_display_room(ch, tomb, FALSE));
+		}
+	}
+	
+	if (file) {
+		free_char(vict);
+	}
+}
+
+
 SHOW(show_tools) {
 	char buf[MAX_STRING_LENGTH];
 	obj_data *obj, *next_obj;
@@ -5146,6 +5268,70 @@ SHOW(show_produced) {
 		if (ch->desc) {
 			page_string(ch->desc, output, TRUE);
 		}
+	}
+}
+
+
+SHOW(show_languages) {
+	char arg[MAX_INPUT_LENGTH], output[MAX_STRING_LENGTH], line[MAX_STRING_LENGTH];
+	struct player_language *lang, *next_lang;
+	generic_data *gen;
+	char_data *plr = NULL;
+	size_t size, count;
+	bool file = FALSE;
+	
+	argument = one_word(argument, arg);
+	skip_spaces(&argument);
+	
+	if (!*arg) {
+		msg_to_char(ch, "Usage: show languages <player> [keywords]\r\n");
+	}
+	else if (!(plr = find_or_load_player(arg, &file))) {
+		send_to_char("There is no such player.\r\n", ch);
+	}
+	else {
+		if (*argument) {
+			size = snprintf(output, sizeof(output), "Languages matching '%s' for %s:\r\n", argument, GET_NAME(plr));
+		}
+		else {
+			size = snprintf(output, sizeof(output), "Languages for %s:\r\n", GET_NAME(plr));
+		}
+		
+		count = 0;
+		HASH_ITER(hh, GET_LANGUAGES(plr), lang, next_lang) {
+			if (lang->level == LANG_UNKNOWN || !(gen = find_generic(lang->vnum, GENERIC_LANGUAGE))) {
+				continue;
+			}
+			if (*argument && !multi_isname(argument, GEN_NAME(gen))) {
+				continue;	// searched
+			}
+		
+			// show it
+			snprintf(line, sizeof(line), " [%5d] %s (%s)%s%s\r\n", GEN_VNUM(gen), GEN_NAME(gen), language_types[lang->level], (GET_SPEAKING(plr) == lang->vnum) ? " - \tgcurrently speaking\t0" : "", (GET_LOYALTY(plr) && speaks_language_empire(GET_LOYALTY(plr), lang->vnum) == lang->level) ? ", from empire" : "");
+			if (size + strlen(line) < sizeof(output)) {
+				strcat(output, line);
+				size += strlen(line);
+				++count;
+			}
+			else {
+				if (size + 10 < sizeof(output)) {
+					strcat(output, "OVERFLOW\r\n");
+				}
+				break;
+			}
+		}
+	
+		if (!count) {
+			strcat(output, "  none\r\n");	// space reserved for this for sure
+		}
+	
+		if (ch->desc) {
+			page_string(ch->desc, output, TRUE);
+		}
+	}
+	
+	if (plr && file) {
+		free_char(plr);
 	}
 }
 
@@ -5897,16 +6083,7 @@ void do_stat_building(char_data *ch, bld_data *bdg) {
 	}
 	
 	msg_to_char(ch, "Hitpoints: [&g%d&0], Fame: [&g%d&0], Extra Rooms: [&g%d&0], Height: [&g%d&0]\r\n", GET_BLD_MAX_DAMAGE(bdg), GET_BLD_FAME(bdg), GET_BLD_EXTRA_ROOMS(bdg), GET_BLD_HEIGHT(bdg));
-	
-	// artisan?
-	if (GET_BLD_ARTISAN(bdg) != NOTHING) {
-		sprintf(buf, ", Artisan: &g%d&0 &c%s&0", GET_BLD_ARTISAN(bdg), get_mob_name_by_proto(GET_BLD_ARTISAN(bdg), FALSE));
-	}
-	else {
-		*buf = '\0';
-	}
-	
-	msg_to_char(ch, "Citizens: [&g%d&0], Military: [&g%d&0]%s\r\n", GET_BLD_CITIZENS(bdg), GET_BLD_MILITARY(bdg), buf);
+	msg_to_char(ch, "Citizens: [&g%d&0], Military: [&g%d&0], Artisan: [&g%d&0] &c%s&0\r\n", GET_BLD_CITIZENS(bdg), GET_BLD_MILITARY(bdg), GET_BLD_ARTISAN(bdg), GET_BLD_ARTISAN(bdg) != NOTHING ? get_mob_name_by_proto(GET_BLD_ARTISAN(bdg), FALSE) : "none");
 	
 	if (GET_BLD_RELATIONS(bdg)) {
 		get_bld_relations_display(GET_BLD_RELATIONS(bdg), lbuf);
@@ -6091,6 +6268,7 @@ void do_stat_character(char_data *ch, char_data *k) {
 	if (IS_NPC(k)) {
 		sprintbit(MOB_FLAGS(k), action_bits, buf2, TRUE);
 		msg_to_char(ch, "NPC flags: &c%s&0\r\n", buf2);
+		msg_to_char(ch, "Nameset: \ty%s\t0, Language: [\tc%d\t0] \ty%s\t0\r\n", name_sets[MOB_NAME_SET(k)], MOB_LANGUAGE(k), get_generic_name_by_vnum(MOB_LANGUAGE(k)));
 	}
 	else {
 		msg_to_char(ch, "Idle Timer (in tics) [\tg%d\t0], View Height: [\tg%d\t0]\r\n", k->char_specials.timer, get_view_height(k, IN_ROOM(k)));
@@ -6135,7 +6313,7 @@ void do_stat_character(char_data *ch, char_data *k) {
 
 	if (!IS_NPC(k)) {
 		msg_to_char(ch, "Hunger: %d, Thirst: %d, Drunk: %d\r\n", GET_COND(k, FULL), GET_COND(k, THIRST), GET_COND(k, DRUNK));
-		msg_to_char(ch, "Recent deaths: %d\r\n", GET_RECENT_DEATH_COUNT(k));
+		msg_to_char(ch, "Speaking: %s, Recent deaths: %d\r\n", get_generic_name_by_vnum(GET_SPEAKING(k)), GET_RECENT_DEATH_COUNT(k));
 	}
 	
 	if (IS_MORPHED(k)) {
@@ -8176,22 +8354,24 @@ ACMD(do_dc) {
 
 // do_directions
 ACMD(do_distance) {
-	char arg[MAX_INPUT_LENGTH];
+	char arg[MAX_INPUT_LENGTH], *ptr;
 	room_data *target;
 	int dir, dist;
 	
 	one_word(argument, arg);
+	ptr = arg;
+	skip_spaces(&ptr);
 	
 	if (!IS_IMMORTAL(ch) && !IS_NPC(ch) && !HAS_NAVIGATION(ch)) {
 		msg_to_char(ch, "You don't know how to navigate or determine distances.\r\n");
 	}
-	else if (!*arg) {
+	else if (!*ptr) {
 		msg_to_char(ch, "Get the direction and distance to where?\r\n");
 	}
-	else if (!IS_IMMORTAL(ch) && (!isdigit(*arg) || !strchr(arg, ','))) {
+	else if (!IS_IMMORTAL(ch) && (!isdigit(*ptr) || !strchr(ptr, ','))) {
 		msg_to_char(ch, "You can only find distances to coordinates.\r\n");
 	}
-	else if (!(target = find_target_room(ch, arg))) {
+	else if (!(target = find_target_room(ch, ptr))) {
 		msg_to_char(ch, "Unknown target.\r\n");
 	}
 	else {	
@@ -9820,6 +10000,7 @@ ACMD(do_restore) {
 	ability_data *abil, *next_abil;
 	skill_data *skill, *next_skill;
 	struct cooldown_data *cool;
+	generic_data *gen, *next_gen;
 	vehicle_data *veh;
 	empire_data *emp;
 	char_data *vict;
@@ -10022,6 +10203,15 @@ ACMD(do_restore) {
 		// re-add abilities
 		if (emp) {
 			adjust_abilities_to_empire(vict, emp, TRUE);
+		}
+		
+		// languages
+		HASH_ITER(hh, generic_table, gen, next_gen) {
+			if (GEN_TYPE(gen) != GENERIC_LANGUAGE || GEN_FLAGGED(gen, GEN_IN_DEVELOPMENT)) {
+				continue;
+			}
+			
+			add_language(vict, GEN_VNUM(gen), LANG_SPEAK);
 		}
 	}
 	
@@ -10239,6 +10429,7 @@ ACMD(do_show) {
 		{ "minipets", LVL_START_IMM, show_minipets },
 		{ "moons", LVL_START_IMM, show_moons },
 		{ "mounts", LVL_START_IMM, show_mounts },
+		{ "languages", LVL_START_IMM, show_languages },
 		{ "learned", LVL_START_IMM, show_learned },
 		{ "currency", LVL_START_IMM, show_currency },
 		{ "technology", LVL_START_IMM, show_technology },
@@ -10250,11 +10441,13 @@ ACMD(do_show) {
 		{ "produced", LVL_START_IMM, show_produced },
 		{ "resource", LVL_START_IMM, show_resource },
 		{ "olc", LVL_START_IMM, show_olc },
+		{ "home", LVL_START_IMM, show_home },
 		{ "homeless", LVL_START_IMM, show_homeless },
 		{ "companions", LVL_START_IMM, show_companions },
 		{ "lastnames", LVL_START_IMM, show_lastnames },
 		{ "oceanmobs", LVL_START_IMM, show_oceanmobs },
 		{ "subzone", LVL_START_IMM, show_subzone },
+		{ "tomb", LVL_START_IMM, show_tomb },
 
 		// last
 		{ "\n", 0, NULL }

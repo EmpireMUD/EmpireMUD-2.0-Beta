@@ -4,7 +4,7 @@ a leopard~
 A leopard is waiting to strike!
 ~
 75 100 cdgjoz c 3
-0 0 0 10
+0 0 0 10 -1
 D
    The leopard is a beautiful golden color with rosette spots all over its
 coat. The rest of the animal, on the other hand, is a well-honed murder weapon.
@@ -19,7 +19,7 @@ a jungle elephant~
 A towering jungle elephant is rummaging around.
 ~
 20 40 dejoy 0 5
-0 0 0 27
+0 0 0 27 -1
 D
    The great elephant has a blanket over its back, belted on to form a sort of
 saddle, or a place to attach a proper saddle.
@@ -36,7 +36,7 @@ a jaguar~
 A spotted jaguar is stalking you!
 ~
 75 100 cdgjoz c 3
-0 0 0 10
+0 0 0 10 -1
 D
 The jaguar is barely visible as it stalks through heavy leaves, but its
 characteristic spots give away its location.
@@ -51,7 +51,7 @@ a tapir~
 A tapir is rooting around a bush.
 ~
 75 100 djo 0 3
-0 0 0 9
+0 0 0 9 -1
 D
    The tapir is tapered on the front end. It's the strangest animal you've ever
 seen, like a horse and a pig had a baby and it was raised by an elephant.
@@ -65,7 +65,7 @@ a giant anaconda~
 A giant anaconda is draping from the tree!
 ~
 75 100 cdgjo cs 4
-0 0 5 5
+0 0 5 5 -1
 D
    The snake is as long as a boat, and as big around as a dog. It's capable of
 strangling an ox with its powerful muscles, and can unhinge its jaw to swallow
@@ -82,7 +82,7 @@ a green treesnake~
 A green treesnake is dangling toward you.
 ~
 40 60 cdjo c 1
-0 0 5 9
+0 0 5 9 -1
 D
    The little treesnake is no bigger around than your smallest finger, but its
 mouth gapes wide and its fangs look sharp!
@@ -98,7 +98,7 @@ a macaw~
 A brightly colored macaw flies past you.
 ~
 10 20 djo m 1
-0 0 2 9
+0 0 2 9 -1
 D
 The exotic macaw has plumage in bright red, yellow and blue.
 ~
@@ -113,7 +113,7 @@ a grey parrot~
 A grey parrot is pecking at some fruit.
 ~
 10 20 djo m 1
-0 0 2 9
+0 0 2 9 -1
 D
    The small parrot is a beautiful palette of greys. Its yellow eye follows you
 as the bird crushes a seed in its beak.
@@ -128,7 +128,7 @@ a black mamba~
 A black mamba is coiled up on the ground.
 ~
 40 60 cdjo c 2
-0 0 5 9
+0 0 5 9 -1
 D
    Despite its name, the snake is a pale shade of grey. It looks small until it
 moves, and then you realize this is one of the largest snakes you've seen!
@@ -145,8 +145,8 @@ monkey brown little~
 a monkey~
 A little brown monkey is walking along a low branch.
 ~
-40 60 djo c 2
-0 0 0 9
+30 40 djo c 2
+0 0 0 9 -1
 D
    The little monkey is balanced carefully on a low branch, clinging to the
 branch with its nimble toes as it reaches for dangling branches with its hands.
@@ -160,7 +160,7 @@ a chimpanzee~
 A hairy chimpanzee eyes you cautiously.
 ~
 75 100 doA 0 3
-1 0 0 15
+1 0 0 15 -1
 D
    The chimpanzee scratches its gray chin as it ponders you. It reminds you of
 a little old man, hunched over and contemplative.
@@ -173,7 +173,7 @@ a gorilla~
 A huge gorilla pounds its chest at you.
 ~
 75 100 doA 0 3
-1 0 0 15
+1 0 0 15 -1
 D
    The gorilla is twice your size. It's mostly black, but its back is pure
 silver. It doesn't look happy that you've invaded its territory, and it beats
@@ -187,7 +187,7 @@ a baboon~
 A baboon is sitting here and staring at you.
 ~
 75 100 djoA 0 3
-1 0 0 9
+1 0 0 9 -1
 D
    The brown baboon chews a handful of leaves, watching you cautiously as if
 it's unsure of your intentions.
@@ -201,7 +201,7 @@ an ocelot~
 An ocelot is cleaning its paws.
 ~
 40 60 djo c 2
-0 0 0 10
+0 0 0 10 -1
 D
    The ocelot's fur is a beautiful mix of lines, spots, and rosettes that make
 it a prized catch for hunters.
@@ -216,7 +216,7 @@ a massive crocodile~
 A massive crocodile is lurking here.
 ~
 75 100 cdgjo c 5
-0 0 0 10
+0 0 0 10 -1
 D
    The enormous, flat reptile is barely moving -- more a murder-log than an
 animal. When it opens its maw, you can see dozens of spike-shaped teeth lining
@@ -232,7 +232,7 @@ a flying fox~
 A flying fox is flapping around above you.
 ~
 10 20 djo m 1
-0 0 2 9
+0 0 2 9 -1
 D
 This gigantic bat is nearly the size of a fox!
 ~
@@ -245,7 +245,7 @@ a black bat~
 A black bat is flying here.
 ~
 1 5 djo m 1
-0 0 2 9
+0 0 2 9 -1
 D
 The tiny bat is fluttering to and fro, chasing bugs. You can barely see the
 tiny black bat against the darkness.
@@ -257,7 +257,7 @@ a jackrabbit~
 A jackrabbit sits with its ears raised.
 ~
 1 5 djo 0 1
-0 0 15 9
+0 0 15 9 -1
 D
    The oversized jackrabbit -- actually a hare -- sits perfectly still and
 slowly moves its enormous, plate-shaped ears to scan for danger.
@@ -273,7 +273,7 @@ a cougar~
 A cougar is crouched low and watching you.
 ~
 20 40 dgjko c 3
-0 0 0 10
+0 0 0 10 -1
 D
    The cougar has a flecked brown coat, rounded ears, and an unusually long
 tail with a black tip. It crouches low to the ground, almost vanishing against
@@ -290,7 +290,7 @@ a bobcat~
 A curious bobcat is sitting here, waiting.
 ~
 10 20 djo c 2
-0 0 0 10
+0 0 0 10 -1
 D
    Though larger than a housecat, this spotted bobcat isn't very large. It
 lowers its ears behind its ruffled face as it sees you, and waits for you to
@@ -308,7 +308,7 @@ a coyote~
 A lanky coyote dashes past you.
 ~
 10 20 dgjo c 2
-0 0 0 10
+0 0 0 10 -1
 D
    The scrawny coyote looks like it hasn't eaten all season. It keeps its
 distance from you, but its eyes never stop following you.
@@ -322,7 +322,7 @@ a mule deer~
 A mule deer is alerted.
 ~
 10 20 djo 0 4
-0 0 0 27
+0 0 0 27 -1
 D
    The pale brown deer almost disappears against the brush, but its enormous
 ears give it away. It stands perfectly still, watching you, unsure what to do.
@@ -337,7 +337,7 @@ a ground squirrel~
 A small ground squirrel dashes behind a shrub.
 ~
 1 5 djo c 1
-0 0 0 9
+0 0 0 9 -1
 D
    The ground squirrel looks almost comical. Its body is skinny to the point of
 looking emaciated, but its cheeks are puffed out to preposterous proportions as
@@ -353,7 +353,7 @@ a roadrunner~
 A roadrunner dashes past you!
 ~
 1 5 dgjo c 1
-0 0 0 9
+0 0 0 9 -1
 D
    This striking bird has a bright red patch behind its eye, and its brown
 feathers come to a crest on the top of its head. It has an unusually long tail
@@ -369,7 +369,7 @@ an ostrich~
 An ostrich ruffles its feathers and backs away from you.
 ~
 10 20 djo c 3
-0 0 0 11
+0 0 0 11 -1
 D
    This awkward creature looks like a baby bird that forgot to moult as it
 grew. It is taller than you are, with a long, bare neck and huge, downy
@@ -388,7 +388,7 @@ a meerkat~
 A meerkat is standing on its hind legs, watching you.
 ~
 1 5 djo 0 1
-0 0 0 9
+0 0 0 9 -1
 D
 The banded little meerkat stands on its hind legs and scouts for danger.
 ~
@@ -401,7 +401,7 @@ a horned lizard~
 A horned lizard is digging at the ground.
 ~
 1 5 djo 0 1
-0 0 0 10
+0 0 0 10 -1
 D
    This flat little lizard would be invisible against the ground if you hadn't
 just seen it move.
@@ -414,7 +414,7 @@ a desert tortoise~
 A desert tortoise slowly wanders by.
 ~
 5 15 djoy 0 1
-0 0 0 9
+0 0 0 9 -1
 D
    The tortoise has a hard, rounded shell as well as powerful armored legs.
 Its beak is made for eating fruits and leaves, but it looks as if it might take
@@ -428,7 +428,7 @@ a pronghorn~
 A musky pronghorn stops to watch you.
 ~
 10 20 djo 0 4
-0 0 0 11
+0 0 0 11 -1
 D
    This odd animal resembles a deer or antelope, but its horns reveal a
 different lineage. Despite its appearance, it's actually more closely related
@@ -445,7 +445,7 @@ a hyena~
 A spotted hyena saunters along.
 ~
 20 40 dgjo c 3
-0 0 14 10
+0 0 14 10 -1
 D
    The hyena walks along with little concern for you. Its short mane and
 spotted coat flutter in the wind. The hyena is an ancient symbol of treachery,
@@ -463,7 +463,7 @@ a sidewinder~
 A sidewinder rattlesnake is coiled and rattling.
 ~
 5 15 djo 0 1
-0 0 5 9
+0 0 5 9 -1
 D
    The sidewinder moves in a characteristic sideways motion, waving across the
 sand almost as if it's water. The rattle on the end of its tail lets you know
@@ -480,7 +480,7 @@ a giant scorpion~
 A giant scorpion skitters toward cover.
 ~
 5 15 djoz 0 1
-0 0 8 3
+0 0 8 3 -1
 D
 Though giant for a scorpion, it's still quite small.
 ~
@@ -492,7 +492,7 @@ a bison~
 A heavy bison is roaming around.
 ~
 10 20 dfjoy 0 4
-0 0 0 11
+0 0 0 11 -1
 D
 The bison, the greatest predator of the endless grass, towers over the plains.
 ~
@@ -505,7 +505,7 @@ a great-horned owl~
 A great-horned owl is surveying the ground.
 ~
 5 15 djo m 2
-0 0 2 10
+0 0 2 10 -1
 D
 You can barely see the owl as it swoops silently across the night sky.
 ~
@@ -524,7 +524,7 @@ a collared peccary~
 A collared peccary stands perfectly still, watching you.
 ~
 5 15 dgjo c 2
-0 0 0 9
+0 0 0 9 -1
 D
    This foul-smelling musk hog only superficially resembles a pig. It's
 thinner, hairier, and significantly meaner.
@@ -538,7 +538,7 @@ a giant anteater~
 A giant anteater is lumbering about.
 ~
 10 20 djo c 3
-0 0 0 15
+0 0 0 15 -1
 D
    This odd, lumbering creature almost appears to be walking backwards as its
 narrow face is shaped like a tail and its bushy tale is thick like a head.
@@ -554,7 +554,7 @@ a moose~
 A moose is standing here.
 ~
 20 40 djo 0 4
-0 0 0 11
+0 0 0 11 -1
 D
    The moose is bigger than any deer you've ever seen, and taller than some of
 your favorite trees. It seems wary of you, but it's large enough to hold its
@@ -570,7 +570,7 @@ an elk~
 An elk is grazing here.
 ~
 20 40 djo 0 4
-0 0 0 11
+0 0 0 11 -1
 D
    The elk resembles a deer, but it is at least twice as bulky as any deer
 you've seen.
@@ -585,7 +585,7 @@ a giraffe~
 A tall giraffe is grazing here.
 ~
 10 20 djo 0 5
-0 0 0 11
+0 0 0 11 -1
 D
    The giraffe towers above you, surveying the landscape from its lofty vantage
 point. Its huge, reticulated spots form a mesmerizing pattern and you can
@@ -600,7 +600,7 @@ a white rhino~
 A white rhinoceros stomps around.
 ~
 20 40 djoA 0 4
-0 0 0 27
+0 0 0 27 -1
 D
    The massive rhinoceros is large, even by its own standards. It has a great
 horn on its nose, and a smaller horn behind it. Its armored skin and heavy
@@ -619,7 +619,7 @@ a massive elephant~
 A massive elephant lumbers past you.
 ~
 20 40 dejoy 0 5
-0 0 0 27
+0 0 0 27 -1
 D
 The gray elephant is truly huge, with ears like bedsheets and legs like trees.
 ~
@@ -635,7 +635,7 @@ a red fox~
 A red fox is playing here.
 ~
 5 15 djo c 2
-0 0 0 9
+0 0 0 9 -1
 D
    The little fox has a bright orange coat, with a white tip on its tail. It
 moves low to the ground, stalking its prey behind tall plants.
@@ -649,7 +649,7 @@ a llama~
 A llama is looking at you.
 ~
 10 20 dfjko 0 4
-0 0 0 9
+0 0 0 9 -1
 D
 The shaggy llama munches a mouthful of grass as it contemplates you.
 ~
@@ -665,7 +665,7 @@ a snow leopard~
 A snow leopard is waiting to strike!
 ~
 20 40 dgjko c 2
-0 0 0 10
+0 0 0 10 -1
 D
    This large, bulky leopard is covered in shaggy fur, decorated with large
 rosettes, and armed with dozens of sharp claws and teeth. It stalks prey in
@@ -683,7 +683,7 @@ a raccoon~
 A raccoon is cleaning its paws.
 ~
 5 15 djo c 2
-0 0 0 9
+0 0 0 9 -1
 D
 The sly little bandit sits on its rear feet, rubbing its paws together.
 ~
@@ -696,7 +696,7 @@ an opossum~
 There is an opossum on the ground, but it looks dead.
 ~
 5 15 djo c 2
-0 0 0 9
+0 0 0 9 -1
 D
 You're pretty sure the opossum is dead.
 ~
@@ -709,7 +709,7 @@ a badger~
 A badger is digging furiously at the ground.
 ~
 20 40 djoz c 2
-0 0 0 10
+0 0 0 10 -1
 D
    The badger -- nature's plow -- digs furiously at the ground, stopping only
 briefly to listen for its quarry scurrying through tunnels below.
@@ -724,7 +724,7 @@ a forest turtle~
 A forest turtle is munching on something.
 ~
 1 5 djo 0 1
-0 0 0 9
+0 0 0 9 -1
 D
    This flat little brown turtle plods along through the underbrush, stopping
 occasionally to grab a berry or leaf in its beak.
@@ -737,7 +737,7 @@ a bluebird~
 A bluebird is pecking at the ground.
 ~
 1 5 djo m 1
-0 0 2 26
+0 0 2 26 -1
 D
 This tiny bird has a gorgeous blue back, with a reddish brown belly.
 ~
@@ -753,7 +753,7 @@ a small finch~
 A small finch is perched here.
 ~
 1 5 djo m 1
-0 0 2 26
+0 0 2 26 -1
 D
    This little round bird has a gray back, a striped wing, and a bright pink
 chest. Its tiny black beak is perfect for cracking open seeds, which it seems
@@ -771,7 +771,7 @@ a woodpecker~
 A woodpecker is hammering away at a tree.
 ~
 1 5 djo m 1
-0 0 2 26
+0 0 2 26 -1
 D
    The woodpecker is mostly black and white, with a bright red crest on its
 head. It clings to the side of a tree, hammering away as it drills for food.
@@ -794,7 +794,7 @@ a bird of paradise~
 A bird of paradise is displaying its feathers.
 ~
 10 20 djo m 1
-0 0 2 26
+0 0 2 26 -1
 D
    The exotic bird is larger than a pigeon, but smaller than a goose. Its long,
 vibrant feathers come in every color, but they pale in comparison to the bird's
@@ -809,7 +809,7 @@ a bull~
 A bull is grazing here.
 ~
 20 40 djo 0 4
-0 0 0 27
+0 0 0 27 -1
 D
    The bull is grazing peacefully, as if it doesn't know its head is crowned
 with a pair of murderhorns.
@@ -833,7 +833,7 @@ an ox~
 An ox is standing here.
 ~
 10 20 dejo 0 4
-0 0 0 11
+0 0 0 11 -1
 D
 The ox meanders about, munching grass and minding its own business.
 ~
@@ -846,7 +846,7 @@ a pig~
 A pig is rooting around.
 ~
 5 15 djo 0 3
-0 0 0 9
+0 0 0 9 -1
 D
    The pig is big and round, almost ready for market. It roots around at the
 ground before rolling over to cover itself in fresh dirt.
@@ -859,7 +859,7 @@ a muskrat~
 A muskrat is digging around.
 ~
 40 60 djo 0 2
-0 0 0 9
+0 0 0 9 -1
 D
 The muskrat is big, for a rodent. It's more like a beaver than a rat.
 ~
@@ -872,7 +872,7 @@ a beaver~
 A beaver rests back on its hind legs and looks at you.
 ~
 40 60 djo 0 2
-0 0 0 9
+0 0 0 9 -1
 D
    The beaver is large, with a distinctive flat tail and massive teeth, which
 it uses to build its dam home.
@@ -886,7 +886,7 @@ a swamp crab~
 A giant swamp crab pokes its claw up out of the water.
 ~
 40 60 cdjo cG 2
-0 0 0 10
+0 0 0 10 -1
 D
    The crab is nearly the size of a hunting dog! It has one massive claw and
 another, smaller, claw. Neither claw makes you want to move closer.
@@ -898,7 +898,7 @@ a snapping turtle~
 A snapping turtle pokes its head up.
 ~
 40 60 cdjo c 1
-0 0 0 9
+0 0 0 9 -1
 D
    This large freshwater turtle isn't much to look at, until it opens its
 powerful beak and snaps down on a stray tree branch, snapping the branch in
@@ -912,7 +912,7 @@ a great heron~
 A great heron is poking around for food.
 ~
 40 60 djo m 2
-0 0 2 9
+0 0 2 9 -1
 D
    This tall, slender, graceful bird is a heron. Its long beak is perfect for
 stabbing into the water to grab an unsuspecting fish. When it flaps its wings,
@@ -927,7 +927,7 @@ Will o' the Wisp~
 A glowing wisp floats along the swamp.
 ~
 100 125 cdoux c 0
-1 0 0 28
+1 0 0 28 -1
 D
    It just looks like a ball of light hovering over the swamp.
 ~
@@ -939,7 +939,7 @@ the swamp witch~
 The swamp witch lurches about.
 ~
 75 100 cdovxI c 3
-2 0 0 19
+2 0 0 19 -1
 D
    The old witch is clothed in bits of swamp. Her hair is indistinguishable
 from the moss that hangs from the trees. Her skin is pale and slimy, like
@@ -957,7 +957,7 @@ a swamp bandit~
 Someone is lurking behind a tree!
 ~
 75 100 cdovI c 3
-1 0 0 4
+1 0 0 4 -1
 D
    The bandit is dressed in gray and green to match the swamp, with a mask over
 his mouth to disguise his face.
@@ -972,7 +972,7 @@ a manatee~
 A manatee is bobbing near the surface.
 ~
 30 50 djlo 0 4
-0 0 6 9
+0 0 6 9 -1
 D
    The manatee takes a breath at the surface and then drifts down to chew the
 plants that grow at the bottom. It's a massive creature, like a sea cow.
@@ -986,7 +986,7 @@ a dolphin~
 A common dolphin is swimming along side you.
 ~
 30 50 djlo 0 3
-0 0 6 9
+0 0 6 9 -1
 D
    The dolphin jumps out of the water over and over, either trying to perform
 for you or trying to get a look at you. Its back is dark and its belly is
@@ -1002,7 +1002,7 @@ a sea otter~
 A sea otter glides past you.
 ~
 30 50 djlo 0 2
-0 0 6 9
+0 0 6 9 -1
 D
    The large, brown otter swims past you and then rolls over to float on its
 back through the tranquil water. It places a rock on its chest and then slams a
@@ -1018,7 +1018,7 @@ the right whale~
 A huge right whale surfaces nearby!
 ~
 30 50 djloy 0 6
-0 0 6 5
+0 0 6 5 -1
 D
    This type of whale is known as a the right whale to hunt. The whale slowly
 skims the surface, gulping in water and spewing it back out. You can barely see
@@ -1033,7 +1033,7 @@ the fin whale~
 A gigantic fin whale swims up alongside you!
 ~
 30 50 djloy 0 6
-0 0 6 5
+0 0 6 5 -1
 D
    Cruising just below the surface, the fin whale is barely visible as it pulls
 up alongside you. Then, its enormous back crests through the waves and it
@@ -1049,7 +1049,7 @@ the whale shark~
 A huge, spotted whale shark swims just below the surface.
 ~
 30 50 djloy 0 5
-0 0 6 5
+0 0 6 5 -1
 D
    The whale shark is unmistakably a fish, and yet it is the size of a whale!
 Its skin is inky black, almost invisible against the water, but it's covered in
@@ -1073,7 +1073,7 @@ the basking shark~
 A basking shark swims slowly, with its mouth wide open.
 ~
 30 50 djloy 0 5
-0 0 6 5
+0 0 6 5 -1
 D
    Though large, the basking shark isn't exceptionally big, for a shark. It
 trawls along just below the surface with its gaping maw hung open like a net,
@@ -1098,7 +1098,7 @@ a gannet~
 A gannet dives out of the air and into the water.
 ~
 1 5 djo m 2
-0 0 2 9
+0 0 2 9 -1
 D
    As you watch the gannet circle overhead, it tucks back its wings and drops
 into a high-speed dive, piercing the water like an arrow. It vanishes beneath
@@ -1113,7 +1113,7 @@ an albatross~
 An albatross soars effortlessly on the wing.
 ~
 1 5 djo m 2
-0 0 2 9
+0 0 2 9 -1
 D
    This great white and grey bird, the albatross, soars almost without
 flapping. It is said they even sleep on the wing. The albatross is the ancient
@@ -1128,7 +1128,7 @@ an arctic fox~
 An arctic fox is playing here.
 ~
 30 50 djo c 2
-0 0 14 9
+0 0 14 9 -1
 D
    The arctic fox is plush, with pure white fur. When it turns its head away
 from you, you can barely make out its outline against the snow.
@@ -1142,7 +1142,7 @@ a dire arctic fox~
 A dire arctic fox rolls nearby.
 ~
 75 100 djo c 2
-0 0 14 9
+0 0 14 9 -1
 D
    This fearsome white fox is larger than most wolves, though it has all the
 sleek and slender features of its small namesake. It rolls playfully, perhaps
@@ -1158,7 +1158,7 @@ an arctic hare~
 An arctic hare sits upright, staring.
 ~
 10 20 djo 0 1
-0 0 15 9
+0 0 15 9 -1
 D
    The coat of this hare is as white as the driven snow, punctuated only by
 black tips on its ears. It's larger than the rabbits and hares you're used to,
@@ -1173,7 +1173,7 @@ a reindeer~
 A reindeer raises its head from grazing.
 ~
 50 75 dejo 0 4
-0 0 14 27
+0 0 14 27 -1
 D
    This heavy creature is a reindeer, found only in the coldest parts of the
 world. It has a dull gray coat with a white belly, a short tail, and two
@@ -1190,7 +1190,7 @@ a barded reindeer~
 A barded reindeer waits regally nearby.
 ~
 50 75 bdej 0 4
-0 0 14 27
+0 0 14 27 -1
 D
    This heavy creature is a reindeer, found only in the coldest parts of the
 world. It has a dull gray coat with a white belly, a short tail, and two
@@ -1210,7 +1210,7 @@ a polar bear~
 A polar bear scratches at the ground.
 ~
 75 100 dgjkoy c 4
-0 0 0 10
+0 0 0 10 -1
 D
    This strange creature is the largest bear you've ever seen! It has the bulk,
 the shape, and the face of a bear, but its fur is stark white and it looks VERY
@@ -1225,7 +1225,7 @@ a narwhal~
 A huge narwhal breaks the surface of the water.
 ~
 50 75 djloy 0 4
-0 0 6 5
+0 0 6 5 -1
 D
    The narwhal is smaller than most whales you've seen, but still larger than
 any bear or bison. It has a single long, spiraling tooth protruding from its
@@ -1241,7 +1241,7 @@ a lemming~
 A small lemming darts between the shadows.
 ~
 5 8 adjo 0 1
-0 0 7 9
+0 0 7 9 -1
 D
 This tiny, round rodent has long, soft fur splotched with brown and black.
 ~
@@ -1254,7 +1254,7 @@ a huge walrus~
 A huge walrus bellows nearby.
 ~
 75 100 djoA 0 4
-0 0 13 27
+0 0 13 27 -1
 D
    This massive creature, which looks to be half seal and half bear, bears
 tusks the size of broadswords. Its body is truly huge, and it stands its ground
@@ -1271,7 +1271,7 @@ a bristling wolverine~
 A bristling wolverine watches you menacingly.
 ~
 75 100 cdjo c 2
-0 0 7 10
+0 0 7 10 -1
 D
    This small predator has the shape of a weasel, the bulk of a bear, the claws
 of a lion, and the ferocity of a dragon. Its brown and black fur is highly
@@ -1286,7 +1286,7 @@ a rainbow-billed puffin~
 A rainbow-billed puffin preens its feathers nearby.
 ~
 10 20 dgjlo 0 1
-0 0 16 26
+0 0 16 26 -1
 D
    The puffin is a mid-sized black and white water bird with bright orange feet
 and a spectacular multi-colored bill. Like penguins, puffins hunt fish by
@@ -1301,7 +1301,7 @@ a penguin~
 A penguin pops out of the ice.
 ~
 30 50 djo 0 2
-0 0 16 26
+0 0 16 26 -1
 D
    This black and white penguin looks around for predators and then climbs onto
 the ice. It stands upright, tall for its size, and waddles around with
@@ -1317,7 +1317,7 @@ an emperor penguin~
 An emperor penguin slides across the ice nearby.
 ~
 50 75 dgjlo 0 2
-0 0 16 26
+0 0 16 26 -1
 D
    This enormous penguin has a splash of yellow over its white belly. It
 otherwise looks like a larger version of the other penguins you've seen -- as
@@ -1333,7 +1333,7 @@ a large elephant seal~
 A large elephant seal bellows nearby.
 ~
 75 100 djoA 0 4
-0 0 13 5
+0 0 13 5 -1
 D
    Although it's easily the largest seal you've ever seen, the most impressive
 part of this creature isn't its size, it's the trunk-like protrusion on its
@@ -1349,7 +1349,7 @@ a seal~
 A seal slides across the ice.
 ~
 30 50 dgjlo 0 3
-0 0 16 9
+0 0 16 9 -1
 D
    This little gray seal slides around on the ice, moving in circles around you
 as if trying to play a game.
@@ -1363,7 +1363,7 @@ the Emperor of Penguins~
 The Emperor of Penguins stares at you from beneath his penguin cowl.
 ~
 150 150 bdovAI 0 3
-1 0 13 15
+1 0 13 15 -1
 D
    This strange man is wearing a white suit with a black cape and cowl. He
 waddles across the ice, almost perfectly imitating a large penguin. When you
@@ -1377,7 +1377,7 @@ a mouse~
 A mouse scurries by.
 ~
 1 5 bdjo c 1
-0 0 8 9
+0 0 8 9 -1
 D
 This tiny brown mouse scampers from one hole to the next, looking for food.
 ~
@@ -1389,12 +1389,12 @@ a rat~
 A rat scurries by.
 ~
 1 5 bdjo c 1
-0 0 8 9
+0 0 8 9 -1
 D
 The rat is large and brown, with a scaly tail and a voracious appetite.
 ~
 I 0 3012 100.00 1  # BUTCHER: fillet of raw meat
-I 1 1350 100.00 1  # SKIN: small skin
+I 1 10013 100.00 1  # SKIN: rat skin
 T 9188
 S
 #9190
@@ -1403,7 +1403,7 @@ a spider~
 A spider scurries by.
 ~
 1 5 bdjo cG 1
-0 0 7 9
+0 0 7 9 -1
 D
 The closer you look at the spider, the less close to it you want to be.
 ~
@@ -1415,7 +1415,7 @@ a large spider~
 A large spider creeps by.
 ~
 1 5 djo cG 1
-0 0 9 9
+0 0 9 9 -1
 D
    This spider is large enough -- and hairy enough -- to be a mouse. Instead,
 though, it's the thing mice see in their nightmares.
@@ -1428,7 +1428,7 @@ a tabby cat~
 A tabby cat purrs nearby.
 ~
 5 15 djoz c 2
-0 0 0 10
+0 0 0 10 -1
 D
    This friendly brown cat has soft stripes and the fur on its forehead forms
 the letter 'M'. You can hear it purring from here.
@@ -1448,7 +1448,7 @@ a tabby cat~
 A tabby cat arches and hisses at you.
 ~
 5 15 djoz c 2
-0 0 0 10
+0 0 0 10 -1
 D
    This little gray cat puffs up its fur and arches its back as you approach.
 It doesn't seem to like you very much.
@@ -1465,7 +1465,7 @@ a hunting hound~
 A hunting hound watches you, tail wagging.
 ~
 5 15 djoz c 2
-0 0 14 9
+0 0 14 9 -1
 D
 The old hound dog circles you, wagging its tail, ready to hunt.
 ~
@@ -1477,7 +1477,7 @@ a hunting hound~
 A hunting hound growls and bristles at you.
 ~
 5 15 djoz c 2
-0 0 14 9
+0 0 14 9 -1
 D
 This old hound doesn't look too friendly. Perhaps it belongs to someone else.
 ~
@@ -1489,7 +1489,7 @@ a tree frog~
 A tree frog blinks each eye at you.
 ~
 1 5 bdjo c 1
-0 0 1 9
+0 0 1 9 -1
 D
    This tiny green frog has huge black eyes. It sits motionless, perhaps
 waiting for you to pass.
@@ -1501,7 +1501,7 @@ a gecko~
 A gecko flicks its tongue nearby.
 ~
 1 5 bdjko c 1
-0 0 1 9
+0 0 1 9 -1
 D
    The tiny gecko clings just above eye level, nearly motionless except to
 occasionally clean one of its eyes with its tongue.
@@ -1514,7 +1514,7 @@ a moth~
 A moth flutters nearby.
 ~
 1 5 bdjo cG 1
-0 0 2 15
+0 0 2 15 -1
 D
 The little brown moth flits to and fro, never stopping for long.
 ~
@@ -1526,7 +1526,7 @@ a beetle~
 A beetle skitters for cover nearby.
 ~
 1 5 bdjo c 1
-0 0 8 9
+0 0 8 9 -1
 D
 This shiny little black beetle doesn't seem too interested in you.
 ~

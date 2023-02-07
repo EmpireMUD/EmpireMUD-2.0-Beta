@@ -104,6 +104,7 @@ OLC_MODULE(archedit_description);
 OLC_MODULE(archedit_femalerank);
 OLC_MODULE(archedit_flags);
 OLC_MODULE(archedit_gear);
+OLC_MODULE(archedit_language);
 OLC_MODULE(archedit_lore);
 OLC_MODULE(archedit_malerank);
 OLC_MODULE(archedit_name);
@@ -277,6 +278,7 @@ OLC_MODULE(medit_custom);
 OLC_MODULE(medit_flags);
 OLC_MODULE(medit_interaction);
 OLC_MODULE(medit_keywords);
+OLC_MODULE(medit_language);
 OLC_MODULE(medit_longdescription);
 OLC_MODULE(medit_lookdescription);
 OLC_MODULE(medit_maxlevel);
@@ -598,6 +600,7 @@ const struct olc_command_data olc_data[] = {
 	{ "femalerank", archedit_femalerank, OLC_ARCHETYPE, OLC_CF_EDITOR },
 	{ "flags", archedit_flags, OLC_ARCHETYPE, OLC_CF_EDITOR },
 	{ "gear", archedit_gear, OLC_ARCHETYPE, OLC_CF_EDITOR },
+	{ "language", archedit_language, OLC_ARCHETYPE, OLC_CF_EDITOR },
 	{ "lore", archedit_lore, OLC_ARCHETYPE, OLC_CF_EDITOR },
 	{ "malerank", archedit_malerank, OLC_ARCHETYPE, OLC_CF_EDITOR },
 	{ "name", archedit_name, OLC_ARCHETYPE, OLC_CF_EDITOR },
@@ -780,6 +783,7 @@ const struct olc_command_data olc_data[] = {
 	{ "flags", medit_flags, OLC_MOBILE, OLC_CF_EDITOR },
 	{ "interaction", medit_interaction, OLC_MOBILE, OLC_CF_EDITOR },
 	{ "keywords", medit_keywords, OLC_MOBILE, OLC_CF_EDITOR },
+	{ "language", medit_language, OLC_MOBILE, OLC_CF_EDITOR },
 	{ "longdescription", medit_longdescription, OLC_MOBILE, OLC_CF_EDITOR },
 	{ "lookdescription", medit_lookdescription, OLC_MOBILE, OLC_CF_EDITOR },
 	{ "maxlevel", medit_maxlevel, OLC_MOBILE, OLC_CF_EDITOR },
@@ -4373,15 +4377,52 @@ void get_extra_desc_display(struct extra_descr_data *list, char *save_buffer, si
 * @param char *save_buffer A buffer to store the result to.
 */
 void get_icons_display(struct icon_data *list, char *save_buffer) {
-	char lbuf[MAX_INPUT_LENGTH], ibuf[MAX_INPUT_LENGTH], line[MAX_INPUT_LENGTH];
+	char lbuf[MAX_INPUT_LENGTH], ibuf[MAX_INPUT_LENGTH], line[MAX_INPUT_LENGTH], *tmp;
 	struct icon_data *icon;
 	int size, count = 0;
 
 	*save_buffer = '\0';
 	
 	for (icon = list; icon; icon = icon->next) {
-		// have to copy one of the show_color_codes() because it won't work correctly if it appears twice in the same line
+		// basic icon buffer
 		replace_question_color(icon->icon, icon->color, ibuf);
+		if (strstr(ibuf, "@w")) {
+			tmp = str_replace("@w", ".", ibuf);
+			strcpy(ibuf, tmp);
+			free(tmp);
+		}
+		if (strstr(ibuf, "@e")) {
+			tmp = str_replace("@e", ".", ibuf);
+			strcpy(ibuf, tmp);
+			free(tmp);
+		}
+		if (strstr(ibuf, "@.")) {
+			tmp = str_replace("@.", ".", ibuf);
+			strcpy(ibuf, tmp);
+			free(tmp);
+		}
+		if (strstr(ibuf, "@u")) {
+			tmp = str_replace("@u", "v", ibuf);
+			strcpy(ibuf, tmp);
+			free(tmp);
+		}
+		if (strstr(ibuf, "@U")) {
+			tmp = str_replace("@U", "V", ibuf);
+			strcpy(ibuf, tmp);
+			free(tmp);
+		}
+		if (strstr(ibuf, "@v")) {
+			tmp = str_replace("@v", "v", ibuf);
+			strcpy(ibuf, tmp);
+			free(tmp);
+		}
+		if (strstr(ibuf, "@V")) {
+			tmp = str_replace("@V", "V", ibuf);
+			strcpy(ibuf, tmp);
+			free(tmp);
+		}
+		
+		// have to copy one of the show_color_codes() because it won't work correctly if it appears twice in the same line
 		strcpy(lbuf, show_color_codes(icon->icon));
 		sprintf(line, " %2d. %s: %s%s&0  %s%s&0 %s", ++count, icon_types[icon->type], icon->color, ibuf, icon->color, show_color_codes(icon->color), lbuf);
 		
@@ -4784,7 +4825,7 @@ bool audit_interactions(any_vnum vnum, struct interaction_item *list, int attach
 	
 	HASH_ITER(hh, set, as, next_as) {
 		HASH_ITER(hh, as->set, at, next_at) {
-			if (at->percent > 100.0) {
+			if (at->percent > 100.001) {
 				olc_audit_msg(ch, vnum, "Interaction %s exclusion set '%c' totals %.2f%%", interact_types[as->type], (char)at->code, at->percent);
 				problem = TRUE;
 			}
@@ -5483,7 +5524,7 @@ bool olc_parse_requirement_args(char_data *ch, int type, char *argument, bool fi
 	bool need_rmt = FALSE, need_sect = FALSE, need_skill = FALSE;
 	bool need_veh = FALSE, need_mob_flags = FALSE, need_faction = FALSE;
 	bool need_currency = FALSE, need_func_flags = FALSE, need_veh_flags = FALSE;
-	bool need_dip_flags = FALSE, need_event = FALSE;
+	bool need_dip_flags = FALSE, need_event = FALSE, need_language = FALSE;
 	
 	*amount = 1;
 	*vnum = 0;
@@ -5586,6 +5627,11 @@ bool olc_parse_requirement_args(char_data *ch, int type, char *argument, bool fi
 			need_event = TRUE;
 			break;
 		}
+		case REQ_SPEAK_LANGUAGE:
+		case REQ_RECOGNIZE_LANGUAGE: {
+			need_language = TRUE;
+			break;
+		}
 		case REQ_OWN_HOMES:
 		case REQ_CROP_VARIETY:
 		case REQ_EMPIRE_WEALTH:
@@ -5661,6 +5707,19 @@ bool olc_parse_requirement_args(char_data *ch, int type, char *argument, bool fi
 		}
 		if (!(gen = find_generic(atoi(arg), GENERIC_CURRENCY))) {
 			msg_to_char(ch, "Invalid generic currency '%s'.\r\n", arg);
+			return FALSE;
+		}
+		*vnum = GEN_VNUM(gen);
+	}
+	if (need_language) {
+		generic_data *gen;
+		argument = any_one_word(argument, arg);
+		if (!*arg) {
+			msg_to_char(ch, "You must provide a generic language vnum or name.\r\n");
+			return FALSE;
+		}
+		if (!((gen = find_generic(atoi(arg), GENERIC_LANGUAGE)) || (gen = find_generic_no_spaces(GENERIC_LANGUAGE, arg)))) {
+			msg_to_char(ch, "Invalid generic language '%s'.\r\n", arg);
 			return FALSE;
 		}
 		*vnum = GEN_VNUM(gen);
@@ -7679,7 +7738,7 @@ void olc_process_resources(char_data *ch, char *argument, struct resource_data *
 						msg_to_char(ch, "Usage: resource add component <quantity> <vnum/name>\r\n");
 						return;
 					}
-					if (!(cmp = find_generic_component(arg4))) {
+					if (!(cmp = find_generic_component(trim(arg4)))) {
 						msg_to_char(ch, "Unknown component type '%s'.\r\n", arg4);
 						return;
 					}
@@ -7892,7 +7951,7 @@ void olc_process_resources(char_data *ch, char *argument, struct resource_data *
 			switch (change->type) {
 				case RES_COMPONENT: {
 					generic_data *cmp;
-					if (!(cmp = find_generic_component(arg4))) {
+					if (!(cmp = find_generic_component(trim(arg4)))) {
 						msg_to_char(ch, "Unknown component type '%s'.\r\n", arg4);
 						return;
 					}

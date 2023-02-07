@@ -444,9 +444,9 @@ char *next_page(char *str, descriptor_data *desc) {
 			spec_code = FALSE;
 		
 		// skip & colorcodes
-		else if (*str == '&') {
+		else if (*str == COLOUR_CHAR) {
 			++str;
-			if (*str == '&') {	// cause it to print a & in case of &&
+			if (*str == COLOUR_CHAR) {	// cause it to print a & in case of &&
 				--str;
 			}
 		}

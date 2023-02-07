@@ -692,11 +692,11 @@ if %actor.is_pc% && %actor.empire%
 end
 ~
 #10256
-Primeval adventure completer~
+Primeval: Start delayed despawn~
 0 f 100
 ~
 %buildingecho% %self.room% A bone-shattering roar echoes through the air!
-%adventurecomplete%
+%at% i10251 %load% mob 10276
 return 0
 ~
 #10257
@@ -1323,6 +1323,22 @@ done
 %send% %actor% You study @%self% and learn: %name_list%
 %echoaround% %actor% ~%actor% studies @%self%.
 %purge% %self%
+~
+#10276
+Primeval: Initialize delayed despawner~
+0 n 100
+~
+set spawn_time %timestamp%
+remote spawn_time %self.id%
+~
+#10277
+Primeval: Delayed despawn~
+0 ab 10
+~
+if %self.var(spawn_time,0)% + 1800 < %timestamp%
+  %adventurecomplete%
+  %purge% %self%
+end
 ~
 #10296
 Primeval Portal loot replacer~

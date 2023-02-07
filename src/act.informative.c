@@ -2955,7 +2955,7 @@ ACMD(do_look) {
 				// extra desc takes priority
 				send_to_char(exdesc, ch);
 			}
-			else if (!IS_IMMORTAL(ch) && !ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_LOOK_OUT) && !RMT_FLAGGED(IN_ROOM(ch), RMT_LOOK_OUT)) {
+			else if (!IS_IMMORTAL(ch) && !CAN_LOOK_OUT(IN_ROOM(ch))) {
 				msg_to_char(ch, "You can't do that from here.\r\n");
 			}
 			else if (GET_ROOM_VEHICLE(IN_ROOM(ch))) {
@@ -3122,9 +3122,10 @@ ACMD(do_mapsize) {
 
 ACMD(do_mark) {
 	int dist, dir;
-	room_data *mark;
+	room_data *mark, *here;
 	
 	skip_spaces(&argument);
+	here = get_map_location_for(IN_ROOM(ch));
 	
 	if (IS_NPC(ch)) {
 		msg_to_char(ch, "NPCs can't mark the map.\r\n");
@@ -3133,13 +3134,13 @@ ACMD(do_mark) {
 		GET_MARK_LOCATION(ch) = NOWHERE;
 		msg_to_char(ch, "You clear your marked location.\r\n");
 	}
-	else if (GET_ROOM_VNUM(IN_ROOM(ch)) >= MAP_SIZE) {
-		msg_to_char(ch, "You may only mark distances on the map or from the entry room of a building.\r\n");
+	else if (GET_ROOM_VNUM(here) >= MAP_SIZE || RMT_FLAGGED(IN_ROOM(ch), RMT_NO_LOCATION)) {
+		msg_to_char(ch, "You may only mark distances on the map.\r\n");
 	}
 	else {
 		if (*argument && !str_cmp(argument, "set")) {
-			GET_MARK_LOCATION(ch) = GET_ROOM_VNUM(IN_ROOM(ch));
-			msg_to_char(ch, "You have marked this location. Use 'mark' again to see the distance to it from any other map location.\r\n");
+			GET_MARK_LOCATION(ch) = GET_ROOM_VNUM(here);
+			msg_to_char(ch, "You have marked %s. Use 'mark' again to see the distance to it from any other map location.\r\n", (IN_ROOM(ch) == here ? "this location" : "this map location"));
 		}
 		else if (*argument) {
 			msg_to_char(ch, "Usage: mark [set | clear]\r\n");
@@ -3270,7 +3271,7 @@ ACMD(do_mudstats) {
 ACMD(do_nearby) {
 	int max_dist = room_has_function_and_city_ok(GET_LOYALTY(ch), IN_ROOM(ch), FNC_LARGER_NEARBY) ? 150 : 50;
 	bool cities = TRUE, adventures = TRUE, starts = TRUE, check_arg = FALSE;
-	char buf[MAX_STRING_LENGTH], line[MAX_STRING_LENGTH], part[MAX_STRING_LENGTH], adv_color[256], dist_buf[256];
+	char buf[MAX_STRING_LENGTH], line[MAX_STRING_LENGTH], part[MAX_STRING_LENGTH], adv_color[256], dist_buf[256], trait_buf[256];
 	struct instance_data *inst;
 	struct empire_city_data *city;
 	empire_data *emp, *next_emp;
@@ -3279,6 +3280,8 @@ ACMD(do_nearby) {
 	room_data *loc;
 	any_vnum vnum;
 	struct nearby_item_t *nrb_list = NULL, *nrb_item, *next_item;
+	
+	bitvector_t show_city_traits = ETRAIT_DISTRUSTFUL;
 	
 	// for global nearby
 	struct glb_nrb {
@@ -3357,7 +3360,16 @@ ACMD(do_nearby) {
 				
 					dir = get_direction_for_char(ch, get_direction_to(IN_ROOM(ch), loc));
 					snprintf(dist_buf, sizeof(dist_buf), "%d %s", dist, NEARBY_DIR);
-					snprintf(line, sizeof(line), "%7s: the %s of %s%s / %s%s&0\r\n", dist_buf, city_type[city->type].name, city->name, coord_display_room(ch, loc, FALSE), EMPIRE_BANNER(emp), EMPIRE_NAME(emp));
+					
+					if (city->traits & show_city_traits) {
+						prettier_sprintbit(city->traits & show_city_traits, empire_trait_types, part);
+						snprintf(trait_buf, sizeof(trait_buf), " (%s)", part);
+					}
+					else {
+						*trait_buf = '\0';
+					}
+					
+					snprintf(line, sizeof(line), "%7s: the %s of %s%s / %s%s&0%s\r\n", dist_buf, city_type[city->type].name, city->name, coord_display_room(ch, loc, FALSE), EMPIRE_BANNER(emp), EMPIRE_NAME(emp), trait_buf);
 					
 					CREATE(nrb_item, struct nearby_item_t, 1);
 					nrb_item->text = str_dup(line);
@@ -3838,7 +3850,7 @@ ACMD(do_weather) {
 	}
 	
 	// show sun/daytime
-	if (IS_OUTDOORS(ch) || ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_LOOK_OUT) || RMT_FLAGGED(IN_ROOM(ch), RMT_LOOK_OUT)) {
+	if (IS_OUTDOORS(ch) || CAN_LOOK_OUT(IN_ROOM(ch))) {
 		switch (get_sun_status(IN_ROOM(ch))) {
 			case SUN_DARK: {
 				msg_to_char(ch, "It's nighttime.\r\n");
@@ -3866,12 +3878,12 @@ ACMD(do_weather) {
 	}
 	
 	// show moons
-	if (IS_OUTDOORS(ch)) {
+	if (IS_OUTDOORS(ch) || CAN_LOOK_OUT(IN_ROOM(ch))) {
 		show_visible_moons(ch);
 	}
 	
 	// final message if not outdoors
-	if (!IS_OUTDOORS(ch)) {
+	if (!IS_OUTDOORS(ch) && !CAN_LOOK_OUT(IN_ROOM(ch))) {
 		msg_to_char(ch, "You can't see the sky from here.\r\n");
 	}
 }

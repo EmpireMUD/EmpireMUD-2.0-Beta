@@ -131,7 +131,8 @@ void adventure_summon(char_data *ch, char *argument) {
 * @param char_data *ch The person to return back where they came from.
 */
 void adventure_unsummon(char_data *ch) {
-	room_data *room, *map;
+	room_data *room, *map, *was_in;
+	struct follow_type *fol, *next_fol;
 	bool reloc = FALSE;
 	
 	// safety first
@@ -141,10 +142,14 @@ void adventure_unsummon(char_data *ch) {
 	
 	REMOVE_BIT(PLR_FLAGS(ch), PLR_ADVENTURE_SUMMONED);
 	
+	was_in = IN_ROOM(ch);
 	room = real_room(GET_ADVENTURE_SUMMON_RETURN_LOCATION(ch));
 	map = real_room(GET_ADVENTURE_SUMMON_RETURN_MAP(ch));
 	
 	act("$n vanishes in a wisp of smoke!", TRUE, ch, NULL, NULL, TO_ROOM);
+	
+	/*
+	*/
 	
 	if (room && map && GET_ROOM_VNUM(map) == (GET_MAP_LOC(room) ? GET_MAP_LOC(room)->vnum : NOTHING)) {
 		char_to_room(ch, room);
@@ -158,7 +163,8 @@ void adventure_unsummon(char_data *ch) {
 	act("$n appears in a burst of smoke!", TRUE, ch, NULL, NULL, TO_ROOM);
 	GET_LAST_DIR(ch) = NO_DIR;
 	qt_visit_room(ch, IN_ROOM(ch));
-	
+	pre_greet_mtrigger(ch, IN_ROOM(ch), NO_DIR, "summon");	// cannot pre-greet for summon
+
 	look_at_room(ch);
 	if (reloc) {
 		msg_to_char(ch, "\r\nYour original location could not be located. You have been returned to a safe location after leaving the adventure.\r\n");
@@ -167,7 +173,31 @@ void adventure_unsummon(char_data *ch) {
 		msg_to_char(ch, "\r\nYou have been returned to your original location after leaving the adventure.\r\n");
 	}
 	
+	enter_wtrigger(IN_ROOM(ch), ch, NO_DIR, "summon");
+	entry_memory_mtrigger(ch);
+	greet_mtrigger(ch, NO_DIR, "summon");
+	greet_memory_mtrigger(ch);
+	greet_vtrigger(ch, NO_DIR, "summon");
+	
 	msdp_update_room(ch);
+	
+	// followers?
+	LL_FOREACH_SAFE(ch->followers, fol, next_fol) {
+		if (IS_NPC(fol->follower) && AFF_FLAGGED(fol->follower, AFF_CHARM) && IN_ROOM(fol->follower) == was_in && !FIGHTING(fol->follower)) {
+			act("$n vanishes in a wisp of smoke!", TRUE, fol->follower, NULL, NULL, TO_ROOM);
+			char_to_room(fol->follower, IN_ROOM(ch));
+			GET_LAST_DIR(fol->follower) = NO_DIR;
+			pre_greet_mtrigger(fol->follower, IN_ROOM(fol->follower), NO_DIR, "summon");	// cannot pre-greet for summon
+			look_at_room(fol->follower);
+			act("$n appears in a burst of smoke!", TRUE, fol->follower, NULL, NULL, TO_ROOM);
+			
+			enter_wtrigger(IN_ROOM(fol->follower), fol->follower, NO_DIR, "summon");
+			entry_memory_mtrigger(fol->follower);
+			greet_mtrigger(fol->follower, NO_DIR, "summon");
+			greet_memory_mtrigger(fol->follower);
+			greet_vtrigger(fol->follower, NO_DIR, "summon");
+		}
+	}
 }
 
 
@@ -652,6 +682,7 @@ bool perform_summon(char_data *ch, ability_data *abil, any_vnum vnum, bool check
 	if (!skill_check(ch, ABIL_VNUM(abil), ABIL_DIFFICULTY(abil))) {
 		if (checks) {
 			ability_fail_message(ch, NULL, abil);
+			gain_ability_exp(ch, ABIL_VNUM(abil), 15);
 		}
 		return FALSE;
 	}
@@ -1037,7 +1068,8 @@ OFFER_VALIDATE(oval_summon) {
 }
 
 OFFER_FINISH(ofin_summon) {
-	room_data *loc = real_room(offer->location);
+	room_data *loc = real_room(offer->location), *was_in;
+	struct follow_type *fol, *next_fol;
 	struct instance_data *inst;
 	int type = offer->data;
 	struct map_data *map;
@@ -1056,6 +1088,8 @@ OFFER_FINISH(ofin_summon) {
 		}
 	}
 	
+	was_in = IN_ROOM(ch);
+	
 	act("$n vanishes in a swirl of light!", TRUE, ch, NULL, NULL, TO_ROOM);
 	char_to_room(ch, loc);
 	GET_LAST_DIR(ch) = NO_DIR;
@@ -1070,6 +1104,24 @@ OFFER_FINISH(ofin_summon) {
 	greet_memory_mtrigger(ch);
 	greet_vtrigger(ch, NO_DIR, "summon");
 	msdp_update_room(ch);	// once we're sure we're staying
+	
+	// followers?
+	LL_FOREACH_SAFE(ch->followers, fol, next_fol) {
+		if (IS_NPC(fol->follower) && AFF_FLAGGED(fol->follower, AFF_CHARM) && IN_ROOM(fol->follower) == was_in && !FIGHTING(fol->follower)) {
+			act("$n vanishes in a swirl of light!", TRUE, fol->follower, NULL, NULL, TO_ROOM);
+			char_to_room(fol->follower, IN_ROOM(ch));
+			GET_LAST_DIR(fol->follower) = NO_DIR;
+			pre_greet_mtrigger(fol->follower, IN_ROOM(fol->follower), NO_DIR, "summon");	// cannot pre-greet for summon
+			look_at_room(fol->follower);
+			act("$n appears in a swirl of light!", TRUE, fol->follower, NULL, NULL, TO_ROOM);
+			
+			enter_wtrigger(IN_ROOM(fol->follower), fol->follower, NO_DIR, "summon");
+			entry_memory_mtrigger(fol->follower);
+			greet_mtrigger(fol->follower, NO_DIR, "summon");
+			greet_memory_mtrigger(fol->follower);
+			greet_vtrigger(fol->follower, NO_DIR, "summon");
+		}
+	}
 	
 	return TRUE;
 }
@@ -3434,7 +3486,7 @@ ACMD(do_selfdelete) {
 	else {
 		
 		// logs and messaging
-		syslog(SYS_INFO, GET_INVIS_LEV(ch), TRUE, "DEL: %s (lev %d/%d) has self-deleted", GET_NAME(ch), GET_COMPUTED_LEVEL(ch), GET_ACCESS_LEVEL(ch));
+		syslog(SYS_INFO, GET_INVIS_LEV(ch), TRUE, "DEL: %s (lev %d/%d) has self-deleted [%s]", GET_NAME(ch), GET_COMPUTED_LEVEL(ch), GET_ACCESS_LEVEL(ch), ch->desc ? ch->desc->host : "no host");
 		if (!GET_INVIS_LEV(ch)) {
 			act("$n has left the game.", TRUE, ch, 0, 0, TO_ROOM);
 		}

@@ -437,7 +437,12 @@ Local channels
 say - in-character speech
 oocsay - out-of-character speech
 
-See also: TOGGLE, SAY, SLASH-CHANNELS
+In-character channels such as say and shout use whatever language you are
+currently speaking. Type 'speak' to see or change it. You can also use a
+different language for a single say/shout with #language-name. For example:
+> shout #english Hello!
+
+See also: TOGGLE, SAY, SLASH-CHANNELS, LANGUAGE
 #
 CHARISMA CHA
 

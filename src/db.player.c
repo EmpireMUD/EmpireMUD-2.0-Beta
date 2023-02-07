@@ -34,6 +34,7 @@
 *   loaded_player_hash For Offline Players
 *   Autowiz Wizlist Generator
 *   Helpers
+*   Languages
 *   Map Memory
 *   Playtime Tracking
 *   Empire Member/Greatness Tracking
@@ -782,6 +783,7 @@ void free_char(char_data *ch) {
 	struct player_slash_channel *slash;
 	struct player_craft_data *pcd, *next_pcd;
 	struct player_currency *cur, *next_cur;
+	struct player_language *lang, *next_lang;
 	struct minipet_data *mini, *next_mini;
 	struct player_lastname *lastn;
 	struct player_eq_set *eq_set;
@@ -994,6 +996,10 @@ void free_char(char_data *ch) {
 		HASH_ITER(hh, GET_CURRENCIES(ch), cur, next_cur) {
 			HASH_DEL(GET_CURRENCIES(ch), cur);
 			free(cur);
+		}
+		HASH_ITER(hh, GET_LANGUAGES(ch), lang, next_lang) {
+			HASH_DEL(GET_LANGUAGES(ch), lang);
+			free(lang);
 		}
 		HASH_ITER(hh, GET_LEARNED_CRAFTS(ch), pcd, next_pcd) {
 			HASH_DEL(GET_LEARNED_CRAFTS(ch), pcd);
@@ -1735,7 +1741,12 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *c
 				break;
 			}
 			case 'L': {
-				if (!strn_cmp(line, "Largest Inventory: ", 19)) {
+				if (!strn_cmp(line, "Language: ", 10)) {
+					if (sscanf(line + 10, "%d %d", &i_in[0], &i_in[1]) == 2) {
+						add_language(ch, i_in[0], i_in[1]);
+					}
+				}
+				else if (!strn_cmp(line, "Largest Inventory: ", 19)) {
 					GET_LARGEST_INVENTORY(ch) = atoi(line + 19);
 				}
 				else if (!strn_cmp(line, "Lastname: ", 10)) {
@@ -2108,6 +2119,9 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *c
 						free(junk);
 					}
 				}
+				else if (!strn_cmp(line, "Speaking: ", 10)) {
+					GET_SPEAKING(ch) = atoi(line + 10);
+				}
 				else if (!strn_cmp(line, "Syslog Flags: ", 14)) {
 					SYSLOG_FLAGS(ch) = asciiflag_conv(line + 14);
 				}
@@ -2422,6 +2436,7 @@ void write_player_primary_data_to_file(FILE *fl, char_data *ch) {
 	struct player_skill_data *skill, *next_skill;
 	struct player_craft_data *pcd, *next_pcd;
 	struct player_currency *cur, *next_cur;
+	struct player_language *lang, *next_lang;
 	struct minipet_data *mini, *next_mini;
 	struct mount_data *mount, *next_mount;
 	struct player_slash_channel *slash;
@@ -2668,6 +2683,9 @@ void write_player_primary_data_to_file(FILE *fl, char_data *ch) {
 	}
 	
 	// 'L'
+	HASH_ITER(hh, GET_LANGUAGES(ch), lang, next_lang) {
+		fprintf(fl, "Language: %d %d\n", lang->vnum, lang->level);
+	}
 	fprintf(fl, "Largest Inventory: %d\n", GET_LARGEST_INVENTORY(ch));
 	if (GET_LAST_CORPSE_ID(ch) > 0) {
 		fprintf(fl, "Last Corpse Id: %d\n", GET_LAST_CORPSE_ID(ch));
@@ -2784,6 +2802,9 @@ void write_player_primary_data_to_file(FILE *fl, char_data *ch) {
 			// these are half-loaded slash channels and save in the same way
 			fprintf(fl, "Slash-channel: %s\n", loadslash->name);
 		}
+	}
+	if (GET_SPEAKING(ch) != NOTHING) {
+		fprintf(fl, "Speaking: %d\n", GET_SPEAKING(ch));
 	}
 	if (SYSLOG_FLAGS(ch)) {
 		fprintf(fl, "Syslog Flags: %s\n", bitv_to_alpha(SYSLOG_FLAGS(ch)));
@@ -3885,6 +3906,7 @@ void clear_player(char_data *ch) {
 	GET_TEMPORARY_ACCOUNT_ID(ch) = NOTHING;
 	GET_IMMORTAL_LEVEL(ch) = -1;	// Not an immortal
 	GET_LAST_VEHICLE(ch) = NOTHING;
+	GET_SPEAKING(ch) = NOTHING;
 }
 
 
@@ -4280,6 +4302,7 @@ void enter_player_game(descriptor_data *d, int dolog, bool fresh) {
 	check_learned_crafts(ch);
 	check_currencies(ch);
 	check_eq_sets(ch);
+	check_languages(ch);
 	check_minipets_and_companions(ch);
 	check_player_events(ch);
 	refresh_passive_buffs(ch);
@@ -4436,6 +4459,11 @@ void give_newbie_gear(char_data *ch, obj_vnum vnum, int pos) {
 	}
 	else {
 		equip_char(ch, obj, pos);
+	}
+	
+	// always bind immediately if BoE
+	if (OBJ_FLAGGED(obj, OBJ_BIND_FLAGS)) {
+		bind_obj_to_player(obj, ch);
 	}
 }
 
@@ -4787,6 +4815,11 @@ void start_new_character(char_data *ch) {
 		for (gear = GET_ARCH_GEAR(arch); gear; gear = gear->next) {
 			give_newbie_gear(ch, gear->vnum, gear->wear);
 		}
+		
+		// language
+		if (GET_ARCH_LANGUAGE(arch) && GEN_TYPE(GET_ARCH_LANGUAGE(arch)) == GENERIC_LANGUAGE && !GEN_FLAGGED(GET_ARCH_LANGUAGE(arch), GEN_IN_DEVELOPMENT)) {
+			add_language(ch, GEN_VNUM(GET_ARCH_LANGUAGE(arch)), LANG_SPEAK);
+		}
 	}
 	
 	// guarantee minimum of 1 for active attributes
@@ -4840,6 +4873,342 @@ void update_played_time(char_data *ch) {
 	if (!IS_NPC(ch) && GET_LOYALTY(ch)) {
 		track_empire_playtime(GET_LOYALTY(ch), amt);
 	}
+}
+
+
+ //////////////////////////////////////////////////////////////////////////////
+//// LANGUAGES ///////////////////////////////////////////////////////////////
+
+/**
+* Adds (or updates) a language for a player character. If the level is
+* LANG_UNKNOWN, it will delete the entry (this is the default).
+*
+* @param char_data *ch The player.
+* @param any_vnum vnum The vnum of the language (generic).
+* @param byte level Any LANG_ const to indicate how well they know it the language.
+*/
+void add_language(char_data *ch, any_vnum vnum, byte level) {
+	struct player_language *pl;
+	
+	if (!ch || IS_NPC(ch)) {
+		return;	// oops
+	}
+	
+	// find
+	HASH_FIND_INT(GET_LANGUAGES(ch), &vnum, pl);
+	
+	// add if necessary
+	if (!pl && level != LANG_UNKNOWN) {
+		CREATE(pl, struct player_language, 1);
+		pl->vnum = vnum;
+		HASH_ADD_INT(GET_LANGUAGES(ch), vnum, pl);
+	}
+	
+	// update
+	if (pl) {
+		pl->level = level;
+	}
+	
+	// delete if necessary?
+	if (pl && pl->level == LANG_UNKNOWN) {
+		HASH_DEL(GET_LANGUAGES(ch), pl);
+		free(pl);
+		pl = NULL;
+	}
+	
+	// ensure character speaks SOMETHING if this is a "speak"
+	if (GET_SPEAKING(ch) == NOTHING && pl && pl->level == LANG_SPEAK) {
+		GET_SPEAKING(ch) = vnum;
+	}
+	
+	// otherwise ensure they're not speaking it
+	if (GET_SPEAKING(ch) == vnum && pl && pl->level != LANG_SPEAK) {
+		GET_SPEAKING(ch) = NOTHING;
+	}
+	
+	// update quests and mark for save
+	qt_change_language(ch, vnum, level);
+	queue_delayed_update(ch, CDU_SAVE);
+}
+
+
+/**
+* Adds (or updates) a language for an empires. If the level is LANG_UNKNOWN, it
+* will delete the entry (this is the default). Empire languages are only used
+* to give languages to members.
+*
+* @param empire_data *emp The empire.
+* @param any_vnum vnum The vnum of the language (generic).
+* @param byte level Any LANG_ const to indicate how well they know it the language.
+*/
+void add_language_empire(empire_data *emp, any_vnum vnum, byte level) {
+	struct player_language *pl;
+	
+	if (!emp) {
+		return;	// oops
+	}
+	
+	// find
+	HASH_FIND_INT(EMPIRE_LANGUAGES(emp), &vnum, pl);
+	
+	// add if necessary
+	if (!pl && level != LANG_UNKNOWN) {
+		CREATE(pl, struct player_language, 1);
+		pl->vnum = vnum;
+		HASH_ADD_INT(EMPIRE_LANGUAGES(emp), vnum, pl);
+	}
+	
+	// update
+	if (pl) {
+		pl->level = level;
+	}
+	
+	// delete if necessary?
+	if (pl && pl->level == LANG_UNKNOWN) {
+		HASH_DEL(EMPIRE_LANGUAGES(emp), pl);
+		free(pl);
+		pl = NULL;
+	}
+	
+	// update quests and mark for save
+	// et_change_language(emp, vnum, level);
+	EMPIRE_NEEDS_SAVE(emp) = TRUE;
+}
+
+
+/**
+* Grants a player all the languages their empire speaks. This is meant to be
+* called from within check_languages(), which immediately validates them all.
+*
+* @param char_data *ch The player.
+*/
+static void assign_empire_languages(char_data *ch) {
+	struct player_language *pl, *next_pl;
+	int level;
+	
+	if (!ch || IS_NPC(ch) || !GET_LOYALTY(ch)) {
+		return;	// no work
+	}
+	
+	HASH_ITER(hh, EMPIRE_LANGUAGES(GET_LOYALTY(ch)), pl, next_pl) {
+		level = speaks_language(ch, pl->vnum);
+		if (level < pl->level) {
+			add_language(ch, pl->vnum, pl->level);
+		}
+	}
+}
+
+
+/**
+* This is called when a character logs in or when a language is saved in OLC
+* (under some circumstances) to ensure the character has the correct languages
+* in their list.
+*
+* @param char_data *ch The player.
+*/
+void check_languages(char_data *ch) {
+	struct player_language *lang, *next_lang;
+	generic_data *gen, *next_gen;
+	bool ok = FALSE, save = FALSE;
+	any_vnum backup_speaking = NOTHING, second_backup = NOTHING;
+	
+	if (IS_NPC(ch)) {
+		return;
+	}
+	
+	assign_empire_languages(ch);
+	
+	// check languages they know
+	HASH_ITER(hh, GET_LANGUAGES(ch), lang, next_lang) {
+		// audit it
+		if (!(gen = find_generic(lang->vnum, GENERIC_LANGUAGE))) {
+			ok = FALSE;	// deleted?
+		}
+		else if (GEN_FLAGGED(gen, GEN_IN_DEVELOPMENT)) {
+			ok = FALSE;	// in-dev
+		}
+		else if (lang->level == LANG_UNKNOWN) {
+			ok = FALSE;	// might as well delete these here
+		}
+		else {
+			// seems ok
+			ok = TRUE;
+		}
+		
+		// did we make it
+		if (ok) {
+			// try to store as a backup for later
+			if (backup_speaking == NOTHING && GEN_FLAGGED(gen, GEN_BASIC)) {
+				backup_speaking = lang->vnum;
+			}
+			else if (second_backup == NOTHING) {
+				// non-basic backup just in case
+				second_backup = lang->vnum;
+			}
+		}
+		else {
+			// remove
+			save = TRUE;
+			HASH_DEL(GET_LANGUAGES(ch), lang);
+			free(lang);
+		}
+	}
+	
+	// check for common languages
+	HASH_ITER(hh, generic_table, gen, next_gen) {
+		if (GEN_TYPE(gen) != GENERIC_LANGUAGE) {
+			continue;	// not a language
+		}
+		if (GEN_FLAGGED(gen, GEN_IN_DEVELOPMENT)) {
+			continue;	// can't be in-dev
+		}
+		if (!GEN_FLAGGED(gen, GEN_BASIC)) {
+			continue;	// must be basic
+		}
+		
+		// ok? ensure the player speaks it
+		if (speaks_language(ch, GEN_VNUM(gen)) != LANG_SPEAK) {
+			add_language(ch, GEN_VNUM(gen), LANG_SPEAK);
+			save = TRUE;
+		}
+		
+		// try to store as a backup for later
+		if (backup_speaking == NOTHING) {
+			backup_speaking = GEN_VNUM(gen);
+		}
+	}
+	
+	// ensure they have a valid 'speaking'
+	if (GET_SPEAKING(ch) == NOTHING || speaks_language(ch, GET_SPEAKING(ch)) != LANG_SPEAK) {
+		// this MAY still be 'NOTHING' but it should be a best choice either way
+		GET_SPEAKING(ch) = (backup_speaking != NOTHING ? backup_speaking : second_backup);
+		save = TRUE;
+	}
+	
+	// and save if requested
+	if (save) {
+		queue_delayed_update(ch, CDU_SAVE);
+	}
+}
+
+
+/**
+* Ensures all characters in the game have valid languages. This does not need
+* to hit players who are at menus rather than in-game because they will be
+* checked when they enter the game.
+*/
+void check_languages_all(void) {
+	char_data *ch;
+	
+	check_languages_all_empires();
+	
+	DL_FOREACH(character_list, ch) {
+		if (!IS_NPC(ch)) {
+			check_languages(ch);
+		}
+	}
+}
+
+
+/**
+* Checks languages for all empires.
+*/
+void check_languages_all_empires(void) {
+	empire_data *emp, *next_emp;
+	HASH_ITER(hh, empire_table, emp, next_emp) {
+		check_languages_empire(emp);
+	}
+}
+
+
+/**
+* Check languages for an empire to make sure they are all valid.
+*
+* @param empire_data *emp The empire.
+*/
+void check_languages_empire(empire_data *emp) {
+	generic_data *gen;
+	struct player_language *lang, *next_lang;
+	bool ok = FALSE, save = FALSE;
+	
+	if (emp) {
+		HASH_ITER(hh, EMPIRE_LANGUAGES(emp), lang, next_lang) {
+			// audit it
+			if (!(gen = find_generic(lang->vnum, GENERIC_LANGUAGE))) {
+				ok = FALSE;	// deleted?
+			}
+			else if (GEN_FLAGGED(gen, GEN_IN_DEVELOPMENT)) {
+				ok = FALSE;	// in-dev
+			}
+			else if (lang->level == LANG_UNKNOWN) {
+				ok = FALSE;	// might as well delete these here
+			}
+			else {
+				// seems ok
+				ok = TRUE;
+			}
+		
+			// did we make it
+			if (!ok) {
+				// remove
+				save = TRUE;
+				HASH_DEL(EMPIRE_LANGUAGES(emp), lang);
+				free(lang);
+			}
+		}
+		
+		if (save) {
+			EMPIRE_NEEDS_SAVE(emp) = TRUE;
+		}
+	}
+}
+
+
+/**
+* Determines how well a character knows a language. NPCs always speak any
+* language.
+*
+* @param char_data *ch The player.
+* @param any_vnum vnum The vnum of the language (generic).
+* @return int A LANG_ constant indicating how well the player knows the language.
+*/
+int speaks_language(char_data *ch, any_vnum vnum) {
+	struct player_language *pl;
+	
+	if (!ch) {
+		// oops
+		return LANG_UNKNOWN;
+	}
+	if (IS_NPC(ch)) {
+		// npcs always speak a language
+		return LANG_SPEAK;
+	}
+	
+	// find
+	HASH_FIND_INT(GET_LANGUAGES(ch), &vnum, pl);
+	return pl ? pl->level : LANG_UNKNOWN;
+}
+
+
+/**
+* Determines if an empire has unlocked a language at the empire level (usually
+* from progress goals).
+*
+* @param empire_data *emp The empire.
+* @param any_vnum vnum The vnum of the language (generic).
+* @return int A LANG_ constant indicating how well the empire knows the language.
+*/
+int speaks_language_empire(empire_data *emp, any_vnum vnum) {
+	struct player_language *pl;
+	
+	if (!emp) {
+		// oops
+		return LANG_UNKNOWN;
+	}
+	
+	// find
+	HASH_FIND_INT(EMPIRE_LANGUAGES(emp), &vnum, pl);
+	return pl ? pl->level : LANG_UNKNOWN;
 }
 
 

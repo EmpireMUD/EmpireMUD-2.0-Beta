@@ -546,7 +546,7 @@ void replace_color_codes(char *string, char *new_color) {
 	*temp = '\0';
 	
 	while (string[iter]) {
-		if (string[iter] == '&' && string[iter+1] != '?') {
+		if (string[iter] == COLOUR_CHAR && string[iter+1] != '?') {
 			// copy over new color and skip this part of string
 			strcpy(temp + iter, new_color);
 			++iter;
@@ -1174,7 +1174,7 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options) {
 	bool ship_partial = IS_SET(options, LRR_SHIP_PARTIAL) ? TRUE : FALSE;
 	bool look_out = IS_SET(options, LRR_LOOK_OUT) ? TRUE : FALSE;
 	bool has_ship = (GET_ROOM_VEHICLE(IN_ROOM(ch)) && !VEH_FLAGGED(GET_ROOM_VEHICLE(IN_ROOM(ch)), VEH_BUILDING)) ? TRUE : FALSE;
-	bool show_on_ship = has_ship && ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_LOOK_OUT);
+	bool show_on_ship = has_ship && CAN_LOOK_OUT(IN_ROOM(ch));
 	bool show_title = !show_on_ship || ship_partial || look_out || IS_SET(options, LRR_LOOK_OUT_INSIDE);
 
 	// begin with the sanity check
@@ -2051,14 +2051,14 @@ static void show_map_to_char(char_data *ch, struct mappc_data_container *mappc, 
 			strcpy(show_icon, lbuf);
 		}
 		// need a leading color base color?
-		if (*show_icon != '&') {
+		if (*show_icon != COLOUR_CHAR) {
 			snprintf(lbuf, sizeof(lbuf), "%s%s", base_color, show_icon);
 			strcpy(show_icon, lbuf);
 		}
 	}
 	else {
 		// need a leading color base color?
-		if (*show_icon != '&') {
+		if (*show_icon != COLOUR_CHAR) {
 			snprintf(lbuf, sizeof(lbuf), "%s%s", base_color, show_icon);
 			strcpy(show_icon, lbuf);
 		}
@@ -2078,7 +2078,7 @@ static void show_map_to_char(char_data *ch, struct mappc_data_container *mappc, 
 		if (AFF_FLAGGED(ch, AFF_STONED)) {
 			// check all but the final char
 			for (iter = 0; show_icon[iter] != 0 && show_icon[iter+1] != 0; ++iter) {
-				if (show_icon[iter] == '&' || show_icon[iter] == '\t') {
+				if (show_icon[iter] == COLOUR_CHAR || show_icon[iter] == '\t') {
 					switch(show_icon[iter+1]) {
 						case 'r':	show_icon[iter+1] = 'b';	break;
 						case 'g':	show_icon[iter+1] = 'c';	break;
@@ -2796,7 +2796,7 @@ ACMD(do_mapscan) {
 	else if (!use_room || IS_ADVENTURE_ROOM(use_room) || ROOM_IS_CLOSED(use_room)) {	// check map room
 		msg_to_char(ch, "You can only use mapscan out on the map.\r\n");
 	}
-	else if ((!GET_ROOM_VEHICLE(IN_ROOM(ch)) || !ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_LOOK_OUT)) && (IS_ADVENTURE_ROOM(IN_ROOM(ch)) || ROOM_IS_CLOSED(IN_ROOM(ch)))) {
+	else if ((!GET_ROOM_VEHICLE(IN_ROOM(ch)) || !CAN_LOOK_OUT(IN_ROOM(ch))) && (IS_ADVENTURE_ROOM(IN_ROOM(ch)) || ROOM_IS_CLOSED(IN_ROOM(ch)))) {
 		msg_to_char(ch, "Scan only works out on the map.\r\n");
 	}
 	else if ((dir = parse_direction(ch, argument)) == NO_DIR) {
@@ -2860,7 +2860,7 @@ ACMD(do_scan) {
 	else if (!use_room || IS_ADVENTURE_ROOM(use_room) || ROOM_IS_CLOSED(use_room)) {	// check map room
 		msg_to_char(ch, "You can only use scan out on the map.\r\n");
 	}
-	else if ((!GET_ROOM_VEHICLE(IN_ROOM(ch)) || !ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_LOOK_OUT)) && (IS_ADVENTURE_ROOM(IN_ROOM(ch)) || ROOM_IS_CLOSED(IN_ROOM(ch)))) {
+	else if ((!GET_ROOM_VEHICLE(IN_ROOM(ch)) || !CAN_LOOK_OUT(IN_ROOM(ch))) && (IS_ADVENTURE_ROOM(IN_ROOM(ch)) || ROOM_IS_CLOSED(IN_ROOM(ch)))) {
 		msg_to_char(ch, "Scan only works out on the map.\r\n");
 	}
 	else if ((dir = parse_direction(ch, argument)) == NO_DIR) {

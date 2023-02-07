@@ -202,6 +202,30 @@ int count_empire_objects(empire_data *emp, obj_vnum vnum) {
 
 
 /**
+* Deletes entries by type+value.
+*
+* @param struct progress_perk **list A pointer to the list to delete from.
+* @param int type PRG_PERK type.
+* @param int value The value to remove.
+* @return bool TRUE if the type+value was removed from the list. FALSE if not.
+*/
+bool delete_progress_perk_from_list(struct progress_perk **list, int type, int value) {
+	struct progress_perk *iter, *next_iter;
+	bool any = FALSE;
+	
+	LL_FOREACH_SAFE(*list, iter, next_iter) {
+		if (iter->type == type && iter->value == value) {
+			any = TRUE;
+			LL_DELETE(*list, iter);
+			free(iter);
+		}
+	}
+	
+	return any;
+}
+
+
+/**
 * Finds a goal the empire is currently on. This allows multi-word abbrevs, and
 * prefers exact matches.
 *
@@ -310,6 +334,24 @@ progress_data *find_purchasable_goal_by_name(empire_data *emp, char *name) {
 
 
 /**
+* @param struct progress_perk *list A list to search.
+* @param int type PRG_PERK type.
+* @param int value The value to look for.
+* @return bool TRUE if the type+value is in the list. FALSE if not.
+*/
+bool find_progress_perk_in_list(struct progress_perk *list, int type, int value) {
+	struct progress_perk *perk;
+	
+	LL_FOREACH(list, perk) {
+		if (perk->type == type && perk->value == value) {
+			return TRUE;
+		}
+	}
+	return FALSE;
+}
+
+
+/**
 * Quick way to turn a vnum into a name, safely.
 *
 * @param any_vnum vnum The progression vnum to look up.
@@ -407,6 +449,14 @@ char *get_one_perk_display(struct progress_perk *perk, bool show_vnums) {
 			sprintf(save_buffer, "%+d territory", perk->value);
 			break;
 		}
+		case PRG_PERK_SPEAK_LANGUAGE: {
+			sprintf(save_buffer, "Members can speak %s%s", numstr, get_generic_name_by_vnum(perk->value));
+			break;
+		}
+		case PRG_PERK_RECOGNIZE_LANGUAGE: {
+			sprintf(save_buffer, "Members can recognize %s%s", numstr, get_generic_name_by_vnum(perk->value));
+			break;
+		}
 		default: {
 			strcpy(save_buffer, "UNKNOWN");
 			break;
@@ -502,6 +552,7 @@ void add_completed_goal(empire_data *emp, any_vnum vnum) {
 void apply_progress_to_empire(empire_data *emp, progress_data *prg, bool add) {
 	struct empire_island *isle, *next_isle;
 	struct progress_perk *perk;
+	bool languages = FALSE;
 	
 	if (!emp || !prg) {
 		return;	// sanitation
@@ -566,10 +617,35 @@ void apply_progress_to_empire(empire_data *emp, progress_data *prg, bool add) {
 				SAFE_ADD(EMPIRE_ATTRIBUTE(emp, EATT_WORKFORCE_CAP), (add ? perk->value : -perk->value), 0, INT_MAX, TRUE);
 				break;
 			}
+			case PRG_PERK_SPEAK_LANGUAGE: {
+				if (add) {
+					add_language_empire(emp, perk->value, LANG_SPEAK);
+				}
+				else {
+					add_language_empire(emp, perk->value, LANG_UNKNOWN);
+				}
+				languages = TRUE;
+				break;
+			}
+			case PRG_PERK_RECOGNIZE_LANGUAGE: {	
+				int level = speaks_language_empire(emp, perk->value);
+				// prevent a downgrade if they are at SPEAK not RECOGNIZE
+				if (add && level != LANG_SPEAK) {
+					add_language_empire(emp, perk->value, LANG_RECOGNIZE);
+				}
+				else if (!add && level != LANG_SPEAK) {
+					add_language_empire(emp, perk->value, LANG_UNKNOWN);
+				}
+				languages = TRUE;
+				break;
+			}
 		}
 	}
 	
 	EMPIRE_NEEDS_SAVE(emp) = TRUE;
+	if (languages) {
+		check_languages_all();
+	}
 }
 
 
@@ -2928,6 +3004,16 @@ OLC_MODULE(progedit_perks) {
 						return;
 					}
 					break;	// otherwise ok
+				}
+				case PRG_PERK_SPEAK_LANGUAGE:
+				case PRG_PERK_RECOGNIZE_LANGUAGE: {
+					generic_data *gen;
+					if (!*argument || !((isdigit(*argument) && (gen = find_generic(atoi(argument), GENERIC_LANGUAGE))) || (gen = find_generic_no_spaces(GENERIC_LANGUAGE, argument)))) {
+						msg_to_char(ch, "Invalid generic language vnum '%s'.\r\n", argument);
+						return;
+					}
+					vnum = GEN_VNUM(gen);
+					break;
 				}
 				default: {
 					msg_to_char(ch, "That type is not yet implemented.\r\n");

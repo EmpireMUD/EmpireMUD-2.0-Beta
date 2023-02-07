@@ -1259,6 +1259,7 @@ const char *affected_bits[] = {
 	"IMMUNE-DAMAGE",	// 35
 	"!WHERE",
 	"WATERWALK",
+	"LIGHT",
 	"\n"
 };
 
@@ -1302,6 +1303,7 @@ const char *affected_bits_consider[] = {
 	"",	// 35 - immune-damage
 	"",	// !where
 	"",	// waterwalk
+	"",	// light
 	"\n"
 };
 
@@ -1343,6 +1345,7 @@ const bool aff_is_bad[] = {
 	TRUE,
 	FALSE,	// hard-stunned (not 'bad' because it's uncleansable)
 	FALSE,	// 35 - immune-damage
+	FALSE,
 	FALSE,
 	FALSE,
 };
@@ -2117,6 +2120,7 @@ const char *generic_types[] = {
 	"CURRENCY",	// 5
 	"COMPONENT",
 	"MOON",
+	"LANGUAGE",
 	"\n"
 };
 
@@ -2131,6 +2135,7 @@ const bool generic_types_uses_in_dev[] = {
 	FALSE,	// CURRENCY	// 5
 	FALSE,	// COMPONENT
 	TRUE,	// MOON
+	TRUE,	// LANGUAGE
 };
 
 
@@ -2138,6 +2143,15 @@ const bool generic_types_uses_in_dev[] = {
 const char *generic_flags[] = {
 	"BASIC",	// 0
 	"IN-DEVELOPMENT",
+	"\n"
+};
+
+
+// LANG_x: how well someone speaks a language
+const char *language_types[] = {
+	"unknown",	// 0
+	"recognizes",
+	"speaks",
 	"\n"
 };
 
@@ -2907,6 +2921,8 @@ const char *progress_perk_types[] = {
 	"Greatness-territory",
 	"Workforce-cap",
 	"Territory",
+	"Speak-language",
+	"Recognize-language",
 	"\n"
 };
 
@@ -2955,6 +2971,8 @@ const char *quest_reward_types[] = {
 	"REPUTATION",
 	"CURRENCY",
 	"EVENT-POINTS",
+	"SPEAK-LANGUAGE",	// 10
+	"RECOGNIZE-LANGUAGE",
 	"\n",
 };
 
@@ -4420,6 +4438,8 @@ const char *requirement_types[] = {
 	"LEVEL-UNDER",
 	"LEVEL-OVER",
 	"OWN-VEHICLE-FUNCTION",	// 40
+	"SPEAK-LANGUAGE",
+	"RECOGNIZE-LANGUAGE",
 	"\n",
 };
 
@@ -4466,6 +4486,8 @@ const bool requirement_amt_type[] = {
 	REQ_AMT_NONE,	// event not running
 	REQ_AMT_THRESHOLD,	// level under
 	REQ_AMT_THRESHOLD,	// level over
+	REQ_AMT_NONE,	// speak-language
+	REQ_AMT_NONE,	// recognize-language
 };
 
 
@@ -4511,6 +4533,8 @@ const bool requirement_needs_tracker[] = {
 	FALSE,	// event not running
 	FALSE,	// level under
 	FALSE,	// level over
+	FALSE,	// speak-language
+	FALSE,	// recognize-language
 };
 
 

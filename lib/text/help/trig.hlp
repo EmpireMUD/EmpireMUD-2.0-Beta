@@ -184,6 +184,12 @@ When using field - The variable returns:
 &cadd_progress(vnum)&0 - Grants a progression goal (preferably set SCRIPT-ONLY).
 &cadj&0 - Adjective form of the empire's name.
 &cbanner&0 - Empire's banner (as a color code).
+&ccan_recognize_lang(lang,on|off)&0 - Whether the empire can at least recognize
+   a language. Optional on/off 2nd arg grants/removes this from the empire but
+   NOT from members who already have it. Cannot add/remove if the empire speaks
+   (instead of recognizes) it.
+&ccan_speak(lang,on|off)&0 - Whether the empire can speak a language. Optional
+   on/off 2nd arg grants/removes this from the empire but NOT from members.
 &ccoins&0 - How many coins the empire has in its vaults.
 &cdescription&0 - The empire's full description.
 &cfame&0 - The empire's total fame value.
@@ -635,6 +641,9 @@ Special Variables When using field - The variable returns:
 &cinstance.set_location(room)&0 - Changes the map location of the instance, for
    example if the adventure appears to move.
 &cinstance.start&0 - The entry room of the instance, if any.
+&clanguage.name(vnum|short)&0 - Gets the full name of a language (Low Goblish).
+&clanguage.short(vnum|name)&0 - Gets the short name of a language (low-goblish).
+&clanguage.vnum(short|name)&0 - Gets the vnum of a language by name.
 &cpeople.<vnum>&0 - This variable returns the number of people in the room 
    specified via vnum.
 &crandom.<#>&0 - This returns a number between 1 and the field value. 
@@ -679,6 +688,10 @@ Only the FIRST matching speech trigger on each mob will run unless it also has
 the Allow-Multiple type. Additonal mobs can each run 1 speech trigger without
 Allow-Multiple; this trigger is per-mob. Vehicles do not support this flag yet.
 
+The language used for this speech is provided as the %lang% and %lang_vnum%
+variables. This may be different from %actor.speaking% if the actor specified a
+different language for this speech.
+
 Note: Objects cannot have speech triggers, but mobs, rooms, and vehicles can.
 Note: Speech triggers attached to charmed mobs will not fire unless the trigger
    also has the Charmed type.
@@ -686,10 +699,12 @@ Note: Speech triggers attached to charmed mobs will not fire unless the trigger
 Variables:
   &c%actor%&0 - The character whose speech activated the trigger.
   &c%speech%&0 - The entire phrase spoken.
+  &c%lang%&0 - The name of the language the person used, if any ("Low Goblish").
+  &c%lang_vnum%&0 - The vnum of the language used, if any.
 
 You can add the "Player-in-Room" modifier.
 
-See also: MTRIG CHARMED, PLAYER-IN-ROOM TRIGGER, ALLOW-MULTIPLE
+See also: MTRIG CHARMED, PLAYER-IN-ROOM TRIGGER, ALLOW-MULTIPLE, LANGUAGE
 #d
 "START QUEST TRIGGER" "MTRIG START-QUEST" "OTRIG START-QUEST" "RTRIG START-QUEST" "VTRIG START-QUEST" TRIGEDIT-MOB-START-QUEST TRIGEDIT-OBJ-START-QUEST TRIGEDIT-ROOM-START-QUEST TRIGEDIT-VEH-START-QUEST "START-QUEST TRIGGER"
 

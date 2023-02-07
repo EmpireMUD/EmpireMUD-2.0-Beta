@@ -454,6 +454,7 @@ void boot_db(void) {
 	expire_old_politics();
 	check_learned_empire_crafts();
 	check_nowhere_einv_all();
+	check_languages_all_empires();
 	verify_empire_goals();
 	need_progress_refresh = TRUE;
 	
@@ -1761,6 +1762,7 @@ void clear_char(char_data *ch) {
 	MOB_INSTANCE_ID(ch) = NOTHING;
 	MOB_DYNAMIC_SEX(ch) = NOTHING;
 	MOB_DYNAMIC_NAME(ch) = NOTHING;
+	MOB_LANGUAGE(ch) = NOTHING;
 	MOB_PURSUIT_LEASH_LOC(ch) = NOWHERE;
 	GET_ROPE_VNUM(ch) = NOTHING;
 	
@@ -1866,6 +1868,9 @@ char_data *read_mobile(mob_vnum nr, bool with_triggers) {
 	
 	// note this may lead to slight over-spawning after reboots -pc 5/20/16
 	MOB_SPAWN_TIME(mob) = time(0);
+	
+	// special handling for mobs with LIGHT flags on the prototype
+	++GET_LIGHTS(mob);
 
 	return (mob);
 }

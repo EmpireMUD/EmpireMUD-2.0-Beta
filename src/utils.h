@@ -190,6 +190,7 @@
 #define GET_ARCH_FEMALE_RANK(arch)  ((arch)->female_rank)
 #define GET_ARCH_FLAGS(arch)  ((arch)->flags)
 #define GET_ARCH_GEAR(arch)  ((arch)->gear)
+#define GET_ARCH_LANGUAGE(arch)  ((arch)->language)
 #define GET_ARCH_LORE(arch)  ((arch)->lore)
 #define GET_ARCH_MALE_RANK(arch)  ((arch)->male_rank)
 #define GET_ARCH_NAME(arch)  ((arch)->name)
@@ -575,6 +576,7 @@ int CAN_CARRY_N(char_data *ch);	// formerly a macro
 #define EMPIRE_TERRITORY(emp, type)  ((emp)->territory[(type)])
 #define EMPIRE_WEALTH(emp)  ((emp)->wealth)
 #define EMPIRE_POPULATION(emp)  ((emp)->population)
+#define EMPIRE_LANGUAGES(emp)  ((emp)->languages)
 #define EMPIRE_LEARNED_CRAFTS(emp)  ((emp)->learned_crafts)
 #define EMPIRE_MAPOUT_TOKEN(emp)  ((emp)->mapout_token)
 #define EMPIRE_MEMBER_ACCOUNTS(emp)  ((emp)->member_accounts)
@@ -840,6 +842,7 @@ int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_COORD(ge
 #define MOB_DYNAMIC_SEX(ch)  ((ch)->mob_specials.dynamic_sex)
 #define MOB_FACTION(ch)  ((ch)->mob_specials.faction)
 #define MOB_INSTANCE_ID(ch)  ((ch)->mob_specials.instance_id)
+#define MOB_LANGUAGE(ch)  ((ch)->mob_specials.language)
 #define MOB_MOVE_TYPE(ch)  ((ch)->mob_specials.move_type)
 #define MOB_PURSUIT(ch)  ((ch)->mob_specials.pursuit)
 #define MOB_PURSUIT_LEASH_LOC(ch)  ((ch)->mob_specials.pursuit_leash_loc)
@@ -1176,6 +1179,7 @@ int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_COORD(ge
 #define GET_IMMORTAL_LEVEL(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->immortal_level))
 #define GET_INFORMATIVE_FLAGS(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->informative_flags))
 #define GET_INVIS_LEV(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->invis_level))
+#define GET_LANGUAGES(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->languages))
 #define GET_LARGEST_INVENTORY(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->largest_inventory))
 #define GET_LAST_COMPANION(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->last_companion))
 #define GET_LAST_CORPSE_ID(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->last_corpse_id))
@@ -1224,6 +1228,7 @@ int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_COORD(ge
 #define GET_SKILL_HASH(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->skill_hash))
 #define GET_SKILL_LEVEL(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->skill_level))
 #define GET_SLASH_CHANNELS(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->slash_channels))
+#define GET_SPEAKING(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->speaking))
 #define GET_TECHS(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->techs))
 #define GET_TEMPORARY_ACCOUNT_ID(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->temporary_account_id))
 #define GET_TITLE(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->title))
@@ -1436,6 +1441,7 @@ int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_COORD(ge
 #define HAS_FUNCTION(room, flag)  ((GET_BUILDING(room) && IS_SET(GET_BLD_FUNCTIONS(GET_BUILDING(room)), (flag))) || (GET_ROOM_TEMPLATE(room) && IS_SET(GET_RMT_FUNCTIONS(GET_ROOM_TEMPLATE(room)), (flag))))
 
 // room types
+#define CAN_LOOK_OUT(room)  (ROOM_BLD_FLAGGED((room), BLD_LOOK_OUT) || RMT_FLAGGED((room), RMT_LOOK_OUT))
 #define IS_ADVENTURE_ROOM(room)  ROOM_SECT_FLAGGED((room), SECTF_ADVENTURE)
 #define IS_ANY_BUILDING(room)  ROOM_SECT_FLAGGED((room), SECTF_MAP_BUILDING | SECTF_INSIDE)
 #define IS_DISMANTLING(room)  (ROOM_AFF_FLAGGED((room), ROOM_AFF_DISMANTLING))
@@ -2305,8 +2311,10 @@ void check_for_eligible_goals(empire_data *emp);
 void check_progress_refresh();
 int count_diplomacy(empire_data *emp, bitvector_t dip_flags);
 bool empire_meets_goal_prereqs(empire_data *emp, progress_data *prg);
+bool delete_progress_perk_from_list(struct progress_perk **list, int type, int value);
 progress_data *find_current_progress_goal_by_name(empire_data *emp, char *name);
 progress_data *find_progress_goal_by_name(char *name);
+bool find_progress_perk_in_list(struct progress_perk *list, int type, int value);
 progress_data *find_purchasable_goal_by_name(empire_data *emp, char *name);
 void full_reset_empire_progress(empire_data *only_emp);
 void purchase_goal(empire_data *emp, progress_data *prg, char_data *purchased_by);
@@ -2372,6 +2380,7 @@ void qt_gain_building(char_data *ch, any_vnum vnum);
 void qt_gain_tile_sector(char_data *ch, sector_vnum vnum);
 void qt_change_coins(char_data *ch);
 void qt_change_currency(char_data *ch, any_vnum vnum, int total);
+void qt_change_language(char_data *ch, any_vnum vnum, int level);
 void qt_empire_wealth(char_data *ch, any_vnum amount);
 void qt_event_start_stop(any_vnum event_vnum);
 void qt_gain_vehicle(char_data *ch, vehicle_data *veh);

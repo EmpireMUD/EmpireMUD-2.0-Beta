@@ -150,6 +150,7 @@ extern const struct faction_reputation_type reputation_levels[];
 extern const char *generic_types[];
 extern const bool generic_types_uses_in_dev[];
 extern const char *generic_flags[];
+extern const char *language_types[];
 
 // mob constants
 extern const char *action_bits[];
