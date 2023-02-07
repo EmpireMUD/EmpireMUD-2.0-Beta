@@ -682,6 +682,7 @@ bool perform_summon(char_data *ch, ability_data *abil, any_vnum vnum, bool check
 	if (!skill_check(ch, ABIL_VNUM(abil), ABIL_DIFFICULTY(abil))) {
 		if (checks) {
 			ability_fail_message(ch, NULL, abil);
+			gain_ability_exp(ch, ABIL_VNUM(abil), 15);
 		}
 		return FALSE;
 	}
