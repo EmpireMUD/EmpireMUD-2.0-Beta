@@ -4,7 +4,7 @@ a cave viper~
 A cave viper coils to strike nearby!
 ~
 0 0 bdjB c 1
-0 0 5 9
+0 0 5 9 -1
 I 0 3012 100.00 1  # BUTCHER: fillet of raw meat
 I 1 1355 100.00 1  # SKIN: snakeskin
 I 4 11111 50.00 1  # LOOT: pouch of viper venom
@@ -21,7 +21,7 @@ a hermit~
 A hermit can be seen in the shadows.
 ~
 0 0 bdvAI cn 3
-0 0 0 15
+0 0 0 15 -1
 T 11100
 T 11101
 T 18292
@@ -33,7 +33,7 @@ a venomous skink~
 A shiny yellow skink scurries up a nearby rock.
 ~
 0 0 bdjB c 2
-0 0 7 9
+0 0 7 9 -1
 I 0 3012 100.00 1  # BUTCHER: fillet of raw meat
 I 1 1351 100.00 2  # SKIN: large skin
 I 4 11112 50.00 1  # LOOT: pouch of skink saliva
@@ -50,7 +50,7 @@ a loch colossus~
 The massive shadow of a loch colossus circles menacingly beneath the water's surface.
 ~
 0 0 bdAB c 5
-0 0 6 15
+0 0 6 15 -1
 I 0 3012 100.00 10  # BUTCHER: fillet of raw meat
 I 1 1351 100.00 6  # SKIN: large skin
 I 4 11101 25.00 1 x  # LOOT: colossal ribcage
@@ -67,7 +67,7 @@ a pristine pegasus~
 A majestic white pegasus raises his head and stares at you imperiously.
 ~
 0 100 bdej cim 4
-0 0 2 11
+0 0 2 11 -1
 I 3 11107 100.00 1  # BARDE: armoured pegasus
 T 11103
 S
@@ -77,7 +77,7 @@ a scarlet-hooded raptor~
 An ominous shadow passes over, accompanied by a raspy screech.
 ~
 0 0 bdAB cm 2
-0 0 2 10
+0 0 2 10 -1
 I 0 3200 100.00 1  # BUTCHER: cut of poultry
 I 4 11109 25.00 1 x  # LOOT: raptor claw dagger
 I 4 11108 25.00 1 x  # LOOT: scarlet-feathered hood
@@ -92,7 +92,7 @@ a pristine pegasus~
 A majestic white pegasus raises its head and stares at you imperiously.
 ~
 0 0 bdj cim 4
-0 0 2 11
+0 0 2 11 -1
 T 11102
 S
 #11107
@@ -101,7 +101,7 @@ an armoured pegasus~
 An armoured pegasus strikes a statuesque pose nearby.
 ~
 0 100 bdej cim 4
-0 0 2 11
+0 0 2 11 -1
 T 11103
 S
 #11108
@@ -110,7 +110,7 @@ a horned lizard~
 A horned lizard is digging at the ground.
 ~
 1 3 dj 0 1
-0 0 0 10
+0 0 0 10 -1
 D
    This flat little lizard would be invisible against the ground if you hadn't
 just seen it move.
@@ -123,7 +123,7 @@ a rabbit~
 A white rabbit hops around.
 ~
 1 3 dj 0 1
-0 0 15 9
+0 0 15 9 -1
 D
    The rabbit is pure white, of the kind you rarely see in nature, so it has
 surely come from domestic ancestors. But rabbits are quick to breed, and will
@@ -138,7 +138,7 @@ a mountain goat~
 A mountain goat is prancing about.
 ~
 10 20 djk 0 3
-0 0 0 11
+0 0 0 11 -1
 D
    The mountain goat is large, with strong muscles and white fur. Its small
 hooves are perfect for climbing the steep, craggy mountainsides.
@@ -152,7 +152,7 @@ a woodpecker~
 A woodpecker is hammering away at a tree.
 ~
 1 5 djo m 1
-0 0 2 10
+0 0 2 10 -1
 D
    The woodpecker is mostly black and white, with a bright red crest on its
 head. It clings to the side of a tree, hammering away as it drills for food.
@@ -165,7 +165,7 @@ a jackrabbit~
 A jackrabbit sits with its ears raised.
 ~
 1 3 dj 0 1
-0 0 15 9
+0 0 15 9 -1
 D
    The oversized jackrabbit -- actually a hare -- sits perfectly still and
 slowly moves its enormous, plate-shaped ears to scan for danger.
@@ -179,7 +179,7 @@ a sneaky skink~
 A colorful skink is sneaking around here.
 ~
 1 1 bdoD dn 1
-0 0 7 9
+0 0 7 9 -1
 T 9901
 T 9902
 S
@@ -189,7 +189,7 @@ the sleeping ivy~
 The room is covered in sleeping ivy.
 ~
 0 0 bcdgzA cG 3
-0 0 0 7
+0 0 0 7 -1
 T 11139
 S
 #11131
@@ -198,7 +198,7 @@ a carniferous yew~
 A broad, carniferous yew grows in the middle of the room.
 ~
 0 0 bdgzA cG 5
-0 0 0 5
+0 0 0 5 -1
 I 0 11144 100.00 1  # BUTCHER: yew berries
 I 0 11144 100.00 1  # BUTCHER: yew berries
 I 0 11144 100.00 1  # BUTCHER: yew berries
@@ -211,7 +211,7 @@ a lulling songbird~
 A small songbird, blue and purple shimmering iridescent over its otherwise grey plumage, trills from above.
 ~
 0 0 adgj 0 1
-0 0 2 26
+0 0 2 26 -1
 T 11140
 S
 #11133
@@ -220,7 +220,7 @@ a jumbo crayfish~
 A jumbo crayfish skitters nearby, its carapace flashing hues of red and gold beneath muddy brown.
 ~
 0 0 abdgjlA 0 2
-0 0 8 10
+0 0 8 10 -1
 I 4 11133 100.00 1  # LOOT: opal carapace
 S
 #11134
@@ -229,7 +229,7 @@ a mammoth catfish~
 A mammoth catfish breaks the surface of the swamp nearby.
 ~
 0 0 bcdlA c 3
-0 0 6 5
+0 0 6 5 -1
 I 0 11137 100.00 2  # BUTCHER: catfish fillet
 I 4 11136 100.00 1  # LOOT: catfish dorsal spine
 S
@@ -239,7 +239,7 @@ the caretaker~
 The caretaker, pale and disheveled, pokes at the soil of one of the window boxes, ignoring you.
 ~
 0 0 bdvI n 3
-0 0 13 3
+0 0 13 3 -1
 S
 #11136
 caretaker undead re-animated reanimated~
@@ -247,7 +247,7 @@ the undead caretaker~
 The re-animated caretaker lets out a rattling moan, guttural and ferocious!
 ~
 0 0 cdghuB G 3
-0 0 11 9
+0 0 11 9 -1
 I 4 11142 100.00 1  # LOOT: dried woundwort cutting
 I 4 11143 100.00 1  # LOOT: star anise pod
 I 4 11138 50.00 1 X  # LOOT: wooden staff
@@ -259,7 +259,7 @@ a darting dragonfly~
 A shimmering green dragonfly darts and hovers nearby.
 ~
 0 0 abdjA c 2
-0 0 2 23
+0 0 2 23 -1
 I 4 11133 100.00 1  # LOOT: opal carapace
 S
 #11138
@@ -268,7 +268,7 @@ the titanaconda~
 The titanaconda lunges forward with its massive body!
 ~
 0 0 bcdjluzB c 5
-0 0 5 14
+0 0 5 14 -1
 I 0 3012 100.00 4  # BUTCHER: fillet of raw meat
 I 1 11145 100.00 1  # SKIN: titanaconda's scales
 I 4 11135 100.00 1  # LOOT: titanaconda's collar
@@ -280,7 +280,16 @@ a wading bird~
 A stilt-legged bird struts nearby, its long beak lancing the ground for food.
 ~
 0 0 dgjlA 0 2
-0 0 0 4
+0 0 0 4 -1
 I 0 3200 100.00 1  # BUTCHER: cut of poultry
+S
+#11140
+darting dragonfly hovers shimmering green~
+a darting dragonfly~
+A shimmering green dragonfly darts and hovers nearby.
+~
+0 0 abdjoA c 2
+0 0 2 23 -1
+I 4 11133 100.00 1  # LOOT: opal carapace
 S
 $
