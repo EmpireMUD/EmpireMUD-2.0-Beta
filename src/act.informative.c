@@ -3271,7 +3271,7 @@ ACMD(do_mudstats) {
 ACMD(do_nearby) {
 	int max_dist = room_has_function_and_city_ok(GET_LOYALTY(ch), IN_ROOM(ch), FNC_LARGER_NEARBY) ? 150 : 50;
 	bool cities = TRUE, adventures = TRUE, starts = TRUE, check_arg = FALSE;
-	char buf[MAX_STRING_LENGTH], line[MAX_STRING_LENGTH], part[MAX_STRING_LENGTH], adv_color[256], dist_buf[256];
+	char buf[MAX_STRING_LENGTH], line[MAX_STRING_LENGTH], part[MAX_STRING_LENGTH], adv_color[256], dist_buf[256], trait_buf[256];
 	struct instance_data *inst;
 	struct empire_city_data *city;
 	empire_data *emp, *next_emp;
@@ -3280,6 +3280,8 @@ ACMD(do_nearby) {
 	room_data *loc;
 	any_vnum vnum;
 	struct nearby_item_t *nrb_list = NULL, *nrb_item, *next_item;
+	
+	bitvector_t show_city_traits = ETRAIT_DISTRUSTFUL;
 	
 	// for global nearby
 	struct glb_nrb {
@@ -3358,7 +3360,16 @@ ACMD(do_nearby) {
 				
 					dir = get_direction_for_char(ch, get_direction_to(IN_ROOM(ch), loc));
 					snprintf(dist_buf, sizeof(dist_buf), "%d %s", dist, NEARBY_DIR);
-					snprintf(line, sizeof(line), "%7s: the %s of %s%s / %s%s&0\r\n", dist_buf, city_type[city->type].name, city->name, coord_display_room(ch, loc, FALSE), EMPIRE_BANNER(emp), EMPIRE_NAME(emp));
+					
+					if (city->traits & show_city_traits) {
+						prettier_sprintbit(city->traits & show_city_traits, empire_trait_types, part);
+						snprintf(trait_buf, sizeof(trait_buf), " (%s)", part);
+					}
+					else {
+						*trait_buf = '\0';
+					}
+					
+					snprintf(line, sizeof(line), "%7s: the %s of %s%s / %s%s&0%s\r\n", dist_buf, city_type[city->type].name, city->name, coord_display_room(ch, loc, FALSE), EMPIRE_BANNER(emp), EMPIRE_NAME(emp), trait_buf);
 					
 					CREATE(nrb_item, struct nearby_item_t, 1);
 					nrb_item->text = str_dup(line);
