@@ -1660,6 +1660,11 @@ void char_to_room(char_data *ch, room_data *room) {
 		if (!IS_NPC(ch) && (inst = find_instance_by_room(room, FALSE, TRUE))) {
 			check_instance_is_loaded(inst);
 		}
+
+		// check npc spawns whenever a player is places in a room
+		if (!IS_NPC(ch)) {
+			spawn_mobs_from_center(room);
+		}
 		
 		// sanitation: remove them from the old room first
 		if (IN_ROOM(ch)) {
@@ -1674,11 +1679,6 @@ void char_to_room(char_data *ch, room_data *room) {
 		
 		if (!IS_NPC(ch) && !IS_IMMORTAL(ch)) {
 			check_island_levels(room, (int) GET_COMPUTED_LEVEL(ch));
-		}
-
-		// check npc spawns whenever a player is places in a room
-		if (!IS_NPC(ch)) {
-			spawn_mobs_from_center(IN_ROOM(ch));
 		}
 		
 		// look for an instance to lock
