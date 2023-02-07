@@ -36,6 +36,25 @@ A newbie island usually needs these things:
       !AGGRO  - prevents aggro mobs from attacking players
       !CUSTOMIZE  - prevents players from renaming the island
 
+Some adventures need some setup:
+[   51] Trade Tutorial: Museum of Early Man: Edit this adventure (.adv edit 51)
+        and raise the instance limit to the number of newbie islands on your
+        game (.limit X) -- make sure there are mountains there. You can edit
+        the description to remove the instructions (.description) and then use
+        .save to save changes and exit the editor.
+[   52] Tutorial Quests: Do the same as for the Trade Tutorial: raise the limit
+        and remove the instructions.
+[  180] Misplaced Mother Goose: Read the description of this adventure for
+        instructions on installing it on your newbie islands (vstat adv 180).
+[  181] Goblin Mines: Do the same as for the Tutorial adventures.
+[12000] Binding Circle: Anat: Requires a CONTINENT-flagged island. You can edit
+        the description to remove this note.
+[12030] Binding Circle: Ba'al Hadad: Same as 12000/Anat.
+[12600] Elemental Escape: Do the same as for the Tutorial adventures.
+[18200] The Guild of Adventurers: Read the description of this adventure for
+        instructions on installing it somewhere on your world.
+
+
 Additional tools:
  - 'show startlocs' - Lists the starting locations.
  - 'config world naturalize_newbie_islands true' - If you want to automatically
