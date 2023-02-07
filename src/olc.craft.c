@@ -133,10 +133,12 @@ bool audit_craft(craft_data *craft, char_data *ch) {
 			olc_audit_msg(ch, GET_CRAFT_VNUM(craft), "Vehicle craft with quantity > 1");
 			problem = TRUE;
 		}
+		/* probably don't need this:
 		if (GET_CRAFT_TIME(craft) > 1) {
 			olc_audit_msg(ch, GET_CRAFT_VNUM(craft), "Vehicle craft with time set");
 			problem = TRUE;
 		}
+		*/
 	}
 	else if (CRAFT_FLAGGED(craft, CRAFT_SOUP) && !find_generic(GET_CRAFT_OBJECT(craft), GENERIC_LIQUID)) {	// soups only
 		olc_audit_msg(ch, GET_CRAFT_VNUM(craft), "Invalid liquid type on soup recipe");
