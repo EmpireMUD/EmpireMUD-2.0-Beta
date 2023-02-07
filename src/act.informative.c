@@ -764,7 +764,7 @@ void display_score_to_char(char_data *ch, char_data *to) {
 	sprintf(lbuf2, "Block  [%s%d&0]", HAPPY_COLOR(val, 0), val);
 	
 	sprintf(lbuf3, "Resist  [%dp | %dm]", GET_RESIST_PHYSICAL(ch), GET_RESIST_MAGICAL(ch));
-	msg_to_char(to, "  %-28.28s %-28.28s %-28.28s\r\n", lbuf, lbuf2, lbuf3);
+	msg_to_char(to, "  %-28.28s %-28.28s %-24.24s\r\n", lbuf, lbuf2, lbuf3);
 	
 	// row 2
 	sprintf(lbuf, "Physical  [%s%+d&0]", HAPPY_COLOR(GET_BONUS_PHYSICAL(ch), 0), GET_BONUS_PHYSICAL(ch));
