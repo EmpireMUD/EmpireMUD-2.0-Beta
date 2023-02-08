@@ -134,8 +134,15 @@ OLC_MODULE(mapedit_convert2newbie) {
 		{ 59, 159, TRUE },	// Seaside Stumps
 		{ 60, 160, TRUE },	// Seaside Copse
 		
-		{ 17, 100, FALSE },	// Trench (remove)
-		{ 19, 100, FALSE },	// Canal (remove)
+		// convert
+		{ 41, 140, FALSE },	// Floodplains
+		{ 42, 144, FALSE }, // Flooded Woods
+		{ 43, 145, FALSE },	// Flooded Forest
+		{ 90, 104, FALSE },	// Overgrown Forest
+		
+		// remove
+		{ 17, 100, FALSE },	// Trench
+		{ 19, 100, FALSE },	// Canal
 		
 		{ NOTHING, NOTHING, FALSE }	// list end
 	};
@@ -177,7 +184,7 @@ OLC_MODULE(mapedit_convert2newbie) {
 						any = TRUE;
 					}
 					if (GET_SECT_VNUM(map->sector_type) == newbie_sector_map[iter].normal_sect) {
-						change_terrain(room, newbie_sector_map[iter].newbie_sect, NOTHING);
+						change_terrain(room, newbie_sector_map[iter].newbie_sect, GET_SECT_VNUM(map->base_sector));
 						any = TRUE;
 					}
 					if (GET_SECT_VNUM(base) == newbie_sector_map[iter].normal_sect) {
@@ -193,7 +200,7 @@ OLC_MODULE(mapedit_convert2newbie) {
 						any = TRUE;
 					}
 					if (GET_SECT_VNUM(map->sector_type) == newbie_sector_map[iter].newbie_sect) {
-						change_terrain(room, newbie_sector_map[iter].normal_sect, NOTHING);
+						change_terrain(room, newbie_sector_map[iter].normal_sect, GET_SECT_VNUM(map->base_sector));
 						any = TRUE;
 					}
 					if (GET_SECT_VNUM(base) == newbie_sector_map[iter].newbie_sect) {
