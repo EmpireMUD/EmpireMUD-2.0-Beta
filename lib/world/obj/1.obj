@@ -629,7 +629,7 @@ A bundle of long leaves is lying here.~
    These long, narrow leaves have toothed edges that cut if you aren't careful.
 The leaves are fibrous and could be used for crafting.
 ~
-3 l a 0 7
+3 l a 0 8
 0 0 0
 0 0
 C
@@ -637,6 +637,26 @@ C
 O+ 1 6421
 R
 4 5118 0
+R
+4 5137 0
+S
+#140
+grass long bundle~
+a bundle of long grass~
+A bundle of long grass is lying on the ground.~
+   It's a bundle of long grass, cut roughly at the bottom. You could use it as
+fiber, perhaps for rope making.
+~
+3 l a 0 8
+0 0 0
+0 0
+C
+1 1
+O+ 1 6421
+R
+4 5118 0
+R
+4 5137 0
 S
 #141
 wheat bundle~
