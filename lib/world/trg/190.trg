@@ -579,32 +579,28 @@ if !%arg%
   return 1
   halt
 end
-* TODO: Check nobody's in the adventure before changing difficulty
 set level 50
 set person %room.people%
 while %person%
-  if %person.level% > %level%
+  if %person.level% > %level% && %person.is_pc%
     set level %person.level%
   end
   set person %person.next_in_room%
 done
-if easy /= %arg%
-  %echo% Setting difficulty to Easy...
+if normal /= %arg%
+  %echo% Setting difficulty to Normal...
   set difficulty 1
-  if %level% > 100
-    set level 100
-  end
-elseif medium /= %arg%
-  %echo% Setting difficulty to Medium...
+elseif hard /= %arg%
+  %echo% Setting difficulty to Hard...
   set difficulty 2
-elseif difficult /= %arg%
-  %echo% Setting difficulty to Difficult...
+elseif group /= %arg%
+  %echo% Setting difficulty to Group...
   set difficulty 3
-  if %level% < 100
-    set level 100
-  end
+elseif boss /= %arg%
+  %echo% Setting difficulty to Boss...
+  set difficulty 3
 else
-  %send% %actor% That is not a valid difficulty level for this adventure.
+  %send% %actor% That is not a valid difficulty level for this adventure (Normal, Hard, Group, or Boss).
   halt
   return 1
 end
@@ -615,9 +611,6 @@ nop %instance.level(%level%)%
 set mob %room.people%
 remote difficulty %mob.id%
 set mob_diff %difficulty%
-if %mob.vnum% >= 10204 && %mob.vnum% <= 10205
-  eval mob_diff %mob_diff% + 1
-end
 dg_affect %mob% !ATTACK on 5
 nop %mob.remove_mob_flag(HARD)%
 nop %mob.remove_mob_flag(GROUP)%

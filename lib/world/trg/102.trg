@@ -62,9 +62,6 @@ set difficulty %self.difficulty%
 set mob %self.room.people%
 remote difficulty %mob.id%
 set mob_diff %difficulty%
-if %mob.vnum% >= 10204 && %mob.vnum% <= 10205
-  eval mob_diff %mob_diff% + 1
-end
 dg_affect %mob% !ATTACK on 5
 nop %mob.remove_mob_flag(HARD)%
 nop %mob.remove_mob_flag(GROUP)%
@@ -117,10 +114,7 @@ if %self.mob_flagged(NO-CORPSE)% || !%self.varexists(difficulty)%
 end
 return 0
 set difficulty %self.difficulty%
-set mob_diff %difficulty%
-if %mob.vnum% >= 10204 && %mob.vnum% <= 10205
-  eval mob_diff %mob_diff% + 1
-end
+eval mob_diff %difficulty% - 1
 set mob_num 10202
 while %mob_num% <= 10203
   %load% mob %mob_num%
@@ -129,7 +123,10 @@ while %mob_num% <= 10203
   dg_affect %mob% !ATTACK on 5
   nop %mob.remove_mob_flag(HARD)%
   nop %mob.remove_mob_flag(GROUP)%
-  if %mob_diff% == 1
+  if %mob_diff% == 0
+    %mob.remove_mob_flag(DPS)%
+    %mob.remove_mob_flag(TANK)%
+  elseif %mob_diff% == 1
     * Then we don't need to do anything
   elseif %mob_diff% == 2
     nop %mob.add_mob_flag(HARD)%
@@ -178,9 +175,6 @@ if !%found%
   set mob %self.room.people%
   remote difficulty %mob.id%
   set mob_diff %difficulty%
-  if %mob.vnum% >= 10204 && %mob.vnum% <= 10205
-    eval mob_diff %mob_diff% + 1
-  end
   dg_affect %mob% !ATTACK on 5
   nop %mob.remove_mob_flag(HARD)%
   nop %mob.remove_mob_flag(GROUP)%
@@ -232,9 +226,6 @@ if !%found%
   set mob %self.room.people%
   remote difficulty %mob.id%
   set mob_diff %difficulty%
-  if %mob.vnum% >= 10204 && %mob.vnum% <= 10205
-    eval mob_diff %mob_diff% + 1
-  end
   dg_affect %mob% !ATTACK on 5
   nop %mob.remove_mob_flag(HARD)%
   nop %mob.remove_mob_flag(GROUP)%
@@ -290,9 +281,6 @@ set difficulty %self.difficulty%
 set mob %self.room.people%
 remote difficulty %mob.id%
 set mob_diff %difficulty%
-if %mob.vnum% >= 10204 && %mob.vnum% <= 10205
-  eval mob_diff %mob_diff% + 1
-end
 dg_affect %mob% !ATTACK on 5
 nop %mob.remove_mob_flag(HARD)%
 nop %mob.remove_mob_flag(GROUP)%
@@ -333,7 +321,7 @@ switch %random.4%
 done
 ~
 #10216
-Filks Respawn~
+Filks Respawn - deprecated~
 0 b 100
 ~
 * Respawns Walts if needed
@@ -358,7 +346,7 @@ if (!%found%)
 end
 ~
 #10217
-Walts Respawn~
+Walts Respawn - deprecated~
 0 b 100
 ~
 * Respawns Filks if needed
@@ -426,13 +414,13 @@ end
 if %new_mob%
   set difficulty %goblin.difficulty%
   remote difficulty %new_mob.id%
-  set mob_diff %difficulty%
-  if %mob.vnum% >= 10204 && %mob.vnum% <= 10205
-    eval mob_diff %mob_diff% + 1
-  end
+  eval mob_diff %difficulty% - 1
   nop %new_mob.remove_mob_flag(HARD)%
   nop %new_mob.remove_mob_flag(GROUP)%
-  if %mob_diff% == 1
+  if %mob_diff% == 0
+    %mob.remove_mob_flag(DPS)%
+    %mob.remove_mob_flag(TANK)%
+  elseif %mob_diff% == 1
     * Then we don't need to do anything
   elseif %mob_diff% == 2
     nop %new_mob.add_mob_flag(HARD)%
