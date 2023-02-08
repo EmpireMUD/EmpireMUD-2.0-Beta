@@ -4184,6 +4184,7 @@ map editor commands make instant changes to the map where you're standing.
 You can get help on any of the mapeditor commands with &yHELP MAPEDIT <COMMAND>&0.
 The following commands are available:
  complete - Finishes the building you're standing in.
+ convert2newbie - Converts an island's terrains to/from newbie terrains.
  decay - Performs 1 year of decay (building, trench, mine data) on the tile.
  decustomize - Removes custom icon, name, and description.
  deleteexit - Removes an exit (careful about cutting off building interiors).
@@ -4231,6 +4232,28 @@ Example:
  > .map terrain plains
  > build largehouse north
  > .map complete
+
+See also: MAP OLC
+#d
+"MAPEDIT CONVERT2NEWBIE" CONVERT2NEWBIE
+
+Usage:  .map convert2newbie confirm
+        .map convert2newbie undo
+
+This command converts an island's terrains to or from newbie terrains (which
+look the same but have lower move costs and other small changes. This applies
+to the whole island you're on when you use it.
+
+Note that this is separate from setting the NEWBIE flag on the island.
+
+See also: MAP OLC, ISLAND COMMAND
+#d
+"MAPEDIT DECAY"
+
+Usage:  .map decay
+
+Performs 1 year of decay (building, trench, mine data) on the tile, as if the
+new year had just rolled over.
 
 See also: MAP OLC
 #d
