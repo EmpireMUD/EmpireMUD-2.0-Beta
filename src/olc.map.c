@@ -148,10 +148,10 @@ OLC_MODULE(mapedit_convert2newbie) {
 	
 	// validate arg
 	skip_spaces(&argument);
-	if (!str_cmp(arg, "undo")) {
+	if (!str_cmp(argument, "undo")) {
 		undo = TRUE;
 	}
-	else if (str_cmp(arg, "confirm")) {
+	else if (str_cmp(argument, "confirm")) {
 		msg_to_char(ch, "You must type: .map convert2newbie confirm\r\n");
 		return;
 	}
