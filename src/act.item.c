@@ -1688,7 +1688,7 @@ void do_eq_analyze(char_data *ch, char *argument) {
 		
 		if ((obj = GET_EQ(ch, pos))) {
 			// level
-			if (GET_OBJ_CURRENT_SCALE_LEVEL(obj) + 30 < average_level) {
+			if (GET_OBJ_CURRENT_SCALE_LEVEL(obj) + 64 < my_level) {
 				++low;
 				if (low_size < sizeof(low_string)) {
 					low_size += snprintf(low_string + low_size, sizeof(low_string) - low_size, "%s%s", (*low_string ? ", " : ""), wear_data[pos].name);
@@ -1712,7 +1712,7 @@ void do_eq_analyze(char_data *ch, char *argument) {
 	
 	// output:
 	msg_to_char(ch, "Equipment analysis:\r\n");
-	msg_to_char(ch, "Wearing %d item%s with an average level of %.1f%s.\r\n", items, PLURAL(items), average_level, (average_level + 29 < my_level) ? " (low)" : "");
+	msg_to_char(ch, "Wearing %d item%s with an average level of %.1f%s.\r\n", items, PLURAL(items), average_level, (average_level + 75 < my_level) ? " (low)" : "");
 	if (empty) {
 		msg_to_char(ch, "%d empty slot%s: %s\r\n", empty, PLURAL(empty), empty_string);
 	}
@@ -1740,7 +1740,7 @@ void do_eq_analyze(char_data *ch, char *argument) {
 		else if (average_quality < 4.5) {
 			msg_to_char(ch, "Suggestion: Get more superior gear.\r\n");
 		}
-		else if (average_level + 25 < my_level) {
+		else if (average_level + 75 < my_level) {
 			msg_to_char(ch, "Suggestion: Get more gear that's in your level range.\r\n");
 		}
 		else {
