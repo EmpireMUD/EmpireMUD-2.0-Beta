@@ -1017,7 +1017,7 @@ a level difference. The colors are:
 &p         36-50 levels above you - pink&0
 &r  more than 50 levels above you - red&0
 
-See also: CONSIDER, NEARBY, QUEST, COLOR
+See also: COLORS, CONSIDER, IDENTIFY, NEARBY, QUEST
 #
 LINK LINKDEAD
 

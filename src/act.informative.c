@@ -1642,7 +1642,7 @@ char *obj_desc_for_char(obj_data *obj, char_data *ch, int mode) {
 	if (mode == OBJ_DESC_INVENTORY || mode == OBJ_DESC_EQUIPMENT || mode == OBJ_DESC_CONTENTS || mode == OBJ_DESC_LONG || mode == OBJ_DESC_WAREHOUSE) {
 		// show level:
 		if (PRF_FLAGGED(ch, PRF_ITEM_DETAILS) && GET_OBJ_CURRENT_SCALE_LEVEL(obj) > 1 && mode != OBJ_DESC_LONG && mode != OBJ_DESC_LOOK_AT) {
-			sprintf(tags + strlen(tags), "%s L-%d", (*tags ? "," : ""), GET_OBJ_CURRENT_SCALE_LEVEL(obj));
+			sprintf(tags + strlen(tags), "%s L-%s%d\t0", (*tags ? "," : ""), (PRF_FLAGGED(ch, PRF_ITEM_DETAILS) ? color_by_difficulty(ch, GET_OBJ_CURRENT_SCALE_LEVEL(obj)) : ""), GET_OBJ_CURRENT_SCALE_LEVEL(obj));
 		}
 		
 		// prepare flags:
