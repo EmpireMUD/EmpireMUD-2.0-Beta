@@ -1036,7 +1036,7 @@ QCMD(qcmd_start) {
 	struct instance_data *inst = NULL;
 	char buf[MAX_STRING_LENGTH], vstr[128], typestr[128];
 	quest_data *qst;
-	bool any;
+	bool any, level_fail = FALSE;
 	
 	if (!*argument) {	// no-arg: just list them
 		// find quests
@@ -1106,6 +1106,7 @@ QCMD(qcmd_start) {
 		any = FALSE;
 		LL_FOREACH(quest_list, qtl) {
 			if (get_approximate_level(ch) + 50 < QUEST_MIN_LEVEL(qtl->quest)) {
+				level_fail = TRUE;
 				continue;	// must validate level
 			}
 			if (IS_NON_EVENT_DAILY(qtl->quest) && GET_DAILY_QUESTS(ch) >= config_get_int("dailies_per_day")) {
@@ -1127,7 +1128,7 @@ QCMD(qcmd_start) {
 		}
 		
 		if (!any) {
-			msg_to_char(ch, "There are no quests you can start here.\r\n");
+			msg_to_char(ch, "There are no quests%s you can start here.\r\n", (level_fail ? " in your level range that" : ""));
 		}
 		
 		free_quest_temp_list(quest_list);
