@@ -5797,7 +5797,7 @@ Usage:  .minipet <mob vnum>
 This command assigns which mob is taught by a MINIPET item, when used with the
 'use' command.
 
-See also: MINIPETS
+See also: MINIPETS, MINIPET ITEM
 #d
 "OEDIT MINLEVEL" "OEDIT MIN LEVEL"
 
