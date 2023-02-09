@@ -892,7 +892,7 @@ void finish_dismantle(char_data *ch, room_data *room) {
 	// message to update the room
 	strcpy(to, GET_SECT_NAME(SECT(IN_ROOM(ch))));
 	strtolower(to);
-	sprintf(buf, "It is now %s%s%s.", (to[strlen(to)-1] == 's' ? "" : AN(to)), (to[strlen(to)-1] == 's' ? "" : " "), to);
+	sprintf(buf, "This area is now %s%s%s.", (to[strlen(to)-1] == 's' ? "" : AN(to)), (to[strlen(to)-1] == 's' ? "" : " "), to);
 	act(buf, FALSE, ch, NULL, NULL, TO_CHAR | TO_ROOM);
 }
 
