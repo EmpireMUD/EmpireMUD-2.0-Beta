@@ -1764,6 +1764,17 @@ ACMD(do_drive) {
 	else if (!VEH_FLAGGED(veh, drive_data[subcmd].flag)) {
 		snprintf(buf, sizeof(buf), "You can't %s $V!", drive_data[subcmd].command);
 		act(buf, FALSE, ch, NULL, veh, TO_CHAR);
+		
+		// helpful hint
+		if (VEH_FLAGGED(veh, VEH_FLYING)) {
+			msg_to_char(ch, "Try using 'pilot' instead.\r\n");
+		}
+		else if (VEH_FLAGGED(veh, VEH_SAILING)) {
+			msg_to_char(ch, "Try using 'sail' instead.\r\n");
+		}
+		else if (VEH_FLAGGED(veh, VEH_DRIVING)) {
+			msg_to_char(ch, "Try using 'drive' instead.\r\n");
+		}
 	}
 	else if (VEH_IS_DISMANTLING(veh)) {
 		act("$V isn't going anywhere now that it's being dismantled.", FALSE, ch, NULL, veh, TO_CHAR);
