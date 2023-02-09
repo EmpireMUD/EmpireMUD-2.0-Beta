@@ -582,7 +582,8 @@ void check_island_levels(room_data *location, int level);
 struct island_info *get_island(int island_id, bool create_if_missing);
 struct island_info *get_island_by_coords(char *coords);
 struct island_info *get_island_by_name(char_data *ch, char *name);
-char *get_island_name_for(int island_id, char_data *for_ch);
+char *get_island_name_for_empire(int island_id, empire_data *for_emp);
+#define get_island_name_for(island_id, for_ch)  get_island_name_for_empire((island_id), (for_ch ? GET_LOYALTY(for_ch) : NULL))
 bool island_has_default_name(struct island_info *island);
 void number_and_count_islands(bool reset);
 void save_island_table();

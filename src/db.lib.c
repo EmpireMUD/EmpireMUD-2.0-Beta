@@ -4732,22 +4732,22 @@ struct island_info *get_island_by_name(char_data *ch, char *name) {
 
 
 /**
-* Gets the name that a player sees for an island.
+* Gets the name that an empire sees for an island.
 *
 * @param int island_id Which island.
-* @param char_data *for_ch The player.
+* @param empire_data *for_emp The empire.
 */
-char *get_island_name_for(int island_id, char_data *for_ch) {
+char *get_island_name_for_empire(int island_id, empire_data *for_emp) {
 	struct empire_island *eisle;
 	struct island_info *island;
 	
 	if (island_id == NO_ISLAND || !(island = get_island(island_id, TRUE))) {
 		return "No Island";
 	}
-	if (!GET_LOYALTY(for_ch)) {
+	if (for_emp) {
 		return island->name;
 	}
-	if (!(eisle = get_empire_island(GET_LOYALTY(for_ch), island_id))) {
+	if (!(eisle = get_empire_island(for_emp, island_id))) {
 		return island->name;
 	}
 	
