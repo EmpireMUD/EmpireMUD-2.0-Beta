@@ -208,7 +208,7 @@ Additional codes:
  &&Z Next letter will be capitalized (useful in scripts)
  &&z Next letter will be lowercase
 
-See also: BANNER, INFORMATIVE, POLITICAL, RECOLOR, TOGGLE
+See also: BANNER, INFORMATIVE, POLITICAL, RECOLOR, TOGGLE, LEVEL COLORS
 #
 APPROACH
 
@@ -519,8 +519,8 @@ There are also several possible modifier tags:
  - hard: will require two players in the right level range
  - group: will require three players in the right level range
  - boss: will require four players in the right level range
- 
-See also: DROP FLAGS, LEVELS
+
+See also: DROP FLAGS, LEVELS, LEVEL COLORS
 #
 CONTENTS
 

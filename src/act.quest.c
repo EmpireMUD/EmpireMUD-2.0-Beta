@@ -95,12 +95,12 @@ const char *color_by_difficulty(char_data *ch, int level) {
 	
 	const struct { int level; const char *color; } pairs[] = {
 		// { level diff, color } order highest (hardest) to lowest (easiest)
-		{ 50, "\tr" },
-		{ 35, "\tp" },
-		{ 20, "\to" },
-		{ 10, "\ty" },
-		{ -10, "\tg" },
-		{ -20, "\tj" },
+		{ 51, "\tr" },
+		{ 36, "\tp" },
+		{ 26, "\to" },
+		{ 16, "\ty" },
+		{ -15, "\tg" },
+		{ -25, "\tj" },
 		{ -35, "\ta" },
 		{ -50, "\tc" },
 		{ INT_MIN, "\tw" }	// put this last

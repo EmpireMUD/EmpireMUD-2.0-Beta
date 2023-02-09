@@ -1000,6 +1000,25 @@ Note: Until level 100, you must be in the same level range as an item
 See also: ROLE, SCALING, SYNERGY ABILITY
 Immortals see also: ACCESS LEVEL
 #
+#
+"LEVEL COLORS" "DIFFICULTY COLORS" "COLOR BY LEVEL" "COLOR BY DIFFICULTY" "CONSIDER COLORS" "QUEST COLORS" "ADVENTURE COLORS"
+
+Quest names and adventures appear in different colors depending on their level
+compared to yours. This also appears on commands like 'consider' when it shows
+a level difference. The colors are:
+
+&w  more than 50 levels below you - gray&0
+&c         36-50 levels below you - cyan&0
+&a         26-35 levels below you - azure&0
+&j         16-25 levels below you - jade&0
+&g                near your level - green&0
+&y         16-25 levels above you - yellow&0
+&o         26-35 levels above you - orange&0
+&p         36-50 levels above you - pink&0
+&r  more than 50 levels above you - red&0
+
+See also: CONSIDER, NEARBY, QUEST, COLOR
+#
 LINK LINKDEAD
 
 A lot of players have problems with their links to the game. This can be very
@@ -1199,6 +1218,8 @@ locations) if you want a shorter list, or you can specify search terms.
 
 Certain adventures won't show up on 'nearby', usually because of the
 adventure's design.
+
+See also: LEVEL COLORS
 #
 "NEWBIE ISLANDS"
 
