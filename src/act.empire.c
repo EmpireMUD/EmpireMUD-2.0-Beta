@@ -5817,7 +5817,7 @@ void do_manage_vehicle(char_data *ch, vehicle_data *veh, char *argument) {
 	}
 	
 	if (!*arg) {
-		msg_to_char(ch, "Management for %s:\r\n", VEH_SHORT_DESC(veh));
+		msg_to_char(ch, "Management for %s:\r\n", get_vehicle_short_desc(veh, ch));
 		
 		for (iter = 0; *manage_vehicle_data[iter].name != '\n'; ++iter) {
 			if (manage_vehicle_data[iter].access_level > GET_ACCESS_LEVEL(ch) && (manage_vehicle_data[iter].grant == NOBITS || !IS_GRANTED(ch, manage_vehicle_data[iter].grant))) {
@@ -5871,7 +5871,7 @@ void do_manage_vehicle(char_data *ch, vehicle_data *veh, char *argument) {
 			}
 		}
 		
-		msg_to_char(ch, "You turn the %s management option %s for %s.\r\n", manage_vehicle_data[type].name, on ? "on" : "off", VEH_SHORT_DESC(veh));
+		msg_to_char(ch, "You turn the %s management option %s for %s.\r\n", manage_vehicle_data[type].name, on ? "on" : "off", get_vehicle_short_desc(veh, ch));
 		snprintf(buf, sizeof(buf), "$n turns the %s management option %s for %s.", manage_vehicle_data[type].name, on ? "on" : "off", VEH_SHORT_DESC(veh));
 		act(buf, TRUE, ch, NULL, NULL, TO_ROOM | TO_NOT_IGNORING);
 		

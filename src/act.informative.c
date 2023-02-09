@@ -1173,12 +1173,12 @@ void list_one_vehicle_to_char(vehicle_data *veh, char_data *ch) {
 	}
 	else if (VEH_IS_DISMANTLING(veh)) {
 		pos = size;
-		size += snprintf(buf + size, sizeof(buf) - size, "%s is being dismantled.\r\n", VEH_SHORT_DESC(veh));
+		size += snprintf(buf + size, sizeof(buf) - size, "%s is being dismantled.\r\n", get_vehicle_short_desc(veh, ch));
 		*(buf + pos) = UPPER(*(buf + pos));
 	}
 	else {
 		pos = size;
-		size += snprintf(buf + size, sizeof(buf) - size, "%s is under construction.\r\n", VEH_SHORT_DESC(veh));
+		size += snprintf(buf + size, sizeof(buf) - size, "%s is under construction.\r\n", get_vehicle_short_desc(veh, ch));
 		*(buf + pos) = UPPER(*(buf + pos));
 	}
 	

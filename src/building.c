@@ -216,7 +216,7 @@ bool check_build_location_and_dir(char_data *ch, room_data *room, craft_data *ty
 	}
 	if (make_veh && (is_upgrade || !ROOM_IS_CLOSED(room)) && !vehicle_allows_climate(make_veh, room, NULL)) {
 		if (ch) {
-			msg_to_char(ch, "You can't %s %s here.\r\n", command, VEH_SHORT_DESC(make_veh));
+			msg_to_char(ch, "You can't %s %s here.\r\n", command, get_vehicle_short_desc(make_veh, ch));
 		}
 		return FALSE;
 	}
@@ -3227,7 +3227,7 @@ ACMD(do_upgrade) {
 	// process the list of upgrades -- this will build the 'upgrade to what'
 	// output if there's no arg2, will find the craft if there is, and can also
 	// find the craft if there's no arg2 but there's also only 1 option
-	size = snprintf(output, sizeof(output), "Upgrade %s to what:", (from_veh ? VEH_SHORT_DESC(from_veh) : "it"));
+	size = snprintf(output, sizeof(output), "Upgrade %s to what:", (from_veh ? get_vehicle_short_desc(from_veh, ch) : "it"));
 	to_craft = NULL;	// possibly the one the player requested
 	found = 0;
 	

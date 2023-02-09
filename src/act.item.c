@@ -6204,7 +6204,7 @@ ACMD(do_list) {
 					snprintf(line, sizeof(line), "%s%s%s%s sells%s:\r\n", (*buf ? "\r\n" : ""), vstr, CAP(tmp), rep, matching);
 				}
 				else if (stl->from_veh) {
-					strcpy(tmp, VEH_SHORT_DESC(stl->from_veh));
+					strcpy(tmp, get_vehicle_short_desc(stl->from_veh, ch));
 					snprintf(line, sizeof(line), "%s%s%s%s sells%s:\r\n", (*buf ? "\r\n" : ""), vstr, CAP(tmp), rep, matching);
 				}
 				else {
