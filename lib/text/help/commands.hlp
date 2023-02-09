@@ -750,6 +750,7 @@ Usage:  equipment [-all]  -- see your current gear
         equipment delete <name>  -- delete an equipment set
         equipment list  -- list your equipment sets
         equipment <name>  -- change to an equipment set
+        equipment analyze  -- see help about your equipment
 
 Gives you a list of all the equipment you're wearing, holding, and wielding.
 Items do not take up inventory space when equipped (except containers and their
@@ -766,7 +767,10 @@ Saving an equipment set will automatically 'keep' all items in the set. When
 you change equipment sets, any items that are removed will be placed at the
 end of your inventory (instead of at the beginning like normal).
 
-See also: INVENTORY, REMOVE, WEAR, WIELD, HOLD, SHEATH, DRAW, SWAP, KEEP
+Use 'equipment analyze' (eq -ana) for some helpful information about your gear.
+
+See also: INVENTORY, REMOVE, WEAR, WIELD, HOLD, SHEATH, DRAW, SWAP, KEEP,
+   GEAR LEVELS
 #
 ESTATS ESTATISTICS
 
