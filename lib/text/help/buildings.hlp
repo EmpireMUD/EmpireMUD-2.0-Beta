@@ -194,7 +194,10 @@ CARPENTER
 The carpenter is a workshop for all manner of crafts. Certain craft items,
 such as wagons, require a carpenter shop for you to build them in.
 
-See also:  CRAFT, WOODWORKING
+To get a horse (or other mount) into a carpenter to harness to a vehicle, use
+the 'lead' command.
+
+See also:  CRAFT, LEAD, WOODWORKING
 #
 CAVEHAVEN "CAVE HAVEN" "OBSCURE CAVE"
 

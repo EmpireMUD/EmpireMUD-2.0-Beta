@@ -230,7 +230,9 @@ mountable creatures or ones that are pulling carts, try 'lead' instead.
 
 Herd requires the Animal Husbandry ability.
 
-Use 'load' to move a herded animal into a ship or other vehicle.
+Use 'load' to move a herded animal into a ship or other vehicle. If a mob is a
+mount, you can use 'lead' to move it around instead of herd, especially if you
+are trying to get it into a carpenter.
 
 See also: ANIMAL HUSBANDRY, LEAD, LOAD
 #
@@ -243,7 +245,7 @@ vehicle, it will move with you until type "lead" again to stop. Some vehicles
 need you to harness animals to them before they can move. You can also lead
 any animal which is mountable.
 
-Some vehicles can't be led.
+Some vehicles can't be led. If you can't lead a mob, try 'herd' instead.
 
 Example:  
   > lead horse 
