@@ -856,6 +856,7 @@ void finish_building(char_data *ch, room_data *room) {
 void finish_dismantle(char_data *ch, room_data *room) {
 	obj_data *newobj, *proto;
 	craft_data *type;
+	char to[256];
 	
 	msg_to_char(ch, "You finish dismantling the building.\r\n");
 	act("$n finishes dismantling the building.", FALSE, ch, 0, 0, TO_ROOM);
@@ -887,6 +888,12 @@ void finish_dismantle(char_data *ch, room_data *room) {
 	}
 	
 	disassociate_building(room);
+	
+	// message to update the room
+	strcpy(to, GET_SECT_NAME(SECT(IN_ROOM(ch))));
+	strtolower(to);
+	sprintf(buf, "It is now %s%s%s.", (to[strlen(to)-1] == 's' ? "" : AN(to)), (to[strlen(to)-1] == 's' ? "" : " "), to);
+	act(buf, FALSE, ch, NULL, NULL, TO_CHAR | TO_ROOM);
 }
 
 
