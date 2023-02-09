@@ -2460,7 +2460,7 @@ ACMD(do_cooldowns) {
 		diff = cool->expire_time - time(0);
 		if (diff > 0) {
 			if (diff >= SECS_PER_REAL_HOUR) {
-				snprintf(when, sizeof(when), "%d:%02d:%02d", (diff / SECS_PER_REAL_HOUR), ((diff % SECS_PER_REAL_HOUR) / SECS_PER_REAL_MIN), (SECS_PER_REAL_MIN));
+				snprintf(when, sizeof(when), "%d:%02d:%02d", (diff / SECS_PER_REAL_HOUR), ((diff % SECS_PER_REAL_HOUR) / SECS_PER_REAL_MIN), (diff % SECS_PER_REAL_MIN));
 			}
 			else {
 				snprintf(when, sizeof(when), "%d:%02d", (diff / SECS_PER_REAL_MIN), (diff % SECS_PER_REAL_MIN));
