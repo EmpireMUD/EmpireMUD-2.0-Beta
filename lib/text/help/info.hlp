@@ -259,6 +259,9 @@ Block cap:
 - For hard mobs, raise the total by 10%
 - For group mobs, raise the total by 30%
 
+You must be within 50 of the block cap to have a chance to block at all.
+Otherwise, your opponent is too skilled for you to block.
+
 See also: AFFECTS, SCORE, SHIELD BLOCK, WARD AGAINST MAGIC
 #
 "BLOCKED TILE" BLOCKED LINE-OF-SIGHT "LINE OF SIGHT" LOS ****
