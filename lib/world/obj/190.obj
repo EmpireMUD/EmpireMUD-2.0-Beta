@@ -698,10 +698,7 @@ bell crude huge goblin~
 the goblin bell~
 A huge, crude bell is hanging nearby. (difficulty)~
 You can use this to set the adventure's difficulty.
-Usage: difficulty <easy | medium | difficult>
-Easy: 1-2 players level 50-100.
-Medium: 2-4 players level 50-150.
-Difficult: 3-4 players level 100-150.
+Usage: difficulty <normal | hard | group | boss>
 ~
 3 0 0 0 6
 0 0 0

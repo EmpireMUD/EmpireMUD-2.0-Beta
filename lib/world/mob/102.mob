@@ -22,7 +22,7 @@ Garlgarl goblin shaman~
 Garlgarl, goblin shaman~
 A goblin shaman is drawing symbols in the blood on the floor.
 ~
-50 150 bdxyA 0 2
+50 150 bdxA q 2
 2 0 0 16 -1
 D
    As she draws sigils and signs in the ash and blood on the floor, Garlgarl
@@ -80,7 +80,7 @@ Nilbog goblin champion~
 Nilbog, goblin champion~
 The goblin champion is unpolishing her armor.
 ~
-50 150 bdB 0 2
+50 150 bdyB 0 2
 2 0 0 2 -1
 D
    Nilbog is scrubbing her armor with a goblin polishing stone. It just looks
@@ -100,7 +100,7 @@ Furl goblin war shaman~
 Furl, war shaman~
 The goblin war shaman is raising his staff!
 ~
-50 150 bdxyAB 0 2
+50 150 bdxyzAB 0 2
 1 0 0 18 -1
 D
    Furl swirls his staff in the fire, drawing visions of battle from the fire.
