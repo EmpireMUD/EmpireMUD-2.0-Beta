@@ -3625,8 +3625,11 @@ char *list_one_quest(quest_data *quest, bool detail) {
 		if (IS_EVENT_DAILY(quest)) {
 			snprintf(typestr, sizeof(typestr), " (event daily)");
 		}
+		else if (IS_DAILY_QUEST(quest) && (QUEST_DAILY_CYCLE(quest) == NOTHING || QUEST_DAILY_ACTIVE(quest))) {
+			snprintf(typestr, sizeof(typestr), " (daily, active)");
+		}
 		else if (IS_DAILY_QUEST(quest)) {
-			snprintf(typestr, sizeof(typestr), " (daily)");
+			snprintf(typestr, sizeof(typestr), " (daily, inactive)");
 		}
 		else if (IS_EVENT_QUEST(quest)) {
 			snprintf(typestr, sizeof(typestr), " (event)");
