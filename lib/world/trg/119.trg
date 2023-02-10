@@ -394,8 +394,8 @@ if %actor.is_npc% || !%arg.car% || !(%self.name% ~= %arg.car%)
   halt
 end
 * Level check
-if (%actor.is_npc% || %actor.level% < 150) && !%actor.is_immortal%
-  %send% %actor% You must be at least level 150 to play the claw game.
+if (%actor.is_npc% || %actor.level% < 125) && !%actor.is_immortal%
+  %send% %actor% You must be at least level 125 to play the claw game.
   halt
 end
 * Check if they've already played in this instance
@@ -2527,7 +2527,7 @@ end
 Elemental Plane of Water: Boss death and loot check~
 0 f 100
 ~
-set min_level 150
+set min_level 125
 set room %self.room%
 set ch %room.people%
 set any_ok 0
@@ -3126,7 +3126,7 @@ Skycleave: Only drops loot for unique fighters~
 * mob only loses !LOOT flag if a unique person over min_level has tagged it
 * can also work in reverse, adding it
 set room %self.room%
-set min_level 150
+set min_level 125
 set done 0
 if %actor.is_pc% && %actor.level% >= %min_level% && %self.is_tagged_by(%actor%)%
   set varname pc%actor.id%
@@ -5174,7 +5174,7 @@ Goblin's Dream: Arena challenge death~
 ~
 * This both spawns the next mob and manages the !LOOT flag based on unique fighters
 set room %self.room%
-set min_level 150
+set min_level 125
 set must_fight_timer_obj 11972
 set delay_obj 11973
 * we will return 0 no matter what
