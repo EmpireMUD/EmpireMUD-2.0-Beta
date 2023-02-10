@@ -2336,6 +2336,9 @@ ACMD(do_recipes) {
 			if (IS_SET(GET_CRAFT_FLAGS(craft), CRAFT_IN_DEVELOPMENT) && !IS_IMMORTAL(ch)) {
 				continue;
 			}
+			if (GET_CRAFT_TYPE(craft) == CRAFT_TYPE_WORKFORCE) {
+				continue;	// don't show workforce
+			}
 		
 			// has right abil?
 			if (GET_CRAFT_ABILITY(craft) != NO_ABIL && !has_ability(ch, GET_CRAFT_ABILITY(craft))) {
