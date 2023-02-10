@@ -1731,7 +1731,7 @@ const char *craft_flag_for_info[] = {
 	"requires fire",
 	"",	// soup
 	"",	// in-dev
-	"",	// upgrade
+	"is an upgrade",	// upgrade
 	"",	// dismantle-only
 	"in-city only",
 	"",	// vehicle
