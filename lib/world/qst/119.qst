@@ -209,6 +209,34 @@ Z
 Z
 1 11925
 S
+#11916
+Skycleave: A Mysterious Diary Page~
+   This is an odd diary page, to be sure. You look it over several times,
+reading it meticulously for clues, but you simply don't have the experience
+with the tower to grasp its full meaning. Perhaps it will make more sense
+later. For now, stash the diary page in a safe place.
+   Reach Esteemed reputation with the Tower Skycleave and then sit by the
+fountain on the ground floor and reflect on the diary page again (it will offer
+a quest when you reach Esteemed).
+~
+   You sit by the fountain and reflect on your experiences in the tower thus
+far. Now that you've reached Esteemed reputation with Skycleave, you can start
+the quest from the diary page (if you haven't already).
+~
+2 0 150 250 -1
+A
+2 11920
+A
+2 11918
+A
+2 11919
+P
+17 11800 0 6 -
+W
+16 11800 0 7 -
+Z
+2 11906
+S
 #11918
 Skycleave: Championship Tour~
    You scrutinize the time-traveler's list of villains, looking for more clues.
@@ -225,7 +253,7 @@ tower's many villains as you watch the countless twinkling lights from the
 tree overhead reflect off of the softly burbling water. Surely this was the
 tower's most difficult challenge.
 ~
-8 0 150 250 -1
+9 0 150 250 -1
 A
 2 11918
 P
@@ -260,9 +288,7 @@ W+
 3 11928 0 1 a
 Defeat 1x mob: the First Water~
 Z
-3 11908
-Z
-3 11808
+2 11906
 S
 #11919
 Skycleave: Time-Traveler's Tour~
@@ -278,7 +304,7 @@ the enormous tree above you meander around the room in the surface of the
 fountain. The tower held so many secrets, a person could spend a lifetime
 plumbing its depths. Surely there are a few more...
 ~
-6 0 150 250 -1
+7 0 150 250 -1
 A
 2 11919
 P
@@ -304,9 +330,7 @@ W
 W
 13 11994 0 1 a
 Z
-3 11908
-Z
-3 11808
+2 11906
 S
 #11920
 Skycleave: Out of Time~
@@ -327,7 +351,7 @@ the whole, unaware of their dark fate.
    As you get up, you notice a black glint in the fountain. You reach in and
 find a strange nocturnium pocket watch at the bottom.
 ~
-10 0 150 250 -1
+11 0 150 250 -1
 A
 2 11920
 P
@@ -340,9 +364,7 @@ W+
 11 0 0 1 -
 Find the time-traveler~
 Z
-3 11908
-Z
-3 11808
+2 11906
 S
 #11928
 Skycleave: Test of Water~
