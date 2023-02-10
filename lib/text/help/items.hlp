@@ -215,10 +215,10 @@ eligible for these flags, and are indicated by a GENERIC-DROP flag.
 You can 'toggle item-quality' to turn on/off the display of item quality in
 your inventory and equipment list. For screenreader users, these appear as
 tags next to the item name. For everyone else, the items will be in color:
+- &Ysuperior (yellow)&0
 - &Mboss (magenta)&0
 - &Cgroup (cyan)&0
 - &Ghard (green)&0
-- &Ysuperior (yellow)&0
 - &wjunk (gray)&0
 - normal (no quality)
 
