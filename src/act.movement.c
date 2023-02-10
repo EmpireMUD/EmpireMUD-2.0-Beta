@@ -2433,7 +2433,7 @@ ACMD(do_portal) {
 	struct temp_portal_data *port, *next_port, *portal_list = NULL;
 	room_data *near = NULL, *target = NULL;
 	obj_data *portal, *end, *obj;
-	int bsize, lsize, count, num, dist;
+	int bsize, lsize, count, num, dist, dir;
 	bool all = FALSE, wait_here = FALSE, wait_there = FALSE, ch_in_city;
 	
 	int max_out_of_city_portal = config_get_int("max_out_of_city_portal");
@@ -2516,7 +2516,8 @@ ACMD(do_portal) {
 				lsize += snprintf(line + lsize, sizeof(line) - lsize, "%2d.", count);
 			}
 			
-			lsize += snprintf(line + lsize, sizeof(line) - lsize, "%s %s (%s%s&0) - %d tile%s", coord_display_room(ch, port->room, TRUE), get_room_name(port->room, FALSE), ROOM_OWNER(port->room) ? EMPIRE_BANNER(ROOM_OWNER(port->room)) : "\t0", ROOM_OWNER(port->room) ? EMPIRE_ADJECTIVE(ROOM_OWNER(port->room)) : "not claimed", port->distance, PLURAL(port->distance));
+			dir = get_direction_for_char(ch, get_direction_to(IN_ROOM(ch), port->room));
+			lsize += snprintf(line + lsize, sizeof(line) - lsize, "%s %s (%s%s&0) - %d %s", coord_display_room(ch, port->room, TRUE), get_room_name(port->room, FALSE), ROOM_OWNER(port->room) ? EMPIRE_BANNER(ROOM_OWNER(port->room)) : "\t0", ROOM_OWNER(port->room) ? EMPIRE_ADJECTIVE(ROOM_OWNER(port->room)) : "not claimed", port->distance, (dir == NO_DIR ? "away" : (PRF_FLAGGED(ch, PRF_SCREEN_READER) ? dirs[dir] : alt_dirs[dir])));
 			
 			if ((port->distance > max_out_of_city_portal && (!ch_in_city || !port->in_city)) || (!has_player_tech(ch, PTECH_PORTAL_UPGRADE) && (!GET_LOYALTY(ch) || !EMPIRE_HAS_TECH(GET_LOYALTY(ch), TECH_MASTER_PORTALS)) && GET_ISLAND(IN_ROOM(ch)) != GET_ISLAND(port->room))) {
 				lsize += snprintf(line + lsize, sizeof(line) - lsize, " &r(too far)&0");
