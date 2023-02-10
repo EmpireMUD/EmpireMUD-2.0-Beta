@@ -3503,7 +3503,7 @@ SHOW(show_progression) {
 
 
 SHOW(show_quests) {
-	char name[MAX_INPUT_LENGTH], *arg2, buf[MAX_STRING_LENGTH * 2], when[256];
+	char name[MAX_INPUT_LENGTH], *arg2, buf[MAX_STRING_LENGTH * 3], when[256], line[256];
 	struct player_completed_quest *pcq, *next_pcq;
 	bool file = FALSE, found = FALSE;
 	struct player_quest *pq;
@@ -3536,7 +3536,15 @@ SHOW(show_quests) {
 		size = snprintf(buf, sizeof(buf), "%s's quests (%d/%d dailies, %d/%d event dailies):\r\n", GET_NAME(vict), GET_DAILY_QUESTS(vict), config_get_int("dailies_per_day"), GET_EVENT_DAILY_QUESTS(vict), config_get_int("dailies_per_day"));
 		LL_FOREACH(GET_QUESTS(vict), pq) {
 			count_quest_tasks(pq->tracker, &count, &total);
-			size += snprintf(buf + size, sizeof(buf) - size, "[%5d] %s (%d/%d tasks)\r\n", pq->vnum, get_quest_name_by_proto(pq->vnum), count, total);
+			snprintf(line, sizeof(line), "[%5d] %s (%d/%d tasks)\r\n", pq->vnum, get_quest_name_by_proto(pq->vnum), count, total);
+			
+			if (size + strlen(line) < sizeof(buf)) {
+				size += strlen(line);
+				strcat(buf, line);
+			}
+			else {
+				break;
+			}
 		}
 	
 		if (ch->desc) {
@@ -3573,7 +3581,15 @@ SHOW(show_quests) {
 				snprintf(when, sizeof(when), "(%d day%s ago)", diff, PLURAL(diff));
 			}
 			
-			size += snprintf(buf + size, sizeof(buf) - size, "[%5d] %s %s\r\n", pcq->vnum, get_quest_name_by_proto(pcq->vnum), when);
+			snprintf(line, sizeof(line), "[%5d] %s %s\r\n", pcq->vnum, get_quest_name_by_proto(pcq->vnum), when);
+			
+			if (size + strlen(line) < sizeof(buf)) {
+				size += strlen(line);
+				strcat(buf, line);
+			}
+			else {
+				break;
+			}
 		}
 	
 		if (ch->desc) {
