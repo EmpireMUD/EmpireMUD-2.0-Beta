@@ -770,7 +770,7 @@ end of your inventory (instead of at the beginning like normal).
 Use 'equipment analyze' (eq -ana) for some helpful information about your gear.
 
 See also: INVENTORY, REMOVE, WEAR, WIELD, HOLD, SHEATH, DRAW, SWAP, KEEP,
-   GEAR LEVELS
+   GEAR LEVELS, LEVEL COLORS
 #
 ESTATS ESTATISTICS
 
@@ -1200,7 +1200,7 @@ not take up inventory space when equipped (except containers and their
 contents).
 
 See also: EQUIPMENT, GRAB, HOLD, REMOVE, WEAR, STORE, RETRIEVE, WIELD, SWAP,
-   TOGGLE
+   TOGGLE, LEVEL COLORS
 #
 INTERLINK INTERLINKING
 
