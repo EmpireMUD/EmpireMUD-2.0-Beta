@@ -3172,7 +3172,7 @@ switch %self.vnum%
     else
       %echo% &&mThe Grand High Sorceress gives you a coy smile as she disappears in a burst of magenta glitter, dropping something as she vanishes!&&0
       * chance of mount:
-      if !%room.people(11852)% && %random.100% <= 4
+      if !%room.people(11852)% && %random.100% <= 10
         %load% mob 11852
       end
     end
