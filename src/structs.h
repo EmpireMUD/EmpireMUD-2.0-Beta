@@ -1261,7 +1261,8 @@ typedef struct vehicle_data vehicle_data;
 #define OFFENSE_BURNED_BUILDING  8
 #define OFFENSE_BURNED_VEHICLE  9
 #define OFFENSE_PICKPOCKETED  10
-#define NUM_OFFENSES  11	// total
+#define OFFENSE_RECLAIMED  11
+#define NUM_OFFENSES  12	// total
 
 
 // OFF_x: offense flags

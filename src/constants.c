@@ -1812,6 +1812,7 @@ const struct offense_info_type offense_info[NUM_OFFENSES] = {
 	{ "burned building", 5 },
 	{ "burned vehicle", 5 },
 	{ "pickpocketed", 5 },	// 10
+	{ "reclaimed tile", 2 }
 };
 
 

@@ -985,13 +985,25 @@ year. For more information on mountain resets, see HELP MINE.
 
 See also: MINE, DEEP MINES, PROSPECT, METALS
 #
-RECLAIM
+RECLAIM RECLAIMED
 
 Usage:  reclaim
 
-This command can be used to take ownership of a tile during war. You must be
-standing on the tile, and must already own 4 or more adjacent tiles. Reclaiming
-will take a little while, and can be interrupted by combat.
+This command can be used to take ownership of a tile from another empire. You
+must be standing on the tile and must already own 4 or more adjacent tiles. You
+must also meet at least one of these three criteria:
+- You are at war with the other empire
+- You have a city on the island and the other empire doesn't
+- The tile is in one of your established cities, but is not in a city or
+  outskirts for the other empire
+
+Reclaiming will take a little while and can be interrupted by combat. You will
+cause an offense against the other empire for reclaiming a tile.
+
+Reclaiming a tile requires the 'claim' privilege. Reclaiming while not at war
+also requires the 'diplomacy' privilege.
+
+See also: DIPLOMACY, OFFENSES, PRIVILEGES
 #
 RENOWN "RENOWN GOAL"
 
