@@ -6224,9 +6224,9 @@ char *get_partial_direction_to(char_data *ch, room_data *from, room_data *to, bo
 	
 	// rotate for character
 	if (ch) {
-		degrees -= get_north_for_char(ch) * 90.0;
-		if (degrees < 0) {
-			degrees += 360.0;
+		degrees += get_north_for_char(ch) * 90.0;
+		if (degrees >= 360.0) {
+			degrees -= 360.0;
 		}
 	}
 	
