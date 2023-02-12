@@ -3278,11 +3278,11 @@ ACMD(do_mudstats) {
 ACMD(do_nearby) {
 	int max_dist = room_has_function_and_city_ok(GET_LOYALTY(ch), IN_ROOM(ch), FNC_LARGER_NEARBY) ? 150 : 50;
 	bool cities = TRUE, adventures = TRUE, starts = TRUE, check_arg = FALSE;
-	char buf[MAX_STRING_LENGTH], line[MAX_STRING_LENGTH], part[MAX_STRING_LENGTH], adv_color[256], dist_buf[256], trait_buf[256];
+	char buf[MAX_STRING_LENGTH], line[MAX_STRING_LENGTH], part[MAX_STRING_LENGTH], adv_color[256], dist_buf[256], trait_buf[256], *dir_str;
 	struct instance_data *inst;
 	struct empire_city_data *city;
 	empire_data *emp, *next_emp;
-	int iter, dist, dir, size;
+	int iter, dist, size;
 	bool found = FALSE;
 	room_data *loc;
 	any_vnum vnum;
@@ -3332,7 +3332,8 @@ ACMD(do_nearby) {
 	
 	// displaying:
 	size = snprintf(buf, sizeof(buf), "You find nearby:\r\n");
-	#define NEARBY_DIR  (dir == NO_DIR ? "away" : (PRF_FLAGGED(ch, PRF_SCREEN_READER) ? dirs[dir] : alt_dirs[dir]))
+	#define NEARBY_DIR  get_partial_direction_to(ch, IN_ROOM(ch), loc, (PRF_FLAGGED(ch, PRF_SCREEN_READER) ? FALSE : TRUE))
+			// was: (dir == NO_DIR ? "away" : (PRF_FLAGGED(ch, PRF_SCREEN_READER) ? dirs[dir] : alt_dirs[dir]))
 
 	// check starting locations
 	if (starts) {
@@ -3343,8 +3344,9 @@ ACMD(do_nearby) {
 			if (dist <= max_dist && (!check_arg || multi_isname(argument, get_room_name(loc, FALSE)))) {
 				found = TRUE;
 
-				dir = get_direction_for_char(ch, get_direction_to(IN_ROOM(ch), loc));
-				snprintf(dist_buf, sizeof(dist_buf), "%d %s", dist, NEARBY_DIR);
+				// dir = get_direction_for_char(ch, get_direction_to(IN_ROOM(ch), loc));
+				dir_str = NEARBY_DIR;
+				snprintf(dist_buf, sizeof(dist_buf), "%d %s", dist, dir_str ? dir_str : "away");
 				snprintf(line, sizeof(line), "%7s: %s%s\r\n", dist_buf, get_room_name(loc, FALSE), coord_display_room(ch, loc, FALSE));
 				
 				CREATE(nrb_item, struct nearby_item_t, 1);
@@ -3365,8 +3367,9 @@ ACMD(do_nearby) {
 				if (dist <= max_dist && (!check_arg || multi_isname(argument, city->name))) {
 					found = TRUE;
 				
-					dir = get_direction_for_char(ch, get_direction_to(IN_ROOM(ch), loc));
-					snprintf(dist_buf, sizeof(dist_buf), "%d %s", dist, NEARBY_DIR);
+					// dir = get_direction_for_char(ch, get_direction_to(IN_ROOM(ch), loc));
+					dir_str = NEARBY_DIR;
+					snprintf(dist_buf, sizeof(dist_buf), "%d %s", dist, dir_str ? dir_str : "away");
 					
 					if (city->traits & show_city_traits) {
 						prettier_sprintbit(city->traits & show_city_traits, empire_trait_types, part);
@@ -3447,9 +3450,10 @@ ACMD(do_nearby) {
 		
 			// show instance
 			found = TRUE;
-			dir = get_direction_for_char(ch, get_direction_to(IN_ROOM(ch), loc));
+			// dir = get_direction_for_char(ch, get_direction_to(IN_ROOM(ch), loc));
+			dir_str = NEARBY_DIR;
 			strcpy(adv_color, color_by_difficulty((ch), pick_level_from_range((INST_LEVEL(inst) > 0 ? INST_LEVEL(inst) : get_approximate_level(ch)), GET_ADV_MIN_LEVEL(INST_ADVENTURE(inst)), GET_ADV_MAX_LEVEL(INST_ADVENTURE(inst)))));
-			snprintf(dist_buf, sizeof(dist_buf), "%d %s", dist, NEARBY_DIR);
+			snprintf(dist_buf, sizeof(dist_buf), "%d %s", dist, dir_str ? dir_str : "away");
 			snprintf(line, sizeof(line), "%7s: %s%s\t0%s / %s%s\r\n", dist_buf, adv_color, GET_ADV_NAME(INST_ADVENTURE(inst)), coord_display_room(ch, loc, FALSE), instance_level_string(inst), part);
 			
 			if (glb) {	// just add it to the global list

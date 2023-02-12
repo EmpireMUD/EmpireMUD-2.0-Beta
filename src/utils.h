@@ -1904,6 +1904,7 @@ bool find_sect_within_distance_from_room(room_data *room, sector_vnum sect, int 
 bool get_coord_shift(int start_x, int start_y, int x_shift, int y_shift, int *new_x, int *new_y);
 int get_direction_to(room_data *from, room_data *to);
 room_data *get_map_location_for(room_data *room);
+char *get_partial_direction_to(char_data *ch, room_data *from, room_data *to, bool abbrev);
 int get_room_blocking_height(room_data *room, bool *blocking_vehicle);
 bool is_deep_mine(room_data *room);
 void lock_icon(room_data *room, struct icon_data *use_icon);
