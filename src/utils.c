@@ -6215,6 +6215,11 @@ char *get_partial_direction_to(char_data *ch, room_data *from, room_data *to, bo
 		}
 	}
 	
+	// convert 0 to 360 to help with the detection below
+	if (degrees <= .001) {
+		degrees = 360.0;
+	}
+	
 	log("get_partial_direction_to: (%d,%d) to (%d,%d): %.2f degrees", from_x, from_y, to_x, to_y, degrees);
 	
 	// rotate for character
