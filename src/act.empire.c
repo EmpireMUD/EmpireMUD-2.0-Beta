@@ -6903,7 +6903,7 @@ ACMD(do_reclaim) {
 			msg_to_char(ch, "You can only reclaim territory that is adjacent to at least 4 tiles you own.\r\n");
 		}
 		else {
-			log_to_empire(enemy, ELOG_HOSTILITY, "An enemy is trying to reclaim (%d, %d)", X_COORD(IN_ROOM(ch)), Y_COORD(IN_ROOM(ch)));
+			log_to_empire(enemy, ELOG_HOSTILITY, "Someone is trying to reclaim (%d, %d)", X_COORD(IN_ROOM(ch)), Y_COORD(IN_ROOM(ch)));
 			msg_to_char(ch, "You start to reclaim this area. It will take 5 minutes.\r\n");
 			act("$n starts to reclaim this area for $s empire!", FALSE, ch, NULL, NULL, TO_ROOM);
 			start_action(ch, ACT_RECLAIMING, 12 * SECS_PER_REAL_UPDATE);
