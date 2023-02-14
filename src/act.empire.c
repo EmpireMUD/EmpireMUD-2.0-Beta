@@ -106,6 +106,14 @@ bool can_reclaim(char_data *ch, room_data *room) {
 		msg_to_char(ch, "Your empire already owns the area.\r\n");
 		return FALSE;
 	}
+	else if (EMPIRE_IMM_ONLY(enemy)) {
+		msg_to_char(ch, "You cannot reclaim territory from immortal empires.\r\n");
+		return FALSE;
+	}
+	else if (EMPIRE_ADMIN_FLAGGED(emp, EADM_NO_WAR | EADM_NO_STEAL) || EMPIRE_ADMIN_FLAGGED(enemy, EADM_NO_WAR | EADM_NO_STEAL)) {
+		msg_to_char(ch, "You cannot reclaim territory from that empire.\r\n");
+		return FALSE;
+	}
 	else if (GET_RANK(ch) < EMPIRE_PRIV(emp, PRIV_CLAIM)) {
 		msg_to_char(ch, "You don't have permission to claim land for the empire.\r\n");
 		return FALSE;
