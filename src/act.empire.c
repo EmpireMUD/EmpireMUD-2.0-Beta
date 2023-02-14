@@ -6834,27 +6834,48 @@ ACMD(do_publicize) {
 void process_reclaim(char_data *ch) {
 	empire_data *emp = GET_LOYALTY(ch);
 	empire_data *enemy = ROOM_OWNER(IN_ROOM(ch));
+	room_data *target;
+	char from_str[256];
 	
-	if (real_empire(GET_ACTION_VNUM(ch, 0)) != ROOM_OWNER(IN_ROOM(ch))) {
+	target = real_room(GET_ACTION_VNUM(ch, 1));
+	
+	// message prep
+	if (target != IN_ROOM(ch)) {
+		snprintf(from_str, sizeof(from_str), " from (%d, %d)", X_COORD(IN_ROOM(ch)), Y_COORD(IN_ROOM(ch)));
+	}
+	else {
+	    *from_str = '\0';
+	}
+	
+	// checks...
+	if (!target) {
+		msg_to_char(ch, "You stop reclaiming.\r\n");
+		cancel_action(ch);
+	}
+	else if (real_empire(GET_ACTION_VNUM(ch, 0)) != ROOM_OWNER(target)) {
 		msg_to_char(ch, "You stop reclaiming as ownership has changed.\r\n");
 		cancel_action(ch);
 	}
-	else if (!can_reclaim(ch, IN_ROOM(ch))) {
+	else if (target != IN_ROOM(ch) && ROOM_IS_CLOSED(IN_ROOM(ch))) {
+		msg_to_char(ch, "You can't reclaim from here.\r\n");
+		cancel_action(ch);
+	}
+	else if (!can_reclaim(ch, target)) {
 		// sends its own error message
 		cancel_action(ch);
 	}
 	else if (--GET_ACTION_TIMER(ch) > 0 && (GET_ACTION_TIMER(ch) % 12) == 0) {
-		log_to_empire(enemy, ELOG_HOSTILITY, "Someone is trying to reclaim (%d, %d)", X_COORD(IN_ROOM(ch)), Y_COORD(IN_ROOM(ch)));
-		msg_to_char(ch, "%d minute%s remaining to reclaim this area.\r\n", (GET_ACTION_TIMER(ch) / 12), PLURAL(GET_ACTION_TIMER(ch) / 12));
+		log_to_empire(enemy, ELOG_HOSTILITY, "Someone is trying to reclaim (%d, %d)%s", X_COORD(target), Y_COORD(target), from_str);
+		msg_to_char(ch, "%d minute%s remaining to reclaim the area.\r\n", (GET_ACTION_TIMER(ch) / 12), PLURAL(GET_ACTION_TIMER(ch) / 12));
 	}
 	else if (GET_ACTION_TIMER(ch) <= 0) {
-		log_to_empire(enemy, ELOG_HOSTILITY, "Someone from %s has reclaimed (%d, %d)!", EMPIRE_NAME(emp), X_COORD(IN_ROOM(ch)), Y_COORD(IN_ROOM(ch)));
-		msg_to_char(ch, "You have reclaimed this acre for your empire!");
+		log_to_empire(enemy, ELOG_HOSTILITY, "Someone from %s has reclaimed (%d, %d)%s!", EMPIRE_NAME(emp), X_COORD(target), Y_COORD(target), from_str);
+		msg_to_char(ch, "You have reclaimed the area for your empire!");
 		
-		add_offense(enemy, OFFENSE_RECLAIMED, ch, IN_ROOM(ch), offense_was_seen(ch, enemy, NULL) ? OFF_SEEN : NOBITS);
+		add_offense(enemy, OFFENSE_RECLAIMED, ch, target, offense_was_seen(ch, enemy, NULL) ? OFF_SEEN : NOBITS);
 		
-		abandon_room(IN_ROOM(ch));
-		claim_room(IN_ROOM(ch), emp);
+		abandon_room(target);
+		claim_room(target, emp);
 		
 		GET_ACTION(ch) = ACT_NONE;
 	}
@@ -6863,16 +6884,41 @@ void process_reclaim(char_data *ch) {
 
 ACMD(do_reclaim) {
 	empire_data *emp, *enemy;
-	int x, y, count;
-	room_data *to_room;
+	int x, y, count, dir;
+	room_data *target = IN_ROOM(ch), *to_room;
+	char from_str[256];
 
-	if (IS_NPC(ch))
+	if (IS_NPC(ch)) {
 		return;
+	}
+	
+	// optional arg
+	one_argument(argument, arg);
+	if (*arg && (dir = parse_direction(ch, arg)) != NO_DIR) {
+		if (!IS_OUTDOOR_TILE(IN_ROOM(ch)) || GET_ROOM_VNUM(IN_ROOM(ch)) >= MAP_SIZE) {
+			msg_to_char(ch, "You can't reclaim adjacent tiles unless you're outdoors.\r\n");
+			return;
+		}
+		else if (!(target = real_shift(IN_ROOM(ch), shift_dir[dir][0], shift_dir[dir][1]))) {
+			msg_to_char(ch, "You can't reclaim anything in that direction.\r\n");
+			return;
+		}
+		else {
+			// ok! target was set; continue
+		}
+	}
+	else if (*arg) {
+		msg_to_char(ch, "Usage: reclaim [direction]\r\n");
+		return;
+	}
+	else {
+		target = IN_ROOM(ch);
+	}
 
 	emp = GET_LOYALTY(ch);
-	enemy = ROOM_OWNER(IN_ROOM(ch));
+	enemy = ROOM_OWNER(target);
 
-	if (GET_ACTION(ch) == ACT_RECLAIMING) {
+	if (!*arg && GET_ACTION(ch) == ACT_RECLAIMING) {
 		msg_to_char(ch, "You stop trying to reclaim this area.\r\n");
 		act("$n stops trying to reclaim this area.", FALSE, ch, NULL, NULL, TO_ROOM);
 		GET_ACTION(ch) = ACT_NONE;
@@ -6880,10 +6926,13 @@ ACMD(do_reclaim) {
 	else if (GET_ACTION(ch) != ACT_NONE) {
 		msg_to_char(ch, "You're a little busy right now.\r\n");
 	}
-	else if (!can_reclaim(ch, IN_ROOM(ch))) {
+	else if (target != IN_ROOM(ch) && ROOM_OWNER(IN_ROOM(ch)) != GET_LOYALTY(ch)) {
+		msg_to_char(ch, "You must reclaim adjacent tiles from a tile you own.\r\n");
+	}
+	else if (!can_reclaim(ch, target)) {
 		// sends its own message
 	}
-	else if (HOME_ROOM(IN_ROOM(ch)) != IN_ROOM(ch)) {
+	else if (HOME_ROOM(target) != target) {
 		msg_to_char(ch, "You must reclaim from the main room of the building.\r\n");
 	}
 	else {
@@ -6891,7 +6940,7 @@ ACMD(do_reclaim) {
 		count = 0;
 		for (x = -1; x <= 1; ++x) {
 			for (y = -1; y <= 1; ++y) {
-				to_room = real_shift(IN_ROOM(ch), x, y);
+				to_room = real_shift(target, x, y);
 				
 				if (to_room && ROOM_OWNER(to_room) == emp) {
 					++count;
@@ -6903,11 +6952,19 @@ ACMD(do_reclaim) {
 			msg_to_char(ch, "You can only reclaim territory that is adjacent to at least 4 tiles you own.\r\n");
 		}
 		else {
-			log_to_empire(enemy, ELOG_HOSTILITY, "Someone is trying to reclaim (%d, %d)", X_COORD(IN_ROOM(ch)), Y_COORD(IN_ROOM(ch)));
-			msg_to_char(ch, "You start to reclaim this area. It will take 5 minutes.\r\n");
-			act("$n starts to reclaim this area for $s empire!", FALSE, ch, NULL, NULL, TO_ROOM);
+			if (target != IN_ROOM(ch)) {
+				snprintf(from_str, sizeof(from_str), " from (%d, %d)", X_COORD(IN_ROOM(ch)), Y_COORD(IN_ROOM(ch)));
+			}
+			else {
+				*from_str = '\0';
+			}
+			
+			log_to_empire(enemy, ELOG_HOSTILITY, "Someone is trying to reclaim (%d, %d)%s", X_COORD(target), Y_COORD(target), from_str);
+			msg_to_char(ch, "You start to reclaim the area. It will take 5 minutes.\r\n");
+			act("$n starts to reclaim the area for $s empire!", FALSE, ch, NULL, NULL, TO_ROOM);
 			start_action(ch, ACT_RECLAIMING, 12 * SECS_PER_REAL_UPDATE);
-			GET_ACTION_VNUM(ch, 0) = ROOM_OWNER(IN_ROOM(ch)) ? EMPIRE_VNUM(ROOM_OWNER(IN_ROOM(ch))) : NOTHING;
+			GET_ACTION_VNUM(ch, 0) = ROOM_OWNER(target) ? EMPIRE_VNUM(ROOM_OWNER(target)) : NOTHING;
+			GET_ACTION_VNUM(ch, 1) = GET_ROOM_VNUM(target);
 		}
 	}
 }

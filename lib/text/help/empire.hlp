@@ -987,18 +987,22 @@ See also: MINE, DEEP MINES, PROSPECT, METALS
 #
 RECLAIM RECLAIMED
 
-Usage:  reclaim
+Usage:  reclaim [direction]
 
 This command can be used to take ownership of a tile from another empire. You
-must be standing on the tile and must already own 4 or more adjacent tiles. You
-must also meet at least one of these three criteria:
+must be standing on or adjacent to the tile and must already own 4 or more
+adjacent tiles. You must also meet at least one of these three criteria:
 - You are at war with the other empire
 - You have a city on the island and the other empire doesn't
 - The tile is in one of your established cities, but is not in a city or
   outskirts for the other empire
 
-Reclaiming will take a little while and can be interrupted by combat. You will
-cause an offense against the other empire for reclaiming a tile.
+If you reclaim from an adjacent tile, you must own that tile and it must be
+open/outdoors. The other empire will be alerted to your location.
+
+Reclaiming will take a little while and can be interrupted by combat. All
+players can attack you while you're reclaiming. You will cause an offense
+against the other empire for reclaiming a tile.
 
 Reclaiming a tile requires the 'claim' privilege. Reclaiming while not at war
 also requires the 'diplomacy' privilege.
