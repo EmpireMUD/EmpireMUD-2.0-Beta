@@ -130,7 +130,7 @@ void end_event(struct event_running_data *re) {
 	}
 	
 	// announce
-	syslog(SYS_INFO, LVL_START_IMM, TRUE, "EVENT: [%d] %s (id %d) has ended", EVT_VNUM(event), EVT_NAME(event), re->id);
+	syslog(SYS_EVENT, LVL_START_IMM, TRUE, "EVENT: [%d] %s (id %d) has ended", EVT_VNUM(event), EVT_NAME(event), re->id);
 	log_to_slash_channel_by_name(EVENT_LOG_CHANNEL, NULL, "%s has ended!", EVT_NAME(event));
 	
 	qt_event_start_stop(EVT_VNUM(event));
@@ -317,7 +317,7 @@ void start_event(event_data *event) {
 	events_need_save = TRUE;
 	
 	// announce
-	syslog(SYS_INFO, LVL_START_IMM, TRUE, "EVENT: [%d] %s has started with event id %d", EVT_VNUM(event), EVT_NAME(event), re->id);
+	syslog(SYS_EVENT, LVL_START_IMM, TRUE, "EVENT: [%d] %s has started with event id %d", EVT_VNUM(event), EVT_NAME(event), re->id);
 	log_to_slash_channel_by_name(EVENT_LOG_CHANNEL, NULL, "%s has begun!", EVT_NAME(event));
 	
 	qt_event_start_stop(EVT_VNUM(event));
@@ -532,9 +532,11 @@ int gain_event_points(char_data *ch, any_vnum event_vnum, int points) {
 	
 	if (points > 0) {
 		msg_to_char(ch, "\tyYou gain %d point%s for '%s'! You now have %d%s point%s.\t0\r\n", real_gain, PLURAL(real_gain), running->event ? EVT_NAME(running->event) : "Unknown Event", ped->points, capstr, (ped->points != 1 || *capstr) ? "s" : "");
+		syslog(SYS_EVENT, 0, TRUE, "EVENT: %s gains %d point%s for %s (%d%s total)", GET_NAME(ch), real_gain, PLURAL(real_gain), running->event ? EVT_NAME(running->event) : "Unknown Event", ped->points, capstr);
 	}
 	else if (points < 0) {
 		msg_to_char(ch, "\tyYou lose %d point%s for '%s'! You now have %d%s point%s.\t0\r\n", ABSOLUTE(points), PLURAL(ABSOLUTE(points)), running->event ? EVT_NAME(running->event) : "Unknown Event", ped->points, capstr, (ped->points != 1 || *capstr) ? "s" : "");
+		syslog(SYS_EVENT, 0, TRUE, "EVENT: %s loses %d point%s for %s (%d%s total)", GET_NAME(ch), ABSOLUTE(points), PLURAL(ABSOLUTE(points)), running->event ? EVT_NAME(running->event) : "Unknown Event", ped->points, capstr);
 	}
 	
 	queue_delayed_update(ch, CDU_SAVE);
@@ -568,6 +570,8 @@ struct player_event_data *get_event_data(char_data *ch, int event_id) {
 * possible for quests/scripts to try to grant points without it.
 *
 * Players do not receive a message for this.
+*
+* WARNING: This function is unused and untested. It also does not syslog.
 *
 * @param char_data *ch The person whose points are changing.
 * @param any_vnum event_vnum Which event.
@@ -655,7 +659,7 @@ void cancel_running_event(struct event_running_data *re) {
 	
 	// announce
 	if (re->event) {
-		syslog(SYS_INFO, LVL_START_IMM, TRUE, "EVENT: [%d] %s (id %d) has canceled", EVT_VNUM(re->event), EVT_NAME(re->event), re->id);
+		syslog(SYS_EVENT, LVL_START_IMM, TRUE, "EVENT: [%d] %s (id %d) has canceled", EVT_VNUM(re->event), EVT_NAME(re->event), re->id);
 		log_to_slash_channel_by_name(EVENT_LOG_CHANNEL, NULL, "%s has been canceled", EVT_NAME(re->event));
 	}
 	

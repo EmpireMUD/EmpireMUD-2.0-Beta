@@ -958,6 +958,7 @@ const char *syslog_types[] = {
 	"system",
 	"validation",
 	"empire",
+	"event-points",
 	"\n"
 };
 
