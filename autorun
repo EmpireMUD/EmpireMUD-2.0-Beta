@@ -54,6 +54,7 @@ while ( : ) do
   fgrep "GC:" syslog >> log/godcmds
   fgrep "VALID:" syslog >> log/validation
   fgrep "DEATH:" syslog >> log/rip
+  fgrep "EVENT:" syslog >> log/event
   fgrep "BAD PW:" syslog >> log/badpw
   fgrep "DEL:" syslog >> log/delete
   fgrep "NEW:" syslog >> log/newplayers
