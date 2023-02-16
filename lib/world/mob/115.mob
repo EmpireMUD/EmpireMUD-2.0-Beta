@@ -4,7 +4,7 @@ a brown adventure hound~
 A little brown adventure hound sniffs along the ground.
 ~
 1 1 bdoD n 1
-0 0 0 15
+0 0 0 15 -1
 D
    This little hound dog is decked out in cloth armor and elbow pads, with a
 little backpack on its back. It looks like this hound is ready for an
@@ -17,12 +17,12 @@ an adventurer's steed~
 An adventurer's steed is standing here.
 ~
 100 100 dej 0 4
-0 0 0 11
+0 0 0 11 -1
 D
    This tall, gray horse is decked out in light armor and prominently displays
 its empire's colors on its saddle and barding.
 ~
-I 0 3012 100.00 2  # BUTCHER: a fillet of raw meat
+I 0 3012 100.00 2  # BUTCHER: fillet of raw meat
 S
 #11512
 pegasus adventurer's adventurers~
@@ -30,13 +30,13 @@ an adventurer's pegasus~
 An adventurer's pegasus flaps its wings and whinnies.
 ~
 150 150 dej m 4
-0 0 2 11
+0 0 2 11 -1
 D
    This stunning white pegasus is lightly armored in barding matching the
 empire's banner. The pegasus stretches its wings, rears up on its hind legs,
 and kicks at the air.
 ~
-I 0 3012 100.00 2  # BUTCHER: a fillet of raw meat
+I 0 3012 100.00 2  # BUTCHER: fillet of raw meat
 S
 #11520
 pixy pixie royal~
@@ -44,7 +44,7 @@ the royal pixy~
 A royal pixy is fluttering about.
 ~
 100 100 do mG 3
-0 0 18 28
+0 0 18 28 -1
 D
    This little pixy is the size of a mouse, and wearing a crown of dandelion
 petals.
@@ -72,7 +72,7 @@ the pixy colt~
 A pixy in the shape of a colt whips past your ear.
 ~
 50 50 do mG 3
-0 0 18 28
+0 0 18 28 -1
 D
    This pixy has taken on the form of a tiny horse, though it still has
 butterfly wings.
@@ -97,7 +97,7 @@ the mousy pixy~
 A little pixy in the shape of a mouse scurries away from you.
 ~
 50 50 do mG 3
-0 0 18 28
+0 0 18 28 -1
 D
    The pixy has taken on the shape of a mouse, although its gossamer wings give
 away its secret.
@@ -119,7 +119,7 @@ the steamy pixy~
 A pixy made of pure steam is trying to evaporate away from you.
 ~
 50 50 do mG 3
-0 0 18 28
+0 0 18 28 -1
 D
    This pixy has turned itself into steam, although it still has the same basic
 size and shape of a pixy. A jar should still be able to hold it.
@@ -144,7 +144,7 @@ the golden pixy~
 A golden pixy shines radiantly above you.
 ~
 50 50 do mG 3
-0 0 18 28
+0 0 18 28 -1
 D
 This pixy appears to be made of pure gold, wings and all!
 ~
@@ -168,7 +168,7 @@ the pixy owl~
 A little pixy in the shape of an owl is perched here.
 ~
 50 50 do mG 3
-0 0 18 28
+0 0 18 28 -1
 D
    This pixy has taken the shape of an owl, but its disguise is given away by
 its butterfly wings.
@@ -193,7 +193,7 @@ the pixy fox~
 A pixy in the shape of a fox is running from you.
 ~
 50 50 do mG 3
-0 0 18 28
+0 0 18 28 -1
 D
    This pixy has taken the shape of a fox, although it's far too small to be a
 real fox. The butterfly wings also give it away.
@@ -221,7 +221,7 @@ a sprite-sniffing hog~
 A hog is rooting around, sniffing for sprites.
 ~
 40 40 bdoF nGJ 3
-0 0 14 9
+0 0 14 9 -1
 D
    This old sow has been raised on a strict diet of only pixies, fairies, and
 gnomes. It's adept at rooting them out. This is part of the Pixy Pursuit event.
@@ -236,7 +236,7 @@ a tiny rainbow firefly~
 There's a tiny firefly here.
 ~
 1 1 bdoD mn 1
-0 0 2 15
+0 0 2 15 -1
 D
    The little firefly seems friendly and puts on a show in every color of the
 rainbow.
@@ -896,7 +896,7 @@ a giant rainbow beetle~
 A giant rainbow beetle is roaming around.
 ~
 100 100 dej G 4
-0 0 0 27
+0 0 0 27 -1
 D
    This enormous beetle is nearly the size of a horse and its smooth, black
 carapace reflects every color of the rainbow when it catches the light. Its
@@ -909,7 +909,7 @@ a giant rainbow dragonfly~
 A giant rainbow dragonfly has landed near you.
 ~
 150 150 dej mG 4
-0 0 2 9
+0 0 2 9 -1
 D
    This stunning creature is almost as large as a horse, with a wingspan the
 size of a house. Its long, thin carapace forms a natural saddle in front of the
@@ -923,11 +923,33 @@ a giant moth~
 A giant moth flutters nearby!
 ~
 75 100 bdjo cG 1
-0 0 2 9
+0 0 2 9 -1
 D
    This looks like an ordinary little white moth, except it's MUCH larger than
 you!
 ~
 T 9198
+S
+#11536
+jar living~
+a living jar~
+A living jar is waddling around.
+~
+1 1 bdoD nG 1
+0 0 16 15 -1
+D
+   Tba The clay jar has a low, round shape with an intrixate red wax seal. It
+has short legs made from clay and potsherds, upon which it waddles unsteadily
+as it tries to keep up.
+~
+M
+0
+$n waddles in a little circle.~
+M
+0
+$n waddles up to you.~
+M
+0
+$n takes two steps forward and then falls on its round end.~
 S
 $
