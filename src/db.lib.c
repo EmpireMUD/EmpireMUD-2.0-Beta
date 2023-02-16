@@ -4744,7 +4744,7 @@ char *get_island_name_for_empire(int island_id, empire_data *for_emp) {
 	if (island_id == NO_ISLAND || !(island = get_island(island_id, TRUE))) {
 		return "No Island";
 	}
-	if (for_emp) {
+	if (!for_emp) {
 		return island->name;
 	}
 	if (!(eisle = get_empire_island(for_emp, island_id))) {
