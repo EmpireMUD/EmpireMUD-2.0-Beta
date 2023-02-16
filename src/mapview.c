@@ -2483,7 +2483,8 @@ void show_screenreader_room(char_data *ch, room_data *room, bitvector_t options)
 //// WHERE FUNCTIONS /////////////////////////////////////////////////////////
 
 void perform_mortal_where(char_data *ch, char *arg) {
-	int closest, dir, dist, max_distance;
+	int closest, dist, max_distance;
+	char *dir_str;
 	descriptor_data *d;
 	char_data *i, *found = NULL;
 	
@@ -2525,10 +2526,10 @@ void perform_mortal_where(char_data *ch, char *arg) {
 			}
 			else {
 				// not the same map location -- show distance/coords:
-				dir = get_direction_for_char(ch, get_direction_to(IN_ROOM(ch), IN_ROOM(i)));
+				dir_str = get_partial_direction_to(ch, IN_ROOM(ch), IN_ROOM(i), FALSE);
 				// dist already set for us
 			
-				msg_to_char(ch, "%-20s -%s %s, %d tile%s %s\r\n", PERS(i, ch, FALSE), coord_display_room(ch, IN_ROOM(i), TRUE), get_room_name(IN_ROOM(i), FALSE), dist, PLURAL(dist), (dir != NO_DIR ? dirs[dir] : "away"));
+				msg_to_char(ch, "%-20s -%s %s, %d tile%s %s\r\n", PERS(i, ch, FALSE), coord_display_room(ch, IN_ROOM(i), TRUE), get_room_name(IN_ROOM(i), FALSE), dist, PLURAL(dist), (*dir_str ? dir_str : "away"));
 			}
 			gain_player_tech_exp(ch, PTECH_WHERE_UPGRADE, 10);
 		}
@@ -2570,9 +2571,9 @@ void perform_mortal_where(char_data *ch, char *arg) {
 			}
 			else {
 				// not the same map location -- show distance/coords:
-				dir = get_direction_for_char(ch, get_direction_to(IN_ROOM(ch), IN_ROOM(found)));
+				dir_str = get_partial_direction_to(ch, IN_ROOM(ch), IN_ROOM(found), FALSE);
 				// distance is already set for us as 'closest'
-				msg_to_char(ch, "%-25s -%s %s, %d tile%s %s\r\n", PERS(found, ch, FALSE), coord_display_room(ch, IN_ROOM(found), TRUE), get_room_name(IN_ROOM(found), FALSE), closest, PLURAL(closest), (dir != NO_DIR ? dirs[dir] : "away"));
+				msg_to_char(ch, "%-25s -%s %s, %d tile%s %s\r\n", PERS(found, ch, FALSE), coord_display_room(ch, IN_ROOM(found), TRUE), get_room_name(IN_ROOM(found), FALSE), closest, PLURAL(closest), (*dir_str ? dir_str : "away"));
 			}
 			gain_player_tech_exp(ch, PTECH_WHERE_UPGRADE, 10);
 		}

@@ -3128,7 +3128,8 @@ ACMD(do_mapsize) {
 
 
 ACMD(do_mark) {
-	int dist, dir;
+	int dist;
+	char *dir_str;
 	room_data *mark, *here;
 	
 	skip_spaces(&argument);
@@ -3159,13 +3160,13 @@ ACMD(do_mark) {
 			}
 			else {
 				dist = compute_distance(mark, IN_ROOM(ch));
-				dir = get_direction_for_char(ch, get_direction_to(IN_ROOM(ch), mark));
+				dir_str = get_partial_direction_to(ch, IN_ROOM(ch), mark, FALSE);
 				
 				if (HAS_NAVIGATION(ch)) {
-					msg_to_char(ch, "Your mark at (%d, %d) is %d map tile%s %s.\r\n", X_COORD(mark), Y_COORD(mark), dist, (dist == 1 ? "" : "s"), (dir == NO_DIR ? "away" : dirs[dir]));
+					msg_to_char(ch, "Your mark at (%d, %d) is %d map tile%s %s.\r\n", X_COORD(mark), Y_COORD(mark), dist, (dist == 1 ? "" : "s"), (*dir_str ? dir_str : "away"));
 				}
 				else {
-					msg_to_char(ch, "Your mark is %d map tile%s %s.\r\n", dist, (dist == 1 ? "" : "s"), (dir == NO_DIR ? "away" : dirs[dir]));
+					msg_to_char(ch, "Your mark is %d map tile%s %s.\r\n", dist, (dist == 1 ? "" : "s"), (*dir_str ? dir_str : "away"));
 				}
 			}
 		}

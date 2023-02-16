@@ -8370,9 +8370,9 @@ ACMD(do_dc) {
 
 // do_directions
 ACMD(do_distance) {
-	char arg[MAX_INPUT_LENGTH], *ptr;
+	char arg[MAX_INPUT_LENGTH], *ptr, *dir_str;
 	room_data *target;
-	int dir, dist;
+	int dist;
 	
 	one_word(argument, arg);
 	ptr = arg;
@@ -8391,9 +8391,9 @@ ACMD(do_distance) {
 		msg_to_char(ch, "Unknown target.\r\n");
 	}
 	else {	
-		dir = get_direction_for_char(ch, get_direction_to(IN_ROOM(ch), target));
+		dir_str = get_partial_direction_to(ch, IN_ROOM(ch), target, FALSE);
 		dist = compute_distance(IN_ROOM(ch), target);
-		msg_to_char(ch, "(%d, %d) is %d tile%s %s.\r\n", X_COORD(target), Y_COORD(target), dist, PLURAL(dist), (dir == NO_DIR ? "away" : dirs[dir]));
+		msg_to_char(ch, "(%d, %d) is %d tile%s %s.\r\n", X_COORD(target), Y_COORD(target), dist, PLURAL(dist), (*dir_str ? dir_str : "away"));
 	}
 }
 
