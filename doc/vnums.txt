@@ -2,8 +2,8 @@ EmpireMUD 2.0 uses vnums under 10000 for built-in content and future expansion.
 We recommed you add new content above vnum 10000. Below is a list of the vnum
 blocks that are currently in use.
 
-   0  Boards
- 100  misc natural resources
+   0  boards, basic terrains
+ 100  misc natural resources, newbie island terrains
  200  Empire NPCs and workforce crafts
   50  clay/pottery items
  300  Barded mount mobs

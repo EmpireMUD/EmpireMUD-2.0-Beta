@@ -230,7 +230,7 @@ Examples:
   dg_affect #3024 %actor% off  -- Removes all affects of vnum 134.
   dg_affect %actor% HASTE off silent  -- Quietly removes anything with HASTE.
 
-See also: APPLIES, AFFECTS, GENERIC AFFECTS
+See also: APPLIES, AFFECT FLAGS, GENERIC AFFECTS
 #d
 DG_AFFECT_ROOM
 

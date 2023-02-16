@@ -1676,6 +1676,21 @@ Messages surrounded by '[' and ']' are syslog messages and are in green
 if you have color on. If they are only shown to high-level imms, the level will
 be indicated.
 
+Available syslog types are:
+  config - changes to game configuration.
+  death - players dying
+  error - game errors
+  gc - immortal actions ("god commands")
+  info - minor logs like island renaming, rescans, ideas, bugs, and typos
+  level - changes in access level
+  login - players logging in or out, new players
+  olc - OLC edits and actions
+  script - script errors
+  system - reboots and shutdowns
+  validation - the approve command
+  empire - merges, diplomacy, and wars
+  event - event beginning, end, and all point gains
+
 See also: TOGGLE
 #d
 TEDIT

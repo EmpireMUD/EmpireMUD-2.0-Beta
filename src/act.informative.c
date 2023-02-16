@@ -764,7 +764,7 @@ void display_score_to_char(char_data *ch, char_data *to) {
 	sprintf(lbuf2, "Block  [%s%d&0]", HAPPY_COLOR(val, 0), val);
 	
 	sprintf(lbuf3, "Resist  [%dp | %dm]", GET_RESIST_PHYSICAL(ch), GET_RESIST_MAGICAL(ch));
-	msg_to_char(to, "  %-28.28s %-28.28s %-28.28s\r\n", lbuf, lbuf2, lbuf3);
+	msg_to_char(to, "  %-28.28s %-28.28s %-24.24s\r\n", lbuf, lbuf2, lbuf3);
 	
 	// row 2
 	sprintf(lbuf, "Physical  [%s%+d&0]", HAPPY_COLOR(GET_BONUS_PHYSICAL(ch), 0), GET_BONUS_PHYSICAL(ch));
@@ -1173,12 +1173,12 @@ void list_one_vehicle_to_char(vehicle_data *veh, char_data *ch) {
 	}
 	else if (VEH_IS_DISMANTLING(veh)) {
 		pos = size;
-		size += snprintf(buf + size, sizeof(buf) - size, "%s is being dismantled.\r\n", VEH_SHORT_DESC(veh));
+		size += snprintf(buf + size, sizeof(buf) - size, "%s is being dismantled.\r\n", get_vehicle_short_desc(veh, ch));
 		*(buf + pos) = UPPER(*(buf + pos));
 	}
 	else {
 		pos = size;
-		size += snprintf(buf + size, sizeof(buf) - size, "%s is under construction.\r\n", VEH_SHORT_DESC(veh));
+		size += snprintf(buf + size, sizeof(buf) - size, "%s is under construction.\r\n", get_vehicle_short_desc(veh, ch));
 		*(buf + pos) = UPPER(*(buf + pos));
 	}
 	
@@ -1642,7 +1642,7 @@ char *obj_desc_for_char(obj_data *obj, char_data *ch, int mode) {
 	if (mode == OBJ_DESC_INVENTORY || mode == OBJ_DESC_EQUIPMENT || mode == OBJ_DESC_CONTENTS || mode == OBJ_DESC_LONG || mode == OBJ_DESC_WAREHOUSE) {
 		// show level:
 		if (PRF_FLAGGED(ch, PRF_ITEM_DETAILS) && GET_OBJ_CURRENT_SCALE_LEVEL(obj) > 1 && mode != OBJ_DESC_LONG && mode != OBJ_DESC_LOOK_AT) {
-			sprintf(tags + strlen(tags), "%s L-%d", (*tags ? "," : ""), GET_OBJ_CURRENT_SCALE_LEVEL(obj));
+			sprintf(tags + strlen(tags), "%s L-%s%d\t0", (*tags ? "," : ""), (PRF_FLAGGED(ch, PRF_ITEM_DETAILS) ? color_by_difficulty(ch, GET_OBJ_CURRENT_SCALE_LEVEL(obj)) : ""), GET_OBJ_CURRENT_SCALE_LEVEL(obj));
 		}
 		
 		// prepare flags:
@@ -2449,6 +2449,7 @@ ACMD(do_contents) {
 
 ACMD(do_cooldowns) {	
 	struct cooldown_data *cool;
+	char when[256];
 	int diff;
 	bool found = FALSE;
 	
@@ -2458,7 +2459,13 @@ ACMD(do_cooldowns) {
 		// only show if not expired (in case it wasn't cleaned up yet due to close timing)
 		diff = cool->expire_time - time(0);
 		if (diff > 0) {
-			msg_to_char(ch, " &c%s&0 %d:%02d\r\n", get_generic_name_by_vnum(cool->type), (diff / 60), (diff % 60));
+			if (diff >= SECS_PER_REAL_HOUR) {
+				snprintf(when, sizeof(when), "%d:%02d:%02d", (diff / SECS_PER_REAL_HOUR), ((diff % SECS_PER_REAL_HOUR) / SECS_PER_REAL_MIN), (diff % SECS_PER_REAL_MIN));
+			}
+			else {
+				snprintf(when, sizeof(when), "%d:%02d", (diff / SECS_PER_REAL_MIN), (diff % SECS_PER_REAL_MIN));
+			}
+			msg_to_char(ch, " &c%s&0 %s\r\n", get_generic_name_by_vnum(cool->type), when);
 
 			found = TRUE;
 		}
@@ -3271,11 +3278,11 @@ ACMD(do_mudstats) {
 ACMD(do_nearby) {
 	int max_dist = room_has_function_and_city_ok(GET_LOYALTY(ch), IN_ROOM(ch), FNC_LARGER_NEARBY) ? 150 : 50;
 	bool cities = TRUE, adventures = TRUE, starts = TRUE, check_arg = FALSE;
-	char buf[MAX_STRING_LENGTH], line[MAX_STRING_LENGTH], part[MAX_STRING_LENGTH], adv_color[256], dist_buf[256], trait_buf[256];
+	char buf[MAX_STRING_LENGTH], line[MAX_STRING_LENGTH], part[MAX_STRING_LENGTH], adv_color[256], dist_buf[256], trait_buf[256], *dir_str;
 	struct instance_data *inst;
 	struct empire_city_data *city;
 	empire_data *emp, *next_emp;
-	int iter, dist, dir, size;
+	int iter, dist, size;
 	bool found = FALSE;
 	room_data *loc;
 	any_vnum vnum;
@@ -3325,7 +3332,8 @@ ACMD(do_nearby) {
 	
 	// displaying:
 	size = snprintf(buf, sizeof(buf), "You find nearby:\r\n");
-	#define NEARBY_DIR  (dir == NO_DIR ? "away" : (PRF_FLAGGED(ch, PRF_SCREEN_READER) ? dirs[dir] : alt_dirs[dir]))
+	#define NEARBY_DIR  get_partial_direction_to(ch, IN_ROOM(ch), loc, (PRF_FLAGGED(ch, PRF_SCREEN_READER) ? FALSE : TRUE))
+			// was: (dir == NO_DIR ? "away" : (PRF_FLAGGED(ch, PRF_SCREEN_READER) ? dirs[dir] : alt_dirs[dir]))
 
 	// check starting locations
 	if (starts) {
@@ -3336,9 +3344,10 @@ ACMD(do_nearby) {
 			if (dist <= max_dist && (!check_arg || multi_isname(argument, get_room_name(loc, FALSE)))) {
 				found = TRUE;
 
-				dir = get_direction_for_char(ch, get_direction_to(IN_ROOM(ch), loc));
-				snprintf(dist_buf, sizeof(dist_buf), "%d %s", dist, NEARBY_DIR);
-				snprintf(line, sizeof(line), "%7s: %s%s\r\n", dist_buf, get_room_name(loc, FALSE), coord_display_room(ch, loc, FALSE));
+				// dir = get_direction_for_char(ch, get_direction_to(IN_ROOM(ch), loc));
+				dir_str = NEARBY_DIR;
+				snprintf(dist_buf, sizeof(dist_buf), "%d %3s", dist, dir_str ? dir_str : "away");
+				snprintf(line, sizeof(line), "%8s: %s%s\r\n", dist_buf, get_room_name(loc, FALSE), coord_display_room(ch, loc, FALSE));
 				
 				CREATE(nrb_item, struct nearby_item_t, 1);
 				nrb_item->text = str_dup(line);
@@ -3358,8 +3367,9 @@ ACMD(do_nearby) {
 				if (dist <= max_dist && (!check_arg || multi_isname(argument, city->name))) {
 					found = TRUE;
 				
-					dir = get_direction_for_char(ch, get_direction_to(IN_ROOM(ch), loc));
-					snprintf(dist_buf, sizeof(dist_buf), "%d %s", dist, NEARBY_DIR);
+					// dir = get_direction_for_char(ch, get_direction_to(IN_ROOM(ch), loc));
+					dir_str = NEARBY_DIR;
+					snprintf(dist_buf, sizeof(dist_buf), "%d %3s", dist, dir_str ? dir_str : "away");
 					
 					if (city->traits & show_city_traits) {
 						prettier_sprintbit(city->traits & show_city_traits, empire_trait_types, part);
@@ -3369,7 +3379,7 @@ ACMD(do_nearby) {
 						*trait_buf = '\0';
 					}
 					
-					snprintf(line, sizeof(line), "%7s: the %s of %s%s / %s%s&0%s\r\n", dist_buf, city_type[city->type].name, city->name, coord_display_room(ch, loc, FALSE), EMPIRE_BANNER(emp), EMPIRE_NAME(emp), trait_buf);
+					snprintf(line, sizeof(line), "%8s: the %s of %s%s / %s%s&0%s\r\n", dist_buf, city_type[city->type].name, city->name, coord_display_room(ch, loc, FALSE), EMPIRE_BANNER(emp), EMPIRE_NAME(emp), trait_buf);
 					
 					CREATE(nrb_item, struct nearby_item_t, 1);
 					nrb_item->text = str_dup(line);
@@ -3440,10 +3450,11 @@ ACMD(do_nearby) {
 		
 			// show instance
 			found = TRUE;
-			dir = get_direction_for_char(ch, get_direction_to(IN_ROOM(ch), loc));
+			// dir = get_direction_for_char(ch, get_direction_to(IN_ROOM(ch), loc));
+			dir_str = NEARBY_DIR;
 			strcpy(adv_color, color_by_difficulty((ch), pick_level_from_range((INST_LEVEL(inst) > 0 ? INST_LEVEL(inst) : get_approximate_level(ch)), GET_ADV_MIN_LEVEL(INST_ADVENTURE(inst)), GET_ADV_MAX_LEVEL(INST_ADVENTURE(inst)))));
-			snprintf(dist_buf, sizeof(dist_buf), "%d %s", dist, NEARBY_DIR);
-			snprintf(line, sizeof(line), "%7s: %s%s\t0%s / %s%s\r\n", dist_buf, adv_color, GET_ADV_NAME(INST_ADVENTURE(inst)), coord_display_room(ch, loc, FALSE), instance_level_string(inst), part);
+			snprintf(dist_buf, sizeof(dist_buf), "%d %3s", dist, dir_str ? dir_str : "away");
+			snprintf(line, sizeof(line), "%8s: %s%s\t0%s / %s%s\r\n", dist_buf, adv_color, GET_ADV_NAME(INST_ADVENTURE(inst)), coord_display_room(ch, loc, FALSE), instance_level_string(inst), part);
 			
 			if (glb) {	// just add it to the global list
 				if (glb->str) {

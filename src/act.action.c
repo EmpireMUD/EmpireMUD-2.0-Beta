@@ -2132,7 +2132,7 @@ void process_mining(char_data *ch) {
 		amt = round(GET_OBJ_CURRENT_SCALE_LEVEL(tool) / 6.66) * (OBJ_FLAGGED(tool, OBJ_SUPERIOR) ? 2 : 1);
 		amt = MAX(min_progress_per_mine, amt);
 		
-		GET_ACTION_TIMER(ch) -= GET_STRENGTH(ch) + 3 * (tool ? get_base_dps(tool) : 0);
+		GET_ACTION_TIMER(ch) -= amt;
 
 		act("You pick at the walls with $p, looking for ore.", FALSE, ch, tool, 0, TO_CHAR | TO_SPAMMY);
 		act("$n picks at the walls with $p, looking for ore.", FALSE, ch, tool, 0, TO_ROOM | TO_SPAMMY);

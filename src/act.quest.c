@@ -95,10 +95,14 @@ const char *color_by_difficulty(char_data *ch, int level) {
 	
 	const struct { int level; const char *color; } pairs[] = {
 		// { level diff, color } order highest (hardest) to lowest (easiest)
-		{ 30, "\tr" },
-		{ 10, "\ty" },
-		{ -25, "\tg" },
-		{ -75, "\tc" },
+		{ 51, "\tr" },
+		{ 36, "\tp" },
+		{ 26, "\to" },
+		{ 16, "\ty" },
+		{ -15, "\tg" },
+		{ -25, "\tj" },
+		{ -35, "\ta" },
+		{ -50, "\tc" },
 		{ INT_MIN, "\tw" }	// put this last
 	};
 	
@@ -1036,7 +1040,7 @@ QCMD(qcmd_start) {
 	struct instance_data *inst = NULL;
 	char buf[MAX_STRING_LENGTH], vstr[128], typestr[128];
 	quest_data *qst;
-	bool any;
+	bool any, level_fail = FALSE;
 	
 	if (!*argument) {	// no-arg: just list them
 		// find quests
@@ -1106,6 +1110,7 @@ QCMD(qcmd_start) {
 		any = FALSE;
 		LL_FOREACH(quest_list, qtl) {
 			if (get_approximate_level(ch) + 50 < QUEST_MIN_LEVEL(qtl->quest)) {
+				level_fail = TRUE;
 				continue;	// must validate level
 			}
 			if (IS_NON_EVENT_DAILY(qtl->quest) && GET_DAILY_QUESTS(ch) >= config_get_int("dailies_per_day")) {
@@ -1127,7 +1132,7 @@ QCMD(qcmd_start) {
 		}
 		
 		if (!any) {
-			msg_to_char(ch, "There are no quests you can start here.\r\n");
+			msg_to_char(ch, "There are no quests%s you can start here.\r\n", (level_fail ? " in your level range that" : ""));
 		}
 		
 		free_quest_temp_list(quest_list);

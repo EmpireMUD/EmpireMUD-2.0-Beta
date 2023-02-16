@@ -381,7 +381,10 @@ Immortals with the "EMPIRES" grant can set administrative flags on empires.
  &g!STEAL&0 - Empire cannot steal from other empires.
  &gCITY-CLAIMS-ONLY&0 - Empire cannot claim out-of-city territory.
 
-See also: GRANT
+Both the !WAR and !STEAL flags will prevent 'reclaim' from being used by OR
+against the empire.
+
+See also: GRANT, RECLAIM
 #d
 EFIND
 
@@ -985,13 +988,29 @@ year. For more information on mountain resets, see HELP MINE.
 
 See also: MINE, DEEP MINES, PROSPECT, METALS
 #
-RECLAIM
+RECLAIM RECLAIMED
 
-Usage:  reclaim
+Usage:  reclaim [direction]
 
-This command can be used to take ownership of a tile during war. You must be
-standing on the tile, and must already own 4 or more adjacent tiles. Reclaiming
-will take a little while, and can be interrupted by combat.
+This command can be used to take ownership of a tile from another empire. You
+must be standing on or adjacent to the tile and must already own 4 or more
+adjacent tiles. You must also meet at least one of these three criteria:
+- You are at war with the other empire
+- You have a city on the island and the other empire doesn't
+- The tile is in one of your established cities, but is not in a city or
+  outskirts for the other empire
+
+If you reclaim from an adjacent tile, you must own that tile and it must be
+open/outdoors. The other empire will be alerted to your location.
+
+Reclaiming will take a little while and can be interrupted by combat. All
+players can attack you while you're reclaiming. You will cause an offense
+against the other empire for reclaiming a tile.
+
+Reclaiming a tile requires the 'claim' privilege. Reclaiming while not at war
+also requires the 'diplomacy' privilege.
+
+See also: DIPLOMACY, OFFENSES, PRIVILEGES
 #
 RENOWN "RENOWN GOAL"
 
@@ -1390,7 +1409,7 @@ See &cHELP WORKFORCE CHORES&0 for a list of all workforce chores with descriptio
 See &cHELP WORKFORCE LIMIT&0 for information on limiting production
 
 See also: WORKFORCE CHORES, WORKFORCE WHERE, WORKFORCE WHY, NO-WORK,
-          WORKFORCE KEEP, WORKFORCE CAP, WORKFORCE LIMIT
+          WORKFORCE KEEP, WORKFORCE CAP, WORKFORCE LIMIT, FEEDING WORKFORCE
 #
 "WORKFORCE CAP"
 
@@ -1453,7 +1472,7 @@ tend to cost more food.
 Additional workforce chores are available from progress buys:
   &gprospecting (Prospector Training):&0 NPCs will slowly prospect mountain tiles.
 
-See also: ABANDON, WORKFORCE
+See also: ABANDON, WORKFORCE, FEEDING WORKFORCE
 #
 "WORKFORCE CRAFTING" "WORKFORCE CRAFTS"
 
@@ -1468,6 +1487,34 @@ Common things produced by this:
  Glass blower: glass ingots
 
 See also: WORKFORCE CHORES, WORKFORCE LIMIT
+#
+"WORKFORCE FOOD" "FEEDING WORKFORCE" "WORKFORCE EATING" "STARVING WORKFORCE" "WORKFORCE IS STARVING"
+
+Once your empire has unlocked Workforce, your citizens will start doing work in
+exchange for food. This food is collected once per day. If you don't have
+enough, your workers on that island will begin to starve.
+
+Starving citizens will no longer work, except for certain food-gathering chores
+like farming and fishing. This work stoppage lasts at least a day, until the
+normal time when food would be collected again. After that, if there's enough
+food, they will resume their work.
+
+Food for workers is always take from empire inventory on the island where they
+are working. Each hour a citizen works requires 1 "hour of fullness" -- the
+amount you see when you identify a piece of food. For example, if the food only
+fills for 1 hour, 10 working citizens will eat 10 of it in an hour; but if it
+fills for 24 hours instead, it will feed 24 citizens that hour.
+
+Citizens will consume foods you have the most of first -- the same sorting you
+see on the einventory command. It will use at most 100 of each type of food in
+each hour, in order to avoid using up all of a single food.
+
+Crops and fisheries are a good way to keep your workers fed. Diverse crops will
+reduce the chances of running out of food. Not all crops can be eaten raw. Give
+your workers a bakery and enable workforce crafting; they will cook raw foods
+into additional things to eat.
+
+See also: BAKERY, EINVENTORY, WORKFORCE, WORKFORCE CRAFTS, WORKFORCE WHY
 #
 "WORKFORCE KEEP"
 

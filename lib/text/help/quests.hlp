@@ -19,6 +19,8 @@ Hint: You can abbreviate "q t", or even alias these commands if you use them
 a lot.
 
 For more information on each, see HELP QUEST <command>.
+
+See also: LEVEL COLORS
 #
 "DAILY QUESTS" DAILY DAILIES "EVENT DAILIES"
 
@@ -115,7 +117,9 @@ Usage:  quest list
 
 This command shows all the quests you're on, and their progress.
 
-See also: QUEST
+To see quests available here instead of ones you're on, see QUEST START.
+
+See also: QUEST, LEVEL COLORS
 #
 "QUEST SHARE"
 
@@ -139,7 +143,7 @@ will be an indicator on any person, place, or thing that starts a quest.
 
 Typing 'quest start' with no argument will list the quests available here.
 
-See also: QUEST
+See also: QUEST, LEVEL COLORS
 #
 "QUEST TRACKER"
 

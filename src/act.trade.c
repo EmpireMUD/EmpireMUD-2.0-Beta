@@ -1726,7 +1726,7 @@ void do_gen_craft_vehicle(char_data *ch, craft_data *type, int dir) {
 		return;
 	}
 	if (found_other) {
-		msg_to_char(ch, "You can't %s that while %s is unfinished here.\r\n", gen_craft_data[GET_CRAFT_TYPE(type)].command, VEH_SHORT_DESC(found_other));
+		msg_to_char(ch, "You can't %s that while %s is unfinished here.\r\n", gen_craft_data[GET_CRAFT_TYPE(type)].command, get_vehicle_short_desc(found_other, ch));
 		return;
 	}
 	if (!check_build_location_and_dir(ch, IN_ROOM(ch), type, dir, FALSE, NULL, NULL)) {
@@ -2335,6 +2335,9 @@ ACMD(do_recipes) {
 			// is it a live recipe?
 			if (IS_SET(GET_CRAFT_FLAGS(craft), CRAFT_IN_DEVELOPMENT) && !IS_IMMORTAL(ch)) {
 				continue;
+			}
+			if (GET_CRAFT_TYPE(craft) == CRAFT_TYPE_WORKFORCE) {
+				continue;	// don't show workforce
 			}
 		
 			// has right abil?

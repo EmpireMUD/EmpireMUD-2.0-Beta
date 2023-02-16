@@ -145,15 +145,15 @@ M
 $p molds until there's nothing left.~
 S
 #11906
-fountain stone~
-the stone fountain~
+fountain stone babbling~
+the babbling stone fountain~
 A babbling stone fountain stands in the middle of the chamber.~
    The enormous round fountain shoots water high into the air although,
 miraculously, there's no sign of any water splashing outside the stone rim.
 It looks like some people have tossed coins into the water, perhaps for luck.
 Around the fountain, a long round bench provides ample seating.
 ~
-5 j 0 0 8
+5 j 0 0 9
 1000000 1000000 0
 1 0
 C

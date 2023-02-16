@@ -3486,7 +3486,7 @@ ACMD(do_selfdelete) {
 	else {
 		
 		// logs and messaging
-		syslog(SYS_INFO, GET_INVIS_LEV(ch), TRUE, "DEL: %s (lev %d/%d) has self-deleted [%s]", GET_NAME(ch), GET_COMPUTED_LEVEL(ch), GET_ACCESS_LEVEL(ch), ch->desc ? ch->desc->host : "no host");
+		syslog(SYS_LOGIN, GET_INVIS_LEV(ch), TRUE, "DEL: %s (lev %d/%d) has self-deleted [%s]", GET_NAME(ch), GET_COMPUTED_LEVEL(ch), GET_ACCESS_LEVEL(ch), ch->desc ? ch->desc->host : "no host");
 		if (!GET_INVIS_LEV(ch)) {
 			act("$n has left the game.", TRUE, ch, 0, 0, TO_ROOM);
 		}

@@ -215,10 +215,10 @@ eligible for these flags, and are indicated by a GENERIC-DROP flag.
 You can 'toggle item-quality' to turn on/off the display of item quality in
 your inventory and equipment list. For screenreader users, these appear as
 tags next to the item name. For everyone else, the items will be in color:
+- &Ysuperior (yellow)&0
 - &Mboss (magenta)&0
 - &Cgroup (cyan)&0
 - &Ghard (green)&0
-- &Ysuperior (yellow)&0
 - &wjunk (gray)&0
 - normal (no quality)
 
@@ -243,6 +243,7 @@ Fibers are a component type usually used to make various crafts. Identify the
 fibers to see what type(s) they are.
 
 Common plant fibers:
+  bundle of long grass (soft plant fiber)
   basket of cotton (soft plant fiber)
   bale of straw (stiff plant fiber)
   thorny branches (stiff plant fiber)
@@ -510,6 +511,18 @@ Yellow Lightning Stone (resource)
 Stored in:  Tower of Sorcery
 
 This rare stone can be found in the desert where lightning has struck.
+#
+"LONG GRASS" "LONG LEAVES" "BUNDLE OF LONG GRASS" "BUNDLE OF LONG LEAVES" GRASS 
+
+Stored at:  Lumber Yard, Tailor
+Used for:  crafting
+
+You can gather long grass in the plains and long leaves in the desert. These
+are simple, soft plant fibers that can be used for crafts such as ropes. They
+can be used in any recipe that says (fiber), (soft fiber), (plant fiber), or
+(soft plant fiber).
+
+See also: FIBER COMPONENT, GATHER, CRAFT, ROPE
 #
 LOOM LOOMS "BACKSTRAP LOOM" "BACK STRAP LOOM"
 

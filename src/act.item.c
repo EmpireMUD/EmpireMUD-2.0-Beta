@@ -569,7 +569,7 @@ void identify_obj_to_char(obj_data *obj, char_data *ch) {
 	
 	// show level if scalable OR wearable
 	if (GET_OBJ_CURRENT_SCALE_LEVEL(obj) > 0 && ((GET_OBJ_WEAR(obj) & ~ITEM_WEAR_TAKE) != NOBITS || (proto && OBJ_FLAGGED(proto, OBJ_SCALABLE)))) {
-		msg_to_char(ch, "Level: %d\r\n", GET_OBJ_CURRENT_SCALE_LEVEL(obj));
+		msg_to_char(ch, "Level: %s%d\t0\r\n", color_by_difficulty(ch, GET_OBJ_CURRENT_SCALE_LEVEL(obj)), GET_OBJ_CURRENT_SCALE_LEVEL(obj));
 	}
 	
 	// only show gear if equippable (has more than ITEM_WEAR_TRADE)
@@ -1635,6 +1635,120 @@ static void perform_drop_coins(char_data *ch, empire_data *type, int amount, byt
 
  //////////////////////////////////////////////////////////////////////////////
 //// EQUIPMENT SET HELPERS ///////////////////////////////////////////////////
+
+/**
+* Helps a character understand their equipment and what they need.
+*
+* @param char_data *ch The character.
+* @param char *argument Any additional args after "eq anaylze"
+*/
+void do_eq_analyze(char_data *ch, char *argument) {
+	char low_string[MAX_STRING_LENGTH], empty_string[MAX_STRING_LENGTH], quality_string[MAX_STRING_LENGTH];
+	size_t low_size, empty_size, quality_size;
+	int items = 0, low = 0, empty = 0, quality = 0;
+	double average_level, average_quality, slots, total_level, total_quality;
+	int pos, my_level;
+	obj_data *obj;
+	
+	#define _obj_quality(obj)  (1 + (OBJ_FLAGGED(obj, OBJ_HARD_DROP) ? 1 : 0) + (OBJ_FLAGGED(obj, OBJ_GROUP_DROP) ? 2 : 0) + (OBJ_FLAGGED(obj, OBJ_SUPERIOR) ? 4 : 0))
+	
+	if (!ch || !ch->desc) {
+		return;
+	}
+	
+	my_level = get_approximate_level(ch);
+	slots = total_level = total_quality = 0.0;
+	
+	// first pass to determine averages and look for empties
+	for (pos = 0; pos < NUM_WEARS; ++pos) {
+		if (!wear_data[pos].count_stats || wear_data[pos].gear_level_mod < 0.1) {
+			continue;	// doesn't count enough to matter
+		}
+		
+		// compute
+		slots += wear_data[pos].gear_level_mod;
+		if ((obj = GET_EQ(ch, pos))) {
+			++items;
+			total_level += GET_OBJ_CURRENT_SCALE_LEVEL(obj) * wear_data[pos].gear_level_mod;
+			total_quality += _obj_quality(obj) * wear_data[pos].gear_level_mod;
+		}
+	}
+	
+	slots = MAX(1, slots);
+	average_level = total_level / slots;
+	average_quality = total_quality / slots;
+	*low_string = *empty_string = *quality_string = '\0';
+	low_size = empty_size = quality_size = 0;
+	
+	// 2nd pass to look for low levels and build errors
+	for (pos = 0; pos < NUM_WEARS; ++pos) {
+		if (!wear_data[pos].count_stats || wear_data[pos].gear_level_mod < 0.1) {
+			continue;	// doesn't count enough to matter
+		}
+		
+		if ((obj = GET_EQ(ch, pos))) {
+			// level
+			if (GET_OBJ_CURRENT_SCALE_LEVEL(obj) + 64 < my_level) {
+				++low;
+				if (low_size < sizeof(low_string)) {
+					low_size += snprintf(low_string + low_size, sizeof(low_string) - low_size, "%s%s", (*low_string ? ", " : ""), wear_data[pos].name);
+				}
+			}
+			// quality
+			if (_obj_quality(obj) < average_quality) {
+				++quality;
+				if (quality_size < sizeof(quality_string)) {
+					quality_size += snprintf(quality_string + quality_size, sizeof(quality_string) - quality_size, "%s%s", (*quality_string ? ", " : ""), wear_data[pos].name);
+				}
+			}
+		}
+		else {	// no item
+			++empty;
+			if (empty_size < sizeof(empty_string)) {
+				empty_size += snprintf(empty_string + empty_size, sizeof(empty_string) - empty_size, "%s%s", (*empty_string ? ", " : ""), wear_data[pos].name);
+			}
+		}
+	}
+	
+	// output:
+	msg_to_char(ch, "Equipment analysis:\r\n");
+	msg_to_char(ch, "Wearing %d item%s with an average level of %.1f%s.\r\n", items, PLURAL(items), average_level, (average_level + 75 < my_level) ? " (low)" : "");
+	if (empty) {
+		msg_to_char(ch, "%d empty slot%s: %s\r\n", empty, PLURAL(empty), empty_string);
+	}
+	if (low) {
+		msg_to_char(ch, "%d low-level slot%s: %s\r\n", low, PLURAL(low), low_string);
+	}
+	if (quality) {
+		msg_to_char(ch, "%d lower-quality slot%s: %s\r\n", quality, PLURAL(quality), quality_string);
+	}
+	
+	// help if none of those are low
+	if (!empty && !low && !quality) {
+		if (average_quality < 1.0) {
+			// nothing here -- it's definitely covered by 'empty'
+		}
+		else if (average_quality < 1.75) {
+			msg_to_char(ch, "Suggestion: Team up with other players to defeat higher difficulty mobs for better gear.\r\n");
+		}
+		else if (average_quality < 2.75) {
+			msg_to_char(ch, "Suggestion: Get more group quality (or better) gear.\r\n");
+		}
+		else if (average_quality < 3.75) {
+			msg_to_char(ch, "Suggestion: Get more superior or boss quality gear.\r\n");
+		}
+		else if (average_quality < 4.5) {
+			msg_to_char(ch, "Suggestion: Get more superior gear.\r\n");
+		}
+		else if (average_level + 75 < my_level) {
+			msg_to_char(ch, "Suggestion: Get more gear that's in your level range.\r\n");
+		}
+		else {
+			msg_to_char(ch, "Your equipment looks good.\r\n");
+		}
+	}
+}
+
 
 /**
 * Shows the character their current equipment.
@@ -2952,7 +3066,7 @@ void deliver_shipment(empire_data *emp, struct shipping_data *shipd) {
 	if (dock) {
 		// unload the shipment at the destination
 		if (shipd->vnum != NOTHING && shipd->amount > 0 && obj_proto(shipd->vnum)) {
-			log_to_empire(emp, ELOG_SHIPPING, "%dx %s: shipped to %s%s", shipd->amount, get_obj_name_by_proto(shipd->vnum), get_island(shipd->to_island, TRUE)->name, coord_display(NULL, X_COORD(dock), Y_COORD(dock), FALSE));
+			log_to_empire(emp, ELOG_SHIPPING, "%dx %s: shipped to %s%s", shipd->amount, get_obj_name_by_proto(shipd->vnum), get_island_name_for_empire(shipd->to_island, emp), coord_display(NULL, X_COORD(dock), Y_COORD(dock), FALSE));
 			add_to_empire_storage(emp, shipd->to_island, shipd->vnum, shipd->amount);
 		}
 		if (have_ship) {
@@ -2965,7 +3079,7 @@ void deliver_shipment(empire_data *emp, struct shipping_data *shipd) {
 		
 		// no docks -- unload the shipment at home
 		if (shipd->vnum != NOTHING && shipd->amount > 0 && obj_proto(shipd->vnum)) {
-			log_to_empire(emp, ELOG_SHIPPING, "%dx %s: returned to %s%s", shipd->amount, get_obj_name_by_proto(shipd->vnum), get_island(shipd->from_island, TRUE)->name, coord_display(NULL, dock ? X_COORD(dock) : -1, dock ? Y_COORD(dock) : -1, FALSE));
+			log_to_empire(emp, ELOG_SHIPPING, "%dx %s: returned to %s%s", shipd->amount, get_obj_name_by_proto(shipd->vnum), get_island_name_for_empire(shipd->from_island, emp), coord_display(NULL, dock ? X_COORD(dock) : -1, dock ? Y_COORD(dock) : -1, FALSE));
 			add_to_empire_storage(emp, shipd->from_island, shipd->vnum, shipd->amount);
 		}
 		if (have_ship) {
@@ -5277,6 +5391,9 @@ ACMD(do_equipment) {
 	else if (IS_NPC(ch)) {
 		msg_to_char(ch, "NPCs cannot have equipment sets.\r\n");
 	}
+	else if (!str_cmp(arg, "ana") || !str_cmp(arg, "-ana") || !str_cmp(arg, "analyze") || !str_cmp(arg, "-analyze")) {
+		do_eq_analyze(ch, second);
+	}
 	else if (!str_cmp(arg, "del") || !str_cmp(arg, "-del") || !str_cmp(arg, "delete") || !str_cmp(arg, "-delete")) {
 		do_eq_delete(ch, second);
 	}
@@ -6087,7 +6204,7 @@ ACMD(do_list) {
 					snprintf(line, sizeof(line), "%s%s%s%s sells%s:\r\n", (*buf ? "\r\n" : ""), vstr, CAP(tmp), rep, matching);
 				}
 				else if (stl->from_veh) {
-					strcpy(tmp, VEH_SHORT_DESC(stl->from_veh));
+					strcpy(tmp, get_vehicle_short_desc(stl->from_veh, ch));
 					snprintf(line, sizeof(line), "%s%s%s%s sells%s:\r\n", (*buf ? "\r\n" : ""), vstr, CAP(tmp), rep, matching);
 				}
 				else {

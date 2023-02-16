@@ -680,6 +680,10 @@ ACMD(do_hunt) {
 	
 	skip_spaces(&argument);
 	
+	if (IS_NPC(ch)) {
+		msg_to_char(ch, "You can't do that.\r\n");
+		return;
+	}
 	if (GET_ACTION(ch) == ACT_HUNTING && !*argument) {
 		msg_to_char(ch, "You stop hunting.\r\n");
 		cancel_action(ch);

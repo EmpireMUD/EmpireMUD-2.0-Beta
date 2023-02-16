@@ -174,7 +174,7 @@ ACMD(do_consider) {
 		act("$n considers $s chances against you.", FALSE, ch, NULL, vict, TO_VICT);
 		
 		if (diff != 0) {
-			snprintf(buf, sizeof(buf), "$E is %d level%s %s you.", ABSOLUTE(diff), PLURAL(ABSOLUTE(diff)), diff > 0 ? "below" : "above");
+			snprintf(buf, sizeof(buf), "%s$E is %d level%s %s you.\t0", color_by_difficulty(ch, get_approximate_level(ch) + diff), ABSOLUTE(diff), PLURAL(ABSOLUTE(diff)), diff > 0 ? "below" : "above");
 			act(buf, FALSE, ch, NULL, vict, TO_CHAR);
 			any = TRUE;
 		}

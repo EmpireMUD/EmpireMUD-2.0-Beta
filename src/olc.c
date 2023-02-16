@@ -293,6 +293,7 @@ OLC_MODULE(medit_short_description);
 // map modules
 OLC_MODULE(mapedit_build);
 OLC_MODULE(mapedit_complete_room);
+OLC_MODULE(mapedit_convert2newbie);
 OLC_MODULE(mapedit_decay);
 OLC_MODULE(mapedit_decustomize);
 OLC_MODULE(mapedit_delete_exit);
@@ -798,6 +799,7 @@ const struct olc_command_data olc_data[] = {
 	// map commands
 	{ "build", mapedit_build, OLC_MAP, OLC_CF_MAP_EDIT },
 	{ "complete", mapedit_complete_room, OLC_MAP, OLC_CF_MAP_EDIT },
+	{ "convert2newbie", mapedit_convert2newbie, OLC_MAP, OLC_CF_MAP_EDIT },
 	{ "decay", mapedit_decay, OLC_MAP, OLC_CF_MAP_EDIT },
 	{ "decustomize", mapedit_decustomize, OLC_MAP, OLC_CF_MAP_EDIT },
 	{ "deleteexit", mapedit_delete_exit, OLC_MAP, OLC_CF_MAP_EDIT },

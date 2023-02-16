@@ -1764,6 +1764,17 @@ ACMD(do_drive) {
 	else if (!VEH_FLAGGED(veh, drive_data[subcmd].flag)) {
 		snprintf(buf, sizeof(buf), "You can't %s $V!", drive_data[subcmd].command);
 		act(buf, FALSE, ch, NULL, veh, TO_CHAR);
+		
+		// helpful hint
+		if (VEH_FLAGGED(veh, VEH_FLYING)) {
+			msg_to_char(ch, "Try using 'pilot' instead.\r\n");
+		}
+		else if (VEH_FLAGGED(veh, VEH_SAILING)) {
+			msg_to_char(ch, "Try using 'sail' instead.\r\n");
+		}
+		else if (VEH_FLAGGED(veh, VEH_DRIVING)) {
+			msg_to_char(ch, "Try using 'drive' instead.\r\n");
+		}
 	}
 	else if (VEH_IS_DISMANTLING(veh)) {
 		act("$V isn't going anywhere now that it's being dismantled.", FALSE, ch, NULL, veh, TO_CHAR);
@@ -2301,15 +2312,15 @@ ACMD(do_load_vehicle) {
 			act("You don't have permission to load $V.", FALSE, ch, NULL, veh, TO_CHAR);
 		}
 		else if (VEH_DRIVER(veh)) {
-			msg_to_char(ch, "You can't load %s while %s driving it.\r\n", VEH_SHORT_DESC(veh), VEH_DRIVER(veh) == ch ? "you're" : "someone else is");
+			msg_to_char(ch, "You can't load %s while %s driving it.\r\n", get_vehicle_short_desc(veh, ch), VEH_DRIVER(veh) == ch ? "you're" : "someone else is");
 		}
 		else if (VEH_LED_BY(veh)) {
-			msg_to_char(ch, "You can't load %s while %s leading it.\r\n", VEH_SHORT_DESC(veh), VEH_LED_BY(veh) == ch ? "you're" : "someone else is");
+			msg_to_char(ch, "You can't load %s while %s leading it.\r\n", get_vehicle_short_desc(veh, ch), VEH_LED_BY(veh) == ch ? "you're" : "someone else is");
 		}
 		else if (VEH_SITTING_ON(veh)) {
 			snprintf(buf, sizeof(buf), "%s", position_types[GET_POS(VEH_SITTING_ON(veh))]);
 			*buf = LOWER(*buf);
-			msg_to_char(ch, "You can't load %s while %s %s %s it.\r\n", VEH_SHORT_DESC(veh), VEH_SITTING_ON(veh) == ch ? "you're" : "someone else is", buf, IN_OR_ON(veh));
+			msg_to_char(ch, "You can't load %s while %s %s %s it.\r\n", get_vehicle_short_desc(veh, ch), VEH_SITTING_ON(veh) == ch ? "you're" : "someone else is", buf, IN_OR_ON(veh));
 		}
 		else {
 			perform_load_vehicle(ch, veh, cont, to_room);
@@ -2530,15 +2541,15 @@ ACMD(do_unload_vehicle) {
 			act("You don't have permission to unload $V.", FALSE, ch, NULL, veh, TO_CHAR);
 		}
 		else if (VEH_DRIVER(veh)) {
-			msg_to_char(ch, "You can't unload %s while %s driving it.\r\n", VEH_SHORT_DESC(veh), VEH_DRIVER(veh) == ch ? "you're" : "someone else is");
+			msg_to_char(ch, "You can't unload %s while %s driving it.\r\n", get_vehicle_short_desc(veh, ch), VEH_DRIVER(veh) == ch ? "you're" : "someone else is");
 		}
 		else if (VEH_LED_BY(veh)) {
-			msg_to_char(ch, "You can't unload %s while %s leading it.\r\n", VEH_SHORT_DESC(veh), VEH_LED_BY(veh) == ch ? "you're" : "someone else is");
+			msg_to_char(ch, "You can't unload %s while %s leading it.\r\n", get_vehicle_short_desc(veh, ch), VEH_LED_BY(veh) == ch ? "you're" : "someone else is");
 		}
 		else if (VEH_SITTING_ON(veh)) {
 			snprintf(buf, sizeof(buf), "%s", position_types[GET_POS(VEH_SITTING_ON(veh))]);
 			*buf = LOWER(*buf);
-			msg_to_char(ch, "You can't unload %s while %s %s %s it.\r\n", VEH_SHORT_DESC(veh), VEH_SITTING_ON(veh) == ch ? "you're" : "someone else is", buf, IN_OR_ON(veh));
+			msg_to_char(ch, "You can't unload %s while %s %s %s it.\r\n", get_vehicle_short_desc(veh, ch), VEH_SITTING_ON(veh) == ch ? "you're" : "someone else is", buf, IN_OR_ON(veh));
 		}
 		else {
 			perform_unload_vehicle(ch, veh, cont);

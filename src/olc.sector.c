@@ -983,7 +983,11 @@ OLC_MODULE(sectedit_evolution) {
 					tmp = any_one_arg(tmp, buf);	// buf = sector vnum
 					sectarg = any_one_arg(tmp, arg3);
 					
-					if (!*buf || !isdigit(*buf) || !(vsect = sector_proto(atoi(buf)))) {
+					if (!*buf) {
+						msg_to_char(ch, "Usage: evolution add <evo_type> [value] <percent> <sector vnum>\r\n");
+						return;
+					}
+					else if (!isdigit(*buf) || !(vsect = sector_proto(atoi(buf)))) {
 						msg_to_char(ch, "Invalid sector type '%s'.\r\n", buf);
 						return;
 					}
@@ -1075,7 +1079,11 @@ OLC_MODULE(sectedit_evolution) {
 			// this is based on existing type
 			switch (evo_val_types[change->type]) {
 				case EVO_VAL_SECTOR: {
-					if (!*val_arg || !isdigit(*val_arg) || !(vsect = sector_proto(atoi(val_arg)))) {
+					if (!*val_arg) {
+						msg_to_char(ch, "Usage: evolution change <number> value <new sector>\r\n");
+						return;
+					}
+					else if (!isdigit(*val_arg) || !(vsect = sector_proto(atoi(val_arg)))) {
 						msg_to_char(ch, "Invalid sector type '%s'.\r\n", val_arg);
 						return;
 					}

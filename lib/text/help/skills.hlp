@@ -182,9 +182,10 @@ Usage:  gather
 Speed boosts:  Work ethic bonus, Finder ability, Haste
 
 Allows you to gather sticks from the ground, as well as small saplings. This
-generally works best in the forest.
+generally works best in the forest. On the plains, you can also gather bundles
+of grass to use as fiber.
 
-See also: DEPLETION, SAPLINGS, STICKS, SCAVENGING
+See also: DEPLETION, FIBER, SAPLINGS, STICKS, SCAVENGING
 #
 HARNESS UNHARNESS
 
@@ -229,7 +230,9 @@ mountable creatures or ones that are pulling carts, try 'lead' instead.
 
 Herd requires the Animal Husbandry ability.
 
-Use 'load' to move a herded animal into a ship or other vehicle.
+Use 'load' to move a herded animal into a ship or other vehicle. If a mob is a
+mount, you can use 'lead' to move it around instead of herd, especially if you
+are trying to get it into a carpenter.
 
 See also: ANIMAL HUSBANDRY, LEAD, LOAD
 #
@@ -242,7 +245,7 @@ vehicle, it will move with you until type "lead" again to stop. Some vehicles
 need you to harness animals to them before they can move. You can also lead
 any animal which is mountable.
 
-Some vehicles can't be led.
+Some vehicles can't be led. If you can't lead a mob, try 'herd' instead.
 
 Example:  
   > lead horse 

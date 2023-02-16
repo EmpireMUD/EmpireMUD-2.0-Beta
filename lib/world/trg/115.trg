@@ -171,7 +171,7 @@ end
 %purge% %self%
 ~
 #11520
-start Pixy Pursuit quest~
+Pixy Pursuit: start event/quest~
 2 u 0
 ~
 * Give enchanted jars
@@ -182,35 +182,28 @@ Pixy Pursuit: catch~
 1 c 2
 catch~
 * This is the command for capturing pixies for the Pixy Pursuit event
+return 1
+* basic validation
 if %actor.fighting%
   %send% %actor% You can't do that while fighting!
-  return 1
   halt
-end
-if %actor.carrying% >= %actor.maxcarrying%
+elseif %actor.carrying% >= %actor.maxcarrying%
   %send% %actor% You can't catch anything because your inventory is full!
-  return 1
   halt
-end
-if !%arg%
+elseif !%arg%
   %send% %actor% What do you want to catch with @%self%?
-  return 1
   halt
 end
+* targeting
 set target %actor.char_target(%arg%)%
 if !%target%
   %send% %actor% They must have flown away when they saw you coming, because they're not here.
-  return 1
   halt
-end
-if !%target.is_npc%
+elseif !%target.is_npc%
   %send% %actor% You can really only catch pixies with those jars.
-  return 1
   halt
-end
-if %target.fighting%
+elseif %target.fighting%
   %send% %actor% You can't catch someone who's in combat!
-  return 1
   halt
 end
 * switch will validate the target vnum and set up chances: needs, has -- default needs is random.15 (attribute roll)
@@ -265,7 +258,11 @@ switch %target.vnum%
   break
   default
     * all other vnums
-    %send% %actor% That doesn't appear to be a pixy.
+    if %target.pc_name% ~= pixy
+      %send% %actor% You can't catch that one in these jars.
+    else
+      %send% %actor% That doesn't appear to be a pixy.
+    end
     halt
   break
 done
@@ -275,15 +272,11 @@ done
 wait 2 sec
 if !%target%
   %send% %actor% The pixy got away!
-  return 1
   halt
-end
-if %target.fighting% || %actor.fighting% || %actor.room% != %target.room% || %actor.disabled%
+elseif %target.fighting% || %actor.fighting% || %actor.room% != %target.room% || %actor.disabled%
   * fail with no message (reason should be obvious)
-  return 1
   halt
-end
-if %has% >= %needs%
+elseif %has% >= %needs%
   * Success!
   %load% obj %jar_vnum% %actor% inv
   %send% %actor% You catch ~%target% in a jar!
@@ -296,14 +289,14 @@ else
 end
 * Purge the target either way
 %purge% %target%
-return 1
 ~
 #11522
-Pixy Hunt: exchange with alchemist~
+Pixy Pursuit: exchange with alchemist~
 1 c 2
 exchange~
 set alch 0
 set pers %actor.room.people%
+return 1
 * Find the alchemist
 while %pers% && !%alch%
   if %pers.is_npc% && %pers.vnum% == 231
@@ -312,13 +305,10 @@ while %pers% && !%alch%
   set pers %pers.next_in_room%
 done
 if !%alch%
-  %send% %actor% You can only exchange pixies with the Alchemist.
-  return 1
+  %send% %actor% You can only exchange pixies with an alchemist.
   halt
-end
-if %alch.fighting% || %alch.disabled%
+elseif %alch.fighting% || %alch.disabled%
   %send% %actor% The alchemist can't help you right now!
-  return 1
   halt
 end
 * Okay, the alchemist is valid, now look for items to turn in
@@ -345,16 +335,16 @@ end
 Pixy Pursuit: spawn on move~
 0 i 100
 ~
-* ensure leader present and event running
+* ensure leader present and event running 
 set leader %self.leader%
 if !%leader% || !%event.running(11520)%
   halt
-end
-if %leader.room% != %self.room% || %leader.is_npc%
+elseif %leader.room% != %self.room% || %leader.is_npc%
   halt
 end
 * short delay
 wait 5
+set room %self.room%
 * Check room for the item that blocks spawns
 if %self.room.contents(11523)%
   halt
@@ -371,14 +361,14 @@ if %random.10% > 1 && %timesince% < %random.180%
   halt
 end
 * Figure out which pixy to spawn
-if %leader.room.template% > 0 && %random.5% == 5
+if %room.template% > 0 && %random.5% == 5
   * royal pixy, only in adventures
   set vnum 11520
 else
   eval vnum 11520 + %random.6%
 end
 %load% mob %vnum%
-set pix %leader.room.people%
+set pix %room.people%
 if %pix.vnum% == %vnum%
   switch %random.4%
     case 1
@@ -404,7 +394,7 @@ remote last_11520_spawn %leader.id%
 %force% %pix% mmove
 ~
 #11524
-Pixy Pursuit combat script~
+Pixy Pursuit: pixy combat script~
 0 k 100
 ~
 wait 1
@@ -413,7 +403,7 @@ if %self.disabled%
 end
 * Randomly morph the actor
 if %actor.is_pc% && %random.5% == 5 && %actor.morph% != 11528
-  %send% %actor% ~%self% casts a spell and shrinks you to the size of a mouse! (type 'morph normal' to return to full size)
+  %send% %actor% ~%self% casts a spell and shrinks you to the size of a mouse! (type 'fastmorph normal' to return to full size)
   %echoaround% %actor% ~%self% casts a spell at ~%actor% and shrinks *%actor% to the size of a mouse!
   %morph% %actor% 11528
   halt
@@ -556,7 +546,7 @@ end
 return 1
 ~
 #11534
-Upgrade pixy hunt gear~
+Upgrade pixy pursuit gear~
 1 c 2
 upgrade~
 if !%arg%

@@ -208,7 +208,7 @@ Additional codes:
  &&Z Next letter will be capitalized (useful in scripts)
  &&z Next letter will be lowercase
 
-See also: BANNER, INFORMATIVE, POLITICAL, RECOLOR, TOGGLE
+See also: BANNER, INFORMATIVE, POLITICAL, RECOLOR, TOGGLE, LEVEL COLORS
 #
 APPROACH
 
@@ -519,8 +519,8 @@ There are also several possible modifier tags:
  - hard: will require two players in the right level range
  - group: will require three players in the right level range
  - boss: will require four players in the right level range
- 
-See also: DROP FLAGS, LEVELS
+
+See also: DROP FLAGS, LEVELS, LEVEL COLORS
 #
 CONTENTS
 
@@ -750,6 +750,7 @@ Usage:  equipment [-all]  -- see your current gear
         equipment delete <name>  -- delete an equipment set
         equipment list  -- list your equipment sets
         equipment <name>  -- change to an equipment set
+        equipment analyze  -- see help about your equipment
 
 Gives you a list of all the equipment you're wearing, holding, and wielding.
 Items do not take up inventory space when equipped (except containers and their
@@ -766,7 +767,10 @@ Saving an equipment set will automatically 'keep' all items in the set. When
 you change equipment sets, any items that are removed will be placed at the
 end of your inventory (instead of at the beginning like normal).
 
-See also: INVENTORY, REMOVE, WEAR, WIELD, HOLD, SHEATH, DRAW, SWAP, KEEP
+Use 'equipment analyze' (eq -ana) for some helpful information about your gear.
+
+See also: INVENTORY, REMOVE, WEAR, WIELD, HOLD, SHEATH, DRAW, SWAP, KEEP,
+   GEAR LEVELS, LEVEL COLORS
 #
 ESTATS ESTATISTICS
 
@@ -1104,7 +1108,7 @@ trying to figure out what to drop or give away, since the numbering (2.bag)
 will be the same for identify and drop (instead of also checking your equipment
 for the identify command).
 
-See also: EIDENTIFY
+See also: EIDENTIFY, LEVEL COLORS, EQUIPMENT
 #
 INFORMATIVE "TOGGLE INFORMATIVE"
 
@@ -1196,7 +1200,7 @@ not take up inventory space when equipped (except containers and their
 contents).
 
 See also: EQUIPMENT, GRAB, HOLD, REMOVE, WEAR, STORE, RETRIEVE, WIELD, SWAP,
-   TOGGLE
+   TOGGLE, LEVEL COLORS
 #
 INTERLINK INTERLINKING
 

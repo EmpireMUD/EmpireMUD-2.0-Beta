@@ -958,6 +958,7 @@ const char *syslog_types[] = {
 	"system",
 	"validation",
 	"empire",
+	"event",
 	"\n"
 };
 
@@ -1731,7 +1732,7 @@ const char *craft_flag_for_info[] = {
 	"requires fire",
 	"",	// soup
 	"",	// in-dev
-	"",	// upgrade
+	"is an upgrade",	// upgrade
 	"",	// dismantle-only
 	"in-city only",
 	"",	// vehicle
@@ -1812,6 +1813,7 @@ const struct offense_info_type offense_info[NUM_OFFENSES] = {
 	{ "burned building", 5 },
 	{ "burned vehicle", 5 },
 	{ "pickpocketed", 5 },	// 10
+	{ "reclaimed a tile", 2 }
 };
 
 
@@ -2357,7 +2359,7 @@ const struct wear_data_type wear_data[NUM_WEARS] = {
 	{ "<worn around neck> ", "neck", ITEM_WEAR_NECK, TRUE, 1.0, NO_WEAR, "You're already wearing enough around your neck.", "$n wears $p around $s neck.", "You wear $p around your neck.", TRUE, TRUE },
 	{ " <worn as clothes> ", "clothes", ITEM_WEAR_CLOTHES, TRUE, 0, NO_WEAR, "You're already wearing $p as clothes.", "$n wears $p as clothing.", "You wear $p as clothing.", TRUE, TRUE },
 	{ "   <worn as armor> ", "armor", ITEM_WEAR_ARMOR, TRUE, 2.0, NO_WEAR, "You're already wearing $p as armor.", "$n wears $p as armor.", "You wear $p as armor.", TRUE, TRUE },
-	{ " <worn about body> ", "body", ITEM_WEAR_ABOUT, TRUE, 1.0, NO_WEAR, "You're already wearing $p about your body.", "$n wears $p about $s body.", "You wear $p around your body.", TRUE, TRUE },
+	{ " <worn about body> ", "about", ITEM_WEAR_ABOUT, TRUE, 1.0, NO_WEAR, "You're already wearing $p about your body.", "$n wears $p about $s body.", "You wear $p around your body.", TRUE, TRUE },
 	{ "    <worn on arms> ", "arms", ITEM_WEAR_ARMS, TRUE, 1.0, NO_WEAR, "You're already wearing $p on your arms.", "$n wears $p on $s arms.", "You wear $p on your arms.", TRUE, TRUE },
 	{ "  <worn on wrists> ", "wrists", ITEM_WEAR_WRISTS, TRUE, 1.0, NO_WEAR, "You're already wearing $p on your wrists.", "$n wears $p on $s wrists.", "You wear $p on your wrists.", TRUE, TRUE },
 	{ "   <worn on hands> ", "hands", ITEM_WEAR_HANDS, TRUE, 1.0, NO_WEAR, "You're already wearing $p on your hands.", "$n puts $p on $s hands.", "You put $p on your hands.", TRUE, TRUE },

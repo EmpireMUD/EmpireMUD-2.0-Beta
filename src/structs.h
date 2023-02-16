@@ -1261,7 +1261,8 @@ typedef struct vehicle_data vehicle_data;
 #define OFFENSE_BURNED_BUILDING  8
 #define OFFENSE_BURNED_VEHICLE  9
 #define OFFENSE_PICKPOCKETED  10
-#define NUM_OFFENSES  11	// total
+#define OFFENSE_RECLAIMED  11
+#define NUM_OFFENSES  12	// total
 
 
 // OFF_x: offense flags
@@ -2521,6 +2522,7 @@ typedef enum {
 #define SYS_SYSTEM  BIT(9)	// system stuff
 #define SYS_VALID  BIT(10)	// validation logs
 #define SYS_EMPIRE  BIT(11)	// empire-related logs
+#define SYS_EVENT  BIT(12)	// event news and points
 
 
 // WAIT_x: Wait types for the command_lag() function.

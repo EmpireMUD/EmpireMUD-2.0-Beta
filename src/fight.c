@@ -2469,6 +2469,10 @@ bool can_fight(char_data *ch, char_data *victim) {
 	if (IS_PVP_FLAGGED(ch) && IS_PVP_FLAGGED(victim)) {
 		return TRUE;
 	}
+	// reclaiming?
+	if (!IS_NPC(victim) && GET_ACTION(victim) == ACT_RECLAIMING) {
+		return TRUE;
+	}
 	// is stealing from you
 	if (GET_LOYALTY(ch)) {
 		DL_FOREACH2(victim->carrying, obj, next_content) {
