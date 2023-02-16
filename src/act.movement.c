@@ -2155,7 +2155,7 @@ ACMD(do_circle) {
 	command_lag(ch, WAIT_MOVEMENT);
 	
 	// triggers?
-	if (!enter_wtrigger(IN_ROOM(ch), ch, dir, "move") || !greet_mtrigger(ch, dir, "move") || !greet_vtrigger(ch, dir, "move")) {
+	if (!entry_mtrigger(ch, "move") || !enter_wtrigger(IN_ROOM(ch), ch, dir, "move") || !greet_mtrigger(ch, dir, "move") || !greet_vtrigger(ch, dir, "move")) {
 		char_from_room(ch);
 		char_to_room(ch, was_in);
 		if (ch->desc) {
