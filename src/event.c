@@ -58,6 +58,52 @@ void update_player_leaderboard(char_data *ch, struct event_running_data *re, str
 //// HELPERS /////////////////////////////////////////////////////////////////
 
 /**
+* Removes a player from any still-running events, but leaves then in any old
+* events that have ended (to preserve rank). This is intended for a player who
+* is being deleted, but can be used other times as well.
+*
+* @param char_data *ch The player being deleted from the event(s) (if any).
+*/
+void delete_player_from_running_events(char_data *ch) {
+	struct event_running_data *running;
+	struct event_leaderboard *lb, *next_lb;
+	struct player_event_data *ped;
+	
+	if (!ch || IS_NPC(ch)) {
+		return;
+	}
+	
+	LL_FOREACH(running_events, running) {
+		if (!running->event) {
+			continue;
+		}
+		if (running->status != EVTS_RUNNING) {
+			continue;
+		}
+		
+		HASH_ITER(hh, running->player_leaderboard, lb, next_lb) {
+			if (lb->id == GET_IDNUM(ch)) {
+				// delete my own data for it, if any
+				if ((ped = get_event_data(ch, running->id))) {
+					HASH_DEL(GET_EVENT_DATA(ch), ped);
+					free(ped);
+				}
+				
+				// entry to remove
+				HASH_DEL(running->player_leaderboard, lb);
+				free(lb);
+				
+				events_need_save = TRUE;
+			}
+		}
+	}
+	
+	// in case they're not being deleted
+	queue_delayed_update(ch, CDU_SAVE);
+}
+
+
+/**
 * Gets a character's rank in an event. It returns NOTHING if ch is unranked.
 *
 * @param char_data *ch the player.

@@ -4018,6 +4018,7 @@ void delete_player_character(char_data *ch) {
 	
 	clear_private_owner(GET_IDNUM(ch));
 	purge_bound_items(GET_IDNUM(ch));
+	delete_player_from_running_events(ch);
 
 	// Check the empire
 	if ((emp = GET_LOYALTY(ch)) != NULL) {

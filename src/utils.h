@@ -2150,6 +2150,7 @@ char empire_banner_to_mapout_token(const char *banner);
 bool valid_rank_name(char_data *ch, char *newname);
 
 // event.c
+void delete_player_from_running_events(char_data *ch);
 int gain_event_points(char_data *ch, any_vnum event_vnum, int points);
 struct player_event_data *get_event_data(char_data *ch, int event_id);
 struct event_running_data *only_one_running_event(int *count);
