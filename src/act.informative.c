@@ -1723,7 +1723,7 @@ char *obj_desc_for_char(obj_data *obj, char_data *ch, int mode) {
 		else if (IS_PORTAL(obj)) {
 			room = real_room(GET_PORTAL_TARGET_VNUM(obj));
 			if (room) {
-				sprintf(buf, "%sYou peer into %s and see: %s\t0", NULLSAFE(GET_OBJ_ACTION_DESC(obj)), GET_OBJ_DESC(obj, ch, OBJ_DESC_SHORT), get_room_name(room, TRUE));
+				sprintf(buf, "%sYou peer into %s and see: %s%s\t0", NULLSAFE(GET_OBJ_ACTION_DESC(obj)), GET_OBJ_DESC(obj, ch, OBJ_DESC_SHORT), get_room_name(room, TRUE), coord_display_room(ch, room, FALSE));
 			}
 			else {
 				sprintf(buf, "%sIt's a portal, but it doesn't seem to lead anywhere.", NULLSAFE(GET_OBJ_ACTION_DESC(obj)));
