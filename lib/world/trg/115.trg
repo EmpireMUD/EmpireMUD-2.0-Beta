@@ -345,6 +345,16 @@ end
 * short delay
 wait 5
 set room %self.room%
+* Check that I'm the only one of me here
+set ch %room.people%
+while %ch%
+  if %ch% != %self% && %ch.vnum% == %self.vnum% && %ch.leader% == %self.leader%
+    %echo% ~%self% trots off.
+    %purge% %self%
+    halt
+  end
+  set ch %ch.next_in_room%
+done
 * Check room for the item that blocks spawns
 if %self.room.contents(11523)%
   halt
