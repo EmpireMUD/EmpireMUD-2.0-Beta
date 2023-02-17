@@ -22,7 +22,7 @@ ABANDON NO-ABANDON "NO ABANDON"
 Usage:  abandon [target/coordinates] [confirm]
         manage no-abandon
 
-This command allows you to abandon a building or acre of land which your 
+This command allows you to abandon a building or tile of land which your 
 empire no longer wants. This falls under the cede privilege. Buildings and rare
 crops require you to type 'confirm' when you try to abandon them remotely.
 
@@ -78,7 +78,7 @@ CEDE
 
 Usage:  cede <person>
 
-This is used to cede one acre of land to anyone else currently in the game. You
+This is used to cede one tile of land to anyone else currently in the game. You
 can only cede the map tile you're standing on, and it must be owned by your
 empire. Ceding land to a god or immortal so that you can claim more land may
 get you in trouble.
@@ -174,7 +174,7 @@ CLAIM
 
 Usage:  claim [target]
 
-Claims the acre you're currently on for your empire. This can also be used
+Claims the tile you're currently on for your empire. This can also be used
 to claim vehicles.
 
 To claim things inside the radius of one of your cities, try "city claim".

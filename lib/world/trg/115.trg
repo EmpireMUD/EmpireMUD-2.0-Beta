@@ -258,7 +258,13 @@ switch %target.vnum%
   break
   default
     * all other vnums
-    if %target.pc_name% ~= pixy
+    set clever_list 11819 11820 11982
+    set error_list 11873 11874 11875 11876 11877 11878 11879 11880 11881 11882 11883 11884 11885 11886 11887
+    if %clever_list% ~= %target.vnum%
+      %send% %actor% You try to catch ~%target% but &%target%'s too clever for you!
+    elseif %error_list% ~= %target.vnum%
+      %send% %actor% &%target% is way too big to fit in the jar!
+    elseif %target.pc_name% ~= pixy
       %send% %actor% You can't catch that one in these jars.
     else
       %send% %actor% That doesn't appear to be a pixy.
@@ -345,6 +351,16 @@ end
 * short delay
 wait 5
 set room %self.room%
+* Check that I'm the only one of me here
+set ch %room.people%
+while %ch%
+  if %ch% != %self% && %ch.vnum% == %self.vnum% && %ch.leader% == %self.leader%
+    %echo% ~%self% trots off.
+    %purge% %self%
+    halt
+  end
+  set ch %ch.next_in_room%
+done
 * Check room for the item that blocks spawns
 if %self.room.contents(11523)%
   halt

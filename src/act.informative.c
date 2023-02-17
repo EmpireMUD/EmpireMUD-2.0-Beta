@@ -1723,7 +1723,7 @@ char *obj_desc_for_char(obj_data *obj, char_data *ch, int mode) {
 		else if (IS_PORTAL(obj)) {
 			room = real_room(GET_PORTAL_TARGET_VNUM(obj));
 			if (room) {
-				sprintf(buf, "%sYou peer into %s and see: %s\t0", NULLSAFE(GET_OBJ_ACTION_DESC(obj)), GET_OBJ_DESC(obj, ch, OBJ_DESC_SHORT), get_room_name(room, TRUE));
+				sprintf(buf, "%sYou peer into %s and see: %s%s\t0", NULLSAFE(GET_OBJ_ACTION_DESC(obj)), GET_OBJ_DESC(obj, ch, OBJ_DESC_SHORT), get_room_name(room, TRUE), coord_display_room(ch, room, FALSE));
 			}
 			else {
 				sprintf(buf, "%sIt's a portal, but it doesn't seem to lead anywhere.", NULLSAFE(GET_OBJ_ACTION_DESC(obj)));
@@ -3128,7 +3128,8 @@ ACMD(do_mapsize) {
 
 
 ACMD(do_mark) {
-	int dist, dir;
+	int dist;
+	char *dir_str;
 	room_data *mark, *here;
 	
 	skip_spaces(&argument);
@@ -3159,13 +3160,13 @@ ACMD(do_mark) {
 			}
 			else {
 				dist = compute_distance(mark, IN_ROOM(ch));
-				dir = get_direction_for_char(ch, get_direction_to(IN_ROOM(ch), mark));
+				dir_str = get_partial_direction_to(ch, IN_ROOM(ch), mark, FALSE);
 				
 				if (HAS_NAVIGATION(ch)) {
-					msg_to_char(ch, "Your mark at (%d, %d) is %d map tile%s %s.\r\n", X_COORD(mark), Y_COORD(mark), dist, (dist == 1 ? "" : "s"), (dir == NO_DIR ? "away" : dirs[dir]));
+					msg_to_char(ch, "Your mark at (%d, %d) is %d map tile%s %s.\r\n", X_COORD(mark), Y_COORD(mark), dist, (dist == 1 ? "" : "s"), (*dir_str ? dir_str : "away"));
 				}
 				else {
-					msg_to_char(ch, "Your mark is %d map tile%s %s.\r\n", dist, (dist == 1 ? "" : "s"), (dir == NO_DIR ? "away" : dirs[dir]));
+					msg_to_char(ch, "Your mark is %d map tile%s %s.\r\n", dist, (dist == 1 ? "" : "s"), (*dir_str ? dir_str : "away"));
 				}
 			}
 		}

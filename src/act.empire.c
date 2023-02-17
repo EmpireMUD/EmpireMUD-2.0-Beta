@@ -119,7 +119,7 @@ bool can_reclaim(char_data *ch, room_data *room) {
 		return FALSE;
 	}
 	else if (ROOM_AFF_FLAGGED(room, ROOM_AFF_UNCLAIMABLE)) {
-		msg_to_char(ch, "This acre can't be claimed.\r\n");
+		msg_to_char(ch, "This area can't be claimed.\r\n");
 		return FALSE;
 	}
 	else if (IS_CITY_CENTER(room)) {
@@ -3013,9 +3013,10 @@ struct find_territory_node *reduce_territory_node_list(struct find_territory_nod
 */
 void scan_for_tile(char_data *ch, char *argument) {
 	struct find_territory_node *node_list = NULL, *node, *next_node;
-	int dir, dist, mapsize, total, x, y, check_x, check_y, over_count, dark_distance;
+	int dist, mapsize, total, x, y, check_x, check_y, over_count, dark_distance;
 	int iter, top_height, r_height, view_height;
 	char output[MAX_STRING_LENGTH], line[128], info[256], veh_string[MAX_STRING_LENGTH], temp[MAX_STRING_LENGTH], paint_str[256];
+	char *dir_str;
 	vehicle_data *veh, *scanned_veh;
 	struct map_data *map_loc;
 	room_data *map, *room, *block_room;
@@ -3221,10 +3222,10 @@ void scan_for_tile(char_data *ch, char *argument) {
 				check_y = Y_COORD(node->loc);
 			
 				dist = compute_distance(IN_ROOM(ch), node->loc);
-				dir = get_direction_for_char(ch, get_direction_to(IN_ROOM(ch), node->loc));
+				dir_str = get_partial_direction_to(ch, IN_ROOM(ch), node->loc, PRF_FLAGGED(ch, PRF_SCREEN_READER) ? FALSE : TRUE);
 				
 				// distance and direction
-				lsize = snprintf(line, sizeof(line), "%2d %s: ", dist, (dir == NO_DIR ? "away" : (PRF_FLAGGED(ch, PRF_SCREEN_READER) ? dirs[dir] : alt_dirs[dir])));
+				lsize = snprintf(line, sizeof(line), "%2d %s: ", dist, (*dir_str ? dir_str : "away"));
 				
 				if (node->details) {
 					lsize += snprintf(line + lsize, sizeof(line) - lsize, "%s: %s", (GET_BUILDING(node->loc) ? GET_BLD_NAME(GET_BUILDING(node->loc)) : GET_SECT_NAME(SECT(node->loc))), node->details);
