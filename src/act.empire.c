@@ -119,7 +119,7 @@ bool can_reclaim(char_data *ch, room_data *room) {
 		return FALSE;
 	}
 	else if (ROOM_AFF_FLAGGED(room, ROOM_AFF_UNCLAIMABLE)) {
-		msg_to_char(ch, "This acre can't be claimed.\r\n");
+		msg_to_char(ch, "This area can't be claimed.\r\n");
 		return FALSE;
 	}
 	else if (IS_CITY_CENTER(room)) {

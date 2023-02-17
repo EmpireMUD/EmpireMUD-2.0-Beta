@@ -1626,7 +1626,7 @@ POLITICAL "POLITICAL VIEW" "TOGGLE POLITICAL"
 Usage:  toggle political [on/off]
 
 This toggle changes your map colors from environmental to political. You will
-see each acre colored with the banner of the empire who owns it. Screenreader
+see each tile colored with the banner of the empire who owns it. Screenreader
 users will see empire names next to claimed tiles.
 
 Dimly lit tiles do not appear in 'informative' mode.

@@ -498,7 +498,7 @@ OLC_MODULE(mapedit_pass_walls) {
 
 OLC_MODULE(mapedit_decustomize) {
 	decustomize_room(IN_ROOM(ch));
-	msg_to_char(ch, "All customizations removed on this room/acre.\r\n");
+	msg_to_char(ch, "All customizations removed on this room/area.\r\n");
 }
 
 
