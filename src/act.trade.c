@@ -639,6 +639,10 @@ void resume_craft_building(char_data *ch, craft_data *craft) {
 		msg_to_char(ch, "You are already doing something.\r\n");
 		return;
 	}
+	if (GET_POS(ch) < POS_STANDING) {
+		send_low_pos_msg(ch);
+		return;
+	}
 	
 	start_action(ch, ACT_BUILDING, 0);
 	GET_ACTION_VNUM(ch, 0) = GET_CRAFT_VNUM(craft);
@@ -674,6 +678,10 @@ void resume_craft_vehicle(char_data *ch, vehicle_data *veh, craft_data *craft) {
 	// ensure they CAN resume
 	if (GET_ACTION(ch) != ACT_NONE) {
 		msg_to_char(ch, "You are already doing something.\r\n");
+		return;
+	}
+	if (GET_POS(ch) < POS_STANDING) {
+		send_low_pos_msg(ch);
 		return;
 	}
 	
