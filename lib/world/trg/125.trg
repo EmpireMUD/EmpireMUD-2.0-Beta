@@ -843,7 +843,7 @@ end
 * End of script fragment
 ~
 #12532
-Colossus Master Controller dance~
+Colossus Central Control dance~
 0 bw 100
 ~
 if !%self.varexists(active)%
@@ -934,7 +934,7 @@ else
 end
 ~
 #12533
-Colossus Master Controller dance commands~
+Colossus Central Control dance commands~
 0 c 0
 pull sabotage~
 if sabotage /= %cmd%
@@ -958,7 +958,7 @@ if sabotage /= %cmd%
     if %remaining% == 1
       set plural component
     end
-    %send% %actor% You still need to destroy %remaining% more vital %plural% before you can sabotage the master controller.
+    %send% %actor% You still need to destroy %remaining% more vital %plural% before you can sabotage the central controller.
     halt
   end
   say User not authenticated. Prepare for authentication sequence. Do as the controller commands!
@@ -997,13 +997,13 @@ if %command%
 end
 ~
 #12534
-Colossus Master Controller load~
+Colossus Central Control load~
 0 nx 100
 ~
 dg_affect %self% !ATTACK on -1
 ~
 #12535
-Colossus Master Controller death~
+Colossus Central Control death~
 0 f 100
 ~
 set colossus %instance.mob(12500)%
@@ -1039,7 +1039,7 @@ while %person%
 done
 ~
 #12537
-Master Controller Greeting~
+Central Control Greeting~
 0 h 100
 ~
 wait 1
@@ -1062,7 +1062,7 @@ while %cycle% < 6 && !%self.varexists(active)%
     break
     case 1
       if (%parts_destroyed% < 4)
-        %echo% Lights flash all over the master controller apparatus.
+        %echo% Lights flash all over the central control apparatus.
       else
         say How did you get in here, tiny adventurers?
       end
@@ -1076,13 +1076,13 @@ while %cycle% < 6 && !%self.varexists(active)%
       end
     break
     case 3
-      %echo% Lights flash all over the master controller apparatus, turning from green to red.
+      %echo% Lights flash all over the central control apparatus, turning from green to red.
     break
     case 4
       say Error... power levels are dangerously low.
     break
     case 5
-      %echo% With most of the colossus disabled, its master controller apparatus looks ripe for sabotage.
+      %echo% With most of the colossus disabled, its central control apparatus looks ripe for sabotage.
     break
   done
   wait 2 sec
@@ -1365,7 +1365,7 @@ if %color% and %correct_color%
             nop %colossus.remove_mob_flag(GROUP)%
             nop %colossus.add_mob_flag(HARD)%
           break
-          * 5 is only when the master controller breaks
+          * 5 is only when the central controller breaks
         done
         %scale% %colossus% %colossus.level%
       end
