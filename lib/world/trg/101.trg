@@ -180,10 +180,12 @@ end
 Tranc combat~
 0 k 15
 ~
+* storing ids prevents errors when someone dies during a "wait"
+set id %actor.id%
 wait 10
 * If dog summoned, tank
 if %self.varexists(hound)%
-  if !%actor.aff_flagged(DISARMED)%
+  if %actor.id% == %id% && !%actor.aff_flagged(DISARMED)%
     %echo% ~%self% disarms ~%actor%!
     dg_affect #3018 %actor% DISARMED on 15
   elseif %self.health% < (%self.maxhealth% / 2)

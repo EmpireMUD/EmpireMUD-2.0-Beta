@@ -580,7 +580,7 @@ switch %random.3%
         end
         set person %person.next_in_room%
       done
-    else if %actor% && %actor.id% == %actor_id%
+    elseif %actor% && %actor.id% == %actor_id%
       %send% %actor% &&rThe rime blades slash you, opening dozens of painful, bleeding wounds!
       %echoaround% %actor% The rime blades slash ~%actor%, opening dozens of bleeding wounds!
       %damage% %actor% 150 physical

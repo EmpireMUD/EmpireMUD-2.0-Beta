@@ -2475,7 +2475,7 @@ if !%arg.cdr%
   halt
 elseif tarantula /= %arg.cdr% || giant tarantula /= %arg.cdr%
   set vnum 18879
-else if horse /= %arg.cdr% || headless horse /= %arg.cdr%
+elseif horse /= %arg.cdr% || headless horse /= %arg.cdr%
   set vnum 18839
 else
   %send% %actor% Use the ooze on which mount (giant tarantula or headless horse)?

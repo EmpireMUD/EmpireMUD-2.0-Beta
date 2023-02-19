@@ -3034,7 +3034,7 @@ Winter Wonderland music quests: detect playing~
 set questid %self.vnum%
 if %self.carried_by%
   set actor %self.carried_by%
-else if %self.worn_by%
+elseif %self.worn_by%
   set actor %self.worn_by%
 end
 if %actor.action% != playing
@@ -3090,7 +3090,7 @@ switch %questid%
     set any 0
     if %room.bld_flagged(DEDICATE)% && %actor.canuseroom_member(%room%)%
       set any 1
-    else if %room.in_vehicle% && %actor.empire% == %room.in_vehicle.empire%
+    elseif %room.in_vehicle% && %actor.empire% == %room.in_vehicle.empire%
       if %room.in_vehicle.is_flagged(DEDICATE)%
         set any 1
       end

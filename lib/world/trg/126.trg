@@ -835,16 +835,20 @@ if %self.cooldown(12657)%
   halt
 end
 nop %self.set_cooldown(12657, 30)%
+* storing ids prevents an error after the wait
+set id %actor.id%
 if !%self.morph%
   set current %self.name%
   %morph% %self% 12667
   %echo% %current% rapidly morphs into ~%self% and takes flight!
   wait 1 sec
 end
-%send% %actor% &&r~%self% swoops down and knocks your weapon from your hand!
-%echoaround% %actor% ~%self% swoops down and knocks |%actor% weapon from ^%actor% hand!
-%damage% %actor% 5 physical
-dg_affect #12667 %actor% DISARMED on 5
+if %actor.id% == %id%
+  %send% %actor% &&r~%self% swoops down and knocks your weapon from your hand!
+  %echoaround% %actor% ~%self% swoops down and knocks |%actor% weapon from ^%actor% hand!
+  %damage% %actor% 5 physical
+  dg_affect #12667 %actor% DISARMED on 5
+end
 ~
 #12668
 Crow Druid: Squall~

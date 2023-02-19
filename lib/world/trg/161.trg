@@ -419,7 +419,10 @@ switch %random.4%
     done
   break
 done
-%heal% %random.ally% health 150
+set ally %random.ally%
+if %ally%
+  %heal% %ally% health 150
+end
 ~
 #16114
 when hydra gear is crafted~
