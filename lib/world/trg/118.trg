@@ -5463,8 +5463,8 @@ elseif %move% == 3 && !%self.aff_flagged(BLIND)%
   set cycle 1
   eval wait 8 - %diff%
   set last 0
-  while %cycle% <= (2 * %diff%)
-    set targ %random.enemy%
+  set targ %random.enemy%
+  while %cycle% <= (2 * %diff%) && %targ%
     set targ_id %targ.id%
     skyfight setup dodge %targ%
     if %targ% == %last%
@@ -5488,6 +5488,7 @@ elseif %move% == 3 && !%self.aff_flagged(BLIND)%
     end
     skyfight clear dodge
     eval cycle %cycle% + 1
+    set targ %random.enemy%
   done
 end
 * in case
