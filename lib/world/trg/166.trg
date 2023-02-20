@@ -603,7 +603,7 @@ if !%arg%
   return 0
   halt
 end
-set MoveDir %actor.parse_dir(%arg%)%
+set MoveDir %actor.parse_dir(%arg.car%)%
 set SelfRoom %self.room%
 if !%SelfRoom.in_city%
   %send% %actor% While you have a gift to deliver, you should probably be sneaking around your own city.

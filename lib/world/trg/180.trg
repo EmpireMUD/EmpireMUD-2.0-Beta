@@ -197,10 +197,10 @@ wait 30 sec
 Fiend adds battle~
 0 k 20
 ~
-makeuid fiend mob chained
-if %random.3%<3
+set fiend %self.room.people(18075)%
+if %random.3%<3 && %fiend%
   %echo% ~%self% transfers some of its heat to ~%fiend%!
-  %damage% %fiend% -100
+  %heal% %fiend% health 100
   %damage% %self% 100
 else
   %send% %actor% &&rThere is a destructive explosion as ~%self% hurls itself suicidally at you!&&0
@@ -209,7 +209,8 @@ else
   %aoe% 50 fire
   %damage% %self% 1000
 end
-wait 5 sec *Global cooldown
+*Global cooldown
+wait 5 sec
 ~
 #18079
 Fiend No Leave~

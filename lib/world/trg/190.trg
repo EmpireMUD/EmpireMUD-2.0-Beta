@@ -953,6 +953,7 @@ while %person%
 done
 nop %self.set_cooldown(10200, 30)%
 %echo% ~%self% starts casting a spell...
+set actor_id %actor.id%
 wait 3 sec
 set heroic_mode %self.mob_flagged(GROUP)%
 set hard %self.mob_flagged(HARD)%
@@ -968,6 +969,9 @@ if %goblin% || !%heroic_mode% || !%hard%
       end
       set person %person.next_in_room%
     done
+  elseif %actor.id% != %actor_id%
+    * gone
+    halt
   else
     %send% %actor% &&r~%self% unleashes a bolt of uncontrolled magical energy, which strikes you!
     %echoaround% %actor% ~%self% unleashes a bolt of uncontrolled magical energy, which strikes ~%actor%!
@@ -979,6 +983,9 @@ if %goblin% || !%heroic_mode% || !%hard%
   if %goblin%
     dg_affect #10211 %goblin% HASTE on 30
   end
+elseif %actor.id% != %actor_id%
+  * gone
+  halt
 else
   eval vnum 10200 + %random.5% - 1
   %load% mob %vnum% ally %self.level%
