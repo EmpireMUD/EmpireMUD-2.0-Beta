@@ -850,10 +850,14 @@ else
   eval timer 30 - %count%
 end
 %echo% ~%self% begins to wiggle ^%self% butt as &%self% prepares to pounce!
+* store id to prevent errors after wait
+set id %actor.id%
 wait 3 s
-nop %self.set_cooldown(12322, %timer%)%
-%echo% ~%self% lunges at ~%actor% and strikes with both front claws!
-%damage% %actor% 65 physical
-%damage% %actor% 80 physical
+if %actor.id% == %id%
+  nop %self.set_cooldown(12322, %timer%)%
+  %echo% ~%self% lunges at ~%actor% and strikes with both front claws!
+  %damage% %actor% 65 physical
+  %damage% %actor% 80 physical
+end
 ~
 $

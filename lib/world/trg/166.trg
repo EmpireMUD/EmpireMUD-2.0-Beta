@@ -615,6 +615,10 @@ if %actor.cooldown(16611)%
   nop %actor.set_cooldown(16611, 30)%
   halt
 end
+if !%MoveDir%
+  %send% %actor% That's not a valid direction.
+  halt
+end
 eval to_room %%SelfRoom.%MoveDir%(room)%%
 if !%to_room%
   %send% %actor% Sorry, you're not quite that stealthy. I think someone would notice the hole left behind.
