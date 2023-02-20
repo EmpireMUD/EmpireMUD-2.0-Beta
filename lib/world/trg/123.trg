@@ -136,6 +136,7 @@ nop %mob.remove_mob_flag(HARD)%
 nop %mob.remove_mob_flag(GROUP)%
 if %difficulty% == 1
   * Then we don't need to do anything
+  %echo% ~%self% has been set to Normal.
 elseif %difficulty% == 2
   %echo% ~%self% has been set to Hard.
   nop %mob.add_mob_flag(HARD)%
@@ -152,12 +153,12 @@ wait 1
 * send mob home
 set loc %instance.nearest_rmt(12300)%
 if %loc% && %self.room% != %loc%
-  %echo% ~%self% suddenly leaps high into the air, spreads leathery wings that were hidden under its fur, and flies off!
+  %echo% &&t&&Z~%self% suddenly leaps high into the air, spreads leathery wings that were hidden under its fur, and flies off!&&0
   mgoto %loc%
   nop %self.add_mob_flag(SENTINEL)%
   nop %instance.set_location(%loc%)%
   %regionecho% %loc% -30 You see a fur dragon fly home to its burrow at %loc.coords%!
-  %echo% ~%self% enters the burrow through the hole and blocks the entrance!
+  %echo% &&t&&Z~%self% enters the burrow through the hole and blocks the entrance!&&0
   * update desc
   if %self.varexists(type)%
     switch %self.type%
@@ -623,7 +624,7 @@ switch %difficulty%
     eval roll %random.100%
   break
 done
-%echo% ~%self% shifts as you hear growling from somewhere.
+%echo% &&t&&Z~%self% shifts as you hear growling from somewhere.&&0
 wait 3
 if %roll% > 95
   set SpawnStr a few fledgling fur dragons approach
@@ -636,7 +637,7 @@ else
   set FledglingCount 1
   set str s
 end
-%echo% Suddenly, %SpawnStr% from the corner and attack%str%!
+%echo% &&tSuddenly, %SpawnStr% from the corner and attack%str%!&&0
 while %FledglingCount%
   %load% mob 12318 ally
   eval FledglingCount %FledglingCount% - 1
@@ -661,7 +662,7 @@ Fur Dragon Combat: Itchy mother~
 if !%self.fighting%
   halt
 end
-%echo% ~%self% whines as &%self% rubs an ear against the nearest hard surface. Maybe you should scratch it?
+%echo% &&t**** &&Z~%self% whines as &%self% rubs an ear against the nearest hard surface. Maybe you should scratch it? ****&&0 (scratch)
 set person %self.room.people%
 while %person%
   if %person.varexists(FurScratching)%
@@ -684,7 +685,7 @@ while %person%
 done
 if %CountScratched% >= %PlayerCount%
   dg_affect #12319 %self% off
-  %echo% ~%self% purs in satisfaction and seems to calm down a bit.
+  %echo% &&t&&Z~%self% purs in satisfaction and seems to calm down a bit.&&0
   halt
 end
 eval buff ( %PlayerCount% - %CountScratched% ) * 10
@@ -692,7 +693,7 @@ if %self.mob_flagged(group)%
   eval buff %buff% * 2
 end
 dg_affect #12319 %self% BONUS-PHYSICAL %buff% -1
-%echo% ~%self% seems to become enraged and fights with a greater furiosity!
+%echo% &&t&&Z~%self% seems to become enraged and fights with a greater furiosity!&&0
 ~
 #12320
 Fur Dragon Combat: Scratch the ear~
@@ -724,6 +725,7 @@ if !%self.cooldown(12318)%
     eval difficulty %difficulty% + 2
   end
   %send% %actor% ~%self% doesn't seem to be itchy and &%self% returns the favor!
+  %echoaround% %actor% ~%actor% tries to scratch ~%self%, who quickly returns the favor!
   %damage% %actor% 80 physical
   eval difficulty %difficulty% * 15
   %dot% #12320 %actor% 40 %difficulty% direct 10
