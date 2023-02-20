@@ -821,9 +821,9 @@ switch %IAm%
   break
 done
 if %IAm% == unknown
-  %echo% One of the many fledglings growls as it becomes enraged!
+  %echo% &&tOne of the many fledglings growls as it becomes enraged!&&0
 else
-  %echo% The %IAm% fledgling puffs up as it becomes enraged!
+  %echo% &&tThe %IAm% fledgling puffs up as it becomes enraged!&&0
 end
 if %count% >=10 && !%self.affect(haste)%
   dg_affect %self% HASTE on -1
