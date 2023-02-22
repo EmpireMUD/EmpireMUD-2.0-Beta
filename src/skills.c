@@ -452,7 +452,13 @@ void free_skill_display_t(struct skill_display_t *list) {
 
 // level sorter for skill displays
 int sort_skill_display_by_level(struct skill_display_t *a, struct skill_display_t *b) {
-	return a->level - b->level;
+	if (a->level != b->level) {
+		return a->level - b->level;
+	}
+	else {
+		// same level
+		return strcmp(NULLSAFE(a->name_ptr), NULLSAFE(b->name_ptr));
+	}
 }
 
 
