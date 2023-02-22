@@ -424,6 +424,44 @@ int sort_sda_list(struct synergy_display_ability *a, struct synergy_display_abil
  //////////////////////////////////////////////////////////////////////////////
 //// CORE SKILL FUNCTIONS ////////////////////////////////////////////////////
 
+// for sorting the skill display
+struct skill_display_t {
+	int level;
+	char *name_ptr;	// DO NOT FREE -- only points to the name
+	char *string;	// must free this, though
+	
+	struct skill_display_t *prev, *next;	// doubly-linked list
+};
+
+
+/**
+* @param struct skill_display_t *list Frees this list of skill display lines.
+*/
+void free_skill_display_t(struct skill_display_t *list) {
+	struct skill_display_t *iter, *next;
+	
+	DL_FOREACH_SAFE(list, iter, next) {
+		if (iter->string) {
+			free(iter->string);
+		}
+		DL_DELETE(list, iter);
+		free(iter);
+	}
+}
+
+
+// level sorter for skill displays
+int sort_skill_display_by_level(struct skill_display_t *a, struct skill_display_t *b) {
+	return a->level - b->level;
+}
+
+
+// alpha sorter for skill displays
+int sort_skill_display_by_name(struct skill_display_t *a, struct skill_display_t *b) {
+	return strcmp(NULLSAFE(a->name_ptr), NULLSAFE(b->name_ptr));
+}
+
+
 /**
 * Determines how to color an ability based on its level.
 *
@@ -1168,18 +1206,29 @@ int get_ability_points_spent(char_data *ch, any_vnum skill) {
 
 
 /**
+* Builds the list of abilities for a skill as a doubly-linked list. The order
+* of this list is essentially alphabetic but with dependencies shown under
+* the parent ability. You can sort these afterwards or just display them in
+* order.
+*
+* @param struct skill_display_t **list Pointer to the list of skills we're building.
 * @param char_data *ch The character whose skills to use, and who to send to.
 * @param skill_data *skill Which skill to show.
 * @param any_vnum prereq Which ability, for dependent abilities (NO_PREREQ for base abils).
 * @param int indent How far to indent (goes up as the list goes deeper).
 * @return string the display
 */
-char *get_skill_abilities_display(char_data *ch, skill_data *skill, any_vnum prereq, int indent) {
+void get_skill_abilities_display(struct skill_display_t **list, char_data *ch, skill_data *skill, any_vnum prereq, int indent) {
 	char out[MAX_STRING_LENGTH], lbuf[MAX_STRING_LENGTH], colorize[16];
-	static char retval[MAX_STRING_LENGTH];
 	struct skill_ability *skab;
 	int ind, max_skill = 0;
 	ability_data *abil;
+	struct skill_display_t *skdat;
+	
+	if (!list || !ch || !skill) {
+		// oops no work
+		return;
+	}
 	
 	*out = '\0';
 	
@@ -1247,13 +1296,15 @@ char *get_skill_abilities_display(char_data *ch, skill_data *skill, any_vnum pre
 		}
 		
 		strcat(out, "\r\n");
+		CREATE(skdat, struct skill_display_t, 1);
+		skdat->level = skab->level;
+		skdat->name_ptr = ABIL_NAME(abil);
+		skdat->string = str_dup(out);
+		DL_APPEND(*list, skdat);
 
 		// dependencies
-		strcat(out, get_skill_abilities_display(ch, skill, skab->vnum, indent+1));
+		get_skill_abilities_display(list, ch, skill, skab->vnum, indent+1);
 	}
-	
-	strcpy(retval, out);
-	return retval;
 }
 
 
@@ -1692,6 +1743,7 @@ ACMD(do_noskill) {
 
 ACMD(do_skills) {
 	char arg[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH], lbuf[MAX_INPUT_LENGTH], outbuf[MAX_STRING_LENGTH], *ptr;
+	struct skill_display_t *skdat_list = NULL, *skdat;
 	struct synergy_display_type *sdt_list = NULL, *sdt;
 	struct synergy_display_ability *sda;
 	struct player_skill_data *skdata;
@@ -1702,6 +1754,8 @@ ACMD(do_skills) {
 	int points, level, iter;
 	empire_data *emp;
 	bool found, any, line;
+	bool sort_alpha = FALSE, sort_level = FALSE;
+	size_t size;
 	
 	half_chop(argument, arg, arg2);
 	
@@ -2021,20 +2075,44 @@ ACMD(do_skills) {
 	else {
 		sprintf(lbuf, "%s%s%s", arg, *arg2 ? " " : "", arg2);	// recombine
 		*outbuf = '\0';
+		size = 0;
 		
 		// lbuf: show abilities for 1 skill
 		skill = find_skill_by_name(lbuf);
 		if (skill) {
 			// header
-			strcat(outbuf, get_skill_row_display(ch, skill));
+			size += snprintf(outbuf + size, sizeof(outbuf) - size, "%s", get_skill_row_display(ch, skill));
 			
 			points = get_ability_points_available_for_char(ch, SKILL_VNUM(skill));
 			if (points > 0) {
-				sprintf(outbuf + strlen(outbuf), "You have %d ability point%s to spend. Type 'skill buy <ability>' to purchase a new ability.\r\n", points, (points != 1 ? "s" : ""));
+				size += snprintf(outbuf + size, sizeof(outbuf) - size, "You have %d ability point%s to spend. Type 'skill buy <ability>' to purchase a new ability.\r\n", points, (points != 1 ? "s" : ""));
 			}
 			
 			// list
-			strcat(outbuf, get_skill_abilities_display(ch, skill, NO_PREREQ, 1));
+			get_skill_abilities_display(&skdat_list, ch, skill, NO_PREREQ, 1);
+			
+			// sort if needed?
+			if (sort_level) {
+				DL_SORT(skdat_list, sort_skill_display_by_level);
+			}
+			else if (sort_alpha) {
+				DL_SORT(skdat_list, sort_skill_display_by_name);
+			}
+			
+			// build display
+			DL_FOREACH(skdat_list, skdat) {
+				if (skdat->string && strlen(skdat->string) + size < sizeof(outbuf)) {
+					strcat(outbuf, skdat->string);
+					size += strlen(skdat->string);
+				}
+				else {
+					size += snprintf(outbuf + size, sizeof(outbuf) - size, "OVERFLOW\r\n");
+					break;
+				}
+			}
+			
+			free_skill_display_t(skdat_list);
+			skdat_list = NULL;
 			
 			page_string(ch->desc, outbuf, 1);
 		}
