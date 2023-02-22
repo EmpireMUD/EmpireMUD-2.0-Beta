@@ -1221,7 +1221,7 @@ int get_ability_points_spent(char_data *ch, any_vnum skill) {
 * @param char_data *ch The character whose skills to use, and who to send to.
 * @param skill_data *skill Which skill to show.
 * @param any_vnum prereq Which ability, for dependent abilities (NO_PREREQ for base abils).
-* @param int indent How far to indent (goes up as the list goes deeper).
+* @param int indent How far to indent (goes up as the list goes deeper); use -1 for do-not-indent.
 * @return string the display
 */
 void get_skill_abilities_display(struct skill_display_t **list, char_data *ch, skill_data *skill, any_vnum prereq, int indent) {
@@ -1247,10 +1247,12 @@ void get_skill_abilities_display(struct skill_display_t **list, char_data *ch, s
 		*out = '\0';
 		
 		// indent
-		for (ind = 0; ind < (2 * indent); ++ind) {
-			lbuf[ind] = ' ';
+		if (indent != -1) {
+			for (ind = 0; ind < (2 * indent); ++ind) {
+				lbuf[ind] = ' ';
+			}
+			lbuf[2 * indent] = '\0';
 		}
-		lbuf[2 * indent] = '\0';
 		
 		if (prereq != NO_PREREQ) {
 			strcat(lbuf, "+ ");
@@ -1309,7 +1311,7 @@ void get_skill_abilities_display(struct skill_display_t **list, char_data *ch, s
 		DL_APPEND(*list, skdat);
 
 		// dependencies
-		get_skill_abilities_display(list, ch, skill, skab->vnum, indent+1);
+		get_skill_abilities_display(list, ch, skill, skab->vnum, indent == -1 ? indent : (indent+1));
 	}
 }
 
@@ -2088,7 +2090,7 @@ ACMD(do_skills) {
 			}
 			
 			// list
-			get_skill_abilities_display(&skdat_list, ch, skill, NO_PREREQ, 1);
+			get_skill_abilities_display(&skdat_list, ch, skill, NO_PREREQ, (sort_level || sort_alpha) ? -1 : 1);
 			
 			// sort if needed?
 			if (sort_level) {
