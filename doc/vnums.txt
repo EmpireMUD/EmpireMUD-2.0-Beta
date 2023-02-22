@@ -63,8 +63,8 @@ blocks that are currently in use.
 9200      |
 9300      |
 9400      V
-9500
-9600
+9500  General combat scripts
+9600  More combat scripts
 9700
 9800
 9900  Miscellaneous minipets and summoner items
