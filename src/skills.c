@@ -1214,12 +1214,17 @@ char *get_skill_abilities_display(char_data *ch, skill_data *skill, any_vnum pre
 		// get the proper color for this ability
 		strcpy(colorize, ability_color(ch, abil));
 		
-		sprintf(out + strlen(out), "%s(%s) %s%s\t0 [%d-%d]", lbuf, (has_ability(ch, ABIL_VNUM(abil)) ? "x" : " "), colorize, ABIL_NAME(abil), skab->level, max_skill);
+		if (PRF_FLAGGED(ch, PRF_SCREEN_READER)) {
+			sprintf(out + strlen(out), "%s %s%s\t0 - %s, %d-%d", lbuf, colorize, ABIL_NAME(abil), (has_ability(ch, ABIL_VNUM(abil)) ? "purchased" : "unknown"), skab->level, max_skill);
+		}
+		else {	// non-screenreader
+			sprintf(out + strlen(out), "%s(%s) %s%s\t0 [%d-%d]", lbuf, (has_ability(ch, ABIL_VNUM(abil)) ? "x" : " "), colorize, ABIL_NAME(abil), skab->level, max_skill);
+		}
 		
 		if (has_ability(ch, ABIL_VNUM(abil))) {
 			// this is kind of a hack to quickly make sure you can still use the ability
 			if (levels_gained_from_ability(ch, abil) < GAINS_PER_ABILITY && !strcmp(colorize, "\ty")) {
-				sprintf(out + strlen(out), " %d/%d skill points gained", levels_gained_from_ability(ch, abil), GAINS_PER_ABILITY);
+				sprintf(out + strlen(out), "%s %d/%d skill levels gained", (PRF_FLAGGED(ch, PRF_SCREEN_READER) ? "," : ""), levels_gained_from_ability(ch, abil), GAINS_PER_ABILITY);
 			}
 			else {
 				strcat(out, " (max)");
@@ -1230,10 +1235,10 @@ char *get_skill_abilities_display(char_data *ch, skill_data *skill, any_vnum pre
 			// we check that the parent skill exists first, since this reports it
 			
 			if (skab->prerequisite != NO_PREREQ && !has_ability(ch, skab->prerequisite)) {
-				sprintf(out + strlen(out), " requires %s", get_ability_name_by_vnum(skab->prerequisite));
+				sprintf(out + strlen(out), "%s requires %s", (PRF_FLAGGED(ch, PRF_SCREEN_READER) ? "," : ""), get_ability_name_by_vnum(skab->prerequisite));
 			}
 			else if (get_skill_level(ch, SKILL_VNUM(skill)) < skab->level) {
-				sprintf(out + strlen(out), " requires %s %d", SKILL_NAME(skill), skab->level);
+				sprintf(out + strlen(out), "%s requires %s %d", (PRF_FLAGGED(ch, PRF_SCREEN_READER) ? "," : ""), SKILL_NAME(skill), skab->level);
 			}
 			else {
 				strcat(out, " unpurchased");
