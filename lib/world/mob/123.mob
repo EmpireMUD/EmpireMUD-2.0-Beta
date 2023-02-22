@@ -4,7 +4,7 @@ the fur dragon~
 An enormous fur dragon is stalking low to the ground.
 ~
 225 325 dghk choCD 6
-0 0 9 10
+0 0 9 10 -1
 D
    This tremendous brown creature is undoubtedly a dragon, but its scales are
 covered with fur from snout to tail. If it can fly, you don't see where the
@@ -47,7 +47,7 @@ a flying fur dragon~
 A fur dragon is flying overhead.
 ~
 100 300 dej m 5
-0 0 2 9
+0 0 2 9 -1
 D
    Though it's on the small side for a dragon, this vicious fluffy creature is
 easily large enough to carry you on its back. When it lands, its thick fur and
@@ -61,7 +61,7 @@ a tiny fur dragon~
 A tiny fur dragon is running back and forth.
 ~
 1 1 bdo n 3
-0 0 11 9
+0 0 11 9 -1
 D
    This adorable creature, called Dracofelis by the erudite sorcerers who study
 it, is a fur dragon. It has the wide jaws and cunning mind of a dragon, but
@@ -104,7 +104,7 @@ a furry drake~
 A furry drake is stalking back and forth. (familiar)
 ~
 100 0 dozG cfmG 4
-0 0 2 9
+0 0 2 9 -1
 D
    The drake is like a small dragon. Perhaps not as smart as a true dragon, it
 is nevertheless formidable in combat and voracious after each victory. It seems
@@ -117,8 +117,8 @@ fledgling furry~
 a furry fledgling~
 A furry fledgling gambles about here.
 ~
-225 325 abdhozD 0 2
-0 0 9 9
+225 325 abdhoD 0 2
+0 0 9 9 -1
 D
 It looks like the fur dragon has had kittens, and boy are they sharp!
 ~

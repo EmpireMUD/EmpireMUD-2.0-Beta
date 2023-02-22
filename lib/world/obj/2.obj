@@ -212,9 +212,11 @@ A letheian icon is lying on the ground.~
 different set of abilities for that skill tree. Type 'use icon Skill Name' to
 gain the reset, then 'skill reset Skill Name' to use it.
 ~
-3 0 a 0 3
+3 0 a 0 4
 0 0 0
 0 0
+C
+1 1
 T 263
 S
 $

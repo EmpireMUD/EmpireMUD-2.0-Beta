@@ -640,9 +640,11 @@ end
 %echo% &&tSuddenly, %SpawnStr% from the corner and attack%str%!&&0
 while %FledglingCount%
   %load% mob 12318 ally
+  set CoolOff %self.room.people%
+  nop %CoolOff.set_cooldown(12321, 90)%
   eval FledglingCount %FledglingCount% - 1
 done
-eval timer 60 - %difficulty% * 10
+eval timer 80 - %difficulty% * 10
 nop %self.set_cooldown(12317, %timer%)%
 ~
 #12318
@@ -740,6 +742,9 @@ remote FurScratching %actor.id%
 Fur Dragon Combat: Buff the baby fur dragon~
 0 b 30
 ~
+if %self.cooldown(12321)%
+  halt
+end
 if !%self.fighting%
   %echo% ~%self% hisses and vanishes in a puff of fur!
   %purge% %self%
@@ -825,11 +830,12 @@ if %IAm% == unknown
 else
   %echo% &&tThe %IAm% fledgling puffs up as it becomes enraged!&&0
 end
-if %count% >=10 && !%self.affect(haste)%
+if %count% >=10 && !%self.aff_flagged(haste)%
   dg_affect %self% HASTE on -1
 end
 eval count %count% * 5
 dg_affect #12319 %self% BONUS-PHYSICAL %count% -1
+nop %self.set_cooldown(12321, 90)%
 ~
 #12322
 Fur Dragon Combat: pounce~
