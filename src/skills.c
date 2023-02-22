@@ -1230,8 +1230,6 @@ void get_skill_abilities_display(struct skill_display_t **list, char_data *ch, s
 		return;
 	}
 	
-	*out = '\0';
-	
 	LL_FOREACH(SKILL_ABILITIES(skill), skab) {
 		if (skab->prerequisite != prereq) {
 			continue;
@@ -1239,6 +1237,8 @@ void get_skill_abilities_display(struct skill_display_t **list, char_data *ch, s
 		if (!(abil = find_ability_by_vnum(skab->vnum))) {
 			continue;
 		}
+		
+		*out = '\0';
 		
 		// indent
 		for (ind = 0; ind < (2 * indent); ++ind) {
