@@ -1215,7 +1215,7 @@ char *get_skill_abilities_display(char_data *ch, skill_data *skill, any_vnum pre
 		strcpy(colorize, ability_color(ch, abil));
 		
 		if (PRF_FLAGGED(ch, PRF_SCREEN_READER)) {
-			sprintf(out + strlen(out), "%s%s%s\t0 - %d-%d, %s", lbuf, colorize, ABIL_NAME(abil), skab->level, max_skill, (has_ability(ch, ABIL_VNUM(abil)) ? "unpurchased" : "unknown"));
+			sprintf(out + strlen(out), "%s%s%s\t0 - %d-%d, %s", lbuf, colorize, ABIL_NAME(abil), skab->level, max_skill, (has_ability(ch, ABIL_VNUM(abil)) ? (skab->level == 0 ? "free" : "purchased") : "unknown"));
 		}
 		else {	// non-screenreader
 			sprintf(out + strlen(out), "%s(%s) %s%s\t0 [%d-%d]", lbuf, (has_ability(ch, ABIL_VNUM(abil)) ? "x" : " "), colorize, ABIL_NAME(abil), skab->level, max_skill);
