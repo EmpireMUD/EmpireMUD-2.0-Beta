@@ -1367,19 +1367,19 @@ char *get_skill_gain_display(char_data *ch) {
 char *get_skill_row_display(char_data *ch, skill_data *skill) {
 	static char out[MAX_STRING_LENGTH];
 	struct player_skill_data *skdata;
-	char exp[256];
+	char experience[256];
 	int points = get_ability_points_available_for_char(ch, SKILL_VNUM(skill));
 	
 	skdata = get_skill_data(ch, SKILL_VNUM(skill), FALSE);
 	
 	if (skdata && !skdata->noskill && !IS_ANY_SKILL_CAP(ch, SKILL_VNUM(skill))) {
-		sprintf(exp, ", %.1f%% exp", skdata->exp);
+		sprintf(experience, ", %.1f%% exp", skdata->exp);
 	}
 	else {
-		*exp = '\0';
+		*experience = '\0';
 	}
 	
-	sprintf(out, "[%3d] %s%s\t0%s (%s%s) - %s\r\n", (skdata ? skdata->level : 0), IS_ANY_SKILL_CAP(ch, SKILL_VNUM(skill)) ? "\tg" : "\ty", SKILL_NAME(skill), (points > 0 ? "*" : ""), IS_ANY_SKILL_CAP(ch, SKILL_VNUM(skill)) ? "\tymax\t0" : ((skdata && skdata->noskill) ? "\trnoskill\t0" : "\tcgaining\t0"), exp, SKILL_DESC(skill));
+	sprintf(out, "[%3d] %s%s\t0 (%s%s%s) - %s\r\n", (skdata ? skdata->level : 0), IS_ANY_SKILL_CAP(ch, SKILL_VNUM(skill)) ? "\tg" : "\ty", SKILL_NAME(skill), IS_ANY_SKILL_CAP(ch, SKILL_VNUM(skill)) ? "\tymax\t0" : ((skdata && skdata->noskill) ? "\trnoskill\t0" : "\tcgaining\t0"), experience, (points > 0 ? ", points available" : ""), SKILL_DESC(skill));
 	return out;
 }
 
@@ -1769,7 +1769,6 @@ ACMD(do_skills) {
 		
 		// no argument? list all
 		sprintf(outbuf + strlen(outbuf), "You know the following skills (skill level %d):\r\n", GET_SKILL_LEVEL(ch));
-		found = FALSE;
 		HASH_ITER(sorted_hh, sorted_skills, skill, next_skill) {
 			if (SKILL_FLAGGED(skill, SKILLF_IN_DEVELOPMENT)) {
 				continue;
@@ -1779,14 +1778,8 @@ ACMD(do_skills) {
 			}
 			
 			strcat(outbuf, get_skill_row_display(ch, skill));
-			if (!found && get_ability_points_available_for_char(ch, SKILL_VNUM(skill)) > 0) {
-				found = TRUE;
-			}
 		}
 		
-		if (found) {
-			strcat(outbuf, "* You have ability points available to spend.\r\n");
-		}
 		strcat(outbuf, get_skill_gain_display(ch));
 		
 		page_string(ch->desc, outbuf, 1);
