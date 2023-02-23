@@ -1222,9 +1222,11 @@ int get_ability_points_spent(char_data *ch, any_vnum skill) {
 * @param skill_data *skill Which skill to show.
 * @param any_vnum prereq Which ability, for dependent abilities (NO_PREREQ for base abils).
 * @param int indent How far to indent (goes up as the list goes deeper); use -1 for do-not-indent.
+* @param int min_level Optional: Don't show skills below this level (-1 for no minimum).
+* @param int max_level Optional: Don't show skills above this level (-1 for no maximum).
 * @return string the display
 */
-void get_skill_abilities_display(struct skill_display_t **list, char_data *ch, skill_data *skill, any_vnum prereq, int indent) {
+void get_skill_abilities_display(struct skill_display_t **list, char_data *ch, skill_data *skill, any_vnum prereq, int indent, int min_level, int max_level) {
 	char out[MAX_STRING_LENGTH], lbuf[MAX_STRING_LENGTH], colorize[16];
 	struct skill_ability *skab;
 	int ind, max_skill = 0;
@@ -1311,7 +1313,7 @@ void get_skill_abilities_display(struct skill_display_t **list, char_data *ch, s
 		DL_APPEND(*list, skdat);
 
 		// dependencies
-		get_skill_abilities_display(list, ch, skill, skab->vnum, indent == -1 ? indent : (indent+1));
+		get_skill_abilities_display(list, ch, skill, skab->vnum, indent == -1 ? indent : (indent+1), min_level, max_level);
 	}
 }
 
@@ -1751,6 +1753,7 @@ ACMD(do_noskill) {
 
 ACMD(do_skills) {
 	char arg[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH], lbuf[MAX_INPUT_LENGTH], outbuf[MAX_STRING_LENGTH], *ptr;
+	char new_arg[MAX_INPUT_LENGTH];
 	struct skill_display_t *skdat_list = NULL, *skdat;
 	struct synergy_display_type *sdt_list = NULL, *sdt;
 	struct synergy_display_ability *sda;
@@ -1762,8 +1765,119 @@ ACMD(do_skills) {
 	int points, level, iter;
 	empire_data *emp;
 	bool found, any, line;
-	bool sort_alpha = FALSE, sort_level = FALSE;
+	bool sort_alpha = FALSE, sort_level = FALSE, want_min = FALSE, want_max = FALSE;
+	int min_level = -1, max_level = -1;
 	size_t size;
+	
+	// attempt to parse the args first, to get -l [range] or -a
+	if (*argument) {
+		// will remove any requests/flags and leave the rest of the arg in new_arg
+		*new_arg = '\0';
+		while (*argument) {
+			argument = any_one_word(argument, arg);
+			if (want_min && isdigit(*arg)) {
+				min_level = atoi(arg);
+				want_min = FALSE;
+				
+				// look for max, too
+				want_max = FALSE;
+				
+				// look for maximum
+				for (iter = 0; arg[iter]; ++iter) {
+					if (isdigit(arg[iter]) && !want_max) {
+						// skipping levels
+					}
+					else if (isdigit(arg[iter]) && want_max) {
+						max_level = atoi(arg + iter);
+						want_max = FALSE;
+					}
+					else if (arg[iter] == '-' || arg[iter] == ':') {
+						// level divider
+						want_max = TRUE;
+					}
+					else {
+						// found something else?
+						msg_to_char(ch, "Usage: skills [name] -l <level range>\r\n");
+						return;
+					}
+				}
+				
+				// did we find a max? if not, ask for it in the next arg
+				if (want_max == -1) {
+					want_max = TRUE;
+				}
+			}
+			else if (want_max && isdigit(*arg)) {
+				max_level = atoi(arg);
+				want_max = FALSE;
+			}
+			else if (!strn_cmp(arg, "-l", 2)) {
+				sort_level = TRUE;
+				
+				// check for possible min/max level: find start pos
+				if (!strn_cmp(arg, "-level", 6)) {
+					iter = 6;
+				}
+				else if (!strn_cmp(arg, "-lev", 4)) {
+					iter = 4;
+				}
+				else {
+					iter = 2;
+				}
+				
+				// look for levels here
+				if (iter > strlen(arg) || !arg[iter]) {
+					// no level -- free to continue, but look for levels in the next arg
+					want_min = want_max = TRUE;
+				}
+				else if (!isdigit(arg[iter])) {
+					// unexpected
+					msg_to_char(ch, "Usage: skills [name] -l <level range>\r\n");
+					return;
+				}
+				else {
+					// found a probably minimum
+					min_level = atoi(arg+iter);
+					want_min = want_max = FALSE;
+					
+					// look for maximum
+					for (; arg[iter]; ++iter) {
+						if (isdigit(arg[iter]) && !want_max) {
+							// skipping levels
+						}
+						else if (isdigit(arg[iter]) && want_max) {
+							max_level = atoi(arg + iter);
+							want_max = FALSE;
+						}
+						else if (arg[iter] == '-' || arg[iter] == ':') {
+							// level divider
+							want_max = TRUE;
+						}
+						else {
+							// found something else?
+							msg_to_char(ch, "Usage: skills [name] -l <level range>\r\n");
+							return;
+						}
+					}
+					
+					// did we find a max? if not, ask for it in the next arg
+					if (want_max == -1) {
+						want_max = TRUE;
+					}
+				}
+			}
+			else if (is_abbrev(arg, "-alphabetical")) {
+				sort_alpha = TRUE;
+			}
+			else {
+				// apply it to new_arg instead: length OK because it cannot get LONGER than max-input-length when removing
+				sprintf(new_arg + strlen(new_arg), "%s%s", (*new_arg ? " " : ""), arg);
+			}
+		}
+		
+		// and keep only new_arg
+		argument = new_arg;
+	}
 	
 	half_chop(argument, arg, arg2);
 	
@@ -1772,6 +1886,7 @@ ACMD(do_skills) {
 		return;
 	}
 	
+	// mode based on args
 	if (!*arg) {
 		*outbuf = '\0';
 		
@@ -2090,7 +2205,7 @@ ACMD(do_skills) {
 			}
 			
 			// list
-			get_skill_abilities_display(&skdat_list, ch, skill, NO_PREREQ, (sort_level || sort_alpha) ? -1 : 1);
+			get_skill_abilities_display(&skdat_list, ch, skill, NO_PREREQ, (sort_level || sort_alpha || max_level != -1 || min_level != -1) ? -1 : 1, min_level, max_level);
 			
 			// sort if needed?
 			if (sort_level) {
@@ -2102,6 +2217,14 @@ ACMD(do_skills) {
 			
 			// build display
 			DL_FOREACH(skdat_list, skdat) {
+				if (min_level != -1 && skdat->level < min_level) {
+					continue;
+				}
+				if (max_level != -1 && skdat->level > max_level) {
+					continue;
+				}
+				
+				// show it
 				if (skdat->string && strlen(skdat->string) + size < sizeof(outbuf)) {
 					strcat(outbuf, skdat->string);
 					size += strlen(skdat->string);
