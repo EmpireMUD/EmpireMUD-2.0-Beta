@@ -1753,7 +1753,7 @@ ACMD(do_noskill) {
 
 // this is also do_ability/do_abilities
 ACMD(do_skills) {
-	char arg[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH], lbuf[MAX_INPUT_LENGTH], outbuf[MAX_STRING_LENGTH], *ptr;
+	char arg[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH], lbuf[MAX_STRING_LENGTH], sbuf[MAX_STRING_LENGTH], outbuf[MAX_STRING_LENGTH], *ptr;
 	char new_arg[MAX_INPUT_LENGTH], whole_arg[MAX_INPUT_LENGTH];
 	struct skill_display_t *skdat_list = NULL, *skdat;
 	struct synergy_display_type *sdt_list = NULL, *sdt;
@@ -1763,12 +1763,12 @@ ACMD(do_skills) {
 	struct synergy_ability *syn;
 	struct skill_ability *skab;
 	ability_data *abil;
-	int points, level, iter;
+	int points, level, iter, count;
 	empire_data *emp;
 	bool found, any, line;
 	bool sort_alpha = FALSE, sort_level = FALSE, want_min = FALSE, want_max = FALSE;
 	int min_level = -1, max_level = -1;
-	size_t size;
+	size_t size, l_size;
 	
 	// attempt to parse the args first, to get -l [range] or -a
 	if (*argument) {
@@ -1959,7 +1959,9 @@ ACMD(do_skills) {
 		if (size < sizeof(outbuf)) {
 			size += snprintf(outbuf + size, sizeof(outbuf) - size, "%s", get_skill_gain_display(ch));
 		}
-		page_string(ch->desc, outbuf, TRUE);
+		if (ch->desc) {
+			page_string(ch->desc, outbuf, TRUE);
+		}
 	}
 	else if (!str_cmp(arg, "buy")) {
 		// purchase
@@ -2289,11 +2291,48 @@ ACMD(do_skills) {
 		free_skill_display_t(skdat_list);
 		skdat_list = NULL;
 		
-		page_string(ch->desc, outbuf, 1);
+		if (ch->desc) {
+			page_string(ch->desc, outbuf, 1);
+		}
 	}
 	else if ((abil = find_ability_by_name(whole_arg))) {
 		// show 1 ability detail
 		size = snprintf(outbuf, sizeof(outbuf), "%s%s\t0:\r\n", ability_color(ch, abil), ABIL_NAME(abil));
+		
+		if (ABIL_ASSIGNED_SKILL(abil)) {
+			size += snprintf(outbuf + size, sizeof(outbuf) - size, "%sSkill: %s %d\t0\r\n", (get_skill_level(ch, SKILL_VNUM(ABIL_ASSIGNED_SKILL(abil))) >= ABIL_SKILL_LEVEL(abil)) ? "\t0" : "\tr", SKILL_ABBREV(ABIL_ASSIGNED_SKILL(abil)), ABIL_SKILL_LEVEL(abil));
+		}
+		
+		// assigned roles/synergies
+		count = 0;
+		l_size = 0;
+		*lbuf = '\0';
+		HASH_ITER(hh, skill_table, skill, next_skill) {
+			LL_FOREACH(SKILL_SYNERGIES(skill), syn) {
+				if (syn->ability == ABIL_VNUM(abil)) {
+					snprintf(sbuf, sizeof(sbuf), "%s%s %d + %s %d (%s)\t0", class_role_color[syn->role], SKILL_NAME(skill), SKILL_MAX_LEVEL(skill), get_skill_name_by_vnum(syn->skill), syn->level, class_role[syn->role]);
+					if (strlen(sbuf) > 83) {
+						// too long for half a line
+						l_size += snprintf(lbuf + l_size, sizeof(lbuf) - l_size, "%s %s\r\n", (!(++count % 2) ? "\r\n" : " "), sbuf);
+						if (count % 2) {
+							++count;	// fix columns for the next line, if any
+						}
+					}
+					else {
+						l_size += snprintf(lbuf + l_size, sizeof(lbuf) - l_size, " %-41.41s%s", sbuf, (!(++count % 2) ? "\r\n" : " "));
+					}
+				}
+			}
+		}
+		if (*lbuf) {
+			size += snprintf(outbuf + size, sizeof(outbuf) - size, "Synergies:\r\n%s%s", lbuf, (!(++count % 2) ? "\r\n" : " "));
+		}
+		
+		// types?
+		
+		if (ch->desc) {
+			page_string(ch->desc, outbuf, 1);
+		}
 	}
 	else {
 		msg_to_char(ch, "No such skill or ability.\r\n");
