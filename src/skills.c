@@ -1888,8 +1888,7 @@ ACMD(do_skills) {
 	
 	// mode based on args
 	if (!*arg) {
-		*outbuf = '\0';
-		
+		// no argument? list all
 		if (min_level != -1 && max_level != -1) {
 			sprintf(lbuf, "level %d-%d", min_level, max_level);
 		}
@@ -1900,28 +1899,64 @@ ACMD(do_skills) {
 			sprintf(lbuf, "(skill level %d)", GET_SKILL_LEVEL(ch));
 		}
 		
-		// no argument? list all
-		sprintf(outbuf + strlen(outbuf), "You know the following skills %s:\r\n", lbuf);
+		// start string
+		size = snprintf(outbuf, sizeof(outbuf), "You know the following skills %s:\r\n", lbuf);
+		
 		HASH_ITER(sorted_hh, sorted_skills, skill, next_skill) {
 			if (SKILL_FLAGGED(skill, SKILLF_IN_DEVELOPMENT)) {
 				continue;
 			}
-			if (min_level != -1 && get_skill_level(ch, SKILL_VNUM(skill)) < min_level) {
+			level = get_skill_level(ch, SKILL_VNUM(skill));
+			if (min_level != -1 && level < min_level) {
 				continue;
 			}
-			if (max_level != -1 && get_skill_level(ch, SKILL_VNUM(skill)) > max_level) {
+			if (max_level != -1 && level > max_level) {
 				continue;
 			}
-			if (!SKILL_FLAGGED(skill, SKILLF_BASIC) && get_skill_level(ch, SKILL_VNUM(skill)) < 1 && get_skill_exp(ch, SKILL_VNUM(skill)) < 0.1) {
+			if (!SKILL_FLAGGED(skill, SKILLF_BASIC) && level < 1 && get_skill_exp(ch, SKILL_VNUM(skill)) < 0.1) {
 				continue;	// don't show non-basic skills if the player doesn't have them
 			}
 			
-			strcat(outbuf, get_skill_row_display(ch, skill));
+			// add to data
+			CREATE(skdat, struct skill_display_t, 1);
+			skdat->level = level;
+			skdat->name_ptr = SKILL_NAME(skill);
+			skdat->string = str_dup(get_skill_row_display(ch, skill));
+			DL_APPEND(skdat_list, skdat);
 		}
 		
-		strcat(outbuf, get_skill_gain_display(ch));
+		// sort if needed?
+		if (sort_level) {
+			DL_SORT(skdat_list, sort_skill_display_by_level);
+		}
+		else if (sort_alpha) {
+			DL_SORT(skdat_list, sort_skill_display_by_name);
+		}
 		
-		page_string(ch->desc, outbuf, 1);
+		// build display
+		any = FALSE;
+		DL_FOREACH(skdat_list, skdat) {
+			any = TRUE;
+			if (skdat->string && strlen(skdat->string) + size < sizeof(outbuf)) {
+				strcat(outbuf, skdat->string);
+				size += strlen(skdat->string);
+			}
+			else {
+				size += snprintf(outbuf + size, sizeof(outbuf) - size, "OVERFLOW\r\n");
+				break;
+			}
+		}
+		
+		free_skill_display_t(skdat_list);
+		skdat_list = NULL;
+		
+		if (!any) {
+			size += snprintf(outbuf + size, sizeof(outbuf) - size, " none\r\n");
+		}
+		if (size < sizeof(outbuf)) {
+			size += snprintf(outbuf + size, sizeof(outbuf) - size, "%s", get_skill_gain_display(ch));
+		}
+		page_string(ch->desc, outbuf, TRUE);
 	}
 	else if (!str_cmp(arg, "buy")) {
 		// purchase
