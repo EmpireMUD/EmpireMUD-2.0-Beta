@@ -1751,9 +1751,10 @@ ACMD(do_noskill) {
 }
 
 
+// this is also do_ability/do_abilities
 ACMD(do_skills) {
 	char arg[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH], lbuf[MAX_INPUT_LENGTH], outbuf[MAX_STRING_LENGTH], *ptr;
-	char new_arg[MAX_INPUT_LENGTH];
+	char new_arg[MAX_INPUT_LENGTH], whole_arg[MAX_INPUT_LENGTH];
 	struct skill_display_t *skdat_list = NULL, *skdat;
 	struct synergy_display_type *sdt_list = NULL, *sdt;
 	struct synergy_display_ability *sda;
@@ -1877,8 +1878,10 @@ ACMD(do_skills) {
 		
 		// and keep only new_arg
 		argument = new_arg;
-	}
+	}	// end basic argument parsing
 	
+	argument = trim(argument);
+	strcpy(whole_arg, argument);
 	half_chop(argument, arg, arg2);
 	
 	if (IS_NPC(ch)) {
@@ -2239,61 +2242,61 @@ ACMD(do_skills) {
 			resort_empires(FALSE);
 		}
 	}
-	else {
-		sprintf(lbuf, "%s%s%s", arg, *arg2 ? " " : "", arg2);	// recombine
+	else if ((skill = find_skill_by_name(whole_arg)) && (!SKILL_FLAGGED(skill, SKILLF_IN_DEVELOPMENT) || IS_IMMORTAL(ch))) {
+		// show 1 skill's details
 		*outbuf = '\0';
 		size = 0;
 		
-		// lbuf: show abilities for 1 skill
-		skill = find_skill_by_name(lbuf);
-		if (skill) {
-			// header
-			size += snprintf(outbuf + size, sizeof(outbuf) - size, "%s", get_skill_row_display(ch, skill));
-			
-			points = get_ability_points_available_for_char(ch, SKILL_VNUM(skill));
-			if (points > 0) {
-				size += snprintf(outbuf + size, sizeof(outbuf) - size, "You have %d ability point%s to spend. Type 'skill buy <ability>' to purchase a new ability.\r\n", points, (points != 1 ? "s" : ""));
-			}
-			
-			// list
-			get_skill_abilities_display(&skdat_list, ch, skill, NO_PREREQ, (sort_level || sort_alpha || max_level != -1 || min_level != -1) ? -1 : 1, min_level, max_level);
-			
-			// sort if needed?
-			if (sort_level) {
-				DL_SORT(skdat_list, sort_skill_display_by_level);
-			}
-			else if (sort_alpha) {
-				DL_SORT(skdat_list, sort_skill_display_by_name);
-			}
-			
-			// build display
-			DL_FOREACH(skdat_list, skdat) {
-				if (min_level != -1 && skdat->level < min_level) {
-					continue;
-				}
-				if (max_level != -1 && skdat->level > max_level) {
-					continue;
-				}
-				
-				// show it
-				if (skdat->string && strlen(skdat->string) + size < sizeof(outbuf)) {
-					strcat(outbuf, skdat->string);
-					size += strlen(skdat->string);
-				}
-				else {
-					size += snprintf(outbuf + size, sizeof(outbuf) - size, "OVERFLOW\r\n");
-					break;
-				}
-			}
-			
-			free_skill_display_t(skdat_list);
-			skdat_list = NULL;
-			
-			page_string(ch->desc, outbuf, 1);
+		// header
+		size += snprintf(outbuf + size, sizeof(outbuf) - size, "%s", get_skill_row_display(ch, skill));
+		
+		points = get_ability_points_available_for_char(ch, SKILL_VNUM(skill));
+		if (points > 0) {
+			size += snprintf(outbuf + size, sizeof(outbuf) - size, "You have %d ability point%s to spend. Type 'skill buy <ability>' to purchase a new ability.\r\n", points, (points != 1 ? "s" : ""));
 		}
-		else {
-			msg_to_char(ch, "No such skill.\r\n");
+		
+		// list
+		get_skill_abilities_display(&skdat_list, ch, skill, NO_PREREQ, (sort_level || sort_alpha || max_level != -1 || min_level != -1) ? -1 : 1, min_level, max_level);
+		
+		// sort if needed?
+		if (sort_level) {
+			DL_SORT(skdat_list, sort_skill_display_by_level);
 		}
+		else if (sort_alpha) {
+			DL_SORT(skdat_list, sort_skill_display_by_name);
+		}
+		
+		// build display
+		DL_FOREACH(skdat_list, skdat) {
+			if (min_level != -1 && skdat->level < min_level) {
+				continue;
+			}
+			if (max_level != -1 && skdat->level > max_level) {
+				continue;
+			}
+			
+			// show it
+			if (skdat->string && strlen(skdat->string) + size < sizeof(outbuf)) {
+				strcat(outbuf, skdat->string);
+				size += strlen(skdat->string);
+			}
+			else {
+				size += snprintf(outbuf + size, sizeof(outbuf) - size, "OVERFLOW\r\n");
+				break;
+			}
+		}
+		
+		free_skill_display_t(skdat_list);
+		skdat_list = NULL;
+		
+		page_string(ch->desc, outbuf, 1);
+	}
+	else if ((abil = find_ability_by_name(whole_arg))) {
+		// show 1 ability detail
+		size = snprintf(outbuf, sizeof(outbuf), "%s%s\t0:\r\n", ability_color(ch, abil), ABIL_NAME(abil));
+	}
+	else {
+		msg_to_char(ch, "No such skill or ability.\r\n");
 	}
 }
 

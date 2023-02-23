@@ -528,7 +528,7 @@ See also: APPROACH, USE
 SKILL SKILLS ABILITY ABILITIES "SKILL BUY" "SKILL RESET" "SKILL LEVELS"
 
 Usage:  skills -- list all skills
-        skill <name> -- see abilities in that skill
+        skill <name> -- see details about a skill or ability
         skill buy <ability> -- purchase an ability
         skill reset <skill> -- reset your ability points
         skill drop <skill> <level> -- lose skill levels
@@ -546,7 +546,8 @@ If you specify a skill, you'll see a breakdown of the abilities in that skill
 tree. Abilities marked with an "x" are the ones you already know. To buy a new
 ability, use "skill buy". You must have a free ability point to do this.
 
-For more information, see the help page for each skill or ability.
+If you specify an ability, you will see information about that ability. For
+more information, see the help page for each skill or ability.
 
 When you hit a skill cap level (50, 75, 100) you get to reset your abilities
 in that skill. To do that, you can type "skill reset <skill>". If you type it
