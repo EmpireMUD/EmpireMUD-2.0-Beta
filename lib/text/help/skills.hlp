@@ -535,6 +535,10 @@ Usage:  skills -- list all skills
         skill synergy <skill 1> <skill 2> -- see list of synergy abilities
         skill swap
 
+Sorting: skill -level [name]
+         skill -level [min-max] [name]
+         skill -alpha [name]
+
 This multi-purpose command helps you understand your skills. It shows your
 progress in each skill, and the ability points you've earned.
 
