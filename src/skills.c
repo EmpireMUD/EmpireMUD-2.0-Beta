@@ -1803,7 +1803,7 @@ ACMD(do_skills) {
 				}
 				
 				// did we find a max? if not, ask for it in the next arg
-				if (want_max == -1) {
+				if (max_level == -1) {
 					want_max = TRUE;
 				}
 			}
@@ -1861,7 +1861,7 @@ ACMD(do_skills) {
 					}
 					
 					// did we find a max? if not, ask for it in the next arg
-					if (want_max == -1) {
+					if (max_level == -1) {
 						want_max = TRUE;
 					}
 				}
