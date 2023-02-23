@@ -1246,7 +1246,7 @@ void get_skill_abilities_display(struct skill_display_t **list, char_data *ch, s
 			continue;
 		}
 		
-		*out = '\0';
+		*out = *lbuf ='\0';
 		
 		// indent
 		if (indent != -1) {
@@ -1256,7 +1256,7 @@ void get_skill_abilities_display(struct skill_display_t **list, char_data *ch, s
 			lbuf[2 * indent] = '\0';
 		}
 		
-		if (prereq != NO_PREREQ) {
+		if (prereq != NO_PREREQ && indent != -1) {
 			strcat(lbuf, "+ ");
 		}
 		
