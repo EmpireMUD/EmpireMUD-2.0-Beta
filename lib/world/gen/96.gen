@@ -1,0 +1,24 @@
+#9600
+recovering~
+4 0
+0 0 0 0
+T0
+You recover from that poorly-timed dodge.~
+S
+#9601
+distracted~
+4 0
+0 0 0 0
+T0
+You're no longer distracted.~
+S
+#9602
+struggling~
+4 0
+0 0 0 0
+T0
+You're finally free!~
+T5
+...$e is struggling to get free!~
+S
+$
