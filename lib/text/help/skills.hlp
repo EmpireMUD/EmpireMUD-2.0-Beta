@@ -563,6 +563,8 @@ When you use an ability, its level is limited to your level in its parent skill
 unless you have 100 in that skill, in which case it scales all the way up to
 your full level.
 
+The ability/abilities commands are identical to the skills command.
+
 See also: NOSKILL, SPECIALIZE, SKILL CAPS, SKILL DROP, TRAINING SKILLS,
    ABILITY POINTS, SKILL SWAP, LETHEIAN ICON
 #
