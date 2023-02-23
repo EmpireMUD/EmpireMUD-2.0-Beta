@@ -1890,10 +1890,26 @@ ACMD(do_skills) {
 	if (!*arg) {
 		*outbuf = '\0';
 		
+		if (min_level != -1 && max_level != -1) {
+			sprintf(lbuf, "level %d-%d", min_level, max_level);
+		}
+		else if (min_level != -1) {
+			sprintf(lbuf, "level %d+", min_level);
+		}
+		else {
+			sprintf(lbuf, "(skill level %d)", GET_SKILL_LEVEL(ch));
+		}
+		
 		// no argument? list all
-		sprintf(outbuf + strlen(outbuf), "You know the following skills (skill level %d):\r\n", GET_SKILL_LEVEL(ch));
+		sprintf(outbuf + strlen(outbuf), "You know the following skills %s:\r\n", lbuf);
 		HASH_ITER(sorted_hh, sorted_skills, skill, next_skill) {
 			if (SKILL_FLAGGED(skill, SKILLF_IN_DEVELOPMENT)) {
+				continue;
+			}
+			if (min_level != -1 && get_skill_level(ch, SKILL_VNUM(skill)) < min_level) {
+				continue;
+			}
+			if (max_level != -1 && get_skill_level(ch, SKILL_VNUM(skill)) > max_level) {
 				continue;
 			}
 			if (!SKILL_FLAGGED(skill, SKILLF_BASIC) && get_skill_level(ch, SKILL_VNUM(skill)) < 1 && get_skill_exp(ch, SKILL_VNUM(skill)) < 0.1) {
