@@ -2300,7 +2300,7 @@ ACMD(do_skills) {
 		size = snprintf(outbuf, sizeof(outbuf), "%s%s\t0:\r\n", ability_color(ch, abil), ABIL_NAME(abil));
 		
 		if (ABIL_ASSIGNED_SKILL(abil)) {
-			size += snprintf(outbuf + size, sizeof(outbuf) - size, "%sSkill: %s %d\t0\r\n", (get_skill_level(ch, SKILL_VNUM(ABIL_ASSIGNED_SKILL(abil))) >= ABIL_SKILL_LEVEL(abil)) ? "\t0" : "\tr", SKILL_ABBREV(ABIL_ASSIGNED_SKILL(abil)), ABIL_SKILL_LEVEL(abil));
+			size += snprintf(outbuf + size, sizeof(outbuf) - size, "%sSkill: %s %d\t0\r\n", (get_skill_level(ch, SKILL_VNUM(ABIL_ASSIGNED_SKILL(abil))) >= ABIL_SKILL_LEVEL(abil)) ? "\t0" : "\tr", SKILL_NAME(ABIL_ASSIGNED_SKILL(abil)), ABIL_SKILL_LEVEL(abil));
 		}
 		
 		// assigned roles/synergies
@@ -2311,7 +2311,7 @@ ACMD(do_skills) {
 			LL_FOREACH(SKILL_SYNERGIES(skill), syn) {
 				if (syn->ability == ABIL_VNUM(abil)) {
 					snprintf(sbuf, sizeof(sbuf), "%s%s %d + %s %d (%s)\t0", class_role_color[syn->role], SKILL_NAME(skill), SKILL_MAX_LEVEL(skill), get_skill_name_by_vnum(syn->skill), syn->level, class_role[syn->role]);
-					if (strlen(sbuf) > 83) {
+					if (strlen(sbuf) > 41) {
 						// too long for half a line
 						l_size += snprintf(lbuf + l_size, sizeof(lbuf) - l_size, "%s %s\r\n", (!(++count % 2) ? "\r\n" : " "), sbuf);
 						if (count % 2) {
