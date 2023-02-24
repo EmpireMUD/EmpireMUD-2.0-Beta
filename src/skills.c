@@ -2298,7 +2298,7 @@ ACMD(do_skills) {
 	else if ((!str_cmp(arg, "info") && (abil = find_ability_by_name(arg2))) || (abil = find_ability_by_name(whole_arg))) {
 		// show 1 ability detail
 		has_param_details = FALSE;
-		size = snprintf(outbuf, sizeof(outbuf), "%s%s\t0\r\n", ability_color(ch, abil), ABIL_NAME(abil));
+		size = snprintf(outbuf, sizeof(outbuf), "Information about %s%s\t0:\r\n", ability_color(ch, abil), ABIL_NAME(abil));
 		
 		if (ABIL_MASTERY_ABIL(abil) != NOTHING) {
 			size += snprintf(outbuf + size, sizeof(outbuf) - size, "Mastery ability: %s%s\t0%s\r\n", ability_color(ch, abil), get_ability_name_by_vnum(ABIL_MASTERY_ABIL(abil)), (PRF_FLAGGED(ch, PRF_SCREEN_READER) && !has_ability(ch, ABIL_VNUM(abil))) ? " (not known)" : "");
@@ -2338,17 +2338,8 @@ ACMD(do_skills) {
 		// types, if parameterized
 		if (ABIL_TYPE_LIST(abil)) {
 			get_ability_type_display(ABIL_TYPE_LIST(abil), lbuf, TRUE);
-			/*
-			*lbuf = '\0';
-			l_size = 0;
-			LL_FOREACH(ABIL_TYPE_LIST(abil), atype) {
-				sprintbit(atype->type, ability_type_flags, part, TRUE);
-				l_size += snprintf(lbuf + l_size, sizeof(lbuf) - l_size, "%s%s", *lbuf ? ", " : "", part);
-			}
-			*/
 			if (*lbuf) {
 				has_param_details = TRUE;
-				//strtolower(lbuf);
 				size += snprintf(outbuf + size, sizeof(outbuf) - size, "Type%s: %s\r\n", (strchr(lbuf, ',') ? "s" : ""), lbuf);
 			}
 		}
@@ -2357,7 +2348,7 @@ ACMD(do_skills) {
 		prettier_sprintbit(ABIL_FLAGS(abil), ability_flag_notes, lbuf);
 		if (*lbuf) {
 			has_param_details = TRUE;
-			size += snprintf(buf + size, sizeof(buf) - size, "Notes: \tg%s\t0\r\n", lbuf);
+			size += snprintf(outbuf + size, sizeof(outbuf) - size, "Notes: \tg%s\t0\r\n", lbuf);
 		}
 		
 		// purchased/free/can-purchase -- maybe
@@ -2449,7 +2440,7 @@ ACMD(do_skills) {
 		*/
 		
 		if (!has_param_details) {
-			msg_to_char(ch, "(Not all abilities have additional details available to show here)\r\n");
+			size += snprintf(outbuf + size, sizeof(outbuf) - size, "(Not all abilities have additional details available to show here)\r\n");
 		}
 		
 		if (ch->desc) {
