@@ -2347,25 +2347,23 @@ ACMD(do_skills) {
 		// linked trait, if parameterized
 		if (ABIL_LINKED_TRAIT(abil) != APPLY_NONE) {
 			has_param_details = TRUE;
-			size += snprintf(outbuf + size, sizeof(outbuf) - size, "Linked trait: %s (%d)\r\n", apply_types[ABIL_LINKED_TRAIT(abil)], get_attribute_by_apply(ch, ABIL_LINKED_TRAIT(abil)));
+			strcpy(lbuf, apply_types[ABIL_LINKED_TRAIT(abil)]);
+			strtolower(lbuf);
+			size += snprintf(outbuf + size, sizeof(outbuf) - size, "Linked trait: %s (%d)\r\n", lbuf, get_attribute_by_apply(ch, ABIL_LINKED_TRAIT(abil)));
 		}
 		
 		// notes (flags), if parameterized
 		prettier_sprintbit(ABIL_FLAGS(abil), ability_flag_notes, lbuf);
 		if (*lbuf || str_cmp(lbuf, "none")) {
 			has_param_details = TRUE;
-			size += snprintf(outbuf + size, sizeof(outbuf) - size, "Notes: \tg%s\t0\r\n", lbuf);
+			size += snprintf(outbuf + size, sizeof(outbuf) - size, "Notes: %s\r\n", lbuf);
 		}
 		
 		// purchased/free/can-purchase -- maybe
 
-/*/
-		char buf[MAX_STRING_LENGTH], part[MAX_STRING_LENGTH], part2[MAX_STRING_LENGTH];
-		struct ability_data_list *adl;
-		struct custom_message *custm;
-		struct apply_data *app;
-	
-	
+/*
+		More things we could show (from vstat ability):
+		
 		sprintbit(ABIL_IMMUNITIES(abil), affected_bits, part, TRUE);
 		size += snprintf(buf + size, sizeof(buf) - size, "Immunities: \tc%s\t0\r\n", part);
 	
@@ -2373,16 +2371,11 @@ ACMD(do_skills) {
 		size += snprintf(buf + size, sizeof(buf) - size, "Gain hooks: \tg%s\t0\r\n", part);
 	
 		// command-related portion
-		if (!ABIL_COMMAND(abil)) {
-			size += snprintf(buf + size, sizeof(buf) - size, "Command info: [\tcnot a command\t0]\r\n");
-		}
-		else {
+		if (ABIL_COMMAND(abil)) {
 			sprintbit(ABIL_TARGETS(abil), ability_target_flags, part, TRUE);
 			size += snprintf(buf + size, sizeof(buf) - size, "Command info: [\ty%s\t0], Targets: \tg%s\t0\r\n", ABIL_COMMAND(abil), part);
 		}
 		size += snprintf(buf + size, sizeof(buf) - size, "Cost: [\tc%d %s (+%d/scale)\t0], Cooldown: [\tc%d %s\t0], Cooldown time: [\tc%d second%s\t0]\r\n", ABIL_COST(abil), pool_types[ABIL_COST_TYPE(abil)], ABIL_COST_PER_SCALE_POINT(abil), ABIL_COOLDOWN(abil), get_generic_name_by_vnum(ABIL_COOLDOWN(abil)),  ABIL_COOLDOWN_SECS(abil), PLURAL(ABIL_COOLDOWN_SECS(abil)));
-		size += snprintf(buf + size, sizeof(buf) - size, "Min position: [\tc%s\t0], Linked trait: [\ty%s\t0]\r\n", position_types[ABIL_MIN_POS(abil)], apply_types[ABIL_LINKED_TRAIT(abil)]);
-		size += snprintf(buf + size, sizeof(buf) - size, "Difficulty: \ty%s\t0, Wait type: [\ty%s\t0]\r\n", skill_check_difficulty[ABIL_DIFFICULTY(abil)], wait_types[ABIL_WAIT_TYPE(abil)]);
 	
 		// type-specific data
 		if (IS_SET(ABIL_TYPES(abil), ABILT_BUFF | ABILT_DOT)) {
@@ -2400,7 +2393,6 @@ ACMD(do_skills) {
 			}
 			size += snprintf(buf + size, sizeof(buf) - size, "Durations: [\tc%s/%s seconds\t0]\r\n", part, part2);
 		
-			size += snprintf(buf + size, sizeof(buf) - size, "Custom affect: [\ty%d %s\t0]\r\n", ABIL_AFFECT_VNUM(abil), get_generic_name_by_vnum(ABIL_AFFECT_VNUM(abil)));
 		}	// end buff/dot
 		if (IS_SET(ABIL_TYPES(abil), ABILT_BUFF | ABILT_PASSIVE_BUFF)) {
 			sprintbit(ABIL_AFFECTS(abil), affected_bits, part, TRUE);
@@ -2426,15 +2418,7 @@ ACMD(do_skills) {
 		if (IS_SET(ABIL_TYPES(abil), ABILT_DOT)) {
 			size += snprintf(buf + size, sizeof(buf) - size, "Max stacks: [\tc%d\t0]\r\n", ABIL_MAX_STACKS(abil));
 		}	// end dot
-	
-		if (ABIL_CUSTOM_MSGS(abil)) {
-			size += snprintf(buf + size, sizeof(buf) - size, "Custom messages:\r\n");
 		
-			LL_FOREACH(ABIL_CUSTOM_MSGS(abil), custm) {
-				size += snprintf(buf + size, sizeof(buf) - size, " %s: %s\r\n", ability_custom_types[custm->type], custm->msg);
-			}
-		}
-	
 		// data
 		if (ABIL_DATA(abil)) {
 			size += snprintf(buf + size, sizeof(buf) - size, "Extra data:\r\n");
