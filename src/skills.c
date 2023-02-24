@@ -1274,7 +1274,7 @@ void get_skill_abilities_display(struct skill_display_t **list, char_data *ch, s
 		strcpy(colorize, ability_color(ch, abil));
 		
 		if (PRF_FLAGGED(ch, PRF_SCREEN_READER)) {
-			sprintf(out + strlen(out), "%s%s%s\t0 - %d-%d, %s", lbuf, colorize, ABIL_NAME(abil), skab->level, max_skill, (has_ability(ch, ABIL_VNUM(abil)) ? (skab->level == 0 ? "free" : "purchased") : "unknown"));
+			sprintf(out + strlen(out), "%s%s%s\t0 - %d-%d, %s", lbuf, colorize, ABIL_NAME(abil), skab->level, max_skill, (has_ability(ch, ABIL_VNUM(abil)) ? (skab->level == 0 ? "free" : "purchased") : "unpurchased"));
 		}
 		else {	// non-screenreader
 			sprintf(out + strlen(out), "%s(%s) %s%s\t0 [%d-%d]", lbuf, (has_ability(ch, ABIL_VNUM(abil)) ? "x" : " "), colorize, ABIL_NAME(abil), skab->level, max_skill);
@@ -2297,10 +2297,12 @@ ACMD(do_skills) {
 	}
 	else if ((abil = find_ability_by_name(whole_arg))) {
 		// show 1 ability detail
-		size = snprintf(outbuf, sizeof(outbuf), "%s%s\t0:\r\n", ability_color(ch, abil), ABIL_NAME(abil));
+		size = snprintf(outbuf, sizeof(outbuf), "%s%s\t0\r\n", ability_color(ch, abil), ABIL_NAME(abil));
 		
 		if (ABIL_ASSIGNED_SKILL(abil)) {
 			size += snprintf(outbuf + size, sizeof(outbuf) - size, "%sSkill: %s %d\t0\r\n", (get_skill_level(ch, SKILL_VNUM(ABIL_ASSIGNED_SKILL(abil))) >= ABIL_SKILL_LEVEL(abil)) ? "\t0" : "\tr", SKILL_NAME(ABIL_ASSIGNED_SKILL(abil)), ABIL_SKILL_LEVEL(abil));
+			
+			// parent/prerequisite ability (chain?) -- maybe?
 		}
 		
 		// assigned roles/synergies
@@ -2313,7 +2315,7 @@ ACMD(do_skills) {
 					snprintf(sbuf, sizeof(sbuf), "%s%s %d + %s %d (%s)\t0", class_role_color[syn->role], SKILL_NAME(skill), SKILL_MAX_LEVEL(skill), get_skill_name_by_vnum(syn->skill), syn->level, class_role[syn->role]);
 					if (strlen(sbuf) > 41) {
 						// too long for half a line
-						l_size += snprintf(lbuf + l_size, sizeof(lbuf) - l_size, "%s %s\r\n", (!(++count % 2) ? "\r\n" : " "), sbuf);
+						l_size += snprintf(lbuf + l_size, sizeof(lbuf) - l_size, "%s%s\r\n", (!(++count % 2) ? "\r\n" : " "), sbuf);
 						if (count % 2) {
 							++count;	// fix columns for the next line, if any
 						}
@@ -2328,7 +2330,8 @@ ACMD(do_skills) {
 			size += snprintf(outbuf + size, sizeof(outbuf) - size, "Synergies:\r\n%s%s", lbuf, (!(++count % 2) ? "\r\n" : " "));
 		}
 		
-		// types?
+		// types? -- maybe
+		// purchased/free/can-purchase -- maybe
 		
 		if (ch->desc) {
 			page_string(ch->desc, outbuf, 1);
