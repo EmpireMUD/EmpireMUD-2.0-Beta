@@ -2244,7 +2244,7 @@ ACMD(do_skills) {
 			resort_empires(FALSE);
 		}
 	}
-	else if ((skill = find_skill_by_name(whole_arg)) && (!SKILL_FLAGGED(skill, SKILLF_IN_DEVELOPMENT) || IS_IMMORTAL(ch))) {
+	else if (((!str_cmp(arg, "info") && (skill = find_skill_by_name(arg2))) || (skill = find_skill_by_name(whole_arg))) && (!SKILL_FLAGGED(skill, SKILLF_IN_DEVELOPMENT) || IS_IMMORTAL(ch))) {
 		// show 1 skill's details
 		*outbuf = '\0';
 		size = 0;
@@ -2295,7 +2295,7 @@ ACMD(do_skills) {
 			page_string(ch->desc, outbuf, 1);
 		}
 	}
-	else if ((abil = find_ability_by_name(whole_arg))) {
+	else if ((!str_cmp(arg, "info") && (abil = find_ability_by_name(arg2))) || (abil = find_ability_by_name(whole_arg))) {
 		// show 1 ability detail
 		has_param_details = FALSE;
 		size = snprintf(outbuf, sizeof(outbuf), "%s%s\t0\r\n", ability_color(ch, abil), ABIL_NAME(abil));
