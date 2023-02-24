@@ -1754,7 +1754,7 @@ ACMD(do_noskill) {
 // this is also do_ability/do_abilities
 ACMD(do_skills) {
 	char arg[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH], lbuf[MAX_STRING_LENGTH], sbuf[MAX_STRING_LENGTH], outbuf[MAX_STRING_LENGTH], *ptr;
-	char new_arg[MAX_INPUT_LENGTH], whole_arg[MAX_INPUT_LENGTH], part[256];
+	char new_arg[MAX_INPUT_LENGTH], whole_arg[MAX_INPUT_LENGTH];
 	struct skill_display_t *skdat_list = NULL, *skdat;
 	struct synergy_display_type *sdt_list = NULL, *sdt;
 	struct synergy_display_ability *sda;
@@ -1762,7 +1762,6 @@ ACMD(do_skills) {
 	skill_data *skill, *next_skill, *synergy[2];
 	struct synergy_ability *syn;
 	struct skill_ability *skab;
-	struct ability_type *atype;
 	ability_data *abil;
 	int points, level, iter, count;
 	empire_data *emp;

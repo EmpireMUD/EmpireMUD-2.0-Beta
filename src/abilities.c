@@ -648,11 +648,12 @@ void get_ability_type_display(struct ability_type *list, char *save_buffer, bool
 	LL_FOREACH(list, at) {
 		if (for_players) {
 			prettier_sprintbit(at->type, ability_type_notes, lbuf);
+			sprintf(save_buffer + strlen(save_buffer), "%s%s", (count++ > 0) ? ", " : "", lbuf);
 		}
 		else {
 			sprintbit(at->type, ability_type_flags, lbuf, TRUE);
+			sprintf(save_buffer + strlen(save_buffer), "%s%s(%d)", (count++ > 0) ? ", " : "", lbuf, at->weight);
 		}
-		sprintf(save_buffer + strlen(save_buffer), "%s%s(%d)", (count++ > 0) ? ", " : "", lbuf, at->weight);
 	}
 	if (count == 0) {
 		strcat(save_buffer, "none");
