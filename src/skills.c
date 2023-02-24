@@ -2344,9 +2344,15 @@ ACMD(do_skills) {
 			}
 		}
 		
+		// linked trait, if parameterized
+		if (ABIL_LINKED_TRAIT(abil) != APPLY_NONE) {
+			has_param_details = TRUE;
+			size += snprintf(outbuf + size, sizeof(outbuf) - size, "Linked trait: %s (%d)\r\n", apply_types[ABIL_LINKED_TRAIT(abil)], get_attribute_by_apply(ch, ABIL_LINKED_TRAIT(abil)));
+		}
+		
 		// notes (flags), if parameterized
 		prettier_sprintbit(ABIL_FLAGS(abil), ability_flag_notes, lbuf);
-		if (*lbuf) {
+		if (*lbuf || str_cmp(lbuf, "none")) {
 			has_param_details = TRUE;
 			size += snprintf(outbuf + size, sizeof(outbuf) - size, "Notes: \tg%s\t0\r\n", lbuf);
 		}
