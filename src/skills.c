@@ -2301,7 +2301,7 @@ ACMD(do_skills) {
 		size = snprintf(outbuf, sizeof(outbuf), "%s%s\t0\r\n", ability_color(ch, abil), ABIL_NAME(abil));
 		
 		if (ABIL_MASTERY_ABIL(abil) != NOTHING) {
-			msg_to_char(ch, "Mastery ability: %s%s\t0%s\r\n", ability_color(ch, abil), get_ability_name_by_vnum(ABIL_MASTERY_ABIL(abil)), (PRF_FLAGGED(ch, PRF_SCREEN_READER) && !has_ability(ch, ABIL_VNUM(abil))) ? " (not known)" : "");
+			size += snprintf(outbuf + size, sizeof(outbuf) - size, "Mastery ability: %s%s\t0%s\r\n", ability_color(ch, abil), get_ability_name_by_vnum(ABIL_MASTERY_ABIL(abil)), (PRF_FLAGGED(ch, PRF_SCREEN_READER) && !has_ability(ch, ABIL_VNUM(abil))) ? " (not known)" : "");
 		}
 		
 		if (ABIL_ASSIGNED_SKILL(abil)) {
@@ -2349,7 +2349,7 @@ ACMD(do_skills) {
 			if (*lbuf) {
 				has_param_details = TRUE;
 				//strtolower(lbuf);
-				size += snprintf(outbuf + size, sizeof(outbuf) - size, "Types: %s\r\n", lbuf);
+				size += snprintf(outbuf + size, sizeof(outbuf) - size, "Type%s: %s\r\n", (strchr(lbuf, ',') ? "s" : ""), lbuf);
 			}
 		}
 		
