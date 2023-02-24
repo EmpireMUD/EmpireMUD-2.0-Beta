@@ -154,7 +154,7 @@ const char *ability_flag_notes[] = {
 };
 
 
-// ABILT_x: ability type flags
+// ABILT_x (1/2): ability type flags
 const char *ability_type_flags[] = {
 	"CRAFT",	// 0
 	"BUFF",
@@ -166,6 +166,34 @@ const char *ability_type_flags[] = {
 	"COMPANION",
 	"SUMMON-ANY",
 	"SUMMON-RANDOM",
+/*
+	"UNAFFECTS",
+	"POINTS",
+	"ALTER-OBJS",
+	"GROUPS",
+	"MASSES",
+	"AREAS",
+	"CREATIONS",
+	"MANUAL",
+	"ROOMS",
+	"CRAFT",
+*/
+	"\n"
+};
+
+
+// ABILT_x (2/2): ability types as shown to players
+const char *ability_type_notes[] = {
+	"crafting",	// 0
+	"buff",
+	"damage",
+	"damage-over-time",
+	"player tech",
+	"passive buff",	// 5
+	"ready weapon",
+	"companion",
+	"summon",
+	"summon",
 /*
 	"UNAFFECTS",
 	"POINTS",
