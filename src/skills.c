@@ -2332,7 +2332,7 @@ ACMD(do_skills) {
 			}
 		}
 		if (*lbuf) {
-			size += snprintf(outbuf + size, sizeof(outbuf) - size, "Synergies:\r\n%s%s", lbuf, (!(++count % 2) ? "\r\n" : " "));
+			size += snprintf(outbuf + size, sizeof(outbuf) - size, "Synergies:\r\n%s%s", lbuf, (!(++count % 2) ? "\r\n" : ""));
 		}
 		
 		// types, if parameterized
@@ -2354,7 +2354,7 @@ ACMD(do_skills) {
 		
 		// notes (flags), if parameterized
 		prettier_sprintbit(ABIL_FLAGS(abil), ability_flag_notes, lbuf);
-		if (*lbuf || str_cmp(lbuf, "none")) {
+		if (*lbuf && str_cmp(lbuf, "none")) {
 			has_param_details = TRUE;
 			size += snprintf(outbuf + size, sizeof(outbuf) - size, "Notes: %s\r\n", lbuf);
 		}
