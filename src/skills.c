@@ -2338,15 +2338,18 @@ ACMD(do_skills) {
 		
 		// types, if parameterized
 		if (ABIL_TYPE_LIST(abil)) {
+			get_ability_type_display(ABIL_TYPE_LIST(abil), lbuf, TRUE);
+			/*
 			*lbuf = '\0';
 			l_size = 0;
 			LL_FOREACH(ABIL_TYPE_LIST(abil), atype) {
 				sprintbit(atype->type, ability_type_flags, part, TRUE);
 				l_size += snprintf(lbuf + l_size, sizeof(lbuf) - l_size, "%s%s", *lbuf ? ", " : "", part);
 			}
+			*/
 			if (*lbuf) {
 				has_param_details = TRUE;
-				strtolower(lbuf);
+				//strtolower(lbuf);
 				size += snprintf(outbuf + size, sizeof(outbuf) - size, "Types: %s\r\n", lbuf);
 			}
 		}
