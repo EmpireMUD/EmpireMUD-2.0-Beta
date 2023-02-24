@@ -112,7 +112,7 @@ const char *reboot_type[] = { "reboot", "shutdown" };
  //////////////////////////////////////////////////////////////////////////////
 //// ABILITY CONSTANTS ///////////////////////////////////////////////////////
 
-// ABILF_x: ability flags
+// ABILF_x (1/2): ability flags
 const char *ability_flags[] = {
 	"VIOLENT",	// 0
 	"COUNTERSPELLABLE",
@@ -129,6 +129,27 @@ const char *ability_flags[] = {
 	"RANGED-ONLY",
 	"IGNORE-SUN",
 	"UNSCALED-BUFF",
+	"\n"
+};
+
+
+// ABILF_x (2/2): ability flags shown to players as notes
+const char *ability_flag_notes[] = {
+	"violent",	// 0
+	"counterspellable",
+	"toggles on/off",
+	"",	// INVISIBLE
+	"",	// !ENGAGE
+	"ranged",	// 5
+	"can't be used in animal form",
+	"can't be used while invulnerable",
+	"stronger in caster role",
+	"stronger in healer role",
+	"stronger in melee role",	// 10
+	"stronger in tank role",
+	"can only be used at range",
+	"unaffected by sun",
+	"",	// UNSCALED-BUFF
 	"\n"
 };
 

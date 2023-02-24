@@ -1754,7 +1754,7 @@ ACMD(do_noskill) {
 // this is also do_ability/do_abilities
 ACMD(do_skills) {
 	char arg[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH], lbuf[MAX_STRING_LENGTH], sbuf[MAX_STRING_LENGTH], outbuf[MAX_STRING_LENGTH], *ptr;
-	char new_arg[MAX_INPUT_LENGTH], whole_arg[MAX_INPUT_LENGTH];
+	char new_arg[MAX_INPUT_LENGTH], whole_arg[MAX_INPUT_LENGTH], part[256];
 	struct skill_display_t *skdat_list = NULL, *skdat;
 	struct synergy_display_type *sdt_list = NULL, *sdt;
 	struct synergy_display_ability *sda;
@@ -1762,10 +1762,11 @@ ACMD(do_skills) {
 	skill_data *skill, *next_skill, *synergy[2];
 	struct synergy_ability *syn;
 	struct skill_ability *skab;
+	struct ability_type *atype;
 	ability_data *abil;
 	int points, level, iter, count;
 	empire_data *emp;
-	bool found, any, line;
+	bool found, any, line, has_param_details;
 	bool sort_alpha = FALSE, sort_level = FALSE, want_min = FALSE, want_max = FALSE;
 	int min_level = -1, max_level = -1;
 	size_t size, l_size;
@@ -2297,7 +2298,12 @@ ACMD(do_skills) {
 	}
 	else if ((abil = find_ability_by_name(whole_arg))) {
 		// show 1 ability detail
+		has_param_details = FALSE;
 		size = snprintf(outbuf, sizeof(outbuf), "%s%s\t0\r\n", ability_color(ch, abil), ABIL_NAME(abil));
+		
+		if (ABIL_MASTERY_ABIL(abil) != NOTHING) {
+			msg_to_char(ch, "Mastery ability: %s%s\t0%s\r\n", ability_color(ch, abil), get_ability_name_by_vnum(ABIL_MASTERY_ABIL(abil)), (PRF_FLAGGED(ch, PRF_SCREEN_READER) && !has_ability(ch, ABIL_VNUM(abil))) ? " (not known)" : "");
+		}
 		
 		if (ABIL_ASSIGNED_SKILL(abil)) {
 			size += snprintf(outbuf + size, sizeof(outbuf) - size, "%sSkill: %s %d\t0\r\n", (get_skill_level(ch, SKILL_VNUM(ABIL_ASSIGNED_SKILL(abil))) >= ABIL_SKILL_LEVEL(abil)) ? "\t0" : "\tr", SKILL_NAME(ABIL_ASSIGNED_SKILL(abil)), ABIL_SKILL_LEVEL(abil));
@@ -2330,8 +2336,119 @@ ACMD(do_skills) {
 			size += snprintf(outbuf + size, sizeof(outbuf) - size, "Synergies:\r\n%s%s", lbuf, (!(++count % 2) ? "\r\n" : " "));
 		}
 		
-		// types? -- maybe
+		// types, if parameterized
+		if (ABIL_TYPE_LIST(abil)) {
+			*lbuf = '\0';
+			l_size = 0;
+			LL_FOREACH(ABIL_TYPE_LIST(abil), atype) {
+				sprintbit(atype->type, ability_type_flags, part, TRUE);
+				l_size += snprintf(lbuf + l_size, sizeof(lbuf) - l_size, "%s%s", *lbuf ? ", " : "", part);
+			}
+			if (*lbuf) {
+				has_param_details = TRUE;
+				strtolower(lbuf);
+				size += snprintf(outbuf + size, sizeof(outbuf) - size, "Types: %s\r\n", lbuf);
+			}
+		}
+		
+		// notes (flags), if parameterized
+		prettier_sprintbit(ABIL_FLAGS(abil), ability_flag_notes, lbuf);
+		if (*lbuf) {
+			has_param_details = TRUE;
+			size += snprintf(buf + size, sizeof(buf) - size, "Notes: \tg%s\t0\r\n", lbuf);
+		}
+		
 		// purchased/free/can-purchase -- maybe
+
+/*/
+		char buf[MAX_STRING_LENGTH], part[MAX_STRING_LENGTH], part2[MAX_STRING_LENGTH];
+		struct ability_data_list *adl;
+		struct custom_message *custm;
+		struct apply_data *app;
+	
+	
+		sprintbit(ABIL_IMMUNITIES(abil), affected_bits, part, TRUE);
+		size += snprintf(buf + size, sizeof(buf) - size, "Immunities: \tc%s\t0\r\n", part);
+	
+		sprintbit(ABIL_GAIN_HOOKS(abil), ability_gain_hooks, part, TRUE);
+		size += snprintf(buf + size, sizeof(buf) - size, "Gain hooks: \tg%s\t0\r\n", part);
+	
+		// command-related portion
+		if (!ABIL_COMMAND(abil)) {
+			size += snprintf(buf + size, sizeof(buf) - size, "Command info: [\tcnot a command\t0]\r\n");
+		}
+		else {
+			sprintbit(ABIL_TARGETS(abil), ability_target_flags, part, TRUE);
+			size += snprintf(buf + size, sizeof(buf) - size, "Command info: [\ty%s\t0], Targets: \tg%s\t0\r\n", ABIL_COMMAND(abil), part);
+		}
+		size += snprintf(buf + size, sizeof(buf) - size, "Cost: [\tc%d %s (+%d/scale)\t0], Cooldown: [\tc%d %s\t0], Cooldown time: [\tc%d second%s\t0]\r\n", ABIL_COST(abil), pool_types[ABIL_COST_TYPE(abil)], ABIL_COST_PER_SCALE_POINT(abil), ABIL_COOLDOWN(abil), get_generic_name_by_vnum(ABIL_COOLDOWN(abil)),  ABIL_COOLDOWN_SECS(abil), PLURAL(ABIL_COOLDOWN_SECS(abil)));
+		size += snprintf(buf + size, sizeof(buf) - size, "Min position: [\tc%s\t0], Linked trait: [\ty%s\t0]\r\n", position_types[ABIL_MIN_POS(abil)], apply_types[ABIL_LINKED_TRAIT(abil)]);
+		size += snprintf(buf + size, sizeof(buf) - size, "Difficulty: \ty%s\t0, Wait type: [\ty%s\t0]\r\n", skill_check_difficulty[ABIL_DIFFICULTY(abil)], wait_types[ABIL_WAIT_TYPE(abil)]);
+	
+		// type-specific data
+		if (IS_SET(ABIL_TYPES(abil), ABILT_BUFF | ABILT_DOT)) {
+			if (ABIL_SHORT_DURATION(abil) == UNLIMITED) {
+				strcpy(part, "unlimited");
+			}
+			else {
+				snprintf(part, sizeof(part), "%d", ABIL_SHORT_DURATION(abil));
+			}
+			if (ABIL_LONG_DURATION(abil) == UNLIMITED) {
+				strcpy(part2, "unlimited");
+			}
+			else {
+				snprintf(part2, sizeof(part2), "%d", ABIL_LONG_DURATION(abil));
+			}
+			size += snprintf(buf + size, sizeof(buf) - size, "Durations: [\tc%s/%s seconds\t0]\r\n", part, part2);
+		
+			size += snprintf(buf + size, sizeof(buf) - size, "Custom affect: [\ty%d %s\t0]\r\n", ABIL_AFFECT_VNUM(abil), get_generic_name_by_vnum(ABIL_AFFECT_VNUM(abil)));
+		}	// end buff/dot
+		if (IS_SET(ABIL_TYPES(abil), ABILT_BUFF | ABILT_PASSIVE_BUFF)) {
+			sprintbit(ABIL_AFFECTS(abil), affected_bits, part, TRUE);
+			size += snprintf(buf + size, sizeof(buf) - size, "Affect flags: \tg%s\t0\r\n", part);
+		
+			// applies
+			size += snprintf(buf + size, sizeof(buf) - size, "Applies: ");
+			count = 0;
+			LL_FOREACH(ABIL_APPLIES(abil), app) {
+				size += snprintf(buf + size, sizeof(buf) - size, "%s%d to %s", count++ ? ", " : "", app->weight, apply_types[app->location]);
+			}
+			if (!ABIL_APPLIES(abil)) {
+				size += snprintf(buf + size, sizeof(buf) - size, "none");
+			}
+			size += snprintf(buf + size, sizeof(buf) - size, "\r\n");
+		}	// end buff
+		if (IS_SET(ABIL_TYPES(abil), ABILT_DAMAGE)) {
+			size += snprintf(buf + size, sizeof(buf) - size, "Attack type: [\tc%d\t0]\r\n", ABIL_ATTACK_TYPE(abil));
+		}	// end damage
+		if (IS_SET(ABIL_TYPES(abil), ABILT_DAMAGE | ABILT_DOT)) {
+			size += snprintf(buf + size, sizeof(buf) - size, "Damage type: [\tc%s\t0]\r\n", damage_types[ABIL_DAMAGE_TYPE(abil)]);
+		}	// end damage/dot
+		if (IS_SET(ABIL_TYPES(abil), ABILT_DOT)) {
+			size += snprintf(buf + size, sizeof(buf) - size, "Max stacks: [\tc%d\t0]\r\n", ABIL_MAX_STACKS(abil));
+		}	// end dot
+	
+		if (ABIL_CUSTOM_MSGS(abil)) {
+			size += snprintf(buf + size, sizeof(buf) - size, "Custom messages:\r\n");
+		
+			LL_FOREACH(ABIL_CUSTOM_MSGS(abil), custm) {
+				size += snprintf(buf + size, sizeof(buf) - size, " %s: %s\r\n", ability_custom_types[custm->type], custm->msg);
+			}
+		}
+	
+		// data
+		if (ABIL_DATA(abil)) {
+			size += snprintf(buf + size, sizeof(buf) - size, "Extra data:\r\n");
+			count = 0;
+			LL_FOREACH(ABIL_DATA(abil), adl) {
+				size += snprintf(buf + size, sizeof(buf) - size, " %d. %s\r\n", ++count, ability_data_display(adl));
+			}
+		}
+		*/
+		
+		if (!has_param_details) {
+			msg_to_char(ch, "(Not all abilities have additional details available to show here)\r\n");
+		}
 		
 		if (ch->desc) {
 			page_string(ch->desc, outbuf, 1);
