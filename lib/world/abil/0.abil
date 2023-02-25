@@ -43,6 +43,7 @@ S
 #4
 Wolf Form~
 0 -1 1.00 0 0
+T k 1
 S
 #5
 Null Mana~
@@ -184,6 +185,7 @@ S
 #21
 Horrid Form~
 0 -1 1.00 0 0
+T k 1
 S
 #22
 Dispel~
@@ -209,6 +211,7 @@ S
 #24
 Mist Form~
 0 -1 1.00 0 0
+T k 1
 S
 #25
 Mummify~
