@@ -849,6 +849,48 @@ void empire_player_tech_skillup(empire_data *emp, int tech, double amount) {
 
 
 /**
+* Determines which skill or ability is referred to by either arg2 or whole_arg,
+* depending upon whether or not the first word was "info" (which is dropped).
+*
+* This prefers, in order: exact skill, exact ability, abbreviated skill,
+* abbreviated ability.
+*
+* This requires multiple strings which are already available in the command
+* which called it.
+*
+* @param char *arg1 The first word in the argument.
+* @param char *rest_arg The rest of the argument.
+* @param char *whole_arg The original argument ("arg1 rest_arg").
+* @param skill_data **found_skill Will bind any found skill to this pointer.
+* @param ability_data **found_abil Will bind any found ability to this pointer.
+* @return bool TRUE if it found either a skill or ability; FALSE if not.
+*/
+static bool find_skill_or_ability_for_command(char *arg1, char *rest_arg, char *whole_arg, skill_data **found_skill, ability_data **found_abil) {
+	char *use_arg = ((arg1 && !str_cmp(arg1, "info")) ? rest_arg : whole_arg);
+	
+	*found_skill = NULL;
+	*found_abil = NULL;
+	
+	// in order of precedence:
+	if ((*found_skill = find_skill_by_name_exact(use_arg, FALSE))) {
+		return TRUE;
+	}
+	else if ((*found_abil = find_ability_by_name_exact(use_arg, FALSE))) {
+		return TRUE;
+	}
+	else if ((*found_skill = find_skill_by_name_exact(use_arg, TRUE))) {
+		return TRUE;
+	}
+	else if ((*found_abil = find_ability_by_name_exact(use_arg, TRUE))) {
+		return TRUE;
+	}
+	else {
+		return FALSE;
+	}
+}
+
+
+/**
 * This is the main interface for ability-based skill learning. Ability gain
 * caps are checked here. The amount to gain is automatically reduced if the
 * player has no daily points available.
@@ -2244,7 +2286,10 @@ ACMD(do_skills) {
 			resort_empires(FALSE);
 		}
 	}
-	else if (((!str_cmp(arg, "info") && (skill = find_skill_by_name(arg2))) || (skill = find_skill_by_name(whole_arg))) && (!SKILL_FLAGGED(skill, SKILLF_IN_DEVELOPMENT) || IS_IMMORTAL(ch))) {
+	else if (!find_skill_or_ability_for_command(arg, arg2, whole_arg, &skill, &abil)) {
+		msg_to_char(ch, "No such skill or ability.\r\n");
+	}
+	else if (skill) {
 		// show 1 skill's details
 		*outbuf = '\0';
 		size = 0;
@@ -2295,7 +2340,7 @@ ACMD(do_skills) {
 			page_string(ch->desc, outbuf, 1);
 		}
 	}
-	else if ((!str_cmp(arg, "info") && (abil = find_ability_by_name(arg2))) || (abil = find_ability_by_name(whole_arg))) {
+	else if (abil) {
 		// show 1 ability detail
 		has_param_details = FALSE;
 		size = snprintf(outbuf, sizeof(outbuf), "Information about %s%s\t0:\r\n", ability_color(ch, abil), ABIL_NAME(abil));
@@ -2442,7 +2487,7 @@ ACMD(do_skills) {
 			page_string(ch->desc, outbuf, 1);
 		}
 	}
-	else {
+	else {	// this should be unreachable
 		msg_to_char(ch, "No such skill or ability.\r\n");
 	}
 }
@@ -2772,9 +2817,10 @@ skill_data *find_skill(char *argument) {
 * skills.
 *
 * @param char *name The skill name to look up.
+* @param bool allow_abbrev If TRUE, allows abbreviations.
 * @return skill_data* The skill, or NULL if it doesn't exist.
 */
-skill_data *find_skill_by_name(char *name) {
+skill_data *find_skill_by_name_exact(char *name, bool allow_abbrev) {
 	skill_data *skill, *next_skill, *partial = NULL;
 	
 	if (!*name) {
@@ -2791,7 +2837,7 @@ skill_data *find_skill_by_name(char *name) {
 			// perfect match
 			return skill;
 		}
-		if (!partial && is_multiword_abbrev(name, SKILL_NAME(skill))) {
+		if (allow_abbrev && !partial && is_multiword_abbrev(name, SKILL_NAME(skill))) {
 			// probable match
 			partial = skill;
 		}

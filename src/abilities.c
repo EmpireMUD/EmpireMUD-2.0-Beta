@@ -483,9 +483,10 @@ ability_data *find_ability(char *argument) {
 * Look up an ability by multi-abbrev, preferring exact matches.
 *
 * @param char *name The ability name to look up.
+* @param bool allow_abbrev If true, allows abbreviations.
 * @return ability_data* The ability, or NULL if it doesn't exist.
 */
-ability_data *find_ability_by_name(char *name) {
+ability_data *find_ability_by_name_exact(char *name, bool allow_abbrev) {
 	ability_data *abil, *next_abil, *partial = NULL;
 	
 	if (!*name) {
@@ -498,7 +499,7 @@ ability_data *find_ability_by_name(char *name) {
 			// perfect match
 			return abil;
 		}
-		if (!partial && is_multiword_abbrev(name, ABIL_NAME(abil))) {
+		if (allow_abbrev && !partial && is_multiword_abbrev(name, ABIL_NAME(abil))) {
 			// probable match
 			partial = abil;
 		}
