@@ -2317,7 +2317,7 @@ ACMD(do_skills) {
 		HASH_ITER(hh, skill_table, skill, next_skill) {
 			LL_FOREACH(SKILL_SYNERGIES(skill), syn) {
 				if (syn->ability == ABIL_VNUM(abil)) {
-					snprintf(sbuf, sizeof(sbuf), "%s%s %d + %s %d (%s)\t0", class_role_color[syn->role], SKILL_NAME(skill), SKILL_MAX_LEVEL(skill), get_skill_name_by_vnum(syn->skill), syn->level, class_role[syn->role]);
+					snprintf(sbuf, sizeof(sbuf), "%s%s %d + %s %d (%s)\t0", syn->role == NOTHING ? "\tW" : class_role_color[syn->role], SKILL_NAME(skill), SKILL_MAX_LEVEL(skill), get_skill_name_by_vnum(syn->skill), syn->level, syn->role == NOTHING ? "All" : class_role[syn->role]);
 					if (strlen(sbuf) > 41) {
 						// too long for half a line
 						l_size += snprintf(lbuf + l_size, sizeof(lbuf) - l_size, "%s%s\r\n", (!(++count % 2) ? "\r\n" : " "), sbuf);
