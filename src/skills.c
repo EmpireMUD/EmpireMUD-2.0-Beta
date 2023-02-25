@@ -2320,7 +2320,7 @@ ACMD(do_skills) {
 					snprintf(sbuf, sizeof(sbuf), "%s%s %d + %s %d (%s)\t0", syn->role == NOTHING ? "\tW" : class_role_color[syn->role], SKILL_NAME(skill), SKILL_MAX_LEVEL(skill), get_skill_name_by_vnum(syn->skill), syn->level, syn->role == NOTHING ? "All" : class_role[syn->role]);
 					if (strlen(sbuf) > 41) {
 						// too long for half a line
-						l_size += snprintf(lbuf + l_size, sizeof(lbuf) - l_size, "%s%s\r\n", (!(++count % 2) ? "\r\n" : " "), sbuf);
+						l_size += snprintf(lbuf + l_size, sizeof(lbuf) - l_size, "%s %s\r\n", (!(++count % 2) ? "\r\n" : ""), sbuf);
 						if (count % 2) {
 							++count;	// fix columns for the next line, if any
 						}
