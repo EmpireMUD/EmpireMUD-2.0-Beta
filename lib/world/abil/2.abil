@@ -43,22 +43,27 @@ S
 #211
 Dread Blood Form~
 0 -1 1.00 0 0
+T k 1
 S
 #212
 Savage Werewolf Form~
 0 -1 1.00 0 0
+T k 1
 S
 #213
 Towering Werewolf Form~
 0 -1 1.00 0 0
+T k 1
 S
 #214
 Sage Werewolf Form~
 0 -1 1.00 0 0
+T k 1
 S
 #215
 Animal Forms~
 0 -1 1.00 0 0
+T k 1
 S
 #216
 Refashion~
@@ -391,6 +396,7 @@ S
 #262
 Hone~
 0 -1 1.00 0 0
+T l 1
 S
 #263
 Healing Boost~
@@ -410,6 +416,7 @@ S
 #267
 Astral Werewolf Form~
 0 -1 1.00 0 0
+T k 1
 S
 #268
 Whisperstride~
@@ -418,6 +425,7 @@ S
 #269
 Werewolf Form~
 0 -1 1.00 0 0
+T k 1
 S
 #270
 Family Recipes~

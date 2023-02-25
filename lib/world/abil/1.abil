@@ -324,6 +324,7 @@ S
 #162
 Bat Form~
 0 -1 1.00 0 0
+T k 1
 S
 #163
 Ritual of Burdens~
@@ -367,7 +368,7 @@ S
 #167
 Enchant Weapons~
 0 181 1.00 0 0
-T a 0
+T l 1
 S
 #168
 Summon Swift~
@@ -480,6 +481,7 @@ S
 #181
 Greater Enchantments~
 0 181 1.00 0 0
+T l 1
 S
 #182
 Dangerous Leathers~
@@ -493,12 +495,12 @@ S
 #184
 Enchant Armor~
 0 181 1.00 0 0
-T a 0
+T l 1
 S
 #185
 Enchant Tools~
 0 181 1.00 0 0
-T a 0
+T l 1
 S
 #186
 Ritual of Defense~
