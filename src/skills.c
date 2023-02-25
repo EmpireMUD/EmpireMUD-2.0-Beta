@@ -2325,7 +2325,7 @@ ACMD(do_skills) {
 					}
 					if (strlen(sbuf) > 41) {
 						// too long for half a line
-						l_size += snprintf(lbuf + l_size, sizeof(lbuf) - l_size, "%s %s\r\n", (!(++count % 2) || PRF_FLAGGED(ch, PRF_SCREEN_READER) ? "\r\n" : ""), sbuf);
+						l_size += snprintf(lbuf + l_size, sizeof(lbuf) - l_size, "%s %s\r\n", (!(++count % 2) && !PRF_FLAGGED(ch, PRF_SCREEN_READER) ? "\r\n" : ""), sbuf);
 						if (count % 2) {
 							++count;	// fix columns for the next line, if any
 						}
