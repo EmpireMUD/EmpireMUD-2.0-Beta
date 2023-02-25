@@ -197,7 +197,7 @@ const char *ability_type_notes[] = {
 	"summon",
 	"summon",
 	"morphing",
-	"augments",
+	"augment",
 /*
 	"UNAFFECTS",
 	"POINTS",
