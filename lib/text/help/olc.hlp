@@ -1222,6 +1222,7 @@ The following types are available (each has its own help file):
  &cSUMMON-RANDOM&0 - Player summons a random mob from this list.
  &cMORPH&0 - Ability has morphs that require ir.
  &cAUGMENT&0 - Used for augments/enchanting.
+ &cCUSTOM&0 - Ability is hard-coded, not parameterized.
 
 See also: OLC ABILITIES, BUFF ABILITY, CRAFT ABILITY, DAMAGE ABILITY,
    DOT ABILITY, PLAYER-TECH ABILITY, PASSIVE-BUFF ABILITY,

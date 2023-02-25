@@ -78,6 +78,7 @@ struct {
 	{ ABILT_SUMMON_RANDOM, NULL, NULL },
 	{ ABILT_MORPH, NULL, NULL },
 	{ ABILT_AUGMENT, NULL, NULL },
+	{ ABILT_CUSTOM, NULL, NULL },
 	
 	{ NOBITS }	// this goes last
 };
