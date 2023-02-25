@@ -76,6 +76,8 @@ struct {
 	{ ABILT_COMPANION, NULL, NULL },
 	{ ABILT_SUMMON_ANY, NULL, NULL },
 	{ ABILT_SUMMON_RANDOM, NULL, NULL },
+	{ ABILT_MORPH, NULL, NULL },
+	{ ABILT_AUGMENT, NULL, NULL },
 	
 	{ NOBITS }	// this goes last
 };

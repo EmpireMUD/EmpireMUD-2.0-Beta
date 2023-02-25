@@ -166,6 +166,8 @@ const char *ability_type_flags[] = {
 	"COMPANION",
 	"SUMMON-ANY",
 	"SUMMON-RANDOM",
+	"MORPH",
+	"AUGMENT",
 /*
 	"UNAFFECTS",
 	"POINTS",
@@ -194,6 +196,8 @@ const char *ability_type_notes[] = {
 	"companion",
 	"summon",
 	"summon",
+	"morphing",
+	"augments",
 /*
 	"UNAFFECTS",
 	"POINTS",

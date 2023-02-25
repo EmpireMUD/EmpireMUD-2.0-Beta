@@ -556,6 +556,8 @@ typedef struct vehicle_data vehicle_data;
 #define ABILT_COMPANION  BIT(7)	// grants companions
 #define ABILT_SUMMON_ANY  BIT(8)	// player can summon from a list of mobs
 #define ABILT_SUMMON_RANDOM  BIT(9)	// player can summon a mob at random from a list
+#define ABILT_MORPH  BIT(10)	// ability has morphs that require it
+#define ABILT_AUGMENT  BIT(11)	// related to augments/enchants
 /*
 #define ABILT_UNAFFECTS  BIT(2)
 #define ABILT_POINTS  BIT(3)	// e.g. heal?
