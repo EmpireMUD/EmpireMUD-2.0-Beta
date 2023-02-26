@@ -6842,11 +6842,12 @@ ACMD(do_publicize) {
 */
 void process_reclaim(char_data *ch) {
 	empire_data *emp = GET_LOYALTY(ch);
-	empire_data *enemy = ROOM_OWNER(IN_ROOM(ch));
+	empire_data *enemy;
 	room_data *target;
 	char from_str[256];
 	
 	target = real_room(GET_ACTION_VNUM(ch, 1));
+	enemy = ROOM_OWNER(target);
 	
 	// message prep
 	if (target != IN_ROOM(ch)) {
