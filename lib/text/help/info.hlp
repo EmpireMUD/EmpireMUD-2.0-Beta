@@ -1255,6 +1255,20 @@ cooldown. You can't use pathfinding again until it expires.
 
 See also: RUN, SAIL
 #
+"PLAYER TECHNOLOGIES" "PLAYER TECHNOLOGY" "PLAYER TECHS" PTECHS
+
+Player techs are traits, capabilities, or upgrades that are applied to a player
+by abilities. They are similar to empire technologies.
+
+The ability info display ("ability <name>") lists any techs granted by the
+ability. For players familiar with EmpireMUD, this may indicate what the
+ability does. However, you can usually find better information about it in the
+help file for the ability.
+
+Immortals can view a player's techs with "show technology <name>".
+
+See also: EMPIRE TECHNOLOGIES
+#
 PLAYERKILLING "PLAYER KILLING" PK PVP "TOGGLE PVP"
 
 EmpireMUD player-killing rules
