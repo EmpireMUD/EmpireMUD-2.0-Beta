@@ -6880,7 +6880,7 @@ void process_reclaim(char_data *ch) {
 	}
 	else if (GET_ACTION_TIMER(ch) <= 0) {
 		log_to_empire(enemy, ELOG_HOSTILITY, "Someone from %s has reclaimed (%d, %d)%s!", EMPIRE_NAME(emp), X_COORD(target), Y_COORD(target), from_str);
-		msg_to_char(ch, "You have reclaimed the area for your empire!");
+		msg_to_char(ch, "You have reclaimed the area for your empire!\r\n");
 		
 		add_offense(enemy, OFFENSE_RECLAIMED, ch, target, offense_was_seen(ch, enemy, NULL) ? OFF_SEEN : NOBITS);
 		
