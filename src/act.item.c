@@ -2505,11 +2505,15 @@ static void drink_message(char_data *ch, obj_data *obj, byte type, int subcmd, i
 	switch (type) {
 		case drink_OBJ: {
 			// message to char
-			if (subcmd != SCMD_SIP && obj_has_custom_message(obj, OBJ_CUSTOM_CONSUME_TO_CHAR)) {
+			if (subcmd == SCMD_SIP) {
+				snprintf(buf, sizeof(buf), "You sip the %s liquid from $p.\r\n", get_generic_string_by_vnum(GET_DRINK_CONTAINER_TYPE(obj), GENERIC_LIQUID, GSTR_LIQUID_COLOR));
+				act(buf, FALSE, ch, obj, NULL, TO_CHAR);
+			}
+			if (obj_has_custom_message(obj, OBJ_CUSTOM_CONSUME_TO_CHAR)) {
 				act(obj_get_custom_message(obj, OBJ_CUSTOM_CONSUME_TO_CHAR), FALSE, ch, obj, get_generic_string_by_vnum(GET_DRINK_CONTAINER_TYPE(obj), GENERIC_LIQUID, GSTR_LIQUID_NAME), TO_CHAR);
 			}
 			else {
-				msg_to_char(ch, "You %s the %s.\r\n", subcmd == SCMD_SIP ? "sip" : "drink", get_generic_string_by_vnum(GET_DRINK_CONTAINER_TYPE(obj), GENERIC_LIQUID, GSTR_LIQUID_NAME));
+				msg_to_char(ch, "You drink the %s.\r\n", get_generic_string_by_vnum(GET_DRINK_CONTAINER_TYPE(obj), GENERIC_LIQUID, GSTR_LIQUID_NAME));
 			}
 			
 			// message to room
