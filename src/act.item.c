@@ -616,7 +616,7 @@ void identify_obj_to_char(obj_data *obj, char_data *ch) {
 		}
 		case ITEM_RECIPE: {
 			craft_data *cft = craft_proto(GET_RECIPE_VNUM(obj));
-			msg_to_char(ch, "Teaches craft: %s (%s)\r\n", cft ? GET_CRAFT_NAME(cft) : "UNKNOWN", cft ? craft_types[GET_CRAFT_TYPE(cft)] : "?");
+			msg_to_char(ch, "Teaches craft: %s (%s%s)\r\n", cft ? GET_CRAFT_NAME(cft) : "UNKNOWN", cft ? craft_types[GET_CRAFT_TYPE(cft)] : "?", (cft && has_learned_craft(ch, GET_CRAFT_VNUM(cft))) ? ", learned" : "");
 			break;
 		}
 		case ITEM_WEAPON: {
@@ -724,7 +724,7 @@ void identify_obj_to_char(obj_data *obj, char_data *ch) {
 			break;
 		}
 		case ITEM_MINIPET: {
-			msg_to_char(ch, "Grants minipet: %s\r\n", get_mob_name_by_proto(GET_MINIPET_VNUM(obj), TRUE));
+			msg_to_char(ch, "Grants minipet: %s%s\r\n", get_mob_name_by_proto(GET_MINIPET_VNUM(obj), TRUE), has_minipet(ch, GET_MINIPET_VNUM(obj)) ? " (owned)" :"");
 			break;
 		}
 	}
