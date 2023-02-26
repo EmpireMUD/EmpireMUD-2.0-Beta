@@ -391,11 +391,16 @@ EEDIT(eedit_admin_flags) {
 
 
 EEDIT(eedit_banner) {
+	room_data *room, *next_room;
+	
 	if (!*argument) {
 		msg_to_char(ch, "Set the empire banner to what (HELP COLOR)?\r\n");
 	}
 	else if (!check_banner_color_string(argument, FALSE, FALSE)) {
 		msg_to_char(ch, "Invalid banner color (HELP COLOR) or too many color codes.\r\n");
+	}
+	else if (!strcmp(argument, NULLSAFE(EMPIRE_BANNER(emp)))) {
+		msg_to_char(ch, "That is already your current banner.\r\n");
 	}
 	else {
 		if (EMPIRE_BANNER(emp)) {
@@ -414,6 +419,13 @@ EEDIT(eedit_banner) {
 		}
 		
 		update_MSDP_empire_data_all(emp, FALSE, FALSE);
+		
+		// graphical map update for all tiles I own 
+		HASH_ITER(hh, world_table, room, next_room) {
+			if (GET_ROOM_VNUM(room) < MAP_SIZE && ROOM_OWNER(room) == emp) {
+				request_mapout_update(GET_ROOM_VNUM(room));
+			}
+		}
 	}
 }
 
