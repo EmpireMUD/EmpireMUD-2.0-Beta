@@ -780,7 +780,7 @@ GLB_FUNCTION(run_global_mine_data) {
 	room_data *room = (data ? data->room : NULL);
 	
 	if (!data || !room) {
-		return;	// no work
+		return FALSE;	// no work
 	}
 	
 	set_room_extra_data(room, ROOM_EXTRA_MINE_GLB_VNUM, GET_GLOBAL_VNUM(glb));
@@ -796,6 +796,8 @@ GLB_FUNCTION(run_global_mine_data) {
 	if (ch && GET_GLOBAL_ABILITY(glb) != NO_ABIL) {
 		gain_ability_exp(ch, GET_GLOBAL_ABILITY(glb), 75);
 	}
+	
+	return TRUE;
 }
 
 

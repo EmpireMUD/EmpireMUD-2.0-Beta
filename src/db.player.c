@@ -4696,9 +4696,14 @@ void set_title(char_data *ch, char *title) {
 // for start_new_character
 GLB_FUNCTION(run_global_newbie_gear) {
 	struct archetype_gear *gear;
+	bool any = FALSE;
+	
 	LL_FOREACH(GET_GLOBAL_GEAR(glb), gear) {
 		give_newbie_gear(ch, gear->vnum, gear->wear);
+		any = TRUE;
 	}
+	
+	return any;
 }
 
 

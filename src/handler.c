@@ -4573,7 +4573,7 @@ bool meets_interaction_restrictions(struct interact_restriction *list, char_data
 
 GLB_FUNCTION(run_global_mob_interactions_func) {
 	struct glb_mob_interact_bean *data = (struct glb_mob_interact_bean*)other_data;
-	run_interactions(ch, GET_GLOBAL_INTERACTIONS(glb), data->type, IN_ROOM(ch), data->mob, NULL, NULL, data->func);
+	return run_interactions(ch, GET_GLOBAL_INTERACTIONS(glb), data->type, IN_ROOM(ch), data->mob, NULL, NULL, data->func);
 }
 
 

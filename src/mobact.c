@@ -1128,7 +1128,10 @@ GLB_VALIDATOR(validate_global_map_spawns) {
 GLB_FUNCTION(run_global_map_spawns) {
 	struct glb_map_spawn_bean *data = (struct glb_map_spawn_bean*)other_data;
 	if (data) {
-		spawn_one_list(data->room, GET_GLOBAL_SPAWNS(glb));
+		return (spawn_one_list(data->room, GET_GLOBAL_SPAWNS(glb)) > 0);
+	}
+	else {
+		return FALSE;
 	}
 }
 
