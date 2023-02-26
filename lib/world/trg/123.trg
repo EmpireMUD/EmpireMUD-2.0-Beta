@@ -627,13 +627,13 @@ done
 %echo% &&t&&Z~%self% shifts as you hear growling from somewhere.&&0
 wait 3
 if %roll% > 95
-  set SpawnStr a few fledgling fur dragons approach
+  set SpawnStr a few furry fledglings approach
   set FledglingCount 3
 elseif %roll% > 80
-  set SpawnStr a couple fledgling fur dragons approach
+  set SpawnStr a couple furry fledglings approach
   set FledglingCount 2
 else
-  set SpawnStr a fledgling fur dragon approaches
+  set SpawnStr a furry fledgling approaches
   set FledglingCount 1
   set str s
 end
