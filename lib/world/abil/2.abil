@@ -19,6 +19,7 @@ S
 #205
 Master Survivalist~
 0 -1 1.00 0 0
+T m 0
 S
 #207
 Arcane Power~
@@ -32,6 +33,7 @@ S
 #209
 Outrage~
 0 -1 1.00 0 0
+T m 0
 S
 #210
 Unnatural Thirst~
@@ -68,6 +70,7 @@ S
 #216
 Refashion~
 0 -1 1.00 0 0
+T m 0
 S
 #218
 Dual-Wield~
@@ -78,10 +81,12 @@ S
 #219
 Resurrect~
 0 -1 1.00 0 0
+T m 0
 S
 #220
 Moonrise~
 0 -1 1.00 0 0
+T m 0
 S
 #221
 Iron Blades~
@@ -132,10 +137,12 @@ S
 #228
 Noble Bearing~
 0 -1 1.00 0 0
+T m 0
 S
 #229
 Bloodsweat~
 0 -1 1.00 0 0
+T m 0
 S
 #230
 Improved Reflexes~
@@ -146,30 +153,37 @@ S
 #231
 Shadow Kick~
 0 -1 1.00 0 0
+T m 0
 S
 #232
 Stagger Jab~
 0 -1 1.00 0 0
+T m 0
 S
 #233
 Shadowcage~
 0 -1 1.00 0 0
+T m 0
 S
 #234
 Howl~
 0 -1 1.00 0 0
+T m 0
 S
 #235
 Crucial Jab~
 0 -1 1.00 0 0
+T m 0
 S
 #236
 Diversion~
 0 -1 1.00 0 0
+T m 0
 S
 #237
 Shadow Jab~
 0 -1 1.00 0 0
+T m 0
 S
 #238
 Fastcasting~
@@ -180,10 +194,12 @@ S
 #239
 Ancestral Healing~
 0 -1 1.00 0 0
+T m 0
 S
 #240
 Confer~
 0 -1 1.00 0 0
+T m 0
 S
 #241
 Steelsmith Crafts~
@@ -224,6 +240,7 @@ S
 Workforce Sawing~
 0 -1 1.00 0 0
 T a 0
+T m 0
 S
 #250
 Griffin Familiar~
@@ -412,6 +429,7 @@ S
 #265
 Chant of Illusions~
 0 -1 1.00 0 0
+T m 0
 S
 #267
 Astral Werewolf Form~
@@ -421,6 +439,7 @@ S
 #268
 Whisperstride~
 0 -1 1.00 0 0
+T m 0
 S
 #269
 Werewolf Form~
@@ -440,6 +459,7 @@ S
 #272
 Stablemaster~
 0 -1 1.00 0 0
+T m 0
 S
 #273
 Ablate~
@@ -567,10 +587,12 @@ S
 #286
 Evasion~
 0 -1 1.00 0 0
+T m 0
 S
 #287
 Weapon Proficiency~
 0 -1 1.00 0 0
+T m 0
 S
 #288
 Primitive Crafts~
@@ -600,6 +622,7 @@ S
 #292
 Bite~
 0 -1 1.00 0 0
+T m 0
 S
 #293
 Cook~
@@ -611,22 +634,27 @@ S
 #294
 Kite~
 0 -1 1.00 0 0
+T m 0
 S
 #295
 Bowmaster~
 0 -1 1.00 0 0
+T m 0
 S
 #296
 Trick Shots~
 0 -1 1.00 0 0
+T m 0
 S
 #297
 Charge~
 0 -1 1.00 0 0
+T m 0
 S
 #298
 Fletching~
 0 203 1.00 0 0
+T a 0
 S
 #299
 Animal Husbandry~
