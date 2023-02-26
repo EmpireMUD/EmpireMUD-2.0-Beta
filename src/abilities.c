@@ -4166,7 +4166,7 @@ OLC_MODULE(abiledit_types) {
 				if (at->type == BIT(typeid)) {
 					found = TRUE;
 					sprintbit(BIT(typeid), ability_type_flags, buf, TRUE);
-					msg_to_char(ch, "You remove %s.\r\n", buf);
+					msg_to_char(ch, "You remove %s(%d).\r\n", buf, at->weight);
 					LL_DELETE(ABIL_TYPE_LIST(abil), at);
 					free(at);
 				}
