@@ -64,11 +64,16 @@ Chop (Scavenging ability)
 Usage:  chop
 Speed boosts:  Work ethic bonus, haste, higher level axe, superior axe
 
-This command allows you to chop trees in the forest. Beware, trees are a
-limited resource. Different types of forest give different qualities and
-quantities of trees. Some trees can be scraped, sawed, or lit on fire.
+This command allows you to chop trees in the forest. You must be using an axe
+in your wield, hold, sheath, or tool slot. Find any forest, grove, copse, or
+jungle and type 'chop'. It will take some time, depending on the level and
+quality of your axe.
 
-See also: BUILD, DEPLETION, SCRAPE, TREES, LUMBER, SAW, LIGHT
+Beware, trees are a limited resource. Different types of forest give different
+qualities and quantities of trees. Some trees can be scraped, sawed, or lit on
+fire.
+
+See also: BUILD, DEPLETION, SCRAPE, TREES, LUMBER, SAW, LIGHT, SAPLING
 #
 "DAILY EXPERIENCE BONUS POINTS" "DAILY SKILLS" "BONUS EXPERIENCE POINTS" "DAILY BONUS EXPERIENCE POINTS"
 
