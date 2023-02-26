@@ -1802,6 +1802,7 @@ ACMD(do_skills) {
 	struct synergy_display_ability *sda;
 	struct player_skill_data *skdata;
 	skill_data *skill, *next_skill, *synergy[2];
+	struct ability_data_list *adl;
 	struct synergy_ability *syn;
 	struct skill_ability *skab;
 	ability_data *abil;
@@ -2389,6 +2390,12 @@ ACMD(do_skills) {
 		if (ABIL_TYPE_LIST(abil)) {
 			get_ability_type_display(ABIL_TYPE_LIST(abil), lbuf, TRUE);
 			if (*lbuf) {
+				if (strstr(lbuf, "buff") && ABILITY_FLAGGED(abil, ABILF_VIOLENT)) {
+					// replace "buff" with "debuff"
+					ptr = str_replace("buff", "debuff", lbuf);
+					strcpy(lbuf, ptr);
+					free(ptr);
+				}
 				has_param_details = TRUE;
 				size += snprintf(outbuf + size, sizeof(outbuf) - size, "Type%s: %s\r\n", (strchr(lbuf, ',') ? "s" : ""), lbuf);
 			}
@@ -2407,6 +2414,22 @@ ACMD(do_skills) {
 		if (*lbuf && str_cmp(lbuf, "none")) {
 			has_param_details = TRUE;
 			size += snprintf(outbuf + size, sizeof(outbuf) - size, "Notes: %s\r\n", lbuf);
+		}
+		
+		// data
+		if (ABIL_DATA(abil)) {
+			// techs
+			*lbuf = '\0';
+			l_size = 0;
+			LL_FOREACH(ABIL_DATA(abil), adl) {
+				if (adl->type == ADL_PLAYER_TECH) {
+					l_size += snprintf(lbuf + l_size, sizeof(lbuf) - l_size, "%s%s", (*lbuf ? ", " : ""), player_tech_types[adl->vnum]);
+				}
+			}
+			if (*lbuf) {
+				has_param_details = TRUE;
+				size += snprintf(outbuf + size, sizeof(outbuf) - size, "Player tech%s: %s\r\n", (strchr(lbuf, ',') ? "s" : ""), lbuf);
+			}
 		}
 		
 		// purchased/free/can-purchase -- maybe
@@ -2469,14 +2492,6 @@ ACMD(do_skills) {
 			size += snprintf(buf + size, sizeof(buf) - size, "Max stacks: [\tc%d\t0]\r\n", ABIL_MAX_STACKS(abil));
 		}	// end dot
 		
-		// data
-		if (ABIL_DATA(abil)) {
-			size += snprintf(buf + size, sizeof(buf) - size, "Extra data:\r\n");
-			count = 0;
-			LL_FOREACH(ABIL_DATA(abil), adl) {
-				size += snprintf(buf + size, sizeof(buf) - size, " %d. %s\r\n", ++count, ability_data_display(adl));
-			}
-		}
 		*/
 		
 		if (!has_param_details) {
