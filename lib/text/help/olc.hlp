@@ -555,7 +555,11 @@ wears off.
 If you don't specify an ability, it will just say 'buff' and will have no wear-
 off message.
 
-See also: OLC ABILITIES, BUFF ABILITY
+If you use the LIMIT-CROWD-CONTROL flag, using this buff will cancel it on
+other mobs in the same room. For example, sapping 1 mob cancels anyone else
+you have sapped.
+
+See also: OLC ABILITIES, BUFF ABILITY, ABILEDIT FLAGS
 #d
 "ABILEDIT APPLY" "ABILEDIT APPLIES"
 
@@ -818,8 +822,10 @@ The following ability flags are available:
  &cTANK-ROLE&0 - Bonus for tank role, weaker without it.
  &cRANGED-ONLY&0 - Cannot be used in melee combat.
  &cIGNORE-SUN&0 - For a vampire ability, won't check sunlight.
+ &cUNSCALED-BUFF&0 - Uses exact apply values rather than scaling them.
+ &cLIMIT-CROWD-CONTROL&0 - Cancels the same affectvnum on other mobs in the room.
 
-See also: OLC ABILITIES
+See also: OLC ABILITIES, ABILEDIT AFFECTVNUM
 #d
 "ABILEDIT FULLSEARCH"
 

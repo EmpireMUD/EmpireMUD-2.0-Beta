@@ -129,6 +129,7 @@ const char *ability_flags[] = {
 	"RANGED-ONLY",
 	"IGNORE-SUN",
 	"UNSCALED-BUFF",
+	"LIMIT-CROWD-CONTROL",
 	"\n"
 };
 
@@ -150,6 +151,7 @@ const char *ability_flag_notes[] = {
 	"can only be used at range",
 	"unaffected by sun",
 	"",	// UNSCALED-BUFF
+	"limited crowd control",
 	"\n"
 };
 

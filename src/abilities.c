@@ -2044,6 +2044,10 @@ void perform_ability_command(char_data *ch, ability_data *abil, char *argument) 
 	
 	if (data->success) {
 		charge_ability_cost(ch, ABIL_COST_TYPE(abil), data->cost, ABIL_COOLDOWN(abil), ABIL_COOLDOWN_SECS(abil), ABIL_WAIT_TYPE(abil));
+		
+		if (ABILITY_FLAGGED(abil, ABILF_LIMIT_CROWD_CONTROL) && ABIL_AFFECT_VNUM(abil) != NOTHING) {
+			limit_crowd_control(targ, ABIL_AFFECT_VNUM(abil));
+		}
 	}
 	
 	// clean up data
