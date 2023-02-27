@@ -274,10 +274,11 @@ switch %target.vnum%
 done
 %send% %actor% You swoop toward ~%target% with an enchanted jar...
 %echoaround% %actor% ~%actor% swoops toward ~%target% with an enchanted jar...
+set id %target.id%
 * short wait, then re-validate
 wait 2 sec
-if !%target%
-  %send% %actor% The pixy got away!
+if !%target% || %target.id% != %id%
+  %send% %actor% You missed it. Better luck next time.
   halt
 elseif %target.fighting% || %actor.fighting% || %actor.room% != %target.room% || %actor.disabled%
   * fail with no message (reason should be obvious)

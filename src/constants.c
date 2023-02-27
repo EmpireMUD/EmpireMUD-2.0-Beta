@@ -112,7 +112,7 @@ const char *reboot_type[] = { "reboot", "shutdown" };
  //////////////////////////////////////////////////////////////////////////////
 //// ABILITY CONSTANTS ///////////////////////////////////////////////////////
 
-// ABILF_x: ability flags
+// ABILF_x (1/2): ability flags
 const char *ability_flags[] = {
 	"VIOLENT",	// 0
 	"COUNTERSPELLABLE",
@@ -133,7 +133,28 @@ const char *ability_flags[] = {
 };
 
 
-// ABILT_x: ability type flags
+// ABILF_x (2/2): ability flags shown to players as notes
+const char *ability_flag_notes[] = {
+	"violent",	// 0
+	"counterspellable",
+	"toggles on/off",
+	"",	// INVISIBLE
+	"",	// !ENGAGE
+	"ranged",	// 5
+	"can't be used in animal form",
+	"can't be used while invulnerable",
+	"stronger in caster role",
+	"stronger in healer role",
+	"stronger in melee role",	// 10
+	"stronger in tank role",
+	"can only be used at range",
+	"unaffected by sun",
+	"",	// UNSCALED-BUFF
+	"\n"
+};
+
+
+// ABILT_x (1/2): ability type flags
 const char *ability_type_flags[] = {
 	"CRAFT",	// 0
 	"BUFF",
@@ -145,6 +166,40 @@ const char *ability_type_flags[] = {
 	"COMPANION",
 	"SUMMON-ANY",
 	"SUMMON-RANDOM",
+	"MORPH",
+	"AUGMENT",
+	"CUSTOM",
+/*
+	"UNAFFECTS",
+	"POINTS",
+	"ALTER-OBJS",
+	"GROUPS",
+	"MASSES",
+	"AREAS",
+	"CREATIONS",
+	"MANUAL",
+	"ROOMS",
+	"CRAFT",
+*/
+	"\n"
+};
+
+
+// ABILT_x (2/2): ability types as shown to players
+const char *ability_type_notes[] = {
+	"crafting",	// 0
+	"buff",
+	"damage",
+	"damage-over-time",
+	"player tech",
+	"passive buff",	// 5
+	"ready weapon",
+	"companion",
+	"summon",
+	"summon",
+	"morphing",
+	"augment",
+	"custom",
 /*
 	"UNAFFECTS",
 	"POINTS",

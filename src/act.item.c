@@ -616,7 +616,7 @@ void identify_obj_to_char(obj_data *obj, char_data *ch) {
 		}
 		case ITEM_RECIPE: {
 			craft_data *cft = craft_proto(GET_RECIPE_VNUM(obj));
-			msg_to_char(ch, "Teaches craft: %s (%s)\r\n", cft ? GET_CRAFT_NAME(cft) : "UNKNOWN", cft ? craft_types[GET_CRAFT_TYPE(cft)] : "?");
+			msg_to_char(ch, "Teaches craft: %s (%s%s)\r\n", cft ? GET_CRAFT_NAME(cft) : "UNKNOWN", cft ? craft_types[GET_CRAFT_TYPE(cft)] : "?", (cft && has_learned_craft(ch, GET_CRAFT_VNUM(cft))) ? ", learned" : "");
 			break;
 		}
 		case ITEM_WEAPON: {
@@ -724,7 +724,7 @@ void identify_obj_to_char(obj_data *obj, char_data *ch) {
 			break;
 		}
 		case ITEM_MINIPET: {
-			msg_to_char(ch, "Grants minipet: %s\r\n", get_mob_name_by_proto(GET_MINIPET_VNUM(obj), TRUE));
+			msg_to_char(ch, "Grants minipet: %s%s\r\n", get_mob_name_by_proto(GET_MINIPET_VNUM(obj), TRUE), has_minipet(ch, GET_MINIPET_VNUM(obj)) ? " (owned)" :"");
 			break;
 		}
 	}
@@ -2505,11 +2505,15 @@ static void drink_message(char_data *ch, obj_data *obj, byte type, int subcmd, i
 	switch (type) {
 		case drink_OBJ: {
 			// message to char
-			if (subcmd != SCMD_SIP && obj_has_custom_message(obj, OBJ_CUSTOM_CONSUME_TO_CHAR)) {
+			if (subcmd == SCMD_SIP) {
+				snprintf(buf, sizeof(buf), "You sip the %s liquid from $p.\r\n", get_generic_string_by_vnum(GET_DRINK_CONTAINER_TYPE(obj), GENERIC_LIQUID, GSTR_LIQUID_COLOR));
+				act(buf, FALSE, ch, obj, NULL, TO_CHAR);
+			}
+			if (obj_has_custom_message(obj, OBJ_CUSTOM_CONSUME_TO_CHAR)) {
 				act(obj_get_custom_message(obj, OBJ_CUSTOM_CONSUME_TO_CHAR), FALSE, ch, obj, get_generic_string_by_vnum(GET_DRINK_CONTAINER_TYPE(obj), GENERIC_LIQUID, GSTR_LIQUID_NAME), TO_CHAR);
 			}
 			else {
-				msg_to_char(ch, "You %s the %s.\r\n", subcmd == SCMD_SIP ? "sip" : "drink", get_generic_string_by_vnum(GET_DRINK_CONTAINER_TYPE(obj), GENERIC_LIQUID, GSTR_LIQUID_NAME));
+				msg_to_char(ch, "You drink the %s.\r\n", get_generic_string_by_vnum(GET_DRINK_CONTAINER_TYPE(obj), GENERIC_LIQUID, GSTR_LIQUID_NAME));
 			}
 			
 			// message to room

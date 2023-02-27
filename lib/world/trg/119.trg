@@ -5374,7 +5374,7 @@ elseif %cmd.mudcommand% == time
 elseif %cmd.mudcommand% == weather
   if %room.template% == 11981
     %send% %actor% It's hard to tell the weather from in here.
-  else if %indoor_list% ~= %room.template%
+  elseif %indoor_list% ~= %room.template%
     %send% %actor% It's hard to tell the weather from in here, but a lot of sun is coming from above.
   else
     %send% %actor% The sky is cloudless and sunny.

@@ -1220,6 +1220,9 @@ The following types are available (each has its own help file):
  &cCOMPANION&0 - Adds 1 or more mobs to the player's 'companions' command.
  &cSUMMON-ANY&0 - Player chooses from a list of mobs to summon.
  &cSUMMON-RANDOM&0 - Player summons a random mob from this list.
+ &cMORPH&0 - Ability has morphs that require ir.
+ &cAUGMENT&0 - Used for augments/enchanting.
+ &cCUSTOM&0 - Ability is hard-coded, not parameterized.
 
 See also: OLC ABILITIES, BUFF ABILITY, CRAFT ABILITY, DAMAGE ABILITY,
    DOT ABILITY, PLAYER-TECH ABILITY, PASSIVE-BUFF ABILITY,
@@ -4648,7 +4651,7 @@ To search other fields, you can generally use the normal "search" option for
 other OLC types. For example, to find all mobs with the "Dismissable"
 trigger, use ".t search 9901".
 #d
-"MEDIT INTERACTION" "BEDIT INTERACTION" "OEDIT INTERACTION" "REDIT INTERACTION" "SECTEDIT INTERACTION" "CROPEDIT INTERACTION" "GEDIT INTERACTION" "VEDIT INTERACTION" INTERACTIONS
+INTERACTION "MEDIT INTERACTION" "BEDIT INTERACTION" "OEDIT INTERACTION" "REDIT INTERACTION" "SECTEDIT INTERACTION" "CROPEDIT INTERACTION" "GEDIT INTERACTION" "VEDIT INTERACTION" INTERACTIONS INTERACT
 
 Usage:  .interaction add <type> <quantity> <vnum> <percent> [exclusion code | restrictions]
         .interaction change <number> <field> <value>
@@ -4753,7 +4756,7 @@ Example of possible multiple results from shear:
  3. SHEAR: 1x some wool 5.00%
 
 See also: OLC BUILDINGS, OLC CROPS, OLC MOBILES, OLC SECTORS, OLC VEHICLES,
-  PRODUCTION INTERACTION, OLC WORKFORCE
+  PRODUCTION INTERACTION, OLC WORKFORCE, OLC DEPLETIONS
 #d
 "MEDIT KEYWORDS"
 

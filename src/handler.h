@@ -52,7 +52,7 @@
 
 // global function types -- for run_globals
 #define GLB_VALIDATOR(name)		bool (name)(struct global_data *glb, char_data *ch, void *other_data)
-#define GLB_FUNCTION(name)		void (name)(struct global_data *glb, char_data *ch, void *other_data)
+#define GLB_FUNCTION(name)		bool (name)(struct global_data *glb, char_data *ch, void *other_data)
 
 
  //////////////////////////////////////////////////////////////////////////////

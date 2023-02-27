@@ -76,6 +76,9 @@ struct {
 	{ ABILT_COMPANION, NULL, NULL },
 	{ ABILT_SUMMON_ANY, NULL, NULL },
 	{ ABILT_SUMMON_RANDOM, NULL, NULL },
+	{ ABILT_MORPH, NULL, NULL },
+	{ ABILT_AUGMENT, NULL, NULL },
+	{ ABILT_CUSTOM, NULL, NULL },
 	
 	{ NOBITS }	// this goes last
 };
@@ -480,9 +483,10 @@ ability_data *find_ability(char *argument) {
 * Look up an ability by multi-abbrev, preferring exact matches.
 *
 * @param char *name The ability name to look up.
+* @param bool allow_abbrev If true, allows abbreviations.
 * @return ability_data* The ability, or NULL if it doesn't exist.
 */
-ability_data *find_ability_by_name(char *name) {
+ability_data *find_ability_by_name_exact(char *name, bool allow_abbrev) {
 	ability_data *abil, *next_abil, *partial = NULL;
 	
 	if (!*name) {
@@ -495,7 +499,7 @@ ability_data *find_ability_by_name(char *name) {
 			// perfect match
 			return abil;
 		}
-		if (!partial && is_multiword_abbrev(name, ABIL_NAME(abil))) {
+		if (allow_abbrev && !partial && is_multiword_abbrev(name, ABIL_NAME(abil))) {
 			// probable match
 			partial = abil;
 		}
@@ -637,16 +641,23 @@ struct ability_exec_type *get_ability_type_data(struct ability_exec *data, bitve
 *
 * @param struct ability_type *list Pointer to the start of a list of types.
 * @param char *save_buffer A buffer to store the result to.
+* @param bool for_players If TRUE, shows the player version of the flags instead of the internal version.
 */
-void get_ability_type_display(struct ability_type *list, char *save_buffer) {
+void get_ability_type_display(struct ability_type *list, char *save_buffer, bool for_players) {
 	struct ability_type *at;
 	char lbuf[256];
 	int count = 0;
 	
 	*save_buffer = '\0';
 	LL_FOREACH(list, at) {
-		sprintbit(at->type, ability_type_flags, lbuf, TRUE);
-		sprintf(save_buffer + strlen(save_buffer), "%s%s(%d)", (count++ > 0) ? ", " : "", lbuf, at->weight);
+		if (for_players) {
+			prettier_sprintbit(at->type, ability_type_notes, lbuf);
+			sprintf(save_buffer + strlen(save_buffer), "%s%s", (count++ > 0) ? ", " : "", lbuf);
+		}
+		else {
+			sprintbit(at->type, ability_type_flags, lbuf, TRUE);
+			sprintf(save_buffer + strlen(save_buffer), "%s%s(%d)", (count++ > 0) ? ", " : "", lbuf, at->weight);
+		}
 	}
 	if (count == 0) {
 		strcat(save_buffer, "none");
@@ -3434,7 +3445,7 @@ void do_stat_ability(char_data *ch, ability_data *abil) {
 
 	size += snprintf(buf + size, sizeof(buf) - size, "Scale: [\ty%d%%\t0], Mastery ability: [\ty%d\t0] \ty%s\t0\r\n", (int)(ABIL_SCALE(abil) * 100), ABIL_MASTERY_ABIL(abil), ABIL_MASTERY_ABIL(abil) == NOTHING ? "none" : get_ability_name_by_vnum(ABIL_MASTERY_ABIL(abil)));
 	
-	get_ability_type_display(ABIL_TYPE_LIST(abil), part);
+	get_ability_type_display(ABIL_TYPE_LIST(abil), part, FALSE);
 	size += snprintf(buf + size, sizeof(buf) - size, "Types: \tc%s\t0\r\n", part);
 	
 	sprintbit(ABIL_FLAGS(abil), ability_flags, part, TRUE);
@@ -3545,7 +3556,7 @@ void olc_show_ability(char_data *ch) {
 	sprintf(buf + strlen(buf), "[%s%d\t0] %s%s\t0\r\n", OLC_LABEL_CHANGED, GET_OLC_VNUM(ch->desc), OLC_LABEL_UNCHANGED, !find_ability_by_vnum(ABIL_VNUM(abil)) ? "new ability" : get_ability_name_by_vnum(ABIL_VNUM(abil)));
 	sprintf(buf + strlen(buf), "<%sname\t0> %s\r\n", OLC_LABEL_STR(ABIL_NAME(abil), default_ability_name), NULLSAFE(ABIL_NAME(abil)));
 	
-	get_ability_type_display(ABIL_TYPE_LIST(abil), lbuf);
+	get_ability_type_display(ABIL_TYPE_LIST(abil), lbuf, FALSE);
 	sprintf(buf + strlen(buf), "<%stypes\t0> %s\r\n", OLC_LABEL_PTR(ABIL_TYPE_LIST(abil)), lbuf);
 	
 	sprintf(buf + strlen(buf), "<%smasteryability\t0> %d %s\r\n", OLC_LABEL_VAL(ABIL_MASTERY_ABIL(abil), NOTHING), ABIL_MASTERY_ABIL(abil), ABIL_MASTERY_ABIL(abil) == NOTHING ? "none" : get_ability_name_by_vnum(ABIL_MASTERY_ABIL(abil)));
@@ -4155,7 +4166,7 @@ OLC_MODULE(abiledit_types) {
 				if (at->type == BIT(typeid)) {
 					found = TRUE;
 					sprintbit(BIT(typeid), ability_type_flags, buf, TRUE);
-					msg_to_char(ch, "You remove %s.\r\n", buf);
+					msg_to_char(ch, "You remove %s(%d).\r\n", buf, at->weight);
 					LL_DELETE(ABIL_TYPE_LIST(abil), at);
 					free(at);
 				}

@@ -603,7 +603,7 @@ if !%arg%
   return 0
   halt
 end
-set MoveDir %actor.parse_dir(%arg%)%
+set MoveDir %actor.parse_dir(%arg.car%)%
 set SelfRoom %self.room%
 if !%SelfRoom.in_city%
   %send% %actor% While you have a gift to deliver, you should probably be sneaking around your own city.
@@ -613,6 +613,10 @@ end
 if %actor.cooldown(16611)%
   %send% %actor% You're drawing too much attention to yourself. You need to cool off.
   nop %actor.set_cooldown(16611, 30)%
+  halt
+end
+if !%MoveDir%
+  %send% %actor% That's not a valid direction.
   halt
 end
 eval to_room %%SelfRoom.%MoveDir%(room)%%
@@ -3034,7 +3038,7 @@ Winter Wonderland music quests: detect playing~
 set questid %self.vnum%
 if %self.carried_by%
   set actor %self.carried_by%
-else if %self.worn_by%
+elseif %self.worn_by%
   set actor %self.worn_by%
 end
 if %actor.action% != playing
@@ -3090,7 +3094,7 @@ switch %questid%
     set any 0
     if %room.bld_flagged(DEDICATE)% && %actor.canuseroom_member(%room%)%
       set any 1
-    else if %room.in_vehicle% && %actor.empire% == %room.in_vehicle.empire%
+    elseif %room.in_vehicle% && %actor.empire% == %room.in_vehicle.empire%
       if %room.in_vehicle.is_flagged(DEDICATE)%
         set any 1
       end

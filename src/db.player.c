@@ -4018,6 +4018,7 @@ void delete_player_character(char_data *ch) {
 	
 	clear_private_owner(GET_IDNUM(ch));
 	purge_bound_items(GET_IDNUM(ch));
+	delete_player_from_running_events(ch);
 
 	// Check the empire
 	if ((emp = GET_LOYALTY(ch)) != NULL) {
@@ -4695,9 +4696,14 @@ void set_title(char_data *ch, char *title) {
 // for start_new_character
 GLB_FUNCTION(run_global_newbie_gear) {
 	struct archetype_gear *gear;
+	bool any = FALSE;
+	
 	LL_FOREACH(GET_GLOBAL_GEAR(glb), gear) {
 		give_newbie_gear(ch, gear->vnum, gear->wear);
+		any = TRUE;
 	}
+	
+	return any;
 }
 
 

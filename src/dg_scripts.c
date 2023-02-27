@@ -4246,8 +4246,8 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 								snprintf(str, slen, "%s", dirs[dir]);	// real dir
 							}
 							else {
-								// bad direction -- just give them their arg back
-								snprintf(str, slen, "%s", subfield);
+								// bad direction -- empty result
+								*str = '\0';
 							}
 						}
 						else {	// missing arg

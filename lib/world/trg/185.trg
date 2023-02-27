@@ -91,6 +91,7 @@ switch %random.4%
   break
   * Mana drain + spirit bomb
   case 3
+    set actor_id %actor.id%
     %echo% ~%self% starts drawing all the mana in the room to *%self%self...
     set cycles 4
     set amount 50
@@ -119,6 +120,9 @@ switch %random.4%
     done
     %echo% ~%self% gathers the stolen mana together...
     wait 3 sec
+    if !%actor% || %actor.id% != %actor_id%
+      halt
+    end
     if %heroic_mode%
       * This divisor is important; if this attack is too strong, increase it a bit
       if %damage_scale% < 100
@@ -142,6 +146,7 @@ switch %random.4%
   break
   * Power word stun
   case 4
+    set actor_id %actor.id%
     %echo% ~%self% raises ^%self% staff high and mutters an incantation...
     set interrupted 0
     wait 3 sec
@@ -152,7 +157,7 @@ switch %random.4%
     elseif %heroic_mode% || !%interrupted%
       * Random enemy
       set person %random.enemy%
-      if !%person%
+      if !%person% && %actor.id% == %actor_id%
         set person %actor%
       end
       set multi_target 0

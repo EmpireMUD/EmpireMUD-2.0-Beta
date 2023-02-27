@@ -1273,9 +1273,9 @@ if %actor.trigger_counterspell%
 end
 set prev_name %actor.name%
 %morph% %actor% 10992
-%send% %actor% You are abruptly transformed into ~%actor%!
-%echoaround% %actor% %prev_name% is abruptly transformed into ~%actor%!
-dg_affect #10992 %actor% HARD-STUNNED on 20
+%send% %actor% You are abruptly transformed into %actor.name%!
+%echoaround% %actor% %prev_name% is abruptly transformed into %actor.name%!
+dg_affect #10992 %actor% STUNNED on 20
 wait 15 sec
 if !%actor% || %actor.id% != %id%
   halt

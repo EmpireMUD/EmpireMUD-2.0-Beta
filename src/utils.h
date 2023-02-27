@@ -1928,6 +1928,7 @@ void apply_one_passive_buff(char_data *ch, ability_data *abil);
 bool check_ability(char_data *ch, char *string, bool exact);
 ability_data *find_ability_on_skill(char *name, skill_data *skill);
 ability_data *find_player_ability_by_tech(char_data *ch, int ptech);
+void get_ability_type_display(struct ability_type *list, char *save_buffer, bool for_players);
 int get_player_level_for_ability(char_data *ch, any_vnum abil_vnum);
 bool is_class_ability(ability_data *abil);
 char_data *load_companion_mob(char_data *leader, struct companion_data *cd);
@@ -2150,6 +2151,7 @@ char empire_banner_to_mapout_token(const char *banner);
 bool valid_rank_name(char_data *ch, char *newname);
 
 // event.c
+void delete_player_from_running_events(char_data *ch);
 int gain_event_points(char_data *ch, any_vnum event_vnum, int points);
 struct player_event_data *get_event_data(char_data *ch, int event_id);
 struct event_running_data *only_one_running_event(int *count);

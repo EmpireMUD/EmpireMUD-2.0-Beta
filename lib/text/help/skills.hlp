@@ -64,11 +64,16 @@ Chop (Scavenging ability)
 Usage:  chop
 Speed boosts:  Work ethic bonus, haste, higher level axe, superior axe
 
-This command allows you to chop trees in the forest. Beware, trees are a
-limited resource. Different types of forest give different qualities and
-quantities of trees. Some trees can be scraped, sawed, or lit on fire.
+This command allows you to chop trees in the forest. You must be using an axe
+in your wield, hold, sheath, or tool slot. Find any forest, grove, copse, or
+jungle and type 'chop'. It will take some time, depending on the level and
+quality of your axe.
 
-See also: BUILD, DEPLETION, SCRAPE, TREES, LUMBER, SAW, LIGHT
+Beware, trees are a limited resource. Different types of forest give different
+qualities and quantities of trees. Some trees can be scraped, sawed, or lit on
+fire.
+
+See also: BUILD, DEPLETION, SCRAPE, TREES, LUMBER, SAW, LIGHT, SAPLING
 #
 "DAILY EXPERIENCE BONUS POINTS" "DAILY SKILLS" "BONUS EXPERIENCE POINTS" "DAILY BONUS EXPERIENCE POINTS"
 
@@ -528,12 +533,16 @@ See also: APPROACH, USE
 SKILL SKILLS ABILITY ABILITIES "SKILL BUY" "SKILL RESET" "SKILL LEVELS"
 
 Usage:  skills -- list all skills
-        skill <name> -- see abilities in that skill
+        skill <name> -- see details about a skill or ability
         skill buy <ability> -- purchase an ability
         skill reset <skill> -- reset your ability points
         skill drop <skill> <level> -- lose skill levels
         skill synergy <skill 1> <skill 2> -- see list of synergy abilities
         skill swap
+
+Sorting: skill -level [name]
+         skill -level [min-max] [name]
+         skill -alpha [name]
 
 This multi-purpose command helps you understand your skills. It shows your
 progress in each skill, and the ability points you've earned.
@@ -542,7 +551,8 @@ If you specify a skill, you'll see a breakdown of the abilities in that skill
 tree. Abilities marked with an "x" are the ones you already know. To buy a new
 ability, use "skill buy". You must have a free ability point to do this.
 
-For more information, see the help page for each skill or ability.
+If you specify an ability, you will see information about that ability. For
+more information, see the help page for each skill or ability.
 
 When you hit a skill cap level (50, 75, 100) you get to reset your abilities
 in that skill. To do that, you can type "skill reset <skill>". If you type it
@@ -558,6 +568,8 @@ no more than 10 points from any one ability.
 When you use an ability, its level is limited to your level in its parent skill
 unless you have 100 in that skill, in which case it scales all the way up to
 your full level.
+
+The ability/abilities commands are identical to the skills command.
 
 See also: NOSKILL, SPECIALIZE, SKILL CAPS, SKILL DROP, TRAINING SKILLS,
    ABILITY POINTS, SKILL SWAP, LETHEIAN ICON
