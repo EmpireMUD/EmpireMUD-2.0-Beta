@@ -2351,7 +2351,7 @@ ACMD(do_skills) {
 		}
 		
 		if (ABIL_ASSIGNED_SKILL(abil)) {
-			size += snprintf(outbuf + size, sizeof(outbuf) - size, "%sSkill: %s %d\t0\r\n", (get_skill_level(ch, SKILL_VNUM(ABIL_ASSIGNED_SKILL(abil))) >= ABIL_SKILL_LEVEL(abil)) ? "\t0" : "\tr", SKILL_NAME(ABIL_ASSIGNED_SKILL(abil)), ABIL_SKILL_LEVEL(abil));
+			size += snprintf(outbuf + size, sizeof(outbuf) - size, "Skill: %s%s %d\t0\r\n", (get_skill_level(ch, SKILL_VNUM(ABIL_ASSIGNED_SKILL(abil))) >= ABIL_SKILL_LEVEL(abil)) ? "\t0" : "\tr", SKILL_NAME(ABIL_ASSIGNED_SKILL(abil)), ABIL_SKILL_LEVEL(abil));
 			
 			// parent/prerequisite ability (chain?) -- maybe?
 		}
@@ -2367,7 +2367,7 @@ ACMD(do_skills) {
 						snprintf(sbuf, sizeof(sbuf), "%s%s %d + %s %d (%s)\t0", syn->role == NOTHING ? "\tW" : class_role_color[syn->role], SKILL_NAME(skill), SKILL_MAX_LEVEL(skill), get_skill_name_by_vnum(syn->skill), syn->level, syn->role == NOTHING ? "All" : class_role[syn->role]);
 					}
 					else {
-						snprintf(sbuf, sizeof(sbuf), "%s%s %d + %s %d (%c)\t0", syn->role == NOTHING ? "\tW" : class_role_color[syn->role], SKILL_NAME(skill), SKILL_MAX_LEVEL(skill), get_skill_name_by_vnum(syn->skill), syn->level, syn->role == NOTHING ? 'A' : *class_role[syn->role]);
+						snprintf(sbuf, sizeof(sbuf), "%s%s %d + %s %d (%c)\t0", syn->role == NOTHING ? "\tW" : class_role_color[syn->role], SKILL_ABBREV(skill), SKILL_MAX_LEVEL(skill), get_skill_name_by_vnum(syn->skill), syn->level, syn->role == NOTHING ? 'A' : *class_role[syn->role]);
 					}
 					if (strlen(sbuf) > 41) {
 						// too long for half a line
@@ -2409,14 +2409,7 @@ ACMD(do_skills) {
 			size += snprintf(outbuf + size, sizeof(outbuf) - size, "Linked trait: %s (%d)\r\n", lbuf, get_attribute_by_apply(ch, ABIL_LINKED_TRAIT(abil)));
 		}
 		
-		// notes (flags), if parameterized
-		prettier_sprintbit(ABIL_FLAGS(abil), ability_flag_notes, lbuf);
-		if (*lbuf && str_cmp(lbuf, "none")) {
-			has_param_details = TRUE;
-			size += snprintf(outbuf + size, sizeof(outbuf) - size, "Notes: %s\r\n", lbuf);
-		}
-		
-		// data
+		// data, if parameterized
 		if (ABIL_DATA(abil)) {
 			// techs
 			*lbuf = '\0';
@@ -2433,7 +2426,13 @@ ACMD(do_skills) {
 		}
 		
 		// purchased/free/can-purchase -- maybe
-
+		
+		// notes (flags), if parameterized -- LAST
+		prettier_sprintbit(ABIL_FLAGS(abil), ability_flag_notes, lbuf);
+		if (*lbuf && str_cmp(lbuf, "none")) {
+			has_param_details = TRUE;
+			size += snprintf(outbuf + size, sizeof(outbuf) - size, "Notes: %s\r\n", lbuf);
+		}
 /*
 		More things we could show (from vstat ability):
 		
