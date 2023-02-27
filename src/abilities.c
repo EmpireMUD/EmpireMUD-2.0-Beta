@@ -1748,6 +1748,9 @@ DO_ABIL(do_buff_ability) {
 			return;
 		}
 	}
+	else {
+		total_points = 1;	// dummy number
+	}
 	
 	if (ABIL_IMMUNITIES(abil) && AFF_FLAGGED(vict, ABIL_IMMUNITIES(abil))) {
 		act("$N is immune!", FALSE, ch, NULL, vict, TO_CHAR);
@@ -1782,6 +1785,9 @@ DO_ABIL(do_buff_ability) {
 				total_w += ABSOLUTE(apply->weight);
 			}
 		}
+	}
+	else {
+		total_w = 1;	// not 0, you know, just in case
 	}
 	
 	// now create affects for each apply that we can afford
