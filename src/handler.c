@@ -4050,9 +4050,8 @@ bool run_globals(int glb_type, GLB_FUNCTION(*func), bool allow_many, bitvector_t
 		}
 		else {	// not choose-last
 			if (func) {
-				func(glb, ch, other_data);
+				found |= func(glb, ch, other_data);
 			}
-			found = TRUE;
 			if (!allow_many) {
 				break;	// only use first match
 			}
@@ -4062,8 +4061,7 @@ bool run_globals(int glb_type, GLB_FUNCTION(*func), bool allow_many, bitvector_t
 	
 	// failover/choose-last
 	if (!found && choose_last && func) {
-		func(choose_last, ch, other_data);
-		found = TRUE;
+		found |= func(choose_last, ch, other_data);
 	}
 	
 	return found;
