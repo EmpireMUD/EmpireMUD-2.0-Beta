@@ -1739,7 +1739,7 @@ DO_ABIL(do_buff_ability) {
 	
 	affect_vnum = (ABIL_AFFECT_VNUM(abil) != NOTHING) ? ABIL_AFFECT_VNUM(abil) : ATYPE_BUFF;
 	
-	unscaled = ABILITY_FLAGGED(abil, ABILF_UNSCALED_BUFF);
+	unscaled = ABILITY_FLAGGED(abil, ABILF_UNSCALED_BUFF) ? TRUE : FALSE;
 	if (!unscaled) {
 		total_points = get_ability_type_data(data, ABILT_BUFF)->scale_points;
 		remaining_points = total_points;
