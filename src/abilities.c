@@ -1733,8 +1733,8 @@ DO_ABIL(do_buff_ability) {
 	struct affected_type *af;
 	struct apply_data *apply;
 	any_vnum affect_vnum;
-	double total_points, remaining_points, share, amt;
-	int dur, total_w;
+	double total_points = 1, remaining_points = 1, share, amt;
+	int dur, total_w = 1;
 	bool messaged, unscaled;
 	
 	affect_vnum = (ABIL_AFFECT_VNUM(abil) != NOTHING) ? ABIL_AFFECT_VNUM(abil) : ATYPE_BUFF;
@@ -1747,9 +1747,6 @@ DO_ABIL(do_buff_ability) {
 		if (total_points <= 0) {
 			return;
 		}
-	}
-	else {
-		total_points = 1;	// dummy number
 	}
 	
 	if (ABIL_IMMUNITIES(abil) && AFF_FLAGGED(vict, ABIL_IMMUNITIES(abil))) {
@@ -1785,9 +1782,6 @@ DO_ABIL(do_buff_ability) {
 				total_w += ABSOLUTE(apply->weight);
 			}
 		}
-	}
-	else {
-		total_w = 1;	// not 0, you know, just in case
 	}
 	
 	// now create affects for each apply that we can afford
