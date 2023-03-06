@@ -1623,6 +1623,7 @@ typedef struct vehicle_data vehicle_data;
 #define MOB_SILENT  BIT(33)	// H. will not set off custom strings
 #define MOB_COINS  BIT(34)	// I. mob drops coins on death/pickpocket
 #define MOB_NO_COMMAND  BIT(35)	// J. mob cannot be commanded/ordered
+#define MOB_NO_KNOCKOUT  BIT(36)	// K. mob cannot be knocked out; it's always killed instead
 
 
 // MOB_CUSTOM_x: custom message types

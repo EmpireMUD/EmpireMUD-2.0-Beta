@@ -4620,6 +4620,7 @@ Available mob flags:
  SILENT - Mob will not display custom strings while this flag is on.
  COINS - Mob will drop coins on death/pickpocket.
  NO-COMMAND - Cannot be commanded/ordered.
+ NO-KNOCKOUT - Cannot be knocked unconscious (from toggle autokill).
 
 See also: OLC MOBILES
 #d
