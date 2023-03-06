@@ -2256,7 +2256,7 @@ const char *action_bits[] = {
 	"SILENT",
 	"COINS",
 	"NO-COMMAND",	// 35
-	"NO-KNOCKOUT",
+	"NO-UNCONSCIOUS",
 	"\n"
 };
 

@@ -3626,7 +3626,7 @@ void perform_execute(char_data *ch, char_data *victim, int attacktype, int damty
 
 	/* stop_fighting() is split around here to help with exp */
 	
-	if (MOB_FLAGGED(victim, MOB_NO_KNOCKOUT)) {
+	if (MOB_FLAGGED(victim, MOB_NO_UNCONSCIOUS)) {
 		ok = TRUE;	// never knock unconscious
 	}
 	else if (ch == victim) {
