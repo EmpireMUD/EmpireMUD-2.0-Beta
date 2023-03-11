@@ -931,7 +931,7 @@ static void show_empire_identify_to_char(char_data *ch, empire_data *emp, char *
 		return;
 	}
 	
-	identify_obj_to_char(proto, ch);
+	identify_obj_to_char(proto, ch, FALSE);
 	
 	msg_to_char(ch, "Storage list: \r\n");
 	HASH_ITER(hh, eid_pi_list, eid_pi, eid_pi_next) {

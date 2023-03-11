@@ -2007,7 +2007,7 @@ room_data *find_docks(empire_data *emp, int island_id);
 int find_free_shipping_id(empire_data *emp);
 obj_data *find_lighter_in_list(obj_data *list, bool *had_keep);
 bool get_check_money(char_data *ch, obj_data *obj);
-void identify_obj_to_char(obj_data *obj, char_data *ch);
+void identify_obj_to_char(obj_data *obj, char_data *ch, bool simple);
 int obj_carry_size(obj_data *obj);
 void process_shipping();
 void remove_armor_by_type(char_data *ch, int armor_type);

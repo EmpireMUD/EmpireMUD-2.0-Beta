@@ -411,8 +411,9 @@ bool run_identifies_to(char_data *ch, obj_data **obj, bool *extract) {
 *
 * @param obj_data *obj The item to identify.
 * @param char_data *ch The person to show the data to.
+* @param bool simple If TRUE, hides some of the info.
 */
-void identify_obj_to_char(obj_data *obj, char_data *ch) {
+void identify_obj_to_char(obj_data *obj, char_data *ch, bool simple) {
 	struct string_hash *str_iter, *next_str, *str_hash = NULL;
 	vehicle_data *veh, *veh_iter, *next_veh;
 	bld_data *bld, *bld_iter, *next_bld;
@@ -465,19 +466,19 @@ void identify_obj_to_char(obj_data *obj, char_data *ch) {
 	snprintf(lbuf, sizeof(lbuf), "Your analysis of %s$p\t0%s reveals:", obj_color_by_quality(obj, ch), location);
 	act(lbuf, FALSE, ch, obj, NULL, TO_CHAR);
 	
-	if (GET_OBJ_REQUIRES_QUEST(obj) != NOTHING) {
+	if (!simple && GET_OBJ_REQUIRES_QUEST(obj) != NOTHING) {
 		msg_to_char(ch, "Quest: %s\r\n", get_quest_name_by_proto(GET_OBJ_REQUIRES_QUEST(obj)));
 	}
 	
 	// if it has any wear bits other than TAKE, show if they can't use it
-	if (CAN_WEAR(obj, ~ITEM_WEAR_TAKE)) {
+	if (!simple && CAN_WEAR(obj, ~ITEM_WEAR_TAKE)) {
 		// the TRUE causes it to send a message if unusable
 		msg_to_char(ch, "&r");
 		can_wear_item(ch, obj, TRUE);
 		msg_to_char(ch, "&0");
 	}
 
-	if (GET_OBJ_STORAGE(obj) && !OBJ_FLAGGED(obj, OBJ_NO_STORE) && OBJ_CAN_STORE(obj)) {
+	if (!simple && GET_OBJ_STORAGE(obj) && !OBJ_FLAGGED(obj, OBJ_NO_STORE) && OBJ_CAN_STORE(obj)) {
 		LL_FOREACH(GET_OBJ_STORAGE(obj), store) {
 			if (store->type == TYPE_BLD && (bld = building_proto(store->vnum))) {
 				add_string_hash(&str_hash, GET_BLD_NAME(bld), 1);
@@ -539,7 +540,7 @@ void identify_obj_to_char(obj_data *obj, char_data *ch) {
 	}
 	
 	// other storage
-	if (CAN_WEAR(obj, ITEM_WEAR_TAKE)) {
+	if (!simple && CAN_WEAR(obj, ITEM_WEAR_TAKE)) {
 		library = (IS_BOOK(obj) && book_proto(GET_BOOK_ID(obj)));
 		if (UNIQUE_OBJ_CAN_STORE(obj, FALSE)) {
 			msg_to_char(ch, "Storage location: Home, Warehouse%s\r\n", (library ? ", Library" : ""));
@@ -556,7 +557,7 @@ void identify_obj_to_char(obj_data *obj, char_data *ch) {
 	}
 
 	// binding section
-	if (OBJ_BOUND_TO(obj)) {
+	if (!simple && OBJ_BOUND_TO(obj)) {
 		struct obj_binding *bind;		
 		msg_to_char(ch, "Bound to:");
 		any = FALSE;
@@ -578,8 +579,10 @@ void identify_obj_to_char(obj_data *obj, char_data *ch) {
 			msg_to_char(ch, "Gear rating: %.1f\r\n", rating);
 		}
 		
-		prettier_sprintbit(GET_OBJ_WEAR(obj) & ~ITEM_WEAR_TAKE, wear_bits, buf);
-		msg_to_char(ch, "Can be worn on: %s\r\n", buf);
+		if (!simple) {
+			prettier_sprintbit(GET_OBJ_WEAR(obj) & ~ITEM_WEAR_TAKE, wear_bits, buf);
+			msg_to_char(ch, "Can be worn on: %s\r\n", buf);
+		}
 	}
 	
 	// flags
@@ -730,15 +733,15 @@ void identify_obj_to_char(obj_data *obj, char_data *ch) {
 	}
 	
 	// data that isn't type-based:
-	if (OBJ_FLAGGED(obj, OBJ_PLANTABLE) && (cp = crop_proto(GET_OBJ_VAL(obj, VAL_FOOD_CROP_TYPE)))) {
+	if (!simple && OBJ_FLAGGED(obj, OBJ_PLANTABLE) && (cp = crop_proto(GET_OBJ_VAL(obj, VAL_FOOD_CROP_TYPE)))) {
 		ordered_sprintbit(GET_CROP_CLIMATE(cp), climate_flags, climate_flags_order, CROP_FLAGGED(cp, CROPF_ANY_LISTED_CLIMATE) ? TRUE : FALSE, lbuf);
 		msg_to_char(ch, "Plants %s (%s%s).\r\n", GET_CROP_NAME(cp), GET_CROP_CLIMATE(cp) ? lbuf : "any climate", (CROP_FLAGGED(cp, CROPF_REQUIRES_WATER) ? "; must be near water" : ""));
 	}
 	
-	if (has_interaction(GET_OBJ_INTERACTIONS(obj), INTERACT_COMBINE)) {
+	if (!simple && has_interaction(GET_OBJ_INTERACTIONS(obj), INTERACT_COMBINE)) {
 		msg_to_char(ch, "It can be combined.\r\n");
 	}
-	if (has_interaction(GET_OBJ_INTERACTIONS(obj), INTERACT_SEPARATE)) {
+	if (!simple && has_interaction(GET_OBJ_INTERACTIONS(obj), INTERACT_SEPARATE)) {
 		msg_to_char(ch, "It can be separated.\r\n");
 	}
 	
@@ -757,7 +760,7 @@ void identify_obj_to_char(obj_data *obj, char_data *ch) {
 	}
 	
 	// component info
-	if (GET_OBJ_COMPONENT(obj) != NOTHING && (comp = find_generic(GET_OBJ_COMPONENT(obj), GENERIC_COMPONENT))) {
+	if (!simple && GET_OBJ_COMPONENT(obj) != NOTHING && (comp = find_generic(GET_OBJ_COMPONENT(obj), GENERIC_COMPONENT))) {
 		msg_to_char(ch, "Component type: %s%s\r\n", GEN_NAME(comp), GEN_FLAGGED(comp, GEN_BASIC) ? " (basic)" : "");
 	
 		if (GEN_COMPUTED_RELATIONS(comp)) {
@@ -767,7 +770,7 @@ void identify_obj_to_char(obj_data *obj, char_data *ch) {
 	}
 	
 	// recipes
-	if (GET_OBJ_VNUM(obj) != NOTHING) {
+	if (!simple && GET_OBJ_VNUM(obj) != NOTHING) {
 		size = line_size = snprintf(lbuf, sizeof(lbuf), "Allows: ");
 		any = FALSE;
 		HASH_ITER(sorted_hh, sorted_crafts, craft, next_craft) {
@@ -792,41 +795,43 @@ void identify_obj_to_char(obj_data *obj, char_data *ch) {
 	}
 	
 	// some custom messages
-	LL_FOREACH(GET_OBJ_CUSTOM_MSGS(obj), ocm) {
-		switch (ocm->type) {
-			case OBJ_CUSTOM_LONGDESC: {
-				sprintf(lbuf, "Gives long description: %s", ocm->msg);
-				temp = str_replace("$n", "$o", lbuf);
-				strcpy(lbuf, temp);
-				free(temp);
-				act(lbuf, FALSE, ch, NULL, NULL, TO_CHAR);
-				break;
-			}
-			case OBJ_CUSTOM_LONGDESC_FEMALE: {
-				if (GET_SEX(ch) == SEX_FEMALE) {
+	if (!simple) {
+		LL_FOREACH(GET_OBJ_CUSTOM_MSGS(obj), ocm) {
+			switch (ocm->type) {
+				case OBJ_CUSTOM_LONGDESC: {
 					sprintf(lbuf, "Gives long description: %s", ocm->msg);
 					temp = str_replace("$n", "$o", lbuf);
 					strcpy(lbuf, temp);
 					free(temp);
 					act(lbuf, FALSE, ch, NULL, NULL, TO_CHAR);
+					break;
 				}
-				break;
-			}
-			case OBJ_CUSTOM_LONGDESC_MALE: {
-				if (GET_SEX(ch) == SEX_MALE) {
-					sprintf(lbuf, "Gives long description: %s", ocm->msg);
-					temp = str_replace("$n", "$o", lbuf);
-					strcpy(lbuf, temp);
-					free(temp);
-					act(lbuf, FALSE, ch, NULL, NULL, TO_CHAR);
+				case OBJ_CUSTOM_LONGDESC_FEMALE: {
+					if (GET_SEX(ch) == SEX_FEMALE) {
+						sprintf(lbuf, "Gives long description: %s", ocm->msg);
+						temp = str_replace("$n", "$o", lbuf);
+						strcpy(lbuf, temp);
+						free(temp);
+						act(lbuf, FALSE, ch, NULL, NULL, TO_CHAR);
+					}
+					break;
 				}
-				break;
+				case OBJ_CUSTOM_LONGDESC_MALE: {
+					if (GET_SEX(ch) == SEX_MALE) {
+						sprintf(lbuf, "Gives long description: %s", ocm->msg);
+						temp = str_replace("$n", "$o", lbuf);
+						strcpy(lbuf, temp);
+						free(temp);
+						act(lbuf, FALSE, ch, NULL, NULL, TO_CHAR);
+					}
+					break;
+				}
 			}
 		}
 	}
 	
 	// equipment sets?
-	if (GET_OBJ_EQ_SETS(obj)) {
+	if (!simple && GET_OBJ_EQ_SETS(obj)) {
 		any = FALSE;
 		msg_to_char(ch, "Equipment sets:");
 		LL_FOREACH(GET_OBJ_EQ_SETS(obj), oset) {
@@ -1365,7 +1370,7 @@ void do_shop_identify(char_data *ch, obj_data *shop_obj) {
 	obj_from_room(obj);
 	
 	// show id and desc
-	identify_obj_to_char(obj, ch);
+	identify_obj_to_char(obj, ch, FALSE);
 	if (GET_OBJ_ACTION_DESC(obj)) {
 		msg_to_char(ch, "%s", GET_OBJ_ACTION_DESC(obj));
 	}
@@ -4033,7 +4038,7 @@ void trade_identify(char_data *ch, char *argument) {
 		}
 		
 		// FOUND
-		identify_obj_to_char(tpd->obj, ch);
+		identify_obj_to_char(tpd->obj, ch, FALSE);
 		return;
 	}
 	
@@ -4317,7 +4322,7 @@ void warehouse_identify(char_data *ch, char *argument, int mode) {
 		}
 		
 		// FOUND:
-		identify_obj_to_char(iter->obj, ch);
+		identify_obj_to_char(iter->obj, ch, FALSE);
 		return;
 	}
 	
@@ -4876,11 +4881,11 @@ ACMD(do_compare) {
 		scale_item_to_level(obj, get_approximate_level(ch));
 	}
 	
-	identify_obj_to_char(obj, ch);
+	identify_obj_to_char(obj, ch, TRUE);
 	
 	if (to_obj) {
 		msg_to_char(ch, "\r\n");
-		identify_obj_to_char(to_obj, ch);
+		identify_obj_to_char(to_obj, ch, TRUE);
 		act("$n compares $p to $P.", TRUE, ch, obj, to_obj, TO_ROOM);
 	}
 	else {
@@ -4890,14 +4895,14 @@ ACMD(do_compare) {
 				pos = get_wear_by_item_wear(BIT(iter));
 				if (GET_EQ(ch, pos)) {
 					msg_to_char(ch, "\r\n");
-					identify_obj_to_char(GET_EQ(ch, pos), ch);
+					identify_obj_to_char(GET_EQ(ch, pos), ch, TRUE);
 					act("$n compares $p to $P.", TRUE, ch, obj, GET_EQ(ch, pos), TO_ROOM);
 				}
 				// cascade?
 				while ((pos = wear_data[pos].cascade_pos) != NO_WEAR) {
 					if (GET_EQ(ch, pos)) {
 						msg_to_char(ch, "\r\n");
-						identify_obj_to_char(GET_EQ(ch, pos), ch);
+						identify_obj_to_char(GET_EQ(ch, pos), ch, TRUE);
 						act("$n compares $p to $P.", TRUE, ch, obj, GET_EQ(ch, pos), TO_ROOM);
 					}
 				}
@@ -5992,7 +5997,7 @@ ACMD(do_identify) {
 			}
 		
 			charge_ability_cost(ch, NOTHING, 0, NOTHING, 0, WAIT_OTHER);
-			identify_obj_to_char(obj, ch);
+			identify_obj_to_char(obj, ch, FALSE);
 		
 			if (extract) {
 				// ONLY if we need to extract it but didn't earlier
