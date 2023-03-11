@@ -4815,6 +4815,103 @@ ACMD(do_combine) {
 }
 
 
+ACMD(do_compare) {
+	char arg[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH];
+	obj_data *obj, *to_obj = NULL;
+	bool extract_from = FALSE, extract_to = FALSE, inv_only = FALSE;
+	char_data *tmp_char;
+	vehicle_data *tmp_veh;
+	int iter, pos;
+	
+	// compare [inventory] <first obj> [second obj]
+	argument = two_arguments(argument, arg, arg2);
+	
+	// if first arg is 'inv', restrict to inventory
+	if (strlen(arg) >= 3 && is_abbrev(arg, "inventory")) {
+		inv_only = TRUE;
+		strcpy(arg, arg2);
+		argument = one_argument(argument, arg2);
+	}
+	
+	if (GET_POS(ch) == POS_FIGHTING) {
+		msg_to_char(ch, "You're too busy to do that now!\r\n");
+		return;
+	}
+	if (!*arg) {
+		msg_to_char(ch, "Identify what object%s?\r\n", inv_only ? " in your inventory" : "");
+		return;
+	}
+	if (!generic_find(arg, NULL, inv_only ? FIND_OBJ_INV : (FIND_OBJ_INV | FIND_OBJ_ROOM | FIND_OBJ_EQUIP), ch, &tmp_char, &obj, &tmp_veh)) {
+		msg_to_char(ch, "You see nothing like that %s.\r\n", inv_only ? "in your inventory" : "here");
+		return;
+	}
+	
+	// ok we have the 1st obj; find the 2nd
+	if (*arg2 && !generic_find(arg2, NULL, inv_only ? FIND_OBJ_INV : (FIND_OBJ_INV | FIND_OBJ_ROOM | FIND_OBJ_EQUIP), ch, &tmp_char, &to_obj, &tmp_veh)) {
+		msg_to_char(ch, "You don't seem to have %s %s to compare it to.\r\n", AN(arg2), arg2);
+		return;
+	}
+	
+	// ok
+	charge_ability_cost(ch, NOTHING, 0, NOTHING, 0, WAIT_OTHER);
+	
+	// check identifies-to:
+	if (has_interaction(GET_OBJ_INTERACTIONS(obj), INTERACT_IDENTIFIES_TO) && (WORN_OR_CARRIED_BY(obj, ch) || can_use_room(ch, IN_ROOM(ch), MEMBERS_ONLY))) {
+		act("$n identifies $p.", TRUE, ch, obj, NULL, TO_ROOM);
+		run_identifies_to(ch, &obj, &extract_from);
+		if (ch->desc) {
+			send_stacked_msgs(ch->desc);	// flush the stacked id message before id'ing it
+		}
+	}
+	if (to_obj && has_interaction(GET_OBJ_INTERACTIONS(to_obj), INTERACT_IDENTIFIES_TO) && (WORN_OR_CARRIED_BY(to_obj, ch) || can_use_room(ch, IN_ROOM(ch), MEMBERS_ONLY))) {
+		act("$n identifies $p.", TRUE, ch, to_obj, NULL, TO_ROOM);
+		run_identifies_to(ch, &to_obj, &extract_to);
+		if (ch->desc) {
+			send_stacked_msgs(ch->desc);	// flush the stacked id message before id'ing it
+		}
+	}
+	
+	// ensure scaling
+	if (!IS_IMMORTAL(ch) && GET_OBJ_CURRENT_SCALE_LEVEL(obj) == 0) {
+		scale_item_to_level(obj, get_approximate_level(ch));
+	}
+	
+	identify_obj_to_char(obj, ch);
+	
+	if (to_obj) {
+		identify_obj_to_char(to_obj, ch);
+		act("$n compares $p to $P.", TRUE, ch, obj, to_obj, TO_ROOM);
+	}
+	else {
+		// detect?
+		for (iter = 0; BIT(iter) < GET_OBJ_WEAR(obj); ++iter) {
+			if (BIT(iter) != ITEM_WEAR_TAKE && CAN_WEAR(obj, BIT(iter))) {
+				pos = get_wear_by_item_wear(BIT(iter));
+				if (GET_EQ(ch, pos)) {
+					identify_obj_to_char(GET_EQ(ch, pos), ch);
+					act("$n compares $p to $P.", TRUE, ch, obj, GET_EQ(ch, pos), TO_ROOM);
+				}
+				// cascade?
+				while ((pos = wear_data[pos].cascade_pos) != NO_WEAR) {
+					if (GET_EQ(ch, pos)) {
+						identify_obj_to_char(GET_EQ(ch, pos), ch);
+						act("$n compares $p to $P.", TRUE, ch, obj, GET_EQ(ch, pos), TO_ROOM);
+					}
+				}
+			}
+		}
+	}
+
+	// check requested extractions
+	if (extract_from) {
+		extract_obj(obj);
+	}
+	if (to_obj && extract_to) {
+		extract_obj(to_obj);
+	}
+}
+
+
 ACMD(do_draw) {
 	obj_data *obj = NULL, *removed = NULL;
 	int loc = 0;
@@ -5878,7 +5975,7 @@ ACMD(do_identify) {
 			act("$n identifies $p.", TRUE, ch, obj, NULL, TO_ROOM);
 			
 			// check if it has identifies-to
-			if (obj->carried_by == ch || can_use_room(ch, IN_ROOM(ch), MEMBERS_ONLY)) {
+			if (WORN_OR_CARRIED_BY(obj, ch) || can_use_room(ch, IN_ROOM(ch), MEMBERS_ONLY)) {
 				run_identifies_to(ch, &obj, &extract);
 				if (ch->desc) {
 					// flush the stacked id message before id'ing it

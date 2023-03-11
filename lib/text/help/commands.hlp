@@ -496,6 +496,24 @@ log back in (but you will have to re-cast any buffs on it).
 
 See also: DISMISS, BODYGUARD, FAMILIAR
 #
+COMPARE "COMPARE ITEMS"
+
+Usage:  compare <item> [other item]
+        compare inventory <item> [other item]
+
+This command will use 'identify' compare two items. If you only specify one
+item, it will compare it to whatever you have equipped in the slot it goes in.
+
+This command targets items exactly the same way was 'identify', meaning it
+could target something you have equipped. To guarantee it hits an item in your
+inventory rather than equipment, try 'compare inv <item>'.
+
+Some items become something else (usually a more specific version of whatever
+they were) when you identify them. Using 'compare' will identify the item you
+target exactly as if you had used the 'identify' command.
+
+See also: IDENTIFY, EIDENTIFY
+#
 CONFIRM
 
 Usage:  confirm
@@ -1108,7 +1126,7 @@ trying to figure out what to drop or give away, since the numbering (2.bag)
 will be the same for identify and drop (instead of also checking your equipment
 for the identify command).
 
-See also: EIDENTIFY, LEVEL COLORS, EQUIPMENT
+See also: EIDENTIFY, COMPARE, LEVEL COLORS, EQUIPMENT
 #
 INFORMATIVE "TOGGLE INFORMATIVE"
 
