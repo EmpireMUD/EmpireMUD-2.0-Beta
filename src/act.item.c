@@ -4879,6 +4879,7 @@ ACMD(do_compare) {
 	identify_obj_to_char(obj, ch);
 	
 	if (to_obj) {
+		msg_to_char(ch, "\r\n");
 		identify_obj_to_char(to_obj, ch);
 		act("$n compares $p to $P.", TRUE, ch, obj, to_obj, TO_ROOM);
 	}
@@ -4888,12 +4889,14 @@ ACMD(do_compare) {
 			if (BIT(iter) != ITEM_WEAR_TAKE && CAN_WEAR(obj, BIT(iter))) {
 				pos = get_wear_by_item_wear(BIT(iter));
 				if (GET_EQ(ch, pos)) {
+					msg_to_char(ch, "\r\n");
 					identify_obj_to_char(GET_EQ(ch, pos), ch);
 					act("$n compares $p to $P.", TRUE, ch, obj, GET_EQ(ch, pos), TO_ROOM);
 				}
 				// cascade?
 				while ((pos = wear_data[pos].cascade_pos) != NO_WEAR) {
 					if (GET_EQ(ch, pos)) {
+						msg_to_char(ch, "\r\n");
 						identify_obj_to_char(GET_EQ(ch, pos), ch);
 						act("$n compares $p to $P.", TRUE, ch, obj, GET_EQ(ch, pos), TO_ROOM);
 					}
