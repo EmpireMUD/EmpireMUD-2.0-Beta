@@ -70,6 +70,8 @@ Legacy of Skycleave~
 their legacy can be felt across the land. Show off your empire's place in this
 lasting legacy by constructing the tremendous buildings designed by its
 incomparable magineers and growing one of its rare and magical forests.
+   To complete this goal, you need to own all three buildings and at least one
+fully-grown Calamander Jungle tile.
 ~
 2 4 0 5 f
 P 11800
