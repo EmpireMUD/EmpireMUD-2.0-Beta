@@ -107,6 +107,7 @@ bool can_turn_in_quest_at(char_data *ch, room_data *loc, quest_data *quest, empi
 						return TRUE;
 					}
 				}
+				break;
 			}
 			case QG_ROOM_TEMPLATE: {
 				if (GET_ROOM_TEMPLATE(loc) && GET_RMT_VNUM(GET_ROOM_TEMPLATE(loc)) == giver->vnum) {
