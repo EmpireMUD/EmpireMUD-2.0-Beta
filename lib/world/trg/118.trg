@@ -132,6 +132,10 @@ switch %self.vnum%
     * Skithe
     %send% %actor% The Lion of Time definitely does not have pockets.
   break
+  case 11884
+    * Queen's image
+    %send% %actor% She's not really here; only her image sits on the throne.
+  break
   case 11888
     * Iskip
     %send% %actor% Even if you could get up to his pockets, anything in there would be enormous.
@@ -2343,7 +2347,17 @@ switch %self.vnum%
       if %ch.is_pc%
         * mark who did this
         set spirit %instance.mob(11900)%
-        set finish3 %ch.real_name%
+        if %ch.vnum% == 11836 && %spirit.lich_released%
+          * Scaldorran kill
+          makeuid killer %spirit.lich_released%
+          if %killer.id% == %spirit.lich_released%
+            set finish3 %killer.real_name%
+          else
+            set finish3 %ch.real_name%
+          end
+        else
+          set finish3 %ch.real_name%
+        end
         remote finish3 %spirit.id%
       end
     end
