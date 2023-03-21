@@ -7026,7 +7026,7 @@ if !%self.affect(11874)%
   dg_affect #11874 %self% INTELLIGENCE 1 120
 end
 * how long is allowed?
-eval allow_time 10 + (50 * %self.var(diff,1)%)
+eval allow_time 45 * %self.var(diff,1)%
 * check timers
 if %seconds% > %allow_time%
   * Knezz dies
