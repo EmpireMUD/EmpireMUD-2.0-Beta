@@ -1190,7 +1190,7 @@ ACMD(do_soulsight) {
 			act(buf, FALSE, ch, 0, vict, TO_CHAR);
 		}
 		else {
-			sprintf(buf, " $E is %s.", IS_VAMPIRE(vict) ? "a vampire" : (IS_HUMAN(vict) ? ((IS_NPC(vict) && MOB_FLAGGED(vict, MOB_ANIMAL)) ? "an animal" : (MOB_FLAGGED(vict, MOB_HUMAN) ? "a human" : "a creature")) : "unknown"));
+			sprintf(buf, " $E is %s.", IS_VAMPIRE(vict) ? "a vampire" : (IS_HUMAN(vict) ? ((IS_NPC(vict) && MOB_FLAGGED(vict, MOB_ANIMAL)) ? "an animal" : ((!IS_NPC(vict) || MOB_FLAGGED(vict, MOB_HUMAN)) ? "a human" : "a creature")) : "unknown"));
 			act(buf, FALSE, ch, NULL, vict, TO_CHAR);
 			
 			show_character_affects(vict, ch);
