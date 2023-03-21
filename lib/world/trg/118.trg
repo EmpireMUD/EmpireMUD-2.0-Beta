@@ -3150,7 +3150,7 @@ end
 #11834
 Skycleave: Free the otherworlder~
 0 c 0
-free unchain unshackle break smash~
+free unchain unshackle break smash release~
 return 1
 * validate arg
 if %actor.fighting%
@@ -3261,7 +3261,7 @@ detach 11835 %self.id%
 #11836
 Skycleave: Object interactions~
 1 c 4
-open release look~
+open release look free unleash~
 return 0
 if %arg.car% == in
   set arg %arg.cdr%
@@ -3275,7 +3275,7 @@ end
 if %self.vnum% == 11836
   * Scaldorran's repository: open/release/look in
   set spirit %instance.mob(11900)%
-  if (open /= %cmd% || release /= %cmd%)
+  if (open /= %cmd% || release /= %cmd% || free /= %cmd% || unleash /= %cmd%)
     return 1
     if %spirit.lich_released%
       %send% %actor% The repository is already open!
