@@ -2768,6 +2768,7 @@ elseif look /= %cmd% && %room.template% == 11981
 elseif search /= %cmd% && %room.template% == 11981
   %send% %actor% As you're searching in the dark, the light glinting off a grinning skull catches you off guard... You stumble backwards and fall into a pile of bones!
   %force% %actor% scriptwake skulls
+  return 1
 end
 ~
 #11937
