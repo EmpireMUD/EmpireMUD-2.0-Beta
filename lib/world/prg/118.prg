@@ -21,7 +21,7 @@ of the tower and its occupants. Seek them out -- the villains, foes, and
 adversaries that hide in the tower alike -- and defeat them... for the glory
 of the empire!
 ~
-5 4 0 5 f
+6 4 0 5 c
 K 7 5
 P 11800
 W+

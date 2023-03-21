@@ -255,13 +255,17 @@ tower's most difficult challenge.
    When you finally sit up, you notice a hot cup of tea left alone on the
 bench, and you pick it up.
 ~
-9 0 150 250 -1
+11 0 150 250 -1
 A
 2 11918
 P
 16 11800 0 7 -
 R
 7 11800 25
+R
+2 11926 1
+R
+13 11801 11801
 W
 3 11819 0 1 a
 W
@@ -308,13 +312,17 @@ plumbing its depths. Surely there are a few more...
    On your third trip around the fountain, you notice a hot cup of tea sitting
 abandoned on the bench, and pick it up.
 ~
-7 0 150 250 -1
+9 0 150 250 -1
 A
 2 11919
 P
 16 11800 0 7 -
 R
 7 11800 25
+R
+2 11926 1
+R
+13 11801 11801
 W
 13 11916 0 1 a
 W
@@ -355,7 +363,7 @@ the whole, unaware of their dark fate.
    As you get up, you notice a black glint in the fountain. You reach in and
 find a strange nocturnium pocket watch at the bottom.
 ~
-11 0 150 250 -1
+12 0 150 250 -1
 A
 2 11920
 P
@@ -364,6 +372,8 @@ R
 7 11800 25
 R
 2 11934 1
+R
+13 11801 11801
 W+
 11 0 0 1 -
 Find the time-traveler~

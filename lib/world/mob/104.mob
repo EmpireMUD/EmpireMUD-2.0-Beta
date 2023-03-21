@@ -837,7 +837,7 @@ dryleef vanguard leader goblin~
 Dryleef, vanguard leader~
 Dryleef, leader of the goblin vanguard, is sitting on the throne.
 ~
-0 0 bdhy 0 2
+0 0 bdhyK G 2
 1 0 0 5 -1
 D
    Dryleef's youthful face belies his years of experience at the head of the
@@ -907,7 +907,7 @@ pimmin shaman goblin~
 Pimmin, goblin shaman~
 A goblin shaman is swirling a vial with a rat tail.
 ~
-0 0 bdhxy 0 2
+0 0 bdhxyK G 2
 2 0 0 16 -1
 D
    Pimmin is crouched over a pile of tiny bones and various balls of wax and
@@ -981,7 +981,7 @@ shivsper goblin assassin~
 Shivsper, goblin assassin~
 Shivsper throws a dagger at a crude drawing of a human on the wall.
 ~
-0 0 bdhyz 0 2
+0 0 bdhyzK G 2
 1 0 0 4 -1
 D
    Shivsper leans against the sewer wall, casually tossing his collection of
@@ -1040,7 +1040,7 @@ wargreyn goblin smith blacksmith~
 Wargreyn, goblin blacksmith~
 Wargreyn, the goblin smith, is resting by the forge.
 ~
-0 0 bdhy 0 2
+0 0 bdhyK G 2
 2 0 0 6 -1
 D
    Wargreyn's face hangs heavy on her sharp green cheekbones, showing off years
@@ -1159,7 +1159,7 @@ haxaw medicine goblin~
 Haxaw, medicine goblin~
 Haxaw is sitting here, stirring a small pot.
 ~
-0 0 bdhvxyI M 3
+0 0 bdhvxyIK GM 3
 2 0 0 28 -1
 D
    Haxaw is surprisingly tall and pink, for a goblin, but she has the

@@ -799,7 +799,7 @@ sorceress grand high~
 the Grand High Sorceress~
 The Grand High Sorceress sits on her desk, legs crossed. (difficulty)
 ~
-150 250 bdhxyzJ coDEG 3
+150 250 bdhxyzJK coDEG 3
 2 0 0 22 -1
 D
    The sorceress sits on top of her desk, legs crossed in front of her,
@@ -1064,7 +1064,7 @@ water first embodiment living~
 the First Water~
 You are surrounded by the living embodiment of the First Water! (difficulty)
 ~
-150 250 bdhyzDJ chDEG 5
+150 250 bdhyzDJK chDEG 5
 0 0 0 14 -1
 D
    The water on all sides of you is alive! You have found yourself trapped in
@@ -2425,7 +2425,7 @@ Elver worthy goblin~
 Elver the Worthy~
 Elver the Worthy stands in the center of the arena. (difficulty)
 ~
-150 250 bdhDJ csE 3
+150 250 bdhDJK csEG 3
 1 0 0 5 -1
 D
    Elver is on the small side, even for a goblin, nearly outsized by his own
@@ -2466,7 +2466,7 @@ Nailbokh axe goblin~
 Nailbokh the Axe~
 Nailbokh the Axe stands in the center of the arena.
 ~
-150 250 bdhzDJ c 3
+150 250 bdhzDJK cG 3
 2 0 0 2 -1
 D
    Nailbokh drags her giant stone axe across the arena sand, drawing a line
@@ -2487,6 +2487,15 @@ $n sharpens $s axe with a stone.~
 M
 0
 $n waves $s huge axe in the air.~
+M
+1
+You ready to fight me?~
+M
+1
+FIGHT NAILBOKH!~
+M
+1
+Elver was just round 1.~
 T 11973
 T 11803
 T 11987
@@ -2498,7 +2507,7 @@ Biksi champion orka goblin~
 Biksi, Champion of Orka~
 Biksi, Champion of Orka, stands in the center of the arena.
 ~
-150 250 bdhyzDJ cE 3
+150 250 bdhyzDJK cEG 3
 2 0 0 7 -1
 D
    The Champion of Orka stands in the center of the arena, readying a pair of
@@ -2524,6 +2533,12 @@ Who wants to try the CHAMPION!?~
 M
 0
 $n drags $s whips to create a big circle in the sand.~
+M
+1
+Are you ready to fight or are you still licking your wounds?~
+M
+1
+Come on! Let's fight!~
 T 11973
 T 11803
 T 11988
