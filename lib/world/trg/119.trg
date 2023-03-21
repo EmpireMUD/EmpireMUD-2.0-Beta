@@ -2347,7 +2347,9 @@ while %count% < 12
     * move player
     %echoaround% %actor% ~%actor% lets out a raucous snore and then vanishes into ^%actor% dream.
     %teleport% %actor% %to_room%
-    nop %actor.link_adventure_summon%
+    if %actor.plr_flagged(ADV-SUMMON)%
+      nop %actor.link_adventure_summon%
+    end
     %echoaround% %actor% ~%actor% appears out of nowhere, asleep on the floor!
     %send% %actor% You dream you're flying -- and it feels so real!
     remote skycleave_wake_room %actor.id%
@@ -2364,7 +2366,9 @@ while %count% < 12
         %echoaround% %ch% ~%ch% vanishes into thin air!
         %teleport% %ch% %to_room%
         if %ch.is_pc%
-          nop %ch.link_adventure_summon%
+          if %ch.plr_flagged(ADV-SUMMON)%
+            nop %ch.link_adventure_summon%
+          end
           remote skycleave_wake_room %ch.id%
           remote skycleave_wake %ch.id%
         end
@@ -4510,7 +4514,9 @@ while %count% < 12
     end
     %echoaround% %actor% ~%actor% lets out a raucous snore and then vanishes into ^%actor% dream.
     %teleport% %actor% %to_room%
-    nop %actor.link_adventure_summon%
+    if %actor.plr_flagged(ADV-SUMMON)%
+      nop %actor.link_adventure_summon%
+    end
     %echoaround% %actor% ~%actor% appears out of nowhere, asleep on the floor!
     %send% %actor% You dream you're falling -- the kind where you really feel it!
     remote skycleave_wake_room %actor.id%
@@ -4527,7 +4533,9 @@ while %count% < 12
         %echoaround% %ch% ~%ch% vanishes into thin air!
         %teleport% %ch% %to_room%
         if %ch.is_pc%
-          nop %ch.link_adventure_summon%
+          if %ch.plr_flagged(ADV-SUMMON)%
+            nop %ch.link_adventure_summon%
+          end
           remote skycleave_wake_room %ch.id%
           remote skycleave_wake %ch.id%
         end
@@ -4744,7 +4752,9 @@ while %count% < 12
     end
     %echoaround% %actor% ~%actor% lets out a whistling snore and then vanishes into ^%actor% dream.
     %teleport% %actor% %to_room%
-    nop %actor.link_adventure_summon%
+    if %actor.plr_flagged(ADV-SUMMON)%
+      nop %actor.link_adventure_summon%
+    end
     %echoaround% %actor% ~%actor% appears out of nowhere, asleep on the bed!
     %send% %actor% You dream you're falling -- the kind where you really feel it!
     remote skycleave_wake_room %actor.id%
@@ -4761,7 +4771,9 @@ while %count% < 12
         %echoaround% %ch% ~%ch% vanishes into thin air!
         %teleport% %ch% %to_room%
         if %ch.is_pc%
-          nop %ch.link_adventure_summon%
+          if %ch.plr_flagged(ADV-SUMMON)%
+            nop %ch.link_adventure_summon%
+          end
           remote skycleave_wake_room %ch.id%
           remote skycleave_wake %ch.id%
         end
