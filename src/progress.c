@@ -688,7 +688,7 @@ void check_for_eligible_goals(empire_data *emp) {
 	HASH_ITER(hh, progress_table, prg, next_prg) {
 		vnum = PRG_VNUM(prg);
 		
-		if (PRG_FLAGGED(prg, PRG_IN_DEVELOPMENT | PRG_PURCHASABLE | PRG_SCRIPT_ONLY)) {
+		if (PRG_FLAGGED(prg, PRG_IN_DEVELOPMENT | PRG_PURCHASABLE | PRG_NO_AUTOSTART)) {
 			continue;
 		}
 		if (get_current_goal(emp, vnum)) {
@@ -914,7 +914,7 @@ void refresh_empire_goals(empire_data *emp, any_vnum only_vnum) {
 			}
 			skip = TRUE;
 		}
-		if (PRG_FLAGGED(prg, PRG_SCRIPT_ONLY)) {
+		if (PRG_FLAGGED(prg, PRG_NO_AUTOSTART)) {
 			skip = TRUE;	// we don't affect script goals here
 		}
 		
@@ -1108,9 +1108,11 @@ void remove_completed_goal(empire_data *emp, any_vnum vnum) {
 
 
 /**
-* Call this function to reward an empire with a SCRIPT-ONLY progress goal. This
-* function does not validate prereqs or point availability. It only does the
-* work.
+* Call this function to reward an empire with a NO-SAUTOSTART progress goal.
+* This function does not validate prereqs or point availability. It only does
+* the work.
+*
+* Note: This is also called by QR_GRANT_PROGRESS rewards.
 *
 * @param empire_data *emp Which empire is being rewarded.
 * @param progress_data *prg The progression goal being added.
@@ -1769,8 +1771,8 @@ bool audit_progress(progress_data *prg, char_data *ch) {
 		problem = TRUE;
 	}
 	
-	if (PRG_FLAGGED(prg, PRG_SCRIPT_ONLY) && PRG_FLAGGED(prg, PRG_PURCHASABLE)) {
-		olc_audit_msg(ch, PRG_VNUM(prg), "PURCHASABLE set with SCRIPT-ONLY");
+	if (PRG_FLAGGED(prg, PRG_NO_AUTOSTART) && PRG_FLAGGED(prg, PRG_PURCHASABLE)) {
+		olc_audit_msg(ch, PRG_VNUM(prg), "PURCHASABLE set with NO-AUTOSTART");
 		problem = TRUE;
 	}
 	
@@ -1827,7 +1829,9 @@ void olc_search_progress(char_data *ch, any_vnum vnum) {
 	char buf[MAX_STRING_LENGTH];
 	progress_data *prg = real_progress(vnum), *iter, *next_iter;
 	struct progress_list *pl;
+	quest_data *qiter, *next_qiter;
 	int size, found;
+	bool any;
 	
 	if (!prg) {
 		msg_to_char(ch, "There is no progression entry %d.\r\n", vnum);
@@ -1845,6 +1849,21 @@ void olc_search_progress(char_data *ch, any_vnum vnum) {
 				size += snprintf(buf + size, sizeof(buf) - size, "PRG [%5d] %s\r\n", PRG_VNUM(iter), PRG_NAME(iter));
 				break;
 			}
+		}
+	}
+	
+	// quests
+	HASH_ITER(hh, quest_table, qiter, next_qiter) {
+		if (size >= sizeof(buf)) {
+			break;
+		}
+		// QR_x: quest rewards
+		any = find_quest_reward_in_list(QUEST_REWARDS(qiter), QR_GRANT_PROGRESS, vnum);
+		any |= find_quest_reward_in_list(QUEST_REWARDS(qiter), QR_START_PROGRESS, vnum);
+		
+		if (any) {
+			++found;
+			size += snprintf(buf + size, sizeof(buf) - size, "QST [%5d] %s\r\n", QUEST_VNUM(qiter), QUEST_NAME(qiter));
 		}
 	}
 	
@@ -1929,8 +1948,8 @@ int sort_progress_by_data(progress_data *a, progress_data *b) {
 	else if (PRG_FLAGGED(a, PRG_PURCHASABLE) != PRG_FLAGGED(b, PRG_PURCHASABLE)) {
 		return PRG_FLAGGED(a, PRG_PURCHASABLE) ? 1 : -1;
 	}
-	else if (PRG_FLAGGED(a, PRG_SCRIPT_ONLY) != PRG_FLAGGED(b, PRG_SCRIPT_ONLY)) {
-		return PRG_FLAGGED(a, PRG_SCRIPT_ONLY) ? 1 : -1;
+	else if (PRG_FLAGGED(a, PRG_NO_AUTOSTART) != PRG_FLAGGED(b, PRG_NO_AUTOSTART)) {
+		return PRG_FLAGGED(a, PRG_NO_AUTOSTART) ? 1 : -1;
 	}
 	else {
 		return str_cmp(NULLSAFE(PRG_NAME(a)), NULLSAFE(PRG_NAME(b)));
@@ -2309,6 +2328,7 @@ progress_data *create_progress_table_entry(any_vnum vnum) {
 void olc_delete_progress(char_data *ch, any_vnum vnum) {
 	progress_data *prg, *iter, *next_iter;
 	struct progress_list *pl, *next_pl;
+	quest_data *qiter, *next_qiter;
 	empire_data *emp, *next_emp;
 	struct empire_goal *goal;
 	descriptor_data *desc;
@@ -2357,6 +2377,18 @@ void olc_delete_progress(char_data *ch, any_vnum vnum) {
 		}
 	}
 	
+	// update quests
+	HASH_ITER(hh, quest_table, qiter, next_qiter) {
+		// QR_x: quest rewards
+		any = delete_quest_reward_from_list(&QUEST_REWARDS(qiter), QR_GRANT_PROGRESS, vnum);
+		any |= delete_quest_reward_from_list(&QUEST_REWARDS(qiter), QR_START_PROGRESS, vnum);
+		
+		if (any) {
+			SET_BIT(QUEST_FLAGS(qiter), QST_IN_DEVELOPMENT);
+			save_library_file_for_vnum(DB_BOOT_QST, QUEST_VNUM(qiter));
+		}
+	}
+	
 	// remove from from active editors
 	LL_FOREACH(descriptor_list, desc) {
 		if (GET_OLC_PROGRESS(desc)) {
@@ -2372,6 +2404,16 @@ void olc_delete_progress(char_data *ch, any_vnum vnum) {
 			if (any) {
 				SET_BIT(PRG_FLAGS(GET_OLC_PROGRESS(desc)), PRG_IN_DEVELOPMENT);
 				msg_to_desc(desc, "A progression goal used as a prerequisite by the goal you're editing has been deleted.\r\n");
+			}
+		}
+		if (GET_OLC_QUEST(desc)) {
+			// QR_x: quest rewards
+			any = delete_quest_reward_from_list(&QUEST_REWARDS(GET_OLC_QUEST(desc)), QR_GRANT_PROGRESS, vnum);
+			any |= delete_quest_reward_from_list(&QUEST_REWARDS(GET_OLC_QUEST(desc)), QR_START_PROGRESS, vnum);
+		
+			if (any) {
+				SET_BIT(QUEST_FLAGS(GET_OLC_QUEST(desc)), QST_IN_DEVELOPMENT);
+				msg_to_desc(desc, "A quest used by the progress goal you are editing was deleted.\r\n");
 			}
 		}
 	}

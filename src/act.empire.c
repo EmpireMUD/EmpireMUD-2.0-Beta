@@ -6679,7 +6679,7 @@ ACMD(do_progress) {
 		// Show descendents if any
 		any = FALSE;
 		HASH_ITER(hh, progress_table, prg_iter, next_prg) {
-			if (PRG_FLAGGED(prg_iter, PRG_IN_DEVELOPMENT | PRG_SCRIPT_ONLY | PRG_HIDDEN)) {
+			if (PRG_FLAGGED(prg_iter, PRG_IN_DEVELOPMENT | PRG_NO_AUTOSTART | PRG_HIDDEN)) {
 				continue;	// skip these types
 			}
 			

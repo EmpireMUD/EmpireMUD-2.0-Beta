@@ -6830,8 +6830,7 @@ Usage:  .flags [add | remove] <flags>
 The following progress goal flags are available:
  &cIN-DEVELOPMENT&0 - Empires cannot start or complete this goal.
  &cPURCHASABLE&0 - This goal is purchased, not unlocked by tasks.
- &cSCRIPT-ONLY&0 - For scripts; cannot be purchased and won't be earned unless a
-               script starts it first.
+ &cNO-AUTOSTART&0 - Must be added or started by a script or quest.
  &cHIDDEN&0 - Will not show up in lists until completed.
  &cNO-ANNOUNCE&0 - Does not announce/log completion.
  &cNO-PREVIEW&0 - Mortals can't view this goal before starting it.
@@ -7093,6 +7092,8 @@ Available reward types:
  SPEAK-LANGUAGE - Can now speak a language.
  RECOGNIZE-LANGUAGE - Can now recognize a language (will not override one the
     player can already speak).
+ GRANT-PROGRESS - Player's empire completes a progress goal.
+ START-PROGRESS - Player's empire starts a NO-AUTOSTART progress goal.
 
 Note: If you set empire coins as the reward, but the mob is not part of an
 empire, the player will receive misc coins instead.

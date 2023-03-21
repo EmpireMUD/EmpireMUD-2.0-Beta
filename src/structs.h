@@ -2555,7 +2555,7 @@ typedef enum {
 // PRG_x: progress flags
 #define PRG_IN_DEVELOPMENT  BIT(0)	// a. not available to players
 #define PRG_PURCHASABLE  BIT(1)	// b. can buy it
-#define PRG_SCRIPT_ONLY  BIT(2)	// c. cannot buy/achieve it
+#define PRG_NO_AUTOSTART  BIT(2)	// c. only started or added via script/quest
 #define PRG_HIDDEN  BIT(3)	// d. progress does not show up
 #define PRG_NO_ANNOUNCE  BIT(4)	// e. never announces when this goal is achieved
 #define PRG_NO_PREVIEW  BIT(5)	// f. cannot view it until you're on it
@@ -2613,6 +2613,8 @@ typedef enum {
 #define QR_EVENT_POINTS  9
 #define QR_SPEAK_LANGUAGE  10
 #define QR_RECOGNIZE_LANGUAGE  11
+#define QR_GRANT_PROGRESS  12
+#define QR_START_PROGRESS  13
 
 
 // indicates empire (rather than misc) coins for a reward

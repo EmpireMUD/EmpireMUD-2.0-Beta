@@ -2963,7 +2963,7 @@ const char *progress_types[] = {
 const char *progress_flags[] = {
 	"IN-DEVELOPMENT",
 	"PURCHASABLE",
-	"SCRIPT-ONLY",
+	"NO-AUTOSTART",
 	"HIDDEN",
 	"NO-ANNOUNCE",
 	"NO-PREVIEW",
@@ -3033,6 +3033,8 @@ const char *quest_reward_types[] = {
 	"EVENT-POINTS",
 	"SPEAK-LANGUAGE",	// 10
 	"RECOGNIZE-LANGUAGE",
+	"GRANT-PROGRESS",
+	"START-PROGRESS",
 	"\n",
 };
 
