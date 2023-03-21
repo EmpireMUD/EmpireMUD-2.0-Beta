@@ -2344,7 +2344,7 @@ switch %self.vnum%
       if %ch.is_npc% && %ch.leader%
         set ch %ch.leader%
       end
-      if %ch.is_pc%
+      if %ch.is_pc% || %ch.vnum% == 11836
         * mark who did this
         set spirit %instance.mob(11900)%
         if %ch.vnum% == 11836 && %spirit.lich_released%
