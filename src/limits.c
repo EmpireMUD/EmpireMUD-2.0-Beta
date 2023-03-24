@@ -1458,8 +1458,12 @@ bool check_autostore(obj_data *obj, bool force, empire_data *override_emp) {
 	int islid, home_idnum = NOBODY;
 	
 	// easy exclusions
-	if (obj->carried_by || obj->worn_by || !CAN_WEAR(obj, ITEM_WEAR_TAKE)) {
-		return TRUE;
+	top_obj = get_top_object(obj);
+	if (top_obj->carried_by || top_obj->worn_by) {
+		return TRUE;	// on a person
+	}
+	if (!CAN_WEAR(obj, ITEM_WEAR_TAKE) && !OBJ_CAN_STORE(obj)) {
+		return TRUE;	// no-take AND no-store
 	}
 	
 	// timer check (if not forced)
@@ -1468,7 +1472,6 @@ bool check_autostore(obj_data *obj, bool force, empire_data *override_emp) {
 	}
 	
 	// ensure object is in a room, or in an object in a room
-	top_obj = get_top_object(obj);
 	real_loc = IN_ROOM(top_obj);
 	in_veh = top_obj->in_vehicle;
 	if (in_veh) {
