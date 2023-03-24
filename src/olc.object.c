@@ -483,12 +483,15 @@ void olc_delete_object(char_data *ch, obj_vnum vnum) {
 	adv_data *adv, *next_adv;
 	bld_data *bld, *next_bld;
 	descriptor_data *desc;
+	char name[256];
 	bool found, any_trades = FALSE;
 	
 	if (!(proto = obj_proto(vnum))) {
 		msg_to_char(ch, "There is no such object %d.\r\n", vnum);
 		return;
 	}
+	
+	snprintf(name, sizeof(name), "%s", NULLSAFE(GET_OBJ_SHORT_DESC(proto)));
 	
 	if (HASH_COUNT(object_table) <= 1) {
 		msg_to_char(ch, "You can't delete the last object.\r\n");
@@ -1087,8 +1090,8 @@ void olc_delete_object(char_data *ch, obj_vnum vnum) {
 		}
 	}
 	
-	syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: %s has deleted object %d", GET_NAME(ch), vnum);
-	msg_to_char(ch, "Object %d deleted.\r\n", vnum);
+	syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: %s has deleted object %d %s", GET_NAME(ch), vnum, name);
+	msg_to_char(ch, "Object %d (%s) deleted.\r\n", vnum, name);
 	
 	free_obj(proto);
 }

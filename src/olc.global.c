@@ -212,11 +212,14 @@ char *list_one_global(struct global_data *glb, bool detail) {
 */
 void olc_delete_global(char_data *ch, any_vnum vnum) {
 	struct global_data *glb;
+	char name[256];
 	
 	if (!(glb = global_proto(vnum))) {
 		msg_to_char(ch, "There is no such global %d.\r\n", vnum);
 		return;
 	}
+	
+	snprintf(name, sizeof(name), "%s", NULLSAFE(GET_GLOBAL_NAME(glb)));
 	
 	if (HASH_COUNT(globals_table) <= 1) {
 		msg_to_char(ch, "You can't delete the last global.\r\n");
@@ -230,8 +233,8 @@ void olc_delete_global(char_data *ch, any_vnum vnum) {
 	save_index(DB_BOOT_GLB);
 	save_library_file_for_vnum(DB_BOOT_GLB, vnum);
 	
-	syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: %s has deleted global %d", GET_NAME(ch), vnum);
-	msg_to_char(ch, "Global %d deleted.\r\n", vnum);
+	syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: %s has deleted global %d %s", GET_NAME(ch), vnum, name);
+	msg_to_char(ch, "Global %d (%s) deleted.\r\n", vnum, name);
 	
 	free_global(glb);
 }

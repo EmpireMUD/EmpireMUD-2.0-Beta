@@ -2332,12 +2332,15 @@ void olc_delete_progress(char_data *ch, any_vnum vnum) {
 	empire_data *emp, *next_emp;
 	struct empire_goal *goal;
 	descriptor_data *desc;
+	char name[256];
 	bool any;
 	
 	if (!(prg = real_progress(vnum))) {
 		msg_to_char(ch, "There is no such progress entry %d.\r\n", vnum);
 		return;
 	}
+	
+	snprintf(name, sizeof(name), "%s", NULLSAFE(PRG_NAME(prg)));
 	
 	// removing live instances
 	if (!PRG_FLAGGED(prg, PRG_IN_DEVELOPMENT)) {
@@ -2420,8 +2423,8 @@ void olc_delete_progress(char_data *ch, any_vnum vnum) {
 		}
 	}
 	
-	syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: %s has deleted progress entry %d", GET_NAME(ch), vnum);
-	msg_to_char(ch, "Progress entry %d deleted.\r\n", vnum);
+	syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: %s has deleted progress entry %d %s", GET_NAME(ch), vnum, name);
+	msg_to_char(ch, "Progress entry %d (%s) deleted.\r\n", vnum, name);
 	
 	free_progress(prg);
 }

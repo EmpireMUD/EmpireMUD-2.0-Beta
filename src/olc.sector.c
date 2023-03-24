@@ -239,12 +239,15 @@ void olc_delete_sector(char_data *ch, sector_vnum vnum) {
 	struct map_data *map;
 	room_data *room;
 	int count, x, y;
+	char name[256];
 	bool found;
 	
 	if (!(sect = sector_proto(vnum))) {
 		msg_to_char(ch, "There is no such sector %d.\r\n", vnum);
 		return;
 	}
+	
+	snprintf(name, sizeof(name), "%s", NULLSAFE(GET_SECT_NAME(sect)));
 	
 	if (HASH_COUNT(sector_table) <= 1) {
 		msg_to_char(ch, "You can't delete the last sector.\r\n");
@@ -404,8 +407,8 @@ void olc_delete_sector(char_data *ch, sector_vnum vnum) {
 		}
 	}
 	
-	syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: %s has deleted sector %d", GET_NAME(ch), vnum);
-	msg_to_char(ch, "Sector %d deleted.\r\n", vnum);
+	syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: %s has deleted sector %d %s", GET_NAME(ch), vnum, name);
+	msg_to_char(ch, "Sector %d (%s) deleted.\r\n", vnum, name);
 	
 	if (count > 0) {
 		msg_to_char(ch, "%d live sectors changed.\r\n", count);

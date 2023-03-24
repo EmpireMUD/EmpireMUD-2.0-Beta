@@ -939,11 +939,14 @@ shop_data *create_shop_table_entry(any_vnum vnum) {
 */
 void olc_delete_shop(char_data *ch, any_vnum vnum) {
 	shop_data *shop;
+	char name[256];
 	
 	if (!(shop = real_shop(vnum))) {
 		msg_to_char(ch, "There is no such shop %d.\r\n", vnum);
 		return;
 	}
+	
+	snprintf(name, sizeof(name), "%s", NULLSAFE(SHOP_NAME(shop)));
 	
 	// removing live instances goes here
 	
@@ -959,8 +962,8 @@ void olc_delete_shop(char_data *ch, any_vnum vnum) {
 	
 	// removing from prototypes goes here
 	
-	syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: %s has deleted shop %d", GET_NAME(ch), vnum);
-	msg_to_char(ch, "Shop %d deleted.\r\n", vnum);
+	syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: %s has deleted shop %d %s", GET_NAME(ch), vnum, name);
+	msg_to_char(ch, "Shop %d (%s) deleted.\r\n", vnum, name);
 	
 	free_shop(shop);
 }

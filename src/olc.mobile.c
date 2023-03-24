@@ -317,12 +317,15 @@ void olc_delete_mobile(char_data *ch, mob_vnum vnum) {
 	social_data *soc, *next_soc;
 	bld_data *bld, *next_bld;
 	struct mount_data *mount;
+	char name[256];
 	bool found;
 	
 	if (!(proto = mob_proto(vnum))) {
 		msg_to_char(ch, "There is no such mobile %d.\r\n", vnum);
 		return;
 	}
+	
+	snprintf(name, sizeof(name), "%s", NULLSAFE(GET_SHORT_DESC(proto)));
 	
 	if (HASH_COUNT(mobile_table) <= 1) {
 		msg_to_char(ch, "You can't delete the last mob.\r\n");
@@ -631,8 +634,8 @@ void olc_delete_mobile(char_data *ch, mob_vnum vnum) {
 		}
 	}
 	
-	syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: %s has deleted mobile %d", GET_NAME(ch), vnum);
-	msg_to_char(ch, "Mobile %d deleted.\r\n", vnum);
+	syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: %s has deleted mobile %d %s", GET_NAME(ch), vnum, name);
+	msg_to_char(ch, "Mobile %d (%s) deleted.\r\n", vnum, name);
 	
 	free_char(proto);
 }

@@ -179,12 +179,15 @@ void olc_delete_crop(char_data *ch, crop_vnum vnum) {
 	room_data *room;
 	crop_data *crop;
 	bool found;
+	char name[256];
 	int count;
 	
 	if (!(crop = crop_proto(vnum))) {
 		msg_to_char(ch, "There is no such crop %d.\r\n", vnum);
 		return;
 	}
+	
+	snprintf(name, sizeof(name), "%s", NULLSAFE(GET_CROP_NAME(crop)));
 	
 	if (HASH_COUNT(crop_table) <= 1) {
 		msg_to_char(ch, "You can't delete the last crop.\r\n");
@@ -250,8 +253,8 @@ void olc_delete_crop(char_data *ch, crop_vnum vnum) {
 		}
 	}
 	
-	syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: %s has deleted crop %d", GET_NAME(ch), vnum);
-	msg_to_char(ch, "Crop %d deleted.\r\n", vnum);
+	syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: %s has deleted crop %d %s", GET_NAME(ch), vnum, name);
+	msg_to_char(ch, "Crop %d (%s) deleted.\r\n", vnum, name);
 
 	if (count > 0) {
 		msg_to_char(ch, "%d live crops destroyed.\r\n", count);

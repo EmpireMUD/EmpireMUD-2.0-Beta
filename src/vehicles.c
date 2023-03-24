@@ -3247,12 +3247,15 @@ void olc_delete_vehicle(char_data *ch, any_vnum vnum) {
 	bld_data *bld, *next_bld;
 	obj_data *obj, *next_obj;
 	descriptor_data *desc;
+	char name[256];
 	bool found;
 	
 	if (!(veh = vehicle_proto(vnum))) {
 		msg_to_char(ch, "There is no such vehicle %d.\r\n", vnum);
 		return;
 	}
+	
+	snprintf(name, sizeof(name), "%s", NULLSAFE(VEH_SHORT_DESC(veh)));
 	
 	// remove live vehicles
 	DL_FOREACH_SAFE(vehicle_list, iter, next_iter) {
@@ -3471,8 +3474,8 @@ void olc_delete_vehicle(char_data *ch, any_vnum vnum) {
 		}
 	}
 	
-	syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: %s has deleted vehicle %d", GET_NAME(ch), vnum);
-	msg_to_char(ch, "Vehicle %d deleted.\r\n", vnum);
+	syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: %s has deleted vehicle %d %s", GET_NAME(ch), vnum, name);
+	msg_to_char(ch, "Vehicle %d (%s) deleted.\r\n", vnum, name);
 	
 	free_vehicle(veh);
 }

@@ -365,6 +365,7 @@ void olc_delete_building(char_data *ch, bld_vnum vnum) {
 	adv_data *adv, *next_adv;
 	obj_data *obj, *next_obj;
 	descriptor_data *desc;
+	char name[256];
 	int count;
 	bool found, deleted = FALSE;
 	
@@ -372,6 +373,8 @@ void olc_delete_building(char_data *ch, bld_vnum vnum) {
 		msg_to_char(ch, "There is no such building %d.\r\n", vnum);
 		return;
 	}
+	
+	snprintf(name, sizeof(name), "%s", NULLSAFE(GET_BLD_NAME(bld)));
 	
 	if (HASH_COUNT(building_table) <= 1) {
 		msg_to_char(ch, "You can't delete the last building.\r\n");
@@ -626,8 +629,8 @@ void olc_delete_building(char_data *ch, bld_vnum vnum) {
 		}
 	}
 	
-	syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: %s has deleted building %d", GET_NAME(ch), vnum);
-	msg_to_char(ch, "Building %d deleted.\r\n", vnum);
+	syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: %s has deleted building %d %s", GET_NAME(ch), vnum, name);
+	msg_to_char(ch, "Building %d (%s) deleted.\r\n", vnum, name);
 	
 	if (count > 0) {
 		msg_to_char(ch, "%d live buildings changed.\r\n", count);

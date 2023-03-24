@@ -1112,12 +1112,15 @@ void olc_delete_generic(char_data *ch, any_vnum vnum) {
 	generic_data *gen, *gen_iter, *next_gen;
 	char_data *chiter, *next_ch;
 	bool found, any_quest = FALSE, any_progress = FALSE;
+	char name[256];
 	int res_type;
 	
 	if (!(gen = real_generic(vnum))) {
 		msg_to_char(ch, "There is no such generic %d.\r\n", vnum);
 		return;
 	}
+	
+	snprintf(name, sizeof(name), "%s", NULLSAFE(GEN_NAME(gen)));
 	
 	switch (GEN_TYPE(gen)) {
 		case GENERIC_ACTION: {
@@ -1571,8 +1574,8 @@ void olc_delete_generic(char_data *ch, any_vnum vnum) {
 		}
 	}
 	
-	syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: %s has deleted generic %d", GET_NAME(ch), vnum);
-	msg_to_char(ch, "Generic %d deleted.\r\n", vnum);
+	syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: %s has deleted generic %d %s", GET_NAME(ch), vnum, name);
+	msg_to_char(ch, "Generic %d (%s) deleted.\r\n", vnum, name);
 	
 	free_generic(gen);
 	

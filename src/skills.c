@@ -3764,12 +3764,15 @@ void olc_delete_skill(char_data *ch, any_vnum vnum) {
 	descriptor_data *desc;
 	skill_data *skill, *sk, *next_sk;
 	char_data *chiter;
+	char name[256];
 	bool found;
 	
 	if (!(skill = find_skill_by_vnum(vnum))) {
 		msg_to_char(ch, "There is no such skill %d.\r\n", vnum);
 		return;
 	}
+	
+	snprintf(name, sizeof(name), "%s", NULLSAFE(SKILL_NAME(skill)));
 	
 	// remove it from the hash table first
 	remove_skill_from_table(skill);
@@ -3952,8 +3955,8 @@ void olc_delete_skill(char_data *ch, any_vnum vnum) {
 	save_index(DB_BOOT_SKILL);
 	save_library_file_for_vnum(DB_BOOT_SKILL, vnum);
 	
-	syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: %s has deleted skill %d", GET_NAME(ch), vnum);
-	msg_to_char(ch, "Skill %d deleted.\r\n", vnum);
+	syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: %s has deleted skill %d %s", GET_NAME(ch), vnum, name);
+	msg_to_char(ch, "Skill %d (%s) deleted.\r\n", vnum, name);
 	
 	free_skill(skill);
 }

@@ -4913,12 +4913,15 @@ void olc_delete_quest(char_data *ch, any_vnum vnum) {
 	shop_data *shop, *next_shop;
 	descriptor_data *desc;
 	char_data *chiter;
+	char name[256];
 	bool found;
 	
 	if (!(quest = quest_proto(vnum))) {
 		msg_to_char(ch, "There is no such quest %d.\r\n", vnum);
 		return;
 	}
+	
+	snprintf(name, sizeof(name), "%s", NULLSAFE(QUEST_NAME(quest)));
 	
 	// remove it from the hash table first
 	remove_quest_from_table(quest);
@@ -5075,8 +5078,8 @@ void olc_delete_quest(char_data *ch, any_vnum vnum) {
 		}
 	}
 	
-	syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: %s has deleted quest %d", GET_NAME(ch), vnum);
-	msg_to_char(ch, "Quest %d deleted.\r\n", vnum);
+	syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: %s has deleted quest %d %s", GET_NAME(ch), vnum, name);
+	msg_to_char(ch, "Quest %d (%s) deleted.\r\n", vnum, name);
 	
 	free_quest(quest);
 }

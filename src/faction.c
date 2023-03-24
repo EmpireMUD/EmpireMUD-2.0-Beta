@@ -1064,12 +1064,15 @@ void olc_delete_faction(char_data *ch, any_vnum vnum) {
 	social_data *soc, *next_soc;
 	shop_data *shop, *next_shop;
 	descriptor_data *desc;
+	char name[256];
 	bool found;
 	
 	if (!(fct = find_faction_by_vnum(vnum))) {
 		msg_to_char(ch, "There is no such faction %d.\r\n", vnum);
 		return;
 	}
+	
+	snprintf(name, sizeof(name), "%s", NULLSAFE(FCT_NAME(fct)));
 	
 	// remove it from the hash table first
 	remove_faction_from_table(fct);
@@ -1241,8 +1244,8 @@ void olc_delete_faction(char_data *ch, any_vnum vnum) {
 	save_index(DB_BOOT_FCT);
 	save_library_file_for_vnum(DB_BOOT_FCT, vnum);
 	
-	syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: %s has deleted faction %d", GET_NAME(ch), vnum);
-	msg_to_char(ch, "Faction %d deleted.\r\n", vnum);
+	syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: %s has deleted faction %d %s", GET_NAME(ch), vnum, name);
+	msg_to_char(ch, "Faction %d (%s) deleted.\r\n", vnum, name);
 	
 	free_faction(fct);
 }

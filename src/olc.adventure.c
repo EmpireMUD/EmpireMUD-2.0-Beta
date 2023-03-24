@@ -484,12 +484,15 @@ char *list_one_adventure(adv_data *adv, bool detail) {
 */
 void olc_delete_adventure(char_data *ch, adv_vnum vnum) {
 	adv_data *adv;
+	char name[256];
 	int live = 0;
 	
 	if (!(adv = adventure_proto(vnum))) {
 		msg_to_char(ch, "There is no such adventure zone %d.\r\n", vnum);
 		return;
 	}
+	
+	snprintf(name, sizeof(name), "%s", NULLSAFE(GET_ADV_NAME(adv)));
 	
 	if (HASH_COUNT(adventure_table) <= 1) {
 		msg_to_char(ch, "You can't delete the last adventure zone.\r\n");
@@ -506,8 +509,8 @@ void olc_delete_adventure(char_data *ch, adv_vnum vnum) {
 	save_index(DB_BOOT_ADV);
 	save_library_file_for_vnum(DB_BOOT_ADV, vnum);
 	
-	syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: %s has deleted adventure zone %d", GET_NAME(ch), vnum);
-	msg_to_char(ch, "Adventure zone %d deleted.\r\n", vnum);
+	syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: %s has deleted adventure zone %d %s", GET_NAME(ch), vnum, name);
+	msg_to_char(ch, "Adventure zone %d (%s) deleted.\r\n", vnum, name);
 	
 	if (live > 0) {
 		msg_to_char(ch, "%d live instances removed.\r\n", live);

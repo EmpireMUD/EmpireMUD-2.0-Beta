@@ -2066,12 +2066,15 @@ void olc_delete_event(char_data *ch, any_vnum vnum) {
 	descriptor_data *desc;
 	char_data *chiter;
 	event_data *event;
+	char name[256];
 	bool found;
 	
 	if (!(event = find_event_by_vnum(vnum))) {
 		msg_to_char(ch, "There is no such event %d.\r\n", vnum);
 		return;
 	}
+	
+	snprintf(name, sizeof(name), "%s", NULLSAFE(EVT_NAME(event)));
 	
 	// end the event, if running -- BEFORE removing from the hash table
 	while ((running = find_running_event_by_vnum(vnum))) {
@@ -2215,8 +2218,8 @@ void olc_delete_event(char_data *ch, any_vnum vnum) {
 		}
 	}
 	
-	syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: %s has deleted event %d", GET_NAME(ch), vnum);
-	msg_to_char(ch, "Event %d deleted.\r\n", vnum);
+	syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: %s has deleted event %d %s", GET_NAME(ch), vnum, name);
+	msg_to_char(ch, "Event %d (%s) deleted.\r\n", vnum, name);
 	
 	free_event(event);
 }

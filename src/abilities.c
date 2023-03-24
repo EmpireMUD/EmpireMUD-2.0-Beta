@@ -2850,12 +2850,15 @@ void olc_delete_ability(char_data *ch, any_vnum vnum) {
 	class_data *cls, *next_cls;
 	descriptor_data *desc;
 	char_data *chiter;
+	char name[256];
 	bool found;
 	
 	if (!(abil = find_ability_by_vnum(vnum))) {
 		msg_to_char(ch, "There is no such ability %d.\r\n", vnum);
 		return;
 	}
+	
+	snprintf(name, sizeof(name), "%s", NULLSAFE(ABIL_NAME(abil)));
 		
 	// remove it from the hash table first
 	remove_ability_from_table(abil);
@@ -3056,8 +3059,8 @@ void olc_delete_ability(char_data *ch, any_vnum vnum) {
 	save_index(DB_BOOT_ABIL);
 	save_library_file_for_vnum(DB_BOOT_ABIL, vnum);
 	
-	syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: %s has deleted ability %d", GET_NAME(ch), vnum);
-	msg_to_char(ch, "Ability %d deleted.\r\n", vnum);
+	syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: %s has deleted ability %d %s", GET_NAME(ch), vnum, name);
+	msg_to_char(ch, "Ability %d (%s) deleted.\r\n", vnum, name);
 	
 	free_ability(abil);
 }

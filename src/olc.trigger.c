@@ -315,12 +315,15 @@ void olc_delete_trigger(char_data *ch, trig_vnum vnum) {
 	adv_data *adv, *next_adv;
 	obj_data *obj, *next_obj;
 	bld_data *bld, *next_bld;
+	char name[256];
 	bool found;
 
 	if (!(trig = real_trigger(vnum))) {
 		msg_to_char(ch, "There is no such trigger %d.\r\n", vnum);
 		return;
 	}
+	
+	snprintf(name, sizeof(name), "%s", NULLSAFE(GET_TRIG_NAME(trig)));
 	
 	if (HASH_COUNT(trigger_table) <= 1) {
 		msg_to_char(ch, "You can't delete the last trigger.\r\n");
@@ -482,8 +485,8 @@ void olc_delete_trigger(char_data *ch, trig_vnum vnum) {
 	save_index(DB_BOOT_TRG);
 	save_library_file_for_vnum(DB_BOOT_TRG, vnum);
 	
-	syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: %s has deleted trigger %d", GET_NAME(ch), vnum);
-	msg_to_char(ch, "Trigger %d deleted.\r\n", vnum);
+	syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: %s has deleted trigger %d %s", GET_NAME(ch), vnum, name);
+	msg_to_char(ch, "Trigger %d (%s) deleted.\r\n", vnum, name);
 	
 	free_trigger(trig);
 }
