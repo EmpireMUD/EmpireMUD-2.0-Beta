@@ -2530,6 +2530,7 @@ void nanny(descriptor_data *d, char *arg) {
 				
 				// echo back on
 				ProtocolNoEcho(d, false);
+				SEND_TO_Q("\r\n", d);
 
 				/* Password was correct. */
 				load_result = GET_BAD_PWS(d->character);
@@ -2618,6 +2619,7 @@ void nanny(descriptor_data *d, char *arg) {
 				return;
 			}
 			ProtocolNoEcho(d, false);
+			SEND_TO_Q("\r\n", d);
 			next_creation_step(d);
 			break;
 		}
