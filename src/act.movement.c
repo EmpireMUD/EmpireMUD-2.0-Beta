@@ -2395,12 +2395,18 @@ ACMD(do_gen_door) {
 }
 
 
-ACMD(do_land) {	
+ACMD(do_land) {
 	if (!AFF_FLAGGED(ch, AFF_FLY)) {
 		msg_to_char(ch, "You aren't flying.\r\n");
 		return;
 	}
-
+	
+	// ensure morph isn't the cause
+	if (GET_MORPH(ch) && IS_SET(MORPH_AFFECTS(GET_MORPH(ch)), AFF_FLY)) {
+		msg_to_char(ch, "You can't land in this form.\r\n");
+		return;
+	}
+	
 	affects_from_char_by_aff_flag(ch, AFF_FLY, FALSE);
 	
 	if (!AFF_FLAGGED(ch, AFF_FLY)) {
