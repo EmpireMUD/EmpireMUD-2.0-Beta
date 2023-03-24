@@ -4,7 +4,7 @@ the flame dragon~
 A flame dragon is reducing the countryside to ash!
 ~
 100 150 dgxA c 6
-0 0 5 33
+0 0 5 33 -1
 D
    The size of a large house, this red-orange dragon seems to have a bone to
 pick with the countryside. Every snort, sniff, huff, and cough scorches the
@@ -48,7 +48,7 @@ the dragon hatchling~
 A dragon hatchling is rolling about.
 ~
 1 1 bdoD mn 3
-0 0 2 9
+0 0 2 9 -1
 D
    This little red-orange dragon rolls around in the air as it tries to control
 its tiny wings.
@@ -62,7 +62,7 @@ a fiery rabbit~
 A fiery rabbit is hopping about, leaving ashes.
 ~
 1 10 djo 0 1
-0 0 15 9
+0 0 15 9 -1
 D
 The fiery fur flickers and flits off the back of the odd little flame bunny.
 ~
@@ -75,7 +75,7 @@ a flame imp~
 A little imp is jumping from flame to flame.
 ~
 1 15 doA G 2
-0 0 9 33
+0 0 9 33 -1
 D
 This little hellfiend is in paradise as the countryside burns.
 ~
@@ -86,10 +86,10 @@ a scorched phoenix~
 A scorched phoenix soars low above you!
 ~
 100 125 dehjo mG 1
-0 0 2 12
+0 0 2 12 -1
 D
    This magnificent bird might have been bright orange and yellow in life, but
-its recent death has left it badly scorched, and most of the bird is black. 
+its recent death has left it badly scorched, and most of the bird is black.
 You might be able to ride it!
 ~
 S
@@ -99,7 +99,7 @@ a giant firefly~
 A giant firefly buzzes about.
 ~
 5 10 djo m 1
-0 0 2 12
+0 0 2 12 -1
 D
    You have never seen a firefly so large and, having seen its face up close,
 are not interested in seeing one again.
@@ -111,7 +111,7 @@ a burning salamander~
 A burning salamander crawls out from some rotting wood.
 ~
 10 20 djo 0 1
-0 0 9 12
+0 0 9 12 -1
 D
 The salamander is ablaze but seems unconcerned as it crawls about.
 ~
@@ -124,8 +124,8 @@ flame flickering~
 a flickering flame~
 A flickering flame is burning the fields.
 ~
-30 50 dhoA G 0
-0 0 18 33
+30 50 dhoAK G 0
+0 0 18 33 -1
 D
 The flame is almost entrancing as it flickers from plant to plant.
 ~
@@ -136,7 +136,7 @@ a wandering wyvern~
 A wyvern is flying lazily above you.
 ~
 125 175 dgxyA cm 6
-0 0 2 27
+0 0 2 27 -1
 D
    Though it isn't the largest dragon on the landscape, this wyvern still cases
 a long shadow as it soars. It seems lost, or perhaps like it's looking for
@@ -170,7 +170,7 @@ a bull dragon~
 A bull dragon is stomping around.
 ~
 125 175 dgkxyA c 6
-1 0 9 27
+1 0 9 27 -1
 D
    Though it has wings, the bull dragon seems to spend more of its time on the
 ground as it roots through dirt and plants alike. It seems like it might be
@@ -204,7 +204,7 @@ a dragon guardian~
 A dragon guardian stands proudly before you.
 ~
 125 175 dgxyA cm 6
-0 0 2 27
+0 0 2 27 -1
 D
    Unlike most dragons, the guardian stands on its hind legs with its front
 claws and tremendous teeth poised to attack. It looks a bit lost here, and that
@@ -238,7 +238,7 @@ an emerald dragon~
 An emerald dragon is flying above you.
 ~
 125 175 dgxyA cm 6
-0 0 2 27
+0 0 2 27 -1
 D
    This shimmering green dragon's translucent scales have all the luster of
 emeralds. It casts a brilliant green shadow as it flies across the sky, but it
@@ -272,7 +272,7 @@ a baby wyvern~
 A baby wyvern flaps around awkwardly.
 ~
 1 1 bdoD mn 3
-0 0 2 9
+0 0 2 9 -1
 D
    Though similar to a dragon, wyverns only have two wings and two hind legs.
 Some say this is how dragons originated, before mages started tinkering with
@@ -287,7 +287,7 @@ an emerald dragon~
 An emerald dragon has been saddled and looks ready to fly.
 ~
 100 125 bdej m 5
-0 0 2 33
+0 0 2 33 -1
 D
    This shimmering green dragon's translucent scales have all the luster of
 emeralds.
@@ -299,7 +299,7 @@ a dragonguard~
 A dragonguard is patrolling.
 ~
 125 175 bdtuAD c 4
-1 0 2 27
+1 0 2 27 -1
 D
    As tall as an ogre and stronger than an ox, the dragonguard silently patrols
 the city, ever vigilant.
@@ -312,7 +312,7 @@ a fire ox~
 A fire ox is looking for some scorched grass.
 ~
 100 125 dfjy 0 4
-2 0 0 12
+2 0 0 12 -1
 D
 This stout ox seems to have caught fire. It doesn't look like it noticed.
 ~

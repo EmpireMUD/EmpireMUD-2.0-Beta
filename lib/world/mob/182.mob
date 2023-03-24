@@ -4,7 +4,7 @@ an atlasian tortoise~
 A giant atlasian tortoise plods past, carrying an inn on its back.
 ~
 300 300 dky n 6
-0 0 16 9
+0 0 16 9 -1
 D
    The tortoise is gigantic! It's no wonder they call it atlasian -- it looks
 like it could carry the world on its back. Actually, from down here, it looks
@@ -22,7 +22,7 @@ S
 Tavern patron #n is carousing enthusiastically.
 ~
 0 0 bdvI nD 3
-0 0 0 15
+0 0 0 15 -1
 D
 Like everyone else here, this patron is having a great time!
 ~
@@ -36,7 +36,7 @@ a man waiting to fight~
 A man is waiting for his turn in the fight.
 ~
 200 250 bd n 3
-1 0 0 15
+1 0 0 15 -1
 D
    He's bouncing on the balls of his feet, practising his jabs at the air, and
 just amped up for his turn.
@@ -47,8 +47,8 @@ leon~
 Leon~
 Leon is dusting off his fists.
 ~
-0 0 bdhyA G 3
-1 0 0 1
+0 0 bdhyAK G 3
+1 0 0 1 -1
 D
    Leon's muscles bulge as he warms up. He's shirtless, but has a blue cloth
 mask with large eye holes across his eyes.
@@ -72,8 +72,8 @@ raffee~
 Raffee~
 Raffee is ignoring you as he prepares for his fight.
 ~
-0 0 bdhyA G 3
-1 0 0 3
+0 0 bdhyAK G 3
+1 0 0 3 -1
 D
    Raffee is warming up for the fight, practicing jabs in the corner. He wears
 a red mask over his eyes.
@@ -97,8 +97,8 @@ donnet~
 Donnet~
 Donnet is whittling a large stick.
 ~
-0 0 bdhyA G 3
-1 0 0 5
+0 0 bdhyAK G 3
+1 0 0 5 -1
 D
    Donnet ignores you as he whittles a long, straight sapling into a fighting
 stick. He constantly seems to adjust his purple mask as it starts to block his
@@ -123,8 +123,8 @@ meek langolo~
 Meek Langolo~
 Meek Langolo is showing off on the mat.
 ~
-0 0 bdhyA G 3
-1 0 0 11
+0 0 bdhyAK G 3
+1 0 0 11 -1
 D
    Meek Langolo is anything but. His muscles are as chiseled as the other
 fighters here. He kicks at the air, showing off his quick moves. As he works up
@@ -151,7 +151,7 @@ S
 #n pours a thick, red vial into his cauldron.
 ~
 0 0 bd nD 3
-1 2 0 15
+1 2 0 15 -1
 D
    Though his not-unhandsome face suggests a man in his thirties, his clothes
 are a much older style. His eyes have a pale yellow tone; one has a black
@@ -185,7 +185,7 @@ S
 The shadows curl around #n, guild umbramancer.
 ~
 0 0 bdvI nD 3
-0 2 0 15
+0 2 0 15 -1
 D
    Multiple varied forms can be seen in the shadows covering this being, though
 no one is quite sure what its true shape looks like.
@@ -213,7 +213,7 @@ S
 #n is working furiously at the tinker bench.
 ~
 0 0 bdvI nD 3
-0 1 0 15
+0 1 0 15 -1
 D
    The old tinker sits in the loft's best light, bespectacled in triple-lensed
 glasses and equipped with an array of tiny tools, working on a delicate
@@ -257,7 +257,7 @@ Nostrazak the Incautious~
 An avatar of Nostrazak looms over you, more dragon than man.
 ~
 0 0 bd nD 4
-1 0 0 15
+1 0 0 15 -1
 D
    Though he has the general shape of a man, Nostrazak the Incautious's scaly
 gray skin, horned head, and fiery belches suggest more than a little dragon
@@ -299,7 +299,7 @@ the giant dwarf~
 A giant dwarf stands, arms crossed, in front of the door.
 ~
 0 0 bdvI nD 3
-1 0 0 15
+1 0 0 15 -1
 D
    Though he's rather taller than the average man, he has the proportions of a
 little person. You begin to suspect magic is at work here.
@@ -313,7 +313,7 @@ Fancy #n~
 Fancy #n stands here in a vest, hawking wares.
 ~
 100 150 bdvI nD 3
-0 0 0 19
+0 0 0 19 -1
 D
    It's clear Fancy is a suitable nickname: the shopkeep is dressed all in fine
 silk and velvet. Clearly business is profitable.
@@ -326,7 +326,7 @@ S
 #n walks along, wearing a heavy pack.
 ~
 100 150 dqvI 0 3
-0 0 0 1
+0 0 0 1 -1
 D
    This nondescript adventurer is armored in some standard adventuring gear,
 nothing too special nor too poor. All in all, they seem ready to rush into
@@ -355,7 +355,7 @@ Guildmage #n~
 Guildmage #n stands at the window.
 ~
 100 150 bdqvI e 3
-0 2 0 19
+0 2 0 19 -1
 D
    The old guildmage looks up at you over a pair of old spectacles, but seems
 busy working on spells.
@@ -398,7 +398,7 @@ S
 #n is reshelving the disheveled books.
 ~
 100 150 bdqvI e 3
-0 0 0 5
+0 0 0 5 -1
 D
 The librarian is rearranging books on the shelves.
 ~
@@ -422,7 +422,7 @@ Superintendant #n~
 The superintendant is sitting at the desk.
 ~
 100 150 bdqvI e 3
-1 0 0 1
+1 0 0 1 -1
 D
 The superintendant looks happy to see you.
 ~
@@ -459,7 +459,7 @@ S
 #n is locking up a new treasure.
 ~
 100 150 bdqvI e 3
-0 1 0 4
+0 1 0 4 -1
 D
    The treasurer keeps moving to block your view of any treasure that might be
 stored here.
@@ -472,7 +472,7 @@ a baby tortoise~
 A baby tortoise is munching around on the ground.
 ~
 1 1 bdoD n 1
-0 0 0 9
+0 0 0 9 -1
 D
    This little shelled friend is tottering around, munching on anything small
 that it comes across.
@@ -498,7 +498,7 @@ a tiny ninja tortoise~
 A tiny ninja tortoise is lurking nearby.
 ~
 1 1 bdoD n 1
-0 0 0 9
+0 0 0 9 -1
 D
    This tiny tortoise has an orange cloth mask over its eyes, plus orange pads
 on its arms and legs.
@@ -527,7 +527,7 @@ a dragon turtle~
 A dragon turtle clacks its beak and puffs smoke from its nostrils.
 ~
 1 1 bdoD n 1
-0 0 0 9
+0 0 0 9 -1
 D
    The gorgeous creature looks like a dragon that lives in a turtle shell. The
 shell is armored with thick plates and though it doesn't look like the dragon
@@ -556,7 +556,7 @@ a sanguine monstrosity~
 A sanguine monstrosity is dripping along the ground.
 ~
 100 125 dej 0 4
-0 0 10 27
+0 0 10 27 -1
 D
    This creature -- whose shape you're hesitant to look at, nevermind describe
 -- appears to be made of congealed blood. It oozes and sloshes along apparently
@@ -570,7 +570,7 @@ an umbral warg~
 An umbral warg stalks from shadow to shadow.
 ~
 100 125 dej 0 4
-0 0 9 9
+0 0 9 9 -1
 D
    This wolfish beast is smokey black from its head to the tip of its tail,
 allowing for easier blending with the shadows. The only bright coloration
@@ -584,7 +584,7 @@ a clockwork steed~
 A clockwork steed is munching on some rocks.
 ~
 100 125 de 0 4
-0 0 12 9
+0 0 12 9 -1
 D
    Thin metal flesh coats this beast of burden, concealing most cogs and wires
 within granting movement. Glowing red eyes shine from the face, clearly lit in
@@ -598,7 +598,7 @@ an imperium-clad bear~
 An imperium-clad bear rears up on its hind legs!
 ~
 100 125 dej 0 4
-0 0 26 10
+0 0 26 10 -1
 D
 This great grizzly bear is wearing shining white imperium armor!
 ~
@@ -610,7 +610,7 @@ a group of patrons~
 A group of patrons is huddled over a table with dice and strange documents.
 ~
 0 0 bd nD 4
-0 0 0 15
+0 0 0 15 -1
 D
    The patrons have papers and books scattered across the table, along with
 small ivory cubes that bear odd markings on the sides. Perhaps they're studying
@@ -647,7 +647,7 @@ Death~
 A bony tavern patron with a hooded cloak and scythe is sitting here.
 ~
 0 0 bd nD 3
-1 0 0 15
+1 0 0 15 -1
 D
    With a voice like two slabs of stone rubbed together, He strikes a
 commanding presence -- at least, to those who can see Him. Some of the patrons
@@ -681,7 +681,7 @@ the rat-man~
 A rat-man in a robe is drowning his sorrows at the bar.
 ~
 0 0 bd nD 3
-1 0 0 15
+1 0 0 15 -1
 D
    This man has the furry gray-brown head of a rat, but he's dressed like a
 person. He seems to be drinking a lot.
@@ -711,7 +711,7 @@ a mysterious patron~
 A mysterious stranger in a hooded cloak is lurking in a dark corner.
 ~
 0 0 bd nD 3
-0 0 0 15
+0 0 0 15 -1
 D
    .look The patron's cloak is finely woven; you can see much less of the
 person wearing it. They seem to be waiting for someone.
@@ -732,7 +732,7 @@ Archsorcerer Malfernes~
 Archsorcerer Malfernes removes his cloak and hangs it in the air.
 ~
 0 0 bdvxzBEI cnCE 3
-1 0 0 22
+1 0 0 22 -1
 D
    The Archsorcerer's silky violet robe drapes on the ground as he hovers
 around the clearing. The tall collar, towering mitre, and exaggerated sleeves
@@ -747,8 +747,8 @@ dragon fearsome~
 a fearsome dragon~
 A fearsome dragon coils through the halls and archways of the tower!
 ~
-0 200 dghnxA choCDEG 5
-0 0 5 16
+0 200 dghnxAK choCDEG 5
+0 0 5 16 -1
 D
    This dragon might be more than meets the eye, but from your perspective,
 it's all teeth!
@@ -779,7 +779,7 @@ an imaginary dragon~
 An imaginary dragon is (or isn't) flitting about.
 ~
 100 125 dej m 5
-0 0 2 10
+0 0 2 10 -1
 D
 Perhaps you're imagining things.
 ~
@@ -790,7 +790,7 @@ an imaginary dragonling~
 An imaginary dragonling might be flying around above your head.
 ~
 1 1 bdoD n 2
-0 0 0 9
+0 0 0 9 -1
 D
    When you go to look at it, you realize that, no, that was just your
 imagination.
@@ -825,7 +825,7 @@ the dragon tree planter~
 The dragon tree planter is supposed to be invisible.
 ~
 0 0 d dkln 3
-0 0 0 15
+0 0 0 15 -1
 D
 This mob sets up the dragon tree.
 ~
@@ -837,7 +837,7 @@ the spirit of the tree~
 The spirit of the tree floats nearby.
 ~
 25 50 bdo n 0
-0 0 0 15
+0 0 0 15 -1
 D
    The spirit looks like a tree with no stump. Its bare canopy retains not a
 single leaf. The spirit floats silently, stalwart even now.
@@ -850,7 +850,7 @@ a pen dragon~
 A pen dragon flies around, trailing a stream of black ink.
 ~
 100 200 djoxA cm 5
-0 0 2 27
+0 0 2 27 -1
 D
    The dragon has a black-blue sheen to its scales as it soars and, indeed,
 there's an inky black stream behind it in the air.
@@ -865,9 +865,9 @@ a dungeon dragon~
 A dungeon dragon has gotten free!
 ~
 100 200 djoxA cm 5
-0 0 2 27
+0 0 2 27 -1
 D
-   This red dragon is big! It looks like it could eat you in a single bite. 
+   This red dragon is big! It looks like it could eat you in a single bite.
 Its red scales have faded a little, perhaps from too long in the dungeon, but
 remains every bit as fearsome as it ever was.
 ~
@@ -881,7 +881,7 @@ a little luck dragon~
 A little luck dragon twists and turns through the air.
 ~
 100 200 djoxA cm 2
-0 0 2 27
+0 0 2 27 -1
 D
    The luck dragon is long -- almost unbelievably long -- with stark white fur
 and big, floppy ears. It looks a bit like a dog. It's large enough to carry a

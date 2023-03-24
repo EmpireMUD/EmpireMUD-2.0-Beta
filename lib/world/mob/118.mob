@@ -2228,7 +2228,7 @@ corpse reanimated~
 a reanimated corpse~
 A reanimated corpse is stumbling around the lab.
 ~
-100 250 abdhzJ G 3
+100 250 abdhzJK G 3
 0 0 0 15 -1
 D
    The corpse is dirty, but well-dressed. At least, the parts of it that are
@@ -2258,7 +2258,7 @@ throne flying~
 a flying throne~
 A flying throne flaps just above the ground.
 ~
-50 50 den mG 3
+50 50 denK mG 3
 0 0 27 10 -1
 D
    The ancient wooden throne is made mostly from pitch black ebony, though the
@@ -2316,7 +2316,7 @@ alpaca fluidic~
 a fluidic alpaca~
 A fluidic alpaca sloshes past you!
 ~
-150 250 bdJ nG 3
+150 250 bdJK nG 3
 0 0 14 15 -1
 D
    The fluffy alpaca is made of pure water; you can see right through it! It
@@ -2331,7 +2331,7 @@ dragon water~
 a water dragon~
 A dragon made of water flows past you!
 ~
-150 250 bdJ nG 3
+150 250 bdJK nG 3
 0 0 5 15 -1
 D
    The water dragon is nearly the height of a pony but the length of a sailing
@@ -2347,7 +2347,7 @@ hawk liquiform~
 a liquiform hawk~
 A liquiform hawk soars past you!
 ~
-150 250 bdJ mnG 3
+150 250 bdJK mnG 3
 0 0 25 15 -1
 D
    The elegant hawk is transparent, made only of water. Behind it, the wall
@@ -2364,7 +2364,7 @@ lion aqueous~
 an aqueous lion~
 An aqueous lion is running through!
 ~
-150 250 bdJ nG 3
+150 250 bdJK nG 3
 0 0 11 15 -1
 D
    This majestic lion is made of pure water, sloshing as it ambles along,
@@ -2380,7 +2380,7 @@ unicorn water sparkling~
 a unicorn of sparkling water~
 A unicorn made of sparkling water is running through!
 ~
-150 250 bdJ nG 3
+150 250 bdJK nG 3
 0 0 12 15 -1
 D
    This stunning unicorn is made of nothing but sparkling water! It would be a
@@ -2430,7 +2430,7 @@ barrosh high sorcerer~
 Barrosh~
 High Sorcerer Barrosh is kneeling on the floor.
 ~
-150 250 bdvxEJ nG 3
+150 250 bdvxEJK nG 3
 1 0 0 15 -1
 D
    Barrosh looks disheveled, kneeling on the floor in his violet high sorcerer
@@ -3026,7 +3026,7 @@ D
 style that rather resembles a mushroom, especially as her unusually high,
 arched eyebrows grow into the elaborate hairdo like stems. Her reddish-brown
 silk suit is less embellished than the others you've seen in the city, and
-perhaps made in a different style. However, she wears the same stiff, 
+perhaps made in a different style. However, she wears the same stiff,
 triangular cape in silver and yellow that can be seen on the back of everyone
 here.
    Lotte touches everything as she walks -- the stone staircase, the walls of

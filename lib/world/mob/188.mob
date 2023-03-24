@@ -4,7 +4,7 @@ a restless spirit~
 A restless spirit haunts this place.
 ~
 0 0 bdho cnG 0
-2 0 0 15
+2 0 0 15 -1
 D
    She is dressed in tattered rags, bound in chains, wandering to and fro
 through the tomb. When she passes through you -- and she does -- you feel an
@@ -31,8 +31,8 @@ centaur headless horseman man~
 the headless centaur~
 A headless horse man rears back and brandishes his sword!
 ~
-25 400 bdoD c 4
-1 0 12 1
+25 400 bdoDK cG 4
+1 0 12 1 -1
 D
    This mighty centaur stands head and shoulders above you. Well, shoulders,
 anyway. He is dressed in black armor and armed with a black steel sword, and he
@@ -79,7 +79,7 @@ a risen city guard~
 A risen city guard hunts for intruders.
 ~
 75 175 dhqtuA cG 3
-1 0 13 10
+1 0 13 10 -1
 D
    This guard was clearly more dedicated than any before him. Even in death, he
 patrols the empire, hunting down intruders. Don't mind the gray coloration of
@@ -118,7 +118,7 @@ the attack-o-lantern~
 An attack-o-lantern is floating here.
 ~
 25 400 bdhozD c 3
-0 0 27 28
+0 0 27 28 -1
 D
 It's a carved pumpkin, but it looks like it might be enchanted.
 ~
@@ -130,7 +130,7 @@ the ghost of #n~
 The ghost of #n is haunting this place.
 ~
 0 0 do cmnG 0
-0 0 27 15
+0 0 27 15 -1
 D
 You can see straight through the ghost. That can't be normal.
 ~
@@ -141,7 +141,7 @@ guard #n~
 #n the guard is standing here.
 ~
 5 125 bdoquv 0 3
-1 0 0 1
+1 0 0 1 -1
 D
 The guard doesn't look happy at what you've been doing.
 ~
@@ -152,7 +152,7 @@ a starry-eyed companion~
 A companion stands, starry-eyed, looking around in wonder.
 ~
 1 1 bdoD n 3
-2 0 0 15
+2 0 0 15 -1
 D
 She looks like she's come from a different time.
 ~
@@ -183,7 +183,7 @@ a knocking ghost~
 A ghost lingers in the air.
 ~
 25 75 dovI deG 0
-0 0 27 28
+0 0 27 28 -1
 D
 It's knocking on the walls, the doors, and anything else it comes across.
 ~
@@ -203,7 +203,7 @@ a rattling ghost~
 A ghost lingers in the air.
 ~
 25 75 dovI deG 0
-0 0 27 28
+0 0 27 28 -1
 D
 The ghost is wrapped in chains, and rattles them loudly as it floats along.
 ~
@@ -223,7 +223,7 @@ a skittering hand~
 A disembodied hand skitters across the floor.
 ~
 25 75 dovI 0 1
-0 0 8 15
+0 0 8 15 -1
 D
 You're not sure where this Thing came from.
 ~
@@ -234,7 +234,7 @@ a headless horse~
 A headless horse neighs silently in the breeze.
 ~
 10 100 dej m 4
-0 0 25 11
+0 0 25 11 -1
 D
    The horse has a gleaming black coat, enormous bat wings, glowing hooves, and
 -- most strikingly -- no head. It navigates surprisingly well for a horse with
@@ -252,7 +252,7 @@ a headless horse~
 A headless horse neighs silently in the breeze.
 ~
 10 100 dej 0 4
-0 0 14 11
+0 0 14 11 -1
 D
 It navigates surprisingly well for a horse with no eyes.
 ~
@@ -268,7 +268,7 @@ a nightmare~
 A pitch-black nightmare gallops across the sky.
 ~
 100 150 bdej m 4
-0 0 12 11
+0 0 12 11 -1
 D
 Legend says this black horse flies across the night sky.
 ~
@@ -281,7 +281,7 @@ a little ghoul~
 A little ghoul scampers around, spreading mischief.
 ~
 1 1 bdoD n 2
-0 0 0 9
+0 0 0 9 -1
 D
 The ghoul is collecting bits of candy from the ground.
 ~
@@ -312,7 +312,7 @@ a mischievous goblin~
 A mischievous goblin is lurking around.
 ~
 25 75 dovzI 0 2
-0 0 9 9
+0 0 9 9 -1
 D
 This little goblin runs away when it realizes you're looking at it.
 ~
@@ -323,7 +323,7 @@ a skulking vampire~
 A vampire is skulking in the shadows.
 ~
 25 75 dovwzI 0 3
-0 0 7 9
+0 0 7 9 -1
 D
 It's a vampire. Try not to get too close.
 ~
@@ -335,7 +335,7 @@ a ghost~
 A ghost hangs in the air like a sheet.
 ~
 25 75 dhozD G 0
-0 0 27 16
+0 0 27 16 -1
 D
 On second look, this might just be a floating sheet.
 ~
@@ -346,7 +346,7 @@ a half-spider~
 A strange creature, half-spider, half-man, stands here.
 ~
 25 75 dovzI v 3
-0 0 9 9
+0 0 9 9 -1
 D
    You're not sure what happened to this poor spider, but someone has turned
 half of it into a human!
@@ -358,7 +358,7 @@ a skeleton ghost~
 The ghost of a skeleton is creeping around.
 ~
 1 1 bdoD n 2
-0 0 0 15
+0 0 0 15 -1
 D
    You can see straight through the little skeleton, and not just between the
 ribs! It seems to be wandering back and forth, lost, often passing straight
@@ -396,7 +396,7 @@ the Bylda~
 A Bylda is rampaging!
 ~
 25 400 dyz c 6
-0 0 26 24
+0 0 26 24 -1
 D
    The enormous bear looks cobbled together from leather and bad magic, and
 it's not happy about it! You duck as the Bylda swipes its mighty paw at you,
@@ -455,7 +455,7 @@ a small demon~
 A basic small demon growls here.
 ~
 1 1 do n 2
-0 0 0 15
+0 0 0 15 -1
 D
    A basic demon, small enough to fit through the portal, nothing too
 noticeable about it.
@@ -484,7 +484,7 @@ a nether demon~
 A massive demon of nether origin roars at you!
 ~
 400 400 bdgyzABDF choqACDEK 5
-0 0 0 15
+0 0 0 15 -1
 D
    What are you doing looking at this thing? You should be trying to run, or
 preparing to die! It is massive, far too large to fit through the portal you
@@ -510,7 +510,7 @@ a friendly ghost~
 A ghost with a friendly looking smile hovers above the ground.
 ~
 1 1 dh cmn 3
-0 0 0 15
+0 0 0 15 -1
 D
 Other than a friendly smile, there isn't much to see about this spirit.
 ~
@@ -538,7 +538,7 @@ the headless centaur's victim~
 The latest victim of the headless centaur lays on the ground dying.
 ~
 1 1 bdvI nD 3
-1 0 0 15
+1 0 0 15 -1
 D
    This adventurer has been badly wounded by his fight with the headless
 centaur. Clearly, he wasn't ready for such a battle. You should ease his
@@ -562,7 +562,7 @@ a zombie t-rex~
 A dragon sized zombie stomps about.
 ~
 1 100 deghk c 5
-2 0 26 9
+2 0 26 9 -1
 D
    This former queen of the primeval world has a rough pebbled hide, colored
 similar to a jaguar's pelt. Solid muscle ripples under the desiccated flesh as
@@ -587,7 +587,7 @@ a pig~
 A pig is leashed to keep it from fleeing.
 ~
 5 15 bdjo 0 3
-0 0 0 9
+0 0 0 9 -1
 D
    This fat pig seems ready for market. It's surprisingly clean. Perhaps
 someone already washed it off.
@@ -600,7 +600,7 @@ S
 #n is sharpening a cleaver.
 ~
 20 50 bdqvI 0 3
-0 1 0 2
+0 1 0 2 -1
 D
 The butcher's face is disturbed by a vicious grin.
 ~
@@ -611,7 +611,7 @@ a giant tarantula hawk~
 A giant tarantula hawk is buzzing above you.
 ~
 100 125 dej m 4
-0 0 2 23
+0 0 2 23 -1
 D
    This oversized wasp is large enough to ride, but you're not sure you want to
 get close to that stinger.
@@ -623,7 +623,7 @@ a giant tarantula~
 A giant tarantula menaces you with its hairy legs.
 ~
 100 125 dej 0 4
-0 0 8 9
+0 0 8 9 -1
 D
    This is among the largest spiders you have ever seen -- and you shudder to
 remember the others. Perhaps you can ride it.
@@ -635,7 +635,7 @@ a faded spirit~
 A faded spirit is wandering here.
 ~
 0 1 bdoDF mnG 3
-2 0 30 15
+2 0 30 15 -1
 D
    The hazy ghost of a nearly-forgotten ancestor floats listlessly before you.
 If you squint, it sort of looks like your grandmother!
@@ -647,7 +647,7 @@ Grandmother~
 Grandmother is floating here.
 ~
 0 1 dqvDFI nG 3
-2 0 27 15
+2 0 27 15 -1
 D
    This old spirit has returned to visit the land of the living once more. Her
 portrait has been placed on an altar near her grave, enabling her to cross the
@@ -688,7 +688,7 @@ a zombie terrier~
 A zombie terrier is chasing its tail.
 ~
 1 1 bdoD n 1
-0 0 0 9
+0 0 0 9 -1
 D
    This poor, adorable soul has been stitched back together and reanimated by
 some unknown necromancy. In life, it was an exuberant loyal terrier. In death,
@@ -716,7 +716,7 @@ the Great Pumpkin~
 The Great Pumpkin hovers before you!
 ~
 100 125 bdo cmE 4
-0 0 0 7
+0 0 0 7 -1
 D
    Though few believe in the Great Pumpkin, his mighty gourdness floats here
 before you, leaving no doubt that he is real.
@@ -730,7 +730,7 @@ a little spider~
 A little spider is hiding in the corner.
 ~
 0 0 bdo klnJ 3
-0 0 0 15
+0 0 0 15 -1
 D
 This mob is invisible to players. It provides the room echoes.
 ~
@@ -768,7 +768,7 @@ a little spider~
 A little spider is hiding in the corner.
 ~
 0 0 bdo klnJ 3
-0 0 0 15
+0 0 0 15 -1
 D
 This mob is invisible to players. It provides the room echoes.
 ~
@@ -803,7 +803,7 @@ a little spider~
 A little spider is hiding in the corner.
 ~
 0 0 bdo klnJ 3
-0 0 0 15
+0 0 0 15 -1
 D
 This mob is invisible to players. It provides the room echoes.
 ~
@@ -841,7 +841,7 @@ a little spider~
 A little spider is hiding in the corner.
 ~
 0 0 bdo klnJ 3
-0 0 0 15
+0 0 0 15 -1
 D
 This mob is invisible to players. It provides the room echoes.
 ~
@@ -882,7 +882,7 @@ a little spider~
 A little spider is hiding in the corner.
 ~
 0 0 bdo klnJ 3
-0 0 0 15
+0 0 0 15 -1
 D
 This mob is invisible to players. It provides the room echoes.
 ~
@@ -926,7 +926,7 @@ a little spider~
 A little spider is hiding in the corner.
 ~
 0 0 bdo klnJ 3
-0 0 0 15
+0 0 0 15 -1
 D
 This mob is invisible to players. It provides the room echoes.
 ~

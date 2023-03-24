@@ -4,7 +4,7 @@ the swamp hag~
 An old hag is rocking slowly in her chair.
 ~
 0 0 bdgvxAI c 3
-2 0 0 15
+2 0 0 15 -1
 I 4 10100 5.00 1 X  # LOOT: hag's pestle
 I 4 10101 5.00 1 X  # LOOT: hag's stench
 I 4 10102 5.00 1 X  # LOOT: hag's stench
@@ -31,7 +31,7 @@ a swamp rat~
 A grizzled swamp rat is sitting in the corner.
 ~
 0 0 abdhz c 2
-0 0 0 9
+0 0 0 9 -1
 T 10104
 S
 #10105
@@ -40,7 +40,7 @@ Berk~
 Berk is crouched by the fire, whittling some wood.
 ~
 100 200 abdvzBI 0 3
-1 0 0 4
+1 0 0 4 -1
 D
    He looks like he's been living out here for a while. You can't see what he's
 whittling, but there are a lot of charred wooden skewers around, so he's
@@ -57,7 +57,7 @@ Jorr~
 Jorr is cooking a pot of beans over the fire.
 ~
 100 200 abdvxzBI 0 3
-2 0 0 12
+2 0 0 12 -1
 D
 She's stirring the beans with a dagger. It's tough living out here.
 ~
@@ -72,7 +72,7 @@ Tranc~
 Tranc is strapping on his armor.
 ~
 100 200 abdvyBI 0 3
-1 0 0 5
+1 0 0 5 -1
 D
    From the tusk marks on his armor, you can surmise he's getting ready to go
 hunt a boar.
@@ -88,7 +88,7 @@ Liza the thief hound~
 A black-haired thief hound is standing guard.
 ~
 100 200 abdjz 0 2
-0 0 0 9
+0 0 0 9 -1
 D
    This shaggy old dog has gone a little gray around the muzzle, but it looks
 like she still has all her teeth.
@@ -101,7 +101,7 @@ Sly~
 A thief is hunched in the corner.
 ~
 0 0 abdvI D 3
-1 0 0 4
+1 0 0 4 -1
 D
    He looks like he's doing pretty well for himself, between his charming
 necklace and expensive shadowcraft pants.
@@ -129,7 +129,7 @@ Chiv~
 A thief is warming her hands by the fire.
 ~
 0 0 abdvI D 3
-2 0 0 4
+2 0 0 4 -1
 D
    She has a roguish look about her. And presumably, she's good at it, as she
 seems to be using a talismanic weapon. Those are expensive.
@@ -157,7 +157,7 @@ a thief~
 A thief is leaning against the wall.
 ~
 0 0 abdvI D 3
-2 0 0 4
+2 0 0 4 -1
 D
 Looks like she's just a hired dagger.
 ~
@@ -183,7 +183,7 @@ a baby dragon~
 A baby dragon has hatched!
 ~
 0 0 bdy c 3
-0 0 2 9
+0 0 2 9 -1
 D
 What a cute little green dragon. Wonder where the mother went.
 ~
@@ -198,7 +198,7 @@ Sly~
 A thief is hunched in the corner.
 ~
 0 0 abdvI D 3
-1 0 0 4
+1 0 0 4 -1
 D
 You barely noticed him there. That must be why they call him Sly.
 ~
@@ -225,8 +225,8 @@ cactus jumping~
 a jumping cactus~
 A jumping cactus leans toward you with its bristling spines.
 ~
-75 100 dhuxz cdiG 2
-0 0 8 23
+75 100 dhuxzK cdiG 2
+0 0 8 23 -1
 D
    This odd, segmented little cactus almost has the shape of a human as it
 leaps about. But the instant it touches you, its spines hook into your skin and
@@ -243,8 +243,8 @@ cactus barbary fig~
 a barbary fig~
 A barbary fig cactus turns its spiny pads toward you.
 ~
-75 100 dhuxz cdiG 2
-0 0 8 23
+75 100 dhuxzK cdiG 2
+0 0 8 23 -1
 D
    This litle cactus is made from a series of spiny green discs or pads, and
 topped with equally spiny purple fruit. It seems to have come to life...
@@ -260,8 +260,8 @@ cactus creeping devil~
 a creeping devil cactus~
 A creeping devil cactus lies dangerously close to your feet.
 ~
-75 100 dhuxz cdiG 2
-0 0 8 23
+75 100 dhuxzK cdiG 2
+0 0 8 23 -1
 D
    Like a bristly snake, this deadly cactus creeps along the ground. Under
 bush, through tall grass, beneath the flowers, until it's wrapped around your
@@ -278,8 +278,8 @@ cactus saguaro treant~
 a saguaro treant~
 A huge saguaro cactus bends its spiny arm down toward you.
 ~
-75 100 bdhxzA cdiG 5
-0 0 8 23
+75 100 bdhxzAK cdiG 5
+0 0 8 23 -1
 D
    Though it's as tall as a tree, this treant has no branches or leaves. Its
 pale green flesh is spined from top to bottom in pleated rows, and its
@@ -296,7 +296,7 @@ Head Druid #n~
 Head Druid #n stands at the center of the circle, protected by powerful magic.
 ~
 0 0 bd n 3
-0 2 0 15
+0 2 0 15 -1
 D
    Robed in brown and with an air of superiority, the druid seems to think they
 are the master of the monsoon. It certainly seems to have bent to their will.
@@ -309,7 +309,7 @@ a robed thief~
 A robed thief leans out from behind a large shrub.
 ~
 0 0 bd ein 3
-1 0 0 15
+1 0 0 15 -1
 D
 He's wearing beige and brown to blend into the desert.
 ~
@@ -322,7 +322,7 @@ a wandering merchant~
 A wandering merchant stands here, lamenting the loss of his goods.
 ~
 0 0 d n 3
-1 0 0 15
+1 0 0 15 -1
 D
 He seems a little soaked by the monsoon.
 ~
@@ -335,7 +335,7 @@ a pale man~
 A pale man is lurking in the shadows.
 ~
 0 0 bdw in 3
-1 0 0 15
+1 0 0 15 -1
 D
    There's a reddish glint when the light catches his eyes, and he looks like
 he hasn't eaten in some time.
@@ -349,7 +349,7 @@ a free-tailed bat~
 A little bat flitters around above you.
 ~
 1 5 djo m 1
-0 0 2 9
+0 0 2 9 -1
 D
 This tiny bat is hard to see in the dark.
 ~
@@ -367,7 +367,7 @@ a gila monster~
 An orange and black gila monster is lying on a rock.
 ~
 10 20 dj 0 1
-0 0 0 9
+0 0 0 9 -1
 D
    This odd, oversized lizard has beaded orange and black skin, and a vicious
 bite that's both venomous and putrid.
@@ -387,7 +387,7 @@ an armadillo~
 An armadillo is rolling around on the ground.
 ~
 10 20 dj 0 2
-0 0 0 9
+0 0 0 9 -1
 D
 This roly poly animal seems to curl up into a ball when threatened.
 ~
@@ -406,7 +406,7 @@ a cactus wren~
 A cactus wren is picking at seeds.
 ~
 1 5 dgjo c 1
-0 0 2 9
+0 0 2 9 -1
 D
 This curious little bird is speckled all over.
 ~
@@ -427,7 +427,7 @@ an antelope squirrel~
 An antelope squirrel darts out from under a shrub.
 ~
 1 5 djo c 1
-0 0 0 9
+0 0 0 9 -1
 D
    More squirrel than antelope, this striped little rodent holds its tail over
 its back like a shade.
@@ -450,7 +450,7 @@ a desert bighorn~
 A desert bighorn sheep won't take its eyes off of you.
 ~
 10 20 djo 0 3
-0 0 0 27
+0 0 0 27 -1
 D
 This scrawny sheep has horns that are bigger than its head!
 ~
@@ -472,7 +472,7 @@ a coati~
 A long-tailed coati is digging furiously at the ground.
 ~
 20 30 djo c 2
-0 0 0 10
+0 0 0 10 -1
 D
    This odd critter has a pointed black face, a reddish brown body, and a long,
 striped tail. You've really never seen anything like it!
@@ -495,8 +495,8 @@ elemental melon~
 a melon elemental~
 A melon elemental is rolling around.
 ~
-55 75 dhoz cG 3
-0 0 21 28
+55 75 dhozK cG 3
+0 0 21 28 -1
 D
 It's made from a cluster of large melons.
 ~
@@ -509,7 +509,7 @@ a teddybear cactus~
 A white, spiny teddybear cactus is growing here.
 ~
 1 1 bdoD dn 2
-0 0 0 9
+0 0 0 9 -1
 D
    It's a segmented cactus that's almost shaped like a little bear. The long
 white spines are so dense that it actually appears furry.
@@ -533,7 +533,7 @@ a giant armadillo~
 A giant armadillo grazes nearby.
 ~
 100 125 dej 0 4
-0 0 26 9
+0 0 26 9 -1
 D
    It's big, it's armored, and you're just hoping it doesn't roll into a ball
 while you're riding it.
@@ -545,7 +545,7 @@ a giant ground sloth~
 A giant ground sloth turns slowly toward you.
 ~
 100 125 dej 0 4
-0 0 26 24
+0 0 26 24 -1
 D
 It's not as slow as it looks -- the enormous size makes up the difference.
 ~
@@ -556,7 +556,7 @@ a giant sphinx moth~
 A giant sphinx moth buzzes over you.
 ~
 100 125 dej mG 4
-0 0 2 28
+0 0 2 28 -1
 D
 This amazing moth flaps as fast as a hummingbird.
 ~
@@ -567,7 +567,7 @@ the raging lavaflow~
 The lavaflow rages by.
 ~
 150 150 dhk dkln 3
-0 0 0 15
+0 0 0 15 -1
 D
 Only immortals should see this. This is the lava terraformer mob.
 ~
