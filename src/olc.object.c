@@ -670,6 +670,7 @@ void olc_delete_object(char_data *ch, obj_vnum vnum) {
 		
 		if (found) {
 			SET_BIT(GET_AUG_FLAGS(aug), AUG_IN_DEVELOPMENT);
+			syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: Augment %d %s set IN-DEV due to deleted object", GET_AUG_VNUM(aug), GET_AUG_NAME(aug));
 			save_library_file_for_vnum(DB_BOOT_AUG, GET_AUG_VNUM(aug));
 		}
 	}
@@ -700,6 +701,7 @@ void olc_delete_object(char_data *ch, obj_vnum vnum) {
 		
 		if (found) {
 			SET_BIT(GET_CRAFT_FLAGS(craft), CRAFT_IN_DEVELOPMENT);
+			syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: Craft %d %s set IN-DEV due to deleted object", GET_CRAFT_VNUM(craft), GET_CRAFT_NAME(craft));
 			save_library_file_for_vnum(DB_BOOT_CRAFT, GET_CRAFT_VNUM(craft));
 		}
 	}
@@ -720,6 +722,7 @@ void olc_delete_object(char_data *ch, obj_vnum vnum) {
 		
 		if (found) {
 			// SET_BIT(EVT_FLAGS(event), EVTF_IN_DEVELOPMENT);
+			syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: Event %d %s had rewards for a deleted object (removed rewards but did not set IN-DEV)", EVT_VNUM(event), EVT_NAME(event));
 			save_library_file_for_vnum(DB_BOOT_EVT, EVT_VNUM(event));
 		}
 	}
@@ -759,6 +762,7 @@ void olc_delete_object(char_data *ch, obj_vnum vnum) {
 		
 		if (found) {
 			SET_BIT(MORPH_FLAGS(morph), MORPHF_IN_DEVELOPMENT);
+			syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: Morph %d %s set IN-DEV due to deleted object", MORPH_VNUM(morph), MORPH_SHORT_DESC(morph));
 			save_library_file_for_vnum(DB_BOOT_MORPH, MORPH_VNUM(morph));
 		}
 	}
@@ -781,6 +785,7 @@ void olc_delete_object(char_data *ch, obj_vnum vnum) {
 		
 		if (found) {
 			SET_BIT(PRG_FLAGS(prg), PRG_IN_DEVELOPMENT);
+			syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: Progress %d %s set IN-DEV due to deleted object", PRG_VNUM(prg), PRG_NAME(prg));
 			save_library_file_for_vnum(DB_BOOT_PRG, PRG_VNUM(prg));
 			need_progress_refresh = TRUE;
 		}
@@ -803,6 +808,7 @@ void olc_delete_object(char_data *ch, obj_vnum vnum) {
 		
 		if (found) {
 			SET_BIT(QUEST_FLAGS(quest), QST_IN_DEVELOPMENT);
+			syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: Quest %d %s set IN-DEV due to deleted object", QUEST_VNUM(quest), QUEST_NAME(quest));
 			save_library_file_for_vnum(DB_BOOT_QST, QUEST_VNUM(quest));
 		}
 	}
@@ -831,6 +837,7 @@ void olc_delete_object(char_data *ch, obj_vnum vnum) {
 		
 		if (found) {
 			SET_BIT(SHOP_FLAGS(shop), SHOP_IN_DEVELOPMENT);
+			syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: Shop %d %s set IN-DEV due to deleted object", SHOP_VNUM(shop), SHOP_NAME(shop));
 			save_library_file_for_vnum(DB_BOOT_SHOP, SHOP_VNUM(shop));
 		}
 	}
@@ -845,6 +852,7 @@ void olc_delete_object(char_data *ch, obj_vnum vnum) {
 		
 		if (found) {
 			SET_BIT(SOC_FLAGS(soc), SOC_IN_DEVELOPMENT);
+			syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: Social %d %s set IN-DEV due to deleted object", SOC_VNUM(soc), SOC_NAME(soc));
 			save_library_file_for_vnum(DB_BOOT_SOC, SOC_VNUM(soc));
 		}
 	}
