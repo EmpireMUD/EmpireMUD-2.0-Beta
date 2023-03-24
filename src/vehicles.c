@@ -3283,6 +3283,7 @@ void olc_delete_vehicle(char_data *ch, any_vnum vnum) {
 		found |= delete_bld_relation_by_vnum(&GET_BLD_RELATIONS(bld), BLD_REL_UPGRADES_TO_VEH, vnum);
 		found |= delete_bld_relation_by_vnum(&GET_BLD_RELATIONS(bld), BLD_REL_FORCE_UPGRADE_VEH, vnum);
 		if (found) {
+			syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: Building %d %s lost deleted related vehicle", GET_BLD_VNUM(bld), GET_BLD_NAME(bld));
 			save_library_file_for_vnum(DB_BOOT_BLD, GET_BLD_VNUM(bld));
 		}
 	}
@@ -3308,6 +3309,7 @@ void olc_delete_vehicle(char_data *ch, any_vnum vnum) {
 			if (store->type == TYPE_VEH && store->vnum == vnum) {
 				LL_DELETE(obj->proto_data->storage, store);
 				free(store);
+				syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: Object %d %s lost deleted storage vehicle", GET_OBJ_VNUM(obj), GET_OBJ_SHORT_DESC(obj));
 				save_library_file_for_vnum(DB_BOOT_OBJ, GET_OBJ_VNUM(obj));
 			}
 		}
@@ -3343,6 +3345,7 @@ void olc_delete_vehicle(char_data *ch, any_vnum vnum) {
 	HASH_ITER(hh, room_template_table, rmt, next_rmt) {
 		found = delete_from_spawn_template_list(&GET_RMT_SPAWNS(rmt), ADV_SPAWN_VEH, vnum);
 		if (found) {
+			syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: Room template %d %s lost deleted related vehicle", GET_RMT_VNUM(rmt), GET_RMT_TITLE(rmt));
 			save_library_file_for_vnum(DB_BOOT_RMT, GET_RMT_VNUM(rmt));
 		}
 	}
@@ -3377,6 +3380,7 @@ void olc_delete_vehicle(char_data *ch, any_vnum vnum) {
 		found |= delete_bld_relation_by_vnum(&VEH_RELATIONS(iter), BLD_REL_UPGRADES_TO_VEH, vnum);
 		found |= delete_bld_relation_by_vnum(&VEH_RELATIONS(iter), BLD_REL_FORCE_UPGRADE_VEH, vnum);
 		if (found) {
+			syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: Vehicle %d %s lost deleted related vehicle", VEH_VNUM(iter), VEH_SHORT_DESC(veh));
 			save_library_file_for_vnum(DB_BOOT_VEH, VEH_VNUM(iter));
 		}
 	}

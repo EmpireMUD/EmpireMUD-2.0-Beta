@@ -1104,6 +1104,7 @@ void olc_delete_faction(char_data *ch, any_vnum vnum) {
 		if (find) {
 			HASH_DEL(FCT_RELATIONS(iter), find);
 			free(find);
+			syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: Faction %d %s lost deleted related faction", FCT_VNUM(iter), FCT_NAME(iter));
 			save_library_file_for_vnum(DB_BOOT_FCT, FCT_VNUM(iter));
 		}
 	}
@@ -1112,6 +1113,7 @@ void olc_delete_faction(char_data *ch, any_vnum vnum) {
 	HASH_ITER(hh, mobile_table, mob, next_mob) {
 		if (MOB_FACTION(mob) == fct) {
 			MOB_FACTION(mob) = NULL;
+			syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: Mobile %d %s lost deleted faction", GET_MOB_VNUM(mob), GET_SHORT_DESC(mob));
 			save_library_file_for_vnum(DB_BOOT_MOB, GET_MOB_VNUM(mob));
 		}
 	}

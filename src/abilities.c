@@ -2864,6 +2864,7 @@ void olc_delete_ability(char_data *ch, any_vnum vnum) {
 	HASH_ITER(hh, ability_table, abiter, next_abiter) {
 		if (ABIL_MASTERY_ABIL(abiter) == vnum) {
 			ABIL_MASTERY_ABIL(abiter) = NOTHING;
+			syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: Ability %d %s lost deleted mastery ability", ABIL_VNUM(abiter), ABIL_NAME(abiter));
 			save_library_file_for_vnum(DB_BOOT_ABIL, ABIL_VNUM(abiter));
 		}
 	}
@@ -2882,6 +2883,7 @@ void olc_delete_ability(char_data *ch, any_vnum vnum) {
 	HASH_ITER(hh, class_table, cls, next_cls) {
 		found = remove_vnum_from_class_abilities(&CLASS_ABILITIES(cls), vnum);
 		if (found) {
+			syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: Class %d %s lost deleted ability", CLASS_VNUM(cls), CLASS_NAME(cls));
 			save_library_file_for_vnum(DB_BOOT_CLASS, CLASS_VNUM(cls));
 		}
 	}
@@ -2945,6 +2947,7 @@ void olc_delete_ability(char_data *ch, any_vnum vnum) {
 		found = remove_vnum_from_skill_abilities(&SKILL_ABILITIES(skill), vnum);
 		found |= remove_ability_from_synergy_abilities(&SKILL_SYNERGIES(skill), vnum);
 		if (found) {
+			syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: Skill %d %s lost deleted ability", SKILL_VNUM(skill), SKILL_NAME(skill));
 			save_library_file_for_vnum(DB_BOOT_SKILL, SKILL_VNUM(skill));
 		}
 	}

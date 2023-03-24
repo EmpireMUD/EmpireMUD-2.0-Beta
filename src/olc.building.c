@@ -414,6 +414,7 @@ void olc_delete_building(char_data *ch, bld_vnum vnum) {
 		found |= delete_link_rule_by_type_value(&GET_ADV_LINKING(adv), ADV_LINK_PORTAL_BUILDING_NEW, vnum);
 		
 		if (found) {
+			syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: Adventure %d %s lost deleted linking rule building", GET_ADV_VNUM(adv), GET_ADV_NAME(adv));
 			save_library_file_for_vnum(DB_BOOT_ADV, GET_ADV_VNUM(adv));
 		}
 	}
@@ -426,6 +427,7 @@ void olc_delete_building(char_data *ch, bld_vnum vnum) {
 		found |= delete_from_interaction_list(&GET_BLD_INTERACTIONS(biter), TYPE_BLD, vnum);
 		
 		if (found) {
+			syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: Building %d %s lost deleted related building", GET_BLD_VNUM(biter), GET_BLD_NAME(biter));
 			save_library_file_for_vnum(DB_BOOT_BLD, GET_BLD_VNUM(biter));
 		}
 	}
@@ -442,12 +444,17 @@ void olc_delete_building(char_data *ch, bld_vnum vnum) {
 	
 	// obj storage
 	HASH_ITER(hh, object_table, obj, next_obj) {
+		found = FALSE;
 		LL_FOREACH_SAFE(GET_OBJ_STORAGE(obj), store, next_store) {
 			if (store->type == TYPE_BLD && store->vnum == vnum) {
 				LL_DELETE(obj->proto_data->storage, store);
 				free(store);
-				save_library_file_for_vnum(DB_BOOT_OBJ, GET_OBJ_VNUM(obj));
+				found = TRUE;
 			}
+		}
+		if (found) {
+			syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: Object %d %s lost deleted storage building", GET_OBJ_VNUM(obj), GET_OBJ_SHORT_DESC(obj));
+			save_library_file_for_vnum(DB_BOOT_OBJ, GET_OBJ_VNUM(obj));
 		}
 	}
 	
@@ -519,6 +526,7 @@ void olc_delete_building(char_data *ch, bld_vnum vnum) {
 		found |= delete_bld_relation_by_vnum(&VEH_RELATIONS(veh), BLD_REL_STORES_LIKE_BLD, vnum);
 		
 		if (found) {
+			syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: Vehicle %d %s lost deleted related building", VEH_VNUM(veh), VEH_SHORT_DESC(veh));
 			save_library_file_for_vnum(DB_BOOT_VEH, VEH_VNUM(veh));
 		}
 	}

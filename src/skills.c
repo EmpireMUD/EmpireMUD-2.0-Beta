@@ -3848,6 +3848,7 @@ void olc_delete_skill(char_data *ch, any_vnum vnum) {
 	HASH_ITER(hh, skill_table, sk, next_sk) {
 		found = remove_skill_from_synergy_abilities(&SKILL_SYNERGIES(sk), vnum);
 		if (found) {
+			syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: Skill %d %s lost deleted synergy skill", SKILL_VNUM(sk), SKILL_NAME(sk));
 			save_library_file_for_vnum(DB_BOOT_SKILL, SKILL_VNUM(sk));
 		}
 	}

@@ -1277,6 +1277,7 @@ void olc_delete_generic(char_data *ch, any_vnum vnum) {
 	// update buildings
 	HASH_ITER(hh, building_table, bld, next_bld) {
 		if (remove_thing_from_resource_list(&GET_BLD_YEARLY_MAINTENANCE(bld), res_type, vnum)) {
+			syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: Building %d %s lost deleted maintenance generic", GET_BLD_VNUM(bld), GET_BLD_NAME(bld));
 			save_library_file_for_vnum(DB_BOOT_BLD, GET_BLD_VNUM(bld));
 		}
 	}
@@ -1316,6 +1317,7 @@ void olc_delete_generic(char_data *ch, any_vnum vnum) {
 	// update other generics
 	HASH_ITER(hh, generic_table, gen_iter, next_gen) {
 		if (delete_generic_relation(&GEN_RELATIONS(gen_iter), vnum)) {
+			syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: Generic %d %s lost deleted related generic", GEN_VNUM(gen_iter), GEN_NAME(gen_iter));
 			save_library_file_for_vnum(DB_BOOT_GEN, GEN_VNUM(gen_iter));
 		}
 	}
@@ -1337,6 +1339,7 @@ void olc_delete_generic(char_data *ch, any_vnum vnum) {
 		}
 		
 		if (found) {
+			syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: Object %d %s lost deleted generic", GET_OBJ_VNUM(obj), GET_OBJ_SHORT_DESC(obj));
 			save_library_file_for_vnum(DB_BOOT_OBJ, GET_OBJ_VNUM(obj));
 		}
 	}
@@ -1418,6 +1421,7 @@ void olc_delete_generic(char_data *ch, any_vnum vnum) {
 	// update vehicles
 	HASH_ITER(hh, vehicle_table, veh, next_veh) {
 		if (remove_thing_from_resource_list(&VEH_YEARLY_MAINTENANCE(veh), res_type, vnum)) {
+			syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: Vehicle %d %s lost deleted maintenance generic", VEH_VNUM(veh), VEH_SHORT_DESC(veh));
 			save_library_file_for_vnum(DB_BOOT_VEH, VEH_VNUM(veh));
 		}
 	}

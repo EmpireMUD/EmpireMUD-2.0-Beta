@@ -293,6 +293,7 @@ void olc_delete_craft(char_data *ch, craft_vnum vnum) {
 	HASH_ITER(hh, object_table, obj, next_obj) {
 		if (IS_RECIPE(obj) && GET_RECIPE_VNUM(obj) == vnum) {
 			set_obj_val(obj, VAL_RECIPE_VNUM, 0);
+			syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: Object %d %s lost deleted learnable craft", GET_OBJ_VNUM(obj), GET_OBJ_SHORT_DESC(obj));
 			save_library_file_for_vnum(DB_BOOT_OBJ, GET_OBJ_VNUM(obj));
 		}
 	}
@@ -300,6 +301,7 @@ void olc_delete_craft(char_data *ch, craft_vnum vnum) {
 	// update progression
 	HASH_ITER(hh, progress_table, prg, next_prg) {
 		if (delete_progress_perk_from_list(&PRG_PERKS(prg), PRG_PERK_CRAFT, vnum)) {
+			syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: Progress %d %s lost deleted craft perk", PRG_VNUM(prg), PRG_NAME(prg));
 			save_library_file_for_vnum(DB_BOOT_PRG, PRG_VNUM(prg));
 		}
 	}

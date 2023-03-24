@@ -369,6 +369,7 @@ void olc_delete_trigger(char_data *ch, trig_vnum vnum) {
 	// remove from adventures
 	HASH_ITER(hh, adventure_table, adv, next_adv) {
 		if (delete_from_proto_list_by_vnum(&GET_ADV_SCRIPTS(adv), vnum)) {
+			syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: Adventure %d %s lost deleted trigger", GET_ADV_VNUM(adv), GET_ADV_NAME(adv));
 			save_library_file_for_vnum(DB_BOOT_ADV, GET_ADV_VNUM(adv));
 		}
 	}
@@ -376,6 +377,7 @@ void olc_delete_trigger(char_data *ch, trig_vnum vnum) {
 	// update building protos
 	HASH_ITER(hh, building_table, bld, next_bld) {
 		if (delete_from_proto_list_by_vnum(&GET_BLD_SCRIPTS(bld), vnum)) {
+			syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: Building %d %s lost deleted trigger", GET_BLD_VNUM(bld), GET_BLD_NAME(adv));
 			save_library_file_for_vnum(DB_BOOT_BLD, GET_BLD_VNUM(bld));
 		}
 	}
@@ -383,6 +385,7 @@ void olc_delete_trigger(char_data *ch, trig_vnum vnum) {
 	// update mob protos
 	HASH_ITER(hh, mobile_table, mob, next_mob) {
 		if (delete_from_proto_list_by_vnum(&mob->proto_script, vnum)) {
+			syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: Mobile %d %s lost deleted trigger", GET_MOB_VNUM(mob), GET_SHORT_DESC(mob));
 			save_library_file_for_vnum(DB_BOOT_MOB, mob->vnum);
 		}
 	}
@@ -390,6 +393,7 @@ void olc_delete_trigger(char_data *ch, trig_vnum vnum) {
 	// update obj protos
 	HASH_ITER(hh, object_table, obj, next_obj) {
 		if (delete_from_proto_list_by_vnum(&obj->proto_script, vnum)) {
+			syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: Object %d %s lost deleted trigger", GET_OBJ_VNUM(obj), GET_OBJ_SHORT_DESC(obj));
 			save_library_file_for_vnum(DB_BOOT_OBJ, GET_OBJ_VNUM(obj));
 		}
 	}
@@ -410,6 +414,7 @@ void olc_delete_trigger(char_data *ch, trig_vnum vnum) {
 	// room templates
 	HASH_ITER(hh, room_template_table, rmt, next_rmt) {
 		if (delete_from_proto_list_by_vnum(&GET_RMT_SCRIPTS(rmt), vnum)) {
+			syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: Room template %d %s lost deleted trigger", GET_RMT_VNUM(rmt), GET_RMT_TITLE(rmt));
 			save_library_file_for_vnum(DB_BOOT_RMT, GET_RMT_VNUM(rmt));
 		}
 	}
@@ -428,6 +433,7 @@ void olc_delete_trigger(char_data *ch, trig_vnum vnum) {
 	// update vehicle protos
 	HASH_ITER(hh, vehicle_table, veh, next_veh) {
 		if (delete_from_proto_list_by_vnum(&veh->proto_script, vnum)) {
+			syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: Vehicle %d %s lost deleted trigger", VEH_VNUM(veh), VEH_SHORT_DESC(veh));
 			save_library_file_for_vnum(DB_BOOT_VEH, VEH_VNUM(veh));
 		}
 	}

@@ -397,6 +397,7 @@ void olc_delete_mobile(char_data *ch, mob_vnum vnum) {
 		}
 		
 		if (found) {
+			syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: Ability %d %s lost deleted related mob", ABIL_VNUM(abil), ABIL_NAME(abil));
 			save_library_file_for_vnum(DB_BOOT_ABIL, ABIL_VNUM(abil));
 		}
 	}
@@ -410,6 +411,7 @@ void olc_delete_mobile(char_data *ch, mob_vnum vnum) {
 			found |= TRUE;
 		}
 		if (found) {
+			syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: Building %d %s lost artisan mob", GET_BLD_VNUM(bld), GET_BLD_NAME(bld));
 			save_library_file_for_vnum(DB_BOOT_BLD, GET_BLD_VNUM(bld));
 		}
 	}
@@ -419,6 +421,7 @@ void olc_delete_mobile(char_data *ch, mob_vnum vnum) {
 		found = delete_mob_from_spawn_list(&GET_CROP_SPAWNS(crop), vnum);
 		found |= delete_from_interaction_list(&GET_CROP_INTERACTIONS(crop), TYPE_MOB, vnum);
 		if (found) {
+			syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: Crop %d %s lost deleted related mob", GET_CROP_VNUM(crop), GET_CROP_NAME(crop));
 			save_library_file_for_vnum(DB_BOOT_CROP, GET_CROP_VNUM(crop));
 		}
 	}
@@ -428,6 +431,7 @@ void olc_delete_mobile(char_data *ch, mob_vnum vnum) {
 		found = delete_from_interaction_list(&GET_GLOBAL_INTERACTIONS(glb), TYPE_MOB, vnum);
 		found |= delete_mob_from_spawn_list(&GET_GLOBAL_SPAWNS(glb), vnum);
 		if (found) {
+			syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: Global %d %s lost deleted related mob", GET_GLOBAL_VNUM(glb), GET_GLOBAL_NAME(glb));
 			save_library_file_for_vnum(DB_BOOT_GLB, GET_GLOBAL_VNUM(glb));
 		}
 	}
@@ -435,6 +439,7 @@ void olc_delete_mobile(char_data *ch, mob_vnum vnum) {
 	// update mob interactions
 	HASH_ITER(hh, mobile_table, mob_iter, next_mob) {
 		if (delete_from_interaction_list(&mob_iter->interactions, TYPE_MOB, vnum)) {
+			syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: Mobile %d %s lost deleted related mob", GET_MOB_VNUM(mob_iter), GET_SHORT_DESC(mob_iter));
 			save_library_file_for_vnum(DB_BOOT_MOB, mob_iter->vnum);
 		}
 	}
@@ -470,6 +475,7 @@ void olc_delete_mobile(char_data *ch, mob_vnum vnum) {
 		found = delete_from_spawn_template_list(&GET_RMT_SPAWNS(rmt), ADV_SPAWN_MOB, vnum);
 		found |= delete_from_interaction_list(&GET_RMT_INTERACTIONS(rmt), TYPE_MOB, vnum);
 		if (found) {
+			syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: Room template %d %s lost deleted related mob", GET_RMT_VNUM(rmt), GET_RMT_TITLE(rmt));
 			save_library_file_for_vnum(DB_BOOT_RMT, GET_RMT_VNUM(rmt));
 		}
 	}
@@ -479,6 +485,7 @@ void olc_delete_mobile(char_data *ch, mob_vnum vnum) {
 		found = delete_mob_from_spawn_list(&GET_SECT_SPAWNS(sect), vnum);
 		found |= delete_from_interaction_list(&GET_SECT_INTERACTIONS(sect), TYPE_MOB, vnum);
 		if (found) {
+			syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: Sector %d %s lost deleted related mob", GET_SECT_VNUM(sect), GET_SECT_NAME(sect));
 			save_library_file_for_vnum(DB_BOOT_SECTOR, GET_SECT_VNUM(sect));
 		}
 	}
@@ -510,6 +517,7 @@ void olc_delete_mobile(char_data *ch, mob_vnum vnum) {
 		found = delete_mob_from_spawn_list(&VEH_SPAWNS(veh), vnum);
 		found |= delete_from_interaction_list(&VEH_INTERACTIONS(veh), TYPE_MOB, vnum);
 		if (found) {
+			syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: Vehicle %d %s lost deleted related mob", VEH_VNUM(veh), VEH_SHORT_DESC(veh));
 			save_library_file_for_vnum(DB_BOOT_VEH, VEH_VNUM(veh));
 		}
 	}

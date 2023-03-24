@@ -218,6 +218,7 @@ void olc_delete_crop(char_data *ch, crop_vnum vnum) {
 		found = delete_link_rule_by_type_value(&GET_ADV_LINKING(adv), ADV_LINK_PORTAL_CROP, vnum);
 		
 		if (found) {
+			syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: Adventure %d %s lost deleted linking rule crop", GET_ADV_VNUM(adv), GET_ADV_NAME(adv));
 			save_library_file_for_vnum(DB_BOOT_ADV, GET_ADV_VNUM(adv));
 		}
 	}
@@ -226,6 +227,7 @@ void olc_delete_crop(char_data *ch, crop_vnum vnum) {
 	HASH_ITER(hh, object_table, obj, next_obj) {
 		if (OBJ_FLAGGED(obj, OBJ_PLANTABLE) && GET_OBJ_VAL(obj, VAL_FOOD_CROP_TYPE) == vnum) {
 			set_obj_val(obj, VAL_FOOD_CROP_TYPE, NOTHING);
+			syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: Object %d %s lost deleted plantable crop", GET_OBJ_VNUM(obj), GET_OBJ_SHORT_DESC(obj));
 			save_library_file_for_vnum(DB_BOOT_OBJ, GET_OBJ_VNUM(obj));
 		}
 	}

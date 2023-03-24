@@ -636,6 +636,7 @@ void olc_delete_object(char_data *ch, obj_vnum vnum) {
 		}
 		
 		if (found) {
+			syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: Ability %d %s lost deleted related object", ABIL_VNUM(abil), ABIL_NAME(abil));
 			save_library_file_for_vnum(DB_BOOT_ABIL, ABIL_VNUM(abil));
 		}
 	}
@@ -653,6 +654,7 @@ void olc_delete_object(char_data *ch, obj_vnum vnum) {
 		}
 		
 		if (found) {
+			syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: Archetype %d %s lost deleted gear object", GET_ARCH_VNUM(arch), GET_ARCH_NAME(arch));
 			save_library_file_for_vnum(DB_BOOT_ARCH, GET_ARCH_VNUM(arch));
 		}
 	}
@@ -680,6 +682,7 @@ void olc_delete_object(char_data *ch, obj_vnum vnum) {
 		found = delete_from_interaction_list(&GET_BLD_INTERACTIONS(bld), TYPE_OBJ, vnum);
 		found |= remove_thing_from_resource_list(&GET_BLD_YEARLY_MAINTENANCE(bld), RES_OBJECT, vnum);
 		if (found) {
+			syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: Building %d %s lost deleted related object", GET_BLD_VNUM(bld), GET_BLD_NAME(bld));
 			save_library_file_for_vnum(DB_BOOT_BLD, GET_BLD_VNUM(bld));
 		}
 	}
@@ -710,6 +713,7 @@ void olc_delete_object(char_data *ch, obj_vnum vnum) {
 	HASH_ITER(hh, crop_table, crop, next_crop) {
 		found = delete_from_interaction_list(&GET_CROP_INTERACTIONS(crop), TYPE_OBJ, vnum);
 		if (found) {
+			syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: Crop %d %s lost deleted related object", GET_CROP_VNUM(crop), GET_CROP_NAME(crop));
 			save_library_file_for_vnum(DB_BOOT_CROP, GET_CROP_VNUM(crop));
 		}
 	}
@@ -731,6 +735,7 @@ void olc_delete_object(char_data *ch, obj_vnum vnum) {
 	HASH_ITER(hh, generic_table, gen, next_gen) {
 		if (GET_COMPONENT_OBJ_VNUM(gen) == vnum) {
 			GEN_VALUE(gen, GVAL_OBJ_VNUM) = NOTHING;
+			syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: Generic %d %s lost deleted related object", GEN_VNUM(gen), GEN_NAME(gen));
 			save_library_file_for_vnum(DB_BOOT_GEN, GEN_VNUM(gen));
 		}
 	}
@@ -739,6 +744,7 @@ void olc_delete_object(char_data *ch, obj_vnum vnum) {
 	HASH_ITER(hh, globals_table, glb, next_glb) {
 		found = delete_from_interaction_list(&GET_GLOBAL_INTERACTIONS(glb), TYPE_OBJ, vnum);
 		if (found) {
+			syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: Global %d %s lost deleted related object", GET_GLOBAL_VNUM(glb), GET_GLOBAL_NAME(glb));
 			save_library_file_for_vnum(DB_BOOT_GLB, GET_GLOBAL_VNUM(glb));
 		}
 	}
@@ -747,6 +753,7 @@ void olc_delete_object(char_data *ch, obj_vnum vnum) {
 	HASH_ITER(hh, mobile_table, mob, next_mob) {
 		found = delete_from_interaction_list(&mob->interactions, TYPE_OBJ, vnum);
 		if (found) {
+			syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: Mobile %d %s lost deleted related object", GET_MOB_VNUM(mob), GET_SHORT_DESC(mob));
 			save_library_file_for_vnum(DB_BOOT_MOB, mob->vnum);
 		}
 	}
@@ -771,6 +778,7 @@ void olc_delete_object(char_data *ch, obj_vnum vnum) {
 	HASH_ITER(hh, object_table, obj_iter, next_obj) {
 		found = delete_from_interaction_list(&obj_iter->proto_data->interactions, TYPE_OBJ, vnum);
 		if (found) {
+			syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: Object %d %s lost deleted related object", GET_OBJ_VNUM(obj_iter), GET_OBJ_SHORT_DESC(obj_iter));
 			save_library_file_for_vnum(DB_BOOT_OBJ, GET_OBJ_VNUM(obj_iter));
 		}
 	}
@@ -818,6 +826,7 @@ void olc_delete_object(char_data *ch, obj_vnum vnum) {
 		found = delete_from_spawn_template_list(&GET_RMT_SPAWNS(rmt), ADV_SPAWN_OBJ, vnum);
 		found |= delete_from_interaction_list(&GET_RMT_INTERACTIONS(rmt), TYPE_OBJ, vnum);
 		if (found) {
+			syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: Room template %d %s lost deleted related object", GET_RMT_VNUM(rmt), GET_RMT_TITLE(rmt));
 			save_library_file_for_vnum(DB_BOOT_RMT, GET_RMT_VNUM(rmt));
 		}
 	}
@@ -826,6 +835,7 @@ void olc_delete_object(char_data *ch, obj_vnum vnum) {
 	HASH_ITER(hh, sector_table, sect, next_sect) {
 		found = delete_from_interaction_list(&GET_SECT_INTERACTIONS(sect), TYPE_OBJ, vnum);
 		if (found) {
+			syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: Sector %d %s lost deleted related object", GET_SECT_VNUM(sect), GET_SECT_NAME(sect));
 			save_library_file_for_vnum(DB_BOOT_SECTOR, GET_SECT_VNUM(sect));
 		}
 	}
@@ -862,6 +872,7 @@ void olc_delete_object(char_data *ch, obj_vnum vnum) {
 		found = remove_thing_from_resource_list(&VEH_YEARLY_MAINTENANCE(veh), RES_OBJECT, vnum);
 		found |= delete_from_interaction_list(&VEH_INTERACTIONS(veh), TYPE_OBJ, vnum);
 		if (found) {
+			syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: Vehicle %d %s lost deleted related object", VEH_VNUM(veh), VEH_SHORT_DESC(veh));
 			save_library_file_for_vnum(DB_BOOT_VEH, VEH_VNUM(veh));
 		}
 	}

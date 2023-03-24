@@ -303,6 +303,7 @@ void olc_delete_sector(char_data *ch, sector_vnum vnum) {
 	// update sector evolutions
 	HASH_ITER(hh, sector_table, sect_iter, next_sect) {
 		if (delete_sector_from_evolutions(vnum, &GET_SECT_EVOS(sect_iter))) {
+			syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: Sector %d %s lost deleted evolution sector", GET_SECT_VNUM(sect_iter), GET_SECT_NAME(sect_iter));
 			save_library_file_for_vnum(DB_BOOT_SECTOR, GET_SECT_VNUM(sect_iter));
 		}
 	}
@@ -312,6 +313,7 @@ void olc_delete_sector(char_data *ch, sector_vnum vnum) {
 		found = delete_link_rule_by_type_value(&GET_ADV_LINKING(adv), ADV_LINK_PORTAL_WORLD, vnum);
 		
 		if (found) {
+			syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: Adventure %d %s lost deleted linking sector", GET_ADV_VNUM(adv), GET_ADV_NAME(adv));
 			save_library_file_for_vnum(DB_BOOT_ADV, GET_ADV_VNUM(adv));
 		}
 	}
