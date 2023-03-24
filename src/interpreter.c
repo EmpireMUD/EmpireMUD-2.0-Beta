@@ -2432,6 +2432,9 @@ void nanny(descriptor_data *d, char *arg) {
 					/* undo it just in case they are set */
 					REMOVE_BIT(PLR_FLAGS(d->character), PLR_MAILING);
 
+					// flush messages because updated items appear here
+					send_stacked_msgs(d);
+					
 					SEND_TO_Q("Password: ", d);
 					ProtocolNoEcho(d, true);
 					d->idle_tics = 0;
