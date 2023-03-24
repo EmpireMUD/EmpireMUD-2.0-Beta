@@ -2372,6 +2372,7 @@ void olc_delete_progress(char_data *ch, any_vnum vnum) {
 		
 		if (any) {
 			SET_BIT(PRG_FLAGS(iter), PRG_IN_DEVELOPMENT);
+			syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: Progress %d %s set IN-DEV due to other deleted progress goal", PRG_VNUM(iter), PRG_NAME(iter));
 			save_library_file_for_vnum(DB_BOOT_PRG, PRG_VNUM(iter));
 			need_progress_refresh = TRUE;
 		}
@@ -2385,6 +2386,7 @@ void olc_delete_progress(char_data *ch, any_vnum vnum) {
 		
 		if (any) {
 			SET_BIT(QUEST_FLAGS(qiter), QST_IN_DEVELOPMENT);
+			syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: Quest %d %s set IN-DEV due to deleted progress goal", QUEST_VNUM(qiter), QUEST_NAME(qiter));
 			save_library_file_for_vnum(DB_BOOT_QST, QUEST_VNUM(qiter));
 		}
 	}
