@@ -2116,7 +2116,9 @@ void olc_delete_event(char_data *ch, any_vnum vnum) {
 		found |= delete_event_reward_from_list(&EVT_THRESHOLD_REWARDS(ev), QR_EVENT_POINTS, vnum);
 		
 		if (found) {
+			// we do NOT apply in-dev because it would cancel live event points
 			// SET_BIT(EVT_FLAGS(ev), EVTF_IN_DEVELOPMENT);
+			syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: Event %d %s had rewards for a deleted event (removed rewards but did not set IN-DEV)", EVT_VNUM(ev), EVT_NAME(ev));
 			save_library_file_for_vnum(DB_BOOT_EVT, EVT_VNUM(ev));
 		}
 	}
@@ -2129,6 +2131,7 @@ void olc_delete_event(char_data *ch, any_vnum vnum) {
 		
 		if (found) {
 			SET_BIT(PRG_FLAGS(prg), PRG_IN_DEVELOPMENT);
+			syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: Progress %d %s set IN-DEV due to deleted event", PRG_VNUM(prg), PRG_NAME(prg));
 			save_library_file_for_vnum(DB_BOOT_PRG, PRG_VNUM(prg));
 			need_progress_refresh = TRUE;
 		}
@@ -2146,6 +2149,7 @@ void olc_delete_event(char_data *ch, any_vnum vnum) {
 		
 		if (found) {
 			SET_BIT(QUEST_FLAGS(quest), QST_IN_DEVELOPMENT);
+			syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: Quest %d %s set IN-DEV due to deleted event", QUEST_VNUM(quest), QUEST_NAME(quest));
 			save_library_file_for_vnum(DB_BOOT_QST, QUEST_VNUM(quest));
 		}
 	}
@@ -2158,6 +2162,7 @@ void olc_delete_event(char_data *ch, any_vnum vnum) {
 		
 		if (found) {
 			SET_BIT(SOC_FLAGS(soc), SOC_IN_DEVELOPMENT);
+			syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: Social %d %s set IN-DEV due to deleted event", SOC_VNUM(soc), SOC_NAME(soc));
 			save_library_file_for_vnum(DB_BOOT_SOC, SOC_VNUM(soc));
 		}
 	}
