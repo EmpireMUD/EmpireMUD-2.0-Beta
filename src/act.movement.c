@@ -2402,7 +2402,7 @@ ACMD(do_land) {
 	}
 	
 	// ensure morph isn't the cause
-	if (GET_MORPH(ch) && IS_SET(MORPH_AFFECTS(GET_MORPH(ch)), AFF_FLY)) {
+	if (affected_by_spell_and_apply(ch, ATYPE_MORPH, NOTHING, AFF_FLY)) {
 		msg_to_char(ch, "You can't land in this form.\r\n");
 		return;
 	}
