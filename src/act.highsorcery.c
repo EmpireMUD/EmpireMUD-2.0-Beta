@@ -549,6 +549,10 @@ void summon_materials(char_data *ch, char *argument) {
 		if (proto && multi_isname(objname, GET_OBJ_KEYWORDS(proto)) && (++pos == number)) {
 			found = TRUE;
 			
+			if (!CAN_WEAR(proto, ITEM_WEAR_TAKE)) {
+				msg_to_char(ch, "You can't summon %s.\r\n", GET_OBJ_SHORT_DESC(proto));
+				return;
+			}
 			if (stored_item_requires_withdraw(proto)) {
 				msg_to_char(ch, "You can't summon materials out of the vault.\r\n");
 				return;
