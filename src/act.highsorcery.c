@@ -486,6 +486,10 @@ void summon_materials(char_data *ch, char *argument) {
 		send_low_pos_msg(ch);
 		return;
 	}
+	if (AFF_FLAGGED(ch, AFF_STUNNED | AFF_HARD_STUNNED)) {
+		msg_to_char(ch, "You can't do that... you're stunned!\r\n");
+		return;
+	}
 	
 	if (!GET_ISLAND(IN_ROOM(ch)) || !(isle = get_empire_island(emp, GET_ISLAND_ID(IN_ROOM(ch))))) {
 		msg_to_char(ch, "You can't summon materials here.\r\n");
