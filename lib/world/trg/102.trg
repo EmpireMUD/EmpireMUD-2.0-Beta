@@ -52,7 +52,7 @@ done
 Zelkab Death~
 0 f 100
 ~
-if %self.mob_flagged(NO-CORPSE)% || !%self.varexists(difficulty)%
+if !%self.varexists(difficulty)%
   * This is probably a summoned copy.
   halt
 end
@@ -108,7 +108,7 @@ done
 Garlgarl Death~
 0 f 100
 ~
-if %self.mob_flagged(NO-CORPSE)% || !%self.varexists(difficulty)%
+if !%self.varexists(difficulty)%
   * This is probably a summoned copy.
   halt
 end
@@ -156,7 +156,7 @@ Filks Archer Combat~
 Filks Death~
 0 f 100
 ~
-if %self.mob_flagged(NO-CORPSE)% || !%self.varexists(difficulty)%
+if !%self.varexists(difficulty)%
   * This is probably a summoned copy.
   halt
 end
@@ -207,7 +207,7 @@ Walts Sapper Combat~
 Walts Death~
 0 f 100
 ~
-if %self.mob_flagged(NO-CORPSE)% || !%self.varexists(difficulty)%
+if !%self.varexists(difficulty)%
   * This is probably a summoned copy.
   halt
 end
@@ -271,7 +271,7 @@ done
 Nilbog Death~
 0 f 100
 ~
-if %self.mob_flagged(NO-CORPSE)% || !%self.varexists(difficulty)%
+if !%self.varexists(difficulty)%
   * This is probably a summoned copy.
   halt
 end
@@ -342,6 +342,7 @@ if (!%found%)
   if %walts%
     %echo% ~%walts% respawns.
     nop %walts.add_mob_flag(!LOOT)%
+    nop %walts.add_mob_flag(NO-CORPSE)%
   end
 end
 ~
@@ -367,6 +368,7 @@ if (!%found%)
   if %filks%
     %echo% ~%filks% respawns.
     nop %filks.add_mob_flag(!LOOT)%
+    nop %filks.add_mob_flag(NO-CORPSE)%
   end
 end
 ~
@@ -380,13 +382,13 @@ set fighting 0
 set person %room.people%
 while %person%
   if %person.vnum% == 10202
-    if %person.fighting% || %person.mob_flagged(NO-CORPSE)%
+    if %person.fighting% || %person.disabled%
       set fighting 1
     end
     set goblin %person%
     set filks_present 1
   elseif %person.vnum% == 10203
-    if %person.fighting% || %person.mob_flagged(NO-CORPSE)%
+    if %person.fighting% || %person.disabled%
       set fighting 1
     end
     set walts_present 1
@@ -401,6 +403,7 @@ if %filks_present% && !%walts_present% && !%fighting%
   if %new_mob.vnum% == 10203
     %echo% ~%new_mob% respawns.
     nop %new_mob.add_mob_flag(!LOOT)%
+    nop %new_mob.add_mob_flag(NO-CORPSE)%
   end
 elseif %walts_present% && !%filks_present% && !%fighting%
   * Respawn Filks
@@ -409,6 +412,7 @@ elseif %walts_present% && !%filks_present% && !%fighting%
   if %new_mob.vnum% == 10202
     %echo% ~%new_mob% respawns.
     nop %new_mob.add_mob_flag(!LOOT)%
+    nop %new_mob.add_mob_flag(NO-CORPSE)%
   end
 end
 if %new_mob%
