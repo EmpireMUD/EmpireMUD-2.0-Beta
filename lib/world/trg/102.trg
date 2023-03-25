@@ -434,6 +434,7 @@ if %new_mob%
     nop %new_mob.add_mob_flag(HARD)%
     nop %new_mob.add_mob_flag(GROUP)%
   end
+  nop %new_mob.unscale_and_reset%
 end
 ~
 #10225
