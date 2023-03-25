@@ -2347,6 +2347,9 @@ ACMD(do_follow) {
 				GET_BECKONED_BY(ch) = 0;
 			}
 		}
+		
+		// short delay prevents abuse in pvp (maybe)
+		command_lag(ch, WAIT_ABILITY);
 	}
 }
 
