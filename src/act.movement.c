@@ -1215,7 +1215,7 @@ int move_cost(char_data *ch, room_data *from, room_data *to, int dir, bitvector_
 	}
 	
 	/* move points needed is avg. move loss for src and destination sect type */	
-	if (!IS_INCOMPLETE(from)) {
+	if (IS_INCOMPLETE(from)) {
 		// incomplte: full base cost
 		cost_from = GET_SECT_MOVE_LOSS(BASE_SECT(from));
 	}
@@ -1229,7 +1229,7 @@ int move_cost(char_data *ch, room_data *from, room_data *to, int dir, bitvector_
 	}
 	
 	// cost for the space moving to
-	if (!IS_INCOMPLETE(to)) {
+	if (IS_INCOMPLETE(to)) {
 		cost_to = GET_SECT_MOVE_LOSS(BASE_SECT(to));
 	}
 	else if (!ROOM_IS_CLOSED(to)) {
