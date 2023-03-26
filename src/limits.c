@@ -550,9 +550,14 @@ void real_update_char(char_data *ch) {
 	
 	// put stuff that happens when dead here
 	
-	// players: check for auto-respawn
-	if (ch->desc && IS_DEAD(ch) && get_cooldown_time(ch, COOLDOWN_DEATH_RESPAWN) == 0) {
+	// DEAD players: check for auto-respawn
+	if (IS_DEAD(ch) && ch->desc && get_cooldown_time(ch, COOLDOWN_DEATH_RESPAWN) == 0) {
 		do_respawn(ch, "", 0, 0);
+		return;
+	}
+	
+	// DEAD players: check idle early
+	if (IS_DEAD(ch) && !IS_NPC(ch) && (GET_IDNUM(ch) % REAL_UPDATES_PER_MUD_HOUR) == point_update_cycle && !check_idling(ch)) {
 		return;
 	}
 	
