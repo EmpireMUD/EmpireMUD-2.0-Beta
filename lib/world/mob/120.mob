@@ -4,7 +4,7 @@ the goddess Anat~
 Anat, virgin war-goddess of old, stands fierce and bloody (difficulty).
 ~
 225 325 aduyB ciE 5
-2 0 35 1
+2 0 35 1 -1
 D
    Anat is a beautiful young woman with light brown skin and wavy brown hair,
 dressed in a flowing white gown with a red sash... And she's enormous! This is
@@ -63,7 +63,7 @@ the hawk Yatpan~
 The hawk Yatpan swoops in to attack!
 ~
 225 325 bdhozD q 3
-1 0 2 27
+1 0 2 27 -1
 D
    Yatpan is a large hawk, easily big enough to pick up a man! It's brown on
 the back but lighter on the front, with a speckled breast.
@@ -77,7 +77,7 @@ a trained hawk~
 A trained hawk circles overhead.
 ~
 1 1 bdoD mn 2
-0 0 0 10
+0 0 0 10 -1
 D
    The hawk is brown on its wings and back. Its underside is lighter, though
 its breast is speckled brown and white.
@@ -106,7 +106,7 @@ the memory of Anat~
 The memory of Anat, warrior-goddess of old, barely lingers in the air.
 ~
 225 325 do dn 0
-0 0 27 15
+0 0 27 15 -1
 D
    It calls to mind the memory of Anat, a virgin war-goddess of the ancient
 world. Anat was one of the main gods of Ugarit's pantheon, in what is Syria
@@ -131,7 +131,7 @@ the hawk Yatpan~
 The giant hawk Yatpan alights on the ground.
 ~
 100 125 dej m 3
-0 0 2 10
+0 0 2 10 -1
 D
    Yatpan is a large hawk, easily big enough to pick up a man! It's brown on
 the back but lighter on the front, with a speckled breast.
@@ -143,7 +143,7 @@ the god Ba'al Hadad~
 The storm god Ba'al Hadad towers over you, lightning in his eyes (difficulty).
 ~
 225 325 aduyB ciE 5
-1 0 26 1
+1 0 26 1 -1
 D
    Hadad is an enormous man, as tall as a tower and as strong as heard of oxen.
 On his head, he wears a four-horned crown. The ground and the heavens both
@@ -200,8 +200,8 @@ storm coming stormcloud massive baalhadadstormcloud~
 the Coming Storm~
 A massive stormcloud envelops and suffocates you!
 ~
-225 325 bdnyA ci 5
-0 0 2 21
+225 325 bdnyAK ciG 5
+0 0 2 21 -1
 D
 You can see little else but the storm!
 ~
@@ -215,7 +215,7 @@ the little bronze bull~
 A little bronze bull stands with its horns held high.
 ~
 1 1 bdoD dn 2
-0 0 0 27
+0 0 0 27 -1
 D
    It's a little bull cast in a single piece from bronze, though it runs around
 like a living creature. Every so often, smoke puffs from its nostrils.
@@ -232,7 +232,7 @@ the lightning~
 A bolt of lightning in the shape of a horse appears before you.
 ~
 100 125 de m 0
-0 0 2 21
+0 0 2 21 -1
 D
 It's a bolt of lighting frozen into the shape of a horse!
 ~
@@ -243,7 +243,7 @@ a worshipper of the storm god~
 A worshipper of the storm god bows low, begging for rain.
 ~
 40 60 dovI 0 3
-1 0 0 21
+1 0 0 21 -1
 D
 He wears only a cloth around his waist as he bows low to the ground.
 ~

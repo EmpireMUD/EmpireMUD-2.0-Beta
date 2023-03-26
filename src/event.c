@@ -2066,12 +2066,15 @@ void olc_delete_event(char_data *ch, any_vnum vnum) {
 	descriptor_data *desc;
 	char_data *chiter;
 	event_data *event;
+	char name[256];
 	bool found;
 	
 	if (!(event = find_event_by_vnum(vnum))) {
 		msg_to_char(ch, "There is no such event %d.\r\n", vnum);
 		return;
 	}
+	
+	snprintf(name, sizeof(name), "%s", NULLSAFE(EVT_NAME(event)));
 	
 	// end the event, if running -- BEFORE removing from the hash table
 	while ((running = find_running_event_by_vnum(vnum))) {
@@ -2116,7 +2119,9 @@ void olc_delete_event(char_data *ch, any_vnum vnum) {
 		found |= delete_event_reward_from_list(&EVT_THRESHOLD_REWARDS(ev), QR_EVENT_POINTS, vnum);
 		
 		if (found) {
+			// we do NOT apply in-dev because it would cancel live event points
 			// SET_BIT(EVT_FLAGS(ev), EVTF_IN_DEVELOPMENT);
+			syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: Event %d %s had rewards for a deleted event (removed rewards but did not set IN-DEV)", EVT_VNUM(ev), EVT_NAME(ev));
 			save_library_file_for_vnum(DB_BOOT_EVT, EVT_VNUM(ev));
 		}
 	}
@@ -2129,6 +2134,7 @@ void olc_delete_event(char_data *ch, any_vnum vnum) {
 		
 		if (found) {
 			SET_BIT(PRG_FLAGS(prg), PRG_IN_DEVELOPMENT);
+			syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: Progress %d %s set IN-DEV due to deleted event", PRG_VNUM(prg), PRG_NAME(prg));
 			save_library_file_for_vnum(DB_BOOT_PRG, PRG_VNUM(prg));
 			need_progress_refresh = TRUE;
 		}
@@ -2146,6 +2152,7 @@ void olc_delete_event(char_data *ch, any_vnum vnum) {
 		
 		if (found) {
 			SET_BIT(QUEST_FLAGS(quest), QST_IN_DEVELOPMENT);
+			syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: Quest %d %s set IN-DEV due to deleted event", QUEST_VNUM(quest), QUEST_NAME(quest));
 			save_library_file_for_vnum(DB_BOOT_QST, QUEST_VNUM(quest));
 		}
 	}
@@ -2158,6 +2165,7 @@ void olc_delete_event(char_data *ch, any_vnum vnum) {
 		
 		if (found) {
 			SET_BIT(SOC_FLAGS(soc), SOC_IN_DEVELOPMENT);
+			syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: Social %d %s set IN-DEV due to deleted event", SOC_VNUM(soc), SOC_NAME(soc));
 			save_library_file_for_vnum(DB_BOOT_SOC, SOC_VNUM(soc));
 		}
 	}
@@ -2210,8 +2218,8 @@ void olc_delete_event(char_data *ch, any_vnum vnum) {
 		}
 	}
 	
-	syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: %s has deleted event %d", GET_NAME(ch), vnum);
-	msg_to_char(ch, "Event %d deleted.\r\n", vnum);
+	syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: %s has deleted event %d %s", GET_NAME(ch), vnum, name);
+	msg_to_char(ch, "Event %d (%s) deleted.\r\n", vnum, name);
 	
 	free_event(event);
 }

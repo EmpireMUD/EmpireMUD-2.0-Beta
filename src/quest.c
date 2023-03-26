@@ -107,6 +107,7 @@ bool can_turn_in_quest_at(char_data *ch, room_data *loc, quest_data *quest, empi
 						return TRUE;
 					}
 				}
+				break;
 			}
 			case QG_ROOM_TEMPLATE: {
 				if (GET_ROOM_TEMPLATE(loc) && GET_RMT_VNUM(GET_ROOM_TEMPLATE(loc)) == giver->vnum) {
@@ -681,6 +682,8 @@ void get_tracker_display(struct req_data *tracker, char *save_buffer) {
 void give_quest_rewards(char_data *ch, struct quest_reward *list, int reward_level, empire_data *quest_giver_emp, int instance_id) {
 	char buf[MAX_STRING_LENGTH];
 	struct quest_reward *reward;
+	struct empire_goal *goal;
+	progress_data *prog;
 	
 	LL_FOREACH(list, reward) {
 		// QR_x: reward the rewards
@@ -808,6 +811,25 @@ void give_quest_rewards(char_data *ch, struct quest_reward *list, int reward_lev
 				if (speaks_language(ch, reward->vnum) == LANG_UNKNOWN && real_generic(reward->vnum)) {
 					add_language(ch, reward->vnum, LANG_RECOGNIZE);
 					msg_to_char(ch, "\tyYou can now recognize %s!\t0\r\n", get_generic_name_by_vnum(reward->vnum));
+				}
+				break;
+			}
+			case QR_GRANT_PROGRESS: {
+				if (GET_LOYALTY(ch) && (prog = real_progress(reward->vnum)) && !empire_has_completed_goal(GET_LOYALTY(ch), reward->vnum)) {
+					script_reward_goal(GET_LOYALTY(ch), prog);
+					check_for_eligible_goals(GET_LOYALTY(ch));
+				}
+				break;
+			}
+			case QR_START_PROGRESS: {
+				if (GET_LOYALTY(ch) && (prog = real_progress(reward->vnum))) {
+					if (!empire_has_completed_goal(GET_LOYALTY(ch), reward->vnum) && !get_current_goal(GET_LOYALTY(ch), reward->vnum) && empire_meets_goal_prereqs(GET_LOYALTY(ch), prog)) {
+						// ok to start
+						if ((goal = start_empire_goal(GET_LOYALTY(ch), prog))) {
+							msg_to_char(ch, "\tyYour empire starts the progress goal: %s\t0\r\n", PRG_NAME(prog));
+							refresh_one_goal_tracker(GET_LOYALTY(ch), goal);
+						}
+					}
 				}
 				break;
 			}
@@ -959,6 +981,14 @@ char *quest_reward_string(struct quest_reward *reward, bool show_vnums) {
 		}
 		case QR_RECOGNIZE_LANGUAGE: {
 			snprintf(output, sizeof(output), "%sRecognize %s", vnum, get_generic_name_by_vnum(reward->vnum));
+			break;
+		}
+		case QR_GRANT_PROGRESS: {
+			snprintf(output, sizeof(output), "Grants progress: %s%s", vnum, get_progress_name_by_proto(reward->vnum));
+			break;
+		}
+		case QR_START_PROGRESS: {
+			snprintf(output, sizeof(output), "Starts progress: %s%s", vnum, get_progress_name_by_proto(reward->vnum));
 			break;
 		}
 		default: {
@@ -3407,6 +3437,7 @@ void qt_wear_obj(char_data *ch, obj_data *obj) {
 bool audit_quest(quest_data *quest, char_data *ch) {
 	struct trig_proto_list *tpl;
 	struct quest_reward *rew;
+	progress_data *prog;
 	struct req_data *task;
 	generic_data *gen;
 	trig_data *trig;
@@ -3494,6 +3525,22 @@ bool audit_quest(quest_data *quest, char_data *ch) {
 				}
 				else if (GEN_FLAGGED(gen, GEN_BASIC | GEN_IN_DEVELOPMENT)) {
 					olc_audit_msg(ch, QUEST_VNUM(quest), "Rewards language with BASIC or IN-DEV");
+					problem = TRUE;
+				}
+				break;
+			}
+			case QR_GRANT_PROGRESS:
+			case QR_START_PROGRESS: {
+				if (!(prog = real_progress(rew->vnum))) {
+					olc_audit_msg(ch, QUEST_VNUM(quest), "Rewards non-existent progress goal");
+					problem = TRUE;
+				}
+				else if (PRG_FLAGGED(prog, PRG_IN_DEVELOPMENT)) {
+					olc_audit_msg(ch, QUEST_VNUM(quest), "Rewards IN-DEV progress goal");
+					problem = TRUE;
+				}
+				else if (!PRG_FLAGGED(prog, PRG_NO_AUTOSTART)) {
+					olc_audit_msg(ch, QUEST_VNUM(quest), "Rewards progress goal without NO-AUTOSTART");
 					problem = TRUE;
 				}
 				break;
@@ -3898,6 +3945,20 @@ any_vnum parse_quest_reward_vnum(char_data *ch, int type, char *vnum_arg, char *
 				return PARSE_QRV_FAILED;
 			}
 			if ((gen = real_generic(vnum)) && GEN_TYPE(gen) == GENERIC_LANGUAGE) {
+				ok = TRUE;
+			}
+			break;
+		}
+		case QR_GRANT_PROGRESS:
+		case QR_START_PROGRESS: {
+			if (!*vnum_arg) {
+				strcpy(vnum_arg, prev_arg);	// does not generally need 2 args
+			}
+			if (!*vnum_arg || !isdigit(*vnum_arg) || (vnum = atoi(vnum_arg)) < 0) {
+				msg_to_char(ch, "Invalid progress vnum '%s'.\r\n", vnum_arg);
+				return PARSE_QRV_FAILED;
+			}
+			if (real_progress(vnum)) {
 				ok = TRUE;
 			}
 			break;
@@ -4852,12 +4913,15 @@ void olc_delete_quest(char_data *ch, any_vnum vnum) {
 	shop_data *shop, *next_shop;
 	descriptor_data *desc;
 	char_data *chiter;
+	char name[256];
 	bool found;
 	
 	if (!(quest = quest_proto(vnum))) {
 		msg_to_char(ch, "There is no such quest %d.\r\n", vnum);
 		return;
 	}
+	
+	snprintf(name, sizeof(name), "%s", NULLSAFE(QUEST_NAME(quest)));
 	
 	// remove it from the hash table first
 	remove_quest_from_table(quest);
@@ -4888,6 +4952,7 @@ void olc_delete_quest(char_data *ch, any_vnum vnum) {
 		
 		if (found) {
 			// SET_BIT(EVT_FLAGS(event), EVTF_IN_DEVELOPMENT);
+			syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: Event %d %s had rewards for a deleted quest (removed rewards but did not set IN-DEV)", EVT_VNUM(event), EVT_NAME(event));
 			save_library_file_for_vnum(DB_BOOT_EVT, EVT_VNUM(event));
 		}
 	}
@@ -4900,6 +4965,7 @@ void olc_delete_quest(char_data *ch, any_vnum vnum) {
 		
 		if (found) {
 			SET_BIT(PRG_FLAGS(prg), PRG_IN_DEVELOPMENT);
+			syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: Progress %d %s set IN-DEV due to deleted quest", PRG_VNUM(prg), PRG_NAME(prg));
 			save_library_file_for_vnum(DB_BOOT_PRG, PRG_VNUM(prg));
 			need_progress_refresh = TRUE;
 		}
@@ -4920,6 +4986,7 @@ void olc_delete_quest(char_data *ch, any_vnum vnum) {
 		
 		if (found) {
 			SET_BIT(QUEST_FLAGS(qiter), QST_IN_DEVELOPMENT);
+			syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: Quest %d %s set IN-DEV due to other deleted quest", QUEST_VNUM(qiter), QUEST_NAME(qiter));
 			save_library_file_for_vnum(DB_BOOT_QST, QUEST_VNUM(qiter));
 		}
 	}
@@ -4931,6 +4998,7 @@ void olc_delete_quest(char_data *ch, any_vnum vnum) {
 		
 		if (found) {
 			SET_BIT(SHOP_FLAGS(shop), SHOP_IN_DEVELOPMENT);
+			syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: Shop %d %s set IN-DEV due to deleted quest", SHOP_VNUM(shop), SHOP_NAME(shop));
 			save_library_file_for_vnum(DB_BOOT_SHOP, SHOP_VNUM(shop));
 		}
 	}
@@ -4944,6 +5012,7 @@ void olc_delete_quest(char_data *ch, any_vnum vnum) {
 		
 		if (found) {
 			SET_BIT(SOC_FLAGS(soc), SOC_IN_DEVELOPMENT);
+			syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: Social %d %s set IN-DEV due to deleted quest", SOC_VNUM(soc), SOC_NAME(soc));
 			save_library_file_for_vnum(DB_BOOT_SOC, SOC_VNUM(soc));
 		}
 	}
@@ -5009,8 +5078,8 @@ void olc_delete_quest(char_data *ch, any_vnum vnum) {
 		}
 	}
 	
-	syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: %s has deleted quest %d", GET_NAME(ch), vnum);
-	msg_to_char(ch, "Quest %d deleted.\r\n", vnum);
+	syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: %s has deleted quest %d %s", GET_NAME(ch), vnum, name);
+	msg_to_char(ch, "Quest %d (%s) deleted.\r\n", vnum, name);
 	
 	free_quest(quest);
 }

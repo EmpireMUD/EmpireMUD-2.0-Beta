@@ -565,79 +565,6 @@ ACMD(do_earthmeld) {
 }
 
 
-ACMD(do_entangle) {
-	char_data *vict = NULL;
-	struct affected_type *af;
-	int cost = 20;
-	
-	if (!can_use_ability(ch, ABIL_ENTANGLE, MANA, cost, COOLDOWN_ENTANGLE)) {
-		return;
-	}
-
-	// find target
-	one_argument(argument, arg);
-	if (*arg && !(vict = get_char_vis(ch, arg, NULL, FIND_CHAR_ROOM))) {
-		send_config_msg(ch, "no_person");
-		return;
-	}
-	if (!*arg && !(vict = FIGHTING(ch))) {
-		msg_to_char(ch, "Who would you like to cast that at?\r\n");
-		return;
-	}
-	if (ch == vict) {
-		msg_to_char(ch, "You wouldn't want to cast that on yourself.\r\n");
-		return;
-	}
-	
-	// check validity
-	if (!can_fight(ch, vict)) {
-		act("You can't attack $M!", FALSE, ch, NULL, vict, TO_CHAR);
-		return;
-	}
-	
-	if (NOT_MELEE_RANGE(ch, vict)) {
-		msg_to_char(ch, "You need to be at melee range to do this.\r\n");
-		return;
-	}
-	
-	if (ABILITY_TRIGGERS(ch, vict, NULL, ABIL_ENTANGLE)) {
-		return;
-	}
-	
-	charge_ability_cost(ch, MANA, cost, COOLDOWN_ENTANGLE, 30, WAIT_COMBAT_SPELL);
-	
-	if (SHOULD_APPEAR(ch)) {
-		appear(ch);
-	}
-	
-	// counterspell??
-	if (trigger_counterspell(vict) || AFF_FLAGGED(vict, AFF_IMMUNE_MAGICAL_DEBUFFS)) {
-		act("You send out vines of green mana to entangle $N, but they can't seem to grasp $M.", FALSE, ch, NULL, vict, TO_CHAR);
-		act("$n sends out vines of green mana to entangle you, but they can't seem to latch on.", FALSE, ch, NULL, vict, TO_VICT);
-		act("$n sends out vines of green mana to entangle $N, but they can't seem to grasp $M.", FALSE, ch, NULL, vict, TO_NOTVICT);
-	}
-	else {
-		// succeed
-	
-		act("You shoot out vines of green mana, which entangle $N!", FALSE, ch, NULL, vict, TO_CHAR);
-		act("$n shoots vines of green mana at you, entangling you!", FALSE, ch, NULL, vict, TO_VICT);
-		act("$n shoots vines of green mana at $N, entangling $M!", FALSE, ch, NULL, vict, TO_NOTVICT);
-	
-		af = create_aff(ATYPE_ENTANGLE, 6, APPLY_DEXTERITY, -1, AFF_IMMOBILIZED, ch);
-		affect_join(vict, af, 0);
-
-		engage_combat(ch, vict, TRUE);
-		
-		// release other entangleds here
-		limit_crowd_control(vict, ATYPE_ENTANGLE);
-	}
-	
-	if (can_gain_exp_from(ch, vict)) {
-		gain_ability_exp(ch, ABIL_ENTANGLE, 15);
-	}
-}
-
-
 /**
 * do_heal connects several abilities: ABIL_HEAL, ABIL_HEAL_FRIEND,
 * and ABIL_HEAL_PARTY. Restrictions are based on which of these the player
@@ -1263,7 +1190,7 @@ ACMD(do_soulsight) {
 			act(buf, FALSE, ch, 0, vict, TO_CHAR);
 		}
 		else {
-			sprintf(buf, " $E is %s.", IS_VAMPIRE(vict) ? "a vampire" : (IS_HUMAN(vict) ? ((IS_NPC(vict) && MOB_FLAGGED(vict, MOB_ANIMAL)) ? "an animal" : (MOB_FLAGGED(vict, MOB_HUMAN) ? "a human" : "a creature")) : "unknown"));
+			sprintf(buf, " $E is %s.", IS_VAMPIRE(vict) ? "a vampire" : (IS_HUMAN(vict) ? ((IS_NPC(vict) && MOB_FLAGGED(vict, MOB_ANIMAL)) ? "an animal" : ((!IS_NPC(vict) || MOB_FLAGGED(vict, MOB_HUMAN)) ? "a human" : "a creature")) : "unknown"));
 			act(buf, FALSE, ch, NULL, vict, TO_CHAR);
 			
 			show_character_affects(vict, ch);

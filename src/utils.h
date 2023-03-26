@@ -937,6 +937,7 @@ int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_COORD(ge
 #define OBJVAL_FLAGGED(obj, flag)  (IS_SET(GET_OBJ_VAL((obj), 1), (flag)))
 #define CAN_WEAR(obj, part)  (IS_SET(GET_OBJ_WEAR(obj), (part)))
 #define TOOL_FLAGGED(obj, flag)  IS_SET(GET_OBJ_TOOL_FLAGS(obj), (flag))
+#define WORN_OR_CARRIED_BY(obj, ch)  ((obj)->worn_by == (ch) || (obj)->carried_by == (ch))
 
 // for stacking, sotring, etc
 #define OBJ_CAN_STACK(obj)  (GET_OBJ_TYPE(obj) != ITEM_CONTAINER && !IS_AMMO(obj))
@@ -2006,7 +2007,7 @@ room_data *find_docks(empire_data *emp, int island_id);
 int find_free_shipping_id(empire_data *emp);
 obj_data *find_lighter_in_list(obj_data *list, bool *had_keep);
 bool get_check_money(char_data *ch, obj_data *obj);
-void identify_obj_to_char(obj_data *obj, char_data *ch);
+void identify_obj_to_char(obj_data *obj, char_data *ch, bool simple);
 int obj_carry_size(obj_data *obj);
 void process_shipping();
 void remove_armor_by_type(char_data *ch, int armor_type);

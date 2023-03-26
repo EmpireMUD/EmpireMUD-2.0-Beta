@@ -3,8 +3,8 @@ colossus clockwork enormous~
 the clockwork colossus~
 An enormous clockwork colossus towers over you (adventure).
 ~
-100 200 dkuyzAB cG 6
-0 0 26 14
+100 200 dkuyzABK cG 6
+0 0 26 14 -1
 D
    Looking up at this thing, you can scarcely comprehend what it is. It looks
 like a man, almost, thought it's as tall as any tower you've seen, and its skin
@@ -30,8 +30,8 @@ colossus clockwork miniature~
 the clockwork colossus~
 A miniature clockwork colossus stomps toward you!
 ~
-100 200 dkuyz cG 3
-0 0 26 5
+100 200 dkuyzK cG 3
+0 0 26 5 -1
 D
    This strange-looking metal man is made from bronze and iron. Exposed wheels
 and gears barely hide the fact that this is no man at all, but some odd sort of
@@ -55,8 +55,8 @@ spider clockwork~
 a clockwork spider~
 A clockwork spider walks slowly down the colossus.
 ~
-100 200 bdj GK 4
-0 0 0 21
+100 200 bdjK GK 4
+0 0 0 21 -1
 D
    This odd contraption has the rough shape of a spider: a central hub, which
 makes a constant whirring sound, and eight spindly legs, all constructed from
@@ -72,7 +72,7 @@ an angry magpie~
 A magpie is stealing bits of wire from the colossus.
 ~
 100 200 bdj cmK 1
-0 0 2 26
+0 0 2 26 -1
 D
    It's a pretty little black and white bird, though it seems to be stripping
 wire and bits of shiny metal from the colossus.
@@ -88,7 +88,7 @@ the other adventurer~
 An adventurer is resting here, polishing an axe.
 ~
 100 200 bdpvyzI cm 3
-0 0 0 2
+0 0 0 2 -1
 D
 The hapless adventurer looks tired from the difficult climb.
 ~
@@ -105,7 +105,7 @@ the goblin junk dealer~
 A goblin junk dealer sorts through the wreckage (list).
 ~
 100 200 bdo 0 2
-1 0 0 15
+1 0 0 15 -1
 D
    The little green fellow is smeared with dirty oil, which he occasionally
 tries to wipe off with a rag. It looks excited at the fallen colossus.
@@ -134,7 +134,7 @@ eye lasers~
 Eye lasers are being fired at here.
 ~
 0 0 bd clnK 0
-0 0 0 15
+0 0 0 15 -1
 D
    Only immortals should see this. This mob is how the colossus fires lasers at
 players randomly.
@@ -149,7 +149,7 @@ the central control apparatus~
 The central control apparatus is here.
 ~
 0 0 bdnF GK 4
-0 0 0 15
+0 0 0 15 -1
 D
    The strange apparatus is made mostly of wheels within wheels, spinning and
 turning with no discernible purpose. When they move just right, it almost
@@ -166,8 +166,8 @@ arm left colossal~
 the colossal arm~
 The left arm sways as the colossus moves.
 ~
-0 0 dhy cGK 5
-0 0 0 14
+0 0 dhyK cGK 5
+0 0 0 14 -1
 D
 The colossus's enormous arm is bigger than a tree!
 ~
@@ -181,8 +181,8 @@ arm right colossal~
 the colossal arm~
 The right arm sways as the colossus moves.
 ~
-0 0 dhy cGK 5
-0 0 0 5
+0 0 dhyK cGK 5
+0 0 0 5 -1
 D
    The arm is so big that it's hard to avoid being knocked off the colossus as
 it moves.
@@ -198,7 +198,7 @@ a clockwork magpie~
 A clockwork magpie cocks its head and looks at you quizzically.
 ~
 1 1 bdoD mnG 4
-0 0 2 26
+0 0 2 26 -1
 D
 The little brass bird has been painted with black and white patches.
 ~
@@ -223,7 +223,7 @@ a clockwork elephant~
 A great clockwork elephant towers over you.
 ~
 100 125 dey G 5
-0 0 26 27
+0 0 26 27 -1
 D
    The elephant has a beautiful brass finish as it lumbers ponderously across
 the land. A whirring sound can be heard from inside, where its thundering
@@ -236,7 +236,7 @@ a clockwork eagle~
 A clockwork eagle is perched here, watching.
 ~
 100 125 de mG 4
-0 0 2 10
+0 0 2 10 -1
 D
    This glorious bird is made from polished brass and highlighted with bronze.
 It's larger than a horse and easily accomodates a person on its back, even in

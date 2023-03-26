@@ -181,7 +181,7 @@ Empire variables are accessed via %char.empire% (or obj, room, vehicle). If
 the thing belongs to no empire, this will be empty.
 
 When using field - The variable returns:
-&cadd_progress(vnum)&0 - Grants a progression goal (preferably set SCRIPT-ONLY).
+&cadd_progress(vnum)&0 - Grants a progression goal (preferably set NO-AUTOSTART).
 &cadj&0 - Adjective form of the empire's name.
 &cbanner&0 - Empire's banner (as a color code).
 &ccan_recognize_lang(lang,on|off)&0 - Whether the empire can at least recognize
@@ -211,8 +211,8 @@ When using field - The variable returns:
 &cranks&0 - The number of ranks in the empire.
 &cremove_progress(vnum)&0 - Takes away a progression goal. Warning: If the empire
    still qualifies for the goal, they may instantly re-earn it. This works best
-   if you only remove SCRIPT-ONLY goals.
-&cstart_progress(vnum)&0 - Begins a SCRIPT-ONLY progression goal, which will
+   if you only remove NO-AUTOSTART goals.
+&cstart_progress(vnum)&0 - Begins a NO-AUTOSTART progression goal, which will
    also immediately auto-complete if tasks are already complete. Otherwise, it
    will behave like a normal goal.
 &cterritory&0 - The amount of land claimed.

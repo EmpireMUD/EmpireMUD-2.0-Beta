@@ -3625,19 +3625,18 @@ void perform_execute(char_data *ch, char_data *victim, int attacktype, int damty
 	bool msg;
 
 	/* stop_fighting() is split around here to help with exp */
-
-	/* Probably sent here by damage() */
-	if (ch == victim)
-		ok = TRUE;
-
-	/* Sent here by damage() */
-	if (attacktype > NUM_ATTACK_TYPES || WOULD_EXECUTE(ch, victim)) {
-		ok = TRUE;
-	}
 	
-	// victim is already incapacitated and we're attacking it again?
-	if (GET_POS(victim) == POS_INCAP) {
-		ok = TRUE;
+	if (MOB_FLAGGED(victim, MOB_NO_UNCONSCIOUS)) {
+		ok = TRUE;	// never knock unconscious
+	}
+	else if (ch == victim) {
+		ok = TRUE;	// Probably sent here by damage()
+	}
+	else if (attacktype > NUM_ATTACK_TYPES || WOULD_EXECUTE(ch, victim)) {
+		ok = TRUE;	// Sent here by damage()
+	}
+	else if (GET_POS(victim) == POS_INCAP) {
+		ok = TRUE;	// victim is already incapacitated and we're attacking it again?
 	}
 
 	/* Sent here by do_execute() */

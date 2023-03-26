@@ -132,6 +132,10 @@ switch %self.vnum%
     * Skithe
     %send% %actor% The Lion of Time definitely does not have pockets.
   break
+  case 11884
+    * Queen's image
+    %send% %actor% She's not really here; only her image sits on the throne.
+  break
   case 11888
     * Iskip
     %send% %actor% Even if you could get up to his pockets, anything in there would be enormous.
@@ -2340,10 +2344,20 @@ switch %self.vnum%
       if %ch.is_npc% && %ch.leader%
         set ch %ch.leader%
       end
-      if %ch.is_pc%
+      if %ch.is_pc% || %ch.vnum% == 11836
         * mark who did this
         set spirit %instance.mob(11900)%
-        set finish3 %ch.real_name%
+        if %ch.vnum% == 11836 && %spirit.lich_released%
+          * Scaldorran kill
+          makeuid killer %spirit.lich_released%
+          if %killer.id% == %spirit.lich_released%
+            set finish3 %killer.real_name%
+          else
+            set finish3 %ch.real_name%
+          end
+        else
+          set finish3 %ch.real_name%
+        end
         remote finish3 %spirit.id%
       end
     end
@@ -3136,7 +3150,7 @@ end
 #11834
 Skycleave: Free the otherworlder~
 0 c 0
-free unchain unshackle break smash~
+free unchain unshackle break smash release~
 return 1
 * validate arg
 if %actor.fighting%
@@ -3247,7 +3261,7 @@ detach 11835 %self.id%
 #11836
 Skycleave: Object interactions~
 1 c 4
-open release look~
+open release look free unleash~
 return 0
 if %arg.car% == in
   set arg %arg.cdr%
@@ -3261,7 +3275,7 @@ end
 if %self.vnum% == 11836
   * Scaldorran's repository: open/release/look in
   set spirit %instance.mob(11900)%
-  if (open /= %cmd% || release /= %cmd%)
+  if (open /= %cmd% || release /= %cmd% || free /= %cmd% || unleash /= %cmd%)
     return 1
     if %spirit.lich_released%
       %send% %actor% The repository is already open!
@@ -7012,7 +7026,7 @@ if !%self.affect(11874)%
   dg_affect #11874 %self% INTELLIGENCE 1 120
 end
 * how long is allowed?
-eval allow_time 10 + (50 * %self.var(diff,1)%)
+eval allow_time 45 * %self.var(diff,1)%
 * check timers
 if %seconds% > %allow_time%
   * Knezz dies

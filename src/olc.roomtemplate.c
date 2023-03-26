@@ -277,6 +277,7 @@ void olc_delete_room_template(char_data *ch, rmt_vnum vnum) {
 	shop_data *shop, *next_shop;
 	descriptor_data *desc;
 	room_template *rmt;
+	char name[256];
 	bool found;
 	int count;
 	
@@ -284,6 +285,8 @@ void olc_delete_room_template(char_data *ch, rmt_vnum vnum) {
 		msg_to_char(ch, "There is no such room template %d.\r\n", vnum);
 		return;
 	}
+	
+	snprintf(name, sizeof(name), "%s", NULLSAFE(GET_RMT_TITLE(rmt)));
 	
 	if (HASH_COUNT(room_template_table) <= 1) {
 		msg_to_char(ch, "You can't delete the last room template.\r\n");
@@ -303,6 +306,7 @@ void olc_delete_room_template(char_data *ch, rmt_vnum vnum) {
 		
 		if (found) {
 			SET_BIT(PRG_FLAGS(prg), PRG_IN_DEVELOPMENT);
+			syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: Progress %d %s set IN-DEV due to deleted room template", PRG_VNUM(prg), PRG_NAME(prg));
 			save_library_file_for_vnum(DB_BOOT_PRG, PRG_VNUM(prg));
 			need_progress_refresh = TRUE;
 		}
@@ -317,6 +321,7 @@ void olc_delete_room_template(char_data *ch, rmt_vnum vnum) {
 		
 		if (found) {
 			SET_BIT(QUEST_FLAGS(quest), QST_IN_DEVELOPMENT);
+			syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: Quest %d %s set IN-DEV due to deleted room template", QUEST_VNUM(quest), QUEST_NAME(quest));
 			save_library_file_for_vnum(DB_BOOT_QST, QUEST_VNUM(quest));
 		}
 	}
@@ -327,6 +332,7 @@ void olc_delete_room_template(char_data *ch, rmt_vnum vnum) {
 		
 		if (found) {
 			SET_BIT(SHOP_FLAGS(shop), SHOP_IN_DEVELOPMENT);
+			syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: Shop %d %s set IN-DEV due to deleted room template", SHOP_VNUM(shop), SHOP_NAME(shop));
 			save_library_file_for_vnum(DB_BOOT_SHOP, SHOP_VNUM(shop));
 		}
 	}
@@ -337,6 +343,7 @@ void olc_delete_room_template(char_data *ch, rmt_vnum vnum) {
 		
 		if (found) {
 			SET_BIT(SOC_FLAGS(soc), SOC_IN_DEVELOPMENT);
+			syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: Social %d %s set IN-DEV due to deleted room template", SOC_VNUM(soc), SOC_NAME(soc));
 			save_library_file_for_vnum(DB_BOOT_SOC, SOC_VNUM(soc));
 		}
 	}
@@ -393,8 +400,8 @@ void olc_delete_room_template(char_data *ch, rmt_vnum vnum) {
 		}
 	}
 		
-	syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: %s has deleted room template %d", GET_NAME(ch), vnum);
-	msg_to_char(ch, "Room template %d deleted.\r\n", vnum);
+	syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: %s has deleted room template %d %s", GET_NAME(ch), vnum, name);
+	msg_to_char(ch, "Room template %d (%s) deleted.\r\n", vnum, name);
 	
 	if (count > 0) {
 		msg_to_char(ch, "%d live rooms deleted.\r\n", count);

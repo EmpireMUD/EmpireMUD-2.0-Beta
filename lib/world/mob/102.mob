@@ -45,8 +45,8 @@ A goblin archer is trying to fix her bow.
 50 150 abdzA 0 2
 2 0 0 1 -1
 D
-   Fliks is scrawny, even for a goblin, but it seems to make him more lithe.
-He's quicker than most.
+   Filks is scrawny, even for a goblin, but it seems to make her more lithe.
+She's quicker than most.
 ~
 T 10200
 T 10201
@@ -203,7 +203,7 @@ tumbleweed enchanted~
 an enchanted tumbleweed~
 An enchanted tumbleweed is blowing through.
 ~
-0 50 de G 2
+0 50 deK G 2
 0 0 4 28 -1
 D
 It's rolling around to its stem's content.
@@ -585,7 +585,7 @@ ants swarm~
 a swarm of ants~
 A swarm of ants is coming toward you!
 ~
-0 0 bdjyE cG 2
+0 0 bdjyEK cG 2
 0 0 0 9 -1
 D
    These ants are only a little bit bigger than the ones you're familiar with,

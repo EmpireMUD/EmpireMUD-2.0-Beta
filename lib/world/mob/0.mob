@@ -4,7 +4,7 @@ a bug~
 A small, flittering bug zooms around -- you should report it!
 ~
 1 1 bdjo 0 0
-0 0 0 10
+0 0 0 10 -1
 D
 Like most bugs, the closer you look, the harder it is to see.
 ~
@@ -14,8 +14,8 @@ lion time regal~
 a time lion~
 A regal time lion is basking before you.
 ~
-200 200 dhuA c 3
-0 0 0 10
+200 200 dhuAK c 3
+0 0 0 10 -1
 D
 Do not mess with the time lion. There could be consequences.
 ~

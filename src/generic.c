@@ -1112,12 +1112,15 @@ void olc_delete_generic(char_data *ch, any_vnum vnum) {
 	generic_data *gen, *gen_iter, *next_gen;
 	char_data *chiter, *next_ch;
 	bool found, any_quest = FALSE, any_progress = FALSE;
+	char name[256];
 	int res_type;
 	
 	if (!(gen = real_generic(vnum))) {
 		msg_to_char(ch, "There is no such generic %d.\r\n", vnum);
 		return;
 	}
+	
+	snprintf(name, sizeof(name), "%s", NULLSAFE(GEN_NAME(gen)));
 	
 	switch (GEN_TYPE(gen)) {
 		case GENERIC_ACTION: {
@@ -1269,6 +1272,7 @@ void olc_delete_generic(char_data *ch, any_vnum vnum) {
 	HASH_ITER(hh, augment_table, aug, next_aug) {
 		if (remove_thing_from_resource_list(&GET_AUG_RESOURCES(aug), res_type, vnum)) {
 			SET_BIT(GET_AUG_FLAGS(aug), AUG_IN_DEVELOPMENT);
+			syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: Augment %d %s set IN-DEV due to deleted generic", GET_AUG_VNUM(aug), GET_AUG_NAME(aug));
 			save_library_file_for_vnum(DB_BOOT_AUG, GET_AUG_VNUM(aug));
 		}
 	}
@@ -1276,6 +1280,7 @@ void olc_delete_generic(char_data *ch, any_vnum vnum) {
 	// update buildings
 	HASH_ITER(hh, building_table, bld, next_bld) {
 		if (remove_thing_from_resource_list(&GET_BLD_YEARLY_MAINTENANCE(bld), res_type, vnum)) {
+			syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: Building %d %s lost deleted maintenance generic", GET_BLD_VNUM(bld), GET_BLD_NAME(bld));
 			save_library_file_for_vnum(DB_BOOT_BLD, GET_BLD_VNUM(bld));
 		}
 	}
@@ -1290,6 +1295,7 @@ void olc_delete_generic(char_data *ch, any_vnum vnum) {
 		found |= remove_thing_from_resource_list(&GET_CRAFT_RESOURCES(craft), res_type, vnum);
 		if (found) {
 			SET_BIT(GET_CRAFT_FLAGS(craft), CRAFT_IN_DEVELOPMENT);
+			syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: Craft %d %s set IN-DEV due to deleted generic", GET_CRAFT_VNUM(craft), GET_CRAFT_NAME(craft));
 			save_library_file_for_vnum(DB_BOOT_CRAFT, GET_CRAFT_VNUM(craft));
 		}
 	}
@@ -1306,6 +1312,7 @@ void olc_delete_generic(char_data *ch, any_vnum vnum) {
 		
 		if (found) {
 			// SET_BIT(EVT_FLAGS(event), EVTF_IN_DEVELOPMENT);
+			syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: Event %d %s had rewards for a deleted generic (removed rewards but did not set IN-DEV)", EVT_VNUM(event), EVT_NAME(event));
 			save_library_file_for_vnum(DB_BOOT_EVT, EVT_VNUM(event));
 		}
 	}
@@ -1313,6 +1320,7 @@ void olc_delete_generic(char_data *ch, any_vnum vnum) {
 	// update other generics
 	HASH_ITER(hh, generic_table, gen_iter, next_gen) {
 		if (delete_generic_relation(&GEN_RELATIONS(gen_iter), vnum)) {
+			syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: Generic %d %s lost deleted related generic", GEN_VNUM(gen_iter), GEN_NAME(gen_iter));
 			save_library_file_for_vnum(DB_BOOT_GEN, GEN_VNUM(gen_iter));
 		}
 	}
@@ -1334,6 +1342,7 @@ void olc_delete_generic(char_data *ch, any_vnum vnum) {
 		}
 		
 		if (found) {
+			syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: Object %d %s lost deleted generic", GET_OBJ_VNUM(obj), GET_OBJ_SHORT_DESC(obj));
 			save_library_file_for_vnum(DB_BOOT_OBJ, GET_OBJ_VNUM(obj));
 		}
 	}
@@ -1354,6 +1363,7 @@ void olc_delete_generic(char_data *ch, any_vnum vnum) {
 		if (found) {
 			any_progress = TRUE;
 			SET_BIT(PRG_FLAGS(prg), PRG_IN_DEVELOPMENT);
+			syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: Progress %d %s set IN-DEV due to deleted generic", PRG_VNUM(prg), PRG_NAME(prg));
 			save_library_file_for_vnum(DB_BOOT_PRG, PRG_VNUM(prg));
 			need_progress_refresh = TRUE;
 		}
@@ -1381,6 +1391,7 @@ void olc_delete_generic(char_data *ch, any_vnum vnum) {
 		if (found) {
 			any_quest = TRUE;
 			SET_BIT(QUEST_FLAGS(quest), QST_IN_DEVELOPMENT);
+			syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: Quest %d %s set IN-DEV due to deleted generic", QUEST_VNUM(quest), QUEST_NAME(quest));
 			save_library_file_for_vnum(DB_BOOT_QST, QUEST_VNUM(quest));
 		}
 	}
@@ -1389,6 +1400,7 @@ void olc_delete_generic(char_data *ch, any_vnum vnum) {
 	HASH_ITER(hh, shop_table, shop, next_shop) {
 		if (find_currency_in_shop_item_list(SHOP_ITEMS(shop), vnum)) {
 			SET_BIT(SHOP_FLAGS(shop), SHOP_IN_DEVELOPMENT);
+			syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: Shop %d %s set IN-DEV due to deleted generic", SHOP_VNUM(shop), SHOP_NAME(shop));
 			save_library_file_for_vnum(DB_BOOT_SHOP, SHOP_VNUM(shop));
 		}
 	}
@@ -1404,6 +1416,7 @@ void olc_delete_generic(char_data *ch, any_vnum vnum) {
 		
 		if (found) {
 			SET_BIT(SOC_FLAGS(soc), SOC_IN_DEVELOPMENT);
+			syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: Social %d %s set IN-DEV due to deleted generic", SOC_VNUM(soc), SOC_NAME(soc));
 			save_library_file_for_vnum(DB_BOOT_SOC, SOC_VNUM(soc));
 		}
 	}
@@ -1411,6 +1424,7 @@ void olc_delete_generic(char_data *ch, any_vnum vnum) {
 	// update vehicles
 	HASH_ITER(hh, vehicle_table, veh, next_veh) {
 		if (remove_thing_from_resource_list(&VEH_YEARLY_MAINTENANCE(veh), res_type, vnum)) {
+			syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: Vehicle %d %s lost deleted maintenance generic", VEH_VNUM(veh), VEH_SHORT_DESC(veh));
 			save_library_file_for_vnum(DB_BOOT_VEH, VEH_VNUM(veh));
 		}
 	}
@@ -1560,8 +1574,8 @@ void olc_delete_generic(char_data *ch, any_vnum vnum) {
 		}
 	}
 	
-	syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: %s has deleted generic %d", GET_NAME(ch), vnum);
-	msg_to_char(ch, "Generic %d deleted.\r\n", vnum);
+	syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: %s has deleted generic %d %s", GET_NAME(ch), vnum, name);
+	msg_to_char(ch, "Generic %d (%s) deleted.\r\n", vnum, name);
 	
 	free_generic(gen);
 	

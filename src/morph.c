@@ -887,11 +887,14 @@ morph_data *create_morph_table_entry(any_vnum vnum) {
 void olc_delete_morph(char_data *ch, any_vnum vnum) {
 	char_data *chiter, *next_ch;
 	morph_data *morph;
+	char name[256];
 	
 	if (!(morph = morph_proto(vnum))) {
 		msg_to_char(ch, "There is no such morph %d.\r\n", vnum);
 		return;
 	}
+	
+	snprintf(name, sizeof(name), "%s", NULLSAFE(MORPH_SHORT_DESC(morph)));
 	
 	// un-morph everyone
 	DL_FOREACH_SAFE(character_list, chiter, next_ch) {
@@ -907,8 +910,8 @@ void olc_delete_morph(char_data *ch, any_vnum vnum) {
 	save_index(DB_BOOT_MORPH);
 	save_library_file_for_vnum(DB_BOOT_MORPH, vnum);
 	
-	syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: %s has deleted morph %d", GET_NAME(ch), vnum);
-	msg_to_char(ch, "Morph %d deleted.\r\n", vnum);
+	syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: %s has deleted morph %d %s", GET_NAME(ch), vnum, name);
+	msg_to_char(ch, "Morph %d (%s) deleted.\r\n", vnum, name);
 	
 	free_morph(morph);
 }

@@ -98,6 +98,7 @@ ACMD(do_coins);
 ACMD(do_collapse);
 ACMD(do_colorburst);
 ACMD(do_combine);
+ACMD(do_compare);
 ACMD(do_command);
 ACMD(do_commands);
 ACMD(do_companions);
@@ -158,7 +159,6 @@ ACMD(do_empires);
 ACMD(do_endwar);
 ACMD(do_enervate);
 ACMD(do_enroll);
-ACMD(do_entangle);
 ACMD(do_enter);
 ACMD(do_equipment);
 ACMD(do_esay);
@@ -633,6 +633,7 @@ cpp_extern const struct command_info cmd_info[] = {
 	SIMPLE_CMD( "collapse", POS_STANDING, do_collapse, NO_MIN, CTYPE_SKILL ),
 	ABILITY_CMD( "colorburst", POS_FIGHTING, do_colorburst, NO_MIN, CTYPE_COMBAT, ABIL_COLORBURST ),
 	SIMPLE_CMD( "combine", POS_RESTING, do_combine, NO_MIN, CTYPE_UTIL ),
+	SIMPLE_CMD( "compare", POS_RESTING, do_compare, NO_MIN, CTYPE_SKILL ),
 	ABILITY_CMD( "command", POS_STANDING, do_command, NO_MIN, CTYPE_SKILL, ABIL_VAMP_COMMAND ),
 	SCMD_CMD( "commands", POS_DEAD, do_commands, NO_MIN, CTYPE_UTIL, SCMD_COMMANDS ),
 	SIMPLE_CMD( "companions", POS_DEAD, do_companions, NO_MIN, CTYPE_SKILL ),
@@ -704,7 +705,6 @@ cpp_extern const struct command_info cmd_info[] = {
 	GRANT_CMD( "endwar", POS_DEAD, do_endwar, LVL_CIMPL, CTYPE_IMMORTAL, GRANT_EMPIRES ),
 	ABILITY_CMD( "enervate", POS_FIGHTING, do_enervate, NO_MIN, CTYPE_COMBAT, ABIL_ENERVATE ),
 	SIMPLE_CMD( "enter", POS_STANDING, do_enter, NO_MIN, CTYPE_MOVE ),
-	ABILITY_CMD( "entangle", POS_FIGHTING, do_entangle, NO_MIN, CTYPE_COMBAT, ABIL_ENTANGLE ),
 	SIMPLE_CMD( "enroll", POS_DEAD, do_enroll, NO_MIN, CTYPE_EMPIRE ),
 	SIMPLE_CMD( "equipment", POS_DEAD, do_equipment, NO_MIN, CTYPE_UTIL ),
 	SIMPLE_CMD( "esay", POS_DEAD, do_esay, NO_MIN, CTYPE_EMPIRE ),
@@ -2432,6 +2432,9 @@ void nanny(descriptor_data *d, char *arg) {
 					/* undo it just in case they are set */
 					REMOVE_BIT(PLR_FLAGS(d->character), PLR_MAILING);
 
+					// flush messages because updated items appear here
+					send_stacked_msgs(d);
+					
 					SEND_TO_Q("Password: ", d);
 					ProtocolNoEcho(d, true);
 					d->idle_tics = 0;

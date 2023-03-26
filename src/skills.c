@@ -3764,12 +3764,15 @@ void olc_delete_skill(char_data *ch, any_vnum vnum) {
 	descriptor_data *desc;
 	skill_data *skill, *sk, *next_sk;
 	char_data *chiter;
+	char name[256];
 	bool found;
 	
 	if (!(skill = find_skill_by_vnum(vnum))) {
 		msg_to_char(ch, "There is no such skill %d.\r\n", vnum);
 		return;
 	}
+	
+	snprintf(name, sizeof(name), "%s", NULLSAFE(SKILL_NAME(skill)));
 	
 	// remove it from the hash table first
 	remove_skill_from_table(skill);
@@ -3796,6 +3799,7 @@ void olc_delete_skill(char_data *ch, any_vnum vnum) {
 		
 		if (found) {
 			SET_BIT(GET_ARCH_FLAGS(arch), ARCH_IN_DEVELOPMENT);
+			syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: Archetype %d %s set IN-DEV due to deleted skill", GET_ARCH_VNUM(arch), GET_ARCH_NAME(arch));
 			save_library_file_for_vnum(DB_BOOT_ARCH, GET_ARCH_VNUM(arch));
 		}
 	}
@@ -3805,6 +3809,7 @@ void olc_delete_skill(char_data *ch, any_vnum vnum) {
 		found = remove_vnum_from_class_skill_reqs(&CLASS_SKILL_REQUIREMENTS(cls), vnum);
 		if (found) {
 			SET_BIT(CLASS_FLAGS(cls), CLASSF_IN_DEVELOPMENT);
+			syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: Class %d %s set IN-DEV due to deleted skill", CLASS_VNUM(cls), CLASS_NAME(cls));
 			save_library_file_for_vnum(DB_BOOT_CLASS, CLASS_VNUM(cls));
 		}
 	}
@@ -3817,6 +3822,7 @@ void olc_delete_skill(char_data *ch, any_vnum vnum) {
 		
 		if (found) {
 			SET_BIT(PRG_FLAGS(prg), PRG_IN_DEVELOPMENT);
+			syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: Progress %d %s set IN-DEV due to deleted skill", PRG_VNUM(prg), PRG_NAME(prg));
 			save_library_file_for_vnum(DB_BOOT_PRG, PRG_VNUM(prg));
 			need_progress_refresh = TRUE;
 		}
@@ -3836,6 +3842,7 @@ void olc_delete_skill(char_data *ch, any_vnum vnum) {
 		
 		if (found) {
 			SET_BIT(QUEST_FLAGS(quest), QST_IN_DEVELOPMENT);
+			syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: Quest %d %s set IN-DEV due to deleted skill", QUEST_VNUM(quest), QUEST_NAME(quest));
 			save_library_file_for_vnum(DB_BOOT_QST, QUEST_VNUM(quest));
 		}
 	}
@@ -3844,6 +3851,7 @@ void olc_delete_skill(char_data *ch, any_vnum vnum) {
 	HASH_ITER(hh, skill_table, sk, next_sk) {
 		found = remove_skill_from_synergy_abilities(&SKILL_SYNERGIES(sk), vnum);
 		if (found) {
+			syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: Skill %d %s lost deleted synergy skill", SKILL_VNUM(sk), SKILL_NAME(sk));
 			save_library_file_for_vnum(DB_BOOT_SKILL, SKILL_VNUM(sk));
 		}
 	}
@@ -3856,6 +3864,7 @@ void olc_delete_skill(char_data *ch, any_vnum vnum) {
 		
 		if (found) {
 			SET_BIT(SOC_FLAGS(soc), SOC_IN_DEVELOPMENT);
+			syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: Social %d %s set IN-DEV due to deleted skill", SOC_VNUM(soc), SOC_NAME(soc));
 			save_library_file_for_vnum(DB_BOOT_SOC, SOC_VNUM(soc));
 		}
 	}
@@ -3946,8 +3955,8 @@ void olc_delete_skill(char_data *ch, any_vnum vnum) {
 	save_index(DB_BOOT_SKILL);
 	save_library_file_for_vnum(DB_BOOT_SKILL, vnum);
 	
-	syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: %s has deleted skill %d", GET_NAME(ch), vnum);
-	msg_to_char(ch, "Skill %d deleted.\r\n", vnum);
+	syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: %s has deleted skill %d %s", GET_NAME(ch), vnum, name);
+	msg_to_char(ch, "Skill %d (%s) deleted.\r\n", vnum, name);
 	
 	free_skill(skill);
 }

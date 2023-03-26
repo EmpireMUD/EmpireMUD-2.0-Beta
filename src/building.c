@@ -2039,6 +2039,7 @@ char *vnum_to_interlink(room_vnum vnum) {
 * @param vehicle_data *veh The vehicle they targeted.
 */
 void do_dismantle_vehicle(char_data *ch, vehicle_data *veh) {
+	char_data *ch_iter;
 	craft_data *craft;
 	
 	if (!ch || !veh || IS_NPC(ch)) {
@@ -2098,6 +2099,16 @@ void do_dismantle_vehicle(char_data *ch, vehicle_data *veh) {
 		msg_to_char(ch, "You can't dismantle it while someone is inside.\r\n");
 	}
 	else {
+		// ensure nobody is building it
+		if (!VEH_IS_DISMANTLING(veh)) {
+			DL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), ch_iter, next_in_room) {
+				if (ch_iter != ch && !IS_NPC(ch_iter) && (GET_ACTION(ch_iter) == ACT_BUILDING || GET_ACTION(ch_iter) == ACT_MAINTENANCE || GET_ACTION(ch_iter) == ACT_GEN_CRAFT) && GET_ACTION_VNUM(ch_iter, 1) == VEH_CONSTRUCTION_ID(veh)) {
+					msg_to_char(ch, "You can't start dismantling it while someone is working on it.\r\n");
+					return;
+				}
+			}
+		}
+		
 		// ok: start dismantle
 		act("You begin to dismantle $V.", FALSE, ch, NULL, veh, TO_CHAR);
 		act("$n begins to dismantle $V.", FALSE, ch, NULL, veh, TO_ROOM);
@@ -2113,6 +2124,7 @@ void do_dismantle_vehicle(char_data *ch, vehicle_data *veh) {
 
 ACMD(do_dismantle) {
 	vehicle_data *veh;
+	char_data *ch_iter;
 	craft_data *type;
 
 	if (IS_NPC(ch)) {
@@ -2246,6 +2258,16 @@ ACMD(do_dismantle) {
 	if (!can_see_in_dark_room(ch, IN_ROOM(ch), TRUE)) {
 		msg_to_char(ch, "It's too dark to start dismantling.\r\n");
 		return;
+	}
+	
+	// ensure nobody is building
+	if (!IS_DISMANTLING(IN_ROOM(ch))) {
+		DL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), ch_iter, next_in_room) {
+			if (ch_iter != ch && !IS_NPC(ch_iter) && (GET_ACTION(ch_iter) == ACT_BUILDING || GET_ACTION(ch_iter) == ACT_MAINTENANCE)) {
+				msg_to_char(ch, "You can't start dismantling while someone is still building it.\r\n");
+				return;
+			}
+		}
 	}
 	
 	if (!dismantle_wtrigger(IN_ROOM(ch), ch, TRUE)) {

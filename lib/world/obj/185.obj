@@ -54,7 +54,7 @@ the emerald-green orb~
 A huge emerald-green orb is half-embedded in the door.~
    It looks fragile; you could probably break it with a solid blow from your
 weapon. But how hard should you hit it?
-Usage:  difficulty <hard | boss>
+Usage:  difficulty <normal | hard | group | boss>
 ~
 3 0 0 0 9
 0 0 0

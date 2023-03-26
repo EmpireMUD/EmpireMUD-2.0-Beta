@@ -1100,7 +1100,7 @@ Hints:
    Scaldorran slips the roc egg into his ethereal cloak as strands of ectoplasm
 drip from his gaping maw.
 ~
-9 d 0 0 -1
+10 d 0 0 -1
 A
 1 11836
 A
@@ -1113,6 +1113,7 @@ R
 8 18200 1
 R
 6 18291 1
+T 18277
 W
 2 18291 0 1 -
 Z

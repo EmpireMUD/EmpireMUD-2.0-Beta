@@ -129,6 +129,7 @@ const char *ability_flags[] = {
 	"RANGED-ONLY",
 	"IGNORE-SUN",
 	"UNSCALED-BUFF",
+	"LIMIT-CROWD-CONTROL",
 	"\n"
 };
 
@@ -150,6 +151,7 @@ const char *ability_flag_notes[] = {
 	"can only be used at range",
 	"unaffected by sun",
 	"",	// UNSCALED-BUFF
+	"limited crowd control",
 	"\n"
 };
 
@@ -2254,6 +2256,7 @@ const char *action_bits[] = {
 	"SILENT",
 	"COINS",
 	"NO-COMMAND",	// 35
+	"NO-UNCONSCIOUS",
 	"\n"
 };
 
@@ -2960,7 +2963,7 @@ const char *progress_types[] = {
 const char *progress_flags[] = {
 	"IN-DEVELOPMENT",
 	"PURCHASABLE",
-	"SCRIPT-ONLY",
+	"NO-AUTOSTART",
 	"HIDDEN",
 	"NO-ANNOUNCE",
 	"NO-PREVIEW",
@@ -3030,6 +3033,8 @@ const char *quest_reward_types[] = {
 	"EVENT-POINTS",
 	"SPEAK-LANGUAGE",	// 10
 	"RECOGNIZE-LANGUAGE",
+	"GRANT-PROGRESS",
+	"START-PROGRESS",
 	"\n",
 };
 

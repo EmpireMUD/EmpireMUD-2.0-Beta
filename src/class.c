@@ -1058,11 +1058,14 @@ class_data *create_class_table_entry(any_vnum vnum) {
 void olc_delete_class(char_data *ch, any_vnum vnum) {
 	char_data *chiter;
 	class_data *cls;
+	char name[256];
 	
 	if (!(cls = find_class_by_vnum(vnum))) {
 		msg_to_char(ch, "There is no such class %d.\r\n", vnum);
 		return;
 	}
+	
+	snprintf(name, sizeof(name), "%s", NULLSAFE(CLASS_NAME(cls)));
 	
 	// remove it from the hash table first
 	remove_class_from_table(cls);
@@ -1083,8 +1086,8 @@ void olc_delete_class(char_data *ch, any_vnum vnum) {
 	save_index(DB_BOOT_CLASS);
 	save_library_file_for_vnum(DB_BOOT_CLASS, vnum);
 	
-	syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: %s has deleted class %d", GET_NAME(ch), vnum);
-	msg_to_char(ch, "Class %d deleted.\r\n", vnum);
+	syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: %s has deleted class %d %s", GET_NAME(ch), vnum, name);
+	msg_to_char(ch, "Class %d (%s) deleted.\r\n", vnum, name);
 	
 	free_class(cls);
 }

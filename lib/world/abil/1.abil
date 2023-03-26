@@ -153,8 +153,32 @@ T m 0
 S
 #121
 Entangle~
-0 -1 1.00 0 0
-T m 0
+abfop -1 1.00 o 0
+A
+2 -1
+C
+entangle 7 bf 2 20 0 2025 30 0 3 0
+M
+2
+You shoot out vines of green mana, which entangle $N!~
+M
+3
+$n shoots vines of green mana at you, entangling you!~
+M
+4
+$n shoots vines of green mana at $N, entangling $M!~
+M
+5
+You send out vines of green mana to entangle $N, but they can't seem to grasp $M.~
+M
+6
+$n sends out vines of green mana to entangle you, but they can't seem to latch on.~
+M
+7
+$n sends out vines of green mana to entangle $N, but they can't seem to grasp $M.~
+T b 1
+X b
+3024 20 20 r
 S
 #122
 Familiar~

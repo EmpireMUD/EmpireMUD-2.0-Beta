@@ -213,12 +213,15 @@ char *list_one_book(book_data *book, bool detail) {
 */
 void olc_delete_book(char_data *ch, book_vnum vnum) {
 	book_data *book;
+	char name[256];
 	int author;
 	
 	if (!(book = book_proto(vnum))) {
 		msg_to_char(ch, "There is no such book %d.\r\n", vnum);
 		return;
 	}
+	
+	snprintf(name, sizeof(name), "%s", NULLSAFE(book->title));
 		
 	// pull it from the hash FIRST
 	remove_book_from_table(book);
@@ -228,8 +231,8 @@ void olc_delete_book(char_data *ch, book_vnum vnum) {
 	save_author_books(author);
 
 	if (ch) {	
-		syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: %s has deleted book %d", GET_NAME(ch), vnum);
-		msg_to_char(ch, "Book %d deleted.\r\n", vnum);
+		syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: %s has deleted book %d %s", GET_NAME(ch), vnum, name);
+		msg_to_char(ch, "Book %d (%s) deleted.\r\n", vnum, name);
 	}	
 	
 	free_book(book);

@@ -1349,11 +1349,14 @@ archetype_data *create_archetype_table_entry(any_vnum vnum) {
 */
 void olc_delete_archetype(char_data *ch, any_vnum vnum) {
 	archetype_data *arch;
+	char name[256];
 	
 	if (!(arch = archetype_proto(vnum))) {
 		msg_to_char(ch, "There is no such archetype %d.\r\n", vnum);
 		return;
 	}
+	
+	snprintf(name, sizeof(name), "%s", NULLSAFE(GET_ARCH_NAME(arch)));
 	
 	// remove it from the hash table first
 	remove_archetype_from_table(arch);
@@ -1362,8 +1365,8 @@ void olc_delete_archetype(char_data *ch, any_vnum vnum) {
 	save_index(DB_BOOT_ARCH);
 	save_library_file_for_vnum(DB_BOOT_ARCH, vnum);
 	
-	syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: %s has deleted archetype %d", GET_NAME(ch), vnum);
-	msg_to_char(ch, "Archetype %d deleted.\r\n", vnum);
+	syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: %s has deleted archetype %d %s", GET_NAME(ch), vnum, name);
+	msg_to_char(ch, "Archetype %d (%s) deleted.\r\n", vnum, name);
 	
 	free_archetype(arch);
 }

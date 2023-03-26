@@ -550,6 +550,17 @@ void real_update_char(char_data *ch) {
 	
 	// put stuff that happens when dead here
 	
+	// DEAD players: check for auto-respawn
+	if (IS_DEAD(ch) && ch->desc && get_cooldown_time(ch, COOLDOWN_DEATH_RESPAWN) == 0) {
+		do_respawn(ch, "", 0, 0);
+		return;
+	}
+	
+	// DEAD players: check idle early
+	if (IS_DEAD(ch) && !IS_NPC(ch) && (GET_IDNUM(ch) % REAL_UPDATES_PER_MUD_HOUR) == point_update_cycle && !check_idling(ch)) {
+		return;
+	}
+	
 	// everything beyond here only matters if still alive
 	if (IS_DEAD(ch)) {
 		return;
@@ -558,12 +569,6 @@ void real_update_char(char_data *ch) {
 	// check for end of meters (in case it was missed in the fight code)
 	if (!FIGHTING(ch)) {
 		check_combat_end(ch);
-	}
-	
-	// players: check for auto-respawn
-	if (ch->desc && IS_DEAD(ch) && get_cooldown_time(ch, COOLDOWN_DEATH_RESPAWN) == 0) {
-		do_respawn(ch, "", 0, 0);
-		return;
 	}
 	
 	// first check location: this may move the player
@@ -1458,8 +1463,12 @@ bool check_autostore(obj_data *obj, bool force, empire_data *override_emp) {
 	int islid, home_idnum = NOBODY;
 	
 	// easy exclusions
-	if (obj->carried_by || obj->worn_by || !CAN_WEAR(obj, ITEM_WEAR_TAKE)) {
-		return TRUE;
+	top_obj = get_top_object(obj);
+	if (top_obj->carried_by || top_obj->worn_by) {
+		return TRUE;	// on a person
+	}
+	if (!CAN_WEAR(obj, ITEM_WEAR_TAKE) && !OBJ_CAN_STORE(obj)) {
+		return TRUE;	// no-take AND no-store
 	}
 	
 	// timer check (if not forced)
@@ -1468,7 +1477,6 @@ bool check_autostore(obj_data *obj, bool force, empire_data *override_emp) {
 	}
 	
 	// ensure object is in a room, or in an object in a room
-	top_obj = get_top_object(obj);
 	real_loc = IN_ROOM(top_obj);
 	in_veh = top_obj->in_vehicle;
 	if (in_veh) {

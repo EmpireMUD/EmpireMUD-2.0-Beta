@@ -365,6 +365,7 @@ void olc_delete_building(char_data *ch, bld_vnum vnum) {
 	adv_data *adv, *next_adv;
 	obj_data *obj, *next_obj;
 	descriptor_data *desc;
+	char name[256];
 	int count;
 	bool found, deleted = FALSE;
 	
@@ -372,6 +373,8 @@ void olc_delete_building(char_data *ch, bld_vnum vnum) {
 		msg_to_char(ch, "There is no such building %d.\r\n", vnum);
 		return;
 	}
+	
+	snprintf(name, sizeof(name), "%s", NULLSAFE(GET_BLD_NAME(bld)));
 	
 	if (HASH_COUNT(building_table) <= 1) {
 		msg_to_char(ch, "You can't delete the last building.\r\n");
@@ -414,6 +417,7 @@ void olc_delete_building(char_data *ch, bld_vnum vnum) {
 		found |= delete_link_rule_by_type_value(&GET_ADV_LINKING(adv), ADV_LINK_PORTAL_BUILDING_NEW, vnum);
 		
 		if (found) {
+			syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: Adventure %d %s lost deleted linking rule building", GET_ADV_VNUM(adv), GET_ADV_NAME(adv));
 			save_library_file_for_vnum(DB_BOOT_ADV, GET_ADV_VNUM(adv));
 		}
 	}
@@ -426,6 +430,7 @@ void olc_delete_building(char_data *ch, bld_vnum vnum) {
 		found |= delete_from_interaction_list(&GET_BLD_INTERACTIONS(biter), TYPE_BLD, vnum);
 		
 		if (found) {
+			syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: Building %d %s lost deleted related building", GET_BLD_VNUM(biter), GET_BLD_NAME(biter));
 			save_library_file_for_vnum(DB_BOOT_BLD, GET_BLD_VNUM(biter));
 		}
 	}
@@ -435,18 +440,24 @@ void olc_delete_building(char_data *ch, bld_vnum vnum) {
 		if (CRAFT_IS_BUILDING(craft) && GET_CRAFT_BUILD_TYPE(craft) == vnum) {
 			GET_CRAFT_BUILD_TYPE(craft) = NOTHING;
 			SET_BIT(GET_CRAFT_FLAGS(craft), CRAFT_IN_DEVELOPMENT);
+			syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: Craft %d %s set IN-DEV due to deleted building", GET_CRAFT_VNUM(craft), GET_CRAFT_NAME(craft));
 			save_library_file_for_vnum(DB_BOOT_CRAFT, GET_CRAFT_VNUM(craft));
 		}
 	}
 	
 	// obj storage
 	HASH_ITER(hh, object_table, obj, next_obj) {
+		found = FALSE;
 		LL_FOREACH_SAFE(GET_OBJ_STORAGE(obj), store, next_store) {
 			if (store->type == TYPE_BLD && store->vnum == vnum) {
 				LL_DELETE(obj->proto_data->storage, store);
 				free(store);
-				save_library_file_for_vnum(DB_BOOT_OBJ, GET_OBJ_VNUM(obj));
+				found = TRUE;
 			}
+		}
+		if (found) {
+			syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: Object %d %s lost deleted storage building", GET_OBJ_VNUM(obj), GET_OBJ_SHORT_DESC(obj));
+			save_library_file_for_vnum(DB_BOOT_OBJ, GET_OBJ_VNUM(obj));
 		}
 	}
 	
@@ -457,6 +468,7 @@ void olc_delete_building(char_data *ch, bld_vnum vnum) {
 		
 		if (found) {
 			SET_BIT(PRG_FLAGS(prg), PRG_IN_DEVELOPMENT);
+			syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: Progress %d %s set IN-DEV due to deleted building", PRG_VNUM(prg), PRG_NAME(prg));
 			save_library_file_for_vnum(DB_BOOT_PRG, PRG_VNUM(prg));
 			need_progress_refresh = TRUE;
 		}
@@ -476,6 +488,7 @@ void olc_delete_building(char_data *ch, bld_vnum vnum) {
 		
 		if (found) {
 			SET_BIT(QUEST_FLAGS(quest), QST_IN_DEVELOPMENT);
+			syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: Quest %d %s set IN-DEV due to deleted building", QUEST_VNUM(quest), QUEST_NAME(quest));
 			save_library_file_for_vnum(DB_BOOT_QST, QUEST_VNUM(quest));
 		}
 	}
@@ -486,6 +499,7 @@ void olc_delete_building(char_data *ch, bld_vnum vnum) {
 		
 		if (found) {
 			SET_BIT(SHOP_FLAGS(shop), SHOP_IN_DEVELOPMENT);
+			syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: Shop %d %s set IN-DEV due to deleted building", SHOP_VNUM(shop), SHOP_NAME(shop));
 			save_library_file_for_vnum(DB_BOOT_SHOP, SHOP_VNUM(shop));
 		}
 	}
@@ -497,6 +511,7 @@ void olc_delete_building(char_data *ch, bld_vnum vnum) {
 		
 		if (found) {
 			SET_BIT(SOC_FLAGS(soc), SOC_IN_DEVELOPMENT);
+			syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: Social %d %s set IN-DEV due to deleted building", SOC_VNUM(soc), SOC_NAME(soc));
 			save_library_file_for_vnum(DB_BOOT_SOC, SOC_VNUM(soc));
 		}
 	}
@@ -514,6 +529,7 @@ void olc_delete_building(char_data *ch, bld_vnum vnum) {
 		found |= delete_bld_relation_by_vnum(&VEH_RELATIONS(veh), BLD_REL_STORES_LIKE_BLD, vnum);
 		
 		if (found) {
+			syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: Vehicle %d %s lost deleted related building", VEH_VNUM(veh), VEH_SHORT_DESC(veh));
 			save_library_file_for_vnum(DB_BOOT_VEH, VEH_VNUM(veh));
 		}
 	}
@@ -613,8 +629,8 @@ void olc_delete_building(char_data *ch, bld_vnum vnum) {
 		}
 	}
 	
-	syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: %s has deleted building %d", GET_NAME(ch), vnum);
-	msg_to_char(ch, "Building %d deleted.\r\n", vnum);
+	syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: %s has deleted building %d %s", GET_NAME(ch), vnum, name);
+	msg_to_char(ch, "Building %d (%s) deleted.\r\n", vnum, name);
 	
 	if (count > 0) {
 		msg_to_char(ch, "%d live buildings changed.\r\n", count);

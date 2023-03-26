@@ -680,6 +680,10 @@ void resume_craft_vehicle(char_data *ch, vehicle_data *veh, craft_data *craft) {
 		msg_to_char(ch, "You are already doing something.\r\n");
 		return;
 	}
+	if (VEH_IS_DISMANTLING(veh)) {
+		msg_to_char(ch, "You can't work on that -- it's being dismantled! (Try using 'dismantle' to do that instead.)\r\n");
+		return;
+	}
 	if (GET_POS(ch) < POS_STANDING) {
 		send_low_pos_msg(ch);
 		return;
@@ -1168,6 +1172,11 @@ void process_gen_craft_vehicle(char_data *ch, craft_data *type) {
 	
 	// basic setup
 	if (!type || !check_can_craft(ch, type, TRUE) || !(veh = find_finishable_vehicle(ch, NULL, GET_ACTION_VNUM(ch, 1), &junk)) || VEH_IS_DISMANTLING(veh)) {
+		cancel_gen_craft(ch);
+		return;
+	}
+	if (VEH_IS_DISMANTLING(veh)) {
+		act("You can't work on $V because it's being dismantled.", FALSE, ch, NULL, veh, TO_CHAR);
 		cancel_gen_craft(ch);
 		return;
 	}

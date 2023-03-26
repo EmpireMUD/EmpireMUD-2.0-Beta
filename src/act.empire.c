@@ -931,7 +931,7 @@ static void show_empire_identify_to_char(char_data *ch, empire_data *emp, char *
 		return;
 	}
 	
-	identify_obj_to_char(proto, ch);
+	identify_obj_to_char(proto, ch, FALSE);
 	
 	msg_to_char(ch, "Storage list: \r\n");
 	HASH_ITER(hh, eid_pi_list, eid_pi, eid_pi_next) {
@@ -6666,6 +6666,9 @@ ACMD(do_progress) {
 			}
 			msg_to_char(ch, "Completed %s.\r\n", buf);
 		}
+		else if (!get_current_goal(emp, PRG_VNUM(prg)) && !empire_has_completed_goal(emp, PRG_VNUM(prg))) {
+			msg_to_char(ch, "\trYour empire has not started this goal.\t0\r\n");
+		}
 		
 		// Show prereqs:
 		if (PRG_PREREQS(prg)) {
@@ -6679,7 +6682,7 @@ ACMD(do_progress) {
 		// Show descendents if any
 		any = FALSE;
 		HASH_ITER(hh, progress_table, prg_iter, next_prg) {
-			if (PRG_FLAGGED(prg_iter, PRG_IN_DEVELOPMENT | PRG_SCRIPT_ONLY | PRG_HIDDEN)) {
+			if (PRG_FLAGGED(prg_iter, PRG_IN_DEVELOPMENT | PRG_NO_AUTOSTART | PRG_HIDDEN)) {
 				continue;	// skip these types
 			}
 			

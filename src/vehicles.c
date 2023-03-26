@@ -3247,12 +3247,15 @@ void olc_delete_vehicle(char_data *ch, any_vnum vnum) {
 	bld_data *bld, *next_bld;
 	obj_data *obj, *next_obj;
 	descriptor_data *desc;
+	char name[256];
 	bool found;
 	
 	if (!(veh = vehicle_proto(vnum))) {
 		msg_to_char(ch, "There is no such vehicle %d.\r\n", vnum);
 		return;
 	}
+	
+	snprintf(name, sizeof(name), "%s", NULLSAFE(VEH_SHORT_DESC(veh)));
 	
 	// remove live vehicles
 	DL_FOREACH_SAFE(vehicle_list, iter, next_iter) {
@@ -3283,6 +3286,7 @@ void olc_delete_vehicle(char_data *ch, any_vnum vnum) {
 		found |= delete_bld_relation_by_vnum(&GET_BLD_RELATIONS(bld), BLD_REL_UPGRADES_TO_VEH, vnum);
 		found |= delete_bld_relation_by_vnum(&GET_BLD_RELATIONS(bld), BLD_REL_FORCE_UPGRADE_VEH, vnum);
 		if (found) {
+			syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: Building %d %s lost deleted related vehicle", GET_BLD_VNUM(bld), GET_BLD_NAME(bld));
 			save_library_file_for_vnum(DB_BOOT_BLD, GET_BLD_VNUM(bld));
 		}
 	}
@@ -3297,6 +3301,7 @@ void olc_delete_vehicle(char_data *ch, any_vnum vnum) {
 		
 		if (found) {
 			SET_BIT(GET_CRAFT_FLAGS(craft), CRAFT_IN_DEVELOPMENT);
+			syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: Craft %d %s set IN-DEV due to deleted vehicle", GET_CRAFT_VNUM(craft), GET_CRAFT_NAME(craft));
 			save_library_file_for_vnum(DB_BOOT_CRAFT, GET_CRAFT_VNUM(craft));
 		}
 	}
@@ -3307,6 +3312,7 @@ void olc_delete_vehicle(char_data *ch, any_vnum vnum) {
 			if (store->type == TYPE_VEH && store->vnum == vnum) {
 				LL_DELETE(obj->proto_data->storage, store);
 				free(store);
+				syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: Object %d %s lost deleted storage vehicle", GET_OBJ_VNUM(obj), GET_OBJ_SHORT_DESC(obj));
 				save_library_file_for_vnum(DB_BOOT_OBJ, GET_OBJ_VNUM(obj));
 			}
 		}
@@ -3318,6 +3324,7 @@ void olc_delete_vehicle(char_data *ch, any_vnum vnum) {
 		
 		if (found) {
 			SET_BIT(PRG_FLAGS(prg), PRG_IN_DEVELOPMENT);
+			syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: Progress %d %s set IN-DEV due to deleted vehicle", PRG_VNUM(prg), PRG_NAME(prg));
 			save_library_file_for_vnum(DB_BOOT_PRG, PRG_VNUM(prg));
 			need_progress_refresh = TRUE;
 		}
@@ -3332,6 +3339,7 @@ void olc_delete_vehicle(char_data *ch, any_vnum vnum) {
 		
 		if (found) {
 			SET_BIT(QUEST_FLAGS(quest), QST_IN_DEVELOPMENT);
+			syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: Quest %d %s set IN-DEV due to deleted vehicle", QUEST_VNUM(quest), QUEST_NAME(quest));
 			save_library_file_for_vnum(DB_BOOT_QST, QUEST_VNUM(quest));
 		}
 	}
@@ -3340,6 +3348,7 @@ void olc_delete_vehicle(char_data *ch, any_vnum vnum) {
 	HASH_ITER(hh, room_template_table, rmt, next_rmt) {
 		found = delete_from_spawn_template_list(&GET_RMT_SPAWNS(rmt), ADV_SPAWN_VEH, vnum);
 		if (found) {
+			syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: Room template %d %s lost deleted related vehicle", GET_RMT_VNUM(rmt), GET_RMT_TITLE(rmt));
 			save_library_file_for_vnum(DB_BOOT_RMT, GET_RMT_VNUM(rmt));
 		}
 	}
@@ -3351,6 +3360,7 @@ void olc_delete_vehicle(char_data *ch, any_vnum vnum) {
 		
 		if (found) {
 			SET_BIT(SHOP_FLAGS(shop), SHOP_IN_DEVELOPMENT);
+			syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: Shop %d %s set IN-DEV due to deleted vehicle", SHOP_VNUM(shop), SHOP_NAME(shop));
 			save_library_file_for_vnum(DB_BOOT_SHOP, SHOP_VNUM(shop));
 		}
 	}
@@ -3361,6 +3371,7 @@ void olc_delete_vehicle(char_data *ch, any_vnum vnum) {
 		
 		if (found) {
 			SET_BIT(SOC_FLAGS(soc), SOC_IN_DEVELOPMENT);
+			syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: Social %d %s set IN-DEV due to deleted vehicle", SOC_VNUM(soc), SOC_NAME(soc));
 			save_library_file_for_vnum(DB_BOOT_SOC, SOC_VNUM(soc));
 		}
 	}
@@ -3372,6 +3383,7 @@ void olc_delete_vehicle(char_data *ch, any_vnum vnum) {
 		found |= delete_bld_relation_by_vnum(&VEH_RELATIONS(iter), BLD_REL_UPGRADES_TO_VEH, vnum);
 		found |= delete_bld_relation_by_vnum(&VEH_RELATIONS(iter), BLD_REL_FORCE_UPGRADE_VEH, vnum);
 		if (found) {
+			syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: Vehicle %d %s lost deleted related vehicle", VEH_VNUM(iter), VEH_SHORT_DESC(veh));
 			save_library_file_for_vnum(DB_BOOT_VEH, VEH_VNUM(iter));
 		}
 	}
@@ -3462,8 +3474,8 @@ void olc_delete_vehicle(char_data *ch, any_vnum vnum) {
 		}
 	}
 	
-	syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: %s has deleted vehicle %d", GET_NAME(ch), vnum);
-	msg_to_char(ch, "Vehicle %d deleted.\r\n", vnum);
+	syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: %s has deleted vehicle %d %s", GET_NAME(ch), vnum, name);
+	msg_to_char(ch, "Vehicle %d (%s) deleted.\r\n", vnum, name);
 	
 	free_vehicle(veh);
 }

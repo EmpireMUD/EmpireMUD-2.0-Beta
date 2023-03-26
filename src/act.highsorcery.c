@@ -486,6 +486,10 @@ void summon_materials(char_data *ch, char *argument) {
 		send_low_pos_msg(ch);
 		return;
 	}
+	if (AFF_FLAGGED(ch, AFF_STUNNED | AFF_HARD_STUNNED)) {
+		msg_to_char(ch, "You can't do that... you're stunned!\r\n");
+		return;
+	}
 	
 	if (!GET_ISLAND(IN_ROOM(ch)) || !(isle = get_empire_island(emp, GET_ISLAND_ID(IN_ROOM(ch))))) {
 		msg_to_char(ch, "You can't summon materials here.\r\n");
@@ -549,6 +553,10 @@ void summon_materials(char_data *ch, char *argument) {
 		if (proto && multi_isname(objname, GET_OBJ_KEYWORDS(proto)) && (++pos == number)) {
 			found = TRUE;
 			
+			if (!CAN_WEAR(proto, ITEM_WEAR_TAKE)) {
+				msg_to_char(ch, "You can't summon %s.\r\n", GET_OBJ_SHORT_DESC(proto));
+				return;
+			}
 			if (stored_item_requires_withdraw(proto)) {
 				msg_to_char(ch, "You can't summon materials out of the vault.\r\n");
 				return;

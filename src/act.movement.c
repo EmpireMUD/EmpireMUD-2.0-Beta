@@ -1215,7 +1215,7 @@ int move_cost(char_data *ch, room_data *from, room_data *to, int dir, bitvector_
 	}
 	
 	/* move points needed is avg. move loss for src and destination sect type */	
-	if (!IS_INCOMPLETE(from)) {
+	if (IS_INCOMPLETE(from)) {
 		// incomplte: full base cost
 		cost_from = GET_SECT_MOVE_LOSS(BASE_SECT(from));
 	}
@@ -1229,7 +1229,7 @@ int move_cost(char_data *ch, room_data *from, room_data *to, int dir, bitvector_
 	}
 	
 	// cost for the space moving to
-	if (!IS_INCOMPLETE(to)) {
+	if (IS_INCOMPLETE(to)) {
 		cost_to = GET_SECT_MOVE_LOSS(BASE_SECT(to));
 	}
 	else if (!ROOM_IS_CLOSED(to)) {
@@ -2347,6 +2347,9 @@ ACMD(do_follow) {
 				GET_BECKONED_BY(ch) = 0;
 			}
 		}
+		
+		// short delay prevents abuse in pvp (maybe)
+		command_lag(ch, WAIT_ABILITY);
 	}
 }
 
@@ -2395,12 +2398,18 @@ ACMD(do_gen_door) {
 }
 
 
-ACMD(do_land) {	
+ACMD(do_land) {
 	if (!AFF_FLAGGED(ch, AFF_FLY)) {
 		msg_to_char(ch, "You aren't flying.\r\n");
 		return;
 	}
-
+	
+	// ensure morph isn't the cause
+	if (affected_by_spell_and_apply(ch, ATYPE_MORPH, NOTHING, AFF_FLY)) {
+		msg_to_char(ch, "You can't land in this form.\r\n");
+		return;
+	}
+	
 	affects_from_char_by_aff_flag(ch, AFF_FLY, FALSE);
 	
 	if (!AFF_FLAGGED(ch, AFF_FLY)) {

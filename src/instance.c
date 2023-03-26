@@ -2192,8 +2192,8 @@ bool same_subzone(room_data *a, room_data *b) {
 		return FALSE;
 	}
 	else {
-		// different non-nowhere subzone: defer to the noloc
-		return (noloc_a == noloc_b);
+		// different non-nowhere subzone: always different subzones:
+		return FALSE;
 	}
 	
 	// did we somehow get here? probably separate subzones

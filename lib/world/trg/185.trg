@@ -837,16 +837,14 @@ if !%arg%
 end
 * TODO: Check nobody's in the adventure before changing difficulty
 if normal /= %arg%
-  %send% %actor% You can't set this adventure to that difficulty...
-  return 1
-  halt
+  %echo% Setting difficulty to Normal...
+  set difficulty 1
 elseif hard /= %arg%
   %echo% Setting difficulty to Hard...
   set difficulty 2
 elseif group /= %arg%
-  %send% %actor% You can't set this adventure to that difficulty...
-  return 1
-  halt
+  %echo% Setting difficulty to Group...
+  set difficulty 3
 elseif boss /= %arg%
   %echo% Setting difficulty to Boss...
   set difficulty 4
