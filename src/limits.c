@@ -550,6 +550,12 @@ void real_update_char(char_data *ch) {
 	
 	// put stuff that happens when dead here
 	
+	// players: check for auto-respawn
+	if (ch->desc && IS_DEAD(ch) && get_cooldown_time(ch, COOLDOWN_DEATH_RESPAWN) == 0) {
+		do_respawn(ch, "", 0, 0);
+		return;
+	}
+	
 	// everything beyond here only matters if still alive
 	if (IS_DEAD(ch)) {
 		return;
@@ -558,12 +564,6 @@ void real_update_char(char_data *ch) {
 	// check for end of meters (in case it was missed in the fight code)
 	if (!FIGHTING(ch)) {
 		check_combat_end(ch);
-	}
-	
-	// players: check for auto-respawn
-	if (ch->desc && IS_DEAD(ch) && get_cooldown_time(ch, COOLDOWN_DEATH_RESPAWN) == 0) {
-		do_respawn(ch, "", 0, 0);
-		return;
 	}
 	
 	// first check location: this may move the player
