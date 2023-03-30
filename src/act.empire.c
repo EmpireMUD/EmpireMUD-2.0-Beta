@@ -7394,7 +7394,7 @@ void do_workforce_nearby(char_data *ch, empire_data *emp, char *argument) {
 	struct empire_npc_data *npc;
 	struct generic_name_data *nameset;
 	char_data *proto;
-	char buf[MAX_STRING_LENGTH * 2], line[256], name[256];
+	char buf[MAX_STRING_LENGTH * 4], line[256], name[256];
 	size_t size, lsize;
 	int avail, working;
 	bool overflow = FALSE;
