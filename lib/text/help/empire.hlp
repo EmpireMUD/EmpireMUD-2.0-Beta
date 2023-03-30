@@ -1376,6 +1376,7 @@ Usage:  workforce [chore] [on | off | <limit>] [island name | all]
         workforce keep [number | all] <item name>
         workforce keep default [number | all | none]
         workforce limit [amount | none] [keywords]
+        workforce nearby
 
 Once your empire has purchased the Workforce progress reward, the empire's
 citizens (NPCs) will start performing simple tasks for the empire. You can
@@ -1409,7 +1410,8 @@ See &cHELP WORKFORCE CHORES&0 for a list of all workforce chores with descriptio
 See &cHELP WORKFORCE LIMIT&0 for information on limiting production
 
 See also: WORKFORCE CHORES, WORKFORCE WHERE, WORKFORCE WHY, NO-WORK,
-          WORKFORCE KEEP, WORKFORCE CAP, WORKFORCE LIMIT, FEEDING WORKFORCE
+          WORKFORCE KEEP, WORKFORCE CAP, WORKFORCE LIMIT, FEEDING WORKFORCE,
+          WORKFORCE NEARBY
 #
 "WORKFORCE CAP"
 
@@ -1552,6 +1554,19 @@ You can use multiple keywords to try to get the right item. Example:
 > workforce limit 15 large tree
 
 Using this command without an amount lets you search your current limits.
+
+See also: WORKFORCE
+#
+"WORKFORCE NEARBY"
+
+Usage:  workforce nearby
+
+This command shows citizens that live within 20 tiles of your current
+location and could perform workforce chores. It will also indicate if they are
+already working.
+
+Artisans perform work in the shop where they live, but do not show as (working)
+on this display and do not travel for other chores.
 
 See also: WORKFORCE
 #

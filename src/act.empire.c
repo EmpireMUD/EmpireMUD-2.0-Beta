@@ -7382,6 +7382,83 @@ void do_workforce_limit(char_data *ch, empire_data *emp, char *argument) {
 }
 
 
+/**
+* Handler for do_workforce when the args start: workforce nearby ...
+*
+* @param char_data *ch The player.
+* @param empire_data *emp The empire.
+* @param char *argument Remaining args after "nearby".
+*/
+void do_workforce_nearby(char_data *ch, empire_data *emp, char *argument) {
+	struct empire_territory_data *ter, *next_ter;
+	struct empire_npc_data *npc;
+	struct generic_name_data *nameset;
+	char_data *proto;
+	char buf[MAX_STRING_LENGTH * 2], line[256], name[256];
+	size_t size, lsize;
+	int avail, working;
+	
+	int chore_distance = config_get_int("chore_distance");
+	
+	avail = working = 0;
+	size = snprintf(buf, sizeof(buf), "Citizens within %d tile%s of here:\r\n", chore_distance, PLURAL(chore_distance));
+	
+	// try territory first
+	HASH_ITER(hh, EMPIRE_TERRITORY_LIST(emp), ter, next_ter) {
+		// distance?
+		if (compute_distance(IN_ROOM(ch), ter->room) > chore_distance) {
+			continue;
+		}
+		
+		LL_FOREACH(ter->npcs, npc) {
+			// determine mob name
+			if (npc->mob) {
+				snprintf(name, sizeof(name), "%s%s", GET_SHORT_DESC(npc->mob), (GET_MOB_VNUM(npc->mob) != npc->vnum) ? " (working)" : "");
+				if (GET_MOB_VNUM(npc->mob) != npc->vnum) {
+					++working;
+				}
+				else {
+					++avail;
+				}
+			}
+			else if ((proto = mob_proto(npc->vnum))) {
+				nameset = get_best_name_list(MOB_NAME_SET(proto), npc->sex);
+				snprintf(name, sizeof(name), "%s", nameset->names[npc->name]);
+				++avail;
+			}
+			else {
+				snprintf(name, sizeof(name), "UNKNOWN");
+				++avail;
+			}
+			
+			// prepare name
+			lsize = snprintf(line, sizeof(line), "%s %s\r\n", coord_display_room(ch, ter->room, TRUE), name);
+			
+			// append
+			if (lsize + size + 16 < sizeof(buf)) {
+				size += lsize;
+				strcat(buf, line);
+			}
+			else {
+				size += snprintf(buf + size, sizeof(buf) - size, "OVERFLOW\r\n");
+				break;
+			}
+		}
+	}
+	
+	if (avail == 0 && working == 0) {
+		size += snprintf(buf + size, sizeof(buf) - size, " none\r\n");
+	}
+	else {
+		size += snprintf(buf + size, sizeof(buf) - size, "%d available, %d working, %d total\r\n", avail, working, avail + working);
+	}
+	
+	if (ch->desc) {
+		page_string(ch->desc, buf, TRUE);
+	}
+}
+
+
 ACMD(do_workforce) {
 	char arg[MAX_INPUT_LENGTH], lim_arg[MAX_INPUT_LENGTH], name[MAX_STRING_LENGTH], local_arg[MAX_INPUT_LENGTH], island_arg[MAX_INPUT_LENGTH];
 	char temp[MAX_INPUT_LENGTH];
@@ -7410,6 +7487,9 @@ ACMD(do_workforce) {
 	}
 	else if (!IS_APPROVED(ch) && config_get_bool("manage_empire_approval")) {
 		send_config_msg(ch, "need_approval_string");
+	}
+	else if (is_abbrev(arg, "nearby")) {
+		do_workforce_nearby(ch, emp, argument);
 	}
 	else if (is_abbrev(arg, "where")) {
 		argument = any_one_arg(argument, local_arg);

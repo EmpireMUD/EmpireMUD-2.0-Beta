@@ -50,7 +50,6 @@ struct instance_data *build_instance_loc(adv_data *adv, struct adventure_link_ru
 void Crash_listrent(char_data *ch, char *name);
 void do_stat_vehicle(char_data *ch, vehicle_data *veh);
 room_data *find_location_for_rule(adv_data *adv, struct adventure_link_rule *rule, int *which_dir);
-struct generic_name_data *get_best_name_list(int name_set, int sex);
 void update_account_stats();
 
 // locals
