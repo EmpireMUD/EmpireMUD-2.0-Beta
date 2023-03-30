@@ -7449,7 +7449,7 @@ void do_workforce_nearby(char_data *ch, empire_data *emp, char *argument) {
 	if (avail == 0 && working == 0) {
 		size += snprintf(buf + size, sizeof(buf) - size, " none\r\n");
 	}
-	else {
+	else if (size + 20 < sizeof(buf)) {
 		size += snprintf(buf + size, sizeof(buf) - size, "%d available, %d working, %d total\r\n", avail, working, avail + working);
 	}
 	
