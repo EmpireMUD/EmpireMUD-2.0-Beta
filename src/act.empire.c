@@ -7397,6 +7397,7 @@ void do_workforce_nearby(char_data *ch, empire_data *emp, char *argument) {
 	char buf[MAX_STRING_LENGTH * 2], line[256], name[256];
 	size_t size, lsize;
 	int avail, working;
+	bool overflow = FALSE;
 	
 	int chore_distance = config_get_int("chore_distance");
 	
@@ -7405,6 +7406,10 @@ void do_workforce_nearby(char_data *ch, empire_data *emp, char *argument) {
 	
 	// try territory first
 	HASH_ITER(hh, EMPIRE_TERRITORY_LIST(emp), ter, next_ter) {
+		if (overflow) {
+			break;
+		}
+		
 		// distance?
 		if (compute_distance(IN_ROOM(ch), ter->room) > chore_distance) {
 			continue;
@@ -7441,15 +7446,16 @@ void do_workforce_nearby(char_data *ch, empire_data *emp, char *argument) {
 			}
 			else {
 				size += snprintf(buf + size, sizeof(buf) - size, "OVERFLOW\r\n");
+				overflow = TRUE;
 				break;
 			}
 		}
 	}
 	
-	if (avail == 0 && working == 0) {
+	if (avail == 0 && working == 0 && !overflow) {
 		size += snprintf(buf + size, sizeof(buf) - size, " none\r\n");
 	}
-	else if (size + 20 < sizeof(buf)) {
+	else if (!overflow) {
 		size += snprintf(buf + size, sizeof(buf) - size, "%d available, %d working, %d total\r\n", avail, working, avail + working);
 	}
 	
