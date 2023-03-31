@@ -6667,7 +6667,7 @@ ACMD(do_progress) {
 			msg_to_char(ch, "Completed %s.\r\n", buf);
 		}
 		else if (!get_current_goal(emp, PRG_VNUM(prg)) && !empire_has_completed_goal(emp, PRG_VNUM(prg))) {
-			msg_to_char(ch, "\trYour empire has not started this goal.\t0\r\n");
+			msg_to_char(ch, "\trYour empire has not %s this goal.\t0\r\n", (PRG_FLAGGED(prg, PRG_PURCHASABLE) ? "purchased" : "started"));
 		}
 		
 		// Show prereqs:
