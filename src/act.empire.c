@@ -7402,7 +7402,7 @@ void do_workforce_nearby(char_data *ch, empire_data *emp, char *argument) {
 	int chore_distance = config_get_int("chore_distance");
 	
 	avail = working = 0;
-	size = snprintf(buf, sizeof(buf), "Citizens within %d tile%s of here:\r\n", chore_distance, PLURAL(chore_distance));
+	size = snprintf(buf, sizeof(buf), "Citizens living within %d tile%s of here:\r\n", chore_distance, PLURAL(chore_distance));
 	
 	// try territory first
 	HASH_ITER(hh, EMPIRE_TERRITORY_LIST(emp), ter, next_ter) {
