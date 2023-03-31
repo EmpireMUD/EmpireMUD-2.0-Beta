@@ -7394,10 +7394,10 @@ void do_workforce_nearby(char_data *ch, empire_data *emp, char *argument) {
 	struct empire_npc_data *npc;
 	struct generic_name_data *nameset;
 	char_data *proto;
-	char buf[MAX_STRING_LENGTH * 4], line[256], name[256];
+	char buf[MAX_STRING_LENGTH], line[256], name[256];
 	size_t size, lsize;
 	int avail, working;
-	bool overflow = FALSE;
+	bool full = FALSE;
 	
 	int chore_distance = config_get_int("chore_distance");
 	
@@ -7406,10 +7406,6 @@ void do_workforce_nearby(char_data *ch, empire_data *emp, char *argument) {
 	
 	// try territory first
 	HASH_ITER(hh, EMPIRE_TERRITORY_LIST(emp), ter, next_ter) {
-		if (overflow) {
-			break;
-		}
-		
 		// distance?
 		if (compute_distance(IN_ROOM(ch), ter->room) > chore_distance) {
 			continue;
@@ -7418,7 +7414,9 @@ void do_workforce_nearby(char_data *ch, empire_data *emp, char *argument) {
 		LL_FOREACH(ter->npcs, npc) {
 			// determine mob name
 			if (npc->mob) {
-				snprintf(name, sizeof(name), "%s%s", GET_SHORT_DESC(npc->mob), (GET_MOB_VNUM(npc->mob) != npc->vnum) ? " (working)" : "");
+				if (!full) {
+					snprintf(name, sizeof(name), "%s%s", GET_SHORT_DESC(npc->mob), (GET_MOB_VNUM(npc->mob) != npc->vnum) ? " (working)" : "");
+				}
 				if (GET_MOB_VNUM(npc->mob) != npc->vnum) {
 					++working;
 				}
@@ -7427,36 +7425,44 @@ void do_workforce_nearby(char_data *ch, empire_data *emp, char *argument) {
 				}
 			}
 			else if ((proto = mob_proto(npc->vnum))) {
-				nameset = get_best_name_list(MOB_NAME_SET(proto), npc->sex);
-				snprintf(name, sizeof(name), "%s", nameset->names[npc->name]);
+				if (!full) {
+					nameset = get_best_name_list(MOB_NAME_SET(proto), npc->sex);
+					snprintf(name, sizeof(name), "%s", nameset->names[npc->name]);
+				}
 				++avail;
 			}
 			else {
-				snprintf(name, sizeof(name), "UNKNOWN");
+				if (!full) {
+					snprintf(name, sizeof(name), "UNKNOWN");
+				}
 				++avail;
 			}
 			
-			// prepare name
-			lsize = snprintf(line, sizeof(line), "%s %s\r\n", coord_display_room(ch, ter->room, TRUE), name);
-			
-			// append
-			if (lsize + size + 16 < sizeof(buf)) {
-				size += lsize;
-				strcat(buf, line);
+			if (full) {
+				// just counting, no appending
 			}
 			else {
-				size += snprintf(buf + size, sizeof(buf) - size, "OVERFLOW\r\n");
-				overflow = TRUE;
-				break;
+				// prepare name
+				lsize = snprintf(line, sizeof(line), "%s %s\r\n", coord_display_room(ch, ter->room, TRUE), name);
+			
+				// append
+				if (lsize + size + 110 < sizeof(buf)) {
+					size += lsize;
+					strcat(buf, line);
+				}
+				else {
+					// mark for count-only
+					full = TRUE;
+				}
 			}
 		}
 	}
 	
-	if (avail == 0 && working == 0 && !overflow) {
+	if (avail == 0 && working == 0) {
 		size += snprintf(buf + size, sizeof(buf) - size, " none\r\n");
 	}
-	else if (!overflow) {
-		size += snprintf(buf + size, sizeof(buf) - size, "%d available, %d working, %d total\r\n", avail, working, avail + working);
+	else if (size + 40 < sizeof(buf)) {
+		size += snprintf(buf + size, sizeof(buf) - size, "%s%d available, %d working, %d total\r\n", (full ? " ... and more\r\n" : ""), avail, working, avail + working);
 	}
 	
 	if (ch->desc) {
