@@ -4070,7 +4070,7 @@ void trade_post(char_data *ch, char *argument) {
 		msg_to_char(ch, "Time is in real hours (default: %d).\r\n", config_get_int("trading_post_max_hours"));
 	}
 	else if (!(obj = get_obj_in_list_vis(ch, itemarg, NULL, ch->carrying))) {
-		msg_to_char(ch, "You don't seem to have a %s to trade.", itemarg);
+		msg_to_char(ch, "You don't seem to have %s %s to trade.", AN(itemarg), itemarg);
 	}
 	else if (OBJ_BOUND_TO(obj)) {
 		msg_to_char(ch, "You can't trade bound items.\r\n");
@@ -7658,7 +7658,7 @@ ACMD(do_use) {
 		msg_to_char(ch, "Use what?\r\n");
 	}
 	else if (!(obj = get_obj_in_list_vis(ch, arg, NULL, ch->carrying))) {
-		msg_to_char(ch, "You don't seem to have a %s.\r\n", arg);
+		msg_to_char(ch, "You don't seem to have %s %s.\r\n", AN(arg), arg);
 	}
 	else {
 		if (IS_POISON(obj)) {

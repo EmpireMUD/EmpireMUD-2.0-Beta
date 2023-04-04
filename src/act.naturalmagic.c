@@ -889,7 +889,7 @@ ACMD(do_quaff) {
 		msg_to_char(ch, "Which potion would you like to quaff?\r\n");
 	}
 	else if (!(obj = get_obj_in_list_vis(ch, arg, NULL, ch->carrying))) {
-		msg_to_char(ch, "You don't seem to have a %s.\r\n", arg);
+		msg_to_char(ch, "You don't seem to have %s %s.\r\n", AN(arg), arg);
 	}
 	else if (!IS_POTION(obj)) {
 		msg_to_char(ch, "You can only quaff potions.\r\n");

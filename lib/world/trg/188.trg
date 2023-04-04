@@ -453,7 +453,7 @@ if !%CandyCount%
   elseif %SpecificCandy%
     %send% %actor% You can't fit %SpecificCandy% in @%self%.
   else
-    %send% %actor% You don't seem to have a %PutObj%.
+    %send% %actor% You don't seem to have %PutObj.ana% %PutObj%.
   end
 end
 wait 0
@@ -1129,7 +1129,7 @@ end
 set target %actor.obj_target_inv(%arg%)%
 if !%target%
   * Pass through to upgrade command (upgrading building)
-  * %send% %actor% You don't seem to have a '%arg%'. (You can only use @%self% on items in your inventory.)
+  * %send% %actor% You don't seem to have %arg.ana% '%arg%'. (You can only use @%self% on items in your inventory.)
   return 0
   halt
 end

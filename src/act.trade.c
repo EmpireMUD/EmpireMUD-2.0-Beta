@@ -1476,7 +1476,7 @@ ACMD(do_gen_augment) {
 		list_available_augments(ch, subcmd, NULL);
 	}
 	else if (!(obj = get_obj_in_list_vis(ch, target_arg, NULL, ch->carrying)) && !(obj = get_obj_by_char_share(ch, target_arg))) {
-		msg_to_char(ch, "You don't seem to have any %s.\r\n", target_arg);
+		msg_to_char(ch, "You don't seem to have %s %s.\r\n", AN(target_arg), target_arg);
 	}
 	else if (!*augment_arg) {
 		msg_to_char(ch, "You can %s %s with:\r\n", augment_info[subcmd].verb, GET_OBJ_SHORT_DESC(obj));
@@ -2341,7 +2341,7 @@ ACMD(do_recipes) {
 		msg_to_char(ch, "Show recipes for which item?\r\n");
 	}
 	else if (!(obj = get_obj_in_list_vis(ch, arg, NULL, ch->carrying))) {
-		msg_to_char(ch, "You don't seem to have a %s in your inventory.\r\n", arg);
+		msg_to_char(ch, "You don't seem to have %s %s in your inventory.\r\n", AN(arg), arg);
 	}
 	else {
 		act("With $p, you can make:", FALSE, ch, obj, NULL, TO_CHAR);
@@ -2489,7 +2489,7 @@ ACMD(do_reforge) {
 		// failed validate func -- sends own messages
 	}
 	else if (!(obj = get_obj_in_list_vis(ch, arg, NULL, ch->carrying)) && !(obj = get_obj_by_char_share(ch, arg))) {
-		msg_to_char(ch, "You don't seem to have a %s.\r\n", arg);
+		msg_to_char(ch, "You don't seem to have %s %s.\r\n", AN(arg), arg);
 	}
 	else if (!match_reforge_type(obj, subcmd)) {
 		msg_to_char(ch, "You can only %s ", reforge_data[subcmd].command);

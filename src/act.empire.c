@@ -3010,10 +3010,12 @@ struct find_territory_node *reduce_territory_node_list(struct find_territory_nod
 *
 * @param char_data *ch The player.
 * @param char_data *argument The tile to search for.
+* @param int max_dist How far to see (e.g. mapsize radius).
+* @param bitvector_t only_in_dirs Optional: Requires that any tiles be in one of the directions listed here as BIT(NORTH), BIT(EAST), etc. Ignored if empty.
 */
-void scan_for_tile(char_data *ch, char *argument) {
+void scan_for_tile(char_data *ch, char *argument, int max_dist, bitvector_t only_in_dirs) {
 	struct find_territory_node *node_list = NULL, *node, *next_node;
-	int dist, mapsize, total, x, y, check_x, check_y, over_count, dark_distance;
+	int dist, total, x, y, check_x, check_y, over_count, dark_distance;
 	int iter, top_height, r_height, view_height;
 	char output[MAX_STRING_LENGTH], line[128], info[256], veh_string[MAX_STRING_LENGTH], temp[MAX_STRING_LENGTH], paint_str[256];
 	char *dir_str;
@@ -3024,6 +3026,11 @@ void scan_for_tile(char_data *ch, char *argument) {
 	crop_data *crop;
 	bool ok, claimed, unclaimed, foreign, adventures, check_blocking, is_blocked, blocking_veh;
 	size_t vsize;
+	
+	const bitvector_t north_dirs = BIT(NORTH) | BIT(NORTHWEST) | BIT(NORTHEAST);
+	const bitvector_t east_dirs = BIT(EAST) | BIT(SOUTHEAST) | BIT(NORTHEAST);
+	const bitvector_t south_dirs = BIT(SOUTH) | BIT(SOUTHWEST) | BIT(SOUTHEAST);
+	const bitvector_t west_dirs = BIT(WEST) | BIT(SOUTHWEST) | BIT(NORTHWEST);
 	
 	skip_spaces(&argument);
 	
@@ -3038,8 +3045,10 @@ void scan_for_tile(char_data *ch, char *argument) {
 		msg_to_char(ch, "You can't scan for anything here.\r\n");
 		return;
 	}
-
-	mapsize = get_map_radius(ch);
+	
+	if (max_dist < 1) {
+		max_dist = config_get_int("default_map_size");
+	}
 	claimed = !str_cmp(argument, "claimed") || !str_cmp(argument, "claim");
 	unclaimed = !str_cmp(argument, "unclaimed") || !str_cmp(argument, "unclaim");
 	foreign = !str_cmp(argument, "foreign");
@@ -3047,15 +3056,36 @@ void scan_for_tile(char_data *ch, char *argument) {
 	dark_distance = distance_can_see_in_dark(ch);
 	check_blocking = (!PRF_FLAGGED(ch, PRF_HOLYLIGHT) && config_get_bool("line_of_sight"));
 	
-	for (x = -mapsize; x <= mapsize; ++x) {
-		for (y = -mapsize; y <= mapsize; ++y) {
+	for (x = -max_dist; x <= max_dist; ++x) {
+		// check if directions were requested (x):
+		if (only_in_dirs) {
+			if (IS_SET(only_in_dirs, west_dirs) && !IS_SET(only_in_dirs, east_dirs) && x >= 0) {
+				continue;	// not west
+			}
+			if (IS_SET(only_in_dirs, east_dirs) && !IS_SET(only_in_dirs, west_dirs) && x <= 0) {
+				continue;	// not east
+			}
+		}
+		
+		for (y = -max_dist; y <= max_dist; ++y) {
+			// check if directions were requested (y):
+			if (only_in_dirs) {
+				if (IS_SET(only_in_dirs, south_dirs) && !IS_SET(only_in_dirs, north_dirs) && y >= 0) {
+					continue;	// not south
+				}
+				if (IS_SET(only_in_dirs, north_dirs) && !IS_SET(only_in_dirs, south_dirs) && y <= 0) {
+					continue;	// not north
+				}
+			}
+			
+			// ensure room
 			if (!(room = real_shift(map, x, y))) {
 				continue;
 			}
 			
 			// actual distance check (compute circle)
 			dist = compute_distance(room, IN_ROOM(ch));
-			if (dist > mapsize) {
+			if (dist > max_dist) {
 				continue;
 			}
 			
@@ -3206,7 +3236,7 @@ void scan_for_tile(char_data *ch, char *argument) {
 		sort_territory_from_loc = IN_ROOM(ch);
 	    DL_SORT(node_list, sort_territory_nodes_by_distance);
 		
-		size = snprintf(output, sizeof(output), "Nearby tiles matching '%s' within %d tile%s:\r\n", argument, mapsize, PLURAL(mapsize));
+		size = snprintf(output, sizeof(output), "Nearby tiles matching '%s' within %d tile%s:\r\n", argument, max_dist, PLURAL(max_dist));
 		
 		// display and free the nodes
 		total = over_count = 0;

@@ -6862,7 +6862,7 @@ if !%arg%
 end
 set target %actor.obj_target_inv(%arg%)%
 if !%target%
-  %send% %actor% You don't seem to have a '%arg%'. (You can only use @%self% on items in your inventory.)
+  %send% %actor% You don't seem to have %arg.ana% '%arg%'. (You can only use @%self% on items in your inventory.)
   halt
 end
 if %target.vnum% != 11935 && %target.vnum% != 11936
