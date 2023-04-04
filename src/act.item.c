@@ -6148,7 +6148,7 @@ ACMD(do_light) {
 			do_burn_area(ch, subcmd);
 		}
 		else {
-			msg_to_char(ch, "You don't have a %s.\r\n", arg);
+			msg_to_char(ch, "You don't have %s %s.\r\n", AN(arg), arg);
 		}
 	}
 	else if (!has_interaction(GET_OBJ_INTERACTIONS(obj), INTERACT_LIGHT)) {

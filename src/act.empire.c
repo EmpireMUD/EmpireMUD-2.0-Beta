@@ -1818,7 +1818,7 @@ void downgrade_city(char_data *ch, empire_data *emp, char *argument) {
 
 	if (city->type > 0) {
 		city->type--;
-		log_to_empire(emp, ELOG_TERRITORY, "%s has downgraded %s to a %s", PERS(ch, ch, 1), city->name, city_type[city->type].name);
+		log_to_empire(emp, ELOG_TERRITORY, "%s has downgraded %s to %s %s", PERS(ch, ch, 1), city->name, AN(city_type[city->type].name), city_type[city->type].name);
 		et_change_cities(emp);
 	}
 	else {
@@ -2261,7 +2261,7 @@ void upgrade_city(char_data *ch, empire_data *emp, char *argument) {
 	
 	city->type++;
 	
-	log_to_empire(emp, ELOG_TERRITORY, "%s has upgraded %s to a %s", PERS(ch, ch, 1), city->name, city_type[city->type].name);
+	log_to_empire(emp, ELOG_TERRITORY, "%s has upgraded %s to %s %s", PERS(ch, ch, 1), city->name, AN(city_type[city->type].name), city_type[city->type].name);
 	send_config_msg(ch, "ok_string");
 	read_empire_territory(emp, FALSE);
 	et_change_cities(emp);

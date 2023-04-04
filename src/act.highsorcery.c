@@ -637,7 +637,7 @@ ACMD(do_collapse) {
 	}
 	
 	if (!(portal = get_obj_in_list_vis(ch, arg, NULL, ROOM_CONTENTS(IN_ROOM(ch))))) {
-		msg_to_char(ch, "You don't see a %s here.\r\n", arg);
+		msg_to_char(ch, "You don't see %s %s here.\r\n", AN(arg), arg);
 		return;
 	}
 	

@@ -1497,7 +1497,7 @@ ACMD(do_gen_augment) {
 		msg_to_char(ch, "You cannot %s an item that already has %s %s.\r\n", augment_info[subcmd].verb, AN(augment_info[subcmd].noun), augment_info[subcmd].noun);
 	}
 	else if (obj_has_apply_type(obj, augment_info[subcmd].apply_type)) {
-		msg_to_char(ch, "That item already has a %s effect.\r\n", augment_info[subcmd].noun);
+		msg_to_char(ch, "That item already has %s %s effect.\r\n", AN(augment_info[subcmd].noun), augment_info[subcmd].noun);
 	}
 	else if (!validate_augment_target(ch, obj, aug, TRUE)) {
 		// sends own message

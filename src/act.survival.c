@@ -550,7 +550,7 @@ ACMD(do_butcher) {
 		act("You need to kill $M first.", FALSE, ch, NULL, vict, TO_CHAR);
 	}
 	else if (!corpse) {
-		msg_to_char(ch, "You don't see a %s here.\r\n", arg);
+		msg_to_char(ch, "You don't see %s %s here.\r\n", AN(arg), arg);
 	}
 	else if (!IS_CORPSE(corpse)) {
 		msg_to_char(ch, "You can only butcher a corpse.\r\n");

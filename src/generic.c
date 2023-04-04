@@ -1999,11 +1999,11 @@ OLC_MODULE(genedit_type) {
 		
 		if (generic_types_uses_in_dev[GEN_TYPE(gen)]) {
 			SET_BIT(GEN_FLAGS(gen), GEN_IN_DEVELOPMENT);
-			msg_to_char(ch, "Added IN-DEVELOPMENT flag because you changed it to a %s.\r\n", generic_types[GEN_TYPE(gen)]);
+			msg_to_char(ch, "Added IN-DEVELOPMENT flag because you changed it to %s %s.\r\n", AN(generic_types[GEN_TYPE(gen)]), generic_types[GEN_TYPE(gen)]);
 		}
 		else if (GEN_FLAGGED(gen, GEN_IN_DEVELOPMENT)) {
 			REMOVE_BIT(GEN_FLAGS(gen), GEN_IN_DEVELOPMENT);
-			msg_to_char(ch, "Removed IN-DEVELOPMENT flag because you changed it to a %s.\r\n", generic_types[GEN_TYPE(gen)]);
+			msg_to_char(ch, "Removed IN-DEVELOPMENT flag because you changed it to %s %s.\r\n", AN(generic_types[GEN_TYPE(gen)]), generic_types[GEN_TYPE(gen)]);
 		}
 	}
 }

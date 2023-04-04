@@ -5690,7 +5690,7 @@ SHOW(show_storage) {
 	else {
 		// ok to show: init string/size
 		if (find_bld) {
-			size = snprintf(buf, sizeof(buf), "Objects that can be stored in a %s:\r\n", GET_BLD_NAME(find_bld));
+			size = snprintf(buf, sizeof(buf), "Objects that can be stored in %s %s:\r\n", AN(GET_BLD_NAME(find_bld)), GET_BLD_NAME(find_bld));
 		}
 		else if (find_veh) {
 			size = snprintf(buf, sizeof(buf), "Objects that can be stored in %s:\r\n", VEH_SHORT_DESC(find_veh));

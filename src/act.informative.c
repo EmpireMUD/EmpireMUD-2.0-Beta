@@ -551,6 +551,7 @@ void look_at_target(char_data *ch, char *arg, char *more_args, bool look_inside)
 */
 void look_in_obj(char_data *ch, char *arg, obj_data *obj, vehicle_data *veh) {
 	char buf[MAX_STRING_LENGTH];
+	const char *gstr;
 	char_data *dummy = NULL;
 	int amt, bits = 0;
 
@@ -595,7 +596,8 @@ void look_in_obj(char_data *ch, char *arg, obj_data *obj, vehicle_data *veh) {
 				}
 				else {
 					amt = (GET_DRINK_CONTAINER_CONTENTS(obj) * 3) / GET_DRINK_CONTAINER_CAPACITY(obj);
-					sprintf(buf, "It's %sfull of a %s liquid.\r\n", fullness[amt], get_generic_string_by_vnum(GET_DRINK_CONTAINER_TYPE(obj), GENERIC_LIQUID, GSTR_LIQUID_COLOR));
+					gstr = get_generic_string_by_vnum(GET_DRINK_CONTAINER_TYPE(obj), GENERIC_LIQUID, GSTR_LIQUID_COLOR);
+					sprintf(buf, "It's %sfull of %s %s liquid.\r\n", fullness[amt], AN(gstr), gstr);
 				}
 				send_to_char(buf, ch);
 			}

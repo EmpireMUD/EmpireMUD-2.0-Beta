@@ -2528,7 +2528,7 @@ ACMD(do_designate) {
 	}
 	else if (!*argument || !(type = find_designate_room_by_name(argument, valid_des_flags))) {
 		if (*argument) {	// if any
-			msg_to_char(ch, "You can't designate a '%s' here.\r\n", argument);
+			msg_to_char(ch, "You can't designate %s '%s' here.\r\n", AN(argument), argument);
 		}
 		msg_to_char(ch, "Usage: %s <room>\r\n", (subcmd == SCMD_REDESIGNATE) ? "redesignate" : "designate <direction>");
 
