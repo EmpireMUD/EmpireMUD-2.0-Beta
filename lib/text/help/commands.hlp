@@ -724,10 +724,10 @@ See also: COINS, GET, JUNK, KEEP
 #
 EAT DRINK SIP TASTE
 
-Usage:  eat <item>
-        taste <item>
-        drink [from] <item>
-        sip [from] <item>
+Usage:  eat [item]
+        taste [item]
+        drink [from] [item]
+        sip [from] [item]
 
 If you're hungry or thirsty, these commands are for you! You can drink from
 wells, fountains, and the edge of nearby rivers, too.

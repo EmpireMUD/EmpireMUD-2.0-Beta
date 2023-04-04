@@ -4986,12 +4986,15 @@ ACMD(do_draw) {
 
 
 ACMD(do_drink) {
-	obj_data *obj = NULL;
+	struct string_hash *str_iter, *next_str, *str_hash = NULL;
+	char buf[MAX_STRING_LENGTH], line[256];
+	obj_data *obj = NULL, *check_list[2];
 	int amount, i, liquid;
 	double thirst_amt, hunger_amt;
-	int type = drink_OBJ, number;
+	int type = drink_OBJ, number, iter;
 	room_data *to_room;
 	char *argptr = arg;
+	size_t size;
 
 	one_argument(argument, arg);
 	number = get_number(&argptr);
@@ -5010,8 +5013,48 @@ ACMD(do_drink) {
 		else if (find_flagged_sect_within_distance_from_char(ch, SECTF_DRINK, NOBITS, 1)) {
 			type = drink_ROOM;
 		}
-		else {
-			msg_to_char(ch, "Drink from what?\r\n");
+		else {	// no-arg and no room water: try to show drinkables
+			check_list[0] = ch->carrying;
+			check_list[1] = can_use_room(ch, IN_ROOM(ch), MEMBERS_AND_ALLIES) ? ROOM_CONTENTS(IN_ROOM(ch)) : NULL;
+			for (iter = 0; iter < 2; ++iter) {
+				if (check_list[iter]) {
+					DL_FOREACH2(check_list[iter], obj, next_content) {
+						if (IS_DRINK_CONTAINER(obj) && GET_DRINK_CONTAINER_CONTENTS(obj) > 0) {
+							snprintf(line, sizeof(line), "%s - %d drink%s", GET_OBJ_DESC(obj, ch, OBJ_DESC_SHORT), GET_DRINK_CONTAINER_CONTENTS(obj), PLURAL(GET_DRINK_CONTAINER_CONTENTS(obj)));
+							add_string_hash(&str_hash, line, 1);
+						}
+					}
+				}
+			}
+		
+			if (str_hash) {
+				// show plantables
+				size = snprintf(buf, sizeof(buf), "What do you want to drink from:\r\n");
+				HASH_ITER(hh, str_hash, str_iter, next_str) {
+					if (str_iter->count == 1) {
+						snprintf(line, sizeof(line), " %s\r\n", str_iter->str);
+					}
+					else {
+						snprintf(line, sizeof(line), " %s (x%d)\r\n", str_iter->str, str_iter->count);
+					}
+					if (size + strlen(line) + 16 < sizeof(buf)) {
+						strcat(buf, line);
+						size += strlen(line);
+					}
+					else {
+						size += snprintf(buf + size, sizeof(buf) - size, "OVERFLOW\r\n");
+						break;
+					}
+				}
+				free_string_hash(&str_hash);
+				if (ch->desc) {
+					page_string(ch->desc, buf, TRUE);
+				}
+			}
+			else {
+				// nothing to plant
+				msg_to_char(ch, "Drink from what?\r\n");
+			}
 			return;
 		}
 	}
