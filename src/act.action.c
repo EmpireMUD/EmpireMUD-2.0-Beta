@@ -3442,12 +3442,6 @@ ACMD(do_plant) {
 	else if (!ROOM_AFF_FLAGGED(IN_ROOM(ch), ROOM_AFF_UNCLAIMABLE) && !has_permission(ch, PRIV_HARVEST, IN_ROOM(ch))) {
 		msg_to_char(ch, "You don't have permission to plant crops in the empire.\r\n");
 	}
-	else if (!(evo = get_evolution_by_type(SECT(IN_ROOM(ch)), EVO_PLANTS_TO))) {
-		msg_to_char(ch, "Nothing can be planted here.\r\n");
-	}
-	else if (ROOM_AFF_FLAGGED(IN_ROOM(ch), ROOM_AFF_NO_EVOLVE)) {
-		msg_to_char(ch, "You can't plant here right now.\r\n");
-	}
 	else if (!*arg) {
 		// check inventory for plantables...
 		DL_FOREACH2(ch->carrying, obj, next_content) {
@@ -3486,6 +3480,12 @@ ACMD(do_plant) {
 			// nothing to plant
 			msg_to_char(ch, "What do you want to plant?\r\n");
 		}
+	}
+	else if (!(evo = get_evolution_by_type(SECT(IN_ROOM(ch)), EVO_PLANTS_TO))) {
+		msg_to_char(ch, "Nothing can be planted here.\r\n");
+	}
+	else if (ROOM_AFF_FLAGGED(IN_ROOM(ch), ROOM_AFF_NO_EVOLVE)) {
+		msg_to_char(ch, "You can't plant here right now.\r\n");
 	}
 	else if (!(obj = get_obj_in_list_vis(ch, arg, NULL, ch->carrying))) {
 		msg_to_char(ch, "You don't seem to have any %s.\r\n", arg);
