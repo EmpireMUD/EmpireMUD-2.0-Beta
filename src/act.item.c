@@ -5019,7 +5019,7 @@ ACMD(do_drink) {
 			for (iter = 0; iter < 2; ++iter) {
 				if (check_list[iter]) {
 					DL_FOREACH2(check_list[iter], obj, next_content) {
-						if (IS_DRINK_CONTAINER(obj) && GET_DRINK_CONTAINER_CONTENTS(obj) > 0) {
+						if (IS_DRINK_CONTAINER(obj)) {
 							snprintf(line, sizeof(line), "%s - %d drink%s", GET_OBJ_DESC(obj, ch, OBJ_DESC_SHORT), GET_DRINK_CONTAINER_CONTENTS(obj), PLURAL(GET_DRINK_CONTAINER_CONTENTS(obj)));
 							add_string_hash(&str_hash, line, 1);
 						}
