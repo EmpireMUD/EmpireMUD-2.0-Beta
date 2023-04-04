@@ -3408,10 +3408,13 @@ ACMD(do_pan) {
 
 
 ACMD(do_plant) {
+	struct string_hash *str_iter, *next_str, *str_hash = NULL;
+	char buf[MAX_STRING_LENGTH], line[256], lbuf[256];
 	struct evolution_data *evo;
 	sector_data *original;
 	obj_data *obj;
 	crop_data *cp;
+	size_t size;
 
 	one_argument(argument, arg);
 
@@ -3439,8 +3442,50 @@ ACMD(do_plant) {
 	else if (!ROOM_AFF_FLAGGED(IN_ROOM(ch), ROOM_AFF_UNCLAIMABLE) && !has_permission(ch, PRIV_HARVEST, IN_ROOM(ch))) {
 		msg_to_char(ch, "You don't have permission to plant crops in the empire.\r\n");
 	}
+	else if (!(evo = get_evolution_by_type(SECT(IN_ROOM(ch)), EVO_PLANTS_TO))) {
+		msg_to_char(ch, "Nothing can be planted here.\r\n");
+	}
+	else if (ROOM_AFF_FLAGGED(IN_ROOM(ch), ROOM_AFF_NO_EVOLVE)) {
+		msg_to_char(ch, "You can't plant here right now.\r\n");
+	}
 	else if (!*arg) {
-		msg_to_char(ch, "What do you want to plant?\r\n");
+		// check inventory for plantables...
+		DL_FOREACH2(ch->carrying, obj, next_content) {
+			if (OBJ_FLAGGED(obj, OBJ_PLANTABLE) && (cp = crop_proto(GET_OBJ_VAL(obj, VAL_FOOD_CROP_TYPE)))) {
+				ordered_sprintbit(GET_CROP_CLIMATE(cp), climate_flags, climate_flags_order, CROP_FLAGGED(cp, CROPF_ANY_LISTED_CLIMATE) ? TRUE : FALSE, lbuf);
+				snprintf(line, sizeof(line), "%s - %s%s", GET_OBJ_DESC(obj, ch, OBJ_DESC_SHORT), lbuf, (CROP_FLAGGED(cp, CROPF_REQUIRES_WATER) ? ", requires water" : ""));
+				add_string_hash(&str_hash, line, 1);
+			}
+		}
+		
+		if (str_hash) {
+			// show plantables
+			size = snprintf(buf, sizeof(buf), "What do you want to plant:\r\n");
+			HASH_ITER(hh, str_hash, str_iter, next_str) {
+				if (str_iter->count == 1) {
+					snprintf(line, sizeof(line), " %s\r\n", str_iter->str);
+				}
+				else {
+					snprintf(line, sizeof(line), " %s (x%d)\r\n", str_iter->str, str_iter->count);
+				}
+				if (size + strlen(line) + 16 < sizeof(buf)) {
+					strcat(buf, line);
+					size += strlen(line);
+				}
+				else {
+					size += snprintf(buf + size, sizeof(buf) - size, "OVERFLOW\r\n");
+					break;
+				}
+			}
+			free_string_hash(&str_hash);
+			if (ch->desc) {
+				page_string(ch->desc, buf, TRUE);
+			}
+		}
+		else {
+			// nothing to plant
+			msg_to_char(ch, "What do you want to plant?\r\n");
+		}
 	}
 	else if (!(obj = get_obj_in_list_vis(ch, arg, NULL, ch->carrying))) {
 		msg_to_char(ch, "You don't seem to have any %s.\r\n", arg);
@@ -3454,12 +3499,6 @@ ACMD(do_plant) {
 	}
 	else if (CROP_FLAGGED(cp, CROPF_REQUIRES_WATER) && !find_flagged_sect_within_distance_from_char(ch, SECTF_FRESH_WATER, NOBITS, config_get_int("water_crop_distance"))) {
 		msg_to_char(ch, "You must plant that closer to fresh water.\r\n");
-	}
-	else if (!(evo = get_evolution_by_type(SECT(IN_ROOM(ch)), EVO_PLANTS_TO))) {
-		msg_to_char(ch, "Nothing can be planted here.\r\n");
-	}
-	else if (ROOM_AFF_FLAGGED(IN_ROOM(ch), ROOM_AFF_NO_EVOLVE)) {
-		msg_to_char(ch, "You can't plant here right now.\r\n");
 	}
 	else if (!MATCH_CROP_SECTOR_CLIMATE(cp, SECT(IN_ROOM(ch)))) {
 		if (CROP_FLAGGED(cp, CROPF_ANY_LISTED_CLIMATE)) {
