@@ -5328,21 +5328,65 @@ ACMD(do_drop) {
 
 
 ACMD(do_eat) {
+	struct string_hash *str_iter, *next_str, *str_hash = NULL;
 	bool extract = FALSE, will_buff = FALSE;
-	char buf[MAX_STRING_LENGTH], *argptr = arg;
+	char buf[MAX_STRING_LENGTH], line[256], *argptr = arg;
 	struct affected_type *af;
 	struct obj_apply *apply;
-	obj_data *food;
-	int eat_hours, number;
+	obj_data *food, *check_list[2], *obj;
+	int eat_hours, number, iter;
+	size_t size;
 
 	one_argument(argument, arg);
 	number = get_number(&argptr);
 	
 	// 1. basic validation
-	if (REAL_NPC(ch))		/* Cannot use GET_COND() on mobs. */
+	if (REAL_NPC(ch)) {		/* Cannot use GET_COND() on mobs. */
 		return;
-	if (!*argptr) {
-		send_to_char("Eat what?\r\n", ch);
+	}
+	if (!*argptr) {	// no-arg: try to show edibles
+		// check inventory for edibles...
+		check_list[0] = ch->carrying;
+		check_list[1] = ROOM_CONTENTS(IN_ROOM(ch));
+		for (iter = 0; iter < 2; ++iter) {
+			if (check_list[iter]) {
+				DL_FOREACH2(check_list[iter], obj, next_content) {
+					if (IS_FOOD(obj)) {
+						snprintf(line, sizeof(line), "%s - %d hour%s%s", GET_OBJ_DESC(obj, ch, OBJ_DESC_SHORT), GET_FOOD_HOURS_OF_FULLNESS(obj), PLURAL(GET_FOOD_HOURS_OF_FULLNESS(obj)), (GET_OBJ_APPLIES(obj) || GET_OBJ_AFF_FLAGS(obj)) ? ", buff" : "");
+						add_string_hash(&str_hash, line, 1);
+					}
+				}
+			}
+		}
+		
+		if (str_hash) {
+			// show plantables
+			size = snprintf(buf, sizeof(buf), "What do you want to eat:\r\n");
+			HASH_ITER(hh, str_hash, str_iter, next_str) {
+				if (str_iter->count == 1) {
+					snprintf(line, sizeof(line), " %s\r\n", str_iter->str);
+				}
+				else {
+					snprintf(line, sizeof(line), " %s (x%d)\r\n", str_iter->str, str_iter->count);
+				}
+				if (size + strlen(line) + 16 < sizeof(buf)) {
+					strcat(buf, line);
+					size += strlen(line);
+				}
+				else {
+					size += snprintf(buf + size, sizeof(buf) - size, "OVERFLOW\r\n");
+					break;
+				}
+			}
+			free_string_hash(&str_hash);
+			if (ch->desc) {
+				page_string(ch->desc, buf, TRUE);
+			}
+		}
+		else {
+			// nothing to plant
+			msg_to_char(ch, "Eat what?\r\n");
+		}
 		return;
 	}
 	if (!(food = get_obj_in_list_vis(ch, argptr, &number, ch->carrying))) {
