@@ -1033,6 +1033,9 @@ elseif %obj.vnum% == 11836 && release /= %cmd%
 elseif %obj% != %self%
   %send% %actor% You can't do that with @%obj%.
   halt
+elseif !(Sitting Standing Resting ~= %actor.position%)
+  %send% %actor% You can't do that right now.
+  halt
 end
 * check vnum
 if %self.vnum% == 11913
