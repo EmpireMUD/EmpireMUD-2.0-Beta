@@ -340,7 +340,8 @@ while %person%
       %send% %person% You take them.
     else
       nop %person.give_currency(12650, 1)%
-      %send% %person% As ~%self% dies, a %currency.12650(1)% falls to the ground!
+      set curname %currency.12650(1)%
+      %send% %person% As ~%self% dies, %curname.ana% %curname% falls to the ground!
       %send% %person% You take the newly created token.
     end
   end
@@ -1073,7 +1074,8 @@ while %cycles_left% >= 0
       while %person%
         if %person.is_pc% && %person.on_quest(12650)%
           if %give_token%
-            %send% %person% You receive a %currency.12650(1)%.
+            set curname %currency.12650(1)%.
+            %send% %person% You receive %curname.ana% %curname%.
             nop %person.give_currency(12650, 1)%
           end
           if %done%
@@ -1411,7 +1413,8 @@ if %success% && !%failure%
   while %person%
     if %person.is_pc% && %person.on_quest(12650)%
       if %give_token%
-        %send% %person% You receive a %currency.12650(1)%.
+        set curname %currency.12650(1)%
+        %send% %person% You receive %curname.ana% %curname%.
         nop %person.give_currency(12650, 1)%
       end
       if %done%

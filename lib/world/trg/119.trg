@@ -7264,8 +7264,8 @@ while %pos% > 0
 done
 * message
 dg_affect #%vnum% %ch% %type% %amount% 300
-%send% %ch% ~%self% %verb% itself toward you... you take on a %glow% glow.
-%echoaround% %ch% ~%self% %verb% itself toward ~%ch%... &%ch% takes on a %glow% glow.
+%send% %ch% ~%self% %verb% itself toward you... you take on %glow.ana% %glow% glow.
+%echoaround% %ch% ~%self% %verb% itself toward ~%ch%... &%ch% takes on %glow.ana% %glow% glow.
 ~
 #11991
 Skycleave: Barrosh storytime using script1-3~
