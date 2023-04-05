@@ -27,8 +27,12 @@ if (%actor.nohassle% || !%tricky% || %self.disabled% || %self.position% != Stand
   halt
 end
 * pixies allow the player to pass if they have given a gift to the queen
-if %pixy_vnums% ~= %self.vnum% && %actor.varexists(skycleave_queen)%
-  if %actor.skycleave_queen% == %dailycycle%
+if %pixy_vnums% ~= %self.vnum%
+  if %actor.var(skycleave_queen,0)% == %dailycycle%
+    halt
+  end
+  * or they're playing the flute?
+  if %actor.action% == playing && %actor.eq(hold).vnum% == 11877
     halt
   end
 end
@@ -123,6 +127,17 @@ switch %self.vnum%
     * shimmer and spirits
     %send% %actor% You can't pickpocket someone who doesn't even have a body.
   break
+  case 11829
+  case 11834
+  case 11934
+    * Otherworlder
+    %send% %actor% If it has any pockets, you're not sure where.
+  break
+  case 11863
+  case 11869
+    * Shade/Shadow
+    %send% %actor% That's just a shadow; it doesn't have any pockets.
+  break
   case 11866
   case 11871
     * Mezvienne
@@ -157,6 +172,14 @@ switch %self.vnum%
   case 11917
     * prevents global pickpocket
     %send% %actor% Someone has already emptied the goblin's pockets.
+  break
+  case 11928
+    * First Water
+    %send% %actor% You seem to be the only thing in its pocket!
+  break
+  case 11937
+    * skeleton
+    %send% %actor% You check the skeleton's pockets, which are on the floor, but someone has beaten you to it.
   break
   default
     %send% %actor% There's no way to get close enough to pickpocket ~%self% without *%self% noticing.
@@ -8734,9 +8757,9 @@ if !%target%
 end
 * 3. Future use: Restrictions on who can use it, e.g. based on faction
 * 4. Teleport player
-%send% %actor% Before you can stop yourself, you reach out and %cmd.mudcommand% the sap...
+%send% %actor% Before you can stop yourself, you reach out and %cmd% the sap...
 %send% %actor% Everything goes black...
-%echoaround% %actor% ~%actor%'s eyes go hazy as &%actor% reaches out and %cmd.mudcommand%s the putrid sap.
+%echoaround% %actor% ~%actor%'s eyes go hazy as &%actor% reaches out and %cmd%s the putrid sap.
 %echoaround% %actor% ~%actor% falls unconscious into the sap and vanishes beneath its sticky surface.
 %teleport% %actor% %target%
 if %intro%
