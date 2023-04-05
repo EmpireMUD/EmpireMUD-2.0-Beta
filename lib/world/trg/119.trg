@@ -2728,7 +2728,7 @@ elseif open /= %cmd% && (%room.template% == 11839 || %room.template% == 11939)
 elseif search /= %cmd% && (%room.template% == 11815 || %room.template% == 11915)
   * goblin cages: searching without skill?
   if !%actor.ability(Search)%
-    %send% %actor% You search around but don't see anything special.
+    %send% %actor% You try to search around the bin, but whatever you're looking for, you don't have the skill to find it.
     %echoaround% %actor% ~%actor% searches around the room.
     return 1
   end
