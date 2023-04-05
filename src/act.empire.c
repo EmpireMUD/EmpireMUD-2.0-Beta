@@ -3027,10 +3027,10 @@ void scan_for_tile(char_data *ch, char *argument, int max_dist, bitvector_t only
 	bool ok, claimed, unclaimed, foreign, adventures, check_blocking, is_blocked, blocking_veh;
 	size_t vsize;
 	
-	const bitvector_t north_dirs = BIT(NORTH) | BIT(NORTHWEST) | BIT(NORTHEAST);
-	const bitvector_t east_dirs = BIT(EAST) | BIT(SOUTHEAST) | BIT(NORTHEAST);
-	const bitvector_t south_dirs = BIT(SOUTH) | BIT(SOUTHWEST) | BIT(SOUTHEAST);
-	const bitvector_t west_dirs = BIT(WEST) | BIT(SOUTHWEST) | BIT(NORTHWEST);
+	static bitvector_t north_dirs = BIT(NORTH) | BIT(NORTHWEST) | BIT(NORTHEAST);
+	static bitvector_t east_dirs = BIT(EAST) | BIT(SOUTHEAST) | BIT(NORTHEAST);
+	static bitvector_t south_dirs = BIT(SOUTH) | BIT(SOUTHWEST) | BIT(SOUTHEAST);
+	static bitvector_t west_dirs = BIT(WEST) | BIT(SOUTHWEST) | BIT(NORTHWEST);
 	
 	skip_spaces(&argument);
 	

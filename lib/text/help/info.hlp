@@ -1416,6 +1416,7 @@ SCAN
 Usage:  scan <direction>
         scan <tile/vehicle name>
         scan <claimed/unclaimed/foreign/adventures>
+        scan [max-distance] [-direction]
 
 This command shows you the same information as the screen-reader map display,
 but in only one direction. The distance you see on a scan is based on your
@@ -1430,6 +1431,11 @@ You can get extra information if you have the 'political' or 'informative'
 toggles turned on. Scanning for 'foreign' tiles will show ones owned by empires
 other than your own. However, dimly lit tiles won't appear on political or
 informative at night.
+
+All scans may include the max-distance and -direction modifiers. This lets you
+specify a shorter distance, such as "scan 1" or "scan forest 3", or filter a
+specific direction from a larger scan, such as "scan forest -east". This is
+different from scanning in a direction with "scan east".
 
 Example:
  > scan southwest

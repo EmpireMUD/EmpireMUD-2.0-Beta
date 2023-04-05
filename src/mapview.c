@@ -47,7 +47,7 @@ vehicle_data *find_vehicle_to_show(char_data *ch, room_data *room);
 ACMD(do_exits);
 char *get_screenreader_room_name(char_data *ch, room_data *from_room, room_data *to_room, bool show_dark);
 char *screenread_one_tile(char_data *ch, room_data *origin, room_data *to_room, bool show_dark);
-void show_screenreader_room(char_data *ch, room_data *room, bitvector_t options);
+void show_screenreader_room(char_data *ch, room_data *room, bitvector_t options, int max_dist, bitvector_t only_in_dirs);
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -1282,7 +1282,10 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options) {
 				send_to_char(output, ch);
 			}
 			if (!PRF_FLAGGED(ch, PRF_NO_EXITS)) {
-				show_screenreader_room(ch, room, options);
+				show_screenreader_room(ch, room, options, mapsize, NOBITS);
+				if (!IS_SET(options, LRR_SHIP_PARTIAL | LRR_LOOK_OUT)) {
+					msg_to_char(ch, "Here:\r\n");
+				}
 			}
 		}
 		else {	// ASCII map view
@@ -2465,17 +2468,36 @@ char *screenread_one_tile(char_data *ch, room_data *origin, room_data *to_room, 
 * @param char_data *ch The player "looking" at the room.
 * @param room_data *room What we're looking at.
 * @param bitvector_t options Any LLR_x flags that get passed along.
+* @param int max_dist Maximum view distance.
+* @param bitvector_t only_in_dirs Optional: Filters out directions not in this list (NOBITS for all-dirs).
 */
-void show_screenreader_room(char_data *ch, room_data *room, bitvector_t options) {
+void show_screenreader_room(char_data *ch, room_data *room, bitvector_t options, int max_dist, bitvector_t only_in_dirs) {
 	int each_dir, north = get_north_for_char(ch);
+	
+	static bitvector_t north_dirs = BIT(NORTH) | BIT(NORTHWEST) | BIT(NORTHEAST);
+	static bitvector_t east_dirs = BIT(EAST) | BIT(SOUTHEAST) | BIT(NORTHEAST);
+	static bitvector_t south_dirs = BIT(SOUTH) | BIT(SOUTHWEST) | BIT(SOUTHEAST);
+	static bitvector_t west_dirs = BIT(WEST) | BIT(SOUTHWEST) | BIT(NORTHWEST);
 		
 	// each_dir: iterate over directions and show them in order
 	for (each_dir = 0; each_dir < NUM_2D_DIRS; ++each_dir) {
-		screenread_one_dir(ch, room, confused_dirs[north][0][each_dir], GET_MAPSIZE(ch));
-	}
-	
-	if (!IS_SET(options, LRR_SHIP_PARTIAL | LRR_LOOK_OUT)) {
-		msg_to_char(ch, "Here:\r\n");
+		// check if directions were requested (x):
+		if (only_in_dirs) {
+			if ((each_dir == NORTH || each_dir == NORTHWEST || each_dir == NORTHEAST) && IS_SET(only_in_dirs, south_dirs) && !IS_SET(only_in_dirs, north_dirs)) {
+				continue;
+			}
+			if ((each_dir == SOUTH || each_dir == SOUTHWEST || each_dir == SOUTHEAST) && IS_SET(only_in_dirs, north_dirs) && !IS_SET(only_in_dirs, south_dirs)) {
+				continue;
+			}
+			if ((each_dir == EAST || each_dir == NORTHEAST || each_dir == SOUTHEAST) && IS_SET(only_in_dirs, west_dirs) && !IS_SET(only_in_dirs, east_dirs)) {
+				continue;
+			}
+			if ((each_dir == WEST || each_dir == NORTHWEST || each_dir == SOUTHWEST) && IS_SET(only_in_dirs, east_dirs) && !IS_SET(only_in_dirs, west_dirs)) {
+				continue;
+			}
+		}
+		
+		screenread_one_dir(ch, room, confused_dirs[north][0][each_dir], max_dist);
 	}
 }
 
@@ -2902,13 +2924,12 @@ ACMD(do_scan) {
 	}
 	else if (dist >= 0 && !*new_arg) {
 		// normal 'screenreader look' scan with a custom distance
-		// TODO: dist, dir modifiers
-		look_at_room_by_loc(ch, use_room, NOBITS);
+		show_screenreader_room(ch, use_room, NOBITS, (dist != -1) ? dist : GET_MAPSIZE(ch), dir_modifiers);
 	}
 	else if ((dir = parse_direction(ch, new_arg)) == NO_DIR) {
 		// scanning by tile name
 		clear_recent_moves(ch);
-		scan_for_tile(ch, new_arg, (dist != -1) ? dist : get_map_radius(ch), dir_modifiers);
+		scan_for_tile(ch, new_arg, (dist != -1) ? dist : GET_MAPSIZE(ch), dir_modifiers);
 		gain_player_tech_exp(ch, PTECH_MAP_MEMORY, 0.1);
 	}
 	else if (dir >= NUM_2D_DIRS) {
