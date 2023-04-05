@@ -2922,7 +2922,7 @@ ACMD(do_scan) {
 	else if (!*new_arg && dist == -1 && dir_modifiers == NOBITS) {
 		msg_to_char(ch, "Scan which direction or for what type of tile?\r\n");
 	}
-	else if (dist >= 0 && !*new_arg) {
+	else if (!*new_arg && (dist >= 0 || dir_modifiers)) {
 		// normal 'screenreader look' scan with a custom distance
 		show_screenreader_room(ch, use_room, NOBITS, (dist != -1) ? dist : GET_MAPSIZE(ch), dir_modifiers);
 	}

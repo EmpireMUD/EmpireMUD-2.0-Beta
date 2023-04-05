@@ -3059,10 +3059,10 @@ void scan_for_tile(char_data *ch, char *argument, int max_dist, bitvector_t only
 	for (x = -max_dist; x <= max_dist; ++x) {
 		// check if directions were requested (x):
 		if (only_in_dirs) {
-			if (IS_SET(only_in_dirs, west_dirs) && !IS_SET(only_in_dirs, east_dirs) && x >= 0) {
+			if (IS_SET(only_in_dirs, west_dirs) && !IS_SET(only_in_dirs, east_dirs) && x > 0) {
 				continue;	// not west
 			}
-			if (IS_SET(only_in_dirs, east_dirs) && !IS_SET(only_in_dirs, west_dirs) && x <= 0) {
+			if (IS_SET(only_in_dirs, east_dirs) && !IS_SET(only_in_dirs, west_dirs) && x < 0) {
 				continue;	// not east
 			}
 		}
@@ -3070,10 +3070,10 @@ void scan_for_tile(char_data *ch, char *argument, int max_dist, bitvector_t only
 		for (y = -max_dist; y <= max_dist; ++y) {
 			// check if directions were requested (y):
 			if (only_in_dirs) {
-				if (IS_SET(only_in_dirs, south_dirs) && !IS_SET(only_in_dirs, north_dirs) && y >= 0) {
+				if (IS_SET(only_in_dirs, south_dirs) && !IS_SET(only_in_dirs, north_dirs) && y > 0) {
 					continue;	// not south
 				}
-				if (IS_SET(only_in_dirs, north_dirs) && !IS_SET(only_in_dirs, south_dirs) && y <= 0) {
+				if (IS_SET(only_in_dirs, north_dirs) && !IS_SET(only_in_dirs, south_dirs) && y < 0) {
 					continue;	// not north
 				}
 			}
