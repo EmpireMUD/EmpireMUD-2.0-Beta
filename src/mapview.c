@@ -2474,15 +2474,33 @@ char *screenread_one_tile(char_data *ch, room_data *origin, room_data *to_room, 
 void show_screenreader_room(char_data *ch, room_data *room, bitvector_t options, int max_dist, bitvector_t only_in_dirs) {
 	int each_dir, north = get_north_for_char(ch);
 	
-	static bitvector_t north_dirs = BIT(NORTH) | BIT(NORTHWEST) | BIT(NORTHEAST);
-	static bitvector_t east_dirs = BIT(EAST) | BIT(SOUTHEAST) | BIT(NORTHEAST);
-	static bitvector_t south_dirs = BIT(SOUTH) | BIT(SOUTHWEST) | BIT(SOUTHEAST);
-	static bitvector_t west_dirs = BIT(WEST) | BIT(SOUTHWEST) | BIT(NORTHWEST);
+	// static bitvector_t north_dirs = BIT(NORTH) | BIT(NORTHWEST) | BIT(NORTHEAST);
+	// static bitvector_t east_dirs = BIT(EAST) | BIT(SOUTHEAST) | BIT(NORTHEAST);
+	// static bitvector_t south_dirs = BIT(SOUTH) | BIT(SOUTHWEST) | BIT(SOUTHEAST);
+	// static bitvector_t west_dirs = BIT(WEST) | BIT(SOUTHWEST) | BIT(NORTHWEST);
+	
+	// expand slightly
+	if (only_in_dirs == BIT(NORTH)) {
+		only_in_dirs |= BIT(NORTHEAST) | BIT(NORTHWEST);
+	}
+	if (only_in_dirs == BIT(SOUTH)) {
+		only_in_dirs |= BIT(SOUTHEAST) | BIT(SOUTHWEST);
+	}
+	if (only_in_dirs == BIT(EAST)) {
+		only_in_dirs |= BIT(NORTHEAST) | BIT(SOUTHEAST);
+	}
+	if (only_in_dirs == BIT(WEST)) {
+		only_in_dirs |= BIT(NORTHWEST) | BIT(SOUTHWEST);
+	}
 		
 	// each_dir: iterate over directions and show them in order
 	for (each_dir = 0; each_dir < NUM_2D_DIRS; ++each_dir) {
 		// check if directions were requested (x):
 		if (only_in_dirs) {
+			if (!IS_SET(only_in_dirs, BIT(each_dir))) {
+				continue;
+			}
+			/*
 			if ((each_dir == NORTH || each_dir == NORTHWEST || each_dir == NORTHEAST) && IS_SET(only_in_dirs, south_dirs) && !IS_SET(only_in_dirs, north_dirs)) {
 				continue;
 			}
@@ -2495,6 +2513,7 @@ void show_screenreader_room(char_data *ch, room_data *room, bitvector_t options,
 			if ((each_dir == WEST || each_dir == NORTHWEST || each_dir == SOUTHWEST) && IS_SET(only_in_dirs, east_dirs) && !IS_SET(only_in_dirs, west_dirs)) {
 				continue;
 			}
+			*/
 		}
 		
 		screenread_one_dir(ch, room, confused_dirs[north][0][each_dir], max_dist);
