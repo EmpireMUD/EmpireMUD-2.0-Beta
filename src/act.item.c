@@ -5021,6 +5021,9 @@ ACMD(do_drink) {
 					DL_FOREACH2(check_list[iter], obj, next_content) {
 						if (IS_DRINK_CONTAINER(obj)) {
 							snprintf(line, sizeof(line), "%s - %d drink%s", GET_OBJ_DESC(obj, ch, OBJ_DESC_SHORT), GET_DRINK_CONTAINER_CONTENTS(obj), PLURAL(GET_DRINK_CONTAINER_CONTENTS(obj)));
+							if (GET_DRINK_CONTAINER_CONTENTS(obj) > 0) {
+								snprintf(line + strlen(line), sizeof(line) - strlen(line), " of %s", get_generic_string_by_vnum(GET_DRINK_CONTAINER_TYPE(obj), GENERIC_LIQUID, GSTR_LIQUID_NAME));
+							}
 							add_string_hash(&str_hash, line, 1);
 						}
 					}
