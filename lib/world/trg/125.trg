@@ -10,6 +10,9 @@ if !%instance.start%
   %echo% ~%self% disappears! Or... was it ever there in the first place?
   %purge% %self%
   halt
+elseif %actor.position% != Standing
+  %send% %actor% You can't do that right now.
+  halt
 end
 set room i12501
 set start_room %actor.room%
@@ -42,6 +45,10 @@ if !%colossus%
   set colossus %instance.mob(12501)%
 end
 set room %actor.room%
+if %actor.position% != Standing
+  %send% %actor% You can't do that right now.
+  halt
+end
 if %colossus%
   %send% %actor% You drop down from your perch on ~%colossus% to the ground below.
   %echoaround% %actor% ~%actor% drops down from ^%actor% perch on ~%colossus% to the ground below.
@@ -109,11 +116,13 @@ done
 Colossus eye lasers: dodge command~
 0 c 0
 dodge~
-if !%self.varexists(running)%
+if %actor.position% != Standing && %actor.position% != Fighting
+  %send% %actor% You can't do that right now.
+  halt
+elseif !%self.varexists(running)%
   %send% %actor% There's nothing to dodge.
   halt
-end
-if !%self.running%
+elseif !%self.running%
   %send% %actor% There's nothing to dodge.
   halt
 end

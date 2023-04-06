@@ -312,7 +312,7 @@ plumbing its depths. Surely there are a few more...
    On your third trip around the fountain, you notice a hot cup of tea sitting
 abandoned on the bench, and pick it up.
 ~
-9 0 150 250 -1
+10 0 150 250 -1
 A
 2 11919
 P
@@ -338,9 +338,9 @@ W
 W
 13 11890 0 1 a
 W
-13 11993 0 1 a
-W
 13 11994 0 1 a
+W
+13 11993 0 1 a
 Z
 2 11906
 S

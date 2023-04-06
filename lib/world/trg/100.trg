@@ -490,8 +490,8 @@ if !%actor.can_afford(%cost%)%
 end
 nop %actor.charge_coins(%cost%)%
 %load% obj %vnum% %actor% inv
-%send% %actor% You buy a %named% for %cost% coins.
-%echoaround% %actor% ~%actor% buys a %named%.
+%send% %actor% You buy %named.ana% %named% for %cost% coins.
+%echoaround% %actor% ~%actor% buys %named.ana% %named%.
 ~
 #10034
 Teacher passive~

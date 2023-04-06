@@ -832,7 +832,7 @@ OLC_MODULE(cedit_builds) {
 		msg_to_char(ch, "You can't set it to build a ROOM type building. Old value restored.\r\n");
 	}	
 	else {
-		msg_to_char(ch, "It now builds a %s.\r\n", GET_BLD_NAME(building_proto(GET_CRAFT_BUILD_TYPE(craft))));
+		msg_to_char(ch, "It now builds %s %s.\r\n", AN(GET_BLD_NAME(building_proto(GET_CRAFT_BUILD_TYPE(craft)))), GET_BLD_NAME(building_proto(GET_CRAFT_BUILD_TYPE(craft))));
 	}
 }
 

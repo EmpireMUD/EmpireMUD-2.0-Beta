@@ -50,7 +50,6 @@ struct instance_data *build_instance_loc(adv_data *adv, struct adventure_link_ru
 void Crash_listrent(char_data *ch, char *name);
 void do_stat_vehicle(char_data *ch, vehicle_data *veh);
 room_data *find_location_for_rule(adv_data *adv, struct adventure_link_rule *rule, int *which_dir);
-struct generic_name_data *get_best_name_list(int name_set, int sex);
 void update_account_stats();
 
 // locals
@@ -5691,7 +5690,7 @@ SHOW(show_storage) {
 	else {
 		// ok to show: init string/size
 		if (find_bld) {
-			size = snprintf(buf, sizeof(buf), "Objects that can be stored in a %s:\r\n", GET_BLD_NAME(find_bld));
+			size = snprintf(buf, sizeof(buf), "Objects that can be stored in %s %s:\r\n", AN(GET_BLD_NAME(find_bld)), GET_BLD_NAME(find_bld));
 		}
 		else if (find_veh) {
 			size = snprintf(buf, sizeof(buf), "Objects that can be stored in %s:\r\n", VEH_SHORT_DESC(find_veh));
@@ -8370,24 +8369,22 @@ ACMD(do_dc) {
 
 // do_directions
 ACMD(do_distance) {
-	char arg[MAX_INPUT_LENGTH], *ptr, *dir_str;
+	char *dir_str;
 	room_data *target;
 	int dist;
 	
-	one_word(argument, arg);
-	ptr = arg;
-	skip_spaces(&ptr);
+	skip_spaces(&argument);
 	
 	if (!IS_IMMORTAL(ch) && !IS_NPC(ch) && !HAS_NAVIGATION(ch)) {
 		msg_to_char(ch, "You don't know how to navigate or determine distances.\r\n");
 	}
-	else if (!*ptr) {
+	else if (!*argument) {
 		msg_to_char(ch, "Get the direction and distance to where?\r\n");
 	}
-	else if (!IS_IMMORTAL(ch) && (!isdigit(*ptr) || !strchr(ptr, ','))) {
+	else if (!IS_IMMORTAL(ch) && (!isdigit(*argument) || !strchr(argument, ','))) {
 		msg_to_char(ch, "You can only find distances to coordinates.\r\n");
 	}
-	else if (!(target = find_target_room(ch, ptr))) {
+	else if (!(target = parse_room_from_coords(argument)) && !(target = find_target_room(ch, argument))) {
 		msg_to_char(ch, "Unknown target.\r\n");
 	}
 	else {	

@@ -47,7 +47,7 @@ vehicle_data *find_vehicle_to_show(char_data *ch, room_data *room);
 ACMD(do_exits);
 char *get_screenreader_room_name(char_data *ch, room_data *from_room, room_data *to_room, bool show_dark);
 char *screenread_one_tile(char_data *ch, room_data *origin, room_data *to_room, bool show_dark);
-void show_screenreader_room(char_data *ch, room_data *room, bitvector_t options);
+void show_screenreader_room(char_data *ch, room_data *room, bitvector_t options, int max_dist, bitvector_t only_in_dirs);
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -1282,7 +1282,10 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options) {
 				send_to_char(output, ch);
 			}
 			if (!PRF_FLAGGED(ch, PRF_NO_EXITS)) {
-				show_screenreader_room(ch, room, options);
+				show_screenreader_room(ch, room, options, mapsize, NOBITS);
+				if (!IS_SET(options, LRR_SHIP_PARTIAL | LRR_LOOK_OUT)) {
+					msg_to_char(ch, "Here:\r\n");
+				}
 			}
 		}
 		else {	// ASCII map view
@@ -2247,12 +2250,13 @@ char *get_screenreader_room_name(char_data *ch, room_data *from_room, room_data 
 *
 * @param char_data *ch The player.
 * @param room_data *origin Where the player is looking from.
-* @paraim int dir The direction they are looking.
+* @param int dir The direction they are looking.
+* @param int max_dist How far to show (invalid distances <= 0 will use the default map size).
 */
-void screenread_one_dir(char_data *ch, room_data *origin, int dir) {
+void screenread_one_dir(char_data *ch, room_data *origin, int dir, int max_dist) {
 	char buf[MAX_STRING_LENGTH], roombuf[MAX_INPUT_LENGTH], lastroom[MAX_INPUT_LENGTH];
 	char dirbuf[MAX_STRING_LENGTH];
-	int mapsize, dist, dist_iter, can_see_in_dark_distance, view_height, r_height;
+	int dist, dist_iter, can_see_in_dark_distance, view_height, r_height;
 	room_data *to_room;
 	int repeats, top_height;
 	bool blocking_veh, check_blocking, is_blocked = FALSE;
@@ -2263,9 +2267,9 @@ void screenread_one_dir(char_data *ch, room_data *origin, int dir) {
 		return;	// nobody to show it to
 	}
 	
-	mapsize = GET_MAPSIZE(REAL_CHAR(ch));
-	if (mapsize == 0) {
-		mapsize = config_get_int("default_map_size");
+	// safety
+	if (max_dist <= 0) {
+		max_dist = config_get_int("default_map_size");
 	}
 
 	// setup
@@ -2278,7 +2282,7 @@ void screenread_one_dir(char_data *ch, room_data *origin, int dir) {
 	view_height = get_view_height(ch, origin);
 
 	// show distance that direction		
-	for (dist_iter = 1; dist_iter <= mapsize; ++dist_iter) {
+	for (dist_iter = 1; dist_iter <= max_dist; ++dist_iter) {
 		to_room = real_shift(origin, shift_dir[dir][0] * dist_iter, shift_dir[dir][1] * dist_iter);
 		
 		if (!to_room) {
@@ -2464,17 +2468,55 @@ char *screenread_one_tile(char_data *ch, room_data *origin, room_data *to_room, 
 * @param char_data *ch The player "looking" at the room.
 * @param room_data *room What we're looking at.
 * @param bitvector_t options Any LLR_x flags that get passed along.
+* @param int max_dist Maximum view distance.
+* @param bitvector_t only_in_dirs Optional: Filters out directions not in this list (NOBITS for all-dirs).
 */
-void show_screenreader_room(char_data *ch, room_data *room, bitvector_t options) {
+void show_screenreader_room(char_data *ch, room_data *room, bitvector_t options, int max_dist, bitvector_t only_in_dirs) {
 	int each_dir, north = get_north_for_char(ch);
+	
+	// static bitvector_t north_dirs = BIT(NORTH) | BIT(NORTHWEST) | BIT(NORTHEAST);
+	// static bitvector_t east_dirs = BIT(EAST) | BIT(SOUTHEAST) | BIT(NORTHEAST);
+	// static bitvector_t south_dirs = BIT(SOUTH) | BIT(SOUTHWEST) | BIT(SOUTHEAST);
+	// static bitvector_t west_dirs = BIT(WEST) | BIT(SOUTHWEST) | BIT(NORTHWEST);
+	
+	// expand slightly
+	if (only_in_dirs == BIT(NORTH)) {
+		only_in_dirs |= BIT(NORTHEAST) | BIT(NORTHWEST);
+	}
+	if (only_in_dirs == BIT(SOUTH)) {
+		only_in_dirs |= BIT(SOUTHEAST) | BIT(SOUTHWEST);
+	}
+	if (only_in_dirs == BIT(EAST)) {
+		only_in_dirs |= BIT(NORTHEAST) | BIT(SOUTHEAST);
+	}
+	if (only_in_dirs == BIT(WEST)) {
+		only_in_dirs |= BIT(NORTHWEST) | BIT(SOUTHWEST);
+	}
 		
 	// each_dir: iterate over directions and show them in order
 	for (each_dir = 0; each_dir < NUM_2D_DIRS; ++each_dir) {
-		screenread_one_dir(ch, room, confused_dirs[north][0][each_dir]);
-	}
-	
-	if (!IS_SET(options, LRR_SHIP_PARTIAL | LRR_LOOK_OUT)) {
-		msg_to_char(ch, "Here:\r\n");
+		// check if directions were requested (x):
+		if (only_in_dirs) {
+			if (!IS_SET(only_in_dirs, BIT(each_dir))) {
+				continue;
+			}
+			/*
+			if ((each_dir == NORTH || each_dir == NORTHWEST || each_dir == NORTHEAST) && IS_SET(only_in_dirs, south_dirs) && !IS_SET(only_in_dirs, north_dirs)) {
+				continue;
+			}
+			if ((each_dir == SOUTH || each_dir == SOUTHWEST || each_dir == SOUTHEAST) && IS_SET(only_in_dirs, north_dirs) && !IS_SET(only_in_dirs, south_dirs)) {
+				continue;
+			}
+			if ((each_dir == EAST || each_dir == NORTHEAST || each_dir == SOUTHEAST) && IS_SET(only_in_dirs, west_dirs) && !IS_SET(only_in_dirs, east_dirs)) {
+				continue;
+			}
+			if ((each_dir == WEST || each_dir == NORTHWEST || each_dir == SOUTHWEST) && IS_SET(only_in_dirs, east_dirs) && !IS_SET(only_in_dirs, west_dirs)) {
+				continue;
+			}
+			*/
+		}
+		
+		screenread_one_dir(ch, room, confused_dirs[north][0][each_dir], max_dist);
 	}
 }
 
@@ -2846,17 +2888,45 @@ ACMD(do_mapscan) {
 
 
 ACMD(do_scan) {
-	int dir;
+	char arg[MAX_INPUT_LENGTH], new_arg[MAX_INPUT_LENGTH];
+	bitvector_t dir_modifiers = NOBITS;
+	int dir, dist = -1, val;
 	
 	room_data *use_room = (GET_MAP_LOC(IN_ROOM(ch)) ? real_room(GET_MAP_LOC(IN_ROOM(ch))->vnum) : NULL);
 	
-	skip_spaces(&argument);
+	// this will hold the final argument
+	*new_arg = '\0';
 	
+	// parse argument for optional modifiers
+	while (*argument) {
+		argument = any_one_word(argument, arg);
+		
+		if (*arg == '-' && *(arg+1)) {
+			// -dir modifier (or maybe -dist)
+			if (isdigit(*(arg+1))) {
+				dist = atoi(arg+1);
+			}
+			else if ((val = parse_direction(ch, arg+1)) == NO_DIR) {
+				msg_to_char(ch, "Invalid direction modifier '%s'.\r\n", arg+1);
+				return;
+			}
+			else {
+				// accept direction modifier
+				dir_modifiers |= BIT(val);
+			}
+		}
+		else if (isdigit(*arg)) {
+			dist = atoi(arg);
+		}
+		else {
+			// anything else, we keep
+			snprintf(new_arg + strlen(new_arg), sizeof(new_arg) - strlen(new_arg), "%s%s", *new_arg ? " " : "", arg);
+		}
+	}
+	
+	// basic checks
 	if (AFF_FLAGGED(ch, AFF_BLIND)) {
 		msg_to_char(ch, "You can't see a damned thing, you're blind!\r\n");
-	}
-	else if (!*argument) {
-		msg_to_char(ch, "Scan which direction or for what type of tile?\r\n");
 	}
 	else if (!use_room || IS_ADVENTURE_ROOM(use_room) || ROOM_IS_CLOSED(use_room)) {	// check map room
 		msg_to_char(ch, "You can only use scan out on the map.\r\n");
@@ -2864,17 +2934,31 @@ ACMD(do_scan) {
 	else if ((!GET_ROOM_VEHICLE(IN_ROOM(ch)) || !CAN_LOOK_OUT(IN_ROOM(ch))) && (IS_ADVENTURE_ROOM(IN_ROOM(ch)) || ROOM_IS_CLOSED(IN_ROOM(ch)))) {
 		msg_to_char(ch, "Scan only works out on the map.\r\n");
 	}
-	else if ((dir = parse_direction(ch, argument)) == NO_DIR) {
+	else if (dist == 0 || dist > config_get_int("max_map_size")) {
+		// IF they specified a distance
+		msg_to_char(ch, "Distance must be between 1 and %d.\r\n", config_get_int("max_map_size"));
+	}
+	else if (!*new_arg && dist == -1 && dir_modifiers == NOBITS) {
+		msg_to_char(ch, "Scan which direction or for what type of tile?\r\n");
+	}
+	else if (!*new_arg && (dist >= 0 || dir_modifiers)) {
+		// normal 'screenreader look' scan with a custom distance
+		show_screenreader_room(ch, use_room, NOBITS, (dist != -1) ? dist : GET_MAPSIZE(ch), dir_modifiers);
+	}
+	else if ((dir = parse_direction(ch, new_arg)) == NO_DIR) {
+		// scanning by tile name
 		clear_recent_moves(ch);
-		scan_for_tile(ch, argument);
+		scan_for_tile(ch, new_arg, (dist != -1) ? dist : GET_MAPSIZE(ch), dir_modifiers);
 		gain_player_tech_exp(ch, PTECH_MAP_MEMORY, 0.1);
 	}
 	else if (dir >= NUM_2D_DIRS) {
+		// found a dir but not a valid one
 		msg_to_char(ch, "You can't scan that way.\r\n");
 	}
 	else {
+		// valid dir: scan in one line
 		clear_recent_moves(ch);
-		screenread_one_dir(ch, use_room, dir);
+		screenread_one_dir(ch, use_room, dir, (dist != -1) ? dist : GET_MAPSIZE(ch));
 		gain_player_tech_exp(ch, PTECH_MAP_MEMORY, 0.1);
 	}
 }

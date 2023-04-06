@@ -551,6 +551,7 @@ void look_at_target(char_data *ch, char *arg, char *more_args, bool look_inside)
 */
 void look_in_obj(char_data *ch, char *arg, obj_data *obj, vehicle_data *veh) {
 	char buf[MAX_STRING_LENGTH];
+	const char *gstr;
 	char_data *dummy = NULL;
 	int amt, bits = 0;
 
@@ -595,7 +596,8 @@ void look_in_obj(char_data *ch, char *arg, obj_data *obj, vehicle_data *veh) {
 				}
 				else {
 					amt = (GET_DRINK_CONTAINER_CONTENTS(obj) * 3) / GET_DRINK_CONTAINER_CAPACITY(obj);
-					sprintf(buf, "It's %sfull of a %s liquid.\r\n", fullness[amt], get_generic_string_by_vnum(GET_DRINK_CONTAINER_TYPE(obj), GENERIC_LIQUID, GSTR_LIQUID_COLOR));
+					gstr = get_generic_string_by_vnum(GET_DRINK_CONTAINER_TYPE(obj), GENERIC_LIQUID, GSTR_LIQUID_COLOR);
+					sprintf(buf, "It's %sfull of %s %s liquid.\r\n", fullness[amt], AN(gstr), gstr);
 				}
 				send_to_char(buf, ch);
 			}
@@ -3347,7 +3349,7 @@ ACMD(do_nearby) {
 
 				// dir = get_direction_for_char(ch, get_direction_to(IN_ROOM(ch), loc));
 				dir_str = NEARBY_DIR;
-				snprintf(dist_buf, sizeof(dist_buf), "%d %3s", dist, dir_str ? dir_str : "away");
+				snprintf(dist_buf, sizeof(dist_buf), "%d %3s", dist, (dir_str && *dir_str) ? dir_str : "away");
 				snprintf(line, sizeof(line), "%8s: %s%s\r\n", dist_buf, get_room_name(loc, FALSE), coord_display_room(ch, loc, FALSE));
 				
 				CREATE(nrb_item, struct nearby_item_t, 1);
@@ -3370,7 +3372,7 @@ ACMD(do_nearby) {
 				
 					// dir = get_direction_for_char(ch, get_direction_to(IN_ROOM(ch), loc));
 					dir_str = NEARBY_DIR;
-					snprintf(dist_buf, sizeof(dist_buf), "%d %3s", dist, dir_str ? dir_str : "away");
+					snprintf(dist_buf, sizeof(dist_buf), "%d %3s", dist, (dir_str && *dir_str) ? dir_str : "away");
 					
 					if (city->traits & show_city_traits) {
 						prettier_sprintbit(city->traits & show_city_traits, empire_trait_types, part);
@@ -3454,7 +3456,7 @@ ACMD(do_nearby) {
 			// dir = get_direction_for_char(ch, get_direction_to(IN_ROOM(ch), loc));
 			dir_str = NEARBY_DIR;
 			strcpy(adv_color, color_by_difficulty((ch), pick_level_from_range((INST_LEVEL(inst) > 0 ? INST_LEVEL(inst) : get_approximate_level(ch)), GET_ADV_MIN_LEVEL(INST_ADVENTURE(inst)), GET_ADV_MAX_LEVEL(INST_ADVENTURE(inst)))));
-			snprintf(dist_buf, sizeof(dist_buf), "%d %3s", dist, dir_str ? dir_str : "away");
+			snprintf(dist_buf, sizeof(dist_buf), "%d %3s", dist, (dir_str && *dir_str) ? dir_str : "away");
 			snprintf(line, sizeof(line), "%8s: %s%s\t0%s / %s%s\r\n", dist_buf, adv_color, GET_ADV_NAME(INST_ADVENTURE(inst)), coord_display_room(ch, loc, FALSE), instance_level_string(inst), part);
 			
 			if (glb) {	// just add it to the global list

@@ -316,12 +316,13 @@ R
 4 5617 0
 S
 #2124
-ring golden engagement~
-a golden engagement ring~
-A golden engagement ring is lying on the ground.~
-This is a brilliant golden engagement ring.
+ring engagement~
+an engagement ring~
+An engagement ring is lying on the ground.~
+   This is a brilliant engagement ring. You watch as it twinkles in the light.
+It symbolizes the commitment between two people in love.
 ~
-2 o ab 0 2
+2 o ab 0 3
 0 0 0
 4 0
 A
@@ -332,12 +333,13 @@ R
 4 5617 0
 S
 #2125
-band golden wedding ring~
-a golden wedding band~
-A golden wedding band was dropped here!~
-This is a golden wedding band.
+band wedding ring~
+a wedding band~
+A wedding band was dropped here!~
+   This lovely little ring is just as precious as the metal it was forged from.
+It stands as an enduring symbol of love and commitment.
 ~
-2 o ab 0 2
+2 o ab 0 3
 0 0 0
 4 0
 A

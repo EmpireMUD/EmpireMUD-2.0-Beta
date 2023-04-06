@@ -8017,7 +8017,7 @@ void olc_process_resources(char_data *ch, char *argument, struct resource_data *
 					break;
 				}
 				default: {
-					msg_to_char(ch, "You can't change the name on a %s resource.\r\n", resource_types[change->type]);
+					msg_to_char(ch, "You can't change the name on %s %s resource.\r\n", AN(resource_types[change->type]), resource_types[change->type]);
 					return;
 				}
 			}

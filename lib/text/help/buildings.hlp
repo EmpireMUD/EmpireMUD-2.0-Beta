@@ -446,7 +446,8 @@ GATE
 .xx.  vxxv  Gate  (Build ability)
 
 A gate is an entrance for a fence. Since players are not blocked by fences,
-the gate is purely decorative.
+the gate is purely decorative. It counts as in-city territory even when built
+in the outskirts (4x radius).
 
 See also: FENCE
 #

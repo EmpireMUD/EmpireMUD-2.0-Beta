@@ -2442,7 +2442,7 @@ end
 set target %actor.obj_target_inv(%arg%)%
 if !%target%
   * Pass through to upgrade command (upgrading building)
-  * %send% %actor% You don't seem to have a '%arg%'. (You can only use @%self% on items in your inventory.)
+  * %send% %actor% You don't seem to have %arg.ana% '%arg%'. (You can only use @%self% on items in your inventory.)
   return 0
   halt
 end
@@ -3540,7 +3540,7 @@ if !%CookieCount%
   if %all%
     %send% %actor% You didn't have anything you could put into @%self%.
   else
-    %send% %actor% You don't seem to have a %PutObj%.
+    %send% %actor% You don't seem to have %PutObj.ana% %PutObj%.
   end
 end
 * get a Cookie total and see if the quest is over

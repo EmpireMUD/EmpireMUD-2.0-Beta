@@ -394,7 +394,7 @@ PLANT
 
 Plant (Cook ability)
 
-Usage:  plant <seed/food>
+Usage:  plant [seed/food]
 Speed boosts:  Work ethic bonus, haste
 
 You can replant crops in open fields so that they may regrow and be harvested

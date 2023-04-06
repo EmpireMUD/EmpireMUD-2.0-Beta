@@ -1969,7 +1969,7 @@ void do_customize_island(char_data *ch, char *argument);
 int get_territory_type_for_empire(room_data *loc, empire_data *emp, bool check_wait, bool *city_too_soon);
 #define is_in_city_for_empire(loc, emp, check_wait, city_too_soon)  (get_territory_type_for_empire((loc), (emp), (check_wait), (city_too_soon)) == TER_CITY)	// backwards-compatibility
 void perform_abandon_city(empire_data *emp, struct empire_city_data *city, bool full_abandon);
-void scan_for_tile(char_data *ch, char *argument);
+void scan_for_tile(char_data *ch, char *argument, int max_dist, bitvector_t only_in_dirs);
 void set_workforce_limit(empire_data *emp, int island_id, int chore, int limit);
 void set_workforce_limit_all(empire_data *emp, int chore, int limit);
 void show_workforce_setup_to_char(empire_data *emp, char_data *ch);
@@ -2268,6 +2268,7 @@ void despawn_mob(char_data *ch);
 int determine_best_scale_level(char_data *ch, bool check_group);
 void end_pursuit(char_data *ch, char_data *target);
 struct generic_name_data *get_generic_name_list(int name_set, int sex);
+struct generic_name_data *get_best_name_list(int name_set, int sex);
 int mob_coins(char_data *mob);
 void random_encounter(char_data *ch);
 void run_mobile_activity(char_data *ch);

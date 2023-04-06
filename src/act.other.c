@@ -2905,7 +2905,7 @@ ACMD(do_milk) {
 	else if (get_cooldown_time(mob, COOLDOWN_MILK) > 0)
 		act("$E can't be milked again for a while.", FALSE, ch, 0, mob, TO_CHAR);
 	else if (!(cont = get_obj_in_list_vis(ch, buf, NULL, ch->carrying)))
-		msg_to_char(ch, "You don't seem to have a %s.\r\n", buf);
+		msg_to_char(ch, "You don't seem to have %s %s.\r\n", AN(buf), buf);
 	else if (GET_OBJ_TYPE(cont) != ITEM_DRINKCON)
 		act("You can't milk $N into $p!", FALSE, ch, cont, mob, TO_CHAR);
 	else if (GET_DRINK_CONTAINER_CONTENTS(cont) > 0 && GET_DRINK_CONTAINER_TYPE(cont) != LIQ_MILK)

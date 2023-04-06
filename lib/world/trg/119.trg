@@ -1033,6 +1033,9 @@ elseif %obj.vnum% == 11836 && release /= %cmd%
 elseif %obj% != %self%
   %send% %actor% You can't do that with @%obj%.
   halt
+elseif !(Sitting Standing Resting ~= %actor.position%)
+  %send% %actor% You can't do that right now.
+  halt
 end
 * check vnum
 if %self.vnum% == 11913
@@ -2725,7 +2728,7 @@ elseif open /= %cmd% && (%room.template% == 11839 || %room.template% == 11939)
 elseif search /= %cmd% && (%room.template% == 11815 || %room.template% == 11915)
   * goblin cages: searching without skill?
   if !%actor.ability(Search)%
-    %send% %actor% You search around but don't see anything special.
+    %send% %actor% You try to search around the bin, but whatever you're looking for, you don't have the skill to find it.
     %echoaround% %actor% ~%actor% searches around the room.
     return 1
   end
@@ -4180,7 +4183,7 @@ switch %line%
   case 12
     %echo% ~%mob% pauses for a moment as ^%mob% face looks drawn, almost overcome.
     wait 9 sec
-    %force% %mob% emote 'Thank you, great Queen,' is all the envoy manages to say.
+    %echo% 'Thank you, great Queen,' is all ~%mob% manages to say.
     wait 9 sec
     say And I shall despatch my personal psychopomp. May she see as many giants across the great divide as there are knots in the tree.
   break
@@ -4430,6 +4433,9 @@ drink use~
 if !%arg% || %actor.obj_target(%arg%)% != %self%
   return 0
   halt
+elseif !(Standing Resting Sitting ~= %actor.position%)
+  %send% %actor% You can't do that right now.
+  halt
 end
 * need to return 1 now as we'll be doing some waits
 return 1
@@ -4655,6 +4661,9 @@ use~
 * Causes a teleport if the players sleeps in their bedroom after using this
 if !%arg% || %actor.obj_target(%arg%)% != %self%
   return 0
+  halt
+elseif !(Standing Resting Sitting ~= %actor.position%)
+  %send% %actor% You can't do that right now.
   halt
 end
 * need to return 1 now as we'll be doing some waits
@@ -4950,6 +4959,11 @@ set mm %room.people(11905)%
 if !%mm%
   set mm %room.people(11805)%
 end
+* look for knezz
+set knezz %room.people(11968)%
+if !%knezz%
+  set knezz %room.people(11870)%
+end
 * see if ok
 if %room.template% >= 11875 && %room.template% <= 11899
   set safe 1
@@ -4988,6 +5002,14 @@ elseif %mm%
 else
   %echo% A bolt of lightning from nowhere strikes ~%actor% right in the chest!
   %slay% %actor% %actor.name% has died of hubris at %actor.room.coords%!
+  * aaaand...
+  if %knezz%
+    wait 1
+    %force% %knezz% say Ahahahahahahahahaha...
+    wait 1
+    %echo% ~%knezz% laughs so hard &%knezz% nearly falls over as &%knezz% takes the wand from ~%actor%.
+    %purge% %self%
+  end
 end
 ~
 #11969
@@ -7264,8 +7286,8 @@ while %pos% > 0
 done
 * message
 dg_affect #%vnum% %ch% %type% %amount% 300
-%send% %ch% ~%self% %verb% itself toward you... you take on a %glow% glow.
-%echoaround% %ch% ~%self% %verb% itself toward ~%ch%... &%ch% takes on a %glow% glow.
+%send% %ch% ~%self% %verb% itself toward you... you take on %glow.ana% %glow% glow.
+%echoaround% %ch% ~%self% %verb% itself toward ~%ch%... &%ch% takes on %glow.ana% %glow% glow.
 ~
 #11991
 Skycleave: Barrosh storytime using script1-3~

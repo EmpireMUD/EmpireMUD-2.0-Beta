@@ -4070,7 +4070,7 @@ void trade_post(char_data *ch, char *argument) {
 		msg_to_char(ch, "Time is in real hours (default: %d).\r\n", config_get_int("trading_post_max_hours"));
 	}
 	else if (!(obj = get_obj_in_list_vis(ch, itemarg, NULL, ch->carrying))) {
-		msg_to_char(ch, "You don't seem to have a %s to trade.", itemarg);
+		msg_to_char(ch, "You don't seem to have %s %s to trade.", AN(itemarg), itemarg);
 	}
 	else if (OBJ_BOUND_TO(obj)) {
 		msg_to_char(ch, "You can't trade bound items.\r\n");
@@ -4986,12 +4986,15 @@ ACMD(do_draw) {
 
 
 ACMD(do_drink) {
-	obj_data *obj = NULL;
+	struct string_hash *str_iter, *next_str, *str_hash = NULL;
+	char buf[MAX_STRING_LENGTH], line[256];
+	obj_data *obj = NULL, *check_list[2];
 	int amount, i, liquid;
 	double thirst_amt, hunger_amt;
-	int type = drink_OBJ, number;
+	int type = drink_OBJ, number, iter;
 	room_data *to_room;
 	char *argptr = arg;
+	size_t size;
 
 	one_argument(argument, arg);
 	number = get_number(&argptr);
@@ -5010,8 +5013,51 @@ ACMD(do_drink) {
 		else if (find_flagged_sect_within_distance_from_char(ch, SECTF_DRINK, NOBITS, 1)) {
 			type = drink_ROOM;
 		}
-		else {
-			msg_to_char(ch, "Drink from what?\r\n");
+		else {	// no-arg and no room water: try to show drinkables
+			check_list[0] = ch->carrying;
+			check_list[1] = can_use_room(ch, IN_ROOM(ch), MEMBERS_AND_ALLIES) ? ROOM_CONTENTS(IN_ROOM(ch)) : NULL;
+			for (iter = 0; iter < 2; ++iter) {
+				if (check_list[iter]) {
+					DL_FOREACH2(check_list[iter], obj, next_content) {
+						if (IS_DRINK_CONTAINER(obj)) {
+							snprintf(line, sizeof(line), "%s - %d drink%s", GET_OBJ_DESC(obj, ch, OBJ_DESC_SHORT), GET_DRINK_CONTAINER_CONTENTS(obj), PLURAL(GET_DRINK_CONTAINER_CONTENTS(obj)));
+							if (GET_DRINK_CONTAINER_CONTENTS(obj) > 0) {
+								snprintf(line + strlen(line), sizeof(line) - strlen(line), " of %s", get_generic_string_by_vnum(GET_DRINK_CONTAINER_TYPE(obj), GENERIC_LIQUID, GSTR_LIQUID_NAME));
+							}
+							add_string_hash(&str_hash, line, 1);
+						}
+					}
+				}
+			}
+		
+			if (str_hash) {
+				// show plantables
+				size = snprintf(buf, sizeof(buf), "What do you want to drink from:\r\n");
+				HASH_ITER(hh, str_hash, str_iter, next_str) {
+					if (str_iter->count == 1) {
+						snprintf(line, sizeof(line), " %s\r\n", str_iter->str);
+					}
+					else {
+						snprintf(line, sizeof(line), " %s (x%d)\r\n", str_iter->str, str_iter->count);
+					}
+					if (size + strlen(line) + 16 < sizeof(buf)) {
+						strcat(buf, line);
+						size += strlen(line);
+					}
+					else {
+						size += snprintf(buf + size, sizeof(buf) - size, "OVERFLOW\r\n");
+						break;
+					}
+				}
+				free_string_hash(&str_hash);
+				if (ch->desc) {
+					page_string(ch->desc, buf, TRUE);
+				}
+			}
+			else {
+				// nothing to plant
+				msg_to_char(ch, "Drink from what?\r\n");
+			}
 			return;
 		}
 	}
@@ -5328,25 +5374,69 @@ ACMD(do_drop) {
 
 
 ACMD(do_eat) {
+	struct string_hash *str_iter, *next_str, *str_hash = NULL;
 	bool extract = FALSE, will_buff = FALSE;
-	char buf[MAX_STRING_LENGTH], *argptr = arg;
+	char buf[MAX_STRING_LENGTH], line[256], *argptr = arg;
 	struct affected_type *af;
 	struct obj_apply *apply;
-	obj_data *food;
-	int eat_hours, number;
+	obj_data *food, *check_list[2], *obj;
+	int eat_hours, number, iter;
+	size_t size;
 
 	one_argument(argument, arg);
 	number = get_number(&argptr);
 	
 	// 1. basic validation
-	if (REAL_NPC(ch))		/* Cannot use GET_COND() on mobs. */
+	if (REAL_NPC(ch)) {		/* Cannot use GET_COND() on mobs. */
 		return;
-	if (!*argptr) {
-		send_to_char("Eat what?\r\n", ch);
+	}
+	if (!*argptr) {	// no-arg: try to show edibles
+		// check inventory for edibles...
+		check_list[0] = ch->carrying;
+		check_list[1] = can_use_room(ch, IN_ROOM(ch), MEMBERS_AND_ALLIES) ? ROOM_CONTENTS(IN_ROOM(ch)) : NULL;
+		for (iter = 0; iter < 2; ++iter) {
+			if (check_list[iter]) {
+				DL_FOREACH2(check_list[iter], obj, next_content) {
+					if (IS_FOOD(obj)) {
+						snprintf(line, sizeof(line), "%s - %d hour%s%s", GET_OBJ_DESC(obj, ch, OBJ_DESC_SHORT), GET_FOOD_HOURS_OF_FULLNESS(obj), PLURAL(GET_FOOD_HOURS_OF_FULLNESS(obj)), (GET_OBJ_APPLIES(obj) || GET_OBJ_AFF_FLAGS(obj)) ? ", buff" : "");
+						add_string_hash(&str_hash, line, 1);
+					}
+				}
+			}
+		}
+		
+		if (str_hash) {
+			// show plantables
+			size = snprintf(buf, sizeof(buf), "What do you want to eat:\r\n");
+			HASH_ITER(hh, str_hash, str_iter, next_str) {
+				if (str_iter->count == 1) {
+					snprintf(line, sizeof(line), " %s\r\n", str_iter->str);
+				}
+				else {
+					snprintf(line, sizeof(line), " %s (x%d)\r\n", str_iter->str, str_iter->count);
+				}
+				if (size + strlen(line) + 16 < sizeof(buf)) {
+					strcat(buf, line);
+					size += strlen(line);
+				}
+				else {
+					size += snprintf(buf + size, sizeof(buf) - size, "OVERFLOW\r\n");
+					break;
+				}
+			}
+			free_string_hash(&str_hash);
+			if (ch->desc) {
+				page_string(ch->desc, buf, TRUE);
+			}
+		}
+		else {
+			// nothing to plant
+			msg_to_char(ch, "Eat what?\r\n");
+		}
 		return;
 	}
 	if (!(food = get_obj_in_list_vis(ch, argptr, &number, ch->carrying))) {
-		if (!(food = get_obj_in_list_vis(ch, argptr, &number, ROOM_CONTENTS(IN_ROOM(ch))))) {
+		if (!can_use_room(ch, IN_ROOM(ch), MEMBERS_AND_ALLIES) || !(food = get_obj_in_list_vis(ch, argptr, &number, ROOM_CONTENTS(IN_ROOM(ch))))) {
 			// special case: Taste Blood
 			char_data *vict;
 			if (subcmd == SCMD_TASTE && IS_VAMPIRE(ch) && has_ability(ch, ABIL_TASTE_BLOOD) && (vict = get_char_vis(ch, argptr, &number, FIND_CHAR_ROOM))) {
@@ -6148,7 +6238,7 @@ ACMD(do_light) {
 			do_burn_area(ch, subcmd);
 		}
 		else {
-			msg_to_char(ch, "You don't have a %s.\r\n", arg);
+			msg_to_char(ch, "You don't have %s %s.\r\n", AN(arg), arg);
 		}
 	}
 	else if (!has_interaction(GET_OBJ_INTERACTIONS(obj), INTERACT_LIGHT)) {
@@ -7658,7 +7748,7 @@ ACMD(do_use) {
 		msg_to_char(ch, "Use what?\r\n");
 	}
 	else if (!(obj = get_obj_in_list_vis(ch, arg, NULL, ch->carrying))) {
-		msg_to_char(ch, "You don't seem to have a %s.\r\n", arg);
+		msg_to_char(ch, "You don't seem to have %s %s.\r\n", AN(arg), arg);
 	}
 	else {
 		if (IS_POISON(obj)) {

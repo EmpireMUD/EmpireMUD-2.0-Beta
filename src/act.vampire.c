@@ -1582,7 +1582,7 @@ ACMD(do_veintap) {
 	else if (GET_BLOOD(ch) < amt + 1)
 		msg_to_char(ch, "You can't drain THAT much!\r\n");
 	else if (!(container = get_obj_in_list_vis(ch, buf1, NULL, ch->carrying)))
-		msg_to_char(ch, "You don't seem to have a %s.\r\n", buf1);
+		msg_to_char(ch, "You don't seem to have %s %s.\r\n", AN(buf1), buf1);
 	else if (GET_OBJ_TYPE(container) != ITEM_DRINKCON)
 		msg_to_char(ch, "You can't drain blood into that!\r\n");
 	else if (GET_DRINK_CONTAINER_CONTENTS(container) > 0 && GET_DRINK_CONTAINER_TYPE(container) != LIQ_BLOOD)

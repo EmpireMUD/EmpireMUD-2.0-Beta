@@ -1476,7 +1476,7 @@ ACMD(do_gen_augment) {
 		list_available_augments(ch, subcmd, NULL);
 	}
 	else if (!(obj = get_obj_in_list_vis(ch, target_arg, NULL, ch->carrying)) && !(obj = get_obj_by_char_share(ch, target_arg))) {
-		msg_to_char(ch, "You don't seem to have any %s.\r\n", target_arg);
+		msg_to_char(ch, "You don't seem to have %s %s.\r\n", AN(target_arg), target_arg);
 	}
 	else if (!*augment_arg) {
 		msg_to_char(ch, "You can %s %s with:\r\n", augment_info[subcmd].verb, GET_OBJ_SHORT_DESC(obj));
@@ -1497,7 +1497,7 @@ ACMD(do_gen_augment) {
 		msg_to_char(ch, "You cannot %s an item that already has %s %s.\r\n", augment_info[subcmd].verb, AN(augment_info[subcmd].noun), augment_info[subcmd].noun);
 	}
 	else if (obj_has_apply_type(obj, augment_info[subcmd].apply_type)) {
-		msg_to_char(ch, "That item already has a %s effect.\r\n", augment_info[subcmd].noun);
+		msg_to_char(ch, "That item already has %s %s effect.\r\n", AN(augment_info[subcmd].noun), augment_info[subcmd].noun);
 	}
 	else if (!validate_augment_target(ch, obj, aug, TRUE)) {
 		// sends own message
@@ -2135,7 +2135,12 @@ ACMD(do_gen_craft) {
 		// must call this after start_action() because it stores resources
 		extract_resources(ch, GET_CRAFT_RESOURCES(type), can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED), &GET_ACTION_RESOURCES(ch));
 		
-		msg_to_char(ch, "You start %s.\r\n", gen_craft_data[GET_CRAFT_TYPE(type)].verb);
+		if (GET_CRAFT_NAME(type)[strlen(GET_CRAFT_NAME(type))-1] == 's') {
+			msg_to_char(ch, "You start %s %s.\r\n", gen_craft_data[GET_CRAFT_TYPE(type)].verb, GET_CRAFT_NAME(type));
+		}
+		else {
+			msg_to_char(ch, "You start %s %s %s.\r\n", gen_craft_data[GET_CRAFT_TYPE(type)].verb, AN(GET_CRAFT_NAME(type)), GET_CRAFT_NAME(type));
+		}
 		sprintf(buf, "$n starts %s.", gen_craft_data[GET_CRAFT_TYPE(type)].verb);
 		act(buf, FALSE, ch, NULL, NULL, TO_ROOM);
 	}
@@ -2341,7 +2346,7 @@ ACMD(do_recipes) {
 		msg_to_char(ch, "Show recipes for which item?\r\n");
 	}
 	else if (!(obj = get_obj_in_list_vis(ch, arg, NULL, ch->carrying))) {
-		msg_to_char(ch, "You don't seem to have a %s in your inventory.\r\n", arg);
+		msg_to_char(ch, "You don't seem to have %s %s in your inventory.\r\n", AN(arg), arg);
 	}
 	else {
 		act("With $p, you can make:", FALSE, ch, obj, NULL, TO_CHAR);
@@ -2489,7 +2494,7 @@ ACMD(do_reforge) {
 		// failed validate func -- sends own messages
 	}
 	else if (!(obj = get_obj_in_list_vis(ch, arg, NULL, ch->carrying)) && !(obj = get_obj_by_char_share(ch, arg))) {
-		msg_to_char(ch, "You don't seem to have a %s.\r\n", arg);
+		msg_to_char(ch, "You don't seem to have %s %s.\r\n", AN(arg), arg);
 	}
 	else if (!match_reforge_type(obj, subcmd)) {
 		msg_to_char(ch, "You can only %s ", reforge_data[subcmd].command);
