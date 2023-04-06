@@ -2135,7 +2135,7 @@ ACMD(do_gen_craft) {
 		// must call this after start_action() because it stores resources
 		extract_resources(ch, GET_CRAFT_RESOURCES(type), can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED), &GET_ACTION_RESOURCES(ch));
 		
-		msg_to_char(ch, "You start %s.\r\n", gen_craft_data[GET_CRAFT_TYPE(type)].verb);
+		msg_to_char(ch, "You start %s %s %s.\r\n", gen_craft_data[GET_CRAFT_TYPE(type)].verb, AN(GET_CRAFT_NAME(type)), GET_CRAFT_NAME(type));
 		sprintf(buf, "$n starts %s.", gen_craft_data[GET_CRAFT_TYPE(type)].verb);
 		act(buf, FALSE, ch, NULL, NULL, TO_ROOM);
 	}
