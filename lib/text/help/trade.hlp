@@ -890,12 +890,13 @@ Rawhide Stitching (Trade ability)
 Command:  sew [number] <item>
 
 The basic leather tier is made of rawhide -- untanned leather that is hardened
-to the right shape and stitched together, but isn't waterproof.
+to the right shape and stitched together, but isn't waterproof. These low-level
+items do not require any armor skill to use.
 
 Weapons:
   rawhide whip
 
-Armor:
+Worn:
   rawhide breastplate
   rawhide skullcap
   rawhide bracers
