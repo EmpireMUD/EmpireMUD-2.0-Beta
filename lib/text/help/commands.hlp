@@ -360,7 +360,7 @@ to your empire won't be able to enter.
 For more information on building your first house, see HELP HOUSING GUIDE.
 
 See also: BUILD INFO, RESOURCES, KEEP, EMPIRE, DISMANTLE, DESIGNATE, RECIPES,
-  BUILD ABILITY
+  BUILD ABILITY, CRAFTING ABILITIES
 #
 BUY LIST SHOP SHOPS
 
@@ -1383,7 +1383,7 @@ Usage:  make [number] <thing>
 Make is a crafting command. There are no basic recipes that use 'make', but
 perhaps you can find something that does.
 
-See also: MAKE INFO, RECIPES
+See also: MAKE INFO, RECIPES, CRAFTING ABILITIES
 #
 MAP "MAP COMMAND"
 

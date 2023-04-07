@@ -308,7 +308,8 @@ You can mill:
 You must do this at a Mill building or have a grinding stone equipped.
 However, it will take longer to do it without the building.
 
-See also: CRAFTING LEVEL, COOK, RESOURCES, KEEP, BASIC CRAFTS, RECIPES
+See also: CRAFTING LEVEL, COOK, RESOURCES, KEEP, BASIC CRAFTS, RECIPES,
+   CRAFTING ABILITIES
 #
 MINE MINES
 
@@ -429,7 +430,8 @@ You can press:
 
 You must do this at an Oilmaker building.
 
-See also: CRAFTING LEVEL, COOK, RESOURCES, KEEP, OIL, CRAFT INFO, RECIPES
+See also: CRAFTING LEVEL, COOK, RESOURCES, KEEP, OIL, CRAFT INFO, RECIPES,
+   CRAFTING ABILITIES
 #
 READY
 
@@ -690,7 +692,7 @@ Typing "smelt" by itself will list things you can smelt with the ore available
 in your inventory. Smelting goes faster when you have the correct mastery
 ability (see 'smelt info <type>' to see the mastery ability).
 
-See also: CRAFT INFO, METAL, SEPARATE, WEALTH, RECIPES
+See also: CRAFT INFO, METAL, SEPARATE, WEALTH, RECIPES, CRAFTING ABILITIES
 #
 SPECIALIZE SPECIALTY
 
