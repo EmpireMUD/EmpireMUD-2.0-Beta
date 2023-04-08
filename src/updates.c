@@ -2115,6 +2115,24 @@ PLAYER_UPDATE_FUNC(b5_134_update_players) {
 }
 
 
+// b5.151: apply hide-real-name flag to customized roads
+void b5_151_road_fix(void) {
+	struct map_data *map;
+	room_data *room;
+	
+	LL_FOREACH(land_map, map) {
+		if (SECT_FLAGGED(map->sector_type, SECTF_IS_ROAD) && map->shared->name) {
+			room = map->room ? map->room : real_room(map->vnum);
+			if (room) {
+				SET_BIT(ROOM_BASE_FLAGS(room), ROOM_AFF_HIDE_REAL_NAME);
+				affect_total_room(room);
+				request_world_save(GET_ROOM_VNUM(room), WSAVE_ROOM);
+			}
+		}
+	}
+}
+
+
  //////////////////////////////////////////////////////////////////////////////
 //// UPDATE DATA /////////////////////////////////////////////////////////////
 
@@ -2174,6 +2192,7 @@ const struct {
 	{ "b5.128", b5_128_learned_update, NULL, "Updated learned crafts for trappers posts" },
 	{ "b5.130b", b5_130b_item_refresh, b5_130b_player_refresh, "Updated items that need script attachments" },
 	{ "b5.134", NULL, b5_134_update_players, "Wiped map memory for screenreader users to clear bad data" },
+	{ "b5.151", b5_151_road_fix, NULL, "Applying hide-real-name flag to customized roads" },
 	
 	{ "\n", NULL, NULL, "\n" }	// must be last
 };
