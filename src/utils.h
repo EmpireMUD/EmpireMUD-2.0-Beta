@@ -2093,6 +2093,7 @@ void un_deathshroud(char_data *ch);
 void un_mummify(char_data *ch);
 void update_biting_char(char_data *ch);
 void update_vampire_sun(char_data *ch);
+bool vampire_kill_feeding_target(char_data *ch, char *argument);
 
 // act.vehicles.c
 void do_customize_vehicle(char_data *ch, char *argument);

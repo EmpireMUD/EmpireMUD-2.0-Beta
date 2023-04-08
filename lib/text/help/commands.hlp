@@ -869,11 +869,12 @@ EXECUTE
 Usage:  execute <victim>
 
 This command allows you to execute a person who has already been incapacitated,
-staked, or tied up.
+staked, or tied up. Vampires can also use this on someone they are feeding
+from.
 
 To automatically kill your victims in combat, "toggle autokill".
 
-See also: TOGGLE, STAKE, TIE
+See also: BITE, TOGGLE, STAKE, TIE
 #
 EXTRA-SPACING "EXTRA SPACING" "TOGGLE EXTRA-SPACING"
 
@@ -1267,7 +1268,10 @@ Usage:  kill <victim>
 
 A good way to start a fight.
 
-See also: ASSIST, FLEE
+Kill and murder can also be used by vampires to finish off someone they are
+feeding from.
+
+See also: ASSIST, BITE, FLEE
 #
 LAND
 

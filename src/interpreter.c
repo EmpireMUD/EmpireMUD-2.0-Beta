@@ -715,7 +715,7 @@ cpp_extern const struct command_info cmd_info[] = {
 	SIMPLE_CMD( "examine", POS_SITTING, do_examine, NO_MIN, CTYPE_UTIL ),
 	STANDARD_CMD( "excavate", POS_STANDING, do_excavate, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_BUILD, CMD_NO_ANIMALS, NO_ABIL ),
 	SIMPLE_CMD( "exchange", POS_STANDING, do_exchange, NO_MIN, CTYPE_BUILD ),
-	SIMPLE_CMD( "execute", POS_STANDING, do_execute, NO_MIN, CTYPE_COMBAT ),
+	STANDARD_CMD( "execute", POS_STANDING, do_execute, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_COMBAT, CMD_WHILE_FEEDING, NO_ABIL ),
 	SIMPLE_CMD( "exit", POS_RESTING, do_exit, NO_MIN, CTYPE_UTIL ),
 	SCMD_CMD( "exits", POS_RESTING, do_exits, NO_MIN, CTYPE_UTIL, -1 ),
 	SCMD_CMD( "export", POS_DEAD, do_import, NO_MIN, CTYPE_UTIL, TRADE_EXPORT ),
@@ -771,7 +771,7 @@ cpp_extern const struct command_info cmd_info[] = {
 	ABILITY_CMD( "hide", POS_RESTING, do_hide, NO_MIN, CTYPE_MOVE, ABIL_HIDE ),
 	SIMPLE_CMD( "hint", POS_DEAD, do_tip, NO_MIN, CTYPE_UTIL ),
 	SCMD_CMD( "history", POS_DEAD, do_history, NO_MIN, CTYPE_COMM, SCMD_HISTORY ),
-	SCMD_CMD( "hit", POS_FIGHTING, do_hit, NO_MIN, CTYPE_COMBAT, SCMD_HIT ),
+	STANDARD_CMD( "hit", POS_FIGHTING, do_hit, NO_MIN, NO_GRANTS, SCMD_HIT, CTYPE_COMBAT, CMD_WHILE_FEEDING, NO_ABIL ),
 	SIMPLE_CMD( "hold", POS_RESTING, do_grab, NO_MIN, CTYPE_UTIL ),
 	SIMPLE_CMD( "home", POS_DEAD, do_home, NO_MIN, CTYPE_MOVE ),
 	STANDARD_CMD( "hone", POS_STANDING, do_gen_augment, NO_MIN, NO_GRANTS, AUGMENT_HONE, CTYPE_BUILD, CMD_NO_ANIMALS, NO_ABIL ),
@@ -799,7 +799,7 @@ cpp_extern const struct command_info cmd_info[] = {
 	ABILITY_CMD( "jab", POS_FIGHTING, do_jab, NO_MIN, CTYPE_COMBAT, ABIL_JAB ),
 	STANDARD_CMD( "junk", POS_RESTING, do_drop, NO_MIN, NO_GRANTS, SCMD_JUNK, CTYPE_UTIL, CMD_NO_ABBREV, NO_ABIL ),
 
-	SIMPLE_CMD( "kill", POS_FIGHTING, do_hit, NO_MIN, CTYPE_COMBAT ),
+	STANDARD_CMD( "kill", POS_FIGHTING, do_hit, NO_MIN, NO_GRANTS, SCMD_KILL, CTYPE_COMBAT, CMD_WHILE_FEEDING, NO_ABIL ),
 	SCMD_CMD( "keep", POS_DEAD, do_keep, NO_MIN, CTYPE_UTIL, SCMD_KEEP ),
 	ABILITY_CMD( "kick", POS_FIGHTING, do_kick, NO_MIN, CTYPE_COMBAT, ABIL_KICK ),
 	ABILITY_CMD( "kite", POS_FIGHTING, do_kite, NO_MIN, CTYPE_COMBAT, ABIL_KITE ),
@@ -848,7 +848,7 @@ cpp_extern const struct command_info cmd_info[] = {
 	GRANT_CMD( "moveeinv", POS_DEAD, do_moveeinv, LVL_CIMPL, CTYPE_IMMORTAL, GRANT_EMPIRES ),
 	SIMPLE_CMD( "mudstats", POS_DEAD, do_mudstats, NO_MIN, CTYPE_UTIL ),
 	ABILITY_CMD( "mummify", POS_STUNNED, do_mummify, NO_MIN, CTYPE_MOVE, ABIL_MUMMIFY ),
-	SIMPLE_CMD( "murder", POS_FIGHTING, do_hit, NO_MIN, CTYPE_COMBAT ),
+	STANDARD_CMD( "murder", POS_FIGHTING, do_hit, NO_MIN, NO_GRANTS, SCMD_KILL, CTYPE_COMBAT, CMD_WHILE_FEEDING, NO_ABIL ),
 	SIMPLE_CMD( "mail", POS_STANDING, do_mail, NO_MIN, CTYPE_UTIL ),
 	STANDARD_CMD( "mute", POS_DEAD, do_wizutil, LVL_CIMPL, GRANT_MUTE, SCMD_MUTE, CTYPE_IMMORTAL, NOBITS, NO_ABIL ),
 	SIMPLE_CMD( "mydescription", POS_STANDING, do_mydescription, NO_MIN, CTYPE_UTIL ),
@@ -1238,7 +1238,7 @@ void command_interpreter(char_data *ch, char *argument) {
 	else if (!char_can_act(ch, cmd_info[cmd].minimum_position, !IS_SET(cmd_info[cmd].flags, CMD_NO_ANIMALS), (cmd_info[cmd].ctype != CTYPE_COMBAT && cmd_info[cmd].ctype != CTYPE_SKILL && cmd_info[cmd].ctype != CTYPE_BUILD))) {
 		// sent own error message
 	}
-	else if (GET_FEEDING_FROM(ch) && cmd_info[cmd].minimum_position >= POS_SLEEPING) {
+	else if (GET_FEEDING_FROM(ch) && cmd_info[cmd].minimum_position >= POS_SLEEPING && !IS_SET(cmd_info[cmd].flags, CMD_WHILE_FEEDING)) {
 		msg_to_char(ch, "You can't do that while feeding!\r\n");
 	}
 	else if (IS_NPC(ch) && cmd_info[cmd].minimum_level >= LVL_GOD) {

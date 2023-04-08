@@ -800,6 +800,69 @@ void update_vampire_sun(char_data *ch) {
 }
 
 
+/**
+* Detects and handles cases where the player typed "kill/execute [target]"
+* while feeding from the target. It will generally handle any case where the
+* player is already feeding.
+*
+* @param char_data *ch The player/actor who typed kill/execute/etc.
+* @param char *argument The argument(s) they typed in.
+* @return bool If TRUE, sent a message and handled the command. If FALSE, proceed as normal.
+*/
+bool vampire_kill_feeding_target(char_data *ch, char *argument) {
+	char arg[MAX_INPUT_LENGTH];
+	char_data *vict;
+	obj_data *corpse;
+	
+	if (!GET_FEEDING_FROM(ch)) {
+		return FALSE;	// not feeding at all
+	}
+	
+	one_argument(argument, arg);
+	
+	// find and validate target
+	if (*arg) {
+		if (!(vict = get_char_vis(ch, arg, NULL, FIND_CHAR_ROOM))) {
+			msg_to_char(ch, "They don't seem to be here.\r\n");
+			return TRUE;
+		}
+		if (vict != GET_FEEDING_FROM(ch)) {
+			msg_to_char(ch, "You can't do that while feeding!\r\n");
+			return TRUE;
+		}
+	}
+	else {
+		vict = GET_FEEDING_FROM(ch);
+	}
+	
+	// ok: cancel a can't-stop effect, if present
+	affect_from_char(ch, ATYPE_CANT_STOP, FALSE);
+	
+	act("You bite down and kill $N!", FALSE, ch, NULL, vict, TO_CHAR);
+	act("$N falls limply from $n's arms!", FALSE, ch, NULL, vict, TO_NOTVICT);
+	act("You feel $n's fangs bite down hard. You are dead! Sorry...", FALSE, ch, NULL, vict, TO_VICT);
+	if (!IS_NPC(vict)) {
+		death_log(vict, ch, ATTACK_EXECUTE);
+		add_lore(ch, LORE_PLAYER_KILL, "Killed %s", PERS(vict, vict, TRUE));
+		add_lore(vict, LORE_PLAYER_DEATH, "Slain by %s", PERS(ch, ch, TRUE));
+	}
+	
+	check_scaling(vict, ch);	// ensure scaling
+	tag_mob(vict, ch);	// ensures loot binding if applicable
+	corpse = die(vict, ch);
+	
+	GET_FED_ON_BY(vict) = NULL;
+	GET_FEEDING_FROM(ch) = NULL;
+	
+	// tag corpse
+	if (corpse && !IS_NPC(ch)) {
+		corpse->last_owner_id = GET_IDNUM(ch);
+		corpse->last_empire_id = GET_LOYALTY(ch) ? EMPIRE_VNUM(GET_LOYALTY(ch)) : NOTHING;
+	}
+	return TRUE;
+}
+
+
  //////////////////////////////////////////////////////////////////////////////
 //// COMMANDS ////////////////////////////////////////////////////////////////
 
