@@ -931,6 +931,10 @@ void set_room_custom_name(room_data *room, char *name) {
 		free(ROOM_CUSTOM_NAME(room));
 	}
 	ROOM_CUSTOM_NAME(room) = name ? str_dup(name) : NULL;
+	if (!name) {
+		REMOVE_BIT(ROOM_BASE_FLAGS(room), ROOM_AFF_HIDE_REAL_NAME);
+		affect_total_room(room);
+	}
 	request_world_save(GET_ROOM_VNUM(room), WSAVE_ROOM);
 }
 
@@ -3171,6 +3175,8 @@ void decustomize_shared_data(struct shared_room_data *shared) {
 			shared->icon = NULL;
 		}
 	}
+	REMOVE_BIT(shared->affects, ROOM_AFF_HIDE_REAL_NAME);
+	REMOVE_BIT(shared->base_affects, ROOM_AFF_HIDE_REAL_NAME);
 }
 
 
