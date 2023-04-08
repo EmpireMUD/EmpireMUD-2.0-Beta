@@ -108,7 +108,7 @@ bool audit_building(bld_data *bld, char_data *ch) {
 		problem = TRUE;
 	}
 	if (IS_SET(GET_BLD_BASE_AFFECTS(bld), ROOM_AFF_HIDE_REAL_NAME) && !IS_SET(GET_BLD_FLAGS(bld), BLD_NO_CUSTOMIZE)) {
-		olc_audit_msg(ch, GET_BLD_VNUM(bld), "HIDE-REAL-NAME affedt without NO-CUSTOMIZE flag");
+		olc_audit_msg(ch, GET_BLD_VNUM(bld), "HIDE-REAL-NAME affect without NO-CUSTOMIZE flag");
 		problem = TRUE;
 	}
 	if (GET_BLD_HEIGHT(bld) < 0 || GET_BLD_HEIGHT(bld) > 5) {

@@ -276,7 +276,9 @@ void do_customize_road(char_data *ch, char *argument) {
 			msg_to_char(ch, "What would you like to name this road (or \"none\")?\r\n");
 		}
 		else if (!str_cmp(arg2, "none")) {
+			REMOVE_BIT(ROOM_BASE_FLAGS(IN_ROOM(ch)), ROOM_AFF_HIDE_REAL_NAME);
 			set_room_custom_name(IN_ROOM(ch), NULL);
+			affect_total_room(IN_ROOM(ch));
 			msg_to_char(ch, "This road no longer has a custom name.\r\n");
 			command_lag(ch, WAIT_ABILITY);
 		}
@@ -300,7 +302,9 @@ void do_customize_road(char_data *ch, char *argument) {
 				return;
 			}
 			
+			SET_BIT(ROOM_BASE_FLAGS(IN_ROOM(ch)), ROOM_AFF_HIDE_REAL_NAME);
 			set_room_custom_name(IN_ROOM(ch), arg2);
+			affect_total_room(IN_ROOM(ch));
 			msg_to_char(ch, "This road tile is now called \"%s\".\r\n", arg2);
 			command_lag(ch, WAIT_ABILITY);
 		}
@@ -3062,7 +3066,7 @@ ACMD(do_morph) {
 	
 	skip_spaces(&argument);
 	fast = (subcmd == SCMD_FASTMORPH || FIGHTING(ch) || GET_POS(ch) == POS_FIGHTING);
-	normal = (!str_cmp(argument, "normal") | !str_cmp(argument, "norm"));
+	normal = (!str_cmp(argument, "normal") || !str_cmp(argument, "norm"));
 	
 	// safety first: mobs must use %morph%
 	if (IS_NPC(ch) && (!fast || !normal)) {
