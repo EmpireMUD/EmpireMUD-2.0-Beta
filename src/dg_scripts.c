@@ -8026,7 +8026,7 @@ int script_driver(union script_driver_data_u *sdd, trig_data *trig, int type, in
 	char cmd[MAX_INPUT_LENGTH], *p;
 	struct script_data *sc = 0;
 	struct cmdlist_element *temp;
-	unsigned long loops = 0;
+	// unsigned long loops = 0;
 	void *go = NULL;
 
 	if (depth > MAX_SCRIPT_DEPTH) {
@@ -8114,7 +8114,7 @@ int script_driver(union script_driver_data_u *sdd, trig_data *trig, int type, in
 			}
 			else {
 				cl = temp;
-				loops = 0;
+				// loops = 0;
 			}
 		}
 		else if (!strn_cmp("switch ", p, 7)) {
@@ -8138,7 +8138,7 @@ int script_driver(union script_driver_data_u *sdd, trig_data *trig, int type, in
 					orig_cmd++;
 				if (cl->original && process_if(orig_cmd + 6, go, sc, trig, type)) {
 					cl = cl->original;
-					loops++;   
+					// loops++;   
 					GET_TRIG_LOOPS(trig)++;
 					/* This actually breaks multiple types of triggers -kh
 					if (loops == 30) {
