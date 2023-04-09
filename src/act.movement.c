@@ -2482,8 +2482,7 @@ ACMD(do_portal) {
 			return;
 		}
 		
-		near = find_target_room(ch, arg);
-		if (!near) {
+		if (!(near = parse_room_from_coords(argument)) && !(near = find_target_room(ch, arg))) {
 			msg_to_char(ch, "Invalid location.\r\n");
 			return;
 		}
@@ -2569,7 +2568,7 @@ ACMD(do_portal) {
 	}
 	
 	// targeting: if we didn't get a result yet, try standard targeting
-	if (!target && !(target = find_target_room(ch, argument))) {
+	if (!target && !(target = parse_room_from_coords(argument)) && !(target = find_target_room(ch, argument))) {
 		// sends own message
 		return;
 	}
@@ -3023,7 +3022,7 @@ ACMD(do_transport) {
 	else if (!ROOM_SECT_FLAGGED(IN_ROOM(ch), SECTF_START_LOCATION)) {
 		msg_to_char(ch, "You need to be at a starting location to transport!\r\n");
 	}
-	else if (*arg && !(target = find_target_room(ch, arg))) {
+	else if (*arg && !(target = parse_room_from_coords(argument)) && !(target = find_target_room(ch, arg))) {
 		skip_spaces(&argument);
 		msg_to_char(ch, "You can't transport to '%s'\r\n", argument);
 	}

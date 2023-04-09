@@ -10887,7 +10887,7 @@ ACMD(do_trans) {
 	one_word(argument, arg);
 
 	if (*arg) {
-		if (!(to_room = find_target_room(ch, arg))) {
+		if (!(to_room = parse_room_from_coords(argument)) && !(to_room = find_target_room(ch, arg))) {
 			// sent own error message
 			return;
 		}
