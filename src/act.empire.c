@@ -3410,7 +3410,7 @@ void do_abandon_vehicle(char_data *ch, vehicle_data *veh, bool confirm) {
 
 ACMD(do_abandon) {
 	bool imm_access = (GET_ACCESS_LEVEL(ch) >= LVL_CIMPL || IS_GRANTED(ch, GRANT_EMPIRES));
-	char arg[MAX_INPUT_LENGTH];
+	char arg[MAX_INPUT_LENGTH], *arg2;
 	vehicle_data *veh;
 	room_data *room = IN_ROOM(ch);
 	bool confirm, confirm_arg_1;
@@ -3419,10 +3419,11 @@ ACMD(do_abandon) {
 		return;
 	}
 	
-	argument = one_word(argument, arg);
 	skip_spaces(&argument);
+	arg2 = one_word(argument, arg);
+	skip_spaces(&arg2);
 	confirm_arg_1 = !str_cmp(arg, "confirm");
-	confirm = confirm_arg_1 || !str_cmp(argument, "confirm");	// TRUE if they have the confirm arg
+	confirm = confirm_arg_1 || !str_cmp(arg2, "confirm");	// TRUE if they have the confirm arg
 	
 	if (!IS_APPROVED(ch) && config_get_bool("manage_empire_approval")) {
 		send_config_msg(ch, "need_approval_string");
