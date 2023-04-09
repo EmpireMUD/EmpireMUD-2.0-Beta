@@ -474,18 +474,18 @@ SAW
 Saw (Primitive Crafts ability)
 
 Usage:  saw <item>
-Speed boosts:  Work ethic bonus, haste
-Tool:  saw or lumber yard
+Speed boosts:  Work ethic bonus, haste, superior saw, Woodworking ability
+Tool:  saw (or be at a lumber yard)
 
-You can saw most trees and logs into lumber. You must be in a lumber yard. This
-will go faster if you have the Woodworking ability.
+You can saw trees and logs into lumber using this command. You either need to
+use a saw or perform this task at a lumber yard. When using a saw, it will go
+faster if the saw is superior.
 
-You can saw at a lumber yard or you can forge a saw to do it anywhere (albeit
-more slowly unless your saw is superior).
+This will go faster if you have the Woodworking ability.
 
 Not all types of trees can be sawed.
 
-See also: TREES, LOGS, LUMBER, FORGE
+See also: TREES, LOGS, LUMBER, LUMBER YARD, FORGE, WOODWORKING
 #
 SCRAPE
 
