@@ -9025,7 +9025,7 @@ ACMD(do_goto) {
 
 	one_word(argument, arg);
 	
-	if (!(location = find_target_room(ch, arg))) {
+	if (!(location = parse_room_from_coords(argument)) && !(location = find_target_room(ch, arg))) {
 		return;
 	}
 

@@ -1419,7 +1419,7 @@ void show_workforce_why(empire_data *emp, char_data *ch, char *argument) {
 				only_loc = GET_ROOM_VNUM(IN_ROOM(ch));
 				only_room = IN_ROOM(ch);
 			}
-			else if ((only_room = find_target_room(ch, argument))) {
+			else if ((only_room = parse_room_from_coords(argument)) || (only_room = find_target_room(ch, argument))) {
 				only_loc = GET_ROOM_VNUM(only_room);
 			}
 			else {
@@ -5261,7 +5261,7 @@ ACMD(do_findmaintenance) {
 	}
 	
 	if (*arg) {
-		if (!(find_island = get_island_by_name(ch, arg)) && !(find_room = find_target_room(NULL, arg))) {
+		if (!(find_island = get_island_by_name(ch, arg)) && !(find_room = parse_room_from_coords(argument)) && !(find_room = find_target_room(NULL, arg))) {
 			msg_to_char(ch, "Unknown location: %s.\r\n", arg);
 			return;
 		}
