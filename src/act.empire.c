@@ -3440,7 +3440,7 @@ ACMD(do_abandon) {
 	else if (*arg && !confirm_arg_1 && (veh = get_vehicle_in_room_vis(ch, arg, NULL))) {
 		do_abandon_vehicle(ch, veh, confirm);
 	}
-	else if (*arg && !confirm_arg_1 && !(room = find_target_room(ch, arg))) {
+	else if (*arg && !confirm_arg_1 && !(room = parse_room_from_coords(argument)) && !(room = find_target_room(ch, arg))) {
 		// sends own error
 	}
 	else if (!(room = HOME_ROOM(room))) {
