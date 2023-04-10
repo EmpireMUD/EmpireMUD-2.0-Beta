@@ -3367,6 +3367,8 @@ void remove_loaded_player(char_data *ch) {
 *  -- The Management
 */
 
+// Note: to set the headers of the wiz/godlists, use "config game wizlist_header", "config game godlist_header" in-game
+
 const char *AUTOWIZ_IMM_LMARG = "   ";
 const int AUTOWIZ_IMM_NSIZE = 16;
 const int AUTOWIZ_LINE_LEN = 64;
@@ -3374,17 +3376,6 @@ const int AUTOWIZ_MIN_LEVEL = LVL_GOD;
 
 // max level that should be in columns instead of centered
 const int AUTOWIZ_COL_LEVEL = LVL_GOD;
-
-/* This is deprecated as of b5.151 (use "config game wizlist_header", "config game godlist_header"):
-const char *autowiz_header =
-"*************************************************************************\n"
-"* The following people have reached immortality on EmpireMUD.  They are *\n"
-"* to be treated with respect and awe.  Occasional prayers to them are   *\n"
-"* advisable.  Annoying them is not recommended.  Stealing from them is  *\n"
-"* punishable by immediate death.                                        *\n"
-"*************************************************************************\n";
-*/
-
 
 // AUTOWIZ_MODE_x: which version is being generated
 #define AUTOWIZ_MODE_WIZLIST  0
