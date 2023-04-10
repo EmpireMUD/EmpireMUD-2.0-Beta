@@ -1315,6 +1315,7 @@ void load_help(FILE *fl) {
 	char key[READ_SIZE+1], next_key[READ_SIZE+1], entry[32384];
 	char line[READ_SIZE+1], *scan;
 	struct help_index_element el;
+	int iter;
 
 	/* get the first keyword line */
 	get_one_line(fl, key);
@@ -1329,7 +1330,7 @@ void load_help(FILE *fl) {
 
 		el.level = 0;
 
-		if (*line == '#' && *(line + 1))
+		if (*line == '#' && *(line + 1)) {
 			// this uses switch, not alpha-math, because some of these levels
 			// may be the same as others, but the letters still need to work
 			// consistently -paul
@@ -1359,7 +1360,17 @@ void load_help(FILE *fl) {
 					break;
 				}
 			}
-
+		}
+		
+		// convert ampersand codes like &0 to tab codes like \t0 -- string length won't change
+		for (iter = 0; iter < strlen(entry); ++iter) {
+			if (entry[iter] == '&') {
+				entry[iter] = '\t';
+				// skip next letter as part of the code:
+				++iter;
+			}
+		}
+		
 		/* now, add the entry to the index with each keyword on the keyword line */
 		el.duplicate = 0;
 		el.entry = str_dup(entry);
