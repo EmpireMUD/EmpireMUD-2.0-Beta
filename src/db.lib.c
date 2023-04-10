@@ -4665,6 +4665,13 @@ struct island_info *get_island_by_coords(char *coords) {
 	room_data *room;
 	
 	skip_spaces(&coords);
+
+	// shortcut?
+	if ((room = parse_room_from_coords(coords))) {
+		return GET_ISLAND(room);
+	}
+	
+	// otherwise try to process
 	if (*coords == '(') {
 		any_one_word(coords, str);
 	}

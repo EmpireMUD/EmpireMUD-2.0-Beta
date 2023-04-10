@@ -7662,7 +7662,14 @@ ACMD(do_workforce) {
 	}
 	else if (is_abbrev(arg, "copy")) {
 		// process remaining args (island name may have quotes)
-		argument = any_one_word(argument, island_arg);
+		skip_spaces(&argument);
+		if (*argument == '"') {
+			argument = any_one_word(argument, island_arg);
+		}
+		else {
+			// keep whole arg
+			strcpy(island_arg, argument);
+		}
 		
 		if (!*island_arg) {
 			msg_to_char(ch, "Usage: workforce copy <from island>\r\n");
@@ -7692,7 +7699,13 @@ ACMD(do_workforce) {
 		
 		// process remaining args (island name may have quotes)
 		argument = any_one_arg(argument, lim_arg);
-		any_one_word(argument, island_arg);
+		skip_spaces(&argument);
+		if (*argument == '"') {
+			any_one_word(argument, island_arg);
+		}
+		else {
+			strcpy(island_arg, argument);
+		}
 		
 		// limit arg
 		if (!*lim_arg) {
