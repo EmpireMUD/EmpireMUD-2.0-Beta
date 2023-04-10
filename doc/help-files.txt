@@ -1,0 +1,94 @@
+HELP FILES
+
+This document includes information on help files and how to add or update them.
+
+
+========================
+ LOCATION OF HELP FILES
+========================
+
+Help files are located at:
+  empiremud/lib/text/help/*.hlp
+
+To add an entirely new help file, be sure to add it to the index at:
+  empiremud/lib/text/help/index
+
+
+==========================
+ STRUCTURE OF A HELP FILE
+==========================
+
+Multiple helps can be located in one file. The basic file structure looks like
+this:
+
+-------------------------------------------------------------------------------
+KEYWORD KEYWORDS "MULTI-WORD KEYWORDS"
+
+Body of help file. This help can be viewed by all players.
+
+See also: OTHER HELP FILES
+#
+KEYWORD KEYWORDS "MULTI-WORD KEYWORDS"
+
+Body of help file. This help can only be viewed by immortals.
+
+See also: OTHER HELP FILES
+#d
+$
+-------------------------------------------------------------------------------
+
+
+======================
+ PARTS OF A HELP FILE
+======================
+
+- Each help entry starts with its keywords in all-caps on one line. If a
+  keyword has multiple words, it must be in quotation marks. This looks like:
+  
+                    KEYWORD KEYWORDS "MULTI-WORD KEYWORDS"
+
+- After the keywords, the help entry should have a blank line.
+- The body of the help entry can contain as much or as little information as
+  you like. Review existing help files for standard formatting and information.
+- If there are other related helps, end the entry with a blank line and then a
+  "See also:" with the keywords of those related helps.
+- Each help entry must end with a pound sign (or hash sign), #, on its own
+  line. If the help is level-restricted, this is followed by a letter.
+- At the very end of the file, after the last help entry, the file must end
+  with a dollar sign, $, on its own line.
+
+
+===========================================
+ ACCESS LEVEL RESTRICTIONS ON HELP ENTRIES
+===========================================
+
+Helps that are intended only for players with a specific access level may be
+restricted by putting a letter after the # at the end of the help entry. Levels
+for each letter are:
+
+   #a - Implementor (top level)
+   #b - Co-Implementor
+   #c - Assistant
+   #d - Immortal (lowest admin level)
+   #e - Gods (a special player level)
+   #f - All players (this no longer has any meaning and can simply be a #)
+
+
+===============================
+ COLOR CODES AND CONTROL CODES
+===============================
+
+Help files can contain color codes and other control codes such as &r (red
+color). There is a full list of color codes on HELP COLOR.
+
+Help files also support additional control codes. These don't work on all
+clients but will show only plain text on ones that don't support it:
+
+   MXP links: &(http://address.com/&) opens the URL when clicked
+   MXP in-game links: &(HELP COLOR&) enters the command HELP COLOR when clicked
+   MXP clickable text:  &<send href="help wizhelp">click here&</send>
+   Unicode characters: &[U9814/Rook] shows unicode char 9814 if supported or
+      'Rook' if not.
+   Custom colors: &[F123] foreground color and &B[123] background color
+      The 3 digits inside the brackets indicate RGB values from 0-5 where
+      0 is darkest and 5 is lightest. In order the digits are Red, Green, Blue.
