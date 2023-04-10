@@ -42,7 +42,8 @@ $
  PARTS OF A HELP FILE
 ======================
 
-- Each help entry starts with its keywords in all-caps on one line. If a
+- Each help entry starts with its keywords in all-caps on one line. This line
+  cannot exceed 255 characters in length, like all lines in data files. If a
   keyword has multiple words, it must be in quotation marks. This looks like:
   
                     KEYWORD KEYWORDS "MULTI-WORD KEYWORDS"
@@ -104,3 +105,6 @@ plain-text editor. Be sure not to remove the # or $ lines (see above).
 After editing help files, you can make these changes live in your game by
 typing 'reload xhelp' on an administrator. This will fully reload all helps
 without restarting the MUD.
+
+Note: No line in the file, including keywords, may exceed 255 characters in
+length.
