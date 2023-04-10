@@ -3614,7 +3614,7 @@ const char banner_to_mapout_token[][2] = {
 	{ 'y', 'p' },
 	{ 'm', 'v' },
 	{ 'c', 'w' },
-	{ 'w', 's' },
+	{ 'w', 'r' },
 	{ 'a', 'u' },
 	{ 'j', 'b' },
 	{ 'l', 'y' },
