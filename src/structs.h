@@ -4875,6 +4875,7 @@ struct crop_data {
 	
 	struct spawn_info *spawns;	// mob spawn data
 	struct interaction_item *interactions;	// interaction items
+	struct extra_descr_data *ex_description;	// extra descriptions
 	
 	UT_hash_handle hh;	// crop_table hash
 };
@@ -5886,6 +5887,7 @@ struct sector_data {
 	struct spawn_info *spawns;	// mob spawn data
 	struct evolution_data *evolution;	// change over time
 	struct interaction_item *interactions;	// interaction items
+	struct extra_descr_data *ex_description;	// extra descriptions
 	
 	char *notes;	// misc notes shown only to imms
 	

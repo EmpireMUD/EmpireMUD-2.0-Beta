@@ -6120,7 +6120,7 @@ void do_stat_building(char_data *ch, bld_data *bdg) {
 	if (GET_BLD_EX_DESCS(bdg)) {
 		struct extra_descr_data *desc;
 		sprintf(buf, "Extra descs:&c");
-		for (desc = GET_BLD_EX_DESCS(bdg); desc; desc = desc->next) {
+		LL_FOREACH(GET_BLD_EX_DESCS(bdg), desc) {
 			strcat(buf, " ");
 			strcat(buf, desc->keyword);
 		}
@@ -6535,6 +6535,16 @@ void do_stat_crop(char_data *ch, crop_data *cp) {
 	
 	msg_to_char(ch, "Location: X-Min: [&g%d&0], X-Max: [&g%d&0], Y-Min: [&g%d&0], Y-Max: [&g%d&0]\r\n", GET_CROP_X_MIN(cp), GET_CROP_X_MAX(cp), GET_CROP_Y_MIN(cp), GET_CROP_Y_MAX(cp));
 	
+	if (GET_CROP_EX_DESCS(cp)) {
+		struct extra_descr_data *desc;
+		sprintf(buf, "Extra descs:&c");
+		LL_FOREACH(GET_CROP_EX_DESCS(cp), desc) {
+			strcat(buf, " ");
+			strcat(buf, desc->keyword);
+		}
+		msg_to_char(ch, "%s&0\r\n", buf);
+	}
+	
 	if (GET_CROP_INTERACTIONS(cp)) {
 		send_to_char("Interactions:\r\n", ch);
 		get_interaction_display(GET_CROP_INTERACTIONS(cp), buf);
@@ -6747,7 +6757,7 @@ void do_stat_object(char_data *ch, obj_data *j) {
 	if (GET_OBJ_EX_DESCS(j)) {
 		struct extra_descr_data *desc;
 		sprintf(buf, "Extra descs:&c");
-		for (desc = GET_OBJ_EX_DESCS(j); desc; desc = desc->next) {
+		LL_FOREACH(GET_OBJ_EX_DESCS(j), desc) {
 			strcat(buf, " ");
 			strcat(buf, desc->keyword);
 		}
@@ -7396,7 +7406,7 @@ void do_stat_room_template(char_data *ch, room_template *rmt) {
 	if (GET_RMT_EX_DESCS(rmt)) {
 		struct extra_descr_data *desc;
 		sprintf(buf, "Extra descs:&c");
-		for (desc = GET_RMT_EX_DESCS(rmt); desc; desc = desc->next) {
+		LL_FOREACH(GET_RMT_EX_DESCS(rmt), desc) {
 			strcat(buf, " ");
 			strcat(buf, desc->keyword);
 		}
@@ -7458,6 +7468,16 @@ void do_stat_sector(char_data *ch, sector_data *st) {
 		msg_to_char(ch, "Evolution information:\r\n");
 		get_evolution_display(st->evolution, buf1);
 		send_to_char(buf1, ch);
+	}
+	
+	if (GET_SECT_EX_DESCS(st)) {
+		struct extra_descr_data *desc;
+		sprintf(buf, "Extra descs:&c");
+		LL_FOREACH(GET_SECT_EX_DESCS(st), desc) {
+			strcat(buf, " ");
+			strcat(buf, desc->keyword);
+		}
+		msg_to_char(ch, "%s&0\r\n", buf);
 	}
 
 	if (st->interactions) {

@@ -108,6 +108,7 @@ bool audit_sector(sector_data *sect, char_data *ch) {
 	
 	problem |= audit_interactions(GET_SECT_VNUM(sect), GET_SECT_INTERACTIONS(sect), TYPE_ROOM, ch);
 	problem |= audit_spawns(GET_SECT_VNUM(sect), GET_SECT_SPAWNS(sect), ch);
+	problem |= audit_extra_descs(GET_SECT_VNUM(sect), GET_SECT_EX_DESCS(sect), ch);
 	
 	return problem;
 }
@@ -520,7 +521,7 @@ void olc_fullsearch_sector(char_data *ch, char *argument) {
 		}
 		
 		// string search
-		if (*find_keywords && !multi_isname(find_keywords, GET_SECT_NAME(sect)) && !multi_isname(find_keywords, GET_SECT_TITLE(sect)) && !multi_isname(find_keywords, GET_SECT_COMMANDS(sect))) {
+		if (*find_keywords && !multi_isname(find_keywords, GET_SECT_NAME(sect)) && !multi_isname(find_keywords, GET_SECT_TITLE(sect)) && !multi_isname(find_keywords, GET_SECT_COMMANDS(sect)) && !search_extra_descs(find_keywords, GET_SECT_EX_DESCS(sect))) {
 			// check icons too
 			match = FALSE;
 			LL_FOREACH(GET_SECT_ICONS(sect), icon) {
@@ -704,6 +705,7 @@ void save_olc_sector(descriptor_data *desc) {
 	if (GET_SECT_NOTES(proto)) {
 		free(GET_SECT_NOTES(proto));
 	}
+	free_extra_descs(&GET_SECT_EX_DESCS(proto));
 	while ((spawn = GET_SECT_SPAWNS(proto))) {
 		GET_SECT_SPAWNS(proto) = spawn->next;
 		free(spawn);
@@ -711,6 +713,7 @@ void save_olc_sector(descriptor_data *desc) {
 	free_interactions(&GET_SECT_INTERACTIONS(proto));
 	
 	// sanity
+	prune_extra_descs(&GET_SECT_EX_DESCS(st));
 	if (!GET_SECT_NAME(st) || !*GET_SECT_NAME(st)) {
 		if (GET_SECT_NAME(st)) {
 			free(GET_SECT_NAME(st));
@@ -769,6 +772,9 @@ sector_data *setup_olc_sector(sector_data *input) {
 		GET_SECT_COMMANDS(new) = GET_SECT_COMMANDS(input) ? str_dup(GET_SECT_COMMANDS(input)) : NULL;
 		GET_SECT_NOTES(new) = GET_SECT_NOTES(input) ? str_dup(GET_SECT_NOTES(input)) : NULL;
 		
+		// copy extra descs
+		GET_SECT_EX_DESCS(new) = copy_extra_descs(GET_SECT_EX_DESCS(input));
+		
 		// copy spawns
 		GET_SECT_SPAWNS(new) = copy_spawn_list(GET_SECT_SPAWNS(input));
 		
@@ -819,6 +825,7 @@ int wordcount_sector(sector_data *sect) {
 	count += wordcount_string(GET_SECT_NAME(sect));
 	count += wordcount_string(GET_SECT_COMMANDS(sect));
 	count += wordcount_string(GET_SECT_TITLE(sect));
+	count += wordcount_extra_descriptions(GET_SECT_EX_DESCS(sect));
 	
 	return count;
 }
@@ -835,7 +842,7 @@ int wordcount_sector(sector_data *sect) {
 */
 void olc_show_sector(char_data *ch) {
 	sector_data *st = GET_OLC_SECTOR(ch->desc);
-	char lbuf[MAX_STRING_LENGTH * 2];
+	char buf[MAX_STRING_LENGTH * 4], lbuf[MAX_STRING_LENGTH * 4];
 	struct spawn_info *spawn;
 	int count;
 	
@@ -870,6 +877,13 @@ void olc_show_sector(char_data *ch) {
 	if (st->evolution) {
 		get_evolution_display(st->evolution, buf1);
 		strcat(buf, buf1);
+	}
+
+	// exdesc
+	sprintf(buf + strlen(buf), "Extra descriptions: <%sextra\t0>\r\n", OLC_LABEL_PTR(GET_SECT_EX_DESCS(st)));
+	if (GET_SECT_EX_DESCS(st)) {
+		get_extra_desc_display(GET_SECT_EX_DESCS(st), lbuf, sizeof(lbuf));
+		strcat(buf, lbuf);
 	}
 
 	sprintf(buf + strlen(buf), "Interactions: <%sinteraction\t0>\r\n", OLC_LABEL_PTR(GET_SECT_INTERACTIONS(st)));
@@ -1162,6 +1176,12 @@ OLC_MODULE(sectedit_evolution) {
 			msg_to_char(ch, "\r\n");
 		}
 	}
+}
+
+
+OLC_MODULE(sectedit_extra_desc) {
+	sector_data *st = GET_OLC_SECTOR(ch->desc);
+	olc_process_extra_desc(ch, argument, &GET_SECT_EX_DESCS(st));
 }
 
 

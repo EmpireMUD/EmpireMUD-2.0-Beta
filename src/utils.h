@@ -482,6 +482,7 @@ int CAN_CARRY_N(char_data *ch);	// formerly a macro
 //// CROP UTILS //////////////////////////////////////////////////////////////
 
 #define GET_CROP_CLIMATE(crop)  ((crop)->climate)
+#define GET_CROP_EX_DESCS(crop)  ((crop)->ex_description)
 #define GET_CROP_FLAGS(crop)  ((crop)->flags)
 #define GET_CROP_ICONS(crop)  ((crop)->icons)
 #define GET_CROP_INTERACTIONS(crop)  ((crop)->interactions)
@@ -1484,6 +1485,7 @@ int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_COORD(ge
 #define GET_SECT_CLIMATE(sect)  ((sect)->climate)
 #define GET_SECT_COMMANDS(sect)  ((sect)->commands)
 #define GET_SECT_EVOS(sect)  ((sect)->evolution)
+#define GET_SECT_EX_DESCS(sect)  ((sect)->ex_description)
 #define GET_SECT_FLAGS(sect)  ((sect)->flags)
 #define GET_SECT_ICONS(sect)  ((sect)->icons)
 #define GET_SECT_INTERACTIONS(sect)  ((sect)->interactions)
