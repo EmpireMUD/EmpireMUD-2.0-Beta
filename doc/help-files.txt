@@ -92,3 +92,15 @@ clients but will show only plain text on ones that don't support it:
    Custom colors: &[F123] foreground color and &B[123] background color
       The 3 digits inside the brackets indicate RGB values from 0-5 where
       0 is darkest and 5 is lightest. In order the digits are Red, Green, Blue.
+
+
+================
+ MAKING CHANGES
+================
+
+There is no in-game OLC editor for help files. You should edit them with a
+plain-text editor. Be sure not to remove the # or $ lines (see above).
+
+After editing help files, you can make these changes live in your game by
+typing 'reload xhelp' on an administrator. This will fully reload all helps
+without restarting the MUD.
