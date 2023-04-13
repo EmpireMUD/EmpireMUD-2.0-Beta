@@ -9,12 +9,21 @@ i&W%&?i&W%~
 D0
 &W%&?i&W%&?i~
 &y~
-I 6 18484 100.00 1  # FORAGE: a handful of popcorn
-I 8 3342 100.00 1  # HARVEST: a bale of straw
-I 8 18485 20.00 2 H  # HARVEST: a bag of popcorn
-I 8 18485 20.00 3 H  # HARVEST: a bag of popcorn
-I 8 18485 20.00 4 H  # HARVEST: a bag of popcorn
-I 8 18485 20.00 5 H  # HARVEST: a bag of popcorn
-I 8 18485 20.00 6 H  # HARVEST: a bag of popcorn
+I 6 18484 100.00 1  # FORAGE: handful of popcorn
+I 8 3342 100.00 1  # HARVEST: bale of straw
+I 8 18485 20.00 2 H  # HARVEST: bag of popcorn
+I 8 18485 20.00 3 H  # HARVEST: bag of popcorn
+I 8 18485 20.00 4 H  # HARVEST: bag of popcorn
+I 8 18485 20.00 5 H  # HARVEST: bag of popcorn
+I 8 18485 20.00 6 H  # HARVEST: bag of popcorn
+X
+popcorn corn field desolate plants crop~
+   The field ahead is filled with tall cornstalks, their dull yellow leaves
+rustling in the wind. As you draw closer, you notice that the ears of corn
+growing on the stalks are fluffier than usual. They are popcorn! The air is
+thick with the sweet and salty scent of freshly popped corn and you can almost
+taste the buttery goodness. In the distance, you hear the occasional pop as it
+ripens.
+~
 S
 $

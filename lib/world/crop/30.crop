@@ -12,6 +12,20 @@ I 8 3026 20.00 3 H  # HARVEST: basket of tomatoes
 I 8 3026 20.00 4 H  # HARVEST: basket of tomatoes
 I 8 3026 20.00 5 H  # HARVEST: basket of tomatoes
 I 8 3026 20.00 6 H  # HARVEST: basket of tomatoes
+X
+tomato tomatoes patch crop field~
+   You find yourself in the midst of a large tomato patch. The plants are lush
+and verdant, with their vines winding their way up tall stakes or trellises. 
+The leaves are bright green and shiny, and the fruit is plump and red, hanging
+heavily from the vines. The air is filled with the sweet, tangy scent of
+ripening tomatoes, a fragrance that is both refreshing and invigorating. As you
+walk through the patch, you can hear the soft rustling of the leaves and the
+occasional snap of a stem breaking underfoot. The ground beneath your feet is
+soft and slightly damp, the soil rich and fertile, providing the perfect
+environment for the tomatoes to thrive. The patch seems to be a symbol of the
+abundance of the earth, with each plant producing as much fruit as possible,
+eager to share its bounty with all who come near.
+~
 S
 #3001
 bananas~
@@ -27,6 +41,20 @@ I 8 3028 20.00 3 H  # HARVEST: bunch of bananas
 I 8 3028 20.00 4 H  # HARVEST: bunch of bananas
 I 8 3028 20.00 5 H  # HARVEST: bunch of bananas
 I 8 3028 20.00 6 H  # HARVEST: bunch of bananas
+X
+bananas grove trees jungle crop~
+   You find yourself standing in the midst of a dense jungle, surrounded by
+towering trees and lush foliage. As you move through the underbrush, you come
+upon a grove of banana trees. The tall, slender trunks reach up towards the
+canopy, with their broad green leaves swaying in the warm breeze. Clusters of
+plump, ripe bananas hang from the branches, their golden skins contrasting
+sharply with the deep greens of the surrounding foliage. The air is thick with
+the heady scent of ripe bananas, a fragrance that is both exotic and alluring.
+The ground beneath your feet is soft and spongy, the soil warm and moist,
+providing the perfect environment for the bananas to thrive. The grove seems to
+be a symbol of the fecundity and abundance of the jungle, with the banana trees
+reaching up towards the sky, eager to produce as much fruit as possible.
+~
 S
 #3002
 coconuts~
@@ -67,6 +95,20 @@ I 6 3031 100.00 1  # FORAGE: split coconut
 I 7 3030 100.00 14  # PICK: bunch of coconuts
 I 20 122 50.00 1 c  # CHOP: rough wood
 I 20 122 50.00 2 c  # CHOP: rough wood
+X
+coconuts grove trees crop~
+   You find yourself standing in the midst of a coconut orchard, surrounded by
+an expanse of dry, sandy desert. The tall, slender trunks of the coconut palms
+reach up towards the sky, with their long fronds rustling in the hot, dry
+breeze. Clusters of coconuts hang from the branches, their rough, fibrous husks
+contrasting sharply with the pale sands of the surrounding desert. The air is
+thick with the sweet scent of coconut, a fragrance that is both refreshing and
+invigorating. The ground beneath your feet is dry and sandy, the soil harsh and
+unforgiving, but the coconut palms seem to thrive nonetheless, drawing
+sustenance from the meager desert soil. The orchard seems to be a symbol of the
+resilience and adaptability of life, with the coconut palms standing tall and
+proud, despite the harsh conditions of their surroundings.
+~
 S
 #3003
 grapes~
@@ -85,6 +127,19 @@ I 8 3032 20.00 3 H  # HARVEST: bunch of grapes
 I 8 3032 20.00 4 H  # HARVEST: bunch of grapes
 I 8 3032 20.00 5 H  # HARVEST: bunch of grapes
 I 8 3032 20.00 6 H  # HARVEST: bunch of grapes
+X
+grapes field vines vineyard crop~
+   You find yourself standing in the midst of a vast vineyard, with row upon
+row of grapevines stretching out in all directions. The slender trunks of the
+vines rise up from the rich, loamy soil, their branches heavy with clusters of
+plump, juicy grapes. The deep green leaves rustle in the gentle breeze, casting
+dappled shadows on the ground below. The air is rich with the sweet, musky
+scent of ripening grapes, a fragrance that is both heady and intoxicating. As
+you move through the vineyard, you can hear the faint sound of leaves rustling
+and vines creaking, as the grapes sway gently in the breeze. The vineyard seems
+to be a symbol of abundance and fertility, with the grapevines offering up
+their bounty in a seemingly endless cycle of growth and harvest.
+~
 S
 #3004
 peppers~
@@ -109,6 +164,20 @@ I 8 3034 20.00 3 H  # HARVEST: basket of peppers
 I 8 3034 20.00 4 H  # HARVEST: basket of peppers
 I 8 3034 20.00 5 H  # HARVEST: basket of peppers
 I 8 3034 20.00 6 H  # HARVEST: basket of peppers
+X
+peppers field plants crop~
+   You find yourself standing in a parched, arid field, surrounded by row upon
+row of spiky, verdant plants. Each plant is laden with a fiery harvest of ripe,
+red hot peppers, their pungent aroma hanging heavily in the dry desert air. 
+The plants themselves are low-growing, with small leaves and gnarled stems that
+seem to twist and curl in the scorching sun. The peppers themselves are small,
+but they pack a potent punch, their bright red color contrasting sharply with
+the muted browns and greens of the surrounding landscape. As you stand amidst
+the plants, you can feel the heat radiating off them, a tangible reminder of
+the fiery flavors they contain. Despite the inhospitable surroundings, these
+hot peppers seem to thrive in the desert heat, offering up their bounty to
+those brave enough to partake.
+~
 S
 #3005
 potatoes~
@@ -124,6 +193,21 @@ I 8 3036 20.00 3 H  # HARVEST: sack of potatoes
 I 8 3036 20.00 4 H  # HARVEST: sack of potatoes
 I 8 3036 20.00 5 H  # HARVEST: sack of potatoes
 I 8 3036 20.00 6 H  # HARVEST: sack of potatoes
+X
+potato potatoes field plants crop~
+   You find yourself standing amidst a lush, rolling field of potato plants. 
+The earth is soft and loamy underfoot, and the air is rich with the earthy,
+musky scent of growing things. The potato plants themselves are low-growing and
+bushy, with broad, green leaves that rustle in the breeze. Nestled in the rich
+soil at the base of each plant, you can see the knobby, irregular shapes of
+newly formed potatoes, their pale skins speckled with tiny flecks of dirt. The
+plants seem to stretch out for miles in all directions, an endless sea of
+greenery that is both soothing and serene. As you walk through the field, you
+can hear the faint sound of rustling leaves and creaking stems, a gentle
+symphony of growth and renewal. The potato crop seems to embody the very
+essence of fertility and abundance, offering up a rich bounty of nourishing
+tubers to those who till the earth.
+~
 S
 #3006
 plums~
@@ -145,6 +229,21 @@ D0
 I 6 3038 100.00 1  # FORAGE: ripe plum
 I 7 3037 100.00 14  # PICK: basket of plums
 I 20 120 100.00 1  # CHOP: large tree
+X
+plums orchard trees crop~
+   You stand amidst a fragrant grove of plum trees, their branches heavy with
+the weight of plump, juicy fruits. The leaves of the trees are a vibrant green,
+shimmering in the sunlight that filters down through the canopy overhead. The
+air is thick with the sweet, tangy scent of ripening fruit, mingling with the
+subtle aroma of damp earth and greenery. Each tree is unique, with twisting
+trunks and branches that seem to weave in and out of each other in a natural,
+organic dance. The plums themselves are a deep, velvety purple, their skins
+smooth and glossy in the dappled light. As you walk through the grove, you can
+hear the faint sound of birdsong, a melodic counterpoint to the rustling leaves
+and creaking branches. The plum trees seem to exude a sense of peaceful
+contentment, their bounty a testament to the natural beauty and abundance of
+the world around us.
+~
 S
 #3007
 strawberries~
@@ -169,6 +268,11 @@ I 8 3039 20.00 3 H  # HARVEST: basket of strawberries
 I 8 3039 20.00 4 H  # HARVEST: basket of strawberries
 I 8 3039 20.00 5 H  # HARVEST: basket of strawberries
 I 8 3039 20.00 6 H  # HARVEST: basket of strawberries
+X
+strawberry strawberries plants crop field~
+You find yourself standing in a vast, rolling field of vibrant red strawberries, their juicy, ripe fruits beckoning you from every direction. The scent of fresh fruit is almost overpowering, a heady mix of sweetness and tartness that fills your nostrils and makes your mouth water. The strawberry plants themselves are low-growing and bushy, with bright green leaves that seem to glow in the sunlight. As you walk through the field, you can feel the soft, springy earth beneath your feet, the ground peppered with tiny white flowers and the occasional errant blade of grass. The strawberries themselves are plump and luscious, with glossy skins that glint in the light. The field seems to stretch out for miles, an endless expanse of red and green that is both beautiful and captivating. The field of strawberries is a celebration of the simple pleasures of life, a reminder that sometimes the most satisfying experiences can be found in the sweet, succulent fruits of the earth.
+fi
+~
 S
 #3008
 mangoes~
@@ -193,6 +297,16 @@ D0
 I 6 3042 100.00 1  # FORAGE: single ripe mango
 I 7 3041 100.00 14  # PICK: basket of mangoes
 I 20 128 100.00 1  # CHOP: massive jungle tree
+X
+mango mangoes trees grove crop~
+   As you approach the mango grove, you can feel the warmth of the sun on your
+skin and hear the rustling of leaves. The tall trees are laden with plump, ripe
+fruit in various shades of orange and yellow, their sweet aroma filling the
+air. The leaves provide dappled shade and create a soothing atmosphere, as if
+inviting you to linger and enjoy the serene surroundings. The branches sway
+gently in the breeze, occasionally dropping a mango to the ground with a soft
+thud.
+~
 S
 #3009
 blueberries~
@@ -220,6 +334,17 @@ I 8 3043 20.00 3 H  # HARVEST: basket of blueberries
 I 8 3043 20.00 4 H  # HARVEST: basket of blueberries
 I 8 3043 20.00 5 H  # HARVEST: basket of blueberries
 I 8 3043 20.00 6 H  # HARVEST: basket of blueberries
+X
+blueberry blueberries field crop plants~
+   Walking through the field of blueberries, you can see rows upon rows of low,
+bushy plants covered in small, round berries. The deep blue color of the
+berries is almost mesmerizing, and the sweet aroma fills the air. As you reach
+down to pluck a few berries, you can feel their plumpness and juiciness in your
+fingers. The leaves of the bushes are a vibrant green and have a slight shine
+to them, as if they have been freshly washed. The cool breeze gently rustles
+the leaves and carries the sweet scent of the berries further out into the
+countryside.
+~
 S
 #3011
 coffee~
@@ -262,6 +387,20 @@ I 8 3045 20.00 3 H  # HARVEST: sack of coffee beans
 I 8 3045 20.00 4 H  # HARVEST: sack of coffee beans
 I 8 3045 20.00 5 H  # HARVEST: sack of coffee beans
 I 8 3045 20.00 6 H  # HARVEST: sack of coffee beans
+X
+coffee field beans cherries plants crop~
+   Walking through the field of coffee, you can see neat rows of small,
+glossy-leaved trees. The branches are weighed down with clusters of small,
+green coffee cherries that will ripen into a rich red over time. The air is
+filled with the sweet and earthy scent of the coffee plant, with hints of
+nuttiness and chocolate. As you walk by, you can hear the sound of buzzing bees
+and chirping birds that have come to feed on the nectar and pollen of the
+coffee blossoms. The ground beneath your feet is soft and moist, a result of
+the frequent watering that the coffee plants need. You can feel the warm sun on
+your skin, and you imagine the workers who tend to these trees day in and day
+out, carefully nurturing them until the coffee cherries are ready to be
+harvested.
+~
 S
 #3015
 oats~
@@ -278,6 +417,20 @@ I 8 3046 20.00 3 H  # HARVEST: sack of oats
 I 8 3046 20.00 4 H  # HARVEST: sack of oats
 I 8 3046 20.00 5 H  # HARVEST: sack of oats
 I 8 3046 20.00 6 H  # HARVEST: sack of oats
+X
+oats field stems plants crop~
+   Standing in the midst of a field of oats, you can see a sea of tall, slender
+stems swaying gently in the breeze. The stalks are topped with delicate, pale
+green leaves that rustle softly as the wind passes through. Here and there, you
+can see the tips of long, slender seed heads poking up above the foliage, each
+one containing dozens of tiny oat grains. As you walk through the field, you
+can hear the soft rustle of the oats brushing against one another, and the
+occasional chirping of birds flitting amongst the plants. The ground beneath
+your feet is soft and spongy, with the occasional crunch of dried oat husks
+underfoot. You can smell the faint, earthy aroma of the oat plants, with hints
+of sweetness and nuttiness. All around you is a sense of tranquility and peace,
+as if the quiet and beauty of the oats has enveloped you in its embrace.
+~
 S
 #3016
 watermelons~
@@ -320,6 +473,17 @@ I 8 3047 20.00 3 H  # HARVEST: single ripe watermelon
 I 8 3047 20.00 4 H  # HARVEST: single ripe watermelon
 I 8 3047 20.00 5 H  # HARVEST: single ripe watermelon
 I 8 3047 20.00 6 H  # HARVEST: single ripe watermelon
+X
+watermelons bed field crop plants~
+   You approach a lush bed of watermelons nestled in the heart of the jungle.
+The thick green vines snake through the jungle floor, dotted with juicy, ripe
+watermelons of all sizes. The humid air is perfumed with the sweet scent of the
+fruit, and you can't help but salivate at the thought of biting into a slice of
+the succulent flesh. The brightly colored rinds are tough and bumpy, serving as
+armor for the delicious fruit within. The sound of chirping birds and buzzing
+insects adds to the vibrant ambiance of the jungle, making this an idyllic spot
+to rest and refresh oneself.
+~
 S
 #3017
 lettuce~
@@ -337,6 +501,15 @@ I 8 3049 20.00 5 H  # HARVEST: head of lettuce
 I 8 3049 20.00 6 H  # HARVEST: head of lettuce
 I 8 3050 75.00 2 S  # HARVEST: lettuce seeds
 I 8 3050 25.00 3 S  # HARVEST: lettuce seeds
+X
+lettuce field patch plants crop~
+   In the lettuce field, neat rows of vibrant green lettuce heads stretch out
+in all directions. Their tender leaves dance gently in the breeze, casting a
+cool, refreshing aura over the area. The moist soil beneath your feet speaks to
+the care and attention given to cultivating these delicate greens. It's clear
+that every leaf in this field was grown with the utmost precision and
+dedication.
+~
 S
 #3018
 calabash gourds~
@@ -348,6 +521,15 @@ oooo~
 &g~
 I 6 3053 100.00 1  # FORAGE: green calabash
 I 8 3054 100.00 2  # HARVEST: sack of fresh calabash gourds
+X
+gourds calabash vines plants crop field~
+   A collection of calabash gourds sway in the gentle breeze, their bulbous
+shapes hanging heavily on the vine. The leaves of the gourd plants are broad
+and green, providing shade for the developing fruit as they slowly ripen under
+the sun's warm glow. You can hear the gentle hum of bees as they dart among the
+flowers, pollinating the vines and ensuring a bountiful harvest of these
+versatile gourds.
+~
 S
 #3070
 apricots~
@@ -388,6 +570,17 @@ I 6 3071 100.00 1  # FORAGE: couple of apricots
 I 7 3070 100.00 14  # PICK: basket of apricots
 I 9 121 100.00 1  # GATHER: sticks and leaves
 I 20 120 100.00 1  # CHOP: large tree
+X
+apricots orchard fruit trees crop~
+   You see an apricot orchard stretching out before you, rows upon rows of
+small trees with delicate, green leaves and clusters of orange fruits. The
+scent of sweet apricots fills the air, and the branches are heavy with ripe,
+plump fruit. As you look closer, you can see the fuzzy skin of the apricots and
+the golden flesh inside, promising a juicy, delicious taste. The trees are
+evenly spaced and well-tended, with each one bearing an abundance of fruit. 
+The sound of birds singing and insects buzzing can be heard all around, adding
+to the idyllic atmosphere of the orchard.
+~
 S
 #3072
 sugarcane~
@@ -415,6 +608,17 @@ I 8 3072 20.00 3 H  # HARVEST: bundle of sugarcane
 I 8 3072 20.00 4 H  # HARVEST: bundle of sugarcane
 I 8 3072 20.00 5 H  # HARVEST: bundle of sugarcane
 I 8 3072 20.00 6 H  # HARVEST: bundle of sugarcane
+X
+sugarcane canes plants field crop~
+   A field of sugarcane stretches out before you, with tall stalks swaying
+gently in the warm, tropical breeze. The bright green leaves of the plants
+rustle softly, their pointed tips reaching towards the sun. Each stalk of
+sugarcane is thick and fibrous, with a pale yellow hue that seems to glow in
+the bright sunlight. As you move closer, you can see the long, segmented stalks
+up close, and you catch a faint whiff of their sweet, slightly earthy aroma. 
+The field seems to go on endlessly, with row after row of sugarcane swaying
+rhythmically in the warm, humid air.
+~
 S
 #3074
 garlic~
@@ -430,6 +634,14 @@ I 8 3074 20.00 3 H  # HARVEST: basket of garlic
 I 8 3074 20.00 4 H  # HARVEST: basket of garlic
 I 8 3074 20.00 5 H  # HARVEST: basket of garlic
 I 8 3074 20.00 6 H  # HARVEST: basket of garlic
+X
+garlic field plants crop~
+   A field of garlic spreads out before you, each stalk standing tall and
+proud. The earthy aroma of the bulbs fills the air around you. The green leaves
+of the plants are long and slender, swaying gently in the breeze. Rows upon
+rows of the leafy greens stretch out as far as the eye can see, each plant
+bursting with pungent flavor.
+~
 S
 #3076
 lemons~
@@ -455,6 +667,15 @@ I 6 3077 100.00 1  # FORAGE: single ripe lemon
 I 7 3076 100.00 14  # PICK: basket of lemons
 I 9 121 100.00 1  # GATHER: sticks and leaves
 I 20 120 100.00 1  # CHOP: large tree
+X
+lemons orchard trees crop~
+   The trees are laden with plump, yellow fruit, each one emanating a sweet,
+tangy aroma. The thick leaves offer ample shade from the hot tropical sun,
+making the air cool and refreshing. The gentle rustling of the leaves, swaying
+in the warm, humid breeze, lends a sense of tranquility to the scene. The
+ground below is soft and mossy, with the occasional rock or tree root jutting
+up here and there.
+~
 S
 #3078
 cucumbers~
@@ -488,5 +709,15 @@ I 8 3078 20.00 3 H  # HARVEST: basket of cucumbers
 I 8 3078 20.00 4 H  # HARVEST: basket of cucumbers
 I 8 3078 20.00 5 H  # HARVEST: basket of cucumbers
 I 8 3078 20.00 6 H  # HARVEST: basket of cucumbers
+X
+cucumbers field plants crop~
+   The cucumber field spreads out before you, lush and green. Each plant is
+tall and sturdy, with large green leaves providing ample shade for the ripening
+cucumbers below. The scent of fresh earth mingles with the crisp aroma of the
+growing cucumbers, filling the air with a heady perfume. You can hear the sound
+of water trickling nearby, nourishing the thirsty plants and keeping them
+healthy. As you look closer, you notice the plump cucumbers, each one a deep
+green and glossy, waiting to be harvested.
+~
 S
 $

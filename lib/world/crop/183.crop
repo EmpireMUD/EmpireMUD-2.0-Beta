@@ -15,12 +15,21 @@ D0
 D0
 &a.&?...~
 &g~
-I 6 18322 10.00 1 t  # FORAGE: a sack of flaxseed
-I 6 3003 90.00 1 t  # FORAGE: a handful of grain
-I 8 18321 75.00 1 f  # HARVEST: a bundle of flax fibers
-I 8 18321 25.00 2 f  # HARVEST: a bundle of flax fibers
-I 8 18322 50.00 2 s  # HARVEST: a sack of flaxseed
-I 8 18322 40.00 3 s  # HARVEST: a sack of flaxseed
-I 8 18322 10.00 4 s  # HARVEST: a sack of flaxseed
+I 6 18322 10.00 1 t  # FORAGE: sack of flaxseed
+I 6 3003 90.00 1 t  # FORAGE: handful of grain
+I 8 18321 75.00 1 f  # HARVEST: bundle of flax fibers
+I 8 18321 25.00 2 f  # HARVEST: bundle of flax fibers
+I 8 18322 50.00 2 s  # HARVEST: sack of flaxseed
+I 8 18322 40.00 3 s  # HARVEST: sack of flaxseed
+I 8 18322 10.00 4 s  # HARVEST: sack of flaxseed
+X
+flax field plants crop~
+   You approach a field of tall, slender plants with delicate blue flowers. 
+It's a flax field, and the stalks sway gently in the breeze. The soil is damp
+and fertile, and you can hear the distant murmur of a nearby river. The plants
+are at various stages of growth, some just sprouting while others are ready to
+be harvested. The blue flowers contrast beautifully against the green of the
+leaves and the brown earth, making for a picturesque view.
+~
 S
 $
