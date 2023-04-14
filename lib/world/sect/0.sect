@@ -55,6 +55,14 @@ I 7 1201 100.00 125 p  # PICK: sack of fiveleaf
 I+ 0 70  # Ability: Find Herbs
 I 7 123 100.00 125 p  # PICK: small flower
 I 9 140 100.00 1  # GATHER: bundle of long grass
+X
+plains field grass ground around~
+   You stand in the middle of an expansive, flat open plain. The grasses
+beneath your feet stretch out in all directions, swaying gently in the breeze.
+The occasional bird flits past, calling out to its companions, but otherwise,
+there is nothing but a peaceful silence. The openness of the terrain makes you
+feel exposed and vulnerable, with nowhere to hide.
+~
 S
 #1
 Light Forest~
@@ -99,6 +107,16 @@ I 7 123 100.00 125 p  # PICK: small flower
 I 9 121 85.00 1 g  # GATHER: sticks and leaves
 I 9 131 15.00 1 g  # GATHER: green sapling
 I 20 120 100.00 1  # CHOP: large tree
+X
+forest trees leaves around~
+   You find yourself standing at the edge of a light forest. The trees here are
+young and slender, and the foliage overhead allows dappled sunlight to filter
+through, creating a tranquil, mottled effect on the ground. You can hear the
+soft rustling of leaves as a gentle breeze passes through the trees, and the
+occasional bird chirping overhead. The forest floor is covered in a soft carpet
+of moss and fallen leaves, and the air is cool and refreshing. It's a peaceful
+and serene place.
+~
 S
 #2
 Forest~
@@ -143,6 +161,15 @@ I 7 123 100.00 125 p  # PICK: small flower
 I 9 121 85.00 1 g  # GATHER: sticks and leaves
 I 9 131 15.00 1 g  # GATHER: green sapling
 I 20 120 100.00 1  # CHOP: large tree
+X
+forest trees leaves around~
+   The forest air is cool and fresh, scented with earth and greenery. You can
+hear the rustling of leaves and the occasional bird call, but otherwise,
+animals are sparse. The forest floor is covered with a layer of leaves, twigs,
+and other organic debris, muffling your footsteps as you move. It's a peaceful
+and secluded place, offering a respite from the hustle and bustle of the
+outside world.
+~
 S
 #3
 Shady Forest~
@@ -187,6 +214,14 @@ I 7 123 100.00 125 p  # PICK: small flower
 I 9 121 85.00 1 g  # GATHER: sticks and leaves
 I 9 131 15.00 1 g  # GATHER: green sapling
 I 20 120 100.00 1  # CHOP: large tree
+X
+forest shade shady trees leaves around~
+   You are standing in a shady forest, where the trees grow close together and
+the canopy overhead blocks out much of the sky. The air is cool and damp, and
+the ground beneath your feet is covered in a thick layer of fallen leaves and
+branches. You can hear the occasional rustling of leaves and the soft chirping
+of birds hidden among the foliage.
+~
 S
 #4
 Overgrown Forest~
@@ -253,6 +288,16 @@ I 7 123 100.00 125 p  # PICK: small flower
 I 9 121 85.00 1 g  # GATHER: sticks and leaves
 I 9 131 15.00 1 g  # GATHER: green sapling
 I 20 120 100.00 1  # CHOP: large tree
+X
+forest trees leaves around~
+   You are standing in an overgrown forest, where the underbrush is so thick
+that it's difficult to make out the trunks of the massive trees surrounding
+you. The air is humid and heavy, and the scent of rich soil and decaying leaves
+is almost overwhelming. The forest is alive with the sounds of insects buzzing
+and birds calling out to each other. The forest floor is a chaotic jumble of
+tangled roots, ferns, and thorns, making movement difficult. It's a wild and
+untamed place, where nature reigns supreme.
+~
 S
 #5
 River~
@@ -281,6 +326,14 @@ I 21 1311 25.00 1 f  # FISH: spotted eel
 I 21 1313 25.00 1 f  # FISH: bright red leaping fish
 I 21 1312 100.00 1 f  # FISH: speckled trout
 I 22 174 5.00 1  # PAN: small flake of gold
+X
+river water around~
+   The water of the river flows steadily downstream, its surface shimmering in
+the light. You listen to the murmur of the water as it flows over rocks and
+around bends in the river, and the occasional splash as a fish jumps to catch
+an insect. The river is a calming presence, inviting you to sit and watch the
+world go by for a while.
+~
 S
 #6
 Ocean~
@@ -371,6 +424,16 @@ I 21 1304 5.00 1 f  # FISH: sea junk
 I 21 1302 25.00 1 f  # FISH: giant linefish
 I 21 1303 25.00 1 f  # FISH: magenta arrowfish
 I 21 1301 100.00 1 f  # FISH: striped barbfish
+X
+ocean water horizon around~
+   You are surrounded by a seemingly endless expanse of open ocean, the horizon
+stretching out as far as you can see. The water is a deep blue-green, clear and
+inviting. You can feel the salty spray of the sea on your skin and the sound of
+waves crashing against each other fills your ears. Seabirds circle overhead,
+their calls carried on the wind, and schools of fish dart just beneath the
+surface. The ocean is a vast and mysterious place, both beautiful and
+intimidating, and the possibilities it holds are limitless.
+~
 S
 #7
 Crop~
@@ -442,6 +505,16 @@ D3
 D4
 ----~
 &0~
+X
+road ground rocks path around~
+   You are standing on a well-worn road, its surface made of packed dirt,
+stones, and occasional patches of gravel. The road winds its way through the
+landscape, marking a path that has been traveled by many before you. The edges
+of the road are marked by small rocks and cleared paths, with occasional signs
+or markers pointing the way to your destination. The road is a symbol of
+civilization, a link between far-flung places, and a testament to the human
+desire to explore and discover.
+~
 S
 #10
 Building~
@@ -517,6 +590,16 @@ E
 I 5 102 15.00 1 X  # DIG: flint stone
 I 5 100 100.00 1 X  # DIG: rock
 I 6 3003 100.00 1  # FORAGE: handful of grain
+X
+field seeded seeds plants crop around~
+   You find yourself standing in a vast field of dirt, recently turned over in
+preparation for planting. Here and there, you see the first signs of life
+emerging from the soil - tiny sprouts, their tender green leaves barely visible
+against the brown earth. The air is cool and fresh, with the scent of damp soil
+and new growth all around you. Though the crops have only just begun to emerge,
+it's clear that the field has been carefully tended by skilled farmers, who
+have taken great care to ensure that each seed is planted just so.
+~
 S
 #14
 Sandy Field~
@@ -537,6 +620,18 @@ I 5 102 15.00 1 X  # DIG: flint stone
 I 5 100 100.00 1 X  # DIG: rock
 I 5 103 8.00 1 X  # DIG: yellow lightning stone
 I 6 3014 100.00 1  # FORAGE: dry beans
+X
+field seeded seeds plants crop desert around~
+   You are standing in a parched desert landscape, but amidst the sandy
+terrain, you see the beginnings of life. Rows of small, fragile plants poke
+through the dry earth, their leaves a vibrant green against the muted tones of
+the desert. The tiny sprouts are an oasis in this barren environment, their
+delicate shoots reaching up towards the sky. It's too early to tell what kind
+of crop is being grown here, but the signs of growth are a hopeful sign in a
+place where survival is a constant struggle. As you look around, you can't help
+but wonder what this small plot of land will yield in the weeks and months to
+come.
+~
 S
 #15
 Jungle Field~
@@ -555,6 +650,20 @@ E
 19 0 100.00 27
 I 6 3017 100.00 1  # FORAGE: plump fig
 I 9 133 100.00 1  # GATHER: tangle of vines
+X
+field seeded seeds plants crop jungle around~
+   You have come upon a small clearing, where you can see that the verdant
+jungle has been cleared to make way for a new crop. The freshly turned earth is
+dark and fertile, and tiny green shoots have just begun to emerge from the
+soil. You can't quite make out what the crop is yet, as the plants are still
+too small to identify. But you can see that the farmers who planted them have
+taken great care to ensure that they are planted in neat rows, with plenty of
+space between them to grow. Beyond the clearing, the jungle looms tall and
+green, a stark contrast to the orderly rows of the new crop. It's a scene of
+life and growth in the midst of a wild and untamed environment, and you can't
+help but feel a sense of awe at the tenacity of these farmers in the face of
+such daunting surroundings.
+~
 S
 #16
 Jungle Crop~
@@ -598,6 +707,19 @@ E
 I 5 102 15.00 1 X  # DIG: flint stone
 I 5 101 15.00 1 X  # DIG: lump of clay
 I 5 100 100.00 1 X  # DIG: rock
+X
+trench canal moat ground around~
+   You find yourself standing on the edge of a trench that has been
+painstakingly dug by hand with a great deal of effort and skill. The walls of
+the trench are steep and slick with moisture, and you can hear the distant
+sound of water trickling somewhere within. It's evident that this trench was
+not dug for mere aesthetics - it has a clear function. Perhaps it was dug to
+create a moat or canal, to channel water or to protect a structure. Whatever
+its purpose, you can't help but admire the work that went into its creation.
+It's a reminder of the industriousness and ingenuity of those who live in this
+world, and a testament to what can be accomplished with hard work and
+determination.
+~
 S
 #18
 Tower of Souls~
@@ -617,6 +739,15 @@ D3
 D4
 */\*~
 &y~
+X
+tower souls around~
+   The Tower of Souls looms over you, stretching from its stone foundation to
+the heavens above. The constant whir and whoosh of souls ascending and
+descending the tower's scaffolding drowns out the sound of the world around
+you. From time to time, the tower captures a soul and restores it to life, in
+the flesh.
+(Players with no 'tomb' set will respawn at a Tower of Souls.)
+~
 S
 #19
 Canal~
@@ -625,6 +756,17 @@ A Canal~
 D0
 @w&?~~@e~
 &c~
+X
+canal water trench around~
+   You are standing next to a wide, gently flowing canal. The water here is
+calm and clear, and you can see the faint ripples caused by the current. The
+canal is deep enough that it would be difficult to wade across, and its edges
+are lined with tall, sturdy banks of earth. You can see that the canal has been
+artificially constructed, as its edges are perfectly straight and symmetrical.
+Whether they're being used as a moat to protect a nearby fortress or maybe a
+vital waterway for trade and transportation, these canals always fill you with
+a sense of awe as impressive feats of human engineering.
+~
 S
 #20
 Desert~
@@ -644,8 +786,6 @@ D3
 D4
 ....~
 &y~
-E
-2 21 2.00 25
 E
 2 57 10.00 51
 E
@@ -668,24 +808,24 @@ I+ 0 70  # Ability: Find Herbs
 I 7 123 100.00 125 p  # PICK: small flower
 I 9 139 92.00 1 g  # GATHER: bundle of long leaves
 I 9 134 8.00 1 g  # GATHER: thorny sapling
+X
+desert ground plants cactus cacti around~
+   You stand in the midst of a vast, sandy desert, interrupted only by
+occasional outcroppings of rock and hardy, low-growing vegetation. The
+landscape is rugged and unforgiving, but all around you are signs of life. The
+scorching heat beats down on you, and the only sound is the gentle rustling of
+the wind as it sweeps across the barren terrain. You feel a sense of isolation
+and vulnerability in this harsh, unforgiving landscape.
+~
 S
 #21
 Oasis~
 A Sparkling Oasis~
 '.' 18 kov 6 iw jop
 C
-dig, drink, fill, gather, pick~
-D1
+dig, drink, fill, pick~
+D0
 .&C~~&?.~
-&Y~
-D2
-.&c~~&?.~
-&y~
-D3
-.&C~~&?.~
-&Y~
-D4
-.&c~~&?.~
 &y~
 E
 2 57 4.00 19
@@ -697,14 +837,26 @@ E
 2 5 4.00 19
 E
 2 19 4.00 19
+E
+4 0 2.00 80
+E
+17 20 2.00 25
 I 5 103 8.00 1 X  # DIG: yellow lightning stone
-I 5 102 15.00 1 X  # DIG: flint stone
+I 5 101 15.00 1 X  # DIG: lump of clay
 I 5 100 100.00 1 X  # DIG: rock
 I 6 3014 25.00 1  # FORAGE: dry beans
 I 7 1206 8.33 125 p  # PICK: iridescent blue iris
 I 7 1203 100.00 125 p  # PICK: magewhisper sepals
 I+ 0 70  # Ability: Find Herbs
 I 7 123 100.00 125 p  # PICK: small flower
+X
+oasis plants water vegetation desert around~
+   As you approach the oasis, you can feel the air around you become cooler and
+moister. A small pool of crystal-clear water sparkles in the center of the
+verdant grove of plants, inviting you to quench your thirst. The shade provided
+by the vegetation offers a welcome respite. You can hear the soothing sound of
+a gentle breeze rustling through the leaves.
+~
 S
 #22
 Sandy Trench~
@@ -2516,6 +2668,103 @@ I 7 1204 45.84 125 p  # PICK: daggerbite frond
 I+ 0 70  # Ability: Find Herbs
 I 7 123 100.00 125 p  # PICK: small flower
 I 20 135 100.00 1  # CHOP: reaching sapling
+S
+#80
+Lush Oasis~
+A Lush Oasis~
+'.' 18 koqv 6 aiw jp
+C
+chop, dig, drink, fill, gather, pick~
+D0
+.&C~~&g^~
+&y~
+D0
+&g^&C~~&?.~
+&y~
+E
+0 0 100.00 21
+E
+2 57 4.00 19
+E
+2 53 4.00 19
+E
+2 6 4.00 19
+E
+2 5 4.00 19
+E
+2 19 4.00 19
+E
+4 0 2.00 81
+E
+17 20 2.00 25
+I 5 103 8.00 1 X  # DIG: yellow lightning stone
+I 5 101 15.00 1 X  # DIG: lump of clay
+I 5 100 100.00 1 X  # DIG: rock
+I 6 3014 25.00 1  # FORAGE: dry beans
+I 7 1206 8.33 125 p  # PICK: iridescent blue iris
+I 7 1203 100.00 125 p  # PICK: magewhisper sepals
+I+ 0 70  # Ability: Find Herbs
+I 7 123 100.00 125 p  # PICK: small flower
+I 9 134 15.00 1 g  # GATHER: thorny sapling
+I 9 139 50.00 1 g  # GATHER: bundle of long leaves
+I 9 132 35.00 1 g  # GATHER: thorny branches
+I 20 122 85.00 2 c  # CHOP: rough wood
+I 20 122 10.00 3 c  # CHOP: rough wood
+I 20 122 5.00 4 c  # CHOP: rough wood
+X
+oasis plants water vegetation desert around~
+   As you approach the oasis, you can feel the air around you become cooler and
+moister. A small pool of crystal-clear water sparkles in the center of the
+verdant grove of plants, inviting you to quench your thirst. The shade provided
+by the vegetation offers a welcome respite. You can hear the soothing sound of
+a gentle breeze rustling through the leaves.
+~
+S
+#81
+Shady Oasis~
+A Shady Oasis~
+'.' 18 koqv 6 iw jp
+C
+chop, dig, drink, fill, gather, pick~
+D0
+&g^&C~~&g^~
+&y~
+E
+0 0 100.00 80
+E
+2 57 4.00 19
+E
+2 53 4.00 19
+E
+2 6 4.00 19
+E
+2 5 4.00 19
+E
+2 19 4.00 19
+E
+17 20 2.00 25
+I 5 103 8.00 1 X  # DIG: yellow lightning stone
+I 5 101 15.00 1 X  # DIG: lump of clay
+I 5 100 100.00 1 X  # DIG: rock
+I 6 3014 25.00 1  # FORAGE: dry beans
+I 7 1206 8.33 125 p  # PICK: iridescent blue iris
+I 7 1203 100.00 125 p  # PICK: magewhisper sepals
+I+ 0 70  # Ability: Find Herbs
+I 7 123 100.00 125 p  # PICK: small flower
+I 9 132 35.00 1 g  # GATHER: thorny branches
+I 9 134 15.00 1 g  # GATHER: thorny sapling
+I 9 139 50.00 1 g  # GATHER: bundle of long leaves
+I 20 122 25.00 2 c  # CHOP: rough wood
+I 20 122 25.00 3 c  # CHOP: rough wood
+I 20 122 50.00 4 c  # CHOP: rough wood
+X
+oasis plants water vegetation trees desert around~
+   As you approach the oasis, you can feel the air around you become cooler and
+moister. A small pool of crystal-clear water sparkles in the center of the
+verdant grove of plants, inviting you to quench your thirst. The shade provided
+by the trees offers a welcome respite. You can hear the soothing sound of a
+gentle breeze rustling through the leaves.
+~
 S
 #90
 Old-Growth Forest~
