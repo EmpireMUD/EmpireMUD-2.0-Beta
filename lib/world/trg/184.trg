@@ -7,20 +7,26 @@ if !%instance.location%
   %purge% %self%
   halt
 end
+* sector configs
+set plains_sects 0 7 13 36 46
+set forest_sects 1 2 3 4 90 39 44 45 37 38 39 47
+set jungle_sects 15 16 27 28 61 62 65
+set desert_sects 20 12 14 23 24 25 26
+* work
 if (%room.distance(%instance.location%)% > 5)
   mgoto %instance.location%
 elseif %room.aff_flagged(*HAS-INSTANCE)%
   halt
-elseif (%room.sector% == Plains || %room.sector% == Crop)
+elseif %plains_sects% ~= %room.sector_vnum%
   %terraform% %room% 18451
   %echo% The rising water from the nearby river floods the plains!
-elseif (%room.sector% == Light Forest || %room.sector% == Forest || %room.sector% == Shady Forest || %room.sector% == Overgrown Forest)
+elseif %forest_sects% ~= %room.sector_vnum%
   %terraform% %room% 18452
   %echo% The rising water from the nearby river floods the forest!
-elseif (%room.sector% == Light Jungle || %room.sector% == Jungle || %room.sector% == Jungle Crop)
+elseif %jungle_sects% ~= %room.sector_vnum%
   %terraform% %room% 29
   %echo% The rising water from the nearby river floods the jungle!
-elseif (%room.sector% == Desert || %room.sector% == Grove || %room.sector% == Desert Crop)
+elseif %desert_sects% ~= %room.sector_vnum%
   %terraform% %room% 18453
   %echo% The rising water from the nearby river floods the desert!
 end
