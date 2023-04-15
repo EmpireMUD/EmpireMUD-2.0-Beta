@@ -70,7 +70,7 @@ if (%dist% > 2)
   %echo% ~%self% appears from ^%self% lodge.
 elseif %room.aff_flagged(*HAS-INSTANCE)%
   halt
-elseif (%room.sector% == River && %dist% <= 2)
+elseif (%room.sector_vnum% == 5 && %dist% <= 2)
   %build% %room% 18451
   %echo% ~%self% expands ^%self% dam here.
 end
