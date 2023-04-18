@@ -2133,6 +2133,148 @@ void b5_151_road_fix(void) {
 }
 
 
+// b5.151 part 2: Repair sectors changed by adventures 104 and 18450, and update new terrains
+void b5_151_terrain_fix(void) {
+	struct map_data *map;
+	int changed_sect = 0, changed_base = 0;
+	sector_vnum to_sect, to_base;
+	
+	// sector vnums in use at the time of this patch
+	#define b5151_RIVER  5
+	#define b5151_CROP  7
+	#define b5151_ROAD  9
+	#define b5151_BUILDING  10
+	#define b5151_SEEDED_FIELD  13
+	#define b5151_TRENCH  17
+	#define b5151_CANAL  19
+	#define b5151_DESERT  20
+	#define b5151_OASIS  21
+	#define b5151_SANDY_TRENCH  22
+	#define b5151_DESERT_STUMPS  23
+	#define b5151_DESERT_COPSE  24
+	#define b5151_DESERT_SHRUB  25
+	#define b5151_GROVE  26
+	#define b5151_ESTUARY  53
+	#define b5151_IRRIGATED_FIELD  70
+	#define b5151_IRRIGATED_FOREST  71
+	#define b5151_IRRIGATED_JUNGLE  72
+	#define b5151_IRRIGATED_STUMPS  73
+	#define b5151_IRRIGATED_COPSE  74
+	#define b5151_IRRIGATED_JUNGLE_STUMPS  75
+	#define b5151_IRRIGATED_JUNGLE_COPSE  76
+	#define b5151_IRRIGATED_PLANTED_FIELD  77
+	#define b5151_IRRIGATED_CROP  78
+	#define b5151_DRY_OASIS  82
+	#define b5151_PLANTED_OASIS  83
+	#define b5151_OASIS_CROP  84
+	#define b5151_IRRIGATION_CANAL  85
+	#define b5151_DAMP_TRENCH  86
+	#define b5151_VERDANT_CANAL  87
+	#define b5151_IRRIGATED_OASIS  88
+	
+	// helpers
+	#define b5151_no_sect_change(vnum)  ((vnum) == b5151_ROAD || (vnum) == b5151_BUILDING)
+	#define b5151_is_DESERT(vnum)  ((vnum) == b5151_ROAD || (vnum) == b5151_BUILDING || (vnum) == b5151_DESERT || (vnum) == b5151_GROVE || (vnum) == b5151_DESERT_STUMPS || (vnum) == b5151_DESERT_COPSE || (vnum) == b5151_DESERT_SHRUB)
+	#define b5151_is_IRRIGATED(vnum)  ((vnum) == b5151_IRRIGATED_FIELD || (vnum) == b5151_IRRIGATED_FOREST || (vnum) == b5151_IRRIGATED_JUNGLE || (vnum) == b5151_IRRIGATED_STUMPS || (vnum) == b5151_IRRIGATED_COPSE || (vnum) == b5151_IRRIGATED_JUNGLE_STUMPS || (vnum) == b5151_IRRIGATED_JUNGLE_COPSE || (vnum) == b5151_IRRIGATED_PLANTED_FIELD || (vnum) == b5151_IRRIGATED_CROP || (vnum) == b5151_IRRIGATED_OASIS)
+	
+	
+	LL_FOREACH(land_map, map) {
+		to_sect = to_base = NOTHING;
+		// has_crop = FALSE;
+		
+		// just skip ocean
+		if (map->shared == &ocean_shared_data) {
+			continue;
+		}
+		
+		// chain of things to check
+		if ((GET_SECT_VNUM(map->base_sector) != b5151_RIVER && GET_SECT_VNUM(map->natural_sector) != b5151_RIVER) || (GET_SECT_VNUM(map->base_sector) != b5151_ESTUARY && GET_SECT_VNUM(map->natural_sector) != b5151_ESTUARY)) {
+			// river but not real river?
+			switch (GET_SECT_VNUM(map->natural_sector)) {
+				case b5151_DESERT:
+				case b5151_GROVE: {
+					log("- (%d, %d) River to Irrigation Canal", MAP_X_COORD(map->vnum), MAP_Y_COORD(map->vnum));
+					to_sect = to_base = b5151_IRRIGATION_CANAL;
+					break;
+				}
+				case b5151_OASIS: {
+					log("- (%d, %d) River to Verdant Canal", MAP_X_COORD(map->vnum), MAP_Y_COORD(map->vnum));
+					to_sect = to_base = b5151_VERDANT_CANAL;
+					break;
+				}
+				default: {
+					log("- (%d, %d) Warning: No available fix (river/estuary)", MAP_X_COORD(map->vnum), MAP_Y_COORD(map->vnum));
+					break;
+				}
+			}
+		} // end fake-river
+		else if (GET_SECT_VNUM(map->natural_sector) == b5151_OASIS && (GET_SECT_VNUM(map->base_sector) != b5151_OASIS || GET_SECT_VNUM(map->sector_type) != b5151_OASIS)) {
+			// natural oasis but not base/currently oasis
+			if (b5151_is_DESERT(GET_SECT_VNUM(map->base_sector)) || b5151_is_DESERT(GET_SECT_VNUM(map->base_sector))) {
+				log("- (%d, %d) Desert to Dry Oasis", MAP_X_COORD(map->vnum), MAP_Y_COORD(map->vnum));
+				to_sect = to_base = b5151_DRY_OASIS;
+			}
+			else if (GET_SECT_VNUM(map->base_sector) == b5151_TRENCH || GET_SECT_VNUM(map->base_sector) == b5151_SANDY_TRENCH) {
+				log("- (%d, %d) Trench to Damp Trench", MAP_X_COORD(map->vnum), MAP_Y_COORD(map->vnum));
+				to_sect = to_base = b5151_DAMP_TRENCH;
+			}
+			else if (GET_SECT_VNUM(map->base_sector) == b5151_CANAL || GET_SECT_VNUM(map->base_sector) == b5151_IRRIGATION_CANAL) {
+				log("- (%d, %d) Canal to Verdant Canal", MAP_X_COORD(map->vnum), MAP_Y_COORD(map->vnum));
+				to_sect = to_base = b5151_VERDANT_CANAL;
+			}
+			else if (GET_SECT_VNUM(map->sector_type) == b5151_SEEDED_FIELD || GET_SECT_VNUM(map->sector_type) == b5151_IRRIGATED_PLANTED_FIELD) {
+				log("- (%d, %d) Irrigated seed to Planted Oasis", MAP_X_COORD(map->vnum), MAP_Y_COORD(map->vnum));
+				to_sect = b5151_PLANTED_OASIS;
+				to_base = b5151_IRRIGATED_OASIS;
+				// has_crop = TRUE;
+			}
+			else if (GET_SECT_VNUM(map->sector_type) == b5151_CROP || GET_SECT_VNUM(map->sector_type) == b5151_IRRIGATED_CROP) {
+				log("- (%d, %d) Irrigated crop to Oasis Crop", MAP_X_COORD(map->vnum), MAP_Y_COORD(map->vnum));
+				to_sect = b5151_OASIS_CROP;
+				to_base = b5151_IRRIGATED_OASIS;
+				// has_crop = TRUE;
+			}
+			else if (b5151_is_IRRIGATED(GET_SECT_VNUM(map->base_sector))) {
+				// put this AFTER crops as those are irrigated too
+				log("- (%d, %d) Irrigated tile to Irrigated Oasis", MAP_X_COORD(map->vnum), MAP_Y_COORD(map->vnum));
+				to_sect = to_base = b5151_IRRIGATED_OASIS;
+			}
+			else {
+				log("- (%d, %d) Warning: No available fix (natural oasis)", MAP_X_COORD(map->vnum), MAP_Y_COORD(map->vnum));
+			}
+		}	// end natural oasis
+		else if (GET_SECT_VNUM(map->sector_type) == b5151_CROP && b5151_is_DESERT(GET_SECT_VNUM(map->natural_sector))) {
+			// regular crop on a natural desert tile
+			log("- (%d, %d) Old irrigated crop to new Irrigated Crop", MAP_X_COORD(map->vnum), MAP_Y_COORD(map->vnum));
+			to_sect = b5151_IRRIGATED_CROP;
+			to_base = b5151_IRRIGATED_FIELD;
+			// has_crop = TRUE;
+		}
+		else if (GET_SECT_VNUM(map->sector_type) == b5151_SEEDED_FIELD && b5151_is_DESERT(GET_SECT_VNUM(map->natural_sector))) {
+			// regular crop on a natural desert tile
+			log("- (%d, %d) Old irrigated seed to new Planted Irrigated", MAP_X_COORD(map->vnum), MAP_Y_COORD(map->vnum));
+			to_sect = b5151_IRRIGATED_PLANTED_FIELD;
+			to_base = b5151_IRRIGATED_FIELD;
+			// has_crop = TRUE;
+		}
+		
+		// work
+		if ((to_sect != NOTHING || to_base != NOTHING)) { // && (room = map->room ? map->room : real_room(map->vnum))) {
+			if (to_sect && !b5151_no_sect_change(GET_SECT_VNUM(map->sector_type))) {
+				perform_change_sect(NULL, map, sector_proto(to_sect));
+				++changed_sect;
+			}
+			if (to_base != NOTHING) {
+				perform_change_base_sect(NULL, map, sector_proto(to_base));
+				++changed_base;
+			}
+		}
+	}
+	
+	log("- total: %d sector%s and %d base sector%s", changed_sect, PLURAL(changed_sect), changed_base, PLURAL(changed_base));
+}
+
+
  //////////////////////////////////////////////////////////////////////////////
 //// UPDATE DATA /////////////////////////////////////////////////////////////
 
@@ -2193,6 +2335,7 @@ const struct {
 	{ "b5.130b", b5_130b_item_refresh, b5_130b_player_refresh, "Updated items that need script attachments" },
 	{ "b5.134", NULL, b5_134_update_players, "Wiped map memory for screenreader users to clear bad data" },
 	{ "b5.151", b5_151_road_fix, NULL, "Applying hide-real-name flag to customized roads" },
+	{ "b5.151.1", b5_151_terrain_fix, NULL, "Repairing bad terrains and updating with new oases and irrigated terrains" },
 	
 	{ "\n", NULL, NULL, "\n" }	// must be last
 };
