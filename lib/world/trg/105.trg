@@ -783,16 +783,19 @@ if (%room.distance(%instance.location%)% > 2)
   mgoto %instance.location%
 elseif %room.aff_flagged(*HAS-INSTANCE)%
   halt
-elseif (%room.sector% == River)
+elseif %room.sector_vnum% == 5
   %terraform% %room% 10550
   %echo% The river freezes over!
-elseif (%room.sector% == Estuary)
+elseif %room.sector_vnum% == 53
   %terraform% %room% 10551
   %echo% The estuary freezes over!
-elseif (%room.sector% == Canal)
+elseif %room.sector_vnum% == 19
   %terraform% %room% 10552
   %echo% The canal freezes over!
-elseif (%room.sector% == Lake)
+elseif %room.sector_vnum% == 85
+  %terraform% %room% 10554
+  %echo% The irrigation canal freezes over!
+elseif %room.sector_vnum% == 32
   %terraform% %room% 10553
   %echo% The lake freezes over!
 end

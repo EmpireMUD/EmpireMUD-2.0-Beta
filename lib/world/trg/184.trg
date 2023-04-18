@@ -12,6 +12,9 @@ set plains_sects 0 7 13 36 46
 set forest_sects 1 2 3 4 90 39 44 45 37 38 39 47
 set jungle_sects 15 16 27 28 61 62 65
 set desert_sects 20 12 14 23 24 25 26
+set irrigated_sects 70 73 74 75 76 77 78
+set irrig_forest 71
+set irrig_jungle 72
 * work
 if (%room.distance(%instance.location%)% > 5)
   mgoto %instance.location%
@@ -29,6 +32,15 @@ elseif %jungle_sects% ~= %room.sector_vnum%
 elseif %desert_sects% ~= %room.sector_vnum%
   %terraform% %room% 18453
   %echo% The rising water from the nearby river floods the desert!
+elseif %irrigated_sects% ~= %room.sector_vnum%
+  %terraform% %room% 18454
+  %echo% The rising water from the nearby canal floods the area!
+elseif %irrig_forest% ~= %room.sector_vnum%
+  %terraform% %room% 18455
+  %echo% The rising water from the nearby canal floods the forest!
+elseif %irrig_jungle% ~= %room.sector_vnum%
+  %terraform% %room% 18456
+  %echo% The rising water from the nearby canal floods the jungle!
 end
 ~
 #18451
@@ -57,6 +69,9 @@ Beaver dam cleanup~
 Beaver dam construction~
 0 i 100
 ~
+* sector vnums to allow
+set valid_sects 5 19 53 85
+*
 set room %self.room%
 if !%instance.location%
   %purge% %self%
@@ -70,7 +85,7 @@ if (%dist% > 2)
   %echo% ~%self% appears from ^%self% lodge.
 elseif %room.aff_flagged(*HAS-INSTANCE)%
   halt
-elseif (%room.sector_vnum% == 5 && %dist% <= 2)
+elseif (%valid_sects% ~= %room.sector_vnum% && %dist% <= 2)
   %build% %room% 18451
   %echo% ~%self% expands ^%self% dam here.
 end
