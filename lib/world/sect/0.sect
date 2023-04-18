@@ -821,14 +821,18 @@ S
 #21
 Oasis~
 A Sparkling Oasis~
-'.' 18 kov 6 iw jop
+'.' 18 kov 6 iw jp
 C
-dig, drink, fill, pick~
+dig, drink, fill, gather, pick~
 D0
 .&C~~&?.~
 &y~
 E
 4 0 2.00 80
+E
+8 0 100.00 83
+E
+9 0 75.00 80
 E
 17 20 2.00 25
 I 5 103 8.00 1 X  # DIG: yellow lightning stone
@@ -839,6 +843,8 @@ I 7 1206 8.33 125 p  # PICK: iridescent blue iris
 I 7 1203 100.00 125 p  # PICK: magewhisper sepals
 I+ 0 70  # Ability: Find Herbs
 I 7 123 100.00 125 p  # PICK: small flower
+I 9 134 8.00 1 g  # GATHER: thorny sapling
+I 9 139 92.00 1 g  # GATHER: bundle of long leaves
 X
 oasis plants water vegetation desert around~
    As you approach the oasis, you can feel the air around you become cooler and
@@ -2364,7 +2370,7 @@ S
 #70
 Irrigated Field~
 An Irrigated Field~
-'.' 10 jklrv 2 l bp
+'.' 10 jklrv 2 il bp
 C
 dig, gather, pick~
 D0
@@ -2383,7 +2389,7 @@ E
 E
 5 0 100.00 22
 E
-8 0 100.00 13
+8 0 100.00 77
 E
 9 0 50.00 71
 E
@@ -2405,7 +2411,7 @@ S
 #71
 Irrigated Forest~
 An Irrigated Forest~
-'^' 14 jkqv 3 adl np
+'^' 14 jkqv 3 adil np
 C
 chop, dig, gather, pick~
 D0
@@ -2445,7 +2451,7 @@ S
 #72
 Irrigated Jungle~
 An Irrigated Jungle~
-'^' 14 klqv 3 ad g
+'^' 14 klqv 3 adi g
 C
 chop, dig, gather, pick~
 D0
@@ -2491,7 +2497,7 @@ S
 #73
 Irrigated Stumps~
 An Irrigated Field of Stumps~
-'.' 10 jkrv 2 adl bp
+'.' 10 jkrv 2 adil bp
 C
 burn stumps, dig, gather, pick~
 D0
@@ -2525,7 +2531,7 @@ S
 #74
 Irrigated Copse~
 An Irrigated Copse~
-'w' 13 jkrv 3 ad p
+'w' 13 jkrv 3 adi p
 C
 chop, dig, pick~
 D0
@@ -2566,7 +2572,7 @@ S
 #75
 Irrigated Jungle Stumps~
 An Irrigated Field of Stumps~
-'.' 10 klrv 3 adl p
+'.' 10 klrv 3 adil p
 C
 chop, dig, pick~
 D0
@@ -2598,7 +2604,7 @@ S
 #76
 Irrigated Jungle Copse~
 An Irrigated Jungle Copse~
-'w' 13 klv 6 ad p
+'w' 13 klv 6 adi p
 C
 chop, dig, pick~
 D0
@@ -2645,16 +2651,16 @@ S
 #77
 Planted Irrigated Field~
 A Planted Irrigated Field~
-',' 10 jkl 3 j kp
+',' 10 jkl 3 ij kp
 C
 dig~
 D0
 ,,,,~
 &G~
 E
-1 0 100.00 7
+1 0 100.00 78
 E
-9 0 20.00 7
+9 0 20.00 78
 E
 19 0 100.00 70
 I 5 101 15.00 1 X  # DIG: lump of clay
@@ -2664,7 +2670,7 @@ S
 #78
 Irrigated Crop~
 An Irrigated Crop~
-'.' 10 jkl 3 djk kp
+'.' 10 jkl 3 dijk kp
 D0
 ????~
 &G~
@@ -2677,7 +2683,7 @@ S
 #80
 Lush Oasis~
 A Lush Oasis~
-'.' 18 koqv 6 aiw jp
+'.' 18 koqv 6 adiw jp
 C
 chop, dig, drink, fill, gather, pick~
 D0
@@ -2690,6 +2696,10 @@ E
 0 0 100.00 21
 E
 4 0 2.00 81
+E
+8 0 100.00 83
+E
+9 0 75.00 81
 E
 17 20 2.00 25
 I 5 103 8.00 1 X  # DIG: yellow lightning stone
@@ -2718,7 +2728,7 @@ S
 #81
 Shady Oasis~
 A Shady Oasis~
-'.' 18 koqv 6 iw jp
+'.' 18 koqv 6 diw jp
 C
 chop, dig, drink, fill, gather, pick~
 D0
@@ -2726,6 +2736,8 @@ D0
 &y~
 E
 0 0 100.00 80
+E
+8 0 100.00 83
 E
 17 20 2.00 25
 I 5 103 8.00 1 X  # DIG: yellow lightning stone
@@ -2751,6 +2763,81 @@ by the trees offers a welcome respite. You can hear the soothing sound of a
 gentle breeze rustling through the leaves.
 ~
 S
+#82
+Dry Oasis~
+A Dry Oasis~
+'.' 21 k 6 l ep
+C
+dig, gather, pick~
+D1
+.&T..&?.~
+&Y~
+D2
+.&t..&?.~
+&y~
+D3
+.&T..&?.~
+&Y~
+D4
+.&t..&?.~
+&y~
+E
+5 0 100.00 86
+E
+7 85 4.00 88
+E
+8 0 100.00 83
+E
+9 0 50.00 21
+E
+22 0 0.50 21
+I 5 103 8.00 1 X  # DIG: yellow lightning stone
+I 5 101 15.00 1 X  # DIG: lump of clay
+I 5 100 100.00 1 X  # DIG: rock
+I 6 3014 50.00 1  # FORAGE: dry beans
+I 7 1206 8.33 125 p  # PICK: iridescent blue iris
+I 7 1204 100.00 125 p  # PICK: daggerbite frond
+I+ 0 70  # Ability: Find Herbs
+I 7 123 100.00 125 p  # PICK: small flower
+I 9 139 92.00 1 g  # GATHER: bundle of long leaves
+I 9 134 8.00 1 g  # GATHER: thorny sapling
+_
+Drained by players to create a non-water tile they can build on.
+~
+S
+#83
+Planted Oasis~
+A Planted Oasis~
+'.' 18 kov 6 ijw kp
+C
+dig, drink, fill~
+D0
+&G,&C~~&G,~
+&y~
+E
+1 0 100.00 84
+E
+9 0 75.00 84
+E
+19 0 100.00 21
+I 5 101 15.00 1 X  # DIG: lump of clay
+I 5 100 100.00 1 X  # DIG: rock
+I 5 103 8.00 1 X  # DIG: yellow lightning stone
+I 6 3014 100.00 1  # FORAGE: dry beans
+S
+#84
+Oasis Crop~
+An Oasis Crop~
+'.' 18 kov 6 dijkw kp
+D0
+????~
+&y~
+E
+19 0 100.00 21
+I 5 101 15.00 1 X  # DIG: lump of clay
+I 5 103 8.00 1 X  # DIG: yellow lightning stone
+I 5 100 100.00 1 X  # DIG: rock
+S
 #85
 Irrigation Canal~
 An Irrigation Canal~
@@ -2769,6 +2856,71 @@ Whether they're being used as a moat to protect a nearby fortress or maybe a
 vital waterway for trade and transportation, these canals always fill you with
 a sense of awe as impressive feats of human engineering.
 ~
+S
+#86
+Damp Trench~
+A Damp Trench~
+'.' 24 hk 4 t 0
+C
+dig, excavate, fillin, pour~
+D1
+\__/~
+&y~
+D2
+\__/~
+&y~
+D3
+\__/~
+&y~
+D4
+\__/~
+&y~
+E
+6 0 100.00 87
+I 5 103 8.00 1 X  # DIG: yellow lightning stone
+I 5 101 15.00 1 X  # DIG: lump of clay
+I 5 107 100.00 1 X  # DIG: bag of sand
+S
+#87
+Verdant Canal~
+A Verdant Canal~
+'~' 17 ko 8 gi af
+D0
+@w&?~~@e~
+&C~
+_
+Variant of the canal for natural Oasis tiles.
+~
+S
+#88
+Irrigated Oasis~
+An Oasis on the Irrigated Field~
+'.' 18 jklov 6 iw jp
+C
+dig, drink, fill, gather, pick~
+D0
+.&C~~&?.~
+&G~
+E
+5 0 100.00 86
+E
+8 0 100.00 83
+E
+11 85 4.00 80
+E
+17 20 2.00 25
+E
+17 70 2.00 74
+I 5 103 8.00 1 X  # DIG: yellow lightning stone
+I 5 101 15.00 1 X  # DIG: lump of clay
+I 5 100 100.00 1 X  # DIG: rock
+I 6 3014 100.00 1  # FORAGE: dry beans
+I 7 1206 8.33 125 p  # PICK: iridescent blue iris
+I 7 1203 100.00 125 p  # PICK: magewhisper sepals
+I+ 0 70  # Ability: Find Herbs
+I 7 123 100.00 125 p  # PICK: small flower
+I 9 134 8.00 1 g  # GATHER: thorny sapling
+I 9 139 92.00 1 g  # GATHER: bundle of long leaves
 S
 #90
 Old-Growth Forest~
