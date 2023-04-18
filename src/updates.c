@@ -2140,6 +2140,11 @@ void b5_151_terrain_fix(void) {
 	sector_vnum to_sect, to_base;
 	
 	// sector vnums in use at the time of this patch
+	#define b5151_PLAINS  0
+	#define b5151_FOREST_1  1
+	#define b5151_FOREST_2  2
+	#define b5151_FOREST_3  3
+	#define b5151_FOREST_4  4
 	#define b5151_RIVER  5
 	#define b5151_CROP  7
 	#define b5151_ROAD  9
@@ -2154,6 +2159,11 @@ void b5_151_terrain_fix(void) {
 	#define b5151_DESERT_COPSE  24
 	#define b5151_DESERT_SHRUB  25
 	#define b5151_GROVE  26
+	#define b5151_STUMPS  36
+	#define b5151_COPSE_1  37
+	#define b5151_COPSE_2  38
+	#define b5151_SHORE  50
+	#define b5151_BEACH  51
 	#define b5151_ESTUARY  53
 	#define b5151_IRRIGATED_FIELD  70
 	#define b5151_IRRIGATED_FOREST  71
@@ -2171,11 +2181,20 @@ void b5_151_terrain_fix(void) {
 	#define b5151_DAMP_TRENCH  86
 	#define b5151_VERDANT_CANAL  87
 	#define b5151_IRRIGATED_OASIS  88
+	#define b5151_WEIRDWOOD_0  610
+	#define b5151_WEIRDWOOD_1  611
+	#define b5151_WEIRDWOOD_2  612
+	#define b5151_WEIRDWOOD_3  613
+	#define b5151_WEIRDWOOD_4  614
+	#define b5151_WEIRDWOOD_5  615
+	#define b5151_ENCHANTED_OASIS  616
 	
 	// helpers
 	#define b5151_no_sect_change(vnum)  ((vnum) == b5151_ROAD || (vnum) == b5151_BUILDING)
-	#define b5151_is_DESERT(vnum)  ((vnum) == b5151_ROAD || (vnum) == b5151_BUILDING || (vnum) == b5151_DESERT || (vnum) == b5151_GROVE || (vnum) == b5151_DESERT_STUMPS || (vnum) == b5151_DESERT_COPSE || (vnum) == b5151_DESERT_SHRUB)
+	#define b5151_is_DESERT(vnum)  ((vnum) == b5151_ROAD || (vnum) == b5151_BUILDING || (vnum) == b5151_DESERT || (vnum) == b5151_GROVE || (vnum) == b5151_DESERT_STUMPS || (vnum) == b5151_DESERT_COPSE || (vnum) == b5151_DESERT_SHRUB || (vnum) == b5151_BEACH)
 	#define b5151_is_IRRIGATED(vnum)  ((vnum) == b5151_IRRIGATED_FIELD || (vnum) == b5151_IRRIGATED_FOREST || (vnum) == b5151_IRRIGATED_JUNGLE || (vnum) == b5151_IRRIGATED_STUMPS || (vnum) == b5151_IRRIGATED_COPSE || (vnum) == b5151_IRRIGATED_JUNGLE_STUMPS || (vnum) == b5151_IRRIGATED_JUNGLE_COPSE || (vnum) == b5151_IRRIGATED_PLANTED_FIELD || (vnum) == b5151_IRRIGATED_CROP || (vnum) == b5151_IRRIGATED_OASIS)
+	#define b5151_is_TEMPERATE(vnum)  ((vnum) == b5151_PLAINS || (vnum) == b5151_FOREST_1 || (vnum) == b5151_FOREST_2 || (vnum) == b5151_FOREST_3 || (vnum) == b5151_FOREST_4 || (vnum) == b5151_STUMPS || (vnum) == b5151_COPSE_1 || (vnum) == b5151_COPSE_2 || (vnum) == b5151_SHORE )
+	#define b5151_is_WEIRDWOOD(vnum)  ((vnum) == b5151_WEIRDWOOD_0 || (vnum) == b5151_WEIRDWOOD_1 || (vnum) == b5151_WEIRDWOOD_2 || (vnum) == b5151_WEIRDWOOD_3 || (vnum) == b5151_WEIRDWOOD_4 || (vnum) == b5151_WEIRDWOOD_5)
 	
 	
 	LL_FOREACH(land_map, map) {
@@ -2210,7 +2229,13 @@ void b5_151_terrain_fix(void) {
 		} // end fake-river
 		else if (GET_SECT_VNUM(map->natural_sector) == b5151_OASIS && (GET_SECT_VNUM(map->base_sector) != b5151_OASIS || GET_SECT_VNUM(map->sector_type) != b5151_OASIS)) {
 			// natural oasis but not base/currently oasis
-			if (b5151_is_DESERT(GET_SECT_VNUM(map->base_sector)) || b5151_is_DESERT(GET_SECT_VNUM(map->base_sector))) {
+			if (b5151_no_sect_change(GET_SECT_VNUM(map->sector_type)) && (GET_SECT_VNUM(map->base_sector) == b5151_OASIS || GET_SECT_VNUM(map->base_sector) == b5151_ENCHANTED_OASIS)) {
+				log("- (%d, %d) DEBUG: Probably fine (Bld/Road on Oasis/Oasis)", MAP_X_COORD(map->vnum), MAP_Y_COORD(map->vnum));
+			}
+			else if (GET_SECT_VNUM(map->sector_type) == b5151_ENCHANTED_OASIS && GET_SECT_VNUM(map->base_sector) == b5151_ENCHANTED_OASIS) {
+				log("- (%d, %d) DEBUG: Probably fine (Enchanted Oasis on Oasis)", MAP_X_COORD(map->vnum), MAP_Y_COORD(map->vnum));
+			}
+			else if (b5151_is_DESERT(GET_SECT_VNUM(map->sector_type)) || b5151_is_DESERT(GET_SECT_VNUM(map->base_sector))) {
 				log("- (%d, %d) Desert to Dry Oasis", MAP_X_COORD(map->vnum), MAP_Y_COORD(map->vnum));
 				to_sect = to_base = b5151_DRY_OASIS;
 			}
@@ -2257,8 +2282,26 @@ void b5_151_terrain_fix(void) {
 			to_base = b5151_IRRIGATED_FIELD;
 			// has_crop = TRUE;
 		}
+		else if (b5151_is_DESERT(GET_SECT_VNUM(map->natural_sector)) && !b5151_is_DESERT(GET_SECT_VNUM(map->base_sector))) {
+			// things that started out desert but aren't now
+			if (b5151_is_IRRIGATED(GET_SECT_VNUM(map->base_sector))) {
+				log("- (%d, %d) DEBUG: Probably fine (Irrigated on Desert)", MAP_X_COORD(map->vnum), MAP_Y_COORD(map->vnum));
+			}
+			else if (GET_SECT_VNUM(map->base_sector) == b5151_ENCHANTED_OASIS) {
+				log("- (%d, %d) Enchanted Oasis on non-Oasis tile", MAP_X_COORD(map->vnum), MAP_Y_COORD(map->vnum));
+				to_sect = to_base = b5151_WEIRDWOOD_1;
+			}
+			else if (b5151_is_TEMPERATE(GET_SECT_VNUM(map->base_sector))) {
+				log("- (%d, %d) Temperate tile on Desert", MAP_X_COORD(map->vnum), MAP_Y_COORD(map->vnum));
+				to_sect = to_base = b5151_IRRIGATED_FIELD;
+			}
+			else {
+				log("- (%d, %d) Warning: No available fix (base desert)", MAP_X_COORD(map->vnum), MAP_Y_COORD(map->vnum));
+			}
+		}
 		
-		// work
+		
+		// LAST: do the work
 		if ((to_sect != NOTHING || to_base != NOTHING)) { // && (room = map->room ? map->room : real_room(map->vnum))) {
 			if (to_sect && !b5151_no_sect_change(GET_SECT_VNUM(map->sector_type))) {
 				perform_change_sect(NULL, map, sector_proto(to_sect));
