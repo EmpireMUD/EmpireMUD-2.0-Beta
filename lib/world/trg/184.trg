@@ -12,6 +12,7 @@ set plains_sects 0 7 13 36 46
 set forest_sects 1 2 3 4 90 39 44 45 37 38 39 47
 set jungle_sects 15 16 27 28 61 62 65
 set desert_sects 20 12 14 23 24 25 26
+set oasis_sects 21 80 81 82 83 84 86 88
 set irrigated_sects 70 73 74 75 76 77 78
 set irrig_forest 71
 set irrig_jungle 72
@@ -32,6 +33,9 @@ elseif %jungle_sects% ~= %room.sector_vnum%
 elseif %desert_sects% ~= %room.sector_vnum%
   %terraform% %room% 18453
   %echo% The rising water from the nearby river floods the desert!
+elseif %oasis_sects% ~= %room.sector_vnum%
+  %terraform% %room% 18457
+  %echo% The rising water from the nearby canal floods the oasis!
 elseif %irrigated_sects% ~= %room.sector_vnum%
   %terraform% %room% 18454
   %echo% The rising water from the nearby canal floods the area!
@@ -70,7 +74,7 @@ Beaver dam construction~
 0 i 100
 ~
 * sector vnums to allow
-set valid_sects 5 19 53 85
+set valid_sects 5 19 53 85 87
 *
 set room %self.room%
 if !%instance.location%

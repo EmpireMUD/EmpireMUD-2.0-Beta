@@ -795,6 +795,9 @@ elseif %room.sector_vnum% == 19
 elseif %room.sector_vnum% == 85
   %terraform% %room% 10554
   %echo% The irrigation canal freezes over!
+elseif %room.sector_vnum% == 87
+  %terraform% %room% 10555
+  %echo% The canal freezes over!
 elseif %room.sector_vnum% == 32
   %terraform% %room% 10553
   %echo% The lake freezes over!
