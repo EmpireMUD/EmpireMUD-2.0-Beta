@@ -1,7 +1,7 @@
 #18450
 Beaver Dam~
 A Beaver Dam~
-'#' 26 ov 6 w 0
+'#' 26 ov 6 iwx 0
 D0
 ####~
 &t~
@@ -13,7 +13,7 @@ S
 #18451
 Flooded Plains~
 The Flooded Plains~
-'~' 17 jov 10 w p
+'~' 17 jov 10 iw p
 D1
 ~~~&g.~
 &c~
@@ -63,14 +63,14 @@ D4
 &0.&c~~~~
 &c~
 E
-4 0 0.20 0
+4 0 2.00 0
 E
 9 0 75.00 0
 S
 #18452
 Flooded Woods~
 The Flooded Woods~
-'~' 17 joqv 10 w p
+'~' 17 joqv 10 iw p
 D1
 ~&g^&c~&g^~
 &c~
@@ -96,29 +96,131 @@ D4
 &W^&c~&W^&c~~
 &c~
 E
-4 0 0.20 2
+4 0 2.00 2
 E
 9 0 75.00 2
 S
 #18453
 Flooded Desert~
 The Flooded Desert~
-'~' 17 kov 10 w p
+'~' 17 kov 10 iw p
 D0
 ~~~&Y.~
-&c~
+&C~
 D0
-~~&Y.&c~~
-&c~
+~~&Y.&C~~
+&C~
 D0
-~&Y.&c~~~
-&c~
+~&Y.&C~~~
+&C~
 D0
-&Y.&c~~~~
-&c~
+&Y.&C~~~~
+&C~
 E
-4 0 0.20 20
+4 0 2.00 20
 E
 9 0 75.00 20
+_
+Beaver-flooded variant of flat desert tiles 20 12 14 23 24 25 26
+~
+S
+#18454
+Flooded Desert~
+The Flooded Desert~
+'~' 17 kov 10 iw p
+D0
+~~~&Y.~
+&C~
+D0
+~~&Y.&C~~
+&C~
+D0
+~&Y.&C~~~
+&C~
+D0
+&Y.&C~~~~
+&C~
+E
+4 0 2.00 70
+E
+9 0 75.00 70
+_
+Beaver-flooded sector for flat irrigation tiles: 70 73 74 75 76 77 78
+~
+S
+#18455
+Flooded Desert~
+The Flooded Desert~
+'~' 17 kov 10 iw p
+D0
+~~~&g^~
+&C~
+D0
+~~&g^&?~~
+&C~
+D0
+~&g^&?~~~
+&C~
+D0
+&g^&?~~~~
+&C~
+E
+4 0 2.00 71
+E
+9 0 75.00 71
+_
+Beaver-flooded irrigated forest (71)
+~
+S
+#18456
+Flooded Desert~
+The Flooded Desert~
+'~' 17 kov 10 iw p
+D0
+&G^^&?~~~
+&C~
+D0
+~&G^^&?~~
+&C~
+D0
+~~&G^^~
+&C~
+D0
+~&G^&?~&G^~
+&C~
+D0
+&G^&?~&G^&?~~
+&C~
+D0
+&G^&?~~&G^~
+&C~
+E
+4 0 2.00 72
+E
+9 0 75.00 72
+_
+Beaver-flooded irrigated jungle (72)
+~
+S
+#18457
+Flooded Desert~
+The Flooded Desert~
+'~' 17 kov 10 iw p
+D0
+~~~&Y.~
+&C~
+D0
+&Y.&C~~~~
+&C~
+D0
+~~~~~
+&C~
+E
+4 0 2.00 80
+E
+9 0 75.00 80
+_
+Beaver-flooded oasis - 21, 80, 81, 82, 83, 84, 86, 88
+~
 S
 $
