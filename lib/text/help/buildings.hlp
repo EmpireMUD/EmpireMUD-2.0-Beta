@@ -319,11 +319,11 @@ DRAINAGE "OASIS DRAINAGE" "DRAINED OASIS" "DRAIN OASIS" "DRAINING OASIS"
 
 &y.&c__&y.&0  Draining Oasis  (Stilt Buildings goal)
 
-By building drainage for an oasis, it can be converted into a normal desert.
-If the oasis was created using the 'excavate' command, you can alternatively use
-'fillin' instead.
+By building drainage for an oasis, it can be converted into dry land. Dry oases
+will slowly revert to normal if they are unclaimed.
 
-See also: EXCAVATE
+You can build drainage on any type of oasis, but this will kill anything
+growing on the oasis tile when complete.
 #
 ESTUARYGARDEN "ESTUARY GARDEN"
 
