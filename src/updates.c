@@ -2188,7 +2188,7 @@ void b5_151_terrain_fix(void) {
 		}
 		
 		// chain of things to check
-		if ((GET_SECT_VNUM(map->base_sector) != b5151_RIVER && GET_SECT_VNUM(map->natural_sector) != b5151_RIVER) || (GET_SECT_VNUM(map->base_sector) != b5151_ESTUARY && GET_SECT_VNUM(map->natural_sector) != b5151_ESTUARY)) {
+		if ((GET_SECT_VNUM(map->base_sector) == b5151_RIVER && GET_SECT_VNUM(map->natural_sector) != b5151_RIVER) || (GET_SECT_VNUM(map->base_sector) == b5151_ESTUARY && GET_SECT_VNUM(map->natural_sector) != b5151_ESTUARY)) {
 			// river but not real river?
 			switch (GET_SECT_VNUM(map->natural_sector)) {
 				case b5151_DESERT:
