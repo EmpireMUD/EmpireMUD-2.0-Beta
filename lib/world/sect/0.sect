@@ -830,6 +830,8 @@ D0
 E
 4 0 2.00 80
 E
+7 85 4.00 88
+E
 8 0 100.00 83
 E
 9 0 75.00 80
@@ -2697,7 +2699,7 @@ E
 E
 4 0 2.00 81
 E
-8 0 100.00 83
+7 85 4.00 89
 E
 9 0 75.00 81
 E
@@ -2737,7 +2739,7 @@ D0
 E
 0 0 100.00 80
 E
-8 0 100.00 83
+7 85 4.00 89
 E
 17 20 2.00 25
 I 5 103 8.00 1 X  # DIG: yellow lightning stone
@@ -2902,9 +2904,11 @@ D0
 .&C~~&?.~
 &G~
 E
-5 0 100.00 86
+4 0 2.00 89
 E
 8 0 100.00 83
+E
+9 0 75.00 89
 E
 11 85 4.00 80
 E
@@ -2921,6 +2925,39 @@ I+ 0 70  # Ability: Find Herbs
 I 7 123 100.00 125 p  # PICK: small flower
 I 9 134 8.00 1 g  # GATHER: thorny sapling
 I 9 139 92.00 1 g  # GATHER: bundle of long leaves
+S
+#89
+Shady Irrigated Oasis~
+A Shady Oasis on the Irrigated Field~
+'.' 18 jkloqv 6 diw jp
+C
+dig, drink, fill, gather, pick~
+D0
+&g^&C~~&g^~
+&G~
+E
+0 0 50.00 88
+E
+0 0 100.00 89
+E
+11 85 4.00 81
+E
+17 20 2.00 25
+E
+17 70 2.00 74
+I 5 103 8.00 1 X  # DIG: yellow lightning stone
+I 5 101 15.00 1 X  # DIG: lump of clay
+I 5 100 100.00 1 X  # DIG: rock
+I 6 3014 100.00 1  # FORAGE: dry beans
+I 7 1206 8.33 125 p  # PICK: iridescent blue iris
+I 7 1203 100.00 125 p  # PICK: magewhisper sepals
+I+ 0 70  # Ability: Find Herbs
+I 7 123 100.00 125 p  # PICK: small flower
+I 9 134 8.00 1 g  # GATHER: thorny sapling
+I 9 139 92.00 1 g  # GATHER: bundle of long leaves
+I 20 122 25.00 2 c  # CHOP: rough wood
+I 20 122 50.00 3 c  # CHOP: rough wood
+I 20 122 25.00 4 c  # CHOP: rough wood
 S
 #90
 Old-Growth Forest~
