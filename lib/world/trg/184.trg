@@ -8,10 +8,10 @@ if !%instance.location%
   halt
 end
 * sector configs
-set plains_sects 0 7 13 36 46
+set plains_sects 0 7 13 17 36 46
 set forest_sects 1 2 3 4 90 39 44 45 37 38 39 47
 set jungle_sects 15 16 27 28 61 62 65
-set desert_sects 20 12 14 23 24 25 26
+set desert_sects 20 12 14 22 23 24 25 26
 set oasis_sects 21 80 81 82 83 84 86 88 89
 set irrigated_sects 70 73 74 75 76 77 78
 set irrig_forest 71
