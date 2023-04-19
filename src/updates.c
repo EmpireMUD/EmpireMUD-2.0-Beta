@@ -2152,6 +2152,7 @@ void b5_151_terrain_fix(void) {
 	#define b5151_MOUNTAIN  8
 	#define b5151_ROAD  9
 	#define b5151_BUILDING  10
+	#define b5151_DESERT_CROP  12
 	#define b5151_SEEDED_FIELD  13
 	#define b5151_TRENCH  17
 	#define b5151_CANAL  19
@@ -2176,6 +2177,7 @@ void b5_151_terrain_fix(void) {
 	#define b5151_RIVERSIDE_COPSE  47
 	#define b5151_SHORE  50
 	#define b5151_BEACH  51
+	#define b5151_CLIFFS  52
 	#define b5151_ESTUARY  53
 	#define b5151_SHORESIDE_TREE  54
 	#define b5151_SEASIDE_STUMPS  59
@@ -2195,6 +2197,8 @@ void b5_151_terrain_fix(void) {
 	#define b5151_DAMP_TRENCH  86
 	#define b5151_VERDANT_CANAL  87
 	#define b5151_IRRIGATED_OASIS  88
+	#define b5151_OLD_GROWTH  90
+	
 	#define b5151_WEIRDWOOD_0  610
 	#define b5151_WEIRDWOOD_1  611
 	#define b5151_WEIRDWOOD_2  612
@@ -2214,9 +2218,9 @@ void b5_151_terrain_fix(void) {
 	
 	// helpers
 	#define b5151_no_sect_change(vnum)  ((vnum) == b5151_ROAD || (vnum) == b5151_BUILDING)
-	#define b5151_is_DESERT(vnum)  ((vnum) == b5151_ROAD || (vnum) == b5151_BUILDING || (vnum) == b5151_DESERT || (vnum) == b5151_GROVE || (vnum) == b5151_DESERT_STUMPS || (vnum) == b5151_DESERT_COPSE || (vnum) == b5151_DESERT_SHRUB || (vnum) == b5151_BEACH)
+	#define b5151_is_DESERT(vnum)  ((vnum) == b5151_ROAD || (vnum) == b5151_BUILDING || (vnum) == b5151_DESERT || (vnum) == b5151_GROVE || (vnum) == b5151_DESERT_STUMPS || (vnum) == b5151_DESERT_COPSE || (vnum) == b5151_DESERT_SHRUB || (vnum) == b5151_BEACH || (vnum) == b5151_DESERT_CROP)
 	#define b5151_is_IRRIGATED(vnum)  ((vnum) == b5151_IRRIGATED_FIELD || (vnum) == b5151_IRRIGATED_FOREST || (vnum) == b5151_IRRIGATED_JUNGLE || (vnum) == b5151_IRRIGATED_STUMPS || (vnum) == b5151_IRRIGATED_COPSE || (vnum) == b5151_IRRIGATED_JUNGLE_STUMPS || (vnum) == b5151_IRRIGATED_JUNGLE_COPSE || (vnum) == b5151_IRRIGATED_PLANTED_FIELD || (vnum) == b5151_IRRIGATED_CROP || (vnum) == b5151_IRRIGATED_OASIS)
-	#define b5151_is_TEMPERATE(vnum)  ((vnum) == b5151_PLAINS || (vnum) == b5151_FOREST_1 || (vnum) == b5151_FOREST_2 || (vnum) == b5151_FOREST_3 || (vnum) == b5151_FOREST_4 || (vnum) == b5151_STUMPS || (vnum) == b5151_COPSE_1 || (vnum) == b5151_COPSE_2 || (vnum) == b5151_SHORE || (vnum) == b5151_SHORESIDE_TREE || (vnum) == b5151_SEASIDE_STUMPS || (vnum) == b5151_FOREST_EDGE || (vnum) == b5151_RIVERBANK || (vnum) == b5151_FLOODPLAINS || (vnum) == b5151_FLOODED_WOODS || (vnum) == b5151_FLOODED_FOREST || (vnum) == b5151_LIGHT_RIVERBANK_FOREST || (vnum) == b5151_FORESTED_RIVERBANK || (vnum) == b5151_STUMPED_RIVERBANK || (vnum) == b5151_RIVERSIDE_COPSE)
+	#define b5151_is_TEMPERATE(vnum)  ((vnum) == b5151_PLAINS || (vnum) == b5151_FOREST_1 || (vnum) == b5151_FOREST_2 || (vnum) == b5151_FOREST_3 || (vnum) == b5151_FOREST_4 || (vnum) == b5151_STUMPS || (vnum) == b5151_COPSE_1 || (vnum) == b5151_COPSE_2 || (vnum) == b5151_SHORE || (vnum) == b5151_SHORESIDE_TREE || (vnum) == b5151_SEASIDE_STUMPS || (vnum) == b5151_FOREST_EDGE || (vnum) == b5151_RIVERBANK || (vnum) == b5151_FLOODPLAINS || (vnum) == b5151_FLOODED_WOODS || (vnum) == b5151_FLOODED_FOREST || (vnum) == b5151_LIGHT_RIVERBANK_FOREST || (vnum) == b5151_FORESTED_RIVERBANK || (vnum) == b5151_STUMPED_RIVERBANK || (vnum) == b5151_RIVERSIDE_COPSE || (vnum) == b5151_OLD_GROWTH)
 	#define b5151_is_WEIRDWOOD(vnum)  ((vnum) == b5151_WEIRDWOOD_0 || (vnum) == b5151_WEIRDWOOD_1 || (vnum) == b5151_WEIRDWOOD_2 || (vnum) == b5151_WEIRDWOOD_3 || (vnum) == b5151_WEIRDWOOD_4 || (vnum) == b5151_WEIRDWOOD_5)
 	
 	
@@ -2232,24 +2236,24 @@ void b5_151_terrain_fix(void) {
 		trench_original = get_extra_data(map->shared->extra_data, ROOM_EXTRA_TRENCH_ORIGINAL_SECTOR);
 		
 		// chain of things to check
-		if (GET_SECT_VNUM(map->base_sector) == b5151_MOUNTAIN) {
+		if (GET_SECT_VNUM(map->base_sector) == b5151_MOUNTAIN || GET_SECT_VNUM(map->base_sector) == b5151_CLIFFS) {
 			// skip: mountains are added only by the Volcano
 		}
 		else if ((GET_SECT_VNUM(map->base_sector) == b5151_RIVER && GET_SECT_VNUM(map->natural_sector) != b5151_RIVER) || (GET_SECT_VNUM(map->base_sector) == b5151_ESTUARY && GET_SECT_VNUM(map->natural_sector) != b5151_ESTUARY)) {
 			if (GET_SECT_VNUM(map->natural_sector) == b5151_OASIS) {
-				log("- (%d, %d) River to Verdant Canal", MAP_X_COORD(map->vnum), MAP_Y_COORD(map->vnum));
+				// log("- (%d, %d) River to Verdant Canal", MAP_X_COORD(map->vnum), MAP_Y_COORD(map->vnum));
 				to_sect = to_base = b5151_VERDANT_CANAL;
 				trench_original = b5151_OASIS;
 				remove_bld = TRUE;
 			}
 			else if (b5151_is_DESERT(GET_SECT_VNUM(map->natural_sector))) {
-				log("- (%d, %d) River to Irrigation Canal", MAP_X_COORD(map->vnum), MAP_Y_COORD(map->vnum));
+				// log("- (%d, %d) River to Irrigation Canal", MAP_X_COORD(map->vnum), MAP_Y_COORD(map->vnum));
 				to_sect = to_base = b5151_IRRIGATION_CANAL;
 				trench_original = b5151_DESERT;
 				remove_bld = TRUE;
 			}
 			else if (b5151_is_TEMPERATE(GET_SECT_VNUM(map->natural_sector))) {
-				log("- (%d, %d) River to Canal", MAP_X_COORD(map->vnum), MAP_Y_COORD(map->vnum));
+				// log("- (%d, %d) River to Canal", MAP_X_COORD(map->vnum), MAP_Y_COORD(map->vnum));
 				to_sect = to_base = b5151_CANAL;
 				trench_original = b5151_PLAINS;
 				remove_bld = TRUE;
@@ -2281,7 +2285,7 @@ void b5_151_terrain_fix(void) {
 				trench_original = b5151_OASIS;
 			}
 			else if (GET_SECT_VNUM(map->base_sector) == b5151_CANAL || GET_SECT_VNUM(map->base_sector) == b5151_IRRIGATION_CANAL) {
-				log("- (%d, %d) Canal to Verdant Canal", MAP_X_COORD(map->vnum), MAP_Y_COORD(map->vnum));
+				// log("- (%d, %d) Canal to Verdant Canal", MAP_X_COORD(map->vnum), MAP_Y_COORD(map->vnum));
 				to_sect = to_base = b5151_VERDANT_CANAL;
 				trench_original = b5151_OASIS;
 			}
@@ -2291,24 +2295,29 @@ void b5_151_terrain_fix(void) {
 				to_base = b5151_IRRIGATED_OASIS;
 			}
 			else if (GET_SECT_VNUM(map->sector_type) == b5151_CROP || GET_SECT_VNUM(map->sector_type) == b5151_IRRIGATED_CROP) {
-				log("- (%d, %d) Irrigated crop to Oasis Crop", MAP_X_COORD(map->vnum), MAP_Y_COORD(map->vnum));
+				// log("- (%d, %d) Irrigated crop to Oasis Crop", MAP_X_COORD(map->vnum), MAP_Y_COORD(map->vnum));
 				to_sect = b5151_OASIS_CROP;
 				to_base = b5151_IRRIGATED_OASIS;
 			}
 			else if (b5151_is_TEMPERATE(GET_SECT_VNUM(map->base_sector))) {
-				log("- (%d, %d) Temperate tile back to Oasis", MAP_X_COORD(map->vnum), MAP_Y_COORD(map->vnum));
+				// log("- (%d, %d) Temperate tile back to Oasis", MAP_X_COORD(map->vnum), MAP_Y_COORD(map->vnum));
 				to_sect = to_base = b5151_OASIS;
 				remove_bld = TRUE;
 			}
 			else if (b5151_is_IRRIGATED(GET_SECT_VNUM(map->base_sector))) {
 				// put this AFTER crops as those are irrigated too
-				log("- (%d, %d) Irrigated tile to Irrigated Oasis", MAP_X_COORD(map->vnum), MAP_Y_COORD(map->vnum));
+				// log("- (%d, %d) Irrigated tile to Irrigated Oasis", MAP_X_COORD(map->vnum), MAP_Y_COORD(map->vnum));
 				to_sect = to_base = b5151_IRRIGATED_OASIS;
 				remove_bld = TRUE;
 			}
 			else if (GET_SECT_VNUM(map->base_sector) >= b5151_BEAVER_PLAINS && GET_SECT_VNUM(map->base_sector) <= b5151_BEAVER_END_DESERT) {
-				log("- (%d, %d) Flooded Tile to Flooded Oasis", MAP_X_COORD(map->vnum), MAP_Y_COORD(map->vnum));
+				// log("- (%d, %d) Flooded Tile to Flooded Oasis", MAP_X_COORD(map->vnum), MAP_Y_COORD(map->vnum));
 				to_sect = to_base = b5151_BEAVER_OASIS;
+			}
+			else if (GET_SECT_VNUM(map->base_sector) >= b5151_WEIRDWOOD_0 && GET_SECT_VNUM(map->base_sector) <= b5151_WEIRDWOOD_4) {
+				log("- (%d, %d) Weirdwood to Enchanted Oasis", MAP_X_COORD(map->vnum), MAP_Y_COORD(map->vnum));
+				to_sect = to_base = b5151_ENCHANTED_OASIS;
+				remove_bld = TRUE;
 			}
 			else {
 				log("- (%d, %d) Warning: No available fix (natural oasis)", MAP_X_COORD(map->vnum), MAP_Y_COORD(map->vnum));
@@ -2316,13 +2325,13 @@ void b5_151_terrain_fix(void) {
 		}	// end natural oasis
 		else if (GET_SECT_VNUM(map->sector_type) == b5151_CROP && b5151_is_DESERT(GET_SECT_VNUM(map->natural_sector))) {
 			// regular crop on a natural desert tile
-			log("- (%d, %d) Old irrigated crop to new Irrigated Crop", MAP_X_COORD(map->vnum), MAP_Y_COORD(map->vnum));
+			// log("- (%d, %d) Old irrigated crop to new Irrigated Crop", MAP_X_COORD(map->vnum), MAP_Y_COORD(map->vnum));
 			to_sect = b5151_IRRIGATED_CROP;
 			to_base = b5151_IRRIGATED_FIELD;
 		}
 		else if (GET_SECT_VNUM(map->sector_type) == b5151_SEEDED_FIELD && b5151_is_DESERT(GET_SECT_VNUM(map->natural_sector))) {
 			// regular crop on a natural desert tile
-			log("- (%d, %d) Old irrigated seed to new Planted Irrigated", MAP_X_COORD(map->vnum), MAP_Y_COORD(map->vnum));
+			// log("- (%d, %d) Old irrigated seed to new Planted Irrigated", MAP_X_COORD(map->vnum), MAP_Y_COORD(map->vnum));
 			to_sect = b5151_IRRIGATED_PLANTED_FIELD;
 			to_base = b5151_IRRIGATED_FIELD;
 		}
@@ -2340,17 +2349,20 @@ void b5_151_terrain_fix(void) {
 			else if (b5151_is_DESERT_SCORCH(GET_SECT_VNUM(map->base_sector))) {
 				// log("- (%d, %d) DEBUG: Probably fine (Desert Scorch on Desert)", MAP_X_COORD(map->vnum), MAP_Y_COORD(map->vnum));
 			}
+			else if (GET_SECT_VNUM(map->base_sector) >= b5151_BEAVER_DESERT && GET_SECT_VNUM(map->base_sector) <= b5151_BEAVER_END_DESERT) {
+				log("- (%d, %d) DEBUG: Probably fine (Beaver flooding on desert)", MAP_X_COORD(map->vnum), MAP_Y_COORD(map->vnum));
+			}
 			else if (b5151_is_TEMPERATE_SCORCH(GET_SECT_VNUM(map->base_sector))) {
-				log("- (%d, %d) Temperate Scorch on Desert tile", MAP_X_COORD(map->vnum), MAP_Y_COORD(map->vnum));
+				// log("- (%d, %d) Temperate Scorch on Desert tile", MAP_X_COORD(map->vnum), MAP_Y_COORD(map->vnum));
 				to_sect = to_base = b5151_DESERT;
 			}
 			else if (GET_SECT_VNUM(map->base_sector) == b5151_TRENCH) {
-				log("- (%d, %d) Temperate Trench on Desert tile", MAP_X_COORD(map->vnum), MAP_Y_COORD(map->vnum));
+				// log("- (%d, %d) Temperate Trench on Desert tile", MAP_X_COORD(map->vnum), MAP_Y_COORD(map->vnum));
 				to_sect = to_base = b5151_SANDY_TRENCH;
 				trench_original = b5151_DESERT;
 			}
 			else if (GET_SECT_VNUM(map->base_sector) == b5151_CANAL) {
-				log("- (%d, %d) Canal on Desert tile", MAP_X_COORD(map->vnum), MAP_Y_COORD(map->vnum));
+				// log("- (%d, %d) Canal on Desert tile", MAP_X_COORD(map->vnum), MAP_Y_COORD(map->vnum));
 				to_sect = to_base = b5151_IRRIGATION_CANAL;
 				trench_original = b5151_DESERT;
 			}
@@ -2361,16 +2373,16 @@ void b5_151_terrain_fix(void) {
 				remove_bld = TRUE;
 			}
 			else if (GET_SECT_VNUM(map->base_sector) == b5151_ENCHANTED_OASIS) {
-				log("- (%d, %d) Enchanted Oasis on non-Oasis tile", MAP_X_COORD(map->vnum), MAP_Y_COORD(map->vnum));
+				// log("- (%d, %d) Enchanted Oasis on non-Oasis tile", MAP_X_COORD(map->vnum), MAP_Y_COORD(map->vnum));
 				to_sect = to_base = b5151_WEIRDWOOD_1;
 				remove_bld = TRUE;
 			}
 			else if (b5151_is_TEMPERATE(GET_SECT_VNUM(map->base_sector))) {
-				log("- (%d, %d) Temperate tile on Desert", MAP_X_COORD(map->vnum), MAP_Y_COORD(map->vnum));
+				// log("- (%d, %d) Temperate tile on Desert", MAP_X_COORD(map->vnum), MAP_Y_COORD(map->vnum));
 				to_sect = to_base = b5151_IRRIGATED_FIELD;
 			}
 			else if (GET_SECT_VNUM(map->base_sector) == b5151_BEAVER_PLAINS || GET_SECT_VNUM(map->base_sector) == b5151_BEAVER_WOODS) {
-				log("- (%d, %d) Flooded Tile to Flooded Oasis", MAP_X_COORD(map->vnum), MAP_Y_COORD(map->vnum));
+				// log("- (%d, %d) Flooded Tile to Flooded Oasis", MAP_X_COORD(map->vnum), MAP_Y_COORD(map->vnum));
 				to_sect = to_base = b5151_BEAVER_DESERT;
 			}
 			else {
