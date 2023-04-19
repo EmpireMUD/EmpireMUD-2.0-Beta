@@ -2137,7 +2137,7 @@ void b5_151_road_fix(void) {
 void b5_151_terrain_fix(void) {
 	room_data *room;
 	struct map_data *map;
-	int changed_sect = 0, changed_base = 0;
+	int changed_sect = 0, changed_base = 0, changed_bld = 0;
 	sector_vnum to_sect, to_base, trench_original;
 	bool remove_bld;
 	
@@ -2221,6 +2221,7 @@ void b5_151_terrain_fix(void) {
 	#define b5151_is_DESERT(vnum)  ((vnum) == b5151_ROAD || (vnum) == b5151_BUILDING || (vnum) == b5151_DESERT || (vnum) == b5151_GROVE || (vnum) == b5151_DESERT_STUMPS || (vnum) == b5151_DESERT_COPSE || (vnum) == b5151_DESERT_SHRUB || (vnum) == b5151_BEACH || (vnum) == b5151_DESERT_CROP)
 	#define b5151_is_IRRIGATED(vnum)  ((vnum) == b5151_IRRIGATED_FIELD || (vnum) == b5151_IRRIGATED_FOREST || (vnum) == b5151_IRRIGATED_JUNGLE || (vnum) == b5151_IRRIGATED_STUMPS || (vnum) == b5151_IRRIGATED_COPSE || (vnum) == b5151_IRRIGATED_JUNGLE_STUMPS || (vnum) == b5151_IRRIGATED_JUNGLE_COPSE || (vnum) == b5151_IRRIGATED_PLANTED_FIELD || (vnum) == b5151_IRRIGATED_CROP || (vnum) == b5151_IRRIGATED_OASIS)
 	#define b5151_is_TEMPERATE(vnum)  ((vnum) == b5151_PLAINS || (vnum) == b5151_FOREST_1 || (vnum) == b5151_FOREST_2 || (vnum) == b5151_FOREST_3 || (vnum) == b5151_FOREST_4 || (vnum) == b5151_STUMPS || (vnum) == b5151_COPSE_1 || (vnum) == b5151_COPSE_2 || (vnum) == b5151_SHORE || (vnum) == b5151_SHORESIDE_TREE || (vnum) == b5151_SEASIDE_STUMPS || (vnum) == b5151_FOREST_EDGE || (vnum) == b5151_RIVERBANK || (vnum) == b5151_FLOODPLAINS || (vnum) == b5151_FLOODED_WOODS || (vnum) == b5151_FLOODED_FOREST || (vnum) == b5151_LIGHT_RIVERBANK_FOREST || (vnum) == b5151_FORESTED_RIVERBANK || (vnum) == b5151_STUMPED_RIVERBANK || (vnum) == b5151_RIVERSIDE_COPSE || (vnum) == b5151_OLD_GROWTH)
+	#define b5151_is_MOUNTAIN(vnum)  ((vnum) == b5151_MOUNTAIN || (vnum) == b5151_CLIFFS || ((vnum) >= 10190 && (vnum) <= 10192))
 	#define b5151_is_WEIRDWOOD(vnum)  ((vnum) == b5151_WEIRDWOOD_0 || (vnum) == b5151_WEIRDWOOD_1 || (vnum) == b5151_WEIRDWOOD_2 || (vnum) == b5151_WEIRDWOOD_3 || (vnum) == b5151_WEIRDWOOD_4 || (vnum) == b5151_WEIRDWOOD_5)
 	
 	
@@ -2236,7 +2237,7 @@ void b5_151_terrain_fix(void) {
 		trench_original = get_extra_data(map->shared->extra_data, ROOM_EXTRA_TRENCH_ORIGINAL_SECTOR);
 		
 		// chain of things to check
-		if (GET_SECT_VNUM(map->base_sector) == b5151_MOUNTAIN || GET_SECT_VNUM(map->base_sector) == b5151_CLIFFS) {
+		if (b5151_is_MOUNTAIN(GET_SECT_VNUM(map->base_sector))) {
 			// skip: mountains are added only by the Volcano
 		}
 		else if ((GET_SECT_VNUM(map->base_sector) == b5151_RIVER && GET_SECT_VNUM(map->natural_sector) != b5151_RIVER) || (GET_SECT_VNUM(map->base_sector) == b5151_ESTUARY && GET_SECT_VNUM(map->natural_sector) != b5151_ESTUARY)) {
@@ -2275,12 +2276,12 @@ void b5_151_terrain_fix(void) {
 				to_sect = to_base = b5151_DRY_OASIS;
 			}
 			else if (b5151_is_TEMPERATE_SCORCH(GET_SECT_VNUM(map->base_sector)) || b5151_is_DESERT_SCORCH(GET_SECT_VNUM(map->base_sector))) {
-				log("- (%d, %d) Scorch tile back to Oasis", MAP_X_COORD(map->vnum), MAP_Y_COORD(map->vnum));
+				// log("- (%d, %d) Scorch tile back to Oasis", MAP_X_COORD(map->vnum), MAP_Y_COORD(map->vnum));
 				to_sect = to_base = b5151_OASIS;
 				remove_bld = TRUE;
 			}
 			else if (GET_SECT_VNUM(map->base_sector) == b5151_TRENCH || GET_SECT_VNUM(map->base_sector) == b5151_SANDY_TRENCH) {
-				log("- (%d, %d) Trench to Damp Trench", MAP_X_COORD(map->vnum), MAP_Y_COORD(map->vnum));
+				// log("- (%d, %d) Trench to Damp Trench", MAP_X_COORD(map->vnum), MAP_Y_COORD(map->vnum));
 				to_sect = to_base = b5151_DAMP_TRENCH;
 				trench_original = b5151_OASIS;
 			}
@@ -2290,7 +2291,7 @@ void b5_151_terrain_fix(void) {
 				trench_original = b5151_OASIS;
 			}
 			else if (GET_SECT_VNUM(map->sector_type) == b5151_SEEDED_FIELD || GET_SECT_VNUM(map->sector_type) == b5151_IRRIGATED_PLANTED_FIELD) {
-				log("- (%d, %d) Irrigated seed to Planted Oasis", MAP_X_COORD(map->vnum), MAP_Y_COORD(map->vnum));
+				// log("- (%d, %d) Irrigated seed to Planted Oasis", MAP_X_COORD(map->vnum), MAP_Y_COORD(map->vnum));
 				to_sect = b5151_PLANTED_OASIS;
 				to_base = b5151_IRRIGATED_OASIS;
 			}
@@ -2315,7 +2316,7 @@ void b5_151_terrain_fix(void) {
 				to_sect = to_base = b5151_BEAVER_OASIS;
 			}
 			else if (GET_SECT_VNUM(map->base_sector) >= b5151_WEIRDWOOD_0 && GET_SECT_VNUM(map->base_sector) <= b5151_WEIRDWOOD_4) {
-				log("- (%d, %d) Weirdwood to Enchanted Oasis", MAP_X_COORD(map->vnum), MAP_Y_COORD(map->vnum));
+				// log("- (%d, %d) Weirdwood to Enchanted Oasis", MAP_X_COORD(map->vnum), MAP_Y_COORD(map->vnum));
 				to_sect = to_base = b5151_ENCHANTED_OASIS;
 				remove_bld = TRUE;
 			}
@@ -2350,7 +2351,7 @@ void b5_151_terrain_fix(void) {
 				// log("- (%d, %d) DEBUG: Probably fine (Desert Scorch on Desert)", MAP_X_COORD(map->vnum), MAP_Y_COORD(map->vnum));
 			}
 			else if (GET_SECT_VNUM(map->base_sector) >= b5151_BEAVER_DESERT && GET_SECT_VNUM(map->base_sector) <= b5151_BEAVER_END_DESERT) {
-				log("- (%d, %d) DEBUG: Probably fine (Beaver flooding on desert)", MAP_X_COORD(map->vnum), MAP_Y_COORD(map->vnum));
+				// log("- (%d, %d) DEBUG: Probably fine (Beaver flooding on desert)", MAP_X_COORD(map->vnum), MAP_Y_COORD(map->vnum));
 			}
 			else if (b5151_is_TEMPERATE_SCORCH(GET_SECT_VNUM(map->base_sector))) {
 				// log("- (%d, %d) Temperate Scorch on Desert tile", MAP_X_COORD(map->vnum), MAP_Y_COORD(map->vnum));
@@ -2405,13 +2406,14 @@ void b5_151_terrain_fix(void) {
 				set_extra_data(&map->shared->extra_data, ROOM_EXTRA_TRENCH_ORIGINAL_SECTOR, trench_original);
 			}
 			if (remove_bld && (room = (map->room ? map->room : real_room(map->vnum))) && GET_BUILDING(room)) {
-				log("- (%d, %d) Removing building", MAP_X_COORD(map->vnum), MAP_Y_COORD(map->vnum));
+				// log("- (%d, %d) Removing building", MAP_X_COORD(map->vnum), MAP_Y_COORD(map->vnum));
+				++changed_bld;
 				disassociate_building(room);
 			}
 		}
 	}
 	
-	log("- total: %d sector%s and %d base sector%s", changed_sect, PLURAL(changed_sect), changed_base, PLURAL(changed_base));
+	log("- total: %d sector%s, %d base sector%s, removed %d building%s", changed_sect, PLURAL(changed_sect), changed_base, PLURAL(changed_base), changed_bld, PLURAL(changed_bld));
 }
 
 
