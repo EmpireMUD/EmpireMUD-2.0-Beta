@@ -597,7 +597,7 @@ void replace_icon_codes(char_data *ch, room_data *to_room, char *icon_buf, int t
 		if (strstr(icon_buf, "@e")) {
 			sect = r_east ? BASE_SECT(r_east) : BASE_SECT(to_room);
 			icon = get_icon_from_set(GET_SECT_ICONS(sect), tileset);
-			sprintf(temp, "&0%s%c", icon ? icon->color : "", GET_SECT_ROADSIDE_ICON(sect));
+			sprintf(temp, "%s%c", icon ? icon->color : "&0", GET_SECT_ROADSIDE_ICON(sect));
 			str = str_replace("@e", temp, icon_buf);
 			strcpy(icon_buf, str);
 			free(str);
@@ -606,7 +606,7 @@ void replace_icon_codes(char_data *ch, room_data *to_room, char *icon_buf, int t
 		if (strstr(icon_buf, "@w")) {
 			sect = r_west ? BASE_SECT(r_west) : BASE_SECT(to_room);
 			icon = get_icon_from_set(GET_SECT_ICONS(sect), tileset);
-			sprintf(temp, "&0%s%c", icon ? icon->color : "", GET_SECT_ROADSIDE_ICON(sect));
+			sprintf(temp, "%s%c", icon ? icon->color : "&0", GET_SECT_ROADSIDE_ICON(sect));
 			str = str_replace("@w", temp, icon_buf);
 			strcpy(icon_buf, str);
 			free(str);
