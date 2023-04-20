@@ -2296,6 +2296,11 @@ void b5_151_terrain_fix(void) {
 				to_sect = b5151_OASIS_CROP;
 				to_base = b5151_IRRIGATED_OASIS;
 			}
+			else if (GET_SECT_VNUM(map->sector_type) == b5151_DESERT_CROP) {
+				// log("- (%d, %d) Desert crop to Oasis Crop", MAP_X_COORD(map->vnum), MAP_Y_COORD(map->vnum));
+				to_sect = b5151_OASIS_CROP;
+				to_base = b5151_OASIS;
+			}
 			else if (b5151_is_TEMPERATE(GET_SECT_VNUM(map->base_sector))) {
 				// log("- (%d, %d) Temperate tile back to Oasis", MAP_X_COORD(map->vnum), MAP_Y_COORD(map->vnum));
 				to_sect = to_base = b5151_OASIS;
