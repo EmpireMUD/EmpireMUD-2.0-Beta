@@ -2271,10 +2271,6 @@ void b5_151_terrain_fix(void) {
 			else if (GET_SECT_VNUM(map->sector_type) == b5151_ENCHANTED_OASIS && GET_SECT_VNUM(map->base_sector) == b5151_ENCHANTED_OASIS) {
 				// log("- (%d, %d) DEBUG: Probably fine (Enchanted Oasis on Oasis)", MAP_X_COORD(map->vnum), MAP_Y_COORD(map->vnum));
 			}
-			else if (b5151_is_DESERT(GET_SECT_VNUM(map->sector_type)) || b5151_is_DESERT(GET_SECT_VNUM(map->base_sector))) {
-				// log("- (%d, %d) Desert to Dry Oasis", MAP_X_COORD(map->vnum), MAP_Y_COORD(map->vnum));
-				to_sect = to_base = b5151_DRY_OASIS;
-			}
 			else if (b5151_is_TEMPERATE_SCORCH(GET_SECT_VNUM(map->base_sector)) || b5151_is_DESERT_SCORCH(GET_SECT_VNUM(map->base_sector))) {
 				// log("- (%d, %d) Scorch tile back to Oasis", MAP_X_COORD(map->vnum), MAP_Y_COORD(map->vnum));
 				to_sect = to_base = b5151_OASIS;
@@ -2318,6 +2314,11 @@ void b5_151_terrain_fix(void) {
 			else if (GET_SECT_VNUM(map->base_sector) >= b5151_WEIRDWOOD_0 && GET_SECT_VNUM(map->base_sector) <= b5151_WEIRDWOOD_4) {
 				// log("- (%d, %d) Weirdwood to Enchanted Oasis", MAP_X_COORD(map->vnum), MAP_Y_COORD(map->vnum));
 				to_sect = to_base = b5151_ENCHANTED_OASIS;
+				remove_bld = TRUE;
+			}
+			else if (b5151_is_DESERT(GET_SECT_VNUM(map->sector_type)) || b5151_is_DESERT(GET_SECT_VNUM(map->base_sector))) {
+				// log("- (%d, %d) Desert to Dry Oasis", MAP_X_COORD(map->vnum), MAP_Y_COORD(map->vnum));
+				to_sect = to_base = b5151_DRY_OASIS;
 				remove_bld = TRUE;
 			}
 			else {
