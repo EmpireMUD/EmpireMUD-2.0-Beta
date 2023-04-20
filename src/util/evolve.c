@@ -85,15 +85,16 @@ const int shift_dir[][2] = {
  //////////////////////////////////////////////////////////////////////////////
 //// PROTOTYPES //////////////////////////////////////////////////////////////
 
+bool check_near_evo_sector(struct map_t *tile, int type, struct evolution_data *for_evo);
 int count_adjacent(struct map_t *tile, sector_vnum sect, bool count_original_sect);
 void empire_srandom(unsigned long initial_seed);
 struct evolution_data *get_evo_by_type(sector_vnum sect, int type);
 void index_boot_sectors();
 void load_base_map();
-int map_distance(struct map_t *start, struct map_t *end);
+double map_distance(struct map_t *start, struct map_t *end);
 int number(int from, int to);
 int season(struct map_t *tile);
-bool sect_within_distance(struct map_t *tile, sector_vnum sect, int distance, bool count_original_sect);
+bool sect_within_distance(struct map_t *tile, sector_vnum sect, double distance, bool count_original_sect);
 struct map_t *shift_tile(struct map_t *origin, int x_shift, int y_shift);
 void write_tile(struct map_t *tile, sector_vnum old);
 
@@ -166,7 +167,8 @@ void evolve_one(struct map_t *tile) {
 	
 	// not adjacent
 	if (become == NOTHING && (evo = get_evo_by_type(tile->sector_type, EVO_NOT_ADJACENT))) {
-		if (count_adjacent(tile, evo->value, TRUE) < 1) {
+		if (!check_near_evo_sector(tile, EVO_NOT_ADJACENT, evo)) {
+		//	formerly:	if (count_adjacent(tile, evo->value, TRUE) < 1) {
 			become = evo->becomes;
 		}
 	}
@@ -187,7 +189,8 @@ void evolve_one(struct map_t *tile) {
 	
 	// not near sector
 	if (become == NOTHING && (evo = get_evo_by_type(tile->sector_type, EVO_NOT_NEAR_SECTOR))) {
-		if (!sect_within_distance(tile, evo->value, nearby_distance, TRUE)) {
+		if (!check_near_evo_sector(tile, EVO_NOT_NEAR_SECTOR, evo)) {
+		// formerly: if (!sect_within_distance(tile, evo->value, nearby_distance, TRUE)) {
 			become = evo->becomes;
 		}
 	}
@@ -790,6 +793,41 @@ void write_tile(struct map_t *tile, sector_vnum old) {
 //// HELPER FUNCTIONS ////////////////////////////////////////////////////////
 
 /**
+* Ensures the tile is not near ANY of the NOT-NEAR-SECTOR or NOT-ADJACENT tiles
+* for an evolution to trigger. This is only used if the sector doesn't have the
+* SEPARATE-NOT-NEARS or SEPARATE-NOT-ADJACENTS flags.
+*
+* @param struct map_t *tile The tile to check evolutions and neighbors for.
+* @param struct evolution_data *for_evo Optional: If the flagged SEPARATE-NOT-*, it will only check this one evolution rule. May be NULL.
+* @return bool TRUE if it has at least 1 matching sector near it, FALSE if it has none.
+*/
+bool check_near_evo_sector(struct map_t *tile, int type, struct evolution_data *for_evo) {
+	struct evolution_data *evo;
+	sector_data *sect;
+	bool found = FALSE;
+	
+	HASH_FIND_INT(sector_table, &(tile->sector_type), sect);
+	if (!sect) {
+		return FALSE;
+	}
+	
+	// iterate over evolutions checking all of them
+	LL_FOREACH(GET_SECT_EVOS(sect), evo) {
+		if (for_evo && for_evo != evo && SECT_FLAGGED(sect, (type == EVO_NOT_NEAR_SECTOR ? SECTF_SEPARATE_NOT_NEARS : SECTF_SEPARATE_NOT_ADJACENTS))) {
+			// skipping because we're not doing this one
+			continue;
+		}
+		if (evo->type == type && sect_within_distance(tile, evo->value, evo->type == EVO_NOT_NEAR_SECTOR ? nearby_distance : 1.5, TRUE)) {
+			found = TRUE;
+			break;
+		}
+	}
+	
+	return found;
+}
+
+
+/**
 * Counts how many adjacent tiles have the given sector type...
 *
 * @param struct map_t *tile The location to check.
@@ -911,10 +949,10 @@ struct evolution_data *get_evo_by_type(sector_vnum sect, int type) {
 
 
 // quick distance computation
-int map_distance(struct map_t *start, struct map_t *end) {
-	int dist;
-	int x1 = MAP_X_COORD(start->vnum), x2 = MAP_X_COORD(end->vnum);
-	int y1 = MAP_Y_COORD(start->vnum), y2 = MAP_Y_COORD(end->vnum);
+double map_distance(struct map_t *start, struct map_t *end) {
+	double dist;
+	double x1 = MAP_X_COORD(start->vnum), x2 = MAP_X_COORD(end->vnum);
+	double y1 = MAP_Y_COORD(start->vnum), y2 = MAP_Y_COORD(end->vnum);
 	
 	dist = ((x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2));
 	dist = (int) sqrt(dist);
@@ -1010,11 +1048,11 @@ int season(struct map_t *tile) {
 *
 * @param struct map_t *tile
 * @param sector_vnum sect Sector vnum
-* @param int distance how far away to check
+* @param double distance how far away to check
 * @param bool count_original_sect If TRUE, also checks BASE_SECT
 * @return bool TRUE if the sect is found
 */
-bool sect_within_distance(struct map_t *tile, sector_vnum sect, int distance, bool count_original_sect) {
+bool sect_within_distance(struct map_t *tile, sector_vnum sect, double distance, bool count_original_sect) {
 	bool found = FALSE;
 	struct map_t *shift;
 	int x, y;

@@ -2650,6 +2650,8 @@ typedef enum {
 #define SECTF_SHALLOW_WATER  BIT(22)	// can't earthmeld; other properties like swamp and oasis have
 #define SECTF_NEEDS_HEIGHT  BIT(23)	// will automatically set its 'height' property under certain circumstances
 #define SECTF_KEEPS_HEIGHT  BIT(24)	// retains its 'height' property but won't inherit a new one
+#define SECTF_SEPARATE_NOT_ADJACENTS  BIT(25)	// runs every NOT-ADJACENT evolution separately instead of ensuring it's not adjacent to ANY of them
+#define SECTF_SEPARATE_NOT_NEARS  BIT(26)	// runs every NOT-NEAR-SECTOR evolution separately instead of ensuring it's not near ANY of them
 
 
  //////////////////////////////////////////////////////////////////////////////

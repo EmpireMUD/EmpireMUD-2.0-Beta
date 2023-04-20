@@ -3740,6 +3740,8 @@ const char *sector_flags[] = {
 	"SHALLOW-WATER",
 	"NEEDS-HEIGHT",
 	"KEEPS-HEIGHT",
+	"SEPARATE-NOT-ADJACENTS",	// 25
+	"SEPARATE-NOT-NEARS",
 	"\n"
 };
 
