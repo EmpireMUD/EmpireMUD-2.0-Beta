@@ -1911,6 +1911,7 @@ char *get_partial_direction_to(char_data *ch, room_data *from, room_data *to, bo
 int get_room_blocking_height(room_data *room, bool *blocking_vehicle);
 bool is_deep_mine(room_data *room);
 void lock_icon(room_data *room, struct icon_data *use_icon);
+void lock_icon_map(struct map_data *loc, struct icon_data *use_icon);
 room_data *real_shift(room_data *origin, int x_shift, int y_shift);
 bool room_is_light(room_data *room, bool count_adjacent_light);
 room_data *straight_line(room_data *origin, room_data *destination, int iter);

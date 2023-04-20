@@ -2201,6 +2201,16 @@ void perform_change_sect(room_data *loc, struct map_data *map, sector_data *sect
 		remove_extra_data(loc ? &ROOM_EXTRA_DATA(loc) : &map->shared->extra_data, ROOM_EXTRA_SECTOR_TIME);
 	}
 	
+	// check for icon locking
+	if (SECT_FLAGGED(sect, SECTF_LOCK_ICON)) {
+		if (map) {
+			lock_icon_map(map, NULL);
+		}
+		else if (loc) {
+			lock_icon(loc, NULL);
+		}
+	}
+	
 	request_mapout_update(map ? map->vnum : GET_ROOM_VNUM(loc));
 	request_world_save(map ? map->vnum : GET_ROOM_VNUM(loc), WSAVE_MAP | WSAVE_ROOM);
 }
