@@ -106,6 +106,11 @@ bool audit_sector(sector_data *sect, char_data *ch) {
 		problem = TRUE;
 	}
 	
+	if (!GET_SECT_EX_DESCS(sect)) {
+		olc_audit_msg(ch, GET_SECT_VNUM(sect), "Sector has no extra descriptions");
+		problem = TRUE;
+	}
+	
 	problem |= audit_interactions(GET_SECT_VNUM(sect), GET_SECT_INTERACTIONS(sect), TYPE_ROOM, ch);
 	problem |= audit_spawns(GET_SECT_VNUM(sect), GET_SECT_SPAWNS(sect), ch);
 	problem |= audit_extra_descs(GET_SECT_VNUM(sect), GET_SECT_EX_DESCS(sect), ch);

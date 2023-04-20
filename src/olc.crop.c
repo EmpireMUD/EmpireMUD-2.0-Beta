@@ -109,6 +109,11 @@ bool audit_crop(crop_data *cp, char_data *ch) {
 		problem = TRUE;
 	}
 	
+	if (!GET_CROP_EX_DESCS(cp)) {
+		olc_audit_msg(ch, GET_CROP_VNUM(cp), "Crop has no extra descriptions");
+		problem = TRUE;
+	}
+	
 	problem |= audit_interactions(GET_CROP_VNUM(cp), GET_CROP_INTERACTIONS(cp), TYPE_ROOM, ch);
 	problem |= audit_spawns(GET_CROP_VNUM(cp), GET_CROP_SPAWNS(cp), ch);
 	problem |= audit_extra_descs(GET_CROP_VNUM(cp), GET_CROP_EX_DESCS(cp), ch);
