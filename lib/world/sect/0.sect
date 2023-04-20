@@ -2429,7 +2429,7 @@ S
 #71
 Irrigated Forest~
 An Irrigated Forest~
-'^' 14 jkqv 3 adil np
+'.' 14 jkqv 3 adil np
 C
 chop, dig, gather, pick~
 D0
@@ -2555,7 +2555,7 @@ S
 #74
 Irrigated Copse~
 An Irrigated Copse~
-'w' 13 jkrv 3 adi p
+'.' 13 jkrv 3 adi p
 C
 chop, dig, pick~
 D0
