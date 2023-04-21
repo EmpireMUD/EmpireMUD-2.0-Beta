@@ -2207,21 +2207,31 @@ void b5_151_terrain_fix(void) {
 	#define b5151_WEIRDWOOD_5  615
 	#define b5151_ENCHANTED_OASIS  616
 	
+	#define b5151_PERMA_RIVER  10550
+	#define b5151_PERMA_ESTUARY  10551
+	#define b5151_PERMA_CANAL  10552
+	#define b5151_PERMA_LAKE  10553
+	#define b5151_PERMA_IRRIGATION_CANAL  10554
+	#define b5151_PERMA_VERDANT_CANAL  10555
+
 	#define b5151_BEAVER_PLAINS  18451
 	#define b5151_BEAVER_WOODS  18452
 	#define b5151_BEAVER_DESERT  18453
 	#define b5151_BEAVER_END_DESERT  18456
 	#define b5151_BEAVER_OASIS  18457
+	#define b5151_WITHERED_TEMPERATE  10775
+	#define b5151_WITHERED_DESERT  10776
+	#define b5151_GOBLIN_STUMPS  18100
 	
 	#define b5151_is_TEMPERATE_SCORCH(vnum)  ((vnum) == 10300 || (vnum) == 10302 || (vnum) == 10303)
 	#define b5151_is_DESERT_SCORCH(vnum)  ((vnum) == 10301 || (vnum) == 10304 || (vnum) == 10305)
 	
 	// helpers
 	#define b5151_no_sect_change(vnum)  ((vnum) == b5151_ROAD || (vnum) == b5151_BUILDING)
-	#define b5151_is_DESERT(vnum)  ((vnum) == b5151_ROAD || (vnum) == b5151_BUILDING || (vnum) == b5151_DESERT || (vnum) == b5151_GROVE || (vnum) == b5151_DESERT_STUMPS || (vnum) == b5151_DESERT_COPSE || (vnum) == b5151_DESERT_SHRUB || (vnum) == b5151_BEACH || (vnum) == b5151_DESERT_CROP)
+	#define b5151_is_DESERT(vnum)  ((vnum) == b5151_ROAD || (vnum) == b5151_BUILDING || (vnum) == b5151_DESERT || (vnum) == b5151_GROVE || (vnum) == b5151_DESERT_STUMPS || (vnum) == b5151_DESERT_COPSE || (vnum) == b5151_DESERT_SHRUB || (vnum) == b5151_BEACH || (vnum) == b5151_DESERT_CROP || b5151_is_DESERT_SCORCH(vnum) || (vnum) == b5151_WITHERED_DESERT)
 	#define b5151_is_IRRIGATED(vnum)  ((vnum) == b5151_IRRIGATED_FIELD || (vnum) == b5151_IRRIGATED_FOREST || (vnum) == b5151_IRRIGATED_JUNGLE || (vnum) == b5151_IRRIGATED_STUMPS || (vnum) == b5151_IRRIGATED_COPSE || (vnum) == b5151_IRRIGATED_JUNGLE_STUMPS || (vnum) == b5151_IRRIGATED_JUNGLE_COPSE || (vnum) == b5151_IRRIGATED_PLANTED_FIELD || (vnum) == b5151_IRRIGATED_CROP || (vnum) == b5151_IRRIGATED_OASIS)
-	#define b5151_is_TEMPERATE(vnum)  ((vnum) == b5151_PLAINS || (vnum) == b5151_FOREST_1 || (vnum) == b5151_FOREST_2 || (vnum) == b5151_FOREST_3 || (vnum) == b5151_FOREST_4 || (vnum) == b5151_STUMPS || (vnum) == b5151_COPSE_1 || (vnum) == b5151_COPSE_2 || (vnum) == b5151_SHORE || (vnum) == b5151_SHORESIDE_TREE || (vnum) == b5151_SEASIDE_STUMPS || (vnum) == b5151_FOREST_EDGE || (vnum) == b5151_RIVERBANK || (vnum) == b5151_FLOODPLAINS || (vnum) == b5151_FLOODED_WOODS || (vnum) == b5151_FLOODED_FOREST || (vnum) == b5151_LIGHT_RIVERBANK_FOREST || (vnum) == b5151_FORESTED_RIVERBANK || (vnum) == b5151_STUMPED_RIVERBANK || (vnum) == b5151_RIVERSIDE_COPSE || (vnum) == b5151_OLD_GROWTH)
-	#define b5151_is_MOUNTAIN(vnum)  ((vnum) == b5151_MOUNTAIN || (vnum) == b5151_CLIFFS || ((vnum) >= 10190 && (vnum) <= 10192))
+	#define b5151_is_TEMPERATE(vnum)  ((vnum) == b5151_PLAINS || (vnum) == b5151_FOREST_1 || (vnum) == b5151_FOREST_2 || (vnum) == b5151_FOREST_3 || (vnum) == b5151_FOREST_4 || (vnum) == b5151_STUMPS || (vnum) == b5151_COPSE_1 || (vnum) == b5151_COPSE_2 || (vnum) == b5151_SHORE || (vnum) == b5151_SHORESIDE_TREE || (vnum) == b5151_SEASIDE_STUMPS || (vnum) == b5151_FOREST_EDGE || (vnum) == b5151_RIVERBANK || (vnum) == b5151_FLOODPLAINS || (vnum) == b5151_FLOODED_WOODS || (vnum) == b5151_FLOODED_FOREST || (vnum) == b5151_LIGHT_RIVERBANK_FOREST || (vnum) == b5151_FORESTED_RIVERBANK || (vnum) == b5151_STUMPED_RIVERBANK || (vnum) == b5151_RIVERSIDE_COPSE || (vnum) == b5151_OLD_GROWTH || b5151_is_TEMPERATE_SCORCH(vnum) || ((vnum) >= 10562 && (vnum) <= 10566 /* evergreens */) || (vnum) == b5151_WITHERED_TEMPERATE || ((vnum) >= 11988 && (vnum) <= 11992 /* calamander */) || ((vnum) >= 16697 && (vnum) <= 16699 /* nordlys */) || (vnum) == b5151_GOBLIN_STUMPS || ((vnum) == 18293 || (vnum) == 18294 /* dragon tree */) || (vnum) == b5151_PERMA_RIVER || (vnum) == b5151_PERMA_ESTUARY)
+	#define b5151_is_MOUNTAIN(vnum)  ((vnum) == b5151_MOUNTAIN || (vnum) == b5151_CLIFFS || ((vnum) >= 10190 && (vnum) <= 10192 /* volcano */))
 	#define b5151_is_WEIRDWOOD(vnum)  ((vnum) == b5151_WEIRDWOOD_0 || (vnum) == b5151_WEIRDWOOD_1 || (vnum) == b5151_WEIRDWOOD_2 || (vnum) == b5151_WEIRDWOOD_3 || (vnum) == b5151_WEIRDWOOD_4 || (vnum) == b5151_WEIRDWOOD_5)
 	
 	
@@ -2241,7 +2251,10 @@ void b5_151_terrain_fix(void) {
 			// skip: mountains are added only by the Volcano
 		}
 		else if ((GET_SECT_VNUM(map->base_sector) == b5151_RIVER && GET_SECT_VNUM(map->natural_sector) != b5151_RIVER) || (GET_SECT_VNUM(map->base_sector) == b5151_ESTUARY && GET_SECT_VNUM(map->natural_sector) != b5151_ESTUARY)) {
-			if (GET_SECT_VNUM(map->natural_sector) == b5151_OASIS) {
+			if (GET_SECT_VNUM(map->natural_sector) == b5151_RIVER || GET_SECT_VNUM(map->natural_sector) == b5151_ESTUARY) {
+				log("- (%d, %d) DEBUG: Probably fine (River or Estuary became River or Estuary)", MAP_X_COORD(map->vnum), MAP_Y_COORD(map->vnum));
+			}
+			else if (GET_SECT_VNUM(map->natural_sector) == b5151_OASIS) {
 				// log("- (%d, %d) River to Verdant Canal", MAP_X_COORD(map->vnum), MAP_Y_COORD(map->vnum));
 				to_sect = to_base = b5151_VERDANT_CANAL;
 				trench_original = b5151_OASIS;
@@ -2260,7 +2273,7 @@ void b5_151_terrain_fix(void) {
 				remove_bld = TRUE;
 			}
 			else {
-				log("- (%d, %d) Warning: No available fix (river/estuary)", MAP_X_COORD(map->vnum), MAP_Y_COORD(map->vnum));
+				log("- (%d, %d) Warning: No available fix (river/estuary out of place)", MAP_X_COORD(map->vnum), MAP_Y_COORD(map->vnum));
 			}
 		} // end fake-river
 		else if (GET_SECT_VNUM(map->natural_sector) == b5151_OASIS && (GET_SECT_VNUM(map->base_sector) != b5151_OASIS || GET_SECT_VNUM(map->sector_type) != b5151_OASIS)) {
@@ -2370,6 +2383,11 @@ void b5_151_terrain_fix(void) {
 			}
 			else if (GET_SECT_VNUM(map->base_sector) == b5151_CANAL) {
 				// log("- (%d, %d) Canal on Desert tile", MAP_X_COORD(map->vnum), MAP_Y_COORD(map->vnum));
+				to_sect = to_base = b5151_IRRIGATION_CANAL;
+				trench_original = b5151_DESERT;
+			}
+			else if (GET_SECT_VNUM(map->base_sector) == b5151_PERMA_RIVER || GET_SECT_VNUM(map->base_sector) == b5151_PERMA_ESTUARY || GET_SECT_VNUM(map->base_sector) == b5151_PERMA_CANAL || GET_SECT_VNUM(map->base_sector) == b5151_PERMA_LAKE) {
+				// log("- (%d, %d) Permafrost tile on Desert tile", MAP_X_COORD(map->vnum), MAP_Y_COORD(map->vnum));
 				to_sect = to_base = b5151_IRRIGATION_CANAL;
 				trench_original = b5151_DESERT;
 			}
