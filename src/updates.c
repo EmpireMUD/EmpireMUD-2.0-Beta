@@ -2154,6 +2154,7 @@ void b5_151_terrain_fix(void) {
 	#define b5151_BUILDING  10
 	#define b5151_DESERT_CROP  12
 	#define b5151_SEEDED_FIELD  13
+	#define b5151_SEEDED_DESERT  14
 	#define b5151_TRENCH  17
 	#define b5151_CANAL  19
 	#define b5151_DESERT  20
@@ -2198,6 +2199,7 @@ void b5_151_terrain_fix(void) {
 	#define b5151_VERDANT_CANAL  87
 	#define b5151_IRRIGATED_OASIS  88
 	#define b5151_OLD_GROWTH  90
+	#define b5151_PLANTED_DRY_OASIS  91
 	
 	#define b5151_WEIRDWOOD_0  610
 	#define b5151_WEIRDWOOD_1  611
@@ -2303,6 +2305,11 @@ void b5_151_terrain_fix(void) {
 				// log("- (%d, %d) Irrigated seed to Planted Oasis", MAP_X_COORD(map->vnum), MAP_Y_COORD(map->vnum));
 				to_sect = b5151_PLANTED_OASIS;
 				to_base = b5151_IRRIGATED_OASIS;
+			}
+			else if (GET_SECT_VNUM(map->sector_type) == b5151_SEEDED_DESERT) {
+				// log("- (%d, %d) Seeded Desert to Planted Dry Oasis", MAP_X_COORD(map->vnum), MAP_Y_COORD(map->vnum));
+				to_sect = b5151_PLANTED_DRY_OASIS;
+				to_base = b5151_DRY_OASIS;
 			}
 			else if (GET_SECT_VNUM(map->sector_type) == b5151_CROP || GET_SECT_VNUM(map->sector_type) == b5151_IRRIGATED_CROP) {
 				// log("- (%d, %d) Irrigated crop to Oasis Crop", MAP_X_COORD(map->vnum), MAP_Y_COORD(map->vnum));
