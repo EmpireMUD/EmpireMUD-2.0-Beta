@@ -2252,7 +2252,7 @@ void b5_151_terrain_fix(void) {
 		}
 		else if ((GET_SECT_VNUM(map->base_sector) == b5151_RIVER && GET_SECT_VNUM(map->natural_sector) != b5151_RIVER) || (GET_SECT_VNUM(map->base_sector) == b5151_ESTUARY && GET_SECT_VNUM(map->natural_sector) != b5151_ESTUARY)) {
 			if (GET_SECT_VNUM(map->natural_sector) == b5151_RIVER || GET_SECT_VNUM(map->natural_sector) == b5151_ESTUARY) {
-				log("- (%d, %d) DEBUG: Probably fine (River or Estuary became River or Estuary)", MAP_X_COORD(map->vnum), MAP_Y_COORD(map->vnum));
+				// log("- (%d, %d) DEBUG: Probably fine (River or Estuary became River or Estuary)", MAP_X_COORD(map->vnum), MAP_Y_COORD(map->vnum));
 			}
 			else if (GET_SECT_VNUM(map->natural_sector) == b5151_OASIS) {
 				// log("- (%d, %d) River to Verdant Canal", MAP_X_COORD(map->vnum), MAP_Y_COORD(map->vnum));
@@ -2340,7 +2340,7 @@ void b5_151_terrain_fix(void) {
 				remove_bld = TRUE;
 			}
 			else {
-				log("- (%d, %d) Warning: No available fix (natural oasis)", MAP_X_COORD(map->vnum), MAP_Y_COORD(map->vnum));
+				log("- (%d, %d) Warning: No available fix (natural oasis has bad sector)", MAP_X_COORD(map->vnum), MAP_Y_COORD(map->vnum));
 			}
 		}	// end natural oasis
 		else if (GET_SECT_VNUM(map->sector_type) == b5151_CROP && b5151_is_DESERT(GET_SECT_VNUM(map->natural_sector))) {
@@ -2411,7 +2411,7 @@ void b5_151_terrain_fix(void) {
 				to_sect = to_base = b5151_BEAVER_DESERT;
 			}
 			else {
-				log("- (%d, %d) Warning: No available fix (base desert)", MAP_X_COORD(map->vnum), MAP_Y_COORD(map->vnum));
+				log("- (%d, %d) Warning: No available fix (base desert with something else on top)", MAP_X_COORD(map->vnum), MAP_Y_COORD(map->vnum));
 			}
 		}
 		
