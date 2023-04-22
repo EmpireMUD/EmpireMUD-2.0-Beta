@@ -134,6 +134,11 @@ The Remnants of a Giant Hovel~
 0 0 0 -1
 C
 adventure~
+E
+remnants hovel giant building ruins~
+   It looks like someone rather large was living in this hovel, though they
+seem to have destroyed it when they left. Perhaps you can find them nearby...
+~
 S
 #10966
 Giant Hovel~
@@ -143,6 +148,11 @@ The Remnants of a Giant Hovel~
 0 0 0 -1
 C
 adventure~
+E
+remnants hovel giant building ruins~
+   It looks like someone rather large was living in this hovel, though they
+seem to have destroyed it when they left. Perhaps you can find them nearby...
+~
 S
 #10967
 Giant Hovel~
@@ -152,6 +162,11 @@ The Remnants of a Giant Hovel~
 0 0 0 -1
 C
 adventure~
+E
+remnants hovel giant building ruins~
+   It looks like someone rather large was living in this hovel, though they
+seem to have destroyed it when they left. Perhaps you can find them nearby...
+~
 S
 #10972
 Giant's Causeway~
@@ -159,6 +174,11 @@ A Giant's Causeway~
 &wnnnn~
 124 0 dnD 0
 0 0 0 -1
+E
+causeway giants giant's around~
+   The enormous causeway is made mostly of stone blocks, carefully cut into
+hexagons and interlinked to form a safe way across the water.
+~
 I 29 5006 100.00 1 r  # RUINS-TO-BLD: Ruins
 R
 10973 1 5 0
@@ -188,6 +208,11 @@ A Giant Stone Head~
 &w(oo)~
 124 1 dn 0
 0 0 0 -1
+E
+head stone giant~
+   The enormous head is carved from solid stone in the likeness of a person --
+or, perhaps, a giant. Either way, it's larger than life.
+~
 I 29 5006 100.00 1 r  # RUINS-TO-BLD: Ruins
 R
 10975 1 5 0
