@@ -58,6 +58,10 @@ A Dragonslayer Statue~
 0 0 0 -1
 C
 dedicate~
+E
+statue dragonslayer slayer~
+It's a statue of an epic hero in a dragonslayer pose.
+~
 I 29 5006 100.00 1 r  # RUINS-TO-BLD: Ruins
 R
 1001 1 5 0
@@ -114,6 +118,12 @@ A Hole in the Muck~
 0 0 0 -1
 C
 adventure~
+E
+hole muck down~
+   Something has left a rather large hole, although the muck has started to
+fill back in and it's impossible to tell exactly what it was. It must have been
+large, though, so let's hope it's not still around.
+~
 I 29 5006 100.00 1 r  # RUINS-TO-BLD: Ruins
 S
 #10965

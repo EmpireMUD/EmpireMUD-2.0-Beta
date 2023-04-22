@@ -22,7 +22,7 @@ E
 9 0 75.00 1
 E
 18 0 100.00 0
-I 6 10302 50.00 1  # FORAGE: some firefruit seeds
+I 6 10302 50.00 1  # FORAGE: firefruit seeds
 M
 10302 5.00 0
 M
@@ -35,6 +35,12 @@ M
 10306 5.00 0
 M
 10307 5.00 0
+X
+wood scorched trees forest around~
+   What trees remain here are badly burned. Their twisted, charred trunks
+stretch out of the scorched red land like fingers grasping for help as they
+sink into the dust.
+~
 S
 #10301
 Scorched Grove~
@@ -60,7 +66,7 @@ E
 9 0 75.00 26
 E
 18 0 100.00 20
-I 6 10302 50.00 1  # FORAGE: some firefruit seeds
+I 6 10302 50.00 1  # FORAGE: firefruit seeds
 M
 10302 5.00 0
 M
@@ -73,6 +79,11 @@ M
 10306 5.00 0
 M
 10307 5.00 0
+X
+grove trees scorched around~
+   A few twisted, black tree trunks reach out of the scorched red earth, but
+there are no hints of regrowth after this devastating blaze.
+~
 S
 #10302
 Scorched Plains~
@@ -87,7 +98,7 @@ E
 9 0 75.00 1
 E
 18 0 100.00 0
-I 6 10302 50.00 1  # FORAGE: some firefruit seeds
+I 6 10302 50.00 1  # FORAGE: firefruit seeds
 M
 10302 5.00 0
 M
@@ -100,6 +111,11 @@ M
 10306 5.00 0
 M
 10307 5.00 0
+X
+plains scorched ground around~
+   The ground is scorched red where flames have destroyed everything living
+that once grew upon it.
+~
 S
 #10303
 Scorched Crop~
@@ -114,7 +130,7 @@ E
 9 0 75.00 1
 E
 18 0 100.00 0
-I 6 10302 50.00 1  # FORAGE: some firefruit seeds
+I 6 10302 50.00 1  # FORAGE: firefruit seeds
 M
 10302 5.00 0
 M
@@ -127,6 +143,12 @@ M
 10306 5.00 0
 M
 10307 5.00 0
+X
+crops scorched plants around~
+   The rows of scorched earth suggest this was once a neatly-planted crop. But
+what was sown will never be reaped: everything that once lived here has burned
+to ash.
+~
 S
 #10304
 Scorched Desert Crop~
@@ -141,7 +163,7 @@ E
 9 0 75.00 26
 E
 18 0 100.00 20
-I 6 10302 50.00 1  # FORAGE: some firefruit seeds
+I 6 10302 50.00 1  # FORAGE: firefruit seeds
 M
 10302 5.00 0
 M
@@ -154,6 +176,12 @@ M
 10306 5.00 0
 M
 10307 5.00 0
+X
+crops scorched plants around~
+   The rows of scorched earth suggest this was once a neatly-planted crop. But
+what was sown will never be reaped: everything that once lived here has burned
+to ash.
+~
 S
 #10305
 Scorched Desert~
@@ -168,7 +196,7 @@ E
 9 0 75.00 25
 E
 18 0 100.00 20
-I 6 10302 50.00 1  # FORAGE: some firefruit seeds
+I 6 10302 50.00 1  # FORAGE: firefruit seeds
 M
 10302 5.00 0
 M
@@ -181,5 +209,9 @@ M
 10306 5.00 0
 M
 10307 5.00 0
+X
+desert scorched around~
+The desert shimmers with a reddish glow in the aftermath of a powerful fire.
+~
 S
 $

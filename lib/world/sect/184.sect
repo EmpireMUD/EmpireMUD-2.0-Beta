@@ -9,6 +9,12 @@ E
 4 0 100.00 5
 M
 9156 10.00 0
+X
+dam sticks wood branches logs~
+   Logs, branches, sticks, and any other stray bits of wood have been
+meticulously piled and woven into a rather large dam. It has completely blocked
+the flow of water and has begun to flood the area!
+~
 S
 #18451
 Flooded Plains~
@@ -66,6 +72,10 @@ E
 4 0 2.00 0
 E
 9 0 75.00 0
+X
+flooding flooded water plains around~
+Rising water from a nearby dam has flooded the entire plain!
+~
 S
 #18452
 Flooded Woods~
@@ -99,6 +109,11 @@ E
 4 0 2.00 2
 E
 9 0 75.00 2
+X
+flooding flooded water woods trees around~
+   Rising water from a nearby dam has flooded the forest. Trees poke out, but
+the water is too high to make much use of this land.
+~
 S
 #18453
 Flooded Desert~
@@ -120,6 +135,10 @@ E
 4 0 10.00 20
 E
 9 0 75.00 20
+X
+flooding flooded water desert around~
+Rising water from a nearby dam has flooded the desert!
+~
 _
 Beaver-flooded variant of flat desert tiles 20 12 14 23 24 25 26
 ~
@@ -144,6 +163,10 @@ E
 4 0 2.00 70
 E
 9 0 75.00 70
+X
+flooding flooded water desert around~
+Rising water from a nearby dam has flooded the desert!
+~
 _
 Beaver-flooded sector for flat irrigation tiles: 70 73 74 75 76 77 78
 ~
@@ -168,6 +191,10 @@ E
 4 0 2.00 71
 E
 9 0 75.00 71
+X
+flooding flooded water desert around~
+Rising water from a nearby dam has flooded the desert!
+~
 _
 Beaver-flooded irrigated forest (71)
 ~
@@ -198,6 +225,10 @@ E
 4 0 2.00 72
 E
 9 0 75.00 72
+X
+flooding flooded water desert around~
+Rising water from a nearby dam has flooded the desert!
+~
 _
 Beaver-flooded irrigated jungle (72)
 ~
@@ -219,6 +250,10 @@ E
 4 0 10.00 80
 E
 9 0 75.00 80
+X
+flooding flooded water desert around~
+Rising water from a nearby dam has flooded the desert!
+~
 _
 Beaver-flooded oasis - 21, 80, 81, 82, 83, 84, 86, 88
 ~

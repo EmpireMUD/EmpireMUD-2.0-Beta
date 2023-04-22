@@ -6,6 +6,13 @@ An Interdimensional Whirlwind~
 0 0 0 -1
 A
 j
+E
+whirlwind~
+   The magical whirlwind seems to be a portal between this plane and the
+Magiterranean, the secret realm of druids. You can't seem to penetrate the
+whirlwind, but it looks like the druids have been using it to spread their
+magi-netically modified crops into our world.
+~
 S
 #10550
 Frozen River Portal~
@@ -13,6 +20,12 @@ A Frozen River~
 &W~&C()&W~~
 1000 0 bd 0
 0 0 0 -1
+E
+frozen river portal around~
+   An arch of ice rises above the frozen river, forming the border of a strange
+portal. Snow blasts through the portal and, as the snow lands on your skin, you
+feel the electric mana of the Magiterranean -- the realm of nature mages.
+~
 I 6 10562 95.00 1 F  # FORAGE: handful of red and green seeds
 I 6 10563 5.00 1 F  # FORAGE: seed of pure ice
 M

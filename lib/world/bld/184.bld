@@ -6,6 +6,12 @@ A Beaver Lodge~
 0 0 0 -1
 C
 adventure~
+E
+dam sticks wood branches logs lodge~
+   Logs, branches, sticks, and any other stray bits of wood have been
+meticulously piled and woven into a rather large dam. It has completely blocked
+the flow of water and has begun to flood the area!
+~
 F
 F
 M
@@ -17,6 +23,12 @@ A Beaver Dam~
 &t####~
 1 0 dp 0
 0 0 0 -1
+E
+dam sticks wood branches logs~
+   Logs, branches, sticks, and any other stray bits of wood have been
+meticulously piled and woven into a rather large dam. It has completely blocked
+the flow of water and has begun to flood the area!
+~
 F
 F
 M

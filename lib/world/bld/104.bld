@@ -20,6 +20,10 @@ The Burnt Ruins of a Small Hamlet~
 &?.&0\&?.&0]~
 10 -1 diou 0
 0 0 0 -1
+E
+hamlet ruined burnt ruins~
+It looks like the hamlet has burnt down. It smells terrible.
+~
 R
 1002 1 5 0
 S
@@ -51,7 +55,7 @@ Haxaw sells the following healer gear:
  goose-beak totem  (offhand item)
  goblin deathshroud  (about body, mage armor)
  doubleskin gloves  (hands, mage armor)
- 
+
 Use the list, list id, and buy commands to shop from Haxaw.
 ~
 S
