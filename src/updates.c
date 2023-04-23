@@ -2436,7 +2436,7 @@ void b5_151_terrain_fix(void) {
 			if (trench_original > 0) {
 				set_extra_data(&map->shared->extra_data, ROOM_EXTRA_TRENCH_ORIGINAL_SECTOR, trench_original);
 			}
-			if (remove_bld && (room = (map->room ? map->room : real_room(map->vnum))) && GET_BUILDING(room)) {
+			if (remove_bld && (room = (map->room ? map->room : real_room(map->vnum))) && GET_BUILDING(room) && !IS_CITY_CENTER(room)) {
 				// log("- (%d, %d) Removing building", MAP_X_COORD(map->vnum), MAP_Y_COORD(map->vnum));
 				++changed_bld;
 				disassociate_building(room);
