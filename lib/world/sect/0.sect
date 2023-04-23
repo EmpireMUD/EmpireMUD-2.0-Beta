@@ -488,6 +488,15 @@ I 7 1206 8.33 125 p  # PICK: iridescent blue iris
 I 7 1202 100.00 125 p  # PICK: twig of redthorn
 I+ 0 70  # Ability: Find Herbs
 I 7 123 100.00 125 p  # PICK: small flower
+X
+mountains peaks cliffs crags rocks around~
+   You are standing amongst towering mountains, their jagged peaks reaching
+towards the sky. The air is cool and crisp, with a hint of pine and other
+alpine flora. The mountains are covered in a patchwork of crags and rocky
+outcroppings, with streams cascading down their sides. Above, the sky is a
+crystal clear, and you can see birds soaring in the distance. The sheer size
+and beauty of the mountains is both awe-inspiring and humbling.
+~
 S
 #9
 Road~
@@ -1010,7 +1019,7 @@ copse gnarled desert trees grove around~
    You come across a small copse of trees growing in the midst of the arid
 desert. Despite the harsh conditions, the trees seem to be thriving, their
 roots digging deep into the sandy soil. The trunks are thin, and the branches
-are short, but you can see some of them are beginning to produce new leaves. 
+are short, but you can see some of them are beginning to produce new leaves.
 It's a stark contrast to the desolate surroundings, and the copse provides a
 small oasis of greenery in an otherwise barren landscape.
 ~
@@ -2041,7 +2050,7 @@ I 20 131 100.00 1  # CHOP: green sapling
 X
 copse riverside riverbank bank trees forest stumps around~
    As you approach the river, a small copse comes into view, nestled on the
-bank. Some of the trees have been felled, leaving stumps of varying heights. 
+bank. Some of the trees have been felled, leaving stumps of varying heights.
 But amidst the stumps, there are signs of new growth: tiny saplings and young
 trees are sprouting up, reaching for the light. The lush foliage of the
 surrounding forest provides a natural barrier, casting a dappled shade over the
@@ -2180,7 +2189,7 @@ cliffs mountains ocean sea water down around~
    The sheer cliffs tower high above the churning ocean, their rocky faces
 weathered by wind and salt spray. Jagged edges jut out sharply, creating deep
 shadows that shift with the changing light. At the base of the cliffs, the
-waves crash relentlessly against the rocks, sending up plumes of white foam. 
+waves crash relentlessly against the rocks, sending up plumes of white foam.
 Here and there, small caves and crevices can be seen, evidence of the ceaseless
 erosion that has shaped this coastline over countless years.
 ~
@@ -2353,7 +2362,7 @@ shore exstuary river water ocean sea around~
 falling with the tide. Small crabs scurry around, digging into the sand and mud
 for food. Seagulls and other shorebirds swoop down to grab small fish and other
 creatures that have been stranded on the shore by the receding water. In the
-distance, the sound of waves crashing against the rocky cliffs can be heard. 
+distance, the sound of waves crashing against the rocky cliffs can be heard.
 The air is salty and fresh, with a slight breeze blowing in from the sea.
 ~
 S
@@ -2588,6 +2597,17 @@ E
 E
 16 0 100.00 0
 I 6 3017 33.00 1  # FORAGE: plump fig
+X
+vined densely field stumps jungle trees forest around~
+   You step into a clearing amidst the dense jungle, only to find it marred by
+a cluster of stumps. It's evident that the trees that once stood here have been
+cut down, leaving behind a stark reminder of the human impact on the natural
+world. The ground is littered with fallen branches and leaves, while a faint
+scent of sawdust still lingers in the air. Despite the absence of trees, the
+clearing is not entirely barren. New sprouts and shrubs are beginning to
+emerge, perhaps signaling the start of a new chapter in this patch of land's
+story.
+~
 S
 #62
 Jungle Copse~
@@ -2627,6 +2647,14 @@ E
 15 0 1.00 34
 I 6 3017 33.00 1  # FORAGE: plump fig
 I 20 135 100.00 1  # CHOP: reaching sapling
+X
+copse young jungle trees forest stumps around~
+   You find yourself in a lush jungle copse, surrounded by tall trees and thick
+vegetation. Stumps of previously felled trees dot the area, and new growth has
+emerged from them in the form of saplings and young trees. The air is thick
+with the scent of damp earth and the sounds of wildlife can be heard in the
+distance.
+~
 S
 #63
 Seaside Jungle Stumps~
@@ -2656,6 +2684,14 @@ I 7 1206 8.33 125 p  # PICK: iridescent blue iris
 I 7 1200 100.00 125 p  # PICK: handful of whitegrass
 I+ 0 70  # Ability: Find Herbs
 I 7 123 100.00 125 p  # PICK: small flower
+X
+stumps tropical seaside ocean forest trees around~
+   As you make your way along the jungle's edge, you come across a section
+where the dense foliage abruptly stops, replaced by a stretch of barren ground.
+Here, several tree stumps, their tops cut clean off, jut up from the earth. 
+Looking out past the stumps, you can see the shimmering expanse of the ocean,
+its waves crashing against the rocky shore.
+~
 S
 #64
 Seaside Jungle Copse~
@@ -2688,6 +2724,16 @@ I 7 1200 100.00 125 p  # PICK: handful of whitegrass
 I+ 0 70  # Ability: Find Herbs
 I 7 123 100.00 125 p  # PICK: small flower
 I 20 135 100.00 1  # CHOP: reaching sapling
+X
+copse jungle seaside ocean trees forest around~
+   You find yourself standing at the edge of a jungle copse that reaches down
+to the shore. The area appears to have been disturbed, with stumps of trees
+visible around you. However, new life is emerging from the stumps, with small
+trees and saplings beginning to take root and grow. The sound of the waves
+lapping against the shore can be heard in the distance, and the moist air is
+thick with the scent of the jungle. As you step forward into the copse, you
+can't help but feel a sense of awe at the power of nature to regenerate itself.
+~
 S
 #65
 Jungle Edge~
@@ -2718,6 +2764,17 @@ E
 15 0 1.00 34
 I 6 3017 33.00 1  # FORAGE: plump fig
 I 20 135 100.00 1  # CHOP: reaching sapling
+X
+jungle edge trees forest grassland plains around~
+   As you approach the edge of the jungle, you can feel the air becoming
+slightly cooler and more humid. The sounds of the forest creatures give way to
+the rustling of tall grasses in the open plains beyond. You can see the thick
+foliage of the jungle ahead, with tall trees reaching high into the sky. The
+transition from the grassland to the jungle is marked by a line of trees, their
+trunks thick and gnarled, their branches heavy with vines and moss. The dense
+undergrowth of the jungle begins here, the plant life spilling out from the
+shaded canopy to carpet the ground with vibrant greenery.
+~
 S
 #70
 Irrigated Field~
@@ -2761,6 +2818,14 @@ I+ 0 70  # Ability: Find Herbs
 I 7 123 100.00 125 p  # PICK: small flower
 I 9 134 8.00 1 g  # GATHER: thorny sapling
 I 9 139 92.00 1 g  # GATHER: bundle of long leaves
+X
+field irrigation irrigation desert canal around~
+   You find yourself standing in a vast expanse of freshly irrigated desert. 
+The land is soft and moist beneath your feet, a marked contrast to the dry sand
+that stretches out as far as the eye can see. In the distance, you can see the
+canal that brought life-giving water to this barren place, its gentle flow
+providing the promise of hope and renewal to the surrounding area.
+~
 S
 #71
 Irrigated Forest~
@@ -2803,6 +2868,16 @@ I 9 121 85.00 1 g  # GATHER: sticks and leaves
 I 9 131 15.00 1 g  # GATHER: green sapling
 I 20 120 50.00 2 c  # CHOP: large tree
 I 20 120 50.00 1 c  # CHOP: large tree
+X
+forest trees irrigated irrigation canal around~
+   You are standing in a lush forest that has grown on the irrigated soil
+around the canal. The trees around you are tall and sturdy, with their leaves
+rustling in the breeze. The ground beneath your feet is covered in a thick
+layer of leaves and other debris, making it soft and spongy to walk on. As you
+look up, you can see glimpses of the sky through the canopy of leaves above
+you. The air around you is fresh and cool, and you can hear the chirping of
+birds and the rustling of leaves as the wind blows through the trees.
+~
 S
 #72
 Irrigated Jungle~
@@ -2851,6 +2926,17 @@ I 9 123 85.00 1 g  # GATHER: small flower
 I 9 135 15.00 1 g  # GATHER: reaching sapling
 I 20 128 50.00 1 c  # CHOP: massive jungle tree
 I 20 128 50.00 2 c  # CHOP: massive jungle tree
+X
+jungle forest trees irrigated irrigation canal around~
+   As you walk along the irrigation canal in the desert, you notice a lush and
+dense jungle growing on the fertile soil around it. The thick canopy of trees
+provides shade and coolness, while the sound of birds and monkeys echoes
+through the air. The ground is covered in a thick layer of leaves and fallen
+branches, and you can see vines and creepers hanging from the branches of the
+trees. The air is humid and filled with the scent of rich soil and vegetation.
+As you continue to explore, you can hear the faint sound of running water, as
+the irrigation canal continues to bring life to this once barren land.
+~
 S
 #73
 Irrigated Stumps~
@@ -2887,6 +2973,15 @@ I+ 0 70  # Ability: Find Herbs
 I 7 123 100.00 125 p  # PICK: small flower
 I 9 134 8.00 1 g  # GATHER: thorny sapling
 I 9 139 92.00 1 g  # GATHER: bundle of long leaves
+X
+stumps field trees forest irrigated irrigation canal around~
+   You walk through an irrigated field where stumps of trees lie scattered
+around. The trees have been cut down, leaving behind the stumps as the only
+remnants of their presence. The field has been made fertile by the nearby
+irrigation canal, allowing the growth of crops and vegetation to take place. 
+However, the absence of the trees is noticeable and adds a certain emptiness to
+the area.
+~
 S
 #74
 Irrigated Copse~
@@ -2930,6 +3025,16 @@ I 7 1204 45.84 125 p  # PICK: daggerbite frond
 I+ 0 70  # Ability: Find Herbs
 I 7 123 100.00 125 p  # PICK: small flower
 I 20 131 100.00 1  # CHOP: green sapling
+X
+copse irrigated irrigation trees forest stumps around canal~
+   As you walk through the irrigated field, you come across a small copse where
+the trees have started to regrow. It's a vibrant and green area with young
+saplings and tall trees reaching towards the sky. The lush foliage provides
+ample shade and creates a cool, peaceful atmosphere. The sound of leaves
+rustling in the breeze and birds chirping overhead adds to the tranquil
+ambiance of this growing forest. The scent of fresh soil and vegetation fills
+the air, making it easy to forget you are in the middle of a desert.
+~
 S
 #75
 Irrigated Jungle Stumps~
@@ -2964,6 +3069,15 @@ I+ 0 70  # Ability: Find Herbs
 I 7 1204 45.84 125 p  # PICK: daggerbite frond
 I+ 0 70  # Ability: Find Herbs
 I 7 123 100.00 125 p  # PICK: small flower
+X
+stumps jungle forest trees canal irrigated irrigation around~
+   You walk through an irrigated field where stumps of trees lie scattered
+around. The trees have been cut down, leaving behind the stumps as the only
+remnants of their presence. The field has been made fertile by the nearby
+irrigation canal, allowing the growth of crops and vegetation to take place. 
+However, the absence of the trees is noticeable and adds a certain emptiness to
+the area.
+~
 S
 #76
 Irrigated Jungle Copse~
@@ -3013,6 +3127,16 @@ I 7 1204 45.84 125 p  # PICK: daggerbite frond
 I+ 0 70  # Ability: Find Herbs
 I 7 123 100.00 125 p  # PICK: small flower
 I 20 135 100.00 1  # CHOP: reaching sapling
+X
+copse jungle forest trees stumps irrigated irrigation canal around~
+   As you walk through the irrigated field, you come across a small copse where
+the trees have started to regrow. It's a vibrant and green area with young
+saplings and tall trees reaching towards the sky. The lush foliage provides
+ample shade and creates a cool, peaceful atmosphere. The sound of leaves
+rustling in the breeze and birds chirping overhead adds to the tranquil
+ambiance of this growing forest. The scent of fresh soil and vegetation fills
+the air, making it easy to forget you are in the middle of a desert.
+~
 S
 #77
 Planted Irrigated Field~
@@ -3467,7 +3591,7 @@ I 9 131 15.00 1 g  # GATHER: green sapling
 I 20 137 100.00 1  # CHOP: ancient tree
 X
 forest trees old-growth oldgrowth growth plants around up~
-   As you stand amidst the towering giants, you can't help but feel small. 
+   As you stand amidst the towering giants, you can't help but feel small.
 These trees have stood for centuries, reaching heights that seem to scrape the
 sky. The ground is blanketed in a thick layer of fallen needles and leaves,
 muffling your footsteps. You can see the occasional small clearing where
