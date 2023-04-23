@@ -6,6 +6,16 @@ A Colossal Scaffold~
 0 0 0 -1
 C
 adventure~
+E
+scaffold scaffolding scaffolds~
+   The wood and iron scaffolding is truly colossal, sprawling up toward the
+sky. It has the rough shape of a man, so it must be related to that colossus
+that's been stomping around.
+~
+E
+colossus colossal~
+The colossus doesn't seem to be here anymore.
+~
 T 12511
 S
 $

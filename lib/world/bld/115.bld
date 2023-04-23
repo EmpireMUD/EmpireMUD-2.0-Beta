@@ -6,6 +6,11 @@ An Adventurer Statue~
 0 0 0 -1
 C
 dedicate~
+E
+statue adventurer~
+   The monument is a larger-than-life stone sculpture of a great adventurer. 
+Unfortunately, there's no information on their deeds.
+~
 I 29 5006 100.00 1 r  # RUINS-TO-BLD: Ruins
 R
 1001 1 5 0

@@ -4,6 +4,11 @@ A Goose Farm~
 &0|GG|~
 20 1 dn 0
 0 0 0 -1
+E
+farm goose geese~
+   A field of grass has been fenced off to hold geese -- at least, during the
+season when they're moulting and can't fly away.
+~
 I 29 5006 100.00 1 r  # RUINS-TO-BLD: Ruins
 M
 16651 100.00 0

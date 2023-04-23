@@ -34,6 +34,15 @@ Some Cliffside Docks~
 0 0 0 -1
 C
 board, load, unload~
+E
+docks~
+   The docks are made from sturdy lumber and reinforced for their precarious
+position on the cliffside.
+~
+E
+cliffside~
+The docks are attached directly to the cliffside.
+~
 F
 g
 I 29 5010 100.00 1 r  # RUINS-TO-BLD: Flooded Ruins
@@ -54,6 +63,11 @@ A
 d
 C
 board, load, unload~
+E
+wharf smugglers smuggler's~
+   The smuggler's wharf is well-camouflaged for discreet loading and unloading
+in the dark of night.
+~
 F
 g
 I 29 5010 100.00 1 r  # RUINS-TO-BLD: Flooded Ruins
