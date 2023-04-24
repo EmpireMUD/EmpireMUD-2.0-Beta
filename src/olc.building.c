@@ -116,6 +116,11 @@ bool audit_building(bld_data *bld, char_data *ch) {
 		problem = TRUE;
 	}
 	
+	if (!GET_BLD_EX_DESCS(bld) && IS_SET(GET_BLD_FLAGS(bld), BLD_OPEN)) {
+		olc_audit_msg(ch, GET_BLD_VNUM(bld), "Open building has has no extra descriptions");
+		problem = TRUE;
+	}
+	
 	// check scripts
 	for (tpl = GET_BLD_SCRIPTS(bld); tpl; tpl = tpl->next) {
 		if (!(trig = real_trigger(tpl->vnum))) {
