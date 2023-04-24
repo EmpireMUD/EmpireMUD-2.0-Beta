@@ -2116,7 +2116,12 @@ void perform_change_sect(room_data *loc, struct map_data *map, sector_data *sect
 	old_sect = (loc ? SECT(loc) : map->sector_type);
 	
 	// decustomize
-	decustomize_shared_data(map->shared);
+	if (loc) {
+		decustomize_room(loc);
+	}
+	else {
+		decustomize_shared_data(map->shared);
+	}
 	
 	// update room
 	if (loc) {
