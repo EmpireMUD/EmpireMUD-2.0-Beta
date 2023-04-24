@@ -4,6 +4,12 @@ An Enormous Hole in the Hillside~
 &t\__/~
 124 0 d 0
 0 0 0 -1
+E
+hole enormous large hillside~
+   There are signs around the hole that it was dug recently. More worrying,
+however, is its size. Whatever dug it is larger than a warhorse. Type
+'adventure' to see more information or 'enter hole' to go in.
+~
 S
 #12301
 Enormous Hole~
@@ -13,6 +19,12 @@ An Enormous Hole Between the Trees~
 0 0 0 -1
 A
 d
+E
+hole large enormous trees~
+   There are signs around the hole that it was dug recently. More worrying,
+however, is its size. Whatever dug it is larger than a warhorse. Type
+'adventure' to see more information or 'enter hole' to go in.
+~
 S
 #12302
 Enormous Hole~
@@ -20,6 +32,12 @@ An Enormous Hole in the Desert~
 &t\__/~
 124 0 d 0
 0 0 0 -1
+E
+hole enormous large desert~
+   There are signs around the hole that it was dug recently. More worrying,
+however, is its size. Whatever dug it is larger than a warhorse. Type
+'adventure' to see more information or 'enter hole' to go in.
+~
 S
 #12303
 Enormous Hole~
@@ -29,6 +47,12 @@ An Enormous Hole in the Jungle Floor~
 0 0 0 -1
 A
 d
+E
+hole enormous large jungle floor~
+   There are signs around the hole that it was dug recently. More worrying,
+however, is its size. Whatever dug it is larger than a warhorse. Type
+'adventure' to see more information or 'enter hole' to go in.
+~
 S
 #12308
 Enormous Hole~
@@ -36,6 +60,17 @@ An Enormous, Caved-In Hole~
 &t\__/~
 1 0 d 0
 0 0 0 -1
+E
+hole enormous large caved-in~
+   It looks like there was an enormous hole here, but it has completely caved
+in. Tufts of fur stick out of the dirt, but there are no other clues to the
+identity of the hole's former owner.
+~
+E
+fur tufts~
+   There are large tufts of fur sticking out of the dirt, but whatever left
+them -- and whatever dug the whole -- is long gone.
+~
 R
 12313 1 0 0
 S

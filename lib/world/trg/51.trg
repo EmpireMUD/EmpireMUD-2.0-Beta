@@ -258,11 +258,11 @@ end
 detach 5187 %room.id%
 ~
 #5191
-Oasis Drainage~
+Oasis Drainage: Completing building converts to Dry Oasis~
 2 o 100
 ~
-%echo% The drainage is complete and the area is now a desert.
-%terraform% %room% 20
+%echo% The drainage is complete. The plants begin to die as the oasis dries up.
+%terraform% %room% 82
 return 0
 ~
 #5195

@@ -2668,23 +2668,35 @@ static const char *GetMSSP_Extra_Descs() {
 	struct extra_descr_data *ex;
 	obj_data *obj, *next_obj;
 	bld_data *bld, *next_bld;
+	crop_data *crop, *next_crop;
+	sector_data *sect, *next_sect;
 	int count = 0;
 	
 	HASH_ITER(hh, object_table, obj, next_obj) {
 		if (GET_OBJ_ACTION_DESC(obj) && *GET_OBJ_ACTION_DESC(obj)) {
 			++count;
 		}
-		for (ex = GET_OBJ_EX_DESCS(obj); ex; ex = ex->next) {
+		LL_FOREACH(GET_OBJ_EX_DESCS(obj), ex) {
 			++count;
 		}
 	}
 	HASH_ITER(hh, room_template_table, rmt, next_rmt) {
-		for (ex = GET_RMT_EX_DESCS(rmt); ex; ex = ex->next) {
+		LL_FOREACH(GET_RMT_EX_DESCS(rmt), ex) {
 			++count;
 		}
 	}
 	HASH_ITER(hh, building_table, bld, next_bld) {
-		for (ex = GET_BLD_EX_DESCS(bld); ex; ex = ex->next) {
+		LL_FOREACH(GET_BLD_EX_DESCS(bld), ex) {
+			++count;
+		}
+	}
+	HASH_ITER(hh, crop_table, crop, next_crop) {
+		LL_FOREACH(GET_CROP_EX_DESCS(crop), ex) {
+			++count;
+		}
+	}
+	HASH_ITER(hh, sector_table, sect, next_sect) {
+		LL_FOREACH(GET_SECT_EX_DESCS(sect), ex) {
 			++count;
 		}
 	}

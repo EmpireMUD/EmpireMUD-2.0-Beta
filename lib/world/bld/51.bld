@@ -126,6 +126,16 @@ A Well~
 0 0 0 -1
 C
 drink, fill~
+E
+well water down buckets ropes~
+   Approaching the well, you hear the sound of water bubbling up from deep
+within. The structure itself is simple, yet sturdy, with a circular stone wall
+surrounding the opening. Buckets and ropes hang nearby, suggesting that this
+well is still in use by the locals. As you peer down into the depths, you catch
+a glimpse of the crystal-clear water that sustains the people who live around
+here. The well exudes a sense of community and shared reliance, a crucial
+source of life in this area.
+~
 F
 F
 I 29 5006 100.00 1 r  # RUINS-TO-BLD: Ruins
@@ -147,6 +157,15 @@ D
 mountain, allowing you to mine the natural resources which lie within. Mines
 are commonly useful for digging up iron to make armor, or other precious
 metals to make jewelry.
+~
+E
+mine shaft down mountain building~
+   At the surface of the mountain, you discover a gaping hole in the earth,
+revealing the entrance to a mine shaft. The opening is supported by sturdy
+wooden beams, providing a glimpse into the dark depths below. Debris and rocks
+are strewn about the entrance, hinting at the mining activity that takes place
+within. The air is cool and musty, as if the mountain is holding its breath,
+waiting for the next miners to venture into its depths.
 ~
 F
 o
@@ -265,6 +284,14 @@ A Wooden Fence~
 @u&0vv@v~
 4 0 djmpu 0
 0 0 0 -1
+E
+fence wooden~
+   Made of wooden planks lashed together with rope, the fence seems to go on
+indefinitely, forming a barrier against the wild animals that roam beyond. The
+structure is simple but effective, with no gaps or weaknesses visible to the
+naked eye. It stands as a testament to the ingenuity and resourcefulness of
+those who constructed it, a bulwark against the dangers of the wilderness.
+~
 R
 1003 1 5 0
 R
@@ -276,6 +303,16 @@ A Wooden Gate~
 @u&0xx@v~
 4 0 djmopu 0
 0 0 0 -1
+E
+gate fence wooden~
+   In the midst of the fence, a single gate stands tall and proud. Made of the
+same sturdy wooden planks as the fence itself, the gate is adorned with iron
+hinges and a lock. The gate seems to be the only entry point through the fence,
+leading to whatever lies beyond. The air around the gate is still and quiet, as
+if it is waiting for someone to pass through and disturb the peace. The gate is
+both an invitation and a barrier, offering the possibility of exploration while
+simultaneously marking the boundary between safety and the unknown.
+~
 R
 1003 1 5 0
 R
@@ -360,6 +397,15 @@ There are make-shift carts sitting around full of rock and large storage bins
 are scattered all around the place. A pick that's so worn it looks more like
 a mace is lying at your feet.
 ~
+E
+pit gravel building around~
+   As you make your way down a steep incline to the bottom of this pit, you
+almost gag from all the dust floating around in the air. This is an old, barren
+gravel pit that has been converted in to a storage area for rocks. There are
+make-shift carts sitting around full of rock and large storage bins are
+scattered all around the place. A pick that's so worn it looks more like a mace
+is lying at your feet.
+~
 I 29 5006 100.00 1 r  # RUINS-TO-BLD: Ruins
 R
 1002 2 5 0
@@ -378,6 +424,14 @@ Different piles of wood are scattered about the floor. Large racks for
 storing wood are positioned along the back wall and one of the side walls. A
 worn out axe is leaning against one of the walls and a few chips of wood are
 scattered around your feet.
+~
+E
+lumber yard lumberyard building around~
+   As you enter the yard, the scent of freshly cut wood is very strong. 
+Different piles of wood are scattered about the floor. Large racks for storing
+wood are positioned along the back wall and one of the side walls. A worn out
+axe is leaning against one of the walls and a few chips of wood are scattered
+around your feet.
 ~
 F
 t
@@ -459,6 +513,20 @@ A Quarry~
 0 0 0 -1
 C
 dig, quarry~
+E
+quarry stone pit down building around~
+   As you approach the quarry, you are struck by the sheer size of the exposed
+rock face rising up before you. The walls of the quarry tower above you, with
+layers of stone exposed in varying shades of gray and brown. Stone blocks of
+all sizes are scattered about, some still embedded in the walls, others
+precariously balanced on the edge of the quarry floor. The air is thick with
+the scent of dust and rock, a reminder of the raw, natural materials that are
+extracted here. Despite the starkness of the quarry, there is a sense of
+grandeur and majesty about the place, as if the very rock itself is a testament
+to the monumental structures that it will one day become a part of. The quarry
+is a place of industry and hard work, a reminder that even the most humble of
+materials can be transformed into something magnificent.
+~
 F
 f
 I 5 102 15.00 1 X  # DIG: flint stone
@@ -478,6 +546,20 @@ A Clay Pit~
 0 0 0 -1
 C
 dig~
+E
+pit clay building around~
+   As you approach the clay pit, the ground beneath your feet becomes softer
+and squishier. The pit is a large depression in the ground, filled with soft,
+malleable clay that is perfect for pottery making. The walls of the pit are
+steep and slippery, making it difficult to climb down without sliding in the
+mud. The clay itself is a rich reddish-brown color, with a slightly gritty
+texture that clings to your hands and clothes. Despite the messiness of the
+pit, there is a sense of artistry and creativity about the place, as if the
+very earth itself is a source of inspiration for the potters who use its clay
+to create beautiful works of art. The clay pit is a place of raw materials and
+endless possibilities, a reminder that even the simplest of substances can be
+transformed into something beautiful and useful.
+~
 F
 f
 I 5 101 100.00 1 X  # DIG: lump of clay
@@ -676,6 +758,32 @@ A Bridge Over the River~
 &c~&0--&c~~
 16 0 dmosD 0
 0 0 0 -1
+E
+bridge building~
+   As you step onto the timber and stone bridge, you feel the rough texture of
+the wooden planks beneath your feet. The bridge sways slightly as you walk, but
+its sturdy construction gives you a sense of security. Looking down, you see
+the rushing water of the stream or ravine below, the sunlight reflecting off
+its surface. To either side of the bridge, you notice the moss-covered stone
+supports, their rough texture providing a contrast to the smooth wooden planks
+of the bridge. Despite its small size, there is a sense of adventure and
+exploration about the bridge, as if crossing it is the first step on a great
+journey. The bridge is a place of transition and transformation, a reminder
+that even the simplest of crossings can lead to new experiences and
+discoveries.
+~
+E
+river down around~
+   Looking down from the timber and stone bridge, you see the rushing waters of
+the river or ravine below. The water is crystal clear, reflecting the sunlight
+and casting sparkling ripples across its surface. You can hear the gentle sound
+of the water flowing over the rocks, a soothing and peaceful melody that seems
+to wash away your worries and cares. You notice the various plant and animal
+life that thrives along the riverbanks, from the swaying reeds to the darting
+fish to the colorful birds that swoop down to drink from the water. The river
+is a symbol of life and vitality, a reminder that even in the midst of chaos
+and uncertainty, there is a natural beauty and rhythm to the world around us.
+~
 I 29 5010 100.00 1 r  # RUINS-TO-BLD: Flooded Ruins
 R
 6015 1 1 0
@@ -855,6 +963,14 @@ On The Steps~
 .&0==&?.~
 4 0 dnot 0
 0 0 0 -1
+E
+steps stairs down building around~
+   As you ascend the stone steps, you feel the smooth and polished surface of
+the well-maintained stones beneath your feet. The steps are perfectly aligned
+and spaced, a testament to the craftsmanship of the builders who constructed
+them. Despite their age, the steps are still sturdy and reliable, a symbol of
+the enduring strength and stability of the city that surrounds them.
+~
 R
 1002 1 5 0
 S
@@ -866,6 +982,16 @@ A Statue~
 0 0 0 -1
 C
 dedicate~
+E
+statue monument building around~
+   As you approach the towering statue, you are struck by its sheer size and
+presence. Made entirely of stone, it stands stoic and unyielding against the
+elements, its surface weathered and rough to the touch. Despite its lack of
+color or adornment, the statue commands attention, its imposing figure casting
+a long shadow across the ground below. Standing before it, you feel small and
+insignificant, humbled by the weight of its history and the magnitude of its
+form.
+~
 I 29 5006 100.00 1 r  # RUINS-TO-BLD: Ruins
 R
 1001 1 5 0
@@ -880,6 +1006,19 @@ A Stone Henge~
 0 0 0 -1
 C
 chant druids~
+E
+henge stone building around monument~
+   As you approach the ancient henge, you can feel the weight of history and
+mystery surrounding it. The stones that make up the structure are massive and
+weathered, standing in a perfect circle that seems to stretch endlessly into
+the horizon. Despite their age and wear, the stones are sturdy and immovable, a
+testament to the skill and engineering of the people who erected them so long
+ago. As you walk around the henge, you notice the intricate carvings and
+markings etched into the stone, symbols and patterns that seem to hold hidden
+meanings and significance. Standing in the center of the henge, you feel a
+sense of reverence and awe, as if you are in the presence of something truly
+ancient and powerful.
+~
 I 29 5006 100.00 1 r  # RUINS-TO-BLD: Ruins
 M
 243 30.00 c
@@ -896,6 +1035,16 @@ A Gigantic Megalith~
 .&0||&?.~
 48 1 d 0
 0 0 0 -1
+E
+megalith stone gigantic monument building around~
+   As you approach the towering megalith, you are struck by its sheer size and
+weight. Made of solid stone, it stands tall and imposing, a monolithic monument
+to a long-forgotten time. Despite its simplicity and lack of adornment, the
+megalith commands attention and respect, its surface rough and textured to the
+touch. Looking up at its apex, you wonder at the skill and determination
+required to lift such a massive stone into place, and you can't help but feel a
+sense of awe and wonder at the people that created it.
+~
 I 29 5006 100.00 1 r  # RUINS-TO-BLD: Ruins
 R
 1001 1 5 0
@@ -910,6 +1059,17 @@ A Gloomy Cemetery~
 0 0 0 -1
 C
 tomb~
+E
+cemetery gloomy graves headstones around building~
+   As you step through the rusted iron gate, you find yourself in a small,
+peaceful cemetery. The grass is neatly trimmed, and the headstones are evenly
+spaced, each one a solemn reminder of the lives that once inhabited this world.
+Some are adorned with flowers or small trinkets, while others are bare and
+unadorned. The quiet stillness of the cemetery is only broken by the gentle
+rustling of leaves and the distant chirping of birds. You can't help but feel a
+sense of reverence and respect for those who rest here, their memories
+preserved in the cool, still air.
+~
 F
 B
 I 29 5006 100.00 1 r  # RUINS-TO-BLD: Ruins
@@ -932,6 +1092,14 @@ A Park~
 .&g^&?.&co~
 10 0 dn 0
 0 0 0 -1
+E
+park around trees grass~
+   As you enter the small park, you're surrounded by lush greenery and the
+sweet scent of blooming flowers. Trees tower above, their leaves rustling
+gently in the breeze. The air is filled with the hum of insects and the
+chirping of birds. You feel a sense of peace and serenity wash over you, and
+it's easy to forget the noise and chaos of the outside world.
+~
 R
 1002 1 5 0
 S
@@ -1102,6 +1270,12 @@ D
 be docked here for easy storage. In addition, the facility allows the loading
 of larger pieces of equipment into the ship's hold.
 ~
+E
+docks building around~
+   <description> The docks stretch out several yards into the water. Ships of
+any size may be docked here for easy storage. In addition, the facility allows
+the loading of larger pieces of equipment into the ship's hold.
+~
 F
 g
 I 29 5010 100.00 1 r  # RUINS-TO-BLD: Flooded Ruins
@@ -1119,6 +1293,13 @@ The Shipyard~
 C
 board, manufacture, upgrade~
 D
+   You find yourself in a large building, made from wood and designed to build
+great ships right into the water. Ships built here may be boarded by
+passengers, but the shipyard lacks the facilities to load heavy equipment or
+animals. Ships may also not be brought back in once they leave.
+~
+E
+shipyard yard building around~
    You find yourself in a large building, made from wood and designed to build
 great ships right into the water. Ships built here may be boarded by
 passengers, but the shipyard lacks the facilities to load heavy equipment or
@@ -1148,6 +1329,13 @@ great ships right into the water. Ships built here may be boarded by
 passengers, but the shipyard lacks the facilities to load heavy equipment or
 animals. Ships may also not be brought back in once they leave.
 ~
+E
+shipyard yard great building around~
+   You find yourself in a large building, made from wood and designed to build
+great ships right into the water. Ships built here may be boarded by
+passengers, but the shipyard lacks the facilities to load heavy equipment or
+animals. Ships may also not be brought back in once they leave.
+~
 F
 bu
 I 29 5010 100.00 1 r  # RUINS-TO-BLD: Flooded Ruins
@@ -1166,6 +1354,16 @@ A Rickety Swamp Walk~
 &c~&0--&c~~
 10 0 dmnops 0
 0 0 0 -1
+E
+walk swamp swampwalk boards boardwalk rickety building around~
+   As you step onto the boardwalk, you feel the planks beneath your feet give
+slightly, but they seem sturdy enough to support your weight. The air is heavy
+with the damp, earthy scent of the swamp, and the buzzing of insects is a
+constant background hum. You can see the murky water of the swamp stretching
+out in all directions, with gnarled roots and tangled vegetation protruding
+from the surface. The boardwalk twists and turns through the swamp, providing a
+relatively safe passage through this otherwise treacherous terrain.
+~
 I 29 5010 100.00 1 r  # RUINS-TO-BLD: Flooded Ruins
 R
 1005 1 5 0
@@ -1176,6 +1374,13 @@ A Platform in the Swamp~
 ~&0__&?~~
 4 0 dnp 0
 0 0 0 -1
+E
+platform swamp building around~
+   As you approach the platform, you see wooden planks and beams being laid out
+over the unstable swamp. The structure is reinforced with poles and rope,
+creating a sturdy foundation to support the weight of future construction. The
+air is filled with the scent of freshly cut timber, with hints of peaty swamp.
+~
 I 29 5010 100.00 1 r  # RUINS-TO-BLD: Flooded Ruins
 R
 1005 1 5 0
@@ -1245,6 +1450,14 @@ The Courtyard~
 ....~
 10 0 dln 0
 0 0 0 -1
+E
+courtyard yard down building around~
+   As you step into the courtyard, the sound of your footsteps echo off the
+smooth, polished stones beneath your feet. The courtyard is completely paved,
+with no patches of grass or dirt to be seen. It's a serene and peaceful space,
+surrounded by high walls and offering a brief respite from the hustle and
+bustle of the outside world.
+~
 R
 1002 1 5 0
 S
@@ -1309,6 +1522,13 @@ A Flowing Fountain~
 0 0 0 -1
 C
 drink, fill~
+E
+fountain water flowing building around~
+   As you approach the fountain, you can hear the gentle sound of water
+splashing and feel a cool mist on your face. The water shoots up into the air,
+cascading down the elaborate tiers of the fountain, and reflecting the sunlight
+in a dazzling display of colors.
+~
 F
 F
 I 29 5006 100.00 1 r  # RUINS-TO-BLD: Ruins
@@ -1543,6 +1763,12 @@ A Stone Wall~
 @U&#VV@V~
 32 0 djknr 0
 0 0 0 -1
+E
+wall stones building around~
+   As you gaze at the tall stone wall before you, you notice that it rises high
+above your head, towering like a sentinel above the area. Its imposing presence
+suggests that it is meant to keep something -- or someone -- out.
+~
 I 29 5006 100.00 1 r  # RUINS-TO-BLD: Ruins
 R
 6075 1 1 0
@@ -1586,6 +1812,16 @@ A Terraced Garden~
 0 0 0 -1
 C
 pick~
+E
+garden terrace redthorn plants mountains around~
+   The terraced garden in the mountains is a breathtaking sight. Rows of
+vibrant redthorn plants stretch out in every direction, creating a stunning
+visual display against the rugged terrain. The scent of the herb fills the air,
+and the gentle trickle of water from the nearby mountain stream provides a
+soothing background sound. The garden is a testament to the ingenuity and hard
+work of those who cultivate it, and a testament to the beauty of the natural
+world.
+~
 I 7 1202 100.00 440  # PICK: twig of redthorn
 I 32 1202 100.00 440  # SKILLED-LABOR: twig of redthorn
 I+ 7 3  # Depletion: pick
@@ -1602,6 +1838,14 @@ A Garden Made of Rafts~
 0 0 0 -1
 C
 pick~
+E
+rafts gardens river building around bileberry bileberries berry berries plants~
+   The raft gardens are a unique and inventive way to grow crops. Several
+wooden rafts float on the surface of the river, each with a small garden of
+plants growing on them. In this particular set of raft gardens, bileberries are
+being cultivated. The plants grow thick and healthy, their bright green leaves
+and deep red berries a striking contrast to the murky brown water of the river.
+~
 I 7 1205 100.00 440  # PICK: bileberries
 I 32 1205 100.00 440  # SKILLED-LABOR: bileberries
 I+ 7 3  # Depletion: pick
@@ -1618,6 +1862,16 @@ An Oasis Garden~
 0 0 0 -1
 C
 pick~
+E
+oasis gardens daggerbite fronds magewhisper sepals building around plants~
+   The gardens surrounding the desert oasis are a lush display of vibrant
+greenery and colorful blooms, surrounded by towering palm trees. The scent of
+blooming magewhisper and daggerbite fronds fill the air, and the gentle sound
+of water trickling from the oasis into the carefully tended rows of plants
+creates a soothing melody. Despite the arid desert climate, the gardens thrive
+and produce a bounty of herbs and flowers, thanks to the careful cultivation
+and maintenance by those who tend them.
+~
 I 7 1204 50.00 440 X  # PICK: daggerbite frond
 I 7 1203 50.00 440 X  # PICK: magewhisper sepals
 I 32 1204 50.00 440 s  # SKILLED-LABOR: daggerbite frond
@@ -1637,6 +1891,15 @@ An Estuary Garden~
 0 0 0 -1
 C
 pick~
+E
+gardens estuary river rafts whitegrass grass plants building around~
+   The raft garden floats gently on the calm waters of the estuary, the green
+foliage of whitegrass flourishing on its surface. The herb's feathery white
+blades sway in the gentle breeze, a sight that is both serene and refreshing.
+The vibrant green of the raft garden provides a stark contrast against the
+brown and gray tones of the estuary, making it a true oasis of life in an
+otherwise desolate landscape.
+~
 I 7 1200 100.00 440  # PICK: handful of whitegrass
 I 32 1200 100.00 440  # SKILLED-LABOR: handful of whitegrass
 I+ 7 3  # Depletion: pick
@@ -1653,6 +1916,16 @@ A Shady Garden~
 0 0 0 -1
 C
 pick~
+E
+gardens shady plants fiveleaf fiveleaves leaf leaves building around~
+   The ground inside the shady garden is covered in a soft layer of moss, and
+there are delicate ferns and mushrooms growing in the corners. The garden
+itself is filled with rows of vibrant green plants with small, delicate leaves
+- the fiveleaf herb. The plants seem to thrive in dappled sunlight, and the air
+is filled with the sweet, fresh scent of their leaves. The garden is a peaceful
+oasis in the midst of the wild forest, and it's clear that great care has been
+taken to cultivate this tranquil space.
+~
 I 7 1201 100.00 440  # PICK: sack of fiveleaf
 I 32 1201 100.00 440  # SKILLED-LABOR: sack of fiveleaf
 I+ 7 3  # Depletion: pick
@@ -1751,6 +2024,13 @@ A Mystical Portal~
 C
 collapse, enter, portal~
 D
+   Huge stones encircle you, each set into the ground at such a steep angle
+that they look like could fall at any moment. Each stone is inscribed with a
+strange symbol, and the stones are warm to the touch. You can almost feel the
+power that flows through this place.
+~
+E
+portal mystical building stones around~
    Huge stones encircle you, each set into the ground at such a steep angle
 that they look like could fall at any moment. Each stone is inscribed with a
 strange symbol, and the stones are warm to the touch. You can almost feel the
@@ -1869,6 +2149,14 @@ An Astral Nexus~
 0 0 0 -1
 C
 summon player <name>~
+E
+nexus astral building around~
+   The astral nexus stands tall and grand, constructed from massive pillars of
+stone and blocks of dark, shimmering nocturnium metal. Magical crystals of all
+colors and sizes are embedded into the structure, pulsing with arcane energy.
+As you approach, you feel a strange sensation wash over you, as if the very air
+around the nexus is charged with magic.
+~
 F
 xK
 I 29 5006 100.00 1 r  # RUINS-TO-BLD: Ruins
@@ -1883,6 +2171,15 @@ A Draining Oasis~
 .&c__&?.~
 4 0 dnp 0
 0 0 0 -1
+E
+oasis draining building plants water around~
+   As you approach the oasis, you notice that the water level has dropped
+significantly, and the plants and trees that once thrived here are now wilting
+and dying. The surrounding area is cracked and dry, as if the land itself is
+thirsty. You can see workers at the edge of the oasis using pumps and other
+tools to drain the remaining water. The once beautiful and peaceful oasis now
+has a sense of desolation and sadness.
+~
 I 29 5006 100.00 1 r  # RUINS-TO-BLD: Ruins
 R
 1005 1 5 0
@@ -1942,6 +2239,15 @@ A Family Gravesite~
 0 0 0 -1
 C
 tomb~
+E
+gravesite site graves tombs building around~
+   The family gravesite is nestled in the hills. The gravestones are weathered
+and bear the names of those who have passed on. Some of the graves are marked
+with flowers or other offerings, while others are overgrown with grass and
+weeds. The air is still and peaceful, and the only sound is the rustling of
+leaves in the breeze. It is a solemn and respectful place, where loved ones can
+come to pay their respects and remember those who have gone before.
+~
 F
 B
 M
@@ -1988,6 +2294,13 @@ A Fishery on the Coast~
 0 0 0 -1
 C
 fish~
+E
+fishery ocean building around~
+   The fishery is a long, narrow structure built right on the edge of the
+ocean. It's made of wood and has a sloping roof to protect the workers from the
+sun and rain. Large nets and fishing poles are scattered about, and the smell
+of saltwater and fish is strong in the air.
+~
 F
 I
 I 21 1302 33.00 1 f  # FISH: giant linefish
@@ -2024,6 +2337,16 @@ A Coastal Shrine~
 0 0 0 -1
 C
 dedicate~
+E
+shrine coastal building around~
+   The stone shrine stands tall and sturdy in the water, built upon a rocky
+outcropping just off the coast. The water crashes against the base of the
+shrine, and sea spray fills the air with a salty mist. The shrine itself is
+made of smooth, gray stone and features intricate carvings that depict ancient
+symbols and scenes of sea creatures. Despite the constant barrage of the ocean,
+the shrine seems to have stood the test of time and remains a powerful symbol
+of devotion to those who built it.
+~
 I 29 5010 100.00 1 r  # RUINS-TO-BLD: Flooded Ruins
 R
 1002 1 5 0
@@ -2038,6 +2361,14 @@ A Deep Well on the Mountain~
 0 0 0 -1
 C
 drink, fill~
+E
+well deep mountains building around~
+   The well is built into the side of a rocky outcropping, with a stone
+retaining wall surrounding it to prevent debris from falling in. The opening is
+round and made of stone, with a pulley system and a rope bucket used to draw
+water up from the depths. The water is clear and cold, and the surrounding
+rocks are damp and covered in moss.
+~
 F
 F
 I 29 5006 100.00 1 r  # RUINS-TO-BLD: Ruins

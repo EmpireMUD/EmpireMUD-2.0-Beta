@@ -6266,11 +6266,44 @@ void lock_icon(room_data *room, struct icon_data *use_icon) {
 	if (!room || ROOM_CUSTOM_ICON(room)) {
 		return;
 	}
+	if (SHARED_DATA(room) == &ocean_shared_data) {
+		return;	// never on the ocean
+	}
 
 	if (!(icon = use_icon)) {
 		icon = get_icon_from_set(GET_SECT_ICONS(SECT(room)), GET_SEASON(room));
 	}
 	set_room_custom_icon(room, icon->icon);
+}
+
+
+/**
+* Variant of lock_icon when a room is not available. Only works if there isn't
+* a custom icon yet.
+*
+* @param struct map_data *loc The location to lock.
+* @param struct icon_data *use_icon Optional: Force it to use this icon (may be NULL).
+*/
+void lock_icon_map(struct map_data *loc, struct icon_data *use_icon) {
+	struct icon_data *icon;
+	
+	// safety first
+	if (!loc || loc->shared->icon) {
+		return;	// don't do it if a custom icon is set (or no location provided)
+	}
+	if (loc->shared == &ocean_shared_data) {
+		return;	// never on the ocean
+	}
+
+	if (!(icon = use_icon)) {
+		icon = get_icon_from_set(GET_SECT_ICONS(loc->sector_type), y_coord_to_season[MAP_Y_COORD(loc->vnum)]);
+	}
+	
+	if (loc->shared->icon) {
+		free(loc->shared->icon);
+	}
+	loc->shared->icon = icon ? str_dup(icon->icon) : NULL;
+	request_world_save(loc->vnum, WSAVE_ROOM);
 }
 
 

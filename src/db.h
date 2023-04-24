@@ -497,7 +497,7 @@ void populate_npc(room_data *room, struct empire_territory_data *ter, bool force
 void free_extra_descs(struct extra_descr_data **list);
 void parse_extra_desc(FILE *fl, struct extra_descr_data **list, char *error_part);
 void prune_extra_descs(struct extra_descr_data **list);
-void write_extra_descs_to_file(FILE *fl, struct extra_descr_data *list);
+void write_extra_descs_to_file(FILE *fl, char key, struct extra_descr_data *list);
 
 // events
 extern event_data *event_table;

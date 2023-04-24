@@ -9,6 +9,12 @@ D0
 &p~
 E
 9 0 100.00 604
+X
+saplings enchanted woods trees around~
+   Pink saplings have started to germinate on the rolling plains. They're small
+and wiry, but with the right care -- and the Chant of Nature -- they will
+quickly grow into impressive magical trees.
+~
 S
 #601
 Clear-Cut Enchanted Forest~
@@ -53,6 +59,16 @@ I 5 100 83.00 1 d  # DIG: rock
 I 6 606 100.00 1  # FORAGE: handful of elderberries
 M
 602 100.00 d
+X
+forest enchanted clearcut clear-cut cut stumps enchanted trees around~
+   The forest has been reduced to mere stumps here, and the field is full of
+them. It is not completely devoid of life, however, as you can see wisps of
+mana sublimating off of the stumps. Life will return.
+~
+X
+mana wisps~
+Wisps of mana drift from the tops of the enchanted stumps.
+~
 S
 #602
 Enchanted Copse~
@@ -114,6 +130,13 @@ M
 616 0.33 c
 M
 602 100.00 d
+X
+forest woods copse enchanted trees around lights boughs blue pink violet~
+   You find yourself in the middle of a forest of towering pink trees. Light
+dances through the canopy in shades of blue and violet, but you can't tell if
+the trees are catching it or making it. There's a strange sense of... You can't
+quite put your finger on it. But whatever it is, this copse is full of it.
+~
 S
 #603
 Enchanted Woods~
@@ -193,6 +216,13 @@ M
 615 6.66 c
 M
 616 0.66 c
+X
+forest woods copse enchanted trees around lights boughs blue pink violet~
+   You find yourself in the middle of a forest of towering pink trees. Light
+dances through the canopy in shades of blue and violet, but you can't tell if
+the trees are catching it or making it. There's a strange sense of... You can't
+quite put your finger on it. But whatever it is, these woods are full of it.
+~
 S
 #604
 Enchanted Forest~
@@ -426,6 +456,13 @@ M
 615 10.00 c
 M
 616 1.00 c
+X
+forest woods copse enchanted trees around lights boughs blue pink violet~
+   You find yourself in the middle of a forest of towering pink trees. Light
+dances through the canopy in shades of blue and violet, but you can't tell if
+the trees are catching it or making it. There's a strange sense of... You can't
+quite put your finger on it. But whatever it is, this forest is full of it.
+~
 S
 #605
 Dead Forest~
@@ -491,6 +528,11 @@ I 5 102 9.00 1 d  # DIG: flint stone
 I 5 100 91.00 1 d  # DIG: rock
 I 6 3015 75.00 1  # FORAGE: red berries
 I 20 605 100.00 3 c  # CHOP: pile of dead wood
+X
+forest dead trees enchanted woods around~
+   The dead magewood trees have taken on a dim blue tone, far more disman than
+their bright pink signature color.
+~
 S
 #610
 Weirdwood Saplings~
@@ -524,6 +566,12 @@ D4
 &y~
 E
 9 0 100.00 614
+X
+weirdwood saplings woods trees around~
+   Violet saplings have begun to germinate in the desert sands. They're small
+and bushy, but with the right care -- and the Chant of Nature -- they will
+quickly grow into impressive magical trees.
+~
 S
 #611
 Clear-Cut Weirdwood~
@@ -568,6 +616,16 @@ I 5 100 83.00 1 d  # DIG: rock
 I 6 606 100.00 1  # FORAGE: handful of elderberries
 M
 602 100.00 d
+X
+weirdwood clearcut clear-cut cut stumps grove enchanted forest trees around~
+   The grove is filled with the violet stumps of weirdwood trees. It is not
+completely devoid of life, however, as you can see wisps of mana sublimating
+off of the stumps. There's still life here; it will return.
+~
+X
+mana wisps~
+Wisps of mana drift from the tops of the weirdwood stumps.
+~
 S
 #612
 Weirdwood Thicket~
@@ -633,6 +691,13 @@ M
 618 10.00 c
 M
 621 10.00 c
+X
+weirdwood weald grove thicket woods weirdwoods trees forest around lights boughs blue pink violet~
+   You find yourself in the middle of a forest of twisting, violet trees. 
+Light dances in the boughs in shades of pink and blue, but you can't tell if
+the trees are catching it or making it. There's a strange sense of... You can't
+quite put your finger on it. But whatever it is, this thicket is full of it.
+~
 S
 #613
 Weirdwood Grove~
@@ -776,6 +841,13 @@ M
 618 10.00 c
 M
 621 10.00 c
+X
+weirdwood weald grove thicket woods weirdwoods trees forest around lights boughs blue pink violet~
+   You find yourself in the middle of a forest of twisting, violet trees. 
+Light dances in the boughs in shades of pink and blue, but you can't tell if
+the trees are catching it or making it. There's a strange sense of... You can't
+quite put your finger on it. But whatever it is, this grove is full of it.
+~
 S
 #614
 Weirdwood Weald~
@@ -930,6 +1002,16 @@ Ww&A*&?W~
 E
 0 0 100.00 613
 E
+17 82 0.30 616
+E
+17 89 0.50 616
+E
+17 88 0.50 616
+E
+17 81 0.50 616
+E
+17 80 0.50 616
+E
 17 20 0.30 612
 E
 17 51 0.30 612
@@ -967,6 +1049,13 @@ M
 618 10.00 c
 M
 621 10.00 c
+X
+weirdwood weald grove thicket woods weirdwoods trees forest around lights boughs blue pink violet~
+   You find yourself in the middle of a forest of twisting, violet trees. 
+Light dances in the boughs in shades of pink and blue, but you can't tell if
+the trees are catching it or making it. There's a strange sense of... You can't
+quite put your finger on it. But whatever it is, this weald is full of it.
+~
 S
 #615
 Dead Grove~
@@ -1032,25 +1121,29 @@ I 5 102 9.00 1 d  # DIG: flint stone
 I 5 100 91.00 1 d  # DIG: rock
 I 6 3016 75.00 1  # FORAGE: handful of dates
 I 20 605 100.00 3 c  # CHOP: pile of dead wood
+X
+grove dead trees forest weirdwood woods around~
+   The dead weirdwood trees have taken on a midnight blue tone, far dimmer than
+the bright violet that is their signature color.
+~
 S
 #616
 Enchanted Oasis~
 An Enchanted Oasis~
-'.' 35 ikov 6 iw jop
+'.' 35 ikov 6 iw jp
 C
-dig, drink, fill, gather, pick~
-D1
-@w&P~~@e~
-&Y~
-D2
-@w&P~~@e~
+dig, drink, fill, pick~
+D0
+.&P~~&?.~
 &y~
-D3
-@w&P~~@e~
-&Y~
-D4
-@w&P~~@e~
-&y~
+E
+4 0 0.45 617
+E
+10 611 5.00 21
+E
+10 612 5.00 21
+E
+10 613 5.00 21
 E
 10 614 5.00 21
 E
@@ -1065,7 +1158,74 @@ I 5 103 2.00 1 d  # DIG: yellow lightning stone
 I 5 104 2.00 1 d  # DIG: red bloodstone
 I 5 1300 2.00 1 d  # DIG: glowing green seashell
 I 5 1206 2.00 1 d  # DIG: iridescent blue iris
-I 5 102 9.00 1 d  # DIG: flint stone
+I 5 101 9.00 1 d  # DIG: lump of clay
+I 5 100 83.00 1 d  # DIG: rock
+I 6 606 100.00 1  # FORAGE: handful of elderberries
+I 7 103 2.00 125 p  # PICK: yellow lightning stone
+I 7 104 2.00 125 p  # PICK: red bloodstone
+I 7 1206 2.00 125 p  # PICK: iridescent blue iris
+I 7 1300 2.00 125 p  # PICK: glowing green seashell
+I 7 1203 100.00 125 p  # PICK: magewhisper sepals
+I+ 0 70  # Ability: Find Herbs
+I 7 123 100.00 125 p  # PICK: small flower
+M
+602 100.00 d
+M
+9151 10.00 c
+M
+610 1.00 c
+M
+616 1.00 c
+M
+617 0.99 c
+M
+618 15.00 c
+M
+619 15.00 c
+X
+oasis enchanted weirdwood weald grove thicket weirdwoods trees forest around water~
+   The oasis has taken on a odd pink color, though it's below the surface. The
+water is still crystal clear and unusually refreshing. The desert has begun
+sprouting plants in shades of bright violet. Truly this is a magical place.
+~
+S
+#617
+Lush Enchanted Oasis~
+A Lush Enchanted Oasis~
+'.' 35 ikoqv 6 adiw jp
+C
+chop, dig, drink, fill, pick~
+D0
+.&P~~&VW~
+&y~
+D0
+&VW&P~~&?.~
+&y~
+E
+0 0 100.00 616
+E
+4 0 0.45 618
+E
+10 611 5.00 80
+E
+10 612 5.00 80
+E
+10 613 5.00 80
+E
+10 614 5.00 80
+E
+17 70 0.40 612
+E
+17 51 0.40 612
+E
+17 20 0.40 612
+E
+22 0 50.00 80
+I 5 103 2.00 1 d  # DIG: yellow lightning stone
+I 5 104 2.00 1 d  # DIG: red bloodstone
+I 5 1300 2.00 1 d  # DIG: glowing green seashell
+I 5 1206 2.00 1 d  # DIG: iridescent blue iris
+I 5 101 9.00 1 d  # DIG: lump of clay
 I 5 100 83.00 1 d  # DIG: rock
 I 6 606 100.00 1  # FORAGE: handful of elderberries
 I 7 103 2.00 125 p  # PICK: yellow lightning stone
@@ -1090,5 +1250,74 @@ M
 618 15.00 c
 M
 619 15.00 c
+X
+oasis enchanted weirdwood weald grove thicket weirdwoods trees forest around water~
+   The little pink oasis is surrounded by violet weirdwood trees with twisting,
+gnarled trunks. Magic hangs freely in the air, almost untethered, as it wafts
+from the blooms on the trees.
+~
+S
+#618
+Shady Enchanted Oasis~
+A Shady Enchanted Oasis~
+'.' 35 ikoqv 6 diw jp
+C
+chop, dig, drink, fill, pick~
+D0
+&VW&P~~&VW~
+&y~
+E
+0 0 100.00 617
+E
+10 611 5.00 81
+E
+10 612 5.00 81
+E
+10 613 5.00 81
+E
+10 614 5.00 81
+E
+17 70 0.40 612
+E
+17 51 0.40 612
+E
+17 20 0.40 612
+E
+22 0 50.00 81
+I 5 103 2.00 1 d  # DIG: yellow lightning stone
+I 5 104 2.00 1 d  # DIG: red bloodstone
+I 5 1300 2.00 1 d  # DIG: glowing green seashell
+I 5 1206 2.00 1 d  # DIG: iridescent blue iris
+I 5 101 9.00 1 d  # DIG: lump of clay
+I 5 100 83.00 1 d  # DIG: rock
+I 6 606 100.00 1  # FORAGE: handful of elderberries
+I 7 103 2.00 125 p  # PICK: yellow lightning stone
+I 7 104 2.00 125 p  # PICK: red bloodstone
+I 7 1206 2.00 125 p  # PICK: iridescent blue iris
+I 7 1300 2.00 125 p  # PICK: glowing green seashell
+I 7 1203 100.00 125 p  # PICK: magewhisper sepals
+I+ 0 70  # Ability: Find Herbs
+I 7 123 100.00 125 p  # PICK: small flower
+I 20 618 100.00 1  # CHOP: weirdwood tree
+M
+602 100.00 d
+M
+9151 10.00 c
+M
+610 1.00 c
+M
+616 1.00 c
+M
+617 0.99 c
+M
+618 15.00 c
+M
+619 15.00 c
+X
+oasis enchanted weirdwood weald grove thicket weirdwoods trees forest around water~
+   Gnarly violet trees shade this little pink oasis -- a sure sign that magic
+is afoot. The shallow water is crystal clear and has the purest taste. Its pink
+tone comes from something living at the bottom.
+~
 S
 $

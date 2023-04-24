@@ -965,10 +965,8 @@ tiles of a source of fresh water. Irrigating the desert will allow you to grow
 all types of crops, including temperate ones.
 
 To irrigate an area, excavate a canal and let it fill with water. In the
-desert, the canal will become an oasis first. If a chain of oases connects to
-a water source, it will slowly turn into a canal. Afterwards, the desert around
-it will begin to change terrain type and you can plant crops or grow trees on
-the irrigated terrain. This happens up to 2 tiles away from the canal.
+desert, arid terrain up to 2 tiles away from the irrigation canal will slowly
+convert to irrigated terrain where you can plant crops or grow trees.
 
 See also: EXCAVATE, PLANT, FARMING
 #

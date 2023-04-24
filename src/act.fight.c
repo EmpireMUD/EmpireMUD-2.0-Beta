@@ -230,9 +230,13 @@ ACMD(do_execute) {
 	char_data *victim;
 
 	one_argument(argument, arg);
-
-	if (!*arg)
+	
+	if (vampire_kill_feeding_target(ch, argument)) {
+		// sends own messages
+	}
+	else if (!*arg) {
 		msg_to_char(ch, "Execute whom?\r\n");
+	}
 	else if (!(victim = get_char_vis(ch, arg, NULL, FIND_CHAR_ROOM)))
 		send_config_msg(ch, "no_person");
 	else if (victim == ch)
@@ -318,13 +322,21 @@ ACMD(do_flee) {
 }
 
 
+// also: do_kill
 ACMD(do_hit) {
 	char_data *vict;
 
 	one_argument(argument, arg);
 
-	if (!*arg)
+	if (subcmd == SCMD_KILL && vampire_kill_feeding_target(ch, argument)) {
+		// vampire kills someone they are biting: sends own messages
+	}
+	else if (subcmd != SCMD_KILL && GET_FEEDING_FROM(ch)) {
+		msg_to_char(ch, "You can't do that while feeding!\r\n");
+	}
+	else if (!*arg) {
 		send_to_char("Hit whom?\r\n", ch);
+	}
 	else if (!(vict = get_char_vis(ch, arg, NULL, FIND_CHAR_ROOM)))
 		send_to_char("They don't seem to be here.\r\n", ch);
 	else if (vict == ch) {

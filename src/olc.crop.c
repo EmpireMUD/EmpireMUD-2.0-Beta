@@ -109,8 +109,14 @@ bool audit_crop(crop_data *cp, char_data *ch) {
 		problem = TRUE;
 	}
 	
+	if (!GET_CROP_EX_DESCS(cp)) {
+		olc_audit_msg(ch, GET_CROP_VNUM(cp), "Crop has no extra descriptions");
+		problem = TRUE;
+	}
+	
 	problem |= audit_interactions(GET_CROP_VNUM(cp), GET_CROP_INTERACTIONS(cp), TYPE_ROOM, ch);
 	problem |= audit_spawns(GET_CROP_VNUM(cp), GET_CROP_SPAWNS(cp), ch);
+	problem |= audit_extra_descs(GET_CROP_VNUM(cp), GET_CROP_EX_DESCS(cp), ch);
 	
 	return problem;
 }
@@ -363,9 +369,9 @@ void olc_fullsearch_crop(char_data *ch, char *argument) {
 				continue;
 			}
 		}
-		
+
 		// string search
-		if (*find_keywords && !multi_isname(find_keywords, GET_CROP_NAME(crop)) && !multi_isname(find_keywords, GET_CROP_TITLE(crop))) {
+		if (*find_keywords && !multi_isname(find_keywords, GET_CROP_NAME(crop)) && !multi_isname(find_keywords, GET_CROP_TITLE(crop)) && !search_extra_descs(find_keywords, GET_CROP_EX_DESCS(crop))) {
 			// check icons too
 			match = FALSE;
 			LL_FOREACH(GET_CROP_ICONS(crop), icon) {
@@ -486,6 +492,7 @@ void save_olc_crop(descriptor_data *desc) {
 	if (GET_CROP_TITLE(proto)) {
 		free(GET_CROP_TITLE(proto));
 	}
+	free_extra_descs(&GET_CROP_EX_DESCS(proto));
 	while ((spawn = GET_CROP_SPAWNS(proto))) {
 		GET_CROP_SPAWNS(proto) = spawn->next;
 		free(spawn);
@@ -493,6 +500,7 @@ void save_olc_crop(descriptor_data *desc) {
 	free_interactions(&GET_CROP_INTERACTIONS(proto));
 	
 	// sanity
+	prune_extra_descs(&GET_CROP_EX_DESCS(cp));
 	if (!GET_CROP_NAME(cp) || !*GET_CROP_NAME(cp)) {
 		if (GET_CROP_NAME(cp)) {
 			free(GET_CROP_NAME(cp));
@@ -537,6 +545,9 @@ crop_data *setup_olc_crop(crop_data *input) {
 		GET_CROP_NAME(new) = GET_CROP_NAME(input) ? str_dup(GET_CROP_NAME(input)) : NULL;
 		GET_CROP_TITLE(new) = GET_CROP_TITLE(input) ? str_dup(GET_CROP_TITLE(input)) : NULL;
 		
+		// copy extra descs
+		GET_CROP_EX_DESCS(new) = copy_extra_descs(GET_CROP_EX_DESCS(input));
+		
 		// copy spawns
 		GET_CROP_SPAWNS(new) = copy_spawn_list(GET_CROP_SPAWNS(input));
 		
@@ -571,6 +582,7 @@ int wordcount_crop(crop_data *crop) {
 	
 	count += wordcount_string(GET_CROP_NAME(crop));
 	count += wordcount_string(GET_CROP_TITLE(crop));
+	count += wordcount_extra_descriptions(GET_CROP_EX_DESCS(crop));
 	
 	return count;
 }
@@ -587,7 +599,7 @@ int wordcount_crop(crop_data *crop) {
 */
 void olc_show_crop(char_data *ch) {
 	crop_data *cp = GET_OLC_CROP(ch->desc);
-	char lbuf[MAX_STRING_LENGTH];
+	char buf[MAX_STRING_LENGTH*4], lbuf[MAX_STRING_LENGTH*4];
 	struct spawn_info *spawn;
 	int count;
 	
@@ -616,6 +628,13 @@ void olc_show_crop(char_data *ch) {
 	sprintf(buf + strlen(buf), " <%sxmin\t0> %3d%%, <%sxmax\t0> %3d%%\r\n", OLC_LABEL_VAL(GET_CROP_X_MIN(cp), 0), GET_CROP_X_MIN(cp), OLC_LABEL_VAL(GET_CROP_X_MAX(cp), 100), GET_CROP_X_MAX(cp));
 	sprintf(buf + strlen(buf), " <%symin\t0> %3d%%, <%symax\t0> %3d%%\r\n", OLC_LABEL_VAL(GET_CROP_Y_MIN(cp), 0), GET_CROP_Y_MIN(cp), OLC_LABEL_VAL(GET_CROP_Y_MAX(cp), 100), GET_CROP_Y_MAX(cp));
 
+	// exdesc
+	sprintf(buf + strlen(buf), "Extra descriptions: <%sextra\t0>\r\n", OLC_LABEL_PTR(GET_CROP_EX_DESCS(cp)));
+	if (GET_CROP_EX_DESCS(cp)) {
+		get_extra_desc_display(GET_CROP_EX_DESCS(cp), lbuf, sizeof(lbuf));
+		strcat(buf, lbuf);
+	}
+
 	sprintf(buf + strlen(buf), "Interactions: <%sinteraction\t0>\r\n", OLC_LABEL_PTR(GET_CROP_INTERACTIONS(cp)));
 	if (GET_CROP_INTERACTIONS(cp)) {
 		get_interaction_display(GET_CROP_INTERACTIONS(cp), buf1);
@@ -641,6 +660,12 @@ void olc_show_crop(char_data *ch) {
 OLC_MODULE(cropedit_climate) {
 	crop_data *cp = GET_OLC_CROP(ch->desc);
 	GET_CROP_CLIMATE(cp) = olc_process_flag(ch, argument, "climate", "climate", climate_flags, GET_CROP_CLIMATE(cp));
+}
+
+
+OLC_MODULE(cropedit_extra_desc) {
+	crop_data *cp = GET_OLC_CROP(ch->desc);
+	olc_process_extra_desc(ch, argument, &GET_CROP_EX_DESCS(cp));
 }
 
 

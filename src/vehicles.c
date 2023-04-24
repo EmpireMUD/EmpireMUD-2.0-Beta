@@ -3150,7 +3150,7 @@ void write_vehicle_to_file(FILE *fl, vehicle_data *veh) {
 	}
 	
 	// 'E': extra descs
-	write_extra_descs_to_file(fl, VEH_EX_DESCS(veh));
+	write_extra_descs_to_file(fl, 'E', VEH_EX_DESCS(veh));
 	
 	// I: interactions
 	write_interactions_to_file(fl, VEH_INTERACTIONS(veh));

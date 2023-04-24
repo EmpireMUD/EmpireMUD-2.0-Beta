@@ -6,6 +6,13 @@ A Lone Grave~
 0 0 0 -1
 C
 tomb~
+E
+grave tomb headstone~
+   You come amarker a solitary grave, marked only by a plain wooden cross. The
+marker bears a single name, etched in faded letters. The surrounding area is
+peaceful, as if nature has taken it upon itself to guard the final resting
+place of this unknown soul.
+~
 F
 B
 M
@@ -128,6 +135,12 @@ The Ruins of #n~
 0 0 0 -1
 C
 dismantle~
+E
+ruins building~
+   Whatever this building used to be, it is in ruins now. The walls no longer
+offer any real protection from the elements, and the piles of debris are
+infested with rats. This is the sort of place that attracts trouble.
+~
 T 5006
 S
 #5007
@@ -178,6 +191,14 @@ The City Center~
 ????~
 1000 0 do 0
 0 0 0 -1
+E
+city center plaza building around~
+   The bustling plaza at the center of the city seems to act as an anchor -- a
+fixed point for people to gather. The city stretches in all directions from
+here, such that you can hardly see the edge. The paved ground beneath your feet
+bustles with activity as people hurry to and fro, chatting and laughing along
+the way.
+~
 I 29 5006 100.00 1 r  # RUINS-TO-BLD: Ruins
 S
 #5010
@@ -188,6 +209,16 @@ The Flooded Ruins of #n~
 0 0 0 -1
 C
 dismantle~
+E
+ruins flooded flooding building~
+   As you wade through the water, you realize you're standing in what must have
+been a grand structure, now reduced to ruins. The murky water obscures the
+floor beneath, making it difficult to discern any details about the original
+use of the building. Broken pillars jut up from the water, hinting at the
+building's former grandeur. The only sounds are the lapping of the waves and
+the occasional creaking of timbers, as if the ruins are trying to hold
+themselves together.
+~
 T 5010
 S
 #5011
@@ -291,6 +322,14 @@ The Ruins of a Gatehouse~
 0 0 0 -1
 C
 dismantle~
+E
+ruins gatehouse house building around~
+   The ruins of a gatehouse loom over you, its walls and towers broken and
+crumbled. You can see the remnants of a once-sturdy gate, now rusted and
+twisted on its hinges. Moss and vines cling to the crumbling stones, hinting at
+the long passage of time. Despite the destruction, there is a sense of history
+and importance to the place, as if it played a crucial role in the past.
+~
 T 5007
 S
 $

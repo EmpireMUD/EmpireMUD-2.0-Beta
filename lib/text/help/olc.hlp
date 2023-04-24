@@ -5563,7 +5563,7 @@ other than 0.
 
 See also: ITEM SCALING, OEDIT MISSILESPEED, OEDIT WEAPONTYPE, OLC OBJECTS
 #d
-"OEDIT EXTRA" "OEDIT EXTRA DESCRIPTIONS" "BEDIT EXTRA" "BEDIT EXTRA DESCRIPTIONS" "REDIT EXTRA" "REDIT EXTRA DESCRIPTIONS" "VEDIT EXTRA" "VEDIT EXTRA DESCRIPTIONS"
+"OEDIT EXTRA" "OEDIT EXTRA DESCRIPTIONS" "BEDIT EXTRA" "BEDIT EXTRA DESCRIPTIONS" "REDIT EXTRA" "REDIT EXTRA DESCRIPTIONS" "VEDIT EXTRA" "VEDIT EXTRA DESCRIPTIONS" "CROPEDIT EXTRA" "CROPEDIT EXTRA DESCRIPTIONS" "SECTEDIT EXTRA" "SECTEDIT EXTRA DESCRIPTIONS"
 
 Usage:  .extra add <keywords>
         .extra change <number> <description | keywords> [value]
@@ -5587,7 +5587,7 @@ Example in-game of a locket with extra description keyword "photo":
    It's a photo of a young girl.
 
 See also: OEDIT LOOKDESCRIPTION, OLC BUILDINGS, OLC OBJECTS, STRING EDITOR,
-  OLC ROOM TEMPLATES
+  OLC ROOM TEMPLATES, OLC CROPS, OLC SECTORS
 #d
 "OEDIT FLAGS"
 
@@ -7495,6 +7495,10 @@ Available sector flags:
  NEEDS-HEIGHT - Uses the 'height' property in some way and will set itself from
     nearby tiles if missing.
  KEEPS-HEIGHT - Uses the 'height' property but won't change it (for roads etc).
+ SEPARATE-NOT-ADJACENTS - Runs each NOT-ADJACENT evolution separately rather
+    than making sure the tile isn't adjacent to ANY of them.
+ SEPARATE-NOT-NEARS - Runs each NOT-NEAR-SECTOR evolution separately rather
+    than making sure the tile isn't near ANY of them.
 
 See also: OLC SECTORS, TERRAIN HEIGHT
 #d

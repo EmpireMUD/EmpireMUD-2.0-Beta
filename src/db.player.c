@@ -3367,6 +3367,8 @@ void remove_loaded_player(char_data *ch) {
 *  -- The Management
 */
 
+// Note: to set the headers of the wiz/godlists, use "config game wizlist_header", "config game godlist_header" in-game
+
 const char *AUTOWIZ_IMM_LMARG = "   ";
 const int AUTOWIZ_IMM_NSIZE = 16;
 const int AUTOWIZ_LINE_LEN = 64;
@@ -3375,13 +3377,9 @@ const int AUTOWIZ_MIN_LEVEL = LVL_GOD;
 // max level that should be in columns instead of centered
 const int AUTOWIZ_COL_LEVEL = LVL_GOD;
 
-const char *autowiz_header =
-"*************************************************************************\n"
-"* The following people have reached immortality on EmpireMUD.  They are *\n"
-"* to be treated with respect and awe.  Occasional prayers to them are   *\n"
-"* advisable.  Annoying them is not recommended.  Stealing from them is  *\n"
-"* punishable by immediate death.                                        *\n"
-"*************************************************************************\n";
+// AUTOWIZ_MODE_x: which version is being generated
+#define AUTOWIZ_MODE_WIZLIST  0
+#define AUTOWIZ_MODE_GODLIST  1
 
 
 struct autowiz_name_rec {
@@ -3518,17 +3516,21 @@ void autowiz_read_players(void) {
 /**
 * Writes a wizlist (or godlist) file.
 *
+* @param int mode AUTOWIZ_MODE_WIZLIST or AUTOWIZ_MODE_GODLIST
 * @param FILE *out The file open for writing.
 * @param int minlev Minimum level to write to this file.
 * @param int maxlev Maximum level to write to this file.
 */
-void autowiz_write_wizlist(FILE *out, int minlev, int maxlev) {
+void autowiz_write_wizlist(int mode, FILE *out, int minlev, int maxlev) {
 	char buf[MAX_STRING_LENGTH];
+	const char *header;
 	struct autowiz_level_rec *curr_level;
 	struct autowiz_name_rec *curr_name;
 	int i, j;
 	
-	fprintf(out, "%s\n", autowiz_header);
+	if ((header = config_get_string(mode == AUTOWIZ_MODE_GODLIST ? "godlist_header" : "wizlist_header"))) {
+		fprintf(out, "%s\n", header);
+	}
 	
 	for (curr_level = autowiz_data; curr_level; curr_level = curr_level->next) {
 		if (curr_level->params->level < minlev || curr_level->params->level > maxlev) {
@@ -3616,7 +3618,7 @@ void run_autowiz(void) {
 		log("SYSERR: run_autowiz: Unable to open file %s for writing\r\n", tempname);
 		return;
 	}
-	autowiz_write_wizlist(fl, LVL_START_IMM, LVL_TOP);
+	autowiz_write_wizlist(AUTOWIZ_MODE_WIZLIST, fl, LVL_START_IMM, LVL_TOP);
 	fclose(fl);
 	rename(tempname, basename);
 	
@@ -3629,7 +3631,7 @@ void run_autowiz(void) {
 		log("SYSERR: run_autowiz: Unable to open file %s for writing\r\n", tempname);
 		return;
 	}
-	autowiz_write_wizlist(fl, LVL_GOD, LVL_START_IMM - 1);
+	autowiz_write_wizlist(AUTOWIZ_MODE_GODLIST, fl, LVL_GOD, LVL_START_IMM - 1);
 	fclose(fl);
 	rename(tempname, basename);
 	

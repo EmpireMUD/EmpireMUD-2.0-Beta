@@ -2650,6 +2650,8 @@ typedef enum {
 #define SECTF_SHALLOW_WATER  BIT(22)	// can't earthmeld; other properties like swamp and oasis have
 #define SECTF_NEEDS_HEIGHT  BIT(23)	// will automatically set its 'height' property under certain circumstances
 #define SECTF_KEEPS_HEIGHT  BIT(24)	// retains its 'height' property but won't inherit a new one
+#define SECTF_SEPARATE_NOT_ADJACENTS  BIT(25)	// runs every NOT-ADJACENT evolution separately instead of ensuring it's not adjacent to ANY of them
+#define SECTF_SEPARATE_NOT_NEARS  BIT(26)	// runs every NOT-NEAR-SECTOR evolution separately instead of ensuring it's not near ANY of them
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -4875,6 +4877,7 @@ struct crop_data {
 	
 	struct spawn_info *spawns;	// mob spawn data
 	struct interaction_item *interactions;	// interaction items
+	struct extra_descr_data *ex_description;	// extra descriptions
 	
 	UT_hash_handle hh;	// crop_table hash
 };
@@ -5886,6 +5889,7 @@ struct sector_data {
 	struct spawn_info *spawns;	// mob spawn data
 	struct evolution_data *evolution;	// change over time
 	struct interaction_item *interactions;	// interaction items
+	struct extra_descr_data *ex_description;	// extra descriptions
 	
 	char *notes;	// misc notes shown only to imms
 	

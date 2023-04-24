@@ -39,6 +39,11 @@ I 5 1206 2.00 1 d  # DIG: iridescent blue iris
 I 5 102 9.00 1 d  # DIG: flint stone
 I 5 100 83.00 1 d  # DIG: rock
 I 6 606 100.00 1  # FORAGE: handful of elderberries
+X
+stumps nordlys grove trees forest around~
+   You find yourself in a field of stumps. The trees look exotic, like nordlys,
+but any magic that was here is gone.
+~
 S
 #16698
 Nordlys Tree~
@@ -118,6 +123,14 @@ M
 16698 10.00 0
 M
 16699 10.00 0
+X
+trees grove nordlys enchanted enchnating towering forest around lights green magenta~
+   As you stand beneath the glow of a nordlys tree, looking up through its
+reaching branches, you feel a touch of vertigo, as if you're at the top,
+looking down into the infinite cosmos. Rivers of green and magenta light dance
+through the boughs, unlike anything else you've ever seen. You feel almost
+cradled in its serenity, if only for a moment.
+~
 S
 #16699
 Nordlys Grove~
@@ -243,5 +256,12 @@ M
 16698 10.00 0
 M
 16699 10.00 0
+X
+trees grove nordlys enchanted enchanting forest around lights green magenta~
+   Shimmers of green and magenta light dance through the grove as you stare in
+wonder at the bushy trees. This grove is unlike any you've seen. Indeed, there
+are few like it in the world. For a moment, you feel you could sit here
+forever, staring up at the lights above.
+~
 S
 $

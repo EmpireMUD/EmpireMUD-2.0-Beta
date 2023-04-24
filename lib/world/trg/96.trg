@@ -3,6 +3,9 @@ SCF Script Fight: Setup dodge, interrupt, struggle~
 0 c 0
 scfight~
 * Also requires triggers 9601 and 9604 on the same mob
+* Uses a 'diff' var on the mob with 1=normal, 2=hard, 3=group, 4=boss
+*    diff is set automatically by script 9604 unless you set it ahead of time,
+*    for example to make scripts harder on 'normal' trash mobs in a dungeon.
 * To initialize or clear data:
 *    scfight clear <all | dodge | interrupt | struggle>
 * To set up players for a response command:
@@ -326,7 +329,19 @@ SCF Script Fight: Greeting setup~
 0 h 100
 ~
 * Works with trigs 9600/9601 to ensure players who enter the room do not have
-* stale SCF data.
+* stale SCF data. Also sets diff variable.
+* ensure difficulty
+if !%self.varexists(diff)%
+  set diff 1
+  if %self.mob_flagged(HARD)%
+    eval diff %diff% + 1
+  end
+  if %self.mob_flagged(GROUP)%
+    eval diff %diff% + 2
+  end
+  remote diff %self.id%
+end
+* check data on actor
 if %self.var(wants_scfdodge,0)%
   scfight setup dodge %actor%
 else

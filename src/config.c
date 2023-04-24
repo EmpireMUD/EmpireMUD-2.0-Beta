@@ -1753,6 +1753,7 @@ void init_config_system(void) {
 	// game configs
 	init_config(CONFIG_GAME, "allow_extended_color_codes", CONFTYPE_BOOL, "if on, players can use \t&[F000] and \t&[B000]");
 	init_config(CONFIG_GAME, "automessage_color", CONFTYPE_SHORT_STRING, "color code for automessage (like &&c)");
+	init_config(CONFIG_GAME, "godlist_header", CONFTYPE_LONG_STRING, "shown at the top of the godlist - note gods are not well-implemented");
 	init_config(CONFIG_GAME, "hiring_builders", CONFTYPE_BOOL, "whether the mud is hiring builders");
 	init_config(CONFIG_GAME, "hiring_coders", CONFTYPE_BOOL, "whether the mud is hiring coders");
 	init_config(CONFIG_GAME, "mud_contact", CONFTYPE_SHORT_STRING, "email address of an admin");
@@ -1777,6 +1778,7 @@ void init_config_system(void) {
 	init_config(CONFIG_GAME, "start_message", CONFTYPE_LONG_STRING, "shown to new characters on login");
 	init_config(CONFIG_GAME, "who_list_sort", CONFTYPE_INT, "what order the who-list appears in");
 		init_config_custom("who_list_sort", config_show_who_list_sort, config_edit_who_list_sort, NULL);
+	init_config(CONFIG_GAME, "wizlist_header", CONFTYPE_LONG_STRING, "shown at the top of the wizlist");
 
 	// actions
 	init_config(CONFIG_ACTIONS, "chore_distance", CONFTYPE_INT, "tiles away from home a citizen will work");

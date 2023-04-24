@@ -176,13 +176,23 @@ You must always make your own crafter items, but you may need to buy some of
 the components from other players.
 
 The first tier of crafter items comes at level 100:
-  Head: clockwork goggles (requires a clockwork lens array from an Artificer)
-  Clothes: guildmaster tunic (requires guild-patterned cloth from an
-           Antiquarian)
-  Waist: utility belt (requires some clips and buckles from a Tinker)
-  Off-hand: steel multitool (needs a set of delicate tools from a Steelsmith)
+  Head: clockwork goggles (clockwork lens array, Artificer Crafts)
+  Clothes: guildmaster tunic (guild-patterned cloth, Antiquarian Crafts)
+  Waist: utility belt (clips and buckles, Tinker Crafts)
+  Off-hand: steel multitool (needs delicate tools, Steelsmith Crafts)
 
-See also: CRAFT, ENCHANT, FORGE, SCORE, SEW, SCALABLE CRAFTS
+Look for additional tiers of crafter items to make higher level crafts. You can
+get these patterns from high level world drops or trade with other players for
+the items themselves:
+  Tier 2: Level 175-274 Group/Boss mobs: alchemical filter (Alchemist Crafts),
+    antiquated device parts (Antiquarian Crafts), concealed pouches (Smuggler
+    Crafts), tinker harness (Tinker Crafts)
+  Tier 3: Level 275-374 Group/Boss mobs: smuggled Olympian laurel branch
+    (Smuggler Crafts), Olympic silk (Alchemist Crafts), Amazonian leather
+    (Antiquarian Crafts), guild-forged hammer head (Artificer Crafts)
+
+See also: CRAFT, ENCHANT, FORGE, SCORE, SEW, SCALABLE CRAFTS,
+   CRAFTING ABILITIES
 #
 "DISTILLED HERBS" "ADVANCED HERBS" "HERB JARS" "JAR HERBS" "DISTILLED HERB COMPONENTS"
 

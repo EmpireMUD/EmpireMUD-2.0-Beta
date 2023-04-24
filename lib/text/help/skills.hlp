@@ -308,7 +308,8 @@ You can mill:
 You must do this at a Mill building or have a grinding stone equipped.
 However, it will take longer to do it without the building.
 
-See also: CRAFTING LEVEL, COOK, RESOURCES, KEEP, BASIC CRAFTS, RECIPES
+See also: CRAFTING LEVEL, COOK, RESOURCES, KEEP, BASIC CRAFTS, RECIPES,
+   CRAFTING ABILITIES
 #
 MINE MINES
 
@@ -429,7 +430,8 @@ You can press:
 
 You must do this at an Oilmaker building.
 
-See also: CRAFTING LEVEL, COOK, RESOURCES, KEEP, OIL, CRAFT INFO, RECIPES
+See also: CRAFTING LEVEL, COOK, RESOURCES, KEEP, OIL, CRAFT INFO, RECIPES,
+   CRAFTING ABILITIES
 #
 READY
 
@@ -472,18 +474,18 @@ SAW
 Saw (Primitive Crafts ability)
 
 Usage:  saw <item>
-Speed boosts:  Work ethic bonus, haste
-Tool:  saw or lumber yard
+Speed boosts:  Work ethic bonus, haste, superior saw, Woodworking ability
+Tool:  saw (or be at a lumber yard)
 
-You can saw most trees and logs into lumber. You must be in a lumber yard. This
-will go faster if you have the Woodworking ability.
+You can saw trees and logs into lumber using this command. You either need to
+use a saw or perform this task at a lumber yard. When using a saw, it will go
+faster if the saw is superior.
 
-You can saw at a lumber yard or you can forge a saw to do it anywhere (albeit
-more slowly unless your saw is superior).
+This will go faster if you have the Woodworking ability.
 
 Not all types of trees can be sawed.
 
-See also: TREES, LOGS, LUMBER, FORGE
+See also: TREES, LOGS, LUMBER, LUMBER YARD, FORGE, WOODWORKING
 #
 SCRAPE
 
@@ -690,7 +692,7 @@ Typing "smelt" by itself will list things you can smelt with the ore available
 in your inventory. Smelting goes faster when you have the correct mastery
 ability (see 'smelt info <type>' to see the mastery ability).
 
-See also: CRAFT INFO, METAL, SEPARATE, WEALTH, RECIPES
+See also: CRAFT INFO, METAL, SEPARATE, WEALTH, RECIPES, CRAFTING ABILITIES
 #
 SPECIALIZE SPECIALTY
 

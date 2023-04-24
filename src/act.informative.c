@@ -201,6 +201,24 @@ char *find_exdesc_for_char(char_data *ch, char *word, int *number, obj_data **fo
 		}
 	}
 	
+	// does it match an extra desc on the crop?
+	if (ROOM_CROP(IN_ROOM(ch)) && ROOM_SECT_FLAGGED(IN_ROOM(ch), SECTF_CROP)) {
+		if ((exdesc = find_exdesc(word, GET_CROP_EX_DESCS(ROOM_CROP(IN_ROOM(ch))), number)) != NULL) {
+			if (found_room) {
+				*found_room = IN_ROOM(ch);
+			}
+			return exdesc;
+		}
+	}
+	
+	// does it match an extra desc on the sector?
+	if ((exdesc = find_exdesc(word, GET_SECT_EX_DESCS(SECT(IN_ROOM(ch))), number)) != NULL) {
+		if (found_room) {
+			*found_room = IN_ROOM(ch);
+		}
+		return exdesc;
+	}
+	
 	// no?
 	return NULL;
 }

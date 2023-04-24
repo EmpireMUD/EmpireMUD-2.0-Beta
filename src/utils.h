@@ -482,6 +482,7 @@ int CAN_CARRY_N(char_data *ch);	// formerly a macro
 //// CROP UTILS //////////////////////////////////////////////////////////////
 
 #define GET_CROP_CLIMATE(crop)  ((crop)->climate)
+#define GET_CROP_EX_DESCS(crop)  ((crop)->ex_description)
 #define GET_CROP_FLAGS(crop)  ((crop)->flags)
 #define GET_CROP_ICONS(crop)  ((crop)->icons)
 #define GET_CROP_INTERACTIONS(crop)  ((crop)->interactions)
@@ -1484,6 +1485,7 @@ int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_COORD(ge
 #define GET_SECT_CLIMATE(sect)  ((sect)->climate)
 #define GET_SECT_COMMANDS(sect)  ((sect)->commands)
 #define GET_SECT_EVOS(sect)  ((sect)->evolution)
+#define GET_SECT_EX_DESCS(sect)  ((sect)->ex_description)
 #define GET_SECT_FLAGS(sect)  ((sect)->flags)
 #define GET_SECT_ICONS(sect)  ((sect)->icons)
 #define GET_SECT_INTERACTIONS(sect)  ((sect)->interactions)
@@ -1909,6 +1911,7 @@ char *get_partial_direction_to(char_data *ch, room_data *from, room_data *to, bo
 int get_room_blocking_height(room_data *room, bool *blocking_vehicle);
 bool is_deep_mine(room_data *room);
 void lock_icon(room_data *room, struct icon_data *use_icon);
+void lock_icon_map(struct map_data *loc, struct icon_data *use_icon);
 room_data *real_shift(room_data *origin, int x_shift, int y_shift);
 bool room_is_light(room_data *room, bool count_adjacent_light);
 room_data *straight_line(room_data *origin, room_data *destination, int iter);
@@ -2093,6 +2096,7 @@ void un_deathshroud(char_data *ch);
 void un_mummify(char_data *ch);
 void update_biting_char(char_data *ch);
 void update_vampire_sun(char_data *ch);
+bool vampire_kill_feeding_target(char_data *ch, char *argument);
 
 // act.vehicles.c
 void do_customize_vehicle(char_data *ch, char *argument);

@@ -6,13 +6,23 @@ A Patch of Okra~
 D0
 @@@@~
 &G~
-I 6 19041 100.00 1  # FORAGE: some okra seeds
-I 8 19042 20.00 2 H  # HARVEST: a bunch of okra pods
-I 8 19042 20.00 3 H  # HARVEST: a bunch of okra pods
-I 8 19042 20.00 4 H  # HARVEST: a bunch of okra pods
-I 8 19042 20.00 5 H  # HARVEST: a bunch of okra pods
-I 8 19042 20.00 6 H  # HARVEST: a bunch of okra pods
-I 8 19041 75.00 2 S  # HARVEST: some okra seeds
-I 8 19041 25.00 3 S  # HARVEST: some okra seeds
+I 6 19041 100.00 1  # FORAGE: okra seeds
+I 8 19042 20.00 2 H  # HARVEST: bunch of okra pods
+I 8 19042 20.00 3 H  # HARVEST: bunch of okra pods
+I 8 19042 20.00 4 H  # HARVEST: bunch of okra pods
+I 8 19042 20.00 5 H  # HARVEST: bunch of okra pods
+I 8 19042 20.00 6 H  # HARVEST: bunch of okra pods
+I 8 19041 75.00 2 S  # HARVEST: okra seeds
+I 8 19041 25.00 3 S  # HARVEST: okra seeds
+X
+okra patch plants crop~
+   As you approach the field, you see row upon row of tall, green plants with
+large leaves and long, slender pods. The plants are sturdy and well-maintained,
+with vibrant green leaves and long, thin stems. The okra pods, a deep green
+color with subtle ridges, are plentiful and hang heavily from the plants. As
+you move closer, you notice the soft fuzz on the pods and the subtle aroma of
+fresh, earthy vegetables. The okra crop stretches as far as the eye can see, a
+testament to the hard work and dedication of the farmers who tend it.
+~
 S
 $

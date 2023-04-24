@@ -15,6 +15,12 @@ I 8 10501 20.00 3 H  # HARVEST: handful of glowkra pods
 I 8 10501 20.00 4 H  # HARVEST: handful of glowkra pods
 I 8 10501 20.00 5 H  # HARVEST: handful of glowkra pods
 I 8 10501 20.00 6 H  # HARVEST: handful of glowkra pods
+X
+glowkra okra pods field plants crop glow~
+   An eerie, pulsing glow casts shades of blue across the field of glowkra. The
+pods on each plant, bright and translucent, sway gently in the breeze. Whoever
+created these plants, you can be sure magic was involved.
+~
 S
 #10501
 spadebrush~
@@ -33,6 +39,12 @@ I 8 10507 20.00 6 H  # HARVEST: bundle of spadebrush
 I 8 10506 75.00 1 S  # HARVEST: handful of spadebrush seeds
 I 8 10506 25.00 2 S  # HARVEST: handful of spadebrush seeds
 I 9 121 100.00 1  # GATHER: sticks and leaves
+X
+spadebrush spades field~
+   These plants grow in neat rows, their branches twisted into perfect spades
+that could be used for digging. Each plant grows perfectly for this purpose,
+as if by magic.
+~
 S
 #10502
 dragonsteeth~
@@ -64,6 +76,13 @@ M
 10514 5.00 0
 M
 10509 5.00 0
+X
+teeth tooth field bones crop~
+   The sight of this field sends a shiver down your spine. From the earth,
+jagged white teeth jut upwards, gleaming wickedly in the light, sharp enough to
+slice through flesh with ease. The eerie silence of the field is broken only by
+the creaking of bones in the wind.
+~
 S
 #10503
 bladegrass~
@@ -87,6 +106,12 @@ I 8 10510 20.00 5 H  # HARVEST: bushel of bladegrass
 I 8 10510 20.00 6 H  # HARVEST: bushel of bladegrass
 I 8 10509 75.00 1 S  # HARVEST: handful of bladegrass seeds
 I 8 10509 25.00 2 S  # HARVEST: handful of bladegrass seeds
+X
+bladegrass grass field crop~
+   The blades of this odd grass are thin and pointed, like the edge of a razor. 
+The stalks are tough and sturdy, swaying in the wind like arrows in battle. 
+The field glimmers with a faint metallic sheen, almost like iron.
+~
 S
 #10504
 gemfruit~
@@ -114,6 +139,15 @@ I 8 10514 20.00 3 H  # HARVEST: basket of sparkling gemfruits
 I 8 10514 20.00 4 H  # HARVEST: basket of sparkling gemfruits
 I 8 10514 20.00 5 H  # HARVEST: basket of sparkling gemfruits
 I 8 10514 20.00 6 H  # HARVEST: basket of sparkling gemfruits
+X
+gemfruits fruits gems field bushes crop~
+   As you gaze upon the field of bushes, you see an array of multi-colored
+fruits with sparkling surfaces; some are ruby red, while others are emerald
+green or sapphire blue. Each fruit appears to have a different gem inside, from
+magical seashells to accursed bloodstones. The bushes themselves are small,
+with delicate branches and leaves that sway gently in the breeze. You can't
+help but feel drawn to the gemfruit and their enchanting power.
+~
 S
 #10505
 magic mushrooms~
@@ -129,6 +163,15 @@ I 8 10516 20.00 3 H  # HARVEST: basket of magic mushrooms
 I 8 10516 20.00 4 H  # HARVEST: basket of magic mushrooms
 I 8 10516 20.00 5 H  # HARVEST: basket of magic mushrooms
 I 8 10516 20.00 6 H  # HARVEST: basket of magic mushrooms
+X
+mushrooms magic patch crop~
+   These mushrooms are unlike any you've ever seen. The caps are dull gray, but
+the mere whiff of their spores turn the whole field a kaleidoscope of colors,
+shifting and changing in a hypnotic pattern. As you draw closer, the scent of
+the mushrooms fills your nostrils, sweet and musky. You feel a sudden urge to
+take a bite, even though you know that these mushrooms can have strange effects
+on the mind.
+~
 S
 #10506
 pudding figs~
@@ -155,6 +198,14 @@ I 6 10518 100.00 1 a  # FORAGE: unripe fig
 I 7 10519 100.00 14  # PICK: basket of pudding figs
 I 9 121 100.00 1  # GATHER: sticks and leaves
 I 20 120 100.00 1  # CHOP: large tree
+X
+figs pudding fruit trees crop~
+   Even before you approach the orchard of pudding fig trees, you notice their
+broad leaves shimmering with a faint golden glow. The figs that hang from the
+branches look plump and juicy, their skins a deep yellow hue with a subtle
+sheen. The air around the trees is thick with a sweet and tantalizing aroma
+that tickles your nose, hinting at the rumored pudding inside.
+~
 S
 #10507
 giant beanstalks~
@@ -168,6 +219,13 @@ I 6 10523 100.00 1  # FORAGE: handful of magic beans
 I 8 10537 100.00 1  # HARVEST: giant beanstalk
 I 8 10523 75.00 1 S  # HARVEST: handful of magic beans
 I 8 10523 25.00 2 S  # HARVEST: handful of magic beans
+X
+beanstalks stalks beans plants crop~
+   This towering plant is easily ten times your height, its thick stalk
+reaching towards the sky. The leaves are broad and lush, rustling gently in the
+breeze. You can't help but feel a sense of awe at the sight of these massive
+plants, wondering how tall they can truly grow.
+~
 S
 #10508
 axeroot~
@@ -183,6 +241,14 @@ I 8 10525 20.00 3 H  # HARVEST: axeroot
 I 8 10525 20.00 4 H  # HARVEST: axeroot
 I 8 10525 20.00 5 H  # HARVEST: axeroot
 I 8 10525 20.00 6 H  # HARVEST: axeroot
+X
+axeroot roots plot field crop~
+   This plant is unlike any you've ever seen, its thick root system branching
+out in all directions like an intricate metal net. It seems solid and
+unyielding, like true iron. As you run your hand along the surface of the
+axeroot plant, you feel a sense of strength and durability; this is mighty
+stuff.
+~
 S
 #10509
 puppy plants~
@@ -204,6 +270,12 @@ I 8 10529 20.00 3 H  # HARVEST: puppy pod
 I 8 10529 20.00 4 H  # HARVEST: puppy pod
 I 8 10529 20.00 5 H  # HARVEST: puppy pod
 I 8 10529 20.00 6 H  # HARVEST: puppy pod
+X
+plants puppies puppy cabbage field crop~
+   The sight of these cabbage-like pods is instantly heartwarming: each pod
+contains a tiny, animated plant that looks just like a puppy. They wag their
+stems as you walk down the row, eager for you to pluck one and take it home.
+~
 S
 #10510
 pickthorn~
@@ -225,6 +297,14 @@ I 8 10532 20.00 6 H  # HARVEST: pickthorn stalk
 I 8 10531 75.00 1 S  # HARVEST: red pickthorn fruit
 I 8 10531 25.00 2 S  # HARVEST: red pickthorn fruit
 I 9 132 100.00 1  # GATHER: thorny branches
+X
+pickthorn thorns patch plants crop~
+   The pickthorn bushes stand tall and proud, with thin and spindly branches
+that stretch upward like an ocotillo. At the end of each branch, there is a
+sharp and pointed thorn that glimmers in the light. This unique shape and an
+unusual sheen of iron make these plants ideal for all forms of mining and an
+invaluable resource in the Magiterranean.
+~
 S
 #10511
 vigilant vines~
@@ -250,6 +330,16 @@ M
 10515 50.00 e
 M
 10516 0.50 d
+X
+vines vigilant field plants crop~
+   Vigilant Vines are a special type of plant that act as guardians to the
+land. These animated vines can sense intruders and use their sharp thorns to
+ward them off. They move quickly and with purpose, creating a menacing sight as
+they patrol the area. Despite their aggressiveness towards outsiders, they are
+known to be friendly to those who have earned their trust. Their vibrant green
+leaves and colorful flowers add a beautiful touch to the landscape, making them
+both fearsome and lovely to behold.
+~
 S
 #10551
 rhubarb~
@@ -277,6 +367,17 @@ M
 10557 5.00 0
 M
 10558 5.00 0
+X
+rhubarb patch plants crop~
+   The field is filled with rows of stout, leafy plants that reach up to the
+chest. Each plant has a thick, fleshy stem with bright red skin and a pale
+green interior. The stems are arranged in a uniform pattern, with their leaves
+fanning out in all directions, providing some shade to the ground beneath. The
+leaves are large and green, with prominent veins running through them. The air
+is filled with the earthy smell of the soil and the sweet, tangy aroma of the
+rhubarb stems. The plants seem healthy and well-tended, with no signs of pests
+or disease.
+~
 S
 #10560
 frost ferns~
@@ -301,5 +402,14 @@ M
 10557 5.00 0
 M
 10558 5.00 0
+X
+ferns frost dell plants crop~
+   The ferns are a sight to behold - small, delicate, and as white as freshly
+fallen snow. The fronds are intricately woven and incredibly fragile, seeming
+to sparkle in the light. Despite their fragile appearance, these ferns are
+incredibly hardy, able to thrive in even the harshest of winters. When touched,
+they release a chill that feels like a burst of icy air. You're left wondering
+what mysteries they might hold.
+~
 S
 $

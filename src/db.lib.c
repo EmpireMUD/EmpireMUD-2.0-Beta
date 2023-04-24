@@ -877,7 +877,7 @@ void write_building_to_file(FILE *fl, bld_data *bld) {
 	}
 	
 	// E: extra descriptions
-	write_extra_descs_to_file(fl, GET_BLD_EX_DESCS(bld));
+	write_extra_descs_to_file(fl, 'E', GET_BLD_EX_DESCS(bld));
 	
 	// F: functions
 	if (GET_BLD_FUNCTIONS(bld)) {
@@ -1210,6 +1210,10 @@ void free_crop(crop_data *cp) {
 	if (GET_CROP_ICONS(cp) && (!proto || GET_CROP_ICONS(cp) != GET_CROP_ICONS(proto))) {
 		free_icon_set(&GET_CROP_ICONS(cp));
 	}
+	
+	if (GET_CROP_EX_DESCS(cp) && (!proto || GET_CROP_EX_DESCS(cp) != GET_CROP_EX_DESCS(proto))) {
+		free_extra_descs(&GET_CROP_EX_DESCS(cp));
+	}
 		
 	if (GET_CROP_SPAWNS(cp) && (!proto || GET_CROP_SPAWNS(cp) != GET_CROP_SPAWNS(proto))) {
 		while ((spawn = GET_CROP_SPAWNS(cp))) {
@@ -1321,6 +1325,11 @@ void parse_crop(FILE *fl, crop_vnum vnum) {
 				LL_APPEND(GET_CROP_SPAWNS(crop), spawn);
 				break;
 			}
+			
+			case 'X': {	// extra desc
+				parse_extra_desc(fl, &GET_CROP_EX_DESCS(crop), buf2);
+				break;
+			}
 
 			// end
 			case 'S': {
@@ -1373,6 +1382,9 @@ void write_crop_to_file(FILE *fl, crop_data *cp) {
 		fprintf(fl, "M\n");
 		fprintf(fl, "%d %.2f %s\n", spawn->vnum, spawn->percent, bitv_to_alpha(spawn->flags));
 	}
+	
+	// X: extra descriptions
+	write_extra_descs_to_file(fl, 'X', GET_CROP_EX_DESCS(cp));
 	
 	// end
 	fprintf(fl, "S\n");
@@ -4142,14 +4154,15 @@ void parse_extra_desc(FILE *fl, struct extra_descr_data **list, char *error_part
 * Output extra descriptions with the E tag to a library file.
 *
 * @param FILE *fl The file open for writing.
+* @param char key The key letter this is saved under in the file, usually E or X.
 * @param struct extra_descr_data *list The list to save.
 */
-void write_extra_descs_to_file(FILE *fl, struct extra_descr_data *list) {
+void write_extra_descs_to_file(FILE *fl, char key, struct extra_descr_data *list) {
 	char temp[MAX_STRING_LENGTH];
 	struct extra_descr_data *ex;
 	
 	for (ex = list; ex; ex = ex->next) {
-		fprintf(fl, "E\n");
+		fprintf(fl, "%c\n", key);
 		fprintf(fl, "%s~\n", NULLSAFE(ex->keyword));
 		strcpy(temp, NULLSAFE(ex->description));
 		strip_crlf(temp);
@@ -4665,6 +4678,13 @@ struct island_info *get_island_by_coords(char *coords) {
 	room_data *room;
 	
 	skip_spaces(&coords);
+
+	// shortcut?
+	if ((room = parse_room_from_coords(coords))) {
+		return GET_ISLAND(room);
+	}
+	
+	// otherwise try to process
 	if (*coords == '(') {
 		any_one_word(coords, str);
 	}
@@ -5581,7 +5601,7 @@ void write_obj_to_file(FILE *fl, obj_data *obj) {
 	}
 	
 	// E: extra descriptions
-	write_extra_descs_to_file(fl, GET_OBJ_EX_DESCS(obj));
+	write_extra_descs_to_file(fl, 'E', GET_OBJ_EX_DESCS(obj));
 	
 	// I: interactions
 	write_interactions_to_file(fl, GET_OBJ_INTERACTIONS(obj));
@@ -6050,7 +6070,7 @@ void write_room_template_to_file(FILE *fl, room_template *rmt) {
 	}
 	
 	// E: extra descriptions
-	write_extra_descs_to_file(fl, GET_RMT_EX_DESCS(rmt));
+	write_extra_descs_to_file(fl, 'E', GET_RMT_EX_DESCS(rmt));
 	
 	// I: interactions
 	write_interactions_to_file(fl, GET_RMT_INTERACTIONS(rmt));
@@ -6129,6 +6149,10 @@ void free_sector(sector_data *st) {
 	
 	if (GET_SECT_ICONS(st) && (!proto || GET_SECT_ICONS(st) != GET_SECT_ICONS(proto))) {
 		free_icon_set(&GET_SECT_ICONS(st));
+	}
+	
+	if (GET_SECT_EX_DESCS(st) && (!proto || GET_SECT_EX_DESCS(st) != GET_SECT_EX_DESCS(proto))) {
+		free_extra_descs(&GET_SECT_EX_DESCS(st));
 	}
 	
 	if (GET_SECT_SPAWNS(st) && (!proto || GET_SECT_SPAWNS(st) != GET_SECT_SPAWNS(proto))) {
@@ -6264,6 +6288,11 @@ void parse_sector(FILE *fl, sector_vnum vnum) {
 				break;
 			}
 			
+			case 'X': {	// extra desc
+				parse_extra_desc(fl, &GET_SECT_EX_DESCS(sect), buf2);
+				break;
+			}
+			
 			case '_': {	// notes
 				GET_SECT_NOTES(sect) = fread_string(fl, buf2);
 				break;
@@ -6333,6 +6362,9 @@ void write_sector_to_file(FILE *fl, sector_data *st) {
 		fprintf(fl, "M\n");
 		fprintf(fl, "%d %.2f %s\n", spawn->vnum, spawn->percent, bitv_to_alpha(spawn->flags));
 	}
+	
+	// X: extra descriptions
+	write_extra_descs_to_file(fl, 'X', GET_SECT_EX_DESCS(st));
 	
 	if (GET_SECT_NOTES(st) && *GET_SECT_NOTES(st)) {
 		strcpy(temp, GET_SECT_NOTES(st));

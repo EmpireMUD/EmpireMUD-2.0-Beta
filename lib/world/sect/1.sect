@@ -29,6 +29,14 @@ I 7 1201 100.00 125 p  # PICK: sack of fiveleaf
 I+ 0 70  # Ability: Find Herbs
 I 7 123 100.00 125 p  # PICK: small flower
 I 9 140 100.00 1  # GATHER: bundle of long grass
+X
+plains field grass ground around~
+   You stand in the middle of an expansive, flat open plain. The grasses
+beneath your feet stretch out in all directions, swaying gently in the breeze.
+The occasional bird flits past, calling out to its companions, but otherwise,
+there is nothing but a peaceful silence. The openness of the terrain makes you
+feel exposed and vulnerable, with nowhere to hide.
+~
 _
 Newbie island version of sect 0 Plains
 ~
@@ -68,6 +76,16 @@ I 7 123 100.00 125 p  # PICK: small flower
 I 9 121 85.00 1 g  # GATHER: sticks and leaves
 I 9 131 15.00 1 g  # GATHER: green sapling
 I 20 120 100.00 1  # CHOP: large tree
+X
+forest trees leaves around~
+   You find yourself standing at the edge of a light forest. The trees here are
+young and slender, and the foliage overhead allows dappled sunlight to filter
+through, creating a tranquil, mottled effect on the ground. You can hear the
+soft rustling of leaves as a gentle breeze passes through the trees, and the
+occasional bird chirping overhead. The forest floor is covered in a soft carpet
+of moss and fallen leaves, and the air is cool and refreshing. It's a peaceful
+and serene place.
+~
 _
 Newbie version of sect 1 Light Forest
 ~
@@ -107,6 +125,15 @@ I 7 123 100.00 125 p  # PICK: small flower
 I 9 121 85.00 1 g  # GATHER: sticks and leaves
 I 9 131 15.00 1 g  # GATHER: green sapling
 I 20 120 100.00 1  # CHOP: large tree
+X
+forest trees leaves around~
+   The forest air is cool and fresh, scented with earth and greenery. You can
+hear the rustling of leaves and the occasional bird call, but otherwise,
+animals are sparse. The forest floor is covered with a layer of leaves, twigs,
+and other organic debris, muffling your footsteps as you move. It's a peaceful
+and secluded place, offering a respite from the hustle and bustle of the
+outside world.
+~
 _
 Newbie version of sect 2 Forest
 ~
@@ -146,6 +173,14 @@ I 7 123 100.00 125 p  # PICK: small flower
 I 9 121 85.00 1 g  # GATHER: sticks and leaves
 I 9 131 15.00 1 g  # GATHER: green sapling
 I 20 120 100.00 1  # CHOP: large tree
+X
+forest shade shady trees leaves around~
+   You are standing in a shady forest, where the trees grow close together and
+the canopy overhead blocks out much of the sky. The air is cool and damp, and
+the ground beneath your feet is covered in a thick layer of fallen leaves and
+branches. You can hear the occasional rustling of leaves and the soft chirping
+of birds hidden among the foliage.
+~
 _
 Newbie version of sect 3 Shady Forest
 ~
@@ -211,6 +246,16 @@ I 7 123 100.00 125 p  # PICK: small flower
 I 9 121 85.00 1 g  # GATHER: sticks and leaves
 I 9 131 15.00 1 g  # GATHER: green sapling
 I 20 120 100.00 1  # CHOP: large tree
+X
+forest trees leaves around~
+   You are standing in an overgrown forest, where the underbrush is so thick
+that it's difficult to make out the trunks of the massive trees surrounding
+you. The air is humid and heavy, and the scent of rich soil and decaying leaves
+is almost overwhelming. The forest is alive with the sounds of insects buzzing
+and birds calling out to each other. The forest floor is a chaotic jumble of
+tangled roots, ferns, and thorns, making movement difficult. It's a wild and
+untamed place, where nature reigns supreme.
+~
 _
 Newbie version of sect 4 Overgrown Forest
 ~
@@ -258,6 +303,16 @@ E
 I 5 102 33.33 1 X  # DIG: flint stone
 I 5 100 66.67 1 X  # DIG: rock
 I 6 3003 100.00 1  # FORAGE: handful of grain
+X
+field seeded seeds plants crop around~
+   You find yourself standing in a vast field of dirt, recently turned over in
+preparation for planting. Here and there, you see the first signs of life
+emerging from the soil - tiny sprouts, their tender green leaves barely visible
+against the brown earth. The air is cool and fresh, with the scent of damp soil
+and new growth all around you. Though the crops have only just begun to emerge,
+it's clear that the field has been carefully tended by skilled farmers, who
+have taken great care to ensure that each seed is planted just so.
+~
 _
 Newbie version of sect 13 Seeded Field
 ~
@@ -302,6 +357,14 @@ I 5 102 33.33 1 X  # DIG: flint stone
 I 5 101 16.67 1 X  # DIG: lump of clay
 I 5 100 50.00 1 X  # DIG: rock
 I 6 3013 33.00 1  # FORAGE: handful of nuts
+X
+stumps field forest trees around~
+   The plain is littered with stumps where the trees have been cut down. The
+landscape looks barren and devoid of life, with only scattered rocks and
+patches of grass. The stumps are of varying sizes, some freshly cut with sharp
+edges while others are more weathered and decayed. It's clear that this area
+was once teeming with tall trees, but now only the remnants remain.
+~
 _
 Newbie version of sect 36 Stumps
 ~
@@ -337,6 +400,15 @@ I 5 101 16.67 1 X  # DIG: lump of clay
 I 5 100 50.00 1 X  # DIG: rock
 I 6 3015 33.00 1  # FORAGE: red berries
 I 20 131 100.00 1  # CHOP: green sapling
+X
+copse small trees stumps wood forest around~
+   As you approach the copse, you see small trees sprouting up from old stumps.
+These young saplings are strong and healthy, reaching for the sky with tender,
+green shoots. The air around the copse is fresh, filled with the sweet
+fragrance of new growth. It's a hopeful sight, a reminder that life goes on and
+the forest will thrive again. Birds flit between the trees, their joyful songs
+a testament to the beauty of nature's resilience.
+~
 _
 Newbie version of sect 37 Small Copse
 ~
@@ -372,6 +444,15 @@ I 5 101 16.67 1 X  # DIG: lump of clay
 I 5 100 50.00 1 X  # DIG: rock
 I 6 3015 33.00 1  # FORAGE: red berries
 I 20 131 100.00 1  # CHOP: green sapling
+X
+copse young trees wood forest stumps around~
+   As you approach the copse, you see small trees sprouting up from old stumps.
+These young saplings are strong and healthy, reaching for the sky with tender,
+green shoots. The air around the copse is fresh, filled with the sweet
+fragrance of new growth. It's a hopeful sight, a reminder that life goes on and
+the forest will thrive again. Birds flit between the trees, their joyful songs
+a testament to the beauty of nature's resilience.
+~
 _
 Newbie version of sect 38 Copse
 ~
@@ -407,6 +488,16 @@ I 5 101 16.67 1 X  # DIG: lump of clay
 I 5 100 50.00 1 X  # DIG: rock
 I 6 3015 33.00 1  # FORAGE: red berries
 I 20 131 100.00 1  # CHOP: green sapling
+X
+edge forest trees around~
+   You find yourself standing at the edge of the forest, the last vestige of
+civilization before nature takes over. The forest looms before you, the trees
+reaching high into the sky, their branches forming a canopy overhead. The
+ground is covered in a thick layer of leaves and twigs, and the air is filled
+with the sound of chirping birds and rustling leaves. The scent of pine and
+earth fills your nostrils, inviting you to explore the vast wilderness that
+lies ahead.
+~
 _
 Newbie version of sect 39 Forest Edge
 ~
@@ -442,6 +533,15 @@ I 7 1205 100.00 125 p  # PICK: bileberries
 I+ 0 70  # Ability: Find Herbs
 I 7 123 100.00 125 p  # PICK: small flower
 I 9 140 100.00 1  # GATHER: bundle of long grass
+X
+plains riverbank bank water around~
+   The riverbank is soft and muddy underfoot, with waterlogged earth and thick
+clumps of reeds and cattails sprouting up from the water's edge. The air is
+damp and heavy with the scent of wet earth and decaying vegetation, while the
+sound of the river rushing by is a constant background murmur. The occasional
+splash or rustle in the reeds hints at the presence of small animals or birds
+nearby.
+~
 _
 Newbie version of sect 40 Riverbank
 ~
@@ -493,6 +593,14 @@ I 7 123 100.00 125 p  # PICK: small flower
 I 9 121 85.00 1 g  # GATHER: sticks and leaves
 I 9 131 15.00 1 g  # GATHER: green sapling
 I 20 120 100.00 1  # CHOP: large tree
+X
+trees forest riverbank bank water~
+   You are standing at the edge of the forest, with the sounds of rushing water
+nearby. The tall trees stretch high into the sky, their branches forming a
+canopy overhead. The air is cool and damp, filled with the fresh scent of earth
+and vegetation. The river runs alongside the forest, its gentle flow creating a
+soothing background noise.
+~
 _
 Newbie version of sect 44 Light Riverbank Forest
 ~
@@ -546,6 +654,14 @@ I 7 123 100.00 125 p  # PICK: small flower
 I 9 121 85.00 1 g  # GATHER: sticks and leaves
 I 9 131 15.00 1 g  # GATHER: green sapling
 I 20 120 100.00 1  # CHOP: large tree
+X
+forest trees riverbank bank water river around~
+   You are standing at the edge of the forest, with the sounds of rushing water
+nearby. The tall trees stretch high into the sky, their branches forming a
+canopy overhead. The air is cool and damp, filled with the fresh scent of earth
+and vegetation. The river runs alongside the forest, its gentle flow creating a
+soothing background noise.
+~
 _
 Newbie version of sect 45 Forested Riverbank
 ~
@@ -582,6 +698,15 @@ I 7 1206 8.33 125 p  # PICK: iridescent blue iris
 I 7 1205 100.00 125 p  # PICK: bileberries
 I+ 0 70  # Ability: Find Herbs
 I 7 123 100.00 125 p  # PICK: small flower
+X
+stumps riverbank bank water trees forest around~
+   You stand before a line of stumps on the riverbank, evidence of trees that
+once stood tall and proud. They now form a jagged line along the water's edge,
+their bark stripped and their branches removed. Some stumps are old and
+weathered, while others are fresher, with splintered wood still clinging to the
+sides. The scent of sawdust and fresh-cut wood hangs in the air, a reminder of
+the recent activity.
+~
 _
 Newbie version of sect 46 Stumped Riverbank
 ~
@@ -633,6 +758,16 @@ I 7 1205 100.00 125 p  # PICK: bileberries
 I+ 0 70  # Ability: Find Herbs
 I 7 123 100.00 125 p  # PICK: small flower
 I 20 131 100.00 1  # CHOP: green sapling
+X
+copse riverside riverbank bank trees forest stumps around~
+   As you approach the river, a small copse comes into view, nestled on the
+bank. Some of the trees have been felled, leaving stumps of varying heights.
+But amidst the stumps, there are signs of new growth: tiny saplings and young
+trees are sprouting up, reaching for the light. The lush foliage of the
+surrounding forest provides a natural barrier, casting a dappled shade over the
+copse. The sound of the nearby river can be heard, its gentle current soothing
+and constant.
+~
 _
 Newbie version of sect 47 Riverside Copse
 ~
@@ -665,6 +800,13 @@ I 7 1206 8.33 125 p  # PICK: iridescent blue iris
 I 7 1200 100.00 125 p  # PICK: handful of whitegrass
 I+ 0 70  # Ability: Find Herbs
 I 7 123 100.00 125 p  # PICK: small flower
+X
+shore ocean sea water plains around~
+   The ocean waves crash against the shore, churning up sand and shells. The
+water stretches out endlessly in one direction, while in the other, the shore
+meets the plains. Seabirds can be seen swooping and diving into the water,
+searching for food. The salty sea air is refreshing and invigorating.
+~
 _
 Newbie version of sect 50 Shore
 ~
@@ -719,6 +861,15 @@ I 7 123 100.00 125 p  # PICK: small flower
 I 9 121 85.00 1 g  # GATHER: sticks and leaves
 I 9 131 15.00 1 g  # GATHER: green sapling
 I 20 120 100.00 1  # CHOP: large tree
+X
+tree shoreside water ocean around~
+   A lone tree stands on the edge of the ocean, its roots entwined in the sandy
+soil. The constant sea breeze has sculpted its branches, creating a unique
+shape that appears to be reaching towards the water. The trunk is rough and
+weathered, the bark hardened by years of exposure to the salty air. Despite the
+harsh environment, the tree appears healthy, with a crown of green leaves
+swaying in the wind.
+~
 _
 Newbie version of sect 54 Shoreside Tree
 ~
@@ -752,6 +903,15 @@ I 7 1206 8.33 125 p  # PICK: iridescent blue iris
 I 7 1200 100.00 125 p  # PICK: handful of whitegrass
 I+ 0 70  # Ability: Find Herbs
 I 7 123 100.00 125 p  # PICK: small flower
+X
+shore exstuary river water ocean sea around~
+   The estuary shore is a mix of mud and sand, with the water slowly rising and
+falling with the tide. Small crabs scurry around, digging into the sand and mud
+for food. Seagulls and other shorebirds swoop down to grab small fish and other
+creatures that have been stranded on the shore by the receding water. In the
+distance, the sound of waves crashing against the rocky cliffs can be heard.
+The air is salty and fresh, with a slight breeze blowing in from the sea.
+~
 _
 Newbie version of sect 56 Estuary Shore
 ~
@@ -785,6 +945,16 @@ I 7 1205 100.00 125 p  # PICK: bileberries
 I+ 0 70  # Ability: Find Herbs
 I 7 123 100.00 125 p  # PICK: small flower
 I 9 140 100.00 1  # GATHER: bundle of long grass
+X
+foothills hills lake mountain around~
+   The foothills rise up gently between the lake and the mountains, forming a
+rolling terrain that's scattered with patches of grass and low shrubs. The soil
+here is loose and rocky, with occasional outcroppings of weathered stone that
+jut out from the hillsides. Small streams trickle down from the higher
+elevations, cutting through the soil and rock as they make their way towards
+the lake. The foothills are quiet and peaceful, with only the sound of birdsong
+and the rustle of leaves to break the stillness.
+~
 _
 Newbie version of sect 58 Foothills
 ~
@@ -834,6 +1004,16 @@ I 7 1206 8.33 125 p  # PICK: iridescent blue iris
 I 7 1200 100.00 125 p  # PICK: handful of whitegrass
 I+ 0 70  # Ability: Find Herbs
 I 7 123 100.00 125 p  # PICK: small flower
+X
+stumps shore seaside ocean trees forest around~
+   You stand on the shore, looking at a row of stumps jutting out of the sand.
+It's clear that a forest once stood here, but all that remains now are these
+remnants of what was. Some of the stumps are larger, indicating that the trees
+were older and more mature when they were cut down. Others are smaller, likely
+the result of newer growth that was taken down before it could reach full
+height. The area feels barren and desolate, a stark contrast to what it may
+have looked like in the past.
+~
 _
 Newbie version of 59 Seaside Stumps
 ~
@@ -886,6 +1066,15 @@ I 7 1200 100.00 125 p  # PICK: handful of whitegrass
 I+ 0 70  # Ability: Find Herbs
 I 7 123 100.00 125 p  # PICK: small flower
 I 20 131 100.00 1  # CHOP: green sapling
+X
+copse stumps seaside sea ocean water around forest trees~
+   You stand before a seaside copse, the sound of the waves crashing against
+the shore nearby. Among the tall trees, you notice several stumps, evidence of
+past logging. But there is also a glimmer of hope - small saplings and young
+trees are emerging from the stumps, signifying that regrowth has begun. The
+salty sea air fills your lungs as you take in the scene, marveling at the
+resilience of nature.
+~
 _
 Newbie version of 60 Seaside Copse
 ~

@@ -982,17 +982,19 @@ bool show_pc_in_room(char_data *ch, room_data *room, struct mappc_data_container
 * @param struct icon_data *crop_icon The icon for a crop on the tile (may be NULL).
 * @param int tileset Which tile set (season) to pull icons from.
 * @param char *icon_buf A string to write the icon to.
+* @param char *icon_color A string to write the icon color to -- if we can detect it.
 */
-void build_map_icon(char_data *ch, room_data *to_room, struct icon_data *base_icon, struct icon_data *crop_icon, int tileset, char *icon_buf) {
+void build_map_icon(char_data *ch, room_data *to_room, struct icon_data *base_icon, struct icon_data *crop_icon, int tileset, char *icon_buf, char *icon_color) {
 	struct empire_city_data *city;
 	struct icon_data *icon;
 	
 	// initialize this
-	*icon_buf = '\0';
+	*icon_buf = *icon_color = '\0';
 
 	if (CHECK_CHAMELEON(IN_ROOM(ch), to_room)) {
 		// Hidden buildings
 		strcat(icon_buf, base_icon->icon);
+		strcpy(icon_color, base_icon->color);
 	}
 	else if (ROOM_CUSTOM_ICON(to_room)) {
 		// Rooms with custom icons (take precedence over all but hidden rooms
@@ -1116,6 +1118,7 @@ void build_map_icon(char_data *ch, room_data *to_room, struct icon_data *base_ic
 	}
 	else if (ROOM_SECT_FLAGGED(to_room, SECTF_CROP) && ROOM_CROP(to_room) && crop_icon) {
 		strcat(icon_buf, crop_icon->icon);
+		strcpy(icon_color, crop_icon->color);
 	}
 	else if (IS_CITY_CENTER(to_room)) {
 		if ((city = find_city(ROOM_OWNER(to_room), to_room))) {
@@ -1130,6 +1133,7 @@ void build_map_icon(char_data *ch, room_data *to_room, struct icon_data *base_ic
 	}
 	else if ((icon = get_icon_from_set(GET_SECT_ICONS(SECT(to_room)), tileset))) {
 		strcat(icon_buf, icon->icon);
+		strcpy(icon_color, icon->color);
 	}
 	else {	// error: no icon available
 		strcat(icon_buf, "????");
@@ -1929,7 +1933,7 @@ void look_in_direction(char_data *ch, int dir) {
 */
 static void show_map_to_char(char_data *ch, struct mappc_data_container *mappc, room_data *to_room, bitvector_t options) {
 	bool need_color_terminator = FALSE;
-	char no_color[256], col_buf[256], lbuf[MAX_STRING_LENGTH], self_icon[256], mappc_icon[256], map_icon[256], veh_icon[256], show_icon[256], temp[256];
+	char no_color[256], col_buf[256], lbuf[MAX_STRING_LENGTH], self_icon[256], mappc_icon[256], map_icon[256], veh_icon[256], show_icon[256], temp[256], icon_color[256];
 	int iter;
 	int tileset = GET_SEASON(to_room);
 	struct icon_data *base_icon, *crop_icon = NULL;
@@ -1942,7 +1946,7 @@ static void show_map_to_char(char_data *ch, struct mappc_data_container *mappc, 
 	bool remember_icon = has_player_tech(ch, PTECH_MAP_MEMORY) ? TRUE : FALSE;
 	
 	// clear icon strings
-	*self_icon = *mappc_icon = *map_icon = *veh_icon = *show_icon = '\0';
+	*self_icon = *mappc_icon = *map_icon = *veh_icon = *show_icon = *icon_color = '\0';
 	
 	// detect base icon
 	base_icon = get_icon_from_set(GET_SECT_ICONS(BASE_SECT(to_room)), tileset);
@@ -1972,7 +1976,12 @@ static void show_map_to_char(char_data *ch, struct mappc_data_container *mappc, 
 	
 	// determine if we need to build a map icon:
 	if ((!*self_icon && !*mappc_icon && !*veh_icon) || remember_icon) {
-		build_map_icon(ch, to_room, base_icon, crop_icon, tileset, map_icon);
+		build_map_icon(ch, to_room, base_icon, crop_icon, tileset, map_icon, icon_color);
+	}
+	
+	// ensure icon color
+	if (!*icon_color) {
+		strcpy(icon_color, base_color);
 	}
 	
 	// 2. Determine which icon will be shown (but veh_/map_icon is often used later too)
@@ -2053,16 +2062,16 @@ static void show_map_to_char(char_data *ch, struct mappc_data_container *mappc, 
 			replace_question_color(show_icon, base_color, lbuf);
 			strcpy(show_icon, lbuf);
 		}
-		// need a leading color base color?
+		// need a leading color?
 		if (*show_icon != COLOUR_CHAR) {
-			snprintf(lbuf, sizeof(lbuf), "%s%s", base_color, show_icon);
+			snprintf(lbuf, sizeof(lbuf), "%s%s", icon_color, show_icon);
 			strcpy(show_icon, lbuf);
 		}
 	}
 	else {
-		// need a leading color base color?
+		// need a leading color?
 		if (*show_icon != COLOUR_CHAR) {
-			snprintf(lbuf, sizeof(lbuf), "%s%s", base_color, show_icon);
+			snprintf(lbuf, sizeof(lbuf), "%s%s", icon_color, show_icon);
 			strcpy(show_icon, lbuf);
 		}
 		

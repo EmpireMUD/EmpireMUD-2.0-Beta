@@ -135,6 +135,16 @@ A Boardwalk Over the Shallows~
 &a~&0--&a~~
 16 0 dmnos 0
 0 0 0 -1
+E
+boardwalk boards walk shallows sea building around down~
+   As you step onto the boardwalk, the gentle sound of waves echoes beneath
+your feet. The water below is clear and sparkling, with the occasional school
+of small fish darting by. The boardwalk itself is made of sturdy planks,
+weathered from the salty sea air. To either side, there are tall grasses
+swaying in the breeze and the occasional seabird flying overhead. In the
+distance, you can see the gentle curve of the coastline and the endless expanse
+of the sea beyond.
+~
 I 29 5010 100.00 1 r  # RUINS-TO-BLD: Flooded Ruins
 R
 6015 1 1 0
@@ -151,6 +161,16 @@ A Fishery on the River~
 0 0 0 -1
 C
 fish~
+E
+fishery river building around~
+   The fishery is a sturdy structure built right on the river, with its
+foundation firmly set in the water. Its wooden beams and planks are weathered
+and aged, attesting to years of use. The sound of the flowing river water
+creates a soothing background noise as you approach the fishery. The occasional
+splash can be heard as fish jump out of the water. A faint, pleasant smell of
+water and fish wafts in the air, hinting at the fresh catch that might be
+available.
+~
 F
 FI
 I 21 1311 25.00 1 f  # FISH: spotted eel
@@ -170,6 +190,18 @@ A Fishery on the Lake~
 0 0 0 -1
 C
 fish~
+E
+fishery lake building around~
+   As you stand on the fishery built on stilts over the tranquil lake, you can
+feel the gentle sway of the structure with the rhythm of the water. The wooden
+planks creak under your feet as you walk around, and the smell of the lake
+fills the air. Looking down, you can see the clear water below, shimmering in
+the sunlight. The fishermen are busy tending to their nets and lines, their
+silhouettes visible beneath the surface. The occasional fish jumps out of the
+water, its scales glinting in the sun. The sound of water lapping against the
+stilts and the occasional chirping of birds in the surrounding trees create a
+peaceful atmosphere.
+~
 F
 FI
 I 21 1314 25.00 1 f  # FISH: fat catfish
@@ -189,6 +221,21 @@ The Depository~
 0 0 0 280
 C
 store (any storable item)~
+E
+depository building around~
+   The depository is an open-air structure made entirely of wood. It has a roof
+overhead that provides some shade and shelter from the elements, but there are
+no walls or doors to speak of. Instead, there are rows of long, sturdy shelves
+that stretch out in all directions, each one laden with items of all shapes and
+sizes. There are no signs or labels to indicate what goes where; it's up to the
+workers to sort through the jumbled mess and figure out which warehouse each
+item belongs in. Despite the chaos, there's a sense of organization to it all,
+as if the workers have some sort of system in place that only they can
+comprehend. The depository is always bustling with activity, as people come and
+go, dropping off their goods and supplies and picking up whatever they need for
+their own businesses and homes. It's a hub of commerce and trade, and one of
+the most important buildings in the city.
+~
 F
 J
 I 29 5006 100.00 1 r  # RUINS-TO-BLD: Ruins
@@ -205,6 +252,17 @@ A Seed Silo~
 0 0 0 -1
 C
 inventory, retrieve, store~
+E
+silo seeds building around~
+   The seed silo stands tall in the open field, its wooden structure weathered
+by years of use. The circular shape of the silo is evident from afar, and as
+you draw closer, you notice the shingles lining the roof, protecting the stored
+seeds from the elements. The door, slightly ajar, hints at the abundance of
+seeds stored within, waiting to be planted in the fields. The wooden planks are
+tightly knit, creating a solid structure that has withstood the test of time.
+The silo's foundation is sturdy, and the structure stands tall against the vast
+expanse of the field.
+~
 I 29 5006 100.00 1 r  # RUINS-TO-BLD: Ruins
 R
 1002 1 5 0
@@ -219,6 +277,15 @@ A Sand Pit~
 0 0 0 -1
 C
 dig~
+E
+pit sand down building around~
+   The sand is fine-grained and soft, and it seems to go on forever. The pit is
+relatively deep, with a steep slope leading down into it. There are shovels and
+other digging tools lying around the edges of the pit, and there are large
+piles of sand nearby where people have deposited the sand they've dug up. The
+air is dry and the sun beats down on the sandy ground, making it almost too hot
+to touch. Despite the heat, it's a peaceful and quiet place.
+~
 F
 f
 I 5 100 4.00 1 x  # DIG: rock

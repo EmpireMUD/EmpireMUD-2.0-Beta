@@ -44,5 +44,9 @@ I 20 121 25.00 4 a  # CHOP: sticks and leaves
 I 20 121 25.00 6 a  # CHOP: sticks and leaves
 I 20 121 25.00 10 a  # CHOP: sticks and leaves
 I 20 121 25.00 14 a  # CHOP: sticks and leaves
+X
+stumps field around~
+The stumps that dot this field look like they were hacked apart by tiny axes.
+~
 S
 $

@@ -257,7 +257,7 @@ Raw meat, fish, poultry, and pork can be cooked by themselves but will not
 provide a food buff. There are also more recipes to find in the world.
 
 See also: COOKING FIRE, FAMILY RECIPES, GOURMET CHEF, CRAFTING LEVEL, MILL,
-   BAKERY, RESOURCES, KEEP, RECIPES, COOK INFO, RECIPES
+   BAKERY, RESOURCES, KEEP, RECIPES, COOK INFO, RECIPES, CRAFTING ABILITIES
 #
 CRAFT CRAFTS
 
@@ -269,7 +269,7 @@ You can craft many types of items, from pottery to woodworking to arrows.
 All crafting abilities train when you finish recipes that require them.
 
 See also: CRAFT INFO, CRAFTING LEVEL, RESOURCES, KEEP, RECIPES, POTTERY,
-PRIMITIVE CRAFTS, WOODWORKING
+   PRIMITIVE CRAFTS, WOODWORKING, CRAFTING ABILITIES
 #
 "CRAFT INFO" "FORGE INFO" "SEW INFO" "BUILD INFO" "MANUFACTURE INFO" "COOK INFO" "BAKE INFO" "WEAVE INFO" "MAKE INFO"
 
@@ -286,7 +286,37 @@ its pattern in your inventory.
 For build, this also shows where you can build the building.
 For recipes from patterns, this also shows the level range of the recipe.
 
-See also: RESOURCES, SCALABLE CRAFTS, PATTERNS
+See also: RESOURCES, SCALABLE CRAFTS, PATTERNS, CRAFTING ABILITIES
+#
+"CRAFTING ABILITIES" "CRAFT ABILITIES" "SPECIALIZED CRAFTS" "SPECIALTY CRAFTS" "SPECIAL CRAFTS" "CLASS CRAFTS" SPEC-CRAFT
+
+Main building and crafting abilities:
+  Build, Architect
+  Cook, Family Recipes, Gourmet Chef
+  Primitive Crafts, Basic Crafts, 
+  Forge, Jewelry, Master Blacksmith
+    Armorsmithing, Sturdy Armors, Imperial Armors
+    Weaponcrafting, Iron Blades, Deadly Weapons
+  Pottery, Fine Pottery, Master Craftsman
+  Sew, Rawhide Stitching, Master Tailor
+    Leatherworking, Dangerous Leathers
+    Magic Attire, Magical Vestments
+  Staffmaking, Powerful Staves
+  Woodworking, Advanced Woodworking, Exquisite Woodworking, Master Craftsman
+    Shipbuilding
+    Siegeworks
+
+Specialized building and crafting abilities:
+  Alchemist Crafts, Antiquarian Crafts, Artificer Crafts, Exarch Crafts,
+    Smuggler Crafts, Steelsmith Crafts, Tinker Crafts
+  Poisons, Deadly Poisons
+  Find Shelter
+  Fletching
+  Healing Potions, Nature Potions, Healing Elixirs, Wrath of Nature Potions
+  Secret Cache
+
+See also: BAKE, BREW, BUILD, COOK, CRAFT, FORGE, MAKE, MANUFACTURE, MILL, MIX,
+   PRESS, SEW, SMELT, WEAVE, and any ability listed above
 #
 "CUSTOMIZE BUILDING"
 
@@ -466,7 +496,7 @@ It also allows you to smelt bronze ingots from tin and copper.
 
 See also: CRAFT INFO, CRAFTING LEVEL, RESOURCES, KEEP, SMELT, WEAPONCRAFTING,
   ARMORSMITHING, JEWELRY, MASTER BLACKSMITH, IRON BLADES, STURDY ARMORS,
-  DEADLY WEAPONS, IMPERIAL ARMORS, RECIPES, SAW
+  DEADLY WEAPONS, IMPERIAL ARMORS, RECIPES, SAW, CRAFTING ABILITIES
 #
 "FREE ACTIONS" "CLEAR TERRAIN" "TIDY UP" "SCOUT AREA" "BLOCK WATER" ENGRAVE "MAGIC WORDS" ORGANIZE "SHOVEL SOOT"
 
@@ -890,12 +920,13 @@ Rawhide Stitching (Trade ability)
 Command:  sew [number] <item>
 
 The basic leather tier is made of rawhide -- untanned leather that is hardened
-to the right shape and stitched together, but isn't waterproof.
+to the right shape and stitched together, but isn't waterproof. These low-level
+items do not require any armor skill to use.
 
 Weapons:
   rawhide whip
 
-Armor:
+Worn:
   rawhide breastplate
   rawhide skullcap
   rawhide bracers
@@ -999,7 +1030,7 @@ Additional sewing items are available from other abilities in the Trade skill,
 as well as patterns and crafts hidden around the world.
 
 See also: CRAFT INFO, CRAFTING LEVEL, RESOURCES, KEEP, LEATHERWORKING,
-   RAWHIDE STITCHING, RECIPES, MASTER TAILOR
+   RAWHIDE STITCHING, RECIPES, MASTER TAILOR, CRAFTING ABILITIES
 #
 SHIP SHIPS 
 
@@ -1055,7 +1086,7 @@ Unlock more advanced ships through empire progression:
   Hulk (shipping, 1000 capacity)
 
 See also: CRAFT INFO, BOARD, DISEMBARK, SAIL, SHIPPING, SHIPS, UPGRADE,
-   RESOURCES, KEEP, SCRAP, VEHICLE, RECIPES
+   RESOURCES, KEEP, SCRAP, VEHICLE, RECIPES, CRAFTING ABILITIES
 #
 SIEGEWORKS "SIEGE WORKS"
 
@@ -1209,7 +1240,7 @@ Using the Sew ability:
 (Wool cloth and cotton cloth are used for the same things.)
 
 See also: SHEAR, RESOURCES, KEEP, RECIPES, CRAFT INFO, LOOM, TAILOR, 
-  MASTER TAILOR
+   MASTER TAILOR, CRAFTING ABILITIES
 #
 WOODWORKING "WOOD WORKING"
 

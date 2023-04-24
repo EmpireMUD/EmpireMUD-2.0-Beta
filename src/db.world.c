@@ -145,6 +145,7 @@ void change_terrain(room_data *room, sector_vnum sect, sector_vnum base_sect) {
 	
 	// tear down any building data and customizations
 	disassociate_building(room);
+	decustomize_room(room);
 	
 	// keep crop if it has one
 	if (SECT_FLAGGED(st, SECTF_HAS_CROP_DATA) && ROOM_CROP(room)) {
@@ -931,6 +932,10 @@ void set_room_custom_name(room_data *room, char *name) {
 		free(ROOM_CUSTOM_NAME(room));
 	}
 	ROOM_CUSTOM_NAME(room) = name ? str_dup(name) : NULL;
+	if (!name) {
+		REMOVE_BIT(ROOM_BASE_FLAGS(room), ROOM_AFF_HIDE_REAL_NAME);
+		affect_total_room(room);
+	}
 	request_world_save(GET_ROOM_VNUM(room), WSAVE_ROOM);
 }
 
@@ -2110,6 +2115,14 @@ void perform_change_sect(room_data *loc, struct map_data *map, sector_data *sect
 	// preserve
 	old_sect = (loc ? SECT(loc) : map->sector_type);
 	
+	// decustomize
+	if (loc) {
+		decustomize_room(loc);
+	}
+	else {
+		decustomize_shared_data(map->shared);
+	}
+	
 	// update room
 	if (loc) {
 		SECT(loc) = sect;
@@ -2195,6 +2208,16 @@ void perform_change_sect(room_data *loc, struct map_data *map, sector_data *sect
 	}
 	else {
 		remove_extra_data(loc ? &ROOM_EXTRA_DATA(loc) : &map->shared->extra_data, ROOM_EXTRA_SECTOR_TIME);
+	}
+	
+	// check for icon locking
+	if (SECT_FLAGGED(sect, SECTF_LOCK_ICON)) {
+		if (map) {
+			lock_icon_map(map, NULL);
+		}
+		else if (loc) {
+			lock_icon(loc, NULL);
+		}
 	}
 	
 	request_mapout_update(map ? map->vnum : GET_ROOM_VNUM(loc));
@@ -3171,6 +3194,8 @@ void decustomize_shared_data(struct shared_room_data *shared) {
 			shared->icon = NULL;
 		}
 	}
+	REMOVE_BIT(shared->affects, ROOM_AFF_HIDE_REAL_NAME);
+	REMOVE_BIT(shared->base_affects, ROOM_AFF_HIDE_REAL_NAME);
 }
 
 
@@ -3439,6 +3464,7 @@ INTERACTION_FUNC(ruin_building_to_building_interaction) {
 	bld_data *old_bld, *proto;
 	double save_resources;
 	int dir, paint;
+	char *temp;
 	
 	if (!inter_room || !(proto = building_proto(interaction->vnum)) || GET_ROOM_VNUM(inter_room) >= MAP_SIZE) {
 		return FALSE;	// safety: only works on the map
@@ -3484,7 +3510,9 @@ INTERACTION_FUNC(ruin_building_to_building_interaction) {
 	// custom naming if #n is present (before complete_building)
 	if (strstr(GET_BLD_TITLE(proto), "#n")) {
 		set_room_custom_name(inter_room, NULL);
-		ROOM_CUSTOM_NAME(inter_room) = str_replace("#n", old_bld ? GET_BLD_NAME(old_bld) : "a Building", GET_BLD_TITLE(proto));
+		temp = str_replace("#n", old_bld ? GET_BLD_NAME(old_bld) : "a Building", GET_BLD_TITLE(proto));
+		set_room_custom_name(inter_room, temp);
+		free(temp);
 	}
 	
 	complete_building(inter_room);

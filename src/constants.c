@@ -3614,7 +3614,7 @@ const char banner_to_mapout_token[][2] = {
 	{ 'y', 'p' },
 	{ 'm', 'v' },
 	{ 'c', 'w' },
-	{ 'w', 's' },
+	{ 'w', 'r' },
 	{ 'a', 'u' },
 	{ 'j', 'b' },
 	{ 'l', 'y' },
@@ -3740,6 +3740,8 @@ const char *sector_flags[] = {
 	"SHALLOW-WATER",
 	"NEEDS-HEIGHT",
 	"KEEPS-HEIGHT",
+	"SEPARATE-NOT-ADJACENTS",	// 25
+	"SEPARATE-NOT-NEARS",
 	"\n"
 };
 

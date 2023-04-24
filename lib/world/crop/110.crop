@@ -9,14 +9,22 @@ D0
 D0
 @w&t!&?i@e~
 &g~
-I 6 11010 100.00 1  # FORAGE: a handful of purple seeds
-I 8 11009 20.00 2 H  # HARVEST: a bundle of zephyr cattails
-I 8 11009 20.00 3 H  # HARVEST: a bundle of zephyr cattails
-I 8 11009 20.00 4 H  # HARVEST: a bundle of zephyr cattails
-I 8 11009 20.00 5 H  # HARVEST: a bundle of zephyr cattails
-I 8 11009 20.00 6 H  # HARVEST: a bundle of zephyr cattails
+I 6 11010 100.00 1  # FORAGE: handful of purple seeds
+I 8 11009 20.00 2 H  # HARVEST: bundle of zephyr cattails
+I 8 11009 20.00 3 H  # HARVEST: bundle of zephyr cattails
+I 8 11009 20.00 4 H  # HARVEST: bundle of zephyr cattails
+I 8 11009 20.00 5 H  # HARVEST: bundle of zephyr cattails
+I 8 11009 20.00 6 H  # HARVEST: bundle of zephyr cattails
 M
 11007 100.00 d
+X
+cattails catails tails zephyr patch plants crop~
+   The marshland is covered in wispy cattails, ordinary in every way except the
+deep purple hue that almost shimmers in the light. But a sudden gust of wind is
+all it takes to disturb the delicate plants and lift their fluffy violet seeds
+into the air. These are no ordinary reed, but Zephyr cattails with the power to
+command the wind!
+~
 S
 #11011
 eggplants~
@@ -29,11 +37,18 @@ w&vO&?ww~
 D0
 ww&vO&?w~
 &g~
-I 6 11012 100.00 1  # FORAGE: a tiny eggplant
-I 8 11011 20.00 2 H  # HARVEST: an eggplant
-I 8 11011 20.00 3 H  # HARVEST: an eggplant
-I 8 11011 20.00 4 H  # HARVEST: an eggplant
-I 8 11011 20.00 5 H  # HARVEST: an eggplant
-I 8 11011 20.00 6 H  # HARVEST: an eggplant
+I 6 11012 100.00 1  # FORAGE: tiny eggplant
+I 8 11011 20.00 2 H  # HARVEST: eggplant
+I 8 11011 20.00 3 H  # HARVEST: eggplant
+I 8 11011 20.00 4 H  # HARVEST: eggplant
+I 8 11011 20.00 5 H  # HARVEST: eggplant
+I 8 11011 20.00 6 H  # HARVEST: eggplant
+X
+eggplants plants bed crop~
+   Sprawling field of eggplants spreads out before you, the dark purple and
+shiny skin of the fruits glistening in the sun. You notice that the plants have
+white or lavender-colored flowers, and their soft leaves rustle gently in the
+wind.
+~
 S
 $

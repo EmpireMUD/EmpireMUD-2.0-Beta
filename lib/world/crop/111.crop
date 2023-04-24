@@ -12,6 +12,13 @@ I 8 11102 20.00 3 H  # HARVEST: bunch of carrots
 I 8 11102 20.00 4 H  # HARVEST: bunch of carrots
 I 8 11102 20.00 5 H  # HARVEST: bunch of carrots
 I 8 11102 20.00 6 H  # HARVEST: bunch of carrots
+X
+carrots patch plants crop~
+   Rows of vibrant orange carrots stretch out before you, their lush green tops
+nodding in the breeze. You can see the deep green of the carrot tops peeking
+out from the soil, promising a bountiful harvest of delicious and nutritious
+roots.
+~
 S
 #11101
 blackberries~
@@ -39,6 +46,13 @@ I 8 11104 20.00 3 H  # HARVEST: bunch of blackberries
 I 8 11104 20.00 4 H  # HARVEST: bunch of blackberries
 I 8 11104 20.00 5 H  # HARVEST: bunch of blackberries
 I 8 11104 20.00 6 H  # HARVEST: bunch of blackberries
+X
+blackberries blackberry patch plants crop~
+   The thorny brambles of blackberry bushes fill your vision, the plump and
+juicy fruits of deep purple and black hanging from the vines. The leaves of the
+bushes are a vibrant green, and the sharp thorns stand out against the dark
+branches.
+~
 S
 #11102
 pears~
@@ -79,5 +93,12 @@ I 6 11107 100.00 1  # FORAGE: ripe pear
 I 7 11106 100.00 14  # PICK: juicy pears
 I 9 121 100.00 1  # GATHER: sticks and leaves
 I 20 120 100.00 1  # CHOP: large tree
+X
+pears fruit trees orchard crop~
+   A peaceful orchard of pear trees surrounds you, the plump fruits of golden,
+green, and red hanging from the branches. The leaves rustle in the breeze, and
+you can almost taste the sweet and juicy flavor of the pears just by looking at
+them.
+~
 S
 $
