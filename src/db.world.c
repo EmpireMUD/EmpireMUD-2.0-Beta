@@ -145,6 +145,7 @@ void change_terrain(room_data *room, sector_vnum sect, sector_vnum base_sect) {
 	
 	// tear down any building data and customizations
 	disassociate_building(room);
+	decustomize_room(room);
 	
 	// keep crop if it has one
 	if (SECT_FLAGGED(st, SECTF_HAS_CROP_DATA) && ROOM_CROP(room)) {
@@ -2113,6 +2114,9 @@ void perform_change_sect(room_data *loc, struct map_data *map, sector_data *sect
 	
 	// preserve
 	old_sect = (loc ? SECT(loc) : map->sector_type);
+	
+	// decustomize
+	decustomize_shared_data(map->shared);
 	
 	// update room
 	if (loc) {
