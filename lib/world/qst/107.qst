@@ -59,11 +59,29 @@ Z
 S
 #10731
 Tutorial: Find the Giant Shoe~
-This quest has no description.
-tba
+   Somewhere nearby on the newbie island, there's a giant shoe! Better go check
+it out. There are a few ways to find it. Try these steps:
+- On the newbie island, type 'nearby' to see what's around you.
+- If there's a lot, try 'nearby Misplaced Mother Goose' to find the adventure
+  with the giant shoe.
+- If you still don't see Misplaced Mother Goose, try moving to another part of
+  the newbie island and use nearby again.
+- You can also try 'scan Giant Shoe'. Scan has a shorter range but will find
+  things you can see around you. If you're using the ascii map view, the giant
+  shoe looks like &u| `n&0
+- Once you get directions to Misplaced Mother Goose from nearby or scan, find
+  your way to its location. You can use nearby or scan again along the way. You
+  may have to go around mountains or other terrain to find it.
+- Don't be afraid to 'sleep' to regenerate movement points faster on your way.
+- Once you get to the Giant Shoe, type 'quest finish Tutorial: Find the Giant
+  Shoe' -- or just 'quest finish all'.
 ~
-You have completed the quest.
-tba
+   You have reached the Giant Shoe but this adventure -- Misplaced Mother Goose
+-- doesn't have much to do right here. Type 'adventure' at the Giant Shoe for
+more information about it. To complete the quests for this adventure, look for
+items like the fiddle, pail, candlestick, and more whenever you kill a low-
+level mob anywhere in the world. When you find one, use 'quest start all' and
+look at the item for information on how to get it back to its rightful owner.
 ~
 2 0 0 100 -1
 A
@@ -352,11 +370,25 @@ Z
 S
 #10750
 Tutorial: Find the Goblin Mine~
-This quest has no description.
-tba
+   Somewhere nearby in the mountains of the newbie island, some goblins have
+been mining and run into a spot of trouble! Better go check it out. Follow
+these steps to find it:
+- On the newbie island, type 'nearby' to see what's around you.
+- If there's a lot, try 'nearby Goblin Mines' to find the adventure.
+- If you still don't see Goblin Mines, try moving to another part of the newbie
+  island and use nearby again.
+- Once you get directions to the Goblin Mines from nearby, find your way to
+  its location. You can use 'nearby Goblin Mines' again along the way. It will
+  be on the edge of the mountains -- make sure you don't walk onto a mountain
+  tile trying to get there. You may have to go around other mountains.
+- Don't be afraid to 'sleep' to regenerate movement points faster on your way.
+- Once you get to the Goblin Mines, type 'quest finish Tutorial: Find the
+  Goblin Mine' -- or just 'quest finish all'.
 ~
-You have completed the quest.
-tba
+   You have reached the Goblin Mine but it looks like the goblins have fled.
+You can find them outside the mine with the command 'where goblin'. But there's
+also more to explore inside. Get a torch and head into the mine to see what's
+inside. Maybe it will be interesting.
 ~
 2 0 0 100 -1
 A
