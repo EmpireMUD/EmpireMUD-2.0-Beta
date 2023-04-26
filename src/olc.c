@@ -6257,7 +6257,7 @@ void olc_process_requirements(char_data *ch, char *argument, struct req_data **l
 		skip_spaces(&argument);
 		
 		if (!*num_arg || !isdigit(*num_arg) || !*field_arg) {
-			msg_to_char(ch, "Usage: %s change <number> <amount | vnum> <value>\r\n", command);
+			msg_to_char(ch, "Usage: %s change <number> <amount | group | text | vnum> <value>\r\n", command);
 			return;
 		}
 		
