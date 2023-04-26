@@ -2688,7 +2688,7 @@ X
 stumps tropical seaside ocean forest trees around~
    As you make your way along the jungle's edge, you come across a section
 where the dense foliage abruptly stops, replaced by a stretch of barren ground.
-Here, several tree stumps, their tops cut clean off, jut up from the earth. 
+Here, several tree stumps, their tops cut clean off, jut up from the earth.
 Looking out past the stumps, you can see the shimmering expanse of the ocean,
 its waves crashing against the rocky shore.
 ~
@@ -2820,7 +2820,7 @@ I 9 134 8.00 1 g  # GATHER: thorny sapling
 I 9 139 92.00 1 g  # GATHER: bundle of long leaves
 X
 field irrigation irrigation desert canal around~
-   You find yourself standing in a vast expanse of freshly irrigated desert. 
+   You find yourself standing in a vast expanse of freshly irrigated desert.
 The land is soft and moist beneath your feet, a marked contrast to the dry sand
 that stretches out as far as the eye can see. In the distance, you can see the
 canal that brought life-giving water to this barren place, its gentle flow
@@ -2850,6 +2850,10 @@ E
 E
 0 0 100.00 71
 E
+4 0 1.00 79
+E
+9 0 50.00 79
+E
 11 87 4.00 26
 E
 11 85 4.00 26
@@ -2866,8 +2870,7 @@ I+ 0 70  # Ability: Find Herbs
 I 7 123 100.00 125 p  # PICK: small flower
 I 9 121 85.00 1 g  # GATHER: sticks and leaves
 I 9 131 15.00 1 g  # GATHER: green sapling
-I 20 120 50.00 2 c  # CHOP: large tree
-I 20 120 50.00 1 c  # CHOP: large tree
+I 20 120 100.00 1 c  # CHOP: large tree
 X
 forest trees irrigated irrigation canal around~
    You are standing in a lush forest that has grown on the irrigated soil
@@ -2978,7 +2981,7 @@ stumps field trees forest irrigated irrigation canal around~
    You walk through an irrigated field where stumps of trees lie scattered
 around. The trees have been cut down, leaving behind the stumps as the only
 remnants of their presence. The field has been made fertile by the nearby
-irrigation canal, allowing the growth of crops and vegetation to take place. 
+irrigation canal, allowing the growth of crops and vegetation to take place.
 However, the absence of the trees is noticeable and adds a certain emptiness to
 the area.
 ~
@@ -3074,7 +3077,7 @@ stumps jungle forest trees canal irrigated irrigation around~
    You walk through an irrigated field where stumps of trees lie scattered
 around. The trees have been cut down, leaving behind the stumps as the only
 remnants of their presence. The field has been made fertile by the nearby
-irrigation canal, allowing the growth of crops and vegetation to take place. 
+irrigation canal, allowing the growth of crops and vegetation to take place.
 However, the absence of the trees is noticeable and adds a certain emptiness to
 the area.
 ~
@@ -3179,6 +3182,69 @@ E
 I 5 102 15.00 1 X  # DIG: flint stone
 I 5 101 15.00 1 X  # DIG: lump of clay
 I 5 100 100.00 1 X  # DIG: rock
+S
+#79
+Shady Irrigated Forest~
+A Shady Irrigated Forest~
+'^' 14 jkqv 3 adil np
+C
+chop, dig, gather, pick~
+D0
+&G.&?^^^~
+&g~
+D0
+^^^&G.~
+&g~
+D0
+^&G.&?^^~
+&g~
+D0
+^^&G.&?^~
+&g~
+D0
+&G.&?^^&G.~
+&g~
+D0
+&G..&?^^~
+&g~
+D0
+^^&G..~
+&g~
+D0
+^&G..&?^~
+&g~
+E
+0 1 50.00 71
+E
+0 0 100.00 79
+E
+11 87 4.00 26
+E
+11 85 4.00 26
+I 5 102 15.00 1 X  # DIG: flint stone
+I 5 101 15.00 1 X  # DIG: lump of clay
+I 5 103 8.00 1 X  # DIG: yellow lightning stone
+I 5 100 100.00 1 X  # DIG: rock
+I 6 3014 100.00 1  # FORAGE: dry beans
+I 7 1206 8.33 125 p  # PICK: iridescent blue iris
+I 7 1201 45.83 125 p  # PICK: sack of fiveleaf
+I+ 0 70  # Ability: Find Herbs
+I 7 1204 45.84 125 p  # PICK: daggerbite frond
+I+ 0 70  # Ability: Find Herbs
+I 7 123 100.00 125 p  # PICK: small flower
+I 9 121 85.00 1 g  # GATHER: sticks and leaves
+I 9 131 15.00 1 g  # GATHER: green sapling
+I 20 120 100.00 1 c  # CHOP: large tree
+X
+forest trees irrigated irrigation canal around~
+   You are standing in a lush forest that has grown on the irrigated soil
+around the canal. The trees around you are tall and sturdy, with their leaves
+rustling in the breeze. The ground beneath your feet is covered in a thick
+layer of leaves and other debris, making it soft and spongy to walk on. As you
+look up, you can see glimpses of the sky through the canopy of leaves above
+you. The air around you is fresh and cool, and you can hear the chirping of
+birds and the rustling of leaves as the wind blows through the trees.
+~
 S
 #80
 Lush Oasis~

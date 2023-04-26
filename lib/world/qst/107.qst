@@ -57,6 +57,39 @@ W
 Z
 1 10730
 S
+#10731
+Tutorial: Find the Giant Shoe~
+This quest has no description.
+tba
+~
+You have completed the quest.
+tba
+~
+2 0 0 100 -1
+A
+3 10850
+P
+0 10851 0 1 -
+P
+0 10852 0 1 -
+P
+0 10853 0 1 -
+P
+0 10854 0 1 -
+P
+0 10855 0 1 -
+P
+0 10857 0 1 -
+P
+0 10858 0 1 -
+R
+0 0 1
+W+
+12 10730 0 1 -
+Find the Giant Shoe using nearby~
+Z
+0 10730
+S
 #10732
 To Fetch a Pail of Water~
    Jack and his sister are trying to fetch a pail of water, but it seems they
@@ -316,5 +349,38 @@ W
 2 10746 0 1 -
 Z
 1 10746
+S
+#10750
+Tutorial: Find the Goblin Mine~
+This quest has no description.
+tba
+~
+You have completed the quest.
+tba
+~
+2 0 0 100 -1
+A
+3 10850
+P
+0 10851 0 1 -
+P
+0 10852 0 1 -
+P
+0 10853 0 1 -
+P
+0 10854 0 1 -
+P
+0 10855 0 1 -
+P
+0 10857 0 1 -
+P
+0 10858 0 1 -
+R
+0 0 1
+W+
+12 10750 0 1 -
+Find the Goblin Mine using nearby~
+Z
+0 10750
 S
 $
