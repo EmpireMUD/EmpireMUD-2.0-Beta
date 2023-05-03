@@ -1714,7 +1714,7 @@ ACMD(do_missing_help_files) {
 			found = find_help_entry(LVL_TOP, cmd_info[iter].command);
 		
 			if (!found) {
-				sprintf(lbuf, "%s %-12.12s", lbuf, cmd_info[iter].command);
+				sprintf(lbuf, "%s %-19.19s", lbuf, cmd_info[iter].command);
 				if ((++count % 4) == 0) {
 					strcat(lbuf, "\r\n");
 				}
@@ -1732,13 +1732,13 @@ ACMD(do_missing_help_files) {
 		}
 		
 		if (!find_help_entry(LVL_TOP, SKILL_NAME(skill))) {
-			sprintf(lbuf, "%s %-12.12s", lbuf, SKILL_NAME(skill));
+			sprintf(lbuf, "%s %-19.19s", lbuf, SKILL_NAME(skill));
 			if ((++count % 4) == 0) {
 				strcat(lbuf, "\r\n");
 			}
 		}
 		if (SKILL_ABBREV(skill) && *SKILL_ABBREV(skill) && !find_help_entry(LVL_TOP, SKILL_ABBREV(skill))) {
-			sprintf(lbuf, "%s %-12.12s", lbuf, SKILL_ABBREV(skill));
+			sprintf(lbuf, "%s %-19.19s", lbuf, SKILL_ABBREV(skill));
 			if ((++count % 4) == 0) {
 				strcat(lbuf, "\r\n");
 			}
@@ -1752,13 +1752,13 @@ ACMD(do_missing_help_files) {
 		}
 		
 		if (!find_help_entry(LVL_TOP, ABIL_NAME(abil))) {
-			sprintf(lbuf, "%s %-12.12s", lbuf, ABIL_NAME(abil));
+			sprintf(lbuf, "%s %-19.19s", lbuf, ABIL_NAME(abil));
 			if ((++count % 4) == 0) {
 				strcat(lbuf, "\r\n");
 			}
 		}
-		if (ABIL_COMMAND(abil) && *ABIL_COMMAND(abil) && !find_help_entry(LVL_TOP, ABIL_COMMAND(abil))) {
-			sprintf(lbuf, "%s %-12.12s", lbuf, ABIL_COMMAND(abil));
+		if (ABIL_COMMAND(abil) && *ABIL_COMMAND(abil) && str_cmp(ABIL_COMMAND(abil), ABIL_NAME(abil)) && !find_help_entry(LVL_TOP, ABIL_COMMAND(abil))) {
+			sprintf(lbuf, "%s %-19.19s", lbuf, ABIL_COMMAND(abil));
 			if ((++count % 4) == 0) {
 				strcat(lbuf, "\r\n");
 			}
