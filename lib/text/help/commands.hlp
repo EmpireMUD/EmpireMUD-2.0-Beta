@@ -1024,6 +1024,13 @@ can use the empire's full name, adjective name, or number.
 
 See also: COINS, KEEP
 #
+GOSSIP
+
+EmpireMUD does not have the gossip channel. There are no global in-character
+channels.
+
+See also: CHANNELS
+#
 GRAB HOLD
 
 Usage:  grab <object>
@@ -1040,7 +1047,7 @@ Examples:
 
 See also: EQUIPMENT, REMOVE, WEAR, WIELD, SWAP
 #
-GROUP PARTY
+GROUP PARTY UNGROUP UNPARTY
 
 Usage:  group  -- see status on the group
         group invite <name>  -- invite a player to the group
@@ -1235,6 +1242,14 @@ current location.
 To find buildings that are interlinkable, try 'helpsearch interlink'.
 
 See also: HELPSEARCH, MARK
+#
+INSULT INSULTING
+
+Usage:  insult <person>
+
+This social command insults another person.
+
+See also: SOCIALS
 #
 JUNK "JUNK ITEM" "JUNK OBJECT"
 
@@ -1641,6 +1656,14 @@ Instruments will be played faster while hasted.
 
 See also: HOLD, TIMED ACTION
 #
+POINT
+
+Usage: point <direction | person>
+
+Your character points at the direction or person.
+
+See also: SOCIALS
+#
 POLITICAL "POLITICAL VIEW" "TOGGLE POLITICAL"
 
 Usage:  toggle political [on/off]
@@ -1728,6 +1751,13 @@ Examples:
   > pour cup out
 
 See also: FILL, TRENCH
+#
+PRACTICE PRACTICES PRACTICING
+
+EmpireMUD does not use the 'practice' system. Instead, manage your skills and
+abilities with the 'skill' command.
+
+See also: SKILLS
 #
 PROGRESS PROGRESSION "EMPIRE PROGRESSION" "PROGRESS GOALS" "PROGRESSION GOALS" "PROGRESS POINTS" GOAL GOALS
 
@@ -1896,6 +1926,25 @@ Examples:
 
 See also: GRAB, HOLD, WEAR, WIELD, SHEATH, DRAW, SWAP
 #
+RENT RENTING INN SAVING
+
+EmpireMUD does not use the 'rent' system from CircleMUD. Players generally log
+into the game in the same place they logged out, with their entire inventory
+and equipment intact.
+
+There are a few cases where people don't log back in in the same place. In
+these cases, the player is usually relocated to a tomb or Tower of Souls:
+- If they were in an adventure and it despawned, or they were logged out more
+  than an hour.
+- If they were in territory claimed by another player and were logged out more
+  than an hour.
+- If they were in a ship (or other vehicle) and the ship moved while they were
+  logged out.
+- If they have 'toggle autorecall' on and were logged out more than an hour,
+  in which case they they are sent to their home, if they have one.
+
+See also: HOME, STARTING LOCATION, TOGGLE AUTORECALL, TOMB
+#
 REPAIR MAINTAIN MAINTENANCE DISREPAIR
 
 Usage:  repair [vehicle | building]
@@ -1936,6 +1985,14 @@ You tell someone, 'Who are you?'
 
 See also: IGNORE, TELL, NOTELL
 Immortals see also: BREAKREPLY
+#
+REPORT
+
+EmpireMUD doesn't have a 'report' command. If you're looking on information on
+your group members, try the 'group' command by itself or the 'summary' command.
+If you want to see your own stats from combat, use 'meters'.
+
+See also: GROUP, METERS, SUMMARY
 #
 ROADSIGN "ROAD SIGN" SIGN "BLANK SIGN"
 
@@ -2072,7 +2129,7 @@ to save yourself.
 
 This is not the type of game where you can re-load from past saves.
 #
-SAY OOCSAY OSAY TELL ASK WHISPER ' ""
+SAY OOCSAY OSAY TELL ASK WHISPER ' \"
 
 Usage:  say <string>
         say #<language> <string>
@@ -2726,6 +2783,13 @@ Example:
   > wield 3.sword    (Wield the third sword in your inventory)
 
 See also: EQUIPMENT, REMOVE, WEAR, SHEATH, DRAW, SWAP
+#
+WIMPY
+
+EmpireMUD does not have a 'wimpy' command. There is no automatic way for
+players to flee.
+
+See also: FLEE, FLEET
 #
 WIZLIST GODLIST
 

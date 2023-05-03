@@ -605,6 +605,13 @@ Example:
 
 See also: GRANT, VNUM
 #d
+MISSINGHELP MISSINGHELPS "MISSING HELPS"
+
+Usage:  missinghelp
+
+This command lists any commands, skills, or abilities that do not have help
+files.
+#d
 MOVEEINV "MOVE EINV" "MOVE EMPIRE INVENTORY"
 
 Usage:  moveeinv "<empire>" <from island> <to island>
