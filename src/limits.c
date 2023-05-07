@@ -529,7 +529,7 @@ bool point_update_char(char_data *ch) {
 
 
 /**
-* Runs a real update (every 5 seconds) on ch. This is mainly for player
+* Runs a real update (generally 5 seconds) on ch. This is mainly for player
 * updates, but NPCs hit it for things like affects.
 *
 * @param char_data *ch The character to update.
@@ -1810,8 +1810,8 @@ void point_update_obj(obj_data *obj) {
 
 
 /**
-* Real update (per 5 seconds) on an object. This is only for things that need
-* to happen that often. Everything else happens in a point update.
+* Real update (generally 5 seconds) on an object. This is only for things that
+* need to happen that often. Everything else happens in a point update.
 *
 * @param obj_data *obj The object to update.
 */
@@ -2123,11 +2123,11 @@ void gain_condition(char_data *ch, int condition, int value) {
 
 
 /**
-* health per 5 seconds
+* health per real update (usually 5 seconds)
 *
 * @param char_data *ch the person
 * @param bool info_only TRUE = no skillups
-* @return int How much health to gain per 5 seconds.
+* @return int How much health to gain per update.
 */
 int health_gain(char_data *ch, bool info_only) {
 	double gain, min, needed;
@@ -2162,11 +2162,11 @@ int health_gain(char_data *ch, bool info_only) {
 
 
 /**
-* mana per 5 seconds
+* mana per real update (usually 5 seconds)
 *
 * @param char_data *ch the person
 * @param bool info_only TRUE = no skillups
-* @return int How much mana to gain per 5 seconds.
+* @return int How much mana to gain per update.
 */
 int mana_gain(char_data *ch, bool info_only) {
 	double gain, min, needed;
@@ -2216,11 +2216,11 @@ int mana_gain(char_data *ch, bool info_only) {
 
 
 /**
-* move per 5 seconds
+* move per real update (usually 5 seconds)
 *
 * @param char_data *ch the person
 * @param bool info_only TRUE = no skillups
-* @return int How much move to gain per 5 seconds.
+* @return int How much move to gain per update.
 */
 int move_gain(char_data *ch, bool info_only) {
 	double gain, min, needed;
@@ -2264,7 +2264,7 @@ int move_gain(char_data *ch, bool info_only) {
 //// CORE PERIODICALS ////////////////////////////////////////////////////////
 
 /**
-* Real Update: runs every 5 seconds, primarily for player characters,
+* Real Update: generally every 5 seconds, primarily for player characters,
 * affects, and objects. REAL_UPDATES_PER_MUD_HOUR determines actual timing.
 */
 void real_update(void) {
