@@ -920,7 +920,7 @@ ACMD(do_enervate) {
 		return;
 	}
 	
-	charge_ability_cost(ch, MANA, cost, COOLDOWN_ENERVATE, SECS_PER_MUD_HOUR, WAIT_COMBAT_SPELL);
+	charge_ability_cost(ch, MANA, cost, COOLDOWN_ENERVATE, 75, WAIT_COMBAT_SPELL);
 	
 	if (SHOULD_APPEAR(ch)) {
 		appear(ch);
