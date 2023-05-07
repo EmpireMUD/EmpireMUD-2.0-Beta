@@ -2195,7 +2195,7 @@ int perform_set(char_data *ch, char_data *vict, int mode, char *val_arg) {
 			sprintf(output, "%s's hunger set to %d.", GET_NAME(vict), value);
 		}
 		else {
-			send_to_char("Must be 'off' or a value from 0 to 24.\r\n", ch);
+			send_to_char("Must be 'off' or a value from 0 to %d.\r\n", ch, MAX_CONDITION);
 			return (0);
 		}
 	}
@@ -2211,7 +2211,7 @@ int perform_set(char_data *ch, char_data *vict, int mode, char *val_arg) {
 			sprintf(output, "%s's drunk set to %d.", GET_NAME(vict), value);
 		}
 		else {
-			send_to_char("Must be 'off' or a value from 0 to 24.\r\n", ch);
+			send_to_char("Must be 'off' or a value from 0 to %d.\r\n", ch, MAX_CONDITION);
 			return (0);
 		}
 	}
@@ -2227,7 +2227,7 @@ int perform_set(char_data *ch, char_data *vict, int mode, char *val_arg) {
 			sprintf(output, "%s's thirst set to %d.", GET_NAME(vict), value);
 		}
 		else {
-			send_to_char("Must be 'off' or a value from 0 to 24.\r\n", ch);
+			send_to_char("Must be 'off' or a value from 0 to %d.\r\n", ch, MAX_CONDITION);
 			return (0);
 		}
 	}

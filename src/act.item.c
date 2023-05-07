@@ -5096,7 +5096,7 @@ ACMD(do_drink) {
 	}
 
 	/* The pig is drunk */
-	if (GET_COND(ch, DRUNK) > 360 && GET_COND(ch, THIRST) < 345) {
+	if (IS_DRUNK(ch) && !IS_THIRSTY(ch)) {
 		if (type >= 0)
 			msg_to_char(ch, "You're so inebriated that you don't dare get that close to the water.\r\n");
 		else {

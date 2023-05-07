@@ -42,7 +42,7 @@
 
 // local data
 const char *default_generic_name = "Unnamed Generic";
-#define MAX_LIQUID_COND  (MAX_CONDITION / 15)	// approximate game hours of max cond
+#define MAX_LIQUID_COND  (MAX_CONDITION / REAL_UPDATES_PER_MUD_HOUR)	// approximate game hours of max cond
 
 // local funcs
 struct generic_relation *copy_generic_relations(struct generic_relation *list);

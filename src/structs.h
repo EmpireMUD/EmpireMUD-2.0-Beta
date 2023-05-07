@@ -2966,7 +2966,7 @@ typedef enum {
 #define MAX_CMD_LENGTH  (MAX_STRING_LENGTH-80)	// can't go bigger than this, altho DG Scripts wanted 16k
 #define MAX_COIN  2140000000	// 2.14b (< MAX_INT)
 #define MAX_COIN_TYPES  10	// don't store more than this many different coin types
-#define MAX_CONDITION  750	// FULL, etc
+#define MAX_CONDITION  (REAL_UPDATES_PER_MUD_HOUR * 24 * 2)	// FULL, etc: 2 days of hunger/thirst
 #define MAX_CONFIG_TEXT  4000	// long-string configs
 #define MAX_EMPIRE_DESCRIPTION  2000
 #define MAX_FACTION_DESCRIPTION  4000
@@ -4515,7 +4515,7 @@ struct player_special_data {
 	
 	// misc player attributes
 	ubyte apparent_age;	// for vampires	
-	sh_int conditions[NUM_CONDS];	// Drunk, full, thirsty
+	int conditions[NUM_CONDS];	// Drunk, full, thirsty
 	int resources[NUM_MATERIALS];	// God resources
 	
 	// various lists

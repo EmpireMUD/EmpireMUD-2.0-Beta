@@ -711,7 +711,7 @@ void real_update_char(char_data *ch) {
 		GET_LAST_KNOWN_LEVEL(ch) = GET_COMPUTED_LEVEL(ch);
 	
 		// very drunk? more confused!
-		if (GET_COND(ch, DRUNK) > 350) {
+		if (IS_DRUNK(ch)) {
 			GET_CONFUSED_DIR(ch) = number(0, NUM_SIMPLE_DIRS-1);
 		}
 	
@@ -894,12 +894,12 @@ void real_update_char(char_data *ch) {
 		}
 	
 		random_encounter(ch);
-	}	// end npc-only
+	}	// end player-only
 	
 	// DO THESE LAST:
 	
 	// call point-update if it's our turn
-	if (IS_NPC(ch) && (GET_MOB_VNUM(ch) % REAL_UPDATES_PER_MUD_HOUR) == point_update_cycle) {
+	if (IS_NPC(ch) && (ABSOLUTE(GET_MOB_VNUM(ch)) % REAL_UPDATES_PER_MUD_HOUR) == point_update_cycle) {
 		if (!point_update_char(ch)) {
 			return;
 		}
@@ -2088,11 +2088,9 @@ void gain_condition(char_data *ch, int condition, int value) {
 	}
 
 	intoxicated = (GET_COND(ch, DRUNK) > 0);
-
-	GET_COND(ch, condition) += value;
-
-	GET_COND(ch, condition) = MAX(0, GET_COND(ch, condition));
-	GET_COND(ch, condition) = MIN(MAX_CONDITION, GET_COND(ch, condition));
+	
+	// add the value
+	SAFE_ADD(GET_COND(ch, condition), value, 0, MAX_CONDITION, FALSE);
 	
 	// prevent well-fed if hungry
 	if (IS_HUNGRY(ch) && value > 0) {
@@ -2314,7 +2312,7 @@ void real_update(void) {
 	// vehicles
 	DL_FOREACH_SAFE(vehicle_list, veh, global_next_vehicle) {
 		// each vehicle runs during part of the hour
-		if (!VEH_IS_EXTRACTED(veh) && (VEH_VNUM(veh) % REAL_UPDATES_PER_MUD_HOUR) == point_update_cycle) {
+		if (!VEH_IS_EXTRACTED(veh) && (ABSOLUTE(VEH_VNUM(veh)) % REAL_UPDATES_PER_MUD_HOUR) == point_update_cycle) {
 			point_update_vehicle(veh);
 		}
 	}
