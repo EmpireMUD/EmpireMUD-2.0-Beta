@@ -1185,6 +1185,7 @@ int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_COORD(ge
 #define GET_LANGUAGES(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->languages))
 #define GET_LARGEST_INVENTORY(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->largest_inventory))
 #define GET_LAST_COMPANION(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->last_companion))
+#define GET_LAST_COND_MESSAGE_TIME(ch, cond)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->last_cond_message_time[(cond)]))
 #define GET_LAST_CORPSE_ID(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->last_corpse_id))
 #define GET_LAST_DEATH_TIME(ch)  CHECK_PLAYER_SPECIAL(REAL_CHAR(ch), (REAL_CHAR(ch)->player_specials->last_death_time))
 #define GET_LAST_GOAL_CHECK(ch)  CHECK_PLAYER_SPECIAL(REAL_CHAR(ch), (REAL_CHAR(ch)->player_specials->last_goal_check))

@@ -39,7 +39,6 @@
 */
 
 // external vars
-extern bool gain_cond_message;
 
 // external funcs
 ACMD(do_dismount);
@@ -2094,8 +2093,9 @@ void gain_condition(char_data *ch, int condition, int value) {
 	if (IS_HUNGRY(ch) && value > 0) {
 		affect_from_char(ch, ATYPE_WELL_FED, TRUE);
 	}
-
-	if (!gain_cond_message) {
+	
+	// too soon for a message?
+	if (GET_LAST_COND_MESSAGE_TIME(ch, condition) + SECS_PER_REAL_MIN > time(0)) {
 		return;
 	}
 
@@ -2103,18 +2103,21 @@ void gain_condition(char_data *ch, int condition, int value) {
 		case FULL: {
 			if (IS_HUNGRY(ch) && value > 0) {
 				msg_to_char(ch, "You are hungry.\r\n");
+				GET_LAST_COND_MESSAGE_TIME(ch, condition) = time(0);
 			}
 			return;
 		}
 		case THIRST: {
 			if (IS_THIRSTY(ch) && value > 0) {
 				msg_to_char(ch, "You are thirsty.\r\n");
+				GET_LAST_COND_MESSAGE_TIME(ch, condition) = time(0);
 			}
 			break;
 		}
 		case DRUNK: {
 			if (intoxicated && !GET_COND(ch, condition)) {
 				msg_to_char(ch, "You are now sober.\r\n");
+				GET_LAST_COND_MESSAGE_TIME(ch, condition) = time(0);
 			}
 			break;
 		}

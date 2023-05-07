@@ -133,7 +133,6 @@ int tics_passed = 0;					/* for extern checkpointing			*/
 int scheck = 0;							/* for syntax checking mode			*/
 struct timeval null_time;				/* zero-valued time structure		*/
 FILE *logfile = NULL;					/* Where to send the log messages	*/
-bool gain_cond_message = FALSE;		/* gain cond send messages			*/
 int dg_act_check;	/* toggle for act_trigger */
 unsigned long main_game_pulse = 0;	/* number of pulses since game start */
 static bool reboot_recovery = FALSE;
@@ -808,11 +807,6 @@ void heartbeat(unsigned long heart_pulse) {
 	#define HEARTBEAT_LOG(id_str)
 	
 	// TODO go through this, arrange it better, --combine-anything-combinable(done)--
-
-	// only get a gain condition message on the hour
-	if (HEARTBEAT(SECS_PER_MUD_HOUR)) {
-		gain_cond_message = TRUE;
-	}
 	
 	HEARTBEAT_LOG("start")
 	
@@ -874,7 +868,9 @@ void heartbeat(unsigned long heart_pulse) {
 	if (HEARTBEAT(SECS_PER_MUD_HOUR)) {
 		weather_and_time();
 		HEARTBEAT_LOG("12")
-		
+	}
+	
+	if (HEARTBEAT(WORKFORCE_CYCLE)) {
 		chore_update();
 		HEARTBEAT_LOG("13")
 	}
@@ -996,9 +992,6 @@ void heartbeat(unsigned long heart_pulse) {
 	HEARTBEAT_LOG("42")
 	free_freeable_triggers();
 	HEARTBEAT_LOG("43")
-
-	/* Turn this off */
-	gain_cond_message = FALSE;
 	
 	// prevent accidentally leaving this on
 	pause_affect_total = FALSE;
