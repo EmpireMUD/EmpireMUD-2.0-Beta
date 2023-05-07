@@ -2353,7 +2353,7 @@ int perform_dupe_check(descriptor_data *d) {
 	d->character = target;
 	d->character->desc = d;
 	d->original = NULL;
-	d->character->char_specials.timer = 0;
+	GET_IDLE_SECONDS(d->character) = 0;
 	REMOVE_BIT(PLR_FLAGS(d->character), PLR_MAILING);
 	STATE(d) = CON_PLAYING;
 

@@ -280,7 +280,7 @@ bool users_output(char_data *to, char_data *tch, descriptor_data *d, char *name_
 		strcpy(state, "Linkdead");
 
 	if (ch)
-		sprintf(idletime, "%3d", ch->char_specials.timer * SECS_PER_MUD_HOUR / SECS_PER_REAL_MIN);
+		sprintf(idletime, "%3d", GET_IDLE_SECONDS(ch) / SECS_PER_REAL_MIN);
 	else
 		strcpy(idletime, "");
 
@@ -2195,7 +2195,7 @@ int perform_set(char_data *ch, char_data *vict, int mode, char *val_arg) {
 			sprintf(output, "%s's hunger set to %d.", GET_NAME(vict), value);
 		}
 		else {
-			send_to_char("Must be 'off' or a value from 0 to %d.\r\n", ch, MAX_CONDITION);
+			msg_to_char(ch, "Must be 'off' or a value from 0 to %d.\r\n", MAX_CONDITION);
 			return (0);
 		}
 	}
@@ -2211,7 +2211,7 @@ int perform_set(char_data *ch, char_data *vict, int mode, char *val_arg) {
 			sprintf(output, "%s's drunk set to %d.", GET_NAME(vict), value);
 		}
 		else {
-			send_to_char("Must be 'off' or a value from 0 to %d.\r\n", ch, MAX_CONDITION);
+			msg_to_char(ch, "Must be 'off' or a value from 0 to %d.\r\n", MAX_CONDITION);
 			return (0);
 		}
 	}
@@ -2227,7 +2227,7 @@ int perform_set(char_data *ch, char_data *vict, int mode, char *val_arg) {
 			sprintf(output, "%s's thirst set to %d.", GET_NAME(vict), value);
 		}
 		else {
-			send_to_char("Must be 'off' or a value from 0 to %d.\r\n", ch, MAX_CONDITION);
+			msg_to_char(ch, "Must be 'off' or a value from 0 to %d.\r\n", MAX_CONDITION);
 			return (0);
 		}
 	}
@@ -6286,7 +6286,7 @@ void do_stat_character(char_data *ch, char_data *k) {
 		msg_to_char(ch, "Nameset: \ty%s\t0, Language: [\tc%d\t0] \ty%s\t0\r\n", name_sets[MOB_NAME_SET(k)], MOB_LANGUAGE(k), get_generic_name_by_vnum(MOB_LANGUAGE(k)));
 	}
 	else {
-		msg_to_char(ch, "Idle Timer (in tics) [\tg%d\t0], View Height: [\tg%d\t0]\r\n", k->char_specials.timer, get_view_height(k, IN_ROOM(k)));
+		msg_to_char(ch, "Idle Timer (minutes) [\tg%.1f\t0], View Height: [\tg%d\t0]\r\n", GET_IDLE_SECONDS(k) / (double) SECS_PER_REAL_MIN, get_view_height(k, IN_ROOM(k)));
 		sprintbit(PLR_FLAGS(k), player_bits, buf2, TRUE);
 		msg_to_char(ch, "PLR: &c%s&0\r\n", buf2);
 		sprintbit(PRF_FLAGS(k), preference_bits, buf2, TRUE);

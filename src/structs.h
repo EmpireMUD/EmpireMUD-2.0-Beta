@@ -4608,6 +4608,7 @@ struct player_special_data {
 	
 	// UNSAVED PORTION //
 	
+	int idle_seconds;	// how long they have been idle (updated every 5 seconds or so)
 	int gear_level;	// computed gear level -- determine_gear_level()
 	byte reboot_conf;	// Reboot confirmation
 	byte create_points;	// Used in character creation
@@ -4716,7 +4717,6 @@ struct char_special_data {
 	int mana_regen;	// mana regen add
 	
 	int carry_items;	// Number of items carried
-	int	timer;	// Timer for update
 };
 
 

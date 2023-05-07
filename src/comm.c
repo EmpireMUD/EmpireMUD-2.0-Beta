@@ -608,7 +608,7 @@ bool check_reboot_confirms(void) {
 		else if (IS_NPC(desc->character)) {
 			continue;
 		}
-		else if (!REBOOT_CONF(desc->character) && (desc->character->char_specials.timer * SECS_PER_MUD_HOUR / SECS_PER_REAL_MIN) < 5) {
+		else if (!REBOOT_CONF(desc->character) && (GET_IDLE_SECONDS(desc->character) / SECS_PER_REAL_MIN) < 5) {
 			found = TRUE;
 		}
 	}
@@ -2935,8 +2935,8 @@ char *make_prompt(descriptor_data *d) {
 	else if (STATE(d) == CON_PLAYING) {
 		*prompt = '\0';
 		
-		// show idle after 10 minutes
-		if ((d->character->char_specials.timer * SECS_PER_MUD_HOUR / SECS_PER_REAL_MIN) >= 5) {
+		// show idle after 5 minutes
+		if ((GET_IDLE_SECONDS(d->character) / SECS_PER_REAL_MIN) >= 5) {
 			strcat(prompt, "\tr[IDLE]\t0 ");
 		}
 
@@ -3688,8 +3688,8 @@ void game_loop(socket_t mother_desc) {
 				continue;
 
 			if (d->character) {
-				/* Reset the idle timer & pull char back from void if necessary */
-				d->character->char_specials.timer = 0;
+				// Reset the idle timer
+				GET_IDLE_SECONDS(d->character) = 0;
 				GET_WAIT_STATE(d->character) = 1;
 			}
 			d->has_prompt = 0;

@@ -179,7 +179,8 @@ void check_idle_passwords(void) {
 
 
 /**
-* This checks if a character is too idle and disconnects or times them out.
+* This checks if a character is too idle and disconnects or times them out. It
+* should be called ONLY in the "real updates" (generally every 5 seconds).
 *
 * @param char_data *ch The person to check.
 * @return bool TRUE if the player is still in-game, FALSE if they idled out.
@@ -189,14 +190,14 @@ bool check_idling(char_data *ch) {
 		return TRUE;
 	}
 
-	ch->char_specials.timer++;
+	GET_IDLE_SECONDS(ch) += SECS_PER_REAL_UPDATE;
 	
 	// delay idle-out if active and acting
-	if (ch->desc && !IS_NPC(ch) && GET_ACTION(ch) != ACT_NONE && ch->char_specials.timer < config_get_int("idle_action_rent_time")) {
+	if (ch->desc && GET_ACTION(ch) != ACT_NONE && (GET_IDLE_SECONDS(ch) / SECS_PER_REAL_MIN) < config_get_int("idle_action_rent_time")) {
 		return TRUE;
 	}
 
-	if (ch->char_specials.timer > (ch->desc ? config_get_int("idle_rent_time") : config_get_int("idle_linkdead_rent_time"))) {
+	if ((GET_IDLE_SECONDS(ch) / SECS_PER_REAL_MIN) > (ch->desc ? config_get_int("idle_rent_time") : config_get_int("idle_linkdead_rent_time"))) {
 		return perform_idle_out(ch);
 	}
 	
@@ -393,9 +394,6 @@ bool point_update_char(char_data *ch) {
 	// remove stale offers -- this needs to happen even if dead (resurrect)
 	if (!IS_NPC(ch)) {
 		clean_offers(ch);
-		if (!check_idling(ch)) {
-			return FALSE;
-		}
 	}
 	
 	// everything beyond here only matters if still alive
@@ -556,8 +554,8 @@ void real_update_char(char_data *ch) {
 		return;
 	}
 	
-	// DEAD players: check idle early
-	if (IS_DEAD(ch) && !IS_NPC(ch) && (GET_IDNUM(ch) % REAL_UPDATES_PER_MUD_HOUR) == point_update_cycle && !check_idling(ch)) {
+	// idle players: check very early
+	if (!REAL_NPC(ch) && !check_idling(ch)) {
 		return;
 	}
 	

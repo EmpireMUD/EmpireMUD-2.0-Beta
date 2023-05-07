@@ -1999,8 +1999,8 @@ char *one_who_line(char_data *ch, bool shortlist, bool screenreader) {
 	if (IS_AFK(ch)) {
 		size += snprintf(out + size, sizeof(out) - size, " &r(AFK)&0");
 	}
-	if ((ch->char_specials.timer * SECS_PER_MUD_HOUR / SECS_PER_REAL_MIN) >= 5) {
-		size += snprintf(out + size, sizeof(out) - size, " (idle: %d)", (ch->char_specials.timer * SECS_PER_MUD_HOUR / SECS_PER_REAL_MIN));
+	if ((GET_IDLE_SECONDS(ch) / SECS_PER_REAL_MIN) >= 5) {
+		size += snprintf(out + size, sizeof(out) - size, " (idle: %d)", (GET_IDLE_SECONDS(ch) / SECS_PER_REAL_MIN));
 	}
 	if (IS_PVP_FLAGGED(ch)) {
 		size += snprintf(out + size, sizeof(out) - size, " &R(PVP)&0");
