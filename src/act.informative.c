@@ -731,15 +731,15 @@ void display_score_to_char(char_data *ch, char_data *to) {
 	msg_to_char(to, " +-------------------------------- Condition --------------------------------+\r\n");
 	
 	// row 1 col 1: health, 6 color codes = 12 invisible characters
-	sprintf(lbuf, "&g%d&0/&g%d&0 &g%+d&0/5s", GET_HEALTH(ch), GET_MAX_HEALTH(ch), health_gain(ch, TRUE));
+	sprintf(lbuf, "&g%d&0/&g%d&0 &g%+d&0/%ds", GET_HEALTH(ch), GET_MAX_HEALTH(ch), health_gain(ch, TRUE), SECS_PER_REAL_UPDATE);
 	msg_to_char(to, "  Health: %-28.28s", lbuf);
 
 	// row 1 col 2: move, 6 color codes = 12 invisible characters
-	sprintf(lbuf, "&y%d&0/&y%d&0 &y%+d&0/5s", GET_MOVE(ch), GET_MAX_MOVE(ch), move_gain(ch, TRUE));
+	sprintf(lbuf, "&y%d&0/&y%d&0 &y%+d&0/%ds", GET_MOVE(ch), GET_MAX_MOVE(ch), move_gain(ch, TRUE), SECS_PER_REAL_UPDATE);
 	msg_to_char(to, " Move: %-30.30s", lbuf);
 	
 	// row 1 col 3: mana, 6 color codes = 12 invisible characters
-	sprintf(lbuf, "&c%d&0/&c%d&0 &c%+d&0/5s", GET_MANA(ch), GET_MAX_MANA(ch), mana_gain(ch, TRUE));
+	sprintf(lbuf, "&c%d&0/&c%d&0 &c%+d&0/%ds", GET_MANA(ch), GET_MAX_MANA(ch), mana_gain(ch, TRUE), SECS_PER_REAL_UPDATE);
 	msg_to_char(to, " Mana: %-30.30s\r\n", lbuf);
 	
 	// row 2 col 1: conditions

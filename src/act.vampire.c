@@ -638,7 +638,7 @@ void check_un_vampire(char_data *ch, bool remove_vampire_skills) {
 
 
 /**
-* Updates the "biting" action, per 5 seconds.
+* Updates the "biting" action, per real update (usually 5 seconds).
 *
 * @param char_data *ch The person who might be biting, to update.
 */

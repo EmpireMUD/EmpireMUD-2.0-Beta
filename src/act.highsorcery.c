@@ -93,7 +93,7 @@ const struct {
 #define RIT_FLAG  BIT(0)
 
 // misc
-#define NO_MESSAGE	{ "\t", "\t" }	// skip a tick (5 seconds)
+#define NO_MESSAGE	{ "\t", "\t" }	// skip a tick (generally 5 seconds)
 #define MESSAGE_END  { "\n", "\n" }  // end of sequence (one final tick to get here)
 
 // ritual prototypes

@@ -313,7 +313,7 @@ typedef struct vehicle_data vehicle_data;
 #define APPLY_MOVE  11	// Apply to max move points
 #define APPLY_RESIST_PHYSICAL  12	// Apply to physical damage resistance
 #define APPLY_BLOCK  13	// Apply to chance to block
-#define APPLY_HEAL_OVER_TIME  14	// heals you every 5
+#define APPLY_HEAL_OVER_TIME  14	// heals you every "real update"
 #define APPLY_HEALTH  15	// Apply to max health
 #define APPLY_MANA  16	// Apply to max mana
 #define APPLY_TO_HIT  17	// +to-hit
@@ -629,7 +629,7 @@ typedef struct vehicle_data vehicle_data;
 #define AGH_DODGE  BIT(3)	// gains when actor dodges
 #define AGH_BLOCK  BIT(4)	// gains when actor blocks
 #define AGH_TAKE_DAMAGE  BIT(5)	// gains when hit in melee
-#define AGH_PASSIVE_FREQUENT  BIT(6)	// gains every 5
+#define AGH_PASSIVE_FREQUENT  BIT(6)	// gains every "real update"
 #define AGH_PASSIVE_HOURLY  BIT(7)	// gains every game hour
 #define AGH_ONLY_DARK  BIT(8)	// only gains if it's dark
 #define AGH_ONLY_LIGHT  BIT(9)	// only gains if it's light
@@ -962,7 +962,7 @@ typedef struct vehicle_data vehicle_data;
 #define ATT_BONUS_PHYSICAL  6	// extra physical damage
 #define ATT_BONUS_MAGICAL  7	// extra magical damage
 #define ATT_BONUS_HEALING  8	// extra healing
-#define ATT_HEAL_OVER_TIME  9	// heal per 5
+#define ATT_HEAL_OVER_TIME  9	// heal per "real update"
 #define ATT_RESIST_MAGICAL  10	// damage reduction
 #define ATT_CRAFTING_BONUS  11	// levels added to crafting
 #define ATT_BLOOD_UPKEEP  12	// blood cost per hour
