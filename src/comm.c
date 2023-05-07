@@ -879,8 +879,8 @@ void heartbeat(unsigned long heart_pulse) {
 		HEARTBEAT_LOG("13")
 	}
 	
-	// slightly off the hour to prevent yet another thing on the tick
-	if (HEARTBEAT(SECS_PER_MUD_HOUR+1)) {
+	// odd timing to avoid lining up with other ticks
+	if (HEARTBEAT(119)) {
 		update_empire_npc_data();
 		HEARTBEAT_LOG("14")
 	}
