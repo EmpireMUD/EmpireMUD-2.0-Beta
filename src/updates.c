@@ -2463,9 +2463,11 @@ void b5_152_world_affects(void) {
 	HASH_ITER(hh, world_table, room, next_room) {
 		LL_FOREACH(ROOM_AFFECTS(room), af) {
 			// these were saved as timestamps before, but should now be seconds
-			af->expire_time -= time(0);
-			schedule_room_affect_expire(room, af);
-			request_world_save(GET_ROOM_VNUM(room), WSAVE_ROOM);
+			if (af->expire_time != UNLIMITED) {
+				af->expire_time -= time(0);
+				schedule_room_affect_expire(room, af);
+				request_world_save(GET_ROOM_VNUM(room), WSAVE_ROOM);
+			}
 		}
 	}
 	
@@ -2473,9 +2475,11 @@ void b5_152_world_affects(void) {
 	DL_FOREACH(character_list, mob) {
 		LL_FOREACH(mob->affected, af) {
 			// these were saved in 5-second updates and are now in 1-second intervals instead
-			af->expire_time = time(0) + 5 * (af->expire_time - time(0));
-			schedule_affect_expire(mob, af);
-			request_char_save_in_world(mob);
+			if (af->expire_time != UNLIMITED) {
+				af->expire_time = time(0) + 5 * (af->expire_time - time(0));
+				schedule_affect_expire(mob, af);
+				request_char_save_in_world(mob);
+			}
 		}
 	}
 }
@@ -2487,9 +2491,12 @@ PLAYER_UPDATE_FUNC(b5_152_player_affects) {
 	
 	LL_FOREACH(ch->affected, af) {
 		// these were saved in 5-second updates and are now in 1-second intervals instead
-		af->expire_time = time(0) + 5 * (af->expire_time - time(0));
-		// they are not in the world so we don't need this:
-		// schedule_affect_expire(ch, af);
+		if (af->expire_time != UNLIMITED) {
+			af->expire_time = time(0) + 5 * (af->expire_time - time(0));
+			
+			// they are not in the world so we don't need this:
+			// schedule_affect_expire(ch, af);
+		}
 	}
 }
 
