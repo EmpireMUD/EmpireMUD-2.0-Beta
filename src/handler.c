@@ -1259,6 +1259,8 @@ void schedule_affect_expire(char_data *ch, struct affected_type *af) {
 		af->expire_event = NULL;	// ensure null
 	}
 	else {
+		log("Debug: # %s %d %ld scheduling", GET_PC_NAME(ch), af->type, af->expire_time);
+		
 		// create the event
 		CREATE(expire_data, struct affect_expire_event_data, 1);
 		expire_data->character = ch;
