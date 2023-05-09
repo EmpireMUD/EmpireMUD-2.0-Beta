@@ -123,8 +123,6 @@ EVENTFUNC(affect_expire_event) {
 	// cancel this first
 	af->expire_event = NULL;
 	
-	log("Debug: * %s %d %ld expiring", GET_PC_NAME(ch), af->type, af->expire_time);
-	
 	// messaging?
 	if ((af->type > 0)) {
 		if (!af->next || (af->next->type != af->type) || (af->next->expire_time > af->expire_time)) {

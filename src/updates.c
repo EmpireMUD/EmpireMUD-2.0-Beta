@@ -2254,7 +2254,7 @@ void b5_151_terrain_fix(void) {
 		}
 		else if ((GET_SECT_VNUM(map->base_sector) == b5151_RIVER && GET_SECT_VNUM(map->natural_sector) != b5151_RIVER) || (GET_SECT_VNUM(map->base_sector) == b5151_ESTUARY && GET_SECT_VNUM(map->natural_sector) != b5151_ESTUARY)) {
 			if (GET_SECT_VNUM(map->natural_sector) == b5151_RIVER || GET_SECT_VNUM(map->natural_sector) == b5151_ESTUARY) {
-				// log("- (%d, %d) DEBUG: Probably fine (River or Estuary became River or Estuary)", MAP_X_COORD(map->vnum), MAP_Y_COORD(map->vnum));
+				// log("- (%d, %d) Probably fine (River or Estuary became River or Estuary)", MAP_X_COORD(map->vnum), MAP_Y_COORD(map->vnum));
 			}
 			else if (GET_SECT_VNUM(map->natural_sector) == b5151_OASIS) {
 				// log("- (%d, %d) River to Verdant Canal", MAP_X_COORD(map->vnum), MAP_Y_COORD(map->vnum));
@@ -2281,10 +2281,10 @@ void b5_151_terrain_fix(void) {
 		else if (GET_SECT_VNUM(map->natural_sector) == b5151_OASIS && (GET_SECT_VNUM(map->base_sector) != b5151_OASIS || GET_SECT_VNUM(map->sector_type) != b5151_OASIS)) {
 			// natural oasis but not base/currently oasis
 			if (b5151_no_sect_change(GET_SECT_VNUM(map->sector_type)) && (GET_SECT_VNUM(map->base_sector) == b5151_OASIS || GET_SECT_VNUM(map->base_sector) == b5151_ENCHANTED_OASIS)) {
-				// log("- (%d, %d) DEBUG: Probably fine (Bld/Road on Oasis/Oasis)", MAP_X_COORD(map->vnum), MAP_Y_COORD(map->vnum));
+				// log("- (%d, %d) Probably fine (Bld/Road on Oasis/Oasis)", MAP_X_COORD(map->vnum), MAP_Y_COORD(map->vnum));
 			}
 			else if (GET_SECT_VNUM(map->sector_type) == b5151_ENCHANTED_OASIS && GET_SECT_VNUM(map->base_sector) == b5151_ENCHANTED_OASIS) {
-				// log("- (%d, %d) DEBUG: Probably fine (Enchanted Oasis on Oasis)", MAP_X_COORD(map->vnum), MAP_Y_COORD(map->vnum));
+				// log("- (%d, %d) Probably fine (Enchanted Oasis on Oasis)", MAP_X_COORD(map->vnum), MAP_Y_COORD(map->vnum));
 			}
 			else if (GET_SECT_VNUM(map->sector_type) == b5151_BUILDING && b5151_is_DESERT(GET_SECT_VNUM(map->base_sector))) {
 				// log("- (%d, %d) Building on removed Oasis -> Dry Oasis", MAP_X_COORD(map->vnum), MAP_Y_COORD(map->vnum));
@@ -2370,19 +2370,19 @@ void b5_151_terrain_fix(void) {
 		else if (b5151_is_DESERT(GET_SECT_VNUM(map->natural_sector)) && !b5151_is_DESERT(GET_SECT_VNUM(map->base_sector))) {
 			// things that started out desert but aren't now
 			if (b5151_is_IRRIGATED(GET_SECT_VNUM(map->base_sector))) {
-				// log("- (%d, %d) DEBUG: Probably fine (Irrigated on Desert)", MAP_X_COORD(map->vnum), MAP_Y_COORD(map->vnum));
+				// log("- (%d, %d) Probably fine (Irrigated on Desert)", MAP_X_COORD(map->vnum), MAP_Y_COORD(map->vnum));
 			}
 			else if (b5151_is_WEIRDWOOD(GET_SECT_VNUM(map->base_sector))) {
-				// log("- (%d, %d) DEBUG: Probably fine (Weirdwood on Desert)", MAP_X_COORD(map->vnum), MAP_Y_COORD(map->vnum));
+				// log("- (%d, %d) Probably fine (Weirdwood on Desert)", MAP_X_COORD(map->vnum), MAP_Y_COORD(map->vnum));
 			}
 			else if (GET_SECT_VNUM(map->base_sector) == b5151_SANDY_TRENCH) {
-				// log("- (%d, %d) DEBUG: Probably fine (Sandy Trench on Desert)", MAP_X_COORD(map->vnum), MAP_Y_COORD(map->vnum));
+				// log("- (%d, %d) Probably fine (Sandy Trench on Desert)", MAP_X_COORD(map->vnum), MAP_Y_COORD(map->vnum));
 			}
 			else if (b5151_is_DESERT_SCORCH(GET_SECT_VNUM(map->base_sector))) {
-				// log("- (%d, %d) DEBUG: Probably fine (Desert Scorch on Desert)", MAP_X_COORD(map->vnum), MAP_Y_COORD(map->vnum));
+				// log("- (%d, %d) Probably fine (Desert Scorch on Desert)", MAP_X_COORD(map->vnum), MAP_Y_COORD(map->vnum));
 			}
 			else if (GET_SECT_VNUM(map->base_sector) >= b5151_BEAVER_DESERT && GET_SECT_VNUM(map->base_sector) <= b5151_BEAVER_END_DESERT) {
-				// log("- (%d, %d) DEBUG: Probably fine (Beaver flooding on desert)", MAP_X_COORD(map->vnum), MAP_Y_COORD(map->vnum));
+				// log("- (%d, %d) Probably fine (Beaver flooding on desert)", MAP_X_COORD(map->vnum), MAP_Y_COORD(map->vnum));
 			}
 			else if (b5151_is_TEMPERATE_SCORCH(GET_SECT_VNUM(map->base_sector))) {
 				// log("- (%d, %d) Temperate Scorch on Desert tile", MAP_X_COORD(map->vnum), MAP_Y_COORD(map->vnum));
@@ -2464,7 +2464,7 @@ void b5_152_world_affects(void) {
 		LL_FOREACH(ROOM_AFFECTS(room), af) {
 			// these were saved as timestamps before, but should now be seconds
 			if (af->expire_time != UNLIMITED) {
-				// log("Debug: %d: %d %ld %ld", GET_ROOM_VNUM(room), af->type, af->expire_time, af->expire_time - time(0));
+				// log("%d: %d %ld %ld", GET_ROOM_VNUM(room), af->type, af->expire_time, af->expire_time - time(0));
 				af->expire_time -= time(0);
 				schedule_room_affect_expire(room, af);
 				request_world_save(GET_ROOM_VNUM(room), WSAVE_ROOM);
@@ -2477,7 +2477,7 @@ void b5_152_world_affects(void) {
 		LL_FOREACH(mob->affected, af) {
 			// these were saved in 5-second updates and are now in 1-second intervals instead
 			if (af->expire_time != UNLIMITED) {
-				//  log("Debug: %s: %d %ld %ld", GET_SHORT_DESC(mob), af->type, af->expire_time, (time(0) + 5 * (af->expire_time - time(0))));
+				//  log("%s: %d %ld %ld", GET_SHORT_DESC(mob), af->type, af->expire_time, (time(0) + 5 * (af->expire_time - time(0))));
 				af->expire_time = time(0) + 5 * (af->expire_time - time(0));
 				schedule_affect_expire(mob, af);
 				request_char_save_in_world(mob);
@@ -2493,7 +2493,7 @@ PLAYER_UPDATE_FUNC(b5_152_player_affects) {
 	
 	LL_FOREACH(ch->affected, af) {
 		// these were saved in 5-second updates and are now in 1-second intervals instead
-		// log("Debug: %s: %d %ld", GET_PC_NAME(ch), af->type, af->expire_time);
+		// log("%s: %d %ld", GET_PC_NAME(ch), af->type, af->expire_time);
 		if (af->expire_time != UNLIMITED) {
 			// note they are in SECONDS not TIMESTAMPS at this point
 			af->expire_time *= 5;
