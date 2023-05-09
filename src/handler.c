@@ -1258,7 +1258,12 @@ void schedule_affect_expire(char_data *ch, struct affected_type *af) {
 	if (af->expire_time == UNLIMITED) {
 		af->expire_event = NULL;	// ensure null
 	}
+	else if (!IN_ROOM(ch) || (!IS_NPC(ch) && !AFFECTS_CONVERTED(ch))) {
+		// do not schedule in this case?
+		// no work
+	}
 	else {
+		// normal scheduling
 		log("Debug: # %s %d %ld scheduling", GET_PC_NAME(ch), af->type, af->expire_time);
 		
 		// create the event
