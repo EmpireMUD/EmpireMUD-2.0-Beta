@@ -2464,6 +2464,7 @@ void b5_152_world_affects(void) {
 		LL_FOREACH(ROOM_AFFECTS(room), af) {
 			// these were saved as timestamps before, but should now be seconds
 			if (af->expire_time != UNLIMITED) {
+				log("Debug: %d: %d %ld %ld", GET_ROOM_VNUM(room), af->type, af->expire_time, af->expire_time - time(0));
 				af->expire_time -= time(0);
 				schedule_room_affect_expire(room, af);
 				request_world_save(GET_ROOM_VNUM(room), WSAVE_ROOM);
@@ -2476,6 +2477,7 @@ void b5_152_world_affects(void) {
 		LL_FOREACH(mob->affected, af) {
 			// these were saved in 5-second updates and are now in 1-second intervals instead
 			if (af->expire_time != UNLIMITED) {
+				log("Debug: %s: %d %ld %ld", GET_SHORT_DESC(mob), af->type, af->expire_time, (time(0) + 5 * (af->expire_time - time(0))));
 				af->expire_time = time(0) + 5 * (af->expire_time - time(0));
 				schedule_affect_expire(mob, af);
 				request_char_save_in_world(mob);
@@ -2491,6 +2493,7 @@ PLAYER_UPDATE_FUNC(b5_152_player_affects) {
 	
 	LL_FOREACH(ch->affected, af) {
 		// these were saved in 5-second updates and are now in 1-second intervals instead
+		log("Debug: %s: %d %ld", GET_PC_NAME(ch), af->type, af->expire_time);
 		if (af->expire_time != UNLIMITED) {
 			// note they are in SECONDS not TIMESTAMPS at this point
 			af->expire_time *= 5;
