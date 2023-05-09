@@ -691,6 +691,7 @@ void check_languages(char_data *ch);
 void check_languages_all(void);
 void check_languages_all_empires(void);
 void check_languages_empire(empire_data *emp);
+void convert_and_schedule_player_affects(char_data *ch);
 void delete_player_character(char_data *ch);
 void enter_player_game(descriptor_data *d, int dolog, bool fresh);
 room_data *find_home(char_data *ch);

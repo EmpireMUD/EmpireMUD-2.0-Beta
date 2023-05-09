@@ -3938,6 +3938,31 @@ void clear_player(char_data *ch) {
 
 
 /**
+* Updates the affect timers on players when they first log into the game, and
+* schedules the expiration events. This is also safe to call on offline players
+* if you need the affect timers to be accurate, e.g. in "stat file".
+*
+* @param char_data *ch The player.
+*/
+void convert_and_schedule_player_affects(char_data *ch) {
+	struct affected_type *af;
+	
+	if (!IS_NPC(ch) && !AFFECTS_CONVERTED(ch)) {
+		LL_FOREACH(ch->affected, af) {
+			if (af->expire_time != UNLIMITED) {
+				// convert from seconds
+				af->expire_time += time(0);
+			}
+			
+			// schedule it
+			schedule_affect_expire(ch, af);
+		}
+		AFFECTS_CONVERTED(ch) = TRUE;
+	}
+}
+
+
+/**
 * This runs at startup (if you don't use -q) and deletes players who are
 * timed out according to the delete_invalid_players_after and 
 * delete_inactive_players_after configs. This can be prevented with the
@@ -4324,20 +4349,6 @@ void enter_player_game(descriptor_data *d, int dolog, bool fresh) {
 	index = find_player_index_by_idnum(GET_IDNUM(ch));
 	update_player_index(index, ch);
 	
-	// schedule affect wear-off
-	if (!AFFECTS_CONVERTED(ch)) {
-		LL_FOREACH(ch->affected, af) {
-			if (af->expire_time != UNLIMITED) {
-				// convert from seconds
-				af->expire_time += time(0);
-			}
-			
-			// schedule it
-			schedule_affect_expire(ch, af);
-		}
-		AFFECTS_CONVERTED(ch) = TRUE;
-	}
-	
 	// ensure data is up-to-date
 	apply_all_ability_techs(ch);
 	refresh_all_quests(ch);
@@ -4348,6 +4359,7 @@ void enter_player_game(descriptor_data *d, int dolog, bool fresh) {
 	check_minipets_and_companions(ch);
 	check_player_events(ch);
 	refresh_passive_buffs(ch);
+	convert_and_schedule_player_affects(ch);
 	
 	// break last reply if invis
 	if (GET_LAST_TELL(ch) && (repl = is_playing(GET_LAST_TELL(ch))) && (GET_INVIS_LEV(repl) > GET_ACCESS_LEVEL(ch) || (!IS_IMMORTAL(ch) && PRF_FLAGGED(repl, PRF_INCOGNITO)))) {

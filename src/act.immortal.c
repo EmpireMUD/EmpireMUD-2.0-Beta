@@ -10730,6 +10730,7 @@ ACMD(do_stat) {
 		}
 		else {
 			refresh_passive_buffs(victim);
+			convert_and_schedule_player_affects(ch);
 			do_stat_character(ch, victim);
 		}
 		
