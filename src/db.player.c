@@ -2220,6 +2220,7 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *c
 		// detect aff copied by affect_to_char_silent and fix timer
 		if (ch->affected && ch->affected->type == af->type) {
 			if (ch->affected->expire_event) {
+				log("Debug: canceling expire event for:");
 				dg_event_cancel(ch->affected->expire_event, cancel_affect_expire_event);
 				ch->affected->expire_event = NULL;
 			}
