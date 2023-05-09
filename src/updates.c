@@ -2492,10 +2492,8 @@ PLAYER_UPDATE_FUNC(b5_152_player_affects) {
 	LL_FOREACH(ch->affected, af) {
 		// these were saved in 5-second updates and are now in 1-second intervals instead
 		if (af->expire_time != UNLIMITED) {
-			af->expire_time = time(0) + 5 * (af->expire_time - time(0));
-			
-			// they are not in the world so we don't need this:
-			// schedule_affect_expire(ch, af);
+			// note they are in SECONDS not TIMESTAMPS at this point
+			af->expire_time *= 5;
 		}
 	}
 }
