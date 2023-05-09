@@ -2453,6 +2453,47 @@ void b5_151_terrain_fix(void) {
 }
 
 
+// b5.152 (1/2): fix durations on world and mob affs
+void b5_152_world_affects(void) {
+	room_data *room, *next_room;
+	char_data *mob;
+	struct affected_type *af;
+	
+	// rooms
+	HASH_ITER(hh, world_table, room, next_room) {
+		LL_FOREACH(ROOM_AFFECTS(room), af) {
+			// these were saved as timestamps before, but should now be seconds
+			af->expire_time -= time(0);
+			schedule_room_affect_expire(room, af);
+			request_world_save(GET_ROOM_VNUM(room), WSAVE_ROOM);
+		}
+	}
+	
+	// mobs
+	DL_FOREACH(character_list, mob) {
+		LL_FOREACH(mob->affected, af) {
+			// these were saved in 5-second updates and are now in 1-second intervals instead
+			af->expire_time = time(0) + 5 * (af->expire_time - time(0));
+			schedule_affect_expire(mob, af);
+			request_char_save_in_world(mob);
+		}
+	}
+}
+
+
+// b5.152 (2/2): fix durations on player affs
+PLAYER_UPDATE_FUNC(b5_152_player_affects) {
+	struct affected_type *af;
+	
+	LL_FOREACH(ch->affected, af) {
+		// these were saved in 5-second updates and are now in 1-second intervals instead
+		af->expire_time = time(0) + 5 * (af->expire_time - time(0));
+		// they are not in the world so we don't need this:
+		// schedule_affect_expire(ch, af);
+	}
+}
+
+
  //////////////////////////////////////////////////////////////////////////////
 //// UPDATE DATA /////////////////////////////////////////////////////////////
 
@@ -2514,6 +2555,7 @@ const struct {
 	{ "b5.134", NULL, b5_134_update_players, "Wiped map memory for screenreader users to clear bad data" },
 	{ "b5.151", b5_151_road_fix, NULL, "Applying hide-real-name flag to customized roads" },
 	{ "b5.151.1", b5_151_terrain_fix, NULL, "Repairing bad terrains and updating with new oases and irrigated terrains" },
+	{ "b5.152", b5_152_world_affects, b5_152_player_affects, "Updating expire times on player, mob, and world affects" },
 	
 	{ "\n", NULL, NULL, "\n" }	// must be last
 };
