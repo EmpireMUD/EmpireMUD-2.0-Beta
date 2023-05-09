@@ -1349,6 +1349,7 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *c
 					af->modifier = i_in[3];
 					af->location = i_in[4];
 					af->bitvector = asciiflag_conv(str_in);
+					log("Debug: %s %d %ld", GET_PC_NAME(ch), af->type, af->expire_time);
 					
 					// store for later
 					LL_APPEND(af_list, af);
@@ -2223,6 +2224,10 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *c
 				ch->affected->expire_event = NULL;
 			}
 			ch->affected->expire_time = stored;
+			log("Debug: - %s %d %ld", GET_PC_NAME(ch), ch->affected->type, ch->affected->expire_time);
+		}
+		else {
+			log("Debug: - %s no matching aff (%d)", GET_PC_NAME(ch), ch->affected ? ch->affected->type : -1);
 		}
 		free(af);
 	}
@@ -3953,6 +3958,8 @@ void convert_and_schedule_player_affects(char_data *ch) {
 				// convert from seconds
 				af->expire_time += time(0);
 			}
+
+			log("Debug: + %s %d %ld", GET_PC_NAME(ch), af->type, af->expire_time);
 			
 			// schedule it
 			schedule_affect_expire(ch, af);
