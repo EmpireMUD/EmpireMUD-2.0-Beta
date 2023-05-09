@@ -109,6 +109,41 @@ struct glb_mob_interact_bean {
  //////////////////////////////////////////////////////////////////////////////
 //// AFFECT HANDLERS /////////////////////////////////////////////////////////
 
+// expiry event handler for character affects
+EVENTFUNC(affect_expire_event) {
+	struct affect_expire_event_data *expire_data = (struct affect_expire_event_data *)event_obj;
+	struct affected_type *af, *immune;
+	char_data *ch;
+	
+	// grab data and free it
+	ch = expire_data->character;
+	af = expire_data->affect;
+	free(expire_data);
+	
+	// cancel this first
+	af->expire_event = NULL;
+	
+	// messaging?
+	if ((af->type > 0)) {
+		if (!af->next || (af->next->type != af->type) || (af->next->expire_time > af->expire_time)) {
+			show_wear_off_msg(ch, af->type);
+		}
+	}
+	
+	// special case -- add immunity
+	if (IS_SET(af->bitvector, AFF_STUNNED) && config_get_int("stun_immunity_time") > 0) {
+		immune = create_flag_aff(ATYPE_STUN_IMMUNITY, config_get_int("stun_immunity_time"), AFF_IMMUNE_STUN, ch);
+		affect_join(ch, immune, NOBITS);
+	}
+	
+	affect_remove(ch, af);
+	affect_total(ch);
+	
+	// do not reenqueue
+	return 0;
+}
+
+
 // expiry event handler for rooms
 EVENTFUNC(room_affect_expire_event) {
 	struct room_expire_event_data *expire_data = (struct room_expire_event_data *)event_obj;
@@ -125,7 +160,8 @@ EVENTFUNC(room_affect_expire_event) {
 	af->expire_event = NULL;
 	
 	if ((af->type > 0)) {
-		if (!af->next || (af->next->type != af->type) || (af->next->duration > 0)) {
+		// this avoids sending messages multiple times for 1 affect type
+		if (!af->next || (af->next->type != af->type) || (af->next->expire_time > af->expire_time)) {
 			if ((gen = find_generic(af->type, GENERIC_AFFECT)) && GET_AFFECT_WEAR_OFF_TO_CHAR(gen) && ROOM_PEOPLE(room)) {
 				act(GET_AFFECT_WEAR_OFF_TO_CHAR(gen), FALSE, ROOM_PEOPLE(room), 0, 0, TO_CHAR | TO_ROOM);
 			}
@@ -135,6 +171,13 @@ EVENTFUNC(room_affect_expire_event) {
 	
 	// do not reenqueue
 	return 0;
+}
+
+
+// frees memory when character affect expiry is canceled
+EVENT_CANCEL_FUNC(cancel_affect_expire_event) {
+	struct affect_expire_event_data *data = (struct affect_expire_event_data*)event_obj;
+	free(data);
 }
 
 
@@ -361,18 +404,19 @@ void affect_join(char_data *ch, struct affected_type *af, int flags) {
 	bool found = FALSE;
 	
 	// FIX: merge af into af_iter instead of vice versa; do not remove/add the effect, but may still need to call messaging
+	#define NOT_UNLIM(aff)  ((aff)->expire_time != UNLIMITED)
 	
 	for (af_iter = ch->affected; af_iter && !found; af_iter = af_iter->next) {
 		if (af_iter->type == af->type && af_iter->location == af->location && af_iter->bitvector == af->bitvector) {
 			// found match: will merge the new af into the old one
-			if (IS_SET(flags, ADD_DURATION)) {
-				af_iter->duration += af->duration;
+			if (IS_SET(flags, ADD_DURATION) && NOT_UNLIM(af_iter) && NOT_UNLIM(af)) {
+				af_iter->expire_time += (af->expire_time - time(0));
 			}
-			else if (IS_SET(flags, AVG_DURATION)) {
-				af_iter->duration = (af->duration + af_iter->duration) / 2;
+			else if (IS_SET(flags, AVG_DURATION) && NOT_UNLIM(af_iter) && NOT_UNLIM(af)) {
+				af_iter->expire_time = time(0) + (((af->expire_time - time(0)) + (af_iter->expire_time - time(0))) / 2);
 			}
 			else {	// otherwise keep the new duration
-				af_iter->duration = af->duration;
+				af_iter->expire_time = af->expire_time;
 			}
 			
 			if (IS_SET(flags, ADD_MODIFIER)) {
@@ -401,6 +445,10 @@ void affect_join(char_data *ch, struct affected_type *af, int flags) {
 				}
 			}
 			
+			// reschedule it (duration may have changed)
+			schedule_affect_expire(ch, af_iter);
+			
+			// and save
 			queue_delayed_update(ch, CDU_MSDP_AFFECTS);
 			found = TRUE;
 			break;
@@ -657,8 +705,13 @@ void affect_modify(char_data *ch, byte loc, sh_int mod, bitvector_t bitv, bool a
 */
 void affect_remove(char_data *ch, struct affected_type *af) {
 	// not affected by it at all somehow?
-	if (ch->affected == NULL) {
+	if (!ch || !af || ch->affected == NULL) {
 		return;
+	}
+	
+	if (af->expire_event) {
+		dg_event_cancel(af->expire_event, cancel_affect_expire_event);
+		af->expire_event = NULL;
 	}
 
 	affect_modify(ch, af->location, af->modifier, af->bitvector, FALSE);
@@ -715,10 +768,12 @@ void affect_to_char_silent(char_data *ch, struct affected_type *af) {
 	CREATE(affected_alloc, struct affected_type, 1);
 
 	*affected_alloc = *af;
+	affected_alloc->expire_event = NULL;
 	LL_PREPEND(ch->affected, affected_alloc);
 
 	affect_modify(ch, af->location, af->modifier, af->bitvector, TRUE);
 	affect_total(ch);
+	schedule_affect_expire(ch, affected_alloc);
 	
 	queue_delayed_update(ch, CDU_MSDP_AFFECTS);
 }
@@ -761,6 +816,7 @@ void affect_to_room(room_data *room, struct affected_type *af) {
 	CREATE(affected_alloc, struct affected_type, 1);
 
 	*affected_alloc = *af;
+	affected_alloc->expire_event = NULL;
 	LL_PREPEND(ROOM_AFFECTS(room), affected_alloc);
 	
 	affected_alloc->expire_event = NULL;	// cannot have an event in the copied af at this point
@@ -1067,7 +1123,7 @@ bool affected_by_spell_from_caster(char_data *ch, any_vnum type, char_data *cast
 * Create an affect that modifies a trait.
 *
 * @param any_vnum type ATYPE_ const/vnum
-* @param int duration in 5-second ticks
+* @param int duration in seconds (prior to b5.152, this was 5-second "real update" ticks)
 * @param int location APPLY_
 * @param int modifier +/- amount
 * @param bitvector_t bitvector AFF_
@@ -1080,7 +1136,7 @@ struct affected_type *create_aff(any_vnum type, int duration, int location, int 
 	CREATE(af, struct affected_type, 1);
 	af->type = type;
 	af->cast_by = cast_by ? CAST_BY_ID(cast_by) : 0;
-	af->duration = duration;
+	af->expire_time = (duration == UNLIMITED) ? UNLIMITED : time(0) + duration;
 	af->modifier = modifier;
 	af->location = location;
 	af->bitvector = bitvector;
@@ -1177,6 +1233,41 @@ bool room_affected_by_spell(room_data *room, any_vnum type) {
 
 
 /**
+* Schedules the event handler for a character's affect expiration.
+*
+* @param char_data *ch The person with the affect on them.
+* @param struct affected_type *af The affect (already on the person) to set up expiry for.
+*/
+void schedule_affect_expire(char_data *ch, struct affected_type *af) {
+	struct affect_expire_event_data *expire_data;
+	
+	// check for and remove old event
+	if (af && af->expire_event) {
+		dg_event_cancel(af->expire_event, cancel_affect_expire_event);
+		af->expire_event = NULL;
+	}
+	
+	// safety next
+	if (!ch || !af) {
+		return;
+	}
+	
+	// check durations
+	if (af->expire_time == UNLIMITED) {
+		af->expire_event = NULL;	// ensure null
+	}
+	else {
+		// create the event
+		CREATE(expire_data, struct affect_expire_event_data, 1);
+		expire_data->character = ch;
+		expire_data->affect = af;
+		
+		af->expire_event = dg_event_create(affect_expire_event, (void*)expire_data, (af->expire_time - time(0)) * PASSES_PER_SEC);
+	}
+}
+
+
+/**
 * Schedules the event handler for a room's affect expiration.
 *
 * @param room_data *room The room with the effect on it.
@@ -1191,13 +1282,13 @@ void schedule_room_affect_expire(room_data *room, struct affected_type *af) {
 		af->expire_event = NULL;
 	}
 	
-	if (af->duration != UNLIMITED) {
+	if (af->expire_time != UNLIMITED) {
 		// create the event
 		CREATE(expire_data, struct room_expire_event_data, 1);
 		expire_data->room = room;
 		expire_data->affect = af;
 		
-		af->expire_event = dg_event_create(room_affect_expire_event, (void*)expire_data, (af->duration - time(0)) * PASSES_PER_SEC);
+		af->expire_event = dg_event_create(room_affect_expire_event, (void*)expire_data, (af->expire_time - time(0)) * PASSES_PER_SEC);
 	}
 	else {
 		af->expire_event = NULL;	// ensure null

@@ -2720,10 +2720,10 @@ void perform_inspire(char_data *ch, char_data *vict, int type) {
 	affect_from_char(vict, ATYPE_INSPIRE, FALSE);
 	
 	if (ch == vict || (GET_LOYALTY(ch) && GET_LOYALTY(ch) == GET_LOYALTY(vict))) {
-		time = 24 MUD_HOURS;
+		time = 30 * SECS_PER_REAL_MIN;
 	}
 	else {
-		time = 4 MUD_HOURS;
+		time = 5 * SECS_PER_REAL_MIN;
 	}
 	
 	// amount to give
@@ -7006,7 +7006,7 @@ ACMD(do_reclaim) {
 			log_to_empire(enemy, ELOG_HOSTILITY, "Someone is trying to reclaim (%d, %d)%s", X_COORD(target), Y_COORD(target), from_str);
 			msg_to_char(ch, "You start to reclaim the area. It will take 5 minutes.\r\n");
 			act("$n starts to reclaim the area for $s empire!", FALSE, ch, NULL, NULL, TO_ROOM);
-			start_action(ch, ACT_RECLAIMING, 12 * SECS_PER_REAL_UPDATE);
+			start_action(ch, ACT_RECLAIMING, 60);
 			GET_ACTION_VNUM(ch, 0) = ROOM_OWNER(target) ? EMPIRE_VNUM(ROOM_OWNER(target)) : NOTHING;
 			GET_ACTION_VNUM(ch, 1) = GET_ROOM_VNUM(target);
 		}

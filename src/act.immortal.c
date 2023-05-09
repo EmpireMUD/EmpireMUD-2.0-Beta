@@ -6150,7 +6150,7 @@ void do_stat_character(char_data *ch, char_data *k) {
 	char buf[MAX_STRING_LENGTH], lbuf[MAX_STRING_LENGTH], lbuf2[MAX_STRING_LENGTH], lbuf3[MAX_STRING_LENGTH];
 	struct script_memory *mem;
 	struct cooldown_data *cool;
-	int count, i, i2, iter, diff, found = 0, val;
+	int count, i, i2, iter, diff, duration, found = 0, val;
 	obj_data *j;
 	struct follow_type *fol;
 	struct over_time_effect_type *dot;
@@ -6385,11 +6385,18 @@ void do_stat_character(char_data *ch, char_data *k) {
 			*buf2 = '\0';
 			
 			// duration setup
-			if (aff->duration == UNLIMITED) {
+			if (aff->expire_time == UNLIMITED) {
 				strcpy(lbuf, "infinite");
 			}
 			else {
-				sprintf(lbuf, "%.1fmin", ((double)(aff->duration + 1) * SECS_PER_REAL_UPDATE / 60.0));
+				duration = aff->expire_time - time(0);
+				duration = MAX(duration, 0);
+				if (duration >= 60 * 60) {
+					sprintf(lbuf, "%d:%02d:%02d", (duration / 3600), ((duration % 3600) / 60), ((duration % 3600) % 60));
+				}
+				else {
+					sprintf(lbuf, "%d:%02d", (duration / 60), (duration % 60));
+				}
 			}
 
 			sprintf(buf, "TYPE: (%s) &c%s&0 ", lbuf, get_generic_name_by_vnum(aff->type));
@@ -7338,7 +7345,7 @@ void do_stat_room(char_data *ch) {
 		for (aff = ROOM_AFFECTS(IN_ROOM(ch)); aff; aff = aff->next) {
 			*buf2 = '\0';
 
-			sprintf(buf, "Affect: (%3ldsec) &c%s&0 ", (aff->duration - time(0)), get_generic_name_by_vnum(aff->type));
+			sprintf(buf, "Affect: (%3ldsec) &c%s&0 ", (aff->expire_time - time(0)), get_generic_name_by_vnum(aff->type));
 
 			if (aff->modifier) {
 				sprintf(buf2, "%+d to %s", aff->modifier, apply_types[(int) aff->location]);

@@ -507,7 +507,7 @@ bool starving_vampire_aggro(char_data *ch) {
 	
 	// stun to keep them from stopping
 	if (GET_FEEDING_FROM(ch)) {
-		af = create_flag_aff(ATYPE_CANT_STOP, 6, AFF_HARD_STUNNED, ch);
+		af = create_flag_aff(ATYPE_CANT_STOP, 30, AFF_HARD_STUNNED, ch);
 		affect_join(ch, af, 0);
 	}
 	
@@ -991,7 +991,7 @@ ACMD(do_bite) {
 			
 			// reduce DODGE
 			if (GET_DODGE(ch) > 0 && !tank) {
-				af = create_mod_aff(ATYPE_BITE_PENALTY, 1, APPLY_DODGE, -GET_DODGE(ch), ch);
+				af = create_mod_aff(ATYPE_BITE_PENALTY, 5, APPLY_DODGE, -GET_DODGE(ch), ch);
 				affect_join(ch, af, 0);
 			}
 			
@@ -1163,10 +1163,10 @@ ACMD(do_boost) {
 	// SUCCESS!
 	charge_ability_cost(ch, BLOOD, cost, NOTHING, 0, WAIT_ABILITY);
 	
-	af = create_mod_aff(ATYPE_BOOST, 3 MUD_HOURS, boost_data[pos].apply, (skill_check(ch, ABIL_BOOST, DIFF_HARD) ? boost_data[pos].high_amt : boost_data[pos].base_amt), ch);
+	af = create_mod_aff(ATYPE_BOOST, 5 * SECS_PER_REAL_MIN, boost_data[pos].apply, (skill_check(ch, ABIL_BOOST, DIFF_HARD) ? boost_data[pos].high_amt : boost_data[pos].base_amt), ch);
 	affect_join(ch, af, AVG_DURATION | ADD_MODIFIER);
 	
-	af = create_mod_aff(ATYPE_BOOST, 3 MUD_HOURS, APPLY_BLOOD_UPKEEP, 1, ch);
+	af = create_mod_aff(ATYPE_BOOST, 5 * SECS_PER_REAL_MIN, APPLY_BLOOD_UPKEEP, 1, ch);
 	affect_to_char(ch, af);
 	free(af);
 	

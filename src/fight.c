@@ -1798,7 +1798,7 @@ obj_data *player_death(char_data *ch) {
 	
 	// penalize after so many deaths
 	if (GET_RECENT_DEATH_COUNT(ch) >= config_get_int("deaths_before_penalty") || (is_at_war(GET_LOYALTY(ch)) && GET_RECENT_DEATH_COUNT(ch) >= config_get_int("deaths_before_penalty_war"))) {
-		int duration = config_get_int("seconds_per_death") * (GET_RECENT_DEATH_COUNT(ch) + 1 - config_get_int("deaths_before_penalty")) / SECS_PER_REAL_UPDATE;
+		int duration = config_get_int("seconds_per_death") * (GET_RECENT_DEATH_COUNT(ch) + 1 - config_get_int("deaths_before_penalty"));
 		struct affected_type *af = create_flag_aff(ATYPE_DEATH_PENALTY, duration, AFF_IMMUNE_PHYSICAL | AFF_NO_ATTACK | AFF_HARD_STUNNED, ch);
 		affect_join(ch, af, ADD_DURATION);
 	}
@@ -1838,11 +1838,11 @@ static void shoot_at_char(room_data *from_room, char_data *ch) {
 	
 	if (damage(ch, ch, dam, type, DAM_PHYSICAL) != 0) {
 		// slow effect (1 mud hour)
-		af = create_flag_aff(ATYPE_ARROW_TO_THE_KNEE, 1 MUD_HOURS, AFF_SLOW, ch);
+		af = create_flag_aff(ATYPE_ARROW_TO_THE_KNEE, 30 * SECS_PER_REAL_MIN, AFF_SLOW, ch);
 		affect_join(ch, af, ADD_DURATION);
 		
 		// distraction effect (5 sec)
-		af = create_flag_aff(ATYPE_ARROW_TO_THE_KNEE, 1, AFF_DISTRACTED, ch);
+		af = create_flag_aff(ATYPE_ARROW_TO_THE_KNEE, 5, AFF_DISTRACTED, ch);
 		affect_join(ch, af, 0);
 		
 		// cancel any action the character is doing
@@ -3340,7 +3340,7 @@ int hit(char_data *ch, char_data *victim, obj_data *weapon, bool combat_round) {
 	
 	// some config TODO move this into the config system?
 	int cut_deep_durations[] = { 3, 3, 6 };
-	int stunning_blow_durations[] = { 1, 1, 2 };
+	int stunning_blow_durations[] = { 5, 5, 10 };
 	double big_game_hunter[] = { 1.05, 1.05, 1.10 };
 
 	// brief sanity
@@ -4001,13 +4001,13 @@ void perform_violence_missile(char_data *ch, obj_data *weapon) {
 				atype = find_generic(GET_OBJ_VNUM(best), GENERIC_AFFECT) ? GET_OBJ_VNUM(best) : ATYPE_RANGED_WEAPON;
 			
 				if (GET_OBJ_AFF_FLAGS(best)) {
-					af = create_flag_aff(atype, 1, GET_OBJ_AFF_FLAGS(best), ch);
+					af = create_flag_aff(atype, 5, GET_OBJ_AFF_FLAGS(best), ch);
 					affect_to_char(vict, af);
 					free(af);
 				}
 			
 				LL_FOREACH(GET_OBJ_APPLIES(best), apply) {
-					af = create_mod_aff(atype, 1, apply->location, apply->modifier, ch);
+					af = create_mod_aff(atype, 5, apply->location, apply->modifier, ch);
 					affect_to_char(vict, af);
 					free(af);
 				}
@@ -4017,7 +4017,7 @@ void perform_violence_missile(char_data *ch, obj_data *weapon) {
 			if (!IS_NPC(ch) && weapon && !AFF_FLAGGED(vict, AFF_IMMUNE_PHYSICAL_DEBUFFS) && skill_check(ch, ABIL_TRICK_SHOTS, DIFF_RARELY)) {
 				switch (GET_MISSILE_WEAPON_TYPE(weapon)) {
 					case TYPE_BOW: {
-						af = create_flag_aff(ATYPE_TRICK_SHOT, 2, AFF_SLOW, ch);
+						af = create_flag_aff(ATYPE_TRICK_SHOT, 10, AFF_SLOW, ch);
 						affect_join(vict, af, 0);
 						
 						act("That shot to the leg seems to slow $N!", FALSE, ch, NULL, vict, TO_CHAR);
@@ -4034,7 +4034,7 @@ void perform_violence_missile(char_data *ch, obj_data *weapon) {
 						break;
 					}
 					case TYPE_PISTOL: {
-						af = create_mod_aff(ATYPE_TRICK_SHOT, 2, APPLY_DODGE, -(GET_DEXTERITY(ch) * hit_per_dex), ch);
+						af = create_mod_aff(ATYPE_TRICK_SHOT, 10, APPLY_DODGE, -(GET_DEXTERITY(ch) * hit_per_dex), ch);
 						affect_join(vict, af, 0);
 						
 						act("That shot to the arm seems to shake $N!", FALSE, ch, NULL, vict, TO_CHAR);
@@ -4052,7 +4052,7 @@ void perform_violence_missile(char_data *ch, obj_data *weapon) {
 					}
 					case TYPE_SLING: {
 						if (!AFF_FLAGGED(vict, AFF_IMMUNE_STUN | AFF_STUNNED | AFF_HARD_STUNNED)) {
-							af = create_flag_aff(ATYPE_TRICK_SHOT, 1, AFF_STUNNED, ch);
+							af = create_flag_aff(ATYPE_TRICK_SHOT, 5, AFF_STUNNED, ch);
 							affect_join(vict, af, 0);
 						
 							act("That shot to the head seems to stun $N!", FALSE, ch, NULL, vict, TO_CHAR);

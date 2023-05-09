@@ -535,7 +535,6 @@ bool point_update_char(char_data *ch) {
 */
 void real_update_char(char_data *ch) {
 	struct over_time_effect_type *dot, *next_dot;
-	struct affected_type *af, *next_af, *immune;
 	char_data *room_ch, *next_ch, *caster;
 	struct companion_data *compan;
 	char buf[MAX_STRING_LENGTH];
@@ -543,7 +542,7 @@ void real_update_char(char_data *ch) {
 	int result, iter, type;
 	int fol_count, gain;
 	ability_data *abil;
-	bool found, took_dot, msg, any;
+	bool found, took_dot, msg;
 	
 	// put stuff that happens when dead here
 	
@@ -603,34 +602,6 @@ void real_update_char(char_data *ch) {
 			msg_to_char(ch, "You are beneath a building and begin taking nature burn as the earth you're buried in is separated from fresh air...\r\n");
 		}
 		apply_dot_effect(ch, ATYPE_NATURE_BURN, 6, DAM_MAGICAL, 5, 60, ch);
-	}
-	
-	// update affects (NPCs get this, too)
-	any = FALSE;
-	for (af = ch->affected; af; af = next_af) {
-		next_af = af->next;
-		if (af->duration >= 1) {
-			af->duration--;
-		}
-		else if (af->duration != UNLIMITED) {
-			if ((af->type > 0)) {
-				if (!af->next || (af->next->type != af->type) || (af->next->duration > 0)) {
-					show_wear_off_msg(ch, af->type);
-				}
-			}
-			
-			// special case -- add immunity
-			if (IS_SET(af->bitvector, AFF_STUNNED) && config_get_int("stun_immunity_time") > 0) {
-				immune = create_flag_aff(ATYPE_STUN_IMMUNITY, config_get_int("stun_immunity_time") / SECS_PER_REAL_UPDATE, AFF_IMMUNE_STUN, ch);
-				affect_join(ch, immune, 0);
-			}
-			
-			affect_remove(ch, af);
-			any = TRUE;
-		}
-	}
-	if (any) {
-		affect_total(ch);
 	}
 	
 	// heal-per-5 ? (stops at 0 health or incap)

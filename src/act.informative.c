@@ -1414,17 +1414,25 @@ void show_character_affects(char_data *ch, char_data *to) {
 	struct over_time_effect_type *dot;
 	struct affected_type *aff;
 	char buf[MAX_STRING_LENGTH], buf2[MAX_STRING_LENGTH], lbuf[MAX_INPUT_LENGTH];
+	int duration;
 
 	/* Routine to show what spells a char is affected by */
 	for (aff = ch->affected; aff; aff = aff->next) {
 		*buf2 = '\0';
 
 		// duration setup
-		if (aff->duration == UNLIMITED) {
+		if (aff->expire_time == UNLIMITED) {
 			strcpy(lbuf, "infinite");
 		}
 		else {
-			sprintf(lbuf, "%.1fmin", ((double)(aff->duration + 1) * SECS_PER_REAL_UPDATE / 60.0));
+			duration = aff->expire_time - time(0);
+			duration = MAX(duration, 0);
+			if (duration >= 60 * 60) {
+				sprintf(lbuf, "%d:%02d:%02d", (duration / 3600), ((duration % 3600) / 60), ((duration % 3600) % 60));
+			}
+			else {
+				sprintf(lbuf, "%d:%02d", (duration / 60), (duration % 60));
+			}
 		}
 		
 		// main entry

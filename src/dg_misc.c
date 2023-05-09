@@ -190,7 +190,7 @@ void do_dg_affect(void *go, struct script_data *sc, trig_data *trig, int script_
 	/* add the affect */
 	af.type = atype;
 	af.cast_by = (script_type == MOB_TRIGGER ? CAST_BY_ID((char_data*)go) : 0);
-	af.duration = (duration == -1 ? UNLIMITED : ceil((double)duration / SECS_PER_REAL_UPDATE));
+	af.expire_time = (duration == -1 ? UNLIMITED : (time(0) + duration));
 	af.modifier = value;
 
 	if (type == APPLY_TYPE) {
@@ -297,7 +297,7 @@ void do_dg_affect_room(void *go, struct script_data *sc, trig_data *trig, int sc
 	/* add the affect */
 	af.type = atype;
 	af.cast_by = (script_type == MOB_TRIGGER ? CAST_BY_ID((char_data*)go) : 0);
-	af.duration = time(0) + duration;	// duration is actually expire time on room affs (TODO: change the name)
+	af.expire_time = (duration == -1 ? UNLIMITED : (time(0) + duration));
 	af.modifier = 0;
 	af.location = APPLY_NONE;
 	af.bitvector = BIT(i);

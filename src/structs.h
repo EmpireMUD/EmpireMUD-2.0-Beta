@@ -1514,8 +1514,8 @@ typedef struct vehicle_data vehicle_data;
 // this is based on the number of 5-second ticks in a mud hour
 #define SECS_PER_REAL_UPDATE  5
 #define REAL_UPDATES_PER_MUD_HOUR  (SECS_PER_MUD_HOUR / SECS_PER_REAL_UPDATE)
-#define REAL_UPDATES_PER_MIN  (SECS_PER_REAL_MIN / SECS_PER_REAL_UPDATE)
-#define MUD_HOURS  *REAL_UPDATES_PER_MUD_HOUR
+// #define REAL_UPDATES_PER_MIN  (SECS_PER_REAL_MIN / SECS_PER_REAL_UPDATE)	// this is unused as of b5.152
+// #define MUD_HOURS  *REAL_UPDATES_PER_MUD_HOUR	// this is unused as of b5.152
 
 
 // misc game configs
@@ -3031,6 +3031,13 @@ typedef enum {
  //////////////////////////////////////////////////////////////////////////////
 //// MISCELLANEOUS STRUCTS ///////////////////////////////////////////////////
 
+// for character affect expiration
+struct affect_expire_event_data {
+	char_data *character;
+	struct affected_type *affect;
+};
+
+
 // apply types for augments and morphs
 struct apply_data {
 	int location;	// APPLY_
@@ -3043,13 +3050,12 @@ struct apply_data {
 struct affected_type {
 	any_vnum type;	// The type of spell that caused this
 	int cast_by;	// player ID (positive) or mob vnum (negative)
-	long duration;	// For how long its effects will last. NOTE: for room affects, this is expire timestamp (for players it's time in hours)
+	long expire_time;	// timestamp when the affect will expire -- note: -1 when unlimited; these save as "number of seconds remaining" in player files
 	int modifier;	// This is added to apropriate ability
 	byte location;	// Tells which ability to change - APPLY_
 	bitvector_t bitvector;	// Tells which bits to set - AFF_
 	
-	struct dg_event *expire_event;	// SOMETIMES these have scheduled events (only on rooms)
-		// NOTE: if you apply expire_event to character buffs, functions like affect_join that update the duration must check it
+	struct dg_event *expire_event;	// expiry is handled by events; if scheuled, one is linked here
 	
 	struct affected_type *next;
 };
@@ -4624,6 +4630,7 @@ struct player_special_data {
 	
 	struct combat_meters meters;	// combat meter data
 	
+	bool affects_converted;	// if FALSE, player's affs have seconds-of-duration instead of expire-timestamp
 	bool needs_delayed_load;	// whether or not the player still needs delayed data
 	bool dont_save_delay;	// marked when a player is partially unloaded, to prevent accidentally saving a delay file with no gear
 	bool restore_on_login;	// mark the player to trigger a free reset when they enter the game

@@ -216,7 +216,7 @@ db.lib.o: db.lib.c conf.h sysdep.h structs.h uthash.h utils.h db.h comm.h \
   handler.h skills.h olc.h dg_scripts.h dg_event.h vnums.h constants.h
 	$(CC) -c $(CFLAGS) db.lib.c
 db.player.o: db.player.c conf.h sysdep.h structs.h uthash.h utils.h db.h \
-  comm.h handler.h skills.h interpreter.h dg_scripts.h constants.h
+  comm.h handler.h skills.h interpreter.h dg_event.h dg_scripts.h constants.h
 	$(CC) -c $(CFLAGS) db.player.c
 db.world.o: db.world.c conf.h sysdep.h structs.h uthash.h utils.h db.h \
   comm.h handler.h skills.h dg_scripts.h dg_event.h vnums.h constants.h

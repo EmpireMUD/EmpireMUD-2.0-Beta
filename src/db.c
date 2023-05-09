@@ -1003,7 +1003,7 @@ void renum_world(void) {
 	process_temporary_room_data();
 	
 	HASH_ITER(hh, world_table, room, next_room) {
-		// affects
+		// schedule affects
 		LL_FOREACH(ROOM_AFFECTS(room), af) {
 			schedule_room_affect_expire(room, af);
 		}

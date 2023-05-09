@@ -20,6 +20,7 @@
 #include "handler.h"
 #include "skills.h"
 #include "interpreter.h"
+#include "dg_event.h"
 #include "dg_scripts.h"
 #include "vnums.h"
 #include "constants.h"
@@ -56,6 +57,7 @@ ACMD(do_slash_channel);
 void add_all_gain_hooks(char_data *ch);
 void add_archetype_lore(char_data *ch);
 void apply_all_ability_techs(char_data *ch);
+EVENT_CANCEL_FUNC(cancel_affect_expire_event);
 void check_minipets_and_companions(char_data *ch);
 void check_player_events(char_data *ch);
 void clean_lore(char_data *ch);
@@ -1195,7 +1197,7 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *c
 	bool end = FALSE;
 	trig_data *trig;
 	double dbl_in;
-	long l_in[3];
+	long l_in[3], stored;
 	char c_in[2];
 	
 	// allocate player if we didn't receive one
@@ -1343,7 +1345,7 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *c
 					CREATE(af, struct affected_type, 1);
 					af->type = i_in[0];
 					af->cast_by = i_in[1];
-					af->duration = l_in[2];
+					af->expire_time = l_in[2];	// this is TEMPORARILY a number of seconds (or UNLIMITED)
 					af->modifier = i_in[3];
 					af->location = i_in[4];
 					af->bitvector = asciiflag_conv(str_in);
@@ -2208,9 +2210,20 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *c
 		}
 	}
 	
-	// apply affects
+	// apply affects: need to manage the timers because they are generally WRONG at this point
+	AFFECTS_CONVERTED(ch) = FALSE;
 	LL_FOREACH_SAFE(af_list, af, next_af) {
+		stored = af->expire_time;
 		affect_to_char_silent(ch, af);
+		
+		// detect aff copied by affect_to_char_silent and fix timer
+		if (ch->affected && ch->affected->type == af->type) {
+			if (ch->affected->expire_event) {
+				dg_event_cancel(ch->affected->expire_event, cancel_affect_expire_event);
+				ch->affected->expire_event = NULL;
+			}
+			ch->affected->expire_time = stored;
+		}
 		free(af);
 	}
 	
@@ -2448,6 +2461,7 @@ void write_player_primary_data_to_file(FILE *fl, char_data *ch) {
 	struct cooldown_data *cool;
 	struct resource_data *res;
 	int iter, deficit[NUM_POOLS], pool[NUM_POOLS];
+	long timer;
 	
 	if (!fl || !ch) {
 		log("SYSERR: write_player_primary_data_to_file called without %s", fl ? "character" : "file");
@@ -2490,6 +2504,7 @@ void write_player_primary_data_to_file(FILE *fl, char_data *ch) {
 	while ((af = ch->affected)) {
 		CREATE(new_af, struct affected_type, 1);
 		*new_af = *af;
+		new_af->expire_event = NULL;
 		LL_PREPEND(af_list, new_af);
 		affect_remove(ch, af);
 	}
@@ -2568,7 +2583,17 @@ void write_player_primary_data_to_file(FILE *fl, char_data *ch) {
 		fprintf(fl, "Adventure Summon Map: %d\n", GET_ADVENTURE_SUMMON_RETURN_MAP(ch));
 	}
 	for (af = af_list; af; af = af->next) {	// stored earlier
-		fprintf(fl, "Affect: %d %d %ld %d %d %s\n", af->type, af->cast_by, af->duration, af->modifier, af->location, bitv_to_alpha(af->bitvector));
+		if (af->expire_time == UNLIMITED) {
+			timer = UNLIMITED;
+		}
+		else if (AFFECTS_CONVERTED(ch)) {
+			timer = af->expire_time - time(0);
+		}
+		else {
+			// still in seconds
+			timer = af->expire_time;
+		}
+		fprintf(fl, "Affect: %d %d %ld %d %d %s\n", af->type, af->cast_by, timer, af->modifier, af->location, bitv_to_alpha(af->bitvector));
 	}
 	fprintf(fl, "Affect Flags: %s\n", bitv_to_alpha(AFF_FLAGS(ch)));
 	if (GET_APPARENT_AGE(ch)) {
@@ -4276,12 +4301,12 @@ void enter_player_game(descriptor_data *d, int dolog, bool fresh) {
 	
 	if (!IS_IMMORTAL(ch)) {
 		// ensure player has penalty if at war
-		if (fresh && GET_LOYALTY(ch) && is_at_war(GET_LOYALTY(ch)) && (duration = config_get_int("war_login_delay") / SECS_PER_REAL_UPDATE) > 0) {
+		if (fresh && GET_LOYALTY(ch) && is_at_war(GET_LOYALTY(ch)) && (duration = config_get_int("war_login_delay")) > 0) {
 			af = create_flag_aff(ATYPE_WAR_DELAY, duration, AFF_IMMUNE_PHYSICAL | AFF_NO_ATTACK | AFF_HARD_STUNNED, ch);
 			affect_join(ch, af, ADD_DURATION);
 			msg_to_char(ch, "\trYou are stunned for %d second%s because your empire is at war.\r\n", duration, PLURAL(duration));
 		}
-		else if (fresh && IN_HOSTILE_TERRITORY(ch) && (duration = config_get_int("hostile_login_delay") / SECS_PER_REAL_UPDATE) > 0) {
+		else if (fresh && IN_HOSTILE_TERRITORY(ch) && (duration = config_get_int("hostile_login_delay")) > 0) {
 			af = create_flag_aff(ATYPE_HOSTILE_DELAY, duration, AFF_IMMUNE_PHYSICAL | AFF_NO_ATTACK | AFF_HARD_STUNNED, ch);
 			affect_join(ch, af, ADD_DURATION);
 			msg_to_char(ch, "\trYou are stunned for %d second%s because you logged in in hostile territory.\r\n", duration, PLURAL(duration));
@@ -4298,6 +4323,20 @@ void enter_player_game(descriptor_data *d, int dolog, bool fresh) {
 	// update the index in case any of this changed
 	index = find_player_index_by_idnum(GET_IDNUM(ch));
 	update_player_index(index, ch);
+	
+	// schedule affect wear-off
+	if (!AFFECTS_CONVERTED(ch)) {
+		LL_FOREACH(ch->affected, af) {
+			if (af->expire_time != UNLIMITED) {
+				// convert from seconds
+				af->expire_time += time(0);
+			}
+			
+			// schedule it
+			schedule_affect_expire(ch, af);
+		}
+		AFFECTS_CONVERTED(ch) = TRUE;
+	}
 	
 	// ensure data is up-to-date
 	apply_all_ability_techs(ch);

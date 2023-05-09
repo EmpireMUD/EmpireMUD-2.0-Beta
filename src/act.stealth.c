@@ -497,7 +497,7 @@ int apply_poison(char_data *ch, char_data *vict) {
 	}
 	
 	if (GET_OBJ_AFF_FLAGS(obj)) {
-		af = create_flag_aff(aff_type, 1 MUD_HOURS, GET_OBJ_AFF_FLAGS(obj), ch);
+		af = create_flag_aff(aff_type, 30 * SECS_PER_REAL_MIN, GET_OBJ_AFF_FLAGS(obj), ch);
 		affect_to_char(vict, af);
 		free(af);
 		
@@ -509,7 +509,7 @@ int apply_poison(char_data *ch, char_data *vict) {
 	}
 	
 	LL_FOREACH(GET_OBJ_APPLIES(obj), apply) {
-		af = create_mod_aff(aff_type, 1 MUD_HOURS, apply->location, round(apply->modifier * mod), ch);
+		af = create_mod_aff(aff_type, 30 * SECS_PER_REAL_MIN, apply->location, round(apply->modifier * mod), ch);
 		affect_to_char(vict, af);
 		free(af);
 		
@@ -681,7 +681,7 @@ ACMD(do_darkness) {
 		CREATE(af, struct affected_type, 1);
 		af->type = ATYPE_DARKNESS;
 		af->cast_by = CAST_BY_ID(ch);
-		af->duration = time(0) + 75;	// duration is actually expire time on room affs (TODO: change the name)
+		af->expire_time = time(0) + 75;
 		af->modifier = 0;
 		af->location = APPLY_NONE;
 		af->bitvector = ROOM_AFF_DARK;
@@ -797,7 +797,7 @@ ACMD(do_diversion) {
 				value = ceil(GET_CHARISMA(ch) * (first ? 1.0 : 0.5));
 				first = FALSE;
 				
-				af = create_mod_aff(ATYPE_DIVERSION, 3, APPLY_WITS, -value, ch);
+				af = create_mod_aff(ATYPE_DIVERSION, 15, APPLY_WITS, -value, ch);
 				affect_join(victim, af, NOBITS);
 				
 				msg_to_char(victim, "You can't seem to focus on the battle!\r\n");
@@ -930,7 +930,7 @@ ACMD(do_howl) {
 				value = GET_CHARISMA(ch) * (first ? 4 : 2);
 				first = FALSE;
 				
-				af = create_mod_aff(ATYPE_HOWL, 3, APPLY_TO_HIT, -value, ch);
+				af = create_mod_aff(ATYPE_HOWL, 15, APPLY_TO_HIT, -value, ch);
 				affect_join(victim, af, NOBITS);
 				
 				msg_to_char(victim, "You are too scared to aim effectively!\r\n");
@@ -1086,21 +1086,21 @@ ACMD(do_jab) {
 			if (has_ability(ch, ABIL_STAGGER_JAB) && !AFF_FLAGGED(vict, AFF_IMMUNE_PHYSICAL_DEBUFFS) && check_solo_role(ch)) {
 				struct affected_type *af;
 				int value = ceil(GET_CHARISMA(ch) / 5);
-				af = create_mod_aff(ATYPE_STAGGER_JAB, 3, APPLY_TO_HIT, -value, ch);
+				af = create_mod_aff(ATYPE_STAGGER_JAB, 15, APPLY_TO_HIT, -value, ch);
 				affect_join(vict, af, ADD_MODIFIER);
 			}
 			
 			if (has_ability(ch, ABIL_CRUCIAL_JAB) && !AFF_FLAGGED(vict, AFF_IMMUNE_PHYSICAL_DEBUFFS) && check_solo_role(ch)) {
 				struct affected_type *af;
 				int value = round(GET_COMPUTED_LEVEL(ch) / 80);
-				af = create_mod_aff(ATYPE_CRUCIAL_JAB, 2, APPLY_DEXTERITY, -value, ch);
+				af = create_mod_aff(ATYPE_CRUCIAL_JAB, 15, APPLY_DEXTERITY, -value, ch);
 				affect_join(vict, af, NOBITS);
 			}
 			
 			if (has_ability(ch, ABIL_SHADOW_JAB) && !AFF_FLAGGED(vict, AFF_IMMUNE_PHYSICAL_DEBUFFS) && check_solo_role(ch)) {
 				struct affected_type *af;
 				int value = ceil(GET_CHARISMA(ch) / 5);
-				af = create_mod_aff(ATYPE_SHADOW_JAB, 3, APPLY_DEXTERITY, -value, ch);
+				af = create_mod_aff(ATYPE_SHADOW_JAB, 15, APPLY_DEXTERITY, -value, ch);
 				affect_join(vict, af, ADD_MODIFIER);
 			}
 		}
@@ -1334,7 +1334,7 @@ ACMD(do_sap) {
 		act("$n saps $N in the back of the head.", TRUE, ch, NULL, vict, TO_NOTVICT);
 		
 		if (success) {
-			af = create_flag_aff(ATYPE_SAP, REAL_UPDATES_PER_MIN, AFF_STUNNED, ch);
+			af = create_flag_aff(ATYPE_SAP, SECS_PER_REAL_MIN, AFF_STUNNED, ch);
 			affect_join(vict, af, 0);
 			
 			msg_to_char(vict, "You are momentarily stunned!\r\n");
@@ -1450,7 +1450,7 @@ ACMD(do_shadowcage) {
 				value = GET_CHARISMA(ch) * (first ? 4 : 2);
 				first = FALSE;
 				
-				af = create_mod_aff(ATYPE_SHADOWCAGE, 3, APPLY_DODGE, -value, ch);
+				af = create_mod_aff(ATYPE_SHADOWCAGE, 15, APPLY_DODGE, -value, ch);
 				affect_join(victim, af, NOBITS);
 				
 				msg_to_char(victim, "You can't seem to dodge as well in the shadowcage!\r\n");
@@ -1729,7 +1729,6 @@ ACMD(do_steal) {
 ACMD(do_whisperstride) {
 	struct affected_type *af;
 	int cost = 100;
-	int duration = 6; // 30 seconds
 	if (!can_use_ability(ch, ABIL_WHISPERSTRIDE, MOVE, cost, COOLDOWN_WHISPERSTRIDE)) {
 		return;
 	}
@@ -1751,7 +1750,7 @@ ACMD(do_whisperstride) {
 		msg_to_char(ch, "You cloak yourself with dark whispers, muffling your movement...\r\n");
 		act("$n is surrounded by dark whispers...", TRUE, ch, NULL, NULL, TO_ROOM);
 		
-		af = create_flag_aff(ATYPE_WHISPERSTRIDE, duration, AFF_SNEAK, ch);
+		af = create_flag_aff(ATYPE_WHISPERSTRIDE, 30, AFF_SNEAK, ch);
 		affect_join(ch, af, 0);
 	}
 }

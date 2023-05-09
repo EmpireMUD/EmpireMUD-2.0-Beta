@@ -1844,8 +1844,8 @@ void reset_one_room(room_data *room) {
 				if (mob) {
 					aff = create_aff(reset->arg1, reset->arg3, reset->arg5, reset->arg4, asciiflag_conv(reset->sarg1), NULL);
 					aff->cast_by = reset->arg2;
-					aff->duration = reset->arg3;
-					affect_to_char(mob, aff);
+					// arg3 comes in as either UNLIMITED or seconds-left, so no conversion needed
+					affect_to_char_silent(mob, aff);
 					free(aff);
 				}
 				break;
@@ -4423,7 +4423,7 @@ bool write_map_and_room_to_file(room_vnum vnum, bool force_obj_pack) {
 		fprintf(fl, "Sector: %d %d\n", GET_SECT_VNUM(SECT(room)), GET_SECT_VNUM(BASE_SECT(room)));
 		
 		LL_FOREACH(ROOM_AFFECTS(room), af) {
-			fprintf(fl, "Affect: %d %d %ld %d %d %llu\n", af->type, af->cast_by, af->duration, af->modifier, af->location, af->bitvector);
+			fprintf(fl, "Affect: %d %d %ld %d %d %llu\n", af->type, af->cast_by, af->expire_time == UNLIMITED ? UNLIMITED : (af->expire_time - time(0)), af->modifier, af->location, af->bitvector);
 		}
 		if (HOME_ROOM(room) != room) {
 			fprintf(fl, "Home-room: %d\n", GET_ROOM_VNUM(HOME_ROOM(room)));
@@ -4546,7 +4546,7 @@ bool write_map_and_room_to_file(room_vnum vnum, bool force_obj_pack) {
 				
 				// save affects but not dots
 				LL_FOREACH(mob->affected, aff) {
-					fprintf(fl, "Load: A %d %d %ld %d %d %lld\n", aff->type, aff->cast_by, aff->duration, aff->modifier, aff->location, aff->bitvector);
+					fprintf(fl, "Load: A %d %d %ld %d %d %lld\n", aff->type, aff->cast_by, aff->expire_time == UNLIMITED ? UNLIMITED : (aff->expire_time - time(0)), aff->modifier, aff->location, aff->bitvector);
 				}
 				
 				// instance id if any
@@ -4926,10 +4926,10 @@ void load_one_room_from_wld_file(room_vnum vnum, char index_data) {
 					CREATE(af, struct affected_type, 1);
 					af->type = int_in[0];
 					af->cast_by = int_in[1];
-					af->duration = long_in;
 					af->modifier = int_in[2];
 					af->location = int_in[3];
 					af->bitvector = bit_in[0];
+					af->expire_time = (long_in == UNLIMITED) ? UNLIMITED : (time(0) + long_in);
 					
 					LL_PREPEND(ROOM_AFFECTS(room), af);
 				}

@@ -382,7 +382,7 @@ void apply_one_passive_buff(char_data *ch, ability_data *abil) {
 			remaining_points = MAX(0, remaining_points);
 		}
 		
-		af = create_flag_aff(ABIL_VNUM(abil), 1, ABIL_AFFECTS(abil), ch);
+		af = create_flag_aff(ABIL_VNUM(abil), UNLIMITED, ABIL_AFFECTS(abil), ch);
 		LL_APPEND(GET_PASSIVE_BUFFS(ch), af);
 		affect_modify(ch, af->location, af->modifier, af->bitvector, TRUE);
 	}
@@ -400,7 +400,7 @@ void apply_one_passive_buff(char_data *ch, ability_data *abil) {
 	// now create affects for each apply that we can afford
 	LL_FOREACH(ABIL_APPLIES(abil), apply) {
 		if (apply_never_scales[apply->location] || unscaled) {
-			af = create_mod_aff(ABIL_VNUM(abil), 1, apply->location, apply->weight, ch);
+			af = create_mod_aff(ABIL_VNUM(abil), UNLIMITED, apply->location, apply->weight, ch);
 			LL_APPEND(GET_PASSIVE_BUFFS(ch), af);
 			affect_modify(ch, af->location, af->modifier, af->bitvector, TRUE);
 			continue;
@@ -415,7 +415,7 @@ void apply_one_passive_buff(char_data *ch, ability_data *abil) {
 			remaining_points -= share;
 			remaining_points = MAX(0, total_points);
 			
-			af = create_mod_aff(ABIL_VNUM(abil), 1, apply->location, amt, ch);
+			af = create_mod_aff(ABIL_VNUM(abil), UNLIMITED, apply->location, amt, ch);
 			LL_APPEND(GET_PASSIVE_BUFFS(ch), af);
 			affect_modify(ch, af->location, af->modifier, af->bitvector, TRUE);
 		}
@@ -1754,11 +1754,8 @@ DO_ABIL(do_buff_ability) {
 		return;
 	}
 	
-	// determine duration
+	// determine duration (in seconds)
 	dur = IS_CLASS_ABILITY(ch, ABIL_VNUM(abil)) ? ABIL_LONG_DURATION(abil) : ABIL_SHORT_DURATION(abil);
-	if (dur != UNLIMITED) {
-		dur = (int) ceil((double)dur / SECS_PER_REAL_UPDATE);	// convert units
-	}
 	
 	messaged = FALSE;	// to prevent duplicates
 	

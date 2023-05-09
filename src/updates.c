@@ -3028,7 +3028,7 @@ void parse_pre_b5_116_room(FILE *fl, room_vnum vnum) {
 				CREATE(af, struct affected_type, 1);
 				af->type = t[0];
 				af->cast_by = t[1];
-				af->duration = l_in;
+				af->expire_time = l_in;
 				af->modifier = t[3];
 				af->location = t[4];
 				af->bitvector = asciiflag_conv(str1);

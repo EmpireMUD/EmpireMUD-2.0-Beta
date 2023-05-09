@@ -3174,7 +3174,7 @@ void update_MSDP_affects(char_data *ch, int send_update) {
 		*buf = '\0';
 		buf_size = 0;
 		LL_FOREACH(ch->affected, aff) {
-			buf_size += snprintf(buf + buf_size, sizeof(buf) - buf_size, "%c%s%c%ld", (char)MSDP_VAR, get_generic_name_by_vnum(aff->type), (char)MSDP_VAL, (aff->duration == UNLIMITED ? -1 : (aff->duration * SECS_PER_REAL_UPDATE)));
+			buf_size += snprintf(buf + buf_size, sizeof(buf) - buf_size, "%c%s%c%ld", (char)MSDP_VAR, get_generic_name_by_vnum(aff->type), (char)MSDP_VAL, (aff->expire_time == UNLIMITED ? -1 : (aff->expire_time - time(0))));
 		}
 		MSDPSetTable(ch->desc, eMSDP_AFFECTS, buf);
 		

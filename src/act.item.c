@@ -5542,13 +5542,13 @@ ACMD(do_eat) {
 		affect_from_char(ch, ATYPE_WELL_FED, FALSE);
 		
 		if (GET_OBJ_AFF_FLAGS(food)) {
-			af = create_flag_aff(ATYPE_WELL_FED, eat_hours MUD_HOURS, GET_OBJ_AFF_FLAGS(food), ch);
+			af = create_flag_aff(ATYPE_WELL_FED, eat_hours * SECS_PER_MUD_HOUR, GET_OBJ_AFF_FLAGS(food), ch);
 			affect_to_char(ch, af);
 			free(af);
 		}
 
 		LL_FOREACH(GET_OBJ_APPLIES(food), apply) {
-			af = create_mod_aff(ATYPE_WELL_FED, eat_hours MUD_HOURS, apply->location, apply->modifier, ch);
+			af = create_mod_aff(ATYPE_WELL_FED, eat_hours * SECS_PER_MUD_HOUR, apply->location, apply->modifier, ch);
 			affect_to_char(ch, af);
 			free(af);
 		}
