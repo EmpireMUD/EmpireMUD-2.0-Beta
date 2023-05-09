@@ -3954,6 +3954,9 @@ void convert_and_schedule_player_affects(char_data *ch) {
 	struct affected_type *af;
 	
 	if (!IS_NPC(ch) && !AFFECTS_CONVERTED(ch)) {
+		// must flag this BEFORE trying to schedule any
+		AFFECTS_CONVERTED(ch) = TRUE;
+		
 		LL_FOREACH(ch->affected, af) {
 			if (af->expire_time != UNLIMITED) {
 				// convert from seconds
@@ -3965,7 +3968,6 @@ void convert_and_schedule_player_affects(char_data *ch) {
 			// schedule it
 			schedule_affect_expire(ch, af);
 		}
-		AFFECTS_CONVERTED(ch) = TRUE;
 	}
 }
 
