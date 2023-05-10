@@ -3947,19 +3947,21 @@ void clear_player(char_data *ch) {
 void convert_and_schedule_player_affects(char_data *ch) {
 	struct affected_type *af;
 	
+	// convert timers first
 	if (!IS_NPC(ch) && !AFFECTS_CONVERTED(ch)) {
-		// must flag this BEFORE trying to schedule any
 		AFFECTS_CONVERTED(ch) = TRUE;
-		
 		LL_FOREACH(ch->affected, af) {
 			if (af->expire_time != UNLIMITED) {
 				// convert from seconds
 				af->expire_time += time(0);
 			}
-			
-			// schedule it
-			schedule_affect_expire(ch, af);
 		}
+	}
+	
+	// schedule them even if already converted
+	LL_FOREACH(ch->affected, af) {
+		// schedule it
+		schedule_affect_expire(ch, af);
 	}
 }
 
