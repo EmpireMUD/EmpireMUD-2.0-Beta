@@ -6425,6 +6425,30 @@ void add_stored_event(struct stored_event **list, int type, struct dg_event *eve
 
 
 /**
+* Cancels all stored events, if any, and frees the list and sets it to NULL.
+*
+* @param struct stored_event **list The list to cancel out of.
+*/
+void cancel_all_stored_events(struct stored_event **list) {
+	struct stored_event *iter, *next_iter;
+	
+	if (list) {
+		HASH_ITER(hh, *list, iter, next_iter) {
+			if (iter->ev) {
+				dg_event_cancel(iter->ev, stored_event_info[iter->type].cancel);
+			}
+			iter->ev = NULL;
+			HASH_DEL(*list, iter);
+			free(iter);
+		}
+		
+		// should now definitely be empty and freed
+		*list = NULL;
+	}
+}
+
+
+/**
 * Cancels an event that was stored, and deletes the entry.
 *
 * @param struct stored_event **list The list to cancel out of.
