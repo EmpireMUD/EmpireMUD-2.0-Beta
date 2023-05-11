@@ -2485,9 +2485,11 @@ void write_player_primary_data_to_file(FILE *fl, char_data *ch) {
 	for (iter = 0; iter < NUM_WEARS; ++iter) {
 		if (GET_EQ(ch, iter)) {
 			char_eq[iter] = unequip_char(ch, iter);
+			/* this is almopst certainly an error here as this is called on every save:
 			#ifndef NO_EXTRANEOUS_TRIGGERS
 				remove_otrigger(char_eq[iter], ch);
 			#endif
+			*/
 		}
 		else {
 			char_eq[iter] = NULL;
@@ -2509,6 +2511,7 @@ void write_player_primary_data_to_file(FILE *fl, char_data *ch) {
 		affect_remove(ch, af);
 	}
 	
+	// this is almost certainly ignored due to pause_affect_total
 	affect_total(ch);
 	
 	// reset attributes
@@ -2876,17 +2879,21 @@ void write_player_primary_data_to_file(FILE *fl, char_data *ch) {
 	// re-apply: equipment
 	for (iter = 0; iter < NUM_WEARS; ++iter) {
 		if (char_eq[iter]) {
+			/* this is almost certainly an error since this is called on every save:
 			#ifndef NO_EXTRANEOUS_TRIGGERS
 				if (wear_otrigger(char_eq[iter], ch, iter)) {
 			#endif
-					// this line may depend on the above if
+			*/
+					// this line may depend on the above if NO_EXTRANEOUS_TRIGGERS is off
 					equip_char(ch, char_eq[iter], iter);
+			/* probably an error here (see above):
 			#ifndef NO_EXTRANEOUS_TRIGGERS
 				}
 				else {
 					obj_to_char(char_eq[iter], ch);
 				}
 			#endif
+			*/
 		}
 	}
 	
