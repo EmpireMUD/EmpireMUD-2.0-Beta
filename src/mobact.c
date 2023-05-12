@@ -591,7 +591,7 @@ EVENTFUNC(mob_scavenge_event) {
 	
 	if (MOB_FLAGGED(mob, MOB_SCAVENGER)) {
 		DL_FOREACH2(ROOM_CONTENTS(IN_ROOM(mob)), obj, next_content) {
-			if (GET_OBJ_TYPE(obj) == ITEM_CORPSE && GET_CORPSE_SIZE(obj) <= GET_SIZE(mob)) {
+			if (IS_CORPSE(obj) && GET_CORPSE_SIZE(obj) <= GET_SIZE(mob)) {
 				// valid corpse... random chance to eat it
 				if (!number(0, 5) && CAN_SEE_OBJ(mob, obj)) {
 					act("You eat $p.", FALSE, mob, obj, NULL, TO_CHAR);
