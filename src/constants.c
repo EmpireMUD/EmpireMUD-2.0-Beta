@@ -2275,6 +2275,7 @@ const char *mob_custom_types[] = {
 	"script3",
 	"script4",
 	"script5",
+	"scavenge-corpse",
 	"\n"
 };
 

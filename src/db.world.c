@@ -1860,6 +1860,7 @@ void reset_one_room(room_data *room) {
 				REMOVE_BIT(MOB_FLAGS(mob), MOB_EXTRACTED);
 				
 				GET_ROPE_VNUM(mob) = reset->arg3;
+				check_scheduled_events_mob(mob);
 				
 				tmob = mob;
 				break;

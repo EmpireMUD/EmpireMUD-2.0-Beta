@@ -1791,6 +1791,8 @@ void char_to_room(char_data *ch, room_data *room) {
 			// store last room to player
 			GET_LAST_ROOM(ch) = GET_ROOM_VNUM(room);
 		}
+		
+		schedule_movement_events(ch);
 		request_char_save_in_world(ch);
 	}
 }
@@ -6888,6 +6890,11 @@ void obj_to_room(obj_data *object, room_data *room) {
 		}
 		
 		request_obj_save_in_world(object);
+		
+		// see if anybody wants to eat it
+		if (IS_CORPSE(object)) {
+			check_scavengers(room);
+		}
 	}
 }
 

@@ -1060,12 +1060,14 @@ extern struct empire_territory_data *global_next_territory_entry;
 // combine setting these with saving
 #define set_mob_flags(mob, to_set)  do { \
 	SET_BIT(MOB_FLAGS(mob), (to_set));	\
+	check_scheduled_events_mob(mob);	\
 	request_char_save_in_world(mob);	\
 } while (0)
 
 // combine removing these with saving
 #define remove_mob_flags(mob, to_set)  do { \
 	REMOVE_BIT(MOB_FLAGS(mob), (to_set));	\
+	check_scheduled_events_mob(mob);	\
 	request_char_save_in_world(mob);	\
 } while (0)
 

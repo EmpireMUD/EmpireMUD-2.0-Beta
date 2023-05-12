@@ -1407,7 +1407,7 @@ typedef struct vehicle_data vehicle_data;
 //// EVENT DEFINES (TIMED EVENT SYSTEM) //////////////////////////////////////
 
 // function types
-#define EVENTFUNC(name) long (name)(void *event_obj)
+#define EVENTFUNC(name) long (name)(struct dg_event *the_event, void *event_obj)
 #define EVENT_CANCEL_FUNC(name) void (name)(void *event_obj)
 
 
@@ -1644,6 +1644,7 @@ typedef struct vehicle_data vehicle_data;
 #define MOB_CUSTOM_SCRIPT_3  9	// called by scripts
 #define MOB_CUSTOM_SCRIPT_4  10	// called by scripts
 #define MOB_CUSTOM_SCRIPT_5  11	// called by scripts
+#define MOB_CUSTOM_SCAVENGE_CORPSE  12	// mob eats a corpse due to SCAVENGER flag
 
 
 // MOB_MOVE_x: mob/vehicle movement types
