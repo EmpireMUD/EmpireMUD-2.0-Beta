@@ -504,7 +504,7 @@ EVENTFUNC(mob_move_event) {
 		// things that cancel movement entirely
 		remove = TRUE;
 	}
-	else if (MOB_IS_BUSY(mob)) {
+	else if ((MOB_FLAGGED(mob, MOB_PURSUE) && MOB_PURSUIT(mob)) || MOB_IS_BUSY(mob)) {
 		remove = FALSE;	// various busy flags -- re-enqueue
 	}
 	else if (AFF_FLAGGED(mob, AFF_CHARM | AFF_IMMOBILIZED) || GET_POS(mob) < POS_STANDING || (GET_LEADER(mob) && IN_ROOM(mob) == IN_ROOM(GET_LEADER(mob))) || (MOB_FLAGGED(mob, MOB_PURSUE) && MOB_PURSUIT(mob))) {
