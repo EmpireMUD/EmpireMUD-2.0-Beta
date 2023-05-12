@@ -393,6 +393,7 @@ int GET_MAX_BLOOD(char_data *ch);	// this one is different than the other max po
 #define GET_POS(ch)  ((ch)->char_specials.position)
 #define SET_SIZE(ch)  ((ch)->char_specials.size)	// notice "SET_SIZE" -- the simple version of the macro
 #define GET_SIZE(ch)  (IS_MORPHED(ch) ? MORPH_SIZE(GET_MORPH(ch)) : SET_SIZE(ch))
+#define GET_STORED_EVENTS(ch)  ((ch)->char_specials.stored_events)
 #define HUNTING(ch)  ((ch)->char_specials.hunting)
 #define IS_CARRYING_N(ch)  ((ch)->char_specials.carry_items)
 

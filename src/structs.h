@@ -1418,6 +1418,10 @@ typedef struct vehicle_data vehicle_data;
 #define SEV_GROW_CROP  3
 #define SEV_TAVERN  4
 #define SEV_RESET_TRIGGER  5
+#define SEV_PURSUIT  6	// mob pursuing a target
+#define SEV_MOVEMENT  7	// normal mob movement
+#define SEV_AGGRO  8	// aggro or cityguard mobs
+#define SEV_SCAVENGE  9	// scavenger mobs consume a corpse
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -4726,6 +4730,8 @@ struct char_special_data {
 	int mana_regen;	// mana regen add
 	
 	int carry_items;	// Number of items carried
+	
+	struct stored_event *stored_events;	// linked list of stored dg events
 };
 
 
@@ -5480,6 +5486,12 @@ struct map_event_data {
 };
 
 
+// data for various timed mob events
+struct mob_event_data {
+	char_data *mob;		// which mob
+};
+
+
 // data for the event when a building is burning
 struct room_event_data {
 	room_data *room;
@@ -5498,7 +5510,8 @@ struct stored_event {
 	struct dg_event *ev;
 	int type;	// SEV_ type
 	
-	UT_hash_handle hh;	// hashed by type
+	struct stored_event *next;	// linked list
+	// UT_hash_handle hh;	// FORMERLY hashed by type; these are short lists though
 };
 
 
@@ -6228,7 +6241,7 @@ struct shared_room_data {
 	struct track_data *tracks;	// hash: for tracking
 	
 	// events
-	struct stored_event *events;	// hash table (by type) of stored events
+	struct stored_event *events;	// linked list of stored events
 };
 
 

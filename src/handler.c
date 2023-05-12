@@ -1266,7 +1266,7 @@ void schedule_affect_expire(char_data *ch, struct affected_type *af) {
 		expire_data->character = ch;
 		expire_data->affect = af;
 		
-		af->expire_event = dg_event_create(affect_expire_event, (void*)expire_data, (af->expire_time - time(0)) * PASSES_PER_SEC);
+		af->expire_event = dg_event_create(affect_expire_event, (void*)expire_data, (af->expire_time - time(0)) RL_SEC);
 	}
 }
 
@@ -1292,7 +1292,7 @@ void schedule_room_affect_expire(room_data *room, struct affected_type *af) {
 		expire_data->room = room;
 		expire_data->affect = af;
 		
-		af->expire_event = dg_event_create(room_affect_expire_event, (void*)expire_data, (af->expire_time - time(0)) * PASSES_PER_SEC);
+		af->expire_event = dg_event_create(room_affect_expire_event, (void*)expire_data, (af->expire_time - time(0)) RL_SEC);
 	}
 	else {
 		af->expire_event = NULL;	// ensure null
@@ -1345,6 +1345,7 @@ void extract_char_final(char_data *ch) {
 	}
 	
 	check_dg_owner_purged_char(ch);
+	cancel_all_stored_events(&GET_STORED_EVENTS(ch));
 
 	/* Check to see if we are grouped! */
 	if (GROUP(ch)) {
@@ -1520,6 +1521,9 @@ void extract_char(char_data *ch) {
 	
 	// get rid of friends now (extracts them as well)
 	despawn_charmies(ch, NOTHING);
+	
+	// ensure no stored events
+	cancel_all_stored_events(&GET_STORED_EVENTS(ch));
 	
 	// clear companion (both directions) if any
 	if (GET_COMPANION(ch)) {

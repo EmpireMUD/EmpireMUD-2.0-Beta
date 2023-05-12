@@ -1087,6 +1087,7 @@ void free_char(char_data *ch) {
 	}
 	
 	// clear any pending updates
+	cancel_all_stored_events(&GET_STORED_EVENTS(ch));
 	clear_delayed_update(ch);
 
 	/* find_char helper */

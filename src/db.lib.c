@@ -6383,6 +6383,7 @@ void write_sector_to_file(FILE *fl, sector_data *st) {
 // cancel func externs
 EVENT_CANCEL_FUNC(cancel_burn_event);
 EVENT_CANCEL_FUNC(cancel_map_event);
+EVENT_CANCEL_FUNC(cancel_mob_event);
 EVENT_CANCEL_FUNC(cancel_room_event);
 
 
@@ -6394,6 +6395,10 @@ struct stored_event_info_t stored_event_info[] = {
 	{ cancel_map_event },	// SEV_GROW_CROP
 	{ cancel_room_event },	// SEV_TAVERN
 	{ cancel_room_event },	// SEV_RESET_TRIGGER
+	{ cancel_mob_event },	// SEV_PURSUIT
+	{ cancel_mob_event },	// SEV_MOVEMENT
+	{ cancel_mob_event },	// SEV_AGGRO
+	{ cancel_mob_event },	// SEV_SCAVENGE
 };
 
 
@@ -6408,16 +6413,21 @@ struct stored_event_info_t stored_event_info[] = {
 void add_stored_event(struct stored_event **list, int type, struct dg_event *event) {
 	struct stored_event *sev;
 	
-	if (!event) {
+	if (!list || !event) {
 		return;
 	}
 	
 	// ensure no duplicate entries
-	sev = find_stored_event(*list, type);
-	if (!sev) {
+	if ((sev = find_stored_event(*list, type))) {
+		if (sev->ev) {
+			dg_event_cancel(sev->ev, stored_event_info[sev->type].cancel);
+		}
+		sev->ev = NULL;
+	}
+	else {
 		CREATE(sev, struct stored_event, 1);
 		sev->type = type;
-		HASH_ADD_INT(*list, type, sev);
+		LL_PREPEND(*list, sev);
 	}
 	
 	sev->ev = event;
@@ -6433,12 +6443,12 @@ void cancel_all_stored_events(struct stored_event **list) {
 	struct stored_event *iter, *next_iter;
 	
 	if (list) {
-		HASH_ITER(hh, *list, iter, next_iter) {
+		LL_FOREACH_SAFE(*list, iter, next_iter) {
 			if (iter->ev) {
 				dg_event_cancel(iter->ev, stored_event_info[iter->type].cancel);
 			}
 			iter->ev = NULL;
-			HASH_DEL(*list, iter);
+			LL_DELETE(*list, iter);
 			free(iter);
 		}
 		
@@ -6455,15 +6465,16 @@ void cancel_all_stored_events(struct stored_event **list) {
 * @param int type The SEV_ type to cancel.
 */
 void cancel_stored_event(struct stored_event **list, int type) {
-	struct stored_event *sev = find_stored_event(*list, type);
+	struct stored_event *sev;
 	
-	if (sev && sev->ev) {
-		dg_event_cancel(sev->ev, stored_event_info[type].cancel);
-		sev->ev = NULL;
-	}
-	
-	if (sev) {
-		HASH_DEL(*list, sev);
+	// while prevents any chance of duplicates (which should be impossible)
+	while ((sev = find_stored_event(*list, type))) {
+		if (sev->ev) {
+			dg_event_cancel(sev->ev, stored_event_info[type].cancel);
+			sev->ev = NULL;
+		}
+		
+		LL_DELETE(*list, sev);
 		free(sev);
 	}
 }
@@ -6476,9 +6487,11 @@ void cancel_stored_event(struct stored_event **list, int type) {
 * @param int type The SEV_ type to cancel.
 */
 void delete_stored_event(struct stored_event **list, int type) {
-	struct stored_event *sev = find_stored_event(*list, type);
-	if (sev) {
-		HASH_DEL(*list, sev);
+	struct stored_event *sev;
+	
+	// while prevents any chance of duplicates (which should be impossible)
+	while ((sev = find_stored_event(*list, type))) {
+		LL_DELETE(*list, sev);
 		free(sev);
 	}
 }
@@ -6492,16 +6505,28 @@ void delete_stored_event(struct stored_event **list, int type) {
 * @return struct stored_event* The found event if any, or NULL.
 */
 struct stored_event *find_stored_event(struct stored_event *list, int type) {
-	struct stored_event *find;
+	struct stored_event *iter;
 	
-	HASH_FIND_INT(list, &type, find);
-	return find;
+	LL_FOREACH(list, iter) {
+		if (iter->type == type) {
+			return iter;
+		}
+	}
+	
+	return NULL;	// not found
 }
 
 
 // frees memory when a map event is canceled
 EVENT_CANCEL_FUNC(cancel_map_event) {
 	struct map_event_data *data = (struct map_event_data *)event_obj;
+	free(data);
+}
+
+
+// generic canceller for simple mob events
+EVENT_CANCEL_FUNC(cancel_mob_event) {
+	struct mob_event_data *data = (struct mob_event_data*)event_obj;
 	free(data);
 }
 
@@ -9008,7 +9033,6 @@ void free_complex_data(struct complex_room_data *data) {
 * @param struct shared_room_data *data The data to free.
 */
 void free_shared_room_data(struct shared_room_data *data) {
-	struct stored_event *ev, *next_ev;
 	struct depletion_data *dep;
 	struct track_data *track, *next_track;
 	
@@ -9032,9 +9056,7 @@ void free_shared_room_data(struct shared_room_data *data) {
 		free(track);
 	}
 	
-	HASH_ITER(hh, data->events, ev, next_ev) {
-		cancel_stored_event(&data->events, ev->type);
-	}
+	cancel_all_stored_events(&data->events);
 	
 	free(data);
 }
