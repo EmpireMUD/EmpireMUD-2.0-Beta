@@ -185,7 +185,7 @@ EVENTFUNC(dot_update_event) {
 	}
 	
 	// reschedule or expire
-	if (dot->time_remaining > 0) {
+	if (GET_HEALTH(ch) >= 0 && dot->time_remaining > 0) {
 		return DOT_INTERVAL RL_SEC;	// re-enqueue
 	}
 	else {
