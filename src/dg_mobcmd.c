@@ -1620,7 +1620,7 @@ ACMD(do_mdot) {
 	any_vnum atype = ATYPE_DG_AFFECT;
 	double modifier = 1.0;
 	char_data *vict;
-	int type, max_stacks;
+	int type, max_stacks, duration;
 
 	if (!MOB_OR_IMPL(ch)) {
 		send_config_msg(ch, "huh_string");
@@ -1664,6 +1664,10 @@ ACMD(do_mdot) {
 		mob_log(ch, "mdot: victim (%s) does not exist", name);
 		return;
 	}
+	if ((duration = atoi(durarg)) < 1) {
+		mob_log(ch, "mdot: invalid duration '%s'", durarg);
+		return;
+	}
 	
 	if (*typearg) {
 		type = search_block(typearg, damage_types, FALSE);
@@ -1677,7 +1681,7 @@ ACMD(do_mdot) {
 	}
 	
 	max_stacks = (*stackarg ? atoi(stackarg) : 1);
-	script_damage_over_time(vict, atype, get_approximate_level(ch), type, modifier, atoi(durarg), max_stacks, ch);
+	script_damage_over_time(vict, atype, get_approximate_level(ch), type, modifier, duration, max_stacks, ch);
 }
 
 

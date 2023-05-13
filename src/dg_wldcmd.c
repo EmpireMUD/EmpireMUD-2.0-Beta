@@ -1343,7 +1343,7 @@ WCMD(do_wdot) {
 	any_vnum atype = ATYPE_DG_AFFECT;
 	double modifier = 1.0;
 	char_data *ch;
-	int type, max_stacks;
+	int type, max_stacks, duration;
 
 	argument = one_argument(argument, name);
 	// sometimes name is an affect vnum
@@ -1374,6 +1374,10 @@ WCMD(do_wdot) {
 		wld_log(room, "wdot: target not found");      
 		return;
 	}
+	if ((duration = atoi(durarg)) < 1) {
+		wld_log(room, "wdot: invalid duration '%s'", durarg);
+		return;
+	}
 	
 	if (*typearg) {
 		type = search_block(typearg, damage_types, FALSE);
@@ -1387,7 +1391,7 @@ WCMD(do_wdot) {
 	}
 
 	max_stacks = (*stackarg ? atoi(stackarg) : 1);
-	script_damage_over_time(ch, atype, get_room_scale_level(room, ch), type, modifier, atoi(durarg), max_stacks, NULL);
+	script_damage_over_time(ch, atype, get_room_scale_level(room, ch), type, modifier, duration, max_stacks, NULL);
 }
 
 
