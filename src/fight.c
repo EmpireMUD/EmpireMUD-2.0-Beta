@@ -874,6 +874,7 @@ void stop_combat_no_autokill(char_data *ch) {
 
 	// remove all DoTs
 	while (ch->over_time_effects) {
+		// warning: this can happen when a DOT is still running... as a result, DOTs don't re-enqueue themselves when a character is <0 health
 		dot_remove(ch, ch->over_time_effects);
 	}
 }

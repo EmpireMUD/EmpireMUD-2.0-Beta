@@ -186,6 +186,7 @@ EVENTFUNC(dot_update_event) {
 	
 	// reschedule or expire
 	if (GET_HEALTH(ch) >= 0 && dot->time_remaining > 0) {
+		// NOTE: when a character drops below 0, dots are often removed in a way this CAN'T detect
 		return DOT_INTERVAL RL_SEC;	// re-enqueue
 	}
 	else {
