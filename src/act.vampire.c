@@ -1003,7 +1003,7 @@ ACMD(do_bite) {
 			// melee DoT effect
 			if (melee && result > 0) {
 				stacks = get_approximate_level(ch) / 50;
-				apply_dot_effect(victim, ATYPE_BITE, 3, DAM_PHYSICAL, 7, MAX(1, stacks), ch);
+				apply_dot_effect(victim, ATYPE_BITE, 15, DAM_PHYSICAL, 7, MAX(1, stacks), ch);
 			}
 			
 			// steal blood effect

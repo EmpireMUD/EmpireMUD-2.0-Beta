@@ -75,7 +75,7 @@ struct damage_spell_type {
 	
 	// dot affect
 	int dot_type;	// ATYPE_, -1 for none
-	int dot_duration;	// time for the dot, in 5-SECOND TICKS
+	int dot_duration;	// time for the dot, in SECONDS
 	int dot_damage_type;	// DAM_ for the dot
 	double dot_dmg_mod;	// % of scaled dot damage (1.0 = normal)
 	int dot_max_stacks;	// how high the dot can stack
@@ -98,7 +98,7 @@ const struct damage_spell_type damage_spell[] = {
 	// TODO: ability system does not support: must add support for 2-part abilities (buff and dot separately)
 	{ ABIL_SHADOWLASH, 1.2, ATTACK_SHADOWLASH, 0.25, AFF_IMMUNE_MAGICAL_DEBUFFS,
 		ATYPE_SHADOWLASH_BLIND, 5, APPLY_NONE, 0, AFF_BLIND,
-		ATYPE_SHADOWLASH_DOT, 3, DAM_MAGICAL, 0.75, 3,
+		ATYPE_SHADOWLASH_DOT, 15, DAM_MAGICAL, 0.75, 3,
 		COOLDOWN_SHADOWLASH, 9
 	},
 	

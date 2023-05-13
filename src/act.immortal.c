@@ -6419,13 +6419,7 @@ void do_stat_character(char_data *ch, char_data *k) {
 	
 	// dots
 	for (dot = k->over_time_effects; dot; dot = dot->next) {
-		if (dot->duration == UNLIMITED) {
-			strcpy(lbuf, "unlimited");
-		}
-		else {
-			sprintf(lbuf, "%.1fmin", ((double)(dot->duration + 1) * SECS_PER_REAL_UPDATE / 60.0));
-		}
-		
+		sprintf(lbuf, "%d:%02d", dot->time_remaining / 60, dot->time_remaining % 60);
 		msg_to_char(ch, "TYPE: (%s) &r%s&0 %d %s damage (%d/%d)\r\n", lbuf, get_generic_name_by_vnum(dot->type), dot->damage * dot->stack, damage_types[dot->damage_type], dot->stack, dot->max_stack);
 	}
 

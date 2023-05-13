@@ -533,15 +533,13 @@ bool point_update_char(char_data *ch) {
 * @param char_data *ch The character to update.
 */
 void real_update_char(char_data *ch) {
-	struct over_time_effect_type *dot, *next_dot;
-	char_data *room_ch, *next_ch, *caster;
+	char_data *room_ch, *next_ch;
 	struct companion_data *compan;
 	char buf[MAX_STRING_LENGTH];
 	struct instance_data *inst;
-	int result, iter, type;
-	int fol_count, gain;
+	int fol_count, gain, iter;
 	ability_data *abil;
-	bool found, took_dot, msg;
+	bool found, msg;
 	
 	// put stuff that happens when dead here
 	
@@ -600,48 +598,12 @@ void real_update_char(char_data *ch) {
 		if (!affected_by_spell(ch, ATYPE_NATURE_BURN)) {
 			msg_to_char(ch, "You are beneath a building and begin taking nature burn as the earth you're buried in is separated from fresh air...\r\n");
 		}
-		apply_dot_effect(ch, ATYPE_NATURE_BURN, 6, DAM_MAGICAL, 5, 60, ch);
+		apply_dot_effect(ch, ATYPE_NATURE_BURN, 30, DAM_MAGICAL, 5, 60, ch);
 	}
 	
 	// heal-per-5 ? (stops at 0 health or incap)
 	if (GET_HEAL_OVER_TIME(ch) > 0 && !IS_DEAD(ch) && GET_POS(ch) >= POS_SLEEPING && GET_HEALTH(ch) > 0) {
 		heal(ch, ch, GET_HEAL_OVER_TIME(ch));
-	}
-
-	// update DoTs (NPCs get this, too)
-	took_dot = FALSE;
-	for (dot = ch->over_time_effects; dot; dot = next_dot) {
-		next_dot = dot->next;
-		
-		type = dot->damage_type == DAM_MAGICAL ? ATTACK_MAGICAL_DOT : (
-			dot->damage_type == DAM_FIRE ? ATTACK_FIRE_DOT : (
-			dot->damage_type == DAM_POISON ? ATTACK_POISON_DOT : 
-			ATTACK_PHYSICAL_DOT
-		));
-		
-		caster = find_player_in_room_by_id(IN_ROOM(ch), dot->cast_by);
-		result = damage(caster ? caster : ch, ch, dot->damage * dot->stack, type, dot->damage_type);
-		if (result > 0 && caster) {
-			took_dot = TRUE;
-		}
-		else if (result < 0 || EXTRACTED(ch) || IS_DEAD(ch)) {
-			return;
-		}
-		
-		// remove?
-		if (dot->duration >= 1) {
-			--dot->duration;
-		}
-		else if (dot->duration != UNLIMITED) {
-			// expired
-			if (dot->type > 0) {
-				show_wear_off_msg(ch, dot->type);
-			}
-			dot_remove(ch, dot);
-		}
-	}
-	if (took_dot) {
-		cancel_action(ch);
 	}
 	
 	// biting -- this is usually PC-only, but NPCs could learn to do it
@@ -777,7 +739,8 @@ void real_update_char(char_data *ch) {
 		}
 
 		// regenerate: do not put move_gain and mana_gain inside of MIN/MAX macros -- this will call them twice
-		if (!took_dot) {
+		if (!ch->over_time_effects) {
+			// only heals if they have no DOTs
 			gain = health_gain(ch, FALSE);
 			heal(ch, ch, gain);
 			GET_HEALTH_DEFICIT(ch) = MAX(0, GET_HEALTH_DEFICIT(ch) - gain);

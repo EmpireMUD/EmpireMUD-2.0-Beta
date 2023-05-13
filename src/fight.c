@@ -3339,7 +3339,7 @@ int hit(char_data *ch, char_data *victim, obj_data *weapon, bool combat_round) {
 	char_data *check;
 	
 	// some config TODO move this into the config system?
-	int cut_deep_durations[] = { 3, 3, 6 };
+	int cut_deep_durations[] = { 15, 15, 30 };
 	int stunning_blow_durations[] = { 5, 5, 10 };
 	double big_game_hunter[] = { 1.05, 1.05, 1.10 };
 
@@ -4030,7 +4030,7 @@ void perform_violence_missile(char_data *ch, obj_data *weapon) {
 						act("$n's shot opens a deep artery -- you are bleeding!", FALSE, ch, NULL, vict, TO_VICT);
 						act("$n's shot opens a deep artery -- $N is bleeding!", FALSE, ch, NULL, vict, TO_NOTVICT);
 						
-						apply_dot_effect(vict, ATYPE_TRICK_SHOT, 5, DAM_PHYSICAL, 5, 5, ch);
+						apply_dot_effect(vict, ATYPE_TRICK_SHOT, 25, DAM_PHYSICAL, 5, 5, ch);
 						break;
 					}
 					case TYPE_PISTOL: {
@@ -4047,7 +4047,7 @@ void perform_violence_missile(char_data *ch, obj_data *weapon) {
 						act("$n's shot opens a deep artery -- you are bleeding!", FALSE, ch, NULL, vict, TO_VICT);
 						act("$n's shot opens a deep artery -- $N is bleeding!", FALSE, ch, NULL, vict, TO_NOTVICT);
 						
-						apply_dot_effect(vict, ATYPE_TRICK_SHOT, 5, DAM_PHYSICAL, 5, 5, ch);
+						apply_dot_effect(vict, ATYPE_TRICK_SHOT, 25, DAM_PHYSICAL, 5, 5, ch);
 						break;
 					}
 					case TYPE_SLING: {
@@ -4066,7 +4066,7 @@ void perform_violence_missile(char_data *ch, obj_data *weapon) {
 						act("$n's shot opens a deep artery -- you are bleeding!", FALSE, ch, NULL, vict, TO_VICT);
 						act("$n's shot opens a deep artery -- $N is bleeding!", FALSE, ch, NULL, vict, TO_NOTVICT);
 						
-						apply_dot_effect(vict, ATYPE_TRICK_SHOT, 5, DAM_PHYSICAL, 5, 5, ch);
+						apply_dot_effect(vict, ATYPE_TRICK_SHOT, 25, DAM_PHYSICAL, 5, 5, ch);
 						break;
 					}
 				}

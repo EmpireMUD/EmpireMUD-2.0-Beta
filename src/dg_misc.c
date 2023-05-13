@@ -955,7 +955,7 @@ void script_damage_over_time(char_data *vict, any_vnum atype, int level, int dam
 	}
 
 	// add the affect
-	apply_dot_effect(vict, atype, ceil((double)dur_seconds / SECS_PER_REAL_UPDATE), dam_type, (int) dam, MAX(1, max_stacks), cast_by);
+	apply_dot_effect(vict, atype, dur_seconds, dam_type, (int) dam, MAX(1, max_stacks), cast_by);
 }
 
 

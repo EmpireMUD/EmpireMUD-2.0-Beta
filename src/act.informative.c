@@ -1455,12 +1455,7 @@ void show_character_affects(char_data *ch, char_data *to) {
 	
 	// show DoT affects too
 	for (dot = ch->over_time_effects; dot; dot = dot->next) {
-		if (dot->duration == UNLIMITED) {
-			strcpy(lbuf, "infinite");
-		}
-		else {
-			snprintf(lbuf, sizeof(lbuf), "%.1fmin", ((double)(dot->duration + 1) * SECS_PER_REAL_UPDATE / 60.0));
-		}
+		snprintf(lbuf, sizeof(lbuf), "%d:%02d", dot->time_remaining / 60, dot->time_remaining % 60);
 		
 		// main body
 		msg_to_char(to, "   &r%s&0 (%s) %d %s damage (%d/%d)\r\n", get_generic_name_by_vnum(dot->type), lbuf, dot->damage * dot->stack, damage_types[dot->damage_type], dot->stack, dot->max_stack);

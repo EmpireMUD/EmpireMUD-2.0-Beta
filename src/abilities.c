@@ -1876,9 +1876,6 @@ DO_ABIL(do_dot_ability) {
 	
 	// determine duration
 	dur = IS_CLASS_ABILITY(ch, ABIL_VNUM(abil)) ? ABIL_LONG_DURATION(abil) : ABIL_SHORT_DURATION(abil);
-	if (dur != UNLIMITED) {
-		dur = (int) ceil((double)dur / SECS_PER_REAL_UPDATE);	// convert units
-	}
 	
 	dmg = points * (data->matching_role ? 2 : 1);
 	
@@ -2128,6 +2125,19 @@ bool audit_ability(ability_data *abil, char_data *ch) {
 	HASH_ITER(hh, ability_table, iter, next_iter) {
 		if (iter != abil && ABIL_VNUM(iter) != ABIL_VNUM(abil) && !str_cmp(ABIL_NAME(iter), ABIL_NAME(abil))) {
 			olc_audit_msg(ch, ABIL_VNUM(abil), "Same name as ability %d", ABIL_VNUM(iter));
+			problem = TRUE;
+		}
+	}
+	
+	
+	// dots
+	if (IS_SET(ABIL_TYPES(abil), ABILT_DOT)) {
+		if (ABIL_SHORT_DURATION(abil) == UNLIMITED) {
+			olc_audit_msg(ch, ABIL_VNUM(abil), "Unlimited short duration not supported on DOTs", ABIL_VNUM(iter));
+			problem = TRUE;
+		}
+		if (ABIL_LONG_DURATION(abil) == UNLIMITED) {
+			olc_audit_msg(ch, ABIL_VNUM(abil), "Unlimited long duration not supported on DOTs", ABIL_VNUM(iter));
 			problem = TRUE;
 		}
 	}

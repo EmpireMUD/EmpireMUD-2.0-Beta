@@ -85,10 +85,11 @@ bool affected_by_spell(char_data *ch, any_vnum type);
 bool affected_by_spell_and_apply(char_data *ch, any_vnum type, int apply, bitvector_t aff_flag);
 bool affected_by_spell_from_caster(char_data *ch, any_vnum type, char_data *caster);
 struct affected_type *create_aff(any_vnum type, int duration, int location, int modifier, bitvector_t bitvector, char_data *cast_by);
-void apply_dot_effect(char_data *ch, any_vnum type, sh_int duration, sh_int damage_type, sh_int damage, sh_int max_stack, char_data *cast_by);
+void apply_dot_effect(char_data *ch, any_vnum type, int seconds_duration, sh_int damage_type, sh_int damage, sh_int max_stack, char_data *cast_by);
 void dot_remove(char_data *ch, struct over_time_effect_type *dot);
 bool room_affected_by_spell(room_data *room, any_vnum type);
 void schedule_affect_expire(char_data *ch, struct affected_type *af);
+void schedule_dot_update(char_data *ch, struct over_time_effect_type *dot);
 void show_wear_off_msg(char_data *ch, int atype);
 
 // affect shortcut macros

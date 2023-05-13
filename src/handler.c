@@ -144,6 +144,62 @@ EVENTFUNC(affect_expire_event) {
 }
 
 
+// this runs every 5 seconds until it removes the DOT
+EVENTFUNC(dot_update_event) {
+	struct dot_event_data *data = (struct dot_event_data *)event_obj;
+	struct over_time_effect_type *dot;
+	char_data *ch, *caster;
+	int type, result;
+	
+	// grab data and free it
+	ch = data->ch;
+	dot = data->dot;
+	
+	// cancel this first -- will re-enqueue if needed
+	dot->update_event = NULL;
+	
+	// determine type:
+	// TODO could this be an array or function
+	type = dot->damage_type == DAM_MAGICAL ? ATTACK_MAGICAL_DOT : (
+		dot->damage_type == DAM_FIRE ? ATTACK_FIRE_DOT : (
+		dot->damage_type == DAM_POISON ? ATTACK_POISON_DOT : 
+		ATTACK_PHYSICAL_DOT
+	));
+	caster = find_player_in_room_by_id(IN_ROOM(ch), dot->cast_by);
+	
+	// bam! (damage func shows the messaging)
+	result = damage(caster ? caster : ch, ch, dot->damage * dot->stack, type, dot->damage_type);
+	
+	if (result < 0 || IS_DEAD(ch) || EXTRACTED(ch)) {
+		// done here (death and extraction should both remove the DOT themselves)
+		free(data);
+		return 0;	// do not re-enqueue
+	}
+	
+	// they lived:
+	dot->time_remaining -= DOT_INTERVAL;
+	
+	// cancel action if they were hit
+	if (result > 0) {
+		cancel_action(ch);
+	}
+	
+	// reschedule or expire
+	if (dot->time_remaining > 0) {
+		return DOT_INTERVAL RL_SEC;	// re-enqueue
+	}
+	else {
+		// expired
+		if (dot->type > 0) {
+			show_wear_off_msg(ch, dot->type);
+		}
+		dot_remove(ch, dot);
+		free(data);
+		return 0;	// do not re-enqueue
+	}
+}
+
+
 // expiry event handler for rooms
 EVENTFUNC(room_affect_expire_event) {
 	struct room_expire_event_data *expire_data = (struct room_expire_event_data *)event_obj;
@@ -177,6 +233,13 @@ EVENTFUNC(room_affect_expire_event) {
 // frees memory when character affect expiry is canceled
 EVENT_CANCEL_FUNC(cancel_affect_expire_event) {
 	struct affect_expire_event_data *data = (struct affect_expire_event_data*)event_obj;
+	free(data);
+}
+
+
+// frees memory when character affect expiry is canceled
+EVENT_CANCEL_FUNC(cancel_dot_event) {
+	struct dot_event_data *data = (struct dot_event_data*)event_obj;
 	free(data);
 }
 
@@ -1146,45 +1209,56 @@ struct affected_type *create_aff(any_vnum type, int duration, int location, int 
 
 
 /**
+* Applies a DOT (damage over time) effect to a character and schedules it. If
+* the duration is not divisible by 5, it may last slightly longer.
+*
+* Note that prior to b5.152, this took a duration in 5-second "real update"
+* ticks, not in seconds.
+*
 * @param char_data *ch Person receiving the DoT.
 * @param any_vnum type ATYPE_ const/vnum that caused it.
-* @param sh_int duration Affect time, in 5-second intervals.
+* @param int seconds_duration How long, in seconds, to apply this (will round up to a multple of 5).
 * @param sh_int damage_type DAM_ type.
 * @param sh_int damage How much damage to do per 5-seconds.
 * @param sh_int max_stack Number of times this can stack when re-applied before it expires.
 * @param sh_int char_data *cast_by The caster.
 */
-void apply_dot_effect(char_data *ch, any_vnum type, sh_int duration, sh_int damage_type, sh_int damage, sh_int max_stack, char_data *cast_by) {
-	struct over_time_effect_type *iter, *dot;
+void apply_dot_effect(char_data *ch, any_vnum type, int seconds_duration, sh_int damage_type, sh_int damage, sh_int max_stack, char_data *cast_by) {
+	struct over_time_effect_type *iter, *dot = NULL;
 	generic_data *gen;
-	bool found = FALSE;
 	int id = (cast_by ? CAST_BY_ID(cast_by) : 0);
 	
+	// adjust duration to ensure a multiple of 5 seconds
+	seconds_duration = (int) (ceil(seconds_duration / ((double)DOT_INTERVAL)) * DOT_INTERVAL);
+	seconds_duration = MAX(DOT_INTERVAL, seconds_duration);
+	
 	// first see if they already have one
-	for (iter = ch->over_time_effects; iter && !found; iter = iter->next) {
+	for (iter = ch->over_time_effects; iter && !dot; iter = iter->next) {
 		if (iter->type == type && iter->cast_by == id && iter->damage_type == damage_type && iter->damage == damage) {
 			// refresh effect
-			iter->duration = MAX(iter->duration, duration);
+			iter->time_remaining = MAX(iter->time_remaining, seconds_duration);
 			if (iter->stack < MIN(iter->max_stack, max_stack)) {
 				++iter->stack;
 			}
-			found = TRUE;
+			dot = iter;
 		}
 	}
 	
-	if (!found) {
+	if (!dot) {
 		CREATE(dot, struct over_time_effect_type, 1);
 		LL_PREPEND(ch->over_time_effects, dot);
 		
 		dot->type = type;
 		dot->cast_by = id;
-		dot->duration = duration;
+		dot->time_remaining = seconds_duration;
 		dot->damage_type = damage_type;
 		dot->damage = damage;
 		dot->stack = 1;
 		dot->max_stack = max_stack;
 	}
 	
+	// schedule it -- this will reschedule if it was combined
+	schedule_dot_update(ch, dot);
 	queue_delayed_update(ch, CDU_MSDP_DOTS);
 	
 	// any messaging
@@ -1206,6 +1280,13 @@ void apply_dot_effect(char_data *ch, any_vnum type, sh_int duration, sh_int dama
 * @param struct over_time_effect_type *dot The DoT to remove.
 */
 void dot_remove(char_data *ch, struct over_time_effect_type *dot) {
+	// cancel event?
+	if (dot->update_event) {
+		dg_event_cancel(dot->update_event, cancel_dot_event);
+		dot->update_event = NULL;
+	}
+	
+	// remove from list
 	LL_DELETE(ch->over_time_effects, dot);
 	free(dot);
 	
@@ -1267,6 +1348,42 @@ void schedule_affect_expire(char_data *ch, struct affected_type *af) {
 		expire_data->affect = af;
 		
 		af->expire_event = dg_event_create(affect_expire_event, (void*)expire_data, (af->expire_time - time(0)) RL_SEC);
+	}
+}
+
+
+/**
+* Schedules the event handler for damage-over-time (DOT) effects.
+*
+* @param char_data *ch The person with the DOT on them.
+* @param struct over_time_effect_type *dot The DOT (already on the person) to set up an event for.
+*/
+void schedule_dot_update(char_data *ch, struct over_time_effect_type *dot) {
+	struct dot_event_data *expire_data;
+	
+	// check for and remove old event
+	if (dot && dot->update_event) {
+		dg_event_cancel(dot->update_event, cancel_dot_event);
+		dot->update_event = NULL;
+	}
+	
+	// safety next
+	if (!ch || !dot) {
+		return;
+	}
+	
+	// check durations
+	if (!IN_ROOM(ch)) {
+		// do not schedule in this case?
+		// no work
+	}
+	else {
+		// create the event
+		CREATE(expire_data, struct dot_event_data, 1);
+		expire_data->ch = ch;
+		expire_data->dot = dot;
+		
+		dot->update_event = dg_event_create(dot_update_event, (void*)expire_data, DOT_INTERVAL RL_SEC);
 	}
 }
 

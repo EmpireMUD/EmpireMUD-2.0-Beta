@@ -1587,11 +1587,11 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *c
 					}
 				}
 				else if (!strn_cmp(line, "DoT Effect: ", 12)) {
-					sscanf(line + 12, "%d %d %ld %d %d %d %d", &i_in[0], &i_in[1], &l_in[2], &i_in[3], &i_in[4], &i_in[5], &i_in[6]);
+					sscanf(line + 12, "%d %d %d %d %d %d %d", &i_in[0], &i_in[1], &i_in[2], &i_in[3], &i_in[4], &i_in[5], &i_in[6]);
 					CREATE(dot, struct over_time_effect_type, 1);
 					dot->type = i_in[0];
 					dot->cast_by = i_in[1];
-					dot->duration = l_in[2];
+					dot->time_remaining = i_in[2];
 					dot->damage_type = i_in[3];
 					dot->damage = i_in[4];
 					dot->stack = i_in[5];
@@ -1605,6 +1605,8 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *c
 						ch->over_time_effects = dot;
 					}
 					last_dot = dot;
+					
+					// do not schedule the DOT until they enter the game
 				}
 				BAD_TAG_WARNING(line);
 				break;
@@ -2669,7 +2671,7 @@ void write_player_primary_data_to_file(FILE *fl, char_data *ch) {
 		fprintf(fl, "Disguised Sex: %s\n", genders[(int) GET_DISGUISED_SEX(ch)]);
 	}
 	for (dot = ch->over_time_effects; dot; dot = dot->next) {
-		fprintf(fl, "DoT Effect: %d %d %ld %d %d %d %d\n", dot->type, dot->cast_by, dot->duration, dot->damage_type, dot->damage, dot->stack, dot->max_stack);
+		fprintf(fl, "DoT Effect: %d %d %d %d %d %d %d\n", dot->type, dot->cast_by, dot->time_remaining, dot->damage_type, dot->damage, dot->stack, dot->max_stack);
 	}
 	
 	// 'E'
@@ -3954,6 +3956,7 @@ void clear_player(char_data *ch) {
 */
 void convert_and_schedule_player_affects(char_data *ch) {
 	struct affected_type *af;
+	struct over_time_effect_type *dot;
 	
 	// convert timers first
 	if (!IS_NPC(ch) && !AFFECTS_CONVERTED(ch)) {
@@ -3970,6 +3973,9 @@ void convert_and_schedule_player_affects(char_data *ch) {
 	LL_FOREACH(ch->affected, af) {
 		// schedule it
 		schedule_affect_expire(ch, af);
+	}
+	LL_FOREACH(ch->over_time_effects, dot) {
+		schedule_dot_update(ch, dot);
 	}
 }
 

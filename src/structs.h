@@ -1527,6 +1527,7 @@ typedef struct vehicle_data vehicle_data;
 #define ACTION_CYCLE_MULTIPLIER  10	// make action cycles longer so things can make them go faster
 #define ACTION_CYCLE_SECOND  2	// how many action cycles is 1 second
 #define ACTION_CYCLE_HALF_SEC  1	// how many action cycles is half a second
+#define DOT_INTERVAL  5	// seconds per tick for damage-over-time
 #define HISTORY_SIZE  5	// Keep last 5 commands.
 #define WORKFORCE_CYCLE  76	// seconds between workforce chore updates
 
@@ -4797,15 +4798,24 @@ struct cooldown_data {
 };
 
 
+// for damage-over-time (dot) updates and expiry
+struct dot_event_data {
+	char_data *ch;
+	struct over_time_effect_type *dot;
+};
+
+
 // for damage-over-time (DoTs)
 struct over_time_effect_type {
 	any_vnum type;	// ATYPE_
 	int cast_by;	// player ID (positive) or mob vnum (negative)
-	long duration;	// time in 5-second real-updates
+	int time_remaining;	// time in SECONDS
 	sh_int damage_type;	// DAM_x type
 	sh_int damage;	// amount
 	sh_int stack;	// damage is multiplied by this
 	sh_int max_stack;	// how high it's allowed to stack
+	
+	struct dg_event *update_event;	// for updating every 5 seconds
 
 	struct over_time_effect_type *next;
 };
