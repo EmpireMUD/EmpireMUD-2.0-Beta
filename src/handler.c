@@ -193,8 +193,8 @@ EVENTFUNC(dot_update_event) {
 		if (dot->type > 0) {
 			show_wear_off_msg(ch, dot->type);
 		}
-		dot_remove(ch, dot);
 		free(data);
+		dot_remove(ch, dot);
 		return 0;	// do not re-enqueue
 	}
 }
