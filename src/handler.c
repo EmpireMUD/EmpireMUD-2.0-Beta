@@ -1240,9 +1240,12 @@ void apply_dot_effect(char_data *ch, any_vnum type, int seconds_duration, sh_int
 	// first see if they already have one
 	LL_FOREACH(ch->over_time_effects, iter) {
 		if (iter->type == type && iter->cast_by == id && iter->damage_type == damage_type && iter->damage == damage) {
-			// refresh effect
+			// refresh timer (if longer)
 			iter->time_remaining = MAX(iter->time_remaining, seconds_duration);
-			if (iter->stack < MIN(iter->max_stack, max_stack)) {
+			
+			// take larger of the two stack sizes, and stack it
+			iter->max_stack = MAX(iter->max_stack, max_stack);
+			if (iter->stack < iter->max_stack) {
 				++iter->stack;
 			}
 			
@@ -1394,29 +1397,30 @@ void schedule_dot_update(char_data *ch, struct over_time_effect_type *dot) {
 	struct dot_event_data *expire_data;
 	
 	// check for and remove old event
+	/*
 	if (dot && dot->update_event) {
 		dg_event_cancel(dot->update_event, cancel_dot_event);
 		dot->update_event = NULL;
 	}
+	*/
 	
 	// safety next
 	if (!ch || !dot) {
 		return;
 	}
-	
-	// check durations
 	if (!IN_ROOM(ch)) {
-		// do not schedule in this case?
-		// no work
+		return; // do not schedule in this case? player is not in-game
 	}
-	else {
-		// create the event
-		CREATE(expire_data, struct dot_event_data, 1);
-		expire_data->ch = ch;
-		expire_data->dot = dot;
-		
-		dot->update_event = dg_event_create(dot_update_event, (void*)expire_data, DOT_INTERVAL RL_SEC);
+	if (dot->update_event) {
+		return;	// already scheduled
 	}
+	
+	// ok: create the event
+	CREATE(expire_data, struct dot_event_data, 1);
+	expire_data->ch = ch;
+	expire_data->dot = dot;
+	
+	dot->update_event = dg_event_create(dot_update_event, (void*)expire_data, DOT_INTERVAL RL_SEC);
 }
 
 

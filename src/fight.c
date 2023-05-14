@@ -853,12 +853,19 @@ void siege_kill_vehicle_occupants(vehicle_data *veh, char_data *attacker, vehicl
 * hitting him/her.
 *
 * @param char_data *ch The person who is dying.
+* @param char_data *killer The person who caused it (may be someone else, self, or NULL).
 */
-void stop_combat_no_autokill(char_data *ch) {
-	char_data *ch_iter;
+void stop_combat_no_autokill(char_data *ch, char_data *killer) {
+	char_data *ch_iter, *top_killer;
 	
 	if (FIGHTING(ch)) {
 		stop_fighting(ch);
+	}
+	
+	// find top person (the player responsible)
+	top_killer = killer;
+	while (top_killer && IS_NPC(top_killer) && top_killer->leader) {
+		top_killer = top_killer->leader;
 	}
 
 	// look for anybody in the room fighting ch who wouldn't execute:
@@ -872,10 +879,11 @@ void stop_combat_no_autokill(char_data *ch) {
 	GET_HEALTH(ch) = -1;
 	GET_POS(ch) = POS_INCAP;
 
-	// remove all DoTs
-	while (ch->over_time_effects) {
-		// warning: this can happen when a DOT is still running... as a result, DOTs don't re-enqueue themselves when a character is <0 health
-		dot_remove(ch, ch->over_time_effects);
+	// remove all DoTs? only if it was another player with no-autokill
+	if (ch != top_killer && (!top_killer || !IS_NPC(top_killer))) {
+		while (ch->over_time_effects) {
+			dot_remove(ch, ch->over_time_effects);
+		}
 	}
 }
 
@@ -3181,7 +3189,7 @@ int damage(char_data *ch, char_data *victim, int dam, int attacktype, byte damty
 	else if (ch != victim && GET_POS(victim) < POS_SLEEPING && !WOULD_EXECUTE(ch, victim)) {
 		// SHOULD this also remove DoTs etc? -paul 5/6/2017
 		
-		stop_combat_no_autokill(victim);
+		stop_combat_no_autokill(victim, ch);
 		return -1;	// prevents other damage/effects
 		// no need to message here; they already got a pos message
 	}
@@ -3645,7 +3653,7 @@ void perform_execute(char_data *ch, char_data *victim, int attacktype, int damty
 		ok = TRUE;
 
 	if (!ok) {
-		stop_combat_no_autokill(victim);
+		stop_combat_no_autokill(victim, ch);
 		act("$n is knocked unconscious!", FALSE, victim, 0, 0, TO_ROOM);
 		msg_to_char(victim, "You are knocked unconscious.\r\n");
 		return;
