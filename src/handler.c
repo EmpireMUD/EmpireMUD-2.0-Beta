@@ -158,30 +158,33 @@ EVENTFUNC(dot_update_event) {
 	// cancel this first -- will re-enqueue if needed
 	dot->update_event = NULL;
 	
-	// determine type:
-	// TODO could this be an array or function
-	type = dot->damage_type == DAM_MAGICAL ? ATTACK_MAGICAL_DOT : (
-		dot->damage_type == DAM_FIRE ? ATTACK_FIRE_DOT : (
-		dot->damage_type == DAM_POISON ? ATTACK_POISON_DOT : 
-		ATTACK_PHYSICAL_DOT
-	));
-	caster = find_player_in_room_by_id(IN_ROOM(ch), dot->cast_by);
-	
-	// bam! (damage func shows the messaging)
-	result = damage(caster ? caster : ch, ch, dot->damage * dot->stack, type, dot->damage_type);
-	
-	if (result < 0 || IS_DEAD(ch) || EXTRACTED(ch)) {
-		// done here (death and extraction should both remove the DOT themselves)
-		free(data);
-		return 0;	// do not re-enqueue
-	}
-	
-	// they lived:
-	dot->time_remaining -= DOT_INTERVAL;
-	
-	// cancel action if they were hit
-	if (result > 0) {
-		cancel_action(ch);
+	// damage them if any time remains (if not, this dot is actually already over)
+	if (dot->time_remaining > 0) {
+		// determine type:
+		// TODO could this be an array or function
+		type = dot->damage_type == DAM_MAGICAL ? ATTACK_MAGICAL_DOT : (
+			dot->damage_type == DAM_FIRE ? ATTACK_FIRE_DOT : (
+			dot->damage_type == DAM_POISON ? ATTACK_POISON_DOT : 
+			ATTACK_PHYSICAL_DOT
+		));
+		caster = find_player_in_room_by_id(IN_ROOM(ch), dot->cast_by);
+		
+		// bam! (damage func shows the messaging)
+		result = damage(caster ? caster : ch, ch, dot->damage * dot->stack, type, dot->damage_type);
+		
+		if (result < 0 || IS_DEAD(ch) || EXTRACTED(ch)) {
+			// done here (death and extraction should both remove the DOT themselves)
+			free(data);
+			return 0;	// do not re-enqueue
+		}
+		
+		// they lived:
+		dot->time_remaining -= DOT_INTERVAL;
+		
+		// cancel action if they were hit
+		if (result > 0) {
+			cancel_action(ch);
+		}
 	}
 	
 	// reschedule or expire
@@ -1290,11 +1293,36 @@ void dot_remove(char_data *ch, struct over_time_effect_type *dot) {
 		dot->update_event = NULL;
 	}
 	
-	// remove from list
+	// remove from list and send it off to be freed
 	LL_DELETE(ch->over_time_effects, dot);
-	free(dot);
+	dot->time_remaining = 0;	// prevent any accidental use
+	LL_PREPEND(free_dots_list, dot);
 	
 	queue_delayed_update(ch, CDU_MSDP_DOTS);
+}
+
+
+/**
+* Damage-over-time effects (DOTs) are stored in a list and freed at a time when
+* no DOTs can be processing. The reason for this is that DOTs can kill the
+* character, causing the DOT to be removed by that death while it's still
+* processing in the DG event func.
+*
+* This is called right after DG event updates.
+*/
+void free_freeable_dots(void) {
+	struct over_time_effect_type *dot, *next_dot;
+	
+	LL_FOREACH_SAFE(free_dots_list, dot, next_dot) {
+		// this should NOT be scheduled, but double-check now
+		if (dot->update_event) {
+			dg_event_cancel(dot->update_event, cancel_dot_event);
+			dot->update_event = NULL;
+		}
+		
+		free(dot);
+	}
+	free_dots_list = NULL;
 }
 
 

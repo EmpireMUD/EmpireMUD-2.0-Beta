@@ -8195,8 +8195,9 @@ void free_whole_library(void) {
 		free(island);
 	}
 	
-	// ensure triggers are gone
+	// ensure these are gone
 	free_freeable_triggers();
+	free_freeable_dots();
 	
 	// most of this part is just done in alphabetical order
 	HASH_ITER(hh, ability_table, abil, next_abil) {

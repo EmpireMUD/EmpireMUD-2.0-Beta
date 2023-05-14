@@ -238,6 +238,7 @@ int max_inventory_size = 25;	// records how high inventories go right now (for s
 struct int_hash *inherent_ptech_hash = NULL;	// hash of PTECH_ that are automatic
 struct player_quest *global_next_player_quest = NULL;	// for safely iterating
 struct player_quest *global_next_player_quest_2 = NULL;	// it may be possible for 2 iterators at once on this
+struct over_time_effect_type *free_dots_list = NULL;	// global LL of DOTs that have expired and must be free'd late to prevent issues
 
 // progress
 progress_data *progress_table = NULL;	// hashed by vnum, sorted by vnum

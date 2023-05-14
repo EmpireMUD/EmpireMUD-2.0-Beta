@@ -87,6 +87,7 @@ bool affected_by_spell_from_caster(char_data *ch, any_vnum type, char_data *cast
 struct affected_type *create_aff(any_vnum type, int duration, int location, int modifier, bitvector_t bitvector, char_data *cast_by);
 void apply_dot_effect(char_data *ch, any_vnum type, int seconds_duration, sh_int damage_type, sh_int damage, sh_int max_stack, char_data *cast_by);
 void dot_remove(char_data *ch, struct over_time_effect_type *dot);
+void free_freeable_dots();
 bool room_affected_by_spell(room_data *room, any_vnum type);
 void schedule_affect_expire(char_data *ch, struct affected_type *af);
 void schedule_dot_update(char_data *ch, struct over_time_effect_type *dot);

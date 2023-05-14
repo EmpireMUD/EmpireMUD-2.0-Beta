@@ -812,6 +812,9 @@ void heartbeat(unsigned long heart_pulse) {
 	
 	dg_event_process();
 	HEARTBEAT_LOG("0")
+	
+	free_freeable_dots();
+	HEARTBEAT_LOG("0.5")
 
 	// this is meant to be slightly longer than the mobile_activity pulse (10), and is mentioned in help files
 	if (HEARTBEAT(13)) {
