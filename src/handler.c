@@ -1232,7 +1232,7 @@ void apply_dot_effect(char_data *ch, any_vnum type, int seconds_duration, sh_int
 	generic_data *gen;
 	int id = (cast_by ? CAST_BY_ID(cast_by) : 0);
 	
-	log("Debug: %s apply_dot_effect %d", GET_PC_NAME(ch), dot->type);
+	log("Debug: %s apply_dot_effect %d", GET_PC_NAME(ch), type);
 	
 	// adjust duration to ensure a multiple of 5 seconds
 	seconds_duration = (int) (ceil(seconds_duration / ((double)DOT_INTERVAL)) * DOT_INTERVAL);
