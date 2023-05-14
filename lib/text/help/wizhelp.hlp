@@ -727,7 +727,7 @@ does not keep people from re-attacking). Input queues are also cleared, to
 avoid players accidentally restarting combat from queued attacks. This command
 is grantable.
 
-See also: DIPLOMACY PEACE, GRANT
+See also: DIPLOMACY PEACE, DOTS, GRANT
 #d
 PLAYERDELETE "PLAYER DELETE" "DELETE PLAYER" DELETEPLAYER PLRDELETE
 
