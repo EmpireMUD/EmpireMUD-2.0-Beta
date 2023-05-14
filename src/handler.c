@@ -171,6 +171,7 @@ EVENTFUNC(dot_update_event) {
 	result = damage(caster ? caster : ch, ch, dot->damage * dot->stack, type, dot->damage_type);
 	
 	if (result < 0 || IS_DEAD(ch) || EXTRACTED(ch)) {
+		log("Debug: %s dedz %d", GET_PC_NAME(ch), result);
 		// done here (death and extraction should both remove the DOT themselves)
 		free(data);
 		return 0;	// do not re-enqueue
@@ -187,9 +188,11 @@ EVENTFUNC(dot_update_event) {
 	// reschedule or expire
 	if (GET_HEALTH(ch) >= 0 && dot->time_remaining > 0) {
 		// NOTE: when a character drops below 0, dots are often removed in a way this CAN'T detect
+		log("Debug: %s reschedule %d", GET_PC_NAME(ch), dot->time_remaining);
 		return DOT_INTERVAL RL_SEC;	// re-enqueue
 	}
 	else {
+		log("Debug: %s dot expires %d", GET_PC_NAME(ch), dot->type);
 		// expired
 		if (dot->type > 0) {
 			show_wear_off_msg(ch, dot->type);
@@ -1229,6 +1232,8 @@ void apply_dot_effect(char_data *ch, any_vnum type, int seconds_duration, sh_int
 	generic_data *gen;
 	int id = (cast_by ? CAST_BY_ID(cast_by) : 0);
 	
+	log("Debug: %s apply_dot_effect %d", GET_PC_NAME(ch), dot->type);
+	
 	// adjust duration to ensure a multiple of 5 seconds
 	seconds_duration = (int) (ceil(seconds_duration / ((double)DOT_INTERVAL)) * DOT_INTERVAL);
 	seconds_duration = MAX(DOT_INTERVAL, seconds_duration);
@@ -1241,11 +1246,15 @@ void apply_dot_effect(char_data *ch, any_vnum type, int seconds_duration, sh_int
 			if (iter->stack < MIN(iter->max_stack, max_stack)) {
 				++iter->stack;
 			}
+			
+			log("Debug: - %s existing", GET_PC_NAME(ch));
 			dot = iter;
 		}
 	}
 	
 	if (!dot) {
+		log("Debug: - %s new", GET_PC_NAME(ch));
+	
 		CREATE(dot, struct over_time_effect_type, 1);
 		LL_PREPEND(ch->over_time_effects, dot);
 		
@@ -1281,8 +1290,10 @@ void apply_dot_effect(char_data *ch, any_vnum type, int seconds_duration, sh_int
 * @param struct over_time_effect_type *dot The DoT to remove.
 */
 void dot_remove(char_data *ch, struct over_time_effect_type *dot) {
+	log("Debug: %s dot_remove %d", GET_PC_NAME(ch), dot->type);
 	// cancel event?
 	if (dot->update_event) {
+		log("Debug: - %s detect remove %d", GET_PC_NAME(ch), dot->type);
 		dg_event_cancel(dot->update_event, cancel_dot_event);
 		dot->update_event = NULL;
 	}
@@ -1362,8 +1373,11 @@ void schedule_affect_expire(char_data *ch, struct affected_type *af) {
 void schedule_dot_update(char_data *ch, struct over_time_effect_type *dot) {
 	struct dot_event_data *expire_data;
 	
+	log("Debug: %s schedule_dot_update %d", GET_PC_NAME(ch), dot->type);
+	
 	// check for and remove old event
 	if (dot && dot->update_event) {
+		log("Debug: - %s canceling old event %d", GET_PC_NAME(ch), dot->type);
 		dg_event_cancel(dot->update_event, cancel_dot_event);
 		dot->update_event = NULL;
 	}
