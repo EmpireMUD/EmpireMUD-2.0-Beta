@@ -189,6 +189,7 @@ EVENTFUNC(dot_update_event) {
 	if (GET_HEALTH(ch) >= 0 && dot->time_remaining > 0) {
 		// NOTE: when a character drops below 0, dots are often removed in a way this CAN'T detect
 		log("Debug: %s reschedule %d", GET_PC_NAME(ch), dot->time_remaining);
+		dot->update_event = the_event;
 		return DOT_INTERVAL RL_SEC;	// re-enqueue
 	}
 	else {
