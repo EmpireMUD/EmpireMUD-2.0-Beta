@@ -722,9 +722,10 @@ PEACE "PEACE COMMAND"
 
 Usage:  peace
 
-The peace command ends all combat in the room (but does not keep people from
-re-attacking). Input queues are also cleared, to avoid players accidentally
-restarting combat from queued attacks. This command is grantable.
+The peace command ends all combat in the room and clears all DOT effects (but
+does not keep people from re-attacking). Input queues are also cleared, to
+avoid players accidentally restarting combat from queued attacks. This command
+is grantable.
 
 See also: DIPLOMACY PEACE, GRANT
 #d
