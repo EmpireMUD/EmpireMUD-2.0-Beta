@@ -485,23 +485,6 @@ void real_update_char(char_data *ch) {
 		adventure_unsummon(ch);
 	}
 	
-	if (GET_LEADING_VEHICLE(ch) && IN_ROOM(ch) != IN_ROOM(GET_LEADING_VEHICLE(ch))) {
-		act("You have lost $V and stop leading it.", FALSE, ch, NULL, GET_LEADING_VEHICLE(ch), TO_CHAR);
-		VEH_LED_BY(GET_LEADING_VEHICLE(ch)) = NULL;
-		GET_LEADING_VEHICLE(ch) = NULL;
-	}
-	if (GET_LEADING_MOB(ch) && IN_ROOM(ch) != IN_ROOM(GET_LEADING_MOB(ch))) {
-		act("You have lost $N and stop leading $M.", FALSE, ch, NULL, GET_LEADING_MOB(ch), TO_CHAR);
-		GET_LED_BY(GET_LEADING_MOB(ch)) = NULL;
-		GET_LEADING_MOB(ch) = NULL;
-	}
-	if (GET_SITTING_ON(ch)) {
-		// things that cancel sitting-on:
-		if (IN_ROOM(ch) != IN_ROOM(GET_SITTING_ON(ch)) || (GET_POS(ch) != POS_SITTING && GET_POS(ch) != POS_RESTING && GET_POS(ch) != POS_SLEEPING) || IS_RIDING(ch) || GET_LEADING_MOB(ch) || GET_LEADING_VEHICLE(ch)) {
-			do_unseat_from_vehicle(ch);
-		}
-	}
-	
 	// ensure I don't have an invalid companion in the solo role
 	if (!IS_NPC(ch) && GET_COMPANION(ch) && GET_CLASS_ROLE(ch) == ROLE_SOLO && (compan = has_companion(ch, GET_MOB_VNUM(GET_COMPANION(ch)))) && compan->from_abil != NO_ABIL && (abil = find_ability_by_vnum(compan->from_abil)) && ABIL_IS_SYNERGY(abil) && !check_solo_role(ch)) {
 		act("$N vanishes because you're in the solo role but not alone.", FALSE, ch, NULL, GET_COMPANION(ch), TO_CHAR);
