@@ -1422,6 +1422,7 @@ typedef struct vehicle_data vehicle_data;
 #define SEV_MOVEMENT  7	// normal mob movement
 #define SEV_AGGRO  8	// aggro or cityguard mobs
 #define SEV_SCAVENGE  9	// scavenger mobs consume a corpse
+#define SEV_VAMPIRE_FEEDING  10	// drinking blood
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -5490,6 +5491,12 @@ struct player_event_data {
 
  //////////////////////////////////////////////////////////////////////////////
 //// EVENT STRUCTS (TIMED EVENT SYSTEM) //////////////////////////////////////
+
+// for character-driven events that can be PC or NPC
+struct char_event_data {
+	char_data *character;	// the person acting
+};
+
 
 // for map events
 struct map_event_data {

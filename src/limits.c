@@ -578,14 +578,6 @@ void real_update_char(char_data *ch) {
 		heal(ch, ch, GET_HEAL_OVER_TIME(ch));
 	}
 	
-	// biting -- this is usually PC-only, but NPCs could learn to do it
-	if (GET_FEEDING_FROM(ch)) {
-		update_biting_char(ch);
-		if (EXTRACTED(ch) || IS_DEAD(ch)) {
-			return;
-		}
-	}
-	
 	// players only
 	if (!IS_NPC(ch)) {
 		if (IS_MORPHED(ch)) {

@@ -21,6 +21,7 @@
 #include "db.h"
 #include "skills.h"
 #include "vnums.h"
+#include "dg_event.h"
 #include "dg_scripts.h"
 #include "constants.h"
 
@@ -36,6 +37,7 @@ ACMD(do_stand);
 
 // locals
 ACMD(do_bite);
+EVENTFUNC(vampire_feeding_event);
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -61,6 +63,7 @@ bool cancel_biting(char_data *ch) {
 		act("$n stops feeding from $N.", FALSE, ch, NULL, vict, TO_NOTVICT);
 		GET_FED_ON_BY(vict) = NULL;
 		GET_FEEDING_FROM(ch) = NULL;
+		cancel_stored_event(&GET_STORED_EVENTS(ch), SEV_VAMPIRE_FEEDING);
 		return TRUE;
 	}
 	
@@ -398,6 +401,9 @@ void sire_char(char_data *ch, char_data *victim) {
 * @param char_data *victim The person being bitten.
 */
 void start_drinking_blood(char_data *ch, char_data *victim) {
+	struct char_event_data *data;
+	struct dg_event *ev;
+	
 	// safety first
 	if (GET_FEEDING_FROM(ch)) {
 		cancel_biting(ch);
@@ -411,7 +417,17 @@ void start_drinking_blood(char_data *ch, char_data *victim) {
 
 	stop_fighting(ch);
 	stop_fighting(victim);
-
+	
+	// ensure no existing event
+	cancel_stored_event(&GET_STORED_EVENTS(ch), SEV_VAMPIRE_FEEDING);
+	
+	// create new event
+	CREATE(data, struct char_event_data, 1);
+	data->character = ch;
+	ev = dg_event_create(vampire_feeding_event, data, 5 RL_SEC);
+	add_stored_event(&GET_STORED_EVENTS(ch), SEV_VAMPIRE_FEEDING, ev);
+	
+	// messaging last
 	if (!IS_NPC(victim) && PRF_FLAGGED(victim, PRF_BOTHERABLE)) {
 		act("You grasp $N's wrist and bite into it.", FALSE, ch, 0, victim, TO_CHAR);
 		act("$n grasps $N's wrist and bites into it.", FALSE, ch, 0, victim, TO_NOTVICT);
@@ -797,6 +813,31 @@ void update_vampire_sun(char_data *ch) {
 	if (found) {
 		command_lag(ch, WAIT_ABILITY);
 	}
+}
+
+
+// handles periodic updates when a vampire is drinking blood
+EVENTFUNC(vampire_feeding_event) {
+	struct char_event_data *data = (struct char_event_data*)event_obj;
+	char_data *ch = data->character;
+	
+	// always delete first
+	delete_stored_event(&GET_STORED_EVENTS(ch), SEV_VAMPIRE_FEEDING);
+	
+	// biting -- this is usually PC-only, but NPCs could learn to do it
+	if (GET_FEEDING_FROM(ch)) {
+		update_biting_char(ch);
+	}
+	
+	// check if still feeding (etc)
+	if (!GET_FEEDING_FROM(ch) || EXTRACTED(ch) || IS_DEAD(ch)) {
+		free(data);
+		return 0;	// do not re-enqueue
+	}
+	
+	// if we get here, go ahead and repeat
+	add_stored_event(&GET_STORED_EVENTS(ch), SEV_VAMPIRE_FEEDING, the_event);
+	return 5 RL_SEC;
 }
 
 

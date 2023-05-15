@@ -6382,6 +6382,7 @@ void write_sector_to_file(FILE *fl, sector_data *st) {
 
 // cancel func externs
 EVENT_CANCEL_FUNC(cancel_burn_event);
+EVENT_CANCEL_FUNC(cancel_character_event);
 EVENT_CANCEL_FUNC(cancel_map_event);
 EVENT_CANCEL_FUNC(cancel_mob_event);
 EVENT_CANCEL_FUNC(cancel_room_event);
@@ -6399,6 +6400,7 @@ struct stored_event_info_t stored_event_info[] = {
 	{ cancel_mob_event },	// SEV_MOVEMENT
 	{ cancel_mob_event },	// SEV_AGGRO
 	{ cancel_mob_event },	// SEV_SCAVENGE
+	{ cancel_character_event },	// SEV_VAMPIRE_FEEDING
 };
 
 
@@ -6514,6 +6516,13 @@ struct stored_event *find_stored_event(struct stored_event *list, int type) {
 	}
 	
 	return NULL;	// not found
+}
+
+
+// generic canceller for simple character events
+EVENT_CANCEL_FUNC(cancel_character_event) {
+	struct char_event_data *data = (struct char_event_data*)event_obj;
+	free(data);
 }
 
 
