@@ -1072,11 +1072,15 @@ extern struct empire_territory_data *global_next_territory_entry;
 } while (0)
 
 // combine removing these with saving
+// note: removing TIED will always reset spawn time and schedule the despawn here
 #define remove_mob_flags(mob, to_set)  do { \
 	if (IS_NPC(mob)) {						\
 		REMOVE_BIT(MOB_FLAGS(mob), (to_set));	\
 		check_scheduled_events_mob(mob);	\
 		request_char_save_in_world(mob);	\
+		if (IS_SET((to_set), MOB_TIED)) {	\
+			set_mob_spawn_time((mob), time(0));	\
+		}									\
 	}										\
 } while (0)
 

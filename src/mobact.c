@@ -202,7 +202,9 @@ INTERACTION_FUNC(run_one_encounter) {
 			}
 		}
 		char_to_room(aggr, IN_ROOM(ch));
-		set_mob_flags(aggr, MOB_SPAWNED);
+		if (!MOB_FLAGGED(aggr, MOB_SPAWNED)) {
+			set_mob_flags(aggr, MOB_SPAWNED);
+		}
 		act("$N appears!", FALSE, ch, 0, aggr, TO_CHAR | TO_ROOM);
 		hit(aggr, ch, GET_EQ(aggr, WEAR_WIELD), TRUE);
 		load_mtrigger(aggr);
@@ -1368,7 +1370,7 @@ EVENTFUNC(mob_despawn_event) {
 	int count;
 	
 	// safety first
-	if (!MOB_FLAGGED(mob, MOB_SPAWNED)) {
+	if (!MOB_FLAGGED(mob, MOB_SPAWNED) || MOB_FLAGGED(mob, MOB_TIED)) {
 		delete_stored_event(&GET_STORED_EVENTS(mob), SEV_DESPAWN);
 		free(data);
 		return 0;	// do no re-enqueue
@@ -1447,7 +1449,7 @@ void schedule_despawn_event(char_data *mob) {
 	
 	long interval_mins = config_get_int("mob_spawn_interval");
 	
-	if (mob && MOB_FLAGGED(mob, MOB_SPAWNED) && !find_stored_event(GET_STORED_EVENTS(mob), SEV_DESPAWN) && interval_mins > 0) {
+	if (mob && MOB_FLAGGED(mob, MOB_SPAWNED) && !MOB_FLAGGED(mob, MOB_TIED) && !find_stored_event(GET_STORED_EVENTS(mob), SEV_DESPAWN) && interval_mins > 0) {
 		CREATE(data, struct mob_event_data, 1);
 		data->mob = mob;
 		
@@ -1537,7 +1539,9 @@ static int spawn_one_list(room_data *room, struct spawn_info *list) {
 		setup_generic_npc(mob, ROOM_OWNER(home), NOTHING, NOTHING);
 		
 		// enforce spawn data
-		set_mob_flags(mob, MOB_SPAWNED);
+		if (!MOB_FLAGGED(mob, MOB_SPAWNED)) {
+			set_mob_flags(mob, MOB_SPAWNED);
+		}
 		
 		// put in the room
 		char_to_room(mob, room);
