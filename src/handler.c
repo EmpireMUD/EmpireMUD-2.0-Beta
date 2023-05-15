@@ -88,6 +88,8 @@ void add_dropped_item(empire_data *emp, obj_data *obj);
 void add_dropped_item_anywhere(obj_data *obj, empire_data *only_if_emp);
 void add_dropped_item_list(empire_data *emp, obj_data *list);
 static void add_obj_binding(int idnum, struct obj_binding **list);
+EVENT_CANCEL_FUNC(cancel_cooldown_event);
+EVENTFUNC(cooldown_expire_event);
 void remove_dropped_item(empire_data *emp, obj_data *obj);
 void remove_dropped_item_anywhere(obj_data *obj);
 void remove_dropped_item_list(empire_data *emp, obj_data *list);
@@ -2915,6 +2917,7 @@ int total_coins(char_data *ch) {
 */
 void add_cooldown(char_data *ch, any_vnum type, int seconds_duration) {
 	struct cooldown_data *cool;
+	struct cooldown_expire_event_data *data;
 	bool found = FALSE;
 	
 	if (!find_generic(type, GENERIC_COOLDOWN)) {
@@ -2927,6 +2930,11 @@ void add_cooldown(char_data *ch, any_vnum type, int seconds_duration) {
 		if (cool->type == type) {
 			found = TRUE;
 			cool->expire_time = MAX(cool->expire_time, time(0) + seconds_duration);
+			if (cool->expire_event) {
+				dg_event_cancel(cool->expire_event, cancel_cooldown_event);
+				cool->expire_event = NULL;
+			}
+			break;	// only 1
 		}
 	}
 	
@@ -2938,12 +2946,65 @@ void add_cooldown(char_data *ch, any_vnum type, int seconds_duration) {
 		LL_PREPEND(ch->cooldowns, cool);
 	}
 	
+	// schedule?
+	if (cool) {
+		CREATE(data, struct cooldown_expire_event_data, 1);
+		data->character = ch;
+		data->cooldown = cool;
+		cool->expire_event = dg_event_create(cooldown_expire_event, data, (cool->expire_time - time(0)) RL_SEC);
+	}
+	
 	if (ch->desc) {
 		queue_delayed_update(ch, CDU_MSDP_COOLDOWNS);
 	}
 	if (IS_NPC(ch)) {
 		// only save mobs for this. players don't need it
 		request_char_save_in_world(ch);
+	}
+}
+
+
+// canceller for cooldown events
+EVENT_CANCEL_FUNC(cancel_cooldown_event) {
+	struct cooldown_expire_event_data *data = (struct cooldown_expire_event_data*)event_obj;
+	free(data);
+}
+
+
+// called when a cooldown times out
+EVENTFUNC(cooldown_expire_event) {
+	struct cooldown_expire_event_data *data = (struct cooldown_expire_event_data*)event_obj;
+	char_data *ch = data->character;
+	struct cooldown_data *cool = data->cooldown;
+	generic_data *gen;
+	
+	// always delete first
+	cool->expire_event = NULL;
+	free(data);
+	
+	// messaging is a maybe
+	if (!IS_NPC(ch) && IN_ROOM(ch) && (gen = find_generic(cool->type, GENERIC_COOLDOWN)) && GET_COOLDOWN_WEAR_OFF(gen)) {
+		msg_to_char(ch, "\t%c%s\t0\r\n", (GET_CUSTOM_COLOR(ch, CUSTOM_COLOR_STATUS) ? GET_CUSTOM_COLOR(ch, CUSTOM_COLOR_STATUS) : '0'), GET_COOLDOWN_WEAR_OFF(gen));
+	}
+	
+	remove_cooldown(ch, cool);
+	return 0;	// do not re-enqueue
+}
+
+
+/**
+* Frees a cooldown after ensuring it doesn't have an expiry event scheduled.
+*
+* @param struct cooldown_data *cool The cooldown.
+*/
+void free_cooldown(struct cooldown_data *cool) {
+	if (cool) {
+		if (cool->expire_event) {
+			dg_event_cancel(cool->expire_event, cancel_cooldown_event);
+			cool->expire_event = NULL;
+		}
+		
+		free(cool);
 	}
 }
 
@@ -2978,7 +3039,7 @@ int get_cooldown_time(char_data *ch, any_vnum type) {
 */
 void remove_cooldown(char_data *ch, struct cooldown_data *cool) {
 	LL_DELETE(ch->cooldowns, cool);
-	free(cool);
+	free_cooldown(cool);
 	
 	if (ch->desc) {
 		queue_delayed_update(ch, CDU_MSDP_COOLDOWNS);

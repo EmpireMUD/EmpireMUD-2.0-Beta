@@ -69,7 +69,6 @@ int perform_alias(descriptor_data *d, char *orig);
 char *prompt_olc_info(char_data *ch);
 
 // heartbeat functions
-void check_expired_cooldowns();
 void check_idle_passwords();
 void check_newbie_islands();
 void check_wars();
@@ -826,10 +825,8 @@ void heartbeat(unsigned long heart_pulse) {
 		update_actions();
 		HEARTBEAT_LOG("2")
 	}
-	if (HEARTBEAT(1)) {
-		check_expired_cooldowns();	// descriptor list
-		HEARTBEAT_LOG("3")
-	}
+	
+	// "3" was check_expired_cooldowns -- now a scheduled event
 
 	if (HEARTBEAT(3)) {
 		update_guard_towers();

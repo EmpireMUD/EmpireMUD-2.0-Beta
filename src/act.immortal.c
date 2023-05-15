@@ -10187,8 +10187,7 @@ ACMD(do_restore) {
 	// remove all cooldowns
 	if (all || cds) {
 		while ((cool = vict->cooldowns)) {
-			vict->cooldowns = cool->next;
-			free(cool);
+			remove_cooldown(vict, cool);
 		}
 		
 		sprintf(types + strlen(types), "%s cooldowns", *types ? "," : "");

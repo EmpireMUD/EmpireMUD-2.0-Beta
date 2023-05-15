@@ -156,6 +156,7 @@ void reread_companion_trigs(char_data *mob);
 
 // cooldown handlers
 void add_cooldown(char_data *ch, any_vnum type, int seconds_duration);
+void free_cooldown(struct cooldown_data *cool);
 int get_cooldown_time(char_data *ch, any_vnum type);
 void remove_cooldown(char_data *ch, struct cooldown_data *cool);
 void remove_cooldown_by_type(char_data *ch, any_vnum type);

@@ -4790,10 +4790,18 @@ struct char_data {
 };
 
 
+// for cooldown expiration
+struct cooldown_expire_event_data {
+	char_data *character;
+	struct cooldown_data *cooldown;
+};
+
+
 // cooldown info (cooldowns are defined by generics)
 struct cooldown_data {
 	any_vnum type;	// any COOLDOWN_ const or vnum
 	time_t expire_time;	// time at which the cooldown has expired
+	struct dg_event *expire_event;	// scheduled DG event, if any
 	
 	struct cooldown_data *next;	// linked list
 };

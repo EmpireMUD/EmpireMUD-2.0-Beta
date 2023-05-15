@@ -123,35 +123,6 @@ void check_attribute_gear(char_data *ch) {
 
 
 /**
-* It's not necessary to force-expire cooldowns like this, but players may
-* benefit from an explicit message. As such, to save computational power, this
-* only runs on players who are connected. Nobody else, including mobs, needs
-* to know.
-*/
-void check_expired_cooldowns(void) {	
-	struct cooldown_data *cool, *next_cool;
-	generic_data *gen;
-	char_data *ch;
-	descriptor_data *d;
-	
-	for (d = descriptor_list; d; d = d->next) {
-		if (STATE(d) == CON_PLAYING && (ch = d->character)) {
-			for (cool = ch->cooldowns; cool; cool = next_cool) {
-				next_cool = cool->next;
-				
-				if ((cool->expire_time - time(0)) <= 0) {
-					if ((gen = find_generic(cool->type, GENERIC_COOLDOWN)) && GET_COOLDOWN_WEAR_OFF(gen)) {
-						msg_to_char(ch, "&%c%s&0\r\n", (!IS_NPC(ch) && GET_CUSTOM_COLOR(ch, CUSTOM_COLOR_STATUS)) ? GET_CUSTOM_COLOR(ch, CUSTOM_COLOR_STATUS) : '0', GET_COOLDOWN_WEAR_OFF(gen));
-					}
-					remove_cooldown(ch, cool);
-				}
-			}
-		}
-	}
-}
-
-
-/**
 * Times out players who are sitting at the password or name prompt.
 */
 void check_idle_passwords(void) {
@@ -383,7 +354,6 @@ int limit_crowd_control(char_data *victim, int atype) {
 * @return bool TRUE if the character survives the update, FALSE if not.
 */
 bool point_update_char(char_data *ch) {
-	struct cooldown_data *cool, *next_cool;
 	obj_data *obj, *next_obj;
 	bool found;
 	
@@ -395,10 +365,6 @@ bool point_update_char(char_data *ch) {
 	// everything beyond here only matters if still alive
 	if (IS_DEAD(ch)) {
 		return FALSE;
-	}
-	
-	if (IS_NPC(ch) && FIGHTING(ch)) {
-		check_pointless_fight(ch);
 	}
 	
 	if (!IS_NPC(ch)) {
@@ -477,20 +443,6 @@ bool point_update_char(char_data *ch) {
 		}
 		else {
 			act("The fire rages as the building burns!", FALSE, ch, NULL, NULL, TO_CHAR);
-		}
-	}
-	
-	// check all cooldowns -- ignore chars with descriptors, as they'll want
-	// the OTHER function to remove this (it sends messages; this one includes
-	// NPCs and doesn't)
-	if (!ch->desc) {
-		for (cool = ch->cooldowns; cool; cool = next_cool) {
-			next_cool = cool->next;
-		
-			// is expired?
-			if (time(0) >= cool->expire_time) {
-				remove_cooldown(ch, cool);
-			}
 		}
 	}
 	

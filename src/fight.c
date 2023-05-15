@@ -4265,6 +4265,9 @@ void frequent_combat(unsigned long pulse) {
 		// bring friends in no matter what (on the real seconds
 		if ((pulse % (1 RL_SEC)) == 0) {
 			check_auto_assist(ch);
+			if (IS_NPC(ch)) {
+				check_pointless_fight(ch);
+			}
 		}
 		
 		// reasons you would not get a round
@@ -4273,11 +4276,6 @@ void frequent_combat(unsigned long pulse) {
 		}
 		
 		// ready for combat:
-		
-		// update spawn time: delay despawn due to recent fighting
-		if (MOB_FLAGGED(ch, MOB_SPAWNED)) {
-			set_mob_spawn_time(ch, time(0));
-		}
 		
 		switch (FIGHT_MODE(ch)) {
 			case FMODE_WAITING: {
@@ -4292,6 +4290,12 @@ void frequent_combat(unsigned long pulse) {
 				// my turn?
 				if (GET_LAST_SWING_MAINHAND(ch) + (speed SEC_MICRO) <= microtime()) {
 					GET_LAST_SWING_MAINHAND(ch) = microtime();
+					
+					// update spawned time
+					if (MOB_FLAGGED(ch, MOB_SPAWNED)) {
+						set_mob_spawn_time(ch, time(0));
+					}
+					
 					one_combat_round(ch, speed, GET_EQ(ch, WEAR_RANGED));
 				}
 				break;
@@ -4304,6 +4308,12 @@ void frequent_combat(unsigned long pulse) {
 				speed = get_combat_speed(ch, WEAR_WIELD);
 				if (GET_LAST_SWING_MAINHAND(ch) + (speed SEC_MICRO) <= timestamp) {
 					GET_LAST_SWING_MAINHAND(ch) = timestamp;
+					
+					// update spawned time
+					if (MOB_FLAGGED(ch, MOB_SPAWNED)) {
+						set_mob_spawn_time(ch, time(0));
+					}
+					
 					one_combat_round(ch, speed, GET_EQ(ch, WEAR_WIELD));
 				}
 				
