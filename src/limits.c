@@ -2123,6 +2123,7 @@ int move_gain(char_data *ch, bool info_only) {
 	return MAX(0, (int)gain);
 }
 
+
 /**
 * Schedules an event for heal-over-time applies, if needed.
 *

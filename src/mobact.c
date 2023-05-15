@@ -753,8 +753,8 @@ void schedule_mob_move_event(char_data *ch, bool randomize) {
 
 
 /**
-* Schedules DG events (aggro, scavenging) that happen when a person move into a
-* room.
+* Schedules DG events (aggro, scavenging) that happen when a person moves into
+* a room.
 *
 * @param char_data *ch The person (PC or NPC) who moved into their current room.
 */
@@ -772,6 +772,8 @@ void schedule_movement_events(char_data *ch) {
 			schedule_aggro_event(ch);
 		}
 	}
+	
+	schedule_check_leading_event(ch);
 	
 	// everything else is for NPCs only; players exit here
 	if (!IS_NPC(ch)) {

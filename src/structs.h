@@ -1425,6 +1425,7 @@ typedef struct vehicle_data vehicle_data;
 #define SEV_VAMPIRE_FEEDING  10	// drinking blood
 #define SEV_RESET_MOB  11	// periodic reset of damaged/tagged mobs
 #define SEV_HEAL_OVER_TIME  12	// handles HOT applies
+#define SEV_CHECK_LEADING  13	// called right after moving, in some cases
 
 
  //////////////////////////////////////////////////////////////////////////////

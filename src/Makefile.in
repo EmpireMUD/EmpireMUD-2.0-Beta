@@ -379,7 +379,7 @@ updates.o: updates.c conf.h sysdep.h structs.h protocol.h uthash.h \
   dg_scripts.h olc.h skills.h vnums.h
 	$(CC) -c $(CFLAGS) updates.c
 utils.o: utils.c conf.h sysdep.h structs.h uthash.h utils.h db.h comm.h \
-  handler.h interpreter.h skills.h vnums.h dg_scripts.h constants.h
+  handler.h interpreter.h skills.h vnums.h dg_event.h dg_scripts.h constants.h
 	$(CC) -c $(CFLAGS) utils.c
 vehicles.o: vehicles.c conf.h sysdep.h structs.h protocol.h uthash.h \
   utils.h interpreter.h db.h comm.h olc.h skills.h handler.h dg_scripts.h \

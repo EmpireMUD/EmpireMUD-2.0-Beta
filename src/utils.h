@@ -1837,6 +1837,7 @@ bool has_one_day_playtime(char_data *ch);
 int num_earned_bonus_traits(char_data *ch);
 int pick_level_from_range(int level, int min, int max);
 void relocate_players(room_data *room, room_data *to_room);
+void schedule_check_leading_event(char_data *ch);
 void update_all_players(char_data *to_message, PLAYER_UPDATE_FUNC(*func));
 bool wake_and_stand(char_data *ch);
 

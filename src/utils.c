@@ -24,6 +24,7 @@
 #include "interpreter.h"
 #include "skills.h"
 #include "vnums.h"
+#include "dg_event.h"
 #include "dg_scripts.h"
 #include "constants.h"
 
@@ -3023,6 +3024,41 @@ bool can_see_in_dark_room(char_data *ch, room_data *room, bool count_adjacent_li
 }
 
 
+// checks stuff right after movement
+EVENTFUNC(check_leading_event) {
+	struct char_event_data *data = (struct char_event_data*)event_obj;
+	char_data *ch = data->character;
+	
+	// will not be re-using this
+	delete_stored_event(&GET_STORED_EVENTS(ch), SEV_CHECK_LEADING);
+	free(data);
+	
+	if (!IN_ROOM(ch)) {
+		return 0;	// never re-enqueue
+	}
+	
+	// NOTE: if you add conditions here, check _QUALIFY_CHECK_LEADING(ch) too
+	if (GET_LEADING_VEHICLE(ch) && IN_ROOM(ch) != IN_ROOM(GET_LEADING_VEHICLE(ch))) {
+		act("You have lost $V and stop leading it.", FALSE, ch, NULL, GET_LEADING_VEHICLE(ch), TO_CHAR);
+		VEH_LED_BY(GET_LEADING_VEHICLE(ch)) = NULL;
+		GET_LEADING_VEHICLE(ch) = NULL;
+	}
+	if (GET_LEADING_MOB(ch) && IN_ROOM(ch) != IN_ROOM(GET_LEADING_MOB(ch))) {
+		act("You have lost $N and stop leading $M.", FALSE, ch, NULL, GET_LEADING_MOB(ch), TO_CHAR);
+		GET_LED_BY(GET_LEADING_MOB(ch)) = NULL;
+		GET_LEADING_MOB(ch) = NULL;
+	}
+	if (GET_SITTING_ON(ch)) {
+		// things that cancel sitting-on:
+		if (IN_ROOM(ch) != IN_ROOM(GET_SITTING_ON(ch)) || (GET_POS(ch) != POS_SITTING && GET_POS(ch) != POS_RESTING && GET_POS(ch) != POS_SLEEPING) || IS_RIDING(ch) || GET_LEADING_MOB(ch) || GET_LEADING_VEHICLE(ch)) {
+			do_unseat_from_vehicle(ch);
+		}
+	}
+	
+	return 0;	// never re-enqueue
+}
+
+
 /**
 * Gives a character the appropriate amount of command lag (wait time).
 *
@@ -3236,6 +3272,29 @@ int pick_level_from_range(int level, int min, int max) {
 		level = MIN(level, max);
 	}
 	return level;
+}
+
+
+/**
+* Schedules an event to check things a person is leading/sitting on after
+* moving, if needed.
+*
+* @param char_data *ch The person who moved.
+*/
+void schedule_check_leading_event(char_data *ch) {
+	struct char_event_data *data;
+	struct dg_event *ev;
+	
+	// things that need this function
+	#define _QUALIFY_CHECK_LEADING(ch)  (GET_LEADING_VEHICLE(ch) || GET_LEADING_MOB(ch) || GET_SITTING_ON(ch))
+	
+	if (ch && _QUALIFY_CHECK_LEADING(ch) && !find_stored_event(GET_STORED_EVENTS(ch), SEV_CHECK_LEADING)) {
+		CREATE(data, struct char_event_data, 1);
+		data->character = ch;
+		
+		ev = dg_event_create(check_leading_event, data, 1 RL_SEC);
+		add_stored_event(&GET_STORED_EVENTS(ch), SEV_CHECK_LEADING, ev);
+	}
 }
 
 

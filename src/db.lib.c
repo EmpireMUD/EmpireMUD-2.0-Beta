@@ -6462,6 +6462,7 @@ struct stored_event_info_t stored_event_info[] = {
 	{ cancel_character_event },	// SEV_VAMPIRE_FEEDING
 	{ cancel_mob_event },	// SEV_RESET_MOB
 	{ cancel_character_event },	// SEV_HEAL_OVER_TIME
+	{ cancel_character_event },	// SEV_CHECK_LEADING
 };
 
 
