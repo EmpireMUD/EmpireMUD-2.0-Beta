@@ -2219,7 +2219,6 @@ char_data *get_player_vis(char_data *ch, char *name, bitvector_t flags) {
 */
 char_data *get_char_world(char *name, int *number) {
 	char tmpname[MAX_INPUT_LENGTH], *tmp = tmpname;
-	bool pc_only = FALSE;
 	char_data *ch;
 	int num;
 	
@@ -2232,12 +2231,50 @@ char_data *get_char_world(char *name, int *number) {
 		tmp = name;
 	}
 	if (*number == 0) {
-		pc_only = TRUE;
+		return get_player_world(name, number);
 	}
 	
 	DL_FOREACH(character_list, ch) {
-		if ((!IS_NPC(ch) || !pc_only) && match_char_name(NULL, ch, tmp, MATCH_GLOBAL)) {
-			if (--(*number) == 0 || pc_only) {	// pc_only messes up pos
+		if (match_char_name(NULL, ch, tmp, MATCH_GLOBAL)) {
+			if (--(*number) == 0) {
+				return ch;	// done
+			}
+		}
+	}
+
+	return NULL;
+}
+
+
+/**
+* Searches for a player in the whole world with a matching name, without
+* requiring visibility. This ignores mobs.
+*
+* @param char *name The name of the target.
+* @param int *number Optional: For multi-list number targeting (look 4.bob; may be NULL)
+* @return char_data* The found player, or NULL.
+*/
+char_data *get_player_world(char *name, int *number) {
+	char tmpname[MAX_INPUT_LENGTH], *tmp = tmpname;
+	bool ignore = FALSE;
+	char_data *ch;
+	int num;
+	
+	if (!number) {
+		strcpy(tmp, name);
+		number = &num;
+		num = get_number(&tmp);
+	}
+	else {
+		tmp = name;
+	}
+	if (*number == 0) {
+		ignore = TRUE;
+	}
+	
+	DL_FOREACH2(player_character_list, ch, next_plr) {
+		if (match_char_name(NULL, ch, tmp, MATCH_GLOBAL)) {
+			if (--(*number) == 0 || ignore) {
 				return ch;	// done
 			}
 		}

@@ -3336,7 +3336,7 @@ char_data *find_or_load_player(char *name, bool *is_file) {
 	// not able to find -- look for a player partial match?
 	if (!ch) {
 		sprintf(buf, "0.%s", name);	// add 0. to force player match
-		ch = get_char_world(buf, NULL);
+		ch = get_player_world(buf, NULL);
 		*is_file = FALSE;
 		if (ch && IS_NPC(ch)) {
 			ch = NULL;	// verify player only

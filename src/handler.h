@@ -124,6 +124,7 @@ char_data *get_char_room_vis(char_data *ch, char *name, int *number);
 char_data *get_char_vis(char_data *ch, char *name, int *number, bitvector_t where);
 char_data *get_player_vis(char_data *ch, char *name, bitvector_t flags);
 char_data *get_char_world(char *name, int *number);
+char_data *get_player_world(char *name, int *number);
 
 // coin handlers
 bool can_afford_coins(char_data *ch, empire_data *type, int amount);
