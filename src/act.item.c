@@ -5178,7 +5178,7 @@ ACMD(do_drink) {
 	
 	// apply effects
 	if (liquid == LIQ_BLOOD) {
-		GET_BLOOD(ch) = MIN(GET_MAX_BLOOD(ch), GET_BLOOD(ch) + amount);
+		set_blood(ch, GET_BLOOD(ch) + amount);
 	}
 	
 	// -1 to remove condition, amount = number of gulps

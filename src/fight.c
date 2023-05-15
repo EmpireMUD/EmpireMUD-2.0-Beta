@@ -740,7 +740,7 @@ int reduce_damage_from_skills(int dam, char_data *victim, char_data *attacker, i
 		
 			if (absorb > 0) {
 				dam -= absorb;
-				GET_MANA(victim) -= absorb;
+				set_mana(victim, GET_MANA(victim) - absorb);
 				if (can_gain_exp_from(victim, attacker)) {
 					gain_ability_exp(victim, ABIL_NULL_MANA, 5);
 				}
@@ -876,7 +876,7 @@ void stop_combat_no_autokill(char_data *ch, char_data *killer) {
 	}
 
 	/* knock 'em out */
-	GET_HEALTH(ch) = -1;
+	set_health(ch, -1);
 	GET_POS(ch) = POS_INCAP;
 
 	// remove all DoTs? only if it was another player with no-autokill
@@ -1231,10 +1231,10 @@ void death_restore(char_data *ch) {
 	remove_offers_by_type(ch, OFFER_RESURRECTION);
 	
 	// Pools restore
-	GET_HEALTH(ch) = MAX(1, GET_MAX_HEALTH(ch) / 4);
-	GET_MOVE(ch) = MAX(1, GET_MAX_MOVE(ch) / 4);
-	GET_MANA(ch) = MAX(1, GET_MAX_MANA(ch) / 4);
-	GET_BLOOD(ch) = IS_VAMPIRE(ch) ? MAX(1, GET_MAX_BLOOD(ch) / 4) : GET_MAX_BLOOD(ch);
+	set_health(ch, MAX(1, GET_MAX_HEALTH(ch) / 4));
+	set_move(ch, MAX(1, GET_MAX_MOVE(ch) / 4));
+	set_mana(ch, MAX(1, GET_MAX_MANA(ch) / 4));
+	set_blood(ch, IS_VAMPIRE(ch) ? MAX(1, GET_MAX_BLOOD(ch) / 4) : GET_MAX_BLOOD(ch));
 	
 	// conditions: drunk goes away, but you become hungry/thirsty (by half)
 	if (GET_COND(ch, FULL) >= 0) {
@@ -1303,10 +1303,10 @@ obj_data *die(char_data *ch, char_data *killer) {
 	// somebody saaaaaaave meeeeeeeee
 	if (affected_by_spell(ch, ATYPE_PHOENIX_RITE)) {
 		affect_from_char(ch, ATYPE_PHOENIX_RITE, FALSE);
-		GET_HEALTH(ch) = GET_MAX_HEALTH(ch) / 4;
-		GET_BLOOD(ch) = IS_VAMPIRE(ch) ? MAX(GET_BLOOD(ch), GET_MAX_BLOOD(ch) / 5) : GET_MAX_BLOOD(ch);
-		GET_MOVE(ch) = MAX(GET_MOVE(ch), GET_MAX_MOVE(ch) / 5);
-		GET_MANA(ch) = MAX(GET_MANA(ch), GET_MAX_MANA(ch) / 5);
+		set_health(ch, GET_MAX_HEALTH(ch) / 4);
+		set_blood(ch, IS_VAMPIRE(ch) ? MAX(GET_BLOOD(ch), GET_MAX_BLOOD(ch) / 5) : GET_MAX_BLOOD(ch));
+		set_move(ch, MAX(GET_MOVE(ch), GET_MAX_MOVE(ch) / 5));
+		set_mana(ch, MAX(GET_MANA(ch), GET_MAX_MANA(ch) / 5));
 		GET_POS(ch) = FIGHTING(ch) ? POS_FIGHTING : POS_STANDING;
 		msg_to_char(ch, "A fiery phoenix erupts from your chest and restores you to your feet!\r\n");
 		act("A fiery phoenix erupts from $n's chest and restores $m to $s feet!", FALSE, ch, NULL, NULL, TO_ROOM);
@@ -1368,7 +1368,7 @@ obj_data *die(char_data *ch, char_data *killer) {
 		}
 		add_cooldown(ch, COOLDOWN_DEATH_RESPAWN, config_get_int("death_release_minutes") * SECS_PER_REAL_MIN);
 		msg_to_char(ch, "Type 'respawn' to come back at your tomb.\r\n");
-		GET_HEALTH(ch) = MIN(GET_HEALTH(ch), -10);	// ensure negative health
+		set_health(ch, MIN(GET_HEALTH(ch), -10));	// ensure negative health
 		GET_POS(ch) = POS_DEAD;	// ensure pos
 		run_kill_triggers(ch, killer, NULL);
 		return NULL;
@@ -1716,10 +1716,10 @@ void perform_resurrection(char_data *ch, char_data *rez_by, room_data *loc, any_
 	switch (ability) {
 		case ABIL_RESURRECT: {
 			// custom restore stats: 10% (death_restore puts it at 25%)
-			GET_HEALTH(ch) = MAX(1, GET_MAX_HEALTH(ch) / 10);
-			GET_MOVE(ch) = MAX(1, GET_MAX_MOVE(ch) / 10);
-			GET_MANA(ch) = MAX(1, GET_MAX_MANA(ch) / 10);
-			GET_BLOOD(ch) = IS_VAMPIRE(ch) ? MAX(1, GET_MAX_BLOOD(ch) / 10) : GET_MAX_BLOOD(ch);
+			set_health(ch, MAX(1, GET_MAX_HEALTH(ch) / 10));
+			set_move(ch, MAX(1, GET_MAX_MOVE(ch) / 10));
+			set_mana(ch, MAX(1, GET_MAX_MANA(ch) / 10));
+			set_blood(ch, IS_VAMPIRE(ch) ? MAX(1, GET_MAX_BLOOD(ch) / 10) : GET_MAX_BLOOD(ch));
 
 			msg_to_char(ch, "A strange force lifts you up from the ground, and you seem to float back to your feet...\r\n");
 			msg_to_char(ch, "You feel a rush of blood as your heart starts beating again...\r\n");
@@ -1736,10 +1736,10 @@ void perform_resurrection(char_data *ch, char_data *rez_by, room_data *loc, any_
 		}
 		case ABIL_MOONRISE: {
 			// custom restore stats: 50% (death_restore puts it at 25%)
-			GET_HEALTH(ch) = MAX(1, GET_MAX_HEALTH(ch) / 2);
-			GET_MOVE(ch) = MAX(1, GET_MAX_MOVE(ch) / 2);
-			GET_MANA(ch) = MAX(1, GET_MAX_MANA(ch) / 2);
-			GET_BLOOD(ch) = IS_VAMPIRE(ch) ? MAX(1, GET_MAX_BLOOD(ch) / 2) : GET_MAX_BLOOD(ch);
+			set_health(ch, MAX(1, GET_MAX_HEALTH(ch) / 2));
+			set_move(ch, MAX(1, GET_MAX_MOVE(ch) / 2));
+			set_mana(ch, MAX(1, GET_MAX_MANA(ch) / 2));
+			set_blood(ch, IS_VAMPIRE(ch) ? MAX(1, GET_MAX_BLOOD(ch) / 2) : GET_MAX_BLOOD(ch));
 			
 			// custom restore conditions: less hungry/thirsty (won't incur a penalty yet)
 			if (GET_COND(ch, FULL) >= 0) {
@@ -3065,7 +3065,7 @@ int damage(char_data *ch, char_data *victim, int dam, int attacktype, byte damty
 	dam = MAX(0, dam);
 
 	// Add Damage
-	GET_HEALTH(victim) = GET_HEALTH(victim) - dam;
+	set_health(victim, GET_HEALTH(victim) - dam);
 	update_pos(victim);
 	
 	if (ch != victim) {
@@ -3176,7 +3176,7 @@ int damage(char_data *ch, char_data *victim, int dam, int attacktype, byte damty
 	/* Uh oh.  Victim died. */
 	if (GET_POS(victim) == POS_DEAD) {
 		if (attacktype == ATTACK_VAMPIRE_BITE && ch != victim && !AFF_FLAGGED(victim, AFF_NO_DRINK_BLOOD) && !GET_FEEDING_FROM(ch) && IN_ROOM(ch) == IN_ROOM(victim)) {
-			GET_HEALTH(victim) = 0;
+			set_health(victim, 0);
 			GET_POS(victim) = POS_STUNNED;
 			start_drinking_blood(ch, victim);
 			// fall through to return dam below
@@ -3314,7 +3314,7 @@ void heal(char_data *ch, char_data *vict, int amount) {
 		combat_meter_heal_taken(vict, amount);
 	
 		// apply heal
-		GET_HEALTH(vict) = MIN(GET_MAX_HEALTH(vict), GET_HEALTH(vict) + amount);
+		set_health(vict, GET_HEALTH(vict) + amount);
 	}
 	
 	if (GET_POS(vict) <= POS_STUNNED) {

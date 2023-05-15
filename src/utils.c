@@ -3498,8 +3498,10 @@ void apply_resource(char_data *ch, struct resource_data *res, struct resource_da
 				add_to_resource_list(build_used_list, RES_POOL, res->vnum, res->amount, 0);
 			}
 			
-			GET_CURRENT_POOL(ch, res->vnum) -= res->amount;
-			GET_CURRENT_POOL(ch, res->vnum) = MAX(0, GET_CURRENT_POOL(ch, res->vnum));
+			set_current_pool(ch, res->vnum, GET_CURRENT_POOL(ch, res->vnum) - res->amount);
+			if (GET_CURRENT_POOL(ch, res->vnum) < 0) {
+				set_current_pool(ch, res->vnum, 0);
+			}
 			
 			if (res->vnum == HEALTH) {
 				update_pos(ch);
@@ -3697,8 +3699,10 @@ void extract_resources(char_data *ch, struct resource_data *list, bool ground, s
 						add_to_resource_list(build_used_list, RES_POOL, res->vnum, res->amount, 0);
 					}
 				
-					GET_CURRENT_POOL(ch, res->vnum) -= res->amount;
-					GET_CURRENT_POOL(ch, res->vnum) = MAX(0, GET_CURRENT_POOL(ch, res->vnum));
+					set_current_pool(ch, res->vnum, GET_CURRENT_POOL(ch, res->vnum) - res->amount);
+					if (GET_CURRENT_POOL(ch, res->vnum) < 0) {
+						set_current_pool(ch, res->vnum, 0);
+					}
 					res->amount = 0;	// got full amount
 				
 					if (res->vnum == HEALTH) {
@@ -4012,8 +4016,7 @@ void give_resources(char_data *ch, struct resource_data *list, bool split) {
 				break;
 			}
 			case RES_POOL: {
-				GET_CURRENT_POOL(ch, res->vnum) += res->amount / (split ? 2 : 1);
-				GET_CURRENT_POOL(ch, res->vnum) = MIN(GET_MAX_POOL(ch, res->vnum), GET_CURRENT_POOL(ch, res->vnum));
+				set_current_pool(ch, res->vnum, GET_CURRENT_POOL(ch, res->vnum) + (res->amount / (split ? 2 : 1)));
 				if (GET_HEALTH(ch) > 0 && GET_POS(ch) <= POS_STUNNED) {
 					GET_POS(ch) = POS_RESTING;
 				}

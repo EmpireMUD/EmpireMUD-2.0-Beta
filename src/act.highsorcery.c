@@ -602,7 +602,7 @@ void summon_materials(char_data *ch, char *argument) {
 	else {
 		// save the empire
 		if (found) {
-			GET_MANA(ch) -= cost * count;	// charge only the amount retrieved
+			set_mana(ch, GET_MANA(ch) - (cost * count));	// charge only the amount retrieved
 			read_vault(emp);
 			gain_player_tech_exp(ch, PTECH_SUMMON_MATERIALS, 1);
 		}
@@ -992,7 +992,9 @@ ACMD(do_manashield) {
 		free(af3);
 		
 		// possible to go negative here
-		GET_MANA(ch) = MAX(0, GET_MANA(ch));
+		if (GET_MANA(ch) < 0) {
+			set_mana(ch, 0);
+		}
 	}
 }
 
@@ -1226,7 +1228,7 @@ ACMD(do_ritual) {
 	}
 	
 	if (result) {
-		GET_MANA(ch) -= ritual_data[rit].cost;
+		set_mana(ch, GET_MANA(ch) - ritual_data[rit].cost);
 	}
 }
 
@@ -1446,7 +1448,7 @@ ACMD(do_vigor) {
 			gain *= 2;
 		}
 		
-		GET_MOVE(vict) = MIN(GET_MAX_MOVE(vict), GET_MOVE(vict) + gain);
+		set_move(vict, GET_MOVE(vict) + gain);
 		
 		// the cast_by on this is vict himself, because it is a penalty and this will block cleanse
 		af = create_mod_aff(ATYPE_VIGOR, 75, APPLY_MOVE_REGEN, -5, vict);
@@ -2053,7 +2055,7 @@ RITUAL_FINISH_FUNC(perform_devastation_ritual) {
 		
 		// auto-repeat
 		if (GET_MANA(ch) >= ritual_data[ritual].cost) {
-			GET_MANA(ch) -= ritual_data[ritual].cost;
+			set_mana(ch, GET_MANA(ch) - ritual_data[ritual].cost);
 			GET_ACTION(ch) = ACT_RITUAL;
 			GET_ACTION_TIMER(ch) = 0;
 			// other variables are still set up

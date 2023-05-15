@@ -2902,7 +2902,7 @@ void write_player_primary_data_to_file(FILE *fl, char_data *ch) {
 	
 	// restore pools, which may have been modified
 	for (iter = 0; iter < NUM_POOLS; ++iter) {
-		GET_CURRENT_POOL(ch, iter) = pool[iter];
+		GET_CURRENT_POOL(ch, iter) = pool[iter];	// set ok: character cannot have taken damage here
 		GET_DEFICIT(ch, iter) = deficit[iter];
 	}
 	
@@ -4401,13 +4401,13 @@ void enter_player_game(descriptor_data *d, int dolog, bool fresh) {
 	
 	// free reset?
 	if (RESTORE_ON_LOGIN(ch)) {
-		GET_HEALTH(ch) = GET_MAX_HEALTH(ch);
-		GET_MOVE(ch) = GET_MAX_MOVE(ch);
-		GET_MANA(ch) = GET_MAX_MANA(ch);
+		set_health(ch, GET_MAX_HEALTH(ch));
+		set_move(ch, GET_MAX_MOVE(ch));
+		set_mana(ch, GET_MAX_MANA(ch));
 		GET_COND(ch, FULL) = MIN(0, GET_COND(ch, FULL));
 		GET_COND(ch, THIRST) = MIN(0, GET_COND(ch, THIRST));
 		GET_COND(ch, DRUNK) = MIN(0, GET_COND(ch, DRUNK));
-		GET_BLOOD(ch) = GET_MAX_BLOOD(ch);
+		set_blood(ch, GET_MAX_BLOOD(ch));
 		
 		// clear deficits
 		for (iter = 0; iter < NUM_POOLS; ++iter) {
@@ -4428,8 +4428,8 @@ void enter_player_game(descriptor_data *d, int dolog, bool fresh) {
 	}
 	else {
 		// ensure not dead
-		GET_HEALTH(ch) = MAX(1, GET_HEALTH(ch));
-		GET_BLOOD(ch) = MAX(1, GET_BLOOD(ch));
+		set_health(ch, MAX(1, GET_HEALTH(ch)));
+		set_blood(ch, MAX(1, GET_BLOOD(ch)));
 	}
 	
 	// position must be reset
@@ -4698,7 +4698,7 @@ void reset_char(char_data *ch) {
 	ch->char_specials.position = POS_STANDING;
 	
 	if (GET_MOVE(ch) <= 0) {
-		GET_MOVE(ch) = 1;
+		GET_MOVE(ch) = 1;	// ok to set here: character is definitely not in-game
 	}
 }
 
@@ -4925,10 +4925,10 @@ void start_new_character(char_data *ch) {
 	update_class(ch);
 	
 	// restore pools (last, in case they changed during bonus traits or somewhere)
-	GET_HEALTH(ch) = GET_MAX_HEALTH(ch);
-	GET_MOVE(ch) = GET_MAX_MOVE(ch);
-	GET_MANA(ch) = GET_MAX_MANA(ch);
-	GET_BLOOD(ch) = GET_MAX_BLOOD(ch);
+	set_health(ch, GET_MAX_HEALTH(ch));
+	set_move(ch, GET_MAX_MOVE(ch));
+	set_mana(ch, GET_MAX_MANA(ch));
+	set_blood(ch, GET_MAX_BLOOD(ch));
 	
 	// prevent a repeat
 	REMOVE_BIT(PLR_FLAGS(ch), PLR_NEEDS_NEWBIE_SETUP);

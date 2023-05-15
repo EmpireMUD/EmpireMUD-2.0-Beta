@@ -600,7 +600,7 @@ ACMD(do_stake) {
 		
 		SET_BIT(INJURY_FLAGS(victim), INJ_STAKED);
 		if (GET_HEALTH(victim) <= 0) {
-			GET_HEALTH(victim) = 0;
+			set_health(victim, 0);
 			GET_POS(victim) = POS_STUNNED;
 		}
 		extract_obj(stake);
@@ -730,7 +730,7 @@ ACMD(do_tie) {
 		act("You unbind $N.", FALSE, ch, 0, victim, TO_CHAR);
 		act("$n unbinds you!", FALSE, ch, 0, victim, TO_VICT | TO_SLEEP);
 		act("$n unbinds $N.", FALSE, ch, 0, victim, TO_NOTVICT);
-		GET_HEALTH(victim) = MAX(1, GET_HEALTH(victim));
+		set_health(victim, MAX(1, GET_HEALTH(victim)));
 		GET_POS(victim) = POS_RESTING;
 		REMOVE_BIT(INJURY_FLAGS(victim), INJ_TIED);
 		
@@ -754,7 +754,7 @@ ACMD(do_tie) {
 		act("$n binds and gags $N!", FALSE, ch, 0, victim, TO_NOTVICT);
 		SET_BIT(INJURY_FLAGS(victim), INJ_TIED);
 		if (GET_HEALTH(victim) <= 1) {
-			GET_HEALTH(victim) = 1;
+			set_health(victim, 1);
 			GET_POS(victim) = POS_RESTING;
 		}
 		GET_ROPE_VNUM(victim) = GET_OBJ_VNUM(rope);

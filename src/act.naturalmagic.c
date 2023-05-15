@@ -553,8 +553,9 @@ ACMD(do_earthmeld) {
 			return;
 		}
 	}
-
-	GET_MANA(ch) -= cost;
+	
+	// TODO why isn't this using charge ability cost
+	set_mana(ch, GET_MANA(ch) - cost);
 	
 	msg_to_char(ch, "You dissolve into pure mana and sink into the ground!\r\n");
 	act("$n dissolves into pure mana and sinks right into the ground!", TRUE, ch, 0, 0, TO_ROOM);

@@ -3051,11 +3051,8 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						if (subfield && *subfield) {
 							int amt = atoi(subfield);
 							if (amt != 0) {
-								GET_BLOOD(c) += amt;
-								GET_BLOOD(c) = MAX(GET_BLOOD(c), 0);
-								GET_BLOOD(c) = MIN(GET_BLOOD(c), GET_MAX_BLOOD(c));
-								
-								if (GET_BLOOD(c) == 0) {
+								set_blood(c, GET_BLOOD(c) + amt);
+								if (GET_BLOOD(c) <= 0) {
 									out_of_blood(c);
 								}
 							}
@@ -4081,8 +4078,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					else if (!str_cmp(field, "mana")) {
 						int amt;
 						if (subfield && *subfield && (amt = atoi(subfield))) {
-							GET_MANA(c) += amt;
-							GET_MANA(c) = MIN(GET_MAX_MANA(c), MAX(GET_MANA(c), 0));
+							set_mana(c, GET_MANA(c) + amt);
 						}
 						snprintf(str, slen, "%d", GET_MANA(c));
 					}
@@ -4093,8 +4089,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					else if (!str_cmp(field, "move")) {
 						int amt;
 						if (subfield && *subfield && (amt = atoi(subfield))) {
-							GET_MOVE(c) += amt;
-							GET_MOVE(c) = MIN(GET_MAX_MOVE(c), MAX(GET_MOVE(c), 0));
+							set_move(c, GET_MOVE(c) + amt);
 						}
 						snprintf(str, slen, "%d", GET_MOVE(c));
 					}

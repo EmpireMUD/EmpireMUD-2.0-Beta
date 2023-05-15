@@ -1516,7 +1516,7 @@ bool do_simple_move(char_data *ch, int dir, room_data *to_room, bitvector_t flag
 		int need_movement = move_cost(ch, IN_ROOM(ch), to_room, dir, flags);
 		
 		if (GET_MOVE(ch) >= need_movement) {
-			GET_MOVE(ch) -= need_movement;
+			set_move(ch, GET_MOVE(ch) - need_movement);
 		}
 		else {
 			msg_to_char(ch, "You are too exhausted%s.\r\n", (IS_SET(flags, MOVE_FOLLOW) && GET_LEADER(ch)) ? " to follow" : "");
@@ -2139,7 +2139,7 @@ ACMD(do_circle) {
 
 	// work
 	if (!IS_IMMORTAL(ch) && !IS_NPC(ch)) {
-		GET_MOVE(ch) -= need_movement;
+		set_move(ch, GET_MOVE(ch) - need_movement);
 	}
 	mark_move_time(ch);
 	char_from_room(ch);

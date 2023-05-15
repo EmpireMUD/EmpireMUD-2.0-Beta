@@ -654,7 +654,10 @@ bool can_use_ability(char_data *ch, any_vnum ability, int cost_pool, int cost_am
 */
 void charge_ability_cost(char_data *ch, int cost_pool, int cost_amount, int cooldown_type, int cooldown_time, int wait_type) {
 	if (cost_pool >= 0 && cost_pool < NUM_POOLS && cost_amount > 0) {
-		GET_CURRENT_POOL(ch, cost_pool) = MAX(0, GET_CURRENT_POOL(ch, cost_pool) - cost_amount);
+		set_current_pool(ch, cost_pool, GET_CURRENT_POOL(ch, cost_pool) - cost_amount);
+		if (GET_CURRENT_POOL(ch, cost_pool) < 0) {
+			set_current_pool(ch, cost_pool, 0);
+		}
 	}
 	
 	// only npcs get cooldowns here

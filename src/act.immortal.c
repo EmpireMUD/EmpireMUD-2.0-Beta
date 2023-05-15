@@ -2079,19 +2079,19 @@ int perform_set(char_data *ch, char_data *vict, int mode, char *val_arg) {
 	}
 
 	else if SET_CASE("health") {
-		vict->points.current_pools[HEALTH] = RANGE(0, GET_MAX_HEALTH(vict));
+		set_health(vict, RANGE(0, GET_MAX_HEALTH(vict)));
 		affect_total(vict);
 	}
 	else if SET_CASE("move") {
-		vict->points.current_pools[MOVE] = RANGE(0, GET_MAX_MOVE(vict));
+		set_move(vict, RANGE(0, GET_MAX_MOVE(vict)));
 		affect_total(vict);
 	}
 	else if SET_CASE("mana") {
-		vict->points.current_pools[MANA] = RANGE(0, GET_MAX_MANA(vict));
+		set_mana(vict, RANGE(0, GET_MAX_MANA(vict)));
 		affect_total(vict);
 	}
 	else if SET_CASE("blood") {
-		vict->points.current_pools[BLOOD] = RANGE(0, GET_MAX_BLOOD(vict));
+		set_blood(vict, RANGE(0, GET_MAX_BLOOD(vict)));
 		affect_total(vict);
 	}
 
@@ -10153,7 +10153,7 @@ ACMD(do_restore) {
 	
 	// fill pools
 	if (all || health) {
-		GET_HEALTH(vict) = GET_MAX_HEALTH(vict);
+		set_health(vict, GET_MAX_HEALTH(vict));
 		
 		if (GET_POS(vict) < POS_SLEEPING) {
 			GET_POS(vict) = POS_STANDING;
@@ -10163,15 +10163,15 @@ ACMD(do_restore) {
 		sprintf(types + strlen(types), "%s health", *types ? "," : "");
 	}
 	if (all || mana) {
-		GET_MANA(vict) = GET_MAX_MANA(vict);
+		set_mana(vict, GET_MAX_MANA(vict));
 		sprintf(types + strlen(types), "%s mana", *types ? "," : "");
 	}
 	if (all || moves) {
-		GET_MOVE(vict) = GET_MAX_MOVE(vict);
+		set_move(vict, GET_MAX_MOVE(vict));
 		sprintf(types + strlen(types), "%s moves", *types ? "," : "");
 	}
 	if (all || blood) {
-		GET_BLOOD(vict) = GET_MAX_BLOOD(vict);
+		set_blood(vict, GET_MAX_BLOOD(vict));
 		sprintf(types + strlen(types), "%s blood", *types ? "," : "");
 	}
 	

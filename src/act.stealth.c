@@ -526,7 +526,7 @@ int apply_poison(char_data *ch, char_data *vict) {
 	}
 	
 	if (result >= 0 && GET_HEALTH(vict) > GET_MAX_HEALTH(vict)) {
-		GET_HEALTH(vict) = GET_MAX_HEALTH(vict);
+		set_health(vict, GET_MAX_HEALTH(vict));
 	}
 	
 	// fire a consume trigger but it can't block execution here

@@ -30,6 +30,7 @@
 *   Adventure Lib
 *   Automessages Lib
 *   Building Lib
+*   Character Lib
 *   Craft Lib
 *   Crop Lib
 *   Empire Lib
@@ -912,6 +913,64 @@ void write_building_to_file(FILE *fl, bld_data *bld) {
 	
 	// end
 	fprintf(fl, "S\n");
+}
+
+
+ //////////////////////////////////////////////////////////////////////////////
+//// CHARACTER LIB ///////////////////////////////////////////////////////////
+
+/**
+* Sets the value of a current pool (HEALTH, etc) to the given amount, without
+* going over the maximum. If this sets it below the maximum, it will also
+* schedule a mob reset event if the target is an NPC.
+*
+* @param char_data *ch The person to set a pool for.
+* @param int type Any pool (HEALTH, MOVE, MANA, BLOOD).
+* @param int amount The amount to set it to (automatically bounds to the maximum).
+* @return int The new value of the pool.
+*/
+int set_current_pool(char_data *ch, int type, int amount) {
+	int max;
+	
+	if (type < 0 || type >= NUM_POOLS) {
+		log("SYSERR: set_current_pool called with invalid pool %d (%s)", type, GET_NAME(ch));
+		return 1;
+	}
+	
+	GET_CURRENT_POOL(ch, type) = amount;
+	
+	// NUM_POOLS (search hint): determine maximum
+	switch (type) {
+		case HEALTH: {
+			max = GET_MAX_HEALTH(ch);
+			break;
+		}
+		case MOVE: {
+			max = GET_MAX_MOVE(ch);
+			break;
+		}
+		case MANA: {
+			max = GET_MAX_MANA(ch);
+			break;
+		}
+		case BLOOD: {
+			max = GET_MAX_BLOOD(ch);
+			break;
+		}
+		default: {
+			max = GET_MAX_POOL(ch, type);
+			break;
+		}
+	}
+	
+	if (GET_CURRENT_POOL(ch, type) > max) {
+		GET_CURRENT_POOL(ch, type) = max;
+	}
+	else if (GET_CURRENT_POOL(ch, type) < max && IS_NPC(ch)) {
+		schedule_reset_mob(ch);
+	}
+	
+	return GET_CURRENT_POOL(ch, type);
 }
 
 
@@ -6401,6 +6460,8 @@ struct stored_event_info_t stored_event_info[] = {
 	{ cancel_mob_event },	// SEV_AGGRO
 	{ cancel_mob_event },	// SEV_SCAVENGE
 	{ cancel_character_event },	// SEV_VAMPIRE_FEEDING
+	{ cancel_mob_event },	// SEV_RESET_MOB
+	{ cancel_character_event },	// SEV_HEAL_OVER_TIME
 };
 
 

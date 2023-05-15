@@ -610,6 +610,12 @@ extern char_data *mobile_table;
 extern player_index_data *player_table_by_idnum;
 extern player_index_data *player_table_by_name;
 
+int set_current_pool(char_data *ch, int type, int amount);
+#define set_health(ch, amount)  set_current_pool(ch, HEALTH, amount)
+#define set_move(ch, amount)  set_current_pool(ch, MOVE, amount)
+#define set_mana(ch, amount)  set_current_pool(ch, MANA, amount)
+#define set_blood(ch, amount)  set_current_pool(ch, BLOOD, amount)
+
 void add_mobile_to_table(char_data *mob);
 player_index_data *find_player_index_by_idnum(int idnum);
 player_index_data *find_player_index_by_name(char *name);

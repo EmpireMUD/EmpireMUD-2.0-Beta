@@ -1423,6 +1423,8 @@ typedef struct vehicle_data vehicle_data;
 #define SEV_AGGRO  8	// aggro or cityguard mobs
 #define SEV_SCAVENGE  9	// scavenger mobs consume a corpse
 #define SEV_VAMPIRE_FEEDING  10	// drinking blood
+#define SEV_RESET_MOB  11	// periodic reset of damaged/tagged mobs
+#define SEV_HEAL_OVER_TIME  12	// handles HOT applies
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -1530,6 +1532,7 @@ typedef struct vehicle_data vehicle_data;
 #define ACTION_CYCLE_HALF_SEC  1	// how many action cycles is half a second
 #define DOT_INTERVAL  5	// seconds per tick for damage-over-time
 #define HISTORY_SIZE  5	// Keep last 5 commands.
+#define MOB_RESTORE_INTERVAL  60	// seconds between when a mob loses health and when it starts checking to restore itself
 #define WORKFORCE_CYCLE  76	// seconds between workforce chore updates
 
 

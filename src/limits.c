@@ -23,6 +23,7 @@
 #include "interpreter.h"
 #include "skills.h"
 #include "vnums.h"
+#include "dg_event.h"
 #include "dg_scripts.h"
 #include "constants.h"
 
@@ -347,92 +348,83 @@ int limit_crowd_control(char_data *victim, int atype) {
 
 
 /**
-* This runs a point update (every hour tick) on a character. It runs on both
-* players and NPCS, right after their "real update" runs.
+* This runs a point update (every hour tick) on a character. It runs on ONLY
+* players, as of b5.152, right after their "real update" runs.
 *
-* @param char_data *ch The character to update.
-* @return bool TRUE if the character survives the update, FALSE if not.
+* @param char_data *ch The player to update.
+* @return bool TRUE if the player survives the update, FALSE if not.
 */
-bool point_update_char(char_data *ch) {
+bool point_update_player(char_data *ch) {
 	obj_data *obj, *next_obj;
 	bool found;
 	
-	// remove stale offers -- this needs to happen even if dead (resurrect)
-	if (!IS_NPC(ch)) {
-		clean_offers(ch);
+	// never for mobs
+	if (IS_NPC(ch)) {
+		return FALSE;
 	}
+	
+	// remove stale offers -- this needs to happen even if dead (resurrect)
+	clean_offers(ch);
 	
 	// everything beyond here only matters if still alive
 	if (IS_DEAD(ch)) {
 		return FALSE;
 	}
 	
-	if (!IS_NPC(ch)) {
-		// check bad quest items
-		remove_quest_items(ch);
-		
-		// check way over-inventory (2x overburdened)
-		if (!IS_IMMORTAL(ch) && IS_CARRYING_N(ch) > 2 * GET_LARGEST_INVENTORY(ch)) {
-			found = FALSE;
-			DL_FOREACH_SAFE2(ch->carrying, obj, next_obj, next_content) {
-				if (IS_CARRYING_N(ch) > 2 * GET_LARGEST_INVENTORY(ch)) {
-					if (!found) {
-						found = TRUE;
-						msg_to_char(ch, "You are way overburdened and begin losing items...\r\n");
-					}
-					if (perform_drop(ch, obj, SCMD_DROP, "drop") <= 0) {
-						perform_drop(ch, obj, SCMD_JUNK, "lose");
-					}
+	// check bad quest items
+	remove_quest_items(ch);
+	
+	// check way over-inventory (2x overburdened)
+	if (!IS_IMMORTAL(ch) && IS_CARRYING_N(ch) > 2 * GET_LARGEST_INVENTORY(ch)) {
+		found = FALSE;
+		DL_FOREACH_SAFE2(ch->carrying, obj, next_obj, next_content) {
+			if (IS_CARRYING_N(ch) > 2 * GET_LARGEST_INVENTORY(ch)) {
+				if (!found) {
+					found = TRUE;
+					msg_to_char(ch, "You are way overburdened and begin losing items...\r\n");
+				}
+				if (perform_drop(ch, obj, SCMD_DROP, "drop") <= 0) {
+					perform_drop(ch, obj, SCMD_JUNK, "lose");
 				}
 			}
 		}
-		
-		if (IS_BLOOD_STARVED(ch)) {
-			msg_to_char(ch, "You are starving!\r\n");
-		}
-		
-		// light-based gains
-		if (IS_OUTDOORS(ch) && get_sun_status(IN_ROOM(ch)) == SUN_LIGHT) {
-			gain_player_tech_exp(ch, PTECH_VAMPIRE_SUN_IMMUNITY, 2);
-		}
-		
-		if (GET_MOUNT_LIST(ch)) {
-			gain_ability_exp(ch, ABIL_STABLEMASTER, 2);
-		}
-		
-		run_ability_gain_hooks(ch, NULL, AGH_PASSIVE_HOURLY);
-		
-		// death count decrease after 3 minutes without a death
-		if (GET_RECENT_DEATH_COUNT(ch) > 0 && GET_LAST_DEATH_TIME(ch) + (3 * SECS_PER_REAL_MIN) < time(0)) {
-			GET_RECENT_DEATH_COUNT(ch) -= 1;
-		}
+	}
+	
+	if (IS_BLOOD_STARVED(ch)) {
+		msg_to_char(ch, "You are starving!\r\n");
+	}
+	
+	// light-based gains
+	if (IS_OUTDOORS(ch) && get_sun_status(IN_ROOM(ch)) == SUN_LIGHT) {
+		gain_player_tech_exp(ch, PTECH_VAMPIRE_SUN_IMMUNITY, 2);
+	}
+	
+	if (GET_MOUNT_LIST(ch)) {
+		gain_ability_exp(ch, ABIL_STABLEMASTER, 2);
+	}
+	
+	run_ability_gain_hooks(ch, NULL, AGH_PASSIVE_HOURLY);
+	
+	// death count decrease after 3 minutes without a death
+	if (GET_RECENT_DEATH_COUNT(ch) > 0 && GET_LAST_DEATH_TIME(ch) + (3 * SECS_PER_REAL_MIN) < time(0)) {
+		GET_RECENT_DEATH_COUNT(ch) -= 1;
 	}
 	
 	// bloody upkeep
-	if (IS_VAMPIRE(ch) && !IS_IMMORTAL(ch) && !IS_NPC(ch)) {
-		GET_BLOOD(ch) -= MAX(0, GET_BLOOD_UPKEEP(ch));
+	if (IS_VAMPIRE(ch) && !IS_IMMORTAL(ch)) {
+		if (GET_BLOOD_UPKEEP(ch) > 0) {
+			set_blood(ch, GET_BLOOD(ch) - GET_BLOOD_UPKEEP(ch));
+		}
 		
 		if (GET_BLOOD(ch) < 0) {
 			out_of_blood(ch);
 			return FALSE;
 		}
 	}
-	else {	// not a vampire (or is imm/npc)
+	else {	// not a vampire (or is imm)
 		// don't gain blood whilst being fed upon
 		if (GET_FED_ON_BY(ch) == NULL) {
-			GET_BLOOD(ch) = MIN(GET_BLOOD(ch) + 1, GET_MAX_BLOOD(ch));
-		}
-	}
-	
-	// healing for NPCs -- pcs are in real_update
-	if (IS_NPC(ch)) {
-		if (!check_reset_mob(ch, FALSE) && GET_POS(ch) < POS_STUNNED) {
-			GET_HEALTH(ch) -= 1;
-			update_pos(ch);
-			if (GET_POS(ch) == POS_DEAD) {
-				die(ch, ch);
-				return FALSE;
-			}
+			set_blood(ch, GET_BLOOD(ch) + 1);
 		}
 	}
 	
@@ -524,11 +516,6 @@ void real_update_char(char_data *ch) {
 		apply_dot_effect(ch, ATYPE_NATURE_BURN, 30, DAM_MAGICAL, 5, 60, ch);
 	}
 	
-	// heal-per-5 ? (stops at 0 health or incap)
-	if (GET_HEAL_OVER_TIME(ch) > 0 && !IS_DEAD(ch) && GET_POS(ch) >= POS_SLEEPING && GET_HEALTH(ch) > 0) {
-		heal(ch, ch, GET_HEAL_OVER_TIME(ch));
-	}
-	
 	// players only
 	if (!IS_NPC(ch)) {
 		if (IS_MORPHED(ch)) {
@@ -564,7 +551,7 @@ void real_update_char(char_data *ch) {
 		}
 	
 		if (GET_BLOOD(ch) > GET_MAX_BLOOD(ch)) {
-			GET_BLOOD(ch) = GET_MAX_BLOOD(ch);
+			set_blood(ch, GET_MAX_BLOOD(ch));
 		}
 
 		// periodic exp and skill gain
@@ -634,8 +621,7 @@ void real_update_char(char_data *ch) {
 
 		/* moving on.. */
 		if (GET_POS(ch) < POS_STUNNED || (GET_POS(ch) == POS_STUNNED && health_gain(ch, TRUE) <= 0)) {
-			GET_HEALTH(ch) = MIN(0, GET_HEALTH(ch));	// fixing? a bug where a player whose health is positve but is in a bleeding out position, would not bleed out right away (but couldn't recover)
-			GET_HEALTH(ch) -= 1;
+			set_health(ch, MIN(0, GET_HEALTH(ch)) - 1);	// fixing? a bug where a player whose health is positve but is in a bleeding out position, would not bleed out right away (but couldn't recover)
 			update_pos(ch);
 			if (GET_POS(ch) == POS_DEAD) {
 				msg_to_char(ch, "You die from your wounds!\r\n");
@@ -665,7 +651,7 @@ void real_update_char(char_data *ch) {
 		if (!IS_NPC(ch) && !IS_IMMORTAL(ch) && IS_SWIMMING(ch)) {
 			// swimming: costs moves
 			if (GET_MOVE(ch) > 0) {
-				GET_MOVE(ch) -= 1;
+				set_move(ch, GET_MOVE(ch) - 1);
 			}
 			if (GET_MOVE(ch) <= 0) {
 				msg_to_char(ch, "You sink beneath the water and die!\r\n");
@@ -677,15 +663,13 @@ void real_update_char(char_data *ch) {
 		}
 		else {	// normal move gain
 			gain = move_gain(ch, FALSE);
-			GET_MOVE(ch) += gain;
-			GET_MOVE(ch) = MIN(GET_MOVE(ch), GET_MAX_MOVE(ch));
+			set_move(ch, GET_MOVE(ch) + gain);
 			GET_MOVE_DEFICIT(ch) = MAX(0, GET_MOVE_DEFICIT(ch) - gain);
 		}
 	
 		// mana gain
 		gain = mana_gain(ch, FALSE);
-		GET_MANA(ch) += gain;
-		GET_MANA(ch) = MIN(GET_MANA(ch), GET_MAX_MANA(ch));
+		set_mana(ch, GET_MANA(ch) + gain);
 		GET_MANA_DEFICIT(ch) = MAX(0, GET_MANA_DEFICIT(ch) - gain);
 	
 		if (IS_VAMPIRE(ch)) {
@@ -743,14 +727,9 @@ void real_update_char(char_data *ch) {
 	
 	// DO THESE LAST:
 	
-	// call point-update if it's our turn
-	if (IS_NPC(ch) && (ABSOLUTE(GET_MOB_VNUM(ch)) % REAL_UPDATES_PER_MUD_HOUR) == point_update_cycle) {
-		if (!point_update_char(ch)) {
-			return;
-		}
-	}
-	else if (!IS_NPC(ch) && (GET_IDNUM(ch) % REAL_UPDATES_PER_MUD_HOUR) == point_update_cycle) {
-		if (!point_update_char(ch)) {
+	// call point-update if it's our turn (players only)
+	if (!IS_NPC(ch) && (GET_IDNUM(ch) % REAL_UPDATES_PER_MUD_HOUR) == point_update_cycle) {
+		if (!point_update_player(ch)) {
 			return;
 		}
 	}
@@ -1968,6 +1947,44 @@ void gain_condition(char_data *ch, int condition, int value) {
 }
 
 
+// processes heal-over-time applis
+EVENTFUNC(heal_over_time_event) {
+	struct char_event_data *data = (struct char_event_data*)event_obj;
+	char_data *ch = data->character;
+	
+	// ensure in-game or skip it
+	if (!IN_ROOM(ch)) {
+		return 5 RL_SEC;	// re-enqueue
+	}
+	
+	// always delete first
+	delete_stored_event(&GET_STORED_EVENTS(ch), SEV_HEAL_OVER_TIME);
+	
+	// work
+	if (GET_HEAL_OVER_TIME(ch) > 0 && !IS_DEAD(ch) && GET_POS(ch) >= POS_SLEEPING && GET_HEALTH(ch) > 0) {
+		heal(ch, ch, GET_HEAL_OVER_TIME(ch));
+	}
+	
+	// check done?
+	if (GET_HEAL_OVER_TIME(ch) <= 0 || IS_DEAD(ch) || EXTRACTED(ch)) {
+		free(data);
+		return 0;	// no re-enqueue
+	}
+	else {
+		// re-store, re-enqueue, and try again
+		if (!find_stored_event(GET_STORED_EVENTS(ch), SEV_HEAL_OVER_TIME)) {
+			add_stored_event(&GET_STORED_EVENTS(ch), SEV_HEAL_OVER_TIME, the_event);
+			return 5 RL_SEC;
+		}
+		else {
+			// already added a new one -- just flush this one
+			free(data);
+			return 0;
+		}
+	}
+}
+
+
 /**
 * health per real update (usually 5 seconds)
 *
@@ -2105,6 +2122,25 @@ int move_gain(char_data *ch, bool info_only) {
 
 	return MAX(0, (int)gain);
 }
+
+/**
+* Schedules an event for heal-over-time applies, if needed.
+*
+* @param char_data *ch The person with a heal-over-time effect.
+*/
+void schedule_heal_over_time(char_data *ch) {
+	struct char_event_data *data;
+	struct dg_event *ev;
+	
+	if (ch && GET_HEAL_OVER_TIME(ch) > 0 && !find_stored_event(GET_STORED_EVENTS(ch), SEV_HEAL_OVER_TIME)) {
+		CREATE(data, struct char_event_data, 1);
+		data->character = ch;
+		
+		ev = dg_event_create(heal_over_time_event, data, 5 RL_SEC);
+		add_stored_event(&GET_STORED_EVENTS(ch), SEV_HEAL_OVER_TIME, ev);
+	}
+}
+
 
  //////////////////////////////////////////////////////////////////////////////
 //// CORE PERIODICALS ////////////////////////////////////////////////////////

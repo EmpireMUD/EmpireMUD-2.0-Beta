@@ -2242,6 +2242,7 @@ void gain_condition(char_data *ch, int condition, int value);
 int health_gain(char_data *ch, bool info_only);
 int mana_gain(char_data *ch, bool info_only);
 int move_gain(char_data *ch, bool info_only);
+void schedule_heal_over_time(char_data *ch);
 void update_empire_needs(empire_data *emp, struct empire_island *eisle, struct empire_needs *needs);
 
 // mapview.c
@@ -2290,6 +2291,7 @@ void schedule_aggro_event(char_data *ch);
 void schedule_despawn_event(char_data *mob);
 void schedule_mob_move_event(char_data *ch, bool randomize);
 void schedule_movement_events(char_data *ch);
+void schedule_reset_mob(char_data *ch);
 void schedule_pursuit_event(char_data *ch);
 void schedule_scavenge_event(char_data *ch, bool randomize);
 void set_mob_spawn_time(char_data *mob, long when);

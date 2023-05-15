@@ -1855,18 +1855,19 @@ char_data *read_mobile(mob_vnum nr, bool with_triggers) {
 		GET_MAX_MOVE(mob) = 1;
 	}
 	
+	// fix pools
 	for (iter = 0; iter < NUM_POOLS; ++iter) {
 		mob->points.current_pools[iter] = mob->points.max_pools[iter];
 	}
+
+	// GET_MAX_BLOOD is a function
+	GET_BLOOD(mob) = GET_MAX_BLOOD(mob);	// set ok: mob being loaded
 
 	mob->player.time.birth = time(0);
 	mob->player.time.played = 0;
 	mob->player.time.logon = time(0);
 
 	MOB_PURSUIT(mob) = NULL;
-
-	// GET_MAX_BLOOD is a function
-	GET_BLOOD(mob) = GET_MAX_BLOOD(mob);
 	
 	mob->script_id = 0;	// will detect when needed
 	

@@ -644,7 +644,7 @@ ACMD(do_outrage) {
 			// ok seems valid...
 			if (skill_check(ch, ABIL_OUTRAGE, DIFF_MEDIUM)) {
 				if (found) {	// add cost if more than 1 victim (already found)
-					GET_MOVE(ch) -= add_cost;
+					set_move(ch, GET_MOVE(ch) - add_cost);
 				}
 				
 				hit(ch, victim, GET_EQ(ch, WEAR_WIELD), FALSE);

@@ -895,7 +895,7 @@ INTERACTION_FUNC(tame_interact) {
 		}
 
 		prc = (double)GET_HEALTH(inter_mob) / MAX(1, GET_MAX_HEALTH(inter_mob));
-		GET_HEALTH(newmob) = (int)(prc * GET_MAX_HEALTH(newmob));
+		set_health(newmob, (int)(prc * GET_MAX_HEALTH(newmob)));
 		
 		// message before triggering
 		if (!any) {

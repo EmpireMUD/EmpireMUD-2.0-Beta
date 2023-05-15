@@ -295,8 +295,7 @@ void make_vampire(char_data *ch, bool lore, any_vnum skill_vnum) {
 			gain_skill(ch, find_skill_by_vnum(skill_vnum), 1, NULL);
 		}
 
-		GET_BLOOD(ch) = config_get_int("blood_starvation_level") * 1.5;
-		GET_BLOOD(ch) = MIN(GET_BLOOD(ch), GET_MAX_BLOOD(ch));
+		set_blood(ch, config_get_int("blood_starvation_level") * 1.5);
 
 		remove_lore(ch, LORE_START_VAMPIRE);
 		remove_lore(ch, LORE_SIRE_VAMPIRE);
@@ -365,7 +364,7 @@ void sire_char(char_data *ch, char_data *victim) {
 	// did we find a valid vamp skill
 	if (vamp_skill != NOTHING && CAN_GAIN_NEW_SKILLS(victim) && noskill_ok(victim, vamp_skill)) {
 		make_vampire(victim, FALSE, vamp_skill);
-		GET_BLOOD(ch) -= 10;
+		set_blood(ch, GET_BLOOD(ch) - 10);
 
 		act("You tear open your wrist with your fangs and drip blood into $N's mouth!", FALSE, ch, 0, victim, TO_CHAR);
 		act("$n tears open $s wrist with $s teeth and drips blood into $N's mouth!", FALSE, ch, 0, victim, TO_NOTVICT);
@@ -647,7 +646,7 @@ void check_un_vampire(char_data *ch, bool remove_vampire_skills) {
 	if (!IS_VAMPIRE(ch)) {
 		remove_lore(ch, LORE_PURIFY);
 		add_lore(ch, LORE_PURIFY, "Purified");
-		GET_BLOOD(ch) = GET_MAX_BLOOD(ch);
+		set_blood(ch, GET_MAX_BLOOD(ch));
 		GET_APPARENT_AGE(ch) = 0;
 	}
 }
@@ -677,13 +676,13 @@ void update_biting_char(char_data *ch) {
 	
 	// Transfuse blood -- 10-25 points (pints?) at a time
 	amount = MIN(number(10, 25), GET_BLOOD(victim));
-	GET_BLOOD(victim) -= amount;
+	set_blood(victim, GET_BLOOD(victim) - amount);
 	
 	// can gain more
 	if (has_player_tech(ch, PTECH_DRINK_BLOOD_FASTER)) {
 		amount *= 2;
 	}
-	GET_BLOOD(ch) = MIN(GET_MAX_BLOOD(ch), GET_BLOOD(ch) + amount);
+	set_blood(ch, GET_BLOOD(ch) + amount);
 	
 	// sanguine restoration: 10% heal to h/m/v per drink when biting humans
 	if ((!IS_NPC(victim) || MOB_FLAGGED(victim, MOB_HUMAN)) && has_ability(ch, ABIL_SANGUINE_RESTORATION)) {
@@ -691,19 +690,19 @@ void update_biting_char(char_data *ch) {
 		heal(ch, ch, hamt);
 		
 		hamt = GET_MAX_MANA(ch) / 10;
-		GET_MANA(ch) = MIN(GET_MAX_MANA(ch), GET_MANA(ch) + hamt);
+		set_mana(ch, GET_MANA(ch) + hamt);
 		
 		hamt = GET_MAX_MOVE(ch) / 10;
-		GET_MOVE(ch) = MIN(GET_MAX_MOVE(ch), GET_MOVE(ch) + hamt);
+		set_move(ch, GET_MOVE(ch) + hamt);
 	}
 
 	if (GET_BLOOD(victim) <= 0 && GET_ACTION(ch) != ACT_SIRING) {
-		GET_BLOOD(victim) = 0;
+		set_blood(victim, 0);
 
 		if (!IS_NPC(victim) && !PRF_FLAGGED(ch, PRF_AUTOKILL)) {
 			// give back a little blood
-			GET_BLOOD(victim) = 1;
-			GET_BLOOD(ch) -= 1;
+			set_blood(victim, 1);
+			set_blood(ch, GET_BLOOD(ch) - 1);
 			cancel_biting(ch);
 			return;
 		}
@@ -1049,8 +1048,8 @@ ACMD(do_bite) {
 			
 			// steal blood effect
 			if (has_player_tech(ch, PTECH_BITE_STEAL_BLOOD) && result > 0 && !AFF_FLAGGED(victim, AFF_NO_DRINK_BLOOD) && !GET_FED_ON_BY(victim)) {
-				GET_BLOOD(ch) = MIN(GET_MAX_BLOOD(ch), GET_BLOOD(ch) + 2);
-				GET_BLOOD(victim) = MAX(1, GET_BLOOD(victim) - 2);
+				set_blood(ch, GET_BLOOD(ch) + 2);
+				set_blood(victim, MAX(1, GET_BLOOD(victim) - 2));
 			}
 			
 			if (can_gain_exp_from(ch, victim)) {
@@ -1423,8 +1422,8 @@ ACMD(do_feed) {
 		act("$n slices $s wrist open and feeds you some blood from the cut!", FALSE, ch, 0, victim, TO_VICT);
 
 		// mve the blood
-		GET_BLOOD(ch) -= amt;
-		GET_BLOOD(victim) = MIN(GET_MAX_BLOOD(victim), GET_BLOOD(victim) + amt);
+		set_blood(ch, GET_BLOOD(ch) - amt);
+		set_blood(victim, GET_BLOOD(victim) + amt);
 	}
 }
 
@@ -1606,13 +1605,13 @@ ACMD(do_regenerate) {
 			case REGEN_MANA: {
 				msg_to_char(ch, "You draw out the mystical energy from your blood.\r\n");
 				act("$n's skin flushes red.", TRUE, ch, NULL, NULL, TO_ROOM);
-				GET_MANA(ch) = MIN(GET_MAX_MANA(ch), GET_MANA(ch) + amount);
+				set_mana(ch, GET_MANA(ch) + amount);
 				break;
 			}
 			case REGEN_MOVE: {
 				msg_to_char(ch, "You focus your blood into your sore muscles.\r\n");
 				act("$n seems invigorated.", TRUE, ch, NULL, NULL, TO_ROOM);
-				GET_MOVE(ch) = MIN(GET_MAX_MOVE(ch), GET_MOVE(ch) + amount);
+				set_move(ch, GET_MOVE(ch) + amount);
 				break;
 			}
 		}

@@ -574,6 +574,54 @@ EVENTFUNC(mob_pursuit_event) {
 }
 
 
+// checks if it's time to reset the mob; reschedules itself if not
+EVENTFUNC(mob_reset_event) {
+	struct mob_event_data *data = (struct mob_event_data*)event_obj;
+	char_data *mob = data->mob;
+	bool result;
+	
+	// always delete first
+	delete_stored_event(&GET_STORED_EVENTS(mob), SEV_RESET_MOB);
+	
+	// safety first
+	if (!IS_NPC(mob)) {
+		free(data);
+		return 0;	// do not re-enqueue
+	}
+	
+	// ok, try it
+	result = check_reset_mob(mob, FALSE);
+	
+	if (result) {
+		// success on the reset and goodbye
+		free(data);
+		return 0;	// do not re-enqueue
+	}
+	else {
+		// did not reset
+		if (GET_POS(mob) < POS_STUNNED) {
+			set_health(mob, GET_HEALTH(mob) - 1);
+			update_pos(mob);
+			if (GET_POS(mob) == POS_DEAD) {
+				die(mob, mob);
+				free(data);
+				return 0;	// do not re-enqueue
+			}
+		}
+		
+		// try again soon
+		if (!find_stored_event(GET_STORED_EVENTS(mob), SEV_RESET_MOB)) {
+			add_stored_event(&GET_STORED_EVENTS(mob), SEV_RESET_MOB, the_event);
+			return MOB_RESTORE_INTERVAL RL_SEC;	// re-enqueue
+		}
+	}
+	
+	// if we got here, it's done
+	free(data);
+	return 0;	// do not re-enqueue
+}
+
+
 // handles scavenger mobs trying to eat a corpse
 EVENTFUNC(mob_scavenge_event) {
 	struct mob_event_data *data = (struct mob_event_data*)event_obj;
@@ -752,6 +800,26 @@ void schedule_pursuit_event(char_data *ch) {
 		
 		ev = dg_event_create(mob_pursuit_event, data, (2 + number(0, 6)) RL_SEC);
 		add_stored_event(&GET_STORED_EVENTS(ch), SEV_PURSUIT, ev);
+	}
+}
+
+
+/**
+* Schedules a check_reset_mob(). Call this when the mob has taken damage, or
+* anything else that would be reset by that function.
+*
+* @param char_data *ch The mob to schedule to reset.
+*/
+void schedule_reset_mob(char_data *ch) {
+	if (IS_NPC(ch) && !find_stored_event(GET_STORED_EVENTS(ch), SEV_RESET_MOB)) {
+		struct mob_event_data *data;
+		struct dg_event *ev;
+		
+		CREATE(data, struct mob_event_data, 1);
+		data->mob = ch;
+		
+		ev = dg_event_create(mob_reset_event, data, MOB_RESTORE_INTERVAL RL_SEC);
+		add_stored_event(&GET_STORED_EVENTS(ch), SEV_RESET_MOB, ev);
 	}
 }
 
@@ -1878,9 +1946,10 @@ bool check_reset_mob(char_data *ch, bool force) {
 	
 	// ok: reset me
 	free_mob_tags(&MOB_TAGGED_BY(ch));
-	GET_HEALTH(ch) = GET_MAX_HEALTH(ch);
-	GET_MOVE(ch) = GET_MAX_MOVE(ch);
-	GET_MANA(ch) = GET_MAX_MANA(ch);
+	set_health(ch, GET_MAX_HEALTH(ch));
+	set_move(ch, GET_MAX_MOVE(ch));
+	set_mana(ch, GET_MAX_MANA(ch));
+	set_blood(ch, GET_MAX_BLOOD(ch));
 	if (GET_POS(ch) < POS_SLEEPING) {
 		GET_POS(ch) = POS_STANDING;
 	}
@@ -2199,13 +2268,20 @@ void scale_mob_to_level(char_data *mob, int level) {
 	
 	// cleanup
 	for (iter = 0; iter < NUM_POOLS; ++iter) {
-		mob->points.current_pools[iter] = mob->points.max_pools[iter] - pools_down[iter];
+		set_current_pool(mob, iter, mob->points.max_pools[iter] - pools_down[iter]);
 		// ensure minimum of 1 after scaling:
-		mob->points.current_pools[iter] = MIN(mob->points.max_pools[iter], MAX(1, mob->points.current_pools[iter]));
+		if (mob->points.current_pools[iter] < 1) {
+			set_current_pool(mob, iter, 1);
+		}
 	}
 	for (iter = 0; iter < NUM_ATTRIBUTES; ++iter) {
 		mob->aff_attributes[iter] = mob->real_attributes[iter];
 	}
 	affect_total(mob);
 	update_pos(mob);
+	
+	// mark for descale if possible
+	if (!MOB_FLAGGED(mob, MOB_NO_RESCALE)) {
+		schedule_reset_mob(mob);
+	}
 }

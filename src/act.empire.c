@@ -3522,7 +3522,7 @@ ACMD(do_barde) {
 					}
 		
 					prc = (double)GET_HEALTH(mob) / MAX(1, GET_MAX_HEALTH(mob));
-					GET_HEALTH(newmob) = (int)(prc * GET_MAX_HEALTH(newmob));
+					set_health(newmob, (int)(prc * GET_MAX_HEALTH(newmob)));
 				}
 				
 				if (interact->quantity > 1) {

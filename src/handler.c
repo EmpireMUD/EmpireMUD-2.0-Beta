@@ -623,18 +623,18 @@ void affect_modify(char_data *ch, byte loc, sh_int mod, bitvector_t bitv, bool a
 			
 			// prevent from going negative
 			orig = GET_MOVE(ch);
-			SAFE_ADD(GET_MOVE(ch), mod, INT_MIN, INT_MAX, TRUE);
+			set_move(ch, GET_MOVE(ch) + mod);
 			
 			if (!IS_NPC(ch)) {
 				if (GET_MOVE(ch) < 0) {
 					GET_MOVE_DEFICIT(ch) -= GET_MOVE(ch);
-					GET_MOVE(ch) = 0;
+					set_move(ch, 0);
 				}
 				else if (GET_MOVE_DEFICIT(ch) > 0) {
 					diff = MAX(0, GET_MOVE(ch) - orig);
 					diff = MIN(GET_MOVE_DEFICIT(ch), diff);
 					GET_MOVE_DEFICIT(ch) -= diff;
-					GET_MOVE(ch) -= diff;
+					set_move(ch, GET_MOVE(ch) - diff);
 				}
 			}
 			break;
@@ -645,14 +645,14 @@ void affect_modify(char_data *ch, byte loc, sh_int mod, bitvector_t bitv, bool a
 			
 			// apply to current
 			orig = GET_HEALTH(ch);
-			SAFE_ADD(GET_HEALTH(ch), mod, INT_MIN, INT_MAX, TRUE);
+			set_health(ch, GET_HEALTH(ch) + mod);
 			
 			if (!IS_NPC(ch)) {
 				if (GET_HEALTH(ch) < 1) {
 					if (GET_POS(ch) >= POS_SLEEPING) {
 						// min 1 on health unless unconscious
 						GET_HEALTH_DEFICIT(ch) -= (GET_HEALTH(ch)-1);
-						GET_HEALTH(ch) = 1;
+						set_health(ch, 1);
 					}
 					// otherwise leave them dead/negative
 				}
@@ -662,12 +662,12 @@ void affect_modify(char_data *ch, byte loc, sh_int mod, bitvector_t bitv, bool a
 					diff = MIN(diff, GET_HEALTH_DEFICIT(ch));
 					diff = MIN(diff, GET_HEALTH(ch)-1);
 					GET_HEALTH_DEFICIT(ch) -= diff;
-					GET_HEALTH(ch) -= diff;
+					set_health(ch, GET_HEALTH(ch) - diff);
 				}
 			}
 			else {
 				// npcs cannot die this way
-				GET_HEALTH(ch) = MAX(1, GET_HEALTH(ch));
+				set_health(ch, MAX(1, GET_HEALTH(ch)));
 			}
 			break;
 		}
@@ -676,18 +676,18 @@ void affect_modify(char_data *ch, byte loc, sh_int mod, bitvector_t bitv, bool a
 			
 			// prevent from going negative
 			orig = GET_MANA(ch);
-			SAFE_ADD(GET_MANA(ch), mod, INT_MIN, INT_MAX, TRUE);
+			set_mana(ch, GET_MANA(ch) + mod);
 			
 			if (!IS_NPC(ch)) {
 				if (GET_MANA(ch) < 0) {
 					GET_MANA_DEFICIT(ch) -= GET_MANA(ch);
-					GET_MANA(ch) = 0;
+					set_mana(ch, 0);
 				}
 				else if (GET_MANA_DEFICIT(ch) > 0) {
 					diff = MAX(0, GET_MANA(ch) - orig);
 					diff = MIN(GET_MANA_DEFICIT(ch), diff);
 					GET_MANA_DEFICIT(ch) -= diff;
-					GET_MANA(ch) -= diff;
+					set_mana(ch, GET_MANA(ch) - diff);
 				}
 			}
 			break;
@@ -741,6 +741,9 @@ void affect_modify(char_data *ch, byte loc, sh_int mod, bitvector_t bitv, bool a
 		}
 		case APPLY_HEAL_OVER_TIME: {
 			SAFE_ADD(GET_HEAL_OVER_TIME(ch), mod, INT_MIN, INT_MAX, TRUE);
+			if (mod > 0) {
+				schedule_heal_over_time(ch);
+			}
 			break;
 		}
 		case APPLY_CRAFTING: {
@@ -1023,9 +1026,9 @@ void affect_total(char_data *ch) {
 	GET_MAX_HEALTH(ch) = MAX(1, GET_MAX_HEALTH(ch));
 	
 	// restore these because in some cases, they mess up during an affect_total
-	GET_HEALTH(ch) = health;
-	GET_MOVE(ch) = move;
-	GET_MANA(ch) = mana;
+	set_health(ch, health);
+	set_move(ch, move);
+	set_mana(ch, mana);
 	
 	// check for inventory size
 	if (!IS_NPC(ch) && CAN_CARRY_N(ch) > GET_LARGEST_INVENTORY(ch)) {
@@ -5832,6 +5835,9 @@ void tag_mob(char_data *mob, char_data *player) {
 	if (!mob || !player || mob == player || !IS_NPC(mob) || IS_NPC(player)) {
 		return;
 	}
+	
+	// tagged mobs need a reset later
+	schedule_reset_mob(mob);
 	
 	// do not re-tag
 	if (MOB_TAGGED_BY(mob)) {
