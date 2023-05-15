@@ -1865,6 +1865,14 @@ void reset_one_room(room_data *room) {
 				tmob = mob;
 				break;
 			}
+			case 'N': {	// extra mob info
+				if (mob) {
+					if (reset->arg2 > 0) {
+						set_mob_spawn_time(mob, reset->arg2);
+					}
+				}
+				break;
+			}
 			
 			case 'C': {	// add cooldown to mob
 				if (mob) {
@@ -4544,6 +4552,11 @@ bool write_map_and_room_to_file(room_vnum vnum, bool force_obj_pack) {
 			if (mob && MOB_SAVES_TO_ROOM(mob)) {
 				// basic mob data
 				fprintf(fl, "Load: M %d %llu %d 0\n", GET_MOB_VNUM(mob), MOB_FLAGS(mob), GET_ROPE_VNUM(mob));
+				
+				// extra mob data?
+				if (MOB_FLAGGED(mob, MOB_SPAWNED)) {
+					fprintf(fl, "Load: N 0 %ld 0 0\n", MOB_SPAWN_TIME(mob));
+				}
 				
 				// save affects but not dots
 				LL_FOREACH(mob->affected, aff) {

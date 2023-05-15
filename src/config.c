@@ -999,6 +999,19 @@ CONFIG_HANDLER(config_show_who_list_sort) {
 }
 
 
+// resets after setting
+CONFIG_HANDLER(config_edit_mob_spawn_interval) {
+	int old = config_get_int("mob_spawn_interval");
+	
+	// pass thru first...
+	config_edit_int(ch, config, argument);
+	
+	if (config_get_int("mob_spawn_interval") != old) {
+		reschedule_all_despawns();
+	}
+}
+
+
  //////////////////////////////////////////////////////////////////////////////
 //// CONFIG SYSTEM: SHOW FUNCS ///////////////////////////////////////////////
 
@@ -1871,6 +1884,7 @@ void init_config_system(void) {
 	init_config(CONFIG_MOBS, "default_language_vnum", CONFTYPE_INT, "language (generic) mobs speak with by default");
 	init_config(CONFIG_MOBS, "max_npc_attribute", CONFTYPE_INT, "how high primary attributes go on mobs");
 	init_config(CONFIG_MOBS, "mob_spawn_interval", CONFTYPE_INT, "how often mobs spawn/last");
+		init_config_custom("mob_spawn_interval", config_show_int, config_edit_mob_spawn_interval, NULL);
 	init_config(CONFIG_MOBS, "mob_spawn_radius", CONFTYPE_INT, "distance from players that mobs spawn");
 	init_config(CONFIG_MOBS, "mob_despawn_radius", CONFTYPE_INT, "distance from players to despawn mobs");
 	init_config(CONFIG_MOBS, "npc_follower_limit", CONFTYPE_INT, "more npc followers than this causes aggro");

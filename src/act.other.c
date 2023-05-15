@@ -604,7 +604,7 @@ void perform_herd(char_data *ch, char_data *mob, room_data *to_room, int dir, ve
 		
 		// update spawn time: delay despawn due to interaction
 		if (MOB_FLAGGED(mob, MOB_SPAWNED)) {
-			MOB_SPAWN_TIME(mob) = time(0);
+			set_mob_spawn_time(mob, time(0));
 		}
 		
 		if (perform_move(mob, dir, to_room, MOVE_HERD | (out ? MOVE_EXIT : (into_veh ? (MOVE_ENTER_VEH | MOVE_NO_COST) : NOBITS)))) {

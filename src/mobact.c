@@ -658,6 +658,7 @@ void check_scheduled_events_mob(char_data *mob) {
 	schedule_scavenge_event(mob, TRUE);
 	schedule_mob_move_event(mob, TRUE);
 	schedule_pursuit_event(mob);
+	schedule_despawn_event(mob);
 }
 
 
@@ -1358,6 +1359,123 @@ void despawn_mob(char_data *ch) {
 	}
 
 	extract_char(ch);
+}
+
+
+EVENTFUNC(mob_despawn_event) {
+	struct mob_event_data *data = (struct mob_event_data*)event_obj;
+	char_data *mob = data->mob, *chiter;
+	int count;
+	
+	// safety first
+	if (!MOB_FLAGGED(mob, MOB_SPAWNED)) {
+		delete_stored_event(&GET_STORED_EVENTS(mob), SEV_DESPAWN);
+		free(data);
+		return 0;	// do no re-enqueue
+	}
+	else if (mob->desc) {
+		// switched-- try again later
+		return 60 RL_SEC;
+	}
+	else if (GET_LED_BY(mob) || GET_LEADING_MOB(mob) || GET_LEADING_VEHICLE(mob) || GET_FED_ON_BY(mob) || MOB_FLAGGED(mob, MOB_TIED)) {
+		// try again soon
+		return 60 RL_SEC;
+	}
+	
+	// animal-in-a-stable checks
+	if (MOB_FLAGGED(mob, MOB_ANIMAL) && room_has_function_and_city_ok(NULL, IN_ROOM(mob), FNC_STABLE)) {
+		// check mob crowding
+		count = 0;
+		DL_FOREACH2(ROOM_PEOPLE(IN_ROOM(mob)), chiter, next_in_room) {
+			if (IS_NPC(chiter) && GET_MOB_VNUM(chiter) == GET_MOB_VNUM(mob)) {
+				++count;
+			}
+		}
+		if (count > config_get_int("num_duplicates_in_stable")) {
+			act("$n is feeling overcrowded, and leaves.", TRUE, mob, NULL, NULL, TO_ROOM);
+			delete_stored_event(&GET_STORED_EVENTS(mob), SEV_DESPAWN);
+			free(data);
+			despawn_mob(mob);
+			return 0;	// do no re-enqueue
+		}
+		
+		// otherwise we've hit the stable exception! come back in an hour
+		return SECS_PER_REAL_HOUR RL_SEC;
+	}
+	
+	// last check: players nerby
+	if (distance_to_nearest_player(IN_ROOM(mob)) <= config_get_int("mob_despawn_radius")) {
+		return 60 RL_SEC;	// re-enqueue
+	}
+	
+	// ok: if we got here, we can despawn the mob
+	delete_stored_event(&GET_STORED_EVENTS(mob), SEV_DESPAWN);
+	free(data);
+	despawn_mob(mob);
+	return 0;	// do no re-enqueue
+}
+
+
+/**
+* Call this e.g. if you change the "mob_spawn_interval" config. It will update
+* the despawn schedule for all SPAWNED mobs based on the new interval, and
+* ensure all SPAWNED mobs have despawn events.
+*/
+void reschedule_all_despawns(void) {
+	char_data *iter;
+	
+	DL_FOREACH(character_list, iter) {
+		if (MOB_FLAGGED(iter, MOB_SPAWNED)) {
+			cancel_stored_event(&GET_STORED_EVENTS(iter), SEV_DESPAWN);
+			schedule_despawn_event(iter);
+		}
+	}
+}
+
+
+/**
+* Schedules a DG event for a spawned mob to despawn. It guarantees the despawn
+* time will be in the future. Safe to call on any mob but won't override an
+* existing scheduled event.
+*
+* @param char_data *mob The mob to schedule for.
+*/
+void schedule_despawn_event(char_data *mob) {
+	struct mob_event_data *data;
+	struct dg_event *ev;
+	long when;
+	
+	long interval_mins = config_get_int("mob_spawn_interval");
+	
+	if (mob && MOB_FLAGGED(mob, MOB_SPAWNED) && !find_stored_event(GET_STORED_EVENTS(mob), SEV_DESPAWN) && interval_mins > 0) {
+		CREATE(data, struct mob_event_data, 1);
+		data->mob = mob;
+		
+		// determine seconds-from-now
+		when = MOB_SPAWN_TIME(mob) + (interval_mins * SECS_PER_REAL_MIN) - time(0);
+		if (when <= 0) {
+			// ensure it's in the future to avoid a ton of collisions at once if the mud reboots after being down a while
+			when = number(1, 60);
+		}
+		
+		ev = dg_event_create(mob_despawn_event, data, when RL_SEC);
+		add_stored_event(&GET_STORED_EVENTS(mob), SEV_DESPAWN, ev);
+	}
+}
+
+
+/**
+* Sets (or re-sets) the spawn time for a mob and schedules the despawn event.
+*
+* @param char_data *mob The mob to set a spawn time for.
+* @param long when The timestamp when the mob spawned -- usually time(0).
+*/
+void set_mob_spawn_time(char_data *mob, long when) {
+	if (mob && IS_NPC(mob)) {
+		MOB_SPAWN_TIME(mob) = when;
+		cancel_stored_event(&GET_STORED_EVENTS(mob), SEV_DESPAWN);
+		schedule_despawn_event(mob);
+	}
 }
 
 

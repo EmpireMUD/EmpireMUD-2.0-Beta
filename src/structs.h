@@ -1413,7 +1413,7 @@ typedef struct vehicle_data vehicle_data;
 
 // SEV_x: stored event types
 #define SEV_TRENCH_FILL  0
-	#define SEV_UNUSED  1	// no longer used
+#define SEV_DESPAWN  1
 #define SEV_BURN_DOWN  2
 #define SEV_GROW_CROP  3
 #define SEV_TAVERN  4

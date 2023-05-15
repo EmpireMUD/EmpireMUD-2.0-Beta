@@ -385,9 +385,7 @@ int limit_crowd_control(char_data *victim, int atype) {
 bool point_update_char(char_data *ch) {
 	struct cooldown_data *cool, *next_cool;
 	obj_data *obj, *next_obj;
-	char_data *chiter;
 	bool found;
-	int count;
 	
 	// remove stale offers -- this needs to happen even if dead (resurrect)
 	if (!IS_NPC(ch)) {
@@ -401,22 +399,6 @@ bool point_update_char(char_data *ch) {
 	
 	if (IS_NPC(ch) && FIGHTING(ch)) {
 		check_pointless_fight(ch);
-	}
-	
-	// check mob crowding (for npcs in stables)
-	if (IS_NPC(ch) && !ch->desc && room_has_function_and_city_ok(NULL, IN_ROOM(ch), FNC_STABLE)) {
-		count = 1;	// me
-		DL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), chiter, next_in_room) {
-			if (ch != chiter && !EXTRACTED(chiter) && IS_NPC(chiter) && GET_MOB_VNUM(chiter) == GET_MOB_VNUM(ch)) {
-				++count;
-			}
-		}
-		
-		if (count > config_get_int("num_duplicates_in_stable")) {
-			act("$n is feeling overcrowded, and leaves.", TRUE, ch, NULL, NULL, TO_ROOM);
-			extract_char(ch);
-			return FALSE;
-		}
 	}
 	
 	if (!IS_NPC(ch)) {
@@ -457,16 +439,6 @@ bool point_update_char(char_data *ch) {
 		// death count decrease after 3 minutes without a death
 		if (GET_RECENT_DEATH_COUNT(ch) > 0 && GET_LAST_DEATH_TIME(ch) + (3 * SECS_PER_REAL_MIN) < time(0)) {
 			GET_RECENT_DEATH_COUNT(ch) -= 1;
-		}
-	}
-	
-	// check spawned
-	if (REAL_NPC(ch) && !ch->desc && MOB_FLAGGED(ch, MOB_SPAWNED) && (!MOB_FLAGGED(ch, MOB_ANIMAL) || !room_has_function_and_city_ok(NULL, IN_ROOM(ch), FNC_STABLE)) && MOB_SPAWN_TIME(ch) < (time(0) - config_get_int("mob_spawn_interval") * SECS_PER_REAL_MIN)) {
-		if (!GET_LED_BY(ch) && !GET_LEADING_MOB(ch) && !GET_LEADING_VEHICLE(ch) && !MOB_FLAGGED(ch, MOB_TIED)) {
-			if (distance_to_nearest_player(IN_ROOM(ch)) > config_get_int("mob_despawn_radius")) {
-				despawn_mob(ch);
-				return FALSE;
-			}
 		}
 	}
 	

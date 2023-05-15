@@ -541,7 +541,7 @@ void perform_load_mob(char_data *ch, char_data *mob, vehicle_data *cont, room_da
 	
 	// update spawn time: delay despawn due to interaction
 	if (MOB_FLAGGED(mob, MOB_SPAWNED)) {
-		MOB_SPAWN_TIME(mob) = time(0);
+		set_mob_spawn_time(mob, time(0));
 	}
 	
 	snprintf(buf, sizeof(buf), "$n is loaded %sto $V.", IN_OR_ON(cont));
@@ -600,7 +600,7 @@ void perform_unload_mob(char_data *ch, char_data *mob, vehicle_data *cont) {
 	
 	// update spawn time: delay despawn due to interaction
 	if (MOB_FLAGGED(mob, MOB_SPAWNED)) {
-		MOB_SPAWN_TIME(mob) = time(0);
+		set_mob_spawn_time(mob, time(0));
 	}
 	
 	act("$n is unloaded from $V.", FALSE, mob, NULL, cont, TO_ROOM);
@@ -2082,7 +2082,7 @@ ACMD(do_lead) {
 	if (GET_LEADING_MOB(ch)) {
 		// update spawn time: delay despawn due to interaction
 		if (MOB_FLAGGED(GET_LEADING_MOB(ch), MOB_SPAWNED)) {
-			MOB_SPAWN_TIME(GET_LEADING_MOB(ch)) = time(0);
+			set_mob_spawn_time(GET_LEADING_MOB(ch), time(0));
 		}
 		
 		act("You stop leading $N.", FALSE, ch, NULL, GET_LEADING_MOB(ch), TO_CHAR);
@@ -2136,7 +2136,7 @@ ACMD(do_lead) {
 			
 			// update spawn time: delay despawn due to interaction
 			if (MOB_FLAGGED(mob, MOB_SPAWNED)) {
-				MOB_SPAWN_TIME(mob) = time(0);
+				set_mob_spawn_time(mob, time(0));
 			}
 		}
 	}

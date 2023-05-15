@@ -4276,7 +4276,7 @@ void frequent_combat(unsigned long pulse) {
 		
 		// update spawn time: delay despawn due to recent fighting
 		if (MOB_FLAGGED(ch, MOB_SPAWNED)) {
-			MOB_SPAWN_TIME(ch) = time(0);
+			set_mob_spawn_time(ch, time(0));
 		}
 		
 		switch (FIGHT_MODE(ch)) {

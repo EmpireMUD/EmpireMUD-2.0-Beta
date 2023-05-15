@@ -220,7 +220,7 @@ ACMD(do_consider) {
 		
 		// update spawn time: delay despawn due to interaction
 		if (MOB_FLAGGED(vict, MOB_SPAWNED)) {
-			MOB_SPAWN_TIME(vict) = time(0);
+			set_mob_spawn_time(vict, time(0));
 		}
 	}
 }

@@ -836,7 +836,7 @@ void charge_workforce(empire_data *emp, int chore, room_data *room, char_data *w
 	if (worker) {
 		// update spawn time as they are still working (prevent despawn)
 		// this also blocks another chore from grabbing them during this cycle
-		MOB_SPAWN_TIME(worker) = time(0);
+		set_mob_spawn_time(worker, time(0));
 		
 		// log for workforce-where
 		log_workforce_where(emp, worker, chore);

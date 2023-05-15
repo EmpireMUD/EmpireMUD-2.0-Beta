@@ -1879,7 +1879,7 @@ char_data *read_mobile(mob_vnum nr, bool with_triggers) {
 	}
 	
 	// note this may lead to slight over-spawning after reboots -pc 5/20/16
-	MOB_SPAWN_TIME(mob) = time(0);
+	set_mob_spawn_time(mob, time(0));
 	
 	// special handling for mobs with LIGHT flags on the prototype
 	if (AFF_FLAGGED(mob, AFF_LIGHT)) {

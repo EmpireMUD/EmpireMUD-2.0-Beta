@@ -6390,7 +6390,7 @@ EVENT_CANCEL_FUNC(cancel_room_event);
 // SEV_x: list of cancel functions
 struct stored_event_info_t stored_event_info[] = {
 	{ cancel_map_event },	// SEV_TRENCH_FILL
-		{ NULL },	// unused
+	{ cancel_mob_event },	// SEV_DESPAWN
 	{ cancel_burn_event },	// SEV_BURN_DOWN
 	{ cancel_map_event },	// SEV_GROW_CROP
 	{ cancel_room_event },	// SEV_TAVERN
