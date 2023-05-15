@@ -558,12 +558,11 @@ void real_update_char(char_data *ch) {
 		}
 	}
 	
-	// check leader's solo role
-	if (IS_NPC(ch) && GET_COMPANION(ch) && GET_CLASS_ROLE(GET_COMPANION(ch)) == ROLE_SOLO && (compan = has_companion(GET_COMPANION(ch), GET_MOB_VNUM(ch))) && compan->from_abil != NO_ABIL && (abil = find_ability_by_vnum(compan->from_abil)) && ABIL_IS_SYNERGY(abil) && !check_solo_role(GET_COMPANION(ch))) {
-		act("$N vanishes because you're in the solo role but not alone.", FALSE, GET_LEADER(ch), NULL, ch, TO_CHAR);
-		act("$N vanishes.", FALSE, GET_LEADER(ch), NULL, ch, TO_NOTVICT);
-		extract_char(ch);
-		return;
+	// ensure I don't have an invalid companion in the solo role
+	if (!IS_NPC(ch) && GET_COMPANION(ch) && GET_CLASS_ROLE(ch) == ROLE_SOLO && (compan = has_companion(ch, GET_MOB_VNUM(GET_COMPANION(ch)))) && compan->from_abil != NO_ABIL && (abil = find_ability_by_vnum(compan->from_abil)) && ABIL_IS_SYNERGY(abil) && !check_solo_role(ch)) {
+		act("$N vanishes because you're in the solo role but not alone.", FALSE, ch, NULL, GET_COMPANION(ch), TO_CHAR);
+		act("$N vanishes.", FALSE, ch, NULL, GET_COMPANION(ch), TO_NOTVICT);
+		extract_char(GET_COMPANION(ch));
 	}
 	// earthmeld damage
 	if (!IS_NPC(ch) && !IS_IMMORTAL(ch) && AFF_FLAGGED(ch, AFF_EARTHMELD) && IS_COMPLETE(IN_ROOM(ch)) && (ROOM_IS_CLOSED(IN_ROOM(ch)) || ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_BARRIER))) {
