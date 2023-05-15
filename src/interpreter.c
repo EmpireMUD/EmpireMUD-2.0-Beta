@@ -2316,9 +2316,7 @@ int perform_dupe_check(descriptor_data *d) {
 	 * duplicates, though theoretically none should be able to exist).
 	 */
 	
-	DL_FOREACH_SAFE(character_list, ch, next_ch) {
-		if (IS_NPC(ch))
-			continue;
+	DL_FOREACH_SAFE2(player_character_list, ch, next_ch, next_plr) {
 		if (GET_IDNUM(ch) != id)
 			continue;
 

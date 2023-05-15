@@ -11222,9 +11222,10 @@ ACMD(do_users) {
 	one_argument(argument, arg);
 
 	if (!*host_search) {
-		DL_FOREACH(character_list, tch) {
-			if (IS_NPC(tch) || tch->desc)
+		DL_FOREACH2(player_character_list, tch, next_plr) {
+			if (tch->desc) {
 				continue;
+			}
 			result = users_output(ch, tch, NULL, name_search, low, high, rp);
 			
 			if (result) {

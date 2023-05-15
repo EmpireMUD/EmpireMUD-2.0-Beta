@@ -265,11 +265,7 @@ void olc_delete_craft(char_data *ch, craft_vnum vnum) {
 	}
 	
 	// find players who are crafting it and stop them (BEFORE removing from table)
-	DL_FOREACH(character_list, iter) {
-		if (IS_NPC(iter)) {
-			continue;
-		}
-		
+	DL_FOREACH2(player_character_list, iter, next_plr) {
 		// currently crafting
 		if (GET_ACTION(iter) == ACT_GEN_CRAFT && GET_ACTION_VNUM(iter, 0) == GET_CRAFT_VNUM(craft)) {
 			msg_to_char(iter, "The craft you were making has been deleted.\r\n");

@@ -2975,11 +2975,8 @@ void olc_delete_ability(char_data *ch, any_vnum vnum) {
 	}
 	
 	// update live players
-	DL_FOREACH(character_list, chiter) {
+	DL_FOREACH2(player_character_list, chiter, next_plr) {
 		found = FALSE;
-		if (IS_NPC(chiter)) {
-			continue;
-		}
 		
 		HASH_ITER(hh, GET_ABILITY_HASH(chiter), plab, next_plab) {
 			if (plab->vnum == vnum) {
@@ -3339,8 +3336,8 @@ void save_olc_ability(descriptor_data *desc) {
 	}
 	
 	// update live players' gain hooks and techs
-	DL_FOREACH(character_list, chiter) {
-		if (!IS_NPC(chiter) && (abd = get_ability_data(chiter, vnum, FALSE))) {
+	DL_FOREACH2(player_character_list, chiter, next_plr) {
+		if ((abd = get_ability_data(chiter, vnum, FALSE))) {
 			any = FALSE;
 			for (iter = 0; iter < NUM_SKILL_SETS && !any; ++iter) {
 				if (abd->purchased[iter]) {
@@ -3400,8 +3397,8 @@ void save_olc_ability(descriptor_data *desc) {
 	
 	// apply passive buffs
 	if (IS_SET(ABIL_TYPES(proto), ABILT_PASSIVE_BUFF)) {
-		DL_FOREACH(character_list, chiter) {
-			if (!IS_NPC(chiter) && (abd = get_ability_data(chiter, vnum, FALSE))) {
+		DL_FOREACH2(player_character_list, chiter, next_plr) {
+			if ((abd = get_ability_data(chiter, vnum, FALSE))) {
 				if (abd->purchased[GET_CURRENT_SKILL_SET(chiter)]) {
 					apply_one_passive_buff(chiter, proto);
 				}

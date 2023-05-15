@@ -547,8 +547,8 @@ void olc_delete_object(char_data *ch, obj_vnum vnum) {
 	}
 	
 	// remove from home storage
-	DL_FOREACH(character_list, chiter) {
-		if (!IS_NPC(chiter) && delete_unique_storage_by_vnum(&GET_HOME_STORAGE(chiter), vnum)) {
+	DL_FOREACH2(player_character_list, chiter, next_plr) {
+		if (delete_unique_storage_by_vnum(&GET_HOME_STORAGE(chiter), vnum)) {
 			queue_delayed_update(chiter, CDU_SAVE);
 		}
 	}
@@ -1694,12 +1694,10 @@ void save_olc_object(descriptor_data *desc) {
 	}
 	
 	// update objs in home storage
-	DL_FOREACH(character_list, chiter) {
-		if (!IS_NPC(chiter)) {
-			DL_FOREACH(GET_HOME_STORAGE(chiter), eus) {
-				if (eus->obj && GET_OBJ_VNUM(eus->obj) == vnum) {
-					update_live_obj_from_olc(eus->obj, proto, obj);
-				}
+	DL_FOREACH2(player_character_list, chiter, next_plr) {
+		DL_FOREACH(GET_HOME_STORAGE(chiter), eus) {
+			if (eus->obj && GET_OBJ_VNUM(eus->obj) == vnum) {
+				update_live_obj_from_olc(eus->obj, proto, obj);
 			}
 		}
 	}

@@ -166,8 +166,8 @@ void end_event(struct event_running_data *re) {
 	events_need_save = TRUE;
 	
 	// update all in-game players so they have their current rank
-	DL_FOREACH(character_list, ch) {
-		if (IS_NPC(ch) || !(ped = get_event_data(ch, re->id))) {
+	DL_FOREACH2(player_character_list, ch, next_plr) {
+		if (!(ped = get_event_data(ch, re->id))) {
 			continue;	// no work
 		}
 		
@@ -711,11 +711,7 @@ void cancel_running_event(struct event_running_data *re) {
 	
 	// look for people with event data and remove it
 	id = re->id;
-	DL_FOREACH(character_list, chiter) {
-		if (IS_NPC(chiter)) {
-			continue;
-		}
-		
+	DL_FOREACH2(player_character_list, chiter, next_plr) {
 		HASH_FIND_INT(GET_EVENT_DATA(chiter), &id, ped);
 		if (ped) {
 			HASH_DEL(GET_EVENT_DATA(chiter), ped);
@@ -2085,11 +2081,7 @@ void olc_delete_event(char_data *ch, any_vnum vnum) {
 	remove_event_from_table(event);
 	
 	// look for people with event data and remove it
-	DL_FOREACH(character_list, chiter) {
-		if (IS_NPC(chiter)) {
-			continue;
-		}
-		
+	DL_FOREACH2(player_character_list, chiter, next_plr) {
 		HASH_ITER(hh, GET_EVENT_DATA(chiter), ped, next_ped) {
 			if (!ped->event || EVT_VNUM(ped->event) == vnum) {
 				HASH_DEL(GET_EVENT_DATA(chiter), ped);

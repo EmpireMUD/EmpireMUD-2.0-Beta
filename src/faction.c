@@ -1299,10 +1299,7 @@ void save_olc_faction(descriptor_data *desc) {
 	HASH_SRT(sorted_hh, sorted_factions, sort_factions_by_data);
 	
 	// update live players
-	DL_FOREACH(character_list, chiter) {
-		if (IS_NPC(chiter)) {
-			continue;
-		}
+	DL_FOREACH2(player_character_list, chiter, next_plr) {
 		update_reputations(chiter);
 	}
 }

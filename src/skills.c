@@ -3873,11 +3873,8 @@ void olc_delete_skill(char_data *ch, any_vnum vnum) {
 	}
 	
 	// remove from live players
-	DL_FOREACH(character_list, chiter) {
+	DL_FOREACH2(player_character_list, chiter, next_plr) {
 		found = FALSE;
-		if (IS_NPC(chiter)) {
-			continue;
-		}
 		
 		HASH_ITER(hh, GET_SKILL_HASH(chiter), plsk, next_plsk) {
 			if (plsk->vnum == vnum) {
@@ -4030,12 +4027,10 @@ void save_olc_skill(descriptor_data *desc) {
 	read_ability_requirements();
 	
 	// update all players in case there are new level-0 abilities
-	DL_FOREACH_SAFE(character_list, ch_iter, next_ch) {
-		if (!IS_NPC(ch_iter)) {
-			update_class(ch_iter);
-			give_level_zero_abilities(ch_iter);
-			assign_class_abilities(ch_iter, NULL, NOTHING);
-		}
+	DL_FOREACH_SAFE2(player_character_list, ch_iter, next_ch, next_plr) {
+		update_class(ch_iter);
+		give_level_zero_abilities(ch_iter);
+		assign_class_abilities(ch_iter, NULL, NOTHING);
 	}
 }
 

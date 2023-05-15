@@ -4962,8 +4962,8 @@ ACMD(do_enroll) {
 		reread_empire_tech(GET_LOYALTY(ch));
 		
 		// need to update quests too: do this AFTER rereading tech
-		DL_FOREACH(character_list, victim) {
-			if (!IS_NPC(victim) && GET_LOYALTY(victim) == e) {
+		DL_FOREACH2(player_character_list, victim, next_plr) {
+			if (GET_LOYALTY(victim) == e) {
 				refresh_all_quests(victim);
 			}
 		}

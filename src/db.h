@@ -603,10 +603,11 @@ void load_map_memory(char_data *ch);
 extern account_data *account_table;
 extern char_data *character_list;
 extern char_data *combat_list;
-extern char_data *global_next_char;
+extern char_data *global_next_player;
 extern char_data *next_combat_list;
 extern char_data *next_combat_list_main;
 extern char_data *mobile_table;
+extern char_data *player_character_list;
 extern player_index_data *player_table_by_idnum;
 extern player_index_data *player_table_by_name;
 

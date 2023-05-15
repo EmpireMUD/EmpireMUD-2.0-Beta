@@ -189,8 +189,8 @@ char_data *is_at_menu(int id) {
 char_data *is_playing(int id) {
 	char_data *ch;
 	
-	DL_FOREACH(character_list, ch) {
-		if (!IS_NPC(ch) && GET_IDNUM(ch) == id && !EXTRACTED(ch)) {
+	DL_FOREACH2(player_character_list, ch, next_plr) {
+		if (GET_IDNUM(ch) == id && !EXTRACTED(ch)) {
 			return ch;
 		}
 	}
@@ -4262,6 +4262,7 @@ void enter_player_game(descriptor_data *d, int dolog, bool fresh) {
 
 	// add to lists
 	DL_PREPEND(character_list, ch);
+	DL_PREPEND2(player_character_list, ch, prev_plr, next_plr);
 	ch->script_id = GET_IDNUM(ch);	// if not already set
 	if (!ch->in_lookup_table) {
 		add_to_lookup_table(ch->script_id, (void *)ch, TYPE_MOB);
@@ -5179,10 +5180,8 @@ void check_languages_all(void) {
 	
 	check_languages_all_empires();
 	
-	DL_FOREACH(character_list, ch) {
-		if (!IS_NPC(ch)) {
-			check_languages(ch);
-		}
+	DL_FOREACH2(player_character_list, ch, next_plr) {
+		check_languages(ch);
 	}
 }
 

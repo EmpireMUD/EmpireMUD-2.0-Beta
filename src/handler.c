@@ -1498,8 +1498,8 @@ void extract_char_final(char_data *ch) {
 	pause_affect_total = TRUE;
 	
 	// update iterators
-	if (ch == global_next_char) {
-		global_next_char = global_next_char->next;
+	if (ch == global_next_player) {
+		global_next_player = global_next_player->next_plr;
 	}
 	
 	check_dg_owner_purged_char(ch);
@@ -1653,8 +1653,8 @@ void extract_char_final(char_data *ch) {
 */
 void extract_char(char_data *ch) {
 	// update iterators
-	if (ch == global_next_char) {
-		global_next_char = global_next_char->next;
+	if (ch == global_next_player) {
+		global_next_player = global_next_player->next_plr;
 	}
 	
 	if (!EXTRACTED(ch)) {
@@ -1737,6 +1737,9 @@ void extract_pending_chars(void) {
 		// ensure they're really (probably) in the character list
 		if (character_list && (character_list == vict || vict->prev || vict->next)) {
 			DL_DELETE(character_list, vict);
+		}
+		if (!IS_NPC(vict) && player_character_list && (player_character_list == vict || vict->prev_plr || vict->next_plr)) {
+			DL_DELETE2(player_character_list, vict, prev_plr, next_plr);
 		}
 
 		// moving this down below the prev_vict block because ch was still in
@@ -2183,9 +2186,7 @@ char_data *get_char_vis(char_data *ch, char *name, int *number, bitvector_t wher
 char_data *get_player_vis(char_data *ch, char *name, bitvector_t flags) {
 	char_data *i, *found = NULL;
 	
-	DL_FOREACH(character_list, i) {
-		if (IS_NPC(i))
-			continue;
+	DL_FOREACH2(player_character_list, i, next_plr) {
 		if (IS_SET(flags, FIND_CHAR_ROOM) && !WIZHIDE_OK(ch, i)) {
 			continue;
 		}
@@ -2363,10 +2364,8 @@ void cleanup_all_coins(void) {
 	char_data *ch;
 	descriptor_data *desc;
 	
-	DL_FOREACH(character_list, ch) {
-		if (!IS_NPC(ch)) {
-			cleanup_coins(ch);
-		}
+	DL_FOREACH2(player_character_list, ch, next_plr) {
+		cleanup_coins(ch);
 	}
 		
 	for (desc = descriptor_list; desc; desc = desc->next) {

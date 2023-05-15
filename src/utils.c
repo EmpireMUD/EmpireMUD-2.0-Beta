@@ -7058,8 +7058,8 @@ void update_all_players(char_data *to_message, PLAYER_UPDATE_FUNC(*func)) {
 	}
 	
 	// verify there are no disconnected players characters in-game, which might not be saved
-	DL_FOREACH(character_list, ch) {
-		if (!IS_NPC(ch) && !ch->desc) {
+	DL_FOREACH2(player_character_list, ch, next_plr) {
+		if (!ch->desc) {
 			sprintf(buf, "update_all_players: Unable to update because of linkdead player (%s). Try again later.", GET_NAME(ch));
 			if (to_message) {
 				msg_to_char(to_message, "%s\r\n", buf);
