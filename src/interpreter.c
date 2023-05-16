@@ -76,6 +76,7 @@ ACMD(do_bloodsweat);
 ACMD(do_board);
 ACMD(do_boost);
 ACMD(do_breakreply);
+ACMD(do_burn);
 ACMD(do_buy);
 ACMD(do_butcher);
 
@@ -603,7 +604,7 @@ cpp_extern const struct command_info cmd_info[] = {
 	SIMPLE_CMD( "breakreply", POS_DEAD, do_breakreply, LVL_START_IMM, CTYPE_IMMORTAL ),
 	SIMPLE_CMD( "buy", POS_RESTING, do_buy, NO_MIN, CTYPE_UTIL ),
 	SCMD_CMD( "bug", POS_DEAD, do_gen_write, NO_MIN, CTYPE_COMM, SCMD_BUG ),
-	SCMD_CMD( "burn", POS_SITTING, do_light, NO_MIN, CTYPE_UTIL, SCMD_BURN ),
+	SCMD_CMD( "burn", POS_SITTING, do_burn, NO_MIN, CTYPE_UTIL, SCMD_BURN ),
 	SIMPLE_CMD( "butcher", POS_STANDING, do_butcher, NO_MIN, CTYPE_SKILL ),
 	SCMD_CMD( "brief", POS_DEAD, do_no_cmd, NO_MIN, CTYPE_UTIL, NOCMD_TOGGLE ),
 

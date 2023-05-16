@@ -3558,6 +3558,134 @@ ACMD(do_barde) {
 }
 
 
+/**
+* Attempts to start burning a building, checking everything as it goes. This
+* can be called remotely; ch can be anywhere.
+*
+* @param char_data *ch The person doing the burning.
+* @param room_data *room The targeted room (should be a map building).
+* @param obj_data *lighter Optional: If a lighter is given, it will be used for this. If not, we assume they don't need it.
+*/
+void do_burn_building(char_data *ch, room_data *room, obj_data *lighter) {
+	char to_char[256], to_room[256];
+	
+	// ensure we have the real room
+	room = HOME_ROOM(room);
+	
+	// npc denial
+	if (IS_NPC(ch)) {
+		msg_to_char(ch, "NPCs cannot light buildings on fire.\r\n");
+	}
+	else if (IS_BURNING(room)) {
+		msg_to_char(ch, "Looks like it's already on fire!\r\n");
+	}
+	else if (GET_POS(ch) < POS_STANDING) {
+		send_low_pos_msg(ch);
+	}
+	else if (!ROOM_SECT_FLAGGED(room, SECTF_MAP_BUILDING)) {
+		msg_to_char(ch, "You can only set buildings on fire this way.\r\n");
+	}
+	else if (ROOM_OWNER(room) && GET_LOYALTY(ch) && ROOM_OWNER(room) != GET_LOYALTY(ch) && !has_relationship(GET_LOYALTY(ch), ROOM_OWNER(room), DIPL_WAR)) {
+		msg_to_char(ch, "You can't burn buildings owned by %s because you're not at war.\r\n", EMPIRE_NAME(ROOM_OWNER(room)));
+	}
+	else if (!ROOM_BLD_FLAGGED(room, BLD_BURNABLE)) {
+		msg_to_char(ch, "It doesn't seem to be flammable.\r\n");
+	}
+	else {
+		// message here
+		if (lighter) {
+			snprintf(to_char, sizeof(to_char), "You use $p to light the building on fire!");
+			snprintf(to_room, sizeof(to_room), "$n uses $p to light %s building on fire!", (room == HOME_ROOM(IN_ROOM(ch))) ? "the" : "a");
+		}
+		else {
+			// no lighter?
+			snprintf(to_char, sizeof(to_char), "You light the building on fire!");
+			snprintf(to_room, sizeof(to_room), "$n lights %s building on fire!", (room == HOME_ROOM(IN_ROOM(ch))) ? "the" : "a");
+		}
+	
+		act(to_char, FALSE, ch, lighter, NULL, TO_CHAR);
+		act(to_room, FALSE, ch, lighter, NULL, TO_ROOM);
+	
+		// start the fire!
+		start_burning(room);
+		command_lag(ch, WAIT_COMBAT_ABILITY);
+	
+		// lighter use or XP
+		if (lighter) {
+			used_lighter(ch, lighter);
+		}
+		else {
+			gain_player_tech_exp(ch, PTECH_LIGHT_FIRE, 15);
+		}
+	
+		// and an offense
+		if (ROOM_OWNER(room) && GET_LOYALTY(ch)) {
+			add_offense(ROOM_OWNER(room), OFFENSE_BURNED_BUILDING, ch, room, offense_was_seen(ch, ROOM_OWNER(room), IN_ROOM(ch)) ? OFF_SEEN : NOBITS);
+		}
+	}
+}
+
+
+ACMD(do_burn) {
+	bool objless = has_player_tech(ch, PTECH_LIGHT_FIRE);
+	char *argptr = arg;
+	obj_data *lighter = NULL;
+	room_data *target;
+	vehicle_data *veh;
+	bool kept = FALSE;
+	int number, dir;
+
+	one_argument(argument, arg);
+	number = get_number(&argptr);
+
+	if (!objless) {
+		lighter = find_lighter_in_list(ch->carrying, &kept);
+	}
+
+	if (!*argptr) {
+		msg_to_char(ch, "Burn what?\r\n");
+	}
+	else if (!IS_NPC(ch) && !objless && !lighter) {
+		// nothing to light it with
+		if (kept) {
+			msg_to_char(ch, "You need a lighter that isn't marked 'keep'.\r\n");
+		}
+		else {
+			msg_to_char(ch, "You don't have anything to light that with.\r\n");
+		}
+	}
+	else if ((dir = parse_direction(ch, argptr)) != NO_DIR) {
+		// burn <dir>
+		if (!IS_OUTDOOR_TILE(IN_ROOM(ch)) || GET_ROOM_VNUM(IN_ROOM(ch)) >= MAP_SIZE) {
+			msg_to_char(ch, "You can't burn adjacent tiles unless you're outdoors.\r\n");
+		}
+		else if (!(target = real_shift(IN_ROOM(ch), shift_dir[dir][0], shift_dir[dir][1])) || !ROOM_SECT_FLAGGED(target, SECTF_MAP_BUILDING)) {
+			msg_to_char(ch, "You can't burn anything in that direction.\r\n");
+		}
+		else {
+			do_burn_building(ch, target, lighter);
+		}
+	}
+	else if ((!str_cmp(arg, "building") || !str_cmp(arg, "build")) && IS_ANY_BUILDING(IN_ROOM(ch))) {
+		do_burn_building(ch, IN_ROOM(ch), lighter);
+	}
+	else if ((veh = get_vehicle_in_room_vis(ch, argptr, &number))) {
+		// try burning a vehicle
+		do_light_vehicle(ch, veh, lighter);
+	}
+	else if (!str_cmp(arg, "area") || !str_cmp(arg, "room") || !str_cmp(arg, "here") || isname(arg, get_room_name(IN_ROOM(ch), FALSE))) {
+		do_burn_area(ch, subcmd);
+	}
+		
+	else if (get_obj_in_list_vis_prefer_interaction(ch, argptr, &number, ch->carrying, INTERACT_LIGHT) || get_obj_in_list_vis_prefer_interaction(ch, argptr, &number, ROOM_CONTENTS(IN_ROOM(ch)), INTERACT_LIGHT)) {
+		msg_to_char(ch, "You can't burn items with this command. Try 'light' instead.\r\n");
+	}
+	else {
+		msg_to_char(ch, "You don't see %s %s to burn here.\r\n", AN(arg), arg);
+	}
+}
+
+
 ACMD(do_cede) {
 	empire_data *e = GET_LOYALTY(ch), *f;
 	room_data *room, *iter, *next_iter;
