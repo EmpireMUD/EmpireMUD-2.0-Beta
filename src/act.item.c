@@ -6235,7 +6235,7 @@ ACMD(do_light) {
 		if ((veh = get_vehicle_in_room_vis(ch, argptr, &number))) {
 			do_light_vehicle(ch, veh, lighter);
 		}
-		else if ((dir = parse_direction(ch, argptr))) {
+		else if ((dir = parse_direction(ch, argptr)) != NO_DIR) {
 			// burn <dir>
 			if (!IS_OUTDOOR_TILE(IN_ROOM(ch)) || GET_ROOM_VNUM(IN_ROOM(ch)) >= MAP_SIZE) {
 				msg_to_char(ch, "You can't burn adjacent tiles unless you're outdoors.\r\n");
