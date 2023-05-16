@@ -452,6 +452,8 @@ D4
 ????~
 &0~
 E
+16 0 100.00 0
+E
 19 0 100.00 0
 I 5 102 15.00 1 X  # DIG: flint stone
 I 5 101 15.00 1 X  # DIG: lump of clay
@@ -576,6 +578,8 @@ D4
 ????~
 &y~
 E
+16 0 100.00 20
+E
 19 0 100.00 20
 I 5 102 15.00 1 X  # DIG: flint stone
 I 5 103 8.00 1 X  # DIG: yellow lightning stone
@@ -594,6 +598,8 @@ E
 1 0 100.00 7
 E
 9 0 20.00 7
+E
+16 0 100.00 0
 E
 19 0 100.00 0
 I 5 102 15.00 1 X  # DIG: flint stone
@@ -623,6 +629,8 @@ E
 1 0 100.00 12
 E
 9 0 20.00 12
+E
+16 0 100.00 20
 E
 19 0 100.00 20
 I 5 102 15.00 1 X  # DIG: flint stone
@@ -655,6 +663,8 @@ E
 1 0 100.00 16
 E
 9 0 20.00 16
+E
+16 0 100.00 0
 E
 19 0 100.00 27
 I 6 3017 100.00 1  # FORAGE: plump fig
@@ -690,6 +700,8 @@ D3
 D4
 ????~
 &g~
+E
+16 0 100.00 0
 E
 19 0 100.00 27
 S
@@ -950,6 +962,8 @@ E
 9 0 50.00 24
 E
 16 0 100.00 20
+E
+23 0 100.00 20
 I 5 103 8.00 1 X  # DIG: yellow lightning stone
 I 5 102 15.00 1 X  # DIG: flint stone
 I 5 100 100.00 1 X  # DIG: rock
@@ -1480,6 +1494,8 @@ E
 9 0 50.00 37
 E
 16 0 100.00 0
+E
+23 0 100.00 0
 I 5 102 15.00 1 X  # DIG: flint stone
 I 5 101 15.00 1 X  # DIG: lump of clay
 I 5 100 100.00 1 X  # DIG: rock
@@ -1988,6 +2004,8 @@ E
 12 0 25.00 41
 E
 16 0 100.00 40
+E
+23 0 100.00 40
 I 5 102 9.00 1 X  # DIG: flint stone
 I 5 100 9.00 1 X  # DIG: rock
 I 5 101 100.00 1 X  # DIG: lump of clay
@@ -2484,6 +2502,8 @@ E
 10 57 5.00 36
 E
 16 0 100.00 50
+E
+23 0 100.00 50
 I 5 102 9.00 1 x  # DIG: flint stone
 I 5 107 9.00 1 x  # DIG: bag of sand
 I 5 101 100.00 1 x  # DIG: lump of clay
@@ -2610,6 +2630,8 @@ E
 15 0 1.00 0
 E
 16 0 100.00 0
+E
+23 0 100.00 0
 I 6 3017 33.00 1  # FORAGE: plump fig
 X
 vined densely field stumps jungle trees forest around~
@@ -2692,6 +2714,8 @@ E
 10 57 5.00 61
 E
 16 0 100.00 50
+E
+23 0 100.00 50
 I 6 3051 50.00 1 x  # FORAGE: sea urchin
 I 6 3052 50.00 1 x  # FORAGE: clam
 I 7 1206 8.33 125 p  # PICK: iridescent blue iris
@@ -2985,6 +3009,8 @@ E
 11 85 4.00 23
 E
 16 0 100.00 70
+E
+23 0 100.00 70
 I 5 102 15.00 1 X  # DIG: flint stone
 I 5 103 8.00 1 X  # DIG: yellow lightning stone
 I 5 101 15.00 1 X  # DIG: lump of clay
@@ -3087,6 +3113,8 @@ E
 11 85 4.00 23
 E
 16 0 100.00 70
+E
+23 0 100.00 70
 I 5 102 15.00 1 X  # DIG: flint stone
 I 5 101 15.00 1 X  # DIG: lump of clay
 I 5 103 8.00 1 X  # DIG: yellow lightning stone
@@ -3189,6 +3217,8 @@ E
 E
 11 19 4.00 20
 E
+16 0 100.00 70
+E
 19 0 100.00 70
 I 5 101 15.00 1 X  # DIG: lump of clay
 I 5 100 100.00 1 X  # DIG: rock
@@ -3217,6 +3247,8 @@ E
 11 85 4.00 20
 E
 11 19 4.00 20
+E
+16 0 100.00 70
 E
 19 0 100.00 70
 I 5 102 15.00 1 X  # DIG: flint stone
@@ -3446,6 +3478,8 @@ E
 E
 9 0 75.00 84
 E
+16 0 100.00 21
+E
 19 0 100.00 21
 I 5 101 15.00 1 X  # DIG: lump of clay
 I 5 100 100.00 1 X  # DIG: rock
@@ -3468,6 +3502,8 @@ An Oasis Crop~
 D0
 ????~
 &y~
+E
+16 0 100.00 21
 E
 19 0 100.00 21
 I 5 101 15.00 1 X  # DIG: lump of clay
@@ -3729,6 +3765,8 @@ E
 1 0 100.00 84
 E
 9 0 75.00 84
+E
+16 0 100.00 82
 E
 19 0 100.00 82
 I 5 101 15.00 1 X  # DIG: lump of clay

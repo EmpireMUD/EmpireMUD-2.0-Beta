@@ -332,7 +332,7 @@ M
 10558 5.00 0
 X
 evergreens forest trees pines around~
-   The evergreens have closed in around you and you can see little else. 
+   The evergreens have closed in around you and you can see little else.
 Above, they grow tall and straight, reaching like colossal fingers toward the
 sky. The countless needles buffer all sound except the gentle breeze and the
 infrequent call of a loud bird. The air is cold -- colder than you were
@@ -423,6 +423,8 @@ E
 9 0 50.00 10562
 E
 16 0 100.00 0
+E
+23 0 100.00 0
 I 5 10552 9.00 1 X  # DIG: arctic brambleberries
 I 5 100 100.00 1 X  # DIG: rock
 I 6 3013 75.00 1  # FORAGE: handful of nuts
