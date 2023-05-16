@@ -3576,6 +3576,9 @@ void do_burn_building(char_data *ch, room_data *room, obj_data *lighter) {
 	if (IS_NPC(ch)) {
 		msg_to_char(ch, "NPCs cannot light buildings on fire.\r\n");
 	}
+	else if (GET_ROOM_VEHICLE(room)) {
+		do_light_vehicle(ch, GET_ROOM_VEHICLE(room), lighter);
+	}
 	else if (IS_BURNING(room)) {
 		msg_to_char(ch, "Looks like it's already on fire!\r\n");
 	}
@@ -3669,7 +3672,7 @@ ACMD(do_burn) {
 	else if ((!str_cmp(arg, "building") || !str_cmp(arg, "build")) && IS_ANY_BUILDING(IN_ROOM(ch))) {
 		do_burn_building(ch, IN_ROOM(ch), lighter);
 	}
-	else if ((veh = get_vehicle_in_room_vis(ch, argptr, &number))) {
+	else if (generic_find(argptr, &number, FIND_VEHICLE_ROOM | FIND_VEHICLE_INSIDE, ch, NULL, NULL, &veh)) {
 		// try burning a vehicle
 		do_light_vehicle(ch, veh, lighter);
 	}
