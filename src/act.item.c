@@ -6205,9 +6205,10 @@ ACMD(do_light) {
 	bool objless = has_player_tech(ch, PTECH_LIGHT_FIRE);
 	char buf[MAX_STRING_LENGTH], *argptr = arg;
 	obj_data *obj, *lighter = NULL;
+	room_data *target;
 	vehicle_data *veh;
 	bool kept = FALSE;
-	int number;
+	int number, dir;
 
 	one_argument(argument, arg);
 	number = get_number(&argptr);
@@ -6233,6 +6234,21 @@ ACMD(do_light) {
 		// try burning a vehicle
 		if ((veh = get_vehicle_in_room_vis(ch, argptr, &number))) {
 			do_light_vehicle(ch, veh, lighter);
+		}
+		else if ((dir = parse_direction(ch, argptr))) {
+			// burn <dir>
+			if (!IS_OUTDOOR_TILE(IN_ROOM(ch)) || GET_ROOM_VNUM(IN_ROOM(ch)) >= MAP_SIZE) {
+				msg_to_char(ch, "You can't burn adjacent tiles unless you're outdoors.\r\n");
+			}
+			else if (!(target = real_shift(IN_ROOM(ch), shift_dir[dir][0], shift_dir[dir][1])) || !ROOM_SECT_FLAGGED(target, SECTF_MAP_BUILDING)) {
+				msg_to_char(ch, "You can't burn anything in that direction.\r\n");
+			}
+			else {
+				do_burn_building(ch, target, lighter);
+			}
+		}
+		else if (!str_cmp(arg, "building") && IS_ANY_BUILDING(IN_ROOM(ch))) {
+			do_burn_building(ch, IN_ROOM(ch), lighter);
 		}
 		else if (!str_cmp(arg, "area") || !str_cmp(arg, "room") || !str_cmp(arg, "here") || isname(arg, get_room_name(IN_ROOM(ch), FALSE))) {
 			do_burn_area(ch, subcmd);

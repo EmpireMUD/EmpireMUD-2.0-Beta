@@ -1675,6 +1675,8 @@ void schedule_burn_down(room_data *room) {
 * @param room_data *room The room to burn.
 */
 void start_burning(room_data *room) {
+	descriptor_data *desc;
+	
 	room = HOME_ROOM(room);	// burning is always on the home room
 	
 	if (!COMPLEX_DATA(room)) {
@@ -1687,6 +1689,13 @@ void start_burning(room_data *room) {
 	// ensure no building or dismantling
 	stop_room_action(room, ACT_BUILDING);
 	stop_room_action(room, ACT_DISMANTLING);
+	
+	// messaging
+	LL_FOREACH(descriptor_list, desc) {
+		if (STATE(desc) == CON_PLAYING && desc->character && AWAKE(desc->character) && HOME_ROOM(IN_ROOM(desc->character)) == HOME_ROOM(room)) {
+			msg_to_char(desc->character, "The building is on fire!\r\n");
+		}
+	}
 }
 
 

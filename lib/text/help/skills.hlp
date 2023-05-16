@@ -259,17 +259,22 @@ See also: BOARD, DRAG, HARNESS, HERD
 #
 LIGHT BURN TORCH
 
-Usage:  light <item | vehicle | area>
-        burn <item | vehicle | area>
+Usage:  light <item | building | vehicle | area | direction>
+        burn <item | building | vehicle | area | direction>
 
 To light something, you must have fire sticks or some other lighter. You may
 light sticks to create torches. You can also light trees or logs to make camp
 fires. Dropping a torch (or lighting a fire) may burn down the building it's
 in, if it's unowned or you are at war with the owner.
 
+You can use these commands to light a building on fire, either from the same
+tile as the building (burn building), or from an adjecent tile (burn
+<direction>). If the building is claimed, you must be at war with the owner to
+do this.
+
 You can also burn the area (either with the word 'area' or with any keyword
 from the room title) to remove stumps and other features. This only works on
-certain terrain.
+certain terrain, and only on the room you're in.
 
 Some lighters have a limited number of uses and will be thrown away afterwards.
 If you have marked a lighter 'keep', it won't be used (unless it has unlimited

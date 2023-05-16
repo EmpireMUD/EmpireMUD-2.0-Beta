@@ -2495,8 +2495,10 @@ THROW
 
 Usage:  throw <object> <direction>
 
-This is used to throw an object into a near-by room. This is used primarily
-for burning down buildings.
+This is used to throw an object into an adjacent tile or building. This is used
+primarily for burning down buildings by throwing torches through the entrance.
+
+See also: BURN
 #
 TIE UNTIE
 
