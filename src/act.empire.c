@@ -3676,7 +3676,7 @@ ACMD(do_burn) {
 		// try burning a vehicle
 		do_light_vehicle(ch, veh, lighter);
 	}
-	else if (!str_cmp(arg, "area") || !str_cmp(arg, "room") || !str_cmp(arg, "here") || isname(arg, get_room_name(IN_ROOM(ch), FALSE))) {
+	else if (!str_cmp(arg, "area") || !str_cmp(arg, "room") || !str_cmp(arg, "here") || isname(arg, get_room_name(IN_ROOM(ch), FALSE)) || isname(arg, GET_SECT_NAME(SECT(IN_ROOM(ch))))) {
 		do_burn_area(ch);
 	}
 		

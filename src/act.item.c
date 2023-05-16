@@ -6228,7 +6228,7 @@ ACMD(do_light) {
 	}
 	else if (!(obj = get_obj_in_list_vis_prefer_interaction(ch, argptr, &number, ch->carrying, INTERACT_LIGHT)) && !(obj = get_obj_in_list_vis_prefer_interaction(ch, argptr, &number, ROOM_CONTENTS(IN_ROOM(ch)), INTERACT_LIGHT))) {
 		// invalid arg... trying to light one of these?
-		if (generic_find(argptr, &number, FIND_VEHICLE_ROOM | FIND_VEHICLE_INSIDE, ch, NULL, NULL, &veh) || (dir = parse_direction(ch, argptr)) != NO_DIR || is_abbrev(arg, "building") || is_abbrev(arg, "area") || is_abbrev(arg, "room") || is_abbrev(arg, "here") || isname(arg, get_room_name(IN_ROOM(ch), FALSE))) {
+		if (generic_find(argptr, &number, FIND_VEHICLE_ROOM | FIND_VEHICLE_INSIDE, ch, NULL, NULL, &veh) || (dir = parse_direction(ch, argptr)) != NO_DIR || is_abbrev(arg, "building") || is_abbrev(arg, "area") || is_abbrev(arg, "room") || is_abbrev(arg, "here") || isname(arg, get_room_name(IN_ROOM(ch), FALSE)) || isname(arg, GET_SECT_NAME(SECT(IN_ROOM(ch))))) {
 			msg_to_char(ch, "You can't light vehicles, buildings, or terrain with this command. Try 'burn' instead.\r\n");
 		}
 		else {
