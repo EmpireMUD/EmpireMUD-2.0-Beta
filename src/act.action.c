@@ -2858,36 +2858,37 @@ void do_burn_building(char_data *ch, room_data *room, obj_data *lighter) {
 	else if (!ROOM_BLD_FLAGGED(room, BLD_BURNABLE)) {
 		msg_to_char(ch, "It doesn't seem to be flammable.\r\n");
 	}
-	
-	// message here
-	if (lighter) {
-		snprintf(to_char, sizeof(to_char), "You use $p to light the building on fire!");
-		snprintf(to_room, sizeof(to_room), "$n uses $p to light %s building on fire!", (room == HOME_ROOM(IN_ROOM(ch))) ? "the" : "a");
-	}
 	else {
-		// no lighter?
-		snprintf(to_char, sizeof(to_char), "You light the building on fire!");
-		snprintf(to_room, sizeof(to_room), "$n lights %s building on fire!", (room == HOME_ROOM(IN_ROOM(ch))) ? "the" : "a");
-	}
+		// message here
+		if (lighter) {
+			snprintf(to_char, sizeof(to_char), "You use $p to light the building on fire!");
+			snprintf(to_room, sizeof(to_room), "$n uses $p to light %s building on fire!", (room == HOME_ROOM(IN_ROOM(ch))) ? "the" : "a");
+		}
+		else {
+			// no lighter?
+			snprintf(to_char, sizeof(to_char), "You light the building on fire!");
+			snprintf(to_room, sizeof(to_room), "$n lights %s building on fire!", (room == HOME_ROOM(IN_ROOM(ch))) ? "the" : "a");
+		}
 	
-	act(to_char, FALSE, ch, lighter, NULL, TO_CHAR);
-	act(to_room, FALSE, ch, lighter, NULL, TO_ROOM);
+		act(to_char, FALSE, ch, lighter, NULL, TO_CHAR);
+		act(to_room, FALSE, ch, lighter, NULL, TO_ROOM);
 	
-	// start the fire!
-	start_burning(room);
-	command_lag(ch, WAIT_COMBAT_ABILITY);
+		// start the fire!
+		start_burning(room);
+		command_lag(ch, WAIT_COMBAT_ABILITY);
 	
-	// lighter use or XP
-	if (lighter) {
-		used_lighter(ch, lighter);
-	}
-	else {
-		gain_player_tech_exp(ch, PTECH_LIGHT_FIRE, 15);
-	}
+		// lighter use or XP
+		if (lighter) {
+			used_lighter(ch, lighter);
+		}
+		else {
+			gain_player_tech_exp(ch, PTECH_LIGHT_FIRE, 15);
+		}
 	
-	// and an offense
-	if (ROOM_OWNER(room) && GET_LOYALTY(ch)) {
-		add_offense(ROOM_OWNER(room), OFFENSE_BURNED_BUILDING, ch, room, offense_was_seen(ch, ROOM_OWNER(room), IN_ROOM(ch)) ? OFF_SEEN : NOBITS);
+		// and an offense
+		if (ROOM_OWNER(room) && GET_LOYALTY(ch)) {
+			add_offense(ROOM_OWNER(room), OFFENSE_BURNED_BUILDING, ch, room, offense_was_seen(ch, ROOM_OWNER(room), IN_ROOM(ch)) ? OFF_SEEN : NOBITS);
+		}
 	}
 }
 
