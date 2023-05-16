@@ -1097,7 +1097,7 @@ void do_light_vehicle(char_data *ch, vehicle_data *veh, obj_data *lighter) {
 		msg_to_char(ch, "Mobs can't light %ss on fire.\r\n", VEH_OR_BLD(veh));
 	}
 	else if (!VEH_FLAGGED(veh, VEH_BURNABLE)) {
-		msg_to_char(ch, "You can't seem to get it to burn.\r\n");
+		msg_to_char(ch, "It doesn't seem to be flammable\r\n");
 	}
 	else if (VEH_FLAGGED(veh, VEH_ON_FIRE)) {
 		msg_to_char(ch, "It is already on fire!\r\n");

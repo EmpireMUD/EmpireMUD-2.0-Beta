@@ -3344,6 +3344,7 @@ const char *evo_types[] = {
 	"TIMED",	// 20
 	"OWNED",
 	"UNOWNED",
+	"BURN-STUMPS",
 	"\n"
 };
 
@@ -3373,6 +3374,7 @@ const int evo_val_types[NUM_EVOS] = {
 	EVO_VAL_NUMBER,	// timed (minutes)
 	EVO_VAL_NONE,	// owned
 	EVO_VAL_NONE,	// unowned
+	EVO_VAL_NONE,	// burn-stumps
 };
 
 
@@ -3401,6 +3403,7 @@ const bool evo_is_over_time[] = {
 	TRUE,	// timed
 	TRUE,	// owned
 	TRUE,	// unowned
+	FALSE,	// burn-stumps
 };
 
 

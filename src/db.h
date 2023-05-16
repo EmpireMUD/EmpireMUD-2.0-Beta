@@ -945,7 +945,7 @@ void init_mine(room_data *room, char_data *ch, empire_data *emp);
 room_data *load_map_room(room_vnum vnum, bool schedule_unload);
 FILE *open_world_file(int block);
 void parse_other_shared_data(struct shared_room_data *shared, char *line, char *error_part);
-void perform_burn_room(room_data *room);
+void perform_burn_room(room_data *room, int evo_type);
 room_data *real_real_room(room_vnum vnum);
 room_data *real_room(room_vnum vnum);
 void remove_room_from_world_tables(room_data *room);

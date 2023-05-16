@@ -6236,7 +6236,7 @@ ACMD(do_light) {
 		}
 	}
 	else if (!has_interaction(GET_OBJ_INTERACTIONS(obj), INTERACT_LIGHT)) {
-		msg_to_char(ch, "You can't light that!\r\n");
+		act("You can't light $p!", FALSE, ch, obj, NULL, TO_CHAR);
 	}
 	else {
 		if (objless) {

@@ -2881,7 +2881,8 @@ typedef enum {
 #define EVO_TIMED  20	// evolves after a certain number of minutes
 #define EVO_OWNED  21	// evolves if owned
 #define EVO_UNOWNED  22	// evolves if un-owned
-#define NUM_EVOS  23	// total
+#define EVO_BURN_STUMPS  23	// uses the burn-stumps workforce to evolve
+#define NUM_EVOS  24	// total
 
 // EVO_VAL_x: evolution value types
 #define EVO_VAL_NONE  0

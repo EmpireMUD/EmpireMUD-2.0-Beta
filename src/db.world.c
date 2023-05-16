@@ -830,14 +830,15 @@ void init_mine(room_data *room, char_data *ch, empire_data *emp) {
 * Changes the sector when an outdoor tile is 'burned down', if there's an
 * evolution for it. (No effect on rooms without the evolution.)
 *
-* @param room_data *room The outdoor room with a BURNS-TO evolution.
+* @param room_data *room The outdoor room with a matching evolution.
+* @param int evo_type Should be EVO_BURNS_TO or EVO_BURN_STUMPS
 */
-void perform_burn_room(room_data *room) {
+void perform_burn_room(room_data *room, int evo_type) {
 	char buf[MAX_STRING_LENGTH], from[256], to[256];
 	struct evolution_data *evo;
 	sector_data *sect;
 	
-	if ((evo = get_evolution_by_type(SECT(room), EVO_BURNS_TO)) && (sect = sector_proto(evo->becomes)) && SECT(room) != sect) {
+	if ((evo = get_evolution_by_type(SECT(room), evo_type)) && (sect = sector_proto(evo->becomes)) && SECT(room) != sect) {
 		if (ROOM_PEOPLE(room)) {
 			strcpy(from, GET_SECT_NAME(SECT(room)));
 			strtolower(from);

@@ -1387,7 +1387,7 @@ void process_burn_area(char_data *ch) {
 		}
 		
 		// finished burning
-		perform_burn_room(IN_ROOM(ch));
+		perform_burn_room(IN_ROOM(ch), EVO_BURNS_TO);
 		cancel_action(ch);
 		stop_room_action(IN_ROOM(ch), ACT_BURN_AREA);
 		

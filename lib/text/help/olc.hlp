@@ -7456,6 +7456,7 @@ Available types ([value] isn't used unless specified):
  &cTIMED&0 - Occurs after the given number of minutes.
  &cOWNED&0 - Evolves if the tile is claimed.
  &cUNOWNED&0 - Evolves if the tile is not claimed.
+ &cBURN-STUMPS&0 - Sector this tile becomes when burnt by workforce.
 
 Examples:
  Jungle: .evolution add CHOPPED-DOWN 1 50% 28
