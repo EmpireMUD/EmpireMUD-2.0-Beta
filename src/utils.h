@@ -1952,7 +1952,7 @@ void setup_ability_companions(char_data *ch);
 // act.action.c
 bool action_flagged(char_data *ch, bitvector_t actf);
 void cancel_action(char_data *ch);
-void do_burn_area(char_data *ch, int subcmd);
+void do_burn_area(char_data *ch);
 obj_data *has_tool(char_data *ch, bitvector_t flags);
 obj_data *has_all_tools(char_data *ch, bitvector_t flags);
 void process_build_action(char_data *ch);

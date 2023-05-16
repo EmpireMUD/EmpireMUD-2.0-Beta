@@ -3677,7 +3677,7 @@ ACMD(do_burn) {
 		do_light_vehicle(ch, veh, lighter);
 	}
 	else if (!str_cmp(arg, "area") || !str_cmp(arg, "room") || !str_cmp(arg, "here") || isname(arg, get_room_name(IN_ROOM(ch), FALSE))) {
-		do_burn_area(ch, subcmd);
+		do_burn_area(ch);
 	}
 		
 	else if (get_obj_in_list_vis_prefer_interaction(ch, argptr, &number, ch->carrying, INTERACT_LIGHT) || get_obj_in_list_vis_prefer_interaction(ch, argptr, &number, ROOM_CONTENTS(IN_ROOM(ch)), INTERACT_LIGHT)) {

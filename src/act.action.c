@@ -571,12 +571,9 @@ void show_prospect_result(char_data *ch, room_data *room) {
 * Makes sure a person can [still] burn the room they are in.
 *
 * @param char_data *ch The player.
-* @param int subcmd SCMD_LIGHT or SCMD_BURN.
 * @return bool TRUE if safe, FALSE if they cannot burn it.
 */
-bool validate_burn_area(char_data *ch, int subcmd) {
-	const char *cmdname[] = { "light", "burn" };	// also in do_burn_area
-	
+bool validate_burn_area(char_data *ch) {
 	bool objless = has_player_tech(ch, PTECH_LIGHT_FIRE);
 	obj_data *lighter = NULL;
 	bool kept = FALSE;
@@ -586,7 +583,7 @@ bool validate_burn_area(char_data *ch, int subcmd) {
 	}
 	
 	if (!has_evolution_type(SECT(IN_ROOM(ch)), EVO_BURNS_TO)) {
-		msg_to_char(ch, "You can't %s this type of area.\r\n", cmdname[subcmd]);
+		msg_to_char(ch, "You can't burn this type of area.\r\n");
 	}
 	else if (ROOM_AFF_FLAGGED(IN_ROOM(ch), ROOM_AFF_NO_EVOLVE)) {
 		msg_to_char(ch, "You can't burn the area right now.\r\n");
@@ -597,7 +594,7 @@ bool validate_burn_area(char_data *ch, int subcmd) {
 			msg_to_char(ch, "You need a lighter that isn't marked 'keep'.\r\n");
 		}
 		else {
-			msg_to_char(ch, "You don't have a lighter to %s the area with.\r\n", cmdname[subcmd]);
+			msg_to_char(ch, "You don't have a lighter to burn the area with.\r\n");
 		}
 	}
 	else if (ROOM_OWNER(IN_ROOM(ch)) && ROOM_OWNER(IN_ROOM(ch)) != GET_LOYALTY(ch) && !has_relationship(GET_LOYALTY(ch), ROOM_OWNER(IN_ROOM(ch)), DIPL_WAR)) {
@@ -1354,7 +1351,7 @@ void process_build_action(char_data *ch) {
 * @param char_data *ch The person burning the area.
 */
 void process_burn_area(char_data *ch) {
-	if (!validate_burn_area(ch, GET_ACTION_VNUM(ch, 0))) {
+	if (!validate_burn_area(ch)) {
 		// sends own message
 		cancel_action(ch);
 		return;
@@ -2968,16 +2965,13 @@ ACMD(do_dig) {
 * This is a timed action that triggers a room evolution.
 *
 * @param char_data *ch The character doing the action.
-* @param int subcmd The subcmd that was passed to do_light (SCMD_LIGHT, SCMD_BURN).
 */
-void do_burn_area(char_data *ch, int subcmd) {
-	const char *cmdname[] = { "light", "burn" };	// also in do_light
-	
+void do_burn_area(char_data *ch) {
 	obj_data *lighter = NULL;
 	bool kept;
 	
 	if (IS_NPC(ch)) {
-		msg_to_char(ch, "You cannot %s the area.\r\n", cmdname[subcmd]);
+		msg_to_char(ch, "You cannot burn the area.\r\n");
 	}
 	else if (IS_ANY_BUILDING(IN_ROOM(ch))) {
 		// pass thru
@@ -2994,13 +2988,11 @@ void do_burn_area(char_data *ch, int subcmd) {
 	else if (GET_POS(ch) != POS_STANDING) {
 		send_low_pos_msg(ch);
 	}
-	else if (!validate_burn_area(ch, subcmd)) {
+	else if (!validate_burn_area(ch)) {
 		// sends its own message
 	}
 	else {
 		start_action(ch, ACT_BURN_AREA, 5);
-		GET_ACTION_VNUM(ch, 0) = subcmd;
-		
 		msg_to_char(ch, "You prepare to burn the area...\r\n");
 		act("$n prepares to burn the area...", FALSE, ch, NULL, NULL, TO_ROOM);
 	}
