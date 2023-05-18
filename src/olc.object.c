@@ -129,6 +129,10 @@ bool audit_object(obj_data *obj, char_data *ch) {
 		olc_audit_msg(ch, GET_OBJ_VNUM(obj), "CREATABLE");
 		problem = TRUE;
 	}
+	if (OBJ_FLAGGED(obj, OBJ_LIGHT) && GET_OBJ_TIMER(obj) <= 0) {
+		olc_audit_msg(ch, GET_OBJ_VNUM(obj), "Infinite light (LIGHT flag)");
+		problem = TRUE;
+	}
 	if (OBJ_FLAGGED(obj, OBJ_HARD_DROP | OBJ_GROUP_DROP)) {
 		olc_audit_msg(ch, GET_OBJ_VNUM(obj), "Loot quality flags set");
 		problem = TRUE;
@@ -330,7 +334,11 @@ bool audit_object(obj_data *obj, char_data *ch) {
 		}
 		case ITEM_LIGHT: {
 			if (GET_LIGHT_HOURS_REMAINING(obj) == UNLIMITED && GET_OBJ_TIMER(obj) <= 0) {
-				olc_audit_msg(ch, GET_OBJ_VNUM(obj), "Infinite light");
+				olc_audit_msg(ch, GET_OBJ_VNUM(obj), "Infinite light (LIGHT item type)");
+				problem = TRUE;
+			}
+			if (OBJ_FLAGGED(obj, OBJ_LIGHT)) {
+				olc_audit_msg(ch, GET_OBJ_VNUM(obj), "Item has both LIGHT type and LIGHT flag");
 				problem = TRUE;
 			}
 			break;

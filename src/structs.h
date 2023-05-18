@@ -1913,7 +1913,7 @@ typedef enum {
 // OBJ_x: Extra object flags -- OBJ_FLAGGED(obj, f)
 #define OBJ_UNIQUE  BIT(0)	// a. can only use 1 at a time
 #define OBJ_PLANTABLE  BIT(1)	// b. Uses val 2 to set a crop type
-//	#define OBJ_UNUSED  BIT(2)	// c. Formerly LIGHT; this is now an item type
+#define OBJ_LIGHT  BIT(2)	// c. Generates light (prefer LIGHT item type tho)
 #define OBJ_SUPERIOR  BIT(3)	// d. Item is of superior quality
 #define OBJ_LARGE  BIT(4)	// e. Item can't be put in bags
 #define OBJ_CREATED  BIT(5)	// f. Was created by a god

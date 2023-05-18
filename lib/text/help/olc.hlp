@@ -5603,6 +5603,7 @@ effects. Never set a flag marked with an * (asterisk).
 Available flags:
  UNIQUE - can only equip 1 at a time
  PLANTABLE - can be planted as a crop (see OEDIT PLANTS)
+ LIGHT - lights up the room (prefer LIGHT item type instead of the flag)
  SUPERIOR - crafted by a master craftsman, adds the (superior) tag
  LARGE - takes up 2 inventory slots, adds the (large) tag
  *CREATED - created by a god command
@@ -5626,7 +5627,7 @@ Available flags:
  !STORE - can't be stored (or home/warehouse stored), can be toggled by scripts
  SEEDED - has already been seeded with the 'seed' command
 
-See also: BINDING, OLC OBJECTS
+See also: BINDING, OLC OBJECTS, LIGHT ITEM
 #d
 "OEDIT FULLNESS"
 
@@ -8332,6 +8333,10 @@ See also: OEDIT CUSTOM
 
 The LIGHT item illuminates dark areas. Players need these items to work outside
 at night, to explore dark caves, and sometimes for cooking food.
+
+There is also a LIGHT object flag. Prefer to use the item type INSTEAD whenever
+possible. Do not put both on the same item. The flag is for cases where a
+scenery item needs to double as a light.
 
 Object values:
  0 - hours of light remaining (or -1 for unlimited light)

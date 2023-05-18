@@ -2552,7 +2552,7 @@ const int item_wear_to_wear[] = {
 const char *extra_bits[] = {
 	"UNIQUE",	// 0
 	"PLANTABLE",
-	"*",
+	"LIGHT",
 	"SUPERIOR",
 	"LARGE",
 	"*CREATED",	// 5
@@ -2585,7 +2585,7 @@ const char *extra_bits[] = {
 const char *extra_bits_inv_flags[] = {
 	"unique",	// unique
 	"",	// plantable
-	"",	// *
+	"",	// light (controlled separately)
 	"superior",
 	"large",
 	"",	// created
@@ -2618,7 +2618,7 @@ const char *extra_bits_inv_flags[] = {
 const double obj_flag_scaling_bonus[] = {
 	1.1,	// OBJ_UNIQUE
 	1.0,	// OBJ_PLANTABLE
-	1.0,	// unused
+	1.0,	// OBJ_LIGHT
 	1.73,	// OBJ_SUPERIOR
 	1.0,	// OBJ_LARGE
 	1.0,	// OBJ_CREATED
