@@ -337,8 +337,6 @@ Objects (OEDIT):
   storage locations for an item to be stored in "warehouse storage".
 - If an item is used as a building resource, you should give it custom messages
   for build-to-char and build-to-room.
-- All lights must have a timer. If you want a player to activate a light before
-  it starts timing down, make an unlit version with a LIGHT interaction.
 - The COMBINE interaction should always use 1 exclusion set, as it will extract
   the original item if the interaction succeeds, and it's usually not safe to
   run additional interactions.
@@ -5216,6 +5214,11 @@ Food:
  0 - hours of fullness
  1 - crop vnum (if plantable)
 
+Light:
+ 0 - hours remaining (-1 is unlimited)
+ 1 - is lit (1) or not (0)
+ 2 - flags (light-fire, can-douse, junk-when-expire, cooking-fire)
+
 Lighter:
  0 - number of uses (-1 is unlimited)
 
@@ -5600,7 +5603,6 @@ effects. Never set a flag marked with an * (asterisk).
 Available flags:
  UNIQUE - can only equip 1 at a time
  PLANTABLE - can be planted as a crop (see OEDIT PLANTS)
- LIGHT - lights up the room at night
  SUPERIOR - crafted by a master craftsman, adds the (superior) tag
  LARGE - takes up 2 inventory slots, adds the (large) tag
  *CREATED - created by a god command
@@ -5698,6 +5700,39 @@ Examples:
  keywords: phaester wailing huge
 
 See also: OLC OBJECTS
+#d
+"OEDIT LIGHTHOURS" "OEDIT LIGHT HOURS" "OEDIT HOURS OF LIGHT"
+
+Usage:  .lighthours <hours | unlimited>
+
+This sets how many hours a light lasts. It is separate from the object's timer.
+
+If the JUNK-WHEN-EXPIRED light flag is set, it will automatically be destroyed
+when this timer expires.
+
+See also: OLC OBJECTS, OEDIT LIGHT FLAGS, OEDIT LIGHT IS LIT
+#d
+"OEDIT LIGHTFLAGS" "OEDIT LIGHT FLAGS"
+
+Usage:  .lightflags [add | remove] [flags]
+
+This sets flags on a light item. These change how the light behaves. Here are
+the available options:
+ &cLIGHT-FIRE&0 - Can be used in place of a LIGHTER (when lit) to light things.
+ &cCAN-DOUSE&0 - The player can put the light out and re-light it.
+ &cJUNK-WHEN-EXPIRED&0 - When the light burns out, the whole item is purged.
+ &cCOOKING-FIRE&0 - Can be used to cook.
+
+See also: OLC OBJECTS, OEDIT LIGHT HOURS, OEDIT LIGHT IS LIT
+#d
+"OEDIT LIGHTISLIT" "OEDIT LIGHT IS LIT" "OEDIT IS LIT"
+
+Usage:  .lightislit <yes | no>
+
+Determines whether or not the light is "lit" by default. If not, the player
+must light it themselves using a lighter.
+
+See also: OLC OBJECTS, OEDIT LIGHT FLAGS, OEDIT LIGHT HOURS
 #d
 "OEDIT LIQUID"
 
@@ -6023,7 +6058,7 @@ Available types:
  PAINT - used for painting buildings
  *MAIL - a letter (internal use only)
  WEALTH - adds to empire wealth when stored
- LIGHTER - can light fires
+ LIGHTER - can light fires (contrast with LIGHT)
  MINIPET - teaches a minipet to the player on 'use'
  MISSILE-WEAPON - a bow, or similar (requires .wear RANGED)
  AMMO - ammunition for missile weapons
@@ -6034,6 +6069,7 @@ Available types:
  POISON - adds an effect to melee combat
  ARMOR - requires certain skills to wear
  BOOK - can be read like a library book
+ LIGHT - lights up the room (when lit); contrast with LIGHTER
 
 You can get specific help on each of these via HELP <type> ITEM
 
@@ -8292,6 +8328,28 @@ be displayed randomly every few action ticks.
 
 See also: OEDIT CUSTOM
 #d
+"LIGHT ITEM" "LIGHT OBJECT"
+
+The LIGHT item illuminates dark areas. Players need these items to work outside
+at night, to explore dark caves, and sometimes for cooking food.
+
+Object values:
+ 0 - hours of light remaining (or -1 for unlimited light)
+ 1 - is lit (1) or not (0)
+ 2 - light flags:
+       LIGHT-FIRE - can be used like a LIGHTER item, when lit
+       CAN-DOUSE - the player can put it out and re-light it
+       JUNK-WHEN-EXPIRED - when it burns out, the item is lost
+       COOKING-FIRE - the player can cook with it
+
+Example lights:
+- torch: 18 hours of light, LIGHT-FIRE, CAN-DOUSE, JUNK-WHEN-EXPIRED
+- campfire: 24 hours of light, LIGHT-FIRE, JUNK-WHEN-EXPIRED, COOKING-FIRE
+- lantern: 24 hours of light, CAN-DOUSE
+
+See also: LIGHTER OBJECT, OEDIT LIGHT HOURS, OEDIT LIGHT IS LIT,
+   OEDIT LIGHT FLAGS
+#d
 "LIGHTER ITEM" "LIGHTER OBJECT"
 
 The LIGHTER item type can be used to light fires and torches. It can either
@@ -8301,7 +8359,9 @@ box).
 Object values:
  0 - number of uses
 
-See also: OEDIT USES
+Do not confuse LIGHTER with LIGHT. A lighter lights a light.
+
+See also: LIGHT OBJECT, OEDIT USES
 #d
 "MAIL ITEM" "MAIL OBJECT"
 
@@ -8613,7 +8673,7 @@ Available flags:
  ALLOW-ROUGH - drag/drive work on rough terrain (e.g. mountains)
  SIT - player can sit on the vehicle
  IN - changes text from "on" to "in", and "aboard" to "inside"
- BURNABLE - can be burnt using the "light" command
+ BURNABLE - can be burnt using the "burn" command
  CONTAINER - items can be placed inside
  SHIPPING - can be used by the shipping system
  CUSTOMIZABLE - allows "customize vehicle"
@@ -8624,7 +8684,7 @@ Available flags:
  CARRY-VEHICLES - vehicles can be put inside (usually via drag/lead)
  CARRY-MOBS - mobs can be put inside (usually via lead)
  SIEGE-WEAPONS - can fire on buildings and vehicles
- ON-FIRE - currently burning (via the "light" command)
+ ON-FIRE - currently burning (via the "burn" command)
  !LOAD-ONTO-VEHICLE - cannot be loaded onto another vehicle
  VISIBLE-IN-DARK - can be seen at night without a light
  !CLAIM - cannot be claimed

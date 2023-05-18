@@ -1702,6 +1702,10 @@ char *obj_desc_for_char(obj_data *obj, char_data *ch, int mode) {
 			sprintf(tags + strlen(tags), "%s %s", (*tags ? "," : ""), flags);
 		}
 		
+		if (LIGHT_IS_LIT(obj)) {
+			sprintf(tags + strlen(tags), "%s lit", (*tags ? "," : ""));
+		}
+		
 		if (PRF_FLAGGED(ch, PRF_ITEM_DETAILS) && GET_OBJ_REQUIRES_QUEST(obj) != NOTHING) {
 			sprintf(tags + strlen(tags), "%s quest", (*tags ? "," : ""));
 		}

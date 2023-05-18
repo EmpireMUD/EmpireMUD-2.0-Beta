@@ -6768,7 +6768,7 @@ void equip_char(char_data *ch, obj_data *obj, int pos) {
 		obj->worn_on = pos;
 
 		// lights?
-		if (OBJ_FLAGGED(obj, OBJ_LIGHT)) {
+		if (LIGHT_IS_LIT(obj)) {
 			++GET_LIGHTS(ch);
 			if (IN_ROOM(ch)) {
 				++ROOM_LIGHTS(IN_ROOM(ch));
@@ -6818,7 +6818,7 @@ void obj_from_char(obj_data *object) {
 		update_MSDP_inventory(object->carried_by, UPDATE_SOON);
 
 		// check lights
-		if (OBJ_FLAGGED(object, OBJ_LIGHT)) {
+		if (LIGHT_IS_LIT(object)) {
 			--GET_LIGHTS(object->carried_by);
 			if (IN_ROOM(object->carried_by)) {
 				--ROOM_LIGHTS(IN_ROOM(object->carried_by));
@@ -6879,7 +6879,7 @@ void obj_from_room(obj_data *object) {
 		request_obj_save_in_world(object);
 		
 		// update lights
-		if (OBJ_FLAGGED(object, OBJ_LIGHT)) {
+		if (LIGHT_IS_LIT(object)) {
 			--ROOM_LIGHTS(IN_ROOM(object));
 		}
 		if (ROOM_OWNER(IN_ROOM(object))) {
@@ -6975,7 +6975,7 @@ void obj_to_char(obj_data *object, char_data *ch) {
 		}
 		
 		// update lights
-		if (OBJ_FLAGGED(object, OBJ_LIGHT)) {
+		if (LIGHT_IS_LIT(object)) {
 			++GET_LIGHTS(ch);
 			
 			// check if the room needs to be lit
@@ -7130,7 +7130,7 @@ void obj_to_room(obj_data *object, room_data *room) {
 		IN_ROOM(object) = room;
 		
 		// check light
-		if (OBJ_FLAGGED(object, OBJ_LIGHT)) {
+		if (LIGHT_IS_LIT(object)) {
 			++ROOM_LIGHTS(IN_ROOM(object));
 		}
 		
@@ -7249,7 +7249,7 @@ obj_data *unequip_char(char_data *ch, int pos) {
 		obj->worn_on = NO_WEAR;
 
 		// adjust lights
-		if (OBJ_FLAGGED(obj, OBJ_LIGHT)) {
+		if (LIGHT_IS_LIT(obj)) {
 			--GET_LIGHTS(ch);
 			if (IN_ROOM(ch)) {
 				--ROOM_LIGHTS(IN_ROOM(ch));
@@ -9181,12 +9181,12 @@ void reset_light_count(room_data *room) {
 			++ROOM_LIGHTS(room);
 		}
 		for (pos = 0; pos < NUM_WEARS; ++pos) {
-			if (GET_EQ(ch, pos) && OBJ_FLAGGED(GET_EQ(ch, pos), OBJ_LIGHT)) {
+			if (GET_EQ(ch, pos) && LIGHT_IS_LIT(GET_EQ(ch, pos))) {
 				++ROOM_LIGHTS(room);
 			}
 		}
 		DL_FOREACH2(ch->carrying, obj, next_content) {
-			if (OBJ_FLAGGED(obj, OBJ_LIGHT)) {
+			if (LIGHT_IS_LIT(obj)) {
 				++ROOM_LIGHTS(room);
 			}
 		}
@@ -9195,7 +9195,7 @@ void reset_light_count(room_data *room) {
 	
 	// objects
 	DL_FOREACH2(ROOM_CONTENTS(room), obj, next_content) {
-		if (OBJ_FLAGGED(obj, OBJ_LIGHT)) {
+		if (LIGHT_IS_LIT(obj)) {
 			++ROOM_LIGHTS(room);
 		}
 	}

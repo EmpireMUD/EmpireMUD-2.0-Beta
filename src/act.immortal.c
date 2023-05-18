@@ -6955,6 +6955,17 @@ void do_stat_object(char_data *ch, obj_data *j) {
 			msg_to_char(ch, "Minipet: [%d] %s\r\n", GET_MINIPET_VNUM(j), get_mob_name_by_proto(GET_MINIPET_VNUM(j), FALSE));
 			break;
 		}
+		case ITEM_LIGHT: {
+			if (GET_LIGHT_HOURS_REMAINING(j) == UNLIMITED) {
+				snprintf(part, sizeof(part), "unlimited light");
+			}
+			else {
+				snprintf(part, sizeof(part), "%d hour%s remaining", GET_LIGHT_HOURS_REMAINING(j), PLURAL(GET_LIGHT_HOURS_REMAINING(j)));
+			}
+			sprintbit(GET_LIGHT_FLAGS(j), light_flags, buf, TRUE);
+			msg_to_char(ch, "Light: %s (%s), flags: %s\r\n", part, (GET_LIGHT_IS_LIT(j) ? "lit" : "unlit"), buf);
+			break;
+		}
 		default:
 			msg_to_char(ch, "Values 0-2: [&g%d&0] [&g%d&0] [&g%d&0]\r\n", GET_OBJ_VAL(j, 0), GET_OBJ_VAL(j, 1), GET_OBJ_VAL(j, 2));
 			break;

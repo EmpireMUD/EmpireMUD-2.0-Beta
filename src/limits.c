@@ -1439,8 +1439,8 @@ void point_update_obj(obj_data *obj) {
 		return;
 	}
 
-	if (OBJ_FLAGGED(obj, OBJ_LIGHT)) {
-		if (GET_OBJ_TIMER(obj) == 2) {
+	if (LIGHT_IS_LIT(obj)) {
+		if (GET_LIGHT_HOURS_REMAINING(obj) == 2) {
 			if (obj->worn_by) {
 				act("Your light begins to flicker and fade.", FALSE, obj->worn_by, obj, 0, TO_CHAR);
 				act("$n's light begins to flicker and fade.", TRUE, obj->worn_by, obj, 0, TO_ROOM);
@@ -1451,7 +1451,7 @@ void point_update_obj(obj_data *obj) {
 				if (ROOM_PEOPLE(IN_ROOM(obj)))
 					act("$p begins to flicker and fade.", FALSE, ROOM_PEOPLE(IN_ROOM(obj)), obj, 0, TO_CHAR | TO_ROOM);
 		}
-		else if (GET_OBJ_TIMER(obj) == 1) {
+		else if (GET_LIGHT_HOURS_REMAINING(obj) == 1) {
 			if (obj->worn_by) {
 				act("Your light burns out.", FALSE, obj->worn_by, obj, 0, TO_CHAR);
 				act("$n's light burns out.", TRUE, obj->worn_by, obj, 0, TO_ROOM);
@@ -1628,7 +1628,7 @@ void real_update_obj(obj_data *obj) {
 	char_data *pyro;
 	
 	// burny
-	if (OBJ_FLAGGED(obj, OBJ_LIGHT) && IN_ROOM(obj) && IS_ANY_BUILDING(IN_ROOM(obj))) {
+	if (LIGHT_IS_LIT(obj) && LIGHT_FLAGGED(obj, LIGHT_FLAG_LIGHT_FIRE) && IN_ROOM(obj) && IS_ANY_BUILDING(IN_ROOM(obj))) {
 		home = HOME_ROOM(IN_ROOM(obj));
 		if (ROOM_BLD_FLAGGED(home, BLD_BURNABLE) && !IS_BURNING(home)) {
 			// only items with an empire id are considered: you can't burn stuff down by accident (unless the building is unowned)

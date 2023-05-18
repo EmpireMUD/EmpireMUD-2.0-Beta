@@ -65,7 +65,7 @@ static void wear_message(char_data *ch, obj_data *obj, int where);
 
 // ONLY flags to show on identify / warehouse inv
 // TODO consider moving this to structs.h near the flag list
-bitvector_t show_obj_flags = OBJ_LIGHT | OBJ_SUPERIOR | OBJ_ENCHANTED | OBJ_JUNK | OBJ_TWO_HANDED | OBJ_BIND_ON_EQUIP | OBJ_BIND_ON_PICKUP | OBJ_HARD_DROP | OBJ_GROUP_DROP | OBJ_GENERIC_DROP | OBJ_UNIQUE;
+bitvector_t show_obj_flags = OBJ_SUPERIOR | OBJ_ENCHANTED | OBJ_JUNK | OBJ_TWO_HANDED | OBJ_BIND_ON_EQUIP | OBJ_BIND_ON_PICKUP | OBJ_HARD_DROP | OBJ_GROUP_DROP | OBJ_GENERIC_DROP | OBJ_UNIQUE;
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -168,6 +168,60 @@ int count_objs_in_room(room_data *room) {
 
 
 /**
+* Finds an object for a characcter using hte 'light' command. This will prefer
+* an object they CAN light.
+*
+* @param char_data *ch The person who's looking.
+* @param char *name The target argument.
+* @param int *number Optional: For multi-list number targeting (look 4.hat; may be NULL)
+* @param obj_data *list The list to search.
+* @return obj_data *The item found, or NULL. May or may be lightable.
+*/
+obj_data *get_obj_in_list_vis_prefer_lightable(char_data *ch, char *name, int *number, obj_data *list) {
+	char copy[MAX_INPUT_LENGTH], *tmp = copy;
+	obj_data *i, *backup = NULL;
+	int num;
+	bool gave_num;
+	
+	if (!number) {
+		strcpy(tmp, name);
+		number = &num;
+		num = get_number(&tmp);
+	}
+	else {
+		tmp = name;
+	}
+	if (*number == 0) {
+		return NULL;
+	}
+	
+	// if the number is > 1 (PROBABLY requested #.name) take any item that matches
+	// note: this changed in b5.108; previously it could detect this more accurately
+	gave_num = (*number > 1);
+	
+	DL_FOREACH2(list, i, next_content) {
+		if (CAN_SEE_OBJ(ch, i) && MATCH_ITEM_NAME(tmp, i)) {
+			if (gave_num) {
+				if (--(*number) == 0) {
+					return i;
+				}
+			}
+			else {	// did not give a number
+				if (CAN_LIGHT_OBJ(i)) {
+					return i;	// is a match
+				}
+				else if (!backup) {
+					backup = i;	// missing interaction but otherwise a match
+				}
+			}
+		}
+	}
+
+	return backup;
+}
+
+
+/**
 * Returns the targeted position, or else the first place an item can be worn.
 *
 * @param char_data *ch The player.
@@ -216,21 +270,26 @@ obj_data *find_lighter_in_list(obj_data *list, bool *had_keep) {
 	*had_keep = FALSE;	// presumably
 	
 	DL_FOREACH2(list, obj, next_content) {
-		if (!IS_LIGHTER(obj)) {
-			continue;	// not a lighter
-		}
-		if (GET_LIGHTER_USES(obj) == UNLIMITED) {
-			if (!best || GET_LIGHTER_USES(best) != UNLIMITED || !OBJ_FLAGGED(best, OBJ_KEEP)) {
-				best = obj;	// new best
+		// two types of lighters:
+		if (IS_LIGHT(obj)) {
+			if (LIGHT_IS_LIT(obj) && LIGHT_FLAGGED(obj, LIGHT_FLAG_LIGHT_FIRE) && (!best || !IS_LIGHT(best))) {
+				best = obj;
 			}
 		}
-		else if (!OBJ_FLAGGED(obj, OBJ_KEEP)) {	// not unlmited; don't use kept items if not unlimited
-			if (!best || (GET_LIGHTER_USES(best) != UNLIMITED && GET_LIGHTER_USES(best) > GET_LIGHTER_USES(obj))) {
-				best = obj;	// new best
+		else if (IS_LIGHTER(obj)) {
+			if (GET_LIGHTER_USES(obj) == UNLIMITED) {
+				if (!best || (!IS_LIGHT(best) && GET_LIGHTER_USES(best) != UNLIMITED)) {
+					best = obj;	// new best
+				}
 			}
-		}
-		else {
-			*had_keep = TRUE;
+			else if (!OBJ_FLAGGED(obj, OBJ_KEEP)) {	// not unlmited; don't use kept items if not unlimited
+				if (!best || (GET_LIGHTER_USES(best) != UNLIMITED && GET_LIGHTER_USES(best) > GET_LIGHTER_USES(obj))) {
+					best = obj;	// new best
+				}
+			}
+			else {
+				*had_keep = TRUE;
+			}
 		}
 	}
 	
@@ -728,6 +787,20 @@ void identify_obj_to_char(obj_data *obj, char_data *ch, bool simple) {
 		}
 		case ITEM_MINIPET: {
 			msg_to_char(ch, "Grants minipet: %s%s\r\n", get_mob_name_by_proto(GET_MINIPET_VNUM(obj), TRUE), has_minipet(ch, GET_MINIPET_VNUM(obj)) ? " (owned)" :"");
+			break;
+		}
+		case ITEM_LIGHT: {
+			if (GET_LIGHT_HOURS_REMAINING(obj) == UNLIMITED) {
+				snprintf(part, sizeof(part), "does not burn out");
+			}
+			else {
+				snprintf(part, sizeof(part), "has %d hour%s of light remaining", GET_LIGHT_HOURS_REMAINING(obj), PLURAL(GET_LIGHT_HOURS_REMAINING(obj)));
+			}
+			msg_to_char(ch, "It %s (%s).\r\n", part, (GET_LIGHT_IS_LIT(obj) ? "lit" : "unlit"));
+			prettier_sprintbit(GET_LIGHT_FLAGS(obj), light_flags, part);
+			if (*part) {
+				msg_to_char(ch, "Additional information: %s\r\n", part);
+			}
 			break;
 		}
 	}
@@ -1445,7 +1518,10 @@ void use_minipet_obj(char_data *ch, obj_data *obj) {
 * @return bool TRUE if the item was used up and purged; FALSE if the item was not purged.
 */
 bool used_lighter(char_data *ch, obj_data *obj) {
-	if (!obj || !IS_LIGHTER(obj)) {
+	if (!ch || !obj) {
+		return FALSE;	// huh
+	}
+	if (!IS_LIGHTER(obj) && !IS_LIGHT(obj)) {
 		return FALSE;	// not even a lighter
 	}
 	
@@ -1459,7 +1535,8 @@ bool used_lighter(char_data *ch, obj_data *obj) {
 		reduce_obj_binding(obj, ch);
 	}
 	
-	if (GET_LIGHTER_USES(obj) != UNLIMITED) {
+	// only lighters (not lights) get used up here
+	if (IS_LIGHTER(obj) && GET_LIGHTER_USES(obj) != UNLIMITED) {
 		set_obj_val(obj, VAL_LIGHTER_USES, GET_LIGHTER_USES(obj) - 1);	// use 1 charge
 		SET_BIT(GET_OBJ_EXTRA(obj), OBJ_NO_STORE);	// no longer storable
 		
@@ -6226,7 +6303,7 @@ ACMD(do_light) {
 			msg_to_char(ch, "You don't have anything to light that with.\r\n");
 		}
 	}
-	else if (!(obj = get_obj_in_list_vis_prefer_interaction(ch, argptr, &number, ch->carrying, INTERACT_LIGHT)) && !(obj = get_obj_in_list_vis_prefer_interaction(ch, argptr, &number, ROOM_CONTENTS(IN_ROOM(ch)), INTERACT_LIGHT))) {
+	else if (!(obj = get_obj_in_list_vis_prefer_lightable(ch, argptr, &number, ch->carrying)) && !(obj = get_obj_in_list_vis_prefer_lightable(ch, argptr, &number, ROOM_CONTENTS(IN_ROOM(ch))))) {
 		// invalid arg... trying to light one of these?
 		if (generic_find(argptr, &number, FIND_VEHICLE_ROOM | FIND_VEHICLE_INSIDE, ch, NULL, NULL, &veh) || (dir = parse_direction(ch, argptr)) != NO_DIR || is_abbrev(arg, "building") || is_abbrev(arg, "area") || is_abbrev(arg, "room") || is_abbrev(arg, "here") || isname(arg, get_room_name(IN_ROOM(ch), FALSE)) || isname(arg, GET_SECT_NAME(SECT(IN_ROOM(ch))))) {
 			msg_to_char(ch, "You can't light vehicles, buildings, or terrain with this command. Try 'burn' instead.\r\n");
@@ -6235,8 +6312,11 @@ ACMD(do_light) {
 			msg_to_char(ch, "You don't have %s %s.\r\n", AN(arg), arg);
 		}
 	}
-	else if (!has_interaction(GET_OBJ_INTERACTIONS(obj), INTERACT_LIGHT)) {
+	else if (!CAN_LIGHT_OBJ(obj)) {
 		act("You can't light $p!", FALSE, ch, obj, NULL, TO_CHAR);
+	}
+	else if (lighter == obj) {
+		msg_to_char(ch, "You can't use an item to light itself.\r\n");
 	}
 	else {
 		if (objless) {
@@ -6266,10 +6346,33 @@ ACMD(do_light) {
 			act("$n lights $P.", FALSE, ch, NULL, obj, TO_ROOM);
 		}
 		
-		// will extract no matter what happens here
-		empty_obj_before_extract(obj);
-		run_interactions(ch, GET_OBJ_INTERACTIONS(obj), INTERACT_LIGHT, IN_ROOM(ch), NULL, obj, NULL, light_obj_interact);
-		extract_obj(obj);
+		if (!has_interaction(GET_OBJ_INTERACTIONS(obj), INTERACT_LIGHT) && IS_LIGHT(obj) && !GET_LIGHT_IS_LIT(obj) && GET_LIGHT_HOURS_REMAINING(obj) != 0) {
+			// lighting a light
+			set_obj_val(obj, VAL_LIGHT_IS_LIT, 1);
+			
+			if (obj->carried_by) {
+				++GET_LIGHTS(obj->carried_by);
+				if (IN_ROOM(obj->carried_by)) {
+					++ROOM_LIGHTS(IN_ROOM(obj->carried_by));
+				}
+			}
+			else if (obj->worn_by) {
+				++GET_LIGHTS(obj->worn_by);
+				if (IN_ROOM(obj->worn_by)) {
+					++ROOM_LIGHTS(IN_ROOM(obj->worn_by));
+				}
+			}
+			else if (IN_ROOM(obj)) {
+				++ROOM_LIGHTS(IN_ROOM(obj));
+			}
+		}
+		else {
+			// running interactions: will extract no matter what happens here
+			empty_obj_before_extract(obj);
+			run_interactions(ch, GET_OBJ_INTERACTIONS(obj), INTERACT_LIGHT, IN_ROOM(ch), NULL, obj, NULL, light_obj_interact);
+			extract_obj(obj);
+		}
+		
 		command_lag(ch, WAIT_OTHER);
 		
 		if (lighter) {

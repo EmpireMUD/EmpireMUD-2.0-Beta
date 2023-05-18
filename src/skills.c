@@ -2965,8 +2965,16 @@ bool has_cooking_fire(char_data *ch) {
 		return TRUE;
 	}
 	
+	// fires in room
 	DL_FOREACH2(ROOM_CONTENTS(IN_ROOM(ch)), obj, next_content) {
-		if (OBJ_FLAGGED(obj, OBJ_LIGHT) && !CAN_WEAR(obj, ITEM_WEAR_TAKE)) {
+		if (LIGHT_IS_LIT(obj) && LIGHT_FLAGGED(obj, LIGHT_FLAG_COOKING_FIRE)) {
+			return TRUE;
+		}
+	}
+	
+	// fires in inventory
+	DL_FOREACH2(ch->carrying, obj, next_content) {
+		if (LIGHT_IS_LIT(obj) && LIGHT_FLAGGED(obj, LIGHT_FLAG_COOKING_FIRE)) {
 			return TRUE;
 		}
 	}

@@ -2470,6 +2470,7 @@ const char *item_types[] = {
 	"POISON",
 	"ARMOR",
 	"BOOK",
+	"LIGHT",
 	"\n"
 };
 
@@ -2551,7 +2552,7 @@ const int item_wear_to_wear[] = {
 const char *extra_bits[] = {
 	"UNIQUE",	// 0
 	"PLANTABLE",
-	"LIGHT",
+	"*",
 	"SUPERIOR",
 	"LARGE",
 	"*CREATED",	// 5
@@ -2584,7 +2585,7 @@ const char *extra_bits[] = {
 const char *extra_bits_inv_flags[] = {
 	"unique",	// unique
 	"",	// plantable
-	"light",
+	"",	// *
 	"superior",
 	"large",
 	"",	// created
@@ -2617,7 +2618,7 @@ const char *extra_bits_inv_flags[] = {
 const double obj_flag_scaling_bonus[] = {
 	1.1,	// OBJ_UNIQUE
 	1.0,	// OBJ_PLANTABLE
-	1.0,	// OBJ_LIGHT
+	1.0,	// unused
 	1.73,	// OBJ_SUPERIOR
 	1.0,	// OBJ_LARGE
 	1.0,	// OBJ_CREATED
@@ -2710,6 +2711,26 @@ const char *fullness[] = {
 	"about half ",
 	"more than half ",
 	""
+};
+
+
+// LIGHT_FLAG_x (1/2): flags for ITEM_LIGHT, show to immortals
+const char *light_flags[] = {
+	"LIGHT-FIRE",	// 0
+	"CAN-DOUSE",
+	"JUNK-WHEN-EXPIRED",
+	"COOKING-FIRE",
+	"\n"
+};
+
+
+// LIGHT_FLAG_x (1/2): flags for ITEM_LIGHT, shown on identify
+const char *light_flags_for_identify[] = {
+	"can be used as a lighter when lit",	// 0
+	"can be doused",
+	"",	// LIGHT_FLAG_JUNK_WHEN_EXPIRED
+	"can be used for cooking",
+	"\n"
 };
 
 

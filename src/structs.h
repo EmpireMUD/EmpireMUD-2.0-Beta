@@ -1857,6 +1857,7 @@ typedef enum {
 #define ITEM_POISON  26	// poison vial
 #define ITEM_ARMOR  27	// armor!
 #define ITEM_BOOK  28	// tied to the book/library system
+#define ITEM_LIGHT  29	// item is a light (torch, etc)
 
 
 // ITEM_WEAR_x: Take/Wear flags -- where an item can be worn
@@ -1882,6 +1883,13 @@ typedef enum {
 #define ITEM_WEAR_SADDLE  BIT(18)	// s. Saddle
 
 
+// LIGHT_FLAG_x (possibly also LIGHT_x as a search hint): flags for ITEM_LIGHT
+#define LIGHT_FLAG_LIGHT_FIRE  BIT(0)	// It can be used in place of a lighter
+#define LIGHT_FLAG_CAN_DOUSE  BIT(1)	// It can be put out
+#define LIGHT_FLAG_JUNK_WHEN_EXPIRED  BIT(2)	// automatically removed
+#define LIGHT_FLAG_COOKING_FIRE  BIT(3)	// allows cooking
+
+
 // Item materials
 #define MAT_WOOD  0	// Made from wood
 #define MAT_ROCK  1	// ...rock
@@ -1905,7 +1913,7 @@ typedef enum {
 // OBJ_x: Extra object flags -- OBJ_FLAGGED(obj, f)
 #define OBJ_UNIQUE  BIT(0)	// a. can only use 1 at a time
 #define OBJ_PLANTABLE  BIT(1)	// b. Uses val 2 to set a crop type
-#define OBJ_LIGHT  BIT(2)	// c. Lights until timer pops
+//	#define OBJ_UNUSED  BIT(2)	// c. Formerly LIGHT; this is now an item type
 #define OBJ_SUPERIOR  BIT(3)	// d. Item is of superior quality
 #define OBJ_LARGE  BIT(4)	// e. Item can't be put in bags
 #define OBJ_CREATED  BIT(5)	// f. Was created by a god

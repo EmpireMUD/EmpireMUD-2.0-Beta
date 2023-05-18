@@ -323,24 +323,39 @@ void do_customize_road(char_data *ch, char *argument) {
 * @param obj_data *cont The liquid container full of water.
 */
 void do_douse_obj(char_data *ch, obj_data *obj, obj_data *cont) {
-	if (!OBJ_FLAGGED(obj, OBJ_LIGHT)) {
+	if (!IS_LIGHT(obj)) {
 		msg_to_char(ch, "You can't douse that -- it's not a light or fire.\r\n");
 	}
-	else if (GET_OBJ_TIMER(obj) == UNLIMITED) {
+	else if (!LIGHT_IS_LIT(obj)) {
+		act("$p isn't even lit!", FALSE, ch, obj, NULL, TO_CHAR);
+	}
+	else if (!LIGHT_FLAGGED(obj, LIGHT_FLAG_CAN_DOUSE)) {
 		act("You can't seem to douse $p.", FALSE, ch, obj, NULL, TO_CHAR);
 	}
 	else if (IN_ROOM(obj) && !can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED)) {
 		msg_to_char(ch, "You can't douse anything here.\r\n");
 	}
 	else {
-		set_obj_val(cont, VAL_DRINK_CONTAINER_CONTENTS, 0);
-		
 		act("You douse $p with $P.", FALSE, ch, obj, cont, TO_CHAR);
 		act("$n douses $p with $P.", FALSE, ch, obj, cont, TO_ROOM);
 		
-		// run the timer trigger, same as if it timed out
-		if (timer_otrigger(obj)) {
-			extract_obj(obj);	// unless prevented by the trigger
+		set_obj_val(cont, VAL_DRINK_CONTAINER_CONTENTS, 0);
+		set_obj_val(obj, VAL_LIGHT_IS_LIT, 0);
+		
+		if (obj->carried_by) {
+			--GET_LIGHTS(obj->carried_by);
+			if (IN_ROOM(obj->carried_by)) {
+				--ROOM_LIGHTS(IN_ROOM(obj->carried_by));
+			}
+		}
+		else if (obj->worn_by) {
+			--GET_LIGHTS(obj->worn_by);
+			if (IN_ROOM(obj->worn_by)) {
+				--ROOM_LIGHTS(IN_ROOM(obj->worn_by));
+			}
+		}
+		else if (IN_ROOM(obj)) {
+			--ROOM_LIGHTS(IN_ROOM(obj));
 		}
 	}
 }
@@ -2244,7 +2259,7 @@ ACMD(do_douse) {
 		else if (GET_ROOM_VEHICLE(IN_ROOM(ch)) && isname(arg, VEH_KEYWORDS(GET_ROOM_VEHICLE(IN_ROOM(ch))))) {
 			do_douse_vehicle(ch, GET_ROOM_VEHICLE(IN_ROOM(ch)), obj);
 		}
-		else if (generic_find(arg, NULL, FIND_OBJ_INV | FIND_OBJ_ROOM, ch, NULL, &found_obj, NULL)) {
+		else if (generic_find(arg, NULL, FIND_OBJ_INV | FIND_OBJ_ROOM | FIND_OBJ_EQUIP, ch, NULL, &found_obj, NULL)) {
 			do_douse_obj(ch, found_obj, obj);
 		}
 		else {

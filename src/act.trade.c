@@ -717,7 +717,7 @@ void show_craft_info(char_data *ch, char *argument, int craft_type) {
 	bld_data *bld;
 	
 	// these flags show on craft info
-	bitvector_t show_flags = OBJ_UNIQUE | OBJ_LIGHT | OBJ_LARGE | OBJ_TWO_HANDED | OBJ_BIND_ON_EQUIP | OBJ_BIND_ON_PICKUP;
+	bitvector_t show_flags = OBJ_UNIQUE | OBJ_LARGE | OBJ_TWO_HANDED | OBJ_BIND_ON_EQUIP | OBJ_BIND_ON_PICKUP;
 	
 	if (!*argument) {
 		msg_to_char(ch, "Get %s info on what?\r\n", gen_craft_data[craft_type].command);
@@ -792,6 +792,19 @@ void show_craft_info(char_data *ch, char *argument, int craft_type) {
 				}
 				else {
 					sprintf(buf + strlen(buf), ", %d use%s\r\n", GET_LIGHTER_USES(proto), PLURAL(GET_LIGHTER_USES(proto)));
+				}
+				break;
+			}
+			case ITEM_LIGHT: {
+				if (GET_LIGHT_HOURS_REMAINING(proto) == UNLIMITED) {
+					strcat(buf, ", unlimited");
+				}
+				else {
+					sprintf(buf + strlen(buf), "%d hour%s of light", GET_LIGHT_HOURS_REMAINING(proto), PLURAL(GET_LIGHT_HOURS_REMAINING(proto)));
+				}
+				prettier_sprintbit(GET_LIGHT_FLAGS(proto), light_flags, part);
+				if (*part) {
+					sprintf(buf + strlen(buf), ", %s", part);
 				}
 				break;
 			}

@@ -1110,6 +1110,18 @@ int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_COORD(ge
 #define VAL_MINIPET_VNUM  0
 #define GET_MINIPET_VNUM(obj)  (IS_MINIPET(obj) ? GET_OBJ_VAL((obj), VAL_MINIPET_VNUM) : NOTHING)
 
+// ITEM_LIGHT
+#define IS_LIGHT(obj)  (GET_OBJ_TYPE(obj) == ITEM_LIGHT)
+#define VAL_LIGHT_HOURS_REMAINING  0
+#define VAL_LIGHT_IS_LIT  1
+#define VAL_LIGHT_FLAGS  2
+#define GET_LIGHT_HOURS_REMAINING(obj)  (IS_LIGHT(obj) ? GET_OBJ_VAL((obj), VAL_LIGHT_HOURS_REMAINING) : 0)
+#define GET_LIGHT_IS_LIT(obj)  (IS_LIGHT(obj) ? GET_OBJ_VAL((obj), VAL_LIGHT_IS_LIT) : FALSE)
+#define GET_LIGHT_FLAGS(obj)  (IS_LIGHT(obj) ? GET_OBJ_VAL((obj), VAL_LIGHT_FLAGS) : NOBITS)
+#define CAN_LIGHT_OBJ(obj)  ((IS_LIGHT(obj) && !GET_LIGHT_IS_LIT(obj) && GET_LIGHT_HOURS_REMAINING(obj) != 0) || has_interaction(GET_OBJ_INTERACTIONS(obj), INTERACT_LIGHT))
+#define LIGHT_FLAGGED(obj, flag)  IS_SET(GET_LIGHT_FLAGS(obj), (flag))
+#define LIGHT_IS_LIT(obj)  (GET_LIGHT_IS_LIT(obj) && GET_LIGHT_HOURS_REMAINING(obj) != 0)
+
 
  //////////////////////////////////////////////////////////////////////////////
 //// PLAYER UTILS ////////////////////////////////////////////////////////////
