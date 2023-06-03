@@ -166,7 +166,7 @@ Z
 1 10733
 S
 #10734
-Jack Be Nimble (unlit candlestick)~
+Jack Be Nimble~
    Jack is a real daredevil, but there's nothing to jump around here but the
 creek. If you could bring Jack his candlestick, perhaps he'd share his best
 jumping shoes.
@@ -183,20 +183,24 @@ The candlestick.
 
 You can use your enchanted breadcrumbs to teleport home, but do it quickly.
 ~
-9 d 0 25 0
+10 d 0 25 0
 A
 2 10734
+A
+2 10735
 R
 2 10736 1
 R
 2 10749 1
 W
 2 10734 0 1 -
+W
+2 10735 0 1 -
 Z
 1 10734
 S
 #10735
-Jack Be Nimble (lit candlestick)~
+Jack Be Nimble~
    Jack is a real daredevil, but there's nothing to jump around here but the
 creek. If you could bring Jack his candlestick, perhaps he'd share his best
 jumping shoes.
@@ -213,9 +217,7 @@ The candlestick.
 
 You can use your enchanted breadcrumbs to teleport home, but do it quickly.
 ~
-9 d 0 25 0
-A
-2 10735
+11 d 0 25 0
 R
 2 10736 1
 R
@@ -223,6 +225,8 @@ R
 T 10735
 W
 2 10735 0 1 -
+W
+2 10734 0 1 -
 Z
 1 10734
 S

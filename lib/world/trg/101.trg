@@ -1137,7 +1137,15 @@ Suppress Weather~
 1 n 100
 ~
 * Turns on !WEATHER for a number of seconds equal to <value1>
-dg_affect_room %self.room% !WEATHER on %self.val0%
+* Fallback is to use the item's timer
+set duration %self.val0%
+if %duration% < 1
+  eval duration %self.timer% * 75
+end
+* now set it if possible
+if %duration% > 0
+  dg_affect_room %self.room% !WEATHER on %duration%
+end
 ~
 #10166
 Cactus Spawn Teleport~

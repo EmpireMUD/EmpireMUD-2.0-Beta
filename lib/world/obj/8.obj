@@ -65,28 +65,29 @@ S
 lantern~
 a lantern~
 A lantern has been set here.~
-Light the lantern to see after dark.
+   Lanterns are a good way to light the way at night. Use 'light lantern' and
+'douse lantern' to save wax. You can refill the lantern with 'put candle
+lantern'.
 ~
-3 0 a 0 2
-0 0 0
+29 0 a 0 6
+48 0 2
 8 0
 C
 1 1
-I 11 805 100.00 1  # LIGHT: bright lantern
-R
-4 5121 0
-R
-4 5610 0
+T 804
 S
 #805
-lantern bright~
-a bright lantern~
-A bright lantern has been set here.~
-The lantern really lights up the place.
+lantern~
+a lantern~
+A lantern has been set here.~
+   Lanterns are a good way to light the way at night. Use 'light lantern' and
+'douse lantern' to save wax. You can refill the lantern with 'put candle
+lantern'.
 ~
-3 c ao 0 1
-0 0 0
-8 48
+29 0 ao 0 4
+48 1 2
+8 0
+T 804
 S
 #806
 mirror looking glass silver~
@@ -150,30 +151,28 @@ R
 4 5121 0
 S
 #851
-candle unlit~
-an unlit candle~
-An unlit candle has been dropped here.~
-Light the candle to see after dark.
+candle~
+a candle~
+A candle is sitting on the ground.~
+   Candles have long been a simple way to see at night. Use 'light candle' and
+'douse candle' to use it.
 ~
-3 l ao 0 5
-0 0 0
-9 8064
+29 l ao 0 9
+8 0 7
+9 0
 C
 1 1
-I 11 852 100.00 1  # LIGHT: candle
-R
-4 5121 0
-R
-4 5610 0
+O+ 1 851
 S
 #852
 candle~
 a candle~
-A candle has been dropped here.~
-The candle lights the way.
+A candle is sitting on the ground.~
+A candle lights the way. Use 'light candle' and 'douse candle' to use it.
 ~
-3 cl ao 0 1
-0 0 0
-9 6
+29 0 ao 0 7
+8 1 7
+9 0
+O+ 1 851
 S
 $

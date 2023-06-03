@@ -58,9 +58,9 @@ a fistful of firebird feathers~
 Some firebird feathers are glowing on the ground.~
 The feathers come from the mythical firebird, and glow even when plucked.
 ~
-3 c a 0 2
-0 0 0
-10 400
+29 0 a 0 3
+400 1 0
+10 0
 O+ 1 6442
 S
 #10105
@@ -428,9 +428,9 @@ a mesquite fire~
 A fragrant mesquite fire is burning here!~
 The mesquite fire has a strong desert scent, perfect for cooking meat.
 ~
-3 c 0 0 2
-0 0 0
-0 48
+29 0 0 0 3
+48 1 13
+0 0
 S
 #10146
 basket fruits saguaro red bright~
@@ -983,8 +983,8 @@ The hot air waves above the bright red lava flow.~
 starting to crust over. It burns you even to stand this close, and your skin is
 starting to blister.
 ~
-3 c 0 0 6
-3600 0 0
+29 0 0 0 7
+-1 1 0
 1 48
 C
 150 150

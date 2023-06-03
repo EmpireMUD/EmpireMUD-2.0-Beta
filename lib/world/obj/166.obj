@@ -297,8 +297,8 @@ comes from within, but the design of the metal makes it impossible to see what
 causes it.
 type: buff <target> to extend how long the ornament sticks around.
 ~
-3 cv 0 0 10
-0 0 0
+29 v 0 0 11
+-1 1 0
 2 576
 T 16627
 S
@@ -442,8 +442,8 @@ A straw goat crackles and spits as it burns.~
    Someone put a lot of time into making the straw goat, only to have it burned
 down by a common vandal. What is this city coming to?
 ~
-3 c 0 0 3
-0 0 0
+29 0 0 0 4
+-1 1 9
 0 576
 M
 18
@@ -758,8 +758,8 @@ the lantern~
 A little lantern is floating in the air.~
 This little lantern is floating in the air.
 ~
-3 ck 0 0 3
-0 0 0
+29 k 0 0 4
+-1 1 0
 0 4
 C
 1 1

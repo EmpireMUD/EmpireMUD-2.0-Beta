@@ -454,8 +454,8 @@ a rawhide breastplate~
 A rawhide breastplate is lying here.~
 This simple piece of hardened rawhide is light weight and offers good mobility.
 ~
-27 emo aq 0 1
-1 0 0
+2 emo aq 0 2
+0 0 0
 7 0
 A
 17 1 0
@@ -468,8 +468,8 @@ a rawhide skullcap~
 A rawhide skullcap is lying on the ground.~
 The skullcap is made from fine rawhide.
 ~
-27 mo ae 0 1
-1 0 0
+2 mo ae 0 2
+0 0 0
 7 0
 A
 17 1 0
@@ -482,8 +482,8 @@ rawhide bracers~
 A pair of rawhide bracers is lying here.~
 These bracers should protect your arms in combat.
 ~
-27 mo ai 0 1
-1 0 0
+2 mo ai 0 2
+0 0 0
 7 0
 A
 17 1 0

@@ -935,8 +935,8 @@ against intruders or rescuers, you cannot tell. The makeshift barricade has
 collapsed as it burns. Luckily, it doesn't seem to catch any of the tower's
 rare and expensive ebony paneling on fire.
 ~
-3 c 0 0 4
-0 0 0
+29 0 0 0 5
+-1 1 9
 0 12
 C
 50 50
@@ -2106,9 +2106,9 @@ brilliance is as ephemeral as the setting sun.
    Tresydions tended Tagra Nes and its people for thousands of years, growing
 the community as well as the tree.
 ~
-3 c a 0 10
-0 0 0
-0 96
+29 0 a 0 11
+96 1 0
+0 0
 C
 150 150
 M

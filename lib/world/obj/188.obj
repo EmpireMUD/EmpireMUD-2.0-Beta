@@ -1356,35 +1356,28 @@ C
 50 50
 S
 #18895
-jack-o-lantern lantern jackolantern unlit~
-an unlit jack-o-lantern~
-An unlit jack-o-lantern is sitting here.~
-   This big orange pumpkin has been cut to look like a face, and an unlit
-candle has been placed inside.
+jack-o-lantern lantern jackolantern~
+a jack-o-lantern~
+A jack-o-lantern is sitting here.~
+   This big orange pumpkin has been cut to look like a face. Use 'light
+jack-o-lantern' and 'douse jack-o-lantern' to control the light.
 ~
-3 0 ao 0 4
-0 0 0
+29 0 ao 0 6
+36 0 6
 7 168
 C
 1 1
-I 11 18896 100.00 1  # LIGHT: lit jack-o-lantern
-R
-4 5121 0
-R
-4 5610 0
-R
-4 5606 0
 S
 #18896
-jack-o-lantern lantern jackolantern lit~
-a lit jack-o-lantern~
-A lit jack-o-lantern is casting an eerie light.~
-   This big orange pumpkin has been carved to look like a face. A bright candle
-inside casts a spooky light all around you.
+jack-o-lantern lantern jackolantern~
+a jack-o-lantern~
+A jack-o-lantern is sitting here.~
+   This big orange pumpkin has been cut to look like a face. Use 'light
+jack-o-lantern' and 'douse jack-o-lantern' to control the light.
 ~
-3 c ao 0 4
-0 0 0
-7 36
+29 0 ao 0 7
+36 1 4
+7 168
 C
 1 1
 S
