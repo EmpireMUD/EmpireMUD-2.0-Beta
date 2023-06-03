@@ -48,6 +48,9 @@ ACMD(do_respawn);
 // local vars
 int point_update_cycle = 0;	// helps spread out point updates
 
+// local funcs
+bool tick_obj_timer(obj_data *obj);
+
 
  //////////////////////////////////////////////////////////////////////////////
 //// CHARACTER LIMITS ////////////////////////////////////////////////////////
@@ -1249,12 +1252,14 @@ void update_empire_needs(empire_data *emp, struct empire_island *eisle, struct e
 //// OBJECT LIMITS ///////////////////////////////////////////////////////////
 
 /**
-* Checks and runs an autostore for an object.
+* Checks and runs an autostore for an object. This function does NOT check the
+* basic autostore timer, but it WILL check the timer if it's in a room with
+* long-autostore (unless force=TRUE).
 *
 * @param obj_data *obj The item to check/store.
 * @param bool force If TRUE, ignores timers and players present and stores all storables.
 * @param empire_data *override_emp Optional: If not NULL, will store to this empire.
-* @return bool TRUE if the item is still in the world, FALSE if it was extracted
+* @return bool TRUE if the item is still in the world, FALSE if it was extracted (or if its autostore event should be canceled)
 */
 bool check_autostore(obj_data *obj, bool force, empire_data *override_emp) {
 	player_index_data *index;
@@ -1269,15 +1274,18 @@ bool check_autostore(obj_data *obj, bool force, empire_data *override_emp) {
 	// easy exclusions
 	top_obj = get_top_object(obj);
 	if (top_obj->carried_by || top_obj->worn_by) {
-		return TRUE;	// on a person
+		return FALSE;	// on a person
 	}
 	if (!CAN_WEAR(obj, ITEM_WEAR_TAKE) && !OBJ_CAN_STORE(obj)) {
-		return TRUE;	// no-take AND no-store
+		return FALSE;	// no-take AND no-store
 	}
-	
-	// timer check (if not forced)
-	if (!force && (GET_AUTOSTORE_TIMER(obj) + config_get_int("autostore_time") * SECS_PER_REAL_MIN) > time(0)) {
-		return TRUE;
+	if (!IN_ROOM(obj) && !obj->in_vehicle && !obj->in_obj) {
+		// we aren't somewhere that autostore would even work on us -- cancel it
+		return FALSE;
+	}
+	if (obj->in_vehicle && !force) {
+		// contents of a vehicle only auto-store on a force: cancel if automatic
+		return FALSE;
 	}
 	
 	// ensure object is in a room, or in an object in a room
@@ -1421,73 +1429,132 @@ bool check_autostore(obj_data *obj, bool force, empire_data *override_emp) {
 
 
 /**
-* This runs a point update (every hour tick) on an object.
+* Determines when the timer on an object timer's DG event should be set. A
+* result of 0 means "no need for this".
 *
-* @param obj_data *obj The object to update.
+* @param obj_data *obj The object.
+* @return int Number of seconds to schedule for, or 0 if it doesn't need it.
 */
-void point_update_obj(obj_data *obj) {
-	char buf[MAX_STRING_LENGTH];
-	char *to_char_str = NULL, *to_room_str = NULL;
-	room_data *to_room, *obj_r;
-	obj_data *top;
-	char_data *c;
+static int compute_obj_event_timer(obj_data *obj) {
+	int seconds = 0;
+	
+	if (GET_OBJ_TIMER(obj) > 0 || (LIGHT_IS_LIT(obj) && GET_LIGHT_HOURS_REMAINING(obj) > 0)) {
+		// timer or lit light
+		seconds = SECS_PER_MUD_HOUR;
+	}
+	else if (IN_ROOM(obj) && CAN_WEAR(obj, ITEM_WEAR_TAKE) && ROOM_SECT_FLAGGED(IN_ROOM(obj), SECTF_FRESH_WATER | SECTF_OCEAN)) {
+		// floating obj
+		seconds = SECS_PER_MUD_HOUR;
+	}
+	
+	return seconds;	// may still be 0
+}
+
+
+EVENTFUNC(obj_autostore_event) {
+	struct obj_event_data *data = (struct obj_event_data*)event_obj;
+	obj_data *obj = data->obj;
+	long when;
+	
+	when = GET_AUTOSTORE_TIMER(obj) + (config_get_int("autostore_time") * SECS_PER_REAL_MIN) - time(0);
+	
+	// double-check that it isn't in the future
+	if (when > 0) {
+		// ... and just re-enqueue it for the future
+		return when RL_SEC;
+	}
+	
+	// ok, always delete before doing anything else (storing the object would try to cancel this event)
+	delete_stored_event(&GET_OBJ_STORED_EVENTS(obj), SEV_OBJ_AUTOSTORE);
+	
+	if (!check_autostore(obj, FALSE, NULL)) {
+		// obj was autostored/purged, or other reasons not to reschedule
+		free(data);
+		return 0;	// don't re-enqueue
+	}
+	else {
+		// autostore prevented... check again soon
+		add_stored_event(&GET_OBJ_STORED_EVENTS(obj), SEV_OBJ_AUTOSTORE, the_event);
+		return 60 RL_SEC;	// re-enqueue for 1 minute from now and try again
+	}
+}
+
+
+EVENTFUNC(obj_hour_event) {
+	struct obj_event_data *data = (struct obj_event_data*)event_obj;
+	obj_data *obj = data->obj;
+	char_data *ch_iter, *pyro;
+	empire_data *emp, *enemy;
+	struct empire_political_data *pol;
+	room_data *home, *to_room;
+	int new_timer;
 	time_t timer;
 	
-	// ensure this obj is actually in-game
-	top = get_top_object(obj);
-	if ((top->carried_by && !IN_ROOM(top->carried_by)) || (top->worn_by && !IN_ROOM(top->worn_by))) {
-		return;
-	}
-
+	// always delete first
+	delete_stored_event(&GET_OBJ_STORED_EVENTS(obj), SEV_OBJ_TIMER);
+	
+	// things we do here:
+	
+	// check for burning-out message
 	if (LIGHT_IS_LIT(obj)) {
-		if (GET_LIGHT_HOURS_REMAINING(obj) == 2) {
+		if (GET_LIGHT_HOURS_REMAINING(obj) == 2 || GET_OBJ_TIMER(obj) == 2) {
 			if (obj->worn_by) {
-				act("Your light begins to flicker and fade.", FALSE, obj->worn_by, obj, 0, TO_CHAR);
-				act("$n's light begins to flicker and fade.", TRUE, obj->worn_by, obj, 0, TO_ROOM);
-			}
-			else if (obj->carried_by)
-				act("$p begins to flicker and fade.", FALSE, obj->carried_by, obj, 0, TO_CHAR);
-			else if (IN_ROOM(obj))
-				if (ROOM_PEOPLE(IN_ROOM(obj)))
-					act("$p begins to flicker and fade.", FALSE, ROOM_PEOPLE(IN_ROOM(obj)), obj, 0, TO_CHAR | TO_ROOM);
-		}
-		else if (GET_LIGHT_HOURS_REMAINING(obj) == 1) {
-			if (obj->worn_by) {
-				act("Your light burns out.", FALSE, obj->worn_by, obj, 0, TO_CHAR);
-				act("$n's light burns out.", TRUE, obj->worn_by, obj, 0, TO_ROOM);
+				act("Your light begins to flicker and fade.", FALSE, obj->worn_by, obj, NULL, TO_CHAR);
+				act("$n's light begins to flicker and fade.", TRUE, obj->worn_by, obj, NULL, TO_ROOM);
 			}
 			else if (obj->carried_by) {
-				act("$p burns out.", FALSE, obj->carried_by, obj, 0, TO_CHAR);
+				act("$p begins to flicker and fade.", FALSE, obj->carried_by, obj, NULL, TO_CHAR);
 			}
-			else if (IN_ROOM(obj)) {
-				if (ROOM_PEOPLE(IN_ROOM(obj)))
-					act("$p burns out.", FALSE, ROOM_PEOPLE(IN_ROOM(obj)), obj, 0, TO_CHAR | TO_ROOM);
+			else if (IN_ROOM(obj) && ROOM_PEOPLE(IN_ROOM(obj))) {
+				act("$p begins to flicker and fade.", FALSE, ROOM_PEOPLE(IN_ROOM(obj)), obj, NULL, TO_CHAR | TO_ROOM);
+			}
+		}
+		else if (GET_OBJ_TIMER(obj) == 1) {
+			// this section does NOT message for GET_LIGHT_HOURS_REMAINING(obj) == 1 (see: use_hour_of_light)
+			if (obj->worn_by) {
+				act("Your light burns out.", FALSE, obj->worn_by, obj, NULL, TO_CHAR);
+				act("$n's light burns out.", TRUE, obj->worn_by, obj, NULL, TO_ROOM);
+			}
+			else if (obj->carried_by) {
+				act("$p burns out.", FALSE, obj->carried_by, obj, NULL, TO_CHAR);
+			}
+			else if (IN_ROOM(obj) && ROOM_PEOPLE(IN_ROOM(obj))) {
+				act("$p burns out.", FALSE, ROOM_PEOPLE(IN_ROOM(obj)), obj, NULL, TO_CHAR | TO_ROOM);
 			}
 		}
 	}
-
+	
+	// check light burnout
+	if (IS_LIGHT(obj) && !use_hour_of_light(obj, TRUE)) {
+		// extracted
+		free(data);
+		return 0;	// don't re-enqueue
+	}
+	
 	// float or sink
 	if (IN_ROOM(obj) && CAN_WEAR(obj, ITEM_WEAR_TAKE) && ROOM_SECT_FLAGGED(IN_ROOM(obj), SECTF_FRESH_WATER | SECTF_OCEAN)) {
 		if (materials[GET_OBJ_MATERIAL(obj)].floats && (to_room = real_shift(IN_ROOM(obj), shift_dir[WEST][0], shift_dir[WEST][1]))) {
 			if (!number(0, 2) && !ROOM_SECT_FLAGGED(to_room, SECTF_ROUGH) && !ROOM_IS_CLOSED(to_room)) {
 				// float-west message
-				DL_FOREACH2(ROOM_PEOPLE(IN_ROOM(obj)), c, next_in_room) {
-					if (c->desc) {
-						sprintf(buf, "$p floats %s.", dirs[get_direction_for_char(c, WEST)]);
-						act(buf, TRUE, c, obj, NULL, TO_CHAR);
+				DL_FOREACH2(ROOM_PEOPLE(IN_ROOM(obj)), ch_iter, next_in_room) {
+					if (ch_iter->desc) {
+						sprintf(buf, "$p floats %s.", dirs[get_direction_for_char(ch_iter, WEST)]);
+						act(buf, TRUE, ch_iter, obj, NULL, TO_CHAR);
 					}
 				}
 				
-				// move object but keep autostore
+				// move object but keep autostore time
 				timer = GET_AUTOSTORE_TIMER(obj);
+				suspend_autostore_updates = TRUE;
 				obj_to_room(obj, to_room);
-				GET_AUTOSTORE_TIMER(obj) = timer;
+				suspend_autostore_updates = FALSE;
+				schedule_obj_autostore_check(obj, timer);
 				
 				// floats-in message
-				DL_FOREACH2(ROOM_PEOPLE(IN_ROOM(obj)), c, next_in_room) {
-					if (c->desc) {
-						sprintf(buf, "$p floats in from %s.", from_dir[get_direction_for_char(c, WEST)]);
-						act(buf, TRUE, c, obj, NULL, TO_CHAR);
+				DL_FOREACH2(ROOM_PEOPLE(IN_ROOM(obj)), ch_iter, next_in_room) {
+					if (ch_iter->desc) {
+						sprintf(buf, "$p floats in from %s.", from_dir[get_direction_for_char(ch_iter, WEST)]);
+						act(buf, TRUE, ch_iter, obj, NULL, TO_CHAR);
 					}
 				}
 			}
@@ -1496,12 +1563,168 @@ void point_update_obj(obj_data *obj) {
 			if (ROOM_PEOPLE(IN_ROOM(obj))) {
 				act("$p sinks quickly to the bottom.", TRUE, ROOM_PEOPLE(IN_ROOM(obj)), obj, 0, TO_CHAR | TO_ROOM);
 			}
+			free(data);
 			extract_obj(obj);
-			return;
+			return 0;	// don't re-enqueue
 		}
 	}
+	
+	// check main obj timer
+	if (!tick_obj_timer(obj)) {
+		free(data);
+		return 0;	// don't re-enqueue
+	}
+	
+	// burn the room? ONLY if we got this far
+	if (LIGHT_IS_LIT(obj) && LIGHT_FLAGGED(obj, LIGHT_FLAG_LIGHT_FIRE) && IN_ROOM(obj) && IS_ANY_BUILDING(IN_ROOM(obj))) {
+		home = HOME_ROOM(IN_ROOM(obj));
+		if (ROOM_BLD_FLAGGED(home, BLD_BURNABLE) && !IS_BURNING(home)) {
+			// only items with an empire id are considered: you can't burn stuff down by accident (unless the building is unowned)
+			if (obj->last_empire_id != NOTHING || !ROOM_OWNER(home)) {
+				// check that the empire is at war
+				emp = ROOM_OWNER(home);
+				enemy = real_empire(obj->last_empire_id);
+				
+				// check for war
+				if (!emp || (enemy && (pol = find_relation(enemy, emp)) && IS_SET(pol->type, DIPL_WAR))) {
+					if (ROOM_PEOPLE(IN_ROOM(obj))) {
+						act("A stray ember from $p ignites the room!", FALSE, ROOM_PEOPLE(IN_ROOM(obj)), obj, NULL, TO_CHAR | TO_ROOM);
+					}
+					start_burning(home);
+					
+					if (emp && obj->last_owner_id > 0 && (pyro = is_playing(obj->last_owner_id))) {
+						add_offense(emp, OFFENSE_BURNED_BUILDING, pyro, IN_ROOM(pyro), offense_was_seen(pyro, emp, IN_ROOM(obj)) ? OFF_SEEN : NOBITS);
+					}
+				}
+			}
+		}
+	}
+	
+	// END: determine new timer
+	if ((new_timer = compute_obj_event_timer(obj)) > 0) {
+		// re-store, re-enqueue, and try again
+		if (!find_stored_event(GET_OBJ_STORED_EVENTS(obj), SEV_OBJ_TIMER)) {
+			add_stored_event(&GET_OBJ_STORED_EVENTS(obj), SEV_OBJ_TIMER, the_event);
+			return new_timer RL_SEC;
+		}
+		else {
+			// already added a new one -- just flush this one
+			free(data);
+			return 0;	// don't re-enqueue
+		}
+	
+	}
+	else {	// no longer need this
+		free(data);
+		return 0;	// don't re-enqueue
+	}
+}
 
-	/* timer count down */
+
+/**
+* Schedules a check_autostore when an item is put into a room, vehicle, or
+* other object.
+*
+* NOTE: The "autostore timer" on the object is the time it was dropped, NOT the
+* time at which it will store.
+*
+* @param obj_data *obj The object.
+* @param long new_autostore_timer Optional: Will also update the autostore timer to this timestamp and reschedule if necessary (pass 0 to not-change).
+*/
+void schedule_obj_autostore_check(obj_data *obj, long new_autostore_timer) {
+	struct obj_event_data *data;
+	struct dg_event *ev;
+	long seconds;
+	bool change = FALSE;
+	
+	if (!obj) {
+		return;	// ???
+	}
+	
+	// figure out correct time
+	if (new_autostore_timer > 0 && new_autostore_timer != GET_AUTOSTORE_TIMER(obj)) {
+		GET_AUTOSTORE_TIMER(obj) = new_autostore_timer;
+		change = TRUE;
+	}
+	
+	// already have an event?
+	if (find_stored_event(GET_OBJ_STORED_EVENTS(obj), SEV_OBJ_AUTOSTORE)) {
+		if (change) {
+			// ok: cancel and reschedule
+			cancel_stored_event(&GET_OBJ_STORED_EVENTS(obj), SEV_OBJ_AUTOSTORE);
+		}
+		else {
+			return;	// have one already (and we're not updating it)
+		}
+	}
+	
+	// find out when
+	seconds = GET_AUTOSTORE_TIMER(obj) + (config_get_int("autostore_time") * SECS_PER_REAL_MIN) - time(0);
+	if (seconds < 1) {
+		// do it in the near-future if it's passed (usually due to a reboot)
+		// random timing spreads them out when there's a bunch
+		seconds = number(1, 20);
+	}
+	
+	CREATE(data, struct obj_event_data, 1);
+	data->obj = obj;
+	
+	ev = dg_event_create(obj_autostore_event, data, seconds RL_SEC);
+	add_stored_event(&GET_OBJ_STORED_EVENTS(obj), SEV_OBJ_AUTOSTORE, ev);
+}
+
+
+/**
+* Schedules any timer updates an item needs as DG events.
+*
+* NOTE: some of the when-to-schedule also appears in obj_hour_event
+*
+* @param obj_data *obj The object.
+* @param bool override If TRUE, will delete any existing event.
+*/
+void schedule_obj_timer_update(obj_data *obj, bool override) {
+	struct obj_event_data *data;
+	struct dg_event *ev;
+	int seconds;
+	
+	if (!obj) {
+		return;	// ???
+	}
+	else if (!override && find_stored_event(GET_OBJ_STORED_EVENTS(obj), SEV_OBJ_TIMER)) {
+		return;	// have one already
+	}
+	
+	// delete first?
+	if (override) {
+		cancel_stored_event(&GET_OBJ_STORED_EVENTS(obj), SEV_OBJ_TIMER);
+	}
+	
+	// do we need to be scheduled?
+	seconds = compute_obj_event_timer(obj);
+	
+	// we only schedule here, not cancel -- it will cancel itself
+	if (seconds > 0) {
+		CREATE(data, struct obj_event_data, 1);
+		data->obj = obj;
+		
+		ev = dg_event_create(obj_hour_event, data, seconds RL_SEC);
+		add_stored_event(&GET_OBJ_STORED_EVENTS(obj), SEV_OBJ_TIMER, ev);
+	}
+}
+
+
+/**
+* Does a game-hour tick on an object's timer.
+*
+* @param obj_data *obj The object.
+* @return bool FALSE if the object was purged, TRUE if it survived
+*/
+bool tick_obj_timer(obj_data *obj) {
+	char *to_char_str = NULL, *to_room_str = NULL;
+	room_data *obj_r;
+	int trig_result;
+	
+	// timer count down
 	if (GET_OBJ_TIMER(obj) > 0) {
 		GET_OBJ_TIMER(obj)--;
 	}
@@ -1509,12 +1732,18 @@ void point_update_obj(obj_data *obj) {
 	if (GET_OBJ_TIMER(obj) == 0) {
 		obj_r = obj_room(obj);
 		
-		if (!timer_otrigger(obj) || obj_room(obj) != obj_r) {
-			return;
+		// run triggers (-1 = purged, 0 is just cancel this expiry)
+		trig_result = timer_otrigger(obj);
+		if (trig_result == -1) {
+			return FALSE;
+		}
+		else if (trig_result == 0 || obj_room(obj) != obj_r) {
+			return TRUE;	// survived, but not finishing the timer
 		}
 		
 		if (IS_DRINK_CONTAINER(obj)) {
-			// messaging
+			// special handling: drink containers USUALLY just get emptied
+			// messaging: 
 			if (GET_DRINK_CONTAINER_CONTENTS(obj) > 0 || OBJ_FLAGGED(obj, OBJ_SINGLE_USE)) {
 				// messaging to char
 				if (obj->carried_by || obj->worn_by) {
@@ -1560,10 +1789,10 @@ void point_update_obj(obj_data *obj) {
 				
 				empty_obj_before_extract(obj);
 				extract_obj(obj);
-				return;
+				return FALSE;
 			}
 		}
-		else {  // all others actually decay
+		else {  // all others (not drink containers) actually decay
 			// check custom messages first, then material message, then default
 			if (obj->carried_by || obj->worn_by) {
 				if (obj_has_custom_message(obj, OBJ_CUSTOM_DECAYS_ON_CHAR)) {
@@ -1604,58 +1833,12 @@ void point_update_obj(obj_data *obj) {
 			
 			empty_obj_before_extract(obj);
 			extract_obj(obj);
-			return;
+			return FALSE;
 		} // end non-drink decay
 	}
 	
-	// 2nd type of timer: the autostore timer (keeps the world clean of litter)
-	if (!check_autostore(obj, FALSE, NULL)) {
-		return;
-	}
-}
-
-
-/**
-* Real update (generally 5 seconds) on an object. This is only for things that
-* need to happen that often. Everything else happens in a point update.
-*
-* @param obj_data *obj The object to update.
-*/
-void real_update_obj(obj_data *obj) {
-	struct empire_political_data *pol;
-	empire_data *emp, *enemy;
-	room_data *home;
-	char_data *pyro;
-	
-	// burny
-	if (LIGHT_IS_LIT(obj) && LIGHT_FLAGGED(obj, LIGHT_FLAG_LIGHT_FIRE) && IN_ROOM(obj) && IS_ANY_BUILDING(IN_ROOM(obj))) {
-		home = HOME_ROOM(IN_ROOM(obj));
-		if (ROOM_BLD_FLAGGED(home, BLD_BURNABLE) && !IS_BURNING(home)) {
-			// only items with an empire id are considered: you can't burn stuff down by accident (unless the building is unowned)
-			if (obj->last_empire_id != NOTHING || !ROOM_OWNER(home)) {
-				// check that the empire is at war
-				emp = ROOM_OWNER(home);
-				enemy = real_empire(obj->last_empire_id);
-				
-				// check for war
-				if (!emp || (enemy && (pol = find_relation(enemy, emp)) && IS_SET(pol->type, DIPL_WAR))) {
-					if (ROOM_PEOPLE(IN_ROOM(obj))) {
-						act("A stray ember from $p ignites the room!", FALSE, ROOM_PEOPLE(IN_ROOM(obj)), obj, NULL, TO_CHAR | TO_ROOM);
-					}
-					start_burning(home);
-					
-					if (emp && obj->last_owner_id > 0 && (pyro = is_playing(obj->last_owner_id))) {
-						add_offense(emp, OFFENSE_BURNED_BUILDING, pyro, IN_ROOM(pyro), offense_was_seen(pyro, emp, IN_ROOM(obj)) ? OFF_SEEN : NOBITS);
-					}
-				}
-			}
-		}
-	}
-	
-	// point-update if it's my turn
-	if ((ABSOLUTE(GET_OBJ_VNUM(obj)) % REAL_UPDATES_PER_MUD_HOUR) == point_update_cycle) {
-		point_update_obj(obj);
-	}
+	// obj survived?
+	return TRUE;
 }
 
 
@@ -2136,7 +2319,6 @@ void schedule_heal_over_time(char_data *ch) {
 * affects, and objects. REAL_UPDATES_PER_MUD_HOUR determines actual timing.
 */
 void real_update(void) {
-	obj_data *obj;
 	char_data *ch;
 	vehicle_data *veh;
 	
@@ -2162,16 +2344,11 @@ void real_update(void) {
 		point_update_cycle = 0;
 	}
 
-	// characters
+	// players
 	DL_FOREACH_SAFE2(player_character_list, ch, global_next_player, next_plr) {
 		if (!EXTRACTED(ch)) {
 			real_update_player(ch);
 		}
-	}
-
-	// objs
-	DL_FOREACH_SAFE(object_list, obj, global_next_obj) {
-		real_update_obj(obj);
 	}
 	
 	// vehicles

@@ -3062,7 +3062,7 @@ void clear_private_owner(int id) {
 		if (ROOM_PRIVATE_OWNER(HOME_ROOM(iter)) == id) {
 			// reset autostore timer
 			DL_FOREACH2(ROOM_CONTENTS(iter), obj, next_content) {
-				GET_AUTOSTORE_TIMER(obj) = time(0);
+				schedule_obj_autostore_check(obj, time(0));
 			}
 		}
 	}
@@ -3074,7 +3074,7 @@ void clear_private_owner(int id) {
 			
 			// reset autostore timer
 			DL_FOREACH2(ROOM_CONTENTS(iter), obj, next_content) {
-				GET_AUTOSTORE_TIMER(obj) = time(0);
+				schedule_obj_autostore_check(obj, time(0));
 			}
 		}
 	}

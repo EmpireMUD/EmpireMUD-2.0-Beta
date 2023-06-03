@@ -2442,6 +2442,7 @@ vehicle_data *unstore_vehicle_from_file(FILE *fl, any_vnum vnum, char *error_str
 							}
 							if ((load_obj = Obj_load_from_file(fl, load_vnum, &location, NULL, error))) {
 								// Obj_load_from_file may return a NULL for deleted objs
+								suspend_autostore_updates = TRUE;	// see end of block for FALSE
 				
 								// Not really an inventory, but same idea.
 								if (location > 0) {
@@ -2451,7 +2452,7 @@ vehicle_data *unstore_vehicle_from_file(FILE *fl, any_vnum vnum, char *error_str
 								// store autostore timer through obj_to_room
 								timer = GET_AUTOSTORE_TIMER(load_obj);
 								obj_to_vehicle(load_obj, veh);
-								GET_AUTOSTORE_TIMER(load_obj) = timer;
+								schedule_obj_autostore_check(load_obj, timer);
 				
 								for (iter = MAX_BAG_ROWS - 1; iter > -location; --iter) {
 									// No container, back to vehicle
@@ -2459,7 +2460,7 @@ vehicle_data *unstore_vehicle_from_file(FILE *fl, any_vnum vnum, char *error_str
 										DL_DELETE2(cont_row[iter], obj, prev_content, next_content);
 										timer = GET_AUTOSTORE_TIMER(obj);
 										obj_to_vehicle(obj, veh);
-										GET_AUTOSTORE_TIMER(obj) = timer;
+										schedule_obj_autostore_check(obj, timer);
 									}
 								}
 								if (iter == -location && cont_row[iter]) {			/* Content list exists. */
@@ -2473,14 +2474,14 @@ vehicle_data *unstore_vehicle_from_file(FILE *fl, any_vnum vnum, char *error_str
 										}
 										timer = GET_AUTOSTORE_TIMER(load_obj);
 										obj_to_vehicle(load_obj, veh);			/* Add to vehicle first. */
-										GET_AUTOSTORE_TIMER(load_obj) = timer;
+										schedule_obj_autostore_check(load_obj, timer);
 									}
 									else {				/* Object isn't container, empty content list. */
 										DL_FOREACH_SAFE2(cont_row[iter], obj, next_obj, next_content) {
 											DL_DELETE2(cont_row[iter], obj, prev_content, next_content);
 											timer = GET_AUTOSTORE_TIMER(obj);
 											obj_to_vehicle(obj, veh);
-											GET_AUTOSTORE_TIMER(obj) = timer;
+											schedule_obj_autostore_check(obj, timer);
 										}
 									}
 								}
@@ -2488,6 +2489,8 @@ vehicle_data *unstore_vehicle_from_file(FILE *fl, any_vnum vnum, char *error_str
 									obj_from_room(load_obj);
 									DL_APPEND2(cont_row[-location - 1], load_obj, prev_content, next_content);
 								}
+								
+								suspend_autostore_updates = FALSE;
 							}
 						}
 						else if (!strn_cmp(line, "Contents-end", 12)) {

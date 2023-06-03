@@ -1412,12 +1412,12 @@ typedef struct vehicle_data vehicle_data;
 
 
 // SEV_x: stored event types
-#define SEV_TRENCH_FILL  0
-#define SEV_DESPAWN  1
-#define SEV_BURN_DOWN  2
-#define SEV_GROW_CROP  3
-#define SEV_TAVERN  4
-#define SEV_RESET_TRIGGER  5
+#define SEV_TRENCH_FILL  0	// water fills over time
+#define SEV_DESPAWN  1	// mob despawn
+#define SEV_BURN_DOWN  2	// for buildings
+#define SEV_GROW_CROP  3	// normal crop growth time
+#define SEV_TAVERN  4	// tavern resource use timer
+#define SEV_RESET_TRIGGER  5	// for tavern resets
 #define SEV_PURSUIT  6	// mob pursuing a target
 #define SEV_MOVEMENT  7	// normal mob movement
 #define SEV_AGGRO  8	// aggro or cityguard mobs
@@ -1426,6 +1426,8 @@ typedef struct vehicle_data vehicle_data;
 #define SEV_RESET_MOB  11	// periodic reset of damaged/tagged mobs
 #define SEV_HEAL_OVER_TIME  12	// handles HOT applies
 #define SEV_CHECK_LEADING  13	// called right after moving, in some cases
+#define SEV_OBJ_TIMER  14	// various timer updates
+#define SEV_OBJ_AUTOSTORE  15	// autostore check for objects
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -1888,6 +1890,7 @@ typedef enum {
 #define LIGHT_FLAG_CAN_DOUSE  BIT(1)	// It can be put out
 #define LIGHT_FLAG_JUNK_WHEN_EXPIRED  BIT(2)	// automatically removed
 #define LIGHT_FLAG_COOKING_FIRE  BIT(3)	// allows cooking
+#define LIGHT_FLAG_DESTROY_WHEN_DOUSED  BIT(4)	// always expires when doused
 
 
 // Item materials
@@ -5532,6 +5535,12 @@ struct mob_event_data {
 };
 
 
+// data for various timed object events
+struct obj_event_data {
+	obj_data *obj;		// which object
+};
+
+
 // data for the event when a building is burning
 struct room_event_data {
 	room_data *room;
@@ -5754,6 +5763,7 @@ struct obj_data {
 	time_t stolen_timer;	// when the object was last stolen
 	empire_vnum stolen_from;	// empire who owned it
 	
+	struct stored_event *stored_events;	// linked list of stored dg events
 	time_t autostore_timer;	// how long an object has been where it be
 	
 	struct obj_binding *bound_to;	// LL of who it's bound to

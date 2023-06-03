@@ -5350,6 +5350,9 @@ void free_obj(obj_data *obj) {
 		free_obj_apply_list(GET_OBJ_APPLIES(obj));
 	}
 	
+	// in case
+	cancel_all_stored_events(&GET_OBJ_STORED_EVENTS(obj));
+	
 	/* free any assigned scripts */
 	if (SCRIPT(obj)) {
 		extract_script(obj, OBJ_TRIGGER);
@@ -6444,6 +6447,7 @@ EVENT_CANCEL_FUNC(cancel_burn_event);
 EVENT_CANCEL_FUNC(cancel_character_event);
 EVENT_CANCEL_FUNC(cancel_map_event);
 EVENT_CANCEL_FUNC(cancel_mob_event);
+EVENT_CANCEL_FUNC(cancel_obj_event);
 EVENT_CANCEL_FUNC(cancel_room_event);
 
 
@@ -6463,6 +6467,8 @@ struct stored_event_info_t stored_event_info[] = {
 	{ cancel_mob_event },	// SEV_RESET_MOB
 	{ cancel_character_event },	// SEV_HEAL_OVER_TIME
 	{ cancel_character_event },	// SEV_CHECK_LEADING
+	{ cancel_obj_event },	// SEV_OBJ_TIMER
+	{ cancel_obj_event },	// SEV_OBJ_AUTOSTORE
 };
 
 
@@ -6598,6 +6604,13 @@ EVENT_CANCEL_FUNC(cancel_map_event) {
 // generic canceller for simple mob events
 EVENT_CANCEL_FUNC(cancel_mob_event) {
 	struct mob_event_data *data = (struct mob_event_data*)event_obj;
+	free(data);
+}
+
+
+// generic canceller for simple object events
+EVENT_CANCEL_FUNC(cancel_obj_event) {
+	struct obj_event_data *data = (struct obj_event_data*)event_obj;
 	free(data);
 }
 

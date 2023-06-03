@@ -2075,6 +2075,7 @@ int set_obj_val(obj_data *obj, int pos, int value) {
 	
 	// and set it
 	GET_OBJ_VAL(obj, pos) = value;
+	
 	return value;
 }
 
@@ -2224,7 +2225,7 @@ void olc_get_values_display(char_data *ch, char *storage) {
 			}
 			sprintbit(GET_LIGHT_FLAGS(obj), light_flags, temp, TRUE);
 			sprintf(storage + strlen(storage), "<%slightflags\t0> %s\r\n", OLC_LABEL_VAL(GET_LIGHT_FLAGS(obj), NOBITS), temp);
-			sprintf(storage + strlen(storage), "<%slightislit\t0> %s\r\n", OLC_LABEL_VAL(GET_LIGHT_IS_LIT(obj), 0), GET_LIGHT_IS_LIT(obj) ? "yes" : "no");
+			sprintf(storage + strlen(storage), "<%slightislit\t0> %s\r\n", OLC_LABEL_VAL(GET_LIGHT_IS_LIT(obj), 1), GET_LIGHT_IS_LIT(obj) ? "yes" : "no");
 			break;
 		}
 		
@@ -2974,11 +2975,11 @@ OLC_MODULE(oedit_lightislit) {
 	else if (!*argument) {
 		msg_to_char(ch, "Usage: .ligthislit <yes | no>\r\n");
 	}
-	else if (is_abbrev(argument, "yes") || is_abbrev(argument, "on") || is_abbrev(argument, "lit")) {
+	else if (!str_cmp(argument, "1") || is_abbrev(argument, "yes") || is_abbrev(argument, "on") || is_abbrev(argument, "lit")) {
 		GET_OBJ_VAL(obj, VAL_LIGHT_IS_LIT) = 1;
 		msg_to_char(ch, "It now defaults to 'lit'.\r\n");
 	}
-	else if (is_abbrev(argument, "no") || is_abbrev(argument, "off") || is_abbrev(argument, "unlit")) {
+	else if (!str_cmp(argument, "0") || is_abbrev(argument, "no") || is_abbrev(argument, "off") || is_abbrev(argument, "unlit")) {
 		GET_OBJ_VAL(obj, VAL_LIGHT_IS_LIT) = 0;
 		msg_to_char(ch, "It now defaults to 'unlit'.\r\n");
 	}
@@ -3484,6 +3485,10 @@ OLC_MODULE(oedit_type) {
 			}
 			case ITEM_MINIPET: {
 				set_obj_val(obj, VAL_MINIPET_VNUM, NOTHING);
+				break;
+			}
+			case ITEM_LIGHT: {
+				set_obj_val(obj, VAL_LIGHT_IS_LIT, 1);
 				break;
 			}
 			default: {

@@ -6963,7 +6963,7 @@ void do_stat_object(char_data *ch, obj_data *j) {
 				snprintf(part, sizeof(part), "%d hour%s remaining", GET_LIGHT_HOURS_REMAINING(j), PLURAL(GET_LIGHT_HOURS_REMAINING(j)));
 			}
 			sprintbit(GET_LIGHT_FLAGS(j), light_flags, buf, TRUE);
-			msg_to_char(ch, "Light: %s (%s), flags: %s\r\n", part, (GET_LIGHT_IS_LIT(j) ? "lit" : "unlit"), buf);
+			msg_to_char(ch, "Light: \tc%s\t0 (\tc%s\t0), flags: \tc%s\t0\r\n", part, (GET_LIGHT_IS_LIT(j) ? "lit" : "unlit"), buf);
 			break;
 		}
 		default:
@@ -9491,6 +9491,7 @@ ACMD(do_oset) {
 	char obj_arg[MAX_INPUT_LENGTH], field_arg[MAX_INPUT_LENGTH], *obj_arg_ptr = obj_arg;
 	obj_data *obj;
 	int number;
+	bool was_lit;
 	
 	argument = one_argument(argument, obj_arg);
 	argument = any_one_arg(argument, field_arg);
@@ -9504,7 +9505,19 @@ ACMD(do_oset) {
 		msg_to_char(ch, "You don't seem to have %s %s.\r\n", AN(obj_arg), obj_arg);
 	}
 	else if (is_abbrev(field_arg, "flags")) {
+		was_lit = LIGHT_IS_LIT(obj);
+		
 		GET_OBJ_EXTRA(obj) = olc_process_flag(ch, argument, "extra", "oset name flags", extra_bits, GET_OBJ_EXTRA(obj));
+							
+		// check lights
+		if (was_lit != LIGHT_IS_LIT(obj)) {
+			if (was_lit) {
+				apply_obj_light(obj, FALSE);
+			}
+			else {
+				apply_obj_light(obj, TRUE);
+			}
+		}
 		request_obj_save_in_world(obj);
 	}
 	else if (is_abbrev(field_arg, "keywords") || is_abbrev(field_arg, "aliases")) {
@@ -9558,6 +9571,7 @@ ACMD(do_oset) {
 		}
 		else {
 			GET_OBJ_TIMER(obj) = atoi(argument);
+			schedule_obj_timer_update(obj, TRUE);
 			request_obj_save_in_world(obj);
 			msg_to_char(ch, "You change its timer to %d.\r\n", GET_OBJ_TIMER(obj));
 		}

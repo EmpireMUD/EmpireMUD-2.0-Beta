@@ -1703,7 +1703,10 @@ char *obj_desc_for_char(obj_data *obj, char_data *ch, int mode) {
 		}
 		
 		if (LIGHT_IS_LIT(obj)) {
-			sprintf(tags + strlen(tags), "%s lit", (*tags ? "," : ""));
+			sprintf(tags + strlen(tags), "%s light", (*tags ? "," : ""));
+		}
+		else if (IS_LIGHT(obj) && GET_LIGHT_HOURS_REMAINING(obj) == 0) {
+			sprintf(tags + strlen(tags), "%s burnt out", (*tags ? "," : ""));
 		}
 		
 		if (PRF_FLAGGED(ch, PRF_ITEM_DETAILS) && GET_OBJ_REQUIRES_QUEST(obj) != NOTHING) {

@@ -2720,6 +2720,7 @@ const char *light_flags[] = {
 	"CAN-DOUSE",
 	"JUNK-WHEN-EXPIRED",
 	"COOKING-FIRE",
+	"DESTROY-WHEN-DOUSED",
 	"\n"
 };
 
@@ -2730,6 +2731,7 @@ const char *light_flags_for_identify[] = {
 	"can be doused",
 	"",	// LIGHT_FLAG_JUNK_WHEN_EXPIRED
 	"can be used for cooking",
+	"lost when doused",
 	"\n"
 };
 

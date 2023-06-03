@@ -6043,6 +6043,35 @@ void add_to_object_list(obj_data *obj) {
 
 
 /**
+* Raises or lowers the light count where the object is. This does NOT check if
+* the object is lit or not. The object is only used to get the location, if
+* any.
+*
+* @param obj_data *obj The object (ideally this is a light, but it does not check).
+* @param bool add If TRUE, adds a light. If FALSE, removes one.
+*/
+void apply_obj_light(obj_data *obj, bool add) {
+	if (obj) {
+		if (obj->carried_by) {
+			GET_LIGHTS(obj->carried_by) += (add ? 1 : -1);
+			if (IN_ROOM(obj->carried_by)) {
+				ROOM_LIGHTS(IN_ROOM(obj->carried_by)) += (add ? 1 : -1);
+			}
+		}
+		else if (obj->worn_by) {
+			GET_LIGHTS(obj->worn_by) += (add ? 1 : -1);
+			if (IN_ROOM(obj->worn_by)) {
+				ROOM_LIGHTS(IN_ROOM(obj->worn_by)) += (add ? 1 : -1);
+			}
+		}
+		else if (IN_ROOM(obj)) {
+			ROOM_LIGHTS(IN_ROOM(obj)) += (add ? 1 : -1);
+		}
+	}
+}
+
+
+/**
 * Copies an item, even a modified one, to a new item.
 *
 * @param obj_data *input The item to copy.
@@ -6184,6 +6213,7 @@ void extract_obj(obj_data *obj) {
 		extract_obj(obj->contains);
 	}
 	
+	cancel_all_stored_events(&GET_OBJ_STORED_EVENTS(obj));
 	remove_from_object_list(obj);
 
 	if (SCRIPT(obj)) {
@@ -6844,6 +6874,7 @@ void obj_from_obj(obj_data *obj) {
 		log("SYSERR: (%s): trying to illegally extract obj from obj.", __FILE__);
 	}
 	else {
+		cancel_stored_event(&GET_OBJ_STORED_EVENTS(obj), SEV_OBJ_AUTOSTORE);
 		remove_dropped_item_anywhere(obj);
 		request_obj_save_in_world(obj);
 		
@@ -6876,6 +6907,7 @@ void obj_from_room(obj_data *object) {
 		log("SYSERR: NULL object (%p) or obj not in a room (%p) passed to obj_from_room", object, IN_ROOM(object));
 	}
 	else {
+		cancel_stored_event(&GET_OBJ_STORED_EVENTS(object), SEV_OBJ_AUTOSTORE);
 		request_obj_save_in_world(object);
 		
 		// update lights
@@ -6901,6 +6933,7 @@ void obj_from_vehicle(obj_data *object) {
 		log("SYSERR: NULL object (%p) or obj not in a vehicle (%p) passed to obj_from_vehicle", object, object->in_vehicle);
 	}
 	else {
+		cancel_stored_event(&GET_OBJ_STORED_EVENTS(object), SEV_OBJ_AUTOSTORE);
 		request_obj_save_in_world(object);
 		if (VEH_OWNER(object->in_vehicle)) {
 			remove_dropped_item(VEH_OWNER(object->in_vehicle), object);
@@ -6955,6 +6988,7 @@ void obj_to_char(obj_data *object, char_data *ch) {
 		}
 		
 		// set the timer here; actual rules for it are in limits.c
+		// we do NOT schedule the actual autostore check here (items on chars don't autostore)
 		GET_AUTOSTORE_TIMER(object) = time(0);
 		
 		// unmark uncollected loot
@@ -6985,6 +7019,7 @@ void obj_to_char(obj_data *object, char_data *ch) {
 		}
 		
 		qt_get_obj(ch, object);
+		schedule_obj_timer_update(object, FALSE);
 		request_obj_save_in_world(object);
 	}
 	else {
@@ -7099,7 +7134,9 @@ void obj_to_obj(obj_data *obj, obj_data *obj_to) {
 		}
 		
 		// set the timer here; actual rules for it are in limits.c
-		GET_AUTOSTORE_TIMER(obj) = time(0);
+		if (!suspend_autostore_updates) {
+			schedule_obj_autostore_check(obj, time(0));
+		}
 		
 		// clear these now
 		REMOVE_BIT(GET_OBJ_EXTRA(obj), OBJ_KEEP);
@@ -7109,6 +7146,7 @@ void obj_to_obj(obj_data *obj, obj_data *obj_to) {
 		obj->in_obj = obj_to;
 		
 		add_dropped_item_anywhere(obj, NULL);
+		schedule_obj_timer_update(obj, FALSE);
 		request_obj_save_in_world(obj);
 	}
 }
@@ -7139,12 +7177,15 @@ void obj_to_room(obj_data *object, room_data *room) {
 		clear_obj_eq_sets(object);
 
 		// set the timer here; actual rules for it are in limits.c
-		GET_AUTOSTORE_TIMER(object) = time(0);
+		if (!suspend_autostore_updates) {
+			schedule_obj_autostore_check(object, time(0));
+		}
 		
 		if (ROOM_OWNER(room)) {
 			add_dropped_item(ROOM_OWNER(room), object);
 		}
 		
+		schedule_obj_timer_update(object, FALSE);
 		request_obj_save_in_world(object);
 		
 		// see if anybody wants to eat it
@@ -7177,12 +7218,17 @@ void obj_to_vehicle(obj_data *object, vehicle_data *veh) {
 		clear_obj_eq_sets(object);
 		
 		// set the timer here; actual rules for it are in limits.c
-		VEH_LAST_MOVE_TIME(veh) = GET_AUTOSTORE_TIMER(object) = time(0);
+		VEH_LAST_MOVE_TIME(veh) = time(0);
+		if (!suspend_autostore_updates) {
+			// update this time but don't schedule an autostore event -- vehicles do it themselves
+			GET_AUTOSTORE_TIMER(object) = time(0);
+		}
 		
 		if (VEH_OWNER(veh)) {
 			add_dropped_item(VEH_OWNER(veh), object);
 		}
 		
+		schedule_obj_timer_update(object, FALSE);
 		request_obj_save_in_world(object);
 	}
 }

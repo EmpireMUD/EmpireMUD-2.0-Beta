@@ -320,7 +320,7 @@ void do_customize_road(char_data *ch, char *argument) {
 *
 * @param char_data *ch The douser.
 * @param obj_data *obj The object to douse.
-* @param obj_data *cont The liquid container full of water.
+* @param obj_data *cont Optional: The liquid container full of water (may be NULL).
 */
 void do_douse_obj(char_data *ch, obj_data *obj, obj_data *cont) {
 	if (!IS_LIGHT(obj)) {
@@ -332,30 +332,26 @@ void do_douse_obj(char_data *ch, obj_data *obj, obj_data *cont) {
 	else if (!LIGHT_FLAGGED(obj, LIGHT_FLAG_CAN_DOUSE)) {
 		act("You can't seem to douse $p.", FALSE, ch, obj, NULL, TO_CHAR);
 	}
-	else if (IN_ROOM(obj) && !can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED)) {
+	else if (IN_ROOM(obj) && !can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED) && (IS_NPC(ch) || LAST_OWNER_ID(obj) != GET_IDNUM(ch))) {
 		msg_to_char(ch, "You can't douse anything here.\r\n");
 	}
 	else {
-		act("You douse $p with $P.", FALSE, ch, obj, cont, TO_CHAR);
-		act("$n douses $p with $P.", FALSE, ch, obj, cont, TO_ROOM);
-		
-		set_obj_val(cont, VAL_DRINK_CONTAINER_CONTENTS, 0);
-		set_obj_val(obj, VAL_LIGHT_IS_LIT, 0);
-		
-		if (obj->carried_by) {
-			--GET_LIGHTS(obj->carried_by);
-			if (IN_ROOM(obj->carried_by)) {
-				--ROOM_LIGHTS(IN_ROOM(obj->carried_by));
-			}
+		if (cont) {
+			act("You douse $p with $P.", FALSE, ch, obj, cont, TO_CHAR);
+			act("$n douses $p with $P.", FALSE, ch, obj, cont, TO_ROOM);
+			
+			// use the water
+			set_obj_val(cont, VAL_DRINK_CONTAINER_CONTENTS, 0);
 		}
-		else if (obj->worn_by) {
-			--GET_LIGHTS(obj->worn_by);
-			if (IN_ROOM(obj->worn_by)) {
-				--ROOM_LIGHTS(IN_ROOM(obj->worn_by));
-			}
+		else {
+			// no container
+			act("You douse $p.", FALSE, ch, obj, NULL, TO_CHAR);
+			act("$n douses $p.", FALSE, ch, obj, NULL, TO_ROOM);
 		}
-		else if (IN_ROOM(obj)) {
-			--ROOM_LIGHTS(IN_ROOM(obj));
+		
+		// douse it -- this may extract the item
+		if (douse_light(obj) == FALSE) {
+			msg_to_char(ch, "It's used up and you throw it away.\r\n");
 		}
 	}
 }
@@ -2237,22 +2233,27 @@ ACMD(do_douse) {
 	char arg[MAX_INPUT_LENGTH];
 	vehicle_data *veh;
 	int amount;
+	bool use_room;
 	
-	// this loop finds a water container and sets obj
-	DL_FOREACH2(ch->carrying, iter, next_content) {
-		if (GET_DRINK_CONTAINER_TYPE(iter) == LIQ_WATER && GET_DRINK_CONTAINER_CONTENTS(iter) > 0) {
-			obj = iter;
-			break;
+	// prefer a room source
+	use_room = (IS_IMMORTAL(ch) || WATER_SECT(IN_ROOM(ch)) || ROOM_SECT_FLAGGED(IN_ROOM(ch), SECTF_DRINK) || room_has_function_and_city_ok(GET_LOYALTY(ch), IN_ROOM(ch), FNC_DRINK_WATER));
+	
+	if (!use_room) {
+		// this loop finds a water container and sets obj
+		DL_FOREACH2(ch->carrying, iter, next_content) {
+			if (GET_DRINK_CONTAINER_TYPE(iter) == LIQ_WATER && GET_DRINK_CONTAINER_CONTENTS(iter) > 0) {
+				obj = iter;
+				break;
+			}
 		}
 	}
 	
 	one_argument(argument, arg);
 	
-	if (!IN_ROOM(ch))
-		msg_to_char(ch, "Unexpected error in douse.\r\n");
-	else if (!obj)
+	if (!obj && !use_room) {
 		msg_to_char(ch, "You have nothing to douse the fire with!\r\n");
-	else if (*arg) {
+	}
+	else if (*arg && str_cmp(arg, "fire")) {
 		if ((veh = get_vehicle_in_room_vis(ch, arg, NULL))) {
 			do_douse_vehicle(ch, veh, obj);
 		}
@@ -2272,12 +2273,23 @@ ACMD(do_douse) {
 	else if (!IS_ANY_BUILDING(IN_ROOM(ch)) || !IS_BURNING(room))
 		msg_to_char(ch, "There's no fire here!\r\n");
 	else {
-		amount = GET_DRINK_CONTAINER_CONTENTS(obj);
-		set_obj_val(obj, VAL_DRINK_CONTAINER_CONTENTS, 0);
+		if (obj) {
+			amount = GET_DRINK_CONTAINER_CONTENTS(obj);
+			set_obj_val(obj, VAL_DRINK_CONTAINER_CONTENTS, 0);
+			
+			act("You throw some water from $p onto the flames!", FALSE, ch, obj, NULL, TO_CHAR);
+			act("$n throws some water from $p onto the flames!", FALSE, ch, obj, NULL, TO_ROOM);
+		}
+		else {
+			// water from room/immortal
+			amount = config_get_int("fire_extinguish_value") / 4;
+			amount = MAX(amount, 1);
+			act("You throw some water onto the flames!", FALSE, ch, NULL, NULL, TO_CHAR);
+			act("$n throws some water onto the flames!", FALSE, ch, NULL, NULL, TO_ROOM);
+		}
 		
+		// and remove the fire...
 		add_to_room_extra_data(room, ROOM_EXTRA_FIRE_REMAINING, -amount);
-		act("You throw some water from $p onto the flames!", FALSE, ch, obj, 0, TO_CHAR);
-		act("$n throws some water from $p onto the flames!", FALSE, ch, obj, 0, TO_ROOM);
 
 		if (get_room_extra_data(room, ROOM_EXTRA_FIRE_REMAINING) <= 0) {
 			act("The flames have been extinguished!", FALSE, ch, 0, 0, TO_CHAR | TO_ROOM);
@@ -2939,6 +2951,7 @@ ACMD(do_milk) {
 		set_obj_val(cont, VAL_DRINK_CONTAINER_CONTENTS, GET_DRINK_CONTAINER_CONTENTS(cont) + amount);
 		set_obj_val(cont, VAL_DRINK_CONTAINER_TYPE, LIQ_MILK);
 		GET_OBJ_TIMER(cont) = 72;	// mud hours
+		schedule_obj_timer_update(cont, FALSE);
 		gain_player_tech_exp(ch, PTECH_MILK, 33);
 		request_obj_save_in_world(cont);
 	}

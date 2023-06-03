@@ -690,21 +690,23 @@ See also: MARK
 #
 DOUSE BURNING "PUT OUT FIRE" FIRE-BRIGADE "FIRE BRIGADE"
 
-Usage:  douse [vehicle | light]
+Usage:  douse [vehicle | light | fire]
 
-In the event of a fire, you may douse it with water from any portable source. 
-It may take a lot of water to douse the fire, and you may have to leave and 
-come back. If you don't fully douse it, the flames will slowly rise again, 
-and destroy your structure.
+In the event of a fire, you may douse it with water from any portable source,
+or with water from the room itself if any is available.  It may take a lot of
+water to douse the fire, and you may have to leave and come back if you're
+using a canteen or barrel. If you don't fully douse it, the flames will slowly
+rise again and destroy your structure.
 
 If your empire has a workforce, the fire-brigade can also put out fires for
 you. They will always succeed if left alone. However, they do so very slowly
 and are easy targets for enemy players at war.
 
-If you use this on a light such as a torch or cooking fire, it will extinguish
-the light (and destroy the object).
+If you use this on a light such as a torch, it will consume an hour from the
+time remaining on that light. Dousing some things may destroy them. Not all
+lights can be doused.
 
-See also: COOKING FIRE, LIGHT, WORKFORCE
+See also: BURN, LIGHT, WORKFORCE
 #
 DRAG
 

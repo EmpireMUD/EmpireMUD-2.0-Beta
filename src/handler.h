@@ -261,6 +261,7 @@ void perform_mount(char_data *ch, char_data *mount);
 
 // object handlers
 void add_to_object_list(obj_data *obj);
+void apply_obj_light(obj_data *obj, bool add);
 struct obj_binding *copy_obj_bindings(struct obj_binding *from);
 obj_data *copy_warehouse_obj(obj_data *input);
 void empty_obj_before_extract(obj_data *obj);

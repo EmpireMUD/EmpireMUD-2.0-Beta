@@ -902,6 +902,7 @@ int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_COORD(ge
 #define GET_OBJ_KEYWORDS(obj)  ((obj)->name)
 #define GET_OBJ_LONG_DESC(obj)  ((obj)->description)
 #define GET_OBJ_SHORT_DESC(obj)  ((obj)->short_description)
+#define GET_OBJ_STORED_EVENTS(obj)  ((obj)->stored_events)
 #define GET_OBJ_TIMER(obj)  ((obj)->obj_flags.timer)
 #define GET_OBJ_VAL(obj, val)  ((obj)->obj_flags.value[(val)])
 #define GET_OBJ_WEAR(obj)  ((obj)->obj_flags.wear_flags)
@@ -1120,7 +1121,7 @@ int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_COORD(ge
 #define GET_LIGHT_FLAGS(obj)  (IS_LIGHT(obj) ? GET_OBJ_VAL((obj), VAL_LIGHT_FLAGS) : NOBITS)
 #define CAN_LIGHT_OBJ(obj)  ((IS_LIGHT(obj) && !GET_LIGHT_IS_LIT(obj) && GET_LIGHT_HOURS_REMAINING(obj) != 0) || has_interaction(GET_OBJ_INTERACTIONS(obj), INTERACT_LIGHT))
 #define LIGHT_FLAGGED(obj, flag)  IS_SET(GET_LIGHT_FLAGS(obj), (flag))
-#define LIGHT_IS_LIT(obj)  (GET_LIGHT_IS_LIT(obj) && GET_LIGHT_HOURS_REMAINING(obj) != 0)
+#define LIGHT_IS_LIT(obj)  (OBJ_FLAGGED((obj), OBJ_LIGHT) || (GET_LIGHT_IS_LIT(obj) && GET_LIGHT_HOURS_REMAINING(obj) != 0))
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -2024,6 +2025,7 @@ bool show_local_einv(char_data *ch, room_data *room, bool thief_mode);
 bool can_take_obj(char_data *ch, obj_data *obj);
 int count_objs_in_room(room_data *room);
 void deliver_shipment(empire_data *emp, struct shipping_data *shipd);
+bool douse_light(obj_data *obj);
 room_data *find_docks(empire_data *emp, int island_id);
 int find_free_shipping_id(empire_data *emp);
 obj_data *find_lighter_in_list(obj_data *list, bool *had_keep);
@@ -2036,6 +2038,7 @@ void remove_honed_gear(char_data *ch);
 void sail_shipment(empire_data *emp, vehicle_data *boat);
 void scale_item_to_level(obj_data *obj, int level);
 bool ship_is_empty(vehicle_data *ship);
+bool use_hour_of_light(obj_data *obj, bool messages);
 bool used_lighter(char_data *ch, obj_data *obj);
 
 // act.movement.c
@@ -2257,6 +2260,8 @@ int health_gain(char_data *ch, bool info_only);
 int mana_gain(char_data *ch, bool info_only);
 int move_gain(char_data *ch, bool info_only);
 void schedule_heal_over_time(char_data *ch);
+void schedule_obj_autostore_check(obj_data *obj, long new_autostore_timer);
+void schedule_obj_timer_update(obj_data *obj, bool override);
 void update_empire_needs(empire_data *emp, struct empire_island *eisle, struct empire_needs *needs);
 
 // mapview.c

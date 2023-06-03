@@ -2653,6 +2653,7 @@ ACMD(do_portal) {
 	set_obj_val(end, VAL_PORTAL_TARGET_VNUM, GET_ROOM_VNUM(IN_ROOM(ch)));
 	GET_OBJ_TIMER(end) = 5;
 	obj_to_room(end, target);
+	
 	if (GET_ROOM_VNUM(IN_ROOM(end))) {
 		act("$p spins open!", TRUE, ROOM_PEOPLE(IN_ROOM(end)), end, 0, TO_ROOM | TO_CHAR);
 	}

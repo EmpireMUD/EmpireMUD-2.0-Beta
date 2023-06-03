@@ -655,6 +655,7 @@ extern obj_data *object_list;
 extern obj_data *object_table;
 extern obj_data *purge_bound_items_next;
 extern obj_data *global_next_obj;
+extern bool suspend_autostore_updates;
 
 void add_object_to_table(obj_data *obj);
 obj_data *create_obj(void);

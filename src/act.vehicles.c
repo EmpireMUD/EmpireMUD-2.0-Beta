@@ -999,18 +999,24 @@ void do_customize_vehicle(char_data *ch, char *argument) {
 *
 * @param char_data *ch The douser.
 * @param vehicle_data *veh The burning vehicle.
-* @param obj_data *cont The liquid container full of water.
+* @param obj_data *cont Optional: The liquid container full of water (may be NULL).
 */
 void do_douse_vehicle(char_data *ch, vehicle_data *veh, obj_data *cont) {
 	if (!VEH_FLAGGED(veh, VEH_ON_FIRE)) {
 		msg_to_char(ch, "It's not even on fire!\r\n");
 	}
 	else {
-		set_obj_val(cont, VAL_DRINK_CONTAINER_CONTENTS, 0);
-		remove_vehicle_flags(veh, VEH_ON_FIRE);
+		if (cont) {
+			set_obj_val(cont, VAL_DRINK_CONTAINER_CONTENTS, 0);
+			act("You put out the fire on $V with $p!", FALSE, ch, cont, veh, TO_CHAR);
+			act("$n puts out the fire on $V with $p!", FALSE, ch, cont, veh, TO_ROOM);
+		}
+		else {
+			act("You put out the fire on $V!", FALSE, ch, NULL, veh, TO_CHAR);
+			act("$n puts out the fire on $V!", FALSE, ch, NULL, veh, TO_ROOM);
+		}
 		
-		act("You put out the fire on $V with $p!", FALSE, ch, cont, veh, TO_CHAR);
-		act("$n puts out the fire on $V with $p!", FALSE, ch, cont, veh, TO_ROOM);
+		remove_vehicle_flags(veh, VEH_ON_FIRE);
 		msg_to_vehicle(veh, FALSE, "The flames have been extinguished!\r\n");
 	}
 }

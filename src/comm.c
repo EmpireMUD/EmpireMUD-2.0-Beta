@@ -995,6 +995,7 @@ void heartbeat(unsigned long heart_pulse) {
 	
 	// prevent accidentally leaving this on
 	pause_affect_total = FALSE;
+	suspend_autostore_updates = FALSE;
 	
 	// check for immediate reboot
 	if (reboot_control.immediate == TRUE) {

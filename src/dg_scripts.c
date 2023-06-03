@@ -4861,8 +4861,20 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						if (subfield && *subfield) {
 							int fl = search_block(subfield, extra_bits, FALSE);
 							if (fl != NOTHING) {
+								bool was_lit = LIGHT_IS_LIT(o);
+								
 								TOGGLE_BIT(GET_OBJ_EXTRA(o), BIT(fl));
 								snprintf(str, slen, (OBJ_FLAGGED(o, BIT(fl)) ? "1" : "0"));
+								
+								if (was_lit != LIGHT_IS_LIT(o)) {
+									if (was_lit) {
+										apply_obj_light(obj, FALSE);
+									}
+									else {
+										apply_obj_light(obj, TRUE);
+									}
+								}
+								
 								request_obj_save_in_world(o);
 							}
 							else {
@@ -5100,19 +5112,56 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						snprintf(str, slen, "%d", GET_OBJ_VNUM(o));
 					else if (!str_cmp(field, "val0")) {
 						if (subfield && is_number(subfield)) {
+							// can change the lights
+							bool was_lit = LIGHT_IS_LIT(o);
+							
 							set_obj_val(o, 0, atoi(subfield));
+							
+							// check lights
+							if (was_lit != LIGHT_IS_LIT(o)) {
+								if (was_lit) {
+									apply_obj_light(o, FALSE);
+								}
+								else {
+									apply_obj_light(o, TRUE);
+								}
+							}
 						}
 						snprintf(str, slen, "%d", GET_OBJ_VAL(o, 0));
 					}
 					else if (!str_cmp(field, "val1")) {
 						if (subfield && is_number(subfield)) {
+							// can change the lights
+							bool was_lit = LIGHT_IS_LIT(o);
+							
 							set_obj_val(o, 1, atoi(subfield));
+							
+							// check lights
+							if (was_lit != LIGHT_IS_LIT(o)) {
+								if (was_lit) {
+									apply_obj_light(o, FALSE);
+								}
+								else {
+									apply_obj_light(o, TRUE);
+								}
+							}
+							if (IS_LIGHT(obj)) {
+								// in case
+								schedule_obj_timer_update(obj, FALSE);
+							}
 						}
 						snprintf(str, slen, "%d", GET_OBJ_VAL(o, 1));
 					}
 					else if (!str_cmp(field, "val2")) {
 						if (subfield && is_number(subfield)) {
+							int old_val = GET_OBJ_VAL(o, 2);
+							
 							set_obj_val(o, 2, atoi(subfield));
+							
+							// things that might need to update:
+							if (GET_OBJ_VAL(o, 2) != old_val) {
+								// ... none so far
+							}
 						}
 						snprintf(str, slen, "%d", GET_OBJ_VAL(o, 2));
 					}

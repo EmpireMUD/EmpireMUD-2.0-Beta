@@ -5217,7 +5217,8 @@ Food:
 Light:
  0 - hours remaining (-1 is unlimited)
  1 - is lit (1) or not (0)
- 2 - flags (light-fire, can-douse, junk-when-expire, cooking-fire)
+ 2 - flags (light-fire, can-douse, junk-when-expire, cooking-fire,
+     destroy-when-doused)
 
 Lighter:
  0 - number of uses (-1 is unlimited)
@@ -5723,6 +5724,7 @@ the available options:
  &cCAN-DOUSE&0 - The player can put the light out and re-light it.
  &cJUNK-WHEN-EXPIRED&0 - When the light burns out, the whole item is purged.
  &cCOOKING-FIRE&0 - Can be used to cook.
+ &cDESTROY-WHEN-DOUSED&0 - If the player douses this light, it is destroyed.
 
 See also: OLC OBJECTS, OEDIT LIGHT HOURS, OEDIT LIGHT IS LIT
 #d
@@ -8346,10 +8348,12 @@ Object values:
        CAN-DOUSE - the player can put it out and re-light it
        JUNK-WHEN-EXPIRED - when it burns out, the item is lost
        COOKING-FIRE - the player can cook with it
+       DESTROY-WHEN-DOUSED - item is lost if they player douses it
 
 Example lights:
 - torch: 18 hours of light, LIGHT-FIRE, CAN-DOUSE, JUNK-WHEN-EXPIRED
-- campfire: 24 hours of light, LIGHT-FIRE, JUNK-WHEN-EXPIRED, COOKING-FIRE
+- campfire: 24 hours of light, LIGHT-FIRE, JUNK-WHEN-EXPIRED, COOKING-FIRE,
+            DESTROY-WHEN-DOUSED
 - lantern: 24 hours of light, CAN-DOUSE
 
 See also: LIGHTER OBJECT, OEDIT LIGHT HOURS, OEDIT LIGHT IS LIT,
