@@ -1487,6 +1487,7 @@ EVENTFUNC(obj_hour_event) {
 	empire_data *emp, *enemy;
 	struct empire_political_data *pol;
 	room_data *home, *to_room;
+	vehicle_data *veh;
 	int new_timer;
 	time_t timer;
 	
@@ -1577,8 +1578,29 @@ EVENTFUNC(obj_hour_event) {
 	
 	// burn the room? ONLY if we got this far
 	if (LIGHT_IS_LIT(obj) && LIGHT_FLAGGED(obj, LIGHT_FLAG_LIGHT_FIRE) && IN_ROOM(obj) && IS_ANY_BUILDING(IN_ROOM(obj))) {
-		home = HOME_ROOM(IN_ROOM(obj));
-		if (ROOM_BLD_FLAGGED(home, BLD_BURNABLE) && !IS_BURNING(home)) {
+		if ((veh = GET_ROOM_VEHICLE(IN_ROOM(obj))) && VEH_FLAGGED(veh, VEH_BURNABLE) && !VEH_FLAGGED(veh, VEH_ON_FIRE)) {
+			// burnable vehicle
+			/// ensure it SHOULD catch fire
+			if (obj->last_empire_id != NOTHING || !VEH_OWNER(veh)) {
+				// ensure empire is at war
+				emp = VEH_OWNER(veh);
+				enemy = real_empire(obj->last_empire_id);
+				
+				// check for war
+				if (!emp || (enemy && (pol = find_relation(enemy, emp)) && IS_SET(pol->type, DIPL_WAR))) {
+					if (ROOM_PEOPLE(IN_ROOM(obj))) {
+						act("A stray ember from $p ignites $V!", FALSE, ROOM_PEOPLE(IN_ROOM(obj)), obj, veh, TO_CHAR | TO_ROOM);
+					}
+					start_vehicle_burning(veh);
+					
+					if (emp && obj->last_owner_id > 0 && (pyro = is_playing(obj->last_owner_id))) {
+						add_offense(emp, OFFENSE_BURNED_VEHICLE, pyro, IN_ROOM(obj), offense_was_seen(pyro, emp, IN_ROOM(obj)) ? OFF_SEEN : NOBITS);
+					}
+				}
+			}
+		}
+		else if (!veh && (home = HOME_ROOM(IN_ROOM(obj))) && ROOM_BLD_FLAGGED(home, BLD_BURNABLE) && !IS_BURNING(home)) {
+			// burnable building
 			// only items with an empire id are considered: you can't burn stuff down by accident (unless the building is unowned)
 			if (obj->last_empire_id != NOTHING || !ROOM_OWNER(home)) {
 				// check that the empire is at war
@@ -1593,7 +1615,7 @@ EVENTFUNC(obj_hour_event) {
 					start_burning(home);
 					
 					if (emp && obj->last_owner_id > 0 && (pyro = is_playing(obj->last_owner_id))) {
-						add_offense(emp, OFFENSE_BURNED_BUILDING, pyro, IN_ROOM(pyro), offense_was_seen(pyro, emp, IN_ROOM(obj)) ? OFF_SEEN : NOBITS);
+						add_offense(emp, OFFENSE_BURNED_BUILDING, pyro, IN_ROOM(obj), offense_was_seen(pyro, emp, IN_ROOM(obj)) ? OFF_SEEN : NOBITS);
 					}
 				}
 			}
