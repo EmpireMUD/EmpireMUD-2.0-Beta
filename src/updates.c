@@ -2453,11 +2453,74 @@ void b5_151_terrain_fix(void) {
 }
 
 
-// b5.152 (1/2): fix durations on world and mob affs
-void b5_152_world_affects(void) {
+// b5.152 (1/4): Updates a "light" object with new data.
+void b5_152_light_update(obj_data *obj) {
+	obj_data *proto;
+	bool was_lit;
+	
+	if ((OBJ_FLAGGED(obj, OBJ_LIGHT) || IS_LIGHT(obj)) && (proto = obj_proto(GET_OBJ_VNUM(obj)))) {
+		was_lit = LIGHT_IS_LIT(obj);
+		
+		// type is always loaded from file -- no need to update
+		
+		// light flag likely removed
+		if (!OBJ_FLAGGED(proto, OBJ_LIGHT)) {
+			REMOVE_BIT(GET_OBJ_EXTRA(obj), OBJ_LIGHT);
+		}
+		
+		// timer likely changed, too: remove it if applicable
+		if (GET_OBJ_TIMER(proto) <= 0) {
+			GET_OBJ_TIMER(obj) = GET_OBJ_TIMER(proto);
+		}
+		
+		// match all 3 vals if it became a light type
+		if (IS_LIGHT(obj)) {
+			GET_OBJ_VAL(obj, 0) = GET_OBJ_VAL(proto, 0);
+			GET_OBJ_VAL(obj, 1) = GET_OBJ_VAL(proto, 1);
+			GET_OBJ_VAL(obj, 2) = GET_OBJ_VAL(proto, 2);
+		}
+		
+		// and is it really in the world? (not on a loaded character)
+		if (IN_ROOM(obj) || obj->in_vehicle || obj->in_obj || (obj->carried_by && IN_ROOM(obj->carried_by)) || (obj->worn_by && IN_ROOM(obj->worn_by))) {
+			request_obj_save_in_world(obj);
+			schedule_obj_timer_update(obj, FALSE);
+			
+			// and, did this shut the light off?
+			if (was_lit != LIGHT_IS_LIT(obj)) {
+				if (was_lit) {
+					apply_obj_light(obj, FALSE);
+				}
+				else {
+					apply_obj_light(obj, TRUE);
+				}
+			}
+		}
+	}
+}
+
+
+// b5.152 (2/4): Updates contents of a container -- only when carried by a player
+void b5_152_container_update(obj_data *obj) {
+	if (obj->next_content) {
+		b5_152_container_update(obj->next_content);
+	}
+	if (obj->contains) {
+		b5_152_container_update(obj->contains);
+	}
+	
+	b5_152_light_update(obj);
+}
+
+
+// b5.152 (3/4): replace lights and fix durations on world and mob affs
+void b5_152_world_update(void) {
 	room_data *room, *next_room;
 	char_data *mob;
+	obj_data *obj, *next_obj;
 	struct affected_type *af;
+	struct empire_unique_storage *eus;
+	struct trading_post_data *tpd;
+	empire_data *emp, *next_emp;
 	
 	// rooms
 	HASH_ITER(hh, world_table, room, next_room) {
@@ -2484,13 +2547,74 @@ void b5_152_world_affects(void) {
 			}
 		}
 	}
+	
+	// lights in the world
+	DL_FOREACH(object_list, obj) {
+		b5_152_light_update(obj);
+	}
+	
+	// lights in empire storage
+	HASH_ITER(hh, empire_table, emp, next_emp) {
+		DL_FOREACH(EMPIRE_UNIQUE_STORAGE(emp), eus) {
+			if ((obj = eus->obj)) {
+				b5_152_light_update(obj);
+			}
+		}
+		EMPIRE_NEEDS_STORAGE_SAVE(emp) = TRUE;
+	}
+	
+	// trading post
+	DL_FOREACH(trading_list, tpd) {
+		if ((obj = tpd->obj)) {
+			b5_152_light_update(obj);
+		}
+	}
+	save_trading_post();
+	
+	// and report on any objects that might be in the DB and unchanged
+	HASH_ITER(hh, object_table, obj, next_obj) {
+		if (OBJ_FLAGGED(obj, OBJ_LIGHT)) {
+			log("Warning: Object [%d] %s has LIGHT flag not converted by b5.152 patch (HELP LIGHT ITEM)", GET_OBJ_VNUM(obj), GET_OBJ_SHORT_DESC(obj));
+		}
+	}
 }
 
 
-// b5.152 (2/2): fix durations on player affs
-PLAYER_UPDATE_FUNC(b5_152_player_affects) {
+// b5.152 (4/4): replace lights and fix durations on player affs
+PLAYER_UPDATE_FUNC(b5_152_player_update) {
 	struct affected_type *af;
+	struct empire_unique_storage *eus;
+	obj_data *obj;
+	int pos;
 	
+	check_delayed_load(ch);
+	
+	// equipment
+	for (pos = 0; pos < NUM_WEARS; ++pos) {
+		if ((obj = GET_EQ(ch, pos))) {
+			b5_152_light_update(obj);
+			if (obj->contains) {
+				b5_152_container_update(obj->contains);
+			}
+		}
+	}
+	
+	// inventory
+	DL_FOREACH2(ch->carrying, obj, next_content) {
+		b5_152_light_update(obj);
+		if (obj->contains) {
+			b5_152_container_update(obj->contains);
+		}
+	}
+	
+	// home storage
+	DL_FOREACH(GET_HOME_STORAGE(ch), eus) {
+		if ((obj = eus->obj)) {
+			b5_152_light_update(obj);
+		}
+	}
+	
+	// affect durations
 	LL_FOREACH(ch->affected, af) {
 		// these were saved in 5-second updates and are now in 1-second intervals instead
 		// log("%s: %d %ld", GET_PC_NAME(ch), af->type, af->expire_time);
@@ -2563,7 +2687,7 @@ const struct {
 	{ "b5.134", NULL, b5_134_update_players, "Wiped map memory for screenreader users to clear bad data" },
 	{ "b5.151", b5_151_road_fix, NULL, "Applying hide-real-name flag to customized roads" },
 	{ "b5.151.1", b5_151_terrain_fix, NULL, "Repairing bad terrains and updating with new oases and irrigated terrains" },
-	{ "b5.152", b5_152_world_affects, b5_152_player_affects, "Updating expire times on player, mob, and world affects" },
+	{ "b5.152", b5_152_world_update, b5_152_player_update, "Updating lights and expire times on player, mob, and world affects" },
 	
 	{ "\n", NULL, NULL, "\n" }	// must be last
 };
