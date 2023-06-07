@@ -223,6 +223,7 @@ morph_data *sorted_morphs = NULL;	// alphabetic version // sorted_hh
 obj_data *object_list = NULL;	// global doubly-linked list of objs
 obj_data *object_table = NULL;	// hash table of objs
 bool suspend_autostore_updates = FALSE;	// prevents rescheduling an event twice in a row
+bool add_chaos_to_obj_timers = FALSE;	// spreads out object timers
 
 // safe obj iterators
 obj_data *purge_bound_items_next = NULL;	// used in purge_bound_items()

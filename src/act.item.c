@@ -4264,6 +4264,11 @@ void trade_post(char_data *ch, char *argument) {
 		
 		charge_coins(ch, GET_LOYALTY(ch), post_cost, NULL);
 		
+		// SEV_x: events that must be canceled or changed when an item is posted
+		cancel_stored_event(&GET_OBJ_STORED_EVENTS(obj), SEV_OBJ_AUTOSTORE);
+		cancel_stored_event(&GET_OBJ_STORED_EVENTS(obj), SEV_OBJ_TIMER);
+		// TODO: convert to a timer that can tick while in the trade queue? or prevent timer items from trade
+		
 		CREATE(tpd, struct trading_post_data, 1);
 		
 		// put at end of list

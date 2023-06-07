@@ -10318,6 +10318,11 @@ void store_unique_item(char_data *ch, struct empire_unique_storage **to_list, ob
 		set_obj_val(obj, VAL_DRINK_CONTAINER_TYPE, LIQ_WATER);
 	}
 	
+	// SEV_x: events that must be canceled or changed when an item is stored
+	cancel_stored_event(&GET_OBJ_STORED_EVENTS(obj), SEV_OBJ_AUTOSTORE);
+	cancel_stored_event(&GET_OBJ_STORED_EVENTS(obj), SEV_OBJ_TIMER);
+	// TODO: convert to a timer that can tick while stored
+	
 	// existing eus entry or new one? only passes 'room' if it's an empire; player storage is global
 	if ((eus = find_eus_entry(obj, *to_list, save_emp ? room : NULL))) {
 		// check limits

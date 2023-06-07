@@ -1726,6 +1726,10 @@ void schedule_obj_timer_update(obj_data *obj, bool override) {
 	
 	// we only schedule here, not cancel -- it will cancel itself
 	if (seconds > 0) {
+		if (add_chaos_to_obj_timers) {
+			seconds += number(0, SECS_PER_MUD_HOUR-1);
+		}
+		
 		CREATE(data, struct obj_event_data, 1);
 		data->obj = obj;
 		

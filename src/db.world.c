@@ -2009,6 +2009,9 @@ void startup_room_reset(void) {
 	// prevent putting things in rooms from triggering a save
 	block_world_save_requests = TRUE;
 	
+	// randomly spread out object timers so they're not all on the same second
+	add_chaos_to_obj_timers = TRUE;
+	
 	HASH_ITER(hh, world_table, room, next_room) {
 		affect_total_room(room);
 		if (room->reset_commands) {
@@ -2017,6 +2020,7 @@ void startup_room_reset(void) {
 	}
 	
 	block_world_save_requests = FALSE;
+	add_chaos_to_obj_timers = FALSE;
 }
 
 
