@@ -1109,7 +1109,12 @@ void do_light_vehicle(char_data *ch, vehicle_data *veh, obj_data *lighter) {
 		msg_to_char(ch, "It is already on fire!\r\n");
 	}
 	else if (VEH_OWNER(veh) && GET_LOYALTY(ch) != VEH_OWNER(veh) && !has_relationship(GET_LOYALTY(ch), VEH_OWNER(veh), DIPL_WAR)) {
+		// owned vehicle
 		msg_to_char(ch, "You can't burn %s %ss unless you're at war.\r\n", EMPIRE_ADJECTIVE(VEH_OWNER(veh)), VEH_OR_BLD(veh));
+	}
+	else if (!VEH_OWNER(veh) && ROOM_OWNER(IN_ROOM(veh)) && GET_LOYALTY(ch) != ROOM_OWNER(IN_ROOM(veh)) && !has_relationship(GET_LOYALTY(ch), ROOM_OWNER(IN_ROOM(veh)), DIPL_WAR)) {
+		// unowned vehicle in owned room
+		msg_to_char(ch, "You can't burn %ss on %s land unless you're at war.\r\n", VEH_OR_BLD(veh), EMPIRE_ADJECTIVE(VEH_OWNER(veh)));
 	}
 	else {
 		snprintf(buf, sizeof(buf), "You %s $V on fire!", (lighter ? "use $p to light" : "light"));
