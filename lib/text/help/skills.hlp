@@ -264,7 +264,7 @@ Usage:  light <item | building | vehicle | area | direction>
 To light something, you must have fire sticks or some other lighter. You may
 light sticks to create torches. You can also light trees or logs to make camp
 fires. Dropping a torch (or lighting a fire) may burn down the building it's
-in, if it's unowned or you are at war with the owner.
+in, if it's unowned or if you are at war with the owner.
 
 Some lighters have a limited number of uses and will be thrown away afterwards.
 If you have marked a lighter 'keep', it won't be used (unless it has unlimited
