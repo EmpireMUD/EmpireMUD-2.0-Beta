@@ -373,20 +373,21 @@ building is claimed, you must be at war with the owner to do this. Buildings
 may also catch fire when a torch is dropped or thrown into them.
 
 You can also burn the area (either with 'burn area' or with any keyword from
-the room title) to remove stumps and other features. This only works on certain
-terrain, and only on the room you're in.
+the room title) to remove stumps and other features. It can also be used to
+burn crops and seeded fields. This only works on certain terrain, and only on
+the tile you're on (not on adjacent tiles).
 
 Some lighters have a limited number of uses and will be thrown away afterwards.
 If you have marked a lighter 'keep', it won't be used (unless it has unlimited
 uses).
 
-You can also burn down some vehicles.
+You can also burn down some vehicles. You cannot burn other players' property
+if you are not a member of an empire. Burning your own buildings and vehicles
+requires the 'dismantle' privilege.
 
 To light torches or other items, use 'light'.
 
-You cannot burn other players' property if you are not a member of an empire.
-
-See also: DOUSE, LIGHT, LIGHTERS, TORCH
+See also: DOUSE, LIGHT, LIGHTERS, TORCH, PRIVILEGES
 #
 BUY LIST SHOP SHOPS
 

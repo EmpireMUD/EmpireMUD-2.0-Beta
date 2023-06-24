@@ -3591,6 +3591,9 @@ void do_burn_building(char_data *ch, room_data *room, obj_data *lighter) {
 	else if (ROOM_OWNER(room) && GET_LOYALTY(ch) && ROOM_OWNER(room) != GET_LOYALTY(ch) && !has_relationship(GET_LOYALTY(ch), ROOM_OWNER(room), DIPL_WAR)) {
 		msg_to_char(ch, "You can't burn buildings owned by %s because you're not at war.\r\n", EMPIRE_NAME(ROOM_OWNER(room)));
 	}
+	else if (GET_LOYALTY(ch) && ROOM_OWNER(IN_ROOM(ch)) == GET_LOYALTY(ch) && !HAS_DISMANTLE_PRIV_FOR_BUILDING(ch, IN_ROOM(ch))) {
+		msg_to_char(ch, "You don't have permission to burn the empire's buildings (it requires the dismantle privilege).\r\n");
+	}
 	else if (!ROOM_BLD_FLAGGED(room, BLD_BURNABLE)) {
 		msg_to_char(ch, "It doesn't seem to be flammable.\r\n");
 	}

@@ -634,6 +634,10 @@ int CAN_CARRY_N(char_data *ch);	// formerly a macro
 #define COUNTS_AS_TERRITORY(room)  (HOME_ROOM(room) == (room) && !GET_ROOM_VEHICLE(room))
 #define LARGE_CITY_RADIUS(room)  (ROOM_BLD_FLAGGED((room), BLD_LARGE_CITY_RADIUS) || ROOM_SECT_FLAGGED((room), SECTF_LARGE_CITY_RADIUS))
 
+// dismantle privilege: does NOT actually check owner -- which should be checked BEFORE this
+#define HAS_DISMANTLE_PRIV_FOR_VEHICLE(ch, veh)  (!VEH_OWNER(veh) || !GET_LOYALTY(ch) || GET_RANK(ch) >= EMPIRE_PRIV(GET_LOYALTY(ch), PRIV_DISMANTLE) || get_vehicle_extra_data((veh), ROOM_EXTRA_ORIGINAL_BUILDER) == GET_ACCOUNT(ch)->id)
+#define HAS_DISMANTLE_PRIV_FOR_BUILDING(ch, room)  (can_use_room(ch, (room), MEMBERS_ONLY) && (has_permission(ch, PRIV_DISMANTLE, (room)) || get_room_extra_data((room), ROOM_EXTRA_ORIGINAL_BUILDER) == GET_ACCOUNT(ch)->id))
+
 // deprecated
 #define EMPIRE_CITY_TERRITORY(emp)  EMPIRE_TERRITORY(emp, TER_CITY)
 #define EMPIRE_OUTSIDE_TERRITORY(emp)  EMPIRE_TERRITORY(emp, TER_OUTSKIRTS)

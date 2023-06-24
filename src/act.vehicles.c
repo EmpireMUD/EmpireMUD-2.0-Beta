@@ -1116,6 +1116,9 @@ void do_light_vehicle(char_data *ch, vehicle_data *veh, obj_data *lighter) {
 		// unowned vehicle in owned room
 		msg_to_char(ch, "You can't burn %ss on %s land unless you're at war.\r\n", VEH_OR_BLD(veh), EMPIRE_ADJECTIVE(VEH_OWNER(veh)));
 	}
+	else if (VEH_OWNER(veh) && GET_LOYALTY(ch) == VEH_OWNER(veh) && !HAS_DISMANTLE_PRIV_FOR_VEHICLE(ch, veh)) {
+		msg_to_char(ch, "You don't have permission to burn the empire's %ss (it requires the dismantle privilege).\r\n", VEH_OR_BLD(veh));
+	}
 	else {
 		snprintf(buf, sizeof(buf), "You %s $V on fire!", (lighter ? "use $p to light" : "light"));
 		act(buf, FALSE, ch, lighter, veh, TO_CHAR);

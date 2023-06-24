@@ -798,10 +798,11 @@ Newbie island crops:
 
 Most crops are used to make food and drink. Some, like cotton, have other uses.
 More crops come from adventures. Make sure you claim all your map tiles that
-have crops as unclaimed crops may vanish at the end of the year.
+have crops as unclaimed crops may vanish at the end of the year. Crops can be
+burnt to remove them, even when they're still growing.
 
-See also: CHOP, COOK, FORAGE, HARVEST, MILL, PICK, PLANT, TAVERN, WEAVE,
-    IRRIGATION
+See also: BURN, CHOP, COOK, FORAGE, HARVEST, MILL, PICK, PLANT, TAVERN, WEAVE,
+   IRRIGATION
 #
 APRICOTS CUCUMBERS GARLIC LEMONS SUGARCANE
 

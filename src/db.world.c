@@ -840,7 +840,12 @@ void perform_burn_room(room_data *room, int evo_type) {
 	
 	if ((evo = get_evolution_by_type(SECT(room), evo_type)) && (sect = sector_proto(evo->becomes)) && SECT(room) != sect) {
 		if (ROOM_PEOPLE(room)) {
-			strcpy(from, GET_SECT_NAME(SECT(room)));
+			if (ROOM_CROP(room)) {
+				strcpy(from, GET_CROP_NAME(ROOM_CROP(room)));
+			}
+			else {
+				strcpy(from, GET_SECT_NAME(SECT(room)));
+			}
 			strtolower(from);
 			strcpy(to, GET_SECT_NAME(sect));
 			strtolower(to);

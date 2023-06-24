@@ -588,6 +588,9 @@ bool validate_burn_area(char_data *ch) {
 	else if (ROOM_AFF_FLAGGED(IN_ROOM(ch), ROOM_AFF_NO_EVOLVE)) {
 		msg_to_char(ch, "You can't burn the area right now.\r\n");
 	}
+	else if (GET_LOYALTY(ch) && IS_ANY_BUILDING(IN_ROOM(ch)) && ROOM_OWNER(IN_ROOM(ch)) == GET_LOYALTY(ch) && !HAS_DISMANTLE_PRIV_FOR_BUILDING(ch, IN_ROOM(ch))) {
+		msg_to_char(ch, "You don't have permission to burn the empire's buildings (it requires the dismantle privilege).\r\n");
+	}
 	else if (!objless && !lighter) {
 		// nothing to light it with
 		if (kept) {
@@ -1381,6 +1384,12 @@ void process_burn_area(char_data *ch) {
 			act("You light some fires!", FALSE, ch, NULL, NULL, TO_CHAR);
 			act("$n lights some fires!", FALSE, ch, NULL, NULL, TO_ROOM);
 			gain_player_tech_exp(ch, PTECH_LIGHT_FIRE, 15);
+		}
+		
+		// alert?
+		if (ROOM_OWNER(IN_ROOM(ch)) && ROOM_OWNER(IN_ROOM(ch)) != GET_LOYALTY(ch)) {
+			log_to_empire(ROOM_OWNER(IN_ROOM(ch)), ELOG_HOSTILITY, "Someone has burned (%d, %d) %s", X_COORD(IN_ROOM(ch)), Y_COORD(IN_ROOM(ch)), get_room_name(IN_ROOM(ch), FALSE));
+			add_offense(ROOM_OWNER(IN_ROOM(ch)), OFFENSE_BURNED_TILE, ch, IN_ROOM(ch), offense_was_seen(ch, ROOM_OWNER(IN_ROOM(ch)), IN_ROOM(ch)) ? OFF_SEEN : NOBITS);
 		}
 		
 		// finished burning
