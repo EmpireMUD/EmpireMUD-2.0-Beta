@@ -1696,6 +1696,10 @@ void start_burning(room_data *room) {
 	stop_room_action(room, ACT_BUILDING);
 	stop_room_action(room, ACT_DISMANTLING);
 	
+	if (ROOM_OWNER(room)) {
+		log_to_empire(ROOM_OWNER(room), ELOG_HOSTILITY, "Your %s has caught on fire at (%d, %d)", GET_BUILDING(room) ? skip_filler(GET_BLD_NAME(GET_BUILDING(room))) : "building", X_COORD(room), Y_COORD(room));
+	}
+	
 	// messaging
 	LL_FOREACH(descriptor_list, desc) {
 		if (STATE(desc) == CON_PLAYING && desc->character && AWAKE(desc->character) && HOME_ROOM(IN_ROOM(desc->character)) == HOME_ROOM(room)) {
