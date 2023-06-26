@@ -2573,7 +2573,8 @@ void b5_152_world_update(void) {
 	
 	// and report on any objects that might be in the DB and unchanged
 	HASH_ITER(hh, object_table, obj, next_obj) {
-		if (OBJ_FLAGGED(obj, OBJ_LIGHT)) {
+		// this ignores only 2 vnums that keep LIGHT flags in the stock distribution
+		if (OBJ_FLAGGED(obj, OBJ_LIGHT) && GET_OBJ_VNUM(obj) != 10303 && GET_OBJ_VNUM(obj) != 10502) {
 			log("Warning: Object [%d] %s has LIGHT flag not converted by b5.152 patch (HELP LIGHT ITEM)", GET_OBJ_VNUM(obj), GET_OBJ_SHORT_DESC(obj));
 		}
 	}
