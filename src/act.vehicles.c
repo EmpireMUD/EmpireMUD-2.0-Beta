@@ -1114,7 +1114,7 @@ void do_light_vehicle(char_data *ch, vehicle_data *veh, obj_data *lighter) {
 	}
 	else if (!VEH_OWNER(veh) && ROOM_OWNER(IN_ROOM(veh)) && GET_LOYALTY(ch) != ROOM_OWNER(IN_ROOM(veh)) && !has_relationship(GET_LOYALTY(ch), ROOM_OWNER(IN_ROOM(veh)), DIPL_WAR)) {
 		// unowned vehicle in owned room
-		msg_to_char(ch, "You can't burn %ss on %s land unless you're at war.\r\n", VEH_OR_BLD(veh), EMPIRE_ADJECTIVE(VEH_OWNER(veh)));
+		msg_to_char(ch, "You can't burn %ss on %s land unless you're at war.\r\n", VEH_OR_BLD(veh), EMPIRE_ADJECTIVE(ROOM_OWNER(IN_ROOM(veh))));
 	}
 	else if (VEH_OWNER(veh) && GET_LOYALTY(ch) == VEH_OWNER(veh) && !HAS_DISMANTLE_PRIV_FOR_VEHICLE(ch, veh)) {
 		msg_to_char(ch, "You don't have permission to burn the empire's %ss (it requires the dismantle privilege).\r\n", VEH_OR_BLD(veh));
