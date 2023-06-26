@@ -1119,7 +1119,7 @@ void olc_fullsearch_obj(char_data *ch, char *argument) {
 	bitvector_t find_applies = NOBITS, found_applies, not_flagged = NOBITS, only_flags = NOBITS;
 	bitvector_t only_worn = NOBITS, only_affs = NOBITS;
 	bitvector_t find_interacts = NOBITS, found_interacts, find_custom = NOBITS, found_custom;
-	bitvector_t only_tools = NOBITS;
+	bitvector_t only_tools = NOBITS, only_light_flags = NOBITS;
 	int count, only_level = NOTHING, only_type = NOTHING, only_mat = NOTHING;
 	int only_weapontype = NOTHING, vmin = NOTHING, vmax = NOTHING;
 	bool only_storable = FALSE, not_storable = FALSE;
@@ -1154,6 +1154,7 @@ void olc_fullsearch_obj(char_data *ch, char *argument) {
 		FULLSEARCH_FLAGS("flagged", only_flags, extra_bits)
 		FULLSEARCH_FLAGS("interaction", find_interacts, interact_types)
 		FULLSEARCH_INT("level", only_level, 0, INT_MAX)
+		FULLSEARCH_FLAGS("lightflags", only_light_flags, light_flags)
 		FULLSEARCH_LIST("material", only_mat, (const char **)olc_material_list)
 		FULLSEARCH_BOOL("storable", only_storable)
 		FULLSEARCH_FLAGS("tools", only_tools, tool_flags)
@@ -1206,6 +1207,9 @@ void olc_fullsearch_obj(char_data *ch, char *argument) {
 			continue;
 		}
 		if (only_flags != NOBITS && (GET_OBJ_EXTRA(obj) & only_flags) != only_flags) {
+			continue;
+		}
+		if (only_light_flags != NOBITS && (!IS_LIGHT(obj) || (GET_LIGHT_FLAGS(obj) & only_light_flags) != only_light_flags)) {
 			continue;
 		}
 		if (only_worn != NOBITS && (GET_OBJ_WEAR(obj) & only_worn) != only_worn) {

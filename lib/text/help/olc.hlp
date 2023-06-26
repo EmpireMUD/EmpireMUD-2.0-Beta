@@ -5674,6 +5674,9 @@ Fields:
   &c-wear&0 - see HELP OEDIT WEAR
   &c-vmin&0, &c-vmax&0 - VNUM range limits
 
+Type-based fields:
+  &c-lightflags&0 - see HELP LIGHT ITEM
+
 Examples:
  > .o fullsearch -type WEAPON -wear HOLD
  > .o fullsearch -flagged LARGE -flagged BOP
