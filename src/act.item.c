@@ -1526,7 +1526,7 @@ static void wear_message(char_data *ch, obj_data *obj, int where) {
 bool use_hour_of_light(obj_data *obj, bool messages) {
 	bool was_lit = LIGHT_IS_LIT(obj) ? TRUE : FALSE;
 	
-	if (IS_LIGHT(obj)) {
+	if (IS_LIGHT(obj) && GET_LIGHT_IS_LIT(obj)) {
 		// charge 1 hour
 		if (GET_LIGHT_HOURS_REMAINING(obj) > 0) {
 			set_obj_val(obj, VAL_LIGHT_HOURS_REMAINING, GET_LIGHT_HOURS_REMAINING(obj) - 1);
@@ -1560,10 +1560,12 @@ bool use_hour_of_light(obj_data *obj, bool messages) {
 				return FALSE;	// purged
 			}
 		}
+		
+		// save soon
+		request_obj_save_in_world(obj);
 	}
 	
 	// safe
-	request_obj_save_in_world(obj);
 	return TRUE;
 }
 
