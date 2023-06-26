@@ -189,12 +189,16 @@ bool douse_light(obj_data *obj) {
 		set_obj_val(obj, VAL_LIGHT_IS_LIT, 0);
 		apply_obj_light(obj, FALSE);
 		
+		// should not be storable after this
+		SET_BIT(GET_OBJ_EXTRA(obj), OBJ_NO_STORE);
+		
 		if (LIGHT_FLAGGED(obj, LIGHT_FLAG_DESTROY_WHEN_DOUSED) || (GET_LIGHT_HOURS_REMAINING(obj) == 0 && LIGHT_FLAGGED(obj, LIGHT_FLAG_JUNK_WHEN_EXPIRED))) {
 			extract_obj(obj);
 			return FALSE;	// purged
 		}
 	}
 	
+	request_obj_save_in_world(obj);
 	return TRUE;	// not purged
 }
 
@@ -1526,6 +1530,9 @@ bool use_hour_of_light(obj_data *obj, bool messages) {
 		// charge 1 hour
 		if (GET_LIGHT_HOURS_REMAINING(obj) > 0) {
 			set_obj_val(obj, VAL_LIGHT_HOURS_REMAINING, GET_LIGHT_HOURS_REMAINING(obj) - 1);
+			
+			// and ensure it's set no-store
+			SET_BIT(GET_OBJ_EXTRA(obj), OBJ_NO_STORE);
 		}
 		
 		// turn it off if necessary
@@ -1556,6 +1563,7 @@ bool use_hour_of_light(obj_data *obj, bool messages) {
 	}
 	
 	// safe
+	request_obj_save_in_world(obj);
 	return TRUE;
 }
 
@@ -6441,6 +6449,10 @@ ACMD(do_light) {
 			set_obj_val(obj, VAL_LIGHT_IS_LIT, 1);
 			apply_obj_light(obj, TRUE);
 			schedule_obj_timer_update(obj, FALSE);
+			
+			// set no-store only if we kept the same object
+			SET_BIT(GET_OBJ_EXTRA(obj), OBJ_NO_STORE);
+			request_obj_save_in_world(obj);
 		}
 		else {
 			// running interactions: will extract no matter what happens here
