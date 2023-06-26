@@ -69,11 +69,15 @@ A lantern has been set here.~
 'douse lantern' to save wax. You can refill the lantern with 'put candle
 lantern'.
 ~
-29 0 a 0 6
+29 0 a 0 7
 48 0 2
 8 0
 C
 1 1
+R
+4 5121 0
+R
+4 5610 0
 T 804
 S
 #805
@@ -157,12 +161,16 @@ A candle is sitting on the ground.~
    Candles have long been a simple way to see at night. Use 'light candle' and
 'douse candle' to use it.
 ~
-29 l ao 0 9
+29 l ao 0 10
 8 0 7
 9 0
 C
 1 1
 O+ 1 851
+R
+4 5121 0
+R
+4 5610 0
 S
 #852
 candle~

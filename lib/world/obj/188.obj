@@ -1362,11 +1362,17 @@ A jack-o-lantern is sitting here.~
    This big orange pumpkin has been cut to look like a face. Use 'light
 jack-o-lantern' and 'douse jack-o-lantern' to control the light.
 ~
-29 0 ao 0 6
+29 0 ao 0 7
 36 0 6
 7 168
 C
 1 1
+R
+4 5121 0
+R
+4 5610 0
+R
+4 5606 0
 S
 #18896
 jack-o-lantern lantern jackolantern~
