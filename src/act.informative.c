@@ -2280,6 +2280,7 @@ ACMD(do_chart) {
 	empire_data *emp, *next_emp;
 	int iter, total_claims, num;
 	struct island_info *isle;
+	struct empire_island *eisle;
 	bool any, city_prompt;
 	
 	skip_spaces(&argument);
@@ -2295,10 +2296,41 @@ ACMD(do_chart) {
 	}
 	else {
 		msg_to_char(ch, "Chart information for %s:\r\n", get_island_name_for(isle->id, ch));
+		
+		// alternat names
 		if (GET_LOYALTY(ch) && (e_isle = get_empire_island(GET_LOYALTY(ch), isle->id)) && e_isle->name && strcmp(e_isle->name, isle->name)) {
 			// show global name if different
-			msg_to_char(ch, "Also known as: %s\r\n", isle->name);
+			msg_to_char(ch, "Also known as: %s", isle->name);
+			num = 1;
 		}
+		else {
+			num = 0;	// not shown yet
+		}
+		
+		// alternate names
+		num = 0;
+		HASH_ITER(hh, empire_table, emp, next_emp) {
+			if (EMPIRE_IS_TIMED_OUT(emp) || emp == GET_LOYALTY(ch) || !has_relationship(GET_LOYALTY(ch), emp, DIPL_NONAGGR | DIPL_ALLIED | DIPL_TRADE)) {
+				continue;
+			}
+			if (!(eisle = get_empire_island(emp, isle->id)) || !eisle->name) {
+				continue;
+			}
+			
+			// definitely has a name
+			if (num > 0) {
+				msg_to_char(ch, ", %s (%s)", eisle->name, EMPIRE_NAME(emp));
+			}
+			else {
+				msg_to_char(ch, "Also known as: %s (%s)", eisle->name, EMPIRE_NAME(emp));
+			}
+			++num;
+		}
+		if (num > 0) {
+			msg_to_char(ch, "\r\n");
+		}
+		
+		// desc
 		if (isle->desc) {
 			send_to_char(isle->desc, ch);
 		}
