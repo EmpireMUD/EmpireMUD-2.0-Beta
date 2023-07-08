@@ -436,7 +436,11 @@ If any land is claimed, the three empires with the most claims are listed
 (in descending order). All empires with cities are listed below that, although
 only one city is listed per empire. Outposts are not listed.
 
-See also: ISLANDS, SURVEY
+This command also shows names that other empires call the island. You can only
+see these names if you have a trade pact, non-aggression pact, or alliance with
+the empire.
+
+See also: DIPLOMACY, ISLANDS, SURVEY
 #
 CIRCLE
 
@@ -1105,7 +1109,7 @@ aren't already following someone.
 The leader can use 'group options anonymous' to prevent members from seeing
 each others' locations.
 
-See also: ADVENTURE SUMMON, GSAY
+See also: ADVENTURE SUMMON, GSAY, SUMMARY
 #
 GSAY GTELL PSAY PTELL
 
