@@ -250,7 +250,7 @@ Usage:  pickpocket <victim>
 
 A skilled thief can lift small items from an unsuspecting victim.
 
-You can only pickpocket NPCs, and even then usually only human ones. Thi
+You can only pickpocket NPCs, and even then usually only human ones. This
 ability does not remove items you see in their inventories, only "pocket
 items". The result is largely random but often includes coins. Each NPC can
 only be pickpocketed once.
