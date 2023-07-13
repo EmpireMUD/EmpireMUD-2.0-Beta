@@ -2207,7 +2207,7 @@ Usage:  score
 The score command provides you all the important information about your
 character, including health and attributes.
 
-Your top two skills are dsplayed, if both of these skills are past 75. The
+Your top two skills are displayed, if both of these skills are past 75. The
 level shown on score is your total level, with your skill level shown in
 parentheses.
 
