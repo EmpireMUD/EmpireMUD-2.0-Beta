@@ -5874,13 +5874,18 @@ ACMD(do_tavern) {
 }
 
 
-ACMD(do_tomb) {	
-	room_data *tomb = real_room(GET_TOMB_ROOM(ch)), *real = HOME_ROOM(IN_ROOM(ch));
+ACMD(do_tomb) {
+	struct empire_territory_data *ter, *next_ter;
+	room_data *tomb, *real;
+	char buf[MAX_STRING_LENGTH], line[256];
+	size_t size;
 	
 	if (IS_NPC(ch)) {
 		return;
 	}
 	
+	tomb = real_room(GET_TOMB_ROOM(ch));
+	real = HOME_ROOM(IN_ROOM(ch));
 	skip_spaces(&argument);
 	
 	if (!*argument) {
@@ -5888,13 +5893,50 @@ ACMD(do_tomb) {
 			msg_to_char(ch, "You have no tomb set.\r\n");
 		}
 		else {
-			msg_to_char(ch, "Your tomb is at: %s%s\r\n", get_room_name(tomb, FALSE), coord_display_room(ch, tomb, FALSE));
+			msg_to_char(ch, "Your tomb is at: %s%s%s\r\n", get_room_name(tomb, FALSE), coord_display_room(ch, tomb, FALSE), (GET_ISLAND_ID(tomb) == GET_ISLAND_ID(IN_ROOM(ch))) ? "" : " (different island)");
 		}
 		
 		// additional info
 		if (tomb && !can_use_room(ch, tomb, GUESTS_ALLOWED)) {
 			msg_to_char(ch, "You no longer have access to that tomb because it's owned by %s.\r\n", ROOM_OWNER(tomb) ? EMPIRE_NAME(ROOM_OWNER(tomb)) : "someone else");
 		}
+		
+		// list of valid tombs on this island?
+		if (GET_LOYALTY(ch)) {
+			*buf = '\0';
+			size = 0;
+			HASH_ITER(hh, EMPIRE_TERRITORY_LIST(GET_LOYALTY(ch)), ter, next_ter) {
+				if (GET_ISLAND_ID(ter->room) != GET_ISLAND_ID(IN_ROOM(ch))) {
+					continue;	// wrong island
+				}
+				if (!room_has_function_and_city_ok(GET_LOYALTY(ch), ter->room, FNC_TOMB)) {
+					continue;	// not a tomb
+				}
+				
+				// ok:
+				snprintf(line, sizeof(line), "%s %s%s", coord_display_room(ch, ter->room, TRUE), get_room_name(ter->room, FALSE), (ter->room == tomb) ? " (current)" : "");
+				
+				if (!*buf) {
+					// add header
+					size = snprintf(buf, sizeof(buf), "Tombs on this island:\r\n");
+				}
+				
+				// append
+				if (size + strlen(line) + 20 < sizeof(buf)) {
+					size += snprintf(buf + size, sizeof(buf) - size, "%s\r\n", line);
+				}
+				else {
+					size += snprintf(buf + size, sizeof(buf) - size, "OVERFLOW\r\n");
+					break;
+				}
+			}
+			
+			if (*buf) {
+				send_to_char(buf, ch);
+			}
+		}
+		
+		// can set here?
 		if (room_has_function_and_city_ok(GET_LOYALTY(ch), IN_ROOM(ch), FNC_TOMB)) {
 			msg_to_char(ch, "Use 'tomb set' to change your tomb to this room.\r\n");
 		}

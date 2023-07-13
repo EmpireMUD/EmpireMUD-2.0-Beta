@@ -2662,6 +2662,9 @@ it's nearby. Otherwise, you'll find yourself at a random tomb or cemetery
 on the continent where you died, or at a starting location if there isn't a
 tomb available.
 
+Typing 'tomb' by itself will show your current tomb plus any available tombs
+on your current island.
+
 Basic tombs:
   ..x.  Grave  (newbie grave marker)
   ..x.  Family Gravesite (Build ability)
