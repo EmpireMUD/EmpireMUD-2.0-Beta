@@ -1580,6 +1580,15 @@ If the mob is out of combat long enough to heal, it will also reset its tags.
 
 See also: BINDING
 #
+"TIME ZONE" "TIME ZONES"
+
+This game has different time zones that depend on how far east or west you
+travel on the map. By default, the world has 24 time zones and wraps from east
+to west. The latest time zone is always the one that's furthest east, and is
+the time zone used for global events like the yearly reset.
+
+See also: TIME, YEARLY RESET
+#
 TIP TIPS "TIP OF THE DAY" HINT
 
 Usage:  tip
@@ -1730,6 +1739,24 @@ in the loot from any mob in the 100-200 range, or 200-300 range for the next
 tier above that.
 
 Many different types of items and recipes appear as world drops.
+#
+"YEARLY RESET" EARTHQUAKE QUAKE "NEW YEAR" "NEW YEARS"
+
+When the game world reaches a new year, there is an earthquake with the message
+'The ground under you shakes violently!' This causes a little damage to
+buildings and vehicles; they now require maintenance.
+
+This yearly reset also refreshes any mountain tile that no longer has a mine or
+other building on it, giving them a new type and fresh amount of ore. Other
+types of depletion, such as areas that have been dug until there's nothing left
+to dig up, refresh by 50% during the yearly reset -- even if there's still a
+building on them.
+
+The new year and earthquake happen at the end of December 30 and start of
+January 1 on the 'time' command in the latest time zone in the game. This means
+they may happen before the end of December 30 for many players.
+
+See also: MAINTAIN, TIME, TIME ZONE
 #
 ZENITH "ZENITH PASSAGE" "SUN ZENITH"
 
