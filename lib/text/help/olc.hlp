@@ -5666,6 +5666,12 @@ Fields:
   &c-level&0 - matches anything where this level is within the range
      (note: will not account for objects whose levels are inherited from mobs
      or adventures, see ADVEDIT CASCADE for help)
+  &c-lightflags&0 - see HELP OEDIT LIGHT FLAGS
+  &c-lighthours&0 - search for an exact number of hours of light
+  &c-lighthoursover&0 - search for a light with at least this many hours
+  &c-lighthoursunder&0 - search for a light with at most this many hours
+  &c-lightislit&0 - find lights that default to lit, excluding the LIGHT flag
+  &c-lightisunlit&0 - find lights that default to unlit
   &c-material&0 - see OEDIT MATERIAL
   &c-storable -unstorable&0 - Only get objects with or without storage sites.
   &c-tools&0 - see HELP OEDIT TOOLS
@@ -5685,6 +5691,8 @@ Examples:
 To search other fields, you can generally use the normal "search" option for
 other OLC types. For example, to find all objects with the "Minipet Use"
 trigger, use ".t search 9900".
+
+See also: LIGHT ITEM
 #d
 "OEDIT KEYWORDS"
 
