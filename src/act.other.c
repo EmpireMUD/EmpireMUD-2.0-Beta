@@ -358,6 +358,48 @@ void do_douse_obj(char_data *ch, obj_data *obj, obj_data *cont) {
 
 
 /**
+* Performs a douse on a room, with an optional water source pre-validated.
+*
+* @param char_data *ch The douser.
+* @param room_data *room The room to douse.
+* @param obj_data *cont Optional: The liquid container full of water (may be NULL).
+*/
+void do_douse_room(char_data *ch, room_data *room, obj_data *cont) {
+	int amount = 0;
+	
+	// ensure this
+	room = HOME_ROOM(room);
+	
+	if (cont && IS_DRINK_CONTAINER(cont)) {
+		amount = GET_DRINK_CONTAINER_CONTENTS(cont);
+		set_obj_val(cont, VAL_DRINK_CONTAINER_CONTENTS, 0);
+		set_obj_val(cont, VAL_DRINK_CONTAINER_TYPE, 0);
+		
+		act("You throw some water from $p onto the flames!", FALSE, ch, cont, NULL, TO_CHAR);
+		act("$n throws some water from $p onto the flames!", FALSE, ch, cont, NULL, TO_ROOM);
+	}
+	else {
+		// water from room/immortal
+		amount = config_get_int("fire_extinguish_value") / 4;
+		amount = MAX(amount, 1);
+		act("You throw some water onto the flames!", FALSE, ch, NULL, NULL, TO_CHAR);
+		act("$n throws some water onto the flames!", FALSE, ch, NULL, NULL, TO_ROOM);
+	}
+	
+	// and remove the fire...
+	add_to_room_extra_data(room, ROOM_EXTRA_FIRE_REMAINING, -amount);
+
+	if (get_room_extra_data(room, ROOM_EXTRA_FIRE_REMAINING) <= 0) {
+		act("The flames have been extinguished!", FALSE, ch, NULL, NULL, TO_CHAR | TO_ROOM);
+		if (room != IN_ROOM(ch) && ROOM_PEOPLE(room)) {
+			act("The flames have been extinguished!", FALSE, ROOM_PEOPLE(room), NULL, NULL, TO_CHAR | TO_ROOM);
+		}
+		stop_burning(room);
+	}
+}
+
+
+/**
 * Finds a minipet belonging to the character, if any.
 *
 * @param char_data *ch The player whose pet to look for.
@@ -2232,7 +2274,6 @@ ACMD(do_douse) {
 	obj_data *obj = NULL, *found_obj = NULL, *iter;
 	char arg[MAX_INPUT_LENGTH];
 	vehicle_data *veh;
-	int amount;
 	bool use_room;
 	
 	// prefer a room source
@@ -2270,31 +2311,11 @@ ACMD(do_douse) {
 	else if (GET_ROOM_VEHICLE(IN_ROOM(ch)) && VEH_FLAGGED(GET_ROOM_VEHICLE(IN_ROOM(ch)), VEH_ON_FIRE)) {
 		do_douse_vehicle(ch, GET_ROOM_VEHICLE(IN_ROOM(ch)), obj);
 	}
-	else if (!IS_ANY_BUILDING(IN_ROOM(ch)) || !IS_BURNING(room))
+	else if (!IS_ANY_BUILDING(IN_ROOM(ch)) || !IS_BURNING(room)) {
 		msg_to_char(ch, "There's no fire here!\r\n");
+	}
 	else {
-		if (obj) {
-			amount = GET_DRINK_CONTAINER_CONTENTS(obj);
-			set_obj_val(obj, VAL_DRINK_CONTAINER_CONTENTS, 0);
-			
-			act("You throw some water from $p onto the flames!", FALSE, ch, obj, NULL, TO_CHAR);
-			act("$n throws some water from $p onto the flames!", FALSE, ch, obj, NULL, TO_ROOM);
-		}
-		else {
-			// water from room/immortal
-			amount = config_get_int("fire_extinguish_value") / 4;
-			amount = MAX(amount, 1);
-			act("You throw some water onto the flames!", FALSE, ch, NULL, NULL, TO_CHAR);
-			act("$n throws some water onto the flames!", FALSE, ch, NULL, NULL, TO_ROOM);
-		}
-		
-		// and remove the fire...
-		add_to_room_extra_data(room, ROOM_EXTRA_FIRE_REMAINING, -amount);
-
-		if (get_room_extra_data(room, ROOM_EXTRA_FIRE_REMAINING) <= 0) {
-			act("The flames have been extinguished!", FALSE, ch, 0, 0, TO_CHAR | TO_ROOM);
-			stop_burning(room);
-		}
+		do_douse_room(ch, room, obj);
 	}
 }
 

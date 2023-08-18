@@ -2070,6 +2070,7 @@ void adventure_summon(char_data *ch, char *argument);
 void adventure_unsummon(char_data *ch);
 void cancel_adventure_summon(char_data *ch);
 bool dismiss_any_minipet(char_data *ch);
+void do_douse_room(char_data *ch, room_data *room, obj_data *cont);
 
 // act.quest.c
 const char *color_by_difficulty(char_data *ch, int level);
