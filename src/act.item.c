@@ -1539,15 +1539,28 @@ bool use_hour_of_light(obj_data *obj, bool messages) {
 		if (GET_LIGHT_HOURS_REMAINING(obj) == 0) {
 			set_obj_val(obj, VAL_LIGHT_IS_LIT, 0);
 			
-			if (obj->worn_by) {
+			// to-char message
+			if ((obj->worn_by || obj->carried_by) && obj_has_custom_message(obj, OBJ_CUSTOM_DECAYS_ON_CHAR)) {
+				act(obj_get_custom_message(obj, OBJ_CUSTOM_DECAYS_ON_CHAR), FALSE, obj->worn_by ? obj->worn_by : obj->carried_by, obj, NULL, TO_CHAR);
+			}
+			else if (obj->worn_by) {
 				act("Your light burns out.", FALSE, obj->worn_by, obj, NULL, TO_CHAR);
-				act("$n's light burns out.", TRUE, obj->worn_by, obj, NULL, TO_ROOM);
 			}
 			else if (obj->carried_by) {
 				act("$p burns out.", FALSE, obj->carried_by, obj, NULL, TO_CHAR);
 			}
+			
+			// to-room message(s)
+			if (obj->worn_by) {
+				act("$n's light burns out.", TRUE, obj->worn_by, obj, NULL, TO_ROOM);
+			}
 			else if (IN_ROOM(obj) && ROOM_PEOPLE(IN_ROOM(obj))) {
-				act("$p burns out.", FALSE, ROOM_PEOPLE(IN_ROOM(obj)), obj, NULL, TO_CHAR | TO_ROOM);
+				if (obj_has_custom_message(obj, OBJ_CUSTOM_DECAYS_IN_ROOM)) {
+					act(obj_get_custom_message(obj, OBJ_CUSTOM_DECAYS_IN_ROOM), FALSE, ROOM_PEOPLE(IN_ROOM(obj)), obj, NULL, TO_CHAR | TO_ROOM);
+				}
+				else {
+					act("$p burns out.", FALSE, ROOM_PEOPLE(IN_ROOM(obj)), obj, NULL, TO_CHAR | TO_ROOM);
+				}
 			}
 			
 			// lights out (ensure it was lit coming in if we do this
@@ -6800,6 +6813,12 @@ ACMD(do_pour) {
 		if (!str_cmp(arg2, "out")) {
 			if (!CAN_WEAR(from_obj, ITEM_WEAR_TAKE)) {
 				msg_to_char(ch, "You can't pour that out.\r\n");
+				return;
+			}
+			
+			// shortcut through do_douse_room if it's water and burning
+			if (IS_ANY_BUILDING(IN_ROOM(ch)) && IS_BURNING(HOME_ROOM(IN_ROOM(ch))) && GET_DRINK_CONTAINER_TYPE(from_obj) == LIQ_WATER) {
+				do_douse_room(ch, IN_ROOM(ch), from_obj);
 				return;
 			}
 			

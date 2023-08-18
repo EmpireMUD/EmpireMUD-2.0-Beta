@@ -8361,6 +8361,11 @@ Object values:
        COOKING-FIRE - the player can cook with it
        DESTROY-WHEN-DOUSED - item is lost if they player douses it
 
+Light items also use these custom messages:
+ decays-on-char - When the light burns out (or its timer expires) while worn or
+   carried.
+ decays-in-room - When the light burns out (or its timer expires) in a room.
+
 Example lights:
 - torch: 18 hours of light, LIGHT-FIRE, CAN-DOUSE, JUNK-WHEN-EXPIRED
 - campfire: 24 hours of light, LIGHT-FIRE, JUNK-WHEN-EXPIRED, COOKING-FIRE,
