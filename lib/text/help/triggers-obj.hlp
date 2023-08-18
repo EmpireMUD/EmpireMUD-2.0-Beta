@@ -261,9 +261,6 @@ would be extracted. If you want to prevent the object's extraction, you should
 use the "otimer" command to change its timer to -1 (infinite) or to a new
 positive value, then return 0 from the script.
 
-If a player uses 'douse' to put out a torch/fire with a timer, it will
-immediately fire any timer triggers on that object.
-
 See also: OTIMER, OEDIT TIMER, DOUSE
 #d
 "WEAR TRIGGER" "OTRIG WEAR" TRIGEDIT-OBJ-WEAR

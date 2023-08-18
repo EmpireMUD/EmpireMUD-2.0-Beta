@@ -460,8 +460,6 @@ Triggers and Scripts (TRIGEDIT):
 - Consume triggers on poisons or arrows MUST return 0 if they purge the %self%
   items. You can also check "if %target%" to be sure you have someone to hit
   in these triggers.
-- If a player uses 'douse' to put out a torch/fire with a timer, it will
-  immediately fire any Timer triggers on the object.
 
 Vehicles (VEDIT):
 - Keywords should always have the most significant word first (the noun). This
