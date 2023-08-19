@@ -1491,13 +1491,14 @@ EVENTFUNC(obj_hour_event) {
 	int new_timer;
 	time_t timer;
 	
-	// ensure the object is in-game SOMEWHERE
-	if (!obj_room(obj)) {
-		return 0;	// do not re-enqueue
-	}
-	
 	// always delete first
 	delete_stored_event(&GET_OBJ_STORED_EVENTS(obj), SEV_OBJ_TIMER);
+	
+	// ensure the object is in-game SOMEWHERE
+	if (!obj_room(obj)) {
+		free(data);
+		return 0;	// do not re-enqueue
+	}
 	
 	// things we do here:
 	
