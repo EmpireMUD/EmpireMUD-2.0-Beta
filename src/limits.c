@@ -1491,6 +1491,11 @@ EVENTFUNC(obj_hour_event) {
 	int new_timer;
 	time_t timer;
 	
+	// ensure the object is in-game SOMEWHERE
+	if (!obj_room(obj)) {
+		return 0;	// do not re-enqueue
+	}
+	
 	// always delete first
 	delete_stored_event(&GET_OBJ_STORED_EVENTS(obj), SEV_OBJ_TIMER);
 	
@@ -1735,6 +1740,47 @@ void schedule_obj_timer_update(obj_data *obj, bool override) {
 		
 		ev = dg_event_create(obj_hour_event, data, seconds RL_SEC);
 		add_stored_event(&GET_OBJ_STORED_EVENTS(obj), SEV_OBJ_TIMER, ev);
+	}
+}
+
+
+/**
+* Schedules obj timers on an object plus any objects inside it, and inside
+* those objects, and so on.
+*
+* @param obj_data *obj The object to schedule timers on.
+*/
+static void schedule_all_obj_timers_recursive(obj_data *obj) {
+	obj_data *inner, *next_obj;
+	
+	if (obj) {
+		schedule_obj_timer_update(obj, TRUE);
+		DL_FOREACH_SAFE2(obj->contains, inner, next_obj, next_content) {
+			schedule_all_obj_timers_recursive(inner);
+	    }
+	}
+}
+
+
+/**
+* Called when a player enters the game to schedule timers as-needed for all
+* their items. May be called in other cases where this is appropriate, too. It
+* will override any existing timers on the items.
+*
+* @param char_data *ch The person whose objects need scheduling.
+*/
+void schedule_all_obj_timers(char_data *ch) {
+	obj_data *obj, *next_obj;
+	int pos;
+	
+	for (pos = 0; pos < NUM_WEARS; ++pos) {
+		if (GET_EQ(ch, pos)) {
+			schedule_all_obj_timers_recursive(GET_EQ(ch, pos));
+		}
+	}
+	
+	DL_FOREACH_SAFE2(ch->carrying, obj, next_obj, next_content) {
+		schedule_all_obj_timers_recursive(obj);
 	}
 }
 
