@@ -168,7 +168,7 @@ You can see the city radius by typing 'toggle political' and looking at the
 background highlight (on the visual map), or you can use the 'mark' command
 to measure distances from the center if you're using a screenreader.
 
-See also: MARK, CITY INFORMATION, CITY COMMANDS, PROGRESSION
+See also: MARK, CITY INFORMATION, CITY COMMANDS, EXTENDED RADIUS, PROGRESSION
 #
 CLAIM
 
@@ -603,6 +603,20 @@ inventory. This command will try to match an item in your inventory before
 searching the item database.
 
 See also: COINS, EXCHANGE RATE
+#
+"EXTENDED RADIUS" EXTENDED-RADIUS "LARGE CITY RADIUS" LARGE-CITY-RADIUS "LARGE RADIUS" LARGE-RADIUS
+
+A tile with the (extended radius) indicator after its city name indicates that
+it is actually in the city's outskirts, but it is a type of building or terrain
+that counts as in-city in the outskirts (4x city radius).
+
+For example, when you look at a room:
+This is the Autonomous outpost of Capital 1 (extended radius).
+
+The OLC flag for this is LARGE-CITY-RADIUS, and is available on buildings and
+sectors.
+
+See also: OUTSKIRTS, TERRITORY
 #
 FAME
 
@@ -1124,7 +1138,7 @@ outskirts.
 When an empire's members start to time out from lack of gameplay, the empire
 may start losing territory.
 
-See also: CITIES, EMPIRE TIMEOUT, TERRITORY COMMAND, ESTATS
+See also: CITIES, EMPIRE TIMEOUT, EXTENDED RADIUS, TERRITORY COMMAND, ESTATS
 #
 "TERRITORY COMMAND"
 

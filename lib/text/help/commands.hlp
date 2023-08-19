@@ -1362,7 +1362,7 @@ Roads count as their base terrain for most building functions, so you can
 build things facing roads. Roads count as in-city territory when built in the
 outskirts (4x radius).
 
-See also: CHANT OF ILLUSIONS, EMPIRE, PATHFINDING, ROADSIGN
+See also: CHANT OF ILLUSIONS, EMPIRE, EXTENDED RADIUS, PATHFINDING, ROADSIGN
 #
 LEARN LEARNED LEARNING
 
