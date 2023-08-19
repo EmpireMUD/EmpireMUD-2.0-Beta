@@ -2316,7 +2316,7 @@ void olc_show_object(char_data *ch) {
 	
 	if (GET_OBJ_TIMER(obj) > 0) {
 		minutes = GET_OBJ_TIMER(obj) * SECS_PER_MUD_HOUR / SECS_PER_REAL_MIN;
-		sprintf(buf1, "%d ticks (%d:%02d)", GET_OBJ_TIMER(obj), minutes / 60, minutes % 60);
+		sprintf(buf1, "%d tick%s (%d:%02d)", GET_OBJ_TIMER(obj), PLURAL(GET_OBJ_TIMER(obj)), minutes / 60, minutes % 60);
 	}
 	else {
 		strcpy(buf1, "none");

@@ -6779,7 +6779,7 @@ void do_stat_object(char_data *ch, obj_data *j) {
 	
 	if (GET_OBJ_TIMER(j) > 0) {
 		minutes = GET_OBJ_TIMER(j) * SECS_PER_MUD_HOUR / SECS_PER_REAL_MIN;
-		snprintf(part, sizeof(part), "%d ticks (%d:%02d)", GET_OBJ_TIMER(j), minutes / 60, minutes % 60);
+		snprintf(part, sizeof(part), "%d tick%s (%d:%02d)", GET_OBJ_TIMER(j), PLURAL(GET_OBJ_TIMER(j)), minutes / 60, minutes % 60);
 	}
 	else {
 		strcpy(part, "none");
