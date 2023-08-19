@@ -3367,7 +3367,7 @@ void perform_abandon_room(room_data *room) {
 		// update territory counts
 		if (COUNTS_AS_TERRITORY(room)) {
 			struct empire_island *eisle = get_empire_island(emp, GET_ISLAND_ID(room));
-			ter_type = get_territory_type_for_empire(room, emp, FALSE, &junk);
+			ter_type = get_territory_type_for_empire(room, emp, FALSE, &junk, NULL);
 			
 			SAFE_ADD(EMPIRE_TERRITORY(emp, ter_type), -1, 0, UINT_MAX, FALSE);
 			SAFE_ADD(eisle->territory[ter_type], -1, 0, UINT_MAX, FALSE);
@@ -3488,7 +3488,7 @@ void perform_claim_room(room_data *room, empire_data *emp) {
 	// update territory counts
 	if (COUNTS_AS_TERRITORY(room)) {
 		struct empire_island *eisle = get_empire_island(emp, GET_ISLAND_ID(room));
-		ter_type = get_territory_type_for_empire(room, emp, FALSE, &junk);
+		ter_type = get_territory_type_for_empire(room, emp, FALSE, &junk, NULL);
 		
 		SAFE_ADD(EMPIRE_TERRITORY(emp, ter_type), 1, 0, UINT_MAX, FALSE);
 		SAFE_ADD(eisle->territory[ter_type], 1, 0, UINT_MAX, FALSE);

@@ -136,7 +136,7 @@ bool can_reclaim(char_data *ch, room_data *room) {
 		is_ok = FALSE;
 		
 		// check city
-		if (get_territory_type_for_empire(room, emp, TRUE, &too_soon) == TER_CITY && get_territory_type_for_empire(room, enemy, TRUE, &too_soon) == TER_FRONTIER) {
+		if (get_territory_type_for_empire(room, emp, TRUE, &too_soon, NULL) == TER_CITY && get_territory_type_for_empire(room, enemy, TRUE, &too_soon, NULL) == TER_FRONTIER) {
 			// I have a city here and they don't even have an outskirts
 			is_ok = TRUE;
 		}
@@ -1640,7 +1640,7 @@ bool check_in_city_requirement(room_data *room, bool check_wait) {
 	if (!ROOM_BLD_FLAGGED(room, BLD_IN_CITY_ONLY) && !HAS_FUNCTION(room, FNC_IN_CITY_ONLY) && !ROOM_BLD_FLAGGED(home, BLD_IN_CITY_ONLY) && !HAS_FUNCTION(home, FNC_IN_CITY_ONLY)) {
 		return TRUE;
 	}
-	if (ROOM_OWNER(room) && get_territory_type_for_empire(room, ROOM_OWNER(room), check_wait, &junk) == TER_CITY) {
+	if (ROOM_OWNER(room) && get_territory_type_for_empire(room, ROOM_OWNER(room), check_wait, &junk, NULL) == TER_CITY) {
 		return TRUE;
 	}
 	
@@ -1761,7 +1761,7 @@ void claim_city(char_data *ch, empire_data *emp, char *argument) {
 						if (compute_distance(center, to_room) > radius) {
 							continue;
 						}
-						if (get_territory_type_for_empire(to_room, emp, FALSE, &junk) != TER_CITY) {
+						if (get_territory_type_for_empire(to_room, emp, FALSE, &junk, NULL) != TER_CITY) {
 							continue;	// wouldn't be in-city (checks corners and islands)
 						}
 						
@@ -1983,17 +1983,22 @@ void found_city(char_data *ch, empire_data *emp, char *argument) {
 * @param empire_data *emp The empire to check.
 * @param bool check_wait If TRUE, requires the city wait time to have passed.
 * @param bool *city_too_soon Optional: Will be set to TRUE if there was a city but it was founded too recently. (Pass NULL to skip.)
+* @param bool *using_large_radius Optional: Will be set to TRUE if the territory counts as in-city but is actually in the outskirts. (Pass NULL to skip.)
 * @return bool TRUE if in-city, FALSE if not.
 */
-int get_territory_type_for_empire(room_data *loc, empire_data *emp, bool check_wait, bool *city_too_soon) {
+int get_territory_type_for_empire(room_data *loc, empire_data *emp, bool check_wait, bool *city_too_soon, bool *using_large_radius) {
 	struct empire_city_data *city;
 	int dist, best_dist = MAP_SIZE, type = TER_FRONTIER, last_type = TER_FRONTIER;
+	bool one_large = FALSE, last_large = FALSE, best_large = FALSE;
 	
 	double outskirts_multiplier = config_get_double("outskirts_modifier");	// radius multiplier
 	int wait = check_wait ? config_get_int("minutes_to_full_city") * SECS_PER_REAL_MIN : 0;
 	
 	if (city_too_soon) {
 		*city_too_soon = FALSE;	// init this
+	}
+	if (using_large_radius) {
+		*using_large_radius = FALSE;	// init
 	}
 	
 	if (!emp) {
@@ -2007,6 +2012,7 @@ int get_territory_type_for_empire(room_data *loc, empire_data *emp, bool check_w
 	
 	LL_FOREACH(EMPIRE_CITY_LIST(emp), city) {
 		dist = compute_distance(loc, city->location);
+		one_large = FALSE;
 		
 		// check radii
 		if (dist <= city_type[city->type].radius && GET_ISLAND(loc) == GET_ISLAND(city->location)) {
@@ -2015,6 +2021,11 @@ int get_territory_type_for_empire(room_data *loc, empire_data *emp, bool check_w
 		}
 		else if (dist <= (city_type[city->type].radius * outskirts_multiplier)) {
 			type = LARGE_CITY_RADIUS(loc) ? TER_CITY : TER_OUTSKIRTS;
+			
+			// may need to mark that it's "large"
+			if (type == TER_CITY) {
+				one_large = TRUE;
+			}
 		}
 		else {
 			type = TER_FRONTIER;
@@ -2037,11 +2048,17 @@ int get_territory_type_for_empire(room_data *loc, empire_data *emp, bool check_w
 				*city_too_soon = TRUE;
 			}
 			type = last_type;	// restore previous type
+			best_large = last_large;
 		}
 		else {
 			last_type = type;	// save this for next iteration
 			best_dist = dist;	// save this for next iteration
+			best_large = last_large = one_large;
 		}
+	}
+	
+	if (using_large_radius && type == TER_CITY && best_large) {
+		*using_large_radius = best_large;
 	}
 	
 	return type;
@@ -2167,7 +2184,7 @@ void perform_abandon_city(empire_data *emp, struct empire_city_data *city, bool 
 				// check ownership
 				if (to_room && ROOM_OWNER(to_room) == emp && !ROOM_AFF_FLAGGED(to_room, ROOM_AFF_NO_ABANDON)) {
 					// warning: never abandon things that are still within another city
-					if (get_territory_type_for_empire(to_room, emp, FALSE, &junk) != TER_CITY) {
+					if (get_territory_type_for_empire(to_room, emp, FALSE, &junk, NULL) != TER_CITY) {
 						// check if ACTUALLY within the abandoned city
 						if (compute_distance(cityloc, to_room) <= radius) {
 							abandon_room(to_room);
@@ -3749,13 +3766,13 @@ ACMD(do_cede) {
 	else if (EMPIRE_TERRITORY(f, TER_TOTAL) >= land_can_claim(f, TER_TOTAL)) {
 		msg_to_char(ch, "You can't cede land to %s, %s empire can't own any more land.\r\n", REAL_HMHR(targ), REAL_HSHR(targ));
 	}
-	else if (get_territory_type_for_empire(room, f, FALSE, &junk) == TER_OUTSKIRTS && EMPIRE_TERRITORY(f, TER_OUTSKIRTS) >= OUTSKIRTS_CLAIMS_AVAILABLE(f)) {
+	else if (get_territory_type_for_empire(room, f, FALSE, &junk, NULL) == TER_OUTSKIRTS && EMPIRE_TERRITORY(f, TER_OUTSKIRTS) >= OUTSKIRTS_CLAIMS_AVAILABLE(f)) {
 		msg_to_char(ch, "You can't cede land to that empire as it is over its limit for territory on the outskirts of cities.\r\n");
 	}
-	else if (get_territory_type_for_empire(room, f, FALSE, &junk) == TER_FRONTIER && EMPIRE_TERRITORY(f, TER_FRONTIER) >= land_can_claim(f, TER_FRONTIER)) {
+	else if (get_territory_type_for_empire(room, f, FALSE, &junk, NULL) == TER_FRONTIER && EMPIRE_TERRITORY(f, TER_FRONTIER) >= land_can_claim(f, TER_FRONTIER)) {
 		msg_to_char(ch, "You can't cede land to that empire as it is over its limit for territory on the frontier.\r\n");
 	}
-	else if (EMPIRE_ADMIN_FLAGGED(f, EADM_CITY_CLAIMS_ONLY) && get_territory_type_for_empire(room, f, FALSE, &junk) != TER_CITY) {
+	else if (EMPIRE_ADMIN_FLAGGED(f, EADM_CITY_CLAIMS_ONLY) && get_territory_type_for_empire(room, f, FALSE, &junk, NULL) != TER_CITY) {
 		msg_to_char(ch, "That empire is forbidden from gaining new territory outside of a city.\r\n");
 	}
 	else if (is_at_war(f)) {
@@ -3868,13 +3885,13 @@ void do_claim_room(char_data *ch, room_data *room, empire_data *emp) {
 	else if (!can_build_or_claim_at_war(ch, room) && !imm_access) {
 		msg_to_char(ch, "You can't claim while at war with the empire that controls this area.\r\n");
 	}
-	else if (!imm_access && get_territory_type_for_empire(room, emp, FALSE, &junk) == TER_OUTSKIRTS && EMPIRE_TERRITORY(emp, TER_OUTSKIRTS) >= OUTSKIRTS_CLAIMS_AVAILABLE(emp)) {
+	else if (!imm_access && get_territory_type_for_empire(room, emp, FALSE, &junk, NULL) == TER_OUTSKIRTS && EMPIRE_TERRITORY(emp, TER_OUTSKIRTS) >= OUTSKIRTS_CLAIMS_AVAILABLE(emp)) {
 		msg_to_char(ch, "You can't claim the area because you're over the %d%% of your territory that can be on the outskirts of cities.\r\n", (int)(100 * config_get_double("land_outside_city_modifier")));
 	}
-	else if (!imm_access && get_territory_type_for_empire(room, emp, FALSE, &junk) == TER_FRONTIER && EMPIRE_TERRITORY(emp, TER_FRONTIER) >= land_can_claim(emp, TER_FRONTIER)) {
+	else if (!imm_access && get_territory_type_for_empire(room, emp, FALSE, &junk, NULL) == TER_FRONTIER && EMPIRE_TERRITORY(emp, TER_FRONTIER) >= land_can_claim(emp, TER_FRONTIER)) {
 		msg_to_char(ch, "You can't claim the area because you're over the %d%% of your territory that can be on the frontier.\r\n", (int)(100 * config_get_double("land_frontier_modifier")));
 	}
-	else if (!imm_access && EMPIRE_ADMIN_FLAGGED(emp, EADM_CITY_CLAIMS_ONLY) && get_territory_type_for_empire(room, emp, FALSE, &junk) != TER_CITY) {
+	else if (!imm_access && EMPIRE_ADMIN_FLAGGED(emp, EADM_CITY_CLAIMS_ONLY) && get_territory_type_for_empire(room, emp, FALSE, &junk, NULL) != TER_CITY) {
 		msg_to_char(ch, "Your empire is forbidden from claiming outside of a city.\r\n");
 	}
 	else {
@@ -7361,13 +7378,13 @@ ACMD(do_territory) {
 		if (ROOM_OWNER(iter) != emp) {
 			continue;	// not owned
 		}
-		if (outside_only && get_territory_type_for_empire(iter, emp, FALSE, &junk) == TER_CITY) {
+		if (outside_only && get_territory_type_for_empire(iter, emp, FALSE, &junk, NULL) == TER_CITY) {
 			continue;	// not outside
 		}
-		if (outskirts_only && get_territory_type_for_empire(iter, emp, FALSE, &junk) != TER_OUTSKIRTS) {
+		if (outskirts_only && get_territory_type_for_empire(iter, emp, FALSE, &junk, NULL) != TER_OUTSKIRTS) {
 			continue;	// not outskirts
 		}
-		if (frontier_only && get_territory_type_for_empire(iter, emp, FALSE, &junk) != TER_FRONTIER) {
+		if (frontier_only && get_territory_type_for_empire(iter, emp, FALSE, &junk, NULL) != TER_FRONTIER) {
 			continue;	// not outskirts
 		}
 		

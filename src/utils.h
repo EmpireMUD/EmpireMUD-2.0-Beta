@@ -1992,8 +1992,8 @@ void log_to_slash_channel_by_name(char *chan_name, char_data *ignorable_person, 
 bool check_in_city_requirement(room_data *room, bool check_wait);
 void do_burn_building(char_data *ch, room_data *room, obj_data *lighter);
 void do_customize_island(char_data *ch, char *argument);
-int get_territory_type_for_empire(room_data *loc, empire_data *emp, bool check_wait, bool *city_too_soon);
-#define is_in_city_for_empire(loc, emp, check_wait, city_too_soon)  (get_territory_type_for_empire((loc), (emp), (check_wait), (city_too_soon)) == TER_CITY)	// backwards-compatibility
+int get_territory_type_for_empire(room_data *loc, empire_data *emp, bool check_wait, bool *city_too_soon, bool *using_large_radius);
+#define is_in_city_for_empire(loc, emp, check_wait, city_too_soon)  (get_territory_type_for_empire((loc), (emp), (check_wait), (city_too_soon), NULL) == TER_CITY)	// backwards-compatibility
 void perform_abandon_city(empire_data *emp, struct empire_city_data *city, bool full_abandon);
 void scan_for_tile(char_data *ch, char *argument, int max_dist, bitvector_t only_in_dirs);
 void set_workforce_limit(empire_data *emp, int island_id, int chore, int limit);

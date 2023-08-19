@@ -6463,7 +6463,7 @@ bool room_is_light(room_data *room, bool count_adjacent_light) {
 	if (!RMT_FLAGGED(room, RMT_DARK) && get_sun_status(room) != SUN_DARK) {
 		return TRUE;	// not dark: it isn't dark outside
 	}
-	if (ROOM_OWNER(room) && EMPIRE_HAS_TECH(ROOM_OWNER(room), TECH_CITY_LIGHTS) && get_territory_type_for_empire(room, ROOM_OWNER(room), FALSE, NULL) != TER_FRONTIER) {
+	if (ROOM_OWNER(room) && EMPIRE_HAS_TECH(ROOM_OWNER(room), TECH_CITY_LIGHTS) && get_territory_type_for_empire(room, ROOM_OWNER(room), FALSE, NULL, NULL) != TER_FRONTIER) {
 		return TRUE;	// not dark: city lights
 	}
 	if (count_adjacent_light && adjacent_room_is_light(room)) {
@@ -6957,7 +6957,7 @@ bool room_has_function_and_city_ok(empire_data *for_emp, room_data *room, bitvec
 		if (VEH_FLAGGED(veh, MOVABLE_VEH_FLAGS) && IS_SET(fnc_flag, IMMOBILE_FNCS)) {
 			continue;	// exclude certain functions on movable vehicles (functions that require room data)
 		}
-		if (IS_SET(VEH_FUNCTIONS(veh), FNC_IN_CITY_ONLY) && (!ROOM_OWNER(room) || get_territory_type_for_empire(room, ROOM_OWNER(room), TRUE, &junk) != TER_CITY)) {
+		if (IS_SET(VEH_FUNCTIONS(veh), FNC_IN_CITY_ONLY) && (!ROOM_OWNER(room) || get_territory_type_for_empire(room, ROOM_OWNER(room), TRUE, &junk, NULL) != TER_CITY)) {
 			continue;	// not in-city but needs it
 		}
 		
@@ -7015,7 +7015,7 @@ bool vehicle_has_function_and_city_ok(vehicle_data *veh, bitvector_t fnc_flag) {
 		if (ROOM_OWNER(room) && ROOM_OWNER(room) != emp) {
 			return FALSE;	// someone else's claim is not in our city
 		}
-		if (get_territory_type_for_empire(room, emp, TRUE, &junk) != TER_CITY) {
+		if (get_territory_type_for_empire(room, emp, TRUE, &junk, NULL) != TER_CITY) {
 			return FALSE;	// not in-city for us either
 		}
 	}

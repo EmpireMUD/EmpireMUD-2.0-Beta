@@ -1697,7 +1697,7 @@ void do_gen_craft_building(char_data *ch, craft_data *type, int dir) {
 	if (!ROOM_OWNER(IN_ROOM(ch)) && can_claim(ch) && !ROOM_AFF_FLAGGED(IN_ROOM(ch), ROOM_AFF_UNCLAIMABLE)) {
 		empire_data *emp = get_or_create_empire(ch);
 		if (emp) {
-			ter_type = get_territory_type_for_empire(IN_ROOM(ch), emp, FALSE, &junk);
+			ter_type = get_territory_type_for_empire(IN_ROOM(ch), emp, FALSE, &junk, NULL);
 			if (EMPIRE_TERRITORY(emp, ter_type) < land_can_claim(emp, ter_type)) {
 				claim_room(IN_ROOM(ch), emp);
 			}
@@ -1777,7 +1777,7 @@ void do_gen_craft_vehicle(char_data *ch, craft_data *type, int dir) {
 			if (!ROOM_OWNER(HOME_ROOM(IN_ROOM(ch))) && can_claim(ch) && !ROOM_AFF_FLAGGED(HOME_ROOM(IN_ROOM(ch)), ROOM_AFF_UNCLAIMABLE)) {
 				empire_data *emp = get_or_create_empire(ch);
 				if (emp) {
-					int ter_type = get_territory_type_for_empire(HOME_ROOM(IN_ROOM(ch)), emp, FALSE, &junk);
+					int ter_type = get_territory_type_for_empire(HOME_ROOM(IN_ROOM(ch)), emp, FALSE, &junk, NULL);
 					if (EMPIRE_TERRITORY(emp, ter_type) < land_can_claim(emp, ter_type)) {
 						claim_room(HOME_ROOM(IN_ROOM(ch)), emp);
 					}

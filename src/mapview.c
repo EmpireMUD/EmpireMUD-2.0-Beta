@@ -1159,7 +1159,7 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options) {
 	int first_start, first_end, second_start, second_end, temp;
 	int dist, can_see_in_dark_distance;
 	int x_offset = 0, y_offset = 0;
-	bool y_first, invert_x, invert_y, comma, junk, show_blocked;
+	bool y_first, invert_x, invert_y, comma, junk, show_blocked, large_radius;
 	struct instance_data *inst;
 	player_index_data *index;
 	room_vnum **view_grid = NULL;
@@ -1612,8 +1612,8 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options) {
 		msg_to_char(ch, "\r\n");
 	}
 	else if (emp) {
-		if ((ter_type = get_territory_type_for_empire(room, emp, FALSE, &junk)) == TER_CITY && (city = find_closest_city(emp, room))) {
-			msg_to_char(ch, "This is the %s%s&0 %s of %s.", EMPIRE_BANNER(emp), EMPIRE_ADJECTIVE(emp), city_type[city->type].name, city->name);
+		if ((ter_type = get_territory_type_for_empire(room, emp, FALSE, &junk, &large_radius)) == TER_CITY && (city = find_closest_city(emp, room))) {
+			msg_to_char(ch, "This is the %s%s&0 %s of %s%s.", EMPIRE_BANNER(emp), EMPIRE_ADJECTIVE(emp), city_type[city->type].name, city->name, large_radius ? " (extended radius)" : "");
 		}
 		else {
 			msg_to_char(ch, "This area is claimed by %s%s&0%s.", EMPIRE_BANNER(emp), EMPIRE_NAME(emp), (ter_type == TER_OUTSKIRTS) ? ", on the outskirts of a city" : "");
