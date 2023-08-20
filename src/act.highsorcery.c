@@ -985,7 +985,7 @@ ACMD(do_manashield) {
 		
 		af2 = create_mod_aff(ATYPE_MANASHIELD, 30 * SECS_PER_REAL_MIN, APPLY_RESIST_PHYSICAL, amt, ch);
 		affect_to_char(ch, af2);
-		free(af1);
+		free(af2);
 		
 		af3 = create_mod_aff(ATYPE_MANASHIELD, 30 * SECS_PER_REAL_MIN, APPLY_RESIST_MAGICAL, amt, ch);
 		affect_to_char(ch, af3);
