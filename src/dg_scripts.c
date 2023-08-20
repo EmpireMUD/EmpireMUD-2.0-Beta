@@ -4868,10 +4868,10 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 								
 								if (was_lit != LIGHT_IS_LIT(o)) {
 									if (was_lit) {
-										apply_obj_light(obj, FALSE);
+										apply_obj_light(o, FALSE);
 									}
 									else {
-										apply_obj_light(obj, TRUE);
+										apply_obj_light(o, TRUE);
 									}
 								}
 								
@@ -5145,9 +5145,9 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 									apply_obj_light(o, TRUE);
 								}
 							}
-							if (IS_LIGHT(obj)) {
+							if (IS_LIGHT(o)) {
 								// in case
-								schedule_obj_timer_update(obj, FALSE);
+								schedule_obj_timer_update(o, FALSE);
 							}
 						}
 						snprintf(str, slen, "%d", GET_OBJ_VAL(o, 1));
