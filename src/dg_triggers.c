@@ -1082,7 +1082,12 @@ void reboot_mtrigger(char_data *ch) {
 */
 
 
-// returns 0 if obj was purged
+/**
+* Fires when an object's timer expired.
+*
+* @param obj_data *obj The object.
+* @return int 1 to continue, 0 to stop, -1 if the object was purged
+*/
 int timer_otrigger(obj_data *obj) {
 	trig_data *t, *next_t;
 	int return_val;
@@ -1099,7 +1104,11 @@ int timer_otrigger(obj_data *obj) {
 			/* don't allow a wear to take place, if
 			* the object is purged.
 			*/
-			if (!obj || !return_val || (t->purge_tracker && t->purge_tracker->purged)) {
+			if (!obj || (t->purge_tracker && t->purge_tracker->purged)) {
+				return -1;
+			}
+			else if (!return_val) {
+				// break out only on a 0
 				return 0;
 			}
 		}

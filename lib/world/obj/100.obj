@@ -17,9 +17,9 @@ wild fire~
 A little fire is burning on the ground.~
 Wild fire is bright, but quite harmless.
 ~
-3 cm ao 0 1
-0 0 0
-10 168
+29 m ao 0 2
+168 1 5
+10 0
 A
 7 2 0
 A
@@ -402,8 +402,8 @@ A grand candelabra creates dancing shadows on the walls.~
    The grand candelabra is made of pitch-black nocturnium, and its yellow-green
 flames create shadows which dance eerily across the walls.
 ~
-3 c 0 0 1
-0 0 0
+29 0 0 0 2
+-1 1 0
 2 0
 E
 shadows~

@@ -452,6 +452,8 @@ D4
 ????~
 &0~
 E
+16 0 100.00 0
+E
 19 0 100.00 0
 I 5 102 15.00 1 X  # DIG: flint stone
 I 5 101 15.00 1 X  # DIG: lump of clay
@@ -576,6 +578,8 @@ D4
 ????~
 &y~
 E
+16 0 100.00 20
+E
 19 0 100.00 20
 I 5 102 15.00 1 X  # DIG: flint stone
 I 5 103 8.00 1 X  # DIG: yellow lightning stone
@@ -594,6 +598,8 @@ E
 1 0 100.00 7
 E
 9 0 20.00 7
+E
+16 0 100.00 0
 E
 19 0 100.00 0
 I 5 102 15.00 1 X  # DIG: flint stone
@@ -623,6 +629,8 @@ E
 1 0 100.00 12
 E
 9 0 20.00 12
+E
+16 0 100.00 20
 E
 19 0 100.00 20
 I 5 102 15.00 1 X  # DIG: flint stone
@@ -655,6 +663,8 @@ E
 1 0 100.00 16
 E
 9 0 20.00 16
+E
+16 0 100.00 0
 E
 19 0 100.00 27
 I 6 3017 100.00 1  # FORAGE: plump fig
@@ -690,6 +700,8 @@ D3
 D4
 ????~
 &g~
+E
+16 0 100.00 0
 E
 19 0 100.00 27
 S
@@ -802,6 +814,8 @@ E
 E
 5 0 100.00 22
 E
+7 19 4.00 70
+E
 7 87 4.00 70
 E
 7 85 4.00 70
@@ -840,6 +854,8 @@ D0
 &y~
 E
 4 0 2.00 80
+E
+7 19 4.00 88
 E
 7 87 4.00 88
 E
@@ -937,6 +953,8 @@ E
 E
 4 0 2.50 24
 E
+7 19 4.00 73
+E
 7 87 4.00 73
 E
 7 85 4.00 73
@@ -944,6 +962,8 @@ E
 9 0 50.00 24
 E
 16 0 100.00 20
+E
+23 0 100.00 20
 I 5 103 8.00 1 X  # DIG: yellow lightning stone
 I 5 102 15.00 1 X  # DIG: flint stone
 I 5 100 100.00 1 X  # DIG: rock
@@ -996,6 +1016,8 @@ E
 2 57 10.00 51
 E
 4 0 0.40 26
+E
+7 19 4.00 74
 E
 7 87 4.00 74
 E
@@ -1051,6 +1073,8 @@ E
 E
 4 0 0.40 26
 E
+7 19 4.00 74
+E
 7 87 4.00 74
 E
 7 85 4.00 74
@@ -1097,6 +1121,8 @@ E
 0 1 100.00 23
 E
 2 57 10.00 51
+E
+7 19 4.00 71
 E
 7 87 4.00 71
 E
@@ -1468,6 +1494,8 @@ E
 9 0 50.00 37
 E
 16 0 100.00 0
+E
+23 0 100.00 0
 I 5 102 15.00 1 X  # DIG: flint stone
 I 5 101 15.00 1 X  # DIG: lump of clay
 I 5 100 100.00 1 X  # DIG: rock
@@ -1976,6 +2004,8 @@ E
 12 0 25.00 41
 E
 16 0 100.00 40
+E
+23 0 100.00 40
 I 5 102 9.00 1 X  # DIG: flint stone
 I 5 100 9.00 1 X  # DIG: rock
 I 5 101 100.00 1 X  # DIG: lump of clay
@@ -2128,6 +2158,8 @@ D4
 &y~
 E
 5 0 100.00 22
+E
+7 19 4.00 70
 E
 7 87 4.00 70
 E
@@ -2470,6 +2502,8 @@ E
 10 57 5.00 36
 E
 16 0 100.00 50
+E
+23 0 100.00 50
 I 5 102 9.00 1 x  # DIG: flint stone
 I 5 107 9.00 1 x  # DIG: bag of sand
 I 5 101 100.00 1 x  # DIG: lump of clay
@@ -2596,6 +2630,8 @@ E
 15 0 1.00 0
 E
 16 0 100.00 0
+E
+23 0 100.00 0
 I 6 3017 33.00 1  # FORAGE: plump fig
 X
 vined densely field stumps jungle trees forest around~
@@ -2678,6 +2714,8 @@ E
 10 57 5.00 61
 E
 16 0 100.00 50
+E
+23 0 100.00 50
 I 6 3051 50.00 1 x  # FORAGE: sea urchin
 I 6 3052 50.00 1 x  # FORAGE: clam
 I 7 1206 8.33 125 p  # PICK: iridescent blue iris
@@ -2688,7 +2726,7 @@ X
 stumps tropical seaside ocean forest trees around~
    As you make your way along the jungle's edge, you come across a section
 where the dense foliage abruptly stops, replaced by a stretch of barren ground.
-Here, several tree stumps, their tops cut clean off, jut up from the earth. 
+Here, several tree stumps, their tops cut clean off, jut up from the earth.
 Looking out past the stumps, you can see the shimmering expanse of the ocean,
 its waves crashing against the rocky shore.
 ~
@@ -2802,6 +2840,8 @@ E
 E
 9 0 50.00 71
 E
+11 19 4.00 20
+E
 11 87 4.00 20
 E
 11 85 4.00 20
@@ -2820,7 +2860,7 @@ I 9 134 8.00 1 g  # GATHER: thorny sapling
 I 9 139 92.00 1 g  # GATHER: bundle of long leaves
 X
 field irrigation irrigation desert canal around~
-   You find yourself standing in a vast expanse of freshly irrigated desert. 
+   You find yourself standing in a vast expanse of freshly irrigated desert.
 The land is soft and moist beneath your feet, a marked contrast to the dry sand
 that stretches out as far as the eye can see. In the distance, you can see the
 canal that brought life-giving water to this barren place, its gentle flow
@@ -2850,6 +2890,12 @@ E
 E
 0 0 100.00 71
 E
+4 0 1.00 79
+E
+9 0 50.00 79
+E
+11 19 4.00 26
+E
 11 87 4.00 26
 E
 11 85 4.00 26
@@ -2866,8 +2912,7 @@ I+ 0 70  # Ability: Find Herbs
 I 7 123 100.00 125 p  # PICK: small flower
 I 9 121 85.00 1 g  # GATHER: sticks and leaves
 I 9 131 15.00 1 g  # GATHER: green sapling
-I 20 120 50.00 2 c  # CHOP: large tree
-I 20 120 50.00 1 c  # CHOP: large tree
+I 20 120 100.00 1 c  # CHOP: large tree
 X
 forest trees irrigated irrigation canal around~
    You are standing in a lush forest that has grown on the irrigated soil
@@ -2907,6 +2952,8 @@ E
 0 1 50.00 75
 E
 0 0 100.00 72
+E
+11 19 4.00 26
 E
 11 87 4.00 26
 E
@@ -2955,11 +3002,15 @@ E
 E
 9 0 50.00 74
 E
+11 19 4.00 23
+E
 11 87 4.00 23
 E
 11 85 4.00 23
 E
 16 0 100.00 70
+E
+23 0 100.00 70
 I 5 102 15.00 1 X  # DIG: flint stone
 I 5 103 8.00 1 X  # DIG: yellow lightning stone
 I 5 101 15.00 1 X  # DIG: lump of clay
@@ -2978,7 +3029,7 @@ stumps field trees forest irrigated irrigation canal around~
    You walk through an irrigated field where stumps of trees lie scattered
 around. The trees have been cut down, leaving behind the stumps as the only
 remnants of their presence. The field has been made fertile by the nearby
-irrigation canal, allowing the growth of crops and vegetation to take place. 
+irrigation canal, allowing the growth of crops and vegetation to take place.
 However, the absence of the trees is noticeable and adds a certain emptiness to
 the area.
 ~
@@ -3009,6 +3060,8 @@ E
 4 0 0.40 71
 E
 9 0 50.00 71
+E
+11 19 4.00 24
 E
 11 87 4.00 24
 E
@@ -3053,11 +3106,15 @@ E
 E
 9 0 50.00 76
 E
+11 19 4.00 23
+E
 11 87 4.00 23
 E
 11 85 4.00 23
 E
 16 0 100.00 70
+E
+23 0 100.00 70
 I 5 102 15.00 1 X  # DIG: flint stone
 I 5 101 15.00 1 X  # DIG: lump of clay
 I 5 103 8.00 1 X  # DIG: yellow lightning stone
@@ -3074,7 +3131,7 @@ stumps jungle forest trees canal irrigated irrigation around~
    You walk through an irrigated field where stumps of trees lie scattered
 around. The trees have been cut down, leaving behind the stumps as the only
 remnants of their presence. The field has been made fertile by the nearby
-irrigation canal, allowing the growth of crops and vegetation to take place. 
+irrigation canal, allowing the growth of crops and vegetation to take place.
 However, the absence of the trees is noticeable and adds a certain emptiness to
 the area.
 ~
@@ -3111,6 +3168,8 @@ E
 4 0 0.40 72
 E
 9 0 50.00 72
+E
+11 19 4.00 24
 E
 11 87 4.00 24
 E
@@ -3152,6 +3211,14 @@ E
 E
 9 0 20.00 78
 E
+11 85 4.00 20
+E
+11 87 4.00 20
+E
+11 19 4.00 20
+E
+16 0 100.00 70
+E
 19 0 100.00 70
 I 5 101 15.00 1 X  # DIG: lump of clay
 I 5 100 100.00 1 X  # DIG: rock
@@ -3175,10 +3242,81 @@ D0
 ????~
 &G~
 E
+11 87 4.00 20
+E
+11 85 4.00 20
+E
+11 19 4.00 20
+E
+16 0 100.00 70
+E
 19 0 100.00 70
 I 5 102 15.00 1 X  # DIG: flint stone
 I 5 101 15.00 1 X  # DIG: lump of clay
 I 5 100 100.00 1 X  # DIG: rock
+S
+#79
+Shady Irrigated Forest~
+A Shady Irrigated Forest~
+'^' 14 jkqv 3 adil np
+C
+chop, dig, gather, pick~
+D0
+&G.&?^^^~
+&g~
+D0
+^^^&G.~
+&g~
+D0
+^&G.&?^^~
+&g~
+D0
+^^&G.&?^~
+&g~
+D0
+&G.&?^^&G.~
+&g~
+D0
+&G..&?^^~
+&g~
+D0
+^^&G..~
+&g~
+D0
+^&G..&?^~
+&g~
+E
+0 1 50.00 71
+E
+0 0 100.00 79
+E
+11 87 4.00 26
+E
+11 85 4.00 26
+I 5 102 15.00 1 X  # DIG: flint stone
+I 5 101 15.00 1 X  # DIG: lump of clay
+I 5 103 8.00 1 X  # DIG: yellow lightning stone
+I 5 100 100.00 1 X  # DIG: rock
+I 6 3014 100.00 1  # FORAGE: dry beans
+I 7 1206 8.33 125 p  # PICK: iridescent blue iris
+I 7 1201 45.83 125 p  # PICK: sack of fiveleaf
+I+ 0 70  # Ability: Find Herbs
+I 7 1204 45.84 125 p  # PICK: daggerbite frond
+I+ 0 70  # Ability: Find Herbs
+I 7 123 100.00 125 p  # PICK: small flower
+I 9 121 85.00 1 g  # GATHER: sticks and leaves
+I 9 131 15.00 1 g  # GATHER: green sapling
+I 20 120 100.00 1 c  # CHOP: large tree
+X
+forest trees irrigated irrigation canal around~
+   You are standing in a lush forest that has grown on the irrigated soil
+around the canal. The trees around you are tall and sturdy, with their leaves
+rustling in the breeze. The ground beneath your feet is covered in a thick
+layer of leaves and other debris, making it soft and spongy to walk on. As you
+look up, you can see glimpses of the sky through the canopy of leaves above
+you. The air around you is fresh and cool, and you can hear the chirping of
+birds and the rustling of leaves as the wind blows through the trees.
+~
 S
 #80
 Lush Oasis~
@@ -3196,6 +3334,8 @@ E
 0 0 100.00 21
 E
 4 0 2.00 81
+E
+7 19 4.00 89
 E
 7 87 4.00 89
 E
@@ -3238,6 +3378,8 @@ D0
 &y~
 E
 0 0 100.00 80
+E
+7 19 4.00 89
 E
 7 87 4.00 89
 E
@@ -3288,6 +3430,8 @@ D4
 E
 5 0 100.00 86
 E
+7 19 4.00 88
+E
 7 87 4.00 88
 E
 7 85 4.00 88
@@ -3334,6 +3478,8 @@ E
 E
 9 0 75.00 84
 E
+16 0 100.00 21
+E
 19 0 100.00 21
 I 5 101 15.00 1 X  # DIG: lump of clay
 I 5 100 100.00 1 X  # DIG: rock
@@ -3356,6 +3502,8 @@ An Oasis Crop~
 D0
 ????~
 &y~
+E
+16 0 100.00 21
 E
 19 0 100.00 21
 I 5 101 15.00 1 X  # DIG: lump of clay
@@ -3448,6 +3596,8 @@ E
 E
 9 0 75.00 89
 E
+11 19 4.00 80
+E
 11 87 4.00 80
 E
 11 85 4.00 80
@@ -3487,6 +3637,8 @@ E
 0 0 50.00 88
 E
 0 0 100.00 89
+E
+11 19 4.00 81
 E
 11 87 4.00 81
 E
@@ -3613,6 +3765,8 @@ E
 1 0 100.00 84
 E
 9 0 75.00 84
+E
+16 0 100.00 82
 E
 19 0 100.00 82
 I 5 101 15.00 1 X  # DIG: lump of clay

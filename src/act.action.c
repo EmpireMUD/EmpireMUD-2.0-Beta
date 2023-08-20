@@ -571,12 +571,9 @@ void show_prospect_result(char_data *ch, room_data *room) {
 * Makes sure a person can [still] burn the room they are in.
 *
 * @param char_data *ch The player.
-* @param int subcmd SCMD_LIGHT or SCMD_BURN.
 * @return bool TRUE if safe, FALSE if they cannot burn it.
 */
-bool validate_burn_area(char_data *ch, int subcmd) {
-	const char *cmdname[] = { "light", "burn" };	// also in do_burn_area
-	
+bool validate_burn_area(char_data *ch) {
 	bool objless = has_player_tech(ch, PTECH_LIGHT_FIRE);
 	obj_data *lighter = NULL;
 	bool kept = FALSE;
@@ -586,10 +583,13 @@ bool validate_burn_area(char_data *ch, int subcmd) {
 	}
 	
 	if (!has_evolution_type(SECT(IN_ROOM(ch)), EVO_BURNS_TO)) {
-		msg_to_char(ch, "You can't %s this type of area.\r\n", cmdname[subcmd]);
+		msg_to_char(ch, "You can't burn this type of area.\r\n");
 	}
 	else if (ROOM_AFF_FLAGGED(IN_ROOM(ch), ROOM_AFF_NO_EVOLVE)) {
 		msg_to_char(ch, "You can't burn the area right now.\r\n");
+	}
+	else if (GET_LOYALTY(ch) && IS_ANY_BUILDING(IN_ROOM(ch)) && ROOM_OWNER(IN_ROOM(ch)) == GET_LOYALTY(ch) && !HAS_DISMANTLE_PRIV_FOR_BUILDING(ch, IN_ROOM(ch))) {
+		msg_to_char(ch, "You don't have permission to burn the empire's buildings (it requires the dismantle privilege).\r\n");
 	}
 	else if (!objless && !lighter) {
 		// nothing to light it with
@@ -597,7 +597,7 @@ bool validate_burn_area(char_data *ch, int subcmd) {
 			msg_to_char(ch, "You need a lighter that isn't marked 'keep'.\r\n");
 		}
 		else {
-			msg_to_char(ch, "You don't have a lighter to %s the area with.\r\n", cmdname[subcmd]);
+			msg_to_char(ch, "You don't have a lighter to burn the area with.\r\n");
 		}
 	}
 	else if (ROOM_OWNER(IN_ROOM(ch)) && ROOM_OWNER(IN_ROOM(ch)) != GET_LOYALTY(ch) && !has_relationship(GET_LOYALTY(ch), ROOM_OWNER(IN_ROOM(ch)), DIPL_WAR)) {
@@ -1354,7 +1354,7 @@ void process_build_action(char_data *ch) {
 * @param char_data *ch The person burning the area.
 */
 void process_burn_area(char_data *ch) {
-	if (!validate_burn_area(ch, GET_ACTION_VNUM(ch, 0))) {
+	if (!validate_burn_area(ch)) {
 		// sends own message
 		cancel_action(ch);
 		return;
@@ -1386,8 +1386,14 @@ void process_burn_area(char_data *ch) {
 			gain_player_tech_exp(ch, PTECH_LIGHT_FIRE, 15);
 		}
 		
+		// alert?
+		if (ROOM_OWNER(IN_ROOM(ch)) && ROOM_OWNER(IN_ROOM(ch)) != GET_LOYALTY(ch)) {
+			log_to_empire(ROOM_OWNER(IN_ROOM(ch)), ELOG_HOSTILITY, "Someone has burned (%d, %d) %s", X_COORD(IN_ROOM(ch)), Y_COORD(IN_ROOM(ch)), get_room_name(IN_ROOM(ch), FALSE));
+			add_offense(ROOM_OWNER(IN_ROOM(ch)), OFFENSE_BURNED_TILE, ch, IN_ROOM(ch), offense_was_seen(ch, ROOM_OWNER(IN_ROOM(ch)), IN_ROOM(ch)) ? OFF_SEEN : NOBITS);
+		}
+		
 		// finished burning
-		perform_burn_room(IN_ROOM(ch));
+		perform_burn_room(IN_ROOM(ch), EVO_BURNS_TO);
 		cancel_action(ch);
 		stop_room_action(IN_ROOM(ch), ACT_BURN_AREA);
 		
@@ -1572,7 +1578,7 @@ void process_digging(char_data *ch) {
 		
 		// earthmeld damage
 		msg_to_char(iter, "You feel nature burning at your earthmelded form as someone digs above you!\r\n");
-		apply_dot_effect(iter, ATYPE_NATURE_BURN, 6, DAM_MAGICAL, 5, 60, iter);
+		apply_dot_effect(iter, ATYPE_NATURE_BURN, 30, DAM_MAGICAL, 5, 60, iter);
 	}
 }
 
@@ -1688,7 +1694,7 @@ void process_excavating(char_data *ch) {
 		
 		// earthmeld damage
 		msg_to_char(iter, "You feel nature burning at your earthmelded form as someone digs above you!\r\n");
-		apply_dot_effect(iter, ATYPE_NATURE_BURN, 6, DAM_MAGICAL, 5, 60, iter);
+		apply_dot_effect(iter, ATYPE_NATURE_BURN, 30, DAM_MAGICAL, 5, 60, iter);
 	}
 }
 
@@ -2052,7 +2058,7 @@ void process_hunting(char_data *ch) {
 		
 		// stun it if triggers allow
 		if (!run_ability_triggers_by_player_tech(ch, PTECH_HUNT_ANIMALS, mob, NULL)) {
-			af = create_flag_aff(ATYPE_HUNTED, 1, AFF_IMMOBILIZED, ch);
+			af = create_flag_aff(ATYPE_HUNTED, 5, AFF_IMMOBILIZED, ch);
 			affect_join(mob, af, 0);
 		}
 		
@@ -2721,8 +2727,8 @@ void process_swap_skill_sets(char_data *ch) {
 		perform_swap_skill_sets(ch);
 		GET_ACTION(ch) = ACT_NONE;
 		
-		GET_MOVE(ch) = MIN(GET_MOVE(ch), GET_MAX_MOVE(ch)/4);
-		GET_MANA(ch) = MIN(GET_MANA(ch), GET_MAX_MANA(ch)/4);
+		set_move(ch, MIN(GET_MOVE(ch), GET_MAX_MOVE(ch)/4));
+		set_mana(ch, MIN(GET_MANA(ch), GET_MAX_MANA(ch)/4));
 	}
 }
 
@@ -2968,13 +2974,22 @@ ACMD(do_dig) {
 * This is a timed action that triggers a room evolution.
 *
 * @param char_data *ch The character doing the action.
-* @param int subcmd The subcmd that was passed to do_light (SCMD_LIGHT, SCMD_BURN).
 */
-void do_burn_area(char_data *ch, int subcmd) {
-	const char *cmdname[] = { "light", "burn" };	// also in do_light
+void do_burn_area(char_data *ch) {
+	obj_data *lighter = NULL;
+	bool kept;
 	
 	if (IS_NPC(ch)) {
-		msg_to_char(ch, "You cannot %s the area.\r\n", cmdname[subcmd]);
+		msg_to_char(ch, "You cannot burn the area.\r\n");
+	}
+	else if (IS_ANY_BUILDING(IN_ROOM(ch))) {
+		// pass thru
+		if (!has_player_tech(ch, PTECH_LIGHT_FIRE) && !(lighter = find_lighter_in_list(ch->carrying, &kept))) {
+			msg_to_char(ch, "You don't seem to have a lighter%s.\r\n", (kept ? " that isn't marked (keep)" : ""));
+		}
+		else {
+			do_burn_building(ch, IN_ROOM(ch), lighter);
+		}
 	}
 	else if (GET_ACTION(ch) != ACT_NONE) {
 		msg_to_char(ch, "You're a little bit busy right now.\r\n");
@@ -2982,13 +2997,11 @@ void do_burn_area(char_data *ch, int subcmd) {
 	else if (GET_POS(ch) != POS_STANDING) {
 		send_low_pos_msg(ch);
 	}
-	else if (!validate_burn_area(ch, subcmd)) {
+	else if (!validate_burn_area(ch)) {
 		// sends its own message
 	}
 	else {
 		start_action(ch, ACT_BURN_AREA, 5);
-		GET_ACTION_VNUM(ch, 0) = subcmd;
-		
 		msg_to_char(ch, "You prepare to burn the area...\r\n");
 		act("$n prepares to burn the area...", FALSE, ch, NULL, NULL, TO_ROOM);
 	}

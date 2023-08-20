@@ -603,12 +603,19 @@ void load_map_memory(char_data *ch);
 extern account_data *account_table;
 extern char_data *character_list;
 extern char_data *combat_list;
-extern char_data *global_next_char;
+extern char_data *global_next_player;
 extern char_data *next_combat_list;
 extern char_data *next_combat_list_main;
 extern char_data *mobile_table;
+extern char_data *player_character_list;
 extern player_index_data *player_table_by_idnum;
 extern player_index_data *player_table_by_name;
+
+int set_current_pool(char_data *ch, int type, int amount);
+#define set_health(ch, amount)  set_current_pool(ch, HEALTH, amount)
+#define set_move(ch, amount)  set_current_pool(ch, MOVE, amount)
+#define set_mana(ch, amount)  set_current_pool(ch, MANA, amount)
+#define set_blood(ch, amount)  set_current_pool(ch, BLOOD, amount)
 
 void add_mobile_to_table(char_data *mob);
 player_index_data *find_player_index_by_idnum(int idnum);
@@ -648,6 +655,8 @@ extern obj_data *object_list;
 extern obj_data *object_table;
 extern obj_data *purge_bound_items_next;
 extern obj_data *global_next_obj;
+extern bool suspend_autostore_updates;
+extern bool add_chaos_to_obj_timers;
 
 void add_object_to_table(obj_data *obj);
 obj_data *create_obj(void);
@@ -674,6 +683,7 @@ obj_data *Obj_load_from_file(FILE *fl, obj_vnum vnum, int *location, char_data *
 void objpack_load_room(room_data *room, bool use_pre_b5_116_dir);
 
 // players
+extern struct over_time_effect_type *free_dots_list;
 extern struct player_quest *global_next_player_quest, *global_next_player_quest_2;
 extern struct group_data *group_list;
 extern struct int_hash *inherent_ptech_hash;
@@ -691,6 +701,7 @@ void check_languages(char_data *ch);
 void check_languages_all(void);
 void check_languages_all_empires(void);
 void check_languages_empire(empire_data *emp);
+void convert_and_schedule_player_affects(char_data *ch);
 void delete_player_character(char_data *ch);
 void enter_player_game(descriptor_data *d, int dolog, bool fresh);
 room_data *find_home(char_data *ch);
@@ -832,12 +843,14 @@ extern double empire_score_average[NUM_SCORES];
 
 // stored event libs
 void add_stored_event(struct stored_event **list, int type, struct dg_event *event);
+void cancel_all_stored_events(struct stored_event **list);
 void cancel_stored_event(struct stored_event **list, int type);
 void delete_stored_event(struct stored_event **list, int type);
 struct stored_event *find_stored_event(struct stored_event *list, int type);
 
 // stored event helpers
 #define add_stored_event_room(room, type, ev)  add_stored_event(&SHARED_DATA(room)->events, type, ev)
+#define cancel_all_stored_events_room(room)  cancel_all_stored_events(&SHARED_DATA(room)->events)
 #define cancel_stored_event_room(room, type)  cancel_stored_event(&SHARED_DATA(room)->events, type)
 #define delete_stored_event_room(room, type)  delete_stored_event(&SHARED_DATA(room)->events, type)
 #define find_stored_event_room(room, type)  find_stored_event(SHARED_DATA(room)->events, type)
@@ -934,7 +947,7 @@ void init_mine(room_data *room, char_data *ch, empire_data *emp);
 room_data *load_map_room(room_vnum vnum, bool schedule_unload);
 FILE *open_world_file(int block);
 void parse_other_shared_data(struct shared_room_data *shared, char *line, char *error_part);
-void perform_burn_room(room_data *room);
+void perform_burn_room(room_data *room, int evo_type);
 room_data *real_real_room(room_vnum vnum);
 room_data *real_room(room_vnum vnum);
 void remove_room_from_world_tables(room_data *room);
@@ -1054,16 +1067,30 @@ extern struct empire_territory_data *global_next_territory_entry;
 	}	\
 } while(0)
 
-// combine setting these with saving
-#define set_mob_flags(mob, to_set)  do { \
-	SET_BIT(MOB_FLAGS(mob), (to_set));	\
-	request_char_save_in_world(mob);	\
+// combine setting mob flags with saving
+// note: adding SPAWNED will always reset spawn time and schedule the despawn here
+#define set_mob_flags(mob, to_set)  do { 	\
+	if (IS_NPC(mob)) {						\
+		SET_BIT(MOB_FLAGS(mob), (to_set));	\
+		check_scheduled_events_mob(mob);	\
+		request_char_save_in_world(mob);	\
+		if (IS_SET((to_set), MOB_SPAWNED)) {	\
+			set_mob_spawn_time((mob), time(0));	\
+		}									\
+	}										\
 } while (0)
 
 // combine removing these with saving
+// note: removing TIED will always reset spawn time and schedule the despawn here
 #define remove_mob_flags(mob, to_set)  do { \
-	REMOVE_BIT(MOB_FLAGS(mob), (to_set));	\
-	request_char_save_in_world(mob);	\
+	if (IS_NPC(mob)) {						\
+		REMOVE_BIT(MOB_FLAGS(mob), (to_set));	\
+		check_scheduled_events_mob(mob);	\
+		request_char_save_in_world(mob);	\
+		if (IS_SET((to_set), MOB_TIED)) {	\
+			set_mob_spawn_time((mob), time(0));	\
+		}									\
+	}										\
 } while (0)
 
 

@@ -22,6 +22,7 @@
 #include "interpreter.h"
 #include "handler.h"
 #include "skills.h"
+#include "dg_event.h"
 #include "dg_scripts.h"
 #include "vnums.h"
 #include "constants.h"
@@ -30,6 +31,7 @@
 * Contents:
 *   Helpers
 *   Generic NPCs
+*   DG Events for Mobs
 *   Mob Movement
 *   Mob Activity
 *   Mob Spawning
@@ -44,6 +46,10 @@ extern bool caught_up_mobs;
 ACMD(do_exit);
 ACMD(do_say);
 
+// local functions
+bool check_aggro(char_data *ch);
+bool check_mob_pursuit(char_data *ch);
+
 
 // for validate_global_map_spawns, run_global_map_spawns
 struct glb_map_spawn_bean {
@@ -55,6 +61,9 @@ struct glb_map_spawn_bean {
 
  //////////////////////////////////////////////////////////////////////////////
 //// HELPERS /////////////////////////////////////////////////////////////////
+
+// when a mob is too busy for regular activity
+#define MOB_IS_BUSY(ch)  (GET_FED_ON_BY(ch) || EXTRACTED(ch) || IS_DEAD(ch) || AFF_FLAGGED((ch), AFF_STUNNED | AFF_HARD_STUNNED) || FIGHTING(ch) || !AWAKE(ch) || AFF_FLAGGED(ch, AFF_CHARM) || MOB_FLAGGED(ch, MOB_TIED) || IS_INJURED(ch, INJ_TIED) || GET_LED_BY(ch))
 
 /**
 * Creates a new mob pursuit entry -- this will delete any old entry for the
@@ -80,6 +89,8 @@ void add_pursuit(char_data *ch, char_data *target) {
 	purs->idnum = GET_IDNUM(target);
 	purs->last_seen = time(0);
 	purs->location = GET_ROOM_VNUM(HOME_ROOM(IN_ROOM(ch)));
+	
+	schedule_pursuit_event(ch);
 }
 
 
@@ -191,7 +202,9 @@ INTERACTION_FUNC(run_one_encounter) {
 			}
 		}
 		char_to_room(aggr, IN_ROOM(ch));
-		set_mob_flags(aggr, MOB_SPAWNED);
+		if (!MOB_FLAGGED(aggr, MOB_SPAWNED)) {
+			set_mob_flags(aggr, MOB_SPAWNED);
+		}
 		act("$N appears!", FALSE, ch, 0, aggr, TO_CHAR | TO_ROOM);
 		hit(aggr, ch, GET_EQ(aggr, WEAR_WIELD), TRUE);
 		load_mtrigger(aggr);
@@ -434,6 +447,406 @@ void setup_generic_npc(char_data *mob, empire_data *emp, int name, int sex) {
 	}
 	
 	request_char_save_in_world(mob);
+}
+
+
+ //////////////////////////////////////////////////////////////////////////////
+//// DG EVENTS FOR MOBS //////////////////////////////////////////////////////
+
+// handles aggro/cityguard
+EVENTFUNC(mob_aggro_event) {
+	struct mob_event_data *data = (struct mob_event_data*)event_obj;
+	char_data *mob = data->mob;
+	bool remove;
+	
+	// always delete first
+	delete_stored_event(&GET_STORED_EVENTS(mob), SEV_AGGRO);
+	
+	if (!MOB_FLAGGED(mob, MOB_AGGRESSIVE | MOB_CITYGUARD)) {
+		remove = TRUE;	// no flag
+	}
+	else if (MOB_IS_BUSY(mob)) {
+		remove = FALSE;	// various busy flags -- re-enqueue
+	}
+	else {
+		// ok
+		remove = check_aggro(mob) ? FALSE : TRUE;
+	}
+	
+	if (remove || IS_DEAD(mob) || EXTRACTED(mob)) {
+		// removed by request or when dead
+		free(data);
+		return 0;	// no re-enqueue
+	}
+	else {
+		// re-store, re-enqueue, and try again
+		if (!find_stored_event(GET_STORED_EVENTS(mob), SEV_AGGRO)) {
+			add_stored_event(&GET_STORED_EVENTS(mob), SEV_AGGRO, the_event);
+			return number(1, 10) RL_SEC;
+		}
+		else {
+			// already added a new one -- just flush this one
+			free(data);
+			return 0;
+		}
+	}
+}
+
+
+// handles mob movement
+EVENTFUNC(mob_move_event) {
+	struct mob_event_data *data = (struct mob_event_data*)event_obj;
+	char_data *mob = data->mob;
+	bool remove;
+	
+	// always delete first
+	delete_stored_event(&GET_STORED_EVENTS(mob), SEV_MOVEMENT);
+	
+	if (!IS_NPC(mob) || MOB_FLAGGED(mob, MOB_SENTINEL | MOB_TIED)) {
+		// things that cancel movement entirely
+		remove = TRUE;
+	}
+	else if ((MOB_FLAGGED(mob, MOB_PURSUE) && MOB_PURSUIT(mob)) || MOB_IS_BUSY(mob)) {
+		remove = FALSE;	// various busy flags -- re-enqueue
+	}
+	else if (AFF_FLAGGED(mob, AFF_CHARM | AFF_IMMOBILIZED) || GET_POS(mob) < POS_STANDING || (GET_LEADER(mob) && IN_ROOM(mob) == IN_ROOM(GET_LEADER(mob))) || (MOB_FLAGGED(mob, MOB_PURSUE) && MOB_PURSUIT(mob))) {
+		// cancel temporarily but re-enquue
+		remove = FALSE;
+	}
+	else {
+		// ok to try a move!
+		try_mobile_movement(mob);
+		remove = FALSE;
+	}
+	
+	if (remove || IS_DEAD(mob) || EXTRACTED(mob)) {
+		// removed by request or when dead
+		free(data);
+		return 0;	// no re-enqueue
+	}
+	else {
+		// re-store, re-enqueue, and try again
+		if (!find_stored_event(GET_STORED_EVENTS(mob), SEV_MOVEMENT)) {
+			add_stored_event(&GET_STORED_EVENTS(mob), SEV_MOVEMENT, the_event);
+			return 10 RL_SEC;
+		}
+		else {
+			// already added a new one -- just flush this one
+			free(data);
+			return 0;
+		}
+	}
+}
+
+
+// handles mob pursuit
+EVENTFUNC(mob_pursuit_event) {
+	struct mob_event_data *data = (struct mob_event_data*)event_obj;
+	char_data *mob = data->mob;
+	bool remove;
+	
+	// always delete first
+	delete_stored_event(&GET_STORED_EVENTS(mob), SEV_PURSUIT);
+	
+	if (!IS_NPC(mob) || !MOB_FLAGGED(mob, MOB_PURSUE) || !MOB_PURSUIT(mob)) {
+		// things that cancel pursuit entirely
+		remove = TRUE;
+	}
+	else if (MOB_IS_BUSY(mob)) {
+		remove = FALSE;	// various busy flags -- re-enqueue
+	}
+	else {
+		// ok to pursue!
+		check_mob_pursuit(mob);
+		remove = FALSE;
+	}
+	
+	if (remove || IS_DEAD(mob) || EXTRACTED(mob)) {
+		// removed by request or when dead
+		free(data);
+		return 0;	// no re-enqueue
+	}
+	else {
+		// re-store, re-enqueue, and try again
+		add_stored_event(&GET_STORED_EVENTS(mob), SEV_PURSUIT, the_event);
+		return (2 + number(0, 6)) RL_SEC;
+	}
+}
+
+
+// checks if it's time to reset the mob; reschedules itself if not
+EVENTFUNC(mob_reset_event) {
+	struct mob_event_data *data = (struct mob_event_data*)event_obj;
+	char_data *mob = data->mob;
+	bool result;
+	
+	// always delete first
+	delete_stored_event(&GET_STORED_EVENTS(mob), SEV_RESET_MOB);
+	
+	// safety first
+	if (!IS_NPC(mob)) {
+		free(data);
+		return 0;	// do not re-enqueue
+	}
+	
+	// ok, try it
+	result = check_reset_mob(mob, FALSE);
+	
+	if (result) {
+		// success on the reset and goodbye
+		free(data);
+		return 0;	// do not re-enqueue
+	}
+	else {
+		// did not reset
+		if (GET_POS(mob) < POS_STUNNED) {
+			set_health(mob, GET_HEALTH(mob) - 1);
+			update_pos(mob);
+			if (GET_POS(mob) == POS_DEAD) {
+				die(mob, mob);
+				free(data);
+				return 0;	// do not re-enqueue
+			}
+		}
+		
+		// try again soon
+		if (!find_stored_event(GET_STORED_EVENTS(mob), SEV_RESET_MOB)) {
+			add_stored_event(&GET_STORED_EVENTS(mob), SEV_RESET_MOB, the_event);
+			return MOB_RESTORE_INTERVAL RL_SEC;	// re-enqueue
+		}
+	}
+	
+	// if we got here, it's done
+	free(data);
+	return 0;	// do not re-enqueue
+}
+
+
+// handles scavenger mobs trying to eat a corpse
+EVENTFUNC(mob_scavenge_event) {
+	struct mob_event_data *data = (struct mob_event_data*)event_obj;
+	char_data *mob;
+	obj_data *obj;
+	bool found = FALSE;
+	
+	// grab data
+	mob = data->mob;
+	
+	if (MOB_IS_BUSY(mob)) {
+		return 5 RL_SEC;	// try again soon
+	}
+	
+	// always delete first
+	delete_stored_event(&GET_STORED_EVENTS(mob), SEV_SCAVENGE);
+	
+	if (MOB_FLAGGED(mob, MOB_SCAVENGER)) {
+		DL_FOREACH2(ROOM_CONTENTS(IN_ROOM(mob)), obj, next_content) {
+			if (IS_CORPSE(obj) && GET_CORPSE_SIZE(obj) <= GET_SIZE(mob)) {
+				// valid corpse... random chance to eat it
+				if (!number(0, 5) && CAN_SEE_OBJ(mob, obj)) {
+					act("You eat $p.", FALSE, mob, obj, NULL, TO_CHAR);
+					if (mob_has_custom_message(mob, MOB_CUSTOM_SCAVENGE_CORPSE)) {
+						act(mob_get_custom_message(mob, MOB_CUSTOM_SCAVENGE_CORPSE), FALSE, mob, obj, NULL, TO_ROOM);
+					}
+					else {
+						act("$n eats $p.", FALSE, mob, obj, NULL, TO_ROOM);
+					}
+					empty_obj_before_extract(obj);
+					extract_obj(obj);
+				}
+				
+				found = TRUE;
+				break;	// only 1 corpse, even if we didn't eat it (will re-enqueue this event)
+			}
+		}
+	}
+	
+	if (found) {
+		// re-store, re-enqueue, and try again
+		add_stored_event(&GET_STORED_EVENTS(mob), SEV_SCAVENGE, the_event);
+		return 5 RL_SEC;
+	}
+	else {
+		// nothing to scavenge
+		free(data);
+		return 0;	// do not re-enqueue
+	}
+}
+
+
+/**
+* Schedule a scavenge event for all scavengers in the room.
+*
+* @param room_data *room The room to check scavengers in.
+*/
+void check_scavengers(room_data *room) {
+	char_data *ch_iter;
+	
+	if (room) {
+		DL_FOREACH2(ROOM_PEOPLE(room), ch_iter, next_in_room) {
+			if (MOB_FLAGGED(ch_iter, MOB_SCAVENGER)) {
+				schedule_scavenge_event(ch_iter, TRUE);
+			}
+		}
+	}
+}
+
+
+/**
+* Looks for unscheduled DG events that a mob requires, and schedules them if
+* so.
+*
+* @param char_data *mob The mob to schedule events for, if needed.
+*/
+void check_scheduled_events_mob(char_data *mob) {
+	if (!mob || !IS_NPC(mob) || EXTRACTED(mob)) {
+		return;	// no work
+	}
+	
+	// all these check their own conditions
+	schedule_aggro_event(mob);
+	schedule_scavenge_event(mob, TRUE);
+	schedule_mob_move_event(mob, TRUE);
+	schedule_pursuit_event(mob);
+	schedule_despawn_event(mob);
+}
+
+
+/**
+* Schedules a DG event for an aggro/cityguard mob to look for attackable
+* targets.
+*
+* @param char_data *ch The mob to schedule for.
+*/
+void schedule_aggro_event(char_data *ch) {
+	struct mob_event_data *data;
+	struct dg_event *ev;
+	
+	if (ch && MOB_FLAGGED(ch, MOB_AGGRESSIVE | MOB_CITYGUARD) && !find_stored_event(GET_STORED_EVENTS(ch), SEV_AGGRO)) {
+		CREATE(data, struct mob_event_data, 1);
+		data->mob = ch;
+		
+		ev = dg_event_create(mob_aggro_event, data, (number(0,6) - 0.75) RL_SEC);
+		add_stored_event(&GET_STORED_EVENTS(ch), SEV_AGGRO, ev);
+	}
+}
+
+
+/**
+* Schedules normal movement for a mob.
+*
+* @param char_data *ch The mob who will be moving.
+* @param bool randomize If TRUE, schedules for 10-20 seconds from now. If FALSE, it's always 10 seconds.
+*/
+void schedule_mob_move_event(char_data *ch, bool randomize) {
+	struct mob_event_data *data;
+	struct dg_event *ev;
+	
+	if (ch && !MOB_FLAGGED(ch, MOB_SENTINEL | MOB_TIED) && !find_stored_event(GET_STORED_EVENTS(ch), SEV_MOVEMENT)) {
+		CREATE(data, struct mob_event_data, 1);
+		data->mob = ch;
+		
+		ev = dg_event_create(mob_move_event, data, (randomize ? 10 + number(0,10) : 10) RL_SEC);
+		add_stored_event(&GET_STORED_EVENTS(ch), SEV_MOVEMENT, ev);
+	}
+}
+
+
+/**
+* Schedules DG events (aggro, scavenging) that happen when a person moves into
+* a room.
+*
+* @param char_data *ch The person (PC or NPC) who moved into their current room.
+*/
+void schedule_movement_events(char_data *ch) {
+	char_data *ch_iter;
+	
+	if (!ch || !IN_ROOM(ch)) {
+		return;	// huh?
+	}
+	
+	// check mobs in the room
+	DL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), ch_iter, next_in_room) {
+		if (MOB_FLAGGED(ch_iter, MOB_AGGRESSIVE | MOB_CITYGUARD)) {
+			// mobs (including me) who might aggro
+			schedule_aggro_event(ch);
+		}
+	}
+	
+	schedule_check_leading_event(ch);
+	
+	// everything else is for NPCs only; players exit here
+	if (!IS_NPC(ch)) {
+		return;
+	}
+	
+	// events on this mob
+	schedule_scavenge_event(ch, FALSE);
+	schedule_mob_move_event(ch, FALSE);
+}
+
+
+/**
+* Schedules the pursuit event for a mob. Call when a mob gains pursuit targets
+* and at startup.
+*
+* @param char_data *ch The mob who is pursuing.
+*/
+void schedule_pursuit_event(char_data *ch) {
+	struct mob_event_data *data;
+	struct dg_event *ev;
+	
+	if (ch && MOB_FLAGGED(ch, MOB_PURSUE) && MOB_PURSUIT(ch) && !find_stored_event(GET_STORED_EVENTS(ch), SEV_PURSUIT)) {
+		CREATE(data, struct mob_event_data, 1);
+		data->mob = ch;
+		
+		ev = dg_event_create(mob_pursuit_event, data, (2 + number(0, 6)) RL_SEC);
+		add_stored_event(&GET_STORED_EVENTS(ch), SEV_PURSUIT, ev);
+	}
+}
+
+
+/**
+* Schedules a check_reset_mob(). Call this when the mob has taken damage, or
+* anything else that would be reset by that function.
+*
+* @param char_data *ch The mob to schedule to reset.
+*/
+void schedule_reset_mob(char_data *ch) {
+	if (IS_NPC(ch) && !find_stored_event(GET_STORED_EVENTS(ch), SEV_RESET_MOB)) {
+		struct mob_event_data *data;
+		struct dg_event *ev;
+		
+		CREATE(data, struct mob_event_data, 1);
+		data->mob = ch;
+		
+		ev = dg_event_create(mob_reset_event, data, MOB_RESTORE_INTERVAL RL_SEC);
+		add_stored_event(&GET_STORED_EVENTS(ch), SEV_RESET_MOB, ev);
+	}
+}
+
+
+/**
+* Schedules the scavenger flag for a mob. Call when:
+* - entering a room
+* - corpse drops in the room
+* - gaining scavenger flag
+* - at startup for all scavenger mobs
+*
+* @param char_data *ch The mob who will scavenge.
+* @param bool randomize If TRUE, schedules for 5-10 seconds from now. If FALSE, it's always 5 seconds.
+*/
+void schedule_scavenge_event(char_data *ch, bool randomize) {
+	struct mob_event_data *data;
+	struct dg_event *ev;
+	
+	if (ch && MOB_FLAGGED(ch, MOB_SCAVENGER) && !find_stored_event(GET_STORED_EVENTS(ch), SEV_SCAVENGE)) {
+		CREATE(data, struct mob_event_data, 1);
+		data->mob = ch;
+		
+		ev = dg_event_create(mob_scavenge_event, data, (randomize ? 5 + number(0,5) : 5) RL_SEC);
+		add_stored_event(&GET_STORED_EVENTS(ch), SEV_SCAVENGE, ev);
+	}
 }
 
 
@@ -765,49 +1178,28 @@ bool try_mobile_movement(char_data *ch) {
 //// MOB ACTIVITY ////////////////////////////////////////////////////////////
 
 /**
-* Main cycle of mob activity: runs on 1 mob at a time as of b5.115. Previously,
-* this was mobile_activity() and iterated over the character list. Now it runs
-* inside of real_update().
+* Checks if there's anybody here to aggro (AGGRESSIVE or CITYGUARD flags).
 *
-* @param char_data *ch The mob.
+* @param char_data *ch The mob doing the aggroing.
+* @return bool If TRUE, keep checking periodically. If FALSE, there are no valid targets at all.
 */
-void run_mobile_activity(char_data *ch) {
-	register char_data *ally, *vict, *targ;
-	bool acted = FALSE, moved = FALSE, is_hostile, is_enemy;
-	obj_data *obj;
-
+// return FALSE to cancel event completely, TRUE to continue
+bool check_aggro(char_data *ch) {
+	char_data *vict, *ally, *targ;
+	bool is_hostile, is_enemy;
+	bool acted = FALSE, any = FALSE;
+	
 	#define CAN_AGGRO(mob, vict)  (!IS_IMMORTAL(vict) && !IS_DEAD(vict) && !NOHASSLE(vict) && (IS_NPC(vict) || !PRF_FLAGGED(vict, PRF_WIZHIDE)) && !IS_GOD(vict) && vict != GET_LEADER(mob) && !AFF_FLAGGED(vict, AFF_IMMUNE_PHYSICAL | AFF_NO_TARGET_IN_ROOM | AFF_NO_SEE_IN_ROOM | AFF_NO_ATTACK) && CAN_SEE(mob, vict) && can_fight((mob), (vict)))
 	
-	// prevent running multiple mob moves during a catch-up cycle
-	if (!catch_up_mobs) {
-		return;
-	}
-	caught_up_mobs = TRUE;	// indicate we have run at least 1 mob
-	
-	// things that prevent activity:
-	if (!IS_MOB(ch) || GET_FED_ON_BY(ch) || EXTRACTED(ch) || IS_DEAD(ch) || AFF_FLAGGED(ch, AFF_STUNNED | AFF_HARD_STUNNED)) {
-		return;	// not a mob or is disabled
-	}
-	if (FIGHTING(ch) || !AWAKE(ch) || AFF_FLAGGED(ch, AFF_CHARM) || MOB_FLAGGED(ch, MOB_TIED) || IS_INJURED(ch, INJ_TIED) || GET_LED_BY(ch)) {
-		return;	// already busy
-	}
-	
-	// 1. pursuit
-	if (!moved && MOB_FLAGGED(ch, MOB_PURSUE) && MOB_PURSUIT(ch) && !moved) {
-		moved = check_mob_pursuit(ch);
-	}
-	
-	// 2. try a basic move
-	if (!moved && !MOB_FLAGGED(ch, MOB_SENTINEL | MOB_TIED) && !AFF_FLAGGED(ch, AFF_CHARM | AFF_IMMOBILIZED) && GET_POS(ch) == POS_STANDING && (!GET_LEADER(ch) || IN_ROOM(ch) != IN_ROOM(GET_LEADER(ch))) && (!MOB_FLAGGED(ch, MOB_PURSUE) || !MOB_PURSUIT(ch))) {
-		moved = try_mobile_movement(ch);
-	}
-
-	// 3. Aggressive Mobs (even if we moved)
 	if (!acted && MOB_FLAGGED(ch, MOB_AGGRESSIVE) && (IS_ADVENTURE_ROOM(IN_ROOM(ch)) || !ISLAND_FLAGGED(IN_ROOM(ch), ISLE_NO_AGGRO))) {
 		DL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), vict, next_in_room) {
 			if (vict == ch) {
 				continue;	// ignore: self
 			}
+			
+			// mark that there's at least 1 non-me here
+			any = TRUE;
+			
 			if (!IS_NPC(vict) && !vict->desc) {
 				continue;	// ignore: linkdead player
 			}
@@ -826,15 +1218,18 @@ void run_mobile_activity(char_data *ch) {
 			acted = TRUE;
 			break;
 		}
-	}	// end aggro
+	}	// end aggressive
 	
-	// 4. Cityguards
 	if (!acted && MOB_FLAGGED(ch, MOB_CITYGUARD) && GET_LOYALTY(ch)) {
-		// 4.1: look for people to assist
+		// look for people to assist
 		DL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), ally, next_in_room) {
 			if (ally == ch || GET_LOYALTY(ally) != GET_LOYALTY(ch)) {
 				continue;	// ignore: is self or is wrong empire
 			}
+			
+			// mark that there's someone else here
+			any = TRUE;
+			
 			if (!(targ = FIGHTING(ally)) || targ == ch || targ == GET_LEADER(ch)) {
 				continue;	// ignore: fighting us!
 			}
@@ -854,12 +1249,16 @@ void run_mobile_activity(char_data *ch) {
 			break;
 		}	// end cityguard assist
 		
-		// 4.2: look for intruders to aggro
+		// look for intruders to aggro
 		if (!acted && !ISLAND_FLAGGED(IN_ROOM(ch), ISLE_NO_AGGRO)) {
 			DL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), vict, next_in_room) {
 				if (GET_LOYALTY(vict) == GET_LOYALTY(ch)) {
 					continue;	// ignore: self or same empire
 				}
+				
+				// mark that there's someone here
+				any = TRUE;
+				
 				if (!IS_NPC(vict) && !vict->desc) {
 					continue;	// ignore: linkdead player
 				}
@@ -904,19 +1303,8 @@ void run_mobile_activity(char_data *ch) {
 		}	// end cityguard aggro
 	}	// end cityguard
 	
-	// 5. scavenging
-	if (!acted && MOB_FLAGGED(ch, MOB_SCAVENGER)) {
-		DL_FOREACH2(ROOM_CONTENTS(IN_ROOM(ch)), obj, next_content) {
-			if (GET_OBJ_TYPE(obj) == ITEM_CORPSE && GET_CORPSE_SIZE(obj) <= GET_SIZE(ch) && !number(0, 10)) {
-				act("$n eats $p.", FALSE, ch, obj, NULL, TO_ROOM);
-				empty_obj_before_extract(obj);
-				extract_obj(obj);
-				break;
-			}
-		}
-	}
-
-	/* Add new mobile actions here */
+	// this indicates if there's any reason to keep checking aggro
+	return any;
 }
 
 
@@ -1046,6 +1434,123 @@ void despawn_mob(char_data *ch) {
 }
 
 
+EVENTFUNC(mob_despawn_event) {
+	struct mob_event_data *data = (struct mob_event_data*)event_obj;
+	char_data *mob = data->mob, *chiter;
+	int count;
+	
+	// safety first
+	if (!MOB_FLAGGED(mob, MOB_SPAWNED) || MOB_FLAGGED(mob, MOB_TIED)) {
+		delete_stored_event(&GET_STORED_EVENTS(mob), SEV_DESPAWN);
+		free(data);
+		return 0;	// do no re-enqueue
+	}
+	else if (mob->desc) {
+		// switched-- try again later
+		return 60 RL_SEC;
+	}
+	else if (GET_LED_BY(mob) || GET_LEADING_MOB(mob) || GET_LEADING_VEHICLE(mob) || GET_FED_ON_BY(mob) || MOB_FLAGGED(mob, MOB_TIED)) {
+		// try again soon
+		return 60 RL_SEC;
+	}
+	
+	// animal-in-a-stable checks
+	if (MOB_FLAGGED(mob, MOB_ANIMAL) && room_has_function_and_city_ok(NULL, IN_ROOM(mob), FNC_STABLE)) {
+		// check mob crowding
+		count = 0;
+		DL_FOREACH2(ROOM_PEOPLE(IN_ROOM(mob)), chiter, next_in_room) {
+			if (IS_NPC(chiter) && GET_MOB_VNUM(chiter) == GET_MOB_VNUM(mob)) {
+				++count;
+			}
+		}
+		if (count > config_get_int("num_duplicates_in_stable")) {
+			act("$n is feeling overcrowded, and leaves.", TRUE, mob, NULL, NULL, TO_ROOM);
+			delete_stored_event(&GET_STORED_EVENTS(mob), SEV_DESPAWN);
+			free(data);
+			despawn_mob(mob);
+			return 0;	// do no re-enqueue
+		}
+		
+		// otherwise we've hit the stable exception! come back in an hour
+		return SECS_PER_REAL_HOUR RL_SEC;
+	}
+	
+	// last check: players nerby
+	if (distance_to_nearest_player(IN_ROOM(mob)) <= config_get_int("mob_despawn_radius")) {
+		return 60 RL_SEC;	// re-enqueue
+	}
+	
+	// ok: if we got here, we can despawn the mob
+	delete_stored_event(&GET_STORED_EVENTS(mob), SEV_DESPAWN);
+	free(data);
+	despawn_mob(mob);
+	return 0;	// do no re-enqueue
+}
+
+
+/**
+* Call this e.g. if you change the "mob_spawn_interval" config. It will update
+* the despawn schedule for all SPAWNED mobs based on the new interval, and
+* ensure all SPAWNED mobs have despawn events.
+*/
+void reschedule_all_despawns(void) {
+	char_data *iter;
+	
+	DL_FOREACH(character_list, iter) {
+		if (MOB_FLAGGED(iter, MOB_SPAWNED)) {
+			cancel_stored_event(&GET_STORED_EVENTS(iter), SEV_DESPAWN);
+			schedule_despawn_event(iter);
+		}
+	}
+}
+
+
+/**
+* Schedules a DG event for a spawned mob to despawn. It guarantees the despawn
+* time will be in the future. Safe to call on any mob but won't override an
+* existing scheduled event.
+*
+* @param char_data *mob The mob to schedule for.
+*/
+void schedule_despawn_event(char_data *mob) {
+	struct mob_event_data *data;
+	struct dg_event *ev;
+	long when;
+	
+	long interval_mins = config_get_int("mob_spawn_interval");
+	
+	if (mob && MOB_FLAGGED(mob, MOB_SPAWNED) && !MOB_FLAGGED(mob, MOB_TIED) && !find_stored_event(GET_STORED_EVENTS(mob), SEV_DESPAWN) && interval_mins > 0) {
+		CREATE(data, struct mob_event_data, 1);
+		data->mob = mob;
+		
+		// determine seconds-from-now
+		when = MOB_SPAWN_TIME(mob) + (interval_mins * SECS_PER_REAL_MIN) - time(0);
+		if (when <= 0) {
+			// ensure it's in the future to avoid a ton of collisions at once if the mud reboots after being down a while
+			when = number(1, 60);
+		}
+		
+		ev = dg_event_create(mob_despawn_event, data, when RL_SEC);
+		add_stored_event(&GET_STORED_EVENTS(mob), SEV_DESPAWN, ev);
+	}
+}
+
+
+/**
+* Sets (or re-sets) the spawn time for a mob and schedules the despawn event.
+*
+* @param char_data *mob The mob to set a spawn time for.
+* @param long when The timestamp when the mob spawned -- usually time(0).
+*/
+void set_mob_spawn_time(char_data *mob, long when) {
+	if (mob && IS_NPC(mob)) {
+		MOB_SPAWN_TIME(mob) = when;
+		cancel_stored_event(&GET_STORED_EVENTS(mob), SEV_DESPAWN);
+		schedule_despawn_event(mob);
+	}
+}
+
+
 /**
 * Runs a single spawn list on a room. The room is assumed to be pre-validated
 * and ready to receive spawns.
@@ -1104,7 +1609,9 @@ static int spawn_one_list(room_data *room, struct spawn_info *list) {
 		setup_generic_npc(mob, ROOM_OWNER(home), NOTHING, NOTHING);
 		
 		// enforce spawn data
-		set_mob_flags(mob, MOB_SPAWNED);
+		if (!MOB_FLAGGED(mob, MOB_SPAWNED)) {
+			set_mob_flags(mob, MOB_SPAWNED);
+		}
 		
 		// put in the room
 		char_to_room(mob, room);
@@ -1441,9 +1948,10 @@ bool check_reset_mob(char_data *ch, bool force) {
 	
 	// ok: reset me
 	free_mob_tags(&MOB_TAGGED_BY(ch));
-	GET_HEALTH(ch) = GET_MAX_HEALTH(ch);
-	GET_MOVE(ch) = GET_MAX_MOVE(ch);
-	GET_MANA(ch) = GET_MAX_MANA(ch);
+	set_health(ch, GET_MAX_HEALTH(ch));
+	set_move(ch, GET_MAX_MOVE(ch));
+	set_mana(ch, GET_MAX_MANA(ch));
+	set_blood(ch, GET_MAX_BLOOD(ch));
 	if (GET_POS(ch) < POS_SLEEPING) {
 		GET_POS(ch) = POS_STANDING;
 	}
@@ -1762,13 +2270,20 @@ void scale_mob_to_level(char_data *mob, int level) {
 	
 	// cleanup
 	for (iter = 0; iter < NUM_POOLS; ++iter) {
-		mob->points.current_pools[iter] = mob->points.max_pools[iter] - pools_down[iter];
+		set_current_pool(mob, iter, mob->points.max_pools[iter] - pools_down[iter]);
 		// ensure minimum of 1 after scaling:
-		mob->points.current_pools[iter] = MIN(mob->points.max_pools[iter], MAX(1, mob->points.current_pools[iter]));
+		if (mob->points.current_pools[iter] < 1) {
+			set_current_pool(mob, iter, 1);
+		}
 	}
 	for (iter = 0; iter < NUM_ATTRIBUTES; ++iter) {
 		mob->aff_attributes[iter] = mob->real_attributes[iter];
 	}
 	affect_total(mob);
 	update_pos(mob);
+	
+	// mark for descale if possible
+	if (!MOB_FLAGGED(mob, MOB_NO_RESCALE)) {
+		schedule_reset_mob(mob);
+	}
 }

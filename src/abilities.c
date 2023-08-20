@@ -382,7 +382,7 @@ void apply_one_passive_buff(char_data *ch, ability_data *abil) {
 			remaining_points = MAX(0, remaining_points);
 		}
 		
-		af = create_flag_aff(ABIL_VNUM(abil), 1, ABIL_AFFECTS(abil), ch);
+		af = create_flag_aff(ABIL_VNUM(abil), UNLIMITED, ABIL_AFFECTS(abil), ch);
 		LL_APPEND(GET_PASSIVE_BUFFS(ch), af);
 		affect_modify(ch, af->location, af->modifier, af->bitvector, TRUE);
 	}
@@ -400,7 +400,7 @@ void apply_one_passive_buff(char_data *ch, ability_data *abil) {
 	// now create affects for each apply that we can afford
 	LL_FOREACH(ABIL_APPLIES(abil), apply) {
 		if (apply_never_scales[apply->location] || unscaled) {
-			af = create_mod_aff(ABIL_VNUM(abil), 1, apply->location, apply->weight, ch);
+			af = create_mod_aff(ABIL_VNUM(abil), UNLIMITED, apply->location, apply->weight, ch);
 			LL_APPEND(GET_PASSIVE_BUFFS(ch), af);
 			affect_modify(ch, af->location, af->modifier, af->bitvector, TRUE);
 			continue;
@@ -415,7 +415,7 @@ void apply_one_passive_buff(char_data *ch, ability_data *abil) {
 			remaining_points -= share;
 			remaining_points = MAX(0, total_points);
 			
-			af = create_mod_aff(ABIL_VNUM(abil), 1, apply->location, amt, ch);
+			af = create_mod_aff(ABIL_VNUM(abil), UNLIMITED, apply->location, amt, ch);
 			LL_APPEND(GET_PASSIVE_BUFFS(ch), af);
 			affect_modify(ch, af->location, af->modifier, af->bitvector, TRUE);
 		}
@@ -1754,11 +1754,8 @@ DO_ABIL(do_buff_ability) {
 		return;
 	}
 	
-	// determine duration
+	// determine duration (in seconds)
 	dur = IS_CLASS_ABILITY(ch, ABIL_VNUM(abil)) ? ABIL_LONG_DURATION(abil) : ABIL_SHORT_DURATION(abil);
-	if (dur != UNLIMITED) {
-		dur = (int) ceil((double)dur / SECS_PER_REAL_UPDATE);	// convert units
-	}
 	
 	messaged = FALSE;	// to prevent duplicates
 	
@@ -1879,9 +1876,6 @@ DO_ABIL(do_dot_ability) {
 	
 	// determine duration
 	dur = IS_CLASS_ABILITY(ch, ABIL_VNUM(abil)) ? ABIL_LONG_DURATION(abil) : ABIL_SHORT_DURATION(abil);
-	if (dur != UNLIMITED) {
-		dur = (int) ceil((double)dur / SECS_PER_REAL_UPDATE);	// convert units
-	}
 	
 	dmg = points * (data->matching_role ? 2 : 1);
 	
@@ -2131,6 +2125,19 @@ bool audit_ability(ability_data *abil, char_data *ch) {
 	HASH_ITER(hh, ability_table, iter, next_iter) {
 		if (iter != abil && ABIL_VNUM(iter) != ABIL_VNUM(abil) && !str_cmp(ABIL_NAME(iter), ABIL_NAME(abil))) {
 			olc_audit_msg(ch, ABIL_VNUM(abil), "Same name as ability %d", ABIL_VNUM(iter));
+			problem = TRUE;
+		}
+	}
+	
+	
+	// dots
+	if (IS_SET(ABIL_TYPES(abil), ABILT_DOT)) {
+		if (ABIL_SHORT_DURATION(abil) == UNLIMITED) {
+			olc_audit_msg(ch, ABIL_VNUM(abil), "Unlimited short duration not supported on DOTs", ABIL_VNUM(iter));
+			problem = TRUE;
+		}
+		if (ABIL_LONG_DURATION(abil) == UNLIMITED) {
+			olc_audit_msg(ch, ABIL_VNUM(abil), "Unlimited long duration not supported on DOTs", ABIL_VNUM(iter));
 			problem = TRUE;
 		}
 	}
@@ -2670,6 +2677,7 @@ void read_ability_requirements(void) {
 	
 	HASH_ITER(hh, skill_table, skill, next_skill) {
 		LL_FOREACH(SKILL_ABILITIES(skill), iter) {
+			// TODO should this be moved up? or be checking ability in-dev?
 			if (IS_SET(SKILL_FLAGS(skill), SKILLF_IN_DEVELOPMENT)) {
 				continue;	// don't count if in-dev
 			}
@@ -2967,11 +2975,8 @@ void olc_delete_ability(char_data *ch, any_vnum vnum) {
 	}
 	
 	// update live players
-	DL_FOREACH(character_list, chiter) {
+	DL_FOREACH2(player_character_list, chiter, next_plr) {
 		found = FALSE;
-		if (IS_NPC(chiter)) {
-			continue;
-		}
 		
 		HASH_ITER(hh, GET_ABILITY_HASH(chiter), plab, next_plab) {
 			if (plab->vnum == vnum) {
@@ -3331,8 +3336,8 @@ void save_olc_ability(descriptor_data *desc) {
 	}
 	
 	// update live players' gain hooks and techs
-	DL_FOREACH(character_list, chiter) {
-		if (!IS_NPC(chiter) && (abd = get_ability_data(chiter, vnum, FALSE))) {
+	DL_FOREACH2(player_character_list, chiter, next_plr) {
+		if ((abd = get_ability_data(chiter, vnum, FALSE))) {
 			any = FALSE;
 			for (iter = 0; iter < NUM_SKILL_SETS && !any; ++iter) {
 				if (abd->purchased[iter]) {
@@ -3392,8 +3397,8 @@ void save_olc_ability(descriptor_data *desc) {
 	
 	// apply passive buffs
 	if (IS_SET(ABIL_TYPES(proto), ABILT_PASSIVE_BUFF)) {
-		DL_FOREACH(character_list, chiter) {
-			if (!IS_NPC(chiter) && (abd = get_ability_data(chiter, vnum, FALSE))) {
+		DL_FOREACH2(player_character_list, chiter, next_plr) {
+			if ((abd = get_ability_data(chiter, vnum, FALSE))) {
 				if (abd->purchased[GET_CURRENT_SKILL_SET(chiter)]) {
 					apply_one_passive_buff(chiter, proto);
 				}

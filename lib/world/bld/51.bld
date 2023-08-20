@@ -427,7 +427,7 @@ scattered around your feet.
 ~
 E
 lumber yard lumberyard building around~
-   As you enter the yard, the scent of freshly cut wood is very strong. 
+   As you enter the yard, the scent of freshly cut wood is very strong.
 Different piles of wood are scattered about the floor. Large racks for storing
 wood are positioned along the back wall and one of the side walls. A worn out
 axe is leaning against one of the walls and a few chips of wood are scattered
@@ -1272,9 +1272,9 @@ of larger pieces of equipment into the ship's hold.
 ~
 E
 docks building around~
-   <description> The docks stretch out several yards into the water. Ships of
-any size may be docked here for easy storage. In addition, the facility allows
-the loading of larger pieces of equipment into the ship's hold.
+   The docks stretch out several yards into the water. Ships of any size may be
+docked here for easy storage. In addition, the facility allows the loading of
+larger pieces of equipment into the ship's hold.
 ~
 F
 g
@@ -1846,6 +1846,8 @@ plants growing on them. In this particular set of raft gardens, bileberries are
 being cultivated. The plants grow thick and healthy, their bright green leaves
 and deep red berries a striking contrast to the murky brown water of the river.
 ~
+F
+F
 I 7 1205 100.00 440  # PICK: bileberries
 I 32 1205 100.00 440  # SKILLED-LABOR: bileberries
 I+ 7 3  # Depletion: pick
@@ -1872,6 +1874,8 @@ creates a soothing melody. Despite the arid desert climate, the gardens thrive
 and produce a bounty of herbs and flowers, thanks to the careful cultivation
 and maintenance by those who tend them.
 ~
+F
+F
 I 7 1204 50.00 440 X  # PICK: daggerbite frond
 I 7 1203 50.00 440 X  # PICK: magewhisper sepals
 I 32 1204 50.00 440 s  # SKILLED-LABOR: daggerbite frond

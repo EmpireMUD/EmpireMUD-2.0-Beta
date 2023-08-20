@@ -30,6 +30,7 @@
 *   Adventure Lib
 *   Automessages Lib
 *   Building Lib
+*   Character Lib
 *   Craft Lib
 *   Crop Lib
 *   Empire Lib
@@ -912,6 +913,64 @@ void write_building_to_file(FILE *fl, bld_data *bld) {
 	
 	// end
 	fprintf(fl, "S\n");
+}
+
+
+ //////////////////////////////////////////////////////////////////////////////
+//// CHARACTER LIB ///////////////////////////////////////////////////////////
+
+/**
+* Sets the value of a current pool (HEALTH, etc) to the given amount, without
+* going over the maximum. If this sets it below the maximum, it will also
+* schedule a mob reset event if the target is an NPC.
+*
+* @param char_data *ch The person to set a pool for.
+* @param int type Any pool (HEALTH, MOVE, MANA, BLOOD).
+* @param int amount The amount to set it to (automatically bounds to the maximum).
+* @return int The new value of the pool.
+*/
+int set_current_pool(char_data *ch, int type, int amount) {
+	int max;
+	
+	if (type < 0 || type >= NUM_POOLS) {
+		log("SYSERR: set_current_pool called with invalid pool %d (%s)", type, GET_NAME(ch));
+		return 1;
+	}
+	
+	GET_CURRENT_POOL(ch, type) = amount;
+	
+	// NUM_POOLS (search hint): determine maximum
+	switch (type) {
+		case HEALTH: {
+			max = GET_MAX_HEALTH(ch);
+			break;
+		}
+		case MOVE: {
+			max = GET_MAX_MOVE(ch);
+			break;
+		}
+		case MANA: {
+			max = GET_MAX_MANA(ch);
+			break;
+		}
+		case BLOOD: {
+			max = GET_MAX_BLOOD(ch);
+			break;
+		}
+		default: {
+			max = GET_MAX_POOL(ch, type);
+			break;
+		}
+	}
+	
+	if (GET_CURRENT_POOL(ch, type) > max) {
+		GET_CURRENT_POOL(ch, type) = max;
+	}
+	else if (GET_CURRENT_POOL(ch, type) < max && IS_NPC(ch)) {
+		schedule_reset_mob(ch);
+	}
+	
+	return GET_CURRENT_POOL(ch, type);
 }
 
 
@@ -5291,6 +5350,9 @@ void free_obj(obj_data *obj) {
 		free_obj_apply_list(GET_OBJ_APPLIES(obj));
 	}
 	
+	// in case
+	cancel_all_stored_events(&GET_OBJ_STORED_EVENTS(obj));
+	
 	/* free any assigned scripts */
 	if (SCRIPT(obj)) {
 		extract_script(obj, OBJ_TRIGGER);
@@ -6382,18 +6444,31 @@ void write_sector_to_file(FILE *fl, sector_data *st) {
 
 // cancel func externs
 EVENT_CANCEL_FUNC(cancel_burn_event);
+EVENT_CANCEL_FUNC(cancel_character_event);
 EVENT_CANCEL_FUNC(cancel_map_event);
+EVENT_CANCEL_FUNC(cancel_mob_event);
+EVENT_CANCEL_FUNC(cancel_obj_event);
 EVENT_CANCEL_FUNC(cancel_room_event);
 
 
 // SEV_x: list of cancel functions
 struct stored_event_info_t stored_event_info[] = {
 	{ cancel_map_event },	// SEV_TRENCH_FILL
-		{ NULL },	// unused
+	{ cancel_mob_event },	// SEV_DESPAWN
 	{ cancel_burn_event },	// SEV_BURN_DOWN
 	{ cancel_map_event },	// SEV_GROW_CROP
 	{ cancel_room_event },	// SEV_TAVERN
 	{ cancel_room_event },	// SEV_RESET_TRIGGER
+	{ cancel_mob_event },	// SEV_PURSUIT
+	{ cancel_mob_event },	// SEV_MOVEMENT
+	{ cancel_mob_event },	// SEV_AGGRO
+	{ cancel_mob_event },	// SEV_SCAVENGE
+	{ cancel_character_event },	// SEV_VAMPIRE_FEEDING
+	{ cancel_mob_event },	// SEV_RESET_MOB
+	{ cancel_character_event },	// SEV_HEAL_OVER_TIME
+	{ cancel_character_event },	// SEV_CHECK_LEADING
+	{ cancel_obj_event },	// SEV_OBJ_TIMER
+	{ cancel_obj_event },	// SEV_OBJ_AUTOSTORE
 };
 
 
@@ -6408,19 +6483,48 @@ struct stored_event_info_t stored_event_info[] = {
 void add_stored_event(struct stored_event **list, int type, struct dg_event *event) {
 	struct stored_event *sev;
 	
-	if (!event) {
+	if (!list || !event) {
 		return;
 	}
 	
 	// ensure no duplicate entries
-	sev = find_stored_event(*list, type);
-	if (!sev) {
+	if ((sev = find_stored_event(*list, type))) {
+		if (sev->ev) {
+			dg_event_cancel(sev->ev, stored_event_info[sev->type].cancel);
+		}
+		sev->ev = NULL;
+	}
+	else {
 		CREATE(sev, struct stored_event, 1);
 		sev->type = type;
-		HASH_ADD_INT(*list, type, sev);
+		LL_PREPEND(*list, sev);
 	}
 	
 	sev->ev = event;
+}
+
+
+/**
+* Cancels all stored events, if any, and frees the list and sets it to NULL.
+*
+* @param struct stored_event **list The list to cancel out of.
+*/
+void cancel_all_stored_events(struct stored_event **list) {
+	struct stored_event *iter, *next_iter;
+	
+	if (list) {
+		LL_FOREACH_SAFE(*list, iter, next_iter) {
+			if (iter->ev) {
+				dg_event_cancel(iter->ev, stored_event_info[iter->type].cancel);
+			}
+			iter->ev = NULL;
+			LL_DELETE(*list, iter);
+			free(iter);
+		}
+		
+		// should now definitely be empty and freed
+		*list = NULL;
+	}
 }
 
 
@@ -6431,15 +6535,16 @@ void add_stored_event(struct stored_event **list, int type, struct dg_event *eve
 * @param int type The SEV_ type to cancel.
 */
 void cancel_stored_event(struct stored_event **list, int type) {
-	struct stored_event *sev = find_stored_event(*list, type);
+	struct stored_event *sev;
 	
-	if (sev && sev->ev) {
-		dg_event_cancel(sev->ev, stored_event_info[type].cancel);
-		sev->ev = NULL;
-	}
-	
-	if (sev) {
-		HASH_DEL(*list, sev);
+	// while prevents any chance of duplicates (which should be impossible)
+	while ((sev = find_stored_event(*list, type))) {
+		if (sev->ev) {
+			dg_event_cancel(sev->ev, stored_event_info[type].cancel);
+			sev->ev = NULL;
+		}
+		
+		LL_DELETE(*list, sev);
 		free(sev);
 	}
 }
@@ -6452,9 +6557,11 @@ void cancel_stored_event(struct stored_event **list, int type) {
 * @param int type The SEV_ type to cancel.
 */
 void delete_stored_event(struct stored_event **list, int type) {
-	struct stored_event *sev = find_stored_event(*list, type);
-	if (sev) {
-		HASH_DEL(*list, sev);
+	struct stored_event *sev;
+	
+	// while prevents any chance of duplicates (which should be impossible)
+	while ((sev = find_stored_event(*list, type))) {
+		LL_DELETE(*list, sev);
 		free(sev);
 	}
 }
@@ -6468,16 +6575,42 @@ void delete_stored_event(struct stored_event **list, int type) {
 * @return struct stored_event* The found event if any, or NULL.
 */
 struct stored_event *find_stored_event(struct stored_event *list, int type) {
-	struct stored_event *find;
+	struct stored_event *iter;
 	
-	HASH_FIND_INT(list, &type, find);
-	return find;
+	LL_FOREACH(list, iter) {
+		if (iter->type == type) {
+			return iter;
+		}
+	}
+	
+	return NULL;	// not found
+}
+
+
+// generic canceller for simple character events
+EVENT_CANCEL_FUNC(cancel_character_event) {
+	struct char_event_data *data = (struct char_event_data*)event_obj;
+	free(data);
 }
 
 
 // frees memory when a map event is canceled
 EVENT_CANCEL_FUNC(cancel_map_event) {
 	struct map_event_data *data = (struct map_event_data *)event_obj;
+	free(data);
+}
+
+
+// generic canceller for simple mob events
+EVENT_CANCEL_FUNC(cancel_mob_event) {
+	struct mob_event_data *data = (struct mob_event_data*)event_obj;
+	free(data);
+}
+
+
+// generic canceller for simple object events
+EVENT_CANCEL_FUNC(cancel_obj_event) {
+	struct obj_event_data *data = (struct obj_event_data*)event_obj;
 	free(data);
 }
 
@@ -8146,8 +8279,9 @@ void free_whole_library(void) {
 		free(island);
 	}
 	
-	// ensure triggers are gone
+	// ensure these are gone
 	free_freeable_triggers();
+	free_freeable_dots();
 	
 	// most of this part is just done in alphabetical order
 	HASH_ITER(hh, ability_table, abil, next_abil) {
@@ -8984,7 +9118,6 @@ void free_complex_data(struct complex_room_data *data) {
 * @param struct shared_room_data *data The data to free.
 */
 void free_shared_room_data(struct shared_room_data *data) {
-	struct stored_event *ev, *next_ev;
 	struct depletion_data *dep;
 	struct track_data *track, *next_track;
 	
@@ -9008,9 +9141,7 @@ void free_shared_room_data(struct shared_room_data *data) {
 		free(track);
 	}
 	
-	HASH_ITER(hh, data->events, ev, next_ev) {
-		cancel_stored_event(&data->events, ev->type);
-	}
+	cancel_all_stored_events(&data->events);
 	
 	free(data);
 }

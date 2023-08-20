@@ -172,13 +172,13 @@ void apply_potion(obj_data *obj, char_data *ch) {
 	}
 	
 	if (GET_OBJ_AFF_FLAGS(obj)) {
-		af = create_flag_aff(aff_type, 24 MUD_HOURS, GET_OBJ_AFF_FLAGS(obj), ch);
+		af = create_flag_aff(aff_type, 30 * SECS_PER_REAL_MIN, GET_OBJ_AFF_FLAGS(obj), ch);
 		affect_to_char(ch, af);
 		free(af);
 	}
 
 	LL_FOREACH(GET_OBJ_APPLIES(obj), apply) {
-		af = create_mod_aff(aff_type, 24 MUD_HOURS, apply->location, apply->modifier, ch);
+		af = create_mod_aff(aff_type, 30 * SECS_PER_REAL_MIN, apply->location, apply->modifier, ch);
 		affect_to_char(ch, af);
 		free(af);
 	}
@@ -285,11 +285,11 @@ ACMD(do_confer) {
 	struct affected_type *aff, *aff_iter;
 	bool any, found_existing, found_ch;
 	int amt, iter, abbrev, type, conferred_amt, avail_str;
-	int match_duration = 0;
+	long match_duration = 0;
 	char_data *vict = ch;
 	
 	// configs
-	int duration = 6 * REAL_UPDATES_PER_MIN;
+	long duration = 6 * SECS_PER_REAL_MIN;
 	int cost = 50;
 
 	struct {
@@ -409,11 +409,12 @@ ACMD(do_confer) {
 			if (aff_iter->type == ATYPE_CONFER && aff_iter->cast_by == CAST_BY_ID(ch) && aff_iter->location == confer_list[type].apply) {
 				found_existing = TRUE;
 				aff_iter->modifier += amt;
-				match_duration = aff_iter->duration;	// store this to match it later
-				aff_iter->duration = duration;	// reset to max duration
+				match_duration = aff_iter->expire_time;	// store this to match it later
+				aff_iter->expire_time = time(0) + duration;	// reset to max duration
 
 				// ensure stats are correct
 				affect_modify(vict, aff_iter->location, amt, NOBITS, TRUE);
+				schedule_affect_expire(vict, aff_iter);
 				affect_total(vict);
 				break;
 			}
@@ -424,13 +425,14 @@ ACMD(do_confer) {
 			found_ch = FALSE;
 			for (aff_iter = ch->affected; aff_iter; aff_iter = aff_iter->next) {
 				// we match by duration because lengthening any -str affect that had the same duration is equally good
-				if (aff_iter->type == ATYPE_CONFERRED && aff_iter->duration == match_duration) {
+				if (aff_iter->type == ATYPE_CONFERRED && aff_iter->expire_time == match_duration) {
 					found_ch = TRUE;
 					aff_iter->modifier -= 1;	// additional -1 strength
-					aff_iter->duration = duration;	// reset to max duration
+					aff_iter->expire_time = time(0) + duration;	// reset to max duration
 
 					// ensure stats are correct
 					affect_modify(ch, aff_iter->location, -1, NOBITS, TRUE);
+					schedule_affect_expire(ch, aff_iter);
 					affect_total(ch);
 					break;
 				}
@@ -477,7 +479,7 @@ ACMD(do_counterspell) {
 		msg_to_char(ch, "You ready a counterspell.\r\n");
 		act("$n flickers momentarily with a blue-white aura.", TRUE, ch, NULL, NULL, TO_ROOM);
 		
-		af = create_flag_aff(ATYPE_COUNTERSPELL, 1 MUD_HOURS, 0, ch);
+		af = create_flag_aff(ATYPE_COUNTERSPELL, 30 * SECS_PER_REAL_MIN, 0, ch);
 		affect_join(ch, af, 0);
 	}
 }
@@ -551,14 +553,15 @@ ACMD(do_earthmeld) {
 			return;
 		}
 	}
-
-	GET_MANA(ch) -= cost;
+	
+	// TODO why isn't this using charge ability cost
+	set_mana(ch, GET_MANA(ch) - cost);
 	
 	msg_to_char(ch, "You dissolve into pure mana and sink into the ground!\r\n");
 	act("$n dissolves into pure mana and sinks right into the ground!", TRUE, ch, 0, 0, TO_ROOM);
 	GET_POS(ch) = POS_SLEEPING;
 
-	af = create_aff(ATYPE_EARTHMELD, -1, APPLY_NONE, 0, AFF_NO_TARGET_IN_ROOM | AFF_NO_SEE_IN_ROOM | AFF_EARTHMELD, ch);
+	af = create_aff(ATYPE_EARTHMELD, UNLIMITED, APPLY_NONE, 0, AFF_NO_TARGET_IN_ROOM | AFF_NO_SEE_IN_ROOM | AFF_EARTHMELD, ch);
 	affect_join(ch, af, 0);
 	
 	gain_ability_exp(ch, ABIL_EARTHMELD, 15);
@@ -994,7 +997,7 @@ ACMD(do_rejuvenate) {
 		act("$n surrounds $N with the bright white mana of rejuvenation.", FALSE, ch, NULL, vict, TO_NOTVICT);
 	}
 	
-	af = create_mod_aff(ATYPE_REJUVENATE, 6, APPLY_HEAL_OVER_TIME, amount, ch);
+	af = create_mod_aff(ATYPE_REJUVENATE, 30, APPLY_HEAL_OVER_TIME, amount, ch);
 	affect_join(vict, af, 0);
 	
 	if (can_gain_exp_from(ch, vict)) {
@@ -1151,7 +1154,7 @@ ACMD(do_skybrand) {
 		act("$n marks you with a glowing blue skybrand!", FALSE, ch, NULL, vict, TO_VICT);
 		act("$n marks $N with a glowing blue skybrand!", FALSE, ch, NULL, vict, TO_NOTVICT);
 		
-		apply_dot_effect(vict, ATYPE_SKYBRAND, 6, DAM_MAGICAL, dmg, 3, ch);
+		apply_dot_effect(vict, ATYPE_SKYBRAND, 30, DAM_MAGICAL, dmg, 3, ch);
 		engage_combat(ch, vict, TRUE);
 	}
 	

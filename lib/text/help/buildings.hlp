@@ -77,7 +77,7 @@ Boardwalks count as in-city territory even if built in the outskirts
 
 For a road over a river, use a bridge instead.
 
-See also: BRIDGE, ROAD
+See also: BRIDGE, EXTENDED RADIUS, ROAD
 #
 BRIDGE "BRIDGES GOAL"
 
@@ -92,7 +92,7 @@ Bridges count as in-city territory even if built in the outskirts (4x radius).
 
 To build a road over other terrains, see boardwalk and swampwalk.
 
-See also: BOARDWALK, SWAMPWALK, PROGRESS
+See also: BOARDWALK, EXTENDED RADIUS, SWAMPWALK, PROGRESS
 #
 "BUILD ABILITY" "BASIC BUILDINGS"
 
@@ -262,7 +262,7 @@ digging on unprepared ground. You can dig more clay from them before depletion.
 
 Clay pits count as in-city territory when built in the outskirts (4x radius).
 
-See also: DIG
+See also: DIG, EXTENDED RADIUS
 #
 CLIFFDWELLING "CLIFF DWELLING"
 
@@ -877,7 +877,7 @@ effectively. You can dig more sand from them before depletion.
 
 Sand pits count as in-city territory when built in the outskirts (4x radius).
 
-See also: DIG
+See also: DIG, EXTENDED RADIUS
 #
 SEEDSILO "SEED SILO"
 
@@ -936,7 +936,7 @@ to milk cows or shear sheep. This is also where you can barde horses.
 
 Most animals will not despawn if left in a stable, but there is a limit on the
 number of duplicate animals in each stable, after which any extras will despawn
-normally. (By default, this limit is 2.)
+normally. (By default, this limit is 2, and only applies to spawned animals.)
 
 See also: BARDE, MILK, SHEAR
 #
@@ -990,7 +990,7 @@ attacks by crocodilians. This can also be built on marshes.
 
 Clay pits count as in-city territory when built in the outskirts (4x radius).
 
-See also: BUILDING
+See also: BUILDING, EXTENDED RADIUS
 #
 SWAMPHUT "SWAMP HUT"
 

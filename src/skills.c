@@ -654,7 +654,10 @@ bool can_use_ability(char_data *ch, any_vnum ability, int cost_pool, int cost_am
 */
 void charge_ability_cost(char_data *ch, int cost_pool, int cost_amount, int cooldown_type, int cooldown_time, int wait_type) {
 	if (cost_pool >= 0 && cost_pool < NUM_POOLS && cost_amount > 0) {
-		GET_CURRENT_POOL(ch, cost_pool) = MAX(0, GET_CURRENT_POOL(ch, cost_pool) - cost_amount);
+		set_current_pool(ch, cost_pool, GET_CURRENT_POOL(ch, cost_pool) - cost_amount);
+		if (GET_CURRENT_POOL(ch, cost_pool) < 0) {
+			set_current_pool(ch, cost_pool, 0);
+		}
 	}
 	
 	// only npcs get cooldowns here
@@ -2962,8 +2965,16 @@ bool has_cooking_fire(char_data *ch) {
 		return TRUE;
 	}
 	
+	// fires in room
 	DL_FOREACH2(ROOM_CONTENTS(IN_ROOM(ch)), obj, next_content) {
-		if (OBJ_FLAGGED(obj, OBJ_LIGHT) && !CAN_WEAR(obj, ITEM_WEAR_TAKE)) {
+		if (LIGHT_IS_LIT(obj) && LIGHT_FLAGGED(obj, LIGHT_FLAG_COOKING_FIRE)) {
+			return TRUE;
+		}
+	}
+	
+	// fires in inventory
+	DL_FOREACH2(ch->carrying, obj, next_content) {
+		if (LIGHT_IS_LIT(obj) && LIGHT_FLAGGED(obj, LIGHT_FLAG_COOKING_FIRE)) {
 			return TRUE;
 		}
 	}
@@ -3870,11 +3881,8 @@ void olc_delete_skill(char_data *ch, any_vnum vnum) {
 	}
 	
 	// remove from live players
-	DL_FOREACH(character_list, chiter) {
+	DL_FOREACH2(player_character_list, chiter, next_plr) {
 		found = FALSE;
-		if (IS_NPC(chiter)) {
-			continue;
-		}
 		
 		HASH_ITER(hh, GET_SKILL_HASH(chiter), plsk, next_plsk) {
 			if (plsk->vnum == vnum) {
@@ -4027,12 +4035,10 @@ void save_olc_skill(descriptor_data *desc) {
 	read_ability_requirements();
 	
 	// update all players in case there are new level-0 abilities
-	DL_FOREACH_SAFE(character_list, ch_iter, next_ch) {
-		if (!IS_NPC(ch_iter)) {
-			update_class(ch_iter);
-			give_level_zero_abilities(ch_iter);
-			assign_class_abilities(ch_iter, NULL, NOTHING);
-		}
+	DL_FOREACH_SAFE2(player_character_list, ch_iter, next_ch, next_plr) {
+		update_class(ch_iter);
+		give_level_zero_abilities(ch_iter);
+		assign_class_abilities(ch_iter, NULL, NOTHING);
 	}
 }
 

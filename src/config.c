@@ -944,6 +944,26 @@ CONFIG_HANDLER(config_edit_typelist) {
  //////////////////////////////////////////////////////////////////////////////
 //// CONFIG SYSTEM: CUSTOM EDITORS ///////////////////////////////////////////
 
+// resets after setting
+CONFIG_HANDLER(config_edit_autostore_time) {
+	int old = config_get_int("autostore_time");
+	obj_data *obj;
+	
+	// pass thru first...
+	config_edit_int(ch, config, argument);
+	
+	if (config_get_int("autostore_time") != old) {
+		// update all autostore times
+		DL_FOREACH(object_list, obj) {
+			if (find_stored_event(GET_OBJ_STORED_EVENTS(obj), SEV_OBJ_AUTOSTORE)) {
+				cancel_stored_event(&GET_OBJ_STORED_EVENTS(obj), SEV_OBJ_AUTOSTORE);
+				schedule_obj_autostore_check(obj, 0);
+			}
+		}
+	}
+}
+
+
 CONFIG_HANDLER(config_edit_who_list_sort) {
 	int input, iter, old;
 	
@@ -995,6 +1015,19 @@ CONFIG_HANDLER(config_show_who_list_sort) {
 	msg_to_char(ch, "Valid sorts are:\r\n");
 	for (iter = 0; *who_list_sort_types[iter] != '\n'; ++iter) {
 		msg_to_char(ch, " %s\r\n", who_list_sort_types[iter]);
+	}
+}
+
+
+// resets after setting
+CONFIG_HANDLER(config_edit_mob_spawn_interval) {
+	int old = config_get_int("mob_spawn_interval");
+	
+	// pass thru first...
+	config_edit_int(ch, config, argument);
+	
+	if (config_get_int("mob_spawn_interval") != old) {
+		reschedule_all_despawns();
 	}
 }
 
@@ -1847,6 +1880,7 @@ void init_config_system(void) {
 	// items
 	init_config(CONFIG_ITEMS, "auto_update_items", CONFTYPE_BOOL, "uses item version numbers to automatically update items");
 	init_config(CONFIG_ITEMS, "autostore_time", CONFTYPE_INT, "minutes items last on the ground");
+		init_config_custom("autostore_time", config_show_int, config_edit_autostore_time, NULL);
 	init_config(CONFIG_ITEMS, "bound_item_junk_time", CONFTYPE_INT, "minutes bound items last on the ground before being junked");
 	init_config(CONFIG_ITEMS, "long_autostore_time", CONFTYPE_INT, "minutes items last with the long-autostore bld flag");
 	init_config(CONFIG_ITEMS, "room_item_limit", CONFTYPE_INT, "number of items allowed in buildings with item-limit flag");
@@ -1871,6 +1905,7 @@ void init_config_system(void) {
 	init_config(CONFIG_MOBS, "default_language_vnum", CONFTYPE_INT, "language (generic) mobs speak with by default");
 	init_config(CONFIG_MOBS, "max_npc_attribute", CONFTYPE_INT, "how high primary attributes go on mobs");
 	init_config(CONFIG_MOBS, "mob_spawn_interval", CONFTYPE_INT, "how often mobs spawn/last");
+		init_config_custom("mob_spawn_interval", config_show_int, config_edit_mob_spawn_interval, NULL);
 	init_config(CONFIG_MOBS, "mob_spawn_radius", CONFTYPE_INT, "distance from players that mobs spawn");
 	init_config(CONFIG_MOBS, "mob_despawn_radius", CONFTYPE_INT, "distance from players to despawn mobs");
 	init_config(CONFIG_MOBS, "npc_follower_limit", CONFTYPE_INT, "more npc followers than this causes aggro");
@@ -1907,9 +1942,9 @@ void init_config_system(void) {
 	init_config(CONFIG_PLAYERS, "max_light_radius_base", CONFTYPE_INT, "maximum tiles away you can see unskilled in the dark based on the moon(s)");
 	init_config(CONFIG_PLAYERS, "num_daily_skill_points", CONFTYPE_INT, "easy skillups per day");
 	init_config(CONFIG_PLAYERS, "num_bonus_trait_daily_skills", CONFTYPE_INT, "bonus trait for skillups");
-	init_config(CONFIG_PLAYERS, "idle_action_rent_time", CONFTYPE_INT, "how many ticks before a player performing an action is idle-rented");
-	init_config(CONFIG_PLAYERS, "idle_rent_time", CONFTYPE_INT, "how many ticks before a player is idle-rented");
-	init_config(CONFIG_PLAYERS, "idle_linkdead_rent_time", CONFTYPE_INT, "how many ticks before a linkdead player is idle-rented");
+	init_config(CONFIG_PLAYERS, "idle_action_rent_time", CONFTYPE_INT, "how many minutes before a player performing an action is idle-rented");
+	init_config(CONFIG_PLAYERS, "idle_rent_time", CONFTYPE_INT, "how many minutes before a player is idle-rented");
+	init_config(CONFIG_PLAYERS, "idle_linkdead_rent_time", CONFTYPE_INT, "how many minutes before a linkdead player is idle-rented");
 	init_config(CONFIG_PLAYERS, "line_of_sight", CONFTYPE_BOOL, "if on, terrain can block view on the map");
 	init_config(CONFIG_PLAYERS, "map_memory_limit", CONFTYPE_INT, "how many tiles a player is allowed to remember (10k tiles = 1MB RAM)");
 	init_config(CONFIG_PLAYERS, "max_capitals_in_name", CONFTYPE_INT, "how many uppercase letters can be in a player name (0 for unlimited)");

@@ -14,9 +14,10 @@ S
 arrows quiver wooden~
 a quiver of wooden arrows~
 A quiver of wooden arrows is lying here.~
-You can use arrows from your inventory, if you have a bow equipped.
+   You can use arrows from your inventory, if you have a bow equipped. Try
+lighting them on fire, too.
 ~
-21 lo a 0 3
+21 lo a 0 4
 10 0 0
 0 0
 I 11 911 10.00 1  # LIGHT: quiver of flaming arrows
@@ -49,7 +50,7 @@ a quiver of flaming arrows~
 A quiver of flaming arrows is burning here.~
 Keep this in your inventory while shooting your bow.
 ~
-21 co a 0 2
+21 o a 0 3
 10 1 0
 0 4
 S

@@ -277,6 +277,8 @@ D4
 ????~
 &0~
 E
+16 0 100.00 100
+E
 19 0 100.00 100
 I 5 102 33.33 1 X  # DIG: flint stone
 I 5 101 16.67 1 X  # DIG: lump of clay
@@ -298,6 +300,8 @@ E
 1 0 100.00 107
 E
 9 0 100.00 107
+E
+16 0 100.00 100
 E
 19 0 100.00 100
 I 5 102 33.33 1 X  # DIG: flint stone
@@ -353,6 +357,8 @@ E
 9 0 100.00 137
 E
 16 0 100.00 100
+E
+23 0 100.00 100
 I 5 102 33.33 1 X  # DIG: flint stone
 I 5 101 16.67 1 X  # DIG: lump of clay
 I 5 100 50.00 1 X  # DIG: rock
@@ -690,6 +696,8 @@ E
 9 0 100.00 147
 E
 16 0 100.00 140
+E
+23 0 100.00 140
 I 5 102 9.00 1 X  # DIG: flint stone
 I 5 100 9.00 1 X  # DIG: rock
 I 5 101 82.00 1 X  # DIG: lump of clay
@@ -995,6 +1003,8 @@ E
 9 0 100.00 160
 E
 16 0 100.00 150
+E
+23 0 100.00 150
 I 5 102 9.00 1 x  # DIG: flint stone
 I 5 107 9.00 1 x  # DIG: bag of sand
 I 5 101 82.00 1 x  # DIG: lump of clay

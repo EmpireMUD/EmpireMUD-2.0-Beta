@@ -199,7 +199,7 @@ when you've accomplished this. (Type 'speak' when you find the druid.)
 propaganda for further study. You can now perform daily quests in the Monsoon
 Rift for the Guild of Adventurers.
 ~
-11 d 0 0 -1
+13 d 0 0 -1
 A
 1 18217
 A
@@ -211,7 +211,7 @@ R
 R
 8 18200 1
 W+
-11 0 0 1 -
+11 0 0 1 a
 Close the rift~
 W
 2 18258 0 1 a

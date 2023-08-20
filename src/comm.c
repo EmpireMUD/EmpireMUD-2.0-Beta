@@ -69,7 +69,6 @@ int perform_alias(descriptor_data *d, char *orig);
 char *prompt_olc_info(char_data *ch);
 
 // heartbeat functions
-void check_expired_cooldowns();
 void check_idle_passwords();
 void check_newbie_islands();
 void check_wars();
@@ -133,7 +132,6 @@ int tics_passed = 0;					/* for extern checkpointing			*/
 int scheck = 0;							/* for syntax checking mode			*/
 struct timeval null_time;				/* zero-valued time structure		*/
 FILE *logfile = NULL;					/* Where to send the log messages	*/
-bool gain_cond_message = FALSE;		/* gain cond send messages			*/
 int dg_act_check;	/* toggle for act_trigger */
 unsigned long main_game_pulse = 0;	/* number of pulses since game start */
 static bool reboot_recovery = FALSE;
@@ -608,7 +606,7 @@ bool check_reboot_confirms(void) {
 		else if (IS_NPC(desc->character)) {
 			continue;
 		}
-		else if (!REBOOT_CONF(desc->character) && (desc->character->char_specials.timer * SECS_PER_MUD_HOUR / SECS_PER_REAL_MIN) < 5) {
+		else if (!REBOOT_CONF(desc->character) && (GET_IDLE_SECONDS(desc->character) / SECS_PER_REAL_MIN) < 5) {
 			found = TRUE;
 		}
 	}
@@ -808,16 +806,14 @@ void heartbeat(unsigned long heart_pulse) {
 	#define HEARTBEAT_LOG(id_str)
 	
 	// TODO go through this, arrange it better, --combine-anything-combinable(done)--
-
-	// only get a gain condition message on the hour
-	if (HEARTBEAT(SECS_PER_MUD_HOUR)) {
-		gain_cond_message = TRUE;
-	}
 	
 	HEARTBEAT_LOG("start")
 	
 	dg_event_process();
 	HEARTBEAT_LOG("0")
+	
+	free_freeable_dots();
+	HEARTBEAT_LOG("0.5")
 
 	// this is meant to be slightly longer than the mobile_activity pulse (10), and is mentioned in help files
 	if (HEARTBEAT(13)) {
@@ -829,10 +825,8 @@ void heartbeat(unsigned long heart_pulse) {
 		update_actions();
 		HEARTBEAT_LOG("2")
 	}
-	if (HEARTBEAT(1)) {
-		check_expired_cooldowns();	// descriptor list
-		HEARTBEAT_LOG("3")
-	}
+	
+	// "3" was check_expired_cooldowns -- now a scheduled event
 
 	if (HEARTBEAT(3)) {
 		update_guard_towers();
@@ -874,13 +868,15 @@ void heartbeat(unsigned long heart_pulse) {
 	if (HEARTBEAT(SECS_PER_MUD_HOUR)) {
 		weather_and_time();
 		HEARTBEAT_LOG("12")
-		
+	}
+	
+	if (HEARTBEAT(WORKFORCE_CYCLE)) {
 		chore_update();
 		HEARTBEAT_LOG("13")
 	}
 	
-	// slightly off the hour to prevent yet another thing on the tick
-	if (HEARTBEAT(SECS_PER_MUD_HOUR+1)) {
+	// odd timing to avoid lining up with other ticks
+	if (HEARTBEAT(119)) {
 		update_empire_npc_data();
 		HEARTBEAT_LOG("14")
 	}
@@ -996,12 +992,10 @@ void heartbeat(unsigned long heart_pulse) {
 	HEARTBEAT_LOG("42")
 	free_freeable_triggers();
 	HEARTBEAT_LOG("43")
-
-	/* Turn this off */
-	gain_cond_message = FALSE;
 	
 	// prevent accidentally leaving this on
 	pause_affect_total = FALSE;
+	suspend_autostore_updates = FALSE;
 	
 	// check for immediate reboot
 	if (reboot_control.immediate == TRUE) {
@@ -2935,8 +2929,8 @@ char *make_prompt(descriptor_data *d) {
 	else if (STATE(d) == CON_PLAYING) {
 		*prompt = '\0';
 		
-		// show idle after 10 minutes
-		if ((d->character->char_specials.timer * SECS_PER_MUD_HOUR / SECS_PER_REAL_MIN) >= 5) {
+		// show idle after 5 minutes
+		if ((GET_IDLE_SECONDS(d->character) / SECS_PER_REAL_MIN) >= 5) {
 			strcat(prompt, "\tr[IDLE]\t0 ");
 		}
 
@@ -3688,8 +3682,8 @@ void game_loop(socket_t mother_desc) {
 				continue;
 
 			if (d->character) {
-				/* Reset the idle timer & pull char back from void if necessary */
-				d->character->char_specials.timer = 0;
+				// Reset the idle timer
+				GET_IDLE_SECONDS(d->character) = 0;
 				GET_WAIT_STATE(d->character) = 1;
 			}
 			d->has_prompt = 0;

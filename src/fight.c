@@ -740,7 +740,7 @@ int reduce_damage_from_skills(int dam, char_data *victim, char_data *attacker, i
 		
 			if (absorb > 0) {
 				dam -= absorb;
-				GET_MANA(victim) -= absorb;
+				set_mana(victim, GET_MANA(victim) - absorb);
 				if (can_gain_exp_from(victim, attacker)) {
 					gain_ability_exp(victim, ABIL_NULL_MANA, 5);
 				}
@@ -853,12 +853,19 @@ void siege_kill_vehicle_occupants(vehicle_data *veh, char_data *attacker, vehicl
 * hitting him/her.
 *
 * @param char_data *ch The person who is dying.
+* @param char_data *killer The person who caused it (may be someone else, self, or NULL).
 */
-void stop_combat_no_autokill(char_data *ch) {
-	char_data *ch_iter;
+void stop_combat_no_autokill(char_data *ch, char_data *killer) {
+	char_data *ch_iter, *top_killer;
 	
 	if (FIGHTING(ch)) {
 		stop_fighting(ch);
+	}
+	
+	// find top person (the player responsible)
+	top_killer = killer;
+	while (top_killer && IS_NPC(top_killer) && top_killer->leader) {
+		top_killer = top_killer->leader;
 	}
 
 	// look for anybody in the room fighting ch who wouldn't execute:
@@ -869,12 +876,14 @@ void stop_combat_no_autokill(char_data *ch) {
 	}
 
 	/* knock 'em out */
-	GET_HEALTH(ch) = -1;
+	set_health(ch, -1);
 	GET_POS(ch) = POS_INCAP;
 
-	// remove all DoTs
-	while (ch->over_time_effects) {
-		dot_remove(ch, ch->over_time_effects);
+	// remove all DoTs? only if it was another player with no-autokill
+	if (ch != top_killer && (!top_killer || !IS_NPC(top_killer))) {
+		while (ch->over_time_effects) {
+			dot_remove(ch, ch->over_time_effects);
+		}
 	}
 }
 
@@ -1222,10 +1231,10 @@ void death_restore(char_data *ch) {
 	remove_offers_by_type(ch, OFFER_RESURRECTION);
 	
 	// Pools restore
-	GET_HEALTH(ch) = MAX(1, GET_MAX_HEALTH(ch) / 4);
-	GET_MOVE(ch) = MAX(1, GET_MAX_MOVE(ch) / 4);
-	GET_MANA(ch) = MAX(1, GET_MAX_MANA(ch) / 4);
-	GET_BLOOD(ch) = IS_VAMPIRE(ch) ? MAX(1, GET_MAX_BLOOD(ch) / 4) : GET_MAX_BLOOD(ch);
+	set_health(ch, MAX(1, GET_MAX_HEALTH(ch) / 4));
+	set_move(ch, MAX(1, GET_MAX_MOVE(ch) / 4));
+	set_mana(ch, MAX(1, GET_MAX_MANA(ch) / 4));
+	set_blood(ch, IS_VAMPIRE(ch) ? MAX(1, GET_MAX_BLOOD(ch) / 4) : GET_MAX_BLOOD(ch));
 	
 	// conditions: drunk goes away, but you become hungry/thirsty (by half)
 	if (GET_COND(ch, FULL) >= 0) {
@@ -1294,10 +1303,10 @@ obj_data *die(char_data *ch, char_data *killer) {
 	// somebody saaaaaaave meeeeeeeee
 	if (affected_by_spell(ch, ATYPE_PHOENIX_RITE)) {
 		affect_from_char(ch, ATYPE_PHOENIX_RITE, FALSE);
-		GET_HEALTH(ch) = GET_MAX_HEALTH(ch) / 4;
-		GET_BLOOD(ch) = IS_VAMPIRE(ch) ? MAX(GET_BLOOD(ch), GET_MAX_BLOOD(ch) / 5) : GET_MAX_BLOOD(ch);
-		GET_MOVE(ch) = MAX(GET_MOVE(ch), GET_MAX_MOVE(ch) / 5);
-		GET_MANA(ch) = MAX(GET_MANA(ch), GET_MAX_MANA(ch) / 5);
+		set_health(ch, GET_MAX_HEALTH(ch) / 4);
+		set_blood(ch, IS_VAMPIRE(ch) ? MAX(GET_BLOOD(ch), GET_MAX_BLOOD(ch) / 5) : GET_MAX_BLOOD(ch));
+		set_move(ch, MAX(GET_MOVE(ch), GET_MAX_MOVE(ch) / 5));
+		set_mana(ch, MAX(GET_MANA(ch), GET_MAX_MANA(ch) / 5));
 		GET_POS(ch) = FIGHTING(ch) ? POS_FIGHTING : POS_STANDING;
 		msg_to_char(ch, "A fiery phoenix erupts from your chest and restores you to your feet!\r\n");
 		act("A fiery phoenix erupts from $n's chest and restores $m to $s feet!", FALSE, ch, NULL, NULL, TO_ROOM);
@@ -1359,7 +1368,7 @@ obj_data *die(char_data *ch, char_data *killer) {
 		}
 		add_cooldown(ch, COOLDOWN_DEATH_RESPAWN, config_get_int("death_release_minutes") * SECS_PER_REAL_MIN);
 		msg_to_char(ch, "Type 'respawn' to come back at your tomb.\r\n");
-		GET_HEALTH(ch) = MIN(GET_HEALTH(ch), -10);	// ensure negative health
+		set_health(ch, MIN(GET_HEALTH(ch), -10));	// ensure negative health
 		GET_POS(ch) = POS_DEAD;	// ensure pos
 		run_kill_triggers(ch, killer, NULL);
 		return NULL;
@@ -1707,10 +1716,10 @@ void perform_resurrection(char_data *ch, char_data *rez_by, room_data *loc, any_
 	switch (ability) {
 		case ABIL_RESURRECT: {
 			// custom restore stats: 10% (death_restore puts it at 25%)
-			GET_HEALTH(ch) = MAX(1, GET_MAX_HEALTH(ch) / 10);
-			GET_MOVE(ch) = MAX(1, GET_MAX_MOVE(ch) / 10);
-			GET_MANA(ch) = MAX(1, GET_MAX_MANA(ch) / 10);
-			GET_BLOOD(ch) = IS_VAMPIRE(ch) ? MAX(1, GET_MAX_BLOOD(ch) / 10) : GET_MAX_BLOOD(ch);
+			set_health(ch, MAX(1, GET_MAX_HEALTH(ch) / 10));
+			set_move(ch, MAX(1, GET_MAX_MOVE(ch) / 10));
+			set_mana(ch, MAX(1, GET_MAX_MANA(ch) / 10));
+			set_blood(ch, IS_VAMPIRE(ch) ? MAX(1, GET_MAX_BLOOD(ch) / 10) : GET_MAX_BLOOD(ch));
 
 			msg_to_char(ch, "A strange force lifts you up from the ground, and you seem to float back to your feet...\r\n");
 			msg_to_char(ch, "You feel a rush of blood as your heart starts beating again...\r\n");
@@ -1727,10 +1736,10 @@ void perform_resurrection(char_data *ch, char_data *rez_by, room_data *loc, any_
 		}
 		case ABIL_MOONRISE: {
 			// custom restore stats: 50% (death_restore puts it at 25%)
-			GET_HEALTH(ch) = MAX(1, GET_MAX_HEALTH(ch) / 2);
-			GET_MOVE(ch) = MAX(1, GET_MAX_MOVE(ch) / 2);
-			GET_MANA(ch) = MAX(1, GET_MAX_MANA(ch) / 2);
-			GET_BLOOD(ch) = IS_VAMPIRE(ch) ? MAX(1, GET_MAX_BLOOD(ch) / 2) : GET_MAX_BLOOD(ch);
+			set_health(ch, MAX(1, GET_MAX_HEALTH(ch) / 2));
+			set_move(ch, MAX(1, GET_MAX_MOVE(ch) / 2));
+			set_mana(ch, MAX(1, GET_MAX_MANA(ch) / 2));
+			set_blood(ch, IS_VAMPIRE(ch) ? MAX(1, GET_MAX_BLOOD(ch) / 2) : GET_MAX_BLOOD(ch));
 			
 			// custom restore conditions: less hungry/thirsty (won't incur a penalty yet)
 			if (GET_COND(ch, FULL) >= 0) {
@@ -1798,7 +1807,7 @@ obj_data *player_death(char_data *ch) {
 	
 	// penalize after so many deaths
 	if (GET_RECENT_DEATH_COUNT(ch) >= config_get_int("deaths_before_penalty") || (is_at_war(GET_LOYALTY(ch)) && GET_RECENT_DEATH_COUNT(ch) >= config_get_int("deaths_before_penalty_war"))) {
-		int duration = config_get_int("seconds_per_death") * (GET_RECENT_DEATH_COUNT(ch) + 1 - config_get_int("deaths_before_penalty")) / SECS_PER_REAL_UPDATE;
+		int duration = config_get_int("seconds_per_death") * (GET_RECENT_DEATH_COUNT(ch) + 1 - config_get_int("deaths_before_penalty"));
 		struct affected_type *af = create_flag_aff(ATYPE_DEATH_PENALTY, duration, AFF_IMMUNE_PHYSICAL | AFF_NO_ATTACK | AFF_HARD_STUNNED, ch);
 		affect_join(ch, af, ADD_DURATION);
 	}
@@ -1838,11 +1847,11 @@ static void shoot_at_char(room_data *from_room, char_data *ch) {
 	
 	if (damage(ch, ch, dam, type, DAM_PHYSICAL) != 0) {
 		// slow effect (1 mud hour)
-		af = create_flag_aff(ATYPE_ARROW_TO_THE_KNEE, 1 MUD_HOURS, AFF_SLOW, ch);
+		af = create_flag_aff(ATYPE_ARROW_TO_THE_KNEE, 30 * SECS_PER_REAL_MIN, AFF_SLOW, ch);
 		affect_join(ch, af, ADD_DURATION);
 		
 		// distraction effect (5 sec)
-		af = create_flag_aff(ATYPE_ARROW_TO_THE_KNEE, 1, AFF_DISTRACTED, ch);
+		af = create_flag_aff(ATYPE_ARROW_TO_THE_KNEE, 5, AFF_DISTRACTED, ch);
 		affect_join(ch, af, 0);
 		
 		// cancel any action the character is doing
@@ -2761,7 +2770,7 @@ bool besiege_vehicle(char_data *attacker, vehicle_data *veh, int damage, int sie
 	// not dead yet
 	if (VEH_HEALTH(veh) > 0) {
 		// apply needed maintenance if we did more than 10% damage
-		if (damage >= (VEH_MAX_HEALTH(veh) / 10) && !VEH_IS_DISMANTLING(veh)) {
+		if ((damage >= (VEH_MAX_HEALTH(veh) / 10) || !VEH_NEEDS_RESOURCES(veh)) && !VEH_IS_DISMANTLING(veh)) {
 			old_list = VEH_NEEDS_RESOURCES(veh);
 			VEH_NEEDS_RESOURCES(veh) = combine_resources(old_list, VEH_YEARLY_MAINTENANCE(veh) ? VEH_YEARLY_MAINTENANCE(veh) : default_res);
 			free_resource_list(old_list);
@@ -3056,7 +3065,7 @@ int damage(char_data *ch, char_data *victim, int dam, int attacktype, byte damty
 	dam = MAX(0, dam);
 
 	// Add Damage
-	GET_HEALTH(victim) = GET_HEALTH(victim) - dam;
+	set_health(victim, GET_HEALTH(victim) - dam);
 	update_pos(victim);
 	
 	if (ch != victim) {
@@ -3167,7 +3176,7 @@ int damage(char_data *ch, char_data *victim, int dam, int attacktype, byte damty
 	/* Uh oh.  Victim died. */
 	if (GET_POS(victim) == POS_DEAD) {
 		if (attacktype == ATTACK_VAMPIRE_BITE && ch != victim && !AFF_FLAGGED(victim, AFF_NO_DRINK_BLOOD) && !GET_FEEDING_FROM(ch) && IN_ROOM(ch) == IN_ROOM(victim)) {
-			GET_HEALTH(victim) = 0;
+			set_health(victim, 0);
 			GET_POS(victim) = POS_STUNNED;
 			start_drinking_blood(ch, victim);
 			// fall through to return dam below
@@ -3180,7 +3189,7 @@ int damage(char_data *ch, char_data *victim, int dam, int attacktype, byte damty
 	else if (ch != victim && GET_POS(victim) < POS_SLEEPING && !WOULD_EXECUTE(ch, victim)) {
 		// SHOULD this also remove DoTs etc? -paul 5/6/2017
 		
-		stop_combat_no_autokill(victim);
+		stop_combat_no_autokill(victim, ch);
 		return -1;	// prevents other damage/effects
 		// no need to message here; they already got a pos message
 	}
@@ -3305,7 +3314,7 @@ void heal(char_data *ch, char_data *vict, int amount) {
 		combat_meter_heal_taken(vict, amount);
 	
 		// apply heal
-		GET_HEALTH(vict) = MIN(GET_MAX_HEALTH(vict), GET_HEALTH(vict) + amount);
+		set_health(vict, GET_HEALTH(vict) + amount);
 	}
 	
 	if (GET_POS(vict) <= POS_STUNNED) {
@@ -3339,8 +3348,8 @@ int hit(char_data *ch, char_data *victim, obj_data *weapon, bool combat_round) {
 	char_data *check;
 	
 	// some config TODO move this into the config system?
-	int cut_deep_durations[] = { 3, 3, 6 };
-	int stunning_blow_durations[] = { 1, 1, 2 };
+	int cut_deep_durations[] = { 15, 15, 30 };
+	int stunning_blow_durations[] = { 5, 5, 10 };
 	double big_game_hunter[] = { 1.05, 1.05, 1.10 };
 
 	// brief sanity
@@ -3644,7 +3653,7 @@ void perform_execute(char_data *ch, char_data *victim, int attacktype, int damty
 		ok = TRUE;
 
 	if (!ok) {
-		stop_combat_no_autokill(victim);
+		stop_combat_no_autokill(victim, ch);
 		act("$n is knocked unconscious!", FALSE, victim, 0, 0, TO_ROOM);
 		msg_to_char(victim, "You are knocked unconscious.\r\n");
 		return;
@@ -4001,13 +4010,13 @@ void perform_violence_missile(char_data *ch, obj_data *weapon) {
 				atype = find_generic(GET_OBJ_VNUM(best), GENERIC_AFFECT) ? GET_OBJ_VNUM(best) : ATYPE_RANGED_WEAPON;
 			
 				if (GET_OBJ_AFF_FLAGS(best)) {
-					af = create_flag_aff(atype, 1, GET_OBJ_AFF_FLAGS(best), ch);
+					af = create_flag_aff(atype, 5, GET_OBJ_AFF_FLAGS(best), ch);
 					affect_to_char(vict, af);
 					free(af);
 				}
 			
 				LL_FOREACH(GET_OBJ_APPLIES(best), apply) {
-					af = create_mod_aff(atype, 1, apply->location, apply->modifier, ch);
+					af = create_mod_aff(atype, 5, apply->location, apply->modifier, ch);
 					affect_to_char(vict, af);
 					free(af);
 				}
@@ -4017,7 +4026,7 @@ void perform_violence_missile(char_data *ch, obj_data *weapon) {
 			if (!IS_NPC(ch) && weapon && !AFF_FLAGGED(vict, AFF_IMMUNE_PHYSICAL_DEBUFFS) && skill_check(ch, ABIL_TRICK_SHOTS, DIFF_RARELY)) {
 				switch (GET_MISSILE_WEAPON_TYPE(weapon)) {
 					case TYPE_BOW: {
-						af = create_flag_aff(ATYPE_TRICK_SHOT, 2, AFF_SLOW, ch);
+						af = create_flag_aff(ATYPE_TRICK_SHOT, 10, AFF_SLOW, ch);
 						affect_join(vict, af, 0);
 						
 						act("That shot to the leg seems to slow $N!", FALSE, ch, NULL, vict, TO_CHAR);
@@ -4030,11 +4039,11 @@ void perform_violence_missile(char_data *ch, obj_data *weapon) {
 						act("$n's shot opens a deep artery -- you are bleeding!", FALSE, ch, NULL, vict, TO_VICT);
 						act("$n's shot opens a deep artery -- $N is bleeding!", FALSE, ch, NULL, vict, TO_NOTVICT);
 						
-						apply_dot_effect(vict, ATYPE_TRICK_SHOT, 5, DAM_PHYSICAL, 5, 5, ch);
+						apply_dot_effect(vict, ATYPE_TRICK_SHOT, 25, DAM_PHYSICAL, 5, 5, ch);
 						break;
 					}
 					case TYPE_PISTOL: {
-						af = create_mod_aff(ATYPE_TRICK_SHOT, 2, APPLY_DODGE, -(GET_DEXTERITY(ch) * hit_per_dex), ch);
+						af = create_mod_aff(ATYPE_TRICK_SHOT, 10, APPLY_DODGE, -(GET_DEXTERITY(ch) * hit_per_dex), ch);
 						affect_join(vict, af, 0);
 						
 						act("That shot to the arm seems to shake $N!", FALSE, ch, NULL, vict, TO_CHAR);
@@ -4047,12 +4056,12 @@ void perform_violence_missile(char_data *ch, obj_data *weapon) {
 						act("$n's shot opens a deep artery -- you are bleeding!", FALSE, ch, NULL, vict, TO_VICT);
 						act("$n's shot opens a deep artery -- $N is bleeding!", FALSE, ch, NULL, vict, TO_NOTVICT);
 						
-						apply_dot_effect(vict, ATYPE_TRICK_SHOT, 5, DAM_PHYSICAL, 5, 5, ch);
+						apply_dot_effect(vict, ATYPE_TRICK_SHOT, 25, DAM_PHYSICAL, 5, 5, ch);
 						break;
 					}
 					case TYPE_SLING: {
 						if (!AFF_FLAGGED(vict, AFF_IMMUNE_STUN | AFF_STUNNED | AFF_HARD_STUNNED)) {
-							af = create_flag_aff(ATYPE_TRICK_SHOT, 1, AFF_STUNNED, ch);
+							af = create_flag_aff(ATYPE_TRICK_SHOT, 5, AFF_STUNNED, ch);
 							affect_join(vict, af, 0);
 						
 							act("That shot to the head seems to stun $N!", FALSE, ch, NULL, vict, TO_CHAR);
@@ -4066,7 +4075,7 @@ void perform_violence_missile(char_data *ch, obj_data *weapon) {
 						act("$n's shot opens a deep artery -- you are bleeding!", FALSE, ch, NULL, vict, TO_VICT);
 						act("$n's shot opens a deep artery -- $N is bleeding!", FALSE, ch, NULL, vict, TO_NOTVICT);
 						
-						apply_dot_effect(vict, ATYPE_TRICK_SHOT, 5, DAM_PHYSICAL, 5, 5, ch);
+						apply_dot_effect(vict, ATYPE_TRICK_SHOT, 25, DAM_PHYSICAL, 5, 5, ch);
 						break;
 					}
 				}
@@ -4256,6 +4265,9 @@ void frequent_combat(unsigned long pulse) {
 		// bring friends in no matter what (on the real seconds
 		if ((pulse % (1 RL_SEC)) == 0) {
 			check_auto_assist(ch);
+			if (IS_NPC(ch)) {
+				check_pointless_fight(ch);
+			}
 		}
 		
 		// reasons you would not get a round
@@ -4264,11 +4276,6 @@ void frequent_combat(unsigned long pulse) {
 		}
 		
 		// ready for combat:
-		
-		// update spawn time: delay despawn due to recent fighting
-		if (MOB_FLAGGED(ch, MOB_SPAWNED)) {
-			MOB_SPAWN_TIME(ch) = time(0);
-		}
 		
 		switch (FIGHT_MODE(ch)) {
 			case FMODE_WAITING: {
@@ -4283,6 +4290,12 @@ void frequent_combat(unsigned long pulse) {
 				// my turn?
 				if (GET_LAST_SWING_MAINHAND(ch) + (speed SEC_MICRO) <= microtime()) {
 					GET_LAST_SWING_MAINHAND(ch) = microtime();
+					
+					// update spawned time
+					if (MOB_FLAGGED(ch, MOB_SPAWNED)) {
+						set_mob_spawn_time(ch, time(0));
+					}
+					
 					one_combat_round(ch, speed, GET_EQ(ch, WEAR_RANGED));
 				}
 				break;
@@ -4295,6 +4308,12 @@ void frequent_combat(unsigned long pulse) {
 				speed = get_combat_speed(ch, WEAR_WIELD);
 				if (GET_LAST_SWING_MAINHAND(ch) + (speed SEC_MICRO) <= timestamp) {
 					GET_LAST_SWING_MAINHAND(ch) = timestamp;
+					
+					// update spawned time
+					if (MOB_FLAGGED(ch, MOB_SPAWNED)) {
+						set_mob_spawn_time(ch, time(0));
+					}
+					
 					one_combat_round(ch, speed, GET_EQ(ch, WEAR_WIELD));
 				}
 				

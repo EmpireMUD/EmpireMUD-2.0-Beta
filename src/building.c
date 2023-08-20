@@ -392,7 +392,7 @@ void construct_building(room_data *room, bld_vnum type) {
 	
 	// for updating territory counts
 	was_large = LARGE_CITY_RADIUS(room);
-	was_ter = ROOM_OWNER(room) ? get_territory_type_for_empire(room, ROOM_OWNER(room), FALSE, &junk) : TER_FRONTIER;
+	was_ter = ROOM_OWNER(room) ? get_territory_type_for_empire(room, ROOM_OWNER(room), FALSE, &junk, NULL) : TER_FRONTIER;
 	
 	sect = SECT(room);
 	change_terrain(room, config_get_int("default_building_sect"), NOTHING);
@@ -404,7 +404,7 @@ void construct_building(room_data *room, bld_vnum type) {
 	// check for territory updates
 	if (ROOM_OWNER(room) && was_large != LARGE_CITY_RADIUS(room)) {
 		struct empire_island *eisle = get_empire_island(ROOM_OWNER(room), GET_ISLAND_ID(room));
-		is_ter = get_territory_type_for_empire(room, ROOM_OWNER(room), FALSE, &junk);
+		is_ter = get_territory_type_for_empire(room, ROOM_OWNER(room), FALSE, &junk, NULL);
 		
 		if (was_ter != is_ter) {	// did territory type change?
 			SAFE_ADD(EMPIRE_TERRITORY(ROOM_OWNER(room), was_ter), -1, 0, UINT_MAX, FALSE);
@@ -565,7 +565,7 @@ void disassociate_building(room_data *room) {
 	
 	// for updating territory counts
 	was_large = ROOM_BLD_FLAGGED(room, BLD_LARGE_CITY_RADIUS) ? TRUE : FALSE;
-	was_ter = ROOM_OWNER(room) ? get_territory_type_for_empire(room, ROOM_OWNER(room), FALSE, &junk) : TER_FRONTIER;
+	was_ter = ROOM_OWNER(room) ? get_territory_type_for_empire(room, ROOM_OWNER(room), FALSE, &junk, NULL) : TER_FRONTIER;
 	
 	if (ROOM_OWNER(room) && GET_BUILDING(room) && IS_COMPLETE(room)) {
 		qt_empire_players(ROOM_OWNER(room), qt_lose_building, GET_BLD_VNUM(GET_BUILDING(room)));
@@ -675,7 +675,7 @@ void disassociate_building(room_data *room) {
 	// check for territory updates
 	if (ROOM_OWNER(room) && was_large != (ROOM_BLD_FLAGGED(room, BLD_LARGE_CITY_RADIUS) ? TRUE : FALSE)) {
 		struct empire_island *eisle = get_empire_island(ROOM_OWNER(room), GET_ISLAND_ID(room));
-		is_ter = get_territory_type_for_empire(room, ROOM_OWNER(room), FALSE, &junk);
+		is_ter = get_territory_type_for_empire(room, ROOM_OWNER(room), FALSE, &junk, NULL);
 		
 		if (was_ter != is_ter) {
 			SAFE_ADD(EMPIRE_TERRITORY(ROOM_OWNER(room), was_ter), -1, 0, UINT_MAX, FALSE);
@@ -1351,7 +1351,7 @@ void setup_tunnel_entrance(char_data *ch, room_data *room, int dir) {
 	affect_total_room(room);
 	COMPLEX_DATA(room)->entrance = dir;
 	if (emp && can_claim(ch) && !ROOM_AFF_FLAGGED(room, ROOM_AFF_UNCLAIMABLE)) {
-		ter_type = get_territory_type_for_empire(room, emp, FALSE, &junk);
+		ter_type = get_territory_type_for_empire(room, emp, FALSE, &junk, NULL);
 		if (EMPIRE_TERRITORY(emp, ter_type) < land_can_claim(emp, ter_type)) {
 			claim_room(room, emp);
 		}
@@ -2074,7 +2074,7 @@ void do_dismantle_vehicle(char_data *ch, vehicle_data *veh) {
 	else if (WATER_SECT(IN_ROOM(ch))) {
 		msg_to_char(ch, "You can't dismantle it in the water.\r\n");
 	}
-	else if (VEH_OWNER(veh) && GET_LOYALTY(ch) && GET_RANK(ch) < EMPIRE_PRIV(GET_LOYALTY(ch), PRIV_DISMANTLE) && get_vehicle_extra_data(veh, ROOM_EXTRA_ORIGINAL_BUILDER) != GET_ACCOUNT(ch)->id) {
+	else if (!HAS_DISMANTLE_PRIV_FOR_VEHICLE(ch, veh)) {
 		msg_to_char(ch, "You don't have permission to dismantle that.\r\n");
 	}
 	else if ((craft = find_craft_for_vehicle(veh)) && GET_CRAFT_ABILITY(craft) != NO_ABIL && !has_ability(ch, GET_CRAFT_ABILITY(craft)) && get_vehicle_extra_data(veh, ROOM_EXTRA_ORIGINAL_BUILDER) != GET_ACCOUNT(ch)->id) {
@@ -2236,7 +2236,7 @@ ACMD(do_dismantle) {
 		return;
 	}
 
-	if (!can_use_room(ch, IN_ROOM(ch), MEMBERS_ONLY) || (!has_permission(ch, PRIV_DISMANTLE, IN_ROOM(ch)) && get_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_ORIGINAL_BUILDER) != GET_ACCOUNT(ch)->id)) {
+	if (!HAS_DISMANTLE_PRIV_FOR_BUILDING(ch, IN_ROOM(ch))) {
 		msg_to_char(ch, "You don't have permission to dismantle this building.\r\n");
 		return;
 	}

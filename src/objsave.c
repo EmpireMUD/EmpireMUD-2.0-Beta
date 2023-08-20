@@ -942,6 +942,7 @@ void objpack_load_room(room_data *room, bool use_pre_b5_116_dir) {
 			
 			if ((obj = Obj_load_from_file(fl, vnum, &location, NULL, err_str))) {
 				// Obj_load_from_file may return a NULL for deleted objs
+				suspend_autostore_updates = TRUE;	// see end of block for FALSE
 				
 				// Not really an inventory, but same idea.
 				if (location > 0) {
@@ -951,7 +952,7 @@ void objpack_load_room(room_data *room, bool use_pre_b5_116_dir) {
 				// store autostore timer through obj_to_room
 				timer = GET_AUTOSTORE_TIMER(obj);
 				obj_to_room(obj, room);
-				GET_AUTOSTORE_TIMER(obj) = timer;
+				schedule_obj_autostore_check(obj, timer);
 				
 				for (iter = MAX_BAG_ROWS - 1; iter > -location; --iter) {
 					// No container, back to room.
@@ -959,7 +960,7 @@ void objpack_load_room(room_data *room, bool use_pre_b5_116_dir) {
 						DL_DELETE2(cont_row[iter], o, prev_content, next_content);
 						timer = GET_AUTOSTORE_TIMER(o);
 						obj_to_room(o, room);
-						GET_AUTOSTORE_TIMER(o) = timer;
+						schedule_obj_autostore_check(o, timer);
 					}
 				}
 				if (iter == -location && cont_row[iter]) {			/* Content list exists. */
@@ -973,14 +974,14 @@ void objpack_load_room(room_data *room, bool use_pre_b5_116_dir) {
 						}
 						timer = GET_AUTOSTORE_TIMER(obj);
 						obj_to_room(obj, room);			/* Add to room first. */
-						GET_AUTOSTORE_TIMER(obj) = timer;
+						schedule_obj_autostore_check(obj, timer);
 					}
 					else {				/* Object isn't container, empty content list. */
 						DL_FOREACH_SAFE2(cont_row[iter], o, next_o, next_content) {
 							DL_DELETE2(cont_row[iter], o, prev_content, next_content);
 							timer = GET_AUTOSTORE_TIMER(o);
 							obj_to_room(o, room);
-							GET_AUTOSTORE_TIMER(o) = timer;
+							schedule_obj_autostore_check(o, timer);
 						}
 					}
 				}
@@ -988,9 +989,12 @@ void objpack_load_room(room_data *room, bool use_pre_b5_116_dir) {
 					obj_from_room(obj);
 					DL_APPEND2(cont_row[-location - 1], obj, prev_content, next_content);
 				}
+				
+				suspend_autostore_updates = FALSE;
 			}
 			else {
 				// no obj returned -- it was probably deleted
+				suspend_autostore_updates = TRUE;
 				
 				// item is missing here -- attempt to dump stuff back to the room if pending
 				for (iter = MAX_BAG_ROWS - 1; iter >= 0; --iter) {
@@ -998,9 +1002,11 @@ void objpack_load_room(room_data *room, bool use_pre_b5_116_dir) {
 						DL_DELETE2(cont_row[iter], o, prev_content, next_content);
 						timer = GET_AUTOSTORE_TIMER(o);
 						obj_to_room(o, room);
-						GET_AUTOSTORE_TIMER(o) = timer;
+						schedule_obj_autostore_check(o, timer);
 					}
 				}
+				
+				suspend_autostore_updates = FALSE;
 				
 				/*
 				log("SYSERR: Got back non-object while loading vnum %d for %s", vnum, fname);

@@ -91,7 +91,7 @@ You can use the 'eedit' command to configure your empire.
 Type 'cooldowns' to see how long until your abilities are available.
 Players with less than 24 hours of playtime can't be attacked by other players, unless they are hostile.
 You can identify items to see how good they are, or which is better.
-To identify an item in your inventory when you're wearing something with the same name, try 'id 1.item'.
+To identify an item in your inventory when you're wearing something with the same name, try 'id inv <name>'.
 You can create new slash-channels with /join.
 Your Workforce and other NPCs will stop spawning if nobody logs in for 2 weeks.
 Once you build a city, you can name your island with the 'customize' command.

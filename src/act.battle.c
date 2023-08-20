@@ -171,7 +171,7 @@ ACMD(do_bash) {
 
 		if (damage(ch, vict, dam, ATTACK_BASH, DAM_PHYSICAL) > 0) {	/* -1 = dead, 0 = miss */
 			if (!AFF_FLAGGED(vict, AFF_IMMUNE_PHYSICAL_DEBUFFS | AFF_IMMUNE_STUN)) {
-				af = create_flag_aff(ATYPE_BASH, 1, AFF_STUNNED, ch);
+				af = create_flag_aff(ATYPE_BASH, 5, AFF_STUNNED, ch);
 				affect_join(vict, af, 0);
 		
 				// release other saps here
@@ -226,11 +226,11 @@ ACMD(do_charge) {
 		act("$n charges at $N!", FALSE, ch, NULL, vict, TO_NOTVICT);
 		
 		// apply temporary hit/damage boosts
-		af = create_mod_aff(ATYPE_CHARGE, 1, APPLY_TO_HIT, 100, ch);
+		af = create_mod_aff(ATYPE_CHARGE, 5, APPLY_TO_HIT, 100, ch);
 		affect_join(ch, af, 0);
-		af = create_mod_aff(ATYPE_CHARGE, 1, APPLY_BONUS_PHYSICAL, GET_STRENGTH(ch), ch);
+		af = create_mod_aff(ATYPE_CHARGE, 5, APPLY_BONUS_PHYSICAL, GET_STRENGTH(ch), ch);
 		affect_join(ch, af, 0);
-		af = create_mod_aff(ATYPE_CHARGE, 1, APPLY_BONUS_MAGICAL, GET_INTELLIGENCE(ch), ch);
+		af = create_mod_aff(ATYPE_CHARGE, 5, APPLY_BONUS_MAGICAL, GET_INTELLIGENCE(ch), ch);
 		affect_join(ch, af, 0);
 		
 		res = hit(ch, vict, GET_EQ(ch, WEAR_WIELD), TRUE);
@@ -259,7 +259,7 @@ ACMD(do_disarm) {
 	struct affected_type *af;
 	char_data *victim;
 	int cost = 15;
-	int disarm_levels[] = { 1, 3, 5 };
+	int disarm_levels[] = { 5, 15, 25 };	// durations
 
 	one_argument(argument, arg);
 
@@ -449,7 +449,7 @@ ACMD(do_heartstop) {
 			gain_ability_exp(ch, ABIL_HEARTSTOP, 15);
 		}
 
-		af = create_flag_aff(ATYPE_HEARTSTOP, 4, AFF_CANT_SPEND_BLOOD, ch);
+		af = create_flag_aff(ATYPE_HEARTSTOP, 20, AFF_CANT_SPEND_BLOOD, ch);
 		affect_join(victim, af, ADD_DURATION);
 
 		msg_to_char(victim, "Your blood becomes inert!\r\n");
@@ -510,9 +510,9 @@ ACMD(do_kick) {
 		if (has_ability(ch, ABIL_SHADOW_KICK) && check_solo_role(ch) && !AFF_FLAGGED(vict, AFF_IMMUNE_PHYSICAL_DEBUFFS)) {
 			struct affected_type *af;
 			int value = round(GET_COMPUTED_LEVEL(ch) / 50);
-			af = create_mod_aff(ATYPE_SHADOW_KICK, 2, APPLY_BONUS_PHYSICAL, -value, ch);
+			af = create_mod_aff(ATYPE_SHADOW_KICK, 10, APPLY_BONUS_PHYSICAL, -value, ch);
 			affect_join(vict, af, 0);
-			af = create_mod_aff(ATYPE_SHADOW_KICK, 2, APPLY_BONUS_MAGICAL, -value, ch);
+			af = create_mod_aff(ATYPE_SHADOW_KICK, 10, APPLY_BONUS_MAGICAL, -value, ch);
 			affect_join(vict, af, 0);
 		}
 	
@@ -644,7 +644,7 @@ ACMD(do_outrage) {
 			// ok seems valid...
 			if (skill_check(ch, ABIL_OUTRAGE, DIFF_MEDIUM)) {
 				if (found) {	// add cost if more than 1 victim (already found)
-					GET_MOVE(ch) -= add_cost;
+					set_move(ch, GET_MOVE(ch) - add_cost);
 				}
 				
 				hit(ch, victim, GET_EQ(ch, WEAR_WIELD), FALSE);

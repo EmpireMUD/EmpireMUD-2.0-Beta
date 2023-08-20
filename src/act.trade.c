@@ -717,7 +717,7 @@ void show_craft_info(char_data *ch, char *argument, int craft_type) {
 	bld_data *bld;
 	
 	// these flags show on craft info
-	bitvector_t show_flags = OBJ_UNIQUE | OBJ_LIGHT | OBJ_LARGE | OBJ_TWO_HANDED | OBJ_BIND_ON_EQUIP | OBJ_BIND_ON_PICKUP;
+	bitvector_t show_flags = OBJ_UNIQUE | OBJ_LARGE | OBJ_TWO_HANDED | OBJ_BIND_ON_EQUIP | OBJ_BIND_ON_PICKUP;
 	
 	if (!*argument) {
 		msg_to_char(ch, "Get %s info on what?\r\n", gen_craft_data[craft_type].command);
@@ -792,6 +792,19 @@ void show_craft_info(char_data *ch, char *argument, int craft_type) {
 				}
 				else {
 					sprintf(buf + strlen(buf), ", %d use%s\r\n", GET_LIGHTER_USES(proto), PLURAL(GET_LIGHTER_USES(proto)));
+				}
+				break;
+			}
+			case ITEM_LIGHT: {
+				if (GET_LIGHT_HOURS_REMAINING(proto) == UNLIMITED) {
+					strcat(buf, ", unlimited");
+				}
+				else {
+					sprintf(buf + strlen(buf), "%d hour%s of light", GET_LIGHT_HOURS_REMAINING(proto), PLURAL(GET_LIGHT_HOURS_REMAINING(proto)));
+				}
+				prettier_sprintbit(GET_LIGHT_FLAGS(proto), light_flags, part);
+				if (*part) {
+					sprintf(buf + strlen(buf), ", %s", part);
 				}
 				break;
 			}
@@ -895,7 +908,7 @@ INTERACTION_FUNC(tame_interact) {
 		}
 
 		prc = (double)GET_HEALTH(inter_mob) / MAX(1, GET_MAX_HEALTH(inter_mob));
-		GET_HEALTH(newmob) = (int)(prc * GET_MAX_HEALTH(newmob));
+		set_health(newmob, (int)(prc * GET_MAX_HEALTH(newmob)));
 		
 		// message before triggering
 		if (!any) {
@@ -1684,7 +1697,7 @@ void do_gen_craft_building(char_data *ch, craft_data *type, int dir) {
 	if (!ROOM_OWNER(IN_ROOM(ch)) && can_claim(ch) && !ROOM_AFF_FLAGGED(IN_ROOM(ch), ROOM_AFF_UNCLAIMABLE)) {
 		empire_data *emp = get_or_create_empire(ch);
 		if (emp) {
-			ter_type = get_territory_type_for_empire(IN_ROOM(ch), emp, FALSE, &junk);
+			ter_type = get_territory_type_for_empire(IN_ROOM(ch), emp, FALSE, &junk, NULL);
 			if (EMPIRE_TERRITORY(emp, ter_type) < land_can_claim(emp, ter_type)) {
 				claim_room(IN_ROOM(ch), emp);
 			}
@@ -1764,7 +1777,7 @@ void do_gen_craft_vehicle(char_data *ch, craft_data *type, int dir) {
 			if (!ROOM_OWNER(HOME_ROOM(IN_ROOM(ch))) && can_claim(ch) && !ROOM_AFF_FLAGGED(HOME_ROOM(IN_ROOM(ch)), ROOM_AFF_UNCLAIMABLE)) {
 				empire_data *emp = get_or_create_empire(ch);
 				if (emp) {
-					int ter_type = get_territory_type_for_empire(HOME_ROOM(IN_ROOM(ch)), emp, FALSE, &junk);
+					int ter_type = get_territory_type_for_empire(HOME_ROOM(IN_ROOM(ch)), emp, FALSE, &junk, NULL);
 					if (EMPIRE_TERRITORY(emp, ter_type) < land_can_claim(emp, ter_type)) {
 						claim_room(HOME_ROOM(IN_ROOM(ch)), emp);
 					}

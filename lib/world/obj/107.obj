@@ -461,33 +461,34 @@ S
 #10734
 candlestick~
 a candlestick~
-A candlestick is lying here, unlit.~
+A candlestick is standing on the ground.~
    This candlestick is made from fine copper, and is surely someone's family
 heirloom. Indeed, the base is etched with the name 'Nimble'. Perhaps if you
 could find its owner, he'd reward you.
    You can 'use' this item to teleport back to the nearest Mother Goose
 adventure. From there, try 'where nimble' to find the right Jack.
+   You can also 'light' and 'douse' the candlestick.
 ~
-3 p ao 0 5
-0 0 0
+29 p ao 0 7
+168 0 3
 13 0
-I 11 10735 100.00 1  # LIGHT: lit candlestick
 T 10738
 T 9806
 S
 #10735
-candlestick lit~
-a lit candlestick~
-A lit candlestick is sitting on the ground.~
+candlestick~
+a candlestick~
+A candlestick is standing on the ground.~
    This candlestick is made from fine copper, and is surely someone's family
 heirloom. Indeed, the base is etched with the name 'Nimble'. Perhaps if you
 could find its owner, he'd reward you.
    You can 'use' this item to teleport back to the nearest Mother Goose
 adventure. From there, try 'where nimble' to find the right Jack.
+   You can also 'light' and 'douse' the candlestick.
 ~
-3 cp ao 0 6
-0 0 0
-13 168
+29 p ao 0 9
+168 1 3
+13 0
 T 10738
 T 9806
 S
@@ -899,23 +900,24 @@ S
 #10763
 lantern silk spidersilk~
 a spidersilk lantern~
-A spidersilk lantern was left here.~
-You wonder if you could light it without burning yourself.
+A spidersilk lantern is lying on the ground.~
+   The lantern is made from spidersilk! You can 'light' or 'douse' it to make
+it last longer.
 ~
-3 0 ao 0 2
-0 0 0
+29 0 ao 0 3
+168 0 6
 11 0
-I 11 10764 100.00 1  # LIGHT: lit spidersilk lantern
 S
 #10764
-lantern lit spidersilk silk~
-a lit spidersilk lantern~
-A lit spidersilk lantern is lying on the ground.~
-The spidersilk burns nicely.
+lantern spidersilk silk~
+a spidersilk lantern~
+A spidersilk lantern is lying on the ground.~
+   The lantern is made from spidersilk! You can 'light' or 'douse' it to make
+it last longer.
 ~
-3 c ao 0 2
-0 0 0
-11 168
+29 0 ao 0 4
+168 1 6
+11 0
 S
 #10765
 slippers silk pair spidersilk~

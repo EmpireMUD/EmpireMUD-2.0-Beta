@@ -357,6 +357,9 @@ OLC_MODULE(oedit_flags);
 OLC_MODULE(oedit_fullness);
 OLC_MODULE(oedit_interaction);
 OLC_MODULE(oedit_keywords);
+OLC_MODULE(oedit_lightflags);
+OLC_MODULE(oedit_lighthours);
+OLC_MODULE(oedit_lightislit);
 OLC_MODULE(oedit_liquid);
 OLC_MODULE(oedit_long_desc);
 OLC_MODULE(oedit_material);
@@ -864,6 +867,9 @@ const struct olc_command_data olc_data[] = {
 	{ "fullness", oedit_fullness, OLC_OBJECT, OLC_CF_EDITOR },
 	{ "interaction", oedit_interaction, OLC_OBJECT, OLC_CF_EDITOR },
 	{ "keywords", oedit_keywords, OLC_OBJECT, OLC_CF_EDITOR },
+	{ "lighthours", oedit_lighthours, OLC_OBJECT, OLC_CF_EDITOR },
+	{ "lightflags", oedit_lightflags, OLC_OBJECT, OLC_CF_EDITOR },
+	{ "lightislit", oedit_lightislit, OLC_OBJECT, OLC_CF_EDITOR },
 	{ "liquid", oedit_liquid, OLC_OBJECT, OLC_CF_EDITOR },
 	{ "longdescription", oedit_long_desc, OLC_OBJECT, OLC_CF_EDITOR },
 	{ "lookdescription", oedit_action_desc, OLC_OBJECT, OLC_CF_EDITOR },
@@ -6257,7 +6263,7 @@ void olc_process_requirements(char_data *ch, char *argument, struct req_data **l
 		skip_spaces(&argument);
 		
 		if (!*num_arg || !isdigit(*num_arg) || !*field_arg) {
-			msg_to_char(ch, "Usage: %s change <number> <amount | vnum> <value>\r\n", command);
+			msg_to_char(ch, "Usage: %s change <number> <amount | group | text | vnum> <value>\r\n", command);
 			return;
 		}
 		

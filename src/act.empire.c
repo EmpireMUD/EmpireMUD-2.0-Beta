@@ -136,7 +136,7 @@ bool can_reclaim(char_data *ch, room_data *room) {
 		is_ok = FALSE;
 		
 		// check city
-		if (get_territory_type_for_empire(room, emp, TRUE, &too_soon) == TER_CITY && get_territory_type_for_empire(room, enemy, TRUE, &too_soon) == TER_FRONTIER) {
+		if (get_territory_type_for_empire(room, emp, TRUE, &too_soon, NULL) == TER_CITY && get_territory_type_for_empire(room, enemy, TRUE, &too_soon, NULL) == TER_FRONTIER) {
 			// I have a city here and they don't even have an outskirts
 			is_ok = TRUE;
 		}
@@ -1640,7 +1640,7 @@ bool check_in_city_requirement(room_data *room, bool check_wait) {
 	if (!ROOM_BLD_FLAGGED(room, BLD_IN_CITY_ONLY) && !HAS_FUNCTION(room, FNC_IN_CITY_ONLY) && !ROOM_BLD_FLAGGED(home, BLD_IN_CITY_ONLY) && !HAS_FUNCTION(home, FNC_IN_CITY_ONLY)) {
 		return TRUE;
 	}
-	if (ROOM_OWNER(room) && get_territory_type_for_empire(room, ROOM_OWNER(room), check_wait, &junk) == TER_CITY) {
+	if (ROOM_OWNER(room) && get_territory_type_for_empire(room, ROOM_OWNER(room), check_wait, &junk, NULL) == TER_CITY) {
 		return TRUE;
 	}
 	
@@ -1761,7 +1761,7 @@ void claim_city(char_data *ch, empire_data *emp, char *argument) {
 						if (compute_distance(center, to_room) > radius) {
 							continue;
 						}
-						if (get_territory_type_for_empire(to_room, emp, FALSE, &junk) != TER_CITY) {
+						if (get_territory_type_for_empire(to_room, emp, FALSE, &junk, NULL) != TER_CITY) {
 							continue;	// wouldn't be in-city (checks corners and islands)
 						}
 						
@@ -1983,17 +1983,22 @@ void found_city(char_data *ch, empire_data *emp, char *argument) {
 * @param empire_data *emp The empire to check.
 * @param bool check_wait If TRUE, requires the city wait time to have passed.
 * @param bool *city_too_soon Optional: Will be set to TRUE if there was a city but it was founded too recently. (Pass NULL to skip.)
+* @param bool *using_large_radius Optional: Will be set to TRUE if the territory counts as in-city but is actually in the outskirts. (Pass NULL to skip.)
 * @return bool TRUE if in-city, FALSE if not.
 */
-int get_territory_type_for_empire(room_data *loc, empire_data *emp, bool check_wait, bool *city_too_soon) {
+int get_territory_type_for_empire(room_data *loc, empire_data *emp, bool check_wait, bool *city_too_soon, bool *using_large_radius) {
 	struct empire_city_data *city;
 	int dist, best_dist = MAP_SIZE, type = TER_FRONTIER, last_type = TER_FRONTIER;
+	bool one_large = FALSE, last_large = FALSE, best_large = FALSE;
 	
 	double outskirts_multiplier = config_get_double("outskirts_modifier");	// radius multiplier
 	int wait = check_wait ? config_get_int("minutes_to_full_city") * SECS_PER_REAL_MIN : 0;
 	
 	if (city_too_soon) {
 		*city_too_soon = FALSE;	// init this
+	}
+	if (using_large_radius) {
+		*using_large_radius = FALSE;	// init
 	}
 	
 	if (!emp) {
@@ -2007,6 +2012,7 @@ int get_territory_type_for_empire(room_data *loc, empire_data *emp, bool check_w
 	
 	LL_FOREACH(EMPIRE_CITY_LIST(emp), city) {
 		dist = compute_distance(loc, city->location);
+		one_large = FALSE;
 		
 		// check radii
 		if (dist <= city_type[city->type].radius && GET_ISLAND(loc) == GET_ISLAND(city->location)) {
@@ -2015,6 +2021,11 @@ int get_territory_type_for_empire(room_data *loc, empire_data *emp, bool check_w
 		}
 		else if (dist <= (city_type[city->type].radius * outskirts_multiplier)) {
 			type = LARGE_CITY_RADIUS(loc) ? TER_CITY : TER_OUTSKIRTS;
+			
+			// may need to mark that it's "large"
+			if (type == TER_CITY) {
+				one_large = TRUE;
+			}
 		}
 		else {
 			type = TER_FRONTIER;
@@ -2037,11 +2048,17 @@ int get_territory_type_for_empire(room_data *loc, empire_data *emp, bool check_w
 				*city_too_soon = TRUE;
 			}
 			type = last_type;	// restore previous type
+			best_large = last_large;
 		}
 		else {
 			last_type = type;	// save this for next iteration
 			best_dist = dist;	// save this for next iteration
+			best_large = last_large = one_large;
 		}
+	}
+	
+	if (using_large_radius && type == TER_CITY && best_large) {
+		*using_large_radius = best_large;
 	}
 	
 	return type;
@@ -2167,7 +2184,7 @@ void perform_abandon_city(empire_data *emp, struct empire_city_data *city, bool 
 				// check ownership
 				if (to_room && ROOM_OWNER(to_room) == emp && !ROOM_AFF_FLAGGED(to_room, ROOM_AFF_NO_ABANDON)) {
 					// warning: never abandon things that are still within another city
-					if (get_territory_type_for_empire(to_room, emp, FALSE, &junk) != TER_CITY) {
+					if (get_territory_type_for_empire(to_room, emp, FALSE, &junk, NULL) != TER_CITY) {
 						// check if ACTUALLY within the abandoned city
 						if (compute_distance(cityloc, to_room) <= radius) {
 							abandon_room(to_room);
@@ -2720,10 +2737,10 @@ void perform_inspire(char_data *ch, char_data *vict, int type) {
 	affect_from_char(vict, ATYPE_INSPIRE, FALSE);
 	
 	if (ch == vict || (GET_LOYALTY(ch) && GET_LOYALTY(ch) == GET_LOYALTY(vict))) {
-		time = 24 MUD_HOURS;
+		time = 30 * SECS_PER_REAL_MIN;
 	}
 	else {
-		time = 4 MUD_HOURS;
+		time = 5 * SECS_PER_REAL_MIN;
 	}
 	
 	// amount to give
@@ -3522,7 +3539,7 @@ ACMD(do_barde) {
 					}
 		
 					prc = (double)GET_HEALTH(mob) / MAX(1, GET_MAX_HEALTH(mob));
-					GET_HEALTH(newmob) = (int)(prc * GET_MAX_HEALTH(newmob));
+					set_health(newmob, (int)(prc * GET_MAX_HEALTH(newmob)));
 				}
 				
 				if (interact->quantity > 1) {
@@ -3554,6 +3571,140 @@ ACMD(do_barde) {
 		}
 		
 		free_exclusion_data(excl);
+	}
+}
+
+
+/**
+* Attempts to start burning a building, checking everything as it goes. This
+* can be called remotely; ch can be anywhere.
+*
+* @param char_data *ch The person doing the burning.
+* @param room_data *room The targeted room (should be a map building).
+* @param obj_data *lighter Optional: If a lighter is given, it will be used for this. If not, we assume they don't need it.
+*/
+void do_burn_building(char_data *ch, room_data *room, obj_data *lighter) {
+	char to_char[256], to_room[256];
+	
+	// ensure we have the real room
+	room = HOME_ROOM(room);
+	
+	// npc denial
+	if (IS_NPC(ch)) {
+		msg_to_char(ch, "NPCs cannot light buildings on fire.\r\n");
+	}
+	else if (GET_ROOM_VEHICLE(room)) {
+		do_light_vehicle(ch, GET_ROOM_VEHICLE(room), lighter);
+	}
+	else if (IS_BURNING(room)) {
+		msg_to_char(ch, "Looks like it's already on fire!\r\n");
+	}
+	else if (GET_POS(ch) < POS_STANDING) {
+		send_low_pos_msg(ch);
+	}
+	else if (!ROOM_SECT_FLAGGED(room, SECTF_MAP_BUILDING)) {
+		msg_to_char(ch, "You can only set buildings on fire this way.\r\n");
+	}
+	else if (ROOM_OWNER(room) && GET_LOYALTY(ch) && ROOM_OWNER(room) != GET_LOYALTY(ch) && !has_relationship(GET_LOYALTY(ch), ROOM_OWNER(room), DIPL_WAR)) {
+		msg_to_char(ch, "You can't burn buildings owned by %s because you're not at war.\r\n", EMPIRE_NAME(ROOM_OWNER(room)));
+	}
+	else if (GET_LOYALTY(ch) && ROOM_OWNER(IN_ROOM(ch)) == GET_LOYALTY(ch) && !HAS_DISMANTLE_PRIV_FOR_BUILDING(ch, IN_ROOM(ch))) {
+		msg_to_char(ch, "You don't have permission to burn the empire's buildings (it requires the dismantle privilege).\r\n");
+	}
+	else if (!ROOM_BLD_FLAGGED(room, BLD_BURNABLE)) {
+		msg_to_char(ch, "It doesn't seem to be flammable.\r\n");
+	}
+	else {
+		// message here
+		if (lighter) {
+			snprintf(to_char, sizeof(to_char), "You use $p to light the building on fire!");
+			snprintf(to_room, sizeof(to_room), "$n uses $p to light %s building on fire!", (room == HOME_ROOM(IN_ROOM(ch))) ? "the" : "a");
+		}
+		else {
+			// no lighter?
+			snprintf(to_char, sizeof(to_char), "You light the building on fire!");
+			snprintf(to_room, sizeof(to_room), "$n lights %s building on fire!", (room == HOME_ROOM(IN_ROOM(ch))) ? "the" : "a");
+		}
+	
+		act(to_char, FALSE, ch, lighter, NULL, TO_CHAR);
+		act(to_room, FALSE, ch, lighter, NULL, TO_ROOM);
+	
+		// start the fire!
+		start_burning(room);
+		command_lag(ch, WAIT_COMBAT_ABILITY);
+	
+		// lighter use or XP
+		if (lighter) {
+			used_lighter(ch, lighter);
+		}
+		else {
+			gain_player_tech_exp(ch, PTECH_LIGHT_FIRE, 15);
+		}
+	
+		// and an offense
+		if (ROOM_OWNER(room) && GET_LOYALTY(ch)) {
+			add_offense(ROOM_OWNER(room), OFFENSE_BURNED_BUILDING, ch, room, offense_was_seen(ch, ROOM_OWNER(room), IN_ROOM(ch)) ? OFF_SEEN : NOBITS);
+		}
+	}
+}
+
+
+ACMD(do_burn) {
+	bool objless = has_player_tech(ch, PTECH_LIGHT_FIRE);
+	char *argptr = arg;
+	obj_data *lighter = NULL;
+	room_data *target;
+	vehicle_data *veh;
+	bool kept = FALSE;
+	int number, dir;
+
+	one_argument(argument, arg);
+	number = get_number(&argptr);
+
+	if (!objless) {
+		lighter = find_lighter_in_list(ch->carrying, &kept);
+	}
+
+	if (!*argptr) {
+		msg_to_char(ch, "Burn what?\r\n");
+	}
+	else if (!IS_NPC(ch) && !objless && !lighter) {
+		// nothing to light it with
+		if (kept) {
+			msg_to_char(ch, "You need a lighter that isn't marked 'keep'.\r\n");
+		}
+		else {
+			msg_to_char(ch, "You don't have anything to light that with.\r\n");
+		}
+	}
+	else if ((dir = parse_direction(ch, argptr)) != NO_DIR) {
+		// burn <dir>
+		if (!IS_OUTDOOR_TILE(IN_ROOM(ch)) || GET_ROOM_VNUM(IN_ROOM(ch)) >= MAP_SIZE) {
+			msg_to_char(ch, "You can't burn adjacent tiles unless you're outdoors.\r\n");
+		}
+		else if (!(target = real_shift(IN_ROOM(ch), shift_dir[dir][0], shift_dir[dir][1])) || !ROOM_SECT_FLAGGED(target, SECTF_MAP_BUILDING)) {
+			msg_to_char(ch, "You can't burn anything in that direction.\r\n");
+		}
+		else {
+			do_burn_building(ch, target, lighter);
+		}
+	}
+	else if ((!str_cmp(arg, "building") || !str_cmp(arg, "build")) && IS_ANY_BUILDING(IN_ROOM(ch))) {
+		do_burn_building(ch, IN_ROOM(ch), lighter);
+	}
+	else if (generic_find(argptr, &number, FIND_VEHICLE_ROOM | FIND_VEHICLE_INSIDE, ch, NULL, NULL, &veh)) {
+		// try burning a vehicle
+		do_light_vehicle(ch, veh, lighter);
+	}
+	else if (!str_cmp(arg, "area") || !str_cmp(arg, "room") || !str_cmp(arg, "here") || isname(arg, get_room_name(IN_ROOM(ch), FALSE)) || isname(arg, GET_SECT_NAME(SECT(IN_ROOM(ch))))) {
+		do_burn_area(ch);
+	}
+		
+	else if (get_obj_in_list_vis_prefer_interaction(ch, argptr, &number, ch->carrying, INTERACT_LIGHT) || get_obj_in_list_vis_prefer_interaction(ch, argptr, &number, ROOM_CONTENTS(IN_ROOM(ch)), INTERACT_LIGHT)) {
+		msg_to_char(ch, "You can't burn items with this command. Try 'light' instead.\r\n");
+	}
+	else {
+		msg_to_char(ch, "You don't see %s %s to burn here.\r\n", AN(arg), arg);
 	}
 }
 
@@ -3615,13 +3766,13 @@ ACMD(do_cede) {
 	else if (EMPIRE_TERRITORY(f, TER_TOTAL) >= land_can_claim(f, TER_TOTAL)) {
 		msg_to_char(ch, "You can't cede land to %s, %s empire can't own any more land.\r\n", REAL_HMHR(targ), REAL_HSHR(targ));
 	}
-	else if (get_territory_type_for_empire(room, f, FALSE, &junk) == TER_OUTSKIRTS && EMPIRE_TERRITORY(f, TER_OUTSKIRTS) >= OUTSKIRTS_CLAIMS_AVAILABLE(f)) {
+	else if (get_territory_type_for_empire(room, f, FALSE, &junk, NULL) == TER_OUTSKIRTS && EMPIRE_TERRITORY(f, TER_OUTSKIRTS) >= OUTSKIRTS_CLAIMS_AVAILABLE(f)) {
 		msg_to_char(ch, "You can't cede land to that empire as it is over its limit for territory on the outskirts of cities.\r\n");
 	}
-	else if (get_territory_type_for_empire(room, f, FALSE, &junk) == TER_FRONTIER && EMPIRE_TERRITORY(f, TER_FRONTIER) >= land_can_claim(f, TER_FRONTIER)) {
+	else if (get_territory_type_for_empire(room, f, FALSE, &junk, NULL) == TER_FRONTIER && EMPIRE_TERRITORY(f, TER_FRONTIER) >= land_can_claim(f, TER_FRONTIER)) {
 		msg_to_char(ch, "You can't cede land to that empire as it is over its limit for territory on the frontier.\r\n");
 	}
-	else if (EMPIRE_ADMIN_FLAGGED(f, EADM_CITY_CLAIMS_ONLY) && get_territory_type_for_empire(room, f, FALSE, &junk) != TER_CITY) {
+	else if (EMPIRE_ADMIN_FLAGGED(f, EADM_CITY_CLAIMS_ONLY) && get_territory_type_for_empire(room, f, FALSE, &junk, NULL) != TER_CITY) {
 		msg_to_char(ch, "That empire is forbidden from gaining new territory outside of a city.\r\n");
 	}
 	else if (is_at_war(f)) {
@@ -3734,13 +3885,13 @@ void do_claim_room(char_data *ch, room_data *room, empire_data *emp) {
 	else if (!can_build_or_claim_at_war(ch, room) && !imm_access) {
 		msg_to_char(ch, "You can't claim while at war with the empire that controls this area.\r\n");
 	}
-	else if (!imm_access && get_territory_type_for_empire(room, emp, FALSE, &junk) == TER_OUTSKIRTS && EMPIRE_TERRITORY(emp, TER_OUTSKIRTS) >= OUTSKIRTS_CLAIMS_AVAILABLE(emp)) {
+	else if (!imm_access && get_territory_type_for_empire(room, emp, FALSE, &junk, NULL) == TER_OUTSKIRTS && EMPIRE_TERRITORY(emp, TER_OUTSKIRTS) >= OUTSKIRTS_CLAIMS_AVAILABLE(emp)) {
 		msg_to_char(ch, "You can't claim the area because you're over the %d%% of your territory that can be on the outskirts of cities.\r\n", (int)(100 * config_get_double("land_outside_city_modifier")));
 	}
-	else if (!imm_access && get_territory_type_for_empire(room, emp, FALSE, &junk) == TER_FRONTIER && EMPIRE_TERRITORY(emp, TER_FRONTIER) >= land_can_claim(emp, TER_FRONTIER)) {
+	else if (!imm_access && get_territory_type_for_empire(room, emp, FALSE, &junk, NULL) == TER_FRONTIER && EMPIRE_TERRITORY(emp, TER_FRONTIER) >= land_can_claim(emp, TER_FRONTIER)) {
 		msg_to_char(ch, "You can't claim the area because you're over the %d%% of your territory that can be on the frontier.\r\n", (int)(100 * config_get_double("land_frontier_modifier")));
 	}
-	else if (!imm_access && EMPIRE_ADMIN_FLAGGED(emp, EADM_CITY_CLAIMS_ONLY) && get_territory_type_for_empire(room, emp, FALSE, &junk) != TER_CITY) {
+	else if (!imm_access && EMPIRE_ADMIN_FLAGGED(emp, EADM_CITY_CLAIMS_ONLY) && get_territory_type_for_empire(room, emp, FALSE, &junk, NULL) != TER_CITY) {
 		msg_to_char(ch, "Your empire is forbidden from claiming outside of a city.\r\n");
 	}
 	else {
@@ -4962,8 +5113,8 @@ ACMD(do_enroll) {
 		reread_empire_tech(GET_LOYALTY(ch));
 		
 		// need to update quests too: do this AFTER rereading tech
-		DL_FOREACH(character_list, victim) {
-			if (!IS_NPC(victim) && GET_LOYALTY(victim) == e) {
+		DL_FOREACH2(player_character_list, victim, next_plr) {
+			if (GET_LOYALTY(victim) == e) {
 				refresh_all_quests(victim);
 			}
 		}
@@ -5740,13 +5891,18 @@ ACMD(do_tavern) {
 }
 
 
-ACMD(do_tomb) {	
-	room_data *tomb = real_room(GET_TOMB_ROOM(ch)), *real = HOME_ROOM(IN_ROOM(ch));
+ACMD(do_tomb) {
+	struct empire_territory_data *ter, *next_ter;
+	room_data *tomb, *real;
+	char buf[MAX_STRING_LENGTH], line[256];
+	size_t size;
 	
 	if (IS_NPC(ch)) {
 		return;
 	}
 	
+	tomb = real_room(GET_TOMB_ROOM(ch));
+	real = HOME_ROOM(IN_ROOM(ch));
 	skip_spaces(&argument);
 	
 	if (!*argument) {
@@ -5754,13 +5910,50 @@ ACMD(do_tomb) {
 			msg_to_char(ch, "You have no tomb set.\r\n");
 		}
 		else {
-			msg_to_char(ch, "Your tomb is at: %s%s\r\n", get_room_name(tomb, FALSE), coord_display_room(ch, tomb, FALSE));
+			msg_to_char(ch, "Your tomb is at: %s%s%s\r\n", get_room_name(tomb, FALSE), coord_display_room(ch, tomb, FALSE), (GET_ISLAND_ID(tomb) == GET_ISLAND_ID(IN_ROOM(ch))) ? "" : " (different island)");
 		}
 		
 		// additional info
 		if (tomb && !can_use_room(ch, tomb, GUESTS_ALLOWED)) {
 			msg_to_char(ch, "You no longer have access to that tomb because it's owned by %s.\r\n", ROOM_OWNER(tomb) ? EMPIRE_NAME(ROOM_OWNER(tomb)) : "someone else");
 		}
+		
+		// list of valid tombs on this island?
+		if (GET_LOYALTY(ch)) {
+			*buf = '\0';
+			size = 0;
+			HASH_ITER(hh, EMPIRE_TERRITORY_LIST(GET_LOYALTY(ch)), ter, next_ter) {
+				if (GET_ISLAND_ID(ter->room) != GET_ISLAND_ID(IN_ROOM(ch))) {
+					continue;	// wrong island
+				}
+				if (!room_has_function_and_city_ok(GET_LOYALTY(ch), ter->room, FNC_TOMB)) {
+					continue;	// not a tomb
+				}
+				
+				// ok:
+				snprintf(line, sizeof(line), "%s %s%s", coord_display_room(ch, ter->room, TRUE), get_room_name(ter->room, FALSE), (ter->room == tomb) ? " (current)" : "");
+				
+				if (!*buf) {
+					// add header
+					size = snprintf(buf, sizeof(buf), "Tombs on this island:\r\n");
+				}
+				
+				// append
+				if (size + strlen(line) + 20 < sizeof(buf)) {
+					size += snprintf(buf + size, sizeof(buf) - size, "%s\r\n", line);
+				}
+				else {
+					size += snprintf(buf + size, sizeof(buf) - size, "OVERFLOW\r\n");
+					break;
+				}
+			}
+			
+			if (*buf) {
+				send_to_char(buf, ch);
+			}
+		}
+		
+		// can set here?
 		if (room_has_function_and_city_ok(GET_LOYALTY(ch), IN_ROOM(ch), FNC_TOMB)) {
 			msg_to_char(ch, "Use 'tomb set' to change your tomb to this room.\r\n");
 		}
@@ -7006,7 +7199,7 @@ ACMD(do_reclaim) {
 			log_to_empire(enemy, ELOG_HOSTILITY, "Someone is trying to reclaim (%d, %d)%s", X_COORD(target), Y_COORD(target), from_str);
 			msg_to_char(ch, "You start to reclaim the area. It will take 5 minutes.\r\n");
 			act("$n starts to reclaim the area for $s empire!", FALSE, ch, NULL, NULL, TO_ROOM);
-			start_action(ch, ACT_RECLAIMING, 12 * SECS_PER_REAL_UPDATE);
+			start_action(ch, ACT_RECLAIMING, 60);
 			GET_ACTION_VNUM(ch, 0) = ROOM_OWNER(target) ? EMPIRE_VNUM(ROOM_OWNER(target)) : NOTHING;
 			GET_ACTION_VNUM(ch, 1) = GET_ROOM_VNUM(target);
 		}
@@ -7185,13 +7378,13 @@ ACMD(do_territory) {
 		if (ROOM_OWNER(iter) != emp) {
 			continue;	// not owned
 		}
-		if (outside_only && get_territory_type_for_empire(iter, emp, FALSE, &junk) == TER_CITY) {
+		if (outside_only && get_territory_type_for_empire(iter, emp, FALSE, &junk, NULL) == TER_CITY) {
 			continue;	// not outside
 		}
-		if (outskirts_only && get_territory_type_for_empire(iter, emp, FALSE, &junk) != TER_OUTSKIRTS) {
+		if (outskirts_only && get_territory_type_for_empire(iter, emp, FALSE, &junk, NULL) != TER_OUTSKIRTS) {
 			continue;	// not outskirts
 		}
-		if (frontier_only && get_territory_type_for_empire(iter, emp, FALSE, &junk) != TER_FRONTIER) {
+		if (frontier_only && get_territory_type_for_empire(iter, emp, FALSE, &junk, NULL) != TER_FRONTIER) {
 			continue;	// not outskirts
 		}
 		

@@ -2254,7 +2254,7 @@ void b5_151_terrain_fix(void) {
 		}
 		else if ((GET_SECT_VNUM(map->base_sector) == b5151_RIVER && GET_SECT_VNUM(map->natural_sector) != b5151_RIVER) || (GET_SECT_VNUM(map->base_sector) == b5151_ESTUARY && GET_SECT_VNUM(map->natural_sector) != b5151_ESTUARY)) {
 			if (GET_SECT_VNUM(map->natural_sector) == b5151_RIVER || GET_SECT_VNUM(map->natural_sector) == b5151_ESTUARY) {
-				// log("- (%d, %d) DEBUG: Probably fine (River or Estuary became River or Estuary)", MAP_X_COORD(map->vnum), MAP_Y_COORD(map->vnum));
+				// log("- (%d, %d) Probably fine (River or Estuary became River or Estuary)", MAP_X_COORD(map->vnum), MAP_Y_COORD(map->vnum));
 			}
 			else if (GET_SECT_VNUM(map->natural_sector) == b5151_OASIS) {
 				// log("- (%d, %d) River to Verdant Canal", MAP_X_COORD(map->vnum), MAP_Y_COORD(map->vnum));
@@ -2281,10 +2281,10 @@ void b5_151_terrain_fix(void) {
 		else if (GET_SECT_VNUM(map->natural_sector) == b5151_OASIS && (GET_SECT_VNUM(map->base_sector) != b5151_OASIS || GET_SECT_VNUM(map->sector_type) != b5151_OASIS)) {
 			// natural oasis but not base/currently oasis
 			if (b5151_no_sect_change(GET_SECT_VNUM(map->sector_type)) && (GET_SECT_VNUM(map->base_sector) == b5151_OASIS || GET_SECT_VNUM(map->base_sector) == b5151_ENCHANTED_OASIS)) {
-				// log("- (%d, %d) DEBUG: Probably fine (Bld/Road on Oasis/Oasis)", MAP_X_COORD(map->vnum), MAP_Y_COORD(map->vnum));
+				// log("- (%d, %d) Probably fine (Bld/Road on Oasis/Oasis)", MAP_X_COORD(map->vnum), MAP_Y_COORD(map->vnum));
 			}
 			else if (GET_SECT_VNUM(map->sector_type) == b5151_ENCHANTED_OASIS && GET_SECT_VNUM(map->base_sector) == b5151_ENCHANTED_OASIS) {
-				// log("- (%d, %d) DEBUG: Probably fine (Enchanted Oasis on Oasis)", MAP_X_COORD(map->vnum), MAP_Y_COORD(map->vnum));
+				// log("- (%d, %d) Probably fine (Enchanted Oasis on Oasis)", MAP_X_COORD(map->vnum), MAP_Y_COORD(map->vnum));
 			}
 			else if (GET_SECT_VNUM(map->sector_type) == b5151_BUILDING && b5151_is_DESERT(GET_SECT_VNUM(map->base_sector))) {
 				// log("- (%d, %d) Building on removed Oasis -> Dry Oasis", MAP_X_COORD(map->vnum), MAP_Y_COORD(map->vnum));
@@ -2370,19 +2370,19 @@ void b5_151_terrain_fix(void) {
 		else if (b5151_is_DESERT(GET_SECT_VNUM(map->natural_sector)) && !b5151_is_DESERT(GET_SECT_VNUM(map->base_sector))) {
 			// things that started out desert but aren't now
 			if (b5151_is_IRRIGATED(GET_SECT_VNUM(map->base_sector))) {
-				// log("- (%d, %d) DEBUG: Probably fine (Irrigated on Desert)", MAP_X_COORD(map->vnum), MAP_Y_COORD(map->vnum));
+				// log("- (%d, %d) Probably fine (Irrigated on Desert)", MAP_X_COORD(map->vnum), MAP_Y_COORD(map->vnum));
 			}
 			else if (b5151_is_WEIRDWOOD(GET_SECT_VNUM(map->base_sector))) {
-				// log("- (%d, %d) DEBUG: Probably fine (Weirdwood on Desert)", MAP_X_COORD(map->vnum), MAP_Y_COORD(map->vnum));
+				// log("- (%d, %d) Probably fine (Weirdwood on Desert)", MAP_X_COORD(map->vnum), MAP_Y_COORD(map->vnum));
 			}
 			else if (GET_SECT_VNUM(map->base_sector) == b5151_SANDY_TRENCH) {
-				// log("- (%d, %d) DEBUG: Probably fine (Sandy Trench on Desert)", MAP_X_COORD(map->vnum), MAP_Y_COORD(map->vnum));
+				// log("- (%d, %d) Probably fine (Sandy Trench on Desert)", MAP_X_COORD(map->vnum), MAP_Y_COORD(map->vnum));
 			}
 			else if (b5151_is_DESERT_SCORCH(GET_SECT_VNUM(map->base_sector))) {
-				// log("- (%d, %d) DEBUG: Probably fine (Desert Scorch on Desert)", MAP_X_COORD(map->vnum), MAP_Y_COORD(map->vnum));
+				// log("- (%d, %d) Probably fine (Desert Scorch on Desert)", MAP_X_COORD(map->vnum), MAP_Y_COORD(map->vnum));
 			}
 			else if (GET_SECT_VNUM(map->base_sector) >= b5151_BEAVER_DESERT && GET_SECT_VNUM(map->base_sector) <= b5151_BEAVER_END_DESERT) {
-				// log("- (%d, %d) DEBUG: Probably fine (Beaver flooding on desert)", MAP_X_COORD(map->vnum), MAP_Y_COORD(map->vnum));
+				// log("- (%d, %d) Probably fine (Beaver flooding on desert)", MAP_X_COORD(map->vnum), MAP_Y_COORD(map->vnum));
 			}
 			else if (b5151_is_TEMPERATE_SCORCH(GET_SECT_VNUM(map->base_sector))) {
 				// log("- (%d, %d) Temperate Scorch on Desert tile", MAP_X_COORD(map->vnum), MAP_Y_COORD(map->vnum));
@@ -2453,6 +2453,180 @@ void b5_151_terrain_fix(void) {
 }
 
 
+// b5.152 (1/4): Updates a "light" object with new data.
+void b5_152_light_update(obj_data *obj) {
+	obj_data *proto;
+	bool was_lit;
+	
+	if ((OBJ_FLAGGED(obj, OBJ_LIGHT) || IS_LIGHT(obj)) && (proto = obj_proto(GET_OBJ_VNUM(obj)))) {
+		was_lit = LIGHT_IS_LIT(obj);
+		
+		// type is always loaded from file -- no need to update
+		
+		// light flag likely removed
+		if (!OBJ_FLAGGED(proto, OBJ_LIGHT)) {
+			REMOVE_BIT(GET_OBJ_EXTRA(obj), OBJ_LIGHT);
+		}
+		
+		// timer likely changed, too: remove it if applicable
+		if (GET_OBJ_TIMER(proto) <= 0) {
+			GET_OBJ_TIMER(obj) = GET_OBJ_TIMER(proto);
+		}
+		
+		// match all 3 vals if it became a light type
+		if (IS_LIGHT(obj)) {
+			GET_OBJ_VAL(obj, 0) = GET_OBJ_VAL(proto, 0);
+			GET_OBJ_VAL(obj, 1) = GET_OBJ_VAL(proto, 1);
+			GET_OBJ_VAL(obj, 2) = GET_OBJ_VAL(proto, 2);
+		}
+		
+		// and is it really in the world? (not on a loaded character)
+		if (IN_ROOM(obj) || obj->in_vehicle || obj->in_obj || (obj->carried_by && IN_ROOM(obj->carried_by)) || (obj->worn_by && IN_ROOM(obj->worn_by))) {
+			request_obj_save_in_world(obj);
+			schedule_obj_timer_update(obj, FALSE);
+			
+			// and, did this shut the light off?
+			if (was_lit != LIGHT_IS_LIT(obj)) {
+				if (was_lit) {
+					apply_obj_light(obj, FALSE);
+				}
+				else {
+					apply_obj_light(obj, TRUE);
+				}
+			}
+		}
+	}
+}
+
+
+// b5.152 (2/4): Updates contents of a container -- only when carried by a player
+void b5_152_container_update(obj_data *obj) {
+	if (obj->next_content) {
+		b5_152_container_update(obj->next_content);
+	}
+	if (obj->contains) {
+		b5_152_container_update(obj->contains);
+	}
+	
+	b5_152_light_update(obj);
+}
+
+
+// b5.152 (3/4): replace lights and fix durations on world and mob affs
+void b5_152_world_update(void) {
+	room_data *room, *next_room;
+	char_data *mob;
+	obj_data *obj, *next_obj;
+	struct affected_type *af;
+	struct empire_unique_storage *eus;
+	struct trading_post_data *tpd;
+	empire_data *emp, *next_emp;
+	
+	// rooms
+	HASH_ITER(hh, world_table, room, next_room) {
+		LL_FOREACH(ROOM_AFFECTS(room), af) {
+			// these were saved as timestamps before, but should now be seconds
+			if (af->expire_time != UNLIMITED) {
+				// log("%d: %d %ld %ld", GET_ROOM_VNUM(room), af->type, af->expire_time, af->expire_time - time(0));
+				af->expire_time -= time(0);
+				schedule_room_affect_expire(room, af);
+				request_world_save(GET_ROOM_VNUM(room), WSAVE_ROOM);
+			}
+		}
+	}
+	
+	// mobs
+	DL_FOREACH(character_list, mob) {
+		LL_FOREACH(mob->affected, af) {
+			// these were saved in 5-second updates and are now in 1-second intervals instead
+			if (af->expire_time != UNLIMITED) {
+				//  log("%s: %d %ld %ld", GET_SHORT_DESC(mob), af->type, af->expire_time, (time(0) + 5 * (af->expire_time - time(0))));
+				af->expire_time = time(0) + 5 * (af->expire_time - time(0));
+				schedule_affect_expire(mob, af);
+				request_char_save_in_world(mob);
+			}
+		}
+	}
+	
+	// lights in the world
+	DL_FOREACH(object_list, obj) {
+		b5_152_light_update(obj);
+	}
+	
+	// lights in empire storage
+	HASH_ITER(hh, empire_table, emp, next_emp) {
+		DL_FOREACH(EMPIRE_UNIQUE_STORAGE(emp), eus) {
+			if ((obj = eus->obj)) {
+				b5_152_light_update(obj);
+			}
+		}
+		EMPIRE_NEEDS_STORAGE_SAVE(emp) = TRUE;
+	}
+	
+	// trading post
+	DL_FOREACH(trading_list, tpd) {
+		if ((obj = tpd->obj)) {
+			b5_152_light_update(obj);
+		}
+	}
+	save_trading_post();
+	
+	// and report on any objects that might be in the DB and unchanged
+	HASH_ITER(hh, object_table, obj, next_obj) {
+		// this ignores only 2 vnums that keep LIGHT flags in the stock distribution
+		if (OBJ_FLAGGED(obj, OBJ_LIGHT) && GET_OBJ_VNUM(obj) != 10303 && GET_OBJ_VNUM(obj) != 10502) {
+			log("Warning: Object [%d] %s has LIGHT flag not converted by b5.152 patch (HELP LIGHT ITEM)", GET_OBJ_VNUM(obj), GET_OBJ_SHORT_DESC(obj));
+		}
+	}
+}
+
+
+// b5.152 (4/4): replace lights and fix durations on player affs
+PLAYER_UPDATE_FUNC(b5_152_player_update) {
+	struct affected_type *af;
+	struct empire_unique_storage *eus;
+	obj_data *obj;
+	int pos;
+	
+	check_delayed_load(ch);
+	
+	// equipment
+	for (pos = 0; pos < NUM_WEARS; ++pos) {
+		if ((obj = GET_EQ(ch, pos))) {
+			b5_152_light_update(obj);
+			if (obj->contains) {
+				b5_152_container_update(obj->contains);
+			}
+		}
+	}
+	
+	// inventory
+	DL_FOREACH2(ch->carrying, obj, next_content) {
+		b5_152_light_update(obj);
+		if (obj->contains) {
+			b5_152_container_update(obj->contains);
+		}
+	}
+	
+	// home storage
+	DL_FOREACH(GET_HOME_STORAGE(ch), eus) {
+		if ((obj = eus->obj)) {
+			b5_152_light_update(obj);
+		}
+	}
+	
+	// affect durations
+	LL_FOREACH(ch->affected, af) {
+		// these were saved in 5-second updates and are now in 1-second intervals instead
+		// log("%s: %d %ld", GET_PC_NAME(ch), af->type, af->expire_time);
+		if (af->expire_time != UNLIMITED) {
+			// note they are in SECONDS not TIMESTAMPS at this point
+			af->expire_time *= 5;
+		}
+	}
+}
+
+
  //////////////////////////////////////////////////////////////////////////////
 //// UPDATE DATA /////////////////////////////////////////////////////////////
 
@@ -2514,6 +2688,7 @@ const struct {
 	{ "b5.134", NULL, b5_134_update_players, "Wiped map memory for screenreader users to clear bad data" },
 	{ "b5.151", b5_151_road_fix, NULL, "Applying hide-real-name flag to customized roads" },
 	{ "b5.151.1", b5_151_terrain_fix, NULL, "Repairing bad terrains and updating with new oases and irrigated terrains" },
+	{ "b5.152", b5_152_world_update, b5_152_player_update, "Updating lights and expire times on player, mob, and world affects" },
 	
 	{ "\n", NULL, NULL, "\n" }	// must be last
 };
@@ -3028,7 +3203,7 @@ void parse_pre_b5_116_room(FILE *fl, room_vnum vnum) {
 				CREATE(af, struct affected_type, 1);
 				af->type = t[0];
 				af->cast_by = t[1];
-				af->duration = l_in;
+				af->expire_time = l_in;
 				af->modifier = t[3];
 				af->location = t[4];
 				af->bitvector = asciiflag_conv(str1);

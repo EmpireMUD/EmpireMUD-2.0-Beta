@@ -168,7 +168,7 @@ See also: BUILD, HOMELESS CITIZENS, NODISMANTLE
 Items that light fires:
   fire sticks (Primitive Crafts ability)
   fire drill (Woodworking ability)
-  flintsteel tinderbox (Forge ability)
+  firesteel tinderbox (Forge ability)
 
 Usage:  light <object>
 
@@ -257,27 +257,22 @@ Example:
 
 See also: BOARD, DRAG, HARNESS, HERD
 #
-LIGHT BURN TORCH
+LIGHT TORCH
 
-Usage:  light <item | vehicle | area>
-        burn <item | vehicle | area>
+Usage:  light <item | building | vehicle | area | direction>
 
 To light something, you must have fire sticks or some other lighter. You may
 light sticks to create torches. You can also light trees or logs to make camp
 fires. Dropping a torch (or lighting a fire) may burn down the building it's
-in, if it's unowned or you are at war with the owner.
-
-You can also burn the area (either with the word 'area' or with any keyword
-from the room title) to remove stumps and other features. This only works on
-certain terrain.
+in, if it's unowned or if you are at war with the owner.
 
 Some lighters have a limited number of uses and will be thrown away afterwards.
 If you have marked a lighter 'keep', it won't be used (unless it has unlimited
 uses).
 
-You can also burn down some vehicles with the 'light' command.
+To light buildings, vehicles, or terrain, use 'burn'.
 
-See also: COOKING FIRE, DOUSE, THROW, LIGHTERS
+See also: BURN, COOKING FIRE, DOUSE, THROW, LIGHTERS
 #
 MILK
 
@@ -345,7 +340,7 @@ Types of mines:
 Mine types that require Rare Metals (or other abilities) will also grant
 experience for that ability when you mine ore.
 
-See also: DEPLETION, DEEP MINES, PROSPECT, RARE METALS
+See also: DEPLETION, DEEP MINES, EXTENDED RADIUS, PROSPECT, RARE METALS
 #
 MINT "COIN MILLS" COINMILLS
 

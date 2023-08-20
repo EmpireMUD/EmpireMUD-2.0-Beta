@@ -393,6 +393,7 @@ int GET_MAX_BLOOD(char_data *ch);	// this one is different than the other max po
 #define GET_POS(ch)  ((ch)->char_specials.position)
 #define SET_SIZE(ch)  ((ch)->char_specials.size)	// notice "SET_SIZE" -- the simple version of the macro
 #define GET_SIZE(ch)  (IS_MORPHED(ch) ? MORPH_SIZE(GET_MORPH(ch)) : SET_SIZE(ch))
+#define GET_STORED_EVENTS(ch)  ((ch)->char_specials.stored_events)
 #define HUNTING(ch)  ((ch)->char_specials.hunting)
 #define IS_CARRYING_N(ch)  ((ch)->char_specials.carry_items)
 
@@ -632,6 +633,10 @@ int CAN_CARRY_N(char_data *ch);	// formerly a macro
 #define BELONGS_IN_TERRITORY_LIST(room)  (IS_ANY_BUILDING(room) || COMPLEX_DATA(room) || ROOM_SECT_FLAGGED(room, SECTF_CHORE))
 #define COUNTS_AS_TERRITORY(room)  (HOME_ROOM(room) == (room) && !GET_ROOM_VEHICLE(room))
 #define LARGE_CITY_RADIUS(room)  (ROOM_BLD_FLAGGED((room), BLD_LARGE_CITY_RADIUS) || ROOM_SECT_FLAGGED((room), SECTF_LARGE_CITY_RADIUS))
+
+// dismantle privilege: does NOT actually check owner -- which should be checked BEFORE this
+#define HAS_DISMANTLE_PRIV_FOR_VEHICLE(ch, veh)  (!VEH_OWNER(veh) || !GET_LOYALTY(ch) || GET_RANK(ch) >= EMPIRE_PRIV(GET_LOYALTY(ch), PRIV_DISMANTLE) || get_vehicle_extra_data((veh), ROOM_EXTRA_ORIGINAL_BUILDER) == GET_ACCOUNT(ch)->id)
+#define HAS_DISMANTLE_PRIV_FOR_BUILDING(ch, room)  (can_use_room(ch, (room), MEMBERS_ONLY) && (has_permission(ch, PRIV_DISMANTLE, (room)) || get_room_extra_data((room), ROOM_EXTRA_ORIGINAL_BUILDER) == GET_ACCOUNT(ch)->id))
 
 // deprecated
 #define EMPIRE_CITY_TERRITORY(emp)  EMPIRE_TERRITORY(emp, TER_CITY)
@@ -901,6 +906,7 @@ int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_COORD(ge
 #define GET_OBJ_KEYWORDS(obj)  ((obj)->name)
 #define GET_OBJ_LONG_DESC(obj)  ((obj)->description)
 #define GET_OBJ_SHORT_DESC(obj)  ((obj)->short_description)
+#define GET_OBJ_STORED_EVENTS(obj)  ((obj)->stored_events)
 #define GET_OBJ_TIMER(obj)  ((obj)->obj_flags.timer)
 #define GET_OBJ_VAL(obj, val)  ((obj)->obj_flags.value[(val)])
 #define GET_OBJ_WEAR(obj)  ((obj)->obj_flags.wear_flags)
@@ -945,7 +951,7 @@ int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_COORD(ge
 #define OBJ_CAN_STORE(obj)  (GET_OBJ_STORAGE(obj) && GET_OBJ_REQUIRES_QUEST(obj) == NOTHING && !OBJ_BOUND_TO(obj) && !OBJ_FLAGGED((obj), OBJ_NO_STORE | OBJ_SUPERIOR | OBJ_ENCHANTED) && !IS_STOLEN(obj))
 #define UNIQUE_OBJ_CAN_STORE(obj, allow_bound)  ((allow_bound || (!OBJ_BOUND_TO(obj) && !OBJ_FLAGGED((obj), OBJ_BIND_ON_PICKUP))) && !OBJ_CAN_STORE(obj) && !OBJ_FLAGGED((obj), OBJ_NO_STORE | OBJ_JUNK) && GET_OBJ_TIMER(obj) == UNLIMITED && GET_OBJ_REQUIRES_QUEST(obj) == NOTHING && !IS_STOLEN(obj))
 #define OBJ_STACK_FLAGS  (OBJ_SUPERIOR | OBJ_KEEP | OBJ_ENCHANTED | OBJ_HARD_DROP | OBJ_GROUP_DROP | OBJ_BIND_ON_EQUIP | OBJ_BIND_ON_PICKUP)
-#define OBJS_ARE_SAME(o1, o2)  (GET_OBJ_VNUM(o1) == GET_OBJ_VNUM(o2) && GET_OBJ_CURRENT_SCALE_LEVEL(o1) == GET_OBJ_CURRENT_SCALE_LEVEL(o2) && ((GET_OBJ_EXTRA(o1) & OBJ_STACK_FLAGS) == (GET_OBJ_EXTRA(o2) & OBJ_STACK_FLAGS)) && (GET_OBJ_SHORT_DESC(o1) == GET_OBJ_SHORT_DESC(o2) || !strcmp(GET_OBJ_SHORT_DESC(o1), GET_OBJ_SHORT_DESC(o2))) && (GET_OBJ_LONG_DESC(o1) == GET_OBJ_LONG_DESC(o2) || !strcmp(GET_OBJ_LONG_DESC(o1), GET_OBJ_LONG_DESC(o2))) && (!IS_DRINK_CONTAINER(o1) || GET_DRINK_CONTAINER_TYPE(o1) == GET_DRINK_CONTAINER_TYPE(o2)) && (!IS_BOOK(o1) || !IS_BOOK(o2) || GET_BOOK_ID(o1) == GET_BOOK_ID(o2)) && (!IS_AMMO(o1) || !IS_AMMO(o2) || GET_AMMO_QUANTITY(o1) == GET_AMMO_QUANTITY(o2)) && (IS_STOLEN(o1) == IS_STOLEN(o2)) && identical_bindings((o1),(o2)))
+#define OBJS_ARE_SAME(o1, o2)  (GET_OBJ_VNUM(o1) == GET_OBJ_VNUM(o2) && GET_OBJ_CURRENT_SCALE_LEVEL(o1) == GET_OBJ_CURRENT_SCALE_LEVEL(o2) && ((GET_OBJ_EXTRA(o1) & OBJ_STACK_FLAGS) == (GET_OBJ_EXTRA(o2) & OBJ_STACK_FLAGS)) && (GET_OBJ_SHORT_DESC(o1) == GET_OBJ_SHORT_DESC(o2) || !strcmp(GET_OBJ_SHORT_DESC(o1), GET_OBJ_SHORT_DESC(o2))) && (GET_OBJ_LONG_DESC(o1) == GET_OBJ_LONG_DESC(o2) || !strcmp(GET_OBJ_LONG_DESC(o1), GET_OBJ_LONG_DESC(o2))) && (!IS_DRINK_CONTAINER(o1) || GET_DRINK_CONTAINER_TYPE(o1) == GET_DRINK_CONTAINER_TYPE(o2)) && (!IS_BOOK(o1) || !IS_BOOK(o2) || GET_BOOK_ID(o1) == GET_BOOK_ID(o2)) && (!IS_AMMO(o1) || !IS_AMMO(o2) || GET_AMMO_QUANTITY(o1) == GET_AMMO_QUANTITY(o2)) && (!IS_LIGHT(o1) || !IS_LIGHT(o2) || GET_LIGHT_IS_LIT(o1) == GET_LIGHT_IS_LIT(o2) || GET_LIGHT_HOURS_REMAINING(o1) == GET_LIGHT_HOURS_REMAINING(o2) || (GET_LIGHT_HOURS_REMAINING(o1) > 0 && GET_LIGHT_HOURS_REMAINING(o2) > 0)) && (IS_STOLEN(o1) == IS_STOLEN(o2)) && identical_bindings((o1),(o2)))
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -1109,6 +1115,18 @@ int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_COORD(ge
 #define VAL_MINIPET_VNUM  0
 #define GET_MINIPET_VNUM(obj)  (IS_MINIPET(obj) ? GET_OBJ_VAL((obj), VAL_MINIPET_VNUM) : NOTHING)
 
+// ITEM_LIGHT
+#define IS_LIGHT(obj)  (GET_OBJ_TYPE(obj) == ITEM_LIGHT)
+#define VAL_LIGHT_HOURS_REMAINING  0
+#define VAL_LIGHT_IS_LIT  1
+#define VAL_LIGHT_FLAGS  2
+#define GET_LIGHT_HOURS_REMAINING(obj)  (IS_LIGHT(obj) ? GET_OBJ_VAL((obj), VAL_LIGHT_HOURS_REMAINING) : 0)
+#define GET_LIGHT_IS_LIT(obj)  (IS_LIGHT(obj) ? GET_OBJ_VAL((obj), VAL_LIGHT_IS_LIT) : FALSE)
+#define GET_LIGHT_FLAGS(obj)  (IS_LIGHT(obj) ? GET_OBJ_VAL((obj), VAL_LIGHT_FLAGS) : NOBITS)
+#define CAN_LIGHT_OBJ(obj)  ((IS_LIGHT(obj) && !GET_LIGHT_IS_LIT(obj) && GET_LIGHT_HOURS_REMAINING(obj) != 0) || has_interaction(GET_OBJ_INTERACTIONS(obj), INTERACT_LIGHT))
+#define LIGHT_FLAGGED(obj, flag)  IS_SET(GET_LIGHT_FLAGS(obj), (flag))
+#define LIGHT_IS_LIT(obj)  (OBJ_FLAGGED((obj), OBJ_LIGHT) || (GET_LIGHT_IS_LIT(obj) && GET_LIGHT_HOURS_REMAINING(obj) != 0))
+
 
  //////////////////////////////////////////////////////////////////////////////
 //// PLAYER UTILS ////////////////////////////////////////////////////////////
@@ -1122,6 +1140,7 @@ int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_COORD(ge
 #define GET_MORPH(ch)  ((ch)->char_specials.morph)
 
 // ch->player_specials: player_special_data
+#define AFFECTS_CONVERTED(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->affects_converted))
 #define CAN_GAIN_NEW_SKILLS(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->can_gain_new_skills))
 #define CAN_GET_BONUS_SKILLS(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->can_get_bonus_skills))
 #define CREATION_ARCHETYPE(ch, pos)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->creation_archetype[pos]))
@@ -1177,13 +1196,17 @@ int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_COORD(ge
 #define GET_HIGHEST_KNOWN_LEVEL(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->highest_known_level))
 #define GET_HISTORY(ch, type)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->channel_history[(type)]))
 #define GET_HOME_STORAGE(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->home_storage))
+#define GET_IDLE_SECONDS(ch)  CHECK_PLAYER_SPECIAL(REAL_CHAR(ch), (REAL_CHAR(ch)->player_specials->idle_seconds))
 #define GET_IGNORE_LIST(ch, pos)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->ignore_list[(pos)]))
 #define GET_IMMORTAL_LEVEL(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->immortal_level))
 #define GET_INFORMATIVE_FLAGS(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->informative_flags))
 #define GET_INVIS_LEV(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->invis_level))
 #define GET_LANGUAGES(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->languages))
 #define GET_LARGEST_INVENTORY(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->largest_inventory))
+#define GET_LAST_AFF_WEAR_OFF_VNUM(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->last_aff_wear_off_vnum))
+#define GET_LAST_AFF_WEAR_OFF_TIME(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->last_aff_wear_off_time))
 #define GET_LAST_COMPANION(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->last_companion))
+#define GET_LAST_COND_MESSAGE_TIME(ch, cond)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->last_cond_message_time[(cond)]))
 #define GET_LAST_CORPSE_ID(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->last_corpse_id))
 #define GET_LAST_DEATH_TIME(ch)  CHECK_PLAYER_SPECIAL(REAL_CHAR(ch), (REAL_CHAR(ch)->player_specials->last_death_time))
 #define GET_LAST_GOAL_CHECK(ch)  CHECK_PLAYER_SPECIAL(REAL_CHAR(ch), (REAL_CHAR(ch)->player_specials->last_goal_check))
@@ -1252,7 +1275,7 @@ int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_COORD(ge
 #define HAS_BONUS_TRAIT(ch, flag)  (!IS_NPC(ch) && IS_SET(GET_BONUS_TRAITS(ch), (flag)))
 #define HAS_NEW_OFFENSES(ch) (!IS_NPC(ch) && GET_LOYALTY(ch) && EMPIRE_OFFENSES(GET_LOYALTY(ch)) && EMPIRE_OFFENSES(GET_LOYALTY(ch))->timestamp > GET_LAST_OFFENSE_SEEN(ch))
 #define INFORMATIVE_FLAGGED(ch, flag)  (!IS_NPC(ch) && IS_SET(GET_INFORMATIVE_FLAGS(ch), (flag)))
-#define IS_AFK(ch)  (!IS_NPC(ch) && (PRF_FLAGGED((ch), PRF_AFK) || ((ch)->char_specials.timer * SECS_PER_MUD_HOUR / SECS_PER_REAL_MIN) >= 10))
+#define IS_AFK(ch)  (!IS_NPC(ch) && (PRF_FLAGGED((ch), PRF_AFK) || (GET_IDLE_SECONDS(ch) / SECS_PER_REAL_MIN) >= 5))
 #define IS_GRANTED(ch, flag)  (!IS_NPC(ch) && IS_SET(GET_GRANT_FLAGS(ch), (flag)))
 #define IS_MORPHED(ch)  (GET_MORPH(ch) != NULL)
 #define IS_PVP_FLAGGED(ch)  (!IS_NPC(ch) && (PRF_FLAGGED((ch), PRF_ALLOW_PVP) || get_cooldown_time((ch), COOLDOWN_PVP_FLAG) > 0))
@@ -1271,12 +1294,12 @@ int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_COORD(ge
 #define IN_HOSTILE_TERRITORY(ch)  (!IS_NPC(ch) && !IS_IMMORTAL(ch) && ROOM_OWNER(IN_ROOM(ch)) && ROOM_OWNER(IN_ROOM(ch)) != GET_LOYALTY(ch) && (IS_HOSTILE(ch) || empire_is_hostile(ROOM_OWNER(IN_ROOM(ch)), GET_LOYALTY(ch), IN_ROOM(ch))))
 #define IS_APPROVED(ch)  (IS_NPC(ch) || PLR_FLAGGED(ch, PLR_APPROVED) || ACCOUNT_FLAGGED(ch, ACCT_APPROVED))
 #define IS_HOSTILE(ch)  (!IS_NPC(ch) && (get_cooldown_time((ch), COOLDOWN_HOSTILE_FLAG) > 0 || get_cooldown_time((ch), COOLDOWN_ROGUE_FLAG) > 0))
-#define IS_HUNGRY(ch)  (GET_COND((ch), FULL) >= 360 && !HAS_BONUS_TRAIT((ch), BONUS_NO_HUNGER) && !has_player_tech((ch), PTECH_NO_HUNGER))
-#define IS_DRUNK(ch)  (GET_COND(ch, DRUNK) >= 360)
+#define IS_HUNGRY(ch)  (GET_COND((ch), FULL) >= (REAL_UPDATES_PER_MUD_HOUR * 24) && !HAS_BONUS_TRAIT((ch), BONUS_NO_HUNGER) && !has_player_tech((ch), PTECH_NO_HUNGER))
+#define IS_DRUNK(ch)  (GET_COND(ch, DRUNK) >= (REAL_UPDATES_PER_MUD_HOUR * 24))
 #define IS_GOD(ch)  (GET_ACCESS_LEVEL(ch) == LVL_GOD)
 #define IS_IMMORTAL(ch)  (GET_ACCESS_LEVEL(ch) >= LVL_START_IMM)
 #define IS_RIDING(ch)  (!IS_NPC(ch) && GET_MOUNT_VNUM(ch) != NOTHING && MOUNT_FLAGGED(ch, MOUNT_RIDING))
-#define IS_THIRSTY(ch)  (GET_COND((ch), THIRST) >= 360 && !HAS_BONUS_TRAIT((ch), BONUS_NO_THIRST) && !has_player_tech((ch), PTECH_NO_THIRST))
+#define IS_THIRSTY(ch)  (GET_COND((ch), THIRST) >= (REAL_UPDATES_PER_MUD_HOUR * 24) && !HAS_BONUS_TRAIT((ch), BONUS_NO_THIRST) && !has_player_tech((ch), PTECH_NO_THIRST))
 #define IS_BLOOD_STARVED(ch)  (IS_VAMPIRE(ch) && GET_BLOOD(ch) <= config_get_int("blood_starvation_level"))
 
 // for act() and act-like things (requires to_sleeping and is_spammy set to true/false)
@@ -1833,6 +1856,7 @@ bool has_one_day_playtime(char_data *ch);
 int num_earned_bonus_traits(char_data *ch);
 int pick_level_from_range(int level, int min, int max);
 void relocate_players(room_data *room, room_data *to_room);
+void schedule_check_leading_event(char_data *ch);
 void update_all_players(char_data *to_message, PLAYER_UPDATE_FUNC(*func));
 bool wake_and_stand(char_data *ch);
 
@@ -1947,7 +1971,7 @@ void setup_ability_companions(char_data *ch);
 // act.action.c
 bool action_flagged(char_data *ch, bitvector_t actf);
 void cancel_action(char_data *ch);
-void do_burn_area(char_data *ch, int subcmd);
+void do_burn_area(char_data *ch);
 obj_data *has_tool(char_data *ch, bitvector_t flags);
 obj_data *has_all_tools(char_data *ch, bitvector_t flags);
 void process_build_action(char_data *ch);
@@ -1968,9 +1992,10 @@ void log_to_slash_channel_by_name(char *chan_name, char_data *ignorable_person, 
 
 // act.empire.c
 bool check_in_city_requirement(room_data *room, bool check_wait);
+void do_burn_building(char_data *ch, room_data *room, obj_data *lighter);
 void do_customize_island(char_data *ch, char *argument);
-int get_territory_type_for_empire(room_data *loc, empire_data *emp, bool check_wait, bool *city_too_soon);
-#define is_in_city_for_empire(loc, emp, check_wait, city_too_soon)  (get_territory_type_for_empire((loc), (emp), (check_wait), (city_too_soon)) == TER_CITY)	// backwards-compatibility
+int get_territory_type_for_empire(room_data *loc, empire_data *emp, bool check_wait, bool *city_too_soon, bool *using_large_radius);
+#define is_in_city_for_empire(loc, emp, check_wait, city_too_soon)  (get_territory_type_for_empire((loc), (emp), (check_wait), (city_too_soon), NULL) == TER_CITY)	// backwards-compatibility
 void perform_abandon_city(empire_data *emp, struct empire_city_data *city, bool full_abandon);
 void scan_for_tile(char_data *ch, char *argument, int max_dist, bitvector_t only_in_dirs);
 void set_workforce_limit(empire_data *emp, int island_id, int chore, int limit);
@@ -2006,6 +2031,7 @@ bool show_local_einv(char_data *ch, room_data *room, bool thief_mode);
 bool can_take_obj(char_data *ch, obj_data *obj);
 int count_objs_in_room(room_data *room);
 void deliver_shipment(empire_data *emp, struct shipping_data *shipd);
+bool douse_light(obj_data *obj);
 room_data *find_docks(empire_data *emp, int island_id);
 int find_free_shipping_id(empire_data *emp);
 obj_data *find_lighter_in_list(obj_data *list, bool *had_keep);
@@ -2018,6 +2044,7 @@ void remove_honed_gear(char_data *ch);
 void sail_shipment(empire_data *emp, vehicle_data *boat);
 void scale_item_to_level(obj_data *obj, int level);
 bool ship_is_empty(vehicle_data *ship);
+bool use_hour_of_light(obj_data *obj, bool messages);
 bool used_lighter(char_data *ch, obj_data *obj);
 
 // act.movement.c
@@ -2045,6 +2072,7 @@ void adventure_summon(char_data *ch, char *argument);
 void adventure_unsummon(char_data *ch);
 void cancel_adventure_summon(char_data *ch);
 bool dismiss_any_minipet(char_data *ch);
+void do_douse_room(char_data *ch, room_data *room, obj_data *cont);
 
 // act.quest.c
 const char *color_by_difficulty(char_data *ch, int level);
@@ -2232,11 +2260,16 @@ void unlink_instance_entrance(room_data *room, struct instance_data *inst, bool 
 // limits.c
 bool can_teleport_to(char_data *ch, room_data *loc, bool check_owner);
 bool check_autostore(obj_data *obj, bool force, empire_data *override_emp);
+void check_pointless_fight(char_data *mob);
 void check_ruined_cities();
 void gain_condition(char_data *ch, int condition, int value);
 int health_gain(char_data *ch, bool info_only);
 int mana_gain(char_data *ch, bool info_only);
 int move_gain(char_data *ch, bool info_only);
+void schedule_all_obj_timers(char_data *ch);
+void schedule_heal_over_time(char_data *ch);
+void schedule_obj_autostore_check(obj_data *obj, long new_autostore_timer);
+void schedule_obj_timer_update(obj_data *obj, bool override);
 void update_empire_needs(empire_data *emp, struct empire_island *eisle, struct empire_needs *needs);
 
 // mapview.c
@@ -2268,6 +2301,8 @@ char *get_informative_color(char_data *ch, bool dismantling, bool unfinished, bo
 void add_pursuit(char_data *ch, char_data *target);
 bool check_reset_mob(char_data *ch, bool force);
 bool check_scaling(char_data *mob, char_data *attacker);
+void check_scavengers(room_data *room);
+void check_scheduled_events_mob(char_data *mob);
 void despawn_mob(char_data *ch);
 int determine_best_scale_level(char_data *ch, bool check_group);
 void end_pursuit(char_data *ch, char_data *target);
@@ -2275,10 +2310,18 @@ struct generic_name_data *get_generic_name_list(int name_set, int sex);
 struct generic_name_data *get_best_name_list(int name_set, int sex);
 int mob_coins(char_data *mob);
 void random_encounter(char_data *ch);
-void run_mobile_activity(char_data *ch);
+void reschedule_all_despawns();
 void scale_mob_as_companion(char_data *mob, char_data *leader, int use_level);
 void scale_mob_for_character(char_data *mob, char_data *ch);
 void scale_mob_to_level(char_data *mob, int level);
+void schedule_aggro_event(char_data *ch);
+void schedule_despawn_event(char_data *mob);
+void schedule_mob_move_event(char_data *ch, bool randomize);
+void schedule_movement_events(char_data *ch);
+void schedule_reset_mob(char_data *ch);
+void schedule_pursuit_event(char_data *ch);
+void schedule_scavenge_event(char_data *ch, bool randomize);
+void set_mob_spawn_time(char_data *mob, long when);
 void setup_generic_npc(char_data *mob, empire_data *emp, int name, int sex);
 void spawn_mobs_from_center(room_data *center);
 bool try_mobile_movement(char_data *ch);

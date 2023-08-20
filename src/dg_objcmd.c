@@ -509,10 +509,10 @@ OCMD(do_orestore) {
 			GET_POS(victim) = POS_STANDING;
 		}
 		affect_total(victim);
-		GET_HEALTH(victim) = GET_MAX_HEALTH(victim);
-		GET_MOVE(victim) = GET_MAX_MOVE(victim);
-		GET_MANA(victim) = GET_MAX_MANA(victim);
-		GET_BLOOD(victim) = GET_MAX_BLOOD(victim);
+		set_health(victim, GET_MAX_HEALTH(victim));
+		set_move(victim, GET_MAX_MOVE(victim));
+		set_mana(victim, GET_MAX_MANA(victim));
+		set_blood(victim, GET_MAX_BLOOD(victim));
 	}
 	if (otarg) {
 		// not sure what to do for objs
@@ -577,6 +577,7 @@ OCMD(do_otimer) {
 		obj_log(obj, "otimer: bad argument");
 	else {
 		GET_OBJ_TIMER(obj) = atoi(arg);
+		schedule_obj_timer_update(obj, FALSE);
 		request_obj_save_in_world(obj);
 	}
 }
@@ -1463,7 +1464,7 @@ OCMD(do_odot) {
 	any_vnum atype = ATYPE_DG_AFFECT;
 	double modifier = 1.0;
 	char_data *ch;
-	int type, max_stacks;
+	int type, max_stacks, duration;
 
 	argument = one_argument(argument, name);
 	// sometimes name is an affect vnum
@@ -1495,6 +1496,10 @@ OCMD(do_odot) {
 		obj_log(obj, "odot: target not found");        
 		return;
 	}
+	if ((duration = atoi(durarg)) < 1) {
+		obj_log(obj, "odot: invalid duration '%s'", durarg);
+		return;
+	}
 	
 	if (*typearg) {
 		type = search_block(typearg, damage_types, FALSE);
@@ -1508,7 +1513,7 @@ OCMD(do_odot) {
 	}
 	
 	max_stacks = (*stackarg ? atoi(stackarg) : 1);
-	script_damage_over_time(ch, atype, get_obj_scale_level(obj, ch), type, modifier, atoi(durarg), max_stacks, NULL);
+	script_damage_over_time(ch, atype, get_obj_scale_level(obj, ch), type, modifier, duration, max_stacks, NULL);
 }
 
 
@@ -1631,6 +1636,7 @@ OCMD(do_odoor) {
 OCMD(do_osetval) {
 	char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH];
 	int position, new_value;
+	bool was_lit;
 
 	two_arguments(argument, arg1, arg2);
 	if (!*arg1 || !*arg2 || !is_number(arg1) || !is_number(arg2)) {
@@ -1640,10 +1646,29 @@ OCMD(do_osetval) {
 
 	position = atoi(arg1);
 	new_value = atoi(arg2);
-	if (position >= 0 && position < NUM_OBJ_VAL_POSITIONS)
+	if (position >= 0 && position < NUM_OBJ_VAL_POSITIONS) {
+		// this can change the lights
+		was_lit = LIGHT_IS_LIT(obj);
+		
 		set_obj_val(obj, position, new_value);
-	else
+		
+		// check lights
+		if (was_lit != LIGHT_IS_LIT(obj)) {
+			if (was_lit) {
+				apply_obj_light(obj, FALSE);
+			}
+			else {
+				apply_obj_light(obj, TRUE);
+			}
+		}
+		if (GET_OBJ_TYPE(obj) == ITEM_LIGHT && position == VAL_LIGHT_IS_LIT) {
+			// in case
+			schedule_obj_timer_update(obj, FALSE);
+		}
+	}
+	else {
 		obj_log(obj, "osetval: position out of bounds!");
+	}
 }
 
 /* submitted by PurpleOnyx - tkhasi@shadowglen.com*/

@@ -168,7 +168,7 @@ You can see the city radius by typing 'toggle political' and looking at the
 background highlight (on the visual map), or you can use the 'mark' command
 to measure distances from the center if you're using a screenreader.
 
-See also: MARK, CITY INFORMATION, CITY COMMANDS, PROGRESSION
+See also: MARK, CITY INFORMATION, CITY COMMANDS, EXTENDED RADIUS, PROGRESSION
 #
 CLAIM
 
@@ -604,6 +604,20 @@ searching the item database.
 
 See also: COINS, EXCHANGE RATE
 #
+"EXTENDED RADIUS" EXTENDED-RADIUS "LARGE CITY RADIUS" LARGE-CITY-RADIUS "LARGE RADIUS" LARGE-RADIUS
+
+A tile with the (extended radius) indicator after its city name indicates that
+it is actually in the city's outskirts, but it is a type of building or terrain
+that counts as in-city in the outskirts (4x city radius).
+
+For example, when you look at a room:
+This is the Autonomous outpost of Capital 1 (extended radius).
+
+The OLC flag for this is LARGE-CITY-RADIUS, and is available on buildings and
+sectors.
+
+See also: OUTSKIRTS, TERRITORY
+#
 FAME
 
 Empires gain Fame by building great monuments. This trait is required to
@@ -950,7 +964,8 @@ Privileges:
   storage: can retrieve from storage buildings
   warehouse: can retrieve unique items from the warehouse
   progress: can buy progression goals
-  dismantle: can dismantle buildings owned by the empire
+  dismantle: can dismantle buildings and vehicles owned by the empire (also
+    controls burning your empire's buildings and vehicles)
 
 See also: CLAIM, BUILD, HARVEST, PROMOTE, DEMOTE, CHOP, CEDE, EEDIT, ELOG
 #
@@ -1123,7 +1138,7 @@ outskirts.
 When an empire's members start to time out from lack of gameplay, the empire
 may start losing territory.
 
-See also: CITIES, EMPIRE TIMEOUT, TERRITORY COMMAND, ESTATS
+See also: CITIES, EMPIRE TIMEOUT, EXTENDED RADIUS, TERRITORY COMMAND, ESTATS
 #
 "TERRITORY COMMAND"
 

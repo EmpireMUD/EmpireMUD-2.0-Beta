@@ -24,6 +24,7 @@
 #include "interpreter.h"
 #include "skills.h"
 #include "vnums.h"
+#include "dg_event.h"
 #include "dg_scripts.h"
 #include "constants.h"
 
@@ -3023,6 +3024,41 @@ bool can_see_in_dark_room(char_data *ch, room_data *room, bool count_adjacent_li
 }
 
 
+// checks stuff right after movement
+EVENTFUNC(check_leading_event) {
+	struct char_event_data *data = (struct char_event_data*)event_obj;
+	char_data *ch = data->character;
+	
+	// will not be re-using this
+	delete_stored_event(&GET_STORED_EVENTS(ch), SEV_CHECK_LEADING);
+	free(data);
+	
+	if (!IN_ROOM(ch)) {
+		return 0;	// never re-enqueue
+	}
+	
+	// NOTE: if you add conditions here, check _QUALIFY_CHECK_LEADING(ch) too
+	if (GET_LEADING_VEHICLE(ch) && IN_ROOM(ch) != IN_ROOM(GET_LEADING_VEHICLE(ch))) {
+		act("You have lost $V and stop leading it.", FALSE, ch, NULL, GET_LEADING_VEHICLE(ch), TO_CHAR);
+		VEH_LED_BY(GET_LEADING_VEHICLE(ch)) = NULL;
+		GET_LEADING_VEHICLE(ch) = NULL;
+	}
+	if (GET_LEADING_MOB(ch) && IN_ROOM(ch) != IN_ROOM(GET_LEADING_MOB(ch))) {
+		act("You have lost $N and stop leading $M.", FALSE, ch, NULL, GET_LEADING_MOB(ch), TO_CHAR);
+		GET_LED_BY(GET_LEADING_MOB(ch)) = NULL;
+		GET_LEADING_MOB(ch) = NULL;
+	}
+	if (GET_SITTING_ON(ch)) {
+		// things that cancel sitting-on:
+		if (IN_ROOM(ch) != IN_ROOM(GET_SITTING_ON(ch)) || (GET_POS(ch) != POS_SITTING && GET_POS(ch) != POS_RESTING && GET_POS(ch) != POS_SLEEPING) || IS_RIDING(ch) || GET_LEADING_MOB(ch) || GET_LEADING_VEHICLE(ch)) {
+			do_unseat_from_vehicle(ch);
+		}
+	}
+	
+	return 0;	// never re-enqueue
+}
+
+
 /**
 * Gives a character the appropriate amount of command lag (wait time).
 *
@@ -3236,6 +3272,29 @@ int pick_level_from_range(int level, int min, int max) {
 		level = MIN(level, max);
 	}
 	return level;
+}
+
+
+/**
+* Schedules an event to check things a person is leading/sitting on after
+* moving, if needed.
+*
+* @param char_data *ch The person who moved.
+*/
+void schedule_check_leading_event(char_data *ch) {
+	struct char_event_data *data;
+	struct dg_event *ev;
+	
+	// things that need this function
+	#define _QUALIFY_CHECK_LEADING(ch)  (GET_LEADING_VEHICLE(ch) || GET_LEADING_MOB(ch) || GET_SITTING_ON(ch))
+	
+	if (ch && _QUALIFY_CHECK_LEADING(ch) && !find_stored_event(GET_STORED_EVENTS(ch), SEV_CHECK_LEADING)) {
+		CREATE(data, struct char_event_data, 1);
+		data->character = ch;
+		
+		ev = dg_event_create(check_leading_event, data, 1 RL_SEC);
+		add_stored_event(&GET_STORED_EVENTS(ch), SEV_CHECK_LEADING, ev);
+	}
 }
 
 
@@ -3498,8 +3557,10 @@ void apply_resource(char_data *ch, struct resource_data *res, struct resource_da
 				add_to_resource_list(build_used_list, RES_POOL, res->vnum, res->amount, 0);
 			}
 			
-			GET_CURRENT_POOL(ch, res->vnum) -= res->amount;
-			GET_CURRENT_POOL(ch, res->vnum) = MAX(0, GET_CURRENT_POOL(ch, res->vnum));
+			set_current_pool(ch, res->vnum, GET_CURRENT_POOL(ch, res->vnum) - res->amount);
+			if (GET_CURRENT_POOL(ch, res->vnum) < 0) {
+				set_current_pool(ch, res->vnum, 0);
+			}
 			
 			if (res->vnum == HEALTH) {
 				update_pos(ch);
@@ -3697,8 +3758,10 @@ void extract_resources(char_data *ch, struct resource_data *list, bool ground, s
 						add_to_resource_list(build_used_list, RES_POOL, res->vnum, res->amount, 0);
 					}
 				
-					GET_CURRENT_POOL(ch, res->vnum) -= res->amount;
-					GET_CURRENT_POOL(ch, res->vnum) = MAX(0, GET_CURRENT_POOL(ch, res->vnum));
+					set_current_pool(ch, res->vnum, GET_CURRENT_POOL(ch, res->vnum) - res->amount);
+					if (GET_CURRENT_POOL(ch, res->vnum) < 0) {
+						set_current_pool(ch, res->vnum, 0);
+					}
 					res->amount = 0;	// got full amount
 				
 					if (res->vnum == HEALTH) {
@@ -4012,8 +4075,7 @@ void give_resources(char_data *ch, struct resource_data *list, bool split) {
 				break;
 			}
 			case RES_POOL: {
-				GET_CURRENT_POOL(ch, res->vnum) += res->amount / (split ? 2 : 1);
-				GET_CURRENT_POOL(ch, res->vnum) = MIN(GET_MAX_POOL(ch, res->vnum), GET_CURRENT_POOL(ch, res->vnum));
+				set_current_pool(ch, res->vnum, GET_CURRENT_POOL(ch, res->vnum) + (res->amount / (split ? 2 : 1)));
 				if (GET_HEALTH(ch) > 0 && GET_POS(ch) <= POS_STUNNED) {
 					GET_POS(ch) = POS_RESTING;
 				}
@@ -6401,7 +6463,7 @@ bool room_is_light(room_data *room, bool count_adjacent_light) {
 	if (!RMT_FLAGGED(room, RMT_DARK) && get_sun_status(room) != SUN_DARK) {
 		return TRUE;	// not dark: it isn't dark outside
 	}
-	if (ROOM_OWNER(room) && EMPIRE_HAS_TECH(ROOM_OWNER(room), TECH_CITY_LIGHTS) && get_territory_type_for_empire(room, ROOM_OWNER(room), FALSE, NULL) != TER_FRONTIER) {
+	if (ROOM_OWNER(room) && EMPIRE_HAS_TECH(ROOM_OWNER(room), TECH_CITY_LIGHTS) && get_territory_type_for_empire(room, ROOM_OWNER(room), FALSE, NULL, NULL) != TER_FRONTIER) {
 		return TRUE;	// not dark: city lights
 	}
 	if (count_adjacent_light && adjacent_room_is_light(room)) {
@@ -6895,7 +6957,7 @@ bool room_has_function_and_city_ok(empire_data *for_emp, room_data *room, bitvec
 		if (VEH_FLAGGED(veh, MOVABLE_VEH_FLAGS) && IS_SET(fnc_flag, IMMOBILE_FNCS)) {
 			continue;	// exclude certain functions on movable vehicles (functions that require room data)
 		}
-		if (IS_SET(VEH_FUNCTIONS(veh), FNC_IN_CITY_ONLY) && (!ROOM_OWNER(room) || get_territory_type_for_empire(room, ROOM_OWNER(room), TRUE, &junk) != TER_CITY)) {
+		if (IS_SET(VEH_FUNCTIONS(veh), FNC_IN_CITY_ONLY) && (!ROOM_OWNER(room) || get_territory_type_for_empire(room, ROOM_OWNER(room), TRUE, &junk, NULL) != TER_CITY)) {
 			continue;	// not in-city but needs it
 		}
 		
@@ -6953,7 +7015,7 @@ bool vehicle_has_function_and_city_ok(vehicle_data *veh, bitvector_t fnc_flag) {
 		if (ROOM_OWNER(room) && ROOM_OWNER(room) != emp) {
 			return FALSE;	// someone else's claim is not in our city
 		}
-		if (get_territory_type_for_empire(room, emp, TRUE, &junk) != TER_CITY) {
+		if (get_territory_type_for_empire(room, emp, TRUE, &junk, NULL) != TER_CITY) {
 			return FALSE;	// not in-city for us either
 		}
 	}
@@ -6996,8 +7058,8 @@ void update_all_players(char_data *to_message, PLAYER_UPDATE_FUNC(*func)) {
 	}
 	
 	// verify there are no disconnected players characters in-game, which might not be saved
-	DL_FOREACH(character_list, ch) {
-		if (!IS_NPC(ch) && !ch->desc) {
+	DL_FOREACH2(player_character_list, ch, next_plr) {
+		if (!ch->desc) {
 			sprintf(buf, "update_all_players: Unable to update because of linkdead player (%s). Try again later.", GET_NAME(ch));
 			if (to_message) {
 				msg_to_char(to_message, "%s\r\n", buf);

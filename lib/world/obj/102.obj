@@ -822,9 +822,9 @@ a lit branch~
 A lit branch is burning on the ground.~
 The burning branch spits and sparks as pockets of sap catch fire.
 ~
-3 c ao 0 1
-0 0 0
-0 48
+29 0 ao 0 2
+48 1 5
+0 0
 S
 #10263
 whistle bone small dracosaur~

@@ -167,7 +167,8 @@ act.trade.o: act.trade.c conf.h sysdep.h structs.h uthash.h utils.h \
   comm.h interpreter.h handler.h db.h skills.h vnums.h dg_scripts.h constants.h
 	$(CC) -c $(CFLAGS) act.trade.c
 act.vampire.o: act.vampire.c conf.h sysdep.h structs.h uthash.h utils.h \
-  comm.h interpreter.h handler.h db.h skills.h vnums.h dg_scripts.h constants.h
+  comm.h interpreter.h handler.h db.h skills.h vnums.h dg_event.h \
+  dg_scripts.h constants.h
 	$(CC) -c $(CFLAGS) act.vampire.c
 act.vehicles.o: act.vehicles.c conf.h sysdep.h structs.h uthash.h utils.h \
   comm.h interpreter.h handler.h db.h skills.h dg_scripts.h vnums.h constants.h
@@ -216,7 +217,7 @@ db.lib.o: db.lib.c conf.h sysdep.h structs.h uthash.h utils.h db.h comm.h \
   handler.h skills.h olc.h dg_scripts.h dg_event.h vnums.h constants.h
 	$(CC) -c $(CFLAGS) db.lib.c
 db.player.o: db.player.c conf.h sysdep.h structs.h uthash.h utils.h db.h \
-  comm.h handler.h skills.h interpreter.h dg_scripts.h constants.h
+  comm.h handler.h skills.h interpreter.h dg_event.h dg_scripts.h constants.h
 	$(CC) -c $(CFLAGS) db.player.c
 db.world.o: db.world.c conf.h sysdep.h structs.h uthash.h utils.h db.h \
   comm.h handler.h skills.h dg_scripts.h dg_event.h vnums.h constants.h
@@ -285,7 +286,7 @@ interpreter.o: interpreter.c conf.h sysdep.h structs.h uthash.h comm.h \
   dg_scripts.h constants.h
 	$(CC) -c $(CFLAGS) interpreter.c
 limits.o: limits.c conf.h sysdep.h structs.h uthash.h utils.h comm.h db.h \
-  handler.h interpreter.h skills.h vnums.h dg_scripts.h constants.h
+  handler.h interpreter.h skills.h vnums.h dg_event.h dg_scripts.h constants.h
 	$(CC) -c $(CFLAGS) limits.c
 mail.o: mail.c conf.h sysdep.h structs.h uthash.h utils.h comm.h db.h \
   interpreter.h handler.h
@@ -294,7 +295,7 @@ mapview.o: mapview.c conf.h sysdep.h structs.h uthash.h utils.h comm.h \
   interpreter.h handler.h db.h skills.h vnums.h dg_scripts.h constants.h
 	$(CC) -c $(CFLAGS) mapview.c
 mobact.o: mobact.c conf.h sysdep.h structs.h uthash.h utils.h db.h comm.h \
-  interpreter.h handler.h skills.h dg_scripts.h vnums.h constants.h
+  interpreter.h handler.h skills.h dg_event.h dg_scripts.h vnums.h constants.h
 	$(CC) -c $(CFLAGS) mobact.c
 modify.o: modify.c conf.h sysdep.h structs.h uthash.h utils.h \
   interpreter.h handler.h db.h comm.h boards.h olc.h
@@ -378,7 +379,7 @@ updates.o: updates.c conf.h sysdep.h structs.h protocol.h uthash.h \
   dg_scripts.h olc.h skills.h vnums.h
 	$(CC) -c $(CFLAGS) updates.c
 utils.o: utils.c conf.h sysdep.h structs.h uthash.h utils.h db.h comm.h \
-  handler.h interpreter.h skills.h vnums.h dg_scripts.h constants.h
+  handler.h interpreter.h skills.h vnums.h dg_event.h dg_scripts.h constants.h
 	$(CC) -c $(CFLAGS) utils.c
 vehicles.o: vehicles.c conf.h sysdep.h structs.h protocol.h uthash.h \
   utils.h interpreter.h db.h comm.h olc.h skills.h handler.h dg_scripts.h \

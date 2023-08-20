@@ -21,6 +21,7 @@
 #include "db.h"
 #include "skills.h"
 #include "vnums.h"
+#include "dg_event.h"
 #include "dg_scripts.h"
 #include "constants.h"
 
@@ -36,6 +37,7 @@ ACMD(do_stand);
 
 // locals
 ACMD(do_bite);
+EVENTFUNC(vampire_feeding_event);
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -61,6 +63,7 @@ bool cancel_biting(char_data *ch) {
 		act("$n stops feeding from $N.", FALSE, ch, NULL, vict, TO_NOTVICT);
 		GET_FED_ON_BY(vict) = NULL;
 		GET_FEEDING_FROM(ch) = NULL;
+		cancel_stored_event(&GET_STORED_EVENTS(ch), SEV_VAMPIRE_FEEDING);
 		return TRUE;
 	}
 	
@@ -292,8 +295,7 @@ void make_vampire(char_data *ch, bool lore, any_vnum skill_vnum) {
 			gain_skill(ch, find_skill_by_vnum(skill_vnum), 1, NULL);
 		}
 
-		GET_BLOOD(ch) = config_get_int("blood_starvation_level") * 1.5;
-		GET_BLOOD(ch) = MIN(GET_BLOOD(ch), GET_MAX_BLOOD(ch));
+		set_blood(ch, config_get_int("blood_starvation_level") * 1.5);
 
 		remove_lore(ch, LORE_START_VAMPIRE);
 		remove_lore(ch, LORE_SIRE_VAMPIRE);
@@ -362,7 +364,7 @@ void sire_char(char_data *ch, char_data *victim) {
 	// did we find a valid vamp skill
 	if (vamp_skill != NOTHING && CAN_GAIN_NEW_SKILLS(victim) && noskill_ok(victim, vamp_skill)) {
 		make_vampire(victim, FALSE, vamp_skill);
-		GET_BLOOD(ch) -= 10;
+		set_blood(ch, GET_BLOOD(ch) - 10);
 
 		act("You tear open your wrist with your fangs and drip blood into $N's mouth!", FALSE, ch, 0, victim, TO_CHAR);
 		act("$n tears open $s wrist with $s teeth and drips blood into $N's mouth!", FALSE, ch, 0, victim, TO_NOTVICT);
@@ -398,6 +400,9 @@ void sire_char(char_data *ch, char_data *victim) {
 * @param char_data *victim The person being bitten.
 */
 void start_drinking_blood(char_data *ch, char_data *victim) {
+	struct char_event_data *data;
+	struct dg_event *ev;
+	
 	// safety first
 	if (GET_FEEDING_FROM(ch)) {
 		cancel_biting(ch);
@@ -411,7 +416,17 @@ void start_drinking_blood(char_data *ch, char_data *victim) {
 
 	stop_fighting(ch);
 	stop_fighting(victim);
-
+	
+	// ensure no existing event
+	cancel_stored_event(&GET_STORED_EVENTS(ch), SEV_VAMPIRE_FEEDING);
+	
+	// create new event
+	CREATE(data, struct char_event_data, 1);
+	data->character = ch;
+	ev = dg_event_create(vampire_feeding_event, data, 5 RL_SEC);
+	add_stored_event(&GET_STORED_EVENTS(ch), SEV_VAMPIRE_FEEDING, ev);
+	
+	// messaging last
 	if (!IS_NPC(victim) && PRF_FLAGGED(victim, PRF_BOTHERABLE)) {
 		act("You grasp $N's wrist and bite into it.", FALSE, ch, 0, victim, TO_CHAR);
 		act("$n grasps $N's wrist and bites into it.", FALSE, ch, 0, victim, TO_NOTVICT);
@@ -507,7 +522,7 @@ bool starving_vampire_aggro(char_data *ch) {
 	
 	// stun to keep them from stopping
 	if (GET_FEEDING_FROM(ch)) {
-		af = create_flag_aff(ATYPE_CANT_STOP, 6, AFF_HARD_STUNNED, ch);
+		af = create_flag_aff(ATYPE_CANT_STOP, 30, AFF_HARD_STUNNED, ch);
 		affect_join(ch, af, 0);
 	}
 	
@@ -631,14 +646,14 @@ void check_un_vampire(char_data *ch, bool remove_vampire_skills) {
 	if (!IS_VAMPIRE(ch)) {
 		remove_lore(ch, LORE_PURIFY);
 		add_lore(ch, LORE_PURIFY, "Purified");
-		GET_BLOOD(ch) = GET_MAX_BLOOD(ch);
+		set_blood(ch, GET_MAX_BLOOD(ch));
 		GET_APPARENT_AGE(ch) = 0;
 	}
 }
 
 
 /**
-* Updates the "biting" action, per 5 seconds.
+* Updates the "biting" action, per real update (usually 5 seconds).
 *
 * @param char_data *ch The person who might be biting, to update.
 */
@@ -661,13 +676,13 @@ void update_biting_char(char_data *ch) {
 	
 	// Transfuse blood -- 10-25 points (pints?) at a time
 	amount = MIN(number(10, 25), GET_BLOOD(victim));
-	GET_BLOOD(victim) -= amount;
+	set_blood(victim, GET_BLOOD(victim) - amount);
 	
 	// can gain more
 	if (has_player_tech(ch, PTECH_DRINK_BLOOD_FASTER)) {
 		amount *= 2;
 	}
-	GET_BLOOD(ch) = MIN(GET_MAX_BLOOD(ch), GET_BLOOD(ch) + amount);
+	set_blood(ch, GET_BLOOD(ch) + amount);
 	
 	// sanguine restoration: 10% heal to h/m/v per drink when biting humans
 	if ((!IS_NPC(victim) || MOB_FLAGGED(victim, MOB_HUMAN)) && has_ability(ch, ABIL_SANGUINE_RESTORATION)) {
@@ -675,19 +690,19 @@ void update_biting_char(char_data *ch) {
 		heal(ch, ch, hamt);
 		
 		hamt = GET_MAX_MANA(ch) / 10;
-		GET_MANA(ch) = MIN(GET_MAX_MANA(ch), GET_MANA(ch) + hamt);
+		set_mana(ch, GET_MANA(ch) + hamt);
 		
 		hamt = GET_MAX_MOVE(ch) / 10;
-		GET_MOVE(ch) = MIN(GET_MAX_MOVE(ch), GET_MOVE(ch) + hamt);
+		set_move(ch, GET_MOVE(ch) + hamt);
 	}
 
 	if (GET_BLOOD(victim) <= 0 && GET_ACTION(ch) != ACT_SIRING) {
-		GET_BLOOD(victim) = 0;
+		set_blood(victim, 0);
 
 		if (!IS_NPC(victim) && !PRF_FLAGGED(ch, PRF_AUTOKILL)) {
 			// give back a little blood
-			GET_BLOOD(victim) = 1;
-			GET_BLOOD(ch) -= 1;
+			set_blood(victim, 1);
+			set_blood(ch, GET_BLOOD(ch) - 1);
 			cancel_biting(ch);
 			return;
 		}
@@ -797,6 +812,31 @@ void update_vampire_sun(char_data *ch) {
 	if (found) {
 		command_lag(ch, WAIT_ABILITY);
 	}
+}
+
+
+// handles periodic updates when a vampire is drinking blood
+EVENTFUNC(vampire_feeding_event) {
+	struct char_event_data *data = (struct char_event_data*)event_obj;
+	char_data *ch = data->character;
+	
+	// always delete first
+	delete_stored_event(&GET_STORED_EVENTS(ch), SEV_VAMPIRE_FEEDING);
+	
+	// biting -- this is usually PC-only, but NPCs could learn to do it
+	if (GET_FEEDING_FROM(ch)) {
+		update_biting_char(ch);
+	}
+	
+	// check if still feeding (etc)
+	if (!GET_FEEDING_FROM(ch) || EXTRACTED(ch) || IS_DEAD(ch)) {
+		free(data);
+		return 0;	// do not re-enqueue
+	}
+	
+	// if we get here, go ahead and repeat
+	add_stored_event(&GET_STORED_EVENTS(ch), SEV_VAMPIRE_FEEDING, the_event);
+	return 5 RL_SEC;
 }
 
 
@@ -991,7 +1031,7 @@ ACMD(do_bite) {
 			
 			// reduce DODGE
 			if (GET_DODGE(ch) > 0 && !tank) {
-				af = create_mod_aff(ATYPE_BITE_PENALTY, 1, APPLY_DODGE, -GET_DODGE(ch), ch);
+				af = create_mod_aff(ATYPE_BITE_PENALTY, 5, APPLY_DODGE, -GET_DODGE(ch), ch);
 				affect_join(ch, af, 0);
 			}
 			
@@ -1003,13 +1043,13 @@ ACMD(do_bite) {
 			// melee DoT effect
 			if (melee && result > 0) {
 				stacks = get_approximate_level(ch) / 50;
-				apply_dot_effect(victim, ATYPE_BITE, 3, DAM_PHYSICAL, 7, MAX(1, stacks), ch);
+				apply_dot_effect(victim, ATYPE_BITE, 15, DAM_PHYSICAL, 7, MAX(1, stacks), ch);
 			}
 			
 			// steal blood effect
 			if (has_player_tech(ch, PTECH_BITE_STEAL_BLOOD) && result > 0 && !AFF_FLAGGED(victim, AFF_NO_DRINK_BLOOD) && !GET_FED_ON_BY(victim)) {
-				GET_BLOOD(ch) = MIN(GET_MAX_BLOOD(ch), GET_BLOOD(ch) + 2);
-				GET_BLOOD(victim) = MAX(1, GET_BLOOD(victim) - 2);
+				set_blood(ch, GET_BLOOD(ch) + 2);
+				set_blood(victim, MAX(1, GET_BLOOD(victim) - 2));
 			}
 			
 			if (can_gain_exp_from(ch, victim)) {
@@ -1163,10 +1203,10 @@ ACMD(do_boost) {
 	// SUCCESS!
 	charge_ability_cost(ch, BLOOD, cost, NOTHING, 0, WAIT_ABILITY);
 	
-	af = create_mod_aff(ATYPE_BOOST, 3 MUD_HOURS, boost_data[pos].apply, (skill_check(ch, ABIL_BOOST, DIFF_HARD) ? boost_data[pos].high_amt : boost_data[pos].base_amt), ch);
+	af = create_mod_aff(ATYPE_BOOST, 5 * SECS_PER_REAL_MIN, boost_data[pos].apply, (skill_check(ch, ABIL_BOOST, DIFF_HARD) ? boost_data[pos].high_amt : boost_data[pos].base_amt), ch);
 	affect_join(ch, af, AVG_DURATION | ADD_MODIFIER);
 	
-	af = create_mod_aff(ATYPE_BOOST, 3 MUD_HOURS, APPLY_BLOOD_UPKEEP, 1, ch);
+	af = create_mod_aff(ATYPE_BOOST, 5 * SECS_PER_REAL_MIN, APPLY_BLOOD_UPKEEP, 1, ch);
 	affect_to_char(ch, af);
 	free(af);
 	
@@ -1382,8 +1422,8 @@ ACMD(do_feed) {
 		act("$n slices $s wrist open and feeds you some blood from the cut!", FALSE, ch, 0, victim, TO_VICT);
 
 		// mve the blood
-		GET_BLOOD(ch) -= amt;
-		GET_BLOOD(victim) = MIN(GET_MAX_BLOOD(victim), GET_BLOOD(victim) + amt);
+		set_blood(ch, GET_BLOOD(ch) - amt);
+		set_blood(victim, GET_BLOOD(victim) + amt);
 	}
 }
 
@@ -1565,13 +1605,13 @@ ACMD(do_regenerate) {
 			case REGEN_MANA: {
 				msg_to_char(ch, "You draw out the mystical energy from your blood.\r\n");
 				act("$n's skin flushes red.", TRUE, ch, NULL, NULL, TO_ROOM);
-				GET_MANA(ch) = MIN(GET_MAX_MANA(ch), GET_MANA(ch) + amount);
+				set_mana(ch, GET_MANA(ch) + amount);
 				break;
 			}
 			case REGEN_MOVE: {
 				msg_to_char(ch, "You focus your blood into your sore muscles.\r\n");
 				act("$n seems invigorated.", TRUE, ch, NULL, NULL, TO_ROOM);
-				GET_MOVE(ch) = MIN(GET_MAX_MOVE(ch), GET_MOVE(ch) + amount);
+				set_move(ch, GET_MOVE(ch) + amount);
 				break;
 			}
 		}

@@ -313,7 +313,7 @@ typedef struct vehicle_data vehicle_data;
 #define APPLY_MOVE  11	// Apply to max move points
 #define APPLY_RESIST_PHYSICAL  12	// Apply to physical damage resistance
 #define APPLY_BLOCK  13	// Apply to chance to block
-#define APPLY_HEAL_OVER_TIME  14	// heals you every 5
+#define APPLY_HEAL_OVER_TIME  14	// heals you every "real update"
 #define APPLY_HEALTH  15	// Apply to max health
 #define APPLY_MANA  16	// Apply to max mana
 #define APPLY_TO_HIT  17	// +to-hit
@@ -629,7 +629,7 @@ typedef struct vehicle_data vehicle_data;
 #define AGH_DODGE  BIT(3)	// gains when actor dodges
 #define AGH_BLOCK  BIT(4)	// gains when actor blocks
 #define AGH_TAKE_DAMAGE  BIT(5)	// gains when hit in melee
-#define AGH_PASSIVE_FREQUENT  BIT(6)	// gains every 5
+#define AGH_PASSIVE_FREQUENT  BIT(6)	// gains every "real update"
 #define AGH_PASSIVE_HOURLY  BIT(7)	// gains every game hour
 #define AGH_ONLY_DARK  BIT(8)	// only gains if it's dark
 #define AGH_ONLY_LIGHT  BIT(9)	// only gains if it's light
@@ -962,7 +962,7 @@ typedef struct vehicle_data vehicle_data;
 #define ATT_BONUS_PHYSICAL  6	// extra physical damage
 #define ATT_BONUS_MAGICAL  7	// extra magical damage
 #define ATT_BONUS_HEALING  8	// extra healing
-#define ATT_HEAL_OVER_TIME  9	// heal per 5
+#define ATT_HEAL_OVER_TIME  9	// heal per "real update"
 #define ATT_RESIST_MAGICAL  10	// damage reduction
 #define ATT_CRAFTING_BONUS  11	// levels added to crafting
 #define ATT_BLOOD_UPKEEP  12	// blood cost per hour
@@ -1266,7 +1266,8 @@ typedef struct vehicle_data vehicle_data;
 #define OFFENSE_BURNED_VEHICLE  9
 #define OFFENSE_PICKPOCKETED  10
 #define OFFENSE_RECLAIMED  11
-#define NUM_OFFENSES  12	// total
+#define OFFENSE_BURNED_TILE  12
+#define NUM_OFFENSES  13	// total
 
 
 // OFF_x: offense flags
@@ -1407,17 +1408,27 @@ typedef struct vehicle_data vehicle_data;
 //// EVENT DEFINES (TIMED EVENT SYSTEM) //////////////////////////////////////
 
 // function types
-#define EVENTFUNC(name) long (name)(void *event_obj)
+#define EVENTFUNC(name) long (name)(struct dg_event *the_event, void *event_obj)
 #define EVENT_CANCEL_FUNC(name) void (name)(void *event_obj)
 
 
 // SEV_x: stored event types
-#define SEV_TRENCH_FILL  0
-	#define SEV_UNUSED  1	// no longer used
-#define SEV_BURN_DOWN  2
-#define SEV_GROW_CROP  3
-#define SEV_TAVERN  4
-#define SEV_RESET_TRIGGER  5
+#define SEV_TRENCH_FILL  0	// water fills over time
+#define SEV_DESPAWN  1	// mob despawn
+#define SEV_BURN_DOWN  2	// for buildings
+#define SEV_GROW_CROP  3	// normal crop growth time
+#define SEV_TAVERN  4	// tavern resource use timer
+#define SEV_RESET_TRIGGER  5	// for tavern resets
+#define SEV_PURSUIT  6	// mob pursuing a target
+#define SEV_MOVEMENT  7	// normal mob movement
+#define SEV_AGGRO  8	// aggro or cityguard mobs
+#define SEV_SCAVENGE  9	// scavenger mobs consume a corpse
+#define SEV_VAMPIRE_FEEDING  10	// drinking blood
+#define SEV_RESET_MOB  11	// periodic reset of damaged/tagged mobs
+#define SEV_HEAL_OVER_TIME  12	// handles HOT applies
+#define SEV_CHECK_LEADING  13	// called right after moving, in some cases
+#define SEV_OBJ_TIMER  14	// various timer updates
+#define SEV_OBJ_AUTOSTORE  15	// autostore check for objects
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -1514,8 +1525,8 @@ typedef struct vehicle_data vehicle_data;
 // this is based on the number of 5-second ticks in a mud hour
 #define SECS_PER_REAL_UPDATE  5
 #define REAL_UPDATES_PER_MUD_HOUR  (SECS_PER_MUD_HOUR / SECS_PER_REAL_UPDATE)
-#define REAL_UPDATES_PER_MIN  (SECS_PER_REAL_MIN / SECS_PER_REAL_UPDATE)
-#define MUD_HOURS  *REAL_UPDATES_PER_MUD_HOUR
+// #define REAL_UPDATES_PER_MIN  (SECS_PER_REAL_MIN / SECS_PER_REAL_UPDATE)	// this is unused as of b5.152
+// #define MUD_HOURS  *REAL_UPDATES_PER_MUD_HOUR	// this is unused as of b5.152
 
 
 // misc game configs
@@ -1523,7 +1534,10 @@ typedef struct vehicle_data vehicle_data;
 #define ACTION_CYCLE_MULTIPLIER  10	// make action cycles longer so things can make them go faster
 #define ACTION_CYCLE_SECOND  2	// how many action cycles is 1 second
 #define ACTION_CYCLE_HALF_SEC  1	// how many action cycles is half a second
+#define DOT_INTERVAL  5	// seconds per tick for damage-over-time
 #define HISTORY_SIZE  5	// Keep last 5 commands.
+#define MOB_RESTORE_INTERVAL  60	// seconds between when a mob loses health and when it starts checking to restore itself
+#define WORKFORCE_CYCLE  76	// seconds between workforce chore updates
 
 
 // System timing
@@ -1639,6 +1653,7 @@ typedef struct vehicle_data vehicle_data;
 #define MOB_CUSTOM_SCRIPT_3  9	// called by scripts
 #define MOB_CUSTOM_SCRIPT_4  10	// called by scripts
 #define MOB_CUSTOM_SCRIPT_5  11	// called by scripts
+#define MOB_CUSTOM_SCAVENGE_CORPSE  12	// mob eats a corpse due to SCAVENGER flag
 
 
 // MOB_MOVE_x: mob/vehicle movement types
@@ -1845,6 +1860,7 @@ typedef enum {
 #define ITEM_POISON  26	// poison vial
 #define ITEM_ARMOR  27	// armor!
 #define ITEM_BOOK  28	// tied to the book/library system
+#define ITEM_LIGHT  29	// item is a light (torch, etc)
 
 
 // ITEM_WEAR_x: Take/Wear flags -- where an item can be worn
@@ -1870,6 +1886,14 @@ typedef enum {
 #define ITEM_WEAR_SADDLE  BIT(18)	// s. Saddle
 
 
+// LIGHT_FLAG_x (possibly also LIGHT_x as a search hint): flags for ITEM_LIGHT
+#define LIGHT_FLAG_LIGHT_FIRE  BIT(0)	// It can be used in place of a lighter
+#define LIGHT_FLAG_CAN_DOUSE  BIT(1)	// It can be put out
+#define LIGHT_FLAG_JUNK_WHEN_EXPIRED  BIT(2)	// automatically removed
+#define LIGHT_FLAG_COOKING_FIRE  BIT(3)	// allows cooking
+#define LIGHT_FLAG_DESTROY_WHEN_DOUSED  BIT(4)	// always expires when doused
+
+
 // Item materials
 #define MAT_WOOD  0	// Made from wood
 #define MAT_ROCK  1	// ...rock
@@ -1893,7 +1917,7 @@ typedef enum {
 // OBJ_x: Extra object flags -- OBJ_FLAGGED(obj, f)
 #define OBJ_UNIQUE  BIT(0)	// a. can only use 1 at a time
 #define OBJ_PLANTABLE  BIT(1)	// b. Uses val 2 to set a crop type
-#define OBJ_LIGHT  BIT(2)	// c. Lights until timer pops
+#define OBJ_LIGHT  BIT(2)	// c. Generates light (prefer LIGHT item type tho)
 #define OBJ_SUPERIOR  BIT(3)	// d. Item is of superior quality
 #define OBJ_LARGE  BIT(4)	// e. Item can't be put in bags
 #define OBJ_CREATED  BIT(5)	// f. Was created by a god
@@ -2869,7 +2893,8 @@ typedef enum {
 #define EVO_TIMED  20	// evolves after a certain number of minutes
 #define EVO_OWNED  21	// evolves if owned
 #define EVO_UNOWNED  22	// evolves if un-owned
-#define NUM_EVOS  23	// total
+#define EVO_BURN_STUMPS  23	// uses the burn-stumps workforce to evolve
+#define NUM_EVOS  24	// total
 
 // EVO_VAL_x: evolution value types
 #define EVO_VAL_NONE  0
@@ -2966,7 +2991,7 @@ typedef enum {
 #define MAX_CMD_LENGTH  (MAX_STRING_LENGTH-80)	// can't go bigger than this, altho DG Scripts wanted 16k
 #define MAX_COIN  2140000000	// 2.14b (< MAX_INT)
 #define MAX_COIN_TYPES  10	// don't store more than this many different coin types
-#define MAX_CONDITION  750	// FULL, etc
+#define MAX_CONDITION  (REAL_UPDATES_PER_MUD_HOUR * 24 * 2)	// FULL, etc: 2 days of hunger/thirst
 #define MAX_CONFIG_TEXT  4000	// long-string configs
 #define MAX_EMPIRE_DESCRIPTION  2000
 #define MAX_FACTION_DESCRIPTION  4000
@@ -3030,6 +3055,13 @@ typedef enum {
  //////////////////////////////////////////////////////////////////////////////
 //// MISCELLANEOUS STRUCTS ///////////////////////////////////////////////////
 
+// for character affect expiration
+struct affect_expire_event_data {
+	char_data *character;
+	struct affected_type *affect;
+};
+
+
 // apply types for augments and morphs
 struct apply_data {
 	int location;	// APPLY_
@@ -3042,13 +3074,12 @@ struct apply_data {
 struct affected_type {
 	any_vnum type;	// The type of spell that caused this
 	int cast_by;	// player ID (positive) or mob vnum (negative)
-	long duration;	// For how long its effects will last. NOTE: for room affects, this is expire timestamp (for players it's time in hours)
+	long expire_time;	// timestamp when the affect will expire -- note: -1 when unlimited; these save as "number of seconds remaining" in player files
 	int modifier;	// This is added to apropriate ability
 	byte location;	// Tells which ability to change - APPLY_
 	bitvector_t bitvector;	// Tells which bits to set - AFF_
 	
-	struct dg_event *expire_event;	// SOMETIMES these have scheduled events (only on rooms)
-		// NOTE: if you apply expire_event to character buffs, functions like affect_join that update the duration must check it
+	struct dg_event *expire_event;	// expiry is handled by events; if scheuled, one is linked here
 	
 	struct affected_type *next;
 };
@@ -4515,7 +4546,7 @@ struct player_special_data {
 	
 	// misc player attributes
 	ubyte apparent_age;	// for vampires	
-	sh_int conditions[NUM_CONDS];	// Drunk, full, thirsty
+	int conditions[NUM_CONDS];	// Drunk, full, thirsty
 	int resources[NUM_MATERIALS];	// God resources
 	
 	// various lists
@@ -4608,12 +4639,16 @@ struct player_special_data {
 	
 	// UNSAVED PORTION //
 	
+	int idle_seconds;	// how long they have been idle (updated every 5 seconds or so)
 	int gear_level;	// computed gear level -- determine_gear_level()
 	byte reboot_conf;	// Reboot confirmation
 	byte create_points;	// Used in character creation
 	int group_invite_by;	// idnum of the last player to invite this one
 	time_t move_time[TRACK_MOVE_TIMES];	// timestamp of last X moves
 	int beckoned_by;	// idnum of player who beckoned (for follow)
+	int last_aff_wear_off_vnum;	// helps prevent duplicate wear-off messages
+	time_t last_aff_wear_off_time;	// helps prevent duplicate wear-off messages
+	int last_cond_message_time[NUM_CONDS];	// last time we sent a message for drunk, full, thirsty
 	int last_look_sun;	// used to determine if the player needs to 'look' at sunrise/set
 	bool map_memory_needs_save;	// whether or not to save the map memory file
 	bool map_memory_loaded;	// whether or not it has been loaded yet
@@ -4621,6 +4656,7 @@ struct player_special_data {
 	
 	struct combat_meters meters;	// combat meter data
 	
+	bool affects_converted;	// if FALSE, player's affs have seconds-of-duration instead of expire-timestamp
 	bool needs_delayed_load;	// whether or not the player still needs delayed data
 	bool dont_save_delay;	// marked when a player is partially unloaded, to prevent accidentally saving a delay file with no gear
 	bool restore_on_login;	// mark the player to trigger a free reset when they enter the game
@@ -4716,7 +4752,8 @@ struct char_special_data {
 	int mana_regen;	// mana regen add
 	
 	int carry_items;	// Number of items carried
-	int	timer;	// Timer for update
+	
+	struct stored_event *stored_events;	// linked list of stored dg events
 };
 
 
@@ -4752,6 +4789,7 @@ struct char_data {
 
 	char_data *prev_in_room, *next_in_room;	// For room->people - doubly-linked list
 	char_data *prev, *next;	// For character_list (doubly-linked)
+	char_data *prev_plr, *next_plr;	// For player_character_list (doubly-linked)
 	char_data *next_fighting;	// For fighting list
 	bool in_combat_list;	// helps with removing from combat list
 	
@@ -4772,12 +4810,27 @@ struct char_data {
 };
 
 
+// for cooldown expiration
+struct cooldown_expire_event_data {
+	char_data *character;
+	struct cooldown_data *cooldown;
+};
+
+
 // cooldown info (cooldowns are defined by generics)
 struct cooldown_data {
 	any_vnum type;	// any COOLDOWN_ const or vnum
 	time_t expire_time;	// time at which the cooldown has expired
+	struct dg_event *expire_event;	// scheduled DG event, if any
 	
 	struct cooldown_data *next;	// linked list
+};
+
+
+// for damage-over-time (dot) updates and expiry
+struct dot_event_data {
+	char_data *ch;
+	struct over_time_effect_type *dot;
 };
 
 
@@ -4785,11 +4838,13 @@ struct cooldown_data {
 struct over_time_effect_type {
 	any_vnum type;	// ATYPE_
 	int cast_by;	// player ID (positive) or mob vnum (negative)
-	long duration;	// time in 5-second real-updates
+	int time_remaining;	// time in SECONDS
 	sh_int damage_type;	// DAM_x type
 	sh_int damage;	// amount
 	sh_int stack;	// damage is multiplied by this
 	sh_int max_stack;	// how high it's allowed to stack
+	
+	struct dg_event *update_event;	// for updating every 5 seconds
 
 	struct over_time_effect_type *next;
 };
@@ -5465,9 +5520,27 @@ struct player_event_data {
  //////////////////////////////////////////////////////////////////////////////
 //// EVENT STRUCTS (TIMED EVENT SYSTEM) //////////////////////////////////////
 
+// for character-driven events that can be PC or NPC
+struct char_event_data {
+	char_data *character;	// the person acting
+};
+
+
 // for map events
 struct map_event_data {
 	struct map_data *map;
+};
+
+
+// data for various timed mob events
+struct mob_event_data {
+	char_data *mob;		// which mob
+};
+
+
+// data for various timed object events
+struct obj_event_data {
+	obj_data *obj;		// which object
 };
 
 
@@ -5489,7 +5562,8 @@ struct stored_event {
 	struct dg_event *ev;
 	int type;	// SEV_ type
 	
-	UT_hash_handle hh;	// hashed by type
+	struct stored_event *next;	// linked list
+	// UT_hash_handle hh;	// FORMERLY hashed by type; these are short lists though
 };
 
 
@@ -5692,6 +5766,7 @@ struct obj_data {
 	time_t stolen_timer;	// when the object was last stolen
 	empire_vnum stolen_from;	// empire who owned it
 	
+	struct stored_event *stored_events;	// linked list of stored dg events
 	time_t autostore_timer;	// how long an object has been where it be
 	
 	struct obj_binding *bound_to;	// LL of who it's bound to
@@ -6219,7 +6294,7 @@ struct shared_room_data {
 	struct track_data *tracks;	// hash: for tracking
 	
 	// events
-	struct stored_event *events;	// hash table (by type) of stored events
+	struct stored_event *events;	// linked list of stored events
 };
 
 

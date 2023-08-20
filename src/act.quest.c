@@ -928,6 +928,7 @@ QCMD(qcmd_info) {
 
 QCMD(qcmd_list) {
 	char buf[MAX_STRING_LENGTH], vstr[128], typestr[128];
+	struct quest_temp_list *quest_list = NULL;
 	struct player_quest *pq;
 	quest_data *proto;
 	int count, total;
@@ -935,6 +936,11 @@ QCMD(qcmd_list) {
 	
 	if (!GET_QUESTS(ch)) {
 		msg_to_char(ch, "You aren't on any quests.\r\n");
+		
+		if ((quest_list = build_available_quest_list(ch))) {
+			msg_to_char(ch, "Try 'quest start' to see a list of available quests here.\r\n");
+			free_quest_temp_list(quest_list);
+		}
 		return;
 	}
 	

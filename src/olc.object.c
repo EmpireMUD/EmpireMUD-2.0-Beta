@@ -130,7 +130,7 @@ bool audit_object(obj_data *obj, char_data *ch) {
 		problem = TRUE;
 	}
 	if (OBJ_FLAGGED(obj, OBJ_LIGHT) && GET_OBJ_TIMER(obj) <= 0) {
-		olc_audit_msg(ch, GET_OBJ_VNUM(obj), "Infinite light");
+		olc_audit_msg(ch, GET_OBJ_VNUM(obj), "Infinite light (LIGHT flag)");
 		problem = TRUE;
 	}
 	if (OBJ_FLAGGED(obj, OBJ_HARD_DROP | OBJ_GROUP_DROP)) {
@@ -328,6 +328,17 @@ bool audit_object(obj_data *obj, char_data *ch) {
 		case ITEM_MINIPET: {
 			if (GET_MINIPET_VNUM(obj) == NOTHING || !mob_proto(GET_MINIPET_VNUM(obj))) {
 				olc_audit_msg(ch, GET_OBJ_VNUM(obj), "Minipet not set");
+				problem = TRUE;
+			}
+			break;
+		}
+		case ITEM_LIGHT: {
+			if (GET_LIGHT_HOURS_REMAINING(obj) == UNLIMITED && GET_OBJ_TIMER(obj) <= 0) {
+				olc_audit_msg(ch, GET_OBJ_VNUM(obj), "Infinite light (LIGHT item type)");
+				problem = TRUE;
+			}
+			if (OBJ_FLAGGED(obj, OBJ_LIGHT)) {
+				olc_audit_msg(ch, GET_OBJ_VNUM(obj), "Item has both LIGHT type and LIGHT flag");
 				problem = TRUE;
 			}
 			break;
@@ -547,8 +558,8 @@ void olc_delete_object(char_data *ch, obj_vnum vnum) {
 	}
 	
 	// remove from home storage
-	DL_FOREACH(character_list, chiter) {
-		if (!IS_NPC(chiter) && delete_unique_storage_by_vnum(&GET_HOME_STORAGE(chiter), vnum)) {
+	DL_FOREACH2(player_character_list, chiter, next_plr) {
+		if (delete_unique_storage_by_vnum(&GET_HOME_STORAGE(chiter), vnum)) {
 			queue_delayed_update(chiter, CDU_SAVE);
 		}
 	}
@@ -1108,10 +1119,12 @@ void olc_fullsearch_obj(char_data *ch, char *argument) {
 	bitvector_t find_applies = NOBITS, found_applies, not_flagged = NOBITS, only_flags = NOBITS;
 	bitvector_t only_worn = NOBITS, only_affs = NOBITS;
 	bitvector_t find_interacts = NOBITS, found_interacts, find_custom = NOBITS, found_custom;
-	bitvector_t only_tools = NOBITS;
+	bitvector_t only_tools = NOBITS, only_light_flags = NOBITS;
 	int count, only_level = NOTHING, only_type = NOTHING, only_mat = NOTHING;
 	int only_weapontype = NOTHING, vmin = NOTHING, vmax = NOTHING;
-	bool only_storable = FALSE, not_storable = FALSE;
+	// light hours uses -2 because the valid range is -1 to INT_MAX
+	int only_light_hours = -2 ,light_hours_over = -2, light_hours_under = -2;
+	bool only_storable = FALSE, not_storable = FALSE, light_is_lit = FALSE, light_is_unlit = FALSE;
 	struct interaction_item *inter;
 	struct custom_message *cust;
 	obj_data *obj, *next_obj;
@@ -1143,6 +1156,12 @@ void olc_fullsearch_obj(char_data *ch, char *argument) {
 		FULLSEARCH_FLAGS("flagged", only_flags, extra_bits)
 		FULLSEARCH_FLAGS("interaction", find_interacts, interact_types)
 		FULLSEARCH_INT("level", only_level, 0, INT_MAX)
+		FULLSEARCH_FLAGS("lightflags", only_light_flags, light_flags)
+		FULLSEARCH_INT("lighthours", only_light_hours, -1, INT_MAX)
+		FULLSEARCH_INT("lighthoursover", light_hours_over, -1, INT_MAX)
+		FULLSEARCH_INT("lighthoursunder", light_hours_under, -1, INT_MAX)
+		FULLSEARCH_BOOL("lightislit", light_is_lit)
+		FULLSEARCH_BOOL("lightisunlit", light_is_unlit)
 		FULLSEARCH_LIST("material", only_mat, (const char **)olc_material_list)
 		FULLSEARCH_BOOL("storable", only_storable)
 		FULLSEARCH_FLAGS("tools", only_tools, tool_flags)
@@ -1195,6 +1214,27 @@ void olc_fullsearch_obj(char_data *ch, char *argument) {
 			continue;
 		}
 		if (only_flags != NOBITS && (GET_OBJ_EXTRA(obj) & only_flags) != only_flags) {
+			continue;
+		}
+		if (only_light_flags != NOBITS && (!IS_LIGHT(obj) || (GET_LIGHT_FLAGS(obj) & only_light_flags) != only_light_flags)) {
+			continue;
+		}
+		if (only_light_hours != -2 && (!IS_LIGHT(obj) || GET_LIGHT_HOURS_REMAINING(obj) != only_light_hours)) {
+			continue;
+		}
+		if (only_light_hours != -2 && (!IS_LIGHT(obj) || GET_LIGHT_HOURS_REMAINING(obj) != only_light_hours)) {
+			continue;
+		}
+		if (light_hours_over != -2 && (!IS_LIGHT(obj) || GET_LIGHT_HOURS_REMAINING(obj) < light_hours_over)) {
+			continue;
+		}
+		if (light_hours_under != -2 && (!IS_LIGHT(obj) || GET_LIGHT_HOURS_REMAINING(obj) > light_hours_under)) {
+			continue;
+		}
+		if (light_is_lit && (!IS_LIGHT(obj) || !GET_LIGHT_IS_LIT(obj))) {
+			continue;
+		}
+		if (light_is_unlit && (!IS_LIGHT(obj) || GET_LIGHT_IS_LIT(obj))) {
 			continue;
 		}
 		if (only_worn != NOBITS && (GET_OBJ_WEAR(obj) & only_worn) != only_worn) {
@@ -1694,12 +1734,10 @@ void save_olc_object(descriptor_data *desc) {
 	}
 	
 	// update objs in home storage
-	DL_FOREACH(character_list, chiter) {
-		if (!IS_NPC(chiter)) {
-			DL_FOREACH(GET_HOME_STORAGE(chiter), eus) {
-				if (eus->obj && GET_OBJ_VNUM(eus->obj) == vnum) {
-					update_live_obj_from_olc(eus->obj, proto, obj);
-				}
+	DL_FOREACH2(player_character_list, chiter, next_plr) {
+		DL_FOREACH(GET_HOME_STORAGE(chiter), eus) {
+			if (eus->obj && GET_OBJ_VNUM(eus->obj) == vnum) {
+				update_live_obj_from_olc(eus->obj, proto, obj);
 			}
 		}
 	}
@@ -2066,6 +2104,7 @@ int set_obj_val(obj_data *obj, int pos, int value) {
 	
 	// and set it
 	GET_OBJ_VAL(obj, pos) = value;
+	
 	return value;
 }
 
@@ -2206,6 +2245,18 @@ void olc_get_values_display(char_data *ch, char *storage) {
 			sprintf(storage + strlen(storage), "<%sminipet\t0> %d %s\r\n", OLC_LABEL_VAL(GET_MINIPET_VNUM(obj), NOTHING), GET_MINIPET_VNUM(obj), get_mob_name_by_proto(GET_MINIPET_VNUM(obj), FALSE));
 			break;
 		}
+		case ITEM_LIGHT: {
+			if (GET_LIGHT_HOURS_REMAINING(obj) == UNLIMITED) {
+				sprintf(storage + strlen(storage), "<%slighthours\t0> unlimited\r\n", OLC_LABEL_VAL(GET_LIGHT_HOURS_REMAINING(obj), 0));
+			}
+			else {
+				sprintf(storage + strlen(storage), "<%slighthours\t0> %d\r\n", OLC_LABEL_VAL(GET_LIGHT_HOURS_REMAINING(obj), 0), GET_LIGHT_HOURS_REMAINING(obj));
+			}
+			sprintbit(GET_LIGHT_FLAGS(obj), light_flags, temp, TRUE);
+			sprintf(storage + strlen(storage), "<%slightflags\t0> %s\r\n", OLC_LABEL_VAL(GET_LIGHT_FLAGS(obj), NOBITS), temp);
+			sprintf(storage + strlen(storage), "<%slightislit\t0> %s\r\n", OLC_LABEL_VAL(GET_LIGHT_IS_LIT(obj), 1), GET_LIGHT_IS_LIT(obj) ? "yes" : "no");
+			break;
+		}
 		
 		// types with no vals
 		case ITEM_BOARD:
@@ -2265,7 +2316,7 @@ void olc_show_object(char_data *ch) {
 	
 	if (GET_OBJ_TIMER(obj) > 0) {
 		minutes = GET_OBJ_TIMER(obj) * SECS_PER_MUD_HOUR / SECS_PER_REAL_MIN;
-		sprintf(buf1, "%d ticks (%d:%02d)", GET_OBJ_TIMER(obj), minutes / 60, minutes % 60);
+		sprintf(buf1, "%d tick%s (%d:%02d)", GET_OBJ_TIMER(obj), PLURAL(GET_OBJ_TIMER(obj)), minutes / 60, minutes % 60);
 	}
 	else {
 		strcpy(buf1, "none");
@@ -2910,6 +2961,63 @@ OLC_MODULE(oedit_keywords) {
 }
 
 
+OLC_MODULE(oedit_lightflags) {
+	obj_data *obj = GET_OLC_OBJECT(ch->desc);
+	
+	if (!IS_LIGHT(obj)) {
+		msg_to_char(ch, "You can only set lightflags on a light object.\r\n");
+	}
+	else {
+		set_obj_val(obj, VAL_LIGHT_FLAGS, olc_process_flag(ch, argument, "light", "lightflags", light_flags, GET_OBJ_VAL(obj, VAL_LIGHT_FLAGS)));
+	}
+}
+
+
+OLC_MODULE(oedit_lighthours) {
+	obj_data *obj = GET_OLC_OBJECT(ch->desc);
+	
+	if (!IS_LIGHT(obj)) {
+		msg_to_char(ch, "You can only set light-hours on a LIGHT object.\r\n");
+	}
+	else if (is_abbrev(argument, "unlimited")) {
+		set_obj_val(obj, VAL_LIGHT_HOURS_REMAINING, UNLIMITED);
+		
+		if (PRF_FLAGGED(ch, PRF_NOREPEAT)) {
+			send_config_msg(ch, "ok_string");
+		}
+		else {
+			msg_to_char(ch, "It now has unlimited hours of light.\r\n");
+		}
+	}
+	else {
+		set_obj_val(obj, VAL_LIGHT_HOURS_REMAINING, olc_process_number(ch, argument, "hours of light", "lighthours", 0, MAX_INT, GET_OBJ_VAL(obj, VAL_LIGHT_HOURS_REMAINING)));
+	}
+}
+
+
+OLC_MODULE(oedit_lightislit) {
+	obj_data *obj = GET_OLC_OBJECT(ch->desc);
+	
+	if (!IS_LIGHT(obj)) {
+		msg_to_char(ch, "You can only set light-is-lit on a light object.\r\n");
+	}
+	else if (!*argument) {
+		msg_to_char(ch, "Usage: .ligthislit <yes | no>\r\n");
+	}
+	else if (!str_cmp(argument, "1") || is_abbrev(argument, "yes") || is_abbrev(argument, "on") || is_abbrev(argument, "lit")) {
+		GET_OBJ_VAL(obj, VAL_LIGHT_IS_LIT) = 1;
+		msg_to_char(ch, "It now defaults to 'lit'.\r\n");
+	}
+	else if (!str_cmp(argument, "0") || is_abbrev(argument, "no") || is_abbrev(argument, "off") || is_abbrev(argument, "unlit")) {
+		GET_OBJ_VAL(obj, VAL_LIGHT_IS_LIT) = 0;
+		msg_to_char(ch, "It now defaults to 'unlit'.\r\n");
+	}
+	else {
+		msg_to_char(ch, "You must specify yes/on/lit or no/off/unlit.\r\n");
+	}
+}
+
+
 OLC_MODULE(oedit_liquid) {
 	obj_data *obj = GET_OLC_OBJECT(ch->desc);
 	any_vnum old;
@@ -3406,6 +3514,10 @@ OLC_MODULE(oedit_type) {
 			}
 			case ITEM_MINIPET: {
 				set_obj_val(obj, VAL_MINIPET_VNUM, NOTHING);
+				break;
+			}
+			case ITEM_LIGHT: {
+				set_obj_val(obj, VAL_LIGHT_IS_LIT, 1);
 				break;
 			}
 			default: {

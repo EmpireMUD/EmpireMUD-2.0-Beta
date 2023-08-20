@@ -180,6 +180,8 @@ extern const struct material_data materials[NUM_MATERIALS];
 extern const char *container_bits[];
 extern const char *corpse_flags[];
 extern const char *fullness[];
+extern const char *light_flags[];
+extern const char *light_flags_for_identify[];
 extern const char *paint_colors[];
 extern const char *paint_names[];
 extern const char *resource_types[];

@@ -23,6 +23,7 @@
 #include "interpreter.h"
 #include "skills.h"
 #include "vnums.h"
+#include "dg_event.h"
 #include "dg_scripts.h"
 #include "constants.h"
 
@@ -39,7 +40,6 @@
 */
 
 // external vars
-extern bool gain_cond_message;
 
 // external funcs
 ACMD(do_dismount);
@@ -47,7 +47,9 @@ ACMD(do_respawn);
 
 // local vars
 int point_update_cycle = 0;	// helps spread out point updates
-int mobile_activity_cycle = 0;	// alternates groups of mobs
+
+// local funcs
+bool tick_obj_timer(obj_data *obj);
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -125,35 +127,6 @@ void check_attribute_gear(char_data *ch) {
 
 
 /**
-* It's not necessary to force-expire cooldowns like this, but players may
-* benefit from an explicit message. As such, to save computational power, this
-* only runs on players who are connected. Nobody else, including mobs, needs
-* to know.
-*/
-void check_expired_cooldowns(void) {	
-	struct cooldown_data *cool, *next_cool;
-	generic_data *gen;
-	char_data *ch;
-	descriptor_data *d;
-	
-	for (d = descriptor_list; d; d = d->next) {
-		if (STATE(d) == CON_PLAYING && (ch = d->character)) {
-			for (cool = ch->cooldowns; cool; cool = next_cool) {
-				next_cool = cool->next;
-				
-				if ((cool->expire_time - time(0)) <= 0) {
-					if ((gen = find_generic(cool->type, GENERIC_COOLDOWN)) && GET_COOLDOWN_WEAR_OFF(gen)) {
-						msg_to_char(ch, "&%c%s&0\r\n", (!IS_NPC(ch) && GET_CUSTOM_COLOR(ch, CUSTOM_COLOR_STATUS)) ? GET_CUSTOM_COLOR(ch, CUSTOM_COLOR_STATUS) : '0', GET_COOLDOWN_WEAR_OFF(gen));
-					}
-					remove_cooldown(ch, cool);
-				}
-			}
-		}
-	}
-}
-
-
-/**
 * Times out players who are sitting at the password or name prompt.
 */
 void check_idle_passwords(void) {
@@ -179,7 +152,8 @@ void check_idle_passwords(void) {
 
 
 /**
-* This checks if a character is too idle and disconnects or times them out.
+* This checks if a character is too idle and disconnects or times them out. It
+* should be called ONLY in the "real updates" (generally every 5 seconds).
 *
 * @param char_data *ch The person to check.
 * @return bool TRUE if the player is still in-game, FALSE if they idled out.
@@ -189,14 +163,14 @@ bool check_idling(char_data *ch) {
 		return TRUE;
 	}
 
-	ch->char_specials.timer++;
+	GET_IDLE_SECONDS(ch) += SECS_PER_REAL_UPDATE;
 	
 	// delay idle-out if active and acting
-	if (ch->desc && !IS_NPC(ch) && GET_ACTION(ch) != ACT_NONE && ch->char_specials.timer < config_get_int("idle_action_rent_time")) {
+	if (ch->desc && GET_ACTION(ch) != ACT_NONE && (GET_IDLE_SECONDS(ch) / SECS_PER_REAL_MIN) < config_get_int("idle_action_rent_time")) {
 		return TRUE;
 	}
 
-	if (ch->char_specials.timer > (ch->desc ? config_get_int("idle_rent_time") : config_get_int("idle_linkdead_rent_time"))) {
+	if ((GET_IDLE_SECONDS(ch) / SECS_PER_REAL_MIN) > (ch->desc ? config_get_int("idle_rent_time") : config_get_int("idle_linkdead_rent_time"))) {
 		return perform_idle_out(ch);
 	}
 	
@@ -377,128 +351,83 @@ int limit_crowd_control(char_data *victim, int atype) {
 
 
 /**
-* This runs a point update (every hour tick) on a character. It runs on both
-* players and NPCS, right after their "real update" runs.
+* This runs a point update (every hour tick) on a character. It runs on ONLY
+* players, as of b5.152, right after their "real update" runs.
 *
-* @param char_data *ch The character to update.
-* @return bool TRUE if the character survives the update, FALSE if not.
+* @param char_data *ch The player to update.
+* @return bool TRUE if the player survives the update, FALSE if not.
 */
-bool point_update_char(char_data *ch) {
-	struct cooldown_data *cool, *next_cool;
+bool point_update_player(char_data *ch) {
 	obj_data *obj, *next_obj;
-	char_data *chiter;
 	bool found;
-	int count;
+	
+	// never for mobs
+	if (IS_NPC(ch)) {
+		return FALSE;
+	}
 	
 	// remove stale offers -- this needs to happen even if dead (resurrect)
-	if (!IS_NPC(ch)) {
-		clean_offers(ch);
-		if (!check_idling(ch)) {
-			return FALSE;
-		}
-	}
+	clean_offers(ch);
 	
 	// everything beyond here only matters if still alive
 	if (IS_DEAD(ch)) {
 		return FALSE;
 	}
 	
-	if (IS_NPC(ch) && FIGHTING(ch)) {
-		check_pointless_fight(ch);
-	}
+	// check bad quest items
+	remove_quest_items(ch);
 	
-	// check mob crowding (for npcs in stables)
-	if (IS_NPC(ch) && !ch->desc && room_has_function_and_city_ok(NULL, IN_ROOM(ch), FNC_STABLE)) {
-		count = 1;	// me
-		DL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), chiter, next_in_room) {
-			if (ch != chiter && !EXTRACTED(chiter) && IS_NPC(chiter) && GET_MOB_VNUM(chiter) == GET_MOB_VNUM(ch)) {
-				++count;
-			}
-		}
-		
-		if (count > config_get_int("num_duplicates_in_stable")) {
-			act("$n is feeling overcrowded, and leaves.", TRUE, ch, NULL, NULL, TO_ROOM);
-			extract_char(ch);
-			return FALSE;
-		}
-	}
-	
-	if (!IS_NPC(ch)) {
-		// check bad quest items
-		remove_quest_items(ch);
-		
-		// check way over-inventory (2x overburdened)
-		if (!IS_IMMORTAL(ch) && IS_CARRYING_N(ch) > 2 * GET_LARGEST_INVENTORY(ch)) {
-			found = FALSE;
-			DL_FOREACH_SAFE2(ch->carrying, obj, next_obj, next_content) {
-				if (IS_CARRYING_N(ch) > 2 * GET_LARGEST_INVENTORY(ch)) {
-					if (!found) {
-						found = TRUE;
-						msg_to_char(ch, "You are way overburdened and begin losing items...\r\n");
-					}
-					if (perform_drop(ch, obj, SCMD_DROP, "drop") <= 0) {
-						perform_drop(ch, obj, SCMD_JUNK, "lose");
-					}
+	// check way over-inventory (2x overburdened)
+	if (!IS_IMMORTAL(ch) && IS_CARRYING_N(ch) > 2 * GET_LARGEST_INVENTORY(ch)) {
+		found = FALSE;
+		DL_FOREACH_SAFE2(ch->carrying, obj, next_obj, next_content) {
+			if (IS_CARRYING_N(ch) > 2 * GET_LARGEST_INVENTORY(ch)) {
+				if (!found) {
+					found = TRUE;
+					msg_to_char(ch, "You are way overburdened and begin losing items...\r\n");
+				}
+				if (perform_drop(ch, obj, SCMD_DROP, "drop") <= 0) {
+					perform_drop(ch, obj, SCMD_JUNK, "lose");
 				}
 			}
 		}
-		
-		if (IS_BLOOD_STARVED(ch)) {
-			msg_to_char(ch, "You are starving!\r\n");
-		}
-		
-		// light-based gains
-		if (IS_OUTDOORS(ch) && get_sun_status(IN_ROOM(ch)) == SUN_LIGHT) {
-			gain_player_tech_exp(ch, PTECH_VAMPIRE_SUN_IMMUNITY, 2);
-		}
-		
-		if (GET_MOUNT_LIST(ch)) {
-			gain_ability_exp(ch, ABIL_STABLEMASTER, 2);
-		}
-		
-		run_ability_gain_hooks(ch, NULL, AGH_PASSIVE_HOURLY);
-		
-		// death count decrease after 3 minutes without a death
-		if (GET_RECENT_DEATH_COUNT(ch) > 0 && GET_LAST_DEATH_TIME(ch) + (3 * SECS_PER_REAL_MIN) < time(0)) {
-			GET_RECENT_DEATH_COUNT(ch) -= 1;
-		}
 	}
 	
-	// check spawned
-	if (REAL_NPC(ch) && !ch->desc && MOB_FLAGGED(ch, MOB_SPAWNED) && (!MOB_FLAGGED(ch, MOB_ANIMAL) || !room_has_function_and_city_ok(NULL, IN_ROOM(ch), FNC_STABLE)) && MOB_SPAWN_TIME(ch) < (time(0) - config_get_int("mob_spawn_interval") * SECS_PER_REAL_MIN)) {
-		if (!GET_LED_BY(ch) && !GET_LEADING_MOB(ch) && !GET_LEADING_VEHICLE(ch) && !MOB_FLAGGED(ch, MOB_TIED)) {
-			if (distance_to_nearest_player(IN_ROOM(ch)) > config_get_int("mob_despawn_radius")) {
-				despawn_mob(ch);
-				return FALSE;
-			}
-		}
+	if (IS_BLOOD_STARVED(ch)) {
+		msg_to_char(ch, "You are starving!\r\n");
+	}
+	
+	// light-based gains
+	if (IS_OUTDOORS(ch) && get_sun_status(IN_ROOM(ch)) == SUN_LIGHT) {
+		gain_player_tech_exp(ch, PTECH_VAMPIRE_SUN_IMMUNITY, 2);
+	}
+	
+	if (GET_MOUNT_LIST(ch)) {
+		gain_ability_exp(ch, ABIL_STABLEMASTER, 2);
+	}
+	
+	run_ability_gain_hooks(ch, NULL, AGH_PASSIVE_HOURLY);
+	
+	// death count decrease after 3 minutes without a death
+	if (GET_RECENT_DEATH_COUNT(ch) > 0 && GET_LAST_DEATH_TIME(ch) + (3 * SECS_PER_REAL_MIN) < time(0)) {
+		GET_RECENT_DEATH_COUNT(ch) -= 1;
 	}
 	
 	// bloody upkeep
-	if (IS_VAMPIRE(ch) && !IS_IMMORTAL(ch) && !IS_NPC(ch)) {
-		GET_BLOOD(ch) -= MAX(0, GET_BLOOD_UPKEEP(ch));
+	if (IS_VAMPIRE(ch) && !IS_IMMORTAL(ch)) {
+		if (GET_BLOOD_UPKEEP(ch) > 0) {
+			set_blood(ch, GET_BLOOD(ch) - GET_BLOOD_UPKEEP(ch));
+		}
 		
 		if (GET_BLOOD(ch) < 0) {
 			out_of_blood(ch);
 			return FALSE;
 		}
 	}
-	else {	// not a vampire (or is imm/npc)
+	else {	// not a vampire (or is imm)
 		// don't gain blood whilst being fed upon
 		if (GET_FED_ON_BY(ch) == NULL) {
-			GET_BLOOD(ch) = MIN(GET_BLOOD(ch) + 1, GET_MAX_BLOOD(ch));
-		}
-	}
-	
-	// healing for NPCs -- pcs are in real_update
-	if (IS_NPC(ch)) {
-		if (!check_reset_mob(ch, FALSE) && GET_POS(ch) < POS_STUNNED) {
-			GET_HEALTH(ch) -= 1;
-			update_pos(ch);
-			if (GET_POS(ch) == POS_DEAD) {
-				die(ch, ch);
-				return FALSE;
-			}
+			set_blood(ch, GET_BLOOD(ch) + 1);
 		}
 	}
 	
@@ -512,41 +441,28 @@ bool point_update_char(char_data *ch) {
 		}
 	}
 	
-	// check all cooldowns -- ignore chars with descriptors, as they'll want
-	// the OTHER function to remove this (it sends messages; this one includes
-	// NPCs and doesn't)
-	if (!ch->desc) {
-		for (cool = ch->cooldowns; cool; cool = next_cool) {
-			next_cool = cool->next;
-		
-			// is expired?
-			if (time(0) >= cool->expire_time) {
-				remove_cooldown(ch, cool);
-			}
-		}
-	}
-	
 	return TRUE;	// we lived!
 }
 
 
 /**
-* Runs a real update (every 5 seconds) on ch. This is mainly for player
-* updates, but NPCs hit it for things like affects.
+* Runs a real update (generally 5 seconds) on ch. This is ONLY for players as
+* of b5.152 -- NPCs schedule all their updates instead.
 *
-* @param char_data *ch The character to update.
+* @param char_data *ch The player to update.
 */
-void real_update_char(char_data *ch) {
-	struct over_time_effect_type *dot, *next_dot;
-	struct affected_type *af, *next_af, *immune;
-	char_data *room_ch, *next_ch, *caster;
+void real_update_player(char_data *ch) {
+	char_data *room_ch, *next_ch;
 	struct companion_data *compan;
 	char buf[MAX_STRING_LENGTH];
 	struct instance_data *inst;
-	int result, iter, type;
-	int fol_count, gain;
+	int fol_count, gain, iter;
 	ability_data *abil;
-	bool found, took_dot, msg, any;
+	bool found, msg;
+	
+	if (IS_NPC(ch)) {
+		return;
+	}
 	
 	// put stuff that happens when dead here
 	
@@ -556,8 +472,8 @@ void real_update_char(char_data *ch) {
 		return;
 	}
 	
-	// DEAD players: check idle early
-	if (IS_DEAD(ch) && !IS_NPC(ch) && (GET_IDNUM(ch) % REAL_UPDATES_PER_MUD_HOUR) == point_update_cycle && !check_idling(ch)) {
+	// idle players: check very early
+	if (!check_idling(ch)) {
 		return;
 	}
 	
@@ -576,343 +492,234 @@ void real_update_char(char_data *ch) {
 		adventure_unsummon(ch);
 	}
 	
-	if (GET_LEADING_VEHICLE(ch) && IN_ROOM(ch) != IN_ROOM(GET_LEADING_VEHICLE(ch))) {
-		act("You have lost $V and stop leading it.", FALSE, ch, NULL, GET_LEADING_VEHICLE(ch), TO_CHAR);
-		VEH_LED_BY(GET_LEADING_VEHICLE(ch)) = NULL;
-		GET_LEADING_VEHICLE(ch) = NULL;
-	}
-	if (GET_LEADING_MOB(ch) && IN_ROOM(ch) != IN_ROOM(GET_LEADING_MOB(ch))) {
-		act("You have lost $N and stop leading $M.", FALSE, ch, NULL, GET_LEADING_MOB(ch), TO_CHAR);
-		GET_LED_BY(GET_LEADING_MOB(ch)) = NULL;
-		GET_LEADING_MOB(ch) = NULL;
-	}
-	if (GET_SITTING_ON(ch)) {
-		// things that cancel sitting-on:
-		if (IN_ROOM(ch) != IN_ROOM(GET_SITTING_ON(ch)) || (GET_POS(ch) != POS_SITTING && GET_POS(ch) != POS_RESTING && GET_POS(ch) != POS_SLEEPING) || IS_RIDING(ch) || GET_LEADING_MOB(ch) || GET_LEADING_VEHICLE(ch)) {
-			do_unseat_from_vehicle(ch);
-		}
-	}
-	
-	// check leader's solo role
-	if (IS_NPC(ch) && GET_COMPANION(ch) && GET_CLASS_ROLE(GET_COMPANION(ch)) == ROLE_SOLO && (compan = has_companion(GET_COMPANION(ch), GET_MOB_VNUM(ch))) && compan->from_abil != NO_ABIL && (abil = find_ability_by_vnum(compan->from_abil)) && ABIL_IS_SYNERGY(abil) && !check_solo_role(GET_COMPANION(ch))) {
-		act("$N vanishes because you're in the solo role but not alone.", FALSE, GET_LEADER(ch), NULL, ch, TO_CHAR);
-		act("$N vanishes.", FALSE, GET_LEADER(ch), NULL, ch, TO_NOTVICT);
-		extract_char(ch);
-		return;
+	// ensure I don't have an invalid companion in the solo role
+	if (GET_COMPANION(ch) && GET_CLASS_ROLE(ch) == ROLE_SOLO && (compan = has_companion(ch, GET_MOB_VNUM(GET_COMPANION(ch)))) && compan->from_abil != NO_ABIL && (abil = find_ability_by_vnum(compan->from_abil)) && ABIL_IS_SYNERGY(abil) && !check_solo_role(ch)) {
+		act("$N vanishes because you're in the solo role but not alone.", FALSE, ch, NULL, GET_COMPANION(ch), TO_CHAR);
+		act("$N vanishes.", FALSE, ch, NULL, GET_COMPANION(ch), TO_NOTVICT);
+		extract_char(GET_COMPANION(ch));
 	}
 	// earthmeld damage
-	if (!IS_NPC(ch) && !IS_IMMORTAL(ch) && AFF_FLAGGED(ch, AFF_EARTHMELD) && IS_COMPLETE(IN_ROOM(ch)) && (ROOM_IS_CLOSED(IN_ROOM(ch)) || ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_BARRIER))) {
+	if (!IS_IMMORTAL(ch) && AFF_FLAGGED(ch, AFF_EARTHMELD) && IS_COMPLETE(IN_ROOM(ch)) && (ROOM_IS_CLOSED(IN_ROOM(ch)) || ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_BARRIER))) {
 		if (!affected_by_spell(ch, ATYPE_NATURE_BURN)) {
 			msg_to_char(ch, "You are beneath a building and begin taking nature burn as the earth you're buried in is separated from fresh air...\r\n");
 		}
-		apply_dot_effect(ch, ATYPE_NATURE_BURN, 6, DAM_MAGICAL, 5, 60, ch);
-	}
-	
-	// update affects (NPCs get this, too)
-	any = FALSE;
-	for (af = ch->affected; af; af = next_af) {
-		next_af = af->next;
-		if (af->duration >= 1) {
-			af->duration--;
-		}
-		else if (af->duration != UNLIMITED) {
-			if ((af->type > 0)) {
-				if (!af->next || (af->next->type != af->type) || (af->next->duration > 0)) {
-					show_wear_off_msg(ch, af->type);
-				}
-			}
-			
-			// special case -- add immunity
-			if (IS_SET(af->bitvector, AFF_STUNNED) && config_get_int("stun_immunity_time") > 0) {
-				immune = create_flag_aff(ATYPE_STUN_IMMUNITY, config_get_int("stun_immunity_time") / SECS_PER_REAL_UPDATE, AFF_IMMUNE_STUN, ch);
-				affect_join(ch, immune, 0);
-			}
-			
-			affect_remove(ch, af);
-			any = TRUE;
-		}
-	}
-	if (any) {
-		affect_total(ch);
-	}
-	
-	// heal-per-5 ? (stops at 0 health or incap)
-	if (GET_HEAL_OVER_TIME(ch) > 0 && !IS_DEAD(ch) && GET_POS(ch) >= POS_SLEEPING && GET_HEALTH(ch) > 0) {
-		heal(ch, ch, GET_HEAL_OVER_TIME(ch));
-	}
-
-	// update DoTs (NPCs get this, too)
-	took_dot = FALSE;
-	for (dot = ch->over_time_effects; dot; dot = next_dot) {
-		next_dot = dot->next;
-		
-		type = dot->damage_type == DAM_MAGICAL ? ATTACK_MAGICAL_DOT : (
-			dot->damage_type == DAM_FIRE ? ATTACK_FIRE_DOT : (
-			dot->damage_type == DAM_POISON ? ATTACK_POISON_DOT : 
-			ATTACK_PHYSICAL_DOT
-		));
-		
-		caster = find_player_in_room_by_id(IN_ROOM(ch), dot->cast_by);
-		result = damage(caster ? caster : ch, ch, dot->damage * dot->stack, type, dot->damage_type);
-		if (result > 0 && caster) {
-			took_dot = TRUE;
-		}
-		else if (result < 0 || EXTRACTED(ch) || IS_DEAD(ch)) {
-			return;
-		}
-		
-		// remove?
-		if (dot->duration >= 1) {
-			--dot->duration;
-		}
-		else if (dot->duration != UNLIMITED) {
-			// expired
-			if (dot->type > 0) {
-				show_wear_off_msg(ch, dot->type);
-			}
-			dot_remove(ch, dot);
-		}
-	}
-	if (took_dot) {
-		cancel_action(ch);
-	}
-	
-	// biting -- this is usually PC-only, but NPCs could learn to do it
-	if (GET_FEEDING_FROM(ch)) {
-		update_biting_char(ch);
-		if (EXTRACTED(ch) || IS_DEAD(ch)) {
-			return;
-		}
+		apply_dot_effect(ch, ATYPE_NATURE_BURN, 30, DAM_MAGICAL, 5, 60, ch);
 	}
 	
 	// players only
-	if (!IS_NPC(ch)) {
-		if (IS_MORPHED(ch)) {
-			check_morph_ability(ch);
-		}
-		if (IS_RIDING(ch)) {
-			check_should_dismount(ch);
-		}
-		if (CAN_CARRY_N(ch) > max_inventory_size) {
-			// record maximum global inventory size, for script safety
-			max_inventory_size = CAN_CARRY_N(ch);
-		}
-		
-		// update recent level data if level has gone up or it's been too long since we've seen a higher level
-		if (!IS_IMMORTAL(ch) && GET_COMPUTED_LEVEL(ch) > GET_HIGHEST_KNOWN_LEVEL(ch)) {
-			if ((int) (GET_COMPUTED_LEVEL(ch) / 100) > (int) (GET_HIGHEST_KNOWN_LEVEL(ch) / 100)) {
-				// first time over a new 100?
-				log_to_slash_channel_by_name(PLAYER_LOG_CHANNEL, ch, "%s has reached level %d!", PERS(ch, ch, TRUE), (int)(GET_COMPUTED_LEVEL(ch) / 100) * 100);
-			}
-		
-			GET_HIGHEST_KNOWN_LEVEL(ch) = GET_COMPUTED_LEVEL(ch);
-		}
-		// update the last-known-level
-		GET_LAST_KNOWN_LEVEL(ch) = GET_COMPUTED_LEVEL(ch);
+	if (IS_MORPHED(ch)) {
+		check_morph_ability(ch);
+	}
+	if (IS_RIDING(ch)) {
+		check_should_dismount(ch);
+	}
+	if (CAN_CARRY_N(ch) > max_inventory_size) {
+		// record maximum global inventory size, for script safety
+		max_inventory_size = CAN_CARRY_N(ch);
+	}
 	
-		// very drunk? more confused!
-		if (GET_COND(ch, DRUNK) > 350) {
-			GET_CONFUSED_DIR(ch) = number(0, NUM_SIMPLE_DIRS-1);
+	// update recent level data if level has gone up or it's been too long since we've seen a higher level
+	if (!IS_IMMORTAL(ch) && GET_COMPUTED_LEVEL(ch) > GET_HIGHEST_KNOWN_LEVEL(ch)) {
+		if ((int) (GET_COMPUTED_LEVEL(ch) / 100) > (int) (GET_HIGHEST_KNOWN_LEVEL(ch) / 100)) {
+			// first time over a new 100?
+			log_to_slash_channel_by_name(PLAYER_LOG_CHANNEL, ch, "%s has reached level %d!", PERS(ch, ch, TRUE), (int)(GET_COMPUTED_LEVEL(ch) / 100) * 100);
 		}
 	
-		if (GET_EQ(ch, WEAR_SADDLE) && !IS_RIDING(ch)) {
-			perform_remove(ch, WEAR_SADDLE);
-		}
-	
-		if (GET_BLOOD(ch) > GET_MAX_BLOOD(ch)) {
-			GET_BLOOD(ch) = GET_MAX_BLOOD(ch);
-		}
+		GET_HIGHEST_KNOWN_LEVEL(ch) = GET_COMPUTED_LEVEL(ch);
+	}
+	// update the last-known-level
+	GET_LAST_KNOWN_LEVEL(ch) = GET_COMPUTED_LEVEL(ch);
 
-		// periodic exp and skill gain
-		if (GET_DAILY_CYCLE(ch) < data_get_long(DATA_DAILY_CYCLE)) {
-			// other stuff that resets daily
-			gain = compute_bonus_exp_per_day(ch);
-			if (GET_DAILY_BONUS_EXPERIENCE(ch) < gain) {
-				GET_DAILY_BONUS_EXPERIENCE(ch) = gain;
-				update_MSDP_bonus_exp(ch, UPDATE_SOON);
-			}
-			GET_DAILY_QUESTS(ch) = 0;
-			GET_EVENT_DAILY_QUESTS(ch) = 0;
-		
-			msg_to_char(ch, "&yYour daily quests and bonus experience have reset!&0\r\n");
-			
-			if (fail_daily_quests(ch, TRUE) | fail_daily_quests(ch, FALSE)) {
-				msg_to_char(ch, "Your daily quests expire.\r\n");
-			}
-		
-			// update to this cycle so it only happens once a day
-			GET_DAILY_CYCLE(ch) = data_get_long(DATA_DAILY_CYCLE);
-			queue_delayed_update(ch, CDU_SAVE);
-		}
+	// very drunk? more confused!
+	if (IS_DRUNK(ch)) {
+		GET_CONFUSED_DIR(ch) = number(0, NUM_SIMPLE_DIRS-1);
+	}
 
-		/* Update conditions */
-		if (HAS_BONUS_TRAIT(ch, BONUS_NO_HUNGER) || has_player_tech(ch, PTECH_NO_HUNGER)) {			
-			gain_condition(ch, FULL, -1);
-		}
-		else {
-			if (!number(0, 1)) {
-				gain_condition(ch, FULL, 1);
-			}
-		}
-	
-		run_ability_gain_hooks(ch, NULL, AGH_PASSIVE_FREQUENT);
-	
-		// more thirsty?
-		if (HAS_BONUS_TRAIT(ch, BONUS_NO_THIRST) || has_player_tech(ch, PTECH_NO_THIRST)) {
-			gain_condition(ch, THIRST, -1);
-		}
-		else {
-			if (!number(0, 1)) {
-				gain_condition(ch, THIRST, 1);
-			}
-		}
-	
-		// less drunk
-		gain_condition(ch, DRUNK, AWAKE(ch) ? -1 : -6);
-	
-		// ensure character isn't under on primary attributes
-		check_attribute_gear(ch);
-	
-		// ensure character isn't using any gear they shouldn't be
-		found = FALSE;
-		for (iter = 0; iter < NUM_WEARS; ++iter) {
-			if (wear_data[iter].count_stats && GET_EQ(ch, iter) && !can_wear_item(ch, GET_EQ(ch, iter), TRUE)) {
-				// can_wear_item sends own message to ch
-				act("$n stops using $p.", TRUE, ch, GET_EQ(ch, iter), NULL, TO_ROOM);
-				// this may extract it
-				unequip_char_to_inventory(ch, iter);
-				found = TRUE;
-			}
-		}
-		if (found) {
-			determine_gear_level(ch);
-		}
+	if (GET_EQ(ch, WEAR_SADDLE) && !IS_RIDING(ch)) {
+		perform_remove(ch, WEAR_SADDLE);
+	}
 
-		/* moving on.. */
-		if (GET_POS(ch) < POS_STUNNED || (GET_POS(ch) == POS_STUNNED && health_gain(ch, TRUE) <= 0)) {
-			GET_HEALTH(ch) = MIN(0, GET_HEALTH(ch));	// fixing? a bug where a player whose health is positve but is in a bleeding out position, would not bleed out right away (but couldn't recover)
-			GET_HEALTH(ch) -= 1;
-			update_pos(ch);
-			if (GET_POS(ch) == POS_DEAD) {
-				msg_to_char(ch, "You die from your wounds!\r\n");
-				act("$n falls down, dead.", FALSE, ch, 0, 0, TO_ROOM);
-				death_log(ch, ch, TYPE_SUFFERING);
-				die(ch, ch);
-				return;
-			}
-			else {
-				msg_to_char(ch, "You are bleeding and will die soon without aid.\r\n");
-			}
+	if (GET_BLOOD(ch) > GET_MAX_BLOOD(ch)) {
+		set_blood(ch, GET_MAX_BLOOD(ch));
+	}
+
+	// periodic exp and skill gain
+	if (GET_DAILY_CYCLE(ch) < data_get_long(DATA_DAILY_CYCLE)) {
+		// other stuff that resets daily
+		gain = compute_bonus_exp_per_day(ch);
+		if (GET_DAILY_BONUS_EXPERIENCE(ch) < gain) {
+			GET_DAILY_BONUS_EXPERIENCE(ch) = gain;
+			update_MSDP_bonus_exp(ch, UPDATE_SOON);
+		}
+		GET_DAILY_QUESTS(ch) = 0;
+		GET_EVENT_DAILY_QUESTS(ch) = 0;
+	
+		msg_to_char(ch, "&yYour daily quests and bonus experience have reset!&0\r\n");
+		
+		if (fail_daily_quests(ch, TRUE) | fail_daily_quests(ch, FALSE)) {
+			msg_to_char(ch, "Your daily quests expire.\r\n");
+		}
+	
+		// update to this cycle so it only happens once a day
+		GET_DAILY_CYCLE(ch) = data_get_long(DATA_DAILY_CYCLE);
+		queue_delayed_update(ch, CDU_SAVE);
+	}
+
+	/* Update conditions */
+	if (HAS_BONUS_TRAIT(ch, BONUS_NO_HUNGER) || has_player_tech(ch, PTECH_NO_HUNGER)) {			
+		gain_condition(ch, FULL, -1);
+	}
+	else {
+		if (!number(0, 1)) {
+			gain_condition(ch, FULL, 1);
+		}
+	}
+
+	run_ability_gain_hooks(ch, NULL, AGH_PASSIVE_FREQUENT);
+
+	// more thirsty?
+	if (HAS_BONUS_TRAIT(ch, BONUS_NO_THIRST) || has_player_tech(ch, PTECH_NO_THIRST)) {
+		gain_condition(ch, THIRST, -1);
+	}
+	else {
+		if (!number(0, 1)) {
+			gain_condition(ch, THIRST, 1);
+		}
+	}
+
+	// less drunk
+	gain_condition(ch, DRUNK, AWAKE(ch) ? -1 : -6);
+
+	// ensure character isn't under on primary attributes
+	check_attribute_gear(ch);
+
+	// ensure character isn't using any gear they shouldn't be
+	found = FALSE;
+	for (iter = 0; iter < NUM_WEARS; ++iter) {
+		if (wear_data[iter].count_stats && GET_EQ(ch, iter) && !can_wear_item(ch, GET_EQ(ch, iter), TRUE)) {
+			// can_wear_item sends own message to ch
+			act("$n stops using $p.", TRUE, ch, GET_EQ(ch, iter), NULL, TO_ROOM);
+			// this may extract it
+			unequip_char_to_inventory(ch, iter);
+			found = TRUE;
+		}
+	}
+	if (found) {
+		determine_gear_level(ch);
+	}
+
+	/* moving on.. */
+	if (GET_POS(ch) < POS_STUNNED || (GET_POS(ch) == POS_STUNNED && health_gain(ch, TRUE) <= 0)) {
+		set_health(ch, MIN(0, GET_HEALTH(ch)) - 1);	// fixing? a bug where a player whose health is positve but is in a bleeding out position, would not bleed out right away (but couldn't recover)
+		update_pos(ch);
+		if (GET_POS(ch) == POS_DEAD) {
+			msg_to_char(ch, "You die from your wounds!\r\n");
+			act("$n falls down, dead.", FALSE, ch, 0, 0, TO_ROOM);
+			death_log(ch, ch, TYPE_SUFFERING);
+			die(ch, ch);
 			return;
 		}
 		else {
-			// position > stunned		
+			msg_to_char(ch, "You are bleeding and will die soon without aid.\r\n");
 		}
+		return;
+	}
+	else {
+		// position > stunned		
+	}
 
-		// regenerate: do not put move_gain and mana_gain inside of MIN/MAX macros -- this will call them twice
-		if (!took_dot) {
-			gain = health_gain(ch, FALSE);
-			heal(ch, ch, gain);
-			GET_HEALTH_DEFICIT(ch) = MAX(0, GET_HEALTH_DEFICIT(ch) - gain);
-		}
-	
-		// check move gain
-		if (!IS_NPC(ch) && !IS_IMMORTAL(ch) && IS_SWIMMING(ch)) {
-			// swimming: costs moves
-			if (GET_MOVE(ch) > 0) {
-				GET_MOVE(ch) -= 1;
-			}
-			if (GET_MOVE(ch) <= 0) {
-				msg_to_char(ch, "You sink beneath the water and die!\r\n");
-				act("$n sinks beneath the water and dies!", FALSE, ch, NULL, NULL, TO_ROOM);
-				death_log(ch, ch, TYPE_SUFFERING);
-				die(ch, ch);
-				return;
-			}
-		}
-		else {	// normal move gain
-			gain = move_gain(ch, FALSE);
-			GET_MOVE(ch) += gain;
-			GET_MOVE(ch) = MIN(GET_MOVE(ch), GET_MAX_MOVE(ch));
-			GET_MOVE_DEFICIT(ch) = MAX(0, GET_MOVE_DEFICIT(ch) - gain);
-		}
-	
-		// mana gain
-		gain = mana_gain(ch, FALSE);
-		GET_MANA(ch) += gain;
-		GET_MANA(ch) = MIN(GET_MANA(ch), GET_MAX_MANA(ch));
-		GET_MANA_DEFICIT(ch) = MAX(0, GET_MANA_DEFICIT(ch) - gain);
-	
-		if (IS_VAMPIRE(ch)) {
-			update_vampire_sun(ch);
-		}
+	// regenerate: do not put move_gain and mana_gain inside of MIN/MAX macros -- this will call them twice
+	if (!ch->over_time_effects) {
+		// only heals if they have no DOTs
+		gain = health_gain(ch, FALSE);
+		heal(ch, ch, gain);
+		GET_HEALTH_DEFICIT(ch) = MAX(0, GET_HEALTH_DEFICIT(ch) - gain);
+	}
 
-		if (!AWAKE(ch) && IS_MORPHED(ch) && CHAR_MORPH_FLAGGED(ch, MORPHF_NO_SLEEP)) {
-			sprintf(buf, "%s has become $n!", PERS(ch, ch, 0));
-			msg = !CHAR_MORPH_FLAGGED(ch, MORPHF_NO_MORPH_MESSAGE);
-
-			perform_morph(ch, NULL);
-		
-			if (msg) {
-				act(buf, TRUE, ch, 0, 0, TO_ROOM);
-			}
-			msg_to_char(ch, "You revert to normal!\r\n");
+	// check move gain
+	if (!IS_IMMORTAL(ch) && IS_SWIMMING(ch)) {
+		// swimming: costs moves
+		if (GET_MOVE(ch) > 0) {
+			set_move(ch, GET_MOVE(ch) - 1);
 		}
-
-		/* Blood check */
-		if (GET_BLOOD(ch) <= 0 && !GET_FED_ON_BY(ch) && !GET_FEEDING_FROM(ch)) {
-			out_of_blood(ch);
+		if (GET_MOVE(ch) <= 0) {
+			msg_to_char(ch, "You sink beneath the water and die!\r\n");
+			act("$n sinks beneath the water and dies!", FALSE, ch, NULL, NULL, TO_ROOM);
+			death_log(ch, ch, TYPE_SUFFERING);
+			die(ch, ch);
 			return;
 		}
-		else if (IS_BLOOD_STARVED(ch)) {
-			cancel_blood_upkeeps(ch);
-			starving_vampire_aggro(ch);
+	}
+	else {	// normal move gain
+		gain = move_gain(ch, FALSE);
+		set_move(ch, GET_MOVE(ch) + gain);
+		GET_MOVE_DEFICIT(ch) = MAX(0, GET_MOVE_DEFICIT(ch) - gain);
+	}
+
+	// mana gain
+	gain = mana_gain(ch, FALSE);
+	set_mana(ch, GET_MANA(ch) + gain);
+	GET_MANA_DEFICIT(ch) = MAX(0, GET_MANA_DEFICIT(ch) - gain);
+
+	if (IS_VAMPIRE(ch)) {
+		update_vampire_sun(ch);
+	}
+
+	if (!AWAKE(ch) && IS_MORPHED(ch) && CHAR_MORPH_FLAGGED(ch, MORPHF_NO_SLEEP)) {
+		sprintf(buf, "%s has become $n!", PERS(ch, ch, 0));
+		msg = !CHAR_MORPH_FLAGGED(ch, MORPHF_NO_MORPH_MESSAGE);
+
+		perform_morph(ch, NULL);
+	
+		if (msg) {
+			act(buf, TRUE, ch, 0, 0, TO_ROOM);
+		}
+		msg_to_char(ch, "You revert to normal!\r\n");
+	}
+
+	/* Blood check */
+	if (GET_BLOOD(ch) <= 0 && !GET_FED_ON_BY(ch) && !GET_FEEDING_FROM(ch)) {
+		out_of_blood(ch);
+		return;
+	}
+	else if (IS_BLOOD_STARVED(ch)) {
+		cancel_blood_upkeeps(ch);
+		starving_vampire_aggro(ch);
+	}
+
+	// too-many-followers check
+	fol_count = 0;
+	DL_FOREACH_SAFE2(ROOM_PEOPLE(IN_ROOM(ch)), room_ch, next_ch, next_in_room) {
+		// check is npc following ch
+		if (room_ch == ch || room_ch->desc || !IS_NPC(room_ch) || GET_LEADER(room_ch) != ch) {
+			continue;
 		}
 	
-		// too-many-followers check
-		fol_count = 0;
-		DL_FOREACH_SAFE2(ROOM_PEOPLE(IN_ROOM(ch)), room_ch, next_ch, next_in_room) {
-			// check is npc following ch
-			if (room_ch == ch || room_ch->desc || !IS_NPC(room_ch) || GET_LEADER(room_ch) != ch) {
-				continue;
-			}
-		
-			// don't care about companions
-			if (GET_COMPANION(room_ch)) {
-				continue;
-			}
-		
-			if (++fol_count > config_get_int("npc_follower_limit")) {
-				REMOVE_BIT(AFF_FLAGS(room_ch), AFF_CHARM);
-				stop_follower(room_ch);
-			
-				if (can_fight(room_ch, ch)) {
-					act("$n becomes enraged!", FALSE, room_ch, NULL, NULL, TO_ROOM);
-					engage_combat(room_ch, ch, TRUE);
-				}
-			}
+		// don't care about companions
+		if (GET_COMPANION(room_ch)) {
+			continue;
 		}
 	
-		random_encounter(ch);
-	}	// end npc-only
+		if (++fol_count > config_get_int("npc_follower_limit")) {
+			REMOVE_BIT(AFF_FLAGS(room_ch), AFF_CHARM);
+			stop_follower(room_ch);
+		
+			if (can_fight(room_ch, ch)) {
+				act("$n becomes enraged!", FALSE, room_ch, NULL, NULL, TO_ROOM);
+				engage_combat(room_ch, ch, TRUE);
+			}
+		}
+	}
+
+	random_encounter(ch);
 	
 	// DO THESE LAST:
 	
 	// call point-update if it's our turn
-	if (IS_NPC(ch) && (GET_MOB_VNUM(ch) % REAL_UPDATES_PER_MUD_HOUR) == point_update_cycle) {
-		if (!point_update_char(ch)) {
+	if ((GET_IDNUM(ch) % REAL_UPDATES_PER_MUD_HOUR) == point_update_cycle) {
+		if (!point_update_player(ch)) {
 			return;
 		}
-	}
-	else if (!IS_NPC(ch) && (GET_IDNUM(ch) % REAL_UPDATES_PER_MUD_HOUR) == point_update_cycle) {
-		if (!point_update_char(ch)) {
-			return;
-		}
-	}
-	
-	// mob activity: if we're still here, run half the mobs each time
-	if (IS_NPC(ch) && (ABSOLUTE(GET_MOB_VNUM(ch)) % 2) == mobile_activity_cycle) {
-		run_mobile_activity(ch);
 	}
 }
 
@@ -1142,7 +949,7 @@ static void reduce_outside_territory_one(empire_data *emp) {
 	struct empire_city_data *city;
 	room_data *iter, *next_iter, *loc, *farthest;
 	int dist, this_far, far_dist, far_type, ter_type;
-	bool junk, outskirts_over, frontier_over, total_over;
+	bool junk, outskirts_over, frontier_over, total_over, was_large;
 	
 	// sanity
 	if (!emp || EMPIRE_IMM_ONLY(emp)) {
@@ -1170,14 +977,14 @@ static void reduce_outside_territory_one(empire_data *emp) {
 		loc = HOME_ROOM(iter);
 		
 		// if owner matches AND it's not in a city
-		if (ROOM_OWNER(loc) == emp && (ter_type = get_territory_type_for_empire(loc, emp, FALSE, &junk)) != TER_CITY) {
-			if (ter_type == TER_CITY) {
-				continue;	// NEVER do a city, even if total is over
+		if (ROOM_OWNER(loc) == emp && ((ter_type = get_territory_type_for_empire(loc, emp, FALSE, &junk, &was_large)) != TER_CITY || was_large)) {
+			if (ter_type == TER_CITY && !was_large) {
+				continue;	// NEVER do a city, even if total is over (except large-radius portions)
 			}
 			if (ter_type == TER_FRONTIER && !frontier_over && !total_over) {
 				continue;
 			}
-			else if (ter_type == TER_OUTSKIRTS && !outskirts_over && !total_over) {
+			else if ((ter_type == TER_OUTSKIRTS || was_large) && !outskirts_over && !total_over) {
 				continue;
 			}
 			
@@ -1445,12 +1252,14 @@ void update_empire_needs(empire_data *emp, struct empire_island *eisle, struct e
 //// OBJECT LIMITS ///////////////////////////////////////////////////////////
 
 /**
-* Checks and runs an autostore for an object.
+* Checks and runs an autostore for an object. This function does NOT check the
+* basic autostore timer, but it WILL check the timer if it's in a room with
+* long-autostore (unless force=TRUE).
 *
 * @param obj_data *obj The item to check/store.
 * @param bool force If TRUE, ignores timers and players present and stores all storables.
 * @param empire_data *override_emp Optional: If not NULL, will store to this empire.
-* @return bool TRUE if the item is still in the world, FALSE if it was extracted
+* @return bool TRUE if the item is still in the world, FALSE if it was extracted (or if its autostore event should be canceled)
 */
 bool check_autostore(obj_data *obj, bool force, empire_data *override_emp) {
 	player_index_data *index;
@@ -1465,15 +1274,18 @@ bool check_autostore(obj_data *obj, bool force, empire_data *override_emp) {
 	// easy exclusions
 	top_obj = get_top_object(obj);
 	if (top_obj->carried_by || top_obj->worn_by) {
-		return TRUE;	// on a person
+		return FALSE;	// on a person
 	}
 	if (!CAN_WEAR(obj, ITEM_WEAR_TAKE) && !OBJ_CAN_STORE(obj)) {
-		return TRUE;	// no-take AND no-store
+		return FALSE;	// no-take AND no-store
 	}
-	
-	// timer check (if not forced)
-	if (!force && (GET_AUTOSTORE_TIMER(obj) + config_get_int("autostore_time") * SECS_PER_REAL_MIN) > time(0)) {
-		return TRUE;
+	if (!IN_ROOM(obj) && !obj->in_vehicle && !obj->in_obj) {
+		// we aren't somewhere that autostore would even work on us -- cancel it
+		return FALSE;
+	}
+	if (obj->in_vehicle && !force) {
+		// contents of a vehicle only auto-store on a force: cancel if automatic
+		return FALSE;
 	}
 	
 	// ensure object is in a room, or in an object in a room
@@ -1617,73 +1429,139 @@ bool check_autostore(obj_data *obj, bool force, empire_data *override_emp) {
 
 
 /**
-* This runs a point update (every hour tick) on an object.
+* Determines when the timer on an object timer's DG event should be set. A
+* result of 0 means "no need for this".
 *
-* @param obj_data *obj The object to update.
+* @param obj_data *obj The object.
+* @return int Number of seconds to schedule for, or 0 if it doesn't need it.
 */
-void point_update_obj(obj_data *obj) {
-	char buf[MAX_STRING_LENGTH];
-	char *to_char_str = NULL, *to_room_str = NULL;
-	room_data *to_room, *obj_r;
-	obj_data *top;
-	char_data *c;
+static int compute_obj_event_timer(obj_data *obj) {
+	int seconds = 0;
+	
+	if (GET_OBJ_TIMER(obj) > 0 || (LIGHT_IS_LIT(obj) && GET_LIGHT_HOURS_REMAINING(obj) > 0)) {
+		// timer or lit light
+		seconds = SECS_PER_MUD_HOUR;
+	}
+	else if (IN_ROOM(obj) && CAN_WEAR(obj, ITEM_WEAR_TAKE) && ROOM_SECT_FLAGGED(IN_ROOM(obj), SECTF_FRESH_WATER | SECTF_OCEAN)) {
+		// floating obj
+		seconds = SECS_PER_MUD_HOUR;
+	}
+	
+	return seconds;	// may still be 0
+}
+
+
+EVENTFUNC(obj_autostore_event) {
+	struct obj_event_data *data = (struct obj_event_data*)event_obj;
+	obj_data *obj = data->obj;
+	long when;
+	
+	when = GET_AUTOSTORE_TIMER(obj) + (config_get_int("autostore_time") * SECS_PER_REAL_MIN) - time(0);
+	
+	// double-check that it isn't in the future
+	if (when > 0) {
+		// ... and just re-enqueue it for the future
+		return when RL_SEC;
+	}
+	
+	// ok, always delete before doing anything else (storing the object would try to cancel this event)
+	delete_stored_event(&GET_OBJ_STORED_EVENTS(obj), SEV_OBJ_AUTOSTORE);
+	
+	if (!check_autostore(obj, FALSE, NULL)) {
+		// obj was autostored/purged, or other reasons not to reschedule
+		free(data);
+		return 0;	// don't re-enqueue
+	}
+	else {
+		// autostore prevented... check again soon
+		add_stored_event(&GET_OBJ_STORED_EVENTS(obj), SEV_OBJ_AUTOSTORE, the_event);
+		return 60 RL_SEC;	// re-enqueue for 1 minute from now and try again
+	}
+}
+
+
+EVENTFUNC(obj_hour_event) {
+	struct obj_event_data *data = (struct obj_event_data*)event_obj;
+	obj_data *obj = data->obj;
+	char_data *ch_iter, *pyro;
+	empire_data *emp, *enemy;
+	struct empire_political_data *pol;
+	room_data *home, *to_room;
+	vehicle_data *veh;
+	int new_timer;
 	time_t timer;
 	
-	// ensure this obj is actually in-game
-	top = get_top_object(obj);
-	if ((top->carried_by && !IN_ROOM(top->carried_by)) || (top->worn_by && !IN_ROOM(top->worn_by))) {
-		return;
+	// always delete first
+	delete_stored_event(&GET_OBJ_STORED_EVENTS(obj), SEV_OBJ_TIMER);
+	
+	// ensure the object is in-game SOMEWHERE
+	if (!obj_room(obj)) {
+		free(data);
+		return 0;	// do not re-enqueue
 	}
-
-	if (OBJ_FLAGGED(obj, OBJ_LIGHT)) {
-		if (GET_OBJ_TIMER(obj) == 2) {
+	
+	// things we do here:
+	
+	// check for burning-out message
+	if (LIGHT_IS_LIT(obj)) {
+		if (GET_LIGHT_HOURS_REMAINING(obj) == 2 || GET_OBJ_TIMER(obj) == 2) {
 			if (obj->worn_by) {
-				act("Your light begins to flicker and fade.", FALSE, obj->worn_by, obj, 0, TO_CHAR);
-				act("$n's light begins to flicker and fade.", TRUE, obj->worn_by, obj, 0, TO_ROOM);
-			}
-			else if (obj->carried_by)
-				act("$p begins to flicker and fade.", FALSE, obj->carried_by, obj, 0, TO_CHAR);
-			else if (IN_ROOM(obj))
-				if (ROOM_PEOPLE(IN_ROOM(obj)))
-					act("$p begins to flicker and fade.", FALSE, ROOM_PEOPLE(IN_ROOM(obj)), obj, 0, TO_CHAR | TO_ROOM);
-		}
-		else if (GET_OBJ_TIMER(obj) == 1) {
-			if (obj->worn_by) {
-				act("Your light burns out.", FALSE, obj->worn_by, obj, 0, TO_CHAR);
-				act("$n's light burns out.", TRUE, obj->worn_by, obj, 0, TO_ROOM);
+				act("Your light begins to flicker and fade.", FALSE, obj->worn_by, obj, NULL, TO_CHAR);
+				act("$n's light begins to flicker and fade.", TRUE, obj->worn_by, obj, NULL, TO_ROOM);
 			}
 			else if (obj->carried_by) {
-				act("$p burns out.", FALSE, obj->carried_by, obj, 0, TO_CHAR);
+				act("$p begins to flicker and fade.", FALSE, obj->carried_by, obj, NULL, TO_CHAR);
 			}
-			else if (IN_ROOM(obj)) {
-				if (ROOM_PEOPLE(IN_ROOM(obj)))
-					act("$p burns out.", FALSE, ROOM_PEOPLE(IN_ROOM(obj)), obj, 0, TO_CHAR | TO_ROOM);
+			else if (IN_ROOM(obj) && ROOM_PEOPLE(IN_ROOM(obj))) {
+				act("$p begins to flicker and fade.", FALSE, ROOM_PEOPLE(IN_ROOM(obj)), obj, NULL, TO_CHAR | TO_ROOM);
+			}
+		}
+		else if (GET_OBJ_TIMER(obj) == 1) {
+			// this section does NOT message for GET_LIGHT_HOURS_REMAINING(obj) == 1 (see: use_hour_of_light)
+			if (obj->worn_by) {
+				act("Your light burns out.", FALSE, obj->worn_by, obj, NULL, TO_CHAR);
+				act("$n's light burns out.", TRUE, obj->worn_by, obj, NULL, TO_ROOM);
+			}
+			else if (obj->carried_by) {
+				act("$p burns out.", FALSE, obj->carried_by, obj, NULL, TO_CHAR);
+			}
+			else if (IN_ROOM(obj) && ROOM_PEOPLE(IN_ROOM(obj))) {
+				act("$p burns out.", FALSE, ROOM_PEOPLE(IN_ROOM(obj)), obj, NULL, TO_CHAR | TO_ROOM);
 			}
 		}
 	}
-
+	
+	// check light burnout
+	if (IS_LIGHT(obj) && !use_hour_of_light(obj, TRUE)) {
+		// extracted
+		free(data);
+		return 0;	// don't re-enqueue
+	}
+	
 	// float or sink
 	if (IN_ROOM(obj) && CAN_WEAR(obj, ITEM_WEAR_TAKE) && ROOM_SECT_FLAGGED(IN_ROOM(obj), SECTF_FRESH_WATER | SECTF_OCEAN)) {
 		if (materials[GET_OBJ_MATERIAL(obj)].floats && (to_room = real_shift(IN_ROOM(obj), shift_dir[WEST][0], shift_dir[WEST][1]))) {
 			if (!number(0, 2) && !ROOM_SECT_FLAGGED(to_room, SECTF_ROUGH) && !ROOM_IS_CLOSED(to_room)) {
 				// float-west message
-				DL_FOREACH2(ROOM_PEOPLE(IN_ROOM(obj)), c, next_in_room) {
-					if (c->desc) {
-						sprintf(buf, "$p floats %s.", dirs[get_direction_for_char(c, WEST)]);
-						act(buf, TRUE, c, obj, NULL, TO_CHAR);
+				DL_FOREACH2(ROOM_PEOPLE(IN_ROOM(obj)), ch_iter, next_in_room) {
+					if (ch_iter->desc) {
+						sprintf(buf, "$p floats %s.", dirs[get_direction_for_char(ch_iter, WEST)]);
+						act(buf, TRUE, ch_iter, obj, NULL, TO_CHAR);
 					}
 				}
 				
-				// move object but keep autostore
+				// move object but keep autostore time
 				timer = GET_AUTOSTORE_TIMER(obj);
+				suspend_autostore_updates = TRUE;
 				obj_to_room(obj, to_room);
-				GET_AUTOSTORE_TIMER(obj) = timer;
+				suspend_autostore_updates = FALSE;
+				schedule_obj_autostore_check(obj, timer);
 				
 				// floats-in message
-				DL_FOREACH2(ROOM_PEOPLE(IN_ROOM(obj)), c, next_in_room) {
-					if (c->desc) {
-						sprintf(buf, "$p floats in from %s.", from_dir[get_direction_for_char(c, WEST)]);
-						act(buf, TRUE, c, obj, NULL, TO_CHAR);
+				DL_FOREACH2(ROOM_PEOPLE(IN_ROOM(obj)), ch_iter, next_in_room) {
+					if (ch_iter->desc) {
+						sprintf(buf, "$p floats in from %s.", from_dir[get_direction_for_char(ch_iter, WEST)]);
+						act(buf, TRUE, ch_iter, obj, NULL, TO_CHAR);
 					}
 				}
 			}
@@ -1692,12 +1570,234 @@ void point_update_obj(obj_data *obj) {
 			if (ROOM_PEOPLE(IN_ROOM(obj))) {
 				act("$p sinks quickly to the bottom.", TRUE, ROOM_PEOPLE(IN_ROOM(obj)), obj, 0, TO_CHAR | TO_ROOM);
 			}
+			free(data);
 			extract_obj(obj);
-			return;
+			return 0;	// don't re-enqueue
 		}
 	}
+	
+	// check main obj timer
+	if (!tick_obj_timer(obj)) {
+		free(data);
+		return 0;	// don't re-enqueue
+	}
+	
+	// burn the room? ONLY if we got this far
+	if (LIGHT_IS_LIT(obj) && LIGHT_FLAGGED(obj, LIGHT_FLAG_LIGHT_FIRE) && IN_ROOM(obj) && IS_ANY_BUILDING(IN_ROOM(obj))) {
+		if ((veh = GET_ROOM_VEHICLE(IN_ROOM(obj))) && VEH_FLAGGED(veh, VEH_BURNABLE) && !VEH_FLAGGED(veh, VEH_ON_FIRE)) {
+			// burnable vehicle
+			/// ensure it SHOULD catch fire
+			if (obj->last_empire_id != NOTHING || !VEH_OWNER(veh)) {
+				// ensure empire is at war
+				emp = VEH_OWNER(veh);
+				enemy = real_empire(obj->last_empire_id);
+				
+				// check for war
+				if (!emp || (enemy && (pol = find_relation(enemy, emp)) && IS_SET(pol->type, DIPL_WAR))) {
+					if (ROOM_PEOPLE(IN_ROOM(obj))) {
+						act("A stray ember from $p ignites $V!", FALSE, ROOM_PEOPLE(IN_ROOM(obj)), obj, veh, TO_CHAR | TO_ROOM);
+					}
+					start_vehicle_burning(veh);
+					
+					if (emp && obj->last_owner_id > 0 && (pyro = is_playing(obj->last_owner_id))) {
+						add_offense(emp, OFFENSE_BURNED_VEHICLE, pyro, IN_ROOM(obj), offense_was_seen(pyro, emp, IN_ROOM(obj)) ? OFF_SEEN : NOBITS);
+					}
+				}
+			}
+		}
+		else if (!veh && (home = HOME_ROOM(IN_ROOM(obj))) && ROOM_BLD_FLAGGED(home, BLD_BURNABLE) && !IS_BURNING(home)) {
+			// burnable building
+			// only items with an empire id are considered: you can't burn stuff down by accident (unless the building is unowned)
+			if (obj->last_empire_id != NOTHING || !ROOM_OWNER(home)) {
+				// check that the empire is at war
+				emp = ROOM_OWNER(home);
+				enemy = real_empire(obj->last_empire_id);
+				
+				// check for war
+				if (!emp || (enemy && (pol = find_relation(enemy, emp)) && IS_SET(pol->type, DIPL_WAR))) {
+					if (ROOM_PEOPLE(IN_ROOM(obj))) {
+						act("A stray ember from $p ignites the room!", FALSE, ROOM_PEOPLE(IN_ROOM(obj)), obj, NULL, TO_CHAR | TO_ROOM);
+					}
+					start_burning(home);
+					
+					if (emp && obj->last_owner_id > 0 && (pyro = is_playing(obj->last_owner_id))) {
+						add_offense(emp, OFFENSE_BURNED_BUILDING, pyro, IN_ROOM(obj), offense_was_seen(pyro, emp, IN_ROOM(obj)) ? OFF_SEEN : NOBITS);
+					}
+				}
+			}
+		}
+	}
+	
+	// END: determine new timer
+	if ((new_timer = compute_obj_event_timer(obj)) > 0) {
+		// re-store, re-enqueue, and try again
+		if (!find_stored_event(GET_OBJ_STORED_EVENTS(obj), SEV_OBJ_TIMER)) {
+			add_stored_event(&GET_OBJ_STORED_EVENTS(obj), SEV_OBJ_TIMER, the_event);
+			return new_timer RL_SEC;
+		}
+		else {
+			// already added a new one -- just flush this one
+			free(data);
+			return 0;	// don't re-enqueue
+		}
+	
+	}
+	else {	// no longer need this
+		free(data);
+		return 0;	// don't re-enqueue
+	}
+}
 
-	/* timer count down */
+
+/**
+* Schedules a check_autostore when an item is put into a room, vehicle, or
+* other object.
+*
+* NOTE: The "autostore timer" on the object is the time it was dropped, NOT the
+* time at which it will store.
+*
+* @param obj_data *obj The object.
+* @param long new_autostore_timer Optional: Will also update the autostore timer to this timestamp and reschedule if necessary (pass 0 to not-change).
+*/
+void schedule_obj_autostore_check(obj_data *obj, long new_autostore_timer) {
+	struct obj_event_data *data;
+	struct dg_event *ev;
+	long seconds;
+	bool change = FALSE;
+	
+	if (!obj) {
+		return;	// ???
+	}
+	
+	// figure out correct time
+	if (new_autostore_timer > 0 && new_autostore_timer != GET_AUTOSTORE_TIMER(obj)) {
+		GET_AUTOSTORE_TIMER(obj) = new_autostore_timer;
+		change = TRUE;
+	}
+	
+	// already have an event?
+	if (find_stored_event(GET_OBJ_STORED_EVENTS(obj), SEV_OBJ_AUTOSTORE)) {
+		if (change) {
+			// ok: cancel and reschedule
+			cancel_stored_event(&GET_OBJ_STORED_EVENTS(obj), SEV_OBJ_AUTOSTORE);
+		}
+		else {
+			return;	// have one already (and we're not updating it)
+		}
+	}
+	
+	// find out when
+	seconds = GET_AUTOSTORE_TIMER(obj) + (config_get_int("autostore_time") * SECS_PER_REAL_MIN) - time(0);
+	if (seconds < 1) {
+		// do it in the near-future if it's passed (usually due to a reboot)
+		// random timing spreads them out when there's a bunch
+		seconds = number(1, 20);
+	}
+	
+	CREATE(data, struct obj_event_data, 1);
+	data->obj = obj;
+	
+	ev = dg_event_create(obj_autostore_event, data, seconds RL_SEC);
+	add_stored_event(&GET_OBJ_STORED_EVENTS(obj), SEV_OBJ_AUTOSTORE, ev);
+}
+
+
+/**
+* Schedules any timer updates an item needs as DG events.
+*
+* NOTE: some of the when-to-schedule also appears in obj_hour_event
+*
+* @param obj_data *obj The object.
+* @param bool override If TRUE, will delete any existing event.
+*/
+void schedule_obj_timer_update(obj_data *obj, bool override) {
+	struct obj_event_data *data;
+	struct dg_event *ev;
+	int seconds;
+	
+	if (!obj) {
+		return;	// ???
+	}
+	else if (!override && find_stored_event(GET_OBJ_STORED_EVENTS(obj), SEV_OBJ_TIMER)) {
+		return;	// have one already
+	}
+	
+	// delete first?
+	if (override) {
+		cancel_stored_event(&GET_OBJ_STORED_EVENTS(obj), SEV_OBJ_TIMER);
+	}
+	
+	// do we need to be scheduled?
+	seconds = compute_obj_event_timer(obj);
+	
+	// we only schedule here, not cancel -- it will cancel itself
+	if (seconds > 0) {
+		if (add_chaos_to_obj_timers) {
+			seconds += number(0, SECS_PER_MUD_HOUR-1);
+		}
+		
+		CREATE(data, struct obj_event_data, 1);
+		data->obj = obj;
+		
+		ev = dg_event_create(obj_hour_event, data, seconds RL_SEC);
+		add_stored_event(&GET_OBJ_STORED_EVENTS(obj), SEV_OBJ_TIMER, ev);
+	}
+}
+
+
+/**
+* Schedules obj timers on an object plus any objects inside it, and inside
+* those objects, and so on.
+*
+* @param obj_data *obj The object to schedule timers on.
+*/
+static void schedule_all_obj_timers_recursive(obj_data *obj) {
+	obj_data *inner, *next_obj;
+	
+	if (obj) {
+		schedule_obj_timer_update(obj, TRUE);
+		DL_FOREACH_SAFE2(obj->contains, inner, next_obj, next_content) {
+			schedule_all_obj_timers_recursive(inner);
+	    }
+	}
+}
+
+
+/**
+* Called when a player enters the game to schedule timers as-needed for all
+* their items. May be called in other cases where this is appropriate, too. It
+* will override any existing timers on the items.
+*
+* @param char_data *ch The person whose objects need scheduling.
+*/
+void schedule_all_obj_timers(char_data *ch) {
+	obj_data *obj, *next_obj;
+	int pos;
+	
+	for (pos = 0; pos < NUM_WEARS; ++pos) {
+		if (GET_EQ(ch, pos)) {
+			schedule_all_obj_timers_recursive(GET_EQ(ch, pos));
+		}
+	}
+	
+	DL_FOREACH_SAFE2(ch->carrying, obj, next_obj, next_content) {
+		schedule_all_obj_timers_recursive(obj);
+	}
+}
+
+
+/**
+* Does a game-hour tick on an object's timer.
+*
+* @param obj_data *obj The object.
+* @return bool FALSE if the object was purged, TRUE if it survived
+*/
+bool tick_obj_timer(obj_data *obj) {
+	char *to_char_str = NULL, *to_room_str = NULL;
+	room_data *obj_r;
+	int trig_result;
+	
+	// timer count down
 	if (GET_OBJ_TIMER(obj) > 0) {
 		GET_OBJ_TIMER(obj)--;
 	}
@@ -1705,12 +1805,18 @@ void point_update_obj(obj_data *obj) {
 	if (GET_OBJ_TIMER(obj) == 0) {
 		obj_r = obj_room(obj);
 		
-		if (!timer_otrigger(obj) || obj_room(obj) != obj_r) {
-			return;
+		// run triggers (-1 = purged, 0 is just cancel this expiry)
+		trig_result = timer_otrigger(obj);
+		if (trig_result == -1) {
+			return FALSE;
+		}
+		else if (trig_result == 0 || obj_room(obj) != obj_r) {
+			return TRUE;	// survived, but not finishing the timer
 		}
 		
 		if (IS_DRINK_CONTAINER(obj)) {
-			// messaging
+			// special handling: drink containers USUALLY just get emptied
+			// messaging: 
 			if (GET_DRINK_CONTAINER_CONTENTS(obj) > 0 || OBJ_FLAGGED(obj, OBJ_SINGLE_USE)) {
 				// messaging to char
 				if (obj->carried_by || obj->worn_by) {
@@ -1756,10 +1862,10 @@ void point_update_obj(obj_data *obj) {
 				
 				empty_obj_before_extract(obj);
 				extract_obj(obj);
-				return;
+				return FALSE;
 			}
 		}
-		else {  // all others actually decay
+		else {  // all others (not drink containers) actually decay
 			// check custom messages first, then material message, then default
 			if (obj->carried_by || obj->worn_by) {
 				if (obj_has_custom_message(obj, OBJ_CUSTOM_DECAYS_ON_CHAR)) {
@@ -1800,58 +1906,12 @@ void point_update_obj(obj_data *obj) {
 			
 			empty_obj_before_extract(obj);
 			extract_obj(obj);
-			return;
+			return FALSE;
 		} // end non-drink decay
 	}
 	
-	// 2nd type of timer: the autostore timer (keeps the world clean of litter)
-	if (!check_autostore(obj, FALSE, NULL)) {
-		return;
-	}
-}
-
-
-/**
-* Real update (per 5 seconds) on an object. This is only for things that need
-* to happen that often. Everything else happens in a point update.
-*
-* @param obj_data *obj The object to update.
-*/
-void real_update_obj(obj_data *obj) {
-	struct empire_political_data *pol;
-	empire_data *emp, *enemy;
-	room_data *home;
-	char_data *pyro;
-	
-	// burny
-	if (OBJ_FLAGGED(obj, OBJ_LIGHT) && IN_ROOM(obj) && IS_ANY_BUILDING(IN_ROOM(obj))) {
-		home = HOME_ROOM(IN_ROOM(obj));
-		if (ROOM_BLD_FLAGGED(home, BLD_BURNABLE) && !IS_BURNING(home)) {
-			// only items with an empire id are considered: you can't burn stuff down by accident (unless the building is unowned)
-			if (obj->last_empire_id != NOTHING || !ROOM_OWNER(home)) {
-				// check that the empire is at war
-				emp = ROOM_OWNER(home);
-				enemy = real_empire(obj->last_empire_id);
-				
-				// check for war
-				if (!emp || (enemy && (pol = find_relation(enemy, emp)) && IS_SET(pol->type, DIPL_WAR))) {
-					if (ROOM_PEOPLE(IN_ROOM(obj))) {
-						act("A stray ember from $p ignites the room!", FALSE, ROOM_PEOPLE(IN_ROOM(obj)), obj, NULL, TO_CHAR | TO_ROOM);
-					}
-					start_burning(home);
-					
-					if (emp && obj->last_owner_id > 0 && (pyro = is_playing(obj->last_owner_id))) {
-						add_offense(emp, OFFENSE_BURNED_BUILDING, pyro, IN_ROOM(pyro), offense_was_seen(pyro, emp, IN_ROOM(obj)) ? OFF_SEEN : NOBITS);
-					}
-				}
-			}
-		}
-	}
-	
-	// point-update if it's my turn
-	if ((ABSOLUTE(GET_OBJ_VNUM(obj)) % REAL_UPDATES_PER_MUD_HOUR) == point_update_cycle) {
-		point_update_obj(obj);
-	}
+	// obj survived?
+	return TRUE;
 }
 
 
@@ -2088,18 +2148,17 @@ void gain_condition(char_data *ch, int condition, int value) {
 	}
 
 	intoxicated = (GET_COND(ch, DRUNK) > 0);
-
-	GET_COND(ch, condition) += value;
-
-	GET_COND(ch, condition) = MAX(0, GET_COND(ch, condition));
-	GET_COND(ch, condition) = MIN(MAX_CONDITION, GET_COND(ch, condition));
+	
+	// add the value
+	SAFE_ADD(GET_COND(ch, condition), value, 0, MAX_CONDITION, FALSE);
 	
 	// prevent well-fed if hungry
 	if (IS_HUNGRY(ch) && value > 0) {
 		affect_from_char(ch, ATYPE_WELL_FED, TRUE);
 	}
-
-	if (!gain_cond_message) {
+	
+	// too soon for a message?
+	if (GET_LAST_COND_MESSAGE_TIME(ch, condition) + SECS_PER_REAL_MIN > time(0)) {
 		return;
 	}
 
@@ -2107,18 +2166,21 @@ void gain_condition(char_data *ch, int condition, int value) {
 		case FULL: {
 			if (IS_HUNGRY(ch) && value > 0) {
 				msg_to_char(ch, "You are hungry.\r\n");
+				GET_LAST_COND_MESSAGE_TIME(ch, condition) = time(0);
 			}
 			return;
 		}
 		case THIRST: {
 			if (IS_THIRSTY(ch) && value > 0) {
 				msg_to_char(ch, "You are thirsty.\r\n");
+				GET_LAST_COND_MESSAGE_TIME(ch, condition) = time(0);
 			}
 			break;
 		}
 		case DRUNK: {
 			if (intoxicated && !GET_COND(ch, condition)) {
 				msg_to_char(ch, "You are now sober.\r\n");
+				GET_LAST_COND_MESSAGE_TIME(ch, condition) = time(0);
 			}
 			break;
 		}
@@ -2126,12 +2188,50 @@ void gain_condition(char_data *ch, int condition, int value) {
 }
 
 
+// processes heal-over-time applis
+EVENTFUNC(heal_over_time_event) {
+	struct char_event_data *data = (struct char_event_data*)event_obj;
+	char_data *ch = data->character;
+	
+	// ensure in-game or skip it
+	if (!IN_ROOM(ch)) {
+		return 5 RL_SEC;	// re-enqueue
+	}
+	
+	// always delete first
+	delete_stored_event(&GET_STORED_EVENTS(ch), SEV_HEAL_OVER_TIME);
+	
+	// work
+	if (GET_HEAL_OVER_TIME(ch) > 0 && !IS_DEAD(ch) && GET_POS(ch) >= POS_SLEEPING && GET_HEALTH(ch) > 0) {
+		heal(ch, ch, GET_HEAL_OVER_TIME(ch));
+	}
+	
+	// check done?
+	if (GET_HEAL_OVER_TIME(ch) <= 0 || IS_DEAD(ch) || EXTRACTED(ch)) {
+		free(data);
+		return 0;	// no re-enqueue
+	}
+	else {
+		// re-store, re-enqueue, and try again
+		if (!find_stored_event(GET_STORED_EVENTS(ch), SEV_HEAL_OVER_TIME)) {
+			add_stored_event(&GET_STORED_EVENTS(ch), SEV_HEAL_OVER_TIME, the_event);
+			return 5 RL_SEC;
+		}
+		else {
+			// already added a new one -- just flush this one
+			free(data);
+			return 0;
+		}
+	}
+}
+
+
 /**
-* health per 5 seconds
+* health per real update (usually 5 seconds)
 *
 * @param char_data *ch the person
 * @param bool info_only TRUE = no skillups
-* @return int How much health to gain per 5 seconds.
+* @return int How much health to gain per update.
 */
 int health_gain(char_data *ch, bool info_only) {
 	double gain, min, needed;
@@ -2166,11 +2266,11 @@ int health_gain(char_data *ch, bool info_only) {
 
 
 /**
-* mana per 5 seconds
+* mana per real update (usually 5 seconds)
 *
 * @param char_data *ch the person
 * @param bool info_only TRUE = no skillups
-* @return int How much mana to gain per 5 seconds.
+* @return int How much mana to gain per update.
 */
 int mana_gain(char_data *ch, bool info_only) {
 	double gain, min, needed;
@@ -2220,11 +2320,11 @@ int mana_gain(char_data *ch, bool info_only) {
 
 
 /**
-* move per 5 seconds
+* move per real update (usually 5 seconds)
 *
 * @param char_data *ch the person
 * @param bool info_only TRUE = no skillups
-* @return int How much move to gain per 5 seconds.
+* @return int How much move to gain per update.
 */
 int move_gain(char_data *ch, bool info_only) {
 	double gain, min, needed;
@@ -2264,15 +2364,34 @@ int move_gain(char_data *ch, bool info_only) {
 	return MAX(0, (int)gain);
 }
 
+
+/**
+* Schedules an event for heal-over-time applies, if needed.
+*
+* @param char_data *ch The person with a heal-over-time effect.
+*/
+void schedule_heal_over_time(char_data *ch) {
+	struct char_event_data *data;
+	struct dg_event *ev;
+	
+	if (ch && GET_HEAL_OVER_TIME(ch) > 0 && !find_stored_event(GET_STORED_EVENTS(ch), SEV_HEAL_OVER_TIME)) {
+		CREATE(data, struct char_event_data, 1);
+		data->character = ch;
+		
+		ev = dg_event_create(heal_over_time_event, data, 5 RL_SEC);
+		add_stored_event(&GET_STORED_EVENTS(ch), SEV_HEAL_OVER_TIME, ev);
+	}
+}
+
+
  //////////////////////////////////////////////////////////////////////////////
 //// CORE PERIODICALS ////////////////////////////////////////////////////////
 
 /**
-* Real Update: runs every 5 seconds, primarily for player characters,
+* Real Update: generally every 5 seconds, primarily for player characters,
 * affects, and objects. REAL_UPDATES_PER_MUD_HOUR determines actual timing.
 */
 void real_update(void) {
-	obj_data *obj;
 	char_data *ch;
 	vehicle_data *veh;
 	
@@ -2297,24 +2416,18 @@ void real_update(void) {
 	if (++point_update_cycle >= REAL_UPDATES_PER_MUD_HOUR) {
 		point_update_cycle = 0;
 	}
-	mobile_activity_cycle = (mobile_activity_cycle ? 0 : 1);
 
-	// characters
-	DL_FOREACH_SAFE(character_list, ch, global_next_char) {
+	// players
+	DL_FOREACH_SAFE2(player_character_list, ch, global_next_player, next_plr) {
 		if (!EXTRACTED(ch)) {
-			real_update_char(ch);
+			real_update_player(ch);
 		}
-	}
-
-	// objs
-	DL_FOREACH_SAFE(object_list, obj, global_next_obj) {
-		real_update_obj(obj);
 	}
 	
 	// vehicles
 	DL_FOREACH_SAFE(vehicle_list, veh, global_next_vehicle) {
 		// each vehicle runs during part of the hour
-		if (!VEH_IS_EXTRACTED(veh) && (VEH_VNUM(veh) % REAL_UPDATES_PER_MUD_HOUR) == point_update_cycle) {
+		if (!VEH_IS_EXTRACTED(veh) && (ABSOLUTE(VEH_VNUM(veh)) % REAL_UPDATES_PER_MUD_HOUR) == point_update_cycle) {
 			point_update_vehicle(veh);
 		}
 	}

@@ -65,7 +65,7 @@ static void wear_message(char_data *ch, obj_data *obj, int where);
 
 // ONLY flags to show on identify / warehouse inv
 // TODO consider moving this to structs.h near the flag list
-bitvector_t show_obj_flags = OBJ_LIGHT | OBJ_SUPERIOR | OBJ_ENCHANTED | OBJ_JUNK | OBJ_TWO_HANDED | OBJ_BIND_ON_EQUIP | OBJ_BIND_ON_PICKUP | OBJ_HARD_DROP | OBJ_GROUP_DROP | OBJ_GENERIC_DROP | OBJ_UNIQUE;
+bitvector_t show_obj_flags = OBJ_SUPERIOR | OBJ_ENCHANTED | OBJ_JUNK | OBJ_TWO_HANDED | OBJ_BIND_ON_EQUIP | OBJ_BIND_ON_PICKUP | OBJ_HARD_DROP | OBJ_GROUP_DROP | OBJ_GENERIC_DROP | OBJ_UNIQUE;
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -168,6 +168,96 @@ int count_objs_in_room(room_data *room) {
 
 
 /**
+* Douses a LIGHT-type object, if possible. This turns it off, charges 1 hour of
+* light time (lost fuel; also prevents well-timed infinite lights by dousing
+* and re-lighting). This will extract JUNK-WHEN-EXPIRED and DESTROY-WHEN-DOUSED
+* lights on its own.
+*
+* If this returns TRUE, you can check success with LIGHT_IS_LIT(obj).
+*
+* @param obj_data *obj The LIGHT + CAN-DOUSE object to be doused (may be purged).
+* @return bool Returns FALSE if the light was purged; TRUE in all other cases (even if not doused).
+*/
+bool douse_light(obj_data *obj) {
+	if (IS_LIGHT(obj) && LIGHT_IS_LIT(obj) && LIGHT_FLAGGED(obj, LIGHT_FLAG_CAN_DOUSE)) {
+		// charge 1 hour
+		if (GET_LIGHT_HOURS_REMAINING(obj) > 0) {
+			set_obj_val(obj, VAL_LIGHT_HOURS_REMAINING, GET_LIGHT_HOURS_REMAINING(obj) - 1);
+		}
+		
+		// turn off
+		set_obj_val(obj, VAL_LIGHT_IS_LIT, 0);
+		apply_obj_light(obj, FALSE);
+		
+		// should not be storable after this
+		SET_BIT(GET_OBJ_EXTRA(obj), OBJ_NO_STORE);
+		
+		if (LIGHT_FLAGGED(obj, LIGHT_FLAG_DESTROY_WHEN_DOUSED) || (GET_LIGHT_HOURS_REMAINING(obj) == 0 && LIGHT_FLAGGED(obj, LIGHT_FLAG_JUNK_WHEN_EXPIRED))) {
+			extract_obj(obj);
+			return FALSE;	// purged
+		}
+	}
+	
+	request_obj_save_in_world(obj);
+	return TRUE;	// not purged
+}
+
+
+/**
+* Finds an object for a characcter using hte 'light' command. This will prefer
+* an object they CAN light.
+*
+* @param char_data *ch The person who's looking.
+* @param char *name The target argument.
+* @param int *number Optional: For multi-list number targeting (look 4.hat; may be NULL)
+* @param obj_data *list The list to search.
+* @return obj_data *The item found, or NULL. May or may be lightable.
+*/
+obj_data *get_obj_in_list_vis_prefer_lightable(char_data *ch, char *name, int *number, obj_data *list) {
+	char copy[MAX_INPUT_LENGTH], *tmp = copy;
+	obj_data *i, *backup = NULL;
+	int num;
+	bool gave_num;
+	
+	if (!number) {
+		strcpy(tmp, name);
+		number = &num;
+		num = get_number(&tmp);
+	}
+	else {
+		tmp = name;
+	}
+	if (*number == 0) {
+		return NULL;
+	}
+	
+	// if the number is > 1 (PROBABLY requested #.name) take any item that matches
+	// note: this changed in b5.108; previously it could detect this more accurately
+	gave_num = (*number > 1);
+	
+	DL_FOREACH2(list, i, next_content) {
+		if (CAN_SEE_OBJ(ch, i) && MATCH_ITEM_NAME(tmp, i)) {
+			if (gave_num) {
+				if (--(*number) == 0) {
+					return i;
+				}
+			}
+			else {	// did not give a number
+				if (CAN_LIGHT_OBJ(i)) {
+					return i;	// is a match
+				}
+				else if (!backup) {
+					backup = i;	// missing interaction but otherwise a match
+				}
+			}
+		}
+	}
+
+	return backup;
+}
+
+
+/**
 * Returns the targeted position, or else the first place an item can be worn.
 *
 * @param char_data *ch The player.
@@ -216,21 +306,26 @@ obj_data *find_lighter_in_list(obj_data *list, bool *had_keep) {
 	*had_keep = FALSE;	// presumably
 	
 	DL_FOREACH2(list, obj, next_content) {
-		if (!IS_LIGHTER(obj)) {
-			continue;	// not a lighter
-		}
-		if (GET_LIGHTER_USES(obj) == UNLIMITED) {
-			if (!best || GET_LIGHTER_USES(best) != UNLIMITED || !OBJ_FLAGGED(best, OBJ_KEEP)) {
-				best = obj;	// new best
+		// two types of lighters:
+		if (IS_LIGHT(obj)) {
+			if (LIGHT_IS_LIT(obj) && LIGHT_FLAGGED(obj, LIGHT_FLAG_LIGHT_FIRE) && (!best || !IS_LIGHT(best))) {
+				best = obj;
 			}
 		}
-		else if (!OBJ_FLAGGED(obj, OBJ_KEEP)) {	// not unlmited; don't use kept items if not unlimited
-			if (!best || (GET_LIGHTER_USES(best) != UNLIMITED && GET_LIGHTER_USES(best) > GET_LIGHTER_USES(obj))) {
-				best = obj;	// new best
+		else if (IS_LIGHTER(obj)) {
+			if (GET_LIGHTER_USES(obj) == UNLIMITED) {
+				if (!best || (!IS_LIGHT(best) && GET_LIGHTER_USES(best) != UNLIMITED)) {
+					best = obj;	// new best
+				}
 			}
-		}
-		else {
-			*had_keep = TRUE;
+			else if (!OBJ_FLAGGED(obj, OBJ_KEEP)) {	// not unlmited; don't use kept items if not unlimited
+				if (!best || (GET_LIGHTER_USES(best) != UNLIMITED && GET_LIGHTER_USES(best) > GET_LIGHTER_USES(obj))) {
+					best = obj;	// new best
+				}
+			}
+			else {
+				*had_keep = TRUE;
+			}
 		}
 	}
 	
@@ -728,6 +823,20 @@ void identify_obj_to_char(obj_data *obj, char_data *ch, bool simple) {
 		}
 		case ITEM_MINIPET: {
 			msg_to_char(ch, "Grants minipet: %s%s\r\n", get_mob_name_by_proto(GET_MINIPET_VNUM(obj), TRUE), has_minipet(ch, GET_MINIPET_VNUM(obj)) ? " (owned)" :"");
+			break;
+		}
+		case ITEM_LIGHT: {
+			if (GET_LIGHT_HOURS_REMAINING(obj) == UNLIMITED) {
+				snprintf(part, sizeof(part), "does not burn out");
+			}
+			else {
+				snprintf(part, sizeof(part), "has %d hour%s of light remaining", GET_LIGHT_HOURS_REMAINING(obj), PLURAL(GET_LIGHT_HOURS_REMAINING(obj)));
+			}
+			msg_to_char(ch, "It %s (%s).\r\n", part, (GET_LIGHT_IS_LIT(obj) ? "lit" : "unlit"));
+			prettier_sprintbit(GET_LIGHT_FLAGS(obj), light_flags_for_identify, part);
+			if (*part) {
+				msg_to_char(ch, "Additional information: %s\r\n", part);
+			}
 			break;
 		}
 	}
@@ -1407,6 +1516,74 @@ static void wear_message(char_data *ch, obj_data *obj, int where) {
 
 
 /**
+* Consumes 1 hour of light on a LIGHT-type object. If this burns out the light
+* and it has the JUNK-WHEN-EXPIRED flag, the object is purged.
+*
+* @param obj_data *obj The light (may be purged).
+* @param bool messages If TRUE, will send burn-out messages.
+* @return bool Returns FALSE if the light was purged; TRUE in all other cases.
+*/
+bool use_hour_of_light(obj_data *obj, bool messages) {
+	bool was_lit = LIGHT_IS_LIT(obj) ? TRUE : FALSE;
+	
+	if (IS_LIGHT(obj) && GET_LIGHT_IS_LIT(obj)) {
+		// charge 1 hour
+		if (GET_LIGHT_HOURS_REMAINING(obj) > 0) {
+			set_obj_val(obj, VAL_LIGHT_HOURS_REMAINING, GET_LIGHT_HOURS_REMAINING(obj) - 1);
+			
+			// and ensure it's set no-store
+			SET_BIT(GET_OBJ_EXTRA(obj), OBJ_NO_STORE);
+		}
+		
+		// turn it off if necessary
+		if (GET_LIGHT_HOURS_REMAINING(obj) == 0) {
+			set_obj_val(obj, VAL_LIGHT_IS_LIT, 0);
+			
+			// to-char message
+			if ((obj->worn_by || obj->carried_by) && obj_has_custom_message(obj, OBJ_CUSTOM_DECAYS_ON_CHAR)) {
+				act(obj_get_custom_message(obj, OBJ_CUSTOM_DECAYS_ON_CHAR), FALSE, obj->worn_by ? obj->worn_by : obj->carried_by, obj, NULL, TO_CHAR);
+			}
+			else if (obj->worn_by) {
+				act("Your light burns out.", FALSE, obj->worn_by, obj, NULL, TO_CHAR);
+			}
+			else if (obj->carried_by) {
+				act("$p burns out.", FALSE, obj->carried_by, obj, NULL, TO_CHAR);
+			}
+			
+			// to-room message(s)
+			if (obj->worn_by) {
+				act("$n's light burns out.", TRUE, obj->worn_by, obj, NULL, TO_ROOM);
+			}
+			else if (IN_ROOM(obj) && ROOM_PEOPLE(IN_ROOM(obj))) {
+				if (obj_has_custom_message(obj, OBJ_CUSTOM_DECAYS_IN_ROOM)) {
+					act(obj_get_custom_message(obj, OBJ_CUSTOM_DECAYS_IN_ROOM), FALSE, ROOM_PEOPLE(IN_ROOM(obj)), obj, NULL, TO_CHAR | TO_ROOM);
+				}
+				else {
+					act("$p burns out.", FALSE, ROOM_PEOPLE(IN_ROOM(obj)), obj, NULL, TO_CHAR | TO_ROOM);
+				}
+			}
+			
+			// lights out (ensure it was lit coming in if we do this
+			if (was_lit) {
+				apply_obj_light(obj, FALSE);
+			}
+			
+			if (LIGHT_FLAGGED(obj, LIGHT_FLAG_JUNK_WHEN_EXPIRED)) {
+				extract_obj(obj);
+				return FALSE;	// purged
+			}
+		}
+		
+		// save soon
+		request_obj_save_in_world(obj);
+	}
+	
+	// safe
+	return TRUE;
+}
+
+
+/**
 * Attempt to learn a minipet. Caution: this may extract the obj.
 *
 * @param char_data *ch The player trying to learn it.
@@ -1445,7 +1622,10 @@ void use_minipet_obj(char_data *ch, obj_data *obj) {
 * @return bool TRUE if the item was used up and purged; FALSE if the item was not purged.
 */
 bool used_lighter(char_data *ch, obj_data *obj) {
-	if (!obj || !IS_LIGHTER(obj)) {
+	if (!ch || !obj) {
+		return FALSE;	// huh
+	}
+	if (!IS_LIGHTER(obj) && !IS_LIGHT(obj)) {
 		return FALSE;	// not even a lighter
 	}
 	
@@ -1459,7 +1639,8 @@ bool used_lighter(char_data *ch, obj_data *obj) {
 		reduce_obj_binding(obj, ch);
 	}
 	
-	if (GET_LIGHTER_USES(obj) != UNLIMITED) {
+	// only lighters (not lights) get used up here
+	if (IS_LIGHTER(obj) && GET_LIGHTER_USES(obj) != UNLIMITED) {
 		set_obj_val(obj, VAL_LIGHTER_USES, GET_LIGHTER_USES(obj) - 1);	// use 1 charge
 		SET_BIT(GET_OBJ_EXTRA(obj), OBJ_NO_STORE);	// no longer storable
 		
@@ -2511,10 +2692,10 @@ static void drink_message(char_data *ch, obj_data *obj, byte type, int subcmd, i
 		case drink_OBJ: {
 			// message to char
 			if (subcmd == SCMD_SIP) {
-				snprintf(buf, sizeof(buf), "You sip the %s liquid from $p.\r\n", get_generic_string_by_vnum(GET_DRINK_CONTAINER_TYPE(obj), GENERIC_LIQUID, GSTR_LIQUID_COLOR));
+				snprintf(buf, sizeof(buf), "You sip the %s liquid from $p.", get_generic_string_by_vnum(GET_DRINK_CONTAINER_TYPE(obj), GENERIC_LIQUID, GSTR_LIQUID_COLOR));
 				act(buf, FALSE, ch, obj, NULL, TO_CHAR);
 			}
-			if (obj_has_custom_message(obj, OBJ_CUSTOM_CONSUME_TO_CHAR)) {
+			else if (obj_has_custom_message(obj, OBJ_CUSTOM_CONSUME_TO_CHAR)) {
 				act(obj_get_custom_message(obj, OBJ_CUSTOM_CONSUME_TO_CHAR), FALSE, ch, obj, get_generic_string_by_vnum(GET_DRINK_CONTAINER_TYPE(obj), GENERIC_LIQUID, GSTR_LIQUID_NAME), TO_CHAR);
 			}
 			else {
@@ -2522,7 +2703,10 @@ static void drink_message(char_data *ch, obj_data *obj, byte type, int subcmd, i
 			}
 			
 			// message to room
-			if (subcmd != SCMD_SIP && obj_has_custom_message(obj, OBJ_CUSTOM_CONSUME_TO_ROOM)) {
+			if (subcmd == SCMD_SIP) {
+				act("$n sips from $p.", TRUE, ch, obj, NULL, TO_ROOM);
+			}
+			else if (obj_has_custom_message(obj, OBJ_CUSTOM_CONSUME_TO_ROOM)) {
 				act(obj_get_custom_message(obj, OBJ_CUSTOM_CONSUME_TO_ROOM), TRUE, ch, obj, get_generic_string_by_vnum(GET_DRINK_CONTAINER_TYPE(obj), GENERIC_LIQUID, GSTR_LIQUID_NAME), TO_ROOM);
 			}
 			else {
@@ -2599,6 +2783,7 @@ void fill_from_room(char_data *ch, obj_data *obj) {
 	/* First same type liq. */
 	set_obj_val(obj, VAL_DRINK_CONTAINER_TYPE, liquid);
 	GET_OBJ_TIMER(obj) = timer;
+	schedule_obj_timer_update(obj, FALSE);
 
 	set_obj_val(obj, VAL_DRINK_CONTAINER_CONTENTS, GET_DRINK_CONTAINER_CAPACITY(obj));
 	request_obj_save_in_world(obj);
@@ -4105,6 +4290,11 @@ void trade_post(char_data *ch, char *argument) {
 		
 		charge_coins(ch, GET_LOYALTY(ch), post_cost, NULL);
 		
+		// SEV_x: events that must be canceled or changed when an item is posted
+		cancel_stored_event(&GET_OBJ_STORED_EVENTS(obj), SEV_OBJ_AUTOSTORE);
+		cancel_stored_event(&GET_OBJ_STORED_EVENTS(obj), SEV_OBJ_TIMER);
+		// TODO: convert to a timer that can tick while in the trade queue? or prevent timer items from trade
+		
 		CREATE(tpd, struct trading_post_data, 1);
 		
 		// put at end of list
@@ -5096,7 +5286,7 @@ ACMD(do_drink) {
 	}
 
 	/* The pig is drunk */
-	if (GET_COND(ch, DRUNK) > 360 && GET_COND(ch, THIRST) < 345) {
+	if (IS_DRUNK(ch) && !IS_THIRSTY(ch)) {
 		if (type >= 0)
 			msg_to_char(ch, "You're so inebriated that you don't dare get that close to the water.\r\n");
 		else {
@@ -5178,7 +5368,7 @@ ACMD(do_drink) {
 	
 	// apply effects
 	if (liquid == LIQ_BLOOD) {
-		GET_BLOOD(ch) = MIN(GET_MAX_BLOOD(ch), GET_BLOOD(ch) + amount);
+		set_blood(ch, GET_BLOOD(ch) + amount);
 	}
 	
 	// -1 to remove condition, amount = number of gulps
@@ -5542,13 +5732,13 @@ ACMD(do_eat) {
 		affect_from_char(ch, ATYPE_WELL_FED, FALSE);
 		
 		if (GET_OBJ_AFF_FLAGS(food)) {
-			af = create_flag_aff(ATYPE_WELL_FED, eat_hours MUD_HOURS, GET_OBJ_AFF_FLAGS(food), ch);
+			af = create_flag_aff(ATYPE_WELL_FED, eat_hours * SECS_PER_MUD_HOUR, GET_OBJ_AFF_FLAGS(food), ch);
 			affect_to_char(ch, af);
 			free(af);
 		}
 
 		LL_FOREACH(GET_OBJ_APPLIES(food), apply) {
-			af = create_mod_aff(ATYPE_WELL_FED, eat_hours MUD_HOURS, apply->location, apply->modifier, ch);
+			af = create_mod_aff(ATYPE_WELL_FED, eat_hours * SECS_PER_MUD_HOUR, apply->location, apply->modifier, ch);
 			affect_to_char(ch, af);
 			free(af);
 		}
@@ -6198,16 +6388,14 @@ ACMD(do_keep) {
 }
 
 
-// also do_burn
+// prior to b5.152, this was also do_burn
 ACMD(do_light) {
-	const char *cmdname[] = { "light", "burn" };	// also in do_burn_area
-	
 	bool objless = has_player_tech(ch, PTECH_LIGHT_FIRE);
-	char buf[MAX_STRING_LENGTH], *argptr = arg;
+	char *argptr = arg;
 	obj_data *obj, *lighter = NULL;
 	vehicle_data *veh;
 	bool kept = FALSE;
-	int number;
+	int number, dir;
 
 	one_argument(argument, arg);
 	number = get_number(&argptr);
@@ -6217,8 +6405,7 @@ ACMD(do_light) {
 	}
 
 	if (!*argptr) {
-		sprintf(buf, "%s what?\r\n", cmdname[subcmd]);
-		send_to_char(CAP(buf), ch);
+		msg_to_char(ch, "Light what?\r\n");
 	}
 	else if (!IS_NPC(ch) && !objless && !lighter) {
 		// nothing to light it with
@@ -6226,28 +6413,31 @@ ACMD(do_light) {
 			msg_to_char(ch, "You need a lighter that isn't marked 'keep'.\r\n");
 		}
 		else {
-			msg_to_char(ch, "You don't have anything to %s that with.\r\n", cmdname[subcmd]);
+			msg_to_char(ch, "You don't have anything to light that with.\r\n");
 		}
 	}
-	else if (!(obj = get_obj_in_list_vis_prefer_interaction(ch, argptr, &number, ch->carrying, INTERACT_LIGHT)) && !(obj = get_obj_in_list_vis_prefer_interaction(ch, argptr, &number, ROOM_CONTENTS(IN_ROOM(ch)), INTERACT_LIGHT))) {
-		// try burning a vehicle
-		if ((veh = get_vehicle_in_room_vis(ch, argptr, &number))) {
-			do_light_vehicle(ch, veh, lighter);
-		}
-		else if (!str_cmp(arg, "area") || !str_cmp(arg, "room") || !str_cmp(arg, "here") || isname(arg, get_room_name(IN_ROOM(ch), FALSE))) {
-			do_burn_area(ch, subcmd);
+	else if (!(obj = get_obj_in_list_vis_prefer_lightable(ch, argptr, &number, ch->carrying)) && !(obj = get_obj_in_list_vis_prefer_lightable(ch, argptr, &number, ROOM_CONTENTS(IN_ROOM(ch))))) {
+		// invalid arg... trying to light one of these?
+		if (generic_find(argptr, &number, FIND_VEHICLE_ROOM | FIND_VEHICLE_INSIDE, ch, NULL, NULL, &veh) || (dir = parse_direction(ch, argptr)) != NO_DIR || is_abbrev(arg, "building") || is_abbrev(arg, "area") || is_abbrev(arg, "room") || is_abbrev(arg, "here") || isname(arg, get_room_name(IN_ROOM(ch), FALSE)) || isname(arg, GET_SECT_NAME(SECT(IN_ROOM(ch))))) {
+			msg_to_char(ch, "You can't light vehicles, buildings, or terrain with this command. Try 'burn' instead.\r\n");
 		}
 		else {
 			msg_to_char(ch, "You don't have %s %s.\r\n", AN(arg), arg);
 		}
 	}
-	else if (!has_interaction(GET_OBJ_INTERACTIONS(obj), INTERACT_LIGHT)) {
-		msg_to_char(ch, "You can't %s that!\r\n", cmdname[subcmd]);
+	else if (LIGHT_IS_LIT(obj) && !has_interaction(GET_OBJ_INTERACTIONS(obj), INTERACT_LIGHT)) {
+		msg_to_char(ch, "It's already lit!\r\n");
+	}
+	else if (!CAN_LIGHT_OBJ(obj)) {
+		act("You can't light $p!", FALSE, ch, obj, NULL, TO_CHAR);
+	}
+	else if (lighter == obj) {
+		msg_to_char(ch, "You can't use an item to light itself.\r\n");
 	}
 	else {
 		if (objless) {
-			act("You light $p on fire!", FALSE, ch, obj, NULL, TO_CHAR);
-			act("$n lights $p on fire!", FALSE, ch, obj, NULL, TO_ROOM);
+			act("You light $p!", FALSE, ch, obj, NULL, TO_CHAR);
+			act("$n lights $p!", FALSE, ch, obj, NULL, TO_ROOM);
 			gain_player_tech_exp(ch, PTECH_LIGHT_FIRE, 15);
 		}
 		else if (lighter) {
@@ -6272,10 +6462,23 @@ ACMD(do_light) {
 			act("$n lights $P.", FALSE, ch, NULL, obj, TO_ROOM);
 		}
 		
-		// will extract no matter what happens here
-		empty_obj_before_extract(obj);
-		run_interactions(ch, GET_OBJ_INTERACTIONS(obj), INTERACT_LIGHT, IN_ROOM(ch), NULL, obj, NULL, light_obj_interact);
-		extract_obj(obj);
+		if (!has_interaction(GET_OBJ_INTERACTIONS(obj), INTERACT_LIGHT) && IS_LIGHT(obj) && !GET_LIGHT_IS_LIT(obj) && GET_LIGHT_HOURS_REMAINING(obj) != 0) {
+			// lighting a light
+			set_obj_val(obj, VAL_LIGHT_IS_LIT, 1);
+			apply_obj_light(obj, TRUE);
+			schedule_obj_timer_update(obj, FALSE);
+			
+			// set no-store only if we kept the same object
+			SET_BIT(GET_OBJ_EXTRA(obj), OBJ_NO_STORE);
+			request_obj_save_in_world(obj);
+		}
+		else {
+			// running interactions: will extract no matter what happens here
+			empty_obj_before_extract(obj);
+			run_interactions(ch, GET_OBJ_INTERACTIONS(obj), INTERACT_LIGHT, IN_ROOM(ch), NULL, obj, NULL, light_obj_interact);
+			extract_obj(obj);
+		}
+		
 		command_lag(ch, WAIT_OTHER);
 		
 		if (lighter) {
@@ -6613,6 +6816,12 @@ ACMD(do_pour) {
 				return;
 			}
 			
+			// shortcut through do_douse_room if it's water and burning
+			if (IS_ANY_BUILDING(IN_ROOM(ch)) && IS_BURNING(HOME_ROOM(IN_ROOM(ch))) && GET_DRINK_CONTAINER_TYPE(from_obj) == LIQ_WATER) {
+				do_douse_room(ch, IN_ROOM(ch), from_obj);
+				return;
+			}
+			
 			act("$n empties $p.", TRUE, ch, from_obj, 0, TO_ROOM);
 			act("You empty $p.", FALSE, ch, from_obj, 0, TO_CHAR);
 
@@ -6676,6 +6885,7 @@ ACMD(do_pour) {
 	
 	// copy the timer on the liquid, even if UNLIMITED
 	GET_OBJ_TIMER(to_obj) = GET_OBJ_TIMER(from_obj);
+	schedule_obj_timer_update(to_obj, FALSE);
 
 	// check if there was too little to pour, and adjust
 	if (GET_DRINK_CONTAINER_CONTENTS(from_obj) <= 0) {

@@ -2796,11 +2796,7 @@ void qt_event_start_stop(any_vnum event_vnum) {
 	struct req_data *task;
 	char_data *ch;
 	
-	DL_FOREACH(character_list, ch) {
-		if (IS_NPC(ch)) {
-			continue;
-		}
-		
+	DL_FOREACH2(player_character_list, ch, next_plr) {
 		LL_FOREACH(GET_QUESTS(ch), pq) {
 			LL_FOREACH(pq->tracker, task) {
 				if (task->type == REQ_EVENT_RUNNING && task->vnum == event_vnum) {
@@ -4927,10 +4923,7 @@ void olc_delete_quest(char_data *ch, any_vnum vnum) {
 	remove_quest_from_table(quest);
 	
 	// look for people on the quest and force a refresh
-	DL_FOREACH(character_list, chiter) {
-		if (IS_NPC(chiter)) {
-			continue;
-		}
+	DL_FOREACH2(player_character_list, chiter, next_plr) {
 		if (!is_on_quest(chiter, vnum)) {
 			continue;
 		}

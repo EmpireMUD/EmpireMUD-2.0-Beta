@@ -950,9 +950,9 @@ This ability lets you light things without a fire source. It also allows you to
 brew potions, mix poisons, and cook foods without needing a fire or stove.
 However, you cannot bake with it.
 
-This ability gains experience when you use it to light things, but not when you
-cook things with it. It will be used in preference to fire sticks or other
-lighters.
+This ability gains experience when you use it to light or burn things, but not
+when you cook things with it. It will be used in preference to fire sticks or
+other lighters.
 
 See also: LIGHT
 #

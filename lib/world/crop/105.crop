@@ -40,7 +40,7 @@ I 8 10506 75.00 1 S  # HARVEST: handful of spadebrush seeds
 I 8 10506 25.00 2 S  # HARVEST: handful of spadebrush seeds
 I 9 121 100.00 1  # GATHER: sticks and leaves
 X
-spadebrush spades field~
+spadebrush spades field crop~
    These plants grow in neat rows, their branches twisted into perfect spades
 that could be used for digging. Each plant grows perfectly for this purpose,
 as if by magic.
@@ -108,8 +108,8 @@ I 8 10509 75.00 1 S  # HARVEST: handful of bladegrass seeds
 I 8 10509 25.00 2 S  # HARVEST: handful of bladegrass seeds
 X
 bladegrass grass field crop~
-   The blades of this odd grass are thin and pointed, like the edge of a razor. 
-The stalks are tough and sturdy, swaying in the wind like arrows in battle. 
+   The blades of this odd grass are thin and pointed, like the edge of a razor.
+The stalks are tough and sturdy, swaying in the wind like arrows in battle.
 The field glimmers with a faint metallic sheen, almost like iron.
 ~
 S

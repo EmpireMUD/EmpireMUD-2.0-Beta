@@ -362,6 +362,33 @@ For more information on building your first house, see HELP HOUSING GUIDE.
 See also: BUILD INFO, RESOURCES, KEEP, EMPIRE, DISMANTLE, DESIGNATE, RECIPES,
   BUILD ABILITY, CRAFTING ABILITIES
 #
+BURN
+
+Usage:  burn <building | vehicle | area | direction>
+
+To burn something, you must have fire sticks or some other lighter. You can use
+this command to light a building on fire, either from the same tile as the
+building (burn building), or from an adjecent tile (burn <direction>). If the
+building is claimed, you must be at war with the owner to do this. Buildings
+may also catch fire when a torch is dropped or thrown into them.
+
+You can also burn the area (either with 'burn area' or with any keyword from
+the room title) to remove stumps and other features. It can also be used to
+burn crops and seeded fields. This only works on certain terrain, and only on
+the tile you're on (not on adjacent tiles).
+
+Some lighters have a limited number of uses and will be thrown away afterwards.
+If you have marked a lighter 'keep', it won't be used (unless it has unlimited
+uses).
+
+You can also burn down some vehicles. You cannot burn other players' property
+if you are not a member of an empire. Burning your own buildings and vehicles
+requires the 'dismantle' privilege.
+
+To light torches or other items, use 'light'.
+
+See also: DOUSE, LIGHT, LIGHTERS, TORCH, PRIVILEGES
+#
 BUY LIST SHOP SHOPS
 
 Usage:  list [keywords]
@@ -409,7 +436,11 @@ If any land is claimed, the three empires with the most claims are listed
 (in descending order). All empires with cities are listed below that, although
 only one city is listed per empire. Outposts are not listed.
 
-See also: ISLANDS, SURVEY
+This command also shows names that other empires call the island. You can only
+see these names if you have a trade pact, non-aggression pact, or alliance with
+the empire.
+
+See also: DIPLOMACY, ISLANDS, SURVEY
 #
 CIRCLE
 
@@ -667,21 +698,23 @@ See also: MARK
 #
 DOUSE BURNING "PUT OUT FIRE" FIRE-BRIGADE "FIRE BRIGADE"
 
-Usage:  douse [vehicle | light]
+Usage:  douse [vehicle | light | fire]
 
-In the event of a fire, you may douse it with water from any portable source. 
-It may take a lot of water to douse the fire, and you may have to leave and 
-come back. If you don't fully douse it, the flames will slowly rise again, 
-and destroy your structure.
+In the event of a fire, you may douse it with water from any portable source,
+or with water from the room itself if any is available.  It may take a lot of
+water to douse the fire, and you may have to leave and come back if you're
+using a canteen or barrel. If you don't fully douse it, the flames will slowly
+rise again and destroy your structure.
 
 If your empire has a workforce, the fire-brigade can also put out fires for
 you. They will always succeed if left alone. However, they do so very slowly
 and are easy targets for enemy players at war.
 
-If you use this on a light such as a torch or cooking fire, it will extinguish
-the light (and destroy the object).
+If you use this on a light such as a torch, it will consume an hour from the
+time remaining on that light. Dousing some things may destroy them. Not all
+lights can be doused.
 
-See also: COOKING FIRE, LIGHT, WORKFORCE
+See also: BURN, LIGHT, WORKFORCE
 #
 DRAG
 
@@ -1024,6 +1057,13 @@ can use the empire's full name, adjective name, or number.
 
 See also: COINS, KEEP
 #
+GOSSIP
+
+EmpireMUD does not have the gossip channel. There are no global in-character
+channels.
+
+See also: CHANNELS
+#
 GRAB HOLD
 
 Usage:  grab <object>
@@ -1040,7 +1080,7 @@ Examples:
 
 See also: EQUIPMENT, REMOVE, WEAR, WIELD, SWAP
 #
-GROUP PARTY
+GROUP PARTY UNGROUP UNPARTY
 
 Usage:  group  -- see status on the group
         group invite <name>  -- invite a player to the group
@@ -1069,7 +1109,7 @@ aren't already following someone.
 The leader can use 'group options anonymous' to prevent members from seeing
 each others' locations.
 
-See also: ADVENTURE SUMMON, GSAY
+See also: ADVENTURE SUMMON, GSAY, SUMMARY
 #
 GSAY GTELL PSAY PTELL
 
@@ -1113,7 +1153,7 @@ Usage:  identify [inv] <item | vehicle>
 This command provides detailed information about an item or vehicle.
 
 Tip: When trying to identify an item in your inventory that has the same name
-as something you are wearing, try using '1.name'.
+as something you are wearing, try using 'id inv <name>'.
 
 Some items become something else (usually a more specific version of whatever
 they were) when you identify them. You can identify multiple items at a time
@@ -1236,6 +1276,14 @@ To find buildings that are interlinkable, try 'helpsearch interlink'.
 
 See also: HELPSEARCH, MARK
 #
+INSULT INSULTING
+
+Usage:  insult <person>
+
+This social command insults another person.
+
+See also: SOCIALS
+#
 JUNK "JUNK ITEM" "JUNK OBJECT"
 
 Usage:  junk <object>
@@ -1314,7 +1362,7 @@ Roads count as their base terrain for most building functions, so you can
 build things facing roads. Roads count as in-city territory when built in the
 outskirts (4x radius).
 
-See also: CHANT OF ILLUSIONS, EMPIRE, PATHFINDING, ROADSIGN
+See also: CHANT OF ILLUSIONS, EMPIRE, EXTENDED RADIUS, PATHFINDING, ROADSIGN
 #
 LEARN LEARNED LEARNING
 
@@ -1641,6 +1689,14 @@ Instruments will be played faster while hasted.
 
 See also: HOLD, TIMED ACTION
 #
+POINT
+
+Usage: point <direction | person>
+
+Your character points at the direction or person.
+
+See also: SOCIALS
+#
 POLITICAL "POLITICAL VIEW" "TOGGLE POLITICAL"
 
 Usage:  toggle political [on/off]
@@ -1728,6 +1784,13 @@ Examples:
   > pour cup out
 
 See also: FILL, TRENCH
+#
+PRACTICE PRACTICES PRACTICING
+
+EmpireMUD does not use the 'practice' system. Instead, manage your skills and
+abilities with the 'skill' command.
+
+See also: SKILLS
 #
 PROGRESS PROGRESSION "EMPIRE PROGRESSION" "PROGRESS GOALS" "PROGRESSION GOALS" "PROGRESS POINTS" GOAL GOALS
 
@@ -1896,6 +1959,25 @@ Examples:
 
 See also: GRAB, HOLD, WEAR, WIELD, SHEATH, DRAW, SWAP
 #
+RENT RENTING INN SAVING
+
+EmpireMUD does not use the 'rent' system from CircleMUD. Players generally log
+into the game in the same place they logged out, with their entire inventory
+and equipment intact.
+
+There are a few cases where people don't log back in in the same place. In
+these cases, the player is usually relocated to a tomb or Tower of Souls:
+- If they were in an adventure and it despawned, or they were logged out more
+  than an hour.
+- If they were in territory claimed by another player and were logged out more
+  than an hour.
+- If they were in a ship (or other vehicle) and the ship moved while they were
+  logged out.
+- If they have 'toggle autorecall' on and were logged out more than an hour,
+  in which case they they are sent to their home, if they have one.
+
+See also: HOME, STARTING LOCATION, TOGGLE AUTORECALL, TOMB
+#
 REPAIR MAINTAIN MAINTENANCE DISREPAIR
 
 Usage:  repair [vehicle | building]
@@ -1936,6 +2018,14 @@ You tell someone, 'Who are you?'
 
 See also: IGNORE, TELL, NOTELL
 Immortals see also: BREAKREPLY
+#
+REPORT
+
+EmpireMUD doesn't have a 'report' command. If you're looking on information on
+your group members, try the 'group' command by itself or the 'summary' command.
+If you want to see your own stats from combat, use 'meters'.
+
+See also: GROUP, METERS, SUMMARY
 #
 ROADSIGN "ROAD SIGN" SIGN "BLANK SIGN"
 
@@ -2072,7 +2162,7 @@ to save yourself.
 
 This is not the type of game where you can re-load from past saves.
 #
-SAY OOCSAY OSAY TELL ASK WHISPER ' ""
+SAY OOCSAY OSAY TELL ASK WHISPER ' \"
 
 Usage:  say <string>
         say #<language> <string>
@@ -2117,7 +2207,7 @@ Usage:  score
 The score command provides you all the important information about your
 character, including health and attributes.
 
-Your top two skills are dsplayed, if both of these skills are past 75. The
+Your top two skills are displayed, if both of these skills are past 75. The
 level shown on score is your total level, with your skill level shown in
 parentheses.
 
@@ -2438,8 +2528,10 @@ THROW
 
 Usage:  throw <object> <direction>
 
-This is used to throw an object into a near-by room. This is used primarily
-for burning down buildings.
+This is used to throw an object into an adjacent tile or building. This is used
+primarily for burning down buildings by throwing torches through the entrance.
+
+See also: BURN
 #
 TIE UNTIE
 
@@ -2472,6 +2564,8 @@ Handy time-conversion chart:
  - 1 hour in-game = 75 seconds
  - 1 day in-game = 30 minutes
  - 1 year in-game = 7.5 days
+
+See also: TIME ZONE, YEARLY RESET
 #
 TITLE
 
@@ -2569,6 +2663,9 @@ If you die, you will find yourself resurrected at your own tomb, so long as
 it's nearby. Otherwise, you'll find yourself at a random tomb or cemetery
 on the continent where you died, or at a starting location if there isn't a
 tomb available.
+
+Typing 'tomb' by itself will show your current tomb plus any available tombs
+on your current island.
 
 Basic tombs:
   ..x.  Grave  (newbie grave marker)
@@ -2726,6 +2823,13 @@ Example:
   > wield 3.sword    (Wield the third sword in your inventory)
 
 See also: EQUIPMENT, REMOVE, WEAR, SHEATH, DRAW, SWAP
+#
+WIMPY
+
+EmpireMUD does not have a 'wimpy' command. There is no automatic way for
+players to flee.
+
+See also: FLEE, FLEET
 #
 WIZLIST GODLIST
 

@@ -212,7 +212,8 @@ char_data *combat_list = NULL;	// head of l-list of fighting chars
 char_data *next_combat_list = NULL;	// used for iteration of combat_list when more than 1 person can be removed from combat in 1 loop iteration
 char_data *next_combat_list_main = NULL;	// used for iteration of combat_list in frequent_combat()
 struct generic_name_data *generic_names = NULL;	// LL of generic name sets
-char_data *global_next_char = NULL;	// used in limits.c for iterating
+char_data *global_next_player = NULL;	// used in limits.c for iterating
+char_data *player_character_list = NULL;	// global doubly-linked list of players-only (no NPCs)
 
 // morphs
 morph_data *morph_table = NULL;	// main morph hash table
@@ -221,6 +222,8 @@ morph_data *sorted_morphs = NULL;	// alphabetic version // sorted_hh
 // objects
 obj_data *object_list = NULL;	// global doubly-linked list of objs
 obj_data *object_table = NULL;	// hash table of objs
+bool suspend_autostore_updates = FALSE;	// prevents rescheduling an event twice in a row
+bool add_chaos_to_obj_timers = FALSE;	// spreads out object timers
 
 // safe obj iterators
 obj_data *purge_bound_items_next = NULL;	// used in purge_bound_items()
@@ -238,6 +241,7 @@ int max_inventory_size = 25;	// records how high inventories go right now (for s
 struct int_hash *inherent_ptech_hash = NULL;	// hash of PTECH_ that are automatic
 struct player_quest *global_next_player_quest = NULL;	// for safely iterating
 struct player_quest *global_next_player_quest_2 = NULL;	// it may be possible for 2 iterators at once on this
+struct over_time_effect_type *free_dots_list = NULL;	// global LL of DOTs that have expired and must be free'd late to prevent issues
 
 // progress
 progress_data *progress_table = NULL;	// hashed by vnum, sorted by vnum
@@ -1003,7 +1007,7 @@ void renum_world(void) {
 	process_temporary_room_data();
 	
 	HASH_ITER(hh, world_table, room, next_room) {
-		// affects
+		// schedule affects
 		LL_FOREACH(ROOM_AFFECTS(room), af) {
 			schedule_room_affect_expire(room, af);
 		}
@@ -1854,18 +1858,19 @@ char_data *read_mobile(mob_vnum nr, bool with_triggers) {
 		GET_MAX_MOVE(mob) = 1;
 	}
 	
+	// fix pools
 	for (iter = 0; iter < NUM_POOLS; ++iter) {
 		mob->points.current_pools[iter] = mob->points.max_pools[iter];
 	}
+
+	// GET_MAX_BLOOD is a function
+	GET_BLOOD(mob) = GET_MAX_BLOOD(mob);	// set ok: mob being loaded
 
 	mob->player.time.birth = time(0);
 	mob->player.time.played = 0;
 	mob->player.time.logon = time(0);
 
 	MOB_PURSUIT(mob) = NULL;
-
-	// GET_MAX_BLOOD is a function
-	GET_BLOOD(mob) = GET_MAX_BLOOD(mob);
 	
 	mob->script_id = 0;	// will detect when needed
 	
@@ -1878,7 +1883,7 @@ char_data *read_mobile(mob_vnum nr, bool with_triggers) {
 	}
 	
 	// note this may lead to slight over-spawning after reboots -pc 5/20/16
-	MOB_SPAWN_TIME(mob) = time(0);
+	set_mob_spawn_time(mob, time(0));
 	
 	// special handling for mobs with LIGHT flags on the prototype
 	if (AFF_FLAGGED(mob, AFF_LIGHT)) {

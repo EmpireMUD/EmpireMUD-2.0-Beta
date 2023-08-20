@@ -47,7 +47,7 @@ CARTOGRAPHY
 Cartography (Survival ability)
 
 Grants map-memory (allows you to remember tiles you've seen before when you
-can't see them due to darkness or being blocking by mountains). This ability
+can't see them due to darkness or being blocked by mountains). This ability
 gains experience whenever you look or scan on the map.
 
 See also: MAP-MEMORY, NAVIGATION
@@ -109,6 +109,7 @@ FISH FISHING "FISH COMMAND"
 Fish (Survival ability)
 
 Usage:  fish [direction]
+Speed boost:  Higher level fishing tool
 Tool:  basic spear
 
 Learn to live at the water's edge by fishing. As your skill improves, you will
@@ -244,7 +245,7 @@ Gains experience when you cross mountains while not riding.
 
 See also: CLIMB, AUTOCLIMB, BLOCKED TILE
 #
-NAVIGATION COORDINATES
+NAVIGATION NAVIGATE COORDINATES
 
 Navigation (Survival ability)
 

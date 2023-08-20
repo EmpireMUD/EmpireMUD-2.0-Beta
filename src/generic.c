@@ -42,7 +42,7 @@
 
 // local data
 const char *default_generic_name = "Unnamed Generic";
-#define MAX_LIQUID_COND  (MAX_CONDITION / 15)	// approximate game hours of max cond
+#define MAX_LIQUID_COND  (MAX_CONDITION / REAL_UPDATES_PER_MUD_HOUR)	// approximate game hours of max cond
 
 // local funcs
 struct generic_relation *copy_generic_relations(struct generic_relation *list);
@@ -1142,11 +1142,7 @@ void olc_delete_generic(char_data *ch, any_vnum vnum) {
 	}
 	
 	// remove from live lists: player currencies
-	DL_FOREACH(character_list, chiter) {
-		if (IS_NPC(chiter)) {
-			continue;
-		}
-		
+	DL_FOREACH2(player_character_list, chiter, next_plr) {
 		HASH_ITER(hh, GET_CURRENCIES(chiter), cur, next_cur) {
 			if (cur->vnum == vnum) {
 				HASH_DEL(GET_CURRENCIES(chiter), cur);
@@ -1583,10 +1579,8 @@ void olc_delete_generic(char_data *ch, any_vnum vnum) {
 		need_progress_refresh = TRUE;
 	}
 	if (any_quest) {
-		DL_FOREACH_SAFE(character_list, chiter, next_ch) {
-			if (!IS_NPC(chiter)) {
-				refresh_all_quests(chiter);
-			}
+		DL_FOREACH_SAFE2(player_character_list, chiter, next_ch, next_plr) {
+			refresh_all_quests(chiter);
 		}
 	}
 	

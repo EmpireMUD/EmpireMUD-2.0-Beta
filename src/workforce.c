@@ -201,7 +201,7 @@ void process_one_chore(empire_data *emp, room_data *room) {
 	}
 	
 	// THING 5: Outdoor/non-building chores
-	if (CHORE_ACTIVE(CHORE_BURN_STUMPS) && !ROOM_AFF_FLAGGED(room, ROOM_AFF_NO_EVOLVE | ROOM_AFF_NO_WORKFORCE_EVOS) && has_evolution_type(SECT(room), EVO_BURNS_TO)) {
+	if (CHORE_ACTIVE(CHORE_BURN_STUMPS) && !ROOM_AFF_FLAGGED(room, ROOM_AFF_NO_EVOLVE | ROOM_AFF_NO_WORKFORCE_EVOS) && has_evolution_type(SECT(room), EVO_BURN_STUMPS)) {
 		do_chore_burn_stumps(emp, room);
 		return;
 	}
@@ -836,7 +836,7 @@ void charge_workforce(empire_data *emp, int chore, room_data *room, char_data *w
 	if (worker) {
 		// update spawn time as they are still working (prevent despawn)
 		// this also blocks another chore from grabbing them during this cycle
-		MOB_SPAWN_TIME(worker) = time(0);
+		set_mob_spawn_time(worker, time(0));
 		
 		// log for workforce-where
 		log_workforce_where(emp, worker, chore);
@@ -2052,10 +2052,10 @@ void do_chore_burn_stumps(empire_data *emp, room_data *room) {
 	}
 	
 	if (worker) {	// always just 1 tick
-		if (has_evolution_type(SECT(room), EVO_BURNS_TO)) {
+		if (has_evolution_type(SECT(room), EVO_BURN_STUMPS)) {
 			charge_workforce(emp, CHORE_BURN_STUMPS, room, worker, 1, NOTHING, 0);
 			act("$n lights some fires!", FALSE, worker, NULL, NULL, TO_ROOM);
-			perform_burn_room(room);
+			perform_burn_room(room, EVO_BURN_STUMPS);
 			add_workforce_production_log(emp, WPLOG_STUMPS_BURNED, 0, 1);
 		}
 		
@@ -2132,7 +2132,7 @@ void do_chore_chopping(empire_data *emp, room_data *room) {
 					// done
 					stop_room_action(room, ACT_CHOPPING);
 					
-					if (!ROOM_AFF_FLAGGED(room, ROOM_AFF_NO_ABANDON) && empire_chore_limit(emp, GET_ISLAND_ID(room), CHORE_ABANDON_CHOPPED) && (!has_evolution_type(SECT(room), EVO_BURNS_TO) || !empire_chore_limit(emp, GET_ISLAND_ID(room), CHORE_BURN_STUMPS))) {
+					if (!ROOM_AFF_FLAGGED(room, ROOM_AFF_NO_ABANDON) && empire_chore_limit(emp, GET_ISLAND_ID(room), CHORE_ABANDON_CHOPPED) && (!has_evolution_type(SECT(room), EVO_BURN_STUMPS) || !empire_chore_limit(emp, GET_ISLAND_ID(room), CHORE_BURN_STUMPS))) {
 						abandon_room(room);
 					}
 				}

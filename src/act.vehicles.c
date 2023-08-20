@@ -541,7 +541,7 @@ void perform_load_mob(char_data *ch, char_data *mob, vehicle_data *cont, room_da
 	
 	// update spawn time: delay despawn due to interaction
 	if (MOB_FLAGGED(mob, MOB_SPAWNED)) {
-		MOB_SPAWN_TIME(mob) = time(0);
+		set_mob_spawn_time(mob, time(0));
 	}
 	
 	snprintf(buf, sizeof(buf), "$n is loaded %sto $V.", IN_OR_ON(cont));
@@ -600,7 +600,7 @@ void perform_unload_mob(char_data *ch, char_data *mob, vehicle_data *cont) {
 	
 	// update spawn time: delay despawn due to interaction
 	if (MOB_FLAGGED(mob, MOB_SPAWNED)) {
-		MOB_SPAWN_TIME(mob) = time(0);
+		set_mob_spawn_time(mob, time(0));
 	}
 	
 	act("$n is unloaded from $V.", FALSE, mob, NULL, cont, TO_ROOM);
@@ -999,18 +999,24 @@ void do_customize_vehicle(char_data *ch, char *argument) {
 *
 * @param char_data *ch The douser.
 * @param vehicle_data *veh The burning vehicle.
-* @param obj_data *cont The liquid container full of water.
+* @param obj_data *cont Optional: The liquid container full of water (may be NULL).
 */
 void do_douse_vehicle(char_data *ch, vehicle_data *veh, obj_data *cont) {
 	if (!VEH_FLAGGED(veh, VEH_ON_FIRE)) {
 		msg_to_char(ch, "It's not even on fire!\r\n");
 	}
 	else {
-		set_obj_val(cont, VAL_DRINK_CONTAINER_CONTENTS, 0);
-		remove_vehicle_flags(veh, VEH_ON_FIRE);
+		if (cont) {
+			set_obj_val(cont, VAL_DRINK_CONTAINER_CONTENTS, 0);
+			act("You put out the fire on $V with $p!", FALSE, ch, cont, veh, TO_CHAR);
+			act("$n puts out the fire on $V with $p!", FALSE, ch, cont, veh, TO_ROOM);
+		}
+		else {
+			act("You put out the fire on $V!", FALSE, ch, NULL, veh, TO_CHAR);
+			act("$n puts out the fire on $V!", FALSE, ch, NULL, veh, TO_ROOM);
+		}
 		
-		act("You put out the fire on $V with $p!", FALSE, ch, cont, veh, TO_CHAR);
-		act("$n puts out the fire on $V with $p!", FALSE, ch, cont, veh, TO_ROOM);
+		remove_vehicle_flags(veh, VEH_ON_FIRE);
 		msg_to_vehicle(veh, FALSE, "The flames have been extinguished!\r\n");
 	}
 }
@@ -1097,13 +1103,21 @@ void do_light_vehicle(char_data *ch, vehicle_data *veh, obj_data *lighter) {
 		msg_to_char(ch, "Mobs can't light %ss on fire.\r\n", VEH_OR_BLD(veh));
 	}
 	else if (!VEH_FLAGGED(veh, VEH_BURNABLE)) {
-		msg_to_char(ch, "You can't seem to get it to burn.\r\n");
+		msg_to_char(ch, "It doesn't seem to be flammable\r\n");
 	}
 	else if (VEH_FLAGGED(veh, VEH_ON_FIRE)) {
 		msg_to_char(ch, "It is already on fire!\r\n");
 	}
 	else if (VEH_OWNER(veh) && GET_LOYALTY(ch) != VEH_OWNER(veh) && !has_relationship(GET_LOYALTY(ch), VEH_OWNER(veh), DIPL_WAR)) {
+		// owned vehicle
 		msg_to_char(ch, "You can't burn %s %ss unless you're at war.\r\n", EMPIRE_ADJECTIVE(VEH_OWNER(veh)), VEH_OR_BLD(veh));
+	}
+	else if (!VEH_OWNER(veh) && ROOM_OWNER(IN_ROOM(veh)) && GET_LOYALTY(ch) != ROOM_OWNER(IN_ROOM(veh)) && !has_relationship(GET_LOYALTY(ch), ROOM_OWNER(IN_ROOM(veh)), DIPL_WAR)) {
+		// unowned vehicle in owned room
+		msg_to_char(ch, "You can't burn %ss on %s land unless you're at war.\r\n", VEH_OR_BLD(veh), EMPIRE_ADJECTIVE(ROOM_OWNER(IN_ROOM(veh))));
+	}
+	else if (VEH_OWNER(veh) && GET_LOYALTY(ch) == VEH_OWNER(veh) && !HAS_DISMANTLE_PRIV_FOR_VEHICLE(ch, veh)) {
+		msg_to_char(ch, "You don't have permission to burn the empire's %ss (it requires the dismantle privilege).\r\n", VEH_OR_BLD(veh));
 	}
 	else {
 		snprintf(buf, sizeof(buf), "You %s $V on fire!", (lighter ? "use $p to light" : "light"));
@@ -2082,7 +2096,7 @@ ACMD(do_lead) {
 	if (GET_LEADING_MOB(ch)) {
 		// update spawn time: delay despawn due to interaction
 		if (MOB_FLAGGED(GET_LEADING_MOB(ch), MOB_SPAWNED)) {
-			MOB_SPAWN_TIME(GET_LEADING_MOB(ch)) = time(0);
+			set_mob_spawn_time(GET_LEADING_MOB(ch), time(0));
 		}
 		
 		act("You stop leading $N.", FALSE, ch, NULL, GET_LEADING_MOB(ch), TO_CHAR);
@@ -2136,7 +2150,7 @@ ACMD(do_lead) {
 			
 			// update spawn time: delay despawn due to interaction
 			if (MOB_FLAGGED(mob, MOB_SPAWNED)) {
-				MOB_SPAWN_TIME(mob) = time(0);
+				set_mob_spawn_time(mob, time(0));
 			}
 		}
 	}

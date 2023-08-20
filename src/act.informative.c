@@ -731,15 +731,15 @@ void display_score_to_char(char_data *ch, char_data *to) {
 	msg_to_char(to, " +-------------------------------- Condition --------------------------------+\r\n");
 	
 	// row 1 col 1: health, 6 color codes = 12 invisible characters
-	sprintf(lbuf, "&g%d&0/&g%d&0 &g%+d&0/5s", GET_HEALTH(ch), GET_MAX_HEALTH(ch), health_gain(ch, TRUE));
+	sprintf(lbuf, "&g%d&0/&g%d&0 &g%+d&0/%ds", GET_HEALTH(ch), GET_MAX_HEALTH(ch), health_gain(ch, TRUE), SECS_PER_REAL_UPDATE);
 	msg_to_char(to, "  Health: %-28.28s", lbuf);
 
 	// row 1 col 2: move, 6 color codes = 12 invisible characters
-	sprintf(lbuf, "&y%d&0/&y%d&0 &y%+d&0/5s", GET_MOVE(ch), GET_MAX_MOVE(ch), move_gain(ch, TRUE));
+	sprintf(lbuf, "&y%d&0/&y%d&0 &y%+d&0/%ds", GET_MOVE(ch), GET_MAX_MOVE(ch), move_gain(ch, TRUE), SECS_PER_REAL_UPDATE);
 	msg_to_char(to, " Move: %-30.30s", lbuf);
 	
 	// row 1 col 3: mana, 6 color codes = 12 invisible characters
-	sprintf(lbuf, "&c%d&0/&c%d&0 &c%+d&0/5s", GET_MANA(ch), GET_MAX_MANA(ch), mana_gain(ch, TRUE));
+	sprintf(lbuf, "&c%d&0/&c%d&0 &c%+d&0/%ds", GET_MANA(ch), GET_MAX_MANA(ch), mana_gain(ch, TRUE), SECS_PER_REAL_UPDATE);
 	msg_to_char(to, " Mana: %-30.30s\r\n", lbuf);
 	
 	// row 2 col 1: conditions
@@ -1414,17 +1414,25 @@ void show_character_affects(char_data *ch, char_data *to) {
 	struct over_time_effect_type *dot;
 	struct affected_type *aff;
 	char buf[MAX_STRING_LENGTH], buf2[MAX_STRING_LENGTH], lbuf[MAX_INPUT_LENGTH];
+	int duration;
 
 	/* Routine to show what spells a char is affected by */
 	for (aff = ch->affected; aff; aff = aff->next) {
 		*buf2 = '\0';
 
 		// duration setup
-		if (aff->duration == UNLIMITED) {
+		if (aff->expire_time == UNLIMITED) {
 			strcpy(lbuf, "infinite");
 		}
 		else {
-			sprintf(lbuf, "%.1fmin", ((double)(aff->duration + 1) * SECS_PER_REAL_UPDATE / 60.0));
+			duration = aff->expire_time - time(0);
+			duration = MAX(duration, 0);
+			if (duration >= 60 * 60) {
+				sprintf(lbuf, "%d:%02d:%02d", (duration / 3600), ((duration % 3600) / 60), ((duration % 3600) % 60));
+			}
+			else {
+				sprintf(lbuf, "%d:%02d", (duration / 60), (duration % 60));
+			}
 		}
 		
 		// main entry
@@ -1447,12 +1455,7 @@ void show_character_affects(char_data *ch, char_data *to) {
 	
 	// show DoT affects too
 	for (dot = ch->over_time_effects; dot; dot = dot->next) {
-		if (dot->duration == UNLIMITED) {
-			strcpy(lbuf, "infinite");
-		}
-		else {
-			snprintf(lbuf, sizeof(lbuf), "%.1fmin", ((double)(dot->duration + 1) * SECS_PER_REAL_UPDATE / 60.0));
-		}
+		snprintf(lbuf, sizeof(lbuf), "%d:%02d", dot->time_remaining / 60, dot->time_remaining % 60);
 		
 		// main body
 		msg_to_char(to, "   &r%s&0 (%s) %d %s damage (%d/%d)\r\n", get_generic_name_by_vnum(dot->type), lbuf, dot->damage * dot->stack, damage_types[dot->damage_type], dot->stack, dot->max_stack);
@@ -1697,6 +1700,13 @@ char *obj_desc_for_char(obj_data *obj, char_data *ch, int mode) {
 		// append flags
 		if (*flags && strncmp(flags, "NOBITS", 6) && strncmp(flags, "none", 4)) {
 			sprintf(tags + strlen(tags), "%s %s", (*tags ? "," : ""), flags);
+		}
+		
+		if (LIGHT_IS_LIT(obj)) {
+			sprintf(tags + strlen(tags), "%s light", (*tags ? "," : ""));
+		}
+		else if (IS_LIGHT(obj) && GET_LIGHT_HOURS_REMAINING(obj) == 0) {
+			sprintf(tags + strlen(tags), "%s burnt out", (*tags ? "," : ""));
 		}
 		
 		if (PRF_FLAGGED(ch, PRF_ITEM_DETAILS) && GET_OBJ_REQUIRES_QUEST(obj) != NOTHING) {
@@ -1999,8 +2009,8 @@ char *one_who_line(char_data *ch, bool shortlist, bool screenreader) {
 	if (IS_AFK(ch)) {
 		size += snprintf(out + size, sizeof(out) - size, " &r(AFK)&0");
 	}
-	if ((ch->char_specials.timer * SECS_PER_MUD_HOUR / SECS_PER_REAL_MIN) >= 5) {
-		size += snprintf(out + size, sizeof(out) - size, " (idle: %d)", (ch->char_specials.timer * SECS_PER_MUD_HOUR / SECS_PER_REAL_MIN));
+	if ((GET_IDLE_SECONDS(ch) / SECS_PER_REAL_MIN) >= 5) {
+		size += snprintf(out + size, sizeof(out) - size, " (idle: %d)", (GET_IDLE_SECONDS(ch) / SECS_PER_REAL_MIN));
 	}
 	if (IS_PVP_FLAGGED(ch)) {
 		size += snprintf(out + size, sizeof(out) - size, " &R(PVP)&0");
@@ -2285,10 +2295,44 @@ ACMD(do_chart) {
 	}
 	else {
 		msg_to_char(ch, "Chart information for %s:\r\n", get_island_name_for(isle->id, ch));
+		
+		// alternat names
 		if (GET_LOYALTY(ch) && (e_isle = get_empire_island(GET_LOYALTY(ch), isle->id)) && e_isle->name && strcmp(e_isle->name, isle->name)) {
 			// show global name if different
-			msg_to_char(ch, "Also known as: %s\r\n", isle->name);
+			msg_to_char(ch, "Also known as: %s", isle->name);
+			num = 1;
 		}
+		else {
+			num = 0;	// not shown yet
+		}
+		
+		// alternate names
+		num = 0;
+		HASH_ITER(hh, empire_table, emp, next_emp) {
+			if (EMPIRE_IS_TIMED_OUT(emp) || emp == GET_LOYALTY(ch)) {
+				continue;
+			}
+			if (!IS_IMMORTAL(ch) && !has_relationship(GET_LOYALTY(ch), emp, DIPL_NONAGGR | DIPL_ALLIED | DIPL_TRADE)) {
+				continue;
+			}
+			if (!(e_isle = get_empire_island(emp, isle->id)) || !e_isle->name || !str_cmp(e_isle->name, isle->name)) {
+				continue;
+			}
+			
+			// definitely has a name
+			if (num > 0) {
+				msg_to_char(ch, ", %s (%s)", e_isle->name, EMPIRE_NAME(emp));
+			}
+			else {
+				msg_to_char(ch, "Also known as: %s (%s)", e_isle->name, EMPIRE_NAME(emp));
+			}
+			++num;
+		}
+		if (num > 0) {
+			msg_to_char(ch, "\r\n");
+		}
+		
+		// desc
 		if (isle->desc) {
 			send_to_char(isle->desc, ch);
 		}
@@ -3674,7 +3718,7 @@ ACMD(do_survey) {
 	struct empire_island *eisle;
 	struct island_info *island;
 	int ter_type, base_height, mod_height;
-	bool junk;
+	bool junk, large_radius;
 	
 	msg_to_char(ch, "You survey the area:\r\n");
 	
@@ -3706,8 +3750,8 @@ ACMD(do_survey) {
 	
 	// empire
 	if (ROOM_OWNER(IN_ROOM(ch))) {
-		if ((ter_type = get_territory_type_for_empire(IN_ROOM(ch), ROOM_OWNER(IN_ROOM(ch)), FALSE, &junk)) == TER_CITY && (city = find_closest_city(ROOM_OWNER(IN_ROOM(ch)), IN_ROOM(ch)))) {
-			msg_to_char(ch, "This is the %s%s&0 %s of %s.\r\n", EMPIRE_BANNER(ROOM_OWNER(IN_ROOM(ch))), EMPIRE_ADJECTIVE(ROOM_OWNER(IN_ROOM(ch))), city_type[city->type].name, city->name);
+		if ((ter_type = get_territory_type_for_empire(IN_ROOM(ch), ROOM_OWNER(IN_ROOM(ch)), FALSE, &junk, &large_radius)) == TER_CITY && (city = find_closest_city(ROOM_OWNER(IN_ROOM(ch)), IN_ROOM(ch)))) {
+			msg_to_char(ch, "This is the %s%s&0 %s of %s%s.\r\n", EMPIRE_BANNER(ROOM_OWNER(IN_ROOM(ch))), EMPIRE_ADJECTIVE(ROOM_OWNER(IN_ROOM(ch))), city_type[city->type].name, city->name, large_radius ? " (extended radius)" : "");
 		}
 		else if (ter_type == TER_OUTSKIRTS) {
 			msg_to_char(ch, "This is the outskirts of %s%s&0.\r\n", EMPIRE_BANNER(ROOM_OWNER(IN_ROOM(ch))), EMPIRE_NAME(ROOM_OWNER(IN_ROOM(ch))));
@@ -3717,8 +3761,8 @@ ACMD(do_survey) {
 		}
 	}
 	else if (GET_LOYALTY(ch)) {
-		ter_type = get_territory_type_for_empire(IN_ROOM(ch), GET_LOYALTY(ch), FALSE, &junk);
-		msg_to_char(ch, "This location would be %s for your empire.\r\n", (ter_type == TER_CITY ? "in a city" : (ter_type == TER_OUTSKIRTS ? "on the outskirts of a city" : "on the frontier")));
+		ter_type = get_territory_type_for_empire(IN_ROOM(ch), GET_LOYALTY(ch), FALSE, &junk, &large_radius);
+		msg_to_char(ch, "This location would be %s for your empire%s.\r\n", (ter_type == TER_CITY ? "in a city" : (ter_type == TER_OUTSKIRTS ? "on the outskirts of a city" : "on the frontier")), large_radius ? " (extended radius)" : "");
 	}
 	
 	// building info

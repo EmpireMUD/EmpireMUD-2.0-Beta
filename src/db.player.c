@@ -20,6 +20,7 @@
 #include "handler.h"
 #include "skills.h"
 #include "interpreter.h"
+#include "dg_event.h"
 #include "dg_scripts.h"
 #include "vnums.h"
 #include "constants.h"
@@ -56,6 +57,7 @@ ACMD(do_slash_channel);
 void add_all_gain_hooks(char_data *ch);
 void add_archetype_lore(char_data *ch);
 void apply_all_ability_techs(char_data *ch);
+EVENT_CANCEL_FUNC(cancel_affect_expire_event);
 void check_minipets_and_companions(char_data *ch);
 void check_player_events(char_data *ch);
 void clean_lore(char_data *ch);
@@ -187,8 +189,8 @@ char_data *is_at_menu(int id) {
 char_data *is_playing(int id) {
 	char_data *ch;
 	
-	DL_FOREACH(character_list, ch) {
-		if (!IS_NPC(ch) && GET_IDNUM(ch) == id && !EXTRACTED(ch)) {
+	DL_FOREACH2(player_character_list, ch, next_plr) {
+		if (GET_IDNUM(ch) == id && !EXTRACTED(ch)) {
 			return ch;
 		}
 	}
@@ -1085,6 +1087,7 @@ void free_char(char_data *ch) {
 	}
 	
 	// clear any pending updates
+	cancel_all_stored_events(&GET_STORED_EVENTS(ch));
 	clear_delayed_update(ch);
 
 	/* find_char helper */
@@ -1195,7 +1198,7 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *c
 	bool end = FALSE;
 	trig_data *trig;
 	double dbl_in;
-	long l_in[3];
+	long l_in[3], stored;
 	char c_in[2];
 	
 	// allocate player if we didn't receive one
@@ -1343,7 +1346,7 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *c
 					CREATE(af, struct affected_type, 1);
 					af->type = i_in[0];
 					af->cast_by = i_in[1];
-					af->duration = l_in[2];
+					af->expire_time = l_in[2];	// this is TEMPORARILY a number of seconds (or UNLIMITED)
 					af->modifier = i_in[3];
 					af->location = i_in[4];
 					af->bitvector = asciiflag_conv(str_in);
@@ -1584,11 +1587,11 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *c
 					}
 				}
 				else if (!strn_cmp(line, "DoT Effect: ", 12)) {
-					sscanf(line + 12, "%d %d %ld %d %d %d %d", &i_in[0], &i_in[1], &l_in[2], &i_in[3], &i_in[4], &i_in[5], &i_in[6]);
+					sscanf(line + 12, "%d %d %d %d %d %d %d", &i_in[0], &i_in[1], &i_in[2], &i_in[3], &i_in[4], &i_in[5], &i_in[6]);
 					CREATE(dot, struct over_time_effect_type, 1);
 					dot->type = i_in[0];
 					dot->cast_by = i_in[1];
-					dot->duration = l_in[2];
+					dot->time_remaining = i_in[2];
 					dot->damage_type = i_in[3];
 					dot->damage = i_in[4];
 					dot->stack = i_in[5];
@@ -1602,6 +1605,8 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *c
 						ch->over_time_effects = dot;
 					}
 					last_dot = dot;
+					
+					// do not schedule the DOT until they enter the game
 				}
 				BAD_TAG_WARNING(line);
 				break;
@@ -2208,9 +2213,20 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *c
 		}
 	}
 	
-	// apply affects
+	// apply affects: need to manage the timers because they are generally WRONG at this point
+	AFFECTS_CONVERTED(ch) = FALSE;
 	LL_FOREACH_SAFE(af_list, af, next_af) {
+		stored = af->expire_time;
 		affect_to_char_silent(ch, af);
+		
+		// detect aff copied by affect_to_char_silent and fix timer
+		if (ch->affected && ch->affected->type == af->type) {
+			if (ch->affected->expire_event) {
+				dg_event_cancel(ch->affected->expire_event, cancel_affect_expire_event);
+				ch->affected->expire_event = NULL;
+			}
+			ch->affected->expire_time = stored;
+		}
 		free(af);
 	}
 	
@@ -2448,6 +2464,7 @@ void write_player_primary_data_to_file(FILE *fl, char_data *ch) {
 	struct cooldown_data *cool;
 	struct resource_data *res;
 	int iter, deficit[NUM_POOLS], pool[NUM_POOLS];
+	long timer;
 	
 	if (!fl || !ch) {
 		log("SYSERR: write_player_primary_data_to_file called without %s", fl ? "character" : "file");
@@ -2471,9 +2488,11 @@ void write_player_primary_data_to_file(FILE *fl, char_data *ch) {
 	for (iter = 0; iter < NUM_WEARS; ++iter) {
 		if (GET_EQ(ch, iter)) {
 			char_eq[iter] = unequip_char(ch, iter);
+			/* this is almopst certainly an error here as this is called on every save:
 			#ifndef NO_EXTRANEOUS_TRIGGERS
 				remove_otrigger(char_eq[iter], ch);
 			#endif
+			*/
 		}
 		else {
 			char_eq[iter] = NULL;
@@ -2490,10 +2509,12 @@ void write_player_primary_data_to_file(FILE *fl, char_data *ch) {
 	while ((af = ch->affected)) {
 		CREATE(new_af, struct affected_type, 1);
 		*new_af = *af;
+		new_af->expire_event = NULL;
 		LL_PREPEND(af_list, new_af);
 		affect_remove(ch, af);
 	}
 	
+	// this is almost certainly ignored due to pause_affect_total
 	affect_total(ch);
 	
 	// reset attributes
@@ -2568,7 +2589,17 @@ void write_player_primary_data_to_file(FILE *fl, char_data *ch) {
 		fprintf(fl, "Adventure Summon Map: %d\n", GET_ADVENTURE_SUMMON_RETURN_MAP(ch));
 	}
 	for (af = af_list; af; af = af->next) {	// stored earlier
-		fprintf(fl, "Affect: %d %d %ld %d %d %s\n", af->type, af->cast_by, af->duration, af->modifier, af->location, bitv_to_alpha(af->bitvector));
+		if (af->expire_time == UNLIMITED) {
+			timer = UNLIMITED;
+		}
+		else if (AFFECTS_CONVERTED(ch)) {
+			timer = af->expire_time - time(0);
+		}
+		else {
+			// still in seconds
+			timer = af->expire_time;
+		}
+		fprintf(fl, "Affect: %d %d %ld %d %d %s\n", af->type, af->cast_by, timer, af->modifier, af->location, bitv_to_alpha(af->bitvector));
 	}
 	fprintf(fl, "Affect Flags: %s\n", bitv_to_alpha(AFF_FLAGS(ch)));
 	if (GET_APPARENT_AGE(ch)) {
@@ -2640,7 +2671,7 @@ void write_player_primary_data_to_file(FILE *fl, char_data *ch) {
 		fprintf(fl, "Disguised Sex: %s\n", genders[(int) GET_DISGUISED_SEX(ch)]);
 	}
 	for (dot = ch->over_time_effects; dot; dot = dot->next) {
-		fprintf(fl, "DoT Effect: %d %d %ld %d %d %d %d\n", dot->type, dot->cast_by, dot->duration, dot->damage_type, dot->damage, dot->stack, dot->max_stack);
+		fprintf(fl, "DoT Effect: %d %d %d %d %d %d %d\n", dot->type, dot->cast_by, dot->time_remaining, dot->damage_type, dot->damage, dot->stack, dot->max_stack);
 	}
 	
 	// 'E'
@@ -2851,23 +2882,27 @@ void write_player_primary_data_to_file(FILE *fl, char_data *ch) {
 	// re-apply: equipment
 	for (iter = 0; iter < NUM_WEARS; ++iter) {
 		if (char_eq[iter]) {
+			/* this is almost certainly an error since this is called on every save:
 			#ifndef NO_EXTRANEOUS_TRIGGERS
 				if (wear_otrigger(char_eq[iter], ch, iter)) {
 			#endif
-					// this line may depend on the above if
+			*/
+					// this line may depend on the above if NO_EXTRANEOUS_TRIGGERS is off
 					equip_char(ch, char_eq[iter], iter);
+			/* probably an error here (see above):
 			#ifndef NO_EXTRANEOUS_TRIGGERS
 				}
 				else {
 					obj_to_char(char_eq[iter], ch);
 				}
 			#endif
+			*/
 		}
 	}
 	
 	// restore pools, which may have been modified
 	for (iter = 0; iter < NUM_POOLS; ++iter) {
-		GET_CURRENT_POOL(ch, iter) = pool[iter];
+		GET_CURRENT_POOL(ch, iter) = pool[iter];	// set ok: character cannot have taken damage here
 		GET_DEFICIT(ch, iter) = deficit[iter];
 	}
 	
@@ -3301,7 +3336,7 @@ char_data *find_or_load_player(char *name, bool *is_file) {
 	// not able to find -- look for a player partial match?
 	if (!ch) {
 		sprintf(buf, "0.%s", name);	// add 0. to force player match
-		ch = get_char_world(buf, NULL);
+		ch = get_player_world(buf, NULL);
 		*is_file = FALSE;
 		if (ch && IS_NPC(ch)) {
 			ch = NULL;	// verify player only
@@ -3913,6 +3948,39 @@ void clear_player(char_data *ch) {
 
 
 /**
+* Updates the affect timers on players when they first log into the game, and
+* schedules the expiration events. This is also safe to call on offline players
+* if you need the affect timers to be accurate, e.g. in "stat file".
+*
+* @param char_data *ch The player.
+*/
+void convert_and_schedule_player_affects(char_data *ch) {
+	struct affected_type *af;
+	struct over_time_effect_type *dot;
+	
+	// convert timers first
+	if (!IS_NPC(ch) && !AFFECTS_CONVERTED(ch)) {
+		AFFECTS_CONVERTED(ch) = TRUE;
+		LL_FOREACH(ch->affected, af) {
+			if (af->expire_time != UNLIMITED) {
+				// convert from seconds
+				af->expire_time += time(0);
+			}
+		}
+	}
+	
+	// schedule them even if already converted
+	LL_FOREACH(ch->affected, af) {
+		// schedule it
+		schedule_affect_expire(ch, af);
+	}
+	LL_FOREACH(ch->over_time_effects, dot) {
+		schedule_dot_update(ch, dot);
+	}
+}
+
+
+/**
 * This runs at startup (if you don't use -q) and deletes players who are
 * timed out according to the delete_invalid_players_after and 
 * delete_inactive_players_after configs. This can be prevented with the
@@ -4194,6 +4262,7 @@ void enter_player_game(descriptor_data *d, int dolog, bool fresh) {
 
 	// add to lists
 	DL_PREPEND(character_list, ch);
+	DL_PREPEND2(player_character_list, ch, prev_plr, next_plr);
 	ch->script_id = GET_IDNUM(ch);	// if not already set
 	if (!ch->in_lookup_table) {
 		add_to_lookup_table(ch->script_id, (void *)ch, TYPE_MOB);
@@ -4276,12 +4345,12 @@ void enter_player_game(descriptor_data *d, int dolog, bool fresh) {
 	
 	if (!IS_IMMORTAL(ch)) {
 		// ensure player has penalty if at war
-		if (fresh && GET_LOYALTY(ch) && is_at_war(GET_LOYALTY(ch)) && (duration = config_get_int("war_login_delay") / SECS_PER_REAL_UPDATE) > 0) {
+		if (fresh && GET_LOYALTY(ch) && is_at_war(GET_LOYALTY(ch)) && (duration = config_get_int("war_login_delay")) > 0) {
 			af = create_flag_aff(ATYPE_WAR_DELAY, duration, AFF_IMMUNE_PHYSICAL | AFF_NO_ATTACK | AFF_HARD_STUNNED, ch);
 			affect_join(ch, af, ADD_DURATION);
 			msg_to_char(ch, "\trYou are stunned for %d second%s because your empire is at war.\r\n", duration, PLURAL(duration));
 		}
-		else if (fresh && IN_HOSTILE_TERRITORY(ch) && (duration = config_get_int("hostile_login_delay") / SECS_PER_REAL_UPDATE) > 0) {
+		else if (fresh && IN_HOSTILE_TERRITORY(ch) && (duration = config_get_int("hostile_login_delay")) > 0) {
 			af = create_flag_aff(ATYPE_HOSTILE_DELAY, duration, AFF_IMMUNE_PHYSICAL | AFF_NO_ATTACK | AFF_HARD_STUNNED, ch);
 			affect_join(ch, af, ADD_DURATION);
 			msg_to_char(ch, "\trYou are stunned for %d second%s because you logged in in hostile territory.\r\n", duration, PLURAL(duration));
@@ -4309,6 +4378,8 @@ void enter_player_game(descriptor_data *d, int dolog, bool fresh) {
 	check_minipets_and_companions(ch);
 	check_player_events(ch);
 	refresh_passive_buffs(ch);
+	convert_and_schedule_player_affects(ch);
+	schedule_all_obj_timers(ch);
 	
 	// break last reply if invis
 	if (GET_LAST_TELL(ch) && (repl = is_playing(GET_LAST_TELL(ch))) && (GET_INVIS_LEV(repl) > GET_ACCESS_LEVEL(ch) || (!IS_IMMORTAL(ch) && PRF_FLAGGED(repl, PRF_INCOGNITO)))) {
@@ -4332,13 +4403,13 @@ void enter_player_game(descriptor_data *d, int dolog, bool fresh) {
 	
 	// free reset?
 	if (RESTORE_ON_LOGIN(ch)) {
-		GET_HEALTH(ch) = GET_MAX_HEALTH(ch);
-		GET_MOVE(ch) = GET_MAX_MOVE(ch);
-		GET_MANA(ch) = GET_MAX_MANA(ch);
+		set_health(ch, GET_MAX_HEALTH(ch));
+		set_move(ch, GET_MAX_MOVE(ch));
+		set_mana(ch, GET_MAX_MANA(ch));
 		GET_COND(ch, FULL) = MIN(0, GET_COND(ch, FULL));
 		GET_COND(ch, THIRST) = MIN(0, GET_COND(ch, THIRST));
 		GET_COND(ch, DRUNK) = MIN(0, GET_COND(ch, DRUNK));
-		GET_BLOOD(ch) = GET_MAX_BLOOD(ch);
+		set_blood(ch, GET_MAX_BLOOD(ch));
 		
 		// clear deficits
 		for (iter = 0; iter < NUM_POOLS; ++iter) {
@@ -4359,8 +4430,8 @@ void enter_player_game(descriptor_data *d, int dolog, bool fresh) {
 	}
 	else {
 		// ensure not dead
-		GET_HEALTH(ch) = MAX(1, GET_HEALTH(ch));
-		GET_BLOOD(ch) = MAX(1, GET_BLOOD(ch));
+		set_health(ch, MAX(1, GET_HEALTH(ch)));
+		set_blood(ch, MAX(1, GET_BLOOD(ch)));
 	}
 	
 	// position must be reset
@@ -4629,7 +4700,7 @@ void reset_char(char_data *ch) {
 	ch->char_specials.position = POS_STANDING;
 	
 	if (GET_MOVE(ch) <= 0) {
-		GET_MOVE(ch) = 1;
+		GET_MOVE(ch) = 1;	// ok to set here: character is definitely not in-game
 	}
 }
 
@@ -4856,10 +4927,10 @@ void start_new_character(char_data *ch) {
 	update_class(ch);
 	
 	// restore pools (last, in case they changed during bonus traits or somewhere)
-	GET_HEALTH(ch) = GET_MAX_HEALTH(ch);
-	GET_MOVE(ch) = GET_MAX_MOVE(ch);
-	GET_MANA(ch) = GET_MAX_MANA(ch);
-	GET_BLOOD(ch) = GET_MAX_BLOOD(ch);
+	set_health(ch, GET_MAX_HEALTH(ch));
+	set_move(ch, GET_MAX_MOVE(ch));
+	set_mana(ch, GET_MAX_MANA(ch));
+	set_blood(ch, GET_MAX_BLOOD(ch));
 	
 	// prevent a repeat
 	REMOVE_BIT(PLR_FLAGS(ch), PLR_NEEDS_NEWBIE_SETUP);
@@ -5110,10 +5181,8 @@ void check_languages_all(void) {
 	
 	check_languages_all_empires();
 	
-	DL_FOREACH(character_list, ch) {
-		if (!IS_NPC(ch)) {
-			check_languages(ch);
-		}
+	DL_FOREACH2(player_character_list, ch, next_plr) {
+		check_languages(ch);
 	}
 }
 

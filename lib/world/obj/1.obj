@@ -1109,11 +1109,12 @@ S
 torch~
 a torch~
 A torch has been dropped here.~
-A torch is important when you're out at night.
+   A torch is important when you're out at night. You can use 'douse torch' and
+'light torch' to save some of it for later.
 ~
-1 chl ano 0 4
-0 2 12
-0 10
+29 l ao 0 7
+16 1 7
+0 0
 S
 #186
 spear head stone spearhead~

@@ -93,7 +93,7 @@ const struct {
 #define RIT_FLAG  BIT(0)
 
 // misc
-#define NO_MESSAGE	{ "\t", "\t" }	// skip a tick (5 seconds)
+#define NO_MESSAGE	{ "\t", "\t" }	// skip a tick (generally 5 seconds)
 #define MESSAGE_END  { "\n", "\n" }  // end of sequence (one final tick to get here)
 
 // ritual prototypes
@@ -602,7 +602,7 @@ void summon_materials(char_data *ch, char *argument) {
 	else {
 		// save the empire
 		if (found) {
-			GET_MANA(ch) -= cost * count;	// charge only the amount retrieved
+			set_mana(ch, GET_MANA(ch) - (cost * count));	// charge only the amount retrieved
 			read_vault(emp);
 			gain_player_tech_exp(ch, PTECH_SUMMON_MATERIALS, 1);
 		}
@@ -736,7 +736,7 @@ ACMD(do_colorburst) {
 		
 		amt = CHOOSE_BY_ABILITY_LEVEL(levels, ch, ABIL_COLORBURST) - GET_INTELLIGENCE(ch);
 	
-		af = create_mod_aff(ATYPE_COLORBURST, 6, APPLY_TO_HIT, amt, ch);
+		af = create_mod_aff(ATYPE_COLORBURST, 30, APPLY_TO_HIT, amt, ch);
 		affect_join(vict, af, 0);
 
 		engage_combat(ch, vict, FALSE);
@@ -920,7 +920,7 @@ ACMD(do_enervate) {
 		return;
 	}
 	
-	charge_ability_cost(ch, MANA, cost, COOLDOWN_ENERVATE, SECS_PER_MUD_HOUR, WAIT_COMBAT_SPELL);
+	charge_ability_cost(ch, MANA, cost, COOLDOWN_ENERVATE, 75, WAIT_COMBAT_SPELL);
 	
 	if (SHOULD_APPEAR(ch)) {
 		appear(ch);
@@ -939,9 +939,9 @@ ACMD(do_enervate) {
 		act("$n shouts something at you... The world takes on a reddish hue and you feel your stamina drain.", FALSE, ch, NULL, vict, TO_VICT);
 		act("$n shouts some kind of hex at $N, who starts to glow red and seems weakened!", FALSE, ch, NULL, vict, TO_NOTVICT);
 	
-		af = create_mod_aff(ATYPE_ENERVATE, 1 MUD_HOURS, APPLY_MOVE_REGEN, -1 * GET_INTELLIGENCE(ch) / 2, ch);
+		af = create_mod_aff(ATYPE_ENERVATE, 75, APPLY_MOVE_REGEN, -1 * GET_INTELLIGENCE(ch) / 2, ch);
 		affect_join(vict, af, 0);
-		af2 = create_mod_aff(ATYPE_ENERVATE_GAIN, 1 MUD_HOURS, APPLY_MOVE_REGEN, CHOOSE_BY_ABILITY_LEVEL(levels, ch, ABIL_ENERVATE), ch);
+		af2 = create_mod_aff(ATYPE_ENERVATE_GAIN, 75, APPLY_MOVE_REGEN, CHOOSE_BY_ABILITY_LEVEL(levels, ch, ABIL_ENERVATE), ch);
 		affect_join(ch, af2, 0);
 
 		engage_combat(ch, vict, FALSE);
@@ -979,15 +979,22 @@ ACMD(do_manashield) {
 		
 		amt = CHOOSE_BY_ABILITY_LEVEL(levels, ch, ABIL_MANASHIELD) + (GET_INTELLIGENCE(ch) / 3);
 		
-		af1 = create_mod_aff(ATYPE_MANASHIELD, 24 MUD_HOURS, APPLY_MANA, -25, ch);
-		af2 = create_mod_aff(ATYPE_MANASHIELD, 24 MUD_HOURS, APPLY_RESIST_PHYSICAL, amt, ch);
-		af3 = create_mod_aff(ATYPE_MANASHIELD, 24 MUD_HOURS, APPLY_RESIST_MAGICAL, amt, ch);
-		affect_join(ch, af1, 0);
-		affect_join(ch, af2, 0);
-		affect_join(ch, af3, 0);
+		af1 = create_mod_aff(ATYPE_MANASHIELD, 30 * SECS_PER_REAL_MIN, APPLY_MANA, -25, ch);
+		affect_to_char(ch, af1);
+		free(af1);
+		
+		af2 = create_mod_aff(ATYPE_MANASHIELD, 30 * SECS_PER_REAL_MIN, APPLY_RESIST_PHYSICAL, amt, ch);
+		affect_to_char(ch, af2);
+		free(af2);
+		
+		af3 = create_mod_aff(ATYPE_MANASHIELD, 30 * SECS_PER_REAL_MIN, APPLY_RESIST_MAGICAL, amt, ch);
+		affect_to_char(ch, af3);
+		free(af3);
 		
 		// possible to go negative here
-		GET_MANA(ch) = MAX(0, GET_MANA(ch));
+		if (GET_MANA(ch) < 0) {
+			set_mana(ch, 0);
+		}
 	}
 }
 
@@ -1221,7 +1228,7 @@ ACMD(do_ritual) {
 	}
 	
 	if (result) {
-		GET_MANA(ch) -= ritual_data[rit].cost;
+		set_mana(ch, GET_MANA(ch) - ritual_data[rit].cost);
 	}
 }
 
@@ -1290,10 +1297,10 @@ ACMD(do_siphon) {
 		act("$n shouts something at you... The world takes on a violet glow and you feel your mana siphoned away.", FALSE, ch, NULL, vict, TO_VICT);
 		act("$n shouts some kind of hex at $N, who starts to glow violet as mana flows away from $S skin!", FALSE, ch, NULL, vict, TO_NOTVICT);
 
-		af = create_mod_aff(ATYPE_SIPHON, 4, APPLY_MANA_REGEN, CHOOSE_BY_ABILITY_LEVEL(levels, ch, ABIL_SIPHON), ch);
+		af = create_mod_aff(ATYPE_SIPHON, 20, APPLY_MANA_REGEN, CHOOSE_BY_ABILITY_LEVEL(levels, ch, ABIL_SIPHON), ch);
 		affect_join(ch, af, 0);
 		
-		af = create_mod_aff(ATYPE_SIPHON_DRAIN, 4, APPLY_MANA_REGEN, -1 * CHOOSE_BY_ABILITY_LEVEL(levels, ch, ABIL_SIPHON), ch);
+		af = create_mod_aff(ATYPE_SIPHON_DRAIN, 20, APPLY_MANA_REGEN, -1 * CHOOSE_BY_ABILITY_LEVEL(levels, ch, ABIL_SIPHON), ch);
 		affect_join(vict, af, 0);
 
 		engage_combat(ch, vict, FALSE);
@@ -1310,7 +1317,7 @@ ACMD(do_slow) {
 	struct affected_type *af;
 	int cost = 20;
 	
-	int levels[] = { 0.5 MUD_HOURS, 0.5 MUD_HOURS, 1 MUD_HOURS };
+	int levels[] = { 35, 35, 75 };	// duration
 		
 	if (!can_use_ability(ch, ABIL_SLOW, MANA, cost, COOLDOWN_SLOW)) {
 		return;
@@ -1441,10 +1448,10 @@ ACMD(do_vigor) {
 			gain *= 2;
 		}
 		
-		GET_MOVE(vict) = MIN(GET_MAX_MOVE(vict), GET_MOVE(vict) + gain);
+		set_move(vict, GET_MOVE(vict) + gain);
 		
 		// the cast_by on this is vict himself, because it is a penalty and this will block cleanse
-		af = create_mod_aff(ATYPE_VIGOR, 1 MUD_HOURS, APPLY_MOVE_REGEN, -5, vict);
+		af = create_mod_aff(ATYPE_VIGOR, 75, APPLY_MOVE_REGEN, -5, vict);
 		affect_join(vict, af, 0);
 		
 		gain_ability_exp(ch, ABIL_VIGOR, 33.4);
@@ -1562,7 +1569,7 @@ RITUAL_FINISH_FUNC(perform_ritual_of_burdens) {
 	msg_to_char(ch, "You feel the weight of the world lift from your shoulders!\r\n");
 	act("$n seems uplifted!", FALSE, ch, NULL, NULL, TO_ROOM);
 	
-	af = create_mod_aff(ATYPE_UNBURDENED, 24 MUD_HOURS, APPLY_INVENTORY, CHOOSE_BY_ABILITY_LEVEL(burden_levels, ch, ABIL_RITUAL_OF_BURDENS), ch);
+	af = create_mod_aff(ATYPE_UNBURDENED, 30 * SECS_PER_REAL_MIN, APPLY_INVENTORY, CHOOSE_BY_ABILITY_LEVEL(burden_levels, ch, ABIL_RITUAL_OF_BURDENS), ch);
 	affect_join(ch, af, 0);	
 	
 	gain_ability_exp(ch, ABIL_RITUAL_OF_BURDENS, 25);
@@ -2048,7 +2055,7 @@ RITUAL_FINISH_FUNC(perform_devastation_ritual) {
 		
 		// auto-repeat
 		if (GET_MANA(ch) >= ritual_data[ritual].cost) {
-			GET_MANA(ch) -= ritual_data[ritual].cost;
+			set_mana(ch, GET_MANA(ch) - ritual_data[ritual].cost);
 			GET_ACTION(ch) = ACT_RITUAL;
 			GET_ACTION_TIMER(ch) = 0;
 			// other variables are still set up

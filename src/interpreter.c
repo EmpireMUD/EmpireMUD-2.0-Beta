@@ -76,6 +76,7 @@ ACMD(do_bloodsweat);
 ACMD(do_board);
 ACMD(do_boost);
 ACMD(do_breakreply);
+ACMD(do_burn);
 ACMD(do_buy);
 ACMD(do_butcher);
 
@@ -603,7 +604,7 @@ cpp_extern const struct command_info cmd_info[] = {
 	SIMPLE_CMD( "breakreply", POS_DEAD, do_breakreply, LVL_START_IMM, CTYPE_IMMORTAL ),
 	SIMPLE_CMD( "buy", POS_RESTING, do_buy, NO_MIN, CTYPE_UTIL ),
 	SCMD_CMD( "bug", POS_DEAD, do_gen_write, NO_MIN, CTYPE_COMM, SCMD_BUG ),
-	SCMD_CMD( "burn", POS_SITTING, do_light, NO_MIN, CTYPE_UTIL, SCMD_BURN ),
+	SCMD_CMD( "burn", POS_SITTING, do_burn, NO_MIN, CTYPE_UTIL, SCMD_BURN ),
 	SIMPLE_CMD( "butcher", POS_STANDING, do_butcher, NO_MIN, CTYPE_SKILL ),
 	SCMD_CMD( "brief", POS_DEAD, do_no_cmd, NO_MIN, CTYPE_UTIL, NOCMD_TOGGLE ),
 
@@ -1700,21 +1701,67 @@ ACMD(do_commands) {
 
 ACMD(do_missing_help_files) {
 	struct help_index_element *found;
+	ability_data *abil, *next_abil;
+	skill_data *skill, *next_skill;
 	int iter, count;
-	char lbuf[MAX_STRING_LENGTH];
+	char lbuf[MAX_STRING_LENGTH * 2];
 	
 	*lbuf = 0;
-	
 	count = 0;
+	
+	// commands:
 	for (iter = 0; *cmd_info[iter].command != '\n'; ++iter) {
 		if (strcmp(cmd_info[iter].command, "RESERVED") != 0) {
 			found = find_help_entry(LVL_TOP, cmd_info[iter].command);
 		
 			if (!found) {
-				sprintf(lbuf, "%s %-12.12s", lbuf, cmd_info[iter].command);
+				sprintf(lbuf, "%s %-19.19s", lbuf, cmd_info[iter].command);
 				if ((++count % 4) == 0) {
 					strcat(lbuf, "\r\n");
 				}
+			}
+		}
+	}
+	
+	// skills
+	HASH_ITER(hh, skill_table, skill, next_skill) {
+		if (IS_SET(SKILL_FLAGS(skill), SKILLF_IN_DEVELOPMENT)) {
+			continue;	// don't count if in-dev
+		}
+		if (!SKILL_NAME(skill)) {
+			continue;
+		}
+		
+		if (!find_help_entry(LVL_TOP, SKILL_NAME(skill))) {
+			sprintf(lbuf, "%s %-19.19s", lbuf, SKILL_NAME(skill));
+			if ((++count % 4) == 0) {
+				strcat(lbuf, "\r\n");
+			}
+		}
+		if (SKILL_ABBREV(skill) && *SKILL_ABBREV(skill) && !find_help_entry(LVL_TOP, SKILL_ABBREV(skill))) {
+			sprintf(lbuf, "%s %-19.19s", lbuf, SKILL_ABBREV(skill));
+			if ((++count % 4) == 0) {
+				strcat(lbuf, "\r\n");
+			}
+		}
+	}
+	
+	// abilities
+	HASH_ITER(hh, ability_table, abil, next_abil) {
+		if (!ABIL_NAME(abil)) {
+			continue;
+		}
+		
+		if (!find_help_entry(LVL_TOP, ABIL_NAME(abil))) {
+			sprintf(lbuf, "%s %-19.19s", lbuf, ABIL_NAME(abil));
+			if ((++count % 4) == 0) {
+				strcat(lbuf, "\r\n");
+			}
+		}
+		if (ABIL_COMMAND(abil) && *ABIL_COMMAND(abil) && str_cmp(ABIL_COMMAND(abil), ABIL_NAME(abil)) && !find_help_entry(LVL_TOP, ABIL_COMMAND(abil))) {
+			sprintf(lbuf, "%s %-19.19s", lbuf, ABIL_COMMAND(abil));
+			if ((++count % 4) == 0) {
+				strcat(lbuf, "\r\n");
 			}
 		}
 	}
@@ -1725,10 +1772,10 @@ ACMD(do_missing_help_files) {
 	}
 	
 	if (strlen(lbuf) == 0) {
-		msg_to_char(ch, "All commands appear to have help files (but some may just be abbreviations).\r\n");
+		msg_to_char(ch, "Everything appears to have help files (but some may just be abbreviations).\r\n");
 	}
 	else {
-		msg_to_char(ch, "The following commands need help files:\r\n%s", lbuf);
+		msg_to_char(ch, "The following things need help files:\r\n%s", lbuf);
 	}
 }
 
@@ -2270,9 +2317,7 @@ int perform_dupe_check(descriptor_data *d) {
 	 * duplicates, though theoretically none should be able to exist).
 	 */
 	
-	DL_FOREACH_SAFE(character_list, ch, next_ch) {
-		if (IS_NPC(ch))
-			continue;
+	DL_FOREACH_SAFE2(player_character_list, ch, next_ch, next_plr) {
 		if (GET_IDNUM(ch) != id)
 			continue;
 
@@ -2307,7 +2352,7 @@ int perform_dupe_check(descriptor_data *d) {
 	d->character = target;
 	d->character->desc = d;
 	d->original = NULL;
-	d->character->char_specials.timer = 0;
+	GET_IDLE_SECONDS(d->character) = 0;
 	REMOVE_BIT(PLR_FLAGS(d->character), PLR_MAILING);
 	STATE(d) = CON_PLAYING;
 

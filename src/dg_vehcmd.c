@@ -1250,7 +1250,7 @@ VCMD(do_vdot) {
 	any_vnum atype = ATYPE_DG_AFFECT;
 	double modifier = 1.0;
 	char_data *ch;
-	int type, max_stacks;
+	int type, max_stacks, duration;
 
 	argument = one_argument(argument, name);
 	// sometimes name is an affect vnum
@@ -1282,6 +1282,10 @@ VCMD(do_vdot) {
 		veh_log(veh, "vdot: target not found");        
 		return;
 	}
+	if ((duration = atoi(durarg)) < 1) {
+		veh_log(veh, "vdot: invalid duration '%s'", durarg);
+		return;
+	}
 	
 	if (*typearg) {
 		type = search_block(typearg, damage_types, FALSE);
@@ -1295,7 +1299,7 @@ VCMD(do_vdot) {
 	}
 	
 	max_stacks = (*stackarg ? atoi(stackarg) : 1);
-	script_damage_over_time(ch, atype, get_vehicle_scale_level(veh, ch), type, modifier, atoi(durarg), max_stacks, NULL);
+	script_damage_over_time(ch, atype, get_vehicle_scale_level(veh, ch), type, modifier, duration, max_stacks, NULL);
 }
 
 
@@ -1543,10 +1547,10 @@ VCMD(do_vrestore) {
 			GET_POS(victim) = POS_STANDING;
 		}
 		affect_total(victim);
-		GET_HEALTH(victim) = GET_MAX_HEALTH(victim);
-		GET_MOVE(victim) = GET_MAX_MOVE(victim);
-		GET_MANA(victim) = GET_MAX_MANA(victim);
-		GET_BLOOD(victim) = GET_MAX_BLOOD(victim);
+		set_health(victim, GET_MAX_HEALTH(victim));
+		set_move(victim, GET_MAX_MOVE(victim));
+		set_mana(victim, GET_MAX_MANA(victim));
+		set_blood(victim, GET_MAX_BLOOD(victim));
 	}
 	if (obj) {
 		// not sure what to do for objs
