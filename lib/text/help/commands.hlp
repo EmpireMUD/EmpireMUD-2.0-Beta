@@ -2230,7 +2230,7 @@ and (1) represents the number of ability points you have to spend.
 
 Score also shows things which are affecting you.
 
-See also: SHIELD BLOCK, AFFECTS, SKILL LEVEL, GEAR LEVEL
+See also: SHIELD BLOCK, AFFECTS, SKILL LEVEL, GEAR LEVEL, REGENS
 #
 SCRAP
 
@@ -2369,10 +2369,14 @@ The SLEEP command puts you to sleep, allowing you to regain your stamina more
 quickly. You will be largely unaware of your surroundings while asleep. You
 can awaken yourself with the WAKE command.
 
+Sleep boosts all your regens considerably, and may be the only way to
+regenerate move points if you're hungry or thirsty. This effect is even faster
+in a bedroom or similar location.
+
 You also can sleep on some furniture and vehicles. Sleeping in a canoe will
 protect you from sharks in the ocean.
 
-See also: WAKE
+See also: REGENS, WAKE
 #
 SOCIALS
 
