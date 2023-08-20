@@ -1466,11 +1466,25 @@ void schedule_room_affect_expire(room_data *room, struct affected_type *af) {
 */
 void show_wear_off_msg(char_data *ch, any_vnum atype) {
 	generic_data *gen = find_generic(atype, GENERIC_AFFECT);
-	if (gen && GET_AFFECT_WEAR_OFF_TO_CHAR(gen) && ch->desc) {
-		msg_to_char(ch, "&%c%s&0\r\n", (!IS_NPC(ch) && GET_CUSTOM_COLOR(ch, CUSTOM_COLOR_STATUS)) ? GET_CUSTOM_COLOR(ch, CUSTOM_COLOR_STATUS) : '0', GET_AFFECT_WEAR_OFF_TO_CHAR(gen));
+	char_data *vict;
+	
+	if (!ch || !IN_ROOM(ch) || !gen) {
+		return;	// no work need doing
 	}
-	if (gen && GET_AFFECT_WEAR_OFF_TO_ROOM(gen)) {
-		act(GET_AFFECT_WEAR_OFF_TO_ROOM(gen), TRUE, ch, NULL, NULL, TO_ROOM);
+	
+	if (GET_AFFECT_WEAR_OFF_TO_CHAR(gen) && ch->desc && (IS_NPC(ch) || GET_LAST_AFF_WEAR_OFF_VNUM(ch) != atype || GET_LAST_AFF_WEAR_OFF_TIME(ch) != time(0))) {
+		msg_to_char(ch, "&%c%s&0\r\n", (!IS_NPC(ch) && GET_CUSTOM_COLOR(ch, CUSTOM_COLOR_STATUS)) ? GET_CUSTOM_COLOR(ch, CUSTOM_COLOR_STATUS) : '0', GET_AFFECT_WEAR_OFF_TO_CHAR(gen));
+		GET_LAST_AFF_WEAR_OFF_VNUM(ch) = atype;
+		GET_LAST_AFF_WEAR_OFF_TIME(ch) = time(0);
+	}
+	if (GET_AFFECT_WEAR_OFF_TO_ROOM(gen)) {
+		DL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), vict, next_in_room) {
+			if (vict->desc && (IS_NPC(vict) || GET_LAST_AFF_WEAR_OFF_VNUM(vict) != atype || GET_LAST_AFF_WEAR_OFF_TIME(vict) != time(0))) {
+				act(GET_AFFECT_WEAR_OFF_TO_ROOM(gen), TRUE, ch, NULL, vict, TO_VICT);
+				GET_LAST_AFF_WEAR_OFF_VNUM(vict) = atype;
+				GET_LAST_AFF_WEAR_OFF_TIME(vict) = time(0);
+			}
+		}
 	}
 }
 

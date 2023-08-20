@@ -4646,6 +4646,8 @@ struct player_special_data {
 	int group_invite_by;	// idnum of the last player to invite this one
 	time_t move_time[TRACK_MOVE_TIMES];	// timestamp of last X moves
 	int beckoned_by;	// idnum of player who beckoned (for follow)
+	int last_aff_wear_off_vnum;	// helps prevent duplicate wear-off messages
+	time_t last_aff_wear_off_time;	// helps prevent duplicate wear-off messages
 	int last_cond_message_time[NUM_CONDS];	// last time we sent a message for drunk, full, thirsty
 	int last_look_sun;	// used to determine if the player needs to 'look' at sunrise/set
 	bool map_memory_needs_save;	// whether or not to save the map memory file
