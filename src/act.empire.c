@@ -7106,6 +7106,7 @@ void process_reclaim(char_data *ch) {
 		msg_to_char(ch, "%d minute%s remaining to reclaim the area.\r\n", (GET_ACTION_TIMER(ch) / 12), PLURAL(GET_ACTION_TIMER(ch) / 12));
 	}
 	else if (GET_ACTION_TIMER(ch) <= 0) {
+		log_to_empire(emp, ELOG_HOSTILITY, "%s has reclaimed (%d, %d) from %s!", PERS(ch, ch, TRUE), X_COORD(target), Y_COORD(target), EMPIRE_NAME(enemy));
 		log_to_empire(enemy, ELOG_HOSTILITY, "Someone from %s has reclaimed (%d, %d)%s!", EMPIRE_NAME(emp), X_COORD(target), Y_COORD(target), from_str);
 		msg_to_char(ch, "You have reclaimed the area for your empire!\r\n");
 		
