@@ -1653,6 +1653,12 @@ buildings, you can also paint them from the outside.
 
 You need the 'customize' privilege in your empire to paint or unpaint.
 
+Examples:
+
+  > paint building orange
+  > paint raft blue
+  > unpaint wagon
+
 See also: COLORS, PAINTER'S WORKSHOP
 #
 PAN
