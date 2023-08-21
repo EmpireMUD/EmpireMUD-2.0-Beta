@@ -1201,6 +1201,12 @@ D0
 D0
 &VW&P~~&?.~
 &y~
+D0
+.&P~~&Vw~
+&y~
+D0
+&Vw&P~~&?.~
+&y~
 E
 0 0 100.00 616
 E
@@ -1265,6 +1271,15 @@ C
 chop, dig, drink, fill, pick~
 D0
 &VW&P~~&VW~
+&y~
+D0
+&Vw&P~~&VW~
+&y~
+D0
+&VW&P~~&Vw~
+&y~
+D0
+&Vw&P~~&Vw~
 &y~
 E
 0 0 100.00 617
