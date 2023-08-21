@@ -907,12 +907,13 @@ good place to dig up rocks. You can also quarry stone here using the "quarry"
 command. You will find more rocks before a quarry depletes, compared to digging
 anywhere else.
 
-If you have the "dig" workforce enabled, your citizens will only dig rocks if
-you have a quarry.
+Building a quarry allows your workforce to produce rocks and flint with the
+"digging" chore and stone blocks with the "production" chore. Workforce won't
+dig for rocks anywhere except quarries (and sand pits).
 
 Quarries count as in-city territory when built in the outskirts (4x radius).
 
-See also: DEPLETION, DIG, EXTENDED RADIUS
+See also: DEPLETION, DIG, EXTENDED RADIUS, WORKFORCE, WORKFORCE PRODUCTION
 #
 "RAWHIDE STITCHING"
 
