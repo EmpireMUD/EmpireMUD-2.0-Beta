@@ -1230,7 +1230,7 @@ good idea to read them every once in a while.
    credits  - the people who made EmpireMUD possible
    version  - displays the current EmpireMUD version
 #
-INVENTORY
+INVENTORY INV I
 
 Usage:  inventory
         inventory [-k | -n] <keywords>
