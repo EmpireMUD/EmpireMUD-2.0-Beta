@@ -1,11 +1,11 @@
-! "EXCLAMATION MARK" ^ CARAT
+! "EXCLAMATION MARK" ^ CARET
 
 Use ! (exclamation mark) to repeat the last command typed at the keyboard. You
 can also repeat any of your last 5 commands by abbreviating the one you want to
 repeat after the exclamation mark. For example, '!w' might repeat your last who
 or whois.
 
-Use ^ (carat) to replace a string from the last command with a new string. The
+Use ^ (caret) to replace a string from the last command with a new string. The
 syntax is the same as in csh: "^old-string^replacement"
 
 Examples:
