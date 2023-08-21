@@ -7631,7 +7631,7 @@ void do_workforce_nearby(char_data *ch, empire_data *emp, char *argument) {
 	struct empire_npc_data *npc;
 	struct generic_name_data *nameset;
 	char_data *proto;
-	char buf[MAX_STRING_LENGTH], line[256], name[256];
+	char buf[MAX_STRING_LENGTH], line[256], name[256], *temp;
 	size_t size, lsize;
 	int avail, working;
 	bool full = FALSE;
@@ -7665,6 +7665,11 @@ void do_workforce_nearby(char_data *ch, empire_data *emp, char *argument) {
 				if (!full) {
 					nameset = get_best_name_list(MOB_NAME_SET(proto), npc->sex);
 					snprintf(name, sizeof(name), "%s", nameset->names[npc->name]);
+					
+					temp = str_replace("#n", name, GET_SHORT_DESC(proto));
+					strncpy(name, temp, sizeof(name));
+					name[sizeof(name)-1] = '\0';	// ensure terminator
+					free(temp);
 				}
 				++avail;
 			}
