@@ -2993,7 +2993,7 @@ struct find_territory_node *reduce_territory_node_list(struct find_territory_nod
 	
 	// iterate until there are no more than 350 nodes
 	DL_COUNT(list, node, count);
-	while (count > 350) {
+	while (count > 300) {
 		DL_FOREACH_SAFE(list, node, next_node) {
 			// is there a node later in the list that is within range?
 			if ((find = find_nearby_territory_node(node->loc, next_node, size))) {
