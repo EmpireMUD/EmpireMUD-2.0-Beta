@@ -7130,7 +7130,10 @@ elseif diagnose /= %cmd% && %self.vnum% == 11866
   %send% %actor% ~%self% doesn't look very good.
 elseif (mount /= %cmd% || ride /= %cmd%) && %self.vnum% == 11852
   * flying throne
-  if %actor.completed_quest(11918)% || %actor.completed_quest(11919)% || %actor.completed_quest(11864)%
+  if !%arg% || %actor.char_target(%arg.car%)% != %self%
+    * pass through
+    return 0
+  elseif %actor.completed_quest(11918)% || %actor.completed_quest(11919)% || %actor.completed_quest(11864)%
     * allow
     return 0
   else
