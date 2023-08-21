@@ -142,6 +142,7 @@ struct text_file_data_type text_file_data[NUM_TEXT_FILE_STRINGS] = {
 	{ "godlist", LIB_TEXT"godlist", FALSE, 0, 0 },
 	{ "handbook", LIB_TEXT"handbook", TRUE, LVL_CIMPL, MAX_STRING_LENGTH },
 	{ "helpscreen", LIB_TEXT_HELP"screen", TRUE, LVL_GOD, MAX_STRING_LENGTH },
+	{ "helpscreenreader", LIB_TEXT_HELP"screen-screenreader", TRUE, LVL_GOD, MAX_STRING_LENGTH },
 	{ "imotd", LIB_TEXT"imotd", TRUE, LVL_GOD, MAX_MOTD_LENGTH },
 	{ "info", LIB_TEXT"info", TRUE, LVL_GOD, MAX_STRING_LENGTH },
 	{ "motd", LIB_TEXT"motd", TRUE, LVL_GOD, MAX_MOTD_LENGTH },

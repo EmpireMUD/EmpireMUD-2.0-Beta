@@ -2708,7 +2708,12 @@ ACMD(do_help) {
 	skip_spaces(&argument);
 
 	if (!*argument) {
-		page_string(ch->desc, text_file_strings[TEXT_FILE_HELP_SCREEN], FALSE);
+		if (PRF_FLAGGED(ch, PRF_SCREEN_READER)) {
+			send_to_char(text_file_strings[TEXT_FILE_HELP_SCREEN_SCREENREADER], ch);
+		}
+		else {
+			page_string(ch->desc, text_file_strings[TEXT_FILE_HELP_SCREEN], FALSE);
+		}
 		return;
 	}
 	if (help_table) {

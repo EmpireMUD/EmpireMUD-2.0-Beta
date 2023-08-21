@@ -9948,6 +9948,7 @@ ACMD(do_reload) {
 	}
 	else if (!str_cmp(arg, "help")) {
 		reload_text_string(TEXT_FILE_HELP_SCREEN);
+		reload_text_string(TEXT_FILE_HELP_SCREEN_SCREENREADER);
 	}
 	else if (!str_cmp(arg, "info")) {
 		reload_text_string(TEXT_FILE_INFO);
