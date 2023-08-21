@@ -2635,6 +2635,12 @@ void sort_einv_for_empire(empire_data *emp);
 				log("SYSERR: SAFE_ADD out of bounds at %s:%d.", __FILE__, __LINE__);	\
 			}	\
 		}	\
+		else if ((field) < (min)) {	\
+			(field) = (min);	\
+		}	\
+		else if ((field) > (max)) {	\
+			(field) = (max);	\
+		}	\
 	} while (0)
 
 
