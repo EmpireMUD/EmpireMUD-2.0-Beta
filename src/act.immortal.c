@@ -8413,7 +8413,7 @@ ACMD(do_distance) {
 	else if (!*argument) {
 		msg_to_char(ch, "Get the direction and distance to where?\r\n");
 	}
-	else if (!IS_IMMORTAL(ch) && (!isdigit(*argument) || !strchr(argument, ','))) {
+	else if (!IS_IMMORTAL(ch) && ((!isdigit(*argument) && *argument != '(') || !strchr(argument, ','))) {
 		msg_to_char(ch, "You can only find distances to coordinates.\r\n");
 	}
 	else if (!(target = parse_room_from_coords(argument)) && !(target = find_target_room(ch, argument))) {
