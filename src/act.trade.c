@@ -655,8 +655,8 @@ void resume_craft_building(char_data *ch, craft_data *craft) {
 		*the_buf = '\0';
 	}
 	
-	msg_to_char(ch, "You go back to work on %s%s!\r\n", the_buf, bld_name);
-	sprintf(buf, "$n goes back to work on %s%s!", the_buf, bld_name);
+	msg_to_char(ch, "You continue working on %s%s!\r\n", the_buf, bld_name);
+	sprintf(buf, "$n continues working on %s%s!", the_buf, bld_name);
 	act(buf, FALSE, ch, NULL, NULL, TO_ROOM);
 }
 
