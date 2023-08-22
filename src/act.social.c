@@ -346,8 +346,8 @@ ACMD(do_insult) {
 
 
 ACMD(do_point) {
-	char buf[MAX_STRING_LENGTH];
-	char_data *vict, *next_vict;
+	char buf[MAX_STRING_LENGTH], to_char[MAX_STRING_LENGTH], *to_room;
+	char_data *vict, *pers, *next_pers;
 	obj_data *obj;
 	vehicle_data *veh;
 	char color;
@@ -367,19 +367,19 @@ ACMD(do_point) {
 			add_to_channel_history(ch, CHANNEL_HISTORY_SAY, ch, buf);
 		}
 		
-		DL_FOREACH_SAFE2(ROOM_PEOPLE(IN_ROOM(ch)), vict, next_vict, next_in_room) {
-			if (vict != ch && CAN_SEE(vict, ch) && AWAKE(vict)) {
-				if (vict->desc) {
-					clear_last_act_message(vict->desc);
+		DL_FOREACH_SAFE2(ROOM_PEOPLE(IN_ROOM(ch)), pers, next_pers, next_in_room) {
+			if (pers != ch && CAN_SEE(pers, ch) && AWAKE(pers)) {
+				if (pers->desc) {
+					clear_last_act_message(pers->desc);
 				}
 				
-				color = (!IS_NPC(vict) && GET_CUSTOM_COLOR(vict, CUSTOM_COLOR_EMOTE)) ? GET_CUSTOM_COLOR(vict, CUSTOM_COLOR_EMOTE) : '0';
-				sprintf(buf, "\t%c$n points %s.\t0", color, dirs[get_direction_for_char(vict, dir)]);
-				act(buf, FALSE, ch, NULL, vict, TO_VICT | TO_NOT_IGNORING);
+				color = (!IS_NPC(pers) && GET_CUSTOM_COLOR(pers, CUSTOM_COLOR_EMOTE)) ? GET_CUSTOM_COLOR(pers, CUSTOM_COLOR_EMOTE) : '0';
+				sprintf(buf, "\t%c$n points %s.\t0", color, dirs[get_direction_for_char(pers, dir)]);
+				act(buf, FALSE, ch, NULL, pers, TO_VICT | TO_NOT_IGNORING);
 				
 				// channel history
-				if (vict->desc && vict->desc->last_act_message) {
-					add_to_channel_history(vict, CHANNEL_HISTORY_SAY, ch, vict->desc->last_act_message);
+				if (pers->desc && pers->desc->last_act_message) {
+					add_to_channel_history(pers, CHANNEL_HISTORY_SAY, ch, pers->desc->last_act_message);
 				}
 			}
 		}
@@ -392,13 +392,49 @@ ACMD(do_point) {
 		sprintf(buf, "point %s", argument);
 		check_social(ch, buf, FALSE);
 	}
-	else if (obj) {
-		act("You point at $p.", FALSE, ch, obj, NULL, TO_CHAR);
-		act("$n points at $p.", TRUE, ch, obj, NULL, TO_ROOM);
-	}
-	else if (veh) {
-		act("You point at $V.", FALSE, ch, NULL, veh, TO_CHAR);
-		act("$n points at $V.", TRUE, ch, NULL, veh, TO_ROOM);
+	else if (obj || veh) {
+		// combine these as they both do the same loop
+		color = (!IS_NPC(ch) && GET_CUSTOM_COLOR(ch, CUSTOM_COLOR_EMOTE)) ? GET_CUSTOM_COLOR(ch, CUSTOM_COLOR_EMOTE) : '0';
+		
+		if (obj) {
+			snprintf(to_char, sizeof(to_char), "\t%cYou point at $p.\t0", color);
+			to_room = "$n points at $p.\t0";
+		}
+		else if (veh) {
+			snprintf(to_char, sizeof(to_char), "\t%cYou point at $v.\t0", color);
+			to_room = "$n points at $v.";
+		}
+		else {
+			// ??
+			msg_to_char(ch, "You try to point.\r\n");
+			return;
+		}
+		
+		// send to ch
+		if (ch->desc) {
+			clear_last_act_message(ch->desc);
+		}
+		act(to_char, FALSE, ch, obj ? (const void*)obj : (const void*)veh, NULL, TO_CHAR);
+		if (ch->desc && ch->desc->last_act_message) {
+			add_to_channel_history(ch, CHANNEL_HISTORY_SAY, ch, ch->desc->last_act_message);
+		}
+		
+		DL_FOREACH_SAFE2(ROOM_PEOPLE(IN_ROOM(ch)), pers, next_pers, next_in_room) {
+			if (pers != ch && CAN_SEE(pers, ch) && AWAKE(pers)) {
+				if (pers->desc) {
+					clear_last_act_message(pers->desc);
+				}
+				
+				color = (!IS_NPC(pers) && GET_CUSTOM_COLOR(pers, CUSTOM_COLOR_EMOTE)) ? GET_CUSTOM_COLOR(pers, CUSTOM_COLOR_EMOTE) : '0';
+				sprintf(buf, "\t%c%s", color, to_room);
+				act(buf, FALSE, ch, obj ? (const void*)obj : (const void*)veh, pers, TO_VICT | TO_NOT_IGNORING);
+				
+				// channel history
+				if (pers->desc && pers->desc->last_act_message) {
+					add_to_channel_history(pers, CHANNEL_HISTORY_SAY, ch, pers->desc->last_act_message);
+				}
+			}
+		}
 	}
 	else {
 		msg_to_char(ch, "You must have a VERY long index finger because you don't see %s %s here.\r\n", AN(arg), arg);
