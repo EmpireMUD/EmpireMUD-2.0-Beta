@@ -1698,9 +1698,9 @@ See also: HOLD, TIMED ACTION
 #
 POINT
 
-Usage: point <direction | person>
+Usage:  point <direction | person | object | vehicle>
 
-Your character points at the direction or person.
+Your character points. The target must be present in the room with you.
 
 See also: SOCIALS
 #

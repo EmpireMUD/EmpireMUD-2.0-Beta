@@ -348,6 +348,8 @@ ACMD(do_insult) {
 ACMD(do_point) {
 	char buf[MAX_STRING_LENGTH];
 	char_data *vict, *next_vict;
+	obj_data *obj;
+	vehicle_data *veh;
 	char color;
 	int dir;
 	
@@ -382,10 +384,24 @@ ACMD(do_point) {
 			}
 		}
 	}
-	else {
-		// normal point
+	else if (!generic_find(arg, NULL, FIND_CHAR_ROOM | FIND_OBJ_ROOM | FIND_VEHICLE_ROOM | FIND_VEHICLE_INSIDE, ch, &vict, &obj, &veh)) {
+		msg_to_char(ch, "You must have a VERY long index finger because you don't see %s %s here.\r\n", AN(arg), arg);
+	}
+	else if (vict) {
+		// normal point social
 		sprintf(buf, "point %s", argument);
 		check_social(ch, buf, FALSE);
+	}
+	else if (obj) {
+		act("You point at $p.", FALSE, ch, obj, NULL, TO_CHAR);
+		act("$n points at $p.", TRUE, ch, obj, NULL, TO_ROOM);
+	}
+	else if (veh) {
+		act("You point at $V.", FALSE, ch, NULL, veh, TO_CHAR);
+		act("$n points at $V.", TRUE, ch, NULL, veh, TO_ROOM);
+	}
+	else {
+		msg_to_char(ch, "You must have a VERY long index finger because you don't see %s %s here.\r\n", AN(arg), arg);
 	}
 }
 
