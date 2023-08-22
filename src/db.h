@@ -150,14 +150,15 @@ typedef struct map_file_data_v1  map_file_data;	// the current version of the st
 #define TEXT_FILE_GODLIST  1
 #define TEXT_FILE_HANDBOOK  2
 #define TEXT_FILE_HELP_SCREEN  3
-#define TEXT_FILE_IMOTD  4
-#define TEXT_FILE_INFO  5
-#define TEXT_FILE_MOTD  6
-#define TEXT_FILE_NEWS  7
-#define TEXT_FILE_POLICY  8
-#define TEXT_FILE_SHORT_CREDITS  9
-#define TEXT_FILE_WIZLIST  10
-#define NUM_TEXT_FILE_STRINGS  11	// total
+#define TEXT_FILE_HELP_SCREEN_SCREENREADER  4
+#define TEXT_FILE_IMOTD  5
+#define TEXT_FILE_INFO  6
+#define TEXT_FILE_MOTD  7
+#define TEXT_FILE_NEWS  8
+#define TEXT_FILE_POLICY  9
+#define TEXT_FILE_SHORT_CREDITS  10
+#define TEXT_FILE_WIZLIST  11
+#define NUM_TEXT_FILE_STRINGS  12	// total
 
 // misc files (user-modifiable libs)
 #define CONFIG_FILE  LIB_MISC"game_configs"  // config.c system

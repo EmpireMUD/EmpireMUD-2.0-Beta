@@ -199,6 +199,24 @@ the 'lead' command.
 
 See also:  CRAFT, LEAD, WOODWORKING
 #
+CASTLE PORTCULLIS
+
+]||[  Castle (Luxuries goal)
+
+Extra rooms:  30, interlink
+Special rooms:  greathall, crypt, throne, vault, baths, laboratory
+
+This building serves as the entrance to a castle, with a huge number of rooms
+available to designate. You can also interlink it with other buildings to make
+a tremendous castle.
+
+The entrance room is the portcullis, but you can change it using Customize
+Building.
+
+You can only have this building in a city.
+
+See also: CUSTOMIZE BUILDING, DESIGNATE, INTERLINK, PALACE
+#
 CAVEHAVEN "CAVE HAVEN" "OBSCURE CAVE"
 
 &y/&0()&y\&0  Cave Haven  (Vampire Havens goal)
@@ -258,11 +276,15 @@ CLAYPIT "CLAY PIT"
 &y|__|&0  Clay Pit  (Build ability)
 
 Clay pits are reinforced areas where fresh clay can be dug deeper, safer than
-digging on unprepared ground. You can dig more clay from them before depletion.
+digging on unprepared ground. You can dig more clay from them before depletion
+compared to undeveloped map tiles.
+
+Workforce will also dig for clay in clay pits with the "digging" chore. It
+won't dig up clay on tiles that don't have clay pits.
 
 Clay pits count as in-city territory when built in the outskirts (4x radius).
 
-See also: DIG, EXTENDED RADIUS
+See also: DIG, EXTENDED RADIUS, WORKFORCE
 #
 CLIFFDWELLING "CLIFF DWELLING"
 
@@ -372,22 +394,6 @@ will respawn there if you die nearby. This will save you a walk back.
 You can learn to build more permanent graves later.
 
 See also: BUILD, TOMB
-#
-"GREAT HALL" GREATHALL
-
-[**]  Great Hall (Luxuries goal)
-
-Extra rooms:  30, interlink
-Special rooms:  greathall, crypt, throne, vault, baths, laboratory
-
-The great hall is a major component of castles or other distinguished
-buildings, or it can serve as the entrance for those. You can designate a
-huge number of rooms from the great hall, and can interlink it with other
-buildings.
-
-You can only have this building in a city.
-
-See also: DESIGNATE, PORTCULLIS, INTERLINK
 #
 FAMILYGRAVESITE "FAMILY GRAVESITE"
 
@@ -769,6 +775,21 @@ paints once a painter spawns in this building.
 
 See also: PAINT, QUEST, MASTER CRAFTSMAN
 #
+PALACE
+
+]**[  Palace (Luxuries goal)
+
+Extra rooms:  30, interlink
+Special rooms:  greathall, crypt, throne, vault, baths, laboratory
+
+A palace is a lavish place for a king or queen to hold audience with
+dignitaries and to rule from their throne. It holds a huge number of rooms and
+can be interlinked with other buildings.
+
+You can only have this building in a city.
+
+See also: CASTLE, DESIGNATE, INTERLINK
+#
 PARK
 
 &g.^.&co&0  Park  (Build ability)
@@ -783,20 +804,6 @@ The Pigeon Post is a service that uses highly-trained birds to send mail across
 the world. You can receive mail anywhere, but must send it from the Post.
 
 See also: MAIL
-#
-PORTCULLIS "CASTLE PORTCULLIS" CASTLE PALACE
-
-V[]V  Portcullis (Luxuries goal)
-
-Extra rooms:  30, interlink
-Special rooms:  greathall, crypt, throne, vault, baths, laboratory
-
-The portcullis serves as the entrance to a castle. You can designate a huge
-number of rooms from the portcullis, and can interlink it with other buildings.
-
-You can only have this building in a city.
-
-See also: DESIGNATE, GREAT HALL, INTERLINK
 #
 PUEBLO
 
@@ -873,11 +880,16 @@ SANDPIT "SAND PIT"
 &Y|__|&0  Sand Pit  (Build ability)
 
 Sand pits are reinforced areas where fine, clean sand can be dug more
-effectively. You can dig more sand from them before depletion.
+effectively. You can dig more sand from them before depletion compared to
+regular shores.
+
+Workforce will also dig for sand (and sometimes rocks or flint) if the
+"digging" chore is enabled. It won't dig for sand on tiles that don't have sand
+pits.
 
 Sand pits count as in-city territory when built in the outskirts (4x radius).
 
-See also: DIG, EXTENDED RADIUS
+See also: DIG, EXTENDED RADIUS, WORKFORCE CHORES
 #
 SEEDSILO "SEED SILO"
 

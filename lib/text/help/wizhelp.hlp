@@ -892,7 +892,7 @@ Valid files are:
   credits    (/mud_dir/lib/text/credits)
   intros     (/mud_dir/lib/text/intros/*)
   handbook   (/mud_dir/lib/text/handbook)
-  help       (/mud_dir/lib/text/help)
+  help       (/mud_dir/lib/text/help/screen and screen-screenreader)
   immlist    (/mud_dir/lib/text/immlist)
   imotd      (/mud_dir/lib/text/imotd)
   news       (/mud_dir/lib/text/news)

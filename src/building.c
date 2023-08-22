@@ -2935,8 +2935,8 @@ ACMD(do_paint) {
 		msg_to_char(ch, "You don't have permission to paint anything (customize).\r\n");
 		return;
 	}
-	if (!*arg1) {
-		msg_to_char(ch, "Usage: paint <building | vehicle> <paint item>\r\n");
+	if (!*arg1 || !*arg2) {
+		msg_to_char(ch, "Usage: paint <building | vehicle> <paint item to use>\r\n");
 		return;
 	}
 	
@@ -2986,10 +2986,6 @@ ACMD(do_paint) {
 	}
 	
 	// ok find/validate the paint object
-	if (!*arg2) {
-		msg_to_char(ch, "Paint with what color?\r\n");
-		return;
-	}
 	if (!(paint = get_obj_in_list_vis(ch, arg2, NULL, ch->carrying))) {
 		msg_to_char(ch, "You don't seem to have that paint with.\r\n");
 		return;

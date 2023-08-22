@@ -3988,10 +3988,11 @@ SHOW(show_buildings) {
 	size_t size, l_size;
 	sector_data *sect;
 	room_data *room;
-	bool any;
+	bool any, use_columns;
 	
 	// fresh numbers
 	update_world_count();
+	use_columns = !PRF_FLAGGED(ch, PRF_SCREEN_READER);
 	
 	if (!*argument) {	// no-arg: show summary
 		// output
@@ -4004,10 +4005,10 @@ SHOW(show_buildings) {
 			
 			this = stats_get_building_count(bld);
 			strcpy(buf, GET_BLD_NAME(bld));
-			msg_to_char(ch, " %6d %-26.26s %s", this, CAP(buf), !((++count)%2) ? "\r\n" : " ");
+			msg_to_char(ch, " %6d %-26.26s %s", this, CAP(buf), (!((++count)%2) || !use_columns) ? "\r\n" : " ");
 			total += this;
 		}
-		if (count % 2) {
+		if (count % 2 && use_columns) {
 			msg_to_char(ch, "\r\n");
 		}
 	
@@ -4176,10 +4177,11 @@ SHOW(show_crops) {
 	int count, total, this;
 	struct map_data *map;
 	size_t size, l_size;
-	bool any;
+	bool any, use_columns;
 	
 	// fresh numbers
 	update_world_count();
+	use_columns = !PRF_FLAGGED(ch, PRF_SCREEN_READER);
 	
 	if (!*argument) {	// no-arg: show summary
 		// output
@@ -4188,10 +4190,10 @@ SHOW(show_crops) {
 		HASH_ITER(hh, crop_table, crop, next_crop) {
 			this = stats_get_crop_count(crop);
 			strcpy(buf, GET_CROP_NAME(crop));
-			msg_to_char(ch, " %6d %-26.26s %s", this, CAP(buf), !((++count)%2) ? "\r\n" : " ");
+			msg_to_char(ch, " %6d %-26.26s %s", this, CAP(buf), (!((++count)%2) || !use_columns) ? "\r\n" : " ");
 			total += this;
 		}
-		if (count % 2) {
+		if (count % 2 && use_columns) {
 			msg_to_char(ch, "\r\n");
 		}
 	
@@ -4448,10 +4450,11 @@ SHOW(show_terrain) {
 	int count, total, this;
 	struct map_data *map;
 	size_t size, l_size;
-	bool any;
+	bool any, use_columns;
 	
 	// fresh numbers
 	update_world_count();
+	use_columns = !PRF_FLAGGED(ch, PRF_SCREEN_READER);
 	
 	if (!*argument) {	// no-arg: show summary
 		// output
@@ -4459,11 +4462,11 @@ SHOW(show_terrain) {
 	
 		HASH_ITER(hh, sector_table, sect, next_sect) {
 			this = stats_get_sector_count(sect);
-			msg_to_char(ch, " %6d %-26.26s %s", this, GET_SECT_NAME(sect), !((++count)%2) ? "\r\n" : " ");
+			msg_to_char(ch, " %6d %-26.26s %s", this, GET_SECT_NAME(sect), (!((++count)%2) || !use_columns) ? "\r\n" : " ");
 			total += this;
 		}
 	
-		if (count % 2) {
+		if (count % 2 && use_columns) {
 			msg_to_char(ch, "\r\n");
 		}
 	
@@ -6974,7 +6977,7 @@ void do_stat_object(char_data *ch, obj_data *j) {
 	// data that isn't type-based:
 	if (OBJ_FLAGGED(j, OBJ_PLANTABLE) && (cp = crop_proto(GET_OBJ_VAL(j, VAL_FOOD_CROP_TYPE)))) {
 		ordered_sprintbit(GET_CROP_CLIMATE(cp), climate_flags, climate_flags_order, CROP_FLAGGED(cp, CROPF_ANY_LISTED_CLIMATE) ? TRUE : FALSE, buf);
-		msg_to_char(ch, "Plants %s (%s%s).\r\n", GET_CROP_NAME(cp), GET_CROP_CLIMATE(cp) ? buf : "any climate", (CROP_FLAGGED(cp, CROPF_REQUIRES_WATER) ? "; must be near water" : ""));
+		msg_to_char(ch, "Plants [%d] %s (%s%s).\r\n", GET_OBJ_VAL(j, VAL_FOOD_CROP_TYPE), GET_CROP_NAME(cp), GET_CROP_CLIMATE(cp) ? buf : "any climate", (CROP_FLAGGED(cp, CROPF_REQUIRES_WATER) ? "; must be near water" : ""));
 	}
 
 	/*
@@ -8413,7 +8416,7 @@ ACMD(do_distance) {
 	else if (!*argument) {
 		msg_to_char(ch, "Get the direction and distance to where?\r\n");
 	}
-	else if (!IS_IMMORTAL(ch) && (!isdigit(*argument) || !strchr(argument, ','))) {
+	else if (!IS_IMMORTAL(ch) && ((!isdigit(*argument) && *argument != '(') || !strchr(argument, ','))) {
 		msg_to_char(ch, "You can only find distances to coordinates.\r\n");
 	}
 	else if (!(target = parse_room_from_coords(argument)) && !(target = find_target_room(ch, argument))) {
@@ -9948,6 +9951,7 @@ ACMD(do_reload) {
 	}
 	else if (!str_cmp(arg, "help")) {
 		reload_text_string(TEXT_FILE_HELP_SCREEN);
+		reload_text_string(TEXT_FILE_HELP_SCREEN_SCREENREADER);
 	}
 	else if (!str_cmp(arg, "info")) {
 		reload_text_string(TEXT_FILE_INFO);

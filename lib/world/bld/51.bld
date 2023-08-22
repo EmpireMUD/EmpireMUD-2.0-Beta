@@ -1564,20 +1564,24 @@ R
 T 5164
 S
 #5165
-Portcullis~
-A Great Portcullis~
-@U&0[]@V~
+Castle~
+The Portcullis of a Castle~
+&0]||[~
 64 0 florR abeghijkm
 30 0 0 -1
 D
-   You are standing beneath a great portcullis. This is the entrance to a
-magnificent stone structure the likes of which are unrivalled anywhere. The
-construction is superb, possibly the best you've seen yet. The building is
-very imposing, and yet somehow welcoming -- that is unless you don't belong.
+   You are standing beneath the great portcullis at the entrance to a
+magnificent stone structure, the likes of which are unrivalled anywhere. The
+construction is superb and every block is expertly cut, showing off the great
+prosperity and expert craftsmenship of the kingdom.
 ~
 E
 portcullis gate~
 The portcullis is massive. It must take 5 men to close it.
+~
+E
+castle~
+The castle is made of stone.
 ~
 I 29 5007 100.00 1 r  # RUINS-TO-BLD: Ruins
 R
@@ -1586,16 +1590,17 @@ R
 6790 2 1 0
 S
 #5166
-Great Hall~
-The Great Hall~
-&0[**]~
+Palace~
+A Lavish Palace~
+&0]**[~
 64 0 flrR abeghijkm
 30 0 0 -1
 D
-   This is the Great Hall, a room lined with magnificent suits of armor and
-decorated with the best gold available. The Great Hall is often one of the most
-important parts of the castle as it shows the wealth of the monarch. It also
-leads to the throne room.
+   You stand in the great hall that serves as the entryway to a magnificent
+palace. Massive stone arches support a vaulted ceiling that towers far above
+you, almost as if the room has its own sky. Shields and banners line the walls,
+telling tales of valor and every part of the hall is decorated to show off the
+kingdom's wealth and prosperity.
 ~
 I 29 5007 100.00 1 r  # RUINS-TO-BLD: Ruins
 R

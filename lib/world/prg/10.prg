@@ -180,7 +180,7 @@ Luxuries~
    The poorest people walk the longest distances to water. But for the rich,
 water flows from every corner. Build a fountain and some baths so that your
 citizens can enjoy the greatest luxury of all: flowing water. Completing this
-goal will give you the ability to build the portcullis and greathall buildings,
+goal will give you the ability to build the castle and palace buildings,
 which serve as the entrances for castles. It also gives you steps, a nicer
 version of roads for your cities, as well as a luxury ship called the carrack.
 ~
@@ -200,10 +200,9 @@ W
 S
 #1041
 Castle~
-   Build a castle, starting with a great hall or portcullis (or mountain hall).
-Usually castles involve interlinking more than one of these buildings and
-adding walls around them, but finishing the first great hall or portcullis will
-complete this goal.
+   Build a castle, portcullis, or mountain hall). Usually castles involve
+interlinking more than one of these buildings and adding walls around them, but
+finishing the first building will complete this goal.
 ~
 2 1 0 25 0
 P 1040

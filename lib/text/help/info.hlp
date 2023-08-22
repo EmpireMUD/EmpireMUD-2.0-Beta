@@ -769,7 +769,8 @@ You can plant and manage crops in order to supply food and trade goods to your
 empire. The crops that grow in orchards can be picked; the rest are harvested.
 You can chop down orchards in order to remove them; other crops are removed
 when you harvest them. The crops listed here grow wild on the map -- you can
-find them by foraging. There are more crops to be found in adventure zones.
+find them by foraging, but you'll have to travel to different regions to find
+them all. And there are even more crops to be found in adventure zones.
 
 Temperate crops (plains):
  &Y^^&Go&Y^&0  Apples              &Y^&oo&Y^^&0  Apricots             &Y::::&0  Barley
@@ -797,9 +798,9 @@ Newbie island crops:
  &G@@@@&0  Lettuce             &goooo&0  Calabash gourds
 
 Most crops are used to make food and drink. Some, like cotton, have other uses.
-More crops come from adventures. Make sure you claim all your map tiles that
-have crops as unclaimed crops may vanish at the end of the year. Crops can be
-burnt to remove them, even when they're still growing.
+Make sure you claim all your map tiles that have crops as unclaimed crops may
+vanish at the end of the year. Crops can be burnt to remove them, even when
+they're still growing.
 
 See also: BURN, CHOP, COOK, FORAGE, HARVEST, MILL, PICK, PLANT, TAVERN, WEAVE,
    IRRIGATION
@@ -916,7 +917,10 @@ nearby that has blood.
 All timed actions, such as crafting and chores, take twice as long while you
 are hungry, thirsty, or blood-starved.
 
-See also: BLOOD, EAT, UNNATURAL THIRST, SATED THIRST, TIME
+Regeneration drops to very low levels when a character is hungry, thirsty, or
+starving. Sleeping may be the only way to regenerate in this case.
+
+See also: BLOOD, EAT, UNNATURAL THIRST, REGENS, SATED THIRST, SLEEP, TIME
 #
 INFRA INFRAVISION
 
@@ -1322,6 +1326,22 @@ inventory and gear.
 You can identify items to see which quest they belong to.
 
 See also: IDENTIFY
+#
+REGEN REGENS REGENERATION "REGEN RATE" "MANA REGENERATION" "MOVE REGENERATION" "HEALTH REGENERATION"
+
+'Regens' refer to the rate at which a character regenerates health, moves, or
+mana. For example, your 'mana regen' is the amount of mana you gain every 5
+seconds. Sleeping boosts your regens significantly.
+
+You can see your regens on the 'score' command where they are shown as +X/5s,
+meaning you gain X every 5 seconds.
+
+If your character is hungry or thirsty, your regen rate will drop precipitously
+and it may be necessary to sleep in order to gain any at all.
+
+Characters normally only regenerate health when they are not in combat.
+
+See also: HEALTH, HUNGER, MANA, MOVES, REGENERATE, SLEEP, STARVING, THIRST
 #
 RESIST-MAGICAL "RESIST MAGICAL" "MAGICAL RESISTANCE"
 

@@ -600,9 +600,13 @@ static void show_detailed_empire(char_data *ch, empire_data *e) {
 	empire_data *emp_iter, *next_emp;
 	bool found, is_own_empire, comma;
 	player_index_data *index;
-	char line[256];
+	char output[MAX_STRING_LENGTH * 4], line[256];
+	size_t size;
 	
 	is_own_empire = (GET_LOYALTY(ch) == e) || GET_ACCESS_LEVEL(ch) >= LVL_CIMPL || IS_GRANTED(ch, GRANT_EMPIRES);
+	
+	*output = '\0';
+	size = 0;
 
 	// add empire vnum for imms
 	if (IS_IMMORTAL(ch)) {
@@ -612,67 +616,67 @@ static void show_detailed_empire(char_data *ch, empire_data *e) {
 		*line = '\0';
 	}
 	
-	msg_to_char(ch, "%s%s&0%s, led by %s\r\n", EMPIRE_BANNER(e), EMPIRE_NAME(e), line, (index = find_player_index_by_idnum(EMPIRE_LEADER(e))) ? index->fullname : "(Unknown)");
+	size += snprintf(output + size, sizeof(output) - size, "%s%s&0%s, led by %s\r\n", EMPIRE_BANNER(e), EMPIRE_NAME(e), line, (index = find_player_index_by_idnum(EMPIRE_LEADER(e))) ? index->fullname : "(Unknown)");
 	
 	if (IS_IMMORTAL(ch)) {
-		msg_to_char(ch, "Created: %-24.24s\r\n", ctime(&EMPIRE_CREATE_TIME(e)));
+		size += snprintf(output + size, sizeof(output) - size, "Created: %-24.24s\r\n", ctime(&EMPIRE_CREATE_TIME(e)));
 		sprintbit(EMPIRE_ADMIN_FLAGS(e), empire_admin_flags, line, TRUE);
-		msg_to_char(ch, "Admin flags: \tg%s\t0\r\n", line);
+		size += snprintf(output + size, sizeof(output) - size, "Admin flags: \tg%s\t0\r\n", line);
 	}
 	
 	if (EMPIRE_DESCRIPTION(e)) {
-		msg_to_char(ch, "%s&0", EMPIRE_DESCRIPTION(e));
+		size += snprintf(output + size, sizeof(output) - size, "%s&0", EMPIRE_DESCRIPTION(e));
 	}
 	
-	msg_to_char(ch, "Adjective form: %s\r\n", EMPIRE_ADJECTIVE(e));
+	size += snprintf(output + size, sizeof(output) - size, "Adjective form: %s\r\n", EMPIRE_ADJECTIVE(e));
 
-	msg_to_char(ch, "Ranks%s:\r\n", (is_own_empire ? " and privileges" : ""));
+	size += snprintf(output + size, sizeof(output) - size, "Ranks%s:\r\n", (is_own_empire ? " and privileges" : ""));
 	for (iter = 1; iter <= EMPIRE_NUM_RANKS(e); ++iter) {
 		// rank name
-		msg_to_char(ch, " %2d. %s&0", iter, EMPIRE_RANK(e, iter-1));
+		size += snprintf(output + size, sizeof(output) - size, " %2d. %s&0", iter, EMPIRE_RANK(e, iter-1));
 		
 		// privs -- only shown to own empire
 		if (is_own_empire) {
 			found = FALSE;
 			for (sub = 0; sub < NUM_PRIVILEGES; ++sub) {
 				if (EMPIRE_PRIV(e, sub) == iter) {
-					msg_to_char(ch, "%s%s", (found ? ", " : " - "), priv[sub]);
+					size += snprintf(output + size, sizeof(output) - size, "%s%s", (found ? ", " : " - "), priv[sub]);
 					found = TRUE;
 				}
 			}
 		}
 		
-		msg_to_char(ch, "\r\n");
+		size += snprintf(output + size, sizeof(output) - size, "\r\n");
 	}
 
 	prettier_sprintbit(EMPIRE_FRONTIER_TRAITS(e), empire_trait_types, buf);
-	msg_to_char(ch, "Frontier traits: %s\r\n", buf);
-	msg_to_char(ch, "Population: %d player%s, %d citizen%s, %d military\r\n", EMPIRE_MEMBERS(e), (EMPIRE_MEMBERS(e) != 1 ? "s" : ""), EMPIRE_POPULATION(e), (EMPIRE_POPULATION(e) != 1 ? "s" : ""), EMPIRE_MILITARY(e));
-	msg_to_char(ch, "Territory: %d/%d (%d in-city, %d/%d outskirts, %d/%d frontier)\r\n", EMPIRE_TERRITORY(e, TER_TOTAL), land_can_claim(e, TER_TOTAL), EMPIRE_TERRITORY(e, TER_CITY), EMPIRE_TERRITORY(e, TER_OUTSKIRTS), land_can_claim(e, TER_OUTSKIRTS), EMPIRE_TERRITORY(e, TER_FRONTIER), land_can_claim(e, TER_FRONTIER));
-	msg_to_char(ch, "(Land per greatness: %d, Land per 100 wealth: %d, Bonus territory: %d)\r\n", (config_get_int("land_per_greatness") + EMPIRE_ATTRIBUTE(e, EATT_TERRITORY_PER_GREATNESS)), EMPIRE_ATTRIBUTE(e, EATT_TERRITORY_PER_100_WEALTH), EMPIRE_ATTRIBUTE(e, EATT_BONUS_TERRITORY));
+	size += snprintf(output + size, sizeof(output) - size, "Frontier traits: %s\r\n", buf);
+	size += snprintf(output + size, sizeof(output) - size, "Population: %d player%s, %d citizen%s, %d military\r\n", EMPIRE_MEMBERS(e), (EMPIRE_MEMBERS(e) != 1 ? "s" : ""), EMPIRE_POPULATION(e), (EMPIRE_POPULATION(e) != 1 ? "s" : ""), EMPIRE_MILITARY(e));
+	size += snprintf(output + size, sizeof(output) - size, "Territory: %d/%d (%d in-city, %d/%d outskirts, %d/%d frontier)\r\n", EMPIRE_TERRITORY(e, TER_TOTAL), land_can_claim(e, TER_TOTAL), EMPIRE_TERRITORY(e, TER_CITY), EMPIRE_TERRITORY(e, TER_OUTSKIRTS), land_can_claim(e, TER_OUTSKIRTS), EMPIRE_TERRITORY(e, TER_FRONTIER), land_can_claim(e, TER_FRONTIER));
+	size += snprintf(output + size, sizeof(output) - size, "(Land per greatness: %d, Land per 100 wealth: %d, Bonus territory: %d)\r\n", (config_get_int("land_per_greatness") + EMPIRE_ATTRIBUTE(e, EATT_TERRITORY_PER_GREATNESS)), EMPIRE_ATTRIBUTE(e, EATT_TERRITORY_PER_100_WEALTH), EMPIRE_ATTRIBUTE(e, EATT_BONUS_TERRITORY));
 
-	msg_to_char(ch, "Wealth: %d (%d treasure + %.1f coin%s at %d%%)\r\n", (int) GET_TOTAL_WEALTH(e), EMPIRE_WEALTH(e), EMPIRE_COINS(e), (EMPIRE_COINS(e) != 1.0 ? "s" : ""), (int)(COIN_VALUE * 100));
-	msg_to_char(ch, "Greatness: %d, Fame: %d\r\n", EMPIRE_GREATNESS(e), EMPIRE_FAME(e));
+	size += snprintf(output + size, sizeof(output) - size, "Wealth: %d (%d treasure + %.1f coin%s at %d%%)\r\n", (int) GET_TOTAL_WEALTH(e), EMPIRE_WEALTH(e), EMPIRE_COINS(e), (EMPIRE_COINS(e) != 1.0 ? "s" : ""), (int)(COIN_VALUE * 100));
+	size += snprintf(output + size, sizeof(output) - size, "Greatness: %d, Fame: %d\r\n", EMPIRE_GREATNESS(e), EMPIRE_FAME(e));
 	
 	if (is_own_empire) {
 		total = config_get_int("max_chore_resource_per_member") * EMPIRE_MEMBERS(e) + EMPIRE_ATTRIBUTE(e, EATT_WORKFORCE_CAP);
 		for (iter = 0; *city_type[iter].name != '\n'; ++iter);
 		type = MIN(iter-1, EMPIRE_ATTRIBUTE(e, EATT_MAX_CITY_SIZE));
-		msg_to_char(ch, "Workforce cap: %d item%s, Max city size: %s\r\n", total, PLURAL(total), city_type[type].name);
+		size += snprintf(output + size, sizeof(output) - size, "Workforce cap: %d item%s, Max city size: %s\r\n", total, PLURAL(total), city_type[type].name);
 	}
 	
 	if (is_own_empire || !EMPIRE_HAS_TECH(e, TECH_HIDDEN_PROGRESS)) {
-		msg_to_char(ch, "Technology: ");
+		size += snprintf(output + size, sizeof(output) - size, "Technology: ");
 		for (iter = 0, comma = FALSE; iter < NUM_TECHS; ++iter) {
 			if (EMPIRE_HAS_TECH(e, iter)) {
-				msg_to_char(ch, "%s%s", (comma ? ", " : ""), techs[iter]);
+				size += snprintf(output + size, sizeof(output) - size, "%s%s", (comma ? ", " : ""), techs[iter]);
 				comma = TRUE;
 			}
 		}
 		if (!comma) {
-			msg_to_char(ch, "none");
+			size += snprintf(output + size, sizeof(output) - size, "none");
 		}
-		msg_to_char(ch, "\r\n");
+		size += snprintf(output + size, sizeof(output) - size, "\r\n");
 	}
 	
 	// determine rank by iterating over the sorted empire list
@@ -688,28 +692,30 @@ static void show_detailed_empire(char_data *ch, empire_data *e) {
 	total = 0;
 	for (iter = 1; iter < NUM_PROGRESS_TYPES; ++iter) {
 		total += EMPIRE_PROGRESS_POINTS(e, iter);
-		msg_to_char(ch, "%s: %d, ", progress_types[iter], EMPIRE_PROGRESS_POINTS(e, iter));
+		size += snprintf(output + size, sizeof(output) - size, "%s: %d, ", progress_types[iter], EMPIRE_PROGRESS_POINTS(e, iter));
 	}
-	msg_to_char(ch, "Total: %d\r\n", total);
+	size += snprintf(output + size, sizeof(output) - size, "Total: %d\r\n", total);
 	
 	// Score
-	msg_to_char(ch, "Score: %d, ranked #%d (", get_total_score(e), found_rank);
+	size += snprintf(output + size, sizeof(output) - size, "Score: %d, ranked #%d (", get_total_score(e), found_rank);
 	for (iter = 0, comma = FALSE; iter < NUM_SCORES; ++iter) {
 		sprinttype(iter, score_type, buf, sizeof(buf), "UNDEFINED");
-		msg_to_char(ch, "%s%s %d", (comma ? ", " : ""), buf, EMPIRE_SCORE(e, iter));
+		size += snprintf(output + size, sizeof(output) - size, "%s%s %d", (comma ? ", " : ""), buf, EMPIRE_SCORE(e, iter));
 		comma = TRUE;
 	}
-	msg_to_char(ch, ")\r\n");
+	size += snprintf(output + size, sizeof(output) - size, ")\r\n");
 
 	// show war cost?
 	if (GET_LOYALTY(ch) && GET_LOYALTY(ch) != e && !EMPIRE_IMM_ONLY(e) && !EMPIRE_IMM_ONLY(GET_LOYALTY(ch)) && !has_relationship(GET_LOYALTY(ch), e, DIPL_NONAGGR | DIPL_ALLIED)) {
 		int war_cost = get_war_cost(GET_LOYALTY(ch), e);
 		if (war_cost > 0) {
-			msg_to_char(ch, "Cost to declare war or thievery on this empire: %d coin%s\r\n", war_cost, PLURAL(war_cost));
+			size += snprintf(output + size, sizeof(output) - size, "Cost to declare war or thievery on this empire: %d coin%s\r\n", war_cost, PLURAL(war_cost));
 		}
 	}
 	
-	// show_empire_diplomacy(ch, e, NULL);
+	if (ch->desc) {
+		page_string(ch->desc, output, TRUE);
+	}
 }
 
 
@@ -2993,7 +2999,7 @@ struct find_territory_node *reduce_territory_node_list(struct find_territory_nod
 	
 	// iterate until there are no more than 350 nodes
 	DL_COUNT(list, node, count);
-	while (count > 350) {
+	while (count > 120) {
 		DL_FOREACH_SAFE(list, node, next_node) {
 			// is there a node later in the list that is within range?
 			if ((find = find_nearby_territory_node(node->loc, next_node, size))) {
@@ -3006,8 +3012,14 @@ struct find_territory_node *reduce_territory_node_list(struct find_territory_nod
 			}
 		}
 		
-		// double size on each pass
-		size *= 2;
+		// increase size on each pass
+		if (size < 25) {
+			size += 5;
+		}
+		else {
+			size += 10;
+		}
+		
 		DL_COUNT(list, node, count);
 	}
 	
@@ -7106,6 +7118,7 @@ void process_reclaim(char_data *ch) {
 		msg_to_char(ch, "%d minute%s remaining to reclaim the area.\r\n", (GET_ACTION_TIMER(ch) / 12), PLURAL(GET_ACTION_TIMER(ch) / 12));
 	}
 	else if (GET_ACTION_TIMER(ch) <= 0) {
+		log_to_empire(emp, ELOG_HOSTILITY, "%s has reclaimed (%d, %d) from %s!", PERS(ch, ch, TRUE), X_COORD(target), Y_COORD(target), EMPIRE_NAME(enemy));
 		log_to_empire(enemy, ELOG_HOSTILITY, "Someone from %s has reclaimed (%d, %d)%s!", EMPIRE_NAME(emp), X_COORD(target), Y_COORD(target), from_str);
 		msg_to_char(ch, "You have reclaimed the area for your empire!\r\n");
 		
@@ -7618,7 +7631,7 @@ void do_workforce_nearby(char_data *ch, empire_data *emp, char *argument) {
 	struct empire_npc_data *npc;
 	struct generic_name_data *nameset;
 	char_data *proto;
-	char buf[MAX_STRING_LENGTH], line[256], name[256];
+	char buf[MAX_STRING_LENGTH], line[256], name[256], *temp;
 	size_t size, lsize;
 	int avail, working;
 	bool full = FALSE;
@@ -7652,6 +7665,11 @@ void do_workforce_nearby(char_data *ch, empire_data *emp, char *argument) {
 				if (!full) {
 					nameset = get_best_name_list(MOB_NAME_SET(proto), npc->sex);
 					snprintf(name, sizeof(name), "%s", nameset->names[npc->name]);
+					
+					temp = str_replace("#n", name, GET_SHORT_DESC(proto));
+					strncpy(name, temp, sizeof(name));
+					name[sizeof(name)-1] = '\0';	// ensure terminator
+					free(temp);
 				}
 				++avail;
 			}

@@ -1,11 +1,12 @@
-! ^
+! "EXCLAMATION MARK" ^ CARET
 
-Use ! to repeat the last command typed at the keyboard. You can also repeat
-any of your last 5 commands by abbreviating the one you want to repeat. For
-example, '!w' might repeat your last whois.
+Use ! (exclamation mark) to repeat the last command typed at the keyboard. You
+can also repeat any of your last 5 commands by abbreviating the one you want to
+repeat after the exclamation mark. For example, '!w' might repeat your last who
+or whois.
 
-Use ^ to replace a string from the last command with a new string. The syntax
-is the same as in csh: "^old-string^replacement"
+Use ^ (caret) to replace a string from the last command with a new string. The
+syntax is the same as in csh: "^old-string^replacement"
 
 Examples:
 
@@ -20,7 +21,7 @@ Examples:
 
 See also: ALIAS
 #
-+ - -- "INPUT QUEUE" "COMMAND QUEUE" "INPUT LAG" "COMMAND LAG" QUEUE
++ - -- "INPUT QUEUE" "COMMAND QUEUE" "INPUT LAG" "COMMAND LAG" QUEUE "MINUS SIGN" "PLUS SIGN"
 
 The + and - commands allow you to manipulate your input queue. Some commands,
 such as abilities, cause a small amount of "command lag". Anything you type
@@ -1229,7 +1230,7 @@ good idea to read them every once in a while.
    credits  - the people who made EmpireMUD possible
    version  - displays the current EmpireMUD version
 #
-INVENTORY
+INVENTORY INV I
 
 Usage:  inventory
         inventory [-k | -n] <keywords>
@@ -1651,6 +1652,12 @@ For traditional buildings, you must paint from inside. For vehicles or newer
 buildings, you can also paint them from the outside.
 
 You need the 'customize' privilege in your empire to paint or unpaint.
+
+Examples:
+
+  > paint building orange
+  > paint raft blue
+  > unpaint wagon
 
 See also: COLORS, PAINTER'S WORKSHOP
 #
@@ -2230,7 +2237,7 @@ and (1) represents the number of ability points you have to spend.
 
 Score also shows things which are affecting you.
 
-See also: SHIELD BLOCK, AFFECTS, SKILL LEVEL, GEAR LEVEL
+See also: SHIELD BLOCK, AFFECTS, SKILL LEVEL, GEAR LEVEL, REGENS
 #
 SCRAP
 
@@ -2369,10 +2376,14 @@ The SLEEP command puts you to sleep, allowing you to regain your stamina more
 quickly. You will be largely unaware of your surroundings while asleep. You
 can awaken yourself with the WAKE command.
 
+Sleep boosts all your regens considerably, and may be the only way to
+regenerate move points if you're hungry or thirsty. This effect is even faster
+in a bedroom or similar location.
+
 You also can sleep on some furniture and vehicles. Sleeping in a canoe will
 protect you from sharks in the ocean.
 
-See also: WAKE
+See also: REGENS, WAKE
 #
 SOCIALS
 

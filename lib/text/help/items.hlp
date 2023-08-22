@@ -480,7 +480,10 @@ your inventory.
 can use this to avoid wasting more precious components when you have cheaper
 ones available.
 
-See also: COMPONENT
+Note: If you 'keep' an item, it can't be turned in as part of a quest and won't
+be counted by the quest tracker. Unkeep it for it to appear.
+
+See also: COMPONENT, QUEST
 #
 KNIFE KNIVES
 
@@ -1051,7 +1054,7 @@ See also: IDENTIFY
 VAULT
 
 Building:  Vault (designated)
-Designated in:  portcullis, great hall
+Designated in:  castle, palace
 
 Command:  deposit <number> [empire] <coins>
           warehouse <action> <item keywords>

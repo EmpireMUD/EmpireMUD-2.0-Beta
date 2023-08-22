@@ -84,7 +84,10 @@ in somewhere.
 
 To finish a quest, you must have finished the tasks on its tracker.
 
-See also: QUEST, QUEST TRACKER
+Note: If you 'keep' an item, it can't be turned in as part of a quest and won't
+be counted by the quest tracker. Unkeep it for it to appear.
+
+See also: KEEP, QUEST, QUEST TRACKER
 #
 "QUEST GROUP"
 
@@ -109,7 +112,10 @@ the quest tracker help file for more information.
 When you use it on a quest you've already completed, it will show the
 completion message and the rewards as well.
 
-See also: QUEST, QUEST TRACKER
+Note: If you 'keep' an item, it can't be turned in as part of a quest and won't
+be counted by the quest tracker. Unkeep it for it to appear.
+
+See also: KEEP, QUEST, QUEST TRACKER
 #
 "QUEST LIST"
 
@@ -156,7 +162,10 @@ Some quests require ALL tasks in the tracker to be complete, others only
 require some tasks. If any tasks say "or", you only need to match one of the
 ors.
 
-See also: QUEST
+Note: If you 'keep' an item, it can't be turned in as part of a quest and won't
+be counted by the quest tracker. Unkeep it for it to appear.
+
+See also: KEEP, QUEST
 #
 "CITY DAILIES"
 

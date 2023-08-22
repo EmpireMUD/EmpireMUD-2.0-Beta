@@ -2627,6 +2627,24 @@ PLAYER_UPDATE_FUNC(b5_152_player_update) {
 }
 
 
+// b5.153: Fix players with invalid hunger/thirst values due to a bug in b5.152
+PLAYER_UPDATE_FUNC(b5_153_player_repair) {
+	int iter;
+	
+	for (iter = 0; iter < NUM_CONDS; ++iter) {
+		// repair weird negatives
+		if (GET_COND(ch, iter) < -1) {
+			GET_COND(ch, iter) = UNLIMITED;
+		}
+		
+		// check for mortals with unlimited values they shouldn't have
+		if (!IS_IMMORTAL(ch) && !IS_GOD(ch) && GET_COND(ch, iter) == UNLIMITED) {
+			GET_COND(ch, iter) = 0;
+		}
+	}
+}
+
+
  //////////////////////////////////////////////////////////////////////////////
 //// UPDATE DATA /////////////////////////////////////////////////////////////
 
@@ -2689,6 +2707,7 @@ const struct {
 	{ "b5.151", b5_151_road_fix, NULL, "Applying hide-real-name flag to customized roads" },
 	{ "b5.151.1", b5_151_terrain_fix, NULL, "Repairing bad terrains and updating with new oases and irrigated terrains" },
 	{ "b5.152", b5_152_world_update, b5_152_player_update, "Updating lights and expire times on player, mob, and world affects" },
+	{ "b5.153", NULL, b5_153_player_repair, "Repairing hunger/thirst on players" },
 	
 	{ "\n", NULL, NULL, "\n" }	// must be last
 };

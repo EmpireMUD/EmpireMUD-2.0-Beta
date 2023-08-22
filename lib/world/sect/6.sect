@@ -1184,7 +1184,7 @@ M
 619 15.00 c
 X
 oasis enchanted weirdwood weald grove thicket weirdwoods trees forest around water~
-   The oasis has taken on a odd pink color, though it's below the surface. The
+   The oasis has taken on an odd pink color, though it's below the surface. The
 water is still crystal clear and unusually refreshing. The desert has begun
 sprouting plants in shades of bright violet. Truly this is a magical place.
 ~
@@ -1200,6 +1200,12 @@ D0
 &y~
 D0
 &VW&P~~&?.~
+&y~
+D0
+.&P~~&Vw~
+&y~
+D0
+&Vw&P~~&?.~
 &y~
 E
 0 0 100.00 616
@@ -1265,6 +1271,15 @@ C
 chop, dig, drink, fill, pick~
 D0
 &VW&P~~&VW~
+&y~
+D0
+&Vw&P~~&VW~
+&y~
+D0
+&VW&P~~&Vw~
+&y~
+D0
+&Vw&P~~&Vw~
 &y~
 E
 0 0 100.00 617

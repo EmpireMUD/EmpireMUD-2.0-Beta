@@ -90,7 +90,7 @@ in the wrong skill by using 'noskill'.
 
 See also: ABILITY POINTS, SKILLS, SKILL CAPS, NOSKILL
 #
-DESIGNATE REDESIGNATE KITCHEN BEDROOM LABORATORY LARDER CLOSET CRYPT STUDY
+DESIGNATE REDESIGNATE KITCHEN BEDROOM LABORATORY LARDER CLOSET CRYPT STUDY GREATHALL "GREAT HALL"
 
 Usage:  designate <direction> <room>
         redesignate <room>
@@ -151,8 +151,13 @@ can't refund any coins, mana, or liquids that were spent.
 
 You can also dismantle some vehicles.
 
-This requires the 'dismantle' empire privilege, unless you are the person who
-originally built the building.
+To start dismantling something, you need the same ability that was required to
+build it in the first place. Use 'build info <name>' to see what ability that
+is. People without the ability can still help to dismantle it once someone has
+started.
+
+It also requires the 'dismantle' empire privilege, unless you are the person
+who originally built the building.
 
 You can use 'nodismantle' to keep yourself from accidentally dismantling a
 building.
@@ -161,7 +166,7 @@ Note: Mountain tiles only refresh with new ore each year if the mines (or other
 buildings) have been dismantled and removed. However, all other resource
 buildings refresh each year without being dismantled.
 
-See also: BUILD, HOMELESS CITIZENS, NODISMANTLE
+See also: BUILD, BUILD INFO, HOMELESS CITIZENS, NODISMANTLE
 #
 "FIRE STICKS" FIRESTICKS "FIRE DRILL" "FIRESTEEL TINDERBOX" TINDERBOX "FLINT SET" LIGHTERS
 

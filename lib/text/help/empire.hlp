@@ -134,7 +134,7 @@ don't claim it yourself.
 
 There is a 60-minute waiting period between when you found a city, and when it
 counts as a city for things like City Teleportation, certain buildings such as
-the Great Hall, for guard towers, and for some other game rules.
+the palace, for guard towers, and for some other game rules.
 
 EmpireMUD periodically checks if cities have no claimed buildings and, if so,
 will remove the city center and refund the city point. This helps keep the map
@@ -775,8 +775,8 @@ LUXURIES "LUXURIES GOAL"
 Luxuries (Community goal)
 
 Rewards the following buildings:
-  [**]  greathall  (in-city only)
-  V[]V  portcullis  (in-city only)
+  ]||[  castle  (in-city only)
+  ]**[  palace  (in-city only)
   .==.  steps
 
 See also: LUXURY RESOURCES GOAL, PROGRESS
@@ -1464,7 +1464,7 @@ Workforce types:
   &ychopping:&0 NPCs will chop down forests and desert groves (Not orchards - 
      use farming without replanting for that).
   &ycrafting:&0 NPCs will make certain crafts (see WORKFORCE CRAFTING).
-  &ydigging:&0 NPCs will dig for in any quarry, clay pit, or sand pit.
+  &ydigging:&0 NPCs will dig in any quarry, clay pit, or sand pit.
   &ydismantle-mines:&0 marks empty mines to be dismantled by the building chore.
   &yfarming:&0 NPCs will harvest crops. Costs no food.
   &yfire-brigade:&0 NPCs will put out fires.
