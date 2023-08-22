@@ -216,10 +216,8 @@ earn their prized gear. You won't be able to fight each goblin until you pick
 a difficulty with the 'difficulty' command.
 
 The gear sold in the shops is the same as the gear created by the crafting
-patterns and the loot dropped by the goblins except for the levels and flags:
-- Loot from defeating goblins: levels 50-150, normal/hard/group difficulty, BoP
-- Purchased items: levels 1-175, normal difficulty, BoE
-- Crafted items: levels 1-175, normal or superior, BoE
+patterns and the loot dropped by the goblins, but it will be BoE instead of BoP
+when crafted, can go as high as level 175, and may be crafted as superior.
 
 Healer crafts (Haxaw's mad sketches):
  Haxaw's poison ring  (finger, forged, Jewelry)
