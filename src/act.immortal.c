@@ -4176,10 +4176,11 @@ SHOW(show_crops) {
 	int count, total, this;
 	struct map_data *map;
 	size_t size, l_size;
-	bool any;
+	bool any, use_columns;
 	
 	// fresh numbers
 	update_world_count();
+	use_columns = !PRF_FLAGGED(ch, PRF_SCREEN_READER);
 	
 	if (!*argument) {	// no-arg: show summary
 		// output
@@ -4188,10 +4189,10 @@ SHOW(show_crops) {
 		HASH_ITER(hh, crop_table, crop, next_crop) {
 			this = stats_get_crop_count(crop);
 			strcpy(buf, GET_CROP_NAME(crop));
-			msg_to_char(ch, " %6d %-26.26s %s", this, CAP(buf), !((++count)%2) ? "\r\n" : " ");
+			msg_to_char(ch, " %6d %-26.26s %s", this, CAP(buf), !((++count)%2 || !use_columns) ? "\r\n" : " ");
 			total += this;
 		}
-		if (count % 2) {
+		if (count % 2 && !use_columns) {
 			msg_to_char(ch, "\r\n");
 		}
 	
