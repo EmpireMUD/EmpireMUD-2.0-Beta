@@ -820,7 +820,8 @@ GIMMICK "COMBAT GIMMICK" "FIGHT GIMMICK" "INTERACTIVE FIGHT"
 
 Some fights are interactive and will require you to type the right command at
 the right time. Depending on the adventure, the difficulty setting, and the
-specific mob, these gimmicks can range from fun to deadly.
+specific mob, these gimmicks can range from fun to deadly. Not all adventures
+use combat gimmicks.
 
 For example, in the Tower Skycleave, the player may receive this message in a
 fight:
