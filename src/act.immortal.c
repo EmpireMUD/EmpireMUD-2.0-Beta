@@ -3988,10 +3988,11 @@ SHOW(show_buildings) {
 	size_t size, l_size;
 	sector_data *sect;
 	room_data *room;
-	bool any;
+	bool any, use_columns;
 	
 	// fresh numbers
 	update_world_count();
+	use_columns = !PRF_FLAGGED(ch, PRF_SCREEN_READER);
 	
 	if (!*argument) {	// no-arg: show summary
 		// output
@@ -4004,10 +4005,10 @@ SHOW(show_buildings) {
 			
 			this = stats_get_building_count(bld);
 			strcpy(buf, GET_BLD_NAME(bld));
-			msg_to_char(ch, " %6d %-26.26s %s", this, CAP(buf), !((++count)%2) ? "\r\n" : " ");
+			msg_to_char(ch, " %6d %-26.26s %s", this, CAP(buf), (!((++count)%2) || !use_columns) ? "\r\n" : " ");
 			total += this;
 		}
-		if (count % 2) {
+		if (count % 2 && use_columns) {
 			msg_to_char(ch, "\r\n");
 		}
 	
@@ -4192,7 +4193,7 @@ SHOW(show_crops) {
 			msg_to_char(ch, " %6d %-26.26s %s", this, CAP(buf), (!((++count)%2) || !use_columns) ? "\r\n" : " ");
 			total += this;
 		}
-		if (count % 2 && !use_columns) {
+		if (count % 2 && use_columns) {
 			msg_to_char(ch, "\r\n");
 		}
 	
@@ -4449,10 +4450,11 @@ SHOW(show_terrain) {
 	int count, total, this;
 	struct map_data *map;
 	size_t size, l_size;
-	bool any;
+	bool any, use_columns;
 	
 	// fresh numbers
 	update_world_count();
+	use_columns = !PRF_FLAGGED(ch, PRF_SCREEN_READER);
 	
 	if (!*argument) {	// no-arg: show summary
 		// output
@@ -4460,11 +4462,11 @@ SHOW(show_terrain) {
 	
 		HASH_ITER(hh, sector_table, sect, next_sect) {
 			this = stats_get_sector_count(sect);
-			msg_to_char(ch, " %6d %-26.26s %s", this, GET_SECT_NAME(sect), !((++count)%2) ? "\r\n" : " ");
+			msg_to_char(ch, " %6d %-26.26s %s", this, GET_SECT_NAME(sect), (!((++count)%2) || !use_columns) ? "\r\n" : " ");
 			total += this;
 		}
 	
-		if (count % 2) {
+		if (count % 2 && use_columns) {
 			msg_to_char(ch, "\r\n");
 		}
 	
