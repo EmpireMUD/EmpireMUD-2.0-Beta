@@ -835,7 +835,7 @@ S
 #10451
 dryleef vanguard leader goblin~
 Dryleef, vanguard leader~
-Dryleef, leader of the goblin vanguard, is sitting on the throne.
+Dryleef, leader of the goblin vanguard, is sitting on the throne. (difficulty)
 ~
 0 0 bdhyK G 2
 1 0 0 5 -1
@@ -905,7 +905,7 @@ S
 #10452
 pimmin shaman goblin~
 Pimmin, goblin shaman~
-A goblin shaman is swirling a vial with a rat tail.
+A goblin shaman is swirling a vial with a rat tail. (difficulty)
 ~
 0 0 bdhxyK G 2
 2 0 0 16 -1
@@ -979,7 +979,7 @@ S
 #10453
 shivsper goblin assassin~
 Shivsper, goblin assassin~
-Shivsper throws a dagger at a crude drawing of a human on the wall.
+Shivsper throws a dagger at a crude drawing of a human on the wall. (difficulty)
 ~
 0 0 bdhyzK G 2
 1 0 0 4 -1
@@ -1038,7 +1038,7 @@ S
 #10454
 wargreyn goblin smith blacksmith~
 Wargreyn, goblin blacksmith~
-Wargreyn, the goblin smith, is resting by the forge.
+Wargreyn, the goblin smith, is resting by the forge. (difficulty)
 ~
 0 0 bdhyK G 2
 2 0 0 6 -1
@@ -1157,7 +1157,7 @@ S
 #10457
 haxaw medicine goblin~
 Haxaw, medicine goblin~
-Haxaw is sitting here, stirring a small pot.
+Haxaw is sitting here, stirring a small pot. (difficulty)
 ~
 0 0 bdhvxyIK GM 3
 2 0 0 28 -1

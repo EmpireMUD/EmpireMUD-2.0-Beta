@@ -26,7 +26,8 @@ up into the streets. This can only mean one thing: Goblins! Will you buy the
 goblins' wares, or drive them from the city? This adventure sells 30 BoE items,
 the crafting patterns BoE for them all, and 4 unique buildings. You can also
 fight the goblins solo or in pairs (on normal, hard, or group difficulty) to
-earn their prized gear.
+earn their prized gear. You won't be able to fight each goblin until you pick
+a difficulty with the 'difficulty' command.
    The gear sold in the shops is the same as the gear created by the crafting
 patterns and the loot dropped by the goblins except for the levels and flags:
 - Loot from defeating goblins: levels 50-150, normal/hard/group difficulty, BoP
