@@ -4189,7 +4189,7 @@ SHOW(show_crops) {
 		HASH_ITER(hh, crop_table, crop, next_crop) {
 			this = stats_get_crop_count(crop);
 			strcpy(buf, GET_CROP_NAME(crop));
-			msg_to_char(ch, " %6d %-26.26s %s", this, CAP(buf), !((++count)%2 || !use_columns) ? "\r\n" : " ");
+			msg_to_char(ch, " %6d %-26.26s %s", this, CAP(buf), !((++count)%2 && use_columns) ? "\r\n" : " ");
 			total += this;
 		}
 		if (count % 2 && !use_columns) {
