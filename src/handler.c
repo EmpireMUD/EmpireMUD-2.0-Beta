@@ -8415,7 +8415,7 @@ bool meets_requirements(char_data *ch, struct req_data *list, struct instance_da
 			case REQ_GET_COMPONENT: {
 				struct resource_data *res = NULL;
 				add_to_resource_list(&res, RES_COMPONENT, req->vnum, req->needed, req->misc);
-				if (!has_resources(ch, res, FALSE, FALSE)) {
+				if (!has_resources(ch, res, FALSE, FALSE, NULL)) {
 					ok = FALSE;
 				}
 				free_resource_list(res);
@@ -8424,7 +8424,7 @@ bool meets_requirements(char_data *ch, struct req_data *list, struct instance_da
 			case REQ_GET_OBJECT: {
 				struct resource_data *res = NULL;
 				add_to_resource_list(&res, RES_OBJECT, req->vnum, req->needed, 0);
-				if (!has_resources(ch, res, FALSE, FALSE)) {
+				if (!has_resources(ch, res, FALSE, FALSE, NULL)) {
 					ok = FALSE;
 				}
 				free_resource_list(res);
@@ -8538,7 +8538,7 @@ bool meets_requirements(char_data *ch, struct req_data *list, struct instance_da
 				if (!found) {
 					// check inventory
 					add_to_resource_list(&res, RES_OBJECT, req->vnum, req->needed, 0);
-					if (!has_resources(ch, res, FALSE, FALSE)) {
+					if (!has_resources(ch, res, FALSE, FALSE, NULL)) {
 						ok = FALSE;
 					}
 					free_resource_list(res);

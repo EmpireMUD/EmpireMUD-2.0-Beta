@@ -1515,7 +1515,7 @@ ACMD(do_gen_augment) {
 	else if (!validate_augment_target(ch, obj, aug, TRUE)) {
 		// sends own message
 	}
-	else if (!has_resources(ch, GET_AUG_RESOURCES(aug), FALSE, TRUE)) {
+	else if (!has_resources(ch, GET_AUG_RESOURCES(aug), FALSE, TRUE, GET_AUG_NAME(aug))) {
 		// sends its own messages
 	}
 	else if (GET_AUG_ABILITY(aug) != NO_ABIL && ABILITY_TRIGGERS(ch, NULL, obj, GET_AUG_ABILITY(aug))) {
@@ -2100,7 +2100,7 @@ ACMD(do_gen_craft) {
 	else if (IS_CARRYING_N(ch) > CAN_CARRY_N(ch)) {
 		msg_to_char(ch, "You can't %s anything while overburdened.\r\n", gen_craft_data[subcmd].command);
 	}
-	else if (!has_resources(ch, GET_CRAFT_RESOURCES(type), can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED), TRUE)) {
+	else if (!has_resources(ch, GET_CRAFT_RESOURCES(type), can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED), TRUE, GET_CRAFT_NAME(type))) {
 		// this sends its own message ("You need X more of ...")
 		//msg_to_char(ch, "You don't have the resources to %s that.\r\n", gen_craft_data[GET_CRAFT_TYPE(type)].command);
 	}
@@ -2536,7 +2536,7 @@ ACMD(do_reforge) {
 		if (!validate_item_rename(ch, obj, argument)) {
 			// sends own message
 		}
-		else if (!has_resources(ch, res, can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED), TRUE)) {
+		else if (!has_resources(ch, res, can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED), TRUE, NULL)) {
 			// sends own message
 		}
 		else {
@@ -2578,7 +2578,7 @@ ACMD(do_reforge) {
 		if (!proto) {
 			msg_to_char(ch, "You can't renew that.\r\n");
 		}
-		else if (!has_resources(ch, res, can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED), TRUE)) {
+		else if (!has_resources(ch, res, can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED), TRUE, NULL)) {
 			// sends own message
 		}
 		else {
@@ -2639,7 +2639,7 @@ ACMD(do_reforge) {
 		else if (!(cft_abil = find_ability_by_vnum(GET_CRAFT_ABILITY(ctype))) || ABIL_MASTERY_ABIL(cft_abil) == NOTHING || !has_ability(ch, ABIL_MASTERY_ABIL(cft_abil))) {
 			msg_to_char(ch, "You don't have the mastery to make that item superior.\r\n");
 		}
-		else if (!has_resources(ch, res, can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED), TRUE)) {
+		else if (!has_resources(ch, res, can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED), TRUE, NULL)) {
 			// sends own message
 		}
 		else {

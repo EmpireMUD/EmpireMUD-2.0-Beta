@@ -2787,7 +2787,7 @@ ACMD(do_lay) {
 	}
 	else if (!ROOM_SECT_FLAGGED(IN_ROOM(ch), SECTF_LAY_ROAD))
 		msg_to_char(ch, "You can't lay a road here!\r\n");
-	else if (!has_resources(ch, cost, TRUE, TRUE)) {
+	else if (!has_resources(ch, cost, TRUE, TRUE, NULL)) {
 		// sends own messages
 	}
 	else {

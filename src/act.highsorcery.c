@@ -1489,7 +1489,7 @@ RITUAL_SETUP_FUNC(start_chant_of_illusions) {
 		msg_to_char(ch, "This road is already cloaked in illusion.\r\n");
 		return FALSE;
 	}
-	if (!has_resources(ch, illusion_res, TRUE, TRUE)) {
+	if (!has_resources(ch, illusion_res, TRUE, TRUE, NULL)) {
 		// message sent by has_resources
 		return FALSE;
 	}
@@ -1765,7 +1765,7 @@ RITUAL_SETUP_FUNC(start_ritual_of_defense) {
 		return FALSE;
 	}
 	
-	if (!has_resources(ch, defense_res, TRUE, TRUE)) {
+	if (!has_resources(ch, defense_res, TRUE, TRUE, NULL)) {
 		// message sent by has_resources
 		return FALSE;
 	}

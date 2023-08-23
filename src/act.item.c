@@ -104,7 +104,7 @@ INTERACTION_FUNC(combine_obj_interact) {
 	// how many they need
 	add_to_resource_list(&res, RES_OBJECT, GET_OBJ_VNUM(inter_item), interaction->quantity, 0);
 	
-	if (!has_resources(ch, res, can_use_room(ch, IN_ROOM(ch), MEMBERS_ONLY), TRUE)) {
+	if (!has_resources(ch, res, can_use_room(ch, IN_ROOM(ch), MEMBERS_ONLY), TRUE, NULL)) {
 		// error message sent by has_resources
 		free_resource_list(res);
 		return TRUE;

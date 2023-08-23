@@ -1867,7 +1867,7 @@ void extract_resources(char_data *ch, struct resource_data *list, bool ground, s
 struct resource_data *get_next_resource(char_data *ch, struct resource_data *list, bool ground, bool left2right, obj_data **found_obj);
 char *get_resource_name(struct resource_data *res);
 void give_resources(char_data *ch, struct resource_data *list, bool split);
-bool has_resources(char_data *ch, struct resource_data *list, bool ground, bool send_msgs);
+bool has_resources(char_data *ch, struct resource_data *list, bool ground, bool send_msgs, char *msg_prefix);
 void reduce_dismantle_resources(int damage, int max_health, struct resource_data **list);
 void show_resource_list(struct resource_data *list, char *save_buffer);
 
