@@ -164,6 +164,9 @@ Long strings use the full text editor. To edit, use: config <key> edit
 
 There is no undo button, but all changes are logged.
 
+Key names may be abbreviated when viewing a key's value, but not when changing
+the value.
+
 If you want to experiment with the system, you can change test_config in the
 "other" set.
 #b
