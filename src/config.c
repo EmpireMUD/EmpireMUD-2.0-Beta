@@ -2126,14 +2126,14 @@ ACMD(do_config) {
 			val_arg = any_one_word(argument, arg2);
 			skip_spaces(&val_arg);
 			if (!(cnf = get_config_by_key(arg2, (*argument && !verbose) ? TRUE : FALSE)) || cnf->set != set) {
-				msg_to_char(ch, "Invalid key %s in %s configs (must be exact).\r\n", arg2, config_groups[set]);
+				msg_to_char(ch, "Invalid key %s in %s configs (keys must be exact).\r\n", arg2, config_groups[set]);
 				return;
 			}
 		}
 	}
 	else {	// no arg or invalid arg
 		if (*arg1) {
-			msg_to_char(ch, "Invalid config type or key '%s'.\r\n", arg1);
+			msg_to_char(ch, "Invalid config type or key '%s' (keys must be exact).\r\n", arg1);
 		}
 		
 		msg_to_char(ch, "Usage: config <type> [-v]\r\n");
