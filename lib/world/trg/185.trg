@@ -988,7 +988,8 @@ set room7 %room6.east(room)%
 Jungle Temple adventure cleanup building replacer~
 2 e 100
 ~
-if %room.var(18247_hidden,0)%
+set start %instance.start%
+if %start% && %start.var(18247_hidden,0)%
   * shortcut and do not leave a temple behind
   halt
 end
