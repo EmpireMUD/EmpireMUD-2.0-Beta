@@ -667,6 +667,15 @@ if %colossus%
   nop %instance.set_location(%instance.real_location%)%
   %echoaround% %colossus% &&w~%colossus% staggers slowly up.&&0
 end
+* and check quest completion
+set ch %self.room.people%
+while %ch%
+  if %ch.on_quest(18250)%
+    %quest% %ch% trigger 18250
+  end
+  set ch %ch.next_in_room%
+done
+* and finally,
 %purge% %self%
 ~
 #12525
