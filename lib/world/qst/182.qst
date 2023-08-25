@@ -156,6 +156,441 @@ W
 Z
 0 18222
 S
+#18240
+Golden Goblin: Fathom a Little Goblin Aid~
+   The old librarian glances over at you from the books and asks, 'Are you
+looking for work? There's a little goblin ship stuck in a cave and in need of
+repairs. It's not much, but the guild will undoubtedly cover your expenses in
+the interest of indebting the little lime creatures to us.'
+   The librarian leafs through some loose papers to find one with a drawing of
+a ship. 'Ah, here it is. The Golden Goblin. I'm not sure which cave it's stuck
+in, but I'm sure it's nearby on the coast. Do be sure to let them know at the
+main guildhall when you've helped out. You know the one, in the Tipsy Tortoise.
+And be quick about it.'
+~
+   The vampire looks up from his cauldron as you approach, peering at you
+through dim yellow eyes.
+   'You must be the one who aided the Golden Goblin,' he says. 'I have received
+a squid from their sorceress, Fathma, speaking highly of you. At least, as
+highly as a goblin can speak. Pirates they may be, but those goblins will pay
+their debts. As will we. I believe I owe you this...'
+~
+12 e 0 0 -1
+A
+1 18218
+D 18240
+P
+0 18279 0 1 a
+P
+17 18200 0 7 a
+R
+7 18200 10
+R
+1 -1 100
+W+
+11 0 0 1 -
+Help Fathma~
+Z
+1 18208
+S
+#18241
+Goblin Challenge: Smoke Them Out~
+   The old librarian glances over at you from the books and asks, 'Are you
+looking for work? I came across a recipe for a smoke bomb which, according to
+the author, will drive them off. I need it tested, plain and simple.'
+   The librarian hands you an old page torn from a book. At a glance, it looks
+simple enough (craft info smoke bomb).
+   'Try it out,' the librarian says. Let the umbramancer at the Tipsy Tortoise
+know if it works. It's just copper and bileberries. And cram the page in there
+for good measure, too. You will be compensated for your time.'
+~
+   The shadowy sorcerer listens to your tale of the smoke bomb, especially the
+part where it cleared out the entire goblin nest.
+   'Extremely interesting,' the umbramancer says. 'This will take further
+study. In the meantime, your reward...'
+~
+14 e 0 0 -1
+A
+1 18218
+D 18240
+P
+0 18279 0 1 a
+P
+17 18200 0 7 a
+R
+7 18200 10
+R
+1 -1 100
+T 18277
+W+
+11 0 0 1 -
+Smoke the goblins out~
+Z
+1 18209
+S
+#18242
+Goblin Challenge: Defeat All Challengers~
+   'We have received a request,' the librarian says over a thick pair of
+spectacles. 'It's goblins again, of course. They've become a nuissance. I sent
+an adventurer already, but he found the nest had been cleared out by the little
+menaces themselves. They won't have gone far. Search nearby ruins and try to
+find it.'
+   The librarian turns away, but turns back to add, 'Oh, and you'll need to
+defeat them in proper combat if you hope to really drive them off. Do the
+Goblin Challenge, as we say. But be quick about it. Report back to Nostrazak
+at the Tipsy Tortoise when the deed is done.'
+~
+   You approach Nostrazak, who circles back behind his desk and listens
+intently as you tell him about your experience fighting the goblins in their
+dirty little arena.
+   'But they've moved on now?' he asks. 'You're sure?'
+   You nod, assuring him you completed the challenge and the goblins have
+moved out of the ruins. With any luck, they won't be back.
+~
+13 e 0 0 -1
+A
+1 18218
+D 18240
+P
+0 18279 0 1 a
+P
+17 18200 0 7 a
+R
+7 18200 10
+R
+1 -1 100
+W+
+3 10200 0 1 a
+Defeat the bruiser~
+W+
+3 10201 0 1 a
+Defeat the shaman~
+W+
+3 10202 0 1 a
+Defeat the archer~
+W+
+3 10203 0 1 a
+Defeat the sapper~
+W+
+3 10204 0 1 a
+Defeat the champion~
+W+
+3 10205 0 1 a
+Defeat the war shaman~
+Z
+1 18211
+S
+#18243
+Mill Manor: Catching Bugs~
+tba
+~
+tba
+~
+15 e 0 0 -1
+A
+1 18217
+D 18243
+P
+0 18279 0 1 a
+P
+17 18200 0 7 a
+R
+7 18200 10
+R
+1 -1 100
+T 18277
+W+
+11 0 0 1 -
+Catch three bugs~
+Z
+1 18208
+S
+#18244
+Swamp Hag: Suitable Supplies~
+tba
+ 1. GET-OBJECT: Get objects: 5x [10013] a rat skin (a)
+ 2. GET-COMPONENT: Get components: 5x (herbs) (a)
+ 3. GET-COMPONENT: Get components: 5x (thick magic leathers) (b)
+~
+tba
+~
+16 de 0 0 -1
+A
+1 18217
+D 18243
+P
+0 18279 0 1 a
+P
+17 18200 0 7 a
+R
+7 18200 10
+R
+1 -1 100
+W
+2 10013 0 5 a
+W
+1 6650 0 5 a
+W
+1 6531 0 5 b
+Z
+1 18210
+S
+#18245
+Swamp Hag: Feeding Rodentmort~
+tba
+~
+tba
+~
+18 e 0 0 -1
+A
+1 18217
+D 18243
+P
+0 18279 0 1 a
+P
+17 18200 0 7 a
+R
+7 18200 10
+R
+1 -1 100
+T 18277
+W+
+11 0 0 1 a
+Feed Rodentmort three corpses~
+Z
+1 18211
+S
+#18246
+Lost Temple: Important Archaeology~
+tba
+~
+tba
+~
+17 e 0 0 -1
+A
+1 18219
+D 18246
+P
+0 18279 0 1 a
+P
+17 18200 0 7 a
+R
+7 18200 10
+R
+1 -1 100
+T 18277
+W
+2 18249 0 4 -
+Z
+1 18210
+S
+#18247
+Lost Temple: Get Lost~
+tba
+~
+tba
+~
+18 e 0 0 -1
+A
+1 18219
+D 18246
+P
+0 18279 0 1 a
+P
+17 18200 0 7 a
+R
+7 18200 10
+R
+1 -1 100
+T 18277
+W+
+11 0 0 1 a
+Cast the spell on a lost temple~
+Z
+1 18208
+S
+#18248
+Wandering Dragon: Flame's End Fandango~
+tba
+~
+tba
+~
+18 e 0 0 -1
+A
+1 18219
+D 18246
+P
+0 18279 0 1 a
+P
+17 18200 0 7 a
+R
+7 18200 10
+R
+1 -1 100
+W
+3 10330 0 1 -
+W
+3 10331 0 1 -
+W
+3 10332 0 1 -
+W
+3 10333 0 1 -
+Z
+1 18211
+S
+#18249
+Clockwork Colossus: Cog and Collect~
+tba
+~
+tba
+~
+19 de 0 0 -1
+A
+1 18218
+D 18249
+P
+0 18279 0 1 a
+P
+17 18200 0 7 a
+R
+7 18200 10
+R
+1 -1 100
+W
+2 12506 0 1 a
+W
+2 12507 0 1 a
+Z
+1 18210
+S
+#18250
+Clockwork Colossus: Fettered Footwork~
+tba
+~
+tba
+~
+19 e 0 0 -1
+A
+1 18218
+D 18249
+P
+0 18279 0 1 a
+P
+17 18200 0 7 a
+R
+7 18200 10
+R
+1 -1 100
+T 18277
+W+
+11 0 0 1 a
+Bind the colossus's ankle~
+Z
+1 18211
+S
+#18251
+Three Bandits: Relic Ruffians Remedy~
+tba
+~
+tba
+~
+20 e 0 0 -1
+A
+1 18218
+D 18249
+P
+0 18279 0 1 a
+P
+17 18200 0 7 a
+R
+7 18200 10
+R
+1 -1 100
+T 18277
+W+
+11 0 0 1 a
+Pay off the bandits~
+Z
+1 18208
+S
+#18252
+Skycleave: Pilfering Pixies~
+tba
+~
+tba
+~
+20 e 0 0 -1
+A
+1 18217
+D 18252
+P
+0 18279 0 1 a
+P
+17 18200 0 7 a
+R
+7 18200 10
+R
+1 -1 100
+T 18277
+W+
+11 0 0 1 a
+Pilfer a racing pixy~
+W+
+2 18252 0 1 a
+Bring the pixy jar to the Tinker~
+Z
+1 18210
+S
+#18253
+Skycleave: Ink and Intrigue~
+tba
+~
+tba
+~
+21 e 0 0 -1
+A
+1 18217
+D 18252
+P
+0 18279 0 1 a
+P
+17 18200 0 7 a
+R
+7 18200 10
+R
+1 -1 100
+T 18277
+W+
+11 0 0 1 a
+Steal the scrolls~
+Z
+1 18209
+S
+#18254
+Hamlet: Reflecting on the Situation~
+tba
+~
+tba
+~
+22 e 0 0 -1
+A
+1 18217
+D 18252
+P
+0 18279 0 1 a
+P
+17 18200 0 7 a
+R
+7 18200 10
+R
+1 -1 100
+T 18277
+W+
+11 0 0 1 a
+Capture 3 fiends in the mirror~
+Z
+1 18210
+S
 #18256
 The Grove: Capture a Wildling~
    The Guild of Adventurers needs more information on the Magiterranean. Find a

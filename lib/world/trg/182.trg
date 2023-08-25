@@ -574,6 +574,179 @@ switch %random.4%
   break
 done
 ~
+#18227
+GoA: Use smoke bomb~
+1 c 2
+use~
+* Flushes out a Goblin Challenge
+return 1
+* basic errors first
+if !%arg% || %actor.obj_target(%arg.car%)% != %self%
+  return 0
+  halt
+elseif %actor.fighting%
+  %send% %actor% You're a bit busy right now!
+  halt
+elseif %actor.position% != Standing && %actor.position% != Resting && %actor.position% != Sitting
+  %send% %actor% You need to get up first.
+  halt
+end
+* try to do the thing
+set ok 0
+set room %actor.room%
+* remove goblins
+set ch %room.people%
+while %ch%
+  set next_ch %ch.next_in_room%
+  if %ch.vnum% >= 10200 && %ch.vnum% <= 10205
+    if !%ok%
+      %send% %actor% You throw down the smoke bomb... there's a putrid smell as green gas fills the nest!
+      %echoaround% %actor% ~%actor% throws down a smoke bomb... there's a putrid smell as green as fills the nest!
+      set ok 1
+    end
+    %echo% ~%ch% runs screaming from the nest!
+    %purge% %ch%
+  end
+  set ch %next_ch%
+done
+* remove bell
+set bell %room.contents(19060)%
+if %bell%
+  %purge% %bell%
+  if !%ok%
+    %send% %actor% You throw down the smoke bomb... there's a putrid smell as green gas fills the nest!
+    %echoaround% %actor% ~%actor% throws down a smoke bomb... there's a putrid smell as green as fills the nest!
+    set ok 1
+  end
+end
+* and?
+if %ok%
+  * trigger completion
+  %adventurecomplete%
+  set ch %room.people%
+  while %ch%
+    if %ch.on_quest(18241)%
+      %quest% %ch% trigger 18241
+      %send% %ch% You've successfully cleared a goblin nest with the smoke bomb!
+    end
+    set ch %ch.next_in_room%
+  done
+  %purge% %self%
+else
+  %send% %actor% It doesn't look like there are any goblins here to clear out. It's best you save your smoke bomb.
+end
+~
+#18228
+GoA: Use gilded net to catch bugs~
+1 c 2
+net~
+* Catches a 'bug' in Mill Manor
+set num_needed 2
+set bug_list 11133 11137 11140
+return 1
+* basic errors first
+set vict %actor.char_target(%arg.car%)%
+if !%arg%
+  %send% %actor% Net whom?
+  halt
+elseif %vict.vnum% < 11130 || !(%bug_list% ~= %vict.vnum%)
+  %send% %actor% You can't net ~%vict% with this!
+  halt
+elseif %actor.fighting%
+  %send% %actor% You're a bit busy right now!
+  halt
+elseif %actor.position% != Standing
+  %send% %actor% You need to get up first.
+  halt
+end
+* try to do the thing
+%send% %actor% You swoop toward ~%vict% with the gilded net... and catch it!
+%echoaround% %actor% ~%actor% swoops toward ~%vict% with @%self%... and catches it!
+eval 18243_bug_count %actor.var(18243_bug_count,0)% + 1
+remote 18243_bug_count %actor.id%
+%purge% %vict%
+if %18243_bug_count% >= %num_needed%
+  %send% %actor% That's all the bugs you needed... and good thing, too. Your net just broke!
+  if %actor.on_quest(18243)%
+    %quest% %actor% trigger 18243
+  end
+  %purge% %self%
+end
+~
+#18229
+GoA: Summon Rodentmort~
+1 c 2
+release~
+set needed 2
+return 1
+if !%arg%
+  %send% %actor% Release what?
+  halt
+elseif !(Rodentmort /= %arg%) && !(rat /= %arg%) && !(Morty /= %arg%)
+  %send% %actor% You don't seem to have that (try: release Rodentmort).
+  halt
+end
+* validate
+set found 0
+set ch %actor.room.people%
+while %ch%
+  if %ch.vnum% == 18224 && %ch.leader% == %actor%
+    set found 1
+  end
+  set ch %ch.next_in_room%
+done
+if %found%
+  %send% %actor% Rodentmort is already out of his cage.
+  halt
+end
+if %actor.var(18245_food_count,0)% >= %needed%
+  %send% %actor% Rodentmort is sleeping in his cage; you already finished this quest.
+  * in case
+  %quest% %actor% trigger 18245
+  halt
+end
+* ok, summon him
+%load% mob 18224
+set rat %actor.room.people%
+if %rat.vnum% == 18224
+  %force% %rat% mfollow %actor%
+  %send% %actor% You open the water-logged cage and ~%rat% plops out!
+  %echoaround% %actor% ~%actor% opens a water-logged cage and ~%rat% plops out!
+else
+  %send% %actor% You can't seem to get the cage open.
+end
+~
+#18230
+GoA: Rodentmort behavior~
+0 bt 75
+~
+* seek food and eat
+set needed 2
+set leader %self.leader%
+set room %self.room%
+* check leader here
+if !%leader% || %leader.room% != %room%
+  %echo% ~%self% scampers off.
+  %purge% %self%
+  halt
+end
+* eat a corpse?
+set obj %room.contents(1000)%
+if %obj%
+  %echo% ~%self% devours @%obj%! &&Z&%self% makes a huge mess.
+  nop %obj.empty%
+  %purge% %obj%
+  eval 18245_food_count %leader.var(18245_food_count,0)% + 1
+  remote 18245_food_count %leader.id%
+  wait 1 s
+  if %18245_food_count% >= %needed%
+    %echo% ~%self% hops back into ^%self% cage and falls asleep.
+    %quest% %leader% trigger 18245
+    %purge% %self%
+    halt
+  end
+end
+~
 #18238
 Consider / Kill Death~
 0 c 0
@@ -640,6 +813,266 @@ if !%rep_check%
   halt
 end
 return 0
+~
+#18248
+GoA: Pry gem off the wall~
+1 c 2
+pry~
+set valid_rooms 18503 18504 18508 18509 18510 18511 18512 18513 18514
+set needed 4
+set room %actor.room%
+return 1
+if %arg% && %arg% != gem
+  %send% %actor% You can only use @%self% to pry gems.
+  halt
+elseif !%room.template% || !(%valid_rooms% ~= %room.template%)
+  %send% %actor% There are no gems you can pry here using @%self%.
+  halt
+elseif %room.var(18246_gem_pried,0)% == %actor.id%
+  %send% %actor% You already pried it off.
+  halt
+elseif %room.var(18246_gem_pried,0)% > 0
+  %send% %actor% There was a gem here, but someone has already pried it off.
+  halt
+end
+* ok safe to pry
+%load% obj 18249 %actor% inv
+set 18246_gem_pried %actor.id%
+remote 18246_gem_pried %room.id%
+%send% %actor% You manage to pry a gem loose from the wall!
+%echoaround% %actor% ~%actor% pries a gem loose from the wall and pockets it!
+* check limit
+set found 0
+set obj %actor.inventory%
+while %obj%
+  if %obj.vnum% == 18249
+    eval found %found% + 1
+  end
+  set obj %obj.next_in_list%
+done
+if %found% >= %needed%
+  %send% %actor% ... your enchanted bar of prying breaks. Luckily, you got enough gems.
+  %echoaround% %actor% @%self% breaks in |%actor% hands.
+  %purge% %self%
+end
+~
+#18250
+GoA: Use stone orb of hiding~
+1 c 2
+use~
+* check targeting
+if !%arg% || %actor.obj_target(%arg.car%)% != %self%
+  return 0
+  halt
+end
+return 1
+set room %actor.room%
+set start %instance.start%
+set emerald %room.contents(18507)%
+* check location
+if %room.template% != 18501
+  %send% %actor% You need to use this orb at the great gate of a lost temple, in front of its emerald-green orb.
+  halt
+elseif %start% && %start.var(18247_hidden,0)%
+  %send% %actor% The emerald-green orb in front of the gate is drained of power. Someone has already hidden this temple.
+  halt
+elseif !%emerald%
+  %send% %actor% It looks like someone already shattered the emerald-green orb. You won't be able to use @%self% here.
+  halt
+end
+* ok go
+%adventurecomplete%
+if %start%
+  set 18247_hidden %actor.id%
+  remote 18247_hidden %start.id%
+end
+%send% %actor% You hold out @%self% and watch as a strange glow flows from the emerald-green orb in front of the gate, into the orb in your hands...
+%echoaround% %actor% ~%actor% holds out @%self% and you watch as a strange glow flows from the emerald-green orb in front of the gate, into the orb in ^%actor% hands...
+%regionecho% %room% 1 There's a strange rumbling that shakes the whole area!
+%echo% The emerald-green orb goes dark as vines begin to overtake the temple.
+%send% %actor% The stone orb in your hands turns to sand and falls to the ground.
+* trigger quests
+set ch %room.people%
+while %ch%
+  if %ch.on_quest(18247)%
+    %quest% %ch% trigger 18247
+  end
+  set ch %ch.next_in_room%
+done
+* and purge
+%purge% %emerald%
+%purge% %self%
+~
+#18251
+GoA: Bribe bandits~
+1 c 2
+bribe~
+return 1
+* check bandit here
+set room %actor.room%
+* find 1 bandit
+set bandit %room.people(10105)%
+if !%bandit%
+  set bandit %room.people(10106)%
+end
+if !%bandit%
+  set bandit %room.people(10107)%
+end
+if !%bandit%
+  %send% %actor% There's nobody here you can give this bribe to.
+  halt
+end
+* check bribe amount
+set amount %arg.car%
+set type %arg.cdr%
+if !%arg%
+  %force% %bandit% say Ha! You're wasting my time and yours. I want at least 300 coin on top of that.
+  %send% %actor% Type 'bribe 300 coins' to make a better offer.
+  halt
+end
+if %amount% < 300 || !(coins /= %type%)
+  %send% %actor% Usage: bribe <number> coins
+  %send% %actor% You cannot specify a type of coins for this.
+  halt
+end
+if !%actor.can_afford(%amount%)%
+  %send% %actor% You don't have that many coins.
+  halt
+end
+* ok go
+nop %actor.charge_coins(%amount%)%
+%send% %actor% You slip ~%bandit% the guild's bribe plus %amount% coins of your own...
+%echoaround% %actor% ~%actor% slips something to ~%bandit%.
+wait 1
+%force% %bandit% say Well, that's our mischief managed, then.
+wait 1
+* complete quests and purge bandits
+set ch %room.people%
+while %ch%
+  set next_ch %ch.next_in_room%
+  if %ch.on_quest(18251)%
+    %quest% %ch% trigger 18251
+  elseif %ch.vnum% >= 10105 && %ch.vnum% <= 10109
+    %echo% ~%ch% leaves.
+    %purge% %ch%
+  end
+  set ch %next_ch%
+done
+* and purge me
+%purge% %self%
+~
+#18252
+GoA: Pilfer pixy using a jar~
+1 c 2
+pilfer~
+return 1
+set room %actor.room%
+if %arg% && !(pixy /= %arg%)
+  %send% %actor% This jar can only be used for pilfering pixies.
+  halt
+elseif %self.val0%
+  %quest% %actor% trigger 18252
+  %send% %actor% You've already pilfered the pixy.
+  halt
+elseif %room.template% != 11918
+  %send% %actor% You're not looking for any common pixy... You need to do this at the Pixy Races in the Tower Skycleave.
+  halt
+end
+* ok:
+%send% %actor% You covertly place the jar next to the pixy stalls and tap it three times...
+%send% %actor% You see one of the pixies -- Mischantsy -- disappear in a little whirl of light, and then the jar shakes.
+%send% %actor% You slip the jar back in your pocket and hope no one sees.
+%echoaround% %actor% You notice ~%actor% doing something near the pixy stalls.
+%quest% %actor% trigger 18252
+nop %self.val0(1)%
+%mod% %self% keywords jar pilfered pixy old clay
+%mod% %self% shortdesc a pilfered pixy in a jar
+%mod% %self% longdesc A pilfered pixy in a jar is lying on the ground.
+%mod% %self% lookdesc tba
+~
+#18253
+GoA: Use skeleton key to steal scrolls~
+1 c 2
+use~
+return 1
+set room %actor.room%
+if !%arg% || %actor.obj_target(%arg.car%)% != %self%
+  return 0
+  halt
+elseif %self.val0%
+  %send% %actor% You've already stolen the scrolls.
+  %quest% %actor% trigger 18253
+  halt
+elseif %room.people(11847)%
+  %send% %actor% You can't get to the right drawer with Kara Virduke here.
+  halt
+elseif %room.template% != 11835 && %room.template% != 11935
+  %send% %actor% This isn't the right place to use the disarticulated skeleton key.
+  halt
+end
+* ok:
+%send% %actor% You sneak over through the archway and unlock a drawer with the disarticulated skeleton key...
+%send% %actor% You find the sealed scrolls inside and quickly pocket them.
+%echoaround% %actor% You notice ~%actor% doing something through the archway, but &%var%'s back before you can see what &%var%'s doing.
+%quest% %actor% trigger 18253
+nop %self.val0(1)%
+%mod% %self% keywords scrolls sealed set
+%mod% %self% shortdesc a set of sealed scrolls
+%mod% %self% longdesc A set of sealed scrolls is lying on the ground.
+%mod% %self% lookdesc tba
+detach 18253 %self.id%
+~
+#18254
+GoA: Reflect mob with smoky mirror~
+1 c 2
+reflect~
+return 1
+set room %actor.room%
+set vict %actor.char_target(%arg.car%)%
+if !%arg%
+  %send% %actor% Reflect whom with the strange and smoky mirror?
+  halt
+elseif !%vict%
+  %send% %actor% You don't see anybody called %arg.car% here.
+  halt
+elseif %vict.vnum% < 10401 || %vict.vnum% > 10415
+  %send% %actor% You hold the strange and smoky mirror up to ~%vict% but can't see a reflection.
+  %echoaround% %actor% ~%actor% holds a strange mirror up near ~%vict% but you can't tell what &%var%'s doing.
+  halt
+end
+* ok to mirror them
+%send% %actor% You hold the strange and smoky mirror up to ~%vict%...
+%echoaround% %actor% ~%actor% holds a strange mirror up near ~%vict%...
+if %vict.vnum% == 10404 && !%self.val0%
+  nop %self.val0(1)%
+  set extract 1
+elseif %vict.vnum% == 10409 && !%self.val1%
+  nop %self.val1(1)%
+  set extract 1
+elseif %vict.vnum% == 10414 && !%self.val2%
+  nop %self.val2(1)%
+  set extract 1
+else
+  * oops
+  set extract 0
+end
+* check completion
+if %self.val0% && %self.val1% && %self.val2%
+  set ch %room.people%
+  while %ch%
+    if %ch.on_quest(18254)%
+      %quest% %ch% trigger 18254
+    end
+    set ch %ch.next_in_room%
+  done
+end
+* consequences!
+if %extract%
+  %echo% ~%vict% is sucked into the mirror!
+  %purge% %vict%
+else
+  %force% %vict% maggro %actor%
+end
 ~
 #18256
 Catch wildling with a huge net~
@@ -901,6 +1334,37 @@ Adventurer Guild Tier 2: Give items on start~
 2 u 0
 ~
 switch %questvnum%
+  case 18241
+    %load% obj 18218 %actor% inv
+  break
+  case 18243
+    %load% obj 18220 %actor% inv
+    set 18243_bug_count 0
+    remote 18243_bug_count %actor.id%
+  break
+  case 18245
+    %load% obj 18224 %actor% inv
+    set 18245_food_count 0
+    remote 18245_food_count %actor.id%
+  break
+  case 18246
+    %load% obj 18248 %actor% inv
+  break
+  case 18247
+    %load% obj 18250 %actor% inv
+  break
+  case 18251
+    %load% obj 18251 %actor% inv
+  break
+  case 18252
+    %load% obj 18252 %actor% inv
+  break
+  case 18253
+    %load% obj 18253 %actor% inv
+  break
+  case 18254
+    %load% obj 18254 %actor% inv
+  break
   case 18279
     if %actor.completed_quest(18283)% && %actor.completed_quest(18287)% && %actor.completed_quest(18291)% && %actor.completed_quest(18295)%
       %load% obj 18294 %actor% inv

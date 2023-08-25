@@ -173,6 +173,60 @@ Use: build guildhall <direction> (city-only, single use)
 0 0 0
 0 0
 S
+#18218
+page old bombs smoke about~
+an old page about smoke bombs~
+An old page sits on the ground.~
+   The page is tattered on one side where it was torn from a book and tattered,
+differently, on the other three sides from too many years spent being shuffled
+from shelf to shelf. It bears a crude drawing of a copper tube with the
+alchemical symbol for bileberries. A loose interpretation of the text, so far
+as you can tell, suggests two ingots of copper or tin, 5 handfulls of bile-
+berries crushed into paste, and some fiber to stablize it. And, as the
+librarian suggested, the page should be wadded up inside as well.
+Usage: craft smoke bomb
+~
+3 0 a 0 3
+0 0 0
+0 0
+C
+1 1
+Q 18241
+S
+#18219
+bomb smoke fuming green~
+a fuming green smoke bomb~
+A fuming green smoke bomb is lying on the ground.~
+   Smoke diffuses from the seams of the bomb, turning the bomb's cylindrical
+casing a pale shade of green. You feel nervous holding onto the bomb; it would
+be best to test it quickly and report back to the guild. Seek out a Goblin
+Challenge and use the bomb to drive off the goblins, as the librarian asked,
+before this thing goes off in your hands.
+Usage: use bomb
+~
+3 0 a 0 2
+0 0 0
+13 0
+C
+1 1
+Q 18241
+T 18227
+S
+#18220
+net gilded guilded insect~
+a gilded insect net~
+A gilded insect net has been dropped here.~
+tba
+Usage: net <target>
+~
+3 0 a 0 4
+0 0 0
+11 0
+C
+1 1
+Q 18243
+T 18228
+S
 #18221
 egg atlasian~
 an atlasian egg~
@@ -213,6 +267,21 @@ has grown considerably, and looks as if it is about to hatch.
 -1 1 9
 7 144
 T 18225
+S
+#18224
+cage rat water-logged waterlogged logged~
+a water-logged rat cage~
+A water-logged rat cage is sitting here.~
+tba
+Use: release Rodentmort
+~
+3 0 a 0 2
+0 0 0
+0 0
+C
+1 1
+Q 18245
+T 18229
 S
 #18225
 whistle tortoise baby~
@@ -398,6 +467,109 @@ A
 5 1 0
 C
 100 200
+S
+#18248
+bar prying enchanted~
+an enchanted bar of prying~
+An enchanted bar of prying is lying here.~
+tba
+kUsage: pry gem
+~
+3 j a 0 2
+0 0 0
+2 0
+C
+1 1
+Q 18246
+T 18248
+S
+#18249
+gem jade important~
+an important jade gem~
+An important jade gem is lying on the ground.~
+tba
+~
+3 0 a 0 1
+0 0 0
+12 0
+C
+1 1
+Q 18246
+S
+#18250
+orb stone hiding~
+the stone orb of hiding~
+The stone orb of hiding is hidden here.~
+tba
+Usage: use orb
+~
+3 0 a 0 3
+0 0 0
+1 0
+C
+1 1
+Q 18247
+T 18250
+S
+#18251
+pouch coins~
+a pouch of coins for the bandit~
+A pouch of coins is lying here.~
+tba
+Usage: bribe
+~
+3 0 a 0 2
+0 0 0
+7 0
+C
+1 1
+Q 18251
+T 18251
+S
+#18252
+jar old clay pixy~
+an old clay pixy jar~
+An old clay pixy jar is lying here.~
+tba
+Usage: pilfer pixy
+~
+3 0 a 0 3
+0 0 0
+6 0
+C
+1 1
+Q 18252
+T 18252
+S
+#18253
+key skeleton disarticulated~
+a disarticulated skeleton key~
+A disarticulated skeleton key is lying here.~
+tba
+Usage: use key
+~
+3 0 a 0 1
+0 0 0
+14 0
+C
+1 1
+Q 18253
+T 18253
+S
+#18254
+mirror smoky strange~
+a strange and smoky mirror~
+A strange and smoky mirror is lying here.~
+tba
+Usage: reflect <mob>
+~
+3 0 a 0 2
+0 0 0
+8 0
+C
+1 1
+Q 18254
+T 18254
 S
 #18256
 net wildling huge~
