@@ -282,9 +282,22 @@ Z
 S
 #18243
 Mill Manor: Catching Bugs~
-tba
+   'Ah! Aha! Glad to see you here,' the guildmage says, with a wrinkled grin.
+'Have you been to the swamp lately? There's an old manor house with some, shall
+we say, strange goings-on. Especially with the bugs.'
+   The guildmage shuffles some items around on one of the tables, retrieves
+a gilded net, and hands it to you.
+   'The guild tasks you with catching some bugs. They may be large, but rest
+assured the enchanted net will do most of the work. You'll have to find Mill
+Manor on your own, but if you can get to the swamp, it should be nearby. Once
+you have them, take them to the old one in the Tipsy Tortoise. Quickly.'
+   Find the bugs in Mill Manor and type 'net <target>' to catch two of them.
 ~
-tba
+   You place the gilded net and the captured bugs on the workbench. The
+tattooed alchemist sets the ladle down by his cauldron and approaches with
+interest.
+   'Oh yes,' he says, examining the bugs. 'Yes, these will do nicely. Here is
+your reward. Don't lose it all in one place.'
 ~
 15 e 0 0 -1
 A
@@ -301,18 +314,27 @@ R
 T 18277
 W+
 11 0 0 1 -
-Catch three bugs~
+Catch 2 bugs~
 Z
 1 18208
 S
 #18244
 Swamp Hag: Suitable Supplies~
-tba
- 1. GET-OBJECT: Get objects: 5x [10013] a rat skin (a)
- 2. GET-COMPONENT: Get components: 5x (herbs) (a)
- 3. GET-COMPONENT: Get components: 5x (thick magic leathers) (b)
+   'Agent Germione has sent a messenger mouse with a particular request,' the
+guildmage says slowly. 'She has need of an enchanted rat suit for an upcoming
+dinner and the guild would like to remain her primary supplier. So this task
+falls to you, and I'll hear no complaints.'
+   The guildmage sips from a swirling blue mug and turns directly toward you.
+   'I know it's distasteful, but there's an alternative. The old hag will take
+briarhide or absinthian leather if you have some, or else rat skins and herbs
+if you don't. In either case, gather the materials and set out for the Tipsy
+Tortoise. Our tinker will put the suit together for her.'
+   Deliver 5x rat skins and 15x herbs, or else 5x thick magic leathers to the
+tinker in the guildhall at the Tipsy Tortoise for your reward.
 ~
-tba
+   The old tinker looks at you through a set of colorful lenses and then takes
+the supplies you've brought, saying, 'Not exactly ideal but this should do. No
+time to chew the fat about it. On your way. Oh, and your reward...'
 ~
 16 de 0 0 -1
 A
@@ -329,7 +351,7 @@ R
 W
 2 10013 0 5 a
 W
-1 6650 0 5 a
+1 6650 0 15 a
 W
 1 6531 0 5 b
 Z
@@ -337,9 +359,39 @@ Z
 S
 #18245
 Swamp Hag: Feeding Rodentmort~
-tba
+   'This is a bit of a messy one,' the guildmage says sheepishly while sliding
+a wicker cage out from a low shelf. The cage sprays droplets of water as it
+shakes back and forth, followed by the raspy sound of something scratching at
+the inside.
+   The old guildmage sets the cage down at your feet, where it starts to form a
+murky puddle around it. 'Don't worry about the biting. He'll realize you aren't
+food soon enough, probably,' the guildmage says. 'This should be a brief task.
+The briefer the better, honestly. I've had all I can take of the creature. The
+Pet That Shall Not Be Named, I've been calling him. Honestly, I should never
+have offered to watch him. But, Germione claimed he was enchanted, so I could
+not resist the urge to take a peek under the bonnet.'
+   The guildmage laughs.
+   'In any event, she'll want him back in good condition and I have not been
+able to bring myself to feed him. The thing eats only the freshly-dead.
+Honestly. I'm not sure what she's playing at, calling him enchanted. Maybe his
+for size alone, but otherwise there's not a single thing special about him.'
+   Just then, there's a POP and a burst of fire, and a slip of parchment
+appears in a bottle on the table. The guildmage slides the note out and reads
+it.
+   'Oh, it seems Nostrazak would like to see Pet That Shall Not Be Named before
+we send it back to the old hag. Well, you had still better feed the vile thing.
+Then drop it at the Tipsy Tortoise and wash your hands of the matter. Perhaps
+twice.'
+   Type 'release Rodentmort' to let the rat out of the cage. He'll eat any
+corpses he comes across. A rodent of such unusual size will need at least three
+of them.
 ~
-tba
+   You pass the water-logged cage over to Nostrazak the Incautious. He taps at
+it with a long claw, causing the cage to shake and sputter for a moment.
+   'Feisty thing,' Nostrazak says. 'Yes you are. Yes you are. Who's a feisty
+little thing? Good little Morty. Uncle Nosty has a treat for you...'
+   Your reward is on the desk and you decide this is a good time to take it and
+leave.
 ~
 18 e 0 0 -1
 A

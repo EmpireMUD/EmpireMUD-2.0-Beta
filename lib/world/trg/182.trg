@@ -721,7 +721,7 @@ GoA: Rodentmort behavior~
 0 bt 75
 ~
 * seek food and eat
-set needed 2
+set needed 3
 set leader %self.leader%
 set room %self.room%
 * check leader here
@@ -730,22 +730,27 @@ if !%leader% || %leader.room% != %room%
   %purge% %self%
   halt
 end
-* eat a corpse?
-set obj %room.contents(1000)%
-if %obj%
-  %echo% ~%self% devours @%obj%! &&Z&%self% makes a huge mess.
-  nop %obj.empty%
-  %purge% %obj%
-  eval 18245_food_count %leader.var(18245_food_count,0)% + 1
-  remote 18245_food_count %leader.id%
-  wait 1 s
-  if %18245_food_count% >= %needed%
-    %echo% ~%self% hops back into ^%self% cage and falls asleep.
-    %quest% %leader% trigger 18245
-    %purge% %self%
-    halt
+* eat a corpse? try inventory then room
+set obj %self.inventory(1000)%
+set loop 0
+while %loop% <= 1
+  if %obj%
+    %echo% ~%self% devours @%obj%! &&Z&%self% makes a huge mess.
+    nop %obj.empty%
+    %purge% %obj%
+    eval 18245_food_count %leader.var(18245_food_count,0)% + 1
+    remote 18245_food_count %leader.id%
+    wait 1 s
+    if %18245_food_count% >= %needed%
+      %echo% ~%self% hops back into ^%self% cage and falls asleep.
+      %quest% %leader% trigger 18245
+      %purge% %self%
+      halt
+    end
   end
-end
+  set obj %room.contents(1000)%
+  eval loop %loop% + 1
+done
 ~
 #18238
 Consider / Kill Death~

@@ -467,14 +467,19 @@ stored here.
 T 18218
 S
 #18224
-Rodentmort rat unusually large Morty~
+Rodentmort rat unusually large Morty ROUS~
 Rodentmort~
 An unusually large rat is sitting here.
 ~
 100 100 bdjoDF n 3
 1 0 71 9 -1
 D
-tba
+   The rat is at least as large as a dog; hopefully that's the worst thing
+about him. His fur shimmers in the light, perhaps because it's always slightly
+wet. This water-logged horror is Rodentmort, one of the swamp hag's favorite
+rats, and he looks hungry.
+   Rodentmort will eat any corpse he comes across. Maybe if he has enough of
+them, he'll fall asleep.
 ~
 M
 0

@@ -216,7 +216,10 @@ S
 net gilded guilded insect~
 a gilded insect net~
 A gilded insect net has been dropped here.~
-tba
+   The intricately-netted tool almost looks like gold filigree, though it lacks
+the heft that would reveal it as pure gold. It's a large net, glimmering bright
+yellow in the light, and with the soft current of mana flowing through it to
+hint at its enchantment. Whoever crafted this was certainly an expert.
 Usage: net <target>
 ~
 3 0 a 0 4
@@ -272,7 +275,12 @@ S
 cage rat water-logged waterlogged logged~
 a water-logged rat cage~
 A water-logged rat cage is sitting here.~
-tba
+   The wicker cage looks freshly-made but there are bites and scratches near
+any hole or opening. The cage is woven to be nearly solid, perhaps to keep its
+occupant from squeezing or biting its way out, but from the number of repairs,
+it doesn't seem to work...
+   The cage is heavy, but it's on skids so you spend most of your time dragging
+it behind you, listening to the guttural squeaks of poor Rodentmort.
 Use: release Rodentmort
 ~
 3 0 a 0 2
