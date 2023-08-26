@@ -532,7 +532,11 @@ S
 pouch coins~
 a pouch of coins for the bandit~
 A pouch of coins is lying here.~
-tba
+   The small leather pouch holds its coins so tightly that they feel neatly
+stacked inside. It's heavier than it looks, too. You try to pry it open to take
+a look inside, but the knot on top is more complicated than any you've seen,
+and the drawstring is laced with nocturnium.
+   Use this pouch to bribe the bandits in the ruins.
 Usage: bribe
 ~
 3 0 a 0 2

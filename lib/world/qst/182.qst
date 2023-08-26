@@ -326,7 +326,7 @@ dinner and the guild would like to remain her primary supplier. So this task
 falls to you, and I'll hear no complaints.'
    The guildmage sips from a swirling blue mug and turns directly toward you.
    'I know it's distasteful, but there's an alternative. The old hag will take
-briarhide or absinthian leather if you have some, or else rat skins and herbs
+briar hide or absinthian leather if you have some, or else rat skins and herbs
 if you don't. In either case, gather the materials and set out for the Tipsy
 Tortoise. Our tinker will put the suit together for her.'
    Deliver 5x rat skins and 15x herbs, or else 5x thick magic leathers to the
@@ -373,8 +373,8 @@ not resist the urge to take a peek under the bonnet.'
    The guildmage laughs.
    'In any event, she'll want him back in good condition and I have not been
 able to bring myself to feed him. The thing eats only the freshly-dead.
-Honestly. I'm not sure what she's playing at, calling him enchanted. Maybe his
-for size alone, but otherwise there's not a single thing special about him.'
+Honestly. I'm not sure what she's playing at, calling him enchanted. Maybe for
+his size alone, but otherwise there's not a single thing special about him.'
    Just then, there's a POP and a burst of fire, and a slip of parchment
 appears in a bottle on the table. The guildmage slides the note out and reads
 it.
@@ -455,7 +455,7 @@ from Adventurer 86 about a lost temple recently rediscovered in the jungle.
 These things are like lodestones for amateur treasure hunters and looters of
 all types, so it's critical we get there first. To protect the treasures.'
    The superintendant picks up a stone orb off of the desk and hands it to you.
-It's surprisngly light. 'You'll need this. Find the temple -- head to the
+It's surprisingly light. 'You'll need this. Find the temple -- head to the
 jungle and you should see it nearby -- and make your way to the gate. 86 says
 there's a strange orb there blocking the door. It's only a matter of time
 before someone figures out how to use the orb's magic to open the temple. That
@@ -611,9 +611,19 @@ Z
 S
 #18251
 Three Bandits: Relic Ruffians Remedy~
-tba
+   'Oh, there is a particular matter that could use your attention,' the
+librarian says, pulling a small pouch of coins from an ornamented box.
+   'Some bandits have been camping in an old ruin, not terribly far from here.
+We need them out, but we'd like to hire them. Covertly, of course. The guild
+would like you to bribe them to leave with these coins. They contain a hidden
+message that the bandits will surely recognize after they leave. I'm sure the
+bribe will be enough to do the trick. Just be subtle about it.'
+   The librarian hands you the pouch of coins. Seek out the bandits in the
+ruins and type 'bribe'.
 ~
-tba
+   'Hope they didn't give you any trouble,' the vampire says as you relate the
+story of bribing the bandits. He laughs when you tell him it cost extra.
+   'But at least they took the marked coins. Good job.'
 ~
 20 e 0 0 -1
 A
@@ -630,7 +640,7 @@ R
 T 18277
 W+
 11 0 0 1 a
-Pay off the bandits~
+Bribe the bandits~
 Z
 1 18208
 S
