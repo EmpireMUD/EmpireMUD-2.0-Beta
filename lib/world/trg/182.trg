@@ -677,7 +677,7 @@ end
 GoA: Summon Rodentmort~
 1 c 2
 release~
-set needed 2
+set needed 3
 return 1
 if !%arg%
   %send% %actor% Release what?
@@ -745,8 +745,8 @@ while %loop% <= 1
       %echo% ~%self% hops back into ^%self% cage and falls asleep.
       %quest% %leader% trigger 18245
       %purge% %self%
-      halt
     end
+    halt
   end
   set obj %room.contents(1000)%
   eval loop %loop% + 1

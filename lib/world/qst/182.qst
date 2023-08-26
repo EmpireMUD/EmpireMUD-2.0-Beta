@@ -414,9 +414,21 @@ Z
 S
 #18246
 Lost Temple: Important Archaeology~
-tba
+   'Aha!' says the superintendant. 'Just who I wanted to see. I got a report
+from Adventurer 86 about a lost temple recently rediscovered in the jungle.
+These things are like lodestones for amateur treasure hunters and looters of
+all types, so it's critical we get there first. To protect the treasures.'
+   The superintendant rummages through a box under the desk and hands you an
+enchanted metal bar. 'You'll need this, or it's impossible to get them loose.
+Pry out as many of the gems as you can and then get them to the guild's tinker
+at the Tipsy Tortoise. That should keep them safe from looters.'
+   Find a lost temple in the jungle, enter it, and type 'pry gem' inside the
+temple to get 4 gems to bring back to the guild.
 ~
-tba
+   The tinker takes the sack of gems from you and pulls one out, holding it up
+to the light.
+   'Ah, exactly what I've been needing. Oh, and I'll take that pry bar from you
+as well. Your pay is on the table. Excellent work as always.'
 ~
 17 e 0 0 -1
 A
@@ -438,9 +450,27 @@ Z
 S
 #18247
 Lost Temple: Get Lost~
-tba
+   'Aha!' says the superintendant. 'Just who I wanted to see. I got a report
+from Adventurer 86 about a lost temple recently rediscovered in the jungle.
+These things are like lodestones for amateur treasure hunters and looters of
+all types, so it's critical we get there first. To protect the treasures.'
+   The superintendant picks up a stone orb off of the desk and hands it to you.
+It's surprisngly light. 'You'll need this. Find the temple -- head to the
+jungle and you should see it nearby -- and make your way to the gate. 86 says
+there's a strange orb there blocking the door. It's only a matter of time
+before someone figures out how to use the orb's magic to open the temple. That
+is where you come in. You are going to hijack that magic using our own orb,
+locking the temple and causing vines to grow so that nobody else finds it
+before we can get an expert in there. Think you can handle that? Good. Report
+in at the Tipsy Tortoise when it's done. They'll want to know the temple's
+location.'
+   Type 'use orb' in a Lost Temple before selecting a difficulty.
 ~
-tba
+   You describe, in detail, where you hid the lost temple as the vampire
+scratches some notes onto a parchment.
+   'Most excellent,' he says as he tucks away the notes. 'I shall begin
+assembling a team at once. Who knows what delectable secrets lie in that
+temple. Oh, your payment is by the door.'
 ~
 18 e 0 0 -1
 A
@@ -463,9 +493,19 @@ Z
 S
 #18248
 Wandering Dragon: Flame's End Fandango~
-tba
+   'Aha!' says the superintendant. 'Just who I wanted to see. I got a contract
+to remove a pest. Rather permanently. Hope you're ready to do the dance of the
+dragons because this one will put up a fight. Are you up to it? Seek out a
+wandering dragon. You can usually find one nearby, if you check enough places.
+Take care of it and then report back to Nostrazak for your reward.'
 ~
-tba
+   Nostrazak the Incautious's face reddens and he seems to double in size as
+he bellows out, 'You killed a dragon?'
+   'Kidding, of course,' he says, calmer, as he sits back into his chair. 'I
+may be part dragon, but money is money and the guild will certainly profit from
+this. Don't worry, you still get your share. And you've done a good deed. Those
+villagers don't have to fret about the dragon anymore, and the guild will put
+its remains to good use. Here's your pay.'
 ~
 18 e 0 0 -1
 A
@@ -492,9 +532,19 @@ Z
 S
 #18249
 Clockwork Colossus: Cog and Collect~
-tba
+   'I have a special request from the guild's tinker,' the librarian says,
+without looking up at you. 'You're to find one of those notorious clockwork
+colossi. Truly, marvels of magineering. They have little worker drones, spiders
+fashioned from brass and bronze that keep the colossus in good repair. Our good
+tinker needs some of the brass scraps that the spiders use in the repairs. Oh,
+and some copper wire while you're there. I'm sure the tinker will pay your
+usual fee if you deliver the goods to the Tipsy Tortoise.'
+   Find a clockwork colossus and retrieve the items from the creatures that
+inhabit it.
 ~
-tba
+   You place the brass scrap metal and salvaged wire on the workstation.
+   'Your timing is like clockwork,' the tinker says. 'Could not be more
+perfect. I know exactly what I'm going to do with those. Here's your pay.'
 ~
 19 de 0 0 -1
 A
@@ -517,9 +567,28 @@ Z
 S
 #18250
 Clockwork Colossus: Fettered Footwork~
-tba
+   'I have another job for you, if you're up to it,' the librarian says, over
+the top of a thick book. 'Last time I was at the Tipsy Tortoise, Nostrazak the
+Incautious was lecturing about too many villages being trampled by clockwork
+colossi. Those villages are a good source of income for the guild, so I have
+been researching the matter and I think I have a solution.'
+   The librarian shows you a diagram of a leg and foot, with a large
+contraption built around the ankle.
+   'It's a colossal ankle brace. Climb up onto the colossus's foot and
+manufacture one of these directly around the ankle. The colossus will have
+trouble moving and will be forced to return to its scaffold. Might just save
+the day. Anyway, it shouldn't be hard to find a colossus nearby. You'll need to
+bring a bunch of bronze or iron, and a lot of nails. It's important to secure
+the brace to the leg. Don't worry, you can't hurt the colossus. It's an
+automaton. Oh, and report back in at the Tipsy Tortoise when it's done.'
+   From atop the enormous boots of the clockwork colossus, type 'manufacture
+colossal ankle brace' to construct the brace.
 ~
-tba
+   'Ingenius,' says Nostrazak the Incautious when you regale him with the story
+of the colossus. 'Your local librarian came up with that? Simply ingenius.
+Librarians are the backbone of this continent. And good to hear that the
+colossus will trample no more villages. Really, tremendous work in the name of
+the Guild.'
 ~
 19 e 0 0 -1
 A

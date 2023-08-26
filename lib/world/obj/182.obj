@@ -480,8 +480,11 @@ S
 bar prying enchanted~
 an enchanted bar of prying~
 An enchanted bar of prying is lying here.~
-tba
-kUsage: pry gem
+   It's a long metal bar with a flattened claw at each end, made specifically
+for prying. This one has a faint glow, like it's been enchanted. And luckily,
+the enchantment seems to have made it lighter, too, because it seems to be
+solid metal. Use it to pry gems loose in the Lost Temple.
+Usage: pry gem
 ~
 3 j a 0 2
 0 0 0
@@ -495,7 +498,9 @@ S
 gem jade important~
 an important jade gem~
 An important jade gem is lying on the ground.~
-tba
+   The jade has been expertly cut, with the likeness of a jaguar carved from
+its face. Though you know the gem is quite old, it looks pristine and is
+undoubtedly worth a great deal.
 ~
 3 0 a 0 1
 0 0 0
@@ -508,7 +513,11 @@ S
 orb stone hiding~
 the stone orb of hiding~
 The stone orb of hiding is hidden here.~
-tba
+   Though it's made from cold, solid stone, the orb is surprisingly light. Its
+surface is unfinished stone and, other than the weight, you don't see anything
+special about it at all.
+   You were instructed to take this orb to a Lost Temple and use it at the
+gates, before selecting a difficulty.
 Usage: use orb
 ~
 3 0 a 0 3
