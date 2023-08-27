@@ -604,6 +604,13 @@ while %ch%
       %echoaround% %actor% ~%actor% throws down a smoke bomb... there's a putrid smell as green as fills the nest!
       set ok 1
     end
+    if %ch.vnum% == 10200 || %ch.vnum% == 10204
+      %regionecho% %room% 15 &&y&&Z~%ch% yells, 'We's going to get you next time!'&&0
+    elseif %ch.vnum% == 10201 || %ch.vnum% == 10205
+      %regionecho% %room% 15 &&y&&Z~%ch% yells, 'You hasn't seen the last of us!'&&0
+    elseif %ch.vnum% == 10202 || %ch.vnum% == 10203
+      %regionecho% %room% 15 &&y&&Z~%ch% yells, 'Aaaaaaaaaahhhh!!!'&&0
+    end
     %echo% ~%ch% runs screaming from the nest!
     %purge% %ch%
   end
@@ -616,6 +623,7 @@ if %bell%
   if !%ok%
     %send% %actor% You throw down the smoke bomb... there's a putrid smell as green gas fills the nest!
     %echoaround% %actor% ~%actor% throws down a smoke bomb... there's a putrid smell as green as fills the nest!
+    %regionecho% %room% 15 &&yYou hear a goblin yell, 'Aaaaaaaaaahhhh!!!'&&0
     set ok 1
   end
 end
@@ -631,6 +639,8 @@ if %ok%
     end
     set ch %ch.next_in_room%
   done
+  %mod% %room% description The floor of the ruins is eaten away and you stumble down into a den to which the word filthy hardly does justice. 
+  %mod% %room% append-description It looks like some goblins had been nesting here, but something has driven them off. There's a lingering stench and some green smoke hanging in the still air, but not sign of the goblins.
   %purge% %self%
 else
   %send% %actor% It doesn't look like there are any goblins here to clear out. It's best you save your smoke bomb.
@@ -846,6 +856,7 @@ set 18246_gem_pried %actor.id%
 remote 18246_gem_pried %room.id%
 %send% %actor% You manage to pry a gem loose from the wall!
 %echoaround% %actor% ~%actor% pries a gem loose from the wall and pockets it!
+%mod% %room% append-description Someone has pried a gem from the wall.
 * check limit
 set found 0
 set obj %actor.inventory%
@@ -896,6 +907,8 @@ end
 %regionecho% %room% 1 There's a strange rumbling that shakes the whole area!
 %echo% The emerald-green orb goes dark as vines begin to overtake the temple.
 %send% %actor% The stone orb in your hands turns to sand and falls to the ground.
+%mod% %room% description You stand before a huge, thick stone gate, engraved with carvings of tribal warriors dressed as eagles and jaguars. The gate is closed;
+%mod% %room% append-description there does not seem to be a way to open it. The orb that once powered the gate has gone dark.
 * trigger quests
 set ch %room.people%
 while %ch%
