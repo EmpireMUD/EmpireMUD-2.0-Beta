@@ -646,9 +646,25 @@ Z
 S
 #18252
 Skycleave: Pilfering Pixies~
-tba
+   The guildmage opens a small wooden crate and pulls out an old clay jar,
+which brings a cloud of dust out with it. The guildmage blows it off and hands
+it to you.
+   'It's a pixy jar. Not just any pixy jar, either, the guildmage says. 'We've
+had it re-enchanted to be able to capture a pixy without touching it. Why, you
+might ask? Because we need to smuggle one of them out of the most secure prison
+in history.'
+   The guildmage pauses for drama.
+   'The Tower Skycleave. Your job is to find the tower again, get to the pixy
+races, and set this jar next to the stalls. Your target is Mischantsy, one of
+the racers. Once she's in the jar, you're to deliver it to the tinker at the
+main hall in the Tipsy Tortoise.'
+   Type 'pilfer pixy' at Skycleave's pixy races to steal the pixy.
 ~
-tba
+   You set the old pixy jar on the tinker's station.
+   'Ah, you really managed it,' the tinker says, picking it up. 'I have big
+plans for this pixy. I wouldn't worry too much about it. That tower turns out
+to be stuck in a time loop, so in the technical sense, the pixy is still back
+there racing.'
 ~
 20 e 0 0 -1
 A

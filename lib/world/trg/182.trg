@@ -993,7 +993,10 @@ nop %self.val0(1)%
 %mod% %self% keywords jar pilfered pixy old clay
 %mod% %self% shortdesc a pilfered pixy in a jar
 %mod% %self% longdesc A pilfered pixy in a jar is lying on the ground.
-%mod% %self% lookdesc tba
+%mod% %self% lookdesc The jar is made from rough clay and looks quite old. The top is sealed with
+%mod% %self% append-lookdesc red wax, and you can hear someone shouting inside when you shake it. Magic
+%mod% %self% append-lookdesc words are written along the jar's margin, in an ancient language you can't read.
+%mod% %self% append-lookdesc-noformat &0   You need to take the jar to the guild tinker in the Tipsy Tortoise.
 ~
 #18253
 GoA: Use skeleton key to steal scrolls~
