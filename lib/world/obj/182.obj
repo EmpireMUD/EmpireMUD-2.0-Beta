@@ -146,6 +146,24 @@ this trinket to teleport to the nearest Tipsy Tortoise Tavern.
 0 0
 T 18214
 S
+#18215
+loom diminution~
+the loom of diminution~
+A loom of diminution has been left behind.~
+   The loom is made of wood and looks both old and fragile, so you hold it
+delicately in your hands. It's cold to the touch and drips with ethereal green
+mana. According to the Guild of Adventurers, it has the power to shrink
+goblins to diminutive size. They want you to test it at the Goblin Challenge.
+Usage: shrink <goblin>
+~
+3 0 a 0 1
+0 0 0
+0 0
+C
+1 1
+Q 18242
+T 18231
+S
 #18216
 charter guild adventurers~
 a Guild of Adventurers charter~
@@ -486,7 +504,7 @@ the enchantment seems to have made it lighter, too, because it seems to be
 solid metal. Use it to pry gems loose in the Lost Temple.
 Usage: pry gem
 ~
-3 j a 0 2
+3 0 a 0 3
 0 0 0
 2 0
 C

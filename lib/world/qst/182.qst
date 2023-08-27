@@ -229,25 +229,30 @@ Z
 1 18209
 S
 #18242
-Goblin Challenge: Defeat All Challengers~
+Goblin Challenge: Large and In Charge~
    'We have received a request,' the librarian says over a thick pair of
 spectacles. 'It's goblins again, of course. They've become a nuissance. I sent
 an adventurer already, but he found the nest had been cleared out by the little
 menaces themselves. They won't have gone far. Search nearby ruins and try to
 find it.'
-   The librarian turns away, but turns back to add, 'Oh, and you'll need to
-defeat them in proper combat if you hope to really drive them off. Do the
-Goblin Challenge, as we say. But be quick about it. Report back to Nostrazak
-at the Tipsy Tortoise when the deed is done.'
+   The librarian turns away, but turns back to add, 'Oh, and I'd like you to
+test this. It's an old loom of diminution. Supposedly, they can shrink goblins.
+Heavens, perhaps that's how the goblins ended up so small in the first place!'
+   The librarian hands you the wooden loom.
+   'Oh, and do drive the goblins off once you've shrunk them. We can't have
+teeny goblins running around, can we? Do the Goblin Challenge, as we say. And
+be quick about it. Report back to Nostrazak at the Tipsy Tortoise when the deed
+is done.'
 ~
    You approach Nostrazak, who circles back behind his desk and listens
 intently as you tell him about your experience fighting the goblins in their
 dirty little arena.
-   'But they've moved on now?' he asks. 'You're sure?'
+   'I'm amazed the loom still works. Of course, I'll need it back. But truly,
+excellent job. Let's just hope they move on and don't bother our client again.'
    You nod, assuring him you completed the challenge and the goblins have
 moved out of the ruins. With any luck, they won't be back.
 ~
-13 e 0 0 -1
+15 e 0 0 -1
 A
 1 18218
 D 18240
@@ -259,6 +264,10 @@ R
 7 18200 10
 R
 1 -1 100
+T 18277
+W+
+11 0 0 1 a
+Successfully shrink a goblin~
 W+
 3 10200 0 1 a
 Defeat the bruiser~

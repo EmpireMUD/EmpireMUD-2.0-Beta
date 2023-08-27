@@ -639,7 +639,7 @@ if %ok%
     end
     set ch %ch.next_in_room%
   done
-  %mod% %room% description The floor of the ruins is eaten away and you stumble down into a den to which the word filthy hardly does justice. 
+  %mod% %room% description The floor of the ruins is eaten away and you stumble down into a den to which the word filthy hardly does justice.
   %mod% %room% append-description It looks like some goblins had been nesting here, but something has driven them off. There's a lingering stench and some green smoke hanging in the still air, but not sign of the goblins.
   %purge% %self%
 else
@@ -761,6 +761,50 @@ while %loop% <= 1
   set obj %room.contents(1000)%
   eval loop %loop% + 1
 done
+~
+#18231
+GoA: Loom of diminution (shrink ray)~
+1 c 2
+shrink~
+return 1
+set room %actor.room%
+set vict %actor.char_target(%arg.car%)%
+if !%arg%
+  %send% %actor% Shrink whom with the loom of diminution?
+  halt
+elseif !%vict%
+  %send% %actor% You don't see anybody called %arg.car% here.
+  halt
+elseif %vict.vnum% < 10200 || %vict.vnum% > 10205
+  %send% %actor% You take aim at ~%vict% with the loom, but it doesn't have any effect!
+  %echoaround% %actor% ~%actor% aims a strange wooden loom at ~%vict%, but nothing happens!
+  halt
+end
+* ok to mirror them
+%send% %actor% You take aim at ~%vict% with the loom of diminution...
+%echoaround% %actor% ~%actor% takes aim at ~%vict% with a strange wooden loom...
+%echo% ~%vict% shrieks as &%vict% shrinks and shrinks!
+if !%vict.affect(18231)%
+  nop %vict.add_mob_flag(!LOOT)%
+  if %vict.mob_flagged(HARD)%
+    nop %vict.remove_mob_flag(HARD)%
+  elseif %vict.mob_flagged(GROUP)%
+    nop %vict.remove_mob_flag(GROUP)%
+    nop %vict.add_mob_flag(HARD)%
+  end
+  dg_affect #18231 %vict% BONUS-PHYSICAL -20 -1
+  dg_affect #18231 %vict% BONUS-MAGICAL -20 -1
+end
+* check completion
+if %self.val0% && %self.val1% && %self.val2%
+  set ch %room.people%
+  while %ch%
+    if %ch.on_quest(18242)%
+      %quest% %ch% trigger 18242
+    end
+    set ch %ch.next_in_room%
+  done
+end
 ~
 #18238
 Consider / Kill Death~
