@@ -730,9 +730,25 @@ Z
 S
 #18254
 Hamlet: Reflecting on the Situation~
-tba
+   'I have discovered a vintage mirror in storage and I believe it could be
+fiend-glass,' the guildmage says, offering you the mirror. It's old and worn,
+but at the same time, elegant in a medieval sort of way. Curiously, though the
+glass is in good condition, you cannot see your reflection in it.
+   'The guild had quite a lot of these at one point, and they still turn up
+from time to time. I intend to send it to the master tinker, but first we must
+verify its abilities. That's where you come in. The mirror is out of attunement
+so I would like you to travel to a nearby hamlet that has been overrun by the
+undead. Turn the mirror on the fiends within and see which of them see their
+reflection in it for the last time. If you manage to capture three of them,
+take the mirror to the tinket at the Tipsy Tortoise.'
+   Type 'reflect <person>' to use the mirror on them. It will only work in the
+Hamlet of the Undead.
 ~
-tba
+   You place the mirror in front of the tinker, who grabs it excitedly.
+   'Oh, a real one? Quite spectacular,' the tinker says without looking up from
+the old mirror. 'Quite spectacular, indeed. Oh, and you've nabbed a necrofiend?
+And what's this, is there a woman in here? She looks like some kind of dark
+wizard. You have outdone yourself this time. Truly, truly.'
 ~
 22 e 0 0 -1
 A

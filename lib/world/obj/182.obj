@@ -586,11 +586,15 @@ Q 18253
 T 18253
 S
 #18254
-mirror smoky strange~
+mirror smoky strange vintage~
 a strange and smoky mirror~
 A strange and smoky mirror is lying here.~
-tba
-Usage: reflect <mob>
+   The mirror is rather old and though tarnished, its silver handle is
+elegantly crafted. The glass, however, is smoky and you can't find an angle
+that reflects any part of your face. It seems clear that this mirror was
+enchanted for a different purpose.
+   In the Hamlet of the Undead, type 'reflect <person>' to use it on the
+various fiends who reside there.
 ~
 3 0 a 0 2
 0 0 0
