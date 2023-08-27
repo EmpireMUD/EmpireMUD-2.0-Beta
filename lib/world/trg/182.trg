@@ -1037,10 +1037,10 @@ end
 %echoaround% %actor% You notice ~%actor% doing something through the archway, but &%var%'s back before you can see what &%var%'s doing.
 %quest% %actor% trigger 18253
 nop %self.val0(1)%
-%mod% %self% keywords scrolls sealed set
-%mod% %self% shortdesc a set of sealed scrolls
-%mod% %self% longdesc A set of sealed scrolls is lying on the ground.
-%mod% %self% lookdesc tba
+%mod% %self% keywords scrolls evolving enigmas set
+%mod% %self% shortdesc scrolls of evolving enigmas
+%mod% %self% longdesc A set of scrolls of evolving enigmas is lying on the ground.
+%mod% %self% lookdesc The set contains three scrolls bound together with a shimmering rainbow ribbon. 
 detach 18253 %self.id%
 ~
 #18254
