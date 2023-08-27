@@ -598,7 +598,7 @@ elseif group /= %arg%
   set difficulty 3
 elseif boss /= %arg%
   %echo% Setting difficulty to Boss...
-  set difficulty 3
+  set difficulty 4
 else
   %send% %actor% That is not a valid difficulty level for this adventure (Normal, Hard, Group, or Boss).
   halt
