@@ -1040,7 +1040,40 @@ nop %self.val0(1)%
 %mod% %self% keywords scrolls evolving enigmas set
 %mod% %self% shortdesc scrolls of evolving enigmas
 %mod% %self% longdesc A set of scrolls of evolving enigmas is lying on the ground.
-%mod% %self% lookdesc The set contains three scrolls bound together with a shimmering rainbow ribbon. 
+%mod% %self% lookdesc The set contains three scrolls bound together with a shimmering rainbow ribbon, which you cannot remove. Only the title text on the outside of the scrolls can be read:
+switch %random.5%
+  case 1
+    %mod% %self% append-lookdesc-noformat &0       Conjure Confections: The Art of Edible Illusions
+    %mod% %self% append-lookdesc-noformat &0       Casting Coup d'Etat: How to Turn Rival Sorcerers into Rabbits
+    %mod% %self% append-lookdesc-noformat &0       Invisible Threads: Weaving a Tapestry of Subjugation with Spells
+  break
+  case 2
+    %mod% %self% append-lookdesc-noformat &0       Eldritch Blast and Past: Mastering Time-Travel with a Zing
+    %mod% %self% append-lookdesc-noformat &0       Beyond Borders: The Sorcerer's Guide to Expanding Horizons
+    %mod% %self% append-lookdesc-noformat &0       The Grimoire Gambol: Dancing Your Way Through Spellcasting
+  break
+  case 3
+    %mod% %self% append-lookdesc-noformat &0       The Art of Blinking: Winking for Mages
+    %mod% %self% append-lookdesc-noformat &0       Goblin Romance: Wooing with Stolen Shiny Objects
+    %mod% %self% append-lookdesc-noformat &0       Empire of the Unseen: The Alchemical Art of Crafting Kingdoms
+  break
+  case 4
+    %mod% %self% append-lookdesc-noformat &0       Summon Sandwich: When You're Hungry and in a Bind
+    %mod% %self% append-lookdesc-noformat &0       Goblin's Guide to Gardening: How to Plant Trouble and Harvest Chaos
+    %mod% %self% append-lookdesc-noformat &0       Summoning Success: Bringing Minions to Work on Time and on Budget
+  break
+  case 5
+    %mod% %self% append-lookdesc-noformat &0       The Polymorph Paradox: Toad or Not Toad?
+    %mod% %self% append-lookdesc-noformat &0       Enchanted Economics: Turning Lead into Gold and Gold into World Domination
+    %mod% %self% append-lookdesc-noformat &0       Mana Management: Ensuring Your Empire's Energy Efficiency
+  break
+  case 6
+    %mod% %self% append-lookdesc-noformat &0       Feather Fall Fashion: Stylish Landing Strategies
+    %mod% %self% append-lookdesc-noformat &0       Dominion's Enigma: Deciphering Secrets of the Arcane Ascendant
+    %mod% %self% append-lookdesc-noformat &0       Goblin Tinker School: How to Turn Anything into a Makeshift Weapon
+  break
+done
+%mod% %self% append-lookdesc-noformat &0   You must deliver these scrolls to the Tipsy Tortoise.
 detach 18253 %self.id%
 ~
 #18254
