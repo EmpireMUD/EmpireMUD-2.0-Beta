@@ -1003,8 +1003,8 @@ end
 %echoaround% %actor% You notice ~%actor% doing something near the pixy stalls.
 %quest% %actor% trigger 18252
 nop %self.val0(1)%
-%mod% %self% keywords jar pilfered pixy old clay
-%mod% %self% shortdesc a pilfered pixy in a jar
+%mod% %self% keywords jar pilfered pixy old clay Mischantsy's Mischantsys
+%mod% %self% shortdesc Mischantsy's pixy jar
 %mod% %self% longdesc A pilfered pixy in a jar is lying on the ground.
 %mod% %self% lookdesc The jar is made from rough clay and looks quite old. The top is sealed with
 %mod% %self% append-lookdesc red wax, and you can hear someone shouting inside when you shake it. Magic

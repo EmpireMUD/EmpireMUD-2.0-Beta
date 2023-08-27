@@ -690,9 +690,24 @@ Z
 S
 #18253
 Skycleave: Ink and Intrigue~
-tba
+   'While you're here, there's a matter I was hoping you could help with,' the
+guildmage says. 'I know you managed to finesse your way into Skycleave's upper
+echelon. I've learned from Agent M that the tower houses a set of scrolls of
+evolving enigmas. Perhaps you've heard of this? The text on the scrolls
+actually changes over time as it absorbs and filters new knowledge. The guild
+has a few of them already, but the scrolls are predictably unpredictable.'
+   The guildmage take a sip from a small cup of murky, blue liquid.
+   'As you know by now, Skycleave is stuck in some sort of time loop. If you
+manage to steal the scrolls of evolving enigmas, they'll be none the wiser.
+They're stored in the back of the Eruditorium, in one of the drawers. Take this
+skeleton key. When you're done, deliver it to the Tipsy Tortoise. I'm certain
+our umbramancer will appreciate it.'
 ~
-tba
+   You hand the scrolls of evolving enigmas over to the umbramancer.
+   'Ah, these are exactly perfect,' the shadowy form says. 'Perfectly crafted.
+These are from the Tower Skycleave, then? I've never been able to get inside.
+Shame, really. That place is a treasure trove of lost secrets. I shall be sure
+to put these scrolls to good use.'
 ~
 21 e 0 0 -1
 A
@@ -709,7 +724,7 @@ R
 T 18277
 W+
 11 0 0 1 a
-Steal the scrolls~
+Steal the scrolls of evolving enigmas~
 Z
 1 18209
 S
