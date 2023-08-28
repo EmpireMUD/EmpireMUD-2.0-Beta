@@ -182,6 +182,8 @@ extern const char *corpse_flags[];
 extern const char *fullness[];
 extern const char *light_flags[];
 extern const char *light_flags_for_identify[];
+extern const char *mint_flags[];
+extern const char *mint_flags_for_identify[];
 extern const char *paint_colors[];
 extern const char *paint_names[];
 extern const char *resource_types[];

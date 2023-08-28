@@ -2847,7 +2847,7 @@ void do_chore_minting(empire_data *emp, room_data *room, vehicle_data *veh) {
 			}
 			
 			orn = store->proto;
-			if (orn && store->amount >= 1 && IS_WEALTH_ITEM(orn) && GET_WEALTH_VALUE(orn) > 0 && GET_WEALTH_AUTOMINT(orn)) {
+			if (orn && store->amount >= 1 && IS_WEALTH_ITEM(orn) && GET_WEALTH_VALUE(orn) > 0 && IS_MINT_FLAGGED(orn, MINT_FLAG_AUTOMINT) && !IS_MINT_FLAGGED(orn, MINT_FLAG_NO_MINT)) {
 				if (highest == NULL || store->amount > high_amt) {
 					highest = store;
 					high_amt = store->amount;

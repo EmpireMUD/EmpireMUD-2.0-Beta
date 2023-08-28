@@ -809,7 +809,10 @@ void identify_obj_to_char(obj_data *obj, char_data *ch, bool simple) {
 		}
 		case ITEM_WEALTH: {
 			msg_to_char(ch, "Adds %d wealth when stored.\r\n", GET_WEALTH_VALUE(obj));
-			msg_to_char(ch, "Automatically minted by workforce: %s\r\n", GET_WEALTH_AUTOMINT(obj) ? "yes" : "no");
+			prettier_sprintbit(GET_WEALTH_MINT_FLAGS(obj), mint_flags_for_identify, part);
+			if (*part) {
+				msg_to_char(ch, "Additional information: %s\r\n", part);
+			}
 			break;
 		}
 		case ITEM_LIGHTER: {

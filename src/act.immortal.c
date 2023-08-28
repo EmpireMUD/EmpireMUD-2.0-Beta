@@ -6941,8 +6941,8 @@ void do_stat_object(char_data *ch, obj_data *j) {
 			break;
 		}
 		case ITEM_WEALTH: {
-			msg_to_char(ch, "Wealth value: %d\r\n", GET_WEALTH_VALUE(j));
-			msg_to_char(ch, "Automatically minted by workforce: %s\r\n", GET_WEALTH_AUTOMINT(j) ? "yes" : "no");
+			sprintbit(GET_WEALTH_MINT_FLAGS(j), mint_flags, buf, TRUE);
+			msg_to_char(ch, "Wealth value: \ts%d\t0, flags: \tc%s\t0\r\n", GET_WEALTH_VALUE(j), buf);
 			break;
 		}
 		case ITEM_LIGHTER: {

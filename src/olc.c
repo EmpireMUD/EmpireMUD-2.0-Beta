@@ -339,7 +339,6 @@ OLC_MODULE(oedit_affecttype);
 OLC_MODULE(oedit_apply);
 OLC_MODULE(oedit_armortype);
 OLC_MODULE(oedit_ammotype);
-OLC_MODULE(oedit_automint);
 OLC_MODULE(oedit_capacity);
 OLC_MODULE(oedit_cdtime);
 OLC_MODULE(oedit_charges);
@@ -366,6 +365,7 @@ OLC_MODULE(oedit_material);
 OLC_MODULE(oedit_maxlevel);
 OLC_MODULE(oedit_minipet);
 OLC_MODULE(oedit_minlevel);
+OLC_MODULE(oedit_mintflags);
 OLC_MODULE(oedit_paint);
 OLC_MODULE(oedit_plants);
 OLC_MODULE(oedit_quantity);
@@ -849,7 +849,6 @@ const struct olc_command_data olc_data[] = {
 	{ "apply", oedit_apply, OLC_OBJECT, OLC_CF_EDITOR },
 	{ "armortype", oedit_armortype, OLC_OBJECT, OLC_CF_EDITOR },
 	{ "ammotype", oedit_ammotype, OLC_OBJECT, OLC_CF_EDITOR },
-	{ "automint", oedit_automint, OLC_OBJECT, OLC_CF_EDITOR },
 	{ "capacity", oedit_capacity, OLC_OBJECT, OLC_CF_EDITOR },
 	{ "cdtime", oedit_cdtime, OLC_OBJECT, OLC_CF_EDITOR },
 	{ "charges", oedit_charges, OLC_OBJECT, OLC_CF_EDITOR },
@@ -877,6 +876,7 @@ const struct olc_command_data olc_data[] = {
 	{ "maxlevel", oedit_maxlevel, OLC_OBJECT, OLC_CF_EDITOR },
 	{ "minlevel", oedit_minlevel, OLC_OBJECT, OLC_CF_EDITOR },
 	{ "minipet", oedit_minipet, OLC_OBJECT, OLC_CF_EDITOR },
+	{ "mintflags", oedit_mintflags, OLC_OBJECT, OLC_CF_EDITOR },
 	{ "paint", oedit_paint, OLC_OBJECT, OLC_CF_EDITOR },
 	{ "plants", oedit_plants, OLC_OBJECT, OLC_CF_EDITOR },
 	{ "quantity", oedit_quantity, OLC_OBJECT, OLC_CF_EDITOR },

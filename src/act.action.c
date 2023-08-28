@@ -3359,7 +3359,7 @@ ACMD(do_mint) {
 	else if (!(obj = get_obj_in_list_vis(ch, argptr, &number, ch->carrying)) && !(obj = get_obj_in_list_vis(ch, argptr, &number, ROOM_CONTENTS(IN_ROOM(ch))))) {
 		msg_to_char(ch, "You don't seem to have %s %s.\r\n", AN(arg), arg);
 	}
-	else if (!IS_WEALTH_ITEM(obj) || GET_WEALTH_VALUE(obj) <= 0) {
+	else if (!IS_WEALTH_ITEM(obj) || GET_WEALTH_VALUE(obj) <= 0 || IS_MINT_FLAGGED(obj, MINT_FLAG_NO_MINT)) {
 		msg_to_char(ch, "You can't mint that into coins.\r\n");
 	}
 	else if (!can_see_in_dark_room(ch, IN_ROOM(ch), TRUE)) {

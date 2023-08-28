@@ -1914,6 +1914,11 @@ typedef enum {
 #define NUM_MATERIALS  16	// Total number of matierals
 
 
+// MINT_FLAG_x: flags for ITEM_WEALTH
+#define MINT_FLAG_AUTOMINT  BIT(0)	// Workforce will mint it
+#define MINT_FLAG_NO_MINT  BIT(1)	// item cannot be minted
+
+
 // OBJ_x: Extra object flags -- OBJ_FLAGGED(obj, f)
 #define OBJ_UNIQUE  BIT(0)	// a. can only use 1 at a time
 #define OBJ_PLANTABLE  BIT(1)	// b. Uses val 2 to set a crop type
