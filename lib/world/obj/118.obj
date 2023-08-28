@@ -1691,8 +1691,8 @@ to turn it on; or, perhaps it isn't working any more.
 stray thoughts and dreams of wizards and sorcerers. Purifying mana is nearly
 impossible, but deconfabulating it can be done with the right equipment.
 ~
-15 e a 0 5
-1 0 0
+15 e a 0 6
+1 2 0
 2 0
 C
 150 150
@@ -1710,8 +1710,8 @@ touch, but you can't figure out how to open it, nor what it's doing.
    You can 'use' this condenser to throw it at an enemy in combat.
    Magic scholars have posited that the ether can be used as a source of mana.
 ~
-15 e a 0 5
-1 0 0
+15 e a 0 6
+1 2 0
 2 0
 C
 150 150
@@ -1731,8 +1731,8 @@ distinct arms and hands that join near its waist.
    Many cultures practice woodcarving to create ornaments, dolls, and religious
 sculptures.
 ~
-15 0 a 0 5
-1 0 0
+15 0 a 0 6
+1 2 0
 0 0
 C
 150 150
@@ -1751,8 +1751,8 @@ you do notice that it's ice cold to the touch.
    When mana becomes too pure, it sometimes becomes explosive. As this can be a
 side-effect of deconfabulation, the proper solution is a reconfabulator.
 ~
-15 e a 0 5
-1 0 0
+15 e a 0 6
+1 2 0
 2 0
 C
 150 150
@@ -1771,8 +1771,8 @@ prototype; you can't figure out how to make it do anything.
    The magineers at Skycleave design far more gizmos than they ever create.
 Some take years of research and experimentation and, of those, many still fail.
 ~
-15 0 a 0 5
-1 0 0
+15 0 a 0 6
+1 2 0
 1 0
 C
 150 150
@@ -1794,8 +1794,8 @@ nothing you do or say seems to control it.
 thank-you notes, and Dear John letters. It perfectly mimics one's handwriting,
 though the text is rarely original.
 ~
-15 0 a 0 6
-1 0 0
+15 0 a 0 7
+1 2 0
 2 0
 C
 150 150
@@ -2393,8 +2393,8 @@ interest to scholars and sorcerers alike.
 as apprentices repeatedly unleashed primordial horrors upon the world, those
 keys were melted, one by one, until only water and shadow remained.
 ~
-15 0 a 0 6
-1 0 0
+15 0 a 0 7
+1 2 0
 10 0
 C
 150 150
@@ -2429,8 +2429,8 @@ impressions where her eyes would be.
    Many types of statuettes with women's forms are described as Venus
 figurines, though they rarely relate to the Greek goddess.
 ~
-15 0 a 0 8
-1 0 0
+15 0 a 0 9
+1 2 0
 0 0
 C
 150 150
@@ -2446,8 +2446,8 @@ when it catches the light, its lustrous surface shimmers like a pastel rainbow.
    Pearls often symbolize beauty, wisdom, and luxury. But to a person whose
 diet is made of shellfish, they can instead represent abundance.
 ~
-15 0 a 0 9
-1 0 0
+15 0 a 0 10
+1 2 0
 14 0
 C
 150 150
@@ -2508,8 +2508,8 @@ of the person the stone is attuned to. The process rarely succeeds at enriching
 the stone as the stone's power is easily absorbed by an injured soul rather
 than the other way around.
 ~
-15 0 a 0 9
-1 0 0
+15 0 a 0 10
+1 2 0
 1 0
 C
 1 1
