@@ -775,12 +775,23 @@ if !%arg%
 elseif !%vict%
   %send% %actor% You don't see anybody called %arg.car% here.
   halt
-elseif %vict.vnum% < 10200 || %vict.vnum% > 10205
+elseif %vict.vnum% < 10200 || %vict.vnum% > 10205 || %vict.affect(18232)%
   %send% %actor% You take aim at ~%vict% with the loom, but it doesn't have any effect!
   %echoaround% %actor% ~%actor% aims a strange wooden loom at ~%vict%, but nothing happens!
   halt
+elseif %vict.affect(18231)%
+  %send% %actor% It looks like ~%vict% has already shrunk!
+  halt
+elseif %random.100% > 75
+  * 25% chance to fail
+  %send% %actor% You take aim at ~%vict% with the loom, but it doesn't have any effect...
+  %echoaround% %actor% ~%actor% aims a strange wooden loom at ~%vict%, but nothing happens...
+  %echo% ... if anything, it might have made *%vict% bigger!
+  dg_affect #18232 %vict% BONUS-PHYSICAL 1 -1
+  dg_affect #18232 %vict% BONUS-MAGICAL 1 -1
+  halt
 end
-* ok to mirror them
+* ok to shrink them
 %send% %actor% You take aim at ~%vict% with the loom of diminution...
 %echoaround% %actor% ~%actor% takes aim at ~%vict% with a strange wooden loom...
 %echo% ~%vict% shrieks as &%vict% shrinks and shrinks!
@@ -796,15 +807,13 @@ if !%vict.affect(18231)%
   dg_affect #18231 %vict% BONUS-MAGICAL -20 -1
 end
 * check completion
-if %self.val0% && %self.val1% && %self.val2%
-  set ch %room.people%
-  while %ch%
-    if %ch.on_quest(18242)%
-      %quest% %ch% trigger 18242
-    end
-    set ch %ch.next_in_room%
-  done
-end
+set ch %room.people%
+while %ch%
+  if %ch.on_quest(18242)%
+    %quest% %ch% trigger 18242
+  end
+  set ch %ch.next_in_room%
+done
 ~
 #18238
 Consider / Kill Death~
@@ -984,26 +993,61 @@ if !%bandit%
   %send% %actor% There's nobody here you can give this bribe to.
   halt
 end
-* check bribe amount
+* check bribe amount and variables
+eval intimidate %actor.strength% == 15 || %actor.level% >= 300
+eval outwit %actor.wits% == 15
+eval charm %actor.charisma% == 15
+eval override %intimidate% || %outwit% || %charm%
 set amount %arg.car%
 set type %arg.cdr%
 if !%arg%
-  %force% %bandit% say Ha! You're wasting my time and yours. I want at least 300 coin on top of that.
-  %send% %actor% Type 'bribe 300 coins' to make a better offer.
+  %force% %bandit% say Ha! You're wasting my time and yours. I want at least 500 coin on top of that.
+  %send% %actor% Type 'bribe 500 coins' to make a better offer.
   halt
-end
-if %amount% < 300 || !(coins /= %type%)
+elseif !(coins /= %type%)
   %send% %actor% Usage: bribe <number> coins
   %send% %actor% You cannot specify a type of coins for this.
   halt
-end
-if !%actor.can_afford(%amount%)%
-  %send% %actor% You don't have that many coins.
+elseif %amount% < 100 && !%override%
+  %force% %bandit% say You must be bloody joking. Best make it 600 coin.
+  %send% %actor% Type 'bribe 600 coins' to make a better offer.
+  halt
+elseif %amount% < 200 && !%override%
+  %force% %bandit% say %amount%? No. I could do 450.
+  %send% %actor% Type 'bribe 600 coins' to make a better offer.
+  halt
+elseif %amount% < 300 && !%override%
+  %force% %bandit% say How about 350?
+  %send% %actor% Type 'bribe 350 coins' to make a better offer.
   halt
 end
-* ok go
-nop %actor.charge_coins(%amount%)%
-%send% %actor% You slip ~%bandit% the guild's bribe plus %amount% coins of your own...
+* anything >= 300 is fine...
+if %amount% > 0
+  if !%actor.can_afford(%amount%)%
+    %send% %actor% You don't have that many coins.
+    halt
+  else
+    nop %actor.charge_coins(%amount%)%
+  end
+end
+* messages
+if %amount% < 450 && %charm%
+  %send% %actor% You charm ~%bandit%, who agrees to your terms.
+  %echoaround% %actor% ~%actor% seems to charm ~%bandit%.
+elseif %amount% < 450 && %outwit%
+  %send% %actor% You play a quick game of rock, cloth, shearing knife with ~%bandit%... and win!
+  %echoaround% %actor% ~%actor% plays a quick game of rock, cloth, shearing knife with ~%bandit%... and wins!
+elseif %amount% < 450 && %intimidate%
+  %send% %actor% You get real close to ~%bandit% and flash your weapon...
+  %echoaround% %actor% ~%actor% gets real close to ~%bandit% and flashes ^%actor% weapon...
+  %force% %bandit% say Alright, you're right, not worth it. We'll do it your way.
+end
+* final messaging
+if %amount% > 0
+  %send% %actor% You slip ~%bandit% the guild's bribe plus %amount% of your own coins...
+else
+  %send% %actor% You slip the guild's bribe to ~%bandit%.
+end
 %echoaround% %actor% ~%actor% slips something to ~%bandit%.
 wait 1
 %force% %bandit% say Well, that's our mischief managed, then.
@@ -1085,7 +1129,7 @@ nop %self.val0(1)%
 %mod% %self% shortdesc scrolls of evolving enigmas
 %mod% %self% longdesc A set of scrolls of evolving enigmas is lying on the ground.
 %mod% %self% lookdesc The set contains three scrolls bound together with a shimmering rainbow ribbon, which you cannot remove. Only the title text on the outside of the scrolls can be read:
-switch %random.5%
+switch %random.6%
   case 1
     %mod% %self% append-lookdesc-noformat &0      Conjure Confections: The Art of Edible Illusions
     %mod% %self% append-lookdesc-noformat &0      Casting Coup d'Etat: How to Turn Rival Sorcerers into Rabbits
@@ -1438,6 +1482,9 @@ switch %questvnum%
   case 18241
     %load% obj 18218 %actor% inv
   break
+  case 18242
+    %load% obj 18215 %actor% inv
+  break
   case 18243
     %load% obj 18220 %actor% inv
     set 18243_bug_count 0
@@ -1505,6 +1552,15 @@ end
 Support quest progress checker~
 2 v 0
 ~
+if %questvnum% == 18283
+  * remove signalling stone if any
+  set stone %actor.inventory(18280)%
+  if %stone%
+    %send% %actor% @%stone% vanishes from your pocket without a trace.
+    %purge% %stone%
+  end
+end
+* check if all 4 quests are done
 if %actor.completed_quest(18283)% && %actor.completed_quest(18287)% && %actor.completed_quest(18291)% && %actor.completed_quest(18295)%
   %quest% %actor% trigger 18279
 end

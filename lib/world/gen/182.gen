@@ -36,13 +36,18 @@ T0
 Your dragon turtle whistle cooldown has ended.~
 S
 #18231
-shrunk~
+diminutive~
 4 0
 0 0 0 0
 T4
 $e appears to have shrunk!~
 T5
 ...$e seems to have shrunk!~
+S
+#18232
+failed diminution~
+4 0
+0 0 0 0
 S
 #18285
 imaginary egg~
