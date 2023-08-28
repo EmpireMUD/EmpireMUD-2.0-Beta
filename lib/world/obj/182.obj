@@ -622,6 +622,26 @@ C
 Q 18254
 T 18254
 S
+#18255
+card dance draconic~
+a draconic dance card~
+A draconic dance card has been discarded here.~
+   This dance card depicts a variety of dance moves, all modified to suit a
+large, scaly audience. If you can manage to find a wandering dragon nearby,
+type 'dance' to begin performing these moves. If it's impressed enough, it may
+leave the area without violence.
+   The moves depicted on the dance card are: twirl, spin, jump, slide, sway,
+flutter, glide, stomp, wave, stretch, wiggle, clap, skip, hop, shake, tiptoe,
+kick, sashay, and pirouette.
+~
+3 0 a 0 1
+0 0 0
+0 0
+C
+1 1
+Q 18248
+T 18255
+S
 #18256
 net wildling huge~
 a wildling net~

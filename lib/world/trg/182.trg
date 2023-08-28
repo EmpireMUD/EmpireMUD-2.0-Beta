@@ -925,6 +925,90 @@ if %found% >= %needed%
   %purge% %self%
 end
 ~
+#18249
+GoA: Flame's End Fandango dragon script~
+0 b 100
+~
+* ticks every 13 seconds for the dragon dance
+set room %self.room%
+set count 0
+set 18248_next %self.var(18248_next)%
+set ch %room.people%
+* check and update progress
+while %ch%
+  if %ch.var(18248_dancing)% == %self.vnum%
+    eval count %count% + 1
+    if %18248_next% && %ch.var(18248_move)% == %18248_next%
+      eval 18248_prog %ch.var(18248_prog)% + 1
+      if %18248_prog% >= 8
+        * done!
+        %send% %ch% You complete the dance with a flourish!
+        %send% %ch% ~%self% seems impressed! You've finished the quest!
+        %echoaround% %ch% ~%ch% completes the dance with a flourish!
+        %quest% %ch% trigger 18248
+        rdelete 18248_dancing %ch.id%
+        set 18248_despawn 1
+        remote 18248_despawn %self.id%
+        eval count %count% - 1
+        set card %ch.inventory(18255)%
+        if %card%
+          %purge% %card%
+        end
+      end
+    elseif %18248_next%
+      %send% %ch% It seems like you missed that last move.
+      eval 18248_prog %ch.var(18248_prog)% - 1
+      if %18248_prog% < 0
+        set 18248_prog 0
+      end
+    else
+      * no next move (probably first move)
+      set 18248_prog 0
+    end
+    remote 18248_prog %ch.id%
+    rdelete 18248_move %ch.id%
+  end
+  set ch %ch.next_in_room%
+done
+* still going?
+if %count% > 0
+  set move_list twirl spin jump slide sway flutter glide stomp wave stretch wiggle clap skip hop shake tiptoe kick sashay pirouette
+  * 19 is the number of moves
+  set move %random.19%
+  while %move% > 0
+    set 18248_next %move_list.car%
+    set move_list %move_list.cdr%
+    eval move %move% - 1
+  done
+  remote 18248_next %self.id%
+  wait 1 s
+  switch %random.3%
+    case 1
+      %echo% ~%self% motions for a '%18248_next%'...
+    break
+    case 2
+      %echo% ~%self% seems to want you to '%18248_next%'...
+    break
+    case 3
+      %echo% It seems like a '%18248_next%' would impress ~%self%...
+    break
+  done
+else
+  * done
+  if %self.var(18248_despawn)%
+    if %instance.start%
+      %at% %instance.start% %adventurecomplete%
+    end
+    wait 1
+    %echo% ~%self% is so impressed that &%self% leaves the region and moves on.
+    %purge% %self%
+  else
+    rdelete 18248_next %self.id%
+    nop %self.remove_mob_flag(SENTINEL)%
+    detach 18249 %self.id%
+  end
+end
+~
 #18250
 GoA: Use stone orb of hiding~
 1 c 2
@@ -1219,6 +1303,126 @@ else
   %force% %vict% maggro %actor%
 end
 ~
+#18255
+GoA: Flame's End Fandango dance~
+1 c 2
+dance twirl spin jump slide sway flutter glide stomp wave stretch wiggle clap skip hop shake tiptoe kick sashay pirouette~
+set room %actor.room%
+set 18248_dancing %actor.var(18248_dancing,-2)%
+set dg %room.people(%18248_dancing%)%
+if %cmd% == dance
+  * setup
+  if %actor.var(18248_dancing)% && %dg% && %dg.var(18248_next)% && %dg.has_trigger(18249)%
+    %send% %actor% You're already dancing... better keep up! (type %dg.var(18248_next)%)
+    halt
+  end
+  set dg %room.people(10330)%
+  if !%dg%
+    set dg %room.people(10331)%
+  end
+  if !%dg%
+    set dg %room.people(10332)%
+  end
+  if !%dg%
+    set dg %room.people(10333)%
+  end
+  if !%dg%
+    %send% %actor% There's no wandering dragon here to dance for.
+    rdelete 18248_dancing %actor.id%
+    halt
+  end
+  * ok
+  nop %dg.add_mob_flag(SENTINEL)%
+  if !%dg.has_trigger(18249)%
+    attach 18249 %dg.id%
+  end
+  if %dg.var(18248_next)%
+    %send% %actor% You join in on the dance. It looks like ~%dg% is waiting for you to '%dg.var(18248_next)%'!
+  else
+    %send% %actor% You prepare to dance for the dragon! Get ready...
+  end
+  set 18248_dancing %dg.vnum%
+  remote 18248_dancing %actor.id%
+  rdelete 18248_move %actor.id%
+  set 18248_prog 0
+  remote 18248_prog %actor.id%
+  halt
+elseif %18248_dancing% < 0
+  %send% %actor% You must type 'dance' to start the dance.
+  halt
+end
+* doing a dance move
+if !%dg%
+  %send% %actor% The dragon seems to have left.
+  rdelete 18248_dancing %actor.id%
+  halt
+end
+set 18248_move %cmd%
+remote 18248_move %actor.id%
+if twirl /= %cmd%
+  set am You gracefully twirl on the spot, your movements as fluid as a river's current.
+  set rm ~%actor% gracefully twirls on the spot, ^%actor% movements as fluid as a river's current.
+elseif spin /= %cmd%
+  set am You spin around, a whirlwind of energy and motion.
+  set rm ~%actor% spins around, a whirlwind of energy and motion.
+elseif jump /= %cmd%
+  set am With a burst of energy, you leap into the air and land with a triumphant grin.
+  set rm With a burst of energy, ~%actor% leaps into the air and lands with a triumphant grin.
+elseif slide /= %cmd%
+  set am You slide across the ground with a playful glint in your eye, leaving a trail of excitement.
+  set rm ~%actor% slides across the floor with a playful glint in ^%actor% eye, leaving a trail of excitement.
+elseif sway /= %cmd%
+  set am Your body sways rhythmically to an invisible melody, capturing the essence of the music.
+  set rm |%actor% body sways rhythmically to an invisible melody, capturing the essence of the music.
+elseif flutter /= %cmd%
+  set am Your movements become light and airy, like a delicate butterfly dancing in the breeze.
+  set rm |%actor% movements become light and airy, like a delicate butterfly dancing in the breeze.
+elseif glide /= %cmd%
+  set am You glide smoothly across the floor, your steps elegant and serene.
+  set rm ~%actor% glides smoothly across the floor, ^%actor% steps elegant and serene.
+elseif stomp /= %cmd%
+  set am With a bold stomp, you make your presence known, commanding attention with each beat.
+  set rm With a bold stomp, ~%actor% makes ^%actor% presence known, commanding attention with each beat.
+elseif wave /= %cmd%
+  set am You wave your arms gracefully, a cheerful greeting to the world around you.
+  set rm ~%actor% waves ^%actor% arms gracefully, a cheerful greeting to the world around *%actor%.
+elseif stretch /= %cmd%
+  set am Your limbs extend in a graceful stretch, embodying a sense of freedom and vitality.
+  set rm |%actor% limbs extend in a graceful stretch, embodying a sense of freedom and vitality.
+elseif wiggle /= %cmd%
+  set am You wiggle and sway, exuding a carefree spirit in every movement.
+  set rm ~%actor% wiggles and sways, exuding a carefree spirit in every movement.
+elseif clap /= %cmd%
+  set am You clap your hands together, the sound echoing like applause for your performance.
+  set rm ~%actor% claps ^%actor% hands together, the sound echoing like applause for the performance.
+elseif skip /= %cmd%
+  set am You skip with childlike joy, your heart light and your spirits high.
+  set rm ~%actor% skips with childlike joy, ^%actor% heart light and ^%actor% spirits high.
+elseif hop /= %cmd%
+  set am A playful hop brings a touch of whimsy to your dance, a moment of pure delight.
+  set rm A playful hop brings a touch of whimsy to |%actor% dance, a moment of pure delight.
+elseif shake /= %cmd%
+  set am You shake your body with infectious energy, inviting others to join your enthusiasm.
+  set rm ~%actor% shakes ^%actor% body with infectious energy, inviting others to join the enthusiasm.
+elseif tiptoe /= %cmd%
+  set am You tiptoe gracefully, as if walking on air, leaving a trail of elegance in your wake.
+  set rm ~%actor% tiptoes gracefully, as if walking on air, leaving a trail of elegance in ^%actor% wake.
+elseif kick /= %cmd%
+  set am A swift kick punctuates your dance, infusing it with a burst of dynamic energy.
+  set rm A swift kick punctuates |%actor% dance, infusing it with a burst of dynamic energy.
+elseif sashay /= %cmd%
+  set am You sashay with confidence, your steps full of flair and style.
+  set rm ~%actor% sashays with confidence, ^%actor% steps full of flair and style.
+elseif pirouette /= %cmd%
+  set am You execute a perfect pirouette, your grace and precision a testament to your skill.
+  set rm ~%actor% executes a perfect pirouette, ^%actor% grace and precision a testament to ^%actor% skill.
+else
+  %send% %actor% You don't know that dance move.
+  halt
+end
+%send% %actor% %am%
+%echoaround% %actor% %rm%
+~
 #18256
 Catch wildling with a huge net~
 1 c 3
@@ -1500,6 +1704,9 @@ switch %questvnum%
   break
   case 18247
     %load% obj 18250 %actor% inv
+  break
+  case 18248
+    %load% obj 18255 %actor% inv
   break
   case 18251
     %load% obj 18251 %actor% inv
