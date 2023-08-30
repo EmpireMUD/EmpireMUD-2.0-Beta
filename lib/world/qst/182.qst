@@ -35,7 +35,7 @@ on the shoulders with both hands. 'Here to sign up? ' he asks, jovially. 'All
 members of the empire are welcome here, whether you're a ratcatcher or a...
 Dragoncatcher, I suppose!'
 ~
-You sign your name to the guild roster.
+You sign your name to the guild roster. You're a member now!
 ~
 6 f 0 0 -1
 A
@@ -155,6 +155,624 @@ W
 2 18097 0 1 a
 Z
 0 18222
+S
+#18240
+Golden Goblin: Fathom a Little Goblin Aid~
+   The old librarian glances over at you from the books and asks, 'Are you
+looking for work? There's a little goblin ship stuck in a cave and in need of
+repairs. It's not much, but the guild will undoubtedly cover your expenses in
+the interest of indebting the little lime creatures to us.'
+   The librarian leafs through some loose papers to find one with a drawing of
+a ship. 'Ah, here it is. The Golden Goblin. I'm not sure which cave it's stuck
+in, but I'm sure it's nearby on the coast. Do be sure to let them know at the
+main guildhall when you've helped out. You know the one, in the Tipsy Tortoise.
+And be quick about it.'
+~
+   The vampire looks up from his cauldron as you approach, peering at you
+through dim yellow eyes.
+   'You must be the one who aided the Golden Goblin,' he says. 'I have received
+a squid from their sorceress, Fathma, speaking highly of you. At least, as
+highly as a goblin can speak. Pirates they may be, but those goblins will pay
+their debts. As will we. I believe I owe you this...'
+~
+12 e 0 0 -1
+A
+1 18218
+D 18240
+P
+0 18279 0 1 a
+P
+17 18200 0 7 a
+R
+7 18200 10
+R
+1 -1 100
+W+
+11 0 0 1 -
+Help Fathma~
+Z
+1 18208
+S
+#18241
+Goblin Challenge: Smoke Them Out~
+   The old librarian glances over at you from the books and asks, 'Are you
+looking for work? I came across a recipe for a smoke bomb which, according to
+the author, will drive them off. I need it tested, plain and simple.'
+   The librarian hands you an old page torn from a book. At a glance, it looks
+simple enough (craft info smoke bomb).
+   'Try it out,' the librarian says. Let the umbramancer at the Tipsy Tortoise
+know if it works. It's just copper and bileberries. And cram the page in there
+for good measure, too. You will be compensated for your time.'
+~
+   The shadowy sorcerer listens to your tale of the smoke bomb, especially the
+part where it cleared out the entire goblin nest.
+   'Extremely interesting,' the umbramancer says. 'This will take further
+study. In the meantime, your reward...'
+~
+14 e 0 0 -1
+A
+1 18218
+D 18240
+P
+0 18279 0 1 a
+P
+17 18200 0 7 a
+R
+7 18200 10
+R
+1 -1 100
+T 18277
+W+
+11 0 0 1 -
+Smoke the goblins out~
+Z
+1 18209
+S
+#18242
+Goblin Challenge: Large and In Charge~
+   'We have received a request,' the librarian says over a thick pair of
+spectacles. 'It's goblins again, of course. They've become a nuissance. I sent
+an adventurer already, but he found the nest had been cleared out by the little
+menaces themselves. They won't have gone far. Search nearby ruins and try to
+find it.'
+   The librarian turns away, but turns back to add, 'Oh, and I'd like you to
+test this. It's an old loom of diminution. Supposedly, they can shrink goblins.
+Heavens, perhaps that's how the goblins ended up so small in the first place!'
+   The librarian hands you the wooden loom.
+   'Oh, and do drive the goblins off once you've shrunk them. We can't have
+teeny goblins running around, can we? Do the Goblin Challenge, as we say. And
+be quick about it. Report back to Nostrazak at the Tipsy Tortoise when the deed
+is done.'
+~
+   You approach Nostrazak, who circles back behind his desk and listens
+intently as you tell him about your experience fighting the goblins in their
+dirty little arena.
+   'I'm amazed the loom still works. Of course, I'll need it back. But truly,
+excellent job. Shame all their loot was shrunk, too. Let's just hope they move
+on and don't bother our client again.'
+   You nod, assuring him you completed the challenge and the goblins have
+moved out of the ruins. With any luck, they won't be back.
+~
+15 e 0 0 -1
+A
+1 18218
+D 18240
+P
+0 18279 0 1 a
+P
+17 18200 0 7 a
+R
+7 18200 10
+R
+1 -1 100
+T 18277
+W+
+11 0 0 1 a
+Successfully shrink a goblin~
+W+
+3 10200 0 1 a
+Defeat the bruiser~
+W+
+3 10201 0 1 a
+Defeat the shaman~
+W+
+3 10202 0 1 a
+Defeat the archer~
+W+
+3 10203 0 1 a
+Defeat the sapper~
+W+
+3 10204 0 1 a
+Defeat the champion~
+W+
+3 10205 0 1 a
+Defeat the war shaman~
+Z
+1 18211
+S
+#18243
+Mill Manor: Catching Bugs~
+   'Ah! Aha! Glad to see you here,' the guildmage says, with a wrinkled grin.
+'Have you been to the swamp lately? There's an old manor house with some, shall
+we say, strange goings-on. Especially with the bugs.'
+   The guildmage shuffles some items around on one of the tables, retrieves
+a gilded net, and hands it to you.
+   'The guild tasks you with catching some bugs. They may be large, but rest
+assured the enchanted net will do most of the work. You'll have to find Mill
+Manor on your own, but if you can get to the swamp, it should be nearby. Once
+you have them, take them to the old one in the Tipsy Tortoise. Quickly.'
+   Find the bugs in Mill Manor and type 'net <target>' to catch two of them.
+~
+   You place the captured bugs on the workbench. The tattooed alchemist sets
+the ladle down by his cauldron and approaches with interest.
+   'Oh yes,' he says, examining the bugs. 'Yes, these will do nicely. Here is
+your reward. Don't lose it all in one place.'
+~
+15 e 0 0 -1
+A
+1 18217
+D 18243
+P
+0 18279 0 1 a
+P
+17 18200 0 7 a
+R
+7 18200 10
+R
+1 -1 100
+T 18277
+W+
+11 0 0 1 -
+Catch 2 bugs~
+Z
+1 18208
+S
+#18244
+Swamp Hag: Suitable Supplies~
+   'Agent Germione has sent a messenger mouse with a particular request,' the
+guildmage says slowly. 'She has need of an enchanted rat suit for an upcoming
+dinner and the guild would like to remain her primary supplier. So this task
+falls to you, and I'll hear no complaints.'
+   The guildmage sips from a swirling blue mug and turns directly toward you.
+   'I know it's distasteful, but there's an alternative. The old hag will take
+briar hide or absinthian leather if you have some, or else rat skins and herbs
+if you don't. In either case, gather the materials and set out for the Tipsy
+Tortoise. Our tinker will put the suit together for her.'
+   Deliver 5x rat skins and 15x herbs, or else 5x thick magic leathers to the
+tinker in the guildhall at the Tipsy Tortoise for your reward.
+~
+   The old tinker looks at you through a set of colorful lenses and then takes
+the supplies you've brought, saying, 'Not exactly ideal but this should do. No
+time to chew the fat about it. On your way. Oh, and your reward...'
+~
+16 de 0 0 -1
+A
+1 18217
+D 18243
+P
+0 18279 0 1 a
+P
+17 18200 0 7 a
+R
+7 18200 10
+R
+1 -1 100
+W
+2 10013 0 5 a
+W
+1 6650 0 15 a
+W
+1 6531 0 5 b
+Z
+1 18210
+S
+#18245
+Swamp Hag: Feeding Rodentmort~
+   'This is a bit of a messy one,' the guildmage says sheepishly while sliding
+a wicker cage out from a low shelf. The cage sprays droplets of water as it
+shakes back and forth, followed by the raspy sound of something scratching at
+the inside.
+   The old guildmage sets the cage down at your feet, where it starts to form a
+murky puddle around it. 'Don't worry about the biting. He'll realize you aren't
+food soon enough, probably,' the guildmage says. 'This should be a brief task.
+The briefer the better, honestly. I've had all I can take of the creature. The
+Pet That Shall Not Be Named, I've been calling him. Honestly, I should never
+have offered to watch him. But, Germione claimed he was enchanted, so I could
+not resist the urge to take a peek under the bonnet.'
+   The guildmage laughs.
+   'In any event, she'll want him back in good condition and I have not been
+able to bring myself to feed him. The thing eats only the freshly-dead.
+Honestly. I'm not sure what she's playing at, calling him enchanted. Maybe for
+his size alone, but otherwise there's not a single thing special about him.'
+   Just then, there's a POP and a burst of fire, and a slip of parchment
+appears in a bottle on the table. The guildmage slides the note out and reads
+it.
+   'Oh, it seems Nostrazak would like to see Pet That Shall Not Be Named before
+we send it back to the old hag. Well, you had still better feed the vile thing.
+Then drop it at the Tipsy Tortoise and wash your hands of the matter. Perhaps
+twice.'
+   Type 'release Rodentmort' to let the rat out of the cage. He'll eat any
+corpses he comes across. A rodent of such unusual size will need at least three
+of them.
+~
+   You pass the water-logged cage over to Nostrazak the Incautious. He taps at
+it with a long claw, causing the cage to shake and sputter for a moment.
+   'Feisty thing,' Nostrazak says. 'Yes you are. Yes you are. Who's a feisty
+little thing? Good little Morty. Uncle Nosty has a treat for you...'
+   Your reward is on the desk and you decide this is a good time to take it and
+leave.
+~
+18 e 0 0 -1
+A
+1 18217
+D 18243
+P
+0 18279 0 1 a
+P
+17 18200 0 7 a
+R
+7 18200 10
+R
+1 -1 100
+T 18277
+W+
+11 0 0 1 a
+Feed Rodentmort three corpses~
+Z
+1 18211
+S
+#18246
+Lost Temple: Important Archaeology~
+   'Aha!' says the superintendant. 'Just who I wanted to see. I got a report
+from Adventurer 86 about a lost temple recently rediscovered in the jungle.
+These things are like lodestones for amateur treasure hunters and looters of
+all types, so it's critical we get there first. To protect the treasures.'
+   The superintendant rummages through a box under the desk and hands you an
+enchanted metal bar. 'You'll need this, or it's impossible to get them loose.
+Pry out as many of the gems as you can and then get them to the guild's tinker
+at the Tipsy Tortoise. That should keep them safe from looters.'
+   Find a lost temple in the jungle, enter it, and type 'pry gem' inside the
+temple to get 4 gems to bring back to the guild.
+~
+   The tinker takes the sack of gems from you and pulls one out, holding it up
+to the light.
+   'Ah, exactly what I've been needing. Oh, these gems are truly spectacular.
+You really are a gem. Your pay is on the table. Excellent work as always.'
+~
+17 e 0 0 -1
+A
+1 18219
+D 18246
+P
+0 18279 0 1 a
+P
+17 18200 0 7 a
+R
+7 18200 10
+R
+1 -1 100
+T 18277
+W
+2 18249 0 4 -
+Z
+1 18210
+S
+#18247
+Lost Temple: Get Lost~
+   'Aha!' says the superintendant. 'Just who I wanted to see. I got a report
+from Adventurer 86 about a lost temple recently rediscovered in the jungle.
+These things are like lodestones for amateur treasure hunters and looters of
+all types, so it's critical we get there first. To protect the treasures.'
+   The superintendant picks up a stone orb off of the desk and hands it to you.
+It's surprisingly light. 'You'll need this. Find the temple -- head to the
+jungle and you should see it nearby -- and make your way to the gate. 86 says
+there's a strange orb there blocking the door. It's only a matter of time
+before someone figures out how to use the orb's magic to open the temple. That
+is where you come in. You are going to hijack that magic using our own orb,
+locking the temple and causing vines to grow so that nobody else finds it
+before we can get an expert in there. Think you can handle that? Good. Report
+in at the Tipsy Tortoise when it's done. They'll want to know the temple's
+location.'
+   Type 'use orb' in a Lost Temple before selecting a difficulty.
+~
+   You describe, in detail, where you hid the lost temple as the vampire
+scratches some notes onto a parchment.
+   'Most excellent,' he says as he tucks away the notes. 'I shall begin
+assembling a team at once. Who knows what delectable secrets lie in that
+temple. Oh, your payment is by the door.'
+~
+18 e 0 0 -1
+A
+1 18219
+D 18246
+P
+0 18279 0 1 a
+P
+17 18200 0 7 a
+R
+7 18200 10
+R
+1 -1 100
+T 18277
+W+
+11 0 0 1 a
+Cast the spell on a lost temple~
+Z
+1 18208
+S
+#18248
+Wandering Dragon: Flame's End Fandango~
+   'Aha!' says the superintendant. 'Just who I wanted to see. I got a contract
+to remove a pest -- a rather large one. The guild would like you to try an
+ancient technique that removes the dragon without killing it. Such a thing
+would be very useful to us. Take this dance card, seek out the wandering dragon
+nearby, and perform the dance. Take care of it, and then report back to
+Nostrazak for your reward. And be sure you don't hurt the dragon.'
+~
+   Nostrazak the Incautious's face reddens and he seems to double in size as
+he bellows out, 'You actually performed the dance of dragons?'
+   'Such a thing was once thought impossible,' he says, less excitedly, as he
+sits back into his chair. 'Even I have never accomplished such a feat. You must
+be classically trained -- or very, very lucky. The guild will be excited to
+hear of this. Here's your pay.'
+~
+20 e 0 0 -1
+A
+1 18219
+D 18246
+P
+0 18279 0 1 a
+P
+17 18200 0 7 a
+R
+7 18200 10
+R
+1 -1 100
+T 18277
+W+
+11 0 0 1 a
+Dance for the dragon~
+Z
+1 18211
+S
+#18249
+Clockwork Colossus: Cog and Collect~
+   'I have a special request from the guild's tinker,' the librarian says,
+without looking up at you. 'You're to find one of those notorious clockwork
+colossi. Truly, marvels of magineering. They have little worker drones, spiders
+fashioned from brass and bronze that keep the colossus in good repair. Our good
+tinker needs some of the brass scraps that the spiders use in the repairs. Oh,
+and some copper wire while you're there. I'm sure the tinker will pay your
+usual fee if you deliver the goods to the Tipsy Tortoise.'
+   Find a clockwork colossus and retrieve the items from the creatures that
+inhabit it.
+~
+   You place the brass scrap metal and salvaged wire on the workstation.
+   'Your timing is like clockwork,' the tinker says. 'Could not be more
+perfect. I know exactly what I'm going to do with those. Here's your pay.'
+~
+19 de 0 0 -1
+A
+1 18218
+D 18249
+P
+0 18279 0 1 a
+P
+17 18200 0 7 a
+R
+7 18200 10
+R
+1 -1 100
+W
+2 12506 0 1 a
+W
+2 12507 0 1 a
+Z
+1 18210
+S
+#18250
+Clockwork Colossus: Fettered Footwork~
+   'I have another job for you, if you're up to it,' the librarian says, over
+the top of a thick book. 'Last time I was at the Tipsy Tortoise, Nostrazak the
+Incautious was lecturing about too many villages being trampled by clockwork
+colossi. Those villages are a good source of income for the guild, so I have
+been researching the matter and I think I have a solution.'
+   The librarian shows you a diagram of a leg and foot, with a large
+contraption built around the ankle.
+   'It's a colossal ankle brace. Climb up onto the colossus's foot and
+manufacture one of these directly around the ankle. The colossus will have
+trouble moving and will be forced to return to its scaffold. Might just save
+the day. Anyway, it shouldn't be hard to find a colossus nearby. You'll need to
+bring a bunch of bronze or iron, and a lot of nails. It's important to secure
+the brace to the leg. Don't worry, you can't hurt the colossus. It's an
+automaton. Oh, and report back in at the Tipsy Tortoise when it's done.'
+   From atop the enormous boots of the clockwork colossus, type 'manufacture
+colossal ankle brace' to construct the brace.
+~
+   'Ingenius,' says Nostrazak the Incautious when you regale him with the story
+of the colossus. 'Your local librarian came up with that? Simply ingenius.
+Librarians are the backbone of this continent. And good to hear that the
+colossus will trample no more villages. Really, tremendous work in the name of
+the Guild.'
+~
+19 e 0 0 -1
+A
+1 18218
+D 18249
+P
+0 18279 0 1 a
+P
+17 18200 0 7 a
+R
+7 18200 10
+R
+1 -1 100
+T 18277
+W+
+11 0 0 1 a
+Bind the colossus's ankle~
+Z
+1 18211
+S
+#18251
+Three Bandits: Relic Ruffians Remedy~
+   'Oh, there is a particular matter that could use your attention,' the
+librarian says, pulling a small pouch of coins from an ornamented box.
+   'Some bandits have been camping in an old ruin, not terribly far from here.
+We need them out, but we'd like to hire them. Covertly, of course. The guild
+would like you to bribe them to leave with these coins. They contain a hidden
+message that the bandits will surely recognize after they leave. I'm sure the
+bribe will be enough to do the trick. Just be subtle about it.'
+   The librarian hands you the pouch of coins. Seek out the bandits in the
+ruins and type 'bribe'.
+~
+   'Hope they didn't give you any trouble,' the vampire says as you relate the
+story of bribing the bandits. He laughs when you tell him it cost extra.
+   'But at least they took the marked coins. Good job.'
+~
+20 e 0 0 -1
+A
+1 18218
+D 18249
+P
+0 18279 0 1 a
+P
+17 18200 0 7 a
+R
+7 18200 10
+R
+1 -1 100
+T 18277
+W+
+11 0 0 1 a
+Bribe the bandits~
+Z
+1 18208
+S
+#18252
+Skycleave: Pilfering Pixies~
+   The guildmage opens a small wooden crate and pulls out an old clay jar,
+which brings a cloud of dust out with it. The guildmage blows it off and hands
+it to you.
+   'It's a pixy jar. Not just any pixy jar, either, the guildmage says. 'We've
+had it re-enchanted to be able to capture a pixy without touching it. Why, you
+might ask? Because we need to smuggle one of them out of the most secure prison
+in history.'
+   The guildmage pauses for drama.
+   'The Tower Skycleave. Your job is to find the tower again, get to the pixy
+races, and set this jar next to the stalls. Your target is Mischantsy, one of
+the racers. Once she's in the jar, you're to deliver it to the tinker at the
+main hall in the Tipsy Tortoise.'
+   Type 'pilfer pixy' at Skycleave's pixy races to steal the pixy.
+~
+   You set the old pixy jar on the tinker's station.
+   'Ah, you really managed it,' the tinker says, picking it up. 'I have big
+plans for this pixy. I wouldn't worry too much about it. That tower turns out
+to be stuck in a time loop, so in the technical sense, the pixy is still back
+there racing.'
+~
+20 e 0 0 -1
+A
+1 18217
+D 18252
+P
+0 18279 0 1 a
+P
+17 18200 0 7 a
+R
+7 18200 10
+R
+1 -1 100
+T 18277
+W+
+11 0 0 1 a
+Pilfer a racing pixy~
+W+
+2 18252 0 1 a
+Bring the pixy jar to the Tinker~
+Z
+1 18210
+S
+#18253
+Skycleave: Ink and Intrigue~
+   'While you're here, there's a matter I was hoping you could help with,' the
+guildmage says. 'I know you managed to finesse your way into Skycleave's upper
+echelon. I've learned from Agent M that the tower houses a set of scrolls of
+evolving enigmas. Perhaps you've heard of this? The text on the scrolls
+actually changes over time as it absorbs and filters new knowledge. The guild
+has a few of them already, but the scrolls are predictably unpredictable.'
+   The guildmage take a sip from a small cup of murky, blue liquid.
+   'As you know by now, Skycleave is stuck in some sort of time loop. If you
+manage to steal the scrolls of evolving enigmas, they'll be none the wiser.
+They're stored in the back of the Eruditorium, in one of the drawers. Take this
+skeleton key. When you're done, deliver it to the Tipsy Tortoise. I'm certain
+our umbramancer will appreciate it.'
+~
+   You hand the scrolls of evolving enigmas over to the umbramancer.
+   'Ah, these are exactly perfect,' the shadowy form says. 'Perfectly crafted.
+These are from the Tower Skycleave, then? I've never been able to get inside.
+Shame, really. That place is a treasure trove of lost secrets. I shall be sure
+to put these scrolls to good use.'
+~
+21 e 0 0 -1
+A
+1 18217
+D 18252
+P
+0 18279 0 1 a
+P
+17 18200 0 7 a
+R
+7 18200 10
+R
+1 -1 100
+T 18277
+W+
+11 0 0 1 a
+Steal the scrolls of evolving enigmas~
+Z
+1 18209
+S
+#18254
+Hamlet: Reflecting on the Situation~
+   'I have discovered a vintage mirror in storage and I believe it could be
+fiend-glass,' the guildmage says, offering you the mirror. It's old and worn,
+but at the same time, elegant in a medieval sort of way. Curiously, though the
+glass is in good condition, you cannot see your reflection in it.
+   'The guild had quite a lot of these at one point, and they still turn up
+from time to time. I intend to send it to the master tinker, but first we must
+verify its abilities. That's where you come in. The mirror is out of attunement
+so I would like you to travel to a nearby hamlet that has been overrun by the
+undead. Turn the mirror on the fiends within and see which of them see their
+reflection in it for the last time. If you manage to capture three of them,
+take the mirror to the tinket at the Tipsy Tortoise.'
+   Type 'reflect <person>' to use the mirror on them. It will only work in the
+Hamlet of the Undead.
+~
+   You place the mirror in front of the tinker, who grabs it excitedly.
+   'Oh, a real one? Quite spectacular,' the tinker says without looking up from
+the old mirror. 'Quite spectacular, indeed. Oh, and you've nabbed a necrofiend?
+And what's this, is there a woman in here? She looks like some kind of dark
+wizard. You have outdone yourself this time. Truly, truly.'
+~
+22 e 0 0 -1
+A
+1 18217
+D 18252
+P
+0 18279 0 1 a
+P
+17 18200 0 7 a
+R
+7 18200 10
+R
+1 -1 100
+T 18277
+W+
+11 0 0 1 a
+Capture 3 fiends in the mirror~
+Z
+1 18210
 S
 #18256
 The Grove: Capture a Wildling~

@@ -466,6 +466,75 @@ stored here.
 ~
 T 18218
 S
+#18224
+Rodentmort rat unusually large Morty ROUS~
+Rodentmort~
+An unusually large rat is sitting here.
+~
+100 100 bdjoDF n 3
+1 0 71 9 -1
+D
+   The rat is at least as large as a dog; hopefully that's the worst thing
+about him. His fur shimmers in the light, perhaps because it's always slightly
+wet. This water-logged horror is Rodentmort, one of the swamp hag's favorite
+rats, and he looks hungry.
+   Rodentmort will eat any corpse he comes across. Maybe if he has enough of
+them, he'll fall asleep.
+~
+M
+0
+$n scampers playfully around your feet.~
+M
+0
+The enormous rat sniffs the air with curiosity.~
+M
+0
+With a rumbling purr, $n rubs against your leg.~
+M
+0
+$n's beady eyes glint mischievously in the light.~
+M
+0
+$n's tail twitches in excitement as $e explores $s surroundings.~
+M
+0
+$n lets out a soft squeak of contentment.~
+M
+0
+The giant rat sniffs at your hand, $s whiskers tickling your skin.~
+M
+0
+With a cautious glance, $n inspects a nearby corpse.~
+M
+0
+$n chatters $s teeth as if sizing up the nearby swamp critters.~
+M
+0
+$n's nose wrinkles as $e catches a whiff of the swampy air.~
+M
+0
+The giant rat curls up beside you, $s warmth surprisingly comforting.~
+M
+0
+With a quick dash, $n grabs a fallen leaf and carries it around.~
+M
+0
+The large rat nuzzles your ankle, seeking your attention.~
+M
+0
+With a playful leap, $n pounces on a passing insect.~
+M
+0
+$n's tail coils around your wrist, showing a hint of affection.~
+M
+0
+$n's whiskers twitch as $e investigates an interesting scent.~
+M
+0
+The enormous rat stretches out, showcasing $s sleek fur.~
+T 9901
+T 18230
+S
 #18225
 tortoise baby~
 a baby tortoise~
@@ -555,7 +624,7 @@ monstrosity sanguine~
 a sanguine monstrosity~
 A sanguine monstrosity is dripping along the ground.
 ~
-100 125 dej 0 4
+100 125 de 0 4
 0 0 10 27 -1
 D
    This creature -- whose shape you're hesitant to look at, nevermind describe
@@ -564,12 +633,28 @@ unaware that it's leaving a red trail behind it.
 ~
 T 18240
 S
+#18229
+nebulavion scarlet red mist~
+a scarlet nebulavion~
+A scarlet nebulavion hangs in the air like a red mist.
+~
+100 125 dehjnK mG 4
+0 0 84 27 -1
+D
+   Ethereal tendrils reach out from the red mist like beckoning fingers, almost
+daring you to try to climb onto it. It is at once formless and cloudlike,
+twirling through the air with flecks of scarlet and vermillion like a dancer.
+It seems to pulse with a heartbeat of its own, a rhythmic whisper capable of
+carrying only the most daring of adventurers through the skies.
+~
+T 18241
+S
 #18230
 warg umbral~
 an umbral warg~
 An umbral warg stalks from shadow to shadow.
 ~
-100 125 dej 0 4
+100 125 de 0 4
 0 0 9 9 -1
 D
    This wolfish beast is smokey black from its head to the tip of its tail,
@@ -577,6 +662,22 @@ allowing for easier blending with the shadows. The only bright coloration
 visible comes from its vibrent eyes and white fangs.
 ~
 T 18240
+S
+#18231
+shadowraptor raptor eclipse~
+an eclipse shadowraptor~
+An eclipse shadowraptor circles above you, blocking the light.
+~
+100 125 dehnK mG 4
+0 0 25 9 -1
+D
+   The creature -- if it can be called that -- is shrouded in darkness. Or
+perhaps, closer inspection, it IS the darkness. Its striking appearance is like
+night itself, with only the faintest outline of the agile predator it's named
+for. Its spectral aura is daunting, daring you to try to ride it as it dances
+through the air.
+~
+T 18241
 S
 #18232
 steed clockwork~
@@ -592,6 +693,21 @@ some manor, though by what is unclear.
 ~
 T 18240
 S
+#18233
+rotary aeroforge~
+an aeroforge rotary~
+An aeroforge rotary twirls above you.
+~
+100 125 dehnK mG 4
+0 0 2 15 -1
+D
+   The aeroforge rotary is a testament to the ingenious engineering of the
+Guild of Adventurers. This soaring marvel resembles an intricate fusion of
+airborne artistry and mechanical precision, held aloft by screw-shaped sails
+that spin above it, with a narrow seat beneath for a single pilot.
+~
+T 18241
+S
 #18234
 bear imperium-clad clad~
 an imperium-clad bear~
@@ -603,6 +719,23 @@ D
 This great grizzly bear is wearing shining white imperium armor!
 ~
 T 18240
+S
+#18235
+warbalcon balcon celestial~
+a celestial warbalcon~
+A celestial warbalcon soars overhead.
+~
+100 125 de m 4
+0 0 46 11 -1
+D
+   The might and grace of the warbalcon are on full display as it flaps its
+long, slender wings overhead. It resembles an enormous draft horse with a
+strikingly iridescent coat, though it has no mane. Its long wings and fanned
+tail are reminiscent of a tremendous falcon, though it swoops more with terror
+than with grace. Its deafening call is like a thundering warble, warning all
+who hear it of the devastation to come.
+~
+T 18241
 S
 #18236
 patrons group~
@@ -778,7 +911,7 @@ dragon imaginary~
 an imaginary dragon~
 An imaginary dragon is (or isn't) flitting about.
 ~
-100 125 dej m 5
+100 125 de m 5
 0 0 2 10 -1
 D
 Perhaps you're imagining things.

@@ -1941,7 +1941,7 @@ ACMD(do_fire) {
 	else if (!*veh_arg || !*tar_arg) {
 		msg_to_char(ch, "Usage: fire <vehicle> <direction | target vehicle>\r\n");
 	}
-	else if (!has_resources(ch, ammo, can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED), TRUE)) {
+	else if (!has_resources(ch, ammo, can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED), TRUE, NULL)) {
 		// sends own error message
 	}
 	

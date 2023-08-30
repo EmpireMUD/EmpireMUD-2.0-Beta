@@ -493,7 +493,7 @@ intensify~
 3 0
 0 0 0 0
 T0
-Your intensify cooldown has ended.~
+Your intensity has ended.~
 S
 #2073
 abate~
@@ -507,7 +507,7 @@ amplify~
 3 0
 0 0 0 0
 T0
-Your amplify cooldown has ended.~
+You are no longer amplified.~
 S
 #2075
 beguile~
@@ -535,7 +535,7 @@ withstand~
 3 0
 0 0 0 0
 T0
-Your withstand cooldown has ended.~
+You are no longer withstanding.~
 S
 #2079
 hinder~
@@ -556,7 +556,7 @@ adapt~
 3 0
 0 0 0 0
 T0
-Your adapt cooldown has ended.~
+Your adaptation is no longer effective.~
 S
 #2082
 lacerate~
@@ -577,14 +577,14 @@ prepared~
 3 0
 0 0 0 0
 T0
-Your prepared cooldown has ended.~
+Your preparations expire.~
 S
 #2085
 gleam~
 3 0
 0 0 0 0
 T0
-Your gleam cooldown has ended.~
+You are no longer gleaming.~
 S
 #2086
 sunder~

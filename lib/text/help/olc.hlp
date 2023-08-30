@@ -5258,7 +5258,7 @@ Recipe:
 
 Wealth:
  0 - treasure value
- 1 - automint (if 0, workforce won't mint this)
+ 1 - flags (automint, no-mint)
 
 Weapon:
  1 - bonus damage (if scalable, this is the weight to scale the damage)
@@ -5369,14 +5369,6 @@ Common ammo types:
 
 See also: OLC OBJECTS, OEDIT TYPE, SHOW
 #d
-"OEDIT AUTOMINT" "OEDIT AUTO MINT"
-
-Usage:  .automint <on|off>
-
-This allows a wealth item to be automatically minted into coins by Workforce.
-
-See also: OLC OBJECTS
-#d
 "OEDIT TEXT" "OEDIT BOOK"
 
 Usage:  .text <book vnum>
@@ -5385,9 +5377,6 @@ You can create book objects to place in your adventure zones. Like ordinary
 books, their name will be overridden by the name set in the book editor. You
 can see the book id of any book you've written by typing "bookedit list" (it's
 the number in the [brackets]), or via "vnum book".
-
-(This field was formerly called ".book" but was changed because it conflicts
-with the book editor.)
 
 See also: BOOKEDIT, OLC OBJECTS
 #d
@@ -5869,6 +5858,16 @@ If you set the minlevel to 0, there will be no lower limit and objs can scale
 to any level under the maximum.
 
 See also: ITEM SCALING, OEDIT MAXLEVEL, OLC OBJECTS
+#d
+"OEDIT MINTFLAGS" "OEDIT MINT FLAGS" "OEDIT AUTOMINT" "OEDIT AUTO MINT" "OEDIT NO-MINT" "OEDIT NOMINT" "OEDIT NO MINT"
+
+Usage:  .mintflags [add | remove] <flags>
+
+Mint flags are:
+  AUTOMINT - allows Workforce to mint the item into coins
+  NO-MINT - item cannot be minted into coins at all
+
+See also: OLC OBJECTS
 #d
 "OEDIT REQUIRESQUEST" "OEDIT REQUIRES QUEST" "OEDIT REQUIRE QUEST" "OEDIT QUEST"
 
@@ -9034,14 +9033,15 @@ See also: OLC VEHICLES
 "WEALTH ITEM" "WEALTH OBJECT"
 
 The WEALTH type represents an object of value. These are not converted to money
-like the COINS type is, but they can be minted into coins by players with a
-mint. Wealth items contribute to an empire's total wealth when they are stored.
+like the COINS type is, but they can usually be minted into coins by players
+with a mint. Wealth items contribute to an empire's total wealth when they are
+stored.
 
 This item type has no effect unless the item is stored in normal storage.
 
 Object values:
  0 - treasure value
- 1 - automint (if 0, workforce won't mint this)
+ 1 - flags (1: automint, 2: no-mint)
 #d
 "WEAPON ITEM" "WEAPON OBJECT"
 

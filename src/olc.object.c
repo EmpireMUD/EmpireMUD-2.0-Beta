@@ -2229,7 +2229,8 @@ void olc_get_values_display(char_data *ch, char *storage) {
 		}
 		case ITEM_WEALTH: {
 			sprintf(storage + strlen(storage), "<%swealth\t0> %d\r\n", OLC_LABEL_VAL(GET_WEALTH_VALUE(obj), 0), GET_WEALTH_VALUE(obj));
-			sprintf(storage + strlen(storage), "<%sautomint\t0> %s\r\n", OLC_LABEL_VAL(GET_WEALTH_AUTOMINT(obj), 0), offon_types[GET_WEALTH_AUTOMINT(obj)]);
+			sprintbit(GET_WEALTH_MINT_FLAGS(obj), mint_flags, temp, TRUE);
+			sprintf(storage + strlen(storage), "<%smintflags\t0> %s\r\n", OLC_LABEL_VAL(GET_WEALTH_MINT_FLAGS(obj), NOBITS), temp);
 			break;
 		}
 		case ITEM_LIGHTER: {
@@ -2663,18 +2664,6 @@ OLC_MODULE(oedit_ammotype) {
 }
 
 
-OLC_MODULE(oedit_automint) {
-	obj_data *obj = GET_OLC_OBJECT(ch->desc);
-	
-	if (GET_OBJ_TYPE(obj) != ITEM_WEALTH) {
-		msg_to_char(ch, "You can only set the automint value on a wealth item.\r\n");
-	}
-	else {
-		set_obj_val(obj, VAL_WEALTH_AUTOMINT, olc_process_type(ch, argument, "automint value", "automint", offon_types, GET_OBJ_VAL(obj, VAL_WEALTH_AUTOMINT)));
-	}
-}
-
-
 // formerly oedit_book, which had a name conflict with ".book"
 OLC_MODULE(oedit_text) {
 	obj_data *obj = GET_OLC_OBJECT(ch->desc);
@@ -2958,6 +2947,18 @@ OLC_MODULE(oedit_interaction) {
 OLC_MODULE(oedit_keywords) {
 	obj_data *obj = GET_OLC_OBJECT(ch->desc);
 	olc_process_string(ch, argument, "keywords", &GET_OBJ_KEYWORDS(obj));
+}
+
+
+OLC_MODULE(oedit_mintflags) {
+	obj_data *obj = GET_OLC_OBJECT(ch->desc);
+	
+	if (!IS_WEALTH_ITEM(obj)) {
+		msg_to_char(ch, "You can only set mintflags on a wealth object.\r\n");
+	}
+	else {
+		set_obj_val(obj, VAL_WEALTH_MINT_FLAGS, olc_process_flag(ch, argument, "mint", "mintflags", mint_flags, GET_OBJ_VAL(obj, VAL_WEALTH_MINT_FLAGS)));
+	}
 }
 
 

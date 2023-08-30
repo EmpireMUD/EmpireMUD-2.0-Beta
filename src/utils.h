@@ -1057,9 +1057,10 @@ int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_COORD(ge
 // ITEM_WEALTH
 #define IS_WEALTH_ITEM(obj)  (GET_OBJ_TYPE(obj) == ITEM_WEALTH)
 #define VAL_WEALTH_VALUE  0
-#define VAL_WEALTH_AUTOMINT  1
+#define VAL_WEALTH_MINT_FLAGS  1
 #define GET_WEALTH_VALUE(obj)  (IS_WEALTH_ITEM(obj) ? GET_OBJ_VAL((obj), VAL_WEALTH_VALUE) : 0)
-#define GET_WEALTH_AUTOMINT(obj)  (IS_WEALTH_ITEM(obj) ? GET_OBJ_VAL((obj), VAL_WEALTH_AUTOMINT) : 0)
+#define GET_WEALTH_MINT_FLAGS(obj)  (IS_WEALTH_ITEM(obj) ? GET_OBJ_VAL((obj), VAL_WEALTH_MINT_FLAGS) : NOBITS)
+#define IS_MINT_FLAGGED(obj, flag)  IS_SET(GET_WEALTH_MINT_FLAGS(obj), (flag))
 
 // ITEM_MISSILE_WEAPON
 #define IS_MISSILE_WEAPON(obj)  (GET_OBJ_TYPE(obj) == ITEM_MISSILE_WEAPON)
@@ -1867,7 +1868,7 @@ void extract_resources(char_data *ch, struct resource_data *list, bool ground, s
 struct resource_data *get_next_resource(char_data *ch, struct resource_data *list, bool ground, bool left2right, obj_data **found_obj);
 char *get_resource_name(struct resource_data *res);
 void give_resources(char_data *ch, struct resource_data *list, bool split);
-bool has_resources(char_data *ch, struct resource_data *list, bool ground, bool send_msgs);
+bool has_resources(char_data *ch, struct resource_data *list, bool ground, bool send_msgs, char *msg_prefix);
 void reduce_dismantle_resources(int damage, int max_health, struct resource_data **list);
 void show_resource_list(struct resource_data *list, char *save_buffer);
 

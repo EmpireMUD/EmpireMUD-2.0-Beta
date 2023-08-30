@@ -3524,7 +3524,7 @@ ACMD(do_barde) {
 	else if (GET_LED_BY(mob)) {
 		act("You can't barde $M right now.", FALSE, ch, NULL, mob, TO_CHAR);
 	}
-	else if (!IS_NPC(ch) && !has_resources(ch, res, TRUE, TRUE)) {
+	else if (!IS_NPC(ch) && !has_resources(ch, res, TRUE, TRUE, NULL)) {
 		// messages itself
 	}
 	else {

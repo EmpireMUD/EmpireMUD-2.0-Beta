@@ -155,7 +155,7 @@ act.quest.o: act.quest.c conf.h sysdep.h structs.h uthash.h utils.h \
   db.h comm.h handler.h interpreter.h skills.h dg_scripts.h constants.h
 	$(CC) -c $(CFLAGS) act.quest.c
 act.social.o: act.social.c conf.h sysdep.h structs.h uthash.h utils.h \
-  comm.h interpreter.h handler.h db.h skills.h constants.h
+  comm.h interpreter.h handler.h db.h skills.h constants.h dg_scripts.h
 	$(CC) -c $(CFLAGS) act.social.c
 act.stealth.o: act.stealth.c conf.h sysdep.h structs.h uthash.h utils.h \
   comm.h interpreter.h handler.h db.h skills.h vnums.h dg_scripts.h constants.h

@@ -4170,9 +4170,10 @@ void reduce_dismantle_resources(int damage, int max_health, struct resource_data
 * @param struct resource_data *list Any resource list.
 * @param bool ground If TRUE, will also count resources on the ground.
 * @param bool send_msgs If TRUE, will alert the character as to what they need. FALSE runs silently.
+* @param char *msg_prefix Optional: If provided AND send_msgs is TRUE, prepends this to any error message as "msg_prefix: You need..." (may be NULL)
 */
-bool has_resources(char_data *ch, struct resource_data *list, bool ground, bool send_msgs) {
-	char buf[MAX_STRING_LENGTH];
+bool has_resources(char_data *ch, struct resource_data *list, bool ground, bool send_msgs, char *msg_prefix) {
+	char buf[MAX_STRING_LENGTH], prefix[256];
 	int amt, liter, cycle;
 	struct resource_data *res, *list_copy;
 	bool ok = TRUE;
@@ -4301,37 +4302,46 @@ bool has_resources(char_data *ch, struct resource_data *list, bool ground, bool 
 		
 		// RES_x: messaging for types the player is missing
 		if (send_msgs) {
+			// prepare prefix, if any
+			if (msg_prefix && *msg_prefix) {
+				snprintf(prefix, sizeof(prefix), "%s: You need", msg_prefix);
+				CAP(prefix);
+			}
+			else {
+				snprintf(prefix, sizeof(prefix), "You need");
+			}
+			
 			switch (res->type) {
 				case RES_OBJECT: {
-					msg_to_char(ch, "%s %d more of %s", (ok ? "You need" : ","), res->amount, skip_filler(get_obj_name_by_proto(res->vnum)));
+					msg_to_char(ch, "%s %d more of %s", (ok ? prefix : ","), res->amount, skip_filler(get_obj_name_by_proto(res->vnum)));
 					break;
 				}
 				case RES_COMPONENT: {
-					msg_to_char(ch, "%s %d more (%s)", (ok ? "You need" : ","), res->amount, res->amount == 1 ? get_generic_name_by_vnum(res->vnum) : get_generic_string_by_vnum(res->vnum, GENERIC_COMPONENT, GSTR_COMPONENT_PLURAL));
+					msg_to_char(ch, "%s %d more (%s)", (ok ? prefix : ","), res->amount, res->amount == 1 ? get_generic_name_by_vnum(res->vnum) : get_generic_string_by_vnum(res->vnum, GENERIC_COMPONENT, GSTR_COMPONENT_PLURAL));
 					break;
 				}
 				case RES_LIQUID: {
-					msg_to_char(ch, "%s %d more unit%s of %s", (ok ? "You need" : ","), res->amount, PLURAL(res->amount), get_generic_string_by_vnum(res->vnum, GENERIC_LIQUID, GSTR_LIQUID_NAME));
+					msg_to_char(ch, "%s %d more unit%s of %s", (ok ? prefix : ","), res->amount, PLURAL(res->amount), get_generic_string_by_vnum(res->vnum, GENERIC_LIQUID, GSTR_LIQUID_NAME));
 					break;
 				}
 				case RES_TOOL: {
 					prettier_sprintbit(res->vnum, tool_flags, buf);
-					msg_to_char(ch, "%s %d more %s (tool%s)", (ok ? "You need" : ","), res->amount, buf, PLURAL(res->amount));
+					msg_to_char(ch, "%s %d more %s (tool%s)", (ok ? prefix : ","), res->amount, buf, PLURAL(res->amount));
 					break;
 				}
 				case RES_COINS: {
 					empire_data *coin_emp = real_empire(res->vnum);
-					msg_to_char(ch, "%s %s", (ok ? "You need" : ","), money_amount(coin_emp, res->amount));
+					msg_to_char(ch, "%s %s", (ok ? prefix : ","), money_amount(coin_emp, res->amount));
 					break;
 				}
 				case RES_CURRENCY: {
-					msg_to_char(ch, "%s %d more %s", (ok ? "You need" : ","), res->amount, get_generic_string_by_vnum(res->vnum, GENERIC_CURRENCY, WHICH_CURRENCY(res->amount)));
+					msg_to_char(ch, "%s %d more %s", (ok ? prefix : ","), res->amount, get_generic_string_by_vnum(res->vnum, GENERIC_CURRENCY, WHICH_CURRENCY(res->amount)));
 					break;
 				}
 				case RES_POOL: {
 					// special rule: require that blood or health costs not reduce player below 1
 					amt = res->amount + ((res->vnum == HEALTH || res->vnum == BLOOD) ? 1 : 0);
-					msg_to_char(ch, "%s %d more %s point%s", (ok ? "You need" : ","), amt, pool_types[res->vnum], PLURAL(amt));
+					msg_to_char(ch, "%s %d more %s point%s", (ok ? prefix : ","), amt, pool_types[res->vnum], PLURAL(amt));
 					break;
 				}
 			}

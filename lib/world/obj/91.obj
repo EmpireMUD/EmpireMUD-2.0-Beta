@@ -66,8 +66,8 @@ A rare rhinoceros horn is lying here.~
    This exotic conical horn comes from a rhinoceros. Due to their rarity, the
 horns are quite expensive.
 ~
-15 0 a 0 11
-8 0 0
+15 0 a 0 12
+8 2 0
 14 0
 C
 1 1
@@ -81,8 +81,8 @@ a huge ivory tusk~
 A huge ivory tusk is lying here.~
 The long, elegantly curved ivory tusk must have come from a great elephant.
 ~
-15 e a 0 9
-4 0 0
+15 e a 0 10
+4 2 0
 14 0
 C
 1 1
@@ -96,8 +96,8 @@ a common rhinoceros horn~
 A rhinoceros horn is lying here.~
 The horn is cracked, but should still fetch a decent price.
 ~
-15 0 a 0 13
-1 0 0
+15 0 a 0 14
+1 2 0
 14 0
 C
 1 1

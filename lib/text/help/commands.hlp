@@ -639,6 +639,39 @@ Examples:
   > diagnose
   > diagnose rasmussen
 #
+DIFFICULTY "DIFFICULTY SELECTOR" "NORMAL DIFFICULTY" "HARD DIFFICULTY" "GROUP DIFFICULTY" "BOSS DIFFICULTY"
+
+Usage:  difficulty <normal | hard | group | boss>
+
+Some adventures are available at more than one difficulty setting. This is
+separate from the required player level, and is usually based on the number of
+players present. Adventures may use difficulty settings in various ways, but in
+general, the difficulties are as follows:
+
+Normal:
+For one player by themselves, or for inexperienced players working together.
+This is the lowest setting. In some adventures, it spawns fewer mobs; while in
+others, combat gimmicks are less painful. But in all cases, it sets the mob to
+the lowest health and damage settings available at its level.
+
+Hard:
+For two players working together, or one well-prepared player. Health and
+damage are increased and, in some adventures, there may be additional mobs or
+combat gimmicks.
+
+Group:
+For three players -- ideally, a tank, a healer, and a dps of some kind. It's
+usually only possible to do this alone if you are above the mob's level and
+you have come prepared.
+
+Boss:
+For four players, which should include a tank, a healer, and two dps. This is
+the highest difficulty setting and will more damage to defeat in a longer
+fight. Players are usually only able to handle boss difficulty alone if they
+are significantly above the mob's level and have strong gear and skills.
+
+See also: ADVENTURE, COMBAT GIMMICK, LEVEL COLORS
+#
 DIRECTIONS NORTH SOUTH EAST WEST NORTHEAST NORTHWEST SOUTHEAST SOUTHWEST UP DOWN NE NW SE SW FORE AFT PORT STARBOARD
 
 Usage:  north, south, east, west
@@ -1698,9 +1731,9 @@ See also: HOLD, TIMED ACTION
 #
 POINT
 
-Usage: point <direction | person>
+Usage:  point <direction | person | object | vehicle>
 
-Your character points at the direction or person.
+Your character points. The target must be present in the room with you.
 
 See also: SOCIALS
 #

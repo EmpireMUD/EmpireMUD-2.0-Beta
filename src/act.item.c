@@ -104,7 +104,7 @@ INTERACTION_FUNC(combine_obj_interact) {
 	// how many they need
 	add_to_resource_list(&res, RES_OBJECT, GET_OBJ_VNUM(inter_item), interaction->quantity, 0);
 	
-	if (!has_resources(ch, res, can_use_room(ch, IN_ROOM(ch), MEMBERS_ONLY), TRUE)) {
+	if (!has_resources(ch, res, can_use_room(ch, IN_ROOM(ch), MEMBERS_ONLY), TRUE, NULL)) {
 		// error message sent by has_resources
 		free_resource_list(res);
 		return TRUE;
@@ -809,7 +809,10 @@ void identify_obj_to_char(obj_data *obj, char_data *ch, bool simple) {
 		}
 		case ITEM_WEALTH: {
 			msg_to_char(ch, "Adds %d wealth when stored.\r\n", GET_WEALTH_VALUE(obj));
-			msg_to_char(ch, "Automatically minted by workforce: %s\r\n", GET_WEALTH_AUTOMINT(obj) ? "yes" : "no");
+			prettier_sprintbit(GET_WEALTH_MINT_FLAGS(obj), mint_flags_for_identify, part);
+			if (*part) {
+				msg_to_char(ch, "Additional information: %s\r\n", part);
+			}
 			break;
 		}
 		case ITEM_LIGHTER: {

@@ -97,8 +97,8 @@ a dragon scale~
 A dragon scale is lying on the ground.~
 The dragon scale looks like you could use it to craft something impressive.
 ~
-15 el a 0 4
-1 0 0
+15 el a 0 5
+1 2 0
 7 0
 R
 4 5193 a
@@ -457,8 +457,8 @@ a fractured skystone~
 A fractured skystone is lying on the ground.~
 The skystone seems to have shattered. You can't sense any magic left in it.
 ~
-15 0 a 0 7
-1 0 0
+15 0 a 0 8
+1 2 0
 10 0
 R
 4 5193 0
@@ -471,8 +471,8 @@ a large, broken skystone~
 A large, broken skystone is lying here.~
 This elegant skystone appears to be broken and all the magic has leaked out.
 ~
-15 0 a 0 5
-5 0 0
+15 0 a 0 6
+5 2 0
 10 0
 R
 4 5193 0

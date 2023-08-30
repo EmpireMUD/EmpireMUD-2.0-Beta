@@ -2012,7 +2012,7 @@ int text_processed(char *field, char *subfield, struct trig_var_data *vd, char *
 		snprintf(str, slen, "%s", AN(vd->value));
 		return TRUE;
 	}
-	else if (!str_cmp(field, "cap")) {                 /* ana or an/a       */
+	else if (!str_cmp(field, "cap")) {                 // capitalize first letter
 		snprintf(str, slen, "%s", vd->value);
 		for (p = str; *p; ++p) {
 			if (isspace(*p)) {
@@ -3723,7 +3723,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						}
 						else {
 							add_to_resource_list(&resources, RES_COMPONENT, GEN_VNUM(cmp), atoi(arg2), 0);
-							snprintf(str, slen, "%d", has_resources(c, resources, FALSE, FALSE) ? 1 : 0);
+							snprintf(str, slen, "%d", has_resources(c, resources, FALSE, FALSE, NULL) ? 1 : 0);
 							free_resource_list(resources);
 						}
 					}
@@ -3787,7 +3787,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 							if (*arg1 && *arg2 && (vnum = atoi(arg1)) > 0 && (amt = atoi(arg2)) > 0) {
 								add_to_resource_list(&res, RES_OBJECT, vnum, amt, 0);
 								
-								if (has_resources(c, res, can_use_room(c, IN_ROOM(c), GUESTS_ALLOWED), FALSE)) {
+								if (has_resources(c, res, can_use_room(c, IN_ROOM(c), GUESTS_ALLOWED), FALSE, NULL)) {
 									snprintf(str, slen, "1");
 								}
 								
@@ -5628,7 +5628,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						mob_vnum find_vnum = NOTHING;
 						
 						// optional vnum search
-						if (subfield && *subfield && isdigit(*subfield)) {
+						if (subfield && *subfield && (*subfield == '-' || isdigit(*subfield))) {
 							find_vnum = atoi(subfield);
 						}
 				

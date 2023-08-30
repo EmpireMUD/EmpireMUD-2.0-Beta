@@ -360,14 +360,34 @@ struct config_type *config_table = NULL;	// hash table of configs
 * Load a config's whole entry by key. You should use the type functions
 * config_get_int(), etc. for loading the data itself.
 *
+* Note that when exact=TRUE, this function does a hash lookup and is much
+* faster than exact=FALSE, which checks the whole table for abbrevs.
+*
 * @param char *key The config key.
+* @param bool exact If TRUE, does not allow abbrevs.
 * @return struct config_type* The config, if it exists.
 */
-struct config_type *get_config_by_key(char *key) {
+struct config_type *get_config_by_key(char *key, bool exact) {
 	struct config_type *cnf;
 	
-	HASH_FIND_STR(config_table, key, cnf);
-	return cnf;
+	if (exact) {
+		HASH_FIND_STR(config_table, key, cnf);
+		return cnf;
+	}
+	else {
+		struct config_type *next_cnf, *abbrev = NULL;
+		
+		HASH_ITER(hh, config_table, cnf, next_cnf) {
+			if (!str_cmp(key, cnf->key)) {
+				return cnf;	// exact match
+			}
+			else if (!abbrev && is_abbrev(key, cnf->key)) {
+				abbrev = cnf;
+			}
+		}
+		
+		return abbrev;	// if any (may be NULL)
+	}
 }
 
 
@@ -386,7 +406,7 @@ bitvector_t config_get_bitvector(char *key) {
 	}
 	
 	// maybe?
-	cnf = get_config_by_key(key);
+	cnf = get_config_by_key(key, TRUE);
 	
 	if (!cnf) {
 		syslog(SYS_ERROR, LVL_START_IMM, TRUE, "SYSERR: config_get_bitvector called with invalid key '%s'", key);
@@ -417,7 +437,7 @@ bool config_get_bool(char *key) {
 	}
 	
 	// maybe?
-	cnf = get_config_by_key(key);
+	cnf = get_config_by_key(key, TRUE);
 	
 	if (!cnf) {
 		syslog(SYS_ERROR, LVL_START_IMM, TRUE, "SYSERR: config_get_bool called with invalid key '%s'", key);
@@ -448,7 +468,7 @@ double config_get_double(char *key) {
 	}
 	
 	// maybe?
-	cnf = get_config_by_key(key);
+	cnf = get_config_by_key(key, TRUE);
 	
 	if (!cnf) {
 		syslog(SYS_ERROR, LVL_START_IMM, TRUE, "SYSERR: config_get_double called with invalid key '%s'", key);
@@ -479,7 +499,7 @@ int config_get_int(char *key) {
 	}
 	
 	// maybe?
-	cnf = get_config_by_key(key);
+	cnf = get_config_by_key(key, TRUE);
 	
 	if (!cnf) {
 		syslog(SYS_ERROR, LVL_START_IMM, TRUE, "SYSERR: config_get_int called with invalid key '%s'", key);
@@ -514,7 +534,7 @@ int *config_get_int_array(char *key, int *array_size) {
 	}
 	
 	// maybe?
-	cnf = get_config_by_key(key);
+	cnf = get_config_by_key(key, TRUE);
 	
 	if (!cnf) {
 		syslog(SYS_ERROR, LVL_START_IMM, TRUE, "SYSERR: config_get_int_array called with invalid key '%s'", key);
@@ -548,7 +568,7 @@ const char *config_get_string(char *key) {
 	}
 	
 	// maybe?
-	cnf = get_config_by_key(key);
+	cnf = get_config_by_key(key, TRUE);
 	
 	if (!cnf) {
 		syslog(SYS_ERROR, LVL_START_IMM, TRUE, "SYSERR: config_get_string called with invalid key '%s'", key);
@@ -2092,7 +2112,8 @@ ACMD(do_config) {
 	argument = any_one_word(argument, arg1);
 	skip_spaces(&argument);
 	
-	if (*arg1 && (cnf = get_config_by_key(arg1))) {
+	if (*arg1 && (cnf = get_config_by_key(arg1, (*argument ? TRUE : FALSE)))) {
+		// now accepts abbrevs ONLY if there's no value
 		// will use: <key> [value]
 		val_arg = argument;
 	}
@@ -2104,15 +2125,15 @@ ACMD(do_config) {
 		if (!verbose && *argument) {
 			val_arg = any_one_word(argument, arg2);
 			skip_spaces(&val_arg);
-			if (!(cnf = get_config_by_key(arg2)) || cnf->set != set) {
-				msg_to_char(ch, "Invalid key %s in %s configs.\r\n", arg2, config_groups[set]);
+			if (!(cnf = get_config_by_key(arg2, (*argument && !verbose) ? TRUE : FALSE)) || cnf->set != set) {
+				msg_to_char(ch, "Invalid key %s in %s configs (keys must be exact).\r\n", arg2, config_groups[set]);
 				return;
 			}
 		}
 	}
 	else {	// no arg or invalid arg
 		if (*arg1) {
-			msg_to_char(ch, "Invalid config type or key '%s'.\r\n", arg1);
+			msg_to_char(ch, "Invalid config type or key '%s' (keys must be exact).\r\n", arg1);
 		}
 		
 		msg_to_char(ch, "Usage: config <type> [-v]\r\n");

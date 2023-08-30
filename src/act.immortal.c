@@ -4937,10 +4937,10 @@ SHOW(show_account) {
 			}
 		}
 		else if (ACCOUNT_FLAGGED(loaded, ACCT_MULTI_IP) || IS_SET(acc_ptr->flags, ACCT_MULTI_IP)) {
-			msg_to_char(ch, " &r[%d %s] %s  (separate account %d)&0\r\n", loaded_file ? GET_LAST_KNOWN_LEVEL(loaded) : GET_COMPUTED_LEVEL(loaded), skills, GET_PC_NAME(loaded), GET_ACCOUNT(loaded)->id);
+			msg_to_char(ch, " &r[%d %s] %s  (separate account %d)&0%s\r\n", loaded_file ? GET_LAST_KNOWN_LEVEL(loaded) : GET_COMPUTED_LEVEL(loaded), skills, GET_PC_NAME(loaded), GET_ACCOUNT(loaded)->id, !loaded_file ? " &c(online)&0" : "");
 		}
 		else {
-			msg_to_char(ch, " &r[%d %s] %s  (same IP, account %d)&0\r\n", loaded_file ? GET_LAST_KNOWN_LEVEL(loaded) : GET_COMPUTED_LEVEL(loaded), skills, GET_PC_NAME(loaded), GET_ACCOUNT(loaded)->id);
+			msg_to_char(ch, " &r[%d %s] %s  (same IP, account %d)&0%s\r\n", loaded_file ? GET_LAST_KNOWN_LEVEL(loaded) : GET_COMPUTED_LEVEL(loaded), skills, GET_PC_NAME(loaded), GET_ACCOUNT(loaded)->id, !loaded_file ? " &c(online)&0" : "");
 		}
 		
 		if (loaded_file) {
@@ -6941,8 +6941,8 @@ void do_stat_object(char_data *ch, obj_data *j) {
 			break;
 		}
 		case ITEM_WEALTH: {
-			msg_to_char(ch, "Wealth value: %d\r\n", GET_WEALTH_VALUE(j));
-			msg_to_char(ch, "Automatically minted by workforce: %s\r\n", GET_WEALTH_AUTOMINT(j) ? "yes" : "no");
+			sprintbit(GET_WEALTH_MINT_FLAGS(j), mint_flags, buf, TRUE);
+			msg_to_char(ch, "Wealth value: \ts%d\t0, flags: \tc%s\t0\r\n", GET_WEALTH_VALUE(j), buf);
 			break;
 		}
 		case ITEM_LIGHTER: {

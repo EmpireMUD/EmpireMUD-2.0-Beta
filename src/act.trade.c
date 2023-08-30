@@ -655,8 +655,8 @@ void resume_craft_building(char_data *ch, craft_data *craft) {
 		*the_buf = '\0';
 	}
 	
-	msg_to_char(ch, "You go back to work on %s%s!\r\n", the_buf, bld_name);
-	sprintf(buf, "$n goes back to work on %s%s!", the_buf, bld_name);
+	msg_to_char(ch, "You continue working on %s%s!\r\n", the_buf, bld_name);
+	sprintf(buf, "$n continues working on %s%s!", the_buf, bld_name);
 	act(buf, FALSE, ch, NULL, NULL, TO_ROOM);
 }
 
@@ -715,6 +715,7 @@ void show_craft_info(char_data *ch, char *argument, int craft_type) {
 	vehicle_data *veh;
 	obj_data *proto;
 	bld_data *bld;
+	int craft_level;
 	
 	// these flags show on craft info
 	bitvector_t show_flags = OBJ_UNIQUE | OBJ_LARGE | OBJ_TWO_HANDED | OBJ_BIND_ON_EQUIP | OBJ_BIND_ON_PICKUP;
@@ -746,10 +747,14 @@ void show_craft_info(char_data *ch, char *argument, int craft_type) {
 		msg_to_char(ch, "Creates liquid: %d unit%s of %s\r\n", GET_CRAFT_QUANTITY(craft), PLURAL(GET_CRAFT_QUANTITY(craft)), get_generic_string_by_vnum(GET_CRAFT_OBJECT(craft), GENERIC_LIQUID, GSTR_LIQUID_NAME));
 	}
 	else if ((proto = obj_proto(GET_CRAFT_OBJECT(craft)))) {
+		craft_level = get_craft_scale_level(ch, craft);
 		// build info string
 		sprintf(buf, " (%s", item_types[(int) GET_OBJ_TYPE(proto)]);
 		if (GET_OBJ_MIN_SCALE_LEVEL(proto) > 0 || GET_OBJ_MAX_SCALE_LEVEL(proto) > 0) {
-			sprintf(buf + strlen(buf), ", level %s", level_range_string(GET_OBJ_MIN_SCALE_LEVEL(proto), GET_OBJ_MAX_SCALE_LEVEL(proto), 0));
+			sprintf(buf + strlen(buf), ", level %d (%s)", craft_level, level_range_string(GET_OBJ_MIN_SCALE_LEVEL(proto), GET_OBJ_MAX_SCALE_LEVEL(proto), 0));
+		}
+		else if (OBJ_FLAGGED(proto, OBJ_SCALABLE) && craft_level > 0) {
+			sprintf(buf + strlen(buf), ", level %d", craft_level);
 		}
 		if (GET_OBJ_WEAR(proto) & ~ITEM_WEAR_TAKE) {
 			prettier_sprintbit(GET_OBJ_WEAR(proto) & ~ITEM_WEAR_TAKE, wear_bits, part);
@@ -1515,7 +1520,7 @@ ACMD(do_gen_augment) {
 	else if (!validate_augment_target(ch, obj, aug, TRUE)) {
 		// sends own message
 	}
-	else if (!has_resources(ch, GET_AUG_RESOURCES(aug), FALSE, TRUE)) {
+	else if (!has_resources(ch, GET_AUG_RESOURCES(aug), FALSE, TRUE, GET_AUG_NAME(aug))) {
 		// sends its own messages
 	}
 	else if (GET_AUG_ABILITY(aug) != NO_ABIL && ABILITY_TRIGGERS(ch, NULL, obj, GET_AUG_ABILITY(aug))) {
@@ -2100,7 +2105,7 @@ ACMD(do_gen_craft) {
 	else if (IS_CARRYING_N(ch) > CAN_CARRY_N(ch)) {
 		msg_to_char(ch, "You can't %s anything while overburdened.\r\n", gen_craft_data[subcmd].command);
 	}
-	else if (!has_resources(ch, GET_CRAFT_RESOURCES(type), can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED), TRUE)) {
+	else if (!has_resources(ch, GET_CRAFT_RESOURCES(type), can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED), TRUE, GET_CRAFT_NAME(type))) {
 		// this sends its own message ("You need X more of ...")
 		//msg_to_char(ch, "You don't have the resources to %s that.\r\n", gen_craft_data[GET_CRAFT_TYPE(type)].command);
 	}
@@ -2536,7 +2541,7 @@ ACMD(do_reforge) {
 		if (!validate_item_rename(ch, obj, argument)) {
 			// sends own message
 		}
-		else if (!has_resources(ch, res, can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED), TRUE)) {
+		else if (!has_resources(ch, res, can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED), TRUE, NULL)) {
 			// sends own message
 		}
 		else {
@@ -2578,7 +2583,7 @@ ACMD(do_reforge) {
 		if (!proto) {
 			msg_to_char(ch, "You can't renew that.\r\n");
 		}
-		else if (!has_resources(ch, res, can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED), TRUE)) {
+		else if (!has_resources(ch, res, can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED), TRUE, NULL)) {
 			// sends own message
 		}
 		else {
@@ -2639,7 +2644,7 @@ ACMD(do_reforge) {
 		else if (!(cft_abil = find_ability_by_vnum(GET_CRAFT_ABILITY(ctype))) || ABIL_MASTERY_ABIL(cft_abil) == NOTHING || !has_ability(ch, ABIL_MASTERY_ABIL(cft_abil))) {
 			msg_to_char(ch, "You don't have the mastery to make that item superior.\r\n");
 		}
-		else if (!has_resources(ch, res, can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED), TRUE)) {
+		else if (!has_resources(ch, res, can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED), TRUE, NULL)) {
 			// sends own message
 		}
 		else {

@@ -3744,7 +3744,7 @@ ACMD(do_survey) {
 	
 	base_height = ROOM_HEIGHT(HOME_ROOM(IN_ROOM(ch)));
 	mod_height = get_room_blocking_height(IN_ROOM(ch), NULL);
-	if (base_height || mod_height) {
+	if (base_height > 0 && mod_height > 0) {
 		if (mod_height != base_height) {
 			msg_to_char(ch, "Elevation: %d (with structures: %d)\r\n", base_height, mod_height);
 		}

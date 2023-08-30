@@ -710,8 +710,8 @@ A shining red dragon stone is lying here.~
 of this one, it must have come from a colossal dragon! The dragon essence
 stored in this type of stone is used to craft legendary weapons and armor.
 ~
-15 0 a 0 2
-1 0 0
+15 0 a 0 3
+1 2 0
 12 0
 C
 1 1
@@ -801,8 +801,8 @@ An ancient book, the Draconomicon, hovers before you!~
 Unfortunately, it's also written in a dead draconic language, and you can't
 make out its words. But it's also worth its weight in gold.
 ~
-15 0 a 0 2
-48 0 0
+15 0 a 0 3
+48 2 0
 7 0
 R
 4 5611 a
@@ -1096,8 +1096,8 @@ A pure crystal orb is lying here.~
 beautifully shaped. Orbs like this are rare, and are sought after by powerful
 spellcasters for their clarity.
 ~
-15 0 a 0 5
-16 0 0
+15 0 a 0 6
+16 2 0
 8 0
 R
 4 5611 a
@@ -1110,8 +1110,8 @@ A crystal skull is lying here.~
 skull of some crystalline demon. Either way, these skulls are supremely rare
 and are sought out by powerful spellcasters the world over.
 ~
-15 e a 0 6
-24 0 0
+15 e a 0 7
+24 2 0
 8 0
 R
 4 5611 a

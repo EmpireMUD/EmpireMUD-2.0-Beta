@@ -134,9 +134,9 @@ A
 Q 18272
 S
 #18214
-trinket tortoise~
-a tortoise trinket~
-A tortoise trinket is lying on its back.~
+trinket tortoise tipsy transport~
+a Tipsy Tortoise transport trinket~
+A Tipsy Tortoise transport trinket is lying on its back.~
    This strange trinket is carved from wood in the shape of a tortoise. It has
 been wrapped in a scaly leather and bound with cactus needles. You can 'use'
 this trinket to teleport to the nearest Tipsy Tortoise Tavern.
@@ -145,6 +145,24 @@ this trinket to teleport to the nearest Tipsy Tortoise Tavern.
 0 0 0
 0 0
 T 18214
+S
+#18215
+loom diminution~
+the loom of diminution~
+A loom of diminution has been left behind.~
+   The loom is made of wood and looks both old and fragile, so you hold it
+delicately in your hands. It's cold to the touch and drips with ethereal green
+mana. According to the Guild of Adventurers, it has the power to shrink
+goblins to diminutive size. They want you to test it at the Goblin Challenge.
+Usage: shrink <goblin>
+~
+3 0 a 0 1
+0 0 0
+0 0
+C
+1 1
+Q 18242
+T 18231
 S
 #18216
 charter guild adventurers~
@@ -172,6 +190,63 @@ Use: build guildhall <direction> (city-only, single use)
 3 gp a 0 3
 0 0 0
 0 0
+S
+#18218
+page old bombs smoke about~
+an old page about smoke bombs~
+An old page sits on the ground.~
+   The page is tattered on one side where it was torn from a book and tattered,
+differently, on the other three sides from too many years spent being shuffled
+from shelf to shelf. It bears a crude drawing of a copper tube with the
+alchemical symbol for bileberries. A loose interpretation of the text, so far
+as you can tell, suggests two ingots of copper or tin, 5 handfulls of bile-
+berries crushed into paste, and some fiber to stablize it. And, as the
+librarian suggested, the page should be wadded up inside as well.
+Usage: craft smoke bomb
+~
+3 0 a 0 3
+0 0 0
+0 0
+C
+1 1
+Q 18241
+S
+#18219
+bomb smoke fuming green~
+a fuming green smoke bomb~
+A fuming green smoke bomb is lying on the ground.~
+   Smoke diffuses from the seams of the bomb, turning the bomb's cylindrical
+casing a pale shade of green. You feel nervous holding onto the bomb; it would
+be best to test it quickly and report back to the guild. Seek out a Goblin
+Challenge and use the bomb to drive off the goblins, as the librarian asked,
+before this thing goes off in your hands.
+Usage: use bomb
+~
+3 0 a 0 2
+0 0 0
+13 0
+C
+1 1
+Q 18241
+T 18227
+S
+#18220
+net gilded guilded insect~
+a gilded insect net~
+A gilded insect net has been dropped here.~
+   The intricately-netted tool almost looks like gold filigree, though it lacks
+the heft that would reveal it as pure gold. It's a large net, glimmering bright
+yellow in the light, and with the soft current of mana flowing through it to
+hint at its enchantment. Whoever crafted this was certainly an expert.
+Usage: net <target>
+~
+3 0 a 0 4
+0 0 0
+11 0
+C
+1 1
+Q 18243
+T 18228
 S
 #18221
 egg atlasian~
@@ -214,6 +289,26 @@ has grown considerably, and looks as if it is about to hatch.
 7 144
 T 18225
 S
+#18224
+cage rat water-logged waterlogged logged~
+a water-logged rat cage~
+A water-logged rat cage is sitting here.~
+   The wicker cage looks freshly-made but there are bites and scratches near
+any hole or opening. The cage is woven to be nearly solid, perhaps to keep its
+occupant from squeezing or biting its way out, but from the number of repairs,
+it doesn't seem to work...
+   The cage is heavy, but it's on skids so you spend most of your time dragging
+it behind you, listening to the guttural squeaks of poor Rodentmort.
+Use: release Rodentmort
+~
+3 0 a 0 2
+0 0 0
+0 0
+C
+1 1
+Q 18245
+T 18229
+S
 #18225
 whistle tortoise baby~
 a baby tortoise whistle~
@@ -248,54 +343,115 @@ Type 'use whistle' to summon it.
 2 0
 S
 #18228
-whistle sanguine~
-a sanguine whistle~
+whistle sanguine monstrosity mount~
+a sanguine monstrosity mount whistle~
 A sanguine whistle is lying on the ground.~
    This whistle appears to be made from congealed blood, and leaves your
-fingers sticky as you touch it. If you 'use' the whistle, it will summon a new
-mount.
+fingers sticky as you touch it. If you 'use' the whistle, it will summon a the
+sanguine monstrosity -- a blood mount.
+   The mount requires that the player be Liked by the Guild of Adventurers.
 ~
 3 ep a 0 8
 18228 0 0
 2 0
 T 9910
 S
+#18229
+whistle nebulavion scarlet flying mount~
+a scarlet nebulavion flying mount whistle~
+A scarlet nebulavion whistle is lying here.~
+   The long wooden whistle is bright red and exudes a red mist when air passes
+through it. When you 'use' this whistle, it will summon the scarlet nebulavion,
+a flying mount that appears like a cloud of red mist.
+   The mount requires that the player be Venerated by the Guild of Adventurers.
+~
+3 ep a 0 9
+18229 0 0
+0 0
+T 9910
+S
 #18230
-whistle umbral~
-an umbral whistle~
+whistle umbral warg mount~
+an umbral warg mount whistle~
 An umbral whistle is lying here.~
    This whistle drips through your fingers as you struggle to hold it, as if it
 is made from pure shadow. You have no idea where something like this could have
 come from, but it does seem as if you could 'use' it to summon a new mount.
+   The mount requires that the player be Liked by the Guild of Adventurers.
 ~
 3 ep a 0 7
 18230 0 0
 2 0
 T 9910
 S
+#18231
+whistle eclipse shadowraptor raptor flying mount~
+an eclipse shadowraptor flying mount whistle~
+An eclipse shadowraptor whistle is lying here.~
+   This striking whistle is as black as the midday sun during an eclipse, with
+a striking red outline. When you 'use' this whistle, it summons the eclipse
+shadowraptor, a flying mount with the form of a bird's shadow.
+   The mount requires that the player be Venerated by the Guild of Adventurers.
+~
+3 ep a 0 8
+18231 0 0
+2 0
+T 9910
+S
 #18232
-apparatus clockwork~
-a clockwork apparatus~
-A clockwork apparatus is lying on the floor.~
+apparatus clockwork steed mount~
+a clockwork steed mount apparatus~
+A clockwork steed mount apparatus is lying on the floor.~
    This apparatus is strange, with is spinning gears and whirring motor. But,
 at least, it's simple: there is one large button marked 'use'. An inscription
-on the back indicates that it summons a clockwork steed.
+on the back indicates that it creates a clockwork steed mount.
+   The mount requires that the player be Liked by the Guild of Adventurers.
 ~
 3 ep a 0 6
 18232 0 0
 2 0
 T 9910
 S
+#18233
+assembler rotary aeroforge flying mount~
+an aeroforge rotary flying mount assembler~
+An aeroforge rotary assembler is lying here.~
+   This odd apparatus is designed to assemble itself into an aeroforge rotary
+-- a sort of flying screw that can hold a person aloft. When you 'use' this
+assembler, it creates the flying mount for you.
+   The mount requires that the player be Venerated by the Guild of Adventurers.
+~
+3 ep a 0 7
+18233 0 0
+0 0
+T 9910
+S
 #18234
-whistle imperium-clad clad~
-an imperium-clad whistle~
-A clockwork apparatus is lying on the floor.~
+whistle imperium-clad clad bear mount~
+an imperium-clad bear mount whistle~
+An imperium-clad mount whistle is lying here.~
    This whistle appears to be plated with pure imperium, and stamped with the
 sigil of the Guild of Adventurers. If you 'use' this whistle, it will summon an
-epic mount.
+imperium-clad bear as an epic mount.
+   The mount requires that the player be Liked by the Guild of Adventurers.
 ~
 3 ep a 0 7
 18234 0 0
+2 0
+T 9910
+S
+#18235
+whistle warbalcon celestial balcon flying mount~
+a celestial warbalcon flying mount whistle~
+A celestial warbalcon whistle is lying here.~
+   The whistle is plated with fine imperium, with a strange sort of pegasus
+emblazoned on the top. When you 'use' this whistle, it will summon the
+celestial warbalcon, an enormous horse with falcon wings that serves as a
+flying mount.
+   The mount requires that the player be Venerated by the Guild of Adventurers.
+~
+3 ep a 0 8
+18235 0 0
 2 0
 T 9910
 S
@@ -398,6 +554,154 @@ A
 5 1 0
 C
 100 200
+S
+#18248
+bar prying enchanted~
+an enchanted bar of prying~
+An enchanted bar of prying is lying here.~
+   It's a long metal bar with a flattened claw at each end, made specifically
+for prying. This one has a faint glow, like it's been enchanted. And luckily,
+the enchantment seems to have made it lighter, too, because it seems to be
+solid metal. Use it to pry gems loose in the Lost Temple.
+Usage: pry gem
+~
+3 0 a 0 3
+0 0 0
+2 0
+C
+1 1
+Q 18246
+T 18248
+S
+#18249
+gem jade important~
+an important jade gem~
+An important jade gem is lying on the ground.~
+   The jade has been expertly cut, with the likeness of a jaguar carved from
+its face. Though you know the gem is quite old, it looks pristine and is
+undoubtedly worth a great deal.
+~
+15 0 a 0 3
+18 2 0
+12 0
+C
+1 1
+Q 18246
+S
+#18250
+orb stone hiding~
+the stone orb of hiding~
+The stone orb of hiding is hidden here.~
+   Though it's made from cold, solid stone, the orb is surprisingly light. Its
+surface is unfinished stone and, other than the weight, you don't see anything
+special about it at all.
+   You were instructed to take this orb to a Lost Temple and use it at the
+gates, before selecting a difficulty.
+Usage: use orb
+~
+3 0 a 0 3
+0 0 0
+1 0
+C
+1 1
+Q 18247
+T 18250
+S
+#18251
+pouch coins~
+a pouch of coins for the bandit~
+A pouch of coins is lying here.~
+   The small leather pouch holds its coins so tightly that they feel neatly
+stacked inside. It's heavier than it looks, too. You try to pry it open to take
+a look inside, but the knot on top is more complicated than any you've seen,
+and the drawstring is laced with nocturnium.
+   Use this pouch to bribe the bandits in the ruins.
+Usage: bribe
+~
+3 0 a 0 2
+0 0 0
+7 0
+C
+1 1
+Q 18251
+T 18251
+S
+#18252
+jar old clay pixy~
+an old clay pixy jar~
+An old clay pixy jar is lying here.~
+   The jar is made from rough clay and looks quite old. The top is sealed with
+red wax, and it doesn't feel like there's anything inside. At least, not when
+you shake it. Magic words are written along the jar's margin, in an ancient
+language you can't read.
+   Take the jar to the pixy races at the Tower Skycleave and pilfer the pixy,
+then drop it off at the Tipsy Tortoise.
+Usage: pilfer pixy
+~
+3 0 a 0 3
+0 0 0
+6 0
+C
+1 1
+Q 18252
+T 18252
+S
+#18253
+key skeleton disarticulated~
+a disarticulated skeleton key~
+A disarticulated skeleton key is lying here.~
+   The key is made from tiny bones that have been assembled in a wholly
+unnatural configuration. When you jiggle the key, they seem to rearrange
+themselves; to what end, you're not certain. All you know is that this key
+is supposed to open a drawer in the eruditorium at the Tower Skycleave.
+Usage: use key
+~
+3 0 a 0 1
+0 0 0
+14 0
+C
+1 1
+Q 18253
+T 18253
+S
+#18254
+mirror smoky strange vintage~
+a strange and smoky mirror~
+A strange and smoky mirror is lying here.~
+   The mirror is rather old and though tarnished, its silver handle is
+elegantly crafted. The glass, however, is smoky and you can't find an angle
+that reflects any part of your face. It seems clear that this mirror was
+enchanted for a different purpose.
+   In the Hamlet of the Undead, type 'reflect <person>' to use it on the
+various fiends who reside there.
+~
+3 0 a 0 2
+0 0 0
+8 0
+C
+1 1
+Q 18254
+T 18254
+S
+#18255
+card dance draconic~
+a draconic dance card~
+A draconic dance card has been discarded here.~
+   This dance card depicts a variety of dance moves, all modified to suit a
+large, scaly audience. If you can manage to find a wandering dragon nearby,
+type 'dance' to begin performing these moves. If it's impressed enough, it may
+leave the area without violence.
+   The moves depicted on the dance card are: twirl, spin, jump, slide, sway,
+flutter, glide, stomp, wave, stretch, wiggle, clap, skip, hop, shake, tiptoe,
+kick, sashay, and pirouette.
+~
+3 0 a 0 1
+0 0 0
+0 0
+C
+1 1
+Q 18248
+T 18255
 S
 #18256
 net wildling huge~

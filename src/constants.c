@@ -2726,13 +2726,29 @@ const char *light_flags[] = {
 };
 
 
-// LIGHT_FLAG_x (1/2): flags for ITEM_LIGHT, shown on identify
+// LIGHT_FLAG_x (2/2): flags for ITEM_LIGHT, shown on identify
 const char *light_flags_for_identify[] = {
 	"can be used as a lighter when lit",	// 0
 	"can be doused",
 	"",	// LIGHT_FLAG_JUNK_WHEN_EXPIRED
 	"can be used for cooking",
 	"lost when doused",
+	"\n"
+};
+
+
+// MINT_FLAG_x (1/2): flags for wealth items to control minting
+const char *mint_flags[] = {
+	"AUTOMINT",
+	"NO-MINT",
+	"\n"
+};
+
+
+// MINT_FLAG_x (2/2): flags as shown to players on identify
+const char *mint_flags_for_identify[] = {
+	"automatically minted by Workforce",
+	"cannot be minted into coins",
 	"\n"
 };
 

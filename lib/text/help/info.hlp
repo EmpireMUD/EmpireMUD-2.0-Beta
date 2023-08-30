@@ -122,7 +122,7 @@ will not be eligible for resurrection. You can still be summoned back.
 - If you teleport or trinket out, you won't be sent back where you were before
 the adventure summon. (Except random-teleport.)
 
-See also: ACCEPT, GROUP, NEARBY
+See also: ACCEPT, COMBAT GIMMICK, DIFFICULTY SELECTOR, GROUP, NEARBY
 #
 ATTRIBUTES STATS
 
@@ -816,6 +816,27 @@ most regular land tiles, including plains, forest, desert, crops, and roads.
 
 Mountains, rivers, lakes, oceans, jungles, and swamps are not valid.
 #
+GIMMICK "COMBAT GIMMICK" "FIGHT GIMMICK" "INTERACTIVE FIGHT"
+
+Some fights are interactive and will require you to type the right command at
+the right time. Depending on the adventure, the difficulty setting, and the
+specific mob, these gimmicks can range from fun to deadly. Not all adventures
+use combat gimmicks.
+
+For example, in the Tower Skycleave, the player may receive this message in a
+fight:
+
+&yNelbog shouts, 'Goblinbaaaaaaaaaall!'&&0
+&m**** Nelbog ducks and rolls toward you! ****&0 (dodge)
+
+In this case, you must type "dodge" within 8 seconds. If you do, Nelbog crashes
+into the wall -- which will stun her on lower difficulties and even damage her
+if the difficulty is set to 'normal'. If you fail to dodge in time, Nelbog will
+hurt you (more on higher difficulties) and, if the difficulty is set to 'group'
+or 'boss', will also put a slowing effect on you.
+
+See also: DIFFICULTY
+#
 GREATNESS GRT
 
 Greatness (social attribute)
@@ -1006,7 +1027,7 @@ Note: Until level 100, you must be in the same level range as an item
 See also: ROLE, SCALING, SYNERGY ABILITY
 Immortals see also: ACCESS LEVEL
 #
-"LEVEL COLORS" "DIFFICULTY COLORS" "COLOR BY LEVEL" "COLOR BY DIFFICULTY" "CONSIDER COLORS" "QUEST COLORS" "ADVENTURE COLORS"
+"LEVEL COLORS" "COLOR BY LEVEL" "COLOR BY DIFFICULTY" "CONSIDER COLORS" "QUEST COLORS" "ADVENTURE COLORS"
 
 Quest names and adventures appear in different colors depending on their level
 compared to yours. This also appears on commands like 'consider' when it shows

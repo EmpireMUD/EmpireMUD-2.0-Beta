@@ -1406,6 +1406,11 @@ bool check_ability(char_data *ch, char *string, bool exact) {
 		return FALSE;	// did not match any anything
 	}
 	
+	// does a command trigger override this ability command?
+	if (strlen(string) < strlen(ABIL_COMMAND(abil)) && check_command_trigger(ch, ABIL_COMMAND(abil), arg1, CMDTRG_EXACT)) {
+		return TRUE;
+	}
+	
 	// ok check if we can perform it
 	if (!char_can_act(ch, ABIL_MIN_POS(abil), !ABILITY_FLAGGED(abil, ABILF_NO_ANIMAL), !ABILITY_FLAGGED(abil, ABILF_NO_INVULNERABLE | ABILF_VIOLENT))) {
 		return TRUE;	// sent its own error message

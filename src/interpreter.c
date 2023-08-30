@@ -1177,7 +1177,7 @@ void command_interpreter(char_data *ch, char *argument) {
 		arg[iter] = LOWER(arg[iter]);
 	}
 
-	// Command trigger (1/3): exact match on typed-in word
+	// Command trigger (1/3): exact match on typed-in word (note: this is checked 2 more times below, AND inside abilities and socials)s
 	if (check_command_trigger(ch, arg, line, CMDTRG_EXACT)) {
 		return;
 	}

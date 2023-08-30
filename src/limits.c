@@ -1209,7 +1209,7 @@ void update_empire_needs(empire_data *emp, struct empire_island *eisle, struct e
 					// type not implemented
 					
 					// Note for implementation:
-					// if (IS_WEALTH(obj)) { vault = TRUE; }
+					// if (IS_WEALTH_ITEM(obj)) { vault = TRUE; }
 					break;
 				}
 			}
