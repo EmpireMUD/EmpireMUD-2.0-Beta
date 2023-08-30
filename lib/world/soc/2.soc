@@ -736,4 +736,296 @@ You bite yourself on the arm. Ouch!~
 M7
 $n bites $mself on the arm.~
 S
+#246
+twirl~
+twirl~
+b 8 8
+M0
+You twirl around, feeling a bit dizzy.~
+M1
+$n twirls around like a spinning top, almost colliding with a wall.~
+M2
+You twirl $M around gracefully.~
+M3
+$n twirls $N around, creating a mesmerizing sight.~
+M4
+$n twirls you around, leaving you slightly disoriented.~
+M5
+You can't find anyone named that to twirl with.~
+M6
+You elegantly twirl around, lost in your own world.~
+M7
+$n gracefully twirls around, lost in a moment of dance.~
+S
+#247
+spin~
+spin~
+b 8 8
+M0
+You spin in place, feeling a bit lightheaded.~
+M1
+$n starts spinning like a top, narrowly avoiding a collision with furniture.~
+M2
+You grab $M and spin around together in a wild dance.~
+M3
+$n takes $N by the hand and spins around in a dizzying display.~
+M4
+$n grabs your hand and spins you around, leaving you feeling a mix of excitement and dizziness.~
+M5
+You can't seem to find anyone by that name to spin with.~
+M6
+You start spinning around in a playful dance, unable to stop the laughter bubbling up within you.~
+M7
+$n spins around gracefully, a look of pure joy on $s face.~
+S
+#248
+slide~
+slide~
+0 8 8
+M0
+You slide around the room gracefully, like a dancer on ice.~
+M1
+$n slides around the area, looking like $e's auditioning for a skating show.~
+M2
+You slide toward $N, landing near $S feet.~
+M3
+$n slides toward $N, landing near $S feet.~
+M4
+$n slides toward you, landing near your feet.~
+M5
+You can't seem to find anyone with that name to slide with.~
+M6
+You start sliding around, your movements fluid and almost ethereal.~
+M7
+$n slides around with a carefree expression, making it seem like a dance on smooth ice.~
+S
+#249
+jump~
+jump~
+0 8 8
+M0
+You jump into the air with glee, feeling weightless for a moment.~
+M1
+$n jumps into the air with a look of pure joy on $s face.~
+M2
+You jump into $S arms with a playful expression.~
+M3
+$n jumps into $N's arms, their excitement palpable.~
+M4
+$n jumps toward you, a playful expression on $s face.~
+M5
+You can't seem to find anyone with that name to jump with.~
+M6
+You jump around energetically, a burst of excitement propelling you.~
+M7
+$n jumps around with youthful enthusiasm, filling the air with energy.~
+S
+#250
+sway~
+sway~
+b 8 8
+M0
+You sway gently from side to side, lost in your own rhythm.~
+M1
+$n sways gently, lost in $s own rhythm.~
+M2
+You try to sway $M.~
+M3
+$n tries to sway $N.~
+M4
+$n tries to sway you.~
+M5
+You can't sway what you can't see.~
+M6
+You may be good at talking to yourself, but you can't seem to sway yourself.~
+M7
+$n tries to convince $mself of something.~
+S
+#251
+flutter~
+flutter~
+b 6 6
+M0
+You let your arms flutter like delicate wings.~
+M1
+$n flutters $s arms like delicate wings.~
+S
+#252
+glide~
+glide~
+b 8 8
+M0
+You spread your arms and glide around the area.~
+M1
+$n spreads $s arms and glides around.~
+S
+#253
+stomp~
+stomp~
+0 8 8
+M0
+You stomp around with determination, making your presence known.~
+M1
+$n stomps around with determination, causing the ground to tremble.~
+M2
+You pretend to stomp on $N's foot, playfully asserting your presence.~
+M3
+$n pretends to stomp on $N's foot, playfully asserting $s presence.~
+M4
+$n pretends to stomp on your foot, a mischievous glint in $s eyes.~
+M5
+You can't seem to find anyone by that name to stomp on.~
+S
+#254
+stretch~
+stretch~
+b 6 6
+M0
+You stretch and yawn.~
+M1
+$n stretches and yawns.~
+M2
+You offer to help $M stretch, guiding $S limbs to relieve tension.~
+M3
+$n offers to help you stretch, guiding your limbs to relieve tension.~
+M4
+$n offers to help you stretch, guiding your limbs to relieve tension.~
+M5
+You can't seem to find anyone with that name to help them stretch.~
+M6
+You stretch your muscles, feeling the tension ease away.~
+M7
+$n stretches $s muscles, relieving the tension.~
+S
+#255
+skip~
+skip~
+0 8 8
+M0
+You skip around with a lighthearted bounce in your step.~
+M1
+$n skips around with a lighthearted bounce in $s step.~
+M2
+You take $N's hand and skip together with a joyful rhythm.~
+M3
+$n takes $N's hand and skips around, creating a cheerful scene.~
+M4
+$n takes your hand and skips with you, the motion spreading a smile across your face.~
+M5
+You can't seem to find anyone by that name to skip with.~
+M6
+You start to skip around playfully, inviting others to join your dance.~
+M7
+$n's skipping steps invite everyone to join $m in a joyful dance.~
+S
+#256
+tiptoe~
+tiptoe~
+b 8 8
+M0
+You tiptoe around, your steps barely making a sound.~
+M1
+$n tiptoes around, $s steps barely making a sound.~
+M2
+You tiptoe behind $N's back, trying to go unnoticed.~
+M3
+$n tiptoes behind $N's back, a mischievous glint in $s eyes.~
+M4
+$n tiptoes behind you, and you can feel the presence without looking.~
+M5
+You can't seem to find anyone by that name to tiptoe behind.~
+S
+#257
+sashay~
+sashay~
+0 8 8
+M0
+You sashay gracefully, your movements flowing like a dance.~
+M1
+$n sashays gracefully, $s movements flowing like a dance.~
+M2
+You take $N's hand and sashay together with a flair, a mesmerizing sight.~
+M3
+$n takes your hand and sashays with $N, creating a mesmerizing sight.~
+M4
+$n takes your hand and sashays with you, creating a shared dance.~
+M5
+You can't seem to find anyone by that name to sashay with.~
+S
+#258
+pirouette~
+pirouette~
+0 8 8
+M0
+You pirouette gracefully, spinning on one foot with finesse.~
+M1
+$n pirouettes gracefully, spinning on one foot with finesse.~
+M2
+You take $N's hand and perform a synchronized pirouette, creating a mesmerizing display.~
+M3
+$n takes your hand and performs a synchronized pirouette with $N, creating a mesmerizing display.~
+M4
+$n takes your hand and performs a synchronized pirouette with you, sharing a moment of beauty.~
+M5
+You can't seem to find anyone by that name to pirouette with.~
+S
+#259
+lmao~
+lmao~
+0 8 8
+M0
+You laugh so hard you feel like your ass might fall off.~
+M1
+$n laughs so hard it seems $e might fall over.~
+M2
+You share a moment of uncontrollable laughter with $M, both of you nearly in tears.~
+M3
+$n and $N burst into fits of uncontrollable laughter.~
+M4
+$n and you share a genuine and uncontrollable laughter.~
+M5
+You can't seem to find anyone by that name to share the laughter with.~
+M6
+You laugh uproariously, your amusement contagious.~
+M7
+$n's laughter is infectious, making everyone around burst into laughter.~
+S
+#260
+fomo~
+fomo~
+0 8 8
+M0
+You check anxiously for pigeons, feeling a pang of FOMO.~
+M1
+$n checks anxiously for pigeons, a hint of FOMO on $s face.~
+M2
+You accuse $M of having FOMO.~
+M3
+$n accuses $N of having FOMO.~
+M4
+$n accuses you of having FOMO.~
+M5
+You don't see them here. Perhaps they really do have FOMO.~
+S
+#261
+ijbol~
+ijbol~
+0 8 8
+M0
+You just burst out laughing.~
+M1
+$n just bursts out laughing.~
+M2
+You can't help but burst into laughter with $M, sharing the joy of the moment.~
+M3
+$n's infectious laughter causes $N to burst into fits of laughter, too.~
+M4
+$n's sudden laughter catches you off guard, and you can't help but join in.~
+M5
+You can't seem to find anyone by that name to share the laughter with.~
+M6
+You just burst out laughing, unable to contain your amusement.~
+M7
+$n just bursts out laughing, $s amusement spilling over.~
+S
 $
