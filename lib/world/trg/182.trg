@@ -551,7 +551,7 @@ return 0
 random guild adventurer description~
 0 n 100
 ~
-switch %random.4%
+switch %random.5%
   case 1
     %mod% %self% longdesc %self.name% is looking for a place to setup %self.hisher% lab tent.
     %mod% %self% lookdesc The shoes of this adventurer are completely covered in muck and other unspeakable things from the city's sewers where the local goblin outpost is located.
@@ -571,6 +571,11 @@ switch %random.4%
     %mod% %self% longdesc %self.name% wanders along in a scent cloud of burning bodies.
     %mod% %self% lookdesc The scent of burning bodies clings to this adventurer as %self.heshe% walks about.
     %mod% %self% append-lookdesc At first it isn't clear just where that offensive scent would have come from, but then %self.heshe% plucks a Necrofiend's spike from %self.hisher% backside with a wince.
+  break
+  case 5
+    %mod% %self% longdesc %self.name% skips along, twirling a gnarled old wand.
+    %mod% %self% lookdesc The adventurer skips along in an oversized, purple witch's hat, twirling %self.hisher% gnarled old wand with little care for what it's aimed at.
+    %mod% %self% append-lookdesc Luckily, %self.heshe% doesn't seem to know how to use it -- or %self.heshe% doesn't have the power.
   break
 done
 ~
@@ -947,11 +952,13 @@ while %ch%
         %echoaround% %ch% ~%ch% completes the dance with a flourish!
         %quest% %ch% trigger 18248
         rdelete 18248_dancing %ch.id%
+        rdelete 18248_prog %ch.id%
         set 18248_despawn 1
         remote 18248_despawn %self.id%
         eval count %count% - 1
         set card %ch.inventory(18255)%
         if %card%
+          %send% %ch% You yelp and let go of the draconic dance card as it spontaneously burns up!
           %purge% %card%
         end
       end
@@ -961,11 +968,12 @@ while %ch%
       if %18248_prog% < 0
         set 18248_prog 0
       end
+      remote 18248_prog %ch.id%
     else
       * no next move (probably first move)
       set 18248_prog 0
+      remote 18248_prog %ch.id%
     end
-    remote 18248_prog %ch.id%
     rdelete 18248_move %ch.id%
   end
   set ch %ch.next_in_room%
