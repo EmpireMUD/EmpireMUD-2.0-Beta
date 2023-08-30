@@ -21,6 +21,7 @@
 #include "db.h"
 #include "skills.h"
 #include "constants.h"
+#include "dg_scripts.h"
 
 /**
 * Contents:
@@ -52,6 +53,11 @@ bool check_social(char_data *ch, char *string, bool exact) {
 	
 	if (!(soc = find_social(ch, str, exact))) {
 		return FALSE;	// no match to any social
+	}
+	
+	// does a command trigger override this social?
+	if (strlen(string) < strlen(SOC_COMMAND(soc)) && check_command_trigger(ch, SOC_COMMAND(soc), arg1, CMDTRG_EXACT)) {
+		return TRUE;
 	}
 	
 	// earthmeld doesn't hit the correct error in char_can_act -- just block all socials in earthmeld
