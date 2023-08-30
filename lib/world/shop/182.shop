@@ -3,6 +3,7 @@ Adventurer Guild Healer Shop~
 18200 0 0 0
 I 18239 1 18200 7
 I 18228 1 18200 6
+I 18229 2 18200 8
 L
 1 18208
 S
@@ -11,6 +12,7 @@ Adventurer Guild Caster Shop~
 18200 0 0 0
 I 18238 1 18200 7
 I 18230 1 18200 6
+I 18231 2 18200 8
 L
 1 18209
 S
@@ -19,6 +21,7 @@ Adventurer Guild Melee Shop~
 18200 0 0 0
 I 18237 1 18200 7
 I 18232 1 18200 6
+I 18233 2 18200 8
 L
 1 18210
 S
@@ -27,6 +30,7 @@ Adventurer Guild Tank Shop~
 18200 0 0 0
 I 18236 1 18200 7
 I 18234 1 18200 6
+I 18235 2 18200 8
 L
 1 18211
 S

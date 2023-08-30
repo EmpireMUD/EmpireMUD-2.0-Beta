@@ -624,7 +624,7 @@ monstrosity sanguine~
 a sanguine monstrosity~
 A sanguine monstrosity is dripping along the ground.
 ~
-100 125 dej 0 4
+100 125 de 0 4
 0 0 10 27 -1
 D
    This creature -- whose shape you're hesitant to look at, nevermind describe
@@ -633,12 +633,28 @@ unaware that it's leaving a red trail behind it.
 ~
 T 18240
 S
+#18229
+nebulavion scarlet red mist~
+a scarlet nebulavion~
+A scarlet nebulavion hangs in the air like a red mist.
+~
+100 125 dehjnK mG 4
+0 0 84 27 -1
+D
+   Ethereal tendrils reach out from the red mist like beckoning fingers, almost
+daring you to try to climb onto it. It is at once formless and cloudlike,
+twirling through the air with flecks of scarlet and vermillion like a dancer.
+It seems to pulse with a heartbeat of its own, a rhythmic whisper capable of
+carrying only the most daring of adventurers through the skies.
+~
+T 18241
+S
 #18230
 warg umbral~
 an umbral warg~
 An umbral warg stalks from shadow to shadow.
 ~
-100 125 dej 0 4
+100 125 de 0 4
 0 0 9 9 -1
 D
    This wolfish beast is smokey black from its head to the tip of its tail,
@@ -646,6 +662,22 @@ allowing for easier blending with the shadows. The only bright coloration
 visible comes from its vibrent eyes and white fangs.
 ~
 T 18240
+S
+#18231
+shadowraptor raptor eclipse~
+an eclipse shadowraptor~
+An eclipse shadowraptor circles above you, blocking the light.
+~
+100 125 dehnK mG 4
+0 0 25 9 -1
+D
+   The creature -- if it can be called that -- is shrouded in darkness. Or
+perhaps, closer inspection, it IS the darkness. Its striking appearance is like
+night itself, with only the faintest outline of the agile predator it's named
+for. Its spectral aura is daunting, daring you to try to ride it as it dances
+through the air.
+~
+T 18241
 S
 #18232
 steed clockwork~
@@ -661,6 +693,21 @@ some manor, though by what is unclear.
 ~
 T 18240
 S
+#18233
+rotary aeroforge~
+an aeroforge rotary~
+An aeroforge rotary twirls above you.
+~
+100 125 dehnK mG 4
+0 0 2 15 -1
+D
+   The aeroforge rotary is a testament to the ingenious engineering of the
+Guild of Adventurers. This soaring marvel resembles an intricate fusion of
+airborne artistry and mechanical precision, held aloft by screw-shaped sails
+that spin above it, with a narrow seat beneath for a single pilot.
+~
+T 18241
+S
 #18234
 bear imperium-clad clad~
 an imperium-clad bear~
@@ -672,6 +719,23 @@ D
 This great grizzly bear is wearing shining white imperium armor!
 ~
 T 18240
+S
+#18235
+warbalcon balcon celestial~
+a celestial warbalcon~
+A celestial warbalcon soars overhead.
+~
+100 125 de m 4
+0 0 46 11 -1
+D
+   The might and grace of the warbalcon are on full display as it flaps its
+long, slender wings overhead. It resembles an enormous draft horse with a
+strikingly iridescent coat, though it has no mane. Its long wings and fanned
+tail are reminiscent of a tremendous falcon, though it swoops more with terror
+than with grace. Its deafening call is like a thundering warble, warning all
+who hear it of the devastation to come.
+~
+T 18241
 S
 #18236
 patrons group~
@@ -847,7 +911,7 @@ dragon imaginary~
 an imaginary dragon~
 An imaginary dragon is (or isn't) flitting about.
 ~
-100 125 dej m 5
+100 125 de m 5
 0 0 2 10 -1
 D
 Perhaps you're imagining things.

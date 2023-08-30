@@ -879,7 +879,7 @@ S
 #254
 stretch~
 stretch~
-b 6 6
+b 5 5
 M0
 You stretch and yawn.~
 M1
@@ -972,7 +972,7 @@ S
 #259
 lmao~
 lmao~
-0 8 8
+0 5 5
 M0
 You laugh so hard you feel like your ass might fall off.~
 M1
@@ -993,7 +993,7 @@ S
 #260
 fomo~
 fomo~
-0 8 8
+0 5 5
 M0
 You check anxiously for pigeons, feeling a pang of FOMO.~
 M1
@@ -1010,7 +1010,7 @@ S
 #261
 ijbol~
 ijbol~
-0 8 8
+0 5 5
 M0
 You just burst out laughing.~
 M1

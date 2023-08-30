@@ -134,9 +134,9 @@ A
 Q 18272
 S
 #18214
-trinket tortoise~
-a tortoise trinket~
-A tortoise trinket is lying on its back.~
+trinket tortoise tipsy transport~
+a Tipsy Tortoise transport trinket~
+A Tipsy Tortoise transport trinket is lying on its back.~
    This strange trinket is carved from wood in the shape of a tortoise. It has
 been wrapped in a scaly leather and bound with cactus needles. You can 'use'
 this trinket to teleport to the nearest Tipsy Tortoise Tavern.
@@ -343,54 +343,115 @@ Type 'use whistle' to summon it.
 2 0
 S
 #18228
-whistle sanguine~
-a sanguine whistle~
+whistle sanguine monstrosity mount~
+a sanguine monstrosity mount whistle~
 A sanguine whistle is lying on the ground.~
    This whistle appears to be made from congealed blood, and leaves your
-fingers sticky as you touch it. If you 'use' the whistle, it will summon a new
-mount.
+fingers sticky as you touch it. If you 'use' the whistle, it will summon a the
+sanguine monstrosity -- a blood mount.
+   The mount requires that the player be Liked by the Guild of Adventurers.
 ~
 3 ep a 0 8
 18228 0 0
 2 0
 T 9910
 S
+#18229
+whistle nebulavion scarlet flying mount~
+a scarlet nebulavion flying mount whistle~
+A scarlet nebulavion whistle is lying here.~
+   The long wooden whistle is bright red and exudes a red mist when air passes
+through it. When you 'use' this whistle, it will summon the scarlet nebulavion,
+a flying mount that appears like a cloud of red mist.
+   The mount requires that the player be Venerated by the Guild of Adventurers.
+~
+3 ep a 0 9
+18229 0 0
+0 0
+T 9910
+S
 #18230
-whistle umbral~
-an umbral whistle~
+whistle umbral warg mount~
+an umbral warg mount whistle~
 An umbral whistle is lying here.~
    This whistle drips through your fingers as you struggle to hold it, as if it
 is made from pure shadow. You have no idea where something like this could have
 come from, but it does seem as if you could 'use' it to summon a new mount.
+   The mount requires that the player be Liked by the Guild of Adventurers.
 ~
 3 ep a 0 7
 18230 0 0
 2 0
 T 9910
 S
+#18231
+whistle eclipse shadowraptor raptor flying mount~
+an eclipse shadowraptor flying mount whistle~
+An eclipse shadowraptor whistle is lying here.~
+   This striking whistle is as black as the midday sun during an eclipse, with
+a striking red outline. When you 'use' this whistle, it summons the eclipse
+shadowraptor, a flying mount with the form of a bird's shadow.
+   The mount requires that the player be Venerated by the Guild of Adventurers.
+~
+3 ep a 0 8
+18231 0 0
+2 0
+T 9910
+S
 #18232
-apparatus clockwork~
-a clockwork apparatus~
-A clockwork apparatus is lying on the floor.~
+apparatus clockwork steed mount~
+a clockwork steed mount apparatus~
+A clockwork steed mount apparatus is lying on the floor.~
    This apparatus is strange, with is spinning gears and whirring motor. But,
 at least, it's simple: there is one large button marked 'use'. An inscription
-on the back indicates that it summons a clockwork steed.
+on the back indicates that it creates a clockwork steed mount.
+   The mount requires that the player be Liked by the Guild of Adventurers.
 ~
 3 ep a 0 6
 18232 0 0
 2 0
 T 9910
 S
+#18233
+assembler rotary aeroforge flying mount~
+an aeroforge rotary flying mount assembler~
+An aeroforge rotary assembler is lying here.~
+   This odd apparatus is designed to assemble itself into an aeroforge rotary
+-- a sort of flying screw that can hold a person aloft. When you 'use' this
+whistle, it creates the flying mount for you.
+   The mount requires that the player be Venerated by the Guild of Adventurers.
+~
+3 ep a 0 7
+18233 0 0
+0 0
+T 9910
+S
 #18234
-whistle imperium-clad clad~
-an imperium-clad whistle~
-A clockwork apparatus is lying on the floor.~
+whistle imperium-clad clad bear mount~
+an imperium-clad bear mount whistle~
+An imperium-clad mount whistle is lying here.~
    This whistle appears to be plated with pure imperium, and stamped with the
 sigil of the Guild of Adventurers. If you 'use' this whistle, it will summon an
-epic mount.
+imperium-clad bear as an epic mount.
+   The mount requires that the player be Liked by the Guild of Adventurers.
 ~
 3 ep a 0 7
 18234 0 0
+2 0
+T 9910
+S
+#18235
+whistle warbalcon celestial balcon flying mount~
+a celestial warbalcon flying mount whistle~
+A celestial warbalcon whistle is lying here.~
+   The whistle is plated with fine imperium, with a strange sort of pegasus
+emblazoned on the top. When you 'use' this whistle, it will summon the
+celestial warbalcon, an enormous horse with falcon wings that serves as a
+flying mount.
+   The mount requires that the player be Venerated by the Guild of Adventurers.
+~
+3 ep a 0 8
+18235 0 0
 2 0
 T 9910
 S
