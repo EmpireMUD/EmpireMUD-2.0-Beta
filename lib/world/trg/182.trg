@@ -1348,7 +1348,12 @@ if %cmd% == dance
   remote 18248_prog %actor.id%
   halt
 elseif %18248_dancing% < 0
-  %send% %actor% You must type 'dance' to start the dance.
+  if %dg%
+    %send% %actor% You must type 'dance' to start the dance.
+  else
+    * just pass thru
+    return 0
+  end
   halt
 end
 * doing a dance move
