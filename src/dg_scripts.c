@@ -5628,7 +5628,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						mob_vnum find_vnum = NOTHING;
 						
 						// optional vnum search
-						if (subfield && *subfield && isdigit(*subfield)) {
+						if (subfield && *subfield && (*subfield == '-' || isdigit(*subfield))) {
 							find_vnum = atoi(subfield);
 						}
 				
