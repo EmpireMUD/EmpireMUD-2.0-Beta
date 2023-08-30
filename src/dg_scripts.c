@@ -2012,7 +2012,7 @@ int text_processed(char *field, char *subfield, struct trig_var_data *vd, char *
 		snprintf(str, slen, "%s", AN(vd->value));
 		return TRUE;
 	}
-	else if (!str_cmp(field, "cap")) {                 /* ana or an/a       */
+	else if (!str_cmp(field, "cap")) {                 // capitalize first letter
 		snprintf(str, slen, "%s", vd->value);
 		for (p = str; *p; ++p) {
 			if (isspace(*p)) {
