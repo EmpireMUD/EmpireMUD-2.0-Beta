@@ -963,7 +963,7 @@ while %ch%
         end
       end
     elseif %18248_next%
-      %send% %ch% It seems like you missed that last move.
+      %send% %ch% You might have missed that last dance move...
       eval 18248_prog %ch.var(18248_prog)% - 1
       if %18248_prog% < 0
         set 18248_prog 0
