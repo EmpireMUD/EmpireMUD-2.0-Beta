@@ -972,8 +972,8 @@ while %ch%
     else
       * no next move (probably first move)
       set 18248_prog 0
-      remote 18248_prog %ch.id%
     end
+    remote 18248_prog %ch.id%
     rdelete 18248_move %ch.id%
   end
   set ch %ch.next_in_room%
