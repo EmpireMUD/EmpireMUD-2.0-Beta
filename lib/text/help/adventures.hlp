@@ -91,10 +91,12 @@ See also: ADVENTURE
 #
 "THE CURSED CHALICE OF MILL MANOR" "CURSED CHALICE OF MILL MANOR" "MILL MANOR"
 
-The Cursed Chalice of Mill Manor (level 100-150 adventure)
+The Cursed Chalice of Mill Manor (level 100-200 adventure)
 
 Mill Manor can be found deep in the swamp. Will you be the one to end the curse
 and restore the land?
+
+This adventure has normal, hard, group, and boss difficulties available.
 
 See also: ADVENTURE
 #
@@ -357,21 +359,33 @@ The tavern shop sells:
   a Guild of Adventurers charter - builds a guildhall (Venerated)
   an atlasian egg - your own atlasian tortoise (Venerated)
 
+  a Guild of Adventurers seeker stone - finds the tortoise (Liked)
+  a baby tortoise whistle - minipet (Esteemed)
+  a Tipsy Tortoise transport trinket - teleports you to the tortoise (Esteemed)
+  a ninja tortoise whistle - minipet (Venerated)
+  a dragon turtle whistle - minipet (Revered)
+  a Guild of Adventurers charter - builds another guildhall (Venerated)
+  an atlasian egg - your own atlasian tortoise (Venerated)
+  
 The umbramancer sells:
   the terrapin ring of acerbity - 100-200 caster ring (Esteemed)
-  an umbral whistle - land mount (Liked)
+  an umbral warg mount whistle - land mount (Liked)
+  an eclipse shadowraptor flying mount whistle - flying mount (Venerated)
 
 The vampire sells:
   the chelonian ring of extrication - 100-200 healer ring (Esteemed)
-  a sanguine whistle - land mount (Liked)
+  a sanguine monstrosity mount whistle - land mount (Liked)
+  a scarlet nebulavion flying mount whistle - flying mount (Venerated)
 
 The tinker sells:
   the testudinal ring of courage - 100-200 melee ring (Esteemed)
-  a clockwork apparatus - land mount (Liked)
+  a clockwork steed mount apparatus - land mount (Liked)
+  an aeroforge rotary flying mount assembler - flying mount (Venerated)
 
 The guildleader sells:
   the tortoiseshell ring of mettle - 100-200 tank ring (Esteemed)
-  an imperium-clad whistle - land mount (Liked)
+  an imperium-clad bear mount whistle - land mount (Liked)
+  a celestial warbalcon flying mount whistle - flying mount (Venerated)
 
 See also: ADVENTURE
 #
