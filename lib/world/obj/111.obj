@@ -376,7 +376,7 @@ This shaft leads back out of the canyons to the mountain above.
 1 0
 S
 #11130
-leather leatherbound book journal~
+book journal mage's mages leatherbound~
 a mage's journal~
 You find a leatherbound journal.~
    Bound in supple leather, the journal is nearly an inch thick, its parchment
@@ -384,9 +384,11 @@ pages covered with tiny handwriting and detailed illustrations. Leafing through
 the pages, the sheets slip by fluidly before parting naturally at a crease in
 the binding.
 ~
-28 j a 0 3
+28 j a 0 5
 24 0 0
 7 0
+C
+1 1
 E
 spell~
    There are four words written here in a heavy hand (garden, mill, stable,
@@ -403,9 +405,11 @@ emeralds wends its way around the stem, vine-like and dotted with blood red
 ruby thorns. The inner surface of the cup shimmers in an oily fashion, rainbow
 reflections curling in a way that causes ill ease.
 ~
-4 j a 0 1
+4 j a 0 2
 4 0 0
 4 4
+C
+1 1
 T 11136
 T 11137
 S
@@ -418,9 +422,11 @@ mosses cascading from the ceiling, but they part easily when pulled away from
 the lid to reveal a stained marble surface beneath. The sides depict friezes of
 what the estate must have looked like in its livelier days.
 ~
-3 0 0 0 1
+3 0 0 0 2
 0 0 0
 1 0
+C
+1 1
 E
 frieze~
    There is a recessed edge along the top of the frieze, evidence that the lid
@@ -439,9 +445,11 @@ blue against a midnight backdrop.
 
 Forge (Imperial Armors): opal carapace buckler
 ~
-3 0 a 0 4
+3 0 a 0 5
 0 0 0
 14 0
+C
+1 1
 R
 4 5621 0
 R
@@ -455,9 +463,11 @@ A hunk of jeweled slag cools nearby.~
 was intricately beautiful, is nonetheless worth its weight in .. Well, gold and
 jewels!
 ~
-15 0 a 0 2
+15 0 a 0 3
 16 0 0
 4 0
+C
+1 1
 R
 4 5611 a
 S
@@ -468,13 +478,15 @@ The titanaconda's collar lies nearby.~
    The scaly surface of the titanaconda's collar reflects motley hues of green
 in the light.
 ~
-2 emp al 0 1
+2 emp al 0 2
 0 0 0
 7 0
 A
 4 1 0
 A
 5 1 0
+C
+100 200
 S
 #11136
 catfish dorsal spine~
@@ -485,7 +497,7 @@ puncture wounds.
 
 Craft (Deadly Weapons): dorsal spine mace
 ~
-1 mo an 0 2
+1 mo an 0 3
 0 1 3
 14 0
 A
@@ -493,7 +505,7 @@ A
 A
 17 1 0
 C
-100 150
+100 200
 S
 #11137
 fillet filet catfish fish~
@@ -501,9 +513,11 @@ a catfish fillet~
 Tehre is a fillet of catfish nearby.~
 You can eat the meat raw... or cook it.
 ~
-6 0 a 0 2
+6 0 a 0 3
 6 0 0
 7 24
+C
+1 1
 R
 4 5119 0
 S
@@ -515,11 +529,13 @@ A branch, the length of a walking staff, is lying nearby.~
 black by decaying berries. But its weight is perfectly balanced for use as a
 staff weapon, and it tingles slightly when held.
 ~
-1 emp an 0 2
+1 emp an 0 3
 0 1 19
 0 0
 A
 17 1 0
+C
+100 200
 S
 #11139
 wooden staff branch~
@@ -529,13 +545,15 @@ A branch, the length of a walking staff, is lying nearby.~
 the limb: an undulating length of pale sunrise yellow, streaked with ocher
 veins. It feels oddly warm to the touch.
 ~
-1 emp an p 4
+1 emp an p 5
 0 1 16
 0 0
 A
 7 1 0
 A
 23 1 0
+C
+100 200
 S
 #11140
 wooden cube hex box~
@@ -548,9 +566,11 @@ grain. There is a small rune in the middle of the upturned face, and a
 different image branded into each of the four other visible sides: a mill, a
 garden, a stable, and an estate.
 ~
-3 j 0 0 1
+3 j 0 0 2
 0 0 0
 0 0
+C
+1 1
 E
 rune~
    The writing warns clearly that the item inside is cursed, and that only
@@ -574,9 +594,11 @@ There is an open hex box in the sarcophagus.~
 burns away from the center in a bright, violet embering. Inside, cradled in a
 bunting of brocade green silk, an intricately jeweled chalice gleams brightly.
 ~
-4 j 0 0 1
+4 j 0 0 2
 1 0 0
 0 0
+C
+1 1
 S
 #11142
 woundwort cutting dried~
@@ -585,9 +607,11 @@ A dried cutting of woundwort hangs nearby.~
    Tied to a line strung above the window box, an inverted cutting of woundwort
 has been hung to dry, its tiny lilac flowers brittle but vibrant.
 ~
-3 0 a 0 1
+3 0 a 0 2
 0 0 0
 0 0
+C
+1 1
 S
 #11143
 star anise pod~
@@ -597,9 +621,11 @@ A star anise pod is here.~
 star-shaped husk with a sound like distant applause, while wafting their spiced
 aroma.
 ~
-3 0 a 0 1
+3 0 a 0 2
 0 0 0
 0 0
+C
+1 1
 S
 #11144
 berries yew~
@@ -608,9 +634,11 @@ There is a scattering of yew berries nearby.~
    Ranging in hue from scarlet to crimson, the berries of the carniferous yew
 stand out brightly against the thin-leafed tree and its swaddling ivy.
 ~
-3 0 a 0 1
+3 0 a 0 2
 0 0 0
 0 0
+C
+1 1
 S
 #11145
 scales titanaconda's titanacondas~
@@ -622,9 +650,11 @@ protection.
 Sew (Imperial Armors): titanaconda scale coat
 Sew (Imperial Armors): titanaconda scale trousers
 ~
-3 e a 0 4
+3 e a 0 5
 0 0 0
 7 0
+C
+1 1
 R
 4 5120 0
 R
@@ -633,13 +663,13 @@ R
 4 5621 0
 S
 #11146
-titanaconda coat~
+coat scale titanaconda~
 a titanaconda scale coat~
 A coat made from titanaconda scales hangs nearby.~
    The long coat, sewn from the scales of a titanaconda, is strong but
 flexible, and its hues of deep green reflect wetly in the light.
 ~
-27 mo aq 0 2
+27 mo aq 0 4
 2 0 0
 7 0
 A
@@ -649,16 +679,16 @@ A
 A
 12 1 0
 C
-100 150
+100 225
 S
 #11147
-titanaconda trousers~
+trousers scale titanaconda~
 titanaconda scale trousers~
 A pair of titanaconda scale trousers hang nearby.~
    The trousers, sewn from the scales of a titanaconda, are strong but
 flexible, and their hues of deep green reflect wetly in the light.
 ~
-27 mo af 0 2
+27 mo af 0 3
 2 0 0
 7 0
 A
@@ -668,7 +698,7 @@ A
 A
 17 1 0
 C
-100 150
+100 225
 S
 #11148
 carapace buckler opal~
@@ -677,7 +707,7 @@ An opal carapace buckler rests nearby.~
    A buckler, forged from an opal carapace, shimmers darkly in the light. Its
 heft is reassuring, and its balance is superb.
 ~
-23 mo ao 0 1
+23 mo ao 0 2
 0 0 0
 0 0
 A
@@ -685,7 +715,7 @@ A
 A
 13 1 0
 C
-100 150
+100 225
 S
 #11149
 mace dorsal spine spiked~
@@ -693,7 +723,7 @@ a dorsal spine mace~
 A mace spiked with dorsal spines rests nearby.~
 The head of the mace is studded with dorsal spines from a mammoth catfish.
 ~
-1 emo an 0 2
+1 emo an 0 3
 0 1 5
 14 0
 A
@@ -701,6 +731,21 @@ A
 A
 17 1 0
 C
-100 175
+100 225
+S
+#11150
+vegetation path overgrown~
+the vegetation~
+The path is blocked by overgrown vegetation. (difficulty)~
+   The grass and plants have grown so tall that the path is nearly obscured. 
+You'll have to cut your way through (by selecting a difficulty).
+Usage: difficulty <normal | hard | group | boss>
+~
+3 0 0 0 2
+0 0 0
+0 0
+C
+1 1
+T 11150
 S
 $
