@@ -470,6 +470,8 @@ if %found% && !%exists%
     else
       set diff 1
     end
+    nop %mob.remove_mob_flag(HARD)%
+    nop %mob.remove_mob_flag(GROUP)%
     if (%diff% // 2) == 0
       nop %mob.add_mob_flag(HARD)%
     end
@@ -654,6 +656,8 @@ if %snake.vnum% == 11138
   else
     set diff 1
   end
+  nop %snake.remove_mob_flag(HARD)%
+  nop %snake.remove_mob_flag(GROUP)%
   if (%diff% // 2) == 0
     nop %snake.add_mob_flag(HARD)%
   end
@@ -724,6 +728,8 @@ if %random.4% == 4
   %load% mob 11140
   makeuid dragonfly mob dragonfly
   set diff %self.var(difficulty,1)%
+  nop %dragonfly.remove_mob_flag(HARD)%
+  nop %dragonfly.remove_mob_flag(GROUP)%
   if (%diff% // 2) == 0
     nop %dragonfly.add_mob_flag(HARD)%
   end
