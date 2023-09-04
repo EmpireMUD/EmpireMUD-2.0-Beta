@@ -726,21 +726,23 @@ end
 if %random.4% == 4
   %echo% A darting dragonfly appears and attacks!
   %load% mob 11140
-  makeuid dragonfly mob dragonfly
-  set diff %self.var(difficulty,1)%
-  nop %dragonfly.remove_mob_flag(HARD)%
-  nop %dragonfly.remove_mob_flag(GROUP)%
-  if (%diff% // 2) == 0
-    nop %dragonfly.add_mob_flag(HARD)%
-  end
-  if %diff% >= 3
-    nop %dragonfly.add_mob_flag(GROUP)%
-  end
-  nop %dragonfly.unscale_and_reset%
-  if %self.carried_by%
-    %force% %dragonfly% %aggro% %self.carried_by%
-  else
-    %force% %dragonfly% outrage
+  set dragonfly %self.room.people%
+  if %dragonfly.vnum% == 11140
+    set diff %self.var(difficulty,1)%
+    nop %dragonfly.remove_mob_flag(HARD)%
+    nop %dragonfly.remove_mob_flag(GROUP)%
+    if (%diff% // 2) == 0
+      nop %dragonfly.add_mob_flag(HARD)%
+    end
+    if %diff% >= 3
+      nop %dragonfly.add_mob_flag(GROUP)%
+    end
+    nop %dragonfly.unscale_and_reset%
+    if %self.carried_by%
+      %force% %dragonfly% %aggro% %self.carried_by%
+    else
+      %force% %dragonfly% %aggro%
+    end
   end
 end
 ~
