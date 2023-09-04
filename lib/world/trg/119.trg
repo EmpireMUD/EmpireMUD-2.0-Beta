@@ -1620,7 +1620,7 @@ elseif %mode% == fillin
       set list_size 8
     break
     case 2
-      set name_list Spite Sprite Spitfire Doom-Wing Doomer Faithbreaker Vyla Blaze
+      set name_list Spite Sprite Spitfire Doomwing Doomer Faithbreaker Vyla Blaze
       set list_size 8
     break
     case 3
