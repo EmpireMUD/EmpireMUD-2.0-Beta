@@ -99,17 +99,26 @@ Cave Viper Combat~
 ~
 %send% %actor% ~%self% strikes out and bites your leg!
 %echoaround% %actor% ~%self% strikes out and bites |%actor% leg!
-%dot% %actor% 100 30 poison
+if %actor.poison_immunity%
+  %damage% %actor% 30 physical
+elseif %actor.resist_poison%
+  %damage% %actor% 50 poison
+else
+  %dot% %actor% 100 30 poison
+  %damage% %actor% 50 poison
+end
 ~
 #11105
 Venomous Skink Combat~
 0 k 10
 ~
 %send% %actor% ~%self% bites down and latches onto your arm!
-%send% %actor% You don't feel so good...
 %echoaround% %actor% ~%self% bites down and latches onto |%actor% arm!
-%echoaround% %actor% ~%actor% doesn't look so good...
-dg_affect %actor% slow on 30
+if !%actor.poison_immunity% && !%actor.resist_poison%
+  %send% %actor% You don't feel so good...
+  %echoaround% %actor% ~%actor% doesn't look so good...
+  dg_affect %actor% slow on 30
+end
 %damage% %actor% 50
 ~
 #11106
