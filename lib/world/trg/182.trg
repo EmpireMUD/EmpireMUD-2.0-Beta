@@ -1145,6 +1145,7 @@ wait 1
 %force% %bandit% say Well, that's our mischief managed, then.
 wait 1
 * complete quests and purge bandits
+%adventurecomplete%
 set ch %room.people%
 while %ch%
   set next_ch %ch.next_in_room%
