@@ -7,10 +7,7 @@ wood.
 Commands: &cadventure&0
 ~
 bd 0 0 -1
-D5
-~
-0 11101
-T 11123
+M 1 11127 100.00 1
 T 11125
 S
 #11101

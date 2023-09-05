@@ -413,10 +413,54 @@ Loch Colossus block door~
 %send% %actor% You cannot reach that while ~%self% is in the way.
 return 0
 ~
+#11117
+Burrow Canyons: Check mob difficulty on-load~
+0 n 100
+~
+set boss_mobs 11103 11105
+set mini_mobs 11100 11102
+set start %instance.start%
+if %start%
+  set difficulty %start.var(difficulty,0)%
+else
+  set difficulty 0
+end
+if %difficulty% > 0
+  nop %self.remove_mob_flag(!TELEPORT)%
+  nop %self.remove_mob_flag(HARD)%
+  nop %self.remove_mob_flag(GROUP%
+  * boss?
+  if %boss_mobs% ~= %self.vnum%
+    if %difficulty% == 2
+      nop %self.add_mob_flag(HARD)%
+    elseif %difficulty% == 3
+      nop %self.add_mob_flag(GROUP)%
+    elseif %difficulty% == 4
+      nop %self.add_mob_flag(HARD)%
+      nop %self.add_mob_flag(GROUP)%
+    end
+  elseif %mini_mobs% ~= %self.vnum% && %difficulty% > 2
+    nop %self.add_mob_flag(HARD)%
+  end
+end
+detach 11117 %self.id%
+~
+#11118
+Burrow Canyons: Purge diff-sel on load~
+1 n 100
+~
+set start %instance.start%
+if %start.var(difficulty,0)% > 0
+  * already scaled
+  %purge% %self%
+end
+~
 #11123
 Start despawn time~
 2 g 100
 ~
+* This was formerly used to start the despawn timer when a player entered.
+* The difficulty selector now handles this.
 if !%self.contents(11124)%
   * start despawn
   %load% obj 11124
@@ -438,6 +482,108 @@ set loc %instance.location%
 if %loc%
   %door% %self% up room %loc.vnum%
 end
+~
+#11127
+Burrow Canyons: difficulty selector~
+1 c 4
+difficulty~
+return 1
+* Configs
+set start_room 11100
+set end_room 11123
+set boss_mobs 11103 11105
+set mini_mobs 11100 11102
+* Check args...
+if %self.varexists(scaled)%
+  %send% %actor% The difficulty has already been set.
+  halt
+end
+if !%arg%
+  %send% %actor% You must specify a level of difficulty (normal \| hard \| group \| boss).
+  halt
+end
+if normal /= %arg%
+  %echo% Setting difficulty to Normal...
+  set difficulty 1
+  set hard_mini 0
+elseif hard /= %arg%
+  %echo% Setting difficulty to Hard...
+  set difficulty 2
+  set hard_mini 0
+elseif group /= %arg%
+  %echo% Setting difficulty to Group...
+  set difficulty 3
+  set hard_mini 1
+elseif boss /= %arg%
+  %echo% Setting difficulty to Boss...
+  set difficulty 4
+  set hard_mini 1
+else
+  %send% %actor% That is not a valid difficulty level for this adventure (normal \| hard \| group \| boss).
+  halt
+end
+* Clear existing difficulty flags and set new ones.
+set vnum %start_room%
+while %vnum% <= %end_room%
+  set there %instance.nearest_rmt(%vnum%)%
+  if %there%
+    set mob %there.people%
+    set last 0
+    while %mob%
+      set next_mob %mob.next_in_room%
+      if %mob.is_npc%
+        if %mob.vnum% >= 11100 && %mob.vnum% <= 11129
+          * allow shadowstep
+          nop %mob.remove_mob_flag(!TELEPORT)%
+          * wipe difficulty flags
+          if %mob.vnum% != 11101
+            nop %mob.remove_mob_flag(HARD)%
+            nop %mob.remove_mob_flag(GROUP)%
+          end
+        end
+        if %boss_mobs% ~= %mob.vnum%
+          * scale as boss
+          if %difficulty% == 2
+            nop %mob.add_mob_flag(HARD)%
+          elseif %difficulty% == 3
+            nop %mob.add_mob_flag(GROUP)%
+          elseif %difficulty% == 4
+            nop %mob.add_mob_flag(HARD)%
+            nop %mob.add_mob_flag(GROUP)%
+          end
+        elseif %hard_mini% && %mini_mobs% ~= %mob.vnum%
+          * scale as miniboss
+          nop %mob.add_mob_flag(HARD)%
+        end
+      end
+      * and loop
+      set mob %next_mob%
+    done
+  end
+  * and repeat
+  eval vnum %vnum% + 1
+done
+* link room
+set room %self.room%
+if !%room.east(room)%
+  %door% %room% northeast room i11101
+end
+* messaging:
+%send% %actor% You shift the debris out of the way to reveal an open cavern.
+%echoaround% %actor% ~%actor% shifts some debris out of the way to reveal an open cavern.
+if %difficulty% > 2
+  %echo% ... it looks dangerous.
+end
+* mark adventure as scaled
+set start %instance.start%
+if %start%
+  remote difficulty %start.id%
+end
+if !%room.contents(11124)%
+  * start despawn
+  %load% obj 11124
+end
+%purge% %self%
 ~
 #11130
 Caretaker Replacement~
