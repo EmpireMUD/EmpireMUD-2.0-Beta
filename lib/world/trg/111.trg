@@ -97,6 +97,9 @@ end
 Cave Viper Combat~
 0 k 10
 ~
+if %self.cooldown(11104)%
+  halt
+end
 %send% %actor% ~%self% strikes out and bites your leg!
 %echoaround% %actor% ~%self% strikes out and bites |%actor% leg!
 if %actor.poison_immunity%
@@ -107,11 +110,15 @@ else
   %dot% %actor% 100 30 poison
   %damage% %actor% 50 poison
 end
+nop %self.set_cooldown(11104,20)%
 ~
 #11105
 Venomous Skink Combat~
 0 k 10
 ~
+if %self.cooldown(11104)%
+  halt
+end
 %send% %actor% ~%self% bites down and latches onto your arm!
 %echoaround% %actor% ~%self% bites down and latches onto |%actor% arm!
 if !%actor.poison_immunity% && !%actor.resist_poison%
@@ -120,6 +127,7 @@ if !%actor.poison_immunity% && !%actor.resist_poison%
   dg_affect %actor% slow on 30
 end
 %damage% %actor% 50
+nop %self.set_cooldown(11104,20)%
 ~
 #11106
 Lean Left~
@@ -437,7 +445,7 @@ end
 if %difficulty% > 0
   nop %self.remove_mob_flag(!TELEPORT)%
   nop %self.remove_mob_flag(HARD)%
-  nop %self.remove_mob_flag(GROUP%
+  nop %self.remove_mob_flag(GROUP)%
   * boss?
   if %boss_mobs% ~= %self.vnum%
     if %difficulty% == 2
@@ -451,6 +459,7 @@ if %difficulty% > 0
   elseif %mini_mobs% ~= %self.vnum% && %difficulty% > 2
     nop %self.add_mob_flag(HARD)%
   end
+  nop %self.unscale_and_reset%
 end
 detach 11117 %self.id%
 ~
@@ -565,6 +574,7 @@ while %vnum% <= %end_room%
           nop %mob.add_mob_flag(HARD)%
         end
       end
+      nop %mob.unscale_and_reset%
       * and loop
       set mob %next_mob%
     done
@@ -1083,6 +1093,7 @@ while %vnum% <= %end_room%
           nop %mob.add_mob_flag(HARD)%
         end
       end
+      nop %mob.unscale_and_reset%
       * and loop
       set mob %next_mob%
     done
