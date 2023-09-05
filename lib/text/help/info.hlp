@@ -826,7 +826,7 @@ use combat gimmicks.
 For example, in the Tower Skycleave, the player may receive this message in a
 fight:
 
-&yNelbog shouts, 'Goblinbaaaaaaaaaall!'&0
+&yNelbog shouts, 'Goblinbaaaaaaaaaall!'&&0
 &m**** Nelbog ducks and rolls toward you! ****&0 (dodge)
 
 In this case, you must type "dodge" within 8 seconds. If you do, Nelbog crashes
