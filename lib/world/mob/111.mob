@@ -3,7 +3,7 @@ viper cave~
 a cave viper~
 A cave viper coils to strike nearby!
 ~
-0 0 bdjB c 1
+0 0 bdjBE c 1
 0 0 5 9 -1
 I 0 3012 100.00 1  # BUTCHER: fillet of raw meat
 I 1 1355 100.00 1  # SKIN: snakeskin
@@ -14,13 +14,14 @@ I 4 11117 15.00 1 x  # LOOT: torn adventurer's leggings
 I 4 11118 1.00 1 x  # LOOT: skink whistle
 T 11104
 T 10405
+T 11117
 S
 #11101
 hermit~
 a hermit~
 A hermit can be seen in the shadows.
 ~
-0 0 bdvAI cn 3
+0 0 bdvAE cn 3
 0 0 0 15 -1
 T 11100
 T 11101
@@ -32,7 +33,7 @@ shiny yellow skink venomous~
 a venomous skink~
 A shiny yellow skink scurries up a nearby rock.
 ~
-0 0 bdjB c 2
+0 0 bdjBE c 2
 0 0 7 9 -1
 I 0 3012 100.00 1  # BUTCHER: fillet of raw meat
 I 1 1351 100.00 2  # SKIN: large skin
@@ -43,13 +44,14 @@ I 4 11117 20.00 1 x  # LOOT: torn adventurer's leggings
 I 4 11118 1.00 1 x  # LOOT: skink whistle
 T 11105
 T 10405
+T 11117
 S
 #11103
 colossus collossus loch shadow massive~
 a loch colossus~
 The massive shadow of a loch colossus circles menacingly beneath the water's surface.
 ~
-0 0 bdAB c 5
+0 0 bdABE c 5
 0 0 6 15 -1
 I 0 3012 100.00 10  # BUTCHER: fillet of raw meat
 I 1 1351 100.00 6  # SKIN: large skin
@@ -60,6 +62,7 @@ I 4 11122 25.00 1 x  # LOOT: colossal bone staff
 T 11114
 T 10405
 T 11116
+T 11117
 S
 #11104
 pegasus majestic white pristine~
@@ -76,7 +79,7 @@ scarlet-hooded hooded raptor shadow ominous screech~
 a scarlet-hooded raptor~
 An ominous shadow passes over, accompanied by a raspy screech.
 ~
-0 0 bdAB cm 2
+0 0 bdABE cm 2
 0 0 2 10 -1
 I 0 3200 100.00 1  # BUTCHER: cut of poultry
 I 4 11109 25.00 1 x  # LOOT: raptor claw dagger
@@ -85,13 +88,14 @@ I 4 11114 25.00 1 x  # LOOT: scarlet-feathered cape
 I 4 11123 25.00 1 x  # LOOT: scarlet feather earrings
 T 11113
 T 10405
+T 11117
 S
 #11106
 pegasus majestic white pristine~
 a pristine pegasus~
 A majestic white pegasus raises its head and stares at you imperiously.
 ~
-0 0 bdj cim 4
+0 0 bdjE cim 4
 0 0 2 11 -1
 T 11102
 S
@@ -109,7 +113,7 @@ lizard horned~
 a horned lizard~
 A horned lizard is digging at the ground.
 ~
-1 3 dj 0 1
+1 3 djE 0 1
 0 0 0 10 -1
 D
    This flat little lizard would be invisible against the ground if you hadn't
@@ -122,7 +126,7 @@ rabbit white~
 a rabbit~
 A white rabbit hops around.
 ~
-1 3 dj 0 1
+1 3 djE 0 1
 0 0 15 9 -1
 D
    The rabbit is pure white, of the kind you rarely see in nature, so it has
@@ -137,7 +141,7 @@ goat mountain~
 a mountain goat~
 A mountain goat is prancing about.
 ~
-10 20 djk 0 3
+10 20 djkE 0 3
 0 0 0 11 -1
 D
    The mountain goat is large, with strong muscles and white fur. Its small
@@ -151,7 +155,7 @@ woodpecker pecker bird~
 a woodpecker~
 A woodpecker is hammering away at a tree.
 ~
-1 5 djo m 1
+1 5 djE m 1
 0 0 2 10 -1
 D
    The woodpecker is mostly black and white, with a bright red crest on its
@@ -164,7 +168,7 @@ jackrabbit rabbit~
 a jackrabbit~
 A jackrabbit sits with its ears raised.
 ~
-1 3 dj 0 1
+1 3 djE 0 1
 0 0 15 9 -1
 D
    The oversized jackrabbit -- actually a hare -- sits perfectly still and
@@ -210,7 +214,7 @@ lulling songbird bird blue purple grey gray~
 a lulling songbird~
 A small songbird, blue and purple shimmering iridescent over its otherwise grey plumage, trills from above.
 ~
-0 0 adgj 0 1
+0 0 adgj c 1
 0 0 2 26 -1
 T 11140
 S
@@ -219,7 +223,7 @@ jumbo crayfish skitters muddy~
 a jumbo crayfish~
 A jumbo crayfish skitters nearby, its carapace flashing hues of red and gold beneath muddy brown.
 ~
-0 0 abdgjlA 0 2
+0 0 abdgjlA c 2
 0 0 8 10 -1
 I 4 11133 100.00 1  # LOOT: opal carapace
 S
@@ -238,7 +242,7 @@ caretaker~
 the caretaker~
 The caretaker, pale and disheveled, pokes at the soil of one of the window boxes, ignoring you.
 ~
-0 0 bdvI n 3
+0 0 bdvI cn 3
 0 0 13 3 -1
 S
 #11136
@@ -246,7 +250,7 @@ caretaker undead re-animated reanimated~
 the undead caretaker~
 The re-animated caretaker lets out a rattling moan, guttural and ferocious!
 ~
-0 0 cdghuB G 3
+0 0 cdghuB cG 3
 0 0 11 9 -1
 I 4 11142 100.00 1  # LOOT: dried woundwort cutting
 I 4 11143 100.00 1  # LOOT: star anise pod
@@ -279,7 +283,7 @@ bird stilt-legged wading~
 a wading bird~
 A stilt-legged bird struts nearby, its long beak lancing the ground for food.
 ~
-0 0 dgjlA 0 2
+0 0 dgjlA c 2
 0 0 0 4 -1
 I 0 3200 100.00 1  # BUTCHER: cut of poultry
 S
@@ -288,7 +292,7 @@ darting dragonfly hovers shimmering green~
 a darting dragonfly~
 A shimmering green dragonfly darts and hovers nearby.
 ~
-0 0 abdjoA c 2
+0 0 abdjouA c 2
 0 0 2 23 -1
 I 4 11133 100.00 1  # LOOT: opal carapace
 S

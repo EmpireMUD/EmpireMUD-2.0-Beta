@@ -258,9 +258,9 @@ style spells. Instead, mobs can use most player abilities directly at no cost.
 #d
 %DOOR% MDOOR ODOOR VDOOR WDOOR TRIGEDIT-EXIT TRIG-EXIT 
 
-%door% <vnum> <direction> <field> [value]
+%door% <from room> <direction> <field> [value]
 
-Used for adding, deleting, and modifying doors in room #vnum. Direction 
+Used for adding, deleting, and modifying doors in the room. The direction 
 determines which door is being changed, and can be any full direction name.
 If the door does not exist first, a new door will be created. Field is what
 property of the door is being changed. Valid fields are:
@@ -270,7 +270,10 @@ property of the door is being changed. Valid fields are:
    a - Exit is a door that can be opened and closed. Default is open.
    b - The door is closed.
 &cname&0- Value is the name of the door in the specified direction.
-&croom&0- Value is the vnum of the room this direction leads to.
+&croom&0- Value is the vnum of the room this direction leads to. It can be used
+   to add an exit to an existing room, including in adventures where it should
+   can be used with adventure template ids such as i12345 instead of a true
+   room vnum.
 &cadd <room building vnum>&0 - Add an exit (two-way) to a new room in this
    direction, using the building vnum provided (must be flagged ROOM). This
    only works in map buildings and vehicles, never in adventure zones or on

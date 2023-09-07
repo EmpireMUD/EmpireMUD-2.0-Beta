@@ -963,7 +963,7 @@ while %ch%
         end
       end
     elseif %18248_next%
-      %send% %ch% It seems like you missed that last move.
+      %send% %ch% You might have missed that last dance move...
       eval 18248_prog %ch.var(18248_prog)% - 1
       if %18248_prog% < 0
         set 18248_prog 0
@@ -972,8 +972,8 @@ while %ch%
     else
       * no next move (probably first move)
       set 18248_prog 0
-      remote 18248_prog %ch.id%
     end
+    remote 18248_prog %ch.id%
     rdelete 18248_move %ch.id%
   end
   set ch %ch.next_in_room%
@@ -1145,6 +1145,7 @@ wait 1
 %force% %bandit% say Well, that's our mischief managed, then.
 wait 1
 * complete quests and purge bandits
+%adventurecomplete%
 set ch %room.people%
 while %ch%
   set next_ch %ch.next_in_room%

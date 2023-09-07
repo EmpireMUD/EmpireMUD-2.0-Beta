@@ -97,20 +97,37 @@ end
 Cave Viper Combat~
 0 k 10
 ~
+if %self.cooldown(11104)%
+  halt
+end
 %send% %actor% ~%self% strikes out and bites your leg!
 %echoaround% %actor% ~%self% strikes out and bites |%actor% leg!
-%dot% %actor% 100 30 poison
+if %actor.poison_immunity%
+  %damage% %actor% 30 physical
+elseif %actor.resist_poison%
+  %damage% %actor% 50 poison
+else
+  %dot% %actor% 100 30 poison
+  %damage% %actor% 50 poison
+end
+nop %self.set_cooldown(11104,20)%
 ~
 #11105
 Venomous Skink Combat~
 0 k 10
 ~
+if %self.cooldown(11104)%
+  halt
+end
 %send% %actor% ~%self% bites down and latches onto your arm!
-%send% %actor% You don't feel so good...
 %echoaround% %actor% ~%self% bites down and latches onto |%actor% arm!
-%echoaround% %actor% ~%actor% doesn't look so good...
-dg_affect %actor% slow on 30
+if !%actor.poison_immunity% && !%actor.resist_poison%
+  %send% %actor% You don't feel so good...
+  %echoaround% %actor% ~%actor% doesn't look so good...
+  dg_affect %actor% slow on 30
+end
 %damage% %actor% 50
+nop %self.set_cooldown(11104,20)%
 ~
 #11106
 Lean Left~
@@ -413,10 +430,55 @@ Loch Colossus block door~
 %send% %actor% You cannot reach that while ~%self% is in the way.
 return 0
 ~
+#11117
+Burrow Canyons: Check mob difficulty on-load~
+0 n 100
+~
+set boss_mobs 11103 11105
+set mini_mobs 11100 11102
+set start %instance.start%
+if %start%
+  set difficulty %start.var(difficulty,0)%
+else
+  set difficulty 0
+end
+if %difficulty% > 0
+  nop %self.remove_mob_flag(!TELEPORT)%
+  nop %self.remove_mob_flag(HARD)%
+  nop %self.remove_mob_flag(GROUP)%
+  * boss?
+  if %boss_mobs% ~= %self.vnum%
+    if %difficulty% == 2
+      nop %self.add_mob_flag(HARD)%
+    elseif %difficulty% == 3
+      nop %self.add_mob_flag(GROUP)%
+    elseif %difficulty% == 4
+      nop %self.add_mob_flag(HARD)%
+      nop %self.add_mob_flag(GROUP)%
+    end
+  elseif %mini_mobs% ~= %self.vnum% && %difficulty% > 2
+    nop %self.add_mob_flag(HARD)%
+  end
+  nop %self.unscale_and_reset%
+end
+detach 11117 %self.id%
+~
+#11118
+Burrow Canyons: Purge diff-sel on load~
+1 n 100
+~
+set start %instance.start%
+if %start.var(difficulty,0)% > 0
+  * already scaled
+  %purge% %self%
+end
+~
 #11123
 Start despawn time~
 2 g 100
 ~
+* This was formerly used to start the despawn timer when a player entered.
+* The difficulty selector now handles this.
 if !%self.contents(11124)%
   * start despawn
   %load% obj 11124
@@ -438,6 +500,109 @@ set loc %instance.location%
 if %loc%
   %door% %self% up room %loc.vnum%
 end
+~
+#11127
+Burrow Canyons: difficulty selector~
+1 c 4
+difficulty~
+return 1
+* Configs
+set start_room 11100
+set end_room 11123
+set boss_mobs 11103 11105
+set mini_mobs 11100 11102
+* Check args...
+if %self.varexists(scaled)%
+  %send% %actor% The difficulty has already been set.
+  halt
+end
+if !%arg%
+  %send% %actor% You must specify a level of difficulty (normal \| hard \| group \| boss).
+  halt
+end
+if normal /= %arg%
+  %echo% Setting difficulty to Normal...
+  set difficulty 1
+  set hard_mini 0
+elseif hard /= %arg%
+  %echo% Setting difficulty to Hard...
+  set difficulty 2
+  set hard_mini 0
+elseif group /= %arg%
+  %echo% Setting difficulty to Group...
+  set difficulty 3
+  set hard_mini 1
+elseif boss /= %arg%
+  %echo% Setting difficulty to Boss...
+  set difficulty 4
+  set hard_mini 1
+else
+  %send% %actor% That is not a valid difficulty level for this adventure (normal \| hard \| group \| boss).
+  halt
+end
+* Clear existing difficulty flags and set new ones.
+set vnum %start_room%
+while %vnum% <= %end_room%
+  set there %instance.nearest_rmt(%vnum%)%
+  if %there%
+    set mob %there.people%
+    set last 0
+    while %mob%
+      set next_mob %mob.next_in_room%
+      if %mob.is_npc%
+        if %mob.vnum% >= 11100 && %mob.vnum% <= 11129
+          * allow shadowstep
+          nop %mob.remove_mob_flag(!TELEPORT)%
+          * wipe difficulty flags
+          if %mob.vnum% != 11101
+            nop %mob.remove_mob_flag(HARD)%
+            nop %mob.remove_mob_flag(GROUP)%
+          end
+        end
+        if %boss_mobs% ~= %mob.vnum%
+          * scale as boss
+          if %difficulty% == 2
+            nop %mob.add_mob_flag(HARD)%
+          elseif %difficulty% == 3
+            nop %mob.add_mob_flag(GROUP)%
+          elseif %difficulty% == 4
+            nop %mob.add_mob_flag(HARD)%
+            nop %mob.add_mob_flag(GROUP)%
+          end
+        elseif %hard_mini% && %mini_mobs% ~= %mob.vnum%
+          * scale as miniboss
+          nop %mob.add_mob_flag(HARD)%
+        end
+      end
+      nop %mob.unscale_and_reset%
+      * and loop
+      set mob %next_mob%
+    done
+  end
+  * and repeat
+  eval vnum %vnum% + 1
+done
+* link room
+set room %self.room%
+if !%room.east(room)%
+  %door% %room% northeast room i11101
+end
+* messaging:
+%send% %actor% You shift the debris out of the way to reveal an open cavern.
+%echoaround% %actor% ~%actor% shifts some debris out of the way to reveal an open cavern.
+if %difficulty% > 2
+  %echo% ... it looks dangerous.
+end
+* mark adventure as scaled
+set start %instance.start%
+if %start%
+  remote difficulty %start.id%
+end
+if !%room.contents(11124)%
+  * start despawn
+  %load% obj 11124
+end
+%purge% %self%
 ~
 #11130
 Caretaker Replacement~
@@ -462,6 +627,24 @@ while %ch%
 done
 if %found% && !%exists%
   %at% i11142 wload mob 11136
+  set mob %atroom.people%
+  if %mob.vnum% == 11136
+    set start %instance.start%
+    if %start%
+      set diff %start.var(difficulty,1)%
+    else
+      set diff 1
+    end
+    nop %mob.remove_mob_flag(HARD)%
+    nop %mob.remove_mob_flag(GROUP)%
+    if (%diff% // 2) == 0
+      nop %mob.add_mob_flag(HARD)%
+    end
+    if %diff% >= 3
+      nop %mob.add_mob_flag(GROUP)%
+    end
+    nop %mob.unscale_and_reset%
+  end
 end
 ~
 #11131
@@ -599,6 +782,16 @@ wait 1 sec
 %load% obj 11141
 makeuid box obj openhexbox
 %load% obj 11131 %box%
+set chalice %box.contents%
+if %chalice.vnum% == 11131%
+  set start %instance.start%
+  if %start%
+    set difficulty %start.var(difficulty,1)%
+  else
+    set difficulty 1
+  end
+  remote difficulty %chalice.id%
+end
 %purge% %self%
 ~
 #11135
@@ -616,10 +809,30 @@ global sarcophagus_running
 %send% %actor% You cautiously open @%self%...
 %echoaround% %actor% ~%actor% cautiously opens @%self%...
 %echo% A giant shape lurches at you from the darkness inside!
+set room %self.room%
 %load% mob 11138
 %load% obj 11140
-makeuid snake mob titanaconda
-%force% %snake% %aggro% %actor%
+set snake %room.people%
+if %snake.vnum% == 11138
+  * difficulty
+  set start %instance.start%
+  if %start%
+    set diff %start.var(difficulty,1)%
+  else
+    set diff 1
+  end
+  nop %snake.remove_mob_flag(HARD)%
+  nop %snake.remove_mob_flag(GROUP)%
+  if (%diff% // 2) == 0
+    nop %snake.add_mob_flag(HARD)%
+  end
+  if %diff% >= 3
+    nop %snake.add_mob_flag(GROUP)%
+  end
+  nop %snake.unscale_and_reset%
+  * and aggro
+  %force% %snake% %aggro% %actor%
+end
 %purge% %self%
 set sarcophagus_running 0
 global sarcophagus_running
@@ -678,11 +891,23 @@ end
 if %random.4% == 4
   %echo% A darting dragonfly appears and attacks!
   %load% mob 11140
-  makeuid dragonfly mob dragonfly
-  if %self.carried_by%
-    %force% %dragonfly% %aggro% %self.carried_by%
-  else
-    %force% %dragonfly% outrage
+  set dragonfly %self.room.people%
+  if %dragonfly.vnum% == 11140
+    set diff %self.var(difficulty,1)%
+    nop %dragonfly.remove_mob_flag(HARD)%
+    nop %dragonfly.remove_mob_flag(GROUP)%
+    if (%diff% // 2) == 0
+      nop %dragonfly.add_mob_flag(HARD)%
+    end
+    if %diff% >= 3
+      nop %dragonfly.add_mob_flag(GROUP)%
+    end
+    nop %dragonfly.unscale_and_reset%
+    if %self.carried_by%
+      %force% %dragonfly% %aggro% %self.carried_by%
+    else
+      %force% %dragonfly% %aggro%
+    end
   end
 end
 ~
@@ -717,9 +942,17 @@ if !%target%
 end
 %send% %target% ~%self% encircles you and constricts!
 %echoaround% %target% ~%self% encircles ~%target% and constricts *%target%!
-dg_affect %target% HARD-STUNNED on 15
-dg_affect %self% HARD-STUNNED on 15
-%damage% %target% 50
+if %target.affect(3050)% || %target.level% >= (%self.level% + 100)
+  * stun immunity or high level
+  %damage% %target% 150
+  dg_affect %self% HARD-STUNNED on 15
+  wait 15 sec
+  halt
+else
+  dg_affect %target% STUNNED on 15
+  dg_affect %self% HARD-STUNNED on 15
+  %damage% %target% 50
+end
 set verify_target %target.id%
 wait 5 sec
 if %verify_target% != %target.id%
@@ -758,8 +991,16 @@ if !%target%
 end
 %send% %target% ~%self% wraps *%self%self around you, mummifying you and dragging you off to blissful slumber...
 %echoaround% %target% ~%self% wraps *%self%self around ~%target%, mummifying *%target% and dragging *%target% off to blissful slumber...
-dg_affect %target% HARD-STUNNED on 15
-dg_affect %self% HARD-STUNNED on 15
+if %target.affect(3050)% || %target.level% >= (%self.level% + 100)
+  * stun immunity or high level
+  %damage% %target% 50
+  dg_affect %self% HARD-STUNNED on 15
+  wait 15 sec
+  halt
+else
+  dg_affect %target% STUNNED on 15
+  dg_affect %self% HARD-STUNNED on 15
+end
 * prevents re-running of this script until affect ends
 wait 15 sec
 ~
@@ -782,5 +1023,100 @@ MM Start Progression~
 if %actor.is_pc% && %actor.empire%
   nop %actor.empire.start_progress(11130)%
 end
+~
+#11150
+Mill Manor: Difficulty selector~
+1 c 4
+difficulty~
+return 1
+* Configs
+set start_room 11131
+set end_room 11151
+set boss_mobs 11135 11136 11138
+set mini_mobs 11130 11131 11132 11133 11134 11137 11139 11140
+* Check args...
+if %self.varexists(scaled)%
+  %send% %actor% The difficulty has already been set.
+  halt
+end
+if !%arg%
+  %send% %actor% You must specify a level of difficulty (normal \| hard \| group \| boss).
+  halt
+end
+if normal /= %arg%
+  %echo% Setting difficulty to Normal...
+  set difficulty 1
+  set hard_mini 0
+elseif hard /= %arg%
+  %echo% Setting difficulty to Hard...
+  set difficulty 2
+  set hard_mini 0
+elseif group /= %arg%
+  %echo% Setting difficulty to Group...
+  set difficulty 3
+  set hard_mini 1
+elseif boss /= %arg%
+  %echo% Setting difficulty to Boss...
+  set difficulty 4
+  set hard_mini 1
+else
+  %send% %actor% That is not a valid difficulty level for this adventure (normal \| hard \| group \| boss).
+  halt
+end
+* Clear existing difficulty flags and set new ones.
+set vnum %start_room%
+while %vnum% <= %end_room%
+  set there %instance.nearest_rmt(%vnum%)%
+  if %there%
+    set mob %there.people%
+    set last 0
+    while %mob%
+      set next_mob %mob.next_in_room%
+      if %mob.is_npc%
+        if %mob.vnum% >= 11130 && %mob.vnum% <= 11159
+          * wipe difficulty flags
+          nop %mob.remove_mob_flag(HARD)%
+          nop %mob.remove_mob_flag(GROUP)%
+        end
+        if %boss_mobs% ~= %mob.vnum%
+          * scale as boss
+          if %difficulty% == 2
+            nop %mob.add_mob_flag(HARD)%
+          elseif %difficulty% == 3
+            nop %mob.add_mob_flag(GROUP)%
+          elseif %difficulty% == 4
+            nop %mob.add_mob_flag(HARD)%
+            nop %mob.add_mob_flag(GROUP)%
+          end
+        elseif %hard_mini% && %mini_mobs% ~= %mob.vnum%
+          * scale as miniboss
+          nop %mob.add_mob_flag(HARD)%
+        end
+      end
+      nop %mob.unscale_and_reset%
+      * and loop
+      set mob %next_mob%
+    done
+  end
+  * and repeat
+  eval vnum %vnum% + 1
+done
+* link room
+set room %self.room%
+if !%room.east(room)%
+  %door% %room% east room i11131
+end
+* messaging:
+%send% %actor% You cut your way through the thick vegetation on the path.
+%echoaround% %actor% ~%actor% cuts ^%actor% way through the thick vegetation on the path.
+if %difficulty% > 2
+  %echo% ... it looks dangerous.
+end
+* mark adventure as scaled
+set start %instance.start%
+if %start%
+  remote difficulty %start.id%
+end
+%purge% %self%
 ~
 $
