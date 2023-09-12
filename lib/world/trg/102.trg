@@ -62,7 +62,7 @@ set difficulty %self.difficulty%
 set mob %self.room.people%
 remote difficulty %mob.id%
 set mob_diff %difficulty%
-dg_affect %mob% !ATTACK on 5
+dg_affect #10216 %mob% !ATTACK on 5
 nop %mob.remove_mob_flag(HARD)%
 nop %mob.remove_mob_flag(GROUP)%
 if %mob_diff% == 1
@@ -120,7 +120,8 @@ while %mob_num% <= 10203
   %load% mob %mob_num%
   set mob %self.room.people%
   remote difficulty %mob.id%
-  dg_affect %mob% !ATTACK on 5
+  eval aff_id %mob_num% + 15
+  dg_affect #%aff_id% %mob% !ATTACK on 5
   nop %mob.remove_mob_flag(HARD)%
   nop %mob.remove_mob_flag(GROUP)%
   if %mob_diff% == 0
@@ -175,7 +176,7 @@ if !%found%
   set mob %self.room.people%
   remote difficulty %mob.id%
   set mob_diff %difficulty%
-  dg_affect %mob% !ATTACK on 5
+  dg_affect #10219 %mob% !ATTACK on 5
   nop %mob.remove_mob_flag(HARD)%
   nop %mob.remove_mob_flag(GROUP)%
   if %mob_diff% == 1
@@ -226,7 +227,7 @@ if !%found%
   set mob %self.room.people%
   remote difficulty %mob.id%
   set mob_diff %difficulty%
-  dg_affect %mob% !ATTACK on 5
+  dg_affect #10219 %mob% !ATTACK on 5
   nop %mob.remove_mob_flag(HARD)%
   nop %mob.remove_mob_flag(GROUP)%
   if %mob_diff% == 1
@@ -281,7 +282,7 @@ set difficulty %self.difficulty%
 set mob %self.room.people%
 remote difficulty %mob.id%
 set mob_diff %difficulty%
-dg_affect %mob% !ATTACK on 5
+dg_affect #10220 %mob% !ATTACK on 5
 nop %mob.remove_mob_flag(HARD)%
 nop %mob.remove_mob_flag(GROUP)%
 if %mob_diff% == 1
