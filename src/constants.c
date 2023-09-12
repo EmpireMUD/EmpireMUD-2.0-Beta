@@ -2161,7 +2161,7 @@ const struct faction_reputation_type reputation_levels[] = {
 	{ REP_LIKED, "Liked", "\tc", 100 },
 	{ REP_ESTEEMED, "Esteemed", "\ta", 300 },
 	{ REP_VENERATED, "Venerated", "\tg", 750 },
-	{ REP_REVERED, "Revered", "\tg", 1000 },
+	{ REP_REVERED, "Revered", "\tG", 1000 },
 	
 	{ -1, "\n", "\t0", 0 },	// last
 };
