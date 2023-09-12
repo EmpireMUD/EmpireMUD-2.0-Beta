@@ -696,7 +696,9 @@ return 1
 set room %self.room%
 * BORROW first
 if borrow /= %cmd%
-  if !(Rodentmort /= %arg%) && !(rat /= %arg%) && !(Morty /= %arg%)
+  if !%arg%
+    %send% %actor% Borrow what?
+  elseif !(Rodentmort /= %arg%) && !(rat /= %arg%) && !(Morty /= %arg%)
     %send% %actor% This cage can only be used to borrow Rodentmort.
   elseif %self.val0%
     %send% %actor% You already borrowed Rodentmort.
