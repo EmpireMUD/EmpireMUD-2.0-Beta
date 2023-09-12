@@ -459,13 +459,14 @@ emeralds wends its way around the stem, vine-like and dotted with blood red
 ruby thorns. The inner surface of the cup shimmers in an oily fashion, rainbow
 reflections curling in a way that causes ill ease.
 ~
-4 j a 0 2
+4 j a 0 3
 4 0 0
 4 4
 C
 1 1
 T 11136
 T 11137
+T 11142
 S
 #11132
 closed sarcophagus~
@@ -648,11 +649,15 @@ There is an open hex box in the sarcophagus.~
 burns away from the center in a bright, violet embering. Inside, cradled in a
 bunting of brocade green silk, an intricately jeweled chalice gleams brightly.
 ~
-4 j 0 0 2
+4 j 0 0 3
 1 0 0
-0 0
+0 48
 C
 1 1
+M
+18
+The hex box falls apart from years of decay.~
+T 11143
 S
 #11142
 woundwort cutting dried~
