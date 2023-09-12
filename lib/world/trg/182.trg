@@ -1205,8 +1205,11 @@ elseif %self.val0%
   %send% %actor% You've already stolen the scrolls.
   %quest% %actor% trigger 18253
   halt
-elseif %room.people(11847)%
+elseif %room.people(11847)% && %actor.skill(Stealth)% < 50
   %send% %actor% You can't get to the right drawer with Kara Virduke here.
+  halt
+elseif %actor.fighting%
+  %send% %actor% You're a little busy right now!
   halt
 elseif %room.template% != 11835 && %room.template% != 11935
   %send% %actor% This isn't the right place to use the disarticulated skeleton key.
