@@ -1344,7 +1344,7 @@ if %blood% < %cost%
   halt
 end
 set room %actor.room%
-if %room.sector% != Oasis
+if !(%room.sector% ~= Oasis)
   %send% %actor% You can only infuse @%self% at an oasis.
   halt
 end
