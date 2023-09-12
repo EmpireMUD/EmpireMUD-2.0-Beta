@@ -701,7 +701,7 @@ if borrow /= %cmd%
   elseif %self.val0%
     %send% %actor% You already borrowed Rodentmort.
   elseif !%room.people(19000)%
-    %send% %actor% You need to borrow the rat from the Swamp Hag; she's not here.
+    %send% %actor% You need to borrow the rat from the swamp hag; she's not here.
   elseif %actor.fighting% || %actor.position% == Sleeping
     %send% %actor% You can't do that right now.
   else
