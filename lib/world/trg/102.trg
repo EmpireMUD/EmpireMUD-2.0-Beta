@@ -955,6 +955,10 @@ elseif terrosaur /= %arg% || fearsome /= %arg%
 elseif archsorcerer /= %arg% || malfernes /= %arg%
   set keyword malfernes
   set target %instance.mob(10254)%
+  if !%target%
+    * guild version instead?
+    set target %instance.mob(18280)%
+  end
 elseif three-horned /= %arg% || horned /= %arg% || frilled /= %arg%
   set keyword frilled
   set target %instance.mob(10255)%
