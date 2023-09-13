@@ -9095,7 +9095,7 @@ end
 set spirit %instance.mob(11900)%
 set diff2 %diff%
 remote diff2 %spirit.id%
-set start2 %actor.name%
+set start2 %actor.real_name%
 remote start2 %spirit.id%
 * Load mobs
 %at% i11810 skygobpix %diff% g  * trash mob
@@ -9164,7 +9164,7 @@ end
 set spirit %instance.mob(11900)%
 set diff3 %diff%
 remote diff3 %spirit.id%
-set start3 %actor.name%
+set start3 %actor.real_name%
 remote start3 %spirit.id%
 * Load mobs
 %at% i11834 %load% mob 11830  * High Master Caius (phase A dummy)
@@ -9232,7 +9232,7 @@ end
 set spirit %instance.mob(11900)%
 set diff4 %diff%
 remote diff4 %spirit.id%
-set start4 %actor.name%
+set start4 %actor.real_name%
 remote start4 %spirit.id%
 * Load mobs
 %at% i11865 %load% mob 11859  * Page Sheila

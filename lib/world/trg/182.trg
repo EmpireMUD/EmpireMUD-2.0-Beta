@@ -689,12 +689,43 @@ if %18243_bug_count% >= %num_needed%
 end
 ~
 #18229
-GoA: Summon Rodentmort~
+GoA: Rodentmort's water-logged cage~
 1 c 2
-release~
-set needed 3
+borrow release~
 return 1
-if !%arg%
+set room %self.room%
+* BORROW first
+if borrow /= %cmd%
+  if !%arg%
+    %send% %actor% Borrow what?
+  elseif !(Rodentmort /= %arg%) && !(rat /= %arg%) && !(Morty /= %arg%)
+    %send% %actor% This cage can only be used to borrow Rodentmort.
+  elseif %self.val0%
+    %send% %actor% You already borrowed Rodentmort.
+  elseif !%room.people(19000)%
+    %send% %actor% You need to borrow the rat from the swamp hag; she's not here.
+  elseif %actor.fighting% || %actor.position% == Sleeping
+    %send% %actor% You can't do that right now.
+  else
+    set hag %room.people(19000)%
+    %force% %hag% say Here you are, dearie...
+    wait 1
+    %echo% A rat of unusual size hops into |%actor% water-logged cage!
+    nop %self.val0(1)%
+    %mod% %self% lookdesc The wicker cage looks freshly-made but there are bites and scratches near any hole or opening. The cage is woven to be nearly solid, perhaps to keep its
+    %mod% %self% append-lookdesc occupant from squeezing or biting its way out, but from the number of repairs, it doesn't seem to work...
+    %mod% %self% append-lookdesc-noformat &0   The cage is heavy, but it's on skids so you spend most of your time dragging
+    %mod% %self% append-lookdesc-noformat it behind you, listening to the guttural squeaks of poor Rodentmort.
+    %mod% %self% append-lookdesc-noformat Use: release Rodentmort
+  end
+  halt
+end
+* RELEASE SECOND
+set needed 3
+if !%self.val0%
+  %send% %actor% You need to go borrow Rodentmort from Germione first.
+  halt
+elseif !%arg%
   %send% %actor% Release what?
   halt
 elseif !(Rodentmort /= %arg%) && !(rat /= %arg%) && !(Morty /= %arg%)
@@ -1205,8 +1236,11 @@ elseif %self.val0%
   %send% %actor% You've already stolen the scrolls.
   %quest% %actor% trigger 18253
   halt
-elseif %room.people(11847)%
+elseif %room.people(11847)% && %actor.skill(Stealth)% < 50
   %send% %actor% You can't get to the right drawer with Kara Virduke here.
+  halt
+elseif %actor.fighting%
+  %send% %actor% You're a little busy right now!
   halt
 elseif %room.template% != 11835 && %room.template% != 11935
   %send% %actor% This isn't the right place to use the disarticulated skeleton key.

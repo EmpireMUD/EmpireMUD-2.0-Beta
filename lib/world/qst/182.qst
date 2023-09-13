@@ -1,5 +1,5 @@
 #18200
-Join the Guild of Adventurers~
+Guild of Adventurers: Join Up Today!~
    If you want to join the Guild of Adventurers, you must first demonstrate
 commitment by commissioning a guildhall in one of your cities. You receive a
 guild charter; take it home and 'build guildhall <direction>' to set it up.
@@ -29,7 +29,7 @@ Z
 1 18219
 S
 #18201
-Here to Sign Up~
+Guild of Adventurers: Here to Sign Up~
    The superintendant looks up at you, stands up from his desk, and claps you
 on the shoulders with both hands. 'Here to sign up? ' he asks, jovially. 'All
 members of the empire are welcome here, whether you're a ratcatcher or a...
@@ -54,7 +54,7 @@ Z
 1 18219
 S
 #18208
-Seek Out Fame and Adventure~
+Guild of Adventurers: Seek Out Fame and Adventure~
    The barkeep takes you aside and leans over to say, 'You have the look of an
 adventurer about you. Perhaps you've heard of the Guild of Adventurers. They
 always need fresh blood. Here, take this seeker stone and use it to find the
@@ -83,7 +83,7 @@ Z
 1 18212
 S
 #18221
-My Very Own Egg~
+Guild of Adventurers: My Very Own Egg~
    You have acquired an atlasian egg -- a truly rare treasure indeed! You can
 feel the embryonic tortoise's heartbeat within the shell. You need to find some
 clear desert or plains and 'plant' the egg to help it grow and hatch.
@@ -101,7 +101,7 @@ Z
 0 18221
 S
 #18222
-Tending the Egg~
+Guild of Adventurers: Tending the Egg~
    The egg doesn't seem to be warm enough. You're no expert on the care and
 rearing of atlasian tortoises, but it doesn't seem like any ordinary covering
 is going to help. Fortunately, you've heard of a salve made from burnt zephyr
@@ -125,7 +125,7 @@ Z
 0 18221
 S
 #18223
-Bonfire of the Tortoises~
+Guild of Adventurers: Bonfire of the Tortoises~
    Now that the egg has begun to grow, you realize zephyr salve alone won't be
 enough to hatch it. You recall hearing someone at the Tipsy Tortoise Tavern
 recall the story of hatching a giant egg. And as you recall, he did it by
@@ -368,32 +368,26 @@ Z
 S
 #18245
 Swamp Hag: Feeding Rodentmort~
-   'This is a bit of a messy one,' the guildmage says sheepishly while sliding
-a wicker cage out from a low shelf. The cage sprays droplets of water as it
-shakes back and forth, followed by the raspy sound of something scratching at
-the inside.
+   'This is going to be a bit of a messy one,' the guildmage says sheepishly
+while sliding a wicker cage out from a low shelf. The cage is soaked with water
+and has an authentic 'swamp' aroma about it.
    The old guildmage sets the cage down at your feet, where it starts to form a
-murky puddle around it. 'Don't worry about the biting. He'll realize you aren't
-food soon enough, probably,' the guildmage says. 'This should be a brief task.
-The briefer the better, honestly. I've had all I can take of the creature. The
-Pet That Shall Not Be Named, I've been calling him. Honestly, I should never
-have offered to watch him. But, Germione claimed he was enchanted, so I could
-not resist the urge to take a peek under the bonnet.'
+murky puddle around it. 'This should be a relatively brief task. The briefer,
+the better, honestly. You're to pay a visit to Germione and borrow one of her
+favorite rats -- a foul Creature Who Shall Not Be Named. Apologies, but I've
+cared for the creature before and it is all too unpleasant.'
    The guildmage laughs.
-   'In any event, she'll want him back in good condition and I have not been
-able to bring myself to feed him. The thing eats only the freshly-dead.
-Honestly. I'm not sure what she's playing at, calling him enchanted. Maybe for
-his size alone, but otherwise there's not a single thing special about him.'
-   Just then, there's a POP and a burst of fire, and a slip of parchment
-appears in a bottle on the table. The guildmage slides the note out and reads
-it.
-   'Oh, it seems Nostrazak would like to see Pet That Shall Not Be Named before
-we send it back to the old hag. Well, you had still better feed the vile thing.
-Then drop it at the Tipsy Tortoise and wash your hands of the matter. Perhaps
-twice.'
-   Type 'release Rodentmort' to let the rat out of the cage. He'll eat any
-corpses he comes across. A rodent of such unusual size will need at least three
-of them.
+   'Nostrazak the Incautious would like to have a peek under the bonnet, so to
+speak. The Guild has used enchanted rats before and our fearless thinks he's
+come up with a new angle. Once you have the rodent in the cage, you may find it
+becomes more docile once fed. I would suggest releasing it for a bit but be
+warned that it only eats the dead.'
+   With that, the guildmage burns a small scroll in the fire and returns to
+another task.
+   Visit the swamp hag, Germione, and type 'borrow Rodentmort'. After that,
+find some corpses for him and type 'release Rodentmort'. The rat will hop out
+of the cage and eat corpses off the ground. When he's full, drop him off at
+the Tipsy Tortoise with Nostrazak the Incautious.
 ~
    You pass the water-logged cage over to Nostrazak the Incautious. He taps at
 it with a long claw, causing the cage to shake and sputter for a moment.
@@ -587,7 +581,8 @@ bring a bunch of bronze or iron, and a lot of nails. It's important to secure
 the brace to the leg. Don't worry, you can't hurt the colossus. It's an
 automaton. Oh, and report back in at the Tipsy Tortoise when it's done.'
    From atop the enormous boots of the clockwork colossus, type 'manufacture
-colossal ankle brace' to construct the brace.
+colossal ankle brace' to construct the brace. Don't forget to bring along
+12x (common metal ingots) and 12x (nails).
 ~
    'Ingenius,' says Nostrazak the Incautious when you regale him with the story
 of the colossus. 'Your local librarian came up with that? Simply ingenius.
@@ -775,7 +770,7 @@ Z
 1 18210
 S
 #18256
-The Grove: Capture a Wildling~
+Grove: Capture a Wildling~
    The Guild of Adventurers needs more information on the Magiterranean. Find a
 portal into The Grove somewhere in the forest, make your way inside, and find a
 wildling. Be warned! The wildlings like to spring out from the forest without
@@ -961,7 +956,7 @@ Z
 1 18208
 S
 #18265
-The Grove: A Sample of Wild Fire~
+Grove: A Sample of Wild Fire~
    The Guild is working on a new mana potion, based on a Magiterranean
 substance called 'wild fire'. Unfortunately, we've run out of samples to work
 with. Travel into the Magiterranean's mysterious Grove, and return with some of
@@ -991,7 +986,7 @@ Z
 1 18209
 S
 #18266
-The Grove: Wild Population~
+Grove: Wild Population~
    The Guild has been dealing with an infestation of wildlings from the
 Magiterranean. It's time for a show of force. You must invade the Grove and put
 an end to the infestation.
@@ -1359,7 +1354,7 @@ Z
 1 10452
 S
 #18277
-Speak to Nostrazak About the Guildhall~
+Guild of Adventurers: Speak to Nostrazak~
    Our local guildhall has forged something of a reputation for itself, but
 there has to be more we can do to improve our standing in the Guild of
 Adventurers. Travel back to headquarters at the Tipsy Tortoise Tavern and speak
@@ -1385,7 +1380,7 @@ Z
 1 18211
 S
 #18278
-Discuss Support With Your Superintendant~
+Guild of Adventurers: Discuss Support With Your Superintendant~
    Nostrazak pulls out a chair, turns it around, and sits backwards in it to
 talk to you -- a necessity for him, as his draconian tail no longer allows him
 to sit properly in a chair. Nostrazak explains that the Guild relies on its
@@ -1410,7 +1405,7 @@ Z
 1 18219
 S
 #18279
-Gather Support For Your Guildhall~
+Guild of Adventurers: Gather Support For Your Guildhall~
    The superintendant reviews Nostrazak's instructions, then retrieves a scroll
 from the desk and reads it carefully. 'Speak to our guildmage and librarian
 about finding these allies of the guild. Surely they will be able to help you.
@@ -1441,7 +1436,7 @@ Z
 1 18211
 S
 #18280
-Seek Support From Malfernes~
+Guild of Adventurers: Seek Support From Malfernes~
    The guild has many sorcerer allies, but the strongest is Archsorcerer
 Malfernes. However, Malfernes has been missing for some time -- millions of
 years, in fact. Last time anybody saw Malfernes, he was stuck in a tem-portal
@@ -1475,7 +1470,7 @@ Z
 1 18280
 S
 #18281
-Fetch the Cursed Chalice of Mill Manor~
+Mill Manor: Fetch the Cursed Chalice of Mill Manor~
    Archsorcerer Malfernes has long coveted powerful artifacts, but he has been
 unable to expand his collection while he's stuck in this time loop, deep in the
 distant past. You could win his support by traveling to Mill Manor, deep in the
@@ -1506,7 +1501,7 @@ Z
 1 18280
 S
 #18282
-Imagine Dragons~
+Wandering Dragon: Imagine Dragons~
    Archsorcerer Malfernes confides in you that he has a long-standing rivalry
 with High Sorceress Celiya after an incident involving a mutual former lover, a
 poorly-trained skeletal mammoth, and sixty-thousand barrels of manawine. But
@@ -1538,7 +1533,7 @@ Z
 1 18280
 S
 #18283
-Support From Malfernes~
+Guild of Adventurers: Support From Malfernes~
    Having secured support from the Archsorcerer Malfernes, you're ready to
 return to your local guildhall and inform your guildmage of your success.
 ~
@@ -1560,7 +1555,7 @@ Z
 1 18217
 S
 #18284
-Seek Support From Germione~
+Guild of Adventurers: Seek Support From Germione~
    Even when an adventurer retires, their affiliation with the guild continues.
 You must seek out one such former member, the hedge witch Germione, who lives in a
 hut on stilts in the swamp. Find the hut, pull down the rope ladder, and pay
@@ -1590,7 +1585,7 @@ Z
 1 19000
 S
 #18285
-Germione's Ratcatcher~
+Sewers: Germione's Ratcatcher~
    'The secret to training swamp rats is, they can't be trained,' Germione
 says. 'I have to import city rats and then hex them into swamp rats. You just
 can't train the real swamp rats like you can the city rats.'
@@ -1617,7 +1612,7 @@ Z
 1 19000
 S
 #18286
-Vengeance for Measley~
+Lost Temple: Vengeance for Measley~
    Germione leans forward and wipes a tear from her eye with a grotesque
 ratskin handkerchief as she tells you the story of her favorite pet, Measley.
 As a rust-colored rat, Measely was perfect for spying on Germione's enemies
@@ -1651,7 +1646,7 @@ Z
 1 19000
 S
 #18287
-Support From Germione~
+Guild of Adventurers: Support From Germione~
    Having secured support from the hedge witch Germione, you're ready to return
 to your local guildhall and inform the librarian of your success.
 ~
@@ -1674,7 +1669,7 @@ Z
 1 18218
 S
 #18288
-Seek Support From Scaldorran~
+Guild of Adventurers: Seek Support From Scaldorran~
    The guild has an ally working in a mid-level position in the Tower
 Skycleave. Like many sorcery towers, Skycleave sometimes teleports around from
 place to place. But it always announces its presence, so you may be able to
@@ -1705,7 +1700,7 @@ Z
 1 11936
 S
 #18289
-Procure a Roc Egg~
+Gigantic Nest: Procure a Roc Egg~
    Scaldorran has a deep, eternal hunger that can never be sated by earthly
 foods -- such is the fate of all liches. But the abominable Yetsy has recently
 shared a recipe for 1000 Year Eggs, and Scaldorran only needs a good Roc egg to
@@ -1740,7 +1735,7 @@ Z
 1 11936
 S
 #18290
-Bugging the Grand High Sorcerer~
+Skycleave: Bugging the Grand High Sorcerer~
    Scaldorran pulls you aside and casts a Cone of Silence around you. 'Between
 you and me,' he says, 'the Guild doesn't trust the Grand High Sorcerer. I need
 you to take this enchanted bug up to the office, and plant it while nobody is
@@ -1772,7 +1767,7 @@ Z
 1 11936
 S
 #18291
-Support From Scaldorran~
+Guild of Adventurers: Support From Scaldorran~
    Having secured support from the High Lich Scaldorran, you're ready to return
 to your local guildhall and inform your guildmage of your success.
 ~
@@ -1798,7 +1793,7 @@ Z
 1 18217
 S
 #18292
-Seek Support From Adventurer 13~
+Guild of Adventurers: Seek Support From Adventurer 13~
    The guild has eyes everywhere, from the courts of emperors, to the bottom of
 the canyon. One such pair of eyes belong to a man known only as Adventurer 13.
 His true identity is known only to Nostrazak and the other guild leaders, but
@@ -1826,7 +1821,7 @@ Z
 1 11101
 S
 #18293
-Fruit of the Serene Canyon~
+Burrow Canyons: Fruit of the Serene Canyon~
    Adventurer 13 has grown quite hungry living as a hermit in Burrow Canyons.
 But no ordinary food will sate this hunger. You must travel to the serene
 canyon hidden beyond the waterfall. Doing so will not be easy. Be prepared to
@@ -1859,7 +1854,7 @@ Z
 1 11101
 S
 #18294
-Message for the Goblins~
+Goblin Challenge: Message for the Goblins~
    After a long, strange story, you learn that Adventurer 13 has a
 long-standing grudge against Furl, war shaman of the goblins. It seems Furl has
 discovered the secret to immortality, allowing him to resurrect after every
@@ -1887,7 +1882,7 @@ Z
 1 11101
 S
 #18295
-Support From Adventurer 13~
+Guild of Adventurers: Support From Adventurer 13~
    Having secured support from Adventurer 13, you are ready to return to your
 local guildhall and inform the librarian of your success.
 ~

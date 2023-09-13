@@ -224,11 +224,16 @@ end
 Mob block higher template id~
 0 s 100
 ~
+* list of mobs you can sneak past
+set sneakable_list 10401 10402 10403 10406 10407 10408 10411 10412 10413
 * One quick trick to get the target room
 set room_var %self.room%
 eval to_room %%room_var.%direction%(room)%%
 * Compare template ids to figure out if they're going forward or back
 if (%actor.nohassle% || !%to_room% || %to_room.template% < %room_var.template%)
+  halt
+elseif %actor.aff_flagged(SNEAK)% && %sneakable_list% ~= %self.vnum%
+  * allow sneak
   halt
 end
 %send% %actor% You can't seem to get past ~%self%!

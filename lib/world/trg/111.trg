@@ -831,7 +831,7 @@ if %snake.vnum% == 11138
   end
   nop %snake.unscale_and_reset%
   * and aggro
-  %force% %snake% %aggro% %actor%
+  %force% %snake% maggro %actor%
 end
 %purge% %self%
 set sarcophagus_running 0
@@ -904,9 +904,9 @@ if %random.4% == 4
     end
     nop %dragonfly.unscale_and_reset%
     if %self.carried_by%
-      %force% %dragonfly% %aggro% %self.carried_by%
+      %force% %dragonfly% maggro %self.carried_by%
     else
-      %force% %dragonfly% %aggro%
+      %force% %dragonfly% maggro
     end
   end
 end
@@ -916,7 +916,7 @@ Chalice Expiration~
 1 f 0
 ~
 * Only works if still in the dungeon, otherwise decays naturally
-if %instance.id%
+if %self.varexists(instid)% && %instance.id% && %self.var(instid)% == %instance.id%
   %adventurecomplete%
   * swap in i11150 for the old stone marker
   %door% i11130 east room i11150
@@ -1024,6 +1024,22 @@ if %actor.is_pc% && %actor.empire%
   nop %actor.empire.start_progress(11130)%
 end
 ~
+#11142
+Mill Manor Chalice: Record location on load~
+1 n 100
+~
+if %instance.id%
+  set instid %instance.id%
+  remote instid %self.id%
+end
+detach 11142 %self.id%
+~
+#11143
+Mill Manor: Delayed despawn~
+1 f 0
+~
+%adventurecomplete%
+~
 #11150
 Mill Manor: Difficulty selector~
 1 c 4
@@ -1118,5 +1134,11 @@ if %start%
   remote difficulty %start.id%
 end
 %purge% %self%
+~
+#11151
+Mill Manor: Delayed despawn~
+1 f 0
+~
+%adventurecomplete%
 ~
 $

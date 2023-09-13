@@ -50,7 +50,7 @@ S
 #19005
 rope hanging ladder~
 a hanging rope~
-A rope hangs down from the bottom of the hut.~
+A rope hangs down from the bottom of the hut. (difficulty)~
    The rope appears to be attached to the rope ladder, and is therefore your
 ticket into the hut. You can select your difficulty here.
 Usage:  difficulty <normal | hard | group | boss>

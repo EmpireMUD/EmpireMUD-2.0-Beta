@@ -987,7 +987,7 @@ Reputation levels and values:
   &cLiked&0  100 to 299
   &aEsteemed&0  300 to 749
   &gVenerated&0  750 to 999
-  &gRevered&0  1000
+  &GRevered&0  1000
 #
 FIGHTMESSAGES "FIGHT MESSAGES" FMESSAGES "FIGHT SPAM" "COMBAT SPAM" "COMBAT MESSAGES"
 

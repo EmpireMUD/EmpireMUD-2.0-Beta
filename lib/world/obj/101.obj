@@ -359,7 +359,8 @@ rift monsoon~
 the rift~
 Monsoon rains blow through a strange rift in the world! (adventure)~
    Strong winds and huge droplets of rain come whipping out of the rift, making
-it hard to approach. It's difficult to see what's on the other side.
+it hard to approach. It's difficult to see what's on the other side. Type
+'&center rift&0' to find out!
 ~
 8 0 0 0 2
 -1 0 0
@@ -371,7 +372,7 @@ the rift~
 There's a giant rift torn in the fabric of reality.~
    The rift looks like a giant tear, hovering in the air before you. It seems
 to create a razor-thin portal between this hypercolor desert and the desert
-outside in what you consider the real world.
+outside in what you consider the real world. Type '&center rift&0' to get back out.
 ~
 8 0 0 0 2
 -1 0 0

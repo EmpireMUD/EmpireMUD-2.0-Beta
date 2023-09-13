@@ -693,7 +693,7 @@ M
 621 10.00 c
 X
 weirdwood weald grove thicket woods weirdwoods trees forest around lights boughs blue pink violet~
-   You find yourself in the middle of a forest of twisting, violet trees. 
+   You find yourself in the middle of a forest of twisting, violet trees.
 Light dances in the boughs in shades of pink and blue, but you can't tell if
 the trees are catching it or making it. There's a strange sense of... You can't
 quite put your finger on it. But whatever it is, this thicket is full of it.
@@ -843,7 +843,7 @@ M
 621 10.00 c
 X
 weirdwood weald grove thicket woods weirdwoods trees forest around lights boughs blue pink violet~
-   You find yourself in the middle of a forest of twisting, violet trees. 
+   You find yourself in the middle of a forest of twisting, violet trees.
 Light dances in the boughs in shades of pink and blue, but you can't tell if
 the trees are catching it or making it. There's a strange sense of... You can't
 quite put your finger on it. But whatever it is, this grove is full of it.
@@ -1051,7 +1051,7 @@ M
 621 10.00 c
 X
 weirdwood weald grove thicket woods weirdwoods trees forest around lights boughs blue pink violet~
-   You find yourself in the middle of a forest of twisting, violet trees. 
+   You find yourself in the middle of a forest of twisting, violet trees.
 Light dances in the boughs in shades of pink and blue, but you can't tell if
 the trees are catching it or making it. There's a strange sense of... You can't
 quite put your finger on it. But whatever it is, this weald is full of it.
@@ -1266,7 +1266,7 @@ S
 #618
 Shady Enchanted Oasis~
 A Shady Enchanted Oasis~
-'.' 35 ikoqv 6 diw jp
+'.' 35 ikoqv 6 adiw jp
 C
 chop, dig, drink, fill, pick~
 D0

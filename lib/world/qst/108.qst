@@ -408,7 +408,7 @@ Z
 1 10803
 S
 #10825
-The Perfect Rock~
+Museum: The Perfect Rock~
    Horation is looking for just the right rock to represent the Stone Age. It
 needs to be slightly gray or brown, between the size of a pea and the size of
 your fist, and either smooth or rough. Basically, any rock will do. You never
@@ -463,7 +463,7 @@ Z
 1 10826
 S
 #10827
-Collect Basic Resources~
+Museum: Collect Basic Resources~
    Horation explains that he is trying to open a museum to show off the
 accomplishments of Early Man that led to the first empires and the dawn of
 civilization. The real problem is that nobody will fund an archaeological dig
@@ -505,7 +505,7 @@ Z
 1 10826
 S
 #10828
-Make Stone Tools~
+Museum: Make Stone Tools~
 The curator needs you to make some basic stone tools for the museum.
 Craft 2 handaxes and 2 spear heads:
  1. 'Use' a regular rock and then type 'chip flint'.
@@ -552,7 +552,7 @@ Z
 1 10826
 S
 #10829
-Make Axes and Spears~
+Museum: Make Axes and Spears~
 The curator needs more tools for the exhibit.
 Craft a stone axe:
  1. You should still have handaxes and handles from the previous quest. If not,
@@ -597,7 +597,7 @@ Z
 1 10826
 S
 #10830
-Collect More Materials~
+Museum: Collect More Materials~
 The curator wants you to collect some more advanced resources.
 Get 2 small leather:
  1. Kill small animals like squirrels, meerkats, or rabbits.
@@ -644,7 +644,7 @@ Z
 1 10826
 S
 #10831
-Create Early Building Materials~
+Museum: Create Early Building Materials~
    The curator would like you to create some of early man's best building
 materials using the supplies you collected. This will require the
 Basic Crafts ability. You can type 'skill trade' to see it.
@@ -691,7 +691,7 @@ Z
 1 10826
 S
 #10832
-Examples of Early Sewing~
+Museum: Examples of Early Sewing~
 The curator needs some examples of early sewn crafts.
 Steps:
  1. You need at least level 5 Trade skill.
@@ -732,7 +732,7 @@ Z
 1 10826
 S
 #10833
-Examples of Early Pottery~
+Museum: Examples of Early Pottery~
 The curator needs some examples of early pottery.
 Steps:
  1. You need at least level 10 Trade skill.
@@ -774,7 +774,7 @@ Z
 1 10826
 S
 #10834
-Examples of Early Woodworking~
+Museum: Examples of Early Woodworking~
 The curator wants you to make some examples of early woodworking.
 Steps:
  1. You need at least 15 Trade skill.
@@ -816,7 +816,7 @@ Z
 1 10826
 S
 #10835
-Examples of Smithed Tools~
+Museum: Examples of Smithed Tools~
 The curator would like you to forge some metal tools.
 Steps:
  1. Type 'skill buy forge'.
@@ -861,7 +861,7 @@ Z
 1 10826
 S
 #10836
-A Master's Journey~
+Museum: A Master's Journey~
    The journey to becoming a master craftsman is long and difficult, and this
 is only the beginning. For now, help Horation build his Museum of Early Man.
 But if you choose to seek out mastery of your craft, return to Horation's
@@ -895,7 +895,7 @@ Z
 1 10827
 S
 #10837
-A Grandmaster's Journey~
+Museum: A Grandmaster's Journey~
    Horation seems pleased to meet such a skilled craftsman. His museum may be
 dedicated to the early history of mankind's crafts, but he always likes to
 encourage modern artisans. He's willing to give you one of his infamous
