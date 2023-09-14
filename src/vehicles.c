@@ -1475,6 +1475,144 @@ void add_room_to_vehicle(room_data *room, vehicle_data *veh) {
 
 
 /**
+* Applies a vehicle's techs and other numeric data to the island.
+*
+* WARNING: This is only to be called from apply/unapply-vehicle-to-room, and is
+* part of that process. Calling it separately risks getting this data out of
+* sync.
+*
+* @param vehicle_data *veh The vehicle to update.
+* @param int island_id Which island to apply it to.
+* @param bool add Adds the techs/data if TRUE, or removes them if FALSE.
+*/
+static void apply_vehicle_tech(vehicle_data *veh, int island_id, bool add) {
+	struct empire_territory_data *ter;
+	struct empire_npc_data *npc;
+	struct vehicle_room_list *vrl;
+	struct empire_island *e_isle;
+	empire_data *emp;
+	int amt = add ? 1 : -1;	// adding or removing 1
+	
+	// only care about
+	if (!veh || !(emp = VEH_OWNER(veh)) || !VEH_IS_COMPLETE(veh)) {
+		return;
+	}
+	
+	// for stuff that needs an island
+	e_isle = (island_id == NO_ISLAND) ? NULL : get_empire_island(emp, island_id);
+	
+	if (IS_SET(VEH_FUNCTIONS(veh), FNC_DOCKS)) {
+		EMPIRE_TECH(emp, TECH_SEAPORT) += amt;
+		if (e_isle) {
+			e_isle->tech[TECH_SEAPORT] += amt;
+		}
+	}
+	
+	// local traits
+	if (e_isle) {
+		// TODO: count vehicle artisan as population?
+		
+		// count population on interior rooms
+		LL_FOREACH(VEH_ROOM_LIST(veh), vrl) {
+			if ((ter = find_territory_entry(emp, vrl->room))) {
+				LL_FOREACH(ter->npcs, npc) {
+					e_isle->population += amt;
+				}
+			}
+		}
+	}
+	
+	// global traits
+	EMPIRE_MILITARY(emp) += VEH_MILITARY(veh) * amt;
+	EMPIRE_FAME(emp) += VEH_FAME(veh) * amt;
+	
+	// TODO: this should be moved to apply-to-island, probably
+	// re-send claim info in case it changed
+	update_MSDP_empire_data_all(emp, TRUE, TRUE);
+}
+
+
+/**
+* Applies a vehicle's traits/data to an island, including empire-island data if
+* it's claimed. This also sets up the inside of the vehicle.
+*
+* @param vehicle_data *veh The vehicle.
+* @param int island_id Which island to apply to, if any.
+*/
+void apply_vehicle_to_island(vehicle_data *veh, int island_id) {
+	struct vehicle_room_list *vrl;
+	struct island_info *isle;
+	vehicle_data *iter;
+	
+	if (!veh || VEH_APPLIED_TO_ISLAND(veh) == island_id) {
+		return;	// no change or no vehicle
+	}
+	
+	// remove first
+	unapply_vehicle_to_island(veh);
+	
+	// update island id
+	VEH_APPLIED_TO_ISLAND(veh) = island_id;
+	
+	// update island pointers inside
+	if (VEH_ROOM_LIST(veh)) {
+		isle = (island_id != NO_ISLAND) ? get_island(island_id, TRUE) : NULL;
+		
+		LL_FOREACH(VEH_ROOM_LIST(veh), vrl) {
+			if (GET_ISLAND_ID(vrl->room) != island_id || GET_ISLAND(vrl->room) != isle) {
+				GET_ISLAND_ID(vrl->room) = island_id;
+				GET_ISLAND(vrl->room) = isle;
+				request_world_save(GET_ROOM_VNUM(vrl->room), WSAVE_ROOM);
+				
+				// check vehicles inside and cascade
+				DL_FOREACH2(ROOM_VEHICLES(vrl->room), iter, next_in_room) {
+					apply_vehicle_to_island(iter, island_id);
+				}
+			}
+		}
+	}
+	
+	// and apply tech
+	apply_vehicle_tech(veh, island_id, TRUE);
+}
+
+
+/**
+* Applies a vehicle's traits to a room. If they were already applied to another
+* room, they will be removed from there first -- unless the two rooms are on
+* the same island, in which case the applied-to-room is merely updated.
+*
+* @param vehicle_data *veh The vehicle.
+* @param room_data *room The room to apply it to.
+*/
+void apply_vehicle_to_room(vehicle_data *veh, room_data *room) {
+	struct vehicle_room_list *vrl;
+	vehicle_data *iter;
+	
+	// apply to island first
+	apply_vehicle_to_island(veh, room ? GET_ISLAND_ID(room) : NO_ISLAND);
+	
+	if (room == VEH_APPLIED_TO_ROOM(veh)) {
+		return;	// same room / no work
+	}
+	
+	// ok: remove from old room first
+	unapply_vehicle_to_room(veh);
+	VEH_APPLIED_TO_ROOM(veh) = room;
+	
+	// update room pointers inside
+	LL_FOREACH(VEH_ROOM_LIST(veh), vrl) {
+		GET_MAP_LOC(vrl->room) = GET_MAP_LOC(room);
+		
+		// check vehicles inside and cascade
+		DL_FOREACH2(ROOM_VEHICLES(vrl->room), iter, next_in_room) {
+			apply_vehicle_to_room(iter, room);
+		}
+	}
+}
+
+
+/**
 * Checks for common vehicle problems and reports them to ch.
 *
 * @param vehicle_data *veh The item to audit.
@@ -2323,6 +2461,42 @@ void store_one_vehicle_to_file(vehicle_data *veh, FILE *fl) {
 	}
 	
 	fprintf(fl, "Vehicle-end\n");
+}
+
+
+/**
+* Removes a vehicle's traits from an island.
+*
+* @param vehicle_data *veh The vehicle.
+*/
+void unapply_vehicle_to_island(vehicle_data *veh) {
+	if (veh && VEH_APPLIED_TO_ISLAND(veh) != NO_ISLAND) {
+		// un-apply tech
+		apply_vehicle_tech(veh, VEH_APPLIED_TO_ISLAND(veh), FALSE);
+		
+		// NOTE: do not remove the island-id on the interior rooms -- do this only when applying to a new room
+		
+		// and clear the data
+		VEH_APPLIED_TO_ISLAND(veh) = NO_ISLAND;
+	}
+}
+
+
+/**
+* Removes a vehicle's traits from a room.
+*
+* @param vehicle_data *veh The vehicle.
+*/
+void unapply_vehicle_to_room(vehicle_data *veh) {
+	// island first
+	unapply_vehicle_to_island(veh);
+	
+	if (veh && VEH_APPLIED_TO_ROOM(veh)) {
+		// NOTE: do not remove the map-loc on the interior rooms -- do this only when applying to a new room
+		
+		// and clear the data
+		VEH_APPLIED_TO_ROOM(veh) = NULL;
+	}
 }
 
 
