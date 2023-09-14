@@ -184,7 +184,7 @@ COMMAND
 Command (Vampire ability)
 
 Usage:  command <name> <task> [sentence]
-Debuff type:  Vampire
+Debuff type:  mental
 
 A vampire with this power can look deep into the eyes of men and command them
 to do simple tasks. The task can be just one word, which must be spoken aloud
@@ -316,6 +316,8 @@ The vampire dissolves into mist, unable to be harmed. Many spells and abilities
 cannot be used while in this state, and you cannot use it in combat. However,
 you can move around while transformed.
 
+Although the mist form can't fly, it can cross water freely.
+
 Gains experience when you finish transforming into mist.
 
 See also: MORPH
@@ -363,6 +365,8 @@ With Vampire up to level 50, this regenerates 1 per blood point. Up to 75,
 it regenerates 1.5. And higher than that, it regenerates 2.5.
 
 Gains experience whenever you use this ability.
+
+This is different from normal regeneration; see also: REGENS
 #
 "SANGUINE RESTORATION"
 
@@ -502,7 +506,7 @@ Weaken (Vampire ability)
 Usage:  weaken [victim]
 Cooldown:  75 seconds
 Cost:  50 blood
-Debuff type:  Vampire
+Debuff type:  physical
 
 A vampire who is learned in the ways of blood can use her own blood to drain
 the strength and intelligence of others for 75 seconds.

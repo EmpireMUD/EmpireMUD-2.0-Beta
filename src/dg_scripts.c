@@ -35,6 +35,7 @@ extern unsigned long main_game_pulse;
 int eval_lhs_op_rhs(char *expr, char *result, void *go, struct script_data *sc, trig_data *trig, int type);
 struct cmdlist_element *find_case(trig_data *trig, struct cmdlist_element *cl, void *go, struct script_data *sc, int type, char *cond);
 void process_eval(void *go, struct script_data *sc, trig_data *trig, int type, char *cmd);
+void var_subst(void *go, struct script_data *sc, trig_data *trig, int type, char *line, char *buf);
 
 
 int trgvar_in_room(room_vnum vnum) {
@@ -1135,7 +1136,7 @@ EVENTFUNC(trig_wait_event) {
 
 void do_stat_trigger(char_data *ch, trig_data *trig) {
 	struct cmdlist_element *cmd_list;
-	char sb[MAX_STRING_LENGTH], buf[MAX_STRING_LENGTH];
+	char sb[MAX_STRING_LENGTH * 2], buf[MAX_STRING_LENGTH], temp[MAX_STRING_LENGTH];
 	int len = 0;
 
 	if (!trig) {
@@ -1183,12 +1184,15 @@ void do_stat_trigger(char_data *ch, trig_data *trig) {
 
 	cmd_list = trig->cmdlist;
 	while (cmd_list) {
-		if (cmd_list->cmd)
-			len += snprintf(sb + len, sizeof(sb)-len, "%s\r\n", show_color_codes(cmd_list->cmd));
-
-		if (len > MAX_CMD_LENGTH) {
-			len += snprintf(sb + len, sizeof(sb)-len, "*** Overflow - script too long! ***\r\n");
-			break;
+		if (cmd_list->cmd) {
+			strcpy(temp, show_color_codes(cmd_list->cmd));
+			if (len + strlen(temp) + 2 < sizeof(sb)) {
+				len += snprintf(sb + len, sizeof(sb)-len, "%s\r\n", temp);
+			}
+			else {
+				len += snprintf(sb + len, sizeof(sb)-len, "*** Overflow - script too long! ***\r\n");
+				break;
+			}
 		}
 		
 		cmd_list = cmd_list->next;
@@ -1295,7 +1299,7 @@ void do_sstat_room(char_data *ch) {
 
 
 void do_sstat_object(char_data *ch, obj_data *j) {
-	msg_to_char(ch, "Script information (id %d):\r\n", j->script_id);
+	msg_to_char(ch, "Script information (id %d):\r\n", SCRIPT(j) ? obj_script_id(j) : j->script_id);
 	if (!SCRIPT(j)) {
 		msg_to_char(ch, "  None.\r\n");
 		return;
@@ -1306,7 +1310,7 @@ void do_sstat_object(char_data *ch, obj_data *j) {
 
 
 void do_sstat_character(char_data *ch, char_data *k) {
-	msg_to_char(ch, "Script information (id %d):\r\n", k->script_id);
+	msg_to_char(ch, "Script information (id %d):\r\n", SCRIPT(k) ? char_script_id(k) : k->script_id);
 	if (!SCRIPT(k)) {
 		msg_to_char(ch, "  None.\r\n");
 		return;
@@ -1979,7 +1983,7 @@ void script_log_by_type(int go_type, void *go, const char *format, ...) {
 }
 
 
-int text_processed(char *field, char *subfield, struct trig_var_data *vd, char *str, size_t slen) {
+int text_processed(char *field, char *subfield, struct trig_var_data *vd, char *str, size_t slen, void *go, struct script_data *sc, trig_data *trig, int type) {
 	char *p, *p2;
 	char tmpvar[MAX_STRING_LENGTH];
 
@@ -2006,6 +2010,23 @@ int text_processed(char *field, char *subfield, struct trig_var_data *vd, char *
 	}
 	else if (!str_cmp(field, "ana")) {                 /* ana or an/a       */
 		snprintf(str, slen, "%s", AN(vd->value));
+		return TRUE;
+	}
+	else if (!str_cmp(field, "cap")) {                 // capitalize first letter
+		snprintf(str, slen, "%s", vd->value);
+		for (p = str; *p; ++p) {
+			if (isspace(*p)) {
+				continue;
+			}
+			else if (*p == COLOUR_CHAR && *(p + 1)) {
+				++p;	// skip one for & (color char)
+			}
+			else if (isdigit(*p) || isalpha(*p)) {
+				// found an alpha/numeric char? cap it and break
+				CAP(p);
+				break;
+			}
+		}
 		return TRUE;
 	}
 	else if (!str_cmp(field, "char")) {
@@ -2043,6 +2064,15 @@ int text_processed(char *field, char *subfield, struct trig_var_data *vd, char *
 		snprintf(str, slen, "%s", cdr);
 		return TRUE;
 	}
+	else if (!str_cmp(field, "empty")) {
+		if (!str_cmp(vd->value, "") || !str_cmp(vd->value, "0")) {
+			snprintf(str, slen, "1");
+		}
+		else {
+			snprintf(str, slen, "0");
+		}
+		return TRUE;
+	}
 	else if (!str_cmp(field, "index_of")) {
 		char *find;
 		if (subfield && *subfield && (find = strchr(vd->value, *subfield))) {
@@ -2065,7 +2095,14 @@ int text_processed(char *field, char *subfield, struct trig_var_data *vd, char *
 			snprintf(str, slen, "%s", cmd_info[cmd].command);
 		return TRUE;
 	}
-
+	else if (!str_cmp(field, "process")) {
+		// processes substitutions
+		char temp[MAX_INPUT_LENGTH];
+		var_subst(go, sc, trig, type, vd->value, temp);
+		snprintf(str, slen, "%s", temp);
+		return TRUE;
+	}
+	
 	return FALSE;
 }
 
@@ -2171,6 +2208,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 		"send",
 		"siege",
 		"slay",
+		"subecho",
 		"teleport",
 		"terracrop",
 		"terraform",
@@ -2641,6 +2679,44 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					strcpy(str, "UNKNOWN");
 				}
 			}
+			else if (!str_cmp(var, "language")) {
+				generic_data *lang = NULL;
+				
+				// look up language
+				if (subfield && *subfield) {
+					if (isdigit(*subfield)) {
+						lang = find_generic(atoi(subfield), GENERIC_LANGUAGE);
+					}
+					if (!lang) {
+						lang = find_generic_no_spaces(GENERIC_LANGUAGE, subfield);
+					}
+				}
+				
+				if (!str_cmp(field, "name")) {
+					snprintf(str, slen, "%s", lang ? GEN_NAME(lang) : "");
+				}
+				else if (!str_cmp(field, "short")) {
+					char temp[1024];
+					int pos;
+					
+					strcpy(temp, lang ? GEN_NAME(lang) : "");
+					for (pos = 0; pos < strlen(temp); ++pos) {
+						if (temp[pos] == ' ') {
+							temp[pos] = '-';
+						}
+						else {
+							temp[pos] = LOWER(temp[pos]);
+						}
+					}
+					snprintf(str, slen, "%s", temp);
+				}
+				else if (!str_cmp(field, "vnum")) {
+					snprintf(str, slen, "%d", lang ? GEN_VNUM(lang) : -1);
+				}
+				else {
+					snprintf(str, slen, "UNKNOWN");
+				}
+			}
 			else if (!str_cmp(var, "random")) {
 				if (!str_cmp(field, "char") || !str_cmp(field, "ally") || !str_cmp(field, "enemy")) {
 					bool ally = (!str_cmp(field, "ally") ? TRUE : FALSE);
@@ -2732,7 +2808,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 		}
 
 		if (c) {
-			if (text_processed(field, subfield, vd, str, slen))
+			if (text_processed(field, subfield, vd, str, slen, go, sc, trig, type))
 				return;
 
 			else if (!str_cmp(field, "global")) { /* get global of something else */
@@ -2760,7 +2836,10 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						}
 					}
 					else if (!str_cmp(field, "action")) {
-						if (IS_NPC(c) || GET_ACTION(c) == ACT_NONE) {
+						if (GET_FEEDING_FROM(c)) {
+							snprintf(str, slen, "feeding");
+						}
+						else if (IS_NPC(c) || GET_ACTION(c) == ACT_NONE) {
 							strcpy(str, "");	// none
 						}
 						else if (GET_ACTION(c) == ACT_GEN_CRAFT) {
@@ -2871,6 +2950,15 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 							*str = '\0';
 						}
 					}
+					else if (!str_cmp(field, "adventure_summoned_from")) {
+						room_data *find;
+						if (!IS_NPC(c) && PLR_FLAGGED(c, PLR_ADVENTURE_SUMMONED) && (find = real_room(GET_ADVENTURE_SUMMON_RETURN_LOCATION(c)))) {
+							snprintf(str, slen, "%c%d", UID_CHAR, room_script_id(find));
+						}
+						else {
+							snprintf(str, slen, "0");
+						}
+					}
 					else if (!str_cmp(field, "aff_flagged")) {
 						if (subfield && *subfield) {
 							bitvector_t pos = search_block(subfield, affected_bits, FALSE);
@@ -2940,18 +3028,31 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					break;
 				}
 				case 'b': {	// char.b*
-					if (!str_cmp(field, "block")) {
+					if (!str_cmp(field, "biting")) {
+						if (GET_FEEDING_FROM(c)) {
+							snprintf(str, slen, "%c%d", UID_CHAR, char_script_id(GET_FEEDING_FROM(c)));
+						}
+						else {
+							*str = '\0';
+						}
+					}
+					else if (!str_cmp(field, "bitten_by")) {
+						if (GET_FED_ON_BY(c)) {
+							snprintf(str, slen, "%c%d", UID_CHAR, char_script_id(GET_FED_ON_BY(c)));
+						}
+						else {
+							*str = '\0';
+						}
+					}
+					else if (!str_cmp(field, "block")) {
 						snprintf(str, slen, "%d", get_block_rating(c, FALSE));
 					}
 					else if (!str_cmp(field, "blood")) {
 						if (subfield && *subfield) {
 							int amt = atoi(subfield);
 							if (amt != 0) {
-								GET_BLOOD(c) += amt;
-								GET_BLOOD(c) = MAX(GET_BLOOD(c), 0);
-								GET_BLOOD(c) = MIN(GET_BLOOD(c), GET_MAX_BLOOD(c));
-								
-								if (GET_BLOOD(c) == 0) {
+								set_blood(c, GET_BLOOD(c) + amt);
+								if (GET_BLOOD(c) <= 0) {
 									out_of_blood(c);
 								}
 							}
@@ -2992,7 +3093,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					/*
 					else if (!str_cmp(field, "coins")) {
 						// TODO possibly a way to specify coin type or do it by actor's loyalty?
-						// nop %ch.coins(10)%
+						// nop %c.coins(10)%
 						if (subfield && *subfield) {
 							int addition = atoi(subfield);
 							increase_coins(c, OTHER_COIN, addition);
@@ -3030,6 +3131,76 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 							cancel_adventure_summon(c);
 						}
 						*str = '\0';
+					}
+					else if (!str_cmp(field, "can_recognize_lang")) {
+						// arg1: language name/vnum
+						// arg2: optional on/off to toggle recognize
+						char arg1[256], arg2[256];
+						int mode;
+						generic_data *lang = NULL;
+						
+						comma_args(subfield, arg1, arg2);
+						
+						// load language
+						if (*arg1) {
+							if (isdigit(*arg1)) {
+								lang = find_generic(atoi(arg1), GENERIC_LANGUAGE);
+							}
+							if (!lang) {
+								lang = find_generic_no_spaces(GENERIC_LANGUAGE, arg1);
+							}
+						}
+						
+						// optional toggle on/off
+						if (!IS_NPC(c) && *arg2 && lang) {
+							if (!str_cmp(arg2, "1") || !str_cmp(arg2, "on")) {
+								if (speaks_language(c, GEN_VNUM(lang)) != LANG_SPEAK) {
+									add_language(c, GEN_VNUM(lang), LANG_RECOGNIZE);
+								}
+							}
+							else if (!str_cmp(arg2, "0") || !str_cmp(arg2, "off")) {
+								if (speaks_language(c, GEN_VNUM(lang)) != LANG_SPEAK) {
+									add_language(c, GEN_VNUM(lang), LANG_UNKNOWN);
+								}
+							}
+							check_languages(c);
+						}
+						
+						// and show recognizability
+						mode = lang ? speaks_language(c, GEN_VNUM(lang)) : LANG_UNKNOWN;
+						snprintf(str, slen, "%d", (mode == LANG_RECOGNIZE || mode == LANG_SPEAK) ? 1 : 0);
+					}
+					else if (!str_cmp(field, "can_speak")) {
+						// arg1: language name/vnum
+						// arg2: optional on/off to toggle speaking
+						char arg1[256], arg2[256];
+						generic_data *lang = NULL;
+						
+						comma_args(subfield, arg1, arg2);
+						
+						// load language
+						if (*arg1) {
+							if (isdigit(*arg1)) {
+								lang = find_generic(atoi(arg1), GENERIC_LANGUAGE);
+							}
+							if (!lang) {
+								lang = find_generic_no_spaces(GENERIC_LANGUAGE, arg1);
+							}
+						}
+						
+						// optional toggle on/off
+						if (!IS_NPC(c) && *arg2 && lang) {
+							if (!str_cmp(arg2, "1") || !str_cmp(arg2, "on")) {
+								add_language(c, GEN_VNUM(lang), LANG_SPEAK);
+							}
+							else if (!str_cmp(arg2, "0") || !str_cmp(arg2, "off")) {
+								add_language(c, GEN_VNUM(lang), LANG_UNKNOWN);
+							}
+							check_languages(c);
+						}
+						
+						// and show speakability
+						snprintf(str, slen, "%d", (lang && speaks_language(c, GEN_VNUM(lang)) == LANG_SPEAK) ? 1 : 0);
 					}
 					else if (!str_cmp(field, "can_start_quest")) {
 						if (subfield && *subfield && isdigit(*subfield)) {
@@ -3173,6 +3344,14 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 							*str = '\0';
 						}
 					}
+					else if (!str_cmp(field, "command_lag")) {
+						// true/false if the character is in a "wait", OR sets a wait
+						int wait_type;
+						if (subfield && *subfield && (wait_type = search_block(subfield, wait_types, FALSE)) != NOTHING) {
+							command_lag(c, wait_type);
+						}
+						snprintf(str, slen, "%d", (GET_WAIT_STATE(c) > 0 ? 1 : 0));
+					}
 					else if (!str_cmp(field, "completed_quest")) {
 						if (subfield && *subfield && isdigit(*subfield)) {
 							any_vnum vnum = atoi(subfield);
@@ -3214,6 +3393,45 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						}
 						else {
 							strcpy(str, "0");
+						}
+					}
+					else if (!str_cmp(field, "custom")) {
+						// default to empty
+						*str = '\0';
+						if (subfield && *subfield && IS_NPC(c)) {
+							char arg1[256], arg2[256];
+							int ctype, count = 0, pos = -1;
+							struct custom_message *mcm, *found_mcm = NULL;
+							
+							comma_args(subfield, arg1, arg2);
+							if (*arg1 && (ctype = search_block(arg1, mob_custom_types, FALSE)) != NOTHING) {
+								if (*arg2) {	// optional message pos
+									pos = atoi(arg2);
+								}
+								
+								// valid type
+								LL_FOREACH(MOB_CUSTOM_MSGS(c), mcm) {
+									if (mcm->type != ctype) {
+										continue;
+									}
+									
+									// seems valid
+									if (pos != -1 && pos-- <= 0) {
+										// only looking for 1
+										found_mcm = mcm;
+										break;
+									}
+									else if (pos == -1 && (!number(0, count++) || !found_mcm)) {
+										// picking at random
+										found_mcm = mcm;
+									}
+								}
+								
+								// did we find one
+								if (found_mcm) {
+									snprintf(str, slen, "%s", NULLSAFE(found_mcm->msg));
+								}
+							}
 						}
 					}
 
@@ -3281,6 +3499,12 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						}
 						else {
 							*str = '\0';
+						}
+					}
+					else if (!str_cmp(field, "end_adventure_summon")) {
+						*str = '\0';
+						if (IS_NPC(c) && PLR_FLAGGED(c, PLR_ADVENTURE_SUMMONED)) {
+							adventure_unsummon(c);
 						}
 					}
 					else if (!str_cmp(field, "eq")) {
@@ -3355,6 +3579,12 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						else {
 							snprintf(str, slen, "%s", GET_PC_NAME(c));
 						}
+					}
+					else if (!str_cmp(field, "flush_queue")) {
+						if (c->desc) {
+							send_stacked_msgs(c->desc);
+						}
+						*str = '\0';
 					}
 					else if (!str_cmp(field, "follower")) {
 						struct follow_type *fol;
@@ -3433,7 +3663,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 							
 							comma_args(subfield, arg1, arg2);
 							if (*arg1 && *arg2 && (sk = find_skill(arg1)) && (amount = atoi(arg2)) != 0 && noskill_ok(c, SKILL_VNUM(sk))) {
-								gain_skill(c, sk, amount);
+								gain_skill(c, sk, amount, NULL);
 								snprintf(str, slen, "1");
 							}
 						}
@@ -3493,7 +3723,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						}
 						else {
 							add_to_resource_list(&resources, RES_COMPONENT, GEN_VNUM(cmp), atoi(arg2), 0);
-							snprintf(str, slen, "%d", has_resources(c, resources, FALSE, FALSE) ? 1 : 0);
+							snprintf(str, slen, "%d", has_resources(c, resources, FALSE, FALSE, NULL) ? 1 : 0);
 							free_resource_list(resources);
 						}
 					}
@@ -3557,7 +3787,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 							if (*arg1 && *arg2 && (vnum = atoi(arg1)) > 0 && (amt = atoi(arg2)) > 0) {
 								add_to_resource_list(&res, RES_OBJECT, vnum, amt, 0);
 								
-								if (has_resources(c, res, can_use_room(c, IN_ROOM(c), GUESTS_ALLOWED), FALSE)) {
+								if (has_resources(c, res, can_use_room(c, IN_ROOM(c), GUESTS_ALLOWED), FALSE, NULL)) {
 									snprintf(str, slen, "1");
 								}
 								
@@ -3599,6 +3829,16 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					else if (!str_cmp(field, "heshe"))
 						snprintf(str, slen, "%s", HSSH(c));
 
+					else if (!str_cmp(field, "highest_level")) {
+						if (IS_NPC(c)) {
+							int lev = get_approximate_level(c);
+							snprintf(str, slen, "%d", MAX(lev, GET_MAX_SCALE_LEVEL(c)));
+						}
+						else {
+							snprintf(str, slen, "%d", GET_HIGHEST_KNOWN_LEVEL(c));
+						}
+					}
+
 					else if (!str_cmp(field, "himher"))
 						snprintf(str, slen, "%s", HMHR(c));
 
@@ -3625,9 +3865,9 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					break;
 				}
 				case 'i': {	// char.i*
-					if (!str_cmp(field, "id"))
+					if (!str_cmp(field, "id")) {
 						snprintf(str, slen, "%d", char_script_id(c));
-
+					}
 					else if (!str_cmp(field, "is_name")) {
 						if (subfield && *subfield && match_char_name(NULL, c, subfield, NOBITS)) {
 							snprintf(str, slen, "1");
@@ -3720,6 +3960,24 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					else if (!str_cmp(field, "is_immortal")) {
 						snprintf(str, slen, "%d", IS_IMMORTAL(c) ? 1 : 0);
 					}
+					else if (!str_cmp(field, "is_tagged_by")) {
+						char_data *targ;
+						if (subfield && *subfield && (targ = get_char(subfield))) {
+							if (IS_NPC(targ) && GET_LEADER(targ)) {
+								targ = GET_LEADER(targ);
+							}
+							snprintf(str, slen, "%d", IS_TAGGED_BY(c, targ) ? 1 : 0);
+						}
+						else {
+							strcpy(str, "0");
+						}
+					}
+					else if (!str_cmp(field, "is_scaled")) {
+						snprintf(str, slen, "%d", (IS_NPC(c) && GET_CURRENT_SCALE_LEVEL(c) > 0) ? 1 : 0);
+					}
+					else if (!str_cmp(field, "is_waterwalking")) {
+						snprintf(str, slen, HAS_WATERWALK(c) ? "1" : "0");
+					}
 
 					else if (!str_cmp(field, "int") || !str_cmp(field, "intelligence")) {
 						snprintf(str, slen, "%d", GET_INTELLIGENCE(c));
@@ -3767,6 +4025,23 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						}
 						*str = '\0';
 					}
+					else if (!str_cmp(field, "link_adventure_summon")) {
+						*str = '\0';
+						if (!IS_NPC(c) && PLR_FLAGGED(c, PLR_ADVENTURE_SUMMONED)) {
+							struct instance_data *inst = find_instance_by_room(IN_ROOM(c), FALSE, FALSE);
+							GET_ADVENTURE_SUMMON_INSTANCE_ID(c) = inst ? INST_ID(inst) : NOTHING;
+						}
+					}
+					else if (!str_cmp(field, "linked_to_instance")) {
+						struct instance_data *inst;
+						room_data *froom = (subfield && *subfield) ? get_room(IN_ROOM(c), subfield) : IN_ROOM(c);
+						if (IS_NPC(c) && froom && (inst = find_instance_by_room(froom, FALSE, TRUE)) && MOB_INSTANCE_ID(c) == inst->id) {
+							snprintf(str, slen, "1");
+						}
+						else {
+							snprintf(str, slen, "0");
+						}
+					}
 					else if (!str_cmp(field, "longdesc")) {
 						snprintf(str, slen, "%s", GET_LONG_DESC(c));
 						// trim trailing CRLFs
@@ -3777,7 +4052,21 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					break;
 				}
 				case 'm': {	// char.m*
-					if (!str_cmp(field, "maxcarrying")) {
+					if (!str_cmp(field, "mark_adventure_summoned_from")) {
+						*str = '\0';
+						if (!IS_NPC(c)) {
+							struct map_data *map;
+							if (!PLR_FLAGGED(c, PLR_ADVENTURE_SUMMONED)) {
+								// ensure this is not set
+								GET_ADVENTURE_SUMMON_INSTANCE_ID(c) = NOTHING;
+							}
+							SET_BIT(PLR_FLAGS(c), PLR_ADVENTURE_SUMMONED);
+							GET_ADVENTURE_SUMMON_RETURN_LOCATION(c) = GET_ROOM_VNUM(IN_ROOM(c));
+							map = GET_MAP_LOC(IN_ROOM(c));
+							GET_ADVENTURE_SUMMON_RETURN_MAP(c) = map ? map->vnum : NOWHERE;
+						}
+					}
+					else if (!str_cmp(field, "maxcarrying")) {
 						snprintf(str, slen, "%d", CAN_CARRY_N(c));
 					}
 					else if (!str_cmp(field, "maxhitp") || !str_cmp(field, "maxhealth"))
@@ -3789,8 +4078,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					else if (!str_cmp(field, "mana")) {
 						int amt;
 						if (subfield && *subfield && (amt = atoi(subfield))) {
-							GET_MANA(c) += amt;
-							GET_MANA(c) = MIN(GET_MAX_MANA(c), MAX(GET_MANA(c), 0));
+							set_mana(c, GET_MANA(c) + amt);
 						}
 						snprintf(str, slen, "%d", GET_MANA(c));
 					}
@@ -3801,8 +4089,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					else if (!str_cmp(field, "move")) {
 						int amt;
 						if (subfield && *subfield && (amt = atoi(subfield))) {
-							GET_MOVE(c) += amt;
-							GET_MOVE(c) = MIN(GET_MAX_MOVE(c), MAX(GET_MOVE(c), 0));
+							set_move(c, GET_MOVE(c) + amt);
 						}
 						snprintf(str, slen, "%d", GET_MOVE(c));
 					}
@@ -3954,8 +4241,8 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 								snprintf(str, slen, "%s", dirs[dir]);	// real dir
 							}
 							else {
-								// bad direction -- just give them their arg back
-								snprintf(str, slen, "%s", subfield);
+								// bad direction -- empty result
+								*str = '\0';
 							}
 						}
 						else {	// missing arg
@@ -4042,7 +4329,10 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					break;
 				}
 				case 'r': {	// char.r*
-					if (!str_cmp(field, "remove_companion")) {
+					if (!str_cmp(field, "real_name")) {
+						snprintf(str, slen, "%s", PERS(c, c, TRUE));
+					}
+					else if (!str_cmp(field, "remove_companion")) {
 						if (!IS_NPC(c) && subfield && *subfield && isdigit(*subfield)) {
 							remove_companion(c, atoi(subfield));
 						}
@@ -4205,6 +4495,9 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 							snprintf(str, slen, "0");
 						}
 					}
+					else if (!str_cmp(field, "speaking")) {
+						snprintf(str, slen, "%d", IS_NPC(c) ? (MOB_LANGUAGE(c) != NOTHING ? MOB_LANGUAGE(c) : config_get_int("default_language_vnum")) : GET_SPEAKING(c));
+					}
 					
 					break;
 				}
@@ -4246,6 +4539,12 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 							request_char_save_in_world(c);
 						}
 						*str = '\0';
+					}
+					else if (!str_cmp(field, "unscale_and_reset")) {
+						if (IS_NPC(c)) {
+							check_reset_mob(c, TRUE);
+						}
+						* str = '\0';
 					}
 					break;
 				}
@@ -4296,7 +4595,28 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						*/
 							strcpy(str, "-1");
 					}    
+					
+					else if (!str_cmp(field, "var")) {
+						struct trig_var_data *remote_vd;
+						char arg1[256], arg2[256];
+						bool found = FALSE;
 
+						comma_args(subfield, arg1, arg2);
+						*str = '\0';
+
+						if (*arg1 && SCRIPT(c)) {
+							LL_FOREACH(SCRIPT(c)->global_vars, remote_vd) {
+								if (!str_cmp(remote_vd->name, arg1)) {
+									snprintf(str, slen, "%s", remote_vd->value);
+									found = TRUE;
+									break;
+								}
+							}
+						}
+						if (!found && *arg2) {
+							snprintf(str, slen, "%s", arg2);
+						}
+					}
 					else if (!str_cmp(field, "varexists")) {
 						struct trig_var_data *remote_vd;
 						snprintf(str, slen, "0");
@@ -4339,7 +4659,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 		} /* if (c) ...*/
 
 		else if (o) {
-			if (text_processed(field, subfield, vd, str, slen))
+			if (text_processed(field, subfield, vd, str, slen, go, sc, trig, type))
 				return;
 
 			*str = '\x1';
@@ -4433,7 +4753,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 				case 'c': {	// obj.c*
 					if (!str_cmp(field, "can_wear")) {
 						int pos;
-						if (subfield && *subfield && (pos = search_block(subfield, wear_bits, FALSE))) {
+						if (subfield && *subfield && (pos = search_block(subfield, wear_bits, FALSE)) != NOTHING) {
 							snprintf(str, slen, "%d", CAN_WEAR(o, BIT(pos)) ? 1 : 0);
 						}
 						else {
@@ -4474,6 +4794,45 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						}
 						snprintf(str, slen, "%d", count);
 					}
+					else if (!str_cmp(field, "custom")) {
+						// default to empty
+						*str = '\0';
+						if (subfield && *subfield) {
+							char arg1[256], arg2[256];
+							int ctype, count = 0, pos = -1;
+							struct custom_message *mcm, *found_mcm = NULL;
+							
+							comma_args(subfield, arg1, arg2);
+							if (*arg1 && (ctype = search_block(arg1, obj_custom_types, FALSE)) != NOTHING) {
+								if (*arg2) {	// optional message pos
+									pos = atoi(arg2);
+								}
+								
+								// valid type
+								LL_FOREACH(GET_OBJ_CUSTOM_MSGS(o), mcm) {
+									if (mcm->type != ctype) {
+										continue;
+									}
+									
+									// seems valid
+									if (pos != -1 && pos-- <= 0) {
+										// only looking for 1
+										found_mcm = mcm;
+										break;
+									}
+									else if (pos == -1 && (!number(0, count++) || !found_mcm)) {
+										// picking at random
+										found_mcm = mcm;
+									}
+								}
+								
+								// did we find one
+								if (found_mcm) {
+									snprintf(str, slen, "%s", NULLSAFE(found_mcm->msg));
+								}
+							}
+						}
+					}
 					break;
 				}
 				case 'e': {	// obj.e*
@@ -4485,6 +4844,16 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 							*str = '\0';
 						}
 					}
+					else if (!str_cmp(field, "empty")) {
+						*str = '\0';
+						if (IS_CORPSE(o) || IS_CONTAINER(o)) {
+							empty_obj_before_extract(o);
+						}
+						else if (IS_DRINK_CONTAINER(o)) {
+							set_obj_val(o, VAL_DRINK_CONTAINER_CONTENTS, 0);
+							set_obj_val(o, VAL_DRINK_CONTAINER_TYPE, 0);
+						}
+					}
 					break;
 				}
 				case 'f': {	// obj.f*
@@ -4492,8 +4861,20 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						if (subfield && *subfield) {
 							int fl = search_block(subfield, extra_bits, FALSE);
 							if (fl != NOTHING) {
+								bool was_lit = LIGHT_IS_LIT(o);
+								
 								TOGGLE_BIT(GET_OBJ_EXTRA(o), BIT(fl));
 								snprintf(str, slen, (OBJ_FLAGGED(o, BIT(fl)) ? "1" : "0"));
+								
+								if (was_lit != LIGHT_IS_LIT(o)) {
+									if (was_lit) {
+										apply_obj_light(o, FALSE);
+									}
+									else {
+										apply_obj_light(o, TRUE);
+									}
+								}
+								
 								request_obj_save_in_world(o);
 							}
 							else {
@@ -4605,9 +4986,18 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					}
 					break;
 				}
+				case 'k': {	// obj.k*
+					if (!str_cmp(field, "keywords")) {
+						snprintf(str, slen, "%s", GET_OBJ_KEYWORDS(o));
+					}
+					break;
+				}
 				case 'l': {	// obj.l*
 					if (!str_cmp(field, "level")) {
 						snprintf(str, slen, "%d", GET_OBJ_CURRENT_SCALE_LEVEL(o));
+					}
+					else if (!str_cmp(field, "longdesc")) {
+						snprintf(str, slen, "%s", GET_OBJ_LONG_DESC(o));
 					}
 					break;
 				}
@@ -4683,7 +5073,28 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					break;
 				}
 				case 'v': {	// obj.v*
-					if (!str_cmp(field, "varexists")) {
+						if (!str_cmp(field, "var")) {
+							struct trig_var_data *remote_vd;
+							char arg1[256], arg2[256];
+							bool found = FALSE;
+
+							comma_args(subfield, arg1, arg2);
+							*str = '\0';
+
+							if (*arg1 && SCRIPT(o)) {
+								LL_FOREACH(SCRIPT(o)->global_vars, remote_vd) {
+									if (!str_cmp(remote_vd->name, arg1)) {
+										snprintf(str, slen, "%s", remote_vd->value);
+										found = TRUE;
+										break;
+									}
+								}
+							}
+							if (!found && *arg2) {
+								snprintf(str, slen, "%s", arg2);
+							}
+						}
+					else if (!str_cmp(field, "varexists")) {
 						struct trig_var_data *remote_vd;
 						snprintf(str, slen, "0");
 						if (SCRIPT(o)) {
@@ -4701,19 +5112,56 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						snprintf(str, slen, "%d", GET_OBJ_VNUM(o));
 					else if (!str_cmp(field, "val0")) {
 						if (subfield && is_number(subfield)) {
+							// can change the lights
+							bool was_lit = LIGHT_IS_LIT(o);
+							
 							set_obj_val(o, 0, atoi(subfield));
+							
+							// check lights
+							if (was_lit != LIGHT_IS_LIT(o)) {
+								if (was_lit) {
+									apply_obj_light(o, FALSE);
+								}
+								else {
+									apply_obj_light(o, TRUE);
+								}
+							}
 						}
 						snprintf(str, slen, "%d", GET_OBJ_VAL(o, 0));
 					}
 					else if (!str_cmp(field, "val1")) {
 						if (subfield && is_number(subfield)) {
+							// can change the lights
+							bool was_lit = LIGHT_IS_LIT(o);
+							
 							set_obj_val(o, 1, atoi(subfield));
+							
+							// check lights
+							if (was_lit != LIGHT_IS_LIT(o)) {
+								if (was_lit) {
+									apply_obj_light(o, FALSE);
+								}
+								else {
+									apply_obj_light(o, TRUE);
+								}
+							}
+							if (IS_LIGHT(o)) {
+								// in case
+								schedule_obj_timer_update(o, FALSE);
+							}
 						}
 						snprintf(str, slen, "%d", GET_OBJ_VAL(o, 1));
 					}
 					else if (!str_cmp(field, "val2")) {
 						if (subfield && is_number(subfield)) {
+							int old_val = GET_OBJ_VAL(o, 2);
+							
 							set_obj_val(o, 2, atoi(subfield));
+							
+							// things that might need to update:
+							if (GET_OBJ_VAL(o, 2) != old_val) {
+								// ... none so far
+							}
 						}
 						snprintf(str, slen, "%d", GET_OBJ_VAL(o, 2));
 					}
@@ -4754,7 +5202,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 		} /* if (o) ... */
 
 		else if (r) {
-			if (text_processed(field, subfield, vd, str, slen))
+			if (text_processed(field, subfield, vd, str, slen, go, sc, trig, type))
 				return;
 				
 			*str = '\x1';
@@ -4919,6 +5367,27 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						}
 						else {
 							*str = '\0';
+						}
+					}
+					else if (!str_cmp(field, "depletion")) {
+						// usage: %room.depletion(TYPE)% to get
+						//        %room.depletion(TYPE,AMOUNT)% to set
+						char arg1[256], arg2[256];
+						int type;
+						comma_args(subfield, arg1, arg2);
+						
+						if (!*arg1 || (type = search_block(arg1, depletion_type, FALSE)) == NOTHING) {
+							// missing type?
+							*str = '\0';
+						}
+						else if (!*arg2 || !isdigit(*arg2)) {
+							// just getting
+							snprintf(str, slen, "%d", get_depletion(r, type));
+						}
+						else {
+							// setting
+							set_room_depletion(r, type, atoi(arg2));
+							snprintf(str, slen, "%d", get_depletion(r, type));
 						}
 					}
 					else if (!str_cmp(field, "direction")) {
@@ -5145,16 +5614,38 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						}
 					}
 					else if (!str_cmp(field, "players_present")) {
-						snprintf(str, slen, "%d", any_players_in_room(r) ? 1 : 0);
+						char_data *chit;
+						int num = 0;
+						DL_FOREACH2(ROOM_PEOPLE(r), chit, next_in_room) {
+							if (!IS_NPC(chit)) {
+								++num;
+							}
+						}
+						snprintf(str, slen, "%d", num);
 					}
 					else if (!str_cmp(field, "people")) {
 						char_data *temp_ch = NULL;
+						mob_vnum find_vnum = NOTHING;
+						
+						// optional vnum search
+						if (subfield && *subfield && (*subfield == '-' || isdigit(*subfield))) {
+							find_vnum = atoi(subfield);
+						}
 				
 						// attempt to prevent extracted people from showing in lists
 						DL_FOREACH2(ROOM_PEOPLE(r), temp_ch, next_in_room) {
-							if (!SCRIPT_SHOULD_SKIP_CHAR(temp_ch)) {
-								break;
+							if (EXTRACTED(temp_ch)) {
+								continue;	// always skip
 							}
+							if (find_vnum != NOTHING && GET_MOB_VNUM(temp_ch) != find_vnum) {
+								continue;	// vnum mismatch
+							}
+							if (find_vnum == NOTHING && SCRIPT_SHOULD_SKIP_CHAR(temp_ch)) {
+								continue;	// skippable character (if not searching by vnum)
+							}
+							
+							// if we got to here, this is valid character; break out
+							break;
 						}
 				
 						if (temp_ch) {
@@ -5225,6 +5716,15 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					else if (!str_cmp(field, "starboard")) {
 						direction_vars(r, STARBOARD, subfield, str, slen);
 					}
+					else if (!str_cmp(field, "subzone")) {
+						if (GET_ROOM_TEMPLATE(r) && GET_RMT_SUBZONE(GET_ROOM_TEMPLATE(r)) != NOWHERE) {
+							snprintf(str, slen, "%d", GET_RMT_SUBZONE(GET_ROOM_TEMPLATE(r)));
+						}
+						else {
+							// no valid subzone: show a -1
+							snprintf(str, slen, "-1");
+						}
+					}
 					else if (!str_cmp(field, "sun")) {
 						snprintf(str, slen, "%s", sun_types[get_sun_status(r)]);
 					}
@@ -5274,7 +5774,28 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					break;
 				}
 				case 'v': {	// room.v*
-					if (!str_cmp(field, "varexists")) {
+					if (!str_cmp(field, "var")) {
+						struct trig_var_data *remote_vd;
+						char arg1[256], arg2[256];
+						bool found = FALSE;
+
+						comma_args(subfield, arg1, arg2);
+						*str = '\0';
+
+						if (*arg1 && SCRIPT(r)) {
+							LL_FOREACH(SCRIPT(r)->global_vars, remote_vd) {
+								if (!str_cmp(remote_vd->name, arg1)) {
+									snprintf(str, slen, "%s", remote_vd->value);
+									found = TRUE;
+									break;
+								}
+							}
+						}
+						if (!found && *arg2) {
+							snprintf(str, slen, "%s", arg2);
+						}
+					}
+					else if (!str_cmp(field, "varexists")) {
 						struct trig_var_data *remote_vd;
 						snprintf(str, slen, "0");
 						if (SCRIPT(r)) {
@@ -5348,7 +5869,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 		
 
 		else if (v) {	// vehicle variable
-			if (text_processed(field, subfield, vd, str, slen))
+			if (text_processed(field, subfield, vd, str, slen, go, sc, trig, type))
 				return;
 				
 			*str = '\x1';
@@ -5421,6 +5942,27 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						}
 						else {
 							*str = '\0';
+						}
+					}
+					else if (!str_cmp(field, "depletion")) {
+						// usage: %veh.depletion(TYPE)% to get
+						//        %veh.depletion(TYPE,AMOUNT)% to set
+						char arg1[256], arg2[256];
+						int type;
+						comma_args(subfield, arg1, arg2);
+						
+						if (!*arg1 || (type = search_block(arg1, depletion_type, FALSE)) == NOTHING) {
+							// missing type?
+							*str = '\0';
+						}
+						else if (!*arg2 || !isdigit(*arg2)) {
+							// just getting
+							snprintf(str, slen, "%d", get_vehicle_depletion(v, type));
+						}
+						else {
+							// setting
+							set_vehicle_depletion(v, type, atoi(arg2));
+							snprintf(str, slen, "%d", get_vehicle_depletion(v, type));
 						}
 					}
 					else if (!str_cmp(field, "driver")) {
@@ -5706,7 +6248,28 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					break;
 				}
 				case 'v': {	// veh.v*
-					if (!str_cmp(field, "varexists")) {
+					if (!str_cmp(field, "var")) {
+						struct trig_var_data *remote_vd;
+						char arg1[256], arg2[256];
+						bool found = FALSE;
+
+						comma_args(subfield, arg1, arg2);
+						*str = '\0';
+
+						if (*arg1 && SCRIPT(v)) {
+							LL_FOREACH(SCRIPT(v)->global_vars, remote_vd) {
+								if (!str_cmp(remote_vd->name, arg1)) {
+									snprintf(str, slen, "%s", remote_vd->value);
+									found = TRUE;
+									break;
+								}
+							}
+						}
+						if (!found && *arg2) {
+							snprintf(str, slen, "%s", arg2);
+						}
+					}
+					else if (!str_cmp(field, "varexists")) {
 						struct trig_var_data *remote_vd;
 						snprintf(str, slen, "0");
 						if (SCRIPT(v)) {
@@ -5751,7 +6314,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 		
 
 		else if (e) {	// empire variable
-			if (text_processed(field, subfield, vd, str, slen)) {
+			if (text_processed(field, subfield, vd, str, slen, go, sc, trig, type)) {
 				return;
 			}
 				
@@ -5791,7 +6354,77 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					break;
 				}
 				case 'c': {	// emp.c*
-					if (!str_cmp(field, "coins")) {
+					if (!str_cmp(field, "can_recognize_lang")) {
+						// arg1: language name/vnum
+						// arg2: optional on/off to toggle recognize
+						char arg1[256], arg2[256];
+						int mode;
+						generic_data *lang = NULL;
+						
+						comma_args(subfield, arg1, arg2);
+						
+						// load language
+						if (*arg1) {
+							if (isdigit(*arg1)) {
+								lang = find_generic(atoi(arg1), GENERIC_LANGUAGE);
+							}
+							if (!lang) {
+								lang = find_generic_no_spaces(GENERIC_LANGUAGE, arg1);
+							}
+						}
+						
+						// optional toggle on/off
+						if (*arg2 && lang) {
+							if (!str_cmp(arg2, "1") || !str_cmp(arg2, "on")) {
+								if (speaks_language_empire(e, GEN_VNUM(lang)) != LANG_SPEAK) {
+									add_language_empire(e, GEN_VNUM(lang), LANG_RECOGNIZE);
+								}
+							}
+							else if (!str_cmp(arg2, "0") || !str_cmp(arg2, "off")) {
+								if (speaks_language_empire(e, GEN_VNUM(lang)) != LANG_SPEAK) {
+									add_language_empire(e, GEN_VNUM(lang), LANG_UNKNOWN);
+								}
+							}
+							check_languages_empire(e);
+						}
+						
+						// and show recognizability
+						mode = lang ? speaks_language_empire(e, GEN_VNUM(lang)) : LANG_UNKNOWN;
+						snprintf(str, slen, "%d", (mode == LANG_RECOGNIZE || mode == LANG_SPEAK) ? 1 : 0);
+					}
+					else if (!str_cmp(field, "can_speak")) {
+						// arg1: language name/vnum
+						// arg2: optional on/off to toggle speaking
+						char arg1[256], arg2[256];
+						generic_data *lang = NULL;
+						
+						comma_args(subfield, arg1, arg2);
+						
+						// load language
+						if (*arg1) {
+							if (isdigit(*arg1)) {
+								lang = find_generic(atoi(arg1), GENERIC_LANGUAGE);
+							}
+							if (!lang) {
+								lang = find_generic_no_spaces(GENERIC_LANGUAGE, arg1);
+							}
+						}
+						
+						// optional toggle on/off
+						if (*arg2 && lang) {
+							if (!str_cmp(arg2, "1") || !str_cmp(arg2, "on")) {
+								add_language_empire(e, GEN_VNUM(lang), LANG_SPEAK);
+							}
+							else if (!str_cmp(arg2, "0") || !str_cmp(arg2, "off")) {
+								add_language_empire(e, GEN_VNUM(lang), LANG_UNKNOWN);
+							}
+							check_languages_empire(e);
+						}
+						
+						// and show speakability
+						snprintf(str, slen, "%d", (lang && speaks_language_empire(e, GEN_VNUM(lang)) == LANG_SPEAK) ? 1 : 0);
+					}
+					else if (!str_cmp(field, "coins")) {
 						snprintf(str, slen, "%d", (int) EMPIRE_COINS(e));
 					}
 					break;
@@ -6013,7 +6646,28 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					break;
 				}
 				case 'v': {	// emp.v*
-					if (!str_cmp(field, "varexists")) {
+					if (!str_cmp(field, "var")) {
+						struct trig_var_data *remote_vd;
+						char arg1[256], arg2[256];
+						bool found = FALSE;
+
+						comma_args(subfield, arg1, arg2);
+						*str = '\0';
+
+						if (*arg1 && SCRIPT(e)) {
+							LL_FOREACH(SCRIPT(e)->global_vars, remote_vd) {
+								if (!str_cmp(remote_vd->name, arg1)) {
+									snprintf(str, slen, "%s", remote_vd->value);
+									found = TRUE;
+									break;
+								}
+							}
+						}
+						if (!found && *arg2) {
+							snprintf(str, slen, "%s", arg2);
+						}
+					}
+					else if (!str_cmp(field, "varexists")) {
 						struct trig_var_data *remote_vd;
 						snprintf(str, slen, "0");
 						if (SCRIPT(e)) {
@@ -6063,7 +6717,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 		}	// if (e) ...
 		
 		else {
-			if (vd && text_processed(field, subfield, vd, str, slen))
+			if (vd && text_processed(field, subfield, vd, str, slen, go, sc, trig, type))
 				return;
 		}
 	}
@@ -6487,7 +7141,7 @@ struct cmdlist_element *find_end(struct cmdlist_element *cl) {
 	if (!(cl->next))
 		return cl;
 
-	for (c = cl->next; c->next; c = c->next) {
+	for (c = cl->next; c && c->next; c = c->next) {
 		for (p = c->cmd; *p && isspace(*p); p++);
 
 		if (!strn_cmp("if ", p, 3))
@@ -7416,7 +8070,7 @@ int script_driver(union script_driver_data_u *sdd, trig_data *trig, int type, in
 	char cmd[MAX_INPUT_LENGTH], *p;
 	struct script_data *sc = 0;
 	struct cmdlist_element *temp;
-	unsigned long loops = 0;
+	// unsigned long loops = 0;
 	void *go = NULL;
 
 	if (depth > MAX_SCRIPT_DEPTH) {
@@ -7504,7 +8158,7 @@ int script_driver(union script_driver_data_u *sdd, trig_data *trig, int type, in
 			}
 			else {
 				cl = temp;
-				loops = 0;
+				// loops = 0;
 			}
 		}
 		else if (!strn_cmp("switch ", p, 7)) {
@@ -7528,7 +8182,7 @@ int script_driver(union script_driver_data_u *sdd, trig_data *trig, int type, in
 					orig_cmd++;
 				if (cl->original && process_if(orig_cmd + 6, go, sc, trig, type)) {
 					cl = cl->original;
-					loops++;   
+					// loops++;   
 					GET_TRIG_LOOPS(trig)++;
 					/* This actually breaks multiple types of triggers -kh
 					if (loops == 30) {

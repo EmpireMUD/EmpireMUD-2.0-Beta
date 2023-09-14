@@ -1,8 +1,8 @@
 #9900
-Mini-pet Use~
+Minipet Use~
 1 c 3
 use~
-* DEPRECATED: This controlled mini-pets before b5.47 when they got a code-based collection
+* DEPRECATED: This controlled minipets before b5.47 when they got a code-based collection
 return 0
 halt
 if %actor.obj_target(%arg%)% != %self% && !(%self.is_name(%arg%)% && %self.worn_by%)
@@ -35,7 +35,7 @@ while %ch% && !%found%
   set ch %ch.next_in_room%
 done
 if %found%
-  %send% %actor% You already have this mini-pet.
+  %send% %actor% You already have this minipet.
 elseif %found_pet% then
   %send% %actor% You already have another non-familiar follower.
 elseif %mobs% > 4
@@ -147,14 +147,18 @@ else
 end
 ~
 #9999
-Iterative mini-pet reward~
+Iterative minipet reward~
 1 c 2
 use~
+if %actor.obj_target(%arg%)% != %self%
+  return 0
+  halt
+end
 set pet_found 0
 set vnum 9900
 while !%pet_found%
   if %vnum% >= 9923
-    %send% %actor% You already have all the mini-pets @%self% can provide!
+    %send% %actor% You already have all the minipets @%self% can provide!
     %send% %actor% Keep it for now, and pester Yvain to add more.
     halt
   elseif %vnum% == 9919 || %actor.has_minipet(%vnum%)%
@@ -168,13 +172,13 @@ if %pet_found%
   set mob %self.room.people%
   if %mob.vnum% != %pet_found%
     * Uh-oh.
-    %echo% Something went horribly wrong while granting a mini-pet. Please bug-report this error.
+    %echo% Something went horribly wrong while granting a minipet. Please bug-report this error.
     halt
   end
   set mob_string %mob.name%
   %purge% %mob%
   %send% %actor% You open @%self% and find a whistle inside!
-  %send% %actor% You gain '%mob_string%' as a mini-pet. Use the minipets command to summon it.
+  %send% %actor% You gain '%mob_string%' as a minipet. Use the minipets command to summon it.
   %echoaround% %actor% ~%actor% opens @%self% and takes %mob_string% whistle out.
   nop %actor.add_minipet(%vnum%)%
   %purge% %self%

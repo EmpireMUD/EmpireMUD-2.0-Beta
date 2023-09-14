@@ -4,6 +4,13 @@ A Broken Binding Circle~
 &0{&R**&0}~
 1000 0 bd 0
 0 0 0 -1
+E
+circle binding broken around ground~
+   The old god Anat has been bound here, tied to this world and made mortal so
+at last she may be killed. In the ancient world, Anat killed men and gods
+alike. Now, though, the circle is broken and she has escaped. Can you track her
+down and stop her before the world drowns in blood once again?
+~
 T 12014
 S
 #12001
@@ -12,6 +19,11 @@ The Binding Circle~
 &0{**}~
 96 5 bdln 0
 0 0 0 -1
+E
+circle binding ground around~
+   An intricate binding circle has been constructed here, with strong chains to
+hold down whatever man or beast -- or god -- this circle was built for.
+~
 I 29 5006 100.00 1 r  # RUINS-TO-BLD: Ruins
 R
 12001 1 5 0
@@ -44,6 +56,14 @@ A Broken Binding Circle~
 &0{&C**&0}~
 1000 0 bd 0
 0 0 0 -1
+E
+circle binding broken ground around~
+   The old god Ba'al Hadad has been bound, tied to this world and made mortal
+so you can defeat him. In the ancient world, Ba'al Hadad was master of storms,
+able to drown whole cities in his wrath. Now, he has broken free to roam the
+world once more. Can you track him down and find him before the world drowns in
+floods once more?
+~
 T 12040
 S
 $

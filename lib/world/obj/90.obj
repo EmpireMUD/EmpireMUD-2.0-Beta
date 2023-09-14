@@ -170,8 +170,8 @@ A unicorn horn is sticking out of the ground.~
    This thin, spiralled horn is the stuff of legends. If it's real, it could
 fetch a lot of money.
 ~
-15 0 a 0 3
-16 0 0
+15 0 a 0 4
+16 2 0
 14 0
 C
 100 100
@@ -224,8 +224,8 @@ A pair of jackalope antlers are lying here.~
    These antlers may resemble tiny deer antlers, but they are clearly from a
 legendary jackalope.
 ~
-15 0 a 0 4
-16 0 0
+15 0 a 0 5
+16 2 0
 14 0
 C
 100 100
@@ -238,8 +238,8 @@ a sasquatch hide~
 A sasquatch hide is draped here.~
 This huge hide could be from none other than the sasquatch!
 ~
-15 0 a 0 7
-16 0 0
+15 0 a 0 8
+16 2 0
 7 0
 C
 100 100
@@ -254,8 +254,8 @@ A luxurious yeti fur is draping here.~
    This huge, white fur could only have come from the elusive yeti. It must be
 worth its weight in gold!
 ~
-15 0 a 0 8
-16 0 0
+15 0 a 0 9
+16 2 0
 7 0
 C
 100 100
@@ -270,8 +270,8 @@ An enormous mammoth tusk is standing here.~
    The tusk is larger, longer, and curvier than any elephant's tusk. It can
 only have come from a mammoth, the rarest of the giant beasts.
 ~
-15 e a 0 8
-16 0 0
+15 e a 0 9
+16 2 0
 14 0
 C
 100 100
@@ -287,8 +287,8 @@ A hoard of gold has spilled onto the floor.~
 across the land. Each piece has long claw marks or signs of fire, both
 resulting from its time in a dragon's hoard.
 ~
-15 0 a 0 5
-16 0 0
+15 0 a 0 6
+16 2 0
 4 0
 C
 100 100
@@ -303,8 +303,8 @@ A mermaid's purse has been dropped here.~
 There doesn't seem to be a way to open it, but it feels like there are pearls
 inside. These purses are known to come from mermaids who swim in deep waters.
 ~
-15 0 a 0 5
-16 0 0
+15 0 a 0 6
+16 2 0
 7 0
 C
 100 100

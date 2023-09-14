@@ -3,8 +3,24 @@ gardener hooded magiterranean~
 the Magiterranean gardener~
 A hooded gardener is poking at the ground.
 ~
-5 80 dv cnoB 3
-0 2 0 22
+5 80 dvI cno 3
+1 2 0 22
+D
+   This old druid prods the ground with his staff, tosses in a glowing seed,
+and buries it with his foot. He hardly seems to notice you.
+~
+M
+0
+$n pokes a hole in the ground with his staff and plants a glowing seed.~
+M
+0
+$n waves his hand and a weed on the ground shrivels up, dead.~
+M
+0
+$n chants softly to a little glowing seed in his hand.~
+M
+0
+$n conjures a tiny raincloud to water the plants.~
 T 10501
 S
 #10501
@@ -14,6 +30,23 @@ A foxglove terrier runs circles around you.
 ~
 1 1 bdoD nG 2
 0 0 0 9
+D
+   This adorable little purple puppy seems to have fur made from flowers. It
+doesn't seem to mind the bees coming and going from its back. If anything, it
+seems to enjoy them.
+~
+M
+0
+$n shakes a cloud of pollen into the air.~
+M
+0
+$n scratches at its ear and a bumblebee flies out!~
+M
+0
+$n rolls around on the ground.~
+M
+0
+$n chases its tail in circles.~
 T 9901
 T 9902
 T 10504
@@ -25,6 +58,26 @@ A grass-green verdant retriever is holding a stick in its mouth.
 ~
 1 1 bdoD nG 2
 0 0 0 9
+D
+   With its luscious green fur, this dog spends most of the day basking in the
+sun. But when there's a spare moment to fetch a stick, all that solar energy
+comes pouring out as boundless excitement and endless drool.
+~
+M
+0
+$n runs off and comes back with a stick.~
+M
+0
+$n sneezes a cloud of pollen into the air.~
+M
+0
+$n wags its tail.~
+M
+0
+$n scratches its ear, releasing pollen into the air.~
+M
+4
+$n rolls over to bask in the light.~
 T 9901
 T 9902
 T 10504
@@ -36,6 +89,22 @@ A pink petal poodle wags her tail.
 ~
 1 1 bdoD nG 2
 2 0 0 9
+D
+   This lovely white and pink dog appears to be covered in dainty petals
+instead of fur.
+~
+M
+0
+$n scratches at $s petals.~
+M
+0
+$n shakes $mself off and releases a plume of pollen.~
+M
+0
+$n prances around, releasing pollen behind $m.~
+M
+0
+$n dances around playfully.~
 T 9901
 T 9902
 T 10504
@@ -47,6 +116,27 @@ A sunflower spaniel barks up at the sky.
 ~
 1 1 bdoD nG 2
 0 0 0 9
+D
+This adorable little yellow dog seems to have petals instead of fur.
+~
+M
+0
+$n barks.~
+M
+0
+$n runs in circles around you.~
+M
+4
+$n rolls around in the sun.~
+M
+5
+$n looks a little wilted.~
+M
+0
+$n seems to be looking for something to pollenate.~
+M
+0
+$n chases its tail.~
 T 9901
 T 9902
 T 10504
@@ -58,6 +148,9 @@ A skeletal guard marches silently past.
 ~
 100 125 dhqtuD cG 3
 0 0 0 1
+D
+No bones about it, this guard makes you uncomfortable.
+~
 S
 #10506
 sheep skeletal skeleton empty~
@@ -66,6 +159,9 @@ The empty skeleton of a sheep is frolicking around.
 ~
 5 10 djoy G 2
 0 0 0 9
+D
+You aren't sure if these are being raised for their meat or their wool.
+~
 S
 #10507
 chicken undead~
@@ -74,6 +170,10 @@ An undead chicken is pecking mindlessly at the ground.
 ~
 1 3 djo G 1
 2 0 0 10
+D
+   It doesn't seem to lay eggs, but it does eat a lot of bugs -- sometimes, the
+same bug over and over.
+~
 S
 #10508
 hound skeletal~
@@ -82,6 +182,18 @@ A skeletal hound is lying here as if basking in the sun.
 ~
 20 40 djoz cG 2
 0 0 14 9
+D
+You've seen skinny dogs before, but this one is downright bony.
+~
+M
+0
+$n looks like it's trying to bark.~
+M
+0
+$n chases its tailbones after a few fall off.~
+M
+0
+$n shakes itself off but then has to go retrieve a lost rib.~
 S
 #10509
 horse zombie~
@@ -90,7 +202,10 @@ A zombie horse is standing here, skin still falling off it.
 ~
 30 60 dejo G 4
 0 0 14 11
-I 3 10510 100.00 1 X  # BARDE: a zombie charger
+D
+This horse has seen better days. And knights.
+~
+I 3 10510 100.00 1 X  # BARDE: zombie charger
 S
 #10510
 charger zombie armored~
@@ -99,10 +214,13 @@ An armored zombie charger is decomposing valiantly here.
 ~
 40 80 bdej G 4
 0 0 0 11
-I 4 175 100.00 4  # LOOT: an iron ingot
-I 4 175 75.00 2  # LOOT: an iron ingot
-I 4 175 50.00 2  # LOOT: an iron ingot
-I 4 175 50.00 2  # LOOT: an iron ingot
+D
+   The armor is a good fit, considering this poor horse has no muscle or flesh.
+~
+I 4 175 100.00 4  # LOOT: iron ingot
+I 4 175 75.00 2  # LOOT: iron ingot
+I 4 175 50.00 2  # LOOT: iron ingot
+I 4 175 50.00 2  # LOOT: iron ingot
 S
 #10511
 cat skeletal~
@@ -111,6 +229,24 @@ A skeletal cat is cleaning its bones.
 ~
 10 30 djoz cG 1
 0 0 0 10
+D
+This old cat is still trying to clean itself.
+~
+M
+0
+$n rubs against your ankle.~
+M
+0
+$n tries to clean its paws.~
+M
+0
+$n tries to clean its back.~
+M
+0
+$n tries to clean its tail.~
+M
+0
+$n bares its fangs as if to hiss.~
 S
 #10512
 skeleton cow skeletal~
@@ -119,6 +255,9 @@ The skeleton of a cow is trying to graze here.
 ~
 5 10 djoy G 4
 0 0 0 11
+D
+Presumably they aren't farming it for its milk.
+~
 S
 #10513
 bird decaying zombie~
@@ -127,6 +266,9 @@ A decaying bird flies overhead on tattered wings.
 ~
 5 15 djo mG 1
 0 0 2 10
+D
+This little bird only has a wing and a half, but seems to be making do.
+~
 S
 #10514
 rabbit skeletal~
@@ -135,6 +277,9 @@ A skeletal rabbit hops around.
 ~
 1 3 djo G 1
 0 0 15 9
+D
+It keeps munching on grass, which falls right back out through its neck.
+~
 S
 #10515
 vegetable vigilant~
@@ -143,6 +288,9 @@ A vigilant vegetable stalks the fields.
 ~
 125 150 doqtuA cG 3
 0 0 13 7
+D
+Freed from its roots, this plant seems to be patrolling.
+~
 S
 #10516
 vegetable vigilante masked~
@@ -151,30 +299,39 @@ A masked vigilante vegetable is lurking in the shadows.
 ~
 50 75 cdo cG 3
 0 0 13 7
+D
+This plant seems to have gone bad.
+~
 S
 #10550
 Aquilo polar baron~
 Aquilo, the Polar Baron~
 Aquilo, the Polar Baron, hovers above the snow on a frosty updraft.
 ~
-0 0 bdvxyzABE cm 3
+0 0 bdvxyzABEI cm 3
 1 0 2 20
-I 4 10570 100.00 1  # LOOT: a chance of boss loot
+D
+   Clad in a cosmic robe lined with stark white fur, Baron Aquilo cuts a dash
+as he hovers on the updraft. As you approach him, you feel colder and colder,
+as if he is the source of all cold in the world. If you can't stop him, all
+life might freeze.
+~
+I 4 10570 100.00 1  # LOOT: chance of boss loot
 I 4 10579 14.28 1 L  # LOOT: cold echoes of the future
-I 4 10584 14.29 1 L  # LOOT: the metaimperium amulet of the Permafrost
-I 4 10589 14.28 1 L  # LOOT: the polar bear shield
+I 4 10584 14.29 1 L  # LOOT: metaimperium amulet of the Permafrost
+I 4 10589 14.28 1 L  # LOOT: polar bear shield
 I 4 10580 14.28 1 L  # LOOT: whispers of icy cataclysm
-I 4 10585 14.29 1 L  # LOOT: the frozen heart of the Permafrost
-I 4 10590 14.28 1 L  # LOOT: an intricately runed walrus tusk
+I 4 10585 14.29 1 L  # LOOT: frozen heart of the Permafrost
+I 4 10590 14.28 1 L  # LOOT: intricately runed walrus tusk
 I 4 10583 14.30 1 L  # LOOT: hoarfrost earplates
 I 4 10581 14.28 1 M  # LOOT: dangling baubles of the eternal sun
-I 4 10586 14.29 1 M  # LOOT: the celestial locket of the Permafrost
-I 4 10591 14.28 1 M  # LOOT: a frozen adder stone
+I 4 10586 14.29 1 M  # LOOT: celestial locket of the Permafrost
+I 4 10591 14.28 1 M  # LOOT: frozen adder stone
 I 4 10582 14.28 1 M  # LOOT: frost flower ear cuffs
-I 4 10587 14.29 1 M  # LOOT: the empyrean pearls of the Permafrost
-I 4 10592 14.28 1 M  # LOOT: the Tome of the Polar Baron
-I 4 10588 14.30 1 M  # LOOT: the aegis charm of the Permafrost
-I 12 10598 100.00 1  # PICKPOCKET: a frozen gemstone
+I 4 10587 14.29 1 M  # LOOT: empyrean pearls of the Permafrost
+I 4 10592 14.28 1 M  # LOOT: Tome of the Polar Baron
+I 4 10588 14.30 1 M  # LOOT: aegis charm of the Permafrost
+I 12 10598 100.00 1  # PICKPOCKET: frozen gemstone
 M
 1
 The frost will be your doooooooom!~
@@ -192,24 +349,30 @@ S
 Cryomancer #n~
 Cryomancer #n, apprentice to the Polar Baron, glares at you from atop a frozen column.
 ~
-0 0 bdvxyE c 3
+0 0 bdvxyEI c 3
 0 3 0 20
-I 4 10570 100.00 1  # LOOT: a chance of boss loot
+D
+   The cryomancer seems to be channeling the cold from elsewhere on the
+mountain, bringing it down and infusing it into every living thing. The hair on
+your arms stands up as if to keep you warm, but this is a cold you can feel in
+your very bones.
+~
+I 4 10570 100.00 1  # LOOT: chance of boss loot
 I 4 10579 7.15 1 L  # LOOT: cold echoes of the future
 I 4 10580 7.14 1 L  # LOOT: whispers of icy cataclysm
 I 4 10581 7.14 1 L  # LOOT: dangling baubles of the eternal sun
 I 4 10582 7.14 1 L  # LOOT: frost flower ear cuffs
 I 4 10583 7.14 1 L  # LOOT: hoarfrost earplates
-I 4 10584 7.14 1 L  # LOOT: the metaimperium amulet of the Permafrost
-I 4 10585 7.15 1 L  # LOOT: the frozen heart of the Permafrost
-I 4 10586 7.14 1 L  # LOOT: the celestial locket of the Permafrost
-I 4 10587 7.14 1 L  # LOOT: the empyrean pearls of the Permafrost
-I 4 10588 7.15 1 L  # LOOT: the aegis charm of the Permafrost
-I 4 10589 7.14 1 L  # LOOT: the polar bear shield
-I 4 10590 7.14 1 L  # LOOT: an intricately runed walrus tusk
-I 4 10591 7.15 1 L  # LOOT: a frozen adder stone
-I 4 10592 7.14 1 L  # LOOT: the Tome of the Polar Baron
-I 12 10598 100.00 1  # PICKPOCKET: a frozen gemstone
+I 4 10584 7.14 1 L  # LOOT: metaimperium amulet of the Permafrost
+I 4 10585 7.15 1 L  # LOOT: frozen heart of the Permafrost
+I 4 10586 7.14 1 L  # LOOT: celestial locket of the Permafrost
+I 4 10587 7.14 1 L  # LOOT: empyrean pearls of the Permafrost
+I 4 10588 7.15 1 L  # LOOT: aegis charm of the Permafrost
+I 4 10589 7.14 1 L  # LOOT: polar bear shield
+I 4 10590 7.14 1 L  # LOOT: intricately runed walrus tusk
+I 4 10591 7.15 1 L  # LOOT: frozen adder stone
+I 4 10592 7.14 1 L  # LOOT: Tome of the Polar Baron
+I 12 10598 100.00 1  # PICKPOCKET: frozen gemstone
 M
 1
 Aquilo said you'd come.~
@@ -225,24 +388,30 @@ mage rime #n apprentice~
 Rime Mage #n~
 Rime Mage #n glowers at you from behind a cold violet fire.
 ~
-0 0 bdvxyE c 3
+0 0 bdvxyEI c 3
 0 3 0 20
-I 4 10570 100.00 1  # LOOT: a chance of boss loot
+D
+   As you approach the mage, you notice the frost on your breath swirl around
+you and condense into a thin layer of ice on your clothes. All around you, the
+same frost is forming on every surface, as if every bit of life-giving moisture
+is being locked away forever.
+~
+I 4 10570 100.00 1  # LOOT: chance of boss loot
 I 4 10579 7.15 1 L  # LOOT: cold echoes of the future
 I 4 10580 7.14 1 L  # LOOT: whispers of icy cataclysm
 I 4 10581 7.14 1 L  # LOOT: dangling baubles of the eternal sun
 I 4 10582 7.14 1 L  # LOOT: frost flower ear cuffs
 I 4 10583 7.14 1 L  # LOOT: hoarfrost earplates
-I 4 10584 7.14 1 L  # LOOT: the metaimperium amulet of the Permafrost
-I 4 10585 7.15 1 L  # LOOT: the frozen heart of the Permafrost
-I 4 10586 7.14 1 L  # LOOT: the celestial locket of the Permafrost
-I 4 10587 7.14 1 L  # LOOT: the empyrean pearls of the Permafrost
-I 4 10588 7.15 1 L  # LOOT: the aegis charm of the Permafrost
-I 4 10589 7.14 1 L  # LOOT: the polar bear shield
-I 4 10590 7.14 1 L  # LOOT: an intricately runed walrus tusk
-I 4 10591 7.15 1 L  # LOOT: a frozen adder stone
-I 4 10592 7.14 1 L  # LOOT: the Tome of the Polar Baron
-I 12 10598 100.00 1  # PICKPOCKET: a frozen gemstone
+I 4 10584 7.14 1 L  # LOOT: metaimperium amulet of the Permafrost
+I 4 10585 7.15 1 L  # LOOT: frozen heart of the Permafrost
+I 4 10586 7.14 1 L  # LOOT: celestial locket of the Permafrost
+I 4 10587 7.14 1 L  # LOOT: empyrean pearls of the Permafrost
+I 4 10588 7.15 1 L  # LOOT: aegis charm of the Permafrost
+I 4 10589 7.14 1 L  # LOOT: polar bear shield
+I 4 10590 7.14 1 L  # LOOT: intricately runed walrus tusk
+I 4 10591 7.15 1 L  # LOOT: frozen adder stone
+I 4 10592 7.14 1 L  # LOOT: Tome of the Polar Baron
+I 12 10598 100.00 1  # PICKPOCKET: frozen gemstone
 M
 1
 The elements will be your undoing!~
@@ -260,7 +429,11 @@ A rabid caribou charges at you, spraying frozen foam from its mouth!
 ~
 0 0 bdj 0 4
 0 0 0 27
-I 0 10596 100.00 1  # BUTCHER: a fillet of frozen meat
+D
+   This husky deer is foaming at the mouth and has its long antler aimed
+squarely at you.
+~
+I 0 10596 100.00 1  # BUTCHER: fillet of frozen meat
 T 10558
 T 10553
 S
@@ -271,7 +444,11 @@ An enchanted orca surprises you from above!
 ~
 0 0 bdj m 5
 0 0 2 9
-I 0 10596 100.00 1  # BUTCHER: a fillet of frozen meat
+D
+   This great beast of the sea is somehow flying through the air, mouth open,
+teeth bared, and coming straight for you!
+~
+I 0 10596 100.00 1  # BUTCHER: fillet of frozen meat
 T 10558
 T 10553
 S
@@ -282,7 +459,11 @@ A pack of vicious ermines surprises you from tunnels in the snow!
 ~
 0 0 bdj 0 2
 0 0 0 9
-I 0 10596 100.00 1  # BUTCHER: a fillet of frozen meat
+D
+   Though small, these white weasels outnumber you and they keep appearing from
+snow tunnels without any end in sight!
+~
+I 0 10596 100.00 1  # BUTCHER: fillet of frozen meat
 T 10558
 T 10553
 S
@@ -293,8 +474,11 @@ A snowshoe hare darts away from you.
 ~
 1 5 djo 0 1
 0 0 15 9
-I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
-I 1 1350 100.00 1  # SKIN: a small skin
+D
+The stark white hare hops along, foraging for rare bits of green grass.
+~
+I 0 3012 100.00 1  # BUTCHER: fillet of raw meat
+I 1 1350 100.00 1  # SKIN: small skin
 M
 0
 $n sees you and darts away!~
@@ -309,9 +493,13 @@ A white arctic wolf hunches low and bares its fangs.
 ~
 20 40 djo c 3
 0 0 0 10
-I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
-I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
-I 1 1351 100.00 1  # SKIN: a large skin
+D
+   The wolf is all white, barely visible in the snow but with the visage of a
+ghost anywhere else.
+~
+I 0 3012 100.00 1  # BUTCHER: fillet of raw meat
+I 0 3012 100.00 1  # BUTCHER: fillet of raw meat
+I 1 1351 100.00 1  # SKIN: large skin
 M
 0
 $n looks directly at you, opens $s mouth to show $s fangs, and growls deep in $s chest as $s hackles stand on end...~
@@ -326,7 +514,11 @@ An arctic tern swoops low in the sky.
 ~
 5 15 djoz m 1
 0 0 2 9
-I 0 3200 100.00 1  # BUTCHER: a cut of poultry
+D
+   The bird has a white and grey body with a black cap and red feet. Its forked
+tail gives it the elegant look of a fish in the sky.
+~
+I 0 3200 100.00 1  # BUTCHER: cut of poultry
 S
 #10559
 freezer river~
@@ -335,6 +527,10 @@ The river freezer is here.
 ~
 0 0 dh dklmn 3
 0 0 0 15
+D
+   Only immortals should see this. This is the mob that changes rivers and
+lakes into frozen rivers and lakes.
+~
 T 10559
 T 10560
 S
@@ -345,6 +541,10 @@ A sword of ice animated by Aquilo's power is flying around.
 ~
 0 0 bdhzDF m 2
 0 0 2 1
+D
+   Since it doesn't shatter on impact, it might actually by pykrete instead of
+ice.
+~
 T 10564
 S
 #10561
@@ -354,6 +554,10 @@ An ice sprite is flitting around here.
 ~
 75 125 bdhoxDF cm 1
 0 0 2 28
+D
+   Like an oversized snowflake, the sprite is ephemeral and beautiful, but
+capable of burying an entire village if it comes en masse.
+~
 T 10564
 S
 #10562
@@ -363,6 +567,9 @@ A summoned ice elemental soars overhead on wings of rime.
 ~
 75 125 bdhoxzDF cm 1
 0 0 2 20
+D
+The elemental is scarcely more than ice, but it is both sharp and deadly.
+~
 T 10564
 S
 #10564
@@ -372,6 +579,10 @@ A polar bear is resting here.
 ~
 100 125 bdej 0 4
 0 0 26 9
+D
+   It's enormous, white, and you have begun to suspect that the last thing you
+see will be the inside of it.
+~
 S
 #10565
 penguin emperor~
@@ -380,6 +591,11 @@ An emperor penguin stands placidly before you.
 ~
 100 125 dejl 0 2
 0 0 6 9
+D
+   This tall penguin looks downright imperial with its black back, white belly,
+and golden neck. It stands tall, head in the air, watching you pass through its
+beady black eyes.
+~
 S
 #10566
 wyvern frost~
@@ -388,6 +604,9 @@ A frost wyvern is perched nearby.
 ~
 100 125 dej m 5
 0 0 2 10
+D
+This gorgeous wyvern has light blue scales and tufts of long white fur.
+~
 S
 #10567
 cub bear polar~
@@ -396,6 +615,9 @@ A polar bear cub is rolling around on the ground.
 ~
 1 1 bdoD n 2
 0 0 0 9
+D
+It's simply the most adorable little white bear cub you've seen in your life.
+~
 T 9901
 T 9902
 S
@@ -406,6 +628,10 @@ A walrus wearing a vest and tophat has set up a shop on the ice (list).
 ~
 75 125 bdH enD 4
 1 0 0 15
+D
+   This poor fellow appears to have suffered a curse that turned him into a
+walrus. At least it hasn't affected his sense of fashion.
+~
 M
 1
 Step right up! Step right up! Just type 'list' to see my wares!~

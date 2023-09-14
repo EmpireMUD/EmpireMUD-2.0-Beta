@@ -20,6 +20,7 @@
 #include "handler.h"
 #include "skills.h"
 #include "interpreter.h"
+#include "dg_event.h"
 #include "dg_scripts.h"
 #include "vnums.h"
 #include "constants.h"
@@ -34,6 +35,7 @@
 *   loaded_player_hash For Offline Players
 *   Autowiz Wizlist Generator
 *   Helpers
+*   Languages
 *   Map Memory
 *   Playtime Tracking
 *   Empire Member/Greatness Tracking
@@ -55,6 +57,7 @@ ACMD(do_slash_channel);
 void add_all_gain_hooks(char_data *ch);
 void add_archetype_lore(char_data *ch);
 void apply_all_ability_techs(char_data *ch);
+EVENT_CANCEL_FUNC(cancel_affect_expire_event);
 void check_minipets_and_companions(char_data *ch);
 void check_player_events(char_data *ch);
 void clean_lore(char_data *ch);
@@ -186,8 +189,8 @@ char_data *is_at_menu(int id) {
 char_data *is_playing(int id) {
 	char_data *ch;
 	
-	DL_FOREACH(character_list, ch) {
-		if (!IS_NPC(ch) && GET_IDNUM(ch) == id && !EXTRACTED(ch)) {
+	DL_FOREACH2(player_character_list, ch, next_plr) {
+		if (GET_IDNUM(ch) == id && !EXTRACTED(ch)) {
 			return ch;
 		}
 	}
@@ -782,6 +785,7 @@ void free_char(char_data *ch) {
 	struct player_slash_channel *slash;
 	struct player_craft_data *pcd, *next_pcd;
 	struct player_currency *cur, *next_cur;
+	struct player_language *lang, *next_lang;
 	struct minipet_data *mini, *next_mini;
 	struct player_lastname *lastn;
 	struct player_eq_set *eq_set;
@@ -995,6 +999,10 @@ void free_char(char_data *ch) {
 			HASH_DEL(GET_CURRENCIES(ch), cur);
 			free(cur);
 		}
+		HASH_ITER(hh, GET_LANGUAGES(ch), lang, next_lang) {
+			HASH_DEL(GET_LANGUAGES(ch), lang);
+			free(lang);
+		}
 		HASH_ITER(hh, GET_LEARNED_CRAFTS(ch), pcd, next_pcd) {
 			HASH_DEL(GET_LEARNED_CRAFTS(ch), pcd);
 			free(pcd);
@@ -1079,6 +1087,7 @@ void free_char(char_data *ch) {
 	}
 	
 	// clear any pending updates
+	cancel_all_stored_events(&GET_STORED_EVENTS(ch));
 	clear_delayed_update(ch);
 
 	/* find_char helper */
@@ -1189,8 +1198,8 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *c
 	bool end = FALSE;
 	trig_data *trig;
 	double dbl_in;
-	long l_in[3];
-	char c_in;
+	long l_in[3], stored;
+	char c_in[2];
 	
 	// allocate player if we didn't receive one
 	if (!ch) {
@@ -1337,7 +1346,7 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *c
 					CREATE(af, struct affected_type, 1);
 					af->type = i_in[0];
 					af->cast_by = i_in[1];
-					af->duration = l_in[2];
+					af->expire_time = l_in[2];	// this is TEMPORARILY a number of seconds (or UNLIMITED)
 					af->modifier = i_in[3];
 					af->location = i_in[4];
 					af->bitvector = asciiflag_conv(str_in);
@@ -1525,9 +1534,9 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *c
 					}
 				}
 				else if (!strn_cmp(line, "Color: ", 7)) {
-					sscanf(line + 7, "%s %c", str_in, &c_in);
+					sscanf(line + 7, "%s %c", str_in, &c_in[0]);
 					if ((num = search_block(str_in, custom_color_types, TRUE)) != NOTHING) {
-						GET_CUSTOM_COLOR(ch, num) = c_in;
+						GET_CUSTOM_COLOR(ch, num) = c_in[0];
 					}
 				}
 				else if (!strn_cmp(line, "Currency: ", 10)) {
@@ -1578,11 +1587,11 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *c
 					}
 				}
 				else if (!strn_cmp(line, "DoT Effect: ", 12)) {
-					sscanf(line + 12, "%d %d %ld %d %d %d %d", &i_in[0], &i_in[1], &l_in[2], &i_in[3], &i_in[4], &i_in[5], &i_in[6]);
+					sscanf(line + 12, "%d %d %d %d %d %d %d", &i_in[0], &i_in[1], &i_in[2], &i_in[3], &i_in[4], &i_in[5], &i_in[6]);
 					CREATE(dot, struct over_time_effect_type, 1);
 					dot->type = i_in[0];
 					dot->cast_by = i_in[1];
-					dot->duration = l_in[2];
+					dot->time_remaining = i_in[2];
 					dot->damage_type = i_in[3];
 					dot->damage = i_in[4];
 					dot->stack = i_in[5];
@@ -1596,6 +1605,8 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *c
 						ch->over_time_effects = dot;
 					}
 					last_dot = dot;
+					
+					// do not schedule the DOT until they enter the game
 				}
 				BAD_TAG_WARNING(line);
 				break;
@@ -1629,10 +1640,14 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *c
 						}
 					}
 				}
+				else if (!strn_cmp(line, "Event Dailies: ", 15)) {
+					GET_EVENT_DAILY_QUESTS(ch) = atoi(line + 14);
+				}
 				else if (!strn_cmp(line, "Extra Attribute: ", 17)) {
 					sscanf(line + 17, "%s %d", str_in, &i_in[0]);
 					if ((num = search_block(str_in, extra_attribute_types, TRUE)) != NOTHING) {
-						GET_EXTRA_ATT(ch, num) = i_in[0];
+						// these are no longer saved/read
+						// GET_EXTRA_ATT(ch, num) = i_in[0];
 					}
 				}
 				BAD_TAG_WARNING(line);
@@ -1731,7 +1746,12 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *c
 				break;
 			}
 			case 'L': {
-				if (!strn_cmp(line, "Largest Inventory: ", 19)) {
+				if (!strn_cmp(line, "Language: ", 10)) {
+					if (sscanf(line + 10, "%d %d", &i_in[0], &i_in[1]) == 2) {
+						add_language(ch, i_in[0], i_in[1]);
+					}
+				}
+				else if (!strn_cmp(line, "Largest Inventory: ", 19)) {
 					GET_LARGEST_INVENTORY(ch) = atoi(line + 19);
 				}
 				else if (!strn_cmp(line, "Lastname: ", 10)) {
@@ -1996,11 +2016,16 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *c
 					}
 				}
 				else if (!strn_cmp(line, "Quest-task: ", 12)) {
-					if (last_plrq && sscanf(line + 12, "%d %d %lld %d %d %c", &i_in[0], &i_in[1], &bit_in, &i_in[2], &i_in[3], &c_in) == 6) {
-						// found group
+					if (last_plrq && sscanf(line + 12, "%d %d %lld %d %d %c %c", &i_in[0], &i_in[1], &bit_in, &i_in[2], &i_in[3], &c_in[0], &c_in[1]) == 7) {
+						// found everything
+					}
+					else if (last_plrq && sscanf(line + 12, "%d %d %lld %d %d %c", &i_in[0], &i_in[1], &bit_in, &i_in[2], &i_in[3], &c_in[0]) == 6) {
+						// found group but no custom
+						c_in[1] = 0;
 					}
 					else if (last_plrq && sscanf(line + 12, "%d %d %lld %d %d", &i_in[0], &i_in[1], &bit_in, &i_in[2], &i_in[3]) == 5) {
-						c_in = 0;	// no group given
+						c_in[0] = 0;	// no group given
+						c_in[1] = 0;	// no custom info given
 					}
 					else {
 						// bad format
@@ -2013,7 +2038,11 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *c
 					task->misc = bit_in;
 					task->needed = i_in[2];
 					task->current = i_in[3];
-					task->group = c_in;
+					task->group = isalpha(c_in[0]) ? c_in[0] : 0;
+					
+					if (c_in[1] == '+') {
+						task->custom = fread_string(fl, error);
+					}
 					
 					LL_APPEND(last_plrq->tracker, task);
 				}
@@ -2094,6 +2123,9 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *c
 					if (junk) {
 						free(junk);
 					}
+				}
+				else if (!strn_cmp(line, "Speaking: ", 10)) {
+					GET_SPEAKING(ch) = atoi(line + 10);
 				}
 				else if (!strn_cmp(line, "Syslog Flags: ", 14)) {
 					SYSLOG_FLAGS(ch) = asciiflag_conv(line + 14);
@@ -2181,9 +2213,20 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *c
 		}
 	}
 	
-	// apply affects
+	// apply affects: need to manage the timers because they are generally WRONG at this point
+	AFFECTS_CONVERTED(ch) = FALSE;
 	LL_FOREACH_SAFE(af_list, af, next_af) {
+		stored = af->expire_time;
 		affect_to_char_silent(ch, af);
+		
+		// detect aff copied by affect_to_char_silent and fix timer
+		if (ch->affected && ch->affected->type == af->type) {
+			if (ch->affected->expire_event) {
+				dg_event_cancel(ch->affected->expire_event, cancel_affect_expire_event);
+				ch->affected->expire_event = NULL;
+			}
+			ch->affected->expire_time = stored;
+		}
 		free(af);
 	}
 	
@@ -2409,6 +2452,7 @@ void write_player_primary_data_to_file(FILE *fl, char_data *ch) {
 	struct player_skill_data *skill, *next_skill;
 	struct player_craft_data *pcd, *next_pcd;
 	struct player_currency *cur, *next_cur;
+	struct player_language *lang, *next_lang;
 	struct minipet_data *mini, *next_mini;
 	struct mount_data *mount, *next_mount;
 	struct player_slash_channel *slash;
@@ -2420,6 +2464,7 @@ void write_player_primary_data_to_file(FILE *fl, char_data *ch) {
 	struct cooldown_data *cool;
 	struct resource_data *res;
 	int iter, deficit[NUM_POOLS], pool[NUM_POOLS];
+	long timer;
 	
 	if (!fl || !ch) {
 		log("SYSERR: write_player_primary_data_to_file called without %s", fl ? "character" : "file");
@@ -2443,9 +2488,11 @@ void write_player_primary_data_to_file(FILE *fl, char_data *ch) {
 	for (iter = 0; iter < NUM_WEARS; ++iter) {
 		if (GET_EQ(ch, iter)) {
 			char_eq[iter] = unequip_char(ch, iter);
+			/* this is almopst certainly an error here as this is called on every save:
 			#ifndef NO_EXTRANEOUS_TRIGGERS
 				remove_otrigger(char_eq[iter], ch);
 			#endif
+			*/
 		}
 		else {
 			char_eq[iter] = NULL;
@@ -2462,10 +2509,12 @@ void write_player_primary_data_to_file(FILE *fl, char_data *ch) {
 	while ((af = ch->affected)) {
 		CREATE(new_af, struct affected_type, 1);
 		*new_af = *af;
+		new_af->expire_event = NULL;
 		LL_PREPEND(af_list, new_af);
 		affect_remove(ch, af);
 	}
 	
+	// this is almost certainly ignored due to pause_affect_total
 	affect_total(ch);
 	
 	// reset attributes
@@ -2540,7 +2589,17 @@ void write_player_primary_data_to_file(FILE *fl, char_data *ch) {
 		fprintf(fl, "Adventure Summon Map: %d\n", GET_ADVENTURE_SUMMON_RETURN_MAP(ch));
 	}
 	for (af = af_list; af; af = af->next) {	// stored earlier
-		fprintf(fl, "Affect: %d %d %ld %d %d %s\n", af->type, af->cast_by, af->duration, af->modifier, af->location, bitv_to_alpha(af->bitvector));
+		if (af->expire_time == UNLIMITED) {
+			timer = UNLIMITED;
+		}
+		else if (AFFECTS_CONVERTED(ch)) {
+			timer = af->expire_time - time(0);
+		}
+		else {
+			// still in seconds
+			timer = af->expire_time;
+		}
+		fprintf(fl, "Affect: %d %d %ld %d %d %s\n", af->type, af->cast_by, timer, af->modifier, af->location, bitv_to_alpha(af->bitvector));
 	}
 	fprintf(fl, "Affect Flags: %s\n", bitv_to_alpha(AFF_FLAGS(ch)));
 	if (GET_APPARENT_AGE(ch)) {
@@ -2612,15 +2671,19 @@ void write_player_primary_data_to_file(FILE *fl, char_data *ch) {
 		fprintf(fl, "Disguised Sex: %s\n", genders[(int) GET_DISGUISED_SEX(ch)]);
 	}
 	for (dot = ch->over_time_effects; dot; dot = dot->next) {
-		fprintf(fl, "DoT Effect: %d %d %ld %d %d %d %d\n", dot->type, dot->cast_by, dot->duration, dot->damage_type, dot->damage, dot->stack, dot->max_stack);
+		fprintf(fl, "DoT Effect: %d %d %d %d %d %d %d\n", dot->type, dot->cast_by, dot->time_remaining, dot->damage_type, dot->damage, dot->stack, dot->max_stack);
 	}
 	
 	// 'E'
+	fprintf(fl, "Event Dailies: %d\n", GET_EVENT_DAILY_QUESTS(ch));
+	/* No longer writing extra attributes: these come from abilities/gear and should not be saved/loaded
+		note that if you reenable this, you must also enable the part that loads it
 	for (iter = 0; iter < NUM_EXTRA_ATTRIBUTES; ++iter) {
 		if (GET_EXTRA_ATT(ch, iter)) {
 			fprintf(fl, "Extra Attribute: %s %d\n", extra_attribute_types[iter], GET_EXTRA_ATT(ch, iter));
 		}
 	}
+	*/
 	
 	// 'F'
 	fprintf(fl, "Fight Messages: %s\n", bitv_to_alpha(GET_FIGHT_MESSAGES(ch)));
@@ -2651,6 +2714,9 @@ void write_player_primary_data_to_file(FILE *fl, char_data *ch) {
 	}
 	
 	// 'L'
+	HASH_ITER(hh, GET_LANGUAGES(ch), lang, next_lang) {
+		fprintf(fl, "Language: %d %d\n", lang->vnum, lang->level);
+	}
 	fprintf(fl, "Largest Inventory: %d\n", GET_LARGEST_INVENTORY(ch));
 	if (GET_LAST_CORPSE_ID(ch) > 0) {
 		fprintf(fl, "Last Corpse Id: %d\n", GET_LAST_CORPSE_ID(ch));
@@ -2768,6 +2834,9 @@ void write_player_primary_data_to_file(FILE *fl, char_data *ch) {
 			fprintf(fl, "Slash-channel: %s\n", loadslash->name);
 		}
 	}
+	if (GET_SPEAKING(ch) != NOTHING) {
+		fprintf(fl, "Speaking: %d\n", GET_SPEAKING(ch));
+	}
 	if (SYSLOG_FLAGS(ch)) {
 		fprintf(fl, "Syslog Flags: %s\n", bitv_to_alpha(SYSLOG_FLAGS(ch)));
 	}
@@ -2813,23 +2882,27 @@ void write_player_primary_data_to_file(FILE *fl, char_data *ch) {
 	// re-apply: equipment
 	for (iter = 0; iter < NUM_WEARS; ++iter) {
 		if (char_eq[iter]) {
+			/* this is almost certainly an error since this is called on every save:
 			#ifndef NO_EXTRANEOUS_TRIGGERS
 				if (wear_otrigger(char_eq[iter], ch, iter)) {
 			#endif
-					// this line may depend on the above if
+			*/
+					// this line may depend on the above if NO_EXTRANEOUS_TRIGGERS is off
 					equip_char(ch, char_eq[iter], iter);
+			/* probably an error here (see above):
 			#ifndef NO_EXTRANEOUS_TRIGGERS
 				}
 				else {
 					obj_to_char(char_eq[iter], ch);
 				}
 			#endif
+			*/
 		}
 	}
 	
 	// restore pools, which may have been modified
 	for (iter = 0; iter < NUM_POOLS; ++iter) {
-		GET_CURRENT_POOL(ch, iter) = pool[iter];
+		GET_CURRENT_POOL(ch, iter) = pool[iter];	// set ok: character cannot have taken damage here
 		GET_DEFICIT(ch, iter) = deficit[iter];
 	}
 	
@@ -2979,7 +3052,10 @@ void write_player_delayed_data_to_file(FILE *fl, char_data *ch) {
 	LL_FOREACH(GET_QUESTS(ch), plrq) {
 		fprintf(fl, "Quest: %d %d %ld %d %d\n", plrq->vnum, plrq->version, plrq->start_time, plrq->instance_id, plrq->adventure);
 		LL_FOREACH(plrq->tracker, task) {
-			fprintf(fl, "Quest-task: %d %d %lld %d %d %c\n", task->type, task->vnum, task->misc, task->needed, task->current, task->group);
+			fprintf(fl, "Quest-task: %d %d %lld %d %d %c %s\n", task->type, task->vnum, task->misc, task->needed, task->current, task->group ? task->group : '-', (task->custom && *task->custom) ? "+" : "");
+			if (task->custom && *task->custom) {
+				fprintf(fl, "%s~\n", task->custom);
+			}
 		}
 	}
 	HASH_ITER(hh, GET_COMPLETED_QUESTS(ch), plrcom, next_plrcom) {
@@ -3260,7 +3336,7 @@ char_data *find_or_load_player(char *name, bool *is_file) {
 	// not able to find -- look for a player partial match?
 	if (!ch) {
 		sprintf(buf, "0.%s", name);	// add 0. to force player match
-		ch = get_char_world(buf, NULL);
+		ch = get_player_world(buf, NULL);
 		*is_file = FALSE;
 		if (ch && IS_NPC(ch)) {
 			ch = NULL;	// verify player only
@@ -3326,6 +3402,8 @@ void remove_loaded_player(char_data *ch) {
 *  -- The Management
 */
 
+// Note: to set the headers of the wiz/godlists, use "config game wizlist_header", "config game godlist_header" in-game
+
 const char *AUTOWIZ_IMM_LMARG = "   ";
 const int AUTOWIZ_IMM_NSIZE = 16;
 const int AUTOWIZ_LINE_LEN = 64;
@@ -3334,13 +3412,9 @@ const int AUTOWIZ_MIN_LEVEL = LVL_GOD;
 // max level that should be in columns instead of centered
 const int AUTOWIZ_COL_LEVEL = LVL_GOD;
 
-const char *autowiz_header =
-"*************************************************************************\n"
-"* The following people have reached immortality on EmpireMUD.  They are *\n"
-"* to be treated with respect and awe.  Occasional prayers to them are   *\n"
-"* advisable.  Annoying them is not recommended.  Stealing from them is  *\n"
-"* punishable by immediate death.                                        *\n"
-"*************************************************************************\n";
+// AUTOWIZ_MODE_x: which version is being generated
+#define AUTOWIZ_MODE_WIZLIST  0
+#define AUTOWIZ_MODE_GODLIST  1
 
 
 struct autowiz_name_rec {
@@ -3477,17 +3551,21 @@ void autowiz_read_players(void) {
 /**
 * Writes a wizlist (or godlist) file.
 *
+* @param int mode AUTOWIZ_MODE_WIZLIST or AUTOWIZ_MODE_GODLIST
 * @param FILE *out The file open for writing.
 * @param int minlev Minimum level to write to this file.
 * @param int maxlev Maximum level to write to this file.
 */
-void autowiz_write_wizlist(FILE *out, int minlev, int maxlev) {
+void autowiz_write_wizlist(int mode, FILE *out, int minlev, int maxlev) {
 	char buf[MAX_STRING_LENGTH];
+	const char *header;
 	struct autowiz_level_rec *curr_level;
 	struct autowiz_name_rec *curr_name;
 	int i, j;
 	
-	fprintf(out, "%s\n", autowiz_header);
+	if ((header = config_get_string(mode == AUTOWIZ_MODE_GODLIST ? "godlist_header" : "wizlist_header"))) {
+		fprintf(out, "%s\n", header);
+	}
 	
 	for (curr_level = autowiz_data; curr_level; curr_level = curr_level->next) {
 		if (curr_level->params->level < minlev || curr_level->params->level > maxlev) {
@@ -3575,7 +3653,7 @@ void run_autowiz(void) {
 		log("SYSERR: run_autowiz: Unable to open file %s for writing\r\n", tempname);
 		return;
 	}
-	autowiz_write_wizlist(fl, LVL_START_IMM, LVL_TOP);
+	autowiz_write_wizlist(AUTOWIZ_MODE_WIZLIST, fl, LVL_START_IMM, LVL_TOP);
 	fclose(fl);
 	rename(tempname, basename);
 	
@@ -3588,7 +3666,7 @@ void run_autowiz(void) {
 		log("SYSERR: run_autowiz: Unable to open file %s for writing\r\n", tempname);
 		return;
 	}
-	autowiz_write_wizlist(fl, LVL_GOD, LVL_START_IMM - 1);
+	autowiz_write_wizlist(AUTOWIZ_MODE_GODLIST, fl, LVL_GOD, LVL_START_IMM - 1);
 	fclose(fl);
 	rename(tempname, basename);
 	
@@ -3865,6 +3943,40 @@ void clear_player(char_data *ch) {
 	GET_TEMPORARY_ACCOUNT_ID(ch) = NOTHING;
 	GET_IMMORTAL_LEVEL(ch) = -1;	// Not an immortal
 	GET_LAST_VEHICLE(ch) = NOTHING;
+	GET_SPEAKING(ch) = NOTHING;
+}
+
+
+/**
+* Updates the affect timers on players when they first log into the game, and
+* schedules the expiration events. This is also safe to call on offline players
+* if you need the affect timers to be accurate, e.g. in "stat file".
+*
+* @param char_data *ch The player.
+*/
+void convert_and_schedule_player_affects(char_data *ch) {
+	struct affected_type *af;
+	struct over_time_effect_type *dot;
+	
+	// convert timers first
+	if (!IS_NPC(ch) && !AFFECTS_CONVERTED(ch)) {
+		AFFECTS_CONVERTED(ch) = TRUE;
+		LL_FOREACH(ch->affected, af) {
+			if (af->expire_time != UNLIMITED) {
+				// convert from seconds
+				af->expire_time += time(0);
+			}
+		}
+	}
+	
+	// schedule them even if already converted
+	LL_FOREACH(ch->affected, af) {
+		// schedule it
+		schedule_affect_expire(ch, af);
+	}
+	LL_FOREACH(ch->over_time_effects, dot) {
+		schedule_dot_update(ch, dot);
+	}
 }
 
 
@@ -3976,6 +4088,7 @@ void delete_player_character(char_data *ch) {
 	
 	clear_private_owner(GET_IDNUM(ch));
 	purge_bound_items(GET_IDNUM(ch));
+	delete_player_from_running_events(ch);
 
 	// Check the empire
 	if ((emp = GET_LOYALTY(ch)) != NULL) {
@@ -4149,6 +4262,7 @@ void enter_player_game(descriptor_data *d, int dolog, bool fresh) {
 
 	// add to lists
 	DL_PREPEND(character_list, ch);
+	DL_PREPEND2(player_character_list, ch, prev_plr, next_plr);
 	ch->script_id = GET_IDNUM(ch);	// if not already set
 	if (!ch->in_lookup_table) {
 		add_to_lookup_table(ch->script_id, (void *)ch, TYPE_MOB);
@@ -4231,12 +4345,12 @@ void enter_player_game(descriptor_data *d, int dolog, bool fresh) {
 	
 	if (!IS_IMMORTAL(ch)) {
 		// ensure player has penalty if at war
-		if (fresh && GET_LOYALTY(ch) && is_at_war(GET_LOYALTY(ch)) && (duration = config_get_int("war_login_delay") / SECS_PER_REAL_UPDATE) > 0) {
+		if (fresh && GET_LOYALTY(ch) && is_at_war(GET_LOYALTY(ch)) && (duration = config_get_int("war_login_delay")) > 0) {
 			af = create_flag_aff(ATYPE_WAR_DELAY, duration, AFF_IMMUNE_PHYSICAL | AFF_NO_ATTACK | AFF_HARD_STUNNED, ch);
 			affect_join(ch, af, ADD_DURATION);
 			msg_to_char(ch, "\trYou are stunned for %d second%s because your empire is at war.\r\n", duration, PLURAL(duration));
 		}
-		else if (fresh && IN_HOSTILE_TERRITORY(ch) && (duration = config_get_int("hostile_login_delay") / SECS_PER_REAL_UPDATE) > 0) {
+		else if (fresh && IN_HOSTILE_TERRITORY(ch) && (duration = config_get_int("hostile_login_delay")) > 0) {
 			af = create_flag_aff(ATYPE_HOSTILE_DELAY, duration, AFF_IMMUNE_PHYSICAL | AFF_NO_ATTACK | AFF_HARD_STUNNED, ch);
 			affect_join(ch, af, ADD_DURATION);
 			msg_to_char(ch, "\trYou are stunned for %d second%s because you logged in in hostile territory.\r\n", duration, PLURAL(duration));
@@ -4244,9 +4358,11 @@ void enter_player_game(descriptor_data *d, int dolog, bool fresh) {
 	}
 
 	// script/trigger stuff
-	greet_mtrigger(ch, NO_DIR);
+	pre_greet_mtrigger(ch, IN_ROOM(ch), NO_DIR, "login");	// cannot pre-greet for this
+	enter_wtrigger(IN_ROOM(ch), ch, NO_DIR, "login");
+	greet_mtrigger(ch, NO_DIR, "login");
 	greet_memory_mtrigger(ch);
-	greet_vtrigger(ch, NO_DIR);
+	greet_vtrigger(ch, NO_DIR, "login");
 	
 	// update the index in case any of this changed
 	index = find_player_index_by_idnum(GET_IDNUM(ch));
@@ -4258,9 +4374,12 @@ void enter_player_game(descriptor_data *d, int dolog, bool fresh) {
 	check_learned_crafts(ch);
 	check_currencies(ch);
 	check_eq_sets(ch);
+	check_languages(ch);
 	check_minipets_and_companions(ch);
 	check_player_events(ch);
 	refresh_passive_buffs(ch);
+	convert_and_schedule_player_affects(ch);
+	schedule_all_obj_timers(ch);
 	
 	// break last reply if invis
 	if (GET_LAST_TELL(ch) && (repl = is_playing(GET_LAST_TELL(ch))) && (GET_INVIS_LEV(repl) > GET_ACCESS_LEVEL(ch) || (!IS_IMMORTAL(ch) && PRF_FLAGGED(repl, PRF_INCOGNITO)))) {
@@ -4284,13 +4403,13 @@ void enter_player_game(descriptor_data *d, int dolog, bool fresh) {
 	
 	// free reset?
 	if (RESTORE_ON_LOGIN(ch)) {
-		GET_HEALTH(ch) = GET_MAX_HEALTH(ch);
-		GET_MOVE(ch) = GET_MAX_MOVE(ch);
-		GET_MANA(ch) = GET_MAX_MANA(ch);
+		set_health(ch, GET_MAX_HEALTH(ch));
+		set_move(ch, GET_MAX_MOVE(ch));
+		set_mana(ch, GET_MAX_MANA(ch));
 		GET_COND(ch, FULL) = MIN(0, GET_COND(ch, FULL));
 		GET_COND(ch, THIRST) = MIN(0, GET_COND(ch, THIRST));
 		GET_COND(ch, DRUNK) = MIN(0, GET_COND(ch, DRUNK));
-		GET_BLOOD(ch) = GET_MAX_BLOOD(ch);
+		set_blood(ch, GET_MAX_BLOOD(ch));
 		
 		// clear deficits
 		for (iter = 0; iter < NUM_POOLS; ++iter) {
@@ -4311,8 +4430,8 @@ void enter_player_game(descriptor_data *d, int dolog, bool fresh) {
 	}
 	else {
 		// ensure not dead
-		GET_HEALTH(ch) = MAX(1, GET_HEALTH(ch));
-		GET_BLOOD(ch) = MAX(1, GET_BLOOD(ch));
+		set_health(ch, MAX(1, GET_HEALTH(ch)));
+		set_blood(ch, MAX(1, GET_BLOOD(ch)));
 	}
 	
 	// position must be reset
@@ -4414,6 +4533,11 @@ void give_newbie_gear(char_data *ch, obj_vnum vnum, int pos) {
 	}
 	else {
 		equip_char(ch, obj, pos);
+	}
+	
+	// always bind immediately if BoE
+	if (OBJ_FLAGGED(obj, OBJ_BIND_FLAGS)) {
+		bind_obj_to_player(obj, ch);
 	}
 }
 
@@ -4576,7 +4700,7 @@ void reset_char(char_data *ch) {
 	ch->char_specials.position = POS_STANDING;
 	
 	if (GET_MOVE(ch) <= 0) {
-		GET_MOVE(ch) = 1;
+		GET_MOVE(ch) = 1;	// ok to set here: character is definitely not in-game
 	}
 }
 
@@ -4645,9 +4769,14 @@ void set_title(char_data *ch, char *title) {
 // for start_new_character
 GLB_FUNCTION(run_global_newbie_gear) {
 	struct archetype_gear *gear;
+	bool any = FALSE;
+	
 	LL_FOREACH(GET_GLOBAL_GEAR(glb), gear) {
 		give_newbie_gear(ch, gear->vnum, gear->wear);
+		any = TRUE;
 	}
+	
+	return any;
 }
 
 
@@ -4765,6 +4894,11 @@ void start_new_character(char_data *ch) {
 		for (gear = GET_ARCH_GEAR(arch); gear; gear = gear->next) {
 			give_newbie_gear(ch, gear->vnum, gear->wear);
 		}
+		
+		// language
+		if (GET_ARCH_LANGUAGE(arch) && GEN_TYPE(GET_ARCH_LANGUAGE(arch)) == GENERIC_LANGUAGE && !GEN_FLAGGED(GET_ARCH_LANGUAGE(arch), GEN_IN_DEVELOPMENT)) {
+			add_language(ch, GEN_VNUM(GET_ARCH_LANGUAGE(arch)), LANG_SPEAK);
+		}
 	}
 	
 	// guarantee minimum of 1 for active attributes
@@ -4793,10 +4927,10 @@ void start_new_character(char_data *ch) {
 	update_class(ch);
 	
 	// restore pools (last, in case they changed during bonus traits or somewhere)
-	GET_HEALTH(ch) = GET_MAX_HEALTH(ch);
-	GET_MOVE(ch) = GET_MAX_MOVE(ch);
-	GET_MANA(ch) = GET_MAX_MANA(ch);
-	GET_BLOOD(ch) = GET_MAX_BLOOD(ch);
+	set_health(ch, GET_MAX_HEALTH(ch));
+	set_move(ch, GET_MAX_MOVE(ch));
+	set_mana(ch, GET_MAX_MANA(ch));
+	set_blood(ch, GET_MAX_BLOOD(ch));
 	
 	// prevent a repeat
 	REMOVE_BIT(PLR_FLAGS(ch), PLR_NEEDS_NEWBIE_SETUP);
@@ -4818,6 +4952,340 @@ void update_played_time(char_data *ch) {
 	if (!IS_NPC(ch) && GET_LOYALTY(ch)) {
 		track_empire_playtime(GET_LOYALTY(ch), amt);
 	}
+}
+
+
+ //////////////////////////////////////////////////////////////////////////////
+//// LANGUAGES ///////////////////////////////////////////////////////////////
+
+/**
+* Adds (or updates) a language for a player character. If the level is
+* LANG_UNKNOWN, it will delete the entry (this is the default).
+*
+* @param char_data *ch The player.
+* @param any_vnum vnum The vnum of the language (generic).
+* @param byte level Any LANG_ const to indicate how well they know it the language.
+*/
+void add_language(char_data *ch, any_vnum vnum, byte level) {
+	struct player_language *pl;
+	
+	if (!ch || IS_NPC(ch)) {
+		return;	// oops
+	}
+	
+	// find
+	HASH_FIND_INT(GET_LANGUAGES(ch), &vnum, pl);
+	
+	// add if necessary
+	if (!pl && level != LANG_UNKNOWN) {
+		CREATE(pl, struct player_language, 1);
+		pl->vnum = vnum;
+		HASH_ADD_INT(GET_LANGUAGES(ch), vnum, pl);
+	}
+	
+	// update
+	if (pl) {
+		pl->level = level;
+	}
+	
+	// delete if necessary?
+	if (pl && pl->level == LANG_UNKNOWN) {
+		HASH_DEL(GET_LANGUAGES(ch), pl);
+		free(pl);
+		pl = NULL;
+	}
+	
+	// ensure character speaks SOMETHING if this is a "speak"
+	if (GET_SPEAKING(ch) == NOTHING && pl && pl->level == LANG_SPEAK) {
+		GET_SPEAKING(ch) = vnum;
+	}
+	
+	// otherwise ensure they're not speaking it
+	if (GET_SPEAKING(ch) == vnum && pl && pl->level != LANG_SPEAK) {
+		GET_SPEAKING(ch) = NOTHING;
+	}
+	
+	// update quests and mark for save
+	qt_change_language(ch, vnum, level);
+	queue_delayed_update(ch, CDU_SAVE);
+}
+
+
+/**
+* Adds (or updates) a language for an empires. If the level is LANG_UNKNOWN, it
+* will delete the entry (this is the default). Empire languages are only used
+* to give languages to members.
+*
+* @param empire_data *emp The empire.
+* @param any_vnum vnum The vnum of the language (generic).
+* @param byte level Any LANG_ const to indicate how well they know it the language.
+*/
+void add_language_empire(empire_data *emp, any_vnum vnum, byte level) {
+	struct player_language *pl;
+	
+	if (!emp) {
+		return;	// oops
+	}
+	
+	// find
+	HASH_FIND_INT(EMPIRE_LANGUAGES(emp), &vnum, pl);
+	
+	// add if necessary
+	if (!pl && level != LANG_UNKNOWN) {
+		CREATE(pl, struct player_language, 1);
+		pl->vnum = vnum;
+		HASH_ADD_INT(EMPIRE_LANGUAGES(emp), vnum, pl);
+	}
+	
+	// update
+	if (pl) {
+		pl->level = level;
+	}
+	
+	// delete if necessary?
+	if (pl && pl->level == LANG_UNKNOWN) {
+		HASH_DEL(EMPIRE_LANGUAGES(emp), pl);
+		free(pl);
+		pl = NULL;
+	}
+	
+	// update quests and mark for save
+	// et_change_language(emp, vnum, level);
+	EMPIRE_NEEDS_SAVE(emp) = TRUE;
+}
+
+
+/**
+* Grants a player all the languages their empire speaks. This is meant to be
+* called from within check_languages(), which immediately validates them all.
+*
+* @param char_data *ch The player.
+*/
+static void assign_empire_languages(char_data *ch) {
+	struct player_language *pl, *next_pl;
+	int level;
+	
+	if (!ch || IS_NPC(ch) || !GET_LOYALTY(ch)) {
+		return;	// no work
+	}
+	
+	HASH_ITER(hh, EMPIRE_LANGUAGES(GET_LOYALTY(ch)), pl, next_pl) {
+		level = speaks_language(ch, pl->vnum);
+		if (level < pl->level) {
+			add_language(ch, pl->vnum, pl->level);
+		}
+	}
+}
+
+
+/**
+* This is called when a character logs in or when a language is saved in OLC
+* (under some circumstances) to ensure the character has the correct languages
+* in their list.
+*
+* @param char_data *ch The player.
+*/
+void check_languages(char_data *ch) {
+	struct player_language *lang, *next_lang;
+	generic_data *gen, *next_gen;
+	bool ok = FALSE, save = FALSE;
+	any_vnum backup_speaking = NOTHING, second_backup = NOTHING;
+	
+	if (IS_NPC(ch)) {
+		return;
+	}
+	
+	assign_empire_languages(ch);
+	
+	// check languages they know
+	HASH_ITER(hh, GET_LANGUAGES(ch), lang, next_lang) {
+		// audit it
+		if (!(gen = find_generic(lang->vnum, GENERIC_LANGUAGE))) {
+			ok = FALSE;	// deleted?
+		}
+		else if (GEN_FLAGGED(gen, GEN_IN_DEVELOPMENT)) {
+			ok = FALSE;	// in-dev
+		}
+		else if (lang->level == LANG_UNKNOWN) {
+			ok = FALSE;	// might as well delete these here
+		}
+		else {
+			// seems ok
+			ok = TRUE;
+		}
+		
+		// did we make it
+		if (ok) {
+			// try to store as a backup for later
+			if (backup_speaking == NOTHING && GEN_FLAGGED(gen, GEN_BASIC)) {
+				backup_speaking = lang->vnum;
+			}
+			else if (second_backup == NOTHING) {
+				// non-basic backup just in case
+				second_backup = lang->vnum;
+			}
+		}
+		else {
+			// remove
+			save = TRUE;
+			HASH_DEL(GET_LANGUAGES(ch), lang);
+			free(lang);
+		}
+	}
+	
+	// check for common languages
+	HASH_ITER(hh, generic_table, gen, next_gen) {
+		if (GEN_TYPE(gen) != GENERIC_LANGUAGE) {
+			continue;	// not a language
+		}
+		if (GEN_FLAGGED(gen, GEN_IN_DEVELOPMENT)) {
+			continue;	// can't be in-dev
+		}
+		if (!GEN_FLAGGED(gen, GEN_BASIC)) {
+			continue;	// must be basic
+		}
+		
+		// ok? ensure the player speaks it
+		if (speaks_language(ch, GEN_VNUM(gen)) != LANG_SPEAK) {
+			add_language(ch, GEN_VNUM(gen), LANG_SPEAK);
+			save = TRUE;
+		}
+		
+		// try to store as a backup for later
+		if (backup_speaking == NOTHING) {
+			backup_speaking = GEN_VNUM(gen);
+		}
+	}
+	
+	// ensure they have a valid 'speaking'
+	if (GET_SPEAKING(ch) == NOTHING || speaks_language(ch, GET_SPEAKING(ch)) != LANG_SPEAK) {
+		// this MAY still be 'NOTHING' but it should be a best choice either way
+		GET_SPEAKING(ch) = (backup_speaking != NOTHING ? backup_speaking : second_backup);
+		save = TRUE;
+	}
+	
+	// and save if requested
+	if (save) {
+		queue_delayed_update(ch, CDU_SAVE);
+	}
+}
+
+
+/**
+* Ensures all characters in the game have valid languages. This does not need
+* to hit players who are at menus rather than in-game because they will be
+* checked when they enter the game.
+*/
+void check_languages_all(void) {
+	char_data *ch;
+	
+	check_languages_all_empires();
+	
+	DL_FOREACH2(player_character_list, ch, next_plr) {
+		check_languages(ch);
+	}
+}
+
+
+/**
+* Checks languages for all empires.
+*/
+void check_languages_all_empires(void) {
+	empire_data *emp, *next_emp;
+	HASH_ITER(hh, empire_table, emp, next_emp) {
+		check_languages_empire(emp);
+	}
+}
+
+
+/**
+* Check languages for an empire to make sure they are all valid.
+*
+* @param empire_data *emp The empire.
+*/
+void check_languages_empire(empire_data *emp) {
+	generic_data *gen;
+	struct player_language *lang, *next_lang;
+	bool ok = FALSE, save = FALSE;
+	
+	if (emp) {
+		HASH_ITER(hh, EMPIRE_LANGUAGES(emp), lang, next_lang) {
+			// audit it
+			if (!(gen = find_generic(lang->vnum, GENERIC_LANGUAGE))) {
+				ok = FALSE;	// deleted?
+			}
+			else if (GEN_FLAGGED(gen, GEN_IN_DEVELOPMENT)) {
+				ok = FALSE;	// in-dev
+			}
+			else if (lang->level == LANG_UNKNOWN) {
+				ok = FALSE;	// might as well delete these here
+			}
+			else {
+				// seems ok
+				ok = TRUE;
+			}
+		
+			// did we make it
+			if (!ok) {
+				// remove
+				save = TRUE;
+				HASH_DEL(EMPIRE_LANGUAGES(emp), lang);
+				free(lang);
+			}
+		}
+		
+		if (save) {
+			EMPIRE_NEEDS_SAVE(emp) = TRUE;
+		}
+	}
+}
+
+
+/**
+* Determines how well a character knows a language. NPCs always speak any
+* language.
+*
+* @param char_data *ch The player.
+* @param any_vnum vnum The vnum of the language (generic).
+* @return int A LANG_ constant indicating how well the player knows the language.
+*/
+int speaks_language(char_data *ch, any_vnum vnum) {
+	struct player_language *pl;
+	
+	if (!ch) {
+		// oops
+		return LANG_UNKNOWN;
+	}
+	if (IS_NPC(ch)) {
+		// npcs always speak a language
+		return LANG_SPEAK;
+	}
+	
+	// find
+	HASH_FIND_INT(GET_LANGUAGES(ch), &vnum, pl);
+	return pl ? pl->level : LANG_UNKNOWN;
+}
+
+
+/**
+* Determines if an empire has unlocked a language at the empire level (usually
+* from progress goals).
+*
+* @param empire_data *emp The empire.
+* @param any_vnum vnum The vnum of the language (generic).
+* @return int A LANG_ constant indicating how well the empire knows the language.
+*/
+int speaks_language_empire(empire_data *emp, any_vnum vnum) {
+	struct player_language *pl;
+	
+	if (!emp) {
+		// oops
+		return LANG_UNKNOWN;
+	}
+	
+	// find
+	HASH_FIND_INT(EMPIRE_LANGUAGES(emp), &vnum, pl);
+	return pl ? pl->level : LANG_UNKNOWN;
 }
 
 
@@ -4883,6 +5351,7 @@ void add_player_map_memory(char_data *ch, room_vnum vnum, char *icon, char *name
 void delete_player_map_memory(struct player_map_memory *memory, char_data *ch) {
 	// ch is optional
 	if (ch && !IS_NPC(ch)) {
+		GET_MAP_MEMORY_NEEDS_SAVE(ch) = TRUE;
 		HASH_DEL(GET_MAP_MEMORY(ch), memory);
 		--GET_MAP_MEMORY_COUNT(ch);
 	}
@@ -4954,7 +5423,15 @@ void load_map_memory(char_data *ch) {
 		
 		// load from file
 		while (get_line(fl, line)) {
-			if (*line && sscanf(line, "%d %ld %4s %s", &vnum, &timestamp, icon, name) == 4) {
+			if (*line == '*' && sscanf(line+2, "%d %ld %s", &vnum, &timestamp, name) == 3) {
+				// remove dummy values
+				if (!strcmp(name, "~")) {
+					*name = '\0';
+				}
+				// and add
+				add_player_map_memory(ch, vnum, "", name, timestamp);
+			}
+			else if (*line && sscanf(line, "%d %ld %4s %s", &vnum, &timestamp, icon, name) == 4) {
 				// remove dummy values
 				if (!strcmp(icon, "    ")) {
 					*icon = '\0';
@@ -5022,7 +5499,12 @@ void write_map_memory(char_data *ch) {
 	}
 	
 	HASH_ITER(hh, GET_MAP_MEMORY(ch), map_mem, next) {
-		fprintf(fl, "%d %ld %-4.4s %s\n", map_mem->vnum, map_mem->timestamp, NULLSAFE(map_mem->icon), (map_mem->name && *map_mem->name) ? map_mem->name : "~");
+		if (map_mem->icon) {
+			fprintf(fl, "%d %ld %-4.4s %s\n", map_mem->vnum, map_mem->timestamp, map_mem->icon, (map_mem->name && *map_mem->name) ? map_mem->name : "~");
+		}
+		else {	// no icon
+			fprintf(fl, "* %d %ld %s\n", map_mem->vnum, map_mem->timestamp, (map_mem->name && *map_mem->name) ? map_mem->name : "~");
+		}
 	}
 	
 	fclose(fl);

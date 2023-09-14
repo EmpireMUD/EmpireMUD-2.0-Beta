@@ -202,6 +202,30 @@ int count_empire_objects(empire_data *emp, obj_vnum vnum) {
 
 
 /**
+* Deletes entries by type+value.
+*
+* @param struct progress_perk **list A pointer to the list to delete from.
+* @param int type PRG_PERK type.
+* @param int value The value to remove.
+* @return bool TRUE if the type+value was removed from the list. FALSE if not.
+*/
+bool delete_progress_perk_from_list(struct progress_perk **list, int type, int value) {
+	struct progress_perk *iter, *next_iter;
+	bool any = FALSE;
+	
+	LL_FOREACH_SAFE(*list, iter, next_iter) {
+		if (iter->type == type && iter->value == value) {
+			any = TRUE;
+			LL_DELETE(*list, iter);
+			free(iter);
+		}
+	}
+	
+	return any;
+}
+
+
+/**
 * Finds a goal the empire is currently on. This allows multi-word abbrevs, and
 * prefers exact matches.
 *
@@ -210,7 +234,7 @@ int count_empire_objects(empire_data *emp, obj_vnum vnum) {
 */
 progress_data *find_current_progress_goal_by_name(empire_data *emp, char *name) {
 	struct empire_goal *goal, *next_goal;
-	progress_data *prg, *partial = NULL;
+	progress_data *prg, *partial = NULL, *multi = NULL;
 	
 	if (!emp || !*name) {
 		return NULL;
@@ -227,9 +251,12 @@ progress_data *find_current_progress_goal_by_name(empire_data *emp, char *name) 
 		else if (!partial && is_multiword_abbrev(name, PRG_NAME(prg))) {
 			partial = prg;
 		}
+		else if (!multi && multi_isname(name, PRG_NAME(prg))) {
+			multi = prg;
+		}
 	}
 	
-	return partial;	// if any
+	return partial ? partial : multi;	// if any
 }
 
 
@@ -240,7 +267,7 @@ progress_data *find_current_progress_goal_by_name(empire_data *emp, char *name) 
 * @param char *name The name to look for.
 */
 progress_data *find_progress_goal_by_name(char *name) {
-	progress_data *prg, *next_prg, *partial = NULL;
+	progress_data *prg, *next_prg, *partial = NULL, *multi = NULL;
 	
 	if (!*name) {
 		return NULL;
@@ -257,9 +284,12 @@ progress_data *find_progress_goal_by_name(char *name) {
 		else if (!partial && is_multiword_abbrev(name, PRG_NAME(prg))) {
 			partial = prg;
 		}
+		else if (!multi && multi_isname(name, PRG_NAME(prg))) {
+			multi = prg;
+		}
 	}
 	
-	return partial;	// if any
+	return partial ? partial : multi;	// if any
 }
 
 
@@ -271,7 +301,7 @@ progress_data *find_progress_goal_by_name(char *name) {
 * @param char *name The name to look for.
 */
 progress_data *find_purchasable_goal_by_name(empire_data *emp, char *name) {
-	progress_data *prg, *next_prg, *partial = NULL;
+	progress_data *prg, *next_prg, *partial = NULL, *multi = NULL;
 	
 	if (!emp || !*name) {
 		return NULL;
@@ -294,9 +324,30 @@ progress_data *find_purchasable_goal_by_name(empire_data *emp, char *name) {
 		else if (!partial && is_multiword_abbrev(name, PRG_NAME(prg))) {
 			partial = prg;
 		}
+		else if (!multi && multi_isname(name, PRG_NAME(prg))) {
+			multi = prg;
+		}
 	}
 	
-	return partial;	// if any
+	return partial ? partial : multi;	// if any
+}
+
+
+/**
+* @param struct progress_perk *list A list to search.
+* @param int type PRG_PERK type.
+* @param int value The value to look for.
+* @return bool TRUE if the type+value is in the list. FALSE if not.
+*/
+bool find_progress_perk_in_list(struct progress_perk *list, int type, int value) {
+	struct progress_perk *perk;
+	
+	LL_FOREACH(list, perk) {
+		if (perk->type == type && perk->value == value) {
+			return TRUE;
+		}
+	}
+	return FALSE;
 }
 
 
@@ -398,6 +449,14 @@ char *get_one_perk_display(struct progress_perk *perk, bool show_vnums) {
 			sprintf(save_buffer, "%+d territory", perk->value);
 			break;
 		}
+		case PRG_PERK_SPEAK_LANGUAGE: {
+			sprintf(save_buffer, "Members can speak %s%s", numstr, get_generic_name_by_vnum(perk->value));
+			break;
+		}
+		case PRG_PERK_RECOGNIZE_LANGUAGE: {
+			sprintf(save_buffer, "Members can recognize %s%s", numstr, get_generic_name_by_vnum(perk->value));
+			break;
+		}
 		default: {
 			strcpy(save_buffer, "UNKNOWN");
 			break;
@@ -425,6 +484,23 @@ void get_progress_perks_display(struct progress_perk *list, char *save_buffer, b
 	}
 	
 	// empty list not shown
+}
+
+
+/**
+* Counts the words of text in a progression's strings.
+*
+* @param progress_data *prg The progression whose strings to count.
+* @return int The number of words in the progression's strings.
+*/
+int wordcount_progress(progress_data *prg) {
+	int count = 0;
+	
+	count += wordcount_string(PRG_NAME(prg));
+	count += wordcount_string(PRG_DESCRIPTION(prg));
+	count += wordcount_requirements(PRG_TASKS(prg));
+	
+	return count;
 }
 
 
@@ -476,6 +552,7 @@ void add_completed_goal(empire_data *emp, any_vnum vnum) {
 void apply_progress_to_empire(empire_data *emp, progress_data *prg, bool add) {
 	struct empire_island *isle, *next_isle;
 	struct progress_perk *perk;
+	bool languages = FALSE;
 	
 	if (!emp || !prg) {
 		return;	// sanitation
@@ -540,10 +617,35 @@ void apply_progress_to_empire(empire_data *emp, progress_data *prg, bool add) {
 				SAFE_ADD(EMPIRE_ATTRIBUTE(emp, EATT_WORKFORCE_CAP), (add ? perk->value : -perk->value), 0, INT_MAX, TRUE);
 				break;
 			}
+			case PRG_PERK_SPEAK_LANGUAGE: {
+				if (add) {
+					add_language_empire(emp, perk->value, LANG_SPEAK);
+				}
+				else {
+					add_language_empire(emp, perk->value, LANG_UNKNOWN);
+				}
+				languages = TRUE;
+				break;
+			}
+			case PRG_PERK_RECOGNIZE_LANGUAGE: {	
+				int level = speaks_language_empire(emp, perk->value);
+				// prevent a downgrade if they are at SPEAK not RECOGNIZE
+				if (add && level != LANG_SPEAK) {
+					add_language_empire(emp, perk->value, LANG_RECOGNIZE);
+				}
+				else if (!add && level != LANG_SPEAK) {
+					add_language_empire(emp, perk->value, LANG_UNKNOWN);
+				}
+				languages = TRUE;
+				break;
+			}
 		}
 	}
 	
 	EMPIRE_NEEDS_SAVE(emp) = TRUE;
+	if (languages) {
+		check_languages_all();
+	}
 }
 
 
@@ -586,7 +688,7 @@ void check_for_eligible_goals(empire_data *emp) {
 	HASH_ITER(hh, progress_table, prg, next_prg) {
 		vnum = PRG_VNUM(prg);
 		
-		if (PRG_FLAGGED(prg, PRG_IN_DEVELOPMENT | PRG_PURCHASABLE | PRG_SCRIPT_ONLY)) {
+		if (PRG_FLAGGED(prg, PRG_IN_DEVELOPMENT | PRG_PURCHASABLE | PRG_NO_AUTOSTART)) {
 			continue;
 		}
 		if (get_current_goal(emp, vnum)) {
@@ -812,7 +914,7 @@ void refresh_empire_goals(empire_data *emp, any_vnum only_vnum) {
 			}
 			skip = TRUE;
 		}
-		if (PRG_FLAGGED(prg, PRG_SCRIPT_ONLY)) {
+		if (PRG_FLAGGED(prg, PRG_NO_AUTOSTART)) {
 			skip = TRUE;	// we don't affect script goals here
 		}
 		
@@ -1006,14 +1108,18 @@ void remove_completed_goal(empire_data *emp, any_vnum vnum) {
 
 
 /**
-* Call this function to reward an empire with a SCRIPT-ONLY progress goal. This
-* function does not validate prereqs or point availability. It only does the
-* work.
+* Call this function to reward an empire with a NO-SAUTOSTART progress goal.
+* This function does not validate prereqs or point availability. It only does
+* the work.
+*
+* Note: This is also called by QR_GRANT_PROGRESS rewards.
 *
 * @param empire_data *emp Which empire is being rewarded.
 * @param progress_data *prg The progression goal being added.
 */
 void script_reward_goal(empire_data *emp, progress_data *prg) {
+	struct empire_goal *goal;
+	
 	if (!emp || !prg) {
 		return;	// nothing to do
 	}
@@ -1023,7 +1129,11 @@ void script_reward_goal(empire_data *emp, progress_data *prg) {
 	}
 	log_to_empire(emp, ELOG_PROGRESS, "Achieved: %s", PRG_NAME(prg));
 	
+	goal = get_current_goal(emp, PRG_VNUM(prg));
 	add_completed_goal(emp, PRG_VNUM(prg));
+	if (goal) {
+		cancel_empire_goal(emp, goal);
+	}
 	check_for_eligible_goals(emp);
 }
 
@@ -1661,8 +1771,8 @@ bool audit_progress(progress_data *prg, char_data *ch) {
 		problem = TRUE;
 	}
 	
-	if (PRG_FLAGGED(prg, PRG_SCRIPT_ONLY) && PRG_FLAGGED(prg, PRG_PURCHASABLE)) {
-		olc_audit_msg(ch, PRG_VNUM(prg), "PURCHASABLE set with SCRIPT-ONLY");
+	if (PRG_FLAGGED(prg, PRG_NO_AUTOSTART) && PRG_FLAGGED(prg, PRG_PURCHASABLE)) {
+		olc_audit_msg(ch, PRG_VNUM(prg), "PURCHASABLE set with NO-AUTOSTART");
 		problem = TRUE;
 	}
 	
@@ -1719,7 +1829,9 @@ void olc_search_progress(char_data *ch, any_vnum vnum) {
 	char buf[MAX_STRING_LENGTH];
 	progress_data *prg = real_progress(vnum), *iter, *next_iter;
 	struct progress_list *pl;
+	quest_data *qiter, *next_qiter;
 	int size, found;
+	bool any;
 	
 	if (!prg) {
 		msg_to_char(ch, "There is no progression entry %d.\r\n", vnum);
@@ -1737,6 +1849,21 @@ void olc_search_progress(char_data *ch, any_vnum vnum) {
 				size += snprintf(buf + size, sizeof(buf) - size, "PRG [%5d] %s\r\n", PRG_VNUM(iter), PRG_NAME(iter));
 				break;
 			}
+		}
+	}
+	
+	// quests
+	HASH_ITER(hh, quest_table, qiter, next_qiter) {
+		if (size >= sizeof(buf)) {
+			break;
+		}
+		// QR_x: quest rewards
+		any = find_quest_reward_in_list(QUEST_REWARDS(qiter), QR_GRANT_PROGRESS, vnum);
+		any |= find_quest_reward_in_list(QUEST_REWARDS(qiter), QR_START_PROGRESS, vnum);
+		
+		if (any) {
+			++found;
+			size += snprintf(buf + size, sizeof(buf) - size, "QST [%5d] %s\r\n", QUEST_VNUM(qiter), QUEST_NAME(qiter));
 		}
 	}
 	
@@ -1821,8 +1948,8 @@ int sort_progress_by_data(progress_data *a, progress_data *b) {
 	else if (PRG_FLAGGED(a, PRG_PURCHASABLE) != PRG_FLAGGED(b, PRG_PURCHASABLE)) {
 		return PRG_FLAGGED(a, PRG_PURCHASABLE) ? 1 : -1;
 	}
-	else if (PRG_FLAGGED(a, PRG_SCRIPT_ONLY) != PRG_FLAGGED(b, PRG_SCRIPT_ONLY)) {
-		return PRG_FLAGGED(a, PRG_SCRIPT_ONLY) ? 1 : -1;
+	else if (PRG_FLAGGED(a, PRG_NO_AUTOSTART) != PRG_FLAGGED(b, PRG_NO_AUTOSTART)) {
+		return PRG_FLAGGED(a, PRG_NO_AUTOSTART) ? 1 : -1;
 	}
 	else {
 		return str_cmp(NULLSAFE(PRG_NAME(a)), NULLSAFE(PRG_NAME(b)));
@@ -2060,7 +2187,7 @@ void parse_progress(FILE *fl, any_vnum vnum) {
 				break;
 			}
 			case 'W': {	// tasks / work
-				parse_requirement(fl, &PRG_TASKS(prg), error);
+				parse_requirement(fl, &PRG_TASKS(prg), (*(line+1) == '+' ? TRUE : FALSE), error);
 				break;
 			}
 			
@@ -2201,15 +2328,19 @@ progress_data *create_progress_table_entry(any_vnum vnum) {
 void olc_delete_progress(char_data *ch, any_vnum vnum) {
 	progress_data *prg, *iter, *next_iter;
 	struct progress_list *pl, *next_pl;
+	quest_data *qiter, *next_qiter;
 	empire_data *emp, *next_emp;
 	struct empire_goal *goal;
 	descriptor_data *desc;
+	char name[256];
 	bool any;
 	
 	if (!(prg = real_progress(vnum))) {
 		msg_to_char(ch, "There is no such progress entry %d.\r\n", vnum);
 		return;
 	}
+	
+	snprintf(name, sizeof(name), "%s", NULLSAFE(PRG_NAME(prg)));
 	
 	// removing live instances
 	if (!PRG_FLAGGED(prg, PRG_IN_DEVELOPMENT)) {
@@ -2244,8 +2375,22 @@ void olc_delete_progress(char_data *ch, any_vnum vnum) {
 		
 		if (any) {
 			SET_BIT(PRG_FLAGS(iter), PRG_IN_DEVELOPMENT);
+			syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: Progress %d %s set IN-DEV due to other deleted progress goal", PRG_VNUM(iter), PRG_NAME(iter));
 			save_library_file_for_vnum(DB_BOOT_PRG, PRG_VNUM(iter));
 			need_progress_refresh = TRUE;
+		}
+	}
+	
+	// update quests
+	HASH_ITER(hh, quest_table, qiter, next_qiter) {
+		// QR_x: quest rewards
+		any = delete_quest_reward_from_list(&QUEST_REWARDS(qiter), QR_GRANT_PROGRESS, vnum);
+		any |= delete_quest_reward_from_list(&QUEST_REWARDS(qiter), QR_START_PROGRESS, vnum);
+		
+		if (any) {
+			SET_BIT(QUEST_FLAGS(qiter), QST_IN_DEVELOPMENT);
+			syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: Quest %d %s set IN-DEV due to deleted progress goal", QUEST_VNUM(qiter), QUEST_NAME(qiter));
+			save_library_file_for_vnum(DB_BOOT_QST, QUEST_VNUM(qiter));
 		}
 	}
 	
@@ -2266,10 +2411,20 @@ void olc_delete_progress(char_data *ch, any_vnum vnum) {
 				msg_to_desc(desc, "A progression goal used as a prerequisite by the goal you're editing has been deleted.\r\n");
 			}
 		}
+		if (GET_OLC_QUEST(desc)) {
+			// QR_x: quest rewards
+			any = delete_quest_reward_from_list(&QUEST_REWARDS(GET_OLC_QUEST(desc)), QR_GRANT_PROGRESS, vnum);
+			any |= delete_quest_reward_from_list(&QUEST_REWARDS(GET_OLC_QUEST(desc)), QR_START_PROGRESS, vnum);
+		
+			if (any) {
+				SET_BIT(QUEST_FLAGS(GET_OLC_QUEST(desc)), QST_IN_DEVELOPMENT);
+				msg_to_desc(desc, "A quest used by the progress goal you are editing was deleted.\r\n");
+			}
+		}
 	}
 	
-	syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: %s has deleted progress entry %d", GET_NAME(ch), vnum);
-	msg_to_char(ch, "Progress entry %d deleted.\r\n", vnum);
+	syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: %s has deleted progress entry %d %s", GET_NAME(ch), vnum, name);
+	msg_to_char(ch, "Progress entry %d (%s) deleted.\r\n", vnum, name);
 	
 	free_progress(prg);
 }
@@ -2285,7 +2440,7 @@ void olc_fullsearch_progress(char_data *ch, char *argument) {
 	char buf[MAX_STRING_LENGTH * 2], line[MAX_STRING_LENGTH], type_arg[MAX_INPUT_LENGTH], val_arg[MAX_INPUT_LENGTH], find_keywords[MAX_INPUT_LENGTH];
 	bitvector_t not_flagged = NOBITS, only_flags = NOBITS;
 	bitvector_t  find_tasks = NOBITS, found_tasks, find_perks = NOBITS, found_perks;
-	int count, only_cost = NOTHING, only_value = NOTHING, only_type = NOTHING;
+	int count, only_cost = NOTHING, only_value = NOTHING, only_type = NOTHING, vmin = NOTHING, vmax = NOTHING;
 	progress_data *prg, *next_prg;
 	struct progress_perk *perk;
 	struct req_data *task;
@@ -2314,6 +2469,8 @@ void olc_fullsearch_progress(char_data *ch, char *argument) {
 		FULLSEARCH_LIST("type", only_type, progress_types)
 		FULLSEARCH_FLAGS("unflagged", not_flagged, progress_flags)
 		FULLSEARCH_INT("value", only_value, 0, INT_MAX)
+		FULLSEARCH_INT("vmin", vmin, 0, INT_MAX)
+		FULLSEARCH_INT("vmax", vmax, 0, INT_MAX)
 		
 		else {	// not sure what to do with it? treat it like a keyword
 			sprintf(find_keywords + strlen(find_keywords), "%s%s", *find_keywords ? " " : "", type_arg);
@@ -2328,6 +2485,9 @@ void olc_fullsearch_progress(char_data *ch, char *argument) {
 	
 	// okay now look up items
 	HASH_ITER(hh, progress_table, prg, next_prg) {
+		if ((vmin != NOTHING && PRG_VNUM(prg) < vmin) || (vmax != NOTHING && PRG_VNUM(prg) > vmax)) {
+			continue;	// vnum range
+		}
 		if (only_value != NOTHING && PRG_VALUE(prg) != only_value) {
 			continue;
 		}
@@ -2891,6 +3051,16 @@ OLC_MODULE(progedit_perks) {
 						return;
 					}
 					break;	// otherwise ok
+				}
+				case PRG_PERK_SPEAK_LANGUAGE:
+				case PRG_PERK_RECOGNIZE_LANGUAGE: {
+					generic_data *gen;
+					if (!*argument || !((isdigit(*argument) && (gen = find_generic(atoi(argument), GENERIC_LANGUAGE))) || (gen = find_generic_no_spaces(GENERIC_LANGUAGE, argument)))) {
+						msg_to_char(ch, "Invalid generic language vnum '%s'.\r\n", argument);
+						return;
+					}
+					vnum = GEN_VNUM(gen);
+					break;
 				}
 				default: {
 					msg_to_char(ch, "That type is not yet implemented.\r\n");

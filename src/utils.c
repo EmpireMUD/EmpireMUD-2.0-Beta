@@ -24,6 +24,7 @@
 #include "interpreter.h"
 #include "skills.h"
 #include "vnums.h"
+#include "dg_event.h"
 #include "dg_scripts.h"
 #include "constants.h"
 
@@ -2598,6 +2599,9 @@ void change_sex(char_data *ch, int sex) {
 	}
 	
 	// the change
+	if (sex != GET_REAL_SEX(ch)) {
+		ch->customized = TRUE;
+	}
 	GET_REAL_SEX(ch) = sex;
 	
 	// update companion data
@@ -2954,6 +2958,35 @@ double rate_item(obj_data *obj) {
 //// PLAYER UTILS ////////////////////////////////////////////////////////////
 
 /**
+* Player's carry limit. This was formerly a macro.
+*
+* @param char_data *ch The player/character.
+* @return int The maximum number of items.
+*/
+int CAN_CARRY_N(char_data *ch) {
+	int bonus;
+	int total = 25;	// TODO: should this be a configurable base
+	
+	// contribution from gear
+	total += GET_BONUS_INVENTORY(ch);
+	if (GET_EQ(ch, WEAR_PACK)) {
+		total += GET_PACK_CAPACITY(GET_EQ(ch, WEAR_PACK));
+	}
+	
+	// players only:
+	if (!IS_NPC(ch)) {
+		// player's bonus trait
+		if (HAS_BONUS_TRAIT(ch, BONUS_INVENTORY)) {
+			bonus = GET_HIGHEST_KNOWN_LEVEL(ch) / 10;
+			total += MAX(5, bonus);
+		}
+	}
+	
+	return total;
+}
+
+
+/**
 * Determines if a character can see in a dark room. This replaces a shirt-load
 * of macros that were increasingly hard to read.
 *
@@ -2988,6 +3021,41 @@ bool can_see_in_dark_room(char_data *ch, room_data *room, bool count_adjacent_li
 	
 	// all other cases:
 	return FALSE;
+}
+
+
+// checks stuff right after movement
+EVENTFUNC(check_leading_event) {
+	struct char_event_data *data = (struct char_event_data*)event_obj;
+	char_data *ch = data->character;
+	
+	// will not be re-using this
+	delete_stored_event(&GET_STORED_EVENTS(ch), SEV_CHECK_LEADING);
+	free(data);
+	
+	if (!IN_ROOM(ch)) {
+		return 0;	// never re-enqueue
+	}
+	
+	// NOTE: if you add conditions here, check _QUALIFY_CHECK_LEADING(ch) too
+	if (GET_LEADING_VEHICLE(ch) && IN_ROOM(ch) != IN_ROOM(GET_LEADING_VEHICLE(ch))) {
+		act("You have lost $V and stop leading it.", FALSE, ch, NULL, GET_LEADING_VEHICLE(ch), TO_CHAR);
+		VEH_LED_BY(GET_LEADING_VEHICLE(ch)) = NULL;
+		GET_LEADING_VEHICLE(ch) = NULL;
+	}
+	if (GET_LEADING_MOB(ch) && IN_ROOM(ch) != IN_ROOM(GET_LEADING_MOB(ch))) {
+		act("You have lost $N and stop leading $M.", FALSE, ch, NULL, GET_LEADING_MOB(ch), TO_CHAR);
+		GET_LED_BY(GET_LEADING_MOB(ch)) = NULL;
+		GET_LEADING_MOB(ch) = NULL;
+	}
+	if (GET_SITTING_ON(ch)) {
+		// things that cancel sitting-on:
+		if (IN_ROOM(ch) != IN_ROOM(GET_SITTING_ON(ch)) || (GET_POS(ch) != POS_SITTING && GET_POS(ch) != POS_RESTING && GET_POS(ch) != POS_SLEEPING) || IS_RIDING(ch) || GET_LEADING_MOB(ch) || GET_LEADING_VEHICLE(ch)) {
+			do_unseat_from_vehicle(ch);
+		}
+	}
+	
+	return 0;	// never re-enqueue
 }
 
 
@@ -3204,6 +3272,29 @@ int pick_level_from_range(int level, int min, int max) {
 		level = MIN(level, max);
 	}
 	return level;
+}
+
+
+/**
+* Schedules an event to check things a person is leading/sitting on after
+* moving, if needed.
+*
+* @param char_data *ch The person who moved.
+*/
+void schedule_check_leading_event(char_data *ch) {
+	struct char_event_data *data;
+	struct dg_event *ev;
+	
+	// things that need this function
+	#define _QUALIFY_CHECK_LEADING(ch)  (GET_LEADING_VEHICLE(ch) || GET_LEADING_MOB(ch) || GET_SITTING_ON(ch))
+	
+	if (ch && _QUALIFY_CHECK_LEADING(ch) && !find_stored_event(GET_STORED_EVENTS(ch), SEV_CHECK_LEADING)) {
+		CREATE(data, struct char_event_data, 1);
+		data->character = ch;
+		
+		ev = dg_event_create(check_leading_event, data, 1 RL_SEC);
+		add_stored_event(&GET_STORED_EVENTS(ch), SEV_CHECK_LEADING, ev);
+	}
 }
 
 
@@ -3466,8 +3557,10 @@ void apply_resource(char_data *ch, struct resource_data *res, struct resource_da
 				add_to_resource_list(build_used_list, RES_POOL, res->vnum, res->amount, 0);
 			}
 			
-			GET_CURRENT_POOL(ch, res->vnum) -= res->amount;
-			GET_CURRENT_POOL(ch, res->vnum) = MAX(0, GET_CURRENT_POOL(ch, res->vnum));
+			set_current_pool(ch, res->vnum, GET_CURRENT_POOL(ch, res->vnum) - res->amount);
+			if (GET_CURRENT_POOL(ch, res->vnum) < 0) {
+				set_current_pool(ch, res->vnum, 0);
+			}
 			
 			if (res->vnum == HEALTH) {
 				update_pos(ch);
@@ -3665,8 +3758,10 @@ void extract_resources(char_data *ch, struct resource_data *list, bool ground, s
 						add_to_resource_list(build_used_list, RES_POOL, res->vnum, res->amount, 0);
 					}
 				
-					GET_CURRENT_POOL(ch, res->vnum) -= res->amount;
-					GET_CURRENT_POOL(ch, res->vnum) = MAX(0, GET_CURRENT_POOL(ch, res->vnum));
+					set_current_pool(ch, res->vnum, GET_CURRENT_POOL(ch, res->vnum) - res->amount);
+					if (GET_CURRENT_POOL(ch, res->vnum) < 0) {
+						set_current_pool(ch, res->vnum, 0);
+					}
 					res->amount = 0;	// got full amount
 				
 					if (res->vnum == HEALTH) {
@@ -3980,8 +4075,7 @@ void give_resources(char_data *ch, struct resource_data *list, bool split) {
 				break;
 			}
 			case RES_POOL: {
-				GET_CURRENT_POOL(ch, res->vnum) += res->amount / (split ? 2 : 1);
-				GET_CURRENT_POOL(ch, res->vnum) = MIN(GET_MAX_POOL(ch, res->vnum), GET_CURRENT_POOL(ch, res->vnum));
+				set_current_pool(ch, res->vnum, GET_CURRENT_POOL(ch, res->vnum) + (res->amount / (split ? 2 : 1)));
 				if (GET_HEALTH(ch) > 0 && GET_POS(ch) <= POS_STUNNED) {
 					GET_POS(ch) = POS_RESTING;
 				}
@@ -4076,9 +4170,10 @@ void reduce_dismantle_resources(int damage, int max_health, struct resource_data
 * @param struct resource_data *list Any resource list.
 * @param bool ground If TRUE, will also count resources on the ground.
 * @param bool send_msgs If TRUE, will alert the character as to what they need. FALSE runs silently.
+* @param char *msg_prefix Optional: If provided AND send_msgs is TRUE, prepends this to any error message as "msg_prefix: You need..." (may be NULL)
 */
-bool has_resources(char_data *ch, struct resource_data *list, bool ground, bool send_msgs) {
-	char buf[MAX_STRING_LENGTH];
+bool has_resources(char_data *ch, struct resource_data *list, bool ground, bool send_msgs, char *msg_prefix) {
+	char buf[MAX_STRING_LENGTH], prefix[256];
 	int amt, liter, cycle;
 	struct resource_data *res, *list_copy;
 	bool ok = TRUE;
@@ -4207,37 +4302,46 @@ bool has_resources(char_data *ch, struct resource_data *list, bool ground, bool 
 		
 		// RES_x: messaging for types the player is missing
 		if (send_msgs) {
+			// prepare prefix, if any
+			if (msg_prefix && *msg_prefix) {
+				snprintf(prefix, sizeof(prefix), "%s: You need", msg_prefix);
+				CAP(prefix);
+			}
+			else {
+				snprintf(prefix, sizeof(prefix), "You need");
+			}
+			
 			switch (res->type) {
 				case RES_OBJECT: {
-					msg_to_char(ch, "%s %d more of %s", (ok ? "You need" : ","), res->amount, skip_filler(get_obj_name_by_proto(res->vnum)));
+					msg_to_char(ch, "%s %d more of %s", (ok ? prefix : ","), res->amount, skip_filler(get_obj_name_by_proto(res->vnum)));
 					break;
 				}
 				case RES_COMPONENT: {
-					msg_to_char(ch, "%s %d more (%s)", (ok ? "You need" : ","), res->amount, res->amount == 1 ? get_generic_name_by_vnum(res->vnum) : get_generic_string_by_vnum(res->vnum, GENERIC_COMPONENT, GSTR_COMPONENT_PLURAL));
+					msg_to_char(ch, "%s %d more (%s)", (ok ? prefix : ","), res->amount, res->amount == 1 ? get_generic_name_by_vnum(res->vnum) : get_generic_string_by_vnum(res->vnum, GENERIC_COMPONENT, GSTR_COMPONENT_PLURAL));
 					break;
 				}
 				case RES_LIQUID: {
-					msg_to_char(ch, "%s %d more unit%s of %s", (ok ? "You need" : ","), res->amount, PLURAL(res->amount), get_generic_string_by_vnum(res->vnum, GENERIC_LIQUID, GSTR_LIQUID_NAME));
+					msg_to_char(ch, "%s %d more unit%s of %s", (ok ? prefix : ","), res->amount, PLURAL(res->amount), get_generic_string_by_vnum(res->vnum, GENERIC_LIQUID, GSTR_LIQUID_NAME));
 					break;
 				}
 				case RES_TOOL: {
 					prettier_sprintbit(res->vnum, tool_flags, buf);
-					msg_to_char(ch, "%s %d more %s (tool%s)", (ok ? "You need" : ","), res->amount, buf, PLURAL(res->amount));
+					msg_to_char(ch, "%s %d more %s (tool%s)", (ok ? prefix : ","), res->amount, buf, PLURAL(res->amount));
 					break;
 				}
 				case RES_COINS: {
 					empire_data *coin_emp = real_empire(res->vnum);
-					msg_to_char(ch, "%s %s", (ok ? "You need" : ","), money_amount(coin_emp, res->amount));
+					msg_to_char(ch, "%s %s", (ok ? prefix : ","), money_amount(coin_emp, res->amount));
 					break;
 				}
 				case RES_CURRENCY: {
-					msg_to_char(ch, "%s %d more %s", (ok ? "You need" : ","), res->amount, get_generic_string_by_vnum(res->vnum, GENERIC_CURRENCY, WHICH_CURRENCY(res->amount)));
+					msg_to_char(ch, "%s %d more %s", (ok ? prefix : ","), res->amount, get_generic_string_by_vnum(res->vnum, GENERIC_CURRENCY, WHICH_CURRENCY(res->amount)));
 					break;
 				}
 				case RES_POOL: {
 					// special rule: require that blood or health costs not reduce player below 1
 					amt = res->amount + ((res->vnum == HEALTH || res->vnum == BLOOD) ? 1 : 0);
-					msg_to_char(ch, "%s %d more %s point%s", (ok ? "You need" : ","), amt, pool_types[res->vnum], PLURAL(amt));
+					msg_to_char(ch, "%s %d more %s point%s", (ok ? prefix : ","), amt, pool_types[res->vnum], PLURAL(amt));
 					break;
 				}
 			}
@@ -4836,7 +4940,7 @@ void replace_question_color(char *input, char *color, char *output) {
 	*output = '\0';
 	
 	for (ipos = 0, opos = 0; ipos < strlen(input); ++ipos) {
-		if (input[ipos] == '&' && input[ipos+1] == '?') {
+		if (input[ipos] == COLOUR_CHAR && input[ipos+1] == '?') {
 			// copy replacement color instead
 			strcpy(output + opos, color);
 			opos += strlen(color);
@@ -5173,8 +5277,8 @@ char *strip_color(char *input) {
 	int iter, pos;
 
 	for (iter = 0, pos = 0; pos < (MAX_STRING_LENGTH-1) && iter < strlen(input); ++iter) {
-		if (input[iter] == '&') {
-			if (input[iter+1] == '&') {
+		if (input[iter] == COLOUR_CHAR) {
+			if (input[iter+1] == COLOUR_CHAR) {
 				// double &: copy both
 				lbuf[pos++] = input[iter];
 				lbuf[pos++] = input[++iter];
@@ -5185,7 +5289,7 @@ char *strip_color(char *input) {
 			}
 		}
 		else if (input[iter] == '\t') {
-			if (input[iter+1] == '&' || input[iter+1] == '\t') {
+			if (input[iter+1] == COLOUR_CHAR || input[iter+1] == '\t') {
 				// double \t: copy both
 				lbuf[pos++] = input[iter];
 				lbuf[pos++] = input[++iter];
@@ -6100,6 +6204,117 @@ int get_direction_to(room_data *from, room_data *to) {
 
 
 /**
+* This gets the direction on a 16-direction circle that includes partial
+* directions like east-northeast (ene). This helps point players in the
+* correct direction. Since these are not legitimate game directions, they are
+* returned as strings not intergers.
+*
+* @param char_data *ch The player viewing it, for purposes of map rotation (Optional: may be NULL).
+* @param room_data *from The origin point.
+* @param room_data *to The desitination point.
+* @param bool abbrev If TRUE, gets e.g. "ene". If FALSE, gets e.g. "east-northeast".
+* @return char* The string for the direction. May be an empty string if to == from.
+*/
+char *get_partial_direction_to(char_data *ch, room_data *from, room_data *to, bool abbrev) {
+	room_data *origin = HOME_ROOM(from), *dest = HOME_ROOM(to);
+	int from_x = X_COORD(origin), from_y = Y_COORD(origin);
+	int to_x = X_COORD(dest), to_y = Y_COORD(dest);
+	int x_diff = to_x - from_x, y_diff = to_y - from_y;
+	int iter;
+	double radians, slope, degrees;
+	
+	char *partial_dirs[][2] = {
+		// counter-clockwise from ENE, ending with E
+		{ "east-northeast", "ene" },
+		{ "northeast", "ne" },
+		{ "north-northeast", "nne" },
+		{ "north", "n" },
+		{ "north-northwest", "nnw" },
+		{ "northwest", "nw" },
+		{ "west-northwest", "wnw" },
+		{ "west", "w" },
+		{ "west-southwest", "wsw" },
+		{ "southwest", "sw" },
+		{ "south-southwest", "ssw" },
+		{ "south", "s" },
+		{ "south-southeast", "sse" },
+		{ "southeast", "se" },
+		{ "east-southeast", "ese" },
+		{ "east", "e" }		// must be last for the iterator to work
+	};
+	
+	// adjust for edges
+	if (WRAP_X) {
+		if (x_diff < (-1 * MAP_WIDTH / 2)) {
+			x_diff += MAP_WIDTH;
+		}
+		if (x_diff > (MAP_WIDTH / 2)) {
+			x_diff -= MAP_WIDTH;
+		}
+	}
+	if (WRAP_Y) {
+		if (y_diff < (-1 * MAP_HEIGHT / 2)) {
+			y_diff += MAP_HEIGHT;
+		}
+		if (y_diff > (MAP_HEIGHT / 2)) {
+			y_diff -= MAP_HEIGHT;
+		}
+	}
+
+	// tolerance: 1 e/w per 5 north would still count as "north"
+	if (x_diff == 0 && y_diff == 0) {
+		return "";
+	}
+	else if (x_diff == 0) {
+		degrees = (y_diff > 0 ? 90 : 270);
+	}
+	else {
+		slope = (double) y_diff / (double) x_diff;
+		radians = atan(slope);
+		
+		// convert to degrees and adjust for direction
+		degrees = 180 * radians / M_PI;
+		if (x_diff < 0) {
+			// quadrant II or III: add 180
+			degrees += 180;
+		}
+		else if (y_diff < 0) {
+			// quadrant IV: add 360
+			degrees += 360;
+		}
+		else {	// (y_diff > 0)
+			// quadrant I: no adjustment
+		}
+	}
+	
+	// rotate for character
+	if (ch) {
+		degrees += get_north_for_char(ch) * 90.0;
+		if (degrees >= 360.0) {
+			degrees -= 360.0;
+		}
+	}
+	
+	// convert 0 to 360 to help with the detection below
+	if (degrees <= .001) {
+		degrees = 360.0;
+	}
+	
+	// each dir is 22.5 degrees of the circle (11.25 each way)
+	// so we remove that first 11.25 and do East (0 degrees) at the end...
+	for (iter = 0; strcmp(partial_dirs[iter][1], "e"); ++iter) {
+		if ((degrees - 11.25) < ((iter + 1) * 22.5)) {
+			// found!
+			return partial_dirs[iter][(abbrev ? 1 : 0)];
+		}
+	}
+	
+	// if we got here, it's only because it's the last direction: east
+	return partial_dirs[iter][(abbrev ? 1 : 0)];
+}
+
+
+/**
 * @param room_data *room A room that has existing mine data
 * @return TRUE if the room has a deep mine set up
 */
@@ -6123,11 +6338,44 @@ void lock_icon(room_data *room, struct icon_data *use_icon) {
 	if (!room || ROOM_CUSTOM_ICON(room)) {
 		return;
 	}
+	if (SHARED_DATA(room) == &ocean_shared_data) {
+		return;	// never on the ocean
+	}
 
 	if (!(icon = use_icon)) {
 		icon = get_icon_from_set(GET_SECT_ICONS(SECT(room)), GET_SEASON(room));
 	}
 	set_room_custom_icon(room, icon->icon);
+}
+
+
+/**
+* Variant of lock_icon when a room is not available. Only works if there isn't
+* a custom icon yet.
+*
+* @param struct map_data *loc The location to lock.
+* @param struct icon_data *use_icon Optional: Force it to use this icon (may be NULL).
+*/
+void lock_icon_map(struct map_data *loc, struct icon_data *use_icon) {
+	struct icon_data *icon;
+	
+	// safety first
+	if (!loc || loc->shared->icon) {
+		return;	// don't do it if a custom icon is set (or no location provided)
+	}
+	if (loc->shared == &ocean_shared_data) {
+		return;	// never on the ocean
+	}
+
+	if (!(icon = use_icon)) {
+		icon = get_icon_from_set(GET_SECT_ICONS(loc->sector_type), y_coord_to_season[MAP_Y_COORD(loc->vnum)]);
+	}
+	
+	if (loc->shared->icon) {
+		free(loc->shared->icon);
+	}
+	loc->shared->icon = icon ? str_dup(icon->icon) : NULL;
+	request_world_save(loc->vnum, WSAVE_ROOM);
 }
 
 
@@ -6195,7 +6443,7 @@ void relocate_players(room_data *room, room_data *to_room) {
 			GET_LAST_DIR(ch) = NO_DIR;
 			look_at_room(ch);
 			act("$n arrives.", TRUE, ch, NULL, NULL, TO_ROOM);
-			enter_wtrigger(IN_ROOM(ch), ch, NO_DIR);
+			enter_wtrigger(IN_ROOM(ch), ch, NO_DIR, "system");
 			msdp_update_room(ch);
 		}
 	}
@@ -6225,7 +6473,7 @@ bool room_is_light(room_data *room, bool count_adjacent_light) {
 	if (!RMT_FLAGGED(room, RMT_DARK) && get_sun_status(room) != SUN_DARK) {
 		return TRUE;	// not dark: it isn't dark outside
 	}
-	if (ROOM_OWNER(room) && EMPIRE_HAS_TECH(ROOM_OWNER(room), TECH_CITY_LIGHTS) && get_territory_type_for_empire(room, ROOM_OWNER(room), FALSE, NULL) != TER_FRONTIER) {
+	if (ROOM_OWNER(room) && EMPIRE_HAS_TECH(ROOM_OWNER(room), TECH_CITY_LIGHTS) && get_territory_type_for_empire(room, ROOM_OWNER(room), FALSE, NULL, NULL) != TER_FRONTIER) {
 		return TRUE;	// not dark: city lights
 	}
 	if (count_adjacent_light && adjacent_room_is_light(room)) {
@@ -6526,6 +6774,79 @@ int sort_string_hash(struct string_hash *a, struct string_hash *b) {
 
 
 /**
+* Builds a string from the contents of a string_hash. This does NOT free the
+* hash in the process.
+*
+* @param struct string_hash *str_hash The string hash to convert to a string.
+* @param char *to_string The buffer to save it to.
+* @param size_t string_size Limit for to_string, to prevent buffer overruns.
+* @param bool show_count If TRUE, shows (x123) after anything with a count over 1; if FALSE never shows the number.
+* @param bool use_commas If TRUE, puts commas between entries; if FALSE only shows spaces.
+* @param bool use_and If TRUE, puts an "and" before the last entry; if FALSE, just has a comma (or space if no commas).
+*/
+void string_hash_to_string(struct string_hash *str_hash, char *to_string, size_t string_size, bool show_count, bool use_commas, bool use_and) {
+	struct string_hash *str_iter, *next_str;
+	char entry[MAX_STRING_LENGTH];
+	size_t entry_size, cur_size;
+	
+	if (!to_string) {
+		return;	// baffling
+	}
+	
+	*to_string = '\0';
+	cur_size = 0;
+	
+	if (!str_hash) {
+		return;	// nothing else to do
+	}
+	
+	HASH_ITER(hh, str_hash, str_iter, next_str) {
+		// build one entry
+		*entry = '\0';
+		entry_size = 0;
+		
+		// start: leading and?
+		if (use_and && !next_str && str_iter != str_hash) {
+			// last entry and not the first entry
+			entry_size += snprintf(entry + entry_size, sizeof(entry) - entry_size, "and ");
+		}
+		
+		// name
+		entry_size += snprintf(entry + entry_size, sizeof(entry) - entry_size, "%s", str_iter->str);
+		
+		// count?
+		if (str_iter->count > 1 && show_count) {
+			entry_size += snprintf(entry + entry_size, sizeof(entry) - entry_size, " (x%d)", str_iter->count);
+		}
+		
+		// trailing comma?
+		if (use_commas && next_str && (!use_and || HASH_COUNT(str_hash) > 2)) {
+			if (entry_size + 2 < sizeof(entry)) {
+				strcat(entry, ", ");
+				entry_size += 2;
+			}
+		}
+		else if (next_str) {
+			if (entry_size + 1 < sizeof(entry)) {
+				strcat(entry, " ");
+				++entry_size;
+			}
+		}
+		
+		// now append?
+		if (cur_size + entry_size < string_size - 12) {
+			strcat(to_string, entry);
+			cur_size += entry_size;
+		}
+		else {
+			cur_size += snprintf(to_string + cur_size, string_size - cur_size, "**OVERFLOW**");
+			break;
+		}
+	}
+}
+
+
+/**
 * Gets a string fragment if an obj is shared (by someone other than ch). This
 * is used by enchanting and some other commands, in their success strings. It
 * has an $N in the string, so pass obj->worn_by as the 2nd char in your act()
@@ -6646,7 +6967,7 @@ bool room_has_function_and_city_ok(empire_data *for_emp, room_data *room, bitvec
 		if (VEH_FLAGGED(veh, MOVABLE_VEH_FLAGS) && IS_SET(fnc_flag, IMMOBILE_FNCS)) {
 			continue;	// exclude certain functions on movable vehicles (functions that require room data)
 		}
-		if (IS_SET(VEH_FUNCTIONS(veh), FNC_IN_CITY_ONLY) && (!ROOM_OWNER(room) || get_territory_type_for_empire(room, ROOM_OWNER(room), TRUE, &junk) != TER_CITY)) {
+		if (IS_SET(VEH_FUNCTIONS(veh), FNC_IN_CITY_ONLY) && (!ROOM_OWNER(room) || get_territory_type_for_empire(room, ROOM_OWNER(room), TRUE, &junk, NULL) != TER_CITY)) {
 			continue;	// not in-city but needs it
 		}
 		
@@ -6704,7 +7025,7 @@ bool vehicle_has_function_and_city_ok(vehicle_data *veh, bitvector_t fnc_flag) {
 		if (ROOM_OWNER(room) && ROOM_OWNER(room) != emp) {
 			return FALSE;	// someone else's claim is not in our city
 		}
-		if (get_territory_type_for_empire(room, emp, TRUE, &junk) != TER_CITY) {
+		if (get_territory_type_for_empire(room, emp, TRUE, &junk, NULL) != TER_CITY) {
 			return FALSE;	// not in-city for us either
 		}
 	}
@@ -6747,8 +7068,8 @@ void update_all_players(char_data *to_message, PLAYER_UPDATE_FUNC(*func)) {
 	}
 	
 	// verify there are no disconnected players characters in-game, which might not be saved
-	DL_FOREACH(character_list, ch) {
-		if (!IS_NPC(ch) && !ch->desc) {
+	DL_FOREACH2(player_character_list, ch, next_plr) {
+		if (!ch->desc) {
 			sprintf(buf, "update_all_players: Unable to update because of linkdead player (%s). Try again later.", GET_NAME(ch));
 			if (to_message) {
 				msg_to_char(to_message, "%s\r\n", buf);

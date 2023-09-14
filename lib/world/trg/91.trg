@@ -134,7 +134,7 @@ detach 9118 %self.id%
 Wimpy Flee~
 0 l 20
 ~
-if %self.disabled% || %self.aff_flagged(ENTANGLED)%
+if %self.disabled% || %self.aff_flagged(IMMOBILIZED)%
   halt
 end
 if %random.3% == 3

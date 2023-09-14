@@ -21,9 +21,12 @@ fire).
 Use the "return 0" option cautiously, as this may make the vehicle
 indestructible.
 
-When an adventure instance ends, any vehicles belonging to the instance will
-also fire their Destroy triggers before being purged. This destruction CANNOT
-be prevented.
+Variables: 
+  &c%method%&0 - How it was destroyed (siege, burning, ruins, despawn*).
+
+* When an adventure instance ends, any vehicles belonging to the instance will
+also fire their Destroy triggers before being purged with a "despawn" %method%.
+This destruction CANNOT be prevented.
 #d
 "VTRIG COMMANDS" "VEHICLE COMMANDS" TRIGEDIT-VEH-COMMANDS
 
@@ -55,6 +58,7 @@ help files for more info):
 &c%send%&0 - Send a message to one person.
 &c%siege%&0 - Deals siege damage to a vehicle or room.
 &c%slay%&0 - Instantly kills the target.
+&c%subecho%&0 - Sends a message to everyone in a given subzone.
 &c%teleport%&0 - Moves people to another location.
 &c%terracrop%&0 - Changes the terrain to a certain crop type.
 &c%terraform%&0 - Changes the terrain to a certain sector type.
@@ -95,6 +99,8 @@ When using field  - The variable returns:
 &ccontents&0 - The first item inside the vehicle (if a container).
 &ccount(str)&0 - Number of matching items inside (name/vnum).
 &cdedicated_to&0 - If the vehicle is dedicated to someone, gets the name.
+&cdepletion(type)&0 - Get the current depletion amount (OLC DEPLETION) for the
+   vehicle, or change it with %veh.depletion(type,amount)%; 0 is not-depleted.
 &cdriver&0 - The person driving/sailing the vehicle, if any.
 &cdump&0 - Empties everything out of the vehicle, including people.
 &cdump_objects&0 - Empties just the contents, if the vehicle is a container.
@@ -133,7 +139,9 @@ When using field  - The variable returns:
 &cunlink_instance&0 - Disconnects the vehicle from any adventure, meaning it
    will not be cleaned up when the instance closes (e.g. player gets to keep
    a vehicle that was loaded inside an instance).
-&cvarexists()&0 - Returns 1 if global variable in subfield exists, 0 if not.
+&cvar(name,default)&0 - Gets the value of that var if it exists and gets
+   'default' if it doesn't. Default is optional; gets empty string if none.
+&cvarexists()&0 - Returns 1 if remote variable in subfield exists, 0 if not.
 &cvnum&0 - The vehicle's vnum.
 
 See also: EMPIRE VARS, VEDIT FLAGS, FUNCTION FLAGS

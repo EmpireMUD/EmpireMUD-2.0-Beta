@@ -97,6 +97,177 @@ OLC_MODULE(mapedit_build) {
 }
 
 
+OLC_MODULE(mapedit_convert2newbie) {
+	bool undo = FALSE, any;
+	int count, iter, island_id = NO_ISLAND;
+	sector_data *base;
+	struct island_info *isle;
+	struct map_data *map;
+	room_data *room;
+
+	// maps sects between normal temperate islands and newbie islands for automatic conversion
+	struct {
+		any_vnum normal_sect;	// e.g. [0] Plains
+		any_vnum newbie_sect;	// e.g. [100] Plains (newbie)
+		bool reversible;	// if FALSE, only converts normal->newbie, not newbie->normal
+	} newbie_sector_map[] = {
+		{ 0, 100, TRUE },	// Plains
+		{ 1, 101, TRUE },	// Light Forest
+		{ 2, 102, TRUE },	// Forest
+		{ 3, 103, TRUE },	// Shady Forest
+		{ 4, 104, TRUE },	// Overgrown Forest
+		{ 7, 107, TRUE },	// Crop
+		{ 13, 113, TRUE },	// Seeded Field
+		{ 36, 136, TRUE },	// Stumps
+		{ 37, 137, TRUE },	// Small Copse
+		{ 38, 138, TRUE },	// Copse
+		{ 39, 139, TRUE },	// Forest Edge
+		{ 40, 140, TRUE },	// Riverbank
+		{ 44, 144, TRUE },	// Light Riverbank Forest
+		{ 45, 145, TRUE },	// Forested Riverbank
+		{ 46, 146, TRUE },	// Stumped Riverbank
+		{ 47, 147, TRUE },	// Riverside Copse
+		{ 50, 150, TRUE },	// Shore
+		{ 54, 154, TRUE },	// Shoreside Tree
+		{ 56, 156, TRUE },	// Estuary Shore
+		{ 58, 158, TRUE },	// Foothills
+		{ 59, 159, TRUE },	// Seaside Stumps
+		{ 60, 160, TRUE },	// Seaside Copse
+		
+		// convert
+		{ 41, 140, FALSE },	// Floodplains
+		{ 42, 144, FALSE }, // Flooded Woods
+		{ 43, 145, FALSE },	// Flooded Forest
+		{ 90, 104, FALSE },	// Overgrown Forest
+		
+		// remove
+		{ 17, 100, FALSE },	// Trench
+		{ 19, 100, FALSE },	// Canal
+		
+		{ NOTHING, NOTHING, FALSE }	// list end
+	};
+	
+	// validate location
+	if ((island_id = GET_ISLAND_ID(IN_ROOM(ch))) == NO_ISLAND) {
+		msg_to_char(ch, "You can't do that while not on any island.\r\n");
+		return;
+	}
+	
+	// validate arg
+	skip_spaces(&argument);
+	if (!str_cmp(argument, "undo")) {
+		undo = TRUE;
+	}
+	else if (str_cmp(argument, "confirm")) {
+		msg_to_char(ch, "You must type: .map convert2newbie confirm\r\n");
+		return;
+	}
+	
+	count = 0;
+	
+	// check all land tiles
+	LL_FOREACH(land_map, map) {
+		if (map->shared->island_id != island_id) {
+			continue;	// wrong island
+		}
+		
+		room = map->room;	// may or may not exist
+		base = map->base_sector;
+		any = FALSE;
+		
+		if (room) {
+			for (iter = 0; newbie_sector_map[iter].normal_sect != NOTHING; ++iter) {
+				if (!undo) {
+					// normal -> newbie
+					if (GET_SECT_VNUM(map->natural_sector) == newbie_sector_map[iter].normal_sect) {
+						set_natural_sector(map, sector_proto(newbie_sector_map[iter].newbie_sect));
+						any = TRUE;
+					}
+					if (GET_SECT_VNUM(map->sector_type) == newbie_sector_map[iter].normal_sect) {
+						change_terrain(room, newbie_sector_map[iter].newbie_sect, GET_SECT_VNUM(map->base_sector));
+						any = TRUE;
+					}
+					if (GET_SECT_VNUM(base) == newbie_sector_map[iter].normal_sect) {
+						change_base_sector(room, sector_proto(newbie_sector_map[iter].newbie_sect));
+						any = TRUE;
+					}
+				}
+				
+				if (undo && newbie_sector_map[iter].reversible) {
+					// newbie -> normal
+					if (GET_SECT_VNUM(map->natural_sector) == newbie_sector_map[iter].newbie_sect) {
+						set_natural_sector(map, sector_proto(newbie_sector_map[iter].normal_sect));
+						any = TRUE;
+					}
+					if (GET_SECT_VNUM(map->sector_type) == newbie_sector_map[iter].newbie_sect) {
+						change_terrain(room, newbie_sector_map[iter].normal_sect, GET_SECT_VNUM(map->base_sector));
+						any = TRUE;
+					}
+					if (GET_SECT_VNUM(base) == newbie_sector_map[iter].newbie_sect) {
+						change_base_sector(room, sector_proto(newbie_sector_map[iter].normal_sect));
+						any = TRUE;
+					}
+				}
+			}
+			
+			// no longer need this
+			remove_room_extra_data(room, ROOM_EXTRA_TRENCH_ORIGINAL_SECTOR);
+		}
+		else {	// map only, no room
+			for (iter = 0; newbie_sector_map[iter].normal_sect != NOTHING; ++iter) {
+				if (!undo) {
+					// normal -> newbie
+					if (GET_SECT_VNUM(map->natural_sector) == newbie_sector_map[iter].normal_sect) {
+						set_natural_sector(map, sector_proto(newbie_sector_map[iter].newbie_sect));
+						any = TRUE;
+					}
+					if (GET_SECT_VNUM(map->sector_type) == newbie_sector_map[iter].normal_sect) {
+						perform_change_sect(NULL, map, sector_proto(newbie_sector_map[iter].newbie_sect));
+						any = TRUE;
+					}
+					if (GET_SECT_VNUM(base) == newbie_sector_map[iter].normal_sect) {
+						perform_change_base_sect(NULL, map, sector_proto(newbie_sector_map[iter].newbie_sect));
+						any = TRUE;
+					}
+				}
+				
+				if (undo && newbie_sector_map[iter].reversible) {
+					// newbie -> normal
+					if (GET_SECT_VNUM(map->natural_sector) == newbie_sector_map[iter].newbie_sect) {
+						set_natural_sector(map, sector_proto(newbie_sector_map[iter].normal_sect));
+						any = TRUE;
+					}
+					if (GET_SECT_VNUM(map->sector_type) == newbie_sector_map[iter].newbie_sect) {
+						perform_change_sect(NULL, map, sector_proto(newbie_sector_map[iter].normal_sect));
+						any = TRUE;
+					}
+					if (GET_SECT_VNUM(base) == newbie_sector_map[iter].newbie_sect) {
+						perform_change_base_sect(NULL, map, sector_proto(newbie_sector_map[iter].normal_sect));
+						any = TRUE;
+					}
+				}
+			}
+			
+			// no longer need this
+			remove_extra_data(&map->shared->extra_data, ROOM_EXTRA_TRENCH_ORIGINAL_SECTOR);
+		}
+		if (any) {
+			request_world_save(map->vnum, WSAVE_ROOM | WSAVE_MAP);
+			++count;
+		}
+	}
+	
+	if (count > 0) {
+		isle = get_island(island_id, TRUE);
+		syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: %s has %s on %d tile%s on island %d %s", GET_NAME(ch), (undo ? "undone convert2newbie" : "used convert2newbie"), count, PLURAL(count), island_id, isle->name);
+		msg_to_char(ch, "You have %s on %d tile%s on this island.\r\n", (undo ? "undone convert2newbie" : "used convert2newbie"), count, PLURAL(count));
+	}
+	else {
+		msg_to_char(ch, "Found no tiles to convert on this island.\r\n");
+	}
+}
+
+
 OLC_MODULE(mapedit_decay) {
 	room_data *room = HOME_ROOM(IN_ROOM(ch));
 	
@@ -327,7 +498,7 @@ OLC_MODULE(mapedit_pass_walls) {
 
 OLC_MODULE(mapedit_decustomize) {
 	decustomize_room(IN_ROOM(ch));
-	msg_to_char(ch, "All customizations removed on this room/acre.\r\n");
+	msg_to_char(ch, "All customizations removed on this room/area.\r\n");
 }
 
 
@@ -358,7 +529,7 @@ OLC_MODULE(mapedit_icon) {
 		msg_to_char(ch, "What would you like to set the icon to (or \"none\")?\r\n");
 	else if (!validate_icon(argument))
 		msg_to_char(ch, "Room icons must be exactly four characters.\r\n");
-	else if (argument[0] != '&')
+	else if (argument[0] != COLOUR_CHAR)
 		msg_to_char(ch, "Icons must begin with a color code.\r\n");
 	else {
 		set_room_custom_icon(IN_ROOM(ch), argument);

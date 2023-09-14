@@ -1,0 +1,907 @@
+#12300
+hole large enormous~
+the enormous hole~
+There is a rather large hole in the ground. (adventure)~
+   There are signs around the hole that it was dug recently. More worrying,
+however, is its size. Whatever dug it is larger than a warhorse. Type
+'adventure' to see more information or 'enter hole' to go in.
+~
+8 0 0 0 2
+-1 0 0
+1 0
+S
+#12301
+hole~
+the hole~
+The hole leads back to the surface. (enter hole)~
+It's a small climb, but you should be able to get out (enter hole).
+~
+8 0 0 0 4
+-1 0 0
+1 0
+S
+#12302
+fur tufts~
+the tufts of fur~
+Tufts of fur are strewn about the lair.~
+   There's a surprising amount of fur all over, from the large tufts strewn
+about the floor to the individual strands that seem to have adhered themselves
+to every single thing. It looks as if a large fight happened in the lair of a
+very furry creature.
+~
+3 0 0 0 2
+0 0 0
+7 48
+T 12302
+S
+#12303
+hoard dragon's dragons fur~
+a fur dragon's hoard~
+The hoard of a fur dragon is piled high and gleaming.~
+   The hoard is piled high with gold in every form, from coins to statues to
+exotic golden pelts. More impressive, though, is that someone has slain the fur
+dragon.
+~
+15 0 a 0 3
+32 0 0
+4 0
+R
+4 5611 a
+S
+#12304
+fleece golden mauled~
+a mauled golden fleece~
+A mauled golden fleece is lying here.~
+   Is this... Could it be... Is it even possible? Is this the sacred fleece of
+Chrysomallos? The same fleece that Jason quested for with his Argonauts for
+King Pelias? It was lost for so many years, perhaps in the lair of that fur
+dragon the whole time. It's slightly badly mauled, but surely that can't lower
+the value of a fabled relic, can it?
+~
+15 0 a 0 4
+48 0 0
+4 0
+R
+4 5611 a
+S
+#12305
+yarn golden fabled bast~
+the fabled golden yarn of Bast~
+The fabled golden yarn of Bast is strewn about.~
+   With your eyes closed, this feels like the finest yarn you have ever felt.
+It's soft, supple, strong, and sleek. But with your eyes open, you can hardly
+bring yourself to touch it as its gleaming color and immense size make it one
+of the most valuable treasures you have ever held.
+~
+15 0 a 0 4
+64 0 0
+4 0
+R
+4 5611 a
+S
+#12306
+whistle mount flying fur dragon~
+a flying fur dragon mount whistle~
+A flying fur dragon mount whistle is lying here.~
+You can use this whistle to summon a flying fur dragon mount.
+~
+3 0 a 0 5
+12306 0 0
+2 0
+T 9910
+S
+#12307
+whistle tiny fur dragon minipet~
+a tiny fur dragon minipet whistle~
+A tiny fur dragon minipet whistle is lying here.~
+Type 'use whistle' to gain a tiny fur dragon pet.
+~
+19 p a 0 8
+12307 0 0
+2 0
+S
+#12308
+flute familiar drake furry~
+a furry drake familiar flute~
+A furry drake familiar flute is floating here.~
+   This odd flute will add a furry drake to your familiar list -- if you have
+the right ability. Type 'use flute' to gain it.
+~
+3 0 a 0 2
+0 0 0
+0 0
+T 12309
+S
+#12309
+corpse enormous fur dragon~
+the enormous corpse of a fur dragon~
+The enormous corpse of a fur dragon takes up most of the burrow.~
+   The corpse is too large to move. You'll have to skin and butcher it here.
+The dragon is still warm to the touch, even in death. It looks as if the dragon
+has dropped the treasure it was clutching in its talons.
+~
+10 m 0 0 3
+12300 6 0
+7 48
+S
+#12310
+pelt fur dragon~
+a fur dragon pelt~
+A fur dragon pelt is hanging here.~
+This exotic fur comes from a dragon, and a rare one at that.
+~
+3 e a 0 13
+0 0 0
+7 0
+C
+1 1
+O+ 1 6551
+R
+4 5120 0
+R
+4 5193 0
+S
+#12311
+pack traveling furry dragonscale scale~
+a furry dragonscale traveling pack~
+A furry dragonscale traveling pack has been left here.~
+   This pack is made from the scales of a very furry dragon. It must have some
+kind of enchantment on it, because it looks MUCH bigger inside than outside.
+It's also lighter than it appears.
+~
+24 mp ar 0 10
+17 0 0
+7 0
+A
+15 1 0
+A
+16 1 0
+A
+11 1 0
+A
+5 1 6
+A
+5 1 3
+C
+225 375
+S
+#12313
+digging enormous amount~
+an enormous amount of digging~
+It takes an enormous amount of digging to open this hole back up.~
+This is a dummy object that prevents maintenance on the caved-in burrow
+~
+3 0 0 0 1
+0 0 0
+0 0
+S
+#12314
+study fur dragon~
+a fur dragon study~
+A fur dragon study is lying here.~
+   This item is loaded by trigger 12316, which will restring it and set its
+value0 property.
+~
+7 0 a 0 3
+0 0 0
+0 0
+T 12314
+S
+#12315
+sabatons dragon hunter pair valiant~
+valiant dragon hunter sabatons~
+A pair of valiant dragon hunter sabatons are lying here.~
+   These sabatons are made from argentine plates that have been covered in
+dragon hide and enchanted to protect an intrepid hunter against the most
+dangerous game: dragons.
+~
+27 mp ag 0 9
+3 0 0
+2 0
+A
+2 1 0
+A
+15 5 0
+A
+13 4 0
+A
+18 4 0
+A
+24 3 0
+A
+12 3 0
+A
+5 1 6
+A
+5 1 3
+C
+225 375
+T 12315
+S
+#12316
+wraps foot shadow virtuoso~
+shadow virtuoso foot wraps~
+A pair of shadow virtuoso foot wraps have unraveled here.~
+   These long wraps are made from cloth and leather that seem to seethe and
+steam shadow. Dragon scales and argentine webbing add additional protection,
+and an enchantment seems to muffle the sounds of movement.
+~
+27 mp ag 0 11
+1 0 0
+7 0
+A
+1 1 0
+A
+2 1 0
+A
+9 1 0
+A
+17 5 0
+A
+21 12 0
+A
+5 1 6
+A
+5 1 3
+C
+225 375
+T 12315
+S
+#12317
+boots fiery dracomancer boots pair~
+fiery dracomancer boots~
+A pair of fiery dracomancer boots is lying here.~
+   These boots are tall, both in the heel and on your leg. They're made from
+dragon scales and have been enchanted with dragon flame -- or, at least, a good
+substitute.
+~
+27 mp ag 0 8
+0 0 0
+11 0
+A
+8 1 0
+A
+2 1 0
+A
+9 1 0
+A
+17 5 0
+A
+22 12 0
+A
+5 1 6
+A
+5 1 3
+C
+225 375
+T 12315
+S
+#12318
+sandals radiant living flame pair~
+radiant sandals of the living flame~
+A pair of radiant sandals of the living flame are lying here.~
+   The arcane symbols burned onto every inch of these elegant wood and leather
+sandals identify them as belonging to the Cult of Living Flame, a group of
+dragon worshippers. Little is known about the cult, but these sandals certainly
+seem powerful: the mana that leaks through the burn marks gives them a warm,
+radiant glow that feels like a warm fire on a cold winter's day.
+~
+27 mp ag 0 11
+0 0 0
+11 0
+A
+8 1 0
+A
+9 1 0
+A
+16 4 0
+A
+7 2 0
+A
+23 12 0
+A
+5 1 6
+A
+5 1 3
+C
+225 375
+T 12315
+S
+#12319
+boots dragon pit fighter pair~
+dragon pit fighter boots~
+A pair of dragon pit fighter boots are standing here.~
+   The boots are rugged, sturdy, warm, and -- critically -- webbed with a fine
+argentine mesh that makes them nearly impervious to damage. The mesh is
+supposed to resist the bite of even the most enormous dragon, but that might be
+wishful thinking.
+~
+27 mp ag 0 9
+2 0 0
+2 0
+A
+2 1 0
+A
+15 5 0
+A
+18 5 0
+A
+17 5 0
+A
+13 4 0
+A
+5 1 6
+A
+5 1 3
+C
+225 375
+T 12315
+S
+#12320
+vambraces dragon hunter pair valiant~
+valiant dragon hunter vambraces~
+A pair of valiant dragon hunter vambraces have been left here.~
+   The vambraces are made from dragon scales that are, oddly, furry.
+Undernear, a mesh of argentine metal protects from the crushing bites of
+various enormous creatures.
+~
+27 mp ai 0 6
+3 0 0
+2 0
+A
+2 1 0
+A
+15 7 0
+A
+24 6 0
+A
+12 6 0
+A
+5 1 6
+A
+5 1 3
+C
+225 375
+T 12315
+S
+#12321
+wraps arm shadow virtuoso pair~
+shadow virtuoso arm wraps~
+A pair of shadow virtuoso arm wraps have unraveled here.~
+   These long, elegant wraps are made from dark cloth and leather. Shadows seem
+to seep from every part of them. Dragon scales and argentine webbing add
+additional protection without sacrificing movement.
+~
+27 mp ai 0 10
+1 0 0
+7 0
+A
+1 1 0
+A
+2 1 0
+A
+9 1 0
+A
+17 5 0
+A
+21 12 0
+A
+5 1 6
+A
+5 1 3
+C
+225 375
+T 12315
+S
+#12322
+sleeves fiery dracomancer pair~
+fiery dracomancer sleeves~
+A pair of fiery dracomancer sleeves are lying here.~
+   The sleeves, which look like they're meant to be worn over your clothing,
+are made from dragon scales and are enchanted such that they flicker and dance
+with dragonfire -- or, at least, they appear to.
+~
+27 mp ai 0 9
+0 0 0
+11 0
+A
+8 1 0
+A
+2 1 0
+A
+9 1 0
+A
+17 5 0
+A
+22 12 0
+A
+5 1 6
+A
+5 1 3
+C
+225 375
+T 12315
+S
+#12323
+braces flame radiant living~
+radiant braces of the living flame~
+The radiant braces of the living flame are lying here.~
+   These glorious arm braces are made from magical wood and mysterious
+eventide, wrapped in dragon leather, and emblazoned with arcane symbols that
+identify it as belonging to the mysterious Cult of the Living Flame. The braces
+make you feel warm even on the coldest day.
+~
+27 mp aj 0 12
+0 0 0
+11 0
+A
+8 1 0
+A
+9 1 0
+A
+16 4 0
+A
+7 2 0
+A
+23 12 0
+A
+5 1 6
+A
+5 1 3
+C
+225 375
+T 12315
+S
+#12324
+armguards guards dragon pit fighter~
+dragon pit fighter armguards~
+A pair of dragon pit fighter armguards have been left here.~
+   These fine armguards look like they were made to be used by fighters in the
+dragon pits.
+~
+27 mp ai 0 10
+2 0 0
+2 0
+A
+2 1 0
+A
+15 5 0
+A
+18 5 0
+A
+17 4 0
+A
+13 5 0
+A
+5 1 6
+A
+5 1 3
+C
+225 375
+T 12315
+S
+#12325
+ring fur dragon hunter~
+a fur dragon hunter ring~
+A fur dragon hunter ring is lying here.~
+   This furry ring -- presumably made from real dragon's fur, along with
+argentine and other precious materials -- is supposed to make you lucky against
+fur dragons.
+~
+2 mp ab 0 10
+0 0 0
+4 0
+A
+2 1 0
+A
+9 1 0
+A
+17 8 0
+A
+5 1 6
+A
+5 1 3
+C
+225 375
+T 12315
+S
+#12326
+ring dragonpike pike~
+a dragonpike ring~
+A dragonpike ring is lying here.~
+   This intricate ring, which has melded dragon scales, gold, and argentine, is
+inscribed inside and out with tiny dragons being impaled by long pikes (or
+perhaps lances).
+~
+2 mp ab 0 11
+0 0 0
+4 0
+A
+2 1 0
+A
+12 1 0
+A
+24 1 0
+A
+15 7 0
+A
+5 1 6
+A
+5 1 3
+C
+225 375
+T 12315
+S
+#12327
+ring living mana~
+a ring of living mana~
+A ring of living mana twists and coils in the air.~
+   In this ring you can see the texture of dragonhide and the glint of
+eventide, but they have become ethereal as the ring has dissolved into pure
+mana and barely holds its form as it coils around your finger.
+~
+2 mp ab 0 11
+0 0 0
+10 0
+A
+8 1 0
+A
+9 1 0
+A
+16 4 0
+A
+7 4 0
+A
+5 1 6
+A
+5 1 3
+C
+225 375
+T 12315
+S
+#12328
+ring shadowforged forged~
+a shadowforged ring~
+A shadowforged ring is hidden here.~
+   The ring is so black that it might be made from darkness itself, though it
+has the feel of dragon leather and the smell of argentine. Perhaps an
+enchantment keeps it hidden from view.
+~
+2 mp ab 0 11
+0 0 0
+4 0
+A
+21 1 0
+A
+5 1 6
+A
+5 1 3
+C
+225 375
+T 12315
+S
+#12329
+ring dracomancer~
+a dracomancer ring~
+A dracomancer ring has been lost here.~
+   This exotic ring is made from dragon scales, eventide, and gold. It burns
+with the searing pain of dragon fire, sparing no one but the wearer.
+~
+2 mp ab 0 11
+0 0 0
+4 0
+A
+22 1 0
+A
+5 1 6
+A
+5 1 3
+C
+225 375
+T 12315
+S
+#12330
+ring flame living~
+a ring of living flame~
+A ring of living flame spins in the air.~
+   Though the ring itself isn't made of fire -- it's made of dragon leather and
+expensive metals -- it heats your finger almost to the point of pain when you
+wear it.
+~
+2 mp ab 0 11
+0 0 0
+4 0
+A
+23 1 0
+A
+5 1 6
+A
+5 1 3
+C
+225 375
+T 12315
+S
+#12331
+bow dragon hunter valiant~
+a valiant dragon hunter bow~
+A valiant dragon hunter bow is lying here.~
+   This bow is carved from sleek magical wood and you can see mana rising like
+steam from the intricate carvings that adorn its curves. Though it's no larger
+than any other bow, it is clearly built for hunting dragons.
+~
+20 emp ap 0 8
+29 6 0
+0 0
+A
+2 1 0
+A
+15 5 0
+A
+12 4 0
+A
+24 4 0
+A
+5 1 6
+A
+5 1 3
+C
+225 375
+T 12315
+S
+#12332
+bow shadow virtuoso~
+a shadow virtuoso bow~
+A shadow virtuoso bow has been left behind.~
+   This elegant bow has been carved from black wood that was infused by magic
+even as a seedling. The carving on the bow makes it difficult to see in dim
+light, and many of the bow's victims are surprised to find themselves deceased.
+~
+20 emp ap 0 10
+29 7 0
+0 0
+A
+1 1 0
+A
+2 1 0
+A
+9 1 0
+A
+21 10 0
+A
+5 1 6
+A
+5 1 3
+C
+225 375
+T 12315
+S
+#12333
+bow fiery dracomancer~
+a fiery dracomancer bow~
+A fiery dracomancer bow hovers in the air.~
+   This burning bow looks as though it was carved from wood that was already
+ablaze. And, fueled by the mana inside, the wood has never gone out.
+~
+20 emp ap 0 10
+29 3 0
+0 0
+A
+8 1 0
+A
+2 1 0
+A
+9 1 0
+A
+22 14 0
+A
+5 1 6
+A
+5 1 3
+C
+225 375
+T 12315
+S
+#12334
+bow radiant living flame~
+the radiant bow of the living flame~
+The radiant bow of the living flame is lying here.~
+   This elegant bow is made of the finest magical wood and burned with
+countless tiny arcane symbols that identify it as belonging to the Cult of
+Living Flame. Little is known about these dragon worshippers, but they might be
+looking for their bow.
+~
+20 emp ap 0 12
+29 3 0
+0 0
+A
+8 1 0
+A
+9 1 0
+A
+16 1 0
+A
+7 4 0
+A
+23 10 0
+A
+5 1 6
+A
+5 1 3
+C
+225 375
+T 12315
+S
+#12335
+bow dragon pit fighter~
+a dragon pit fighter bow~
+Someone has left a dragon pit fighter bow here.~
+   This oversized bow has been carved in the likeness of a dragon, perhaps in
+hopes of intimidating one in the dragon pits. Still, it looks like it can deal
+serious damage.
+~
+20 emp ap 0 9
+29 6 0
+0 0
+A
+2 1 0
+A
+17 4 0
+A
+18 4 0
+A
+13 4 0
+A
+9 1 0
+A
+5 1 6
+A
+5 1 3
+C
+225 375
+T 12315
+S
+#12336
+bow dragon king righteous~
+the righteous bow of the dragon king~
+The righteous bow of the dragon king has been left behind.~
+   The bow is small and light but impossibly strong. Every inch of it is
+covered with intricate carvings showing the life, ascension, and conquest of an
+unnamed dragon king from ages past.
+~
+20 mp ap 0 11
+29 3 0
+0 0
+A
+15 1 0
+A
+16 1 0
+A
+11 1 0
+A
+6 1 0
+A
+19 1 0
+A
+5 1 6
+A
+5 1 3
+C
+100 375
+T 12315
+S
+#12337
+crown king dragon scaled~
+the scaled crown of the dragon king~
+The scaled crown of the dragon king is lying here.~
+   The crown is made from exotic gems and gleaming dragon scales, bound in
+precious metal and enchanted to ensure a long and righteous reign.
+~
+2 mp ae 0 10
+0 0 0
+4 0
+A
+15 1 0
+A
+16 1 0
+A
+11 1 0
+A
+6 1 0
+A
+19 1 0
+A
+5 2 0
+A
+5 1 6
+A
+5 1 3
+C
+100 375
+T 12315
+S
+#12338
+boots traveling dragon king~
+traveling boots of the dragon king~
+The traveling boots of the dragon king are standing here, waiting.~
+   These scaled boots are emblazoned with precious metals and exotic gems. To
+be worn only by a king, and only when traveling, these boots are said to
+protect from every possible delay and inconvenience.
+~
+2 mp ag 0 12
+0 0 0
+7 0
+A
+15 1 0
+A
+16 1 0
+A
+11 1 0
+A
+6 1 0
+A
+19 1 0
+A
+5 1 6
+A
+5 1 3
+C
+100 375
+T 12315
+S
+#12339
+ring signet dragon king~
+the signet ring of the dragon king~
+The signet ring of the dragon king is lying here.~
+   This oversized ring is made from gold, argentine, and maybe eventide as it
+twists and swirls with ancient, fiery magic.
+~
+2 amp ab 0 12
+0 0 0
+4 0
+A
+15 1 0
+A
+16 1 0
+A
+11 1 0
+A
+6 1 0
+A
+19 1 0
+A
+5 1 6
+A
+5 1 3
+C
+100 375
+T 12315
+S
+#12340
+collar livery dragon king~
+the livery collar of the dragon king~
+The livery collar of the dragon king has been dropped here.~
+   This thick chain announces to the world that its bearer acts with the
+authority and infallibility of the dragon king.
+~
+2 amp ac 0 13
+0 0 0
+4 0
+A
+15 1 0
+A
+16 1 0
+A
+11 1 0
+A
+6 1 0
+A
+19 1 0
+A
+5 1 6
+A
+5 1 3
+C
+100 375
+T 12315
+S
+$

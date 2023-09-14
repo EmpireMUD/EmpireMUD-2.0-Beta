@@ -182,7 +182,7 @@ room_template *create_room_template_table_entry(rmt_vnum vnum) {
 */
 char *list_one_room_template(room_template *rmt, bool detail) {
 	static char output[MAX_STRING_LENGTH];
-	char flags[MAX_STRING_LENGTH];
+	char flags[MAX_STRING_LENGTH], funcs[MAX_STRING_LENGTH];
 	
 	bitvector_t show_flags = RMT_OUTDOOR | RMT_DARK | RMT_LIGHT | RMT_NO_MOB | RMT_NO_TELEPORT | RMT_LOOK_OUT | RMT_NO_LOCATION;
 	
@@ -194,8 +194,15 @@ char *list_one_room_template(room_template *rmt, bool detail) {
 		else {
 			*flags = '\0';
 		}
+		if (GET_RMT_FUNCTIONS(rmt)) {
+			strcpy(funcs, " - ");
+			sprintbit(GET_RMT_FUNCTIONS(rmt), function_flags, funcs + 3, TRUE);
+		}
+		else {
+			*funcs = '\0';
+		}
 		
-		snprintf(output, sizeof(output), "[%5d] %s%s", GET_RMT_VNUM(rmt), GET_RMT_TITLE(rmt), flags);
+		snprintf(output, sizeof(output), "[%5d] %s%s%s", GET_RMT_VNUM(rmt), GET_RMT_TITLE(rmt), flags, funcs);
 	}
 	else {
 		snprintf(output, sizeof(output), "[%5d] %s", GET_RMT_VNUM(rmt), GET_RMT_TITLE(rmt));
@@ -270,6 +277,7 @@ void olc_delete_room_template(char_data *ch, rmt_vnum vnum) {
 	shop_data *shop, *next_shop;
 	descriptor_data *desc;
 	room_template *rmt;
+	char name[256];
 	bool found;
 	int count;
 	
@@ -277,6 +285,8 @@ void olc_delete_room_template(char_data *ch, rmt_vnum vnum) {
 		msg_to_char(ch, "There is no such room template %d.\r\n", vnum);
 		return;
 	}
+	
+	snprintf(name, sizeof(name), "%s", NULLSAFE(GET_RMT_TITLE(rmt)));
 	
 	if (HASH_COUNT(room_template_table) <= 1) {
 		msg_to_char(ch, "You can't delete the last room template.\r\n");
@@ -296,6 +306,7 @@ void olc_delete_room_template(char_data *ch, rmt_vnum vnum) {
 		
 		if (found) {
 			SET_BIT(PRG_FLAGS(prg), PRG_IN_DEVELOPMENT);
+			syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: Progress %d %s set IN-DEV due to deleted room template", PRG_VNUM(prg), PRG_NAME(prg));
 			save_library_file_for_vnum(DB_BOOT_PRG, PRG_VNUM(prg));
 			need_progress_refresh = TRUE;
 		}
@@ -310,6 +321,7 @@ void olc_delete_room_template(char_data *ch, rmt_vnum vnum) {
 		
 		if (found) {
 			SET_BIT(QUEST_FLAGS(quest), QST_IN_DEVELOPMENT);
+			syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: Quest %d %s set IN-DEV due to deleted room template", QUEST_VNUM(quest), QUEST_NAME(quest));
 			save_library_file_for_vnum(DB_BOOT_QST, QUEST_VNUM(quest));
 		}
 	}
@@ -320,6 +332,7 @@ void olc_delete_room_template(char_data *ch, rmt_vnum vnum) {
 		
 		if (found) {
 			SET_BIT(SHOP_FLAGS(shop), SHOP_IN_DEVELOPMENT);
+			syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: Shop %d %s set IN-DEV due to deleted room template", SHOP_VNUM(shop), SHOP_NAME(shop));
 			save_library_file_for_vnum(DB_BOOT_SHOP, SHOP_VNUM(shop));
 		}
 	}
@@ -330,6 +343,7 @@ void olc_delete_room_template(char_data *ch, rmt_vnum vnum) {
 		
 		if (found) {
 			SET_BIT(SOC_FLAGS(soc), SOC_IN_DEVELOPMENT);
+			syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: Social %d %s set IN-DEV due to deleted room template", SOC_VNUM(soc), SOC_NAME(soc));
 			save_library_file_for_vnum(DB_BOOT_SOC, SOC_VNUM(soc));
 		}
 	}
@@ -386,8 +400,8 @@ void olc_delete_room_template(char_data *ch, rmt_vnum vnum) {
 		}
 	}
 		
-	syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: %s has deleted room template %d", GET_NAME(ch), vnum);
-	msg_to_char(ch, "Room template %d deleted.\r\n", vnum);
+	syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: %s has deleted room template %d %s", GET_NAME(ch), vnum, name);
+	msg_to_char(ch, "Room template %d (%s) deleted.\r\n", vnum, name);
 	
 	if (count > 0) {
 		msg_to_char(ch, "%d live rooms deleted.\r\n", count);
@@ -409,6 +423,7 @@ void olc_fullsearch_room_template(char_data *ch, char *argument) {
 	
 	bitvector_t only_flags = NOBITS, only_functions = NOBITS, only_affs = NOBITS;;
 	bitvector_t find_interacts = NOBITS, not_flagged = NOBITS, found_interacts = NOBITS;
+	int vmin = NOTHING, vmax = NOTHING;
 	
 	struct interaction_item *inter;
 	room_template *rmt, *next_rmt;
@@ -435,6 +450,8 @@ void olc_fullsearch_room_template(char_data *ch, char *argument) {
 		FULLSEARCH_FLAGS("unflagged", not_flagged, room_template_flags)
 		FULLSEARCH_FLAGS("functions", only_functions, function_flags)
 		FULLSEARCH_FLAGS("interaction", find_interacts, interact_types)
+		FULLSEARCH_INT("vmin", vmin, 0, INT_MAX)
+		FULLSEARCH_INT("vmax", vmax, 0, INT_MAX)
 		
 		else {	// not sure what to do with it? treat it like a keyword
 			sprintf(find_keywords + strlen(find_keywords), "%s%s", *find_keywords ? " " : "", type_arg);
@@ -449,6 +466,9 @@ void olc_fullsearch_room_template(char_data *ch, char *argument) {
 	
 	// okay now look up templates
 	HASH_ITER(hh, room_template_table, rmt, next_rmt) {
+		if ((vmin != NOTHING && GET_RMT_VNUM(rmt) < vmin) || (vmax != NOTHING && GET_RMT_VNUM(rmt) > vmax)) {
+			continue;	// vnum range
+		}
 		if (only_affs != NOBITS && (GET_RMT_BASE_AFFECTS(rmt) & only_affs) != only_affs) {
 			continue;
 		}
@@ -777,6 +797,23 @@ bool valid_room_template_vnum(rmt_vnum vnum) {
 }
 
 
+/**
+* Counts the words of text in a room template's strings.
+*
+* @param room_template *rmt The room template whose strings to count.
+* @return int The number of words in the room template's strings.
+*/
+int wordcount_room_template(room_template *rmt) {
+	int count = 0;
+	
+	count += wordcount_string(GET_RMT_TITLE(rmt));
+	count += wordcount_string(GET_RMT_DESC(rmt));
+	count += wordcount_extra_descriptions(GET_RMT_EX_DESCS(rmt));
+	
+	return count;
+}
+
+
  //////////////////////////////////////////////////////////////////////////////
 //// DISPLAYS ////////////////////////////////////////////////////////////////
 
@@ -890,7 +927,7 @@ void get_template_spawns_display(struct adventure_spawn *list, char *save_buffer
 */
 void olc_show_room_template(char_data *ch) {
 	room_template *rmt = GET_OLC_ROOM_TEMPLATE(ch->desc);
-	char lbuf[MAX_STRING_LENGTH];
+	char buf[MAX_STRING_LENGTH*4], lbuf[MAX_STRING_LENGTH*4];
 	
 	adv_data *adv = get_adventure_for_vnum(GET_OLC_VNUM(ch->desc));
 	
@@ -904,6 +941,14 @@ void olc_show_room_template(char_data *ch) {
 	sprintf(buf + strlen(buf), "Adventure: %d %s%s\t0\r\n", adv ? GET_ADV_VNUM(adv) : NOTHING, OLC_LABEL_CHANGED, adv ? GET_ADV_NAME(adv) : "none");
 	sprintf(buf + strlen(buf), "<%stitle\t0> %s\r\n", OLC_LABEL_STR(GET_RMT_TITLE(rmt), default_rmt_title), NULLSAFE(GET_RMT_TITLE(rmt)));
 	sprintf(buf + strlen(buf), "<%sdescription\t0>\r\n%s", OLC_LABEL_STR(GET_RMT_DESC(rmt), ""), NULLSAFE(GET_RMT_DESC(rmt)));
+	
+	if (GET_RMT_SUBZONE(rmt) != NOWHERE) {
+		snprintf(lbuf, sizeof(lbuf), "%d", GET_RMT_SUBZONE(rmt));
+	}
+	else {
+		strcpy(lbuf, "none");
+	}
+	sprintf(buf + strlen(buf), "<%ssubzone\t0> %s\r\n", OLC_LABEL_VAL(GET_RMT_SUBZONE(rmt), NOWHERE), lbuf);
 	
 	sprintbit(GET_RMT_FLAGS(rmt), room_template_flags, lbuf, TRUE);
 	sprintf(buf + strlen(buf), "<%sflags\t0> %s\r\n", OLC_LABEL_VAL(GET_RMT_FLAGS(rmt), NOBITS), lbuf);
@@ -924,14 +969,14 @@ void olc_show_room_template(char_data *ch) {
 	// exdesc
 	sprintf(buf + strlen(buf), "Extra descriptions: <%sextra\t0>\r\n", OLC_LABEL_PTR(GET_RMT_EX_DESCS(rmt)));
 	if (GET_RMT_EX_DESCS(rmt)) {
-		get_extra_desc_display(GET_RMT_EX_DESCS(rmt), buf1);
-		strcat(buf, buf1);
+		get_extra_desc_display(GET_RMT_EX_DESCS(rmt), lbuf, sizeof(lbuf));
+		strcat(buf, lbuf);
 	}
 	
 	sprintf(buf + strlen(buf), "Interactions: <%sinteraction\t0>\r\n", OLC_LABEL_PTR(GET_RMT_INTERACTIONS(rmt)));
 	if (GET_RMT_INTERACTIONS(rmt)) {
-		get_interaction_display(GET_RMT_INTERACTIONS(rmt), buf1);
-		strcat(buf, buf1);
+		get_interaction_display(GET_RMT_INTERACTIONS(rmt), lbuf);
+		strcat(buf, lbuf);
 	}
 	
 	// spawns
@@ -1406,5 +1451,23 @@ OLC_MODULE(rmedit_spawns) {
 		msg_to_char(ch, "Usage: spawn change <number> <vnum | percent | limit> <value>\r\n");
 		msg_to_char(ch, "Usage: spawn copy <from type> <from vnum>\r\n");
 		msg_to_char(ch, "Usage: spawn remove <number | all>\r\n");
+	}
+}
+
+
+OLC_MODULE(rmedit_subzone) {
+	room_template *rmt = GET_OLC_ROOM_TEMPLATE(ch->desc);
+	
+	if (!str_cmp(argument, "none")) {
+		GET_RMT_SUBZONE(rmt) = NOWHERE;
+		if (PRF_FLAGGED(ch, PRF_NOREPEAT)) {
+			send_config_msg(ch, "ok_string");
+		}
+		else {
+			msg_to_char(ch, "It no longer has a subzone.\r\n");
+		}
+	}
+	else {
+		GET_RMT_SUBZONE(rmt) = olc_process_number(ch, argument, "subzone vnum", "subzone", 0, MAX_VNUM, GET_RMT_SUBZONE(rmt));
 	}
 }

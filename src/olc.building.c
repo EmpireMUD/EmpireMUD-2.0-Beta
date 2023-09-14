@@ -107,8 +107,17 @@ bool audit_building(bld_data *bld, char_data *ch) {
 		olc_audit_msg(ch, GET_BLD_VNUM(bld), "No RUINS-TO-* interactions");
 		problem = TRUE;
 	}
+	if (IS_SET(GET_BLD_BASE_AFFECTS(bld), ROOM_AFF_HIDE_REAL_NAME) && !IS_SET(GET_BLD_FLAGS(bld), BLD_NO_CUSTOMIZE)) {
+		olc_audit_msg(ch, GET_BLD_VNUM(bld), "HIDE-REAL-NAME affect without NO-CUSTOMIZE flag");
+		problem = TRUE;
+	}
 	if (GET_BLD_HEIGHT(bld) < 0 || GET_BLD_HEIGHT(bld) > 5) {
 		olc_audit_msg(ch, GET_BLD_VNUM(bld), "Unusual height: %d", GET_BLD_HEIGHT(bld));
+		problem = TRUE;
+	}
+	
+	if (!GET_BLD_EX_DESCS(bld) && IS_SET(GET_BLD_FLAGS(bld), BLD_OPEN)) {
+		olc_audit_msg(ch, GET_BLD_VNUM(bld), "Open building has has no extra descriptions");
 		problem = TRUE;
 	}
 	
@@ -361,6 +370,7 @@ void olc_delete_building(char_data *ch, bld_vnum vnum) {
 	adv_data *adv, *next_adv;
 	obj_data *obj, *next_obj;
 	descriptor_data *desc;
+	char name[256];
 	int count;
 	bool found, deleted = FALSE;
 	
@@ -368,6 +378,8 @@ void olc_delete_building(char_data *ch, bld_vnum vnum) {
 		msg_to_char(ch, "There is no such building %d.\r\n", vnum);
 		return;
 	}
+	
+	snprintf(name, sizeof(name), "%s", NULLSAFE(GET_BLD_NAME(bld)));
 	
 	if (HASH_COUNT(building_table) <= 1) {
 		msg_to_char(ch, "You can't delete the last building.\r\n");
@@ -410,6 +422,7 @@ void olc_delete_building(char_data *ch, bld_vnum vnum) {
 		found |= delete_link_rule_by_type_value(&GET_ADV_LINKING(adv), ADV_LINK_PORTAL_BUILDING_NEW, vnum);
 		
 		if (found) {
+			syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: Adventure %d %s lost deleted linking rule building", GET_ADV_VNUM(adv), GET_ADV_NAME(adv));
 			save_library_file_for_vnum(DB_BOOT_ADV, GET_ADV_VNUM(adv));
 		}
 	}
@@ -422,6 +435,7 @@ void olc_delete_building(char_data *ch, bld_vnum vnum) {
 		found |= delete_from_interaction_list(&GET_BLD_INTERACTIONS(biter), TYPE_BLD, vnum);
 		
 		if (found) {
+			syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: Building %d %s lost deleted related building", GET_BLD_VNUM(biter), GET_BLD_NAME(biter));
 			save_library_file_for_vnum(DB_BOOT_BLD, GET_BLD_VNUM(biter));
 		}
 	}
@@ -431,18 +445,24 @@ void olc_delete_building(char_data *ch, bld_vnum vnum) {
 		if (CRAFT_IS_BUILDING(craft) && GET_CRAFT_BUILD_TYPE(craft) == vnum) {
 			GET_CRAFT_BUILD_TYPE(craft) = NOTHING;
 			SET_BIT(GET_CRAFT_FLAGS(craft), CRAFT_IN_DEVELOPMENT);
+			syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: Craft %d %s set IN-DEV due to deleted building", GET_CRAFT_VNUM(craft), GET_CRAFT_NAME(craft));
 			save_library_file_for_vnum(DB_BOOT_CRAFT, GET_CRAFT_VNUM(craft));
 		}
 	}
 	
 	// obj storage
 	HASH_ITER(hh, object_table, obj, next_obj) {
+		found = FALSE;
 		LL_FOREACH_SAFE(GET_OBJ_STORAGE(obj), store, next_store) {
 			if (store->type == TYPE_BLD && store->vnum == vnum) {
 				LL_DELETE(obj->proto_data->storage, store);
 				free(store);
-				save_library_file_for_vnum(DB_BOOT_OBJ, GET_OBJ_VNUM(obj));
+				found = TRUE;
 			}
+		}
+		if (found) {
+			syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: Object %d %s lost deleted storage building", GET_OBJ_VNUM(obj), GET_OBJ_SHORT_DESC(obj));
+			save_library_file_for_vnum(DB_BOOT_OBJ, GET_OBJ_VNUM(obj));
 		}
 	}
 	
@@ -453,6 +473,7 @@ void olc_delete_building(char_data *ch, bld_vnum vnum) {
 		
 		if (found) {
 			SET_BIT(PRG_FLAGS(prg), PRG_IN_DEVELOPMENT);
+			syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: Progress %d %s set IN-DEV due to deleted building", PRG_VNUM(prg), PRG_NAME(prg));
 			save_library_file_for_vnum(DB_BOOT_PRG, PRG_VNUM(prg));
 			need_progress_refresh = TRUE;
 		}
@@ -460,8 +481,11 @@ void olc_delete_building(char_data *ch, bld_vnum vnum) {
 	
 	// quests
 	HASH_ITER(hh, quest_table, quest, next_quest) {
+		// QG_x:
 		found = delete_quest_giver_from_list(&QUEST_STARTS_AT(quest), QG_BUILDING, vnum);
 		found |= delete_quest_giver_from_list(&QUEST_ENDS_AT(quest), QG_BUILDING, vnum);
+		
+		// REQ_x:
 		found |= delete_requirement_from_list(&QUEST_TASKS(quest), REQ_OWN_BUILDING, vnum);
 		found |= delete_requirement_from_list(&QUEST_PREREQS(quest), REQ_OWN_BUILDING, vnum);
 		found |= delete_requirement_from_list(&QUEST_TASKS(quest), REQ_VISIT_BUILDING, vnum);
@@ -469,6 +493,7 @@ void olc_delete_building(char_data *ch, bld_vnum vnum) {
 		
 		if (found) {
 			SET_BIT(QUEST_FLAGS(quest), QST_IN_DEVELOPMENT);
+			syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: Quest %d %s set IN-DEV due to deleted building", QUEST_VNUM(quest), QUEST_NAME(quest));
 			save_library_file_for_vnum(DB_BOOT_QST, QUEST_VNUM(quest));
 		}
 	}
@@ -479,6 +504,7 @@ void olc_delete_building(char_data *ch, bld_vnum vnum) {
 		
 		if (found) {
 			SET_BIT(SHOP_FLAGS(shop), SHOP_IN_DEVELOPMENT);
+			syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: Shop %d %s set IN-DEV due to deleted building", SHOP_VNUM(shop), SHOP_NAME(shop));
 			save_library_file_for_vnum(DB_BOOT_SHOP, SHOP_VNUM(shop));
 		}
 	}
@@ -490,6 +516,7 @@ void olc_delete_building(char_data *ch, bld_vnum vnum) {
 		
 		if (found) {
 			SET_BIT(SOC_FLAGS(soc), SOC_IN_DEVELOPMENT);
+			syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: Social %d %s set IN-DEV due to deleted building", SOC_VNUM(soc), SOC_NAME(soc));
 			save_library_file_for_vnum(DB_BOOT_SOC, SOC_VNUM(soc));
 		}
 	}
@@ -507,6 +534,7 @@ void olc_delete_building(char_data *ch, bld_vnum vnum) {
 		found |= delete_bld_relation_by_vnum(&VEH_RELATIONS(veh), BLD_REL_STORES_LIKE_BLD, vnum);
 		
 		if (found) {
+			syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: Vehicle %d %s lost deleted related building", VEH_VNUM(veh), VEH_SHORT_DESC(veh));
 			save_library_file_for_vnum(DB_BOOT_VEH, VEH_VNUM(veh));
 		}
 	}
@@ -606,8 +634,8 @@ void olc_delete_building(char_data *ch, bld_vnum vnum) {
 		}
 	}
 	
-	syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: %s has deleted building %d", GET_NAME(ch), vnum);
-	msg_to_char(ch, "Building %d deleted.\r\n", vnum);
+	syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: %s has deleted building %d %s", GET_NAME(ch), vnum, name);
+	msg_to_char(ch, "Building %d (%s) deleted.\r\n", vnum, name);
 	
 	if (count > 0) {
 		msg_to_char(ch, "%d live buildings changed.\r\n", count);
@@ -629,6 +657,7 @@ void olc_delete_building(char_data *ch, bld_vnum vnum) {
 void olc_fullsearch_building(char_data *ch, char *argument) {
 	char buf[MAX_STRING_LENGTH * 2], line[MAX_STRING_LENGTH], type_arg[MAX_INPUT_LENGTH], val_arg[MAX_INPUT_LENGTH], find_keywords[MAX_INPUT_LENGTH];
 	int count;
+	bool found_one;
 	
 	char only_icon[MAX_INPUT_LENGTH], only_commands[MAX_INPUT_LENGTH];
 	bitvector_t only_designate = NOBITS, only_flags = NOBITS, only_functions = NOBITS;
@@ -640,8 +669,10 @@ void olc_fullsearch_building(char_data *ch, char *argument) {
 	int only_hitpoints = NOTHING, hitpoints_over = NOTHING, hitpoints_under = NOTHING;
 	int only_military = NOTHING, military_over = NOTHING, military_under = NOTHING;
 	int only_rooms = NOTHING, rooms_over = NOTHING, rooms_under = NOTHING;
+	int only_depletion = NOTHING, vmin = NOTHING, vmax = NOTHING;
 	
 	struct interaction_item *inter;
+	struct interact_restriction *inter_res;
 	bld_data *bld, *next_bld;
 	size_t size;
 	
@@ -668,6 +699,7 @@ void olc_fullsearch_building(char_data *ch, char *argument) {
 		FULLSEARCH_INT("citizensover", cits_over, 0, INT_MAX)
 		FULLSEARCH_INT("citizensunder", cits_under, 0, INT_MAX)
 		FULLSEARCH_STRING("commands", only_commands)
+		FULLSEARCH_LIST("depletion", only_depletion, depletion_type)
 		FULLSEARCH_FLAGS("designate", only_designate, designate_flags)
 		FULLSEARCH_INT("fame", only_fame, 0, INT_MAX)
 		FULLSEARCH_INT("fameover", fame_over, 0, INT_MAX)
@@ -690,6 +722,8 @@ void olc_fullsearch_building(char_data *ch, char *argument) {
 		FULLSEARCH_INT("military", only_military, 0, INT_MAX)
 		FULLSEARCH_INT("militaryover", military_over, 0, INT_MAX)
 		FULLSEARCH_INT("militaryunder", military_under, 0, INT_MAX)
+		FULLSEARCH_INT("vmin", vmin, 0, INT_MAX)
+		FULLSEARCH_INT("vmax", vmax, 0, INT_MAX)
 		
 		else {	// not sure what to do with it? treat it like a keyword
 			sprintf(find_keywords + strlen(find_keywords), "%s%s", *find_keywords ? " " : "", type_arg);
@@ -704,6 +738,9 @@ void olc_fullsearch_building(char_data *ch, char *argument) {
 	
 	// okay now look up items
 	HASH_ITER(hh, building_table, bld, next_bld) {
+		if ((vmin != NOTHING && GET_BLD_VNUM(bld) < vmin) || (vmax != NOTHING && GET_BLD_VNUM(bld) > vmax)) {
+			continue;	// vnum range
+		}
 		if (only_affs != NOBITS && (GET_BLD_BASE_AFFECTS(bld) & only_affs) != only_affs) {
 			continue;
 		}
@@ -773,6 +810,20 @@ void olc_fullsearch_building(char_data *ch, char *argument) {
 				found_interacts |= BIT(inter->type);
 			}
 			if ((find_interacts & found_interacts) != find_interacts) {
+				continue;
+			}
+		}
+		if (only_depletion != NOTHING) {
+			found_one = FALSE;
+			LL_FOREACH(GET_BLD_INTERACTIONS(bld), inter) {
+				LL_FOREACH(inter->restrictions, inter_res) {
+					if (inter_res->type == INTERACT_RESTRICT_DEPLETION && inter_res->vnum == only_depletion) {
+						found_one = TRUE;
+						break;
+					}
+				}
+			}
+			if (!found_one) {
 				continue;
 			}
 		}
@@ -948,7 +999,18 @@ void olc_search_building(char_data *ch, bld_vnum vnum) {
 		if (size >= sizeof(buf)) {
 			break;
 		}
-		if (find_quest_giver_in_list(QUEST_STARTS_AT(quest), QG_BUILDING, vnum) || find_quest_giver_in_list(QUEST_ENDS_AT(quest), QG_BUILDING, vnum) || find_requirement_in_list(QUEST_TASKS(quest), REQ_OWN_BUILDING, vnum) || find_requirement_in_list(QUEST_PREREQS(quest), REQ_OWN_BUILDING, vnum) || find_requirement_in_list(QUEST_TASKS(quest), REQ_VISIT_BUILDING, vnum) || find_requirement_in_list(QUEST_PREREQS(quest), REQ_VISIT_BUILDING, vnum)) {
+		
+		// QG_x:
+		any = find_quest_giver_in_list(QUEST_STARTS_AT(quest), QG_BUILDING, vnum);
+		any |= find_quest_giver_in_list(QUEST_ENDS_AT(quest), QG_BUILDING, vnum);
+		
+		// REQ_x:
+		any |= find_requirement_in_list(QUEST_TASKS(quest), REQ_OWN_BUILDING, vnum);
+		any |= find_requirement_in_list(QUEST_PREREQS(quest), REQ_OWN_BUILDING, vnum);
+		any |= find_requirement_in_list(QUEST_TASKS(quest), REQ_VISIT_BUILDING, vnum);
+		any |= find_requirement_in_list(QUEST_PREREQS(quest), REQ_VISIT_BUILDING, vnum);
+		
+		if (any) {
 			++found;
 			size += snprintf(buf + size, sizeof(buf) - size, "QST [%5d] %s\r\n", QUEST_VNUM(quest), QUEST_NAME(quest));
 		}
@@ -1196,6 +1258,25 @@ void smart_copy_bld_relations(struct bld_relation **to_list, struct bld_relation
 }
 
 
+/**
+* Counts the words of text in a building's strings.
+*
+* @param bld_data *bld The building whose strings to count.
+* @return int The number of words in the building's strings.
+*/
+int wordcount_building(bld_data *bld) {
+	int count = 0;
+	
+	count += wordcount_string(GET_BLD_NAME(bld));
+	count += wordcount_string(GET_BLD_TITLE(bld));
+	count += wordcount_string(GET_BLD_COMMANDS(bld));
+	count += wordcount_string(GET_BLD_DESC(bld));
+	count += wordcount_extra_descriptions(GET_BLD_EX_DESCS(bld));
+		
+	return count;
+}
+
+
  //////////////////////////////////////////////////////////////////////////////
 //// DISPLAYS ////////////////////////////////////////////////////////////////
 
@@ -1207,7 +1288,7 @@ void smart_copy_bld_relations(struct bld_relation **to_list, struct bld_relation
 */
 void olc_show_building(char_data *ch) {
 	bld_data *bdg = GET_OLC_BUILDING(ch->desc);
-	char lbuf[MAX_STRING_LENGTH], buf1[MAX_STRING_LENGTH];
+	char buf[MAX_STRING_LENGTH*4], lbuf[MAX_STRING_LENGTH*4];
 	bool is_room = IS_SET(GET_BLD_FLAGS(bdg), BLD_ROOM) ? TRUE : FALSE;
 	struct spawn_info *spawn;
 	int count;
@@ -1254,28 +1335,28 @@ void olc_show_building(char_data *ch) {
 	
 	sprintf(buf + strlen(buf), "Relationships: <%srelations\t0>\r\n", OLC_LABEL_PTR(GET_BLD_RELATIONS(bdg)));
 	if (GET_BLD_RELATIONS(bdg)) {
-		get_bld_relations_display(GET_BLD_RELATIONS(bdg), buf1);
-		strcat(buf, buf1);
+		get_bld_relations_display(GET_BLD_RELATIONS(bdg), lbuf);
+		strcat(buf, lbuf);
 	}
 
 	// exdesc
 	sprintf(buf + strlen(buf), "Extra descriptions: <%sextra\t0>\r\n", OLC_LABEL_PTR(GET_BLD_EX_DESCS(bdg)));
 	if (GET_BLD_EX_DESCS(bdg)) {
-		get_extra_desc_display(GET_BLD_EX_DESCS(bdg), buf1);
-		strcat(buf, buf1);
+		get_extra_desc_display(GET_BLD_EX_DESCS(bdg), lbuf, sizeof(lbuf));
+		strcat(buf, lbuf);
 	}
 
 	sprintf(buf + strlen(buf), "Interactions: <%sinteraction\t0>\r\n", OLC_LABEL_PTR(GET_BLD_INTERACTIONS(bdg)));
 	if (GET_BLD_INTERACTIONS(bdg)) {
-		get_interaction_display(GET_BLD_INTERACTIONS(bdg), buf1);
-		strcat(buf, buf1);
+		get_interaction_display(GET_BLD_INTERACTIONS(bdg), lbuf);
+		strcat(buf, lbuf);
 	}
 	
 	// maintenance resources
 	sprintf(buf + strlen(buf), "Yearly maintenance resources required: <%sresource\t0>\r\n", OLC_LABEL_PTR(GET_BLD_YEARLY_MAINTENANCE(bdg)));
 	if (GET_BLD_YEARLY_MAINTENANCE(bdg)) {
-		get_resource_display(GET_BLD_YEARLY_MAINTENANCE(bdg), buf1);
-		strcat(buf, buf1);
+		get_resource_display(GET_BLD_YEARLY_MAINTENANCE(bdg), lbuf);
+		strcat(buf, lbuf);
 	}
 
 	// scripts

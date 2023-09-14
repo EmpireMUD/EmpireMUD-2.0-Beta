@@ -31,6 +31,8 @@ burrow charge~
 0 0 0 0
 T0
 You are no longer hard-stunned by the burrow charge.~
+T5
+...$e seems stunned!~
 S
 #10958
 swamp breath~
@@ -47,6 +49,8 @@ S
 burrowed~
 4 0
 0 0 0 0
+T5
+...$e is burrowed!~
 S
 #10966
 giant attack~
@@ -59,6 +63,8 @@ stunned~
 0 0 0 0
 T0
 You are no longer stunned by the giant's attack.~
+T5
+...$e is stunned!~
 S
 #10968
 dazed~
@@ -112,6 +118,8 @@ stunned~
 0 0 0 0
 T0
 You are no longer stunned.~
+T5
+...$e is stunned!~
 S
 #10985
 bleeding~
@@ -135,11 +143,17 @@ T0
 You hit the ground.~
 T1
 $n hits the ground.~
+T4
+$e is several feet in the air, enveloped in a dust devil!~
+T5
+...$e is caught in the dust devil and struggling to find footing!~
 S
 #10991
 dust cloud~
 4 0
 0 0 0 0
+T5
+...$e is blinded by the dust!~
 S
 #10992
 baleful polymorph~
@@ -147,6 +161,8 @@ baleful polymorph~
 0 0 0 0
 T0
 You are no longer stunned by your sudden transformation.~
+T5
+...$e is just sitting there, confused.~
 S
 #10993
 ugly stick~
@@ -174,5 +190,7 @@ T0
 You retrieve your weapon.~
 T1
 $n retrieves $s weapon.~
+T5
+...$e has lost $s weapon!~
 S
 $

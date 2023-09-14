@@ -19,6 +19,12 @@ A Portal in the Forest~
 0 0 0 -1
 C
 enter portal~
+E
+portal grove forest~
+   The portal crackles and hisses with a strange energy that is at once natural
+and unnatural. You can tell by the way the portal has formed in a tree that
+there are powerful natural forces at work here.
+~
 S
 #12671
 Wood Henge~
@@ -28,7 +34,14 @@ A Wood Henge~
 0 0 0 -1
 C
 chant druids~
-I 29 5006 100.00 1 r  # RUINS-TO-BLD: Small Ruins
+E
+henge wood building~
+   Massive timbers have been constructed in a post-and-lintel circle large
+enough to host a rather large party. It seems to be aligned to the winter
+solstice. Close inspection of the wood shows scratch marks, as if wild animals
+have been climbing it.
+~
+I 29 5006 100.00 1 r  # RUINS-TO-BLD: Ruins
 M
 12671 75.00 c
 R

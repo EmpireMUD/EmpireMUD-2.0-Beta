@@ -4,11 +4,13 @@ a snakeskin bag~
 A snakeskin bag has been left nearby.~
 A patchwork of different snakeskins with a lot of room inside.
 ~
-24 mp ar 0 1
+24 mp ar 0 2
 1 0 0
 7 0
 A
 17 1 0
+C
+75 175
 S
 #11101
 ribcage colossal~
@@ -18,9 +20,11 @@ A colossal ribcage is lying here.~
 again afterwards.
 Craft (no skill): rib-bone boat
 ~
-3 eg a 0 7
+3 eg a 0 8
 0 0 0
 14 0
+C
+1 1
 S
 #11102
 carrots bunch~
@@ -28,9 +32,11 @@ a bunch of carrots~
 There are a bunch of carrots scattered across the ground.~
 You can eat carrots, or plant them.
 ~
-6 bgl a 0 6
+6 bgl a 0 7
 12 11100 0
 7 168
+C
+1 1
 I 15 11103 100.00 4 x  # SEPARATE: carrot
 O+ 1 6152
 R
@@ -42,9 +48,11 @@ a carrot~
 Someone dropped a large carrot here.~
 This is just one carrot, so it's not enough to plant, but it tastes good.
 ~
-6 g a 0 7
+6 g a 0 8
 1 0 0
 7 48
+C
+1 1
 I 14 11102 100.00 4 x  # COMBINE: bunch of carrots
 O+ 1 6142
 S
@@ -54,9 +62,11 @@ a bunch of blackberries~
 There are a bunch of blackberries scattered across the ground.~
 You can eat blackberries, or plant them.
 ~
-6 bgl a 0 6
+6 bgl a 0 7
 12 11101 0
 7 168
+C
+1 1
 I 15 11105 100.00 4 x  # SEPARATE: few blackberries
 O+ 1 6132
 R
@@ -68,9 +78,11 @@ a few blackberries~
 There are a few loose blackberries here.~
 This is just a few blackberries, so they're not enough to plant, but they taste good.
 ~
-6 g a 0 6
+6 g a 0 7
 1 0 0
 7 48
+C
+1 1
 I 14 11104 100.00 4 x  # COMBINE: bunch of blackberries
 O+ 1 6122
 S
@@ -80,9 +92,11 @@ some juicy pears~
 There are some juicy pears scattered across the ground.~
 You can eat pears, or plant them.
 ~
-6 bgl a 0 6
+6 bgl a 0 7
 12 11102 0
 7 168
+C
+1 1
 I 15 11107 100.00 4 x  # SEPARATE: ripe pear
 O+ 1 6132
 R
@@ -94,9 +108,11 @@ a ripe pear~
 Someone has dropped a ripe pear nearby.~
 This is just one pear, so it's not enough to plant, but it tastes good.
 ~
-6 g a 0 7
+6 g a 0 8
 2 0 0
 7 48
+C
+1 1
 I 14 11106 100.00 4 x  # COMBINE: juicy pears
 O+ 1 6122
 S
@@ -106,13 +122,15 @@ a scarlet-feathered hood~
 A scarlet-feathered hood flutters on the ground nearby.~
 Obviously, this is a trophy worthy of someone who's bested a Scarlet-Hooded Raptor!
 ~
-2 mp ae 0 1
+2 mp ae 0 2
 -1 -1 -1
 7 0
 A
 18 1 0
 A
 11 1 0
+C
+75 175
 S
 #11109
 dagger raptor claw dagger-length~
@@ -120,13 +138,15 @@ a raptor claw dagger~
 A dagger-length raptor claw sticks out of the ground nearby.~
 This weapon will prove as useful to its new owner as it did to its last.
 ~
-1 hmp ano f 2
+1 hmp ano f 3
 0 1 4
 7 0
 A
 2 1 0
 A
 17 1 0
+C
+75 175
 S
 #11110
 colossal tooth club~
@@ -134,13 +154,15 @@ a colossal tooth club~
 A colossal tooth club bobs nearby.~
 It's not very sharp, but it'll make a great blunt weapon!
 ~
-1 hmp an 0 1
+1 hmp an 0 2
 0 1 5
 14 0
 A
 1 1 0
 A
 13 1 0
+C
+75 175
 S
 #11111
 pouch venom viper~
@@ -148,11 +170,11 @@ a pouch of viper venom~
 A pouch of viper venom rests nearby.~
 This small pouch of viper venom could come in handy.
 ~
-26 m a 0 4
+26 m a 0 5
 0 15 -1
 7 0
 C
-125 125
+175 175
 R
 4 5193 0
 T 1273
@@ -163,13 +185,13 @@ a pouch of skink saliva~
 A pouch of skink saliva rests nearby.~
 This small pouch of skink saliva could come in handy.
 ~
-26 m a 0 3
+26 m a 0 4
 0 15 -1
 7 0
 A
 15 -1 0
 C
-125 125
+175 175
 R
 4 5193 0
 S
@@ -183,9 +205,11 @@ Forge (Jewelry): cave viper sigil (mage neck)
 Forge (Jewelry): serpent pendant (melee neck)
 Forge (Jewelry): skink amulet (tank neck)
 ~
-3 0 a 0 5
+3 0 a 0 6
 0 0 0
 12 0
+C
+1 1
 R
 4 5193 0
 R
@@ -197,13 +221,15 @@ a scarlet-feathered cape~
 A scarlet-feathered cape is lying here.~
 This cape is made from the bright red plumage of a scarlet-feathered raptor.
 ~
-27 mp ak 0 2
+27 mp ak 0 3
 2 0 0
 7 0
 A
 2 1 0
 A
 18 1 0
+C
+75 175
 S
 #11115
 bracer skinkskin colorful~
@@ -211,13 +237,15 @@ a skinkskin bracer~
 A colorful skinkskin bracer is lying here.~
 This colorful scaly bracelet is made from the skin of a cave skink.
 ~
-27 mo aj 0 2
+27 mo aj 0 3
 1 0 0
 7 0
 A
 17 1 0
 A
 2 1 0
+C
+75 175
 S
 #11116
 skullcap bone colossal~
@@ -226,13 +254,15 @@ A colossal bone skullcap is lying here.~
    This massive skullcap is made from an actual colossus skull! It's
 surprisingly comfortable.
 ~
-27 mp ae 0 1
+27 mp ae 0 2
 3 0 0
 14 0
 A
 1 2 0
 A
 17 1 0
+C
+75 175
 S
 #11117
 leggings adventurer's adventurers torn~
@@ -241,13 +271,15 @@ An adventurer's leggings are lying here, ripped and torn.~
    Something unfortunate clearly happened to the owner of these leggings, but
 their many, many pockets are still intact. Waste not, want not?
 ~
-2 mo af 0 1
+2 mo af 0 2
 0 0 0
 7 0
 A
 19 1 0
 A
 9 2 0
+C
+75 175
 S
 #11118
 whistle skink colorful~
@@ -256,9 +288,11 @@ A colorful skink whistle is lying here.~
 This whistle can summon a noncombat pet!
 Type 'use whistle' to summon it.
 ~
-19 p a 0 3
+19 p a 0 4
 11113 0 0
 7 0
+C
+1 1
 S
 #11119
 sigil viper cave~
@@ -267,7 +301,7 @@ A cave viper sigil is lying here.~
    This magical silver necklace is shaped like a cave viper. Its emerald eyes
 almost seems to follow you around the room...
 ~
-2 mo ac 0 5
+2 mo ac 0 6
 0 0 0
 3 0
 A
@@ -275,7 +309,7 @@ A
 A
 7 1 0
 C
-75 125
+75 200
 S
 #11120
 pendant serpent~
@@ -284,7 +318,7 @@ A serpent pendant is lying here.~
    This silver pendant is shaped like a cave viper, with strange emerald eyes.
 It almost seems to move when you're not watching.
 ~
-2 mo ac 0 6
+2 mo ac 0 7
 0 0 0
 3 0
 A
@@ -292,7 +326,7 @@ A
 A
 4 1 0
 C
-75 125
+75 200
 S
 #11121
 amulet skink~
@@ -301,7 +335,7 @@ A skink amulet is lying here.~
    The emerald eyes of this silver amulet gaze balefully at you. It almost
 seems to move when you're not watching.
 ~
-2 mo ac 0 4
+2 mo ac 0 5
 0 0 0
 3 0
 A
@@ -309,7 +343,7 @@ A
 A
 15 1 0
 C
-75 125
+75 200
 S
 #11122
 staff bone colossal~
@@ -318,11 +352,13 @@ A colossal bone staff is lying here.~
    This massive staff is made from one of the smaller bones of a loch colossus.
 It's still REALLY big.
 ~
-1 ehmp an p 4
+1 ehmp an p 5
 0 3 20
 14 0
 A
 17 1 0
+C
+75 175
 S
 #11123
 earrings scarlet feather~
@@ -332,13 +368,15 @@ A pair of scarlet feathered earrings is lying here.~
 displaying your victory over a scarlet-feathered raptor without wearing its
 entire scalp on your head.
 ~
-2 mp am 0 2
+2 mp am 0 3
 0 0 0
 7 0
 A
 4 2 0
 A
 9 1 0
+C
+75 175
 S
 #11124
 dust falling stream slow~
@@ -375,8 +413,24 @@ This shaft leads back out of the canyons to the mountain above.
 -1 0 0
 1 0
 S
+#11127
+debris~
+the debris~
+Some debris is blocking the tunnel. (difficulty)~
+   Mining debris blocks part of the tunnel but it looks like you could get past
+it (by selecting a difficulty).
+Usage: difficulty <normal | hard | group | boss>
+~
+3 0 0 0 5
+0 0 0
+1 0
+C
+1 1
+T 11127
+T 11118
+S
 #11130
-leather leatherbound book journal~
+book journal mage's mages leatherbound~
 a mage's journal~
 You find a leatherbound journal.~
    Bound in supple leather, the journal is nearly an inch thick, its parchment
@@ -384,9 +438,11 @@ pages covered with tiny handwriting and detailed illustrations. Leafing through
 the pages, the sheets slip by fluidly before parting naturally at a crease in
 the binding.
 ~
-28 j a 0 3
+28 j a 0 5
 24 0 0
 7 0
+C
+1 1
 E
 spell~
    There are four words written here in a heavy hand (garden, mill, stable,
@@ -403,11 +459,14 @@ emeralds wends its way around the stem, vine-like and dotted with blood red
 ruby thorns. The inner surface of the cup shimmers in an oily fashion, rainbow
 reflections curling in a way that causes ill ease.
 ~
-4 j a 0 1
+4 j a 0 3
 4 0 0
 4 4
+C
+1 1
 T 11136
 T 11137
+T 11142
 S
 #11132
 closed sarcophagus~
@@ -418,9 +477,11 @@ mosses cascading from the ceiling, but they part easily when pulled away from
 the lid to reveal a stained marble surface beneath. The sides depict friezes of
 what the estate must have looked like in its livelier days.
 ~
-3 0 0 0 1
+3 0 0 0 2
 0 0 0
 1 0
+C
+1 1
 E
 frieze~
    There is a recessed edge along the top of the frieze, evidence that the lid
@@ -439,9 +500,11 @@ blue against a midnight backdrop.
 
 Forge (Imperial Armors): opal carapace buckler
 ~
-3 0 a 0 4
+3 0 a 0 5
 0 0 0
 14 0
+C
+1 1
 R
 4 5621 0
 R
@@ -455,9 +518,11 @@ A hunk of jeweled slag cools nearby.~
 was intricately beautiful, is nonetheless worth its weight in .. Well, gold and
 jewels!
 ~
-15 0 a 0 2
+15 0 a 0 3
 16 0 0
 4 0
+C
+1 1
 R
 4 5611 a
 S
@@ -468,13 +533,15 @@ The titanaconda's collar lies nearby.~
    The scaly surface of the titanaconda's collar reflects motley hues of green
 in the light.
 ~
-2 emp al 0 1
+2 emp al 0 2
 0 0 0
 7 0
 A
 4 1 0
 A
 5 1 0
+C
+100 200
 S
 #11136
 catfish dorsal spine~
@@ -485,7 +552,7 @@ puncture wounds.
 
 Craft (Deadly Weapons): dorsal spine mace
 ~
-1 mo an 0 2
+1 mo an 0 3
 0 1 3
 14 0
 A
@@ -493,7 +560,7 @@ A
 A
 17 1 0
 C
-100 150
+100 200
 S
 #11137
 fillet filet catfish fish~
@@ -501,9 +568,11 @@ a catfish fillet~
 Tehre is a fillet of catfish nearby.~
 You can eat the meat raw... or cook it.
 ~
-6 0 a 0 2
+6 0 a 0 3
 6 0 0
 7 24
+C
+1 1
 R
 4 5119 0
 S
@@ -515,11 +584,13 @@ A branch, the length of a walking staff, is lying nearby.~
 black by decaying berries. But its weight is perfectly balanced for use as a
 staff weapon, and it tingles slightly when held.
 ~
-1 emp an 0 2
+1 emp an 0 3
 0 1 19
 0 0
 A
 17 1 0
+C
+100 200
 S
 #11139
 wooden staff branch~
@@ -529,13 +600,15 @@ A branch, the length of a walking staff, is lying nearby.~
 the limb: an undulating length of pale sunrise yellow, streaked with ocher
 veins. It feels oddly warm to the touch.
 ~
-1 emp an p 4
+1 emp an p 5
 0 1 16
 0 0
 A
 7 1 0
 A
 23 1 0
+C
+100 200
 S
 #11140
 wooden cube hex box~
@@ -548,9 +621,11 @@ grain. There is a small rune in the middle of the upturned face, and a
 different image branded into each of the four other visible sides: a mill, a
 garden, a stable, and an estate.
 ~
-3 j 0 0 1
+3 j 0 0 2
 0 0 0
 0 0
+C
+1 1
 E
 rune~
    The writing warns clearly that the item inside is cursed, and that only
@@ -574,9 +649,15 @@ There is an open hex box in the sarcophagus.~
 burns away from the center in a bright, violet embering. Inside, cradled in a
 bunting of brocade green silk, an intricately jeweled chalice gleams brightly.
 ~
-4 j 0 0 1
+4 j 0 0 3
 1 0 0
-0 0
+0 48
+C
+1 1
+M
+18
+The hex box falls apart from years of decay.~
+T 11143
 S
 #11142
 woundwort cutting dried~
@@ -585,9 +666,11 @@ A dried cutting of woundwort hangs nearby.~
    Tied to a line strung above the window box, an inverted cutting of woundwort
 has been hung to dry, its tiny lilac flowers brittle but vibrant.
 ~
-3 0 a 0 1
+3 0 a 0 2
 0 0 0
 0 0
+C
+1 1
 S
 #11143
 star anise pod~
@@ -597,9 +680,11 @@ A star anise pod is here.~
 star-shaped husk with a sound like distant applause, while wafting their spiced
 aroma.
 ~
-3 0 a 0 1
+3 0 a 0 2
 0 0 0
 0 0
+C
+1 1
 S
 #11144
 berries yew~
@@ -608,9 +693,11 @@ There is a scattering of yew berries nearby.~
    Ranging in hue from scarlet to crimson, the berries of the carniferous yew
 stand out brightly against the thin-leafed tree and its swaddling ivy.
 ~
-3 0 a 0 1
+3 0 a 0 2
 0 0 0
 0 0
+C
+1 1
 S
 #11145
 scales titanaconda's titanacondas~
@@ -622,9 +709,11 @@ protection.
 Sew (Imperial Armors): titanaconda scale coat
 Sew (Imperial Armors): titanaconda scale trousers
 ~
-3 e a 0 4
+3 e a 0 5
 0 0 0
 7 0
+C
+1 1
 R
 4 5120 0
 R
@@ -633,13 +722,13 @@ R
 4 5621 0
 S
 #11146
-titanaconda coat~
+coat scale titanaconda~
 a titanaconda scale coat~
 A coat made from titanaconda scales hangs nearby.~
    The long coat, sewn from the scales of a titanaconda, is strong but
 flexible, and its hues of deep green reflect wetly in the light.
 ~
-27 mo aq 0 2
+27 mo aq 0 4
 2 0 0
 7 0
 A
@@ -649,16 +738,16 @@ A
 A
 12 1 0
 C
-100 150
+100 225
 S
 #11147
-titanaconda trousers~
+trousers scale titanaconda~
 titanaconda scale trousers~
 A pair of titanaconda scale trousers hang nearby.~
    The trousers, sewn from the scales of a titanaconda, are strong but
 flexible, and their hues of deep green reflect wetly in the light.
 ~
-27 mo af 0 2
+27 mo af 0 3
 2 0 0
 7 0
 A
@@ -668,7 +757,7 @@ A
 A
 17 1 0
 C
-100 150
+100 225
 S
 #11148
 carapace buckler opal~
@@ -677,7 +766,7 @@ An opal carapace buckler rests nearby.~
    A buckler, forged from an opal carapace, shimmers darkly in the light. Its
 heft is reassuring, and its balance is superb.
 ~
-23 mo ao 0 1
+23 mo ao 0 2
 0 0 0
 0 0
 A
@@ -685,7 +774,7 @@ A
 A
 13 1 0
 C
-100 150
+100 225
 S
 #11149
 mace dorsal spine spiked~
@@ -693,7 +782,7 @@ a dorsal spine mace~
 A mace spiked with dorsal spines rests nearby.~
 The head of the mace is studded with dorsal spines from a mammoth catfish.
 ~
-1 emo an 0 2
+1 emo an 0 3
 0 1 5
 14 0
 A
@@ -701,6 +790,21 @@ A
 A
 17 1 0
 C
-100 175
+100 225
+S
+#11150
+vegetation path overgrown~
+the vegetation~
+The path is blocked by overgrown vegetation. (difficulty)~
+   The grass and plants have grown so tall that the path is nearly obscured.
+You'll have to cut your way through (by selecting a difficulty).
+Usage: difficulty <normal | hard | group | boss>
+~
+3 0 0 0 2
+0 0 0
+0 0
+C
+1 1
+T 11150
 S
 $

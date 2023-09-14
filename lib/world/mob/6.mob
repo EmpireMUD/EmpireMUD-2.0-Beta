@@ -3,8 +3,8 @@ necrovandal vandal cultist~
 the necrovandal~
 A necrovandal cultist skulks about beneath a midnight-blue, hooded robe.
 ~
-50 75 bdovx c 3
-1 0 0 19
+50 75 bdovxI c 3
+1 0 0 19 -1
 D
    The necrovandal is cloaked in dark blue, purple, and black. These vandals
 are known to destroy enchanted forests, given the chance.
@@ -17,13 +17,13 @@ a talking horse~
 A horse looks up from the grass and greets you by name.
 ~
 10 20 dejo 0 4
-0 0 14 11
+0 0 14 11 -1
 D
 It just looks like an ordinary horse.
 ~
-I 0 3012 100.00 2  # BUTCHER: a fillet of raw meat
-I 1 607 100.00 2  # SKIN: a shimmering hide
-I 3 611 100.00 1 X  # BARDE: a talking warhorse
+I 0 3012 100.00 2  # BUTCHER: fillet of raw meat
+I 1 607 100.00 2  # SKIN: shimmering hide
+I 3 611 100.00 1 X  # BARDE: talking warhorse
 M
 1
 I've been trying to buy a bamboo harvester, but nobody wants to talk to a horse.~
@@ -43,16 +43,16 @@ a talking warhorse~
 An armored warhorse shouts its battle cry.
 ~
 40 80 bdej 0 4
-0 0 0 11
+0 0 0 11 -1
 D
 This rather plain-looking horse has been barded with the colors of the empire.
 ~
-I 0 3012 100.00 2  # BUTCHER: a fillet of raw meat
-I 1 607 100.00 2  # SKIN: a shimmering hide
-I 4 175 100.00 4  # LOOT: an iron ingot
-I 4 175 75.00 2  # LOOT: an iron ingot
-I 4 175 50.00 2  # LOOT: an iron ingot
-I 4 175 50.00 2  # LOOT: an iron ingot
+I 0 3012 100.00 2  # BUTCHER: fillet of raw meat
+I 1 607 100.00 2  # SKIN: shimmering hide
+I 4 175 100.00 4  # LOOT: iron ingot
+I 4 175 75.00 2  # LOOT: iron ingot
+I 4 175 50.00 2  # LOOT: iron ingot
+I 4 175 50.00 2  # LOOT: iron ingot
 M
 1
 I've been trying to buy a bamboo harvester, but nobody wants to talk to a horse.~
@@ -73,12 +73,12 @@ a talking bunny~
 A bunny thumps its foot and asks you for the time.
 ~
 1 5 djo 0 1
-0 0 15 9
+0 0 15 9 -1
 D
 It looks like a perfectly ordinary bunny.
 ~
-I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
-I 1 607 100.00 1  # SKIN: a shimmering hide
+I 0 3012 100.00 1  # BUTCHER: fillet of raw meat
+I 1 607 100.00 1  # SKIN: shimmering hide
 T 612
 S
 #613
@@ -87,12 +87,12 @@ a singing bear~
 A bear is dancing around and singing a tune.
 ~
 20 40 dgjkoy c 4
-0 0 0 10
+0 0 0 10 -1
 D
 It just looks like a regular bear.
 ~
-I 0 3012 100.00 3  # BUTCHER: a fillet of raw meat
-I 1 607 100.00 2  # SKIN: a shimmering hide
+I 0 3012 100.00 3  # BUTCHER: fillet of raw meat
+I 1 607 100.00 2  # SKIN: shimmering hide
 M
 0
 $n sings, 'Look for the bear necessities, the simple bear necessities. Forget about your worries and your strife...'~
@@ -111,12 +111,12 @@ tree walking~
 a walking tree~
 A tree has uprooted itself and is walking around.
 ~
-20 30 dho G 4
-0 0 33 15
+20 30 dhoK G 4
+0 0 33 15 -1
 D
 The tree is using its roots like feet!
 ~
-I 4 120 100.00 1  # LOOT: a large tree
+I 4 120 100.00 1  # LOOT: large tree
 T 614
 S
 #615
@@ -125,15 +125,15 @@ a feral pixy~
 A feral pixy swoops down at you from the trees.
 ~
 30 50 doxz 0 1
-0 0 2 9
+0 0 2 9 -1
 D
    This vicious little pixy keeps zipping past your ears, perhaps trying to get
 you to leave. You seem to have angered it.
 ~
-I 4 103 20.00 1 g  # LOOT: a yellow lightning stone
-I 4 104 20.00 1 g  # LOOT: a red bloodstone
-I 4 1300 20.00 1 g  # LOOT: a glowing green seashell
-I 4 1206 20.00 1 g  # LOOT: an iridescent blue iris
+I 4 103 20.00 1 g  # LOOT: yellow lightning stone
+I 4 104 20.00 1 g  # LOOT: red bloodstone
+I 4 1300 20.00 1 g  # LOOT: glowing green seashell
+I 4 1206 20.00 1 g  # LOOT: iridescent blue iris
 T 615
 S
 #616
@@ -142,15 +142,15 @@ a pixy queen~
 A pixy queen is buzzing around your head.
 ~
 30 50 dxzA 0 1
-2 0 2 9
+2 0 2 9 -1
 D
    This tiny pixy won't seem to leave you alone. She keeps casting spells that
 buzz right past your ear, perhaps as warning shots!
 ~
-I 4 103 20.00 1 g  # LOOT: a yellow lightning stone
-I 4 104 20.00 1 g  # LOOT: a red bloodstone
-I 4 1300 20.00 1 g  # LOOT: a glowing green seashell
-I 4 1206 20.00 1 g  # LOOT: an iridescent blue iris
+I 4 103 20.00 1 g  # LOOT: yellow lightning stone
+I 4 104 20.00 1 g  # LOOT: red bloodstone
+I 4 1300 20.00 1 g  # LOOT: glowing green seashell
+I 4 1206 20.00 1 g  # LOOT: iridescent blue iris
 T 616
 S
 #617
@@ -158,8 +158,8 @@ genie~
 the genie~
 A genie hovers around, trailing smoke from his tail.
 ~
-200 300 bdhoxzA c 3
-1 0 27 21
+200 300 bdhoxzAK cG 3
+1 0 27 21 -1
 D
    This odd man has a blue tinge to his skin, and his hair is pulled into a
 small tuft on top of his head, but the best indication that he's a genie is
@@ -167,7 +167,7 @@ that his body ends at the waist and everything below that is just a funnel of
 sand and smoke. Since he has no binding cuffs on his wrists, you can also
 assume this is a free genie.
 ~
-I 4 620 100.00 1  # LOOT: a brass bottle
+I 4 620 100.00 1  # LOOT: brass bottle
 M
 1
 Finally free of that itty bitty living space.~
@@ -199,12 +199,12 @@ a monkey in a hat~
 A monkey in a little hat is sitting here, staring.
 ~
 40 60 djo 0 2
-0 0 1 16
+0 0 1 16 -1
 D
 It looks like a rather plain monkey, except for the fez on its head.
 ~
-I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
-I 1 607 100.00 1  # SKIN: a shimmering hide
+I 0 3012 100.00 1  # BUTCHER: fillet of raw meat
+I 1 607 100.00 1  # SKIN: shimmering hide
 M
 0
 $n pulls out a pair of brass cymbals and clangs them together repeatedly.~
@@ -230,12 +230,12 @@ a singing camel~
 A camel hums quietly as it lumbers around.
 ~
 40 60 dejo 0 4
-0 0 26 9
+0 0 26 9 -1
 D
 It just looks like an ordinary camel.
 ~
-I 0 3012 100.00 2  # BUTCHER: a fillet of raw meat
-I 1 607 100.00 2  # SKIN: a shimmering hide
+I 0 3012 100.00 2  # BUTCHER: fillet of raw meat
+I 1 607 100.00 2  # SKIN: shimmering hide
 M
 0
 $n croons, 'Salome the camel has ten humps. Salome the camel has ten humps. Salome the camel has ten humps, so ride, Salome, ride. Salome the camel has nine humps...'~
@@ -270,7 +270,7 @@ a baby genie~
 A blue baby genie is rolling around on the ground.
 ~
 1 1 bdoDF n 1
-1 0 0 21
+1 0 0 21 -1
 D
    The little genie looks like a fat, laughing baby, except for the blue tinge
 to his skin and the swirl of sand and smoke where his legs should be. He
@@ -303,7 +303,7 @@ a whirling sandstorm~
 A sandstorm is whirling around violently!
 ~
 0 0 d n 5
-0 0 36 22
+0 0 36 22 -1
 D
 The sandstorm is huge, and irritating, but doesn't seem to be hurting you.
 ~

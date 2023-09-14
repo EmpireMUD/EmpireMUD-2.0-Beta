@@ -1,0 +1,368 @@
+#11800
+teapot pot large talking~
+a teapot~
+A large, talking teapot is standing here.~
+cil 5 15 100 nrG 3
+1 0 -1 11807
+D
+   This oversized teapot is pearly white with a purple base and curved purple
+lid. The teapot's spout forms the enormous nose of the face on the side of the
+teapot which, to your surprise, can talk!
+~
+S
+#11826
+donkey confused~
+a confused donkey~
+A confused donkey stands nearby.~
+bcj 11 14 0 0 3
+0 0 -1 -1
+A
+21 -5
+A
+22 -5
+A
+23 -5
+D
+   The old, gray donkey stands there, befuddled, looking at its hooves, then at
+you, then back at the situation, then back at its hooves.
+~
+S
+#11827
+donkey confused~
+a confused donkey~
+A confused donkey stands nearby.~
+bcj 11 14 0 0 3
+0 0 -1 -1
+A
+21 -25
+A
+22 -25
+A
+23 -25
+A
+13 -5
+A
+18 -5
+A
+17 -5
+D
+   The old, gray donkey stands there, befuddled, looking at its hooves, then at
+you, then back at the situation, then back at its hooves.
+~
+S
+#11829
+otherworlder four-armed armed~
+a four-armed otherworlder~
+A four-armed otherworlder is barreling through!~
+bn 15 37 0 0 4
+0 0 -1 -1
+A
+21 1
+D
+   The otherworlder hunches low as it runs, occasionally hitting its head. It's
+a lot taller than a human, with dappled periwinkle skin. It wears some kind of
+scale armor that appears as thin as a sheet, allowing it to move effortlessly
+with its four curved, boneless arms and legs. It narrows all four of its black
+eyes to vertical slits as it considers its chances of escape in each direction.
+~
+S
+#11830
+otherworlder spiked~
+a spiked otherworlder~
+A spiked otherworlder is barreling through!~
+bn 15 37 0 0 4
+0 0 -1 -1
+A
+21 2
+A
+17 1
+A
+18 -5
+D
+   The periwinkle blue otherworlder has long spikes protruding from its back
+and from its upper pair of arms. The lower pair, thankfully, is smooth. It's
+rather large, struggling at times to move without getting stuck. Its thin scale
+armor appears undamaged by the spikes. It turns furiously as it considers the
+best way to escape the tower.
+~
+S
+#11831
+otherworlder gargantuan~
+a gargantuan otherworlder~
+A gargantuan otherworlder takes up all the space as it tries to get through!~
+bn 15 37 0 0 5
+0 0 -1 -1
+A
+21 3
+A
+17 1
+A
+18 -10
+D
+   The enormous, perwinkle blue otherworlder scarcely fits as it struggles to
+find a way out of the tower. It has grown considerably since it was released,
+and stretches its paper-thin scale armor almost to the limit. The otherworlder
+has two legs and four arms, though at times it seems to prefer to run on all
+sixes. Its head is covered in small, narrow black eyes that dart in different
+directions as it considers its escape.
+~
+S
+#11835
+otherworlder four-armed armed~
+a four-armed otherworlder~
+A four-armed otherworlder is barreling through!~
+bn 15 37 0 0 4
+0 0 -1 -1
+A
+21 3
+A
+17 1
+A
+12 1
+A
+24 1
+A
+18 -5
+D
+   The otherworlder hunches low as it runs, occasionally hitting its head. It's
+a lot taller than a human, with dappled periwinkle skin. It wears some kind of
+scale armor that appears as thin as a sheet, allowing it to move effortlessly
+with its four curved, boneless arms and legs. It narrows all four of its black
+eyes to vertical slits as it considers its chances of escape in each direction.
+~
+S
+#11836
+otherworlder spiked~
+a spiked otherworlder~
+A spiked otherworlder is barreling through!~
+bn 15 37 0 0 4
+0 0 -1 -1
+A
+21 5
+A
+17 1
+A
+12 1
+A
+24 1
+A
+22 -5
+A
+18 -10
+D
+   The periwinkle blue otherworlder has long spikes protruding from its back
+and from its upper pair of arms. The lower pair, thankfully, is smooth. It's
+rather large, struggling at times to move without getting stuck. Its thin scale
+armor appears undamaged by the spikes. It turns furiously as it considers the
+best way to escape the tower.
+~
+S
+#11837
+otherworlder gargantuan~
+a gargantuan otherworlder~
+A gargantuan otherworlder takes up all the space as it tries to get through!~
+bn 15 37 0 0 5
+0 0 -1 -1
+A
+21 5
+A
+17 1
+A
+12 1
+A
+24 1
+A
+22 -5
+A
+23 -5
+A
+18 -10
+D
+   The enormous, perwinkle blue otherworlder scarcely fits as it struggles to
+find a way out of the tower. It has grown considerably since it was released,
+and stretches its paper-thin scale armor almost to the limit. The otherworlder
+has two legs and four arms, though at times it seems to prefer to run on all
+sixes. Its head is covered in small, narrow black eyes that dart in different
+directions as it considers its escape.
+~
+S
+#11848
+viper pit mercenary mage~
+a pit viper~
+A pit viper is coiled and ready to strike!~
+bj 9 5 0 0 3
+0 0 -1 -1
+D
+   The pit viper is as big as you are! It flicks its long, forked tongue in and
+out of its mouth as it twists and coils in preparation for a strike!
+~
+S
+#11854
+warthog muddled~
+a muddled warthog~
+A warthog looks around, muddled.~
+bcj 27 43 0 0 2
+0 0 -1 -1
+A
+21 -5
+A
+22 -5
+A
+23 -5
+D
+   The reddish-brown warthog seems befuddled. It looks at you, looks around,
+looks down at its hooves, then back to you again. It's a long creature with the
+look of a demonic pig, with vicious tusks coming out both sides of its long
+snout and lean, mean little legs. At least, they'd be mean if it knew what to
+do with them. As it is, the poor warthog is just standing there looking dumb.
+~
+S
+#11855
+warthog muddled~
+a muddled warthog~
+A warthog looks around, muddled.~
+bcj 27 43 0 0 2
+0 0 -1 -1
+A
+21 -25
+A
+22 -25
+A
+23 -25
+A
+13 -10
+A
+18 -10
+A
+17 -10
+D
+   The reddish-brown warthog seems befuddled. It looks at you, looks around,
+looks down at its hooves, then back to you again. It's a long creature with the
+look of a demonic pig, with vicious tusks coming out both sides of its long
+snout and lean, mean little legs. At least, they'd be mean if it knew what to
+do with them. As it is, the poor warthog is just standing there looking dumb.
+~
+S
+#11867
+broom useless~
+a useless broom~
+A useless broom stands here, doing nothing.~
+bcj 5 36 0 pr 3
+0 0 -1 -1
+A
+21 -5
+A
+22 -5
+A
+23 -5
+D
+   With its short heather pole and twiggy end, this old besom broom would be
+difficult for a person to use.
+~
+S
+#11868
+rag threadbare bare~
+a threadbare rag~
+A threadbare rag is lying on the floor.~
+bcj 7 72 0 pr 3
+0 0 -1 -1
+A
+21 -5
+A
+22 -5
+A
+23 -5
+D
+   The old rag is threadbare and tattered; surely it has seen better days. It
+seems to be moving on its own, albeit not very well.
+~
+S
+#11869
+beater rug~
+a rug beater~
+A rug beater is spinning in place.~
+bcj 5 21 0 pr 3
+0 0 -1 -1
+A
+21 -5
+A
+22 -5
+A
+23 -5
+D
+   The rug beater is hardly more than an old rattan stick with one end bent
+into a flat head. Though they're used to beat the dust out of rugs and carpets,
+this one is just spinning in place.
+~
+S
+#11877
+broom useless~
+a useless broom~
+A useless broom stands here, doing nothing.~
+bcj 5 36 0 pr 3
+0 0 -1 -1
+A
+21 -25
+A
+22 -25
+A
+23 -25
+A
+13 -5
+A
+18 -5
+A
+17 -5
+D
+   With its short heather pole and twiggy end, this old besom broom would be
+difficult for a person to use.
+~
+S
+#11878
+rag threadbare bare~
+a threadbare rag~
+A threadbare rag is lying on the floor.~
+bcj 7 72 0 pr 3
+0 0 -1 -1
+A
+21 -25
+A
+22 -25
+A
+23 -25
+A
+13 -5
+A
+18 -5
+A
+17 -5
+D
+   The old rag is threadbare and tattered; surely it has seen better days. It
+seems to be moving on its own, albeit not very well.
+~
+S
+#11879
+beater rug~
+a rug beater~
+A rug beater is spinning in place.~
+bcj 5 21 0 pr 3
+0 0 -1 -1
+A
+21 -25
+A
+22 -25
+A
+23 -25
+A
+13 -5
+A
+18 -5
+A
+17 -5
+D
+   The rug beater is hardly more than an old rattan stick with one end bent
+into a flat head. Though they're used to beat the dust out of rugs and carpets,
+this one is just spinning in place.
+~
+S
+$

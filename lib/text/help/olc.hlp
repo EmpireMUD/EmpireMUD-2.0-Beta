@@ -337,8 +337,6 @@ Objects (OEDIT):
   storage locations for an item to be stored in "warehouse storage".
 - If an item is used as a building resource, you should give it custom messages
   for build-to-char and build-to-room.
-- All lights must have a timer. If you want a player to activate a light before
-  it starts timing down, make an unlit version with a LIGHT interaction.
 - The COMBINE interaction should always use 1 exclusion set, as it will extract
   the original item if the interaction succeeds, and it's usually not safe to
   run additional interactions.
@@ -462,8 +460,6 @@ Triggers and Scripts (TRIGEDIT):
 - Consume triggers on poisons or arrows MUST return 0 if they purge the %self%
   items. You can also check "if %target%" to be sure you have someone to hit
   in these triggers.
-- If a player uses 'douse' to put out a torch/fire with a timer, it will
-  immediately fire any Timer triggers on the object.
 
 Vehicles (VEDIT):
 - Keywords should always have the most significant word first (the noun). This
@@ -555,7 +551,11 @@ wears off.
 If you don't specify an ability, it will just say 'buff' and will have no wear-
 off message.
 
-See also: OLC ABILITIES, BUFF ABILITY
+If you use the LIMIT-CROWD-CONTROL flag, using this buff will cancel it on
+other mobs in the same room. For example, sapping 1 mob cancels anyone else
+you have sapped.
+
+See also: OLC ABILITIES, BUFF ABILITY, ABILEDIT FLAGS
 #d
 "ABILEDIT APPLY" "ABILEDIT APPLIES"
 
@@ -702,6 +702,7 @@ See also: OLC ABILITIES
 
 Usage:  .custom add <type> <message>
         .custom change <number> <type | message> <value>
+        .custom move <number> <up | down>
         .custom remove <number | all>
 
 You can set custom messages on abilities. Different types of abilities may use
@@ -817,8 +818,10 @@ The following ability flags are available:
  &cTANK-ROLE&0 - Bonus for tank role, weaker without it.
  &cRANGED-ONLY&0 - Cannot be used in melee combat.
  &cIGNORE-SUN&0 - For a vampire ability, won't check sunlight.
+ &cUNSCALED-BUFF&0 - Uses exact apply values rather than scaling them.
+ &cLIMIT-CROWD-CONTROL&0 - Cancels the same affectvnum on other mobs in the room.
 
-See also: OLC ABILITIES
+See also: OLC ABILITIES, ABILEDIT AFFECTVNUM
 #d
 "ABILEDIT FULLSEARCH"
 
@@ -850,11 +853,12 @@ Fields:
   &c-targets&0 - see HELP ABILEDIT TARGETS
   &c-type&0 - see HELP ABILEDIT TYPE
   &c-waittype&0 - see HELP ABILEDIT WAIT TYPE
+  &c-vmin&0, &c-vmax&0 - VNUM range limits
 
 Examples:
  > .abil fullsearch -type PLAYER-TECH -ptech Swimming
  > .abil fullsearch -flagged RANGED -flagged RANGED-ONLY
- > .abil fullsearch -scaleover 50 -scaleunder 99
+ > .abil fullsearch -scaleover 50 -scaleunder 99 -vmin 10000 -vmax 10099
 
 To search other fields, you can generally use the normal "search" option for
 other OLC types. For example, to find all abilities with a certain cooldown,
@@ -889,8 +893,8 @@ See also: OLC ABILITIES
 Usage:  .immunities [add | remove] <flag>
 
 These are affect flags that make the target immune to this ability. For
-example, the !BATTLE immunity means mobs with that flag can't be targeted by
-this ability.
+example, the IMMUNE-PHYSICAL-DEBUFFS immunity means mobs with that flag can't
+be targeted by this ability.
 
 Any affect flag can be used for this.
 
@@ -1218,12 +1222,15 @@ The following types are available (each has its own help file):
  &cCOMPANION&0 - Adds 1 or more mobs to the player's 'companions' command.
  &cSUMMON-ANY&0 - Player chooses from a list of mobs to summon.
  &cSUMMON-RANDOM&0 - Player summons a random mob from this list.
+ &cMORPH&0 - Ability has morphs that require ir.
+ &cAUGMENT&0 - Used for augments/enchanting.
+ &cCUSTOM&0 - Ability is hard-coded, not parameterized.
 
 See also: OLC ABILITIES, BUFF ABILITY, CRAFT ABILITY, DAMAGE ABILITY,
    DOT ABILITY, PLAYER-TECH ABILITY, PASSIVE-BUFF ABILITY,
    READY-WEAPONS ABILITY, COMPANION ABILITY, SUMMON ABILITY
 #d
-"ABILEDIT WAITTYPE" "ABILEDIT WAIT TYPE"
+"ABILEDIT WAITTYPE" "ABILEDIT WAIT TYPE" "WAIT TYPES"
 
 Usage:  .waittype <type>
 
@@ -1231,7 +1238,17 @@ The wait type is how long the character has "command lag" after using this
 ability. These are standardized wait times, so you select them from a list
 based on what type of ability you're making.
 
-Choose the wait type that best fits your ability.
+Most waits are currently 1.25 seconds.
+
+Choose the wait type that best fits your ability:
+  &cNONE&0 - no wait
+  &cABILITY&0 - basic ability (not combat)
+  &cCOMBAT-ABILITY&0 - combat ability (like kick)
+  &cCOMBAT-SPELL&0 - combat spell
+  &cMOVEMENT&0 - basic movement, based on riding etc; wait time based on
+     terrain, abilities, and traits
+  &cSPELL&0 - a basic spell (not a combat spell); Fastcasting reduces this wait
+  &cOTHER&0 - anything else that needs a wait
 
 See also: COMMAND LAG, OLC ABILITIES
 #d
@@ -1751,7 +1768,7 @@ been instantiated.
 
 See also: OLC ADVENTURES
 #d
-"AFFECT FLAGS"
+"AFFECT FLAGS" "AFF FLAGS" "AFFECT BITS" "AFF BITS"
 
 The following affect flags are available:
  BLIND - Unable to see.
@@ -1761,17 +1778,17 @@ The following affect flags are available:
  HIDE - Cannot be seen in room (without search).
  *CHARM - NPC will take orders from its master -- do not use this on items.
  INVIS - Can't be seen, except by magic.
- !BATTLE - Immune to the Battle debuffs.
+ IMMUNE-PHYSICAL-DEBUFFS - Immune to any 'physical' debuffs.
  SENSE-HIDE - Can see hidden people.
  !PHYSICAL - Immune to physical damage -- do not use this on items.
  !TARGET - Cannot be targeted in the room -- do not use this on items.
  !SEE - Cannot be seen in the room at all -- do not use this on items.
  FLY - Is flying.
  !ATTACK - Cannot be attacked -- do not use this on items.
- !HIGH-SORCERY - Immune to High Sorcery debuffs.
- DISARM - Has lost their weapon -- do not use this on items.
+ IMMUNE-MAGICAL-DEBUFFS- Immune to any 'magical' debuffs.
+ DISARMED - Has lost their weapon -- do not use this on items.
  HASTE - Has the effect of the Hasten ability.
- ENTANGLED - Cannot move -- do not use this on items.
+ IMMOBILIZED - Cannot move -- do not use this on items.
  SLOW - Combat speed reduced, like the Slow spell.
  STUNNED - Can't participate in combat or move -- do not use this on items.
  STONED - Sees the world in strange, trippy colors.
@@ -1781,15 +1798,18 @@ The following affect flags are available:
  EARTHMELD - Submerged in the earth and can't take normal actions -- do not use this on items.
  MUMMIFY - Immune to attack and cannot act -- do not use this on items.
  SOULMASK - Immune to soulsight.
- !NATURAL-MAGIC - Immune to the Natural Magic debuffs.
- !STEALTH - Immune to the Stealth debuffs.
- !VAMPIRE - Immune to Vampire debuffs.
+ NO-TRACKS - Does not leave tracks.
+ IMMUNE-POISON-DEBUFFS - Immune to any 'poison' debuffs.
+ IMMUNE-MENTAL-DEBUFFS - Immune to any 'mental' debuffs.
  !STUN - Immune to stun effects.
  !DRINK-BLOOD - Can't be bitten/sired by vampires.
  DISTRACTED - Cannot perform timed actions.
  HARD-STUNNED - A stun that cannot be cleansed and does not trigger immunity.
  IMMUNE-DAMAGE - Cannot take damage -- do not use this on items.
  !WHERE - Cannot be found using the 'where' command.
+ WATERWALK - Does not need to swim and doesn't drown. Unlike the AQUATIC mob
+   flag, this allows it to move on both water and land.
+ LIGHT - Character provides light to the room.
 #d
 ARCHEDIT "OLC ARCHETYPES" "ARCHETYPE OLC" "ARCHETYPE EDITOR"
 
@@ -1886,6 +1906,18 @@ wield, hold.
 The hold slot is generally a light, e.g. the newbie torch (2104).
 
 See also: OLC ARCHETYPES, OLC GLOBALS, GEDIT TYPE
+#d
+"ARCHEDIT LANGUAGE"
+
+Usage:  .language <vnum | name | none>
+
+This sets which language the player will start with, if any.
+
+If players have more than one archetype that give languages, they will speak
+all of those languages. If no archetypes provide a language, you should ensure
+you have at least one BASIC-flagged language for players to speak.
+
+See also: OLC ARCHETYPES, LANGUAGE, GENERIC LANGUAGE
 #d
 "ARCHEDIT LORE"
 
@@ -2036,7 +2068,7 @@ enchant) if he doesn't have the item.
 The required object will not be consumed unless it is also in the resource
 list. An example non-consumable augment might require a spellbook object, so
 the effect is that having the spellbook allows the player to enchant weapons
-with extra mana.  An example consumable augment might be a grindstone that
+with extra mana. An example consumable augment might be a grindstone that
 lets a player "hone" a sword with additional to-hit.
 
 See also: OLC AUGMENTS, VNUM
@@ -2108,6 +2140,7 @@ Available affects:
  REPEL-ANIMALS - animal npcs won't wander in
  NO-WORKFORCE-EVOS - workforce won't do chores that would change the tile type
  MAPOUT-BUILDING - appears as a building on the graphical map
+ NO-TRACKS - characters do not leave tracks here and the track command fails
 
 Some affects are managed by live data and commands (do not set affects with *):
  *HAS-INSTANCE - an adventure is linked here
@@ -2120,7 +2153,11 @@ Some affects are managed by live data and commands (do not set affects with *):
  *!DISMANTLE - cannot be dismantled until nodismantle is toggled
  *INCOMPLETE - building is unfinished
  *FAKE-INSTANCE - roaming adventure is using this tile
- *HIDE-REAL-NAME - won't show real name after custom room name (see MANAGE)
+
+Affects that are SOMETIMES safe to use:
+ HIDE-REAL-NAME - won't show real name after custom room name (see MANAGE).
+   This can be used on buildings when you expect a script, NOT A PLAYER, to
+   rename it.
 
 See also: OLC BUILDINGS, OLC ROOM TEMPLATES
 #d
@@ -2277,12 +2314,13 @@ Available flags:
  ROAD-ICON - replaces the building icon with generated road icons/dashes: --+-
  ROAD-ICON-WIDE - replaces the icon with wide road icons: ====
  ATTACH-BARRIER - icons with @u/@v will attach to this building like a barrier
+ NO-CUSTOMIZE - cannot be customized by players
  SAIL - can enter this building with a boat
  ITEM-LIMIT - only a certain number of items can be dropped here
  LONG-AUTOSTORE - autostore takes 72 hours instead of 3 here
  HIGH-DEPLETION - has more resources than a normal tile
  !DELETE - will not be deleted for not having a homeroom
- NEED-BOAT - requires a boat, flying, or swimming to enter
+ NEED-BOAT - requires a boat, flying, waterwalk, or swimming to enter
  LOOK-OUT - can see the map using "look out"
  2ND-TERRITORY - counts as territory off the map (e.g. in a ship)
  UPGRADED - modifies other building types like SHIPYARD
@@ -2305,6 +2343,7 @@ Fields:
   &c-affects&0 - see HELP BEDIT AFFECTS
   &c-citizens -citizensover -citizensunder&0 - specific number of citizens
   &c-commands&0 - match the text of the commands line, if any
+  &c-depletion&0 - see HELP OLC DEPLETION
   &c-designate&0 - see HELP DESIGNATE FLAGS
   &c-fame -fameover -fameunder&0 - specific fame amount
   &c-flagged -unflagged&0 - see HELP BEDIT FLAGS
@@ -2315,11 +2354,12 @@ Fields:
   &c-hitpoints -hitpointsover -hitpointsunder&0 - specific hitpoint amount
   &c-military -militaryover -militaryunder&0 - specific military value
   &c-rooms -roomsover -roomsunder&0 - specific extra rooms value
+  &c-vmin&0, &c-vmax&0 - VNUM range limits
 
 Examples:
  > .b fullsearch -hitpointsover 50
  > .b fullsearch -unflagged ROOM -function FORGE
- > .b fullsearch -flagged ROOM -citizensover 1
+ > .b fullsearch -flagged ROOM -citizensover 1 -vmin 10000 -vmax 10099
 
 To search other fields, you can generally use the normal "search" option for
 other OLC types. For example, to find all buildings that have a certain artisan
@@ -2751,12 +2791,14 @@ Fields:
   &c-level -levelover -levelunder&0 - specific level requirement
   &c-quantity -quantityover -quantityunder&0 - specific quantity value
   &c-requiresobject&0 - requires any object
+  &c-requiresfunction&0 - requires a function flag
   &c-time -timeover -timeunder&0 - specific craft time (in action ticks)
+  &c-vmin&0, &c-vmax&0 - VNUM range limits
 
 Examples:
  > .craft fullsearch -type FORGE -levelover 1
  > .craft fullsearch -type COOK -flagged FIRE
- > .craft fullsearch -levelover 50 sword
+ > .craft fullsearch -levelover 50 sword -vmin 10000 -vmax 10099
 
 To search other fields, you can generally use the normal "search" option for
 other OLC types. For example, to find all crafts that require the 'Cook'
@@ -3112,11 +3154,12 @@ Fields:
   &c-interaction&0 - has a specific type, see HELP CROPEDIT INTERACTION
   &c-mapout&0 - color name, see HELP CROPEDIT MAPOUT
   &c-x&0, &c-y&0 - is within a certain x or y coordinate range (only wild crops)
+  &c-vmin&0, &c-vmax&0 - VNUM range limits
 
 Examples:
  > .crop fullsearch -x 25 -y 25 potato
  > .crop fullsearch -flagged NEWBIE-ONLY -flagged ORCHARD
- > .crop fullsearch -interaction CHOP
+ > .crop fullsearch -interaction CHOP -vmin 10000 -vmax 10099
 
 To search other fields, you can generally use the normal "search" option for
 other OLC types. For example, to find all crops that spawn a certain mob,
@@ -3262,10 +3305,24 @@ Avoid starting with "The" or "A".
 
 See also: OLC EVENTS
 #d
+"EVEDIT MAXPOINTS" "EVEDIT MAX POINTS" "EVEDIT MAXIMUM POINTS"
+
+Usage:  .maxpoints <points | none>
+
+This optional trait caps the maximum number of points a player may gain in the
+event. After this, any extra points are ignored. Without this trait, players
+may gain any number of points.
+
+Uses for this:
+- On a long event with a fixed number of points each day, to skip a day safely.
+- On an event where players only need to do daily quests a few times to finish.
+
+See also: OLC EVENTS
+#d
 "EVEDIT MINLEVEL" "EVEDIT MAXLEVEL" "EVEDIT MIN LEVEL" "EVEDIT MAX LEVEL" "EVEDIT MINIMUM LEVEL" "EVEDIT MAXIMUM LEVEL"
 
-Usage:  .minlevel <level>
-        .maxlevel <level>
+Usage:  .minlevel <level | none>
+        .maxlevel <level | none>
 
 This allows you to set the level limits on an event. This is only used for
 display, and is not enforced. If you wish to enforce a level limit on an event,
@@ -3397,6 +3454,7 @@ Usage:  .flags [add | remove] <flags>
 The following faction flags are available:
  IN-DEVELOPMENT - The faction can't be seen by players, and won't gain rep.
  REP-FROM-KILLS - Players can gain/lose rep by killing faction mobs.
+ HIDE-IN-LIST - Does not appear in the 'factions' command for players.
 
 See also: OLC FACTIONS, OLC REMOVEINDEV, RELATIONSHIP FLAGS
 #d
@@ -3529,6 +3587,8 @@ Affects have 4 properties:
     applied.
   <&ywearoff&0> An optional message shown to the character when the affect ends.
   <&ywearoff2room&0> An optional message shown to the rest of the room.
+  <&ylookatchar&0> An optional message shown after description on 'look name'.
+  <&ylookatroom&0> An optional message shown after the character on 'look'.
 
 You can use <&ystandardwearoff&0> to add the normal wear-off message. This only
 adds a message for the character -- normal effects don't show anything to the
@@ -3553,6 +3613,36 @@ This message is sent to the room when a person gains this affect. It will
 only be shown to players who can see that person. This message is optional.
 
 See also: OLC GENERICS, GENERIC AFFECTS
+#d
+"GENEDIT LOOKATCHAR" "GENEDIT LOOK-AT-CHAR" "GENEDIT LOOK AT CHAR"
+
+Usage:  .lookatchar <message | none>
+
+This message is shown below the character description when another person looks
+at them while this affect is on them. This message is optional.
+
+Can use $n, $e, $s, and $m tokens.
+
+Example:
+You look at Albert:
+You notice a distinct, red glint in his eyes.
+
+See also: OLC GENERICS, GENERIC AFFECTS, DOLLAR SIGN CODES
+#d
+"GENEDIT LOOKATROOM" "GENEDIT LOOK-AT-ROOM" "GENEDIT LOOK AT ROOM"
+
+Usage:  .lookatroom <message | none>
+
+This messages is shown below the character when a person looks at the room they
+are in while they have this affect. This message is optional.
+
+Can use $n, $e, $s, and $m tokens. Messages usually start with "...$e".
+
+Example:
+<Queen> Victoria stands before you in full regalia.
+...she has a majestic aura about her!
+
+See also: OLC GENERICS, GENERIC AFFECTS, DOLLAR SIGN CODES
 #d
 "GENERIC COMPONENTS" "COMPONENT GENERICS" "COMPONENT EDITOR"
 
@@ -3626,8 +3716,11 @@ See also: OLC GENERICS
 
 Usage:  .flags [add | remove] <flags>
 
-This set of flags applies to the generic. There are currently no flags
-available.
+The following flags for generics are available:
+ &cBASIC&0 - For components, only basic components can substitute for simpler
+    component types (fine pillar will substitute for pillar because of BASIC).
+ &cIN-DEVELOPMENT&0 - Will not show up for players. This currently only applies
+    to MOON generics.
 
 See also: OLC GENERICS
 #d
@@ -3644,6 +3737,24 @@ Where possible, try to use the same vnum for the item and for the component.
 However, this is not required if you have a compelling reason not to.
 
 See also: GENERIC COMPONENTS
+#d
+"GENERIC LANGUAGE" "LANGUAGE GENERICS" "LANGUAGE EDITOR"
+
+The 'language' generic type creates languages that players and NPCs can speak.
+
+Languages only have a name and some flags. Players can refer to a language by
+its whole name, or can remove the spaces or replace spaces with dashes. For
+example, a language called "Old High Western" can also be referred to as
+"old-high-western" or "oldhighwestern".
+
+Flags used by languages:
+  BASIC - All players can automatically speak this language.
+  IN-DEVELOPMENT - Language is not available.
+
+EmpireMUD comes with language [150] English and all characters start with this
+language. Add the IN-DEV flag to disable it.
+
+See also: OLC GENERICS, SPEAK, SET LANGUAGE, SHOW LANGUAGES
 #d
 "GENERIC MOON" "MOON GENERICS" "MOON EDITOR" "GENEDIT CYCLE"
 
@@ -4078,6 +4189,7 @@ map editor commands make instant changes to the map where you're standing.
 You can get help on any of the mapeditor commands with &yHELP MAPEDIT <COMMAND>&0.
 The following commands are available:
  complete - Finishes the building you're standing in.
+ convert2newbie - Converts an island's terrains to/from newbie terrains.
  decay - Performs 1 year of decay (building, trench, mine data) on the tile.
  decustomize - Removes custom icon, name, and description.
  deleteexit - Removes an exit (careful about cutting off building interiors).
@@ -4125,6 +4237,28 @@ Example:
  > .map terrain plains
  > build largehouse north
  > .map complete
+
+See also: MAP OLC
+#d
+"MAPEDIT CONVERT2NEWBIE" CONVERT2NEWBIE
+
+Usage:  .map convert2newbie confirm
+        .map convert2newbie undo
+
+This command converts an island's terrains to or from newbie terrains (which
+look the same but have lower move costs and other small changes. This applies
+to the whole island you're on when you use it.
+
+Note that this is separate from setting the NEWBIE flag on the island.
+
+See also: MAP OLC, ISLAND COMMAND
+#d
+"MAPEDIT DECAY"
+
+Usage:  .map decay
+
+Performs 1 year of decay (building, trench, mine data) on the tile, as if the
+new year had just rolled over.
 
 See also: MAP OLC
 #d
@@ -4260,7 +4394,7 @@ unclaimable or which have adventures.
 
 You can change a tile/island's natural state with: .map remember [island]
 
-See also: MAP OLC, MAPEDIT REMEMBER
+See also: MAP OLC, MAPEDIT REMEMBER, NATURALIZE
 #d
 "MAPEDIT PASSWALLS"
 
@@ -4286,7 +4420,7 @@ Building and adventure tiles are ignored during this command.
 The opposite command is .map naturalize, which restores a room/island/world
 to its original state.
 
-See also: MAP OLC, MAPEDIT NATURALIZE
+See also: MAP OLC, MAPEDIT NATURALIZE, NATURALIZE
 #d
 "MAPEDIT ROOMTYPE" "MAPEDIT ROOM TYPE"
 
@@ -4405,6 +4539,7 @@ See also: OLC MOBILES
 
 Usage:  .custom add <type> <message>
         .custom change <number> <type | message> <value>
+        .custom move <number> <up | down>
         .custom remove <number | all>
 
 You can set custom messages on mobs, which are shown at different times
@@ -4423,6 +4558,9 @@ Message types:
  &csay-day&0 - Like say, but only during the day.
  &csay-night&0 - Only during the night.
  &clong-desc&0 - Variable long descriptions (prevents normal long desc showing)
+ &cscript1&0 - &cscript5&0 - Can be referenced in scripts as
+   %mob.custom(script1)%, %mob.custom(script1,0)%, etc.
+ &cscavenge-corpse&0 - Shown when a SCAVENGER mob eats a corpse ($p is the corpse).
 
 Note: The 'echo' and 'say' types share the same random interval, and the mob
 will only do one or the other each time.
@@ -4452,7 +4590,7 @@ Available mob flags:
  TIED - Tied to a hitching post; will not wander unless untied; does not despawn.
  ANIMAL - Counts as an animal for herding, tying, etc.
  MOUNTAIN-WALK - Can cross mountain tiles.
- AQUATIC - Can cross water tiles, but won't move on land.
+ AQUATIC - Can cross water tiles, but won't move on land. (see WATERWALK)
  *PLURAL - Uses the pronouns 'their', 'they', and 'them' in act messages.
  NO-ATTACK - Mob can be in combat, but will not hit
  SPAWNED - De-spawns after 5 minutes if no players are nearby.
@@ -4477,6 +4615,9 @@ Available mob flags:
     specific attributes on it after it loaded. Note that it will still scale
     the first time, so ensure that it is scaled before changing attributes.
  SILENT - Mob will not display custom strings while this flag is on.
+ COINS - Mob will drop coins on death/pickpocket.
+ NO-COMMAND - Cannot be commanded/ordered.
+ NO-UNCONSCIOUS - Cannot be knocked unconscious (from toggle autokill).
 
 See also: OLC MOBILES
 #d
@@ -4503,17 +4644,18 @@ Fields:
   &c-sex&0 - male, female, neutral
   &c-size&0 - see HELP MOB SIZE
   &c-attack&0 - see HELP MEDIT ATTACK
+  &c-vmin&0, &c-vmax&0 - VNUM range limits
 
 Examples:
  > .m fullsearch -sex male -attack slash
  > .m fullsearch -flagged SENTINEL -flagged PURSUE
- > .m fullsearch -level 100 guard
+ > .m fullsearch -level 100 guard -vmin 10000 -vmax 10099
 
 To search other fields, you can generally use the normal "search" option for
 other OLC types. For example, to find all mobs with the "Dismissable"
 trigger, use ".t search 9901".
 #d
-"MEDIT INTERACTION" "BEDIT INTERACTION" "OEDIT INTERACTION" "REDIT INTERACTION" "SECTEDIT INTERACTION" "CROPEDIT INTERACTION" "GEDIT INTERACTION" "VEDIT INTERACTION" INTERACTIONS
+INTERACTION "MEDIT INTERACTION" "BEDIT INTERACTION" "OEDIT INTERACTION" "REDIT INTERACTION" "SECTEDIT INTERACTION" "CROPEDIT INTERACTION" "GEDIT INTERACTION" "VEDIT INTERACTION" INTERACTIONS INTERACT
 
 Usage:  .interaction add <type> <quantity> <vnum> <percent> [exclusion code | restrictions]
         .interaction change <number> <field> <value>
@@ -4603,6 +4745,7 @@ Optional interaction restrictions:
  &c-normal&0 - Mob/obj must have no HARD or GROUP flag.
  &c-ptech <name>&0 - Player must have this player-tech.
  &c-tech <name>&0 - Empire must have this tech.
+ &c-depletion <type>&0 - Uses this type of depletion (see OLC DEPLETION).
 
 Examples:
 > .interaction add FORAGE 1 12345 100 x -ability "Find Herbs"
@@ -4617,7 +4760,7 @@ Example of possible multiple results from shear:
  3. SHEAR: 1x some wool 5.00%
 
 See also: OLC BUILDINGS, OLC CROPS, OLC MOBILES, OLC SECTORS, OLC VEHICLES,
-  PRODUCTION INTERACTION, OLC WORKFORCE
+  PRODUCTION INTERACTION, OLC WORKFORCE, OLC DEPLETIONS
 #d
 "MEDIT KEYWORDS"
 
@@ -4635,6 +4778,19 @@ Example:
  keywords: dragon fiery huge red
 
 See also: MEDIT SHORTDESCRIPTION, MEDIT LONGDESCRIPTION
+#d
+"MEDIT LANGUAGE" "MOB LANGUAGE"
+
+Usage:  .language <vnum | name | default>
+
+This changes which language a mob will use for any say/shout actions it takes.
+Mobs can also use the #language tag at the start of any say/shout (unless they
+were ordered/commanded by a player).
+
+Mobs without this property will use the global default, set with the
+'default_language_vnum' mob config.
+
+See also: OLC MOBILES, SAY, SPEAK, MEDIT CUSTOM, CONFIG
 #d
 "MEDIT MAXLEVEL" "MEDIT MAX LEVEL"
 
@@ -4984,7 +5140,7 @@ Examples:
 
 See also: MORPHEDIT LONG DESCRIPTION, OLC MORPHS
 #d
-"MOUNT WHISTLE" WHISTLE "MOUNT REWARD"
+"MOUNT WHISTLE" WHISTLE "MOUNT REWARD" "BUILDING MOUNTS" "MOUNTS"
 
 Mount whistles (or other similar items) are used to reward players with mounts
 using the loot drop table of an NPC. Players seem to prefer receiving their
@@ -4996,8 +5152,16 @@ kill it without realizing what it is. Another problem is that if the player
 leads a mount out of the adventure, the mount may despawn when the adventure
 despawns.
 
-To create a mount whistle, attach script 10263 (Mount whistle use) to an
-object, and set the object's <value0> field to the vnum of the mount.
+To create a mount whistle, attach script 9910 (Summon mob / Mount whistle) to
+an object, and set the object's <value0> field to the vnum of the mount. This
+is a 'use' command trigger that summons the mob.
+
+Types of mounts:
+  FLY affect: Flying mount; requires the Riding-Flying ptech.
+  WATERWALK affect: Can ride on water just like land; requires Riding-Upgrade.
+  AQUATIC mob flag: Aquatic mount; can only ride on water tiles.
+
+See also: PTECH
 #d
 NOBITS "NO BITS"
 
@@ -5048,6 +5212,12 @@ Food:
  0 - hours of fullness
  1 - crop vnum (if plantable)
 
+Light:
+ 0 - hours remaining (-1 is unlimited)
+ 1 - is lit (1) or not (0)
+ 2 - flags (light-fire, can-douse, junk-when-expire, cooking-fire,
+     destroy-when-doused)
+
 Lighter:
  0 - number of uses (-1 is unlimited)
 
@@ -5088,7 +5258,7 @@ Recipe:
 
 Wealth:
  0 - treasure value
- 1 - automint (if 0, workforce won't mint this)
+ 1 - flags (automint, no-mint)
 
 Weapon:
  1 - bonus damage (if scalable, this is the weight to scale the damage)
@@ -5199,14 +5369,6 @@ Common ammo types:
 
 See also: OLC OBJECTS, OEDIT TYPE, SHOW
 #d
-"OEDIT AUTOMINT" "OEDIT AUTO MINT"
-
-Usage:  .automint <on|off>
-
-This allows a wealth item to be automatically minted into coins by Workforce.
-
-See also: OLC OBJECTS
-#d
 "OEDIT TEXT" "OEDIT BOOK"
 
 Usage:  .text <book vnum>
@@ -5215,9 +5377,6 @@ You can create book objects to place in your adventure zones. Like ordinary
 books, their name will be overridden by the name set in the book editor. You
 can see the book id of any book you've written by typing "bookedit list" (it's
 the number in the [brackets]), or via "vnum book".
-
-(This field was formerly called ".book" but was changed because it conflicts
-with the book editor.)
 
 See also: BOOKEDIT, OLC OBJECTS
 #d
@@ -5337,6 +5496,7 @@ See also: GENERIC CURRENCY
 
 Usage:  .custom add <type> <message>
         .custom change <number> <type | message> <value>
+        .custom move <number> <up | down>
         .custom remove <number | all>
 
 You can set custom messages on objects for various actions. These messages
@@ -5351,8 +5511,9 @@ Message types:
  &cbuild-to-room&0 - Shown to the room when the item is built into a building.
  &cinstrument-to-char&0 - Shown every few seconds to the person playing the instrument.
  &cinstrument-to-room&0 - Shown every few seconds to the room when someone is playing an instrument.
- &ceat-to-char&0 - Shown to the person when they eat the item.
- &ceat-to-room&0 - Shown to the room when a person eats an item.
+ &cconsume-to-char&0 - Shown to the person when they eat/drink/quaff/light the item.
+   ($p for food/drink/potion/lighter; $T for liquid; $P for thing lit on fire)
+ &cconsume-to-room&0 - Shown to the room when a person eats/drinks/quaffs/lights an item.
  &ccraft-to-char&0 - Shown to the actor when building a vehicle ($V for vehicle).
  &ccraft-to-room&0 - Shown to the room when building a vehicle ($V for vehicle).
  &cwear-to-char&0 - Shown to the person when they wear an item ($p for item).
@@ -5368,6 +5529,8 @@ Message types:
  &cdecays-in-room&0 - Shown to the room if the item decays on the ground.
  &cresource-to-char&0 - Shown to the character when they gain it as a resource.
  &cresource-to-room&0 - Shown to room when gained as a resource (e.g. chopped).
+ &cscript1&0 - &cscript5&0 - Can be referenced in scripts as
+   %obj.custom(script1)%, %obj.custom(script1,0)%, etc.
 
 See also: OLC OBJECTS, DOLLAR SIGN CODES
 #d
@@ -5392,7 +5555,7 @@ other than 0.
 
 See also: ITEM SCALING, OEDIT MISSILESPEED, OEDIT WEAPONTYPE, OLC OBJECTS
 #d
-"OEDIT EXTRA" "OEDIT EXTRA DESCRIPTIONS" "BEDIT EXTRA" "BEDIT EXTRA DESCRIPTIONS" "REDIT EXTRA" "REDIT EXTRA DESCRIPTIONS" "VEDIT EXTRA" "VEDIT EXTRA DESCRIPTIONS"
+"OEDIT EXTRA" "OEDIT EXTRA DESCRIPTIONS" "BEDIT EXTRA" "BEDIT EXTRA DESCRIPTIONS" "REDIT EXTRA" "REDIT EXTRA DESCRIPTIONS" "VEDIT EXTRA" "VEDIT EXTRA DESCRIPTIONS" "CROPEDIT EXTRA" "CROPEDIT EXTRA DESCRIPTIONS" "SECTEDIT EXTRA" "SECTEDIT EXTRA DESCRIPTIONS"
 
 Usage:  .extra add <keywords>
         .extra change <number> <description | keywords> [value]
@@ -5416,7 +5579,7 @@ Example in-game of a locket with extra description keyword "photo":
    It's a photo of a young girl.
 
 See also: OEDIT LOOKDESCRIPTION, OLC BUILDINGS, OLC OBJECTS, STRING EDITOR,
-  OLC ROOM TEMPLATES
+  OLC ROOM TEMPLATES, OLC CROPS, OLC SECTORS
 #d
 "OEDIT FLAGS"
 
@@ -5428,7 +5591,7 @@ effects. Never set a flag marked with an * (asterisk).
 Available flags:
  UNIQUE - can only equip 1 at a time
  PLANTABLE - can be planted as a crop (see OEDIT PLANTS)
- LIGHT - lights up the room at night
+ LIGHT - lights up the room (prefer LIGHT item type instead of the flag)
  SUPERIOR - crafted by a master craftsman, adds the (superior) tag
  LARGE - takes up 2 inventory slots, adds the (large) tag
  *CREATED - created by a god command
@@ -5452,7 +5615,7 @@ Available flags:
  !STORE - can't be stored (or home/warehouse stored), can be toggled by scripts
  SEEDED - has already been seeded with the 'seed' command
 
-See also: BINDING, OLC OBJECTS
+See also: BINDING, OLC OBJECTS, LIGHT ITEM
 #d
 "OEDIT FULLNESS"
 
@@ -5490,21 +5653,33 @@ Fields:
   &c-level&0 - matches anything where this level is within the range
      (note: will not account for objects whose levels are inherited from mobs
      or adventures, see ADVEDIT CASCADE for help)
+  &c-lightflags&0 - see HELP OEDIT LIGHT FLAGS
+  &c-lighthours&0 - search for an exact number of hours of light
+  &c-lighthoursover&0 - search for a light with at least this many hours
+  &c-lighthoursunder&0 - search for a light with at most this many hours
+  &c-lightislit&0 - find lights that default to lit, excluding the LIGHT flag
+  &c-lightisunlit&0 - find lights that default to unlit
   &c-material&0 - see OEDIT MATERIAL
   &c-storable -unstorable&0 - Only get objects with or without storage sites.
   &c-tools&0 - see HELP OEDIT TOOLS
   &c-type&0 - see HELP OEDIT TYPE
   &c-weapontype&0 - see HELP OEDIT WEAPONTYPE
   &c-wear&0 - see HELP OEDIT WEAR
+  &c-vmin&0, &c-vmax&0 - VNUM range limits
+
+Type-based fields:
+  &c-lightflags&0 - see HELP LIGHT ITEM
 
 Examples:
  > .o fullsearch -type WEAPON -wear HOLD
  > .o fullsearch -flagged LARGE -flagged BOP
- > .o fullsearch -level 50 sword
+ > .o fullsearch -level 50 sword -vmin 10000 -vmax 10099
 
 To search other fields, you can generally use the normal "search" option for
-other OLC types. For example, to find all objects with the "Mini-pet Use"
+other OLC types. For example, to find all objects with the "Minipet Use"
 trigger, use ".t search 9900".
+
+See also: LIGHT ITEM
 #d
 "OEDIT KEYWORDS"
 
@@ -5525,6 +5700,40 @@ Examples:
  keywords: phaester wailing huge
 
 See also: OLC OBJECTS
+#d
+"OEDIT LIGHTHOURS" "OEDIT LIGHT HOURS" "OEDIT HOURS OF LIGHT"
+
+Usage:  .lighthours <hours | unlimited>
+
+This sets how many hours a light lasts. It is separate from the object's timer.
+
+If the JUNK-WHEN-EXPIRED light flag is set, it will automatically be destroyed
+when this timer expires.
+
+See also: OLC OBJECTS, OEDIT LIGHT FLAGS, OEDIT LIGHT IS LIT
+#d
+"OEDIT LIGHTFLAGS" "OEDIT LIGHT FLAGS"
+
+Usage:  .lightflags [add | remove] [flags]
+
+This sets flags on a light item. These change how the light behaves. Here are
+the available options:
+ &cLIGHT-FIRE&0 - Can be used in place of a LIGHTER (when lit) to light things.
+ &cCAN-DOUSE&0 - The player can put the light out and re-light it.
+ &cJUNK-WHEN-EXPIRED&0 - When the light burns out, the whole item is purged.
+ &cCOOKING-FIRE&0 - Can be used to cook.
+ &cDESTROY-WHEN-DOUSED&0 - If the player douses this light, it is destroyed.
+
+See also: OLC OBJECTS, OEDIT LIGHT HOURS, OEDIT LIGHT IS LIT
+#d
+"OEDIT LIGHTISLIT" "OEDIT LIGHT IS LIT" "OEDIT IS LIT"
+
+Usage:  .lightislit <yes | no>
+
+Determines whether or not the light is "lit" by default. If not, the player
+must light it themselves using a lighter.
+
+See also: OLC OBJECTS, OEDIT LIGHT FLAGS, OEDIT LIGHT HOURS
 #d
 "OEDIT LIQUID"
 
@@ -5635,7 +5844,7 @@ Usage:  .minipet <mob vnum>
 This command assigns which mob is taught by a MINIPET item, when used with the
 'use' command.
 
-See also: MINIPETS
+See also: MINIPETS, MINIPET ITEM
 #d
 "OEDIT MINLEVEL" "OEDIT MIN LEVEL"
 
@@ -5649,6 +5858,16 @@ If you set the minlevel to 0, there will be no lower limit and objs can scale
 to any level under the maximum.
 
 See also: ITEM SCALING, OEDIT MAXLEVEL, OLC OBJECTS
+#d
+"OEDIT MINTFLAGS" "OEDIT MINT FLAGS" "OEDIT AUTOMINT" "OEDIT AUTO MINT" "OEDIT NO-MINT" "OEDIT NOMINT" "OEDIT NO MINT"
+
+Usage:  .mintflags [add | remove] <flags>
+
+Mint flags are:
+  AUTOMINT - allows Workforce to mint the item into coins
+  NO-MINT - item cannot be minted into coins at all
+
+See also: OLC OBJECTS
 #d
 "OEDIT REQUIRESQUEST" "OEDIT REQUIRES QUEST" "OEDIT REQUIRE QUEST" "OEDIT QUEST"
 
@@ -5850,8 +6069,8 @@ Available types:
  PAINT - used for painting buildings
  *MAIL - a letter (internal use only)
  WEALTH - adds to empire wealth when stored
- LIGHTER - can light fires
- MINIPET - teaches a mini-pet to the player on 'use'
+ LIGHTER - can light fires (contrast with LIGHT)
+ MINIPET - teaches a minipet to the player on 'use'
  MISSILE-WEAPON - a bow, or similar (requires .wear RANGED)
  AMMO - ammunition for missile weapons
  INSTRUMENT - a musical instrument -- must set custom messages
@@ -5861,6 +6080,7 @@ Available types:
  POISON - adds an effect to melee combat
  ARMOR - requires certain skills to wear
  BOOK - can be read like a library book
+ LIGHT - lights up the room (when lit); contrast with LIGHTER
 
 You can get specific help on each of these via HELP <type> ITEM
 
@@ -6195,6 +6415,35 @@ WARNING: This cannot be undone (except by restoring a backup, if there is one).
 
 See also: VNUM
 #d
+"OLC DEPLETION" "OLC DEPLETIONS" "INTERACTION DEPLETIONS" "PRODUCTION DEPLETIONS"
+
+The 'production' and 'skilled labor' workforce chores use building interactions
+to generate items for the empire. These default to the 'production' depletion
+type on the tile, but you can specify a different one using -depletion <type>
+on the interaction.
+
+Example: .interaction add PRODUCTION 125 12345 100.0 -depletion trapping
+ 125 is the maximum number to generate, 12345 is the vnum, 100.0 is the chance
+ to produce 1 each hour, and it uses the 'trapping' depletion type.
+
+Available depletion types:
+ dig
+ forage
+ gather
+ pick
+ fish
+ quarry
+ pan
+ trapping
+ chop
+ hunt
+ production
+
+Note: This only applies to the PRODUCTION and SKILLED-LABOR interactions, and
+only on buildings and vehicles.
+
+See also: BEDIT INTERACTION
+#d
 "OLC EDIT"
 
 Usage:  .<type> edit <vnum>
@@ -6254,6 +6503,26 @@ This command lists all objects (or mobs, or whatever) between two vnums
 (inclusive). If the range is too long, it cuts off the list and you can try
 again with a narrower range of vnums. If you provide the -d (--details)
 argument, more information is shown per line.
+
+Information provided by the -d flag:
+ abilities: mastery
+ adventure: mob/object/room count
+ archetypes: skills, skill point total, and attribute total
+ augments: ability/skill, applies
+ book: byline
+ class: skill requirements
+ craft: shows craft type
+ generic: info based on generic type
+ global: info based on global type
+ mobiles: level range and many flags
+ morph: ability/skill requirement
+ objects: level range and some flags (quality, enchanted, scalable, binding)
+ progress: type
+ quests: level range and some flags (in-dev, daily, event, tutorial, group)
+ rooms: some flags (outdoor, dark/light, no mob/teleport/loc, look out)
+ sectors: climate and build-on flags
+ skill: skill description
+ social: shows in-dev and requirements, if any
 
 To look up items by name, use the 'vnum' command.
 
@@ -6344,7 +6613,7 @@ The following types will have IN-DEVELOPMENT flags removed in the vnum range:
 - classes
 - crafts
 - factions
-- generics (moon)
+- generics (only used on MOON generics)
 - globals
 - morphs
 - progress goals
@@ -6508,6 +6777,19 @@ Example vehicle settings:
 
 See also: BUILDING-VEHICLES, OLC, OLC ABORT, OLC EDIT, OLC EDITOR, OLC SAVE
 #d
+"OLC WORDCOUNT" "OLC WORD COUNT" WORDCOUNT "WORD COUNT"
+
+Usage:  .<type> wordcount <from vnum> [to vnum]
+
+This command counts all the words in the text for the various OLC types. For
+example, an object counts all the words in its keywords, short desc, long desc,
+look desc, extra descriptions, and custom messages.
+
+If you use this on a single adventure, it will count all parts of the
+adventure and provide a total.
+
+See also: OLC LIST, VNUM
+#d
 "OLC WORKFORCE" "WORKFORCE OLC"
 
 There are several ways to make an empire's workforce work a building:
@@ -6535,12 +6817,15 @@ chore.
 
 The interaction's "quantity" is the depletion limit; workforce will produce the
 item 1 at a time. Depletions are slightly random; set this number 25% higher
-than the amount you want the player to get per year. All production on a single
-tile or building will share the same depletion counter.
+than the amount you want the player to get per year.
+
+All production on a single tile or building will share the same depletion
+counter unless you use the "-depletion <type>" option on each interaction. See
+the help file on OLC DEPLETION.
 
 The interaction's "percentage" is the chance per hour to produce the item.
 
-See also: INTERACTIONS, OLC WORKFORCE
+See also: INTERACTIONS, OLC WORKFORCE, OLC DEPLETION
 #d
 PROGEDIT "OLC PROGRESSION" "PROGRESSION OLC" "PROGRESS OLC"
 
@@ -6593,10 +6878,10 @@ Usage:  .flags [add | remove] <flags>
 The following progress goal flags are available:
  &cIN-DEVELOPMENT&0 - Empires cannot start or complete this goal.
  &cPURCHASABLE&0 - This goal is purchased, not unlocked by tasks.
- &cSCRIPT-ONLY&0 - For scripts; cannot be purchased and won't be earned unless a
-               script starts it first.
+ &cNO-AUTOSTART&0 - Must be added or started by a script or quest.
  &cHIDDEN&0 - Will not show up in lists until completed.
  &cNO-ANNOUNCE&0 - Does not announce/log completion.
+ &cNO-PREVIEW&0 - Mortals can't view this goal before starting it.
 
 See also: OLC PROGRESS
 #d
@@ -6615,9 +6900,10 @@ Fields:
   &c-tasks&0 - see HELP REQUIREMENTS / HELP PROGEDIT TASKS
   &c-type&0 - see HELP PROGEDIT TYPE
   &c-value&0 - match a specific value
+  &c-vmin&0, &c-vmax&0 - VNUM range limits
 
 Examples:
- > .prog fullsearch -type PLAYER-TECH -ptech Swimming
+ > .prog fullsearch -type PLAYER-TECH -ptech Swimming -vmin 10000 -vmax 10099
  > .prog fullsearch -flagged RANGED -flagged RANGED-ONLY
 
 To search other fields, you can generally use the normal "search" option for
@@ -6660,6 +6946,8 @@ Perk types:
  Greatness-territory - Increases territory per greatness point.
  Workforce-cap - Raises the maximum workforce cap.
  Territory - Directly adds to the total territory for an empire.
+ Speak-language - All members can speak this language.
+ Recognize-language - All members can recognize this language when spoken.
 
 Note: To grant progress points for a goal, set the 'value' field instead.
 
@@ -6696,7 +6984,8 @@ Task types that do not apply to empire progression:
  &rCOMPLETED-QUEST, NOT-COMPLETED-QUEST, NOT-ON-QUEST, SKILL-LEVEL-OVER,
  SKILL-LEVEL-UNDER, TRIGGERED, VISIT-BUILDING, VISIT-ROOM-TEMPLATE,
  VISIT-SECTOR, HAVE-ABILITY, REP-OVER, REP-UNDER, WEARING, WEARING-OR-HAS,
- GET-CURRENCY, CAN-GAIN-SKILL&0
+ GET-CURRENCY, CAN-GAIN-SKILL, LEVEL-UNDER, LEVEL-OVER, SPEAK-LANGUAGE,
+ RECOGNIZE-LANGUAGE&0
 
 See also: OLC PROGRESS, REQUIREMENTS
 #d
@@ -6779,6 +7068,8 @@ The following quest flags are available:
     Use this flag for basic tutorials only, like ones on common items.
  GROUP-COMPLETION - Will auto-finish the quest if a group member turns it in
     while in the same room.
+ EVENT - Quest is marked as part of an event. If it's a daily quest, it is
+    separate from non-event dailies.
 
 See also: OLC QUESTS, DAILY QUEST
 #d
@@ -6846,6 +7137,11 @@ Available reward types:
  REPUTATION - Gain/lose faction reputation.
  CURRENCY - Gives generic currency (e.g. tokens).
  EVENT-POINTS - Points toward an event (only happens if the event is running).
+ SPEAK-LANGUAGE - Can now speak a language.
+ RECOGNIZE-LANGUAGE - Can now recognize a language (will not override one the
+    player can already speak).
+ GRANT-PROGRESS - Player's empire completes a progress goal.
+ START-PROGRESS - Player's empire starts a NO-AUTOSTART progress goal.
 
 Note: If you set empire coins as the reward, but the mob is not part of an
 empire, the player will receive misc coins instead.
@@ -6927,7 +7223,7 @@ The following room template flags are available:
  LIGHT - Never requires a light.
  !MOB - Mobs will not wander into the room (they may still be spawned there).
  PEACEFUL - No combat allowed.
- NEED-BOAT - Requires a boat, swimming, or fly.
+ NEED-BOAT - Requires a boat, swimming, waterwalk, or fly.
  !TELEPORT - Cannot teleport in or out.
  LOOK-OUT - can see the map using "look out"
  !LOCATION - no location shown; disables "where"
@@ -6947,11 +7243,12 @@ Fields:
   &c-flagged -unflagged&0 - see HELP REDIT FLAGS
   &c-functions&0 - see HELP REDIT FUNCTIONS
   &c-interactions&0 - has a specific type, see HELP REDIT INTERACTION
+  &c-vmin&0, &c-vmax&0 - VNUM range limits
 
 Examples:
  > .r fullsearch -interactions DIG
  > .r fullsearch -unflagged LIGHT -function FORGE
- > .r fullsearch -flagged !MOB -flagged DARK
+ > .r fullsearch -flagged !MOB -flagged DARK -vmin 10000 -vmax 10099
 
 To search other fields, you can generally use the normal "search" option for
 other OLC types. For example, to find all templates that spawn a certain mob
@@ -7005,10 +7302,35 @@ This is different from the spawn data set on crops, sectors, and buildings.
 
 See also: OLC ROOM TEMPLATES, ADVEDIT RESET TIME, VNUM
 #d
+"REDIT SUBZONE" "REDIT SUB-ZONE" "REDIT SUB ZONE" SUBZONE SUB-ZONE "SUB ZONE"
+
+Usage:  .subzone <vnum | none>
+
+Room templates have an optional numerical property called subzone. This divides
+an adventure up for commands like "where", "shout", and also %subecho%. It is
+usually used with the !LOCATION flag, which indicates that a room is not "at"
+the map location where the adventure instance is linked.
+
+If you are using this property, you should set the subzone id to the vnum of a
+room template in that subzone. All room templates with the same subzone id are
+"in the same place". The same subzone can be used across multiple adventures,
+if they are all conceptually "in the same non-map place".
+
+An example of a subzone is the Portal to the Primeval adventure, which takes
+place through a portal. All the room templates in the adventure are in the
+"same place" but that place is not "at the map location where the portal
+spawned".
+
+Note: Without a !LOCATION flag, a room with a subzone will still share the
+where/shout range of other areas around it as if it has no subzone. However,
+the %subecho% command will still work as expected without the !LOCATION flag.
+
+See also: REDIT FLAG, %SUBECHO%
+#d
 REQUIREMENTS "QEDIT TASKS" "QEDIT PREREQS" "QEDIT PREREQUISITES" "SOCEDIT REQUIREMENTS"
 
-Usage:  .<field> add <type> <vnum> [group]
-        .<field> change <number> <amount | group | vnum> <value>
+Usage:  .<field> add <type> <vnum> [group] [custom text]
+        .<field> change <number> <amount | group | text | vnum> <value>
         .<field> copy <from type> <from vnum> [tasks/prereqs (quests only)]
         .<field> remove <number | all>
 
@@ -7020,6 +7342,10 @@ A player only needs to meet 1 requirement from the list. However, you can
 create requirement groups where all conditions on a group must be met. If
 there is more than one group, the player only needs to meet all conditions from
 any 1 group. Group names are always a single case-sensitive letter.
+
+Custom text is optional and will replace the normal display text. If using
+custom text, you MUST provide the [group] argument first, but it can be '-' or
+"none".
 
 Available tasks:
  &cCOMPLETED-QUEST&0 - Must complete a certain quest.
@@ -7064,6 +7390,8 @@ Available tasks:
  &cEVENT-NOT-RUNNING&0 - Not available while the event is running.
  &cLEVEL-UNDER&0 - Composite/total level not higher than this.
  &cLEVEL-OVER&0 - Composite/total level not lower than this.
+ &cSPEAK-LANGUAGE&0 - Player knows how to speak a language.
+ &cRECOGNIZE-LANGUAGE&0 - Player can recognize or speak a language.
 
 &r*&0 Some types require a trackable quest, and cannot be used as prereqs.
 ^ If a type requires flags and you use more than one flag, you MUST put the
@@ -7175,6 +7503,7 @@ Available types ([value] isn't used unless specified):
  &cTIMED&0 - Occurs after the given number of minutes.
  &cOWNED&0 - Evolves if the tile is claimed.
  &cUNOWNED&0 - Evolves if the tile is not claimed.
+ &cBURN-STUMPS&0 - Sector this tile becomes when burnt by workforce.
 
 Examples:
  Jungle: .evolution add CHOPPED-DOWN 1 50% 28
@@ -7215,6 +7544,10 @@ Available sector flags:
  NEEDS-HEIGHT - Uses the 'height' property in some way and will set itself from
     nearby tiles if missing.
  KEEPS-HEIGHT - Uses the 'height' property but won't change it (for roads etc).
+ SEPARATE-NOT-ADJACENTS - Runs each NOT-ADJACENT evolution separately rather
+    than making sure the tile isn't adjacent to ANY of them.
+ SEPARATE-NOT-NEARS - Runs each NOT-NEAR-SECTOR evolution separately rather
+    than making sure the tile isn't near ANY of them.
 
 See also: OLC SECTORS, TERRAIN HEIGHT
 #d
@@ -7234,11 +7567,12 @@ Fields:
   &c-interaction&0 - has a specific type, see HELP SECTEDIT INTERACTION
   &c-mapout&0 - color name, see HELP SECTEDIT MAPOUT
   &c-roadsideicon&0 - has a certain icon letter - HELP SECTEDIT ROADSIDEICON
+  &c-vmin&0, &c-vmax&0 - VNUM range limits
 
 Examples:
  > .sect fullsearch -climate forest -evolution CHOPPED-DOWN
  > .sect fullsearch -flagged CHORE -flagged ROUGH
- > .sect fullsearch -interaction CHOP
+ > .sect fullsearch -interaction CHOP -vmin 10000 -vmax 10099
 
 To search other fields, you can generally use the normal "search" option for
 other OLC types. For example, to find all sectors that spawn a certain mob,
@@ -7380,7 +7714,7 @@ See also: OLC SHOPS, OLC REMOVEINDEV
 #d
 "SHOPEDIT ITEMS"
 Usage: .item add <vnum> <cost> <currency vnum | coins> [min reputation]
-       .item change <number> vnum <value>
+       .item change <number> <vnum | cost | currency | reputation> <value>
        .item move <number> <up | down>
        .item copy <from type> <from vnum>
        .item remove <number | all>
@@ -7389,13 +7723,13 @@ The shop's item list determines what it sells. Shops have an infinite number
 of each item, and do not run out. Shopkeepers do not receive the coins or
 currency that are paid to them; this is always lost.
 
-The parameters for add/copy are:
+The parameters for add/change are:
 - vnum: The object vnum to sell.
 - cost: The number of coins/currency.
 - currency: Either the word 'coins' or the vnum of a generic currency. Coins
   will always be miscellaneous coins unless the shop's mob/room belong to an
   empire, in which case it will be empire coins.
-- min reputation: If the shop has allegiance to a faction, this is the lowest
+- reputation: If the shop has allegiance to a faction, this is the lowest
   reputation that can buy the item (optional).
 
 See also: SHOPEDIT ALLEGIANCE, OLC SHOPS, GENERIC CURRENCY, VNUM
@@ -7760,10 +8094,11 @@ the trigger's name and command text.
 Fields:
   &c-attaches&0 - see HELP TRIGEDIT ATTACHES
   &c-type&0 - see HELP MTRIG TYPES, etc.
+  &c-vmin&0, &c-vmax&0 - VNUM range limits
 
 Examples:
  > .t fullsearch -type Random -type Global
- > .t fullsearch i11234
+ > .t fullsearch i11234 -vmin 11200 -vmax 11299
  > .t fullsearch %force%
 #d
 "TRIGEDIT NAME"
@@ -7968,6 +8303,9 @@ Other drink containers are like fountains, as no-take objects in the room
 which can provide very large amounts of liquid to players. These shouldn't
 be scalable, and you can set the capacity as high as you like.
 
+If a drink container doesn't have TAKE (can't be taken) and is in the room,
+players can 'fill' from it like a fountain.
+
 Note: Unlike other items, if there is a 'timer' on a drink container, it will
 only cause the liquid inside to go bad and be poured out, rather than purging
 the whole container.
@@ -8001,6 +8339,39 @@ be displayed randomly every few action ticks.
 
 See also: OEDIT CUSTOM
 #d
+"LIGHT ITEM" "LIGHT OBJECT"
+
+The LIGHT item illuminates dark areas. Players need these items to work outside
+at night, to explore dark caves, and sometimes for cooking food.
+
+There is also a LIGHT object flag. Prefer to use the item type INSTEAD whenever
+possible. Do not put both on the same item. The flag is for cases where a
+scenery item needs to double as a light.
+
+Object values:
+ 0 - hours of light remaining (or -1 for unlimited light)
+ 1 - is lit (1) or not (0)
+ 2 - light flags:
+       LIGHT-FIRE - can be used like a LIGHTER item, when lit
+       CAN-DOUSE - the player can put it out and re-light it
+       JUNK-WHEN-EXPIRED - when it burns out, the item is lost
+       COOKING-FIRE - the player can cook with it
+       DESTROY-WHEN-DOUSED - item is lost if they player douses it
+
+Light items also use these custom messages:
+ decays-on-char - When the light burns out (or its timer expires) while worn or
+   carried.
+ decays-in-room - When the light burns out (or its timer expires) in a room.
+
+Example lights:
+- torch: 18 hours of light, LIGHT-FIRE, CAN-DOUSE, JUNK-WHEN-EXPIRED
+- campfire: 24 hours of light, LIGHT-FIRE, JUNK-WHEN-EXPIRED, COOKING-FIRE,
+            DESTROY-WHEN-DOUSED
+- lantern: 24 hours of light, CAN-DOUSE
+
+See also: LIGHTER OBJECT, OEDIT LIGHT HOURS, OEDIT LIGHT IS LIT,
+   OEDIT LIGHT FLAGS
+#d
 "LIGHTER ITEM" "LIGHTER OBJECT"
 
 The LIGHTER item type can be used to light fires and torches. It can either
@@ -8010,7 +8381,9 @@ box).
 Object values:
  0 - number of uses
 
-See also: OEDIT USES
+Do not confuse LIGHTER with LIGHT. A lighter lights a light.
+
+See also: LIGHT OBJECT, OEDIT USES
 #d
 "MAIL ITEM" "MAIL OBJECT"
 
@@ -8020,18 +8393,18 @@ extra-description to get the same effect.
 #d
 "MINIPET ITEM" "MINIPET OBJECT" "MINI-PET ITEM" "MINI-PET OBJECT" "MINI PET OBJECT" "MINI PET ITEM" "PET WHISTLE"
 
-Mini-pets are a common cosmetic reward from adventure zones. They are taught
+Minipets are a common cosmetic reward from adventure zones. They are taught
 by a MINIPET item, and the player may get that item from a loot drop or a
 shop.
 
 Object values on a MINIPET item:
  0 - mob vnum to teach
 
-Mini-pet mobs should have the following traits:
+Minipet mobs should have the following traits:
  - Locked to a low level like 1
  - Adorable custom messages (optional)
 
-Mini-pets automatically gain the following when summoned:
+Minipets automatically gain the following when summoned:
  - Scaled to the player's level
  - Flags: SENTINEL SPAWNED !LOOT !EXPERIENCE (and ISNPC)
  - Affects: !ATTACK CHARMED
@@ -8263,6 +8636,7 @@ See also: VEDIT FLAGS, OLC VEHICLES
 
 Usage:  .custom add <type> <message>
         .custom change <number> <type | message> <value>
+        .custom move <number> <up | down>
         .custom remove <number | all>
 
 You can set custom messages on vehicles.
@@ -8321,7 +8695,7 @@ Available flags:
  ALLOW-ROUGH - drag/drive work on rough terrain (e.g. mountains)
  SIT - player can sit on the vehicle
  IN - changes text from "on" to "in", and "aboard" to "inside"
- BURNABLE - can be burnt using the "light" command
+ BURNABLE - can be burnt using the "burn" command
  CONTAINER - items can be placed inside
  SHIPPING - can be used by the shipping system
  CUSTOMIZABLE - allows "customize vehicle"
@@ -8332,7 +8706,7 @@ Available flags:
  CARRY-VEHICLES - vehicles can be put inside (usually via drag/lead)
  CARRY-MOBS - mobs can be put inside (usually via lead)
  SIEGE-WEAPONS - can fire on buildings and vehicles
- ON-FIRE - currently burning (via the "light" command)
+ ON-FIRE - currently burning (via the "burn" command)
  !LOAD-ONTO-VEHICLE - cannot be loaded onto another vehicle
  VISIBLE-IN-DARK - can be seen at night without a light
  !CLAIM - cannot be claimed
@@ -8393,6 +8767,7 @@ with a dash (-) are matched to the vehicle's name and other text.
 Fields:
   &c-animalsrequired&0 - number required (or "any" for anything over zero)
   &c-capacity -capacityover -capacityunder&0 - specific capacity
+  &c-depletion&0 - see HELP OLC DEPLETION
   &c-designate&0 - see HELP DESIGNATE FLAGS
   &c-fame -fameover -fameunder&0 - specific fame amount
   &c-flagged -unflagged&0 - see HELP VEDIT FLAGS
@@ -8407,10 +8782,11 @@ Fields:
   &c-rooms -roomsover -roomsunder&0 - specific extra rooms value
   &c-sizeunder -sizeover&0 - check a range of sizes (inclusive)
   &c-speed&0 - see HELP VEDIT SPEED
+  &c-vmin&0, &c-vmax&0 - VNUM range limits
 
 Examples:
  > .veh fullsearch -level 125 -hitpointsover 50
- > .veh fullsearch wood -flagged BURNABLE
+ > .veh fullsearch wood -flagged BURNABLE -vmin 10000 -vmax 10099
 
 To search other fields, you can generally use the normal "search" option for
 other OLC types. For example, to find all vehicles that have a certain interior
@@ -8657,14 +9033,15 @@ See also: OLC VEHICLES
 "WEALTH ITEM" "WEALTH OBJECT"
 
 The WEALTH type represents an object of value. These are not converted to money
-like the COINS type is, but they can be minted into coins by players with a
-mint. Wealth items contribute to an empire's total wealth when they are stored.
+like the COINS type is, but they can usually be minted into coins by players
+with a mint. Wealth items contribute to an empire's total wealth when they are
+stored.
 
 This item type has no effect unless the item is stored in normal storage.
 
 Object values:
  0 - treasure value
- 1 - automint (if 0, workforce won't mint this)
+ 1 - flags (1: automint, 2: no-mint)
 #d
 "WEAPON ITEM" "WEAPON OBJECT"
 

@@ -40,7 +40,7 @@ A jar of pickled glowkra is shining away.~
    This jar contains freshly pickled glowkra pods. It's bright enough to light
 the way at night.
 ~
-6 c a 0 6
+6 c a 0 8
 12 0 0
 8 336
 B
@@ -383,9 +383,12 @@ A handful of magic beans is scattered here.~
    These beans look strangely ordinary... You can't believe anyone would sell a
 whole cow just for these.
 ~
-6 bk a 0 4
+6 b a 0 5
 6 10507 0
 10 48
+O+ 1 6141
+R
+4 5116 0
 S
 #10524
 leaves dark gray grey axeroot~
@@ -652,7 +655,7 @@ S
 #10554
 runes strange glacier~
 the strange runes~
-Strange, glowing runes are carved into the side of the glacier.~
+Strange, glowing runes are carved into the side of the glacier. (difficulty)~
    The runes appear to be a safeguard left by kinder mages, to help heroes who
 must come and defeat the Polar Baron, should he use his glacial powers to
 spread frost across the world. There is a small plaque beneath the runes.
@@ -725,7 +728,7 @@ Some fresh spruce lumber is piled here.~
    The pale, knotty wood is nevertheless strong. Lumber is used in building
 construction.
 ~
-3 e a 0 5
+3 e a 0 6
 0 0 0
 0 0
 I 11 1002 100.00 1  # LIGHT: roaring fire
@@ -737,10 +740,10 @@ M
 $n positions some lumber and ties it in place.~
 M
 6
-You position some lumber on the frame of $V.~
+You position $p on $V.~
 M
 7
-$n positions some lumber on the frame of $V.~
+$n positions $p on $V.~
 O+ 1 6000
 R
 4 5118 0
@@ -789,11 +792,13 @@ a handful of red and green seeds~
 A handful of red and green seeds are scattered on the ground.~
 These small, thin seeds are colored red and green.
 ~
-6 b a 0 7
+6 b a 0 8
 1 10551 0
 7 576
 C
 1 1
+R
+4 5210 0
 S
 #10563
 seed pure ice~
@@ -801,11 +806,13 @@ a seed of pure ice~
 A seed made of ice is lying here.~
 This seed looks like a tiny crystal, but for its delicate, icy touch.
 ~
-3 b a 0 4
+3 b a 0 5
 0 10560 0
 9 0
 C
 1 1
+R
+4 5210 0
 S
 #10564
 charm polar bear~

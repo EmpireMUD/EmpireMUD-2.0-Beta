@@ -710,8 +710,8 @@ A shining red dragon stone is lying here.~
 of this one, it must have come from a colossal dragon! The dragon essence
 stored in this type of stone is used to craft legendary weapons and armor.
 ~
-15 0 a 0 2
-1 0 0
+15 0 a 0 3
+1 2 0
 12 0
 C
 1 1
@@ -801,8 +801,8 @@ An ancient book, the Draconomicon, hovers before you!~
 Unfortunately, it's also written in a dead draconic language, and you can't
 make out its words. But it's also worth its weight in gold.
 ~
-15 0 a 0 2
-48 0 0
+15 0 a 0 3
+48 2 0
 7 0
 R
 4 5611 a
@@ -917,10 +917,10 @@ the monstrous carcass of a muck dragon~
 The monstrous carcass of a muck dragon is floating on the water.~
    The corpse is so enormous that you can't imagine picking it up. The muck
 dragon is still slimy, even in death, as if its scales exude mucus of their own
-accord. It look as if the dragon has dropped the treasure it was clutching in
+accord. It looks as if the dragon has dropped the treasure it was clutching in
 its talons.
 ~
-10 0 0 0 1
+10 0 0 0 2
 10950 0 0
 7 48
 S
@@ -1096,8 +1096,8 @@ A pure crystal orb is lying here.~
 beautifully shaped. Orbs like this are rare, and are sought after by powerful
 spellcasters for their clarity.
 ~
-15 0 a 0 5
-16 0 0
+15 0 a 0 6
+16 2 0
 8 0
 R
 4 5611 a
@@ -1110,8 +1110,8 @@ A crystal skull is lying here.~
 skull of some crystalline demon. Either way, these skulls are supremely rare
 and are sought out by powerful spellcasters the world over.
 ~
-15 e a 0 6
-24 0 0
+15 e a 0 7
+24 2 0
 8 0
 R
 4 5611 a
@@ -1132,7 +1132,7 @@ S
 skull talking~
 a talking skull~
 A talking skull is lying here.~
-This skull can become a mini-pet. Type 'use skull' to receive it.
+This skull can become a minipet. Type 'use skull' to receive it.
 ~
 19 p a 0 5
 10987 0 0
@@ -1142,7 +1142,7 @@ S
 grimoire mother's mothers~
 Mother's grimoire~
 Mother's grimoire is floating here.~
-This grimoire can become a mini-pet. Type 'use grimoire' to receive it.
+This grimoire can become a minipet. Type 'use grimoire' to receive it.
 ~
 19 p a 0 6
 10988 0 0
@@ -1152,7 +1152,7 @@ S
 collar cat's cats~
 a cat's collar~
 A cat's collar is lying here.~
-This collar can become a mini-pet. Type 'use collar' to receive it.
+This collar can become a minipet. Type 'use collar' to receive it.
 ~
 19 p a 0 7
 10989 0 0

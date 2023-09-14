@@ -1,0 +1,250 @@
+#11931
+dance~
+dance~
+b 8 8
+L
+18 11931 0 1 -
+M0
+You dance as if no one is watching.~
+M1
+$n closes $s eyes and dances around without a care in the world.~
+M2
+You grab $N and dance around with $M.~
+M3
+$n grabs $N and dances around with $M.~
+M4
+$n grabs you by the hand and dances around with you.~
+M5
+You'll have to dance by yourself; they're not here.~
+M6
+You might be by yourself, but you dance all the same.~
+M7
+$n dances around by $mself.~
+S
+#11932
+cough~
+cough~
+0 5 0
+L
+18 11932 0 1 -
+M0
+You cough suspiciously.~
+M1
+$n coughs suspiciously.~
+M2
+You cough at $N.~
+M3
+$n coughs in $N's direction.~
+M4
+$n coughs right at you!~
+M5
+You were hoping to spread the plague but they're not here.~
+M6
+You let out a cough inside your coat.~
+M7
+There's a cough from $n's midsection.~
+S
+#11983
+bow~
+bow~
+b 8 5
+L
+18 11983 0 1 -
+M0
+You twirl around and give a deep bow.~
+M1
+$n twirls around and gives a deep bow.~
+M2
+You twirl and bow before $N.~
+M3
+$n twirls and bows before $N.~
+M4
+$n twirls and bows before you.~
+M5
+They seem to have bowed out.~
+M6
+You twirl around and bow as low as you can.~
+M7
+$n twirls around and bows as low as $e can.~
+S
+#11984
+cheer~
+cheer~
+0 5 0
+L
+18 11984 0 1 -
+M0
+You cheer stoically.~
+M1
+$n cheers stoically.~
+M2
+You give $N a subdued cheer.~
+M3
+$n gives $N a subdued cheer.~
+M4
+$n gives you a subdued cheer.~
+M5
+Cheer for whom?~
+M6
+You let out an unenthused cheer.~
+M7
+$n lets out an unenthused cheer.~
+S
+#11985
+comfort~
+comfort~
+0 5 5
+L
+18 11985 0 1 -
+M0
+You offer some comfort in these trying times.~
+M1
+$n offers comfort in these trying times.~
+M2
+You put an arm around $N and comfort $M.~
+M3
+$n puts an arm around $N and comforts $M.~
+M4
+$n puts an arm around you and comforts you.~
+M5
+You try to comfort them but they aren't here.~
+M6
+You take comfort in what you can.~
+M7
+$n seems to take comfort in what $e can.~
+S
+#11986
+dance~
+dance~
+b 8 8
+L
+18 11986 0 1 -
+M0
+You dance around joyfully.~
+M1
+$n dances around joyfully.~
+M2
+You dance in circles around $N.~
+M3
+$n dances in circles around $N.~
+M4
+$n dances in circles around you.~
+M5
+They're not here, but you dance a little anyway.~
+M6
+You dance merrily with yourself.~
+M7
+$n dances merrily with $mself.~
+S
+#11987
+greet~
+greet~
+0 5 5
+L
+18 11987 0 1 -
+M0
+You greet everyone with an icy howl.~
+M1
+An icy howl pierces the air as $n greets you.~
+M2
+There's an icy howl as you greet $N.~
+M3
+There's an icy howl as the lich $n greets $N.~
+M4
+There's an icy howl as the lich $n greets you.~
+M5
+Looks like they were scared off before you could even greet them.~
+M6
+You'll look crazy trying to greet yourself.~
+S
+#11988
+nod~
+nod~
+b 5 0
+L
+18 11988 0 1 -
+M0
+You give a quick nod.~
+M1
+$n gives a quick nod.~
+M2
+You nod to $N.~
+M3
+$n nods to $N.~
+M4
+$n nods to you.~
+M5
+They don't seem to be here.~
+M6
+You nod quietly to yourself.~
+M7
+$n nods quietly to $mself.~
+S
+#11989
+shrug~
+shrug~
+b 5 0
+L
+18 11989 0 1 -
+M0
+You shrug a little, but not so much that they think you don't know the answer.~
+M1
+$n gives a little shrug.~
+M2
+You shrug at $N.~
+M3
+$n gives $N a little shrug.~
+M4
+$n gives you a little shrug.~
+M5
+You shrug as you try to find them.~
+M6
+You shrug to yourself. Who knows?~
+M7
+$n shrugs to $mself.~
+S
+#11990
+tap~
+tap~
+b 5 0
+L
+18 11990 0 1 -
+M0
+You tap one foot, then the other, and soon you're doing a little dance.~
+M1
+$n taps $s foot impatiently. Then taps the other. Then does a little dance.~
+M2
+You tap your foot as you wait for $N.~
+M3
+$n taps $s foot, waiting for $N.~
+M4
+$n taps $s foot, waiting for you.~
+M5
+Don't get impatient with them; they're not even here!~
+M6
+You tap your foot to the music in your head.~
+M7
+$n taps $s foot to some unheard music.~
+S
+#11991
+wave~
+wave~
+b 5 0
+L
+18 11991 0 1 -
+M0
+The light glimmers around you as you wave.~
+M1
+The light glimmers around $n as $e waves.~
+M2
+The light glimmers around you as you wave at $N.~
+M3
+The light glimmers around $n as $e waves at $N.~
+M4
+The light glimmers around $n as $e waves at you.~
+M5
+It's just you and the glimmer here; you don't see them.~
+M6
+You'd look silly waving to yourself.~
+S
+$

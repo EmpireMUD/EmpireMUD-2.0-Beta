@@ -1,5 +1,5 @@
 #18200
-Join the Guild of Adventurers~
+Guild of Adventurers: Join Up Today!~
    If you want to join the Guild of Adventurers, you must first demonstrate
 commitment by commissioning a guildhall in one of your cities. You receive a
 guild charter; take it home and 'build guildhall <direction>' to set it up.
@@ -29,13 +29,13 @@ Z
 1 18219
 S
 #18201
-Here to Sign Up~
+Guild of Adventurers: Here to Sign Up~
    The superintendant looks up at you, stands up from his desk, and claps you
 on the shoulders with both hands. 'Here to sign up? ' he asks, jovially. 'All
 members of the empire are welcome here, whether you're a ratcatcher or a...
 Dragoncatcher, I suppose!'
 ~
-You sign your name to the guild roster.
+You sign your name to the guild roster. You're a member now!
 ~
 6 f 0 0 -1
 A
@@ -54,7 +54,7 @@ Z
 1 18219
 S
 #18208
-Seek Out Fame and Adventure~
+Guild of Adventurers: Seek Out Fame and Adventure~
    The barkeep takes you aside and leans over to say, 'You have the look of an
 adventurer about you. Perhaps you've heard of the Guild of Adventurers. They
 always need fresh blood. Here, take this seeker stone and use it to find the
@@ -69,7 +69,7 @@ You've found your way to the Guild of Adventurers!
 A
 1 220
 P
-5 18200 0 1
+5 18200 0 1 -
 R
 0 0 5
 R
@@ -83,7 +83,7 @@ Z
 1 18212
 S
 #18221
-My Very Own Egg~
+Guild of Adventurers: My Very Own Egg~
    You have acquired an atlasian egg -- a truly rare treasure indeed! You can
 feel the embryonic tortoise's heartbeat within the shell. You need to find some
 clear desert or plains and 'plant' the egg to help it grow and hatch.
@@ -96,12 +96,12 @@ A
 R
 6 18222 1
 W
-7 18221 0 1
+7 18221 0 1 -
 Z
 0 18221
 S
 #18222
-Tending the Egg~
+Guild of Adventurers: Tending the Egg~
    The egg doesn't seem to be warm enough. You're no expert on the care and
 rearing of atlasian tortoises, but it doesn't seem like any ordinary covering
 is going to help. Fortunately, you've heard of a salve made from burnt zephyr
@@ -115,17 +115,17 @@ there's more work to do before it can hatch.
 A
 5 18221
 P
-0 18221 0 1
+0 18221 0 1 -
 R
 6 18223 1
 T 18222
 W
-2 11016 0 4
+2 11016 0 4 -
 Z
 0 18221
 S
 #18223
-Bonfire of the Tortoises~
+Guild of Adventurers: Bonfire of the Tortoises~
    Now that the egg has begun to grow, you realize zephyr salve alone won't be
 enough to hatch it. You recall hearing someone at the Tipsy Tortoise Tavern
 recall the story of hatching a giant egg. And as you recall, he did it by
@@ -137,11 +137,11 @@ skystones, and the essence of a molten fiend.
 light the whole thing ablaze with wild fire and molten essence! Now to wait for
 it to hatch...
 ~
-9 d 0 0 0
+10 d 0 0 0
 A
 5 18222
 P
-0 18222 0 1
+0 18222 0 1 -
 T 18223
 W
 1 6001 0 12 a
@@ -150,14 +150,627 @@ W
 W
 2 10254 0 3 a
 W
-2 10037 0 2 a
+2 11900 0 2 a
 W
 2 18097 0 1 a
 Z
 0 18222
 S
+#18240
+Golden Goblin: Fathom a Little Goblin Aid~
+   The old librarian glances over at you from the books and asks, 'Are you
+looking for work? There's a little goblin ship stuck in a cave and in need of
+repairs. It's not much, but the guild will undoubtedly cover your expenses in
+the interest of indebting the little lime creatures to us.'
+   The librarian leafs through some loose papers to find one with a drawing of
+a ship. 'Ah, here it is. The Golden Goblin. I'm not sure which cave it's stuck
+in, but I'm sure it's nearby on the coast. Do be sure to let them know at the
+main guildhall when you've helped out. You know the one, in the Tipsy Tortoise.
+And be quick about it.'
+~
+   The vampire looks up from his cauldron as you approach, peering at you
+through dim yellow eyes.
+   'You must be the one who aided the Golden Goblin,' he says. 'I have received
+a squid from their sorceress, Fathma, speaking highly of you. At least, as
+highly as a goblin can speak. Pirates they may be, but those goblins will pay
+their debts. As will we. I believe I owe you this...'
+~
+12 e 0 0 -1
+A
+1 18218
+D 18240
+P
+0 18279 0 1 a
+P
+17 18200 0 7 a
+R
+7 18200 10
+R
+1 -1 100
+W+
+11 0 0 1 -
+Help Fathma~
+Z
+1 18208
+S
+#18241
+Goblin Challenge: Smoke Them Out~
+   The old librarian glances over at you from the books and asks, 'Are you
+looking for work? I came across a recipe for a smoke bomb which, according to
+the author, will drive them off. I need it tested, plain and simple.'
+   The librarian hands you an old page torn from a book. At a glance, it looks
+simple enough (craft info smoke bomb).
+   'Try it out,' the librarian says. Let the umbramancer at the Tipsy Tortoise
+know if it works. It's just copper and bileberries. And cram the page in there
+for good measure, too. You will be compensated for your time.'
+~
+   The shadowy sorcerer listens to your tale of the smoke bomb, especially the
+part where it cleared out the entire goblin nest.
+   'Extremely interesting,' the umbramancer says. 'This will take further
+study. In the meantime, your reward...'
+~
+14 e 0 0 -1
+A
+1 18218
+D 18240
+P
+0 18279 0 1 a
+P
+17 18200 0 7 a
+R
+7 18200 10
+R
+1 -1 100
+T 18277
+W+
+11 0 0 1 -
+Smoke the goblins out~
+Z
+1 18209
+S
+#18242
+Goblin Challenge: Large and In Charge~
+   'We have received a request,' the librarian says over a thick pair of
+spectacles. 'It's goblins again, of course. They've become a nuissance. I sent
+an adventurer already, but he found the nest had been cleared out by the little
+menaces themselves. They won't have gone far. Search nearby ruins and try to
+find it.'
+   The librarian turns away, but turns back to add, 'Oh, and I'd like you to
+test this. It's an old loom of diminution. Supposedly, they can shrink goblins.
+Heavens, perhaps that's how the goblins ended up so small in the first place!'
+   The librarian hands you the wooden loom.
+   'Oh, and do drive the goblins off once you've shrunk them. We can't have
+teeny goblins running around, can we? Do the Goblin Challenge, as we say. And
+be quick about it. Report back to Nostrazak at the Tipsy Tortoise when the deed
+is done.'
+~
+   You approach Nostrazak, who circles back behind his desk and listens
+intently as you tell him about your experience fighting the goblins in their
+dirty little arena.
+   'I'm amazed the loom still works. Of course, I'll need it back. But truly,
+excellent job. Shame all their loot was shrunk, too. Let's just hope they move
+on and don't bother our client again.'
+   You nod, assuring him you completed the challenge and the goblins have
+moved out of the ruins. With any luck, they won't be back.
+~
+15 e 0 0 -1
+A
+1 18218
+D 18240
+P
+0 18279 0 1 a
+P
+17 18200 0 7 a
+R
+7 18200 10
+R
+1 -1 100
+T 18277
+W+
+11 0 0 1 a
+Successfully shrink a goblin~
+W+
+3 10200 0 1 a
+Defeat the bruiser~
+W+
+3 10201 0 1 a
+Defeat the shaman~
+W+
+3 10202 0 1 a
+Defeat the archer~
+W+
+3 10203 0 1 a
+Defeat the sapper~
+W+
+3 10204 0 1 a
+Defeat the champion~
+W+
+3 10205 0 1 a
+Defeat the war shaman~
+Z
+1 18211
+S
+#18243
+Mill Manor: Catching Bugs~
+   'Ah! Aha! Glad to see you here,' the guildmage says, with a wrinkled grin.
+'Have you been to the swamp lately? There's an old manor house with some, shall
+we say, strange goings-on. Especially with the bugs.'
+   The guildmage shuffles some items around on one of the tables, retrieves
+a gilded net, and hands it to you.
+   'The guild tasks you with catching some bugs. They may be large, but rest
+assured the enchanted net will do most of the work. You'll have to find Mill
+Manor on your own, but if you can get to the swamp, it should be nearby. Once
+you have them, take them to the old one in the Tipsy Tortoise. Quickly.'
+   Find the bugs in Mill Manor and type 'net <target>' to catch two of them.
+~
+   You place the captured bugs on the workbench. The tattooed alchemist sets
+the ladle down by his cauldron and approaches with interest.
+   'Oh yes,' he says, examining the bugs. 'Yes, these will do nicely. Here is
+your reward. Don't lose it all in one place.'
+~
+15 e 0 0 -1
+A
+1 18217
+D 18243
+P
+0 18279 0 1 a
+P
+17 18200 0 7 a
+R
+7 18200 10
+R
+1 -1 100
+T 18277
+W+
+11 0 0 1 -
+Catch 2 bugs~
+Z
+1 18208
+S
+#18244
+Swamp Hag: Suitable Supplies~
+   'Agent Germione has sent a messenger mouse with a particular request,' the
+guildmage says slowly. 'She has need of an enchanted rat suit for an upcoming
+dinner and the guild would like to remain her primary supplier. So this task
+falls to you, and I'll hear no complaints.'
+   The guildmage sips from a swirling blue mug and turns directly toward you.
+   'I know it's distasteful, but there's an alternative. The old hag will take
+briar hide or absinthian leather if you have some, or else rat skins and herbs
+if you don't. In either case, gather the materials and set out for the Tipsy
+Tortoise. Our tinker will put the suit together for her.'
+   Deliver 5x rat skins and 15x herbs, or else 5x thick magic leathers to the
+tinker in the guildhall at the Tipsy Tortoise for your reward.
+~
+   The old tinker looks at you through a set of colorful lenses and then takes
+the supplies you've brought, saying, 'Not exactly ideal but this should do. No
+time to chew the fat about it. On your way. Oh, and your reward...'
+~
+16 de 0 0 -1
+A
+1 18217
+D 18243
+P
+0 18279 0 1 a
+P
+17 18200 0 7 a
+R
+7 18200 10
+R
+1 -1 100
+W
+2 10013 0 5 a
+W
+1 6650 0 15 a
+W
+1 6531 0 5 b
+Z
+1 18210
+S
+#18245
+Swamp Hag: Feeding Rodentmort~
+   'This is going to be a bit of a messy one,' the guildmage says sheepishly
+while sliding a wicker cage out from a low shelf. The cage is soaked with water
+and has an authentic 'swamp' aroma about it.
+   The old guildmage sets the cage down at your feet, where it starts to form a
+murky puddle around it. 'This should be a relatively brief task. The briefer,
+the better, honestly. You're to pay a visit to Germione and borrow one of her
+favorite rats -- a foul Creature Who Shall Not Be Named. Apologies, but I've
+cared for the creature before and it is all too unpleasant.'
+   The guildmage laughs.
+   'Nostrazak the Incautious would like to have a peek under the bonnet, so to
+speak. The Guild has used enchanted rats before and our fearless thinks he's
+come up with a new angle. Once you have the rodent in the cage, you may find it
+becomes more docile once fed. I would suggest releasing it for a bit but be
+warned that it only eats the dead.'
+   With that, the guildmage burns a small scroll in the fire and returns to
+another task.
+   Visit the swamp hag, Germione, and type 'borrow Rodentmort'. After that,
+find some corpses for him and type 'release Rodentmort'. The rat will hop out
+of the cage and eat corpses off the ground. When he's full, drop him off at
+the Tipsy Tortoise with Nostrazak the Incautious.
+~
+   You pass the water-logged cage over to Nostrazak the Incautious. He taps at
+it with a long claw, causing the cage to shake and sputter for a moment.
+   'Feisty thing,' Nostrazak says. 'Yes you are. Yes you are. Who's a feisty
+little thing? Good little Morty. Uncle Nosty has a treat for you...'
+   Your reward is on the desk and you decide this is a good time to take it and
+leave.
+~
+18 e 0 0 -1
+A
+1 18217
+D 18243
+P
+0 18279 0 1 a
+P
+17 18200 0 7 a
+R
+7 18200 10
+R
+1 -1 100
+T 18277
+W+
+11 0 0 1 a
+Feed Rodentmort three corpses~
+Z
+1 18211
+S
+#18246
+Lost Temple: Important Archaeology~
+   'Aha!' says the superintendant. 'Just who I wanted to see. I got a report
+from Adventurer 86 about a lost temple recently rediscovered in the jungle.
+These things are like lodestones for amateur treasure hunters and looters of
+all types, so it's critical we get there first. To protect the treasures.'
+   The superintendant rummages through a box under the desk and hands you an
+enchanted metal bar. 'You'll need this, or it's impossible to get them loose.
+Pry out as many of the gems as you can and then get them to the guild's tinker
+at the Tipsy Tortoise. That should keep them safe from looters.'
+   Find a lost temple in the jungle, enter it, and type 'pry gem' inside the
+temple to get 4 gems to bring back to the guild.
+~
+   The tinker takes the sack of gems from you and pulls one out, holding it up
+to the light.
+   'Ah, exactly what I've been needing. Oh, these gems are truly spectacular.
+You really are a gem. Your pay is on the table. Excellent work as always.'
+~
+17 e 0 0 -1
+A
+1 18219
+D 18246
+P
+0 18279 0 1 a
+P
+17 18200 0 7 a
+R
+7 18200 10
+R
+1 -1 100
+T 18277
+W
+2 18249 0 4 -
+Z
+1 18210
+S
+#18247
+Lost Temple: Get Lost~
+   'Aha!' says the superintendant. 'Just who I wanted to see. I got a report
+from Adventurer 86 about a lost temple recently rediscovered in the jungle.
+These things are like lodestones for amateur treasure hunters and looters of
+all types, so it's critical we get there first. To protect the treasures.'
+   The superintendant picks up a stone orb off of the desk and hands it to you.
+It's surprisingly light. 'You'll need this. Find the temple -- head to the
+jungle and you should see it nearby -- and make your way to the gate. 86 says
+there's a strange orb there blocking the door. It's only a matter of time
+before someone figures out how to use the orb's magic to open the temple. That
+is where you come in. You are going to hijack that magic using our own orb,
+locking the temple and causing vines to grow so that nobody else finds it
+before we can get an expert in there. Think you can handle that? Good. Report
+in at the Tipsy Tortoise when it's done. They'll want to know the temple's
+location.'
+   Type 'use orb' in a Lost Temple before selecting a difficulty.
+~
+   You describe, in detail, where you hid the lost temple as the vampire
+scratches some notes onto a parchment.
+   'Most excellent,' he says as he tucks away the notes. 'I shall begin
+assembling a team at once. Who knows what delectable secrets lie in that
+temple. Oh, your payment is by the door.'
+~
+18 e 0 0 -1
+A
+1 18219
+D 18246
+P
+0 18279 0 1 a
+P
+17 18200 0 7 a
+R
+7 18200 10
+R
+1 -1 100
+T 18277
+W+
+11 0 0 1 a
+Cast the spell on a lost temple~
+Z
+1 18208
+S
+#18248
+Wandering Dragon: Flame's End Fandango~
+   'Aha!' says the superintendant. 'Just who I wanted to see. I got a contract
+to remove a pest -- a rather large one. The guild would like you to try an
+ancient technique that removes the dragon without killing it. Such a thing
+would be very useful to us. Take this dance card, seek out the wandering dragon
+nearby, and perform the dance. Take care of it, and then report back to
+Nostrazak for your reward. And be sure you don't hurt the dragon.'
+~
+   Nostrazak the Incautious's face reddens and he seems to double in size as
+he bellows out, 'You actually performed the dance of dragons?'
+   'Such a thing was once thought impossible,' he says, less excitedly, as he
+sits back into his chair. 'Even I have never accomplished such a feat. You must
+be classically trained -- or very, very lucky. The guild will be excited to
+hear of this. Here's your pay.'
+~
+20 e 0 0 -1
+A
+1 18219
+D 18246
+P
+0 18279 0 1 a
+P
+17 18200 0 7 a
+R
+7 18200 10
+R
+1 -1 100
+T 18277
+W+
+11 0 0 1 a
+Dance for the dragon~
+Z
+1 18211
+S
+#18249
+Clockwork Colossus: Cog and Collect~
+   'I have a special request from the guild's tinker,' the librarian says,
+without looking up at you. 'You're to find one of those notorious clockwork
+colossi. Truly, marvels of magineering. They have little worker drones, spiders
+fashioned from brass and bronze that keep the colossus in good repair. Our good
+tinker needs some of the brass scraps that the spiders use in the repairs. Oh,
+and some copper wire while you're there. I'm sure the tinker will pay your
+usual fee if you deliver the goods to the Tipsy Tortoise.'
+   Find a clockwork colossus and retrieve the items from the creatures that
+inhabit it.
+~
+   You place the brass scrap metal and salvaged wire on the workstation.
+   'Your timing is like clockwork,' the tinker says. 'Could not be more
+perfect. I know exactly what I'm going to do with those. Here's your pay.'
+~
+19 de 0 0 -1
+A
+1 18218
+D 18249
+P
+0 18279 0 1 a
+P
+17 18200 0 7 a
+R
+7 18200 10
+R
+1 -1 100
+W
+2 12506 0 1 a
+W
+2 12507 0 1 a
+Z
+1 18210
+S
+#18250
+Clockwork Colossus: Fettered Footwork~
+   'I have another job for you, if you're up to it,' the librarian says, over
+the top of a thick book. 'Last time I was at the Tipsy Tortoise, Nostrazak the
+Incautious was lecturing about too many villages being trampled by clockwork
+colossi. Those villages are a good source of income for the guild, so I have
+been researching the matter and I think I have a solution.'
+   The librarian shows you a diagram of a leg and foot, with a large
+contraption built around the ankle.
+   'It's a colossal ankle brace. Climb up onto the colossus's foot and
+manufacture one of these directly around the ankle. The colossus will have
+trouble moving and will be forced to return to its scaffold. Might just save
+the day. Anyway, it shouldn't be hard to find a colossus nearby. You'll need to
+bring a bunch of bronze or iron, and a lot of nails. It's important to secure
+the brace to the leg. Don't worry, you can't hurt the colossus. It's an
+automaton. Oh, and report back in at the Tipsy Tortoise when it's done.'
+   From atop the enormous boots of the clockwork colossus, type 'manufacture
+colossal ankle brace' to construct the brace. Don't forget to bring along
+12x (common metal ingots) and 12x (nails).
+~
+   'Ingenius,' says Nostrazak the Incautious when you regale him with the story
+of the colossus. 'Your local librarian came up with that? Simply ingenius.
+Librarians are the backbone of this continent. And good to hear that the
+colossus will trample no more villages. Really, tremendous work in the name of
+the Guild.'
+~
+19 e 0 0 -1
+A
+1 18218
+D 18249
+P
+0 18279 0 1 a
+P
+17 18200 0 7 a
+R
+7 18200 10
+R
+1 -1 100
+T 18277
+W+
+11 0 0 1 a
+Bind the colossus's ankle~
+Z
+1 18211
+S
+#18251
+Three Bandits: Relic Ruffians Remedy~
+   'Oh, there is a particular matter that could use your attention,' the
+librarian says, pulling a small pouch of coins from an ornamented box.
+   'Some bandits have been camping in an old ruin, not terribly far from here.
+We need them out, but we'd like to hire them. Covertly, of course. The guild
+would like you to bribe them to leave with these coins. They contain a hidden
+message that the bandits will surely recognize after they leave. I'm sure the
+bribe will be enough to do the trick. Just be subtle about it.'
+   The librarian hands you the pouch of coins. Seek out the bandits in the
+ruins and type 'bribe'.
+~
+   'Hope they didn't give you any trouble,' the vampire says as you relate the
+story of bribing the bandits. He laughs when you tell him it cost extra.
+   'But at least they took the marked coins. Good job.'
+~
+20 e 0 0 -1
+A
+1 18218
+D 18249
+P
+0 18279 0 1 a
+P
+17 18200 0 7 a
+R
+7 18200 10
+R
+1 -1 100
+T 18277
+W+
+11 0 0 1 a
+Bribe the bandits~
+Z
+1 18208
+S
+#18252
+Skycleave: Pilfering Pixies~
+   The guildmage opens a small wooden crate and pulls out an old clay jar,
+which brings a cloud of dust out with it. The guildmage blows it off and hands
+it to you.
+   'It's a pixy jar. Not just any pixy jar, either, the guildmage says. 'We've
+had it re-enchanted to be able to capture a pixy without touching it. Why, you
+might ask? Because we need to smuggle one of them out of the most secure prison
+in history.'
+   The guildmage pauses for drama.
+   'The Tower Skycleave. Your job is to find the tower again, get to the pixy
+races, and set this jar next to the stalls. Your target is Mischantsy, one of
+the racers. Once she's in the jar, you're to deliver it to the tinker at the
+main hall in the Tipsy Tortoise.'
+   Type 'pilfer pixy' at Skycleave's pixy races to steal the pixy.
+~
+   You set the old pixy jar on the tinker's station.
+   'Ah, you really managed it,' the tinker says, picking it up. 'I have big
+plans for this pixy. I wouldn't worry too much about it. That tower turns out
+to be stuck in a time loop, so in the technical sense, the pixy is still back
+there racing.'
+~
+20 e 0 0 -1
+A
+1 18217
+D 18252
+P
+0 18279 0 1 a
+P
+17 18200 0 7 a
+R
+7 18200 10
+R
+1 -1 100
+T 18277
+W+
+11 0 0 1 a
+Pilfer a racing pixy~
+W+
+2 18252 0 1 a
+Bring the pixy jar to the Tinker~
+Z
+1 18210
+S
+#18253
+Skycleave: Ink and Intrigue~
+   'While you're here, there's a matter I was hoping you could help with,' the
+guildmage says. 'I know you managed to finesse your way into Skycleave's upper
+echelon. I've learned from Agent M that the tower houses a set of scrolls of
+evolving enigmas. Perhaps you've heard of this? The text on the scrolls
+actually changes over time as it absorbs and filters new knowledge. The guild
+has a few of them already, but the scrolls are predictably unpredictable.'
+   The guildmage takes a sip from a small cup of murky, blue liquid.
+   'As you know by now, Skycleave is stuck in some sort of time loop. If you
+manage to steal the scrolls of evolving enigmas, they'll be none the wiser.
+They're stored in the back of the Eruditorium, in one of the drawers. Take this
+skeleton key. When you're done, deliver it to the Tipsy Tortoise. I'm certain
+our umbramancer will appreciate it.'
+~
+   You hand the scrolls of evolving enigmas over to the umbramancer.
+   'Ah, these are exactly perfect,' the shadowy form says. 'Perfectly crafted.
+These are from the Tower Skycleave, then? I've never been able to get inside.
+Shame, really. That place is a treasure trove of lost secrets. I shall be sure
+to put these scrolls to good use.'
+~
+21 e 0 0 -1
+A
+1 18217
+D 18252
+P
+0 18279 0 1 a
+P
+17 18200 0 7 a
+R
+7 18200 10
+R
+1 -1 100
+T 18277
+W+
+11 0 0 1 a
+Steal the scrolls of evolving enigmas~
+Z
+1 18209
+S
+#18254
+Hamlet: Reflecting on the Situation~
+   'I have discovered a vintage mirror in storage and I believe it could be
+fiend-glass,' the guildmage says, offering you the mirror. It's old and worn,
+but at the same time, elegant in a medieval sort of way. Curiously, though the
+glass is in good condition, you cannot see your reflection in it.
+   'The guild had quite a lot of these at one point, and they still turn up
+from time to time. I intend to send it to the master tinker, but first we must
+verify its abilities. That's where you come in. The mirror is out of attunement
+so I would like you to travel to a nearby hamlet that has been overrun by the
+undead. Turn the mirror on the fiends within and see which of them see their
+reflection in it for the last time. If you manage to capture three of them,
+take the mirror to the tinker at the Tipsy Tortoise.'
+   Type 'reflect <person>' to use the mirror on them. It will only work in the
+Hamlet of the Undead.
+~
+   You place the mirror in front of the tinker, who grabs it excitedly.
+   'Oh, a real one? Quite spectacular,' the tinker says without looking up from
+the old mirror. 'Quite spectacular, indeed. Oh, and you've nabbed a necrofiend?
+And what's this, is there a woman in here? She looks like some kind of dark
+wizard. You have outdone yourself this time. Truly, truly.'
+~
+22 e 0 0 -1
+A
+1 18217
+D 18252
+P
+0 18279 0 1 a
+P
+17 18200 0 7 a
+R
+7 18200 10
+R
+1 -1 100
+T 18277
+W+
+11 0 0 1 a
+Capture 3 fiends in the mirror~
+Z
+1 18210
+S
 #18256
-The Grove: Capture a Wildling~
+Grove: Capture a Wildling~
    The Guild of Adventurers needs more information on the Magiterranean. Find a
 portal into The Grove somewhere in the forest, make your way inside, and find a
 wildling. Be warned! The wildlings like to spring out from the forest without
@@ -173,14 +786,14 @@ A
 A
 1 18209
 P
-16 18200 0 6
+16 18200 0 6 -
 R
 7 18200 10
 R
 8 18200 1
 T 18257
 W
-2 18257 0 1
+2 18257 0 1 -
 Z
 1 18217
 Z
@@ -199,19 +812,20 @@ when you've accomplished this. (Type 'speak' when you find the druid.)
 propaganda for further study. You can now perform daily quests in the Monsoon
 Rift for the Guild of Adventurers.
 ~
-10 d 0 0 -1
+13 d 0 0 -1
 A
 1 18217
 A
 1 18209
 P
-16 18200 0 6
+16 18200 0 6 -
 R
 7 18200 10
 R
 8 18200 1
-W
-11 0 0 1
+W+
+11 0 0 1 a
+Close the rift~
 W
 2 18258 0 1 a
 Z
@@ -237,14 +851,14 @@ A
 A
 1 18211
 P
-16 18200 0 6
+16 18200 0 6 -
 R
 7 18200 10
 R
 8 18200 1
 T 18261
 W
-2 18261 0 1
+2 18261 0 1 -
 Z
 1 18219
 Z
@@ -269,7 +883,7 @@ A
 A
 1 18210
 P
-16 18200 0 6
+16 18200 0 6 -
 R
 7 18200 10
 R
@@ -299,13 +913,13 @@ A
 A
 1 18208
 P
-16 18200 0 6
+16 18200 0 6 -
 R
 7 18200 10
 R
 8 18200 1
 W
-13 10110 0 1
+13 10110 0 1 -
 Z
 1 18208
 Z
@@ -329,20 +943,20 @@ A
 A
 1 18208
 P
-16 18200 0 6
+16 18200 0 6 -
 R
 7 18200 10
 R
 8 18200 1
 W
-2 10015 0 1
+2 10015 0 1 -
 Z
 1 18218
 Z
 1 18208
 S
 #18265
-The Grove: A Sample of Wild Fire~
+Grove: A Sample of Wild Fire~
    The Guild is working on a new mana potion, based on a Magiterranean
 substance called 'wild fire'. Unfortunately, we've run out of samples to work
 with. Travel into the Magiterranean's mysterious Grove, and return with some of
@@ -365,14 +979,14 @@ R
 R
 1 -1 50
 W
-2 12654 0 1
+2 12654 0 1 -
 Z
 1 18217
 Z
 1 18209
 S
 #18266
-The Grove: Wild Population~
+Grove: Wild Population~
    The Guild has been dealing with an infestation of wildlings from the
 Magiterranean. It's time for a show of force. You must invade the Grove and put
 an end to the infestation.
@@ -394,13 +1008,13 @@ R
 R
 1 -1 50
 W
-3 12658 0 1
+3 12658 0 1 -
 W
-3 12659 0 1
+3 12659 0 1 -
 W
-3 12660 0 1
+3 12660 0 1 -
 W
-3 12661 0 1
+3 12661 0 1 -
 Z
 1 18211
 Z
@@ -449,7 +1063,7 @@ of what the Guild is paid for this service.
 ~
 The Guild thanks you for closing the rift and helping to protect the locals.
 ~
-5 e 0 0 -1
+6 e 0 0 -1
 A
 1 18217
 A
@@ -463,8 +1077,9 @@ R
 7 18200 10
 R
 1 -1 50
-W
-11 0 0 1
+W+
+11 0 0 1 -
+Close a rift~
 Z
 1 18217
 Z
@@ -495,7 +1110,7 @@ R
 R
 1 -1 50
 W
-2 10553 0 4
+2 10553 0 4 -
 Z
 1 18208
 Z
@@ -511,7 +1126,7 @@ return the siphoned frost power to the guild.
 ~
 You hand over the siphon and the frosty power it contains.
 ~
-13 e 0 0 -1
+14 e 0 0 -1
 A
 1 18210
 A
@@ -526,8 +1141,9 @@ R
 R
 1 -1 50
 T 18261
-W
-11 0 0 1
+W+
+11 0 0 1 -
+Use the siphon on the Cryomancer and Rime Mage~
 Z
 1 18210
 Z
@@ -558,9 +1174,9 @@ R
 R
 1 -1 50
 W
-3 10110 0 1
+3 10110 0 1 -
 W
-3 10111 0 1
+3 10111 0 1 -
 W
 3 10114 0 1 a
 W
@@ -597,7 +1213,7 @@ R
 1 -1 50
 T 18261
 W
-2 18210 0 1
+2 18210 0 1 -
 Z
 3 10110
 S
@@ -625,9 +1241,9 @@ R
 R
 1 -1 50
 W
-3 10011 0 10
+3 10011 0 10 -
 W
-3 10012 0 10
+3 10012 0 10 -
 W
 3 10011 0 5 a
 W
@@ -703,7 +1319,7 @@ R
 R
 1 -1 50
 W
-1 6510 0 5
+1 6510 0 5 -
 Z
 1 10454
 S
@@ -733,12 +1349,12 @@ R
 R
 1 -1 50
 W
-2 1300 0 5
+2 1300 0 5 -
 Z
 1 10452
 S
 #18277
-Speak to Nostrazak About the Guildhall~
+Guild of Adventurers: Speak to Nostrazak~
    Our local guildhall has forged something of a reputation for itself, but
 there has to be more we can do to improve our standing in the Guild of
 Adventurers. Travel back to headquarters at the Tipsy Tortoise Tavern and speak
@@ -759,12 +1375,12 @@ P
 R
 6 18278 1
 W
-13 18207 0 1
+13 18207 0 1 -
 Z
 1 18211
 S
 #18278
-Discuss Support With Your Superintendant~
+Guild of Adventurers: Discuss Support With Your Superintendant~
    Nostrazak pulls out a chair, turns it around, and sits backwards in it to
 talk to you -- a necessity for him, as his draconian tail no longer allows him
 to sit properly in a chair. Nostrazak explains that the Guild relies on its
@@ -784,12 +1400,12 @@ P
 R
 6 18279 1
 W
-12 18219 0 1
+12 18219 0 1 -
 Z
 1 18219
 S
 #18279
-Gather Support For Your Guildhall~
+Guild of Adventurers: Gather Support For Your Guildhall~
    The superintendant reviews Nostrazak's instructions, then retrieves a scroll
 from the desk and reads it carefully. 'Speak to our guildmage and librarian
 about finding these allies of the guild. Surely they will be able to help you.
@@ -820,7 +1436,7 @@ Z
 1 18211
 S
 #18280
-Seek Support From Malfernes~
+Guild of Adventurers: Seek Support From Malfernes~
    The guild has many sorcerer allies, but the strongest is Archsorcerer
 Malfernes. However, Malfernes has been missing for some time -- millions of
 years, in fact. Last time anybody saw Malfernes, he was stuck in a tem-portal
@@ -833,7 +1449,7 @@ If you have trouble getting there, try bringing a tracker.
 ~
 Archsorcerer Malfernes agrees to support you, in exchange for some help.
 ~
-7 0 0 0 -1
+8 0 0 0 -1
 A
 1 18217
 P
@@ -847,13 +1463,14 @@ R
 T 18277
 W
 13 10255 0 1 a
-W
+W+
 11 0 0 1 a
+Signal and speak to Malfernes~
 Z
 1 18280
 S
 #18281
-Fetch the Cursed Chalice of Mill Manor~
+Mill Manor: Fetch the Cursed Chalice of Mill Manor~
    Archsorcerer Malfernes has long coveted powerful artifacts, but he has been
 unable to expand his collection while he's stuck in this time loop, deep in the
 distant past. You could win his support by traveling to Mill Manor, deep in the
@@ -879,15 +1496,15 @@ R
 6 18283 1
 T 18277
 W
-2 18283 0 1
+2 18283 0 1 -
 Z
 1 18280
 S
 #18282
-Imagine Dragons~
+Wandering Dragon: Imagine Dragons~
    Archsorcerer Malfernes confides in you that he has a long-standing rivalry
 with High Sorceress Celiya after an incident involving a mutual former lover, a
-poorly-trained skeletal mammoth, and sixty -thousand barrels of manawine. But
+poorly-trained skeletal mammoth, and sixty-thousand barrels of manawine. But
 being trapped in the Primeval era, Malfernes is unable to continue this war of
 practical jokes. He hands you the Staff of Draconic Imagination and instructs
 you to seek out a flame dragon or a wandering dragon who has abandoned its
@@ -897,7 +1514,7 @@ and 'use staff' again to release the image in the tower.
    Malfernes cackles with glee when you tell him about your escapades at the
 Tower Skycleave.
 ~
-7 0 0 0 -1
+8 0 0 0 -1
 A
 1 18280
 P
@@ -909,13 +1526,14 @@ R
 R
 6 18283 1
 T 18277
-W
-11 0 0 1
+W+
+11 0 0 1 -
+Use a staff to imagine a dragon~
 Z
 1 18280
 S
 #18283
-Support From Malfernes~
+Guild of Adventurers: Support From Malfernes~
    Having secured support from the Archsorcerer Malfernes, you're ready to
 return to your local guildhall and inform your guildmage of your success.
 ~
@@ -932,12 +1550,12 @@ R
 7 18200 10
 T 18278
 W
-12 18217 0 1
+12 18217 0 1 -
 Z
 1 18217
 S
 #18284
-Seek Support From Germione~
+Guild of Adventurers: Seek Support From Germione~
    Even when an adventurer retires, their affiliation with the guild continues.
 You must seek out one such former member, the hedge witch Germione, who lives in a
 hut on stilts in the swamp. Find the hut, pull down the rope ladder, and pay
@@ -947,7 +1565,7 @@ Germione a visit. Perhaps her support will be enough to secure your guildhall.
    The hedge witch, Germione, agrees to support you in exchange for some
 'errands'.
 ~
-9 0 0 0 -1
+10 0 0 0 -1
 A
 1 18218
 P
@@ -960,13 +1578,14 @@ R
 6 18286 1
 W
 13 19002 0 1 a
-W
+W+
 11 0 0 1 a
+Speak to Germione~
 Z
 1 19000
 S
 #18285
-Germione's Ratcatcher~
+Sewers: Germione's Ratcatcher~
    'The secret to training swamp rats is, they can't be trained,' Germione
 says. 'I have to import city rats and then hex them into swamp rats. You just
 can't train the real swamp rats like you can the city rats.'
@@ -979,7 +1598,7 @@ Germione squeals with joy to see you've brought back 10 rats.
 A
 1 19000
 P
-0 18284 0 1
+0 18284 0 1 -
 R
 7 18200 10
 R
@@ -988,12 +1607,12 @@ R
 6 18287 1
 T 18277
 W
-2 18287 0 10
+2 18287 0 10 -
 Z
 1 19000
 S
 #18286
-Vengeance for Measley~
+Lost Temple: Vengeance for Measley~
    Germione leans forward and wipes a tear from her eye with a grotesque
 ratskin handkerchief as she tells you the story of her favorite pet, Measley.
 As a rust-colored rat, Measely was perfect for spying on Germione's enemies
@@ -1012,7 +1631,7 @@ beloved Measley's death.
 A
 1 19000
 P
-0 18284 0 1
+0 18284 0 1 -
 R
 7 18200 10
 R
@@ -1027,7 +1646,7 @@ Z
 1 19000
 S
 #18287
-Support From Germione~
+Guild of Adventurers: Support From Germione~
    Having secured support from the hedge witch Germione, you're ready to return
 to your local guildhall and inform the librarian of your success.
 ~
@@ -1045,25 +1664,23 @@ R
 7 18200 10
 T 18278
 W
-12 18218 0 1
+12 18218 0 1 -
 Z
 1 18218
 S
 #18288
-Seek Support From Scaldorran~
+Guild of Adventurers: Seek Support From Scaldorran~
    The guild has an ally working in a mid-level position in the Tower
 Skycleave. Like many sorcery towers, Skycleave sometimes teleports around from
 place to place. But it always announces its presence, so you may be able to
 find it by asking around. Find the High Lich, Scaldorran, in the Lich Labs and
 see if you can convince him to rally support behind our guildhall.
    You can let Scaldorran know you're from the guild by using his old codeword,
-'eternity'. Just say that to him when you find him. If you get to the Lich Labs
-and he's dead for some reason, just 'use' this spare phylactery to resurrect
-the old fool.
+'Eternity'. Just say that to him when you find him.
 ~
 High Lich Scaldorran seems convinced to let you prove your worth...
 ~
-11 0 0 0 -1
+14 0 0 0 -1
 A
 1 18217
 P
@@ -1072,16 +1689,18 @@ R
 6 18289 1
 R
 6 18290 1
-T 18277
 W
 13 10055 0 1 a
-W
+W+
 11 0 0 1 a
+Speak to Scaldorran~
 Z
-1 10048
+1 11836
+Z
+1 11936
 S
 #18289
-Procure a Roc Egg~
+Gigantic Nest: Procure a Roc Egg~
    Scaldorran has a deep, eternal hunger that can never be sated by earthly
 foods -- such is the fate of all liches. But the abominable Yetsy has recently
 shared a recipe for 1000 Year Eggs, and Scaldorran only needs a good Roc egg to
@@ -1094,11 +1713,13 @@ Hints:
    Scaldorran slips the roc egg into his ethereal cloak as strands of ectoplasm
 drip from his gaping maw.
 ~
-7 d 0 0 -1
+10 d 0 0 -1
 A
-1 10048
+1 11836
+A
+1 11936
 P
-0 18288 0 1
+0 18288 0 1 -
 R
 7 18200 10
 R
@@ -1107,25 +1728,29 @@ R
 6 18291 1
 T 18277
 W
-2 18291 0 1
+2 18291 0 1 -
 Z
-1 10048
+1 11836
+Z
+1 11936
 S
 #18290
-Bugging Knezz~
+Skycleave: Bugging the Grand High Sorcerer~
    Scaldorran pulls you aside and casts a Cone of Silence around you. 'Between
-you and me,' he says, 'the Guild doesn't trust Grand High Sorcerer Knezz. I
-need you to take this enchanted bug up to his office, and plant it while he
-isn't looking. And be quick about it.'
+you and me,' he says, 'the Guild doesn't trust the Grand High Sorcerer. I need
+you to take this enchanted bug up to the office, and plant it while nobody is
+looking. And be quick about it.'
 ~
-   Scaldorran taps the tips of his fingerbones together and mutters
+   Scaldorran ends the tips of his bandages together and mutters
 'eeeeexcellent' to himself.
 ~
-7 0 0 0 -1
+11 0 0 0 -1
 A
-1 10048
+1 11836
+A
+1 11936
 P
-0 18288 0 1
+0 18288 0 1 -
 R
 7 18200 10
 R
@@ -1133,21 +1758,26 @@ R
 R
 6 18291 1
 T 18277
-W
-11 0 0 1
+W+
+11 0 0 1 -
+Bug the Grand High Sorcerer~
 Z
-1 10048
+1 11836
+Z
+1 11936
 S
 #18291
-Support From Scaldorran~
+Guild of Adventurers: Support From Scaldorran~
    Having secured support from the High Lich Scaldorran, you're ready to return
 to your local guildhall and inform your guildmage of your success.
 ~
 The guildhall appreciates your support.
 ~
-9 0 0 0 -1
+10 0 0 0 -1
 A
-1 10048
+1 11836
+A
+1 11936
 P
 0 18289 0 1 a
 P
@@ -1158,12 +1788,12 @@ R
 6 18280 1
 T 18278
 W
-12 18217 0 1
+12 18217 0 1 -
 Z
 1 18217
 S
 #18292
-Seek Support From Adventurer 13~
+Guild of Adventurers: Seek Support From Adventurer 13~
    The guild has eyes everywhere, from the courts of emperors, to the bottom of
 the canyon. One such pair of eyes belong to a man known only as Adventurer 13.
 His true identity is known only to Nostrazak and the other guild leaders, but
@@ -1173,7 +1803,7 @@ you must say this answer aloud: River.
 ~
 Adventurer 13 seems convinced you are who you say.
 ~
-11 0 0 0 -1
+12 0 0 0 -1
 A
 1 18218
 P
@@ -1184,13 +1814,14 @@ R
 6 18294 1
 W
 13 11105 0 1 a
-W
+W+
 11 0 0 1 a
+Speak to Adventurer 13~
 Z
 1 11101
 S
 #18293
-Fruit of the Serene Canyon~
+Burrow Canyons: Fruit of the Serene Canyon~
    Adventurer 13 has grown quite hungry living as a hermit in Burrow Canyons.
 But no ordinary food will sate this hunger. You must travel to the serene
 canyon hidden beyond the waterfall. Doing so will not be easy. Be prepared to
@@ -1204,7 +1835,7 @@ Adventurer 13 eagerly takes the serene food you offer him.
 A
 1 11101
 P
-0 18292 0 1
+0 18292 0 1 -
 R
 7 18200 10
 R
@@ -1223,7 +1854,7 @@ Z
 1 11101
 S
 #18294
-Message for the Goblins~
+Goblin Challenge: Message for the Goblins~
    After a long, strange story, you learn that Adventurer 13 has a
 long-standing grudge against Furl, war shaman of the goblins. It seems Furl has
 discovered the secret to immortality, allowing him to resurrect after every
@@ -1238,7 +1869,7 @@ message to Furl.
 A
 1 11101
 P
-0 18292 0 1
+0 18292 0 1 -
 R
 7 18200 10
 R
@@ -1246,12 +1877,12 @@ R
 R
 6 18295 1
 W
-3 10205 0 1
+3 10205 0 1 -
 Z
 1 11101
 S
 #18295
-Support From Adventurer 13~
+Guild of Adventurers: Support From Adventurer 13~
    Having secured support from Adventurer 13, you are ready to return to your
 local guildhall and inform the librarian of your success.
 ~
@@ -1271,7 +1902,7 @@ R
 6 18284 1
 T 18278
 W
-12 18218 0 1
+12 18218 0 1 -
 Z
 1 18218
 S

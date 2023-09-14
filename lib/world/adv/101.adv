@@ -1,0 +1,23 @@
+#10105
+Ruins: Three Bandits~
+Paul Clarke~
+   It looks like someone has been camping out in these ruins. You've found the
+hideout of infamous bandits Berk, Jorr, and Tranc! These three are not renowned
+for fighting fair, but if you're lucky, maybe only one of them is home.
+~
+10105 10109 100-200
+20 0 ck 0
+L
+0 ac
+5007 -1 -1 -1
+14 0 0
+L
+5 0
+2880 -1 -1 -1
+-1 0 0
+L
+6 0
+50 -1 -1 -1
+-1 0 0
+S
+$

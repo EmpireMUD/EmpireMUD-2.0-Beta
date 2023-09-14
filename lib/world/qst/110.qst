@@ -1,5 +1,5 @@
 #11000
-Hatch the Egg~
+Gigantic Nest: Hatch the Egg~
    This giant egg needs help with the final stage of its incubation, and the
 mother is nowhere to be seen. A special salve made from zephyr cattails would
 do the trick. Follow these instructions to complete the quest:
@@ -33,12 +33,12 @@ R
 T 11008
 T 11006
 W
-2 11016 0 4
+2 11016 0 4 -
 Z
 2 11001
 S
 #11001
-Protect the Hatchling~
+Gigantic Nest: Protect the Hatchling~
    The gigantic egg is about to hatch, but the chick inside will need some
 supplies if it's going to survive. You receive a supply list for the nest.
 Return when you've made them all.
@@ -76,7 +76,7 @@ Z
 2 11001
 S
 #11002
-Steal the Egg~
+Gigantic Nest: Steal the Egg~
    An egg like this is worth a fortune on the black market, and you know just
 who to sell it to. When you start this quest, you will automatically grab the
 egg and flee the nest. The egg's mother will surely be right on your tail, so
@@ -85,7 +85,7 @@ you're caught, or are in combat when the timer ends, you will fail the quest.
 ~
 You trade the egg for your rewards, relieved that you escaped safely.
 ~
-10 bce 100 125 -1
+11 bce 100 125 -1
 A
 2 11001
 P
@@ -103,13 +103,14 @@ R
 R
 2 11052 1
 T 11018
-W
-11 0 0 1
+W+
+11 0 0 1 -
+Escape the roc until the buyer arrives~
 Z
 1 11003
 S
 #11003
-Smash the Egg~
+Gigantic Nest: Smash the Egg~
    These fearsome rocs have been killing farm animals in this region. You can
 put a stop to it now! You smash the egg, preventing future generations of the
 legendary bird from terrorizing the countryside. Now you merely need to contend
@@ -134,7 +135,7 @@ R
 2 11052 1
 T 11003
 W
-3 11000 0 1
+3 11000 0 1 -
 Z
 1 11001
 S

@@ -716,29 +716,41 @@ S
 bracelet dracosaur bone~
 a dracosaur bone bracelet~
 There is a dracosaur bone bracelet on the ground.~
-This bracelet is made from small dracosaur bones.
+   This bracelet is made from small dracosaur bones. It has a strange, almost
+primordial glow.
 ~
-2 mp aj 0 1
-0 0 0
+27 mp aj 0 2
+1 0 0
 14 0
 A
-17 1 0
+1 1 0
 A
-21 1 0
+17 4 0
+A
+21 4 0
+C
+0 200
+T 10272
 S
 #10256
 wristband dracosaur scale~
 a dracosaur scale wristband~
 A dracosaur scale wristband is lying on the ground.~
-The wristband is made from braided dracosaur leather.
+   The wristband is made from braided dracosaur leather inlaid with obsidian
+and bound together by nocturnium.
 ~
-2 mp aj 0 1
+27 mp aj 0 6
 0 0 0
-7 0
+8 0
 A
-16 1 0
+8 1 0
 A
-22 1 0
+22 4 0
+A
+17 4 0
+C
+0 200
+T 10272
 S
 #10257
 spawner miniboss dracosaur~
@@ -757,13 +769,18 @@ an obsidian bracelet~
 Someone has left an obsidian bracelet here.~
 The bracelet is made from black volcanic glass, and radiates with energy.
 ~
-2 mp aj 0 1
+27 mp aj 0 4
 0 0 0
 8 0
 A
-23 1 0
+8 1 0
 A
-7 1 0
+23 4 0
+A
+7 4 0
+C
+0 200
+T 10272
 S
 #10259
 satchel primitive~
@@ -805,9 +822,9 @@ a lit branch~
 A lit branch is burning on the ground.~
 The burning branch spits and sparks as pockets of sap catch fire.
 ~
-3 c ao 0 1
-0 0 0
-0 48
+29 0 ao 0 2
+48 1 5
+0 0
 S
 #10263
 whistle bone small dracosaur~
@@ -849,6 +866,33 @@ R
 R
 4 5621 0
 S
+#10266
+edge extinction~
+the edge of extinction~
+The edge of extinction is lying here.~
+   This exquisite dagger is carved from the bone of a long-dead beast and
+inlaid with primordial obsidian glass. Despite all this, it looks freshly
+forged and it's made in a fairly modern style.
+~
+1 imp an f 6
+0 1 4
+14 0
+A
+24 -1 0
+A
+1 1 0
+A
+9 1 0
+A
+21 7 0
+A
+5 1 6
+A
+5 1 3
+C
+0 200
+T 10272
+S
 #10267
 tooth dracosaur serrated~
 a serrated dracosaur tooth~
@@ -875,26 +919,37 @@ A primordial bone axe is sticking up from the ground.~
 something huge, and ancient. The handle is wrapped in a hardened, scaly
 leather. It looks like you'd need to use both hands to wield it.
 ~
-1 ehmno an a 2
-0 3 2
+1 ehmnp an a 5
+0 5 2
 14 0
 A
 1 1 0
 A
-17 1 0
+17 3 0
+A
+5 1 6
+A
+5 1 3
 C
-0 125
+0 200
+T 10272
 S
 #10269
-pattern axe primordial~
-the primordial axe pattern~
-The pattern for a primordial axe is lying here.~
-This pattern allows you to craft the primordial axe, a powerful weapon from
-the dawn of time.
+book primordial weapon schematics~
+a book of primordial weapon schematics~
+A book of primordial weapon schematics is lying here.~
+   This set of schematics will show you how to make five powerful weapons using
+rare resources from the dawn of time. Type 'learn schematics' to learn:
+  primordial axe  (2-Handed Melee, Slicing, Forge, Deadly Weapons)
+  edge of extinction  (1-Handed Melee, Stabbing, Forge, Deadly Weapons)
+  dracosaur bone spear  (Tank/Solo/PVP, Jabbing, Forge, Deadly Weapons)
+  jeweled bone staff  (Healer, Craft, Powerful Staves)
+  Tome of the Primordium  (Caster, Wield/Hold, Mana Blast, Craft, Powerful Staves)
 ~
-7 0 a 0 3
-10268 0 0
+3 0 a 0 7
+0 0 0
 0 0
+T 10275
 S
 #10270
 spear bone dracosaur~
@@ -902,21 +957,32 @@ the dracosaur bone spear~
 A dracosaur bone spear is lying here.~
 This huge spear looks like it was made from the massive legbone of a dracosaur!
 ~
-1 emo an b 5
+1 emp an b 7
 0 1 3
 14 0
 A
-13 1 0
+2 1 0
 A
-18 1 0
+18 3 0
+A
+13 3 0
+A
+12 1 0
+A
+24 1 0
+A
+5 1 6
+A
+5 1 3
 C
-0 125
+0 200
 M
 15
 You jab your spear into the water and when you extract it you find $p on the end!~
 M
 16
 $n jabs $s spear into the water and when $e draws it out, it has $p on the end!~
+T 10272
 S
 #10271
 pattern spear dracosaur bone~
@@ -937,26 +1003,44 @@ A jeweled bone staff has been discarded here.~
 Violet gems encircle its crown, and a thick, scaly hide is wrapped around the
 shaft.
 ~
-1 ehmo an p 2
+1 ehmp an p 4
 0 1 18
 14 0
 A
 9 1 0
 A
-8 2 0
+8 1 0
+A
+16 1 0
+A
+7 2 0
+A
+23 3 0
+A
+5 1 6
+A
+5 1 3
 C
-0 125
+0 200
+T 10272
 S
 #10273
-pattern staff bone jeweled~
-the jeweled bone staff pattern~
-The pattern for a jeweled bone staff is lying here.~
-This pattern allows you to craft the jeweled bone staff, a great magical weapon
-from the prehistoric era.
+book dracosaur armor schematics~
+a book of dracosaur armor schematics~
+A book of dracosaur armor schematics is lying here.~
+   This set of schematics will teach you how to make five incredibly tough
+armor sets using rare resources from beyond the Primeval Portal. Type 'learn
+schematics' to learn:
+  dracosaur scale robe  (Healer, Sew, Magical Vestments)
+  dracoscale armor  (Tank, Forge, Imperial Armors)
+  dracosaur hide armor  (Melee, Sew, Dangerous Leathers)
+  dracosaur tooth robe  (Caster, Sew, Magical Vestments)
+  dracosaur fang armor  (PVP/Solo, Forge, Imperial Armors)
 ~
-7 0 a 0 3
-10272 0 0
+3 0 a 0 5
+0 0 0
 0 0
+T 10275
 S
 #10274
 robe dracosaur scale~
@@ -965,57 +1049,86 @@ A dracosaur scale robe is crumpled in a heap.~
    This robe appears to be made from the hide of dracosaurs -- primitive
 dragons from the primeval age. The craftsmanship, however, is very modern.
 ~
-27 emo aq 0 1
+27 emp aq 0 3
 0 0 0
 7 0
 A
-12 -1 0
+16 2 0
+A
+8 1 0
+A
+9 1 0
+A
+7 2 0
 A
 23 3 0
 A
-16 1 0
+5 1 6
+A
+5 1 3
 C
-0 125
+0 200
+T 10272
 S
 #10275
-pattern robe dracosaur scale~
-the dracosaur scale robe pattern~
-The pattern for a dracosaur scale robe is lying here.~
-This pattern allows you to sew the dracosaur scale robe, a powerful healing
-robe from the Primeval period.
+book primordial footwear designs~
+a book of primordial footwear designs~
+A book of primordial footwear designs is lying here.~
+   These designs will teach you to make five amazing sets of footwear using
+rare resources from the Primeval era. Type 'learn designs' to learn:
+  dracosaur scale sandals  (Healer, Sew, Magical Vestments)
+  primordial boots  (Tank, Forge, Imperial Armors)
+  dracosaur fang shoes  (Melee, Sew, Dangerous Leathers)
+  dracosaur tooth boots  (Caster, Sew, Magical Vestments)
+  dracosaur scale boots  (PVP/Solo, Forge, Imperial Armors)
 ~
-7 0 a 0 3
+7 0 a 0 5
 10274 0 0
 0 0
+T 10275
 S
 #10276
 boots dracosaur scale pair~
 dracosaur scale boots~
 A pair of dracosaur scale boots is lying here.~
-The boots look to be made from hardened dracosaur scales, and edged in imperium.
+The boots look to be made from hardened dracosaur scales and edged in imperium.
 ~
-27 emo ag 0 1
+27 emp ag 0 3
 2 0 0
 7 0
 A
-17 1 0
-A
 2 1 0
 A
-18 1 0
+18 2 0
+A
+17 3 0
+A
+12 1 0
+A
+24 1 0
+A
+15 1 0
 C
-0 125
+0 200
+T 10272
 S
 #10277
-pattern boots dracosaur scale~
-the dracosaur scale boots pattern~
-The pattern for some dracosaur scale boots is lying here.~
-This pattern allows you to forge the dracosaur scale boots, medium armor well-
-suited to mucking through pre-history.
+book dracosaur wristwear designs~
+a book of dracosaur wristwear designs~
+A book of dracosaur wristwear designs is lying here.~
+   These designs will show you how to make five stunning articles of wristwear
+inspired by the dracosaurs beyond the Primeval Portal. Type 'learn designs' to
+learn:
+  obsidian bracelet  (Healer, Craft, Magical Vestments)
+  dracoscale vambraces  (Tank, Forge, Imperial Armors)
+  dracosaur bone bracelet  (Melee, Sew, Dangerous Leathers)
+  dracosaur scale wristband  (Caster, Sew, Magical Vestments)
+  stunning dracosaur wristguard  (PVP/Solo, Forge, Imperial Armors)
 ~
-7 0 a 0 3
-10276 0 0
+3 0 a 0 5
+0 0 0
 0 0
+T 10275
 S
 #10278
 boots primordial pair~
@@ -1023,19 +1136,26 @@ a pair of primordial boots~
 A pair of primordial boots is lying here.~
 The boots are made from shaped dracosaur bone, laced with imperium.
 ~
-27 emo ag 0 1
+27 emp ag 0 3
 3 0 0
 14 0
 A
-9 -2 0
+21 -1 0
+A
+17 -1 0
 A
 2 1 0
 A
 15 2 0
 A
-1 -1 0
+18 2 0
+A
+12 2 0
+A
+24 2 0
 C
-0 125
+0 200
+T 10272
 S
 #10279
 pattern boots primordial~
@@ -1049,32 +1169,47 @@ boots in all of history.
 0 0
 S
 #10280
-gauntlets pair dracosaur scale~
-a pair of dracosaur scale gauntlets~
-A pair of dracosaur scale gauntlets is lying in the dust.~
-   These fine gauntlets are made from hardened dracosaur scales, and look like
-they pack quite the punch.
+wristguard dracosaur stunning~
+a stunning dracosaur wristguard~
+A stunning dracosaur wristguard has been left behind.~
+   This odd little shield is meant to attach to the wrist and forearm to
+deflect blows without hindering your movement or occupying one of your hands.
+More interesting, though, is that it is crafted from the hide and bones of a
+dracosaur -- a vicious, ancient dragon from beyond the Primeval portal.
 ~
-27 mo ah 0 1
-1 0 0
+27 mp aj 0 4
+2 0 0
 7 0
 A
-17 2 0
+1 1 0
 A
-21 1 0
+17 4 0
+A
+21 4 0
+A
+2 1 0
+A
+17 4 0
+A
+18 4 0
 C
-0 125
+0 200
+T 10272
 S
 #10281
-pattern gauntlets dracosaur scale~
-the dracosaur scale gauntlets pattern~
-The pattern for the dracosaur scale gauntlets is lying here.~
-This pattern allows you to sew the dracosaur scale gauntlets, dangerous leather
-gloves from beyond the Primeval portal.
+book dracosaur belt patterns~
+a book of dracosaur belt patterns~
+A book of dracosaur belt patterns is lying here.~
+   These patterns will teach you how to make three powerful belts using rare
+dracosaur parts from the dawn of time. Type 'learn patterns' to learn:
+  dracosaur fang belt  (Melee or Caster DPS, Sew, Dangerous Leathers)
+  obsidian dracosaur waistband  (Caster or Healer, Sew, Magical Vestments)
+  mighty dracoscale belt  (Tank or PVP/Solo, Forge, Imperial Armors)
 ~
-7 0 a 0 3
-10280 0 0
+3 0 a 0 6
+0 0 0
 0 0
+T 10275
 S
 #10282
 tome primordial primordium~
@@ -1083,17 +1218,24 @@ Someone has left a primordial tome here.~
    The tome is a heavy book, bound in a thick, scaly leather. A violet gem is
 set into its cover, and the whole thing reeks of ancient mana.
 ~
-3 emo ao 0 1
-0 0 0
+1 mp ano 0 4
+0 1 28
 7 0
 A
 12 -1 0
 A
-22 2 0
+8 1 0
 A
-17 1 0
+9 1 0
+A
+22 7 0
+A
+5 1 6
+A
+5 1 3
 C
-0 125
+0 200
+T 10272
 S
 #10283
 schematic tome primordium primordial~
@@ -1125,13 +1267,13 @@ C
 0 125
 S
 #10285
-pattern bone crown primeval~
-the bone crown pattern~
-The pattern for the bone crown of the primeval is lying here.~
-This pattern allows you to craft the bone crown of the primeval, an ancient
+design bone crown primeval~
+a design for the bone crown of the primeval~
+The design for the bone crown of the primeval is lying here.~
+   This pattern allows you to craft the bone crown of the primeval, an ancient
 symbol of kings from a less civilized age.
 ~
-7 0 a 0 3
+7 0 a 0 5
 10284 0 0
 0 0
 S
@@ -1145,5 +1287,331 @@ This whistle can be used just once, to summon a terrosaur mount.
 10286 0 0
 14 0
 T 9910
+S
+#10287
+armor dracoscale scale suit~
+dracoscale armor~
+A suit of dracoscale armor is piled here.~
+   The armor has been made from rugged dracosaur scales -- the armor of dragons
+from the dawn of time. A skilled (and modern) craftsman has hammered an
+imperium mesh to the outside of the scales, making the wearer nigh-impervious
+to harm.
+~
+27 emp aq 0 6
+3 0 0
+7 0
+A
+15 2 0
+A
+2 1 0
+A
+18 2 0
+A
+13 2 0
+A
+12 2 0
+A
+24 2 0
+A
+5 1 6
+A
+5 1 3
+C
+0 200
+T 10272
+S
+#10288
+armor dracosaur hide suit~
+dracosaur hide armor~
+A suit of dracosaur hide armor is draped here.~
+   The scaly hide of a primitive dracosaur has been masterfully worked to make
+it more pliable without sacrificing its dragon-like strength.
+~
+27 emp aq 0 6
+1 0 0
+7 0
+A
+6 1 0
+A
+1 1 0
+A
+2 1 0
+A
+17 2 0
+A
+21 4 0
+A
+5 1 6
+A
+5 1 3
+C
+0 200
+T 10272
+S
+#10289
+robe teeth tooth dracosaur~
+a dracosaur tooth robe~
+A robe made from dracosaur teeth is lying here.~
+   The robe is made from dracosaur teeth from neck to toe. These large,
+serrated, fearsome teeth come from ancient dragons, lost at the dawn of time
+and recently re-discovered by enterprising chronomancers. The robe has been
+worked by a modern artisan who has carefully arranged the teeth and cloth to
+prevent injuries to the wearer. The same cannot be said for anyone in front of
+them.
+~
+27 emp aq 0 4
+0 0 0
+7 0
+A
+11 1 0
+A
+8 1 0
+A
+9 1 0
+A
+17 2 0
+A
+22 4 0
+A
+5 1 6
+A
+5 1 3
+C
+0 200
+T 10272
+S
+#10290
+armor suit dracosaur fang~
+dracosaur fang armor~
+A suit of dracosaur fang armor is lying here.~
+   This ferocious armor is made from the scaly hide and serrated fangs of
+dracosaurs -- primitive dragons from the dawn of time. A modern master has
+worked the dracosaur into the sort of strong, nimble armor that a versatile
+fighter needs.
+~
+27 emp aq 0 8
+2 0 0
+7 0
+A
+15 2 0
+A
+2 1 0
+A
+17 2 0
+A
+18 2 0
+A
+12 1 0
+A
+24 1 0
+A
+5 1 6
+A
+5 1 3
+C
+0 200
+T 10272
+S
+#10291
+sandals dracosaur scale~
+dracosaur scale sandals~
+A pair of dracosaur scale sandals have stopped here.~
+   These sandals are made from dracosaur hide and scales. The materials may
+have come from the dawn of time, but the fine workmanship is modern.
+~
+27 mp ag 0 4
+0 0 0
+7 0
+A
+22 -1 0
+A
+17 -1 0
+A
+8 1 0
+A
+9 1 0
+A
+16 1 0
+A
+7 2 0
+A
+23 4 0
+C
+0 200
+T 10272
+S
+#10292
+boots dracosaur tooth pair~
+dracosaur tooth boots~
+A pair of dracosaur tooth boots is lying here.~
+   The knee-high boots are made from scaly leather and draped with the huge
+serrated teeth of a dracosaur -- a primitive dragon from the dawn of time. The
+workmanship, however, suggests they were made by a person.
+~
+27 mp ag 0 5
+0 0 0
+7 0
+A
+23 -1 0
+A
+18 -1 0
+A
+8 1 0
+A
+9 1 0
+A
+16 1 0
+A
+7 1 0
+A
+22 5 0
+C
+0 200
+T 10272
+S
+#10293
+shoes dracosaur fang pair~
+dracosaur fang shoes~
+A pair of dracosaur fang shoes are lying here.~
+   These shoes are made from the tough, scaly leather of a dracosaur and
+studded with the serrated points of its teeth. The shoes are quick and quiet
+for the bearer, and very painful for whoever might be on the receiving end of
+their kick.
+~
+27 mp ag 0 6
+1 0 0
+14 0
+A
+18 -1 0
+A
+12 -1 0
+A
+1 1 0
+A
+9 1 0
+A
+11 1 0
+A
+6 1 0
+A
+21 5 0
+C
+0 200
+T 10272
+S
+#10294
+vambraces dracoscale scale pair~
+dracoscale vambraces~
+A pair of dracoscale vambraces has been left here.~
+   These mighty vambraces, which fully cover your wrists and lower arms, appear
+to be made from tough dracosaur scales by a very, very skilled blacksmith.
+~
+27 mp aj 0 4
+3 0 0
+7 0
+A
+2 1 0
+A
+18 4 0
+A
+13 4 0
+C
+0 200
+T 10272
+S
+#10295
+whistle teeny terrosaur minipet~
+a teeny terrosaur minipet whistle~
+A teeny terrosaur minipet whistle is lying here.~
+Type 'use whistle' to gain a teeny terrosaur minipet.
+~
+19 p a 0 8
+10295 0 0
+2 0
+S
+#10296
+Primeval Portal loot replacer~
+the Primeval Portal loot replacer~
+The Primeval Portal loot replacer is here.~
+This item is automatically replaced with loot when it loads on a mob.
+~
+3 p a 0 1
+0 0 0
+0 0
+T 10296
+S
+#10297
+belt fang dracosaur~
+a dracosaur fang belt~
+A dracosaur fang belt is lying here.~
+   This belt is made from the scaly hide and serrated teeth of a dracosaur -- a
+primitive dragon from the depths of the Primeval. The fine workmanship ensures
+that the sharp bits never pierce your stomach or thighs, but it would be
+dangerous to do anything intimate in this.
+~
+2 mp al 0 6
+0 0 0
+14 0
+A
+2 1 0
+A
+9 2 0
+A
+17 4 0
+A
+11 1 0
+A
+4 1 0
+C
+0 200
+T 10272
+S
+#10298
+waistband band obsidian dracosaur~
+an obsidian dracosaur waistband~
+An obsidian dracosaur waistband is lying on the ground.~
+   This scaly leather waistband is studded with countless shards of obsidian
+that have been arranged to display a dozen constellations. Strangely, though,
+some of the constellations have the wrong number of stars, as if they were
+recorded some time in the distant past, when the stars themselves were
+different.
+~
+2 mp al 0 7
+0 0 0
+14 0
+A
+9 1 0
+A
+8 2 0
+A
+16 2 0
+A
+7 4 0
+C
+0 200
+T 10272
+S
+#10299
+belt dracoscale mighty scale~
+a mighty dracoscale belt~
+A mighty dracoscale belt is lying here.~
+   The belt is made from dracosaur leather and scales, carefully plated to make
+it impossible to deliver a powerful blow to the wearer's midsection. It also
+seems to provide good back support, preventing that prehistoric "hunched" look.
+~
+2 mp al 0 9
+0 0 0
+7 0
+A
+2 2 0
+A
+18 3 0
+A
+13 3 0
+A
+15 1 0
+C
+0 200
+T 10272
 S
 $

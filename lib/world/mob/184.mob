@@ -3,7 +3,7 @@ beaver dire~
 a dire beaver~
 A dire beaver is building a huge dam here.
 ~
-25 75 djy cm 3
+25 75 djy cL 3
 0 0 0 9
 D
    Beavers are large, furry, semi-aquatic rodents, best known for chewing
@@ -23,6 +23,9 @@ The water is rising here.
 ~
 0 0 dh dklmn 0
 0 0 0 15
+D
+Only immortals should see this. This is the terraformer and beaver spawner.
+~
 T 18450
 T 18451
 S
@@ -46,6 +49,10 @@ A small snowy owl is drifting overhead.
 ~
 1 1 bdoD mn 1
 0 0 0 9
+D
+   Though snowy owls are large birds with vicious talons and razor beaks, this
+one seems docile -- almost friendly.
+~
 M
 0
 $n picks up a small scroll, flies away, and then returns again.~
@@ -74,6 +81,10 @@ A beastly fido is mucking through the garbage looking for food here.
 ~
 1 1 bdoD n 2
 1 0 0 9
+D
+   The fido is a small dog that has a foul smell and pieces of rotted meat
+hanging around his teeth.
+~
 M
 0
 $n smells awful.~
@@ -96,6 +107,10 @@ A tiny, brainless scarecrow is dancing and singing around your feet.
 ~
 1 1 bdoD mn 2
 1 0 0 9
+D
+   The clumsy little scarecrow sings, hums, and dances as he marches along
+behind you.
+~
 M
 1
 We're off to see the wizard!~
@@ -118,6 +133,9 @@ A cheerful little bird is sitting here singing.
 ~
 1 1 bdoD mn 1
 0 0 2 26
+D
+This little yellow bird just keeps singing away.
+~
 T 9901
 T 9902
 S
@@ -128,6 +146,11 @@ A ball of vorpal yarn in the shape of a sheep is frolicking here.
 ~
 1 1 bdoD n 1
 0 0 14 9
+D
+   The ball of yarn twists and roils in the air, sometimes lashing out with a
+razor-sharp strand, but never hitting anything. Suddenly, it takes the shape of
+a sheep and begins prancing around.
+~
 T 9901
 T 9902
 S
@@ -138,6 +161,9 @@ A hobbit stands nearby, looking timidly around.
 ~
 1 1 bdoD n 2
 1 0 0 15
+D
+This tiny man seems to have lost his shoes.
+~
 T 18490
 T 9901
 T 9902
@@ -149,6 +175,10 @@ A pint-sized werewolf is running in circles.
 ~
 1 1 bdoD n 2
 0 0 28 9
+D
+   The werewolf lets out a tiny a-wooo as it dashes around and paws at the
+ground.
+~
 M
 0
 $n throws its head back and gives a tiny howl!~
@@ -177,6 +207,9 @@ Blue Guest (out on his feet) is here.
 ~
 1 1 bdoD n 3
 1 0 0 9
+D
+You don't see anything special about him.
+~
 T 9901
 T 9902
 S
@@ -187,6 +220,9 @@ A huge radroach probes the ground with its antennae.
 ~
 1 1 bdoD n 2
 0 0 0 9
+D
+It looks like a giant cockroach! It's almost as big as a dog!
+~
 T 9901
 T 9902
 S
@@ -197,6 +233,9 @@ A teacup poodle sits happily in its owner's handbag.
 ~
 1 1 bdoD dn 1
 0 0 0 9
+D
+It's an adorable tiny dog with tightly curled hair.
+~
 M
 0
 $n yips.~
@@ -216,6 +255,9 @@ A cloud of dysentery hangs in the air.
 ~
 1 1 bdoD mn 0
 0 0 0 9
+D
+That can't be healthy.
+~
 M
 0
 You cough.~
@@ -228,13 +270,31 @@ You feel like you might be running a fever.~
 T 9901
 T 9902
 S
+#18473
+steed spirit~
+a spirit steed~
+A spirit steed gallops along.
+~
+1 1 bdoD n 3
+0 0 12 9
+D
+   The spirit steed looks like a small horse, though it has long, curved horns
+perhaps like a goat. It's gray hair is capped by a shaggy white mane, the white
+tufts above its hooves, and a long, white tail. Though it's called a spirit
+steed, it's quite solid.
+~
+T 18470
+S
 #18482
 keeper peacekeeper~
 the Peacekeeper~
 A Peacekeeper is standing here, ready to jump in at the first sign of trouble.
 ~
-0 0 bdv nD 3
+0 0 bdvI nD 3
 1 0 0 1
+D
+He looks very strong and wise.  Looks like he doesn't answer to ANYONE.
+~
 M
 0
 $n spits in your face.~
@@ -250,6 +310,9 @@ An oozing green gelatinous blob is here, sucking in bits of debris.
 ~
 0 0 bd nD 2
 0 0 32 9
+D
+A horrid looking thing; it is huge, greenish, and looks like the blob.
+~
 M
 0
 $n ripples in the wind.~
@@ -269,8 +332,11 @@ janitor~
 the janitor~
 A janitor is walking around, cleaning up.
 ~
-0 0 bdv nD 3
+0 0 bdvI nD 3
 1 0 0 1
+D
+What a tough job he has.
+~
 M
 0
 $n sweeps up some litter from the corner.~
@@ -292,6 +358,9 @@ A raggedy scarecrow is draped on an old wooden frame.
 ~
 0 0 bd nD 3
 1 0 0 1
+D
+This poor brainless thing is, nevertheless, out standing in his field.
+~
 M
 0
 The cold wind blows as it snows popcorn from the dried out stalks.~
@@ -321,6 +390,10 @@ A woolly cow stares at you sheepishly.
 ~
 10 20 dfjoy 0 3
 0 0 0 11
+D
+   You're not sure what to make of this thing, but presumably it pairs well
+with potatoes.
+~
 I 0 3012 100.00 1  # BUTCHER: fillet of raw meat
 I 0 3012 100.00 1  # BUTCHER: fillet of raw meat
 I 0 3012 100.00 1  # BUTCHER: fillet of raw meat
@@ -347,6 +420,9 @@ Something is standing here, and you're pretty sure it's not a horse.
 ~
 100 125 bdej 0 4
 0 0 14 11
+D
+It would be hard to explain exactly what this is, so you resolve never to try.
+~
 I 3 18488 100.00 1  # BARDE: armored whatsit
 S
 #18488
@@ -356,14 +432,21 @@ An armored whatsit is here. It's definitely not a horse.
 ~
 150 175 bdejy 0 4
 0 0 14 11
+D
+   You would hate to be the person who has to write the encyclopedia entry for
+this whatsit, because you have no idea how to describe it.
+~
 S
 #18489
 #n ravenous vampire~
 #n~
 A ravenous vampire is standing here.
 ~
-0 0 bdvw nD 3
+0 0 bdvwI nD 3
 0 0 0 9
+D
+You feel entranced by the vampire's eyes.
+~
 T 18489
 S
 #18490
@@ -371,8 +454,12 @@ crowd shoppers~
 the crowd of shoppers~
 A crowd of busy shoppers moves back and forth, oblivious to your presence.
 ~
-0 0 bdv nD 4
+0 0 bdvI nD 4
 0 0 0 1
+D
+   It's hard to even move as the throng of shoppers struggle toward something
+called a Black Friday Sale.
+~
 M
 0
 A shopper says, 'Whoa, nice cosplay!'~
@@ -421,8 +508,12 @@ man crazy~
 the crazy man~
 A crazy man with wild, white hair stands here in a matching jacket.
 ~
-0 0 bdv nD 3
+0 0 bdvI nD 3
 1 0 0 1
+D
+   He's a tall, thin man with a strained expression on his face as he tries to
+figure out where -- or when -- he's arrived.
+~
 M
 1
 Great Scott!~
@@ -444,8 +535,12 @@ doctor strange mad man~
 the strange doctor~
 A mad man is standing next to his box.
 ~
-0 0 bdv nD 3
+0 0 bdvI nD 3
 1 0 0 1
+D
+   He doesn't really look familiar, but you have the strangest feeling that
+you've seen him before.
+~
 M
 1
 The universe is big. It's vast and complicated and ridiculous. And sometimes, very rarely, impossible things just happen.~
@@ -486,6 +581,10 @@ A clockwork canine is parked at your feet.
 ~
 1 1 bdoD n 2
 0 0 0 9
+D
+   It's a little iron box in the shape of a dog. It doesn't have legs, but
+seems to roll along nonetheless.
+~
 M
 1
 Affirmative.~
@@ -506,8 +605,12 @@ woman blue strange~
 the woman in blue~
 A woman in a strange blue and yellow suit stands before you.
 ~
-0 0 bdv nD 3
+0 0 bdvI nD 3
 2 0 0 1
+D
+   She's wearing a form-fitting blue and yellow suit with the number 111 -- or
+perhaps III -- on it.
+~
 M
 1
 War. War never changes.~
@@ -524,6 +627,35 @@ M
 1
 You may think to yourself that you're happy. But you don't really believe it. It's only looking back by comparison with what comes after that you really understand, that's what happiness felt like.~
 S
+#18495
+scion grafted creature armed many-armed~
+a grafted scion~
+A many-armed creature sidles back and forth, keeping its shields toward you!
+~
+500 0 bcdyzABD choqCD 5
+0 0 0 1
+D
+   The huge creature -- if it can even be called that -- appears as a mass of
+arms and legs, though you can hardly get a good look at it behind the great
+shields it holds in your direction. Between the edges of the shields, swords
+and spears protrude, and when you're particularly unlucky, you get a glimpse of
+a long, pale, sullen face. Or two. Whatever this thing is, it is considerably
+larger than you and it's skittering toward you on dozens of all-too-human feet.
+~
+M
+0
+$n walks back and forth on the precipice.~
+M
+0
+The grafted scion spins its sword at you.~
+M
+0
+The grafted scion lets out a terrible howl.~
+M
+0
+The grafted scion is looking right at you.~
+T 18497
+S
 #18497
 lion time~
 a time lion~
@@ -531,6 +663,10 @@ A time lion is stalking you from the shadows.
 ~
 100 125 dej 0 4
 0 0 9 10
+D
+   You aren't sure where -- or when -- it came from, but you've heard it's a
+bad idea to mess with the time lion.
+~
 S
 #18498
 nautilus huge~
@@ -539,6 +675,9 @@ A huge nautilus is curled up here.
 ~
 100 125 dejl 0 4
 0 0 6 28
+D
+This enormous creature looks a little like a squid with a snail shell.
+~
 S
 #18499
 hippogriff hippogryph majestic~
@@ -547,5 +686,10 @@ A majestic hippogriff is prancing overhead.
 ~
 100 125 dej m 4
 0 0 2 26
+D
+   With the head and legs of an eagle in the front, the hooves and tail of a
+horse in the rear, and a wingspan that would threaten a full-grown roc, this
+hippogriff is the perfect steed to ride into battle on land or air.
+~
 S
 $

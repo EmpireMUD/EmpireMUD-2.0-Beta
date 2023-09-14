@@ -6,6 +6,8 @@ T0
 You land quickly as your magical flight wears off.~
 T1
 $n lands on the ground as $s magical flight wears off.~
+T5
+...$e is flying with gossamer mana wings!~
 S
 #3002
 entrancement~
@@ -48,6 +50,10 @@ sap~
 0 0 0 0
 T0
 You are no longer stunned.~
+T1
+$n recovers from being sapped.~
+T5
+...$e has been hit over the head and looks stunned!~
 S
 #3008
 mana shield~
@@ -78,6 +84,10 @@ mummify~
 0 0 0 0
 T0
 Your flesh returns to normal.~
+T4
+$e is mummified in a hard, dark substance!~
+T5
+...$e is mummified in a hard outer covering!~
 S
 #3012
 earth armor~
@@ -118,7 +128,7 @@ heartstop~
 4 0
 0 0 0 0
 T0
-Your vitae is no longer hindered.~
+Your blood is no longer hindered.~
 S
 #3017
 phoenix rite~
@@ -133,6 +143,10 @@ disarm~
 0 0 0 0
 T0
 You recover and are no longer disarmed.~
+T4
+$e has been disarmed!~
+T5
+...$e has been disarmed!~
 S
 #3019
 shocked~
@@ -203,6 +217,8 @@ T0
 You are no longer blinded by sand.~
 T2
 You're blind!~
+T5
+...$e is groping around blindly!~
 S
 #3029
 healing potion~
@@ -285,6 +301,10 @@ claws~
 0 0 0 0
 T0
 Your claws retract.~
+T4
+$s hands are huge, distorted, and very sharp!~
+T5
+...$s fingers are mutated into giant, hideous claws!~
 S
 #3041
 deathshroud~
@@ -308,6 +328,10 @@ T0
 Your supernatural majesty fades.~
 T1
 $n seems less majestic now.~
+T4
+$n has an aura of majesty about $m.~
+T5
+...$e has a majestic aura about $m!~
 S
 #3044
 alacrity~
@@ -334,6 +358,8 @@ T2
 The world seems brighter.~
 T3
 $n's eyes flash and take on a pale red glow.~
+T4
+There is a pale red glint in $s eyes.~
 S
 #3046
 death penalty~
@@ -366,6 +392,8 @@ stunning blow~
 0 0 0 0
 T0
 You are no longer dazed by that stunning blow.~
+T5
+...$e is dazed by a stunning blow!~
 S
 #3050
 stun immunity~
@@ -609,8 +637,6 @@ S
 intensified~
 4 0
 0 0 0 0
-T0
-Your intensity ends.~
 S
 #3087
 abated~
@@ -627,8 +653,6 @@ S
 amplified~
 4 0
 0 0 0 0
-T0
-You no longer feel amplified.~
 T2
 You feel amplified!~
 S
@@ -665,8 +689,6 @@ S
 withstanding~
 4 0
 0 0 0 0
-T0
-You are no longer withstanding.~
 S
 #3093
 hindered~
@@ -690,8 +712,6 @@ S
 adaptation~
 4 0
 0 0 0 0
-T0
-Your adaptation is no longer effective.~
 S
 #3096
 lacerated~
@@ -715,14 +735,10 @@ S
 prepared~
 4 0
 0 0 0 0
-T0
-Your preparations expire.~
 S
 #3099
 gleaming~
 4 0
 0 0 0 0
-T0
-You are no longer gleaming.~
 S
 $

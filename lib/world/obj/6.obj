@@ -149,11 +149,17 @@ A large piece of shimmering leather is lying here.~
 softly with iridescent light. While pretty, it's mostly only useful for the
 same things as ordinary leather.
 ~
-3 0 a 0 5
+3 0 a 0 6
 0 0 0
 7 0
 C
 1 1
+M
+6
+You stretch $p onto $V.~
+M
+7
+$n stretches $p onto $V.~
 O+ 1 6530
 R
 4 5120 0
@@ -252,11 +258,17 @@ A pile of briar hide is precariously stacked here.~
 the outside becomes spiny and sharp. This type of leather is used to make great
 armors, by the most skilled craftsmen.
 ~
-3 l a 0 4
+3 l a 0 5
 0 0 0
 7 0
 C
 1 1
+M
+6
+You stretch $p onto $V.~
+M
+7
+$n stretches $p onto $V.~
 O+ 1 6531
 R
 4 5120 0
@@ -269,11 +281,17 @@ A pile of absinthian leather seethes on the ground.~
 mere presence gives onlookers a bitter taste. This fine leather is used to make
 vitriolic weapons and armor, by skilled craftsmen.
 ~
-3 l a 0 5
+3 l a 0 6
 0 0 0
 7 0
 C
 1 1
+M
+6
+You stretch $p onto $V.~
+M
+7
+$n stretches $p onto $V.~
 O+ 1 6531
 R
 4 5120 0
@@ -301,9 +319,9 @@ A magical magenta fire is roaring here!~
    A pile of bright pink wood is burning, releasing a bright, hot magenta flame
 and a cool, smoky mist of mana.
 ~
-3 c 0 0 1
-0 0 0
-0 48
+29 0 0 0 3
+48 1 31
+0 0
 S
 #618
 weirdwood-tree trees wood~
@@ -359,7 +377,7 @@ bottle brass~
 a brass bottle~
 A brass bottle is lying here.~
    This looks like a brass baby's bottle. You rattle it around, but can't tell
-what's inside. Try typing 'use bottle' to get the mini-pet inside.
+what's inside. Try typing 'use bottle' to get the minipet inside.
 ~
 19 0 a 0 2
 620 0 0

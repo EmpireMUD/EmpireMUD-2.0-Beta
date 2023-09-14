@@ -127,6 +127,68 @@ void add_to_slash_channel_history(struct slash_channel *chan, char_data *speaker
 
 
 /**
+* Determines if the argument starts with #<language> and parses it out. If not,
+* it also determines the default language. If it returns FALSE, the player
+* received an error message.
+*
+* Note that ORDERED mobs will parse out the #lang but will ignore it.
+*
+* @param char_data *ch The player who typed a command such as say #lang
+* @param char **argument The argument as-typed. It will be advanced past the language arg.
+* @param generic_data **find_lang A pointer to a variable to bind the found language to. This COULD be NULL if the player speaks no languages.
+* @return bool Returns FALSE if the player received an error message, or TRUE in all other cases (even if it could not find a language).
+*/
+bool determine_language_from_string(char_data *ch, char **argument, generic_data **find_lang) {
+	char arg[MAX_INPUT_LENGTH];
+	
+	*find_lang = NULL;
+	skip_spaces(argument);
+	
+	if (**argument == '#') {
+		// split out #language to string
+		*argument = one_argument(*argument, arg);
+		skip_spaces(argument);
+		
+		if (!*(arg + 1)) {
+			msg_to_char(ch, "You must specify which language when your message begins with #.\r\n");
+			return FALSE;
+		}
+		
+		// try to find language
+		if ((IS_IMMORTAL(ch) || IS_NPC(ch)) && isdigit(*(arg + 1))) {
+			*find_lang = find_generic(atoi(arg + 1), GENERIC_LANGUAGE);
+		}
+		if (!*find_lang) {
+			// try by name
+			*find_lang = find_generic_no_spaces(GENERIC_LANGUAGE, arg + 1);
+		}
+		if (!*find_lang || speaks_language(ch, GEN_VNUM(*find_lang)) != LANG_SPEAK) {
+			msg_to_char(ch, "You don't speak %s.\r\n", (*find_lang ? GEN_NAME(*find_lang) : "such a language"));
+			return FALSE;
+		}
+		
+		// success: picked a language
+	}
+	if (!IS_NPC(ch) && !*find_lang) {
+		*find_lang = find_generic(GET_SPEAKING(ch), GENERIC_LANGUAGE);
+	}
+	if (IS_NPC(ch) && (!*find_lang || AFF_FLAGGED(ch, AFF_ORDERED))) {
+		*find_lang = NULL;	// in case it was ordered
+		if (MOB_LANGUAGE(ch) != NOTHING) {
+			*find_lang = find_generic(MOB_LANGUAGE(ch), GENERIC_LANGUAGE);
+		}
+		if (!*find_lang) {
+			// backup
+			*find_lang = find_generic(config_get_int("default_language_vnum"), GENERIC_LANGUAGE);
+		}
+	}
+	
+	// hopefully we found one... but either way, there was no error so:
+	return TRUE;
+}
+
+
+/**
 * Determines if the majority of online members of an empire are ignoring the
 * victim. If there's a tie, this counts as 'ignoring'. This can be used to
 * prevent spamming with things like diplomacy.
@@ -401,14 +463,15 @@ void remove_ignore(char_data *ch, int idnum) {
 
 // uses subcmd as a position in the pub_comm array
 ACMD(do_pub_comm) {
-	char msgbuf[MAX_STRING_LENGTH], someonebuf[MAX_STRING_LENGTH], lbuf[MAX_STRING_LENGTH], recog[MAX_STRING_LENGTH];
+	char msgbuf[MAX_STRING_LENGTH], langbuf[MAX_STRING_LENGTH];
 	char level_string[10], invis_string[10];
 	descriptor_data *desc;
-	bool emote = FALSE;
-	int level = 0;
+	generic_data *lang = NULL;
+	bool emote = FALSE, res;
+	int level = 0, mode;
 
 	skip_spaces(&argument);
-
+	
 	// simple validation
 	if (AFF_FLAGGED(ch, AFF_CHARM) && !ch->desc) {
 		msg_to_char(ch, "You can't %s.\r\n", pub_comm[subcmd].name);
@@ -425,28 +488,45 @@ ACMD(do_pub_comm) {
 	else if (pub_comm[subcmd].ignore_flag != NOBITS && PRF_FLAGGED(ch, pub_comm[subcmd].ignore_flag)) {
 		msg_to_char(ch, "You are currently ignoring the %s channel. Use toggle to turn it back on first.\r\n", pub_comm[subcmd].name);
 	}
-	else if (!*argument) {
-		msg_to_char(ch, "Yes, %s, fine, %s we must, but WHAT???\r\n", pub_comm[subcmd].name, pub_comm[subcmd].name);
-	}
 	else {
-		// look for emote or level
-		while (*argument == '*' || *argument == '#') {
-			if (*argument == '*') {
-				emote = TRUE;
-				++argument;
+		if (pub_comm[subcmd].type == PUB_COMM_OOC) {
+			// look for emote or level
+			while (*argument == '*' || *argument == '#') {
+				if (*argument == '*') {
+					emote = TRUE;
+					++argument;
+				}
+				else if (*argument == '#') {
+					// #1 indicates "level 1+"
+					argument = any_one_arg(argument+1, arg);
+					skip_spaces(&argument);
+					level = atoi(arg);
+				}
 			}
-			else if (*argument == '#') {
-				// #1 indicates "level 1+"
-				argument = any_one_arg(argument+1, arg);
-				skip_spaces(&argument);
-				level = atoi(arg);
+		}
+		else {
+			// not OOC: determine language if applicable
+			res = determine_language_from_string(ch, &argument, &lang);
+			if (!res) {
+				// if we got here it sent an error
+				return;
+			}
+			if (!lang) {
+				msg_to_char(ch, "You don't have a language to %s in (see HELP SPEAK).\r\n", pub_comm[subcmd].name);
+				return;
 			}
 		}
 		
-		// in case there was an emote or level indicator, skip spaces again
+		// in case there was a modifier, skip spaces again
 		skip_spaces(&argument);
-		level = MAX(level, pub_comm[subcmd].min_level);
 		
+		// ensure argument now
+		if (!*argument) {
+			msg_to_char(ch, "Yes, %s, fine, %s we must, but WHAT???\r\n", pub_comm[subcmd].name, pub_comm[subcmd].name);
+			return;
+		}
+		
+		level = MAX(level, pub_comm[subcmd].min_level);
 		if (level > GET_REAL_LEVEL(ch)) {
 			msg_to_char(ch, "You can't speak above your own level.\r\n");
 			return;
@@ -477,7 +557,12 @@ ACMD(do_pub_comm) {
 			switch (pub_comm[subcmd].type) {
 				case PUB_COMM_GLOBAL:
 				case PUB_COMM_SHORT_RANGE: {
-					sprintf(msgbuf, "%sYou%s %s%s, '%s%s'\tn", pub_comm[subcmd].color, invis_string, pub_comm[subcmd].name, level_string, argument, pub_comm[subcmd].color);
+					if (!lang || IS_NPC(ch) || GEN_VNUM(lang) == GET_SPEAKING(ch)) {
+						sprintf(msgbuf, "%sYou%s %s%s, '%s%s'\tn", pub_comm[subcmd].color, invis_string, pub_comm[subcmd].name, level_string, argument, pub_comm[subcmd].color);
+					}
+					else {
+						sprintf(msgbuf, "%sYou%s %s%s, in %s, '%s%s'\tn", pub_comm[subcmd].color, invis_string, pub_comm[subcmd].name, level_string, (lang ? GEN_NAME(lang) : "another language"), argument, pub_comm[subcmd].color);
+					}
 					break;
 				}
 				case PUB_COMM_OOC:
@@ -493,7 +578,7 @@ ACMD(do_pub_comm) {
 			}
 	
 			// send the message to ch
-			act(msgbuf, FALSE, ch, 0, 0, TO_CHAR | TO_SLEEP);
+			act(msgbuf, FALSE, ch, NULL, NULL, TO_CHAR | TO_SLEEP);
 			
 			// trap last act() and send to the history
 			if (ch->desc && ch->desc->last_act_message && pub_comm[subcmd].history != NO_HISTORY) {
@@ -501,91 +586,105 @@ ACMD(do_pub_comm) {
 			}
 		}
 		
-		// message to others: (build msgbuf, recog, and someonebuf)
-		switch (pub_comm[subcmd].type) {
-			case PUB_COMM_GLOBAL:
-			case PUB_COMM_SHORT_RANGE: {
-				// leading color code is handled later
-				
-				sprintf(msgbuf, "$n%s %ss%s, '%s%s'\tn", invis_string, pub_comm[subcmd].name, level_string, argument, pub_comm[subcmd].color);
-				if (IS_DISGUISED(ch) || IS_MORPHED(ch)) {
-					sprintf(recog, "$n ($o)%s %ss%s, '%s%s'\tn", invis_string, pub_comm[subcmd].name, level_string, argument, pub_comm[subcmd].color);
-				}
-				else {
-					strcpy(recog, msgbuf);
-				}
-				
-				// invis version
-				sprintf(someonebuf, "Someone %ss%s, '%s%s'\tn", pub_comm[subcmd].name, level_string, argument, pub_comm[subcmd].color);
-				break;
-			}
-			case PUB_COMM_OOC:
-			default: {
-				if (emote) {
-					sprintf(msgbuf, "[%s%s\tn%s%s] $o %s\tn", pub_comm[subcmd].color, pub_comm[subcmd].name, invis_string, level_string, argument);
-					strcpy(recog, msgbuf);
-					sprintf(someonebuf, "[%s%s\tn%s] Someone %s\tn", pub_comm[subcmd].color, pub_comm[subcmd].name, level_string, argument);
-				}
-				else {
-					sprintf(msgbuf, "[%s%s\tn $o%s%s]: %s\tn", pub_comm[subcmd].color, pub_comm[subcmd].name, invis_string, level_string, argument);
-					strcpy(recog, msgbuf);
-					sprintf(someonebuf, "[%s%s\tn Someone%s]: %s\tn", pub_comm[subcmd].color, pub_comm[subcmd].name, level_string, argument);
-				}
-				break;
-			}
-		}
-		
+		// message to others:
 		for (desc = descriptor_list; desc; desc = desc->next) {
-			// basic qualifications
-			if (STATE(desc) == CON_PLAYING && desc != ch->desc && desc->character && !is_ignoring(desc->character, ch) && GET_REAL_LEVEL(desc->character) >= level) {
-				// can hear the channel?
-				if (pub_comm[subcmd].ignore_flag == NOBITS || !PRF_FLAGGED(desc->character, pub_comm[subcmd].ignore_flag)) {
-					// distance?
-					if (pub_comm[subcmd].type != PUB_COMM_SHORT_RANGE || compute_distance(IN_ROOM(ch), IN_ROOM(desc->character)) <= 50) {
-						// quiet room?
-						if (pub_comm[subcmd].type == PUB_COMM_OOC || !ROOM_AFF_FLAGGED(IN_ROOM(desc->character), ROOM_AFF_SILENT)) {
-							// special color handling for non-ooc channels
-							if (pub_comm[subcmd].type != PUB_COMM_OOC) {
-								// use act() so that nobody gets the color code that wouldn't get the rest of the string
-								//act(pub_comm[subcmd].color, FALSE, ch, NULL, desc->character, TO_VICT | TO_SLEEP | TO_NODARK);
-								send_to_char(pub_comm[subcmd].color, desc->character);
-							}
-							
-							// channel history
-							clear_last_act_message(desc);
-							
-							// send message
-							if (CAN_SEE_NO_DARK(desc->character, ch)) {
-								if ((IS_MORPHED(ch) || IS_DISGUISED(ch)) && (IS_IMMORTAL(desc->character) || CAN_RECOGNIZE(desc->character, ch))) {
-									act(recog, FALSE, ch, NULL, desc->character, TO_VICT | TO_SLEEP | TO_NODARK);
-								}
-								else {
-									act(msgbuf, FALSE, ch, NULL, desc->character, TO_VICT | TO_SLEEP | TO_NODARK);
-								}
-							}
-							else {
-								act(someonebuf, FALSE, ch, NULL, desc->character, TO_VICT | TO_SLEEP | TO_NODARK);
-							}
-							
-							// get the message from act() and put it in history
-							if (desc->last_act_message && pub_comm[subcmd].history != NO_HISTORY) {
-								// color handling for history
-								if (pub_comm[subcmd].type != PUB_COMM_OOC) {
-									sprintf(lbuf, "%s%s", pub_comm[subcmd].color, desc->last_act_message);
-								}
-								else {
-									strcpy(lbuf, desc->last_act_message);
-								}
-								
-								add_to_channel_history(desc->character, pub_comm[subcmd].history, ch, lbuf);
-							}
-							else {
-								// color terminator if they somehow missed the rest of the string
-								send_to_char("\t0", desc->character);
-							}
+			if (STATE(desc) != CON_PLAYING || desc == ch->desc || !desc->character) {
+				continue;	// basic qualifications
+			}
+			if (GET_REAL_LEVEL(desc->character) < level) {
+				continue;	// too low
+			}
+			if (pub_comm[subcmd].ignore_flag != NOBITS && PRF_FLAGGED(desc->character, pub_comm[subcmd].ignore_flag)) {
+				continue;	// not on channel
+			}
+			if (pub_comm[subcmd].type != PUB_COMM_OOC && ROOM_AFF_FLAGGED(IN_ROOM(desc->character), ROOM_AFF_SILENT)) {
+				continue;	// quiet room?
+			}
+			if (is_ignoring(desc->character, ch)) {
+				continue;	// ignore: always no
+			}
+			if (pub_comm[subcmd].type == PUB_COMM_SHORT_RANGE && (!same_subzone(IN_ROOM(ch), IN_ROOM(desc->character)) || compute_distance(IN_ROOM(ch), IN_ROOM(desc->character)) > 50)) {
+				continue;	// distance/subzone
+			}
+				
+			// ok:
+			
+			// channel history
+			clear_last_act_message(desc);
+			
+			// message
+			*msgbuf = '\0';
+			switch (pub_comm[subcmd].type) {
+				case PUB_COMM_GLOBAL:
+				case PUB_COMM_SHORT_RANGE: {
+					mode = lang ? speaks_language(desc->character, GEN_VNUM(lang)) : LANG_SPEAK;
+					
+					// language
+					if (lang && !IS_NPC(desc->character) && GEN_VNUM(lang) != GET_SPEAKING(desc->character) && mode != LANG_UNKNOWN) {
+						sprintf(langbuf, "%s in %s", (mode == LANG_SPEAK ? "," : ""), GEN_NAME(lang));
+					}
+					else {
+						*langbuf = '\0';
+					}
+				
+					// prefix
+					if (CAN_SEE_NO_DARK(desc->character, ch)) {
+						if ((IS_MORPHED(ch) || IS_DISGUISED(ch)) && CAN_RECOGNIZE(desc->character, ch)) {
+							sprintf(msgbuf, "%s$n ($o)%s %ss%s%s", pub_comm[subcmd].color, invis_string, pub_comm[subcmd].name, level_string, langbuf);
+						}
+						else {
+							sprintf(msgbuf, "%s$n%s %ss%s%s", pub_comm[subcmd].color, invis_string, pub_comm[subcmd].name, level_string, langbuf);
 						}
 					}
+					else {
+						sprintf(msgbuf, "%sSomeone %ss%s%s", pub_comm[subcmd].color, pub_comm[subcmd].name, level_string, langbuf);
+					}
+					
+					// message portion
+					if (mode == LANG_SPEAK) {
+						sprintf(msgbuf + strlen(msgbuf), ", '%s%s'\tn", argument, pub_comm[subcmd].color);
+					}
+					else if (mode == LANG_RECOGNIZE) {
+						strcat(msgbuf, ", but you don't understand it.\tn");
+					}
+					else {
+						// cannot understand
+						strcat(msgbuf, " something, but you can't understand $m.\tn");
+					}
+					
+					break;
 				}
+				case PUB_COMM_OOC:
+				default: {
+					if (CAN_SEE_NO_DARK(desc->character, ch)) {
+						if (emote) {
+							sprintf(msgbuf, "[%s%s\tn%s%s] $o %s\tn", pub_comm[subcmd].color, pub_comm[subcmd].name, invis_string, level_string, argument);
+						}
+						else {
+							sprintf(msgbuf, "[%s%s\tn $o%s%s]: %s\tn", pub_comm[subcmd].color, pub_comm[subcmd].name, invis_string, level_string, argument);
+						}
+					}
+					else {
+						// can't see
+						if (emote) {
+							sprintf(msgbuf, "[%s%s\tn%s] Someone %s\tn", pub_comm[subcmd].color, pub_comm[subcmd].name, level_string, argument);
+						}
+						else {
+							sprintf(msgbuf, "[%s%s\tn Someone%s]: %s\tn", pub_comm[subcmd].color, pub_comm[subcmd].name, level_string, argument);
+						}
+					}
+					break;
+				}
+			}
+			
+			// send message
+			if (*msgbuf) {
+				act(msgbuf, FALSE, ch, NULL, desc->character, TO_VICT | TO_SLEEP | TO_NODARK);
+			}
+			
+			// get the message from act() and put it in history
+			if (desc->last_act_message && pub_comm[subcmd].history != NO_HISTORY) {
+				add_to_channel_history(desc->character, pub_comm[subcmd].history, ch, desc->last_act_message);
 			}
 		}
 	}
@@ -1190,6 +1289,7 @@ ACMD(do_slash_channel) {
 	struct channel_history_data *hist;
 	struct player_slash_channel *slash;
 	char arg2[MAX_INPUT_LENGTH], arg3[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH];
+	char message[MAX_INPUT_LENGTH];
 	player_index_data *index;
 	descriptor_data *desc;
 	char_data *vict;
@@ -1397,7 +1497,10 @@ ACMD(do_slash_channel) {
 				else {
 					*buf = '\0';
 				}
-				msg_to_char(ch, "%3s%s: %s%s", simple_time_since(hist->timestamp), buf, hist->message, (hist->message[strlen(hist->message) - 1] != '\n') ? "\r\n" : "");
+				strncpy(message, hist->message, MAX_INPUT_LENGTH-1);
+				message[MAX_INPUT_LENGTH-1] = '\0';
+				delete_doubledollar(message);
+				msg_to_char(ch, "%3s%s: %s%s", simple_time_since(hist->timestamp), buf, message, (message[strlen(message) - 1] != '\n') ? "\r\n" : "");
 			}
 		}
 	}
@@ -1589,7 +1692,7 @@ ACMD(do_history) {
 			if (chd_iter->message[pos] == '\r' || chd_iter->message[pos] == '\n') {	
 				found_crlf = TRUE;
 			}
-			else if (chd_iter->message[pos] == '&' || chd_iter->message[pos-1] == '&') {
+			else if (chd_iter->message[pos] == COLOUR_CHAR || chd_iter->message[pos-1] == COLOUR_CHAR) {
 				// probably color code
 				--pos;
 			}
@@ -1760,8 +1863,8 @@ ACMD(do_recolor) {
 		GET_CUSTOM_COLOR(ch, type) = 0;	// none
 		msg_to_char(ch, "You no longer have a custom %s color.\r\n", custom_color_types[type]);
 	}
-	else if (strlen(argument) != 2 || *argument != '&' || !strchr(valid_colors, argument[1])) {
-		msg_to_char(ch, "You must specify a single color code (for example, \t&r).\r\n");
+	else if (strlen(argument) != 2 || *argument != COLOUR_CHAR || !strchr(valid_colors, argument[1])) {
+		msg_to_char(ch, "You must specify a single color code (for example, \t%cr).\r\n", COLOUR_CHAR);
 	}
 	else {
 		GET_CUSTOM_COLOR(ch, type) = argument[1];	// store just the color code
@@ -1815,79 +1918,195 @@ ACMD(do_reply) {
 
 ACMD(do_say) {
 	char_data *c;
-	char lbuf[MAX_STRING_LENGTH], string[MAX_STRING_LENGTH], recog[MAX_STRING_LENGTH], buf[MAX_STRING_LENGTH];
-	int ctype = (subcmd == SCMD_OOCSAY ? CUSTOM_COLOR_OOCSAY : CUSTOM_COLOR_SAY);
+	char buf[MAX_STRING_LENGTH];
+	int ctype = (subcmd == SCMD_OOCSAY ? CUSTOM_COLOR_OOCSAY : CUSTOM_COLOR_SAY), mode;
+	generic_data *lang = NULL;
 	char color;
+	bool show_real_name, res;
 	
 	skip_spaces(&argument);
 	
-	if (!*argument)
+	// determine language
+	res = determine_language_from_string(ch, &argument, &lang);
+	if (!res) {
+		// if we got here it sent an error
+		return;
+	}
+	
+	if (!*argument) {
 		msg_to_char(ch, "Yes, but WHAT do you want to say?\r\n");
-	else if (subcmd != SCMD_OOCSAY && ROOM_AFF_FLAGGED(IN_ROOM(ch), ROOM_AFF_SILENT))
+	}
+	else if (subcmd != SCMD_OOCSAY && ROOM_AFF_FLAGGED(IN_ROOM(ch), ROOM_AFF_SILENT)) {
 		msg_to_char(ch, "You speak, but no words come out!\r\n");
+	}
 	else if (IS_NPC(ch) && MOB_FLAGGED(ch, MOB_ANIMAL) && AFF_FLAGGED(ch, AFF_CHARM)) {
 		msg_to_char(ch, "Animals can't talk.\r\n");
 	}
+	else if (!lang && subcmd != SCMD_OOCSAY) {
+		msg_to_char(ch, "You don't have a language to speak in (see HELP SPEAK).\r\n");
+	}
 	else {
-		if (subcmd == SCMD_OOCSAY) {
-			strcpy(buf1, " out of character,");
-		}
-		else {
-			*buf1 = '\0';
-		}
-		
-		// this leaves in a "%c" used for a color code
-		sprintf(string, "$n says,%s '%s\t%%c'\tn", buf1, double_percents(argument));
-		sprintf(recog, "$n ($o) says,%s '%s\t%%c'\tn", buf1, double_percents(argument));
-		
 		DL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), c, next_in_room) {
-			if (REAL_NPC(c) || ch == c || is_ignoring(c, ch))
+			if (REAL_NPC(c) || ch == c || is_ignoring(c, ch)) {
 				continue;
+			}
 			
 			// for channel history
 			if (c->desc) {
 				clear_last_act_message(c->desc);
 			}
 			
+			// options
+			mode = lang ? speaks_language(c, GEN_VNUM(lang)) : LANG_SPEAK;
+			show_real_name = ((IS_MORPHED(ch) || IS_DISGUISED(ch)) && CAN_RECOGNIZE(c, ch));
 			color = (!IS_NPC(c) && GET_CUSTOM_COLOR(c, ctype)) ? GET_CUSTOM_COLOR(c, ctype) : '0';
-			msg_to_char(c, "\t%c", color);
 			
-			if ((IS_MORPHED(ch) || IS_DISGUISED(ch)) && (IS_IMMORTAL(c) || CAN_RECOGNIZE(c, ch))) {
-				sprintf(buf, recog, color);
+			// build string
+			if (subcmd == SCMD_OOCSAY) {
+				// ooc
+				sprintf(buf, "\t%c$n%s says, out of character, '%s\t%c'\tn", color, (show_real_name ? " ($o)" : ""), argument, color);
+			}
+			else if (mode == LANG_SPEAK && (IS_NPC(c) || !lang || GET_SPEAKING(c) == GEN_VNUM(lang))) {
+				// same language
+				sprintf(buf, "\t%c$n%s says, '%s\t%c'\tn", color, (show_real_name ? " ($o)" : ""), argument, color);
+			}
+			else if (mode == LANG_SPEAK) {
+				// different language
+				sprintf(buf, "\t%c$n%s says, in %s, '%s\t%c'\tn", color, (show_real_name ? " ($o)" : ""), (lang ? GEN_NAME(lang) : "another language"), argument, color);
+			}
+			else if (mode == LANG_RECOGNIZE) {
+				// different language, can't understand
+				sprintf(buf, "\t%c$n%s says something in %s but you don't understand it.\tn", color, (show_real_name ? " ($o)" : ""), (lang ? GEN_NAME(lang) : "another language"));
 			}
 			else {
-				sprintf(buf, string, color);
+				// don't recognize
+				sprintf(buf, "\t%c$n%s says something but you don't understand $m.\tn", color, (show_real_name ? " ($o)" : ""));
 			}
 			
+			// send
 			act(buf, FALSE, ch, 0, c, TO_VICT | DG_NO_TRIG);
 			
 			// channel history
 			if (c->desc && c->desc->last_act_message) {
 				// the message was sent via act(), we can retrieve it from the desc
-				sprintf(lbuf, "\t%c%s", color, c->desc->last_act_message);
-				add_to_channel_history(c, CHANNEL_HISTORY_SAY, ch, lbuf);
+				add_to_channel_history(c, CHANNEL_HISTORY_SAY, ch, c->desc->last_act_message);
 			}
 		}
 		
-		if (PRF_FLAGGED(ch, PRF_NOREPEAT))
+		if (PRF_FLAGGED(ch, PRF_NOREPEAT)) {
 			send_config_msg(ch, "ok_string");
+		}
 		else {
 			delete_doubledollar(argument);
 			color = (!IS_NPC(ch) && GET_CUSTOM_COLOR(ch, ctype)) ? GET_CUSTOM_COLOR(ch, ctype) : '0';
-			sprintf(lbuf, "\t%cYou say,%s '%s\t%c'\tn\r\n", color, buf1, argument, color);
-			send_to_char(lbuf, ch);
+			if (subcmd == SCMD_OOCSAY || !lang || IS_NPC(ch) || GEN_VNUM(lang) == GET_SPEAKING(ch)) {
+				sprintf(buf, "\t%cYou say,%s '%s\t%c'\tn\r\n", color, (subcmd == SCMD_OOCSAY ? " out of character," : ""), argument, color);
+			}
+			else {
+				sprintf(buf, "\t%cYou say, in %s, '%s\t%c'\tn\r\n", color, (lang ? GEN_NAME(lang) : "another language"), argument, color);
+			}
+			send_to_char(buf, ch);
 
 			if (ch->desc) {
-				add_to_channel_history(ch, CHANNEL_HISTORY_SAY, ch, lbuf);
+				add_to_channel_history(ch, CHANNEL_HISTORY_SAY, ch, buf);
 			}
 		}
 		
 		/* trigger check */
 		if (subcmd != SCMD_OOCSAY) {
-			speech_mtrigger(ch, argument);
-			speech_wtrigger(ch, argument);
-			speech_vtrigger(ch, argument);
+			speech_mtrigger(ch, argument, lang);
+			speech_wtrigger(ch, argument, lang);
+			speech_vtrigger(ch, argument, lang);
 		}
+	}
+}
+
+
+ACMD(do_speak) {
+	char buf[MAX_STRING_LENGTH], line[256], mods[256];
+	struct player_language *lang, *next_lang;
+	generic_data *gen;
+	size_t size, lsize;
+	int count;
+	
+	skip_spaces(&argument);
+	
+	if (IS_NPC(ch)) {
+		msg_to_char(ch, "NPCs cannot use 'speak' and must specify a language on every say command.\r\n");
+		return;
+	}
+	
+	// no-arg: Just show languages I speak
+	if (!*argument) {
+		size = snprintf(buf, sizeof(buf), "You speak the following languages:\r\n");
+		
+		count = 0;
+		HASH_ITER(hh, GET_LANGUAGES(ch), lang, next_lang) {
+			if (lang->level <= LANG_UNKNOWN) {
+				continue;	// does not speak it
+			}
+			if (!(gen = real_generic(lang->vnum)) || GEN_FLAGGED(gen, GEN_IN_DEVELOPMENT)) {
+				continue;
+			}
+			
+			// ok:
+			++count;
+			
+			// build modifiers
+			*mods = '\0';
+			if (lang->level == LANG_RECOGNIZE) {
+				sprintf(mods + strlen(mods), "%srecognize only", (*mods ? ", " : ""));
+			}
+			if (GET_LOYALTY(ch) && speaks_language_empire(GET_LOYALTY(ch), lang->vnum) == lang->level) {
+				sprintf(mods + strlen(mods), "%sempire", (*mods ? ", " : ""));
+			}
+			if (GET_SPEAKING(ch) == lang->vnum) {
+				sprintf(mods + strlen(mods), "%s\tgcurrently speaking\t0", (*mods ? ", " : ""));
+			}
+			
+			// build line
+			if (*mods) {
+				lsize = snprintf(line, sizeof(line), " %s (%s)\r\n", GEN_NAME(gen), mods);
+			}
+			else {
+				lsize = snprintf(line, sizeof(line), " %s\r\n", GEN_NAME(gen));
+			}
+			
+			// append
+			if (size + lsize + 17 < sizeof(buf)) {
+				strcat(buf, line);
+				size += lsize;
+			}
+			else {
+				// overflow somehow?
+				size += snprintf(buf + size, sizeof(buf) - size, "**OVERFLOW**\r\n");
+				break;
+			}
+		}
+		
+		if (!count) {
+			size += snprintf(buf + size, sizeof(buf) - size, " none\r\n");
+		}
+		if (ch->desc) {
+			page_string(ch->desc, buf, TRUE);
+		}
+		return;
+	}
+	
+	// with arg, try to change which language I speak
+	if (!(gen = find_generic_no_spaces(GENERIC_LANGUAGE, argument))) {
+		msg_to_char(ch, "You don't know any '%s' language.\r\n", argument);
+	}
+	else if (speaks_language(ch, GEN_VNUM(gen)) != LANG_SPEAK) {
+		msg_to_char(ch, "You don't know how to speak that language.\r\n");
+	}
+	else if (GET_SPEAKING(ch) == GEN_VNUM(gen)) {
+		msg_to_char(ch, "You're already speaking %s.\r\n", GEN_NAME(gen));
+	}
+	else {
+		GET_SPEAKING(ch) = GEN_VNUM(gen);
+		msg_to_char(ch, "You will now speak %s.\r\n", GEN_NAME(gen));
+		queue_delayed_update(ch, CDU_SAVE);
 	}
 }
 

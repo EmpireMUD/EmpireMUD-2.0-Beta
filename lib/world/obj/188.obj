@@ -411,7 +411,7 @@ S
 whistle psychic~
 a psychic whistle~
 A whistle that's slightly psychic has been left here.~
-This whistle can grant you a mini-pet!
+This whistle can grant you a minipet!
 Type 'use whistle' to get it.
 ~
 19 p a 0 5
@@ -652,7 +652,7 @@ S
 whistle ghoul~
 a ghoul whistle~
 A ghoul whistle has been dropped here.~
-This whistle can grant you a mini-pet!
+This whistle can grant you a minipet!
 Type 'use whistle' to get it.
 ~
 19 p a 0 5
@@ -746,6 +746,21 @@ A
 5 1 0
 A
 5 1 3
+S
+#18848
+pillowcase case pillaging~
+a pillaging pillowcase~
+A pillaging pillowcase is standing up on its own!~
+   If you are seeing this, it is broken. Please report to an immortal via the
+bug command.
+~
+3 p a 0 9
+0 0 0
+7 0
+Q 18808
+T 18809
+T 18808
+T 18810
 S
 #18849
 dead spirits~
@@ -873,6 +888,46 @@ T 18858
 T 18859
 T 18860
 S
+#18858
+wheel wagon skeletal~
+a skeletal wagon wheel~
+A wheel made up of dismantled skeleton lays here.~
+This macabre wheel was clearly once part of some form of wagon. It is made up
+of various bones, human from the look of them.
+~
+3 e a 0 3
+0 0 0
+14 0
+C
+1 400
+S
+#18859
+whistle bone fading~
+a fading bone whistle~
+A fading bone whistle floats before you.~
+   This curious whistle appears to be made of bone, but you can see right
+through it and you have trouble grasping or blowing the whistle. What sort of
+thing is both bone and ghost at once?
+   Type 'use whistle' to gain a new non-combat minipet.
+~
+19 p a 0 7
+18859 0 0
+14 0
+S
+#18860
+plans bylda~
+the plans for Bylda~
+The plans for Bylda are lying here.~
+   It's a rather intricate technical drawing of a large bear made primarily
+from wood and straw, with a leather outer coating. You'll need to build it in
+one of your cities and animate it with magic. Type 'build info Bylda' to see
+what it requires and 'build Bylda' to start it.
+~
+3 p a 0 2
+0 0 0
+0 0
+Q 18860
+S
 #18861
 tome notes demon summoning~
 demon summoning notes~
@@ -897,6 +952,23 @@ This just makes it impossible to maintain the nether portal.
 3 0 a 0 1
 0 0 0
 0 0
+S
+#18866
+charm blooddrop~
+a blooddrop charm~
+A blooddrop-shaped charm rolls about here.~
+   Shaped like a blooddrop, this charm is slightly sticky to the touch. You
+feel it would have something to do with being a vampire, but aren't quite sure
+what.
+~
+3 k a 0 8
+0 0 0
+10 0
+C
+1 1
+Q 18866
+T 18866
+T 18867
 S
 #18869
 sheet music~
@@ -928,22 +1000,6 @@ C
 Q 18870
 T 18869
 S
-#18871
-report medical~
-a medical report~
-A medical report about a victim of the headless centaur is folded here.~
-   The report makes it look like the centaur's victim doesn't have much time
-left.
-Type:  build medical tent
-~
-3 0 a 0 7
-0 0 0
-7 0
-C
-1 1
-Q 18873
-T 18869
-S
 #18873
 report medical~
 a medical report~
@@ -960,6 +1016,20 @@ soothe the fallen adventurer into his final rest by playing some music.
 C
 1 1
 Q 18873
+S
+#18875
+whistle tooth hollow~
+a tooth whistle~
+A hollowed out tooth has been shaped into a whistle.~
+   Use this whistle to call a special zombie mount, whom this tooth was
+originally ripped from.
+~
+3 p a 0 3
+18875 0 0
+14 0
+C
+1 1
+T 9910
 S
 #18876
 block butcher's butchers reddened~
@@ -1063,13 +1133,14 @@ A portrait of grandmother is lying here.~
 her family home. It's obvious the artist took great care in creating this
 loving image.
 ~
-3 p a 0 2
+3 p a 0 3
 0 0 0
 0 0
 C
 1 1
 Q 18880
 T 18881
+T 18880
 S
 #18882
 portrait grandmother~
@@ -1135,7 +1206,7 @@ S
 whistle well-stitched stitched~
 a well-stitched whistle~
 A well-stitched whistle is lying here.~
-This whistle grants you a zombie terrier mini-pet. Use the whistle to get it.
+This whistle grants you a zombie terrier minipet. Use the whistle to get it.
 ~
 19 p a 0 6
 18885 0 0
@@ -1259,7 +1330,7 @@ A roast pumpkin is lying here.~
    The pumpkin has taken on a dark orange color -- almost brown. It's mushy,
 but tastes a lot better than it did fresh.
 ~
-6 gm a 0 12
+6 gm a 0 13
 24 18890 0
 7 1680
 A
@@ -1267,6 +1338,8 @@ A
 C
 50 50
 O+ 1 6241
+R
+4 5619 0
 S
 #18894
 seeds roasted pumpkin~
@@ -1283,18 +1356,17 @@ C
 50 50
 S
 #18895
-jack-o-lantern lantern jackolantern unlit~
-an unlit jack-o-lantern~
-An unlit jack-o-lantern is sitting here.~
-   This big orange pumpkin has been cut to look like a face, and an unlit
-candle has been placed inside.
+jack-o-lantern lantern jackolantern~
+a jack-o-lantern~
+A jack-o-lantern is sitting here.~
+   This big orange pumpkin has been cut to look like a face. Use 'light
+jack-o-lantern' and 'douse jack-o-lantern' to control the light.
 ~
-3 0 ao 0 4
-0 0 0
+29 0 ao 0 7
+36 0 6
 7 168
 C
 1 1
-I 11 18896 100.00 1  # LIGHT: lit jack-o-lantern
 R
 4 5121 0
 R
@@ -1303,15 +1375,15 @@ R
 4 5606 0
 S
 #18896
-jack-o-lantern lantern jackolantern lit~
-a lit jack-o-lantern~
-A lit jack-o-lantern is casting an eerie light.~
-   This big orange pumpkin has been carved to look like a face. A bright candle
-inside casts a spooky light all around you.
+jack-o-lantern lantern jackolantern~
+a jack-o-lantern~
+A jack-o-lantern is sitting here.~
+   This big orange pumpkin has been cut to look like a face. Use 'light
+jack-o-lantern' and 'douse jack-o-lantern' to control the light.
 ~
-3 c ao 0 4
-0 0 0
-7 36
+29 0 ao 0 7
+36 1 4
+7 168
 C
 1 1
 S

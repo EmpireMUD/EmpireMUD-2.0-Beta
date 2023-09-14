@@ -58,6 +58,52 @@ void update_player_leaderboard(char_data *ch, struct event_running_data *re, str
 //// HELPERS /////////////////////////////////////////////////////////////////
 
 /**
+* Removes a player from any still-running events, but leaves then in any old
+* events that have ended (to preserve rank). This is intended for a player who
+* is being deleted, but can be used other times as well.
+*
+* @param char_data *ch The player being deleted from the event(s) (if any).
+*/
+void delete_player_from_running_events(char_data *ch) {
+	struct event_running_data *running;
+	struct event_leaderboard *lb, *next_lb;
+	struct player_event_data *ped;
+	
+	if (!ch || IS_NPC(ch)) {
+		return;
+	}
+	
+	LL_FOREACH(running_events, running) {
+		if (!running->event) {
+			continue;
+		}
+		if (running->status != EVTS_RUNNING) {
+			continue;
+		}
+		
+		HASH_ITER(hh, running->player_leaderboard, lb, next_lb) {
+			if (lb->id == GET_IDNUM(ch)) {
+				// delete my own data for it, if any
+				if ((ped = get_event_data(ch, running->id))) {
+					HASH_DEL(GET_EVENT_DATA(ch), ped);
+					free(ped);
+				}
+				
+				// entry to remove
+				HASH_DEL(running->player_leaderboard, lb);
+				free(lb);
+				
+				events_need_save = TRUE;
+			}
+		}
+	}
+	
+	// in case they're not being deleted
+	queue_delayed_update(ch, CDU_SAVE);
+}
+
+
+/**
 * Gets a character's rank in an event. It returns NOTHING if ch is unranked.
 *
 * @param char_data *ch the player.
@@ -120,8 +166,8 @@ void end_event(struct event_running_data *re) {
 	events_need_save = TRUE;
 	
 	// update all in-game players so they have their current rank
-	DL_FOREACH(character_list, ch) {
-		if (IS_NPC(ch) || !(ped = get_event_data(ch, re->id))) {
+	DL_FOREACH2(player_character_list, ch, next_plr) {
+		if (!(ped = get_event_data(ch, re->id))) {
 			continue;	// no work
 		}
 		
@@ -130,7 +176,7 @@ void end_event(struct event_running_data *re) {
 	}
 	
 	// announce
-	syslog(SYS_INFO, LVL_START_IMM, TRUE, "EVENT: [%d] %s (id %d) has ended", EVT_VNUM(event), EVT_NAME(event), re->id);
+	syslog(SYS_EVENT, LVL_START_IMM, TRUE, "EVENT: [%d] %s (id %d) has ended", EVT_VNUM(event), EVT_NAME(event), re->id);
 	log_to_slash_channel_by_name(EVENT_LOG_CHANNEL, NULL, "%s has ended!", EVT_NAME(event));
 	
 	qt_event_start_stop(EVT_VNUM(event));
@@ -254,14 +300,15 @@ void smart_copy_event_rewards(struct event_reward **to_list, struct event_reward
 *
 * @param char *name The string (name/vnum) to look for.
 * @param bool running_only If TRUE, skips events that aren't running.
+* @param bool allow_in_dev If TRUE, will return in-dev adventures, too.
 * @return event_data* The event prototype found, if any.
 */
-event_data *smart_find_event(char *name, bool running_only) {
+event_data *smart_find_event(char *name, bool running_only, bool allow_in_dev) {
 	event_data *iter, *next_iter, *partial = NULL;
 	any_vnum find_vnum = (isdigit(*name) ? atoi(name) : NOTHING);
 	
 	HASH_ITER(hh, event_table, iter, next_iter) {
-		if (EVT_FLAGGED(iter, EVTF_IN_DEVELOPMENT)) {
+		if (!allow_in_dev && EVT_FLAGGED(iter, EVTF_IN_DEVELOPMENT)) {
 			continue;	// skip in-dev
 		}
 		if (running_only && !find_running_event_by_vnum(EVT_VNUM(iter))) {
@@ -316,13 +363,32 @@ void start_event(event_data *event) {
 	events_need_save = TRUE;
 	
 	// announce
-	syslog(SYS_INFO, LVL_START_IMM, TRUE, "EVENT: [%d] %s has started with event id %d", EVT_VNUM(event), EVT_NAME(event), re->id);
+	syslog(SYS_EVENT, LVL_START_IMM, TRUE, "EVENT: [%d] %s has started with event id %d", EVT_VNUM(event), EVT_NAME(event), re->id);
 	log_to_slash_channel_by_name(EVENT_LOG_CHANNEL, NULL, "%s has begun!", EVT_NAME(event));
 	
 	qt_event_start_stop(EVT_VNUM(event));
 	et_event_start_stop(EVT_VNUM(event));
 	
 	schedule_event_event(re);
+}
+
+
+/**
+* Counts the words of text in an event's strings.
+*
+* NOTE: Excludes notes.
+*
+* @param event_data *evt The event whose strings to count.
+* @return int The number of words in the event's strings.
+*/
+int wordcount_event(event_data *evt) {
+	int count = 0;
+	
+	count += wordcount_string(EVT_NAME(evt));
+	count += wordcount_string(EVT_DESCRIPTION(evt));
+	count += wordcount_string(EVT_COMPLETE_MSG(evt));
+	
+	return count;
 }
 
 
@@ -477,6 +543,8 @@ void free_player_event_data(struct player_event_data *hash) {
 int gain_event_points(char_data *ch, any_vnum event_vnum, int points) {
 	struct event_running_data *running;
 	struct player_event_data *ped;
+	char capstr[256];
+	int real_gain;
 	
 	if (!ch || !points) {
 		return 0;	// no work
@@ -493,13 +561,28 @@ int gain_event_points(char_data *ch, any_vnum event_vnum, int points) {
 		ped->level = GET_HIGHEST_KNOWN_LEVEL(ch);
 	}
 	SAFE_ADD(ped->points, points, 0, INT_MAX, FALSE);
+	real_gain = points;
+	if (EVT_MAX_POINTS(running->event) > 0 && ped->points > EVT_MAX_POINTS(running->event)) {
+		real_gain -= (ped->points - EVT_MAX_POINTS(running->event));
+		ped->points = EVT_MAX_POINTS(running->event);
+	}
 	update_player_leaderboard(ch, running, ped);
 	
+	// cap?
+	if (EVT_MAX_POINTS(running->event) > 0) {
+		snprintf(capstr, sizeof(capstr), "/%d", EVT_MAX_POINTS(running->event));
+	}
+	else {
+		*capstr = '\0';
+	}
+	
 	if (points > 0) {
-		msg_to_char(ch, "\tyYou gain %d point%s for '%s'! You now have %d point%s.\t0\r\n", points, PLURAL(points), running->event ? EVT_NAME(running->event) : "Unknown Event", ped->points, PLURAL(ped->points));
+		msg_to_char(ch, "\tyYou gain %d point%s for '%s'! You now have %d%s point%s.\t0\r\n", real_gain, PLURAL(real_gain), running->event ? EVT_NAME(running->event) : "Unknown Event", ped->points, capstr, (ped->points != 1 || *capstr) ? "s" : "");
+		syslog(SYS_EVENT, 0, TRUE, "EVENT: %s gains %d point%s for %s (%d%s total)", GET_NAME(ch), real_gain, PLURAL(real_gain), running->event ? EVT_NAME(running->event) : "Unknown Event", ped->points, capstr);
 	}
 	else if (points < 0) {
-		msg_to_char(ch, "\tyYou lose %d point%s for '%s'! You now have %d point%s.\t0\r\n", ABSOLUTE(points), PLURAL(ABSOLUTE(points)), running->event ? EVT_NAME(running->event) : "Unknown Event", ped->points, PLURAL(ped->points));
+		msg_to_char(ch, "\tyYou lose %d point%s for '%s'! You now have %d%s point%s.\t0\r\n", ABSOLUTE(points), PLURAL(ABSOLUTE(points)), running->event ? EVT_NAME(running->event) : "Unknown Event", ped->points, capstr, (ped->points != 1 || *capstr) ? "s" : "");
+		syslog(SYS_EVENT, 0, TRUE, "EVENT: %s loses %d point%s for %s (%d%s total)", GET_NAME(ch), ABSOLUTE(points), PLURAL(ABSOLUTE(points)), running->event ? EVT_NAME(running->event) : "Unknown Event", ped->points, capstr);
 	}
 	
 	queue_delayed_update(ch, CDU_SAVE);
@@ -534,6 +617,8 @@ struct player_event_data *get_event_data(char_data *ch, int event_id) {
 *
 * Players do not receive a message for this.
 *
+* WARNING: This function is unused and untested. It also does not syslog.
+*
 * @param char_data *ch The person whose points are changing.
 * @param any_vnum event_vnum Which event.
 * @param int points How many points to have.
@@ -557,6 +642,9 @@ void set_event_points(char_data *ch, any_vnum event_vnum, int points) {
 		ped->level = GET_HIGHEST_KNOWN_LEVEL(ch);
 	}
 	ped->points = points;
+	if (EVT_MAX_POINTS(running->event) > 0 && ped->points > EVT_MAX_POINTS(running->event)) {
+		ped->points = EVT_MAX_POINTS(running->event);
+	}
 	update_player_leaderboard(ch, running, ped);
 }
 
@@ -617,17 +705,13 @@ void cancel_running_event(struct event_running_data *re) {
 	
 	// announce
 	if (re->event) {
-		syslog(SYS_INFO, LVL_START_IMM, TRUE, "EVENT: [%d] %s (id %d) has canceled", EVT_VNUM(re->event), EVT_NAME(re->event), re->id);
+		syslog(SYS_EVENT, LVL_START_IMM, TRUE, "EVENT: [%d] %s (id %d) has canceled", EVT_VNUM(re->event), EVT_NAME(re->event), re->id);
 		log_to_slash_channel_by_name(EVENT_LOG_CHANNEL, NULL, "%s has been canceled", EVT_NAME(re->event));
 	}
 	
 	// look for people with event data and remove it
 	id = re->id;
-	DL_FOREACH(character_list, chiter) {
-		if (IS_NPC(chiter)) {
-			continue;
-		}
-		
+	DL_FOREACH2(player_character_list, chiter, next_plr) {
 		HASH_FIND_INT(GET_EVENT_DATA(chiter), &id, ped);
 		if (ped) {
 			HASH_DEL(GET_EVENT_DATA(chiter), ped);
@@ -1443,7 +1527,7 @@ void parse_event_reward(char *line, struct event_reward **list, char *error_str)
 void parse_event(FILE *fl, any_vnum vnum) {
 	char line[256], error[256], str_in[256];
 	event_data *event, *find;
-	int int_in[6];
+	int int_in[7];
 	
 	CREATE(event, event_data, 1);
 	clear_event(event);
@@ -1465,10 +1549,14 @@ void parse_event(FILE *fl, any_vnum vnum) {
 	EVT_COMPLETE_MSG(event) = fread_string(fl, error);
 	EVT_NOTES(event) = fread_string(fl, error);
 	
-	// 5. version type flags min max duration repeats
-	if (!get_line(fl, line) || sscanf(line, "%d %d %s %d %d %d %d", &int_in[0], &int_in[1], str_in, &int_in[2], &int_in[3], &int_in[4], &int_in[5]) != 7) {
-		log("SYSERR: Format error in line 4 of %s", error);
-		exit(1);
+	// 5. version type flags min max duration repeats max-points
+	if (!get_line(fl, line) || sscanf(line, "%d %d %s %d %d %d %d %d", &int_in[0], &int_in[1], str_in, &int_in[2], &int_in[3], &int_in[4], &int_in[5], &int_in[6]) != 8) {
+		// older version:
+		int_in[6] = 0;
+		  if (sscanf(line, "%d %d %s %d %d %d %d", &int_in[0], &int_in[1], str_in, &int_in[2], &int_in[3], &int_in[4], &int_in[5]) != 7) {
+			log("SYSERR: Format error in line 4 of %s", error);
+			exit(1);
+		}
 	}
 	
 	EVT_VERSION(event) = int_in[0];
@@ -1478,6 +1566,7 @@ void parse_event(FILE *fl, any_vnum vnum) {
 	EVT_MAX_LEVEL(event) = int_in[3];
 	EVT_DURATION(event) = int_in[4];
 	EVT_REPEATS_AFTER(event) = int_in[5];
+	EVT_MAX_POINTS(event) = int_in[6];
 	
 	// optionals
 	for (;;) {
@@ -1653,7 +1742,7 @@ void process_evedit_rewards(char_data *ch, char *argument, struct event_reward *
 		else if ((num = atoi(num_arg)) < 1) {
 			msg_to_char(ch, "Invalid amount '%s'.\r\n", num_arg);
 		}
-		else if ((vnum = parse_quest_reward_vnum(ch, stype, vnum_arg, num_arg)) == NOTHING) {
+		else if ((vnum = parse_quest_reward_vnum(ch, stype, vnum_arg, num_arg)) == PARSE_QRV_FAILED) {
 			// this should have sent its own message
 		}
 		else {	// ok!
@@ -1746,7 +1835,7 @@ void process_evedit_rewards(char_data *ch, char *argument, struct event_reward *
 			}
 		}
 		else if (is_abbrev(field_arg, "vnum")) {
-			if ((vnum = parse_quest_reward_vnum(ch, change->type, vnum_arg, NULL)) == NOTHING) {
+			if ((vnum = parse_quest_reward_vnum(ch, change->type, vnum_arg, NULL)) == PARSE_QRV_FAILED) {
 				// sends own error
 			}
 			else {
@@ -1907,8 +1996,8 @@ void write_event_to_file(FILE *fl, event_data *event) {
 	strip_crlf(temp);
 	fprintf(fl, "%s~\n", temp);
 	
-	// 5. version type flags min max duration repeats
-	fprintf(fl, "%d %d %s %d %d %d %d\n", EVT_VERSION(event), EVT_TYPE(event), bitv_to_alpha(EVT_FLAGS(event)), EVT_MIN_LEVEL(event), EVT_MAX_LEVEL(event), EVT_DURATION(event), EVT_REPEATS_AFTER(event));
+	// 5. version type flags min max duration repeats max-points
+	fprintf(fl, "%d %d %s %d %d %d %d %d\n", EVT_VERSION(event), EVT_TYPE(event), bitv_to_alpha(EVT_FLAGS(event)), EVT_MIN_LEVEL(event), EVT_MAX_LEVEL(event), EVT_DURATION(event), EVT_REPEATS_AFTER(event), EVT_MAX_POINTS(event));
 	
 	// R. rank rewards
 	write_event_rewards_to_file(fl, 'R', EVT_RANK_REWARDS(event));
@@ -1973,12 +2062,15 @@ void olc_delete_event(char_data *ch, any_vnum vnum) {
 	descriptor_data *desc;
 	char_data *chiter;
 	event_data *event;
+	char name[256];
 	bool found;
 	
 	if (!(event = find_event_by_vnum(vnum))) {
 		msg_to_char(ch, "There is no such event %d.\r\n", vnum);
 		return;
 	}
+	
+	snprintf(name, sizeof(name), "%s", NULLSAFE(EVT_NAME(event)));
 	
 	// end the event, if running -- BEFORE removing from the hash table
 	while ((running = find_running_event_by_vnum(vnum))) {
@@ -1989,11 +2081,7 @@ void olc_delete_event(char_data *ch, any_vnum vnum) {
 	remove_event_from_table(event);
 	
 	// look for people with event data and remove it
-	DL_FOREACH(character_list, chiter) {
-		if (IS_NPC(chiter)) {
-			continue;
-		}
-		
+	DL_FOREACH2(player_character_list, chiter, next_plr) {
 		HASH_ITER(hh, GET_EVENT_DATA(chiter), ped, next_ped) {
 			if (!ped->event || EVT_VNUM(ped->event) == vnum) {
 				HASH_DEL(GET_EVENT_DATA(chiter), ped);
@@ -2023,7 +2111,9 @@ void olc_delete_event(char_data *ch, any_vnum vnum) {
 		found |= delete_event_reward_from_list(&EVT_THRESHOLD_REWARDS(ev), QR_EVENT_POINTS, vnum);
 		
 		if (found) {
+			// we do NOT apply in-dev because it would cancel live event points
 			// SET_BIT(EVT_FLAGS(ev), EVTF_IN_DEVELOPMENT);
+			syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: Event %d %s had rewards for a deleted event (removed rewards but did not set IN-DEV)", EVT_VNUM(ev), EVT_NAME(ev));
 			save_library_file_for_vnum(DB_BOOT_EVT, EVT_VNUM(ev));
 		}
 	}
@@ -2036,6 +2126,7 @@ void olc_delete_event(char_data *ch, any_vnum vnum) {
 		
 		if (found) {
 			SET_BIT(PRG_FLAGS(prg), PRG_IN_DEVELOPMENT);
+			syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: Progress %d %s set IN-DEV due to deleted event", PRG_VNUM(prg), PRG_NAME(prg));
 			save_library_file_for_vnum(DB_BOOT_PRG, PRG_VNUM(prg));
 			need_progress_refresh = TRUE;
 		}
@@ -2053,6 +2144,7 @@ void olc_delete_event(char_data *ch, any_vnum vnum) {
 		
 		if (found) {
 			SET_BIT(QUEST_FLAGS(quest), QST_IN_DEVELOPMENT);
+			syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: Quest %d %s set IN-DEV due to deleted event", QUEST_VNUM(quest), QUEST_NAME(quest));
 			save_library_file_for_vnum(DB_BOOT_QST, QUEST_VNUM(quest));
 		}
 	}
@@ -2065,6 +2157,7 @@ void olc_delete_event(char_data *ch, any_vnum vnum) {
 		
 		if (found) {
 			SET_BIT(SOC_FLAGS(soc), SOC_IN_DEVELOPMENT);
+			syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: Social %d %s set IN-DEV due to deleted event", SOC_VNUM(soc), SOC_NAME(soc));
 			save_library_file_for_vnum(DB_BOOT_SOC, SOC_VNUM(soc));
 		}
 	}
@@ -2117,8 +2210,8 @@ void olc_delete_event(char_data *ch, any_vnum vnum) {
 		}
 	}
 	
-	syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: %s has deleted event %d", GET_NAME(ch), vnum);
-	msg_to_char(ch, "Event %d deleted.\r\n", vnum);
+	syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: %s has deleted event %d %s", GET_NAME(ch), vnum, name);
+	msg_to_char(ch, "Event %d (%s) deleted.\r\n", vnum, name);
 	
 	free_event(event);
 }
@@ -2317,6 +2410,13 @@ void do_stat_event(char_data *ch, event_data *event) {
 	}
 	size += snprintf(buf + size, sizeof(buf) - size, "Level limits: [\tc%s\t0], Duration: [\tc%d minutes (%d:%02d:%02d)\t0], Repeatable: [\tc%s\t0]\r\n", level_range_string(EVT_MIN_LEVEL(event), EVT_MAX_LEVEL(event), 0), EVT_DURATION(event), (EVT_DURATION(event) / (60 * 24)), ((EVT_DURATION(event) % (60 * 24)) / 60), ((EVT_DURATION(event) % (60 * 24)) % 60), part);
 	
+	if (EVT_MAX_POINTS(event) > 0) {
+		size += snprintf(buf + size, sizeof(buf) - size, "Maximum points: [\tc%d\t0]\r\n", EVT_MAX_POINTS(event));
+	}
+	else {
+		size += snprintf(buf + size, sizeof(buf) - size, "Maximum points: [\tcnone\t0]\r\n");
+	}
+	
 	get_event_reward_display(EVT_RANK_REWARDS(event), part);
 	size += snprintf(buf + size, sizeof(buf) - size, "Rank Rewards:\r\n%s", *part ? part : " none\r\n");
 	
@@ -2373,6 +2473,13 @@ void olc_show_event(char_data *ch) {
 		sprintf(buf + strlen(buf), "<%srepeat\t0> %d minutes (%d:%02d:%02d)\r\n", OLC_LABEL_VAL(EVT_REPEATS_AFTER(event), 0), EVT_REPEATS_AFTER(event), (EVT_REPEATS_AFTER(event) / (60 * 24)), ((EVT_REPEATS_AFTER(event) % (60 * 24)) / 60), ((EVT_REPEATS_AFTER(event) % (60 * 24)) % 60));
 	}
 	
+	if (EVT_MAX_POINTS(event) > 0) {
+		sprintf(buf + strlen(buf), "<%smaxpoints\t0> %d\r\n", OLC_LABEL_CHANGED, EVT_MAX_POINTS(event));
+	}
+	else {
+		sprintf(buf + strlen(buf), "<%smaxpoints\t0> none\r\n", OLC_LABEL_UNCHANGED);
+	}
+	
 	get_event_reward_display(EVT_RANK_REWARDS(event), lbuf);
 	sprintf(buf + strlen(buf), "Rank rewards: <%srank\t0>\r\n%s", OLC_LABEL_PTR(EVT_RANK_REWARDS(event)), lbuf);
 	
@@ -2395,7 +2502,7 @@ void olc_show_event(char_data *ch) {
 void show_event_detail(char_data *ch, event_data *event) {
 	// bool full_access = (GET_ACCESS_LEVEL(ch) >= LVL_CIMPL || IS_GRANTED(ch, GRANT_EVENTS));
 	struct event_running_data *running = find_last_event_by_vnum(EVT_VNUM(event));
-	char vnum[MAX_STRING_LENGTH], part[MAX_STRING_LENGTH];
+	char vnum[MAX_STRING_LENGTH], part[MAX_STRING_LENGTH], point_str[256];
 	struct player_event_data *ped = NULL;
 	int diff, rank = 0;
 	
@@ -2461,16 +2568,25 @@ void show_event_detail(char_data *ch, event_data *event) {
 			// no other status shown
 		}
 		
+		// determine cap and point amount
+		if (EVT_MAX_POINTS(event) > 0) {
+			snprintf(point_str, sizeof(point_str), "/%d points", EVT_MAX_POINTS(event));
+		}
+		else {
+			snprintf(point_str, sizeof(point_str), " point%s", (!ped || ped->points != 1) ? "s" : "");
+		}
+		
+		// show points
 		if (ped) {
 			if (rank > 0) {
-				msg_to_char(ch, "Rank: %d (%d point%s)\r\n", rank, ped->points, PLURAL(ped->points));
+				msg_to_char(ch, "Rank: %d (%d%s)\r\n", rank, ped->points, point_str);
 			}
 			else {
-				msg_to_char(ch, "Rank: unranked (%d point%s)\r\n", ped->points, PLURAL(ped->points));
+				msg_to_char(ch, "Rank: unranked (%d%s)\r\n", ped->points, point_str);
 			}
 		}
 		else {
-			msg_to_char(ch, "Rank: unranked (0 points)\r\n");
+			msg_to_char(ch, "Rank: unranked (0%s)\r\n", point_str);
 		}
 	}
 }
@@ -2615,7 +2731,7 @@ void show_event_rewards(char_data *ch, struct event_running_data *re) {
 void show_events_no_arg(char_data *ch) {
 	struct event_running_data *running, *only;
 	struct player_event_data *ped;
-	char part[MAX_STRING_LENGTH];
+	char part[MAX_STRING_LENGTH], point_str[256];
 	int count, rank, when;
 	
 	// fetch count and optional only-running-event
@@ -2653,13 +2769,21 @@ void show_events_no_arg(char_data *ch) {
 			msg_to_char(ch, " %s%s", EVT_NAME(running->event), part);
 			
 			if ((ped = get_event_data(ch, running->id))) {
+				// determine cap and point amount
+				if (EVT_MAX_POINTS(running->event) > 0) {
+					snprintf(point_str, sizeof(point_str), "/%d points", EVT_MAX_POINTS(running->event));
+				}
+				else {
+					snprintf(point_str, sizeof(point_str), " point%s", PLURAL(ped->points));
+				}
+				
 				if ((rank = get_event_rank(ch, running)) > 0) {
 					sprintf(part, "rank %d", rank);
 				}
 				else {
 					strcpy(part, "unranked");
 				}
-				msg_to_char(ch, " (%d point%s, %s)", ped->points, PLURAL(ped->points), part);
+				msg_to_char(ch, " (%d%s, %s)", ped->points, point_str, part);
 			}
 			
 			when = running->start_time + (EVT_DURATION(running->event) * SECS_PER_REAL_MIN) - time(0);
@@ -2761,13 +2885,37 @@ OLC_MODULE(evedit_name) {
 
 OLC_MODULE(evedit_maxlevel) {
 	event_data *event = GET_OLC_EVENT(ch->desc);
-	EVT_MAX_LEVEL(event) = olc_process_number(ch, argument, "maximum level", "maxlevel", 0, MAX_INT, EVT_MAX_LEVEL(event));
+	if (!str_cmp(argument, "none")) {
+		EVT_MAX_LEVEL(event) = 0;
+		msg_to_char(ch, "It no longer has a maximum level.\r\n");
+	}
+	else {
+		EVT_MAX_LEVEL(event) = olc_process_number(ch, argument, "maximum level", "maxlevel", 0, MAX_INT, EVT_MAX_LEVEL(event));
+	}
+}
+
+
+OLC_MODULE(evedit_maxpoints) {
+	event_data *event = GET_OLC_EVENT(ch->desc);
+	if (!str_cmp(argument, "none")) {
+		EVT_MAX_POINTS(event) = 0;
+		msg_to_char(ch, "It no longer has a maximum number of points.\r\n");
+	}
+	else {
+		EVT_MAX_POINTS(event) = olc_process_number(ch, argument, "maximum points", "maxpoints", 0, MAX_INT, EVT_MAX_POINTS(event));
+	}
 }
 
 
 OLC_MODULE(evedit_minlevel) {
 	event_data *event = GET_OLC_EVENT(ch->desc);
-	EVT_MIN_LEVEL(event) = olc_process_number(ch, argument, "minimum level", "minlevel", 0, MAX_INT, EVT_MIN_LEVEL(event));
+	if (!str_cmp(argument, "none")) {
+		EVT_MIN_LEVEL(event) = 0;
+		msg_to_char(ch, "It no longer has a minimum level.\r\n");
+	}
+	else {
+		EVT_MIN_LEVEL(event) = olc_process_number(ch, argument, "minimum level", "minlevel", 0, MAX_INT, EVT_MIN_LEVEL(event));
+	}
 }
 
 
@@ -2870,7 +3018,7 @@ ACMD(do_events) {
 	}
 	
 	// are they looking up an event instead?
-	if (*arg && type == NOTHING && (event = smart_find_event(argument, FALSE))) {
+	if (*arg && type == NOTHING && (event = smart_find_event(argument, FALSE, FALSE))) {
 		show_event_detail(ch, event);
 		return;
 	}
@@ -2905,7 +3053,7 @@ EVENT_CMD(evcmd_cancel) {
 	else if (is_number(argument) && !(re = find_running_event_by_id(atoi(argument)))) {
 		msg_to_char(ch, "Unknown event id '%s'.\r\n", argument);
 	}
-	else if (!re && !(event = smart_find_event(argument, TRUE))) {
+	else if (!re && !(event = smart_find_event(argument, TRUE, FALSE))) {
 		msg_to_char(ch, "Unable to find a running event called '%s'.\r\n", argument);
 	}
 	else {
@@ -3049,7 +3197,7 @@ EVENT_CMD(evcmd_end) {
 	else if (is_number(argument) && !(re = find_running_event_by_id(atoi(argument)))) {
 		msg_to_char(ch, "Unknown event id '%s'.\r\n", argument);
 	}
-	else if (!re && !(event = smart_find_event(argument, TRUE))) {
+	else if (!re && !(event = smart_find_event(argument, TRUE, FALSE))) {
 		msg_to_char(ch, "Unable to find a running event called '%s'.\r\n", argument);
 	}
 	else {
@@ -3096,7 +3244,7 @@ EVENT_CMD(evcmd_leaderboard) {
 		event = re->event;
 		// this is a valid case; all other targeting below happens otherwise:
 	}
-	else if (!(event = smart_find_event(argument, FALSE))) {
+	else if (!(event = smart_find_event(argument, FALSE, FALSE))) {
 		msg_to_char(ch, "Unknown event '%s'.\r\n", argument);
 		return;
 	}
@@ -3211,7 +3359,7 @@ EVENT_CMD(evcmd_rewards) {
 		event = re->event;
 		// this is a valid case; all other targeting below happens otherwise:
 	}
-	else if (!(event = smart_find_event(argument, FALSE))) {
+	else if (!(event = smart_find_event(argument, FALSE, FALSE))) {
 		msg_to_char(ch, "Unknown event '%s'.\r\n", argument);
 		return;
 	}
@@ -3232,7 +3380,7 @@ EVENT_CMD(evcmd_start) {
 	if (!*argument) {
 		msg_to_char(ch, "Start what event?\r\n");
 	}
-	else if (!(event = smart_find_event(argument, FALSE))) {
+	else if (!(event = smart_find_event(argument, FALSE, TRUE))) {
 		msg_to_char(ch, "Unknown event '%s'.\r\n", argument);
 	}
 	else if (find_running_event_by_vnum(EVT_VNUM(event))) {

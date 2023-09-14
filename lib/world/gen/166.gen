@@ -58,6 +58,8 @@ S
 grinchy pole impact~
 4 0
 0 0 0 0
+T5
+...$e seems stunned.~
 S
 #16617
 Max summon~
@@ -70,9 +72,61 @@ pixy curse~
 0 0 0 0
 T0
 The curse of the pixy fades.~
+T5
+...$e is holding perfectly still.~
+S
+#16635
+scared pet~
+3 0
+0 0 0 0
+S
+#16641
+well-fed pet~
+4 0
+0 0 0 0
+S
+#16642
+well-fed pet~
+3 0
+0 0 0 0
 S
 #16657
 dreidel~
+3 0
+0 0 0 0
+S
+#16667
+floating lantern~
+3 0
+0 0 0 0
+S
+#16668
+gingerbread man~
+3 0
+0 0 0 0
+S
+#16669
+snowmother melt~
+3 0
+0 0 0 0
+S
+#16680
+cooldown for krampus~
+3 0
+0 0 0 0
+S
+#16681
+krampus switching~
+4 0
+0 0 0 0
+S
+#16682
+krampus's curse~
+4 0
+0 0 0 0
+S
+#16683
+krampus heal cooldown~
 3 0
 0 0 0 0
 S

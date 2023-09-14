@@ -116,6 +116,9 @@ struct olc_command_data {
 	int flags;	// OLC_CF_
 };
 
+// for parse_quest_reward_vnum:
+#define PARSE_QRV_FAILED  -999
+
 
 // olc.c helpers
 bool can_start_olc_edit(char_data *ch, int type, any_vnum vnum);
@@ -124,6 +127,7 @@ void get_interaction_display(struct interaction_item *list, char *save_buffer);
 void get_resource_display(struct resource_data *list, char *save_buffer);
 void get_script_display(struct trig_proto_list *list, char *save_buffer);
 int find_olc_type(char *name);
+bool interactions_are_identical(struct interaction_item *a, struct interaction_item *b);
 bool player_can_olc_edit(char_data *ch, int type, any_vnum vnum);
 
 // olc auditor functions
@@ -267,7 +271,7 @@ void olc_show_vehicle(char_data *ch);
 void get_adventure_linking_display(struct adventure_link_rule *list, char *save_buffer);
 void get_archetype_gear_display(struct archetype_gear *list, char *save_buffer);
 void get_bld_relations_display(struct bld_relation *list, char *save_buffer);
-void get_extra_desc_display(struct extra_descr_data *list, char *save_buffer);
+void get_extra_desc_display(struct extra_descr_data *list, char *save_buffer, size_t buf_size);
 void get_generic_relation_display(struct generic_relation *list, bool show_vnums, char *save_buf, char *prefix);
 char *get_interaction_restriction_display(struct interact_restriction *list, bool whole_list);
 void get_evolution_display(struct evolution_data *list, char *save_buffer);
@@ -280,6 +284,39 @@ void get_template_spawns_display(struct adventure_spawn *list, char *save_buffer
 // olc helpers
 const char *get_interaction_target(int type, any_vnum vnum);
 char **get_weapon_types_string();
+
+// word count: core functions
+int wordcount_custom_messages(struct custom_message *list);
+int wordcount_extra_descriptions(struct extra_descr_data *list);
+int wordcount_requirements(struct req_data *list);
+int wordcount_string(const char *string);
+
+// word count: types
+int wordcount_ability(ability_data *abil);
+int wordcount_adventure(struct adventure_data *adv);
+int wordcount_archetype(archetype_data *arch);
+int wordcount_augment(augment_data *aug);
+int wordcount_book(book_data *book);
+int wordcount_building(bld_data *bld);
+int wordcount_class(class_data *cls);
+int wordcount_craft(craft_data *craft);
+int wordcount_crop(crop_data *crop);
+int wordcount_event(event_data *evt);
+int wordcount_faction(faction_data *fct);
+int wordcount_generic(generic_data *gen);
+int wordcount_global(struct global_data *glb);
+int wordcount_mobile(char_data *ch);
+int wordcount_morph(morph_data *mph);
+int wordcount_object(obj_data *obj);
+int wordcount_progress(progress_data *prg);
+int wordcount_quest(quest_data *quest);
+int wordcount_room_template(room_template *rmt);
+int wordcount_sector(sector_data *sect);
+int wordcount_shop(shop_data *shop);
+int wordcount_skill(skill_data *skill);
+int wordcount_social(social_data *soc);
+int wordcount_trigger(trig_data *trig);
+int wordcount_vehicle(vehicle_data *veh);
 
 // helpers from other systems
 bool find_event_reward_in_list(struct event_reward *list, int type, any_vnum vnum);

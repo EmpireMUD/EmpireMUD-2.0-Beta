@@ -2,7 +2,7 @@
 Inside the Beaver Dam~
 You shouldn't be able to get in here.
 ~
-gi 0 0
+gi 0 0 -1
 M 0 18450 100.00 1
 M 0 18451 100.00 1
 S
@@ -12,14 +12,14 @@ An Unstable Portal~
 see where you are, or where you're going! You can still hear the sorcerers back
 in the tower, but you're not sure what lies beyond the portal.
 ~
-cdgi 0 0
+cdgi 0 0 18460
 T 18460
 S
 #18461
 Farther from the Portal~
 You've traveled too far from the portal and this reality is fading...
 ~
-cdgi 0 0
+cdgi 0 0 18461
 D8
 ~
 0 18460
@@ -31,7 +31,7 @@ suggests someone has been living here, and the shelves are decorated with small
 figurines and other items. The top of the cupboard is stepped, suggesting this
 cupboard is underneath a staircase.
 ~
-cgi 0 0
+cgi 0 0 18462
 D1
 ~
 0 18461
@@ -65,7 +65,7 @@ mound upon which the temple is built and ends on the temple square below.
 To the west, you see the Reading Room.  The donation room is in a small
 alcove to your east.
 ~
-cgi 0 0
+cgi 0 0 18463
 D0
 ~
 0 18461
@@ -104,7 +104,7 @@ wind, and the ears of corn have dried out and burst in the sun, littering the
 ground in a heavy snow of popped corn. In the distance you can faintly see a
 manor house.
 ~
-acgi 0 0
+acgi 0 0 18464
 D0
 ~
 0 18461
@@ -130,8 +130,8 @@ The blue plaque reads:
 "The Wizard of Oz", to the 1939 film by that name, and to the song "Tragic
 Kingdom" by No Doubt.
 ~
-I 6 18484 100.00 1  # FORAGE: a handful of popcorn
-I 7 18485 100.00 1  # PICK: a bag of popcorn
+I 6 18484 100.00 1  # FORAGE: handful of popcorn
+I 7 18485 100.00 1  # PICK: bag of popcorn
 M 0 18485 100.00 1
 T 18461
 T 18462
@@ -142,7 +142,7 @@ S
 Twisty Little Passages~
 You are in a maze of twisty little passages, all alike.
 ~
-cgi 0 0
+cgi 0 0 18465
 D0
 ~
 0 18461
@@ -176,7 +176,7 @@ from moment to moment. Bizarre beasts populate the stalls, and rather than
 running straight along the bottom, the straw-covered floor twists around to the
 ceiling like a corkscrew.
 ~
-cgi 0 w
+cgi 0 w 18466
 D2
 ~
 0 18461
@@ -201,7 +201,7 @@ stand. The doors and archways are perfectly round, like nothing you've ever
 seen before. The house is filled with knick knacks, tchotchkes, and kitsch of
 all kinds. The smell of pipe smoke wafts in from the garden.
 ~
-cgi 0 0
+cgi 0 0 18467
 D0
 ~
 0 18461
@@ -251,7 +251,7 @@ A Vast Field (88, 200)~
 |&b~~~~~~~~~~~~~~~~~~~~~~~~~~~~&0....&b~~~~~~~~~~~~~~~~~~~~~~~~~~~~&0|
 +------------------------------------------------------------+
 ~
-acgi 0 0
+acgi 0 0 18468
 D0
 ~
 0 18461
@@ -285,7 +285,7 @@ The closet is a dark, cramped space.  It appears  to be very crowded in here;
  bumbling about is a metal doorknob set at waist level into  what might be a
  door.  Next to it is a spring lever labeled 'QUIET!'.
 ~
-cgi 0 0
+cgi 0 0 18469
 E
 coat coats~
 A generic coat. Right out of the closet.
@@ -310,7 +310,7 @@ A Massive Steel Vault~
 stretches toward the exit: a huge steel gear painted with the number 111. You
 can see no way to open the gear, which is fixed firmly in place.
 ~
-cgi 0 0
+cgi 0 0 18470
 D0
 ~
 0 18461
@@ -335,7 +335,7 @@ which must have cost a fortune, as each pane is crystal clear and free from
 defects. The items in the shop window are like nothing you have ever seen, but
 the bustling crowd of people seem eager to buy them. (Type 'list')
 ~
-acgi 0 0
+acgi 0 0 18471
 D0
 ~
 0 18461
@@ -379,7 +379,7 @@ A Long, Dusty Trail~
    Next landmark: 22 miles
   Miles traveled: 736 miles
 ~
-cgi 0 0
+cgi 0 0 18472
 D1
 ~
 0 18461
@@ -403,31 +403,356 @@ T 18496
 T 18491
 S
 #18473
-Portal 12~
-tba
+The Precipice of Anticipation~
+   The portal deposits you on a broken stone path through a cemetery on a leaf-
+strewn precipice above a vast sea. Square slabs mark a series of old graves
+along the straight path, which leads to a large circle paved with flat stones
+and carved with a well-worn design. Across the circle, there is a tall statue
+of a woman looking down, with her arms outstretched. Behind her, an enormous
+glowing tree lights up the sky.
+   The few trees that once grew on this precipice are small and dead. The uncut
+grass off the path has turned brown. The faded yellow remains of flowers
+cluster in patches here and there, sometimes covered in piles of golden leaves.
+   Behind you lies the ruin of a great mausoleum; to the east, the path leads
+through an archway in a broken wall and across a wooden bridge. In all other
+directions, the cliff falls off precipitously and the sea is far, far below.
+In the distance, clouds block your view of everything except the glowing tree.
 ~
-cgi 0 0
-D0
-~
-0 18461
+acgi 0 0 18473
 D1
 ~
 0 18461
 D2
 ~
 0 18461
-D3
+E
+shadow~
+Oh that's not good...
 ~
-0 18461
+E
+path pavers~
+   The path is paved with flat stones, not more than ten feet wide, with a
+short curb decorating the sides. It has not been maintained in some time; grass
+grows between some of the paving stones, which have become uneven with age.
+~
+E
+broken~
+   Everything on the cliffside is in disrepair. The path, once finely paved,
+bears many damaged stones. Parts of the walls are damaged or missing, though
+the sheer drop of the cliff requires no defense.
+~
+E
+stones~
+   All the construction here was stone, from the paths, to the walls, to the
+statues. There's no way to tell how long it took to fall into this state.
+~
+E
+cemetery~
+   This cemetery may once have been larger; it ends abruptly in several places
+where the edge of the cliff begins without warning. At the head of this portion
+of it, a thirty-foot statue of a woman with out-stretched arms watches over the
+dead. Behind you, a tall statue of a knight covered in roots guards a large
+mausoleum on higher ground. To the east, through an archway, the path leads
+down to a wooden bridge.
+~
+E
+precipice cliffside rocky~
+   The cemetery is set atop a rocky precipice with steep drops on every side.
+Fog in the air makes it difficult to see the bottom, but you catch glimpses of
+choppy water far below.
+~
+E
+sea vast below down ocean water~
+   You can barely see the sea through all the haze, but it seems to go on
+forever in every direction except east, where you can barely make out a large
+castle on a distant cliff.
+~
+E
+circle border~
+   In the center of this area of the cemetery, raised slightly above the
+ground, there lies a large stone circle, perhaps fifty feet across, with a
+border carved with patterns that resemble branches and leaves, though they are
+badly worn and difficult to distinguish.
+   The center of the circle, made from hundreds of paving stones, is carved in
+low relief with three interlocking rings at the center and sprawling roots that
+stretch toward the border. The circle is in better condition than the path,
+though weather and foot traffic have worn down its details.
+~
+E
+paved flat~
+   The paths and circles are paved with flat stones. Along the path, equally
+flat slabs of stone serve as grave markers.
+~
+E
+center design well-worn~
+   The center of the great stone circle is carved in low relief with three
+interlocking rings at the center and sprawling roots that stretch toward the
+border. The circle is in better condition than the path, though weather and
+foot traffic have worn down its details.
+~
+E
+statue tall woman~
+   The statue is at least thirty feet tall, showing a woman with her head down
+and arms straight out to the sides, with the five fingers of each hand splayed
+in opposite directions. Her hair is tied in two long braids, flowing down in
+front of her shoulders; one reaches her knee while the other is cut off below
+her left breast.
+   The woman's gown drapes to the ground, though it has been carved in motion,
+as if it's blowing slightly to her right. Behind her, a large stone ribbon
+coils in a figure-eight, giving the impression of motion. It is inscribed with
+unusual shapes and symbols you can't quite see from here; whether it truly
+represents a ribbon, or a serpent, or a spell, you cannot tell.
+   The woman's head is encircled with a wreath of roots, or perhaps branches,
+fitted tightly like a crown. Her upper arms are wrapped in thin bands that seem
+to tether her to the great ribbon behind her. Indeed, below her draping gown,
+you can see one of her feet dangles, as if she's hanging from the ribbon, or
+perhaps floating. In the light, the ribbon has an almost golden hue, as do
+the woman's crown and necklace, against the gray of the stone statue.
+   The entire statue stands atop a large plinth made from stone bricks. At the
+front, it is carved with a stylized tree flanked by a pair of lions. Beast
+faces seem to grow out of the tree's branches as well, supported by leaves. At
+the bottom, below the ground, the roots are bulbous, perhaps with something
+growing in them, but the scene is old and worn, like the rest of the statue.
+A four-stranded braid pattern runs down the face of the plinth, next to the
+carved scene. The corners of the plinth are carved like round pillars made of
+rough human forms tucked together.
+   Broken headstones are clustered around the base of the statue, perhaps too
+close to be graves. The statue is right at the edge of the cliff; you can't
+get behind it to see what it looks like from the back. From the sides, the
+woman's upper body seems to be hanging foward, as if she's attached by the arms
+and legs.
+~
+E
+ribbon serpent~
+   Behind the tall statue of the woman is a large stone ribbon, coiled in a
+figure-eight with the end carved to look like it's dangling, or even moving.
+The ribbon is inscribed with unusual shapes and symbols you can't quite see
+from here; whether it truly represents a ribbon, or a serpent, or a spell,
+you cannot tell.
+   The woman looks as if she might be suspended from the ribbon; her feet do
+not touch the plinth. Her weight is supported by her gown instead.
+~
+E
+foot feet~
+   You can only see one of the feet of the woman's tall statue, but it dangles
+as if she's floating or hanging from something.
+~
+E
+gown~
+   The tall statue of a woman at the head of the cemetery is depicted in a
+gown that gives the impression of motion, as if it's being blown to the west.
+~
+E
+plinth~
+   The woman's statue stands atop a large plinth made from stone bricks. At the
+front, it is carved with a stylized tree flanked by a pair of lions. Beast
+faces seem to grow out of the tree's branches as well, supported by leaves. At
+the bottom, below the ground, the roots are bulbous, perhaps with something
+growing in them, but the scene is old and worn, like the rest of the statue.
+A four-stranded braid pattern runs down the face of the plinth, next to the
+carved scene. The corners of the plinth are carved like round pillars made of
+rough human forms tucked together.
+~
+E
+ground~
+   The ground is overgrown with grass along the paved path. At the edges,
+especially along the cliffside, the ground is rocky.
+~
+E
+statues~
+   Statues surround you. The wall to the south is topped with an enormous
+knight. The head of the cemetary, north of you, has a tall statue of a woman.
+Along the walls, several statues of hooded religious figures hold greatswords,
+and atop the walls you see smaller statues of young girls and birds of prey.
+~
+E
+girls young~
+   You can see a statue of a young girl holding a vase or jug atop both the
+east and south walls. She's up too high to see details.
+~
+E
+birds prey~
+Statues of eagles or some other large bird of prey top some parts of the walls.
+~
+E
+braids~
+   The statue of the woman has two long braids in her hair. A four-stranded
+braid also appears in other carvings.
+~
+E
+carvings~
+   The walls, statues, the circle in the center of the cemetery, and the grave
+markers are all richly carved.
+~
+E
+necklace~
+   The large statue of the woman is wearing a necklace but you can't make out
+the details from down here.
+~
+E
+crown~
+   The large statue of the woman is wearing a golden crown that appears to be
+made of roots or branches.
+~
+E
+tree glowing up light northeast~
+   The brightest light in the sky is not the sun, it's a truly enormous tree
+that grows from trunk to crown with all the brilliance of a summer day, though
+the sky behind it is gray with roiling clouds.
+   The tree's canopy, sparse with golden leaves, stretches in a great circle
+many times larger than the sun.
+~
+E
+sun~
+   The sun is difficult to see as it's little more than a bright circle
+struggling against the clouds.
+~
+E
+sky~
+   The sky is gray, with clouds blowing toward the north. The gloom is cut by
+the great, glowing tree in the northeast.
+~
+E
+trees~
+   Small, scraggly trees dot the cliffside. Most look dead and half blown-over
+in the high winds, though they seem to be the source of the piles of golden
+leaves on the ground.
+~
+E
+slabs squares graves markers~
+   Several low stone slabs serve as grave markers, just off the paved path. The
+slabs are carved with natural patterns, especially branches and leaves. At the
+center, a pair of heraldic lions face each other, rampant. Thirteen such
+markers remain.
+   Old swords and spears stick up from the ground near some of the graves.
+~
+E
+flowers~
+   A few flowers remain here and there, though they are dried and withered.
+They have a yellow-brown hue, with short stems. You can't identify them.
+~
+E
+yellow brown golden~
+   The leaves, the flowers, the ferns, the grass, even the glowing tree --
+everything here that isn't made of stone or cloud -- is in some shade of gold
+or brown.
+~
+E
+grass~
+The uncut brown grass is littered with leaves and flowers and ferns.
+~
+E
+ruins~
+   The entire cemetery is in ruins. In places, it looks as if part has been
+lost to the cliff. Bits of wall are missing; grass grows between the uneven
+pavers of the path; nothing has been repaired or maintained in ages.
+~
+E
+mausoleum south higher~
+   The ground rises to the south, toward a large mausoleum in the distance. The
+wall in front of it is topped with a colossal statue of a knight with a rounded
+finial on his helmet.
+~
+E
+knight colossal finial~
+   Atop the wall to the south stands a colossal statue of a knight. The statue
+is depicted with roots growing up over it and the knight holds a tall, leafy
+stem. The knight's helmet is topped with a half-circle finial that loosely
+resembles the canopy of a tree.
+   The knight is carved in gray stone like the buildings, but the roots and
+branches are golden brown.
+~
+E
+walls~
+   The walls of the cemetery are made of gray stone bricks and often
+intricately carved with lions, branches, and leaves. On top of them, smaller
+sculptures depict birds of prey, more lions, and a young girl holding a vase.
+   The walls are not in good repair: whole sections are missing and much of the
+rest is overgrown with vines. A blue plaque has been affixed to one of the
+walls.
+~
+E
+archway east~
+   The archway to the east leads down to a wooden bridge. Beyond that, far
+beyond, you can see a large castle on a distance cliff. The short bridge leads
+elsewhere, but its destination is out of sight from here. A blue plaque is
+attached to the wall near the archway.
+~
+E
+bridge~
+   You can see a wooden bridge suspended from edge of the cliff, beyond the
+archway to the east.
+~
+E
+out distance haze fog north west northwest southwest~
+   You can't see much in the distance because of the fog and haze. Over the
+cliff, there is a steep drop, beneath which you can barely make out choppy
+waves.
+~
+E
+clouds~
+   The sky is covered in roiling clouds which blow toward the north. Down here,
+a hazy fog is buffeted by the wind.
+~
+E
+southeast~
+   A hole in the corner of the cemetery wall lets you see out to the southeast,
+but there's little you can see through the fog.
+~
+E
+vines~
+Brown, leafy vines hang over parts of the walls.
+~
+E
+swords spears axes daggers~
+   Around some of the graves, swords and spears protrude from the ground. They
+are all old and rusted, from a long-ago conflict. They stick out at haphazard
+angles, with no sense of organization or pattern. A few are stuck in other
+parts of the cemetery as well, away from the marked graves. The occasional axe
+or dagger makes an appearance as well, staked into the ground forevermore.
+~
+E
+headstones clustered clusters~
+   Clusters of curved headstones adorn the sides of the woman's statue, the
+path beyond the archway, and some other corners of the cemetery. These
+headstones seem to be too close together to mark separate graves.
+~
+E
+roots~
+   Roots can be seen entangling the knight statue, in the relief on the circle,
+and in some of the other motifs.
+~
+E
+castle~
+   Through the fog and the archway, you can see a huge castle in the east. Its
+towers rise above a great cliff, though you can make out few details in the
+haze. Banners still fly from the castle walls; despite damage on the sea side
+of it, someone must still reside within.
+~
+E
+damage~
+Everything here is damaged.
+~
+E
+plaque~
+The blue plaque reads:
+   This unstable portal is dedicated to Elden Ring, a deeply frustrating but
+also richly environmental RPG by FromSoftware. Elden Ring tells complex,
+thoughtful stories told through unreliable narrators, half-truths, and
+countless tiny details that slowly expose the truth to players willing to hunt
+for scraps of lore.
+~
 T 18461
 T 18462
 T 18496
+T 18492
+T 18473
 S
 #18474
 Portal 13~
 tba
 ~
-cgi 0 0
+cgi 0 0 18474
 D0
 ~
 0 18461
@@ -448,7 +773,7 @@ S
 Portal 14~
 tba
 ~
-cgi 0 0
+cgi 0 0 18475
 D0
 ~
 0 18461
@@ -468,7 +793,7 @@ S
 Portal 15~
 tba
 ~
-cgi 0 0
+cgi 0 0 18476
 D0
 ~
 0 18461
@@ -488,7 +813,7 @@ S
 Portal 16~
 tba
 ~
-cgi 0 0
+cgi 0 0 18477
 D0
 ~
 0 18461
@@ -508,7 +833,7 @@ S
 Portal 17~
 tba
 ~
-cgi 0 0
+cgi 0 0 18478
 D0
 ~
 0 18461

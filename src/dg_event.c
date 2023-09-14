@@ -108,7 +108,7 @@ void dg_event_process(void) {
 		}
 
 		/* call event func, reenqueue event if retval > 0 */
-		if ((new_time = (the_event->func)(the_event->event_obj)) > 0) {
+		if ((new_time = (the_event->func)(the_event, the_event->event_obj)) > 0) {
 			SAFE_ADD(new_time, main_game_pulse, 0, ULONG_MAX, FALSE);
 			the_event->q_el = queue_enq(event_q, the_event, new_time);
 		}

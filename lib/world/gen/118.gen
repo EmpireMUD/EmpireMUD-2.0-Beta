@@ -1,0 +1,465 @@
+#11800
+Skycleave mob ability cooldown~
+3 0
+0 0 0 0
+S
+#11804
+Enchanted Water~
+1 0
+0 0 3 0
+T0
+enchanted water~
+T1
+crystal clear~
+S
+#11810
+rolling~
+4 0
+0 0 0 0
+T5
+...$e is rolling on the floor!~
+S
+#11811
+fan of knives~
+4 0
+0 0 0 0
+T0
+You pull a knife out of your chest.~
+T5
+...$e has a knife sticking out of $m!~
+S
+#11812
+recovering~
+4 0
+0 0 0 0
+T0
+You recover from that poorly-timed dodge.~
+S
+#11813
+distracted~
+4 0
+0 0 0 0
+T0
+You refocus on the fight.~
+S
+#11814
+prone~
+4 0
+0 0 0 0
+T0
+You get back up.~
+T5
+...$e is lying prone on the ground.~
+S
+#11815
+disarmed~
+4 0
+0 0 0 0
+T0
+You recover your weapon.~
+T5
+...$e has lost $s weapon!~
+S
+#11816
+ankle stab~
+4 0
+0 0 0 0
+T0
+Your ankle wound starts to feel better.~
+T4
+$e is bleeding from $s ankle.~
+T5
+...$e is bleeding from the ankle.~
+S
+#11817
+embiggened~
+4 0
+0 0 0 0
+T1
+$n returns to normal size.~
+T5
+...$e is huge!~
+S
+#11818
+off-balance~
+4 0
+0 0 0 0
+T0
+You regain your balance.~
+T5
+...$e is off-balance.~
+S
+#11820
+miniaturized~
+4 0
+0 0 0 0
+T0
+You return to normal size.~
+T1
+$n returns to normal size.~
+T2
+You suddenly shrink to the size of a pixy!~
+T3
+$n suddenly shrinks to the size of a pixy!~
+T5
+...$e has shrunk to the size of a pixy!~
+S
+#11821
+miniaturized~
+4 0
+0 0 0 0
+S
+#11822
+struggling~
+4 0
+0 0 0 0
+T0
+You're finally free!~
+T5
+...$e is struggling to get free!~
+S
+#11823
+blinding barrage~
+4 0
+0 0 0 0
+T0
+You can see again.~
+T5
+...$e has been blinded by the barrage!~
+S
+#11824
+rain of arrows~
+4 0
+0 0 0 0
+T0
+You pull an arrow from your chest.~
+T5
+...$e has arrows sticking out of $m.~
+S
+#11832
+conditional visibility~
+4 0
+0 0 0 0
+S
+#11841
+blind~
+4 0
+0 0 0 0
+T0
+You can see again.~
+T5
+...$e is stumbling around blindly!~
+S
+#11842
+bleeding~
+4 0
+0 0 0 0
+T0
+You are no longer bleeding.~
+T4
+$e is bleeding badly!~
+T5
+...$e is bleeding badly!~
+S
+#11843
+firebrand~
+4 0
+0 0 0 0
+T0
+The flame brand on your arm burns out.~
+T1
+The flaming brand on $n's arm burns out.~
+T4
+$s arm is on fire!~
+T5
+...$s arm is on fire!~
+S
+#11844
+enchanted weapon~
+4 0
+0 0 0 0
+T5
+...$s weapon is glowing!~
+S
+#11845
+weapon sheathed~
+4 0
+0 0 0 0
+T5
+...$e is focused on a big attack -- this is your chance to strike!~
+S
+#11847
+arcane tattoos~
+4 0
+0 0 0 0
+T1
+The golden tattoos on $n's arms stop glowing.~
+T5
+...$s arms are covered in glowing gold tattoos!~
+S
+#11848
+viper venom~
+4 0
+0 0 0 0
+T0
+The viper venom no longer stings.~
+T5
+...$e looks a bit ill.~
+S
+#11849
+blood curse~
+4 0
+0 0 0 0
+T0
+The blood curse ends.~
+T5
+...$e is afflicted by a blood curse!~
+S
+#11850
+corpse's touch~
+4 0
+0 0 0 0
+T0
+The deathly pallor of the corpse's touch wears off.~
+T5
+...$e looks deathly pale.~
+S
+#11851
+stunned~
+4 0
+0 0 0 0
+T0
+You are no longer stunned.~
+T5
+...$e seems stunned!~
+S
+#11852
+boss stunned~
+4 0
+0 0 0 0
+T5
+...$e's stunned -- now is the time to strike!~
+S
+#11854
+dodged penalty~
+4 0
+0 0 0 0
+T5
+...this is your chance to strike!~
+S
+#11855
+arcane tattoos~
+4 0
+0 0 0 0
+T1
+The silver tattoos on $n's arms stop glowing.~
+T5
+...$s arms are covered in glowing silver tattoos!~
+S
+#11856
+timely dodge~
+4 0
+0 0 0 0
+S
+#11857
+belt of Venus~
+4 0
+0 0 0 0
+T0
+You are no longer affected by the belt of Venus.~
+T5
+...$e seems to be moving very slowly.~
+S
+#11858
+venomous jab~
+4 0
+0 0 0 0
+T0
+The venom burns itself out of your system.~
+T5
+...$e looks like $e's going to be sick.~
+S
+#11859
+gash of Cronus~
+4 0
+0 0 0 0
+T0
+The gash of Cronus fades.~
+T5
+...$e seems to be moving slowly.~
+S
+#11860
+complete darkness~
+4 0
+0 0 0 0
+T0
+The darkness fades and you can see again!~
+T5
+...$e is swinging wildly, unable to see!~
+S
+#11861
+pinned shadow~
+4 0
+0 0 0 0
+T0
+You're no longer pinned down by the shadow dagger!~
+T5
+...$s shadow is pinned to the ground!~
+S
+#11863
+shadow cage~
+4 0
+0 0 0 0
+T4
+$e is trapped in a shadow cage -- free $m!~
+T5
+...$e is trapped in a shadow cage -- free $m!~
+S
+#11864
+absorbed spell~
+4 0
+0 0 0 0
+T5
+...$e has absorbed some power!~
+S
+#11865
+condensed ether~
+4 0
+0 0 0 0
+T0
+The condensed ether fades and you can move again.~
+T5
+...$e's being slowed by condensed ether!~
+S
+#11867
+momentarily stunned~
+4 0
+0 0 0 0
+T0
+You're no longer stunned.~
+S
+#11868
+blowback~
+4 0
+0 0 0 0
+T5
+...$e seems to be weakened!~
+S
+#11869
+shadow flail~
+4 0
+0 0 0 0
+T5
+...it's flailing wildly around the office!~
+S
+#11870
+shadow flail~
+4 0
+0 0 0 0
+T0
+You recover from the flailing tendril.~
+T5
+...$e seems off-balance from the tendril.~
+S
+#11871
+wave of guilt~
+4 0
+0 0 0 0
+T0
+The wave of guilt fades.~
+T5
+...$e has a guilty look.~
+S
+#11872
+deathbolt~
+4 0
+0 0 0 0
+T0
+The deathbolt fades, at least for now.~
+T5
+...$e is glowing from the deathbolt.~
+S
+#11873
+slightly drained~
+4 0
+0 0 0 0
+S
+#11874
+life drain~
+4 0
+0 0 0 0
+T5
+...it seems to be stealing Master Knezz's life force!~
+S
+#11880
+magic rock candy~
+6 0
+0 11880 0 0
+R 6600
+R 6340
+T0
+magic rock candies~
+S
+#11883
+power of Skycleave~
+4 0
+0 0 0 0
+T0
+The power of Skycleave fades from you.~
+T2
+You feel a torrent of power course through your body!~
+T4
+$e has a strange violet glow about $m.~
+T5
+...$e has a strange violet glow!~
+S
+#11885
+pure morning dew~
+1 0
+-4 0 4 0
+T0
+pure morning dew~
+T1
+crystal clear~
+S
+#11888
+trapped in a jar~
+4 0
+0 0 0 0
+T4
+$e is trapped in a jar -- free $m!~
+T5
+...$e is trapped in a jar -- free $m!~
+S
+#11889
+rays of moonlight~
+4 0
+0 0 0 0
+S
+#11890
+swirling seas~
+4 0
+0 0 0 0
+S
+#11891
+crystallized sap~
+4 0
+0 0 0 0
+S
+#11892
+lightning struck~
+4 0
+0 0 0 0
+T1
+The Iskip slows back down.~
+S
+#11896
+Lilac Goblin Wine~
+1 0
+5 1 1 0
+T0
+lilac wine~
+T1
+purple~
+S
+$

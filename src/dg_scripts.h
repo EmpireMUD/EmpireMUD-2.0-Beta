@@ -64,6 +64,8 @@
 #define MTRIG_BUY              BIT(24)	// attempting a purchase
 #define MTRIG_KILL             BIT(25)	// mob has killed something
 #define MTRIG_ALLOW_MULTIPLE   BIT(26)	// for triggers that block other triggers, allows multiple to run
+#define MTRIG_CAN_FIGHT        BIT(27)	// checked when trying to attack a mob you're not already fighting
+#define MTRIG_PRE_GREET_ALL    BIT(28)	// similar to greet-all but called BEFORE moving the person into the room
 
 
 // OTRIG_x: obj trigger types
@@ -139,6 +141,7 @@
 #define WTRIG_REBOOT           BIT(23)	// after the mud reboots
 #define WTRIG_BUY              BIT(24)	// attempting a purchase
 // unused 25: rooms cannot kill
+#define WTRIG_ALLOW_MULTIPLE   BIT(26)	// for triggers that block other triggers, allows multiple to run
 
 
 // list of global trigger types (for random_triggers linked list)
@@ -163,6 +166,8 @@
 #define OCMD_POISON  8
 #define OCMD_PAINT  9
 #define OCMD_LIGHT  10
+#define OCMD_TASTE  11
+#define OCMD_SIP  12
 
 #define TRIG_NEW                0	     /* trigger starts from top  */
 #define TRIG_RESTART            1	     /* trigger restarting       */
@@ -312,13 +317,14 @@ struct wld_command_info {
 /* function prototypes from dg_triggers.c (and others) */
 void adventure_cleanup_wtrigger(room_data *room);
 void act_mtrigger(const char_data *ch, char *str, char_data *actor, char_data *victim, obj_data *object, obj_data *target, char *arg);  
-void speech_mtrigger(char_data *actor, char *str);
-void speech_wtrigger(char_data *actor, char *str);
+void speech_mtrigger(char_data *actor, char *str, generic_data *language);
+void speech_wtrigger(char_data *actor, char *str, generic_data *language);
 void greet_memory_mtrigger(char_data *ch);
-int greet_mtrigger(char_data *actor, int dir);
-int entry_mtrigger(char_data *ch);
+int greet_mtrigger(char_data *actor, int dir, char *method);
+int pre_greet_mtrigger(char_data *actor, room_data *room, int dir, char *method);
+int entry_mtrigger(char_data *ch, char *method);
 void entry_memory_mtrigger(char_data *ch);
-int enter_wtrigger(room_data *room, char_data *actor, int dir);
+int enter_wtrigger(room_data *room, char_data *actor, int dir, char *method);
 int drop_otrigger(obj_data *obj, char_data *actor, int mode);
 int timer_otrigger(obj_data *obj);
 int get_otrigger(obj_data *obj, char_data *actor);
@@ -336,6 +342,7 @@ int death_mtrigger(char_data *ch, char_data *actor);
 void fight_mtrigger(char_data *ch);
 void hitprcnt_mtrigger(char_data *ch);
 int bribe_mtrigger(char_data *ch, char_data *actor, int amount);
+int can_fight_mtrigger(char_data *ch, char_data *actor);
 
 void complete_wtrigger(room_data *room);
 int dismantle_wtrigger(room_data *room, char_data *actor, bool preventable);
@@ -352,9 +359,9 @@ int ability_wtrigger(char_data *actor, char_data *vict, obj_data *obj, any_vnum 
 
 int buy_vtrigger(char_data *actor, char_data *shopkeeper, obj_data *buying, int cost, any_vnum currency);
 
-int leave_mtrigger(char_data *actor, int dir, char *custom_dir);
-int leave_wtrigger(room_data *room, char_data *actor, int dir, char *custom_dir);
-int leave_otrigger(room_data *room, char_data *actor, int dir, char *custom_dir);
+int leave_mtrigger(char_data *actor, int dir, char *custom_dir, char *method);
+int leave_wtrigger(room_data *room, char_data *actor, int dir, char *custom_dir, char *method);
+int leave_otrigger(room_data *room, char_data *actor, int dir, char *custom_dir, char *method);
 
 int door_mtrigger(char_data *actor, int subcmd, int dir);
 int door_wtrigger(char_data *actor, int subcmd, int dir);
@@ -367,12 +374,12 @@ int kill_otrigger(obj_data *obj, char_data *dying, char_data *killer);
 int run_kill_triggers(char_data *dying, char_data *killer, vehicle_data *veh_killer);
 
 int command_vtrigger(char_data *actor, char *cmd, char *argument, int mode);
-int destroy_vtrigger(vehicle_data *veh);
-int entry_vtrigger(vehicle_data *veh);
-int leave_vtrigger(char_data *actor, int dir, char *custom_dir);
+int destroy_vtrigger(vehicle_data *veh, char *method);
+int entry_vtrigger(vehicle_data *veh, char *method);
+int leave_vtrigger(char_data *actor, int dir, char *custom_dir, char *method);
 void load_vtrigger(vehicle_data *veh);
-int greet_vtrigger(char_data *actor, int dir);
-void speech_vtrigger(char_data *actor, char *str);
+int greet_vtrigger(char_data *actor, int dir, char *method);
+void speech_vtrigger(char_data *actor, char *str, generic_data *language);
 
 void reboot_mtrigger(char_data *ch);
 void reboot_otrigger(obj_data *obj);

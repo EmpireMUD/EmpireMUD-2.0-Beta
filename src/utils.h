@@ -190,6 +190,7 @@
 #define GET_ARCH_FEMALE_RANK(arch)  ((arch)->female_rank)
 #define GET_ARCH_FLAGS(arch)  ((arch)->flags)
 #define GET_ARCH_GEAR(arch)  ((arch)->gear)
+#define GET_ARCH_LANGUAGE(arch)  ((arch)->language)
 #define GET_ARCH_LORE(arch)  ((arch)->lore)
 #define GET_ARCH_MALE_RANK(arch)  ((arch)->male_rank)
 #define GET_ARCH_NAME(arch)  ((arch)->name)
@@ -392,28 +393,32 @@ int GET_MAX_BLOOD(char_data *ch);	// this one is different than the other max po
 #define GET_POS(ch)  ((ch)->char_specials.position)
 #define SET_SIZE(ch)  ((ch)->char_specials.size)	// notice "SET_SIZE" -- the simple version of the macro
 #define GET_SIZE(ch)  (IS_MORPHED(ch) ? MORPH_SIZE(GET_MORPH(ch)) : SET_SIZE(ch))
+#define GET_STORED_EVENTS(ch)  ((ch)->char_specials.stored_events)
 #define HUNTING(ch)  ((ch)->char_specials.hunting)
 #define IS_CARRYING_N(ch)  ((ch)->char_specials.carry_items)
 
 
 // definitions
 #define AWAKE(ch)  (GET_POS(ch) > POS_SLEEPING || GET_POS(ch) == POS_DEAD)
-#define CAN_CARRY_N(ch)  (25 + GET_BONUS_INVENTORY(ch) + (HAS_BONUS_TRAIT(ch, BONUS_INVENTORY) ? 5 : 0) + (GET_EQ((ch), WEAR_PACK) ? GET_PACK_CAPACITY(GET_EQ(ch, WEAR_PACK)) : 0))
+int CAN_CARRY_N(char_data *ch);	// formerly a macro
 #define CAN_CARRY_OBJ(ch,obj)  (FREE_TO_CARRY(obj) || (IS_CARRYING_N(ch) + obj_carry_size(obj)) <= CAN_CARRY_N(ch))
 #define CAN_GET_OBJ(ch, obj)  (CAN_WEAR((obj), ITEM_WEAR_TAKE) && CAN_CARRY_OBJ((ch),(obj)) && CAN_SEE_OBJ((ch),(obj)))
 #define CAN_RECOGNIZE(ch, vict)  (PRF_FLAGGED(ch, PRF_HOLYLIGHT) || (!AFF_FLAGGED(vict, AFF_NO_SEE_IN_ROOM) && ((GET_LOYALTY(ch) && GET_LOYALTY(ch) == GET_LOYALTY(vict)) || (GROUP(ch) && in_same_group(ch, vict)) || (!CHAR_MORPH_FLAGGED((vict), MORPHF_ANIMAL) && !IS_DISGUISED(vict)))))
 #define CAN_RIDE_FLYING_MOUNT(ch)  (has_player_tech((ch), PTECH_RIDING_FLYING))
+#define CAN_RIDE_MOUNT(ch, mob)  (MOB_FLAGGED((mob), MOB_MOUNTABLE) && (!AFF_FLAGGED((mob), AFF_FLY) || CAN_RIDE_FLYING_MOUNT(ch)) && (!AFF_FLAGGED((mob), AFF_WATERWALK) || CAN_RIDE_WATERWALK_MOUNT(ch)))
+#define CAN_RIDE_WATERWALK_MOUNT(ch)  (has_player_tech((ch), PTECH_RIDING_UPGRADE))
 #define CAN_SEE_IN_MAGIC_DARKNESS(ch)  (IS_NPC(ch) ? (get_approximate_level(ch) > 100) : (PRF_FLAGGED((ch), PRF_HOLYLIGHT) || has_ability((ch), ABIL_DARKNESS)))
 #define CAN_SPEND_BLOOD(ch)  (!AFF_FLAGGED(ch, AFF_CANT_SPEND_BLOOD))
 #define CAST_BY_ID(ch)  (IS_NPC(ch) ? (-1 * GET_MOB_VNUM(ch)) : GET_IDNUM(ch))
 #define EFFECTIVELY_FLYING(ch)  (IS_RIDING(ch) ? MOUNT_FLAGGED(ch, MOUNT_FLYING) : AFF_FLAGGED(ch, AFF_FLY))
-#define EFFECTIVELY_SWIMMING(ch)  (EFFECTIVELY_FLYING(ch) || (IS_RIDING(ch) && (MOUNT_FLAGGED((ch), MOUNT_AQUATIC) || has_player_tech((ch), PTECH_RIDING_UPGRADE))) || (IS_NPC(ch) ? MOB_FLAGGED((ch), MOB_AQUATIC) : has_player_tech((ch), PTECH_SWIMMING)))
+#define EFFECTIVELY_SWIMMING(ch)  (EFFECTIVELY_FLYING(ch) || HAS_WATERWALK(ch) || (IS_RIDING(ch) && (MOUNT_FLAGGED((ch), MOUNT_AQUATIC) || has_player_tech((ch), PTECH_RIDING_UPGRADE))) || (IS_NPC(ch) ? MOB_FLAGGED((ch), MOB_AQUATIC) : has_player_tech((ch), PTECH_SWIMMING)))
 #define FREE_TO_CARRY(obj)  (IS_COINS(obj) || GET_OBJ_REQUIRES_QUEST(obj) != NOTHING)
 #define HAS_INFRA(ch)  AFF_FLAGGED(ch, AFF_INFRAVISION)
+#define HAS_WATERWALK(ch)  (AFF_FLAGGED((ch), AFF_WATERWALK) || MOUNT_FLAGGED((ch), MOUNT_WATERWALK))
 #define IS_HUMAN(ch)  (!IS_VAMPIRE(ch))
 #define IS_MAGE(ch)  (IS_NPC(ch) ? MOB_FLAGGED((ch), MOB_CASTER) : (has_skill_flagged((ch), SKILLF_CASTER) > 0))
 #define IS_OUTDOORS(ch)  IS_OUTDOOR_TILE(IN_ROOM(ch))
-#define IS_SWIMMING(ch)  (WATER_SECT(IN_ROOM(ch)) && !GET_SITTING_ON(ch) && !IS_RIDING(ch) && !EFFECTIVELY_FLYING(ch))
+#define IS_SWIMMING(ch)  (WATER_SECT(IN_ROOM(ch)) && !GET_SITTING_ON(ch) && !IS_RIDING(ch) && !EFFECTIVELY_FLYING(ch) && !HAS_WATERWALK(ch))
 #define IS_VAMPIRE(ch)  (IS_NPC(ch) ? MOB_FLAGGED((ch), MOB_VAMPIRE) : (has_skill_flagged((ch), SKILLF_VAMPIRE) > 0))
 #define NOT_MELEE_RANGE(ch, vict)  ((FIGHTING(ch) && FIGHT_MODE(ch) != FMODE_MELEE) || (FIGHTING(vict) && FIGHT_MODE(vict) != FMODE_MELEE))
 #define WOULD_EXECUTE(ch, vict)  (MOB_FLAGGED((vict), MOB_HARD | MOB_GROUP) || (IS_NPC(ch) ? ((GET_LEADER(ch) && !IS_NPC(GET_LEADER(ch))) ? PRF_FLAGGED(GET_LEADER(ch), PRF_AUTOKILL) : (!MOB_FLAGGED((ch), MOB_ANIMAL) || MOB_FLAGGED((ch), MOB_AGGRESSIVE | MOB_HARD | MOB_GROUP))) : PRF_FLAGGED((ch), PRF_AUTOKILL)))
@@ -478,6 +483,7 @@ int GET_MAX_BLOOD(char_data *ch);	// this one is different than the other max po
 //// CROP UTILS //////////////////////////////////////////////////////////////
 
 #define GET_CROP_CLIMATE(crop)  ((crop)->climate)
+#define GET_CROP_EX_DESCS(crop)  ((crop)->ex_description)
 #define GET_CROP_FLAGS(crop)  ((crop)->flags)
 #define GET_CROP_ICONS(crop)  ((crop)->icons)
 #define GET_CROP_INTERACTIONS(crop)  ((crop)->interactions)
@@ -572,6 +578,7 @@ int GET_MAX_BLOOD(char_data *ch);	// this one is different than the other max po
 #define EMPIRE_TERRITORY(emp, type)  ((emp)->territory[(type)])
 #define EMPIRE_WEALTH(emp)  ((emp)->wealth)
 #define EMPIRE_POPULATION(emp)  ((emp)->population)
+#define EMPIRE_LANGUAGES(emp)  ((emp)->languages)
 #define EMPIRE_LEARNED_CRAFTS(emp)  ((emp)->learned_crafts)
 #define EMPIRE_MAPOUT_TOKEN(emp)  ((emp)->mapout_token)
 #define EMPIRE_MEMBER_ACCOUNTS(emp)  ((emp)->member_accounts)
@@ -585,6 +592,7 @@ int GET_MAX_BLOOD(char_data *ch);	// this one is different than the other max po
 #define EMPIRE_NEXT_TIMEOUT(emp)  ((emp)->next_timeout)
 #define EMPIRE_PLAYTIME_TRACKER(emp)  ((emp)->playtime_tracker)
 #define EMPIRE_PRODUCTION_LIMITS(emp)  ((emp)->production_limits)
+#define EMPIRE_PRODUCTION_LOGS(emp)  ((emp)->production_logs)
 #define EMPIRE_PRODUCTION_TOTALS(emp)  ((emp)->production_totals)
 #define EMPIRE_PROGRESS_POINTS(emp, type)  ((emp)->progress_points[(type)])
 #define EMPIRE_PROGRESS_POOL(emp)  EMPIRE_ATTRIBUTE((emp), EATT_PROGRESS_POOL)
@@ -626,6 +634,10 @@ int GET_MAX_BLOOD(char_data *ch);	// this one is different than the other max po
 #define COUNTS_AS_TERRITORY(room)  (HOME_ROOM(room) == (room) && !GET_ROOM_VEHICLE(room))
 #define LARGE_CITY_RADIUS(room)  (ROOM_BLD_FLAGGED((room), BLD_LARGE_CITY_RADIUS) || ROOM_SECT_FLAGGED((room), SECTF_LARGE_CITY_RADIUS))
 
+// dismantle privilege: does NOT actually check owner -- which should be checked BEFORE this
+#define HAS_DISMANTLE_PRIV_FOR_VEHICLE(ch, veh)  (!VEH_OWNER(veh) || !GET_LOYALTY(ch) || GET_RANK(ch) >= EMPIRE_PRIV(GET_LOYALTY(ch), PRIV_DISMANTLE) || get_vehicle_extra_data((veh), ROOM_EXTRA_ORIGINAL_BUILDER) == GET_ACCOUNT(ch)->id)
+#define HAS_DISMANTLE_PRIV_FOR_BUILDING(ch, room)  (can_use_room(ch, (room), MEMBERS_ONLY) && (has_permission(ch, PRIV_DISMANTLE, (room)) || get_room_extra_data((room), ROOM_EXTRA_ORIGINAL_BUILDER) == GET_ACCOUNT(ch)->id))
+
 // deprecated
 #define EMPIRE_CITY_TERRITORY(emp)  EMPIRE_TERRITORY(emp, TER_CITY)
 #define EMPIRE_OUTSIDE_TERRITORY(emp)  EMPIRE_TERRITORY(emp, TER_OUTSKIRTS)
@@ -640,6 +652,7 @@ int GET_MAX_BLOOD(char_data *ch);	// this one is different than the other max po
 #define EVT_DURATION(evt)  ((evt)->duration)
 #define EVT_FLAGS(evt)  ((evt)->flags)
 #define EVT_MAX_LEVEL(evt)  ((evt)->max_level)
+#define EVT_MAX_POINTS(evt)  ((evt)->max_points)
 #define EVT_MIN_LEVEL(evt)  ((evt)->min_level)
 #define EVT_NAME(evt)  ((evt)->name)
 #define EVT_NOTES(evt)  ((evt)->notes)
@@ -720,10 +733,14 @@ int GET_MAX_BLOOD(char_data *ch);	// this one is different than the other max po
 #define GSTR_AFFECT_WEAR_OFF_TO_ROOM  1
 #define GSTR_AFFECT_APPLY_TO_CHAR  2
 #define GSTR_AFFECT_APPLY_TO_ROOM  3
+#define GSTR_AFFECT_LOOK_AT_CHAR  4
+#define GSTR_AFFECT_LOOK_AT_ROOM  5
 #define GET_AFFECT_WEAR_OFF_TO_CHAR(gen)  (GEN_TYPE(gen) == GENERIC_AFFECT ? GEN_STRING((gen), GSTR_AFFECT_WEAR_OFF_TO_CHAR) : NULL)
 #define GET_AFFECT_WEAR_OFF_TO_ROOM(gen)  (GEN_TYPE(gen) == GENERIC_AFFECT ? GEN_STRING((gen), GSTR_AFFECT_WEAR_OFF_TO_ROOM) : NULL)
 #define GET_AFFECT_APPLY_TO_CHAR(gen)  (GEN_TYPE(gen) == GENERIC_AFFECT ? GEN_STRING((gen), GSTR_AFFECT_APPLY_TO_CHAR) : NULL)
 #define GET_AFFECT_APPLY_TO_ROOM(gen)  (GEN_TYPE(gen) == GENERIC_AFFECT ? GEN_STRING((gen), GSTR_AFFECT_APPLY_TO_ROOM) : NULL)
+#define GET_AFFECT_LOOK_AT_CHAR(gen)  (GEN_TYPE(gen) == GENERIC_AFFECT ? GEN_STRING((gen), GSTR_AFFECT_LOOK_AT_CHAR) : NULL)
+#define GET_AFFECT_LOOK_AT_ROOM(gen)  (GEN_TYPE(gen) == GENERIC_AFFECT ? GEN_STRING((gen), GSTR_AFFECT_LOOK_AT_ROOM) : NULL)
 
 // GENERIC_CURRENCY
 #define GSTR_CURRENCY_SINGULAR  0
@@ -831,6 +848,7 @@ int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_COORD(ge
 #define MOB_DYNAMIC_SEX(ch)  ((ch)->mob_specials.dynamic_sex)
 #define MOB_FACTION(ch)  ((ch)->mob_specials.faction)
 #define MOB_INSTANCE_ID(ch)  ((ch)->mob_specials.instance_id)
+#define MOB_LANGUAGE(ch)  ((ch)->mob_specials.language)
 #define MOB_MOVE_TYPE(ch)  ((ch)->mob_specials.move_type)
 #define MOB_PURSUIT(ch)  ((ch)->mob_specials.pursuit)
 #define MOB_PURSUIT_LEASH_LOC(ch)  ((ch)->mob_specials.pursuit_leash_loc)
@@ -888,6 +906,7 @@ int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_COORD(ge
 #define GET_OBJ_KEYWORDS(obj)  ((obj)->name)
 #define GET_OBJ_LONG_DESC(obj)  ((obj)->description)
 #define GET_OBJ_SHORT_DESC(obj)  ((obj)->short_description)
+#define GET_OBJ_STORED_EVENTS(obj)  ((obj)->stored_events)
 #define GET_OBJ_TIMER(obj)  ((obj)->obj_flags.timer)
 #define GET_OBJ_VAL(obj, val)  ((obj)->obj_flags.value[(val)])
 #define GET_OBJ_WEAR(obj)  ((obj)->obj_flags.wear_flags)
@@ -925,13 +944,14 @@ int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_COORD(ge
 #define OBJVAL_FLAGGED(obj, flag)  (IS_SET(GET_OBJ_VAL((obj), 1), (flag)))
 #define CAN_WEAR(obj, part)  (IS_SET(GET_OBJ_WEAR(obj), (part)))
 #define TOOL_FLAGGED(obj, flag)  IS_SET(GET_OBJ_TOOL_FLAGS(obj), (flag))
+#define WORN_OR_CARRIED_BY(obj, ch)  ((obj)->worn_by == (ch) || (obj)->carried_by == (ch))
 
 // for stacking, sotring, etc
 #define OBJ_CAN_STACK(obj)  (GET_OBJ_TYPE(obj) != ITEM_CONTAINER && !IS_AMMO(obj))
 #define OBJ_CAN_STORE(obj)  (GET_OBJ_STORAGE(obj) && GET_OBJ_REQUIRES_QUEST(obj) == NOTHING && !OBJ_BOUND_TO(obj) && !OBJ_FLAGGED((obj), OBJ_NO_STORE | OBJ_SUPERIOR | OBJ_ENCHANTED) && !IS_STOLEN(obj))
-#define UNIQUE_OBJ_CAN_STORE(obj, allow_bound)  ((allow_bound || !OBJ_BOUND_TO(obj)) && !OBJ_CAN_STORE(obj) && !OBJ_FLAGGED((obj), OBJ_NO_STORE | OBJ_JUNK) && GET_OBJ_TIMER(obj) == UNLIMITED && GET_OBJ_REQUIRES_QUEST(obj) == NOTHING && !IS_STOLEN(obj))
-#define OBJ_STACK_FLAGS  (OBJ_SUPERIOR | OBJ_KEEP | OBJ_ENCHANTED)
-#define OBJS_ARE_SAME(o1, o2)  (GET_OBJ_VNUM(o1) == GET_OBJ_VNUM(o2) && GET_OBJ_CURRENT_SCALE_LEVEL(o1) == GET_OBJ_CURRENT_SCALE_LEVEL(o2) && ((GET_OBJ_EXTRA(o1) & OBJ_STACK_FLAGS) == (GET_OBJ_EXTRA(o2) & OBJ_STACK_FLAGS)) && (GET_OBJ_SHORT_DESC(o1) == GET_OBJ_SHORT_DESC(o2) || !strcmp(GET_OBJ_SHORT_DESC(o1), GET_OBJ_SHORT_DESC(o2))) && (GET_OBJ_LONG_DESC(o1) == GET_OBJ_LONG_DESC(o2) || !strcmp(GET_OBJ_LONG_DESC(o1), GET_OBJ_LONG_DESC(o2))) && (!IS_DRINK_CONTAINER(o1) || GET_DRINK_CONTAINER_TYPE(o1) == GET_DRINK_CONTAINER_TYPE(o2)) && (!IS_BOOK(o1) || !IS_BOOK(o2) || GET_BOOK_ID(o1) == GET_BOOK_ID(o2)) && (!IS_AMMO(o1) || !IS_AMMO(o2) || GET_AMMO_QUANTITY(o1) == GET_AMMO_QUANTITY(o2)) && (IS_STOLEN(o1) == IS_STOLEN(o2)) && identical_bindings((o1),(o2)))
+#define UNIQUE_OBJ_CAN_STORE(obj, allow_bound)  ((allow_bound || (!OBJ_BOUND_TO(obj) && !OBJ_FLAGGED((obj), OBJ_BIND_ON_PICKUP))) && !OBJ_CAN_STORE(obj) && !OBJ_FLAGGED((obj), OBJ_NO_STORE | OBJ_JUNK) && GET_OBJ_TIMER(obj) == UNLIMITED && GET_OBJ_REQUIRES_QUEST(obj) == NOTHING && !IS_STOLEN(obj))
+#define OBJ_STACK_FLAGS  (OBJ_SUPERIOR | OBJ_KEEP | OBJ_ENCHANTED | OBJ_HARD_DROP | OBJ_GROUP_DROP | OBJ_BIND_ON_EQUIP | OBJ_BIND_ON_PICKUP)
+#define OBJS_ARE_SAME(o1, o2)  (GET_OBJ_VNUM(o1) == GET_OBJ_VNUM(o2) && GET_OBJ_CURRENT_SCALE_LEVEL(o1) == GET_OBJ_CURRENT_SCALE_LEVEL(o2) && ((GET_OBJ_EXTRA(o1) & OBJ_STACK_FLAGS) == (GET_OBJ_EXTRA(o2) & OBJ_STACK_FLAGS)) && (GET_OBJ_SHORT_DESC(o1) == GET_OBJ_SHORT_DESC(o2) || !strcmp(GET_OBJ_SHORT_DESC(o1), GET_OBJ_SHORT_DESC(o2))) && (GET_OBJ_LONG_DESC(o1) == GET_OBJ_LONG_DESC(o2) || !strcmp(GET_OBJ_LONG_DESC(o1), GET_OBJ_LONG_DESC(o2))) && (!IS_DRINK_CONTAINER(o1) || GET_DRINK_CONTAINER_TYPE(o1) == GET_DRINK_CONTAINER_TYPE(o2)) && (!IS_BOOK(o1) || !IS_BOOK(o2) || GET_BOOK_ID(o1) == GET_BOOK_ID(o2)) && (!IS_AMMO(o1) || !IS_AMMO(o2) || GET_AMMO_QUANTITY(o1) == GET_AMMO_QUANTITY(o2)) && (!IS_LIGHT(o1) || !IS_LIGHT(o2) || GET_LIGHT_IS_LIT(o1) == GET_LIGHT_IS_LIT(o2) || GET_LIGHT_HOURS_REMAINING(o1) == GET_LIGHT_HOURS_REMAINING(o2) || (GET_LIGHT_HOURS_REMAINING(o1) > 0 && GET_LIGHT_HOURS_REMAINING(o2) > 0)) && (IS_STOLEN(o1) == IS_STOLEN(o2)) && identical_bindings((o1),(o2)))
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -1037,9 +1057,10 @@ int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_COORD(ge
 // ITEM_WEALTH
 #define IS_WEALTH_ITEM(obj)  (GET_OBJ_TYPE(obj) == ITEM_WEALTH)
 #define VAL_WEALTH_VALUE  0
-#define VAL_WEALTH_AUTOMINT  1
+#define VAL_WEALTH_MINT_FLAGS  1
 #define GET_WEALTH_VALUE(obj)  (IS_WEALTH_ITEM(obj) ? GET_OBJ_VAL((obj), VAL_WEALTH_VALUE) : 0)
-#define GET_WEALTH_AUTOMINT(obj)  (IS_WEALTH_ITEM(obj) ? GET_OBJ_VAL((obj), VAL_WEALTH_AUTOMINT) : 0)
+#define GET_WEALTH_MINT_FLAGS(obj)  (IS_WEALTH_ITEM(obj) ? GET_OBJ_VAL((obj), VAL_WEALTH_MINT_FLAGS) : NOBITS)
+#define IS_MINT_FLAGGED(obj, flag)  IS_SET(GET_WEALTH_MINT_FLAGS(obj), (flag))
 
 // ITEM_MISSILE_WEAPON
 #define IS_MISSILE_WEAPON(obj)  (GET_OBJ_TYPE(obj) == ITEM_MISSILE_WEAPON)
@@ -1095,6 +1116,18 @@ int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_COORD(ge
 #define VAL_MINIPET_VNUM  0
 #define GET_MINIPET_VNUM(obj)  (IS_MINIPET(obj) ? GET_OBJ_VAL((obj), VAL_MINIPET_VNUM) : NOTHING)
 
+// ITEM_LIGHT
+#define IS_LIGHT(obj)  (GET_OBJ_TYPE(obj) == ITEM_LIGHT)
+#define VAL_LIGHT_HOURS_REMAINING  0
+#define VAL_LIGHT_IS_LIT  1
+#define VAL_LIGHT_FLAGS  2
+#define GET_LIGHT_HOURS_REMAINING(obj)  (IS_LIGHT(obj) ? GET_OBJ_VAL((obj), VAL_LIGHT_HOURS_REMAINING) : 0)
+#define GET_LIGHT_IS_LIT(obj)  (IS_LIGHT(obj) ? GET_OBJ_VAL((obj), VAL_LIGHT_IS_LIT) : FALSE)
+#define GET_LIGHT_FLAGS(obj)  (IS_LIGHT(obj) ? GET_OBJ_VAL((obj), VAL_LIGHT_FLAGS) : NOBITS)
+#define CAN_LIGHT_OBJ(obj)  ((IS_LIGHT(obj) && !GET_LIGHT_IS_LIT(obj) && GET_LIGHT_HOURS_REMAINING(obj) != 0) || has_interaction(GET_OBJ_INTERACTIONS(obj), INTERACT_LIGHT))
+#define LIGHT_FLAGGED(obj, flag)  IS_SET(GET_LIGHT_FLAGS(obj), (flag))
+#define LIGHT_IS_LIT(obj)  (OBJ_FLAGGED((obj), OBJ_LIGHT) || (GET_LIGHT_IS_LIT(obj) && GET_LIGHT_HOURS_REMAINING(obj) != 0))
+
 
  //////////////////////////////////////////////////////////////////////////////
 //// PLAYER UTILS ////////////////////////////////////////////////////////////
@@ -1108,6 +1141,7 @@ int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_COORD(ge
 #define GET_MORPH(ch)  ((ch)->char_specials.morph)
 
 // ch->player_specials: player_special_data
+#define AFFECTS_CONVERTED(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->affects_converted))
 #define CAN_GAIN_NEW_SKILLS(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->can_gain_new_skills))
 #define CAN_GET_BONUS_SKILLS(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->can_get_bonus_skills))
 #define CREATION_ARCHETYPE(ch, pos)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->creation_archetype[pos]))
@@ -1151,6 +1185,7 @@ int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_COORD(ge
 #define GET_DISGUISED_NAME(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->disguised_name))
 #define GET_DISGUISED_SEX(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->disguised_sex))
 #define GET_EQ_SETS(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->eq_sets))
+#define GET_EVENT_DAILY_QUESTS(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->event_daily_quests))
 #define GET_EVENT_DATA(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->event_data))
 #define GET_EXP_TODAY(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->exp_today))
 #define GET_FACTIONS(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->factions))
@@ -1162,12 +1197,17 @@ int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_COORD(ge
 #define GET_HIGHEST_KNOWN_LEVEL(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->highest_known_level))
 #define GET_HISTORY(ch, type)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->channel_history[(type)]))
 #define GET_HOME_STORAGE(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->home_storage))
+#define GET_IDLE_SECONDS(ch)  CHECK_PLAYER_SPECIAL(REAL_CHAR(ch), (REAL_CHAR(ch)->player_specials->idle_seconds))
 #define GET_IGNORE_LIST(ch, pos)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->ignore_list[(pos)]))
 #define GET_IMMORTAL_LEVEL(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->immortal_level))
 #define GET_INFORMATIVE_FLAGS(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->informative_flags))
 #define GET_INVIS_LEV(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->invis_level))
+#define GET_LANGUAGES(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->languages))
 #define GET_LARGEST_INVENTORY(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->largest_inventory))
+#define GET_LAST_AFF_WEAR_OFF_VNUM(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->last_aff_wear_off_vnum))
+#define GET_LAST_AFF_WEAR_OFF_TIME(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->last_aff_wear_off_time))
 #define GET_LAST_COMPANION(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->last_companion))
+#define GET_LAST_COND_MESSAGE_TIME(ch, cond)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->last_cond_message_time[(cond)]))
 #define GET_LAST_CORPSE_ID(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->last_corpse_id))
 #define GET_LAST_DEATH_TIME(ch)  CHECK_PLAYER_SPECIAL(REAL_CHAR(ch), (REAL_CHAR(ch)->player_specials->last_death_time))
 #define GET_LAST_GOAL_CHECK(ch)  CHECK_PLAYER_SPECIAL(REAL_CHAR(ch), (REAL_CHAR(ch)->player_specials->last_goal_check))
@@ -1214,6 +1254,7 @@ int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_COORD(ge
 #define GET_SKILL_HASH(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->skill_hash))
 #define GET_SKILL_LEVEL(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->skill_level))
 #define GET_SLASH_CHANNELS(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->slash_channels))
+#define GET_SPEAKING(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->speaking))
 #define GET_TECHS(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->techs))
 #define GET_TEMPORARY_ACCOUNT_ID(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->temporary_account_id))
 #define GET_TITLE(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->title))
@@ -1235,7 +1276,7 @@ int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_COORD(ge
 #define HAS_BONUS_TRAIT(ch, flag)  (!IS_NPC(ch) && IS_SET(GET_BONUS_TRAITS(ch), (flag)))
 #define HAS_NEW_OFFENSES(ch) (!IS_NPC(ch) && GET_LOYALTY(ch) && EMPIRE_OFFENSES(GET_LOYALTY(ch)) && EMPIRE_OFFENSES(GET_LOYALTY(ch))->timestamp > GET_LAST_OFFENSE_SEEN(ch))
 #define INFORMATIVE_FLAGGED(ch, flag)  (!IS_NPC(ch) && IS_SET(GET_INFORMATIVE_FLAGS(ch), (flag)))
-#define IS_AFK(ch)  (!IS_NPC(ch) && (PRF_FLAGGED((ch), PRF_AFK) || ((ch)->char_specials.timer * SECS_PER_MUD_HOUR / SECS_PER_REAL_MIN) >= 10))
+#define IS_AFK(ch)  (!IS_NPC(ch) && (PRF_FLAGGED((ch), PRF_AFK) || (GET_IDLE_SECONDS(ch) / SECS_PER_REAL_MIN) >= 5))
 #define IS_GRANTED(ch, flag)  (!IS_NPC(ch) && IS_SET(GET_GRANT_FLAGS(ch), (flag)))
 #define IS_MORPHED(ch)  (GET_MORPH(ch) != NULL)
 #define IS_PVP_FLAGGED(ch)  (!IS_NPC(ch) && (PRF_FLAGGED((ch), PRF_ALLOW_PVP) || get_cooldown_time((ch), COOLDOWN_PVP_FLAG) > 0))
@@ -1254,12 +1295,12 @@ int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_COORD(ge
 #define IN_HOSTILE_TERRITORY(ch)  (!IS_NPC(ch) && !IS_IMMORTAL(ch) && ROOM_OWNER(IN_ROOM(ch)) && ROOM_OWNER(IN_ROOM(ch)) != GET_LOYALTY(ch) && (IS_HOSTILE(ch) || empire_is_hostile(ROOM_OWNER(IN_ROOM(ch)), GET_LOYALTY(ch), IN_ROOM(ch))))
 #define IS_APPROVED(ch)  (IS_NPC(ch) || PLR_FLAGGED(ch, PLR_APPROVED) || ACCOUNT_FLAGGED(ch, ACCT_APPROVED))
 #define IS_HOSTILE(ch)  (!IS_NPC(ch) && (get_cooldown_time((ch), COOLDOWN_HOSTILE_FLAG) > 0 || get_cooldown_time((ch), COOLDOWN_ROGUE_FLAG) > 0))
-#define IS_HUNGRY(ch)  (GET_COND((ch), FULL) >= 360 && !HAS_BONUS_TRAIT((ch), BONUS_NO_HUNGER) && !has_player_tech((ch), PTECH_NO_HUNGER))
-#define IS_DRUNK(ch)  (GET_COND(ch, DRUNK) >= 360)
+#define IS_HUNGRY(ch)  (GET_COND((ch), FULL) >= (REAL_UPDATES_PER_MUD_HOUR * 24) && !HAS_BONUS_TRAIT((ch), BONUS_NO_HUNGER) && !has_player_tech((ch), PTECH_NO_HUNGER))
+#define IS_DRUNK(ch)  (GET_COND(ch, DRUNK) >= (REAL_UPDATES_PER_MUD_HOUR * 24))
 #define IS_GOD(ch)  (GET_ACCESS_LEVEL(ch) == LVL_GOD)
 #define IS_IMMORTAL(ch)  (GET_ACCESS_LEVEL(ch) >= LVL_START_IMM)
 #define IS_RIDING(ch)  (!IS_NPC(ch) && GET_MOUNT_VNUM(ch) != NOTHING && MOUNT_FLAGGED(ch, MOUNT_RIDING))
-#define IS_THIRSTY(ch)  (GET_COND((ch), THIRST) >= 360 && !HAS_BONUS_TRAIT((ch), BONUS_NO_THIRST) && !has_player_tech((ch), PTECH_NO_THIRST))
+#define IS_THIRSTY(ch)  (GET_COND((ch), THIRST) >= (REAL_UPDATES_PER_MUD_HOUR * 24) && !HAS_BONUS_TRAIT((ch), BONUS_NO_THIRST) && !has_player_tech((ch), PTECH_NO_THIRST))
 #define IS_BLOOD_STARVED(ch)  (IS_VAMPIRE(ch) && GET_BLOOD(ch) <= config_get_int("blood_starvation_level"))
 
 // for act() and act-like things (requires to_sleeping and is_spammy set to true/false)
@@ -1306,6 +1347,11 @@ int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_COORD(ge
 #define QUEST_VERSION(quest)  ((quest)->version)
 
 #define QUEST_FLAGGED(quest, flg)  IS_SET(QUEST_FLAGS(quest), (flg))
+
+#define IS_DAILY_QUEST(quest) (QUEST_FLAGGED((quest), QST_DAILY))
+#define IS_EVENT_QUEST(quest) (QUEST_FLAGGED((quest), QST_EVENT))
+#define IS_EVENT_DAILY(quest) (QUEST_FLAGGED((quest), QST_DAILY) && QUEST_FLAGGED((quest), QST_EVENT))
+#define IS_NON_EVENT_DAILY(quest) (QUEST_FLAGGED((quest), QST_DAILY) && !QUEST_FLAGGED((quest), QST_EVENT))
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -1421,6 +1467,7 @@ int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_COORD(ge
 #define HAS_FUNCTION(room, flag)  ((GET_BUILDING(room) && IS_SET(GET_BLD_FUNCTIONS(GET_BUILDING(room)), (flag))) || (GET_ROOM_TEMPLATE(room) && IS_SET(GET_RMT_FUNCTIONS(GET_ROOM_TEMPLATE(room)), (flag))))
 
 // room types
+#define CAN_LOOK_OUT(room)  (ROOM_BLD_FLAGGED((room), BLD_LOOK_OUT) || RMT_FLAGGED((room), RMT_LOOK_OUT))
 #define IS_ADVENTURE_ROOM(room)  ROOM_SECT_FLAGGED((room), SECTF_ADVENTURE)
 #define IS_ANY_BUILDING(room)  ROOM_SECT_FLAGGED((room), SECTF_MAP_BUILDING | SECTF_INSIDE)
 #define IS_DISMANTLING(room)  (ROOM_AFF_FLAGGED((room), ROOM_AFF_DISMANTLING))
@@ -1452,6 +1499,7 @@ int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_COORD(ge
 #define GET_RMT_QUEST_LOOKUPS(rmt)  ((rmt)->quest_lookups)
 #define GET_RMT_SHOP_LOOKUPS(rmt)  ((rmt)->shop_lookups)
 #define GET_RMT_SCRIPTS(rmt)  ((rmt)->proto_script)
+#define GET_RMT_SUBZONE(rmt)  ((rmt)->subzone)
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -1461,6 +1509,7 @@ int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_COORD(ge
 #define GET_SECT_CLIMATE(sect)  ((sect)->climate)
 #define GET_SECT_COMMANDS(sect)  ((sect)->commands)
 #define GET_SECT_EVOS(sect)  ((sect)->evolution)
+#define GET_SECT_EX_DESCS(sect)  ((sect)->ex_description)
 #define GET_SECT_FLAGS(sect)  ((sect)->flags)
 #define GET_SECT_ICONS(sect)  ((sect)->icons)
 #define GET_SECT_INTERACTIONS(sect)  ((sect)->interactions)
@@ -1680,6 +1729,7 @@ void free_pair_hash(struct pair_hash **hash);
 void free_string_hash(struct string_hash **hash);
 void free_vnum_hash(struct vnum_hash **hash);
 int sort_string_hash(struct string_hash *a, struct string_hash *b);
+void string_hash_to_string(struct string_hash *str_hash, char *to_string, size_t string_size, bool show_count, bool use_commas, bool use_and);
 
 // adventure functions from utils.c
 adv_data *get_adventure_for_vnum(rmt_vnum vnum);
@@ -1809,6 +1859,7 @@ bool has_one_day_playtime(char_data *ch);
 int num_earned_bonus_traits(char_data *ch);
 int pick_level_from_range(int level, int min, int max);
 void relocate_players(room_data *room, room_data *to_room);
+void schedule_check_leading_event(char_data *ch);
 void update_all_players(char_data *to_message, PLAYER_UPDATE_FUNC(*func));
 bool wake_and_stand(char_data *ch);
 
@@ -1819,7 +1870,7 @@ void extract_resources(char_data *ch, struct resource_data *list, bool ground, s
 struct resource_data *get_next_resource(char_data *ch, struct resource_data *list, bool ground, bool left2right, obj_data **found_obj);
 char *get_resource_name(struct resource_data *res);
 void give_resources(char_data *ch, struct resource_data *list, bool split);
-bool has_resources(char_data *ch, struct resource_data *list, bool ground, bool send_msgs);
+bool has_resources(char_data *ch, struct resource_data *list, bool ground, bool send_msgs, char *msg_prefix);
 void reduce_dismantle_resources(int damage, int max_health, struct resource_data **list);
 void show_resource_list(struct resource_data *list, char *save_buffer);
 
@@ -1883,9 +1934,11 @@ bool find_sect_within_distance_from_room(room_data *room, sector_vnum sect, int 
 bool get_coord_shift(int start_x, int start_y, int x_shift, int y_shift, int *new_x, int *new_y);
 int get_direction_to(room_data *from, room_data *to);
 room_data *get_map_location_for(room_data *room);
+char *get_partial_direction_to(char_data *ch, room_data *from, room_data *to, bool abbrev);
 int get_room_blocking_height(room_data *room, bool *blocking_vehicle);
 bool is_deep_mine(room_data *room);
 void lock_icon(room_data *room, struct icon_data *use_icon);
+void lock_icon_map(struct map_data *loc, struct icon_data *use_icon);
 room_data *real_shift(room_data *origin, int x_shift, int y_shift);
 bool room_is_light(room_data *room, bool count_adjacent_light);
 room_data *straight_line(room_data *origin, room_data *destination, int iter);
@@ -1906,6 +1959,7 @@ void apply_one_passive_buff(char_data *ch, ability_data *abil);
 bool check_ability(char_data *ch, char *string, bool exact);
 ability_data *find_ability_on_skill(char *name, skill_data *skill);
 ability_data *find_player_ability_by_tech(char_data *ch, int ptech);
+void get_ability_type_display(struct ability_type *list, char *save_buffer, bool for_players);
 int get_player_level_for_ability(char_data *ch, any_vnum abil_vnum);
 bool is_class_ability(ability_data *abil);
 char_data *load_companion_mob(char_data *leader, struct companion_data *cd);
@@ -1920,7 +1974,7 @@ void setup_ability_companions(char_data *ch);
 // act.action.c
 bool action_flagged(char_data *ch, bitvector_t actf);
 void cancel_action(char_data *ch);
-void do_burn_area(char_data *ch, int subcmd);
+void do_burn_area(char_data *ch);
 obj_data *has_tool(char_data *ch, bitvector_t flags);
 obj_data *has_all_tools(char_data *ch, bitvector_t flags);
 void process_build_action(char_data *ch);
@@ -1941,11 +1995,12 @@ void log_to_slash_channel_by_name(char *chan_name, char_data *ignorable_person, 
 
 // act.empire.c
 bool check_in_city_requirement(room_data *room, bool check_wait);
+void do_burn_building(char_data *ch, room_data *room, obj_data *lighter);
 void do_customize_island(char_data *ch, char *argument);
-int get_territory_type_for_empire(room_data *loc, empire_data *emp, bool check_wait, bool *city_too_soon);
-#define is_in_city_for_empire(loc, emp, check_wait, city_too_soon)  (get_territory_type_for_empire((loc), (emp), (check_wait), (city_too_soon)) == TER_CITY)	// backwards-compatibility
+int get_territory_type_for_empire(room_data *loc, empire_data *emp, bool check_wait, bool *city_too_soon, bool *using_large_radius);
+#define is_in_city_for_empire(loc, emp, check_wait, city_too_soon)  (get_territory_type_for_empire((loc), (emp), (check_wait), (city_too_soon), NULL) == TER_CITY)	// backwards-compatibility
 void perform_abandon_city(empire_data *emp, struct empire_city_data *city, bool full_abandon);
-void scan_for_tile(char_data *ch, char *argument);
+void scan_for_tile(char_data *ch, char *argument, int max_dist, bitvector_t only_in_dirs);
 void set_workforce_limit(empire_data *emp, int island_id, int chore, int limit);
 void set_workforce_limit_all(empire_data *emp, int chore, int limit);
 void show_workforce_setup_to_char(empire_data *emp, char_data *ch);
@@ -1963,11 +2018,13 @@ void show_spawn_summary_to_char(char_data *ch, struct spawn_info *list);
 void diag_char_to_char(char_data *i, char_data *ch);
 void display_attributes(char_data *ch, char_data *to);
 void display_tip_to_char(char_data *ch);
+char *find_exdesc_for_char(char_data *ch, char *word, int *number, obj_data **found_obj, vehicle_data **found_veh, room_data **found_room);
 char *get_obj_desc(obj_data *obj, char_data *ch, int mode);
 void get_player_skill_string(char_data *ch, char *buffer, bool abbrev);
 void list_char_to_char(char_data *list, char_data *ch);
 void list_obj_to_char(obj_data *list, char_data *ch, int mode, int show);
-void list_vehicles_to_char(vehicle_data *list, char_data *ch);
+void list_vehicles_to_char(vehicle_data *list, char_data *ch, bool large_only, vehicle_data *exclude);
+char *obj_color_by_quality(obj_data *obj, char_data *ch);
 char *obj_desc_for_char(obj_data *obj, char_data *ch, int mode);
 struct custom_message *pick_custom_longdesc(char_data *ch);
 void show_character_affects(char_data *ch, char_data *to);
@@ -1977,11 +2034,12 @@ bool show_local_einv(char_data *ch, room_data *room, bool thief_mode);
 bool can_take_obj(char_data *ch, obj_data *obj);
 int count_objs_in_room(room_data *room);
 void deliver_shipment(empire_data *emp, struct shipping_data *shipd);
+bool douse_light(obj_data *obj);
 room_data *find_docks(empire_data *emp, int island_id);
 int find_free_shipping_id(empire_data *emp);
 obj_data *find_lighter_in_list(obj_data *list, bool *had_keep);
 bool get_check_money(char_data *ch, obj_data *obj);
-void identify_obj_to_char(obj_data *obj, char_data *ch);
+void identify_obj_to_char(obj_data *obj, char_data *ch, bool simple);
 int obj_carry_size(obj_data *obj);
 void process_shipping();
 void remove_armor_by_type(char_data *ch, int armor_type);
@@ -1989,6 +2047,7 @@ void remove_honed_gear(char_data *ch);
 void sail_shipment(empire_data *emp, vehicle_data *boat);
 void scale_item_to_level(obj_data *obj, int level);
 bool ship_is_empty(vehicle_data *ship);
+bool use_hour_of_light(obj_data *obj, bool messages);
 bool used_lighter(char_data *ch, obj_data *obj);
 
 // act.movement.c
@@ -2016,12 +2075,13 @@ void adventure_summon(char_data *ch, char *argument);
 void adventure_unsummon(char_data *ch);
 void cancel_adventure_summon(char_data *ch);
 bool dismiss_any_minipet(char_data *ch);
+void do_douse_room(char_data *ch, room_data *room, obj_data *cont);
 
 // act.quest.c
 const char *color_by_difficulty(char_data *ch, int level);
 void count_quest_tasks(struct req_data *list, int *complete, int *total);
 void drop_quest(char_data *ch, struct player_quest *pq);
-bool fail_daily_quests(char_data *ch);
+bool fail_daily_quests(char_data *ch, bool event);
 struct instance_data *find_matching_instance_for_shared_quest(char_data *ch, any_vnum quest_vnum);
 void show_quest_tracker(char_data *ch, struct player_quest *pq);
 void start_quest(char_data *ch, quest_data *qst, struct instance_data *inst);
@@ -2045,7 +2105,7 @@ bool valid_no_trace(room_data *room);
 
 // act.trade.c
 void cancel_gen_craft(char_data *ch);
-bool check_can_craft(char_data *ch, craft_data *type);
+bool check_can_craft(char_data *ch, craft_data *type, bool continuing);
 bool find_and_bind(char_data *ch, obj_vnum vnum);
 int get_craft_scale_level(char_data *ch, craft_data *craft);
 int get_crafting_level(char_data *ch);
@@ -2067,6 +2127,7 @@ void un_deathshroud(char_data *ch);
 void un_mummify(char_data *ch);
 void update_biting_char(char_data *ch);
 void update_vampire_sun(char_data *ch);
+bool vampire_kill_feeding_target(char_data *ch, char *argument);
 
 // act.vehicles.c
 void do_customize_vehicle(char_data *ch, char *argument);
@@ -2126,8 +2187,10 @@ char empire_banner_to_mapout_token(const char *banner);
 bool valid_rank_name(char_data *ch, char *newname);
 
 // event.c
+void delete_player_from_running_events(char_data *ch);
 int gain_event_points(char_data *ch, any_vnum event_vnum, int points);
 struct player_event_data *get_event_data(char_data *ch, int event_id);
+struct event_running_data *only_one_running_event(int *count);
 
 // faction.c
 const char *get_faction_name_by_vnum(any_vnum vnum);
@@ -2192,6 +2255,7 @@ void mark_instance_completed(struct instance_data *inst);
 void prune_instances();
 void remove_instance_fake_loc(struct instance_data *inst);
 void reset_instance(struct instance_data *inst);
+bool same_subzone(room_data *a, room_data *b);
 void scale_instance_to_level(struct instance_data *inst, int level);
 void set_instance_fake_loc(struct instance_data *inst, room_data *loc);
 void unlink_instance_entrance(room_data *room, struct instance_data *inst, bool run_cleanup);
@@ -2199,11 +2263,16 @@ void unlink_instance_entrance(room_data *room, struct instance_data *inst, bool 
 // limits.c
 bool can_teleport_to(char_data *ch, room_data *loc, bool check_owner);
 bool check_autostore(obj_data *obj, bool force, empire_data *override_emp);
+void check_pointless_fight(char_data *mob);
 void check_ruined_cities();
 void gain_condition(char_data *ch, int condition, int value);
 int health_gain(char_data *ch, bool info_only);
 int mana_gain(char_data *ch, bool info_only);
 int move_gain(char_data *ch, bool info_only);
+void schedule_all_obj_timers(char_data *ch);
+void schedule_heal_over_time(char_data *ch);
+void schedule_obj_autostore_check(obj_data *obj, long new_autostore_timer);
+void schedule_obj_timer_update(obj_data *obj, bool override);
 void update_empire_needs(empire_data *emp, struct empire_island *eisle, struct empire_needs *needs);
 
 // mapview.c
@@ -2233,17 +2302,29 @@ char *get_informative_color(char_data *ch, bool dismantling, bool unfinished, bo
 
 // mobact.c
 void add_pursuit(char_data *ch, char_data *target);
+bool check_reset_mob(char_data *ch, bool force);
 bool check_scaling(char_data *mob, char_data *attacker);
+void check_scavengers(room_data *room);
+void check_scheduled_events_mob(char_data *mob);
 void despawn_mob(char_data *ch);
 int determine_best_scale_level(char_data *ch, bool check_group);
 void end_pursuit(char_data *ch, char_data *target);
 struct generic_name_data *get_generic_name_list(int name_set, int sex);
+struct generic_name_data *get_best_name_list(int name_set, int sex);
 int mob_coins(char_data *mob);
 void random_encounter(char_data *ch);
-void run_mobile_activity(char_data *ch);
+void reschedule_all_despawns();
 void scale_mob_as_companion(char_data *mob, char_data *leader, int use_level);
 void scale_mob_for_character(char_data *mob, char_data *ch);
 void scale_mob_to_level(char_data *mob, int level);
+void schedule_aggro_event(char_data *ch);
+void schedule_despawn_event(char_data *mob);
+void schedule_mob_move_event(char_data *ch, bool randomize);
+void schedule_movement_events(char_data *ch);
+void schedule_reset_mob(char_data *ch);
+void schedule_pursuit_event(char_data *ch);
+void schedule_scavenge_event(char_data *ch, bool randomize);
+void set_mob_spawn_time(char_data *mob, long when);
 void setup_generic_npc(char_data *mob, empire_data *emp, int name, int sex);
 void spawn_mobs_from_center(room_data *center);
 bool try_mobile_movement(char_data *ch);
@@ -2285,8 +2366,10 @@ void check_for_eligible_goals(empire_data *emp);
 void check_progress_refresh();
 int count_diplomacy(empire_data *emp, bitvector_t dip_flags);
 bool empire_meets_goal_prereqs(empire_data *emp, progress_data *prg);
+bool delete_progress_perk_from_list(struct progress_perk **list, int type, int value);
 progress_data *find_current_progress_goal_by_name(empire_data *emp, char *name);
 progress_data *find_progress_goal_by_name(char *name);
+bool find_progress_perk_in_list(struct progress_perk *list, int type, int value);
 progress_data *find_purchasable_goal_by_name(empire_data *emp, char *name);
 void full_reset_empire_progress(empire_data *only_emp);
 void purchase_goal(empire_data *emp, progress_data *prg, char_data *purchased_by);
@@ -2322,6 +2405,7 @@ void extract_crop_variety(char_data *ch, int amount);
 bool find_quest_giver_in_list(struct quest_giver *list, int type, any_vnum vnum);
 bool find_quest_reward_in_list(struct quest_reward *list, int type, any_vnum vnum);
 char *get_quest_name_by_proto(any_vnum vnum);
+void get_quest_reward_display(struct quest_reward *list, char *save_buffer, bool show_vnums);
 void get_tracker_display(struct req_data *tracker, char *save_buffer);
 void give_quest_rewards(char_data *ch, struct quest_reward *list, int reward_level, empire_data *quest_giver_emp, int instance_id);
 struct player_completed_quest *has_completed_quest(char_data *ch, any_vnum quest, int instance_id);
@@ -2334,6 +2418,7 @@ void refresh_one_quest_tracker(char_data *ch, struct player_quest *pq);
 void remove_quest_items(char_data *ch);
 void remove_quest_items_by_quest(char_data *ch, any_vnum vnum);
 void setup_daily_quest_cycles(int only_cycle);
+int sort_completed_quests_by_timestamp(struct player_completed_quest *a, struct player_completed_quest *b);
 
 void qt_change_ability(char_data *ch, any_vnum abil);
 void qt_change_level(char_data *ch, int level);
@@ -2350,6 +2435,7 @@ void qt_gain_building(char_data *ch, any_vnum vnum);
 void qt_gain_tile_sector(char_data *ch, sector_vnum vnum);
 void qt_change_coins(char_data *ch);
 void qt_change_currency(char_data *ch, any_vnum vnum, int total);
+void qt_change_language(char_data *ch, any_vnum vnum, int level);
 void qt_empire_wealth(char_data *ch, any_vnum amount);
 void qt_event_start_stop(any_vnum event_vnum);
 void qt_gain_vehicle(char_data *ch, vehicle_data *veh);
@@ -2463,6 +2549,7 @@ bool is_zenith_day(room_data *room);
 void reset_weather();
 
 // workforce.c
+void add_workforce_production_log(empire_data *emp, int type, any_vnum vnum, int amount);
 void deactivate_workforce(empire_data *emp, int island_id, int type);
 void deactivate_workforce_island(empire_data *emp, int island_id);
 void deactivate_workforce_room(empire_data *emp, room_data *room);
@@ -2551,6 +2638,12 @@ void sort_einv_for_empire(empire_data *emp);
 				log("SYSERR: SAFE_ADD out of bounds at %s:%d.", __FILE__, __LINE__);	\
 			}	\
 		}	\
+		else if ((field) < (min)) {	\
+			(field) = (min);	\
+		}	\
+		else if ((field) > (max)) {	\
+			(field) = (max);	\
+		}	\
 	} while (0)
 
 
@@ -2569,6 +2662,12 @@ void sort_einv_for_empire(empire_data *emp);
 			if (warn) {	\
 				log("SYSERR: SAFE_ADD_DOUBLE out of bounds at %s:%d.", __FILE__, __LINE__);	\
 			}	\
+		}	\
+		else if ((field) < (min)) {	\
+			(field) = (min);	\
+		}	\
+		else if ((field) > (max)) {	\
+			(field) = (max);	\
 		}	\
 	} while (0)
 

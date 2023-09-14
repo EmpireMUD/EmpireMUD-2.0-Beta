@@ -928,7 +928,7 @@ void ruin_vehicle(vehicle_data *veh, char *message) {
 	room_data *room = IN_ROOM(veh);
 	struct vehicle_room_list *vrl;
 	
-	if (!destroy_vtrigger(veh)) {
+	if (!destroy_vtrigger(veh, "ruins")) {
 		VEH_HEALTH(veh) = MAX(1, VEH_HEALTH(veh));	// ensure health
 		return;
 	}
@@ -1417,6 +1417,26 @@ bool vehicle_is_chameleon(vehicle_data *veh, room_data *from) {
 	
 	// ok chameleon: now check distance
 	return (compute_distance(from, IN_ROOM(veh)) >= 2);
+}
+
+
+/**
+* Counts the words of text in a vehicle's strings.
+*
+* @param vehicle_data *veh The vehicle whose strings to count.
+* @return int The number of words in the vehicle's strings.
+*/
+int wordcount_vehicle(vehicle_data *veh) {
+	int count = 0;
+	
+	count += wordcount_string(VEH_KEYWORDS(veh));
+	count += wordcount_string(VEH_SHORT_DESC(veh));
+	count += wordcount_string(VEH_LONG_DESC(veh));
+	count += wordcount_string(VEH_LOOK_DESC(veh));
+	count += wordcount_extra_descriptions(VEH_EX_DESCS(veh));
+	count += wordcount_custom_messages(VEH_CUSTOM_MSGS(veh));
+	
+	return count;
 }
 
 
@@ -2422,6 +2442,7 @@ vehicle_data *unstore_vehicle_from_file(FILE *fl, any_vnum vnum, char *error_str
 							}
 							if ((load_obj = Obj_load_from_file(fl, load_vnum, &location, NULL, error))) {
 								// Obj_load_from_file may return a NULL for deleted objs
+								suspend_autostore_updates = TRUE;	// see end of block for FALSE
 				
 								// Not really an inventory, but same idea.
 								if (location > 0) {
@@ -2431,7 +2452,7 @@ vehicle_data *unstore_vehicle_from_file(FILE *fl, any_vnum vnum, char *error_str
 								// store autostore timer through obj_to_room
 								timer = GET_AUTOSTORE_TIMER(load_obj);
 								obj_to_vehicle(load_obj, veh);
-								GET_AUTOSTORE_TIMER(load_obj) = timer;
+								schedule_obj_autostore_check(load_obj, timer);
 				
 								for (iter = MAX_BAG_ROWS - 1; iter > -location; --iter) {
 									// No container, back to vehicle
@@ -2439,7 +2460,7 @@ vehicle_data *unstore_vehicle_from_file(FILE *fl, any_vnum vnum, char *error_str
 										DL_DELETE2(cont_row[iter], obj, prev_content, next_content);
 										timer = GET_AUTOSTORE_TIMER(obj);
 										obj_to_vehicle(obj, veh);
-										GET_AUTOSTORE_TIMER(obj) = timer;
+										schedule_obj_autostore_check(obj, timer);
 									}
 								}
 								if (iter == -location && cont_row[iter]) {			/* Content list exists. */
@@ -2453,14 +2474,14 @@ vehicle_data *unstore_vehicle_from_file(FILE *fl, any_vnum vnum, char *error_str
 										}
 										timer = GET_AUTOSTORE_TIMER(load_obj);
 										obj_to_vehicle(load_obj, veh);			/* Add to vehicle first. */
-										GET_AUTOSTORE_TIMER(load_obj) = timer;
+										schedule_obj_autostore_check(load_obj, timer);
 									}
 									else {				/* Object isn't container, empty content list. */
 										DL_FOREACH_SAFE2(cont_row[iter], obj, next_obj, next_content) {
 											DL_DELETE2(cont_row[iter], obj, prev_content, next_content);
 											timer = GET_AUTOSTORE_TIMER(obj);
 											obj_to_vehicle(obj, veh);
-											GET_AUTOSTORE_TIMER(obj) = timer;
+											schedule_obj_autostore_check(obj, timer);
 										}
 									}
 								}
@@ -2468,6 +2489,8 @@ vehicle_data *unstore_vehicle_from_file(FILE *fl, any_vnum vnum, char *error_str
 									obj_from_room(load_obj);
 									DL_APPEND2(cont_row[-location - 1], load_obj, prev_content, next_content);
 								}
+								
+								suspend_autostore_updates = FALSE;
 							}
 						}
 						else if (!strn_cmp(line, "Contents-end", 12)) {
@@ -3131,7 +3154,7 @@ void write_vehicle_to_file(FILE *fl, vehicle_data *veh) {
 	}
 	
 	// 'E': extra descs
-	write_extra_descs_to_file(fl, VEH_EX_DESCS(veh));
+	write_extra_descs_to_file(fl, 'E', VEH_EX_DESCS(veh));
 	
 	// I: interactions
 	write_interactions_to_file(fl, VEH_INTERACTIONS(veh));
@@ -3228,12 +3251,15 @@ void olc_delete_vehicle(char_data *ch, any_vnum vnum) {
 	bld_data *bld, *next_bld;
 	obj_data *obj, *next_obj;
 	descriptor_data *desc;
+	char name[256];
 	bool found;
 	
 	if (!(veh = vehicle_proto(vnum))) {
 		msg_to_char(ch, "There is no such vehicle %d.\r\n", vnum);
 		return;
 	}
+	
+	snprintf(name, sizeof(name), "%s", NULLSAFE(VEH_SHORT_DESC(veh)));
 	
 	// remove live vehicles
 	DL_FOREACH_SAFE(vehicle_list, iter, next_iter) {
@@ -3264,6 +3290,7 @@ void olc_delete_vehicle(char_data *ch, any_vnum vnum) {
 		found |= delete_bld_relation_by_vnum(&GET_BLD_RELATIONS(bld), BLD_REL_UPGRADES_TO_VEH, vnum);
 		found |= delete_bld_relation_by_vnum(&GET_BLD_RELATIONS(bld), BLD_REL_FORCE_UPGRADE_VEH, vnum);
 		if (found) {
+			syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: Building %d %s lost deleted related vehicle", GET_BLD_VNUM(bld), GET_BLD_NAME(bld));
 			save_library_file_for_vnum(DB_BOOT_BLD, GET_BLD_VNUM(bld));
 		}
 	}
@@ -3278,6 +3305,7 @@ void olc_delete_vehicle(char_data *ch, any_vnum vnum) {
 		
 		if (found) {
 			SET_BIT(GET_CRAFT_FLAGS(craft), CRAFT_IN_DEVELOPMENT);
+			syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: Craft %d %s set IN-DEV due to deleted vehicle", GET_CRAFT_VNUM(craft), GET_CRAFT_NAME(craft));
 			save_library_file_for_vnum(DB_BOOT_CRAFT, GET_CRAFT_VNUM(craft));
 		}
 	}
@@ -3288,6 +3316,7 @@ void olc_delete_vehicle(char_data *ch, any_vnum vnum) {
 			if (store->type == TYPE_VEH && store->vnum == vnum) {
 				LL_DELETE(obj->proto_data->storage, store);
 				free(store);
+				syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: Object %d %s lost deleted storage vehicle", GET_OBJ_VNUM(obj), GET_OBJ_SHORT_DESC(obj));
 				save_library_file_for_vnum(DB_BOOT_OBJ, GET_OBJ_VNUM(obj));
 			}
 		}
@@ -3299,6 +3328,7 @@ void olc_delete_vehicle(char_data *ch, any_vnum vnum) {
 		
 		if (found) {
 			SET_BIT(PRG_FLAGS(prg), PRG_IN_DEVELOPMENT);
+			syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: Progress %d %s set IN-DEV due to deleted vehicle", PRG_VNUM(prg), PRG_NAME(prg));
 			save_library_file_for_vnum(DB_BOOT_PRG, PRG_VNUM(prg));
 			need_progress_refresh = TRUE;
 		}
@@ -3313,6 +3343,7 @@ void olc_delete_vehicle(char_data *ch, any_vnum vnum) {
 		
 		if (found) {
 			SET_BIT(QUEST_FLAGS(quest), QST_IN_DEVELOPMENT);
+			syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: Quest %d %s set IN-DEV due to deleted vehicle", QUEST_VNUM(quest), QUEST_NAME(quest));
 			save_library_file_for_vnum(DB_BOOT_QST, QUEST_VNUM(quest));
 		}
 	}
@@ -3321,6 +3352,7 @@ void olc_delete_vehicle(char_data *ch, any_vnum vnum) {
 	HASH_ITER(hh, room_template_table, rmt, next_rmt) {
 		found = delete_from_spawn_template_list(&GET_RMT_SPAWNS(rmt), ADV_SPAWN_VEH, vnum);
 		if (found) {
+			syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: Room template %d %s lost deleted related vehicle", GET_RMT_VNUM(rmt), GET_RMT_TITLE(rmt));
 			save_library_file_for_vnum(DB_BOOT_RMT, GET_RMT_VNUM(rmt));
 		}
 	}
@@ -3332,6 +3364,7 @@ void olc_delete_vehicle(char_data *ch, any_vnum vnum) {
 		
 		if (found) {
 			SET_BIT(SHOP_FLAGS(shop), SHOP_IN_DEVELOPMENT);
+			syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: Shop %d %s set IN-DEV due to deleted vehicle", SHOP_VNUM(shop), SHOP_NAME(shop));
 			save_library_file_for_vnum(DB_BOOT_SHOP, SHOP_VNUM(shop));
 		}
 	}
@@ -3342,6 +3375,7 @@ void olc_delete_vehicle(char_data *ch, any_vnum vnum) {
 		
 		if (found) {
 			SET_BIT(SOC_FLAGS(soc), SOC_IN_DEVELOPMENT);
+			syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: Social %d %s set IN-DEV due to deleted vehicle", SOC_VNUM(soc), SOC_NAME(soc));
 			save_library_file_for_vnum(DB_BOOT_SOC, SOC_VNUM(soc));
 		}
 	}
@@ -3353,6 +3387,7 @@ void olc_delete_vehicle(char_data *ch, any_vnum vnum) {
 		found |= delete_bld_relation_by_vnum(&VEH_RELATIONS(iter), BLD_REL_UPGRADES_TO_VEH, vnum);
 		found |= delete_bld_relation_by_vnum(&VEH_RELATIONS(iter), BLD_REL_FORCE_UPGRADE_VEH, vnum);
 		if (found) {
+			syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: Vehicle %d %s lost deleted related vehicle", VEH_VNUM(iter), VEH_SHORT_DESC(veh));
 			save_library_file_for_vnum(DB_BOOT_VEH, VEH_VNUM(iter));
 		}
 	}
@@ -3443,8 +3478,8 @@ void olc_delete_vehicle(char_data *ch, any_vnum vnum) {
 		}
 	}
 	
-	syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: %s has deleted vehicle %d", GET_NAME(ch), vnum);
-	msg_to_char(ch, "Vehicle %d deleted.\r\n", vnum);
+	syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: %s has deleted vehicle %d %s", GET_NAME(ch), vnum, name);
+	msg_to_char(ch, "Vehicle %d (%s) deleted.\r\n", vnum, name);
 	
 	free_vehicle(veh);
 }
@@ -3459,6 +3494,7 @@ void olc_delete_vehicle(char_data *ch, any_vnum vnum) {
 void olc_fullsearch_vehicle(char_data *ch, char *argument) {
 	char buf[MAX_STRING_LENGTH * 2], line[MAX_STRING_LENGTH], type_arg[MAX_INPUT_LENGTH], val_arg[MAX_INPUT_LENGTH], find_keywords[MAX_INPUT_LENGTH];
 	int count;
+	bool found_one;
 	
 	char only_icon[MAX_INPUT_LENGTH];
 	bitvector_t only_designate = NOBITS, only_flags = NOBITS, only_functions = NOBITS, only_affs = NOBITS;
@@ -3469,11 +3505,12 @@ void olc_fullsearch_vehicle(char_data *ch, char *argument) {
 	int only_hitpoints = NOTHING, hitpoints_over = NOTHING, hitpoints_under = NOTHING, only_level = NOTHING;
 	int only_military = NOTHING, military_over = NOTHING, military_under = NOTHING;
 	int only_rooms = NOTHING, rooms_over = NOTHING, rooms_under = NOTHING, only_move = NOTHING;
-	int size_under = NOTHING, size_over = NOTHING;
+	int size_under = NOTHING, size_over = NOTHING, only_depletion = NOTHING, vmin = NOTHING, vmax = NOTHING;
 	struct custom_message *cust;
 	bool needs_animals = FALSE;
 	
 	struct interaction_item *inter;
+	struct interact_restriction *inter_res;
 	vehicle_data *veh, *next_veh;
 	size_t size;
 	
@@ -3502,6 +3539,7 @@ void olc_fullsearch_vehicle(char_data *ch, char *argument) {
 		FULLSEARCH_INT("capacityover", cap_over, 0, INT_MAX)
 		FULLSEARCH_INT("capacityunder", cap_under, 0, INT_MAX)
 		FULLSEARCH_FLAGS("custom", find_custom, veh_custom_types)
+		FULLSEARCH_LIST("depletion", only_depletion, depletion_type)
 		FULLSEARCH_FLAGS("designate", only_designate, designate_flags)
 		FULLSEARCH_INT("fame", only_fame, 0, INT_MAX)
 		FULLSEARCH_INT("fameover", fame_over, 0, INT_MAX)
@@ -3529,6 +3567,8 @@ void olc_fullsearch_vehicle(char_data *ch, char *argument) {
 		FULLSEARCH_INT("sizeover", size_over, 0, INT_MAX)
 		FULLSEARCH_INT("sizeunder", size_under, 0, INT_MAX)
 		FULLSEARCH_LIST("speed", only_speed, vehicle_speed_types)
+		FULLSEARCH_INT("vmin", vmin, 0, INT_MAX)
+		FULLSEARCH_INT("vmax", vmax, 0, INT_MAX)
 		
 		else {	// not sure what to do with it? treat it like a keyword
 			sprintf(find_keywords + strlen(find_keywords), "%s%s", *find_keywords ? " " : "", type_arg);
@@ -3543,6 +3583,9 @@ void olc_fullsearch_vehicle(char_data *ch, char *argument) {
 	
 	// okay now look up items
 	HASH_ITER(hh, vehicle_table, veh, next_veh) {
+		if ((vmin != NOTHING && VEH_VNUM(veh) < vmin) || (vmax != NOTHING && VEH_VNUM(veh) > vmax)) {
+			continue;	// vnum range
+		}
 		if (only_affs != NOBITS && (VEH_ROOM_AFFECTS(veh) & only_affs) != only_affs) {
 			continue;
 		}
@@ -3612,6 +3655,20 @@ void olc_fullsearch_vehicle(char_data *ch, char *argument) {
 				found_interacts |= BIT(inter->type);
 			}
 			if ((find_interacts & found_interacts) != find_interacts) {
+				continue;
+			}
+		}
+		if (only_depletion != NOTHING) {
+			found_one = FALSE;
+			LL_FOREACH(VEH_INTERACTIONS(veh), inter) {
+				LL_FOREACH(inter->restrictions, inter_res) {
+					if (inter_res->type == INTERACT_RESTRICT_DEPLETION && inter_res->vnum == only_depletion) {
+						found_one = TRUE;
+						break;
+					}
+				}
+			}
+			if (!found_one) {
 				continue;
 			}
 		}
@@ -4058,7 +4115,7 @@ void do_stat_vehicle(char_data *ch, vehicle_data *veh) {
 	}
 	
 	// script info
-	msg_to_char(ch, "Script information (id %d):\r\n", veh->script_id);
+	msg_to_char(ch, "Script information (id %d):\r\n", SCRIPT(veh) ? veh_script_id(veh) : veh->script_id);
 	if (SCRIPT(veh)) {
 		script_stat(ch, SCRIPT(veh));
 	}
@@ -4086,8 +4143,7 @@ void look_at_vehicle(vehicle_data *veh, char_data *ch) {
 	proto = vehicle_proto(VEH_VNUM(veh));
 	
 	if (VEH_LOOK_DESC(veh) && *VEH_LOOK_DESC(veh)) {
-		sprintf(lbuf, "%s:\r\n%s", VEH_SHORT_DESC(veh), VEH_LOOK_DESC(veh));
-		msg_to_char(ch, "%s", CAP(lbuf));
+		msg_to_char(ch, "You look at %s:\r\n%s", VEH_SHORT_DESC(veh), VEH_LOOK_DESC(veh));
 	}
 	else {
 		act("You look at $V but see nothing special.", FALSE, ch, NULL, veh, TO_CHAR);
@@ -4150,7 +4206,7 @@ void look_at_vehicle(vehicle_data *veh, char_data *ch) {
 */
 void olc_show_vehicle(char_data *ch) {
 	vehicle_data *veh = GET_OLC_VEHICLE(ch->desc);
-	char buf[MAX_STRING_LENGTH], lbuf[MAX_STRING_LENGTH];
+	char buf[MAX_STRING_LENGTH*4], lbuf[MAX_STRING_LENGTH*4];
 	struct custom_message *custm;
 	struct spawn_info *spawn;
 	int count;
@@ -4175,29 +4231,25 @@ void olc_show_vehicle(char_data *ch) {
 	sprintf(buf + strlen(buf), "<%shitpoints\t0> %d\r\n", OLC_LABEL_VAL(VEH_MAX_HEALTH(veh), 1), VEH_MAX_HEALTH(veh));
 	sprintf(buf + strlen(buf), "<%smovetype\t0> %s\r\n", OLC_LABEL_VAL(VEH_MOVE_TYPE(veh), 0), mob_move_types[VEH_MOVE_TYPE(veh)]);
 	sprintf(buf + strlen(buf), "<%sspeed\t0> %s, <%ssize\t0> %d\r\n", OLC_LABEL_VAL(VEH_SPEED_BONUSES(veh), VSPEED_NORMAL), vehicle_speed_types[VEH_SPEED_BONUSES(veh)], OLC_LABEL_VAL(VEH_SIZE(veh), 0), VEH_SIZE(veh));
-	sprintf(buf + strlen(buf), "<%scapacity\t0> %d item%s\r\n", OLC_LABEL_VAL(VEH_CAPACITY(veh), 0), VEH_CAPACITY(veh), PLURAL(VEH_CAPACITY(veh)));
-	sprintf(buf + strlen(buf), "<%sanimalsrequired\t0> %d\r\n", OLC_LABEL_VAL(VEH_ANIMALS_REQUIRED(veh), 0), VEH_ANIMALS_REQUIRED(veh));
+	sprintf(buf + strlen(buf), "<%scapacity\t0> %d item%s, <%sanimalsrequired\t0> %d\r\n", OLC_LABEL_VAL(VEH_CAPACITY(veh), 0), VEH_CAPACITY(veh), PLURAL(VEH_CAPACITY(veh)), OLC_LABEL_VAL(VEH_ANIMALS_REQUIRED(veh), 0), VEH_ANIMALS_REQUIRED(veh));
 	
 	if (VEH_MIN_SCALE_LEVEL(veh) > 0) {
-		sprintf(buf + strlen(buf), "<%sminlevel\t0> %d\r\n", OLC_LABEL_CHANGED, VEH_MIN_SCALE_LEVEL(veh));
+		sprintf(lbuf, "<%sminlevel\t0> %d", OLC_LABEL_CHANGED, VEH_MIN_SCALE_LEVEL(veh));
 	}
 	else {
-		sprintf(buf + strlen(buf), "<%sminlevel\t0> none\r\n", OLC_LABEL_UNCHANGED);
+		sprintf(lbuf, "<%sminlevel\t0> none", OLC_LABEL_UNCHANGED);
 	}
 	if (VEH_MAX_SCALE_LEVEL(veh) > 0) {
-		sprintf(buf + strlen(buf), "<%smaxlevel\t0> %d\r\n", OLC_LABEL_CHANGED, VEH_MAX_SCALE_LEVEL(veh));
+		sprintf(buf + strlen(buf), "%s, <%smaxlevel\t0> %d\r\n", lbuf, OLC_LABEL_CHANGED, VEH_MAX_SCALE_LEVEL(veh));
 	}
 	else {
-		sprintf(buf + strlen(buf), "<%smaxlevel\t0> none\r\n", OLC_LABEL_UNCHANGED);
+		sprintf(buf + strlen(buf), "%s, <%smaxlevel\t0> none\r\n", lbuf, OLC_LABEL_UNCHANGED);
 	}
 
-	sprintf(buf + strlen(buf), "<%sinteriorroom\t0> %d - %s\r\n", OLC_LABEL_VAL(VEH_INTERIOR_ROOM_VNUM(veh), NOWHERE), VEH_INTERIOR_ROOM_VNUM(veh), building_proto(VEH_INTERIOR_ROOM_VNUM(veh)) ? GET_BLD_NAME(building_proto(VEH_INTERIOR_ROOM_VNUM(veh))) : "none");
-	sprintf(buf + strlen(buf), "<%sextrarooms\t0> %d\r\n", OLC_LABEL_VAL(VEH_MAX_ROOMS(veh), 0), VEH_MAX_ROOMS(veh));
+	sprintf(buf + strlen(buf), "<%sextrarooms\t0> %d, <%sinteriorroom\t0> %d - %s\r\n", OLC_LABEL_VAL(VEH_MAX_ROOMS(veh), 0), VEH_MAX_ROOMS(veh), OLC_LABEL_VAL(VEH_INTERIOR_ROOM_VNUM(veh), NOWHERE), VEH_INTERIOR_ROOM_VNUM(veh), building_proto(VEH_INTERIOR_ROOM_VNUM(veh)) ? GET_BLD_NAME(building_proto(VEH_INTERIOR_ROOM_VNUM(veh))) : "none");
 	sprintbit(VEH_DESIGNATE_FLAGS(veh), designate_flags, lbuf, TRUE);
 	sprintf(buf + strlen(buf), "<%sdesignate\t0> %s\r\n", OLC_LABEL_VAL(VEH_DESIGNATE_FLAGS(veh), NOBITS), lbuf);
-	sprintf(buf + strlen(buf), "<%sheight\t0> %d\r\n", OLC_LABEL_VAL(VEH_HEIGHT(veh), 0), VEH_HEIGHT(veh));
-	sprintf(buf + strlen(buf), "<%sfame\t0> %d\r\n", OLC_LABEL_VAL(VEH_FAME(veh), 0), VEH_FAME(veh));
-	sprintf(buf + strlen(buf), "<%smilitary\t0> %d\r\n", OLC_LABEL_VAL(VEH_MILITARY(veh), 0), VEH_MILITARY(veh));
+	sprintf(buf + strlen(buf), "<%sheight\t0> %d, <%sfame\t0> %d, <%smilitary\t0> %d\r\n", OLC_LABEL_VAL(VEH_HEIGHT(veh), 0), VEH_HEIGHT(veh), OLC_LABEL_VAL(VEH_FAME(veh), 0), VEH_FAME(veh), OLC_LABEL_VAL(VEH_MILITARY(veh), 0), VEH_MILITARY(veh));
 	
 	sprintbit(VEH_ROOM_AFFECTS(veh), room_aff_bits, lbuf, TRUE);
 	sprintf(buf + strlen(buf), "<%saffects\t0> %s\r\n", OLC_LABEL_VAL(VEH_ROOM_AFFECTS(veh), NOBITS), lbuf);
@@ -4213,7 +4265,7 @@ void olc_show_vehicle(char_data *ch) {
 	// exdesc
 	sprintf(buf + strlen(buf), "Extra descriptions: <%sextra\t0>\r\n", OLC_LABEL_PTR(VEH_EX_DESCS(veh)));
 	if (VEH_EX_DESCS(veh)) {
-		get_extra_desc_display(VEH_EX_DESCS(veh), lbuf);
+		get_extra_desc_display(VEH_EX_DESCS(veh), lbuf, sizeof(lbuf));
 		strcat(buf, lbuf);
 	}
 

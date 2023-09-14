@@ -1,8 +1,8 @@
 * Note: all lines between records which start with '*' are comments and
-* are ignored.  Comments can only be between records, not within them.
+* are ignored. Comments can only be between records, not within them.
 *
 * This file is where the damage messages go for offensive spells, and
-* skills such as kick and backstab.  Also, starting with Circle 3.0, these
+* skills such as kick and backstab. Also, starting with Circle 3.0, these
 * messages are used for failed spells, and weapon messages for misses and
 * death blows.
 *
@@ -14,10 +14,10 @@
 *   Hit message (damager, damagee, onlookers)
 *   God message (damager, damagee, onlookers)
 *
-* All messages must be contained in one line.  They will be sent through
+* All messages must be contained in one line. They will be sent through
 * act(), meaning that all standard act() codes apply, and each message will
-* automatically be wrapped to 79 columns when they are printed.  '#' can
-* be substituted for a message if none should be printed.  Note however
+* automatically be wrapped to 79 columns when they are printed. '#' can
+* be substituted for a message if none should be printed. Note however
 * that, unlike the socials file, all twelve lines must be present for each
 * record, regardless of any '#' fields which may be contained in it.
 
@@ -55,7 +55,7 @@ $N stops a cunning slash from $n who looks disappointed.
 M
  1
 Your slash at $N results in a pool of blood and $S immediate death!
-Blood spurts all over as $n slashes at you.  You die...
+Blood spurts all over as $n slashes at you. You die...
 $n slashes at $N who colors everything red with blood from $S lethal wound.
 You miss $N by an inch, curse that brat!
 You manage to dodge $n's slash and laugh, HA!
@@ -145,7 +145,7 @@ $N begins to slap at $Mself as $n tries to jab $M.
 M
  4
 You successfully pierce $N and $S dead body falls to the ground in a lifeless heap.
-$n pierces you.  You are no longer a living member of this world -- R.I.P.!
+$n pierces you. You are no longer a living member of this world -- R.I.P.!
 $n pierces $N whose suddenly lifeless body falls to the ground!
 You try to pierce $N but pierce the air instead!
 $n pierces holes in the air.
@@ -212,7 +212,7 @@ $n looks perturbed as $s pound misses $N!
 #
 #
 You pound $N!  And $E thanks you for it?  *boggle*
-$n gives you a pound.  Wonder what the exchange rate is...
+$n gives you a pound. Wonder what the exchange rate is...
 $n starts giving pounds to $N who begins to count the money.
 M
  5
@@ -272,7 +272,7 @@ $n tries to whip $N but whips the ground instead!
 #
 #
 Don't try to whip $N.
-$n is trying to whip you.  Yawn.
+$n is trying to whip you. Yawn.
 $n tries to whip $N - yawn.
 
 * Pick
@@ -303,7 +303,7 @@ $n fiercely snaps $s teeth at $N but misses the mark.
 #
 #
 #
-You attempt to bite $N.  Ouch!  That hurt!
+You attempt to bite $N. Ouch!  That hurt!
 $n tries to bite you, how funny.
 $n tries to bite $N - funny, huh?
 M
@@ -371,7 +371,7 @@ $n tries to kick $N, but it turns out more crazy than effective.
 M
  12
 You swing at $N, who catches fire and is incinerated!
-$n swings at you...  You catch fire and are incinerated!
+$n swings at you... You catch fire and are incinerated!
 $n swings at $N, who catches fire and is incinerated!
 You swing at $N, but $E skillfully sidesteps it.
 You skillfully sidestep $n's swing.
@@ -1223,7 +1223,7 @@ You shoot a bolt of fire at $N, but miss!
 $n shoots a bolt of fire from $s hand, but misses you pathetically!
 $n shoots a bolt of fire from $s hand, but misses $N!
 You shoot a bolt of fire from your fist which knocks $N back violently!
-$n shoots a bolt of fire from $s fist...  You're knocked to the ground in flames!
+$n shoots a bolt of fire from $s fist... You're knocked to the ground in flames!
 $n shoots a bolt of fire from $s fist which knocks $N back violently!
 You shoot a bolt of fire at $N, but miss!
 $n shoots a bolt of fire from $s hand, but misses you pathetically!

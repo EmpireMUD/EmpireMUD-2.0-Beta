@@ -8,7 +8,7 @@ smudges, and sew Guild decoy kits. Bring back one of each to get us started.
 ~
 It's going to take a lot more supplies than that to keep the guild running...
 ~
-7 d 0 0 5760
+8 dj 0 0 5760
 A
 1 18219
 A
@@ -45,7 +45,7 @@ Forge another batch of Guild swords.
 ~
 The Guild thanks you for another set of swords.
 ~
-7 d 0 0 0
+8 dj 0 0 0
 A
 1 18219
 A
@@ -76,7 +76,7 @@ Craft another batch of Guild cleansing smudges.
 ~
 The Guild thanks you for another set of smudges.
 ~
-8 d 0 0 0
+9 dj 0 0 0
 A
 1 18217
 A
@@ -107,7 +107,7 @@ Sew another Guild decoy kit.
 ~
 The Guild thanks you for another good decoy kit.
 ~
-9 d 0 0 0
+10 dj 0 0 0
 A
 1 18218
 A
@@ -133,7 +133,7 @@ Z
 1 18210
 S
 #11520
-Pixy Pursuit (event)~
+Pixy Pursuit~
    The Alchemist has lost his supplier for pixy dust, which he needs in order
 to brew many of his critical, life-saving potions. In this treasure hunt event,
 players find and catch pixies for the Alchemist to earn event points. Scour
@@ -154,13 +154,14 @@ To participate in the event:
 ~
 The event has ended.
 ~
-5 0 0 0 0
+8 j 0 0 0
 A
 1 231
 P
-36 11520 0 1
+36 11520 0 1 -
 T 11520
-W
-11 0 0 1
+W+
+11 0 0 1 -
+Catch pixies~
 S
 $

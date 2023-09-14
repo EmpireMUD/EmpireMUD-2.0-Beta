@@ -276,9 +276,10 @@ if %result%
 end
 ~
 #12411
-quest complete: no kill~
+Golden Goblin: Quest completion for goblins~
 2 v 0
 ~
+* set no-kill
 set vnum 12401
 while %vnum% <= 12406
   set mob %instance.mob(%vnum%)%
@@ -287,6 +288,14 @@ while %vnum% <= 12406
   end
   eval vnum %vnum% + 1
 done
+* check if it was a fathma quest
+if %questvnum% >= 12406 && %questvnum% <= 12409
+  if %actor.on_quest(18240)% && !%actor.quest_triggered(18240)%
+    * trigger daily
+    %quest% %actor% trigger 18240
+    %send% %actor% You have successfully aided Fathma and finished 'Fathom a Little Goblin Aid'.
+  end
+end
 ~
 #12412
 Goblin Cove loot load boe/bop~

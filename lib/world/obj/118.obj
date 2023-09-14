@@ -1,0 +1,2536 @@
+#11800
+buffet bufet soup~
+the buffet~
+A buffet has been set out on a long table by the wall.~
+   The buffet table is loaded with apples, pears, cheeses (both fresh and
+foul), crisps, crackers, carrots, cuts of fish and game, brightly colored
+birds, and pots set into the table that hold soup. It has an inviting aroma
+that feels like it's exactly what you need right now.
+~
+6 0 0 0 4
+1000 0 0
+7 0
+C
+100 100
+M
+4
+You eat some fruits and cheeses from the buffet.~
+M
+5
+$n samples some of the delicacies from the buffet.~
+S
+#11801
+shoes pair bustling~
+bustling shoes~
+A pair of bustling shoes seem to be walking in circles.~
+   These shoes are made from fine cloth and leather, and bear the imprint of
+the Tower Skycleave on the heel.
+   The tower is renowned for sorcerers and their apprentices who never tire as
+they trudge up and down the tower's long spiral walkway. One thing is certain:
+These shoes were made for walking.
+~
+2 mo ag 0 6
+-1 -1 -1
+11 0
+A
+6 2 0
+A
+11 1 0
+A
+5 1 6
+C
+150 250
+M
+8
+You slip on some bustling shoes and feel faster already.~
+M
+9
+$n slips on some bustling shoes and seems to speed up.~
+T 11902
+S
+#11802
+aura experimental~
+an experimental aura~
+There's... sort of an aura hovering here.~
+   It glows with... something. Surely this experimental aura was cooked up by
+the sorcerers of the Tower Skycleave, notorious for its unusual magics and
+well-funded research and development.
+   Unbridled innovation is the skeleton key to progress -- at least, according
+to Professor Scaldorran.
+~
+2 mo ak 0 8
+-1 -1 -1
+10 0
+A
+19 1 0
+A
+11 1 0
+A
+6 1 0
+A
+5 1 6
+C
+150 250
+M
+9
+$n starts to glow, somewhat.~
+M
+8
+You start to glow, somewhat.~
+T 11902
+S
+#11803
+manual user claw machine~
+a claw machine user manual~
+The user manual for a claw machine is lying here.~
+   You flip through the claw game machine's user manual. Most of the book
+describes how to repair various issues with the game, and there's also an
+entire chapter described to the machine's creation by Scaldorran in the days
+before he was a Lich. But by far the most interesting part of the manual is
+the chapter that describes how to get each of the specific prizes.
+   The fate of the claw game is controlled by just four events when rescuing
+the Tower Skycleave: whether or not you save Knezz (&rK&0), release Scaldorran (&yS&0),
+use the secret passage on floor 2 (&gP&0), and tried to play the broken claw
+game (&cC&0). Each of these tasks must be completed (or not) during the "rescue"
+phase of their respective floors.
+   Here are the outcomes:
+                          &cC&gP&yS&rK&0  loyal footstool
+                          -&gP&yS&rK&0  goblin's vest
+                          &cC&0-&yS&rK&0  souvenir swab
+                          &cC&gP&0-&rK&0  caged goblin
+                          &cC&gP&yS&0-  little goblin
+                          &cC&gP&0--  hiding shadow
+                          -&gP&yS&0-  glimmering doublet
+                          --&yS&rK&0  page robes
+                          &cC&0-&yS&0-  enchanted doorstop
+                          -&gP&0-&rK&0  apprentice robes
+                          &cC&0--&rK&0  water bug
+                          ---&rK&0  adoring fan
+                          --&yS&0-  lich robes
+                          -&gP&0--  clingy cloak
+                          &cC&0---  liberated wand
+                          ----  crystal ball
+~
+3 p a 0 3
+0 0 0
+0 0
+C
+1 1
+S
+#11804
+flagon everflowing flowing~
+an everflowing flagon~
+An everflowing flagon has been left here.~
+   This old silver flagon stands upright on its wide base, with an elegant
+handle in the shape of a curved tree trunk. The top is outfitted with a hinged
+lid to keep the drink inside from spilling. The side is emblazoned with the
+crest of the Tower Skycleave.
+   It seems this flagon has been enchanted to refill itself with water over
+time. It's also surprisingly heavy for its size, so perhaps the water is just
+hidden somewhere inside it.
+   The Tower Skycleave hosts a welcome reception in its lobby at all times as
+a way of encouraging guests to become clients -- or even patrons. Self-filling
+vessels such as this one are difficult to find outside, however, as the
+sorcerers usually enchant them to be unpilferable.
+~
+5 ep a 0 11
+72 72 11804
+3 0
+C
+150 250
+M
+4
+You take a swig of $T from $p.~
+M
+5
+$n takes a swig from $p.~
+T 11804
+S
+#11805
+looker~
+a looker~
+A looker is here.~
+This item causes the player to 'look' when it loads, then vanishes.
+~
+3 0 a 0 3
+0 0 0
+0 1
+C
+1 1
+T 11805
+S
+#11806
+eyepiece piece skycleaver crystal analysis~
+a skycleaver crystal analysis eyepiece~
+A skycleaver crystal analysis eyepiece has been left here.~
+   This odd crimson crystal is fitted into a nocturnium socket and is held in
+place over your eye by a silken sash. The crystal allows you to see what you're
+working on at the cellular level. It also seems to sense the heat from living
+creatures, granting some degree of night vision.
+   The artificers of Skycleave are known to make all manner of useful trinkets,
+though most of these are created ad hoc by sorcerers looking to shortcut
+whatever difficult task they're working on at the moment.
+~
+2 mo ae 0 18
+0 0 0
+7 0
+A
+25 50 0
+A
+5 1 6
+C
+150 150
+M
+8
+You wear the crystal analysis piece on your eye.~
+M
+9
+$n wears a crystal analysis device on $s eye.~
+T 11902
+S
+#11807
+jar demerits skycleaver~
+a jar of skycleaver demerits~
+A jar of skycleaver demerits is sitting here.~
+   This well-polished clay jar is sealed on top with wax. Both the jar and the
+seal are emblazoned with the coat of arms of the Tower Skycleave. There doesn't
+seem to be a way to open the jar, but you can hear beads rolling around inside.
+   Possession of this jar allows you to morph into the following
+anthropomorphic household items: teapot, broom, sponge, bucket, mop
+   Though it has become all-too common for students at the Tower Skycleave,
+punitive transformation is nevertheless a longstanding tradition for pupils who
+prove disappointing.
+~
+3 o a 0 3
+0 0 0
+0 0
+C
+50 50
+S
+#11808
+sapling blue~
+a blue sapling~
+A blue sapling has fallen here.~
+   This strange sapling was green until you cut it down, but has turned bright
+blue. Its bark is smooth to the touch and though it has a few leaves at the
+top, it is completely unbranched and flawlessly straight.
+   Pixy magic can create true life, even a tree or sapling. But if it dies, the
+life that was given returns to the pixy, and the thing's un-nature is revealed
+in its death.
+~
+3 0 a 0 4
+0 0 0
+0 0
+C
+1 1
+I 11 184 100.00 1  # LIGHT: torch
+O+ 1 6025
+R
+4 5118 0
+S
+#11809
+directory stone slab~
+the directory~
+There is a directory engraved on a stone slab.~
+This look description is updated by trigger 11811.
+~
+3 0 0 0 4
+0 0 0
+1 0
+C
+100 100
+T 11811
+S
+#11810
+whip goblin wrangler's wranglers~
+a goblin wrangler's whip~
+A goblin wrangler's whip is coiled here.~
+   This long, braided whip is made from a deep green leather. The whip's handle
+is relatively small, but its maneuverability allows a skilled wielder to keep
+enemies at bay.
+   The Tower Skycleave, having long been a prized target of goblin burglars,
+began setting traps to capture any goblin who dared enter. But even caged --
+or perhaps even moreso when caged -- a goblin is a crafty sort, and it requires
+a skilled wrangler to keep them under control.
+~
+1 hmo an 0 5
+0 1 7
+7 0
+A
+18 3 0
+A
+13 1 0
+A
+5 1 6
+C
+150 250
+T 11902
+S
+#11811
+spear goblin wrangler's wranglers~
+a goblin wrangler's spear~
+A goblin wrangler's spear has been stabbed into the ground.~
+   Goblin wrangling is notoriously difficult. This long, thin, finely made
+spear is an essential tool for keeping goblins at bay. The spear is made from a
+dark black wood and, though it's polished almost until it looks like
+nocturnium, it is far too light to be metal.
+   Spears such as this are crafted by artificers at the Tower Skycleave, who
+have long faced what they euphemistically call "the goblin problem". It's a
+common occurrence for goblins to attempt to steal the tower's priceless relics,
+so wrangler spears are often stashed around the tower.
+~
+1 ehmo an b 9
+0 1 3
+0 0
+A
+18 2 0
+A
+13 2 0
+A
+5 1 6
+C
+150 250
+M
+15
+You leap into the air and thrust your spear into the water. When you pull it out, you've caught $p!~
+M
+16
+$n leaps into the air and thrusts $s spear into the water. When $e pulls it out, $e finds $p!~
+T 11902
+S
+#11812
+hatchet intricate glass~
+an intricate glass hatchet~
+An intricate glass hatchet is sticking out of the ground.~
+   This hatchet has been knapped from a milky green glass which holds such a
+fine point that it requires no sharpening. The glass grip of the handle seems
+to fit your hand perfectly, such that the hatchet almost becomes an extension
+of your wrist.
+   Glass is capable of forming an exceptional edge, far sharper than any bronze
+or iron, though natural glasses like obsidian are desperately fragile and
+ephemeral.
+~
+1 mo an a 10
+0 4 2
+8 0
+A
+1 1 0
+A
+17 5 0
+A
+21 3 0
+A
+5 1 6
+C
+150 250
+T 11902
+S
+#11813
+sword glowing glass great~
+a glowing glass great sword~
+A glowing glass great sword has been stabbed into the ground.~
+   This enormous sword has been knapped from solid glass! The hilt and the base
+of the blade are made from a milky green glass that becomes clearer and clearer
+near the end, until the sword's tip is nearly invisible!
+   Magical glass of all sorts were produced at Skycleave under the care of
+Grand High Sorcerer Kofi and though the tower no longer manufactures them, the
+artificers are still known to shape old glass ingots into tools and weapons
+from time to time.
+~
+1 emno an 0 12
+0 4 1
+8 0
+A
+1 1 0
+A
+9 1 0
+A
+21 4 0
+A
+17 4 0
+A
+5 1 6
+C
+150 250
+T 11902
+S
+#11814
+warstaff staff celiya's celiyas~
+Celiya's warstaff~
+Celiya's warstaff has been staked into the ground.~
+   This twisting staff has none of the gnarls and knots of other wizard staves
+you've seen. Instead, its twists and turns project a sense of soft elegance
+through the form of this great warstaff. This staff bears the house emblem of
+the great sorcerer Celiya, one of the famed leaders of Skycleave.
+   House Traga was established in the Second Age, and though most of its early
+history is strictly mythological -- and fantastical indeed -- it has produced
+so many High Sorcerers that few question its claims of descent from divinity.
+~
+1 eimo an 0 11
+0 4 17
+0 0
+A
+8 1 0
+A
+9 1 0
+A
+17 4 0
+A
+22 3 0
+A
+5 1 6
+C
+150 250
+T 11902
+S
+#11815
+greatstaff staff apollus appollus~
+the greatstaff of Apollus~
+The greatstaff of Apollus is staked into the ground.~
+   This gnarled old staff is made of a light blond wood. Despite its size,
+which is both taller than a full-grown man and wider at the top than a cow's
+skull, the staff is amazingly light. Veins of red mana skitter up and down the
+staff, pulsing like a heartbeat.
+   Though many Skycleavers speak of Apollus as a person, in reality the title
+refers only to the current holder of the Apollus Chair, the sorcerer who
+oversees magics related to disease, poison, and healing.
+~
+1 ehmo an 0 10
+0 0 19
+0 0
+A
+8 1 0
+A
+23 8 0
+A
+5 1 6
+C
+150 250
+T 11902
+S
+#11816
+club bone scrimshawed~
+a scrimshawed bone club~
+A scrimshawed bone club is lying here.~
+   This huge club is made from the bone of an even larger creature, although
+it's hard to imagine what it might have come from. The entire length of the
+club, save for the leather-wrapped handle, is carved in intricate scrimshaw,
+depicting the aftermath of a great war. In the scene on the club, a single hero
+stands over countless fallen foes, some of whom now serve the hero while others
+merely fertilize their fields.
+   Carving a great victory -- or defeat -- into the bones of the fallen is an
+ancient tradition.
+~
+1 emo an 0 13
+0 3 5
+14 0
+A
+2 1 0
+A
+18 5 0
+A
+21 3 0
+A
+5 1 6
+C
+150 250
+T 11902
+S
+#11817
+staff bone scrimshawed~
+a scrimshawed bone staff~
+A scrimshawed bone staff is lying here.~
+   This staff is made from the long leg bone of some true behemoth. From base
+to tip, the entire staff has been carved with intricate scrimshaw. You lack the
+knowledge to understand the meaning behind the carvings, but the pale blue glow
+they emanate in the dark tells you their purpose is to channel mana.
+   When he had defeated his last foe, Wildermage Indrik carved the bones of his
+fallen allies to celebrate the victory they seized from the tusks of defeat.
+~
+1 emo an 0 13
+0 3 18
+14 0
+A
+2 1 0
+A
+18 5 0
+A
+22 3 0
+A
+5 1 6
+C
+150 250
+T 11902
+S
+#11818
+bow rain rainbow goblin~
+a goblin rain bow~
+A goblin rain bow is lying here.~
+   This small bow is made from lightweight wood that has been made surprisingly
+durable with glue and bits of hide. The bow is relatively undecorated, but as
+you pull on the string you find it sturdy and strong. The only writing on the
+bow appears to be the goblin symbol for rain.
+   The goblins have long forgotten the stories of the original rain bows, so
+called because they were shot off the gobbrabakhs during the driest months to
+strike water from clouds.
+~
+20 emo ap 0 13
+29 1 0
+14 0
+C
+150 250
+T 11902
+S
+#11819
+armor otherworlder suit~
+otherworlder armor~
+A suit of otherworlder armor is lying here.~
+   This suit isn't metal, leather, or cloth. It's a material you've never seen
+before, other than on the captured otherworlder in the Tower Skycleave. The
+material has an iridescent sheen like pearl, but it's as flexible as fine
+linen. The armor even seems to heal itself when damaged.
+   The otherworlder came on a shooting star so bright that its doom lit up the
+night and so heavy it shook every cup from its board for a thousand miles. The
+otherworlder's strange tools and inscrutible magics led the Tower Skycleaver to
+study him, that they might learn enough to stand their ground if an army of
+otherworlders should follow.
+~
+27 emo aq 0 17
+3 0 0
+2 0
+A
+2 1 0
+A
+18 6 0
+A
+13 4 0
+A
+17 -3 0
+C
+150 250
+M
+8
+You equip yourself in the $p.~
+M
+9
+$n equips $mself in $p.~
+T 11902
+S
+#11820
+armor suit living skeleton~
+living skeleton armor~
+A suit of living skeleton armor is lying here.~
+   The ribcage of the armor seems to swell and shrink like a heartbeat as you
+run your hand over it. It seems to be real bone and though you can't see what's
+holding it together, it seems well-attached. Thin red veins of mana streak up
+and down the armor, and they seem to repair it when it's broken.
+   Created first as a costume for a Day of the Dead party, the armor took on a
+life of its own when an errant spell from Scaldorran brought all the costumes
+to life. For his part, Scaldorran insisted he was only trying to liven up the
+party.
+~
+27 emo aq 0 16
+1 0 0
+14 0
+A
+9 1 0
+A
+17 4 0
+A
+21 6 0
+A
+18 -3 0
+C
+150 250
+M
+8
+You equip yourself in the $p.~
+M
+9
+$n equips $mself in $p.~
+T 11902
+S
+#11821
+bindings lich~
+lich bindings~
+The floor is piled with lich bindings.~
+   These ephemeral garments cling loosely to your skin as you touch them.
+Heavy steam falls from the bindings as mana seeps out through their tattered
+ends. These must once have bound a lich, and they are still steeped in its
+icy magic.
+   Skycleave was once home to three great liches -- sorcerers whose power was
+so great that the fabric of the world's magic has a deep impression in their
+image. For these sorcerers, living in death as a shadow of the spells they wove
+in life is still a form of immortality, but few erudite wizards would consider
+the lich to be the same person.
+~
+27 emo aq 0 17
+0 0 0
+11 0
+A
+9 1 0
+A
+17 4 0
+A
+22 6 0
+A
+23 -3 0
+C
+150 250
+M
+8
+You equip yourself in the $p.~
+M
+9
+$n equips $mself in $p.~
+T 11902
+S
+#11822
+robes grand high sorcerer's sorcerers set~
+the Grand High Sorcerer's robes~
+A set of Grand High Sorcerer's robes is floating here.~
+   These violet robes seem to have a life of their own. When removed, they
+stand like a person. When worn, they tug at the wearer's arms and help guide
+them as they cast magical spells. Every inch of the robe is embroidered with
+threads of gold and nocturnium and though they look as if they weigh a ton,
+they feel effortlessly light.
+   After Knezz ascended as Grand High Sorcerer, he grew tired of relying on
+page boys to help him don his heavy robes. What began as a lazy enchantment to
+stand the robes on their own soon became a complex animus spell. Perhaps
+thinking himself above casting his own spells, Knezz eventually enchanted the
+long sleeves of the robe to move his arms for him as well.
+~
+27 emo aq 0 18
+0 0 0
+11 0
+A
+9 1 0
+A
+7 4 0
+A
+23 6 0
+A
+22 -3 0
+C
+150 250
+M
+8
+You stretch out your arms and $p dress themselves onto your body.~
+M
+9
+$n stretches out $s arms and a set of violet robes dress themselves onto $s body.~
+T 11902
+S
+#11823
+armor goblin pleated set~
+pleated goblin armor~
+A set of pleated goblin armor is sitting here.~
+   On a full-grown human, this pleated goblin armor is no longer very pleated.
+However, its goblincraft construction is sturdy and the smell is fairly
+tolerable, making this a fine suit of armor for a nimble thief or dashing
+rogue.
+   The goblins once traded for weapons and armor, but as their society fell,
+they began to imitate the crafts they had once purchased.
+~
+27 emo aq 0 19
+2 0 0
+0 0
+A
+9 1 0
+A
+17 4 0
+A
+18 4 0
+C
+150 250
+M
+8
+You equip yourself in the $p.~
+M
+9
+$n equips $mself in $p.~
+T 11902
+S
+#11824
+shield tower glass~
+a glass tower shield~
+A glass tower shield is standing here.~
+   This huge tower shield is made of crystal clear glass, obscured only by the
+strap and handle on the back, giving its bearer a superior view of the battle
+without compromising saftey. And despite being made from glass, the shield
+takes blow after blow, ringing out like a bell but never shattering.
+   Glass armaments were the clear choice under Grand High Sorcerer Kofi, but
+since have become rather rare.
+~
+23 emo ao 0 15
+0 0 0
+8 0
+A
+17 -1 0
+A
+18 1 0
+A
+13 3 0
+A
+5 1 6
+C
+150 250
+T 11902
+S
+#11825
+dagger twisted arcane~
+a twisted arcane dagger~
+A twisted arcane dagger has been stabbed into the ground.~
+   The hilt of this dagger is made from wood, leather, and bone, but the blade
+seems to be made of pure ice. A heavy steam rolls off the blade as you study
+it, and you can hear the bone-chilling screams of the damned in the crackles
+and pops the blade makes in the heat.
+   The Tower Skycleave has a collection of ice and pykrete weapons from the
+Permafrost Wars, though most melted before High Sorcerer Chun devised a spell
+that could preserve them on our plane.
+~
+1 imo ano f 19
+0 1 4
+2 0
+A
+18 -1 0
+A
+17 1 0
+A
+21 3 0
+A
+5 1 6
+C
+150 250
+T 11902
+S
+#11826
+grimoire barrosh's barroshs lost~
+Barrosh's lost grimoire~
+Barrosh's lost grimoire is lying here.~
+   This arcane tome is bound in a solid ebony cover, its pages sewn in by
+blood-red thread so fine you cannot identify it. Most of the heavy grimoire's
+pages are covered edge-to-edge in different scripts and handwritings, perhaps
+translating each page from language to language. Of these, you can read less
+than half. But the grimoire's power can still be channeled, if you have the
+will.
+   Barrosh inherited the grimoire, less its current cover, from his uncle,
+Barrad. Sorcery came rarely to their line, and it was necessary from the first
+generations to commit spells to text to ensure the family's fortune was not
+lost.
+~
+3 emo ao 0 16
+0 0 0
+0 0
+A
+23 -1 0
+A
+17 1 0
+A
+22 3 0
+A
+5 1 6
+C
+150 250
+T 11902
+S
+#11827
+focus prismatic Knezz's~
+Knezz's prismatic focus~
+Knezz's prismatic focus is lying here.~
+   This odd little gem seems to be made from glass or crystal, suspended from a
+little leather loop so it can be held safely in one's hand. As light hits the
+prism, it splits into beams of every color, from the richest red to the
+vibrantest violet. The beams arc around the room, sometimes glancing off a
+shiny surface, before focusing back together into brilliant white light that
+moves from target to target.
+   High Sorcerer Knezz famously used this focus to trace the glimmering light
+of a magical beacon to a new source of magewood, helping secure his legacy and
+elevating him to the tower's top rank.
+~
+3 mo ao 0 17
+0 0 0
+12 0
+A
+22 -1 0
+A
+7 1 0
+A
+23 3 0
+A
+5 1 6
+C
+150 250
+T 11902
+S
+#11828
+shield starmetal metal freneticist's freneticists~
+a freneticist's starmetal shield~
+A freneticist's starmetal shield is lying here.~
+   This magnificent shield is forged from a star that fell from the heavens.
+From the imprints, you can see that it was cold-worked in the ancient style,
+not forged with fire and smoke. The shield is in the shape of a twinkling star,
+though its rough finish hardly scatters light.
+   On any clear night, shooting stars can be seen across the land. Despite
+this, it is exceedingly rare to find the place where one has fallen, making
+starmetal one of the most sought-after minerals.
+~
+23 emo ao 0 17
+0 0 0
+2 0
+A
+17 1 0
+A
+18 1 0
+A
+13 1 0
+A
+21 2 0
+A
+5 1 6
+C
+150 250
+T 11902
+S
+#11829
+shield mana stabilized manashield~
+a stabilized mana shield~
+A stabilized mana shield is lying here.~
+   The shield is made only of shimmering light, of the same type that surrounds
+sorcerers when they cast a manashield. This one has been shaped into a more
+traditional buckler, and someone has managed to stabilize it so that it doesn't
+dissipate. A careful glance through the ethereal shield reveals that it also
+seems to focus magical attacks cast through it.
+   The Tower Skycleave is home to so many rare and precious items that it is
+under the near-constant threat of invasion, burglary, and assault. Stabilized
+mana shields are de rigueur for the vanguard, which is often full of less-
+experienced students incapable of conjuring a shield of their own.
+~
+23 emo ao 0 18
+0 0 0
+2 0
+A
+17 1 0
+A
+18 1 0
+A
+13 1 0
+A
+22 2 0
+A
+5 1 6
+C
+150 250
+T 11902
+S
+#11830
+bodysuit suit otherworldly worldly~
+an otherworldly bodysuit~
+An otherwordly bodysuit is lying crumpled on the ground.~
+   The paper-thin bodysuit has the look of scale armor, with many dazzling tiny
+shapes that seem to reinforce it even if they don't make it thicker. Every
+square inch of it catches and reflects light like nothing you've ever seen!
+   This suit grants new 'applaud' and 'clap' socials to the wearer.
+   The Shadow Hide found the otherworlder in the burning wreckage of a round
+metal carriage at the bottom of a steep crater. To the erudite lords of
+Skycleave, this was an unparalleled prize and it earned her high acclaim.
+~
+2 mp ad 0 8
+0 0 0
+11 0
+A
+5 1 0
+A
+5 1 6
+C
+1 1
+M
+12
+$n dazzles with an otherworldly presence.~
+M
+8
+You squeeze into $p.~
+M
+9
+$n squeezes into $p.~
+S
+#11831
+ward magical shimmering~
+the magical ward~
+A shimmering magical ward covers the staircase, blocking all access!~
+   The sputtering blue cascade of mana flowing over the staircase is the only
+thing keeping you from climbing up to the next floor -- and the only thing
+keeping whatever is up there at bay.
+   Use the 'difficulty' command to set the difficulty for the next floor before
+proceeding.
+~
+3 0 0 0 5
+0 0 0
+10 0
+C
+250 250
+S
+#11832
+crates wall stacked wooden boxes~
+the wall of stacked crates~
+Wooden crates are stacked around the fountain, walling off part of the chamber.~
+   A wall of crates blocks the north and west, stacked high enough that you
+can't see over it. Some of the crates are supplies, but most of them are
+labeled as precious relics, dangerous artifacts, and irreplaceable books. All
+of the crates are nailed shut. The floor around and under the crates looks
+scorched.
+~
+3 0 0 0 4
+0 0 0
+0 0
+C
+50 50
+T 11835
+S
+#11833
+sculpture nocturnium creature strange~
+the nocturnium sculpture~
+A nocturnium sculpture of a strange creature stands on the dais.~
+   The large sculpture in the center of the room looks like it's made of raw,
+unrefined nocturnium ore, with chunks of black rock sticking out. In form, it
+resembles a hunched person, though it has six arms and indistinct legs. The
+lowest pair of arms are thick and rocky, almost resembling muscles, while the
+upper four arms are slender and formed from long, twisting cables of wrought
+nocturnium.
+   If the sculpture was made to resemble a man or woman, you're not sure which.
+Its face bears a mouth but no eyes, nose, or ears, though it has been sculpted
+to have a thick brow ridge above where the eyes would be.
+   The sculpture is warded by a shimmering wall of light that surrounds the
+dais and prevents you from getting too close.
+~
+3 0 0 0 3
+0 0 0
+2 0
+C
+250 250
+S
+#11834
+table overturned heavy barricade~
+an overturned table~
+A heavy table has been turned on its side as a barricade.~
+   The edges of the table are splintered at the bottom where it was flipped
+unceremoniously onto its side and one of the legs is cracked. Still, this
+hefty mahogany table provides a safe spot to fling spells -- or arrows -- at
+any threat.
+~
+3 0 0 0 3
+0 0 0
+0 0
+C
+50 50
+I 11 11835 100.00 1 b  # LIGHT: burning barricade
+T 11835
+S
+#11835
+barricade burning fire~
+the burning barricade~
+A barricade has caught fire!~
+   It looks like someone tried unsuccessfully to barricade the area; whether
+against intruders or rescuers, you cannot tell. The makeshift barricade has
+collapsed as it burns. Luckily, it doesn't seem to catch any of the tower's
+rare and expensive ebony paneling on fire.
+~
+29 0 0 0 5
+-1 1 9
+0 12
+C
+50 50
+S
+#11836
+repository rough-worked worked pedestal scaldorran's scaldorrans lich~
+Scaldorran's repository~
+A rough-worked stone repository is resting on a pedestal.~
+   The repository is an old stone oil lamp. Parts of it are so worn as to give
+the impression that it has been around since before brass lamps were first
+forged. Every inch of the lamp is cold to the touch, yet water never forms on
+its sides. In the dark, it almost seems to glow, but in bright sunlight it
+takes on a dark, sinister character.
+   A lich is made of pure magic, of a sort that would quickly dissipate after
+the death of a sorcerer. But when a sorcerer commands vast power and abundant
+cleverness, it is possible to prepare a repository to anchor their magic to the
+mortal plane after their body has rotted and their soul has moved on.
+~
+3 0 0 0 5
+0 0 0
+4 0
+C
+250 250
+T 11836
+S
+#11837
+skycleave BoE loot controller~
+a skycleave BoE loot controller~
+A skycleave BoE loot controller is here.~
+Loads a bind-on-equip item.
+~
+3 mo a 0 3
+0 0 0
+0 0
+C
+150 250
+T 11814
+S
+#11838
+skycleave BoP loot controller~
+a skycleave BoP loot controller~
+A skycleave BoP loot controller is here.~
+Loads a bind-on-pickup item.
+~
+3 mp a 0 4
+0 0 0
+0 0
+C
+150 250
+T 11814
+S
+#11839
+tower little~
+the little tower~
+A little tower stands on two legs in the corner.~
+   An odd little tower stands in the corner -- odder, still, because it's
+standing on legs. The tower and legs are both made of stone, though the tower
+is a bit crooked and doesn't form a perfect cylinder. In all regards except for
+the legs, it resembles a little sorcery tower.
+~
+3 0 0 0 2
+0 0 0
+1 0
+C
+150 150
+S
+#11840
+greaves skycleaver magitanium set~
+magitanium skycleaver greaves~
+A set of magitanium skycleaver greaves is lying here.~
+   These impossibly light, unimaginably thin greaves are molded in the shape of
+your shins. The magitanium twists and swirls with iridescent rainbows any time
+it can catch even the tiniest glint of light. These greaves are truly a
+warrior's dream.
+   For a brief time, dubbed "magitanium mania" by High Sorcerer Barrosh, every
+pen, clasp, button, and plate in Skycleave was made from magitanium. Still,
+among the innovations credited to the Tower, magitanium is the one most valued
+by smiths across the land.
+~
+27 mp af 0 22
+3 0 0
+2 0
+A
+2 1 0
+A
+12 4 0
+A
+24 4 0
+C
+150 275
+T 11940
+S
+#11841
+trousers shadowhide skycleaver pair~
+shadowhide skycleaver trousers~
+A pair of shadowhide skycleaver trousers is here.~
+   In dim light, you can hardly see these mastercrafted trousers. On close
+inspection, they are made of fine leather that is so dark, you can scarcely see
+it. The outside surface is micro-textured with barbules that produce no sound
+when rubbed together, while the inside is lined with the finest cloth.
+   As a naturally independent but shy child, Niamh was often accused of
+hiding from others. Though it was her brother who dubbed her "Niamh the Shadow
+Hide", she reclaimed the title for herself at Skycleave.
+~
+27 mp af 0 23
+1 0 0
+7 0
+A
+1 1 0
+A
+9 1 0
+A
+21 8 0
+C
+150 275
+T 11940
+S
+#11842
+leggings thundersilk skycleaver pair~
+thundersilk skycleaver leggings~
+A pair of thundersilk skycleaver leggings is lying here.~
+   These loose-fitting leggings are made from rare, elegant thundersilk -- a
+material that channels every stray spark of static electricity in the air
+straight into a sorcerer's body to strengthen their offensive magic.
+   Thundersilk was once made by pixies, masters of silk, from the coccoons of
+moths that pupated at the lightning-kissed tops of the trees. No pixy cities
+yet remain that produce it.
+~
+27 mp af 0 24
+0 0 0
+11 0
+A
+8 1 0
+A
+9 1 0
+A
+22 8 0
+C
+150 275
+T 11940
+S
+#11843
+skirt soulcloth skycleaver~
+a soulcloth skycleaver skirt~
+A soulcloth skycleaver skirt is draped here.~
+   This midnight-black skirt is made from exceedingly rare soulcoth. When the
+pleats of the skirt are opened, the frantic howls of lost souls slip through
+from the infinitely dark, unseeable void that lies at the heart of the fabric.
+   Soulcloth is meticulously weaved on a splintering loom, usually by a crone.
+When the cloth is done, it is boiled along with the weaver in a stone cauldron,
+trapping the weaver's soul within. This is considered the greatest honor.
+~
+27 mp af 0 26
+0 0 0
+11 0
+A
+8 1 0
+A
+9 1 0
+A
+23 8 0
+C
+150 275
+M
+8
+$p wraps itself around your legs.~
+M
+9
+$p wraps itself around $n.~
+T 11940
+S
+#11844
+shinguards guards moxteel skycleaver moxsteel mocksteel~
+moxteel skycleaver shinguards~
+A pair of moxteel skycleaver shinguards are here.~
+   The sparkling white shinguards are well-molded to fit the fronts of your
+legs. They're small, thin, and shockingly light. This is moxteel, a
+magic-infused metal that weighs less than any normal metal while deflecting
+blows even when they should be strong enough to pierce it.
+   Moxteel was a late invention of Skycleave, after the fad for enchanted glass
+armor had started to wane.
+~
+27 mp af 0 23
+2 0 0
+2 0
+A
+2 1 0
+A
+9 1 0
+A
+17 5 0
+A
+18 3 0
+C
+150 275
+T 11940
+S
+#11845
+girdle magitanium skycleaver~
+a magitanium skycleaver girdle~
+A magitanium skycleaver girdle is on the ground.~
+   This girdle is made from frighteningly thin, unbelievably light magitanium
+plates tied together by reinforced leather. The magitanium twirls and spins
+with iridescent rainbows when light flickers off of it -- truly a warrior's
+dream.
+   Magitanium is an enchanted metal, usually thought to be an infused form of
+imperium, though in reality it has been created from many light metals by the
+artificers of Skycleave.
+~
+27 mp al 0 24
+3 0 0
+2 0
+A
+15 1 0
+A
+18 2 0
+A
+13 1 0
+A
+24 1 0
+A
+12 1 0
+A
+5 1 3
+C
+150 275
+T 11940
+S
+#11846
+strap shadowhide skycleaver~
+a shadowhide skycleaver strap~
+A shadowhide skycleaver strap is hanging here.~
+   This infinitely black waist strap is made to protect the midsection of a
+thief or assassin while still allowing them the full range of movement. The
+shadowhide leather is so dark that it's hard to make out details, but on close
+inspection you can see that the surface is covered in tiny barbules that reduce
+the sound it makes as it rubs against other pieces of armor and clothing.
+   The first shadowhide was made by casting a spell on a pair of melanistic
+foxes, shrinking and silencing their plush fur. Soon, Niamh devised a better
+technique that worked on common leather and required no wild animal.
+~
+27 mp al 0 27
+1 0 0
+7 0
+A
+17 2 0
+A
+21 3 0
+A
+11 1 0
+A
+5 1 3
+C
+150 275
+T 11940
+S
+#11847
+cincture thundersilk skycleaver~
+a thundersilk skycleaver cincture~
+A thundersilk skycleaver cincture is lying here.~
+   This rope of braided, twisted, and knotted thundersilk seems to crackle and
+pop as you run your fingers over it, leaving red marks on your fingers in the
+shape of tiny lightning bolts. Wearing the cincture, you can feel all that
+energy channeled into your body -- and your magic.
+   The fantastically rare nature of thundersilk owes to the way it is normally
+created in small squares that must be stitched together, a trait common to all
+pixy fabrics.
+~
+27 mp al 0 25
+0 0 0
+11 0
+A
+17 2 0
+A
+22 3 0
+A
+16 1 0
+A
+5 1 3
+C
+150 275
+T 11940
+S
+#11848
+sash soulcloth skycleaver~
+a soulcloth skycleaver sash~
+A soulcloth skycleaver sash is lying here.~
+   The sash is loose, folded, and airy, yet its midnight-black color makes it
+impossible to see through it or into the folds. When you try to look, gently
+pulling open one of the sash's folds, a hollow and haunting scream escapes from
+within and freezes both your fingers and your soul.
+   Some mageweavers spend their entire careers dreaming of the day they will
+make a single bolt of soulcloth, such is the promise of immortality it brings.
+~
+27 mp al 0 26
+0 0 0
+11 0
+A
+7 2 0
+A
+23 3 0
+A
+16 1 0
+A
+5 1 3
+C
+150 275
+T 11940
+S
+#11849
+belt moxteel skycleaver moxsteel mocksteel~
+a moxteel skycleaver belt~
+A moxteel skycleaver belt is lying here.~
+   This plated belt is made from sparkling white moxteel, a magic-infused metal
+that can only be worked by a skilled wizard. The moxteel is all but unbendable
+-- it would sooner leave an impression in your skin than take an impression of
+your enemy's weapon itself. Still, it would be hard for anyone to land a blow
+through a belt as well-made as this.
+   At its inception, moxteel was envisioned as a seat for gems and jewels. That
+is, a material suited to crowns and scepters. When it never achieved the
+glister of gold, Skycleave turned to its more practical property and began
+working armor from it.
+~
+27 mp al 0 24
+2 0 0
+2 0
+A
+17 3 0
+A
+18 2 0
+A
+15 1 0
+A
+5 1 3
+C
+150 275
+T 11940
+S
+#11850
+wristguard guard magitanium skycleaver~
+a magitanium skycleaver wristguard~
+A magitanium skycleaver wristguard has been left on the ground.~
+   This bulky wristguard looks heavy, but it's surprisingly light -- both
+because it's made from magitanium and because of the honeycomb structure
+inside, where the magitanium has been shaped to disperse even the most powerful
+impacts. As you run your fingers over the wristguard, the iridescent swirls of
+the magitanium seem to follow every movement.
+   Magitanium originated outside the tower, but it triggered a small feud when
+some sorcerers preferred it over moxteel.
+~
+27 mp aj 0 23
+3 0 0
+2 0
+A
+13 3 0
+A
+18 2 0
+A
+2 1 0
+C
+150 275
+M
+8
+You snap $p onto your wrist.~
+M
+9
+$n snaps $p onto $s wrist.~
+T 11940
+S
+#11851
+cuffs shadowhide skycleaver pair~
+shadowhide skycleaver cuffs~
+A pair of shadowhide skycleaver cuffs have been left here.~
+   These wristcuffs are made of shadowhide, a material so dark that it
+disappears in dim lighting. As you run your fingers over them, you discover
+micro-textured barbules that somehow silence the shadowhide when it brushes up
+against other fabrics.
+   Having already taken command of the swirling darkness before she came to
+Skycleave, the Shadow Hide immediately began infusing it into every jewel,
+trinket, device, and creature, and she found a different result with each.
+~
+27 mp aj 0 25
+1 0 0
+7 0
+A
+2 1 0
+A
+9 1 0
+A
+17 4 0
+A
+21 4 0
+C
+150 275
+T 11940
+S
+#11852
+wristband band thundersilk skycleaver~
+a thundersilk skycleaver wristband~
+A thundersilk skycleaver wristband is lying here.~
+   This long scarf of crackling thundersilk wraps around your wrist, allowing
+it to pull electricity from the air and channel it into your spells. The
+thundersilk is stark white, save for a fair golden sheen that flickers off of
+it when it catches the light. You're not sure you've ever seen silk this fine
+before.
+   The thundersilk moth was once widely herded by pixies in their great tree
+cities. There existed a particular technique for unraveling the coccoon while
+the pupa slept soundly, able to emerge without cutting the precious silk.
+~
+27 mp aj 0 27
+0 0 0
+11 0
+A
+2 1 0
+A
+9 1 0
+A
+17 4 0
+A
+22 4 0
+C
+150 275
+M
+8
+You wrap $p onto your wrist.~
+M
+9
+$n wraps $p onto $s wrist.~
+T 11940
+S
+#11853
+bracelet soulcloth skycleaver~
+a soulcloth skycleaver bracelet~
+A soulcloth skycleaver bracelet is hanging here.~
+   This bracelet has been made from braided strands of soulcloth, a material
+blacker than midnight and rarer than the darkest eclipse. When you tug at the
+bracelet and its braids strain against each other, the soulcloth's depths
+release an ear-piercing screech that leaves you momentarily stunned.
+   Legend holds that a soulcloth weaver can only die if the cloth itself is
+placed into an ever-burning fire, of which few are known, and the sheer value
+of soulcloth is such that this has never been tested.
+~
+27 mp aj 0 28
+0 0 0
+11 0
+A
+8 1 0
+A
+9 1 0
+A
+7 4 0
+A
+23 4 0
+C
+150 275
+M
+8
+You slide $p onto your wrist.~
+M
+9
+$n slides $p onto $s wrist.~
+T 11940
+S
+#11854
+wristcuff cuff moxteel skycleaver moxsteel mocksteel~
+a moxteel skycleaver wristcuff~
+A moxteel skycleaver wristcuff is lying here.~
+   This powerful, light, shimmering wristcuff is made from moxteel, an
+enchanted metal that sparkles like white glitter equally in sunlight or candle
+light.
+   Moxteel took its name from the way its thinness and exceptional durability
+make a mockery of traditional steel.
+~
+27 mp aj 0 26
+2 0 0
+2 0
+A
+2 1 0
+A
+17 4 0
+A
+18 3 0
+A
+13 2 0
+C
+150 275
+M
+8
+You snap $p onto your wrist.~
+M
+9
+$n snaps $p onto $s wrist.~
+T 11940
+S
+#11855
+studs magitanium skycleaver pair~
+magitanium skycleaver studs~
+A pair of magitanium skycleaver studs has been dropped on the ground.~
+   These thick stud earrings are made from pure magitanium, which swirls with
+iridescent rainbows at the merest touch. Though they're small, the earrings
+have been enchanted by a powerful artificer to keep you alive even in the
+direst circumstances.
+   High Sorcerer Itania, in her travels, traded for many of the artifacts and
+relics that line Skycleave's shelves. But her true genius was trading for the
+secrets to make them as well, and the process for crafting magitanium was her
+crowning achievement.
+~
+2 mp am 0 26
+0 0 0
+4 0
+A
+15 1 0
+A
+13 1 0
+A
+18 1 0
+A
+5 1 3
+C
+150 275
+M
+8
+You put some $p through your ears.~
+M
+9
+$n puts some $p through $s ears.~
+M
+8
+You put $p in your ears.~
+M
+9
+$n puts $p in $s ears.~
+T 11940
+S
+#11856
+earrings shadowhide skycleaver pair~
+shadowhide skycleaver earrings~
+A pair of shadowhide skycleaver earrings has fallen here.~
+   These little earrings are made from eventide studs that dangle small scraps
+of shadowhide, a leather so black that most of the time you can't see the
+earrings at all. The shadowhide hardly shows it, but it has been enchanted by a
+powerful wizard to help the bearer of these earrings move faster and more
+quietly in battle.
+   The Shadow Hide became acquainted with darkness at an early age, learning to
+twirl it like ribbons and sculpt it like clay. The two were fast friends, and
+each shaped the other.
+~
+2 mp am 0 26
+0 0 0
+4 0
+A
+11 1 0
+A
+17 2 0
+A
+21 2 0
+A
+5 1 3
+C
+150 275
+T 11940
+S
+#11857
+earrings thundersilk skycleaver pair~
+thundersilk skycleaver earrings~
+A pair of thundersilk skycleaver earrings are floating in the air.~
+   This pair of earrings is made from braided thundersilk threaded through
+nocturnium loops. The thundersilk must have been enchanted to be quieter:
+although you can still see sparks of lightning climbing up and down the
+earrings, it doesn't make that characteristic crackle as it does.
+   Thundersilk moths are born from eggs laid under the highest leaves of great
+trees, where lightning is at its closest. Their caterpillars have furry backs
+that crisp and sizzle as stray sparks in the air are caught and channeled.
+~
+2 mp am 0 26
+0 0 0
+4 0
+A
+16 1 0
+A
+17 2 0
+A
+22 2 0
+A
+5 1 3
+C
+150 275
+M
+8
+You put $p in your ears.~
+M
+9
+$n puts $p in $s ears.~
+T 11940
+S
+#11858
+earrings soulcloth skycleaver pair~
+soulcloth skycleaver earrings~
+A pair of soulcloth skycleaver earrings are half-buried on the ground.~
+   These earrings are made from scraps of midnight-black soulcloth pinned by
+eventide nails. The soulcloth chills you to the bone when you touch it but,
+fortunately, it doesn't let out the ear-piercing wails like ordinary soulcloth
+does when you disturb it.
+   Bolts of soulcloth can be as many yards long as the weaver lived, so a
+single bolt of the stuff is often split into many smaller pieces, at the cost
+of fragmenting the soul held within.
+~
+2 mp am 0 26
+0 0 0
+4 0
+A
+16 1 0
+A
+7 1 0
+A
+23 1 0
+A
+5 1 3
+C
+150 275
+M
+8
+You put $p in your ears.~
+M
+9
+$n puts $p in $s ears.~
+T 11940
+S
+#11859
+earrings moxteel skycleaver pair moxsteel mocksteel~
+moxteel skycleaver earrings~
+A pair of moxteel skycleaver earrings are shimmering on the ground.~
+   These sparkling white earrings are forged from fine filaments of moxteel, a
+magical metal so light you can barely feel them. The earrings have a red glint
+to them not native to the moxteel, suggesting they might carry a powerful
+enchantment.
+   The process for creating moxteel is tightly guarded by the Tower Skycleave
+even after its sorcerers were twice abducted by envious ironmongers who forced
+the secret out by nefarious means. Both abductors vanished within a fortnight
+of the kidnappings.
+~
+2 mp am 0 28
+0 0 0
+4 0
+A
+15 1 0
+A
+18 1 0
+A
+17 1 0
+A
+13 1 0
+A
+5 1 3
+C
+150 275
+M
+8
+You put $p in your ears.~
+M
+9
+$n puts $p in $s ears.~
+T 11940
+S
+#11860
+cultivator shard~
+a shard cultivator~
+A shard cultivator is stuck in the ground.~
+   The shard cultivator is, itself, a gem shard; in your hands, it is
+translucent and slightly glowing. Instructions are written along one side in
+gold ink and an elegant script:
+
+                         Skycleave Shard Cultivator
+                  1. Obtain crafting shard or tedium shard
+              2. Type 'cultivate crafting' or 'cultivate tedium'
+              3. Receive upgraded crafting shard or tedium shard
+                        4. Cultivator is single-use
+                5. Skycleave does not warrant against death
+~
+3 gp a 0 2
+0 0 0
+12 0
+C
+50 50
+T 11860
+S
+#11861
+peacock golden trense~
+the Golden Peacock of Trense~
+The Golden Peacock of Trense is sitting on the ground.~
+   The peacock is nearly life-size with dozens of paper-thin, jewel-encrusted
+tail feathers fanning out over it. Every detail is molded in gold and gems,
+from the smallest feathers to the noble grimace on its beak. This is the world-
+renowned Golden Peacock, prized heirloom of Trense, envy of the seven baronies.
+   The first lords of Trense wore such bright and ostentatious silks that their
+peers accused them of peacocking. When Stane of Skour presented a stuffed
+peacock to Marquel of Trense and Lady Gorgea as a wedding gift, it was meant as
+a slight. But Lord Marquel had the bird replicated in gold and placed above the
+mantle.
+~
+15 0 a 0 1
+100 0 0
+4 0
+C
+1 1
+R
+4 5193 0
+S
+#11862
+handbook book hexes curses~
+a handbook of hexes and curses~
+A handbook of hexes and curses has been left here.~
+   The little red handbook is well-worn. The cover is frayed at the edges and
+some pages are missing. The title identifies it as Happy Harpy's Hex Handbook,
+with a foreword by Instructor Huberus of Skycleave.
+   Huberus was raised by her wealthy uncle after the death of her parents,
+though the man had no fondness for children. He sent her to a series of
+boarding schools, where she excelled at his great expense.
+~
+28 0 a 0 1
+11862 0 0
+0 0
+C
+1 1
+S
+#11863
+shadow wall~
+the wall of shadow~
+A wall of shadow pours down over the staircase.~
+   Cold shadow pours down from the archway before the stairs. You reach out and
+touch it, but it's solid. You can't force your arm through and it seems to be
+impervious to magic. This powerful shadow magic must be coming from somewhere
+nearby.
+~
+3 0 0 0 4
+0 0 0
+10 0
+C
+250 250
+T 11887
+S
+#11864
+deconfabulator mana~
+a mana deconfabulator~
+Someone has left their mana deconfabulator on the ground.~
+   The oversized device is bulky and difficult to even lift, though it isn't
+particularly heavy. It's made from striped magewood and nocturnium straps, with
+a crystal orb on one end and an eventide horn on the other. You don't see a way
+to turn it on; or, perhaps it isn't working any more.
+   You can 'use' this deconfabulator to cast a temporary counterspell.
+   Magical energy, often called mana, is a tangled thing, often tainted by the
+stray thoughts and dreams of wizards and sorcerers. Purifying mana is nearly
+impossible, but deconfabulating it can be done with the right equipment.
+~
+15 e a 0 6
+1 2 0
+2 0
+C
+150 150
+R
+4 5193 0
+T 11850
+S
+#11865
+condenser ether~
+an ether condenser~
+An ether condenser is humming on the ground.~
+   The odd black metal box is inscribed all over with golden letters in a
+script you don't read. It makes a low hum and is, at all times, cold to the
+touch, but you can't figure out how to open it, nor what it's doing.
+   You can 'use' this condenser to throw it at an enemy in combat.
+   Magic scholars have posited that the ether can be used as a source of mana.
+~
+15 e a 0 6
+1 2 0
+2 0
+C
+150 150
+R
+4 5193 0
+T 11850
+S
+#11866
+man wooden carved~
+a carved wooden man~
+A carved wooden man lies on the ground.~
+   The angular wooden figurine resembles a man, at least from the waist up;
+there are no legs. The figurine's head is bald and the details on the face are
+poorly defined, except for a pair of jade squares stuck in for eyes. A
+double-chevron collar is the only hint of clothing, but the sculpture has
+distinct arms and hands that join near its waist.
+   Many cultures practice woodcarving to create ornaments, dolls, and religious
+sculptures.
+~
+15 0 a 0 6
+1 2 0
+0 0
+C
+150 150
+R
+4 5193 0
+S
+#11867
+reconfabulator dynamic~
+a dynamic reconfabulator~
+There is a dynamic reconfabulator on the ground.~
+   The odd tool is little more than an oversized crystal ball with a magewood
+ring around it and a nocturnium stake through the center. You have no knowledge
+of how to use it -- if, indeed, it serves some function or purpose at all. But
+you do notice that it's ice cold to the touch.
+   You can 'use' this reconfabulator to throw it at an enemy in combat.
+   When mana becomes too pure, it sometimes becomes explosive. As this can be a
+side-effect of deconfabulation, the proper solution is a reconfabulator.
+~
+15 e a 0 6
+1 2 0
+2 0
+C
+150 150
+R
+4 5193 0
+T 11850
+S
+#11868
+prototype wellstone miniature~
+a miniature wellstone prototype~
+A prototype for a miniature wellstone is lying on the ground.~
+   The odd little rainbow wellstone seems to have been made from a dozen
+smaller gems and minerals, as if they were fused together and then carved to
+resemble a smooth, round rock, almost like a skipping stone. It seems to be a
+prototype; you can't figure out how to make it do anything.
+   The magineers at Skycleave design far more gizmos than they ever create.
+Some take years of research and experimentation and, of those, many still fail.
+~
+15 0 a 0 6
+1 2 0
+1 0
+C
+150 150
+R
+4 5193 0
+S
+#11869
+pen self-writing writing~
+a self-writing pen~
+A self-writing pen is twitching on the ground.~
+   The elegant tower pen is made from black metal, perhaps nocturnium as there
+is no sign of rust. The top half of the pen is encircled with magic words you
+cannot read, as they scoot around to the other side of the pen whenever you try
+to look at them.
+   Unfortunately, you can't seem to figure out how the self-writing pen works.
+When it's too close to any blank surface, it starts scribbling on its own. But
+nothing you do or say seems to control it.
+   A good self-writing pen can save a person a lot of time writing class notes,
+thank-you notes, and Dear John letters. It perfectly mimics one's handwriting,
+though the text is rarely original.
+~
+15 0 a 0 7
+1 2 0
+2 0
+C
+150 150
+R
+4 5193 0
+S
+#11870
+vortex swirling top stairs~
+the swirling vortex~
+A swirling vortex atop the tower keeps you from climbing the stairs.~
+   The vortex whips and roars on the tower above you with winds so strong you
+can't even climb the stairs. It sounds like somebody is locked in mortal combat
+above you and you won't be able to climb the stairs until someone has died.
+~
+3 0 0 0 5
+0 0 0
+10 0
+C
+250 250
+T 11887
+S
+#11871
+heartwood wood time pillar great~
+the heartwood of time~
+A great pillar of heartwood stands atop the tower.~
+   The dark red wood, scultped with a heart and arteries, stands in a tall
+column atop the tower. The heart has a slow, steady double-beat with glints of
+red and blue light traveling from the heart to the top of the column and then
+back down again.
+   Time itself is being drawn up into the heartwood, then echoed back on itself
+in an endless cycle. Surely this is what is responsible for the sorry state of
+the Tower Skycleave. Your only recourse now is to burn the heartwood in hopes
+of ending the cycle and rescuing the sorcerers from this odious time loop.
+~
+3 j 0 0 6
+0 0 0
+12 0
+C
+250 250
+T 11971
+S
+#11872
+note hand-written handwritten written~
+a hand-written note~
+A hand-written note is lying here.~
+             Amor,
+
+                Though it was but a few fleeting moments, the
+             evening we spent together meant the world to me.
+             Your eyes captivate me like the chandelier; your
+             mind is as deep as the Milky Way, and twice as
+             enchanting.
+                I can't get our encounter out of my head. Meet
+             me again. Soon.
+
+                                              xo D.
+
+             P.S. -- Do NOT tell Marina.
+~
+3 k a 0 7
+0 0 0
+7 0
+C
+150 150
+S
+#11873
+potion red glittering~
+a glittering red potion~
+A glittering red potion is sitting on the ground.~
+   The red potion swirls as you hold it up to the light, glittering with flecks
+of yellow, like pixy dust caught in a whirlpool. There's no label on the flask
+and no way to tell what effect it will have but to quaff it.
+   Potions are a quick way to shore up one's particular deficiencies.
+~
+25 0 a 0 7
+-1 0 3030
+8 0
+A
+8 2 0
+C
+150 150
+I 26 800 100.00 1  # DECAYS-TO: glass flask
+I 27 800 100.00 1  # CONSUMES-TO: glass flask
+R
+4 5130 0
+S
+#11874
+charm stasis filigreed~
+a filigreed stasis charm~
+A filigreed stasis charm is lying on the ground.~
+   The charm is made entirely from nocturnium filigree, expertly crafted to
+look like knitted metal. At the center of the charm, the negative space between
+the filigree forms the outline of a person. The whole thing dangles from a
+thin gold chain, tarnished at the back from heavy wear.
+   The Tower Skycleave is a notoriously high-performing school of magic. Part
+of the school's excellent grade point average, and equally notorious, is its
+low tolerance for under-achievers.
+~
+2 0 ac 0 7
+0 0 0
+2 0
+C
+100 100
+M
+8
+You put $p around your neck and feel more... stable.~
+T 11881
+S
+#11875
+pick hardstone stone~
+a hardstone pick~
+A hardstone pick is lying here.~
+   The small pick has short wooden handle and a triangular stone head, bound
+together by pitch and leather. Scratch-marks run the length of the handle; but,
+though the head of the pick is slightly worn, there are no signs of cracks.
+   Using stone to mine ore is far from ideal. In fact, it's nearly impossible.
+~
+1 imo an h 5
+0 1 8
+1 0
+C
+150 250
+S
+#11876
+stabber obsidian~
+an obsidian stabber~
+An obsidian stabber has been dropped here.~
+   The little obsidian shiv is surprisingly well-shaped. The blade is almost
+wafer-thin, with tiny serrations along both sides. A simple strap of leather
+around the base serves as a simple handle. It may be small, but this thing is
+thin enough to slide between ribs and long enough to pierce the heart.
+   Goblin tools are, as a rule, simple and 'to the point'.
+~
+1 imo ano f 5
+0 1 4
+1 0
+C
+150 250
+S
+#11877
+flute gemstone stone little~
+a little gemstone flute~
+A little gemstone flute has been left here.~
+   The flute is carved from a single piece of iridescent gemstone which
+glitters in every color of the rainbow as the light strikes it. Nineteen tiny
+holes run the length of the flute. It's difficult to play, but the music is
+transcendental.
+   Hold the flute to play it.
+   Joiago learned to play the flute at a young age from his grandmother, who
+gifted him one made by pixies in an earlier age. In the right hands, it has the
+power to evoke powerful emotions and draw listeners into an enchanted dance.
+~
+22 0 ao 0 5
+1 0 0
+12 0
+C
+1 1
+M
+2
+You play a soft, sad melody on the flute...~
+M
+3
+$n plays a soft, sad melody on $s flute...~
+M
+2
+The melancholy notes from your gemstone flute dance around the air...~
+M
+3
+The melancholy notes from $n's gemstone flute dance around the air...~
+M
+2
+The music makes you close your eyes for a moment, and imagine yourself floating on a bed of clouds...~
+M
+3
+$n's music makes you close your eyes for a moment, and imagine yourself floating on a bed of clouds...~
+M
+2
+The world around you seems to disappear for a moment...~
+M
+3
+The world around you seems to disappear for a moment...~
+M
+2
+The music from your gemstone flute rises in the air like a rainbow spiral...~
+M
+3
+The music from $n's gemstone flute rises in the air like a rainbow spiral...~
+M
+2
+The music from your flute dissolves into dissonant notes, dissolving into haze...~
+M
+3
+The music from $n's flute dissolves into dissonant notes, dissolving into haze...~
+M
+2
+The soft, sad music wells up from below, louder, brighter, and faster, until it seems to stream back into your gemstone flute...~
+M
+3
+The soft, sad music wells up from below, louder, brighter, and faster, until it seems to stream back into $n's gemstone flute...~
+M
+2
+You dance backward slowly as you play the flute...~
+M
+3
+$n dances backward slowly as $e plays a gemstone flute...~
+M
+2
+The tune ends with a flourish and you take a little bow.~
+M
+3
+The tune ends with a flourish and $n takes a little bow.~
+M
+2
+You pause to clean the little flute.~
+M
+3
+$n pauses to clean $s flute.~
+M
+2
+You start a jaunty tune on the gemstone flute...~
+M
+3
+$n starts a jaunty tune on $s gemstone flute...~
+M
+2
+You begin to dance about as you play...~
+M
+3
+$n begins to dance about as $e plays...~
+M
+2
+The staccato notes seem to escape your flute and begin to dance about on their own...~
+M
+3
+The staccato notes seem to escape $n's flute and begin to dance about on their own...~
+M
+2
+The world lights up as the music notes dance around on them...~
+M
+3
+The world lights up as the music notes dance around on them...~
+M
+2
+The merry melody floats on the air...~
+M
+3
+The merry melody from $n's flute makes your legs tingle and pull, as if they want to move...~
+M
+2
+You twirl around, playing the flute, but the music has taken on a life beyond its instrument...~
+M
+3
+$n twirls around, playing the flute, but the music has taken on a life beyond its instrument...~
+M
+2
+The music notes flit around you, pulling you in circles, making everyone dance...~
+M
+3
+The music notes flit around you, pulling you in circles, making everyone dance...~
+M
+2
+You begin moving faster and faster, pursuing each escaped note and pulling it back into the flute...~
+M
+3
+$n begins moving faster and faster, pursuing each escaped note and pulling it back into the flute...~
+M
+2
+You twirl into a full bow as the music dances back into the gemstone flute at long last.~
+M
+3
+$n twirls into a full bow as the music dances back into the gemstone flute at long last.~
+M
+2
+You pause to clean the little flute.~
+M
+3
+$n pauses to clean $s flute.~
+T 11812
+S
+#11878
+knife gemstone stone~
+a gemstone knife~
+A gemstone knife is stabbed into the ground.~
+   The blade of the short, thin knife is near-transparent sapphire with an edge
+that could split the hair on a moth. At its base, it swirls into a jade handle
+with no seam or joint; the two minerals seem to flow into each other. At the
+base of the handle, the knife is finished with opal that equally has no
+boundary.
+   The magic required to fuse dissimilar gemstones is deeply rooted in Tagra
+Nes, whose ancestral grandmothers, the Ebru, guard it from beyond death.
+~
+1 mo ano f 8
+0 1 4
+1 0
+A
+22 2 0
+C
+150 250
+S
+#11879
+bud emerald glowing~
+a glowing emerald bud~
+A glowing emerald bud is lying on the ground.~
+   A soft verdant light casts out from the oversized leaf bud. Though its
+delicate leaves are unimaginably thin, they are as hard as emerald. But as you
+watch the bud glow, you find that its edges are slowly turning to ash; its
+brilliance is as ephemeral as the setting sun.
+   Tresydions tended Tagra Nes and its people for thousands of years, growing
+the community as well as the tree.
+~
+29 0 a 0 11
+96 1 0
+0 0
+C
+150 150
+M
+17
+$p crumbles away to ash.~
+M
+18
+$p crumbles away to ash on the ground.~
+S
+#11880
+candy ruby rock~
+some ruby rock candy~
+Some ruby rock candy is scattered on the ground.~
+   The handful of candy looks, at first, like precious gems. Even in the light,
+it can be hard to tell them apart from the real thing. But these are sweet to
+the tongue, evoking the taste of maple syrup or honey as the initial crunch
+melts away into cloying sweetness.
+   Tagra Nes once performed the noble task of drawing up mana from deep beneath
+the earth and releasing it into the world, a task it performed ceaselessly
+beneath both sun and stars for 8200 years, but not a day longer.
+~
+6 m a 0 9
+24 0 0
+12 168
+A
+16 1 0
+A
+7 1 0
+C
+50 50
+M
+4
+You crunch into the ruby rock candy, which melts in your mouth.~
+M
+5
+$n crunches into some ruby rock candy.~
+M
+17
+$p breaks into little pieces and blows away.~
+M
+18
+$p breaks into little pieces and blows away.~
+O+ 1 11880
+S
+#11881
+flask lightning~
+a flask of lightning~
+A flask of lightning is sputtering on the ground.~
+   A bolt of lightning flickers back and forth inside the tightly-corked flask.
+At times, it's so bright it becomes difficult to look at. The flask is packaged
+like a potion, but there's no way to tell what effect it will have except to
+quaff it.
+   The pages of Skycleave are notoriously quick on their feet, in no small part
+due to heavy dependence on potions. It never pays to fall behind in the black
+tower.
+~
+25 m a 0 7
+-1 0 3030
+8 0
+A
+6 1 0
+B
+q
+C
+150 150
+I 26 800 100.00 1  # DECAYS-TO: glass flask
+I 27 800 100.00 1  # CONSUMES-TO: glass flask
+R
+4 5130 0
+S
+#11882
+pool shimmering water dew~
+the dew pool~
+A pool of shimmering water creates dancing patterns on the shell's curved ceiling.~
+   The pool is cut into the floor of the seashell. It's wide, but shallow, and
+you take care not to trip into it as there's no railing or step protecting it.
+The viridescent light from the glowing shell shimmers off of the water and
+dances around on the ceiling.
+~
+5 0 0 0 7
+1000000 1000000 11885
+12 0
+C
+100 100
+M
+4
+You kneel down and drink the $T from the pool.~
+M
+5
+$n kneels down and drinks the $T from the pool.~
+T 11910
+S
+#11883
+wand gnarled old~
+a gnarled old wand~
+A gnarled old wand lies on the ground.~
+   If not for the raw power flowing off of the old wand, it might look like a
+fallen twig. It is perhaps a foot and a half long, lightly discolored around
+the base, and otherwise the only notable feature is the initials carved into
+the end.
+   Though Skycleave is known for its towering staves, capable of channeling
+tremendous manaflows for enormous spells, it also contains a number of wands of
+true power. These relics of an earlier age have brought both renown and ruin to
+even the greatest wizards of myth and legend.
+~
+1 mpwx ao 0 7
+0 1 22
+0 0
+A
+5 2 0
+C
+150 250
+E
+initials~
+   The end of the gnarled wand has the letters 'JK' crossed out and replaced by
+'MM'.
+~
+T 11968
+S
+#11884
+mushroom white~
+a white mushroom~
+A white mushroom is lying here.~
+   The small mushroom is white with a slightly yellowish tinge to its cap.
+Mushrooms like this grow all over.
+   Mushrooms have been eaten since before recorded history, though it's
+important to correctly identify them first. Many mushrooms are difficult to
+distinguish when they're small.
+~
+6 km a 0 1
+6 0 0
+0 0
+C
+150 150
+M
+17
+$p rots and you throw it out.~
+M
+18
+$p rots on the ground.~
+T 11950
+S
+#11885
+pool pools dew~
+one of the dew pools~
+Light twinkles off of the dew pools like stars in a pond.~
+   The pools are cut into the floor itself, forcing you to step carefully to
+avoid falling in. Each one is almost as wide as your armspan, and round in
+shape, but none of them is very deep. The pools closer to the stairs are
+well-lit, while the ones in the back of the grotto are difficult to see.
+~
+5 0 0 0 5
+1000000 1000000 11885
+12 0
+C
+100 100
+M
+4
+You kneel down and drink the $T from one of the pools.~
+M
+5
+$n kneels down and drinks the $T from one of the pools.~
+T 11910
+S
+#11886
+sculpture statue glass me self~
+the glass sculpture~
+A glass sculpture of YOU stands in the middle of the viney maze.~
+   You walk all the way around the sculpture, stunned by its nose, its hair,
+it eyes. In every way, it looks like you -- every bone, every curve, every
+scar and mole. Everything except the clothing. Some great master has sculpted
+you in the classical style, perhaps a little too realistically, but this is
+nevertheless a great work of art.
+   Destroying the sculpture is the furthest thing from your mind. Or, it was,
+until just now. Vanity and narcissism are common pitfalls of great sorcerers.
+~
+3 0 0 0 5
+0 0 0
+8 0
+C
+150 150
+T 11886
+S
+#11887
+shield rainbow pixy shimmering iridescent light queen's~
+the pixy queen's rainbow shield~
+A shimmering iridescent light blocks the exit to the maze!~
+   A stream of iridescent light ripples as it flows over the exit to the maze.
+You can't quite press your hand against it, so it isn't solid, but nor can you
+reach through it. As you try, you see visions of the pixy queen in your mind.
+A crooked grin breaks on her face as she laughs -- cackles, even -- at your
+attempt to pass her impenetrable shield.
+~
+3 0 0 0 4
+0 0 0
+10 0
+C
+250 250
+T 11887
+S
+#11888
+sap putrid trickle~
+the putrid sap~
+A trickle of putrid sap flows from the rotting tree.~
+   The sap swirls in shades of amber and green as it bleeds from rotten core of
+the great tree. Something in the sap calls to you, like a siren. You touch it,
+almost unconsciously, and it starts to creep up your fingers. You recoil,
+equally unconsciously, but as you wipe it off your fingers, you feel a
+revolting urge to taste it.
+   In Smol Nes-Pik, wasting the tree's sap is a great crime, as every last
+pint of it is precious.
+~
+3 0 0 0 4
+0 0 0
+0 0
+C
+1 1
+M
+18
+The sap dries up and crystallizes.~
+T 11884
+S
+#11889
+splinters tiny~
+the splinters~
+Thousands of tiny splinters hover in the air!~
+   Countless splinters of rotten wood swirl in the air on unseen eddies,
+drawing more and more wood from the sides of the hollow, until the air is so
+full of them you can hardly breathe!
+~
+3 0 0 0 2
+0 0 0
+0 0
+C
+1 1
+S
+#11890
+struggle~
+the struggle~
+The remains of a struggle are evident all around.~
+Sometimes it's necessary to 'struggle' to get free.
+~
+3 0 a 0 5
+0 0 0
+0 5
+C
+150 150
+M
+17
+Your struggle ends.~
+M
+18
+The signs of struggle fade.~
+T 11885
+T 11966
+S
+#11891
+sap~
+the sap~
+Sap is flowing from the tree.~
+   The sap has totally encased you! You can do little else but watch the Great
+Tree fall into rot and ruin.
+~
+3 0 0 0 3
+0 0 0
+0 10
+C
+1 1
+M
+18
+Sap drips onto you.~
+T 11954
+S
+#11892
+jelly protium blob~
+some protium jelly~
+There is a blob of protium jelly here.~
+   It seems like water. In your hands, it even feels like water. But somehow,
+it holds itself together. This is an odd curiosity indeed, sure to be of great
+interest to scholars and sorcerers alike.
+   Skycleave once held the keys to many elemental planes. But over the years,
+as apprentices repeatedly unleashed primordial horrors upon the world, those
+keys were melted, one by one, until only water and shadow remained.
+~
+15 0 a 0 7
+1 2 0
+10 0
+C
+150 150
+R
+4 5193 0
+S
+#11893
+leash fox leather fine~
+a fine leather fox leash~
+A fine leather fox leash has been left behind.~
+   The leash is made from a braided strand of purple leather, no longer than
+your arm. It's lightly worn at both ends, especially the handle, and it looks
+as though someone has been carrying it around in their mouth.
+   You can 'use leash' to add a new minipet to your list.
+   Though housepets began as working companions, aiding in hunting, guarding,
+and carrying, they quickly discovered it's easier to be pampered and overfed.
+~
+19 o a 0 7
+11893 0 0
+0 0
+C
+1 1
+S
+#11894
+figurine venus wooden~
+a wooden Venus figurine~
+A wooden Venus figurine is lying here.~
+   The smooth wooden figurine is in the shape of a voluptuous woman with wide
+hips and large breasts; aside from a prominent belly button, there is little
+detail beyond that. Her face is smooth and undetailed except for two square
+impressions where her eyes would be.
+   Many types of statuettes with women's forms are described as Venus
+figurines, though they rarely relate to the Greek goddess.
+~
+15 0 a 0 9
+1 2 0
+0 0
+C
+150 150
+R
+4 5193 0
+S
+#11895
+pearl iridescent~
+an iridescent pearl~
+An iridescent pearl has been left here.~
+   The solitary little pearl isn't perfectly round, but it's well-polished and
+when it catches the light, its lustrous surface shimmers like a pastel rainbow.
+   Pearls often symbolize beauty, wisdom, and luxury. But to a person whose
+diet is made of shellfish, they can instead represent abundance.
+~
+15 0 a 0 10
+1 2 0
+14 0
+C
+150 150
+R
+4 5193 0
+S
+#11896
+bladder leather~
+a leather bladder~
+A leather bladder is lying on the ground.~
+   The small bladder has been stretched and tanned to make it into a canteen.
+No smell remains except the salt of the ocean, but this was once the bladder of
+some unfortunate creature. The mouthpiece is kept shut tight by a leather
+string tied securely around it, but even when it's closed, it smells of lilac.
+   The light, lilac wine, sweet and heady, is said to dull the deep pain of
+losing a lover.
+~
+5 0 a 0 11
+48 48 11896
+14 0
+C
+150 150
+S
+#11897
+rock good~
+a good rock~
+A good rock is lying on the ground.~
+   It's an ordinary, common rock of the sort you find everywhere in the ground.
+The rock is unremarkable. It's small, relatively round, not very smooth, and
+mostly gray.
+   It was once a common tradition for a traveler to pick up a rock as they left
+one city and deposit it in a pile in the next city, carrying it with them as
+protection on the road.
+~
+3 m a e 11
+0 0 0
+1 0
+C
+150 150
+M
+6
+You place $p into $V.~
+M
+7
+$n places $p into $V.~
+O+ 1 6050
+R
+4 5117 0
+S
+#11898
+skystone stone depleted~
+a depleted skystone~
+A depleted skystone has been tossed aside.~
+   The smooth, palm-sized stone has a light blue color to it. It seems to have
+lost its luster and doesn't quite reflect light the way most skystones do.
+   Skystone attunement causes a terrible strain on the soul or natural essence
+of the person the stone is attuned to. The process rarely succeeds at enriching
+the stone as the stone's power is easily absorbed by an injured soul rather
+than the other way around.
+~
+15 0 a 0 10
+1 2 0
+1 0
+C
+1 1
+R
+4 5193 0
+S
+#11899
+jade blue rough-cut cut piece unattuned~
+a piece of rough-cut blue jade~
+A rough-cut piece of blue jade is lying on the ground.~
+   The little stone, smaller than your palm, has a soft light blue color that
+glimmers in the light. It looks like it's been cut or split from other rock
+and knapped into a rough circle.
+   All colors of jade are prized by goblins, light blue most of all for its
+resemblance to the sky. When properly attuned, blue jade can also hold a
+tremendous amount of mana.
+~
+3 p a 0 10
+0 0 0
+1 0
+C
+1 1
+S
+$

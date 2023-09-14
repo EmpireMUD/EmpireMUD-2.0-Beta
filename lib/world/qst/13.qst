@@ -1,12 +1,16 @@
 #1357
 Leather Tutorial~
 Animal skins can be tanned to make leather. This is an easy one:
- 1. Type 'tan skin'.
- Tip: It will go faster if you build a tannery.
+ 1. Make sure you have the Basic Crafts ability: type 'skill buy Basic Crafts'.
+ 2. If you don't have one already, get a small skin or large skin by skinning
+    the corpse of an animal.
+ 3. Type 'tan skin'.
+    Tip: It will go faster if you build a tannery.
 (You can type 'toggle tutorials' to stop seeing new tutorial quests.)
 ~
    You can also learn to sew gear from leather, as well as rawhide gear from
-the raw skins.
+the raw skins. You'll need to buy the Sew skill ('skill buy Sew') as well as
+Rawhide Stitching ('skill buy Rawhide Stitching').
 ~
 1 h 0 15 -1
 A

@@ -1,0 +1,16 @@
+#12300
+A Suspiciously Large Burrow~
+   Oversized claw marks, a surprisingly roomy burrow, and traces of gold on the
+ground lead you to the disquieting conclusion that this burrow is actually a
+dragon's lair. There isn't a lot of room to move, though, and you certainly
+would not be able to get past the dragon.
+~
+cd 0 0
+E
+gold traces ground~
+   There are traces of gold on the ground, but it seems the dragon has hidden
+its hoard well, because you can't find enough gold to pick up.
+~
+M 0 12300 100.00 1
+S
+$

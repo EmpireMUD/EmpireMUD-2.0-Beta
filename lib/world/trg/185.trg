@@ -91,6 +91,7 @@ switch %random.4%
   break
   * Mana drain + spirit bomb
   case 3
+    set actor_id %actor.id%
     %echo% ~%self% starts drawing all the mana in the room to *%self%self...
     set cycles 4
     set amount 50
@@ -119,6 +120,9 @@ switch %random.4%
     done
     %echo% ~%self% gathers the stolen mana together...
     wait 3 sec
+    if !%actor% || %actor.id% != %actor_id%
+      halt
+    end
     if %heroic_mode%
       * This divisor is important; if this attack is too strong, increase it a bit
       if %damage_scale% < 100
@@ -142,6 +146,7 @@ switch %random.4%
   break
   * Power word stun
   case 4
+    set actor_id %actor.id%
     %echo% ~%self% raises ^%self% staff high and mutters an incantation...
     set interrupted 0
     wait 3 sec
@@ -152,7 +157,7 @@ switch %random.4%
     elseif %heroic_mode% || !%interrupted%
       * Random enemy
       set person %random.enemy%
-      if !%person%
+      if !%person% && %actor.id% == %actor_id%
         set person %actor%
       end
       set multi_target 0
@@ -260,7 +265,7 @@ switch %random.4%
       dg_affect #18509 %actor% HARD-STUNNED on 10
       %send% %actor% |%self% powerful blow sends your weapon flying!
       %echoaround% %actor% |%self% powerful blow sends |%actor% weapon flying!
-      dg_affect #18510 %actor% DISARM on 30
+      dg_affect #18510 %actor% DISARMED on 30
     else
       %damage% %actor% 75 physical
       dg_affect #18509 %actor% STUNNED on 5
@@ -353,7 +358,7 @@ switch %random.4%
     set person %self.room.people%
     while %person%
       if %self.is_enemy(%person%)%
-        dg_affect #18513 %person% DISARM on 15
+        dg_affect #18513 %person% DISARMED on 15
       end
       set person %person.next_in_room%
     done
@@ -832,16 +837,14 @@ if !%arg%
 end
 * TODO: Check nobody's in the adventure before changing difficulty
 if normal /= %arg%
-  %send% %actor% You can't set this adventure to that difficulty...
-  return 1
-  halt
+  %echo% Setting difficulty to Normal...
+  set difficulty 1
 elseif hard /= %arg%
   %echo% Setting difficulty to Hard...
   set difficulty 2
 elseif group /= %arg%
-  %send% %actor% You can't set this adventure to that difficulty...
-  return 1
-  halt
+  %echo% Setting difficulty to Group...
+  set difficulty 3
 elseif boss /= %arg%
   %echo% Setting difficulty to Boss...
   set difficulty 4
@@ -985,6 +988,11 @@ set room7 %room6.east(room)%
 Jungle Temple adventure cleanup building replacer~
 2 e 100
 ~
+set start %instance.start%
+if %start% && %start.var(18247_hidden,0)%
+  * shortcut and do not leave a temple behind
+  halt
+end
 set item %room.contents%
 while %item%
   if %item.vnum% == 18502

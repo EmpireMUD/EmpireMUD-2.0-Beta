@@ -10,6 +10,8 @@
 *  CircleMUD is based on DikuMUD, Copyright (C) 1990, 1991.               *
 ************************************************************************ */
 
+#include <math.h>
+
 #include "conf.h"
 #include "sysdep.h"
 
@@ -129,7 +131,7 @@ const struct action_data_struct action_data[] = {
 	{ "chanting", "is chanting a strange song.", NOBITS, perform_ritual, NULL },	// ACT_CHANTING
 	{ "prospecting", "is prospecting.", ACTF_FAST_PROSPECT, process_prospecting, NULL },	// ACT_PROSPECTING
 	{ "filling", "is filling in the trench.", ACTF_HASTE | ACTF_FAST_CHORES | ACTF_FAST_EXCAVATE, process_fillin, NULL },	// ACT_FILLING_IN
-	{ "reclaiming", "is reclaiming this acre!", NOBITS, process_reclaim, NULL },	// ACT_RECLAIMING
+	{ "reclaiming", "is reclaiming the area!", NOBITS, process_reclaim, NULL },	// ACT_RECLAIMING
 	{ "escaping", "is running toward the window!", NOBITS, process_escaping, NULL },	// ACT_ESCAPING
 	{ "running", "runs past you.", ACTF_ALWAYS_FAST | ACTF_EVEN_FASTER | ACTF_FASTER_BONUS | ACTF_ANYWHERE, process_running, cancel_movement_string },	// unused
 	{ "ritual", "is performing an arcane ritual.", NOBITS, perform_ritual, NULL },	// ACT_RITUAL
@@ -142,8 +144,8 @@ const struct action_data_struct action_data[] = {
 	{ "crafting", "is working on something.", NOBITS, process_gen_craft, cancel_gen_craft },	// ACT_GEN_CRAFT
 	{ "sailing", "is sailing the ship.", ACTF_VEHICLE_SPEEDS | ACTF_SITTING, process_driving, cancel_driving },	// ACT_SAILING
 	{ "piloting", "is piloting the vessel.", ACTF_VEHICLE_SPEEDS | ACTF_SITTING, process_driving, cancel_driving },	// ACT_PILOTING
-	{ "skillswap", "is swapping skill sets.", NOBITS, process_swap_skill_sets, NULL },	// ACT_SWAP_SKILL_SETS
-	{ "maintenance", "is repairing the building.", ACTF_HASTE | ACTF_FAST_CHORES, process_maintenance, NULL },	// ACT_MAINTENANCE
+	{ "skill-swapping", "is swapping skill sets.", NOBITS, process_swap_skill_sets, NULL },	// ACT_SWAP_SKILL_SETS
+	{ "repairing", "is repairing the building.", ACTF_HASTE | ACTF_FAST_CHORES, process_maintenance, NULL },	// ACT_MAINTENANCE
 	{ "burning", "is preparing to burn the area.", ACTF_FAST_CHORES, process_burn_area, NULL },	// ACT_BURN_AREA
 	{ "hunting", "is low to the ground, hunting.", ACTF_FINDER, process_hunting, NULL },	// ACT_HUNTING
 	{ "foraging", "is looking around for food.", ACTF_ALWAYS_FAST | ACTF_FINDER | ACTF_HASTE, process_foraging, NULL },	// ACT_FORAGING
@@ -203,7 +205,7 @@ const struct gen_interact_data_t gen_interact_data[] = {
 * @param char_data *ch The actor.
 */
 void cancel_action(char_data *ch) {
-	if (GET_ACTION(ch) != ACT_NONE) {
+	if (!IS_NPC(ch) && GET_ACTION(ch) != ACT_NONE) {
 		// is there a cancel function?
 		if (action_data[GET_ACTION(ch)].cancel_function != NULL) {
 			(action_data[GET_ACTION(ch)].cancel_function)(ch);
@@ -296,6 +298,10 @@ void update_actions(void) {
 			cancel_action(ch);
 			continue;
 		}
+		if (AFF_FLAGGED(ch, AFF_STUNNED | AFF_HARD_STUNNED)) {
+			cancel_action(ch);
+			continue;
+		}
 		if (action_data[GET_ACTION(ch)].process_function == NULL) {
 			// no way to process this action
 			cancel_action(ch);
@@ -310,6 +316,10 @@ void update_actions(void) {
 			continue;
 		}
 		if (GET_POS(ch) < POS_SITTING || GET_POS(ch) == POS_FIGHTING || (!IS_SET(act_flags, ACTF_SITTING) && GET_POS(ch) < POS_STANDING)) {
+			// in most positions, they should know why they're stopping... these two are an exception:
+			if (GET_POS(ch) == POS_SITTING || GET_POS(ch) == POS_RESTING) {
+				msg_to_char(ch, "You can't keep %s while %s.\r\n", action_data[GET_ACTION(ch)].name, (GET_POS(ch) == POS_RESTING ? "resting" : "sitting"));
+			}
 			cancel_action(ch);
 			continue;
 		}
@@ -484,7 +494,7 @@ obj_data *has_tool(char_data *ch, bitvector_t flags) {
 		}
 		
 		// ok! try to see if it's better
-		if (!best_tool || OBJ_FLAGGED(tool, OBJ_SUPERIOR) || (!OBJ_FLAGGED(best_tool, OBJ_SUPERIOR) && GET_OBJ_CURRENT_SCALE_LEVEL(tool) > GET_OBJ_CURRENT_SCALE_LEVEL(best_tool))) {
+		if (!best_tool || (OBJ_FLAGGED(tool, OBJ_SUPERIOR) && !OBJ_FLAGGED(best_tool, OBJ_SUPERIOR)) || (!OBJ_FLAGGED(best_tool, OBJ_SUPERIOR) && GET_OBJ_CURRENT_SCALE_LEVEL(tool) > GET_OBJ_CURRENT_SCALE_LEVEL(best_tool))) {
 			best_tool = tool;	// it seems better
 		}
 	}
@@ -561,12 +571,9 @@ void show_prospect_result(char_data *ch, room_data *room) {
 * Makes sure a person can [still] burn the room they are in.
 *
 * @param char_data *ch The player.
-* @param int subcmd SCMD_LIGHT or SCMD_BURN.
 * @return bool TRUE if safe, FALSE if they cannot burn it.
 */
-bool validate_burn_area(char_data *ch, int subcmd) {
-	const char *cmdname[] = { "light", "burn" };	// also in do_burn_area
-	
+bool validate_burn_area(char_data *ch) {
 	bool objless = has_player_tech(ch, PTECH_LIGHT_FIRE);
 	obj_data *lighter = NULL;
 	bool kept = FALSE;
@@ -576,10 +583,13 @@ bool validate_burn_area(char_data *ch, int subcmd) {
 	}
 	
 	if (!has_evolution_type(SECT(IN_ROOM(ch)), EVO_BURNS_TO)) {
-		msg_to_char(ch, "You can't %s this type of area.\r\n", cmdname[subcmd]);
+		msg_to_char(ch, "You can't burn this type of area.\r\n");
 	}
 	else if (ROOM_AFF_FLAGGED(IN_ROOM(ch), ROOM_AFF_NO_EVOLVE)) {
 		msg_to_char(ch, "You can't burn the area right now.\r\n");
+	}
+	else if (GET_LOYALTY(ch) && IS_ANY_BUILDING(IN_ROOM(ch)) && ROOM_OWNER(IN_ROOM(ch)) == GET_LOYALTY(ch) && !HAS_DISMANTLE_PRIV_FOR_BUILDING(ch, IN_ROOM(ch))) {
+		msg_to_char(ch, "You don't have permission to burn the empire's buildings (it requires the dismantle privilege).\r\n");
 	}
 	else if (!objless && !lighter) {
 		// nothing to light it with
@@ -587,7 +597,7 @@ bool validate_burn_area(char_data *ch, int subcmd) {
 			msg_to_char(ch, "You need a lighter that isn't marked 'keep'.\r\n");
 		}
 		else {
-			msg_to_char(ch, "You don't have a lighter to %s the area with.\r\n", cmdname[subcmd]);
+			msg_to_char(ch, "You don't have a lighter to burn the area with.\r\n");
 		}
 	}
 	else if (ROOM_OWNER(IN_ROOM(ch)) && ROOM_OWNER(IN_ROOM(ch)) != GET_LOYALTY(ch) && !has_relationship(GET_LOYALTY(ch), ROOM_OWNER(IN_ROOM(ch)), DIPL_WAR)) {
@@ -693,7 +703,7 @@ void start_chopping(char_data *ch) {
 	if (!ROOM_AFF_FLAGGED(IN_ROOM(ch), ROOM_AFF_UNCLAIMABLE) && !can_use_room(ch, IN_ROOM(ch), MEMBERS_ONLY)) {
 		msg_to_char(ch, "You don't have permission to chop here.\r\n");
 	}
-	else if (!CAN_CHOP_ROOM(IN_ROOM(ch)) || get_depletion(IN_ROOM(ch), DPLTN_CHOP, FALSE) >= config_get_int("chop_depletion")) {
+	else if (!CAN_CHOP_ROOM(IN_ROOM(ch)) || get_depletion(IN_ROOM(ch), DPLTN_CHOP) >= config_get_int("chop_depletion")) {
 		msg_to_char(ch, "There's nothing left here to chop.\r\n");
 	}
 	else if (ROOM_AFF_FLAGGED(IN_ROOM(ch), ROOM_AFF_HAS_INSTANCE | ROOM_AFF_NO_EVOLVE)) {
@@ -841,7 +851,7 @@ INTERACTION_FUNC(finish_digging) {
 	int num;
 	
 	// depleted? (uses rock for all types except clay)
-	if (get_depletion(inter_room, DPLTN_DIG, FALSE) >= DEPLETION_LIMIT(inter_room)) {
+	if (get_depletion(inter_room, DPLTN_DIG) >= DEPLETION_LIMIT(inter_room)) {
 		msg_to_char(ch, "The ground is too hard and there doesn't seem to be anything useful to dig up here.\r\n");
 		return FALSE;
 	}
@@ -1344,7 +1354,7 @@ void process_build_action(char_data *ch) {
 * @param char_data *ch The person burning the area.
 */
 void process_burn_area(char_data *ch) {
-	if (!validate_burn_area(ch, GET_ACTION_VNUM(ch, 0))) {
+	if (!validate_burn_area(ch)) {
 		// sends own message
 		cancel_action(ch);
 		return;
@@ -1376,8 +1386,14 @@ void process_burn_area(char_data *ch) {
 			gain_player_tech_exp(ch, PTECH_LIGHT_FIRE, 15);
 		}
 		
+		// alert?
+		if (ROOM_OWNER(IN_ROOM(ch)) && ROOM_OWNER(IN_ROOM(ch)) != GET_LOYALTY(ch)) {
+			log_to_empire(ROOM_OWNER(IN_ROOM(ch)), ELOG_HOSTILITY, "Someone has burned (%d, %d) %s", X_COORD(IN_ROOM(ch)), Y_COORD(IN_ROOM(ch)), get_room_name(IN_ROOM(ch), FALSE));
+			add_offense(ROOM_OWNER(IN_ROOM(ch)), OFFENSE_BURNED_TILE, ch, IN_ROOM(ch), offense_was_seen(ch, ROOM_OWNER(IN_ROOM(ch)), IN_ROOM(ch)) ? OFF_SEEN : NOBITS);
+		}
+		
 		// finished burning
-		perform_burn_room(IN_ROOM(ch));
+		perform_burn_room(IN_ROOM(ch), EVO_BURNS_TO);
 		cancel_action(ch);
 		stop_room_action(IN_ROOM(ch), ACT_BURN_AREA);
 		
@@ -1452,6 +1468,9 @@ void process_chop(char_data *ch) {
 	bool got_any = FALSE;
 	char_data *ch_iter;
 	obj_data *axe;
+	int amt;
+	
+	const int min_progress_per_chop = 3;	// TODO this could be a config or related to the 'chop_timer' config; prevents it from taking too long
 	
 	if (!(axe = has_tool(ch, TOOL_AXE))) {
 		send_to_char("You need to be using an axe to chop.\r\n", ch);
@@ -1464,7 +1483,10 @@ void process_chop(char_data *ch) {
 		return;
 	}
 
-	add_to_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_CHOP_PROGRESS, -1 * (GET_STRENGTH(ch) + 3 * (axe ? get_base_dps(axe) : 0)));
+	amt = round(GET_OBJ_CURRENT_SCALE_LEVEL(axe) / 10.0) * (OBJ_FLAGGED(axe, OBJ_SUPERIOR) ? 2 : 1);
+	amt = MAX(min_progress_per_chop, amt);
+
+	add_to_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_CHOP_PROGRESS, -1 * amt);
 	act("You swing $p hard!", FALSE, ch, axe, NULL, TO_CHAR | TO_SPAMMY);
 	act("$n swings $p hard!", FALSE, ch, axe, NULL, TO_ROOM | TO_SPAMMY);
 	
@@ -1473,7 +1495,7 @@ void process_chop(char_data *ch) {
 		remove_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_CHOP_PROGRESS);
 		
 		// run interacts for items only if not depleted
-		if (get_depletion(IN_ROOM(ch), DPLTN_CHOP, FALSE) < config_get_int("chop_depletion")) {
+		if (get_depletion(IN_ROOM(ch), DPLTN_CHOP) < config_get_int("chop_depletion")) {
 			got_any = run_room_interactions(ch, IN_ROOM(ch), INTERACT_CHOP, NULL, GUESTS_ALLOWED, finish_chopping);
 		}
 		
@@ -1523,7 +1545,7 @@ void process_digging(char_data *ch) {
 		GET_ACTION(ch) = ACT_NONE;
 		in_room = IN_ROOM(ch);
 		
-		if (get_depletion(IN_ROOM(ch), DPLTN_DIG, FALSE) < DEPLETION_LIMIT(IN_ROOM(ch)) && run_room_interactions(ch, IN_ROOM(ch), INTERACT_DIG, NULL, GUESTS_ALLOWED, finish_digging)) {
+		if (get_depletion(IN_ROOM(ch), DPLTN_DIG) < DEPLETION_LIMIT(IN_ROOM(ch)) && run_room_interactions(ch, IN_ROOM(ch), INTERACT_DIG, NULL, GUESTS_ALLOWED, finish_digging)) {
 			// success
 			gain_player_tech_exp(ch, PTECH_DIG, 10);
 		
@@ -1556,7 +1578,7 @@ void process_digging(char_data *ch) {
 		
 		// earthmeld damage
 		msg_to_char(iter, "You feel nature burning at your earthmelded form as someone digs above you!\r\n");
-		apply_dot_effect(iter, ATYPE_NATURE_BURN, 6, DAM_MAGICAL, 5, 60, iter);
+		apply_dot_effect(iter, ATYPE_NATURE_BURN, 30, DAM_MAGICAL, 5, 60, iter);
 	}
 }
 
@@ -1672,7 +1694,7 @@ void process_excavating(char_data *ch) {
 		
 		// earthmeld damage
 		msg_to_char(iter, "You feel nature burning at your earthmelded form as someone digs above you!\r\n");
-		apply_dot_effect(iter, ATYPE_NATURE_BURN, 6, DAM_MAGICAL, 5, 60, iter);
+		apply_dot_effect(iter, ATYPE_NATURE_BURN, 30, DAM_MAGICAL, 5, 60, iter);
 	}
 }
 
@@ -1791,7 +1813,7 @@ void process_fishing(char_data *ch) {
 			}
 		}
 	}
-	else if (get_depletion(room, DPLTN_FISH, FALSE) >= DEPLETION_LIMIT(room)) {
+	else if (get_depletion(room, DPLTN_FISH) >= DEPLETION_LIMIT(room)) {
 		msg_to_char(ch, "You just don't seem to be able to catch anything here.\r\n");
 		GET_ACTION(ch) = ACT_NONE;
 	}
@@ -1854,7 +1876,7 @@ void process_foraging(char_data *ch) {
 			return;
 		}
 		
-		if (get_depletion(IN_ROOM(ch), DPLTN_FORAGE, FALSE) >= forage_depletion) {
+		if (get_depletion(IN_ROOM(ch), DPLTN_FORAGE) >= forage_depletion) {
 			msg_to_char(ch, "You can't find anything left to eat here.\r\n");
 			act("$n stops looking for things to eat as $e comes up empty-handed.", TRUE, ch, NULL, NULL, TO_ROOM);
 		}
@@ -1896,7 +1918,7 @@ void process_gathering(char_data *ch) {
 		
 	// done ?
 	if (GET_ACTION_TIMER(ch) <= 0) {
-		if (get_depletion(IN_ROOM(ch), DPLTN_GATHER, FALSE) >= gather_depletion) {
+		if (get_depletion(IN_ROOM(ch), DPLTN_GATHER) >= gather_depletion) {
 			msg_to_char(ch, "There's nothing good left to gather here.\r\n");
 			GET_ACTION(ch) = ACT_NONE;
 		}
@@ -2011,7 +2033,7 @@ void process_hunting(char_data *ch) {
 	if (number(1, 10000) <= chance_times_100) {
 		// found it!
 		
-		if (get_depletion(IN_ROOM(ch), DPLTN_HUNT, FALSE) >= config_get_int("short_depletion")) {
+		if (get_depletion(IN_ROOM(ch), DPLTN_HUNT) >= config_get_int("short_depletion")) {
 			// late check for depletion: make them hunt first
 			msg_to_char(ch, "You don't seem to be able to find any. Maybe this area has been hunted to depletion.\r\n");
 			GET_ACTION(ch) = ACT_NONE;
@@ -2036,7 +2058,7 @@ void process_hunting(char_data *ch) {
 		
 		// stun it if triggers allow
 		if (!run_ability_triggers_by_player_tech(ch, PTECH_HUNT_ANIMALS, mob, NULL)) {
-			af = create_flag_aff(ATYPE_HUNTED, 1, AFF_ENTANGLED, ch);
+			af = create_flag_aff(ATYPE_HUNTED, 5, AFF_IMMOBILIZED, ch);
 			affect_join(mob, af, 0);
 		}
 		
@@ -2081,10 +2103,12 @@ void process_maintenance(char_data *ch) {
 */
 void process_mining(char_data *ch) {	
 	struct global_data *glb;
-	int count, total;
+	int count, total, amt;
 	room_data *in_room;
 	obj_data *tool;
 	bool success;
+	
+	int min_progress_per_mine = 4;	// TODO this could be a config or related to the 'mining_timer' config; prevents it from taking too long
 	
 	if (!room_has_function_and_city_ok(GET_LOYALTY(ch), IN_ROOM(ch), FNC_MINE)) {
 		msg_to_char(ch, "You can't mine here.\r\n");
@@ -2114,8 +2138,11 @@ void process_mining(char_data *ch) {
 			cancel_action(ch);
 			break;
 		}
-
-		GET_ACTION_TIMER(ch) -= GET_STRENGTH(ch) + 3 * (tool ? get_base_dps(tool) : 0);
+		
+		amt = round(GET_OBJ_CURRENT_SCALE_LEVEL(tool) / 6.66) * (OBJ_FLAGGED(tool, OBJ_SUPERIOR) ? 2 : 1);
+		amt = MAX(min_progress_per_mine, amt);
+		
+		GET_ACTION_TIMER(ch) -= amt;
 
 		act("You pick at the walls with $p, looking for ore.", FALSE, ch, tool, 0, TO_CHAR | TO_SPAMMY);
 		act("$n picks at the walls with $p, looking for ore.", FALSE, ch, tool, 0, TO_ROOM | TO_SPAMMY);
@@ -2237,24 +2264,83 @@ void process_morphing(char_data *ch) {
 
 
 /**
-* Tick update for music action.
+* Tick update for music action. Plays the instrument-to-char and instrument-
+* to-room messages in order and then repeats.
 *
 * @param char_data *ch The musician.
 */
 void process_music(char_data *ch) {
+	struct custom_message *mcm, *first_mcm, *found_mcm;
 	obj_data *obj;
+	int count;
 	
 	if (!(obj = GET_EQ(ch, WEAR_HOLD)) || GET_OBJ_TYPE(obj) != ITEM_INSTRUMENT) {
 		msg_to_char(ch, "You need to hold an instrument to play music!\r\n");
 		cancel_action(ch);
+		return;
 	}
-	else {
-		if (obj_has_custom_message(obj, OBJ_CUSTOM_INSTRUMENT_TO_CHAR)) {
-			act(obj_get_custom_message(obj, OBJ_CUSTOM_INSTRUMENT_TO_CHAR), FALSE, ch, obj, 0, TO_CHAR | TO_SPAMMY);
+	
+	// instrument-to-char
+	if (obj_has_custom_message(obj, OBJ_CUSTOM_INSTRUMENT_TO_CHAR)) {
+		GET_ACTION_VNUM(ch, 0) += 1;
+		
+		first_mcm = found_mcm = NULL;
+		count = 0;
+		LL_FOREACH(GET_OBJ_CUSTOM_MSGS(obj), mcm) {
+			if (mcm->type != OBJ_CUSTOM_INSTRUMENT_TO_CHAR) {
+				continue;
+			}
+			
+			// catch the first matching one just in case
+			if (!first_mcm) {
+				first_mcm = mcm;
+			}
+			if (++count == GET_ACTION_VNUM(ch, 0)) {
+				found_mcm = mcm;
+				break;
+			}
+		}
+		if (!found_mcm) {
+			// pull first one
+			found_mcm = first_mcm;
+			GET_ACTION_VNUM(ch, 0) = 1;
 		}
 		
-		if (obj_has_custom_message(obj, OBJ_CUSTOM_INSTRUMENT_TO_ROOM)) {
-			act(obj_get_custom_message(obj, OBJ_CUSTOM_INSTRUMENT_TO_ROOM), FALSE, ch, obj, 0, TO_ROOM | TO_SPAMMY);
+		// did we find one?
+		if (found_mcm && found_mcm->msg) {
+			act(found_mcm->msg, FALSE, ch, obj, NULL, TO_CHAR | TO_SPAMMY);
+		}
+	}
+	
+	// instrument-to-room
+	if (obj_has_custom_message(obj, OBJ_CUSTOM_INSTRUMENT_TO_ROOM)) {
+		GET_ACTION_VNUM(ch, 1) += 1;
+		
+		first_mcm = found_mcm = NULL;
+		count = 0;
+		LL_FOREACH(GET_OBJ_CUSTOM_MSGS(obj), mcm) {
+			if (mcm->type != OBJ_CUSTOM_INSTRUMENT_TO_ROOM) {
+				continue;
+			}
+			
+			// catch the first matching one just in case
+			if (!first_mcm) {
+				first_mcm = mcm;
+			}
+			if (++count == GET_ACTION_VNUM(ch, 1)) {
+				found_mcm = mcm;
+				break;
+			}
+		}
+		if (!found_mcm) {
+			// pull first one
+			found_mcm = first_mcm;
+			GET_ACTION_VNUM(ch, 1) = 1;
+		}
+		
+		// did we find one?
+		if (found_mcm && found_mcm->msg) {
+			act(found_mcm->msg, FALSE, ch, obj, NULL, TO_ROOM | TO_SPAMMY);
 		}
 	}
 }
@@ -2295,7 +2381,7 @@ void process_panning(char_data *ch) {
 			GET_ACTION(ch) = ACT_NONE;
 			
 			// pan will silently fail if depleted
-			if (get_depletion(room, DPLTN_PAN, FALSE) <= config_get_int("short_depletion")) {
+			if (get_depletion(room, DPLTN_PAN) <= config_get_int("short_depletion")) {
 				success = run_room_interactions(ch, room, INTERACT_PAN, NULL, GUESTS_ALLOWED, finish_panning);
 			}
 			
@@ -2641,8 +2727,8 @@ void process_swap_skill_sets(char_data *ch) {
 		perform_swap_skill_sets(ch);
 		GET_ACTION(ch) = ACT_NONE;
 		
-		GET_MOVE(ch) = MIN(GET_MOVE(ch), GET_MAX_MOVE(ch)/4);
-		GET_MANA(ch) = MIN(GET_MANA(ch), GET_MAX_MANA(ch)/4);
+		set_move(ch, MIN(GET_MOVE(ch), GET_MAX_MOVE(ch)/4));
+		set_mana(ch, MIN(GET_MANA(ch), GET_MAX_MANA(ch)/4));
 	}
 }
 
@@ -2888,13 +2974,22 @@ ACMD(do_dig) {
 * This is a timed action that triggers a room evolution.
 *
 * @param char_data *ch The character doing the action.
-* @param int subcmd The subcmd that was passed to do_light (SCMD_LIGHT, SCMD_BURN).
 */
-void do_burn_area(char_data *ch, int subcmd) {
-	const char *cmdname[] = { "light", "burn" };	// also in do_light
+void do_burn_area(char_data *ch) {
+	obj_data *lighter = NULL;
+	bool kept;
 	
 	if (IS_NPC(ch)) {
-		msg_to_char(ch, "You cannot %s the area.\r\n", cmdname[subcmd]);
+		msg_to_char(ch, "You cannot burn the area.\r\n");
+	}
+	else if (IS_ANY_BUILDING(IN_ROOM(ch))) {
+		// pass thru
+		if (!has_player_tech(ch, PTECH_LIGHT_FIRE) && !(lighter = find_lighter_in_list(ch->carrying, &kept))) {
+			msg_to_char(ch, "You don't seem to have a lighter%s.\r\n", (kept ? " that isn't marked (keep)" : ""));
+		}
+		else {
+			do_burn_building(ch, IN_ROOM(ch), lighter);
+		}
 	}
 	else if (GET_ACTION(ch) != ACT_NONE) {
 		msg_to_char(ch, "You're a little bit busy right now.\r\n");
@@ -2902,13 +2997,11 @@ void do_burn_area(char_data *ch, int subcmd) {
 	else if (GET_POS(ch) != POS_STANDING) {
 		send_low_pos_msg(ch);
 	}
-	else if (!validate_burn_area(ch, subcmd)) {
+	else if (!validate_burn_area(ch)) {
 		// sends its own message
 	}
 	else {
 		start_action(ch, ACT_BURN_AREA, 5);
-		GET_ACTION_VNUM(ch, 0) = subcmd;
-		
 		msg_to_char(ch, "You prepare to burn the area...\r\n");
 		act("$n prepares to burn the area...", FALSE, ch, NULL, NULL, TO_ROOM);
 	}
@@ -3071,8 +3164,8 @@ ACMD(do_forage) {
 	else if (GET_ACTION(ch) != ACT_NONE) {
 		send_to_char("You're already busy.\r\n", ch);
 	}
-	else if (!IS_OUTDOORS(ch)) {
-		send_to_char("You can only forage for things outdoors!\r\n", ch);
+	else if (!IS_OUTDOORS(ch) && !can_interact_room(IN_ROOM(ch), INTERACT_FORAGE)) {
+		send_to_char("You don't see anything to forage for here.\r\n", ch);
 	}
 	else if (!can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED)) {
 		msg_to_char(ch, "You don't have permission to forage for anything here.\r\n");
@@ -3266,7 +3359,7 @@ ACMD(do_mint) {
 	else if (!(obj = get_obj_in_list_vis(ch, argptr, &number, ch->carrying)) && !(obj = get_obj_in_list_vis(ch, argptr, &number, ROOM_CONTENTS(IN_ROOM(ch))))) {
 		msg_to_char(ch, "You don't seem to have %s %s.\r\n", AN(arg), arg);
 	}
-	else if (!IS_WEALTH_ITEM(obj) || GET_WEALTH_VALUE(obj) <= 0) {
+	else if (!IS_WEALTH_ITEM(obj) || GET_WEALTH_VALUE(obj) <= 0 || IS_MINT_FLAGGED(obj, MINT_FLAG_NO_MINT)) {
 		msg_to_char(ch, "You can't mint that into coins.\r\n");
 	}
 	else if (!can_see_in_dark_room(ch, IN_ROOM(ch), TRUE)) {
@@ -3328,10 +3421,13 @@ ACMD(do_pan) {
 
 
 ACMD(do_plant) {
+	struct string_hash *str_iter, *next_str, *str_hash = NULL;
+	char buf[MAX_STRING_LENGTH], line[256], lbuf[256];
 	struct evolution_data *evo;
 	sector_data *original;
 	obj_data *obj;
 	crop_data *cp;
+	size_t size;
 
 	one_argument(argument, arg);
 
@@ -3360,7 +3456,49 @@ ACMD(do_plant) {
 		msg_to_char(ch, "You don't have permission to plant crops in the empire.\r\n");
 	}
 	else if (!*arg) {
-		msg_to_char(ch, "What do you want to plant?\r\n");
+		// check inventory for plantables...
+		DL_FOREACH2(ch->carrying, obj, next_content) {
+			if (OBJ_FLAGGED(obj, OBJ_PLANTABLE) && (cp = crop_proto(GET_OBJ_VAL(obj, VAL_FOOD_CROP_TYPE)))) {
+				ordered_sprintbit(GET_CROP_CLIMATE(cp), climate_flags, climate_flags_order, CROP_FLAGGED(cp, CROPF_ANY_LISTED_CLIMATE) ? TRUE : FALSE, lbuf);
+				snprintf(line, sizeof(line), "%s - %s%s", GET_OBJ_DESC(obj, ch, OBJ_DESC_SHORT), lbuf, (CROP_FLAGGED(cp, CROPF_REQUIRES_WATER) ? ", requires water" : ""));
+				add_string_hash(&str_hash, line, 1);
+			}
+		}
+		
+		if (str_hash) {
+			// show plantables
+			size = snprintf(buf, sizeof(buf), "What do you want to plant:\r\n");
+			HASH_ITER(hh, str_hash, str_iter, next_str) {
+				if (str_iter->count == 1) {
+					snprintf(line, sizeof(line), " %s\r\n", str_iter->str);
+				}
+				else {
+					snprintf(line, sizeof(line), " %s (x%d)\r\n", str_iter->str, str_iter->count);
+				}
+				if (size + strlen(line) + 16 < sizeof(buf)) {
+					strcat(buf, line);
+					size += strlen(line);
+				}
+				else {
+					size += snprintf(buf + size, sizeof(buf) - size, "OVERFLOW\r\n");
+					break;
+				}
+			}
+			free_string_hash(&str_hash);
+			if (ch->desc) {
+				page_string(ch->desc, buf, TRUE);
+			}
+		}
+		else {
+			// nothing to plant
+			msg_to_char(ch, "What do you want to plant?\r\n");
+		}
+	}
+	else if (!(evo = get_evolution_by_type(SECT(IN_ROOM(ch)), EVO_PLANTS_TO))) {
+		msg_to_char(ch, "Nothing can be planted here.\r\n");
+	}
+	else if (ROOM_AFF_FLAGGED(IN_ROOM(ch), ROOM_AFF_NO_EVOLVE)) {
+		msg_to_char(ch, "You can't plant here right now.\r\n");
 	}
 	else if (!(obj = get_obj_in_list_vis(ch, arg, NULL, ch->carrying))) {
 		msg_to_char(ch, "You don't seem to have any %s.\r\n", arg);
@@ -3374,12 +3512,6 @@ ACMD(do_plant) {
 	}
 	else if (CROP_FLAGGED(cp, CROPF_REQUIRES_WATER) && !find_flagged_sect_within_distance_from_char(ch, SECTF_FRESH_WATER, NOBITS, config_get_int("water_crop_distance"))) {
 		msg_to_char(ch, "You must plant that closer to fresh water.\r\n");
-	}
-	else if (!(evo = get_evolution_by_type(SECT(IN_ROOM(ch)), EVO_PLANTS_TO))) {
-		msg_to_char(ch, "Nothing can be planted here.\r\n");
-	}
-	else if (ROOM_AFF_FLAGGED(IN_ROOM(ch), ROOM_AFF_NO_EVOLVE)) {
-		msg_to_char(ch, "You can't plant here right now.\r\n");
 	}
 	else if (!MATCH_CROP_SECTOR_CLIMATE(cp, SECT(IN_ROOM(ch)))) {
 		if (CROP_FLAGGED(cp, CROPF_ANY_LISTED_CLIMATE)) {
@@ -3730,7 +3862,7 @@ bool can_gen_interact_room(char_data *ch, room_data *room, const struct gen_inte
 		if (!can_use_room(ch, IN_ROOM(ch), MEMBERS_ONLY)) {
 			can_room_but_no_permit = TRUE;	// error later
 		}
-		else if (data->depletion && get_depletion(room, data->depletion, FALSE) >= get_interaction_depletion_room(ch, GET_LOYALTY(ch), room, data->interact, FALSE)) {
+		else if (data->depletion && get_depletion(room, data->depletion) >= get_interaction_depletion_room(ch, GET_LOYALTY(ch), room, data->interact, FALSE)) {
 			can_room_but_depleted = TRUE;	// error later
 		}
 		else {
@@ -3748,7 +3880,7 @@ bool can_gen_interact_room(char_data *ch, room_data *room, const struct gen_inte
 			can_veh_but_no_permit = veh;
 			continue;
 		}
-		else if (data->depletion != NOTHING && get_vehicle_depletion(veh, data->depletion, FALSE) >= get_interaction_depletion(ch, GET_LOYALTY(ch), VEH_INTERACTIONS(veh), data->interact, FALSE)) {
+		else if (data->depletion != NOTHING && get_vehicle_depletion(veh, data->depletion) >= get_interaction_depletion(ch, GET_LOYALTY(ch), VEH_INTERACTIONS(veh), data->interact, FALSE)) {
 			can_veh_but_depleted = veh;
 			continue;
 		}
@@ -3821,10 +3953,10 @@ INTERACTION_FUNC(finish_gen_interact_room) {
 	if (!data) {
 		return FALSE;
 	}
-	if (data->depletion != NOTHING && inter_veh && get_vehicle_depletion(inter_veh, data->depletion, FALSE) >= (interact_one_at_a_time[interaction->type] ? interaction->quantity : config_get_int("common_depletion"))) {
+	if (data->depletion != NOTHING && inter_veh && get_vehicle_depletion(inter_veh, data->depletion) >= (interact_one_at_a_time[interaction->type] ? interaction->quantity : config_get_int("common_depletion"))) {
 		return FALSE;	// depleted vehicle
 	}
-	else if (data->depletion != NOTHING && !inter_veh && get_depletion(inter_room, data->depletion, FALSE) >= (interact_one_at_a_time[interaction->type] ? interaction->quantity : config_get_int("common_depletion"))) {
+	else if (data->depletion != NOTHING && !inter_veh && get_depletion(inter_room, data->depletion) >= (interact_one_at_a_time[interaction->type] ? interaction->quantity : config_get_int("common_depletion"))) {
 		return FALSE;	// depleted room
 	}
 	

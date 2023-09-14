@@ -54,6 +54,11 @@ bell on a blue ribbon~
 T0
 Your bell on a blue ribbon cooldown has ended.~
 S
+#10749
+breadcrumb teleport~
+3 0
+0 0 0 0
+S
 #10753
 spider egg~
 3 0
@@ -69,6 +74,10 @@ T0
 You break free of the web binding you.~
 T1
 $n breaks free of the web binding $m.~
+T4
+$e is bound up in spiderwebs!~
+T5
+...$e is bound up in webs!~
 S
 #10761
 web~

@@ -4,7 +4,7 @@ A Burning Hamlet~
 nearby are already half-burnt. It looks like all sane citizens have fled, but
 no small number of them did not make it out the gates.
 ~
-acd 0 0
+acd 0 0 -1
 D4
 ~
 0 10401
@@ -24,7 +24,7 @@ Market Street~
 Charred fruit rolls slowly down the hillside, amidst the trampled remains of
 flower bouquets and spoiled vegetables.
 ~
-acd 0 0
+acd 0 0 -1
 D7
 ~
 0 10400
@@ -32,7 +32,7 @@ D0
 ~
 0 10402
 M 1 10402 100.00 1
-M 1 10405 100.00 3
+M 1 10401 100.00 20
 T 10408
 S
 #10402
@@ -42,7 +42,7 @@ down the entire length of Market Street. The buildings that line the street
 have been boarded up, probably by desperate citizens hoping to save their
 homes.
 ~
-acd 0 0
+acd 0 0 -1
 D2
 ~
 0 10401
@@ -50,7 +50,7 @@ D0
 ~
 0 10403
 M 1 10402 100.00 1
-M 1 10405 100.00 3
+M 1 10401 100.00 20
 T 10408
 S
 #10403
@@ -59,7 +59,7 @@ The Market Street Blockade~
 citizens have constructed a huge blockade. The street is completely impassable.
 But at least the buildings aren't on fire here.
 ~
-acd 0 0
+acd 0 0 -1
 D2
 ~
 0 10402
@@ -67,7 +67,7 @@ D3
 ~
 0 10404
 M 0 10404 100.00 1
-M 1 10401 100.00 2
+M 1 10401 100.00 20
 T 10408
 S
 #10404
@@ -76,7 +76,7 @@ A Back Alley~
 tall fence on the back side. The alley looks like it will get you around to the
 town square, but there isn't much room to move back here.
 ~
-acd 0 0
+acd 0 0 -1
 D1
 ~
 0 10403
@@ -84,16 +84,16 @@ D0
 ~
 0 10405
 M 1 10402 100.00 1
-M 1 10407 100.00 2
+M 1 10401 100.00 20
 T 10408
 S
 #10405
 A Back Alley~
-   The alley comes to an end behind town square, past the burning blockade.
+   The alley comes to an end behind the town square, past the burning blockade.
 From here you can see the square, which looks like it's being torn up by a huge
 animal. For the moment, though, you're safe here.
 ~
-acd 0 0
+acd 0 0 -1
 D2
 ~
 0 10404
@@ -110,7 +110,7 @@ skeletal mammoth has torn up carts, stalls, and building facades alike. Every
 street is blocked by the devastation, and burning buildings prevent you from
 going any direction except back into the alley.
 ~
-acd 0 0
+acd 0 0 -1
 D3
 ~
 0 10405
@@ -124,14 +124,14 @@ Main Street~
 them are actually on fire. Melted plates of slag adorn the front of the
 armorer's old shop, and most of the citizens appear to have fled.
 ~
-acd 0 0
+acd 0 0 -1
 D2
 ~
 0 10400
 D0
 ~
 0 10408
-M 1 10403 100.00 1
+M 1 10402 100.00 1
 T 10408
 S
 #10408
@@ -140,15 +140,15 @@ Main Street~
 Several buildings have completely collapsed amidst the chaos, and you can hear
 the howling of the undead from every dark corner.
 ~
-acd 0 0
+acd 0 0 -1
 D2
 ~
 0 10407
 D0
 ~
 0 10409
-M 1 10403 100.00 1
-M 1 10405 100.00 3
+M 1 10402 100.00 1
+M 1 10401 100.00 20
 T 10408
 S
 #10409
@@ -157,7 +157,7 @@ The Main Street Blockade~
 Street to Market Street. It seems that some desperate town guards must have
 tried to block the necromancers from advancing into the hamlet.
 ~
-acd 0 0
+acd 0 0 -1
 D2
 ~
 0 10408
@@ -165,7 +165,7 @@ D5
 ~
 0 10410
 M 0 10409 100.00 1
-M 1 10401 100.00 2
+M 1 10401 100.00 20
 T 10408
 S
 #10410
@@ -174,14 +174,14 @@ A Half-Demolished Store~
 still standing. Most of its walls are in ruins, letting you cut through the
 store to get past the Main Street blockade.
 ~
-acd 0 0
+acd 0 0 -1
 D6
 ~
 0 10409
 D3
 ~
 0 10411
-M 1 10403 100.00 1
+M 1 10402 100.00 1
 T 10408
 S
 #10411
@@ -191,15 +191,15 @@ howling of demons and the shouts of necromancers drowns out even the roar of
 the burning buildings. The blockade to the south blocks you from leaving the
 city, although you can still cut through the shop again.
 ~
-acd 0 0
+acd 0 0 -1
 D1
 ~
 0 10410
 D0
 ~
 0 10412
-M 1 10403 100.00 1
-M 1 10406 100.00 2
+M 1 10402 100.00 1
+M 1 10401 100.00 20
 T 10408
 S
 #10412
@@ -209,7 +209,7 @@ streets, there are corpses of citizens who appear to have been killed, raised
 as undead, and killed again. The sky is dark with smoke, but it looks like
 every path out of the square is blocked.
 ~
-acd 0 0
+acd 0 0 -1
 D2
 ~
 0 10411
@@ -223,14 +223,14 @@ Temple Street~
 overlooks the small hamlet. Compared to the rest of the town, this area is
 relatively undamaged. Still, it looks like the citizens have all fled.
 ~
-acd 0 0
+acd 0 0 -1
 D6
 ~
 0 10400
 D5
 ~
 0 10414
-M 1 10404 100.00 1
+M 1 10402 100.00 1
 T 10408
 S
 #10414
@@ -239,15 +239,15 @@ Temple Street~
 the temple steps. From here you can clearly see the devastation that the
 necromancers have brought down on the hamlet.
 ~
-acd 0 0
+acd 0 0 -1
 D6
 ~
 0 10413
 D0
 ~
 0 10415
-M 1 10404 100.00 1
-M 1 10406 100.00 2
+M 1 10402 100.00 1
+M 1 10401 100.00 20
 T 10408
 S
 #10415
@@ -256,7 +256,7 @@ The Temple Steps~
 air here is dense with smoke, and it burns your lungs as you try to make your
 way through town.
 ~
-acd 0 0
+acd 0 0 -1
 D2
 ~
 0 10414
@@ -272,14 +272,14 @@ The Temple Steps~
 on the hamlet. You can see most of town from here -- or, at least, the plumes
 of smoke coming from its buildings and streets.
 ~
-acd 0 0
+acd 0 0 -1
 D9
 ~
 0 10415
 D8
 ~
 0 10417
-M 1 10404 100.00 1
+M 1 10402 100.00 1
 T 10408
 S
 #10417
@@ -288,15 +288,15 @@ The Entrance to the Temple~
 grand, if it weren't already on fire. The necromancers seem to have ignited the
 marble itself, and the building looks as if it is slowly melting.
 ~
-acd 0 0
+acd 0 0 -1
 D9
 ~
 0 10416
 D0
 ~
 0 10418
-M 1 10404 100.00 1
-M 1 10407 100.00 2
+M 1 10402 100.00 1
+M 1 10401 100.00 20
 T 10408
 S
 #10418
@@ -307,7 +307,7 @@ where statues once stood. The smoke over the city has begun to clear and you
 can clearly see all of the hamlet from the windows. Unfortunately, it's now
 clear that no part of this town can be saved.
 ~
-acd 0 0
+acd 0 0 -1
 D2
 ~
 0 10417
@@ -321,7 +321,7 @@ The City Sewers~
 trough that runs the length of the sewer. Goblins have blocked up this portion
 of the tunnels, although they hardly smell better than the city refuse.
 ~
-c 0 0
+c 0 0 -1
 D0
 ~
 0 10451
@@ -335,7 +335,7 @@ D3
 ~
 0 10454
 M 0 10450 50.00 5
-M 0 10455 1.00 1
+M 0 10455 10.00 1
 T 10452
 T 10454
 S
@@ -344,10 +344,9 @@ The Rat-Fur Throne~
    The sewer grate is stopped up with straw, loosely covered with blankets of
 matted rat fur to make room for a grand throne -- at least, to the goblins. It
 appears some ambitious goblin has set up a command post here. Perhaps they're
-planning an invasion?
-   A sign on the wall lists items for sale.
+planning an invasion? A sign on wall says Dryleef sells some items here.
 ~
-c 0 0
+c 0 0 -1
 D2
 ~
 0 10450
@@ -358,25 +357,35 @@ The throne is made of wood, but covered entirely in loosely-stitched rat fur.
 E
 sign list~
 Dryleef sells the following unique buildings:
- war tent (500 coins)
- message post (500 coins)
- lab tent (500 coins)
- dolmen stone (500 coins)
+ war tent  (semi-portable home with a forge)
+ message post  (sends mail)
+ lab tent  (alchemy workshop)
+ dolmen stone  (tomb)
 
-(Type 'buy <item>' to purchase one.)
+Dryleef sells the following solo/pvp gear:
+ Dryleef's pitfighting ring  (finger)
+ zirconian amulet of goblin bravery  (neck)
+ bog-iron pitfighter's sword  (slashing weapon)
+ Dryleef's pitfighting buckler  (shield)
+ goblin pitfighter's cape  (about body, medium armor)
+ goblin punching bags  (hands, medium armor)
+
+Use the list, list id, and buy commands to shop from Dryleef.
 ~
 M 0 10450 50.00 5
 M 0 10451 100.00 1
+M 2 10457 100.00 1
+M 0 10457 100.00 1
 T 10452
 S
 #10452
 A Makeshift Laboratory~
    Some enterprising goblin has set up a small laboratory in an alcove in the
 sewer wall. None of the potions looks like anything you'd want to drink, but
-there are some old spellbooks lying about.
-   A sign on the wall lists items for sale.
+there are some old spellbooks lying about. A sign on the wall lists items
+Pimmin sells here.
 ~
-c 0 0
+c 0 0 -1
 D3
 ~
 0 10450
@@ -390,11 +399,15 @@ On closer inspection, these aren't potions. They are sewage.
 ~
 E
 sign list~
-Pimmin sells the following caster craft recipes:
- violet leopard shawl pattern (500 coins)
- wildfire gloves pattern (500 coins)
+Pimmin sells the following caster gear:
+ Pimmin's ring  (finger)
+ bone charm necklace  (neck)
+ chicken-bone wand  (magic shock weapon)
+ goblinward tome  (offhand item)
+ violet leopard shawl  (about body, mage armor)
+ wildfire gloves  (hands, mage armor)
 
-(These require Magical Vestments. Type 'buy <item>' to purchase one.)
+Use the list, list id, and buy commands to shop from Pimmin.
 ~
 M 0 10450 50.00 5
 M 0 10452 100.00 1
@@ -404,10 +417,10 @@ S
 A Blocked Tunnel~
    The end of the tunnel has been blocked off, with straw mashed against the
 sewer grate. It looks like several goblins have been sleeping here. And from
-the pile of rat bones, they've been cooking here as well.
-   A sign on the wall lists items for sale.
+the pile of rat bones, they've been cooking here as well. A sign on the wall
+indicates that Shivsper is open for business.
 ~
-c 0 0
+c 0 0 -1
 D0
 ~
 0 10450
@@ -417,11 +430,21 @@ It looks like someone has been eating rats.
 ~
 E
 sign list~
-Shivsper sells the following melee craft recipes:
- rat-fur cloak pattern (500 coins)
- wooden gauntlets pattern (500 coins)
+Shivsper sells the following melee gear:
+ Shivsper's poison ring  (finger)
+ gaudy copper chain  (neck)
+ someone else's axe  (slicing weapon)
+ giant dagger  (wield/hold, stabbing weapon)
+ rat-fur cloak  (about body, light armor)
+ wooden gauntlets  (hands, light armor)
 
-(These require Dangerous Leathers. Type 'buy <item>' to purchase one.)
+Use the list, list id, and buy commands to shop from Shivsper.
+~
+E
+target wall~
+   The target on the wall is a crudely drawn human figure that has been
+repeatedly punctured around the eyes, throat, heart, groin, and for some reason
+also the spleen.
 ~
 M 0 10450 50.00 5
 M 0 10453 100.00 1
@@ -431,20 +454,24 @@ S
 The Goblin Forge~
    The industrious goblins appear to have set up a smithy here in the sewers.
 A heavy, flat block of meteorite ore sits next to a smoldering pit of embers,
-and several ingots of low-grade have been discarded nearby.
-   A sign on the wall lists items for sale.
+and several ingots of low-grade have been discarded nearby. A sign on the wall
+tells you Wargreyn sells fine wares here.
 ~
-c 0 0
+c 0 h -1
 D1
 ~
 0 10450
 E
 sign list~
-Wargreyn sells the following tank craft recipes:
- mesh cloak pattern (500 coins)
- heavy goblin gauntlets pattern (500 coins)
+Wargreyn sells the following tank gear:
+ Wargreyn's ring  (finger)
+ blacksmith's charm  (neck)
+ goblinsmith's hammer  (pounding weapon, hammer)
+ wargskull shield  (shield)
+ mesh cloak  (about body, heavy armor)
+ heavy goblin gauntlets  (hands, heavy armor)
 
-(These require Imperial Armors. Type 'buy <item>' to purchase one.)
+Use the list, list id, and buy commands to shop from Wargreyn.
 ~
 M 0 10450 50.00 5
 M 0 10454 100.00 1

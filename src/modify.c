@@ -417,6 +417,14 @@ char *next_page(char *str, descriptor_data *desc) {
 	
 	length = (desc && desc->pProtocol->ScreenHeight > 0) ? (desc->pProtocol->ScreenHeight - 2) : PAGE_LENGTH;
 	width = (desc && desc->pProtocol->ScreenWidth > 0) ? desc->pProtocol->ScreenWidth : PAGE_WIDTH;
+	
+	// safety checking: this misbehaves badly if those numbers are negative
+	if (length < 1) {
+		length = PAGE_LENGTH;
+	}
+	if (width < 1) {
+		width = PAGE_WIDTH;
+	}
 
 	for (;; ++str) {
 		/* If end of string, return NULL. */
@@ -436,9 +444,9 @@ char *next_page(char *str, descriptor_data *desc) {
 			spec_code = FALSE;
 		
 		// skip & colorcodes
-		else if (*str == '&') {
+		else if (*str == COLOUR_CHAR) {
 			++str;
-			if (*str == '&') {	// cause it to print a & in case of &&
+			if (*str == COLOUR_CHAR) {	// cause it to print a & in case of &&
 				--str;
 			}
 		}

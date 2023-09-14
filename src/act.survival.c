@@ -160,10 +160,14 @@ GLB_FUNCTION(run_global_hunt_for_map_spawns) {
 	struct hunt_global_bean *data = (struct hunt_global_bean*)other_data;
 	struct hunt_helper *hlp;
 	
-	if (data && data->helpers) {
+	if (data && data->helpers && GET_GLOBAL_SPAWNS(glb)) {
 		CREATE(hlp, struct hunt_helper, 1);
 		hlp->list = GET_GLOBAL_SPAWNS(glb);
 		DL_APPEND(*(data->helpers), hlp);
+		return TRUE;
+	}
+	else {
+		return FALSE;
 	}
 }
 
@@ -198,6 +202,9 @@ void do_mount_current(char_data *ch) {
 		msg_to_char(ch, "You're already sitting %s something.\r\n", IN_OR_ON(GET_SITTING_ON(ch)));
 	}
 	else if (MOUNT_FLAGGED(ch, MOUNT_FLYING) && !CAN_RIDE_FLYING_MOUNT(ch)) {
+		msg_to_char(ch, "You don't have the correct ability to ride %s! (see HELP RIDE)\r\n", get_mob_name_by_proto(GET_MOUNT_VNUM(ch), TRUE));
+	}
+	else if (MOUNT_FLAGGED(ch, MOUNT_WATERWALK) && !CAN_RIDE_WATERWALK_MOUNT(ch)) {
 		msg_to_char(ch, "You don't have the correct ability to ride %s! (see HELP RIDE)\r\n", get_mob_name_by_proto(GET_MOUNT_VNUM(ch), TRUE));
 	}
 	else if (run_ability_triggers_by_player_tech(ch, PTECH_RIDING, NULL, NULL)) {
@@ -341,7 +348,7 @@ void do_mount_new(char_data *ch, char *argument) {
 	else if (!MOB_FLAGGED(mob, MOB_MOUNTABLE) && !IS_IMMORTAL(ch)) {
 		act("You can't ride $N!", FALSE, ch, 0, mob, TO_CHAR);
 	}
-	else if (AFF_FLAGGED(mob, AFF_FLY) && !CAN_RIDE_FLYING_MOUNT(ch)) {
+	else if (!CAN_RIDE_MOUNT(ch, mob)) {
 		act("You don't have the correct ability to ride $N! (see HELP RIDE)", FALSE, ch, 0, mob, TO_CHAR);
 	}
 	else if (mob->desc || (GET_PC_NAME(mob) && (proto = mob_proto(GET_MOB_VNUM(mob))) && GET_PC_NAME(mob) != GET_PC_NAME(proto))) {
@@ -543,7 +550,7 @@ ACMD(do_butcher) {
 		act("You need to kill $M first.", FALSE, ch, NULL, vict, TO_CHAR);
 	}
 	else if (!corpse) {
-		msg_to_char(ch, "You don't see a %s here.\r\n", arg);
+		msg_to_char(ch, "You don't see %s %s here.\r\n", AN(arg), arg);
 	}
 	else if (!IS_CORPSE(corpse)) {
 		msg_to_char(ch, "You can only butcher a corpse.\r\n");
@@ -551,7 +558,7 @@ ACMD(do_butcher) {
 	else if (!bind_ok(corpse, ch)) {
 		msg_to_char(ch, "You can't butcher a corpse that is bound to someone else.\r\n");
 	}
-	else if (GET_CORPSE_NPC_VNUM(corpse) == NOTHING || !(proto = mob_proto(GET_CORPSE_NPC_VNUM(corpse)))) {
+	else if (GET_CORPSE_NPC_VNUM(corpse) == NOTHING || !(proto = mob_proto(GET_CORPSE_NPC_VNUM(corpse))) || !has_interaction(proto->interactions, INTERACT_BUTCHER)) {
 		msg_to_char(ch, "You can't get any good meat out of that.\r\n");
 	}
 	else if (!has_tool(ch, TOOL_KNIFE)) {
@@ -677,6 +684,10 @@ ACMD(do_hunt) {
 	
 	skip_spaces(&argument);
 	
+	if (IS_NPC(ch)) {
+		msg_to_char(ch, "You can't do that.\r\n");
+		return;
+	}
 	if (GET_ACTION(ch) == ACT_HUNTING && !*argument) {
 		msg_to_char(ch, "You stop hunting.\r\n");
 		cancel_action(ch);
@@ -699,8 +710,8 @@ ACMD(do_hunt) {
 		msg_to_char(ch, "You can't hunt in cities.\r\n");
 		return;
 	}
-	if (AFF_FLAGGED(ch, AFF_ENTANGLED)) {
-		msg_to_char(ch, "You can't hunt anything while entangled.\r\n");
+	if (AFF_FLAGGED(ch, AFF_IMMOBILIZED)) {
+		msg_to_char(ch, "You can't hunt anything while immobilized.\r\n");
 		return;
 	}
 	if (GET_ACTION(ch) != ACT_NONE && GET_ACTION(ch) != ACT_HUNTING) {
@@ -888,6 +899,10 @@ ACMD(do_track) {
 		return;
 	}
 	else if (ABILITY_TRIGGERS(ch, NULL, NULL, ABIL_TRACK)) {
+		return;
+	}
+	else if (ROOM_AFF_FLAGGED(IN_ROOM(ch), ROOM_AFF_NO_TRACKS)) {
+		msg_to_char(ch, "You can't seem to find a trail.\r\n");
 		return;
 	}
 	

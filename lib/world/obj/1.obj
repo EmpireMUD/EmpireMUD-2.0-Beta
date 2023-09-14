@@ -7,11 +7,17 @@ Rocks can be used as a primitive weapon, used as a knapper to chip pieces of
 flint, as a crafting component, or as catapult shot. They are also used to lay
 roads and build some buildings.
 ~
-1 il ano e 9
+1 il ano e 10
 0 2 5
 1 0
 C
 1 1
+M
+6
+You place $p into $V.~
+M
+7
+$n places $p into $V.~
 O+ 1 6050
 R
 4 5117 0
@@ -39,12 +45,18 @@ A piece of flint is lying on the ground.~
 potential to be shaped into a powerful primitive weapon. Wield a rock and
 'chip' this flint to work it into a more useful shape.
 ~
-1 il ano 0 8
+1 il ano 0 9
 0 1 5
 5 0
 C
 1 1
 I 19 180 100.00 1  # CHIP: chipped flint
+M
+6
+You place $p into $V.~
+M
+7
+$n places $p into $V.~
 O+ 1 6051
 R
 4 5117 0
@@ -108,12 +120,18 @@ A black piece of obsidian is on the ground.~
 obsidian shows through. Obsidian forms a cutting edge like no other stone. Use
 'chip' to give it a sharp edge.
 ~
-1 hl ano 0 10
+1 hl ano 0 11
 0 2 5
 8 0
 C
 1 1
 I 19 182 100.00 1  # CHIP: sharpened piece of obsidian
+M
+6
+You place $p into $V.~
+M
+7
+$n places $p into $V.~
 O+ 1 6052
 R
 4 5117 0
@@ -268,7 +286,7 @@ a stack of lumber~
 Some lumber is stacked on the ground.~
 Lumber is used in building construction.
 ~
-3 el a 0 5
+3 el a 0 6
 0 0 0
 0 0
 C
@@ -282,10 +300,10 @@ M
 $n positions some lumber and ties it in place.~
 M
 6
-You position some lumber on the frame of $V.~
+You position some lumber on $V.~
 M
 7
-$n positions some lumber on the frame of $V.~
+$n positions some lumber on $V.~
 O+ 1 6000
 R
 4 5118 0
@@ -298,7 +316,7 @@ some rough boards~
 There are rough boards stacked here.~
 Lumber is used in building construction.
 ~
-3 e a 0 6
+3 e a 0 7
 0 0 0
 0 0
 C
@@ -312,10 +330,10 @@ M
 $n ties some rough boards into position.~
 M
 6
-You attach some rough boards to the frame of $V.~
+You attach some rough boards to $V.~
 M
 7
-$n attaches some rough boards to the frame of $V.~
+$n attaches some rough boards to $V.~
 O+ 1 6000
 R
 4 5118 0
@@ -414,7 +432,7 @@ Some fine tropical lumber is stacked here.~
    This exotic lumber looks like it was cut from the darkest of jungles. It can
 be used for construction and exquisite crafts.
 ~
-3 e a 0 8
+3 e a 0 9
 0 0 0
 0 0
 C
@@ -428,10 +446,10 @@ M
 $n positions some lumber and ties it in place.~
 M
 6
-You position some lumber on the frame of $V.~
+You position some fine lumber on $V.~
 M
 7
-$n positions some lumber on the frame of $V.~
+$n positions some fine lumber on $V.~
 O+ 1 6002
 R
 4 5118 0
@@ -611,7 +629,7 @@ A bundle of long leaves is lying here.~
    These long, narrow leaves have toothed edges that cut if you aren't careful.
 The leaves are fibrous and could be used for crafting.
 ~
-3 l a 0 7
+3 l a 0 8
 0 0 0
 0 0
 C
@@ -619,6 +637,26 @@ C
 O+ 1 6421
 R
 4 5118 0
+R
+4 5137 0
+S
+#140
+grass long bundle~
+a bundle of long grass~
+A bundle of long grass is lying on the ground.~
+   It's a bundle of long grass, cut roughly at the bottom. You could use it as
+fiber, perhaps for rope making.
+~
+3 l a 0 8
+0 0 0
+0 0
+C
+1 1
+O+ 1 6421
+R
+4 5118 0
+R
+4 5137 0
 S
 #141
 wheat bundle~
@@ -1057,8 +1095,8 @@ striking good steel against a piece of flint to produce sparks, which light the
 tinder and can be used to light a larger fire. Type 'light <object>' to light
 something using this tinderbox.
 ~
-18 0 a 0 6
-10 0 0
+18 0 a 0 8
+25 0 0
 5 0
 C
 50 50
@@ -1071,11 +1109,12 @@ S
 torch~
 a torch~
 A torch has been dropped here.~
-A torch is important when you're out at night.
+   A torch is important when you're out at night. You can use 'douse torch' and
+'light torch' to save some of it for later.
 ~
-1 chl ano 0 4
-0 2 12
-0 10
+29 l ao 0 7
+16 1 7
+0 0
 S
 #186
 spear head stone spearhead~

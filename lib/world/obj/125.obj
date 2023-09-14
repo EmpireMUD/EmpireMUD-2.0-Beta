@@ -58,9 +58,9 @@ master sorcerer, could be used for certain clockwork crafts.
 0 0 0
 2 0
 R
-5193 0
+4 5193 0
 R
-5621 0
+4 5621 0
 S
 #12506
 wire copper salvaged~
@@ -79,9 +79,9 @@ M
 7
 $n wires $V with some salvaged wire.~
 R
-5193 0
+4 5193 0
 R
-5621 0
+4 5621 0
 S
 #12507
 metal scrap brass piece~
@@ -100,9 +100,9 @@ M
 7
 $n attaches some scrap metal to $V.~
 R
-5193 0
+4 5193 0
 R
-5621 0
+4 5621 0
 S
 #12508
 pouch little brass cannonballs~
@@ -240,8 +240,8 @@ A clockwork lower cannon was left here.~
 This piece of advanced weaponry accelerates brass cannonballs using a series of
 gears.
 ~
-20 emp ap 0 5
-29 1 1
+20 emp ap 0 6
+32 1 1
 2 0
 T 12522
 S

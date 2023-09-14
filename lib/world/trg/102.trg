@@ -19,6 +19,18 @@ if %actor.is_pc% && %actor.empire%
   nop %actor.empire.start_progress(10200)%
 end
 ~
+#10203
+Goblin Challenge: Better error message when attacking early~
+0 B 0
+~
+if %self.aff_flagged(!ATTACK)%
+  %send% %actor% You'll have to wait a moment. ~%self% is still getting ready.
+  return 0
+else
+  detach 10203 %self.id%
+  return 1
+end
+~
 #10204
 Zelkab Bruiser Combat~
 0 k 10
@@ -40,7 +52,7 @@ done
 Zelkab Death~
 0 f 100
 ~
-if %self.mob_flagged(NO-CORPSE)% || !%self.varexists(difficulty)%
+if !%self.varexists(difficulty)%
   * This is probably a summoned copy.
   halt
 end
@@ -50,10 +62,7 @@ set difficulty %self.difficulty%
 set mob %self.room.people%
 remote difficulty %mob.id%
 set mob_diff %difficulty%
-if %mob.vnum% >= 10204 && %mob.vnum% <= 10205
-  eval mob_diff %mob_diff% + 1
-end
-dg_affect %mob% !ATTACK on 5
+dg_affect #10216 %mob% !ATTACK on 5
 nop %mob.remove_mob_flag(HARD)%
 nop %mob.remove_mob_flag(GROUP)%
 if %mob_diff% == 1
@@ -99,25 +108,26 @@ done
 Garlgarl Death~
 0 f 100
 ~
-if %self.mob_flagged(NO-CORPSE)% || !%self.varexists(difficulty)%
+if !%self.varexists(difficulty)%
   * This is probably a summoned copy.
   halt
 end
 return 0
 set difficulty %self.difficulty%
-set mob_diff %difficulty%
-if %mob.vnum% >= 10204 && %mob.vnum% <= 10205
-  eval mob_diff %mob_diff% + 1
-end
+eval mob_diff %difficulty% - 1
 set mob_num 10202
 while %mob_num% <= 10203
   %load% mob %mob_num%
   set mob %self.room.people%
   remote difficulty %mob.id%
-  dg_affect %mob% !ATTACK on 5
+  eval aff_id %mob_num% + 15
+  dg_affect #%aff_id% %mob% !ATTACK on 5
   nop %mob.remove_mob_flag(HARD)%
   nop %mob.remove_mob_flag(GROUP)%
-  if %mob_diff% == 1
+  if %mob_diff% == 0
+    %mob.remove_mob_flag(DPS)%
+    %mob.remove_mob_flag(TANK)%
+  elseif %mob_diff% == 1
     * Then we don't need to do anything
   elseif %mob_diff% == 2
     nop %mob.add_mob_flag(HARD)%
@@ -147,7 +157,7 @@ Filks Archer Combat~
 Filks Death~
 0 f 100
 ~
-if %self.mob_flagged(NO-CORPSE)% || !%self.varexists(difficulty)%
+if !%self.varexists(difficulty)%
   * This is probably a summoned copy.
   halt
 end
@@ -166,10 +176,7 @@ if !%found%
   set mob %self.room.people%
   remote difficulty %mob.id%
   set mob_diff %difficulty%
-  if %mob.vnum% >= 10204 && %mob.vnum% <= 10205
-    eval mob_diff %mob_diff% + 1
-  end
-  dg_affect %mob% !ATTACK on 5
+  dg_affect #10219 %mob% !ATTACK on 5
   nop %mob.remove_mob_flag(HARD)%
   nop %mob.remove_mob_flag(GROUP)%
   if %mob_diff% == 1
@@ -201,7 +208,7 @@ Walts Sapper Combat~
 Walts Death~
 0 f 100
 ~
-if %self.mob_flagged(NO-CORPSE)% || !%self.varexists(difficulty)%
+if !%self.varexists(difficulty)%
   * This is probably a summoned copy.
   halt
 end
@@ -220,10 +227,7 @@ if !%found%
   set mob %self.room.people%
   remote difficulty %mob.id%
   set mob_diff %difficulty%
-  if %mob.vnum% >= 10204 && %mob.vnum% <= 10205
-    eval mob_diff %mob_diff% + 1
-  end
-  dg_affect %mob% !ATTACK on 5
+  dg_affect #10219 %mob% !ATTACK on 5
   nop %mob.remove_mob_flag(HARD)%
   nop %mob.remove_mob_flag(GROUP)%
   if %mob_diff% == 1
@@ -268,7 +272,7 @@ done
 Nilbog Death~
 0 f 100
 ~
-if %self.mob_flagged(NO-CORPSE)% || !%self.varexists(difficulty)%
+if !%self.varexists(difficulty)%
   * This is probably a summoned copy.
   halt
 end
@@ -278,10 +282,7 @@ set difficulty %self.difficulty%
 set mob %self.room.people%
 remote difficulty %mob.id%
 set mob_diff %difficulty%
-if %mob.vnum% >= 10204 && %mob.vnum% <= 10205
-  eval mob_diff %mob_diff% + 1
-end
-dg_affect %mob% !ATTACK on 5
+dg_affect #10220 %mob% !ATTACK on 5
 nop %mob.remove_mob_flag(HARD)%
 nop %mob.remove_mob_flag(GROUP)%
 if %mob_diff% == 1
@@ -321,7 +322,7 @@ switch %random.4%
 done
 ~
 #10216
-Filks Respawn~
+Filks Respawn - deprecated~
 0 b 100
 ~
 * Respawns Walts if needed
@@ -342,11 +343,12 @@ if (!%found%)
   if %walts%
     %echo% ~%walts% respawns.
     nop %walts.add_mob_flag(!LOOT)%
+    nop %walts.add_mob_flag(NO-CORPSE)%
   end
 end
 ~
 #10217
-Walts Respawn~
+Walts Respawn - deprecated~
 0 b 100
 ~
 * Respawns Filks if needed
@@ -367,6 +369,7 @@ if (!%found%)
   if %filks%
     %echo% ~%filks% respawns.
     nop %filks.add_mob_flag(!LOOT)%
+    nop %filks.add_mob_flag(NO-CORPSE)%
   end
 end
 ~
@@ -380,13 +383,13 @@ set fighting 0
 set person %room.people%
 while %person%
   if %person.vnum% == 10202
-    if %person.fighting% || %person.mob_flagged(NO-CORPSE)%
+    if %person.fighting% || %person.disabled%
       set fighting 1
     end
     set goblin %person%
     set filks_present 1
   elseif %person.vnum% == 10203
-    if %person.fighting% || %person.mob_flagged(NO-CORPSE)%
+    if %person.fighting% || %person.disabled%
       set fighting 1
     end
     set walts_present 1
@@ -401,6 +404,7 @@ if %filks_present% && !%walts_present% && !%fighting%
   if %new_mob.vnum% == 10203
     %echo% ~%new_mob% respawns.
     nop %new_mob.add_mob_flag(!LOOT)%
+    nop %new_mob.add_mob_flag(NO-CORPSE)%
   end
 elseif %walts_present% && !%filks_present% && !%fighting%
   * Respawn Filks
@@ -409,18 +413,19 @@ elseif %walts_present% && !%filks_present% && !%fighting%
   if %new_mob.vnum% == 10202
     %echo% ~%new_mob% respawns.
     nop %new_mob.add_mob_flag(!LOOT)%
+    nop %new_mob.add_mob_flag(NO-CORPSE)%
   end
 end
 if %new_mob%
   set difficulty %goblin.difficulty%
   remote difficulty %new_mob.id%
-  set mob_diff %difficulty%
-  if %mob.vnum% >= 10204 && %mob.vnum% <= 10205
-    eval mob_diff %mob_diff% + 1
-  end
+  eval mob_diff %difficulty% - 1
   nop %new_mob.remove_mob_flag(HARD)%
   nop %new_mob.remove_mob_flag(GROUP)%
-  if %mob_diff% == 1
+  if %mob_diff% == 0
+    %mob.remove_mob_flag(DPS)%
+    %mob.remove_mob_flag(TANK)%
+  elseif %mob_diff% == 1
     * Then we don't need to do anything
   elseif %mob_diff% == 2
     nop %new_mob.add_mob_flag(HARD)%
@@ -430,6 +435,7 @@ if %new_mob%
     nop %new_mob.add_mob_flag(HARD)%
     nop %new_mob.add_mob_flag(GROUP)%
   end
+  nop %new_mob.unscale_and_reset%
 end
 ~
 #10225
@@ -680,11 +686,11 @@ if %actor.is_pc% && %actor.empire%
 end
 ~
 #10256
-Primeval adventure completer~
+Primeval: Start delayed despawn~
 0 f 100
 ~
 %buildingecho% %self.room% A bone-shattering roar echoes through the air!
-%adventurecomplete%
+%at% i10251 %load% mob 10276
 return 0
 ~
 #10257
@@ -705,6 +711,110 @@ switch %random.3%
   break
 done
 %purge% %self%
+~
+#10258
+Primeval difficulty selector~
+0 c 0
+difficulty~
+return 1
+* Configs
+set start_room 10250
+set end_room 10258
+set boss_mobs 10252 10253 10254
+set mini_mobs 10255 10258
+* NOTE: The miniboss that spawns in a pack is unlisted; it's always Normal.
+* Check args...
+if %self.varexists(scaled)%
+  %send% %actor% The difficulty has already been set.
+  halt
+end
+if !%arg%
+  %send% %actor% You must specify a level of difficulty (normal \| hard \| group \| boss).
+  halt
+end
+if normal /= %arg%
+  %echo% Setting difficulty to Normal...
+  set difficulty 1
+  set hard_mini 0
+elseif hard /= %arg%
+  %echo% Setting difficulty to Hard...
+  set difficulty 2
+  set hard_mini 0
+elseif group /= %arg%
+  %echo% Setting difficulty to Group...
+  set difficulty 3
+  set hard_mini 1
+elseif boss /= %arg%
+  %echo% Setting difficulty to Boss...
+  set difficulty 4
+  set hard_mini 1
+else
+  %send% %actor% That is not a valid difficulty level for this adventure (normal \| hard \| group \| boss).
+  halt
+end
+* Clear existing difficulty flags and set new ones.
+set vnum %start_room%
+while %vnum% <= %end_room%
+  set there %instance.nearest_rmt(%vnum%)%
+  if %there%
+    set mob %there.people%
+    set last 0
+    while %mob%
+      set next_mob %mob.next_in_room%
+      if %mob.is_npc%
+        if %mob.vnum% >= 10250 && %mob.vnum% <= 10299
+          * wipe difficulty flags
+          nop %mob.remove_mob_flag(HARD)%
+          nop %mob.remove_mob_flag(GROUP)%
+        end
+        if %boss_mobs% ~= %mob.vnum%
+          * scale as boss
+          if %difficulty% == 2
+            nop %mob.add_mob_flag(HARD)%
+          elseif %difficulty% == 3
+            nop %mob.add_mob_flag(GROUP)%
+          elseif %difficulty% == 4
+            nop %mob.add_mob_flag(HARD)%
+            nop %mob.add_mob_flag(GROUP)%
+          end
+        elseif %hard_mini% && %mini_mobs% ~= %mob.vnum%
+          * scale as miniboss
+          nop %mob.add_mob_flag(HARD)%
+        end
+        * on normal, remove duplicate mobs
+        if %difficulty% == 1
+          if %mob.vnum% == %last%
+            %purge% %mob%
+          else
+            set last %mob.vnum%
+          end
+        end
+      end
+      * and loop
+      set mob %next_mob%
+    done
+  end
+  * and repeat
+  eval vnum %vnum% + 1
+done
+* messaging:
+if %difficulty% > 2
+  say Be very careful... the scouts say it's dangerous.
+end
+say Ok, open the gate!
+* mark me as scaled
+set scaled 1
+remote scaled %self.id%
+~
+#10259
+Priveal block exit until selected~
+0 s 100
+~
+if %direction% != portal && !%actor.nohassle% && !%self.varexists(scaled)%
+  %send% %actor% The gate is shut. Choose a difficulty to proceed.
+  %send% %actor% Usage: difficulty <normal \| hard \| group \| boss>
+  return 0
+end
 ~
 #10260
 Dracosaur trash spawner~
@@ -813,167 +923,123 @@ flee~
 return 1
 ~
 #10266
-Hint to 10252~
+Primeval track ability~
 2 c 0
 track~
-set tofind 10252
-if (!%actor.ability(Track)% || !%actor.ability(Navigation)%)
+* check abils and arg
+if !%arg% || !%actor.ability(Track)% || !%actor.ability(Navigation)%
   * Fail through to ability message
   return 0
   halt
 end
-* It's never south -- that's always backtrack
-set north %room.north(room)%
-set east %room.east(room)%
-set west %room.west(room)%
-set northeast %room.northeast(room)%
-set northwest %room.northwest(room)%
-set southeast %room.southeast(room)%
-set southwest %room.southwest(room)%
-if (%north% && %north.template% == %tofind%)
-  %send% %actor% You sense a trail to the north!
-  return 1
-elseif (%east% && %east.template% == %tofind%)
-  %send% %actor% You sense a trail to the east!
-  return 1
-elseif (%west% && %west.template% == %tofind%)
-  %send% %actor% You sense a trail to the west!
-  return 1
-elseif (%northeast% && %northeast.template% == %tofind%)
-  %send% %actor% You sense a trail to the northeast!
-  return 1
-elseif (%northwest% && %northwest.template% == %tofind%)
-  %send% %actor% You sense a trail to the northwest!
-  return 1
-elseif (%southeast% && %southeast.template% == %tofind%)
-  %send% %actor% You sense a trail to the southeast!
-  return 1
-elseif (%southwest% && %southwest.template% == %tofind%)
-  %send% %actor% You sense a trail to the southwest!
-  return 1
+* determine who they're tracking from available targets
+set target 0
+if dracosaur /= %arg%
+  set keyword dracosaur
+  * ambiguous keyword
+  if %instance.mob(10255)%
+    set target %instance.mob(10255)%
+  elseif %instance.mob(10256)%
+    set target %instance.mob(10256)%
+  elseif %instance.mob(10257)%
+    set target %instance.mob(10257)%
+  elseif %instance.mob(10252)%
+    * king last (he appears last in the adventure)
+    set target %instance.mob(10252)%
+  end
+elseif king /= %arg%
+  set keyword king
+  set target %instance.mob(10252)%
+elseif terrosaur /= %arg% || fearsome /= %arg%
+  set keyword terrosaur
+  set target %instance.mob(10253)%
+elseif archsorcerer /= %arg% || malfernes /= %arg%
+  set keyword malfernes
+  set target %instance.mob(10254)%
+  if !%target%
+    * guild version instead?
+    set target %instance.mob(18280)%
+  end
+elseif three-horned /= %arg% || horned /= %arg% || frilled /= %arg%
+  set keyword frilled
+  set target %instance.mob(10255)%
+elseif feathered /= %arg%
+  set keyword feathered
+  * ambiguous keyword
+  if %instance.mob(10256)%
+    set target %instance.mob(10256)%
+  elseif %instance.mob(10257)%
+    set target %instance.mob(10257)%
+  end
+elseif small /= %arg%
+  set keyword small
+  set target %instance.mob(10257)%
+elseif druid /= %arg%
+  set keyword druid
+  set target %instance.mob(10258)%
 end
+* see if that keyword was already tracked here
+eval found %%track_%keyword%%%
+if !%found%
+  if !%target%
+    * no target: fall through to normal track
+    return 0
+    halt
+  end
+  * ok find it
+  set my_id %room.template%
+  * It's never south -- that's always backtrack
+  set dir_list north east west northeast northwest southeast southwest
+  set found 0
+  set override 0
+  while %dir_list% && !%override%
+    set dir %dir_list.car%
+    set dir_list %dir_list.cdr%
+    eval to_room %%room.%dir%(room)%%
+    if %to_room% == %target.room%
+      * target is in that room
+      set override %dir%
+    elseif %to_room% && !%found% && %to_room.template% > %my_id%
+      * room has higher template id
+      set found %dir%
+    end
+  done
+  if %override%
+    set found %override%
+  end
+end
+if !%found%
+  * did not find any valid room: fall through to normal track command for error
+  return 0
+  halt
+end
+* ok: now we have found a direction
+%send% %actor% You find a trail to the %found%!
+* save for later
+set track_%keyword% %found%
+global track_%keyword%
+return 1
 ~
 #10267
-Hint to 10253~
+Primeval base camp track hint~
 2 c 0
 track~
-set tofind 10253
-if (!%actor.ability(Track)% || !%actor.ability(Navigation)%)
-  * Fail through to ability message
-  return 0
-  halt
-end
-* It's never south -- that's always backtrack
-set north %room.north(room)%
-set east %room.east(room)%
-set west %room.west(room)%
-set northeast %room.northeast(room)%
-set northwest %room.northwest(room)%
-set southeast %room.southeast(room)%
-set southwest %room.southwest(room)%
-if (%north% && %north.template% == %tofind%)
-  %send% %actor% You sense a trail to the north!
-  return 1
-elseif (%east% && %east.template% == %tofind%)
-  %send% %actor% You sense a trail to the east!
-  return 1
-elseif (%west% && %west.template% == %tofind%)
-  %send% %actor% You sense a trail to the west!
-  return 1
-elseif (%northeast% && %northeast.template% == %tofind%)
-  %send% %actor% You sense a trail to the northeast!
-  return 1
-elseif (%northwest% && %northwest.template% == %tofind%)
-  %send% %actor% You sense a trail to the northwest!
-  return 1
-elseif (%southeast% && %southeast.template% == %tofind%)
-  %send% %actor% You sense a trail to the southeast!
-  return 1
-elseif (%southwest% && %southwest.template% == %tofind%)
-  %send% %actor% You sense a trail to the southwest!
-  return 1
+* shows up after they fail to find tracks
+return 0
+wait 1
+if %actor.room% == %room% && %actor.ability(Track)% && %actor.ability(Navigation)%
+  %send% %actor% It might be easier to find tracks further from the base camp.
 end
 ~
 #10268
-Hint to 10254~
+Primeval backtracking track hint~
 2 c 0
 track~
-set tofind 10254
-if (!%actor.ability(Track)% || !%actor.ability(Navigation)%)
-  * Fail through to ability message
-  return 0
-  halt
-end
-* It's never south -- that's always backtrack
-set north %room.north(room)%
-set east %room.east(room)%
-set west %room.west(room)%
-set northeast %room.northeast(room)%
-set northwest %room.northwest(room)%
-set southeast %room.southeast(room)%
-set southwest %room.southwest(room)%
-if (%north% && %north.template% == %tofind%)
-  %send% %actor% You sense a trail to the north!
-  return 1
-elseif (%east% && %east.template% == %tofind%)
-  %send% %actor% You sense a trail to the east!
-  return 1
-elseif (%west% && %west.template% == %tofind%)
-  %send% %actor% You sense a trail to the west!
-  return 1
-elseif (%northeast% && %northeast.template% == %tofind%)
-  %send% %actor% You sense a trail to the northeast!
-  return 1
-elseif (%northwest% && %northwest.template% == %tofind%)
-  %send% %actor% You sense a trail to the northwest!
-  return 1
-elseif (%southeast% && %southeast.template% == %tofind%)
-  %send% %actor% You sense a trail to the southeast!
-  return 1
-elseif (%southwest% && %southwest.template% == %tofind%)
-  %send% %actor% You sense a trail to the southwest!
-  return 1
-end
-~
-#10269
-Hint to 10255~
-2 c 0
-track~
-set tofind 10255
-if (!%actor.ability(Track)% || !%actor.ability(Navigation)%)
-  * Fail through to ability message
-  return 0
-  halt
-end
-* It's never south -- that's always backtrack
-set north %room.north(room)%
-set east %room.east(room)%
-set west %room.west(room)%
-set northeast %room.northeast(room)%
-set northwest %room.northwest(room)%
-set southeast %room.southeast(room)%
-set southwest %room.southwest(room)%
-if (%north% && %north.template% == %tofind%)
-  %send% %actor% You sense a trail to the north!
-  return 1
-elseif (%east% && %east.template% == %tofind%)
-  %send% %actor% You sense a trail to the east!
-  return 1
-elseif (%west% && %west.template% == %tofind%)
-  %send% %actor% You sense a trail to the west!
-  return 1
-elseif (%northeast% && %northeast.template% == %tofind%)
-  %send% %actor% You sense a trail to the northeast!
-  return 1
-elseif (%northwest% && %northwest.template% == %tofind%)
-  %send% %actor% You sense a trail to the northwest!
-  return 1
-elseif (%southeast% && %southeast.template% == %tofind%)
-  %send% %actor% You sense a trail to the southeast!
-  return 1
-elseif (%southwest% && %southwest.template% == %tofind%)
-  %send% %actor% You sense a trail to the southwest!
-  return 1
+* when they try to track from the "backtracking" room
+return 0
+wait 1
+if %actor.room% == %room% && %actor.ability(Track)% && %actor.ability(Navigation)%
+  %send% %actor% You probably need to go back to the base camp to get your bearings before you can track anything around here.
 end
 ~
 #10270
@@ -1038,6 +1104,118 @@ if (%self.fighting% || %self.disabled% || %actor.room% != %self.room%)
 end
 %aggro% %actor%
 ~
+#10272
+Primeval item BOE/BOP craft/loot twiddler~
+1 n 100
+~
+* items default to BOP but are set BOE if they come from a shop or craft
+set actor %self.carried_by%
+if !%actor%
+  set actor %self.worn_by%
+end
+if !%actor%
+  halt
+end
+if %actor% && %actor.is_pc%
+  * Item was crafted or bought
+  if %self.is_flagged(BOP)%
+    nop %self.flag(BOP)%
+  end
+  if !%self.is_flagged(BOE)%
+    nop %self.flag(BOE)%
+  end
+  * Probably need to unbind when BOE
+  nop %self.bind(nobody)%
+else
+  * Item was probably dropped as loot
+  if !%self.is_flagged(BOP)%
+    nop %self.flag(BOP)%
+  end
+  if %self.is_flagged(BOE)%
+    nop %self.flag(BOE)%
+  end
+end
+detach 10272 %self.id%
+~
+#10273
+Primeval shop: sell resources to shop~
+0 c 0
+sell~
+* Usage: sell <all | item>
+set valid_vnums 10252 10253 10254 10265 10267
+set premium_value 10252 10253 10254
+return 1
+if %arg% == all
+  set all 1
+  set targ 0
+else
+  set all 0
+  set targ %actor.obj_target_inv(%arg.car%)%
+  if !%arg%
+    %send% %actor% Sell what? (or try 'sell all')
+    halt
+  end
+end
+* ready to loop
+set found 0
+set item %actor.inventory%
+while %item% && (%all% || !%found%)
+  set next_item %item.next_in_list%
+  * use %ok% to control what we do in this loop
+  if %all%
+    set ok 1
+  else
+    * single-target: make sure this was the target
+    if %targ% == %item%
+      set ok 1
+    else
+      set ok 0
+    end
+  end
+  * next check the obj type if we got the ok
+  if %ok%
+    if !(%valid_vnums% ~= %item.vnum%)
+      if %all%
+        set ok 0
+      else
+        %send% %actor% You can't sell @%item% here.
+        * Break out of the loop early since it was a single-target fail
+        halt
+      end
+    end
+  end
+  * still ok? go ahead and sell it.
+  if %ok%
+    * determine value
+    if %premium_value% ~= %item.vnum%
+      set value 10
+    else
+      set value 1
+    end
+    * give token
+    %actor.give_currency(10250,%value%)%
+    * messaging
+    %send% %actor% # You sell @%item% for %value% %currency.10250(%value%)%.
+    %echoaround% %actor% # ~%actor% sells @%item%.
+    * increment counter
+    eval found %found% + 1
+    %purge% %item%
+  end
+  * and repeat the loop
+  set item %next_item%
+done
+if %found%
+  set amount %actor.currency(10250)%
+  %send% %actor% # You now have %amount% %currency.10250(%amount%)%.
+else
+  * didn't sell any?
+  if %all%
+    %send% %actor% You didn't have anything to sell.
+  else
+    %send% %actor% You don't seem to have %arg.ana% %arg%.
+  end
+end
+~
 #10274
 Primeval environment~
 2 bw 5
@@ -1056,5 +1234,163 @@ switch %random.4%
     %echo% The ground rumbles beneath you.
   break
 done
+~
+#10275
+Primeval Portal: learn craft book~
+1 c 2
+learn~
+* Usage: learn <self>
+if %actor.obj_target(%arg%)% != %self%
+  return 0
+  halt
+end
+* all other cases will return 1
+* switch MUST set vnum_list, abil_list, and name_list
+switch %self.vnum%
+  case 10269
+    * book of primordial weapon schematics
+    set vnum_list 10268 10270 10272 10282 10266
+    set abil_list 196 196 170 170 196
+    set name_list primordial axe, dracosaur bone spear, jeweled bone staff, edge of extinction, and Tome of the Primordium
+  break
+  case 10273
+    * book of dracosaur armor schematics
+    set vnum_list 10274 10287 10288 10289 10290
+    set abil_list 199 197 182 199 197
+    set name_list dracosaur scale robe, dracoscale armor, dracosaur hide armor, dracosaur tooth robe, and dracosaur fang armor
+  break
+  case 10275
+    * book of primordial footwear designs
+    set vnum_list 10276 10278 10291 10292 10293
+    set abil_list 197 197 199 199 182
+    set name_list dracosaur scale boots, primordial boots, dracosaur scale sandals, dracosaur tooth boots, and dracosaur fang shoes
+  break
+  case 10277
+    * book of dracosaur wristwear designs
+    set vnum_list 10255 10280 10258 10294 10256
+    set abil_list 182 197 199 197 199
+    set name_list dracosaur bone bracelet, stunning dracosaur wristguard, obsidian bracelet, dracoscale vambraces, dracosaur scale wristband
+  break
+  case 10281
+    * book of dracosaur belt patterns
+    set vnum_list 10297 10298 10299
+    set abil_list 182 199 197
+    set name_list dracosaur fang belt, obsidian dracosaur waistband, and mighty dracoscale belt
+  break
+  default
+    %send% %actor% There's nothing you can learn from this.
+    halt
+  break
+done
+* check if the player needs any of them
+set any 0
+set error 0
+set vnum_copy %vnum_list%
+while %vnum_copy%
+  * pluck first numbers out
+  set vnum %vnum_copy.car%
+  set vnum_copy %vnum_copy.cdr%
+  set abil %abil_list.car%
+  set abil_list %abil_list.cdr%
+  if !%actor.learned(%vnum%)%
+    if %actor.ability(%abil%)%
+      set any 1
+    else
+      set error 1
+    end
+  end
+done
+* how'd we do?
+if %error% && !%any%
+  %send% %actor% You don't have the right ability to learn anything new from @%self%.
+  halt
+elseif !%any%
+  %send% %actor% There aren't any recipes you can learn from @%self%.
+  halt
+end
+* ok go ahead and teach them
+while %vnum_list%
+  * pluck first numbers out
+  set vnum %vnum_list.car%
+  set vnum_list %vnum_list.cdr%
+  if !%actor.learned(%vnum%)%
+    nop %actor.add_learned(%vnum%)%
+  end
+done
+* and report...
+%send% %actor% You study @%self% and learn: %name_list%
+%echoaround% %actor% ~%actor% studies @%self%.
+%purge% %self%
+~
+#10276
+Primeval: Initialize delayed despawner~
+0 n 100
+~
+set spawn_time %timestamp%
+remote spawn_time %self.id%
+~
+#10277
+Primeval: Delayed despawn~
+0 ab 10
+~
+if %self.var(spawn_time,0)% + 1800 < %timestamp%
+  %adventurecomplete%
+  %purge% %self%
+end
+~
+#10296
+Primeval Portal loot replacer~
+1 n 100
+~
+* list of vnums and size of the list: WARNING this line must not pass 255 characters
+set vnum_list 10268 10270 10272 10282 10266 10274 10287 10288 10289 10290 10276 10278 10291 10292 10293 10255 10280 10258 10294 10256 10297 10298 10299
+set list_size 23
+set mob %self.carried_by%
+* pick one at random
+eval pos %%random.%list_size%%%
+set vnum 0
+while %pos% > 0 && %vnum_list%
+  set vnum %vnum_list.car%
+  set vnum_list %vnum_list.cdr%
+  eval pos %pos% - 1
+done
+* ensure we found one
+if !%vnum%
+  %echo% [Portal to the Primeval] Error determining loot.
+  wait 1
+  %purge% %self%
+  halt
+end
+* load it
+if %mob%
+  %load% obj %vnum% %mob% inv
+  set loaded %mob.inventory%
+else
+  %load% obj %vnum% %self.room%
+  set loaded %self.room.contents%
+end
+* check it
+if !%loaded% || %loaded.vnum% != %vnum%
+  %echo% [Portal to the Primeval] Error loading loot.
+  wait 1
+  %purge% %self%
+  halt
+end
+* flags/binding
+if %loaded.is_flagged(BOP)%
+  nop %loaded.bind(%self%)%
+end
+if %mob% && %mob.is_npc%
+  * hard/group flags
+  if %mob.mob_flagged(HARD)% && !%loaded.is_flagged(HARD-DROP)%
+    nop %loaded.flag(HARD-DROP)%
+  end
+  if %mob.mob_flagged(GROUP)% && !%loaded.is_flagged(GROUP-DROP)%
+    nop %loaded.flag(GROUP-DROP)%
+  end
+  %scale% %loaded% %self.level%
+end
+wait 1
+%purge% %self%
 ~
 $

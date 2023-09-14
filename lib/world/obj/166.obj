@@ -188,9 +188,36 @@ a sense of rage~
 A sense of rage can be felt in the room.~
 How can you see a feeling?
 ~
-3 k 0 0 1
+3 k 0 0 2
 0 0 0
-10 12
+10 4
+S
+#16615
+puddle~
+a puddle~
+There's a puddle on the ground.~
+It's a little puddle.
+~
+5 g 0 0 2
+6 6 0
+0 3
+C
+1 1
+M
+18
+$p dries up.~
+S
+#16616
+ribbon red giant~
+a giant red ribbon~
+A giant red ribbon is floating in the breeze.~
+   This ribbon is used when making a giant straw goat. Find a nice outdoor spot
+in your empire and 'craft giant straw goat'.
+~
+3 p a 0 2
+0 0 0
+0 0
+Q 16660
 S
 #16618
 outfit reindeer set~
@@ -270,8 +297,8 @@ comes from within, but the design of the metal makes it impossible to see what
 causes it.
 type: buff <target> to extend how long the ornament sticks around.
 ~
-3 cv 0 0 10
-0 0 0
+29 v 0 0 11
+-1 1 0
 2 576
 T 16627
 S
@@ -306,7 +333,7 @@ S
 pixy frozen~
 a frozen pixy~
 A safely frozen pixy is in mid flutter.~
-   An already beautiful creature, this pixy has a enhanced loveliness from the
+   An already beautiful creature, this pixy has an enhanced loveliness from the
 frost coating it's entire body.
 Type: 'place pixy' to top the tree.
 ~
@@ -375,6 +402,72 @@ than a beautiful winter ornament.
 3 v 0 0 2
 0 0 0
 10 2304
+S
+#16640
+certificate pet adoption~
+a pet adoption certificate~
+A pet adoption certificate is lying here.~
+   This certificate entitles you to adopt a new puppy or kitten! Whichever one
+you choose will be added to your companion command.
+Type 'adopt' to see your options.
+~
+3 p a 0 1
+0 0 0
+0 0
+C
+1 1
+T 16640
+S
+#16641
+leash pet holiday immortals immortal's~
+an immortal's holiday pet leash~
+An immortal's holiday pet leash is lying here.~
+   This pet leash allows immortals to repair holiday pets on players. Type
+'leash' to see instructions. This only works for immortals.
+Additional notes:
+- If you 'clear' a player's pet, you can give them obj 16640 which grants
+  a new pet.
+~
+3 k a 0 1
+0 0 0
+0 0
+C
+1 1
+T 16641
+S
+#16643
+goat straw burning~
+a burning straw goat~
+A straw goat crackles and spits as it burns.~
+   Someone put a lot of time into making the straw goat, only to have it burned
+down by a common vandal. What is this city coming to?
+~
+29 0 0 0 4
+-1 1 9
+0 576
+M
+18
+The straw goat finally burns itself out, leaving only ash that blows away on the wind.~
+T 16644
+S
+#16644
+goat straw giant~
+the giant straw goat~
+A giant straw goat looms over you.~
+   This enormous goat has been constructed from straw, wood, and rope to
+celebrate the Yule season. Its long, curved horns are dusted with snow at the
+top, well out of reach.
+~
+3 0 0 0 3
+0 0 0
+0 576
+C
+1 1
+I 11 16643 100.00 1  # LIGHT: burning straw goat
+M
+18
+Citizens show up to take down the giant straw goat and shuffle off with the remaining materials.~
+T 16647
 S
 #16650
 wax sleigh elfish flying~
@@ -621,7 +714,7 @@ S
 whistle pet mini-grinchy grinchy~
 a mini-grinchy pet whistle~
 A mini-grinchy pet whistle is lying here.~
-   This whistle will teach you the tiny grinchy demon mini-pet. Type 'use
+   This whistle will teach you the tiny grinchy demon minipet. Type 'use
 whistle'.
 ~
 19 p a 0 7
@@ -629,10 +722,10 @@ whistle'.
 2 0
 S
 #16665
-whistle reindeer mini-pet dog~
-a reindeer dog mini-pet whistle~
-A reindeer dog mini-pet whistle is lying here.~
-This whistle will teach you the reindeer dog mini-pet.
+whistle reindeer minipet dog~
+a reindeer dog minipet whistle~
+A reindeer dog minipet whistle is lying here.~
+This whistle will teach you the reindeer dog minipet.
 Type 'use whistle'.
 ~
 19 p a 0 8
@@ -658,6 +751,56 @@ A
 5 1 3
 C
 100 400
+S
+#16667
+lantern little~
+the lantern~
+A little lantern is floating in the air.~
+This little lantern is floating in the air.
+~
+29 k 0 0 4
+-1 1 0
+0 4
+C
+1 1
+T 16666
+S
+#16668
+gingerbread-man bread man~
+a gingerbread man~
+A gingerbread man lies dead on the ground.~
+It appears to be a dead gingerbread man.
+~
+6 0 a 0 1
+24 0 0
+0 24
+C
+1 1
+M
+4
+You grab the gingerbread man and take a huge bite out of him!~
+M
+5
+$n grabs the gingerbread man and takes a huge bite out of him!~
+M
+17
+The gingerbread man has gone bad and you discard it.~
+S
+#16669
+snowman snow-man man little~
+a little snowman~
+A little snowman is standing here.~
+It's a handsome little snowman with a button nose and a tophat.
+~
+3 0 0 0 3
+0 0 0
+10 8
+C
+1 1
+I 26 16615 100.00 1  # DECAYS-TO: puddle
+M
+18
+$p melts into a puddle.~
 S
 #16670
 spirit christmas hearty~
@@ -835,7 +978,7 @@ A festive tambourine is here.~
 song. Hold this tambourine and play it for 10 different citizens to complete
 the 'Cheer for the City' quest.
 ~
-22 0 ao 0 5
+22 0 ao 0 6
 0 0 0
 0 0
 C
@@ -844,44 +987,44 @@ M
 2
 You shake the tambourine!~
 M
-3
-$n shakes $p!~
+2
+You are filled with the holiday spirit!~
 M
 2
 You tap the tambourine!~
 M
-3
-$n taps $p!~
+2
+You dance around!~
 M
 2
 You tap the tambourine as you shake it!~
 M
-3
-$n taps $p as $e shakes it!~
+2
+You are filled with the winter cheer!~
 M
 2
 You dance around as you play the tambourine!~
 M
 3
+$n shakes $p!~
+M
+3
+You are filled with the holiday spirit!~
+M
+3
+$n taps $p!~
+M
+3
+You dance around!~
+M
+3
+$n taps $p as $e shakes it!~
+M
+3
+You are filled with the winter cheer!~
+M
+3
 $n dances around as $e plays $p!~
-M
-2
-You are filled with the holiday spirit!~
-M
-3
-You are filled with the holiday spirit!~
-M
-2
-You are filled with the winter cheer!~
-M
-3
-You are filled with the winter cheer!~
-M
-2
-You dance around!~
-M
-3
-You dance around!~
 Q 16676
 T 16676
 S
@@ -893,7 +1036,7 @@ Some sleigh bells are here.~
 it. Hold the sleigh bells and play them at 4 different dedicate-able buildings
 (like shrines and statues) to complete the 'Charity Concert' quest.
 ~
-22 0 ao 0 7
+22 0 ao 0 8
 0 0 0
 0 0
 C
@@ -902,46 +1045,132 @@ M
 2
 You shake the sleigh bells!~
 M
-3
-$n shakes $p!~
+2
+You are filled with the winter cheer!~
 M
 2
 You slap your knee and shake the sleigh bells!~
 M
-3
-$n slaps $s knee and shakes $p!~
+2
+You dance around!~
 M
 2
 You tap your foot as you shake the sleigh bells!~
 M
-3
-$n taps $s foot as $e shakes $p!~
+2
+You are filled with the holiday spirit!~
 M
 2
 You dance around as you shake the sleigh bells!~
 M
 3
+$n shakes $p!~
+M
+3
+You are filled with the winter cheer!~
+M
+3
+$n slaps $s knee and shakes $p!~
+M
+3
+You dance around!~
+M
+3
+$n taps $s foot as $e shakes $p!~
+M
+3
+You are filled with the holiday spirit!~
+M
+3
 $n dances around as $e shakes $p!~
-M
-2
-You are filled with the holiday spirit!~
-M
-3
-You are filled with the holiday spirit!~
-M
-2
-You are filled with the winter cheer!~
-M
-3
-You are filled with the winter cheer!~
-M
-2
-You dance around!~
-M
-3
-You dance around!~
 Q 16677
 T 16676
+S
+#16678
+stocking knitted green~
+a green knitted stocking~
+A green knitted stocking is lying here.~
+   The stocking is far too large to wear, but it's the type that someone might
+hang from a fireplace on Christmas Eve. This one feels like it contains a
+gift... Type 'open stocking' to receive it. But be sure to open it before the
+event ends.
+~
+3 p a 0 5
+0 0 0
+11 0
+T 16678
+S
+#16679
+whistle krampus tiny~
+a tiny krampus whistle~
+A tiny krampus whistle is lying here.~
+This whistle will teach you the tiny krampus minipet. Type 'use whistle'.
+~
+19 p a 0 8
+16679 0 0
+2 0
+S
+#16680
+list naughty scrap parchment~
+the naughty list~
+A scrap of parchment has been left on the ground.~
+   This is Father Christmas's actual naughty list! You were expecting to see a
+lot of names, but it appears that children are innocent and always make it on
+the nice list. Instead, there's just a strange sigil on the parchment.
+   Find the ice cave in the Winter Wonderland and use this parchment to summon
+the demon who's named on this parchment. Defeat it to finish the quest.
+Type 'use list <normal | hard | group | boss>' in the ice cave.
+~
+3 p a 0 3
+0 0 0
+0 0
+C
+1 1
+E
+sigil name~
+   You don't know which demon this sigil belongs to, but you can almost feel
+the evil as you read it.
+~
+Q 16680
+T 16680
+S
+#16683
+object new~
+snow cube~
+A new object is sitting here.~
+~
+0 0 a 0 1
+0 0 0
+0 0
+S
+#16685
+whistle burning straw goat~
+a burning straw goat whistle~
+A burning straw goat whistle is lying here.~
+   This whistle will teach you the burning straw goat minipet. Type 'use
+whistle'.
+~
+19 p a 0 10
+16685 0 0
+2 0
+S
+#16690
+vortex polar miniature constantly-spinning spinning~
+the miniature polar vortex~
+A constantly-spinning polar vortex is held wihtin a magical bubble.~
+   This miniature polar vortex whirls and rages within the magical bubble that
+holds it. Nothing seems to be able to pass through the outer layer except for
+the cookies and chocolates found inside your stockings. Put cookies into the
+polar vortex until it's satisfied!
+~
+3 p a 0 6
+0 0 0
+10 0
+C
+1 1
+Q 16690
+T 16690
+T 16691
 S
 #16695
 jar magewood empty~

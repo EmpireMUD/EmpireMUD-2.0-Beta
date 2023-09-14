@@ -14,6 +14,51 @@ M
 M
 10417 75.00 0
 S
+#10401
+Ruined Hamlet~
+The Burnt Ruins of a Small Hamlet~
+&?.&0\&?.&0]~
+10 -1 diou 0
+0 0 0 -1
+E
+hamlet ruined burnt ruins~
+It looks like the hamlet has burnt down. It smells terrible.
+~
+R
+1002 1 5 0
+S
+#10457
+Rat-Fur Tent~
+Haxaw's Medicine Tent~
+&0[  ]~
+1 0 aq 0
+0 0 0 -1
+D
+   Now that you've climbed into the hanging tent, it seems roomier than you
+expected. The rat-fur walls keep it warm and cozy, albeit at the cost of your
+precious sense of smell. Surprisingly, considering that goblins are known to be
+hoarders, there are no decorations in here. The sole contents are some ratty
+sacks in the corner. A sign hanging from the tent's ceiling says that Haxaw has
+goods for sale.
+~
+E
+ratty sacks corner~
+   The sacks, which are definitely made from rats, seem to contain only
+foul-smelling (and fowl-smelling) herbs and fungi.
+~
+E
+sign list~
+Haxaw sells the following healer gear:
+ Haxaw's poison ring  (finger)
+ goblin neck smile  (neck)
+ flail of many blessings  (magic fire weapon)
+ goose-beak totem  (offhand item)
+ goblin deathshroud  (about body, mage armor)
+ doubleskin gloves  (hands, mage armor)
+
+Use the list, list id, and buy commands to shop from Haxaw.
+~
+S
 #10479
 Goblin War Tent~
 A Goblin War Tent~

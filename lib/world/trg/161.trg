@@ -76,7 +76,7 @@ end
 ~
 #16103
 hydra head random spawn~
-0 bw 50
+0 bw 100
 ~
 set person %self.room.people%
 set headcount 0
@@ -85,9 +85,16 @@ while %person%
     if %person.vnum% >= 16101 && %person.vnum% <= 16104
       eval headcount %headcount% + 1
     end
+  else
+    dg_affect #16102 %person% off
+    dg_affect #16102 %person% waterwalk on 15
   end
   set person %person.next_in_room%
 done
+eval spawn %random.2%
+if %spawn% == 2
+  halt
+end
 if %headcount% <= 3
   %echo% A new bulge on the hydra's trunk begins forming.
   wait 5 s
@@ -121,9 +128,15 @@ while %person%
   if %person.is_pc% && %person.empire%
     nop %person.empire.start_progress(16100)%
   end
-  if %person.is_pc% && %person.inventory(16133)%
-    %send% %person% The hydra seeking stone flares and vanishes now that you've found the beast.
-    %purge% %person.inventory(16133)%
+  if %person.is_pc%
+    if %person.affect(16102)%
+      dg_affect #16102 %person% off
+    end
+    dg_affect #16102 %person% waterwalk on 15
+    if %person.inventory(16133)%
+      %send% %person% The hydra seeking stone flares and vanishes now that you've found the beast.
+      %purge% %person.inventory(16133)%
+    end
   end
   set person %person.next_in_room%
 done
@@ -219,7 +232,7 @@ nop %instance.set_location(%instance.real_location%)%
 hydra withering head debuff~
 0 k 20
 ~
-switch %random.13%
+switch 3
   case 1
     eval DebuffValue ( %self.level% - 274 ) / 15 + 2
     set WitheringDebuff greatness
@@ -273,7 +286,7 @@ switch %random.13%
     set WitheringDebuff bonus-healing
   break
 done
-switch %random.3%
+switch 2
   case 1
     set target %random.enemy%
   break
@@ -344,7 +357,7 @@ while %check_pet%
     %load% mob %GrantPet%
     set GrantPet %self.room.people.name%
     %purge% %self.room.people%
-    %send% %actor% You gain '%GrantPet%' as a mini-pet. Use the minipets command to summon it.
+    %send% %actor% You gain '%GrantPet%' as a minipet. Use the minipets command to summon it.
     set check_pet 0
     %purge% %self%
   else
@@ -406,7 +419,10 @@ switch %random.4%
     done
   break
 done
-%heal% %random.ally% health 150
+set ally %random.ally%
+if %ally%
+  %heal% %ally% health 150
+end
 ~
 #16114
 when hydra gear is crafted~
@@ -611,6 +627,14 @@ switch %random_roll%
     end
   break
 done
+~
+#16119
+someone tries to leave the hydra~
+0 s 100
+~
+if %actor.affect(16102)%
+  dg_affect #16102 %actor% off
+end
 ~
 #16120
 loot replacer~

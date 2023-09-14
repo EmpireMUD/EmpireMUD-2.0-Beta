@@ -145,6 +145,7 @@ void change_terrain(room_data *room, sector_vnum sect, sector_vnum base_sect) {
 	
 	// tear down any building data and customizations
 	disassociate_building(room);
+	decustomize_room(room);
 	
 	// keep crop if it has one
 	if (SECT_FLAGGED(st, SECTF_HAS_CROP_DATA) && ROOM_CROP(room)) {
@@ -780,7 +781,7 @@ GLB_FUNCTION(run_global_mine_data) {
 	room_data *room = (data ? data->room : NULL);
 	
 	if (!data || !room) {
-		return;	// no work
+		return FALSE;	// no work
 	}
 	
 	set_room_extra_data(room, ROOM_EXTRA_MINE_GLB_VNUM, GET_GLOBAL_VNUM(glb));
@@ -796,6 +797,8 @@ GLB_FUNCTION(run_global_mine_data) {
 	if (ch && GET_GLOBAL_ABILITY(glb) != NO_ABIL) {
 		gain_ability_exp(ch, GET_GLOBAL_ABILITY(glb), 75);
 	}
+	
+	return TRUE;
 }
 
 
@@ -827,16 +830,22 @@ void init_mine(room_data *room, char_data *ch, empire_data *emp) {
 * Changes the sector when an outdoor tile is 'burned down', if there's an
 * evolution for it. (No effect on rooms without the evolution.)
 *
-* @param room_data *room The outdoor room with a BURNS-TO evolution.
+* @param room_data *room The outdoor room with a matching evolution.
+* @param int evo_type Should be EVO_BURNS_TO or EVO_BURN_STUMPS
 */
-void perform_burn_room(room_data *room) {
+void perform_burn_room(room_data *room, int evo_type) {
 	char buf[MAX_STRING_LENGTH], from[256], to[256];
 	struct evolution_data *evo;
 	sector_data *sect;
 	
-	if ((evo = get_evolution_by_type(SECT(room), EVO_BURNS_TO)) && (sect = sector_proto(evo->becomes)) && SECT(room) != sect) {
+	if ((evo = get_evolution_by_type(SECT(room), evo_type)) && (sect = sector_proto(evo->becomes)) && SECT(room) != sect) {
 		if (ROOM_PEOPLE(room)) {
-			strcpy(from, GET_SECT_NAME(SECT(room)));
+			if (ROOM_CROP(room)) {
+				strcpy(from, GET_CROP_NAME(ROOM_CROP(room)));
+			}
+			else {
+				strcpy(from, GET_SECT_NAME(SECT(room)));
+			}
 			strtolower(from);
 			strcpy(to, GET_SECT_NAME(sect));
 			strtolower(to);
@@ -929,6 +938,10 @@ void set_room_custom_name(room_data *room, char *name) {
 		free(ROOM_CUSTOM_NAME(room));
 	}
 	ROOM_CUSTOM_NAME(room) = name ? str_dup(name) : NULL;
+	if (!name) {
+		REMOVE_BIT(ROOM_BASE_FLAGS(room), ROOM_AFF_HIDE_REAL_NAME);
+		affect_total_room(room);
+	}
 	request_world_save(GET_ROOM_VNUM(room), WSAVE_ROOM);
 }
 
@@ -1323,13 +1336,7 @@ void annual_update_map_tile(struct map_data *tile) {
 * Runs an annual update (mainly, maintenance) on the vehicle.
 */
 void annual_update_vehicle(vehicle_data *veh) {
-	static struct resource_data *default_res = NULL;
 	char *msg;
-	
-	// resources if it doesn't have its own
-	if (!default_res) {
-		add_to_resource_list(&default_res, RES_COMPONENT, COMP_NAILS, 1, 0);
-	}
 	
 	// ensure a save
 	request_vehicle_save_in_world(veh);
@@ -1339,6 +1346,14 @@ void annual_update_vehicle(vehicle_data *veh) {
 	
 	// does not take annual damage (unless incomplete)
 	if (!VEH_YEARLY_MAINTENANCE(veh) && VEH_IS_COMPLETE(veh)) {
+		// check if it's abandoned furniture: no owner, unowned room, no instance id, not in an adventure, no players here
+		if (!VEH_OWNER(veh) && VEH_INSTANCE_ID(veh) != NOTHING && IN_ROOM(veh) && !ROOM_OWNER(IN_ROOM(veh)) && !IS_ADVENTURE_ROOM(IN_ROOM(veh)) && !any_players_in_room(IN_ROOM(veh))) {
+			// random chance of decay
+			if (!number(0, 51)) {
+				msg = veh_get_custom_message(veh, VEH_CUSTOM_RUINS_TO_ROOM);
+				ruin_vehicle(veh, msg ? msg : "$V is carted off!");
+			}
+		}
 		return;
 	}
 	
@@ -1666,6 +1681,8 @@ void schedule_burn_down(room_data *room) {
 * @param room_data *room The room to burn.
 */
 void start_burning(room_data *room) {
+	descriptor_data *desc;
+	
 	room = HOME_ROOM(room);	// burning is always on the home room
 	
 	if (!COMPLEX_DATA(room)) {
@@ -1678,6 +1695,17 @@ void start_burning(room_data *room) {
 	// ensure no building or dismantling
 	stop_room_action(room, ACT_BUILDING);
 	stop_room_action(room, ACT_DISMANTLING);
+	
+	if (ROOM_OWNER(room)) {
+		log_to_empire(ROOM_OWNER(room), ELOG_HOSTILITY, "Your %s has caught on fire at (%d, %d)", GET_BUILDING(room) ? skip_filler(GET_BLD_NAME(GET_BUILDING(room))) : "building", X_COORD(room), Y_COORD(room));
+	}
+	
+	// messaging
+	LL_FOREACH(descriptor_list, desc) {
+		if (STATE(desc) == CON_PLAYING && desc->character && AWAKE(desc->character) && HOME_ROOM(IN_ROOM(desc->character)) == HOME_ROOM(room)) {
+			msg_to_char(desc->character, "The building is on fire!\r\n");
+		}
+	}
 }
 
 
@@ -1817,6 +1845,7 @@ struct empire_city_data *create_city_entry(empire_data *emp, char *name, room_da
 */
 void reset_one_room(room_data *room) {
 	char field[256], str[MAX_INPUT_LENGTH];
+	struct affected_type *aff;
 	struct reset_com *reset, *next_reset;
 	char_data *tmob = NULL; /* for trigger assignment */
 	char_data *mob = NULL;
@@ -1830,6 +1859,16 @@ void reset_one_room(room_data *room) {
 	// start loading
 	DL_FOREACH_SAFE(room->reset_commands, reset, next_reset) {
 		switch (reset->command) {
+			case 'A': {	// add affect to mob
+				if (mob) {
+					aff = create_aff(reset->arg1, reset->arg3, reset->arg5, reset->arg4, asciiflag_conv(reset->sarg1), NULL);
+					aff->cast_by = reset->arg2;
+					// arg3 comes in as either UNLIMITED or seconds-left, so no conversion needed
+					affect_to_char_silent(mob, aff);
+					free(aff);
+				}
+				break;
+			}
 			case 'M': {	// read a mobile
 				mob = read_mobile(reset->arg1, FALSE);	// no scripts
 				MOB_FLAGS(mob) = reset->arg2;
@@ -1840,8 +1879,17 @@ void reset_one_room(room_data *room) {
 				REMOVE_BIT(MOB_FLAGS(mob), MOB_EXTRACTED);
 				
 				GET_ROPE_VNUM(mob) = reset->arg3;
+				check_scheduled_events_mob(mob);
 				
 				tmob = mob;
+				break;
+			}
+			case 'N': {	// extra mob info
+				if (mob) {
+					if (reset->arg2 > 0) {
+						set_mob_spawn_time(mob, reset->arg2);
+					}
+				}
 				break;
 			}
 			
@@ -1888,7 +1936,10 @@ void reset_one_room(room_data *room) {
 			case 'S': { // custom string
 				if (mob) {
 					half_chop(reset->sarg1, field, str);
-					if (is_abbrev(field, "keywords")) {
+					if (is_abbrev(field, "sex")) {
+						change_sex(mob, atoi(str));
+					}
+					else if (is_abbrev(field, "keywords")) {
 						change_keywords(mob, str);
 					}
 					else if (is_abbrev(field, "longdescription")) {
@@ -1933,17 +1984,13 @@ void reset_one_room(room_data *room) {
 					if (!SCRIPT(tmob)) {
 						create_script_data(tmob, MOB_TRIGGER);
 					}
-					else {
-						add_var(&(SCRIPT(tmob)->global_vars), reset->sarg1, reset->sarg2, reset->arg3);
-					}
+					add_var(&(SCRIPT(tmob)->global_vars), reset->sarg1, reset->sarg2, reset->arg3);
 				}
 				else if (reset->arg1 == WLD_TRIGGER) {
 					if (!room->script) {
 						create_script_data(room, WLD_TRIGGER);
 					}
-					else {
-						add_var(&(room->script->global_vars), reset->sarg1, reset->sarg2, reset->arg3);
-					}
+					add_var(&(room->script->global_vars), reset->sarg1, reset->sarg2, reset->arg3);
 				}
 				break;
 			}
@@ -1971,6 +2018,9 @@ void startup_room_reset(void) {
 	// prevent putting things in rooms from triggering a save
 	block_world_save_requests = TRUE;
 	
+	// randomly spread out object timers so they're not all on the same second
+	add_chaos_to_obj_timers = TRUE;
+	
 	HASH_ITER(hh, world_table, room, next_room) {
 		affect_total_room(room);
 		if (room->reset_commands) {
@@ -1979,6 +2029,7 @@ void startup_room_reset(void) {
 	}
 	
 	block_world_save_requests = FALSE;
+	add_chaos_to_obj_timers = FALSE;
 }
 
 
@@ -2091,10 +2142,18 @@ void perform_change_sect(room_data *loc, struct map_data *map, sector_data *sect
 	
 	// for updating territory counts
 	was_large = (loc && SECT(loc)) ? LARGE_CITY_RADIUS(loc) : FALSE;
-	was_ter = (loc && ROOM_OWNER(loc)) ? get_territory_type_for_empire(loc, ROOM_OWNER(loc), FALSE, &junk) : TER_FRONTIER;
+	was_ter = (loc && ROOM_OWNER(loc)) ? get_territory_type_for_empire(loc, ROOM_OWNER(loc), FALSE, &junk, NULL) : TER_FRONTIER;
 	
 	// preserve
 	old_sect = (loc ? SECT(loc) : map->sector_type);
+	
+	// decustomize
+	if (loc) {
+		decustomize_room(loc);
+	}
+	else {
+		decustomize_shared_data(map->shared);
+	}
 	
 	// update room
 	if (loc) {
@@ -2150,7 +2209,7 @@ void perform_change_sect(room_data *loc, struct map_data *map, sector_data *sect
 	if (loc && ROOM_OWNER(loc)) {
 		if (was_large != LARGE_CITY_RADIUS(loc)) {
 			struct empire_island *eisle = get_empire_island(ROOM_OWNER(loc), GET_ISLAND_ID(loc));
-			is_ter = get_territory_type_for_empire(loc, ROOM_OWNER(loc), FALSE, &junk);
+			is_ter = get_territory_type_for_empire(loc, ROOM_OWNER(loc), FALSE, &junk, NULL);
 			
 			if (was_ter != is_ter) {	// did territory type change?
 				SAFE_ADD(EMPIRE_TERRITORY(ROOM_OWNER(loc), was_ter), -1, 0, UINT_MAX, FALSE);
@@ -2181,6 +2240,16 @@ void perform_change_sect(room_data *loc, struct map_data *map, sector_data *sect
 	}
 	else {
 		remove_extra_data(loc ? &ROOM_EXTRA_DATA(loc) : &map->shared->extra_data, ROOM_EXTRA_SECTOR_TIME);
+	}
+	
+	// check for icon locking
+	if (SECT_FLAGGED(sect, SECTF_LOCK_ICON)) {
+		if (map) {
+			lock_icon_map(map, NULL);
+		}
+		else if (loc) {
+			lock_icon(loc, NULL);
+		}
 	}
 	
 	request_mapout_update(map ? map->vnum : GET_ROOM_VNUM(loc));
@@ -2500,7 +2569,7 @@ void read_empire_territory(empire_data *emp, bool check_tech) {
 			// only count each building as 1
 			if (COUNTS_AS_TERRITORY(iter)) {
 				isle = get_empire_island(e, GET_ISLAND_ID(iter));
-				ter_type = get_territory_type_for_empire(iter, e, FALSE, &junk);
+				ter_type = get_territory_type_for_empire(iter, e, FALSE, &junk, NULL);
 				
 				SAFE_ADD(EMPIRE_TERRITORY(e, ter_type), 1, 0, UINT_MAX, FALSE);
 				SAFE_ADD(isle->territory[ter_type], 1, 0, UINT_MAX, FALSE);
@@ -3008,7 +3077,7 @@ void clear_private_owner(int id) {
 		if (ROOM_PRIVATE_OWNER(HOME_ROOM(iter)) == id) {
 			// reset autostore timer
 			DL_FOREACH2(ROOM_CONTENTS(iter), obj, next_content) {
-				GET_AUTOSTORE_TIMER(obj) = time(0);
+				schedule_obj_autostore_check(obj, time(0));
 			}
 		}
 	}
@@ -3020,7 +3089,7 @@ void clear_private_owner(int id) {
 			
 			// reset autostore timer
 			DL_FOREACH2(ROOM_CONTENTS(iter), obj, next_content) {
-				GET_AUTOSTORE_TIMER(obj) = time(0);
+				schedule_obj_autostore_check(obj, time(0));
 			}
 		}
 	}
@@ -3159,6 +3228,8 @@ void decustomize_shared_data(struct shared_room_data *shared) {
 			shared->icon = NULL;
 		}
 	}
+	REMOVE_BIT(shared->affects, ROOM_AFF_HIDE_REAL_NAME);
+	REMOVE_BIT(shared->base_affects, ROOM_AFF_HIDE_REAL_NAME);
 }
 
 
@@ -3427,6 +3498,7 @@ INTERACTION_FUNC(ruin_building_to_building_interaction) {
 	bld_data *old_bld, *proto;
 	double save_resources;
 	int dir, paint;
+	char *temp;
 	
 	if (!inter_room || !(proto = building_proto(interaction->vnum)) || GET_ROOM_VNUM(inter_room) >= MAP_SIZE) {
 		return FALSE;	// safety: only works on the map
@@ -3472,7 +3544,9 @@ INTERACTION_FUNC(ruin_building_to_building_interaction) {
 	// custom naming if #n is present (before complete_building)
 	if (strstr(GET_BLD_TITLE(proto), "#n")) {
 		set_room_custom_name(inter_room, NULL);
-		ROOM_CUSTOM_NAME(inter_room) = str_replace("#n", old_bld ? GET_BLD_NAME(old_bld) : "a Building", GET_BLD_TITLE(proto));
+		temp = str_replace("#n", old_bld ? GET_BLD_NAME(old_bld) : "a Building", GET_BLD_TITLE(proto));
+		set_room_custom_name(inter_room, temp);
+		free(temp);
 	}
 	
 	complete_building(inter_room);
@@ -4303,6 +4377,7 @@ void write_binary_world_index_updates(void) {
 */
 bool write_map_and_room_to_file(room_vnum vnum, bool force_obj_pack) {
 	char temp[MAX_STRING_LENGTH], fname[256];
+	struct affected_type *aff;
 	struct shared_room_data *shared;
 	struct room_extra_data *red, *next_red;
 	struct depletion_data *dep;
@@ -4382,7 +4457,7 @@ bool write_map_and_room_to_file(room_vnum vnum, bool force_obj_pack) {
 		fprintf(fl, "Sector: %d %d\n", GET_SECT_VNUM(SECT(room)), GET_SECT_VNUM(BASE_SECT(room)));
 		
 		LL_FOREACH(ROOM_AFFECTS(room), af) {
-			fprintf(fl, "Affect: %d %d %ld %d %d %llu\n", af->type, af->cast_by, af->duration, af->modifier, af->location, af->bitvector);
+			fprintf(fl, "Affect: %d %d %ld %d %d %llu\n", af->type, af->cast_by, af->expire_time == UNLIMITED ? UNLIMITED : (af->expire_time - time(0)), af->modifier, af->location, af->bitvector);
 		}
 		if (HOME_ROOM(room) != room) {
 			fprintf(fl, "Home-room: %d\n", GET_ROOM_VNUM(HOME_ROOM(room)));
@@ -4503,6 +4578,16 @@ bool write_map_and_room_to_file(room_vnum vnum, bool force_obj_pack) {
 				// basic mob data
 				fprintf(fl, "Load: M %d %llu %d 0\n", GET_MOB_VNUM(mob), MOB_FLAGS(mob), GET_ROPE_VNUM(mob));
 				
+				// extra mob data?
+				if (MOB_FLAGGED(mob, MOB_SPAWNED)) {
+					fprintf(fl, "Load: N 0 %ld 0 0\n", MOB_SPAWN_TIME(mob));
+				}
+				
+				// save affects but not dots
+				LL_FOREACH(mob->affected, aff) {
+					fprintf(fl, "Load: A %d %d %ld %d %d %lld\n", aff->type, aff->cast_by, aff->expire_time == UNLIMITED ? UNLIMITED : (aff->expire_time - time(0)), aff->modifier, aff->location, aff->bitvector);
+				}
+				
 				// instance id if any
 				if (MOB_INSTANCE_ID(mob) != NOTHING) {
 					fprintf(fl, "Load: I %d 0 0 0\n", MOB_INSTANCE_ID(mob));
@@ -4521,6 +4606,9 @@ bool write_map_and_room_to_file(room_vnum vnum, bool force_obj_pack) {
 				// custom strings
 				if (mob->customized) {
 					m_proto = mob_proto(GET_MOB_VNUM(mob));
+					if (!m_proto || GET_REAL_SEX(mob) != GET_REAL_SEX(m_proto)) {
+						fprintf(fl, "Load: S sex %d\n", GET_REAL_SEX(mob));
+					}
 					if (!m_proto || GET_PC_NAME(mob) != GET_PC_NAME(m_proto)) {
 						fprintf(fl, "Load: S keywords %s\n", NULLSAFE(GET_PC_NAME(mob)));
 					}
@@ -4812,7 +4900,7 @@ void load_one_room_from_wld_file(room_vnum vnum, char index_data) {
 	bitvector_t bit_in[2];
 	long long_in;
 	int int_in[4];
-	char char_in, *reset_read;
+	char char_in, *reset_read, str_in[256];
 	FILE *fl;
 	
 	map = (vnum < MAP_SIZE) ? &world_map[MAP_X_COORD(vnum)][MAP_Y_COORD(vnum)] : NULL;
@@ -4877,10 +4965,10 @@ void load_one_room_from_wld_file(room_vnum vnum, char index_data) {
 					CREATE(af, struct affected_type, 1);
 					af->type = int_in[0];
 					af->cast_by = int_in[1];
-					af->duration = long_in;
 					af->modifier = int_in[2];
 					af->location = int_in[3];
 					af->bitvector = bit_in[0];
+					af->expire_time = (long_in == UNLIMITED) ? UNLIMITED : (time(0) + long_in);
 					
 					LL_PREPEND(ROOM_AFFECTS(room), af);
 				}
@@ -5041,7 +5129,14 @@ void load_one_room_from_wld_file(room_vnum vnum, char index_data) {
 					CREATE(reset, struct reset_com, 1);
 					DL_APPEND(room->reset_commands, reset);
 					
-					if (*reset_read == 'S') {	// mob custom strings: <string type> <value>
+					if (*reset_read == 'A') {	// affect: type cast_by duration modifier location bitvector
+						if (sscanf(reset_read, "%c %lld %lld %lld %lld %lld %s", &reset->command, &reset->arg1, &reset->arg2, &reset->arg3, &reset->arg4, &reset->arg5, str_in) != 7) {
+							log("SYSERR: Invalid load command: %s: '%s'", error, line);
+							exit(1);
+						}
+						reset->sarg1 = str_dup(str_in);
+					}
+					else if (*reset_read == 'S') {	// mob custom strings: <string type> <value>
 						reset->command = *reset_read;
 						reset->sarg1 = strdup(reset_read + 2);
 						if (!strn_cmp(reset->sarg1, "look", 4)) {

@@ -11,6 +11,8 @@ Fond Winter Memories~
    You look back fondly on cherished memories of winter and beloved holiday
 memories. You can still remember opening that first shimmering magewood jar and
 watching the nordlys get tangled in the tree branches...
+
+(You achieved this memory by producing 250 glowing magewood.)
 ~
 1 4 0 5 d
 K 7 5

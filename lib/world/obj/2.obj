@@ -4,9 +4,11 @@ an earthenware bowl~
 An earthenware bowl is lying on the ground.~
 The bowl looks like it would be good for holding water.
 ~
-5 0 a 0 3
+5 0 a 0 4
 12 0 0
 6 0
+R
+4 5606 0
 S
 #251
 pot earthenware~
@@ -45,16 +47,38 @@ A hestian trinket is sitting on the ground.~
    You can use the trinket to teleport home. Use the home command to set your
 home.
 ~
-3 0 a 0 2
-0 0 0
+3 0 a 0 8
+256 3600 0
 6 0
 C
 1 1
+M
+21
+You touch @%self% and it begins to swirl with light...~
+M
+22
+~%actor% touches @%self% and it begins to swirl with light...~
+M
+21
+@%self% glows a bright blue and the light begins to envelop you!~
+M
+22
+@%self% glows a bright blue and the light begins to envelop ~%actor%!~
+M
+23
+~%actor% vanishes in a flash of light!~
+M
+24
+~%actor% appears in a flash of light!~
+M
+25
+The swirling light from @%self% fades.~
 R
 4 5121 0
 R
 4 5610 0
 T 256
+T 9806
 S
 #257
 bricks pile~
@@ -147,16 +171,38 @@ a trinket of conveyance~
 A trinket of conveyance seems to have been dropped here.~
 You can use this trinket to teleport to a random starting location.
 ~
-3 0 a 0 2
-0 0 0
+3 0 a 0 5
+262 1800 0
 6 0
 C
 1 1
+M
+21
+You touch @%self% and it begins to swirl with light...~
+M
+22
+~%actor% touches @%self% and it begins to swirl with light...~
+M
+21
+Yellow light begins to whirl around you...~
+M
+22
+Yellow light begins to whirl around ~%actor%...~
+M
+23
+~%actor% vanishes in a flourish of yellow light!~
+M
+24
+~%actor% appears in a flourish of yellow light!~
+M
+25
+The swirling light from @%self% fades.~
 R
 4 5121 0
 R
 4 5610 0
 T 262
+T 9806
 S
 #263
 icon icons letheian~
@@ -166,9 +212,11 @@ A letheian icon is lying on the ground.~
 different set of abilities for that skill tree. Type 'use icon Skill Name' to
 gain the reset, then 'skill reset Skill Name' to use it.
 ~
-3 0 a 0 3
+3 0 a 0 4
 0 0 0
 0 0
+C
+1 1
 T 263
 S
 $

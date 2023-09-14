@@ -1,11 +1,12 @@
-! ^
+! "EXCLAMATION MARK" ^ CARET
 
-Use ! to repeat the last command typed at the keyboard. You can also repeat
-any of your last 5 commands by abbreviating the one you want to repeat. For
-example, '!w' might repeat your last whois.
+Use ! (exclamation mark) to repeat the last command typed at the keyboard. You
+can also repeat any of your last 5 commands by abbreviating the one you want to
+repeat after the exclamation mark. For example, '!w' might repeat your last who
+or whois.
 
-Use ^ to replace a string from the last command with a new string. The syntax
-is the same as in csh: "^old-string^replacement"
+Use ^ (caret) to replace a string from the last command with a new string. The
+syntax is the same as in csh: "^old-string^replacement"
 
 Examples:
 
@@ -20,7 +21,7 @@ Examples:
 
 See also: ALIAS
 #
-+ - -- "INPUT QUEUE" "COMMAND QUEUE" "INPUT LAG" "COMMAND LAG" QUEUE
++ - -- "INPUT QUEUE" "COMMAND QUEUE" "INPUT LAG" "COMMAND LAG" QUEUE "MINUS SIGN" "PLUS SIGN"
 
 The + and - commands allow you to manipulate your input queue. Some commands,
 such as abilities, cause a small amount of "command lag". Anything you type
@@ -203,8 +204,12 @@ Bright colors:
  &G&&G Green&0      &L&&L Lime&0        &J&&J Jade&0
  &Y&&Y Yellow&0     &O&&O Orange&0      &T&&T Tan&0
  &W&&W White&0
- 
-See also: BANNER, INFORMATIVE, POLITICAL, RECOLOR, TOGGLE
+
+Additional codes:
+ &&Z Next letter will be capitalized (useful in scripts)
+ &&z Next letter will be lowercase
+
+See also: BANNER, INFORMATIVE, POLITICAL, RECOLOR, TOGGLE, LEVEL COLORS
 #
 APPROACH
 
@@ -300,13 +305,14 @@ but don't forget to turn it off again!
 
 See also: BITE, CEDE, PURIFY, SIRE, TOGGLE
 #
-BRIEF "TOGGLE BRIEF"
+BRIEF "TOGGLE ROOM-DESCS" "TOGGLE BRIEF"
 
-Usage:  toggle brief [on/off]
+Usage:  toggle room-descs [on/off]
 
-This toggle turns off room descriptions and shrinks the map display from 15 by
-15 to 7 by 7. It reduces disconnects from buffer overflows for people moving
-quickly across the world.
+This toggle turns on/off room descriptions.
+
+This toggle was formerly called 'brief'. It also formerly reduced the mapsize
+to 3.
 
 See also: COMPACT, MAPSIZE, TOGGLE
 #
@@ -355,7 +361,34 @@ to your empire won't be able to enter.
 For more information on building your first house, see HELP HOUSING GUIDE.
 
 See also: BUILD INFO, RESOURCES, KEEP, EMPIRE, DISMANTLE, DESIGNATE, RECIPES,
-  BUILD ABILITY
+  BUILD ABILITY, CRAFTING ABILITIES
+#
+BURN
+
+Usage:  burn <building | vehicle | area | direction>
+
+To burn something, you must have fire sticks or some other lighter. You can use
+this command to light a building on fire, either from the same tile as the
+building (burn building), or from an adjecent tile (burn <direction>). If the
+building is claimed, you must be at war with the owner to do this. Buildings
+may also catch fire when a torch is dropped or thrown into them.
+
+You can also burn the area (either with 'burn area' or with any keyword from
+the room title) to remove stumps and other features. It can also be used to
+burn crops and seeded fields. This only works on certain terrain, and only on
+the tile you're on (not on adjacent tiles).
+
+Some lighters have a limited number of uses and will be thrown away afterwards.
+If you have marked a lighter 'keep', it won't be used (unless it has unlimited
+uses).
+
+You can also burn down some vehicles. You cannot burn other players' property
+if you are not a member of an empire. Burning your own buildings and vehicles
+requires the 'dismantle' privilege.
+
+To light torches or other items, use 'light'.
+
+See also: DOUSE, LIGHT, LIGHTERS, TORCH, PRIVILEGES
 #
 BUY LIST SHOP SHOPS
 
@@ -404,7 +437,11 @@ If any land is claimed, the three empires with the most claims are listed
 (in descending order). All empires with cities are listed below that, although
 only one city is listed per empire. Outposts are not listed.
 
-See also: ISLANDS, SURVEY
+This command also shows names that other empires call the island. You can only
+see these names if you have a trade pact, non-aggression pact, or alliance with
+the empire.
+
+See also: DIPLOMACY, ISLANDS, SURVEY
 #
 CIRCLE
 
@@ -491,6 +528,24 @@ log back in (but you will have to re-cast any buffs on it).
 
 See also: DISMISS, BODYGUARD, FAMILIAR
 #
+COMPARE "COMPARE ITEMS"
+
+Usage:  compare <item> [other item]
+        compare inventory <item> [other item]
+
+This command will use 'identify' compare two items. If you only specify one
+item, it will compare it to whatever you have equipped in the slot it goes in.
+
+This command targets items exactly the same way was 'identify', meaning it
+could target something you have equipped. To guarantee it hits an item in your
+inventory rather than equipment, try 'compare inv <item>'.
+
+Some items become something else (usually a more specific version of whatever
+they were) when you identify them. Using 'compare' will identify the item you
+target exactly as if you had used the 'identify' command.
+
+See also: IDENTIFY, EIDENTIFY
+#
 CONFIRM
 
 Usage:  confirm
@@ -514,8 +569,8 @@ There are also several possible modifier tags:
  - hard: will require two players in the right level range
  - group: will require three players in the right level range
  - boss: will require four players in the right level range
- 
-See also: DROP FLAGS, LEVELS
+
+See also: DROP FLAGS, LEVELS, LEVEL COLORS
 #
 CONTENTS
 
@@ -584,6 +639,39 @@ Examples:
   > diagnose
   > diagnose rasmussen
 #
+DIFFICULTY "DIFFICULTY SELECTOR" "NORMAL DIFFICULTY" "HARD DIFFICULTY" "GROUP DIFFICULTY" "BOSS DIFFICULTY"
+
+Usage:  difficulty <normal | hard | group | boss>
+
+Some adventures are available at more than one difficulty setting. This is
+separate from the required player level, and is usually based on the number of
+players present. Adventures may use difficulty settings in various ways, but in
+general, the difficulties are as follows:
+
+Normal:
+For one player by themselves, or for inexperienced players working together.
+This is the lowest setting. In some adventures, it spawns fewer mobs; while in
+others, combat gimmicks are less painful. But in all cases, it sets the mob to
+the lowest health and damage settings available at its level.
+
+Hard:
+For two players working together, or one well-prepared player. Health and
+damage are increased and, in some adventures, there may be additional mobs or
+combat gimmicks.
+
+Group:
+For three players -- ideally, a tank, a healer, and a dps of some kind. It's
+usually only possible to do this alone if you are above the mob's level and
+you have come prepared.
+
+Boss:
+For four players, which should include a tank, a healer, and two dps. This is
+the highest difficulty setting and will more damage to defeat in a longer
+fight. Players are usually only able to handle boss difficulty alone if they
+are significantly above the mob's level and have strong gear and skills.
+
+See also: ADVENTURE, COMBAT GIMMICK, LEVEL COLORS
+#
 DIRECTIONS NORTH SOUTH EAST WEST NORTHEAST NORTHWEST SOUTHEAST SOUTHWEST UP DOWN NE NW SE SW FORE AFT PORT STARBOARD
 
 Usage:  north, south, east, west
@@ -608,7 +696,7 @@ DISMISS
 
 Usage:  dismiss <companion | minipet>
 
-This command causes your companion or mini-pet to leave. You can target it by
+This command causes your companion or minipet to leave. You can target it by
 name if it's in the room with you, or else can type 'dismiss companion' or
 'dismiss minipet' to dismiss it anywhere in the world.
 
@@ -644,21 +732,23 @@ See also: MARK
 #
 DOUSE BURNING "PUT OUT FIRE" FIRE-BRIGADE "FIRE BRIGADE"
 
-Usage:  douse [vehicle | light]
+Usage:  douse [vehicle | light | fire]
 
-In the event of a fire, you may douse it with water from any portable source. 
-It may take a lot of water to douse the fire, and you may have to leave and 
-come back. If you don't fully douse it, the flames will slowly rise again, 
-and destroy your structure.
+In the event of a fire, you may douse it with water from any portable source,
+or with water from the room itself if any is available.  It may take a lot of
+water to douse the fire, and you may have to leave and come back if you're
+using a canteen or barrel. If you don't fully douse it, the flames will slowly
+rise again and destroy your structure.
 
 If your empire has a workforce, the fire-brigade can also put out fires for
 you. They will always succeed if left alone. However, they do so very slowly
 and are easy targets for enemy players at war.
 
-If you use this on a light such as a torch or cooking fire, it will extinguish
-the light (and destroy the object).
+If you use this on a light such as a torch, it will consume an hour from the
+time remaining on that light. Dousing some things may destroy them. Not all
+lights can be doused.
 
-See also: COOKING FIRE, LIGHT, WORKFORCE
+See also: BURN, LIGHT, WORKFORCE
 #
 DRAG
 
@@ -701,10 +791,10 @@ See also: COINS, GET, JUNK, KEEP
 #
 EAT DRINK SIP TASTE
 
-Usage:  eat <item>
-        taste <item>
-        drink [from] <item>
-        sip [from] <item>
+Usage:  eat [item]
+        taste [item]
+        drink [from] [item]
+        sip [from] [item]
 
 If you're hungry or thirsty, these commands are for you! You can drink from
 wells, fountains, and the edge of nearby rivers, too.
@@ -745,6 +835,7 @@ Usage:  equipment [-all]  -- see your current gear
         equipment delete <name>  -- delete an equipment set
         equipment list  -- list your equipment sets
         equipment <name>  -- change to an equipment set
+        equipment analyze  -- see help about your equipment
 
 Gives you a list of all the equipment you're wearing, holding, and wielding.
 Items do not take up inventory space when equipped (except containers and their
@@ -761,7 +852,10 @@ Saving an equipment set will automatically 'keep' all items in the set. When
 you change equipment sets, any items that are removed will be placed at the
 end of your inventory (instead of at the beginning like normal).
 
-See also: INVENTORY, REMOVE, WEAR, WIELD, HOLD, SHEATH, DRAW, SWAP, KEEP
+Use 'equipment analyze' (eq -ana) for some helpful information about your gear.
+
+See also: INVENTORY, REMOVE, WEAR, WIELD, HOLD, SHEATH, DRAW, SWAP, KEEP,
+   GEAR LEVELS, LEVEL COLORS
 #
 ESTATS ESTATISTICS
 
@@ -814,39 +908,38 @@ Speed boosts:  Work ethic bonus, haste, Faster Excavations goal
 
 Using a shovel, your own strength, and a lot of time, you can excavate a
 trench from a desert or plains. Once the trench is complete, it will begin
-to fill with water. Eventually, it becomes a canal.
+to fill with water. Eventually, it becomes a canal. In order to dig a trench
+on an oasis tile, you must drain the oasis there first.
 
 The "fillin" command is the opposite of excavate: it fills trenches in until
-they are ordinary plains or desert again. It will also work on a player-created
-oasis or canal. It takes 1 minute to begin a fillin on a completed trench; if
-you cancel the action or are interrupted, you must start the minute over.
+they are ordinary plains or desert again. It will also work on a canal that
+resulted from filling a trench with water. It takes 1 minute to begin to fillin
+a completed trench; if you cancel the action or are interrupted, you must start
+the minute over.
 
 You can only excavate and fill in on claimed land. If you abandon your claim to
-a canal or trench, it will slowly fill in over time.
-
-When a desert trench fills with water, it will become an oasis instead of a
-canal. Oases convert into canals if they are adjacent to other canals or water
-sources.
+a canal or trench, it will slowly fill in over time automatically.
 
 There are three ways to fill a finished trench with water:
  - If there is more water adjacent, the trench will fill quickly.
  - If you pour water out on the ground, you can fill the trench yourself.
  - If you wait long enough, it will fill with rain water on its own.
 
-An unfinished trench will not fill with water.
+An unfinished trench will never fill with water.
 
-See also: CLAIM, OASIS DRAINAGE, IRRIGATION
+See also: CLAIM, OASIS DRAINAGE, IRRIGATION, POUR
 #
 EXECUTE
 
 Usage:  execute <victim>
 
 This command allows you to execute a person who has already been incapacitated,
-staked, or tied up.
+staked, or tied up. Vampires can also use this on someone they are feeding
+from.
 
 To automatically kill your victims in combat, "toggle autokill".
 
-See also: TOGGLE, STAKE, TIE
+See also: BITE, TOGGLE, STAKE, TIE
 #
 EXTRA-SPACING "EXTRA SPACING" "TOGGLE EXTRA-SPACING"
 
@@ -891,10 +984,10 @@ Reputation levels and values:
   &oLoathed&0  -749 to -300
   &yDisliked&0  -299 to -100
   &tNeutral&0  -99 to 99
-  &cLiked&0  100 to 290
+  &cLiked&0  100 to 299
   &aEsteemed&0  300 to 749
   &gVenerated&0  750 to 999
-  &gRevered&0  1000
+  &GRevered&0  1000
 #
 FIGHTMESSAGES "FIGHT MESSAGES" FMESSAGES "FIGHT SPAM" "COMBAT SPAM" "COMBAT MESSAGES"
 
@@ -911,7 +1004,7 @@ FILL
 
 Usage:  fill <item> [from] well
         fill <item> [from] fountain
-        fill <item> river
+        fill <item> [from] river
         fill <item> [from] <item>
        
 If you want to fill a container you're holding with liquid from a fountain or
@@ -998,6 +1091,13 @@ can use the empire's full name, adjective name, or number.
 
 See also: COINS, KEEP
 #
+GOSSIP
+
+EmpireMUD does not have the gossip channel. There are no global in-character
+channels.
+
+See also: CHANNELS
+#
 GRAB HOLD
 
 Usage:  grab <object>
@@ -1014,7 +1114,7 @@ Examples:
 
 See also: EQUIPMENT, REMOVE, WEAR, WIELD, SWAP
 #
-GROUP PARTY
+GROUP PARTY UNGROUP UNPARTY
 
 Usage:  group  -- see status on the group
         group invite <name>  -- invite a player to the group
@@ -1023,6 +1123,7 @@ Usage:  group  -- see status on the group
         group leave  -- leave the group you're in
         group leader <name>  -- change leader
         group new -- create an empty group
+        group options -- set group options (leader only)
 
 Grouping allows multiple players to work on the same challenge, and gives them
 access to a private group channel. You can also type "group" by itself to see
@@ -1039,7 +1140,10 @@ balance game encounters against the number of players in the group.
 Inviting a player to a group automatically beckons them to follow, if they
 aren't already following someone.
 
-See also: ADVENTURE SUMMON, GSAY
+The leader can use 'group options anonymous' to prevent members from seeing
+each others' locations.
+
+See also: ADVENTURE SUMMON, GSAY, SUMMARY
 #
 GSAY GTELL PSAY PTELL
 
@@ -1083,7 +1187,7 @@ Usage:  identify [inv] <item | vehicle>
 This command provides detailed information about an item or vehicle.
 
 Tip: When trying to identify an item in your inventory that has the same name
-as something you are wearing, try using '1.name'.
+as something you are wearing, try using 'id inv <name>'.
 
 Some items become something else (usually a more specific version of whatever
 they were) when you identify them. You can identify multiple items at a time
@@ -1095,7 +1199,7 @@ trying to figure out what to drop or give away, since the numbering (2.bag)
 will be the same for identify and drop (instead of also checking your equipment
 for the identify command).
 
-See also: EIDENTIFY
+See also: EIDENTIFY, COMPARE, LEVEL COLORS, EQUIPMENT
 #
 INFORMATIVE "TOGGLE INFORMATIVE"
 
@@ -1159,10 +1263,10 @@ good idea to read them every once in a while.
    credits  - the people who made EmpireMUD possible
    version  - displays the current EmpireMUD version
 #
-INVENTORY
+INVENTORY INV I
 
 Usage:  inventory
-        inventory [-i | -k | -n] <keywords>
+        inventory [-k | -n] <keywords>
         inventory -c <component type>
         inventory -w <wear location> [keywords]
         inventory -t <type> [keywords]
@@ -1172,12 +1276,12 @@ to check that no thieves have got to your backpack. When in a storage building,
 this also checks the stored items there.
 
 You can also search your inventory by keyword, or use the following flags:
-  &c-i&0 Identify items (e.g. levels).
   &c-k&0 Only show items marked (keep).
   &c-n&0 Omit items marked (keep).
   &c-c&0 Show items of component type (e.g. 'lumber', 'large, single block').
   &c-w&0 Show items which can be worn in a given slot (e.g. 'finger').
   &c-t&0 Show items of a given type (e.g. 'weapon').
+  &r-i&0 No longer supported. Use 'toggle item-details' instead.
 
 Items marked (large) take up two slots instead of one. If you equip an item
 to your "pack" slot, you can carry more items.
@@ -1186,7 +1290,8 @@ If you're trying to see what you're wearing instead, type EQUIPMENT. Items do
 not take up inventory space when equipped (except containers and their
 contents).
 
-See also: EQUIPMENT, GRAB, HOLD, REMOVE, WEAR, STORE, RETRIEVE, WIELD, SWAP
+See also: EQUIPMENT, GRAB, HOLD, REMOVE, WEAR, STORE, RETRIEVE, WIELD, SWAP,
+   TOGGLE, LEVEL COLORS
 #
 INTERLINK INTERLINKING
 
@@ -1204,6 +1309,14 @@ current location.
 To find buildings that are interlinkable, try 'helpsearch interlink'.
 
 See also: HELPSEARCH, MARK
+#
+INSULT INSULTING
+
+Usage:  insult <person>
+
+This social command insults another person.
+
+See also: SOCIALS
 #
 JUNK "JUNK ITEM" "JUNK OBJECT"
 
@@ -1235,7 +1348,10 @@ Usage:  kill <victim>
 
 A good way to start a fight.
 
-See also: ASSIST, FLEE
+Kill and murder can also be used by vampires to finish off someone they are
+feeding from.
+
+See also: ASSIST, BITE, FLEE
 #
 LAND
 
@@ -1280,7 +1396,7 @@ Roads count as their base terrain for most building functions, so you can
 build things facing roads. Roads count as in-city territory when built in the
 outskirts (4x radius).
 
-See also: CHANT OF ILLUSIONS, EMPIRE, PATHFINDING, ROADSIGN
+See also: CHANT OF ILLUSIONS, EMPIRE, EXTENDED RADIUS, PATHFINDING, ROADSIGN
 #
 LEARN LEARNED LEARNING
 
@@ -1340,7 +1456,7 @@ Examples:
 Note that if you LOOK AT CORPSE you will not see its inventory.
 To see what's inside a container (i.e. a corpse) use LOOK IN <object>.
 
-See also: GET, MAP, READ, TAKE, SURVEY, CONTENTS, MAPSCAN
+See also: GET, MAP, READ, TAKE, SURVEY, CONTENTS, MAPSCAN, EXTRA DESCRIPTIONS
 #
 MAKE
 
@@ -1351,7 +1467,7 @@ Usage:  make [number] <thing>
 Make is a crafting command. There are no basic recipes that use 'make', but
 perhaps you can find something that does.
 
-See also: MAKE INFO, RECIPES
+See also: MAKE INFO, RECIPES, CRAFTING ABILITIES
 #
 MAP "MAP COMMAND"
 
@@ -1422,7 +1538,7 @@ The mark command allows you to set a start location and then measure your
 distance to it. This can help with city planning and measuring distances for
 Workforce.
 
-See also: WORKFORCE
+See also: DISTANCE, WORKFORCE
 #
 MESSAGES
 
@@ -1430,6 +1546,8 @@ Usage:  messages
 
 This displays any system messages from the last 24 hours, plus any messages
 that are set to show on login or on auto-repeat.
+
+See also: NEWS
 #
 METERS "COMBAT METERS"
 
@@ -1447,13 +1565,13 @@ Usage:  minipets
         minipet <name>
         minipet dismiss
 
-This command lists, summons, and dismisses your mini-pets. A mini-pet is a
+This command lists, summons, and dismisses your minipets. A minipet is a
 non-combat NPC that follows you around. They are strictly cosmetic, and are
 often awarded as trophies in certain adventures.
 
-You can only have one mini-pet out at a time.
+You can only have one minipet out at a time.
 
-There is no limit to how many mini-pets you can collect. Gotta collect 'em all!
+There is no limit to how many minipets you can collect. Gotta collect 'em all!
 #
 MORTLOG
 
@@ -1489,6 +1607,8 @@ Usage:  news
 
 Shows any recent news from the game staff. For example, updates or new
 adventures might appear here.
+
+See also: MESSAGES
 #
 NODISMANTLE NO-DISMANTLE "NO DISMANTLE"
 
@@ -1538,6 +1658,7 @@ Examples:
 ORDER
 
 Usage:  order <character> <command>
+        order companion <command>
         order followers <command>
 
 Used for ordering pets and charmed people to do your evil bidding. You can
@@ -1564,6 +1685,12 @@ For traditional buildings, you must paint from inside. For vehicles or newer
 buildings, you can also paint them from the outside.
 
 You need the 'customize' privilege in your empire to paint or unpaint.
+
+Examples:
+
+  > paint building orange
+  > paint raft blue
+  > unpaint wagon
 
 See also: COLORS, PAINTER'S WORKSHOP
 #
@@ -1602,12 +1729,20 @@ Instruments will be played faster while hasted.
 
 See also: HOLD, TIMED ACTION
 #
+POINT
+
+Usage:  point <direction | person | object | vehicle>
+
+Your character points. The target must be present in the room with you.
+
+See also: SOCIALS
+#
 POLITICAL "POLITICAL VIEW" "TOGGLE POLITICAL"
 
 Usage:  toggle political [on/off]
 
 This toggle changes your map colors from environmental to political. You will
-see each acre colored with the banner of the empire who owns it. Screenreader
+see each tile colored with the banner of the empire who owns it. Screenreader
 users will see empire names next to claimed tiles.
 
 Dimly lit tiles do not appear in 'informative' mode.
@@ -1690,6 +1825,13 @@ Examples:
 
 See also: FILL, TRENCH
 #
+PRACTICE PRACTICES PRACTICING
+
+EmpireMUD does not use the 'practice' system. Instead, manage your skills and
+abilities with the 'skill' command.
+
+See also: SKILLS
+#
 PROGRESS PROGRESSION "EMPIRE PROGRESSION" "PROGRESS GOALS" "PROGRESSION GOALS" "PROGRESS POINTS" GOAL GOALS
 
 Usage:  progress [category]
@@ -1751,7 +1893,7 @@ Here are the prompt codes and what they do:
   %c  conditions abbreviated (afk, hunger, thirst, etc)
   %C  conditions as words
   %s  bonus skill exp left today
-  %q  daily quests left today
+  %q  daily quests left today, %Q for event dailies
 
 For immortals:
   %r  Sector/building/room number
@@ -1857,6 +1999,25 @@ Examples:
 
 See also: GRAB, HOLD, WEAR, WIELD, SHEATH, DRAW, SWAP
 #
+RENT RENTING INN SAVING
+
+EmpireMUD does not use the 'rent' system from CircleMUD. Players generally log
+into the game in the same place they logged out, with their entire inventory
+and equipment intact.
+
+There are a few cases where people don't log back in in the same place. In
+these cases, the player is usually relocated to a tomb or Tower of Souls:
+- If they were in an adventure and it despawned, or they were logged out more
+  than an hour.
+- If they were in territory claimed by another player and were logged out more
+  than an hour.
+- If they were in a ship (or other vehicle) and the ship moved while they were
+  logged out.
+- If they have 'toggle autorecall' on and were logged out more than an hour,
+  in which case they they are sent to their home, if they have one.
+
+See also: HOME, STARTING LOCATION, TOGGLE AUTORECALL, TOMB
+#
 REPAIR MAINTAIN MAINTENANCE DISREPAIR
 
 Usage:  repair [vehicle | building]
@@ -1897,6 +2058,14 @@ You tell someone, 'Who are you?'
 
 See also: IGNORE, TELL, NOTELL
 Immortals see also: BREAKREPLY
+#
+REPORT
+
+EmpireMUD doesn't have a 'report' command. If you're looking on information on
+your group members, try the 'group' command by itself or the 'summary' command.
+If you want to see your own stats from combat, use 'meters'.
+
+See also: GROUP, METERS, SUMMARY
 #
 ROADSIGN "ROAD SIGN" SIGN "BLANK SIGN"
 
@@ -1977,8 +2146,8 @@ This command allows you to set your character moving in a given direction, or
 along a path you specify. Paths must be pairs of directions and distances which
 your character will move in order.
 
-If you specify coordinates to run to, there must be continous roads all the way
-there (tunnels, gatehouses, and similar buildings are okay as well).
+If you specify coordinates to run to, there must be continuous roads all the
+way there (tunnels, gatehouses, and similar buildings are okay as well).
 
 You will run faster if you have the 'faster walking' bonus trait.
 
@@ -2033,25 +2202,34 @@ to save yourself.
 
 This is not the type of game where you can re-load from past saves.
 #
-SAY OOCSAY OSAY TELL ASK WHISPER ' ""
+SAY OOCSAY OSAY TELL ASK WHISPER ' \"
 
 Usage:  say <string>
+        say #<language> <string>
         oocsay <string>
         <tell | whisper | ask> <player> <string>
 
 If you consider communicating with other beings, you might be understood
 better if you start your sentences with either say, tell, whisper or shout.
 
+When you use say, you'll use whatever language your character is currently
+speaking. You can change this with the speak command, or you can start your
+say with #<language> to say one line in a specific language. For this, remove
+the spaces in the language name or use dashes. Ordered mobs (such as pets)
+cannot use the #language syntax.
+
 Examples:
 
   > say Hey, does anyone know how to get to Oz?
+  > say #low-goblish Hello!
   > tell catje hi, how are you?
 
 You can use ' as a shorthand for say, and " for oocsay, as in:
 
   > 'hello there.
 
-See also: CHANNELS, GSAY, IGNORE, NOREPEAT, NOTELL, REPLY, SLASH CHANNELS
+See also: CHANNELS, GSAY, IGNORE, NOREPEAT, NOTELL, REPLY, SLASH CHANNELS,
+   SPEAK
 #
 SAYHISTORY
 
@@ -2069,7 +2247,7 @@ Usage:  score
 The score command provides you all the important information about your
 character, including health and attributes.
 
-Your top two skills are dsplayed, if both of these skills are past 75. The
+Your top two skills are displayed, if both of these skills are past 75. The
 level shown on score is your total level, with your skill level shown in
 parentheses.
 
@@ -2092,7 +2270,7 @@ and (1) represents the number of ability points you have to spend.
 
 Score also shows things which are affecting you.
 
-See also: SHIELD BLOCK, AFFECTS, SKILL LEVEL, GEAR LEVEL
+See also: SHIELD BLOCK, AFFECTS, SKILL LEVEL, GEAR LEVEL, REGENS
 #
 SCRAP
 
@@ -2119,8 +2297,6 @@ Available options:
  * toggle informative - If on, tiles will indicate if they are being built
      or dismantled, need repair, and some other status types.
  * toggle political - Indicates who owns each map tile.
- * toggle brief - This will hide the map display entirely and not show you
-     what you can see in each direction.
 
 See also: DISPLAY, SCAN, TOGGLE, MAPSIZE, FMESSAGES, MAPSCAN, CHART
 #
@@ -2233,10 +2409,14 @@ The SLEEP command puts you to sleep, allowing you to regain your stamina more
 quickly. You will be largely unaware of your surroundings while asleep. You
 can awaken yourself with the WAKE command.
 
+Sleep boosts all your regens considerably, and may be the only way to
+regenerate move points if you're hungry or thirsty. This effect is even faster
+in a bedroom or similar location.
+
 You also can sleep on some furniture and vehicles. Sleeping in a canoe will
 protect you from sharks in the ocean.
 
-See also: WAKE
+See also: REGENS, WAKE
 #
 SOCIALS
 
@@ -2259,6 +2439,20 @@ The SOCIALS command generates a canonical listing of all available socials.
   > socials
 
 See also: EMOTE
+#
+SPEAK LANGUAGE LANGUAGES
+
+Usage:  speak [language]
+
+This command changes which language your character will speak for in-character
+communication such as 'say' or 'shout'. You can also specify a language for a
+single say/shout with #<language>. For example: say #low-goblish Hello!
+
+Typing 'speak' without an argument lists the languages you know and shows which
+one you're currently speaking. If a language is unlocked by your empire,
+usually from progress goals, it will be indicated here.
+
+See also: SAY, SHOUT
 #
 STEALTHABLE
 
@@ -2318,8 +2512,10 @@ Command:  summon player <name>
 
 This command allows you to teleport another player to your location. You can
 only summon a player who is grouped with you, and to do so you must be at an
-Astral Nexus with another player. That is, you need two players there
-(including you) to summon a third player.
+Astral Nexus.
+
+If the player you are summoning is not a member of your empire, you need an
+additional player (from any empire) present to help summon.
 
 Players must accept the summon using 'accept'.
 
@@ -2376,8 +2572,10 @@ THROW
 
 Usage:  throw <object> <direction>
 
-This is used to throw an object into a near-by room. This is used primarily
-for burning down buildings.
+This is used to throw an object into an adjacent tile or building. This is used
+primarily for burning down buildings by throwing torches through the entrance.
+
+See also: BURN
 #
 TIE UNTIE
 
@@ -2410,6 +2608,8 @@ Handy time-conversion chart:
  - 1 hour in-game = 75 seconds
  - 1 day in-game = 30 minutes
  - 1 year in-game = 7.5 days
+
+See also: TIME ZONE, YEARLY RESET
 #
 TITLE
 
@@ -2439,7 +2639,6 @@ Toggles:
   autorecall - if you're logged out over an hour, automatically sends you home
   autoswim - can enter water without typing 'swim'
   bother - allows "bothersome" things like bite and purify
-  brief - see smaller maps and no room descriptions
   channel-joins - blocks slash-channel join messages
   clearmeters - automatically clears your meters between combats
   compact - no extra newlines
@@ -2455,9 +2654,11 @@ Toggles:
   no-repeat - Some commands will say "ok" instead of typing out your message
   political - shows empire colors instead of terrain colors
   pvp - turns on/off free pvp; will remain on 5 minutes after toggled off
+  room-descs - view or hide room descriptions
   rp - Whether or not you are roleplaying
   screen-reader - see HELP SCREEN READER
   scrolling - scroll long text instead of paginating
+  short-exits - shows CircleMUD-style exits for interior rooms
   shout - the local shout channel
   stealthable - if off, you will be prevented from accidentally stealing
   tell - the tell channel
@@ -2506,6 +2707,9 @@ If you die, you will find yourself resurrected at your own tomb, so long as
 it's nearby. Otherwise, you'll find yourself at a random tomb or cemetery
 on the continent where you died, or at a starting location if there isn't a
 tomb available.
+
+Typing 'tomb' by itself will show your current tomb plus any available tombs
+on your current island.
 
 Basic tombs:
   ..x.  Grave  (newbie grave marker)
@@ -2663,6 +2867,13 @@ Example:
   > wield 3.sword    (Wield the third sword in your inventory)
 
 See also: EQUIPMENT, REMOVE, WEAR, SHEATH, DRAW, SWAP
+#
+WIMPY
+
+EmpireMUD does not have a 'wimpy' command. There is no automatic way for
+players to flee.
+
+See also: FLEE, FLEET
 #
 WIZLIST GODLIST
 

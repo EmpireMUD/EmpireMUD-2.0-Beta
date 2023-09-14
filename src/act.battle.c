@@ -111,7 +111,7 @@ ACMD(do_bash) {
 		send_to_char("You need to wield a weapon to make it a success.\r\n", ch);
 		return;
 	}
-	if (AFF_FLAGGED(ch, AFF_DISARM)) {
+	if (AFF_FLAGGED(ch, AFF_DISARMED)) {
 		msg_to_char(ch, "You can't bash -- your weapon has been disarmed!\r\n");
 		return;
 	}
@@ -170,8 +170,8 @@ ACMD(do_bash) {
 		}
 
 		if (damage(ch, vict, dam, ATTACK_BASH, DAM_PHYSICAL) > 0) {	/* -1 = dead, 0 = miss */
-			if (!AFF_FLAGGED(vict, AFF_IMMUNE_BATTLE | AFF_IMMUNE_STUN)) {
-				af = create_flag_aff(ATYPE_BASH, 1, AFF_STUNNED, ch);
+			if (!AFF_FLAGGED(vict, AFF_IMMUNE_PHYSICAL_DEBUFFS | AFF_IMMUNE_STUN)) {
+				af = create_flag_aff(ATYPE_BASH, 5, AFF_STUNNED, ch);
 				affect_join(vict, af, 0);
 		
 				// release other saps here
@@ -208,7 +208,7 @@ ACMD(do_charge) {
 	else if (FIGHTING(ch) && !NOT_MELEE_RANGE(ch, vict)) {
 		msg_to_char(ch, "You're already in melee range.\r\n");
 	}
-	else if (AFF_FLAGGED(ch, AFF_STUNNED | AFF_HARD_STUNNED | AFF_ENTANGLED)) {
+	else if (AFF_FLAGGED(ch, AFF_STUNNED | AFF_HARD_STUNNED | AFF_IMMOBILIZED)) {
 		msg_to_char(ch, "You can't charge right now!\r\n");
 	}
 	else if (!can_fight(ch, vict)) {
@@ -226,11 +226,11 @@ ACMD(do_charge) {
 		act("$n charges at $N!", FALSE, ch, NULL, vict, TO_NOTVICT);
 		
 		// apply temporary hit/damage boosts
-		af = create_mod_aff(ATYPE_CHARGE, 1, APPLY_TO_HIT, 100, ch);
+		af = create_mod_aff(ATYPE_CHARGE, 5, APPLY_TO_HIT, 100, ch);
 		affect_join(ch, af, 0);
-		af = create_mod_aff(ATYPE_CHARGE, 1, APPLY_BONUS_PHYSICAL, GET_STRENGTH(ch), ch);
+		af = create_mod_aff(ATYPE_CHARGE, 5, APPLY_BONUS_PHYSICAL, GET_STRENGTH(ch), ch);
 		affect_join(ch, af, 0);
-		af = create_mod_aff(ATYPE_CHARGE, 1, APPLY_BONUS_MAGICAL, GET_INTELLIGENCE(ch), ch);
+		af = create_mod_aff(ATYPE_CHARGE, 5, APPLY_BONUS_MAGICAL, GET_INTELLIGENCE(ch), ch);
 		affect_join(ch, af, 0);
 		
 		res = hit(ch, vict, GET_EQ(ch, WEAR_WIELD), TRUE);
@@ -259,7 +259,7 @@ ACMD(do_disarm) {
 	struct affected_type *af;
 	char_data *victim;
 	int cost = 15;
-	int disarm_levels[] = { 1, 3, 5 };
+	int disarm_levels[] = { 5, 15, 25 };	// durations
 
 	one_argument(argument, arg);
 
@@ -283,7 +283,7 @@ ACMD(do_disarm) {
 	else if (IS_NPC(victim) && !GET_EQ(victim, WEAR_WIELD) && !attack_hit_info[MOB_ATTACK_TYPE(victim)].disarmable) {
 		act("You can't disarm $M -- $E isn't using a weapon.", FALSE, ch, 0, victim, TO_CHAR);
 	}
-	else if (AFF_FLAGGED(victim, AFF_DISARM)) {
+	else if (AFF_FLAGGED(victim, AFF_DISARMED)) {
 		act("$E is already disarmed.", FALSE, ch, 0, victim, TO_CHAR);
 	}
 	else if (ABILITY_TRIGGERS(ch, victim, NULL, ABIL_DISARM)) {
@@ -296,7 +296,7 @@ ACMD(do_disarm) {
 		
 		charge_ability_cost(ch, MOVE, cost, COOLDOWN_DISARM, 30, WAIT_COMBAT_ABILITY);
 		
-		if (!skill_check(ch, ABIL_DISARM, DIFF_HARD) || AFF_FLAGGED(victim, AFF_IMMUNE_BATTLE)) {
+		if (!skill_check(ch, ABIL_DISARM, DIFF_HARD) || AFF_FLAGGED(victim, AFF_IMMUNE_PHYSICAL_DEBUFFS)) {
 			act("You attempt to disarm $N, but fail.", FALSE, ch, 0, victim, TO_CHAR);
 			act("$n attempts to disarm you, but fails.", FALSE, ch, 0, victim, TO_VICT);
 			act("$n attempts to disarm $N, but fails.", FALSE, ch, 0, victim, TO_NOTVICT);
@@ -306,7 +306,7 @@ ACMD(do_disarm) {
 			act("$n disarms you! (Your weapon will not work until it wears off.)", FALSE, ch, 0, victim, TO_VICT);
 			act("$n skillfully disarms $N!", TRUE, ch, 0, victim, TO_NOTVICT);
 
-			af = create_flag_aff(ATYPE_DISARM, CHOOSE_BY_ABILITY_LEVEL(disarm_levels, ch, ABIL_DISARM), AFF_DISARM, ch);
+			af = create_flag_aff(ATYPE_DISARM, CHOOSE_BY_ABILITY_LEVEL(disarm_levels, ch, ABIL_DISARM), AFF_DISARMED, ch);
 			affect_join(victim, af, 0);
 		}
 		
@@ -437,7 +437,7 @@ ACMD(do_heartstop) {
 		act("$n grabs you and presses hard against your throat...", FALSE, ch, 0, victim, TO_VICT);
 		act("$n grabs $N and presses hard against $S throat...", TRUE, ch, 0, victim, TO_NOTVICT);
 
-		if (!skill_check(ch, ABIL_HEARTSTOP, DIFF_HARD) || AFF_FLAGGED(victim, AFF_IMMUNE_BATTLE)) {
+		if (!skill_check(ch, ABIL_HEARTSTOP, DIFF_HARD) || AFF_FLAGGED(victim, AFF_IMMUNE_PHYSICAL_DEBUFFS)) {
 			msg_to_char(ch, "But nothing happens.\r\n");
 			if (!FIGHTING(victim)) {
 				hit(victim, ch, GET_EQ(victim, WEAR_WIELD), FALSE);
@@ -449,7 +449,7 @@ ACMD(do_heartstop) {
 			gain_ability_exp(ch, ABIL_HEARTSTOP, 15);
 		}
 
-		af = create_flag_aff(ATYPE_HEARTSTOP, 4, AFF_CANT_SPEND_BLOOD, ch);
+		af = create_flag_aff(ATYPE_HEARTSTOP, 20, AFF_CANT_SPEND_BLOOD, ch);
 		affect_join(victim, af, ADD_DURATION);
 
 		msg_to_char(victim, "Your blood becomes inert!\r\n");
@@ -507,12 +507,12 @@ ACMD(do_kick) {
 	success = IS_SPECIALTY_ABILITY(ch, ABIL_KICK) || check_hit_vs_dodge(ch, vict, FALSE);
 
 	if (success) {
-		if (has_ability(ch, ABIL_SHADOW_KICK) && check_solo_role(ch) && !AFF_FLAGGED(vict, AFF_IMMUNE_BATTLE)) {
+		if (has_ability(ch, ABIL_SHADOW_KICK) && check_solo_role(ch) && !AFF_FLAGGED(vict, AFF_IMMUNE_PHYSICAL_DEBUFFS)) {
 			struct affected_type *af;
 			int value = round(GET_COMPUTED_LEVEL(ch) / 50);
-			af = create_mod_aff(ATYPE_SHADOW_KICK, 2, APPLY_BONUS_PHYSICAL, -value, ch);
+			af = create_mod_aff(ATYPE_SHADOW_KICK, 10, APPLY_BONUS_PHYSICAL, -value, ch);
 			affect_join(vict, af, 0);
-			af = create_mod_aff(ATYPE_SHADOW_KICK, 2, APPLY_BONUS_MAGICAL, -value, ch);
+			af = create_mod_aff(ATYPE_SHADOW_KICK, 10, APPLY_BONUS_MAGICAL, -value, ch);
 			affect_join(vict, af, 0);
 		}
 	
@@ -547,7 +547,7 @@ ACMD(do_kite) {
 		if (vict == ch || FIGHTING(vict) != ch) {
 			continue;	// not hitting me
 		}
-		if (AFF_FLAGGED(vict, AFF_STUNNED | AFF_HARD_STUNNED | AFF_ENTANGLED)) {
+		if (AFF_FLAGGED(vict, AFF_STUNNED | AFF_HARD_STUNNED | AFF_IMMOBILIZED)) {
 			++kitable;	// can kite
 			continue;
 		}
@@ -644,7 +644,7 @@ ACMD(do_outrage) {
 			// ok seems valid...
 			if (skill_check(ch, ABIL_OUTRAGE, DIFF_MEDIUM)) {
 				if (found) {	// add cost if more than 1 victim (already found)
-					GET_MOVE(ch) -= add_cost;
+					set_move(ch, GET_MOVE(ch) - add_cost);
 				}
 				
 				hit(ch, victim, GET_EQ(ch, WEAR_WIELD), FALSE);

@@ -71,9 +71,8 @@ The following things will speed up various chores:
    manufacture, mine, repair, play (music), excavate, pick, scrape, fillin,
    saw, quarry
 - Shovel: dig
-- Weapon damage: chop, mine
-- Superior tool: craft, forge, saw, sew
-- Higher level tool: fish
+- Superior tool: chop, craft, forge, mine, saw, sew
+- Higher level tool: chop, fish, mine
 - Progression goals: excavate, prospect
 - Mastery abilities: forge, sew, crafts in general
 - Woodworking ability: saw, scrape
@@ -123,7 +122,7 @@ will not be eligible for resurrection. You can still be summoned back.
 - If you teleport or trinket out, you won't be sent back where you were before
 the adventure summon. (Except random-teleport.)
 
-See also: ACCEPT, GROUP, NEARBY
+See also: ACCEPT, COMBAT GIMMICK, DIFFICULTY SELECTOR, GROUP, NEARBY
 #
 ATTRIBUTES STATS
 
@@ -259,6 +258,9 @@ Block cap:
 - Start with the mob's level divided by 2 (half)
 - For hard mobs, raise the total by 10%
 - For group mobs, raise the total by 30%
+
+You must be within 50 of the block cap to have a chance to block at all.
+Otherwise, your opponent is too skilled for you to block.
 
 See also: AFFECTS, SCORE, SHIELD BLOCK, WARD AGAINST MAGIC
 #
@@ -438,7 +440,12 @@ Local channels
 say - in-character speech
 oocsay - out-of-character speech
 
-See also: TOGGLE, SAY, SLASH-CHANNELS
+In-character channels such as say and shout use whatever language you are
+currently speaking. Type 'speak' to see or change it. You can also use a
+different language for a single say/shout with #language-name. For example:
+> shout #english Hello!
+
+See also: TOGGLE, SAY, SLASH-CHANNELS, LANGUAGE
 #
 CHARISMA CHA
 
@@ -551,7 +558,7 @@ The 'keep' command can be used to prevent items in your inventory from being
 used for your craft and building commands.
 
 See also: BUILD, CRAFT, DISMANTLE, FORGE, IDENTIFY, KEEP, COMPONENT TYPES
-  RESOURCE ACTIONS
+  FREE ACTIONS
 #
 COOLDOWNS "COOL DOWNS" CD
 
@@ -640,14 +647,18 @@ telling you the area is depleted. For example, digging might tell you the
 ground is too hard and there are no good rocks left.
 
 Most depleted resources recover over time. In each tile, most of the depleted
-resources will return each year. Mountains replenish ore completely, but ONLY
-if you dismantle the mines on them (or other buildings) completely.
+resources will return each year. However, mountains will ONLY replenish ore if
+you dismantle the mines on them completely before the end of the year.
 
 Forests will spread at their edges over time, creating more trees to chop.
-Desert Groves re-grow on their own, at random.
+Desert Groves grow out of desert tiles at random. If you leave stumps behind
+instead of burning them, they will regrow into copses with saplings. Over time,
+the copses will grow into full forests or groves.
 
 Some vehicles and buildings have their own depletions, separate from the
 location they are in.
+
+Immortals see also: OLC DEPLETION
 #
 DEXTERITY DEX
 
@@ -742,13 +753,24 @@ You can also sober up faster by sleeping it off.
 
 See also: CLEANSE, SLEEP, TAVERN
 #
+"EXTRA DESCRIPTIONS" EXDESC
+
+Some things have "extra descriptions" -- things to look at other than the
+object or room itself. For example, if a room describes a chair in the corner,
+it might be possible to "look chair" even if it's just part of the room's text.
+
+Objects, rooms, and vehicles can all have extra descriptions.
+
+See also: look
+#
 FARMING CROPS ORCHARDS AGRICULTURE APPLES WHEAT CORN HOPS COTTON BARLEY PEACHES CHERRIES ORANGES RICE OLIVES PEAS GOURDS PLANTAINS TOMATOES BANANAS COCONUTS GRAPES PEPPERS POTATOES PLUMS STRAWBERRIES MANGOES BLUEBERRIES COFFEE OATS WATERMELONS
 
 You can plant and manage crops in order to supply food and trade goods to your
 empire. The crops that grow in orchards can be picked; the rest are harvested.
 You can chop down orchards in order to remove them; other crops are removed
 when you harvest them. The crops listed here grow wild on the map -- you can
-find them by foraging. There are more crops to be found in adventure zones.
+find them by foraging, but you'll have to travel to different regions to find
+them all. And there are even more crops to be found in adventure zones.
 
 Temperate crops (plains):
  &Y^^&Go&Y^&0  Apples              &Y^&oo&Y^^&0  Apricots             &Y::::&0  Barley
@@ -776,11 +798,12 @@ Newbie island crops:
  &G@@@@&0  Lettuce             &goooo&0  Calabash gourds
 
 Most crops are used to make food and drink. Some, like cotton, have other uses.
-More crops come from adventures. Make sure you claim all your map tiles that
-have crops as unclaimed crops may vanish at the end of the year.
+Make sure you claim all your map tiles that have crops as unclaimed crops may
+vanish at the end of the year. Crops can be burnt to remove them, even when
+they're still growing.
 
-See also: CHOP, COOK, FORAGE, HARVEST, MILL, PICK, PLANT, TAVERN, WEAVE,
-    IRRIGATION
+See also: BURN, CHOP, COOK, FORAGE, HARVEST, MILL, PICK, PLANT, TAVERN, WEAVE,
+   IRRIGATION
 #
 APRICOTS CUCUMBERS GARLIC LEMONS SUGARCANE
 
@@ -792,6 +815,27 @@ When a building says it must be built facing "flat-terrain", this refers to
 most regular land tiles, including plains, forest, desert, crops, and roads.
 
 Mountains, rivers, lakes, oceans, jungles, and swamps are not valid.
+#
+GIMMICK "COMBAT GIMMICK" "FIGHT GIMMICK" "INTERACTIVE FIGHT"
+
+Some fights are interactive and will require you to type the right command at
+the right time. Depending on the adventure, the difficulty setting, and the
+specific mob, these gimmicks can range from fun to deadly. Not all adventures
+use combat gimmicks.
+
+For example, in the Tower Skycleave, the player may receive this message in a
+fight:
+
+&yNelbog shouts, 'Goblinbaaaaaaaaaall!'&0
+&m**** Nelbog ducks and rolls toward you! ****&0 (dodge)
+
+In this case, you must type "dodge" within 8 seconds. If you do, Nelbog crashes
+into the wall -- which will stun her on lower difficulties and even damage her
+if the difficulty is set to 'normal'. If you fail to dodge in time, Nelbog will
+hurt you (more on higher difficulties) and, if the difficulty is set to 'group'
+or 'boss', will also put a slowing effect on you.
+
+See also: DIFFICULTY
 #
 GREATNESS GRT
 
@@ -894,7 +938,10 @@ nearby that has blood.
 All timed actions, such as crafting and chores, take twice as long while you
 are hungry, thirsty, or blood-starved.
 
-See also: BLOOD, EAT, UNNATURAL THIRST, SATED THIRST, TIME
+Regeneration drops to very low levels when a character is hungry, thirsty, or
+starving. Sleeping may be the only way to regenerate in this case.
+
+See also: BLOOD, EAT, UNNATURAL THIRST, REGENS, SATED THIRST, SLEEP, TIME
 #
 INFRA INFRAVISION
 
@@ -944,10 +991,8 @@ tiles of a source of fresh water. Irrigating the desert will allow you to grow
 all types of crops, including temperate ones.
 
 To irrigate an area, excavate a canal and let it fill with water. In the
-desert, the canal will become an oasis first. If a chain of oases connects to
-a water source, it will slowly turn into a canal. Afterwards, the desert around
-it will begin to change terrain type and you can plant crops or grow trees on
-the irrigated terrain. This happens up to 2 tiles away from the canal.
+desert, arid terrain up to 2 tiles away from the irrigation canal will slowly
+convert to irrigated terrain where you can plant crops or grow trees.
 
 See also: EXCAVATE, PLANT, FARMING
 #
@@ -981,6 +1026,24 @@ Note: Until level 100, you must be in the same level range as an item
 
 See also: ROLE, SCALING, SYNERGY ABILITY
 Immortals see also: ACCESS LEVEL
+#
+"LEVEL COLORS" "COLOR BY LEVEL" "COLOR BY DIFFICULTY" "CONSIDER COLORS" "QUEST COLORS" "ADVENTURE COLORS"
+
+Quest names and adventures appear in different colors depending on their level
+compared to yours. This also appears on commands like 'consider' when it shows
+a level difference. The colors are:
+
+&w  more than 50 levels below you - gray&0
+&c         36-50 levels below you - cyan&0
+&a         26-35 levels below you - azure&0
+&j         16-25 levels below you - jade&0
+&g                near your level - green&0
+&y         16-25 levels above you - yellow&0
+&o         26-35 levels above you - orange&0
+&p         36-50 levels above you - pink&0
+&r  more than 50 levels above you - red&0
+
+See also: COLORS, CONSIDER, IDENTIFY, NEARBY, QUEST
 #
 LINK LINKDEAD
 
@@ -1181,13 +1244,16 @@ locations) if you want a shorter list, or you can specify search terms.
 
 Certain adventures won't show up on 'nearby', usually because of the
 adventure's design.
+
+See also: LEVEL COLORS
 #
 "NEWBIE ISLANDS"
 
 Newbie islands are a safe place for newbies to learn and practice the game.
 Depending on the settings for this EmpireMUD, some of the following things
 may happen on newbie islands:
-- Empires lose most claimed land on a newbie island after a week.
+- Empires that are older than 1 week lose most claimed land on a newbie island
+  (they may still claim a small number of tiles).
 - The map returns to its natural state each week on the newbie island.
 - Hostile mobs like the highwayman won't attack you on a newbie island.
 
@@ -1212,6 +1278,20 @@ However if it passes 1/10th of a second, you will also incur a pathfinding
 cooldown. You can't use pathfinding again until it expires.
 
 See also: RUN, SAIL
+#
+"PLAYER TECHNOLOGIES" "PLAYER TECHNOLOGY" "PLAYER TECHS" PTECHS
+
+Player techs are traits, capabilities, or upgrades that are applied to a player
+by abilities. They are similar to empire technologies.
+
+The ability info display ("ability <name>") lists any techs granted by the
+ability. For players familiar with EmpireMUD, this may indicate what the
+ability does. However, you can usually find better information about it in the
+help file for the ability.
+
+Immortals can view a player's techs with "show technology <name>".
+
+See also: EMPIRE TECHNOLOGIES
 #
 PLAYERKILLING "PLAYER KILLING" PK PVP "TOGGLE PVP"
 
@@ -1267,6 +1347,22 @@ inventory and gear.
 You can identify items to see which quest they belong to.
 
 See also: IDENTIFY
+#
+REGEN REGENS REGENERATION "REGEN RATE" "MANA REGENERATION" "MOVE REGENERATION" "HEALTH REGENERATION"
+
+'Regens' refer to the rate at which a character regenerates health, moves, or
+mana. For example, your 'mana regen' is the amount of mana you gain every 5
+seconds. Sleeping boosts your regens significantly.
+
+You can see your regens on the 'score' command where they are shown as +X/5s,
+meaning you gain X every 5 seconds.
+
+If your character is hungry or thirsty, your regen rate will drop precipitously
+and it may be necessary to sleep in order to gain any at all.
+
+Characters normally only regenerate health when they are not in combat.
+
+See also: HEALTH, HUNGER, MANA, MOVES, REGENERATE, SLEEP, STARVING, THIRST
 #
 RESIST-MAGICAL "RESIST MAGICAL" "MAGICAL RESISTANCE"
 
@@ -1360,6 +1456,7 @@ SCAN
 Usage:  scan <direction>
         scan <tile/vehicle name>
         scan <claimed/unclaimed/foreign/adventures>
+        scan [max-distance] [-direction]
 
 This command shows you the same information as the screen-reader map display,
 but in only one direction. The distance you see on a scan is based on your
@@ -1374,6 +1471,11 @@ You can get extra information if you have the 'political' or 'informative'
 toggles turned on. Scanning for 'foreign' tiles will show ones owned by empires
 other than your own. However, dimly lit tiles won't appear on political or
 informative at night.
+
+All scans may include the max-distance and -direction modifiers. This lets you
+specify a shorter distance, such as "scan 1" or "scan forest 3", or filter a
+specific direction from a larger scan, such as "scan forest -east". This is
+different from scanning in a direction with "scan east".
 
 Example:
  > scan southwest
@@ -1482,7 +1584,6 @@ have the same base inventory size).
 Strength is used for:
  - A core attribute for the melee group role.
  - Increasing melee DPS (damage per second) from physical weapons.
- - Chopping and mining faster.
  - Wearing heavy armor (tank armor sometimes has -STRENGTH).
 
 See also: ATTRIBUTES, MELEE DPS, CHOP, MINE
@@ -1519,6 +1620,15 @@ any bind-on-pickup loot the mob drops.
 If the mob is out of combat long enough to heal, it will also reset its tags.
 
 See also: BINDING
+#
+"TIME ZONE" "TIME ZONES"
+
+This game has different time zones that depend on how far east or west you
+travel on the map. By default, the world has 24 time zones and wraps from east
+to west. The latest time zone is always the one that's furthest east, and is
+the time zone used for global events like the yearly reset.
+
+See also: TIME, YEARLY RESET
 #
 TIP TIPS "TIP OF THE DAY" HINT
 
@@ -1615,6 +1725,19 @@ people.
 See also: BOARD, CUSTOMIZE, DESIGNATE, DISEMBARK, DRAG, DRIVE, HARNESS,
 LAND VEHICLES, LEAD, LIGHT, REPAIR, SCRAP, SHIPS, SIT
 #
+WATERWALK "WATER WALK" "WATER WALKING" "WALK ON WATER" "WALKING ON WATER"
+
+The WATERWALK effect allows you to walk normally on water. You will not drown
+or lose movement points from swimming.
+
+Normal land mounts do not benefit from WATERWALK on the player -- you still
+need the correct mount ability to cross water while mounted.
+
+On mobs, this is different from the AQUATIC mob flag, which allows the mob to
+move on water but forbids it from moving onto land.
+
+See also: DROWNING
+#
 WHEREAMI "WHERE AM I"
 
 Usage:  whereami
@@ -1657,6 +1780,24 @@ in the loot from any mob in the 100-200 range, or 200-300 range for the next
 tier above that.
 
 Many different types of items and recipes appear as world drops.
+#
+"YEARLY RESET" EARTHQUAKE QUAKE "NEW YEAR" "NEW YEARS"
+
+When the game world reaches a new year, there is an earthquake with the message
+'The ground under you shakes violently!' This causes a little damage to
+buildings and vehicles; they now require maintenance.
+
+This yearly reset also refreshes any mountain tile that no longer has a mine or
+other building on it, giving them a new type and fresh amount of ore. Other
+types of depletion, such as areas that have been dug until there's nothing left
+to dig up, refresh by 50% during the yearly reset -- even if there's still a
+building on them.
+
+The new year and earthquake happen at the end of December 30 and start of
+January 1 on the 'time' command in the latest time zone in the game. This means
+they may happen before the end of December 30 for many players.
+
+See also: MAINTAIN, TIME, TIME ZONE
 #
 ZENITH "ZENITH PASSAGE" "SUN ZENITH"
 

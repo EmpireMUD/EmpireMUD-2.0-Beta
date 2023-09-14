@@ -666,8 +666,8 @@ end
 %echoaround% %actor% ~%self% lunges forward and sinks ^%self% teeth into |%actor% shoulder!
 eval healthprct %actor.health% * 100 / %actor.maxhealth%
 set can_turn 1
-if %healthprct% > 50 || %actor.aff_flagged(!VAMPIRE)% || %actor.vampire()%
-  * Too much health left, or immune to vampirism
+if %healthprct% > 5 || %actor.vampire()%
+  * Too much health left, or immune already a vampire
   set can_turn 0
 end
 if %actor.is_pc%
@@ -704,7 +704,7 @@ Nerf bat random debuffs~
 set effect %random.4%
 switch %effect%
   case 1
-    %echo% ~%self% brushes you with its wings. and you feel lethargic.
+    %echo% ~%self% brushes you with its wings, and you feel lethargic.
   break
   case 2
     %echo% ~%self% squeaks, and you feel your strength desert you.

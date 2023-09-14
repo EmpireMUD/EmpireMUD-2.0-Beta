@@ -500,7 +500,7 @@ ACMD(do_msend) {
 		return;
 	}
 
-	sub_write(p, victim, TRUE, TO_CHAR | (use_queue ? TO_QUEUE : 0));
+	sub_write(p, victim, TRUE, TO_CHAR | TO_SLEEP | (use_queue ? TO_QUEUE : 0));
 }
 
 
@@ -601,7 +601,10 @@ ACMD(do_mregionecho) {
 		
 		if (center) {
 			DL_FOREACH(character_list, targ) {
-				if (NO_LOCATION(IN_ROOM(targ)) || compute_distance(center, IN_ROOM(targ)) > radius) {
+				if (!same_subzone(center, IN_ROOM(targ))) {
+					continue;
+				}
+				if (compute_distance(center, IN_ROOM(targ)) > radius) {
 					continue;
 				}
 				if (outdoor_only && !IS_OUTDOORS(targ)) {
@@ -611,6 +614,48 @@ ACMD(do_mregionecho) {
 				// send
 				sub_write(msg, targ, TRUE, TO_CHAR | (use_queue ? TO_QUEUE : 0));
 			}
+		}
+	}
+}
+
+
+ACMD(do_msubecho) {
+	char room_number[MAX_INPUT_LENGTH], *msg;
+	bool use_queue;
+	room_data *where;
+	char_data *targ;
+
+	if (!MOB_OR_IMPL(ch)) {
+		send_config_msg(ch, "huh_string");
+		return;
+	}
+
+	if (AFF_FLAGGED(ch, AFF_ORDERED))
+		return;
+
+	msg = any_one_word(argument, room_number);
+	use_queue = script_message_should_queue(&msg);
+
+	if (!*room_number || !*msg) {
+		mob_log(ch, "msubecho called with too few args");
+	}
+	else if (!(where = find_target_room(ch, room_number))) {
+		mob_log(ch, "msubecho called with invalid target");
+	}
+	else if (!ROOM_INSTANCE(where)) {
+		mob_log(ch, "msubecho called outside an adventure");
+	}
+	else {
+		DL_FOREACH(character_list, targ) {
+			if (ROOM_INSTANCE(where) != ROOM_INSTANCE(IN_ROOM(targ))) {
+				continue;	// wrong instance
+			}
+			if (!same_subzone(where, IN_ROOM(targ))) {
+				continue;	// wrong subzone
+			}
+			
+			// send
+			sub_write(msg, targ, TRUE, TO_CHAR | (use_queue ? TO_QUEUE : 0));
 		}
 	}
 }
@@ -798,7 +843,8 @@ ACMD(do_mload) {
 		}
 		
 		cnt = (*arg1 == UID_CHAR) ? get_obj(arg1) : get_obj_vis(ch, arg1, NULL);
-		if (cnt && GET_OBJ_TYPE(cnt) == ITEM_CONTAINER) {	// load in container
+		if (cnt && (GET_OBJ_TYPE(cnt) == ITEM_CONTAINER || GET_OBJ_TYPE(cnt) == ITEM_CORPSE)) {
+			// load in container
 			obj_to_obj(object, cnt);
 			load_otrigger(object);
 			return;
@@ -889,7 +935,7 @@ ACMD(do_mmove) {
 	}
 	
 	// things that block moves
-	if (MOB_FLAGGED(ch, MOB_SENTINEL | MOB_TIED) || AFF_FLAGGED(ch, AFF_CHARM | AFF_ENTANGLED) || GET_POS(ch) != POS_STANDING || (GET_LEADER(ch) && IN_ROOM(ch) == IN_ROOM(GET_LEADER(ch)))) {
+	if (MOB_FLAGGED(ch, MOB_SENTINEL | MOB_TIED) || AFF_FLAGGED(ch, AFF_CHARM | AFF_IMMOBILIZED) || GET_POS(ch) != POS_STANDING || (GET_LEADER(ch) && IN_ROOM(ch) == IN_ROOM(GET_LEADER(ch)))) {
 		return;
 	}
 	
@@ -1023,7 +1069,7 @@ ACMD(do_mgoto) {
 
 	char_from_room(ch);
 	char_to_room(ch, location);
-	enter_wtrigger(IN_ROOM(ch), ch, NO_DIR);
+	enter_wtrigger(IN_ROOM(ch), ch, NO_DIR, "script");
 	msdp_update_room(ch);
 }
 
@@ -1216,10 +1262,10 @@ ACMD(do_mrestore) {
 			GET_POS(victim) = POS_STANDING;
 		}
 		affect_total(victim);
-		GET_HEALTH(victim) = GET_MAX_HEALTH(victim);
-		GET_MOVE(victim) = GET_MAX_MOVE(victim);
-		GET_MANA(victim) = GET_MAX_MANA(victim);
-		GET_BLOOD(victim) = GET_MAX_BLOOD(victim);
+		set_health(victim, GET_MAX_HEALTH(victim));
+		set_move(victim, GET_MAX_MOVE(victim));
+		set_mana(victim, GET_MAX_MANA(victim));
+		set_blood(victim, GET_MAX_BLOOD(victim));
 	}
 	if (obj) {
 		// not sure what to do for objs
@@ -1289,7 +1335,7 @@ ACMD(do_mteleport) {
 				GET_LAST_DIR(vict) = NO_DIR;
 				char_from_room(vict);
 				char_to_room(vict, target);
-				enter_wtrigger(IN_ROOM(vict), vict, NO_DIR);
+				enter_wtrigger(IN_ROOM(vict), vict, NO_DIR, "script");
 				qt_visit_room(vict, IN_ROOM(vict));
 				msdp_update_room(vict);
 			}
@@ -1315,7 +1361,7 @@ ACMD(do_mteleport) {
 						char_from_room(vict);
 						char_to_room(vict, target);
 						GET_LAST_DIR(vict) = NO_DIR;
-						enter_wtrigger(IN_ROOM(vict), ch, NO_DIR);
+						enter_wtrigger(IN_ROOM(vict), ch, NO_DIR, "script");
 						qt_visit_room(vict, IN_ROOM(vict));
 						msdp_update_room(vict);
 					}
@@ -1329,7 +1375,7 @@ ACMD(do_mteleport) {
 				GET_LAST_DIR(vict) = NO_DIR;
 				char_from_room(vict);
 				char_to_room(vict, target);
-				enter_wtrigger(IN_ROOM(vict), vict, NO_DIR);
+				enter_wtrigger(IN_ROOM(vict), vict, NO_DIR, "script");
 				qt_visit_room(vict, IN_ROOM(vict));
 				msdp_update_room(vict);
 			}
@@ -1337,7 +1383,7 @@ ACMD(do_mteleport) {
 		else if ((*arg1 == UID_CHAR && (veh = get_vehicle(arg1))) || (veh = get_vehicle_in_room_vis(ch, arg1, NULL))) {
 			vehicle_from_room(veh);
 			vehicle_to_room(veh, target);
-			entry_vtrigger(veh);
+			entry_vtrigger(veh, "script");
 		}
 		else if ((*arg1 == UID_CHAR && (obj = get_obj(arg1))) || (obj = get_obj_vis(ch, arg1, NULL))) {
 			obj_to_room(obj, target);
@@ -1574,7 +1620,7 @@ ACMD(do_mdot) {
 	any_vnum atype = ATYPE_DG_AFFECT;
 	double modifier = 1.0;
 	char_data *vict;
-	int type, max_stacks;
+	int type, max_stacks, duration;
 
 	if (!MOB_OR_IMPL(ch)) {
 		send_config_msg(ch, "huh_string");
@@ -1618,6 +1664,10 @@ ACMD(do_mdot) {
 		mob_log(ch, "mdot: victim (%s) does not exist", name);
 		return;
 	}
+	if ((duration = atoi(durarg)) < 1) {
+		mob_log(ch, "mdot: invalid duration '%s'", durarg);
+		return;
+	}
 	
 	if (*typearg) {
 		type = search_block(typearg, damage_types, FALSE);
@@ -1631,7 +1681,7 @@ ACMD(do_mdot) {
 	}
 	
 	max_stacks = (*stackarg ? atoi(stackarg) : 1);
-	script_damage_over_time(vict, atype, get_approximate_level(ch), type, modifier, atoi(durarg), max_stacks, ch);
+	script_damage_over_time(vict, atype, get_approximate_level(ch), type, modifier, duration, max_stacks, ch);
 }
 
 
@@ -1940,6 +1990,19 @@ ACMD(do_mslay) {
 		msg_to_char(vict, "Being the cool immortal you are, you sidestep a trap, obviously placed to kill you.\r\n");
 	}
 	else {
+		// log
+		if (!IS_NPC(vict)) {
+			if (*argument) {
+				// custom death log?
+				log_to_slash_channel_by_name(DEATH_LOG_CHANNEL, vict, "%s", argument);
+			}
+			else {
+				// basic death log
+				log_to_slash_channel_by_name(DEATH_LOG_CHANNEL, vict, "%s has died at (%d, %d)!", PERS(vict, vict, TRUE), X_COORD(IN_ROOM(vict)), Y_COORD(IN_ROOM(vict)));
+			}
+			syslog(SYS_DEATH, 0, TRUE, "DEATH: %s has been killed by a script at %s (mob %d)", GET_NAME(vict), room_log_identifier(IN_ROOM(vict)), GET_MOB_VNUM(ch));
+		}
+		
 		die(vict, ch);
 	}
 }
@@ -2021,7 +2084,7 @@ ACMD(do_mtransform) {
 	
 		if (keep_attr) {
 			for (iter = 0; iter < NUM_POOLS; ++iter) {
-				GET_CURRENT_POOL(&tmpmob, iter) = GET_CURRENT_POOL(ch, iter);
+				GET_CURRENT_POOL(&tmpmob, iter) = GET_CURRENT_POOL(ch, iter);	// careful setting this way -- does not schedule heals
 				GET_MAX_POOL(&tmpmob, iter) = GET_MAX_POOL(ch, iter);
 			}
 		}

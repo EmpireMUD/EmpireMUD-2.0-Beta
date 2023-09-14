@@ -1,0 +1,227 @@
+#11988
+Clear-Cut Calamander~
+A Clear-Cut Calamander Grove~
+'.' 10 il 4 a p
+C
+dig~
+D0
+.&t.&?..~
+&g~
+D0
+..&t.&?.~
+&g~
+E
+4 0 0.40 11989
+E
+22 0 5.00 11992
+I 5 103 2.00 1 d  # DIG: yellow lightning stone
+I 5 104 2.00 1 d  # DIG: red bloodstone
+I 5 1300 2.00 1 d  # DIG: glowing green seashell
+I 5 1206 2.00 1 d  # DIG: iridescent blue iris
+I 5 102 9.00 1 d  # DIG: flint stone
+I 5 100 83.00 1 d  # DIG: rock
+I 6 3017 100.00 1  # FORAGE: plump fig
+X
+calamander grove stumps trees forest around~
+   The stumps of this once-verdant grove have a strange, variegated pattern to
+them, with stripes in black and brown. These are calamanders, a rare sort of
+tree grown for their exquisite wood and rumored magical properties. Although,
+perhaps, you can validate those rumors: there's mana leaking from the stumps.
+~
+X
+mana~
+   Wisps of mana escape through the hacked surface of the stumps, escaping
+ephemerally into the air.
+~
+S
+#11989
+Calamander Thicket~
+A Calamander Thicket~
+'.' 4 ilq 6 ad gp
+C
+chop, dig~
+D0
+&g...&?Y~
+&J~
+D0
+&g..&?Y&g.~
+&J~
+D0
+&g.&?Y&g..~
+&J~
+D0
+Y&g...~
+&J~
+E
+0 0 100.00 11988
+E
+4 0 0.40 11990
+E
+22 0 5.00 11992
+I 5 103 2.00 1 d  # DIG: yellow lightning stone
+I 5 104 2.00 1 d  # DIG: red bloodstone
+I 5 1300 2.00 1 d  # DIG: glowing green seashell
+I 5 1206 2.00 1 d  # DIG: iridescent blue iris
+I 5 102 9.00 1 d  # DIG: flint stone
+I 5 100 83.00 1 d  # DIG: rock
+I 6 11999 100.00 1  # FORAGE: piece of jade cheese
+I 20 11995 100.00 1  # CHOP: calamander tree
+M
+11963 10.00 c
+X
+calamander jungle trees wood forest around thicket~
+   The trees in this thicket might, in other circumstances, be rather
+non-descript. The bark is rough, gray-brown in color, and of little interest.
+The trunks aren't straight or particularly sturdy. But you have heard this
+forest contains calamander trees -- a rare wood famed for its striped color and
+rumored magical properties. There could be profit in this wood.
+~
+S
+#11990
+Calamander Grove~
+A Calamander Grove~
+'.' 4 iq 8 ad gp
+C
+chop, dig~
+D0
+&g..&?YY~
+&J~
+D0
+Y&g..&?Y~
+&J~
+D0
+YY&g..~
+&J~
+D0
+Y&g.&?Y&g.~
+&J~
+D0
+&g.&?Y&g.&?Y~
+&J~
+E
+0 0 100.00 11989
+E
+4 0 0.40 11991
+E
+22 0 5.00 11992
+I 5 103 2.00 1 d  # DIG: yellow lightning stone
+I 5 104 2.00 1 d  # DIG: red bloodstone
+I 5 1300 2.00 1 d  # DIG: glowing green seashell
+I 5 1206 2.00 1 d  # DIG: iridescent blue iris
+I 5 102 9.00 1 d  # DIG: flint stone
+I 5 100 83.00 1 d  # DIG: rock
+I 6 11999 100.00 1  # FORAGE: piece of jade cheese
+I 20 11995 100.00 1  # CHOP: calamander tree
+M
+11963 10.00 c
+X
+calamander jungle trees wood forest around grove~
+   The gnarled grove is full of trees that might, in other circumstances, be
+rather non-descript. The bark is rough, gray-brown in color, and of little
+interest. The trunks aren't straight or particularly sturdy. But you have heard
+this forest contains calamander trees -- a rare wood famed for its striped
+color and rumored magical properties. You might be standing in the midst of a
+veritable fortune.
+~
+S
+#11991
+Calamander Jungle~
+A Calamander Jungle~
+'Y' 4 iq 12 ad gp
+C
+chop, dig~
+D0
+&G^&?YYY~
+&J~
+D0
+&G^&?YYY~
+&J~
+D0
+Y&G^&?YY~
+&J~
+D0
+Y&G^&?YY~
+&J~
+D0
+YY&G^&?Y~
+&J~
+D0
+YY&G^&?Y~
+&J~
+D0
+YYY&G^~
+&J~
+D0
+YYY&G^~
+&J~
+D0
+&G^&?Y&O*&?Y~
+&J~
+D0
+Y&O*&?Y&G^~
+&J~
+D0
+&G^&?Y&P*&?Y~
+&J~
+D0
+Y&P*&?Y&G^~
+&J~
+E
+0 0 100.00 11990
+E
+22 0 5.00 11992
+I 5 103 2.00 1 d  # DIG: yellow lightning stone
+I 5 104 2.00 1 d  # DIG: red bloodstone
+I 5 1300 2.00 1 d  # DIG: glowing green seashell
+I 5 1206 2.00 1 d  # DIG: iridescent blue iris
+I 5 102 9.00 1 d  # DIG: flint stone
+I 5 100 83.00 1 d  # DIG: rock
+I 6 11999 100.00 1  # FORAGE: piece of jade cheese
+I 20 11995 100.00 1  # CHOP: calamander tree
+M
+11963 10.00 c
+X
+calamander jungle trees wood forest around~
+   The dense jungle is full of trees that might, in other circumstances, be
+rather non-descript. The bark is rough, gray-brown in color, and of little
+interest. The trunks aren't straight or particularly sturdy. But you have heard
+this forest contains calamander trees -- a rare wood famed for its striped
+color and rumored magical properties. You might be standing in the midst of a
+veritable fortune.
+~
+S
+#11992
+Dead Calamanders~
+A Dead Calamander Grove~
+'Y' 10 lq 12 d np
+C
+chop, dig~
+D0
+&g.&?YYY~
+&b~
+D0
+Y&g.&?YY~
+&b~
+D0
+YY&g.&?Y~
+&b~
+D0
+YYY&g.~
+&b~
+E
+0 0 100.00 61
+E
+4 0 0.80 65
+E
+9 0 50.00 27
+I 5 102 9.00 1 d  # DIG: flint stone
+I 5 100 91.00 1 d  # DIG: rock
+I 6 3017 75.00 1  # FORAGE: plump fig
+I 20 605 100.00 3 c  # CHOP: pile of dead wood
+X
+calamander jungle grove thicket trees wood forest around~
+   The calamander trees have all died. The leaves are long gone and the trunks
+have begun to decay. There are no traces of the magic this grove once held.
+~
+S
+$

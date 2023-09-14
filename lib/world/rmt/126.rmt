@@ -2,7 +2,7 @@
 Elemental Spawn Chamber~
 This room is unreachable by players.
 ~
-gi 0 0
+gi 0 0 -1
 M 0 12600 100.00 1
 M 0 12601 100.00 1
 M 0 12602 100.00 1
@@ -18,34 +18,34 @@ feet in any direction, and the call of animals tells you that you are not
 alone. You can only make out the faintest of trails here, if only because you
 can proceed in no other direction.
 ~
-acd 0 0
+acdi 0 0 12650
 D14
 ~
 0 12651
-I 5 104 3.00 1 X  # DIG: a red bloodstone
-I 5 103 3.00 1 X  # DIG: a yellow lightning stone
-I 5 102 8.00 1 X  # DIG: a flint stone
-I 5 100 100.00 1 X  # DIG: a rock
-I 6 1254 1.00 1 X  # FORAGE: a mana potion
-I 6 3013 25.00 1 X  # FORAGE: a handful of nuts
-I 6 3009 25.00 1 X  # FORAGE: an orange
-I 6 3007 25.00 1 X  # FORAGE: a couple red cherries
-I 6 3001 100.00 1 X  # FORAGE: a green apple
-I 7 1206 8.33 1 p  # PICK: an iridescent blue iris
-I 7 1200 15.28 1 p  # PICK: a handful of whitegrass
+I 5 104 3.00 1 X  # DIG: red bloodstone
+I 5 103 3.00 1 X  # DIG: yellow lightning stone
+I 5 102 8.00 1 X  # DIG: flint stone
+I 5 100 100.00 1 X  # DIG: rock
+I 6 1254 1.00 1 X  # FORAGE: mana potion
+I 6 3013 25.00 1 X  # FORAGE: handful of nuts
+I 6 3009 25.00 1 X  # FORAGE: orange
+I 6 3007 25.00 1 X  # FORAGE: couple red cherries
+I 6 3001 100.00 1 X  # FORAGE: green apple
+I 7 1206 8.33 1 p  # PICK: iridescent blue iris
+I 7 1200 15.28 1 p  # PICK: handful of whitegrass
 I+ 0 70  # Ability: Find Herbs
-I 7 1201 15.28 1 p  # PICK: a sack of fiveleaf
+I 7 1201 15.28 1 p  # PICK: sack of fiveleaf
 I+ 0 70  # Ability: Find Herbs
-I 7 1202 15.28 1 p  # PICK: a twig of redthorn
+I 7 1202 15.28 1 p  # PICK: twig of redthorn
 I+ 0 70  # Ability: Find Herbs
-I 7 1203 15.28 1 p  # PICK: some magewhisper sepals
+I 7 1203 15.28 1 p  # PICK: magewhisper sepals
 I+ 0 70  # Ability: Find Herbs
-I 7 1204 15.28 1 p  # PICK: a daggerbite frond
+I 7 1204 15.28 1 p  # PICK: daggerbite frond
 I+ 0 70  # Ability: Find Herbs
-I 7 1205 15.27 1 p  # PICK: some bileberries
+I 7 1205 15.27 1 p  # PICK: bileberries
 I+ 0 70  # Ability: Find Herbs
-I 7 123 100.00 1 p  # PICK: a small flower
-I 9 121 100.00 1 X  # GATHER: some sticks and leaves
+I 7 123 100.00 1 p  # PICK: small flower
+I 9 121 100.00 1 X  # GATHER: sticks and leaves
 M 0 12676 100.00 1
 T 12654
 T 12680
@@ -59,37 +59,37 @@ Behind the fog, you can hear the cackle of wildlings and the chants of the
 druids.
 Commands: &clist, buy&0
 ~
-ad 0 0
+adi 0 0 12650
 D14
 ~
 0 12650
 D14
 ~
 0 12652
-I 5 104 3.00 1 X  # DIG: a red bloodstone
-I 5 103 3.00 1 X  # DIG: a yellow lightning stone
-I 5 102 8.00 1 X  # DIG: a flint stone
-I 5 100 100.00 1 X  # DIG: a rock
-I 6 1254 1.00 1 X  # FORAGE: a mana potion
-I 6 3013 25.00 1 X  # FORAGE: a handful of nuts
-I 6 3009 25.00 1 X  # FORAGE: an orange
-I 6 3007 25.00 1 X  # FORAGE: a couple red cherries
-I 6 3001 100.00 1 X  # FORAGE: a green apple
-I 7 1206 8.33 1 p  # PICK: an iridescent blue iris
-I 7 1200 15.28 1 p  # PICK: a handful of whitegrass
+I 5 104 3.00 1 X  # DIG: red bloodstone
+I 5 103 3.00 1 X  # DIG: yellow lightning stone
+I 5 102 8.00 1 X  # DIG: flint stone
+I 5 100 100.00 1 X  # DIG: rock
+I 6 1254 1.00 1 X  # FORAGE: mana potion
+I 6 3013 25.00 1 X  # FORAGE: handful of nuts
+I 6 3009 25.00 1 X  # FORAGE: orange
+I 6 3007 25.00 1 X  # FORAGE: couple red cherries
+I 6 3001 100.00 1 X  # FORAGE: green apple
+I 7 1206 8.33 1 p  # PICK: iridescent blue iris
+I 7 1200 15.28 1 p  # PICK: handful of whitegrass
 I+ 0 70  # Ability: Find Herbs
-I 7 1201 15.28 1 p  # PICK: a sack of fiveleaf
+I 7 1201 15.28 1 p  # PICK: sack of fiveleaf
 I+ 0 70  # Ability: Find Herbs
-I 7 1202 15.28 1 p  # PICK: a twig of redthorn
+I 7 1202 15.28 1 p  # PICK: twig of redthorn
 I+ 0 70  # Ability: Find Herbs
-I 7 1203 15.28 1 p  # PICK: some magewhisper sepals
+I 7 1203 15.28 1 p  # PICK: magewhisper sepals
 I+ 0 70  # Ability: Find Herbs
-I 7 1204 15.28 1 p  # PICK: a daggerbite frond
+I 7 1204 15.28 1 p  # PICK: daggerbite frond
 I+ 0 70  # Ability: Find Herbs
-I 7 1205 15.27 1 p  # PICK: some bileberries
+I 7 1205 15.27 1 p  # PICK: bileberries
 I+ 0 70  # Ability: Find Herbs
-I 7 123 100.00 1 p  # PICK: a small flower
-I 9 121 100.00 1 X  # GATHER: some sticks and leaves
+I 7 123 100.00 1 p  # PICK: small flower
+I 9 121 100.00 1 X  # GATHER: sticks and leaves
 M 1 12652 100.00 1
 M 0 12675 100.00 1
 T 12654
@@ -103,7 +103,7 @@ is deathly silent, but the fog all around you echoes with the barks and howls
 and screeches of uncountable wild animals. You can see no eyes through the fog,
 but you have the ever-present sense that they can see you.
 ~
-ad 0 0
+adi 0 0 12650
 D14
 ~
 0 12651
@@ -113,30 +113,30 @@ D14
 D14
 ~
 0 12653
-I 5 104 3.00 1 X  # DIG: a red bloodstone
-I 5 103 3.00 1 X  # DIG: a yellow lightning stone
-I 5 102 8.00 1 X  # DIG: a flint stone
-I 5 100 100.00 1 X  # DIG: a rock
-I 6 1254 1.00 1 X  # FORAGE: a mana potion
-I 6 3013 25.00 1 X  # FORAGE: a handful of nuts
-I 6 3009 25.00 1 X  # FORAGE: an orange
-I 6 3007 25.00 1 X  # FORAGE: a couple red cherries
-I 6 3001 100.00 1 X  # FORAGE: a green apple
-I 7 1206 8.33 1 p  # PICK: an iridescent blue iris
-I 7 1200 15.28 1 p  # PICK: a handful of whitegrass
+I 5 104 3.00 1 X  # DIG: red bloodstone
+I 5 103 3.00 1 X  # DIG: yellow lightning stone
+I 5 102 8.00 1 X  # DIG: flint stone
+I 5 100 100.00 1 X  # DIG: rock
+I 6 1254 1.00 1 X  # FORAGE: mana potion
+I 6 3013 25.00 1 X  # FORAGE: handful of nuts
+I 6 3009 25.00 1 X  # FORAGE: orange
+I 6 3007 25.00 1 X  # FORAGE: couple red cherries
+I 6 3001 100.00 1 X  # FORAGE: green apple
+I 7 1206 8.33 1 p  # PICK: iridescent blue iris
+I 7 1200 15.28 1 p  # PICK: handful of whitegrass
 I+ 0 70  # Ability: Find Herbs
-I 7 1201 15.28 1 p  # PICK: a sack of fiveleaf
+I 7 1201 15.28 1 p  # PICK: sack of fiveleaf
 I+ 0 70  # Ability: Find Herbs
-I 7 1202 15.28 1 p  # PICK: a twig of redthorn
+I 7 1202 15.28 1 p  # PICK: twig of redthorn
 I+ 0 70  # Ability: Find Herbs
-I 7 1203 15.28 1 p  # PICK: some magewhisper sepals
+I 7 1203 15.28 1 p  # PICK: magewhisper sepals
 I+ 0 70  # Ability: Find Herbs
-I 7 1204 15.28 1 p  # PICK: a daggerbite frond
+I 7 1204 15.28 1 p  # PICK: daggerbite frond
 I+ 0 70  # Ability: Find Herbs
-I 7 1205 15.27 1 p  # PICK: some bileberries
+I 7 1205 15.27 1 p  # PICK: bileberries
 I+ 0 70  # Ability: Find Herbs
-I 7 123 100.00 1 p  # PICK: a small flower
-I 9 121 100.00 1 X  # GATHER: some sticks and leaves
+I 7 123 100.00 1 p  # PICK: small flower
+I 9 121 100.00 1 X  # GATHER: sticks and leaves
 M 0 12660 25.00 25
 T 12654
 T 12680
@@ -147,7 +147,7 @@ A Strange Grove~
 trees, and you can't tell which way is forward or backward in the grove. The
 leaves rustle in the canopy, but when you look up, all you see there is fog.
 ~
-a 0 0
+ai 0 0 12650
 D14
 ~
 0 12652
@@ -158,30 +158,30 @@ E
 fog dense canopy trees path~
 Nope, it's just fog. All fog.
 ~
-I 5 104 3.00 1 X  # DIG: a red bloodstone
-I 5 103 3.00 1 X  # DIG: a yellow lightning stone
-I 5 102 8.00 1 X  # DIG: a flint stone
-I 5 100 100.00 1 X  # DIG: a rock
-I 6 1254 1.00 1 X  # FORAGE: a mana potion
-I 6 3013 25.00 1 X  # FORAGE: a handful of nuts
-I 6 3009 25.00 1 X  # FORAGE: an orange
-I 6 3007 25.00 1 X  # FORAGE: a couple red cherries
-I 6 3001 100.00 1 X  # FORAGE: a green apple
-I 7 1206 8.33 1 p  # PICK: an iridescent blue iris
-I 7 1200 15.28 1 p  # PICK: a handful of whitegrass
+I 5 104 3.00 1 X  # DIG: red bloodstone
+I 5 103 3.00 1 X  # DIG: yellow lightning stone
+I 5 102 8.00 1 X  # DIG: flint stone
+I 5 100 100.00 1 X  # DIG: rock
+I 6 1254 1.00 1 X  # FORAGE: mana potion
+I 6 3013 25.00 1 X  # FORAGE: handful of nuts
+I 6 3009 25.00 1 X  # FORAGE: orange
+I 6 3007 25.00 1 X  # FORAGE: couple red cherries
+I 6 3001 100.00 1 X  # FORAGE: green apple
+I 7 1206 8.33 1 p  # PICK: iridescent blue iris
+I 7 1200 15.28 1 p  # PICK: handful of whitegrass
 I+ 0 70  # Ability: Find Herbs
-I 7 1201 15.28 1 p  # PICK: a sack of fiveleaf
+I 7 1201 15.28 1 p  # PICK: sack of fiveleaf
 I+ 0 70  # Ability: Find Herbs
-I 7 1202 15.28 1 p  # PICK: a twig of redthorn
+I 7 1202 15.28 1 p  # PICK: twig of redthorn
 I+ 0 70  # Ability: Find Herbs
-I 7 1203 15.28 1 p  # PICK: some magewhisper sepals
+I 7 1203 15.28 1 p  # PICK: magewhisper sepals
 I+ 0 70  # Ability: Find Herbs
-I 7 1204 15.28 1 p  # PICK: a daggerbite frond
+I 7 1204 15.28 1 p  # PICK: daggerbite frond
 I+ 0 70  # Ability: Find Herbs
-I 7 1205 15.27 1 p  # PICK: some bileberries
+I 7 1205 15.27 1 p  # PICK: bileberries
 I+ 0 70  # Ability: Find Herbs
-I 7 123 100.00 1 p  # PICK: a small flower
-I 9 121 100.00 1 X  # GATHER: some sticks and leaves
+I 7 123 100.00 1 p  # PICK: small flower
+I 9 121 100.00 1 X  # GATHER: sticks and leaves
 M 0 12660 25.00 25
 M 1 12679 75.00 2
 T 12654
@@ -194,34 +194,34 @@ through, and then you can't even do that. You try to move between the trees,
 but the fog smothers you and you gasp for breath. You can only go back from
 here, not forward.
 ~
-a 0 0
+ai 0 0 12650
 D14
 ~
 0 12653
-I 5 104 3.00 1 X  # DIG: a red bloodstone
-I 5 103 3.00 1 X  # DIG: a yellow lightning stone
-I 5 102 8.00 1 X  # DIG: a flint stone
-I 5 100 100.00 1 X  # DIG: a rock
-I 6 1254 1.00 1 X  # FORAGE: a mana potion
-I 6 3013 25.00 1 X  # FORAGE: a handful of nuts
-I 6 3009 25.00 1 X  # FORAGE: an orange
-I 6 3007 25.00 1 X  # FORAGE: a couple red cherries
-I 6 3001 100.00 1 X  # FORAGE: a green apple
-I 7 1206 8.33 1 p  # PICK: an iridescent blue iris
-I 7 1200 15.28 1 p  # PICK: a handful of whitegrass
+I 5 104 3.00 1 X  # DIG: red bloodstone
+I 5 103 3.00 1 X  # DIG: yellow lightning stone
+I 5 102 8.00 1 X  # DIG: flint stone
+I 5 100 100.00 1 X  # DIG: rock
+I 6 1254 1.00 1 X  # FORAGE: mana potion
+I 6 3013 25.00 1 X  # FORAGE: handful of nuts
+I 6 3009 25.00 1 X  # FORAGE: orange
+I 6 3007 25.00 1 X  # FORAGE: couple red cherries
+I 6 3001 100.00 1 X  # FORAGE: green apple
+I 7 1206 8.33 1 p  # PICK: iridescent blue iris
+I 7 1200 15.28 1 p  # PICK: handful of whitegrass
 I+ 0 70  # Ability: Find Herbs
-I 7 1201 15.28 1 p  # PICK: a sack of fiveleaf
+I 7 1201 15.28 1 p  # PICK: sack of fiveleaf
 I+ 0 70  # Ability: Find Herbs
-I 7 1202 15.28 1 p  # PICK: a twig of redthorn
+I 7 1202 15.28 1 p  # PICK: twig of redthorn
 I+ 0 70  # Ability: Find Herbs
-I 7 1203 15.28 1 p  # PICK: some magewhisper sepals
+I 7 1203 15.28 1 p  # PICK: magewhisper sepals
 I+ 0 70  # Ability: Find Herbs
-I 7 1204 15.28 1 p  # PICK: a daggerbite frond
+I 7 1204 15.28 1 p  # PICK: daggerbite frond
 I+ 0 70  # Ability: Find Herbs
-I 7 1205 15.27 1 p  # PICK: some bileberries
+I 7 1205 15.27 1 p  # PICK: bileberries
 I+ 0 70  # Ability: Find Herbs
-I 7 123 100.00 1 p  # PICK: a small flower
-I 9 121 100.00 1 X  # GATHER: some sticks and leaves
+I 7 123 100.00 1 p  # PICK: small flower
+I 9 121 100.00 1 X  # GATHER: sticks and leaves
 M 0 12660 100.00 25
 T 12654
 T 12680
@@ -233,7 +233,7 @@ fog keeps you from straying too far from the path, but you notice an odd burrow
 beneath the roots of a great oak. The wildlings seem to be coming from the
 trees, so perhaps the burrow will be safe.
 ~
-a 0 0
+ai 0 0 12650
 D14
 ~
 0 12662
@@ -248,30 +248,30 @@ undergrowth burrow roots~
    Hidden in the undergrowth around the roots of an old oak tree is a rather
 large burrow.
 ~
-I 5 104 3.00 1 X  # DIG: a red bloodstone
-I 5 103 3.00 1 X  # DIG: a yellow lightning stone
-I 5 102 8.00 1 X  # DIG: a flint stone
-I 5 100 100.00 1 X  # DIG: a rock
-I 6 1254 1.00 1 X  # FORAGE: a mana potion
-I 6 3013 25.00 1 X  # FORAGE: a handful of nuts
-I 6 3009 25.00 1 X  # FORAGE: an orange
-I 6 3007 25.00 1 X  # FORAGE: a couple red cherries
-I 6 3001 100.00 1 X  # FORAGE: a green apple
-I 7 1206 8.33 1 p  # PICK: an iridescent blue iris
-I 7 1200 15.28 1 p  # PICK: a handful of whitegrass
+I 5 104 3.00 1 X  # DIG: red bloodstone
+I 5 103 3.00 1 X  # DIG: yellow lightning stone
+I 5 102 8.00 1 X  # DIG: flint stone
+I 5 100 100.00 1 X  # DIG: rock
+I 6 1254 1.00 1 X  # FORAGE: mana potion
+I 6 3013 25.00 1 X  # FORAGE: handful of nuts
+I 6 3009 25.00 1 X  # FORAGE: orange
+I 6 3007 25.00 1 X  # FORAGE: couple red cherries
+I 6 3001 100.00 1 X  # FORAGE: green apple
+I 7 1206 8.33 1 p  # PICK: iridescent blue iris
+I 7 1200 15.28 1 p  # PICK: handful of whitegrass
 I+ 0 70  # Ability: Find Herbs
-I 7 1201 15.28 1 p  # PICK: a sack of fiveleaf
+I 7 1201 15.28 1 p  # PICK: sack of fiveleaf
 I+ 0 70  # Ability: Find Herbs
-I 7 1202 15.28 1 p  # PICK: a twig of redthorn
+I 7 1202 15.28 1 p  # PICK: twig of redthorn
 I+ 0 70  # Ability: Find Herbs
-I 7 1203 15.28 1 p  # PICK: some magewhisper sepals
+I 7 1203 15.28 1 p  # PICK: magewhisper sepals
 I+ 0 70  # Ability: Find Herbs
-I 7 1204 15.28 1 p  # PICK: a daggerbite frond
+I 7 1204 15.28 1 p  # PICK: daggerbite frond
 I+ 0 70  # Ability: Find Herbs
-I 7 1205 15.27 1 p  # PICK: some bileberries
+I 7 1205 15.27 1 p  # PICK: bileberries
 I+ 0 70  # Ability: Find Herbs
-I 7 123 100.00 1 p  # PICK: a small flower
-I 9 121 100.00 1 X  # GATHER: some sticks and leaves
+I 7 123 100.00 1 p  # PICK: small flower
+I 9 121 100.00 1 X  # GATHER: sticks and leaves
 M 0 12660 25.00 25
 M 1 12679 75.00 2
 T 12654
@@ -284,17 +284,17 @@ person, but once you climb inside, you discover a tunnel large enough to march
 a parade through. The walls of the tunnel are carved with long scratches, as if
 this entire burrow were dug by wild beasts.
 ~
-bd 0 0
+bdi 0 0 12650
 D14
 ~
 0 12657
 D9
 ~
 0 12659
-I 5 104 3.00 1 X  # DIG: a red bloodstone
-I 5 103 3.00 1 X  # DIG: a yellow lightning stone
-I 5 102 8.00 1 X  # DIG: a flint stone
-I 5 100 100.00 1 X  # DIG: a rock
+I 5 104 3.00 1 X  # DIG: red bloodstone
+I 5 103 3.00 1 X  # DIG: yellow lightning stone
+I 5 102 8.00 1 X  # DIG: flint stone
+I 5 100 100.00 1 X  # DIG: rock
 M 0 12658 50.00 3
 T 12657
 S
@@ -304,17 +304,17 @@ A Strange Burrow~
 ends at every turn. The call of the wildlings outside the burrow is only a
 faint echo from here. The tunnels seem to be safe.
 ~
-bd 0 0
+bdi 0 0 12650
 D8
 ~
 0 12658
 D14
 ~
 0 12660
-I 5 104 3.00 1 X  # DIG: a red bloodstone
-I 5 103 3.00 1 X  # DIG: a yellow lightning stone
-I 5 102 8.00 1 X  # DIG: a flint stone
-I 5 100 100.00 1 X  # DIG: a rock
+I 5 104 3.00 1 X  # DIG: red bloodstone
+I 5 103 3.00 1 X  # DIG: yellow lightning stone
+I 5 102 8.00 1 X  # DIG: flint stone
+I 5 100 100.00 1 X  # DIG: rock
 M 0 12658 50.00 3
 M 0 12653 75.00 1
 T 12657
@@ -326,7 +326,7 @@ carved from the earth. Candles atop the altar burn an eerie green flame which
 does little to illuminate the chamber. Exposed roots in the walls are scratched
 with strange symbols that glow faintly in the dark.
 ~
-bd 0 0
+bdi 0 0 12650
 D14
 ~
 0 12659
@@ -340,10 +340,10 @@ E
 walls roots exposed strange symbols glow~
 Odd runes have been scratched into the roots by some three-clawed creature.
 ~
-I 5 104 3.00 1 X  # DIG: a red bloodstone
-I 5 103 3.00 1 X  # DIG: a yellow lightning stone
-I 5 102 8.00 1 X  # DIG: a flint stone
-I 5 100 100.00 1 X  # DIG: a rock
+I 5 104 3.00 1 X  # DIG: red bloodstone
+I 5 103 3.00 1 X  # DIG: yellow lightning stone
+I 5 102 8.00 1 X  # DIG: flint stone
+I 5 100 100.00 1 X  # DIG: rock
 M 0 12654 100.00 1
 M 0 12658 25.00 3
 T 12657
@@ -354,7 +354,7 @@ A Strange Grove~
 not grow here. There are no squirrels or rabbits. In the distance, you can hear
 the call of wildlings. Above you, something rustles in the trees.
 ~
-a 0 0
+ai 0 0 12650
 D14
 ~
 0 12667
@@ -364,30 +364,30 @@ D14
 D14
 ~
 0 12663
-I 5 104 3.00 1 X  # DIG: a red bloodstone
-I 5 103 3.00 1 X  # DIG: a yellow lightning stone
-I 5 102 8.00 1 X  # DIG: a flint stone
-I 5 100 100.00 1 X  # DIG: a rock
-I 6 1254 1.00 1 X  # FORAGE: a mana potion
-I 6 3013 25.00 1 X  # FORAGE: a handful of nuts
-I 6 3009 25.00 1 X  # FORAGE: an orange
-I 6 3007 25.00 1 X  # FORAGE: a couple red cherries
-I 6 3001 100.00 1 X  # FORAGE: a green apple
-I 7 1206 8.33 1 p  # PICK: an iridescent blue iris
-I 7 1200 15.28 1 p  # PICK: a handful of whitegrass
+I 5 104 3.00 1 X  # DIG: red bloodstone
+I 5 103 3.00 1 X  # DIG: yellow lightning stone
+I 5 102 8.00 1 X  # DIG: flint stone
+I 5 100 100.00 1 X  # DIG: rock
+I 6 1254 1.00 1 X  # FORAGE: mana potion
+I 6 3013 25.00 1 X  # FORAGE: handful of nuts
+I 6 3009 25.00 1 X  # FORAGE: orange
+I 6 3007 25.00 1 X  # FORAGE: couple red cherries
+I 6 3001 100.00 1 X  # FORAGE: green apple
+I 7 1206 8.33 1 p  # PICK: iridescent blue iris
+I 7 1200 15.28 1 p  # PICK: handful of whitegrass
 I+ 0 70  # Ability: Find Herbs
-I 7 1201 15.28 1 p  # PICK: a sack of fiveleaf
+I 7 1201 15.28 1 p  # PICK: sack of fiveleaf
 I+ 0 70  # Ability: Find Herbs
-I 7 1202 15.28 1 p  # PICK: a twig of redthorn
+I 7 1202 15.28 1 p  # PICK: twig of redthorn
 I+ 0 70  # Ability: Find Herbs
-I 7 1203 15.28 1 p  # PICK: some magewhisper sepals
+I 7 1203 15.28 1 p  # PICK: magewhisper sepals
 I+ 0 70  # Ability: Find Herbs
-I 7 1204 15.28 1 p  # PICK: a daggerbite frond
+I 7 1204 15.28 1 p  # PICK: daggerbite frond
 I+ 0 70  # Ability: Find Herbs
-I 7 1205 15.27 1 p  # PICK: some bileberries
+I 7 1205 15.27 1 p  # PICK: bileberries
 I+ 0 70  # Ability: Find Herbs
-I 7 123 100.00 1 p  # PICK: a small flower
-I 9 121 100.00 1 X  # GATHER: some sticks and leaves
+I 7 123 100.00 1 p  # PICK: small flower
+I 9 121 100.00 1 X  # GATHER: sticks and leaves
 M 0 12660 25.00 25
 T 12654
 T 12676
@@ -400,7 +400,7 @@ is flooded, with water as high up as the canopy. As you try to swim up for air,
 roots grasp at your leg and drag you back down. Strangely, the roots don't seem
 to stop you from walking along the forest floor.
 ~
-ad 0 0
+adi 0 0 12650
 D14
 ~
 0 12662
@@ -417,7 +417,7 @@ half-walking, unable to swim to the surface to take a breath. The path is hard
 to see now, but each time you deviate from it, a tree root rises from the
 ground like a tentacle and pulls you back toward the path.
 ~
-ad 0 0
+adi 0 0 12650
 D14
 ~
 0 12663
@@ -436,7 +436,7 @@ underwater in what might be a clearing or a pond. The water around you is
 magical, held up by the strange forces of the Magiterranean. And try as you
 might, you can't get to the surface to breathe.
 ~
-ad 0 0
+adi 0 0 12650
 D14
 ~
 0 12664
@@ -452,7 +452,7 @@ as if in tune with the primal movements of the plants around them. The fog in
 the distance seems to glow redder and redder as you press deeper into the
 Grove.
 ~
-a 0 0
+ai 0 0 12650
 D14
 ~
 0 12662
@@ -462,30 +462,30 @@ D14
 D14
 ~
 0 12674
-I 5 104 3.00 1 X  # DIG: a red bloodstone
-I 5 103 3.00 1 X  # DIG: a yellow lightning stone
-I 5 102 8.00 1 X  # DIG: a flint stone
-I 5 100 100.00 1 X  # DIG: a rock
-I 6 1254 1.00 1 X  # FORAGE: a mana potion
-I 6 3013 25.00 1 X  # FORAGE: a handful of nuts
-I 6 3009 25.00 1 X  # FORAGE: an orange
-I 6 3007 25.00 1 X  # FORAGE: a couple red cherries
-I 6 3001 100.00 1 X  # FORAGE: a green apple
-I 7 1206 8.33 1 p  # PICK: an iridescent blue iris
-I 7 1200 15.28 1 p  # PICK: a handful of whitegrass
+I 5 104 3.00 1 X  # DIG: red bloodstone
+I 5 103 3.00 1 X  # DIG: yellow lightning stone
+I 5 102 8.00 1 X  # DIG: flint stone
+I 5 100 100.00 1 X  # DIG: rock
+I 6 1254 1.00 1 X  # FORAGE: mana potion
+I 6 3013 25.00 1 X  # FORAGE: handful of nuts
+I 6 3009 25.00 1 X  # FORAGE: orange
+I 6 3007 25.00 1 X  # FORAGE: couple red cherries
+I 6 3001 100.00 1 X  # FORAGE: green apple
+I 7 1206 8.33 1 p  # PICK: iridescent blue iris
+I 7 1200 15.28 1 p  # PICK: handful of whitegrass
 I+ 0 70  # Ability: Find Herbs
-I 7 1201 15.28 1 p  # PICK: a sack of fiveleaf
+I 7 1201 15.28 1 p  # PICK: sack of fiveleaf
 I+ 0 70  # Ability: Find Herbs
-I 7 1202 15.28 1 p  # PICK: a twig of redthorn
+I 7 1202 15.28 1 p  # PICK: twig of redthorn
 I+ 0 70  # Ability: Find Herbs
-I 7 1203 15.28 1 p  # PICK: some magewhisper sepals
+I 7 1203 15.28 1 p  # PICK: magewhisper sepals
 I+ 0 70  # Ability: Find Herbs
-I 7 1204 15.28 1 p  # PICK: a daggerbite frond
+I 7 1204 15.28 1 p  # PICK: daggerbite frond
 I+ 0 70  # Ability: Find Herbs
-I 7 1205 15.27 1 p  # PICK: some bileberries
+I 7 1205 15.27 1 p  # PICK: bileberries
 I+ 0 70  # Ability: Find Herbs
-I 7 123 100.00 1 p  # PICK: a small flower
-I 9 121 100.00 1 X  # GATHER: some sticks and leaves
+I 7 123 100.00 1 p  # PICK: small flower
+I 9 121 100.00 1 X  # GATHER: sticks and leaves
 M 0 12660 25.00 25
 T 12654
 T 12680
@@ -496,34 +496,34 @@ A Strange Grove~
 fog. As soon as you leave the path, you can no longer see where it was. All of
 a sudden you realize: you're lost!
 ~
-ad 0 0
+adi 0 0 12650
 D14
 ~
 0 12669
-I 5 104 3.00 1 X  # DIG: a red bloodstone
-I 5 103 3.00 1 X  # DIG: a yellow lightning stone
-I 5 102 8.00 1 X  # DIG: a flint stone
-I 5 100 100.00 1 X  # DIG: a rock
-I 6 1254 1.00 1 X  # FORAGE: a mana potion
-I 6 3013 25.00 1 X  # FORAGE: a handful of nuts
-I 6 3009 25.00 1 X  # FORAGE: an orange
-I 6 3007 25.00 1 X  # FORAGE: a couple red cherries
-I 6 3001 100.00 1 X  # FORAGE: a green apple
-I 7 1206 8.33 1 p  # PICK: an iridescent blue iris
-I 7 1200 15.28 1 p  # PICK: a handful of whitegrass
+I 5 104 3.00 1 X  # DIG: red bloodstone
+I 5 103 3.00 1 X  # DIG: yellow lightning stone
+I 5 102 8.00 1 X  # DIG: flint stone
+I 5 100 100.00 1 X  # DIG: rock
+I 6 1254 1.00 1 X  # FORAGE: mana potion
+I 6 3013 25.00 1 X  # FORAGE: handful of nuts
+I 6 3009 25.00 1 X  # FORAGE: orange
+I 6 3007 25.00 1 X  # FORAGE: couple red cherries
+I 6 3001 100.00 1 X  # FORAGE: green apple
+I 7 1206 8.33 1 p  # PICK: iridescent blue iris
+I 7 1200 15.28 1 p  # PICK: handful of whitegrass
 I+ 0 70  # Ability: Find Herbs
-I 7 1201 15.28 1 p  # PICK: a sack of fiveleaf
+I 7 1201 15.28 1 p  # PICK: sack of fiveleaf
 I+ 0 70  # Ability: Find Herbs
-I 7 1202 15.28 1 p  # PICK: a twig of redthorn
+I 7 1202 15.28 1 p  # PICK: twig of redthorn
 I+ 0 70  # Ability: Find Herbs
-I 7 1203 15.28 1 p  # PICK: some magewhisper sepals
+I 7 1203 15.28 1 p  # PICK: magewhisper sepals
 I+ 0 70  # Ability: Find Herbs
-I 7 1204 15.28 1 p  # PICK: a daggerbite frond
+I 7 1204 15.28 1 p  # PICK: daggerbite frond
 I+ 0 70  # Ability: Find Herbs
-I 7 1205 15.27 1 p  # PICK: some bileberries
+I 7 1205 15.27 1 p  # PICK: bileberries
 I+ 0 70  # Ability: Find Herbs
-I 7 123 100.00 1 p  # PICK: a small flower
-I 9 121 100.00 1 X  # GATHER: some sticks and leaves
+I 7 123 100.00 1 p  # PICK: small flower
+I 9 121 100.00 1 X  # GATHER: sticks and leaves
 M 0 12660 25.00 25
 T 12654
 T 12680
@@ -536,7 +536,7 @@ through the trees or the fog. As you wander, lost beyond hope, you come across
 a peculiar tree with a wooden staircase wound around its trunk. Perhaps this
 leads somewhere interesting?
 ~
-a 0 0
+ai 0 0 12650
 D8
 ~
 0 12670
@@ -545,30 +545,30 @@ stairs staircase wooden trunk tree~
    The staircase appears to be made from bent saplings and upturned roots. It
 leads up into the canopy, but you can't see through the fog.
 ~
-I 5 104 3.00 1 X  # DIG: a red bloodstone
-I 5 103 3.00 1 X  # DIG: a yellow lightning stone
-I 5 102 8.00 1 X  # DIG: a flint stone
-I 5 100 100.00 1 X  # DIG: a rock
-I 6 1254 1.00 1 X  # FORAGE: a mana potion
-I 6 3013 25.00 1 X  # FORAGE: a handful of nuts
-I 6 3009 25.00 1 X  # FORAGE: an orange
-I 6 3007 25.00 1 X  # FORAGE: a couple red cherries
-I 6 3001 100.00 1 X  # FORAGE: a green apple
-I 7 1206 8.33 1 p  # PICK: an iridescent blue iris
-I 7 1200 15.28 1 p  # PICK: a handful of whitegrass
+I 5 104 3.00 1 X  # DIG: red bloodstone
+I 5 103 3.00 1 X  # DIG: yellow lightning stone
+I 5 102 8.00 1 X  # DIG: flint stone
+I 5 100 100.00 1 X  # DIG: rock
+I 6 1254 1.00 1 X  # FORAGE: mana potion
+I 6 3013 25.00 1 X  # FORAGE: handful of nuts
+I 6 3009 25.00 1 X  # FORAGE: orange
+I 6 3007 25.00 1 X  # FORAGE: couple red cherries
+I 6 3001 100.00 1 X  # FORAGE: green apple
+I 7 1206 8.33 1 p  # PICK: iridescent blue iris
+I 7 1200 15.28 1 p  # PICK: handful of whitegrass
 I+ 0 70  # Ability: Find Herbs
-I 7 1201 15.28 1 p  # PICK: a sack of fiveleaf
+I 7 1201 15.28 1 p  # PICK: sack of fiveleaf
 I+ 0 70  # Ability: Find Herbs
-I 7 1202 15.28 1 p  # PICK: a twig of redthorn
+I 7 1202 15.28 1 p  # PICK: twig of redthorn
 I+ 0 70  # Ability: Find Herbs
-I 7 1203 15.28 1 p  # PICK: some magewhisper sepals
+I 7 1203 15.28 1 p  # PICK: magewhisper sepals
 I+ 0 70  # Ability: Find Herbs
-I 7 1204 15.28 1 p  # PICK: a daggerbite frond
+I 7 1204 15.28 1 p  # PICK: daggerbite frond
 I+ 0 70  # Ability: Find Herbs
-I 7 1205 15.27 1 p  # PICK: some bileberries
+I 7 1205 15.27 1 p  # PICK: bileberries
 I+ 0 70  # Ability: Find Herbs
-I 7 123 100.00 1 p  # PICK: a small flower
-I 9 121 100.00 1 X  # GATHER: some sticks and leaves
+I 7 123 100.00 1 p  # PICK: small flower
+I 9 121 100.00 1 X  # GATHER: sticks and leaves
 M 0 12660 25.00 25
 M 0 12650 75.00 1
 T 12654
@@ -580,7 +580,7 @@ large around as a cow, easily strong enough to support your weight. The leaves
 around you rustle constantly, and you're certain you are not alone, but you can
 only trek forward from here. Or backward -- you're completely turned around.
 ~
-a 0 0
+ai 0 0 12650
 D9
 ~
 0 12669
@@ -590,26 +590,26 @@ D14
 D14
 ~
 0 12672
-I 6 1254 1.00 1 X  # FORAGE: a mana potion
-I 6 3013 25.00 1 X  # FORAGE: a handful of nuts
-I 6 3009 25.00 1 X  # FORAGE: an orange
-I 6 3007 25.00 1 X  # FORAGE: a couple red cherries
-I 6 3001 100.00 1 X  # FORAGE: a green apple
-I 7 1206 8.33 1 p  # PICK: an iridescent blue iris
-I 7 1200 15.28 1 p  # PICK: a handful of whitegrass
+I 6 1254 1.00 1 X  # FORAGE: mana potion
+I 6 3013 25.00 1 X  # FORAGE: handful of nuts
+I 6 3009 25.00 1 X  # FORAGE: orange
+I 6 3007 25.00 1 X  # FORAGE: couple red cherries
+I 6 3001 100.00 1 X  # FORAGE: green apple
+I 7 1206 8.33 1 p  # PICK: iridescent blue iris
+I 7 1200 15.28 1 p  # PICK: handful of whitegrass
 I+ 0 70  # Ability: Find Herbs
-I 7 1201 15.28 1 p  # PICK: a sack of fiveleaf
+I 7 1201 15.28 1 p  # PICK: sack of fiveleaf
 I+ 0 70  # Ability: Find Herbs
-I 7 1202 15.28 1 p  # PICK: a twig of redthorn
+I 7 1202 15.28 1 p  # PICK: twig of redthorn
 I+ 0 70  # Ability: Find Herbs
-I 7 1203 15.28 1 p  # PICK: some magewhisper sepals
+I 7 1203 15.28 1 p  # PICK: magewhisper sepals
 I+ 0 70  # Ability: Find Herbs
-I 7 1204 15.28 1 p  # PICK: a daggerbite frond
+I 7 1204 15.28 1 p  # PICK: daggerbite frond
 I+ 0 70  # Ability: Find Herbs
-I 7 1205 15.27 1 p  # PICK: some bileberries
+I 7 1205 15.27 1 p  # PICK: bileberries
 I+ 0 70  # Ability: Find Herbs
-I 7 123 100.00 1 p  # PICK: a small flower
-I 9 121 100.00 1 X  # GATHER: some sticks and leaves
+I 7 123 100.00 1 p  # PICK: small flower
+I 9 121 100.00 1 X  # GATHER: sticks and leaves
 M 0 12660 25.00 25
 T 12654
 S
@@ -619,30 +619,30 @@ The Branches Above the Grove~
 abruptly. There is only fog below you, and it's too hard to gauge the distance.
 It seems you can only go backward afterall.
 ~
-a 0 0
+ai 0 0 12650
 D14
 ~
 0 12670
-I 6 1254 1.00 1 X  # FORAGE: a mana potion
-I 6 3013 25.00 1 X  # FORAGE: a handful of nuts
-I 6 3009 25.00 1 X  # FORAGE: an orange
-I 6 3007 25.00 1 X  # FORAGE: a couple red cherries
-I 6 3001 100.00 1 X  # FORAGE: a green apple
-I 7 1206 8.33 1 p  # PICK: an iridescent blue iris
-I 7 1200 15.28 1 p  # PICK: a handful of whitegrass
+I 6 1254 1.00 1 X  # FORAGE: mana potion
+I 6 3013 25.00 1 X  # FORAGE: handful of nuts
+I 6 3009 25.00 1 X  # FORAGE: orange
+I 6 3007 25.00 1 X  # FORAGE: couple red cherries
+I 6 3001 100.00 1 X  # FORAGE: green apple
+I 7 1206 8.33 1 p  # PICK: iridescent blue iris
+I 7 1200 15.28 1 p  # PICK: handful of whitegrass
 I+ 0 70  # Ability: Find Herbs
-I 7 1201 15.28 1 p  # PICK: a sack of fiveleaf
+I 7 1201 15.28 1 p  # PICK: sack of fiveleaf
 I+ 0 70  # Ability: Find Herbs
-I 7 1202 15.28 1 p  # PICK: a twig of redthorn
+I 7 1202 15.28 1 p  # PICK: twig of redthorn
 I+ 0 70  # Ability: Find Herbs
-I 7 1203 15.28 1 p  # PICK: some magewhisper sepals
+I 7 1203 15.28 1 p  # PICK: magewhisper sepals
 I+ 0 70  # Ability: Find Herbs
-I 7 1204 15.28 1 p  # PICK: a daggerbite frond
+I 7 1204 15.28 1 p  # PICK: daggerbite frond
 I+ 0 70  # Ability: Find Herbs
-I 7 1205 15.27 1 p  # PICK: some bileberries
+I 7 1205 15.27 1 p  # PICK: bileberries
 I+ 0 70  # Ability: Find Herbs
-I 7 123 100.00 1 p  # PICK: a small flower
-I 9 121 100.00 1 X  # GATHER: some sticks and leaves
+I 7 123 100.00 1 p  # PICK: small flower
+I 9 121 100.00 1 X  # GATHER: sticks and leaves
 M 0 12660 100.00 25
 T 12654
 S
@@ -654,33 +654,33 @@ balancing along the branch as you cling to smaller branches along the way. You
 measure the distance to the ground with your eyes. It looks like you could get
 down from here and investigate that bonfire.
 ~
-acd 0 0
+acdi 0 0 12650
 D14
 ~
 0 12670
 D9
 ~
 0 12675
-I 6 1254 1.00 1 X  # FORAGE: a mana potion
-I 6 3013 25.00 1 X  # FORAGE: a handful of nuts
-I 6 3009 25.00 1 X  # FORAGE: an orange
-I 6 3007 25.00 1 X  # FORAGE: a couple red cherries
-I 6 3001 100.00 1 X  # FORAGE: a green apple
-I 7 1206 8.33 1 p  # PICK: an iridescent blue iris
-I 7 1200 15.28 1 p  # PICK: a handful of whitegrass
+I 6 1254 1.00 1 X  # FORAGE: mana potion
+I 6 3013 25.00 1 X  # FORAGE: handful of nuts
+I 6 3009 25.00 1 X  # FORAGE: orange
+I 6 3007 25.00 1 X  # FORAGE: couple red cherries
+I 6 3001 100.00 1 X  # FORAGE: green apple
+I 7 1206 8.33 1 p  # PICK: iridescent blue iris
+I 7 1200 15.28 1 p  # PICK: handful of whitegrass
 I+ 0 70  # Ability: Find Herbs
-I 7 1201 15.28 1 p  # PICK: a sack of fiveleaf
+I 7 1201 15.28 1 p  # PICK: sack of fiveleaf
 I+ 0 70  # Ability: Find Herbs
-I 7 1202 15.28 1 p  # PICK: a twig of redthorn
+I 7 1202 15.28 1 p  # PICK: twig of redthorn
 I+ 0 70  # Ability: Find Herbs
-I 7 1203 15.28 1 p  # PICK: some magewhisper sepals
+I 7 1203 15.28 1 p  # PICK: magewhisper sepals
 I+ 0 70  # Ability: Find Herbs
-I 7 1204 15.28 1 p  # PICK: a daggerbite frond
+I 7 1204 15.28 1 p  # PICK: daggerbite frond
 I+ 0 70  # Ability: Find Herbs
-I 7 1205 15.27 1 p  # PICK: some bileberries
+I 7 1205 15.27 1 p  # PICK: bileberries
 I+ 0 70  # Ability: Find Herbs
-I 7 123 100.00 1 p  # PICK: a small flower
-I 9 121 100.00 1 X  # GATHER: some sticks and leaves
+I 7 123 100.00 1 p  # PICK: small flower
+I 9 121 100.00 1 X  # GATHER: sticks and leaves
 M 0 12656 100.00 1
 M 0 12660 25.00 25
 T 12654
@@ -691,37 +691,37 @@ A Strange Grove~
 feel more like a corridor than a forest. The fog makes it difficult to see
 behind you, but the path ahead is well-lit by a bonfire in the distance.
 ~
-a 0 0
+ai 0 0 12650
 D14
 ~
 0 12667
 D14
 ~
 0 12675
-I 5 104 3.00 1 X  # DIG: a red bloodstone
-I 5 103 3.00 1 X  # DIG: a yellow lightning stone
-I 5 102 8.00 1 X  # DIG: a flint stone
-I 5 100 100.00 1 X  # DIG: a rock
-I 6 1254 1.00 1 X  # FORAGE: a mana potion
-I 6 3013 25.00 1 X  # FORAGE: a handful of nuts
-I 6 3009 25.00 1 X  # FORAGE: an orange
-I 6 3007 25.00 1 X  # FORAGE: a couple red cherries
-I 6 3001 100.00 1 X  # FORAGE: a green apple
-I 7 1206 8.33 1 p  # PICK: an iridescent blue iris
-I 7 1200 15.28 1 p  # PICK: a handful of whitegrass
+I 5 104 3.00 1 X  # DIG: red bloodstone
+I 5 103 3.00 1 X  # DIG: yellow lightning stone
+I 5 102 8.00 1 X  # DIG: flint stone
+I 5 100 100.00 1 X  # DIG: rock
+I 6 1254 1.00 1 X  # FORAGE: mana potion
+I 6 3013 25.00 1 X  # FORAGE: handful of nuts
+I 6 3009 25.00 1 X  # FORAGE: orange
+I 6 3007 25.00 1 X  # FORAGE: couple red cherries
+I 6 3001 100.00 1 X  # FORAGE: green apple
+I 7 1206 8.33 1 p  # PICK: iridescent blue iris
+I 7 1200 15.28 1 p  # PICK: handful of whitegrass
 I+ 0 70  # Ability: Find Herbs
-I 7 1201 15.28 1 p  # PICK: a sack of fiveleaf
+I 7 1201 15.28 1 p  # PICK: sack of fiveleaf
 I+ 0 70  # Ability: Find Herbs
-I 7 1202 15.28 1 p  # PICK: a twig of redthorn
+I 7 1202 15.28 1 p  # PICK: twig of redthorn
 I+ 0 70  # Ability: Find Herbs
-I 7 1203 15.28 1 p  # PICK: some magewhisper sepals
+I 7 1203 15.28 1 p  # PICK: magewhisper sepals
 I+ 0 70  # Ability: Find Herbs
-I 7 1204 15.28 1 p  # PICK: a daggerbite frond
+I 7 1204 15.28 1 p  # PICK: daggerbite frond
 I+ 0 70  # Ability: Find Herbs
-I 7 1205 15.27 1 p  # PICK: some bileberries
+I 7 1205 15.27 1 p  # PICK: bileberries
 I+ 0 70  # Ability: Find Herbs
-I 7 123 100.00 1 p  # PICK: a small flower
-I 9 121 100.00 1 X  # GATHER: some sticks and leaves
+I 7 123 100.00 1 p  # PICK: small flower
+I 9 121 100.00 1 X  # GATHER: sticks and leaves
 M 0 12660 25.00 25
 T 12654
 T 12680
@@ -735,37 +735,37 @@ druids of the Grove are mysterious, and you can't tell if this bonfire is part
 of a festival or instead if these are merely the remains of the last
 adventurers who trespassed in the Grove of the Magiterranean.
 ~
-acd 0 0
+acdi 0 0 12650
 D14
 thicket hidden path~
 ab 12676
 D14
 ~
 0 12674
-I 5 104 3.00 1 X  # DIG: a red bloodstone
-I 5 103 3.00 1 X  # DIG: a yellow lightning stone
-I 5 102 8.00 1 X  # DIG: a flint stone
-I 5 100 100.00 1 X  # DIG: a rock
-I 6 1254 1.00 1 X  # FORAGE: a mana potion
-I 6 3013 25.00 1 X  # FORAGE: a handful of nuts
-I 6 3009 25.00 1 X  # FORAGE: an orange
-I 6 3007 25.00 1 X  # FORAGE: a couple red cherries
-I 6 3001 100.00 1 X  # FORAGE: a green apple
-I 7 1206 8.33 1 p  # PICK: an iridescent blue iris
-I 7 1200 15.28 1 p  # PICK: a handful of whitegrass
+I 5 104 3.00 1 X  # DIG: red bloodstone
+I 5 103 3.00 1 X  # DIG: yellow lightning stone
+I 5 102 8.00 1 X  # DIG: flint stone
+I 5 100 100.00 1 X  # DIG: rock
+I 6 1254 1.00 1 X  # FORAGE: mana potion
+I 6 3013 25.00 1 X  # FORAGE: handful of nuts
+I 6 3009 25.00 1 X  # FORAGE: orange
+I 6 3007 25.00 1 X  # FORAGE: couple red cherries
+I 6 3001 100.00 1 X  # FORAGE: green apple
+I 7 1206 8.33 1 p  # PICK: iridescent blue iris
+I 7 1200 15.28 1 p  # PICK: handful of whitegrass
 I+ 0 70  # Ability: Find Herbs
-I 7 1201 15.28 1 p  # PICK: a sack of fiveleaf
+I 7 1201 15.28 1 p  # PICK: sack of fiveleaf
 I+ 0 70  # Ability: Find Herbs
-I 7 1202 15.28 1 p  # PICK: a twig of redthorn
+I 7 1202 15.28 1 p  # PICK: twig of redthorn
 I+ 0 70  # Ability: Find Herbs
-I 7 1203 15.28 1 p  # PICK: some magewhisper sepals
+I 7 1203 15.28 1 p  # PICK: magewhisper sepals
 I+ 0 70  # Ability: Find Herbs
-I 7 1204 15.28 1 p  # PICK: a daggerbite frond
+I 7 1204 15.28 1 p  # PICK: daggerbite frond
 I+ 0 70  # Ability: Find Herbs
-I 7 1205 15.27 1 p  # PICK: some bileberries
+I 7 1205 15.27 1 p  # PICK: bileberries
 I+ 0 70  # Ability: Find Herbs
-I 7 123 100.00 1 p  # PICK: a small flower
-I 9 121 100.00 1 X  # GATHER: some sticks and leaves
+I 7 123 100.00 1 p  # PICK: small flower
+I 9 121 100.00 1 X  # GATHER: sticks and leaves
 M 0 12655 100.00 1
 M 0 12660 25.00 25
 T 12654
@@ -779,34 +779,34 @@ against the brambles of plants in a location that was carefully selected to
 keep interlopers out. It is unwise to stay long, as the wildlings who made the
 nest are likely to return.
 ~
-ad 0 0
+adi 0 0 12650
 D14
 thicket hidden path~
 ab 12675
-I 5 104 3.00 1 X  # DIG: a red bloodstone
-I 5 103 3.00 1 X  # DIG: a yellow lightning stone
-I 5 102 8.00 1 X  # DIG: a flint stone
-I 5 100 100.00 1 X  # DIG: a rock
-I 6 1254 1.00 1 X  # FORAGE: a mana potion
-I 6 3013 25.00 1 X  # FORAGE: a handful of nuts
-I 6 3009 25.00 1 X  # FORAGE: an orange
-I 6 3007 25.00 1 X  # FORAGE: a couple red cherries
-I 6 3001 100.00 1 X  # FORAGE: a green apple
-I 7 1206 8.33 1 p  # PICK: an iridescent blue iris
-I 7 1200 15.28 1 p  # PICK: a handful of whitegrass
+I 5 104 3.00 1 X  # DIG: red bloodstone
+I 5 103 3.00 1 X  # DIG: yellow lightning stone
+I 5 102 8.00 1 X  # DIG: flint stone
+I 5 100 100.00 1 X  # DIG: rock
+I 6 1254 1.00 1 X  # FORAGE: mana potion
+I 6 3013 25.00 1 X  # FORAGE: handful of nuts
+I 6 3009 25.00 1 X  # FORAGE: orange
+I 6 3007 25.00 1 X  # FORAGE: couple red cherries
+I 6 3001 100.00 1 X  # FORAGE: green apple
+I 7 1206 8.33 1 p  # PICK: iridescent blue iris
+I 7 1200 15.28 1 p  # PICK: handful of whitegrass
 I+ 0 70  # Ability: Find Herbs
-I 7 1201 15.28 1 p  # PICK: a sack of fiveleaf
+I 7 1201 15.28 1 p  # PICK: sack of fiveleaf
 I+ 0 70  # Ability: Find Herbs
-I 7 1202 15.28 1 p  # PICK: a twig of redthorn
+I 7 1202 15.28 1 p  # PICK: twig of redthorn
 I+ 0 70  # Ability: Find Herbs
-I 7 1203 15.28 1 p  # PICK: some magewhisper sepals
+I 7 1203 15.28 1 p  # PICK: magewhisper sepals
 I+ 0 70  # Ability: Find Herbs
-I 7 1204 15.28 1 p  # PICK: a daggerbite frond
+I 7 1204 15.28 1 p  # PICK: daggerbite frond
 I+ 0 70  # Ability: Find Herbs
-I 7 1205 15.27 1 p  # PICK: some bileberries
+I 7 1205 15.27 1 p  # PICK: bileberries
 I+ 0 70  # Ability: Find Herbs
-I 7 123 100.00 1 p  # PICK: a small flower
-I 9 121 100.00 1 X  # GATHER: some sticks and leaves
+I 7 123 100.00 1 p  # PICK: small flower
+I 9 121 100.00 1 X  # GATHER: sticks and leaves
 M 0 12669 5.00 1
 M 0 12660 50.00 25
 M 0 12660 50.00 25

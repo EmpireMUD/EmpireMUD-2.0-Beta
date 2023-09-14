@@ -1,0 +1,190 @@
+#11937
+Walking Mausoleum~
+Inside the Walking Mausoleum~
+&0[  ]~
+1 0 aH 0
+0 0 0 -1
+D
+   The cold stone walls of the mausoleum block virtually all light and sound
+from the outside world, giving the small tomb a serene sense of everlasting
+rest. A single catafalque rises from the floor; this resting place was made for
+just one person.
+~
+E
+catafalque~
+   The rectangular stone catafalque occupies much of the space in the small
+tomb. A shallow impression is cut into its surface to keep a body from rolling
+off as the mausoleum walks.
+~
+E
+walls floors~
+The floor and walls are made from cold stone.
+~
+F
+B
+T 11949
+S
+#11938
+Walking Sorcery Tower~
+A Walking Sorcery Tower~
+&0[  ]~
+1 0 aHR 0
+0 1 0 -1
+D
+   The first floor of the tower is set with plush chairs and a small tea table,
+like a cozy parlor. If not for the slighty rocking motion, you could hardly
+tell that the tower stands on two legs. A spiral staircase twists up to the
+second floor. The walls are set with small windows that let you look out and
+there is a door that leads back outside.
+~
+E
+chairs plush~
+The overstuffed chairs make the room more inviting.
+~
+E
+table tea~
+The quaint little tea table is surrounded by chairs.
+~
+E
+stairs staircase spiral~
+The wooden staircase spirals up to the second floor.
+~
+E
+windows~
+The windows let you look out over the countryside.
+~
+E
+door~
+The sturdy oak door leads back outside; type 'exit' to leave.
+~
+E
+walls~
+The walls are made from brick.
+~
+E
+floors~
+The floor is slate.
+~
+S
+#11940
+Upper Walkway~
+The Upper Walkway of the Tower~
+&0[  ]~
+1 0 aHR 0
+0 0 0 -1
+D
+   The wooden stairs rise up to a narrow walkway that links the workshop on the
+west side of the tower with the bedroom on the east side. Windows along the
+round tower walls let you look out to the surrounding countryside -- especially
+important if you want to try to drive the tower from here.
+~
+E
+stairs wooden staircase spiral~
+The narrow staircase rises from the first floor of the tower.
+~
+E
+workshop west~
+The workshop through the west door looks like a good place to do some alchemy.
+~
+E
+bedroom east~
+The bedroom through the east door looks small, but cozy.
+~
+E
+doors~
+The doors are made of simple oak.
+~
+E
+walls~
+The interior walls are made from wood while the exterior walls are brick.
+~
+E
+floors~
+The floors are made from wood.
+~
+S
+#11941
+Enchanting Bedroom~
+An Enchanting Bedroom~
+&0[  ]~
+1 0 aHR 0
+0 1 0 -1
+D
+   The cozy bedroom has sheer curtains draped over the window that filter the
+harsh light of the outside world. Much of the room is taken up by a bed of
+downy violet feathers. As you lie on them, you feel weightless and unburdened.
+You notice the ceiling is painted like the night sky, with clouds that drift
+slowly across it as they change into new shapes.
+~
+E
+curtains sheer~
+   The sheer curtains give the bedroom a rosy glow. Type 'look out' to see out
+the window.
+~
+E
+bed~
+   The bed appears to be no more than a box of loose down, though when you lie
+upon it, you don't seem to touch the feathers at all. Instead, you find
+yourself hovering just above them, weightless and free.
+~
+E
+feathers downy~
+The downy feathers on the bed have a pale violet color.
+~
+E
+ceiling sky starry~
+   The ceiling is painted with a starry night sky that seems to twinkle as you
+stare into its infinite depths. Clouds drift across the ceiling, though they're
+painted on, slowly changing from shape to shape.
+~
+E
+clouds shapes~
+   You watch as painted clouds drift across the starry ceiling. They change
+shape as they do, sometimes forming a bunny, a sailboat, or even a tower.
+~
+E
+walls floors~
+The exterior walls are brick, while the interior walls and floor are wood.
+~
+F
+d
+S
+#11942
+Cluttered Workshop~
+A Cluttered Workshop~
+&0[  ]~
+1 0 aHR 0
+0 0 0 -1
+D
+   Though you can barely squeeze in, the workshop is well-equipped with all
+manner of alchemy materials and magical tools. A tiny oven sits on the counter,
+beneath a heatless elemental burner. Behind the clutter, you can see out the
+window, but just barely.
+~
+E
+windows~
+Type 'look out' to see out the window.
+~
+E
+materials tools magical alchemy~
+   The workshop is full of all manner of strange tools. There's plenty here
+for alchemy and other magical pursuits.
+~
+E
+oven~
+   The little oven takes up a considerable amount of counter space, but doesn't
+seem to be overheating the workshop.
+~
+E
+burner heatless elemental~
+   The elemental burner produces no discernable heat, at least not when you
+pass your hand over it, but it's capable of cooking a potion or a quick meal.
+~
+E
+clutter~
+It's all clutter.
+~
+F
+aGLM
+S
+$

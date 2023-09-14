@@ -130,7 +130,7 @@ own help files. Here are some of the common types of components:
  &cmagic gems&0 - precious stones used in crafting
  &chandles&0 - used for tools and weapons
  &cherbs&0 - used in potions, poisons, and cooking
- &cmetal&0 - various useful or precious metals for cooking
+ &cmetal&0 - various useful or precious metals used in forging or for wealth
  &coils&0 - for cooking or maintaining machinery
  &cpaint&0 - for painting houses
  &ccord&0 and &crope&0 - for crafting, construction, and harnessing animals
@@ -176,13 +176,23 @@ You must always make your own crafter items, but you may need to buy some of
 the components from other players.
 
 The first tier of crafter items comes at level 100:
-  Head: clockwork goggles (requires a clockwork lens array from an Artificer)
-  Clothes: guildmaster tunic (requires guild-patterned cloth from an
-           Antiquarian)
-  Waist: utility belt (requires some clips and buckles from a Tinker)
-  Off-hand: steel multitool (needs a set of delicate tools from a Steelsmith)
+  Head: clockwork goggles (clockwork lens array, Artificer Crafts)
+  Clothes: guildmaster tunic (guild-patterned cloth, Antiquarian Crafts)
+  Waist: utility belt (clips and buckles, Tinker Crafts)
+  Off-hand: steel multitool (needs delicate tools, Steelsmith Crafts)
 
-See also: CRAFT, ENCHANT, FORGE, SCORE, SEW
+Look for additional tiers of crafter items to make higher level crafts. You can
+get these patterns from high level world drops or trade with other players for
+the items themselves:
+  Tier 2: Level 175-274 Group/Boss mobs: alchemical filter (Alchemist Crafts),
+    antiquated device parts (Antiquarian Crafts), concealed pouches (Smuggler
+    Crafts), tinker harness (Tinker Crafts)
+  Tier 3: Level 275-374 Group/Boss mobs: smuggled Olympian laurel branch
+    (Smuggler Crafts), Olympic silk (Alchemist Crafts), Amazonian leather
+    (Antiquarian Crafts), guild-forged hammer head (Artificer Crafts)
+
+See also: CRAFT, ENCHANT, FORGE, SCORE, SEW, SCALABLE CRAFTS,
+   CRAFTING ABILITIES
 #
 "DISTILLED HERBS" "ADVANCED HERBS" "HERB JARS" "JAR HERBS" "DISTILLED HERB COMPONENTS"
 
@@ -215,10 +225,10 @@ eligible for these flags, and are indicated by a GENERIC-DROP flag.
 You can 'toggle item-quality' to turn on/off the display of item quality in
 your inventory and equipment list. For screenreader users, these appear as
 tags next to the item name. For everyone else, the items will be in color:
+- &Ysuperior (yellow)&0
 - &Mboss (magenta)&0
 - &Cgroup (cyan)&0
 - &Ghard (green)&0
-- &Ysuperior (yellow)&0
 - &wjunk (gray)&0
 - normal (no quality)
 
@@ -243,6 +253,7 @@ Fibers are a component type usually used to make various crafts. Identify the
 fibers to see what type(s) they are.
 
 Common plant fibers:
+  bundle of long grass (soft plant fiber)
   basket of cotton (soft plant fiber)
   bale of straw (stiff plant fiber)
   thorny branches (stiff plant fiber)
@@ -251,9 +262,9 @@ Common plant fibers:
   tangle of vines (vine, soft fiber)
 
 Common animal fibers:
-  bird feathers (feather)
-  ostrich feather (large feather)
-  bag of sheep's wool (wool)
+  bird feathers (feather, soft fiber)
+  ostrich feather (large feather, soft fiber)
+  bag of sheep's wool (wool, soft fiber)
 
 See also: COMPONENT, GATHER
 #
@@ -469,7 +480,10 @@ your inventory.
 can use this to avoid wasting more precious components when you have cheaper
 ones available.
 
-See also: COMPONENT
+Note: If you 'keep' an item, it can't be turned in as part of a quest and won't
+be counted by the quest tracker. Unkeep it for it to appear.
+
+See also: COMPONENT, QUEST
 #
 KNIFE KNIVES
 
@@ -510,6 +524,18 @@ Yellow Lightning Stone (resource)
 Stored in:  Tower of Sorcery
 
 This rare stone can be found in the desert where lightning has struck.
+#
+"LONG GRASS" "LONG LEAVES" "BUNDLE OF LONG GRASS" "BUNDLE OF LONG LEAVES" GRASS 
+
+Stored at:  Lumber Yard, Tailor
+Used for:  crafting
+
+You can gather long grass in the plains and long leaves in the desert. These
+are simple, soft plant fibers that can be used for crafts such as ropes. They
+can be used in any recipe that says (fiber), (soft fiber), (plant fiber), or
+(soft plant fiber).
+
+See also: FIBER COMPONENT, GATHER, CRAFT, ROPE
 #
 LOOM LOOMS "BACKSTRAP LOOM" "BACK STRAP LOOM"
 
@@ -823,8 +849,8 @@ many simple buildings.
 
 The best ways to get saplings are:
  chopping a copse
- scraping or sawing trees (rare result)
- gathering in a forest (rare result)
+ scraping or sawing trees (uncommon result)
+ gathering in a forest (uncommon result)
 
 Common types of saplings are:
   green sapling (basic)
@@ -1028,7 +1054,7 @@ See also: IDENTIFY
 VAULT
 
 Building:  Vault (designated)
-Designated in:  portcullis, great hall
+Designated in:  castle, palace
 
 Command:  deposit <number> [empire] <coins>
           warehouse <action> <item keywords>

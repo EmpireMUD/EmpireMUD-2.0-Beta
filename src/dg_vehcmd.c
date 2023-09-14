@@ -303,7 +303,10 @@ VCMD(do_vregionecho) {
 		
 		if (center) {
 			DL_FOREACH(character_list, targ) {
-				if (NO_LOCATION(IN_ROOM(targ)) || compute_distance(center, IN_ROOM(targ)) > radius) {
+				if (!same_subzone(center, IN_ROOM(targ))) {
+					continue;
+				}
+				if (compute_distance(center, IN_ROOM(targ)) > radius) {
 					continue;
 				}
 				if (outdoor_only && !IS_OUTDOORS(targ)) {
@@ -313,6 +316,40 @@ VCMD(do_vregionecho) {
 				// send
 				sub_write(msg, targ, TRUE, TO_CHAR | (use_queue ? TO_QUEUE : 0));
 			}
+		}
+	}
+}
+
+
+VCMD(do_vsubecho) {
+	char room_number[MAX_INPUT_LENGTH], *msg;
+	bool use_queue;
+	room_data *where, *orm = IN_ROOM(veh);
+	char_data *targ;
+	
+	msg = any_one_word(argument, room_number);
+	use_queue = script_message_should_queue(&msg);
+
+	if (!*room_number || !*msg) {
+		veh_log(veh, "vsubecho called with too few args");
+	}
+	else if (!(where = get_room(orm, room_number))) {
+		veh_log(veh, "vsubecho called with invalid target");
+	}
+	else if (!ROOM_INSTANCE(where)) {
+		veh_log(veh, "vsubecho called outside an adventure");
+	}
+	else {
+		DL_FOREACH(character_list, targ) {
+			if (ROOM_INSTANCE(where) != ROOM_INSTANCE(IN_ROOM(targ))) {
+				continue;	// wrong instance
+			}
+			if (!same_subzone(where, IN_ROOM(targ))) {
+				continue;	// wrong subzone
+			}
+			
+			// send
+			sub_write(msg, targ, TRUE, TO_CHAR | (use_queue ? TO_QUEUE : 0));
 		}
 	}
 }
@@ -396,7 +433,7 @@ VCMD(do_vsend) {
 
 	if ((ch = get_char_by_vehicle(veh, buf))) {
 		if (subcmd == SCMD_VSEND)
-			sub_write(msg, ch, TRUE, TO_CHAR | (use_queue ? TO_QUEUE : 0));
+			sub_write(msg, ch, TRUE, TO_CHAR | TO_SLEEP | (use_queue ? TO_QUEUE : 0));
 		else if (subcmd == SCMD_VECHOAROUND)
 			sub_write(msg, ch, TRUE, TO_ROOM | (use_queue ? TO_QUEUE : 0));
 	}
@@ -747,6 +784,19 @@ VCMD(do_vslay) {
 		msg_to_char(vict, "Being the cool immortal you are, you sidestep a trap, obviously placed to kill you.\r\n");
 	}
 	else {
+		// log
+		if (!IS_NPC(vict)) {
+			if (*argument) {
+				// custom death log?
+				log_to_slash_channel_by_name(DEATH_LOG_CHANNEL, vict, "%s", argument);
+			}
+			else {
+				// basic death log
+				log_to_slash_channel_by_name(DEATH_LOG_CHANNEL, vict, "%s has died at (%d, %d)!", PERS(vict, vict, TRUE), X_COORD(IN_ROOM(vict)), Y_COORD(IN_ROOM(vict)));
+			}
+			syslog(SYS_DEATH, 0, TRUE, "DEATH: %s has been killed by a script at %s (veh %d)", GET_NAME(vict), room_log_identifier(IN_ROOM(vict)), VEH_VNUM(veh));
+		}
+		
 		die(vict, vict);
 	}
 }
@@ -787,7 +837,7 @@ VCMD(do_vteleport) {
 			char_from_room(ch);
 			char_to_room(ch, target);
 			GET_LAST_DIR(ch) = NO_DIR;
-			enter_wtrigger(IN_ROOM(ch), ch, NO_DIR);
+			enter_wtrigger(IN_ROOM(ch), ch, NO_DIR, "script");
 			qt_visit_room(ch, IN_ROOM(ch));
 			msdp_update_room(ch);	// once we're sure we're staying
 		}
@@ -812,7 +862,7 @@ VCMD(do_vteleport) {
 						char_from_room(ch);
 						char_to_room(ch, target);
 						GET_LAST_DIR(ch) = NO_DIR;
-						enter_wtrigger(IN_ROOM(ch), ch, NO_DIR);
+						enter_wtrigger(IN_ROOM(ch), ch, NO_DIR, "script");
 						qt_visit_room(ch, IN_ROOM(ch));
 						msdp_update_room(ch);	// once we're sure we're staying
 					}
@@ -826,7 +876,7 @@ VCMD(do_vteleport) {
 				char_from_room(ch);
 				char_to_room(ch, target);
 				GET_LAST_DIR(ch) = NO_DIR;
-				enter_wtrigger(IN_ROOM(ch), ch, NO_DIR);
+				enter_wtrigger(IN_ROOM(ch), ch, NO_DIR, "script");
 				qt_visit_room(ch, IN_ROOM(ch));
 				msdp_update_room(ch);	// once we're sure we're staying
 			}
@@ -834,7 +884,7 @@ VCMD(do_vteleport) {
 		else if ((v = get_vehicle_near_vehicle(veh, arg1))) {
 			vehicle_from_room(v);
 			vehicle_to_room(v, target);
-			entry_vtrigger(v);
+			entry_vtrigger(v, "script");
 		}
 		else if ((obj = get_obj_by_vehicle(veh, arg1))) {
 			obj_to_room(obj, target);
@@ -1063,7 +1113,7 @@ VCMD(do_vload) {
 			return;
 		}
 		cnt = get_obj_near_vehicle(veh, arg1);
-		if (cnt && GET_OBJ_TYPE(cnt) == ITEM_CONTAINER) {
+		if (cnt && (GET_OBJ_TYPE(cnt) == ITEM_CONTAINER || GET_OBJ_TYPE(cnt) == ITEM_CORPSE)) {
 			obj_to_obj(object, cnt);
 			load_otrigger(object);
 			return;
@@ -1200,7 +1250,7 @@ VCMD(do_vdot) {
 	any_vnum atype = ATYPE_DG_AFFECT;
 	double modifier = 1.0;
 	char_data *ch;
-	int type, max_stacks;
+	int type, max_stacks, duration;
 
 	argument = one_argument(argument, name);
 	// sometimes name is an affect vnum
@@ -1232,6 +1282,10 @@ VCMD(do_vdot) {
 		veh_log(veh, "vdot: target not found");        
 		return;
 	}
+	if ((duration = atoi(durarg)) < 1) {
+		veh_log(veh, "vdot: invalid duration '%s'", durarg);
+		return;
+	}
 	
 	if (*typearg) {
 		type = search_block(typearg, damage_types, FALSE);
@@ -1245,7 +1299,7 @@ VCMD(do_vdot) {
 	}
 	
 	max_stacks = (*stackarg ? atoi(stackarg) : 1);
-	script_damage_over_time(ch, atype, get_vehicle_scale_level(veh, ch), type, modifier, atoi(durarg), max_stacks, NULL);
+	script_damage_over_time(ch, atype, get_vehicle_scale_level(veh, ch), type, modifier, duration, max_stacks, NULL);
 }
 
 
@@ -1493,10 +1547,10 @@ VCMD(do_vrestore) {
 			GET_POS(victim) = POS_STANDING;
 		}
 		affect_total(victim);
-		GET_HEALTH(victim) = GET_MAX_HEALTH(victim);
-		GET_MOVE(victim) = GET_MAX_MOVE(victim);
-		GET_MANA(victim) = GET_MAX_MANA(victim);
-		GET_BLOOD(victim) = GET_MAX_BLOOD(victim);
+		set_health(victim, GET_MAX_HEALTH(victim));
+		set_move(victim, GET_MAX_MOVE(victim));
+		set_mana(victim, GET_MAX_MANA(victim));
+		set_blood(victim, GET_MAX_BLOOD(victim));
 	}
 	if (obj) {
 		// not sure what to do for objs
@@ -1643,6 +1697,7 @@ const struct vehicle_command_info veh_cmd_info[] = {
 	{ "vterraform", do_vterraform, NO_SCMD },
 	{ "vbuildingecho", do_vbuildingecho, NO_SCMD },
 	{ "vregionecho", do_vregionecho, NO_SCMD },
+	{ "vsubecho", do_vsubecho, NO_SCMD },
 	{ "vvehicleecho", do_vvehicleecho, NO_SCMD },
 
 	{ "\n", 0, 0 }        /* this must be last */

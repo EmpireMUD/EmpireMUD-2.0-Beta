@@ -31,7 +31,7 @@ ABATE
 Usage:  abate [victim]
 Battle Synergy Ability:  75 Natural Magic
 Linked traits:  Caster role, Intelligence
-Debuff type:  Battle
+Debuff type:  magical
 Cooldown:  9 seconds
 Duration:  9 seconds
 Cost:  32+ mana (varies with level)
@@ -103,7 +103,7 @@ Bash (Battle ability)
 Usage:  bash [target]
 Cooldown:  9 seconds
 Cost:  15 move
-Debuff type:  Battle, Stun
+Debuff type:  physical, stun
 
 Bash your target with your weapon and send him flying to the ground. When you
 successfully bash, your target is briefly stunned. As a specialty ability, bash
@@ -119,7 +119,7 @@ BEGUILE
 Usage:  beguile [victim]
 Battle Synergy Ability:  75 High Sorcery
 Linked traits:  Caster role, Intelligence
-Debuff type:  Battle
+Debuff type:  magical
 Cooldown:  9 seconds
 Duration:  9 seconds
 Cost:  22+ mana (varies with level)
@@ -179,7 +179,7 @@ of the damage boost is based on your strength and intelligence.
 Cut Deep (Battle ability)
 
 Duration:  15 / 30 seconds
-Debuff type:  Battle
+Debuff type:  physical
 
 Once you learn to cut deep, your sharp attacks have a chance to cause deep
 cuts that bleed for additional damage. Higher Battle skill level results in
@@ -211,7 +211,7 @@ Usage:  disarm [target]
 Cooldown:  30 seconds
 Duration:  15 / 25 seconds
 Cost:  15 move
-Debuff type:  Battle
+Debuff type:  physical
 
 In battle you can attempt to disarm your target, reducing the damage he deals by
 knocking away his weapon for a few seconds. If you're fighting someone already,
@@ -268,7 +268,7 @@ EXHAUST
 Usage:  exhaust [victim]
 Battle Synergy Ability:  75 Stealth
 Linked traits:  Melee role, Charisma
-Debuff type:  Battle
+Debuff type:  physical
 Cooldown:  9 seconds
 Duration:  9 seconds
 Cost:  22+ move (varies with level)
@@ -368,7 +368,7 @@ Heartstop (Battle ability)
 Usage:  heartstop [target]
 Cooldown:  30 seconds
 Cost:  30 move
-Debuff type:  Battle
+Debuff type:  physical
 
 Learn to fight vampires and win as you find the right spot to hit to stop them
 from using their blood to activate their deadly powers!
@@ -382,7 +382,7 @@ HINDER
 Usage:  hinder [victim]
 Battle Synergy Ability:  75 Survival
 Linked traits:  Tank role, Strength
-Debuff type:  Battle
+Debuff type:  physical
 Cooldown:  6 seconds
 Duration:  6 seconds
 Cost:  22+ move (varies with level)
@@ -394,7 +394,7 @@ HOBBLE
 Usage:  hobble [victim]
 Battle Synergy Ability:  75 Survival
 Linked traits:  Tank role, Strength
-Debuff type:  Battle
+Debuff type:  physical
 Cooldown:  6 seconds
 Duration:  6 seconds
 Cost:  8+ move (varies with level)
@@ -420,7 +420,7 @@ INFECT
 Usage:  infect [victim]
 Battle Synergy Ability:  75 Vampire
 Linked traits:  Caster role, Wits
-Debuff type:  Battle
+Debuff type:  physical
 Cooldown:  9 seconds
 Duration:  9 seconds
 Cost:  3 blood
@@ -464,7 +464,7 @@ Cooldown:  30 seconds
 Cost:  50 move
 
 You can kite opponents to keep them at range while you shoot them. However,
-your opponents must be stunned, entangled, or attacking someone else. If you
+your opponents must be stunned, immobilized, or attacking someone else. If you
 use this ability while already at range, it will increase the time it takes
 for your opponent to run to you. Otherwise, it will move you back to ranged
 distance and start the run-in timer.
@@ -476,7 +476,7 @@ LACERATE
 Usage:  lacerate [victim]
 Battle Synergy Ability:  75 Vampire
 Linked traits:  Melee role, Wits
-Debuff type:  Battle
+Debuff type:  physical
 Cooldown:  9 seconds
 Duration:  9 seconds
 Cost:  3 blood
@@ -563,8 +563,8 @@ SUNDER
 
 Usage:  sunder [victim]
 Battle Synergy Ability:  75 Trade
-Linked traits:  Tank role
-Debuff type:  Battle
+Linked traits:  Dexterity, Tank role
+Debuff type:  physical
 Cooldown:  9 seconds
 Duration:  9 seconds
 Cost:  11+ move (varies with level)
@@ -669,7 +669,7 @@ See also: SCORE, WITS, HASTEN, SLOW
 
 Stunning Blow (Battle ability)
 
-Debuff type:  Battle, Stun
+Debuff type:  physical, stun
 
 With this passive ability, your blunt weapons have a chance to knock your
 opponent down and stun him briefly, similar to a Bash. Your opponents will be
@@ -708,7 +708,7 @@ See also: COMPANION, DISMISS, ORDER
 
 Trick Shots (Battle ability)
 
-Debuff type:  Battle
+Debuff type:  physical
 
 Your ranged attacks get new effects based on attack type. Your chance to apply
 the effect on each shot is based on your Battle skill.
@@ -742,7 +742,7 @@ UNDERMINE
 Usage:  undermine [victim]
 Battle Synergy Ability:  75 Stealth
 Linked traits:  Melee role, Charisma
-Debuff type:  Battle
+Debuff type:  physical
 Cooldown:  30 seconds
 Duration:  30 seconds
 Cost:  42+ move (varies with level)

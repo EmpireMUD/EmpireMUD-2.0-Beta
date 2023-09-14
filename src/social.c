@@ -85,6 +85,28 @@ bool validate_social_requirements(char_data *ch, social_data *soc) {
 }
 
 
+/**
+* Counts the words of text in a social's strings.
+*
+* @param social_data *soc The social whose strings to count.
+* @return int The number of words in the social's strings.
+*/
+int wordcount_social(social_data *soc) {
+	int count = 0, iter;
+	
+	// count += wordcount_string(SOC_NAME(soc));
+	count += wordcount_string(SOC_COMMAND(soc));
+	
+	for (iter = 0; iter < NUM_SOCM_MESSAGES; ++iter) {
+		if (SOC_MESSAGE(soc, iter)) {
+			count += wordcount_string(SOC_MESSAGE(soc, iter));
+		}
+	}
+	
+	return count;
+}
+
+
  //////////////////////////////////////////////////////////////////////////////
 //// UTILITIES ///////////////////////////////////////////////////////////////
 
@@ -375,7 +397,7 @@ void parse_social(FILE *fl, any_vnum vnum) {
 		}
 		switch (*line) {
 			case 'L': {	// requirements
-				parse_requirement(fl, &SOC_REQUIREMENTS(soc), error);
+				parse_requirement(fl, &SOC_REQUIREMENTS(soc), (*(line+1) == '+' ? TRUE : FALSE), error);
 				break;
 			}
 			
@@ -523,11 +545,14 @@ social_data *create_social_table_entry(any_vnum vnum) {
 */
 void olc_delete_social(char_data *ch, any_vnum vnum) {
 	social_data *soc;
+	char name[256];
 	
 	if (!(soc = social_proto(vnum))) {
 		msg_to_char(ch, "There is no such social %d.\r\n", vnum);
 		return;
 	}
+	
+	snprintf(name, sizeof(name), "%s", NULLSAFE(SOC_NAME(soc)));
 	
 	// remove it from the hash table first
 	remove_social_from_table(soc);
@@ -536,8 +561,8 @@ void olc_delete_social(char_data *ch, any_vnum vnum) {
 	save_index(DB_BOOT_SOC);
 	save_library_file_for_vnum(DB_BOOT_SOC, vnum);
 	
-	syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: %s has deleted social %d", GET_NAME(ch), vnum);
-	msg_to_char(ch, "Social %d deleted.\r\n", vnum);
+	syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: %s has deleted social %d %s", GET_NAME(ch), vnum, name);
+	msg_to_char(ch, "Social %d (%s) deleted.\r\n", vnum, name);
 	
 	free_social(soc);
 }

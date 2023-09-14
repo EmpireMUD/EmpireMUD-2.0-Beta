@@ -26,6 +26,7 @@
 /* same as any_one_arg except that it stops at punctuation */
 char *any_one_name(char *argument, char *first_arg) {
 	char *arg;
+	bool has_uid = FALSE;
 
 	/* Find first non blank */
 	while (isspace(*argument)) {
@@ -33,7 +34,11 @@ char *any_one_name(char *argument, char *first_arg) {
 	}
 
 	/* Find length of first word */
-	for (arg = first_arg; *argument && !isspace(*argument) && (!ispunct(*argument) || *argument == UID_CHAR || *argument == '#' || *argument == '-'); arg++, argument++) {
+	// update: if it finds a UID char, it now ends after the numeric portion, preventing it from eating the 'self' in *%mob%self
+	for (arg = first_arg; *argument && !isspace(*argument) && (!has_uid || isdigit(*argument)) && (!ispunct(*argument) || *argument == UID_CHAR || *argument == '#' || *argument == '-'); arg++, argument++) {
+		if (*argument == UID_CHAR) {
+			has_uid = TRUE;
+		}
 		*arg = LOWER(*argument);
 	}
 	*arg = '\0';
@@ -73,30 +78,45 @@ void sub_write_to_char(char_data *ch, char *tokens[], void *otokens[], char type
 				break;
 			}
 			case '^': {
-				if (!otokens[i] || !CAN_SEE(ch, (char_data*) otokens[i]))
+				if (!otokens[i]) {
+					// formerly included: || !CAN_SEE(ch, (char_data*) otokens[i])
+					// TODO if we had plural pronoun support, !see people should be "their"
 					strcat(sb,"its");
-				else if ((char_data*)otokens[i] == ch)
+				}
+				else if ((char_data*)otokens[i] == ch) {
 					strcat(sb,"your");
-				else
+				}
+				else {
 					strcat(sb,HSHR((char_data*) otokens[i]));
+				}
 				break;
 			}
 			case '&': {
-				if (!otokens[i] || !CAN_SEE(ch, (char_data*) otokens[i]))
+				if (!otokens[i]) {
+					// formerly included: || !CAN_SEE(ch, (char_data*) otokens[i])
+					// TODO if we had plural pronoun support, !see people should be "they"
 					strcat(sb,"it");
-				else if ((char_data*)otokens[i] == ch)
+				}
+				else if ((char_data*)otokens[i] == ch) {
 					strcat(sb,"you");
-				else
+				}
+				else {
 					strcat(sb,HSSH((char_data*) otokens[i]));
+				}
 				break;
 			}
 			case '*': {
-				if (!otokens[i] || !CAN_SEE(ch, (char_data*) otokens[i]))
+				if (!otokens[i]) {
+					// formerly included: || !CAN_SEE(ch, (char_data*) otokens[i])
+					// TODO if we had plural pronoun support, !see people should be "them"
 					strcat(sb,"it");
-				else if ((char_data*)otokens[i] == ch)
+				}
+				else if ((char_data*)otokens[i] == ch) {
 					strcat(sb,"you");
-				else
+				}
+				else {
 					strcat(sb,HMHR((char_data*) otokens[i]));
+				}
 				break;
 			}
 			case '@': {
@@ -114,7 +134,7 @@ void sub_write_to_char(char_data *ch, char *tokens[], void *otokens[], char type
 	
 	// find the first non-color-code and cap it
 	for (iter = 0; iter < strlen(sb); ++iter) {
-		if (sb[iter] == '&') {
+		if (sb[iter] == COLOUR_CHAR) {
 			// skip
 			++iter;
 		}

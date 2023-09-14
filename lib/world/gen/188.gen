@@ -18,6 +18,8 @@ shockwave prance~
 0 0 0 0
 T0
 You are no longer stunned by the headless centaur's prance.~
+T5
+...$e is stunned!~
 S
 #18804
 neck chop~
@@ -25,6 +27,18 @@ neck chop~
 0 0 0 0
 T0
 You are no longer bleeding from the headless centaur's neck chop.~
+S
+#18811
+infected bite~
+4 0
+0 0 0 0
+T0
+Your bite seems to close up.~
+S
+#18812
+risen guard cooldown~
+3 0
+0 0 0 0
 S
 #18819
 costume citizen~
@@ -124,6 +138,33 @@ S
 picking candy~
 3 0
 0 0 0 0
+S
+#18858
+magic words~
+2 0
+0 0 0 0
+T2
+You say the magic words, 'Byldas myrras norras... A little wood and leather take...'~
+T3
+$n says the magic words, 'Byldas myrras norras... A little wood and leather take...'~
+S
+#18859
+magic words~
+2 0
+0 0 0 0
+T2
+You say the magic words, 'Unliving thing, with magic bake...'~
+T3
+$n says the magic words, 'Unliving thing, with magic bake...'~
+S
+#18860
+magic words~
+2 0
+0 0 0 0
+T2
+You say the magic words, 'The most fun you'll ever make!'~
+T3
+$n says the magic words, 'The most fun you'll ever make!'~
 S
 #18862
 nether portal cooldown~

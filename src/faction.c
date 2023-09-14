@@ -153,6 +153,22 @@ faction_data *find_faction_by_vnum(any_vnum vnum) {
 }
 
 
+/**
+* Counts the words of text in a faction's strings.
+*
+* @param faction_data *fct The faction whose strings to count.
+* @return int The number of words in the faction's strings.
+*/
+int wordcount_faction(faction_data *fct) {
+	int count = 0;
+	
+	count += wordcount_string(FCT_NAME(fct));
+	count += wordcount_string(FCT_DESCRIPTION(fct));
+	
+	return count;
+}
+
+
  //////////////////////////////////////////////////////////////////////////////
 //// UTILITIES ///////////////////////////////////////////////////////////////
 
@@ -788,7 +804,7 @@ void gain_reputation(char_data *ch, any_vnum vnum, int amount, bool is_kill, boo
 		amount = pfd->value - old_val;
 		msg_to_char(ch, "%sYou %s %d reputation with %s.\t0\r\n", reputation_levels[idx].color, (amount > 0 ? "gain" : "lose"), ABSOLUTE(amount), FCT_NAME(fct));
 		if (old_rep != pfd->rep) {
-			msg_to_char(ch, "%sYou are now %s with %s.\t0\r\n", reputation_levels[idx].color, reputation_levels[idx].name, FCT_NAME(fct));
+			msg_to_char(ch, "%sYou are now %s by %s.\t0\r\n", reputation_levels[idx].color, reputation_levels[idx].name, FCT_NAME(fct));
 			qt_change_reputation(ch, FCT_VNUM(fct));
 		}
 	}
@@ -948,7 +964,7 @@ void set_reputation(char_data *ch, any_vnum vnum, int rep) {
 	
 	// and message
 	if (old_rep != pfd->rep) {
-		msg_to_char(ch, "%sYou are now %s with %s.\t0\r\n", reputation_levels[rep_idx].color, reputation_levels[rep_idx].name, FCT_NAME(fct));
+		msg_to_char(ch, "%sYou are now %s by %s.\t0\r\n", reputation_levels[rep_idx].color, reputation_levels[rep_idx].name, FCT_NAME(fct));
 		qt_change_reputation(ch, FCT_VNUM(fct));
 	}
 }
@@ -1048,12 +1064,15 @@ void olc_delete_faction(char_data *ch, any_vnum vnum) {
 	social_data *soc, *next_soc;
 	shop_data *shop, *next_shop;
 	descriptor_data *desc;
+	char name[256];
 	bool found;
 	
 	if (!(fct = find_faction_by_vnum(vnum))) {
 		msg_to_char(ch, "There is no such faction %d.\r\n", vnum);
 		return;
 	}
+	
+	snprintf(name, sizeof(name), "%s", NULLSAFE(FCT_NAME(fct)));
 	
 	// remove it from the hash table first
 	remove_faction_from_table(fct);
@@ -1077,6 +1096,7 @@ void olc_delete_faction(char_data *ch, any_vnum vnum) {
 		
 		if (found) {
 			// SET_BIT(EVT_FLAGS(event), EVTF_IN_DEVELOPMENT);
+			syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: Event %d %s had rewards for a deleted faction (removed rewards but did not set IN-DEV)", EVT_VNUM(event), EVT_NAME(event));
 			save_library_file_for_vnum(DB_BOOT_EVT, EVT_VNUM(event));
 		}
 	}
@@ -1087,6 +1107,7 @@ void olc_delete_faction(char_data *ch, any_vnum vnum) {
 		if (find) {
 			HASH_DEL(FCT_RELATIONS(iter), find);
 			free(find);
+			syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: Faction %d %s lost deleted related faction", FCT_VNUM(iter), FCT_NAME(iter));
 			save_library_file_for_vnum(DB_BOOT_FCT, FCT_VNUM(iter));
 		}
 	}
@@ -1095,6 +1116,7 @@ void olc_delete_faction(char_data *ch, any_vnum vnum) {
 	HASH_ITER(hh, mobile_table, mob, next_mob) {
 		if (MOB_FACTION(mob) == fct) {
 			MOB_FACTION(mob) = NULL;
+			syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: Mobile %d %s lost deleted faction", GET_MOB_VNUM(mob), GET_SHORT_DESC(mob));
 			save_library_file_for_vnum(DB_BOOT_MOB, GET_MOB_VNUM(mob));
 		}
 	}
@@ -1106,6 +1128,7 @@ void olc_delete_faction(char_data *ch, any_vnum vnum) {
 		
 		if (found) {
 			SET_BIT(PRG_FLAGS(prg), PRG_IN_DEVELOPMENT);
+			syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: Progress %d %s set IN-DEV due to deleted faction", PRG_VNUM(prg), PRG_NAME(prg));
 			save_library_file_for_vnum(DB_BOOT_PRG, PRG_VNUM(prg));
 			need_progress_refresh = TRUE;
 		}
@@ -1122,6 +1145,7 @@ void olc_delete_faction(char_data *ch, any_vnum vnum) {
 		
 		if (found) {
 			SET_BIT(QUEST_FLAGS(qiter), QST_IN_DEVELOPMENT);
+			syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: Quest %d %s set IN-DEV due to deleted faction", QUEST_VNUM(qiter), QUEST_NAME(qiter));
 			save_library_file_for_vnum(DB_BOOT_QST, QUEST_VNUM(qiter));
 		}
 	}
@@ -1131,6 +1155,7 @@ void olc_delete_faction(char_data *ch, any_vnum vnum) {
 		if (SHOP_ALLEGIANCE(shop) == fct) {
 			SHOP_ALLEGIANCE(shop) = NULL;
 			SET_BIT(SHOP_FLAGS(shop), SHOP_IN_DEVELOPMENT);
+			syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: Shop %d %s set IN-DEV due to deleted faction", SHOP_VNUM(shop), SHOP_NAME(shop));
 			save_library_file_for_vnum(DB_BOOT_SHOP, SHOP_VNUM(shop));
 		}
 	}
@@ -1143,6 +1168,7 @@ void olc_delete_faction(char_data *ch, any_vnum vnum) {
 		
 		if (found) {
 			SET_BIT(SOC_FLAGS(soc), SOC_IN_DEVELOPMENT);
+			syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: Social %d %s set IN-DEV due to deleted faction", SOC_VNUM(soc), SOC_NAME(soc));
 			save_library_file_for_vnum(DB_BOOT_SOC, SOC_VNUM(soc));
 		}
 	}
@@ -1218,8 +1244,8 @@ void olc_delete_faction(char_data *ch, any_vnum vnum) {
 	save_index(DB_BOOT_FCT);
 	save_library_file_for_vnum(DB_BOOT_FCT, vnum);
 	
-	syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: %s has deleted faction %d", GET_NAME(ch), vnum);
-	msg_to_char(ch, "Faction %d deleted.\r\n", vnum);
+	syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: %s has deleted faction %d %s", GET_NAME(ch), vnum, name);
+	msg_to_char(ch, "Faction %d (%s) deleted.\r\n", vnum, name);
 	
 	free_faction(fct);
 }
@@ -1273,10 +1299,7 @@ void save_olc_faction(descriptor_data *desc) {
 	HASH_SRT(sorted_hh, sorted_factions, sort_factions_by_data);
 	
 	// update live players
-	DL_FOREACH(character_list, chiter) {
-		if (IS_NPC(chiter)) {
-			continue;
-		}
+	DL_FOREACH2(player_character_list, chiter, next_plr) {
 		update_reputations(chiter);
 	}
 }

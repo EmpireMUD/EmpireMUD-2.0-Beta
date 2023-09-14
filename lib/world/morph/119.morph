@@ -1,0 +1,44 @@
+#11902
+bucket wooden~
+a bucket~
+A wooden bucket is sitting here, filled with water.~
+cil 5 24 100 nrG 3
+1 0 -1 11807
+D
+   This unusual wooden bucket is filled to the brim with sudsy water. A sponge
+floats on the soap bubbles.
+~
+S
+#11903
+sponge stray~
+a sponge~
+A stray sponge is lying on the floor.~
+cil 5 24 100 nrG 3
+1 0 -1 11807
+D
+   The rough, oddly-shaped sponge is beige-yellow in color. It is porous and
+appears to be leaving a little pool of water around it.
+~
+S
+#11921
+broom~
+a broom~
+There is a broom here.~
+cil 5 36 100 nrG 3
+1 0 -1 11807
+D
+The broom is made from heather wood and bound by a twisted old string.
+~
+S
+#11933
+mop~
+a mop~
+There is a mop here.~
+cil 5 24 100 nrG 3
+1 0 -1 11807
+D
+   The mop is made from a long oak handle with a large knot at the top, with
+twisted curls of wool yarn at the base to hold water.
+~
+S
+$

@@ -1,3 +1,16 @@
+#5107
+Mine Rename Based on Type~
+2 o 100
+~
+wait 0
+set type %room.mine_type%
+if %type%
+  set name %type.car%
+  set pref %name.ana%
+  %mod% %room% title %pref.cap% %name.cap% Mine
+end
+detach 5107 %room.id%
+~
 #5138
 Tavern Hideout Completion~
 2 o 100
@@ -245,11 +258,11 @@ end
 detach 5187 %room.id%
 ~
 #5191
-Oasis Drainage~
+Oasis Drainage: Completing building converts to Dry Oasis~
 2 o 100
 ~
-%echo% The drainage is complete and the area is now a desert.
-%terraform% %room% 20
+%echo% The drainage is complete. The plants begin to die as the oasis dries up.
+%terraform% %room% 82
 return 0
 ~
 #5195
@@ -267,6 +280,10 @@ if !%target.carried_by%
 end
 if !%target.wearable%
   %send% %actor% @%target% is not an equipment item.
+  halt
+end
+if %target.is_flagged(*keep)%
+  %send% %actor% You can not shatter something you are keeping.
   halt
 end
 * 26 ~ 200

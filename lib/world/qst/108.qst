@@ -11,7 +11,7 @@ Hugo gives you some empire advice.
 ~
 14 a 0 25 0
 P
-10 1 0 14
+10 1 0 14 -
 R
 5 1 1
 W
@@ -45,7 +45,7 @@ R
 R
 6 10802 1
 W
-13 10801 0 1
+13 10801 0 1 -
 Z
 1 10801
 S
@@ -74,7 +74,7 @@ tutorial.
 A
 1 10801
 P
-10 1 0 49
+10 1 0 49 -
 R
 0 0 1
 R
@@ -377,7 +377,7 @@ R
 R
 1 -1 50
 W
-7 5108 0 1
+7 5108 0 1 -
 Z
 1 10802
 S
@@ -395,7 +395,7 @@ Royal Advisor Hugo congratulates you on your progress toward greatness.
 A
 1 10801
 P
-0 10802 0 1
+0 10802 0 1 -
 R
 2 10800 1
 R
@@ -403,12 +403,12 @@ R
 R
 0 0 3
 W
-9 1 0 51
+9 1 0 51 -
 Z
 1 10803
 S
 #10825
-The Perfect Rock~
+Museum: The Perfect Rock~
    Horation is looking for just the right rock to represent the Stone Age. It
 needs to be slightly gray or brown, between the size of a pea and the size of
 your fist, and either smooth or rough. Basically, any rock will do. You never
@@ -423,7 +423,7 @@ this just isn't the right rock, so he tells you to keep it.
 ~
 15 0 0 25 0
 P
-10 6 0 14
+10 6 0 14 -
 R
 5 6 1
 W
@@ -458,12 +458,12 @@ R
 R
 6 10827 1
 W
-13 10825 0 1
+13 10825 0 1 -
 Z
 1 10826
 S
 #10827
-Collect Basic Resources~
+Museum: Collect Basic Resources~
    Horation explains that he is trying to open a museum to show off the
 accomplishments of Early Man that led to the first empires and the dawn of
 civilization. The real problem is that nobody will fund an archaeological dig
@@ -482,7 +482,7 @@ Horation looks over each of the rocks and saplings, and seems to approve.
 A
 1 10826
 P
-10 6 0 49
+10 6 0 49 -
 R
 0 0 1
 R
@@ -505,7 +505,7 @@ Z
 1 10826
 S
 #10828
-Make Stone Tools~
+Museum: Make Stone Tools~
 The curator needs you to make some basic stone tools for the museum.
 Craft 2 handaxes and 2 spear heads:
  1. 'Use' a regular rock and then type 'chip flint'.
@@ -552,7 +552,7 @@ Z
 1 10826
 S
 #10829
-Make Axes and Spears~
+Museum: Make Axes and Spears~
 The curator needs more tools for the exhibit.
 Craft a stone axe:
  1. You should still have handaxes and handles from the previous quest. If not,
@@ -597,7 +597,7 @@ Z
 1 10826
 S
 #10830
-Collect More Materials~
+Museum: Collect More Materials~
 The curator wants you to collect some more advanced resources.
 Get 2 small leather:
  1. Kill small animals like squirrels, meerkats, or rabbits.
@@ -644,7 +644,7 @@ Z
 1 10826
 S
 #10831
-Create Early Building Materials~
+Museum: Create Early Building Materials~
    The curator would like you to create some of early man's best building
 materials using the supplies you collected. This will require the
 Basic Crafts ability. You can type 'skill trade' to see it.
@@ -691,7 +691,7 @@ Z
 1 10826
 S
 #10832
-Examples of Early Sewing~
+Museum: Examples of Early Sewing~
 The curator needs some examples of early sewn crafts.
 Steps:
  1. You need at least level 5 Trade skill.
@@ -732,7 +732,7 @@ Z
 1 10826
 S
 #10833
-Examples of Early Pottery~
+Museum: Examples of Early Pottery~
 The curator needs some examples of early pottery.
 Steps:
  1. You need at least level 10 Trade skill.
@@ -774,7 +774,7 @@ Z
 1 10826
 S
 #10834
-Examples of Early Woodworking~
+Museum: Examples of Early Woodworking~
 The curator wants you to make some examples of early woodworking.
 Steps:
  1. You need at least 15 Trade skill.
@@ -816,7 +816,7 @@ Z
 1 10826
 S
 #10835
-Examples of Smithed Tools~
+Museum: Examples of Smithed Tools~
 The curator would like you to forge some metal tools.
 Steps:
  1. Type 'skill buy forge'.
@@ -861,7 +861,7 @@ Z
 1 10826
 S
 #10836
-A Master's Journey~
+Museum: A Master's Journey~
    The journey to becoming a master craftsman is long and difficult, and this
 is only the beginning. For now, help Horation build his Museum of Early Man.
 But if you choose to seek out mastery of your craft, return to Horation's
@@ -888,14 +888,14 @@ R
 R
 0 0 3
 W
-9 6 0 51
+9 6 0 51 -
 Z
 1 10826
 Z
 1 10827
 S
 #10837
-A Grandmaster's Journey~
+Museum: A Grandmaster's Journey~
    Horation seems pleased to meet such a skilled craftsman. His museum may be
 dedicated to the early history of mankind's crafts, but he always likes to
 encourage modern artisans. He's willing to give you one of his infamous
@@ -924,7 +924,7 @@ R
 1 -1 100
 T 10837
 W
-2 10838 0 1
+2 10838 0 1 -
 Z
 1 10826
 Z
@@ -954,7 +954,7 @@ A
 R
 0 0 1
 W
-13 10850 0 1
+13 10850 0 1 -
 Z
 3 10850
 Z
@@ -980,13 +980,11 @@ need to learn the Ritual of Burdens.
 ~
 You have performed a ritual and satisfied the Spirit of Order!
 ~
-10 0 0 25 -1
+12 0 0 25 -1
 A
 1 10851
 P
 0 10850 0 1 a
-P
-10 2 0 49 a
 P
 9 2 0 1 a
 R
@@ -999,10 +997,9 @@ R
 6 10859 1
 R
 6 10865 10865
-W
-10 2 0 49 a
-W
+W+
 11 0 0 1 a
+Cast the ritual of burdens in the Soulstream~
 Z
 1 10851
 S
@@ -1014,7 +1011,7 @@ most locations on the map. Follow these steps:
  1. Type 'enter portal' to get back out into the world.
  2. Walk away from the Tower of Souls by typing a direction such as 'east'.
  3. Type 'dig'. If you can't dig here, move to another tile and try again.
- 4. Keep digging until you have a rock and a flint. Flints appear about 8% of
+ 4. Keep digging until you have a rock and a flint. Flints appear about 15% of
     the time, so it may take a few tries.
  5. When you have the rock and the flint, go back to the Tower of Souls and
     type 'enter soulstream' to get back inside.
@@ -1024,13 +1021,11 @@ most locations on the map. Follow these steps:
 ways to learn low-level Survival. When you reach Survival 5, use 'skill buy
 Navigation' to improve your map.
 ~
-10 d 0 25 -1
+11 d 0 25 -1
 A
 1 10852
 P
 0 10850 0 1 a
-P
-10 5 0 49 a
 P
 9 5 0 1 a
 R
@@ -1043,8 +1038,6 @@ R
 6 10859 1
 R
 6 10865 10865
-W
-10 5 0 49 a
 W
 2 100 0 1 a
 W
@@ -1073,13 +1066,11 @@ it to learn how to use it. Here are the steps for this quest:
 ~
 You have satisfied the Spirit of the Hunt!
 ~
-10 d 0 25 -1
+11 d 0 25 -1
 A
 1 10853
 P
 0 10850 0 1 a
-P
-10 0 0 49 a
 P
 9 0 0 1 a
 R
@@ -1093,8 +1084,6 @@ R
 R
 6 10865 10865
 T 10853
-W
-10 0 0 49 a
 W
 4 0 512 1 a
 W
@@ -1114,13 +1103,11 @@ Heal Friend), but the Spirit of Mana can be healed with the basic Heal.
    You have restored the Spirit of Mana! You can heal yourself after combat to
 raise your Natural Magic skill further.
 ~
-17 0 0 25 -1
+19 0 0 25 -1
 A
 1 10854
 P
 0 10850 0 1 a
-P
-10 3 0 49 a
 P
 9 3 0 1 a
 R
@@ -1133,10 +1120,9 @@ R
 6 10859 1
 R
 6 10865 10865
-W
-10 3 0 49 a
-W
+W+
 11 0 0 1 a
+Heal the Spirit of Mana~
 Z
 1 10854
 S
@@ -1157,13 +1143,11 @@ worry, you'll get better at it as you level up.
 ~
 You have satisfied the Spirit of Darkness with your stealth.
 ~
-14 0 0 25 -1
+16 0 0 25 -1
 A
 1 10855
 P
 0 10850 0 1 a
-P
-10 4 0 49 a
 P
 9 4 0 1 a
 R
@@ -1176,10 +1160,9 @@ R
 6 10859 1
 R
 6 10865 10865
-W
-10 4 0 49 a
-W
+W+
 11 0 0 1 a
+Sneak into the hidden part of the Soulstream~
 Z
 1 10855
 S
@@ -1201,13 +1184,11 @@ Note: This quest will not show as 'complete' until you re-enter the Soulstream.
    You have satisfied the Spirit of Blood! Buy and use more abilities from the
 Vampire skill tree to become a sanguine master!
 ~
-17 0 0 25 -1
+19 0 0 25 -1
 A
 1 10857
 P
 0 10850 0 1 a
-P
-10 7 0 49 a
 P
 9 7 0 1 a
 R
@@ -1221,10 +1202,9 @@ R
 R
 6 10865 10865
 T 10857
-W
-10 7 0 49 a
-W
+W+
 11 0 0 1 a
+Drink blood and return to the Soulstream~
 Z
 1 10857
 S
@@ -1245,13 +1225,11 @@ can be used like a knife for butchering and skinning. Try this:
    You have satisfied the Spirit of Innovation! That spear head can be used for
 butchering, scraping, skinning, and even sewing!
 ~
-14 0 0 25 -1
+15 0 0 25 -1
 A
 1 10858
 P
 0 10850 0 1 a
-P
-10 6 0 49 a
 P
 9 6 0 1 a
 R
@@ -1267,8 +1245,6 @@ R
 R
 6 10865 10865
 W
-10 6 0 49 a
-W
 2 186 0 1 a
 Z
 1 10858
@@ -1279,7 +1255,7 @@ Complete More Tutorials~
 spirit tokens for a special reward. There is a tutorial inside for each of the
 skill trees, but you need to have the skill in the 1-49 level range to get its
 tutorial quest.
-   Once you have four of the tokens, you can finish this quest at the
+   Once you have three of the tokens, you can finish this quest at the
 Soulstream portal, or at any city center. Type 'coins' to see how many of the
 spirit tokens you have right now.
 ~
@@ -1287,11 +1263,11 @@ spirit tokens you have right now.
 special companion! Use this spirit bell to add the 'companion spirit' to your
 minipet collection. Then you can type 'minipet companion spirit' to summon it.
 ~
-9 d 0 25 -1
+10 d 0 25 -1
 R
 2 10859 1
 W
-20 10852 0 4
+20 10852 0 3 -
 Z
 2 10850
 Z
@@ -1307,7 +1283,7 @@ and he will get you started. Try using 'where pageboy' to find him.
 ~
 You've found the pageboy...
 ~
-4 a 0 25 -1
+5 a 0 25 -1
 A
 1 10856
 P
@@ -1323,7 +1299,7 @@ P
 R
 6 10801 1
 W
-10 1 0 49
+10 1 0 49 -
 Z
 1 10800
 S
@@ -1353,7 +1329,7 @@ P
 R
 6 10826 1
 W
-10 6 0 49
+10 6 0 49 -
 Z
 1 10825
 S
@@ -1367,19 +1343,19 @@ You have completed the Spirit of Order's task and become a sorcerer.
 A
 1 10851
 P
-0 10850 0 1
+0 10850 0 1 -
 P
-10 2 0 0
+10 2 0 0 -
 P
-6 10851 0 1
+6 10851 0 1 -
 P
-5 10851 0 1
+5 10851 0 1 -
 R
 0 0 1
 W
-12 5511 0 1
+12 5511 0 1 -
 W
-9 2 0 1
+9 2 0 1 -
 Z
 1 10851
 S
@@ -1393,19 +1369,19 @@ You have completed the quest.
 A
 1 10854
 P
-0 10850 0 1
+0 10850 0 1 -
 P
-10 3 0 0
+10 3 0 0 -
 P
-6 10854 0 1
+6 10854 0 1 -
 P
-5 10854 0 1
+5 10854 0 1 -
 R
 0 0 1
 W
-12 5142 0 1
+12 5142 0 1 -
 W
-9 3 0 1
+9 3 0 1 -
 Z
 1 10854
 S
@@ -1446,19 +1422,19 @@ die).
 A
 3 10850
 P
-0 10851 0 1
+0 10851 0 1 -
 P
-0 10852 0 1
+0 10852 0 1 -
 P
-0 10853 0 1
+0 10853 0 1 -
 P
-0 10854 0 1
+0 10854 0 1 -
 P
-0 10855 0 1
+0 10855 0 1 -
 P
-0 10857 0 1
+0 10857 0 1 -
 P
-0 10858 0 1
+0 10858 0 1 -
 R
 0 0 5
 R

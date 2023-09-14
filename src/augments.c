@@ -128,6 +128,21 @@ bool validate_augment_target(char_data *ch, obj_data *obj, augment_data *aug, bo
 }
 
 
+/**
+* Counts the words of text in an augment's strings.
+*
+* @param augment_data *aug The augment whose strings to count.
+* @return int The number of words in the augment's strings.
+*/
+int wordcount_augment(augment_data *aug) {
+	int count = 0;
+	
+	count += wordcount_string(GET_AUG_NAME(aug));
+	
+	return count;
+}
+
+
  //////////////////////////////////////////////////////////////////////////////
 //// UTILITIES ///////////////////////////////////////////////////////////////
 
@@ -561,11 +576,14 @@ augment_data *create_augment_table_entry(any_vnum vnum) {
 */
 void olc_delete_augment(char_data *ch, any_vnum vnum) {
 	augment_data *aug;
+	char name[256];
 	
 	if (!(aug = augment_proto(vnum))) {
 		msg_to_char(ch, "There is no such augment %d.\r\n", vnum);
 		return;
 	}
+	
+	snprintf(name, sizeof(name), "%s", NULLSAFE(GET_AUG_NAME(aug)));
 	
 	// remove it from the hash table first
 	remove_augment_from_table(aug);
@@ -574,8 +592,8 @@ void olc_delete_augment(char_data *ch, any_vnum vnum) {
 	save_index(DB_BOOT_AUG);
 	save_library_file_for_vnum(DB_BOOT_AUG, vnum);
 	
-	syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: %s has deleted augment %d", GET_NAME(ch), vnum);
-	msg_to_char(ch, "Augment %d deleted.\r\n", vnum);
+	syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: %s has deleted augment %d %s", GET_NAME(ch), vnum, name);
+	msg_to_char(ch, "Augment %d (%s) deleted.\r\n", vnum, name);
 	
 	free_augment(aug);
 }

@@ -190,7 +190,7 @@ bool check_build_location_and_dir(char_data *ch, room_data *room, craft_data *ty
 	}
 	
 	// vehicle size/location checks
-	if (!is_upgrade && make_veh && GET_BUILDING(room) && VEH_FLAGGED(make_veh, VEH_NO_BUILDING)) {
+	if (!is_upgrade && make_veh && VEH_FLAGGED(make_veh, VEH_NO_BUILDING) && (ROOM_IS_CLOSED(room) || (GET_BUILDING(room) && !ROOM_BLD_FLAGGED(room, BLD_OPEN)))) {
 		if (ch) {
 			msg_to_char(ch, "You can't %s that in a building.\r\n", command);
 		}
@@ -216,7 +216,7 @@ bool check_build_location_and_dir(char_data *ch, room_data *room, craft_data *ty
 	}
 	if (make_veh && (is_upgrade || !ROOM_IS_CLOSED(room)) && !vehicle_allows_climate(make_veh, room, NULL)) {
 		if (ch) {
-			msg_to_char(ch, "You can't %s %s here.\r\n", command, VEH_SHORT_DESC(make_veh));
+			msg_to_char(ch, "You can't %s %s here.\r\n", command, get_vehicle_short_desc(make_veh, ch));
 		}
 		return FALSE;
 	}
@@ -392,7 +392,7 @@ void construct_building(room_data *room, bld_vnum type) {
 	
 	// for updating territory counts
 	was_large = LARGE_CITY_RADIUS(room);
-	was_ter = ROOM_OWNER(room) ? get_territory_type_for_empire(room, ROOM_OWNER(room), FALSE, &junk) : TER_FRONTIER;
+	was_ter = ROOM_OWNER(room) ? get_territory_type_for_empire(room, ROOM_OWNER(room), FALSE, &junk, NULL) : TER_FRONTIER;
 	
 	sect = SECT(room);
 	change_terrain(room, config_get_int("default_building_sect"), NOTHING);
@@ -404,7 +404,7 @@ void construct_building(room_data *room, bld_vnum type) {
 	// check for territory updates
 	if (ROOM_OWNER(room) && was_large != LARGE_CITY_RADIUS(room)) {
 		struct empire_island *eisle = get_empire_island(ROOM_OWNER(room), GET_ISLAND_ID(room));
-		is_ter = get_territory_type_for_empire(room, ROOM_OWNER(room), FALSE, &junk);
+		is_ter = get_territory_type_for_empire(room, ROOM_OWNER(room), FALSE, &junk, NULL);
 		
 		if (was_ter != is_ter) {	// did territory type change?
 			SAFE_ADD(EMPIRE_TERRITORY(ROOM_OWNER(room), was_ter), -1, 0, UINT_MAX, FALSE);
@@ -565,7 +565,7 @@ void disassociate_building(room_data *room) {
 	
 	// for updating territory counts
 	was_large = ROOM_BLD_FLAGGED(room, BLD_LARGE_CITY_RADIUS) ? TRUE : FALSE;
-	was_ter = ROOM_OWNER(room) ? get_territory_type_for_empire(room, ROOM_OWNER(room), FALSE, &junk) : TER_FRONTIER;
+	was_ter = ROOM_OWNER(room) ? get_territory_type_for_empire(room, ROOM_OWNER(room), FALSE, &junk, NULL) : TER_FRONTIER;
 	
 	if (ROOM_OWNER(room) && GET_BUILDING(room) && IS_COMPLETE(room)) {
 		qt_empire_players(ROOM_OWNER(room), qt_lose_building, GET_BLD_VNUM(GET_BUILDING(room)));
@@ -675,7 +675,7 @@ void disassociate_building(room_data *room) {
 	// check for territory updates
 	if (ROOM_OWNER(room) && was_large != (ROOM_BLD_FLAGGED(room, BLD_LARGE_CITY_RADIUS) ? TRUE : FALSE)) {
 		struct empire_island *eisle = get_empire_island(ROOM_OWNER(room), GET_ISLAND_ID(room));
-		is_ter = get_territory_type_for_empire(room, ROOM_OWNER(room), FALSE, &junk);
+		is_ter = get_territory_type_for_empire(room, ROOM_OWNER(room), FALSE, &junk, NULL);
 		
 		if (was_ter != is_ter) {
 			SAFE_ADD(EMPIRE_TERRITORY(ROOM_OWNER(room), was_ter), -1, 0, UINT_MAX, FALSE);
@@ -856,6 +856,7 @@ void finish_building(char_data *ch, room_data *room) {
 void finish_dismantle(char_data *ch, room_data *room) {
 	obj_data *newobj, *proto;
 	craft_data *type;
+	char to[256];
 	
 	msg_to_char(ch, "You finish dismantling the building.\r\n");
 	act("$n finishes dismantling the building.", FALSE, ch, 0, 0, TO_ROOM);
@@ -887,6 +888,12 @@ void finish_dismantle(char_data *ch, room_data *room) {
 	}
 	
 	disassociate_building(room);
+	
+	// message to update the room
+	strcpy(to, GET_SECT_NAME(SECT(IN_ROOM(ch))));
+	strtolower(to);
+	sprintf(buf, "This area is now %s%s%s.", (to[strlen(to)-1] == 's' ? "" : AN(to)), (to[strlen(to)-1] == 's' ? "" : " "), to);
+	act(buf, FALSE, ch, NULL, NULL, TO_CHAR | TO_ROOM);
 }
 
 
@@ -1344,7 +1351,7 @@ void setup_tunnel_entrance(char_data *ch, room_data *room, int dir) {
 	affect_total_room(room);
 	COMPLEX_DATA(room)->entrance = dir;
 	if (emp && can_claim(ch) && !ROOM_AFF_FLAGGED(room, ROOM_AFF_UNCLAIMABLE)) {
-		ter_type = get_territory_type_for_empire(room, emp, FALSE, &junk);
+		ter_type = get_territory_type_for_empire(room, emp, FALSE, &junk, NULL);
 		if (EMPIRE_TERRITORY(emp, ter_type) < land_can_claim(emp, ter_type)) {
 			claim_room(room, emp);
 		}
@@ -2032,6 +2039,7 @@ char *vnum_to_interlink(room_vnum vnum) {
 * @param vehicle_data *veh The vehicle they targeted.
 */
 void do_dismantle_vehicle(char_data *ch, vehicle_data *veh) {
+	char_data *ch_iter;
 	craft_data *craft;
 	
 	if (!ch || !veh || IS_NPC(ch)) {
@@ -2066,7 +2074,7 @@ void do_dismantle_vehicle(char_data *ch, vehicle_data *veh) {
 	else if (WATER_SECT(IN_ROOM(ch))) {
 		msg_to_char(ch, "You can't dismantle it in the water.\r\n");
 	}
-	else if (VEH_OWNER(veh) && GET_LOYALTY(ch) && GET_RANK(ch) < EMPIRE_PRIV(GET_LOYALTY(ch), PRIV_DISMANTLE) && get_vehicle_extra_data(veh, ROOM_EXTRA_ORIGINAL_BUILDER) != GET_ACCOUNT(ch)->id) {
+	else if (!HAS_DISMANTLE_PRIV_FOR_VEHICLE(ch, veh)) {
 		msg_to_char(ch, "You don't have permission to dismantle that.\r\n");
 	}
 	else if ((craft = find_craft_for_vehicle(veh)) && GET_CRAFT_ABILITY(craft) != NO_ABIL && !has_ability(ch, GET_CRAFT_ABILITY(craft)) && get_vehicle_extra_data(veh, ROOM_EXTRA_ORIGINAL_BUILDER) != GET_ACCOUNT(ch)->id) {
@@ -2091,6 +2099,16 @@ void do_dismantle_vehicle(char_data *ch, vehicle_data *veh) {
 		msg_to_char(ch, "You can't dismantle it while someone is inside.\r\n");
 	}
 	else {
+		// ensure nobody is building it
+		if (!VEH_IS_DISMANTLING(veh)) {
+			DL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), ch_iter, next_in_room) {
+				if (ch_iter != ch && !IS_NPC(ch_iter) && (GET_ACTION(ch_iter) == ACT_BUILDING || GET_ACTION(ch_iter) == ACT_MAINTENANCE || GET_ACTION(ch_iter) == ACT_GEN_CRAFT) && GET_ACTION_VNUM(ch_iter, 1) == VEH_CONSTRUCTION_ID(veh)) {
+					msg_to_char(ch, "You can't start dismantling it while someone is working on it.\r\n");
+					return;
+				}
+			}
+		}
+		
 		// ok: start dismantle
 		act("You begin to dismantle $V.", FALSE, ch, NULL, veh, TO_CHAR);
 		act("$n begins to dismantle $V.", FALSE, ch, NULL, veh, TO_ROOM);
@@ -2106,6 +2124,7 @@ void do_dismantle_vehicle(char_data *ch, vehicle_data *veh) {
 
 ACMD(do_dismantle) {
 	vehicle_data *veh;
+	char_data *ch_iter;
 	craft_data *type;
 
 	if (IS_NPC(ch)) {
@@ -2169,6 +2188,14 @@ ACMD(do_dismantle) {
 	}
 	
 	if (!COMPLEX_DATA(IN_ROOM(ch))) {
+		// also check for dismantle-able vehicles
+		DL_FOREACH2(ROOM_VEHICLES(IN_ROOM(ch)), veh, next_in_room) {
+			if (VEH_FLAGGED(veh, VEH_DISMANTLING) || !VEH_FLAGGED(veh, VEH_NEVER_DISMANTLE)) {
+				msg_to_char(ch, "Use 'dismantle <name>' to dismantle a vehicle or building in the room.\r\n");
+				return;
+			}
+		}
+		
 		msg_to_char(ch, "You can't start dismantling anything here.\r\n");
 		return;
 	}
@@ -2190,6 +2217,15 @@ ACMD(do_dismantle) {
 
 	if (!(type = find_building_list_entry(IN_ROOM(ch), FIND_BUILD_NORMAL))) {
 		if (!(type = find_building_list_entry(IN_ROOM(ch), FIND_BUILD_UPGRADE))) {
+			// also check for dismantle-able vehicles
+			DL_FOREACH2(ROOM_VEHICLES(IN_ROOM(ch)), veh, next_in_room) {
+				if (VEH_FLAGGED(veh, VEH_DISMANTLING) || !VEH_FLAGGED(veh, VEH_NEVER_DISMANTLE)) {
+					msg_to_char(ch, "Use 'dismantle <name>' to dismantle a vehicle or building in the room.\r\n");
+					return;
+				}
+			}
+			
+			// if we got here, there weren't any
 			msg_to_char(ch, "You can't dismantle anything here.\r\n");
 			return;
 		}
@@ -2200,7 +2236,7 @@ ACMD(do_dismantle) {
 		return;
 	}
 
-	if (!can_use_room(ch, IN_ROOM(ch), MEMBERS_ONLY) || (!has_permission(ch, PRIV_DISMANTLE, IN_ROOM(ch)) && get_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_ORIGINAL_BUILDER) != GET_ACCOUNT(ch)->id)) {
+	if (!HAS_DISMANTLE_PRIV_FOR_BUILDING(ch, IN_ROOM(ch))) {
 		msg_to_char(ch, "You don't have permission to dismantle this building.\r\n");
 		return;
 	}
@@ -2218,6 +2254,20 @@ ACMD(do_dismantle) {
 	if (ROOM_AFF_FLAGGED(IN_ROOM(ch), ROOM_AFF_NO_DISMANTLE)) {
 		msg_to_char(ch, "You can't dismantle this building (use 'manage no-dismantle' to toggle).\r\n");
 		return;
+	}
+	if (!can_see_in_dark_room(ch, IN_ROOM(ch), TRUE)) {
+		msg_to_char(ch, "It's too dark to start dismantling.\r\n");
+		return;
+	}
+	
+	// ensure nobody is building
+	if (!IS_DISMANTLING(IN_ROOM(ch))) {
+		DL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), ch_iter, next_in_room) {
+			if (ch_iter != ch && !IS_NPC(ch_iter) && (GET_ACTION(ch_iter) == ACT_BUILDING || GET_ACTION(ch_iter) == ACT_MAINTENANCE)) {
+				msg_to_char(ch, "You can't start dismantling while someone is still building it.\r\n");
+				return;
+			}
+		}
 	}
 	
 	if (!dismantle_wtrigger(IN_ROOM(ch), ch, TRUE)) {
@@ -2257,7 +2307,7 @@ void do_customize_room(char_data *ch, char *argument) {
 	else if (!emp || ROOM_OWNER(IN_ROOM(ch)) != emp) {
 		msg_to_char(ch, "You must own the tile to do this.\r\n");
 	}
-	else if (!IS_ANY_BUILDING(IN_ROOM(ch))) {
+	else if (!IS_ANY_BUILDING(IN_ROOM(ch)) || ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_NO_CUSTOMIZE)) {
 		msg_to_char(ch, "You can't customize here.\r\n");
 	}
 	else if (!has_permission(ch, PRIV_CUSTOMIZE, IN_ROOM(ch))) {
@@ -2478,7 +2528,7 @@ ACMD(do_designate) {
 	}
 	else if (!*argument || !(type = find_designate_room_by_name(argument, valid_des_flags))) {
 		if (*argument) {	// if any
-			msg_to_char(ch, "You can't designate a '%s' here.\r\n", argument);
+			msg_to_char(ch, "You can't designate %s '%s' here.\r\n", AN(argument), argument);
 		}
 		msg_to_char(ch, "Usage: %s <room>\r\n", (subcmd == SCMD_REDESIGNATE) ? "redesignate" : "designate <direction>");
 
@@ -2737,7 +2787,7 @@ ACMD(do_lay) {
 	}
 	else if (!ROOM_SECT_FLAGGED(IN_ROOM(ch), SECTF_LAY_ROAD))
 		msg_to_char(ch, "You can't lay a road here!\r\n");
-	else if (!has_resources(ch, cost, TRUE, TRUE)) {
+	else if (!has_resources(ch, cost, TRUE, TRUE, NULL)) {
 		// sends own messages
 	}
 	else {
@@ -2885,8 +2935,8 @@ ACMD(do_paint) {
 		msg_to_char(ch, "You don't have permission to paint anything (customize).\r\n");
 		return;
 	}
-	if (!*arg1) {
-		msg_to_char(ch, "Usage: paint <building | vehicle> <paint item>\r\n");
+	if (!*arg1 || !*arg2) {
+		msg_to_char(ch, "Usage: paint <building | vehicle> <paint item to use>\r\n");
 		return;
 	}
 	
@@ -2936,10 +2986,6 @@ ACMD(do_paint) {
 	}
 	
 	// ok find/validate the paint object
-	if (!*arg2) {
-		msg_to_char(ch, "Paint with what color?\r\n");
-		return;
-	}
 	if (!(paint = get_obj_in_list_vis(ch, arg2, NULL, ch->carrying))) {
 		msg_to_char(ch, "You don't seem to have that paint with.\r\n");
 		return;
@@ -3206,7 +3252,7 @@ ACMD(do_upgrade) {
 	// process the list of upgrades -- this will build the 'upgrade to what'
 	// output if there's no arg2, will find the craft if there is, and can also
 	// find the craft if there's no arg2 but there's also only 1 option
-	size = snprintf(output, sizeof(output), "Upgrade %s to what:", (from_veh ? VEH_SHORT_DESC(from_veh) : "it"));
+	size = snprintf(output, sizeof(output), "Upgrade %s to what:", (from_veh ? get_vehicle_short_desc(from_veh, ch) : "it"));
 	to_craft = NULL;	// possibly the one the player requested
 	found = 0;
 	
@@ -3352,7 +3398,7 @@ ACMD(do_upgrade) {
 		msg_to_char(ch, "You're already busy doing something else.\r\n");
 		return;
 	}
-	if (!check_can_craft(ch, to_craft)) {
+	if (!check_can_craft(ch, to_craft, FALSE)) {
 		// sends own messages
 		return;
 	}

@@ -1,0 +1,707 @@
+#11906
+Skycleave: High Sorcery Instruction~
+   Instructor Huberus shuffles back and forth across the classroom, loudly
+pontificating on topics you can't seem to comprehend. It seems to be a High
+Sorcery lesson, but the words are all jumbled.
+   Perhaps you have to pay her first... This daily quest will raise your High
+Sorcery by at least 1 point if it's under 50. (Make sure you don't have High
+Sorcery no-skilled.)
+~
+   You pay the fee and sit for Instructor Huberus's lesson. Comprehension comes
+quickly as you feel your mind expand. For a moment, you can almost see the
+magic that underpins reality.
+~
+4 de 0 0 -1
+A
+1 11906
+P
+9 2 0 1 a
+P
+10 2 0 49 a
+P
+16 11800 0 6 a
+R
+5 2 1
+R
+4 2 50
+W
+21 0 0 500 -
+Z
+1 11906
+S
+#11907
+Skycleave: Win a Prize~
+   'Things are hectic in here, but be sure to find some time to play the claw
+game,' Mageina says to you, over the counter, making a claw motion with her
+hand. 'Never know what you're going to get from that. Let me know.'
+~
+   Mageina sees what you won from the claw game and breathes out a half-laugh
+through her nose.
+   'That's a pretty good one,' she says. 'Maybe even my favorite. But I say
+that about all of them, don't I? At least you managed to find the machine while
+it was working. It keeps breaking and I can never keep track of where we are in
+the...'
+   Mageina looks over your shoulder and then leans in close to say, 'Or rather,
+WHEN we are, in the time loop.'
+~
+11 0 150 250 -1
+A
+1 11805
+A
+1 11905
+R
+7 11800 10
+W+
+11 0 0 1 -
+Win a prize from the claw game~
+Z
+1 11905
+S
+#11908
+Skycleave: Win a Prize from the Claw Game~
+   Another day, another trip through the time loop. What does the claw game
+have in store this time? The only way to find out is to play it. Win another
+prize from the claw game -- if it's in working condition, that is. Otherwise,
+you'll need to aid the rescue of the tower in order to give its residents time
+to fix it.
+~
+   'What did you get?' the shopkeeper shouts from behind the counter. He
+stretches his neck to peer over, eyes wide and eyebrows up, but his face falls
+when he sees your prize.
+   'Oh, yeah,' he says. 'It's giving out a lot of those today. Maybe they fixed
+it wrong. I tried hitting it a few times, erm, with a bucket, but it didn't
+really help much. Still, enjoy your prize... Oh! And thank you for your
+established patronage at Towrinkel's, erm, Gift Shop.'
+~
+27 e 150 250 -1
+A
+1 11900
+A
+2 11908
+A
+2 11907
+P
+16 11800 0 6 a
+P
+0 11907 0 1 a
+R
+7 11800 20
+W+
+11 0 0 1 -
+Win a prize from the claw game~
+Z
+4 11908
+S
+#11913
+Skycleave: Off to the Races~
+   You roll the purple and brown clay jar back and forth. It doesn't feel like
+much in your hands, but your heart is practically beating out of your chest as
+you imagine catching your own pixy and training it for the Pixy Races!
+   Find a pixy, if you can, and catch it in the jar. The salesman suggested
+they can be found in enchanted forests but in a pinch, any escaped pixy might
+do. If you really want to bond with your pixy, give it a good, quick name. Then
+race it at Skycleave's Pixy Races and see how it fares. The more you race, the
+better your pixy will get!
+~
+   'Amazing little thing,' Warden Chicanders says as you load your pixy back
+into the jar. 'Well, it could have done better, but it really did show a lot of
+promise.'
+   The warden rubs the sweat from his long forehead with his palm and then
+grabs a parchment to write down the race results. He peers back and forth
+across the race domes, scribbling some notes to himself.
+   'Oh,' he says at last, looking back down at you. 'Well that was all, unless
+you're racing again. Got to get that little pixy into tip-top shape if you want
+to be the best there ever was.'
+~
+13 0 150 250 -1
+A
+2 11913
+A
+2 11914
+R
+7 11800 10
+W+
+11 0 0 1 -
+Race your own pixy at the Pixy Races~
+Z
+1 11918
+S
+#11914
+Skycleave: Victory Lap~
+   The Tower Skycleave's Pixy Races are rarely open to the public, but your
+assistance to its sorcerers has earned you a permanent invitation. What's more,
+they've seen you race and are eager to see more. Pick your favorite pixy and
+race -- more than race; pick your favorite pixy and win! Show those stuffed
+aubergine robes how it's really done.
+~
+   'I dare say, you seem to know what you're doing,' Warden Chicanders says as
+you load your pixy back into the jar. 'Putting the house pixies to shame. Well,
+rather a good thing we don't let guests bet on the races anymore.'
+   He takes the jar from you for a moment and holds it to the light. You can't
+see through it -- it's made of clay, after all -- but the warden seems to be
+examinining it. He tosses it back to you, nearly missing, and pulls a parchment
+from the sleeve of his robe to scribble some notes.
+   'Might have to run mine like that,' he says. 'In some circuits, those moves
+might be considered cheating. Old rules, new rules; you could go round and
+round about it till the end of time. I say the dirty tricks make it
+interesting. Might have to copy some of yours.'
+~
+15 e 150 250 -1
+A
+1 11900
+A
+1 11918
+P
+16 11800 0 6 a
+P
+0 11913 0 1 a
+R
+7 11800 20
+W+
+11 0 0 1 -
+Win with your own pixy at the Pixy Races~
+Z
+1 11918
+S
+#11915
+Skycleave: Best There Ever Was~
+   Apprentice Ravinder pulls you aside and peers past you before leaning in
+close. His eyes flit back and forth over your shoulder, never on you, and his
+volume drops whenever someone moves into earshot.
+   'I've heard you're quite the racer. Got a pretty good pixy. Thorley said
+you're the best in our generation, although he's not in his proper mind, if you
+catch my meaning,' Ravinder says under his breath.
+   'Let's not mince words. I'm trying to win and I haven't got all the time in
+the world to train a good one. So let's see yours. If it's any good, I'll pay
+you for it. Simple transaction. I'm sure I can make it worth your time.'
+   Train a high-level pixy in a novelty jar and, when it's strong enough, bring
+it to Ravinder and type 'give <pixy> Ravinder'.
+~
+   Apprentice Ravinder tosses the purple and brown jar in the air and catches
+it with a childlike grin. He's almost hugging it as he says, 'You cannot fathom
+how much I look forward to the sweet taste of victory with this little guy.
+Honestly. Take your reward. Oh, this pixy will be worth so much more. Just,
+truly, from the bottom of my heart, thank you. I'll get started in tomorrow's
+race.'
+   Ravinder hardly looks at you as he hands you a delicate glass chrysanthemum
+from inside his white robe. His eyes don't leave his new pixy jar.
+~
+16 0 150 250 -1
+A
+1 11825
+A
+1 11925
+P
+0 11914 0 1 a
+P
+16 11800 0 6 a
+P
+0 11913 0 1 a
+R
+7 11800 10
+R
+2 11933 1
+W+
+11 0 0 1 -
+Offer Ravinder a high-level racing pixy~
+Z
+1 11825
+Z
+1 11925
+S
+#11916
+Skycleave: A Mysterious Diary Page~
+   This is an odd diary page, to be sure. You look it over several times,
+reading it meticulously for clues, but you simply don't have the experience
+with the tower to grasp its full meaning. Perhaps it will make more sense
+later. For now, stash the diary page in a safe place.
+   Reach Esteemed reputation with the Tower Skycleave and then sit by the
+fountain on the ground floor and reflect on the diary page again (it will offer
+a quest when you reach Esteemed).
+~
+   You sit by the fountain and reflect on your experiences in the tower thus
+far. Now that you've reached Esteemed reputation with Skycleave, you can start
+the quest from the diary page (if you haven't already).
+~
+2 0 150 250 -1
+A
+2 11920
+A
+2 11918
+A
+2 11919
+P
+17 11800 0 6 -
+W
+16 11800 0 7 -
+Z
+2 11906
+S
+#11918
+Skycleave: Championship Tour~
+   You scrutinize the time-traveler's list of villains, looking for more clues.
+It seems the mysterious author has fought all these people somewhere in the
+Tower Skycleave and now you find yourself eager to duplicate the feat.
+   With this checklist in hand, find and defeat every one of the Tower
+Skycleave's combatants. Be warned: like the time-traveler himself, it will take
+more than one trip through the tower to get them all. Be sure you're the one to
+kill them as well (or be part of the group that defeats them). If they die
+through some other misfortune, it doesn't count.
+~
+   You sit on the edge of the fountain and reflect on your battles against the
+tower's many villains as you watch the countless twinkling lights from the
+tree overhead reflect off of the softly burbling water. Surely this was the
+tower's most difficult challenge.
+   When you finally sit up, you notice a hot cup of tea left alone on the
+bench, and you pick it up.
+~
+11 0 150 250 -1
+A
+2 11918
+P
+16 11800 0 7 -
+R
+7 11800 25
+R
+2 11926 1
+R
+13 11801 11801
+W
+3 11819 0 1 a
+W
+3 11818 0 1 a
+W
+3 11847 0 1 a
+W
+3 11848 0 1 a
+W
+3 11849 0 1 a
+W+
+3 11867 0 1 a
+Defeat 1x mob: High Sorcerer Barrosh~
+W
+3 11869 0 1 a
+W
+3 11863 0 1 a
+W
+3 11872 0 1 a
+W
+3 11888 0 1 a
+W+
+3 11958 0 1 a
+Defeat 1x mob: Biksi, Champion of Orka~
+W+
+3 11928 0 1 a
+Defeat 1x mob: the First Water~
+Z
+2 11906
+S
+#11919
+Skycleave: Time-Traveler's Tour~
+   You read both sides of the diary page several times, wondering to yourself
+where some of these so-called hidden areas might be. At least now the
+mysterious time-traveler has provided you a checklist.
+   Visit each of the locations in the diary and then return to the first floor
+fountain in the Tower Skycleave to complete the quest. Some of these locations
+must be visited AFTER the tower has been rescued to count.
+~
+   You stroll around the fountain several times, watching the reflection of
+the enormous tree above you meander around the room in the surface of the
+fountain. The tower held so many secrets, a person could spend a lifetime
+plumbing its depths. Surely there are a few more...
+   On your third trip around the fountain, you notice a hot cup of tea sitting
+abandoned on the bench, and pick it up.
+~
+10 0 150 250 -1
+A
+2 11919
+P
+16 11800 0 7 -
+R
+7 11800 25
+R
+2 11926 1
+R
+13 11801 11801
+W
+13 11916 0 1 a
+W
+13 11940 0 1 a
+W
+13 11972 0 1 a
+W
+13 11880 0 1 a
+W
+13 11975 0 1 a
+W
+13 11888 0 1 a
+W
+13 11890 0 1 a
+W
+13 11994 0 1 a
+W
+13 11993 0 1 a
+Z
+2 11906
+S
+#11920
+Skycleave: Out of Time~
+   You read the diary page several times and turn it over in your hands. It
+clearly wasn't written by the hand of any of these sorcerers. Further, it's
+obviously someone who is keenly aware that the Tower Skycleave is stuck in a
+time loop -- a fact that seems lost on most of the tower's denizens.
+   This merits some investigation. Find the mysterious time-traveler who wrote
+the diary and see what insight he has to offer. Afterwards, visit the first
+floor fountain to complete the quest.
+~
+   In the end, it seems the time-traveler met a grim fate. You lay on your back
+and think on it, imagining for a moment that you are at the top, not bottom of
+this enormous chamber, looking down at the nocturnium tree and the tremendous
+fall to its base. This must be how it felt to be trapped in the time loop,
+staring into the pit you can never escape from. At least the sorcerers are, on
+the whole, unaware of their dark fate.
+   As you get up, you notice a black glint in the fountain. You reach in and
+find a strange nocturnium pocket watch at the bottom.
+~
+12 0 150 250 -1
+A
+2 11920
+P
+16 11800 0 7 -
+R
+7 11800 25
+R
+2 11934 1
+R
+13 11801 11801
+W+
+11 0 0 1 -
+Find the time-traveler~
+Z
+2 11906
+S
+#11928
+Skycleave: Test of Water~
+   You once again find yourself underwater and all but trapped by the magical
+boundaries of the elemental plane. Sure, escape is just above you, through the
+portal back to the fountain. But you were never one to shy away from a
+challenge like this.
+   Defeat the First Water again, if you can. And be quick about it; it may be
+impossible to defeat it for good, but it's known to drown anyone who tries.
+Even a brief victory against the First Water would be worthy of celebration.
+Defeat it, then speak to the oreonic in the Attunement Lab.
+~
+   'Ah, little human, a pleasure to see you again. You are looking particularly
+acceptable today,' Goef says as you enter, still dripping from your encounter
+with the First Water.
+   Goef taps one of its spindly upper arms at your head, lightly, making a
+resonant pinging noise as it hits you. The ping echoes off of something in the
+room, though you don't see what; it is beyond cluttered in here. Goef seems to
+be listening to the sound as it bounces back, though he doesn't necessarily
+seem to have ears.
+   'I have added your worthiness... to my own,' Goef says at last. 'I have been
+unable to defeat the First Water, you see. Once, we were locked in combat for a
+week, but even as I could not drown, I also could not... prevail. Next time,
+however, I will try it... your way.'
+   You stare blankly at the bulky stone creature for a moment before he adds:
+   'Not in this body, of course. From time to time, I loose myself from it and
+travel the aether... alone.'
+~
+13 e 150 250 -1
+A
+3 11972
+P
+0 11972 0 1 -
+R
+7 11800 20
+W+
+3 11928 0 1 -
+Defeat the First Water~
+Z
+1 11941
+S
+#11941
+Skycleave: In Tune With the Tower~
+   'Ah, a little human. Greetings,' the oreonic, Goef, says as you approach.
+You hesitate a moment, trying to grasp the notion that you are talking to an
+intelligent, thinking chunk of nocturnium.
+   Goef explains that no one else in the Tower Skycleave is capable of attuning
+skystones because a person in possession of a soul almost always taints the
+process. A soulless intermediary increases the reliability of the attunement,
+and in this regard, Goef is well-practiced. But the oreonic does warn you that
+the more skystones you attune, the harder it will become to attune more.
+   Lastly, Goef offers to demonstrate the process. You will only need an
+unattuned skystone to proceed. Type 'attune unattuned skystone' to begin.
+~
+   'See, little human, it is completely painless,' Goef says, handing back your
+skystone. 'Now that the stone has been attuned, the other humans will trade for
+it around the tower. Allow me to recommend the tedium shard. It doubles as a
+deep back-scratcher.'
+~
+14 0 150 250 -1
+A
+1 11941
+R
+7 11800 10
+W+
+20 11900 0 1 -
+Successfully attune a skystone~
+Z
+1 11941
+S
+#11942
+Skycleave: Attune a Skystone~
+   As you attune skystones, the process becomes more and more difficult, even
+with the assistance of the oreonic master, Goef. Nevertheless, the treasures
+for sale in the Tower Skycleave's shops require the precious stones -- and they
+are certainly worth the cost.
+   Attune another skystone successfully, no matter how many tries it takes.
+~
+   'It was good to see you again, little human,' Goef says, handing back your
+skystone with one of its long, spindly arms. 'I have come to look forward to
+your visits, although it is with regret that I must admit I cannot recall your
+name. Unfortunately, all humans have roughly the same number of eyes and ears
+and mouths and arms, and it makes you very difficult to tell apart.'
+~
+16 e 150 250 -1
+A
+1 11941
+A
+1 11900
+P
+0 11941 0 1 -
+R
+7 11800 20
+W+
+11 0 0 1 -
+Successfully attune a skystone~
+Z
+1 11941
+S
+#11970
+Skycleave: Secret Niamh~
+   Amongst the Skycleave variations, there is a hidden thread in the time loop
+in which the Shadow Hide herself, Niamh, rises to the rank of High Sorcerer.
+Seek out this twist of fate and learn Niamh's own thoughts on her place in the
+time loop.
+   Finding Acting High Sorcerer Niamh will require patience. Return to the
+tower some time after saving it to see if she has received this rare promotion.
+~
+   Acting High Sorcerer Niamh stops what she's doing and listens dismissively,
+at first, as you tell her about the time loop and its variations. But her
+interest grows as you provide more and more details...
+   'You're saying Grand High Sorcerer Knezz might have lived?' she asks, and
+you nod. She ponders it for a moment.
+   'My word,' she says at last. 'I shall set myself to researching this odd
+phenomenon at once. Perhaps my new station in the Tower will prove useful in
+getting answers.'
+   You try to discuss it further, but Niamh seems preoccupied with her own
+thoughts and she soon wanders off.
+~
+21 e 150 250 -1
+A
+1 11900
+D 11863
+P
+16 11800 0 6 a
+P
+0 11812 0 1 a
+R
+7 11800 20
+W
+13 11964 0 1 -
+Z
+1 11970
+S
+#11972
+Skycleave: Elemental Plane of Water~
+   You struggle for a breath as you realize you fell too far into the fountain.
+All you can see in every direction is water -- and it seems to be alive! The
+situation is as interesting as it is unexpected, and you vow to investigate it
+once you've defeated the living water.
+   After you claim victory against the living embodiment of the First Water,
+seek out someone in the Tower Skycleave who has more information.
+~
+   'Oh bother,' Annelise says as you interrupt her mending an old iron staff.
+She tosses it into the rubbish pile and ties her hair up out of her face. She
+takes a seat and wipes sweat from her forehead.
+   'I didn't even realize we had an appointment,' she says. She glances across
+the desk at her calendar, then back to you, then back to the calendar.
+   You interrupt and tell her about your fight with the First Water, from which
+you still don't feel like you've completely dried off. You tell her about the
+pressure in your lungs, about feeling like you were about to drown when the
+living water finally died. And, of course, you mention that it came right back
+to life afterward.
+   'I do keep telling the headmaster we should lock that portal,' Annelise says
+when you finish the tale. 'It is a genuine elemental plane, if you can believe
+it. Frankly you're lucky to have made it out. We lost a lot of pages before we
+put up a sign... which seems to have gone missing.
+   'Anyhow, you can't actually kill it. It's Water itself. All water. Every-
+where. But it's a great test of an adventurer's mettle. Be sure to fight it
+again when you get the chance.'
+~
+16 0 150 250 -1
+A
+3 11972
+P
+16 11800 0 6 -
+R
+7 11800 10
+W+
+3 11928 0 1 -
+Defeat the First Water~
+Z
+1 11839
+Z
+1 11939
+Z
+1 11919
+S
+#11975
+Gobbrabakh of Orka: Where Am I?~
+   As you step onto the rooftop, it begins to dawn on you that you are NOT
+where you were before -- or where you expected to be. 'What is this place?
+And where am I?' you wonder aloud as you look out over the city.
+   The hot summer sun beats down on you as you try to get your bearings. Were
+you just in a tower somewhere? As you struggle to find the answer in your own
+memory, you're quickly distracted by someone walking by. You start to wonder if
+anyone is going to believe you about this place...
+   Find something tangible to take back to Skycleave. Perhaps you can find a
+sorcerer there who will be interested in it.
+~
+   Tyrone makes a puzzled face as he takes the jade tear from you and turns it
+over and over between his fingers.
+   'I have one exactly like this in my room,' he says. 'I mean, ex-act-lee. I
+wonder if it even... well...'
+   He holds the tear up to the light, rubs it between his palms, even sniffs at
+it as he marvels.
+   'I need to compare it's, er, properties. To the other one. Thanks!'
+~
+11 d 150 250 -1
+A
+3 11982
+A
+3 11983
+A
+3 11984
+A
+3 11985
+A
+3 11986
+A
+3 11987
+A
+3 11988
+A
+3 11989
+A
+3 11990
+A
+3 11991
+R
+7 11800 25
+T 11830
+W
+2 11965 0 1 -
+Z
+1 11813
+Z
+1 11913
+S
+#11991
+Gobbrabakh of Orka: Bloodletting Ritual~
+   Celles bids you sit for a moment and you take a spot on one of the mats. She
+carefully leans herself onto a small stool and breathes hard out her nose as
+she lets herself relax.
+   'These old bones don't move like they used to,' she says. 'Thank you for
+taking a moment to speak with me. Today is an important day for the Gobbrabakh
+of Orka. On this day, we celebrate with food and stories and, most importantly,
+bloodletting in the arena.'
+   The old goblin pauses for a moment and shifts her weight on the stool.
+   'It would be a great honor for us if you would participate. It's quite rare
+to have an outsider here during the holy days. Please, do us this honor. Face
+our champion in the arena.'
+~
+   As the dust settles on the arena and the champion, Biksi, collects herself
+in the shade, the crowd stands in awe. The sun crests the sky overhead and
+slowly, a chant builds among the spectators, louder and louder, until it grows
+into a cheer. You can't make out what they're saying -- or you can't understand
+it -- but they seem thrilled at your performance in the arena.
+~
+16 e 150 250 -1
+A
+1 11974
+P
+0 11975 0 1 -
+R
+7 11800 20
+W+
+3 11956 0 1 a
+Defeat the Worthy~
+W+
+3 11957 0 1 a
+Defeat the Axe~
+W+
+3 11958 0 1 a
+Defeat the Champion of Orka~
+Z
+3 11992
+S
+#11993
+Skycleave: Endless River~
+   As you drift off to sleep, you find yourself sitting by a muddy river with
+your trusty fishing net hanging nearby. You've been here before. Or, at least,
+you think you have.
+   When you get back to the Tower Skycleave, perhaps you can find someone who
+wants to hear about your dream. In the meantime, try some fishing.
+~
+   'I've had that exact dream,' Sanjiv says as you recall the story of the
+endless fishing river.
+   'Which is just awful,' he adds. 'Imagine doing work in your dream. As if
+things weren't stressful enough here already. I almost got merc'd by that
+stylish archmage just trying... just trying to do my job.'
+~
+12 0 150 250 -1
+A
+3 11993
+P
+16 11800 0 6 -
+R
+7 11800 10
+W
+13 11993 0 1 -
+Z
+1 11935
+Z
+1 11942
+S
+#11994
+Skycleave: House of God~
+   Just as sleep overtakes you, a bright light grows behind your eyelids and
+a feeling of warmth and comfort envelops you like a blanket. A sense of small-
+ness settles in as you find yourself in an audience with a being far, far
+greater than yourself.
+   It's a cozy dream; the kind you'll yearn for when you finally wake up. And
+perhaps it will be of interest to someone next time you're in the Tower
+Skycleave.
+~
+   There's a creaking noise as Goef turns its head toward you and raises its
+heavy brow.
+   'A curious thing,' it says slowly. 'My... people... have neither dreams nor
+gods. After all, we were created by the wizards of Man -- a creator neither
+safe to worship, nor ever worthy of it. I would surely like to meet a god some
+day. Perhaps it would give us something Mankind could not.'
+~
+14 0 150 250 -1
+A
+3 11994
+P
+16 11800 0 6 -
+R
+7 11800 10
+W
+13 11994 0 1 -
+Z
+1 11941
+S
+$

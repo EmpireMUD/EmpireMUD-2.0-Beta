@@ -4,7 +4,7 @@ A Goblin Nest~
 which the word filthy hardly does justice. It looks like several goblins have
 made their home here, and it may be difficult to get them to leave.
 ~
-cd 0 0
+cd 0 0 -1
 E
 nest filth~
 The nest is made primarily from bits of litter and the bones of food.
@@ -20,7 +20,7 @@ just a little plot, but it's obvious someone has taken good care of it. Neat
 rows of dirt have been carefully watered and though you can't see what's
 growing in them, the fertile soil is sure to produce something delicious.
 ~
-ac 0 0
+ac 0 0 -1
 M 0 10225 100.00 1
 T 10227
 S
@@ -32,7 +32,7 @@ in the distance is blurry, as if the air is waving and blocking your view. And
 then you realize what has happened: you have stumbled back into the
 Magiterranean, the hidden realm of druids.
 ~
-aceg 0 0
+acegi 0 0 10226
 D0
 ~
 0 10227
@@ -54,27 +54,27 @@ the same. These are prickly pear cacti, arranged as bushes of round, spined
 pads. Pale yellow flowers and bright red fruits poke out from the tops of the
 upper pads on each plant.
 ~
-aceg 0 0
+acegi 0 0 10226
 D2
 ~
 0 10226
-I 6 10228 50.00 1 X  # FORAGE: a stack of cactus pads
-I 6 10229 100.00 1 X  # FORAGE: a cactus fruit
-I 7 1206 8.33 1 p  # PICK: an iridescent blue iris
-I 7 1200 13.62 1 p  # PICK: a handful of whitegrass
+I 6 10228 50.00 1 X  # FORAGE: stack of cactus pads
+I 6 10229 100.00 1 X  # FORAGE: cactus fruit
+I 7 1206 8.33 50 p  # PICK: iridescent blue iris
+I 7 1200 13.62 50 p  # PICK: handful of whitegrass
 I+ 0 70  # Ability: Find Herbs
-I 7 1201 13.61 1 p  # PICK: a sack of fiveleaf
+I 7 1201 13.61 50 p  # PICK: sack of fiveleaf
 I+ 0 70  # Ability: Find Herbs
-I 7 1202 13.61 1 p  # PICK: a twig of redthorn
+I 7 1202 13.61 50 p  # PICK: twig of redthorn
 I+ 0 70  # Ability: Find Herbs
-I 7 1203 13.61 1 p  # PICK: some magewhisper sepals
+I 7 1203 13.61 50 p  # PICK: magewhisper sepals
 I+ 0 70  # Ability: Find Herbs
-I 7 1204 13.61 1 p  # PICK: a daggerbite frond
+I 7 1204 13.61 50 p  # PICK: daggerbite frond
 I+ 0 70  # Ability: Find Herbs
-I 7 1205 13.61 1 p  # PICK: some bileberries
+I 7 1205 13.61 50 p  # PICK: bileberries
 I+ 0 70  # Ability: Find Herbs
-I 7 10228 10.00 1 p  # PICK: a stack of cactus pads
-I 7 123 90.00 1 p  # PICK: a small flower
+I 7 10228 10.00 50 p  # PICK: stack of cactus pads
+I 7 123 90.00 50 p  # PICK: small flower
 M 0 10226 33.00 4
 M 1 10243 10.00 1
 S
@@ -86,27 +86,27 @@ and many of them appear to be ripe. On others, the bright red spiral flower
 atop each plant merely hints at the sweet beauty of the fruit that will grow
 out of it.
 ~
-aceg 0 0
+acegi 0 0 10226
 D3
 ~
 0 10226
-I 6 10226 50.00 1 X  # FORAGE: a pineapple
-I 6 10231 100.00 1 X  # FORAGE: some desert dandelions
-I 7 1206 8.33 1 p  # PICK: an iridescent blue iris
-I 7 1200 13.62 1 p  # PICK: a handful of whitegrass
+I 6 10226 50.00 1 X  # FORAGE: pineapple
+I 6 10231 100.00 1 X  # FORAGE: desert dandelions
+I 7 1206 8.33 50 p  # PICK: iridescent blue iris
+I 7 1200 13.62 50 p  # PICK: handful of whitegrass
 I+ 0 70  # Ability: Find Herbs
-I 7 1201 13.61 1 p  # PICK: a sack of fiveleaf
+I 7 1201 13.61 50 p  # PICK: sack of fiveleaf
 I+ 0 70  # Ability: Find Herbs
-I 7 1202 13.61 1 p  # PICK: a twig of redthorn
+I 7 1202 13.61 50 p  # PICK: twig of redthorn
 I+ 0 70  # Ability: Find Herbs
-I 7 1203 13.61 1 p  # PICK: some magewhisper sepals
+I 7 1203 13.61 50 p  # PICK: magewhisper sepals
 I+ 0 70  # Ability: Find Herbs
-I 7 1204 13.61 1 p  # PICK: a daggerbite frond
+I 7 1204 13.61 50 p  # PICK: daggerbite frond
 I+ 0 70  # Ability: Find Herbs
-I 7 1205 13.61 1 p  # PICK: some bileberries
+I 7 1205 13.61 50 p  # PICK: bileberries
 I+ 0 70  # Ability: Find Herbs
-I 7 10226 10.00 1 p  # PICK: a pineapple
-I 7 123 90.00 1 p  # PICK: a small flower
+I 7 10226 10.00 50 p  # PICK: pineapple
+I 7 123 90.00 50 p  # PICK: small flower
 M 0 10226 33.00 4
 M 1 10232 10.00 1
 S
@@ -118,27 +118,27 @@ stones, each with a pale green agave plant atop it. The agaves grow thick,
 fleshy leaves before sprouting a huge stalk into the air to spread its seeds.
 The heart of the agave is a prized food in some cultures.
 ~
-aceg 0 0
+acegi 0 0 10226
 D0
 ~
 0 10226
-I 6 10227 50.00 1 X  # FORAGE: an agave heart
-I 6 10231 100.00 1 X  # FORAGE: some desert dandelions
-I 7 1206 8.33 1 p  # PICK: an iridescent blue iris
-I 7 1200 13.62 1 p  # PICK: a handful of whitegrass
+I 6 10227 50.00 1 X  # FORAGE: agave heart
+I 6 10231 100.00 1 X  # FORAGE: desert dandelions
+I 7 1206 8.33 50 p  # PICK: iridescent blue iris
+I 7 1200 13.62 50 p  # PICK: handful of whitegrass
 I+ 0 70  # Ability: Find Herbs
-I 7 1201 13.61 1 p  # PICK: a sack of fiveleaf
+I 7 1201 13.61 50 p  # PICK: sack of fiveleaf
 I+ 0 70  # Ability: Find Herbs
-I 7 1202 13.61 1 p  # PICK: a twig of redthorn
+I 7 1202 13.61 50 p  # PICK: twig of redthorn
 I+ 0 70  # Ability: Find Herbs
-I 7 1203 13.61 1 p  # PICK: some magewhisper sepals
+I 7 1203 13.61 50 p  # PICK: magewhisper sepals
 I+ 0 70  # Ability: Find Herbs
-I 7 1204 13.61 1 p  # PICK: a daggerbite frond
+I 7 1204 13.61 50 p  # PICK: daggerbite frond
 I+ 0 70  # Ability: Find Herbs
-I 7 1205 13.61 1 p  # PICK: some bileberries
+I 7 1205 13.61 50 p  # PICK: bileberries
 I+ 0 70  # Ability: Find Herbs
-I 7 10227 10.00 1 p  # PICK: an agave heart
-I 7 123 90.00 1 p  # PICK: a small flower
+I 7 10227 10.00 50 p  # PICK: agave heart
+I 7 123 90.00 50 p  # PICK: small flower
 M 0 10226 33.00 4
 M 1 10241 10.00 1
 S
@@ -150,27 +150,27 @@ easier not to get stuck on the sharp, fleshy leaves. Aloe has long been used to
 soothe the skin and treat painful wounds. Perhaps that's what the druids of the
 Magiterranean are growing it for.
 ~
-aceg 0 0
+acegi 0 0 10226
 D1
 ~
 0 10226
-I 6 10230 50.00 1 X  # FORAGE: some thick aloe leaves
-I 6 10231 100.00 1 X  # FORAGE: some desert dandelions
-I 7 1206 8.33 1 p  # PICK: an iridescent blue iris
-I 7 1200 13.62 1 p  # PICK: a handful of whitegrass
+I 6 10230 50.00 1 X  # FORAGE: thick aloe leaves
+I 6 10231 100.00 1 X  # FORAGE: desert dandelions
+I 7 1206 8.33 50 p  # PICK: iridescent blue iris
+I 7 1200 13.62 50 p  # PICK: handful of whitegrass
 I+ 0 70  # Ability: Find Herbs
-I 7 1201 13.61 1 p  # PICK: a sack of fiveleaf
+I 7 1201 13.61 50 p  # PICK: sack of fiveleaf
 I+ 0 70  # Ability: Find Herbs
-I 7 1202 13.61 1 p  # PICK: a twig of redthorn
+I 7 1202 13.61 50 p  # PICK: twig of redthorn
 I+ 0 70  # Ability: Find Herbs
-I 7 1203 13.61 1 p  # PICK: some magewhisper sepals
+I 7 1203 13.61 50 p  # PICK: magewhisper sepals
 I+ 0 70  # Ability: Find Herbs
-I 7 1204 13.61 1 p  # PICK: a daggerbite frond
+I 7 1204 13.61 50 p  # PICK: daggerbite frond
 I+ 0 70  # Ability: Find Herbs
-I 7 1205 13.61 1 p  # PICK: some bileberries
+I 7 1205 13.61 50 p  # PICK: bileberries
 I+ 0 70  # Ability: Find Herbs
-I 7 10230 10.00 1 p  # PICK: some thick aloe leaves
-I 7 123 90.00 1 p  # PICK: a small flower
+I 7 10230 10.00 50 p  # PICK: thick aloe leaves
+I 7 123 90.00 50 p  # PICK: small flower
 M 0 10226 33.00 4
 M 1 10245 10.00 1
 S
@@ -181,124 +181,207 @@ protects the portal from a towering, leafy, primeval jungle. Boxes of supplies
 have been moved here for what appears to be a long hunting expedition, although
 you're not quite sure what they're hunting for.
 ~
-ac 0 0
+aci 0 0 10250
 D0
 ~
-0 10251
+0 10259
+E
+tents gate forest~
+   The tents are in a tight circle, making it hard to see the fencing behind
+them. The gate is tall, but it doesn't look strong enough to protect the camp
+from the animals you can hear calling in the distance. Only the sorcerers'
+magic is holding them back.
+~
+I 5 100 60.00 1 X  # DIG: rock
+I 5 106 20.00 1 X  # DIG: rough piece of obsidian
+I 5 102 10.00 1 X  # DIG: flint stone
+I 5 103 2.50 1 X  # DIG: yellow lightning stone
+I 5 104 2.50 1 X  # DIG: red bloodstone
+I 5 1206 2.50 1 X  # DIG: iridescent blue iris
+I 5 1300 2.50 1 X  # DIG: glowing green seashell
 M 0 10250 100.00 1
 M 0 10251 100.00 1
 T 10274
 T 10255
+T 10267
 S
 #10251
-The Primeval Forest~
-   No part of the forest looks any different to you than any other part. Long
-vines threaten to trip you up at every step, and there is no clear path.
+Backtracking Toward Camp~
+   You try your best to follow the trail back towards base camp and, though you
+get turned around several times, you eventually find the torch-lit path. The
+light from the torches flickers an eerie shade of violet, perhaps enchanted to
+keep the dracosaurs at bay.
 ~
-a 0 0
+aci 0 0 10250
 D2
 ~
-0 10258
-D14
-~
-0 10252
-D14
-~
-0 10256
-D14
-~
-0 10257
-E
-path trail tracks~
-It looks like you could figure out the way if you used the Track ability.
-~
-M 1 10260 100.00 5
-T 10266
+0 10250
 T 10274
-T 10251
+T 10268
 S
 #10252
 The Primeval Forest~
    No part of the forest looks any different to you than any other part. Long
 vines threaten to trip you up at every step, and there is no clear path.
 ~
-a 0 0
+ai 0 0 10250
 D2
 ~
-0 10258
+0 10251
 D14
 ~
-0 10251
+0 10254
 D14
 ~
 0 10253
 D14
 ~
-0 10256
+0 10255
 E
 path trail tracks~
 It looks like you could figure out the way if you used the Track ability.
 ~
 M 1 10260 100.00 5
-T 10267
 T 10274
 T 10251
+T 10266
 S
 #10253
 The Primeval Forest~
    No part of the forest looks any different to you than any other part. Long
 vines threaten to trip you up at every step, and there is no clear path.
 ~
-a 0 0
+ai 0 0 10250
 D2
 ~
-0 10258
-D14
-~
-0 10252
-D14
-~
-0 10257
+0 10251
 D14
 ~
 0 10254
+D14
+~
+0 10256
+D14
+~
+0 10255
 E
 path trail tracks~
 It looks like you could figure out the way if you used the Track ability.
 ~
-M 1 10257 100.00 1
-T 10268
+M 1 10260 100.00 5
 T 10274
 T 10251
+T 10266
 S
 #10254
 The Primeval Forest~
    No part of the forest looks any different to you than any other part. Long
 vines threaten to trip you up at every step, and there is no clear path.
 ~
-a 0 0
+ai 0 0 10250
 D2
 ~
-0 10258
-D14
-~
-0 10252
+0 10251
 D14
 ~
 0 10255
 D14
 ~
-0 10256
+0 10252
+D14
+~
+0 10253
 E
 path trail tracks~
 It looks like you could figure out the way if you used the Track ability.
 ~
 M 1 10260 100.00 5
-T 10269
 T 10274
 T 10251
+T 10266
 S
 #10255
+The Primeval Forest~
+   No part of the forest looks any different to you than any other part. Long
+vines threaten to trip you up at every step, and there is no clear path.
+~
+ai 0 0 10250
+D2
+~
+0 10251
+D14
+~
+0 10254
+D14
+~
+0 10256
+D14
+~
+0 10252
+E
+path trail tracks~
+It looks like you could figure out the way if you used the Track ability.
+~
+M 1 10260 100.00 5
+T 10274
+T 10251
+T 10266
+S
+#10256
+The Primeval Forest~
+   No part of the forest looks any different to you than any other part. Long
+vines threaten to trip you up at every step, and there is no clear path.
+~
+ai 0 0 10250
+D2
+~
+0 10251
+D14
+~
+0 10255
+D14
+~
+0 10253
+D14
+~
+0 10257
+E
+path trail tracks~
+It looks like you could figure out the way if you used the Track ability.
+~
+M 1 10257 100.00 1
+T 10274
+T 10251
+T 10266
+S
+#10257
+The Primeval Forest~
+   No part of the forest looks any different to you than any other part. Long
+vines threaten to trip you up at every step, and there is no clear path.
+~
+ai 0 0 10250
+D2
+~
+0 10251
+D14
+~
+0 10255
+D14
+~
+0 10258
+D14
+~
+0 10252
+E
+path trail tracks~
+It looks like you could figure out the way if you used the Track ability.
+~
+M 1 10260 100.00 5
+T 10274
+T 10251
+T 10266
+S
+#10258
 A Clearing in the Primeval Forest~
    You come to a clearing in the primeval forest, where the dense tangle of
 vines and underbrush opens up to reveal a magnificent landscape. A volcano
@@ -306,85 +389,48 @@ thunders on the horizon, spewing smoke and ash into the air and darkening the
 sun. Through the jungle, you can hear hundreds of animals roar back in
 response.
 ~
-ac 0 0
+aci 0 0 10250
 D2
 ~
-0 10258
+0 10251
 E
 volcano eruption smoke ash~
    A massive volcano in the distance spews a column of fire and death that
 stretches clear to the heavens, and even the sun seems to have trouble breaking
 through its dooming shadow.
 ~
+I 5 100 60.00 1 X  # DIG: rock
+I 5 106 20.00 1 X  # DIG: rough piece of obsidian
+I 5 102 10.00 1 X  # DIG: flint stone
+I 5 103 2.50 1 X  # DIG: yellow lightning stone
+I 5 104 2.50 1 X  # DIG: red bloodstone
+I 5 1206 2.50 1 X  # DIG: iridescent blue iris
+I 5 1300 2.50 1 X  # DIG: glowing green seashell
 M 1 10264 100.00 1
 T 10274
 T 10255
 S
-#10256
-The Primeval Forest~
-   No part of the forest looks any different to you than any other part. Long
-vines threaten to trip you up at every step, and there is no clear path.
+#10259
+Outside of Base Camp~
+   Past the ring of tents and the makeshift gate, there's nothing but forest.
+Endless, impenetrable, disquieting forest. You can hear something moving beyond
+the tree line, but you can't see what it is. Venturing any further from camp
+will run the risk of getting lost, but you might be able to find some tracks.
 ~
-a 0 0
-D2
-~
-0 10258
-D14
-~
-0 10251
-D14
-~
-0 10257
-D14
-~
-0 10252
-E
-path trail tracks~
-It looks like you could figure out the way if you used the Track ability.
-~
-M 1 10260 100.00 5
-T 10266
-T 10274
-T 10251
-S
-#10257
-The Primeval Forest~
-   No part of the forest looks any different to you than any other part. Long
-vines threaten to trip you up at every step, and there is no clear path.
-~
-a 0 0
-D2
-~
-0 10258
-D14
-~
-0 10251
-D14
-~
-0 10253
-D14
-~
-0 10252
-E
-path trail tracks~
-It looks like you could figure out the way if you used the Track ability.
-~
-M 1 10260 100.00 5
-T 10266
-T 10274
-T 10251
-S
-#10258
-Backtracking Toward Camp~
-   You try your best to follow the trail back towards base camp and, though you
-get turned around several times, you eventually find the torch-lit path. The
-light from the torches flickers an eerie shade of violet, perhaps enchanted to
-keep the dracosaurs at bay.
-~
-ac 0 0
+aci 0 0 10250
 D2
 ~
 0 10250
+D0
+~
+0 10254
+E
+gate tents base camp~
+   Even from just outside the gate, you can barely see the camp. The forest
+gobbles up all the torchlight and the cacophany of unfamiliar animal calls
+drowns out any hint that people are living out here.
+~
 T 10274
+T 10267
 S
 $

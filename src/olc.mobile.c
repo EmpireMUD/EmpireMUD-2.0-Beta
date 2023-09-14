@@ -127,6 +127,21 @@ bool audit_mobile(char_data *mob, char_data *ch) {
 		olc_audit_msg(ch, GET_MOB_VNUM(mob), "Animal can't be butchered");
 		problem = TRUE;
 	}
+	if (MOB_LANGUAGE(mob) != NOTHING) {
+		generic_data *lang = real_generic(MOB_LANGUAGE(mob));
+		if (!lang) {
+			olc_audit_msg(ch, GET_MOB_VNUM(mob), "Mob language does not exist.");
+			problem = TRUE;
+		}
+		if (lang && GEN_TYPE(lang) != GENERIC_LANGUAGE) {
+			olc_audit_msg(ch, GET_MOB_VNUM(mob), "Language generic %d is not a language.", GEN_VNUM(lang));
+			problem = TRUE;
+		}
+		if (lang && GEN_FLAGGED(lang, GEN_IN_DEVELOPMENT)) {
+			olc_audit_msg(ch, GET_MOB_VNUM(mob), "Mob language is set IN-DEVELOPMENT.");
+			problem = TRUE;
+		}
+	}
 	
 	problem |= audit_interactions(GET_MOB_VNUM(mob), mob->interactions, TYPE_MOB, ch);
 	
@@ -256,7 +271,7 @@ char *list_one_mobile(char_data *mob, bool detail) {
 	static char output[MAX_STRING_LENGTH];
 	char flags[MAX_STRING_LENGTH];
 	
-	bitvector_t show_flags = MOB_BRING_A_FRIEND | MOB_SENTINEL | MOB_AGGRESSIVE | MOB_MOUNTABLE | MOB_ANIMAL | MOB_AQUATIC | MOB_NO_ATTACK | MOB_SPAWNED | MOB_CHAMPION | MOB_EMPIRE | MOB_CITYGUARD | MOB_GROUP | MOB_HARD | MOB_DPS | MOB_TANK | MOB_CASTER | MOB_VAMPIRE | MOB_HUMAN;
+	bitvector_t show_flags = MOB_BRING_A_FRIEND | MOB_SENTINEL | MOB_AGGRESSIVE | MOB_MOUNTABLE | MOB_ANIMAL | MOB_AQUATIC | MOB_NO_ATTACK | MOB_SPAWNED | MOB_CHAMPION | MOB_EMPIRE | MOB_CITYGUARD | MOB_GROUP | MOB_HARD | MOB_DPS | MOB_TANK | MOB_CASTER | MOB_VAMPIRE | MOB_HUMAN | MOB_COINS;
 	
 	if (detail) {
 		if (IS_SET(MOB_FLAGS(mob), show_flags)) {
@@ -302,12 +317,15 @@ void olc_delete_mobile(char_data *ch, mob_vnum vnum) {
 	social_data *soc, *next_soc;
 	bld_data *bld, *next_bld;
 	struct mount_data *mount;
+	char name[256];
 	bool found;
 	
 	if (!(proto = mob_proto(vnum))) {
 		msg_to_char(ch, "There is no such mobile %d.\r\n", vnum);
 		return;
 	}
+	
+	snprintf(name, sizeof(name), "%s", NULLSAFE(GET_SHORT_DESC(proto)));
 	
 	if (HASH_COUNT(mobile_table) <= 1) {
 		msg_to_char(ch, "You can't delete the last mob.\r\n");
@@ -382,6 +400,7 @@ void olc_delete_mobile(char_data *ch, mob_vnum vnum) {
 		}
 		
 		if (found) {
+			syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: Ability %d %s lost deleted related mob", ABIL_VNUM(abil), ABIL_NAME(abil));
 			save_library_file_for_vnum(DB_BOOT_ABIL, ABIL_VNUM(abil));
 		}
 	}
@@ -395,6 +414,7 @@ void olc_delete_mobile(char_data *ch, mob_vnum vnum) {
 			found |= TRUE;
 		}
 		if (found) {
+			syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: Building %d %s lost artisan mob", GET_BLD_VNUM(bld), GET_BLD_NAME(bld));
 			save_library_file_for_vnum(DB_BOOT_BLD, GET_BLD_VNUM(bld));
 		}
 	}
@@ -404,6 +424,7 @@ void olc_delete_mobile(char_data *ch, mob_vnum vnum) {
 		found = delete_mob_from_spawn_list(&GET_CROP_SPAWNS(crop), vnum);
 		found |= delete_from_interaction_list(&GET_CROP_INTERACTIONS(crop), TYPE_MOB, vnum);
 		if (found) {
+			syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: Crop %d %s lost deleted related mob", GET_CROP_VNUM(crop), GET_CROP_NAME(crop));
 			save_library_file_for_vnum(DB_BOOT_CROP, GET_CROP_VNUM(crop));
 		}
 	}
@@ -413,6 +434,7 @@ void olc_delete_mobile(char_data *ch, mob_vnum vnum) {
 		found = delete_from_interaction_list(&GET_GLOBAL_INTERACTIONS(glb), TYPE_MOB, vnum);
 		found |= delete_mob_from_spawn_list(&GET_GLOBAL_SPAWNS(glb), vnum);
 		if (found) {
+			syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: Global %d %s lost deleted related mob", GET_GLOBAL_VNUM(glb), GET_GLOBAL_NAME(glb));
 			save_library_file_for_vnum(DB_BOOT_GLB, GET_GLOBAL_VNUM(glb));
 		}
 	}
@@ -420,6 +442,7 @@ void olc_delete_mobile(char_data *ch, mob_vnum vnum) {
 	// update mob interactions
 	HASH_ITER(hh, mobile_table, mob_iter, next_mob) {
 		if (delete_from_interaction_list(&mob_iter->interactions, TYPE_MOB, vnum)) {
+			syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: Mobile %d %s lost deleted related mob", GET_MOB_VNUM(mob_iter), GET_SHORT_DESC(mob_iter));
 			save_library_file_for_vnum(DB_BOOT_MOB, mob_iter->vnum);
 		}
 	}
@@ -430,6 +453,7 @@ void olc_delete_mobile(char_data *ch, mob_vnum vnum) {
 		
 		if (found) {
 			SET_BIT(PRG_FLAGS(prg), PRG_IN_DEVELOPMENT);
+			syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: Progress %d %s set IN-DEV due to deleted mobile", PRG_VNUM(prg), PRG_NAME(prg));
 			save_library_file_for_vnum(DB_BOOT_PRG, PRG_VNUM(prg));
 			need_progress_refresh = TRUE;
 		}
@@ -444,6 +468,7 @@ void olc_delete_mobile(char_data *ch, mob_vnum vnum) {
 		
 		if (found) {
 			SET_BIT(QUEST_FLAGS(quest), QST_IN_DEVELOPMENT);
+			syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: Quest %d %s set IN-DEV due to deleted mobile", QUEST_VNUM(quest), QUEST_NAME(quest));
 			save_library_file_for_vnum(DB_BOOT_QST, QUEST_VNUM(quest));
 		}
 	}
@@ -453,6 +478,7 @@ void olc_delete_mobile(char_data *ch, mob_vnum vnum) {
 		found = delete_from_spawn_template_list(&GET_RMT_SPAWNS(rmt), ADV_SPAWN_MOB, vnum);
 		found |= delete_from_interaction_list(&GET_RMT_INTERACTIONS(rmt), TYPE_MOB, vnum);
 		if (found) {
+			syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: Room template %d %s lost deleted related mob", GET_RMT_VNUM(rmt), GET_RMT_TITLE(rmt));
 			save_library_file_for_vnum(DB_BOOT_RMT, GET_RMT_VNUM(rmt));
 		}
 	}
@@ -462,6 +488,7 @@ void olc_delete_mobile(char_data *ch, mob_vnum vnum) {
 		found = delete_mob_from_spawn_list(&GET_SECT_SPAWNS(sect), vnum);
 		found |= delete_from_interaction_list(&GET_SECT_INTERACTIONS(sect), TYPE_MOB, vnum);
 		if (found) {
+			syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: Sector %d %s lost deleted related mob", GET_SECT_VNUM(sect), GET_SECT_NAME(sect));
 			save_library_file_for_vnum(DB_BOOT_SECTOR, GET_SECT_VNUM(sect));
 		}
 	}
@@ -472,6 +499,7 @@ void olc_delete_mobile(char_data *ch, mob_vnum vnum) {
 		
 		if (found) {
 			SET_BIT(SHOP_FLAGS(shop), SHOP_IN_DEVELOPMENT);
+			syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: Shop %d %s set IN-DEV due to deleted mobile", SHOP_VNUM(shop), SHOP_NAME(shop));
 			save_library_file_for_vnum(DB_BOOT_SHOP, SHOP_VNUM(shop));
 		}
 	}
@@ -482,6 +510,7 @@ void olc_delete_mobile(char_data *ch, mob_vnum vnum) {
 		
 		if (found) {
 			SET_BIT(SOC_FLAGS(soc), SOC_IN_DEVELOPMENT);
+			syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: Social %d %s set IN-DEV due to deleted mobile", SOC_VNUM(soc), SOC_NAME(soc));
 			save_library_file_for_vnum(DB_BOOT_SOC, SOC_VNUM(soc));
 		}
 	}
@@ -491,6 +520,7 @@ void olc_delete_mobile(char_data *ch, mob_vnum vnum) {
 		found = delete_mob_from_spawn_list(&VEH_SPAWNS(veh), vnum);
 		found |= delete_from_interaction_list(&VEH_INTERACTIONS(veh), TYPE_MOB, vnum);
 		if (found) {
+			syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: Vehicle %d %s lost deleted related mob", VEH_VNUM(veh), VEH_SHORT_DESC(veh));
 			save_library_file_for_vnum(DB_BOOT_VEH, VEH_VNUM(veh));
 		}
 	}
@@ -604,8 +634,8 @@ void olc_delete_mobile(char_data *ch, mob_vnum vnum) {
 		}
 	}
 	
-	syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: %s has deleted mobile %d", GET_NAME(ch), vnum);
-	msg_to_char(ch, "Mobile %d deleted.\r\n", vnum);
+	syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: %s has deleted mobile %d %s", GET_NAME(ch), vnum, name);
+	msg_to_char(ch, "Mobile %d (%s) deleted.\r\n", vnum, name);
 	
 	free_char(proto);
 }
@@ -622,7 +652,7 @@ void olc_fullsearch_mob(char_data *ch, char *argument) {
 	bitvector_t  find_interacts = NOBITS, found_interacts, find_custom = NOBITS, found_custom;
 	bitvector_t not_flagged = NOBITS, only_flags = NOBITS, only_affs = NOBITS;
 	int only_attack = NOTHING, only_move = NOTHING, only_nameset = NOTHING;
-	int count, only_level = NOTHING, only_sex = NOTHING, only_size = NOTHING;
+	int count, only_level = NOTHING, only_sex = NOTHING, only_size = NOTHING, vmin = NOTHING, vmax = NOTHING;
 	faction_data *only_fct = NULL;
 	struct interaction_item *inter;
 	struct custom_message *cust;
@@ -658,6 +688,8 @@ void olc_fullsearch_mob(char_data *ch, char *argument) {
 		FULLSEARCH_LIST("gender", only_sex, genders)
 		FULLSEARCH_LIST("size", only_size, size_types)
 		FULLSEARCH_FLAGS("unflagged", not_flagged, action_bits)
+		FULLSEARCH_INT("vmin", vmin, 0, INT_MAX)
+		FULLSEARCH_INT("vmax", vmax, 0, INT_MAX)
 		
 		else {	// not sure what to do with it? treat it like a keyword
 			sprintf(find_keywords + strlen(find_keywords), "%s%s", *find_keywords ? " " : "", type_arg);
@@ -672,6 +704,9 @@ void olc_fullsearch_mob(char_data *ch, char *argument) {
 	
 	// okay now look up mobs
 	HASH_ITER(hh, mobile_table, mob, next_mob) {
+		if ((vmin != NOTHING && GET_MOB_VNUM(mob) < vmin) || (vmax != NOTHING && GET_MOB_VNUM(mob) > vmax)) {
+			continue;	// vnum range
+		}
 		if (only_level != NOTHING) {	// level-based checks
 			if (GET_MAX_SCALE_LEVEL(mob) != 0 && only_level > GET_MAX_SCALE_LEVEL(mob)) {
 				continue;
@@ -1142,6 +1177,8 @@ char_data *setup_olc_mobile(char_data *input) {
 		MOB_CUSTOM_MSGS(new) = copy_custom_messages(MOB_CUSTOM_MSGS(input));
 	}
 	else {
+		new->player_specials = &dummy_mob;
+		
 		// brand new
 		GET_PC_NAME(new) = str_dup(default_mob_keywords);
 		GET_SHORT_DESC(new) = str_dup(default_mob_short);
@@ -1155,6 +1192,25 @@ char_data *setup_olc_mobile(char_data *input) {
 	
 	// done
 	return new;	
+}
+
+
+/**
+* Counts the words of text in a mobile's strings.
+*
+* @param char_data *ch The mobile whose strings to count.
+* @return int The number of words in the mobile's strings.
+*/
+int wordcount_mobile(char_data *ch) {
+	int count = 0;
+	
+	count += wordcount_string(GET_PC_NAME(ch));
+	count += wordcount_string(GET_SHORT_DESC(ch));
+	count += wordcount_string(GET_LONG_DESC(ch));
+	count += wordcount_string(GET_LOOK_DESC(ch));
+	count += wordcount_custom_messages(MOB_CUSTOM_MSGS(ch));
+	
+	return count;
 }
 
 
@@ -1209,7 +1265,7 @@ void olc_show_mobile(char_data *ch) {
 	sprintf(buf + strlen(buf), "<%sattack\t0> %s\r\n", OLC_LABEL_VAL(MOB_ATTACK_TYPE(mob), TYPE_HIT), attack_hit_info[MOB_ATTACK_TYPE(mob)].name);
 	sprintf(buf + strlen(buf), "<%smovetype\t0> %s\r\n", OLC_LABEL_VAL(MOB_MOVE_TYPE(mob), 0), mob_move_types[(int) MOB_MOVE_TYPE(mob)]);
 	sprintf(buf + strlen(buf), "<%ssize\t0> %s\r\n", OLC_LABEL_VAL(SET_SIZE(mob), SIZE_NORMAL), size_types[(int)SET_SIZE(mob)]);
-	sprintf(buf + strlen(buf), "<%snameset\t0> %s\r\n", OLC_LABEL_VAL(MOB_NAME_SET(mob), 0), name_sets[MOB_NAME_SET(mob)]);
+	sprintf(buf + strlen(buf), "<%snameset\t0> %s, <%slanguage\t0> %d - %s\r\n", OLC_LABEL_VAL(MOB_NAME_SET(mob), 0), name_sets[MOB_NAME_SET(mob)], OLC_LABEL_VAL(MOB_LANGUAGE(mob), NOTHING), MOB_LANGUAGE(mob), (MOB_LANGUAGE(mob) == NOTHING ? "default" : get_generic_name_by_vnum(MOB_LANGUAGE(mob))));
 	sprintf(buf + strlen(buf), "<%sallegiance\t0> %s\r\n", OLC_LABEL_PTR(MOB_FACTION(mob)), MOB_FACTION(mob) ? FCT_NAME(MOB_FACTION(mob)) : "none");
 	
 	sprintf(buf + strlen(buf), "Interactions: <%sinteraction\t0>\r\n", OLC_LABEL_PTR(mob->interactions));
@@ -1295,6 +1351,30 @@ OLC_MODULE(medit_interaction) {
 OLC_MODULE(medit_keywords) {
 	char_data *mob = GET_OLC_MOBILE(ch->desc);
 	olc_process_string(ch, argument, "keywords", &GET_PC_NAME(mob));
+}
+
+
+OLC_MODULE(medit_language) {
+	char_data *mob = GET_OLC_MOBILE(ch->desc);
+	generic_data *gen;
+	
+	if (!*argument) {
+		msg_to_char(ch, "Set the language to which generic vnum (or name, or none)?\r\n");
+	}
+	else if (!str_cmp(argument, "none") || !str_cmp(argument, "default") || atoi(argument) == NOTHING) {
+		MOB_LANGUAGE(mob) = NOTHING;
+		msg_to_char(ch, "It now has no custom language (and will use the default language for mobs).\r\n");
+	}
+	else if (!((gen = find_generic_no_spaces(GENERIC_LANGUAGE, argument)) || (gen = find_generic(atoi(argument), GENERIC_LANGUAGE)))) {
+		msg_to_char(ch, "Invalid language name or vnum '%s'.\r\n", argument);
+	}
+	else if (GEN_TYPE(gen) != GENERIC_LANGUAGE) {
+		msg_to_char(ch, "That is not a valid language.\r\n");
+	}
+	else {
+		MOB_LANGUAGE(mob) = GEN_VNUM(gen);
+		msg_to_char(ch, "It now has [%d] %s as its default language.\r\n", GEN_VNUM(gen), GEN_NAME(gen));
+	}
 }
 
 

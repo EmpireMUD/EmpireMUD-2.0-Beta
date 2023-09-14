@@ -141,37 +141,41 @@ must BUILD MINE to get at it.
 
 {FF}
 Before that, you'll want to make sure you've got a place to smelt all that iron
-ore you plan on mining. BUILD FOUNDRY requires 20 sticks (type HELP FOUNDRY)
-and this building will let you store your iron ore, as well as melt it down
-to ingots. This means that, if your MINE will be quite a distance from your
-main settlement, you can build a second FOUNDRY in which to deposit the mined
-ore and it will be accessible from the first. Typing INVENTORY in the FOUNDRY
-will let you see your empire's ore and ingot supply. RETRIEVE and STORE will
-let you take and deposit ore, respectively. SMELT ORE will let you turn two
-iron ore into one iron ingot.
+ore you plan on mining. BUILD FOUNDRY requires 4 saplings and 20 stiff plant
+fibers (sticks) and this building will let you store your iron ore, as well as
+melt it down to ingots (see HELP FOUNDRY). This means that, if your MINE will
+be quite a distance from your main settlement, you can build a second FOUNDRY
+in which to deposit the mined ore and it will be accessible from the first.
+Typing INVENTORY in the FOUNDRY will let you see your empire's ore and ingot
+supply. RETRIEVE and STORE will let you take and deposit ore, respectively.
+SMELT ORE will let you turn two iron ore into one iron ingot.
 
 &y/&0[]&y\&0
-When you are ready to BUILD MINE, make sure you have the 4 required logs
-(type HELP MINE). You'll want to find a mountain tile on the edge of a range,
-so that the MINE's entrance can face an open plains tile. Once the MINE is
-finished, you can use the MINE command to begin looking for ore. The question
-that inevitably comes up at this point is "How do I mine without a pick?" You
-need iron to make a pick, and you can't get the iron without the pick!
+When you are ready to BUILD MINE, make sure you have the 4 required pillars
+(scrape trees into logs; these are pillars); type HELP MINE more more info.
+You'll want to find a mountain tile on the edge of a range, so that the MINE
+will be easy to get to from the flat land. Once the MINE is finished, you can
+use the MINE command to begin looking for ore. The question that inevitably
+comes up at this point is "How do I mine without a pick?" You need iron to make
+a pick, and you can't get the iron without the pick!
 
 That stone axe of ours was made by the CRAFT command, with a handaxe and a
 handle. Instead of turning it into an axe, we can also WIELD a handaxe and use
-it for mining. If you need to, craft another handaxe by chipping a flint with 
+it for mining. If you need to, make another handaxe by chipping a flint with 
 a rock. WIELD HANDAXE, then MINE until there's no ore left. Sometimes,
 you come across gold dust while mining ore, or perhaps the entire mine is full
 of silver instead of iron. Silver nuggets and gold dust can be stored in your
 empire's vault, which will increase its wealth rating. They can also be used in
 the FORGE, which will be discussed here shortly. When the MINE is finally
 depleted, DISMANTLE it so that the mountain tile can eventually replenish
-itself. Start another MINE along the mountain range in the meantime.
+itself. Start another MINE along the mountain range in the meantime. Note: Only
+mines must be dismantled to replenish (because they have random ore each year);
+other resource buildings like quarries refresh themselves.
 
 [FF]
 You'll need to get your empire's iron flowing before you BUILD FORGE, because
-this building requires 10 logs, 15 rocks, and 10 iron ingots (type HELP FORGE).
+this building requires 4 pillars (logs), 6 lumber, 15 rocks, and 10 iron
+ingots, an 20 stiff plant fibers (sticks); type HELP FORGE for more info.
 Once constructed, however, you will be able to FORGE ingots into various tools,
 weapons, and armor, according to your skill level. You can make jewelry and
 special items with gold and silver, and the FORGE (or FOUNDRY) is also where

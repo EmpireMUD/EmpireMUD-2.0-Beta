@@ -25,8 +25,10 @@ See also: BEEHIVE, WORKFORCE
 
 ..&C*&0.  Astral Nexus  (Exarch Crafts ability)
 
-The astral nexus allows you to summon other players if you have a second player
-present to help you. This only works in cities.
+The astral nexus allows you to summon other players to its location. This only
+works in your cities. If the person you are summoning is not a member of your
+empire, this requires a second player present to help summon. The second player
+may be from any empire.
 
 See also: SUMMON PLAYER
 #
@@ -75,7 +77,7 @@ Boardwalks count as in-city territory even if built in the outskirts
 
 For a road over a river, use a bridge instead.
 
-See also: BRIDGE, ROAD
+See also: BRIDGE, EXTENDED RADIUS, ROAD
 #
 BRIDGE "BRIDGES GOAL"
 
@@ -90,7 +92,7 @@ Bridges count as in-city territory even if built in the outskirts (4x radius).
 
 To build a road over other terrains, see boardwalk and swampwalk.
 
-See also: BOARDWALK, SWAMPWALK, PROGRESS
+See also: BOARDWALK, EXTENDED RADIUS, SWAMPWALK, PROGRESS
 #
 "BUILD ABILITY" "BASIC BUILDINGS"
 
@@ -131,7 +133,7 @@ Basic buildings granted by the Build ability:
 
 All buildings give experience as you add materials to their construction.
 
-See also: BUILD COMMAND, BUILD INFO, ARCHITECT
+See also: BUILD COMMAND, BUILD INFO, ARCHITECT, CRAFTING ABILITIES
 #
 BURIALCAVERN "BURIAL CAVERN"
 
@@ -192,7 +194,28 @@ CARPENTER
 The carpenter is a workshop for all manner of crafts. Certain craft items,
 such as wagons, require a carpenter shop for you to build them in.
 
-See also:  CRAFT, WOODWORKING
+To get a horse (or other mount) into a carpenter to harness to a vehicle, use
+the 'lead' command.
+
+See also:  CRAFT, LEAD, WOODWORKING
+#
+CASTLE PORTCULLIS
+
+]||[  Castle (Luxuries goal)
+
+Extra rooms:  30, interlink
+Special rooms:  greathall, crypt, throne, vault, baths, laboratory
+
+This building serves as the entrance to a castle, with a huge number of rooms
+available to designate. You can also interlink it with other buildings to make
+a tremendous castle.
+
+The entrance room is the portcullis, but you can change it using Customize
+Building.
+
+You can only have this building in a city.
+
+See also: CUSTOMIZE BUILDING, DESIGNATE, INTERLINK, PALACE
 #
 CAVEHAVEN "CAVE HAVEN" "OBSCURE CAVE"
 
@@ -253,11 +276,15 @@ CLAYPIT "CLAY PIT"
 &y|__|&0  Clay Pit  (Build ability)
 
 Clay pits are reinforced areas where fresh clay can be dug deeper, safer than
-digging on unprepared ground. You can dig more clay from them before depletion.
+digging on unprepared ground. You can dig more clay from them before depletion
+compared to undeveloped map tiles.
+
+Workforce will also dig for clay in clay pits with the "digging" chore. It
+won't dig up clay on tiles that don't have clay pits.
 
 Clay pits count as in-city territory when built in the outskirts (4x radius).
 
-See also: DIG
+See also: DIG, EXTENDED RADIUS, WORKFORCE
 #
 CLIFFDWELLING "CLIFF DWELLING"
 
@@ -314,11 +341,11 @@ DRAINAGE "OASIS DRAINAGE" "DRAINED OASIS" "DRAIN OASIS" "DRAINING OASIS"
 
 &y.&c__&y.&0  Draining Oasis  (Stilt Buildings goal)
 
-By building drainage for an oasis, it can be converted into a normal desert.
-If the oasis was created using the 'excavate' command, you can alternatively use
-'fillin' instead.
+By building drainage for an oasis, it can be converted into dry land. Dry oases
+will slowly revert to normal if they are unclaimed.
 
-See also: EXCAVATE
+You can build drainage on any type of oasis, but this will kill anything
+growing on the oasis tile when complete.
 #
 ESTUARYGARDEN "ESTUARY GARDEN"
 
@@ -367,22 +394,6 @@ will respawn there if you die nearby. This will save you a walk back.
 You can learn to build more permanent graves later.
 
 See also: BUILD, TOMB
-#
-"GREAT HALL" GREATHALL
-
-[**]  Great Hall (Luxuries goal)
-
-Extra rooms:  30, interlink
-Special rooms:  greathall, crypt, throne, vault, baths, laboratory
-
-The great hall is a major component of castles or other distinguished
-buildings, or it can serve as the entrance for those. You can designate a
-huge number of rooms from the great hall, and can interlink it with other
-buildings.
-
-You can only have this building in a city.
-
-See also: DESIGNATE, PORTCULLIS, INTERLINK
 #
 FAMILYGRAVESITE "FAMILY GRAVESITE"
 
@@ -441,7 +452,8 @@ GATE
 .xx.  vxxv  Gate  (Build ability)
 
 A gate is an entrance for a fence. Since players are not blocked by fences,
-the gate is purely decorative.
+the gate is purely decorative. It counts as in-city territory even when built
+in the outskirts (4x radius).
 
 See also: FENCE
 #
@@ -623,7 +635,9 @@ Each lumber yard is a storage facility for the empire's wood. Like all of the
 storage buildings, all lumber yards on the same island are linked together and
 you can retrieve from any of them.
 
-See also: STORAGE
+You can saw lumber at the lumber yard without needing a tool.
+
+See also: SAW, STORAGE
 #
 MEGALITH
 
@@ -751,7 +765,7 @@ PAINTER PAINTSHOP "PAINT SHOP" "PAINTER'S WORKSHOP" "PAINTERS WORKSHOP"
 [PP]  Painter's Workshop  (Foundations goal)
 
 Command:  build painter <direction>
-Requires:  Architect ability, Foundations goal
+Requires:  Foundations goal
 Stored here:  paints
 
 This building is used to make and store paints.
@@ -760,6 +774,21 @@ A Master Craftsman can learn to make paints, and can start the quest to make
 paints once a painter spawns in this building.
 
 See also: PAINT, QUEST, MASTER CRAFTSMAN
+#
+PALACE
+
+]**[  Palace (Luxuries goal)
+
+Extra rooms:  30, interlink
+Special rooms:  greathall, crypt, throne, vault, baths, laboratory
+
+A palace is a lavish place for a king or queen to hold audience with
+dignitaries and to rule from their throne. It holds a huge number of rooms and
+can be interlinked with other buildings.
+
+You can only have this building in a city.
+
+See also: CASTLE, DESIGNATE, INTERLINK
 #
 PARK
 
@@ -775,20 +804,6 @@ The Pigeon Post is a service that uses highly-trained birds to send mail across
 the world. You can receive mail anywhere, but must send it from the Post.
 
 See also: MAIL
-#
-PORTCULLIS "CASTLE PORTCULLIS" CASTLE PALACE
-
-V[]V  Portcullis (Luxuries goal)
-
-Extra rooms:  30, interlink
-Special rooms:  greathall, crypt, throne, vault, baths, laboratory
-
-The portcullis serves as the entrance to a castle. You can designate a huge
-number of rooms from the portcullis, and can interlink it with other buildings.
-
-You can only have this building in a city.
-
-See also: DESIGNATE, GREAT HALL, INTERLINK
 #
 PUEBLO
 
@@ -865,11 +880,16 @@ SANDPIT "SAND PIT"
 &Y|__|&0  Sand Pit  (Build ability)
 
 Sand pits are reinforced areas where fine, clean sand can be dug more
-effectively. You can dig more sand from them before depletion.
+effectively. You can dig more sand from them before depletion compared to
+regular shores.
+
+Workforce will also dig for sand (and sometimes rocks or flint) if the
+"digging" chore is enabled. It won't dig for sand on tiles that don't have sand
+pits.
 
 Sand pits count as in-city territory when built in the outskirts (4x radius).
 
-See also: DIG
+See also: DIG, EXTENDED RADIUS, WORKFORCE CHORES
 #
 SEEDSILO "SEED SILO"
 
@@ -928,7 +948,7 @@ to milk cows or shear sheep. This is also where you can barde horses.
 
 Most animals will not despawn if left in a stable, but there is a limit on the
 number of duplicate animals in each stable, after which any extras will despawn
-normally. (By default, this limit is 2.)
+normally. (By default, this limit is 2, and only applies to spawned animals.)
 
 See also: BARDE, MILK, SHEAR
 #
@@ -980,7 +1000,9 @@ The swamp walk, though never very stable, makes travel through the swamp
 much easier. Swamp animals may still harass you, but you will avoid random
 attacks by crocodilians. This can also be built on marshes.
 
-See also: BUILDING
+Clay pits count as in-city territory when built in the outskirts (4x radius).
+
+See also: BUILDING, EXTENDED RADIUS
 #
 SWAMPHUT "SWAMP HUT"
 

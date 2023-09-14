@@ -30,6 +30,7 @@
 *   Auditors
 *   Sorters
 *   Helpers
+*   Word Count Tools
 */
 
 // local modules
@@ -48,6 +49,7 @@ OLC_MODULE(olc_search);
 OLC_MODULE(olc_set_flags);
 OLC_MODULE(olc_set_max_vnum);
 OLC_MODULE(olc_set_min_vnum);
+OLC_MODULE(olc_wordcount);
 
 // ability modules
 OLC_MODULE(abiledit_affects);
@@ -102,6 +104,7 @@ OLC_MODULE(archedit_description);
 OLC_MODULE(archedit_femalerank);
 OLC_MODULE(archedit_flags);
 OLC_MODULE(archedit_gear);
+OLC_MODULE(archedit_language);
 OLC_MODULE(archedit_lore);
 OLC_MODULE(archedit_malerank);
 OLC_MODULE(archedit_name);
@@ -182,6 +185,7 @@ OLC_MODULE(cedit_volume);
 
 // crop modules
 OLC_MODULE(cropedit_climate);
+OLC_MODULE(cropedit_extra_desc);
 OLC_MODULE(cropedit_flags);
 OLC_MODULE(cropedit_icons);
 OLC_MODULE(cropedit_interaction);
@@ -201,6 +205,7 @@ OLC_MODULE(evedit_duration);
 OLC_MODULE(evedit_flags);
 OLC_MODULE(evedit_name);
 OLC_MODULE(evedit_maxlevel);
+OLC_MODULE(evedit_maxpoints);
 OLC_MODULE(evedit_minlevel);
 OLC_MODULE(evedit_notes);
 OLC_MODULE(evedit_rankrewards);
@@ -234,6 +239,8 @@ OLC_MODULE(genedit_build2char);
 OLC_MODULE(genedit_build2room);
 OLC_MODULE(genedit_craft2char);
 OLC_MODULE(genedit_craft2room);
+OLC_MODULE(genedit_lookatchar);
+OLC_MODULE(genedit_lookatroom);
 OLC_MODULE(genedit_repair2char);
 OLC_MODULE(genedit_repair2room);
 OLC_MODULE(genedit_quick_cooldown);
@@ -272,6 +279,7 @@ OLC_MODULE(medit_custom);
 OLC_MODULE(medit_flags);
 OLC_MODULE(medit_interaction);
 OLC_MODULE(medit_keywords);
+OLC_MODULE(medit_language);
 OLC_MODULE(medit_longdescription);
 OLC_MODULE(medit_lookdescription);
 OLC_MODULE(medit_maxlevel);
@@ -286,6 +294,7 @@ OLC_MODULE(medit_short_description);
 // map modules
 OLC_MODULE(mapedit_build);
 OLC_MODULE(mapedit_complete_room);
+OLC_MODULE(mapedit_convert2newbie);
 OLC_MODULE(mapedit_decay);
 OLC_MODULE(mapedit_decustomize);
 OLC_MODULE(mapedit_delete_exit);
@@ -330,7 +339,6 @@ OLC_MODULE(oedit_affecttype);
 OLC_MODULE(oedit_apply);
 OLC_MODULE(oedit_armortype);
 OLC_MODULE(oedit_ammotype);
-OLC_MODULE(oedit_automint);
 OLC_MODULE(oedit_capacity);
 OLC_MODULE(oedit_cdtime);
 OLC_MODULE(oedit_charges);
@@ -348,12 +356,16 @@ OLC_MODULE(oedit_flags);
 OLC_MODULE(oedit_fullness);
 OLC_MODULE(oedit_interaction);
 OLC_MODULE(oedit_keywords);
+OLC_MODULE(oedit_lightflags);
+OLC_MODULE(oedit_lighthours);
+OLC_MODULE(oedit_lightislit);
 OLC_MODULE(oedit_liquid);
 OLC_MODULE(oedit_long_desc);
 OLC_MODULE(oedit_material);
 OLC_MODULE(oedit_maxlevel);
 OLC_MODULE(oedit_minipet);
 OLC_MODULE(oedit_minlevel);
+OLC_MODULE(oedit_mintflags);
 OLC_MODULE(oedit_paint);
 OLC_MODULE(oedit_plants);
 OLC_MODULE(oedit_quantity);
@@ -416,12 +428,14 @@ OLC_MODULE(rmedit_matchexits);
 OLC_MODULE(rmedit_title);
 OLC_MODULE(rmedit_script);
 OLC_MODULE(rmedit_spawns);
+OLC_MODULE(rmedit_subzone);
 
 // sector modules
 OLC_MODULE(sectedit_buildflags);
 OLC_MODULE(sectedit_climate);
 OLC_MODULE(sectedit_commands);
 OLC_MODULE(sectedit_evolution);
+OLC_MODULE(sectedit_extra_desc);
 OLC_MODULE(sectedit_flags);
 OLC_MODULE(sectedit_icons);
 OLC_MODULE(sectedit_interaction);
@@ -528,6 +542,7 @@ const struct olc_command_data olc_data[] = {
 	{ "list", olc_list, OLC_ABILITY | OLC_ARCHETYPE | OLC_AUGMENT | OLC_BOOK | OLC_BUILDING | OLC_CLASS | OLC_CRAFT | OLC_CROP | OLC_EVENT | OLC_FACTION | OLC_GENERIC | OLC_GLOBAL | OLC_MOBILE | OLC_MORPH | OLC_OBJECT | OLC_PROGRESS | OLC_QUEST | OLC_SECTOR | OLC_SHOP | OLC_SKILL | OLC_SOCIAL | OLC_TRIGGER | OLC_ADVENTURE | OLC_ROOM_TEMPLATE | OLC_VEHICLE, NOBITS },
 	{ "save", olc_save, OLC_ABILITY | OLC_ARCHETYPE | OLC_AUGMENT | OLC_BOOK | OLC_BUILDING | OLC_CLASS | OLC_CRAFT | OLC_CROP | OLC_EVENT | OLC_FACTION | OLC_GENERIC | OLC_GLOBAL | OLC_MOBILE | OLC_MORPH | OLC_OBJECT | OLC_PROGRESS | OLC_QUEST | OLC_SECTOR | OLC_SHOP | OLC_SKILL | OLC_SOCIAL | OLC_TRIGGER | OLC_ADVENTURE | OLC_ROOM_TEMPLATE | OLC_VEHICLE, OLC_CF_EDITOR | OLC_CF_NO_ABBREV },
 	{ "search", olc_search, OLC_ABILITY | OLC_ARCHETYPE | OLC_AUGMENT | OLC_BUILDING | OLC_CLASS | OLC_CRAFT | OLC_CROP | OLC_EVENT | OLC_FACTION | OLC_GENERIC | OLC_GLOBAL | OLC_MOBILE | OLC_MORPH | OLC_OBJECT | OLC_PROGRESS | OLC_QUEST | OLC_SECTOR | OLC_SHOP | OLC_SKILL | OLC_SOCIAL | OLC_TRIGGER | OLC_ROOM_TEMPLATE | OLC_VEHICLE, NOBITS },
+	{ "wordcount", olc_wordcount, OLC_ABILITY | OLC_ARCHETYPE | OLC_AUGMENT | OLC_BOOK | OLC_BUILDING | OLC_CLASS | OLC_CRAFT | OLC_CROP | OLC_EVENT | OLC_FACTION | OLC_GENERIC | OLC_GLOBAL | OLC_MOBILE | OLC_MORPH | OLC_OBJECT | OLC_PROGRESS | OLC_QUEST | OLC_SECTOR | OLC_SHOP | OLC_SKILL | OLC_SOCIAL | OLC_TRIGGER | OLC_ADVENTURE | OLC_ROOM_TEMPLATE | OLC_VEHICLE, NOBITS },
 	
 	// admin
 	{ "removeindev", olc_removeindev, NOBITS, NOBITS },
@@ -591,6 +606,7 @@ const struct olc_command_data olc_data[] = {
 	{ "femalerank", archedit_femalerank, OLC_ARCHETYPE, OLC_CF_EDITOR },
 	{ "flags", archedit_flags, OLC_ARCHETYPE, OLC_CF_EDITOR },
 	{ "gear", archedit_gear, OLC_ARCHETYPE, OLC_CF_EDITOR },
+	{ "language", archedit_language, OLC_ARCHETYPE, OLC_CF_EDITOR },
 	{ "lore", archedit_lore, OLC_ARCHETYPE, OLC_CF_EDITOR },
 	{ "malerank", archedit_malerank, OLC_ARCHETYPE, OLC_CF_EDITOR },
 	{ "name", archedit_name, OLC_ARCHETYPE, OLC_CF_EDITOR },
@@ -672,6 +688,7 @@ const struct olc_command_data olc_data[] = {
 	
 	// crop commands
 	{ "climate", cropedit_climate, OLC_CROP, OLC_CF_EDITOR },
+	{ "extra", cropedit_extra_desc, OLC_CROP, OLC_CF_EDITOR },
 	{ "flags", cropedit_flags, OLC_CROP, OLC_CF_EDITOR },
 	{ "icons", cropedit_icons, OLC_CROP, OLC_CF_EDITOR },
 	{ "interaction", cropedit_interaction, OLC_CROP, OLC_CF_EDITOR },
@@ -691,6 +708,7 @@ const struct olc_command_data olc_data[] = {
 	{ "flags", evedit_flags, OLC_EVENT, OLC_CF_EDITOR },
 	{ "name", evedit_name, OLC_EVENT, OLC_CF_EDITOR },
 	{ "maxlevel", evedit_maxlevel, OLC_EVENT, OLC_CF_EDITOR },
+	{ "maxpoints", evedit_maxpoints, OLC_EVENT, OLC_CF_EDITOR },
 	{ "minlevel", evedit_minlevel, OLC_EVENT, OLC_CF_EDITOR },
 	{ "notes", evedit_notes, OLC_EVENT, OLC_CF_EDITOR },
 	{ "ranks", evedit_rankrewards, OLC_EVENT, OLC_CF_EDITOR },
@@ -720,9 +738,11 @@ const struct olc_command_data olc_data[] = {
 	{ "craft2room", genedit_craft2room, OLC_GENERIC, OLC_CF_EDITOR },
 	{ "repair2char", genedit_repair2char, OLC_GENERIC, OLC_CF_EDITOR },
 	{ "repair2room", genedit_repair2room, OLC_GENERIC, OLC_CF_EDITOR },
-	// generic: cooldowns
+	// generic: affects
 	{ "apply2char", genedit_apply2char, OLC_GENERIC, OLC_CF_EDITOR },
 	{ "apply2room", genedit_apply2room, OLC_GENERIC, OLC_CF_EDITOR },
+	{ "lookatchar", genedit_lookatchar, OLC_GENERIC, OLC_CF_EDITOR },
+	{ "lookatroom", genedit_lookatroom, OLC_GENERIC, OLC_CF_EDITOR },
 	{ "quickcooldown", genedit_quick_cooldown, OLC_GENERIC, NOBITS },
 	{ "standardwearoff", genedit_standardwearoff, OLC_GENERIC, OLC_CF_EDITOR },
 	{ "wearoff", genedit_wearoff, OLC_GENERIC, OLC_CF_EDITOR },
@@ -770,6 +790,7 @@ const struct olc_command_data olc_data[] = {
 	{ "flags", medit_flags, OLC_MOBILE, OLC_CF_EDITOR },
 	{ "interaction", medit_interaction, OLC_MOBILE, OLC_CF_EDITOR },
 	{ "keywords", medit_keywords, OLC_MOBILE, OLC_CF_EDITOR },
+	{ "language", medit_language, OLC_MOBILE, OLC_CF_EDITOR },
 	{ "longdescription", medit_longdescription, OLC_MOBILE, OLC_CF_EDITOR },
 	{ "lookdescription", medit_lookdescription, OLC_MOBILE, OLC_CF_EDITOR },
 	{ "maxlevel", medit_maxlevel, OLC_MOBILE, OLC_CF_EDITOR },
@@ -784,6 +805,7 @@ const struct olc_command_data olc_data[] = {
 	// map commands
 	{ "build", mapedit_build, OLC_MAP, OLC_CF_MAP_EDIT },
 	{ "complete", mapedit_complete_room, OLC_MAP, OLC_CF_MAP_EDIT },
+	{ "convert2newbie", mapedit_convert2newbie, OLC_MAP, OLC_CF_MAP_EDIT },
 	{ "decay", mapedit_decay, OLC_MAP, OLC_CF_MAP_EDIT },
 	{ "decustomize", mapedit_decustomize, OLC_MAP, OLC_CF_MAP_EDIT },
 	{ "deleteexit", mapedit_delete_exit, OLC_MAP, OLC_CF_MAP_EDIT },
@@ -827,7 +849,6 @@ const struct olc_command_data olc_data[] = {
 	{ "apply", oedit_apply, OLC_OBJECT, OLC_CF_EDITOR },
 	{ "armortype", oedit_armortype, OLC_OBJECT, OLC_CF_EDITOR },
 	{ "ammotype", oedit_ammotype, OLC_OBJECT, OLC_CF_EDITOR },
-	{ "automint", oedit_automint, OLC_OBJECT, OLC_CF_EDITOR },
 	{ "capacity", oedit_capacity, OLC_OBJECT, OLC_CF_EDITOR },
 	{ "cdtime", oedit_cdtime, OLC_OBJECT, OLC_CF_EDITOR },
 	{ "charges", oedit_charges, OLC_OBJECT, OLC_CF_EDITOR },
@@ -845,6 +866,9 @@ const struct olc_command_data olc_data[] = {
 	{ "fullness", oedit_fullness, OLC_OBJECT, OLC_CF_EDITOR },
 	{ "interaction", oedit_interaction, OLC_OBJECT, OLC_CF_EDITOR },
 	{ "keywords", oedit_keywords, OLC_OBJECT, OLC_CF_EDITOR },
+	{ "lighthours", oedit_lighthours, OLC_OBJECT, OLC_CF_EDITOR },
+	{ "lightflags", oedit_lightflags, OLC_OBJECT, OLC_CF_EDITOR },
+	{ "lightislit", oedit_lightislit, OLC_OBJECT, OLC_CF_EDITOR },
 	{ "liquid", oedit_liquid, OLC_OBJECT, OLC_CF_EDITOR },
 	{ "longdescription", oedit_long_desc, OLC_OBJECT, OLC_CF_EDITOR },
 	{ "lookdescription", oedit_action_desc, OLC_OBJECT, OLC_CF_EDITOR },
@@ -852,6 +876,7 @@ const struct olc_command_data olc_data[] = {
 	{ "maxlevel", oedit_maxlevel, OLC_OBJECT, OLC_CF_EDITOR },
 	{ "minlevel", oedit_minlevel, OLC_OBJECT, OLC_CF_EDITOR },
 	{ "minipet", oedit_minipet, OLC_OBJECT, OLC_CF_EDITOR },
+	{ "mintflags", oedit_mintflags, OLC_OBJECT, OLC_CF_EDITOR },
 	{ "paint", oedit_paint, OLC_OBJECT, OLC_CF_EDITOR },
 	{ "plants", oedit_plants, OLC_OBJECT, OLC_CF_EDITOR },
 	{ "quantity", oedit_quantity, OLC_OBJECT, OLC_CF_EDITOR },
@@ -916,12 +941,14 @@ const struct olc_command_data olc_data[] = {
 	{ "title", rmedit_title, OLC_ROOM_TEMPLATE, OLC_CF_EDITOR },
 	{ "script", rmedit_script, OLC_ROOM_TEMPLATE, OLC_CF_EDITOR },
 	{ "spawns", rmedit_spawns, OLC_ROOM_TEMPLATE, OLC_CF_EDITOR },
+	{ "subzone", rmedit_subzone, OLC_ROOM_TEMPLATE, OLC_CF_EDITOR },
 	
 	// sector commands	
 	{ "buildflags", sectedit_buildflags, OLC_SECTOR, OLC_CF_EDITOR },
 	{ "climate", sectedit_climate, OLC_SECTOR, OLC_CF_EDITOR },
 	{ "commands", sectedit_commands, OLC_SECTOR, OLC_CF_EDITOR },
 	{ "evolution", sectedit_evolution, OLC_SECTOR, OLC_CF_EDITOR },
+	{ "extra", sectedit_extra_desc, OLC_SECTOR, OLC_CF_EDITOR },
 	{ "flags", sectedit_flags, OLC_SECTOR, OLC_CF_EDITOR },
 	{ "icons", sectedit_icons, OLC_SECTOR, OLC_CF_EDITOR },
 	{ "interaction", sectedit_interaction, OLC_SECTOR, OLC_CF_EDITOR },
@@ -3431,8 +3458,10 @@ OLC_MODULE(olc_removeindev) {
 
 
 OLC_MODULE(olc_save) {
-	char typename[42];
+	char typename[42], name[256];
+	any_vnum vnum;
 	
+	*name = '\0';
 	sprintbit(GET_OLC_TYPE(ch->desc), olc_type_bits, typename, FALSE);
 	
 	if (GET_OLC_TYPE(ch->desc) == 0 || GET_OLC_VNUM(ch->desc) == NOTHING) {
@@ -3445,12 +3474,13 @@ OLC_MODULE(olc_save) {
 		msg_to_char(ch, "Close your text editor (&y,/h&0) before saving an olc editor.\r\n");
 	}
 	else {
-		msg_to_char(ch, "Saving %s %d...\r\n", typename, GET_OLC_VNUM(ch->desc));
+		vnum = GET_OLC_VNUM(ch->desc);
 		
 		// OLC_x:
 		switch (GET_OLC_TYPE(ch->desc)) {
 			case OLC_ABILITY: {
 				void save_olc_ability(descriptor_data *desc);
+				snprintf(name, sizeof(name), "%s", NULLSAFE(ABIL_NAME(GET_OLC_ABILITY(ch->desc))));
 				save_olc_ability(ch->desc);
 				audit_ability(GET_OLC_ABILITY(ch->desc), ch);
 				free_ability(GET_OLC_ABILITY(ch->desc));
@@ -3459,6 +3489,7 @@ OLC_MODULE(olc_save) {
 			}
 			case OLC_ADVENTURE: {
 				void save_olc_adventure(descriptor_data *desc);
+				snprintf(name, sizeof(name), "%s", NULLSAFE(GET_ADV_NAME(GET_OLC_ADVENTURE(ch->desc))));
 				save_olc_adventure(ch->desc);
 				audit_adventure(GET_OLC_ADVENTURE(ch->desc), ch, FALSE);
 				free_adventure(GET_OLC_ADVENTURE(ch->desc));
@@ -3467,6 +3498,7 @@ OLC_MODULE(olc_save) {
 			}
 			case OLC_ARCHETYPE: {
 				void save_olc_archetype(descriptor_data *desc);
+				snprintf(name, sizeof(name), "%s", NULLSAFE(GET_ARCH_NAME(GET_OLC_ARCHETYPE(ch->desc))));
 				save_olc_archetype(ch->desc);
 				audit_archetype(GET_OLC_ARCHETYPE(ch->desc), ch);
 				free_archetype(GET_OLC_ARCHETYPE(ch->desc));
@@ -3475,6 +3507,7 @@ OLC_MODULE(olc_save) {
 			}
 			case OLC_AUGMENT: {
 				void save_olc_augment(descriptor_data *desc);
+				snprintf(name, sizeof(name), "%s", NULLSAFE(GET_AUG_NAME(GET_OLC_AUGMENT(ch->desc))));
 				save_olc_augment(ch->desc);
 				audit_augment(GET_OLC_AUGMENT(ch->desc), ch);
 				free_augment(GET_OLC_AUGMENT(ch->desc));
@@ -3483,6 +3516,7 @@ OLC_MODULE(olc_save) {
 			}
 			case OLC_BOOK: {
 				void save_olc_book(descriptor_data *desc);
+				snprintf(name, sizeof(name), "%s", NULLSAFE(GET_OLC_BOOK(ch->desc)->title));
 				save_olc_book(ch->desc);
 				// audit_book(GET_OLC_BOOK(ch->desc), ch);
 				free_book(GET_OLC_BOOK(ch->desc));
@@ -3490,6 +3524,7 @@ OLC_MODULE(olc_save) {
 				break;
 			}
 			case OLC_BUILDING: {
+				snprintf(name, sizeof(name), "%s", NULLSAFE(GET_BLD_NAME(GET_OLC_BUILDING(ch->desc))));
 				save_olc_building(ch->desc);
 				audit_building(GET_OLC_BUILDING(ch->desc), ch);
 				free_building(GET_OLC_BUILDING(ch->desc));
@@ -3498,6 +3533,7 @@ OLC_MODULE(olc_save) {
 			}
 			case OLC_CLASS: {
 				void save_olc_class(descriptor_data *desc);
+				snprintf(name, sizeof(name), "%s", NULLSAFE(CLASS_NAME(GET_OLC_CLASS(ch->desc))));
 				save_olc_class(ch->desc);
 				audit_class(GET_OLC_CLASS(ch->desc), ch);
 				free_class(GET_OLC_CLASS(ch->desc));
@@ -3505,6 +3541,7 @@ OLC_MODULE(olc_save) {
 				break;
 			}
 			case OLC_CRAFT: {
+				snprintf(name, sizeof(name), "%s", NULLSAFE(GET_CRAFT_NAME(GET_OLC_CRAFT(ch->desc))));
 				save_olc_craft(ch->desc);
 				audit_craft(GET_OLC_CRAFT(ch->desc), ch);
 				free_craft(GET_OLC_CRAFT(ch->desc));
@@ -3513,6 +3550,7 @@ OLC_MODULE(olc_save) {
 			}
 			case OLC_CROP: {
 				void save_olc_crop(descriptor_data *desc);
+				snprintf(name, sizeof(name), "%s", NULLSAFE(GET_CROP_NAME(GET_OLC_CROP(ch->desc))));
 				save_olc_crop(ch->desc);
 				audit_crop(GET_OLC_CROP(ch->desc), ch);
 				free_crop(GET_OLC_CROP(ch->desc));
@@ -3521,6 +3559,7 @@ OLC_MODULE(olc_save) {
 			}
 			case OLC_EVENT: {
 				void save_olc_event(descriptor_data *desc);
+				snprintf(name, sizeof(name), "%s", NULLSAFE(EVT_NAME(GET_OLC_EVENT(ch->desc))));
 				save_olc_event(ch->desc);
 				audit_event(GET_OLC_EVENT(ch->desc), ch);
 				free_event(GET_OLC_EVENT(ch->desc));
@@ -3529,6 +3568,7 @@ OLC_MODULE(olc_save) {
 			}
 			case OLC_FACTION: {
 				void save_olc_faction(descriptor_data *desc);
+				snprintf(name, sizeof(name), "%s", NULLSAFE(FCT_NAME(GET_OLC_FACTION(ch->desc))));
 				save_olc_faction(ch->desc);
 				audit_faction(GET_OLC_FACTION(ch->desc), ch);
 				free_faction(GET_OLC_FACTION(ch->desc));
@@ -3537,6 +3577,7 @@ OLC_MODULE(olc_save) {
 			}
 			case OLC_GENERIC: {
 				void save_olc_generic(descriptor_data *desc);
+				snprintf(name, sizeof(name), "%s", NULLSAFE(GEN_NAME(GET_OLC_GENERIC(ch->desc))));
 				save_olc_generic(ch->desc);
 				audit_generic(GET_OLC_GENERIC(ch->desc), ch);
 				free_generic(GET_OLC_GENERIC(ch->desc));
@@ -3545,6 +3586,7 @@ OLC_MODULE(olc_save) {
 			}
 			case OLC_GLOBAL: {
 				void save_olc_global(descriptor_data *desc);
+				snprintf(name, sizeof(name), "%s", NULLSAFE(GET_GLOBAL_NAME(GET_OLC_GLOBAL(ch->desc))));
 				save_olc_global(ch->desc);
 				audit_global(GET_OLC_GLOBAL(ch->desc), ch);
 				free_global(GET_OLC_GLOBAL(ch->desc));
@@ -3553,6 +3595,7 @@ OLC_MODULE(olc_save) {
 			}
 			case OLC_MOBILE: {
 				void save_olc_mobile(descriptor_data *desc);
+				snprintf(name, sizeof(name), "%s", NULLSAFE(GET_SHORT_DESC(GET_OLC_MOBILE(ch->desc))));
 				save_olc_mobile(ch->desc);
 				audit_mobile(GET_OLC_MOBILE(ch->desc), ch);
 				free_char(GET_OLC_MOBILE(ch->desc));
@@ -3561,6 +3604,7 @@ OLC_MODULE(olc_save) {
 			}
 			case OLC_MORPH: {
 				void save_olc_morph(descriptor_data *desc);
+				snprintf(name, sizeof(name), "%s", NULLSAFE(MORPH_SHORT_DESC(GET_OLC_MORPH(ch->desc))));
 				save_olc_morph(ch->desc);
 				audit_morph(GET_OLC_MORPH(ch->desc), ch);
 				free_morph(GET_OLC_MORPH(ch->desc));
@@ -3569,6 +3613,7 @@ OLC_MODULE(olc_save) {
 			}
 			case OLC_OBJECT: {
 				void save_olc_object(descriptor_data *desc);
+				snprintf(name, sizeof(name), "%s", NULLSAFE(GET_OBJ_SHORT_DESC(GET_OLC_OBJECT(ch->desc))));
 				save_olc_object(ch->desc);
 				audit_object(GET_OLC_OBJECT(ch->desc), ch);
 				free_obj(GET_OLC_OBJECT(ch->desc));
@@ -3577,6 +3622,7 @@ OLC_MODULE(olc_save) {
 			}
 			case OLC_PROGRESS: {
 				void save_olc_progress(descriptor_data *desc);
+				snprintf(name, sizeof(name), "%s", NULLSAFE(PRG_NAME(GET_OLC_PROGRESS(ch->desc))));
 				save_olc_progress(ch->desc);
 				audit_progress(GET_OLC_PROGRESS(ch->desc), ch);
 				free_progress(GET_OLC_PROGRESS(ch->desc));
@@ -3585,6 +3631,7 @@ OLC_MODULE(olc_save) {
 			}
 			case OLC_QUEST: {
 				void save_olc_quest(descriptor_data *desc);
+				snprintf(name, sizeof(name), "%s", NULLSAFE(QUEST_NAME(GET_OLC_QUEST(ch->desc))));
 				save_olc_quest(ch->desc);
 				audit_quest(GET_OLC_QUEST(ch->desc), ch);
 				free_quest(GET_OLC_QUEST(ch->desc));
@@ -3593,6 +3640,7 @@ OLC_MODULE(olc_save) {
 			}
 			case OLC_ROOM_TEMPLATE: {
 				void save_olc_room_template(descriptor_data *desc);
+				snprintf(name, sizeof(name), "%s", NULLSAFE(GET_RMT_TITLE(GET_OLC_ROOM_TEMPLATE(ch->desc))));
 				save_olc_room_template(ch->desc);
 				audit_room_template(GET_OLC_ROOM_TEMPLATE(ch->desc), ch);
 				free_room_template(GET_OLC_ROOM_TEMPLATE(ch->desc));
@@ -3601,6 +3649,7 @@ OLC_MODULE(olc_save) {
 			}
 			case OLC_SECTOR: {
 				void save_olc_sector(descriptor_data *desc);
+				snprintf(name, sizeof(name), "%s", NULLSAFE(GET_SECT_NAME(GET_OLC_SECTOR(ch->desc))));
 				save_olc_sector(ch->desc);
 				audit_sector(GET_OLC_SECTOR(ch->desc), ch);
 				free_sector(GET_OLC_SECTOR(ch->desc));
@@ -3609,6 +3658,7 @@ OLC_MODULE(olc_save) {
 			}
 			case OLC_SHOP: {
 				void save_olc_shop(descriptor_data *desc);
+				snprintf(name, sizeof(name), "%s", NULLSAFE(SHOP_NAME(GET_OLC_SHOP(ch->desc))));
 				save_olc_shop(ch->desc);
 				audit_shop(GET_OLC_SHOP(ch->desc), ch);
 				free_shop(GET_OLC_SHOP(ch->desc));
@@ -3617,6 +3667,7 @@ OLC_MODULE(olc_save) {
 			}
 			case OLC_SKILL: {
 				void save_olc_skill(descriptor_data *desc);
+				snprintf(name, sizeof(name), "%s", NULLSAFE(SKILL_NAME(GET_OLC_SKILL(ch->desc))));
 				save_olc_skill(ch->desc);
 				audit_skill(GET_OLC_SKILL(ch->desc), ch);
 				free_skill(GET_OLC_SKILL(ch->desc));
@@ -3625,6 +3676,7 @@ OLC_MODULE(olc_save) {
 			}
 			case OLC_SOCIAL: {
 				void save_olc_social(descriptor_data *desc);
+				snprintf(name, sizeof(name), "%s", NULLSAFE(SOC_NAME(GET_OLC_SOCIAL(ch->desc))));
 				save_olc_social(ch->desc);
 				audit_social(GET_OLC_SOCIAL(ch->desc), ch);
 				free_social(GET_OLC_SOCIAL(ch->desc));
@@ -3633,6 +3685,7 @@ OLC_MODULE(olc_save) {
 			}
 			case OLC_TRIGGER: {
 				void save_olc_trigger(descriptor_data *desc, char *script_text);
+				snprintf(name, sizeof(name), "%s", NULLSAFE(GET_TRIG_NAME(GET_OLC_TRIGGER(ch->desc))));
 				save_olc_trigger(ch->desc, GET_OLC_STORAGE(ch->desc));
 				audit_trigger(GET_OLC_TRIGGER(ch->desc), ch);
 				free_trigger(GET_OLC_TRIGGER(ch->desc));
@@ -3645,6 +3698,7 @@ OLC_MODULE(olc_save) {
 			}
 			case OLC_VEHICLE: {
 				save_olc_vehicle(ch->desc);
+				snprintf(name, sizeof(name), "%s", NULLSAFE(VEH_SHORT_DESC(GET_OLC_VEHICLE(ch->desc))));
 				audit_vehicle(GET_OLC_VEHICLE(ch->desc), ch);
 				free_vehicle(GET_OLC_VEHICLE(ch->desc));
 				GET_OLC_VEHICLE(ch->desc) = NULL;
@@ -3657,7 +3711,8 @@ OLC_MODULE(olc_save) {
 		}
 		
 		// log and cleanup
-		syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: %s has edited %s %d", GET_NAME(ch), typename, GET_OLC_VNUM(ch->desc));
+		msg_to_char(ch, "Saving %s %d %s...\r\n", typename, vnum, name);
+		syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: %s has edited %s %d %s", GET_NAME(ch), typename, vnum, name);
 		GET_OLC_TYPE(ch->desc) = 0;
 		GET_OLC_VNUM(ch->desc) = NOTHING;
 	}
@@ -3927,6 +3982,361 @@ OLC_MODULE(olc_set_min_vnum) {
 }
 
 
+// Usage: olc mob wordcount <from vnum> [to vnum]
+OLC_MODULE(olc_wordcount) {
+	char temp[256], arg[MAX_INPUT_LENGTH];
+	any_vnum from_vnum = NOTHING, to_vnum = NOTHING;
+	bool found_from = FALSE, found_to = FALSE;
+	int count, wordcount, total, totalwords, iter;
+	adv_data *whole_adv = NULL;
+	
+	skip_spaces(&argument);
+	
+	// allow - or : before the first space
+	for (iter = 0; iter < strlen(argument); ++iter) {
+		if (argument[iter] == '-' || argument[iter] == ':') {
+			argument[iter] = ' ';
+		}
+		else if (argument[iter] == ' ') {
+			break;
+		}
+	}
+	
+	// process argument
+	while (*argument) {
+		argument = any_one_arg(argument, arg);
+		
+		// first argument must be a "from" vnum
+		if (!found_from) {
+			if (!isdigit(*arg)) {
+				msg_to_char(ch, "Invalid vnum.\r\n");
+				return;
+			}
+			from_vnum = atoi(arg);
+			found_from = TRUE;
+			continue;
+		}
+		
+		if (!found_to && isdigit(*arg)) {
+			to_vnum = atoi(arg);
+			found_to = TRUE;
+			continue;
+		}
+		
+		// other types of args:
+		// - none
+		
+		// reached an error
+		msg_to_char(ch, "Usage: wordcount <from vnum> [to vnum]\r\n");
+		return;
+	}
+	
+	if (!found_from) {	// no useful args
+		msg_to_char(ch, "Usage: list <from vnum> [to vnum]\r\n");
+		return;
+	}
+	else if (from_vnum < 0) {
+		msg_to_char(ch, "Invalid vnum range.\r\n");
+		return;
+	}
+	
+	// 2nd vnum optional
+	if (to_vnum == NOTHING) {
+		to_vnum = from_vnum;
+	}
+	
+	// special case: audit whole adventure:
+	if (to_vnum == from_vnum && type == OLC_ADVENTURE && (whole_adv = adventure_proto(from_vnum))) {
+		from_vnum = GET_ADV_START_VNUM(whole_adv);
+		to_vnum = GET_ADV_END_VNUM(whole_adv);
+	}
+	
+	// ready
+	total = totalwords = 0;
+
+	// do for each type (or just the requested type)
+	for (iter = 0; iter < NUM_OLC_TYPES; ++iter) {
+		if (!whole_adv && BIT(iter) != type) {
+			continue;	// skip type, unless doing the whole adventure
+		}
+		
+		// reset for type
+		count = wordcount = 0;
+		
+		// OLC_x:
+		switch (BIT(iter)) {
+			case OLC_ABILITY: {
+				ability_data *abil, *next_abil;
+				HASH_ITER(hh, ability_table, abil, next_abil) {
+					if (ABIL_VNUM(abil) >= from_vnum && ABIL_VNUM(abil) <= to_vnum) {
+						++count;
+						wordcount += wordcount_ability(abil);
+					}
+				}
+				break;
+			}
+			case OLC_ADVENTURE: {
+				if (whole_adv) {
+					count = 1;
+					wordcount = wordcount_adventure(whole_adv);
+				}
+				else {
+					adv_data *adv, *next_adv;
+					HASH_ITER(hh, adventure_table, adv, next_adv) {
+						if (GET_ADV_VNUM(adv) >= from_vnum && GET_ADV_VNUM(adv) <= to_vnum) {
+							++count;
+							wordcount += wordcount_adventure(adv);
+						}
+					}
+				}
+				break;
+			}
+			case OLC_ARCHETYPE: {
+				archetype_data *arch, *next_arch;
+				HASH_ITER(hh, archetype_table, arch, next_arch) {
+					if (GET_ARCH_VNUM(arch) >= from_vnum && GET_ARCH_VNUM(arch) <= to_vnum) {
+						++count;
+						wordcount += wordcount_archetype(arch);
+					}
+				}
+				break;
+			}
+			case OLC_AUGMENT: {
+				struct augment_data *aug, *next_aug;
+				HASH_ITER(hh, augment_table, aug, next_aug) {
+					if (GET_AUG_VNUM(aug) >= from_vnum && GET_AUG_VNUM(aug) <= to_vnum) {
+						++count;
+						wordcount += wordcount_augment(aug);
+					}
+				}
+				break;
+			}
+			case OLC_BOOK: {
+				book_data *book, *next_book;
+				HASH_ITER(hh, book_table, book, next_book) {
+					if (book->vnum >= from_vnum && book->vnum <= to_vnum) {
+						++count;
+						wordcount += wordcount_book(book);
+					}
+				}
+				break;
+			}
+			case OLC_BUILDING: {
+				bld_data *bld, *next_bld;
+				HASH_ITER(hh, building_table, bld, next_bld) {
+					if (GET_BLD_VNUM(bld) >= from_vnum && GET_BLD_VNUM(bld) <= to_vnum) {
+						++count;
+						wordcount += wordcount_building(bld);
+					}
+				}
+				break;
+			}
+			case OLC_CLASS: {
+				class_data *cls, *next_cls;
+				HASH_ITER(hh, class_table, cls, next_cls) {
+					if (CLASS_VNUM(cls) >= from_vnum && CLASS_VNUM(cls) <= to_vnum) {
+						++count;
+						wordcount += wordcount_class(cls);
+					}
+				}
+				break;
+			}
+			case OLC_CRAFT: {
+				craft_data *craft, *next_craft;
+				HASH_ITER(hh, craft_table, craft, next_craft) {
+					if (GET_CRAFT_VNUM(craft) >= from_vnum && GET_CRAFT_VNUM(craft) <= to_vnum) {
+						++count;
+						wordcount += wordcount_craft(craft);
+					}
+				}
+				break;
+			}
+			case OLC_CROP: {
+				crop_data *crop, *next_crop;
+				HASH_ITER(hh, crop_table, crop, next_crop) {
+					if (GET_CROP_VNUM(crop) >= from_vnum && GET_CROP_VNUM(crop) <= to_vnum) {
+						++count;
+						wordcount += wordcount_crop(crop);
+					}
+				}
+				break;
+			}
+			case OLC_EVENT: {
+				event_data *event, *next_event;
+				HASH_ITER(hh, event_table, event, next_event) {
+					if (EVT_VNUM(event) >= from_vnum && EVT_VNUM(event) <= to_vnum) {
+						++count;
+						wordcount += wordcount_event(event);
+					}
+				}
+				break;
+			}
+			case OLC_FACTION: {
+				faction_data *fct, *next_fct;
+				HASH_ITER(hh, faction_table, fct, next_fct) {
+					if (FCT_VNUM(fct) >= from_vnum && FCT_VNUM(fct) <= to_vnum) {
+						++count;
+						wordcount += wordcount_faction(fct);
+					}
+				}
+				break;
+			}
+			case OLC_GENERIC: {
+				generic_data *gen, *next_gen;
+				HASH_ITER(hh, generic_table, gen, next_gen) {
+					if (GEN_VNUM(gen) >= from_vnum && GEN_VNUM(gen) <= to_vnum) {
+						++count;
+						wordcount += wordcount_generic(gen);
+					}
+				}
+				break;
+			}
+			case OLC_GLOBAL: {
+				struct global_data *glb, *next_glb;
+				HASH_ITER(hh, globals_table, glb, next_glb) {
+					if (GET_GLOBAL_VNUM(glb) >= from_vnum && GET_GLOBAL_VNUM(glb) <= to_vnum) {
+						++count;
+						wordcount += wordcount_global(glb);
+					}
+				}
+				break;
+			}
+			case OLC_MOBILE: {
+				char_data *mob, *next_mob;
+				HASH_ITER(hh, mobile_table, mob, next_mob) {
+					if (GET_MOB_VNUM(mob) >= from_vnum && GET_MOB_VNUM(mob) <= to_vnum) {
+						++count;
+						wordcount += wordcount_mobile(mob);
+					}
+				}
+				break;
+			}
+			case OLC_MORPH: {
+				morph_data *morph, *next_morph;
+				HASH_ITER(hh, morph_table, morph, next_morph) {
+					if (MORPH_VNUM(morph) >= from_vnum && MORPH_VNUM(morph) <= to_vnum) {
+						++count;
+						wordcount += wordcount_morph(morph);
+					}
+				}
+				break;
+			}
+			case OLC_OBJECT: {
+				obj_data *obj, *next_obj;
+				HASH_ITER(hh, object_table, obj, next_obj) {
+					if (GET_OBJ_VNUM(obj) >= from_vnum && GET_OBJ_VNUM(obj) <= to_vnum) {
+						++count;
+						wordcount += wordcount_object(obj);
+					}
+				}
+				break;
+			}
+			case OLC_PROGRESS: {
+				progress_data *prg, *next_prg;
+				HASH_ITER(hh, progress_table, prg, next_prg) {
+					if (PRG_VNUM(prg) >= from_vnum && PRG_VNUM(prg) <= to_vnum) {
+						++count;
+						wordcount += wordcount_progress(prg);
+					}
+				}
+				break;
+			}
+			case OLC_QUEST: {
+				quest_data *quest, *next_quest;
+				HASH_ITER(hh, quest_table, quest, next_quest) {
+					if (QUEST_VNUM(quest) >= from_vnum && QUEST_VNUM(quest) <= to_vnum) {
+						++count;
+						wordcount += wordcount_quest(quest);
+					}
+				}
+				break;
+			}
+			case OLC_ROOM_TEMPLATE: {
+				room_template *rmt, *next_rmt;
+				HASH_ITER(hh, room_template_table, rmt, next_rmt) {
+					if (GET_RMT_VNUM(rmt) >= from_vnum && GET_RMT_VNUM(rmt) <= to_vnum) {
+						++count;
+						wordcount += wordcount_room_template(rmt);
+					}
+				}
+				break;
+			}
+			case OLC_SECTOR: {
+				sector_data *sect, *next_sect;
+				HASH_ITER(hh, sector_table, sect, next_sect) {
+					if (GET_SECT_VNUM(sect) >= from_vnum && GET_SECT_VNUM(sect) <= to_vnum) {
+						++count;
+						wordcount += wordcount_sector(sect);
+					}
+				}
+				break;
+			}
+			case OLC_SHOP: {
+				shop_data *shop, *next_shop;
+				HASH_ITER(hh, shop_table, shop, next_shop) {
+					if (SHOP_VNUM(shop) >= from_vnum && SHOP_VNUM(shop) <= to_vnum) {
+						++count;
+						wordcount += wordcount_shop(shop);
+					}
+				}
+				break;
+			}
+			case OLC_SKILL: {
+				skill_data *skill, *next_skill;
+				HASH_ITER(hh, skill_table, skill, next_skill) {
+					if (SKILL_VNUM(skill) >= from_vnum && SKILL_VNUM(skill) <= to_vnum) {
+						++count;
+						wordcount += wordcount_skill(skill);
+					}
+				}
+				break;
+			}
+			case OLC_SOCIAL: {
+				social_data *soc, *next_soc;
+				HASH_ITER(hh, social_table, soc, next_soc) {
+					if (SOC_VNUM(soc) >= from_vnum && SOC_VNUM(soc) <= to_vnum) {
+						++count;
+						wordcount += wordcount_social(soc);
+					}
+				}
+				break;
+			}
+			case OLC_TRIGGER: {
+				trig_data *trig, *next_trig;
+				HASH_ITER(hh, trigger_table, trig, next_trig) {
+					if (GET_TRIG_VNUM(trig) >= from_vnum && GET_TRIG_VNUM(trig) <= to_vnum) {
+						++count;
+						wordcount += wordcount_trigger(trig);
+					}
+				}
+				break;
+			}
+			case OLC_VEHICLE: {
+				vehicle_data *veh, *next_veh;
+				HASH_ITER(hh, vehicle_table, veh, next_veh) {
+					if (VEH_VNUM(veh) >= from_vnum && VEH_VNUM(veh) <= to_vnum) {
+						++count;
+						wordcount += wordcount_vehicle(veh);
+					}
+				}
+				break;
+			}
+		}
+		
+		if (count > 0 || !whole_adv) {
+			sprintbit(BIT(iter), olc_type_bits, temp, FALSE);
+			msg_to_char(ch, "%d %s%s: %d word%s\r\n", count, temp, PLURAL(count), wordcount, PLURAL(wordcount));
+		}
+		total += count;
+		totalwords += wordcount;
+	}
+	
+	if (whole_adv) {
+		msg_to_char(ch, "Total: %d thing%s, %d word%s\r\n", total, PLURAL(total), totalwords, PLURAL(totalwords));
+	}
+}
+
+
  //////////////////////////////////////////////////////////////////////////////
 //// COMMON DISPLAYS /////////////////////////////////////////////////////////
 
@@ -3971,17 +4381,31 @@ void get_evolution_display(struct evolution_data *list, char *save_buffer) {
 *
 * @param struct extra_descr_data *list Pointer to the start of a list of decriptions.
 * @param char *save_buffer A buffer to store the result to.
+* @param size_t buf_size How large the save_buffer is.
 */
-void get_extra_desc_display(struct extra_descr_data *list, char *save_buffer) {
+void get_extra_desc_display(struct extra_descr_data *list, char *save_buffer, size_t buf_size) {
 	struct extra_descr_data *ex;
+	char temp[MAX_STRING_LENGTH];
 	int count = 0;
+	size_t size, tsize;
 	
 	*save_buffer = '\0';
+	size = 0;
+	
 	for (ex = list; ex; ex = ex->next) {
-		sprintf(save_buffer + strlen(save_buffer), " &y%d&0. %s\r\n%s", ++count, (ex->keyword ? ex->keyword : "(null)"), (ex->description ? ex->description : "(null)\n"));
+		tsize = snprintf(temp, sizeof(temp), " &y%d&0. %s\r\n%s", ++count, (ex->keyword ? ex->keyword : "(null)"), (ex->description ? ex->description : "(null)\r\n"));
+		
+		if (size + tsize < buf_size) {
+			strcat(save_buffer, temp);
+			size += tsize;
+		}
+		else {
+			size += snprintf(save_buffer + size, buf_size - size, "** OVERFLOW **\r\n");
+			break;
+		}
 	}
 	if (count == 0) {
-		strcat(save_buffer, " none\r\n");
+		snprintf(save_buffer, buf_size, " none\r\n");
 	}
 }
 
@@ -3993,15 +4417,52 @@ void get_extra_desc_display(struct extra_descr_data *list, char *save_buffer) {
 * @param char *save_buffer A buffer to store the result to.
 */
 void get_icons_display(struct icon_data *list, char *save_buffer) {
-	char lbuf[MAX_INPUT_LENGTH], ibuf[MAX_INPUT_LENGTH], line[MAX_INPUT_LENGTH];
+	char lbuf[MAX_INPUT_LENGTH], ibuf[MAX_INPUT_LENGTH], line[MAX_INPUT_LENGTH], *tmp;
 	struct icon_data *icon;
 	int size, count = 0;
 
 	*save_buffer = '\0';
 	
 	for (icon = list; icon; icon = icon->next) {
-		// have to copy one of the show_color_codes() because it won't work correctly if it appears twice in the same line
+		// basic icon buffer
 		replace_question_color(icon->icon, icon->color, ibuf);
+		if (strstr(ibuf, "@w")) {
+			tmp = str_replace("@w", ".", ibuf);
+			strcpy(ibuf, tmp);
+			free(tmp);
+		}
+		if (strstr(ibuf, "@e")) {
+			tmp = str_replace("@e", ".", ibuf);
+			strcpy(ibuf, tmp);
+			free(tmp);
+		}
+		if (strstr(ibuf, "@.")) {
+			tmp = str_replace("@.", ".", ibuf);
+			strcpy(ibuf, tmp);
+			free(tmp);
+		}
+		if (strstr(ibuf, "@u")) {
+			tmp = str_replace("@u", "v", ibuf);
+			strcpy(ibuf, tmp);
+			free(tmp);
+		}
+		if (strstr(ibuf, "@U")) {
+			tmp = str_replace("@U", "V", ibuf);
+			strcpy(ibuf, tmp);
+			free(tmp);
+		}
+		if (strstr(ibuf, "@v")) {
+			tmp = str_replace("@v", "v", ibuf);
+			strcpy(ibuf, tmp);
+			free(tmp);
+		}
+		if (strstr(ibuf, "@V")) {
+			tmp = str_replace("@V", "V", ibuf);
+			strcpy(ibuf, tmp);
+			free(tmp);
+		}
+		
+		// have to copy one of the show_color_codes() because it won't work correctly if it appears twice in the same line
 		strcpy(lbuf, show_color_codes(icon->icon));
 		sprintf(line, " %2d. %s: %s%s&0  %s%s&0 %s", ++count, icon_types[icon->type], icon->color, ibuf, icon->color, show_color_codes(icon->color), lbuf);
 		
@@ -4062,6 +4523,10 @@ char *get_interaction_restriction_display(struct interact_restriction *list, boo
 			}
 			case INTERACT_RESTRICT_BOSS: {
 				snprintf(line, sizeof(line), "Boss");
+				break;
+			}
+			case INTERACT_RESTRICT_DEPLETION: {
+				snprintf(line, sizeof(line), "Depletion: %s", depletion_type[res->vnum]);
 				break;
 			}
 			default: {
@@ -4143,7 +4608,7 @@ void get_interaction_display(struct interaction_item *list, char *save_buffer) {
 			sprintf(save_buffer + strlen(save_buffer), " (%c)", interact->exclusion_code);
 		}
 		if (interact->restrictions) {
-			sprintf(save_buffer + strlen(save_buffer), " (requires: %s)", get_interaction_restriction_display(interact->restrictions, TRUE));
+			sprintf(save_buffer + strlen(save_buffer), " (%s)", get_interaction_restriction_display(interact->restrictions, TRUE));
 		}
 		strcat(save_buffer, "\r\n");
 	}
@@ -4162,11 +4627,19 @@ void get_interaction_display(struct interaction_item *list, char *save_buffer) {
 */
 void get_requirement_display(struct req_data *list, char *save_buffer) {
 	struct req_data *req;
+	char buf[MAX_INPUT_LENGTH];
 	int count = 0;
 	
 	*save_buffer = '\0';
 	LL_FOREACH(list, req) {
-		sprintf(save_buffer + strlen(save_buffer), "%2d. %s: %s\r\n", ++count, requirement_types[req->type], requirement_string(req, TRUE));
+		if (req->custom) {
+			snprintf(buf, sizeof(buf), ": %s", req->custom);
+		}
+		else {
+			*buf = '\0';
+		}
+		
+		sprintf(save_buffer + strlen(save_buffer), "%2d. %s: %s%s\r\n", ++count, requirement_types[req->type], requirement_string(req, TRUE, FALSE), buf);
 	}
 	
 	// empty list not shown
@@ -4290,10 +4763,11 @@ void get_script_display(struct trig_proto_list *list, char *save_buffer) {
 * @return bool TRUE if any problems were reported; FALSE if all good.
 */
 bool audit_extra_descs(any_vnum vnum, struct extra_descr_data *list, char_data *ch) {
-	struct extra_descr_data *iter;
+	char copy[MAX_INPUT_LENGTH], word[MAX_INPUT_LENGTH], temp[MAX_INPUT_LENGTH];
+	struct extra_descr_data *iter, *sub;
 	bool problem = FALSE;
 	
-	for (iter = list; iter; iter = iter->next) {
+	LL_FOREACH(list, iter) {
 		if (!iter->keyword || !*skip_filler(iter->keyword)) {
 			olc_audit_msg(ch, vnum, "Extra desc: bad keywords");
 			problem = TRUE;
@@ -4305,6 +4779,21 @@ bool audit_extra_descs(any_vnum vnum, struct extra_descr_data *list, char_data *
 		else if (!strn_cmp(iter->description, "Nothing.", 8)) {
 			olc_audit_msg(ch, vnum, "Extra desc '%s': description starting with 'Nothing.'", NULLSAFE(iter->keyword));
 			problem = TRUE;
+		}
+		
+		// check for masking keywords later in the list
+		if (iter->keyword) {
+			LL_FOREACH(iter->next, sub) {
+				strcpy(copy, NULLSAFE(sub->keyword));
+				while (*copy) {
+					half_chop(copy, word, temp);
+					strcpy(copy, temp);
+					if (isname(word, iter->keyword)) {
+						olc_audit_msg(ch, vnum, "Extra desc '%s': keyword '%s' is masked by earlier desc", NULLSAFE(sub->keyword), word);
+						problem = TRUE;
+					}
+				 }
+			}
 		}
 	}
 	
@@ -4376,10 +4865,12 @@ bool audit_interactions(any_vnum vnum, struct interaction_item *list, int attach
 	
 	HASH_ITER(hh, set, as, next_as) {
 		HASH_ITER(hh, as->set, at, next_at) {
-			if (at->percent > 100.0) {
+			/* not currently checking this
+			if (at->percent > 100.001) {
 				olc_audit_msg(ch, vnum, "Interaction %s exclusion set '%c' totals %.2f%%", interact_types[as->type], (char)at->code, at->percent);
 				problem = TRUE;
 			}
+			*/
 			HASH_DEL(as->set, at);
 			free(at);
 		}
@@ -4637,6 +5128,58 @@ int find_olc_type(char *name) {
 		}
 	}
 	return type;
+}
+
+
+/**
+* @param struct interaction_item *a First interaction.
+* @param struct interaction_item *b Second interaction.
+* @return bool TRUE if both interactions are identical, FALSE if different.
+*/
+bool interactions_are_identical(struct interaction_item *a, struct interaction_item *b) {
+	struct interact_restriction *ir, *find;
+	bool found;
+	
+	// check basic data first
+	if (a->type != b->type || a->vnum != b->vnum || a->percent != b->percent || a->quantity != b->quantity || a->exclusion_code != b->exclusion_code) {
+		return FALSE;
+	}
+	
+	// compare interactions: a to b
+	LL_FOREACH(a->restrictions, ir) {
+		// each restriction in a MUST be present in B
+		found = FALSE;
+		LL_FOREACH(b->restrictions, find) {
+			if (ir->type == find->type && ir->vnum == find->vnum) {
+				found = TRUE;
+				break;
+			}
+		}
+		if (!found) {
+			// not the same
+			return FALSE;
+		}
+	}
+	
+	// compare interactions: b to a
+	LL_FOREACH(b->restrictions, ir) {
+		// each restriction in a MUST be present in B
+		found = FALSE;
+		LL_FOREACH(a->restrictions, find) {
+			if (ir->type == find->type && ir->vnum == find->vnum) {
+				found = TRUE;
+				break;
+			}
+		}
+		if (!found) {
+			// not the same
+			return FALSE;
+		}
+	}
+	
+	// interaction comparison basically ignores duplicates even if there's a different number of dupes
+	// if we got here, these items are the same
+	return TRUE;
 }
 
 
@@ -5012,22 +5555,24 @@ int olc_process_number(char_data *ch, char *argument, char *name, char *command,
 * @param int *amount A variable to store the amount to.
 * @param any_vnum *vnum A variable to store the vnum to.
 * @param bitvector_t *misc A variable to store the misc value to.
-* param char *group A variable to store the group arg, if any.
+* @param char *group A variable to store the group arg, if any.
+* @param char **custom_text A variable to store custom display text, if any was provided.
 * @return bool TRUE if the arguments were provided correctly, FALSE if an error was sent.
 */
-bool olc_parse_requirement_args(char_data *ch, int type, char *argument, bool find_amount, int *amount, any_vnum *vnum, bitvector_t *misc, char *group) {
+bool olc_parse_requirement_args(char_data *ch, int type, char *argument, bool find_amount, int *amount, any_vnum *vnum, bitvector_t *misc, char *group, char **custom_text) {
 	char arg[MAX_INPUT_LENGTH]; 
 	bool need_abil = FALSE, need_bld = FALSE, need_component = FALSE;
 	bool need_mob = FALSE, need_obj = FALSE, need_quest = FALSE;
 	bool need_rmt = FALSE, need_sect = FALSE, need_skill = FALSE;
 	bool need_veh = FALSE, need_mob_flags = FALSE, need_faction = FALSE;
 	bool need_currency = FALSE, need_func_flags = FALSE, need_veh_flags = FALSE;
-	bool need_dip_flags = FALSE, need_event = FALSE;
+	bool need_dip_flags = FALSE, need_event = FALSE, need_language = FALSE;
 	
 	*amount = 1;
 	*vnum = 0;
 	*misc = 0;
 	*group = 0;
+	*custom_text = NULL;
 	
 	// REQ_x: determine which args we need
 	switch (type) {
@@ -5124,6 +5669,11 @@ bool olc_parse_requirement_args(char_data *ch, int type, char *argument, bool fi
 			need_event = TRUE;
 			break;
 		}
+		case REQ_SPEAK_LANGUAGE:
+		case REQ_RECOGNIZE_LANGUAGE: {
+			need_language = TRUE;
+			break;
+		}
 		case REQ_OWN_HOMES:
 		case REQ_CROP_VARIETY:
 		case REQ_EMPIRE_WEALTH:
@@ -5199,6 +5749,19 @@ bool olc_parse_requirement_args(char_data *ch, int type, char *argument, bool fi
 		}
 		if (!(gen = find_generic(atoi(arg), GENERIC_CURRENCY))) {
 			msg_to_char(ch, "Invalid generic currency '%s'.\r\n", arg);
+			return FALSE;
+		}
+		*vnum = GEN_VNUM(gen);
+	}
+	if (need_language) {
+		generic_data *gen;
+		argument = any_one_word(argument, arg);
+		if (!*arg) {
+			msg_to_char(ch, "You must provide a generic language vnum or name.\r\n");
+			return FALSE;
+		}
+		if (!((gen = find_generic(atoi(arg), GENERIC_LANGUAGE)) || (gen = find_generic_no_spaces(GENERIC_LANGUAGE, arg)))) {
+			msg_to_char(ch, "Invalid generic language '%s'.\r\n", arg);
 			return FALSE;
 		}
 		*vnum = GEN_VNUM(gen);
@@ -5340,15 +5903,22 @@ bool olc_parse_requirement_args(char_data *ch, int type, char *argument, bool fi
 	}
 	
 	// anything left for a group letter?
-	skip_spaces(&argument);
-	if (*argument && str_cmp(argument, "none")) {	// ignore a "none" here, for "no group"
-		if (strlen(argument) != 1 || !isalpha(*argument)) {
-			msg_to_char(ch, "Group must be a letter (or may be blank).\r\n");
+	argument = any_one_arg(argument, arg);
+	if (*arg && str_cmp(arg, "none") && *arg != '-') {	// ignore a "none" or "-" here, for "no group"
+		if (strlen(arg) != 1 || !isalpha(*arg)) {
+			msg_to_char(ch, "Group must be a letter (or may be blank or -).\r\n");
 			return FALSE;
 		}
 		else {
-			*group = *argument;
+			*group = *arg;
 		}
+	}
+	
+	// anything left for custom text?
+	skip_spaces(&argument);
+	if (*argument) {
+		*custom_text = str_dup(argument);
+		**custom_text = UPPER(**custom_text);
 	}
 	
 	// all good
@@ -5532,7 +6102,7 @@ void olc_process_requirements(char_data *ch, char *argument, struct req_data **l
 	int findtype, num, type;
 	bitvector_t misc;
 	any_vnum vnum;
-	char group;
+	char group, *custom_text;
 	bool found, none;
 	
 	argument = any_one_arg(argument, cmd_arg);	// add/remove/change/copy
@@ -5630,7 +6200,13 @@ void olc_process_requirements(char_data *ch, char *argument, struct req_data **l
 				if (--num == 0) {
 					found = TRUE;
 					
-					msg_to_char(ch, "You remove the %s info for: %s\r\n", command, requirement_string(iter, TRUE));
+					if (iter->custom) {
+						snprintf(buf, sizeof(buf), " (%s)", iter->custom);
+					}
+					else {
+						*buf = '\0';
+					}
+					msg_to_char(ch, "You remove the %s info for: %s%s\r\n", command, requirement_string(iter, TRUE, FALSE), buf);
 					LL_DELETE(*list, iter);
 					free(iter);
 					break;
@@ -5652,7 +6228,7 @@ void olc_process_requirements(char_data *ch, char *argument, struct req_data **l
 		else if ((type = search_block(type_arg, requirement_types, FALSE)) == NOTHING) {
 			msg_to_char(ch, "Invalid type '%s'.\r\n", type_arg);
 		}
-		else if (!olc_parse_requirement_args(ch, type, argument, TRUE, &num, &vnum, &misc, &group)) {
+		else if (!olc_parse_requirement_args(ch, type, argument, TRUE, &num, &vnum, &misc, &group, &custom_text)) {
 			// sends own error
 		}
 		else if (!allow_tracker_types && requirement_needs_tracker[type]) {
@@ -5666,10 +6242,18 @@ void olc_process_requirements(char_data *ch, char *argument, struct req_data **l
 			req->misc = misc;
 			req->group = group;
 			req->needed = num;
-		
+			req->custom = custom_text;
+			
+			if (req->custom) {
+				snprintf(buf, sizeof(buf), " (%s)", req->custom);
+			}
+			else {
+				*buf = '\0';
+			}
+			
 			LL_APPEND(*list, req);
 			LL_SORT(*list, sort_requirements_by_group);
-			msg_to_char(ch, "You add %s: %s\r\n", command, requirement_string(req, TRUE));
+			msg_to_char(ch, "You add %s: %s%s\r\n", command, requirement_string(req, TRUE, FALSE), buf);
 		}
 	}	// end 'add'
 	else if (is_abbrev(cmd_arg, "change")) {
@@ -5679,7 +6263,7 @@ void olc_process_requirements(char_data *ch, char *argument, struct req_data **l
 		skip_spaces(&argument);
 		
 		if (!*num_arg || !isdigit(*num_arg) || !*field_arg) {
-			msg_to_char(ch, "Usage: %s change <number> <amount | vnum> <value>\r\n", command);
+			msg_to_char(ch, "Usage: %s change <number> <amount | group | text | vnum> <value>\r\n", command);
 			return;
 		}
 		
@@ -5691,6 +6275,14 @@ void olc_process_requirements(char_data *ch, char *argument, struct req_data **l
 				change = iter;
 				break;
 			}
+		}
+		
+		// shortcut string to buf
+		if (change && change->custom) {
+			snprintf(buf, sizeof(buf), " (%s)", change->custom);
+		}
+		else {
+			*buf = '\0';
 		}
 		
 		if (!change) {
@@ -5707,25 +6299,25 @@ void olc_process_requirements(char_data *ch, char *argument, struct req_data **l
 			}
 			else {
 				change->needed = num;
-				msg_to_char(ch, "You change %s %d to: %s\r\n", command, atoi(num_arg), requirement_string(change, TRUE));
+				msg_to_char(ch, "You change %s %d to: %s%s\r\n", command, atoi(num_arg), requirement_string(change, TRUE, FALSE), buf);
 			}
 		}
 		else if (is_abbrev(field_arg, "vnum")) {
 			// num is junk here
-			if (!olc_parse_requirement_args(ch, change->type, argument, FALSE, &num, &vnum, &misc, &group)) {
+			if (!olc_parse_requirement_args(ch, change->type, argument, FALSE, &num, &vnum, &misc, &group, &custom_text)) {
 				// sends own error
 			}
 			else {
 				change->vnum = vnum;
 				change->misc = misc;
-				msg_to_char(ch, "Changed %s %d to: %s\r\n", command, atoi(num_arg), requirement_string(change, TRUE));
+				msg_to_char(ch, "Changed %s %d to: %s%s\r\n", command, atoi(num_arg), requirement_string(change, TRUE, FALSE), buf);
 			}
 		}
 		else if (is_abbrev(field_arg, "group")) {
-			if (!str_cmp(argument, "none")) {
+			if (!str_cmp(argument, "none") || *argument == '-') {
 				change->group = 0;
 				LL_SORT(*list, sort_requirements_by_group);
-				msg_to_char(ch, "Changed %s %d to: %s\r\n", command, atoi(num_arg), requirement_string(change, TRUE));
+				msg_to_char(ch, "Changed %s %d to: %s%s\r\n", command, atoi(num_arg), requirement_string(change, TRUE, FALSE), buf);
 			}
 			else if (strlen(argument) != 1 || !isalpha(*argument)) {
 				msg_to_char(ch, "Group must be a letter or 'none'.\r\n");
@@ -5734,11 +6326,29 @@ void olc_process_requirements(char_data *ch, char *argument, struct req_data **l
 			else {
 				change->group = *argument;
 				LL_SORT(*list, sort_requirements_by_group);
-				msg_to_char(ch, "Changed %s %d to: %s\r\n", command, atoi(num_arg), requirement_string(change, TRUE));
+				msg_to_char(ch, "Changed %s %d to: %s%s\r\n", command, atoi(num_arg), requirement_string(change, TRUE, FALSE), buf);
+			}
+		}
+		else if (is_abbrev(field_arg, "text")) {
+			if (!str_cmp(argument, "none")) {
+				if (change->custom) {
+					free(change->custom);
+				}
+				change->custom = NULL;
+				snprintf(buf, sizeof(buf), " (no custom text)");
+				msg_to_char(ch, "Changed %s %d to: %s%s\r\n", command, atoi(num_arg), requirement_string(change, TRUE, FALSE), buf);
+			}
+			else {
+				if (change->custom) {
+					free(change->custom);
+				}
+				change->custom = str_dup(argument);
+				snprintf(buf, sizeof(buf), " (%s)", change->custom);
+				msg_to_char(ch, "Changed %s %d to: %s%s\r\n", command, atoi(num_arg), requirement_string(change, TRUE, FALSE), buf);
 			}
 		}
 		else {
-			msg_to_char(ch, "You can only change the amount, group, or vnum.\r\n");
+			msg_to_char(ch, "You can only change the amount, group, text, or vnum.\r\n");
 		}
 	}	// end 'change'
 	else if (is_abbrev(cmd_arg, "move")) {
@@ -5802,7 +6412,7 @@ void olc_process_requirements(char_data *ch, char *argument, struct req_data **l
 	}	// end 'move'
 	else {
 		msg_to_char(ch, "Usage: %s add <type> <vnum>\r\n", command);
-		msg_to_char(ch, "Usage: %s change <number> vnum <value>\r\n", command);
+		msg_to_char(ch, "Usage: %s change <number> <amount | group | text | vnum> <value>\r\n", command);
 		msg_to_char(ch, "Usage: %s copy <from type> <from vnum> [tasks/prereqs]\r\n", command);
 		msg_to_char(ch, "Usage: %s remove <number | all>\r\n", command);
 		msg_to_char(ch, "Usage: %s move <number> <up | down>\r\n", command);
@@ -6173,9 +6783,68 @@ void olc_process_custom_messages(char_data *ch, char *argument, struct custom_me
 			msg_to_char(ch, "You can only change the type or message.\r\n");
 		}
 	}
+	else if (is_abbrev(arg1, "move")) {
+		struct custom_message *to_move, *prev;
+		bool up;
+		
+		// usage: <cmd> move <number> <up | down>
+		half_chop(arg2, num_arg, val_arg);
+		up = is_abbrev(val_arg, "up");
+		
+		if (!*num_arg || !*val_arg) {
+			msg_to_char(ch, "Usage: custom move <number> <up | down>\r\n");
+		}
+		else if (!isdigit(*num_arg) || (num = atoi(num_arg)) < 1) {
+			msg_to_char(ch, "Invalid custom message number.\r\n");
+		}
+		else if (!is_abbrev(val_arg, "up") && !is_abbrev(val_arg, "down")) {
+			msg_to_char(ch, "You must specify whether you're moving it up or down in the list.\r\n");
+		}
+		else if (up && num == 1) {
+			msg_to_char(ch, "You can't move it up; it's already at the top of the list.\r\n");
+		}
+		else {
+			// find the one to move
+			to_move = prev = NULL;
+			LL_FOREACH(*list, custm) {
+				if (--num == 0) {
+					to_move = custm;
+					break;	// found
+				}
+				else {
+					// store for next iteration
+					prev = custm;
+				}
+			}
+			
+			if (!to_move) {
+				msg_to_char(ch, "Invalid custom message number.\r\n");
+			}
+			else if (!up && !to_move->next) {
+				msg_to_char(ch, "You can't move it down; it's already at the bottom of the list.\r\n");
+			}
+			else {
+				// SUCCESS: attempt to move
+				if (up && prev) {
+					// can move up
+					LL_DELETE(*list, to_move);
+					LL_PREPEND_ELEM(*list, prev, to_move);
+				}
+				else if (!up && (prev = to_move->next)) {
+					// can move down
+					LL_DELETE(*list, to_move);
+					LL_APPEND_ELEM(*list, prev, to_move);
+				}
+				
+				// message: re-atoi(num_arg) because we destroyed num finding our target
+				msg_to_char(ch, "You move custom %d %s.\r\n", atoi(num_arg), (up ? "up" : "down"));
+			}
+		}
+	}
 	else {
 		msg_to_char(ch, "Usage: custom add <type> <message>\r\n");
 		msg_to_char(ch, "Usage: custom change <number> <type | message> <value>\r\n");
+		msg_to_char(ch, "Usage: custom move <number> <up | down>\r\n");
 		msg_to_char(ch, "Usage: custom remove <number | all>\r\n");
 		msg_to_char(ch, "Available types:\r\n");
 		for (iter = 0; *type_names[iter] != '\n'; ++iter) {
@@ -6554,6 +7223,19 @@ bool parse_interaction_restrictions(char_data *ch, char *argument, struct intera
 				fail = TRUE;
 			}
 		}
+		else if (is_abbrev(arg, "-depletion")) {
+			ptr = any_one_word(ptr, arg);
+			if ((num = search_block(arg, depletion_type, FALSE)) != NOTHING) {
+				CREATE(res, struct interact_restriction, 1);
+				res->type = INTERACT_RESTRICT_DEPLETION;
+				res->vnum = num;
+				LL_APPEND(*found_restrictions, res);
+			}
+			else {
+				msg_to_char(ch, "Invalid depletion type '%s'.\r\n", arg);
+				fail = TRUE;
+			}
+		}
 		else if (is_abbrev(arg, "-boss")) {
 			CREATE(res, struct interact_restriction, 1);
 			res->type = INTERACT_RESTRICT_BOSS;
@@ -6887,7 +7569,7 @@ void olc_process_interactions(char_data *ch, char *argument, struct interaction_
 				msg_to_char(ch, " (%c)", exc);
 			}
 			if (found_restrictions) {
-				msg_to_char(ch, " (requires: %s)", get_interaction_restriction_display(found_restrictions, TRUE));
+				msg_to_char(ch, " (%s)", get_interaction_restriction_display(found_restrictions, TRUE));
 			}
 			msg_to_char(ch, "\r\n");
 		}
@@ -7098,7 +7780,7 @@ void olc_process_resources(char_data *ch, char *argument, struct resource_data *
 						msg_to_char(ch, "Usage: resource add component <quantity> <vnum/name>\r\n");
 						return;
 					}
-					if (!(cmp = find_generic_component(arg4))) {
+					if (!(cmp = find_generic_component(trim(arg4)))) {
 						msg_to_char(ch, "Unknown component type '%s'.\r\n", arg4);
 						return;
 					}
@@ -7311,7 +7993,7 @@ void olc_process_resources(char_data *ch, char *argument, struct resource_data *
 			switch (change->type) {
 				case RES_COMPONENT: {
 					generic_data *cmp;
-					if (!(cmp = find_generic_component(arg4))) {
+					if (!(cmp = find_generic_component(trim(arg4)))) {
 						msg_to_char(ch, "Unknown component type '%s'.\r\n", arg4);
 						return;
 					}
@@ -7347,7 +8029,7 @@ void olc_process_resources(char_data *ch, char *argument, struct resource_data *
 					break;
 				}
 				default: {
-					msg_to_char(ch, "You can't change the name on a %s resource.\r\n", resource_types[change->type]);
+					msg_to_char(ch, "You can't change the name on %s %s resource.\r\n", AN(resource_types[change->type]), resource_types[change->type]);
 					return;
 				}
 			}
@@ -7879,7 +8561,7 @@ void smart_copy_interactions(struct interaction_item **addto, struct interaction
 		// see if an identical interaction is in the addto list
 		found = FALSE;
 		for (find = *addto; find && !found; find = find->next) {
-			if (find->type == interact->type && find->vnum == interact->vnum && find->percent == interact->percent && find->quantity == interact->quantity && find->exclusion_code == interact->exclusion_code) {
+			if (interactions_are_identical(interact, find)) {
 				found = TRUE;
 			}
 		}
@@ -7929,6 +8611,9 @@ void smart_copy_requirements(struct req_data **to_list, struct req_data *from_li
 		if (!found) {
 			CREATE(req, struct req_data, 1);
 			*req = *iter;
+			if (iter->custom) {
+				req->custom = str_dup(iter->custom);
+			}
 			LL_APPEND(*to_list, req);
 		}
 	}
@@ -8080,4 +8765,87 @@ bool validate_icon(char *icon) {
 	else {
 		return TRUE;
 	}
+}
+
+ //////////////////////////////////////////////////////////////////////////////
+//// WORD COUNT TOOLS ////////////////////////////////////////////////////////
+
+/**
+* Counts the number of words in all custom messages.
+*
+* @param struct custom_message *list The list of custom messages.
+* @return int The number of words in all custom messages.
+*/
+int wordcount_custom_messages(struct custom_message *list) {
+	struct custom_message *iter;
+	int count = 0;
+	
+	LL_FOREACH(list, iter) {
+		count += wordcount_string(iter->msg);
+	}
+	
+	return count;
+}
+
+
+/**
+* Counts the number of words in all extra descriptions.
+*
+* @param struct extra_descr_data *list The list of extra descriptions.
+* @return int The number of words in all extra descriptions.
+*/
+int wordcount_extra_descriptions(struct extra_descr_data *list) {
+	struct extra_descr_data *iter;
+	int count = 0;
+	
+	LL_FOREACH(list, iter) {
+		count += wordcount_string(iter->keyword);
+		count += wordcount_string(iter->description);
+	}
+	
+	return count;
+}
+
+
+/**
+* Counts the number of words in quest/progress requirements.
+*
+* @param struct req_data *list The list of requirement.
+* @return int The number of words in the requirements.
+*/
+int wordcount_requirements(struct req_data *list) {
+	struct req_data *iter;
+	int count = 0;
+	
+	LL_FOREACH(list, iter) {
+		count += wordcount_string(iter->custom);
+	}
+	
+	return count;
+}
+
+
+/**
+* Counts the number of words in a string, separated by whitespace. Only words
+* containing alpha/numeric characters are counted; pure punctuation is ignored.
+*
+* @param const char *string The string to count words in.
+* @return int The number of words in the string.
+*/
+int wordcount_string(const char *string) {
+	int pos, count = 0;
+	bool counted_word = FALSE;
+	
+	if (string) {
+		for (pos = 0; string[pos]; ++pos) {
+			if (isspace(string[pos]) && string[pos+1] && !isspace(string[pos+1])) {
+				counted_word = FALSE;
+			}
+			else if (!counted_word && (isalpha(string[pos]) || isdigit(string[pos]))) {
+				++count;
+				counted_word = TRUE;
+			}
+		}
+	}
+	return count;
 }

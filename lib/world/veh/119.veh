@@ -1,0 +1,115 @@
+#11937
+mausoleum walking~
+a walking mausoleum~
+A mausoleum on legs towers over you!~
+   The mausoleum towers over you on four enormous stone legs, moving almost
+like a spider, such that you can hardly see the building on top. Grass
+overhangs the edge of the platform, swaying in the breeze as the mausoleum
+moves.
+   Climbing the legs shouldn't be too difficult (enter mausoleum), nor should
+it be hard to get it moving (lead mausoleum). The inside of the mausoleum can
+be used as a tomb.
+~
+@.&0XX@.~
+bouw 83 16 0 0 0 2 0 3 0
+C
+150 250
+D
+11937 0 0
+E
+legs~
+   The mausoleum's legs are enormous columns of articulated stone. Though there
+are only four of them, they give the impression of a giant spider as they move.
+~
+I 30 5006 100.00 1  # RUINS-TO-VEH: ruins of #n
+M
+11944 45.00 e
+P
+0
+R
+6075 1 1 0
+S
+#11938
+sorcery tower sorcerer's sorcerers~
+the sorcery tower~
+A sorcerer's tower on legs rises high above you.~
+   The sight of a walking sorcery tower is something to behold. The brick tower
+stands upon two enormous stone legs with the posture and poise of a large
+person. The windows give the impression of eyes, almost as if the tower is
+watching you.
+   You can drive this tower from any room inside, as its controls are magical,
+but you'll have to look out a window to see where you're going.
+~
+@.&0||@.~
+beuw 26 128 0 0 0 10 0 3 0
+C
+150 250
+D
+11938 0 0
+E
+legs~
+The legs of the sorcery tower almost look human, but they're made of stone.
+~
+E
+windows~
+The windows of the tower are too high to see.
+~
+I 30 5007 100.00 1  # RUINS-TO-VEH: ruins of #n
+P
+0
+R
+6076 1 1 0
+R
+1010 1 5 0
+T 11938
+S
+#11939
+gardens hanging beautiful~
+the hanging gardens~
+Beautiful trees, shrubs, and flowers hang over you from raised terraces.~
+   The gardens hang over raised terraces build from stone and brick strike a
+sense of wonder into every onlooker. Indeed, people travel from the corners of
+the world to sit in the shade of these gardens. Like the famed hanging gardens
+of Sennacherib, they are sure to inspire legends for many generations to come.
+A small pond next to the walkway reflects the beautiful gardens.
+~
+&g[%%]~
+fhuwF 19 30 0 0 F 10 0 4 0
+E
+trees~
+   Trees of all types hang over you from the raised terraces of the garden.
+Each has been expertly manicured and trained to grow out over the walkways to
+provide shade.
+~
+E
+walkways~
+Walkways surround the hanging gardens to give you a better view.
+~
+E
+shrubs~
+   Ornamental shrubs from every corner of the world grow on the terraces of the
+hanging garden.
+~
+E
+flowers~
+Gorgeous, fragrant flowers in every shade and hue fill the gardens.
+~
+E
+pools water~
+   Below the gardens, along the walkway, a small pond provides crystal clear
+water and reflects the trees above.
+~
+I 30 5007 100.00 1  # RUINS-TO-VEH: ruins of #n
+H 0 1
+M
+11943 75.00 ce
+M
+11943 15.00 ce
+P
+2
+R
+1002 1 5 0
+R
+1010 1 5 0
+S
+$

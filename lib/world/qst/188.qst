@@ -10,7 +10,7 @@ To summon the horse man: use lantern <normal | hard | group | boss>
    You have defeated the headless horse man and saved the local villagers from
 his reins of terror. You have earned a goody bag!
 ~
-19 e 0 0 -1
+20 ej 0 0 -1
 A
 2 18803
 A
@@ -27,6 +27,43 @@ W
 W
 3 18801 0 1 a
 S
+#18808
+Halloween: Pillage for Candy~
+   You peer into your goody bag and are knocked back as a spirit flies out with
+a huge smile on its face!
+   'Hi!' it says in a friendly voice. 'I bet you weren't expecting that. If you
+are interested, I have a pillowcase here for you. I always did like the idea of
+getting free candy, but I can't exactly collect it myself.
+   'If you can get me 31 of each type out there, I'd be happy to make it worth
+your while.'
+   The spirit waves back at you as it flies off toward the moon, fading until
+you can only see its big eyes and wide grin, then just the grin, and then, at
+last, nothing at all. When you look down, you notice you're holding a pillaging
+pillowcase.
+   Fill the pillowcase with 31 of each candy before the event ends!
+~
+   As you put the last piece of candy into your pillaging pillowcase, that same
+smiling spirit pops out!
+   'Thank you so much for the candy, friend,' it says. 'Here, have this
+skeletal old wagon wheel for your trouble. I bet you can make something
+interesting from that.'
+   And with a POP! the spirit and the pillowcase both vanish. But when you look
+down, you realize you're holding a wagon wheel.
+~
+10 j 0 0 86400
+A
+2 18829
+P
+36 18800 0 1 -
+R
+2 18858 1
+T 18820
+W+
+11 0 0 1 -
+Fill your pillaging pillowcase with halloween candy~
+Z
+4 18808
+S
 #18819
 Halloween: Costume the Town~
    A restless spirit appears to tell you: It seems your city has become rather
@@ -38,11 +75,12 @@ your citizens and deck them out in festive costumes.
    Your citizens are costumed and now the holiday festivities can begin! You
 have earned a goody bag!
 ~
-18 de 0 0 -1
+21 dej 0 0 -1
 A
 2 18806
 A
 2 18811
+D 18819
 P
 9 6 0 1 a
 P
@@ -54,8 +92,9 @@ R
 T 18820
 W
 2 18819 0 1 a
-W
+W+
 11 0 0 1 a
+Costume 6 citizens~
 S
 #18821
 Halloween: Citizens Will Be Toad~
@@ -68,11 +107,12 @@ normal in no time.
 think of the holiday joy you've brought to your city. You have earned a goody
 bag!
 ~
-15 e 0 0 -1
+18 ej 0 0 -1
 A
 2 18810
 A
 2 18805
+D 18821
 P
 36 18800 0 1 a
 P
@@ -82,8 +122,9 @@ R
 R
 2 18829 1
 T 18820
-W
-11 0 0 1
+W+
+11 0 0 1 -
+Turn 4 citizens into toads~
 S
 #18823
 Halloween: A City Aghast~
@@ -97,7 +138,7 @@ world of the living.
    Now everyone seems to be getting into the 'spirit' of the holiday! You have
 earned a goody bag!
 ~
-15 e 0 0 -1
+17 ej 0 0 -1
 A
 2 18804
 A
@@ -112,8 +153,9 @@ R
 R
 2 18829 1
 T 18820
-W
-11 0 0 1
+W+
+11 0 0 1 -
+Perform the ritual of spirits~
 S
 #18824
 Halloween: A Traditional Bog Roll~
@@ -124,7 +166,7 @@ your city. Type 'use roll' to spread the Halloween cheer to three houses.
    Now that you've redecorated the city, everyone is getting into the holiday
 spirit! You have earned a goody bag!
 ~
-14 e 0 0 -1
+16 ej 0 0 -1
 A
 2 18805
 A
@@ -139,8 +181,9 @@ R
 R
 2 18829 1
 T 18820
-W
-11 0 0 1
+W+
+11 0 0 1 -
+Bog roll 3 houses~
 S
 #18827
 Halloween: Get the Blood Pumping~
@@ -155,11 +198,12 @@ blood pumping.
    The citizens' hearts are definitely pumping now. You have earned a goody
 bag!
 ~
-14 e 0 0 -1
+17 ej 0 0 -1
 A
 2 18808
 A
 2 18806
+D 18827
 P
 36 18800 0 1 a
 P
@@ -169,8 +213,9 @@ R
 R
 2 18829 1
 T 18820
-W
-11 0 0 1
+W+
+11 0 0 1 -
+Scare 5 citizens as Dracula~
 S
 #18828
 Halloween: House of 100 Corpses~
@@ -182,14 +227,14 @@ out, or if it's the thing that will release them.
    You have built an unearthly manor for the spirits of your ancestors to
 inhabit. Your grandmother must be proud.
 ~
-9 0 0 0 -1
+10 j 0 0 -1
 A
 1 18881
 R
 2 18829 1
 T 18820
 W
-7 18828 0 1
+7 18828 0 1 -
 Z
 0 18828
 S
@@ -203,7 +248,7 @@ details.
 ~
 You have appeased the spirits of the dead for today.
 ~
-15 e 0 0 -1
+17 ej 0 0 -1
 A
 2 18807
 A
@@ -216,8 +261,9 @@ R
 R
 2 18829 1
 T 18820
-W
-11 0 0 1
+W+
+11 0 0 1 -
+Make offerings at 5 tombs~
 S
 #18830
 Halloween: Appease the Spirits~
@@ -228,7 +274,7 @@ and type 'offer'. Look at the offering instructions for more details.
 ~
 You have appeased the spirits of the dead for today.
 ~
-15 e 0 0 -1
+17 ej 0 0 -1
 A
 2 18807
 A
@@ -241,8 +287,9 @@ R
 R
 2 18829 1
 T 18820
-W
-11 0 0 1
+W+
+11 0 0 1 -
+Appease spirits at 5 tombs~
 S
 #18831
 Halloween: Appease the Spirits~
@@ -253,7 +300,7 @@ and type 'offer'. Look at the offering instructions for more details.
 ~
 You have appeased the spirits of the dead for today.
 ~
-15 e 0 0 -1
+17 ej 0 0 -1
 A
 2 18807
 A
@@ -266,8 +313,9 @@ R
 R
 2 18829 1
 T 18820
-W
-11 0 0 1
+W+
+11 0 0 1 -
+Appease spirits at 5 tombs~
 S
 #18832
 Halloween: Appease the Spirits~
@@ -278,7 +326,7 @@ tomb and type 'offer'. Look at the offering instructions for more details.
 ~
 You have appeased the spirits of the dead for today.
 ~
-16 e 0 0 -1
+18 ej 0 0 -1
 A
 2 18807
 A
@@ -291,8 +339,9 @@ R
 R
 2 18829 1
 T 18820
-W
-11 0 0 1
+W+
+11 0 0 1 -
+Appease spirits at 5 tombs~
 S
 #18854
 Halloween: Pick or Treat~
@@ -303,7 +352,7 @@ gift to the spirits.
 ~
 The spirits take your freshly stolen candy and grin as they vanish, one by one.
 ~
-14 de 0 0 -1
+15 dej 0 0 -1
 A
 2 18802
 A
@@ -319,7 +368,7 @@ R
 2 18829 1
 T 18820
 W
-2 18855 0 5
+2 18855 0 5 -
 S
 #18856
 Halloween: Magic Mirror~
@@ -332,21 +381,22 @@ tedium of seeing the same old unchanging spirits.
    The spirits are highly amused at the various looks you have captured in the
 reflections and thank you for the entertainment.
 ~
-11 e 0 0 -1
+13 ej 0 0 -1
 A
 2 18806
 A
 2 18807
 D 18856
 P
-36 18800 0 1
+36 18800 0 1 -
 R
 9 18800 10
 R
 2 18829 1
 T 18820
-W
-11 0 0 1
+W+
+11 0 0 1 -
+Look in the mirror wearing 5 different clothes~
 S
 #18857
 Halloween: Bobbing for Apples~
@@ -358,21 +408,54 @@ complete this quest.
 ~
 Good job finding the bigger apple. Hopefully you had some fun doing it.
 ~
-10 e 0 0 -1
+12 ej 0 0 -1
 A
 2 18806
 A
 2 18807
 D 18856
 P
-36 18800 0 1
+36 18800 0 1 -
 R
 9 18800 10
 R
 2 18829 1
 T 18820
-W
-11 0 0 1
+W+
+11 0 0 1 -
+Win at bobbing for apples~
+S
+#18860
+Halloween: Bylda Terror~
+   The city is eager to try out a newly discovered folk festival, believed to
+be long forgotten because of old taboos against saying the name of a bear. The
+Feast of Bylda takes place during the Halloween season, and your kingdom's
+subjects are sure to enjoy it.
+   Take this set of plans and build a mighty bear in your city from wood and
+leather, then enchant it to bring it to life. It'll be a fright to die for.
+See 'build info Bylda' for more information on what it will require.
+~
+   As you finish the magic words, the Bylda comes to life! As it stomps around
+the city, you begin to ask yourself: Did I think this plan through all the way?
+~
+12 ej 0 0 -1
+A
+2 18806
+A
+2 18811
+D 18819
+P
+9 6 0 1 a
+P
+36 18800 0 1 a
+R
+2 18829 1
+R
+9 18800 10
+T 18820
+W+
+11 0 0 1 -
+Hold the Bylda Festival in your city~
 S
 #18861
 Halloween: Delegation of Demons~
@@ -386,7 +469,7 @@ your city to open three portals to the Nether and lure some demons through.
 ~
 Congratulations! You've brought new demons into this world.
 ~
-8 e 0 0 -1
+10 ej 0 0 -1
 A
 2 18804
 A
@@ -401,8 +484,39 @@ R
 R
 9 18800 10
 T 18820
-W
-11 0 0 1
+W+
+11 0 0 1 -
+Perform the ritual of demons to open 3 portals~
+S
+#18866
+Halloween: Keep the Blood Pumping~
+   Halloween is a vampire's favorite time of year, when the veil between the
+living and the dead is at its thinnest. A chance encounter with a vampire can
+leave a person's heart pounding -- at least, if the vampire doesn't kill them.
+And after all, a good fright makes them all the tastier next time.
+   Feed from the blood of five people around your city, but don't kill any of
+them! Take just enough to give them a fright.
+~
+And that's five! They'll be having nightmares for weeks.
+~
+5 ej 0 0 -1
+A
+2 18808
+A
+2 18806
+D 18827
+P
+36 18800 0 1 a
+P
+9 7 0 1 a
+R
+9 18800 10
+R
+2 18829 1
+T 18820
+W+
+11 0 0 1 -
+Feed from 5 people without killing them~
 S
 #18869
 Halloween: Songs for the Deaths Yet to Come~
@@ -416,21 +530,22 @@ target can't be a member.
    Seems that music really can soothe the savage soul... Or at least, failing
 that, it can get them dancing!
 ~
-12 e 0 0 -1
-A
-2 18809
+15 ej 0 0 -1
 A
 2 18808
+A
+2 18809
 D 18870
 P
-36 18800 0 1
+36 18800 0 1 -
 R
 9 18800 10
 R
 2 18829 1
 T 18820
-W
-11 0 0 1
+W+
+11 0 0 1 -
+Soothe a Hard, Group, or Boss mob~
 S
 #18870
 Halloween: Songs for the Dead~
@@ -443,21 +558,22 @@ share in the merriment. You need to do this in one of your cities.
 back for a brief time. Surely their loved ones will be greatful for the chance
 to make their peace now.
 ~
-11 e 0 0 -1
+13 ej 0 0 -1
 A
 2 18809
 A
 2 18808
 D 18870
 P
-36 18800 0 1
+36 18800 0 1 -
 R
 9 18800 10
 R
 2 18829 1
 T 18820
-W
-11 0 0 1
+W+
+11 0 0 1 -
+Play music to bring back 5 citizens in your empire~
 S
 #18873
 Halloween: Songs for the Dying~
@@ -475,21 +591,22 @@ then play some music for the poor soul within.
 the ghost. The healers usher you from the medical tent so they can prepare the
 body for burial.
 ~
-20 e 0 0 -1
+22 ej 0 0 -1
 A
 2 18809
 A
 2 18808
 D 18870
 P
-36 18800 0 1
+36 18800 0 1 -
 R
 9 18800 10
 R
 2 18829 1
 T 18820
-W
-11 0 0 1
+W+
+11 0 0 1 -
+Build a medical tent and soothe someone inside~
 S
 #18880
 Halloween: Ancestor's Offering~
@@ -506,19 +623,20 @@ tomb and type 'place portrait'. That should be enough to summon her.
 ~
 Your grandmother is here once again, if only for a while.
 ~
-10 e 0 0 -1
+12 ej 0 0 -1
 A
 2 18804
 A
 2 18810
 P
-36 18800 0 1
+36 18800 0 1 -
 R
 9 18800 10
 R
 2 18829 1
 T 18820
-W
-11 0 0 1
+W+
+11 0 0 1 -
+Place a portrait of your grandmother on her tomb~
 S
 $

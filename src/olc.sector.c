@@ -106,8 +106,14 @@ bool audit_sector(sector_data *sect, char_data *ch) {
 		problem = TRUE;
 	}
 	
+	if (!GET_SECT_EX_DESCS(sect)) {
+		olc_audit_msg(ch, GET_SECT_VNUM(sect), "Sector has no extra descriptions");
+		problem = TRUE;
+	}
+	
 	problem |= audit_interactions(GET_SECT_VNUM(sect), GET_SECT_INTERACTIONS(sect), TYPE_ROOM, ch);
 	problem |= audit_spawns(GET_SECT_VNUM(sect), GET_SECT_SPAWNS(sect), ch);
+	problem |= audit_extra_descs(GET_SECT_VNUM(sect), GET_SECT_EX_DESCS(sect), ch);
 	
 	return problem;
 }
@@ -239,12 +245,15 @@ void olc_delete_sector(char_data *ch, sector_vnum vnum) {
 	struct map_data *map;
 	room_data *room;
 	int count, x, y;
+	char name[256];
 	bool found;
 	
 	if (!(sect = sector_proto(vnum))) {
 		msg_to_char(ch, "There is no such sector %d.\r\n", vnum);
 		return;
 	}
+	
+	snprintf(name, sizeof(name), "%s", NULLSAFE(GET_SECT_NAME(sect)));
 	
 	if (HASH_COUNT(sector_table) <= 1) {
 		msg_to_char(ch, "You can't delete the last sector.\r\n");
@@ -303,6 +312,7 @@ void olc_delete_sector(char_data *ch, sector_vnum vnum) {
 	// update sector evolutions
 	HASH_ITER(hh, sector_table, sect_iter, next_sect) {
 		if (delete_sector_from_evolutions(vnum, &GET_SECT_EVOS(sect_iter))) {
+			syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: Sector %d %s lost deleted evolution sector", GET_SECT_VNUM(sect_iter), GET_SECT_NAME(sect_iter));
 			save_library_file_for_vnum(DB_BOOT_SECTOR, GET_SECT_VNUM(sect_iter));
 		}
 	}
@@ -312,6 +322,7 @@ void olc_delete_sector(char_data *ch, sector_vnum vnum) {
 		found = delete_link_rule_by_type_value(&GET_ADV_LINKING(adv), ADV_LINK_PORTAL_WORLD, vnum);
 		
 		if (found) {
+			syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: Adventure %d %s lost deleted linking sector", GET_ADV_VNUM(adv), GET_ADV_NAME(adv));
 			save_library_file_for_vnum(DB_BOOT_ADV, GET_ADV_VNUM(adv));
 		}
 	}
@@ -323,6 +334,7 @@ void olc_delete_sector(char_data *ch, sector_vnum vnum) {
 		
 		if (found) {
 			SET_BIT(PRG_FLAGS(prg), PRG_IN_DEVELOPMENT);
+			syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: Progress %d %s set IN-DEV due to deleted sector", PRG_VNUM(prg), PRG_NAME(prg));
 			save_library_file_for_vnum(DB_BOOT_PRG, PRG_VNUM(prg));
 			need_progress_refresh = TRUE;
 		}
@@ -337,6 +349,7 @@ void olc_delete_sector(char_data *ch, sector_vnum vnum) {
 		
 		if (found) {
 			SET_BIT(QUEST_FLAGS(quest), QST_IN_DEVELOPMENT);
+			syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: Quest %d %s set IN-DEV due to deleted sector", QUEST_VNUM(quest), QUEST_NAME(quest));
 			save_library_file_for_vnum(DB_BOOT_QST, QUEST_VNUM(quest));
 		}
 	}
@@ -348,6 +361,7 @@ void olc_delete_sector(char_data *ch, sector_vnum vnum) {
 		
 		if (found) {
 			SET_BIT(SOC_FLAGS(soc), SOC_IN_DEVELOPMENT);
+			syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: Social %d %s set IN-DEV due to deleted sector", SOC_VNUM(soc), SOC_NAME(soc));
 			save_library_file_for_vnum(DB_BOOT_SOC, SOC_VNUM(soc));
 		}
 	}
@@ -399,8 +413,8 @@ void olc_delete_sector(char_data *ch, sector_vnum vnum) {
 		}
 	}
 	
-	syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: %s has deleted sector %d", GET_NAME(ch), vnum);
-	msg_to_char(ch, "Sector %d deleted.\r\n", vnum);
+	syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: %s has deleted sector %d %s", GET_NAME(ch), vnum, name);
+	msg_to_char(ch, "Sector %d (%s) deleted.\r\n", vnum, name);
 	
 	if (count > 0) {
 		msg_to_char(ch, "%d live sectors changed.\r\n", count);
@@ -421,7 +435,7 @@ void olc_fullsearch_sector(char_data *ch, char *argument) {
 	bitvector_t find_interacts = NOBITS, found_interacts, only_build = NOBITS;
 	bitvector_t find_evos = NOBITS, found_evos;
 	bitvector_t not_flagged = NOBITS, only_flags = NOBITS, only_climate = NOBITS;
-	int count, only_mapout = NOTHING;
+	int count, only_mapout = NOTHING, vmin = NOTHING, vmax = NOTHING;
 	char only_roadside = '\0';
 	struct interaction_item *inter;
 	struct evolution_data *evo;
@@ -455,6 +469,8 @@ void olc_fullsearch_sector(char_data *ch, char *argument) {
 		FULLSEARCH_LIST("mapout", only_mapout, mapout_color_names)
 		FULLSEARCH_CHAR("roadsideicon", only_roadside)
 		FULLSEARCH_FLAGS("unflagged", not_flagged, sector_flags)
+		FULLSEARCH_INT("vmin", vmin, 0, INT_MAX)
+		FULLSEARCH_INT("vmax", vmax, 0, INT_MAX)
 		
 		else {	// not sure what to do with it? treat it like a keyword
 			sprintf(find_keywords + strlen(find_keywords), "%s%s", *find_keywords ? " " : "", type_arg);
@@ -469,6 +485,9 @@ void olc_fullsearch_sector(char_data *ch, char *argument) {
 	
 	// okay now look up sects
 	HASH_ITER(hh, sector_table, sect, next_sect) {
+		if ((vmin != NOTHING && GET_SECT_VNUM(sect) < vmin) || (vmax != NOTHING && GET_SECT_VNUM(sect) > vmax)) {
+			continue;	// vnum range
+		}
 		if (only_build != NOBITS && (GET_SECT_BUILD_FLAGS(sect) & only_build) != only_build) {
 			continue;
 		}
@@ -507,7 +526,7 @@ void olc_fullsearch_sector(char_data *ch, char *argument) {
 		}
 		
 		// string search
-		if (*find_keywords && !multi_isname(find_keywords, GET_SECT_NAME(sect)) && !multi_isname(find_keywords, GET_SECT_TITLE(sect)) && !multi_isname(find_keywords, GET_SECT_COMMANDS(sect))) {
+		if (*find_keywords && !multi_isname(find_keywords, GET_SECT_NAME(sect)) && !multi_isname(find_keywords, GET_SECT_TITLE(sect)) && !multi_isname(find_keywords, GET_SECT_COMMANDS(sect)) && !search_extra_descs(find_keywords, GET_SECT_EX_DESCS(sect))) {
 			// check icons too
 			match = FALSE;
 			LL_FOREACH(GET_SECT_ICONS(sect), icon) {
@@ -691,6 +710,7 @@ void save_olc_sector(descriptor_data *desc) {
 	if (GET_SECT_NOTES(proto)) {
 		free(GET_SECT_NOTES(proto));
 	}
+	free_extra_descs(&GET_SECT_EX_DESCS(proto));
 	while ((spawn = GET_SECT_SPAWNS(proto))) {
 		GET_SECT_SPAWNS(proto) = spawn->next;
 		free(spawn);
@@ -698,6 +718,7 @@ void save_olc_sector(descriptor_data *desc) {
 	free_interactions(&GET_SECT_INTERACTIONS(proto));
 	
 	// sanity
+	prune_extra_descs(&GET_SECT_EX_DESCS(st));
 	if (!GET_SECT_NAME(st) || !*GET_SECT_NAME(st)) {
 		if (GET_SECT_NAME(st)) {
 			free(GET_SECT_NAME(st));
@@ -756,6 +777,9 @@ sector_data *setup_olc_sector(sector_data *input) {
 		GET_SECT_COMMANDS(new) = GET_SECT_COMMANDS(input) ? str_dup(GET_SECT_COMMANDS(input)) : NULL;
 		GET_SECT_NOTES(new) = GET_SECT_NOTES(input) ? str_dup(GET_SECT_NOTES(input)) : NULL;
 		
+		// copy extra descs
+		GET_SECT_EX_DESCS(new) = copy_extra_descs(GET_SECT_EX_DESCS(input));
+		
 		// copy spawns
 		GET_SECT_SPAWNS(new) = copy_spawn_list(GET_SECT_SPAWNS(input));
 		
@@ -794,6 +818,24 @@ int sort_evolutions(struct evolution_data *a, struct evolution_data *b) {
 }
 
 
+/**
+* Counts the words of text in a sector's strings.
+*
+* @param sector_data *sect The sector whose strings to count.
+* @return int The number of words in the sector's strings.
+*/
+int wordcount_sector(sector_data *sect) {
+	int count = 0;
+	
+	count += wordcount_string(GET_SECT_NAME(sect));
+	count += wordcount_string(GET_SECT_COMMANDS(sect));
+	count += wordcount_string(GET_SECT_TITLE(sect));
+	count += wordcount_extra_descriptions(GET_SECT_EX_DESCS(sect));
+	
+	return count;
+}
+
+
  //////////////////////////////////////////////////////////////////////////////
 //// DISPLAYS ////////////////////////////////////////////////////////////////
 
@@ -805,7 +847,7 @@ int sort_evolutions(struct evolution_data *a, struct evolution_data *b) {
 */
 void olc_show_sector(char_data *ch) {
 	sector_data *st = GET_OLC_SECTOR(ch->desc);
-	char lbuf[MAX_STRING_LENGTH * 2];
+	char buf[MAX_STRING_LENGTH * 4], lbuf[MAX_STRING_LENGTH * 4];
 	struct spawn_info *spawn;
 	int count;
 	
@@ -840,6 +882,13 @@ void olc_show_sector(char_data *ch) {
 	if (st->evolution) {
 		get_evolution_display(st->evolution, buf1);
 		strcat(buf, buf1);
+	}
+
+	// exdesc
+	sprintf(buf + strlen(buf), "Extra descriptions: <%sextra\t0>\r\n", OLC_LABEL_PTR(GET_SECT_EX_DESCS(st)));
+	if (GET_SECT_EX_DESCS(st)) {
+		get_extra_desc_display(GET_SECT_EX_DESCS(st), lbuf, sizeof(lbuf));
+		strcat(buf, lbuf);
 	}
 
 	sprintf(buf + strlen(buf), "Interactions: <%sinteraction\t0>\r\n", OLC_LABEL_PTR(GET_SECT_INTERACTIONS(st)));
@@ -961,7 +1010,11 @@ OLC_MODULE(sectedit_evolution) {
 					tmp = any_one_arg(tmp, buf);	// buf = sector vnum
 					sectarg = any_one_arg(tmp, arg3);
 					
-					if (!*buf || !isdigit(*buf) || !(vsect = sector_proto(atoi(buf)))) {
+					if (!*buf) {
+						msg_to_char(ch, "Usage: evolution add <evo_type> [value] <percent> <sector vnum>\r\n");
+						return;
+					}
+					else if (!isdigit(*buf) || !(vsect = sector_proto(atoi(buf)))) {
 						msg_to_char(ch, "Invalid sector type '%s'.\r\n", buf);
 						return;
 					}
@@ -1053,7 +1106,11 @@ OLC_MODULE(sectedit_evolution) {
 			// this is based on existing type
 			switch (evo_val_types[change->type]) {
 				case EVO_VAL_SECTOR: {
-					if (!*val_arg || !isdigit(*val_arg) || !(vsect = sector_proto(atoi(val_arg)))) {
+					if (!*val_arg) {
+						msg_to_char(ch, "Usage: evolution change <number> value <new sector>\r\n");
+						return;
+					}
+					else if (!isdigit(*val_arg) || !(vsect = sector_proto(atoi(val_arg)))) {
 						msg_to_char(ch, "Invalid sector type '%s'.\r\n", val_arg);
 						return;
 					}
@@ -1124,6 +1181,12 @@ OLC_MODULE(sectedit_evolution) {
 			msg_to_char(ch, "\r\n");
 		}
 	}
+}
+
+
+OLC_MODULE(sectedit_extra_desc) {
+	sector_data *st = GET_OLC_SECTOR(ch->desc);
+	olc_process_extra_desc(ch, argument, &GET_SECT_EX_DESCS(st));
 }
 
 

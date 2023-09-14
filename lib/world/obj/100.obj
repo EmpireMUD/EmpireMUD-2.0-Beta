@@ -17,9 +17,9 @@ wild fire~
 A little fire is burning on the ground.~
 Wild fire is bright, but quite harmless.
 ~
-3 cm ao 0 1
-0 0 0
-10 168
+29 m ao 0 2
+168 1 5
+10 0
 A
 7 2 0
 A
@@ -97,13 +97,13 @@ a dragon scale~
 A dragon scale is lying on the ground.~
 The dragon scale looks like you could use it to craft something impressive.
 ~
-15 el a 0 4
-1 0 0
+15 el a 0 5
+1 2 0
 7 0
 R
-5193 a
+4 5193 a
 R
-5611 a
+4 5611 a
 S
 #10007
 shield dragonscale scale~
@@ -195,9 +195,11 @@ a rat skin~
 There is a pile of filthy rat skins on the ground.~
 You're not sure why anybody would want a rat skin.
 ~
-3 k a 0 1
+3 k a 0 2
 0 0 0
 7 8064
+C
+1 1
 S
 #10014
 necklace rat tooth teeth~
@@ -340,7 +342,7 @@ A
 C
 50 50
 R
-5130 0
+4 5130 0
 S
 #10025
 hat ratsnest nest dirty~
@@ -400,8 +402,8 @@ A grand candelabra creates dancing shadows on the walls.~
    The grand candelabra is made of pitch-black nocturnium, and its yellow-green
 flames create shadows which dance eerily across the walls.
 ~
-3 c 0 0 1
-0 0 0
+29 0 0 0 2
+-1 1 0
 2 0
 E
 shadows~
@@ -450,36 +452,32 @@ reflection you see, but rather the entrance to the tower.
 3 0
 S
 #10036
-skystone stone small~
-a small skystone~
-A small skystone is lying here.~
-   Skystones are used to buy things at the Tower Skycleave. You can type
-'combine small' to combine 5 of them into a greater skystone.
+skystone stone fractured small~
+a fractured skystone~
+A fractured skystone is lying on the ground.~
+The skystone seems to have shattered. You can't sense any magic left in it.
 ~
-3 l a 0 5
-0 0 0
+15 0 a 0 8
+1 2 0
 10 0
-I 14 10037 100.00 5 x  # COMBINE: a greater skystone
 R
-5193 0
+4 5193 0
 R
-5621 0
+4 5621 0
 S
 #10037
-skystone greater stone~
-a greater skystone~
-A greater skystone is sitting on the ground.~
-   Skystones are used to buy things at the Tower Skycleave. You can type
-'separate greater' to separate it into smaller skystones.
+skystone stone large broken~
+a large, broken skystone~
+A large, broken skystone is lying here.~
+This elegant skystone appears to be broken and all the magic has leaked out.
 ~
-3 l a 0 4
-0 0 0
+15 0 a 0 6
+5 2 0
 10 0
-I 15 10036 100.00 5 x  # SEPARATE: a small skystone
 R
-5193 0
+4 5193 0
 R
-5621 0
+4 5621 0
 S
 #10038
 belt skycleaver~
@@ -694,7 +692,7 @@ q
 C
 50 50
 R
-5130 0
+4 5130 0
 S
 #10053
 sword glass~

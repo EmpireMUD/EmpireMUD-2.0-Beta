@@ -109,8 +109,14 @@ bool audit_crop(crop_data *cp, char_data *ch) {
 		problem = TRUE;
 	}
 	
+	if (!GET_CROP_EX_DESCS(cp)) {
+		olc_audit_msg(ch, GET_CROP_VNUM(cp), "Crop has no extra descriptions");
+		problem = TRUE;
+	}
+	
 	problem |= audit_interactions(GET_CROP_VNUM(cp), GET_CROP_INTERACTIONS(cp), TYPE_ROOM, ch);
 	problem |= audit_spawns(GET_CROP_VNUM(cp), GET_CROP_SPAWNS(cp), ch);
+	problem |= audit_extra_descs(GET_CROP_VNUM(cp), GET_CROP_EX_DESCS(cp), ch);
 	
 	return problem;
 }
@@ -179,12 +185,15 @@ void olc_delete_crop(char_data *ch, crop_vnum vnum) {
 	room_data *room;
 	crop_data *crop;
 	bool found;
+	char name[256];
 	int count;
 	
 	if (!(crop = crop_proto(vnum))) {
 		msg_to_char(ch, "There is no such crop %d.\r\n", vnum);
 		return;
 	}
+	
+	snprintf(name, sizeof(name), "%s", NULLSAFE(GET_CROP_NAME(crop)));
 	
 	if (HASH_COUNT(crop_table) <= 1) {
 		msg_to_char(ch, "You can't delete the last crop.\r\n");
@@ -218,6 +227,7 @@ void olc_delete_crop(char_data *ch, crop_vnum vnum) {
 		found = delete_link_rule_by_type_value(&GET_ADV_LINKING(adv), ADV_LINK_PORTAL_CROP, vnum);
 		
 		if (found) {
+			syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: Adventure %d %s lost deleted linking rule crop", GET_ADV_VNUM(adv), GET_ADV_NAME(adv));
 			save_library_file_for_vnum(DB_BOOT_ADV, GET_ADV_VNUM(adv));
 		}
 	}
@@ -226,6 +236,7 @@ void olc_delete_crop(char_data *ch, crop_vnum vnum) {
 	HASH_ITER(hh, object_table, obj, next_obj) {
 		if (OBJ_FLAGGED(obj, OBJ_PLANTABLE) && GET_OBJ_VAL(obj, VAL_FOOD_CROP_TYPE) == vnum) {
 			set_obj_val(obj, VAL_FOOD_CROP_TYPE, NOTHING);
+			syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: Object %d %s lost deleted plantable crop", GET_OBJ_VNUM(obj), GET_OBJ_SHORT_DESC(obj));
 			save_library_file_for_vnum(DB_BOOT_OBJ, GET_OBJ_VNUM(obj));
 		}
 	}
@@ -248,8 +259,8 @@ void olc_delete_crop(char_data *ch, crop_vnum vnum) {
 		}
 	}
 	
-	syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: %s has deleted crop %d", GET_NAME(ch), vnum);
-	msg_to_char(ch, "Crop %d deleted.\r\n", vnum);
+	syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: %s has deleted crop %d %s", GET_NAME(ch), vnum, name);
+	msg_to_char(ch, "Crop %d (%s) deleted.\r\n", vnum, name);
 
 	if (count > 0) {
 		msg_to_char(ch, "%d live crops destroyed.\r\n", count);
@@ -269,7 +280,7 @@ void olc_fullsearch_crop(char_data *ch, char *argument) {
 	char buf[MAX_STRING_LENGTH * 2], line[MAX_STRING_LENGTH], type_arg[MAX_INPUT_LENGTH], val_arg[MAX_INPUT_LENGTH], find_keywords[MAX_INPUT_LENGTH];
 	bitvector_t  find_interacts = NOBITS, found_interacts;
 	bitvector_t not_flagged = NOBITS, only_flags = NOBITS, only_climate = NOBITS;
-	int count, only_mapout = NOTHING, only_x = NOTHING, only_y = NOTHING;
+	int count, only_mapout = NOTHING, only_x = NOTHING, only_y = NOTHING, vmin = NOTHING, vmax = NOTHING;
 	struct interaction_item *inter;
 	crop_data *crop, *next_crop;
 	struct icon_data *icon;
@@ -299,6 +310,8 @@ void olc_fullsearch_crop(char_data *ch, char *argument) {
 		FULLSEARCH_FLAGS("unflagged", not_flagged, crop_flags)
 		FULLSEARCH_INT("x", only_x, 0, 100)
 		FULLSEARCH_INT("y", only_y, 0, 100)
+		FULLSEARCH_INT("vmin", vmin, 0, INT_MAX)
+		FULLSEARCH_INT("vmax", vmax, 0, INT_MAX)
 		
 		else {	// not sure what to do with it? treat it like a keyword
 			sprintf(find_keywords + strlen(find_keywords), "%s%s", *find_keywords ? " " : "", type_arg);
@@ -313,6 +326,9 @@ void olc_fullsearch_crop(char_data *ch, char *argument) {
 	
 	// okay now look up crpos
 	HASH_ITER(hh, crop_table, crop, next_crop) {
+		if ((vmin != NOTHING && GET_CROP_VNUM(crop) < vmin) || (vmax != NOTHING && GET_CROP_VNUM(crop) > vmax)) {
+			continue;	// vnum range
+		}
 		if ((only_x != NOTHING || only_y != NOTHING) && CROP_FLAGGED(crop, CROPF_NOT_WILD)) {
 			continue;	// can't search x/y on not-wild crops
 		}
@@ -353,9 +369,9 @@ void olc_fullsearch_crop(char_data *ch, char *argument) {
 				continue;
 			}
 		}
-		
+
 		// string search
-		if (*find_keywords && !multi_isname(find_keywords, GET_CROP_NAME(crop)) && !multi_isname(find_keywords, GET_CROP_TITLE(crop))) {
+		if (*find_keywords && !multi_isname(find_keywords, GET_CROP_NAME(crop)) && !multi_isname(find_keywords, GET_CROP_TITLE(crop)) && !search_extra_descs(find_keywords, GET_CROP_EX_DESCS(crop))) {
 			// check icons too
 			match = FALSE;
 			LL_FOREACH(GET_CROP_ICONS(crop), icon) {
@@ -476,6 +492,7 @@ void save_olc_crop(descriptor_data *desc) {
 	if (GET_CROP_TITLE(proto)) {
 		free(GET_CROP_TITLE(proto));
 	}
+	free_extra_descs(&GET_CROP_EX_DESCS(proto));
 	while ((spawn = GET_CROP_SPAWNS(proto))) {
 		GET_CROP_SPAWNS(proto) = spawn->next;
 		free(spawn);
@@ -483,6 +500,7 @@ void save_olc_crop(descriptor_data *desc) {
 	free_interactions(&GET_CROP_INTERACTIONS(proto));
 	
 	// sanity
+	prune_extra_descs(&GET_CROP_EX_DESCS(cp));
 	if (!GET_CROP_NAME(cp) || !*GET_CROP_NAME(cp)) {
 		if (GET_CROP_NAME(cp)) {
 			free(GET_CROP_NAME(cp));
@@ -527,6 +545,9 @@ crop_data *setup_olc_crop(crop_data *input) {
 		GET_CROP_NAME(new) = GET_CROP_NAME(input) ? str_dup(GET_CROP_NAME(input)) : NULL;
 		GET_CROP_TITLE(new) = GET_CROP_TITLE(input) ? str_dup(GET_CROP_TITLE(input)) : NULL;
 		
+		// copy extra descs
+		GET_CROP_EX_DESCS(new) = copy_extra_descs(GET_CROP_EX_DESCS(input));
+		
 		// copy spawns
 		GET_CROP_SPAWNS(new) = copy_spawn_list(GET_CROP_SPAWNS(input));
 		
@@ -550,6 +571,23 @@ crop_data *setup_olc_crop(crop_data *input) {
 }
 
 
+/**
+* Counts the words of text in a crop's strings.
+*
+* @param crop_data *crop The crop whose strings to count.
+* @return int The number of words in the crop's strings.
+*/
+int wordcount_crop(crop_data *crop) {
+	int count = 0;
+	
+	count += wordcount_string(GET_CROP_NAME(crop));
+	count += wordcount_string(GET_CROP_TITLE(crop));
+	count += wordcount_extra_descriptions(GET_CROP_EX_DESCS(crop));
+	
+	return count;
+}
+
+
  //////////////////////////////////////////////////////////////////////////////
 //// DISPLAYS ////////////////////////////////////////////////////////////////
 
@@ -561,7 +599,7 @@ crop_data *setup_olc_crop(crop_data *input) {
 */
 void olc_show_crop(char_data *ch) {
 	crop_data *cp = GET_OLC_CROP(ch->desc);
-	char lbuf[MAX_STRING_LENGTH];
+	char buf[MAX_STRING_LENGTH*4], lbuf[MAX_STRING_LENGTH*4];
 	struct spawn_info *spawn;
 	int count;
 	
@@ -590,6 +628,13 @@ void olc_show_crop(char_data *ch) {
 	sprintf(buf + strlen(buf), " <%sxmin\t0> %3d%%, <%sxmax\t0> %3d%%\r\n", OLC_LABEL_VAL(GET_CROP_X_MIN(cp), 0), GET_CROP_X_MIN(cp), OLC_LABEL_VAL(GET_CROP_X_MAX(cp), 100), GET_CROP_X_MAX(cp));
 	sprintf(buf + strlen(buf), " <%symin\t0> %3d%%, <%symax\t0> %3d%%\r\n", OLC_LABEL_VAL(GET_CROP_Y_MIN(cp), 0), GET_CROP_Y_MIN(cp), OLC_LABEL_VAL(GET_CROP_Y_MAX(cp), 100), GET_CROP_Y_MAX(cp));
 
+	// exdesc
+	sprintf(buf + strlen(buf), "Extra descriptions: <%sextra\t0>\r\n", OLC_LABEL_PTR(GET_CROP_EX_DESCS(cp)));
+	if (GET_CROP_EX_DESCS(cp)) {
+		get_extra_desc_display(GET_CROP_EX_DESCS(cp), lbuf, sizeof(lbuf));
+		strcat(buf, lbuf);
+	}
+
 	sprintf(buf + strlen(buf), "Interactions: <%sinteraction\t0>\r\n", OLC_LABEL_PTR(GET_CROP_INTERACTIONS(cp)));
 	if (GET_CROP_INTERACTIONS(cp)) {
 		get_interaction_display(GET_CROP_INTERACTIONS(cp), buf1);
@@ -615,6 +660,12 @@ void olc_show_crop(char_data *ch) {
 OLC_MODULE(cropedit_climate) {
 	crop_data *cp = GET_OLC_CROP(ch->desc);
 	GET_CROP_CLIMATE(cp) = olc_process_flag(ch, argument, "climate", "climate", climate_flags, GET_CROP_CLIMATE(cp));
+}
+
+
+OLC_MODULE(cropedit_extra_desc) {
+	crop_data *cp = GET_OLC_CROP(ch->desc);
+	olc_process_extra_desc(ch, argument, &GET_CROP_EX_DESCS(cp));
 }
 
 

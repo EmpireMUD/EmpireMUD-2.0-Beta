@@ -160,6 +160,22 @@ void smart_copy_shop_items(struct shop_item **to_list, struct shop_item *from_li
 }
 
 
+/**
+* Counts the words of text in a shop's strings.
+*
+* @param shop_data *shop The shop whose strings to count.
+* @return int The number of words in the shop's strings.
+*/
+int wordcount_shop(shop_data *shop) {
+	int count = 0;
+	
+	// not player-facing
+	// count += wordcount_string(SHOP_NAME(shop));
+	
+	return count;
+}
+
+
  //////////////////////////////////////////////////////////////////////////////
 //// LOOKUP HANDLERS /////////////////////////////////////////////////////////
 
@@ -923,11 +939,14 @@ shop_data *create_shop_table_entry(any_vnum vnum) {
 */
 void olc_delete_shop(char_data *ch, any_vnum vnum) {
 	shop_data *shop;
+	char name[256];
 	
 	if (!(shop = real_shop(vnum))) {
 		msg_to_char(ch, "There is no such shop %d.\r\n", vnum);
 		return;
 	}
+	
+	snprintf(name, sizeof(name), "%s", NULLSAFE(SHOP_NAME(shop)));
 	
 	// removing live instances goes here
 	
@@ -943,8 +962,8 @@ void olc_delete_shop(char_data *ch, any_vnum vnum) {
 	
 	// removing from prototypes goes here
 	
-	syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: %s has deleted shop %d", GET_NAME(ch), vnum);
-	msg_to_char(ch, "Shop %d deleted.\r\n", vnum);
+	syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: %s has deleted shop %d %s", GET_NAME(ch), vnum, name);
+	msg_to_char(ch, "Shop %d (%s) deleted.\r\n", vnum, name);
 	
 	free_shop(shop);
 }
@@ -1046,14 +1065,19 @@ void get_shop_items_display(shop_data *shop, char *save_buffer) {
 	
 	*save_buffer = '\0';
 	LL_FOREACH(SHOP_ITEMS(shop), item) {
-		if (SHOP_ALLEGIANCE(shop)) {
+		if (SHOP_ALLEGIANCE(shop) && item->min_rep != REP_NONE) {
 			snprintf(buf, sizeof(buf), " (%s)", reputation_levels[rep_const_to_index(item->min_rep)].name);
 		}
 		else {
 			*buf = '\0';
 		}
 		
-		sprintf(save_buffer + strlen(save_buffer), "%2d. [%5d] %s for %d %s%s\r\n", ++count, item->vnum, get_obj_name_by_proto(item->vnum), item->cost, (item->currency == NOTHING ? "coins" : get_generic_string_by_vnum(item->currency, GENERIC_CURRENCY, WHICH_CURRENCY(item->cost))), buf);
+		if (item->currency == NOTHING) {
+			sprintf(save_buffer + strlen(save_buffer), "%2d. [%5d] %s for %d coin%s%s\r\n", ++count, item->vnum, get_obj_name_by_proto(item->vnum), item->cost, PLURAL(item->cost), buf);
+		}
+		else {
+			sprintf(save_buffer + strlen(save_buffer), "%2d. [%5d] %s for %d [%d] %s%s\r\n", ++count, item->vnum, get_obj_name_by_proto(item->vnum), item->cost, item->currency, get_generic_string_by_vnum(item->currency, GENERIC_CURRENCY, WHICH_CURRENCY(item->cost)), buf);
+		}
 	}
 	
 	// empty list not shown
@@ -1489,7 +1513,7 @@ OLC_MODULE(shopedit_items) {
 	}	// end 'move'
 	else {
 		msg_to_char(ch, "Usage: item add <vnum> <cost> <currency vnum | coins> [min reputation]\r\n");
-		msg_to_char(ch, "Usage: item change <number> vnum <value>\r\n");
+		msg_to_char(ch, "Usage: item change <number> <vnum | cost | currency | reputation> <value>\r\n");
 		msg_to_char(ch, "Usage: item move <number> <up | down>\r\n");
 		msg_to_char(ch, "Usage: item copy <from type> <from vnum>\r\n");
 		msg_to_char(ch, "Usage: item remove <number | all>\r\n");

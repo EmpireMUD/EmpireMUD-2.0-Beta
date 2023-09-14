@@ -4,13 +4,13 @@ a reindeer~
 A flying reindeer prances above the ground.
 ~
 30 70 dej m 4
-0 0 2 27
+0 0 2 27 -1
 D
 This stunning slate-gray reindeer is hovering a few feet above the ground!
 ~
-I 0 3012 100.00 2  # BUTCHER: a fillet of raw meat
-I 0 9175 100.00 2  # BUTCHER: a reindeer's antlers
-I 1 1351 100.00 1  # SKIN: a large skin
+I 0 3012 100.00 2  # BUTCHER: fillet of raw meat
+I 0 9175 100.00 2  # BUTCHER: reindeer's antlers
+I 1 1351 100.00 1  # SKIN: large skin
 T 10715
 S
 #10701
@@ -19,7 +19,7 @@ the carolers~
 A group of carolers is singing loudly.
 ~
 0 0 bd cn 4
-0 0 0 15
+0 0 0 15 -1
 D
 The carolers are dressed in their finest winter coats.
 ~
@@ -31,7 +31,7 @@ the half-buried elf~
 A half-buried elf is playing in the snow.
 ~
 0 0 bd cn 2
-0 0 0 20
+0 0 0 20 -1
 D
    This tiny elf is so cold that its skin has turned blue. But that doesn't
 seem to have interrupted its fun.
@@ -58,7 +58,7 @@ Father Christmas~
 Father Christmas sits on a great candy-striped throne.
 ~
 0 0 bd nD 3
-1 0 0 15
+1 0 0 15 -1
 D
    Father Christmas is a merry old gentleman, dressed in warm red furs lined
 with white. When he laughs his hearty laugh, his belly shakes like a bowl full
@@ -139,12 +139,12 @@ a plump goose~
 A goose is playing in the snow.
 ~
 1 3 dj 0 2
-2 0 0 9
+2 0 0 9 -1
 D
 This fat white goose is frolicking in the snow.
 ~
-I 0 3200 100.00 2  # BUTCHER: a cut of poultry
-I 0 9025 100.00 1  # BUTCHER: some bird feathers
+I 0 3200 100.00 2  # BUTCHER: cut of poultry
+I 0 9025 100.00 1  # BUTCHER: bird feathers
 M
 0
 $n honks.~
@@ -161,15 +161,31 @@ a reindeer~
 A reindeer raises its head from grazing.
 ~
 30 70 dej 0 4
-0 0 14 27
+0 0 14 27 -1
 D
 The reindeer is a beautiful slate-gray color, with long, strong antlers.
 ~
-I 0 3012 100.00 2  # BUTCHER: a fillet of raw meat
-I 0 9175 100.00 2  # BUTCHER: a reindeer's antlers
-I 1 1351 100.00 1  # SKIN: a large skin
-I 3 9176 100.00 1  # BARDE: a barded reindeer
+I 0 3012 100.00 2  # BUTCHER: fillet of raw meat
+I 0 9175 100.00 2  # BUTCHER: reindeer's antlers
+I 1 1351 100.00 1  # SKIN: large skin
+I 3 9176 100.00 1  # BARDE: barded reindeer
 T 10715
+S
+#10706
+present little~
+a little present~
+A little present is hopping around.
+~
+1 1 bdoD n 2
+0 0 15 11 -1
+D
+   The quaint little present is wrapped in paper with a bow tied on top. It
+seems to be hopping around on its own.
+~
+M
+0
+Holiday music plays in the background.~
+T 10706
 S
 #10709
 elf cheerful~
@@ -177,7 +193,7 @@ a cheerful elf~
 A cheerful elf is dancing about.
 ~
 1 1 bdoD n 2
-1 0 0 15
+1 0 0 15 -1
 D
    This tiny elf is dressed all in green, and dances around to the music in his
 head.
@@ -206,7 +222,7 @@ elf #n~
 A little elf is running around on the ground!
 ~
 1 10 do 0 2
-0 0 11 16
+0 0 11 16 -1
 D
    This little elf appears to have escaped from a workshop somewhere. Based on
 the fur-lined clothing, you have to assume it's somewhere cold!
@@ -252,7 +268,7 @@ a reindeer-wrangling elf~
 A hidden reindeer-wrangling elf is here.
 ~
 0 0 bd klJ 3
-0 0 0 15
+0 0 0 15 -1
 D
    This little guy just makes sure the reindeer appears when it should. It will
 stay here until a player arrives who hasn't spawned a reindeer today.
@@ -265,7 +281,7 @@ a little pine sapling~
 An little pine sapling laden with decorations shuffles past.
 ~
 1 1 bdoD n 2
-0 0 31 23
+0 0 31 23 -1
 D
 This little tree has been all dressed up for Yule.
 ~
@@ -291,7 +307,7 @@ a reindeer fawn~
 A reindeer fawn gazes curiously around.
 ~
 1 1 bdoD n 2
-0 0 14 11
+0 0 14 11 -1
 D
 This tiny reindeer is all black, and hasn't grown its first antlers yet.
 ~
@@ -314,7 +330,7 @@ a small animated snowman~
 A small snowman turns and looks at you with its button eyes.
 ~
 1 1 bdoD n 3
-0 0 21 15
+0 0 21 15 -1
 D
    This adorable snowman seems to leave a trail of water behind it as it
 shuffles around.
@@ -344,7 +360,7 @@ a toy soldier~
 A toy soldier salutes you smartly.
 ~
 1 1 bdoD n 1
-0 0 35 1
+0 0 35 1 -1
 D
 This little soldier is complete with wooden armor and a little wooden hat.
 ~
@@ -360,8 +376,8 @@ snowman large~
 a large snowman~
 A large snowman stands nearby.
 ~
-1 1 dhoD nrG 3
-0 0 9 15
+1 1 dhoDK nrG 3
+0 0 9 15 -1
 D
    The snowman looks smart with his corn cob pipe, his button nose, and two
 eyes made out of coal.
@@ -373,7 +389,11 @@ the cat~
 A musical cat stands on his hind legs, looking for his fiddle.
 ~
 0 25 d n 1
-1 0 0 15
+1 0 0 15 -1
+D
+   This little orange tabby dances about, humming to himself as he looks for
+his fiddle.
+~
 T 10748
 T 10730
 T 10731
@@ -384,7 +404,10 @@ Jack~
 Jack is looking for a pail to fetch some water.
 ~
 0 25 d n 3
-1 0 0 15
+1 0 0 15 -1
+D
+Jack is a messy little boy with tousled brown hair.
+~
 T 10748
 T 10732
 T 10731
@@ -395,7 +418,10 @@ Jill~
 Jill seems to be looking for something.
 ~
 0 25 d n 3
-2 0 0 15
+2 0 0 15 -1
+D
+Jill is a strong little girl with a dainty dress all covered in grass stains.
+~
 T 10736
 T 10731
 T 10733
@@ -406,7 +432,10 @@ Jack B. Nimble~
 Jack B. Nimble is looking for something to leap over.
 ~
 0 25 d n 3
-1 0 0 15
+1 0 0 15 -1
+D
+Jack is doing some stretches and preparing to do some jumps.
+~
 T 10748
 T 10734
 T 10731
@@ -417,7 +446,10 @@ Jack Sprat~
 Jack Sprat holds his belly as it rumbles for food.
 ~
 0 25 d n 3
-1 0 0 15
+1 0 0 15 -1
+D
+Jack looks awfully lean.
+~
 T 10748
 T 10737
 T 10731
@@ -428,7 +460,10 @@ Jack Horner~
 Jack Horner is sitting in the corner.
 ~
 0 25 d n 3
-1 0 0 15
+1 0 0 15 -1
+D
+Jack is looking a little plump, but nobody says 'no' to pie.
+~
 T 10748
 T 10739
 T 10731
@@ -439,7 +474,10 @@ little Miss Muffet~
 Little Miss Muffet is sitting here, hungry.
 ~
 0 25 d n 3
-2 0 0 15
+2 0 0 15 -1
+D
+Miss Muffet is a prim and proper little girl who is ready for a tea party.
+~
 T 10748
 T 10741
 T 10731
@@ -450,7 +488,10 @@ Mary~
 Mary is looking frantically for her lamb.
 ~
 0 25 d n 3
-2 0 0 15
+2 0 0 15 -1
+D
+Mary seems really worried about the lamb.
+~
 T 10748
 T 10743
 T 10731
@@ -461,7 +502,10 @@ a little lamb~
 A little lamb is prancing about.
 ~
 1 1 bdoD n 2
-0 0 14 9
+0 0 14 9 -1
+D
+This fluffy little white lamb is just munching on some grass.
+~
 T 9901
 T 9902
 S
@@ -471,7 +515,11 @@ the old woman~
 An old woman sits in a rocking chair by the giant shoe.
 ~
 0 25 bd n 3
-2 0 0 15
+2 0 0 15 -1
+D
+   Though she's seen better days, the old woman is quite proud of her house,
+cobbled together such as it is.
+~
 T 10748
 T 10746
 T 10731
@@ -482,15 +530,20 @@ a hairy giant spider~
 A giant, hairy spider stares at you from the mine wall.
 ~
 0 25 bcdgj cG 2
-0 0 8 9
+0 0 8 9 -1
+D
+   It's not that the spider is large in the objective sense, as it's not much
+bigger than a great dane. The problem is that it's large in the subjective
+sense, in that it's a lot bigger than a spider should be.
+~
 I 0 10751 100.00 1  # BUTCHER: spider meat
 I 4 10750 90.00 1  # LOOT: spider parts
-I 4 10753 8.33 1 a  # LOOT: a spider egg
+I 4 10753 8.33 1 a  # LOOT: spider egg
 I 4 10755 8.33 1 a  # LOOT: crusty goblin bread
-I 4 10756 8.33 1 a  # LOOT: a rusty goblin ring
-I 4 10757 8.33 1 a  # LOOT: a rusty goblin idol
-I 4 10758 8.33 1 a  # LOOT: a rusty goblin helmet
-I 4 10759 8.33 1 a  # LOOT: a rusty flask
+I 4 10756 8.33 1 a  # LOOT: rusty goblin ring
+I 4 10757 8.33 1 a  # LOOT: rusty goblin idol
+I 4 10758 8.33 1 a  # LOOT: rusty goblin helmet
+I 4 10759 8.33 1 a  # LOOT: rusty flask
 S
 #10751
 spider hunter~
@@ -498,15 +551,20 @@ a hunter spider~
 A hunter spider stalks you on long legs.
 ~
 0 25 bcdgj cG 2
-0 0 8 9
+0 0 8 9 -1
+D
+   The spider's body is slightly larger than a loaf of bread -- which, in
+itself, is deeply concerning. But the bread knives it calls fangs are the real
+terror here.
+~
 I 0 10751 100.00 1  # BUTCHER: spider meat
 I 4 10750 90.00 1  # LOOT: spider parts
-I 4 10753 8.33 1 a  # LOOT: a spider egg
+I 4 10753 8.33 1 a  # LOOT: spider egg
 I 4 10755 8.33 1 a  # LOOT: crusty goblin bread
-I 4 10756 8.33 1 a  # LOOT: a rusty goblin ring
-I 4 10757 8.33 1 a  # LOOT: a rusty goblin idol
-I 4 10758 8.33 1 a  # LOOT: a rusty goblin helmet
-I 4 10759 8.33 1 a  # LOOT: a rusty flask
+I 4 10756 8.33 1 a  # LOOT: rusty goblin ring
+I 4 10757 8.33 1 a  # LOOT: rusty goblin idol
+I 4 10758 8.33 1 a  # LOOT: rusty goblin helmet
+I 4 10759 8.33 1 a  # LOOT: rusty flask
 S
 #10752
 spider widow massive~
@@ -514,18 +572,22 @@ a massive widow spider~
 A massive widow spider eyes you from her nest.
 ~
 0 25 bcdgj ceG 3
-2 0 8 9
+2 0 8 9 -1
+D
+   She's been through more than a few husbands, and from the look in all eight
+of her eyes, you're going to need a priest.
+~
 I 0 10751 100.00 1  # BUTCHER: spider meat
 I 4 10750 90.00 1  # LOOT: spider parts
-I 4 10767 100.00 1  # LOOT: some goblin coins
-I 4 10753 12.50 1 a  # LOOT: a spider egg
-I 4 10760 12.50 1 a  # LOOT: a spidersilk gown
-I 4 10761 12.50 1 a  # LOOT: a spidersilk pouch
-I 4 10762 12.50 1 a  # LOOT: a spidersilk whip
-I 4 10763 12.50 1 a  # LOOT: a spidersilk lantern
-I 4 10764 12.50 1 a  # LOOT: a lit spidersilk lantern
+I 4 10767 100.00 1  # LOOT: goblin coins
+I 4 10753 12.50 1 a  # LOOT: spider egg
+I 4 10760 12.50 1 a  # LOOT: spidersilk gown
+I 4 10761 12.50 1 a  # LOOT: spidersilk pouch
+I 4 10762 12.50 1 a  # LOOT: spidersilk whip
+I 4 10763 12.50 1 a  # LOOT: spidersilk lantern
+I 4 10764 12.50 1 a  # LOOT: lit spidersilk lantern
 I 4 10765 12.50 1 a  # LOOT: spidersilk slippers
-I 4 10766 12.50 1 a  # LOOT: a spidersilk mask
+I 4 10766 12.50 1 a  # LOOT: spidersilk mask
 T 10757
 T 10760
 T 10761
@@ -536,7 +598,10 @@ a spiderling~
 A spiderling crawls over you.
 ~
 1 1 bdoD n 1
-0 0 8 9
+0 0 8 9 -1
+D
+It has no business being as adorable as it is.
+~
 M
 0
 $n skitters around playfully.~
@@ -555,7 +620,12 @@ Miner Nynar~
 Nynar the goblin stands here, looking into his boot ('buy potion').
 ~
 25 25 d cn 2
-1 0 0 15
+1 0 0 15 -1
+D
+   Nynar is frantically checking his boots, gloves, cuffs, and hat for any
+spiders that might have hitched a ride. You can 'list' and 'buy' here. The bug
+potion gives you a little dexterity for a little while.
+~
 M
 1
 So much webs... So much webs...~
@@ -579,7 +649,12 @@ Miner Meena~
 Meena the goblin is sitting here, filing her pick ('buy pick').
 ~
 25 25 d cn 2
-2 0 0 15
+2 0 0 15 -1
+D
+   Meena seems a little nervous, but she keeps sharpening her pick as if she
+has a holy purpose here. You can 'list' and 'buy' here to get a pick of your
+own.
+~
 M
 1
 All of the screaming!~
@@ -603,13 +678,16 @@ the webbed goblin~
 A goblin-shaped cocoon dangles from the ceiling.
 ~
 0 1 bdn 0 2
-0 0 0 15
-I 4 10767 4.17 1 a  # LOOT: some goblin coins
+0 0 0 15 -1
+D
+There's not much you can do for him now.
+~
+I 4 10767 4.17 1 a  # LOOT: goblin coins
 I 4 10755 4.17 1 a  # LOOT: crusty goblin bread
-I 4 10756 4.17 1 a  # LOOT: a rusty goblin ring
-I 4 10757 4.17 1 a  # LOOT: a rusty goblin idol
-I 4 10758 4.17 1 a  # LOOT: a rusty goblin helmet
-I 4 10759 4.17 1 a  # LOOT: a rusty flask
+I 4 10756 4.17 1 a  # LOOT: rusty goblin ring
+I 4 10757 4.17 1 a  # LOOT: rusty goblin idol
+I 4 10758 4.17 1 a  # LOOT: rusty goblin helmet
+I 4 10759 4.17 1 a  # LOOT: rusty flask
 S
 #10757
 Blacklung, goblin foreman~
@@ -617,7 +695,13 @@ Blacklung, Goblin Foreman~
 The goblin foreman is looking around nervously ('buy coffin').
 ~
 25 25 d cn 2
-1 0 0 15
+1 0 0 15 -1
+D
+   Blacklung looks like he's been mining his entire tiny life, and though he's
+wary of spiders, he doesn't seem as scared as the others. You can 'list' and
+'buy' here to get a goblin coffin, which can be used as a short-term tomb to
+respawn from when you die.
+~
 M
 1
 Coffin for sale! 50 coin! (type 'buy coffin')~
@@ -641,7 +725,12 @@ Miner Hanx~
 Miner Hanx runs past you ('buy raft').
 ~
 25 25 d cn 2
-1 0 0 15
+1 0 0 15 -1
+D
+   Hanx never meant to end up on this island, and he only took the mining job
+to pay for a way off. You can 'list' and 'buy' here to get a raft, which will
+get you off this spider-infested island.
+~
 M
 1
 Goblin selling spare raft, 50 coin! (type 'buy raft')~
@@ -662,11 +751,16 @@ a great buffalo~
 A great buffalo grazes below the green boughs.
 ~
 100 125 dejo 0 4
-0 0 0 27
-I 0 3012 100.00 3  # BUTCHER: a fillet of raw meat
-I 1 1351 100.00 4  # SKIN: a large skin
-I 3 10777 100.00 1  # BARDE: an armored war buffalo
-I 4 10781 100.00 1  # LOOT: a buffalo leash
+0 0 0 27 -1
+D
+   This majestic animal stands head and shoulders above you. Its shaggy
+shoulders look like a mountain from down here, and its short horns are plenty
+long enough to gore you.
+~
+I 0 3012 100.00 3  # BUTCHER: fillet of raw meat
+I 1 1351 100.00 4  # SKIN: large skin
+I 3 10777 100.00 1  # BARDE: armored war buffalo
+I 4 10781 100.00 1  # LOOT: buffalo leash
 S
 #10777
 buffalo war armored~
@@ -674,10 +768,16 @@ an armored war buffalo~
 An armored war buffalo is grazing under heavy armor.
 ~
 200 225 bdejo 0 4
-0 0 0 27
-I 0 3012 100.00 3  # BUTCHER: a fillet of raw meat
-I 1 1351 100.00 4  # SKIN: a large skin
-I 4 10781 100.00 1  # LOOT: a buffalo leash
+0 0 0 27 -1
+D
+   This majestic armored animal stands head and shoulders above you. Its shaggy
+shoulders look like a mountain from down here, and its short horns are plenty
+long enough to gore you. Fine plate armor has been fitted to the buffalo to
+ensure that when it rides into battle, nothing can stop it.
+~
+I 0 3012 100.00 3  # BUTCHER: fillet of raw meat
+I 1 1351 100.00 4  # SKIN: large skin
+I 4 10781 100.00 1  # LOOT: buffalo leash
 S
 #10778
 zebra great~
@@ -685,11 +785,15 @@ a great zebra~
 A great zebra stands in the shadows, hidden.
 ~
 100 125 dejo 0 4
-0 0 0 27
-I 0 3012 100.00 2  # BUTCHER: a fillet of raw meat
-I 1 1351 100.00 2  # SKIN: a large skin
-I 3 10779 100.00 1  # BARDE: an armored war zebra
-I 4 10782 100.00 1  # LOOT: a zebra leash
+0 0 0 27 -1
+D
+   This stunning beast is emblazoned with white stripes on a black background.
+It holds its head high as it watches you, always ready to move.
+~
+I 0 3012 100.00 2  # BUTCHER: fillet of raw meat
+I 1 1351 100.00 2  # SKIN: large skin
+I 3 10779 100.00 1  # BARDE: armored war zebra
+I 4 10782 100.00 1  # LOOT: zebra leash
 S
 #10779
 zebra war armored~
@@ -697,10 +801,15 @@ an armored war zebra~
 An armored war zebra stands valliantly before you.
 ~
 200 225 bdejo 0 4
-0 0 0 27
-I 0 3012 100.00 2  # BUTCHER: a fillet of raw meat
-I 1 1351 100.00 2  # SKIN: a large skin
-I 4 10782 100.00 1  # LOOT: a zebra leash
+0 0 0 27 -1
+D
+   This stunning beast is emblazoned with white stripes on a black background.
+It holds its head high as it watches you, always ready to move. Its gleaming
+armor makes it a formidable steed in battle.
+~
+I 0 3012 100.00 2  # BUTCHER: fillet of raw meat
+I 1 1351 100.00 2  # SKIN: large skin
+I 4 10782 100.00 1  # LOOT: zebra leash
 S
 #10781
 buffalo calf~
@@ -708,7 +817,12 @@ a buffalo calf~
 A buffalo calf prances around you.
 ~
 1 1 bdoD n 2
-0 0 0 9
+0 0 0 9 -1
+D
+   This little brown calf looks like the shaggy cousin of a young cow. It
+barely shows the shoulder hump it will grow as an adult but it looks absolutely
+adorable.
+~
 M
 0
 $n prances around you.~
@@ -733,7 +847,10 @@ a zebra foal~
 A zebra foal prances around you.
 ~
 1 1 bdoD n 2
-0 0 0 9
+0 0 0 9 -1
+D
+This adorable little foal is striped in white and black.
+~
 M
 0
 $n prances around you.~

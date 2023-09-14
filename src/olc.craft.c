@@ -133,10 +133,12 @@ bool audit_craft(craft_data *craft, char_data *ch) {
 			olc_audit_msg(ch, GET_CRAFT_VNUM(craft), "Vehicle craft with quantity > 1");
 			problem = TRUE;
 		}
+		/* probably don't need this:
 		if (GET_CRAFT_TIME(craft) > 1) {
 			olc_audit_msg(ch, GET_CRAFT_VNUM(craft), "Vehicle craft with time set");
 			problem = TRUE;
 		}
+		*/
 	}
 	else if (CRAFT_FLAGGED(craft, CRAFT_SOUP) && !find_generic(GET_CRAFT_OBJECT(craft), GENERIC_LIQUID)) {	// soups only
 		olc_audit_msg(ch, GET_CRAFT_VNUM(craft), "Invalid liquid type on soup recipe");
@@ -242,18 +244,20 @@ char *list_one_craft(craft_data *craft, bool detail) {
 * @param craft_vnum vnum The vnum to delete.
 */
 void olc_delete_craft(char_data *ch, craft_vnum vnum) {
-	struct progress_perk *perk, *next_perk;
 	progress_data *prg, *next_prg;
 	empire_data *emp, *next_emp;
 	obj_data *obj, *next_obj;
 	descriptor_data *desc;
 	craft_data *craft;
 	char_data *iter;
+	char name[256];
 	
 	if (!(craft = craft_proto(vnum))) {
 		msg_to_char(ch, "There is no such craft %d.\r\n", vnum);
 		return;
 	}
+	
+	snprintf(name, sizeof(name), "%s", NULLSAFE(GET_CRAFT_NAME(craft)));
 	
 	if (HASH_COUNT(craft_table) <= 1) {
 		msg_to_char(ch, "You can't delete the last craft.\r\n");
@@ -261,11 +265,7 @@ void olc_delete_craft(char_data *ch, craft_vnum vnum) {
 	}
 	
 	// find players who are crafting it and stop them (BEFORE removing from table)
-	DL_FOREACH(character_list, iter) {
-		if (IS_NPC(iter)) {
-			continue;
-		}
-		
+	DL_FOREACH2(player_character_list, iter, next_plr) {
 		// currently crafting
 		if (GET_ACTION(iter) == ACT_GEN_CRAFT && GET_ACTION_VNUM(iter, 0) == GET_CRAFT_VNUM(craft)) {
 			msg_to_char(iter, "The craft you were making has been deleted.\r\n");
@@ -292,18 +292,16 @@ void olc_delete_craft(char_data *ch, craft_vnum vnum) {
 	HASH_ITER(hh, object_table, obj, next_obj) {
 		if (IS_RECIPE(obj) && GET_RECIPE_VNUM(obj) == vnum) {
 			set_obj_val(obj, VAL_RECIPE_VNUM, 0);
+			syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: Object %d %s lost deleted learnable craft", GET_OBJ_VNUM(obj), GET_OBJ_SHORT_DESC(obj));
 			save_library_file_for_vnum(DB_BOOT_OBJ, GET_OBJ_VNUM(obj));
 		}
 	}
 	
 	// update progression
 	HASH_ITER(hh, progress_table, prg, next_prg) {
-		LL_FOREACH_SAFE(PRG_PERKS(prg), perk, next_perk) {
-			if (perk->type == PRG_PERK_CRAFT && perk->value == vnum) {
-				LL_DELETE(PRG_PERKS(prg), perk);
-				free(perk);
-				save_library_file_for_vnum(DB_BOOT_PRG, PRG_VNUM(prg));
-			}
+		if (delete_progress_perk_from_list(&PRG_PERKS(prg), PRG_PERK_CRAFT, vnum)) {
+			syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: Progress %d %s lost deleted craft perk", PRG_VNUM(prg), PRG_NAME(prg));
+			save_library_file_for_vnum(DB_BOOT_PRG, PRG_VNUM(prg));
 		}
 	}
 	
@@ -316,18 +314,15 @@ void olc_delete_craft(char_data *ch, craft_vnum vnum) {
 			}
 		}
 		else if (GET_OLC_PROGRESS(desc)) {
-			LL_FOREACH_SAFE(PRG_PERKS(GET_OLC_PROGRESS(desc)), perk, next_perk) {
-				if (perk->type == PRG_PERK_CRAFT && perk->value == vnum) {
-					LL_DELETE(PRG_PERKS(GET_OLC_PROGRESS(desc)), perk);
-					free(perk);
-					save_library_file_for_vnum(DB_BOOT_PRG, PRG_VNUM(GET_OLC_PROGRESS(desc)));
-				}
+			if (delete_progress_perk_from_list(&PRG_PERKS(GET_OLC_PROGRESS(desc)), PRG_PERK_CRAFT, vnum)) {
+				save_library_file_for_vnum(DB_BOOT_PRG, PRG_VNUM(GET_OLC_PROGRESS(desc)));
+				msg_to_char(desc->character, "A craft used by the progress goal you're editing was deleted.\r\n");
 			}
 		}
 	}
 	
-	syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: %s has deleted craft recipe %d", GET_NAME(ch), vnum);
-	msg_to_char(ch, "Craft recipe %d deleted.\r\n", vnum);
+	syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: %s has deleted craft recipe %d %s", GET_NAME(ch), vnum, name);
+	msg_to_char(ch, "Craft recipe %d (%s) deleted.\r\n", vnum, name);
 	
 	free_craft(craft);
 }
@@ -347,7 +342,7 @@ void olc_fullsearch_craft(char_data *ch, char *argument) {
 	bitvector_t only_buildon = NOBITS, only_buildfacing = NOBITS;
 	int only_type = NOTHING, only_level = NOTHING, only_quantity = NOTHING, only_time = NOTHING;
 	int quantity_over = NOTHING, level_over = NOTHING, time_over = NOTHING;
-	int quantity_under = NOTHING, level_under = NOTHING, time_under = NOTHING;
+	int quantity_under = NOTHING, level_under = NOTHING, time_under = NOTHING, vmin = NOTHING, vmax = NOTHING;
 	bool requires_obj = FALSE;
 	
 	craft_data *craft, *next_craft;
@@ -378,7 +373,7 @@ void olc_fullsearch_craft(char_data *ch, char *argument) {
 		FULLSEARCH_INT("quantitysover", quantity_over, 0, INT_MAX)
 		FULLSEARCH_INT("quantityunder", quantity_under, 0, INT_MAX)
 		FULLSEARCH_INT("level", only_level, 0, INT_MAX)
-		FULLSEARCH_INT("levelsover", level_over, 0, INT_MAX)
+		FULLSEARCH_INT("levelover", level_over, 0, INT_MAX)
 		FULLSEARCH_INT("levelunder", level_under, 0, INT_MAX)
 		FULLSEARCH_FLAGS("requiresfunction", only_functions, function_flags)
 		FULLSEARCH_BOOL("requiresobject", requires_obj)
@@ -386,6 +381,8 @@ void olc_fullsearch_craft(char_data *ch, char *argument) {
 		FULLSEARCH_INT("timesover", time_over, 0, INT_MAX)
 		FULLSEARCH_INT("timeunder", time_under, 0, INT_MAX)
 		FULLSEARCH_FLAGS("tools", only_tools, tool_flags)
+		FULLSEARCH_INT("vmin", vmin, 0, INT_MAX)
+		FULLSEARCH_INT("vmax", vmax, 0, INT_MAX)
 		
 		else {	// not sure what to do with it? treat it like a keyword
 			sprintf(find_keywords + strlen(find_keywords), "%s%s", *find_keywords ? " " : "", type_arg);
@@ -400,6 +397,9 @@ void olc_fullsearch_craft(char_data *ch, char *argument) {
 	
 	// okay now look up crafts
 	HASH_ITER(hh, craft_table, craft, next_craft) {
+		if ((vmin != NOTHING && GET_CRAFT_VNUM(craft) < vmin) || (vmax != NOTHING && GET_CRAFT_VNUM(craft) > vmax)) {
+			continue;	// vnum range
+		}
 		if (requires_obj && GET_CRAFT_REQUIRES_OBJ(craft) == NOTHING) {
 			continue;
 		}
@@ -490,7 +490,6 @@ void olc_fullsearch_craft(char_data *ch, char *argument) {
 void olc_search_craft(char_data *ch, craft_vnum vnum) {
 	char buf[MAX_STRING_LENGTH];
 	craft_data *craft = craft_proto(vnum);
-	struct progress_perk *perk, *next_perk;
 	progress_data *prg, *next_prg;
 	obj_data *obj, *next_obj;
 	int size, found;
@@ -513,12 +512,9 @@ void olc_search_craft(char_data *ch, craft_vnum vnum) {
 	
 	// progression
 	HASH_ITER(hh, progress_table, prg, next_prg) {
-		LL_FOREACH_SAFE(PRG_PERKS(prg), perk, next_perk) {
-			if (perk->type == PRG_PERK_CRAFT && perk->value == vnum) {
-				++found;
-				size += snprintf(buf + size, sizeof(buf) - size, "PRG [%5d] %s\r\n", PRG_VNUM(prg), PRG_NAME(prg));
-				break;
-			}
+		if (find_progress_perk_in_list(PRG_PERKS(prg), PRG_PERK_CRAFT, vnum)) {
+			++found;
+			size += snprintf(buf + size, sizeof(buf) - size, "PRG [%5d] %s\r\n", PRG_VNUM(prg), PRG_NAME(prg));
 		}
 	}
 	
@@ -638,6 +634,22 @@ craft_data *setup_olc_craft(craft_data *input) {
 	// done
 	return new;	
 }
+
+
+/**
+* Counts the words of text in a craft's strings.
+*
+* @param craft_data *craft The craft whose strings to count.
+* @return int The number of words in the craft's strings.
+*/
+int wordcount_craft(craft_data *craft) {
+	int count = 0;
+	
+	count += wordcount_string(GET_CRAFT_NAME(craft));
+	
+	return count;
+}
+
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -816,7 +828,7 @@ OLC_MODULE(cedit_builds) {
 		msg_to_char(ch, "You can't set it to build a ROOM type building. Old value restored.\r\n");
 	}	
 	else {
-		msg_to_char(ch, "It now builds a %s.\r\n", GET_BLD_NAME(building_proto(GET_CRAFT_BUILD_TYPE(craft))));
+		msg_to_char(ch, "It now builds %s %s.\r\n", AN(GET_BLD_NAME(building_proto(GET_CRAFT_BUILD_TYPE(craft)))), GET_BLD_NAME(building_proto(GET_CRAFT_BUILD_TYPE(craft))));
 	}
 }
 

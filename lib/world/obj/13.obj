@@ -176,10 +176,9 @@ S
 statuette old restored~
 a restored old statuette~
 An old statuette is lying here, restored by a craftsman.~
-   This recently repaired statuette's enchantment will increase your charisma
-when you hold it, helping you to catch fish faster!
+The odd little statuette seems to make people like you more.
 ~
-3 jmo ao 0 4
+3 jmo ao 0 5
 0 0 0
 1 0
 A
@@ -392,11 +391,17 @@ a large piece of leather~
 A pile of large pieces of leather is sitting here.~
 Leather can be sewn into armor.
 ~
-3 l a 0 4
+3 l a 0 5
 0 0 0
 7 0
 C
 1 1
+M
+6
+You stretch $p onto $V.~
+M
+7
+$n stretches $p onto $V.~
 O+ 1 6530
 R
 4 5120 0

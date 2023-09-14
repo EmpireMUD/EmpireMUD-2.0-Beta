@@ -86,6 +86,7 @@ help files for more info):
 &c%send%&0 - Send a message to one person.
 &c%siege%&0 - Deals siege damage to a vehicle or room.
 &c%slay%&0 - Instantly kills the target.
+&c%subecho%&0 - Sends a message to everyone in a given subzone.
 &c%teleport%&0 - Moves people to another location.
 &c%terracrop%&0 - Changes the terrain to a certain crop type.
 &c%terraform%&0 - Changes the terrain to a certain sector type.
@@ -108,6 +109,9 @@ that should happen after someone enters, consider adding a 'wait 1'; however,
 a wait will keep the script running and prevent it from running for a second
 person until the first one finishes.
 
+Only the FIRST enter trigger on a room will run unless it also has the
+Allow-Multiple type.
+
 Note: Enter triggers can only prevent people from entering the room if they
 enter normally (usually through an exit from another room). People who appear
 magically can't usually be prevented.
@@ -115,7 +119,12 @@ magically can't usually be prevented.
 Variables:
   &c%actor%&0 - The character entering the room.
   &c%direction%&0 - The direction the character came from, if any.
+  &c%method%&0 - Type of movement (see METHOD LIST).
   &c%room%&0 - The room being entered.
+
+You can add the "Player-in-Room" modifier.
+
+See also: PLAYER-IN-ROOM TRIGGER, ALLOW-MULTIPLE
 #d
 "RTRIG TYPES" TRIGEDIT-ROOM-TYPES "ROOM TRIGGER TYPES" "WORLD TRIGGER TYPES"
 
@@ -165,6 +174,8 @@ When using field - The variable returns:
 &ccrop_flagged(FLG)&0 - True if it's a crop and a given crop flag is present.
 &ccrop_vnum&0 - The vnum of the crop on the map room, if any.
 &cdedicated_to&0 - If the room/building is dedicated to someone, gets the name.
+&cdepletion(type)&0 - Get the current depletion amount (OLC DEPLETION) for the
+   room, or change it with %room.depletion(type,amount)%; 0 is not-depleted.
 &cdirection(target)&0 - The approximate direction to the target.
 &cdistance(target)&0 - The distance between this room and the target.
 &cempire&0 - The empire that owns the room, if any.
@@ -199,13 +210,16 @@ When using field - The variable returns:
 &cname&0 - The name of the room.
 &cpainted&0 - The color the building is painted, if any.
 &cpeople&0 - The id of the first character in the room, or an empty return.
-&cplayers_present&0 - True if there's at least 1 player in the room.
+   Note that this will skip !SEE mobs.
+&cpeople(VNUM)&0 - The id of the first instance of that mob vnum in the room.
+&cplayers_present&0 - Number of players in the room; 0/false if none.
 &crmt_flagged(AFF)&0 - True if the room has a room template flag on it.
    If called with no argument, lists current flags instead.
 &cseason&0 - The local season (spring, summer, autumn, winter).
 &csector&0 - The sector type of the room.
 &csector_flagged(FLG)&0 - True if a given sector flag is present.
 &csector_vnum&0 - The sector vnum of the room.
+&csubzone&0 - The subzone id of the room template, if any (-1 if none).
 &csun&0 - Sun status at the room (regardless of indoor/outdoor): dark, rising,
    light, setting (only 'dark' makes the room dark).
 &ctemplate&0 - The room template vnum, if any.
@@ -213,7 +227,9 @@ When using field - The variable returns:
 &ctitle&0 - The room's title (shown on 'look').
 &cvehicles&0 - The id of the first vehicle in the room, if any
    (then %veh.next_in_room%).
-&cvarexists()&0 - Returns 1 if global variable in subfield exists, 0 if not.
+&cvar(name,default)&0 - Gets the value of that var if it exists and gets
+   'default' if it doesn't. Default is optional; gets empty string if none.
+&cvarexists()&0 - Returns 1 if remote variable in subfield exists, 0 if not.
 &cview_height&0 - The room's effective height including any buildings.
 &cvnum&0 - The room's vnum.
 &cweather&0 - current weather: sunny, cloudy, rainy, or lightning
@@ -221,7 +237,7 @@ When using field - The variable returns:
 See also: EMPIRE VARS, REDIT AFFECTS, REDIT FLAGS, BEDIT FLAGS,
   SECTEDIT BUILDFLAGS, FUNCTION FLAGS
 #d
-"ZONE RESET TRIGGER" "RTRIG ZONE RESET" TRIGEDIT-ROOM-ZONE-RESET TRIGEDIT-ROOM-ZRESET TRIGEDIT-ROOM-LOAD
+"ZONE RESET TRIGGER" "RTRIG ZONE RESET" TRIGEDIT-ROOM-ZONE-RESET TRIGEDIT-ROOM-ZRESET TRIGEDIT-ROOM-LOAD "RESET TRIGGER"
 
 Zone Reset (room trigger)
 
@@ -230,7 +246,12 @@ Argument type:  percent chance to execute
 Activated when the adventure zone this room belongs to is reset. For rooms
 out on the map, reset triggers are called every few minutes.
 
+Only the FIRST zone reset trigger on a room will run unless it also has
+the Allow-Multiple type.
+
 Variables:
   &c%room%&0 - The room it was activated on.
+
+See also: ALLOW-MULTIPLE
 #d
 $~

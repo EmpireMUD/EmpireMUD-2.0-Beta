@@ -3,8 +3,8 @@ hydra oceanic monstrous~
 the oceanic hydra~
 A monstrous oceanic hydra forms its own waves as it surfaces! (adventure)
 ~
-225 325 dlyBE cE 4
-0 0 6 25
+225 325 dlyBEK cE 4
+0 0 6 25 -1
 D
    This serpentine monster can't be seen properly as a majority of its body is
 still under the water. All you can properly see is its head, or is that heads?
@@ -32,14 +32,15 @@ T 16108
 T 16110
 T 16100
 T 16105
+T 16119
 S
 #16101
 head ethereal~
 an ethereal head~
 An ethereal head sways here.
 ~
-225 325 bdhlxAE cdjG 0
-0 0 6 28
+225 325 bdhlxAEK cdjBG 0
+0 0 6 28 -1
 D
    A non-corporeal, serpent-like head attaches to an equally ethereal neck
 leading back to the bulk of the hydra. As the waves swell they seem to pass
@@ -53,8 +54,8 @@ head vicious~
 a vicious head~
 A vicious head sways here.
 ~
-225 325 bdhlzAE cdq 3
-0 0 6 9
+225 325 bdhlzAEK cdqB 3
+0 0 6 9 -1
 D
    A vicious serpent-like head sways back and forth here on the end of a
 serpentine neck, which leads back to the main trunk of the hydra. Fangs the
@@ -69,8 +70,8 @@ head withered~
 a withered head~
 A withered head sways here.
 ~
-225 325 bdhlAE cd 3
-0 0 6 9
+225 325 bdhlAEK cdB 3
+0 0 6 9 -1
 D
    Blackened and shriveled flesh peeks through the scattered scales on this
 head and the serpentine neck attached. As it moves about, a thin layer of slime
@@ -84,8 +85,8 @@ head majestic~
 a majestic head~
 A majestic head sways here.
 ~
-225 325 bdhlxAE cds 3
-0 0 6 15
+225 325 bdhlxAEK cdsB 3
+0 0 6 15 -1
 D
    This head seems to sit back away from the main fighting and direct the
 others like a general ordering his troops. The scale pattern in the shape of a
@@ -100,7 +101,7 @@ a miniature ethereal hydra head~
 A miniature ethereal hydra head floats unsupported here.
 ~
 0 1 bdnoD mn 0
-0 0 27 15
+0 0 27 15 -1
 D
    A miniature ethereal hydra head without a neck or body floats above the
 ground. Smaller than the actual hydra's head, this is still obviously one and
@@ -122,7 +123,7 @@ a miniature vicious hydra head~
 A miniature vicious hydra head floats unsupported here.
 ~
 0 1 bdnoD mn 1
-0 0 27 15
+0 0 27 15 -1
 D
    A miniature vicious hydra head without a neck or body floats above the
 ground. Smaller than the actual hydra's head, this is still obviously one and
@@ -144,7 +145,7 @@ a miniature withering hydra head~
 A miniature withering hydra head floats here unsupported.
 ~
 0 1 bdnoD mn 1
-0 0 27 15
+0 0 27 15 -1
 D
    A miniature withering hydra head without a neck or body floats above the
 ground. Smaller than the actual hydra's head, this is still obviously one and
@@ -166,7 +167,7 @@ a miniature majestic hydra head~
 A miniature majestic hydra head floats here unsupported.
 ~
 0 1 bdnoD mn 1
-0 0 27 15
+0 0 27 15 -1
 D
    A miniature majestic hydra head without a neck or body floats above the
 ground. Smaller than the actual hydra's head, this is still obviously one and
@@ -188,7 +189,7 @@ a baby oceanic hydra~
 A baby oceanic hydra does its best to be intimidating.
 ~
 0 1 dnoD cn 2
-0 0 17 15
+0 0 17 15 -1
 D
    This undersized oceanic hydra still does its best to intimidate all whom
 look at it. Unfortunately, no one seems to have told it that babies aren't all
@@ -202,7 +203,7 @@ an oceanic hydraling~
 An oceanic hydraling waits here for a rider.
 ~
 0 100 bdejl c 3
-0 0 6 9
+0 0 6 9 -1
 D
    Smaller than the true beast, yet larger than a baby oceanic hydra, this
 hydraling is perfectly sized to carry a rider across the ocean.

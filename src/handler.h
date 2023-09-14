@@ -52,7 +52,7 @@
 
 // global function types -- for run_globals
 #define GLB_VALIDATOR(name)		bool (name)(struct global_data *glb, char_data *ch, void *other_data)
-#define GLB_FUNCTION(name)		void (name)(struct global_data *glb, char_data *ch, void *other_data)
+#define GLB_FUNCTION(name)		bool (name)(struct global_data *glb, char_data *ch, void *other_data)
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -85,9 +85,12 @@ bool affected_by_spell(char_data *ch, any_vnum type);
 bool affected_by_spell_and_apply(char_data *ch, any_vnum type, int apply, bitvector_t aff_flag);
 bool affected_by_spell_from_caster(char_data *ch, any_vnum type, char_data *caster);
 struct affected_type *create_aff(any_vnum type, int duration, int location, int modifier, bitvector_t bitvector, char_data *cast_by);
-void apply_dot_effect(char_data *ch, any_vnum type, sh_int duration, sh_int damage_type, sh_int damage, sh_int max_stack, char_data *cast_by);
+void apply_dot_effect(char_data *ch, any_vnum type, int seconds_duration, sh_int damage_type, sh_int damage, sh_int max_stack, char_data *cast_by);
 void dot_remove(char_data *ch, struct over_time_effect_type *dot);
+void free_freeable_dots();
 bool room_affected_by_spell(room_data *room, any_vnum type);
+void schedule_affect_expire(char_data *ch, struct affected_type *af);
+void schedule_dot_update(char_data *ch, struct over_time_effect_type *dot);
 void show_wear_off_msg(char_data *ch, int atype);
 
 // affect shortcut macros
@@ -121,6 +124,7 @@ char_data *get_char_room_vis(char_data *ch, char *name, int *number);
 char_data *get_char_vis(char_data *ch, char *name, int *number, bitvector_t where);
 char_data *get_player_vis(char_data *ch, char *name, bitvector_t flags);
 char_data *get_char_world(char *name, int *number);
+char_data *get_player_world(char *name, int *number);
 
 // coin handlers
 bool can_afford_coins(char_data *ch, empire_data *type, int amount);
@@ -153,6 +157,7 @@ void reread_companion_trigs(char_data *mob);
 
 // cooldown handlers
 void add_cooldown(char_data *ch, any_vnum type, int seconds_duration);
+void free_cooldown(struct cooldown_data *cool);
 int get_cooldown_time(char_data *ch, any_vnum type);
 void remove_cooldown(char_data *ch, struct cooldown_data *cool);
 void remove_cooldown_by_type(char_data *ch, any_vnum type);
@@ -256,6 +261,7 @@ void perform_mount(char_data *ch, char_data *mount);
 
 // object handlers
 void add_to_object_list(obj_data *obj);
+void apply_obj_light(obj_data *obj, bool add);
 struct obj_binding *copy_obj_bindings(struct obj_binding *from);
 obj_data *copy_warehouse_obj(obj_data *input);
 void empty_obj_before_extract(obj_data *obj);
@@ -352,21 +358,34 @@ void extract_required_items(char_data *ch, struct req_data *list);
 bool find_requirement_in_list(struct req_data *list, int type, any_vnum vnum);
 void free_requirements(struct req_data *list);
 bool meets_requirements(char_data *ch, struct req_data *list, struct instance_data *instance);
-char *requirement_string(struct req_data *task, bool show_vnums);
+char *requirement_string(struct req_data *task, bool show_vnums, bool allow_custom);
 
 // resource handlers
 bool remove_thing_from_resource_list(struct resource_data **list, int type, any_vnum vnum);
 
 // resource depletion handlers
 void add_depletion(room_data *room, int type, bool multiple);
+void clear_depletions(room_data *room);
 #define add_vehicle_depletion(veh, type, multiple)  do { perform_add_depletion(&VEH_DEPLETION(veh), (type), (multiple)); request_vehicle_save_in_world(veh); } while (0)
-int get_depletion_amount(struct depletion_data *list, int type, bool only_type);
-#define get_depletion(room, type, only_type)  get_depletion_amount(ROOM_DEPLETION(room), (type), (only_type))
-#define get_vehicle_depletion(veh, type, only_type)  get_depletion_amount(VEH_DEPLETION(veh), (type), (only_type))
+int get_depletion_amount(struct depletion_data *list, int type);
+#define get_depletion(room, type)  get_depletion_amount(ROOM_DEPLETION(room), (type))
+#define get_vehicle_depletion(veh, type)  get_depletion_amount(VEH_DEPLETION(veh), (type))
 void perform_add_depletion(struct depletion_data **list, int type, bool multiple);
 bool remove_depletion_from_list(struct depletion_data **list, int type);
 void remove_depletion(room_data *room, int type);
-void set_depletion(room_data *room, int type, int value);
+void set_depletion(struct depletion_data **list, int type, int value);
+#define set_room_depletion(room, type, amount) {	\
+		if (room && SHARED_DATA(room) != &ocean_shared_data) {	\
+			set_depletion(&ROOM_DEPLETION(room), (type), (amount));	\
+			request_world_save(GET_ROOM_VNUM(room), WSAVE_ROOM);	\
+		}	\
+	}
+#define set_vehicle_depletion(veh, type, amount) {	\
+		if (veh) {	\
+			set_depletion(&VEH_DEPLETION(veh), (type), (amount));	\
+			request_vehicle_save_in_world(veh);	\
+		}	\
+	}
 
 // room handlers
 void attach_building_to_room(bld_data *bld, room_data *room, bool with_triggers);

@@ -1,3 +1,67 @@
+#18858
+wagon corpse~
+a corpse wagon~
+A large covered wagon is loaded with corpses.~
+   The wagon itself seems to be rather generic, until you see the wheels made
+of repurposed bones from a human skeleton. And that's nothing when compared to
+the piles of bodies inside of it. Piles of bodies that, every so often, seem to
+move. At the front of the wagon is a rope, allowing you to drag it about.
+~
+~
+hlmu 19 10 0 0 0 1 0 0 0
+C
+1 400
+I 30 5006 100.00 1  # RUINS-TO-VEH: ruins of #n
+M
+18803 20.00 ce
+P
+2
+R
+6000 2 1 0
+R
+6790 1 1 0
+T 18812
+S
+#18859
+wagon corpse burned~
+a burned out corpse wagon~
+The burned out husk of a corpse wagon is empty here.~
+   This was once a corpse wagon, the proud home of risen city guards. Now it is
+a burnt husk, devoid of any corpses to animate. Some day, maybe a member of the
+empire will take the time to upgrade it back to its former glory.
+~
+~
+u 19 5 0 0 0 -1 0 0 0
+C
+1 400
+I 30 5006 100.00 1  # RUINS-TO-VEH: ruins of #n
+P
+2
+R
+6000 2 1 0
+R
+6790 1 1 0
+U
+3 18858
+S
+#18860
+bylda huge enormous framework~
+the enormous Bylda~
+A huge wooden framework surrounds a Bylda as it's being constructed.~
+   It's hard to figure out what the Bylda is supposed to be. It is surrounded
+by a wooden framework as it's being constructed but it's hard to discern the
+final shape of the thing inside.
+~
+&0(())~
+hmtv 19 1 0 0 0 0 0 0 0
+C
+1 1
+P
+2
+R
+6880 1 1 0
+T 18850
+S
 #18861
 portal demonic nether realm twisting~
 a demonic portal~

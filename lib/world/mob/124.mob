@@ -5,6 +5,12 @@ A seaweed-covered crab is picking at bits of food with its claws.
 ~
 0 50 bdj G 1
 0 0 0 10
+D
+   The flat little crustacean is covered in patches of seaweed that almost seem
+to be growing out of its shell. If it wasn't moving, you'd hardly notice it. 
+You watch as it picks bits of fish from some discarded bones, eating every
+spare morsel.
+~
 S
 #12401
 goblin pirate~
@@ -13,6 +19,10 @@ A goblin pirate is washing the side of the ship.
 ~
 0 0 bd 0 2
 1 0 0 1
+D
+   Sweat glistens on the green-skinned pirate's head and back as he tries in
+vain to scrub barnacles and salt from the side of the wooden ship.
+~
 F 12401
 M
 1
@@ -36,8 +46,14 @@ deckhand hand human~
 the deckhand~
 A human deckhand is chained to the side of the ship.
 ~
-0 0 bdv 0 3
+0 0 bdvI 0 3
 1 0 0 15
+D
+   Though he towers over the pirates, the pink-skinned deckhand seems to have
+no ability to free himself. He's thin -- too thin -- and his ankle is bruised
+from the chain that keeps him in place. He twitches each time the goblins bark
+orders across the deck, always scrambling to do the next thing.
+~
 M
 0
 $n swabs the deck.~
@@ -68,19 +84,28 @@ Smeegle, the goblin quartermaster, is walking around with a list.
 ~
 0 0 bd c 2
 1 0 0 4
+D
+   Smeegle is a tubby little goblin with dark green skin akin to a pine forest.
+He holds a paper list, checking things on the deck as he goes. He stops on
+occasion and scratches his head below the patch of white hair that remains on
+it. He sneers at you whenever he notices you, but it doesn't seem to be
+personal.
+   Smeegle sells some useful items. Use 'list', 'list id', and 'buy' to browse
+his wares.
+~
 F 12401
 I 4 12411 1.50 1 x  # LOOT: dread pirate garb
-I 4 12417 1.00 1 x  # LOOT: a parrot whistle
-I 4 12412 1.00 1 x  # LOOT: a black tricorne hat
-I 4 12424 0.13 1 x  # LOOT: a lucky goblin figurehead
+I 4 12417 1.00 1 x  # LOOT: parrot whistle
+I 4 12412 1.00 1 x  # LOOT: black tricorne hat
+I 4 12424 0.13 1 x  # LOOT: lucky goblin figurehead
 I 4 12425 0.12 1 x  # LOOT: dread goblin sails
 I 4 12426 0.13 1 x  # LOOT: cliffside dock plans
 I 4 12427 0.12 1 x  # LOOT: smuggler's wharf plans
-I 4 12438 9.60 1 x  # LOOT: an imperium pirate hoop
-I 4 12440 9.60 1 x  # LOOT: a nocturnium pirate hoop
-I 4 12444 9.60 1 x  # LOOT: a golden pirate hoop
-I 4 12446 9.60 1 x  # LOOT: a silver pirate hoop
-I 4 12448 9.60 1 x  # LOOT: a bone hoop earring
+I 4 12438 9.60 1 x  # LOOT: imperium pirate hoop
+I 4 12440 9.60 1 x  # LOOT: nocturnium pirate hoop
+I 4 12444 9.60 1 x  # LOOT: golden pirate hoop
+I 4 12446 9.60 1 x  # LOOT: silver pirate hoop
+I 4 12448 9.60 1 x  # LOOT: bone hoop earring
 I 4 12450 9.60 1 x  # LOOT: heavy plated pantaloons
 I 4 12452 9.60 1 x  # LOOT: goblin scullery pantaloons
 I 4 12454 9.60 1 x  # LOOT: goblin sea-shaman pantaloons
@@ -115,19 +140,25 @@ Hornswaggle, the Golden Goblin's first mate, stands ready to fight!
 ~
 0 0 bdy c 2
 1 0 0 7
+D
+   Hornswaggle looks slightly ridiculous in his striped vest and wide hat. The
+whip coiled on his belt drips red, although it's the color of paint not blood.
+He's on the tall side, for a goblin, though still rather small. He never takes
+an eye off of you as he contemplates his options.
+~
 F 12401
 I 4 12411 1.50 1 x  # LOOT: dread pirate garb
-I 4 12417 1.00 1 x  # LOOT: a parrot whistle
-I 4 12412 1.00 1 x  # LOOT: a black tricorne hat
-I 4 12424 0.13 1 x  # LOOT: a lucky goblin figurehead
+I 4 12417 1.00 1 x  # LOOT: parrot whistle
+I 4 12412 1.00 1 x  # LOOT: black tricorne hat
+I 4 12424 0.13 1 x  # LOOT: lucky goblin figurehead
 I 4 12425 0.12 1 x  # LOOT: dread goblin sails
 I 4 12426 0.13 1 x  # LOOT: cliffside dock plans
 I 4 12427 0.12 1 x  # LOOT: smuggler's wharf plans
-I 4 12438 9.60 1 x  # LOOT: an imperium pirate hoop
-I 4 12440 9.60 1 x  # LOOT: a nocturnium pirate hoop
-I 4 12444 9.60 1 x  # LOOT: a golden pirate hoop
-I 4 12446 9.60 1 x  # LOOT: a silver pirate hoop
-I 4 12448 9.60 1 x  # LOOT: a bone hoop earring
+I 4 12438 9.60 1 x  # LOOT: imperium pirate hoop
+I 4 12440 9.60 1 x  # LOOT: nocturnium pirate hoop
+I 4 12444 9.60 1 x  # LOOT: golden pirate hoop
+I 4 12446 9.60 1 x  # LOOT: silver pirate hoop
+I 4 12448 9.60 1 x  # LOOT: bone hoop earring
 I 4 12450 9.60 1 x  # LOOT: heavy plated pantaloons
 I 4 12452 9.60 1 x  # LOOT: goblin scullery pantaloons
 I 4 12454 9.60 1 x  # LOOT: goblin sea-shaman pantaloons
@@ -159,19 +190,26 @@ Captain Greenbeard stands on the aftercastle, sword held high!
 ~
 0 0 bdyz c 2
 1 0 0 1
+D
+   Greenbeard is no taller than any other goblin here, but he's certainly
+bulkier. Though his skin is so pale as to be more gray than green, his beard
+and moustache are brighter than a field of grass in May. He looks a little
+crusty from time spent trapped in this cave, but the gold in his ears and on
+his clothing is polished and bright.
+~
 F 12401
 I 4 12411 1.50 1 x  # LOOT: dread pirate garb
-I 4 12417 1.00 1 x  # LOOT: a parrot whistle
-I 4 12412 1.00 1 x  # LOOT: a black tricorne hat
-I 4 12424 0.13 1 x  # LOOT: a lucky goblin figurehead
+I 4 12417 1.00 1 x  # LOOT: parrot whistle
+I 4 12412 1.00 1 x  # LOOT: black tricorne hat
+I 4 12424 0.13 1 x  # LOOT: lucky goblin figurehead
 I 4 12425 0.12 1 x  # LOOT: dread goblin sails
 I 4 12426 0.13 1 x  # LOOT: cliffside dock plans
 I 4 12427 0.12 1 x  # LOOT: smuggler's wharf plans
-I 4 12438 9.60 1 x  # LOOT: an imperium pirate hoop
-I 4 12440 9.60 1 x  # LOOT: a nocturnium pirate hoop
-I 4 12444 9.60 1 x  # LOOT: a golden pirate hoop
-I 4 12446 9.60 1 x  # LOOT: a silver pirate hoop
-I 4 12448 9.60 1 x  # LOOT: a bone hoop earring
+I 4 12438 9.60 1 x  # LOOT: imperium pirate hoop
+I 4 12440 9.60 1 x  # LOOT: nocturnium pirate hoop
+I 4 12444 9.60 1 x  # LOOT: golden pirate hoop
+I 4 12446 9.60 1 x  # LOOT: silver pirate hoop
+I 4 12448 9.60 1 x  # LOOT: bone hoop earring
 I 4 12450 9.60 1 x  # LOOT: heavy plated pantaloons
 I 4 12452 9.60 1 x  # LOOT: goblin scullery pantaloons
 I 4 12454 9.60 1 x  # LOOT: goblin sea-shaman pantaloons
@@ -203,19 +241,25 @@ Fathma, goblin sorceress of the deep, holds her wand high!
 ~
 0 0 bdxyz c 2
 2 0 0 21
+D
+   The old sorceress holds her glowing wand aloft, holding back the wall of
+water with all her magic. Her skin, though green, has a pale blue sheen in the
+cavern's light. Her eyes glow red and seem to pulse as the water advances and
+recedes.
+~
 F 12401
 I 4 12411 1.50 1 x  # LOOT: dread pirate garb
-I 4 12417 1.00 1 x  # LOOT: a parrot whistle
-I 4 12412 1.00 1 x  # LOOT: a black tricorne hat
-I 4 12424 0.13 1 x  # LOOT: a lucky goblin figurehead
+I 4 12417 1.00 1 x  # LOOT: parrot whistle
+I 4 12412 1.00 1 x  # LOOT: black tricorne hat
+I 4 12424 0.13 1 x  # LOOT: lucky goblin figurehead
 I 4 12425 0.12 1 x  # LOOT: dread goblin sails
 I 4 12426 0.13 1 x  # LOOT: cliffside dock plans
 I 4 12427 0.12 1 x  # LOOT: smuggler's wharf plans
-I 4 12438 9.60 1 x  # LOOT: an imperium pirate hoop
-I 4 12440 9.60 1 x  # LOOT: a nocturnium pirate hoop
-I 4 12444 9.60 1 x  # LOOT: a golden pirate hoop
-I 4 12446 9.60 1 x  # LOOT: a silver pirate hoop
-I 4 12448 9.60 1 x  # LOOT: a bone hoop earring
+I 4 12438 9.60 1 x  # LOOT: imperium pirate hoop
+I 4 12440 9.60 1 x  # LOOT: nocturnium pirate hoop
+I 4 12444 9.60 1 x  # LOOT: golden pirate hoop
+I 4 12446 9.60 1 x  # LOOT: silver pirate hoop
+I 4 12448 9.60 1 x  # LOOT: bone hoop earring
 I 4 12450 9.60 1 x  # LOOT: heavy plated pantaloons
 I 4 12452 9.60 1 x  # LOOT: goblin scullery pantaloons
 I 4 12454 9.60 1 x  # LOOT: goblin sea-shaman pantaloons
@@ -255,8 +299,16 @@ S
 deckhand #n~
 #n has been freed from his shackles (list).
 ~
-0 0 bdv 0 3
+0 0 bdvI 0 3
 1 0 0 15
+D
+   The rail-thin deckhand massages his ankle, which is badly bruised from too
+long spent chained to the ship. He's human, though you can barely tell it for
+how boney he's become. Every sound from the ship causes him to twitch, but the
+relief on his face otherwise shows how glad he is to be free.
+   The deckhand sells some of the goblins' items. Use 'list', 'list id', and
+'buy' to browse them.
+~
 M
 1
 Thank you for freeing me.~
@@ -277,7 +329,12 @@ A blue-ringed octopus clings to the wall and flashes warning colors.
 ~
 0 0 bdj c 2
 0 0 6 7
-I 0 12404 100.00 1  # BUTCHER: a fillet of fish
+D
+   This small yellow octopus is covered in dozens of blue rings that almost
+seem to glow. It's a clear warning that the size difference won't be enough to
+save you from its deadly bite.
+~
+I 0 12404 100.00 1  # BUTCHER: fillet of raw fish
 M
 0
 $n flashes brightly at you.~
@@ -296,7 +353,13 @@ A ball of light dances in the shadows.
 ~
 0 0 bdj c 2
 0 0 6 9
-I 0 12404 100.00 1  # BUTCHER: a fillet of fish
+D
+   This thing is a true horror of the deep! What at first apepars to be a
+glowing orb in the dark cavern is actually the bioluminescent lure of the
+angler fish -- a creature that has more mouth than body, and more tooth than
+mouth.
+~
+I 0 12404 100.00 1  # BUTCHER: fillet of raw fish
 M
 0
 The ball of light bobs back and forth.~
@@ -312,7 +375,13 @@ A wolf eel pokes its head out from a crevice.
 ~
 0 0 bdj c 2
 0 0 6 9
-I 0 12404 100.00 1  # BUTCHER: a fillet of fish
+D
+   With a head bigger than yours, the wolf eel is a frightening sight indeed.
+It pokes out of a hole in the wall, flashing its snaggled teeth at you, but you
+can't see its body or how long it is unless it comes out. And by then, it might
+be too late.
+~
+I 0 12404 100.00 1  # BUTCHER: fillet of raw fish
 M
 0
 $n snaps its jaw.~
@@ -331,8 +400,14 @@ A banded sea snake coils around your legs.
 ~
 0 0 bdj c 2
 0 0 6 9
-I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
-I 1 1355 100.00 1  # SKIN: some snakeskin
+D
+   Few things could be more unnerving than exploring a deep-sea cave while
+holding your breath and coming face to face with a snake. Weren't they bad
+enough on land? This one is long and thin, with black and white bands all along
+its body. Any more detail than that would risk getting too close.
+~
+I 0 3012 100.00 1  # BUTCHER: fillet of raw meat
+I 1 1355 100.00 1  # SKIN: snakeskin
 M
 0
 $n is a little too close for comfort.~
@@ -345,20 +420,26 @@ An armored war orca blocks your way!
 ~
 0 0 bdjy c 5
 0 0 6 9
-I 0 3012 100.00 8  # BUTCHER: a fillet of raw meat
+D
+   The glint of metal in the dark cavern gives you the briefest hope that
+you've found another adventurer, but what foats into view is much larger and
+far less friendly. It's an orca -- a killer whale -- with its black back and
+white eye spots... And a full suit of plate armor custom-fitted to its girth!
+~
+I 0 3012 100.00 8  # BUTCHER: fillet of raw meat
 I 4 12414 100.00 2  # LOOT: fat of orca
-I 4 12428 2.00 1 x  # LOOT: a deep coral ring
-I 4 12429 2.00 1 x  # LOOT: a deep pearl ring
-I 4 12430 2.00 1 x  # LOOT: a deep seaweed ring
-I 4 12431 2.00 1 x  # LOOT: a deep sharktooth ring
-I 4 12432 2.00 1 x  # LOOT: a deep bone ring
-I 4 12433 2.00 1 x  # LOOT: a coral-buckled girdle
-I 4 12434 2.00 1 x  # LOOT: a pearly sash
-I 4 12435 2.00 1 x  # LOOT: a seaweed cumberbund
-I 4 12436 2.00 1 x  # LOOT: a sharktooth cincture
-I 4 12437 2.00 1 x  # LOOT: a band of human bones
-I 4 12418 1.00 1 x  # LOOT: a hydra conch
-I 4 12421 10.00 1 x  # LOOT: a green orca whistle
+I 4 12428 2.00 1 x  # LOOT: deep coral ring
+I 4 12429 2.00 1 x  # LOOT: deep pearl ring
+I 4 12430 2.00 1 x  # LOOT: deep seaweed ring
+I 4 12431 2.00 1 x  # LOOT: deep sharktooth ring
+I 4 12432 2.00 1 x  # LOOT: deep bone ring
+I 4 12433 2.00 1 x  # LOOT: coral-buckled girdle
+I 4 12434 2.00 1 x  # LOOT: pearly sash
+I 4 12435 2.00 1 x  # LOOT: seaweed cumberbund
+I 4 12436 2.00 1 x  # LOOT: sharktooth cincture
+I 4 12437 2.00 1 x  # LOOT: band of human bones
+I 4 12418 1.00 1 x  # LOOT: hydra conch
+I 4 12421 10.00 1 x  # LOOT: green orca whistle
 M
 0
 $n bares its teeth at you.~
@@ -374,19 +455,25 @@ A giant squid fills the cavern!
 ~
 0 0 bdjy c 5
 0 0 6 7
-I 0 12404 100.00 3  # BUTCHER: a fillet of fish
+D
+   Tentacles line the walls of the cavern as you make your way through, ending
+at what almost seems to be a wall with an enormous beak. It takes you a moment
+to realize you're looking at the underside of a giant squid... And you're right
+in front of the mouth!
+~
+I 0 12404 100.00 3  # BUTCHER: fillet of raw fish
 I 4 12415 100.00 2  # LOOT: tentacle of squid
-I 4 12428 2.00 1 x  # LOOT: a deep coral ring
-I 4 12429 2.00 1 x  # LOOT: a deep pearl ring
-I 4 12430 2.00 1 x  # LOOT: a deep seaweed ring
-I 4 12431 2.00 1 x  # LOOT: a deep sharktooth ring
-I 4 12432 2.00 1 x  # LOOT: a deep bone ring
-I 4 12433 2.00 1 x  # LOOT: a coral-buckled girdle
-I 4 12434 2.00 1 x  # LOOT: a pearly sash
-I 4 12435 2.00 1 x  # LOOT: a seaweed cumberbund
-I 4 12436 2.00 1 x  # LOOT: a sharktooth cincture
-I 4 12437 2.00 1 x  # LOOT: a band of human bones
-I 4 12418 1.00 1 x  # LOOT: a hydra conch
+I 4 12428 2.00 1 x  # LOOT: deep coral ring
+I 4 12429 2.00 1 x  # LOOT: deep pearl ring
+I 4 12430 2.00 1 x  # LOOT: deep seaweed ring
+I 4 12431 2.00 1 x  # LOOT: deep sharktooth ring
+I 4 12432 2.00 1 x  # LOOT: deep bone ring
+I 4 12433 2.00 1 x  # LOOT: coral-buckled girdle
+I 4 12434 2.00 1 x  # LOOT: pearly sash
+I 4 12435 2.00 1 x  # LOOT: seaweed cumberbund
+I 4 12436 2.00 1 x  # LOOT: sharktooth cincture
+I 4 12437 2.00 1 x  # LOOT: band of human bones
+I 4 12418 1.00 1 x  # LOOT: hydra conch
 M
 0
 $n snaps its beak menacingly.~
@@ -403,20 +490,26 @@ mermidon myrmidon warrior~
 a mermidon warrior~
 A mermidon warrior aims her trident at you!
 ~
-0 0 bdvy c 3
+0 0 bdvyI c 3
 2 0 6 3
+D
+   Three glints of light appear in the dark cavern and you barely avoid them as
+they come fast at your throat. It's a trident! And the other end is held by a
+fish-woman in bronze armor. She strikes at you fast, moving with preternatural
+grace in the water as you struggle to keep up.
+~
 I 4 12416 100.00 2  # LOOT: eye of mermaid
-I 4 12428 2.00 1 x  # LOOT: a deep coral ring
-I 4 12429 2.00 1 x  # LOOT: a deep pearl ring
-I 4 12430 2.00 1 x  # LOOT: a deep seaweed ring
-I 4 12431 2.00 1 x  # LOOT: a deep sharktooth ring
-I 4 12432 2.00 1 x  # LOOT: a deep bone ring
-I 4 12433 2.00 1 x  # LOOT: a coral-buckled girdle
-I 4 12434 2.00 1 x  # LOOT: a pearly sash
-I 4 12435 2.00 1 x  # LOOT: a seaweed cumberbund
-I 4 12436 2.00 1 x  # LOOT: a sharktooth cincture
-I 4 12437 2.00 1 x  # LOOT: a band of human bones
-I 4 12418 1.00 1 x  # LOOT: a hydra conch
+I 4 12428 2.00 1 x  # LOOT: deep coral ring
+I 4 12429 2.00 1 x  # LOOT: deep pearl ring
+I 4 12430 2.00 1 x  # LOOT: deep seaweed ring
+I 4 12431 2.00 1 x  # LOOT: deep sharktooth ring
+I 4 12432 2.00 1 x  # LOOT: deep bone ring
+I 4 12433 2.00 1 x  # LOOT: coral-buckled girdle
+I 4 12434 2.00 1 x  # LOOT: pearly sash
+I 4 12435 2.00 1 x  # LOOT: seaweed cumberbund
+I 4 12436 2.00 1 x  # LOOT: sharktooth cincture
+I 4 12437 2.00 1 x  # LOOT: band of human bones
+I 4 12418 1.00 1 x  # LOOT: hydra conch
 M
 0
 $n spins her trident to block your path.~
@@ -438,8 +531,10 @@ A parrot with an eyepatch is watching you with its good eye.
 ~
 1 1 bdoD mn 1
 0 0 2 9
-T 9901
-T 9902
+D
+   The parrot is a tall, red bird with blue wings and a white spot around its
+good eye. The other eye is covered in a black leather eyepatch.
+~
 T 12417
 S
 #12418
@@ -449,6 +544,10 @@ A tiny hydra is rolling around on the ground.
 ~
 1 1 bdoD n 1
 0 0 0 9
+D
+   This little blob of a creature has heads coming out of every side. They look
+at you, one by one, as it rolls around on the ground. Luckily it seems playful.
+~
 M
 0
 One of $n's heads snaps at another.~
@@ -464,8 +563,6 @@ $n somersaults around your feet.~
 M
 0
 $n drools from all of its mouths.~
-T 9901
-T 9902
 S
 #12419
 hydra serpent massive nine-headed~
@@ -474,26 +571,32 @@ A massive nine-headed serpent slithers out of the pool.
 ~
 0 0 bdjyA c 5
 0 0 6 9
+D
+   You can scarcely see the serpent's body as all nine of its heads snap at you
+from deep in the cavern. It's enormous! Each head and neck is more massive
+alone than your entire body. It snaps at you with long, jagged, misaligned
+teeth and it takes all your effort to survive the moment.
+~
 I 4 12411 1.00 1 x  # LOOT: dread pirate garb
-I 4 12422 1.00 1 x  # LOOT: a raging kraken shell
-I 4 12423 1.00 1 x  # LOOT: an albatross shell
-I 4 12418 2.00 1 x  # LOOT: a hydra conch
-I 4 12403 10.00 1 x  # LOOT: an old barrel
-I 4 12428 7.50 1 x  # LOOT: a deep coral ring
-I 4 12429 7.50 1 x  # LOOT: a deep pearl ring
-I 4 12430 7.50 1 x  # LOOT: a deep seaweed ring
-I 4 12431 7.50 1 x  # LOOT: a deep sharktooth ring
-I 4 12432 7.50 1 x  # LOOT: a deep bone ring
-I 4 12433 7.50 1 x  # LOOT: a coral-buckled girdle
-I 4 12434 7.50 1 x  # LOOT: a pearly sash
-I 4 12435 7.50 1 x  # LOOT: a seaweed cumberbund
-I 4 12436 7.50 1 x  # LOOT: a sharktooth cincture
-I 4 12437 7.50 1 x  # LOOT: a band of human bones
-I 4 12438 1.00 1 x  # LOOT: an imperium pirate hoop
-I 4 12440 1.00 1 x  # LOOT: a nocturnium pirate hoop
-I 4 12444 1.00 1 x  # LOOT: a golden pirate hoop
-I 4 12446 1.00 1 x  # LOOT: a silver pirate hoop
-I 4 12448 1.00 1 x  # LOOT: a bone hoop earring
+I 4 12422 1.00 1 x  # LOOT: raging kraken shell
+I 4 12423 1.00 1 x  # LOOT: albatross shell
+I 4 12418 2.00 1 x  # LOOT: hydra conch
+I 4 12403 10.00 1 x  # LOOT: old barrel
+I 4 12428 7.50 1 x  # LOOT: deep coral ring
+I 4 12429 7.50 1 x  # LOOT: deep pearl ring
+I 4 12430 7.50 1 x  # LOOT: deep seaweed ring
+I 4 12431 7.50 1 x  # LOOT: deep sharktooth ring
+I 4 12432 7.50 1 x  # LOOT: deep bone ring
+I 4 12433 7.50 1 x  # LOOT: coral-buckled girdle
+I 4 12434 7.50 1 x  # LOOT: pearly sash
+I 4 12435 7.50 1 x  # LOOT: seaweed cumberbund
+I 4 12436 7.50 1 x  # LOOT: sharktooth cincture
+I 4 12437 7.50 1 x  # LOOT: band of human bones
+I 4 12438 1.00 1 x  # LOOT: imperium pirate hoop
+I 4 12440 1.00 1 x  # LOOT: nocturnium pirate hoop
+I 4 12444 1.00 1 x  # LOOT: golden pirate hoop
+I 4 12446 1.00 1 x  # LOOT: silver pirate hoop
+I 4 12448 1.00 1 x  # LOOT: bone hoop earring
 I 4 12450 1.00 1 x  # LOOT: heavy plated pantaloons
 I 4 12452 1.00 1 x  # LOOT: goblin scullery pantaloons
 I 4 12454 1.00 1 x  # LOOT: goblin sea-shaman pantaloons
@@ -529,26 +632,32 @@ Scylla floats in the center of the chamber as water swirls around her!
 ~
 0 0 bdzA c 4
 2 0 6 7
+D
+   Scylla is half alluring topless woman and half... Something else. She sings
+a sweet song as you enter, moving gracefully to lure you all the way into her
+cavern while also hiding the rest of her grotesque body. This is no human
+woman! It's some kind of sea monster! And she looks angry.
+~
 I 4 12411 1.00 1 x  # LOOT: dread pirate garb
-I 4 12422 1.00 1 x  # LOOT: a raging kraken shell
-I 4 12423 1.00 1 x  # LOOT: an albatross shell
-I 4 12418 2.00 1 x  # LOOT: a hydra conch
-I 4 12403 10.00 1 x  # LOOT: an old barrel
-I 4 12428 7.50 1 x  # LOOT: a deep coral ring
-I 4 12429 7.50 1 x  # LOOT: a deep pearl ring
-I 4 12430 7.50 1 x  # LOOT: a deep seaweed ring
-I 4 12431 7.50 1 x  # LOOT: a deep sharktooth ring
-I 4 12432 7.50 1 x  # LOOT: a deep bone ring
-I 4 12433 7.50 1 x  # LOOT: a coral-buckled girdle
-I 4 12434 7.50 1 x  # LOOT: a pearly sash
-I 4 12435 7.50 1 x  # LOOT: a seaweed cumberbund
-I 4 12436 7.50 1 x  # LOOT: a sharktooth cincture
-I 4 12437 7.50 1 x  # LOOT: a band of human bones
-I 4 12438 1.00 1 x  # LOOT: an imperium pirate hoop
-I 4 12440 1.00 1 x  # LOOT: a nocturnium pirate hoop
-I 4 12444 1.00 1 x  # LOOT: a golden pirate hoop
-I 4 12446 1.00 1 x  # LOOT: a silver pirate hoop
-I 4 12448 1.00 1 x  # LOOT: a bone hoop earring
+I 4 12422 1.00 1 x  # LOOT: raging kraken shell
+I 4 12423 1.00 1 x  # LOOT: albatross shell
+I 4 12418 2.00 1 x  # LOOT: hydra conch
+I 4 12403 10.00 1 x  # LOOT: old barrel
+I 4 12428 7.50 1 x  # LOOT: deep coral ring
+I 4 12429 7.50 1 x  # LOOT: deep pearl ring
+I 4 12430 7.50 1 x  # LOOT: deep seaweed ring
+I 4 12431 7.50 1 x  # LOOT: deep sharktooth ring
+I 4 12432 7.50 1 x  # LOOT: deep bone ring
+I 4 12433 7.50 1 x  # LOOT: coral-buckled girdle
+I 4 12434 7.50 1 x  # LOOT: pearly sash
+I 4 12435 7.50 1 x  # LOOT: seaweed cumberbund
+I 4 12436 7.50 1 x  # LOOT: sharktooth cincture
+I 4 12437 7.50 1 x  # LOOT: band of human bones
+I 4 12438 1.00 1 x  # LOOT: imperium pirate hoop
+I 4 12440 1.00 1 x  # LOOT: nocturnium pirate hoop
+I 4 12444 1.00 1 x  # LOOT: golden pirate hoop
+I 4 12446 1.00 1 x  # LOOT: silver pirate hoop
+I 4 12448 1.00 1 x  # LOOT: bone hoop earring
 I 4 12450 1.00 1 x  # LOOT: heavy plated pantaloons
 I 4 12452 1.00 1 x  # LOOT: goblin scullery pantaloons
 I 4 12454 1.00 1 x  # LOOT: goblin sea-shaman pantaloons
@@ -592,7 +701,12 @@ A green-tinged orca is stalking you.
 ~
 100 125 dejl 0 5
 0 0 6 9
-I 0 3012 100.00 4  # BUTCHER: a fillet of raw meat
+D
+   It's a huge black and green sea beast, like a killer whale that's been
+rolling in seaweed. It seems friendly as you approach, nudging your hand with
+its beak despite its jaw being large enough to crush you in one bite.
+~
+I 0 3012 100.00 4  # BUTCHER: fillet of raw meat
 S
 #12422
 kraken raging rages~
@@ -601,7 +715,13 @@ A kraken rages violently in the water!
 ~
 100 125 dejl 0 5
 0 0 6 7
-I 0 12404 100.00 3  # BUTCHER: a fillet of fish
+D
+   You can only see the mantle of this great squid as it cautiously trails its
+eight arms and two tentacles behind it. And then, without warning, it spins and
+flails, turning the water into a deadly trap from which the only safe refuge is
+to climb on its back.
+~
+I 0 12404 100.00 3  # BUTCHER: fillet of raw fish
 S
 #12423
 albatross giant~
@@ -610,15 +730,25 @@ A giant albatross with a saddle circles overhead!
 ~
 100 125 dej m 4
 0 0 2 9
-I 0 3200 100.00 3  # BUTCHER: a cut of poultry
+D
+   The albatross is among the largest of birds, and this one perhaps most of
+all. Its long black wings seem too thin -- and too long -- for such a bird, but
+they are capable of keeping it aloft for days. The rest of its body is stark
+white and it has a long, pale beak.
+~
+I 0 3200 100.00 3  # BUTCHER: cut of poultry
 S
 #12426
 dockmaster master goblin~
 the goblin dockmaster~
 A goblin dockmaster is pacing with a clipboard.
 ~
-30 60 bdqv 0 2
+30 60 bdqvI 0 2
 1 0 0 15
+D
+   The little goblin looks hot and exhausted as he ensures everything is on
+schedule.
+~
 M
 1
 Back to work!~
@@ -628,8 +758,12 @@ deckhand hand goblin~
 a goblin deckhand~
 A goblin deckhand is standing here.
 ~
-20 50 dqv 0 2
+20 50 dqvI 0 2
 1 0 0 15
+D
+   The little green goblin rushes from chore to chore as he keeps everything
+above board.
+~
 M
 1
 Shiver me teeny timbers!~

@@ -22,7 +22,7 @@ High Sorcery Synergy Ability: 100 Battle
 Usage:  ablate [victim]
 Cooldown:  9 seconds
 Cost:  based on damage
-Debuff type:  High Sorcery
+Debuff type:  magical
 
 Ablate deals damage to your victim and will cause bits of his armor to burn
 off, leaving him less resistant to physical damage.
@@ -58,7 +58,7 @@ High Sorcery Synergy Ability: 100 Trade
 Usage:  chronoblast [victim]
 Cooldown:  6 seconds
 Cost:  based on damage
-Debuff type:  High Sorcery
+Debuff type:  magical
 
 Chronoblast uses the artificer's knowledge of clocks to slow down the enemy,
 and the transition into a slower time frame deals serious magical damage.
@@ -85,7 +85,7 @@ Colorburst (High Sorcery ability)
 Usage:  colorburst [victim]
 Cooldown:  30 seconds
 Cost:  15 / 30 / 45 mana
-Debuff type:  High Sorcery
+Debuff type:  magical
 
 Shoot a disorienting burst of color at your foe and makes it harder for them
 to hit you. Colorburst causes a to-hit penalty of -5, -10, or -20 depending
@@ -213,7 +213,7 @@ Usage:  enervate <victim>
 Cooldown:  75 seconds
 Duration:  75 seconds
 Cost:  20 mana
-Debuff type:  High Sorcery
+Debuff type:  magical
 
 Your victim is enervated: he loses move regen. You are able to leech some
 of this for yourself, and your move regeneration receive a temporary boost.
@@ -430,7 +430,7 @@ High Sorcery Synergy Ability: 100 Stealth
 Usage:  shadowlash [victim]
 Cooldown:  9 seconds
 Cost:  based on damage
-Debuff type:  High Sorcery
+Debuff type:  magical
 
 Shadowlash calls forth a tentacle of pure shadow, which wraps itself around
 your victim's head for both instantaneous and lasting damage. It also blinds
@@ -463,7 +463,7 @@ Usage:  siphon [victim]
 Cooldown:  20 seconds
 Duration:  20 seconds
 Cost:  10 mana
-Debuff type:  High Sorcery
+Debuff type:  magical
 
 You can steal mana from other casters using the mana siphon ability. If you are
 in combat, it will automatically target your current opponent. This will boost
@@ -482,7 +482,7 @@ Usage:  slow [victim]
 Cooldown:  75 seconds
 Duration:  35 / 75 seconds
 Cost:  20 mana
-Debuff type:  High Sorcery
+Debuff type:  magical
 
 This ability hexes your victim with lethargy, causing them to attack more
 slowly in combat. If you're already fighting and do not specify a victim, it
@@ -499,7 +499,7 @@ High Sorcery Synergy Ability: 100 Vampire
 Usage:  soulchain [victim]
 Cooldown:  9 seconds
 Cost:  based on damage
-Debuff type:  High Sorcery
+Debuff type:  magical
 
 Soulchain wraps the victim in a painful spiritual binding, sapping his
 intelligence as well as dealing magical damage.
@@ -594,7 +594,7 @@ Sunshock (High Sorcery ability)
 Usage:  sunshock [victim]
 Cooldown:  9 seconds
 Cost:  based on damage
-Debuff type:  High Sorcery
+Debuff type:  magical
 
 Sunshock blasts your target with the pure light of the sun. This deals a small
 amount of damage (scaled by your level, role, and traits), and causes a very
@@ -618,7 +618,7 @@ High Sorcery Synergy Ability: 100 Survival
 Usage:  thornlash [victim]
 Cooldown:  9 seconds
 Cost:  based on damage
-Debuff type:  High Sorcery
+Debuff type:  physical
 
 Thornlash wraps a coil of thorny vines around your victim. The vines cause
 immediate pain, while the thorns dig in and deal poison damage over time. This

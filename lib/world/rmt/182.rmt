@@ -2,7 +2,7 @@
 Turtle Spawn Room~
 You shouldn't be in here.
 ~
-g 0 0
+g 0 0 -1
 M 0 18200 100.00 1
 S
 #18201
@@ -13,7 +13,7 @@ plods so slowly across the land that its shell has overgrown with moss and
 shrubs. Still, you can see most of the countryside from here.
 Commands: &cdisembark, enter tavern, look out&0
 ~
-ch 0 0
+ch 0 0 -1
 M 1 18200 100.00 1
 T 18204
 T 18215
@@ -26,7 +26,7 @@ portraits. The tavern shakes back and forth as the tortoise walks, but the sway
 of the building actually makes for a more comfortable ride than on the shell.
 Commands: &cexit&0
 ~
-c 0 0
+c 0 0 -1
 D10
 ~
 0 18203
@@ -105,7 +105,7 @@ platform, built out over the head of the tortoise, which provides a beautiful
 view of the surrounding land as, down below, the tortoise moves.
 Commands: &clook out&0
 ~
-ach 0 0
+ach 0 0 -1
 D13
 ~
 0 18202
@@ -116,7 +116,7 @@ The Back Room~
 are empty and there is no sign of a desk. Instead, a wrestling mat covers much
 of the room and people are placing bets in the corner.
 ~
-c 0 0
+c 0 0 -1
 D11
 ~
 0 18202
@@ -140,7 +140,7 @@ The Tipsy Tortoise Giftshop~
 barstools, but there are some interesting items on the shelf. However, a sign
 on the wall clearly says 'Adventurers Only'.
 ~
-c 0 0
+c 0 0 -1
 D12
 ~
 0 18202
@@ -162,7 +162,7 @@ small second-floor landing, with a door leading toward the back of the
 tortoise. A large golden plaque declares this the headquarters of the Guild of
 Adventurers.
 ~
-c 0 0
+c 0 0 -1
 D9
 ~
 0 18202
@@ -189,7 +189,7 @@ Tipsy Tortoise downstairs. The walls are made of fine stained cherry wood, and
 are covered in exotic trophies of all types. Overstuffed chairs encircle a
 strange firepit in the center of the room.
 ~
-cg 0 0
+cg 0 H -1
 D10
 ~
 0 18206
@@ -250,7 +250,7 @@ alchemist's workbench and study. A shelf of books, indexed by herb, takes up
 much of the space in the alcove. Locked display cases show a variety of potions
 in various shades of red.
 ~
-cg 0 0
+cg 0 H -1
 D11
 ~
 0 18207
@@ -277,7 +277,7 @@ a plush sofa and a strange fountain appear, as well as walls covered in arcane
 tomes. A black carpet across the floor seems to undulate in a nonexistent
 breeze.
 ~
-cg 0 0
+cg 0 H -1
 D12
 ~
 0 18207
@@ -300,7 +300,7 @@ workshop. Clockwork arms, legs, wings, and other parts you can't identify are
 strewn about the cramped corners. Exotic weapons sit on several workbenches, as
 well as strange, oversized rings.
 ~
-cg 0 0
+cg 0 H -1
 D9
 ~
 0 18207

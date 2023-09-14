@@ -107,6 +107,8 @@ while %cycles_left% >= 0
         %terraform% %room% 605
       elseif %room.sector_vnum% >= 610 && %room.sector_vnum% <= 614
         %terraform% %room% 615
+      elseif %room.sector_vnum% == 616
+        %terraform% %room% 21
       else
         * not a sector we can finish
         nop %self.add_mob_flag(SPAWNED)%
@@ -292,7 +294,7 @@ done
 Walking Tree script~
 0 bw 10
 ~
-if %self.disabled%
+if %self.disabled% || %self.fighting%
   halt
 end
 switch %random.4%

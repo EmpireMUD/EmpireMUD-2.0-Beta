@@ -9,13 +9,13 @@ The miller takes the grain and thanks you for your help.
 A
 1 210
 P
-9 6 0 15
+9 6 0 15 -
 R
 0 0 1
 R
 4 6 25
 W
-1 6170 0 10
+1 6170 0 10 -
 Z
 1 210
 S
@@ -32,14 +32,14 @@ The stablemaster takes the horseshoes and thanks you for your help.
 A
 1 213
 P
-9 6 0 15
+9 6 0 15 -
 R
 0 0 1
 R
 4 6 25
 T 9003
 W
-2 9009 0 8
+2 9009 0 8 -
 Z
 1 213
 S
@@ -57,14 +57,14 @@ off to get it stuffed.
 A
 1 220
 P
-9 0 0 15
+9 0 0 15 -
 R
 4 0 25
 R
 0 0 1
 T 9003
 W
-2 9030 0 1
+2 9030 0 1 -
 Z
 1 220
 S
@@ -80,14 +80,14 @@ You hand over the trinket.
 A
 1 221
 P
-9 4 0 15
+9 4 0 15 -
 R
 0 0 1
 R
 4 4 25
 T 9003
 W
-2 9033 0 1
+2 9033 0 1 -
 Z
 1 221
 S
@@ -98,18 +98,19 @@ trinkets enchanted by a class of novice sorcerers as practice.
 ~
 The High Sorcerer takes the trinkets and thanks you for your help.
 ~
-12 ef 1 75 -1
+14 ef 1 75 -1
 A
 1 228
 P
-9 2 0 15
+9 2 0 15 -
 R
 0 0 1
 T 9003
 W
 2 9036 0 5 a
-W
+W+
 11 0 0 1 a
+Disenchant 5 useless trinkets~
 Z
 1 228
 S
@@ -126,7 +127,7 @@ herb-picking technique. At least you learned something from it.
 A
 1 231
 P
-9 5 0 50
+9 5 0 50 -
 R
 0 0 1
 R
@@ -159,7 +160,7 @@ R
 R
 4 5 25
 W
-2 123 0 8
+2 123 0 8 -
 Z
 1 231
 S
@@ -171,7 +172,7 @@ then return for a reward.
 ~
 The postmaster thanks you for your help.
 ~
-15 ef 0 0 -1
+16 ef 0 0 -1
 A
 1 263
 P
@@ -185,8 +186,9 @@ R
 R
 1 -1 20
 T 9042
-W
-11 0 0 1
+W+
+11 0 0 1 -
+Give the letter to the right person~
 Z
 1 263
 S

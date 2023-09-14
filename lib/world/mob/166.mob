@@ -3,8 +3,8 @@ snowman~
 a snowman~
 A snowman dances around in a circle.
 ~
-1 400 dhnyDFG G 3
-0 0 35 15
+1 400 dhnyDFGK G 3
+0 0 35 15 -1
 D
    Three progressively larger snowballs are stacked atop each other to form the
 body of this snowman. It has some coal for eyes, a carrot for a nose, and the
@@ -28,7 +28,7 @@ a Christmas elf~
 A sneaky Christmas elf watches as people look for the perfect tree.
 ~
 1 1 bdoH cen 3
-0 0 0 15
+0 0 0 15 -1
 D
    This sneaky little elf is watching the tree choppers around these parts as
 they look for the perfect Christmas tree.
@@ -41,8 +41,8 @@ demon grinchy tall green~
 a grinchy demon~
 A tall, green grinchy demon sneaks about.
 ~
-0 400 bdhoy c 4
-1 0 9 7
+0 400 bdhoyK cG 4
+1 0 9 7 -1
 D
    This demon is a furry green cave-dweller who absolutely hates Christmas.
 Each year, he tries to ruin Christmas for as many empires as possible. He's
@@ -50,14 +50,14 @@ spinning a long whip made from Christmas lights, and not just any Who can stop
 him! Drive him off before it's too late.
 ~
 I 4 16663 14.00 1 l  # LOOT: rocking horse saddle
-I 4 16670 14.00 1 l  # LOOT: hearty Christmas spirit
-I 4 16671 14.00 1 l  # LOOT: generous Christmas spirit
-I 4 16672 14.00 1 l  # LOOT: serene Christmas spirit
-I 4 16673 14.00 1 l  # LOOT: warm Christmas spirit
-I 4 16674 14.00 1 l  # LOOT: anxious Christmas spirit
-I 4 16675 14.00 1 l  # LOOT: nostalgic Christmas spirit
-I 4 16664 1.00 1 l  # LOOT: mini-grinchy pet whistle
-I 4 16665 1.00 1 l  # LOOT: reindeer dog mini-pet whistle
+I 4 16670 13.00 1 l  # LOOT: hearty Christmas spirit
+I 4 16671 13.00 1 l  # LOOT: generous Christmas spirit
+I 4 16672 13.00 1 l  # LOOT: serene Christmas spirit
+I 4 16673 13.00 1 l  # LOOT: warm Christmas spirit
+I 4 16674 13.00 1 l  # LOOT: anxious Christmas spirit
+I 4 16675 13.00 1 l  # LOOT: nostalgic Christmas spirit
+I 4 16664 4.00 1 l  # LOOT: mini-grinchy pet whistle
+I 4 16665 4.00 1 l  # LOOT: reindeer dog minipet whistle
 T 16603
 T 16614
 T 16615
@@ -70,8 +70,8 @@ dog max reindeer~
 Max the reindeer dog~
 A dog is here, dressed as a reindeer.
 ~
-50 400 bdhjoAD q 3
-1 0 0 9
+50 400 bdhjoADK qG 3
+1 0 0 9 -1
 D
    Someone has attached a single fake antler to this little brown dog, and
 polished its nose, so that it almost looks like a reindeer. You doubt this
@@ -85,7 +85,7 @@ a winter pixy~
 A winter pixy trickles snow from its wings as it flutters by.
 ~
 1 1 dno mn 2
-0 0 2 15
+0 0 2 15 -1
 D
    This translucent blue and white pixy almost looks to be an animated
 snowball, due to the constant flurries of snow it produces.
@@ -107,7 +107,7 @@ an enraged pixy~
 An enraged pixy furiously flutters about.
 ~
 1 400 douD cm 2
-0 0 2 20
+0 0 2 20 -1
 D
    Small patches of ice are still melting off this raging pixy. Seems someone
 froze it and didn't put it on the tree in time.
@@ -118,8 +118,8 @@ snowman abominable~
 the abominable snowman~
 A massive hairy abominable snowman roars at everyone nearby.
 ~
-1 400 bdkloFG cdhosBCDGJ 4
-0 0 0 15
+1 400 bdkloFGK cdhosCDGJ 4
+0 0 0 15 -1
 D
    A large apelike creature with snow white fur and glowing red eyes, this
 doesn't seem like something you would want to take in a straight fight.
@@ -127,13 +127,149 @@ doesn't seem like something you would want to take in a straight fight.
 T 16631
 T 16632
 S
+#16635
+puppy~
+a puppy~
+A puppy sits here with a bow around its neck.
+~
+1 25 dhoGK cfmG 1
+0 0 0 9 -1
+D
+This adorable little puppy has a bow around its neck.
+~
+T 16635
+T 16636
+T 16638
+T 16637
+T 16639
+T 16642
+T 16648
+S
+#16636
+dog~
+a dog~
+A dog sits here with a bow around its neck.
+~
+1 75 dhoGK cfmG 2
+0 0 0 9 -1
+D
+This adorable dog has a bow around its neck.
+~
+T 16635
+T 16636
+T 16638
+T 16637
+T 16639
+T 16642
+T 16648
+S
+#16637
+dog heroic~
+a heroic dog~
+A heroic dog is sitting here.
+~
+1 150 dhoGK cfmG 2
+0 0 0 9 -1
+D
+This heroic dog has all the poise of a champion.
+~
+T 16635
+T 16636
+T 16638
+T 16637
+T 16642
+T 16648
+S
+#16638
+kitten~
+a kitten~
+A kitten sits here with a bow around its neck.
+~
+1 25 dhoGK cfmG 1
+0 0 0 10 -1
+D
+This adorable little kitten has a bow around its neck.
+~
+T 16635
+T 16636
+T 16638
+T 16637
+T 16639
+T 16642
+T 16648
+S
+#16639
+cat~
+a cat~
+A cat sits here with a bow around its neck.
+~
+1 75 dhoGK cfmG 2
+0 0 0 10 -1
+D
+This adorable cat has a bow around its neck.
+~
+T 16635
+T 16636
+T 16638
+T 16637
+T 16639
+T 16642
+T 16648
+S
+#16640
+cat heroic~
+a heroic cat~
+A heroic cat is sitting here.
+~
+1 150 dhoGK cfmG 2
+0 0 0 10 -1
+D
+This heroic cat has all the poise of a champion.
+~
+T 16635
+T 16636
+T 16638
+T 16637
+T 16642
+T 16648
+S
+#16643
+goat straw~
+a straw goat~
+A straw goat dashes past you!
+~
+1 1 dq n 3
+0 0 11 15 -1
+D
+   The little straw goat is smaller than a real goat, but it has all the
+character. It seems to be running frantically around, butting into anything
+that gets in its way. The goat must have been made by one of the local citizens
+for the upcoming yule festival, but it seems that it got away!
+~
+T 16643
+T 16645
+T 16646
+S
+#16644
+goat spawner straw~
+the straw goat spawner~
+The straw goat spawner is here.
+~
+0 0 d cdln 3
+0 0 0 15 -1
+D
+This invisible mob moves around randomly then spawns a goat object.
+~
+T 16645
+T 16643
+S
 #16651
 goose plump~
 a plump goose~
 A goose is waddling around.
 ~
 1 3 dj 0 2
-0 0 16 9
+0 0 16 9 -1
 D
 This fat white goose looks ready to eat.
 ~
@@ -155,7 +291,7 @@ a red-nosed reindeer~
 A red-nosed reindeer flies overhead!
 ~
 30 70 dej m 4
-0 0 2 27
+0 0 2 27 -1
 D
    This reindeer has a shiny nose. Now that you can see it, you would even say
 it glows!
@@ -170,7 +306,7 @@ the ghost of a Christmas present~
 The ghost of a Christmas present hovers in the air.
 ~
 1 1 bdoD n 2
-0 0 27 11
+0 0 27 11 -1
 D
    This transparent little present is hovering around in the air. It
 occasionally stops above someone's head and shakes itself, rattling like it's
@@ -198,7 +334,7 @@ a fancy nutcracker~
 A fancy wooden nutcracker is parading about.
 ~
 1 1 bdoD n 2
-0 0 35 11
+0 0 35 11 -1
 D
    The nutcracker is short, fashioned from wood, and bears a toothy grimace.
 It wears a green jacket and red pants, and has a tall black hat. Its tufts of
@@ -239,7 +375,7 @@ a little mouse~
 A little mouse is stirring on the ground.
 ~
 1 1 bdoD n 1
-0 0 7 9
+0 0 7 9 -1
 D
 The little mouse is sitting here, stirring something.
 ~
@@ -256,7 +392,7 @@ the gruber~
 A dastardly gruber is creeping about.
 ~
 1 1 bdoD n 2
-0 0 0 15
+0 0 0 15 -1
 D
 The gruber is small, bearded, and difficult to catch.
 ~
@@ -288,7 +424,7 @@ some jingling bells~
 Some jingling bells hang in the air.
 ~
 1 1 bdoD n 2
-0 0 27 11
+0 0 27 11 -1
 D
    The silver bells seem to float in the air, but they dangle back and forth as
 if attached to the holiday spirit itself!
@@ -318,7 +454,7 @@ a spinning dreidel~
 A little dreidel is spinning around.
 ~
 1 1 bdoD n 2
-0 0 31 11
+0 0 31 11 -1
 D
    The dreidel is made of wood, but it seems that some good pixy has brought it
 to life!
@@ -351,13 +487,56 @@ M
 0
 The dreidel spins around.~
 S
+#16660
+crowd people~
+the crowd~
+A crowd of people has formed around the goat.
+~
+100 100 bdho n 3
+0 0 0 15 -1
+D
+   A crowd has gathered around the giant straw goat. People are reveling and
+celebrating the winter season. Some are singing, some are drinking, and some
+are just catching up with old friends.
+~
+M
+0
+You think you spot someone sneaking through the crowd.~
+M
+0
+The crowd dances around the straw goat.~
+M
+0
+The murmur of the crowd makes it hard to hear what anybody is saying.~
+M
+0
+The crowd parades clockwise around the goat.~
+M
+0
+The crowd parades counter-clockwise around the goat.~
+M
+0
+The crowd cheers for the straw goat.~
+M
+0
+The crowd around the goat is enormous.~
+M
+0
+There are so many people around the straw goat that it's hard to tell what's going on.~
+M
+0
+At times, you can't see through the crowd at all.~
+M
+0
+You can hear faint music behind the din of the crowd.~
+S
 #16664
 demon grinchy tiny~
 a tiny grinchy demon~
 A tiny grinchy demon is running around in circles.
 ~
 1 1 bdoD n 2
-1 0 9 15
+1 0 9 15 -1
 D
    It's a furry little green demon with a positively malevolent look on its
 face that just makes it look SO adorable!
@@ -404,7 +583,7 @@ a reindeer dog~
 A dog is here, poorly disguised as a reindeer.
 ~
 1 1 bdoD n 2
-1 0 28 15
+1 0 28 15 -1
 D
    Someone has attached a single fake antler to this little brown dog, and
 polished its nose, so that it almost looks like a reindeer. You doubt this
@@ -413,13 +592,114 @@ would fool any Who, but it looks adorable.
 T 9901
 T 9902
 S
+#16666
+elf strange~
+a strange elf~
+A strange elf sits motionless, watching you.
+~
+1 1 bdoD dn 1
+0 0 0 15 -1
+D
+   The little elf doesn't seem to move at all. On closer inspection, it might
+even be made of cloth. Nevertheless, wherever you move, its eyes always seem
+fixed on you. Each time you look, the elf seems to be in a different place, but
+always with its gaze on you.
+~
+M
+6
+A strange elf sits motionless, watching you.~
+M
+6
+A strange elf sits motionless, watching you.~
+M
+6
+A strange elf is relaxing here, watching you.~
+M
+6
+A strange elf watches you as it sits with its legs crossed.~
+M
+6
+A strange elf is standing here.~
+M
+6
+A strange elf is watching you.~
+S
+#16667
+lantern little floating~
+a floating lantern~
+A little lantern floats in the air above you.
+~
+1 1 bdoD n 1
+0 0 27 15 -1
+D
+This little paper lantern seems to float all on its own!
+~
+T 16667
+S
+#16668
+gingerbread bread man~
+a gingerbread man~
+A gingerbread man is standing here.
+~
+1 1 bdoD n 1
+1 0 0 15 -1
+D
+   This little brown cookie is in the shape of a man, with a simple line for a
+mouth, two dots for eyes, a sugar bow, and clothes made of icing.
+~
+M
+1
+Run, run as fast as you can. You can't catch me. I'm the Gingerbread Man!~
+M
+0
+$n runs around in circles.~
+M
+0
+$n runs around wildly.~
+M
+0
+$n runs around.~
+M
+0
+$n runs around.~
+M
+0
+$n runs around you.~
+M
+1
+Eat me!~
+M
+1
+Do you know the muffin man?~
+M
+1
+Donkey?~
+M
+1
+It looks like we're up Chocolate Creek without a Popsicle stick!~
+T 16668
+S
+#16669
+snowmother mother snow-mother~
+the snowmother~
+A snowmother has been built here.
+~
+1 1 bdoD n 1
+0 0 34 15 -1
+D
+   It's a snowman, so to speak, although it has a decidedly feminine character
+to it with sculpted hair and lacy finishes. The snowmother comes from the cold
+north, where it is called lumememm.
+~
+T 16669
+S
 #16675
 #n~
 #n~
 #n is dancing to the music.
 ~
-20 20 bdov n 3
-0 0 0 15
+20 20 bdovI n 3
+0 0 0 15 -1
 D
 This cheerful citizen seems to be having a great time!
 ~
@@ -431,7 +711,7 @@ a group of prancing dogs~
 A group of dogs are prancing around.
 ~
 20 20 bdo nG 3
-0 0 0 15
+0 0 0 15 -1
 D
 The dogs are prancing around to the music, almost as if they're dancing!
 ~
@@ -454,7 +734,7 @@ a group of orphans~
 A group of orphans is dancing around.
 ~
 20 20 bdo nG 3
-0 0 0 15
+0 0 0 15 -1
 D
 The orphans are dancing around, having a good time.
 ~
@@ -474,13 +754,101 @@ M
 0
 Everyone is singing holiday carols.~
 S
+#16679
+krampus tiny~
+a tiny krampus~
+A tiny krampus is stalking you.
+~
+1 1 bdoD n 2
+0 0 9 15 -1
+D
+   It's a little krampus -- a bizarre goat-man who keeps children in line in
+the winter season.
+~
+S
+#16680
+krampus demon~
+the Krampus demon~
+The Krampus demon stands on mismatched legs, brandishing a switch.
+~
+25 400 bdozK cqEG 3
+1 0 14 15 -1
+D
+   This demonic figure is half goat and half human, with the division down the
+center of his body. One side sports a hoof at the end of his leg, and the other
+a normal human foot. His wrists and ankles each drag chains behind them, and a
+birch switch is strapped across his back.
+~
+I 4 16663 14.00 1 l  # LOOT: rocking horse saddle
+I 4 16670 13.00 1 l  # LOOT: hearty Christmas spirit
+I 4 16671 13.00 1 l  # LOOT: generous Christmas spirit
+I 4 16672 13.00 1 l  # LOOT: serene Christmas spirit
+I 4 16673 13.00 1 l  # LOOT: warm Christmas spirit
+I 4 16674 13.00 1 l  # LOOT: anxious Christmas spirit
+I 4 16675 13.00 1 l  # LOOT: nostalgic Christmas spirit
+I 4 16679 4.00 1 l  # LOOT: tiny krampus whistle
+I 4 16685 4.00 1 l  # LOOT: burning straw goat whistle
+T 16681
+T 16682
+T 16603
+S
+#16682
+mobile new~
+snow mother~
+A new mobile is standing here.
+~
+0 0 d 0 3
+0 0 0 15 -1
+S
+#16683
+mobile new~
+zero the red nosed ghost dog~
+A new mobile is standing here.
+~
+0 0 d 0 3
+0 0 0 15 -1
+S
+#16685
+goat straw burning~
+a burning straw goat~
+A straw goat runs around on fire!
+~
+1 1 bdoD n 2
+0 0 9 15 -1
+D
+   This little straw goat has been brought to life by some cruel demon, only to
+be lit on fire. It runs around, never seeming to burn out, gleeful but
+dangerous.
+~
+M
+0
+A straw goat trails fire as it races past you!~
+M
+0
+The burning straw goat stops running to scratch itself with its horn.~
+M
+0
+The straw goat crackles as it burns.~
+M
+0
+The burning straw goat charges at you, but veers off at the last second.~
+M
+0
+The burning straw goat runs around in circles.~
+M
+0
+The burning straw goat stops, drops, and rolls.~
+M
+0
+The burning straw goat catches an ember on its tongue.~
+S
 #16698
 raven enchanted~
 an enchanted raven~
 An enchanted raven is perched in a tree.
 ~
 40 60 djo cm 2
-0 0 2 21
+0 0 2 21 -1
 D
    The raven is such a deep shade of black that it almost looks blue. It's also
 the largest bird you've seen in these parts. It watches you intently, and you
@@ -529,7 +897,7 @@ an enchanted fox~
 An enchanted fox darts in and out of the woods.
 ~
 40 60 djo c 2
-0 0 7 16
+0 0 7 16 -1
 D
    The fox shifts in color from orange to green to magenta and back as it rolls
 about playfully. It seems to watch you when it thinks you aren't looking.

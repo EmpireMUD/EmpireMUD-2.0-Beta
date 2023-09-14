@@ -313,7 +313,7 @@ typedef struct vehicle_data vehicle_data;
 #define APPLY_MOVE  11	// Apply to max move points
 #define APPLY_RESIST_PHYSICAL  12	// Apply to physical damage resistance
 #define APPLY_BLOCK  13	// Apply to chance to block
-#define APPLY_HEAL_OVER_TIME  14	// heals you every 5
+#define APPLY_HEAL_OVER_TIME  14	// heals you every "real update"
 #define APPLY_HEALTH  15	// Apply to max health
 #define APPLY_MANA  16	// Apply to max mana
 #define APPLY_TO_HIT  17	// +to-hit
@@ -419,6 +419,7 @@ typedef struct vehicle_data vehicle_data;
 #define INTERACT_RESTRICT_HARD  4	// only when mob/obj is 'hard' (but not group)
 #define INTERACT_RESTRICT_GROUP  5	// only when mob/obj is 'group' (but not hard)
 #define INTERACT_RESTRICT_BOSS  6	// only when mob/obj is 'hard' (hard + group)
+#define INTERACT_RESTRICT_DEPLETION  7	// determines which depletion is checked/applied, if applicable
 
 
 // for object saving
@@ -468,6 +469,8 @@ typedef struct vehicle_data vehicle_data;
 #define REQ_LEVEL_UNDER  38
 #define REQ_LEVEL_OVER  39
 #define REQ_OWN_VEHICLE_FUNCTION  40
+#define REQ_SPEAK_LANGUAGE  41
+#define REQ_RECOGNIZE_LANGUAGE  42
 
 
 // REQ_AMT_x: How numbers displayed for different REQ_ types
@@ -539,6 +542,7 @@ typedef struct vehicle_data vehicle_data;
 #define ABILF_RANGED_ONLY  BIT(12)	// m. requires ranged combat
 #define ABILF_IGNORE_SUN  BIT(13)	// n. vampire ability ignores sunlight
 #define ABILF_UNSCALED_BUFF  BIT(14)	// o. buff does not scale at all (fixed values)
+#define ABILF_LIMIT_CROWD_CONTROL  BIT(15)	// p. cancels same buff on others in the room (using affectvnum)
 
 #define ABILITY_ROLE_FLAGS  (ABILF_CASTER_ROLE | ABILF_HEALER_ROLE | ABILF_MELEE_ROLE | ABILF_TANK_ROLE)
 
@@ -553,6 +557,9 @@ typedef struct vehicle_data vehicle_data;
 #define ABILT_COMPANION  BIT(7)	// grants companions
 #define ABILT_SUMMON_ANY  BIT(8)	// player can summon from a list of mobs
 #define ABILT_SUMMON_RANDOM  BIT(9)	// player can summon a mob at random from a list
+#define ABILT_MORPH  BIT(10)	// ability has morphs that require it
+#define ABILT_AUGMENT  BIT(11)	// related to augments/enchants
+#define ABILT_CUSTOM  BIT(12)	// ability is hard-coded
 /*
 #define ABILT_UNAFFECTS  BIT(2)
 #define ABILT_POINTS  BIT(3)	// e.g. heal?
@@ -622,7 +629,7 @@ typedef struct vehicle_data vehicle_data;
 #define AGH_DODGE  BIT(3)	// gains when actor dodges
 #define AGH_BLOCK  BIT(4)	// gains when actor blocks
 #define AGH_TAKE_DAMAGE  BIT(5)	// gains when hit in melee
-#define AGH_PASSIVE_FREQUENT  BIT(6)	// gains every 5
+#define AGH_PASSIVE_FREQUENT  BIT(6)	// gains every "real update"
 #define AGH_PASSIVE_HOURLY  BIT(7)	// gains every game hour
 #define AGH_ONLY_DARK  BIT(8)	// only gains if it's dark
 #define AGH_ONLY_LIGHT  BIT(9)	// only gains if it's light
@@ -784,7 +791,7 @@ typedef struct vehicle_data vehicle_data;
 #define BLD_ROAD_ICON  BIT(18)	// replaces its icon with the generated road icons (dashes)
 #define BLD_ROAD_ICON_WIDE  BIT(19)	// replaces its icon with wide road icons (equals signs)
 #define BLD_ATTACH_BARRIER  BIT(20)	// icons with @u/@v will attach to this
-// #define BLD_UNUSED9  BIT(21)
+#define BLD_NO_CUSTOMIZE  BIT(21)	// cannot be customized
 // #define BLD_UNUSED10  BIT(22)
 // #define BLD_UNUSED11  BIT(23)
 // #define BLD_UNUSED12  BIT(24)
@@ -955,7 +962,7 @@ typedef struct vehicle_data vehicle_data;
 #define ATT_BONUS_PHYSICAL  6	// extra physical damage
 #define ATT_BONUS_MAGICAL  7	// extra magical damage
 #define ATT_BONUS_HEALING  8	// extra healing
-#define ATT_HEAL_OVER_TIME  9	// heal per 5
+#define ATT_HEAL_OVER_TIME  9	// heal per "real update"
 #define ATT_RESIST_MAGICAL  10	// damage reduction
 #define ATT_CRAFTING_BONUS  11	// levels added to crafting
 #define ATT_BLOOD_UPKEEP  12	// blood cost per hour
@@ -973,29 +980,29 @@ typedef struct vehicle_data vehicle_data;
 #define AFF_HIDE  BIT(4)	// e. Char is hidden
 #define AFF_CHARM  BIT(5)	// f. Char is charmed
 #define AFF_INVISIBLE  BIT(6)	// g. Char is invisible
-#define AFF_IMMUNE_BATTLE  BIT(7)	// h. Immunity to Battle debuffs
+#define AFF_IMMUNE_PHYSICAL_DEBUFFS  BIT(7)	// h. Immunity to 'physical' debuffs
 #define AFF_SENSE_HIDE  BIT(8)	// i. See hidden people
 #define AFF_IMMUNE_PHYSICAL  BIT(9)	// j. Immune to physical damage
 #define AFF_NO_TARGET_IN_ROOM  BIT(10)	// k. no-target
 #define AFF_NO_SEE_IN_ROOM  BIT(11)	// l. don't see on look
 #define AFF_FLY  BIT(12)	// m. person can fly
 #define AFF_NO_ATTACK  BIT(13)	// n. can't be attacked
-#define AFF_IMMUNE_HIGH_SORCERY  BIT(14)	// o. immune to high sorcery debuffs
-#define AFF_DISARM  BIT(15)	// p. disarmed
+#define AFF_IMMUNE_MAGICAL_DEBUFFS  BIT(14)	// o. immune to 'magical' debuffs
+#define AFF_DISARMED  BIT(15)	// p. disarmed
 #define AFF_HASTE  BIT(16)	// q. haste: attacks faster
-#define AFF_ENTANGLED  BIT(17)	// r. entangled: can't move
+#define AFF_IMMOBILIZED  BIT(17)	// r. immobilized: can't move (entangled)
 #define AFF_SLOW  BIT(18)	// s. slow (how great did that work out)
 #define AFF_STUNNED  BIT(19)	// t. stunned/unable to act
 #define AFF_STONED  BIT(20)	// u. trippy effects
-#define AFF_CANT_SPEND_BLOOD  BIT(21)	// v. hinder vitae
+#define AFF_CANT_SPEND_BLOOD  BIT(21)	// v. prevents most vampire powers
 #define AFF_CLAWS  BIT(22)	// w. claws
 #define AFF_DEATHSHROUD  BIT(23)	// x. deathshroud
 #define AFF_EARTHMELD  BIT(24)	// y. interred in the earth
 #define AFF_MUMMIFY  BIT(25)	// z. mummified
 #define AFF_SOULMASK  BIT(26)	// A. soulmask
-#define AFF_IMMUNE_NATURAL_MAGIC  BIT(27)	// B. immune to natural magic debuffs
-#define AFF_IMMUNE_STEALTH  BIT(28)	// C. Immune to stealth debuffs
-#define AFF_IMMUNE_VAMPIRE  BIT(29)	// D. Immune to vampire debuffs
+#define AFF_NO_TRACKS  BIT(27)	// B. leaves no tracks
+#define AFF_IMMUNE_POISON_DEBUFFS  BIT(28)	// C. Immune to any 'poison' debuffs
+#define AFF_IMMUNE_MENTAL_DEBUFFS  BIT(29)	// D. Immune to any 'mental' debuffs
 #define AFF_IMMUNE_STUN  BIT(30)	// E. Cannot be hit by stun effects
 #define AFF_ORDERED  BIT(31)	// F. Has been issued an order from a player
 #define AFF_NO_DRINK_BLOOD  BIT(32)	// G. Vampires can't bite or sire
@@ -1003,6 +1010,8 @@ typedef struct vehicle_data vehicle_data;
 #define AFF_HARD_STUNNED  BIT(34)	// I. Hard stuns are uncleansable and don't trigger stun-immunity
 #define AFF_IMMUNE_DAMAGE  BIT(35)	// J. Cannot take damage
 #define AFF_NO_WHERE  BIT(36)	// K. cannot be found using 'WHERE'
+#define AFF_WATERWALK  BIT(37)	// L. won't drown or be affected by water restrictions
+#define AFF_LIGHT  BIT(38)	// M. has a light (lights up the room)
 
 
 // Injury flags -- IS_INJURED
@@ -1256,7 +1265,9 @@ typedef struct vehicle_data vehicle_data;
 #define OFFENSE_BURNED_BUILDING  8
 #define OFFENSE_BURNED_VEHICLE  9
 #define OFFENSE_PICKPOCKETED  10
-#define NUM_OFFENSES  11	// total
+#define OFFENSE_RECLAIMED  11
+#define OFFENSE_BURNED_TILE  12
+#define NUM_OFFENSES  13	// total
 
 
 // OFF_x: offense flags
@@ -1358,6 +1369,19 @@ typedef struct vehicle_data vehicle_data;
 #define WF_PROB_ADVENTURE_PRESENT  7	// blocked by adventure instance
 
 
+// WPLOG_x: Types for the workforce production log
+#define WPLOG_COINS  0
+#define WPLOG_OBJECT  1
+#define WPLOG_BUILDING_DONE  2
+#define WPLOG_BUILDING_DISMANTLED  3
+#define WPLOG_VEHICLE_DONE  4
+#define WPLOG_VEHICLE_DISMANTLED  5
+#define WPLOG_STUMPS_BURNED  6
+#define WPLOG_FIRE_EXTINGUISHED  7
+#define WPLOG_PROSPECTED  8
+#define WPLOG_MAINTENANCE  9
+
+
 // for tracking playtime
 #define PLAYTIME_WEEKS_TO_TRACK  12	// playtime determined by past 12 weeks
 
@@ -1384,17 +1408,27 @@ typedef struct vehicle_data vehicle_data;
 //// EVENT DEFINES (TIMED EVENT SYSTEM) //////////////////////////////////////
 
 // function types
-#define EVENTFUNC(name) long (name)(void *event_obj)
+#define EVENTFUNC(name) long (name)(struct dg_event *the_event, void *event_obj)
 #define EVENT_CANCEL_FUNC(name) void (name)(void *event_obj)
 
 
 // SEV_x: stored event types
-#define SEV_TRENCH_FILL  0
-	#define SEV_UNUSED  1	// no longer used
-#define SEV_BURN_DOWN  2
-#define SEV_GROW_CROP  3
-#define SEV_TAVERN  4
-#define SEV_RESET_TRIGGER  5
+#define SEV_TRENCH_FILL  0	// water fills over time
+#define SEV_DESPAWN  1	// mob despawn
+#define SEV_BURN_DOWN  2	// for buildings
+#define SEV_GROW_CROP  3	// normal crop growth time
+#define SEV_TAVERN  4	// tavern resource use timer
+#define SEV_RESET_TRIGGER  5	// for tavern resets
+#define SEV_PURSUIT  6	// mob pursuing a target
+#define SEV_MOVEMENT  7	// normal mob movement
+#define SEV_AGGRO  8	// aggro or cityguard mobs
+#define SEV_SCAVENGE  9	// scavenger mobs consume a corpse
+#define SEV_VAMPIRE_FEEDING  10	// drinking blood
+#define SEV_RESET_MOB  11	// periodic reset of damaged/tagged mobs
+#define SEV_HEAL_OVER_TIME  12	// handles HOT applies
+#define SEV_CHECK_LEADING  13	// called right after moving, in some cases
+#define SEV_OBJ_TIMER  14	// various timer updates
+#define SEV_OBJ_AUTOSTORE  15	// autostore check for objects
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -1403,6 +1437,7 @@ typedef struct vehicle_data vehicle_data;
 // FCT_x: Faction flags
 #define FCT_IN_DEVELOPMENT  BIT(0)	// a. not live
 #define FCT_REP_FROM_KILLS  BIT(1)	// b. killing mobs affects faction rating
+#define FCT_HIDE_IN_LIST  BIT(2)	// c. not shown in player's list
 
 
 // FCTR_x: Relationship flags
@@ -1490,8 +1525,8 @@ typedef struct vehicle_data vehicle_data;
 // this is based on the number of 5-second ticks in a mud hour
 #define SECS_PER_REAL_UPDATE  5
 #define REAL_UPDATES_PER_MUD_HOUR  (SECS_PER_MUD_HOUR / SECS_PER_REAL_UPDATE)
-#define REAL_UPDATES_PER_MIN  (SECS_PER_REAL_MIN / SECS_PER_REAL_UPDATE)
-#define MUD_HOURS  *REAL_UPDATES_PER_MUD_HOUR
+// #define REAL_UPDATES_PER_MIN  (SECS_PER_REAL_MIN / SECS_PER_REAL_UPDATE)	// this is unused as of b5.152
+// #define MUD_HOURS  *REAL_UPDATES_PER_MUD_HOUR	// this is unused as of b5.152
 
 
 // misc game configs
@@ -1499,7 +1534,10 @@ typedef struct vehicle_data vehicle_data;
 #define ACTION_CYCLE_MULTIPLIER  10	// make action cycles longer so things can make them go faster
 #define ACTION_CYCLE_SECOND  2	// how many action cycles is 1 second
 #define ACTION_CYCLE_HALF_SEC  1	// how many action cycles is half a second
+#define DOT_INTERVAL  5	// seconds per tick for damage-over-time
 #define HISTORY_SIZE  5	// Keep last 5 commands.
+#define MOB_RESTORE_INTERVAL  60	// seconds between when a mob loses health and when it starts checking to restore itself
+#define WORKFORCE_CYCLE  76	// seconds between workforce chore updates
 
 
 // System timing
@@ -1538,6 +1576,7 @@ typedef struct vehicle_data vehicle_data;
 #define GENERIC_CURRENCY  5	// tokens, for shops
 #define GENERIC_COMPONENT  6	// types of generic objects
 #define GENERIC_MOON  7	// moon in the sky
+#define GENERIC_LANGUAGE  8	// language a player can speak
 
 
 // GEN_x: generic flags
@@ -1550,6 +1589,12 @@ typedef struct vehicle_data vehicle_data;
 
 // how many ints a generic stores (update write_generic_to_file if you change this)
 #define NUM_GENERIC_VALUES  4
+
+
+// LANG_x: how well someone speaks a language
+#define LANG_UNKNOWN  0	// default: does not speak it, cannot recognize it
+#define LANG_RECOGNIZE  1	// knows which language it is, but can't speak it
+#define LANG_SPEAK  2	// full comprehension and speaking
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -1590,6 +1635,9 @@ typedef struct vehicle_data vehicle_data;
 #define MOB_NO_EXPERIENCE  BIT(31)	// F. players get no exp against this mob
 #define MOB_NO_RESCALE  BIT(32)	// G. mob won't rescale (after the first time), e.g. if specific traits were set
 #define MOB_SILENT  BIT(33)	// H. will not set off custom strings
+#define MOB_COINS  BIT(34)	// I. mob drops coins on death/pickpocket
+#define MOB_NO_COMMAND  BIT(35)	// J. mob cannot be commanded/ordered
+#define MOB_NO_UNCONSCIOUS  BIT(36)	// K. mob cannot be knocked out; it's always killed instead
 
 
 // MOB_CUSTOM_x: custom message types
@@ -1600,6 +1648,12 @@ typedef struct vehicle_data vehicle_data;
 #define MOB_CUSTOM_ECHO_DAY  4
 #define MOB_CUSTOM_ECHO_NIGHT  5
 #define MOB_CUSTOM_LONG_DESC  6	// random long descs
+#define MOB_CUSTOM_SCRIPT_1  7	// called by scripts
+#define MOB_CUSTOM_SCRIPT_2  8	// called by scripts
+#define MOB_CUSTOM_SCRIPT_3  9	// called by scripts
+#define MOB_CUSTOM_SCRIPT_4  10	// called by scripts
+#define MOB_CUSTOM_SCRIPT_5  11	// called by scripts
+#define MOB_CUSTOM_SCAVENGE_CORPSE  12	// mob eats a corpse due to SCAVENGER flag
 
 
 // MOB_MOVE_x: mob/vehicle movement types
@@ -1640,6 +1694,75 @@ typedef struct vehicle_data vehicle_data;
 #define MOB_MOVE_SHUFFLES  34
 #define MOB_MOVE_MARCHES  35
 #define MOB_MOVE_SWEEPS  36
+#define MOB_MOVE_BARGES  37
+#define MOB_MOVE_BOLTS  38
+#define MOB_MOVE_CHARGES  39
+#define MOB_MOVE_CLAMBERS  40
+#define MOB_MOVE_COASTS  41
+#define MOB_MOVE_DARTS  42
+#define MOB_MOVE_DASHES  43
+#define MOB_MOVE_DRAWS  44
+#define MOB_MOVE_FLITS  45
+#define MOB_MOVE_GLIDES  46
+#define MOB_MOVE_GOES  47
+#define MOB_MOVE_HIKES  48
+#define MOB_MOVE_HOBBLES  49
+#define MOB_MOVE_HURRIES  50
+#define MOB_MOVE_INCHES  51
+#define MOB_MOVE_JOGS  52
+#define MOB_MOVE_JOURNEYS  53
+#define MOB_MOVE_JUMPS  54
+#define MOB_MOVE_LEAPS  55
+#define MOB_MOVE_LIMPS  56
+#define MOB_MOVE_LURCHES  57
+#define MOB_MOVE_MEANDERS  58
+#define MOB_MOVE_MOSEYS  59
+#define MOB_MOVE_PARADES  60
+#define MOB_MOVE_PLODS  61
+#define MOB_MOVE_PRANCES  62
+#define MOB_MOVE_PROWLS  63
+#define MOB_MOVE_RACES  64
+#define MOB_MOVE_ROAMS  65
+#define MOB_MOVE_ROMPS  66
+#define MOB_MOVE_ROVES  67
+#define MOB_MOVE_RUSHES  68
+#define MOB_MOVE_SASHAYS  69
+#define MOB_MOVE_SAUNTERS  70
+#define MOB_MOVE_SCAMPERS  71
+#define MOB_MOVE_SCOOTS  72
+#define MOB_MOVE_SCRAMBLES  73
+#define MOB_MOVE_SCUTTERS  74
+#define MOB_MOVE_SIDLES  75
+#define MOB_MOVE_SKIPS  76
+#define MOB_MOVE_SKULKS  77
+#define MOB_MOVE_SLEEPWALKS  78
+#define MOB_MOVE_SLINKS  79
+#define MOB_MOVE_SLOGS  80
+#define MOB_MOVE_SNEAKS  81
+#define MOB_MOVE_STAGGERS  82
+#define MOB_MOVE_STOMPS  83
+#define MOB_MOVE_STREAKS  84
+#define MOB_MOVE_STRIDES  85
+#define MOB_MOVE_STROLLS  86
+#define MOB_MOVE_STRUTS  87
+#define MOB_MOVE_STUMBLES  88
+#define MOB_MOVE_SWIMS  89
+#define MOB_MOVE_TACKS  90
+#define MOB_MOVE_TEARS  91
+#define MOB_MOVE_TIPTOES  92
+#define MOB_MOVE_TODDLES  93
+#define MOB_MOVE_TOTTERS  94
+#define MOB_MOVE_TRAIPSES  95
+#define MOB_MOVE_TRAMPS  96
+#define MOB_MOVE_TRAVELS  97
+#define MOB_MOVE_TREKS  98
+#define MOB_MOVE_TRUDGES  99
+#define MOB_MOVE_VAULTS  100
+#define MOB_MOVE_WADES  101
+#define MOB_MOVE_WANDERS  102
+#define MOB_MOVE_WHIZZES  103
+#define MOB_MOVE_ZIGZAGS  104
+#define MOB_MOVE_ZOOMS  105
 
 
 // NAMES_x: name sets: add matching files in lib/text/names/
@@ -1737,6 +1860,7 @@ typedef enum {
 #define ITEM_POISON  26	// poison vial
 #define ITEM_ARMOR  27	// armor!
 #define ITEM_BOOK  28	// tied to the book/library system
+#define ITEM_LIGHT  29	// item is a light (torch, etc)
 
 
 // ITEM_WEAR_x: Take/Wear flags -- where an item can be worn
@@ -1762,6 +1886,14 @@ typedef enum {
 #define ITEM_WEAR_SADDLE  BIT(18)	// s. Saddle
 
 
+// LIGHT_FLAG_x (possibly also LIGHT_x as a search hint): flags for ITEM_LIGHT
+#define LIGHT_FLAG_LIGHT_FIRE  BIT(0)	// It can be used in place of a lighter
+#define LIGHT_FLAG_CAN_DOUSE  BIT(1)	// It can be put out
+#define LIGHT_FLAG_JUNK_WHEN_EXPIRED  BIT(2)	// automatically removed
+#define LIGHT_FLAG_COOKING_FIRE  BIT(3)	// allows cooking
+#define LIGHT_FLAG_DESTROY_WHEN_DOUSED  BIT(4)	// always expires when doused
+
+
 // Item materials
 #define MAT_WOOD  0	// Made from wood
 #define MAT_ROCK  1	// ...rock
@@ -1782,10 +1914,15 @@ typedef enum {
 #define NUM_MATERIALS  16	// Total number of matierals
 
 
+// MINT_FLAG_x: flags for ITEM_WEALTH
+#define MINT_FLAG_AUTOMINT  BIT(0)	// Workforce will mint it
+#define MINT_FLAG_NO_MINT  BIT(1)	// item cannot be minted
+
+
 // OBJ_x: Extra object flags -- OBJ_FLAGGED(obj, f)
 #define OBJ_UNIQUE  BIT(0)	// a. can only use 1 at a time
 #define OBJ_PLANTABLE  BIT(1)	// b. Uses val 2 to set a crop type
-#define OBJ_LIGHT  BIT(2)	// c. Lights until timer pops
+#define OBJ_LIGHT  BIT(2)	// c. Generates light (prefer LIGHT item type tho)
 #define OBJ_SUPERIOR  BIT(3)	// d. Item is of superior quality
 #define OBJ_LARGE  BIT(4)	// e. Item can't be put in bags
 #define OBJ_CREATED  BIT(5)	// f. Was created by a god
@@ -1820,8 +1957,8 @@ typedef enum {
 #define OBJ_CUSTOM_BUILD_TO_ROOM  1
 #define OBJ_CUSTOM_INSTRUMENT_TO_CHAR  2
 #define OBJ_CUSTOM_INSTRUMENT_TO_ROOM  3
-#define OBJ_CUSTOM_EAT_TO_CHAR  4
-#define OBJ_CUSTOM_EAT_TO_ROOM  5
+#define OBJ_CUSTOM_CONSUME_TO_CHAR  4
+#define OBJ_CUSTOM_CONSUME_TO_ROOM  5
 #define OBJ_CUSTOM_CRAFT_TO_CHAR  6
 #define OBJ_CUSTOM_CRAFT_TO_ROOM  7
 #define OBJ_CUSTOM_WEAR_TO_CHAR  8
@@ -1837,6 +1974,11 @@ typedef enum {
 #define OBJ_CUSTOM_DECAYS_IN_ROOM  18	// everywhere else
 #define OBJ_CUSTOM_RESOURCE_TO_CHAR  19  // when gained as a resource
 #define OBJ_CUSTOM_RESOURCE_TO_ROOM  20  // when gained as a resource
+#define OBJ_CUSTOM_SCRIPT_1  21	// called by scripts
+#define OBJ_CUSTOM_SCRIPT_2  22	// called by scripts
+#define OBJ_CUSTOM_SCRIPT_3  23	// called by scripts
+#define OBJ_CUSTOM_SCRIPT_4  24	// called by scripts
+#define OBJ_CUSTOM_SCRIPT_5  25	// called by scripts
 
 
 // RES_x: resource requirement types
@@ -2228,8 +2370,9 @@ typedef enum {
 
 // MOUNT_x: mount flags -- MOUNT_FLAGGED(ch, flag)
 #define MOUNT_RIDING  BIT(0)	// player is currently mounted
-#define MOUNT_AQUATIC  BIT(1)	// mount can swim
+#define MOUNT_AQUATIC  BIT(1)	// mount can swim (but not go on land)
 #define MOUNT_FLYING  BIT(2)	// mount can fly
+#define MOUNT_WATERWALK  BIT(3)	// mount can do land/water
 
 
 // OFFER_x - types for the do_accept/offer_data system
@@ -2281,7 +2424,7 @@ typedef enum {
 #define PRF_NO_CHANNEL_JOINS  BIT(15)	// Won't wee channel joins
 #define PRF_AUTOKILL  BIT(16)	// Stops from knocking players out
 #define PRF_SCROLLING  BIT(17)	// Turns off page_string
-#define PRF_BRIEF  BIT(18)	// Cuts map size, removes room descs
+#define PRF_NO_ROOM_DESCS  BIT(18)	// Removes room descs; formerly 'brief'
 #define PRF_BOTHERABLE  BIT(19)	// allows bite, purify, feed, etc
 #define PRF_AUTORECALL  BIT(20)	// free recall when logged off too long
 #define PRF_NOGODNET  BIT(21)	// Can't hear godnet
@@ -2304,6 +2447,7 @@ typedef enum {
 #define PRF_ITEM_QUALITY  BIT(38)	// shows loot quality color/tag in inv/eq
 #define PRF_ITEM_DETAILS  BIT(39)	// shows additional item details on inv/eq
 #define PRF_NO_EXITS  BIT(40)	// hides exits on look and auto-look
+#define PRF_SHORT_EXITS  BIT(41)	// shows circlemud-style exits
 // note: if you add prefs, consider adding them to alt_import_preferences()
 
 
@@ -2412,6 +2556,7 @@ typedef enum {
 #define SYS_SYSTEM  BIT(9)	// system stuff
 #define SYS_VALID  BIT(10)	// validation logs
 #define SYS_EMPIRE  BIT(11)	// empire-related logs
+#define SYS_EVENT  BIT(12)	// event news and points
 
 
 // WAIT_x: Wait types for the command_lag() function.
@@ -2439,9 +2584,10 @@ typedef enum {
 // PRG_x: progress flags
 #define PRG_IN_DEVELOPMENT  BIT(0)	// a. not available to players
 #define PRG_PURCHASABLE  BIT(1)	// b. can buy it
-#define PRG_SCRIPT_ONLY  BIT(2)	// c. cannot buy/achieve it
+#define PRG_NO_AUTOSTART  BIT(2)	// c. only started or added via script/quest
 #define PRG_HIDDEN  BIT(3)	// d. progress does not show up
 #define PRG_NO_ANNOUNCE  BIT(4)	// e. never announces when this goal is achieved
+#define PRG_NO_PREVIEW  BIT(5)	// f. cannot view it until you're on it
 
 
 // PRG_PERK_x: progress perks
@@ -2453,6 +2599,8 @@ typedef enum {
 #define PRG_PERK_TERRITORY_PER_GREATNESS  5	// increases territory per greatness
 #define PRG_PERK_WORKFORCE_CAP  6	// higher workforce caps
 #define PRG_PERK_TERRITORY  7	// grants bonus territory (flat rate)
+#define PRG_PERK_SPEAK_LANGUAGE  8	// whole empire may speak
+#define PRG_PERK_RECOGNIZE_LANGUAGE  9	// whole empire may recognize
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -2468,6 +2616,7 @@ typedef enum {
 #define QST_NO_GUESTS  BIT(6)	// quest start/finish use MEMBERS_ONLY
 #define QST_TUTORIAL  BIT(7)	// quest can be blocked by 'toggle tutorial'
 #define QST_GROUP_COMPLETION  BIT(8)	// group members auto-finish this quest, even if incomplete, if present when any member does
+#define QST_EVENT  BIT(9)	// shows as an event quest; splits dailies into 2 pools
 
 
 // QG_x: quest giver types
@@ -2491,6 +2640,10 @@ typedef enum {
 #define QR_REPUTATION  7
 #define QR_CURRENCY  8
 #define QR_EVENT_POINTS  9
+#define QR_SPEAK_LANGUAGE  10
+#define QR_RECOGNIZE_LANGUAGE  11
+#define QR_GRANT_PROGRESS  12
+#define QR_START_PROGRESS  13
 
 
 // indicates empire (rather than misc) coins for a reward
@@ -2526,6 +2679,8 @@ typedef enum {
 #define SECTF_SHALLOW_WATER  BIT(22)	// can't earthmeld; other properties like swamp and oasis have
 #define SECTF_NEEDS_HEIGHT  BIT(23)	// will automatically set its 'height' property under certain circumstances
 #define SECTF_KEEPS_HEIGHT  BIT(24)	// retains its 'height' property but won't inherit a new one
+#define SECTF_SEPARATE_NOT_ADJACENTS  BIT(25)	// runs every NOT-ADJACENT evolution separately instead of ensuring it's not adjacent to ANY of them
+#define SECTF_SEPARATE_NOT_NEARS  BIT(26)	// runs every NOT-NEAR-SECTOR evolution separately instead of ensuring it's not near ANY of them
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -2743,7 +2898,8 @@ typedef enum {
 #define EVO_TIMED  20	// evolves after a certain number of minutes
 #define EVO_OWNED  21	// evolves if owned
 #define EVO_UNOWNED  22	// evolves if un-owned
-#define NUM_EVOS  23	// total
+#define EVO_BURN_STUMPS  23	// uses the burn-stumps workforce to evolve
+#define NUM_EVOS  24	// total
 
 // EVO_VAL_x: evolution value types
 #define EVO_VAL_NONE  0
@@ -2793,6 +2949,7 @@ typedef enum {
 #define ROOM_AFF_NO_WORKFORCE_EVOS  BIT(22)	// w. workforce chores that would evolve the tile don't run
 #define ROOM_AFF_HIDE_REAL_NAME  BIT(23)	// x. won't show the real name after a custom name, like Ruins of a House (Ruins)
 #define ROOM_AFF_MAPOUT_BUILDING  BIT(24)	// y. shows as a building on the mapout (set automatically)
+#define ROOM_AFF_NO_TRACKS  BIT(25)		// z. nobody leaves tracks and you cannot track
 // NOTE: limit BIT(31) -- This is currently an unsigned int, to save space since there are a lot of rooms in the world
 
 
@@ -2839,7 +2996,7 @@ typedef enum {
 #define MAX_CMD_LENGTH  (MAX_STRING_LENGTH-80)	// can't go bigger than this, altho DG Scripts wanted 16k
 #define MAX_COIN  2140000000	// 2.14b (< MAX_INT)
 #define MAX_COIN_TYPES  10	// don't store more than this many different coin types
-#define MAX_CONDITION  750	// FULL, etc
+#define MAX_CONDITION  (REAL_UPDATES_PER_MUD_HOUR * 24 * 2)	// FULL, etc: 2 days of hunger/thirst
 #define MAX_CONFIG_TEXT  4000	// long-string configs
 #define MAX_EMPIRE_DESCRIPTION  2000
 #define MAX_FACTION_DESCRIPTION  4000
@@ -2903,6 +3060,13 @@ typedef enum {
  //////////////////////////////////////////////////////////////////////////////
 //// MISCELLANEOUS STRUCTS ///////////////////////////////////////////////////
 
+// for character affect expiration
+struct affect_expire_event_data {
+	char_data *character;
+	struct affected_type *affect;
+};
+
+
 // apply types for augments and morphs
 struct apply_data {
 	int location;	// APPLY_
@@ -2915,13 +3079,12 @@ struct apply_data {
 struct affected_type {
 	any_vnum type;	// The type of spell that caused this
 	int cast_by;	// player ID (positive) or mob vnum (negative)
-	long duration;	// For how long its effects will last. NOTE: for room affects, this is expire timestamp (for players it's time in hours)
+	long expire_time;	// timestamp when the affect will expire -- note: -1 when unlimited; these save as "number of seconds remaining" in player files
 	int modifier;	// This is added to apropriate ability
 	byte location;	// Tells which ability to change - APPLY_
 	bitvector_t bitvector;	// Tells which bits to set - AFF_
 	
-	struct dg_event *expire_event;	// SOMETIMES these have scheduled events (only on rooms)
-		// NOTE: if you apply expire_event to character buffs, functions like affect_join that update the duration must check it
+	struct dg_event *expire_event;	// expiry is handled by events; if scheuled, one is linked here
 	
 	struct affected_type *next;
 };
@@ -3285,6 +3448,8 @@ struct req_data {
 	int needed;	// how many the player needs
 	int current;	// how many the player has (for places where this data is tracked
 	
+	char *custom;	// custom display text, may be NULL
+	
 	struct req_data *next;
 };
 
@@ -3633,6 +3798,7 @@ struct room_template {
 	bitvector_t flags;	// RMT_
 	bitvector_t base_affects;	// ROOM_AFF_
 	bitvector_t functions;	// FNC_
+	rmt_vnum subzone;	// for subdividing where/shout/etc
 	
 	// lists
 	struct adventure_spawn *spawns;	// list of objs/mobs
@@ -3665,6 +3831,7 @@ struct archetype_data {
 	char *male_rank;
 	char *female_rank;
 	
+	generic_data *language;	// optional starting language (generic)
 	struct archetype_skill *skills;	// linked list
 	struct archetype_gear *gear;	// linked list
 	int attributes[NUM_ATTRIBUTES];	// starting attributes (default 1)
@@ -3903,6 +4070,7 @@ struct mob_special_data {
 	int max_scale_level;	// maximum level this mob may be scaled to
 	
 	int name_set;	// NAMES_x
+	any_vnum language;	// default language (NOTHING to use global default instead)
 	struct custom_message *custom_msgs;	// any custom messages
 	faction_data *faction;	// if any
 	
@@ -4282,6 +4450,14 @@ struct player_ability_data {
 };
 
 
+// languages a player knows -- also used for empires
+struct player_language {
+	any_vnum vnum;	// vnum of the language (generic)
+	byte level;	// LANG_ constant for how well they speak it
+	UT_hash_handle hh;	// player's language hash
+};
+
+
 // remembers a tile a player has seen before
 struct player_map_memory {
 	room_vnum vnum;	// map loc
@@ -4375,7 +4551,7 @@ struct player_special_data {
 	
 	// misc player attributes
 	ubyte apparent_age;	// for vampires	
-	sh_int conditions[NUM_CONDS];	// Drunk, full, thirsty
+	int conditions[NUM_CONDS];	// Drunk, full, thirsty
 	int resources[NUM_MATERIALS];	// God resources
 	
 	// various lists
@@ -4399,6 +4575,7 @@ struct player_special_data {
 	int daily_cycle;	// Last update cycle registered
 	ubyte daily_bonus_experience;	// boosted skill gain points
 	int daily_quests;	// number of daily quests completed today
+	int event_daily_quests;	// number of daily event quests completed today
 
 	// action info
 	int action;	// ACT_
@@ -4441,6 +4618,8 @@ struct player_special_data {
 	ubyte class_progression;	// % of the way from SPECIALTY_SKILL_CAP to CLASS_SKILL_CAP
 	ubyte class_role;	// ROLE_ chosen by the player
 	class_data *character_class;  // character's class as determined by top skills
+	any_vnum speaking;	// current language
+	struct player_language *languages;	// languages the player speaks/recognizes
 	struct player_craft_data *learned_crafts;	// crafts learned from patterns
 	struct minipet_data *minipets;	// collection of summonable pets
 	struct ability_gain_hook *gain_hooks;	// hash table of when to gain ability xp
@@ -4465,12 +4644,16 @@ struct player_special_data {
 	
 	// UNSAVED PORTION //
 	
+	int idle_seconds;	// how long they have been idle (updated every 5 seconds or so)
 	int gear_level;	// computed gear level -- determine_gear_level()
 	byte reboot_conf;	// Reboot confirmation
 	byte create_points;	// Used in character creation
 	int group_invite_by;	// idnum of the last player to invite this one
 	time_t move_time[TRACK_MOVE_TIMES];	// timestamp of last X moves
 	int beckoned_by;	// idnum of player who beckoned (for follow)
+	int last_aff_wear_off_vnum;	// helps prevent duplicate wear-off messages
+	time_t last_aff_wear_off_time;	// helps prevent duplicate wear-off messages
+	int last_cond_message_time[NUM_CONDS];	// last time we sent a message for drunk, full, thirsty
 	int last_look_sun;	// used to determine if the player needs to 'look' at sunrise/set
 	bool map_memory_needs_save;	// whether or not to save the map memory file
 	bool map_memory_loaded;	// whether or not it has been loaded yet
@@ -4478,6 +4661,7 @@ struct player_special_data {
 	
 	struct combat_meters meters;	// combat meter data
 	
+	bool affects_converted;	// if FALSE, player's affs have seconds-of-duration instead of expire-timestamp
 	bool needs_delayed_load;	// whether or not the player still needs delayed data
 	bool dont_save_delay;	// marked when a player is partially unloaded, to prevent accidentally saving a delay file with no gear
 	bool restore_on_login;	// mark the player to trigger a free reset when they enter the game
@@ -4573,7 +4757,8 @@ struct char_special_data {
 	int mana_regen;	// mana regen add
 	
 	int carry_items;	// Number of items carried
-	int	timer;	// Timer for update
+	
+	struct stored_event *stored_events;	// linked list of stored dg events
 };
 
 
@@ -4609,6 +4794,7 @@ struct char_data {
 
 	char_data *prev_in_room, *next_in_room;	// For room->people - doubly-linked list
 	char_data *prev, *next;	// For character_list (doubly-linked)
+	char_data *prev_plr, *next_plr;	// For player_character_list (doubly-linked)
 	char_data *next_fighting;	// For fighting list
 	bool in_combat_list;	// helps with removing from combat list
 	
@@ -4629,12 +4815,27 @@ struct char_data {
 };
 
 
+// for cooldown expiration
+struct cooldown_expire_event_data {
+	char_data *character;
+	struct cooldown_data *cooldown;
+};
+
+
 // cooldown info (cooldowns are defined by generics)
 struct cooldown_data {
 	any_vnum type;	// any COOLDOWN_ const or vnum
 	time_t expire_time;	// time at which the cooldown has expired
+	struct dg_event *expire_event;	// scheduled DG event, if any
 	
 	struct cooldown_data *next;	// linked list
+};
+
+
+// for damage-over-time (dot) updates and expiry
+struct dot_event_data {
+	char_data *ch;
+	struct over_time_effect_type *dot;
 };
 
 
@@ -4642,11 +4843,13 @@ struct cooldown_data {
 struct over_time_effect_type {
 	any_vnum type;	// ATYPE_
 	int cast_by;	// player ID (positive) or mob vnum (negative)
-	long duration;	// time in 5-second real-updates
+	int time_remaining;	// time in SECONDS
 	sh_int damage_type;	// DAM_x type
 	sh_int damage;	// amount
 	sh_int stack;	// damage is multiplied by this
 	sh_int max_stack;	// how high it's allowed to stack
+	
+	struct dg_event *update_event;	// for updating every 5 seconds
 
 	struct over_time_effect_type *next;
 };
@@ -4734,6 +4937,7 @@ struct crop_data {
 	
 	struct spawn_info *spawns;	// mob spawn data
 	struct interaction_item *interactions;	// interaction items
+	struct extra_descr_data *ex_description;	// extra descriptions
 	
 	UT_hash_handle hh;	// crop_table hash
 };
@@ -5074,6 +5278,16 @@ struct workforce_production_limit {
 };
 
 
+// to support daily workforce elogs
+struct workforce_production_log {
+	int type;	// WPLOG_ type
+	any_vnum vnum;	// object vnum etc
+	int amount;	// quantity
+	
+	struct workforce_production_log *next;	// LL
+};
+
+
 // for offenses committed against an empire
 struct offense_data {
 	int type;	// OFFENSE_ constant
@@ -5160,12 +5374,14 @@ struct empire_data {
 	struct offense_data *offenses;	// doubly-linked list
 	struct empire_goal *goals;	// current goal trackers (hash by vnum)
 	struct empire_completed_goal *completed_goals;	// actually a hash (vnum)
+	struct player_language *languages;	// languages available to the whole empire
 	struct player_craft_data *learned_crafts;	// crafts available to the whole empire
 	struct theft_log *theft_logs;	// recently stolen items
 	struct empire_production_total *production_totals;	// totals of items produced by the empire (hash by vnum)
 	struct empire_homeless_citizen *homeless;	// list of homeless npcs
 	struct script_data *script;	// for storing variables
 	struct workforce_production_limit *production_limits;	// limits on what workforce can make
+	struct workforce_production_log *production_logs;	// LL of things produced
 	struct empire_playtime_tracker *playtime_tracker;	// tracks real gameplay
 	
 	// unsaved data
@@ -5236,6 +5452,7 @@ struct event_data {
 	int max_level;	// or 0 for no max
 	int duration;	// minutes in length
 	int repeats_after;	// minutes to auto-repeat; 0/NOT_REPEATABLE for none
+	int max_points;	// fixed point cap, if >0
 	
 	UT_hash_handle hh;	// hash handle for event_table
 };
@@ -5308,9 +5525,27 @@ struct player_event_data {
  //////////////////////////////////////////////////////////////////////////////
 //// EVENT STRUCTS (TIMED EVENT SYSTEM) //////////////////////////////////////
 
+// for character-driven events that can be PC or NPC
+struct char_event_data {
+	char_data *character;	// the person acting
+};
+
+
 // for map events
 struct map_event_data {
 	struct map_data *map;
+};
+
+
+// data for various timed mob events
+struct mob_event_data {
+	char_data *mob;		// which mob
+};
+
+
+// data for various timed object events
+struct obj_event_data {
+	obj_data *obj;		// which object
 };
 
 
@@ -5332,7 +5567,8 @@ struct stored_event {
 	struct dg_event *ev;
 	int type;	// SEV_ type
 	
-	UT_hash_handle hh;	// hashed by type
+	struct stored_event *next;	// linked list
+	// UT_hash_handle hh;	// FORMERLY hashed by type; these are short lists though
 };
 
 
@@ -5535,6 +5771,7 @@ struct obj_data {
 	time_t stolen_timer;	// when the object was last stolen
 	empire_vnum stolen_from;	// empire who owned it
 	
+	struct stored_event *stored_events;	// linked list of stored dg events
 	time_t autostore_timer;	// how long an object has been where it be
 	
 	struct obj_binding *bound_to;	// LL of who it's bound to
@@ -5732,6 +5969,7 @@ struct sector_data {
 	struct spawn_info *spawns;	// mob spawn data
 	struct evolution_data *evolution;	// change over time
 	struct interaction_item *interactions;	// interaction items
+	struct extra_descr_data *ex_description;	// extra descriptions
 	
 	char *notes;	// misc notes shown only to imms
 	
@@ -6065,7 +6303,7 @@ struct shared_room_data {
 	struct track_data *tracks;	// hash: for tracking
 	
 	// events
-	struct stored_event *events;	// hash table (by type) of stored events
+	struct stored_event *events;	// linked list of stored events
 };
 
 
@@ -6103,6 +6341,8 @@ struct reset_com {
 	long long arg1;
 	long long arg2;	// Arguments to the command
 	long long arg3;
+	long long arg4;
+	long long arg5;
 
 	char *sarg1;	// string argument
 	char *sarg2;	// string argument

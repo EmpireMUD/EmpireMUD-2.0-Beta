@@ -42,7 +42,7 @@ any duplicate queued messages are stacked.
 Example:
   %asound% You hear a blood chilling howl from nearby.
 
-See also: %ECHO%, %REGIONECHO%
+See also: %ECHO%, %REGIONECHO%, %SUBECHO%
 #d
 %AT% MAT OAT VAT WAT
 
@@ -90,7 +90,7 @@ Example:
 
 See also: %TERRAFORM%, %TERRACROP%
 #d
-%BUILDINGECHO% %ECHO% %ECHOAROUND% %ECHONEITHER% %VEHICLEECHO% %SEND% BUILDINGECHO VEHICLEECHO ECHOAROUND ECHONEITHER TRIG-SEND
+%BUILDINGECHO% %ECHO% %ECHOAROUND% %ECHONEITHER% %VEHICLEECHO% %SEND% BUILDINGECHO VEHICLEECHO ECHOAROUND ECHONEITHER TRIG-SEND MECHO MECHOAROUND MECHONEITHER MSEND MBUILDINGECHO MVEHICLEECHO
 
 &c%echo% <message>&0
    Message is sent to all non-sleeping characters in the same room that this 
@@ -104,7 +104,7 @@ See also: %TERRAFORM%, %TERRACROP%
    Message will be sent to all characters in the room EXCEPT the two people.
 
 &c%send% <victim> <message>&0
-   Message will be sent to the victim only.
+   Message will be sent to the victim only. Works even if sleeping.
   
 &c%buildingecho% <room vnum> <message>&0
    Buildingecho echoes message to the entire building. room vnum should be any
@@ -112,6 +112,9 @@ See also: %TERRAFORM%, %TERRACROP%
 
 &c%regionecho% <location> <radius> <message>&0
    Sends to a map region. See HELP %REGIONECHO% for details.
+
+&c%subecho% <location> <message>&0
+   Sends to people in the same instance and subzone. See HELP %SUBECHO%.
 
 &c%vehicleecho% <vehicle> <message>&0
    Sends a message to everyone on/in the target vehicle.
@@ -127,7 +130,7 @@ any duplicate queued messages are stacked.
 NOTE: When used with mobs make sure the mobs can see the players and vehicles,
 i.e not blind, set INFRA.
 
-See also: %ASOUND%, %REGIONECHO%
+See also: %ASOUND%, %REGIONECHO%, %SUBECHO%, SUBZONE
 #d
 COMMENT * "TRIGEDIT COMMENT"
 
@@ -208,8 +211,8 @@ See also: TATTACH, TDETACH, TRIG-ATTACH
 #d
 DG_AFFECT DG_AFFECTS
 
-Usage:  dg_affect [#affect vnum] <target> <property> <value | off> <duration>
-        dg_affect <#affect vnum> <target> off
+Usage:  dg_affect [#affect vnum] <target> <property> <value | off [silent]> <duration>
+        dg_affect <#affect vnum> <target> off [silent]
 
 Puts an affection or apply on the target. Durations must be non-zero. You can
 use -1 for infinite duration ONLY if the target is an NPC.
@@ -218,14 +221,16 @@ The affect vnum arg is optional, and requires a # if you're going to use it.
 For example, #3001 uses the "fly" generic affect.
 
 Using "off" with no property results in removing all affects of a given type.
+If you add "silent" after "off", no wear-off message is shown.
 
 Examples:
   dg_affect %actor% HASTE on 20  -- Sets haste on actor for 20 seconds.
   dg_affect %actor% DODGE 100 20  -- Sets dodge on actor +100 for 20 seconds.
-  dg_affect %actor% STRENGTH off  -- Removes any STRENGTH affects
-  dg_affect #3024 %actor% off  -- Removes all affects of vnum 134
+  dg_affect %actor% STRENGTH off  -- Removes any STRENGTH affects.
+  dg_affect #3024 %actor% off  -- Removes all affects of vnum 134.
+  dg_affect %actor% HASTE off silent  -- Quietly removes anything with HASTE.
 
-See also: APPLIES, AFFECTS, GENERIC AFFECTS
+See also: APPLIES, AFFECT FLAGS, GENERIC AFFECTS
 #d
 DG_AFFECT_ROOM
 
@@ -253,9 +258,9 @@ style spells. Instead, mobs can use most player abilities directly at no cost.
 #d
 %DOOR% MDOOR ODOOR VDOOR WDOOR TRIGEDIT-EXIT TRIG-EXIT 
 
-%door% <vnum> <direction> <field> [value]
+%door% <from room> <direction> <field> [value]
 
-Used for adding, deleting, and modifying doors in room #vnum. Direction 
+Used for adding, deleting, and modifying doors in the room. The direction 
 determines which door is being changed, and can be any full direction name.
 If the door does not exist first, a new door will be created. Field is what
 property of the door is being changed. Valid fields are:
@@ -265,7 +270,10 @@ property of the door is being changed. Valid fields are:
    a - Exit is a door that can be opened and closed. Default is open.
    b - The door is closed.
 &cname&0- Value is the name of the door in the specified direction.
-&croom&0- Value is the vnum of the room this direction leads to.
+&croom&0- Value is the vnum of the room this direction leads to. It can be used
+   to add an exit to an existing room, including in adventures where it should
+   can be used with adventure template ids such as i12345 instead of a true
+   room vnum.
 &cadd <room building vnum>&0 - Add an exit (two-way) to a new room in this
    direction, using the building vnum provided (must be flagged ROOM). This
    only works in map buildings and vehicles, never in adventure zones or on
@@ -426,6 +434,7 @@ See also: EXPRESSIONS, NESTED-IFS
 %LOAD% MLOAD OLOAD VLOAD WLOAD
 
 %load% obj <vnum> [name <position>] [scale level]
+%load% obj <vnum> <in-obj> [scale level]
 %load% obj <vnum> <room> [scale level]
 %load% mob <vnum> [ally] [scale level]
 %load% veh <vnum> [scale level]
@@ -444,6 +453,7 @@ Load an object to the room:  %load% obj 1300 room
 Load a scaled mob to room:  %load% mob 1300 %actor.level%
 Load obj to player inv:  %load% obj 1300 %actor% inv
 Equip obj to player:  %load% obj 1300 %actor% waist
+Load an object in another object:  %load% obj 1300 %container%
 
 Valid wear positions are: head, ears, neck1, neck2, clothes, armor, about,
 arms, wrists, hands, rfinger, lfinger, waist, legs, feet, pack, saddle,
@@ -635,6 +645,10 @@ adventure zone and it will find the map location associated with it.
 If you use a negative radius, it will only echo to people outdoors. Otherwise,
 all players in range will see the echo.
 
+If regionecho is used in a room template with a subzone, only players in the
+same subzone will see it. Other adventures (but not other instances of the same
+adventure) in range will also show the message if they have the same subzone.
+
 Using a # (hash sign) at the start of the message will queue the message, which
 causes it to be sent on a very short delay (after any non-queued messages) and
 any duplicate queued messages are stacked.
@@ -643,7 +657,7 @@ Examples:
   %regionecho% %self.room% 100 # The fair has come to town!
   %regionecho% %self.room% -50 A pegasus flies overhead.
 
-See also: %ECHO%
+See also: %ECHO%, %SUBECHO%, SUBZONE
 #d
 REMOTE
 
@@ -751,13 +765,18 @@ Examples:
 #d
 %SLAY% MSLAY OSLAY VSLAY WSLAY
 
-Usage:  %slay% <target>
+Usage:  %slay% <target> [log message]
 
-This commant instantly kills a mob or player.
+This command instantly kills a mob or player. When used on a player, it will
+also log the death to the syslog and to the death slash-channel. You can
+provide a custom message as an optional argument.
+
+The default death log is:
+%person.name% has died at %person.room.coords%!
 #d
 "SWITCH STATEMENT" "CASE STATEMENT" "BREAK STATEMENT" "DEFAULT STATEMENT" CASE DEFAULT BREAK TRIG-SWITCH TRIGEDIT-SWITCH
 
-Switch statements let you compare once variable to several outcomes. A switch
+Switch statements let you compare one variable to several outcomes. A switch
 always ends with a break statement. Inside, it contains pairs of case/break
 section, and may have a default/break section.
 
@@ -787,6 +806,24 @@ command, are executed.
 &ccase&0 - Used to begin a new conditional group in a switch block.
 &cdefault&0 - Similar to case but matches any condition not met.
 &cdone&0 - Used to terminate a switch (or while) block.
+#d
+%SUBECHO% MSUBECHO OSUBECHO WSUBECHO
+
+%subecho% <location> <message>
+
+Sends a message to everyone in the same adventure and subzone. This works
+whether or not you have the !LOCATION flag set on the subzone.
+
+To send messages to other adventures with the same subzone, use %regionecho%.
+
+Using a # (hash sign) at the start of the message will queue the message, which
+causes it to be sent on a very short delay (after any non-queued messages) and
+any duplicate queued messages are stacked.
+
+Examples:
+  %subecho% %self.room% You hear a howl in the distance.
+
+See also: %ECHO%, %REGIONECHO%, SUBZONE
 #d
 TATTACH
 

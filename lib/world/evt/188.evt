@@ -3,15 +3,16 @@ Halloween of the Dead~
    Hey all you crazy ghosts and goblins, it's time for another Halloween! From
 October 1 to November 2, you'll find pieces of candy when you kill mobs
 anywhere in the world. Each type of candy starts a daily quest that will earn
-you points toward this event. There's a fixed number of points available, so be
-sure to grab them all each day!
+you points toward this event. There's a limited number of points available, so
+be sure to grab them all each day -- players who finish 5 daily quests each day
+for 31 of the 33 days will share the Rank 1 rewards!
 ~
    That's all for this Halloween, ghosts and ghouls, but don't worry: the
 winter holiday is just around the corner. And you'll definitely see the
 headless centaur again next year.
 ~
 ~
-12 0 0 1 400 47520 -1
+13 0 0 1 400 47520 -1 1550
 R 1 1 2 11501 1
 R 1 1 2 18898 1
 R 1 1 2 18838 1

@@ -13,30 +13,36 @@ S
 #102
 Quick Draw~
 0 -1 1.00 0 0
+T m 0
 S
 #103
 Firstaid~
 0 -1 1.00 0 0
+T m 0
 S
 #104
 Fleet~
 0 -1 1.00 0 0
+T m 0
 S
 #105
 Finesse~
 0 -1 1.00 0 0
+T m 0
 S
 #106
 Stunning Blow~
 0 -1 1.00 0 0
+T m 0
 S
 #107
 Veintap~
 0 -1 1.00 0 0
+T m 0
 S
 #108
 Weaken~
-a -1 0.50 D 0
+a -1 0.50 h 0
 A
 1 -1
 A
@@ -59,14 +65,17 @@ S
 #109
 Heal~
 0 -1 1.00 0 0
+T m 0
 S
 #110
 Heal Friend~
 0 -1 1.00 0 0
+T m 0
 S
 #111
 Heal Party~
 0 -1 1.00 0 0
+T m 0
 S
 #112
 Healing Potions~
@@ -81,14 +90,17 @@ S
 #114
 Rejuvenate~
 0 -1 1.00 0 0
+T m 0
 S
 #115
 Purify~
 0 -1 1.00 0 0
+T m 0
 S
 #116
 Cleanse~
 0 -1 1.00 0 0
+T m 0
 S
 #117
 Ready Fireball~
@@ -100,7 +112,7 @@ T g 1
 S
 #118
 Lightningbolt~
-abi -1 1.00 B 0
+abi -1 1.00 o 0
 C
 lightningbolt 7 bf 2 10 3 2023 9 8 3 0
 T c 8
@@ -137,14 +149,40 @@ S
 #120
 Counterspell~
 0 -1 1.00 0 0
+T m 0
 S
 #121
 Entangle~
-0 -1 1.00 0 0
+abfop -1 1.00 o 0
+A
+2 -1
+C
+entangle 7 bf 2 20 0 2025 30 0 3 0
+M
+2
+You shoot out vines of green mana, which entangle $N!~
+M
+3
+$n shoots vines of green mana at you, entangling you!~
+M
+4
+$n shoots vines of green mana at $N, entangling $M!~
+M
+5
+You send out vines of green mana to entangle $N, but they can't seem to grasp $M.~
+M
+6
+$n sends out vines of green mana to entangle you, but they can't seem to latch on.~
+M
+7
+$n sends out vines of green mana to entangle $N, but they can't seem to grasp $M.~
+T b 1
+X b
+3024 20 20 r
 S
 #122
 Familiar~
-0 -1 1.00 0 0
+0 -1 1.00 0 o
 C
 unknown 8 0 2 40 0 -1 0 0 5 0
 D 8 500 0
@@ -172,14 +210,17 @@ S
 #125
 Skybrand~
 0 -1 1.00 0 0
+T m 0
 S
 #126
 Chant of Nature~
 0 -1 1.00 0 0
+T m 0
 S
 #136
 Inspire~
 0 -1 1.00 0 0
+T m 0
 S
 #137
 Customize Building~
@@ -204,6 +245,7 @@ S
 #143
 Steal~
 0 -1 1.00 0 0
+T m 0
 S
 #144
 Infiltrate~
@@ -220,6 +262,7 @@ S
 #146
 Escape~
 0 -1 1.00 0 0
+T m 0
 S
 #147
 Appraisal~
@@ -230,6 +273,7 @@ S
 #148
 Concealment~
 0 -1 1.00 0 0
+T m 0
 S
 #149
 Secret Cache~
@@ -257,6 +301,7 @@ S
 #153
 Shadowstep~
 0 -1 1.00 0 0
+T m 0
 S
 #154
 Vaultcracking~
@@ -267,10 +312,11 @@ S
 #155
 Jab~
 0 -1 1.00 0 0
+T m 0
 S
 #156
 Blind~
-a -1 1.00 C 0
+a -1 1.00 h 0
 C
 blind 7 bf 1 15 0 2040 10 0 2 2
 M
@@ -298,10 +344,12 @@ S
 #157
 Sap~
 0 -1 1.00 0 0
+T m 0
 S
 #158
 Dagger Mastery~
 0 -1 1.00 0 0
+T m 0
 S
 #159
 Poisons~
@@ -320,23 +368,27 @@ S
 #161
 Prick~
 0 -1 1.00 0 0
+T m 0
 S
 #162
 Bat Form~
 0 -1 1.00 0 0
+T k 1
 S
 #163
 Ritual of Burdens~
 0 -1 1.00 0 0
+T m 0
 S
 #164
 Staffmaking~
-0 -1 1.00 0 0
+0 170 1.00 0 0
 T a 0
 S
 #165
 Manashield~
 0 -1 1.00 0 0
+T m 0
 S
 #166
 Foresight~
@@ -367,7 +419,7 @@ S
 #167
 Enchant Weapons~
 0 181 1.00 0 0
-T a 0
+T l 1
 S
 #168
 Summon Swift~
@@ -401,16 +453,18 @@ T e 0
 S
 #170
 Powerful Staves~
-0 -1 1.00 0 0
+0 170 1.00 0 0
 T a 0
 S
 #171
 Staff Mastery~
 0 -1 1.00 0 0
+T m 0
 S
 #172
 Siege Ritual~
 0 -1 1.00 0 0
+T m 0
 S
 #173
 Colorburst~
@@ -444,18 +498,22 @@ S
 #174
 Enervate~
 0 -1 1.00 0 0
+T m 0
 S
 #175
 Slow~
 0 -1 1.00 0 0
+T m 0
 S
 #176
 Siphon~
 0 -1 1.00 0 0
+T m 0
 S
 #177
 Mirrorimage~
 0 -1 1.00 0 0
+T m 0
 S
 #178
 Sunshock~
@@ -472,14 +530,17 @@ S
 #179
 Phoenix Rite~
 0 -1 1.00 0 0
+T m 0
 S
 #180
 Disenchant~
 0 -1 1.00 0 0
+T m 0
 S
 #181
 Greater Enchantments~
 0 181 1.00 0 0
+T l 1
 S
 #182
 Dangerous Leathers~
@@ -489,24 +550,27 @@ S
 #183
 Vigor~
 0 -1 1.00 0 0
+T m 0
 S
 #184
 Enchant Armor~
 0 181 1.00 0 0
-T a 0
+T l 1
 S
 #185
 Enchant Tools~
 0 181 1.00 0 0
-T a 0
+T l 1
 S
 #186
 Ritual of Defense~
 0 -1 1.00 0 0
+T m 0
 S
 #187
 Ritual of Teleportation~
 0 -1 1.00 0 0
+T m 0
 S
 #188
 City Teleportation~
@@ -529,14 +593,17 @@ S
 #191
 Devastation Ritual~
 0 -1 1.00 0 0
+T m 0
 S
 #192
 Sense Life Ritual~
 0 -1 1.00 0 0
+T m 0
 S
 #193
 Ritual of Detection~
 0 -1 1.00 0 0
+T m 0
 S
 #194
 Master Tailor~

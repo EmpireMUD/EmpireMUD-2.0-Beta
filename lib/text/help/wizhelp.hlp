@@ -164,6 +164,9 @@ Long strings use the full text editor. To edit, use: config <key> edit
 
 There is no undo button, but all changes are logged.
 
+Key names may be abbreviated when viewing a key's value, but not when changing
+the value.
+
 If you want to experiment with the system, you can change test_config in the
 "other" set.
 #b
@@ -508,7 +511,8 @@ The 'delete' command deletes by number in the list.
 The 'deleteall' command removes all instances for a given adventure zone
 (by vnum). You can delete ALL instances in the game with 'inst deleteall all'.
 
-The 'info' command gets full details on a single instance.
+The 'info' command gets full details on a single instance (the one you're in,
+or any instance by id).
 
 The 'reset' command will force a zone reset on the instance you're in or the
 instance number you target.
@@ -604,6 +608,13 @@ Example:
 
 See also: GRANT, VNUM
 #d
+MISSINGHELP MISSINGHELPS "MISSING HELPS"
+
+Usage:  missinghelp
+
+This command lists any commands, skills, or abilities that do not have help
+files.
+#d
 MOVEEINV "MOVE EINV" "MOVE EMPIRE INVENTORY"
 
 Usage:  moveeinv "<empire>" <from island> <to island>
@@ -627,6 +638,22 @@ use most communication channels until he/she is unmuted. This command is
 grantable.
 
 See also: FLAGS, GRANT
+#d
+NATURALIZE "NATURAL SECTOR"
+
+'Naturalize' means return a map tile to its natural sector type. You can see
+what that is by using 'stat room' on the map. It shows a display like this:
+Sector: [10 - Building], Base: [0 - Plains], Natural: [4 - Overgrown Forest]
+
+Newbie islands will naturalize their unclaimed tiles each year if the world
+config 'naturalize_newbie_islands' is turned on.
+
+The map editor can be used to naturalize a tile, island, or the whole world
+via '.map naturalize'.
+
+You can change a tile's (or island's) natural sector with '.map remember'.
+
+See also: CONFIG, MAPEDIT NATURALIZE, MAPEDIT REMEMBER
 #d
 NOCUSTOMIZE !CUSTOMIZE "NO CUSTOMIZE"
 
@@ -698,11 +725,12 @@ PEACE "PEACE COMMAND"
 
 Usage:  peace
 
-The peace command ends all combat in the room (but does not keep people from
-re-attacking). Input queues are also cleared, to avoid players accidentally
-restarting combat from queued attacks. This command is grantable.
+The peace command ends all combat in the room and clears all DOT effects (but
+does not keep people from re-attacking). Input queues are also cleared, to
+avoid players accidentally restarting combat from queued attacks. This command
+is grantable.
 
-See also: DIPLOMACY PEACE, GRANT
+See also: DIPLOMACY PEACE, DOTS, GRANT
 #d
 PLAYERDELETE "PLAYER DELETE" "DELETE PLAYER" DELETEPLAYER PLRDELETE
 
@@ -867,7 +895,7 @@ Valid files are:
   credits    (/mud_dir/lib/text/credits)
   intros     (/mud_dir/lib/text/intros/*)
   handbook   (/mud_dir/lib/text/handbook)
-  help       (/mud_dir/lib/text/help)
+  help       (/mud_dir/lib/text/help/screen and screen-screenreader)
   immlist    (/mud_dir/lib/text/immlist)
   imotd      (/mud_dir/lib/text/imotd)
   news       (/mud_dir/lib/text/news)
@@ -910,7 +938,8 @@ maintentance, and puts out any fire. It will complete the vehicle if it is
 incomplete.
 
 If a full restore (all) is performed on an immortal, it also sets all skill
-levels to 100 and gives all abilities (on the main skill set only).
+levels to 100, gives all abilities (on the main skill set only), and grants
+all languages.
 
 This command is grantable.
 
@@ -961,9 +990,11 @@ coins          PC      MISC         Sets coins on-hand for player
 companion      PC      MISC         Sets a companion NPC on/off
 currency       PC      MISC         Sets amounts of adventure currencies
 dailyquestscompleted  PC  NUMBER    Number of dailies they have completed today
+eventdailyquests      PC  NUMBER    Number of event dailies they have completed
 faction        PC      MISC         Change faction reputations (SET FACTION)
 grants         PC      MISC         Set grants for player
 invstart       PC      BINARY       Invisible @ Start
+language       PC      STRING       Change which languages the player speaks
 lastname       PC      STRING       Player's last name, (SET LASTNAME)
 learned        PC      MISC         Turns learned recipes on/off
 maxlevel       PC      NUMBER       Sets the max-known-level, limiting EQ level
@@ -1042,6 +1073,14 @@ You can delete a reputation entirely by setting it to 'none'.
 
 See also: FACTION, SHOW FACTIONS
 #d
+"SET LANGUAGE"
+
+Usage:  set [file] <player> language <language | vnum> <speak | recognize | unknown>
+
+This lets you change which languages a player speaks.
+
+See also: SPEAK, SHOW LANGUAGES
+#d
 "SET LASTNAME" "SET LAST NAME"
 
 Usage:  set <name> lastname <new personal lastname | none>
@@ -1065,7 +1104,7 @@ See also: LEARN, LEARNED, SHOW LEARNED
 
 Usage:  set [file] <player> minipet <mob vnum> <on | off>
 
-This lets you give (or revoke) collectible mini-pets.
+This lets you give (or revoke) collectible minipets.
 
 WARNING: This works on ANY mob vnum.
 
@@ -1101,16 +1140,19 @@ currency   Immort   Shows coins and adventure currencies for a player.
 dailycycle Immort   Shows daily quests with a given cycle id.
 dropped    Immort   Shows all items an empire has on the ground.
 factions   Immort   Shows a player's faction levels.
+home       Immort   Shows where a player's home is, if any.
 homeless   Immort   Shows the homeless citizen list for an empire.
 ignoring   Immort   Shows you who a player has on their ignore list.
 inventory  Immort   Shows how many players have a certain item.
 islands    Immort   Shows you which island ids have empire storage (for MOVEEINV).
+languages  Immort   Shows which languages a player knows and is speaking.
 lastnames  Immort   Shows target player's lastname list.
 learned    Immort   Shows you learned recipes.
-minipets   Immort   Shows you mini-pets collected by a player.
+minipets   Immort   Shows you minipets collected by a player.
 moons      Immort   Shows any moons and their current phases/positions.
 mounts     Immort   Shows you mounts owned by a player.
 notes      Immort   Show notes on a player.
+oceanmobs  Immort   Shows mobs lost in the ocean.
 olc        Immort   Shows all players with OLC access (vnum optional).
 player     Immort   Shows player summary information.
 players    Immort   Shows health and status for all current players.
@@ -1125,9 +1167,11 @@ skills     Immort   Shows skill levels and abilities for a player.
 spawns     Immort   Shows where a mob spawns on the map, similar to ".mob search".
 startlocs  Immort   Shows the location of all starting location tiles.
 storage    Immort   Shows items that can be stored in a given building/room type.
+subzone    Immort   Shows room templates with a matching subzone id.
 technology Immort   Shows ability techs a player has.
 sectors    Immort   Shows tile counts for all sector types (vnum/name optional).
 terrain    Immort   Same as 'sectors' (for historical reasons).
+tomb       Immort   Shows where a player's tomb is, if any.
 tools      Immort   Shows all objects with a given tool type.
 unlearnable Immrt   Shows stats on LEANRED crafts with no assignments.
 uses       Immort   Shows crafts (and vehicles, etc.) that use a component type.
@@ -1209,6 +1253,14 @@ be filtered by name.
 
 See also: FACTION, SET FACTION
 #e
+"SHOW HOME"
+
+Usage:  show home <player>
+
+This command shows where a player has set as their home, if anywhere.
+
+See also: HOME
+#e
 "SHOW HOMELESS"
 
 Usage:  show homeless <empire>
@@ -1245,6 +1297,15 @@ an empire's leaderboard rank in place of its name, but not vnum.
 
 See also: ISLANDS, MOVEEINV
 #e
+"SHOW LANGUAGES"
+
+Usage:  show languages <player> [search phrase]
+
+Shows you languages known by a player, and what language they are currently
+speaking. It will also indicate which languages come from the player's empire.
+
+See also: SET LANGUAGE, SPEAK
+#e
 "SHOW LASTNAMES" "SHOW LAST NAMES"
 
 Usage:  show lastnames <player> [search phrase]
@@ -1266,7 +1327,7 @@ See also: SET LEARNED
 
 Usage:  show minipets <player> [search phrase]
 
-Shows you mini-pets collected by a player.
+Shows you minipets collected by a player.
 
 See also: SET MINIPET
 #e
@@ -1292,6 +1353,18 @@ See also: SET MOUNT
 Usage:  show notes <player name>
 
 Shows immortal notes for the target player's account.
+#e
+"SHOW OCEANMOBS" "SHOW OCEAN MOBS"
+
+Usage:  show oceanmobs
+
+This looks for mobs that might be lost in the ocean. It lists mobs that are:
+- on true Ocean tiles (ones that share data)
+- are not SPAWNED
+- are not linked to an adventure
+
+These mobs usually include lost mounts that came from adventure rewards. Such
+mobs usually do not despawn on their own.
 #e
 "SHOW OLC"
 
@@ -1400,6 +1473,17 @@ Usage:  show storage <building | vehicle> <vnum>
 Lists objects which store in the building or vehicle. This does not include
 stores-like relationships, only items actually set to store there.
 #e
+"SHOW SUBZONE"
+
+Usage:  show subzone <id | vnum>
+
+This command lists all room templates that have the subzone id you provided.
+
+You can also specify a room template's vnum and it will show all rooms with a
+matching subzone to it. This mode only works if there were no exact matches for
+the id you entered, but there IS a room template with that vnum AND it has a
+subzone id.
+#e
 "SHOW TECHNOLOGY"
 
 Usage:  show technology <player>
@@ -1419,6 +1503,14 @@ see as many as fit in the text buffer.
 
 "Show sectors" was formerly called "show terrain", which is also included for
 immortals who still use the old version.
+#e
+"SHOW TOMB"
+
+Usage:  show tomb <player>
+
+Shows where a player has set as their tomb, if anywhere.
+
+See also: TOMB
 #e
 "SHOW TOOLS"
 
@@ -1594,6 +1686,21 @@ The SYSLOG command controls how detailed of an on-line system log you see.
 Messages surrounded by '[' and ']' are syslog messages and are in green
 if you have color on. If they are only shown to high-level imms, the level will
 be indicated.
+
+Available syslog types are:
+  config - changes to game configuration.
+  death - players dying
+  error - game errors
+  gc - immortal actions ("god commands")
+  info - minor logs like island renaming, rescans, ideas, bugs, and typos
+  level - changes in access level
+  login - players logging in or out, new players
+  olc - OLC edits and actions
+  script - script errors
+  system - reboots and shutdowns
+  validation - the approve command
+  empire - merges, diplomacy, and wars
+  event - event beginning, end, and all point gains
 
 See also: TOGGLE
 #d

@@ -1,0 +1,29 @@
+#10250
+Primeval Portal: Search the Forest~
+   The chronomancer seems quite worried about the safety of the base camp.
+After all, the Primeval is a frighteningly unfamiliar and deeply unsettling
+time. Whether a dracosaur, terrosaur, or mad sorcerer, the threat outside the
+camp must be discovered, measured, and defeated. Track down whichever threat is
+most immediate (each Primeval Portal will only have 1 of the 3 boss mobs) and
+ensure it is laid to rest.
+~
+   The chronomancer looks relieved that the base is safe -- at least, for the
+time being.
+~
+3 e 75 175 -1
+A
+1 10250
+R
+8 10250 5
+R
+1 0 100
+W
+3 10252 0 1
+W
+3 10253 0 1
+W
+3 10254 0 1
+Z
+1 10250
+S
+$

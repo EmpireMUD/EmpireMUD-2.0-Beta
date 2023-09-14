@@ -12,9 +12,9 @@ D0
 &A~
 E
 4 0 0.01 18294
-I 5 100 50.00 1 x  # DIG: a rock
-I 5 102 50.00 1 x  # DIG: a flint stone
-I 6 10338 75.00 1  # FORAGE: a scaly dragonfruit
+I 5 100 50.00 1 x  # DIG: rock
+I 5 102 50.00 1 x  # DIG: flint stone
+I 6 10338 75.00 1  # FORAGE: scaly dragonfruit
 M
 18299 5.00 0
 M
@@ -23,6 +23,17 @@ M
 18297 5.00 0
 M
 18296 25.00 0
+X
+field imagination around~
+   What an odd spot you've found yourself in! The grass around you is as blue
+as the sky, and everywhere you turn, you think you see something out of the
+corner of your eye. On the ground, odd, scaly fruit seem to have fallen but
+from where, you cannot tell.
+~
+X
+fruit scaly~
+Try foraging for the fruit.
+~
 S
 #18294
 Dragon Tree~
@@ -35,10 +46,10 @@ D0
 &J~
 E
 0 1 100.00 18293
-I 5 100 50.00 1 x  # DIG: a rock
-I 5 102 50.00 1 x  # DIG: a flint stone
-I 6 10338 75.00 1  # FORAGE: a scaly dragonfruit
-I 20 18296 100.00 1  # CHOP: a great dragon tree
+I 5 100 50.00 1 x  # DIG: rock
+I 5 102 50.00 1 x  # DIG: flint stone
+I 6 10338 75.00 1  # FORAGE: scaly dragonfruit
+I 20 18296 100.00 1  # CHOP: great dragon tree
 M
 18292 0.01 0
 M
@@ -49,5 +60,17 @@ M
 18297 5.00 0
 M
 18296 25.00 0
+X
+tree dragon great trees forest around~
+   The tree absolutely looms above you, taller than a tower or castle --
+perhaps taller than some mountains you've seen. The light green leaves grow
+down the length of the tree, even from the trunk, with a shape like scales. At
+the right angle, it almost resembles a dragon -- surely its namesake. And here
+and there, scaly fruit dangles from its branches.
+~
+X
+fruit scaly~
+The scaly fruit looks tempting. Perhaps you could forage for a ripe one.
+~
 S
 $

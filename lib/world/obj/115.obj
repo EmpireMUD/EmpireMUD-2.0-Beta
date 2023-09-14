@@ -124,7 +124,7 @@ S
 whistle brown adventure hound~
 a brown adventure hound whistle~
 A brown adventure hound whistle is hanging here.~
-This whistle grants you a new mini-pet! Type 'use whistle' to get it.
+This whistle grants you a new minipet! Type 'use whistle' to get it.
 ~
 19 p a 0 5
 11510 0 0
@@ -271,9 +271,12 @@ Some pixy droppings are scattered on the ground.~
    It looks like a pixy has been here recently. On closer inspection, it's
 mostly leaves and berries. Oh well; you'd better look somewhere else for now.
 ~
-3 0 0 0 2
+3 0 0 0 3
 0 0 0
 0 3
+M
+18
+$p turns to glitter and blows away on the wind.~
 S
 #11524
 robes flowing iridescent~
@@ -346,7 +349,7 @@ S
 whistle minipet rainbow firefly~
 a rainbow firefly minipet whistle~
 A rainbow firefly minipet whistle is lying here.~
-This whistle grants you a new mini-pet! Type 'use whistle' to get it.
+This whistle grants you a new minipet! Type 'use whistle' to get it.
 ~
 19 p a 0 6
 11528 0 0
@@ -446,5 +449,15 @@ the Pixy Pursuit quest at the alchemist.
 3 k a 0 3
 30 0 0
 8 0
+S
+#11536
+jar living minipet~
+a living jar minipet~
+A living jar minipet is lying on the ground.~
+You can add this living jar to your list of minipets! Just type 'use jar'.
+~
+19 p a 0 7
+11536 0 0
+6 0
 S
 $

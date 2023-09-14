@@ -21,6 +21,7 @@
 #include "db.h"
 #include "skills.h"
 #include "vnums.h"
+#include "dg_event.h"
 #include "dg_scripts.h"
 #include "constants.h"
 
@@ -36,6 +37,7 @@ ACMD(do_stand);
 
 // locals
 ACMD(do_bite);
+EVENTFUNC(vampire_feeding_event);
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -61,6 +63,7 @@ bool cancel_biting(char_data *ch) {
 		act("$n stops feeding from $N.", FALSE, ch, NULL, vict, TO_NOTVICT);
 		GET_FED_ON_BY(vict) = NULL;
 		GET_FEEDING_FROM(ch) = NULL;
+		cancel_stored_event(&GET_STORED_EVENTS(ch), SEV_VAMPIRE_FEEDING);
 		return TRUE;
 	}
 	
@@ -289,11 +292,10 @@ void make_vampire(char_data *ch, bool lore, any_vnum skill_vnum) {
 		GET_APPARENT_AGE(ch) = GET_REAL_AGE(ch);
 		
 		if (skill_vnum != NOTHING && get_skill_level(ch, skill_vnum) < 1) {
-			gain_skill(ch, find_skill_by_vnum(skill_vnum), 1);
+			gain_skill(ch, find_skill_by_vnum(skill_vnum), 1, NULL);
 		}
 
-		GET_BLOOD(ch) = config_get_int("blood_starvation_level") * 1.5;
-		GET_BLOOD(ch) = MIN(GET_BLOOD(ch), GET_MAX_BLOOD(ch));
+		set_blood(ch, config_get_int("blood_starvation_level") * 1.5);
 
 		remove_lore(ch, LORE_START_VAMPIRE);
 		remove_lore(ch, LORE_SIRE_VAMPIRE);
@@ -362,7 +364,7 @@ void sire_char(char_data *ch, char_data *victim) {
 	// did we find a valid vamp skill
 	if (vamp_skill != NOTHING && CAN_GAIN_NEW_SKILLS(victim) && noskill_ok(victim, vamp_skill)) {
 		make_vampire(victim, FALSE, vamp_skill);
-		GET_BLOOD(ch) -= 10;
+		set_blood(ch, GET_BLOOD(ch) - 10);
 
 		act("You tear open your wrist with your fangs and drip blood into $N's mouth!", FALSE, ch, 0, victim, TO_CHAR);
 		act("$n tears open $s wrist with $s teeth and drips blood into $N's mouth!", FALSE, ch, 0, victim, TO_NOTVICT);
@@ -398,6 +400,9 @@ void sire_char(char_data *ch, char_data *victim) {
 * @param char_data *victim The person being bitten.
 */
 void start_drinking_blood(char_data *ch, char_data *victim) {
+	struct char_event_data *data;
+	struct dg_event *ev;
+	
 	// safety first
 	if (GET_FEEDING_FROM(ch)) {
 		cancel_biting(ch);
@@ -411,7 +416,17 @@ void start_drinking_blood(char_data *ch, char_data *victim) {
 
 	stop_fighting(ch);
 	stop_fighting(victim);
-
+	
+	// ensure no existing event
+	cancel_stored_event(&GET_STORED_EVENTS(ch), SEV_VAMPIRE_FEEDING);
+	
+	// create new event
+	CREATE(data, struct char_event_data, 1);
+	data->character = ch;
+	ev = dg_event_create(vampire_feeding_event, data, 5 RL_SEC);
+	add_stored_event(&GET_STORED_EVENTS(ch), SEV_VAMPIRE_FEEDING, ev);
+	
+	// messaging last
 	if (!IS_NPC(victim) && PRF_FLAGGED(victim, PRF_BOTHERABLE)) {
 		act("You grasp $N's wrist and bite into it.", FALSE, ch, 0, victim, TO_CHAR);
 		act("$n grasps $N's wrist and bites into it.", FALSE, ch, 0, victim, TO_NOTVICT);
@@ -507,7 +522,7 @@ bool starving_vampire_aggro(char_data *ch) {
 	
 	// stun to keep them from stopping
 	if (GET_FEEDING_FROM(ch)) {
-		af = create_flag_aff(ATYPE_CANT_STOP, 6, AFF_HARD_STUNNED, ch);
+		af = create_flag_aff(ATYPE_CANT_STOP, 30, AFF_HARD_STUNNED, ch);
 		affect_join(ch, af, 0);
 	}
 	
@@ -631,14 +646,14 @@ void check_un_vampire(char_data *ch, bool remove_vampire_skills) {
 	if (!IS_VAMPIRE(ch)) {
 		remove_lore(ch, LORE_PURIFY);
 		add_lore(ch, LORE_PURIFY, "Purified");
-		GET_BLOOD(ch) = GET_MAX_BLOOD(ch);
+		set_blood(ch, GET_MAX_BLOOD(ch));
 		GET_APPARENT_AGE(ch) = 0;
 	}
 }
 
 
 /**
-* Updates the "biting" action, per 5 seconds.
+* Updates the "biting" action, per real update (usually 5 seconds).
 *
 * @param char_data *ch The person who might be biting, to update.
 */
@@ -661,13 +676,13 @@ void update_biting_char(char_data *ch) {
 	
 	// Transfuse blood -- 10-25 points (pints?) at a time
 	amount = MIN(number(10, 25), GET_BLOOD(victim));
-	GET_BLOOD(victim) -= amount;
+	set_blood(victim, GET_BLOOD(victim) - amount);
 	
 	// can gain more
 	if (has_player_tech(ch, PTECH_DRINK_BLOOD_FASTER)) {
 		amount *= 2;
 	}
-	GET_BLOOD(ch) = MIN(GET_MAX_BLOOD(ch), GET_BLOOD(ch) + amount);
+	set_blood(ch, GET_BLOOD(ch) + amount);
 	
 	// sanguine restoration: 10% heal to h/m/v per drink when biting humans
 	if ((!IS_NPC(victim) || MOB_FLAGGED(victim, MOB_HUMAN)) && has_ability(ch, ABIL_SANGUINE_RESTORATION)) {
@@ -675,19 +690,19 @@ void update_biting_char(char_data *ch) {
 		heal(ch, ch, hamt);
 		
 		hamt = GET_MAX_MANA(ch) / 10;
-		GET_MANA(ch) = MIN(GET_MAX_MANA(ch), GET_MANA(ch) + hamt);
+		set_mana(ch, GET_MANA(ch) + hamt);
 		
 		hamt = GET_MAX_MOVE(ch) / 10;
-		GET_MOVE(ch) = MIN(GET_MAX_MOVE(ch), GET_MOVE(ch) + hamt);
+		set_move(ch, GET_MOVE(ch) + hamt);
 	}
 
 	if (GET_BLOOD(victim) <= 0 && GET_ACTION(ch) != ACT_SIRING) {
-		GET_BLOOD(victim) = 0;
+		set_blood(victim, 0);
 
 		if (!IS_NPC(victim) && !PRF_FLAGGED(ch, PRF_AUTOKILL)) {
 			// give back a little blood
-			GET_BLOOD(victim) = 1;
-			GET_BLOOD(ch) -= 1;
+			set_blood(victim, 1);
+			set_blood(ch, GET_BLOOD(ch) - 1);
 			cancel_biting(ch);
 			return;
 		}
@@ -706,12 +721,12 @@ void update_biting_char(char_data *ch) {
 			add_lore(victim, LORE_PLAYER_DEATH, "Slain by %s", PERS(ch, ch, TRUE));
 		}
 
-		GET_FED_ON_BY(victim) = NULL;
-		GET_FEEDING_FROM(ch) = NULL;
-
 		check_scaling(victim, ch);	// ensure scaling
 		tag_mob(victim, ch);	// ensures loot binding if applicable
 		corpse = die(victim, ch);
+		
+		GET_FED_ON_BY(victim) = NULL;
+		GET_FEEDING_FROM(ch) = NULL;
 		
 		// tag corpse
 		if (corpse && !IS_NPC(ch)) {
@@ -800,6 +815,94 @@ void update_vampire_sun(char_data *ch) {
 }
 
 
+// handles periodic updates when a vampire is drinking blood
+EVENTFUNC(vampire_feeding_event) {
+	struct char_event_data *data = (struct char_event_data*)event_obj;
+	char_data *ch = data->character;
+	
+	// always delete first
+	delete_stored_event(&GET_STORED_EVENTS(ch), SEV_VAMPIRE_FEEDING);
+	
+	// biting -- this is usually PC-only, but NPCs could learn to do it
+	if (GET_FEEDING_FROM(ch)) {
+		update_biting_char(ch);
+	}
+	
+	// check if still feeding (etc)
+	if (!GET_FEEDING_FROM(ch) || EXTRACTED(ch) || IS_DEAD(ch)) {
+		free(data);
+		return 0;	// do not re-enqueue
+	}
+	
+	// if we get here, go ahead and repeat
+	add_stored_event(&GET_STORED_EVENTS(ch), SEV_VAMPIRE_FEEDING, the_event);
+	return 5 RL_SEC;
+}
+
+
+/**
+* Detects and handles cases where the player typed "kill/execute [target]"
+* while feeding from the target. It will generally handle any case where the
+* player is already feeding.
+*
+* @param char_data *ch The player/actor who typed kill/execute/etc.
+* @param char *argument The argument(s) they typed in.
+* @return bool If TRUE, sent a message and handled the command. If FALSE, proceed as normal.
+*/
+bool vampire_kill_feeding_target(char_data *ch, char *argument) {
+	char arg[MAX_INPUT_LENGTH];
+	char_data *vict;
+	obj_data *corpse;
+	
+	if (!GET_FEEDING_FROM(ch)) {
+		return FALSE;	// not feeding at all
+	}
+	
+	one_argument(argument, arg);
+	
+	// find and validate target
+	if (*arg) {
+		if (!(vict = get_char_vis(ch, arg, NULL, FIND_CHAR_ROOM))) {
+			msg_to_char(ch, "They don't seem to be here.\r\n");
+			return TRUE;
+		}
+		if (vict != GET_FEEDING_FROM(ch)) {
+			msg_to_char(ch, "You can't do that while feeding!\r\n");
+			return TRUE;
+		}
+	}
+	else {
+		vict = GET_FEEDING_FROM(ch);
+	}
+	
+	// ok: cancel a can't-stop effect, if present
+	affect_from_char(ch, ATYPE_CANT_STOP, FALSE);
+	
+	act("You bite down and kill $N!", FALSE, ch, NULL, vict, TO_CHAR);
+	act("$N falls limply from $n's arms!", FALSE, ch, NULL, vict, TO_NOTVICT);
+	act("You feel $n's fangs bite down hard. You are dead! Sorry...", FALSE, ch, NULL, vict, TO_VICT);
+	if (!IS_NPC(vict)) {
+		death_log(vict, ch, ATTACK_EXECUTE);
+		add_lore(ch, LORE_PLAYER_KILL, "Killed %s", PERS(vict, vict, TRUE));
+		add_lore(vict, LORE_PLAYER_DEATH, "Slain by %s", PERS(ch, ch, TRUE));
+	}
+	
+	check_scaling(vict, ch);	// ensure scaling
+	tag_mob(vict, ch);	// ensures loot binding if applicable
+	corpse = die(vict, ch);
+	
+	GET_FED_ON_BY(vict) = NULL;
+	GET_FEEDING_FROM(ch) = NULL;
+	
+	// tag corpse
+	if (corpse && !IS_NPC(ch)) {
+		corpse->last_owner_id = GET_IDNUM(ch);
+		corpse->last_empire_id = GET_LOYALTY(ch) ? EMPIRE_VNUM(GET_LOYALTY(ch)) : NOTHING;
+	}
+	return TRUE;
+}
+
+
  //////////////////////////////////////////////////////////////////////////////
 //// COMMANDS ////////////////////////////////////////////////////////////////
 
@@ -815,8 +918,11 @@ ACMD(do_bite) {
 
 	one_argument(argument, arg);
 
-	if (cancel_biting(ch)) {
-		// sends own message
+	if (!*argument && cancel_biting(ch)) {
+		// skip this if they typed an arg; cancels if possible; sends own message if so
+	}
+	else if (GET_FEEDING_FROM(ch)) {
+		msg_to_char(ch, "You are already biting someone!\r\n");
 	}
 	else if (!IS_VAMPIRE(ch)) {
 		if ((soc = find_social(ch, "bite", TRUE))) {
@@ -827,9 +933,9 @@ ACMD(do_bite) {
 			send_config_msg(ch, "must_be_vampire");
 		}
 	}
-	else if (GET_POS(ch) < POS_FIGHTING) {
+	else if (!char_can_act(ch, POS_FIGHTING, TRUE, FALSE)) {
 		// do_bite allows positions as low as sleeping so you can cancel biting, but they can't do anything past here
-		send_low_pos_msg(ch);
+		// sends own message
 	}
 	else if (IS_NPC(ch)) {
 		msg_to_char(ch, "Nope.\r\n");
@@ -925,7 +1031,7 @@ ACMD(do_bite) {
 			
 			// reduce DODGE
 			if (GET_DODGE(ch) > 0 && !tank) {
-				af = create_mod_aff(ATYPE_BITE_PENALTY, 1, APPLY_DODGE, -GET_DODGE(ch), ch);
+				af = create_mod_aff(ATYPE_BITE_PENALTY, 5, APPLY_DODGE, -GET_DODGE(ch), ch);
 				affect_join(ch, af, 0);
 			}
 			
@@ -937,13 +1043,13 @@ ACMD(do_bite) {
 			// melee DoT effect
 			if (melee && result > 0) {
 				stacks = get_approximate_level(ch) / 50;
-				apply_dot_effect(victim, ATYPE_BITE, 3, DAM_PHYSICAL, 7, MAX(1, stacks), ch);
+				apply_dot_effect(victim, ATYPE_BITE, 15, DAM_PHYSICAL, 7, MAX(1, stacks), ch);
 			}
 			
 			// steal blood effect
 			if (has_player_tech(ch, PTECH_BITE_STEAL_BLOOD) && result > 0 && !AFF_FLAGGED(victim, AFF_NO_DRINK_BLOOD) && !GET_FED_ON_BY(victim)) {
-				GET_BLOOD(ch) = MIN(GET_MAX_BLOOD(ch), GET_BLOOD(ch) + 2);
-				GET_BLOOD(victim) = MAX(1, GET_BLOOD(victim) - 2);
+				set_blood(ch, GET_BLOOD(ch) + 2);
+				set_blood(victim, MAX(1, GET_BLOOD(victim) - 2));
 			}
 			
 			if (can_gain_exp_from(ch, victim)) {
@@ -1097,10 +1203,10 @@ ACMD(do_boost) {
 	// SUCCESS!
 	charge_ability_cost(ch, BLOOD, cost, NOTHING, 0, WAIT_ABILITY);
 	
-	af = create_mod_aff(ATYPE_BOOST, 3 MUD_HOURS, boost_data[pos].apply, (skill_check(ch, ABIL_BOOST, DIFF_HARD) ? boost_data[pos].high_amt : boost_data[pos].base_amt), ch);
+	af = create_mod_aff(ATYPE_BOOST, 5 * SECS_PER_REAL_MIN, boost_data[pos].apply, (skill_check(ch, ABIL_BOOST, DIFF_HARD) ? boost_data[pos].high_amt : boost_data[pos].base_amt), ch);
 	affect_join(ch, af, AVG_DURATION | ADD_MODIFIER);
 	
-	af = create_mod_aff(ATYPE_BOOST, 3 MUD_HOURS, APPLY_BLOOD_UPKEEP, 1, ch);
+	af = create_mod_aff(ATYPE_BOOST, 5 * SECS_PER_REAL_MIN, APPLY_BLOOD_UPKEEP, 1, ch);
 	affect_to_char(ch, af);
 	free(af);
 	
@@ -1188,7 +1294,7 @@ ACMD(do_command) {
 	}
 	else if (!MOB_FLAGGED(victim, MOB_HUMAN))
 		msg_to_char(ch, "You can only give commands to humans.\r\n");
-	else if (MOB_FLAGGED(victim, MOB_HARD | MOB_GROUP) || AFF_FLAGGED(victim, AFF_NO_ATTACK)) {
+	else if (MOB_FLAGGED(victim, MOB_HARD | MOB_GROUP | MOB_NO_COMMAND) || AFF_FLAGGED(victim, AFF_NO_ATTACK)) {
 		act("You can't command $N.", FALSE, ch, NULL, victim, TO_CHAR);
 	}
 	else if (IS_VAMPIRE(victim) && (IS_NPC(victim) || has_skill_flagged(victim, SKILLF_VAMPIRE) > has_skill_flagged(ch, SKILLF_VAMPIRE)))
@@ -1218,7 +1324,7 @@ ACMD(do_command) {
 			gain_ability_exp(ch, ABIL_VAMP_COMMAND, 33.4);
 		}
 
-		if (skill_check(ch, ABIL_VAMP_COMMAND, DIFF_MEDIUM) && !AFF_FLAGGED(victim, AFF_IMMUNE_VAMPIRE)) {
+		if (skill_check(ch, ABIL_VAMP_COMMAND, DIFF_MEDIUM) && !AFF_FLAGGED(victim, AFF_IMMUNE_MENTAL_DEBUFFS)) {
 			un_charm = AFF_FLAGGED(victim, AFF_CHARM) ? FALSE : TRUE;
 			SET_BIT(AFF_FLAGS(victim), AFF_CHARM);
 			
@@ -1307,16 +1413,17 @@ ACMD(do_feed) {
 	else if (IS_DEAD(victim)) {
 		act("It would do no good for $M now -- $E's dead!", FALSE, ch, NULL, victim, TO_CHAR);
 	}
-	else if (IS_NPC(victim) || !PRF_FLAGGED(victim, PRF_BOTHERABLE))
-		act("$E refuses your vitae.", FALSE, ch, 0, victim, TO_CHAR);
+	else if (IS_NPC(victim) || (!PRF_FLAGGED(victim, PRF_BOTHERABLE) && GET_POS(victim) >= POS_SLEEPING)) {
+		act("$E refuses your blood.", FALSE, ch, 0, victim, TO_CHAR);
+	}
 	else {
 		act("You slice your wrist open and feed $N some blood!", FALSE, ch, 0, victim, TO_CHAR);
 		act("$n slices $s wrist open and feeds $N some blood!", TRUE, ch, 0, victim, TO_NOTVICT);
 		act("$n slices $s wrist open and feeds you some blood from the cut!", FALSE, ch, 0, victim, TO_VICT);
 
 		// mve the blood
-		GET_BLOOD(ch) -= amt;
-		GET_BLOOD(victim) = MIN(GET_MAX_BLOOD(victim), GET_BLOOD(victim) + amt);
+		set_blood(ch, GET_BLOOD(ch) - amt);
+		set_blood(victim, GET_BLOOD(victim) + amt);
 	}
 }
 
@@ -1498,13 +1605,13 @@ ACMD(do_regenerate) {
 			case REGEN_MANA: {
 				msg_to_char(ch, "You draw out the mystical energy from your blood.\r\n");
 				act("$n's skin flushes red.", TRUE, ch, NULL, NULL, TO_ROOM);
-				GET_MANA(ch) = MIN(GET_MAX_MANA(ch), GET_MANA(ch) + amount);
+				set_mana(ch, GET_MANA(ch) + amount);
 				break;
 			}
 			case REGEN_MOVE: {
 				msg_to_char(ch, "You focus your blood into your sore muscles.\r\n");
 				act("$n seems invigorated.", TRUE, ch, NULL, NULL, TO_ROOM);
-				GET_MOVE(ch) = MIN(GET_MAX_MOVE(ch), GET_MOVE(ch) + amount);
+				set_move(ch, GET_MOVE(ch) + amount);
 				break;
 			}
 		}
@@ -1578,7 +1685,7 @@ ACMD(do_veintap) {
 	else if (GET_BLOOD(ch) < amt + 1)
 		msg_to_char(ch, "You can't drain THAT much!\r\n");
 	else if (!(container = get_obj_in_list_vis(ch, buf1, NULL, ch->carrying)))
-		msg_to_char(ch, "You don't seem to have a %s.\r\n", buf1);
+		msg_to_char(ch, "You don't seem to have %s %s.\r\n", AN(buf1), buf1);
 	else if (GET_OBJ_TYPE(container) != ITEM_DRINKCON)
 		msg_to_char(ch, "You can't drain blood into that!\r\n");
 	else if (GET_DRINK_CONTAINER_CONTENTS(container) > 0 && GET_DRINK_CONTAINER_TYPE(container) != LIQ_BLOOD)

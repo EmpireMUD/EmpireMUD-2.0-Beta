@@ -1,6 +1,6 @@
 DG-SCRIPTS DG_SCRIPTS DGSCRIPTS TRIGGERS
 
-DG Scripts 1.0.12 e2
+DG Scripts 1.0.12 e3
 
 Stands for Death Gate scripts and are named after the original MUD they came
 from. DG Scripts is a popular CircleMUD snippet and is also included with
@@ -28,6 +28,9 @@ replace, or prevent player abilities. Rooms will trigger on any ability
 performed in them, but mobs and objects only execute Ability triggers if they
 are the target of the ability.
 
+Only the FIRST ability trigger will run on a given mob (or room, etc) unless it
+also has the Allow-Multiple type. This is only supported for mobs and rooms.
+
 Note: Ability triggers attached to charmed mobs will not fire unless the trigger
    also has the Charmed type.
 
@@ -43,7 +46,29 @@ Room triggers also provide:
 Mob and object triggers also provide:
   &c%self%&0 - Ability triggers only execute when the target is self.
 
-See also: MTRIG CHARMED
+See also: MTRIG CHARMED, ALLOW-MULTIPLE
+#d
+ALLOW-MULTIPLE "ALLOW-MULTIPLE TRIGGER" "ALLOW MULTIPLE TRIGGER" "MTRIG ALLOW-MULTIPLE" TRIGEDIT-MOB-ALLOW-MULTIPLE
+
+Allow-Multiple (trigger type)
+
+This type of trigger is set in conjunction with some other triggers to allow
+multiple scripts of the same type to run. Some types of triggers normally only
+allow 1 script to run, even if it returns 0.
+
+For two triggers to both run, BOTH must have Allow-Multiple set.
+
+Be sure not to set Allow-Multiple if the trigger will kill or purge a mob
+running it.
+
+The following trigger types are supported:
+
+Mobs: ability, act, death, entry, leave, load, speech
+Rooms: ability, door, drop, enter, leave, load, speech, zone reset
+
+Support for this can be added to more trigger types on request.
+
+See also: MTRIG <type>, RTRIG <type>
 #d
 "BUY TRIGGER" "MTRIG BUY" "OTRIG BUY" "RTRIG BUY" "VTRIG BUY" TRIGEDIT-MOB-BUY TRIGEDIT-OBJ-BUY TRIGEDIT-ROOM-BUY TRIGEDIT-VEH-BUY
 
@@ -113,6 +138,9 @@ Return value:  return 0 to prevent the door command
 Activated when a player uses the door-specific commands: 'close, open' on a
 door (not on objects). This can be used to require keys or other restrictions.
 
+Only the FIRST door trigger on a mob or room will run unless it also has the
+Allow-Multiple type.
+
 Note: Door triggers attached to charmed mobs will not fire unless the trigger
    also has the Charmed type.
 
@@ -121,7 +149,7 @@ Variables:
   &c%direction%&0 - The direction the command is used on.
   &c%cmd%&0 - The specific command activating the trigger.
 
-See also: MTRIG CHARMED
+See also: MTRIG CHARMED, ALLOW-MULTIPLE
 #d
 "DROP TRIGGER" "OTRIG DROP" "RTRIG DROP" TRIGEDIT-OBJ-DROP TRIGEDIT-ROOM-DROP DROP-TRIGGER TRIG-OBJ-DROP TRIG-ROOM-DROP
 
@@ -136,11 +164,16 @@ room. This trigger also fires on put, junk, and sacrifice.
 
 The object trigger includes putting the object into a container or vehicle.
 
+Only the FIRST drop trigger on a room will run unless it also has the
+Allow-Multiple type. This is not supported for object triggers yet.
+
 Variables:
   &c%actor%&0 - The character attempting to drop the object.
   &c%object%&0 - The object the character is attempting to drop (room trigger).\
   &c%command%&0 - drop, junk, put, sacrifice.
   &c%self%&0 - The item being dropped (object trigger).
+
+See also: ALLOW-MULTIPLE
 #d
 "EMPIRE VARS" "EMPIRE VARIABLES" EMP-VARS EMPIRE-VARS TRIGEDIT-EMP-VAR TRIGEDIT-VARIABLES-EMPIRES
 
@@ -148,9 +181,15 @@ Empire variables are accessed via %char.empire% (or obj, room, vehicle). If
 the thing belongs to no empire, this will be empty.
 
 When using field - The variable returns:
-&cadd_progress(vnum)&0 - Grants a progression goal (preferably set SCRIPT-ONLY).
+&cadd_progress(vnum)&0 - Grants a progression goal (preferably set NO-AUTOSTART).
 &cadj&0 - Adjective form of the empire's name.
 &cbanner&0 - Empire's banner (as a color code).
+&ccan_recognize_lang(lang,on|off)&0 - Whether the empire can at least recognize
+   a language. Optional on/off 2nd arg grants/removes this from the empire but
+   NOT from members who already have it. Cannot add/remove if the empire speaks
+   (instead of recognizes) it.
+&ccan_speak(lang,on|off)&0 - Whether the empire can speak a language. Optional
+   on/off 2nd arg grants/removes this from the empire but NOT from members.
 &ccoins&0 - How many coins the empire has in its vaults.
 &cdescription&0 - The empire's full description.
 &cfame&0 - The empire's total fame value.
@@ -172,11 +211,13 @@ When using field - The variable returns:
 &cranks&0 - The number of ranks in the empire.
 &cremove_progress(vnum)&0 - Takes away a progression goal. Warning: If the empire
    still qualifies for the goal, they may instantly re-earn it. This works best
-   if you only remove SCRIPT-ONLY goals.
-&cstart_progress(vnum)&0 - Begins a SCRIPT-ONLY progression goal, which will
+   if you only remove NO-AUTOSTART goals.
+&cstart_progress(vnum)&0 - Begins a NO-AUTOSTART progression goal, which will
    also immediately auto-complete if tasks are already complete. Otherwise, it
    will behave like a normal goal.
 &cterritory&0 - The amount of land claimed.
+&cvar(name,default)&0 - Gets the value of that var if it exists and gets
+   'default' if it doesn't. Default is optional; gets empty string if none.
 &cvarexists()&0 - Returns 1 if global variable in subfield exists, 0 if not.
    Useful when dealing with remote vars on empires.
 &cvnum&0 - The empire's vnum.
@@ -276,17 +317,25 @@ returning 0 from the script.
 
 Note: Mobs can only Greet people they can see; use Greet All to also trigger on
    people the mob can't see. Vehicle triggers do not make this distinction.
+
 Note: Greet triggers attached to charmed mobs will not fire unless the trigger
    also has the Charmed type.
+
 Note: Players entering magically (or via something other than a normal room
    exit) may not be prevented from entering. You can usually check this by
-   seeing if the %direction% variable is empty.
+   seeing if the %direction% variable is 'none'.
+
+Note: Greet and Greet-All will only catch a person AFTER they enter the room.
+   If you need to run the trigger before they see the room, use Pre-Greet-All.
 
 Variables:
   &c%actor%&0 - The character entering the room.
-  &c%direction%&0 - The direction the character came from, if any.
-  
-See also: MTRIG CHARMED
+  &c%direction%&0 - The direction the character came from, or 'none'.
+  &c%method%&0 - Type of movement (see METHOD LIST).
+
+You can add the "Player-in-Room" modifier.
+
+See also: MTRIG CHARMED, MTRIG PRE-GREET-ALL, PLAYER-IN-ROOM TRIGGER
 #d
 "KILL TRIGGER" "MTRIG KILL" "OTRIG KILL" "VTRIG KILL" TRIGEDIT-MOB-KILL TRIGEDIT-OBJ-KILL TRIGEDIT-VEH-KILL
 
@@ -323,6 +372,9 @@ objects, and vehicles, it is the room they are currently in.
 Mobs can only execute Leave triggers on people they can see. You can use the
 Leave-All version to also stop sneaky or invisible people.
 
+Only the FIRST leave trigger on a mob (or room, etc) will run unless it also
+has the Allow-Multiple type. This is only supported for mobs and rooms so far.
+
 Note: Leave triggers attached to charmed mobs will not fire unless the trigger
    also has the Charmed type.
 
@@ -330,8 +382,11 @@ Variables:
   &c%actor%&0 - The character trying to leave the room.
   &c%direction%&0 - The direction the character is leaving to, or "portal" if
      they are leaving through a portal.
+  &c%method%&0 - Type of movement (see METHOD LIST).
 
-See also: MTRIG LEAVE
+You can add the "Player-in-Room" modifier.
+
+See also: PLAYER-IN-ROOM TRIGGER, ALLOW-MULTIPLE
 #d
 "LOAD TRIGGER" "MTRIG LOAD" "OTRIG LOAD" "RTRIG LOAD" "VTRIG LOAD" TRIGEDIT-MOB-LOAD TRIGEDIT-OBJ-LOAD TRIGEDIT-VEH-LOAD TRIGEDIT-ROOM-LOAD TRIGEDIT-LOAD TRIG-LOAD
 
@@ -349,7 +404,36 @@ the mob and set off its load triggers.
 Buildings call their load triggers when first constructed, even before they
 are complete.
 
-See also: RTRIG COMPLETE
+Only the FIRST load trigger on a mob or room will run unless it also has the
+Allow-Multiple type. This is not implemented for objects or vehicles.
+
+See also: RTRIG COMPLETE, ALLOW-MULTIPLE
+#d
+"METHOD LIST" "METHODS LIST"
+
+Methods of Movement (Enter, Entry, Greet, and Leave triggers)
+
+All enter, entry, greet, and leave triggers provide the %method% variable to
+indicate how the person (or vehicle) moved.
+
+Basic methods:
+  ability - any player ability such as shadowstep
+  enter - entering a vehicle or vehicle-style building, including "load"
+  exit - exiting a vehicle or vehicle-style building, including "unload"
+  login - player entering the game
+  move - normal player movement
+  portal - entered using a portal
+  respawn - player died and respawned
+  summon - including adventure summon, but excluding summon abilities
+  script - moved by %teleport% or mgoto
+
+Uncommon methods:
+  system - person was moved because a vehicle or instance was deleted
+  transport - teleports players between starting locations
+
+Immortal methods:
+  goto - immortal moved themself
+  transfer - immortal moved someone else
 #d
 "MTRIG ENTRY" "VTRIG ENTRY" "MTRIG ENTER" "VTRIG ENTER" TRIGEDIT-MOB-ENTRY TRIGEDIT-VEH-ENTRY TRIGEDIT-ENTRY TRIGGER-ENTRY 
 
@@ -368,10 +452,18 @@ if it returns 0, that message is not sent. Consider using a # on any echoes or
 sends that should appear after the person enters and auto-looks. For other
 things that should happen after someone enters, consider adding a 'wait 1'.
 
+Only the FIRST entry trigger on a mob will run unless it also has the
+Allow-Multiple type. This is not supported for vehicles yet.
+
 Note: Entry triggers attached to charmed mobs will not fire unless the trigger
    also has the Charmed type.
 
-See also: WAIT, MTRIG CHARMED
+Variables:
+  &c%method%&0 - Type of movement (see METHOD LIST).
+
+You can add the "Player-in-Room" modifier.
+
+See also: WAIT, MTRIG CHARMED, PLAYER-IN-ROOM TRIGGER, ALLOW-MULTIPLE
 #d
 MUDCOMMAND CMD.MUDCOMMAND %CMD.MUDCOMMAND% %MUDCOMMAND%
 
@@ -398,8 +490,46 @@ This generally reduces the number of triggers running when they don't need to.
 
 Supported types:
   Random
+  Greet, Greet-All
+  Entry
+  Enter
+  Leave
+  Speech
+  Act
+
+Partially-supported types:
+  Pre-Greet-All: Trigger will only fire if a player is ALREADY in the room.
 
 See also: RANDOM TRIGGER
+#d
+"PRE-GREET-ALL TRIGGER" "PRE-GREET TRIGGER" "PREGREET TRIGGER" "MTRIG PRE-GREET-ALL" TRIGEDIT-MOB-PRE-GREET-ALL "PRE GREET ALL TRIGGER" "MTRIG PRE GREET ALL" TRIGEDIT-MOB-PREGREET-ALL
+
+Pre-Greet-All (trigger)
+
+Argument type:  percent chance to execute
+Return value:  return 0 to attempt to block movement/entry
+
+When a character attempts to enter a room, all Pre-Greet-All triggers on mobs
+in that room fire first. Some types of entry, like normal movement, can be
+prevented by returning 0 from the script. In this case, the character never
+moves at all, and does not see the new room.
+
+Note: Greet triggers attached to charmed mobs will not fire unless the trigger
+   also has the Charmed type.
+
+Note: Players entering magically (or via something other than a normal room
+   exit) may not be prevented from entering. You can usually check this by
+   seeing if the %direction% variable is 'none'.
+
+Variables:
+  &c%actor%&0 - The character entering the room.
+  &c%direction%&0 - The direction the character came from, or 'none'.
+  &c%method%&0 - Type of movement (see METHOD LIST).
+
+You can add the "Player-in-Room" modifier. However, this will make the trigger
+fire only when a player is ALREADY in the room with the pre-greet trigger.
+
+See also: MTRIG CHARMED, MTRIG GREET, PLAYER-IN-ROOM TRIGGER
 #d
 "RANDOM TRIGGER" "MTRIG RANDOM" "OTRIG RANDOM" "RTRIG RANDOM" "VTRIG RANDOM" TRIGEDIT-MOB-RANDOM TRIGEDIT-OBJ-RANDOM TRIGEDIT-ROOM-RANDOM TRIGEDIT-VEH-RANDOM RANDOM-TIMING TIMING
 
@@ -511,6 +641,9 @@ Special Variables When using field - The variable returns:
 &cinstance.set_location(room)&0 - Changes the map location of the instance, for
    example if the adventure appears to move.
 &cinstance.start&0 - The entry room of the instance, if any.
+&clanguage.name(vnum|short)&0 - Gets the full name of a language (Low Goblish).
+&clanguage.short(vnum|name)&0 - Gets the short name of a language (low-goblish).
+&clanguage.vnum(short|name)&0 - Gets the vnum of a language by name.
 &cpeople.<vnum>&0 - This variable returns the number of people in the room 
    specified via vnum.
 &crandom.<#>&0 - This returns a number between 1 and the field value. 
@@ -551,6 +684,14 @@ words in a word list) using the normal "say" command. This is can be used to
 add riddle quests, to make doors activate on command ("open sesame"), or to
 add other types of interactions to the game.
 
+Only the FIRST matching speech trigger on each mob will run unless it also has
+the Allow-Multiple type. Additonal mobs can each run 1 speech trigger without
+Allow-Multiple; this trigger is per-mob. Vehicles do not support this flag yet.
+
+The language used for this speech is provided as the %lang% and %lang_vnum%
+variables. This may be different from %actor.speaking% if the actor specified a
+different language for this speech.
+
 Note: Objects cannot have speech triggers, but mobs, rooms, and vehicles can.
 Note: Speech triggers attached to charmed mobs will not fire unless the trigger
    also has the Charmed type.
@@ -558,8 +699,12 @@ Note: Speech triggers attached to charmed mobs will not fire unless the trigger
 Variables:
   &c%actor%&0 - The character whose speech activated the trigger.
   &c%speech%&0 - The entire phrase spoken.
+  &c%lang%&0 - The name of the language the person used, if any ("Low Goblish").
+  &c%lang_vnum%&0 - The vnum of the language used, if any.
 
-See also: MTRIG CHARMED
+You can add the "Player-in-Room" modifier.
+
+See also: MTRIG CHARMED, PLAYER-IN-ROOM TRIGGER, ALLOW-MULTIPLE, LANGUAGE
 #d
 "START QUEST TRIGGER" "MTRIG START-QUEST" "OTRIG START-QUEST" "RTRIG START-QUEST" "VTRIG START-QUEST" TRIGEDIT-MOB-START-QUEST TRIGEDIT-OBJ-START-QUEST TRIGEDIT-ROOM-START-QUEST TRIGEDIT-VEH-START-QUEST "START-QUEST TRIGGER"
 
@@ -596,6 +741,7 @@ When using field - The variable returns
 &ctrim&0 - Returns the string without any leading or trailing whitespace. 
    This is used to trim extra spaces from the beginning or end of a string.
 &cana&0 - Returns "a" or "an" depending on the first letter of the string.
+&ccap&0 - Returns the string with the first letter capitalized.
 &ccar&0 - Returns the first word of the string. For %text%="this is the string";
    %text.car% will yield "this".
 &ccdr&0 - Returns all but the first word of the string, trimmed. For %text%=
@@ -605,9 +751,13 @@ When using field - The variable returns
 &ccontains()&0 - Subfield used for comparison.
 &cindex_of(char)&0 - Returns the first position of a given character in the
    string, or -1 if it's not found.
+&cempty&0 - Return true if the variable is an empty string or only contains '0'.
 &cmudcommand&0 - Returns the mud command the string is shorthand for. Used to make 
    sure the command you react to is the one you want: For %text%="o"
    %text.mudcommand% will yield "open".
+&cprocess&0 - Processes variable substitutions like %char%, for example when
+   using %mob.custom(script1)% to get text to echo. DO NOT use process on text
+   that comes from player input as this could be manipulated.
    
 See also: MUDCOMMAND
 #d

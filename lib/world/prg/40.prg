@@ -13,7 +13,7 @@ K 2 5144
 K 2 5146
 K 2 5148
 W
-29 0 0 1
+29 0 0 1 -
 S
 #4001
 Renowned~
@@ -28,7 +28,7 @@ K 2 5151
 K 2 5149
 P 4000
 W
-29 0 0 40
+29 0 0 40 -
 S
 #4002
 World Famous~
@@ -40,7 +40,7 @@ enough monuments to reach 150 fame to complete this goal.
 K 7 25
 P 4001
 W
-29 0 0 150
+29 0 0 150 -
 S
 #4010
 Seeds of Magic~
@@ -54,7 +54,7 @@ forests. Completing this goal earns your empire more territory per greatness.
 6 4 0 5 d
 K 5 5
 W
-34 604 0 6
+34 604 0 6 -
 S
 #4011
 Enchanted Forest~
@@ -67,7 +67,7 @@ enough magewood to complete this goal.
 K 7 5
 P 4010
 W
-34 604 0 100
+34 604 0 100 -
 S
 #4012
 Witchwood~
@@ -79,7 +79,7 @@ carefully chop down and saw enough of it to produce 750 stellar magewood.
 K 7 5
 P 4011
 W
-34 604 0 750
+34 604 0 750 -
 S
 #4013
 The Magic Grows~
@@ -91,7 +91,7 @@ this and bards will tell the tale of your empire for ages to come.
 K 7 50
 P 4012
 W
-34 604 0 2000
+34 604 0 2000 -
 S
 #4014
 Rowling in the Forest~
@@ -104,7 +104,7 @@ stellar magewood.
 K 7 50
 P 4013
 W
-34 604 0 5000
+34 604 0 5000 -
 S
 #4015
 Magic to Make the Sanest Man Go Mad~
@@ -117,7 +117,7 @@ last a thousand years.
 K 7 50
 P 4014
 W
-34 604 0 10000
+34 604 0 10000 -
 S
 #4020
 Savings~
@@ -128,7 +128,7 @@ Savings~
 K 4 1
 P 2040
 W
-21 0 0 1000
+21 0 0 1000 -
 S
 #4021
 Wealthy~
@@ -139,7 +139,7 @@ the value of your treasures, and 10% of your coins.
 K 4 1
 P 4020
 W
-28 0 0 1000
+28 0 0 1000 -
 S
 #4022
 Full Coffers~
@@ -152,7 +152,7 @@ K 4 1
 K 1 1
 P 4021
 W
-28 0 0 4000
+28 0 0 4000 -
 S
 #4023
 Mint Condition~
@@ -166,7 +166,7 @@ K 4 2
 K 1 1
 P 4022
 W
-28 0 0 100000
+28 0 0 100000 -
 S
 #4024
 The Only Thing Better Than Gold~
@@ -178,7 +178,7 @@ wealth to complete this herculean task.
 K 7 25
 P 4023
 W
-28 0 0 500000
+28 0 0 500000 -
 S
 #4025
 Draconic Hoard~
@@ -192,7 +192,7 @@ Good luck.
 K 7 25
 P 4024
 W
-28 0 0 1000000
+28 0 0 1000000 -
 S
 #4026
 Rich Beyond Imagining~
@@ -206,7 +206,7 @@ it. Reach 5000000 wealth and prove yours is the wealthiest empire of all time!
 K 7 25
 P 4025
 W
-28 0 0 5000000
+28 0 0 5000000 -
 S
 #4030
 Secret of the Sands~
@@ -221,7 +221,7 @@ weirdwood and saw it into magewood to complete this goal.
 6 4 0 5 0
 K 5 5
 W
-34 619 0 6
+34 619 0 6 -
 S
 #4031
 Grove of Wonders~
@@ -234,7 +234,7 @@ enough magewood to complete this goal.
 K 7 5
 P 4030
 W
-34 619 0 100
+34 619 0 100 -
 S
 #4032
 Weirdwood Warden~
@@ -246,7 +246,7 @@ and carefully chop down and saw enough of it to produce 750 empyreal magewood.
 K 7 5
 P 4031
 W
-34 619 0 750
+34 619 0 750 -
 S
 #4033
 Empyreal Nights~
@@ -258,7 +258,7 @@ this and bards will tell the tale of your empire for ages to come.
 K 7 50
 P 4032
 W
-34 619 0 2000
+34 619 0 2000 -
 S
 #4034
 The Spice is Rife~
@@ -271,7 +271,7 @@ magewood.
 K 7 50
 P 4033
 W
-34 619 0 5000
+34 619 0 5000 -
 S
 #4035
 I Dream of Weirdwood in the Desert Sand~
@@ -280,11 +280,11 @@ I Dream of Weirdwood in the Desert Sand~
 the greatest producer of magewood the world has ever seen and achieve renown
 to last a thousand years.
 ~
-8 4 0 50 0
+9 4 0 50 0
 K 7 50
 P 4034
 W
-25 616 0 1 a
+25 618 0 1 a
 W
 34 619 0 10000 a
 S

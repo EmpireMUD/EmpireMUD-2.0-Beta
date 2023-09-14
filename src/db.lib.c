@@ -30,6 +30,7 @@
 *   Adventure Lib
 *   Automessages Lib
 *   Building Lib
+*   Character Lib
 *   Craft Lib
 *   Crop Lib
 *   Empire Lib
@@ -877,7 +878,7 @@ void write_building_to_file(FILE *fl, bld_data *bld) {
 	}
 	
 	// E: extra descriptions
-	write_extra_descs_to_file(fl, GET_BLD_EX_DESCS(bld));
+	write_extra_descs_to_file(fl, 'E', GET_BLD_EX_DESCS(bld));
 	
 	// F: functions
 	if (GET_BLD_FUNCTIONS(bld)) {
@@ -912,6 +913,64 @@ void write_building_to_file(FILE *fl, bld_data *bld) {
 	
 	// end
 	fprintf(fl, "S\n");
+}
+
+
+ //////////////////////////////////////////////////////////////////////////////
+//// CHARACTER LIB ///////////////////////////////////////////////////////////
+
+/**
+* Sets the value of a current pool (HEALTH, etc) to the given amount, without
+* going over the maximum. If this sets it below the maximum, it will also
+* schedule a mob reset event if the target is an NPC.
+*
+* @param char_data *ch The person to set a pool for.
+* @param int type Any pool (HEALTH, MOVE, MANA, BLOOD).
+* @param int amount The amount to set it to (automatically bounds to the maximum).
+* @return int The new value of the pool.
+*/
+int set_current_pool(char_data *ch, int type, int amount) {
+	int max;
+	
+	if (type < 0 || type >= NUM_POOLS) {
+		log("SYSERR: set_current_pool called with invalid pool %d (%s)", type, GET_NAME(ch));
+		return 1;
+	}
+	
+	GET_CURRENT_POOL(ch, type) = amount;
+	
+	// NUM_POOLS (search hint): determine maximum
+	switch (type) {
+		case HEALTH: {
+			max = GET_MAX_HEALTH(ch);
+			break;
+		}
+		case MOVE: {
+			max = GET_MAX_MOVE(ch);
+			break;
+		}
+		case MANA: {
+			max = GET_MAX_MANA(ch);
+			break;
+		}
+		case BLOOD: {
+			max = GET_MAX_BLOOD(ch);
+			break;
+		}
+		default: {
+			max = GET_MAX_POOL(ch, type);
+			break;
+		}
+	}
+	
+	if (GET_CURRENT_POOL(ch, type) > max) {
+		GET_CURRENT_POOL(ch, type) = max;
+	}
+	else if (GET_CURRENT_POOL(ch, type) < max && IS_NPC(ch)) {
+		schedule_reset_mob(ch);
+	}
+	
+	return GET_CURRENT_POOL(ch, type);
 }
 
 
@@ -1210,6 +1269,10 @@ void free_crop(crop_data *cp) {
 	if (GET_CROP_ICONS(cp) && (!proto || GET_CROP_ICONS(cp) != GET_CROP_ICONS(proto))) {
 		free_icon_set(&GET_CROP_ICONS(cp));
 	}
+	
+	if (GET_CROP_EX_DESCS(cp) && (!proto || GET_CROP_EX_DESCS(cp) != GET_CROP_EX_DESCS(proto))) {
+		free_extra_descs(&GET_CROP_EX_DESCS(cp));
+	}
 		
 	if (GET_CROP_SPAWNS(cp) && (!proto || GET_CROP_SPAWNS(cp) != GET_CROP_SPAWNS(proto))) {
 		while ((spawn = GET_CROP_SPAWNS(cp))) {
@@ -1321,6 +1384,11 @@ void parse_crop(FILE *fl, crop_vnum vnum) {
 				LL_APPEND(GET_CROP_SPAWNS(crop), spawn);
 				break;
 			}
+			
+			case 'X': {	// extra desc
+				parse_extra_desc(fl, &GET_CROP_EX_DESCS(crop), buf2);
+				break;
+			}
 
 			// end
 			case 'S': {
@@ -1373,6 +1441,9 @@ void write_crop_to_file(FILE *fl, crop_data *cp) {
 		fprintf(fl, "M\n");
 		fprintf(fl, "%d %.2f %s\n", spawn->vnum, spawn->percent, bitv_to_alpha(spawn->flags));
 	}
+	
+	// X: extra descriptions
+	write_extra_descs_to_file(fl, 'X', GET_CROP_EX_DESCS(cp));
 	
 	// end
 	fprintf(fl, "S\n");
@@ -1936,6 +2007,8 @@ void free_empire(empire_data *emp) {
 	struct empire_log_data *elog, *next_elog;
 	struct workforce_log *wf_log;
 	struct shipping_data *shipd, *next_shipd;
+	struct workforce_production_log *wplog, *next_wplog;
+	struct player_language *lang, *next_lang;
 	room_data *room;
 	int iter;
 	
@@ -1969,6 +2042,12 @@ void free_empire(empire_data *emp) {
 		free(city);
 	}
 	
+	// free languages
+	HASH_ITER(hh, EMPIRE_LANGUAGES(emp), lang, next_lang) {
+		HASH_DEL(EMPIRE_LANGUAGES(emp), lang);
+		free(lang);
+	}
+	
 	// free learned crafts
 	HASH_ITER(hh, EMPIRE_LEARNED_CRAFTS(emp), pcd, next_pcd) {
 		HASH_DEL(EMPIRE_LEARNED_CRAFTS(emp), pcd);
@@ -1985,6 +2064,12 @@ void free_empire(empire_data *emp) {
 	HASH_ITER(hh, EMPIRE_PRODUCTION_LIMITS(emp), wpl, next_wpl) {
 		HASH_DEL(EMPIRE_PRODUCTION_LIMITS(emp), wpl);
 		free(wpl);
+	}
+	
+	// free production logs
+	LL_FOREACH_SAFE(EMPIRE_PRODUCTION_LOGS(emp), wplog, next_wplog) {
+		LL_DELETE(EMPIRE_PRODUCTION_LOGS(emp), wplog);
+		free(wplog);
 	}
 	
 	// free trades
@@ -2212,13 +2297,28 @@ void load_empire_storage_one(FILE *fl, empire_data *emp) {
 			exit(1);
 		}
 		switch (*line) {
-			case 'L': {	// production limit
-				if (sscanf(line, "L %d %d", &t[0], &t[1]) != 2) {
-					log("SYSERR: Workforce limit line L for empire %d was incomplete", EMPIRE_VNUM(emp));
-					exit(1);
-				}
+			case 'L': {	// production limit/logs
+				// uses a subtype
+				switch (*(line+1)) {
+					case ' ': {	// limit
+						if (sscanf(line, "L %d %d", &t[0], &t[1]) != 2) {
+							log("SYSERR: Workforce limit line L for empire %d was incomplete", EMPIRE_VNUM(emp));
+							exit(1);
+						}
 				
-				set_workforce_production_limit(emp, t[0], t[1]);
+						set_workforce_production_limit(emp, t[0], t[1]);
+						break;
+					}
+					case '2': {	// logs
+						if (sscanf(line, "L2 %d %d %d", &t[0], &t[1], &t[2]) != 3) {
+							log("SYSERR: Workforce log line L2 for empire %d was incomplete", EMPIRE_VNUM(emp));
+							exit(1);
+						}
+						
+						add_workforce_production_log(emp, t[0], t[1], t[2]);
+						break;
+					}
+				}
 				break;
 			}
 			case 'O': {	// storage
@@ -2417,7 +2517,7 @@ void parse_empire(FILE *fl, empire_vnum vnum) {
 	room_data *room;
 	double dbl_in;
 	long long_in;
-	char *tmp, c_in;
+	char *tmp, c_in[2];
 	
 	sprintf(buf2, "empire #%d", vnum);
 	
@@ -2618,6 +2718,16 @@ void parse_empire(FILE *fl, empire_vnum vnum) {
 						}
 						break;
 					}
+					case 'M': {	// GM: languages
+						if (sscanf(line, "GM %d %d", &t[0], &t[1]) != 2) {
+							log("SYSERR: Format error in GM line of empire %d", vnum);
+							// not fatal
+							break;
+						}
+						
+						add_language_empire(emp, t[0], t[1]);
+						break;
+					}
 					case 'P': {	// GP: goal points (progress points)
 						if (sscanf(line, "GP %d %d", &t[0], &t[1]) != 2) {
 							log("SYSERR: Format error in GP line of empire %d", vnum);
@@ -2631,11 +2741,16 @@ void parse_empire(FILE *fl, empire_vnum vnum) {
 						break;
 					}
 					case 'T': {	// GT: tracker for last goal
-						if (last_egoal && sscanf(line, "GT %d %d %lld %d %d %c", &t[0], &t[1], &bit_in, &t[2], &t[3], &c_in) == 6) {
-							// found group
+						if (last_egoal && sscanf(line, "GT %d %d %lld %d %d %c %c", &t[0], &t[1], &bit_in, &t[2], &t[3], &c_in[0], &c_in[1]) == 7) {
+							// found everything
+						}
+						else if (last_egoal && sscanf(line, "GT %d %d %lld %d %d %c", &t[0], &t[1], &bit_in, &t[2], &t[3], &c_in[0]) == 6) {
+							// found group but no custom
+							c_in[1] = 0;
 						}
 						else if (last_egoal && sscanf(line, "GT %d %d %lld %d %d", &t[0], &t[1], &bit_in, &t[2], &t[3]) == 5) {
-							c_in = 0;	// no group given
+							c_in[0] = 0;	// no group given
+							c_in[1] = 0;	// no custom given
 						}
 						else {
 							log("SYSERR: Format error in GT line of empire %d", vnum);
@@ -2652,8 +2767,12 @@ void parse_empire(FILE *fl, empire_vnum vnum) {
 						task->misc = bit_in;
 						task->needed = t[2];
 						task->current = t[3];
-						task->group = c_in;
-					
+						task->group = isalpha(c_in[0]) ? c_in[0] : 0;
+						
+						if (c_in[1] == '+') {
+							task->custom = fread_string(fl, buf2);
+						}
+						
 						LL_APPEND(last_egoal->tracker, task);
 						break;
 					}
@@ -2902,6 +3021,7 @@ void write_empire_to_file(FILE *fl, empire_data *emp) {
 	struct empire_territory_data *ter, *next_ter;
 	struct empire_completed_goal *ecg, *next_ecg;
 	struct player_craft_data *pcd, *next_pcd;
+	struct player_language *lang, *next_lang;
 	struct empire_goal *egoal, *next_egoal;
 	struct empire_needs *need, *next_need;
 	struct empire_homeless_citizen *ehc;
@@ -2966,7 +3086,10 @@ void write_empire_to_file(FILE *fl, empire_data *emp) {
 		
 		// GT goal tracker
 		LL_FOREACH(egoal->tracker, task) {
-			fprintf(fl, "GT %d %d %lld %d %d %c\n", task->type, task->vnum, task->misc, task->needed, task->current, task->group);
+			fprintf(fl, "GT %d %d %lld %d %d %c%s\n", task->type, task->vnum, task->misc, task->needed, task->current, task->group ? task->group : '-', (task->custom && *task->custom) ? " +" : "");
+			if (task->custom && *task->custom) {
+				fprintf(fl, "%s~\n", task->custom);
+			}
 		}
 	}
 	HASH_ITER(hh, EMPIRE_COMPLETED_GOALS(emp), ecg, next_ecg) {
@@ -2976,6 +3099,10 @@ void write_empire_to_file(FILE *fl, empire_data *emp) {
 	HASH_ITER(hh, EMPIRE_LEARNED_CRAFTS(emp), pcd, next_pcd) {
 		// GL learned crafts
 		fprintf(fl, "GL %d %d\n", pcd->vnum, pcd->count);
+	}
+	// GM languages
+	HASH_ITER(hh, EMPIRE_LANGUAGES(emp), lang, next_lang) {
+		fprintf(fl, "GM %d %d\n", lang->vnum, lang->level);
 	}
 	for (iter = 0; iter < NUM_PROGRESS_TYPES; ++iter) {
 		// GP goal points (progress points)
@@ -3119,6 +3246,7 @@ void write_empire_logs_to_file(FILE *fl, empire_data *emp) {
 */
 void write_empire_storage_to_file(FILE *fl, empire_data *emp) {	
 	struct workforce_production_limit *wpl, *next_wpl;
+	struct workforce_production_log *wplog;
 	struct empire_storage_data *store, *next_store;
 	struct empire_production_total *egt, *next_egt;
 	struct empire_island *isle, *next_isle;
@@ -3133,6 +3261,11 @@ void write_empire_storage_to_file(FILE *fl, empire_data *emp) {
 	// L: production limits
 	HASH_ITER(hh, EMPIRE_PRODUCTION_LIMITS(emp), wpl, next_wpl) {
 		fprintf(fl, "L %d %d\n", wpl->vnum, wpl->limit);
+	}
+	
+	// L2: production logs
+	LL_FOREACH(EMPIRE_PRODUCTION_LOGS(emp), wplog) {
+		fprintf(fl, "L2 %d %d %d\n", wplog->type, wplog->vnum, wplog->amount);
 	}
 	
 	// islands
@@ -4080,14 +4213,15 @@ void parse_extra_desc(FILE *fl, struct extra_descr_data **list, char *error_part
 * Output extra descriptions with the E tag to a library file.
 *
 * @param FILE *fl The file open for writing.
+* @param char key The key letter this is saved under in the file, usually E or X.
 * @param struct extra_descr_data *list The list to save.
 */
-void write_extra_descs_to_file(FILE *fl, struct extra_descr_data *list) {
+void write_extra_descs_to_file(FILE *fl, char key, struct extra_descr_data *list) {
 	char temp[MAX_STRING_LENGTH];
 	struct extra_descr_data *ex;
 	
 	for (ex = list; ex; ex = ex->next) {
-		fprintf(fl, "E\n");
+		fprintf(fl, "%c\n", key);
 		fprintf(fl, "%s~\n", NULLSAFE(ex->keyword));
 		strcpy(temp, NULLSAFE(ex->description));
 		strip_crlf(temp);
@@ -4603,6 +4737,13 @@ struct island_info *get_island_by_coords(char *coords) {
 	room_data *room;
 	
 	skip_spaces(&coords);
+
+	// shortcut?
+	if ((room = parse_room_from_coords(coords))) {
+		return GET_ISLAND(room);
+	}
+	
+	// otherwise try to process
 	if (*coords == '(') {
 		any_one_word(coords, str);
 	}
@@ -4670,22 +4811,22 @@ struct island_info *get_island_by_name(char_data *ch, char *name) {
 
 
 /**
-* Gets the name that a player sees for an island.
+* Gets the name that an empire sees for an island.
 *
 * @param int island_id Which island.
-* @param char_data *for_ch The player.
+* @param empire_data *for_emp The empire.
 */
-char *get_island_name_for(int island_id, char_data *for_ch) {
+char *get_island_name_for_empire(int island_id, empire_data *for_emp) {
 	struct empire_island *eisle;
 	struct island_info *island;
 	
 	if (island_id == NO_ISLAND || !(island = get_island(island_id, TRUE))) {
 		return "No Island";
 	}
-	if (!GET_LOYALTY(for_ch)) {
+	if (!for_emp) {
 		return island->name;
 	}
-	if (!(eisle = get_empire_island(GET_LOYALTY(for_ch), island_id))) {
+	if (!(eisle = get_empire_island(for_emp, island_id))) {
 		return island->name;
 	}
 	
@@ -4930,16 +5071,25 @@ void parse_mobile(FILE *mob_f, int nr) {
 	SET_BIT(MOB_FLAGS(mob), MOB_ISNPC);	// sanity
 	REMOVE_BIT(MOB_FLAGS(mob), MOB_EXTRACTED);	// sanity
 
-	// 2. sex name-list move-type attack-type
-	if (!get_line(mob_f, line) || sscanf(line, "%d %d %d %d", &t[0], &t[1], &t[2], &t[3]) != 4) {
-		log("SYSERR: Format in second numeric section of mob #%d\n...expecting line of form '# # # #'", nr);
+	// 2. sex name-list move-type attack-type language
+	if (!get_line(mob_f, line)) {
+		log("SYSERR: Missing second numeric section of mob #%d", nr);
 		exit(1);
+	}
+	else if (sscanf(line, "%d %d %d %d %d", &t[0], &t[1], &t[2], &t[3], &t[4]) != 5) {
+		// pre-b5.146 version
+		t[4] = NOTHING;	// no language
+		if (sscanf(line, "%d %d %d %d", &t[0], &t[1], &t[2], &t[3]) != 4) {
+			log("SYSERR: Format in second numeric section of mob #%d\n...expecting line of form '# # # # #'", nr);
+			exit(1);
+		}
 	}
 
 	mob->player.sex = t[0];
 	MOB_NAME_SET(mob) = t[1];
 	mob->mob_specials.move_type = t[2];
 	mob->mob_specials.attack_type = t[3];
+	mob->mob_specials.language = t[4];
 
 	// basic setup
 	mob->points.max_pools[HEALTH] = 10;
@@ -5030,8 +5180,8 @@ void write_mob_to_file(FILE *fl, char_data *mob) {
 	strcpy(temp2, bitv_to_alpha(AFF_FLAGS(mob)));
 	fprintf(fl, "%d %d %s %s %d\n", GET_MIN_SCALE_LEVEL(mob), GET_MAX_SCALE_LEVEL(mob), temp, temp2, SET_SIZE(mob));
 	
-	// sex name-list move-type attack-type
-	fprintf(fl, "%d %d %d %d\n", GET_SEX(mob), MOB_NAME_SET(mob), MOB_MOVE_TYPE(mob), MOB_ATTACK_TYPE(mob));
+	// sex name-list move-type attack-type language
+	fprintf(fl, "%d %d %d %d %d\n", GET_SEX(mob), MOB_NAME_SET(mob), MOB_MOVE_TYPE(mob), MOB_ATTACK_TYPE(mob), MOB_LANGUAGE(mob));
 
 	// optionals:
 	
@@ -5199,6 +5349,9 @@ void free_obj(obj_data *obj) {
 	if (GET_OBJ_APPLIES(obj) && (!proto || GET_OBJ_APPLIES(obj) != GET_OBJ_APPLIES(proto))) {
 		free_obj_apply_list(GET_OBJ_APPLIES(obj));
 	}
+	
+	// in case
+	cancel_all_stored_events(&GET_OBJ_STORED_EVENTS(obj));
 	
 	/* free any assigned scripts */
 	if (SCRIPT(obj)) {
@@ -5510,7 +5663,7 @@ void write_obj_to_file(FILE *fl, obj_data *obj) {
 	}
 	
 	// E: extra descriptions
-	write_extra_descs_to_file(fl, GET_OBJ_EX_DESCS(obj));
+	write_extra_descs_to_file(fl, 'E', GET_OBJ_EX_DESCS(obj));
 	
 	// I: interactions
 	write_interactions_to_file(fl, GET_OBJ_INTERACTIONS(obj));
@@ -5810,6 +5963,8 @@ void free_room_template(room_template *rmt) {
 */
 void init_room_template(room_template *rmt) {
 	memset((char *)rmt, 0, sizeof(room_template));
+	
+	GET_RMT_SUBZONE(rmt) = NOWHERE;
 }
 
 
@@ -5845,12 +6000,18 @@ void parse_room_template(FILE *fl, rmt_vnum vnum) {
 	GET_RMT_TITLE(rmt) = fread_string(fl, buf2);
 	GET_RMT_DESC(rmt) = fread_string(fl, buf2);
 	
-	// line 3: flags base_affects [functions]
+	// line 3: flags base_affects [functions] [subzone]
 	if (!get_line(fl, line)) {
 		log("SYSERR: Missing line 3 of %s", buf2);
 		exit(1);
 	}
-	if (sscanf(line, "%s %s %s", str_in, str_in2, str_in3) == 3) {
+	if (sscanf(line, "%s %s %s %d", str_in, str_in2, str_in3, &int_in[0]) == 4) {
+		GET_RMT_FLAGS(rmt) = asciiflag_conv(str_in);
+		GET_RMT_BASE_AFFECTS(rmt) = asciiflag_conv(str_in2);
+		GET_RMT_FUNCTIONS(rmt) = asciiflag_conv(str_in3);
+		GET_RMT_SUBZONE(rmt) = int_in[0];
+	}
+	else if (sscanf(line, "%s %s %s", str_in, str_in2, str_in3) == 3) {
 		GET_RMT_FLAGS(rmt) = asciiflag_conv(str_in);
 		GET_RMT_BASE_AFFECTS(rmt) = asciiflag_conv(str_in2);
 		GET_RMT_FUNCTIONS(rmt) = asciiflag_conv(str_in3);
@@ -5961,7 +6122,7 @@ void write_room_template_to_file(FILE *fl, room_template *rmt) {
 	strcpy(temp, bitv_to_alpha(GET_RMT_FLAGS(rmt)));
 	strcpy(temp2, bitv_to_alpha(GET_RMT_BASE_AFFECTS(rmt)));
 	strcpy(temp3, bitv_to_alpha(GET_RMT_FUNCTIONS(rmt)));
-	fprintf(fl, "%s %s %s\n", temp, temp2, temp3);
+	fprintf(fl, "%s %s %s %d\n", temp, temp2, temp3, GET_RMT_SUBZONE(rmt));
 
 	// D: exits
 	for (ex = GET_RMT_EXITS(rmt); ex; ex = ex->next) {
@@ -5971,7 +6132,7 @@ void write_room_template_to_file(FILE *fl, room_template *rmt) {
 	}
 	
 	// E: extra descriptions
-	write_extra_descs_to_file(fl, GET_RMT_EX_DESCS(rmt));
+	write_extra_descs_to_file(fl, 'E', GET_RMT_EX_DESCS(rmt));
 	
 	// I: interactions
 	write_interactions_to_file(fl, GET_RMT_INTERACTIONS(rmt));
@@ -6050,6 +6211,10 @@ void free_sector(sector_data *st) {
 	
 	if (GET_SECT_ICONS(st) && (!proto || GET_SECT_ICONS(st) != GET_SECT_ICONS(proto))) {
 		free_icon_set(&GET_SECT_ICONS(st));
+	}
+	
+	if (GET_SECT_EX_DESCS(st) && (!proto || GET_SECT_EX_DESCS(st) != GET_SECT_EX_DESCS(proto))) {
+		free_extra_descs(&GET_SECT_EX_DESCS(st));
 	}
 	
 	if (GET_SECT_SPAWNS(st) && (!proto || GET_SECT_SPAWNS(st) != GET_SECT_SPAWNS(proto))) {
@@ -6185,6 +6350,11 @@ void parse_sector(FILE *fl, sector_vnum vnum) {
 				break;
 			}
 			
+			case 'X': {	// extra desc
+				parse_extra_desc(fl, &GET_SECT_EX_DESCS(sect), buf2);
+				break;
+			}
+			
 			case '_': {	// notes
 				GET_SECT_NOTES(sect) = fread_string(fl, buf2);
 				break;
@@ -6255,6 +6425,9 @@ void write_sector_to_file(FILE *fl, sector_data *st) {
 		fprintf(fl, "%d %.2f %s\n", spawn->vnum, spawn->percent, bitv_to_alpha(spawn->flags));
 	}
 	
+	// X: extra descriptions
+	write_extra_descs_to_file(fl, 'X', GET_SECT_EX_DESCS(st));
+	
 	if (GET_SECT_NOTES(st) && *GET_SECT_NOTES(st)) {
 		strcpy(temp, GET_SECT_NOTES(st));
 		strip_crlf(temp);
@@ -6271,18 +6444,31 @@ void write_sector_to_file(FILE *fl, sector_data *st) {
 
 // cancel func externs
 EVENT_CANCEL_FUNC(cancel_burn_event);
+EVENT_CANCEL_FUNC(cancel_character_event);
 EVENT_CANCEL_FUNC(cancel_map_event);
+EVENT_CANCEL_FUNC(cancel_mob_event);
+EVENT_CANCEL_FUNC(cancel_obj_event);
 EVENT_CANCEL_FUNC(cancel_room_event);
 
 
 // SEV_x: list of cancel functions
 struct stored_event_info_t stored_event_info[] = {
 	{ cancel_map_event },	// SEV_TRENCH_FILL
-		{ NULL },	// unused
+	{ cancel_mob_event },	// SEV_DESPAWN
 	{ cancel_burn_event },	// SEV_BURN_DOWN
 	{ cancel_map_event },	// SEV_GROW_CROP
 	{ cancel_room_event },	// SEV_TAVERN
 	{ cancel_room_event },	// SEV_RESET_TRIGGER
+	{ cancel_mob_event },	// SEV_PURSUIT
+	{ cancel_mob_event },	// SEV_MOVEMENT
+	{ cancel_mob_event },	// SEV_AGGRO
+	{ cancel_mob_event },	// SEV_SCAVENGE
+	{ cancel_character_event },	// SEV_VAMPIRE_FEEDING
+	{ cancel_mob_event },	// SEV_RESET_MOB
+	{ cancel_character_event },	// SEV_HEAL_OVER_TIME
+	{ cancel_character_event },	// SEV_CHECK_LEADING
+	{ cancel_obj_event },	// SEV_OBJ_TIMER
+	{ cancel_obj_event },	// SEV_OBJ_AUTOSTORE
 };
 
 
@@ -6297,19 +6483,48 @@ struct stored_event_info_t stored_event_info[] = {
 void add_stored_event(struct stored_event **list, int type, struct dg_event *event) {
 	struct stored_event *sev;
 	
-	if (!event) {
+	if (!list || !event) {
 		return;
 	}
 	
 	// ensure no duplicate entries
-	sev = find_stored_event(*list, type);
-	if (!sev) {
+	if ((sev = find_stored_event(*list, type))) {
+		if (sev->ev) {
+			dg_event_cancel(sev->ev, stored_event_info[sev->type].cancel);
+		}
+		sev->ev = NULL;
+	}
+	else {
 		CREATE(sev, struct stored_event, 1);
 		sev->type = type;
-		HASH_ADD_INT(*list, type, sev);
+		LL_PREPEND(*list, sev);
 	}
 	
 	sev->ev = event;
+}
+
+
+/**
+* Cancels all stored events, if any, and frees the list and sets it to NULL.
+*
+* @param struct stored_event **list The list to cancel out of.
+*/
+void cancel_all_stored_events(struct stored_event **list) {
+	struct stored_event *iter, *next_iter;
+	
+	if (list) {
+		LL_FOREACH_SAFE(*list, iter, next_iter) {
+			if (iter->ev) {
+				dg_event_cancel(iter->ev, stored_event_info[iter->type].cancel);
+			}
+			iter->ev = NULL;
+			LL_DELETE(*list, iter);
+			free(iter);
+		}
+		
+		// should now definitely be empty and freed
+		*list = NULL;
+	}
 }
 
 
@@ -6320,15 +6535,16 @@ void add_stored_event(struct stored_event **list, int type, struct dg_event *eve
 * @param int type The SEV_ type to cancel.
 */
 void cancel_stored_event(struct stored_event **list, int type) {
-	struct stored_event *sev = find_stored_event(*list, type);
+	struct stored_event *sev;
 	
-	if (sev && sev->ev) {
-		dg_event_cancel(sev->ev, stored_event_info[type].cancel);
-		sev->ev = NULL;
-	}
-	
-	if (sev) {
-		HASH_DEL(*list, sev);
+	// while prevents any chance of duplicates (which should be impossible)
+	while ((sev = find_stored_event(*list, type))) {
+		if (sev->ev) {
+			dg_event_cancel(sev->ev, stored_event_info[type].cancel);
+			sev->ev = NULL;
+		}
+		
+		LL_DELETE(*list, sev);
 		free(sev);
 	}
 }
@@ -6341,9 +6557,11 @@ void cancel_stored_event(struct stored_event **list, int type) {
 * @param int type The SEV_ type to cancel.
 */
 void delete_stored_event(struct stored_event **list, int type) {
-	struct stored_event *sev = find_stored_event(*list, type);
-	if (sev) {
-		HASH_DEL(*list, sev);
+	struct stored_event *sev;
+	
+	// while prevents any chance of duplicates (which should be impossible)
+	while ((sev = find_stored_event(*list, type))) {
+		LL_DELETE(*list, sev);
 		free(sev);
 	}
 }
@@ -6357,16 +6575,42 @@ void delete_stored_event(struct stored_event **list, int type) {
 * @return struct stored_event* The found event if any, or NULL.
 */
 struct stored_event *find_stored_event(struct stored_event *list, int type) {
-	struct stored_event *find;
+	struct stored_event *iter;
 	
-	HASH_FIND_INT(list, &type, find);
-	return find;
+	LL_FOREACH(list, iter) {
+		if (iter->type == type) {
+			return iter;
+		}
+	}
+	
+	return NULL;	// not found
+}
+
+
+// generic canceller for simple character events
+EVENT_CANCEL_FUNC(cancel_character_event) {
+	struct char_event_data *data = (struct char_event_data*)event_obj;
+	free(data);
 }
 
 
 // frees memory when a map event is canceled
 EVENT_CANCEL_FUNC(cancel_map_event) {
 	struct map_event_data *data = (struct map_event_data *)event_obj;
+	free(data);
+}
+
+
+// generic canceller for simple mob events
+EVENT_CANCEL_FUNC(cancel_mob_event) {
+	struct mob_event_data *data = (struct mob_event_data*)event_obj;
+	free(data);
+}
+
+
+// generic canceller for simple object events
+EVENT_CANCEL_FUNC(cancel_obj_event) {
+	struct obj_event_data *data = (struct obj_event_data*)event_obj;
 	free(data);
 }
 
@@ -6620,7 +6864,12 @@ void discrete_load(FILE *fl, int mode, char *filename) {
 
 	/* modes positions correspond to DB_BOOT_x in db.h */
 	// TODO move this into the other DB_BOOT_x array
-	const char *modes[] = {"world", "mob", "obj", "zone", "empire", "book", "craft", "trg", "crop", "sector", "adventure", "room template", "global", "account", "augment", "archetype", "ability", "class", "skill", "vehicle", "morph", "quest", "social", "faction", "generic", "shop", "progress", "event" };
+	const char *modes[] = {"world", "mob", "obj", "names", "empire", "book",
+		"craft", "building", "trigger", "crop", "sector", "adventure",
+		"room template", "global", "account", "augment", "archetype",
+		"ability", "class", "skill", "vehicle", "morph", "quest", "social",
+		"faction", "generic", "shop", "progress", "event"
+	};
 
 	for (;;) {
 		if (!get_line(fl, line)) {
@@ -8030,8 +8279,9 @@ void free_whole_library(void) {
 		free(island);
 	}
 	
-	// ensure triggers are gone
+	// ensure these are gone
 	free_freeable_triggers();
+	free_freeable_dots();
 	
 	// most of this part is just done in alphabetical order
 	HASH_ITER(hh, ability_table, abil, next_abil) {
@@ -8868,7 +9118,6 @@ void free_complex_data(struct complex_room_data *data) {
 * @param struct shared_room_data *data The data to free.
 */
 void free_shared_room_data(struct shared_room_data *data) {
-	struct stored_event *ev, *next_ev;
 	struct depletion_data *dep;
 	struct track_data *track, *next_track;
 	
@@ -8892,9 +9141,7 @@ void free_shared_room_data(struct shared_room_data *data) {
 		free(track);
 	}
 	
-	HASH_ITER(hh, data->events, ev, next_ev) {
-		cancel_stored_event(&data->events, ev->type);
-	}
+	cancel_all_stored_events(&data->events);
 	
 	free(data);
 }
@@ -9095,9 +9342,10 @@ int sort_requirements_by_group(struct req_data *a, struct req_data *b) {
 *
 * @param FILE *fl The file, having just read the letter tag.
 * @param struct req_data **list The list to append to.
+* @param bool with_custom_text If TRUE, will load the next line for custom text.
 * @param char *error_str How to report if there is an error.
 */
-void parse_requirement(FILE *fl, struct req_data **list, char *error_str) {
+void parse_requirement(FILE *fl, struct req_data **list, bool with_custom_text, char *error_str) {
 	struct req_data *req;
 	int type, needed;
 	bitvector_t misc;
@@ -9128,6 +9376,10 @@ void parse_requirement(FILE *fl, struct req_data **list, char *error_str) {
 	req->group = group;
 	req->needed = needed;
 	req->current = 0;
+	
+	if (with_custom_text) {
+		req->custom = fread_string(fl, error_str);
+	}
 	
 	LL_APPEND(*list, req);
 	LL_SORT(*list, sort_requirements_by_group);
@@ -9168,11 +9420,9 @@ void write_requirements_to_file(FILE *fl, char letter, struct req_data *list) {
 	struct req_data *iter;
 	LL_FOREACH(list, iter) {
 		// NOTE: iter->current is NOT written to file (is only used for live data)
-		if (iter->group) {
-			fprintf(fl, "%c\n%d %d %llu %d %c\n", letter, iter->type, iter->vnum, iter->misc, iter->needed, iter->group);
-		}
-		else {
-			fprintf(fl, "%c\n%d %d %llu %d\n", letter, iter->type, iter->vnum, iter->misc, iter->needed);
+		fprintf(fl, "%c%s\n%d %d %llu %d %c\n", letter, (iter->custom && *iter->custom ? "+" : ""), iter->type, iter->vnum, iter->misc, iter->needed, iter->group ? iter->group : '-');
+		if (iter->custom && *iter->custom) {
+			fprintf(fl, "%s~\n", iter->custom);
 		}
 	}
 }

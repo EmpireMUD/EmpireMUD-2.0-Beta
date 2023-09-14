@@ -43,8 +43,8 @@ Anat's bindings are piled here.~
 still surge with forgotten power, long lost to the world. These might be
 valuable, to the right person.
 ~
-15 0 a 0 1
-1 0 0
+15 0 a 0 2
+1 2 0
 2 0
 R
 4 5621 0
@@ -356,7 +356,7 @@ S
 dress battle old god Anat~
 the battle dress of the old god Anat~
 The battle dress of the old god Anat is lying here.~
-   These clothing, died with saffron and murex, bear the symbols of the virgin
+   These clothing, dyed with saffron and murex, bear the symbols of the virgin
 warrior-goddess Anat.
 ~
 2 o ad 0 2
@@ -404,8 +404,8 @@ Ba'al Hadad's bindings are piled here.~
 still surge with forgotten power, long lost to the world. These might be
 valuable, to the right person.
 ~
-15 0 a 0 2
-1 0 0
+15 0 a 0 3
+1 2 0
 2 0
 R
 4 5621 0
@@ -736,14 +736,17 @@ R
 4 5114 0
 S
 #12053
-seeds jar date palm~
-a jar of date palm seeds~
-A jar of date palm seeds is sitting here.~
-   This clay jar looks truly ancient. There's no telling how long these seeds
-have been sealed inside. You could probably still plant them, if you had a
-fertile desert.
+seeds purse date palm~
+a purse of date palm seeds~
+A purse of date palm seeds is lying here.~
+   This purse is made from well-worn snake leather, so old that the pattern on
+its scales is no longer discernible. Though the seeds have been tucked away in
+the purse a long time, you could probably still PLANT them.
+   Since ancient times, dates have been cultivated in Mesopotamia, Egypt,
+Arabia, and beyond. The fronds of the date palm were used in Roman triumphal
+processions. Beyond that, it makes a beautiful ornimental tree.
 ~
-3 b a 0 7
+3 b a 0 8
 0 12052 0
 7 168
 R

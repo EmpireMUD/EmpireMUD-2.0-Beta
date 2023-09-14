@@ -1,5 +1,51 @@
+#12600
+Nearby: Find the Sorcerer's Apprentice~
+   Somewhere nearby on the newbie island there is a sorcerer's apprentice in
+distress! Find the apprentice and the elemental rift, and see if you can help.
+Follow these steps:
+- On the newbie island, type 'nearby' to see what's around you.
+- If there's a lot, try 'nearby Elemental Escape' to find the adventure.
+- If you still don't see Elemental Escape, try moving to another part of the
+  newbie island and use nearby again.
+- Once you get directions to Elemental Escape from nearby, find your way to
+  its location. You can use 'nearby Elemental Escape' again along the way. You
+  may have to go around mountains or other terrain to find it.
+- Don't be afraid to 'sleep' to regenerate movement points faster on your way.
+- Once you get to the Elemental Rift, type 'quest finish Nearby: Find the
+  Sorcerer's Apprentice' -- or just 'quest finish all'.
+~
+   You have reached the Elemental Rift and found the sorcerer's apprentice and
+things seem dire here... This is an adventure -- a small scripted area with
+stuff to do. Type 'adventure' here at the Elemental Rift to see more
+information about it and try 'quest start all' to check out the quests here.
+~
+1 0 0 100 -1
+A
+3 10850
+P
+0 10851 0 1 -
+P
+0 10852 0 1 -
+P
+0 10853 0 1 -
+P
+0 10854 0 1 -
+P
+0 10855 0 1 -
+P
+0 10857 0 1 -
+P
+0 10858 0 1 -
+R
+0 0 1
+W+
+12 12600 0 1 -
+Find the Elemental Rift using nearby~
+Z
+1 12600
+S
 #12601
-Earth Elemental Essence~
+Elemental Escape: Essence of Earth~
    An earth elemental has escaped! Find it, defeat it, and bring its essence
 back to the apprentice so he can re-summon the elemental before the sorcerer
 notices it escaped. You can use 'where earth' to find the elemental if it is
@@ -10,22 +56,24 @@ of the earth elemental. You have earned favor with the apprentice. Use 'list'
 and 'buy' to spend this favor. You can also type 'coins' to see how much favor
 you have.
 ~
-4 d 0 25 60
+5 d 0 25 60
 A
 1 12600
 A
 2 12601
+P
+38 0 0 50 -
 R
 8 12600 1
 R
 0 0 1
 W
-2 12601 0 1
+2 12601 0 1 -
 Z
 1 12600
 S
 #12602
-Fire Elemental Essence~
+Elemental Escape: Essence of Fire~
    A fire elemental has escaped! Find it, defeat it, and bring its essence back
 to the apprentice so he can re-summon the elemental before the sorcerer notices
 it escaped. You can use 'where fire' to find the elemental if it is nearby, and
@@ -36,22 +84,24 @@ of the fire elemental. You have earned favor with the apprentice. Use 'list'
 and 'buy' to spend this favor. You can also type 'coins' to see how much favor
 you have.
 ~
-5 d 0 25 60
+6 d 0 25 60
 A
 1 12600
 A
 2 12602
+P
+38 0 0 50 -
 R
 8 12600 1
 R
 0 0 1
 W
-2 12602 0 1
+2 12602 0 1 -
 Z
 1 12600
 S
 #12603
-Wind Elemental Essence~
+Elemental Escape: Essence of Wind~
    A wind elemental has escaped! Find it, defeat it, and bring its essence back
 to the apprentice so he can re-summon the elemental before the sorcerer notices
 it escaped. You can use 'where wind' to find the elemental if it is nearby, and
@@ -62,22 +112,24 @@ of the wind elemental. You have earned favor with the apprentice. Use 'list'
 and 'buy' to spend this favor. You can also type 'coins' to see how much favor
 you have.
 ~
-6 d 0 25 60
+7 d 0 25 60
 A
 1 12600
 A
 2 12603
+P
+38 0 0 50 -
 R
 8 12600 1
 R
 0 0 1
 W
-2 12603 0 1
+2 12603 0 1 -
 Z
 1 12600
 S
 #12604
-Water Elemental Essence~
+Elemental Escape: Essence of Water~
    A water elemental has escaped! Find it, defeat it, and bring its essence
 back to the apprentice so he can re-summon the elemental before the sorcerer
 notices it escaped. You can use 'where water' to find the elemental if it is
@@ -88,22 +140,24 @@ of the water elemental. You have earned favor with the apprentice. Use 'list'
 and 'buy' to spend this favor. You can also type 'coins' to see how much favor
 you have.
 ~
-7 d 0 25 60
+8 d 0 25 60
 A
 1 12600
 A
 2 12604
+P
+38 0 0 50 -
 R
 8 12600 1
 R
 0 0 1
 W
-2 12604 0 1
+2 12604 0 1 -
 Z
 1 12600
 S
 #12650
-Tranquility of the Grove~
+Grove: Tranquility of the Grove~
    This little orange fox looks up at you, with fire in its eyes. It explains
 that it is the avatar of the Grove Spirit, and that the druids inside have
 become corrupted by rage. The druids are preparing to invade your world through
@@ -118,7 +172,7 @@ Archdruid.
 get into this kind of trouble again... You receive some magical food, in
 addition to the wooden nickels you already earned.
 ~
-9 bc 1 75 -1
+10 bc 1 75 -1
 A
 1 12676
 P
@@ -133,13 +187,14 @@ R
 0 0 1
 T 12685
 T 12681
-W
-11 0 0 1
+W+
+11 0 0 1 -
+Tranquilize the druid leaders~
 Z
 1 12676
 S
 #12651
-Invasion of the Grove~
+Grove: Invasion of the Grove~
    The little orange fox looks up at you, with fire in its eyes. It explains
 that it is the avatar of the Grove Spirit, and that the druids inside have
 become corrupted by rage. The fox seems distraught that the Archdruid might be
@@ -186,7 +241,7 @@ Z
 1 12677
 S
 #12652
-Invasion of the Grove~
+Grove: Invasion of the Grove~
    The little orange fox looks up at you, with fire in its eyes. It explains
 that it is the avatar of the Grove Spirit, and that the druids inside have
 become corrupted by rage. The fox seems distraught that the Archdruid might be

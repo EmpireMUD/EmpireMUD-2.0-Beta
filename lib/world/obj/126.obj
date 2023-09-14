@@ -148,8 +148,8 @@ a flickering flame~
 A tiny, flickering flame burns brightly on the ground.~
 This tiny spark of flame puts out a surprising amount of light!
 ~
-3 c 0 0 2
-0 0 0
+29 0 0 0 3
+-1 1 0
 10 10080
 C
 0 25
@@ -285,9 +285,9 @@ A little fire is burning on the ground.~
 These little fires are safe enough to put in your pocket, and they'll burn even
 in the depths of the ocean, but only for a little while.
 ~
-3 cmy ao 0 4
-0 0 0
-10 168
+29 my ao 0 5
+168 1 5
+10 0
 A
 7 2 0
 A
@@ -525,7 +525,7 @@ totem grove~
 the totem of tranquility~
 The totem of tranquility is on the ground.~
    The totem is carved from hardwood, in the shape of a baby fox. Inscribed in
-a spiral around the totem are the words to the chant of tranqulity. Use 'chant
+a spiral around the totem are the words to the chant of tranquility. Use 'chant
 tranquility' to tranquilize the Grove.
 ~
 3 0 a 0 2

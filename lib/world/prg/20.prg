@@ -132,7 +132,7 @@ Your reward for all this mining is the ability to dig deeper mines.
 K 0 13
 P 2011
 W
-34 175 0 250
+34 175 0 250 -
 S
 #2015
 Cache of Resources~
@@ -142,21 +142,21 @@ the basic component types: lumber, rock, block, pillar, sapling, and metal.
 You can mix and match different types of each component, such as tin and
 copper. Completing this goal earns you another city point.
 ~
-11 2 0 15 0
+12 2 0 15 0
 K 1 1
 P 2011
 W
-35 6700 0 250 a
+35 6700 0 150 a
 W
-35 6015 0 250 a
+35 6015 0 150 a
 W
-35 6075 0 250 a
+35 6075 0 150 a
 W
-35 6050 0 250 a
+35 6050 0 150 a
 W
-35 6025 0 250 a
+35 6025 0 150 a
 W
-35 6000 0 250 a
+35 6000 0 150 a
 S
 #2016
 Rare Surplus~
@@ -259,7 +259,7 @@ this goal.
 ~
 3 2 0 5 0
 W
-23 0 0 1
+23 0 0 1 -
 S
 #2031
 Harvest Time~
@@ -272,7 +272,7 @@ goal.
 K 7 5
 P 2030
 W
-23 0 0 10
+23 0 0 10 -
 S
 #2032
 Harvest Bounty~
@@ -285,7 +285,7 @@ you have a workforce.
 K 6 100
 P 2031
 W
-23 0 0 30
+23 0 0 30 -
 S
 #2033
 Cornucopia~
@@ -299,7 +299,7 @@ items count toward this goal.
 K 7 50
 P 2032
 W
-23 0 0 60
+23 0 0 60 -
 S
 #2040
 Trade Routes~
@@ -323,7 +323,7 @@ to accept. Completing this goal will unlock a reward of 5 extra territory per
 K 4 5
 P 2040
 W
-31 0 32 1
+31 0 32 1 -
 S
 #2042
 Trade Magnate~
@@ -334,7 +334,7 @@ trading world.
 K 4 5
 P 2041
 W
-31 0 32 10
+31 0 32 10 -
 S
 #2050
 Cargo~
@@ -343,7 +343,7 @@ Build or buy a cargo ship -- one capable of moving goods from island to island.
 2 2 0 15 0
 P 2901
 W
-27 0 512 1
+27 0 512 1 -
 S
 #2051
 Shipping Magnate~
@@ -354,6 +354,6 @@ empire's economy. This goal unlocks the hulk, an advanced cargo ship.
 K 2 957
 P 2050
 W
-27 0 512 5
+27 0 512 5 -
 S
 $

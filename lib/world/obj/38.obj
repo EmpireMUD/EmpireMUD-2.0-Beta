@@ -1,0 +1,153 @@
+#3800
+bread village loaf~
+a loaf of village bread~
+A loaf of village bread has been left behind.~
+   This simple loaf of bread isn't terribly good, but it will keep the
+villagers fed.
+~
+6 0 a 0 4
+48 0 0
+7 1440
+C
+1 1
+R
+4 5619 0
+S
+#3801
+gruel village~
+village gruel~
+Some gruel has been left behind.~
+   This serving of what could, at best, be described as "rudimentary porridge"
+has already gone cold.
+~
+6 0 a 0 6
+48 0 0
+7 336
+C
+1 1
+R
+4 5619 0
+S
+#3803
+rice village~
+village rice~
+Some village rice has been left behind.~
+   The rice has been cleaned and cooked, but it's rather bland. Still, you
+could sustain an enormous workforce on enough of this.
+~
+6 0 a 0 6
+48 0 0
+7 1440
+C
+1 1
+R
+4 5619 0
+S
+#3805
+vegetables pickled village~
+pickled village vegetables~
+Some pickled village vegetables are lying here.~
+   The vegetables have been pickled to make them edible and give them a little
+flavor. Not very much flavor, mind you, but a little.
+~
+6 0 a 0 9
+48 0 0
+7 1440
+C
+1 1
+R
+4 5619 0
+S
+#3807
+cakes oat village~
+village oat cakes~
+Some village oak cakes are lying here.~
+   These oat cakes are made out of little more than milled oats. A little salt
+would have been nice, or perhaps some dried fruit, but there mustn't have been
+any available.
+~
+6 0 a 0 5
+48 0 0
+7 1440
+C
+1 1
+R
+4 5619 0
+S
+#3808
+steak grilled~
+a grilled steak~
+A grilled steak has been left here.~
+   The steak is pretty simple. It's a grilled cut of unidentifiable meat,
+cooked without salt or seasonings, over a hot fire.
+~
+6 0 a 0 6
+24 0 0
+7 336
+C
+1 1
+O+ 1 6220
+R
+4 5619 0
+S
+#3810
+chicken grilled piece~
+a piece of grilled chicken~
+A piece of grilled chicken is lying here.~
+   This cut of grilled poultry would be generous to call itself chicken.
+Still, grilling should make it safe to eat.
+~
+6 0 a 0 6
+24 0 0
+7 336
+C
+1 1
+O+ 1 6221
+R
+4 5619 0
+S
+#3812
+fish fillet filet grilled~
+a fillet of grilled fish~
+A fillet of grilled fish is sitting here.~
+This fish isn't well-seasoned, but at least it's well-cooked.
+~
+6 0 a 0 7
+24 0 0
+7 336
+C
+1 1
+O+ 1 6223
+R
+4 5619 0
+S
+#3814
+porkchop chop grilled~
+a grilled porkchop~
+A grilled porkchop is lying here.~
+This fine cut of pork has been cooked until all hope of flavor is gone.
+~
+6 0 a 0 7
+24 0 0
+7 336
+C
+1 1
+O+ 1 6222
+R
+4 5619 0
+S
+#3816
+fruit preserves village~
+some village fruit preserves~
+Some village fruit preserves have been left here.~
+The fruit has been cooked and preserved for use outside the growing season.
+~
+6 0 a 0 10
+48 0 0
+7 1440
+C
+1 1
+R
+4 5619 0
+S
+$

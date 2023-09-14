@@ -289,7 +289,7 @@ set target %random.char%
 if (%target.is_pc% && %target.has_resources(10013,10)%)
   say Ah, %target.name%, you've done my job for me. Here, have some money.
   nop %target.give_coins(100)%
-  %send% %target% ~%actor% gives you 100 coins.
+  %send% %target% ~%self% gives you 100 coins.
   detach 10022 %self.id%
 end
 ~
@@ -305,7 +305,7 @@ switch %random.2%
       %send% %target% ~%self% shoots a web at you, anchoring you to the ground!
       %echoaround% %target% ~%self% shoots a web at ~%target%, anchoring *%target% to the ground!
       dg_affect %actor% SLOW on 120
-      dg_affect %actor% ENTANGLED on 120
+      dg_affect %actor% IMMOBILIZED on 120
     end
   break
   * Searing Pain poison (DoT) on tank
@@ -490,8 +490,8 @@ if !%actor.can_afford(%cost%)%
 end
 nop %actor.charge_coins(%cost%)%
 %load% obj %vnum% %actor% inv
-%send% %actor% You buy a %named% for %cost% coins.
-%echoaround% %actor% ~%actor% buys a %named%.
+%send% %actor% You buy %named.ana% %named% for %cost% coins.
+%echoaround% %actor% ~%actor% buys %named.ana% %named%.
 ~
 #10034
 Teacher passive~
@@ -1017,22 +1017,22 @@ remote msg_pos %self.id%
 Lich combat~
 0 k 10
 ~
-if !%self.affect(foresight)%
+if !%self.affect(3009)%
   foresight
-elseif !%actor.affect(slow)%
+elseif !%actor.affect(3035)%
   slow
 else
   switch %random.4%
     case 1
       %send% %actor% ~%self% grabs you by the neck and you're both enveloped in a bright purple glow!
       %echoaround% %actor% ~%self% grabs ~%actor% by the neck and they're both enveloped in a bright purple glow!
-      %damage% %self% -50
+      %heal% %self% health 50
       %damage% %actor% 75 magical
     break
     case 2
-      %send% %actor% ~%self% stares into your eyes. You can't move!
-      %echoaround% %actor% ~%self% stares into |%actor% eyes. ~%actor% seems unable to move!
-      dg_affect %actor% STUNNED on 10
+      %send% %actor% ~%self% stares into your eyes. You begin to wither!
+      %echoaround% %actor% ~%self% stares into |%actor% eyes. ~%actor% seems to wither!
+      dg_affect #10052 %actor% strength -2 10
     break
     case 3
       %echo% ~%self% raises ^%self% arms and the floor begins to rumble...
@@ -1066,7 +1066,7 @@ Shackled Ghost combat~
 %send% %actor% ~%self% envelops you. You hear a terrible, soul-piercing scream!
 %echoaround% %actor% ~%self% envelops ~%actor%, who lets out a terrible, soul-piercing scream!
 dg_affect %actor% SLOW on 20
-dg_affect %actor% ENTANGLED on 20
+dg_affect %actor% IMMOBILIZED on 20
 ~
 #10055
 Celiya passive~
@@ -1420,13 +1420,24 @@ if %random.3% == 3
 end
 ~
 #10079
-Skycleaver Trinket teleport~
+Old Skycleaver Trinket: Replace with new one~
 1 c 2
 use~
 if %actor.obj_target(%arg%)% != %self%
   return 0
   halt
 end
+* just replace trinket
+%load% obj 11909 %actor% inv
+if %actor.room.is_outdoors%
+  %send% %actor% A rainbow splits the sky in half and hits your skycleaver trinket...
+else
+  %send% %actor% Your skycleaver trinket glows and becomes startlingly hot...
+end
+%send% %actor% Your skycleaver trinket has received an update. Please try again.
+%purge% %self%
+halt
+* old trigger: teleported to skycleave
 set room_var %self.room%
 * once per 60 minutes
 if %actor.cooldown(10079)%

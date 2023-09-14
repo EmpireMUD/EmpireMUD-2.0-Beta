@@ -10,16 +10,15 @@ that citizens live) to finish this quest.
 collect. By time you've turned around, the cookies are gone and a left-over
 gift has replaced them.
 ~
-14 de 0 0 -1
+18 dej 0 0 -1
 A
 1 10702
-D 10700
 P
-36 10700 0 1
+36 10700 0 1 -
 R
 9 10700 10
 R
-2 16659 1
+2 16678 1
 T 10700
 W
 2 10716 0 20 a
@@ -43,16 +42,71 @@ you a little tune:
  The little dog laughed,
  To see such sport,
  And the dish ran away with the spoon.
+
+You can use your enchanted breadcrumbs to teleport home, but do it quickly.
 ~
-6 d 0 25 0
+7 d 0 25 0
 A
 2 10730
 R
 2 10731 1
+R
+2 10749 1
 W
-2 10730 0 1
+2 10730 0 1 -
 Z
 1 10730
+S
+#10731
+Nearby: Find the Giant Shoe~
+   Somewhere nearby on the newbie island, there's a giant shoe! Better go check
+it out. There are a few ways to find it. Try these steps:
+- On the newbie island, type 'nearby' to see what's around you.
+- If there's a lot, try 'nearby Misplaced Mother Goose' to find the adventure
+  with the giant shoe.
+- If you still don't see Misplaced Mother Goose, try moving to another part of
+  the newbie island and use nearby again.
+- You can also try 'scan Giant Shoe'. Scan has a shorter range but will find
+  things you can see around you. If you're using the ascii map view, the giant
+  shoe looks like &u| `n&0
+- Once you get directions to Misplaced Mother Goose from nearby or scan, find
+  your way to its location. You can use nearby or scan again along the way. You
+  may have to go around mountains or other terrain to find it.
+- Don't be afraid to 'sleep' to regenerate movement points faster on your way.
+- Once you get to the Giant Shoe, type 'quest finish Nearby: Find the Giant
+  Shoe' -- or just 'quest finish all'.
+~
+   You have reached the Giant Shoe but this adventure -- Misplaced Mother Goose
+-- doesn't have much to do right here. Type 'adventure' at the Giant Shoe for
+more information about it. To complete the quests for this adventure, look for
+items like the fiddle, pail, candlestick, and more whenever you kill a low-
+level mob anywhere in the world. When you find one, use 'quest start all' and
+look at the item for information on how to get it back to its rightful owner.
+~
+2 0 0 100 -1
+A
+3 10850
+P
+0 10851 0 1 -
+P
+0 10852 0 1 -
+P
+0 10853 0 1 -
+P
+0 10854 0 1 -
+P
+0 10855 0 1 -
+P
+0 10857 0 1 -
+P
+0 10858 0 1 -
+R
+0 0 1
+W+
+12 10730 0 1 -
+Find the Giant Shoe using nearby~
+Z
+0 10730
 S
 #10732
 To Fetch a Pail of Water~
@@ -67,15 +121,19 @@ Jack and Jill went up the hill
 To fetch a pail of water.
 Jack fell down and broke his crown,
 And Jill came tumbling after.
+
+You can use your enchanted breadcrumbs to teleport home, but do it quickly.
 ~
-5 d 1 25 0
+6 d 1 25 0
 A
 2 10732
 R
 2 10733 1
+R
+2 10749 1
 T 10740
 W
-2 10732 0 1
+2 10732 0 1 -
 Z
 1 10732
 S
@@ -91,20 +149,24 @@ Jack and Jill went up the hill
 To fetch a pail of water.
 Jack fell down and broke his crown,
 And Jill came tumbling after.
+
+You can use your enchanted breadcrumbs to teleport home, but do it quickly.
 ~
-7 d 1 25 0
+8 d 1 25 0
 A
 2 10732
 R
 2 10745 1
+R
+2 10749 1
 T 10740
 W
-2 10732 0 1
+2 10732 0 1 -
 Z
 1 10733
 S
 #10734
-Jack Be Nimble (unlit candlestick)~
+Jack Be Nimble~
    Jack is a real daredevil, but there's nothing to jump around here but the
 creek. If you could bring Jack his candlestick, perhaps he'd share his best
 jumping shoes.
@@ -118,19 +180,27 @@ Jack be nimble,
 Jack be quick,
 Jack jump over
 The candlestick.
+
+You can use your enchanted breadcrumbs to teleport home, but do it quickly.
 ~
-8 d 0 25 0
+10 d 0 25 0
 A
 2 10734
+A
+2 10735
 R
 2 10736 1
+R
+2 10749 1
 W
-2 10734 0 1
+2 10734 0 1 -
+W
+2 10735 0 1 -
 Z
 1 10734
 S
 #10735
-Jack Be Nimble (lit candlestick)~
+Jack Be Nimble~
    Jack is a real daredevil, but there's nothing to jump around here but the
 creek. If you could bring Jack his candlestick, perhaps he'd share his best
 jumping shoes.
@@ -144,15 +214,19 @@ Jack be nimble,
 Jack be quick,
 Jack jump over
 The candlestick.
+
+You can use your enchanted breadcrumbs to teleport home, but do it quickly.
 ~
-8 d 0 25 0
-A
-2 10735
+11 d 0 25 0
 R
 2 10736 1
+R
+2 10749 1
 T 10735
 W
-2 10735 0 1
+2 10735 0 1 -
+W
+2 10734 0 1 -
 Z
 1 10734
 S
@@ -169,14 +243,18 @@ Jack Sprat could eat no fat.
 His wife could eat no lean.
 And so between them both, you see,
 They licked the platter clean.
+
+You can use your enchanted breadcrumbs to teleport home, but do it quickly.
 ~
-9 d 0 25 0
+10 d 0 25 0
 A
 2 10737
 R
 2 10738 1
+R
+2 10749 1
 W
-2 10737 0 1
+2 10737 0 1 -
 Z
 1 10737
 S
@@ -194,14 +272,18 @@ Eating a Christmas pie;
 He put in his thumb,
 And pulled out a plum,
 And said 'What a good boy am I!'
+
+You can use your enchanted breadcrumbs to teleport home, but do it quickly.
 ~
-8 d 0 25 0
+9 d 0 25 0
 A
 2 10739
 R
 2 10740 1
+R
+2 10749 1
 W
-2 10739 0 1
+2 10739 0 1 -
 Z
 1 10739
 S
@@ -220,14 +302,18 @@ Eating her curds and whey;
 Along came a spider
 Who sat down beside her
 And frightened Miss Muffet away.
+
+You can use your enchanted breadcrumbs to teleport home, but do it quickly.
 ~
-9 d 0 25 0
+10 d 0 25 0
 A
 2 10741
 R
 2 10742 1
+R
+2 10749 1
 W
-2 10741 0 1
+2 10741 0 1 -
 Z
 1 10741
 S
@@ -243,14 +329,18 @@ Mary had a little lamb,
 His fleece was white as snow,
 And everwhere that Mary went,
 The lamb was sure to go.
+
+You can use your enchanted breadcrumbs to teleport home, but do it quickly.
 ~
-10 d 0 25 0
+11 d 0 25 0
 A
 2 10744
 R
 2 10743 1
+R
+2 10749 1
 W
-2 10744 0 1
+2 10744 0 1 -
 Z
 1 10743
 S
@@ -267,15 +357,67 @@ There was an old woman who lived in a shoe.
 She had so many children, she didn't know what to do;
 So she gave them some broth without any bread;
 And she whipped them all soundly and sent them to bed.
+
+You can use your enchanted breadcrumbs to teleport home, but do it quickly.
 ~
-10 d 0 25 0
+11 d 0 25 0
 A
 2 10746
 R
 2 10747 1
+R
+2 10749 1
 W
-2 10746 0 1
+2 10746 0 1 -
 Z
 1 10746
+S
+#10750
+Nearby: Find the Goblin Mine~
+   Somewhere nearby in the mountains of the newbie island, some goblins have
+been mining and run into a spot of trouble! Better go check it out. Follow
+these steps to find it:
+- On the newbie island, type 'nearby' to see what's around you.
+- If there's a lot, try 'nearby Goblin Mines' to find the adventure.
+- If you still don't see Goblin Mines, try moving to another part of the newbie
+  island and use nearby again.
+- Once you get directions to the Goblin Mines from nearby, find your way to
+  its location. You can use 'nearby Goblin Mines' again along the way. It will
+  be on the edge of the mountains -- make sure you don't walk onto a mountain
+  tile trying to get there. You may have to go around other mountains.
+- Don't be afraid to 'sleep' to regenerate movement points faster on your way.
+- Once you get to the Goblin Mines, type 'quest finish Nearby: Find the Goblin
+  Mine' -- or just 'quest finish all'.
+~
+   You have reached the Goblin Mine but it looks like the goblins have fled.
+You can find them outside the mine with the command 'where goblin'. But there's
+also more to explore inside. Get a torch and head into the mine to see what's
+inside. Maybe it will be interesting. Type 'adventure' inside the mine for more
+information.
+~
+2 0 0 100 -1
+A
+3 10850
+P
+0 10851 0 1 -
+P
+0 10852 0 1 -
+P
+0 10853 0 1 -
+P
+0 10854 0 1 -
+P
+0 10855 0 1 -
+P
+0 10857 0 1 -
+P
+0 10858 0 1 -
+R
+0 0 1
+W+
+12 10750 0 1 -
+Find the Goblin Mine using nearby~
+Z
+0 10750
 S
 $

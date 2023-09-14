@@ -3,38 +3,42 @@ Neferkare pharaoh pharoah linen-wrapped wrapped~
 Pharaoh Neferkare~
 A linen-wrapped pharaoh climbs out of his sarcophagus.
 ~
-0 0 bdxyzAB c 3
-1 0 13 7
-I 0 18324 100.00 8  # BUTCHER: a bolt of linen
-I 0 3306 25.00 2 b  # BUTCHER: a pouch of jerky
-I 0 3306 25.00 3 b  # BUTCHER: a pouch of jerky
-I 0 3306 25.00 4 b  # BUTCHER: a pouch of jerky
-I 0 3306 25.00 5 b  # BUTCHER: a pouch of jerky
-I 4 18305 100.00 1  # LOOT: a bonus item
+0 0 bdxyzABK cG 3
+1 0 13 7 -1
+D
+   You really can't see much. The former pharaoh is completely wrapped in
+linen, with a painted-on face. And sparks of magic layer his hands like gloves.
+~
+I 0 18324 100.00 8  # BUTCHER: bolt of linen
+I 0 3306 25.00 2 b  # BUTCHER: pouch of jerky
+I 0 3306 25.00 3 b  # BUTCHER: pouch of jerky
+I 0 3306 25.00 4 b  # BUTCHER: pouch of jerky
+I 0 3306 25.00 5 b  # BUTCHER: pouch of jerky
+I 4 18305 100.00 1  # LOOT: bonus item
 I 4 18307 12.00 1 a  # LOOT: Khufu's pharaonic wristbands
 I 4 18312 12.00 1 a  # LOOT: Khufu's leather sandals
-I 4 18317 12.00 1 a  # LOOT: the aura of Nekhbet
+I 4 18317 12.00 1 a  # LOOT: aura of Nekhbet
 I 4 18309 12.00 1 a  # LOOT: golden bangles
 I 4 18314 12.00 1 a  # LOOT: sandals of the burning dunes
-I 4 18319 12.00 1 a  # LOOT: the aura of Thoth
-I 4 18315 12.00 1 a  # LOOT: the mummy's linen footwraps
-I 4 18326 12.00 1 a  # LOOT: a sacred bell
+I 4 18319 12.00 1 a  # LOOT: aura of Thoth
+I 4 18315 12.00 1 a  # LOOT: mummy's linen footwraps
+I 4 18326 12.00 1 a  # LOOT: sacred bell
 I 4 18302 1.00 1 a  # LOOT: Cult of Anubis garments
 I 4 18303 1.00 1 a  # LOOT: Cult of Horus garments
-I 4 18329 1.00 1 a  # LOOT: the Solar Disk of Ra
-I 4 18327 1.00 1 a  # LOOT: a crocodile whistle
+I 4 18329 1.00 1 a  # LOOT: Solar Disk of Ra
+I 4 18327 1.00 1 a  # LOOT: crocodile whistle
 I 4 18306 12.00 1 b  # LOOT: Naqada wristguards
-I 4 18311 12.00 1 b  # LOOT: a pair of plated sandals
-I 4 18316 12.00 1 b  # LOOT: the aura of Geb
-I 4 18308 12.00 1 b  # LOOT: a papyrus charm
+I 4 18311 12.00 1 b  # LOOT: pair of plated sandals
+I 4 18316 12.00 1 b  # LOOT: aura of Geb
+I 4 18308 12.00 1 b  # LOOT: papyrus charm
 I 4 18313 12.00 1 b  # LOOT: sacred lotus sandals
-I 4 18318 12.00 1 b  # LOOT: the aura of Osiris
-I 4 18310 12.00 1 b  # LOOT: a jeweled scarab charm
-I 4 18320 12.00 1 b  # LOOT: the aura of Khufu
+I 4 18318 12.00 1 b  # LOOT: aura of Osiris
+I 4 18310 12.00 1 b  # LOOT: jeweled scarab charm
+I 4 18320 12.00 1 b  # LOOT: aura of Khufu
 I 4 18300 1.00 1 b  # LOOT: Cult of Sobek garments
 I 4 18301 1.00 1 b  # LOOT: Cult of Bastet garments
-I 4 18325 1.00 1 b  # LOOT: the ankh of Hedj-Wer
-I 4 18328 1.00 1 b  # LOOT: a falcon whistle
+I 4 18325 1.00 1 b  # LOOT: ankh of Hedj-Wer
+I 4 18328 1.00 1 b  # LOOT: falcon whistle
 M
 0
 $n lets out an eerie groan.~
@@ -55,7 +59,11 @@ a fierce jackal~
 A fierce jackal is leaving.
 ~
 0 0 bdhjo c 3
-0 0 14 9
+0 0 14 9 -1
+D
+   It looks like a jackal, complete with sandy fur and scraps of meat in its
+teeth.
+~
 T 18301
 S
 #18302
@@ -64,7 +72,12 @@ a swarm of scarabs~
 A swarm of scarabs is leaving.
 ~
 0 0 bdhoyz cm 3
-0 0 2 23
+0 0 2 23 -1
+D
+   There's no way to see individual insects in this constantly shifting swarm.
+Any exposed flesh is immediately set upon and stripped away as fast as a sand
+storm scurges the landscape of the desert above.
+~
 T 18308
 T 18301
 S
@@ -73,10 +86,15 @@ mummy reanimated~
 what's left of the mummy~
 Most of a reanimated mummy shambles past you.
 ~
-250 300 adgh G 3
-1 0 13 5
-I 4 18324 100.00 4  # LOOT: a bolt of linen
-I 4 18322 100.00 1  # LOOT: a sack of flaxseed
+250 300 adghK G 3
+1 0 13 5 -1
+D
+   Not much to see, this figure has been mummified complete with linen
+wrappings. There's no face as it seems something snacked on what was once the
+front of its head.
+~
+I 4 18324 100.00 4  # LOOT: bolt of linen
+I 4 18322 100.00 1  # LOOT: sack of flaxseed
 M
 0
 $n groans slowly.~
@@ -98,7 +116,12 @@ a sacred cat~
 A sacred cat is cleaning its paw.
 ~
 1 1 bdoD n 1
-0 0 0 10
+0 0 0 10 -1
+D
+   This elegant black cat sits with a haughty look, chin up, eyes closed,
+paying very little attention to lesser beings such as yourself. It wears a
+necklace of gold and precious stones, and one of its ears bears a gold loop.
+~
 M
 0
 You stoop to pet $n.~
@@ -111,8 +134,6 @@ $n licks its paw.~
 M
 0
 $n mews.~
-T 9901
-T 9902
 S
 #18327
 crocodile enormous~
@@ -120,7 +141,13 @@ an enormous crocodile~
 An enormous crocodile practically surrounds you!
 ~
 100 125 dej 0 5
-0 0 9 9
+0 0 9 9 -1
+D
+   This beastly reptile is humongous! When it sits still, though, it quickly
+disappears into even the smallest amount of grass, muck, or water. Its long
+snout is lined with too many teeth to count, so it's safer not to be in front
+of that part.
+~
 S
 #18328
 falcon great~
@@ -128,6 +155,12 @@ a great falcon~
 A great falcon stands ready to fly.
 ~
 100 125 dej m 4
-0 0 2 27
+0 0 2 27 -1
+D
+   The falcon is enormous -- bigger than almost any bird you've ever seen --
+but with the distinctive short, curved beak and black eye stripe of any falcon.
+The back of its head is almost blue as it scatters the light, while the wings
+and back are dark grey.
+~
 S
 $

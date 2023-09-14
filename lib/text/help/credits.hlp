@@ -5,13 +5,19 @@ EmpireMUD was developed from CircleMUD (3.0 Beta 17) by Paul Clarke in his
 free time. All code unique to EmpireMUD is the intellectual property of Paul
 Clarke, but is meant to be shared.
 
-I would like to thank Andrew Flyer, David York, Kris Saw, Jason "Opie" Babo,
-Melk, Miltazar, Tharyn, Shandia, Gaia, Evan Hall, and my parents.
+Run your own EmpireMUD! Download it from GitHub:
+             https://github.com/EmpireMUD/EmpireMUD-2.0-Beta
+
+I would like to thank Yvain, Gaia, Domino, Andrew Flyer, David York, Kris Saw,
+Jason "Opie" Babo, Melk, Miltazar, Tharyn, Shandia, Gaia, Evan Hall, Dr Ravi
+Krishnadasan, and my parents.
 
  Bugs, help, etc:  paul@empiremud.net
         Web site:  http://empiremud.net/
 
  Paul Clarke / Khufu / Gideon X
+
+Type 'credits' for the full game credits.
 
 See also: CIRCLEMUD
 #

@@ -16,14 +16,14 @@ M
 $n buries $p.~
 S
 #1002
-fire~
+fire roaring~
 a roaring fire~
 A fire is roaring here!~
 It's warm and cozy.
 ~
-3 c 0 0 1
-0 0 0
-0 24
+29 0 0 0 4
+24 1 31
+0 0
 S
 #1010
 chest gilded~

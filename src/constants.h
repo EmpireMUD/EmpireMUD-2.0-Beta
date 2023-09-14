@@ -19,7 +19,9 @@ extern const char *version;
 
 // ability constants
 extern const char *ability_flags[];
+extern const char *ability_flag_notes[];
 extern const char *ability_type_flags[];
+extern const char *ability_type_notes[];
 extern const char *ability_target_flags[];
 extern const char *ability_custom_types[];
 extern const char *ability_data_types[];
@@ -150,6 +152,7 @@ extern const struct faction_reputation_type reputation_levels[];
 extern const char *generic_types[];
 extern const bool generic_types_uses_in_dev[];
 extern const char *generic_flags[];
+extern const char *language_types[];
 
 // mob constants
 extern const char *action_bits[];
@@ -177,6 +180,10 @@ extern const struct material_data materials[NUM_MATERIALS];
 extern const char *container_bits[];
 extern const char *corpse_flags[];
 extern const char *fullness[];
+extern const char *light_flags[];
+extern const char *light_flags_for_identify[];
+extern const char *mint_flags[];
+extern const char *mint_flags_for_identify[];
 extern const char *paint_colors[];
 extern const char *paint_names[];
 extern const char *resource_types[];
@@ -209,7 +216,7 @@ extern const char *climate_flags[];
 extern const bitvector_t climate_flags_order[];
 extern const bool climate_ruins_vehicle_slowly[][2];
 extern const char *crop_flags[];
-extern const char *depletion_type[NUM_DEPLETION_TYPES];
+extern const char *depletion_type[];
 extern const char *designate_flags[];
 extern const char *evo_types[];
 extern const int evo_val_types[NUM_EVOS];
@@ -242,6 +249,7 @@ extern const char *shop_flags[];
 extern const char *damage_types[];
 extern const char *skill_check_difficulty[];
 extern const char *skill_flags[];
+extern const char *weapon_types[];
 
 // social constants
 extern const char *social_flags[];

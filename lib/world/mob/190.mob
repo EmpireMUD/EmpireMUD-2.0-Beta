@@ -3,25 +3,30 @@ hag swamp old~
 the swamp hag~
 An old hag is rocking slowly in her chair.
 ~
-0 0 bdgvxAB c 3
+0 0 bdgvxABI c 3
 2 0 0 15
-I 4 19003 100.00 1  # LOOT: the Swamp Hag loot replacer
-I 4 19011 9.00 1 L  # LOOT: a repulsive stench
-I 4 19012 9.00 1 L  # LOOT: an offensive stench
-I 4 19013 9.00 1 L  # LOOT: a ghastly stench
-I 4 19014 9.00 1 L  # LOOT: a vile stench
-I 4 19015 9.00 1 L  # LOOT: an assailing stench
-I 4 19016 5.00 1 L  # LOOT: the hag's pestle
+D
+   She looks like somebody's grandmother, but the swamp hag never found the
+time to marry. From the looks of the place, she treats the rats more like her
+children.
+~
+I 4 19003 100.00 1  # LOOT: Swamp Hag loot replacer
+I 4 19011 9.00 1 L  # LOOT: repulsive stench
+I 4 19012 9.00 1 L  # LOOT: offensive stench
+I 4 19013 9.00 1 L  # LOOT: ghastly stench
+I 4 19014 9.00 1 L  # LOOT: vile stench
+I 4 19015 9.00 1 L  # LOOT: assailing stench
+I 4 19016 5.00 1 L  # LOOT: hag's pestle
 I 4 19018 5.00 1 L  # LOOT: plague claws
-I 4 19020 5.00 1 L  # LOOT: the hag's cauldron
-I 4 19022 5.00 1 L  # LOOT: a swarm of stinging insects
-I 4 19024 5.00 1 L  # LOOT: the hag's broom
-I 4 19026 5.00 1 L  # LOOT: the hag's hunting bow
-I 4 19028 5.00 1 L  # LOOT: the hag's wading boots
-I 4 19030 5.00 1 L  # LOOT: the hag's sandals
-I 4 19032 5.00 1 L  # LOOT: the hag's slippers
-I 4 19034 5.00 1 L  # LOOT: the hag's pointe shoes
-I 4 19036 5.00 1 L  # LOOT: the hag's shearling boots
+I 4 19020 5.00 1 L  # LOOT: hag's cauldron
+I 4 19022 5.00 1 L  # LOOT: swarm of stinging insects
+I 4 19024 5.00 1 L  # LOOT: hag's broom
+I 4 19026 5.00 1 L  # LOOT: hag's hunting bow
+I 4 19028 5.00 1 L  # LOOT: hag's wading boots
+I 4 19030 5.00 1 L  # LOOT: hag's sandals
+I 4 19032 5.00 1 L  # LOOT: hag's slippers
+I 4 19034 5.00 1 L  # LOOT: hag's pointe shoes
+I 4 19036 5.00 1 L  # LOOT: hag's shearling boots
 M
 0
 $n rocks in $s chair.~
@@ -50,6 +55,11 @@ A grizzled swamp rat is sitting in the corner.
 ~
 0 0 bdhoz c 2
 0 0 0 9
+D
+   This energetic rat looks green at first glance. At second glance though, it
+is clearly just coated in the muck of the swamp. In any case it looks angry and
+ready to attack!
+~
 T 19013
 T 19014
 S
@@ -60,6 +70,11 @@ A huge swamp rat decked out in bone jewelry stares malevolently at you.
 ~
 0 0 bdhoz c 3
 0 0 0 9
+D
+   This unnaturally oversized rat is decked out in various pieces of bone
+jewelry, all linked together with moss and other unmentionable gunk from the
+swamp.
+~
 T 19013
 S
 #19007
@@ -69,6 +84,10 @@ A swamp rat is trying to climb your leg.
 ~
 1 1 bdoD n 2
 0 0 0 9
+D
+   This domesticated rat looks green at first glance. At second glance though,
+it is clearly just coated in the muck of the swamp.
+~
 M
 0
 $n squeaks.~
@@ -88,6 +107,10 @@ A rodent of unusual size is cleaning its whiskers.
 ~
 100 125 dej 0 4
 0 0 8 9
+D
+   This tremendous rat -- or whatever it is -- might seem an unusual choice for
+a mount, but it looks as gallant as any rodent you've ever seen.
+~
 S
 #19009
 manatee~
@@ -96,6 +119,11 @@ A manatee rolls over playfully.
 ~
 100 125 dejl 0 4
 0 0 6 9
+D
+   This cow of the sea has clearly been fitted with a saddle before based on
+the marks on its gray skin. The four flippers are in near constant movement as
+though this creature just can't stay still. Just what you want in a mount.
+~
 S
 #19010
 broom enchanted~
@@ -104,5 +132,10 @@ An enchanted broom is hovering here.
 ~
 100 125 bde m 3
 0 0 2 28
+D
+   There was once a name engraved on the handle of this broom, but fire damage
+has left it mostly illegible. All that can be made out now is ----b-lt, in a
+golden script.
+~
 S
 $

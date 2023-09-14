@@ -8,11 +8,11 @@ Type 'research' at an alchemist or laboratory to learn more.
 ~
 With your newfound knowledge of pigments, you're ready to make some paints...
 ~
-7 f 75 0 -1
+8 f 75 0 -1
 A
 1 1401
 P
-15 203 0 1
+15 203 0 1 -
 R
 0 0 1
 R
@@ -20,8 +20,9 @@ R
 R
 6 1401 1
 T 1401
-W
-11 0 0 1
+W+
+11 0 0 1 -
+Research at an alchemist or laboratory~
 Z
 1 1401
 S
@@ -42,7 +43,7 @@ P
 R
 6 1402 1
 W
-1 6600 0 3
+1 6600 0 3 -
 Z
 1 1401
 S
@@ -55,7 +56,7 @@ buildings. It might take a few tries to get it right.
    It looks like you successfully made the blue paint! The painter also teaches
 you to make the other primary colors: red and yellow.
 ~
-7 f 75 0 -1
+8 f 75 0 -1
 A
 1 1401
 P
@@ -70,8 +71,9 @@ R
 6 1403 1
 T 1497
 T 1401
-W
-11 0 0 1
+W+
+11 0 0 1 -
+Paint some buildings with experimental blue paint~
 Z
 1 1401
 S
@@ -115,7 +117,7 @@ at the nearest library.
 ~
 With your newfound knowledge of pigments, you're ready to make some paints...
 ~
-8 f 75 0 -1
+9 f 75 0 -1
 A
 1 1401
 P
@@ -131,8 +133,9 @@ R
 R
 6 1405 1
 T 1401
-W
-11 0 0 1
+W+
+11 0 0 1 -
+Research at a library~
 Z
 1 1401
 S

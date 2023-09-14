@@ -142,6 +142,7 @@ struct text_file_data_type text_file_data[NUM_TEXT_FILE_STRINGS] = {
 	{ "godlist", LIB_TEXT"godlist", FALSE, 0, 0 },
 	{ "handbook", LIB_TEXT"handbook", TRUE, LVL_CIMPL, MAX_STRING_LENGTH },
 	{ "helpscreen", LIB_TEXT_HELP"screen", TRUE, LVL_GOD, MAX_STRING_LENGTH },
+	{ "helpscreenreader", LIB_TEXT_HELP"screen-screenreader", TRUE, LVL_GOD, MAX_STRING_LENGTH },
 	{ "imotd", LIB_TEXT"imotd", TRUE, LVL_GOD, MAX_MOTD_LENGTH },
 	{ "info", LIB_TEXT"info", TRUE, LVL_GOD, MAX_STRING_LENGTH },
 	{ "motd", LIB_TEXT"motd", TRUE, LVL_GOD, MAX_MOTD_LENGTH },
@@ -359,14 +360,34 @@ struct config_type *config_table = NULL;	// hash table of configs
 * Load a config's whole entry by key. You should use the type functions
 * config_get_int(), etc. for loading the data itself.
 *
+* Note that when exact=TRUE, this function does a hash lookup and is much
+* faster than exact=FALSE, which checks the whole table for abbrevs.
+*
 * @param char *key The config key.
+* @param bool exact If TRUE, does not allow abbrevs.
 * @return struct config_type* The config, if it exists.
 */
-struct config_type *get_config_by_key(char *key) {
+struct config_type *get_config_by_key(char *key, bool exact) {
 	struct config_type *cnf;
 	
-	HASH_FIND_STR(config_table, key, cnf);
-	return cnf;
+	if (exact) {
+		HASH_FIND_STR(config_table, key, cnf);
+		return cnf;
+	}
+	else {
+		struct config_type *next_cnf, *abbrev = NULL;
+		
+		HASH_ITER(hh, config_table, cnf, next_cnf) {
+			if (!str_cmp(key, cnf->key)) {
+				return cnf;	// exact match
+			}
+			else if (!abbrev && is_abbrev(key, cnf->key)) {
+				abbrev = cnf;
+			}
+		}
+		
+		return abbrev;	// if any (may be NULL)
+	}
 }
 
 
@@ -385,7 +406,7 @@ bitvector_t config_get_bitvector(char *key) {
 	}
 	
 	// maybe?
-	cnf = get_config_by_key(key);
+	cnf = get_config_by_key(key, TRUE);
 	
 	if (!cnf) {
 		syslog(SYS_ERROR, LVL_START_IMM, TRUE, "SYSERR: config_get_bitvector called with invalid key '%s'", key);
@@ -416,7 +437,7 @@ bool config_get_bool(char *key) {
 	}
 	
 	// maybe?
-	cnf = get_config_by_key(key);
+	cnf = get_config_by_key(key, TRUE);
 	
 	if (!cnf) {
 		syslog(SYS_ERROR, LVL_START_IMM, TRUE, "SYSERR: config_get_bool called with invalid key '%s'", key);
@@ -447,7 +468,7 @@ double config_get_double(char *key) {
 	}
 	
 	// maybe?
-	cnf = get_config_by_key(key);
+	cnf = get_config_by_key(key, TRUE);
 	
 	if (!cnf) {
 		syslog(SYS_ERROR, LVL_START_IMM, TRUE, "SYSERR: config_get_double called with invalid key '%s'", key);
@@ -478,7 +499,7 @@ int config_get_int(char *key) {
 	}
 	
 	// maybe?
-	cnf = get_config_by_key(key);
+	cnf = get_config_by_key(key, TRUE);
 	
 	if (!cnf) {
 		syslog(SYS_ERROR, LVL_START_IMM, TRUE, "SYSERR: config_get_int called with invalid key '%s'", key);
@@ -513,7 +534,7 @@ int *config_get_int_array(char *key, int *array_size) {
 	}
 	
 	// maybe?
-	cnf = get_config_by_key(key);
+	cnf = get_config_by_key(key, TRUE);
 	
 	if (!cnf) {
 		syslog(SYS_ERROR, LVL_START_IMM, TRUE, "SYSERR: config_get_int_array called with invalid key '%s'", key);
@@ -547,7 +568,7 @@ const char *config_get_string(char *key) {
 	}
 	
 	// maybe?
-	cnf = get_config_by_key(key);
+	cnf = get_config_by_key(key, TRUE);
 	
 	if (!cnf) {
 		syslog(SYS_ERROR, LVL_START_IMM, TRUE, "SYSERR: config_get_string called with invalid key '%s'", key);
@@ -944,6 +965,26 @@ CONFIG_HANDLER(config_edit_typelist) {
  //////////////////////////////////////////////////////////////////////////////
 //// CONFIG SYSTEM: CUSTOM EDITORS ///////////////////////////////////////////
 
+// resets after setting
+CONFIG_HANDLER(config_edit_autostore_time) {
+	int old = config_get_int("autostore_time");
+	obj_data *obj;
+	
+	// pass thru first...
+	config_edit_int(ch, config, argument);
+	
+	if (config_get_int("autostore_time") != old) {
+		// update all autostore times
+		DL_FOREACH(object_list, obj) {
+			if (find_stored_event(GET_OBJ_STORED_EVENTS(obj), SEV_OBJ_AUTOSTORE)) {
+				cancel_stored_event(&GET_OBJ_STORED_EVENTS(obj), SEV_OBJ_AUTOSTORE);
+				schedule_obj_autostore_check(obj, 0);
+			}
+		}
+	}
+}
+
+
 CONFIG_HANDLER(config_edit_who_list_sort) {
 	int input, iter, old;
 	
@@ -995,6 +1036,19 @@ CONFIG_HANDLER(config_show_who_list_sort) {
 	msg_to_char(ch, "Valid sorts are:\r\n");
 	for (iter = 0; *who_list_sort_types[iter] != '\n'; ++iter) {
 		msg_to_char(ch, " %s\r\n", who_list_sort_types[iter]);
+	}
+}
+
+
+// resets after setting
+CONFIG_HANDLER(config_edit_mob_spawn_interval) {
+	int old = config_get_int("mob_spawn_interval");
+	
+	// pass thru first...
+	config_edit_int(ch, config, argument);
+	
+	if (config_get_int("mob_spawn_interval") != old) {
+		reschedule_all_despawns();
 	}
 }
 
@@ -1753,6 +1807,7 @@ void init_config_system(void) {
 	// game configs
 	init_config(CONFIG_GAME, "allow_extended_color_codes", CONFTYPE_BOOL, "if on, players can use \t&[F000] and \t&[B000]");
 	init_config(CONFIG_GAME, "automessage_color", CONFTYPE_SHORT_STRING, "color code for automessage (like &&c)");
+	init_config(CONFIG_GAME, "godlist_header", CONFTYPE_LONG_STRING, "shown at the top of the godlist - note gods are not well-implemented");
 	init_config(CONFIG_GAME, "hiring_builders", CONFTYPE_BOOL, "whether the mud is hiring builders");
 	init_config(CONFIG_GAME, "hiring_coders", CONFTYPE_BOOL, "whether the mud is hiring coders");
 	init_config(CONFIG_GAME, "mud_contact", CONFTYPE_SHORT_STRING, "email address of an admin");
@@ -1777,6 +1832,7 @@ void init_config_system(void) {
 	init_config(CONFIG_GAME, "start_message", CONFTYPE_LONG_STRING, "shown to new characters on login");
 	init_config(CONFIG_GAME, "who_list_sort", CONFTYPE_INT, "what order the who-list appears in");
 		init_config_custom("who_list_sort", config_show_who_list_sort, config_edit_who_list_sort, NULL);
+	init_config(CONFIG_GAME, "wizlist_header", CONFTYPE_LONG_STRING, "shown at the top of the wizlist");
 
 	// actions
 	init_config(CONFIG_ACTIONS, "chore_distance", CONFTYPE_INT, "tiles away from home a citizen will work");
@@ -1843,8 +1899,9 @@ void init_config_system(void) {
 	init_config(CONFIG_EMPIRE, "redesignate_time", CONFTYPE_INT, "minutes until you can redesignate a room again");
 
 	// items
-	init_config(CONFIG_MOBS, "auto_update_items", CONFTYPE_BOOL, "uses item version numbers to automatically update items");
+	init_config(CONFIG_ITEMS, "auto_update_items", CONFTYPE_BOOL, "uses item version numbers to automatically update items");
 	init_config(CONFIG_ITEMS, "autostore_time", CONFTYPE_INT, "minutes items last on the ground");
+		init_config_custom("autostore_time", config_show_int, config_edit_autostore_time, NULL);
 	init_config(CONFIG_ITEMS, "bound_item_junk_time", CONFTYPE_INT, "minutes bound items last on the ground before being junked");
 	init_config(CONFIG_ITEMS, "long_autostore_time", CONFTYPE_INT, "minutes items last with the long-autostore bld flag");
 	init_config(CONFIG_ITEMS, "room_item_limit", CONFTYPE_INT, "number of items allowed in buildings with item-limit flag");
@@ -1866,8 +1923,10 @@ void init_config_system(void) {
 	init_config(CONFIG_MAIL, "mail_send_message", CONFTYPE_SHORT_STRING, "text shown when player finishes writing mail");
 
 	// mobs
+	init_config(CONFIG_MOBS, "default_language_vnum", CONFTYPE_INT, "language (generic) mobs speak with by default");
 	init_config(CONFIG_MOBS, "max_npc_attribute", CONFTYPE_INT, "how high primary attributes go on mobs");
 	init_config(CONFIG_MOBS, "mob_spawn_interval", CONFTYPE_INT, "how often mobs spawn/last");
+		init_config_custom("mob_spawn_interval", config_show_int, config_edit_mob_spawn_interval, NULL);
 	init_config(CONFIG_MOBS, "mob_spawn_radius", CONFTYPE_INT, "distance from players that mobs spawn");
 	init_config(CONFIG_MOBS, "mob_despawn_radius", CONFTYPE_INT, "distance from players to despawn mobs");
 	init_config(CONFIG_MOBS, "npc_follower_limit", CONFTYPE_INT, "more npc followers than this causes aggro");
@@ -1904,9 +1963,9 @@ void init_config_system(void) {
 	init_config(CONFIG_PLAYERS, "max_light_radius_base", CONFTYPE_INT, "maximum tiles away you can see unskilled in the dark based on the moon(s)");
 	init_config(CONFIG_PLAYERS, "num_daily_skill_points", CONFTYPE_INT, "easy skillups per day");
 	init_config(CONFIG_PLAYERS, "num_bonus_trait_daily_skills", CONFTYPE_INT, "bonus trait for skillups");
-	init_config(CONFIG_PLAYERS, "idle_action_rent_time", CONFTYPE_INT, "how many ticks before a player performing an action is idle-rented");
-	init_config(CONFIG_PLAYERS, "idle_rent_time", CONFTYPE_INT, "how many ticks before a player is idle-rented");
-	init_config(CONFIG_PLAYERS, "idle_linkdead_rent_time", CONFTYPE_INT, "how many ticks before a linkdead player is idle-rented");
+	init_config(CONFIG_PLAYERS, "idle_action_rent_time", CONFTYPE_INT, "how many minutes before a player performing an action is idle-rented");
+	init_config(CONFIG_PLAYERS, "idle_rent_time", CONFTYPE_INT, "how many minutes before a player is idle-rented");
+	init_config(CONFIG_PLAYERS, "idle_linkdead_rent_time", CONFTYPE_INT, "how many minutes before a linkdead player is idle-rented");
 	init_config(CONFIG_PLAYERS, "line_of_sight", CONFTYPE_BOOL, "if on, terrain can block view on the map");
 	init_config(CONFIG_PLAYERS, "map_memory_limit", CONFTYPE_INT, "how many tiles a player is allowed to remember (10k tiles = 1MB RAM)");
 	init_config(CONFIG_PLAYERS, "max_capitals_in_name", CONFTYPE_INT, "how many uppercase letters can be in a player name (0 for unlimited)");
@@ -2053,11 +2112,12 @@ ACMD(do_config) {
 	argument = any_one_word(argument, arg1);
 	skip_spaces(&argument);
 	
-	if (*arg1 && (cnf = get_config_by_key(arg1))) {
+	if (*arg1 && (cnf = get_config_by_key(arg1, (*argument ? TRUE : FALSE)))) {
+		// now accepts abbrevs ONLY if there's no value
 		// will use: <key> [value]
 		val_arg = argument;
 	}
-	else if (*arg1 && (set = search_block(arg1, config_groups, FALSE))) {
+	else if (*arg1 && (set = search_block(arg1, config_groups, FALSE)) != NOTHING) {
 		// will use: <type> [key] [value]
 		verbose = (!str_cmp(argument, "-v") ? TRUE : FALSE);
 		
@@ -2065,15 +2125,15 @@ ACMD(do_config) {
 		if (!verbose && *argument) {
 			val_arg = any_one_word(argument, arg2);
 			skip_spaces(&val_arg);
-			if (!(cnf = get_config_by_key(arg2)) || cnf->set != set) {
-				msg_to_char(ch, "Invalid key %s in %s configs.\r\n", arg2, config_groups[set]);
+			if (!(cnf = get_config_by_key(arg2, (*argument && !verbose) ? TRUE : FALSE)) || cnf->set != set) {
+				msg_to_char(ch, "Invalid key %s in %s configs (keys must be exact).\r\n", arg2, config_groups[set]);
 				return;
 			}
 		}
 	}
 	else {	// no arg or invalid arg
 		if (*arg1) {
-			msg_to_char(ch, "Invalid config type or key '%s'.\r\n", arg1);
+			msg_to_char(ch, "Invalid config type or key '%s' (keys must be exact).\r\n", arg1);
 		}
 		
 		msg_to_char(ch, "Usage: config <type> [-v]\r\n");

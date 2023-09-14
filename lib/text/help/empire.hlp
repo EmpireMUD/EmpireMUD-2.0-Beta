@@ -22,7 +22,7 @@ ABANDON NO-ABANDON "NO ABANDON"
 Usage:  abandon [target/coordinates] [confirm]
         manage no-abandon
 
-This command allows you to abandon a building or acre of land which your 
+This command allows you to abandon a building or tile of land which your 
 empire no longer wants. This falls under the cede privilege. Buildings and rare
 crops require you to type 'confirm' when you try to abandon them remotely.
 
@@ -78,7 +78,7 @@ CEDE
 
 Usage:  cede <person>
 
-This is used to cede one acre of land to anyone else currently in the game. You
+This is used to cede one tile of land to anyone else currently in the game. You
 can only cede the map tile you're standing on, and it must be owned by your
 empire. Ceding land to a god or immortal so that you can claim more land may
 get you in trouble.
@@ -134,15 +134,18 @@ don't claim it yourself.
 
 There is a 60-minute waiting period between when you found a city, and when it
 counts as a city for things like City Teleportation, certain buildings such as
-the Great Hall, for guard towers, and for some other game rules.
+the palace, for guard towers, and for some other game rules.
 
-EmpireMUD periodically checks if cities are completely empty and, if so,
+EmpireMUD periodically checks if cities have no claimed buildings and, if so,
 will remove the city center and refund the city point. This helps keep the map
-clean, and you can prevent it by making sure there is at least one building in
-your city. You will also start to lose cities after 1 week if your empire
-shrinks and you no longer have enough city points available.
+clean, and you can prevent it by making sure there is at least one claimed
+building in your city. If a city is removed in this way, your elog will say the
+city was "abandoned as ruins".
 
-See also: CITY COMMANDS, CITY TRAITS, CITY TYPES, TECHNOLOGY, TERRITORY,
+You will also start to lose cities after 1 week if your empire shrinks and you
+no longer have enough city points available.
+
+See also: CITY COMMANDS, CITY TRAITS, CITY TYPES, ELOG, TECHNOLOGY, TERRITORY,
   WEALTH
 #
 "CITY TYPES" OUTPOST VILLAGE CAPITAL
@@ -165,13 +168,13 @@ You can see the city radius by typing 'toggle political' and looking at the
 background highlight (on the visual map), or you can use the 'mark' command
 to measure distances from the center if you're using a screenreader.
 
-See also: MARK, CITY INFORMATION, CITY COMMANDS, PROGRESSION
+See also: MARK, CITY INFORMATION, CITY COMMANDS, EXTENDED RADIUS, PROGRESSION
 #
 CLAIM
 
 Usage:  claim [target]
 
-Claims the acre you're currently on for your empire. This can also be used
+Claims the tile you're currently on for your empire. This can also be used
 to claim vehicles.
 
 To claim things inside the radius of one of your cities, try "city claim".
@@ -309,9 +312,12 @@ See also: DIPLOMACY, WAR
 #
 DISMANTLE-MINES "DISMANTLE MINES"
 
-The dismantle-mines workforce chore will cause mines to be dismantled auto-
-matically when they are empty. You can prevent this on individual mines using
-the nodismantle command.
+The dismantle-mines workforce chore will automatically mark mines to be
+dismantled when they are empty. However, workers will only dismantle it if the
+building chore is turned on as well. You can prevent dismantling of individual
+mines using the nodismantle command.
+
+Mines must be dismantled each year in order for the ore to refresh.
 
 See also: NODISMANTLE, WORKFORCE
 #
@@ -375,7 +381,10 @@ Immortals with the "EMPIRES" grant can set administrative flags on empires.
  &g!STEAL&0 - Empire cannot steal from other empires.
  &gCITY-CLAIMS-ONLY&0 - Empire cannot claim out-of-city territory.
 
-See also: GRANT
+Both the !WAR and !STEAL flags will prevent 'reclaim' from being used by OR
+against the empire.
+
+See also: GRANT, RECLAIM
 #d
 EFIND
 
@@ -417,7 +426,7 @@ Log types are:
  Shipping - Logs related to shipping.
  Territory - Logs such as cede, and city commands.
  Trade - Logs related to empire trades.
- Workforce - Shows logs of food consumption (shown only on request).
+ Workforce - Shows logs of production and consumption (shown only on request).
  Progress - Recently completed goals and purchased rewards.
  
 See also: PRIVILEGE
@@ -595,6 +604,20 @@ searching the item database.
 
 See also: COINS, EXCHANGE RATE
 #
+"EXTENDED RADIUS" EXTENDED-RADIUS "LARGE CITY RADIUS" LARGE-CITY-RADIUS "LARGE RADIUS" LARGE-RADIUS
+
+A tile with the (extended radius) indicator after its city name indicates that
+it is actually in the city's outskirts, but it is a type of building or terrain
+that counts as in-city in the outskirts (4x city radius).
+
+For example, when you look at a room:
+This is the Autonomous outpost of Capital 1 (extended radius).
+
+The OLC flag for this is LARGE-CITY-RADIUS, and is available on buildings and
+sectors.
+
+See also: OUTSKIRTS, TERRITORY
+#
 FAME
 
 Empires gain Fame by building great monuments. This trait is required to
@@ -752,8 +775,8 @@ LUXURIES "LUXURIES GOAL"
 Luxuries (Community goal)
 
 Rewards the following buildings:
-  [**]  greathall  (in-city only)
-  V[]V  portcullis  (in-city only)
+  ]||[  castle  (in-city only)
+  ]**[  palace  (in-city only)
   .==.  steps
 
 See also: LUXURY RESOURCES GOAL, PROGRESS
@@ -941,7 +964,8 @@ Privileges:
   storage: can retrieve from storage buildings
   warehouse: can retrieve unique items from the warehouse
   progress: can buy progression goals
-  dismantle: can dismantle buildings owned by the empire
+  dismantle: can dismantle buildings and vehicles owned by the empire (also
+    controls burning your empire's buildings and vehicles)
 
 See also: CLAIM, BUILD, HARVEST, PROMOTE, DEMOTE, CHOP, CEDE, EEDIT, ELOG
 #
@@ -979,13 +1003,29 @@ year. For more information on mountain resets, see HELP MINE.
 
 See also: MINE, DEEP MINES, PROSPECT, METALS
 #
-RECLAIM
+RECLAIM RECLAIMED
 
-Usage:  reclaim
+Usage:  reclaim [direction]
 
-This command can be used to take ownership of a tile during war. You must be
-standing on the tile, and must already own 4 or more adjacent tiles. Reclaiming
-will take a little while, and can be interrupted by combat.
+This command can be used to take ownership of a tile from another empire. You
+must be standing on or adjacent to the tile and must already own 4 or more
+adjacent tiles. You must also meet at least one of these three criteria:
+- You are at war with the other empire
+- You have a city on the island and the other empire doesn't
+- The tile is in one of your established cities, but is not in a city or
+  outskirts for the other empire
+
+If you reclaim from an adjacent tile, you must own that tile and it must be
+open/outdoors. The other empire will be alerted to your location.
+
+Reclaiming will take a little while and can be interrupted by combat. All
+players can attack you while you're reclaiming. You will cause an offense
+against the other empire for reclaiming a tile.
+
+Reclaiming a tile requires the 'claim' privilege. Reclaiming while not at war
+also requires the 'diplomacy' privilege.
+
+See also: DIPLOMACY, OFFENSES, PRIVILEGES
 #
 RENOWN "RENOWN GOAL"
 
@@ -1098,7 +1138,7 @@ outskirts.
 When an empire's members start to time out from lack of gameplay, the empire
 may start losing territory.
 
-See also: CITIES, EMPIRE TIMEOUT, TERRITORY COMMAND, ESTATS
+See also: CITIES, EMPIRE TIMEOUT, EXTENDED RADIUS, TERRITORY COMMAND, ESTATS
 #
 "TERRITORY COMMAND"
 
@@ -1122,7 +1162,7 @@ match that keyword. You can specify more than 1 keyword to search or exclude.
 You require the Navigation ability to use the "territory" command, because it
 gives coordinates.
 
-See also: CITIES, NAVIGATION, TERRITORY
+See also: CITIES, NAVIGATION, TERRITORY, MANAGE
 #
 THIEVERY "THIEVERY PERMIT" "STEALING PERMIT"
 
@@ -1197,7 +1237,7 @@ Basic tree types are:
 
 See also: CHANT OF NATURE, CHOP, BUILD, SCRAPE, PILLAR, LUMBER
 #
-TECHNOLOGY TECHNOLOGIES "EMPIRE TECHNOLOGY"
+TECHNOLOGY TECHNOLOGIES "EMPIRE TECHNOLOGY" "EMPIRE TECHNOLOGIES"
 
 Empires can earn many different technologies to boost their abilities and
 effectiveness.
@@ -1313,7 +1353,7 @@ on an empire.
 Some EmpireMUDs require a certain number of offenses before you can declare
 war, to prevent unprovoked wars.
 
-The exchange rate at war it 10%.
+The exchange rate at war is 10%.
 
 See also: DIPLOMACY, EMPIRE SCORE, OFFENSES, THIEVERY PERMIT
 #
@@ -1351,6 +1391,7 @@ Usage:  workforce [chore] [on | off | <limit>] [island name | all]
         workforce keep [number | all] <item name>
         workforce keep default [number | all | none]
         workforce limit [amount | none] [keywords]
+        workforce nearby
 
 Once your empire has purchased the Workforce progress reward, the empire's
 citizens (NPCs) will start performing simple tasks for the empire. You can
@@ -1384,7 +1425,8 @@ See &cHELP WORKFORCE CHORES&0 for a list of all workforce chores with descriptio
 See &cHELP WORKFORCE LIMIT&0 for information on limiting production
 
 See also: WORKFORCE CHORES, WORKFORCE WHERE, WORKFORCE WHY, NO-WORK,
-          WORKFORCE KEEP, WORKFORCE CAP, WORKFORCE LIMIT
+          WORKFORCE KEEP, WORKFORCE CAP, WORKFORCE LIMIT, FEEDING WORKFORCE,
+          WORKFORCE NEARBY
 #
 "WORKFORCE CAP"
 
@@ -1408,7 +1450,8 @@ See also: WORKFORCE
 "WORKFORCE CHORES" "WORKFORCE TYPES"
 
 Workforce types:
-  &yabandon-chopped:&0 NPCs will abandon a tile when they finish chopping.
+  &yabandon-chopped:&0 NPCs will abandon a tile when they finish chopping it,
+     or after burning it if burn-stumps is also on.
   &yabandon-dismantled:&0 NPCs will abandon a tile when they finish dismantling.
   &yabandon-farmed:&0 NPCs will abandon a tile when they finish farming.
   &ybuilding:&0 NPCs will build any building that has been started, or dismantle
@@ -1421,8 +1464,8 @@ Workforce types:
   &ychopping:&0 NPCs will chop down forests and desert groves (Not orchards - 
      use farming without replanting for that).
   &ycrafting:&0 NPCs will make certain crafts (see WORKFORCE CRAFTING).
-  &ydigging:&0 NPCs will dig for in any quarry, clay pit, or sand pit.
-  &ydismantle-mines:&0 mines will be dismantled when empty.
+  &ydigging:&0 NPCs will dig in any quarry, clay pit, or sand pit.
+  &ydismantle-mines:&0 marks empty mines to be dismantled by the building chore.
   &yfarming:&0 NPCs will harvest crops. Costs no food.
   &yfire-brigade:&0 NPCs will put out fires.
   &yfishing:&0 Will catch fish at the fishery. Costs no food.
@@ -1446,7 +1489,7 @@ tend to cost more food.
 Additional workforce chores are available from progress buys:
   &gprospecting (Prospector Training):&0 NPCs will slowly prospect mountain tiles.
 
-See also: ABANDON, WORKFORCE
+See also: ABANDON, WORKFORCE, FEEDING WORKFORCE
 #
 "WORKFORCE CRAFTING" "WORKFORCE CRAFTS"
 
@@ -1455,11 +1498,40 @@ want to use this chore, but turn off specific items, use 'workforce limit' on
 those items.
 
 Common things produced by this:
+ Baker: village foods (gruel, pickled vegetables, bread)
  Forge: nails
  Potter: bricks
  Glass blower: glass ingots
 
 See also: WORKFORCE CHORES, WORKFORCE LIMIT
+#
+"WORKFORCE FOOD" "FEEDING WORKFORCE" "WORKFORCE EATING" "STARVING WORKFORCE" "WORKFORCE IS STARVING"
+
+Once your empire has unlocked Workforce, your citizens will start doing work in
+exchange for food. This food is collected once per day. If you don't have
+enough, your workers on that island will begin to starve.
+
+Starving citizens will no longer work, except for certain food-gathering chores
+like farming and fishing. This work stoppage lasts at least a day, until the
+normal time when food would be collected again. After that, if there's enough
+food, they will resume their work.
+
+Food for workers is always take from empire inventory on the island where they
+are working. Each hour a citizen works requires 1 "hour of fullness" -- the
+amount you see when you identify a piece of food. For example, if the food only
+fills for 1 hour, 10 working citizens will eat 10 of it in an hour; but if it
+fills for 24 hours instead, it will feed 24 citizens that hour.
+
+Citizens will consume foods you have the most of first -- the same sorting you
+see on the einventory command. It will use at most 100 of each type of food in
+each hour, in order to avoid using up all of a single food.
+
+Crops and fisheries are a good way to keep your workers fed. Diverse crops will
+reduce the chances of running out of food. Not all crops can be eaten raw. Give
+your workers a bakery and enable workforce crafting; they will cook raw foods
+into additional things to eat.
+
+See also: BAKERY, EINVENTORY, WORKFORCE, WORKFORCE CRAFTS, WORKFORCE WHY
 #
 "WORKFORCE KEEP"
 
@@ -1497,6 +1569,19 @@ You can use multiple keywords to try to get the right item. Example:
 > workforce limit 15 large tree
 
 Using this command without an amount lets you search your current limits.
+
+See also: WORKFORCE
+#
+"WORKFORCE NEARBY"
+
+Usage:  workforce nearby
+
+This command shows citizens that live within 20 tiles of your current
+location and could perform workforce chores. It will also indicate if they are
+already working.
+
+Artisans perform work in the shop where they live, but do not show as (working)
+on this display and do not travel for other chores.
 
 See also: WORKFORCE
 #

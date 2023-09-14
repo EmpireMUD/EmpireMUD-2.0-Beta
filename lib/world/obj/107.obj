@@ -45,7 +45,7 @@ A
 C
 50 50
 R
-5619 0
+4 5619 0
 S
 #10704
 recipe ham honey-cured cured~
@@ -74,7 +74,7 @@ M
 4
 As you eat the fruitcake, you feel warm deep down inside.~
 R
-5619 0
+4 5619 0
 S
 #10706
 recipe cake fruitcake~
@@ -100,7 +100,7 @@ A
 C
 50 50
 R
-5619 0
+4 5619 0
 S
 #10708
 recipe roast goose~
@@ -117,7 +117,7 @@ bell minipet cheerful elf~
 a cheerful elf minipet bell~
 A cheerful elf minipet bell is lying here.~
 This bell can summon a cheerful elf (a noncombat pet)!
-Type 'use bell' to gain the cheerful elf mini-pet.
+Type 'use bell' to gain the cheerful elf minipet.
 ~
 19 p a 0 7
 10709 0 0
@@ -131,10 +131,11 @@ A snowglobe is lying here.~
 snowglobe' to teleport home, like a hestian trinket. Use the home command to
 set your home.
 ~
-3 p a 0 5
+3 p a 0 6
 0 0 0
 8 0
 T 10710
+T 9806
 S
 #10711
 hat red christmas~
@@ -210,7 +211,7 @@ M
 4
 You're filled with holiday cheer!~
 R
-5606 0
+4 5606 0
 S
 #10717
 recipe cookie christmas~
@@ -256,7 +257,7 @@ eaten, if you can remove them from their prickly green cases.
 6 b a 0 5
 12 10700 0
 7 336
-I 15 10721 100.00 4  # SEPARATE: a handful of chestnuts
+I 15 10721 100.00 4  # SEPARATE: handful of chestnuts
 M
 4
 You peel open $p and eat them.~
@@ -264,9 +265,9 @@ M
 5
 $n peels open $p and eats them.~
 R
-5606 0
+4 5606 0
 R
-5610 0
+4 5610 0
 S
 #10721
 chestnuts handful~
@@ -278,7 +279,7 @@ them, if you can find some more.
 6 0 a 0 4
 1 0 0
 7 48
-I 14 10720 100.00 4  # COMBINE: a basket of chestnuts
+I 14 10720 100.00 4  # COMBINE: basket of chestnuts
 M
 4
 You peel open $p and eat them.~
@@ -301,14 +302,14 @@ A
 C
 50 50
 R
-5606 0
+4 5606 0
 S
 #10723
 whistle Christmas tree minipet~
 a Christmas tree minipet whistle~
 Someone has left their Christmas tree whistle here.~
 This whistle can summon a noncombat pet!
-Type 'use whistle' to gain the little pine sapling mini-pet.
+Type 'use whistle' to gain the little pine sapling minipet.
 ~
 19 p a 0 4
 10723 0 0
@@ -319,7 +320,7 @@ whistle reindeer fawn minipet~
 a reindeer fawn minipet whistle~
 Someone has left their reindeer fawn whistle here.~
 This whistle can summon a noncombat pet!
-Type 'use whistle' to gain the reindee fawn mini-pet.
+Type 'use whistle' to gain the reindee fawn minipet.
 ~
 19 p a 0 5
 10724 0 0
@@ -330,7 +331,7 @@ whistle snowman animated minipet~
 an animated snowman minipet whistle~
 Someone has left their animated snowman whistle here.~
 This whistle can summon a noncombat pet!
-Type 'use whistle' to gain the animated snowman mini-pet.
+Type 'use whistle' to gain the animated snowman minipet.
 ~
 19 p a 0 7
 10725 0 0
@@ -341,7 +342,7 @@ whistle toy soldier minipet~
 a toy soldier minipet whistle~
 Someone has left their toy soldier whistle here.~
 This whistle can summon a noncombat pet!
-Type 'use whistle' to gain the toy soldier mini-pet.
+Type 'use whistle' to gain the toy soldier minipet.
 ~
 19 p a 0 7
 10726 0 0
@@ -351,7 +352,7 @@ S
 whistle minipet winter wonderland~
 a Winter Wonderland minipet whistle~
 A Winter Wonderland minipet whistle is lying here.~
-   Type 'use whistle' to gain a mini-pet from the Winter Wonderland, if there
+   Type 'use whistle' to gain a minipet from the Winter Wonderland, if there
 are any left you don't have.
 ~
 3 p a 0 6
@@ -371,6 +372,18 @@ middle of summer! Just 'use coal' to get started.
 7 0
 T 10728
 S
+#10729
+whistle minipet winter wonderland~
+a Winter Wonderland minipet whistle~
+A Winter Wonderland minipet whistle is lying here.~
+   Type 'use whistle' to gain a minipet from the Winter Wonderland, if there
+are any left you don't have.
+~
+3 p a 0 1
+0 0 0
+10 0
+T 10729
+S
 #10730
 fiddle~
 a fiddle~
@@ -381,7 +394,7 @@ can also play it as an instrument.
    You can 'use' this item to teleport back to the nearest Mother Goose
 adventure. From there, try 'where musical' to find the cat.
 ~
-22 p ao 0 7
+22 p ao 0 8
 0 0 0
 0 0
 M
@@ -397,6 +410,7 @@ M
 3
 You dance as $n plays fine music with $p.~
 T 10738
+T 9806
 S
 #10731
 cloak starry~
@@ -423,10 +437,11 @@ would reward you if you gave it back to them.
    You can 'use' this item to teleport back to the nearest Mother Goose
 adventure. From there, try 'where jack' or 'where jill' to find them.
 ~
-5 p a 0 3
+5 p a 0 4
 32 32 0
 0 0
 T 10738
+T 9806
 S
 #10733
 trousers fetching pair~
@@ -446,33 +461,36 @@ S
 #10734
 candlestick~
 a candlestick~
-A candlestick is lying here, unlit.~
+A candlestick is standing on the ground.~
    This candlestick is made from fine copper, and is surely someone's family
 heirloom. Indeed, the base is etched with the name 'Nimble'. Perhaps if you
 could find its owner, he'd reward you.
    You can 'use' this item to teleport back to the nearest Mother Goose
 adventure. From there, try 'where nimble' to find the right Jack.
+   You can also 'light' and 'douse' the candlestick.
 ~
-3 p ao 0 4
-0 0 0
+29 p ao 0 7
+168 0 3
 13 0
-I 11 10735 100.00 1  # LIGHT: a lit candlestick
 T 10738
+T 9806
 S
 #10735
-candlestick lit~
-a lit candlestick~
-A lit candlestick is sitting on the ground.~
+candlestick~
+a candlestick~
+A candlestick is standing on the ground.~
    This candlestick is made from fine copper, and is surely someone's family
 heirloom. Indeed, the base is etched with the name 'Nimble'. Perhaps if you
 could find its owner, he'd reward you.
    You can 'use' this item to teleport back to the nearest Mother Goose
 adventure. From there, try 'where nimble' to find the right Jack.
+   You can also 'light' and 'douse' the candlestick.
 ~
-3 cp ao 0 5
-0 0 0
-13 168
+29 p ao 0 9
+168 1 3
+13 0
 T 10738
+T 9806
 S
 #10736
 shoes burnt pair~
@@ -499,7 +517,7 @@ if you returned it.
    You can 'use' this item to teleport back to the nearest Mother Goose
 adventure. From there, try 'where sprat' to find the right Jack.
 ~
-6 p a 0 7
+6 p a 0 8
 72 0 0
 7 336
 A
@@ -511,6 +529,7 @@ M
 4
 You eat the ham, carefully making sure you eat no lean.~
 T 10738
+T 9806
 S
 #10738
 belt lean~
@@ -537,7 +556,7 @@ would reward you if you returned it to him.
    You can 'use' this item to teleport back to the nearest Mother Goose
 adventure. From there, try 'where horner' to find the right Jack.
 ~
-6 p a 0 7
+6 p a 0 8
 72 0 0
 7 336
 M
@@ -559,6 +578,7 @@ M
 5
 $n sticks $s thumb into a Christmas pie, and pulls out a plum!~
 T 10738
+T 9806
 S
 #10740
 gloves plum-stained stained~
@@ -584,7 +604,7 @@ find her, she might reward you for their safe return.
    You can 'use' this item to teleport back to the nearest Mother Goose
 adventure. From there, try 'where muffet' to find her.
 ~
-6 p a 0 7
+6 p a 0 8
 72 0 0
 7 336
 M
@@ -597,6 +617,7 @@ M
 5
 $n enjoys some curds and whey.~
 T 10738
+T 9806
 S
 #10742
 spider dangling~
@@ -638,15 +659,16 @@ a bell on a blue ribbon~
 A bell on a blue ribbon is lying here.~
    This little bell on a blue ribbon belongs to Mary's lost lamb. Surely she
 would reward you if you gave the bell back to her. If you 'ring' the bell, you
-will gain a little lamb mini-pet.
+will gain a little lamb minipet.
    You can 'use' this item to teleport back to the nearest Mother Goose
 adventure. From there, try 'where mary' to find her.
 ~
-3 p a 0 9
+3 p a 0 10
 10744 0 0
 2 0
 T 10744
 T 10738
+T 9806
 S
 #10745
 skirt fetching~
@@ -672,7 +694,7 @@ lives in the shoe. If you returned it, she might reward you.
    You can 'use' this item to teleport back to the nearest Mother Goose
 adventure, where you can turn in this quest.
 ~
-6 p a 0 9
+6 p a 0 10
 72 0 0
 7 336
 A
@@ -684,6 +706,7 @@ M
 5
 $n chews on a leathery broth.~
 T 10738
+T 9806
 S
 #10747
 shoestring string spare~
@@ -699,6 +722,23 @@ A
 2 1 0
 C
 25 25
+S
+#10749
+breadcrumbs crumbs enchanted~
+some enchanted breadcrumbs~
+Some enchanted breadcrumbs have been dropped here.~
+   These breadcrumbs won't last long, but they have been enchanted to return
+you to your home. To use these, you must already have a home that you set with
+the 'home' command. Type 'use breadcrumbs' to teleport to it. If you don't use
+these soon, they'll be lost.
+~
+3 p a 0 4
+0 0 0
+7 24
+C
+1 1
+T 10749
+T 9806
 S
 #10750
 parts spider pile~
@@ -763,7 +803,7 @@ A
 C
 50 50
 R
-5130 0
+4 5130 0
 S
 #10755
 bread goblin crusty~
@@ -860,23 +900,24 @@ S
 #10763
 lantern silk spidersilk~
 a spidersilk lantern~
-A spidersilk lantern was left here.~
-You wonder if you could light it without burning yourself.
+A spidersilk lantern is lying on the ground.~
+   The lantern is made from spidersilk! You can 'light' or 'douse' it to make
+it last longer.
 ~
-3 0 ao 0 2
-0 0 0
+29 0 ao 0 3
+168 0 6
 11 0
-I 11 10764 100.00 1  # LIGHT: a lit spidersilk lantern
 S
 #10764
-lantern lit spidersilk silk~
-a lit spidersilk lantern~
-A lit spidersilk lantern is lying on the ground.~
-The spidersilk burns nicely.
+lantern spidersilk silk~
+a spidersilk lantern~
+A spidersilk lantern is lying on the ground.~
+   The lantern is made from spidersilk! You can 'light' or 'douse' it to make
+it last longer.
 ~
-3 c ao 0 2
-0 0 0
-11 168
+29 0 ao 0 4
+168 1 6
+11 0
 S
 #10765
 slippers silk pair spidersilk~
@@ -930,9 +971,9 @@ a sense of victory~
 There is a sense of victory as the spiders are defeated.~
 It seems you have completed the adventure.
 ~
-3 0 0 0 2
+3 0 0 0 3
 0 0 0
-10 4
+10 8
 T 10769
 S
 #10770
@@ -963,9 +1004,11 @@ S
 replacer goblin raft~
 a goblin raft~
 A goblin raft replacer has bugged out.~
-This is supposed to purge itself and spawn a goblin raft. Evidently it didn't.
+   The raft is made from large sticks and some very worn-out twine. You can
+'drag' the raft to the edge of the water, then 'sit' on it and type 'sail
+<direction>'.
 ~
-3 0 0 0 2
+3 0 0 0 3
 0 0 0
 0 1
 T 10773

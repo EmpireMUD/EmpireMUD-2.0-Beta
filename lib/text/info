@@ -11,7 +11,7 @@ description.
 
 If you're using the ASCII map, each map tile is 4 letters wide and uses icons
 like &c~~~~&0 for river and &g^^^^&0 for forest. You can see more symbols on
-the help files for MAP and CROPS.
+the help files for LEGEND and CROPS.
 
 You can type SCORE to see a sheet of information about your character, with
 your name, play time, and skills. It also shows your health, moves, and mana in
@@ -32,25 +32,25 @@ the Goblin Mines, where you can learn how to go on adventures.
 Your empire has goals that you can complete to unlock more buildings, larger
 cities, and other perks. Use the PROGRESS command to see your current goals.
 
-Before it gets dark, you should learn to make a torch. GATHER a stick in the
-forest, and DIG up a flint and a rock. CRAFT a 'flint set' from the rocks, and
-then LIGHT the stick to make a torch.
+Before it gets dark, you should learn to make a torch. GATHER some sticks in
+the forest. CRAFT 'fire sticks' from two of the sticks and then LIGHT a third
+stick to make a torch.
 
 You begin the game with some bread to EAT and water to DRINK. If you see a
-river or an oasis, you can FILL your bottle with water again. You can PICK
-fruit from orchards and you can HARVEST other crops. Or, you can learn the
-Survival skill and BUTCHER animals to COOK food. But don't worry, you won't
-starve to death -- you'll just find that you take longer to perform some tasks
-and you regain health and moves more slowly (you can always SLEEP to regenerate
-faster).
+river or an oasis, you can FILL your bottle with water again. You can FORAGE
+for fruits and nuts for simple foods in the wild, but they aren't very filling.
+Or, you can learn the Survival skill and BUTCHER animals to COOK food. But
+don't worry, you won't starve to death -- you'll just find that you take longer
+to perform some tasks and you regain health and moves more slowly (you can
+always SLEEP to regenerate faster).
 
 If you find it difficult to navigate the map, you may want to buy the
-Navigation ability, from the Survival skill. It will give you coordinates for
+NAVIGATION ability, from the Survival skill. It will give you coordinates for
 each location. When you buy this ability, your map may rotate. That means your
 character didn't know which way was actually North until now.
 
 Additional Utilities:
-  TOGGLE - Lets you turn on and off various channels, modes, and preferences.
+  TOGGLE - Lets you turn on and off various modes and preferences.
     - toggle political: shows ownership on the map
     - toggle informative: shows building status as map colors
   MAPSIZE - Change the size of your game map.
@@ -60,8 +60,9 @@ Additional Utilities:
   IDENTIFY - Tells you how good an item is, and where it's stored.
   HELPSEARCH - Look for help files by searching for text.
 
-After 4 hours of total gameplay (and again after 48 hours), you will receive
-a bonus trait when you next log in. See HELP BONUS TRAITS for information.
+After 12 hours of total gameplay, you will get the opportunity to reset the
+BONUS TRAIT you picked during character creation. After 48 hours of gameplay,
+you will receive a second bonus trait when you next log in.
 
 If you need more information than you can find in help files, DON'T PANIC! You
 can always ask on the &j/newbie&0 channel.

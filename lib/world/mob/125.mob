@@ -3,9 +3,16 @@ colossus clockwork enormous~
 the clockwork colossus~
 An enormous clockwork colossus towers over you (adventure).
 ~
-100 200 dkuyzAB cG 6
-0 0 26 14
-I 4 12551 100.00 1  # LOOT: the clockwork loot controller
+100 200 dkuyzABK cG 6
+0 0 26 14 -1
+D
+   Looking up at this thing, you can scarcely comprehend what it is. It looks
+like a man, almost, thought it's as tall as any tower you've seen, and its skin
+is bronze and iron. Whoever built the colossus must have been closer to your
+size, since much of it looks like you could climb up it.
+   Type 'board colossus' to start the climb.
+~
+I 4 12551 100.00 1  # LOOT: clockwork loot controller
 T 12516
 T 12500
 T 12517
@@ -23,9 +30,14 @@ colossus clockwork miniature~
 the clockwork colossus~
 A miniature clockwork colossus stomps toward you!
 ~
-100 200 dkuyz cG 3
-0 0 26 5
-I 4 12551 100.00 1  # LOOT: the clockwork loot controller
+100 200 dkuyzK cG 3
+0 0 26 5 -1
+D
+   This strange-looking metal man is made from bronze and iron. Exposed wheels
+and gears barely hide the fact that this is no man at all, but some odd sort of
+machine. And though it's called a colossus, it's hardly taller than you are.
+~
+I 4 12551 100.00 1  # LOOT: clockwork loot controller
 T 12518
 T 12520
 T 12521
@@ -43,10 +55,15 @@ spider clockwork~
 a clockwork spider~
 A clockwork spider walks slowly down the colossus.
 ~
-100 200 bdj GK 4
-0 0 0 21
-I 0 12507 100.00 1  # BUTCHER: a piece of brass scrap metal
-I 4 12507 100.00 1  # LOOT: a piece of brass scrap metal
+100 200 bdjK GK 4
+0 0 0 21 -1
+D
+   This odd contraption has the rough shape of a spider: a central hub, which
+makes a constant whirring sound, and eight spindly legs, all constructed from
+polished bronze.
+~
+I 0 12507 100.00 1  # BUTCHER: piece of brass scrap metal
+I 4 12507 100.00 1  # LOOT: piece of brass scrap metal
 T 12513
 S
 #12503
@@ -55,10 +72,14 @@ an angry magpie~
 A magpie is stealing bits of wire from the colossus.
 ~
 100 200 bdj cmK 1
-0 0 2 26
-I 0 3200 100.00 1  # BUTCHER: a cut of poultry
-I 4 12506 75.00 1 x  # LOOT: some salvaged copper wire
-I 4 12506 25.00 2 x  # LOOT: some salvaged copper wire
+0 0 2 26 -1
+D
+   It's a pretty little black and white bird, though it seems to be stripping
+wire and bits of shiny metal from the colossus.
+~
+I 0 3200 100.00 1  # BUTCHER: cut of poultry
+I 4 12506 75.00 1 x  # LOOT: salvaged copper wire
+I 4 12506 25.00 2 x  # LOOT: salvaged copper wire
 T 12513
 S
 #12504
@@ -66,8 +87,11 @@ adventurer #n~
 the other adventurer~
 An adventurer is resting here, polishing an axe.
 ~
-100 200 bdpvyz cm 3
-0 0 0 2
+100 200 bdpvyzI cm 3
+0 0 0 2 -1
+D
+The hapless adventurer looks tired from the difficult climb.
+~
 T 12513
 T 12527
 T 12515
@@ -81,7 +105,13 @@ the goblin junk dealer~
 A goblin junk dealer sorts through the wreckage (list).
 ~
 100 200 bdo 0 2
-1 0 0 15
+1 0 0 15 -1
+D
+   The little green fellow is smeared with dirty oil, which he occasionally
+tries to wipe off with a rag. It looks excited at the fallen colossus.
+   Use 'list' and 'list id' to see what's available here and use 'buy' to
+purchase items.
+~
 M
 1
 That was a big one, weren't he?~
@@ -104,18 +134,27 @@ eye lasers~
 Eye lasers are being fired at here.
 ~
 0 0 bd clnK 0
-0 0 0 15
+0 0 0 15 -1
+D
+   Only immortals should see this. This mob is how the colossus fires lasers at
+players randomly.
+~
 T 12503
 T 12502
 T 12525
 S
 #12507
-controller master apparatus~
-the master controller apparatus~
-The master controller apparatus is here.
+controller central apparatus~
+the central control apparatus~
+The central control apparatus is here.
 ~
 0 0 bdnF GK 4
-0 0 0 15
+0 0 0 15 -1
+D
+   The strange apparatus is made mostly of wheels within wheels, spinning and
+turning with no discernible purpose. When they move just right, it almost
+sounds like a voice giving commands.
+~
 T 12532
 T 12533
 T 12534
@@ -127,9 +166,12 @@ arm left colossal~
 the colossal arm~
 The left arm sways as the colossus moves.
 ~
-0 0 dhy cGK 5
-0 0 0 14
-I 4 12503 100.00 1  # LOOT: the destroyed left arm
+0 0 dhyK cGK 5
+0 0 0 14 -1
+D
+The colossus's enormous arm is bigger than a tree!
+~
+I 4 12503 100.00 1  # LOOT: destroyed left arm
 T 12528
 T 12529
 T 12531
@@ -139,9 +181,13 @@ arm right colossal~
 the colossal arm~
 The right arm sways as the colossus moves.
 ~
-0 0 dhy cGK 5
-0 0 0 5
-I 4 12502 100.00 1  # LOOT: the crippled right arm
+0 0 dhyK cGK 5
+0 0 0 5 -1
+D
+   The arm is so big that it's hard to avoid being knocked off the colossus as
+it moves.
+~
+I 4 12502 100.00 1  # LOOT: crippled right arm
 T 12528
 T 12529
 T 12531
@@ -152,7 +198,10 @@ a clockwork magpie~
 A clockwork magpie cocks its head and looks at you quizzically.
 ~
 1 1 bdoD mnG 4
-0 0 2 26
+0 0 2 26 -1
+D
+The little brass bird has been painted with black and white patches.
+~
 M
 0
 $n chatters to itself.~
@@ -174,7 +223,12 @@ a clockwork elephant~
 A great clockwork elephant towers over you.
 ~
 100 125 dey G 5
-0 0 26 27
+0 0 26 27 -1
+D
+   The elephant has a beautiful brass finish as it lumbers ponderously across
+the land. A whirring sound can be heard from inside, where its thundering
+heartbeat should be.
+~
 S
 #12512
 eagle clockwork~
@@ -182,6 +236,11 @@ a clockwork eagle~
 A clockwork eagle is perched here, watching.
 ~
 100 125 de mG 4
-0 0 2 10
+0 0 2 10 -1
+D
+   This glorious bird is made from polished brass and highlighted with bronze.
+It's larger than a horse and easily accomodates a person on its back, even in
+flight, though it's unclear how such a heavy thing could float on the air.
+~
 S
 $

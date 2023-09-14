@@ -4,7 +4,7 @@ A Winter Wonderland~
 have been carved from ice, but a fierce blizzard is quickly covering them in
 snow. Behind the whip and howl of the wind, you can hear people singing carols.
 ~
-aci 0 0
+aci 0 0 10700
 D0
 ~
 0 10701
@@ -20,7 +20,7 @@ A Winter Wonderland~
 blizard, the beauty of the snow-covered peak is striking. Evergreen trees
 frosted in glittering snow give you the warm feeling of home.
 ~
-aci 0 0
+aci 0 0 10700
 D2
 ~
 0 10700
@@ -44,7 +44,7 @@ A Winter Wonderland~
 the snow tell you that you're not the only one here. You can hear carolers
 singing in the distance, and the smell of cookies fills the air with warmth.
 ~
-aci 0 0
+aci 0 0 10700
 D3
 ~
 0 10701
@@ -61,13 +61,16 @@ fluffy as though it just fell. Below, you can see the top of a harsh winter
 blizzard. But though it is cold up here, you're warmed by visions of sugarplums
 dancing in your head.
 ~
-aci 0 0
+aci 0 0 10700
 D0
 ~
 0 10702
 D3
 ~
 0 10704
+D7
+~
+0 10706
 E
 sugarplums~
 The sugarplums appear to be dancing.
@@ -81,7 +84,7 @@ peak, and you have found the source of the lovely music that fills the cold
 mountain air. You're above even the evergreen trees here, surrounded by nothing
 but the untouched beauty of the snow.
 ~
-aci 0 0
+aci 0 0 10700
 D1
 ~
 0 10703
@@ -100,7 +103,7 @@ The Snowy Peak~
 world, surrounded by the joy of carolers below, you cannot help but be caught
 up in the spirit of the holiday.
 ~
-aci 0 0
+aci 0 0 10700
 D2
 ~
 0 10704
@@ -116,12 +119,23 @@ actually be made from candy canes.
 ~
 M 0 10703 100.00 1
 S
+#10706
+An Icy Cave~
+   This seems to be an icy cave, or perhaps a large igloo off the beaten path
+of the mountain. It isn't obvious just who made the chamber, or what it is for,
+but a sense of malevolence hangs in the air.
+~
+aci 0 0 10700
+D4
+~
+0 10703
+S
 #10730
 Misplaced Mother Goose Spawning Chamber~
    This room is used to spawn the Misplaced Mother Goose adventure. You
 shouldn't be in here.
 ~
-ghi 0 0
+ghi 0 0 -1
 M 0 10730 100.00 1
 M 0 10732 100.00 1
 M 0 10734 100.00 1
@@ -137,7 +151,7 @@ A Mine Shaft~
 you find the entrance to the mine shaft. The walls appear to have been scraped
 clear by picks -- and possibly claws. Little ore remains.
 ~
-bd 0 0
+bd 0 0 -1
 D5
 ~
 0 10751
@@ -152,7 +166,7 @@ A Mine Shaft~
 chittering sound comes from lower in the mine, and you can't help but notice
 that the walls here have a lot of spiderwebs on them.
 ~
-bd 0 0
+bd 0 0 -1
 D6
 ~
 0 10750
@@ -168,7 +182,7 @@ of the tunnel is covered in spiderwebs. You think you can see eyes reflecting
 your light, but maybe if you are very lucky, those will turn out to be precious
 gems instead.
 ~
-bd 0 0
+bd 0 0 -1
 D8
 ~
 0 10751
@@ -183,7 +197,7 @@ An Old Mining Tunnel~
 looks like something was cocooned into the walls. It makes you wonder how many
 goblins were working this old mine.
 ~
-bd 0 0
+bd 0 0 -1
 D4
 ~
 0 10752
@@ -198,7 +212,7 @@ A Web-Covered Cavern~
 There's no evidence of mining, so perhaps the goblins broke through only to
 find themselves in a spider's nest.
 ~
-bd 0 0
+bd 0 0 -1
 D8
 ~
 0 10753
@@ -214,7 +228,7 @@ the nest of a very large spider. Empty egg sacs dangle from every stalactite.
 Trails of rust run from old cocoons. And there is a distinct chittering noise
 that tells you trouble is not far.
 ~
-bd 0 0
+bd 0 0 -1
 D5
 ~
 0 10754
@@ -225,6 +239,6 @@ S
 The Tree of Knowledge~
 You have somehow found your way inside the Tree of Knowledge.
 ~
-g 0 0
+g 0 0 -1
 S
 $

@@ -112,7 +112,7 @@ const char *reboot_type[] = { "reboot", "shutdown" };
  //////////////////////////////////////////////////////////////////////////////
 //// ABILITY CONSTANTS ///////////////////////////////////////////////////////
 
-// ABILF_x: ability flags
+// ABILF_x (1/2): ability flags
 const char *ability_flags[] = {
 	"VIOLENT",	// 0
 	"COUNTERSPELLABLE",
@@ -129,11 +129,34 @@ const char *ability_flags[] = {
 	"RANGED-ONLY",
 	"IGNORE-SUN",
 	"UNSCALED-BUFF",
+	"LIMIT-CROWD-CONTROL",
 	"\n"
 };
 
 
-// ABILT_x: ability type flags
+// ABILF_x (2/2): ability flags shown to players as notes
+const char *ability_flag_notes[] = {
+	"violent",	// 0
+	"counterspellable",
+	"toggles on/off",
+	"",	// INVISIBLE
+	"",	// !ENGAGE
+	"ranged",	// 5
+	"can't be used in animal form",
+	"can't be used while invulnerable",
+	"stronger in caster role",
+	"stronger in healer role",
+	"stronger in melee role",	// 10
+	"stronger in tank role",
+	"can only be used at range",
+	"unaffected by sun",
+	"",	// UNSCALED-BUFF
+	"limited crowd control",
+	"\n"
+};
+
+
+// ABILT_x (1/2): ability type flags
 const char *ability_type_flags[] = {
 	"CRAFT",	// 0
 	"BUFF",
@@ -145,6 +168,40 @@ const char *ability_type_flags[] = {
 	"COMPANION",
 	"SUMMON-ANY",
 	"SUMMON-RANDOM",
+	"MORPH",
+	"AUGMENT",
+	"CUSTOM",
+/*
+	"UNAFFECTS",
+	"POINTS",
+	"ALTER-OBJS",
+	"GROUPS",
+	"MASSES",
+	"AREAS",
+	"CREATIONS",
+	"MANUAL",
+	"ROOMS",
+	"CRAFT",
+*/
+	"\n"
+};
+
+
+// ABILT_x (2/2): ability types as shown to players
+const char *ability_type_notes[] = {
+	"crafting",	// 0
+	"buff",
+	"damage",
+	"damage-over-time",
+	"player tech",
+	"passive buff",	// 5
+	"ready weapon",
+	"companion",
+	"summon",
+	"summon",
+	"morphing",
+	"augment",
+	"custom",
 /*
 	"UNAFFECTS",
 	"POINTS",
@@ -649,6 +706,7 @@ const char *mount_flags[] = {
 	"riding",
 	"aquatic",
 	"flying",
+	"waterwalk",
 	"\n"
 };
 
@@ -700,7 +758,7 @@ const char *preference_bits[] = {
 	"!CHANNEL-JOINS",
 	"AUTOKILL",
 	"SCRL",
-	"BRIEF",
+	"NO-ROOM-DESCS",
 	"BOTHER",
 	"AUTORECALL",
 	"!GOD",
@@ -723,6 +781,7 @@ const char *preference_bits[] = {
 	"ITEM-QUALITY",
 	"ITEM-DETAILS",
 	"!EXITS",
+	"SHORT-EXITS",
 	"\n"
 };
 
@@ -771,7 +830,7 @@ const struct toggle_data_type toggle_data[] = {
 	{ "clearmeters", TOG_ONOFF, PRF_CLEARMETERS, 0, NULL },
 	
 	{ "autorecall", TOG_ONOFF, PRF_AUTORECALL, 0, NULL },
-	{ "brief", TOG_ONOFF, PRF_BRIEF, 0, NULL },
+	{ "room-descs", TOG_OFFON, PRF_NO_ROOM_DESCS, 0, NULL },
 	{ "rp", TOG_ONOFF, PRF_RP, 0, NULL },
 	
 	{ "autoswim", TOG_ONOFF, PRF_AUTOSWIM, 0, NULL },
@@ -800,6 +859,7 @@ const struct toggle_data_type toggle_data[] = {
 	
 	{ "channel-joins", TOG_OFFON, PRF_NO_CHANNEL_JOINS, 0, NULL },
 	{ "exits", TOG_OFFON, PRF_NO_EXITS, 0, NULL },
+	{ "short-exits", TOG_ONOFF, PRF_SHORT_EXITS, 0, NULL },
 	
 	// imm section
 	{ "wiznet", TOG_OFFON, PRF_NOWIZ, LVL_START_IMM, NULL },
@@ -955,6 +1015,7 @@ const char *syslog_types[] = {
 	"system",
 	"validation",
 	"empire",
+	"event",
 	"\n"
 };
 
@@ -995,10 +1056,10 @@ const char *alt_dirs[] = {
 	"se",
 	"u",
 	"d",
-	"fore",
-	"starboard",
-	"port",
-	"aft",
+	"fo",
+	"st",
+	"po",
+	"af",
 	"random",
 	"\n"
 };
@@ -1225,17 +1286,17 @@ const char *affected_bits[] = {
 	"HIDE",
 	"*CHARM",
 	"INVIS",
-	"!BATTLE",
+	"IMMUNE-PHYSICAL-DEBUFFS",
 	"SENSE-HIDE",
 	"!PHYSICAL",
 	"!TARGET",
 	"!SEE",
 	"FLY",
 	"!ATTACK",
-	"!HIGH-SORCERY",
-	"DISARM",
+	"IMMUNE-MAGICAL-DEBUFFS",
+	"DISARMED",
 	"HASTE",
-	"ENTANGLED",
+	"IMMOBILIZED",
 	"SLOW",
 	"STUNNED",
 	"STONED",
@@ -1245,9 +1306,9 @@ const char *affected_bits[] = {
 	"EARTHMELD",
 	"MUMMIFY",
 	"SOULMASK",
-	"!NATURAL-MAGIC",
-	"!STEALTH",
-	"!VAMPIRE",
+	"NO-TRACKS",
+	"IMMUNE-POISON-DEBUFFS",
+	"IMMUNE-MENTAL-DEBUFFS",
 	"!STUN",
 	"*ORDERED",
 	"!DRINK-BLOOD",
@@ -1255,6 +1316,8 @@ const char *affected_bits[] = {
 	"HARD-STUNNED",
 	"IMMUNE-DAMAGE",	// 35
 	"!WHERE",
+	"WATERWALK",
+	"LIGHT",
 	"\n"
 };
 
@@ -1267,17 +1330,17 @@ const char *affected_bits_consider[] = {
 	"",	// hide
 	"",	// 5 - charm
 	"",	// invis
-	"$E is immune to Battle debuffs.",	// !battle
+	"$E is immune to physical debuffs.",	// immune-phyical-debuffs
 	"",	// sense hide
 	"$E is immune to physical damage.",	// !physical
 	"",	// 10 - no-target-in-room
 	"",	// no-see-in-room
 	"",	// fly
 	"$E cannot be attacked.",	// !attack
-	"$E is immune to High Sorcery debuffs.",	// !highsorc
-	"",	// 15 - disarm
+	"$E is immune to magical debuffs.",	// immune-magical-debuffs
+	"",	// 15 - disarmed
 	"",	// haste
-	"",	// entangled
+	"",	// immobilized
 	"",	// slow
 	"",	// stunned
 	"",	// 20 - stoned
@@ -1287,9 +1350,9 @@ const char *affected_bits_consider[] = {
 	"",	// earthmeld
 	"",	// 25 - mummify
 	"$E is soulmasked.",	// soulmask
-	"$E is immune to Natural Magic debuffs.",	// !natmag
-	"$E is immune to Stealth debuffs.",	// !stealth
-	"$E is immune to Vampire debuffs.",	// !vampire
+	"",	// no-tracks
+	"$E is immune to poison debuffs.",	// immune-poison-debuffs
+	"$E is immune to mental debuffs.",	// immune-mental-debuffs
 	"$E is immune to stuns.",	// 30 - !stun
 	"",	// ordred
 	"",	// !drink-blood
@@ -1297,6 +1360,8 @@ const char *affected_bits_consider[] = {
 	"",	// hard-stunned
 	"",	// 35 - immune-damage
 	"",	// !where
+	"",	// waterwalk
+	"",	// light
 	"\n"
 };
 
@@ -1317,9 +1382,9 @@ const bool aff_is_bad[] = {
 	FALSE,
 	FALSE,
 	FALSE,	// unused
-	TRUE,	// 15 - disarm
+	TRUE,	// 15 - disarmed
 	FALSE,
-	TRUE,	// entangled
+	TRUE,	// immobilized
 	TRUE,	// slow
 	TRUE,	// stunned
 	TRUE,	// 20 - stoned
@@ -1338,6 +1403,8 @@ const bool aff_is_bad[] = {
 	TRUE,
 	FALSE,	// hard-stunned (not 'bad' because it's uncleansable)
 	FALSE,	// 35 - immune-damage
+	FALSE,
+	FALSE,
 	FALSE,
 };
 
@@ -1722,7 +1789,7 @@ const char *craft_flag_for_info[] = {
 	"requires fire",
 	"",	// soup
 	"",	// in-dev
-	"",	// upgrade
+	"is an upgrade",	// upgrade
 	"",	// dismantle-only
 	"in-city only",
 	"",	// vehicle
@@ -1803,6 +1870,8 @@ const struct offense_info_type offense_info[NUM_OFFENSES] = {
 	{ "burned building", 5 },
 	{ "burned vehicle", 5 },
 	{ "pickpocketed", 5 },	// 10
+	{ "reclaimed a tile", 2 },
+	{ "burned tile", 5 }
 };
 
 
@@ -2053,6 +2122,7 @@ const char *event_status[] = {
 const char *faction_flags[] = {
 	"IN-DEVELOPMENT",
 	"REP-FROM-KILLS",
+	"HIDE-IN-LIST",
 	"\n"
 };
 
@@ -2091,7 +2161,7 @@ const struct faction_reputation_type reputation_levels[] = {
 	{ REP_LIKED, "Liked", "\tc", 100 },
 	{ REP_ESTEEMED, "Esteemed", "\ta", 300 },
 	{ REP_VENERATED, "Venerated", "\tg", 750 },
-	{ REP_REVERED, "Revered", "\tg", 1000 },
+	{ REP_REVERED, "Revered", "\tG", 1000 },
 	
 	{ -1, "\n", "\t0", 0 },	// last
 };
@@ -2110,6 +2180,7 @@ const char *generic_types[] = {
 	"CURRENCY",	// 5
 	"COMPONENT",
 	"MOON",
+	"LANGUAGE",
 	"\n"
 };
 
@@ -2124,6 +2195,7 @@ const bool generic_types_uses_in_dev[] = {
 	FALSE,	// CURRENCY	// 5
 	FALSE,	// COMPONENT
 	TRUE,	// MOON
+	TRUE,	// LANGUAGE
 };
 
 
@@ -2131,6 +2203,15 @@ const bool generic_types_uses_in_dev[] = {
 const char *generic_flags[] = {
 	"BASIC",	// 0
 	"IN-DEVELOPMENT",
+	"\n"
+};
+
+
+// LANG_x: how well someone speaks a language
+const char *language_types[] = {
+	"unknown",	// 0
+	"recognizes",
+	"speaks",
 	"\n"
 };
 
@@ -2174,6 +2255,9 @@ const char *action_bits[] = {
 	"!EXP",
 	"!RESCALE",
 	"SILENT",
+	"COINS",
+	"NO-COMMAND",	// 35
+	"NO-UNCONSCIOUS",
 	"\n"
 };
 
@@ -2187,6 +2271,12 @@ const char *mob_custom_types[] = {
 	"echo-day",
 	"echo-night",
 	"long-desc",
+	"script1",
+	"script2",
+	"script3",
+	"script4",
+	"script5",
+	"scavenge-corpse",
 	"\n"
 };
 
@@ -2194,42 +2284,27 @@ const char *mob_custom_types[] = {
 // MOB_MOVE_x: mob/vehicle move types
 const char *mob_move_types[] = {
 	"walks",
-	"climbs",
-	"flies",
-	"paddles",
-	"rides",
-	"slithers",
-	"swims",
-	"scurries",
-	"skitters",
-	"creeps",
-	"oozes",
-	"runs",
-	"gallops",
-	"shambles",
-	"trots",
-	"hops",
-	"waddles",
-	"crawls",
-	"flutters",
-	"drives",
-	"sails",
-	"rolls",
-	"rattles",
-	"skis",
-	"slides",
-	"soars",
-	"lumbers",
-	"floats",
-	"lopes",
-	"blows",
-	"drifts",
-	"bounces",
-	"flows",
-	"leaves",
-	"shuffles",
-	"marches",
-	"sweeps",
+	"climbs",	"flies",	"paddles",	"rides",	"slithers",		// 1 - 5
+	"swims",	"scurries",	"skitters",	"creeps",	"oozes",	// 6 - 10
+	"runs",	"gallops",	"shambles",	"trots",	"hops",	// 11 - 15
+	"waddles",	"crawls",	"flutters",	"drives",	"sails",	// 16 - 20
+	"rolls",	"rattles",	"skis",	"slides",	"soars",	// 21 - 25
+	"lumbers",	"floats",	"lopes",	"blows",	"drifts",	// 26 - 30
+	"bounces",	"flows",	"leaves",	"shuffles",	"marches",	// 31 - 35
+	"sweeps",	"barges",	"bolts",	"charges",	"clambers",	// 36 - 40
+	"coasts",	"darts",	"dashes",	"draws",	"flits",	// 41 - 45
+	"glides",	"goes",	"hikes",	"hobbles",	"hurries",	// 46 - 50
+	"inches",	"jogs",	"journeys",	"jumps",	"leaps",	// 51 - 55
+	"limps",	"lurches",	"meanders",	"moseys",	"parades",	// 56 - 60
+	"plods",	"prances",	"prowls",	"races",	"roams",	// 61 - 65
+	"romps",	"roves",	"rushes",	"sashays",	"saunters",	// 66 - 70
+	"scampers",	"scoots",	"scrambles",	"scutters",	"sidles",	// 71 - 75
+	"skips",	"skulks",	"sleepwalks",	"slinks",	"slogs",	// 76 - 80
+	"sneaks",	"staggers",	"stomps",	"streaks",	"strides",	// 81 - 85
+	"strolls",	"struts",	"stumbles",	"swims",	"tacks",	// 86 - 90
+	"tears",	"tiptoes",	"toddles",	"totters",	"traipses",	// 91 - 95
+	"tramps",	"travels",	"treks",	"trudges",	"vaults",	// 96 - 100
+	"wades",	"wanders",	"whizzes",	"zigzags",	"zooms",	// 101 - 105
 	"\n"
 };
 
@@ -2344,7 +2419,7 @@ const struct wear_data_type wear_data[NUM_WEARS] = {
 	{ "<worn around neck> ", "neck", ITEM_WEAR_NECK, TRUE, 1.0, NO_WEAR, "You're already wearing enough around your neck.", "$n wears $p around $s neck.", "You wear $p around your neck.", TRUE, TRUE },
 	{ " <worn as clothes> ", "clothes", ITEM_WEAR_CLOTHES, TRUE, 0, NO_WEAR, "You're already wearing $p as clothes.", "$n wears $p as clothing.", "You wear $p as clothing.", TRUE, TRUE },
 	{ "   <worn as armor> ", "armor", ITEM_WEAR_ARMOR, TRUE, 2.0, NO_WEAR, "You're already wearing $p as armor.", "$n wears $p as armor.", "You wear $p as armor.", TRUE, TRUE },
-	{ " <worn about body> ", "body", ITEM_WEAR_ABOUT, TRUE, 1.0, NO_WEAR, "You're already wearing $p about your body.", "$n wears $p about $s body.", "You wear $p around your body.", TRUE, TRUE },
+	{ " <worn about body> ", "about", ITEM_WEAR_ABOUT, TRUE, 1.0, NO_WEAR, "You're already wearing $p about your body.", "$n wears $p about $s body.", "You wear $p around your body.", TRUE, TRUE },
 	{ "    <worn on arms> ", "arms", ITEM_WEAR_ARMS, TRUE, 1.0, NO_WEAR, "You're already wearing $p on your arms.", "$n wears $p on $s arms.", "You wear $p on your arms.", TRUE, TRUE },
 	{ "  <worn on wrists> ", "wrists", ITEM_WEAR_WRISTS, TRUE, 1.0, NO_WEAR, "You're already wearing $p on your wrists.", "$n wears $p on $s wrists.", "You wear $p on your wrists.", TRUE, TRUE },
 	{ "   <worn on hands> ", "hands", ITEM_WEAR_HANDS, TRUE, 1.0, NO_WEAR, "You're already wearing $p on your hands.", "$n puts $p on $s hands.", "You put $p on your hands.", TRUE, TRUE },
@@ -2396,6 +2471,7 @@ const char *item_types[] = {
 	"POISON",
 	"ARMOR",
 	"BOOK",
+	"LIGHT",
 	"\n"
 };
 
@@ -2510,7 +2586,7 @@ const char *extra_bits[] = {
 const char *extra_bits_inv_flags[] = {
 	"unique",	// unique
 	"",	// plantable
-	"light",
+	"",	// light (controlled separately)
 	"superior",
 	"large",
 	"",	// created
@@ -2544,7 +2620,7 @@ const double obj_flag_scaling_bonus[] = {
 	1.1,	// OBJ_UNIQUE
 	1.0,	// OBJ_PLANTABLE
 	1.0,	// OBJ_LIGHT
-	1.6,	// OBJ_SUPERIOR
+	1.73,	// OBJ_SUPERIOR
 	1.0,	// OBJ_LARGE
 	1.0,	// OBJ_CREATED
 	1.0,	// OBJ_SINGLE_USE
@@ -2555,8 +2631,8 @@ const double obj_flag_scaling_bonus[] = {
 	1.0,	// OBJ_CREATABLE
 	1.0,	// OBJ_SCALABLE
 	1.5,	// OBJ_TWO_HANDED
-	1.3333,	// OBJ_BIND_ON_EQUIP
-	1.5,	// OBJ_BIND_ON_PICKUP
+	1.3,	// OBJ_BIND_ON_EQUIP
+	1.4,	// OBJ_BIND_ON_PICKUP
 	1.0,	// unused
 	1.0,	// OBJ_UNCOLLECTED_LOOT
 	1.0,	// OBJ_KEEP
@@ -2564,7 +2640,7 @@ const double obj_flag_scaling_bonus[] = {
 	1.0,	// unused
 	1.0,	// OBJ_NO_AUTOSTORE
 	1.2,	// OBJ_HARD_DROP
-	1.4,	// OBJ_GROUP_DROP
+	1.3333,	// OBJ_GROUP_DROP
 	1.0,	// OBJ_GENERIC_DROP
 	1.0,	// OBJ_NO_STORE
 	1.0,	// OBJ_SEEDED
@@ -2636,6 +2712,44 @@ const char *fullness[] = {
 	"about half ",
 	"more than half ",
 	""
+};
+
+
+// LIGHT_FLAG_x (1/2): flags for ITEM_LIGHT, show to immortals
+const char *light_flags[] = {
+	"LIGHT-FIRE",	// 0
+	"CAN-DOUSE",
+	"JUNK-WHEN-EXPIRED",
+	"COOKING-FIRE",
+	"DESTROY-WHEN-DOUSED",
+	"\n"
+};
+
+
+// LIGHT_FLAG_x (2/2): flags for ITEM_LIGHT, shown on identify
+const char *light_flags_for_identify[] = {
+	"can be used as a lighter when lit",	// 0
+	"can be doused",
+	"",	// LIGHT_FLAG_JUNK_WHEN_EXPIRED
+	"can be used for cooking",
+	"lost when doused",
+	"\n"
+};
+
+
+// MINT_FLAG_x (1/2): flags for wealth items to control minting
+const char *mint_flags[] = {
+	"AUTOMINT",
+	"NO-MINT",
+	"\n"
+};
+
+
+// MINT_FLAG_x (2/2): flags as shown to players on identify
+const char *mint_flags_for_identify[] = {
+	"automatically minted by Workforce",
+	"cannot be minted into coins",
+	"\n"
 };
 
 
@@ -2730,8 +2844,8 @@ const char *obj_custom_types[] = {
 	"build-to-room",
 	"instrument-to-char",
 	"instrument-to-room",
-	"eat-to-char",
-	"eat-to-room",	// 5
+	"consume-to-char",
+	"consume-to-room",	// 5
 	"craft-to-char",
 	"craft-to-room",
 	"wear-to-char",
@@ -2747,6 +2861,11 @@ const char *obj_custom_types[] = {
 	"decays-in-room",
 	"resource-to-char",
 	"resource-to-room",	// 20
+	"script1",
+	"script2",
+	"script3",
+	"script4",
+	"script5",	// 25
 	"\n"
 };
 
@@ -2885,9 +3004,10 @@ const char *progress_types[] = {
 const char *progress_flags[] = {
 	"IN-DEVELOPMENT",
 	"PURCHASABLE",
-	"SCRIPT-ONLY",
+	"NO-AUTOSTART",
 	"HIDDEN",
 	"NO-ANNOUNCE",
+	"NO-PREVIEW",
 	"\n"
 };
 
@@ -2902,6 +3022,8 @@ const char *progress_perk_types[] = {
 	"Greatness-territory",
 	"Workforce-cap",
 	"Territory",
+	"Speak-language",
+	"Recognize-language",
 	"\n"
 };
 
@@ -2920,6 +3042,7 @@ const char *quest_flags[] = {
 	"NO-GUESTS",
 	"TUTORIAL",
 	"GROUP-COMPLETION",
+	"EVENT",
 	"\n"
 };
 
@@ -2949,6 +3072,10 @@ const char *quest_reward_types[] = {
 	"REPUTATION",
 	"CURRENCY",
 	"EVENT-POINTS",
+	"SPEAK-LANGUAGE",	// 10
+	"RECOGNIZE-LANGUAGE",
+	"GRANT-PROGRESS",
+	"START-PROGRESS",
 	"\n",
 };
 
@@ -3047,7 +3174,7 @@ const char *bld_flags[] = {
 	"ROAD-ICON",
 	"ROAD-ICON-WIDE",
 	"ATTACH-BARRIER",	// 20
-	"*",
+	"NO-CUSTOMIZE",
 	"*",
 	"*",
 	"*",
@@ -3192,7 +3319,7 @@ const char *crop_flags[] = {
 
 
 // DPLTN_x
-const char *depletion_type[NUM_DEPLETION_TYPES] = {
+const char *depletion_type[] = {
 	"dig",
 	"forage",
 	"gather",
@@ -3204,6 +3331,7 @@ const char *depletion_type[NUM_DEPLETION_TYPES] = {
 	"chop",
 	"hunt",
 	"production",
+	"\n"
 };
 
 
@@ -3256,6 +3384,7 @@ const char *evo_types[] = {
 	"TIMED",	// 20
 	"OWNED",
 	"UNOWNED",
+	"BURN-STUMPS",
 	"\n"
 };
 
@@ -3285,6 +3414,7 @@ const int evo_val_types[NUM_EVOS] = {
 	EVO_VAL_NUMBER,	// timed (minutes)
 	EVO_VAL_NONE,	// owned
 	EVO_VAL_NONE,	// unowned
+	EVO_VAL_NONE,	// burn-stumps
 };
 
 
@@ -3313,6 +3443,7 @@ const bool evo_is_over_time[] = {
 	TRUE,	// timed
 	TRUE,	// owned
 	TRUE,	// unowned
+	FALSE,	// burn-stumps
 };
 
 
@@ -3527,7 +3658,7 @@ const char banner_to_mapout_token[][2] = {
 	{ 'y', 'p' },
 	{ 'm', 'v' },
 	{ 'c', 'w' },
-	{ 'w', 's' },
+	{ 'w', 'r' },
 	{ 'a', 'u' },
 	{ 'j', 'b' },
 	{ 'l', 'y' },
@@ -3590,8 +3721,9 @@ const char *room_aff_bits[] = {
 	"REPEL-NPCS",	// 20
 	"REPEL-ANIMALS",
 	"NO-WORKFORCE-EVOS",
-	"*HIDE-REAL-NAME",
+	"HIDE-REAL-NAME",
 	"MAPOUT-BUILDING",
+	"NO-TRACKS",	// 25
 	"\n"
 };
 
@@ -3652,6 +3784,8 @@ const char *sector_flags[] = {
 	"SHALLOW-WATER",
 	"NEEDS-HEIGHT",
 	"KEEPS-HEIGHT",
+	"SEPARATE-NOT-ADJACENTS",	// 25
+	"SEPARATE-NOT-NEARS",
 	"\n"
 };
 
@@ -3799,6 +3933,15 @@ const char *skill_flags[] = {
 };
 
 
+// WEAPON_x: Weapon types
+const char *weapon_types[] = {
+	"blunt",	// 0
+	"sharp",
+	"magic",
+	"\n"
+};
+
+
  //////////////////////////////////////////////////////////////////////////////
 //// SOCIAL CONSTANTS ////////////////////////////////////////////////////////
 
@@ -3855,6 +3998,8 @@ const char *trig_types[] = {
 	"Buy",
 	"Kill",	// 25
 	"Allow-Multiple",
+	"Can-Fight",
+	"Pre-Greet-All",
 	"\n"
 };
 
@@ -3887,6 +4032,8 @@ const bitvector_t mtrig_argument_types[] = {
 	NOBITS,	// buy
 	TRIG_ARG_PERCENT,	// kill
 	NOBITS,	// allow-multiple
+	NOBITS,	// can-fight
+	TRIG_ARG_PERCENT,	// pre-greet-all
 };
 
 
@@ -4042,6 +4189,8 @@ const char *wtrig_types[] = {
 	"Player-in-Room",
 	"Reboot",
 	"Buy",	// 24
+	"*",
+	"Allow-Multiple",
 	"\n"
 };
 
@@ -4072,6 +4221,8 @@ const bitvector_t wtrig_argument_types[] = {
 	NOBITS,	// player-in-room
 	NOBITS,	// reboot
 	NOBITS,	// buy
+	NOBITS,	//
+	NOBITS,	// allow-multiple
 };
 
 
@@ -4327,6 +4478,7 @@ const char *interact_restriction_types[] = {
 	"hard",
 	"group",
 	"boss",
+	"depletion",
 	"\n"
 };
 
@@ -4394,6 +4546,8 @@ const char *requirement_types[] = {
 	"LEVEL-UNDER",
 	"LEVEL-OVER",
 	"OWN-VEHICLE-FUNCTION",	// 40
+	"SPEAK-LANGUAGE",
+	"RECOGNIZE-LANGUAGE",
 	"\n",
 };
 
@@ -4440,6 +4594,8 @@ const bool requirement_amt_type[] = {
 	REQ_AMT_NONE,	// event not running
 	REQ_AMT_THRESHOLD,	// level under
 	REQ_AMT_THRESHOLD,	// level over
+	REQ_AMT_NONE,	// speak-language
+	REQ_AMT_NONE,	// recognize-language
 };
 
 
@@ -4485,6 +4641,8 @@ const bool requirement_needs_tracker[] = {
 	FALSE,	// event not running
 	FALSE,	// level under
 	FALSE,	// level over
+	FALSE,	// speak-language
+	FALSE,	// recognize-language
 };
 
 

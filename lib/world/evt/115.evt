@@ -11,9 +11,10 @@ proven that the pen is mightier -- that's what really matters.
    This is a test event that just uses a 'click' action on object 11500. The
 only way to acquire the item is by loading it.
 ~
-10 0 a 0 0 1 -1
+12 0 a 0 0 1 -1 0
 R 1 1 2 125 1
-R 2 3 2 100 1
+R 2 2 2 100 2
+R 3 3 2 100 1
 R 4 10 2 121 1
 T 10 0 2 100 1
 T 20 0 2 100 2
@@ -37,7 +38,7 @@ turn themselves on, and are acquired at the Guild. The purpose of this event is
 to use up large resource stockpiles, and to encourage people to log in and play
 all weekend.
 ~
-7 0 0 0 0 5760 -1
+7 0 0 0 0 5760 -1 0
 R 1 1 2 11501 1
 R 1 1 2 18221 1
 R 1 3 2 11512 1
@@ -89,7 +90,7 @@ causes pixies to spawn as the player moves; that object manages most of the
 event. Players turn in items 11521 and 11522 at the alchemist, using scripts on
 those items.
 ~
-6 0 0 0 0 5760 -1
+7 0 0 0 0 5760 -1 0
 R 1 1 2 18221 1
 R 1 1 2 11501 1
 R 1 3 2 11526 1
@@ -101,6 +102,7 @@ R 1 10 2 11527 1
 R 1 15 2 11531 1
 R 1 25 2 11534 1
 R 1 25 2 11514 1
+R 1 50 2 11536 1
 R 1 50 2 11513 1
 T 10 0 2 11513 1
 T 100 0 2 263 1

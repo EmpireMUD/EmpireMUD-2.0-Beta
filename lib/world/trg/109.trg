@@ -161,7 +161,7 @@ switch %random.4%
     if (%target%)
       %send% %target% &&r~%self% uses ^%self% tail to hurl a rock at you, stunning you momentarily!&&0
       %echoaround% %target% ~%self% hurls a rock at ~%target% with ^%self% tail, stunning *%target% momentarily!
-      dg_affect %target% HARD-STUNNED on 10
+      dg_affect %target% STUNNED on 10
       %damage% %target% 150 physical
     end
   break
@@ -272,7 +272,7 @@ if %enraged%
     if %self.aff_flagged(HARD-STUNNED)%
       %echo% ~%self% shakes his head and recovers from stunning!
     end
-    if %self.aff_flagged(ENTANGLED)%
+    if %self.aff_flagged(IMMOBILIZED)%
       %echo% ~%self% breaks free of the vines entangling him!
     end
     %echo% ~%self% tries to flee...
@@ -299,13 +299,13 @@ switch %random.4%
     set target %random.enemy%
     set person %room.people%
     while %person%
-      if (%person.tohit% > %target.tohit%) && %self.is_enemy(%person%)% && !%person.aff_flagged(DISARM)%
+      if (%person.tohit% > %target.tohit%) && %self.is_enemy(%person%)% && !%person.aff_flagged(DISARMED)%
         set target %person%
       end
       set person %person.next_in_room%
     done
     if %target%
-      if !%target.aff_flagged(DISARM)%
+      if !%target.aff_flagged(DISARMED)%
         disarm %target%
       end
     end
@@ -1257,12 +1257,13 @@ else
   %echo% ~%self% flickers momentarily with a blue-white aura.
 end
 dg_affect #3021 %self% RESIST-MAGICAL 1 35
+set id %actor.id%
 wait 1 sec
 say Don't think of this as ruining your chances for a date. Think of it as your only chance to kiss a princess!
 wait 2 sec
 %echo% ~%self% snaps ^%self% fingers!
 set actor %self.fighting%
-if !%actor% || %actor.morph% == 10992
+if !%actor% || %actor.id% != %id% || %actor.morph% == 10992
   %echo% ~%self% looks confused.
   halt
 end
@@ -1272,11 +1273,13 @@ if %actor.trigger_counterspell%
 end
 set prev_name %actor.name%
 %morph% %actor% 10992
-%send% %actor% You are abruptly transformed into ~%actor%!
-%echoaround% %actor% %prev_name% is abruptly transformed into ~%actor%!
-dg_affect #10992 %actor% HARD-STUNNED on 20
+%send% %actor% You are abruptly transformed into %actor.name%!
+%echoaround% %actor% %prev_name% is abruptly transformed into %actor.name%!
+dg_affect #10992 %actor% STUNNED on 20
 wait 15 sec
-if %actor.morph% == 10992
+if !%actor% || %actor.id% != %id%
+  halt
+elseif %actor.morph% == 10992
   set prev_name %actor.name%
   %morph% %actor% normal
   %echoaround% %actor% %prev_name% slowly shifts back into ~%actor%.
@@ -1298,8 +1301,9 @@ else
   %echo% ~%self% flickers momentarily with a blue-white aura.
 end
 dg_affect #3021 %self% RESIST-MAGICAL 1 35
+set id %actor.id%
 wait 1 sec
-if !%actor% || !%self.fighting%
+if !%actor% || %actor.id% != %id% || !%self.fighting%
   halt
 end
 %send% %actor% &&r~%self% pulls out a gnarled wooden staff and smacks you over the head with it!
@@ -1327,7 +1331,11 @@ else
   %echo% ~%self% flickers momentarily with a blue-white aura.
 end
 dg_affect #3021 %self% RESIST-MAGICAL 1 35
+set id %actor.id%
 wait 1 sec
+if !%actor% || %actor.id% != %id%
+  halt
+end
 if !%actor.is_pc%
   set person %self.room.people%
   while %person%
@@ -1345,7 +1353,7 @@ if %actor.trigger_counterspell%
 else
   %send% %actor% Your weapon flies out of your hand!
   %echoaround% %actor% |%actor% weapon flies out of ^%actor% hand!
-  dg_affect #10995 %actor% DISARM on 20
+  dg_affect #10995 %actor% DISARMED on 20
 end
 ~
 #10995

@@ -172,13 +172,13 @@ void apply_potion(obj_data *obj, char_data *ch) {
 	}
 	
 	if (GET_OBJ_AFF_FLAGS(obj)) {
-		af = create_flag_aff(aff_type, 24 MUD_HOURS, GET_OBJ_AFF_FLAGS(obj), ch);
+		af = create_flag_aff(aff_type, 30 * SECS_PER_REAL_MIN, GET_OBJ_AFF_FLAGS(obj), ch);
 		affect_to_char(ch, af);
 		free(af);
 	}
 
 	LL_FOREACH(GET_OBJ_APPLIES(obj), apply) {
-		af = create_mod_aff(aff_type, 24 MUD_HOURS, apply->location, apply->modifier, ch);
+		af = create_mod_aff(aff_type, 30 * SECS_PER_REAL_MIN, apply->location, apply->modifier, ch);
 		affect_to_char(ch, af);
 		free(af);
 	}
@@ -285,11 +285,11 @@ ACMD(do_confer) {
 	struct affected_type *aff, *aff_iter;
 	bool any, found_existing, found_ch;
 	int amt, iter, abbrev, type, conferred_amt, avail_str;
-	int match_duration = 0;
+	long match_duration = 0;
 	char_data *vict = ch;
 	
 	// configs
-	int duration = 6 * REAL_UPDATES_PER_MIN;
+	long duration = 6 * SECS_PER_REAL_MIN;
 	int cost = 50;
 
 	struct {
@@ -409,11 +409,12 @@ ACMD(do_confer) {
 			if (aff_iter->type == ATYPE_CONFER && aff_iter->cast_by == CAST_BY_ID(ch) && aff_iter->location == confer_list[type].apply) {
 				found_existing = TRUE;
 				aff_iter->modifier += amt;
-				match_duration = aff_iter->duration;	// store this to match it later
-				aff_iter->duration = duration;	// reset to max duration
+				match_duration = aff_iter->expire_time;	// store this to match it later
+				aff_iter->expire_time = time(0) + duration;	// reset to max duration
 
 				// ensure stats are correct
 				affect_modify(vict, aff_iter->location, amt, NOBITS, TRUE);
+				schedule_affect_expire(vict, aff_iter);
 				affect_total(vict);
 				break;
 			}
@@ -424,13 +425,14 @@ ACMD(do_confer) {
 			found_ch = FALSE;
 			for (aff_iter = ch->affected; aff_iter; aff_iter = aff_iter->next) {
 				// we match by duration because lengthening any -str affect that had the same duration is equally good
-				if (aff_iter->type == ATYPE_CONFERRED && aff_iter->duration == match_duration) {
+				if (aff_iter->type == ATYPE_CONFERRED && aff_iter->expire_time == match_duration) {
 					found_ch = TRUE;
 					aff_iter->modifier -= 1;	// additional -1 strength
-					aff_iter->duration = duration;	// reset to max duration
+					aff_iter->expire_time = time(0) + duration;	// reset to max duration
 
 					// ensure stats are correct
 					affect_modify(ch, aff_iter->location, -1, NOBITS, TRUE);
+					schedule_affect_expire(ch, aff_iter);
 					affect_total(ch);
 					break;
 				}
@@ -477,7 +479,7 @@ ACMD(do_counterspell) {
 		msg_to_char(ch, "You ready a counterspell.\r\n");
 		act("$n flickers momentarily with a blue-white aura.", TRUE, ch, NULL, NULL, TO_ROOM);
 		
-		af = create_flag_aff(ATYPE_COUNTERSPELL, 1 MUD_HOURS, 0, ch);
+		af = create_flag_aff(ATYPE_COUNTERSPELL, 30 * SECS_PER_REAL_MIN, 0, ch);
 		affect_join(ch, af, 0);
 	}
 }
@@ -551,90 +553,18 @@ ACMD(do_earthmeld) {
 			return;
 		}
 	}
-
-	GET_MANA(ch) -= cost;
+	
+	// TODO why isn't this using charge ability cost
+	set_mana(ch, GET_MANA(ch) - cost);
 	
 	msg_to_char(ch, "You dissolve into pure mana and sink into the ground!\r\n");
 	act("$n dissolves into pure mana and sinks right into the ground!", TRUE, ch, 0, 0, TO_ROOM);
 	GET_POS(ch) = POS_SLEEPING;
 
-	af = create_aff(ATYPE_EARTHMELD, -1, APPLY_NONE, 0, AFF_NO_TARGET_IN_ROOM | AFF_NO_SEE_IN_ROOM | AFF_EARTHMELD, ch);
+	af = create_aff(ATYPE_EARTHMELD, UNLIMITED, APPLY_NONE, 0, AFF_NO_TARGET_IN_ROOM | AFF_NO_SEE_IN_ROOM | AFF_EARTHMELD, ch);
 	affect_join(ch, af, 0);
 	
 	gain_ability_exp(ch, ABIL_EARTHMELD, 15);
-}
-
-
-ACMD(do_entangle) {
-	char_data *vict = NULL;
-	struct affected_type *af;
-	int cost = 20;
-	
-	if (!can_use_ability(ch, ABIL_ENTANGLE, MANA, cost, COOLDOWN_ENTANGLE)) {
-		return;
-	}
-
-	// find target
-	one_argument(argument, arg);
-	if (*arg && !(vict = get_char_vis(ch, arg, NULL, FIND_CHAR_ROOM))) {
-		send_config_msg(ch, "no_person");
-		return;
-	}
-	if (!*arg && !(vict = FIGHTING(ch))) {
-		msg_to_char(ch, "Who would you like to cast that at?\r\n");
-		return;
-	}
-	if (ch == vict) {
-		msg_to_char(ch, "You wouldn't want to cast that on yourself.\r\n");
-		return;
-	}
-	
-	// check validity
-	if (!can_fight(ch, vict)) {
-		act("You can't attack $M!", FALSE, ch, NULL, vict, TO_CHAR);
-		return;
-	}
-	
-	if (NOT_MELEE_RANGE(ch, vict)) {
-		msg_to_char(ch, "You need to be at melee range to do this.\r\n");
-		return;
-	}
-	
-	if (ABILITY_TRIGGERS(ch, vict, NULL, ABIL_ENTANGLE)) {
-		return;
-	}
-	
-	charge_ability_cost(ch, MANA, cost, COOLDOWN_ENTANGLE, 30, WAIT_COMBAT_SPELL);
-	
-	if (SHOULD_APPEAR(ch)) {
-		appear(ch);
-	}
-	
-	// counterspell??
-	if (trigger_counterspell(vict) || AFF_FLAGGED(vict, AFF_IMMUNE_NATURAL_MAGIC)) {
-		act("You send out vines of green mana to entangle $N, but they can't seem to grasp $M.", FALSE, ch, NULL, vict, TO_CHAR);
-		act("$n sends out vines of green mana to entangle you, but they can't seem to latch on.", FALSE, ch, NULL, vict, TO_VICT);
-		act("$n sends out vines of green mana to entangle $N, but they can't seem to grasp $M.", FALSE, ch, NULL, vict, TO_NOTVICT);
-	}
-	else {
-		// succeed
-	
-		act("You shoot out vines of green mana, which entangle $N!", FALSE, ch, NULL, vict, TO_CHAR);
-		act("$n shoots vines of green mana at you, entangling you!", FALSE, ch, NULL, vict, TO_VICT);
-		act("$n shoots vines of green mana at $N, entangling $M!", FALSE, ch, NULL, vict, TO_NOTVICT);
-	
-		af = create_aff(ATYPE_ENTANGLE, 6, APPLY_DEXTERITY, -1, AFF_ENTANGLED, ch);
-		affect_join(vict, af, 0);
-
-		engage_combat(ch, vict, TRUE);
-		
-		// release other entangleds here
-		limit_crowd_control(vict, ATYPE_ENTANGLE);
-	}
-	
-	if (can_gain_exp_from(ch, vict)) {
-		gain_ability_exp(ch, ABIL_ENTANGLE, 15);
-	}
 }
 
 
@@ -906,7 +836,7 @@ ACMD(do_purify) {
 	else if (vict != ch && !IS_NPC(vict) && !PRF_FLAGGED(vict, PRF_BOTHERABLE)) {
 		act("You can't purify someone without permission (ask $M to type 'toggle bother').", FALSE, ch, NULL, vict, TO_CHAR);
 	}
-	else if (ch != vict && AFF_FLAGGED(vict, AFF_IMMUNE_NATURAL_MAGIC)) {
+	else if (ch != vict && AFF_FLAGGED(vict, AFF_IMMUNE_MAGICAL_DEBUFFS)) {
 		msg_to_char(ch, "Your victim is immune to that spell.\r\n");
 	}
 	else if (ABILITY_TRIGGERS(ch, vict, NULL, ABIL_PURIFY)) {
@@ -962,7 +892,7 @@ ACMD(do_quaff) {
 		msg_to_char(ch, "Which potion would you like to quaff?\r\n");
 	}
 	else if (!(obj = get_obj_in_list_vis(ch, arg, NULL, ch->carrying))) {
-		msg_to_char(ch, "You don't seem to have a %s.\r\n", arg);
+		msg_to_char(ch, "You don't seem to have %s %s.\r\n", AN(arg), arg);
 	}
 	else if (!IS_POTION(obj)) {
 		msg_to_char(ch, "You can only quaff potions.\r\n");
@@ -978,10 +908,24 @@ ACMD(do_quaff) {
 		if (!consume_otrigger(obj, ch, OCMD_QUAFF, NULL)) {
 			return;	// check trigger last
 		}
-		
-		act("You quaff $p!", FALSE, ch, obj, NULL, TO_CHAR);
-		act("$n quaffs $p!", TRUE, ch, obj, NULL, TO_ROOM);
 
+
+		// message to char
+		if (obj_has_custom_message(obj, OBJ_CUSTOM_CONSUME_TO_CHAR)) {
+			act(obj_get_custom_message(obj, OBJ_CUSTOM_CONSUME_TO_CHAR), FALSE, ch, obj, NULL, TO_CHAR);
+		}
+		else {
+			act("You quaff $p!", FALSE, ch, obj, NULL, TO_CHAR);
+		}
+		
+		// message to room
+		if (obj_has_custom_message(obj, OBJ_CUSTOM_CONSUME_TO_ROOM)) {
+			act(obj_get_custom_message(obj, OBJ_CUSTOM_CONSUME_TO_ROOM), TRUE, ch, obj, NULL, TO_ROOM);
+		}
+		else {
+			act("$n quaffs $p!", TRUE, ch, obj, NULL, TO_ROOM);
+		}
+		
 		apply_potion(obj, ch);
 		
 		run_interactions(ch, GET_OBJ_INTERACTIONS(obj), INTERACT_CONSUMES_TO, IN_ROOM(ch), NULL, obj, NULL, consumes_or_decays_interact);
@@ -1053,7 +997,7 @@ ACMD(do_rejuvenate) {
 		act("$n surrounds $N with the bright white mana of rejuvenation.", FALSE, ch, NULL, vict, TO_NOTVICT);
 	}
 	
-	af = create_mod_aff(ATYPE_REJUVENATE, 6, APPLY_HEAL_OVER_TIME, amount, ch);
+	af = create_mod_aff(ATYPE_REJUVENATE, 30, APPLY_HEAL_OVER_TIME, amount, ch);
 	affect_join(vict, af, 0);
 	
 	if (can_gain_exp_from(ch, vict)) {
@@ -1199,7 +1143,7 @@ ACMD(do_skybrand) {
 	}
 	
 	// counterspell??
-	if (trigger_counterspell(vict) || AFF_FLAGGED(vict, AFF_IMMUNE_NATURAL_MAGIC)) {
+	if (trigger_counterspell(vict) || AFF_FLAGGED(vict, AFF_IMMUNE_MAGICAL_DEBUFFS)) {
 		act("You can't seem to mark $N with the skybrand!", FALSE, ch, NULL, vict, TO_CHAR);
 		act("$n tries to mark you with a skybrand, but fails!", FALSE, ch, NULL, vict, TO_VICT);
 		act("$n tries to mark $N with a skybrand, but fails!", FALSE, ch, NULL, vict, TO_NOTVICT);
@@ -1210,7 +1154,7 @@ ACMD(do_skybrand) {
 		act("$n marks you with a glowing blue skybrand!", FALSE, ch, NULL, vict, TO_VICT);
 		act("$n marks $N with a glowing blue skybrand!", FALSE, ch, NULL, vict, TO_NOTVICT);
 		
-		apply_dot_effect(vict, ATYPE_SKYBRAND, 6, DAM_MAGICAL, dmg, 3, ch);
+		apply_dot_effect(vict, ATYPE_SKYBRAND, 30, DAM_MAGICAL, dmg, 3, ch);
 		engage_combat(ch, vict, TRUE);
 	}
 	
@@ -1249,7 +1193,7 @@ ACMD(do_soulsight) {
 			act(buf, FALSE, ch, 0, vict, TO_CHAR);
 		}
 		else {
-			sprintf(buf, " $E is %s.", IS_VAMPIRE(vict) ? "a vampire" : (IS_HUMAN(vict) ? ((IS_NPC(vict) && MOB_FLAGGED(vict, MOB_ANIMAL)) ? "an animal" : (MOB_FLAGGED(vict, MOB_HUMAN) ? "a human" : "a creature")) : "unknown"));
+			sprintf(buf, " $E is %s.", IS_VAMPIRE(vict) ? "a vampire" : (IS_HUMAN(vict) ? ((IS_NPC(vict) && MOB_FLAGGED(vict, MOB_ANIMAL)) ? "an animal" : ((!IS_NPC(vict) || MOB_FLAGGED(vict, MOB_HUMAN)) ? "a human" : "a creature")) : "unknown"));
 			act(buf, FALSE, ch, NULL, vict, TO_CHAR);
 			
 			show_character_affects(vict, ch);

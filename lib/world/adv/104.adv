@@ -1,0 +1,55 @@
+#10400
+Hamlet of the Undead~
+Paul Clarke~
+   Smoke and fire in the distance have led you to a small hamlet, ablaze and
+beset by the undead. Most of the citizens have fled, but it looks as if those
+who remain could use your help. With no army to come to its rescue, you might
+be the hamlet's only hope!
+~
+10400 10449 175-275
+10 0 k 4
+L
+5 0
+1440 -1 -1 -1
+-1 0 0
+L
+1 a
+10400 -1 -1 -1
+0 de de
+T 10404
+S
+#10450
+The Sewer: Goblin Outpost~
+Paul Clarke~
+   Strange sounds are coming from the sewer grate, and waste has been backing
+up into the streets. This can only mean one thing: Goblins! Will you buy the
+goblins' wares, or drive them from the city? This adventure sells 30 BoE items,
+the crafting patterns BoE for them all, and 4 unique buildings. You can also
+fight the goblins solo or in pairs (on normal, hard, or group difficulty) to
+earn their prized gear. You won't be able to fight each goblin until you pick
+a difficulty with the 'difficulty' command.
+   The gear sold in the shops is the same as the gear created by the crafting
+patterns and the loot dropped by the goblins, but it will be BoE instead of BoP
+when crafted, can go as high as level 175, and may be crafted as superior. See
+HELP GOBLIN OUTPOST for craft info.
+~
+10450 10499 50-150
+30 120 k 2
+L
+2 ab
+9 10450 10451 -1
+-1 0 0
+L
+3 ab
+5009 10450 10451 -1
+-1 0 0
+L
+6 0
+30 -1 -1 -1
+-1 0 0
+L
+5 0
+1440 -1 -1 -1
+-1 0 0
+S
+$

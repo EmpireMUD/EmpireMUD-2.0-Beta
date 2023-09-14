@@ -21,6 +21,15 @@ M
 10557 5.00 0
 M
 10558 5.00 0
+X
+river frozen ice around~
+   The river has turned to solid ice! You can see fish frozen in place just
+beneath the surface.
+~
+X
+fish down~
+A little fish stares up at you from beneath the ice, but it doesn't move.
+~
 S
 #10551
 Frozen Estuary~
@@ -45,6 +54,10 @@ M
 10557 5.00 0
 M
 10558 5.00 0
+X
+estuary river frozen ice around~
+The waters of the estuary have turned to solid ice!
+~
 S
 #10552
 Frozen Canal~
@@ -69,6 +82,10 @@ M
 10557 5.00 0
 M
 10558 5.00 0
+X
+frozen canal ice around~
+The canal has frozen solid!
+~
 S
 #10553
 Frozen Lake~
@@ -93,6 +110,67 @@ M
 10557 5.00 0
 M
 10558 5.00 0
+X
+lake frozen ice around~
+   The lake has frozen completely solid! You can't even hear it creak when you
+walk.
+~
+S
+#10554
+Frozen Irrigation Canal~
+A Frozen Irrigation Canal~
+'~' 2 f 25 0 0
+D0
+~~~~~
+&W~
+E
+4 0 5.00 85
+E
+9 0 100.00 85
+I 6 10562 95.00 1 F  # FORAGE: handful of red and green seeds
+I 6 10563 5.00 1 F  # FORAGE: seed of pure ice
+M
+9178 0.03 g
+M
+9186 5.00 0
+M
+10556 5.00 0
+M
+10557 5.00 0
+M
+10558 5.00 0
+X
+canal irrigation frozen ice around~
+The canal has frozen solid!
+~
+S
+#10555
+Frozen Canal~
+A Frozen Canal~
+'~' 2 f 25 0 0
+D0
+~~~~~
+&W~
+E
+4 0 5.00 87
+E
+9 0 100.00 87
+I 6 10562 95.00 1 F  # FORAGE: handful of red and green seeds
+I 6 10563 5.00 1 F  # FORAGE: seed of pure ice
+M
+9178 0.03 g
+M
+9186 5.00 0
+M
+10556 5.00 0
+M
+10557 5.00 0
+M
+10558 5.00 0
+X
+canal frozen ice around~
+The canal has frozen solid!
+~
 S
 #10562
 Thin Evergreen Forest~
@@ -118,7 +196,7 @@ E
 4 0 0.80 10563
 E
 9 0 50.00 10563
-I 5 102 9.00 1 X  # DIG: flint stone
+I 5 102 15.00 1 X  # DIG: flint stone
 I 5 100 100.00 1 X  # DIG: rock
 I 6 10552 75.00 1  # FORAGE: arctic brambleberries
 I 7 1206 8.33 125 p  # PICK: iridescent blue iris
@@ -133,6 +211,13 @@ M
 10557 5.00 0
 M
 10558 5.00 0
+X
+evergreens forest trees pines around~
+   An evergreen pine towers over you. The hairs on your arms stand up as you
+approach it; a chill hits your cheeks and you realize the cold emanates from
+the tree itself. There's a certain peace in the air, broken only by the
+occasional call of a tern.
+~
 S
 #10563
 Evergreen Forest~
@@ -182,7 +267,7 @@ E
 4 0 0.80 10564
 E
 9 0 50.00 10564
-I 5 102 9.00 1 X  # DIG: flint stone
+I 5 102 15.00 1 X  # DIG: flint stone
 I 5 100 100.00 1 X  # DIG: rock
 I 6 10552 75.00 1  # FORAGE: arctic brambleberries
 I 7 1206 8.33 125 p  # PICK: iridescent blue iris
@@ -197,6 +282,14 @@ M
 10557 5.00 0
 M
 10558 5.00 0
+X
+evergreens forest trees pines around~
+   The majestic evergreens loom over you, filling the air with the invigorating
+scent of pine. The air is cool and crisp, ever moreseo as you approach the
+trees. It's almost as if they're emanating cold itself -- if such a thing were
+possible. The only sounds you hear are the rustling of needles in the breeze
+and the occasional call of an arctic tern.
+~
 S
 #10564
 Overgrown Evergreen Forest~
@@ -222,7 +315,7 @@ E
 4 0 0.20 10565
 E
 9 0 50.00 10565
-I 5 102 9.00 1 X  # DIG: flint stone
+I 5 102 15.00 1 X  # DIG: flint stone
 I 5 100 100.00 1 X  # DIG: rock
 I 6 10552 75.00 1  # FORAGE: arctic brambleberries
 I 7 1206 8.33 125 p  # PICK: iridescent blue iris
@@ -237,6 +330,14 @@ M
 10557 5.00 0
 M
 10558 5.00 0
+X
+evergreens forest trees pines around~
+   The evergreens have closed in around you and you can see little else.
+Above, they grow tall and straight, reaching like colossal fingers toward the
+sky. The countless needles buffer all sound except the gentle breeze and the
+infrequent call of a loud bird. The air is cold -- colder than you were
+expecting -- but filled with the fresh scent of pine.
+~
 S
 #10565
 Thick Evergreen Forest~
@@ -258,7 +359,11 @@ D4
 &j~
 E
 0 1 100.00 10564
-I 5 102 9.00 1 X  # DIG: flint stone
+E
+17 4 0.01 10565
+E
+17 0 0.10 10562
+I 5 102 15.00 1 X  # DIG: flint stone
 I 5 100 100.00 1 X  # DIG: rock
 I 6 10552 75.00 1  # FORAGE: arctic brambleberries
 I 7 1206 8.33 125 p  # PICK: iridescent blue iris
@@ -273,6 +378,14 @@ M
 10557 5.00 0
 M
 10558 5.00 0
+X
+evergreens forest trees pines around~
+   You've found yourself in the densest part of a forest of towering
+evergreens, where the ground is made entirely of soft pine needles and the cold
+air carries nothing but the crisp scent of the trees. Above you, the sky is
+only visible in the gaps between the spruces and pines. There's a deep and
+permeating serenity to this place that you hardly want to leave.
+~
 S
 #10566
 Stumps~
@@ -310,6 +423,8 @@ E
 9 0 50.00 10562
 E
 16 0 100.00 0
+E
+23 0 100.00 0
 I 5 10552 9.00 1 X  # DIG: arctic brambleberries
 I 5 100 100.00 1 X  # DIG: rock
 I 6 3013 75.00 1  # FORAGE: handful of nuts
@@ -319,5 +434,12 @@ M
 10557 5.00 0
 M
 10558 5.00 0
+X
+stumps field forest trees pines evergreens around~
+   The field of stumps around you has begun to rot. From what you can tell,
+most of these were spruce and pine -- trees that do not regrow once felled. A
+chill still lingers in the air, moreso near the stumps. Perhaps the magic is
+not gone from this forest.
+~
 S
 $

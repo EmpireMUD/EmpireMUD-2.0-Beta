@@ -167,15 +167,39 @@ Completer~
 * This formerly completed the adventure at the end of the frost elf fight.
 %adventurecomplete%
 ~
+#10706
+Christmas present minipet: Open present~
+0 ct 0
+open~
+if %actor.obj_target(%arg.car%)%
+  return 0
+  halt
+end
+if %actor.char_target(%arg.car%)% != %self%
+  return 0
+  halt
+end
+return 1
+if %actor% != %self.leader%
+  %send% %actor% You'd like to open the present but it's not for you, and you shouldn't.
+  halt
+end
+* ok
+%send% %actor% You open the little present and find... another present inside, exactly the same as the first!
+%echoaround% %actor% ~%actor% has a look of childlike joy as &%actor% opens a little present and finds another identical present inside!
+nop %actor.command_lag(ABILITY)%
+~
 #10710
 Faster Hestian Trinket (snowglobe)~
 1 c 2
 use~
+* This is basically a [252] HESTIAN TRINKET with custom strings
+* checks
 if %actor.obj_target(%arg%)% != %self%
   return 0
   halt
 end
-if (%actor.position% != Standing)
+if %actor.position% != Standing || %actor.action% || %actor.fighting%
   %send% %actor% You can't do that right now.
   halt
 end
@@ -205,24 +229,44 @@ if %actor.cooldown(256)%
   halt
 end
 set room_var %actor.room%
+* set up 'stop' command
+set stop_command 0
+set stop_message_char You stop using %self.shortdesc%.
+set stop_message_room ~%actor% stops using %self.shortdesc%.
+set needs_stop_command 1
+remote stop_command %actor.id%
+remote stop_message_char %actor.id%
+remote stop_message_room %actor.id%
+remote needs_stop_command %actor.id%
+* start going
 %send% %actor% You shake @%self% and it begins to swirl with light...
 %echoaround% %actor% ~%actor% shakes @%self% and it begins to swirl with light...
-wait 5 sec
-if %actor.room% != %room_var% || %actor.fighting% || !%actor.home% || %self.carried_by% != %actor% || %actor.aff_flagged(DISTRACTED)%
-  halt
-end
-%send% %actor% @%self% glows a wintry white and the light begins to envelop you!
-%echoaround% %actor% @%self% glows a wintry white and the light begins to envelop ~%actor%!
-wait 5 sec
-if %actor.room% != %room_var% || %actor.fighting% || !%actor.home% || %self.carried_by% != %actor% || %actor.aff_flagged(DISTRACTED)%
-  halt
-end
-%echoaround% %actor% ~%actor% vanishes in a flurry of snow!
-%teleport% %actor% %actor.home%
-%force% %actor% look
-%echoaround% %actor% ~%actor% appears in a flurry of snow!
+set cycle 0
+while %cycle% < 2
+  wait 5 sec
+  if %actor.stop_command% || %actor.room% != %room_var% || %actor.fighting% || !%actor.home% || %self.carried_by% != %actor% || %actor.aff_flagged(DISTRACTED)% || %actor.action%
+    %force% %actor% stop cleardata
+    %send% %actor% The swirling light from @%self% fades.
+    halt
+  end
+  switch %cycle%
+    case 0
+      %send% %actor% @%self% glows a wintry white and the light begins to envelop you!
+      %echoaround% %actor% @%self% glows a wintry white and the light begins to envelop ~%actor%!
+    break
+    case 1
+      %echoaround% %actor% ~%actor% vanishes in a flurry of snow!
+      %teleport% %actor% %actor.home%
+      %force% %actor% look
+      %echoaround% %actor% ~%actor% appears in a flurry of snow!
+    break
+  done
+  eval cycle %cycle% + 1
+done
+* cleanup
 nop %actor.set_cooldown(256, 1800)%
 nop %actor.cancel_adventure_summon%
+%force% %actor% stop cleardata
 ~
 #10712
 bottomless gift sack: spawn elf on claimed land~
@@ -299,9 +343,10 @@ if %actor.char_target(%arg.car%)% == %self% && %self.room.template% >= 10700 && 
 end
 ~
 #10727
-Winter Wonderland minipet whistle (random order)~
+Winter Wonderland minipet whistle (random order) pre-2021~
 1 c 2
 use~
+* NOTE: This is the pre-2021 version and has a shorter minipet list, for people who hoarded old whistles.
 * List of vnums granted by this whistle (minipet mobs)
 set list 10709 16657 16658 10723 10724 10725 10726 16653 16654 16655 16656
 * length is used to shuffle the start point of the list
@@ -331,7 +376,7 @@ while (%list% && !%found%)
 done
 * Nothing to give
 if !%found%
-  %send% %actor% You already have all the mini-pets from the Winter Wonderland!
+  %send% %actor% You already have all the minipets from the Winter Wonderland!
   %purge% %self%
   halt
 end
@@ -340,7 +385,7 @@ end
 set pet %actor.room.people%
 if %pet.vnum% == %vnum%
   nop %actor.add_minipet(%vnum%)%
-  %send% %actor% You gain '~%pet%' as a mini-pet. Use the minipets command to summon it.
+  %send% %actor% You gain '~%pet%' as a minipet. Use the minipets command to summon it.
   %purge% %pet%
 else
   %send% %actor% There seems to be a problem giving you minipet #%vnum%. Please report this.
@@ -420,6 +465,55 @@ set mob %self.room.people%
 if (%mob% && %mob.vnum% == %self.val0%)
   nop %mob.unlink_instance%
 end
+~
+#10729
+Winter Wonderland minipet whistle (random order) 2021-2022~
+1 c 2
+use~
+* List of vnums granted by this whistle (minipet mobs)
+set list 10709 16657 16658 10723 10724 10725 10726 16653 16654 16655 16656 16666 16667 16668 16669 10706
+* length is used to shuffle the start point of the list
+set length 15
+* Check targeting
+if %actor.obj_target(%arg.car%)% != %self%
+  return 0
+  halt
+end
+* All other results will return 1
+return 1
+* shuffle the start point
+eval start %%random.%length%%% - 1
+while %start% > 0
+  eval start %start% - 1
+  set list %list.cdr% %list.car%
+done
+* Pick a random pet the owner doesn't know
+set found 0
+while (%list% && !%found%)
+  * get next vnum in list
+  set vnum %list.car%
+  set list %list.cdr%
+  if !%actor.has_minipet(%vnum%)%
+    set found %vnum%
+  end
+done
+* Nothing to give
+if !%found%
+  %send% %actor% You already have all the minipets from the Winter Wonderland!
+  %purge% %self%
+  halt
+end
+* and load 1 for verification and messaging
+%load% mob %vnum%
+set pet %actor.room.people%
+if %pet.vnum% == %vnum%
+  nop %actor.add_minipet(%vnum%)%
+  %send% %actor% You gain '~%pet%' as a minipet. Use the minipets command to summon it.
+  %purge% %pet%
+else
+  %send% %actor% There seems to be a problem giving you minipet #%vnum%. Please report this.
+end
+%purge% %self%
 ~
 #10730
 Hey Diddle Diddle~
@@ -535,7 +629,7 @@ if %actor.obj_target(%arg%)% != %self%
   return 0
   halt
 end
-if (%actor.position% != Standing)
+if %actor.position% != Standing || %actor.action% || %actor.fighting%
   %send% %actor% You can't do that right now.
   halt
 end
@@ -549,32 +643,57 @@ if %actor.cooldown(10738)%
   halt
 end
 set room_var %actor.room%
+* set up 'stop' command
+set stop_command 0
+set stop_message_char You stop using %self.shortdesc% to teleport.
+set stop_message_room ~%actor% stops using %self.shortdesc% to teleport.
+set needs_stop_command 1
+remote stop_command %actor.id%
+remote stop_message_char %actor.id%
+remote stop_message_room %actor.id%
+remote needs_stop_command %actor.id%
+* begin
 %send% %actor% You touch @%self% and it begins to swirl with light...
+if !%actor.home%
+  %send% %actor% WAIT! You haven't set a home! Type 'stop' if you want to do that before teleporting away, and see HELP HOME for more information. Completing this Mother Goose quest will get you a free teleport home using magic breadcrumbs.
+end
 %echoaround% %actor% ~%actor% touches @%self% and it begins to swirl with light...
-wait 5 sec
-if %actor.room% != %room_var% || %actor.fighting% || %self.carried_by% != %actor% || %actor.aff_flagged(DISTRACTED)%
-  halt
-end
-%send% %actor% Yellow light begins to whirl around you...
-%echoaround% %actor% Yellow light begins to whirl around ~%actor%...
-wait 5 sec
-if %actor.room% != %room_var% || %actor.fighting% || %self.carried_by% != %actor% || %actor.aff_flagged(DISTRACTED)%
-  halt
-end
-set destination %instance.nearest_rmt(10730)%
-if !%destination%
-  %send% %actor% Your teleport fails!
-  %echoaround% %actor% |%actor% teleport fails!
-  halt
-end
-%echoaround% %actor% ~%actor% vanishes in a flourish of yellow light!
-%teleport% %actor% %destination%
-set destination %instance.location%
-%teleport% %actor% %destination%
-%force% %actor% look
-%echoaround% %actor% ~%actor% appears in a flourish of yellow light!
+set cycle 0
+while %cycle% < 2
+  wait 5 sec
+  if %actor.stop_command% || %actor.room% != %room_var% || %actor.fighting% || !%actor.home% || %self.carried_by% != %actor% || %actor.aff_flagged(DISTRACTED)% || %actor.action%
+    %force% %actor% stop cleardata
+    %send% %actor% The swirling light from @%self% fades.
+    halt
+  end
+  switch %cycle%
+    case 0
+      %send% %actor% Yellow light begins to whirl around you...
+      %echoaround% %actor% Yellow light begins to whirl around ~%actor%...
+    break
+    case 1
+      set destination %instance.nearest_rmt(10730)%
+      if !%destination%
+        %send% %actor% Your teleport fails!
+        %echoaround% %actor% |%actor% teleport fails!
+        %force% %actor% stop cleardata
+        halt
+      end
+      %echoaround% %actor% ~%actor% vanishes in a flourish of yellow light!
+      * 2-step teleport to get them to the outside
+      %teleport% %actor% %destination%
+      set destination %instance.location%
+      %teleport% %actor% %destination%
+      %force% %actor% look
+      %echoaround% %actor% ~%actor% appears in a flourish of yellow light!
+    break
+  done
+  eval cycle %cycle% + 1
+done
+* cleanup
 nop %actor.set_cooldown(10738, 43200)%
 nop %actor.cancel_adventure_summon%
+%force% %actor% stop cleardata
 ~
 #10739
 Jack Horner~
@@ -644,7 +763,7 @@ switch %random.3%
 done
 ~
 #10744
-Mini-pet use - little lamb bell version~
+Minipet use - little lamb bell version~
 1 c 3
 ring~
 if %actor.obj_target(%arg%)% != %self% && !(%self.is_name(%arg%)% && %self.worn_by%)
@@ -652,10 +771,10 @@ if %actor.obj_target(%arg%)% != %self% && !(%self.is_name(%arg%)% && %self.worn_
   halt
 end
 if %actor.has_minipet(%self.val0%)%
-  %send% %actor% You already have the lamb mini-pet.
+  %send% %actor% You already have the lamb minipet.
 else
   nop %actor.add_minipet(%self.val0%)%
-  %send% %actor% You ring @%self% and gain a little lamb mini-pet! (see HELP MINIPET)
+  %send% %actor% You ring @%self% and gain a little lamb minipet! (see HELP MINIPET)
   %echoaround% %actor% ~%actor% rings @%self%.
 end
 ~
@@ -696,6 +815,84 @@ if (%self.vnum% != 10746)
   mmove
   mmove
 end
+~
+#10749
+Mother Goose: Breadcrumbs teleport you home~
+1 c 2
+use~
+* breadcrumb trinket: shorter copy of hestian trinket
+if %actor.obj_target(%arg%)% != %self%
+  return 0
+  halt
+end
+if %actor.position% != Standing || %actor.action% || %actor.fighting%
+  %send% %actor% You can't do that right now.
+  halt
+end
+if !%actor.can_teleport_room% || !%actor.canuseroom_guest%
+  %send% %actor% You can't teleport out of here.
+  halt
+end
+set home %actor.home%
+if !%home%
+  %send% %actor% You have no home to teleport back to with these breadcrumbs (see HELP HOME).
+  halt
+end
+set veh %home.in_vehicle%
+if %veh%
+  set outside_room %veh.room%
+  if !%actor.canuseroom_guest(%outside_room%)%
+    %send% %actor% You can't teleport home to a vehicle that's parked on foreign territory you don't have permission to use!
+    halt
+  elseif !%actor.can_teleport_room(%outside_room%)%
+    %send% %actor% You can't teleport to your home's current location.
+    halt
+  end
+end
+* check tiemr
+if %actor.cooldown(10749)%
+  %send% %actor% Your %cooldown10749% is on cooldown!
+  halt
+end
+set room_var %actor.room%
+* set up 'stop' command
+set stop_command 0
+set stop_message_char You stop using %self.shortdesc%.
+set stop_message_room ~%actor% stops using %self.shortdesc%.
+set needs_stop_command 1
+remote stop_command %actor.id%
+remote stop_message_char %actor.id%
+remote stop_message_room %actor.id%
+remote needs_stop_command %actor.id%
+* start going
+%send% %actor% You sprinkle some breadcrumbs and feel the wind whip them up into the air...
+%echoaround% %actor% ~%actor% sprinkles some breadcrumbs, which catch the wind and whirl around *%actor%...
+set cycle 0
+while %cycle% < 2
+  wait 5 sec
+  if %actor.stop_command% || %actor.room% != %room_var% || %actor.fighting% || !%actor.home% || %self.carried_by% != %actor% || %actor.aff_flagged(DISTRACTED)% || %actor.action%
+    %force% %actor% stop cleardata
+    %send% %actor% The breadcrums that were whirling around you fall to the ground and rot.
+    halt
+  end
+  switch %cycle%
+    case 0
+      %send% %actor% You're enveloped by a swirl of breadcrumbs...
+      %echoaround% %actor% ~%actor% is enveloped by the swirl of breadcrumbs...
+    break
+    case 1
+      %echoaround% %actor% ~%actor% vanishes in a burst of breadcrumbs!
+      %teleport% %actor% %actor.home%
+      %force% %actor% look
+      %echoaround% %actor% ~%actor% appears in a burst of breadcrumbs!
+    break
+  done
+  eval cycle %cycle% + 1
+done
+* cleanup
+nop %actor.set_cooldown(10749, 300)%
+nop %actor.cancel_adventure_summon%
+%force% %actor% stop cleardata
 ~
 #10750
 Sell spider parts to Miner Nynar~
@@ -1037,13 +1234,11 @@ if %target.affect(10760)%
 end
 nop %self.cooldown(10761, 15)%
 * Valid target found, start attack
-%echo% ~%self% twists around, pointing ^%self% spinneret at ~%target%...
-set verify_target %target.id%
+%send% %target% ~%self% twists around, pointing ^%self% spinneret at you...
+%echoaround% %target% ~%self% twists around, pointing ^%self% spinneret at ~%target%...
 wait 3 sec
-if %verify_target% != %actor.id%
-  halt
-end
-%echo% A stream of sticky webs flies out, binding |%target% limbs!
+%send% %target% A stream of sticky webs flies out, binding your limbs!
+%echoaround% %target% A stream of sticky webs flies out, binding |%target% limbs!
 %send% %target% Type 'struggle' to break free!
 dg_affect #10760 %actor% STUNNED on 15
 ~

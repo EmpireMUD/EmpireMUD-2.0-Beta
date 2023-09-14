@@ -288,7 +288,7 @@ bool move_vehicle(char_data *ch, vehicle_data *veh, int dir, int subcmd) {
 	}
 	if (!IS_COMPLETE(to_room) && (!WATER_SECT(to_room) || !VEH_FLAGGED(veh, VEH_SAILING | VEH_FLYING))) {
 		if (ch) {
-			msg_to_char(ch, "You can't %s in there until it's complete.\r\n", drive_data[subcmd].command);
+			msg_to_char(ch, "You can't %s in there until it's %s.\r\n", drive_data[subcmd].command, IS_DISMANTLING(to_room) ? "fully dismantled" : "complete");
 		}
 		return FALSE;
 	}
@@ -317,7 +317,7 @@ bool move_vehicle(char_data *ch, vehicle_data *veh, int dir, int subcmd) {
 	vehicle_from_room(veh);
 	vehicle_to_room(veh, to_room);
 	
-	if (!entry_vtrigger(veh)) {
+	if (!entry_vtrigger(veh, "move")) {
 		vehicle_from_room(veh);
 		vehicle_to_room(veh, was_in);
 		return FALSE;
@@ -355,10 +355,12 @@ bool move_vehicle(char_data *ch, vehicle_data *veh, int dir, int subcmd) {
 			act(buf, FALSE, VEH_SITTING_ON(veh), NULL, veh, TO_CHAR);
 		}
 		
+		enter_wtrigger(IN_ROOM(VEH_SITTING_ON(veh)), VEH_SITTING_ON(veh), dir, "move");
 		entry_memory_mtrigger(VEH_SITTING_ON(veh));
-		greet_mtrigger(VEH_SITTING_ON(veh), dir);
+		pre_greet_mtrigger(VEH_SITTING_ON(veh), to_room, dir, "move");	// cannot pre-greet for this
+		greet_mtrigger(VEH_SITTING_ON(veh), dir, "move");
 		greet_memory_mtrigger(VEH_SITTING_ON(veh));
-		greet_vtrigger(VEH_SITTING_ON(veh), NO_DIR);
+		greet_vtrigger(VEH_SITTING_ON(veh), dir, "move");
 		msdp_update_room(VEH_SITTING_ON(veh));
 		
 		LL_FOREACH_SAFE(VEH_SITTING_ON(veh)->followers, fol, next_fol) {
@@ -479,6 +481,17 @@ bool perform_put_obj_in_vehicle(char_data *ch, obj_data *obj, vehicle_data *veh)
 		return FALSE;
 	}
 	
+	
+	// don't let people drop bound items in other people's vehicles
+	if (OBJ_BOUND_TO(obj) && VEH_OWNER(veh) && VEH_OWNER(veh) != GET_LOYALTY(ch)) {
+		msg_to_char(ch, "You can't put bound items in there.\r\n");
+		return FALSE;
+	}
+	if (GET_OBJ_REQUIRES_QUEST(obj) != NOTHING && !IS_NPC(ch) && !IS_IMMORTAL(ch)) {
+		act("$p: you can't put quest items in there.", FALSE, ch, obj, NULL, TO_CHAR);
+		return FALSE;
+	}
+	
 	if (VEH_CARRYING_N(veh) + obj_carry_size(obj) > VEH_CAPACITY(veh)) {
 		act("$p won't fit in $V.", FALSE, ch, obj, veh, TO_CHAR | TO_QUEUE);
 		return FALSE;
@@ -521,18 +534,24 @@ void perform_load_mob(char_data *ch, char_data *mob, vehicle_data *cont, room_da
 	act(buf, FALSE, ch, cont, mob, TO_NOTVICT | ACT_VEHICLE_OBJ);
 	
 	char_to_room(mob, to_room);
+	pre_greet_mtrigger(mob, IN_ROOM(mob), NO_DIR, "enter");	// cannot pre-greet for this
 	if (mob->desc) {
 		look_at_room(mob);
+	}
+	
+	// update spawn time: delay despawn due to interaction
+	if (MOB_FLAGGED(mob, MOB_SPAWNED)) {
+		set_mob_spawn_time(mob, time(0));
 	}
 	
 	snprintf(buf, sizeof(buf), "$n is loaded %sto $V.", IN_OR_ON(cont));
 	act(buf, FALSE, mob, NULL, cont, TO_ROOM);
 	
-	enter_wtrigger(IN_ROOM(mob), mob, NO_DIR);
+	enter_wtrigger(IN_ROOM(mob), mob, NO_DIR, "enter");
 	entry_memory_mtrigger(mob);
-	greet_mtrigger(mob, NO_DIR);
+	greet_mtrigger(mob, NO_DIR, "enter");
 	greet_memory_mtrigger(mob);
-	greet_vtrigger(mob, NO_DIR);
+	greet_vtrigger(mob, NO_DIR, "enter");
 	msdp_update_room(mob);	// is this possibly a person?
 }
 
@@ -574,17 +593,23 @@ void perform_unload_mob(char_data *ch, char_data *mob, vehicle_data *cont) {
 	act("$n unloads $N from $v.", FALSE, ch, cont, mob, TO_NOTVICT | ACT_VEHICLE_OBJ);
 	
 	char_to_room(mob, IN_ROOM(cont));
+	pre_greet_mtrigger(mob, IN_ROOM(mob), NO_DIR, "exit");	// cannot pre-greet for this
 	if (mob->desc) {
 		look_at_room(mob);
 	}
 	
+	// update spawn time: delay despawn due to interaction
+	if (MOB_FLAGGED(mob, MOB_SPAWNED)) {
+		set_mob_spawn_time(mob, time(0));
+	}
+	
 	act("$n is unloaded from $V.", FALSE, mob, NULL, cont, TO_ROOM);
 	
-	enter_wtrigger(IN_ROOM(mob), mob, NO_DIR);
+	enter_wtrigger(IN_ROOM(mob), mob, NO_DIR, "exit");
 	entry_memory_mtrigger(mob);
-	greet_mtrigger(mob, NO_DIR);
+	greet_mtrigger(mob, NO_DIR, "exit");
 	greet_memory_mtrigger(mob);
-	greet_vtrigger(mob, NO_DIR);
+	greet_vtrigger(mob, NO_DIR, "exit");
 	msdp_update_room(mob);	// is this possibly a person?
 }
 
@@ -974,18 +999,24 @@ void do_customize_vehicle(char_data *ch, char *argument) {
 *
 * @param char_data *ch The douser.
 * @param vehicle_data *veh The burning vehicle.
-* @param obj_data *cont The liquid container full of water.
+* @param obj_data *cont Optional: The liquid container full of water (may be NULL).
 */
 void do_douse_vehicle(char_data *ch, vehicle_data *veh, obj_data *cont) {
 	if (!VEH_FLAGGED(veh, VEH_ON_FIRE)) {
 		msg_to_char(ch, "It's not even on fire!\r\n");
 	}
 	else {
-		set_obj_val(cont, VAL_DRINK_CONTAINER_CONTENTS, 0);
-		remove_vehicle_flags(veh, VEH_ON_FIRE);
+		if (cont) {
+			set_obj_val(cont, VAL_DRINK_CONTAINER_CONTENTS, 0);
+			act("You put out the fire on $V with $p!", FALSE, ch, cont, veh, TO_CHAR);
+			act("$n puts out the fire on $V with $p!", FALSE, ch, cont, veh, TO_ROOM);
+		}
+		else {
+			act("You put out the fire on $V!", FALSE, ch, NULL, veh, TO_CHAR);
+			act("$n puts out the fire on $V!", FALSE, ch, NULL, veh, TO_ROOM);
+		}
 		
-		act("You put out the fire on $V with $p!", FALSE, ch, cont, veh, TO_CHAR);
-		act("$n puts out the fire on $V with $p!", FALSE, ch, cont, veh, TO_ROOM);
+		remove_vehicle_flags(veh, VEH_ON_FIRE);
 		msg_to_vehicle(veh, FALSE, "The flames have been extinguished!\r\n");
 	}
 }
@@ -1072,13 +1103,21 @@ void do_light_vehicle(char_data *ch, vehicle_data *veh, obj_data *lighter) {
 		msg_to_char(ch, "Mobs can't light %ss on fire.\r\n", VEH_OR_BLD(veh));
 	}
 	else if (!VEH_FLAGGED(veh, VEH_BURNABLE)) {
-		msg_to_char(ch, "You can't seem to get it to burn.\r\n");
+		msg_to_char(ch, "It doesn't seem to be flammable\r\n");
 	}
 	else if (VEH_FLAGGED(veh, VEH_ON_FIRE)) {
 		msg_to_char(ch, "It is already on fire!\r\n");
 	}
 	else if (VEH_OWNER(veh) && GET_LOYALTY(ch) != VEH_OWNER(veh) && !has_relationship(GET_LOYALTY(ch), VEH_OWNER(veh), DIPL_WAR)) {
+		// owned vehicle
 		msg_to_char(ch, "You can't burn %s %ss unless you're at war.\r\n", EMPIRE_ADJECTIVE(VEH_OWNER(veh)), VEH_OR_BLD(veh));
+	}
+	else if (!VEH_OWNER(veh) && ROOM_OWNER(IN_ROOM(veh)) && GET_LOYALTY(ch) != ROOM_OWNER(IN_ROOM(veh)) && !has_relationship(GET_LOYALTY(ch), ROOM_OWNER(IN_ROOM(veh)), DIPL_WAR)) {
+		// unowned vehicle in owned room
+		msg_to_char(ch, "You can't burn %ss on %s land unless you're at war.\r\n", VEH_OR_BLD(veh), EMPIRE_ADJECTIVE(ROOM_OWNER(IN_ROOM(veh))));
+	}
+	else if (VEH_OWNER(veh) && GET_LOYALTY(ch) == VEH_OWNER(veh) && !HAS_DISMANTLE_PRIV_FOR_VEHICLE(ch, veh)) {
+		msg_to_char(ch, "You don't have permission to burn the empire's %ss (it requires the dismantle privilege).\r\n", VEH_OR_BLD(veh));
 	}
 	else {
 		snprintf(buf, sizeof(buf), "You %s $V on fire!", (lighter ? "use $p to light" : "light"));
@@ -1373,6 +1412,9 @@ ACMD(do_dispatch) {
 	// vehicle validation
 	else if (!(veh = find_ship_to_dispatch(ch, targ))) {
 		msg_to_char(ch, "You can't find any ship like that to dispatch on this island.\r\n");
+	}
+	else if (!VEH_OWNER(veh)) {
+		msg_to_char(ch, "You can't dispatch an unclaimed vessel.\r\n");
 	}
 	else if (!can_use_vehicle(ch, veh, MEMBERS_ONLY)) {
 		msg_to_char(ch, "You don't have permission to dispatch that.\r\n");
@@ -1707,7 +1749,7 @@ ACMD(do_drive) {
 	
 	skip_run_filler(&argument);
 	dir_only = !strchr(argument, ' ') && (parse_direction(ch, argument) != NO_DIR);	// only 1 word, and is a direction
-	path_to_room = (*argument && HAS_NAVIGATION(ch)) ? parse_room_from_coords(argument) : NULL;	// maybe
+	path_to_room = *argument ? parse_room_from_coords(argument) : NULL;	// maybe
 	
 	// basics
 	if (IS_NPC(ch)) {
@@ -1736,6 +1778,17 @@ ACMD(do_drive) {
 	else if (!VEH_FLAGGED(veh, drive_data[subcmd].flag)) {
 		snprintf(buf, sizeof(buf), "You can't %s $V!", drive_data[subcmd].command);
 		act(buf, FALSE, ch, NULL, veh, TO_CHAR);
+		
+		// helpful hint
+		if (VEH_FLAGGED(veh, VEH_FLYING)) {
+			msg_to_char(ch, "Try using 'pilot' instead.\r\n");
+		}
+		else if (VEH_FLAGGED(veh, VEH_SAILING)) {
+			msg_to_char(ch, "Try using 'sail' instead.\r\n");
+		}
+		else if (VEH_FLAGGED(veh, VEH_DRIVING)) {
+			msg_to_char(ch, "Try using 'drive' instead.\r\n");
+		}
 	}
 	else if (VEH_IS_DISMANTLING(veh)) {
 		act("$V isn't going anywhere now that it's being dismantled.", FALSE, ch, NULL, veh, TO_CHAR);
@@ -1749,7 +1802,7 @@ ACMD(do_drive) {
 	else if (count_harnessed_animals(veh) < VEH_ANIMALS_REQUIRED(veh)) {
 		msg_to_char(ch, "You must harness %d more animal%s to it first.\r\n", (VEH_ANIMALS_REQUIRED(veh) - count_harnessed_animals(veh)), PLURAL(VEH_ANIMALS_REQUIRED(veh) - count_harnessed_animals(veh)));
 	}
-	else if (veh == GET_ROOM_VEHICLE(IN_ROOM(ch)) && !ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_LOOK_OUT)) {
+	else if (veh == GET_ROOM_VEHICLE(IN_ROOM(ch)) && !CAN_LOOK_OUT(IN_ROOM(ch))) {
 		msg_to_char(ch, "You can't %s here because you can't see outside.\r\n", drive_data[subcmd].command);
 	}
 	else if (!can_use_vehicle(ch, veh, MEMBERS_ONLY)) {
@@ -1774,6 +1827,9 @@ ACMD(do_drive) {
 	}
 	else if (strlen(argument) > 2 && (portal = get_obj_in_list_vis(ch, argument, NULL, ROOM_CONTENTS(IN_ROOM(veh)))) && IS_PORTAL(portal)) {
 		do_drive_through_portal(ch, veh, portal, subcmd);
+	}
+	else if (path_to_room && !HAS_NAVIGATION(ch)) {
+		msg_to_char(ch, "You need a navigation ability to %s using coordinates.\r\n", drive_data[subcmd].command);
 	}
 	else if (!dir_only && !path_to_room && !parse_next_dir_from_string(ch, argument, &dir, &dist, TRUE)) {
 		// sends own error
@@ -1885,7 +1941,7 @@ ACMD(do_fire) {
 	else if (!*veh_arg || !*tar_arg) {
 		msg_to_char(ch, "Usage: fire <vehicle> <direction | target vehicle>\r\n");
 	}
-	else if (!has_resources(ch, ammo, can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED), TRUE)) {
+	else if (!has_resources(ch, ammo, can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED), TRUE, NULL)) {
 		// sends own error message
 	}
 	
@@ -1991,7 +2047,7 @@ ACMD(do_harness) {
 		send_config_msg(ch, "no_person");
 	}
 	else if (!(veh = get_vehicle_in_room_vis(ch, arg2, NULL))) {
-		msg_to_char(ch, "You don't see a %s here.\r\n", arg2);
+		msg_to_char(ch, "You don't see %s %s here.\r\n", AN(arg2), arg2);
 	}
 	else if (count_harnessed_animals(veh) >= VEH_ANIMALS_REQUIRED(veh)) {
 		msg_to_char(ch, "You can't harness %s animals to it.\r\n", count_harnessed_animals(veh) == 0 ? "any" : "any more");
@@ -2038,6 +2094,11 @@ ACMD(do_lead) {
 	one_argument(argument, arg);
 	
 	if (GET_LEADING_MOB(ch)) {
+		// update spawn time: delay despawn due to interaction
+		if (MOB_FLAGGED(GET_LEADING_MOB(ch), MOB_SPAWNED)) {
+			set_mob_spawn_time(GET_LEADING_MOB(ch), time(0));
+		}
+		
 		act("You stop leading $N.", FALSE, ch, NULL, GET_LEADING_MOB(ch), TO_CHAR);
 		act("$n stops leading $N.", FALSE, ch, NULL, GET_LEADING_MOB(ch), TO_ROOM);
 		GET_LED_BY(GET_LEADING_MOB(ch)) = NULL;
@@ -2086,6 +2147,11 @@ ACMD(do_lead) {
 			act("$n begins to lead $N.", TRUE, ch, NULL, mob, TO_ROOM);
 			GET_LEADING_MOB(ch) = mob;
 			GET_LED_BY(mob) = ch;
+			
+			// update spawn time: delay despawn due to interaction
+			if (MOB_FLAGGED(mob, MOB_SPAWNED)) {
+				set_mob_spawn_time(mob, time(0));
+			}
 		}
 	}
 	else if ((veh = get_vehicle_in_room_vis(ch, arg, NULL))) {
@@ -2177,7 +2243,7 @@ ACMD(do_load_vehicle) {
 				if (!MOB_FLAGGED(mob, MOB_ANIMAL | MOB_MOUNTABLE) || GET_LED_BY(mob)) {
 					continue;
 				}
-				if (GET_POS(mob) < POS_STANDING || FIGHTING(mob) || AFF_FLAGGED(mob, AFF_ENTANGLED) || GET_FED_ON_BY(mob)) {
+				if (GET_POS(mob) < POS_STANDING || FIGHTING(mob) || AFF_FLAGGED(mob, AFF_IMMOBILIZED) || GET_FED_ON_BY(mob)) {
 					continue;
 				}
 			
@@ -2221,7 +2287,7 @@ ACMD(do_load_vehicle) {
 		else if (!VEH_FLAGGED(cont, VEH_CARRY_MOBS)) {
 			act("$v won't carry mobs.", FALSE, ch, cont, NULL, TO_CHAR | ACT_VEHICLE_OBJ);
 		}
-		else if (GET_POS(mob) < POS_STANDING || FIGHTING(mob) || AFF_FLAGGED(mob, AFF_ENTANGLED) || GET_FED_ON_BY(mob)) {
+		else if (GET_POS(mob) < POS_STANDING || FIGHTING(mob) || AFF_FLAGGED(mob, AFF_IMMOBILIZED) || GET_FED_ON_BY(mob)) {
 			act("You can't load $M right now.", FALSE, ch, NULL, mob, TO_CHAR);
 		}
 		else if (GET_LED_BY(mob)) {
@@ -2260,15 +2326,15 @@ ACMD(do_load_vehicle) {
 			act("You don't have permission to load $V.", FALSE, ch, NULL, veh, TO_CHAR);
 		}
 		else if (VEH_DRIVER(veh)) {
-			msg_to_char(ch, "You can't load %s while %s driving it.\r\n", VEH_SHORT_DESC(veh), VEH_DRIVER(veh) == ch ? "you're" : "someone else is");
+			msg_to_char(ch, "You can't load %s while %s driving it.\r\n", get_vehicle_short_desc(veh, ch), VEH_DRIVER(veh) == ch ? "you're" : "someone else is");
 		}
 		else if (VEH_LED_BY(veh)) {
-			msg_to_char(ch, "You can't load %s while %s leading it.\r\n", VEH_SHORT_DESC(veh), VEH_LED_BY(veh) == ch ? "you're" : "someone else is");
+			msg_to_char(ch, "You can't load %s while %s leading it.\r\n", get_vehicle_short_desc(veh, ch), VEH_LED_BY(veh) == ch ? "you're" : "someone else is");
 		}
 		else if (VEH_SITTING_ON(veh)) {
 			snprintf(buf, sizeof(buf), "%s", position_types[GET_POS(VEH_SITTING_ON(veh))]);
 			*buf = LOWER(*buf);
-			msg_to_char(ch, "You can't load %s while %s %s %s it.\r\n", VEH_SHORT_DESC(veh), VEH_SITTING_ON(veh) == ch ? "you're" : "someone else is", buf, IN_OR_ON(veh));
+			msg_to_char(ch, "You can't load %s while %s %s %s it.\r\n", get_vehicle_short_desc(veh, ch), VEH_SITTING_ON(veh) == ch ? "you're" : "someone else is", buf, IN_OR_ON(veh));
 		}
 		else {
 			perform_load_vehicle(ch, veh, cont, to_room);
@@ -2340,10 +2406,10 @@ ACMD(do_unharness) {
 		msg_to_char(ch, "Unharness which animal from which vehicle?\r\n");
 	}
 	else if (!(veh = get_vehicle_in_room_vis(ch, arg2, NULL))) {
-		msg_to_char(ch, "You don't see a %s here.\r\n", arg2);
+		msg_to_char(ch, "You don't see %s %s here.\r\n", AN(arg2), arg2);
 	}
 	else if (*arg1 && !(animal = find_harnessed_mob_by_name(veh, arg1))) {
-		msg_to_char(ch, "There isn't a %s harnessed to it.", arg1);
+		msg_to_char(ch, "There isn't %s %s harnessed to it.", AN(arg1), arg1);
 	}
 	else if (count_harnessed_animals(veh) == 0 && !animal) {
 		act("There isn't anything harnessed to $V.", FALSE, ch, NULL, veh, TO_CHAR);
@@ -2410,7 +2476,7 @@ ACMD(do_unload_vehicle) {
 				if (!MOB_FLAGGED(mob, MOB_ANIMAL | MOB_MOUNTABLE) || GET_LED_BY(mob)) {
 					continue;
 				}
-				if (GET_POS(mob) < POS_STANDING || FIGHTING(mob) || AFF_FLAGGED(mob, AFF_ENTANGLED) || GET_FED_ON_BY(mob)) {
+				if (GET_POS(mob) < POS_STANDING || FIGHTING(mob) || AFF_FLAGGED(mob, AFF_IMMOBILIZED) || GET_FED_ON_BY(mob)) {
 					continue;
 				}
 			
@@ -2454,7 +2520,7 @@ ACMD(do_unload_vehicle) {
 		else if (GET_ROOM_VEHICLE(IN_ROOM(cont)) && !VEH_FLAGGED(GET_ROOM_VEHICLE(IN_ROOM(cont)), VEH_CARRY_MOBS)) {
 			msg_to_char(ch, "You can't unload mobs here.\r\n");
 		}
-		else if (GET_POS(mob) < POS_STANDING || FIGHTING(mob) || AFF_FLAGGED(mob, AFF_ENTANGLED) || GET_FED_ON_BY(mob)) {
+		else if (GET_POS(mob) < POS_STANDING || FIGHTING(mob) || AFF_FLAGGED(mob, AFF_IMMOBILIZED) || GET_FED_ON_BY(mob)) {
 			act("You can't unload $M right now.", FALSE, ch, NULL, mob, TO_CHAR);
 		}
 		else if (GET_LED_BY(mob)) {
@@ -2489,15 +2555,15 @@ ACMD(do_unload_vehicle) {
 			act("You don't have permission to unload $V.", FALSE, ch, NULL, veh, TO_CHAR);
 		}
 		else if (VEH_DRIVER(veh)) {
-			msg_to_char(ch, "You can't unload %s while %s driving it.\r\n", VEH_SHORT_DESC(veh), VEH_DRIVER(veh) == ch ? "you're" : "someone else is");
+			msg_to_char(ch, "You can't unload %s while %s driving it.\r\n", get_vehicle_short_desc(veh, ch), VEH_DRIVER(veh) == ch ? "you're" : "someone else is");
 		}
 		else if (VEH_LED_BY(veh)) {
-			msg_to_char(ch, "You can't unload %s while %s leading it.\r\n", VEH_SHORT_DESC(veh), VEH_LED_BY(veh) == ch ? "you're" : "someone else is");
+			msg_to_char(ch, "You can't unload %s while %s leading it.\r\n", get_vehicle_short_desc(veh, ch), VEH_LED_BY(veh) == ch ? "you're" : "someone else is");
 		}
 		else if (VEH_SITTING_ON(veh)) {
 			snprintf(buf, sizeof(buf), "%s", position_types[GET_POS(VEH_SITTING_ON(veh))]);
 			*buf = LOWER(*buf);
-			msg_to_char(ch, "You can't unload %s while %s %s %s it.\r\n", VEH_SHORT_DESC(veh), VEH_SITTING_ON(veh) == ch ? "you're" : "someone else is", buf, IN_OR_ON(veh));
+			msg_to_char(ch, "You can't unload %s while %s %s %s it.\r\n", get_vehicle_short_desc(veh, ch), VEH_SITTING_ON(veh) == ch ? "you're" : "someone else is", buf, IN_OR_ON(veh));
 		}
 		else {
 			perform_unload_vehicle(ch, veh, cont);

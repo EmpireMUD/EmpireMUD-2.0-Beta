@@ -1,6 +1,6 @@
 #205
 Bodyguard refresh and cooldown on death~
-0 f 100
+0 ft 100
 ~
 * partial copy of 9803
 * This script deletes a companion's entry when it dies.
@@ -109,11 +109,25 @@ done
 Hestian Trinket~
 1 c 2
 use~
+* HESTIAN TRINKET: basic timed teleport home; paramenters:
+* val0: cooldown vnum (-1 for none, defaults to 256 if 0)
+* val1: cooldown time (defaults to 3600 if 0)
+* script1: the teleport sequence sent to the character, sent in order
+*   first script1 message is when the actor touches/uses it
+*   remaining script1 messages are sent to the actor every 5 seconds
+* script2: the teleport sequence sent to the room, sent in order
+*   script1 and script2 must match up with the same number of messages
+* script3 (custom): the actor-disappears message, sent to the room
+* script4 (custom): the actor-appears message, sent to the room
+* script5 (custom): cancel mesasge (to actor)
+set default_cooldown_vnum 256
+set default_cooldown_time 3600
+* checks
 if %actor.obj_target(%arg%)% != %self%
   return 0
   halt
 end
-if (%actor.position% != Standing)
+if %actor.position% != Standing || %actor.action% || %actor.fighting%
   %send% %actor% You can't do that right now.
   halt
 end
@@ -123,7 +137,7 @@ if !%actor.can_teleport_room% || !%actor.canuseroom_guest%
 end
 set home %actor.home%
 if !%home%
-  %send% %actor% You have no home to teleport back to with this trinket.
+  %send% %actor% You have no home to teleport back to with @%self% (see HELP HOME).
   halt
 end
 set veh %home.in_vehicle%
@@ -137,30 +151,99 @@ if %veh%
     halt
   end
 end
+* detect configs
+if %self.val0% == -1
+  set cooldown_vnum 0
+elseif %self.val0% == 0
+  set cooldown_vnum %default_cooldown_vnum%
+else
+  set cooldown_vnum %self.val0%
+end
+if %self.val1% == -1
+  set cooldown_time 0
+elseif %self.val1% == 0
+  set cooldown_time %default_cooldown_time%
+else
+  set cooldown_time %self.val1%
+end
 * once per 60 minutes
-if %actor.cooldown(256)%
-  %send% %actor% Your %cooldown.256% is on cooldown!
+if %cooldown_vnum% && %actor.cooldown(%cooldown_vnum%)%
+  eval cooldown_name %%cooldown.%cooldown_vnum%%%
+  %send% %actor% Your %cooldown_name% is still on cooldown!
   halt
 end
 set room_var %actor.room%
-%send% %actor% You touch @%self% and it begins to swirl with light...
-%echoaround% %actor% ~%actor% touches @%self% and it begins to swirl with light...
-wait 5 sec
-if %actor.room% != %room_var% || %actor.fighting% || !%actor.home% || %self.carried_by% != %actor% || %actor.aff_flagged(DISTRACTED)%
-  halt
+* set up 'stop' command
+set stop_command 0
+set stop_message_char You stop using %self.shortdesc%.
+set stop_message_room ~%actor% stops using %self.shortdesc%.
+set needs_stop_command 1
+remote stop_command %actor.id%
+remote stop_message_char %actor.id%
+remote stop_message_room %actor.id%
+remote needs_stop_command %actor.id%
+* start going
+set to_ch %self.custom(script1,0)%
+if !%to_ch.empty%
+  %send% %actor% %to_ch.process%
+else
+  %send% %actor% You touch @%self% and it begins to swirl with light...
 end
-%send% %actor% @%self% glows a bright blue and the light begins to envelop you!
-%echoaround% %actor% @%self% glows a bright blue and the light begins to envelop ~%actor%!
-wait 5 sec
-if %actor.room% != %room_var% || %actor.fighting% || !%actor.home% || %self.carried_by% != %actor% || %actor.aff_flagged(DISTRACTED)%
-  halt
+set to_room %self.custom(script2,0)%
+if !%to_room.empty%
+  %echoaround% %actor% %to_room.process%
+else
+  %echoaround% %actor% ~%actor% touches @%self% and it begins to swirl with light...
 end
-%echoaround% %actor% ~%actor% vanishes in a flash of light!
+set message 1
+set done 0
+while !%done%
+  wait 5 sec
+  * check cancellation
+  if %actor.stop_command% || %actor.room% != %room_var% || %actor.fighting% || !%actor.home% || %self.carried_by% != %actor% || %actor.aff_flagged(DISTRACTED)% || %actor.action%
+    %force% %actor% stop cleardata
+    set to_ch %self.custom(script5)%
+    if !%to_ch.empty%
+      %send% %actor% %to_ch.process%
+    else
+      %send% %actor% The swirling light from @%self% fades.
+    end
+    halt
+  end
+  * check next message
+  set to_ch %self.custom(script1,%message%)%
+  set to_room %self.custom(script2,%message%)%
+  if %to_ch.empty% || %to_room.empty%
+    set done 1
+  else
+    %send% %actor% %to_ch.process%
+    %echoaround% %actor% %to_room.process%
+  end
+  eval message %message% + 1
+done
+* vanish message
+set to_room %self.custom(script3)%
+if !%to_room.empty%
+  %echoaround% %actor% %to_room.process%
+else
+  %echoaround% %actor% ~%actor% vanishes in a flash of light!
+end
+* teleport
 %teleport% %actor% %actor.home%
 %force% %actor% look
-%echoaround% %actor% ~%actor% appears in a flash of light!
-nop %actor.set_cooldown(256, 3600)%
+* arrive message
+set to_room %self.custom(script4)%
+if !%to_room.empty%
+  %echoaround% %actor% %to_room.process%
+else
+  %echoaround% %actor% ~%actor% appears in a flash of light!
+end
+* cleanup
+if %cooldown_vnum% > 0 && %cooldown_time% > 0
+  nop %actor.set_cooldown(%cooldown_vnum%, %cooldown_time%)%
+end
 nop %actor.cancel_adventure_summon%
+%force% %actor% stop cleardata
 ~
 #257
 Start Brick Tutorial~
@@ -204,11 +287,25 @@ end
 Trinket of Conveyance~
 1 c 2
 use~
+* TRINKET OF CONVEYANCE: teleports the player to a starting location; params:
+* val0: cooldown vnum (-1 for none, defaults to 262 if 0)
+* val1: cooldown time (defaults to 1800 if 0)
+* script1: the teleport sequence sent to the character, sent in order
+*   first script1 message is when the actor touches/uses it
+*   remaining script1 messages are sent to the actor every 5 seconds
+* script2: the teleport sequence sent to the room, sent in order
+*   script1 and script2 must match up with the same number of messages
+* script3 (custom): the actor-disappears message, sent to the room
+* script4 (custom): the actor-appears message, sent to the room
+* script5 (custom): cancel mesasge (to actor)
+set default_cooldown_vnum 262
+set default_cooldown_time 1800
+* checks
 if %actor.obj_target(%arg%)% != %self%
   return 0
   halt
 end
-if (%actor.position% != Standing)
+if %actor.position% != Standing || %actor.action% || %actor.fighting%
   %send% %actor% You can't do that right now.
   halt
 end
@@ -216,30 +313,99 @@ if !%actor.can_teleport_room% || !%actor.canuseroom_guest%
   %send% %actor% You can't teleport out of here.
   halt
 end
+* detect configs
+if %self.val0% == -1
+  set cooldown_vnum 0
+elseif %self.val0% == 0
+  set cooldown_vnum %default_cooldown_vnum%
+else
+  set cooldown_vnum %self.val0%
+end
+if %self.val1% == -1
+  set cooldown_time 0
+elseif %self.val1% == 0
+  set cooldown_time %default_cooldown_time%
+else
+  set cooldown_time %self.val1%
+end
 * once per 30 minutes
-if %actor.cooldown(262)%
-  %send% %actor% Your %cooldown.262% is still on cooldown!
+if %cooldown_vnum% && %actor.cooldown(%cooldown_vnum%)%
+  eval cooldown_name %%cooldown.%cooldown_vnum%%%
+  %send% %actor% Your %cooldown_name% is still on cooldown!
   halt
 end
 set room_var %actor.room%
-%send% %actor% You touch @%self% and it begins to swirl with light...
-%echoaround% %actor% ~%actor% touches @%self% and it begins to swirl with light...
-wait 5 sec
-if %actor.room% != %room_var% || %actor.fighting% || %self.carried_by% != %actor% || %actor.aff_flagged(DISTRACTED)%
-  halt
+* set up 'stop' command
+set stop_command 0
+set stop_message_char You stop using %self.shortdesc%.
+set stop_message_room ~%actor% stops using %self.shortdesc%.
+set needs_stop_command 1
+remote stop_command %actor.id%
+remote stop_message_char %actor.id%
+remote stop_message_room %actor.id%
+remote needs_stop_command %actor.id%
+* start going
+set to_ch %self.custom(script1,0)%
+if !%to_ch.empty%
+  %send% %actor% %to_ch.process%
+else
+  %send% %actor% You touch @%self% and it begins to swirl with light...
 end
-%send% %actor% Yellow light begins to whirl around you...
-%echoaround% %actor% Yellow light begins to whirl around ~%actor%...
-wait 5 sec
-if %actor.room% != %room_var% || %actor.fighting% || %self.carried_by% != %actor% || %actor.aff_flagged(DISTRACTED)%
-  halt
+set to_room %self.custom(script2,0)%
+if !%to_room.empty%
+  %echoaround% %actor% %to_room.process%
+else
+  %echoaround% %actor% ~%actor% touches @%self% and it begins to swirl with light...
 end
-%echoaround% %actor% ~%actor% vanishes in a flourish of yellow light!
+set message 1
+set done 0
+while !%done%
+  wait 5 sec
+  * check cancellation
+  if %actor.stop_command% || %actor.room% != %room_var% || %actor.fighting% || %self.carried_by% != %actor% || %actor.aff_flagged(DISTRACTED)% || %actor.action%
+    %force% %actor% stop cleardata
+    set to_ch %self.custom(script5)%
+    if !%to_ch.empty%
+      %send% %actor% %to_ch.process%
+    else
+      %send% %actor% The swirling light from @%self% fades.
+    end
+    halt
+  end
+  * check next message
+  set to_ch %self.custom(script1,%message%)%
+  set to_room %self.custom(script2,%message%)%
+  if %to_ch.empty% || %to_room.empty%
+    set done 1
+  else
+    %send% %actor% %to_ch.process%
+    %echoaround% %actor% %to_room.process%
+  end
+  eval message %message% + 1
+done
+* vanish message
+set to_room %self.custom(script3)%
+if !%to_room.empty%
+  %echoaround% %actor% %to_room.process%
+else
+  %echoaround% %actor% ~%actor% vanishes in a flourish of yellow light!
+end
+* teleport
 %teleport% %actor% %startloc%
 %force% %actor% look
-%echoaround% %actor% ~%actor% appears in a flourish of yellow light!
-nop %actor.set_cooldown(262, 1800)%
+* arrive message
+set to_room %self.custom(script4)%
+if !%to_room.empty%
+  %echoaround% %actor% %to_room.process%
+else
+  %echoaround% %actor% ~%actor% appears in a flourish of yellow light!
+end
+* cleanup
+if %cooldown_vnum% > 0 && %cooldown_time% > 0
+  nop %actor.set_cooldown(%cooldown_vnum%, %cooldown_time%)%
+end
 nop %actor.cancel_adventure_summon%
+%force% %actor% stop cleardata
 %purge% %self%
 ~
 #263
@@ -253,7 +419,9 @@ if (%actor.obj_target(%item%)% != %self%) && (use /= %cmd%)
   halt
 end
 if !%sk%
-  %send% %actor% Usage: use icon <skill>
+  set name %self.name%
+  %send% %actor% You must specify which skill you want a reset for.
+  %send% %actor% Usage: use %name.car% <skill>
   halt
 end
 if (%actor.position% != Standing)

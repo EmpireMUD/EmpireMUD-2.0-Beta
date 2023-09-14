@@ -149,7 +149,7 @@ plant skeletal skeleton~
 the skeletal plant~
 A skeleton with leaves for flesh and vines for veins sways here.
 ~
-125 200 bdhxzAE cwABG 2
+125 200 bdhxzAE cowAG 2
 2 0 0 15
 D
    This clearly female goblin skeleton stands dressed in an astrakhan cloak and
@@ -187,6 +187,11 @@ A skeleton in what is clearly a guard's uniform stands here.
 ~
 125 200 abdhz cqG 3
 0 0 0 2
+D
+   This guard has a bone to pick with anyone trying to get past. The uniform
+clearly was fit for a thin person, as even now it hangs well on the skeletal
+frame.
+~
 I 4 16005 100.00 1  # LOOT: crushed skeleton
 I 4 16014 15.00 1 w  # LOOT: radius bow
 I 4 16012 15.00 1 w  # LOOT: spinal whip
@@ -211,6 +216,10 @@ A skeleton in what is clearly a guard's uniform stands here.
 ~
 125 200 adhz cqG 3
 0 0 0 4
+D
+   This guard clearly takes its job seriously. Even after death, it paces a
+patrol through the underground passage.
+~
 I 4 16005 100.00 1  # LOOT: crushed skeleton
 I 4 16008 3.00 1 a  # LOOT: stapes earring
 I 4 16009 3.00 1 a  # LOOT: ear bone ring
@@ -235,6 +244,11 @@ A horse made up of fragmented bone stands here.
 ~
 125 200 dehj G 4
 0 0 22 11
+D
+   This is clearly a horse, but also clearly not a proper horse skeleton. It
+seems like someone smashed up several skeletons, and just glooed all the pieces
+together with sap to make what stands before you.
+~
 T 16010
 S
 #16009
@@ -244,6 +258,10 @@ A horse made up of more vine than anything else sways here.
 ~
 125 200 dehj G 4
 0 0 14 15
+D
+   A horse has seemingly been grown from the ground, before leafing its roots
+behind.
+~
 T 16010
 S
 #16010
@@ -253,6 +271,12 @@ A skeletal construct, made of many different creatures stands here.
 ~
 125 200 dehj G 4
 0 0 22 9
+D
+   This bone monstrosity is clearly not made of a single type of skeleton. A
+donkey leg here, a crocodile skull there, and all sorts of different pieces in
+between. All in all, it leaves a horific feeling in the air at the mismatch
+nature.
+~
 T 16010
 S
 #16011
@@ -262,6 +286,11 @@ A construct made up of various plants sways here.
 ~
 125 200 dehj G 4
 0 0 13 7
+D
+   This living plant creature is made up of almost exclusively barky limbs and
+thorns. There's not even a defined shape to guess which way the thing might be
+headed, or whom it might be about to attack.
+~
 T 16010
 S
 #16012
@@ -271,6 +300,11 @@ A beastial plant skeleton thing rages here.
 ~
 14 0 cdkoyzB ciG 3
 0 0 0 15
+D
+   This beast is formed of both bone and plant matter. The bones coming from
+various creatures and even some humanoids. The plant matter seeming to mostly
+be moss and other less beautiful growth used to hold everything together.
+~
 S
 #16013
 dracolich skeletal~
@@ -279,6 +313,10 @@ A skeletal dracolich stands here with flames in its eyes.
 ~
 125 200 dehj mG 5
 0 0 25 12
+D
+   Still some how capable of flight, this complete dragon skeleton seems to be
+in perfect health, minus the fleshy bits.
+~
 T 16010
 S
 #16014
@@ -288,6 +326,12 @@ A viney dragon looks to have grown up out of the ground.
 ~
 125 200 dehj mG 5
 0 0 25 15
+D
+   A rather viney dragon flaps here, clearly capable of flight. Every where
+that a flesh and blood creature would have veins and arteries, this one has
+vines. Where a normal dragon would have bones, this dragon has branches. And
+where any other dragon would have scales, this beast has stiff leaves.
+~
 T 16010
 S
 #16015
@@ -297,6 +341,12 @@ A shark made up entirely of vines and other plant life swims here.
 ~
 125 200 dehjl 0 5
 0 0 6 9
+D
+   This green hued shark moves just as swiftly through the water as any other
+aquatic predator, but has a rubbery texture to its pseudo flesh. Close
+inspection shows that what can be mistaken for skin, is in fact layered and
+pressed leaves.
+~
 T 16010
 S
 #16016
@@ -306,6 +356,11 @@ A giant skeletal hawk hovers here.
 ~
 125 200 dehj m 4
 0 0 2 26
+D
+   The over-sized bird is no different than any other. Except maybe its great
+size, or perhaps the lack of feathers, or lack of flesh and organs. Okay, so
+maybe it is a bit different than a standard hawk.
+~
 T 16010
 S
 #16017
@@ -315,6 +370,11 @@ A bird with leaves for feathers hovers here.
 ~
 125 200 dehj m 4
 0 0 2 26
+D
+   This bird is just as colorful as any other tropical avian, the only
+difference being that its coloration is from flowers and autumnal leaves rather
+than the usual feathers.
+~
 T 16010
 S
 $

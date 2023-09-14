@@ -49,7 +49,7 @@
 *   Interaction Handlers
 *   Learned Craft Handlers
 *   Lore Handlers
-*   Mini-pet and Companion Handlers
+*   Minipet and Companion Handlers
 *   Mob Tagging Handlers
 *   Mount Handlers
 *   Object Handlers
@@ -88,6 +88,8 @@ void add_dropped_item(empire_data *emp, obj_data *obj);
 void add_dropped_item_anywhere(obj_data *obj, empire_data *only_if_emp);
 void add_dropped_item_list(empire_data *emp, obj_data *list);
 static void add_obj_binding(int idnum, struct obj_binding **list);
+EVENT_CANCEL_FUNC(cancel_cooldown_event);
+EVENTFUNC(cooldown_expire_event);
 void remove_dropped_item(empire_data *emp, obj_data *obj);
 void remove_dropped_item_anywhere(obj_data *obj);
 void remove_dropped_item_list(empire_data *emp, obj_data *list);
@@ -109,6 +111,102 @@ struct glb_mob_interact_bean {
  //////////////////////////////////////////////////////////////////////////////
 //// AFFECT HANDLERS /////////////////////////////////////////////////////////
 
+// expiry event handler for character affects
+EVENTFUNC(affect_expire_event) {
+	struct affect_expire_event_data *expire_data = (struct affect_expire_event_data *)event_obj;
+	struct affected_type *af, *immune;
+	char_data *ch;
+	
+	// grab data and free it
+	ch = expire_data->character;
+	af = expire_data->affect;
+	free(expire_data);
+	
+	// cancel this first
+	af->expire_event = NULL;
+	
+	// messaging?
+	if ((af->type > 0)) {
+		if (!af->next || (af->next->type != af->type) || (af->next->expire_time > af->expire_time)) {
+			show_wear_off_msg(ch, af->type);
+		}
+	}
+	
+	// special case -- add immunity
+	if (IS_SET(af->bitvector, AFF_STUNNED) && config_get_int("stun_immunity_time") > 0) {
+		immune = create_flag_aff(ATYPE_STUN_IMMUNITY, config_get_int("stun_immunity_time"), AFF_IMMUNE_STUN, ch);
+		affect_join(ch, immune, NOBITS);
+	}
+	
+	affect_remove(ch, af);
+	affect_total(ch);
+	
+	// do not reenqueue
+	return 0;
+}
+
+
+// this runs every 5 seconds until it removes the DOT
+EVENTFUNC(dot_update_event) {
+	struct dot_event_data *data = (struct dot_event_data *)event_obj;
+	struct over_time_effect_type *dot;
+	char_data *ch, *caster;
+	int type, result;
+	
+	// grab data and free it
+	ch = data->ch;
+	dot = data->dot;
+	
+	// cancel this first -- will re-enqueue if needed
+	dot->update_event = NULL;
+	
+	// damage them if any time remains (if not, this dot is actually already over)
+	if (dot->time_remaining > 0) {
+		// determine type:
+		// TODO could this be an array or function
+		type = dot->damage_type == DAM_MAGICAL ? ATTACK_MAGICAL_DOT : (
+			dot->damage_type == DAM_FIRE ? ATTACK_FIRE_DOT : (
+			dot->damage_type == DAM_POISON ? ATTACK_POISON_DOT : 
+			ATTACK_PHYSICAL_DOT
+		));
+		caster = find_player_in_room_by_id(IN_ROOM(ch), dot->cast_by);
+		
+		// bam! (damage func shows the messaging)
+		result = damage(caster ? caster : ch, ch, dot->damage * dot->stack, type, dot->damage_type);
+		
+		if (result < 0 || IS_DEAD(ch) || EXTRACTED(ch)) {
+			// done here (death and extraction should both remove the DOT themselves)
+			free(data);
+			return 0;	// do not re-enqueue
+		}
+		
+		// they lived:
+		dot->time_remaining -= DOT_INTERVAL;
+		
+		// cancel action if they were hit
+		if (result > 0) {
+			cancel_action(ch);
+		}
+	}
+	
+	// reschedule or expire
+	if (GET_HEALTH(ch) >= 0 && dot->time_remaining > 0) {
+		// NOTE: when a character drops below 0, dots are often removed in a way this CAN'T detect
+		dot->update_event = the_event;
+		return DOT_INTERVAL RL_SEC;	// re-enqueue
+	}
+	else {
+		// expired
+		if (dot->type > 0) {
+			show_wear_off_msg(ch, dot->type);
+		}
+		free(data);
+		dot_remove(ch, dot);
+		return 0;	// do not re-enqueue
+	}
+}
+
+
 // expiry event handler for rooms
 EVENTFUNC(room_affect_expire_event) {
 	struct room_expire_event_data *expire_data = (struct room_expire_event_data *)event_obj;
@@ -125,7 +223,8 @@ EVENTFUNC(room_affect_expire_event) {
 	af->expire_event = NULL;
 	
 	if ((af->type > 0)) {
-		if (!af->next || (af->next->type != af->type) || (af->next->duration > 0)) {
+		// this avoids sending messages multiple times for 1 affect type
+		if (!af->next || (af->next->type != af->type) || (af->next->expire_time > af->expire_time)) {
 			if ((gen = find_generic(af->type, GENERIC_AFFECT)) && GET_AFFECT_WEAR_OFF_TO_CHAR(gen) && ROOM_PEOPLE(room)) {
 				act(GET_AFFECT_WEAR_OFF_TO_CHAR(gen), FALSE, ROOM_PEOPLE(room), 0, 0, TO_CHAR | TO_ROOM);
 			}
@@ -135,6 +234,20 @@ EVENTFUNC(room_affect_expire_event) {
 	
 	// do not reenqueue
 	return 0;
+}
+
+
+// frees memory when character affect expiry is canceled
+EVENT_CANCEL_FUNC(cancel_affect_expire_event) {
+	struct affect_expire_event_data *data = (struct affect_expire_event_data*)event_obj;
+	free(data);
+}
+
+
+// frees memory when character affect expiry is canceled
+EVENT_CANCEL_FUNC(cancel_dot_event) {
+	struct dot_event_data *data = (struct dot_event_data*)event_obj;
+	free(data);
 }
 
 
@@ -361,18 +474,19 @@ void affect_join(char_data *ch, struct affected_type *af, int flags) {
 	bool found = FALSE;
 	
 	// FIX: merge af into af_iter instead of vice versa; do not remove/add the effect, but may still need to call messaging
+	#define NOT_UNLIM(aff)  ((aff)->expire_time != UNLIMITED)
 	
 	for (af_iter = ch->affected; af_iter && !found; af_iter = af_iter->next) {
 		if (af_iter->type == af->type && af_iter->location == af->location && af_iter->bitvector == af->bitvector) {
 			// found match: will merge the new af into the old one
-			if (IS_SET(flags, ADD_DURATION)) {
-				af_iter->duration += af->duration;
+			if (IS_SET(flags, ADD_DURATION) && NOT_UNLIM(af_iter) && NOT_UNLIM(af)) {
+				af_iter->expire_time += (af->expire_time - time(0));
 			}
-			else if (IS_SET(flags, AVG_DURATION)) {
-				af_iter->duration = (af->duration + af_iter->duration) / 2;
+			else if (IS_SET(flags, AVG_DURATION) && NOT_UNLIM(af_iter) && NOT_UNLIM(af)) {
+				af_iter->expire_time = time(0) + (((af->expire_time - time(0)) + (af_iter->expire_time - time(0))) / 2);
 			}
 			else {	// otherwise keep the new duration
-				af_iter->duration = af->duration;
+				af_iter->expire_time = af->expire_time;
 			}
 			
 			if (IS_SET(flags, ADD_MODIFIER)) {
@@ -401,6 +515,10 @@ void affect_join(char_data *ch, struct affected_type *af, int flags) {
 				}
 			}
 			
+			// reschedule it (duration may have changed)
+			schedule_affect_expire(ch, af_iter);
+			
+			// and save
 			queue_delayed_update(ch, CDU_MSDP_AFFECTS);
 			found = TRUE;
 			break;
@@ -440,10 +558,26 @@ void affect_modify(char_data *ch, byte loc, sh_int mod, bitvector_t bitv, bool a
 	
 	if (add) {
 		SET_BIT(AFF_FLAGS(ch), bitv);
+		
+		// check lights
+		if (IS_SET(bitv, AFF_LIGHT)) {
+			++GET_LIGHTS(ch);
+			if (IN_ROOM(ch)) {
+				++ROOM_LIGHTS(IN_ROOM(ch));
+			}
+		}
 	}
 	else {
 		REMOVE_BIT(AFF_FLAGS(ch), bitv);
 		mod = -mod;
+		
+		// check lights
+		if (IS_SET(bitv, AFF_LIGHT)) {
+			--GET_LIGHTS(ch);
+			if (IN_ROOM(ch)) {
+				--ROOM_LIGHTS(IN_ROOM(ch));
+			}
+		}
 	}
 	
 	// APPLY_x:
@@ -484,69 +618,80 @@ void affect_modify(char_data *ch, byte loc, sh_int mod, bitvector_t bitv, bool a
 		case APPLY_AGE:
 			SAFE_ADD(GET_AGE_MODIFIER(ch), mod, INT_MIN, INT_MAX, TRUE);
 			break;
-		case APPLY_MOVE:
+		case APPLY_MOVE: {
 			SAFE_ADD(GET_MAX_MOVE(ch), mod, INT_MIN, INT_MAX, TRUE);
 			
 			// prevent from going negative
 			orig = GET_MOVE(ch);
-			SAFE_ADD(GET_MOVE(ch), mod, INT_MIN, INT_MAX, TRUE);
+			set_move(ch, GET_MOVE(ch) + mod);
 			
 			if (!IS_NPC(ch)) {
 				if (GET_MOVE(ch) < 0) {
 					GET_MOVE_DEFICIT(ch) -= GET_MOVE(ch);
-					GET_MOVE(ch) = 0;
+					set_move(ch, 0);
 				}
 				else if (GET_MOVE_DEFICIT(ch) > 0) {
-					diff = MIN(GET_MOVE_DEFICIT(ch), MAX(0, GET_MOVE(ch) - orig));
+					diff = MAX(0, GET_MOVE(ch) - orig);
+					diff = MIN(GET_MOVE_DEFICIT(ch), diff);
 					GET_MOVE_DEFICIT(ch) -= diff;
-					GET_MOVE(ch) -= diff;
+					set_move(ch, GET_MOVE(ch) - diff);
 				}
 			}
 			break;
-		case APPLY_HEALTH:
+		}
+		case APPLY_HEALTH: {
+			// apply to max
 			SAFE_ADD(GET_MAX_HEALTH(ch), mod, INT_MIN, INT_MAX, TRUE);
 			
-			// prevent from going negative
+			// apply to current
 			orig = GET_HEALTH(ch);
-			SAFE_ADD(GET_HEALTH(ch), mod, INT_MIN, INT_MAX, TRUE);
-			GET_HEALTH(ch) = MAX(1, GET_HEALTH(ch));
+			set_health(ch, GET_HEALTH(ch) + mod);
 			
 			if (!IS_NPC(ch)) {
-				if (GET_HEALTH(ch) < 1) {	// min 1 on health
-					GET_HEALTH_DEFICIT(ch) -= (GET_HEALTH(ch)-1);
-					GET_HEALTH(ch) = 1;
+				if (GET_HEALTH(ch) < 1) {
+					if (GET_POS(ch) >= POS_SLEEPING) {
+						// min 1 on health unless unconscious
+						GET_HEALTH_DEFICIT(ch) -= (GET_HEALTH(ch)-1);
+						set_health(ch, 1);
+					}
+					// otherwise leave them dead/negative
 				}
 				else if (GET_HEALTH_DEFICIT(ch) > 0) {
-					diff = MIN(GET_HEALTH_DEFICIT(ch), MAX(0, GET_HEALTH(ch) - orig));
+					// positive health plus a health deficit
+					diff = MAX(0, GET_HEALTH(ch) - orig);
+					diff = MIN(diff, GET_HEALTH_DEFICIT(ch));
 					diff = MIN(diff, GET_HEALTH(ch)-1);
 					GET_HEALTH_DEFICIT(ch) -= diff;
-					GET_HEALTH(ch) -= diff;
+					set_health(ch, GET_HEALTH(ch) - diff);
 				}
 			}
 			else {
 				// npcs cannot die this way
-				GET_HEALTH(ch) = MAX(1, GET_HEALTH(ch));
+				set_health(ch, MAX(1, GET_HEALTH(ch)));
 			}
 			break;
-		case APPLY_MANA:
+		}
+		case APPLY_MANA: {
 			SAFE_ADD(GET_MAX_MANA(ch), mod, INT_MIN, INT_MAX, TRUE);
 			
 			// prevent from going negative
 			orig = GET_MANA(ch);
-			SAFE_ADD(GET_MANA(ch), mod, INT_MIN, INT_MAX, TRUE);
+			set_mana(ch, GET_MANA(ch) + mod);
 			
 			if (!IS_NPC(ch)) {
 				if (GET_MANA(ch) < 0) {
 					GET_MANA_DEFICIT(ch) -= GET_MANA(ch);
-					GET_MANA(ch) = 0;
+					set_mana(ch, 0);
 				}
 				else if (GET_MANA_DEFICIT(ch) > 0) {
-					diff = MIN(GET_MANA_DEFICIT(ch), MAX(0, GET_MANA(ch) - orig));
+					diff = MAX(0, GET_MANA(ch) - orig);
+					diff = MIN(GET_MANA_DEFICIT(ch), diff);
 					GET_MANA_DEFICIT(ch) -= diff;
-					GET_MANA(ch) -= diff;
+					set_mana(ch, GET_MANA(ch) - diff);
 				}
 			}
 			break;
+		}
 		case APPLY_BLOOD: {
 			SAFE_ADD(GET_EXTRA_BLOOD(ch), mod, INT_MIN, INT_MAX, TRUE);
 			break;
@@ -596,6 +741,9 @@ void affect_modify(char_data *ch, byte loc, sh_int mod, bitvector_t bitv, bool a
 		}
 		case APPLY_HEAL_OVER_TIME: {
 			SAFE_ADD(GET_HEAL_OVER_TIME(ch), mod, INT_MIN, INT_MAX, TRUE);
+			if (mod > 0) {
+				schedule_heal_over_time(ch);
+			}
 			break;
 		}
 		case APPLY_CRAFTING: {
@@ -630,8 +778,13 @@ void affect_modify(char_data *ch, byte loc, sh_int mod, bitvector_t bitv, bool a
 */
 void affect_remove(char_data *ch, struct affected_type *af) {
 	// not affected by it at all somehow?
-	if (ch->affected == NULL) {
+	if (!ch || !af || ch->affected == NULL) {
 		return;
+	}
+	
+	if (af->expire_event) {
+		dg_event_cancel(af->expire_event, cancel_affect_expire_event);
+		af->expire_event = NULL;
 	}
 
 	affect_modify(ch, af->location, af->modifier, af->bitvector, FALSE);
@@ -688,10 +841,12 @@ void affect_to_char_silent(char_data *ch, struct affected_type *af) {
 	CREATE(affected_alloc, struct affected_type, 1);
 
 	*affected_alloc = *af;
+	affected_alloc->expire_event = NULL;
 	LL_PREPEND(ch->affected, affected_alloc);
 
 	affect_modify(ch, af->location, af->modifier, af->bitvector, TRUE);
 	affect_total(ch);
+	schedule_affect_expire(ch, affected_alloc);
 	
 	queue_delayed_update(ch, CDU_MSDP_AFFECTS);
 }
@@ -734,6 +889,7 @@ void affect_to_room(room_data *room, struct affected_type *af) {
 	CREATE(affected_alloc, struct affected_type, 1);
 
 	*affected_alloc = *af;
+	affected_alloc->expire_event = NULL;
 	LL_PREPEND(ROOM_AFFECTS(room), affected_alloc);
 	
 	affected_alloc->expire_event = NULL;	// cannot have an event in the copied af at this point
@@ -870,9 +1026,9 @@ void affect_total(char_data *ch) {
 	GET_MAX_HEALTH(ch) = MAX(1, GET_MAX_HEALTH(ch));
 	
 	// restore these because in some cases, they mess up during an affect_total
-	GET_HEALTH(ch) = health;
-	GET_MOVE(ch) = move;
-	GET_MANA(ch) = mana;
+	set_health(ch, health);
+	set_move(ch, move);
+	set_mana(ch, mana);
 	
 	// check for inventory size
 	if (!IS_NPC(ch) && CAN_CARRY_N(ch) > GET_LARGEST_INVENTORY(ch)) {
@@ -1040,7 +1196,7 @@ bool affected_by_spell_from_caster(char_data *ch, any_vnum type, char_data *cast
 * Create an affect that modifies a trait.
 *
 * @param any_vnum type ATYPE_ const/vnum
-* @param int duration in 5-second ticks
+* @param int duration in seconds (prior to b5.152, this was 5-second "real update" ticks)
 * @param int location APPLY_
 * @param int modifier +/- amount
 * @param bitvector_t bitvector AFF_
@@ -1053,7 +1209,7 @@ struct affected_type *create_aff(any_vnum type, int duration, int location, int 
 	CREATE(af, struct affected_type, 1);
 	af->type = type;
 	af->cast_by = cast_by ? CAST_BY_ID(cast_by) : 0;
-	af->duration = duration;
+	af->expire_time = (duration == UNLIMITED) ? UNLIMITED : time(0) + duration;
 	af->modifier = modifier;
 	af->location = location;
 	af->bitvector = bitvector;
@@ -1063,45 +1219,61 @@ struct affected_type *create_aff(any_vnum type, int duration, int location, int 
 
 
 /**
+* Applies a DOT (damage over time) effect to a character and schedules it. If
+* the duration is not divisible by 5, it may last slightly longer.
+*
+* Note that prior to b5.152, this took a duration in 5-second "real update"
+* ticks, not in seconds.
+*
 * @param char_data *ch Person receiving the DoT.
 * @param any_vnum type ATYPE_ const/vnum that caused it.
-* @param sh_int duration Affect time, in 5-second intervals.
+* @param int seconds_duration How long, in seconds, to apply this (will round up to a multple of 5).
 * @param sh_int damage_type DAM_ type.
 * @param sh_int damage How much damage to do per 5-seconds.
 * @param sh_int max_stack Number of times this can stack when re-applied before it expires.
 * @param sh_int char_data *cast_by The caster.
 */
-void apply_dot_effect(char_data *ch, any_vnum type, sh_int duration, sh_int damage_type, sh_int damage, sh_int max_stack, char_data *cast_by) {
-	struct over_time_effect_type *iter, *dot;
+void apply_dot_effect(char_data *ch, any_vnum type, int seconds_duration, sh_int damage_type, sh_int damage, sh_int max_stack, char_data *cast_by) {
+	struct over_time_effect_type *iter, *dot = NULL;
 	generic_data *gen;
-	bool found = FALSE;
 	int id = (cast_by ? CAST_BY_ID(cast_by) : 0);
 	
+	// adjust duration to ensure a multiple of 5 seconds
+	seconds_duration = (int) (ceil(seconds_duration / ((double)DOT_INTERVAL)) * DOT_INTERVAL);
+	seconds_duration = MAX(DOT_INTERVAL, seconds_duration);
+	
 	// first see if they already have one
-	for (iter = ch->over_time_effects; iter && !found; iter = iter->next) {
+	LL_FOREACH(ch->over_time_effects, iter) {
 		if (iter->type == type && iter->cast_by == id && iter->damage_type == damage_type && iter->damage == damage) {
-			// refresh effect
-			iter->duration = MAX(iter->duration, duration);
-			if (iter->stack < MIN(iter->max_stack, max_stack)) {
+			// refresh timer (if longer)
+			iter->time_remaining = MAX(iter->time_remaining, seconds_duration);
+			
+			// take larger of the two stack sizes, and stack it
+			iter->max_stack = MAX(iter->max_stack, max_stack);
+			if (iter->stack < iter->max_stack) {
 				++iter->stack;
 			}
-			found = TRUE;
+			
+			dot = iter;
+			break;	// only need 1
 		}
 	}
 	
-	if (!found) {
+	if (!dot) {
 		CREATE(dot, struct over_time_effect_type, 1);
 		LL_PREPEND(ch->over_time_effects, dot);
 		
 		dot->type = type;
 		dot->cast_by = id;
-		dot->duration = duration;
+		dot->time_remaining = seconds_duration;
 		dot->damage_type = damage_type;
 		dot->damage = damage;
 		dot->stack = 1;
 		dot->max_stack = max_stack;
 	}
 	
+	// schedule it -- this will reschedule if it was combined
+	schedule_dot_update(ch, dot);
 	queue_delayed_update(ch, CDU_MSDP_DOTS);
 	
 	// any messaging
@@ -1123,10 +1295,42 @@ void apply_dot_effect(char_data *ch, any_vnum type, sh_int duration, sh_int dama
 * @param struct over_time_effect_type *dot The DoT to remove.
 */
 void dot_remove(char_data *ch, struct over_time_effect_type *dot) {
+	// cancel event?
+	if (dot->update_event) {
+		dg_event_cancel(dot->update_event, cancel_dot_event);
+		dot->update_event = NULL;
+	}
+	
+	// remove from list and send it off to be freed
 	LL_DELETE(ch->over_time_effects, dot);
-	free(dot);
+	dot->time_remaining = 0;	// prevent any accidental use
+	LL_PREPEND(free_dots_list, dot);
 	
 	queue_delayed_update(ch, CDU_MSDP_DOTS);
+}
+
+
+/**
+* Damage-over-time effects (DOTs) are stored in a list and freed at a time when
+* no DOTs can be processing. The reason for this is that DOTs can kill the
+* character, causing the DOT to be removed by that death while it's still
+* processing in the DG event func.
+*
+* This is called right after DG event updates.
+*/
+void free_freeable_dots(void) {
+	struct over_time_effect_type *dot, *next_dot;
+	
+	LL_FOREACH_SAFE(free_dots_list, dot, next_dot) {
+		// this should NOT be scheduled, but double-check now
+		if (dot->update_event) {
+			dg_event_cancel(dot->update_event, cancel_dot_event);
+			dot->update_event = NULL;
+		}
+		
+		free(dot);
+	}
+	free_dots_list = NULL;
 }
 
 
@@ -1150,6 +1354,82 @@ bool room_affected_by_spell(room_data *room, any_vnum type) {
 
 
 /**
+* Schedules the event handler for a character's affect expiration.
+*
+* @param char_data *ch The person with the affect on them.
+* @param struct affected_type *af The affect (already on the person) to set up expiry for.
+*/
+void schedule_affect_expire(char_data *ch, struct affected_type *af) {
+	struct affect_expire_event_data *expire_data;
+	
+	// check for and remove old event
+	if (af && af->expire_event) {
+		dg_event_cancel(af->expire_event, cancel_affect_expire_event);
+		af->expire_event = NULL;
+	}
+	
+	// safety next
+	if (!ch || !af) {
+		return;
+	}
+	
+	// check durations
+	if (af->expire_time == UNLIMITED) {
+		af->expire_event = NULL;	// ensure null
+	}
+	else if (!IN_ROOM(ch) || (!IS_NPC(ch) && !AFFECTS_CONVERTED(ch))) {
+		// do not schedule in this case?
+		// no work
+	}
+	else {
+		// create the event
+		CREATE(expire_data, struct affect_expire_event_data, 1);
+		expire_data->character = ch;
+		expire_data->affect = af;
+		
+		af->expire_event = dg_event_create(affect_expire_event, (void*)expire_data, (af->expire_time - time(0)) RL_SEC);
+	}
+}
+
+
+/**
+* Schedules the event handler for damage-over-time (DOT) effects.
+*
+* @param char_data *ch The person with the DOT on them.
+* @param struct over_time_effect_type *dot The DOT (already on the person) to set up an event for.
+*/
+void schedule_dot_update(char_data *ch, struct over_time_effect_type *dot) {
+	struct dot_event_data *expire_data;
+	
+	// check for and remove old event
+	/*
+	if (dot && dot->update_event) {
+		dg_event_cancel(dot->update_event, cancel_dot_event);
+		dot->update_event = NULL;
+	}
+	*/
+	
+	// safety next
+	if (!ch || !dot) {
+		return;
+	}
+	if (!IN_ROOM(ch)) {
+		return; // do not schedule in this case? player is not in-game
+	}
+	if (dot->update_event) {
+		return;	// already scheduled
+	}
+	
+	// ok: create the event
+	CREATE(expire_data, struct dot_event_data, 1);
+	expire_data->ch = ch;
+	expire_data->dot = dot;
+	
+	dot->update_event = dg_event_create(dot_update_event, (void*)expire_data, DOT_INTERVAL RL_SEC);
+}
+
+
+/**
 * Schedules the event handler for a room's affect expiration.
 *
 * @param room_data *room The room with the effect on it.
@@ -1164,13 +1444,13 @@ void schedule_room_affect_expire(room_data *room, struct affected_type *af) {
 		af->expire_event = NULL;
 	}
 	
-	if (af->duration != UNLIMITED) {
+	if (af->expire_time != UNLIMITED) {
 		// create the event
 		CREATE(expire_data, struct room_expire_event_data, 1);
 		expire_data->room = room;
 		expire_data->affect = af;
 		
-		af->expire_event = dg_event_create(room_affect_expire_event, (void*)expire_data, (af->duration - time(0)) * PASSES_PER_SEC);
+		af->expire_event = dg_event_create(room_affect_expire_event, (void*)expire_data, (af->expire_time - time(0)) RL_SEC);
 	}
 	else {
 		af->expire_event = NULL;	// ensure null
@@ -1186,11 +1466,25 @@ void schedule_room_affect_expire(room_data *room, struct affected_type *af) {
 */
 void show_wear_off_msg(char_data *ch, any_vnum atype) {
 	generic_data *gen = find_generic(atype, GENERIC_AFFECT);
-	if (gen && GET_AFFECT_WEAR_OFF_TO_CHAR(gen) && ch->desc) {
-		msg_to_char(ch, "&%c%s&0\r\n", (!IS_NPC(ch) && GET_CUSTOM_COLOR(ch, CUSTOM_COLOR_STATUS)) ? GET_CUSTOM_COLOR(ch, CUSTOM_COLOR_STATUS) : '0', GET_AFFECT_WEAR_OFF_TO_CHAR(gen));
+	char_data *vict;
+	
+	if (!ch || !IN_ROOM(ch) || !gen) {
+		return;	// no work need doing
 	}
-	if (gen && GET_AFFECT_WEAR_OFF_TO_ROOM(gen)) {
-		act(GET_AFFECT_WEAR_OFF_TO_ROOM(gen), TRUE, ch, NULL, NULL, TO_ROOM);
+	
+	if (GET_AFFECT_WEAR_OFF_TO_CHAR(gen) && ch->desc && (IS_NPC(ch) || GET_LAST_AFF_WEAR_OFF_VNUM(ch) != atype || GET_LAST_AFF_WEAR_OFF_TIME(ch) != time(0))) {
+		msg_to_char(ch, "&%c%s&0\r\n", (!IS_NPC(ch) && GET_CUSTOM_COLOR(ch, CUSTOM_COLOR_STATUS)) ? GET_CUSTOM_COLOR(ch, CUSTOM_COLOR_STATUS) : '0', GET_AFFECT_WEAR_OFF_TO_CHAR(gen));
+		GET_LAST_AFF_WEAR_OFF_VNUM(ch) = atype;
+		GET_LAST_AFF_WEAR_OFF_TIME(ch) = time(0);
+	}
+	if (GET_AFFECT_WEAR_OFF_TO_ROOM(gen)) {
+		DL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), vict, next_in_room) {
+			if (vict->desc && (IS_NPC(vict) || GET_LAST_AFF_WEAR_OFF_VNUM(vict) != atype || GET_LAST_AFF_WEAR_OFF_TIME(vict) != time(0))) {
+				act(GET_AFFECT_WEAR_OFF_TO_ROOM(gen), TRUE, ch, NULL, vict, TO_VICT);
+				GET_LAST_AFF_WEAR_OFF_VNUM(vict) = atype;
+				GET_LAST_AFF_WEAR_OFF_TIME(vict) = time(0);
+			}
+		}
 	}
 }
 
@@ -1218,11 +1512,12 @@ void extract_char_final(char_data *ch) {
 	pause_affect_total = TRUE;
 	
 	// update iterators
-	if (ch == global_next_char) {
-		global_next_char = global_next_char->next;
+	if (ch == global_next_player) {
+		global_next_player = global_next_player->next_plr;
 	}
 	
 	check_dg_owner_purged_char(ch);
+	cancel_all_stored_events(&GET_STORED_EVENTS(ch));
 
 	/* Check to see if we are grouped! */
 	if (GROUP(ch)) {
@@ -1372,8 +1667,8 @@ void extract_char_final(char_data *ch) {
 */
 void extract_char(char_data *ch) {
 	// update iterators
-	if (ch == global_next_char) {
-		global_next_char = global_next_char->next;
+	if (ch == global_next_player) {
+		global_next_player = global_next_player->next_plr;
 	}
 	
 	if (!EXTRACTED(ch)) {
@@ -1398,6 +1693,9 @@ void extract_char(char_data *ch) {
 	
 	// get rid of friends now (extracts them as well)
 	despawn_charmies(ch, NOTHING);
+	
+	// ensure no stored events
+	cancel_all_stored_events(&GET_STORED_EVENTS(ch));
 	
 	// clear companion (both directions) if any
 	if (GET_COMPANION(ch)) {
@@ -1453,6 +1751,9 @@ void extract_pending_chars(void) {
 		// ensure they're really (probably) in the character list
 		if (character_list && (character_list == vict || vict->prev || vict->next)) {
 			DL_DELETE(character_list, vict);
+		}
+		if (!IS_NPC(vict) && player_character_list && (player_character_list == vict || vict->prev_plr || vict->next_plr)) {
+			DL_DELETE2(player_character_list, vict, prev_plr, next_plr);
 		}
 
 		// moving this down below the prev_vict block because ch was still in
@@ -1633,6 +1934,11 @@ void char_to_room(char_data *ch, room_data *room) {
 		if (!IS_NPC(ch) && (inst = find_instance_by_room(room, FALSE, TRUE))) {
 			check_instance_is_loaded(inst);
 		}
+
+		// check npc spawns whenever a player is places in a room
+		if (!IS_NPC(ch)) {
+			spawn_mobs_from_center(room);
+		}
 		
 		// sanitation: remove them from the old room first
 		if (IN_ROOM(ch)) {
@@ -1648,11 +1954,6 @@ void char_to_room(char_data *ch, room_data *room) {
 		if (!IS_NPC(ch) && !IS_IMMORTAL(ch)) {
 			check_island_levels(room, (int) GET_COMPUTED_LEVEL(ch));
 		}
-
-		// check npc spawns whenever a player is places in a room
-		if (!IS_NPC(ch)) {
-			spawn_mobs_from_center(IN_ROOM(ch));
-		}
 		
 		// look for an instance to lock
 		if (!IS_NPC(ch) && IS_ADVENTURE_ROOM(room) && (inst || (inst = find_instance_by_room(room, FALSE, TRUE)))) {
@@ -1665,6 +1966,8 @@ void char_to_room(char_data *ch, room_data *room) {
 			// store last room to player
 			GET_LAST_ROOM(ch) = GET_ROOM_VNUM(room);
 		}
+		
+		schedule_movement_events(ch);
 		request_char_save_in_world(ch);
 	}
 }
@@ -1841,7 +2144,7 @@ char_data *get_char_room_vis(char_data *ch, char *name, int *number) {
 char_data *get_char_vis(char_data *ch, char *name, int *number, bitvector_t where) {
 	char copy[MAX_INPUT_LENGTH], *tmp = copy;
 	char_data *i;
-	int num;
+	int num, store;
 	
 	if (!number) {
 		strcpy(tmp, name);
@@ -1859,9 +2162,13 @@ char_data *get_char_vis(char_data *ch, char *name, int *number, bitvector_t wher
 	if (IS_SET(where, FIND_CHAR_ROOM))
 		return get_char_room_vis(ch, tmp, number);
 	else if (IS_SET(where, FIND_CHAR_WORLD)) {
+		store = *number;
 		if ((i = get_char_room_vis(ch, tmp, number)) != NULL) {
 			return (i);
 		}
+		
+		// if we didn't find it, restore the number, because otherwise it counts the same person twice
+		*number = store;
 		
 		DL_FOREACH(character_list, i) {
 			if (IS_SET(where, FIND_NPC_ONLY) && !IS_NPC(i)) {	
@@ -1893,9 +2200,7 @@ char_data *get_char_vis(char_data *ch, char *name, int *number, bitvector_t wher
 char_data *get_player_vis(char_data *ch, char *name, bitvector_t flags) {
 	char_data *i, *found = NULL;
 	
-	DL_FOREACH(character_list, i) {
-		if (IS_NPC(i))
-			continue;
+	DL_FOREACH2(player_character_list, i, next_plr) {
 		if (IS_SET(flags, FIND_CHAR_ROOM) && !WIZHIDE_OK(ch, i)) {
 			continue;
 		}
@@ -1928,7 +2233,6 @@ char_data *get_player_vis(char_data *ch, char *name, bitvector_t flags) {
 */
 char_data *get_char_world(char *name, int *number) {
 	char tmpname[MAX_INPUT_LENGTH], *tmp = tmpname;
-	bool pc_only = FALSE;
 	char_data *ch;
 	int num;
 	
@@ -1941,12 +2245,50 @@ char_data *get_char_world(char *name, int *number) {
 		tmp = name;
 	}
 	if (*number == 0) {
-		pc_only = TRUE;
+		return get_player_world(name, number);
 	}
 	
 	DL_FOREACH(character_list, ch) {
-		if ((!IS_NPC(ch) || !pc_only) && match_char_name(NULL, ch, tmp, MATCH_GLOBAL)) {
-			if (--(*number) == 0 || pc_only) {	// pc_only messes up pos
+		if (match_char_name(NULL, ch, tmp, MATCH_GLOBAL)) {
+			if (--(*number) == 0) {
+				return ch;	// done
+			}
+		}
+	}
+
+	return NULL;
+}
+
+
+/**
+* Searches for a player in the whole world with a matching name, without
+* requiring visibility. This ignores mobs.
+*
+* @param char *name The name of the target.
+* @param int *number Optional: For multi-list number targeting (look 4.bob; may be NULL)
+* @return char_data* The found player, or NULL.
+*/
+char_data *get_player_world(char *name, int *number) {
+	char tmpname[MAX_INPUT_LENGTH], *tmp = tmpname;
+	bool ignore = FALSE;
+	char_data *ch;
+	int num;
+	
+	if (!number) {
+		strcpy(tmp, name);
+		number = &num;
+		num = get_number(&tmp);
+	}
+	else {
+		tmp = name;
+	}
+	if (*number == 0) {
+		ignore = TRUE;
+	}
+	
+	DL_FOREACH2(player_character_list, ch, next_plr) {
+		if (match_char_name(NULL, ch, tmp, MATCH_GLOBAL)) {
+			if (--(*number) == 0 || ignore) {
 				return ch;	// done
 			}
 		}
@@ -2073,10 +2415,8 @@ void cleanup_all_coins(void) {
 	char_data *ch;
 	descriptor_data *desc;
 	
-	DL_FOREACH(character_list, ch) {
-		if (!IS_NPC(ch)) {
-			cleanup_coins(ch);
-		}
+	DL_FOREACH2(player_character_list, ch, next_plr) {
+		cleanup_coins(ch);
 	}
 		
 	for (desc = descriptor_list; desc; desc = desc->next) {
@@ -2630,6 +2970,7 @@ int total_coins(char_data *ch) {
 */
 void add_cooldown(char_data *ch, any_vnum type, int seconds_duration) {
 	struct cooldown_data *cool;
+	struct cooldown_expire_event_data *data;
 	bool found = FALSE;
 	
 	if (!find_generic(type, GENERIC_COOLDOWN)) {
@@ -2642,6 +2983,11 @@ void add_cooldown(char_data *ch, any_vnum type, int seconds_duration) {
 		if (cool->type == type) {
 			found = TRUE;
 			cool->expire_time = MAX(cool->expire_time, time(0) + seconds_duration);
+			if (cool->expire_event) {
+				dg_event_cancel(cool->expire_event, cancel_cooldown_event);
+				cool->expire_event = NULL;
+			}
+			break;	// only 1
 		}
 	}
 	
@@ -2653,10 +2999,66 @@ void add_cooldown(char_data *ch, any_vnum type, int seconds_duration) {
 		LL_PREPEND(ch->cooldowns, cool);
 	}
 	
+	// schedule?
+	if (cool) {
+		CREATE(data, struct cooldown_expire_event_data, 1);
+		data->character = ch;
+		data->cooldown = cool;
+		cool->expire_event = dg_event_create(cooldown_expire_event, data, (cool->expire_time - time(0)) RL_SEC);
+	}
+	
 	if (ch->desc) {
 		queue_delayed_update(ch, CDU_MSDP_COOLDOWNS);
 	}
-	request_char_save_in_world(ch);
+	if (IS_NPC(ch)) {
+		// only save mobs for this. players don't need it
+		request_char_save_in_world(ch);
+	}
+}
+
+
+// canceller for cooldown events
+EVENT_CANCEL_FUNC(cancel_cooldown_event) {
+	struct cooldown_expire_event_data *data = (struct cooldown_expire_event_data*)event_obj;
+	free(data);
+}
+
+
+// called when a cooldown times out
+EVENTFUNC(cooldown_expire_event) {
+	struct cooldown_expire_event_data *data = (struct cooldown_expire_event_data*)event_obj;
+	char_data *ch = data->character;
+	struct cooldown_data *cool = data->cooldown;
+	generic_data *gen;
+	
+	// always delete first
+	cool->expire_event = NULL;
+	free(data);
+	
+	// messaging is a maybe
+	if (!IS_NPC(ch) && IN_ROOM(ch) && (gen = find_generic(cool->type, GENERIC_COOLDOWN)) && GET_COOLDOWN_WEAR_OFF(gen)) {
+		msg_to_char(ch, "\t%c%s\t0\r\n", (GET_CUSTOM_COLOR(ch, CUSTOM_COLOR_STATUS) ? GET_CUSTOM_COLOR(ch, CUSTOM_COLOR_STATUS) : '0'), GET_COOLDOWN_WEAR_OFF(gen));
+	}
+	
+	remove_cooldown(ch, cool);
+	return 0;	// do not re-enqueue
+}
+
+
+/**
+* Frees a cooldown after ensuring it doesn't have an expiry event scheduled.
+*
+* @param struct cooldown_data *cool The cooldown.
+*/
+void free_cooldown(struct cooldown_data *cool) {
+	if (cool) {
+		if (cool->expire_event) {
+			dg_event_cancel(cool->expire_event, cancel_cooldown_event);
+			cool->expire_event = NULL;
+		}
+		
+		free(cool);
+	}
 }
 
 
@@ -2690,12 +3092,15 @@ int get_cooldown_time(char_data *ch, any_vnum type) {
 */
 void remove_cooldown(char_data *ch, struct cooldown_data *cool) {
 	LL_DELETE(ch->cooldowns, cool);
-	free(cool);
+	free_cooldown(cool);
 	
 	if (ch->desc) {
 		queue_delayed_update(ch, CDU_MSDP_COOLDOWNS);
 	}
-	request_char_save_in_world(ch);
+	if (IS_NPC(ch)) {
+		// only mobs need a save for this
+		request_char_save_in_world(ch);
+	}
 }
 
 
@@ -2976,7 +3381,7 @@ void perform_abandon_room(room_data *room) {
 		// update territory counts
 		if (COUNTS_AS_TERRITORY(room)) {
 			struct empire_island *eisle = get_empire_island(emp, GET_ISLAND_ID(room));
-			ter_type = get_territory_type_for_empire(room, emp, FALSE, &junk);
+			ter_type = get_territory_type_for_empire(room, emp, FALSE, &junk, NULL);
 			
 			SAFE_ADD(EMPIRE_TERRITORY(emp, ter_type), -1, 0, UINT_MAX, FALSE);
 			SAFE_ADD(eisle->territory[ter_type], -1, 0, UINT_MAX, FALSE);
@@ -3097,7 +3502,7 @@ void perform_claim_room(room_data *room, empire_data *emp) {
 	// update territory counts
 	if (COUNTS_AS_TERRITORY(room)) {
 		struct empire_island *eisle = get_empire_island(emp, GET_ISLAND_ID(room));
-		ter_type = get_territory_type_for_empire(room, emp, FALSE, &junk);
+		ter_type = get_territory_type_for_empire(room, emp, FALSE, &junk, NULL);
 		
 		SAFE_ADD(EMPIRE_TERRITORY(emp, ter_type), 1, 0, UINT_MAX, FALSE);
 		SAFE_ADD(eisle->territory[ter_type], 1, 0, UINT_MAX, FALSE);
@@ -4013,9 +4418,8 @@ bool run_globals(int glb_type, GLB_FUNCTION(*func), bool allow_many, bitvector_t
 		}
 		else {	// not choose-last
 			if (func) {
-				func(glb, ch, other_data);
+				found |= func(glb, ch, other_data);
 			}
-			found = TRUE;
 			if (!allow_many) {
 				break;	// only use first match
 			}
@@ -4025,8 +4429,7 @@ bool run_globals(int glb_type, GLB_FUNCTION(*func), bool allow_many, bitvector_t
 	
 	// failover/choose-last
 	if (!found && choose_last && func) {
-		func(choose_last, ch, other_data);
-		found = TRUE;
+		found |= func(choose_last, ch, other_data);
 	}
 	
 	return found;
@@ -4536,7 +4939,7 @@ bool meets_interaction_restrictions(struct interact_restriction *list, char_data
 
 GLB_FUNCTION(run_global_mob_interactions_func) {
 	struct glb_mob_interact_bean *data = (struct glb_mob_interact_bean*)other_data;
-	run_interactions(ch, GET_GLOBAL_INTERACTIONS(glb), data->type, IN_ROOM(ch), data->mob, NULL, NULL, data->func);
+	return run_interactions(ch, GET_GLOBAL_INTERACTIONS(glb), data->type, IN_ROOM(ch), data->mob, NULL, NULL, data->func);
 }
 
 
@@ -4993,7 +5396,7 @@ void remove_lore_record(char_data *ch, struct lore_data *lore) {
 
 
  //////////////////////////////////////////////////////////////////////////////
-//// MINI-PET AND COMPANION HANDLERS /////////////////////////////////////////
+//// MINIPET AND COMPANION HANDLERS //////////////////////////////////////////
 
 // for minipets/show minipets
 int sort_minipets(struct minipet_data *a, struct minipet_data *b) {
@@ -5483,6 +5886,9 @@ void tag_mob(char_data *mob, char_data *player) {
 		return;
 	}
 	
+	// tagged mobs need a reset later
+	schedule_reset_mob(mob);
+	
 	// do not re-tag
 	if (MOB_TAGGED_BY(mob)) {
 		return;
@@ -5551,13 +5957,22 @@ void add_mount(char_data *ch, mob_vnum vnum, bitvector_t flags) {
 */
 bitvector_t get_mount_flags_by_mob(char_data *mob) {
 	bitvector_t flags = NOBITS;
+	char_data *proto = mob_proto(GET_MOB_VNUM(mob));
+	
+	if (!proto) {
+		// somehow? just fall back
+		proto = mob;
+	}
 	
 	// MOUNT_x: detect mount flags
-	if (AFF_FLAGGED(mob, AFF_FLY)) {
+	if (AFF_FLAGGED(proto, AFF_FLY)) {
 		SET_BIT(flags, MOUNT_FLYING);
 	}
-	if (MOB_FLAGGED(mob, MOB_AQUATIC)) {
+	if (MOB_FLAGGED(proto, MOB_AQUATIC)) {
 		SET_BIT(flags, MOUNT_AQUATIC);
+	}
+	if (AFF_FLAGGED(proto, AFF_WATERWALK)) {
+		SET_BIT(flags, MOUNT_WATERWALK);
 	}
 	
 	return flags;
@@ -5638,6 +6053,35 @@ void perform_mount(char_data *ch, char_data *mount) {
 */
 void add_to_object_list(obj_data *obj) {
 	DL_PREPEND(object_list, obj);
+}
+
+
+/**
+* Raises or lowers the light count where the object is. This does NOT check if
+* the object is lit or not. The object is only used to get the location, if
+* any.
+*
+* @param obj_data *obj The object (ideally this is a light, but it does not check).
+* @param bool add If TRUE, adds a light. If FALSE, removes one.
+*/
+void apply_obj_light(obj_data *obj, bool add) {
+	if (obj) {
+		if (obj->carried_by) {
+			GET_LIGHTS(obj->carried_by) += (add ? 1 : -1);
+			if (IN_ROOM(obj->carried_by)) {
+				ROOM_LIGHTS(IN_ROOM(obj->carried_by)) += (add ? 1 : -1);
+			}
+		}
+		else if (obj->worn_by) {
+			GET_LIGHTS(obj->worn_by) += (add ? 1 : -1);
+			if (IN_ROOM(obj->worn_by)) {
+				ROOM_LIGHTS(IN_ROOM(obj->worn_by)) += (add ? 1 : -1);
+			}
+		}
+		else if (IN_ROOM(obj)) {
+			ROOM_LIGHTS(IN_ROOM(obj)) += (add ? 1 : -1);
+		}
+	}
 }
 
 
@@ -5783,6 +6227,7 @@ void extract_obj(obj_data *obj) {
 		extract_obj(obj->contains);
 	}
 	
+	cancel_all_stored_events(&GET_OBJ_STORED_EVENTS(obj));
 	remove_from_object_list(obj);
 
 	if (SCRIPT(obj)) {
@@ -6367,7 +6812,7 @@ void equip_char(char_data *ch, obj_data *obj, int pos) {
 		obj->worn_on = pos;
 
 		// lights?
-		if (OBJ_FLAGGED(obj, OBJ_LIGHT)) {
+		if (LIGHT_IS_LIT(obj)) {
 			++GET_LIGHTS(ch);
 			if (IN_ROOM(ch)) {
 				++ROOM_LIGHTS(IN_ROOM(ch));
@@ -6417,7 +6862,7 @@ void obj_from_char(obj_data *object) {
 		update_MSDP_inventory(object->carried_by, UPDATE_SOON);
 
 		// check lights
-		if (OBJ_FLAGGED(object, OBJ_LIGHT)) {
+		if (LIGHT_IS_LIT(object)) {
 			--GET_LIGHTS(object->carried_by);
 			if (IN_ROOM(object->carried_by)) {
 				--ROOM_LIGHTS(IN_ROOM(object->carried_by));
@@ -6443,6 +6888,7 @@ void obj_from_obj(obj_data *obj) {
 		log("SYSERR: (%s): trying to illegally extract obj from obj.", __FILE__);
 	}
 	else {
+		cancel_stored_event(&GET_OBJ_STORED_EVENTS(obj), SEV_OBJ_AUTOSTORE);
 		remove_dropped_item_anywhere(obj);
 		request_obj_save_in_world(obj);
 		
@@ -6475,10 +6921,11 @@ void obj_from_room(obj_data *object) {
 		log("SYSERR: NULL object (%p) or obj not in a room (%p) passed to obj_from_room", object, IN_ROOM(object));
 	}
 	else {
+		cancel_stored_event(&GET_OBJ_STORED_EVENTS(object), SEV_OBJ_AUTOSTORE);
 		request_obj_save_in_world(object);
 		
 		// update lights
-		if (OBJ_FLAGGED(object, OBJ_LIGHT)) {
+		if (LIGHT_IS_LIT(object)) {
 			--ROOM_LIGHTS(IN_ROOM(object));
 		}
 		if (ROOM_OWNER(IN_ROOM(object))) {
@@ -6500,6 +6947,7 @@ void obj_from_vehicle(obj_data *object) {
 		log("SYSERR: NULL object (%p) or obj not in a vehicle (%p) passed to obj_from_vehicle", object, object->in_vehicle);
 	}
 	else {
+		cancel_stored_event(&GET_OBJ_STORED_EVENTS(object), SEV_OBJ_AUTOSTORE);
 		request_obj_save_in_world(object);
 		if (VEH_OWNER(object->in_vehicle)) {
 			remove_dropped_item(VEH_OWNER(object->in_vehicle), object);
@@ -6554,6 +7002,7 @@ void obj_to_char(obj_data *object, char_data *ch) {
 		}
 		
 		// set the timer here; actual rules for it are in limits.c
+		// we do NOT schedule the actual autostore check here (items on chars don't autostore)
 		GET_AUTOSTORE_TIMER(object) = time(0);
 		
 		// unmark uncollected loot
@@ -6574,7 +7023,7 @@ void obj_to_char(obj_data *object, char_data *ch) {
 		}
 		
 		// update lights
-		if (OBJ_FLAGGED(object, OBJ_LIGHT)) {
+		if (LIGHT_IS_LIT(object)) {
 			++GET_LIGHTS(ch);
 			
 			// check if the room needs to be lit
@@ -6584,6 +7033,7 @@ void obj_to_char(obj_data *object, char_data *ch) {
 		}
 		
 		qt_get_obj(ch, object);
+		schedule_obj_timer_update(object, FALSE);
 		request_obj_save_in_world(object);
 	}
 	else {
@@ -6698,7 +7148,9 @@ void obj_to_obj(obj_data *obj, obj_data *obj_to) {
 		}
 		
 		// set the timer here; actual rules for it are in limits.c
-		GET_AUTOSTORE_TIMER(obj) = time(0);
+		if (!suspend_autostore_updates) {
+			schedule_obj_autostore_check(obj, time(0));
+		}
 		
 		// clear these now
 		REMOVE_BIT(GET_OBJ_EXTRA(obj), OBJ_KEEP);
@@ -6708,6 +7160,7 @@ void obj_to_obj(obj_data *obj, obj_data *obj_to) {
 		obj->in_obj = obj_to;
 		
 		add_dropped_item_anywhere(obj, NULL);
+		schedule_obj_timer_update(obj, FALSE);
 		request_obj_save_in_world(obj);
 	}
 }
@@ -6729,7 +7182,7 @@ void obj_to_room(obj_data *object, room_data *room) {
 		IN_ROOM(object) = room;
 		
 		// check light
-		if (OBJ_FLAGGED(object, OBJ_LIGHT)) {
+		if (LIGHT_IS_LIT(object)) {
 			++ROOM_LIGHTS(IN_ROOM(object));
 		}
 		
@@ -6738,13 +7191,21 @@ void obj_to_room(obj_data *object, room_data *room) {
 		clear_obj_eq_sets(object);
 
 		// set the timer here; actual rules for it are in limits.c
-		GET_AUTOSTORE_TIMER(object) = time(0);
+		if (!suspend_autostore_updates) {
+			schedule_obj_autostore_check(object, time(0));
+		}
 		
 		if (ROOM_OWNER(room)) {
 			add_dropped_item(ROOM_OWNER(room), object);
 		}
 		
+		schedule_obj_timer_update(object, FALSE);
 		request_obj_save_in_world(object);
+		
+		// see if anybody wants to eat it
+		if (IS_CORPSE(object)) {
+			check_scavengers(room);
+		}
 	}
 }
 
@@ -6771,12 +7232,17 @@ void obj_to_vehicle(obj_data *object, vehicle_data *veh) {
 		clear_obj_eq_sets(object);
 		
 		// set the timer here; actual rules for it are in limits.c
-		VEH_LAST_MOVE_TIME(veh) = GET_AUTOSTORE_TIMER(object) = time(0);
+		VEH_LAST_MOVE_TIME(veh) = time(0);
+		if (!suspend_autostore_updates) {
+			// update this time but don't schedule an autostore event -- vehicles do it themselves
+			GET_AUTOSTORE_TIMER(object) = time(0);
+		}
 		
 		if (VEH_OWNER(veh)) {
 			add_dropped_item(VEH_OWNER(veh), object);
 		}
 		
+		schedule_obj_timer_update(object, FALSE);
 		request_obj_save_in_world(object);
 	}
 }
@@ -6843,7 +7309,7 @@ obj_data *unequip_char(char_data *ch, int pos) {
 		obj->worn_on = NO_WEAR;
 
 		// adjust lights
-		if (OBJ_FLAGGED(obj, OBJ_LIGHT)) {
+		if (LIGHT_IS_LIT(obj)) {
 			--GET_LIGHTS(ch);
 			if (IN_ROOM(ch)) {
 				--ROOM_LIGHTS(IN_ROOM(ch));
@@ -6890,7 +7356,7 @@ obj_data *unequip_char(char_data *ch, int pos) {
 obj_data *unequip_char_to_inventory(char_data *ch, int pos) {
 	obj_data *obj = unequip_char(ch, pos);
 	
-	if (obj && OBJ_FLAGGED(obj, OBJ_SINGLE_USE)) {
+	if (obj && OBJ_FLAGGED(obj, OBJ_SINGLE_USE) && pos != WEAR_SHARE) {
 		extract_obj(obj);
 	}
 	else if (obj) {
@@ -6913,7 +7379,7 @@ obj_data *unequip_char_to_inventory(char_data *ch, int pos) {
 obj_data *unequip_char_to_room(char_data *ch, int pos) {
 	obj_data *obj = unequip_char(ch, pos);
 	
-	if (obj && OBJ_FLAGGED(obj, OBJ_SINGLE_USE)) {
+	if (obj && OBJ_FLAGGED(obj, OBJ_SINGLE_USE) && pos != WEAR_SHARE) {
 		extract_obj(obj);
 	}
 	else if (obj && IN_ROOM(ch)) {
@@ -7706,6 +8172,9 @@ struct req_data *copy_requirements(struct req_data *from) {
 	LL_FOREACH(from, iter) {
 		CREATE(el, struct req_data, 1);
 		*el = *iter;
+		if (iter->custom) {
+			el->custom = str_dup(iter->custom);
+		}
 		LL_APPEND(list, el);
 	}
 	
@@ -7728,6 +8197,9 @@ bool delete_requirement_from_list(struct req_data **list, int type, any_vnum vnu
 	LL_FOREACH_SAFE(*list, iter, next_iter) {
 		if (iter->type == type && iter->vnum == vnum) {
 			any = TRUE;
+			if (iter->custom) {
+				free(iter->custom);
+			}
 			LL_DELETE(*list, iter);
 			free(iter);
 		}
@@ -7865,6 +8337,9 @@ bool find_requirement_in_list(struct req_data *list, int type, any_vnum vnum) {
 void free_requirements(struct req_data *list) {
 	struct req_data *iter, *next_iter;
 	LL_FOREACH_SAFE(list, iter, next_iter) {
+		if (iter->custom) {
+			free(iter->custom);
+		}
 		free(iter);
 	}
 }
@@ -7940,7 +8415,7 @@ bool meets_requirements(char_data *ch, struct req_data *list, struct instance_da
 			case REQ_GET_COMPONENT: {
 				struct resource_data *res = NULL;
 				add_to_resource_list(&res, RES_COMPONENT, req->vnum, req->needed, req->misc);
-				if (!has_resources(ch, res, FALSE, FALSE)) {
+				if (!has_resources(ch, res, FALSE, FALSE, NULL)) {
 					ok = FALSE;
 				}
 				free_resource_list(res);
@@ -7949,7 +8424,7 @@ bool meets_requirements(char_data *ch, struct req_data *list, struct instance_da
 			case REQ_GET_OBJECT: {
 				struct resource_data *res = NULL;
 				add_to_resource_list(&res, RES_OBJECT, req->vnum, req->needed, 0);
-				if (!has_resources(ch, res, FALSE, FALSE)) {
+				if (!has_resources(ch, res, FALSE, FALSE, NULL)) {
 					ok = FALSE;
 				}
 				free_resource_list(res);
@@ -8063,7 +8538,7 @@ bool meets_requirements(char_data *ch, struct req_data *list, struct instance_da
 				if (!found) {
 					// check inventory
 					add_to_resource_list(&res, RES_OBJECT, req->vnum, req->needed, 0);
-					if (!has_resources(ch, res, FALSE, FALSE)) {
+					if (!has_resources(ch, res, FALSE, FALSE, NULL)) {
 						ok = FALSE;
 					}
 					free_resource_list(res);
@@ -8167,6 +8642,15 @@ bool meets_requirements(char_data *ch, struct req_data *list, struct instance_da
 				}
 				break;
 			}
+			case REQ_SPEAK_LANGUAGE: {
+				ok = (speaks_language(ch, req->vnum) == LANG_SPEAK);
+				break;
+			}
+			case REQ_RECOGNIZE_LANGUAGE: {
+				int level = speaks_language(ch, req->vnum);
+				ok = (level == LANG_RECOGNIZE || level == LANG_SPEAK);
+				break;
+			}
 			
 			// some types do not support pre-reqs
 			case REQ_KILL_MOB:
@@ -8210,9 +8694,10 @@ bool meets_requirements(char_data *ch, struct req_data *list, struct instance_da
 *
 * @param struct req_data *req The requirement to show.
 * @param bool show_vnums If TRUE, adds [1234] at the start of the string.
+* @param bool allow_custom If TRUE, will show a custom string isntead.
 * @return char* The string display.
 */
-char *requirement_string(struct req_data *req, bool show_vnums) {
+char *requirement_string(struct req_data *req, bool show_vnums, bool allow_custom) {
 	char vnum[256], lbuf[256];
 	static char output[256];
 	vehicle_data *vproto;
@@ -8413,10 +8898,23 @@ char *requirement_string(struct req_data *req, bool show_vnums) {
 			snprintf(output, sizeof(output), "Level over %d", req->needed);
 			break;
 		}
+		case REQ_SPEAK_LANGUAGE: {
+			snprintf(output, sizeof(output), "Able to speak %s%s", vnum, get_generic_name_by_vnum(req->vnum));
+			break;
+		}
+		case REQ_RECOGNIZE_LANGUAGE: {
+			snprintf(output, sizeof(output), "Able to recognize or speak %s%s", vnum, get_generic_name_by_vnum(req->vnum));
+			break;
+		}
 		default: {
 			sprintf(output, "Unknown condition");
 			break;
 		}
+	}
+	
+	// override with custom?
+	if (allow_custom && req->custom && *req->custom) {
+		snprintf(output, sizeof(output), "%s", req->custom);
 	}
 	
 	if (show_vnums && req->group) {
@@ -8449,41 +8947,41 @@ void add_depletion(room_data *room, int type, bool multiple) {
 
 
 /**
-* Fetch a depletion amount. In normal cases, it returns the requested type
-* PLUS the production depletion, as production applies to all types. If you
-* request production, it will add the next-highest type. Or pass only_type=TRUE
-* to skip this part.
+* Clears all depletions on the room, e.g. when the terrain changes.
+*
+* @param room_data *room Which room.
+*/
+void clear_depletions(room_data *room) {
+	struct depletion_data *dep, *next_dep;
+	
+	if (room && ROOM_DEPLETION(room)) {
+		LL_FOREACH_SAFE(ROOM_DEPLETION(room), dep, next_dep) {
+			LL_DELETE(ROOM_DEPLETION(room), dep);
+			free(dep);
+		}
+		
+		request_world_save(GET_ROOM_VNUM(room), WSAVE_ROOM);
+	}
+}
+
+
+/**
+* Fetch a depletion amount.
 *
 * @param struct depletion_data *list List of depletions.
-* @param int type DPLTN_
-* @param bool only_type Normally this function combines 'production' depletion with the requested type, unless only_type is TRUE.
+* @param int type DPLTN_ Which type to get.
 * @return int The depletion counter on that resource in that room.
 */
-int get_depletion_amount(struct depletion_data *list, int type, bool only_type) {
+int get_depletion_amount(struct depletion_data *list, int type) {
 	struct depletion_data *dep;
-	int amount = 0, highest = 0;
 	
 	LL_FOREACH(list, dep) {
-		if (only_type && dep->type == type) {
-			// shortcut
+		if (dep->type == type) {
 			return dep->count;
-		}
-		else if (!only_type && type == DPLTN_PRODUCTION) {
-			// requesting 'production' will add the next-highest too
-			if (dep->type == DPLTN_PRODUCTION) {
-				amount += dep->count;
-			}
-			else if (dep->count > highest) {
-				highest = dep->count;
-			}
-		}
-		else if (!only_type && (dep->type == type || dep->type == DPLTN_PRODUCTION)) {
-			// requested a non-production type and will also add production to that
-			amount += dep->count;
 		}
 	}
 	
-	return amount + highest;
+	return 0;
 }
 
 
@@ -8559,29 +9057,29 @@ void remove_depletion(room_data *room, int type) {
 
 
 /**
-* Sets a room's depletion to a specific value.
+* Sets a depletion to a specific value.
 *
-* @param room_data *room The room to set depletion on.
+* @param struct depletion_data **list A pointer to the depletion list (ROOM_DEPLETION, etc).
 * @param int type DPLTN_ const
 * @param int value How much to set the depletion to.
 */
-void set_depletion(room_data *room, int type, int value) {
+void set_depletion(struct depletion_data **list, int type, int value) {
 	struct depletion_data *dep;
 	bool found = FALSE;
 	
-	// shortcut: oceans are undepletable
-	if (SHARED_DATA(room) == &ocean_shared_data) {
+	// safety first
+	if (!list) {
 		return;
 	}
 	
 	// shortcut
 	if (value <= 0) {
-		remove_depletion(room, type);
+		remove_depletion_from_list(list, type);
 		return;
 	}
 	
 	// existing?
-	LL_FOREACH(ROOM_DEPLETION(room), dep) {
+	LL_FOREACH(*list, dep) {
 		if (dep->type == type) {
 			dep->count = value;
 			found = TRUE;
@@ -8595,10 +9093,8 @@ void set_depletion(room_data *room, int type, int value) {
 		dep->type = type;
 		dep->count = value;
 		
-		LL_PREPEND(ROOM_DEPLETION(room), dep);
+		LL_PREPEND(*list, dep);
 	}
-	
-	request_world_save(GET_ROOM_VNUM(room), WSAVE_ROOM);
 }
 
 
@@ -8721,7 +9217,7 @@ void reset_light_count(room_data *room) {
 	vehicle_data *veh;
 	obj_data *obj;
 	char_data *ch;
-	int pos;
+	// int pos;
 	
 	ROOM_LIGHTS(room) = 0;
 	
@@ -8739,21 +9235,27 @@ void reset_light_count(room_data *room) {
 	
 	// people
 	DL_FOREACH2(ROOM_PEOPLE(room), ch, next_in_room) {
+		ROOM_LIGHTS(room) += GET_LIGHTS(ch);
+		/*
+		if (AFF_FLAGGED(ch, AFF_LIGHT)) {
+			++ROOM_LIGHTS(room);
+		}
 		for (pos = 0; pos < NUM_WEARS; ++pos) {
-			if (GET_EQ(ch, pos) && OBJ_FLAGGED(GET_EQ(ch, pos), OBJ_LIGHT)) {
+			if (GET_EQ(ch, pos) && LIGHT_IS_LIT(GET_EQ(ch, pos))) {
 				++ROOM_LIGHTS(room);
 			}
 		}
 		DL_FOREACH2(ch->carrying, obj, next_content) {
-			if (OBJ_FLAGGED(obj, OBJ_LIGHT)) {
+			if (LIGHT_IS_LIT(obj)) {
 				++ROOM_LIGHTS(room);
 			}
 		}
+		*/
 	}
 	
 	// objects
 	DL_FOREACH2(ROOM_CONTENTS(room), obj, next_content) {
-		if (OBJ_FLAGGED(obj, OBJ_LIGHT)) {
+		if (LIGHT_IS_LIT(obj)) {
 			++ROOM_LIGHTS(room);
 		}
 	}
@@ -9829,6 +10331,11 @@ void store_unique_item(char_data *ch, struct empire_unique_storage **to_list, ob
 		set_obj_val(obj, VAL_DRINK_CONTAINER_CONTENTS, 0);
 		set_obj_val(obj, VAL_DRINK_CONTAINER_TYPE, LIQ_WATER);
 	}
+	
+	// SEV_x: events that must be canceled or changed when an item is stored
+	cancel_stored_event(&GET_OBJ_STORED_EVENTS(obj), SEV_OBJ_AUTOSTORE);
+	cancel_stored_event(&GET_OBJ_STORED_EVENTS(obj), SEV_OBJ_TIMER);
+	// TODO: convert to a timer that can tick while stored
 	
 	// existing eus entry or new one? only passes 'room' if it's an empire; player storage is global
 	if ((eus = find_eus_entry(obj, *to_list, save_emp ? room : NULL))) {

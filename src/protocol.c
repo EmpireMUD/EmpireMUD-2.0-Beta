@@ -685,7 +685,7 @@ const char *ProtocolOutput(descriptor_t *apDescriptor, const char *apData, int *
 		const char ColourChar[] = { COLOUR_CHAR, '\0' };
 		bool_t bColourOn = true;	// always default to true, or many parts of the code won't work correctly -- TODO change all instances of & in the code to \t so this can be a config
 	#endif /* COLOUR_CHAR */
-	bool_t bTerminate = false, bUseMXP = false, bUseMSP = false;
+	bool_t bTerminate = false, bUseMXP = false, bUseMSP = false, want_cap = FALSE, want_lower = FALSE;
 	int i = 0, j = 0; /* Index values */
 
 	protocol_t *pProtocol = apDescriptor ? apDescriptor->pProtocol : NULL;
@@ -806,7 +806,7 @@ const char *ProtocolOutput(descriptor_t *apDescriptor, const char *apData, int *
 						pCopyFrom = LinkStop;
 					pProtocol->bBlockMXP = false;
 					break;
-				case '<':
+				case '<': {
 					if (!pProtocol->bBlockMXP && pProtocol->pVariables[eMSDP_MXP]->ValueInt) {
 						pCopyFrom = MXPStart;
 						bUseMXP = true;
@@ -818,7 +818,8 @@ const char *ProtocolOutput(descriptor_t *apDescriptor, const char *apData, int *
 					}
 					pProtocol->bBlockMXP = false;
 					break;
-				case '[':
+				}
+				case '[': {
 					if (tolower(apData[++j]) == 'u') {
 						char Buffer[8] = {'\0'}, BugString[256];
 						int Index = 0;
@@ -849,7 +850,7 @@ const char *ProtocolOutput(descriptor_t *apDescriptor, const char *apData, int *
 							ReportBug(BugString);
 						}
 						else if (!bValid) {
-							sprintf(BugString, "BUG: Unicode substitute '%s' truncated.  Missing ']'?\n", Buffer);
+							sprintf(BugString, "BUG: Unicode substitute '%s' truncated. Missing ']'?\n", Buffer);
 							ReportBug(BugString);
 						}
 						else if (pProtocol->pVariables[eMSDP_UTF_8]->ValueInt) {
@@ -919,7 +920,7 @@ const char *ProtocolOutput(descriptor_t *apDescriptor, const char *apData, int *
 							ReportBug(BugString);
 						}
 						else if (!bValid) {
-							sprintf(BugString, "BUG: Required MXP version '%s' too long.  Missing ']'?\n", Buffer);
+							sprintf(BugString, "BUG: Required MXP version '%s' too long. Missing ']'?\n", Buffer);
 							ReportBug(BugString);
 						}
 						else if (!strcmp(pProtocol->pMXPVersion, "Unknown") || strcmp(pProtocol->pMXPVersion, Buffer) < 0) {
@@ -934,6 +935,7 @@ const char *ProtocolOutput(descriptor_t *apDescriptor, const char *apData, int *
 						bTerminate = !bDone;
 					}
 					break;
+				}
 				case '!': /* Used for in-band MSP sound triggers */
 					pCopyFrom = MSP;
 					break;
@@ -945,6 +947,14 @@ const char *ProtocolOutput(descriptor_t *apDescriptor, const char *apData, int *
 				case '-':
 					bColourOn = false;
 					break;
+				case 'Z': {
+					want_cap = TRUE;
+					break;
+				}
+				case 'z': {
+					want_lower = TRUE;
+					break;
+				}
 				case COLOUR_CHAR: {	// allows \t& to guarantee a printed & whether COLOUR_CHAR is on or off, unlike && which displays both & if COLOUR_CHAR is undefined
 					pCopyFrom = ColourChar;
 					break;
@@ -968,7 +978,16 @@ const char *ProtocolOutput(descriptor_t *apDescriptor, const char *apData, int *
 				
 				// requested output
 				while (*pCopyFrom != '\0' && i < MAX_OUTPUT_BUFFER) {
-					Result[i++] = *pCopyFrom++;
+					if (want_cap) {
+						Result[i++] = UPPER(*pCopyFrom++);
+					}
+					else if (want_lower) {
+						Result[i++] = LOWER(*pCopyFrom++);
+					}
+					else {
+						Result[i++] = *pCopyFrom++;
+					}
+					want_cap = want_lower = FALSE;
 				}
 			}
 		}
@@ -1119,6 +1138,15 @@ const char *ProtocolOutput(descriptor_t *apDescriptor, const char *apData, int *
 					}
 					break;
 				}
+				
+				case 'Z': {
+					want_cap = TRUE;
+					break;
+				}
+				case 'z': {
+					want_lower = TRUE;
+					break;
+				}
 
 				default:
 					#ifdef DISPLAY_INVALID_COLOUR_CODES
@@ -1138,7 +1166,16 @@ const char *ProtocolOutput(descriptor_t *apDescriptor, const char *apData, int *
 				
 				// show requested output
 				while (*pCopyFrom != '\0' && i < MAX_OUTPUT_BUFFER) {
-					Result[i++] = *pCopyFrom++;
+					if (want_cap) {
+						Result[i++] = UPPER(*pCopyFrom++);
+					}
+					else if (want_lower) {
+						Result[i++] = LOWER(*pCopyFrom++);
+					}
+					else {
+						Result[i++] = *pCopyFrom++;
+					}
+					want_cap = want_lower = FALSE;
 				}
 			}
 		}
@@ -1146,8 +1183,18 @@ const char *ProtocolOutput(descriptor_t *apDescriptor, const char *apData, int *
 
 		else if (bUseMXP && apData[j] == '>') {
 			const char *pCopyFrom = MXPStop;
-			while (*pCopyFrom != '\0' && i < MAX_OUTPUT_BUFFER)
-				Result[i++] = *pCopyFrom++;
+			while (*pCopyFrom != '\0' && i < MAX_OUTPUT_BUFFER) {
+				if (want_cap) {
+					Result[i++] = UPPER(*pCopyFrom++);
+				}
+				else if (want_lower) {
+					Result[i++] = LOWER(*pCopyFrom++);
+				}
+				else {
+					Result[i++] = *pCopyFrom++;
+				}
+				want_cap = want_lower = FALSE;
+			}
 			bUseMXP = false;
 		}
 		else if (bUseMSP && j > 0 && apData[j-1] == '!' && apData[j] == '!' && PrefixString("SOUND(", &apData[j+1])) {
@@ -1162,7 +1209,16 @@ const char *ProtocolOutput(descriptor_t *apDescriptor, const char *apData, int *
 			}
 			
 			// copy the character
-			Result[i++] = apData[j];
+			if (want_cap) {
+				Result[i++] = UPPER(apData[j]);
+			}
+			else if (want_lower) {
+				Result[i++] = LOWER(apData[j]);
+			}
+			else {
+				Result[i++] = apData[j];
+			}
+			want_cap = want_lower = FALSE;
 		}
 	}
 
@@ -2612,23 +2668,35 @@ static const char *GetMSSP_Extra_Descs() {
 	struct extra_descr_data *ex;
 	obj_data *obj, *next_obj;
 	bld_data *bld, *next_bld;
+	crop_data *crop, *next_crop;
+	sector_data *sect, *next_sect;
 	int count = 0;
 	
 	HASH_ITER(hh, object_table, obj, next_obj) {
 		if (GET_OBJ_ACTION_DESC(obj) && *GET_OBJ_ACTION_DESC(obj)) {
 			++count;
 		}
-		for (ex = GET_OBJ_EX_DESCS(obj); ex; ex = ex->next) {
+		LL_FOREACH(GET_OBJ_EX_DESCS(obj), ex) {
 			++count;
 		}
 	}
 	HASH_ITER(hh, room_template_table, rmt, next_rmt) {
-		for (ex = GET_RMT_EX_DESCS(rmt); ex; ex = ex->next) {
+		LL_FOREACH(GET_RMT_EX_DESCS(rmt), ex) {
 			++count;
 		}
 	}
 	HASH_ITER(hh, building_table, bld, next_bld) {
-		for (ex = GET_BLD_EX_DESCS(bld); ex; ex = ex->next) {
+		LL_FOREACH(GET_BLD_EX_DESCS(bld), ex) {
+			++count;
+		}
+	}
+	HASH_ITER(hh, crop_table, crop, next_crop) {
+		LL_FOREACH(GET_CROP_EX_DESCS(crop), ex) {
+			++count;
+		}
+	}
+	HASH_ITER(hh, sector_table, sect, next_sect) {
+		LL_FOREACH(GET_SECT_EX_DESCS(sect), ex) {
 			++count;
 		}
 	}
@@ -3106,7 +3174,7 @@ void update_MSDP_affects(char_data *ch, int send_update) {
 		*buf = '\0';
 		buf_size = 0;
 		LL_FOREACH(ch->affected, aff) {
-			buf_size += snprintf(buf + buf_size, sizeof(buf) - buf_size, "%c%s%c%ld", (char)MSDP_VAR, get_generic_name_by_vnum(aff->type), (char)MSDP_VAL, (aff->duration == UNLIMITED ? -1 : (aff->duration * SECS_PER_REAL_UPDATE)));
+			buf_size += snprintf(buf + buf_size, sizeof(buf) - buf_size, "%c%s%c%ld", (char)MSDP_VAR, get_generic_name_by_vnum(aff->type), (char)MSDP_VAL, (aff->expire_time == UNLIMITED ? -1 : (aff->expire_time - time(0))));
 		}
 		MSDPSetTable(ch->desc, eMSDP_AFFECTS, buf);
 		
@@ -3220,7 +3288,7 @@ void update_MSDP_dots(char_data *ch, int send_update) {
 			// each dot has a sub-table
 			buf_size += snprintf(buf + buf_size, sizeof(buf) - buf_size, "%c%s%c%c", (char)MSDP_VAR, get_generic_name_by_vnum(dot->type), (char)MSDP_VAL, (char)MSDP_TABLE_OPEN);
 			
-			buf_size += snprintf(buf + buf_size, sizeof(buf) - buf_size, "%cDURATION%c%ld", (char)MSDP_VAR, (char)MSDP_VAL, (dot->duration == UNLIMITED ? -1 : (dot->duration * SECS_PER_REAL_UPDATE)));
+			buf_size += snprintf(buf + buf_size, sizeof(buf) - buf_size, "%cDURATION%c%d", (char)MSDP_VAR, (char)MSDP_VAL, dot->time_remaining);
 			buf_size += snprintf(buf + buf_size, sizeof(buf) - buf_size, "%cTYPE%c%s", (char)MSDP_VAR, (char)MSDP_VAL, damage_types[dot->damage_type]);
 			buf_size += snprintf(buf + buf_size, sizeof(buf) - buf_size, "%cDAMAGE%c%d", (char)MSDP_VAR, (char)MSDP_VAL, dot->damage * dot->stack);
 			buf_size += snprintf(buf + buf_size, sizeof(buf) - buf_size, "%cSTACKS%c%d", (char)MSDP_VAR, (char)MSDP_VAL, dot->stack);

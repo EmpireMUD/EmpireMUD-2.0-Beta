@@ -3,26 +3,53 @@ guard panicked~
 the panicked guard~
 A panicked guard is fleeing the hamlet!
 ~
-0 0 bdv nD 3
-1 0 0 15
+0 0 bdvDI nD 3
+1 0 0 15 -1
+D
+   The guard is still dressed in his city colors, albeit streaked with red and
+slightly singed. He's pacing back and forth anxiously as he awaits news of
+survivors inside, but his limp tells you he's not strong enough to go back in
+and help.
+~
 T 10400
 T 10401
+T 10403
 S
 #10401
 ghoul crouching~
 a crouching ghoul~
 A ghoul is crouched here, looking up at you.
 ~
-0 0 abd s 3
-0 0 0 10
-I 4 10408 3.00 1 X  # LOOT: tarnished silver earrings
-I 4 10409 3.00 1 X  # LOOT: a steel chain
-I 4 10410 3.00 1 X  # LOOT: ringmail bracers
-I 4 10411 3.00 1 X  # LOOT: a ring of pearls
-I 4 10412 3.00 1 X  # LOOT: a fine village dress
-I 4 10413 3.00 1 X  # LOOT: a handsome village suit
-I 4 10414 3.00 1 X  # LOOT: an imperium wedding band
-I 4 10415 3.00 1 X  # LOOT: an heirloom cloth necklace
+0 0 abdE s 3
+0 0 0 10 -1
+D
+   The ghoul looks like it was human, once. Part of its face is missing and its
+clothes are covered in dirt and dried blood. The ghoul sees you and licks its
+teeth menacingly.
+~
+I 4 10408 1.00 1 e  # LOOT: tarnished silver earrings
+I 4 10409 1.00 1 e  # LOOT: steel chain
+I 4 10410 1.00 1 e  # LOOT: ringmail bracers
+I 4 10411 1.00 1 e  # LOOT: ring of pearls
+I 4 10414 1.00 1 e  # LOOT: imperium wedding band
+I 4 10415 1.00 1 e  # LOOT: heirloom cloth necklace
+I 4 10419 1.00 1 e  # LOOT: pair of enchanted boots
+I 4 10448 1.00 1 e  # LOOT: night watch ring
+I 4 10449 1.00 1 e  # LOOT: imperium ear guards
+I 4 10412 2.00 1 e  # LOOT: fine village dress
+I 4 10413 2.00 1 e  # LOOT: handsome village suit
+M
+0
+A ghoul stumbles around. It seems lost.~
+M
+0
+A ghoul suddenly looks up at one of the shops, as if it remembers something of its old life.~
+M
+0
+A ghoul groans a low, dull groan.~
+M
+0
+A ghoul seems to be gnawing on a bone. Hopefully it wasn't anybody you knew.~
 T 10405
 S
 #10402
@@ -30,16 +57,38 @@ panther huge familiar~
 a huge panther~
 A huge panther, surely a mage's familiar, is prowling the street.
 ~
-0 0 bdz 0 4
-0 0 0 9
-I 4 10408 6.00 1 X  # LOOT: tarnished silver earrings
-I 4 10409 6.00 1 X  # LOOT: a steel chain
-I 4 10410 6.00 1 X  # LOOT: ringmail bracers
-I 4 10411 6.00 1 X  # LOOT: a ring of pearls
-I 4 10412 6.00 1 X  # LOOT: a fine village dress
-I 4 10413 6.00 1 X  # LOOT: a handsome village suit
-I 4 10414 6.00 1 X  # LOOT: an imperium wedding band
-I 4 10415 6.00 1 X  # LOOT: an heirloom cloth necklace
+0 0 bdzE 0 4
+0 0 0 9 -1
+D
+   This panther is twice the size of any you've seen in the wild, with strange
+symbols branded into its violet-black fur.
+~
+I 4 10408 1.00 1 e  # LOOT: tarnished silver earrings
+I 4 10409 1.00 1 e  # LOOT: steel chain
+I 4 10410 1.00 1 e  # LOOT: ringmail bracers
+I 4 10411 1.00 1 e  # LOOT: ring of pearls
+I 4 10414 1.00 1 e  # LOOT: imperium wedding band
+I 4 10415 1.00 1 e  # LOOT: heirloom cloth necklace
+I 4 10419 1.00 1 e  # LOOT: pair of enchanted boots
+I 4 10448 1.00 1 e  # LOOT: night watch ring
+I 4 10449 1.00 1 e  # LOOT: imperium ear guards
+I 4 10412 2.00 1 e  # LOOT: fine village dress
+I 4 10413 2.00 1 e  # LOOT: handsome village suit
+M
+0
+The panther stalks back and forth across the street.~
+M
+0
+The panther lets out a low, deep warning growl.~
+M
+0
+The panther licks blood from its paw.~
+M
+0
+The panther stares directly into your eyes, as if challenging you.~
+M
+0
+The panther roars a dull roar.~
 T 10405
 S
 #10403
@@ -47,16 +96,38 @@ cobra giant familiar~
 a giant cobra~
 There is a giant cobra familiar coiled in the street.
 ~
-0 0 bdz 0 4
-0 0 0 9
-I 4 10408 6.00 1 X  # LOOT: tarnished silver earrings
-I 4 10409 6.00 1 X  # LOOT: a steel chain
-I 4 10410 6.00 1 X  # LOOT: ringmail bracers
-I 4 10411 6.00 1 X  # LOOT: a ring of pearls
-I 4 10412 6.00 1 X  # LOOT: a fine village dress
-I 4 10413 6.00 1 X  # LOOT: a handsome village suit
-I 4 10414 6.00 1 X  # LOOT: an imperium wedding band
-I 4 10415 6.00 1 X  # LOOT: an heirloom cloth necklace
+0 0 bdzE 0 4
+0 0 0 9 -1
+D
+   The cobra is larger than a cow with fangs that would embarrass a long-horned
+bull. It coils and rears back to strike at you!
+~
+I 4 10408 1.00 1 e  # LOOT: tarnished silver earrings
+I 4 10409 1.00 1 e  # LOOT: steel chain
+I 4 10410 1.00 1 e  # LOOT: ringmail bracers
+I 4 10411 1.00 1 e  # LOOT: ring of pearls
+I 4 10414 1.00 1 e  # LOOT: imperium wedding band
+I 4 10415 1.00 1 e  # LOOT: heirloom cloth necklace
+I 4 10419 1.00 1 e  # LOOT: pair of enchanted boots
+I 4 10448 1.00 1 e  # LOOT: night watch ring
+I 4 10449 1.00 1 e  # LOOT: imperium ear guards
+I 4 10412 2.00 1 e  # LOOT: fine village dress
+I 4 10413 2.00 1 e  # LOOT: handsome village suit
+M
+0
+The cobra flares its hood as it watches you.~
+M
+0
+The cobra lets out a low, cackling hiss.~
+M
+0
+The cobra flicks its tongue in and out of its mouth.~
+M
+0
+The cobra flickers with a faint blue glow.~
+M
+0
+The cobra rocks back and forth, taunting you.~
 T 10405
 S
 #10404
@@ -64,12 +135,40 @@ skeleton giant animated~
 the giant skeleton~
 The animated skeleton of a giant looms tall over the street!
 ~
-0 0 bdA G 4
-0 0 0 5
-I 4 10418 2.00 1 X  # LOOT: a skeletal horse whip
-I 4 10416 20.00 1 X  # LOOT: a giant bone mace
-I 4 10417 20.00 1 X  # LOOT: a tattered cloak of manasilk
-I 4 10419 20.00 1 X  # LOOT: a pair of enchanted boots
+0 0 bdAE G 4
+0 0 0 5 -1
+D
+   The skeleton is twice your height and even without flesh and bones, it looks
+like it probably outweighs you. It wields a massive bone mace which can only
+have come from a mammoth.
+~
+I 4 10416 9.09 1 p  # LOOT: giant bone mace
+I 4 10421 9.09 1 p  # LOOT: mammoth spear
+I 4 10423 9.09 1 p  # LOOT: shackles of the undead
+I 4 10431 9.09 1 p  # LOOT: pair of ghoulsbane gauntlets
+I 4 10440 9.09 1 p  # LOOT: giant's skull
+I 4 10425 9.09 1 p  # LOOT: studded bone shield
+I 4 10422 9.09 1 p  # LOOT: imperium-weave cloak
+I 4 10432 9.09 1 p  # LOOT: necrotic mail skirt
+I 4 10429 9.09 1 p  # LOOT: terrifying leather mask
+I 4 10405 9.09 1 p  # LOOT: fine hamlet gauntlets
+I 4 10412 4.55 1 p  # LOOT: fine village dress
+I 4 10413 4.55 1 p  # LOOT: handsome village suit
+M
+0
+The skeleton swings its club idly.~
+M
+0
+The skeleton bangs on the roof of one of the shops.~
+M
+0
+The skeleton notices you standing there and stops to stare with its empty eyes.~
+M
+0
+The skeleton grabs a cask of ale from a nearby shop and tries to drink it, but the ale pours through its ribcage and out the bottom.~
+M
+0
+The skeleton roars an unearthly roar at you!~
 T 10405
 T 10410
 S
@@ -78,13 +177,37 @@ mammoth skeletal~
 the skeletal mammoth~
 A skeletal mammoth blocks the entire street!
 ~
-0 0 bdyA G 5
-0 0 0 27
-I 4 10420 2.00 1 X  # LOOT: a skeletal mammoth crop
-I 4 10418 4.00 1 X  # LOOT: a skeletal horse whip
-I 4 10421 20.00 1 X  # LOOT: a mammoth spear
-I 4 10422 20.00 1 X  # LOOT: an imperium-weave cloak
-I 4 10423 20.00 1 X  # LOOT: shackles of the undead
+0 0 bdyAE G 5
+0 0 0 27 -1
+D
+   Without its fur and flesh, the mammoth is still truly mammoth. Its long
+tusks give it a reach you can hardly contend with, and its trunk-like leg bones
+look like a fearsome way to die.
+~
+I 4 10416 9.09 1 p  # LOOT: giant bone mace
+I 4 10421 9.09 1 p  # LOOT: mammoth spear
+I 4 10423 9.09 1 p  # LOOT: shackles of the undead
+I 4 10431 9.09 1 p  # LOOT: pair of ghoulsbane gauntlets
+I 4 10440 9.09 1 p  # LOOT: giant's skull
+I 4 10425 9.09 1 p  # LOOT: studded bone shield
+I 4 10422 9.09 1 p  # LOOT: imperium-weave cloak
+I 4 10432 9.09 1 p  # LOOT: necrotic mail skirt
+I 4 10429 9.09 1 p  # LOOT: terrifying leather mask
+I 4 10405 9.09 1 p  # LOOT: fine hamlet gauntlets
+I 4 10412 4.55 1 p  # LOOT: fine village dress
+I 4 10413 4.55 1 p  # LOOT: handsome village suit
+M
+0
+The skeletal mammoth stomps its feet like a huge, terrifying drum.~
+M
+0
+The mammoth leans its head back to trumpet and though it has no trunk, you hear the deathly echo of its voice reverberate off the shopfronts.~
+M
+0
+The mammoth uses its enormous, bony feet to crush market goods that have spilled in the street.~
+M
+0
+The skeletal mammoth rocks side to side, bashing shops with its entire body.~
 T 10405
 T 10406
 T 10410
@@ -94,16 +217,34 @@ armor animated suit~
 the animated armor~
 An animated suit of armor swings its sword at you!
 ~
-0 0 bdzA G 3
-0 0 0 1
-I 4 10408 6.00 1 X  # LOOT: tarnished silver earrings
-I 4 10409 6.00 1 X  # LOOT: a steel chain
-I 4 10410 6.00 1 X  # LOOT: ringmail bracers
-I 4 10411 6.00 1 X  # LOOT: a ring of pearls
-I 4 10412 6.00 1 X  # LOOT: a fine village dress
-I 4 10413 6.00 1 X  # LOOT: a handsome village suit
-I 4 10414 6.00 1 X  # LOOT: an imperium wedding band
-I 4 10415 6.00 1 X  # LOOT: an heirloom cloth necklace
+0 0 abdzAE G 3
+0 0 0 1 -1
+D
+The armor is empty!
+~
+I 4 10408 1.00 1 e  # LOOT: tarnished silver earrings
+I 4 10409 1.00 1 e  # LOOT: steel chain
+I 4 10410 1.00 1 e  # LOOT: ringmail bracers
+I 4 10411 1.00 1 e  # LOOT: ring of pearls
+I 4 10414 1.00 1 e  # LOOT: imperium wedding band
+I 4 10415 1.00 1 e  # LOOT: heirloom cloth necklace
+I 4 10419 1.00 1 e  # LOOT: pair of enchanted boots
+I 4 10448 1.00 1 e  # LOOT: night watch ring
+I 4 10449 1.00 1 e  # LOOT: imperium ear guards
+I 4 10412 2.00 1 e  # LOOT: fine village dress
+I 4 10413 2.00 1 e  # LOOT: handsome village suit
+M
+0
+A suit of armor tips its visor to you, revealing nothing inside!~
+M
+0
+A suit of armor bangs on its hollow, tinny chest.~
+M
+0
+A suit of armor falls to the ground and scatters for a second, before picking itself back up and putting itself back together.~
+M
+0
+A suit of armor rattles around as it comes ever closer.~
 T 10405
 S
 #10407
@@ -111,16 +252,37 @@ imp green~
 a green imp~
 A green imp scampers down the shopfront!
 ~
-0 0 bdzA G 2
-0 0 0 16
-I 4 10408 6.00 1 X  # LOOT: tarnished silver earrings
-I 4 10409 6.00 1 X  # LOOT: a steel chain
-I 4 10410 6.00 1 X  # LOOT: ringmail bracers
-I 4 10411 6.00 1 X  # LOOT: a ring of pearls
-I 4 10412 6.00 1 X  # LOOT: a fine village dress
-I 4 10413 6.00 1 X  # LOOT: a handsome village suit
-I 4 10414 6.00 1 X  # LOOT: an imperium wedding band
-I 4 10415 6.00 1 X  # LOOT: an heirloom cloth necklace
+0 0 bdzAE G 2
+0 0 0 16 -1
+D
+The little imp is scaly and green, but otherwise resembles a hunched child.
+~
+I 4 10408 1.00 1 e  # LOOT: tarnished silver earrings
+I 4 10409 1.00 1 e  # LOOT: steel chain
+I 4 10410 1.00 1 e  # LOOT: ringmail bracers
+I 4 10411 1.00 1 e  # LOOT: ring of pearls
+I 4 10414 1.00 1 e  # LOOT: imperium wedding band
+I 4 10415 1.00 1 e  # LOOT: heirloom cloth necklace
+I 4 10419 1.00 1 e  # LOOT: pair of enchanted boots
+I 4 10448 1.00 1 e  # LOOT: night watch ring
+I 4 10449 1.00 1 e  # LOOT: imperium ear guards
+I 4 10412 2.00 1 e  # LOOT: fine village dress
+I 4 10413 2.00 1 e  # LOOT: handsome village suit
+M
+0
+The little green imp crawls up and down the walls.~
+M
+0
+The little imp leaps into the air, catches a carrion beetle in its teeth, flips, and lands again.~
+M
+0
+The green imp belches a whisp of fire and smoke.~
+M
+0
+The green imp taunts you with its insane cackle.~
+M
+0
+The little green imp gnaws at its own foot.~
 T 10405
 S
 #10408
@@ -128,16 +290,38 @@ demon ruddy big~
 a ruddy demon~
 A big, ruddy demon blocks your path!
 ~
-0 0 bdyA G 4
-0 0 0 24
-I 4 10408 6.00 1 X  # LOOT: tarnished silver earrings
-I 4 10409 6.00 1 X  # LOOT: a steel chain
-I 4 10410 6.00 1 X  # LOOT: ringmail bracers
-I 4 10411 6.00 1 X  # LOOT: a ring of pearls
-I 4 10412 6.00 1 X  # LOOT: a fine village dress
-I 4 10413 6.00 1 X  # LOOT: a handsome village suit
-I 4 10414 6.00 1 X  # LOOT: an imperium wedding band
-I 4 10415 6.00 1 X  # LOOT: an heirloom cloth necklace
+0 0 bdyAE G 4
+0 0 0 24 -1
+D
+   The demon has bright red skin and a disproportionately large set of chest
+and arm muscles. You can't seem to get past it.
+~
+I 4 10408 1.00 1 e  # LOOT: tarnished silver earrings
+I 4 10409 1.00 1 e  # LOOT: steel chain
+I 4 10410 1.00 1 e  # LOOT: ringmail bracers
+I 4 10411 1.00 1 e  # LOOT: ring of pearls
+I 4 10414 1.00 1 e  # LOOT: imperium wedding band
+I 4 10415 1.00 1 e  # LOOT: heirloom cloth necklace
+I 4 10419 1.00 1 e  # LOOT: pair of enchanted boots
+I 4 10448 1.00 1 e  # LOOT: night watch ring
+I 4 10449 1.00 1 e  # LOOT: imperium ear guards
+I 4 10412 2.00 1 e  # LOOT: fine village dress
+I 4 10413 2.00 1 e  # LOOT: handsome village suit
+M
+0
+The demon swipes at the air with its oversized hands.~
+M
+0
+The demon huffs as black smoke comes out its ears.~
+M
+0
+The demon barks a demonic shout at you and you feel fortunate that you can't understand what it's saying.~
+M
+0
+The demon bangs on the ground.~
+M
+0
+The demon bangs on the building walls.~
 T 10405
 S
 #10409
@@ -145,12 +329,39 @@ necrofiend fiend nine-legged~
 the necrofiend~
 A nine-legged necrofiend crawls over the blockade!
 ~
-0 0 bdB G 4
-0 0 0 20
-I 4 10418 2.00 1 X  # LOOT: a skeletal horse whip
-I 4 10424 20.00 1 X  # LOOT: a disjointed necrofiend leg
-I 4 10425 20.00 1 X  # LOOT: a studded bone shield
-I 4 10426 20.00 1 X  # LOOT: the necrofiend's majesty
+0 0 bdBE G 4
+0 0 0 20 -1
+D
+   The necrofiend skitters back and forth, all the while looming over you and
+never taking any of its eyes off of you.
+~
+I 4 10424 9.09 1 p  # LOOT: disjointed necrofiend leg
+I 4 10427 9.09 1 p  # LOOT: infernomancer's flame
+I 4 10433 9.09 1 p  # LOOT: Fiendclaw
+I 4 10442 9.09 1 p  # LOOT: flames of the eternal pit
+I 4 10443 9.09 1 p  # LOOT: fiendskin gauntlets
+I 4 10426 9.09 1 p  # LOOT: necrofiend's majesty
+I 4 10439 9.09 1 p  # LOOT: fiery infernomancer's hood
+I 4 10447 9.09 1 p  # LOOT: fiendskull cap
+I 4 10428 9.09 1 p  # LOOT: purifying flame
+I 4 10404 9.09 1 p  # LOOT: icy necrofiend fang
+I 4 10406 9.09 1 p  # LOOT: city guard's kilt
+I 4 10412 0.01 1 p  # LOOT: fine village dress
+M
+0
+The necrofiend skitters back and forth.~
+M
+0
+The necrofiend digs at the rubble with its spindly legs.~
+M
+0
+The necrofiend raises its arms and some of its legs into the air and wails.~
+M
+0
+The necrofiend lets out a long, slow groan.~
+M
+0
+The necrofiend stops and stares at you for a moment.~
 T 10405
 T 10411
 S
@@ -159,13 +370,36 @@ S
 Infernomancer #n~
 Infernomancer #n drags waves of fire over the square!
 ~
-0 0 bdxzB 0 3
-0 2 0 16
-I 4 10420 2.00 1 X  # LOOT: a skeletal mammoth crop
-I 4 10418 4.00 1 X  # LOOT: a skeletal horse whip
-I 4 10427 20.00 1 X  # LOOT: the infernomancer's flame
-I 4 10428 20.00 1 X  # LOOT: the purifying flame
-I 4 10429 20.00 1 X  # LOOT: a terrifying leather mask
+0 0 bdxzBE 0 3
+0 2 0 16 -1
+D
+   The infernomancer draws back the edge of their flame-red robes to reveal
+fire where their body should be! This isn't going to end well.
+~
+I 4 10424 9.09 1 p  # LOOT: disjointed necrofiend leg
+I 4 10427 9.09 1 p  # LOOT: infernomancer's flame
+I 4 10433 9.09 1 p  # LOOT: Fiendclaw
+I 4 10442 9.09 1 p  # LOOT: flames of the eternal pit
+I 4 10443 9.09 1 p  # LOOT: fiendskin gauntlets
+I 4 10426 9.09 1 p  # LOOT: necrofiend's majesty
+I 4 10439 9.09 1 p  # LOOT: fiery infernomancer's hood
+I 4 10447 9.09 1 p  # LOOT: fiendskull cap
+I 4 10428 9.09 1 p  # LOOT: purifying flame
+I 4 10404 9.09 1 p  # LOOT: icy necrofiend fang
+I 4 10406 9.09 1 p  # LOOT: city guard's kilt
+I 4 10412 0.01 1 p  # LOOT: fine village dress
+M
+0
+$n tries to reanimate a fallen skeleton, but there aren't enough pieces left.~
+M
+0
+$n paces back and forth in the carnage.~
+M
+0
+$n strips a small, unidentifiable corpse and burns the fat as an offering.~
+M
+0
+The burning rubble glows all the brighter as $n walks past it.~
 T 10405
 T 10406
 T 10412
@@ -175,16 +409,35 @@ watchman risen~
 a risen watchman~
 A risen watchman shambles down the street.
 ~
-0 0 abdzA G 3
-1 0 0 2
-I 4 10408 3.00 1 X  # LOOT: tarnished silver earrings
-I 4 10409 3.00 1 X  # LOOT: a steel chain
-I 4 10410 3.00 1 X  # LOOT: ringmail bracers
-I 4 10411 3.00 1 X  # LOOT: a ring of pearls
-I 4 10412 3.00 1 X  # LOOT: a fine village dress
-I 4 10413 3.00 1 X  # LOOT: a handsome village suit
-I 4 10414 3.00 1 X  # LOOT: an imperium wedding band
-I 4 10415 3.00 1 X  # LOOT: an heirloom cloth necklace
+0 0 abdzAE G 3
+1 0 0 2 -1
+D
+   The watchman seems to think he's doing his duty, protecting the street.
+Since he's dead and you aren't, he seems to consider you a threat!
+~
+I 4 10408 1.00 1 e  # LOOT: tarnished silver earrings
+I 4 10409 1.00 1 e  # LOOT: steel chain
+I 4 10410 1.00 1 e  # LOOT: ringmail bracers
+I 4 10411 1.00 1 e  # LOOT: ring of pearls
+I 4 10414 1.00 1 e  # LOOT: imperium wedding band
+I 4 10415 1.00 1 e  # LOOT: heirloom cloth necklace
+I 4 10419 1.00 1 e  # LOOT: pair of enchanted boots
+I 4 10448 1.00 1 e  # LOOT: night watch ring
+I 4 10449 1.00 1 e  # LOOT: imperium ear guards
+I 4 10412 2.00 1 e  # LOOT: fine village dress
+I 4 10413 2.00 1 e  # LOOT: handsome village suit
+M
+0
+A risen watchman patrols the street.~
+M
+0
+A risen watchman tries to blow a little wooden whistle, but he's missing too much of his jaw.~
+M
+0
+A risen watchman pulls out one of his eyes and polishes it.~
+M
+0
+A risen watchman tries to draw his sword but drops his arm instead.~
 T 10405
 S
 #10412
@@ -192,16 +445,40 @@ monk risen~
 a risen monk~
 A risen monk is gnawing on his own arm.
 ~
-0 0 bdB G 3
-1 0 0 9
-I 4 10408 6.00 1 X  # LOOT: tarnished silver earrings
-I 4 10409 6.00 1 X  # LOOT: a steel chain
-I 4 10410 6.00 1 X  # LOOT: ringmail bracers
-I 4 10411 6.00 1 X  # LOOT: a ring of pearls
-I 4 10412 6.00 1 X  # LOOT: a fine village dress
-I 4 10413 6.00 1 X  # LOOT: a handsome village suit
-I 4 10414 6.00 1 X  # LOOT: an imperium wedding band
-I 4 10415 6.00 1 X  # LOOT: an heirloom cloth necklace
+0 0 bdBE G 3
+1 0 0 9 -1
+D
+The monk looks like he has taken asceticism to the extreme.
+~
+I 4 10408 1.00 1 e  # LOOT: tarnished silver earrings
+I 4 10409 1.00 1 e  # LOOT: steel chain
+I 4 10410 1.00 1 e  # LOOT: ringmail bracers
+I 4 10411 1.00 1 e  # LOOT: ring of pearls
+I 4 10414 1.00 1 e  # LOOT: imperium wedding band
+I 4 10415 1.00 1 e  # LOOT: heirloom cloth necklace
+I 4 10419 1.00 1 e  # LOOT: pair of enchanted boots
+I 4 10448 1.00 1 e  # LOOT: night watch ring
+I 4 10449 1.00 1 e  # LOOT: imperium ear guards
+I 4 10412 2.00 1 e  # LOOT: fine village dress
+I 4 10413 2.00 1 e  # LOOT: handsome village suit
+M
+0
+The risen monk must be a minimalist because it keeps removing parts of its body.~
+M
+0
+The risen monk lets out a serene groan.~
+M
+0
+The risen monk tries to stand from a cross-legged position but ends up having to reattach one of the legs.~
+M
+0
+The risen monk flicks a bell with its finger but loses the finger in the process.~
+M
+0
+The risen monk pauses for a moment of solemn prayer.~
+M
+0
+The risen monk picks up something off the ground and chews on it.~
 T 10405
 S
 #10413
@@ -209,16 +486,40 @@ guard temple risen~
 a risen temple guard~
 A risen temple guard lurches toward you!
 ~
-0 0 bdB G 3
-1 0 0 5
-I 4 10408 6.00 1 X  # LOOT: tarnished silver earrings
-I 4 10409 6.00 1 X  # LOOT: a steel chain
-I 4 10410 6.00 1 X  # LOOT: ringmail bracers
-I 4 10411 6.00 1 X  # LOOT: a ring of pearls
-I 4 10412 6.00 1 X  # LOOT: a fine village dress
-I 4 10413 6.00 1 X  # LOOT: a handsome village suit
-I 4 10414 6.00 1 X  # LOOT: an imperium wedding band
-I 4 10415 6.00 1 X  # LOOT: an heirloom cloth necklace
+0 0 bdBE G 3
+1 0 0 5 -1
+D
+The temple guard's hollow eyes follow you as you move.
+~
+I 4 10408 1.00 1 e  # LOOT: tarnished silver earrings
+I 4 10409 1.00 1 e  # LOOT: steel chain
+I 4 10410 1.00 1 e  # LOOT: ringmail bracers
+I 4 10411 1.00 1 e  # LOOT: ring of pearls
+I 4 10414 1.00 1 e  # LOOT: imperium wedding band
+I 4 10415 1.00 1 e  # LOOT: heirloom cloth necklace
+I 4 10419 1.00 1 e  # LOOT: pair of enchanted boots
+I 4 10448 1.00 1 e  # LOOT: night watch ring
+I 4 10449 1.00 1 e  # LOOT: imperium ear guards
+I 4 10412 2.00 1 e  # LOOT: fine village dress
+I 4 10413 2.00 1 e  # LOOT: handsome village suit
+M
+0
+The risen temple guard groans.~
+M
+0
+The risen temple guard watches you eerily.~
+M
+0
+The risen temple guard pulls out one of his eyes and polishes it with a bloody cloth.~
+M
+0
+The risen temple guard belches and a beetle flies out of his mouth.~
+M
+0
+The risen temple guard scratches furiously at an itch until the offending skin is gone.~
+M
+0
+The risen temple guard peers around for his master.~
 T 10405
 S
 #10414
@@ -226,12 +527,49 @@ S
 Necromancer #n~
 A necromancer is preparing a dark spell over one of the corpses.
 ~
-0 0 bdxAB 0 3
-2 2 0 19
-I 4 10418 2.00 1 X  # LOOT: a skeletal horse whip
-I 4 10430 20.00 1 X  # LOOT: the necromancer's staff
-I 4 10431 20.00 1 X  # LOOT: a pair of ghoulsbane gauntlets
-I 4 10432 20.00 1 X  # LOOT: a necrotic mail skirt
+0 0 bdxABE 0 3
+2 2 0 19 -1
+D
+   The necromancer's black robe stands out against the burning flames of the
+hamlet, as it reflects no light. The brighter the flame, the deeper the pit
+where the surface of the robe should be.
+~
+I 4 10430 9.09 1 p  # LOOT: necromancer's staff
+I 4 10403 9.09 1 p  # LOOT: necromaster's wand
+I 4 10441 9.09 1 p  # LOOT: echoing screams of the void
+I 4 10445 9.09 1 p  # LOOT: swirling mass of shadow
+I 4 10446 9.09 1 p  # LOOT: necromantic knelling trousers
+I 4 10444 9.09 1 p  # LOOT: fine wizardskin gloves
+I 4 10438 9.09 1 p  # LOOT: Shadowkeeper
+I 4 10417 9.09 1 p  # LOOT: tattered cloak of manasilk
+I 4 10434 9.09 1 p  # LOOT: deathlace gloves
+I 4 10435 9.09 1 p  # LOOT: hanged man's hand
+I 4 10407 9.09 1 p  # LOOT: greatbow Hexerei
+I 4 10413 0.01 1 p  # LOOT: handsome village suit
+M
+1
+The pit shall swallow you!~
+M
+1
+It's a shame you made it this far just to die but the ghouls will thank you for it.~
+M
+1
+You're nothing compared to the master.~
+M
+1
+You move slower than the dead.~
+M
+1
+Have we met? I think I may have reanimated your mother last night.~
+M
+1
+You look like you could use a resurrection.~
+M
+1
+It's a shame your only value is as spare parts.~
+M
+1
+A reanimation spell might fix the limp way you're holding that weapon.~
 T 10405
 T 10409
 S
@@ -240,13 +578,50 @@ S
 Necromaster #n~
 Necromaster #n is shouting orders to the cultists!
 ~
-0 0 bdxAB 0 3
-0 2 0 21
-I 4 10420 2.00 1 X  # LOOT: a skeletal mammoth crop
-I 4 10418 4.00 1 X  # LOOT: a skeletal horse whip
-I 4 10433 20.00 1 X  # LOOT: Fiendclaw
-I 4 10434 20.00 1 X  # LOOT: deathlace gloves
-I 4 10435 20.00 1 X  # LOOT: a hanged man's hand
+0 0 bdxABE 0 3
+0 2 0 21 -1
+D
+   The necromaster's midnight-black robe is highlighted by glimmering eventide
+accents, but what makes it most impressive is the icy mist falling from the
+hemline. The necromaster seems to have noticed you because the mist is creeping
+toward your feet.
+~
+I 4 10430 9.09 1 p  # LOOT: necromancer's staff
+I 4 10403 9.09 1 p  # LOOT: necromaster's wand
+I 4 10441 9.09 1 p  # LOOT: echoing screams of the void
+I 4 10445 9.09 1 p  # LOOT: swirling mass of shadow
+I 4 10446 9.09 1 p  # LOOT: necromantic knelling trousers
+I 4 10444 9.09 1 p  # LOOT: fine wizardskin gloves
+I 4 10438 9.09 1 p  # LOOT: Shadowkeeper
+I 4 10417 9.09 1 p  # LOOT: tattered cloak of manasilk
+I 4 10434 9.09 1 p  # LOOT: deathlace gloves
+I 4 10435 9.09 1 p  # LOOT: hanged man's hand
+I 4 10407 9.09 1 p  # LOOT: greatbow Hexerei
+I 4 10413 0.01 1 p  # LOOT: handsome village suit
+M
+1
+Where are the infernals?~
+M
+1
+That apprentice was worthless, eh?~
+M
+1
+You just can't get good help these days.~
+M
+1
+If you want something done right, you must see to it yourself.~
+M
+1
+I should have veen a dentist.~
+M
+1
+I suppose you're here to dance?~
+M
+1
+We may as well move on. This hamlet is dead.~
+M
+1
+It used to be a lot quieter around here.~
 T 10405
 T 10406
 T 10409
@@ -256,18 +631,46 @@ citizen fleeing~
 a fleeing citizen~
 A fleeing citizen looks absolutely panicked!
 ~
-40 80 dv 0 3
-2 0 0 15
-T 10416
+40 80 dvDI 0 3
+2 0 0 15 -1
+D
+She doesn't have time to stop.
+~
+M
+1
+The undead are everywhere!~
+M
+1
+They've burnt down everything!~
+M
+1
+The necrocultists are burning our city!~
+M
+1
+There's a skeletal mammoth in the town square!~
 S
 #10417
 zombie shambling citizen~
 a shambling zombie~
 The shambling zombie of a citizen stumbles toward you.
 ~
-40 80 dv G 3
-0 0 0 9
-T 10417
+40 80 dvDI G 3
+0 0 0 9 -1
+D
+This former citizen has seen better days.
+~
+M
+1
+Urrrrgggghh...~
+M
+0
+$n looks hungry.~
+M
+0
+$n picks its jaw up off the ground.~
+M
+1
+Brrrnnnn...~
 S
 #10418
 horse skeletal~
@@ -275,8 +678,11 @@ a skeletal horse~
 A skeletal horse munches fruitlessly at the turf.
 ~
 30 60 dej G 4
-0 0 14 11
-I 3 10419 100.00 1 X  # BARDE: a skeletal warhorse
+0 0 14 11 -1
+D
+This proud horse may have lost its life, but it stands ready.
+~
+I 3 10419 100.00 1 X  # BARDE: skeletal warhorse
 S
 #10419
 warhorse horse skeletal~
@@ -284,7 +690,11 @@ a skeletal warhorse~
 A skeletal warhorse rears and kicks at the air.
 ~
 40 80 bdej G 4
-0 0 0 11
+0 0 0 11 -1
+D
+   This proud horse may have lost its life, but it stands ready to charge into
+battle at a moment's notice.
+~
 S
 #10420
 mammoth skeletal bony huge~
@@ -292,8 +702,11 @@ a skeletal mammoth~
 A huge, bony skeletal mammoth stands over you.
 ~
 100 120 dejy G 5
-0 0 0 5
-I 3 10421 100.00 1 X  # BARDE: a skeletal warmammoth
+0 0 0 5 -1
+D
+The mammoth is no less enormous without its fur and hide.
+~
+I 3 10421 100.00 1 X  # BARDE: skeletal warmammoth
 S
 #10421
 mammoth skeletal warmammoth huge~
@@ -301,7 +714,72 @@ a skeletal warmammoth~
 A huge skeletal warmammoth looms down on you.
 ~
 100 120 dejy G 5
-0 0 0 5
+0 0 0 5 -1
+D
+This mammoth of a skeleton has been outfitted with fine iron armor.
+~
+S
+#10422
+terrosaur pterosaur skeletal~
+a skeletal terrosaur~
+A skeletal terrosaur soars overhead.
+~
+100 120 dej mG 5
+0 0 2 27 -1
+D
+   This enormous flying beast has died, rotted, and been brought back! The
+terrosaur's eyes glow a misty blue from the magic that holds its bones together
+and lets it fly.
+~
+I 3 10423 100.00 1 X  # BARDE: armored skeletal terrosaur
+S
+#10423
+terrosaur pterosaur armored skeletal~
+an armored skeletal terrosaur~
+An armored skeletal terrosaur swoops low overhead.
+~
+100 120 dejy mG 5
+0 0 2 27 -1
+D
+   This enormous flying beast has died, rotted, and been brought back! The
+terrosaur's eyes glow a misty blue from the magic that holds its bones together
+and lets it fly. The skeletal terrosaur has been outfitted with haunting, icy
+armor and is ready for war!
+~
+S
+#10437
+mammoth skeletal mini~
+a mini skeletal mammoth~
+A mini skeletal mammoth is charging around.
+~
+1 1 bdo n 3
+0 0 11 15 -1
+D
+   You can't tell if this was a miniature mammoth that died and was
+resurrected, or a full-size mammoth that was resurrected and shrunk. Either
+way, its little attitude is adorable.
+~
+M
+0
+$n rams at full speed into your legs, and falls to pieces. It takes the mammoth a minute to pick itself back up.~
+M
+0
+$n charges around at full speed, tusks out.~
+M
+0
+$n tilts its head back like it's trying to trumpet.~
+M
+0
+$n rolls around on the ground.~
+M
+0
+$n stomps its little feet.~
+M
+0
+$n charges at you, but veers off at the last minute (luckily).~
+M
+0
+$n roots around with its tusks.~
 S
 #10450
 rat sewer trained~
@@ -309,83 +787,444 @@ a trained sewer rat~
 A trained rat scurries alongside you.
 ~
 0 75 adj c 1
-0 0 7 9
-I 0 10016 50.00 1  # BUTCHER: a hunk of rat meat
-I 1 10013 100.00 1  # SKIN: a rat skin
+0 0 7 9 -1
+D
+   When the rat thinks you have cheese, it stands on its hind legs and then
+drops and rolls over. Then it realizes you don't actually have any cheese.
+~
+I 0 10016 50.00 1  # BUTCHER: hunk of rat meat
+I 1 10013 100.00 1  # SKIN: rat skin
+M
+0
+$n sniffs the air.~
+M
+0
+$n drags a spare coin into a hole in the wall.~
+M
+0
+$n seems to be collecting debris and piling it up.~
+M
+0
+The hair on your neck stands up as $n swishes past your ankle.~
+M
+0
+You catch $n sniffing at your pack.~
+M
+0
+$n stands on its hind legs and paws at the air.~
+M
+0
+$n squeaks.~
+M
+0
+$n squeaks.~
+M
+0
+$n squeaks.~
+M
+0
+$n does a little flip.~
+M
+0
+$n sits in the corner, listening intently to you.~
+M
+0
+$n sniffs at your foot.~
 T 10014
 S
 #10451
 dryleef vanguard leader goblin~
 Dryleef, vanguard leader~
-Dryleef, leader of the goblin vanguard, is sitting on the throne.
+Dryleef, leader of the goblin vanguard, is sitting on the throne. (difficulty)
 ~
-0 0 bdy 0 2
-1 0 0 5
-I 4 10452 5.00 1 a  # LOOT: Pimmin's ring
-I 4 10453 5.00 1 a  # LOOT: a bone charm necklace
-I 4 10454 5.00 1 a  # LOOT: a chicken-bone wand
-I 4 10455 5.00 1 a  # LOOT: the goblinward tome
-I 4 10458 5.00 1 a  # LOOT: Shivsper's poison ring
-I 4 10459 5.00 1 a  # LOOT: a gaudy copper chain
-I 4 10460 5.00 1 a  # LOOT: someone else's axe
-I 4 10461 5.00 1 a  # LOOT: a giant dagger
-I 4 10464 5.00 1 a  # LOOT: Wargreyn's ring
-I 4 10465 5.00 1 a  # LOOT: the blacksmith's charm
-I 4 10466 5.00 1 a  # LOOT: the goblinsmith's hammer
-I 4 10467 5.00 1 a  # LOOT: a wargskull shield
+0 0 bdhyK G 2
+1 0 0 5 -1
+D
+   Dryleef's youthful face belies his years of experience at the head of the
+goblin vanguard. His shoulders are heavy with ratskin robes and green copper
+chains, but as he taps his remaining fingers on the throne, you can tell his
+weapon hand is always ready. Dryleef has a strong, musky, skunky odor that most
+humans aren't brave enough to comment on.
+~
+I 4 10489 16.66 1 a  # LOOT: Dryleef's pitfighting ring
+I 4 10490 16.66 1 a  # LOOT: zirconian amulet of goblin bravery
+I 4 10491 16.67 1 a  # LOOT: bog-iron pitfighter's sword
+I 4 10492 16.67 1 a  # LOOT: Dryleef's pitfighting buckler
+I 4 10493 16.67 1 a  # LOOT: goblin pitfighter's cape
+I 4 10494 16.67 1 a  # LOOT: goblin punching bags
+I 4 10013 50.00 1 s  # LOOT: rat skin
+I 4 10013 25.00 2 s  # LOOT: rat skin
+M
+1
+Runnin' a vanguard not so easy.~
+M
+1
+Goblin never has any trouble with finding someone to look up to.~
+M
+1
+Visitor sure looks pale and tall, for a goblin.~
+M
+1
+Have lots to sell for the pitfighter or lone adventurer in you! (list, buy)~
+M
+1
+Have lots to sell for the pitfighter or lone adventurer in you! (list, buy)~
+M
+0
+$n sells crafts and BoE items (list, buy).~
+M
+0
+$n sells crafts and BoE items (list, buy).~
+M
+0
+$n sells crafts and BoE items (list, buy).~
+M
+0
+Dryleef sharpens $s little warhammer.~
+M
+0
+Dryleef whispers something to a rat, who scurries under the throne and disappears down a tunnel.~
+M
+0
+Dryleef snorts something from a box $e keeps in $s pocket.~
+M
+0
+Dryleef grabs some small rats and juggles them.~
+M
+1
+Gonna need more war rats.~
+M
+1
+Goblin wonders if a body ever trains peace rats.~
 T 10453
+T 10455
+T 10457
+T 10458
+T 10459
 S
 #10452
 pimmin shaman goblin~
 Pimmin, goblin shaman~
-A goblin shaman is swirling a vial with a rat tail.
+A goblin shaman is swirling a vial with a rat tail. (difficulty)
 ~
-0 0 bdxy 0 2
-2 0 0 16
-I 4 10452 15.00 1 a  # LOOT: Pimmin's ring
-I 4 10453 15.00 1 a  # LOOT: a bone charm necklace
-I 4 10454 15.00 1 a  # LOOT: a chicken-bone wand
-I 4 10455 15.00 1 a  # LOOT: the goblinward tome
-T 10214
+0 0 bdhxyK G 2
+2 0 0 16 -1
+D
+   Pimmin is crouched over a pile of tiny bones and various balls of wax and
+lint. It's hard to tell what she's working on -- indeed, it's hard to discern
+much about the goblins in this foul sewer.
+~
+I 4 10452 16.66 1 a  # LOOT: Pimmin's ring
+I 4 10453 16.66 1 a  # LOOT: bone charm necklace
+I 4 10454 16.67 1 a  # LOOT: chicken-bone wand
+I 4 10455 16.67 1 a  # LOOT: goblinward tome
+I 4 10456 16.67 1 a  # LOOT: violet leopard shawl
+I 4 10457 16.67 1 a  # LOOT: wildfire gloves
+I 4 10013 50.00 1 s  # LOOT: rat skin
+I 4 10013 25.00 2 s  # LOOT: rat skin
+M
+1
+Shaman? More like sha-woman. Or sha-goblin?~
+M
+1
+Bones say trouble is coming.~
+M
+1
+Goblin can tell a lot about the Soon by opening a stomach and reading tea leaves inside.~
+M
+1
+Humans and goblins is the same color on the inside: dead.~
+M
+1
+Dryleef not paying enough for Pimmin to live in such a clean sewer.~
+M
+0
+Pimmin picks up a pile of bones and throws them into the corner, then scurries over to read them.~
+M
+0
+Pimmin plucks a potion from the alcove and drinks it, briefly turning a deep shade of violet.~
+M
+0
+Pimmin plucks a potion from the alcove and drinks it, briefly turning a deep shade of crimson.~
+M
+0
+Pimmin plucks a potion from the alcove and drinks it, briefly turning a deep shade of cerulean.~
+M
+0
+Pimmin plucks a potion from the alcove and drinks it, briefly turning a deep shade of fuchsia.~
+M
+0
+Pimmin plucks a potion from the alcove and drinks it, briefly turning a deep shade of puce.~
+M
+1
+Pimmin would love to sell you war supplies! (list, buy)~
+M
+1
+Pimmin would love to sell you war supplies! (list, buy)~
+M
+0
+$n sells crafts and BoE items (list, buy).~
+M
+0
+$n sells crafts and BoE items (list, buy).~
+M
+0
+$n sells crafts and BoE items (list, buy).~
+T 10455
+T 10457
+T 10458
+T 10459
+T 10461
 S
 #10453
 shivsper goblin assassin~
 Shivsper, goblin assassin~
-Shivsper throws a dagger at a crude drawing of a human on the wall.
+Shivsper throws a dagger at a crude drawing of a human on the wall. (difficulty)
 ~
-0 0 bdyz 0 2
-1 0 0 4
-I 4 10458 15.00 1 a  # LOOT: Shivsper's poison ring
-I 4 10459 15.00 1 a  # LOOT: a gaudy copper chain
-I 4 10460 15.00 1 a  # LOOT: someone else's axe
-I 4 10461 15.00 1 a  # LOOT: a giant dagger
+0 0 bdhyzK G 2
+1 0 0 4 -1
+D
+   Shivsper leans against the sewer wall, casually tossing his collection of
+daggers, needles, shivs, spurs, thorns, and spines at the most sensitive areas
+of his human-shaped target.
+~
+I 4 10458 16.66 1 a  # LOOT: Shivsper's poison ring
+I 4 10459 16.66 1 a  # LOOT: gaudy copper chain
+I 4 10460 16.67 1 a  # LOOT: else's axe
+I 4 10461 16.67 1 a  # LOOT: giant dagger
+I 4 10462 16.67 1 a  # LOOT: rat-fur cloak
+I 4 10463 16.67 1 a  # LOOT: wooden gauntlets
+I 4 10013 50.00 1 s  # LOOT: rat skin
+I 4 10013 25.00 2 s  # LOOT: rat skin
+M
+0
+Shivsper shrieks, 'Shiv!' as $e jabs a dagger into the target on the wall.~
+M
+0
+Shivsper juggles a set of silver needles.~
+M
+0
+Shivsper tosses a fistful of brambles at the target on the wall.~
+M
+0
+Shivsper sharpens an axe that looks too big for $m.~
+M
+0
+Shivsper seems to be using $s axe to sharpen $s dagger.~
+M
+0
+Shivsper pushes some rat bones into little piles at the top of the bedrolls, as if to make pillows.~
+M
+1
+Daggers for stabbing! Axes for stabbing! Rings for stabbing! (list, buy)~
+M
+1
+Stab 'em with a gauntlet and never hear from 'em again! (list, buy)~
+M
+0
+$n sells crafts and BoE items (list, buy).~
+M
+0
+$n sells crafts and BoE items (list, buy).~
+M
+0
+$n sells crafts and BoE items (list, buy).~
 T 10453
+T 10455
+T 10457
+T 10458
+T 10459
 S
 #10454
 wargreyn goblin smith blacksmith~
 Wargreyn, goblin blacksmith~
-Wargreyn, the goblin smith, is resting by the forge.
+Wargreyn, the goblin smith, is resting by the forge. (difficulty)
 ~
-0 0 bdy 0 2
-2 0 0 6
-I 4 10464 15.00 1 a  # LOOT: Wargreyn's ring
-I 4 10465 15.00 1 a  # LOOT: the blacksmith's charm
-I 4 10466 15.00 1 a  # LOOT: the goblinsmith's hammer
-I 4 10467 15.00 1 a  # LOOT: a wargskull shield
+0 0 bdhyK G 2
+2 0 0 6 -1
+D
+   Wargreyn's face hangs heavy on her sharp green cheekbones, showing off years
+of work in front of the hot goblin forge. The life of a goblin smith is a long
+one, as they rarely see much combat.
+~
+I 4 10464 16.66 1 a  # LOOT: Wargreyn's ring
+I 4 10465 16.66 1 a  # LOOT: blacksmith's charm
+I 4 10466 16.67 1 a  # LOOT: goblinsmith's hammer
+I 4 10467 16.67 1 a  # LOOT: wargskull shield
+I 4 10468 16.67 1 a  # LOOT: mesh cloak
+I 4 10469 16.67 1 a  # LOOT: heavy goblin gauntlets
+I 4 10013 50.00 1 s  # LOOT: rat skin
+I 4 10013 25.00 2 s  # LOOT: rat skin
+M
+0
+Wargreyn polishes a spear.~
+M
+0
+Wargreyn lovingly sharpens a small axe.~
+M
+0
+Wargreyn cackles as $e uses $s hammer to make more hammers.~
+M
+0
+Wargreyn carefully sharpens a hammer.~
+M
+0
+Wargreyn casually sharpens a whip.~
+M
+0
+Wargreyn gleefully smashes bones smashes an iron breastplate with $s hammer.~
+M
+0
+Wargreyn hammers out an iron breastplate to repair the damage.~
+M
+0
+Wargreyn sharpens an iron breastplate.~
+M
+0
+Wargreyn attempts to sharpen a rat on the whetstone.~
+M
+1
+Hammers on the house! Not free, just good for destroying houses. (list, buy)~
+M
+1
+Free everything when you pillage with Wargreyn hammers! (list, buy)~
+M
+0
+$n sells crafts and BoE items (list, buy).~
+M
+0
+$n sells crafts and BoE items (list, buy).~
+M
+0
+$n sells crafts and BoE items (list, buy).~
 T 10456
+T 10455
+T 10457
+T 10458
+T 10459
 S
 #10455
 rat war armored giant~
 a giant war rat~
-An giant, armored war rat bares its teeth at you!
+An giant, armored war rat bares its teeth at you! (difficulty)
 ~
 0 0 adjA c 2
-0 0 7 9
-I 0 10016 50.00 1  # BUTCHER: a hunk of rat meat
-I 1 10013 100.00 1  # SKIN: a rat skin
-I 4 10470 33.00 1 a  # LOOT: a rat-fur saddle
-I 4 10471 33.00 1 a  # LOOT: a goblin go-bag
-I 4 10472 34.00 1 a  # LOOT: some wooden goblin pipes
+0 0 7 9 -1
+D
+   Whoever attached the plates of wood and brass to this oversized rat must
+have a sense of humor, and is probably also missing some fingers.
+~
+I 0 10016 50.00 1  # BUTCHER: hunk of rat meat
+I 1 10013 100.00 2  # SKIN: rat skin
+I 4 10470 33.00 1 a  # LOOT: rat-fur saddle
+I 4 10471 33.00 1 a  # LOOT: goblin go-bag
+I 4 10472 34.00 1 a  # LOOT: wooden goblin pipes
+M
+0
+$n barks like a dog.~
+M
+0
+$n sniffs aggressively at your pack.~
+M
+0
+$n tilts its head back and lets out a mortifying squeal.~
+M
+0
+$n fastidiously cleans itself.~
+M
+0
+$n seems to be sharpening its claws on the stonework.~
+M
+0
+$n scratches at the wall.~
+M
+0
+$n tilts its head back and lets out a mighty bark.~
+M
+0
+$n leaps about the sewer.~
+M
+0
+You move to avoid $n as it barrels around the sewer.~
+M
+0
+$n gnaws on a smaller rat carcass.~
 T 10014
+T 10455
+T 10457
+T 10458
+S
+#10457
+haxaw medicine goblin~
+Haxaw, medicine goblin~
+Haxaw is sitting here, stirring a small pot. (difficulty)
+~
+0 0 bdhvxyIK GM 3
+2 0 0 28 -1
+D
+   Haxaw is surprisingly tall and pink, for a goblin, but she has the
+unmistakable odor and characteristic fashion sense of the commonest goblin.
+Though she doesn't look any older than twenty (by human standards), her eyes
+have the milky haze of an old woman.
+~
+I 4 184 100.00 1  # LOOT: torch
+I 4 10483 16.66 1 a  # LOOT: Haxaw's poison ring
+I 4 10484 16.66 1 a  # LOOT: goblin neck smile
+I 4 10485 16.67 1 a  # LOOT: flail of many blessings
+I 4 10486 16.67 1 a  # LOOT: goose-beak totem
+I 4 10487 16.67 1 a  # LOOT: goblin deathshroud
+I 4 10488 16.67 1 a  # LOOT: pair of doubleskin gloves
+I 4 10013 50.00 1 s  # LOOT: rat skin
+I 4 10013 25.00 2 s  # LOOT: rat skin
+M
+0
+Haxaw stuffs bits of rat fur into $s nose.~
+M
+0
+Haxaw trims $s toenails loudly.~
+M
+0
+Haxaw stirs a small pot.~
+M
+0
+Haxaw tastes the liquid from the pot and turns green for a moment.~
+M
+0
+Haxaw digs through one of $s ratty sacks but doesn't seem to find what $e's looking for.~
+M
+0
+Haxaw thinks for a moment, then dumps some spare bones into the pot.~
+M
+1
+Not sure I can see you. Come closer to the pot.~
+M
+1
+Don't move so much! Dangling tent will spill the pot.~
+M
+1
+This my second favorite pot. First favorite got smoked.~
+M
+1
+You're a big goblin, like Haxaw.~
+M
+1
+Looks like you're gonna need this deathshroud. (list, buy)~
+M
+1
+Get a bigger smile here. (list, buy)~
+M
+0
+$n sells crafts and BoE items (list, buy).~
+M
+0
+$n sells crafts and BoE items (list, buy).~
+M
+0
+$n sells crafts and BoE items (list, buy).~
+T 10455
+T 10457
+T 10458
+T 10459
+T 10462
 S
 $

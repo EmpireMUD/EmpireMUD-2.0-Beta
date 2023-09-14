@@ -168,7 +168,7 @@ stone heroic changeling~
 a heroic changeling stone~
 A heroic changeling stone is lying here.~
    This odd stone is made mostly from magic, and glows with arcane symbols. It
-looks like you could use it to summon a mini-pet.
+looks like you could use it to summon a minipet.
 ~
 19 o a 0 7
 2914 0 0
@@ -219,10 +219,10 @@ sure you target the right potion.
 8 0
 C
 200 200
-I 26 800 100.00 1  # DECAYS-TO: a flask
-I 27 800 100.00 1  # CONSUMES-TO: a flask
+I 26 800 100.00 1  # DECAYS-TO: glass flask
+I 27 800 100.00 1  # CONSUMES-TO: glass flask
 R
-5130 0
+4 5130 0
 T 1250
 S
 #2919
@@ -248,10 +248,10 @@ make sure you target the right potion.
 8 0
 C
 200 200
-I 26 800 100.00 1  # DECAYS-TO: a flask
-I 27 800 100.00 1  # CONSUMES-TO: a flask
+I 26 800 100.00 1  # DECAYS-TO: glass flask
+I 27 800 100.00 1  # CONSUMES-TO: glass flask
 R
-5130 0
+4 5130 0
 T 1252
 S
 #2921
@@ -277,10 +277,10 @@ make sure you target the right potion.
 8 0
 C
 200 200
-I 26 800 100.00 1  # DECAYS-TO: a flask
-I 27 800 100.00 1  # CONSUMES-TO: a flask
+I 26 800 100.00 1  # DECAYS-TO: glass flask
+I 27 800 100.00 1  # CONSUMES-TO: glass flask
 R
-5130 0
+4 5130 0
 T 1254
 S
 #2923
@@ -310,10 +310,10 @@ A
 11 2 0
 C
 200 200
-I 26 800 100.00 1  # DECAYS-TO: a flask
-I 27 800 100.00 1  # CONSUMES-TO: a flask
+I 26 800 100.00 1  # DECAYS-TO: glass flask
+I 27 800 100.00 1  # CONSUMES-TO: glass flask
 R
-5130 0
+4 5130 0
 S
 #2925
 formula imperial wayfarer's potion~
@@ -333,15 +333,16 @@ An imperial hex-purging potion is on the ground.~
 potion within. Hint: create an alias for 'quaff imperial-hex-purging' to make
 sure you target the right potion.
 ~
-25 m a 0 15
+25 m a 0 16
 -1 0 3030
 8 0
 C
 200 200
-I 26 800 100.00 1  # DECAYS-TO: a flask
-I 27 800 100.00 1  # CONSUMES-TO: a flask
+I 26 800 100.00 1  # DECAYS-TO: glass flask
+I 27 800 100.00 1  # CONSUMES-TO: glass flask
 R
-5130 0
+4 5130 0
+T 2926
 S
 #2927
 formula imperial hex-purging potion~
@@ -351,6 +352,37 @@ This formula will teach you to brew: imperial hex-purging potion.
 ~
 7 0 a 0 1
 2926 0 0
+0 0
+S
+#2928
+potion imperial waterwalking imperial-waterwalking-potion~
+an imperial waterwalking potion~
+An imperial waterwalking potion is lying here.~
+   This quaint little flask swirls with the colors of the ocean. A little of
+this and you'll be able to walk on water (so long as you aren't mounted). 
+Hint: create an alias for 'quaff imperial-waterwalking-potion' to make sure you
+target the right one.
+~
+25 m a 0 17
+-1 0 3030
+8 0
+B
+L
+C
+200 200
+I 26 800 100.00 1  # DECAYS-TO: glass flask
+I 27 800 100.00 1  # CONSUMES-TO: glass flask
+R
+4 5130 0
+S
+#2929
+formula imperial waterwalking potion~
+the imperial waterwalking potion formula~
+The imperial waterwalking potion formula is on the ground.~
+This formula will teach you to brew: imperial waterwalking potion.
+~
+7 0 a 0 1
+2928 0 0
 0 0
 S
 $

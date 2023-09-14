@@ -15,11 +15,19 @@ D3
 D4
 &0.&?%%&0.~
 &P~
-I 6 12686 100.00 1  # FORAGE: some sugar cubes
-I 8 12687 20.00 2 H  # HARVEST: a bunch of cotton candy
-I 8 12687 20.00 3 H  # HARVEST: a bunch of cotton candy
-I 8 12687 20.00 4 H  # HARVEST: a bunch of cotton candy
-I 8 12687 20.00 5 H  # HARVEST: a bunch of cotton candy
-I 8 12687 20.00 6 H  # HARVEST: a bunch of cotton candy
+I 6 12686 100.00 1  # FORAGE: sugar cubes
+I 8 12687 20.00 2 H  # HARVEST: bunch of cotton candy
+I 8 12687 20.00 3 H  # HARVEST: bunch of cotton candy
+I 8 12687 20.00 4 H  # HARVEST: bunch of cotton candy
+I 8 12687 20.00 5 H  # HARVEST: bunch of cotton candy
+I 8 12687 20.00 6 H  # HARVEST: bunch of cotton candy
+X
+bush cotton candy plants bushes crop~
+   Your eyes widen at the sight of the fluffy pink clouds of cotton candy
+growing on this singular, enormous bush. You have seen few sights in this life
+that compare to this plant; surely it cannot be natural. The sweet smell that
+floats on the wind is enough to make you drool in anticipation -- you can
+almost taste the candy.
+~
 S
 $

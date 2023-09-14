@@ -1,0 +1,410 @@
+#11900
+Skycleave Skystones~
+5 0
+0 0 0 0
+T0
+skystone~
+T1
+skystones~
+S
+#11902
+Skycleaver Coffee~
+1 0
+-24 1 2 0
+T0
+skycleaver coffee~
+T1
+milky brown~
+S
+#11903
+Skycleaver Wine~
+1 0
+8 0 8 0
+T0
+vintage skycleaver violet wine~
+T1
+deep violet~
+S
+#11909
+skycleaver trinket~
+3 0
+0 0 0 0
+T0
+Your skycleaver trinket is no longer depleted.~
+S
+#11910
+skycleaver warpstone~
+3 0
+0 0 0 0
+T0
+Your skycleaver warpstone is no longer depleted.~
+S
+#11912
+Blacktower waterwalking~
+4 0
+0 0 0 0
+T0
+You feel your waterwalking phial fade.~
+T4
+You notice $s feet have a faint purple mist coming off of them.~
+S
+#11920
+glitter everywhere~
+4 0
+0 0 0 0
+T0
+You finally get some of the glitter out of your eyes and nose.~
+T4
+$e's covered in sparkly magenta glitter.~
+T5
+...$e is covered in magenta glitter!~
+S
+#11921
+Violet Tea~
+1 0
+-4 0 2 0
+T0
+violet tea~
+T1
+swirling violet~
+S
+#11924
+Blacktower sight~
+4 0
+0 0 0 0
+T0
+Everything seems to dim as your perfect sight phial wears off.~
+T4
+$s eyes have a faint purple glow in the middle.~
+S
+#11925
+Blacktower burdens~
+4 0
+0 0 0 0
+T0
+You feel your lighter burdens phial wear off and things seem heavier again.~
+T4
+Some of $s items just seem to be floating around $m.~
+S
+#11926
+Skycleaver Tea~
+1 0
+-8 8 8 0
+T0
+temporal mint tea~
+T1
+murky blue~
+S
+#11927
+tired~
+4 0
+0 0 0 0
+T0
+You feel more awake.~
+S
+#11936
+cursed~
+4 0
+0 0 0 0
+T0
+The curse fades.~
+T2
+The spirit passes through you... you are cursed!~
+T3
+The spirit passes through $n, who glows briefly.~
+S
+#11937
+magic words~
+2 0
+0 0 0 0
+T2
+The walking mausoleum stirs and begins to stand.~
+T3
+The walking mausoleum stirs and begins to stand.~
+S
+#11938
+magic words~
+2 0
+0 0 0 0
+T2
+The sorcery tower twitches and starts to stand.~
+T3
+The sorcery tower twitches and starts to stand.~
+S
+#11939
+magic words~
+2 0
+0 0 0 0
+T2
+You shout the magic words, 'By the Tower of Skycleave!'~
+T3
+$n shouts the magic words, 'By the Tower of Skycleave!'~
+S
+#11943
+drowsy~
+4 0
+0 0 0 0
+T0
+You're no longer drowsy.~
+T5
+...$e looks really drowsy.~
+S
+#11948
+crown of thorns~
+4 0
+0 0 0 0
+T5
+...$e's bleeding badly from the thorns in her forehead!~
+S
+#11949
+thornbound~
+4 0
+0 0 0 0
+T4
+$e is bound up in the thorny whip -- free $m!~
+T5
+...$e is bound up in the thorny whip -- free $m!~
+S
+#11950
+thornlash~
+4 0
+0 0 0 0
+T5
+...$e's lashing those whips furiously around the arena!~
+S
+#11951
+ritual bloodshed~
+4 0
+0 0 0 0
+T0
+The ritual bleeding stops.~
+T5
+...$e's bleeding on the sand.~
+S
+#11952
+hammer throw~
+4 0
+0 0 0 0
+T0
+You're no longer dazed by the hammer throw.~
+T5
+...$e seems dazed from the hammer throw.~
+S
+#11953
+hammer thrown~
+4 0
+0 0 0 0
+T1
+$n grabs $s hammers and leaps back into the fray!~
+T5
+...$e is throwing $s hammers.~
+S
+#11954
+prayer of thunder~
+4 0
+0 0 0 0
+T5
+...$s hammers have a faint glow.~
+S
+#11955
+leaping~
+4 0
+0 0 0 0
+T5
+...$e is leaping through the air!~
+S
+#11956
+hammer dance~
+4 0
+0 0 0 0
+T0
+Your leg recovers from the hammer dance.~
+T5
+...$e has been hit by the hammer dance!~
+S
+#11957
+axe wound~
+4 0
+0 0 0 0
+T0
+The axe wound stops bleeding.~
+T5
+...$e is bleeding from an axe wound!~
+S
+#11958
+whirling storm~
+4 0
+0 0 0 0
+T5
+...$e's whirling up a storm with that axe!~
+S
+#11959
+sandblind~
+4 0
+0 0 0 0
+T0
+You finally get the sand out of your eyes!~
+T5
+...$e is trying to get the sand out of $s eyes!~
+S
+#11960
+choking on sand~
+4 0
+0 0 0 0
+T0
+You're no longer choking on sand.~
+T5
+...$e is choking on sand!~
+S
+#11961
+crystalline dew~
+4 0
+0 0 0 0
+S
+#11965
+jade tear~
+4 0
+0 0 0 0
+S
+#11972
+under pressure~
+4 0
+0 0 0 0
+T0
+The effects of the pressure wave fade.~
+T5
+...$e is struggling under pressure.~
+S
+#11988
+blurry glow~
+4 0
+0 0 0 0
+T0
+The blurry glow around you fades.~
+T4
+$e has a blurry glow about $m.~
+T5
+...$e has a blurry glow about $m.~
+S
+#11989
+light glow~
+4 0
+0 0 0 0
+T0
+The light glow around you fades.~
+T4
+$e has a light glow about $m.~
+T5
+...$e has a light glow about $m.~
+S
+#11990
+amber glow~
+4 0
+0 0 0 0
+T0
+The amber glow around you fades.~
+T4
+$e has an amber glow about $m.~
+T5
+...$e has an amber glow about $m.~
+S
+#11991
+cerulean glow~
+4 0
+0 0 0 0
+T0
+The cerulean glow around you fades.~
+T4
+$e has a cerulean glow about $m.~
+T5
+...$e has a cerulean glow about $m.~
+S
+#11992
+ghastly glow~
+4 0
+0 0 0 0
+T0
+The ghastly glow around you fades.~
+T4
+$e has a ghastly glow about $m.~
+T5
+...$e has a ghastly glow about $m.~
+S
+#11993
+powdery glow~
+4 0
+0 0 0 0
+T0
+The powdery glow around you fades.~
+T4
+$e has a powdery glow about $m.~
+T5
+...$e has a powdery glow about $m.~
+S
+#11994
+flaxen glow~
+4 0
+0 0 0 0
+T0
+The flaxen glow around you fades.~
+T4
+$e has a flaxen glow about $m.~
+T5
+...$e has a flaxen glow about $m.~
+S
+#11995
+fluvial glow~
+4 0
+0 0 0 0
+T0
+The fluvial glow around you fades.~
+T4
+$e has a fluvial glow about $m.~
+T5
+...$e has a fluvial glow about $m.~
+S
+#11996
+ruby glow~
+4 0
+0 0 0 0
+T0
+The ruby glow around you fades.~
+T4
+$e has a ruby glow about $m.~
+T5
+...$e has a ruby glow about $m.~
+S
+#11997
+sanguine glow~
+4 0
+0 0 0 0
+T0
+The sanguine glow around you fades.~
+T4
+$e has a sanguine glow about $m.~
+T5
+...$e has a sanguine glow about $m.~
+S
+#11998
+mahogany glow~
+4 0
+0 0 0 0
+T0
+The mahogany glow around you fades.~
+T4
+$e has a mahogany glow about $m.~
+T5
+...$e has a mahogany glow about $m.~
+S
+#11999
+maple glow~
+4 0
+0 0 0 0
+T0
+The maple glow around you fades.~
+T4
+$e has a maple glow about $m.~
+T5
+...$e has a maple glow about $m.~
+S
+$

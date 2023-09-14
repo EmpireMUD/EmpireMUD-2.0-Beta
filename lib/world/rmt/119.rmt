@@ -1,0 +1,5830 @@
+#11901
+The Central Chamber of the Tower Skycleave~
+   The vast central chamber of the Tower Skycleave stretches up above, where
+you can see the second floor railing even from here. Directly above you, the
+bottom of the ever-spiraling walkway forms a circular rim around the inside of
+the chamber through which a magnificent nocturnium tree reaches down, bearing
+the flickering flames that light the whole of the interior.
+~
+cd z 0 -1
+D2
+~
+0 11800
+D5
+~
+0 11902
+D0
+~
+0 11908
+E
+chamber column center central~
+   The chamber rises all the way to the top of the tower, though you can't see
+that far from here because the ever-spiraling walkway is directly above you.
+A great chandelier in the shape of an inverted tree lights the room through the
+central opening.
+~
+E
+spiraling ever-spiraling walkway up~
+   Above you, the walkway spirals up the walls of the immense tower. You can
+see the railing of the second floor from here, but the spiral disappears out
+of sight beyond that.
+~
+E
+staircase stairs~
+   Above, you can see the floating staircases that connect the ever-spiraling
+walkway between floors.
+~
+E
+chandelier tree lamps lights~
+   A graceful, inverted tree reaches down through the circular opening in the
+walkway that spirals up the inside of the tower. The whole tree is sculpted
+from nocturnium wire. Its long, reaching branches hold little flames like oil
+lamps that light up every part of the vast central chamber, but you'd hate to
+be the one who has to refill all those lights.
+~
+E
+nocturnium fixtures handles~
+   Every door handle, sconce, and fixture you can see is made from matte black
+nocturnium, reflecting not a single glint of light from any of the hundreds of
+lamps on the chandelier, which, itself, is an enormous nocturnium sculpture.
+~
+E
+north fountain~
+There is a large fountain in the center of the room, to the north of you.
+~
+E
+northeast ne~
+The cafe is to the northeast.
+~
+E
+floors down~
+The floors are highly-polished white marble.
+~
+E
+south foyer~
+The foyer and exit are to the south.
+~
+E
+walls ebony~
+The walls are paneled with polished black ebony wood.
+~
+M 1 11809 100.00 8
+S
+#11902
+The Central Chamber of the Tower Skycleave~
+   Delicious smells seem to assault you from the archway to the east, where a
+sign in the shape of an arrow guides you to the tower's cafe. A painting of the
+tower hangs next to the archway. Even from here, the babble of the grand
+fountain across from the cafe drowns out the bustle of the crowd. Above, the
+great nocturnium chandelier stretches down through the center of the spiral
+walkway, through which you can see across to the railing of the second floor.
+~
+c z 0 -1
+D6
+~
+0 11901
+D1
+~
+0 11905
+D4
+~
+0 11903
+D3
+~
+0 11908
+E
+east sign cafe~
+   Beside the archway, there is a bright yellow wooden sign in the shape of an
+arrow with blue, cheerful letters on it that reads:
+
+               >>>---C-A-F-E--->
+~
+E
+painting~
+   Framed in ebony wood inlaid with nocturnium, the painting depicts an
+exterior of the Tower skycleave from a distance. In the painting, the sky is
+blue and full of puffy white clouds and the building seems to be set against a
+background of forest and snow-topped mountains.
+~
+E
+smells~
+   The smells wafting from the open archway are rich, delicious and entirely
+too tempting. The strong smell of coffee and sweets are some of the more
+pervasive scents.
+~
+E
+chamber column center central~
+   The chamber rises all the way to the top of the tower, though you can't see
+that far from here because the ever-spiraling walkway is directly above you.
+A great chandelier in the shape of an inverted tree lights the room through the
+central opening.
+~
+E
+spiraling ever-spiraling walkway up~
+   Above you, the walkway spirals up the walls of the immense tower. You can
+see the railing of the second floor from here, but the spiral disappears out
+of sight beyond that.
+~
+E
+staircase stairs~
+   Above, you can see the floating staircases that connect the ever-spiraling
+walkway between floors.
+~
+E
+chandelier tree lamps lights~
+   A graceful, inverted tree reaches down through the circular opening in the
+walkway that spirals up the inside of the tower. The whole tree is sculpted
+from nocturnium wire. Its long, reaching branches hold little flames like oil
+lamps that light up every part of the vast central chamber, but you'd hate to
+be the one who has to refill all those lights.
+~
+E
+nocturnium fixtures handles~
+   Every door handle, sconce, and fixture you can see is made from matte black
+nocturnium, reflecting not a single glint of light from any of the hundreds of
+lamps on the chandelier, which, itself, is an enormous nocturnium sculpture.
+~
+E
+west fountain~
+There is a large fountain in the center of the room, to the west of you.
+~
+E
+floors down~
+The floors are highly-polished white marble.
+~
+E
+walls ebony~
+The walls are paneled with polished black ebony wood.
+~
+E
+northwest southwest nw sw~
+The central chamber of the ground floor is huge!
+~
+S
+#11903
+The Central Chamber of the Tower Skycleave~
+   The grand chamber of the first floor is strangely clean, though it is
+is obvious it gets a lot of traffic. The ebony walls, polished floor, and
+even the underside of the second-floor walkway above you are immaculate. A sign
+hangs on the wall next to a large door, opposite a hanging sculpture made from
+metal and wood.
+~
+c z 0 -1
+D7
+~
+0 11902
+D0
+~
+0 11906
+D6
+~
+0 11904
+D2
+~
+0 11908
+E
+sign north door~
+   The sign by the door is made of a pale blue slate that has blocky carved
+letters that are inlaid with gold. It reads:
+
+                      == Study Hall ==
+
+                   Quiet! Class in Session.
+~
+E
+sculpture hanging strandbeest~
+   This decoration is composed of various metals and woods. Nocturnium,
+imperium, gold, silver, and copper dominate the piece with accents of light and
+dark woods of all kinds. What exactly this contraption is, it is impossible to
+say, however it moves and shifts with many gears and complicated looking
+pieces. It sort of resembles a strandbeest.
+~
+E
+chamber column center central~
+   The chamber rises all the way to the top of the tower, though you can't see
+that far from here because the ever-spiraling walkway is directly above you.
+A great chandelier in the shape of an inverted tree lights the room through the
+central opening.
+~
+E
+spiraling ever-spiraling walkway~
+   Above you, the walkway spirals up the walls of the immense tower. You can
+see the railing of the second floor from here, but the spiral disappears out
+of sight beyond that. A massive chandelier in the shape of an inverted tree
+hangs down through the hole in the middle of the spiral.
+~
+E
+staircase stairs~
+   Above, you can see the floating staircases that connect the ever-spiraling
+walkway between floors.
+~
+E
+chandelier tree lamps lights~
+   A graceful, inverted tree reaches down through the circular opening in the
+walkway that spirals up the inside of the tower. The whole tree is sculpted
+from nocturnium wire. Its long, reaching branches hold little flames like oil
+lamps that light up every part of the vast central chamber, but you'd hate to
+be the one who has to refill all those lights.
+~
+E
+nocturnium fixtures handles~
+   Every door handle, sconce, and fixture you can see is made from matte black
+nocturnium, reflecting not a single glint of light from any of the hundreds of
+lamps on the chandelier, which, itself, is an enormous nocturnium sculpture.
+~
+E
+south fountain~
+There is a large fountain in the center of the room, to the south of you.
+~
+E
+floors down~
+   The floors are highly-polished white marble. It's clean despite so many
+people travelling on it all the time. It must be some special spell by the
+staff that keeps it looking so good.
+~
+E
+walls ebony~
+The walls are paneled with polished black ebony wood.
+~
+E
+southeast se~
+The cafe is to the southeast. You can smell it from here.
+~
+E
+southwest sw~
+The stairs and gift shop are to the southwest.
+~
+S
+#11904
+The Central Chamber of the Tower Skycleave~
+   The ever-spiraling walkway that ascends the Tower Skycleave begins here,
+where sturdy wooden steps jut straight out of the ebony walls. The stairs
+follow the curve of the grand chamber's wall up to the second floor and beyond.
+At the base of the stairs is the archway to the gift shop. A colorful sign
+adorns the side of the entrance.
+~
+c z 0 -1
+D5
+~
+0 11903
+D8
+~
+0 11910
+D3
+~
+0 11907
+D1
+~
+0 11908
+E
+sign~
+   The sign is the color of a skystone with silver lettering across it in a
+cheerful script. It reads:
+
+                   == The Skycleave Tower Gift Shop ==
+~
+E
+chamber column center central~
+   The chamber rises all the way to the top of the tower, though you can't see
+that far from here because the ever-spiraling walkway is directly above you.
+A great chandelier in the shape of an inverted tree lights the room through the
+central opening.
+~
+E
+staircase stairs steps~
+   The wooden stairs jut out directly from the walls. An ebony railing protects
+the opposite side against falls. The stairs rise up to the second floor, where
+they seamlessly join with the ever-spiraling walkway that rises to the top.
+~
+E
+spiraling ever-spiraling walkway up~
+   Starting at the top of the stairs, the walkway spirals up the walls of the
+immense tower. You can see the railing of the second floor from here, but the
+spiral disappears out of sight beyond that.
+~
+E
+chandelier tree lamps lights~
+   A graceful, inverted tree reaches down through the circular opening in the
+walkway that spirals up the inside of the tower. The whole tree is sculpted
+from nocturnium wire. Its long, reaching branches hold little flames like oil
+lamps that light up every part of the vast central chamber, but you'd hate to
+be the one who has to refill all those lights.
+~
+E
+nocturnium fixtures handles~
+   Every door handle, sconce, and fixture you can see is made from matte black
+nocturnium, reflecting not a single glint of light from any of the hundreds of
+lamps on the chandelier, which, itself, is an enormous nocturnium sculpture.
+~
+E
+east fountain cafe~
+   There is a large fountain in the center of the room, to the east of you.
+Beyond that lies the cafe, on the opposite side of the ground floor from you.
+~
+E
+floors down~
+The floors are highly-polished white marble.
+~
+E
+walls ebony~
+The walls are paneled with polished black ebony wood.
+~
+E
+west gift shop~
+The tower's gift shop is through the archway to the west.
+~
+E
+northeast ne~
+The study hall is to the northeast.
+~
+S
+#11905
+Cafe Fendreciel~
+   The large cafe is full of wooden dividers and bistro tables perhaps to make
+it seem like a smaller, more comfortable space. The walls have been papered
+over with pictures of birds and flowers. A menu board floats above the stacks
+of cups, plates, and bowls that cover the long bar along the north wall.
+~
+c z 0 -1
+D3
+~
+0 11902
+E
+fixtures nocturnium~
+Small, elegant nocturnium oil lamps are affixed to the walls.
+~
+E
+pictures paintings paper walls~
+   The walls are papered with pictures of birds, flowers, bees, and
+butterflies. If you stare at them long enough, they actually seem to move,
+almost like a real garden view.
+~
+E
+birds~
+   Little birds of all colors are painted on the walls. Familiar birds like
+finches and woodpeckers are joined by exotic birds of paradise, macaws, and
+many you don't recognize at all. If you watch them long enough, they appear to
+come to life, chirping (silently) at each other and drinking from the flowers.
+~
+E
+flowers~
+   Flowers of all sorts are painted on the papered walls. Sometimes they seem
+to blow in the wind.
+~
+E
+insects bugs bees butterflies butterfly~
+   Little butterflies and bees are painted all over the papered walls.
+Sometimes, out of the corner of your eye, you think one of them flies into one
+of the painted flowers.
+~
+E
+menuboard board~
+   The blue slate menuboard is covered in chalk smears and erase marks. In an
+elegant, flowing script, the board currently reads:
+
+                          == Cafe Fendreciel ==
+                      Skycleaver Coffee.........120
+                      Temporal Mint Tea.........243
+                      Violet Skycleaver Wine....322
+                      Mutton Pasty..............199
+                      Turquoise Cheese..........199
+~
+E
+bar cups bowls plates mess~
+   The long bar is covered in stacks of cups, bowls, and plates. They all look
+clean, but there's no organization to the system at all.
+~
+E
+west door archway fountain~
+   The archway leads out into the busy grand chamber. You can see the fountain
+out in the middle of the room.
+~
+E
+floors down~
+The floors are highly-polished white marble.
+~
+E
+tables~
+   Lots of tables have been crammed into this cafe, separated by wood room
+dividers, to give the spacious cafe that exclusive, expensive, cozy, cramped
+feeling. Some of them are solid black ebony wood, while others are striped
+black and brown calamander.
+~
+E
+dividers room-dividers~
+   The tables are separated by wooden dividers that are intricately carved to
+show geometric patterns that look like big towers made from smaller towers.
+Some of them are solid black ebony wood, while others are striped black and
+brown calamander.
+~
+E
+ebony wood~
+The many of the room dividers and tables are made from polished black ebony.
+~
+E
+calamander~
+   Some of the room dividers and tables are made from striped black and brown
+calamander wood.
+~
+S
+#11906
+The Study Hall~
+   The classroom is not large, and most of its floor space is devoted to small
+wooden desks. The room is quite stark, with one large blackboard making up one
+wall, and another sporting a large bookcase. The walls are paneled with
+polished ebony, but the desks and chairs appear to be oak.
+~
+cd z 0 -1
+D2
+~
+0 11903
+E
+blackboard board chalkboard words writing words~
+   The blackboard is a large piece of slate attached to the wall. It is covered
+in eraser smears and stray chalk dust. There are words written on the board,
+but you don't understand them, if they're really words at all.
+~
+E
+bookcase~
+   A large, dark, wooden bookcase with many tomes of various sizes lining the
+shelves. Some of the titles are legible while others look to have been worn
+away by time and use.
+~
+E
+desk desks chairs~
+   Rows of slightly inclined desks with padded chairs take up most of the floor
+space. The desks look to have some storage area, but there doesn't seem to be a
+latch or handle anywhere. The desks and chairs are made from oak, while
+virtually everything else -- including the instructor's desk at the head of the
+room -- is ebony.
+~
+E
+ebony wood~
+   The paneled walls and ceiling are all made from polished black ebony, though
+the desks are oak.
+~
+E
+floors down~
+The floors are highly-polished white marble.
+~
+E
+doorway south~
+The door leads back to the central chamber.
+~
+E
+walls~
+The paneled black walls are made from ebony.
+~
+S
+#11907
+Towerwinkel's Gift Shoppe~
+   Bubbles of varying sizes float about the quaint gift shop, bouncing off of
+the brightly-colored shelves displaying wares. The ebony wood of the walls
+vanishes behind all the bubbles and bright colors, making the room feel like
+it goes on forever.
+~
+c z 0 -1
+D1
+~
+0 11904
+E
+bubbles~
+   The bubbles float aimlessly around the room. Whenever a group of them come
+together, they form the words, 'Skycleave Gift Shop.'
+~
+E
+shelves shelf brightly-colored colored wares~
+   The brightly-colored shelves display various magical wares. Each is laid out
+where patrons can examine them more closely. Try 'list' and 'list id' to
+inspect them.
+~
+E
+ebony wood walls~
+   The polished black walls almost vanish behind the floating bubbles and
+brightly-colored shelves, making the shop seem much larger than it is.
+~
+E
+floors down~
+The floors are highly-polished white marble.
+~
+E
+east archway doorway stairs stairway~
+To the east, the archway leads out to central chamber and the stairs.
+~
+E
+jars pixy pixies novelty~
+   There is a shelf that's covered end to end with brown and purple pixy jars.
+They seem to be a mere novelty, as none of them contain actual pixies.
+~
+E
+trinkets skycleaver~
+Bins full of little blue tower-shaped stones sit on several shelves.
+~
+E
+phials potions blacktower waterwalking perfect sight lighter burdens rack~
+   A large display rack shows off rows of black glass phials sold under the
+Blacktower imprint. They come in three varieties: waterwalking, perfect sight,
+and lighter burdens.
+~
+E
+bugs beetles fire tinderbox box scarabs~
+   Some of the shelves are covered in tinderboxes, each with a fire bug nestled
+comfortably inside. They look rather like scarab beetles that have been set on
+fire, but it doesn't seem to bother them.
+~
+E
+seedling stone calamander striped~
+There are striped stone seedlings for sale.
+~
+E
+dust~
+   Here and there you see clumps of dust frolicking from shelf to shelf,
+sometimes whirling themselves into little clouds to leap across the gift
+shoppe.
+~
+M 1 11908 100.00 1
+S
+#11908
+The Central Chamber of the Tower Skycleave~
+   Looking up makes you feel almost insignificant as the great central chamber
+of the Tower Skycleave stretches upward, past an inverted nocturnium tree, all
+the way to the top of the tower. The vast ground floor sprawls out around you,
+with the stairs and gift shop to the west, the cafe to the east, and the study
+hall to the north.
+~
+c z F -1
+D2
+~
+0 11901
+D1
+~
+0 11902
+D0
+~
+0 11903
+D3
+~
+0 11904
+E
+bench~
+A long, curving wooden bench surrounds the fountain. It seems to be ebony.
+~
+E
+chandelier tree lamps lights nocturnium up~
+   A graceful, inverted tree reaches down through the circular opening in the
+walkway that spirals up the inside of the tower. The whole tree is sculpted
+from nocturnium wire. Its long, reaching branches hold little flames like oil
+lamps that light up every part of the vast central chamber.
+   From here, you can see all the way to the top of the tower, at the base of
+the tree. There must be thousands of lights on the tree's countless branches.
+~
+E
+staircase stairs spiraling ever-spiraling walkway~
+   West of here, the ever-spiraling staircase and walkway begins. It twists up
+the tower, changing from stairs to sloping ramp, then back to stairs again
+between each floor.
+~
+E
+north study~
+The study hall is to the north.
+~
+E
+east cafe~
+The tower's cafe is to the east.
+~
+E
+west gift shop~
+The gift shop is to the west.
+~
+E
+south~
+The tower's foyer and exit are to the south.
+~
+E
+floors down~
+The floors are highly-polished white marble.
+~
+E
+walls ebony~
+The distant walls are paneled with polished black ebony wood.
+~
+M 1 11906 100.00 2
+T 11813
+S
+#11910
+The Second Floor Walkway of the Tower Skycleave~
+   The staircase rises up from the ground floor and seamlessly shifts into a
+curving spiral walkway that slowly rises as it circles the inside of the tower.
+The ebony walls and floor are pristinely polished and reflect the glint of the
+enormous chandelier that hangs down through the central chamber, just beyond
+your reach over the railing. Below, you can see the fountain and people
+meandering around it. Above, through the tree-like chandelier, you can see
+across to the railing of the third floor.
+~
+cd z 0 -1
+D9
+~
+0 11804
+D7
+~
+0 11911
+E
+southeast se~
+The walkway spirals up around the central chamber.
+~
+E
+walls~
+The wall is spotless and decorated with ebony wood paneling.
+~
+E
+floors~
+   The floor is black, well-polished ebony wood. It blends seamlessly into the
+staircase down to the first floor. The floors seem flat here where you're
+standing, but slope upwards ahead of you.
+~
+E
+walkway curving spiraling ever-spiraling~
+   The ebony walkway is wide enough for four people to walk abreast, with a
+railing to ensure the fifth person doesn't fall. The floor is perfectly flat
+where you're standing, but everywhere ahead of you slopes upwards as it curves
+around the vast chamber, before turning into stairs at the end of the second
+floor. The tree-shaped chandelier hangs down the center of the tower.
+~
+E
+stairs staircase steps~
+   The staircase from the ground floor ends here, where is seamlessly shifts
+into the ever-spiraling walkway. You can also see the spot at the end of the
+second floor where it shifts again into steps up to floor 3.
+~
+E
+railing rails handrail~
+   The curving walkway is guarded by an ebony handrail that keeps you from
+falling. Over the railing, just out of reach, is an immense chandelier shaped
+like an upside-down tree.
+~
+E
+chandelier tree up~
+   An incredible nocturnium tree hangs down from the very top of the tower,
+reaching nearly to the fountain below with its spindly black branches. Each
+branch bears a small oil lamp, lighting the entire central chamber like a
+thousand twinkling stars.
+~
+E
+chamber central room~
+   The central chamber of the tower is an enormous cylinder with the ever-
+spiraling walkway climbing its round ebony wall. A nocturnium chandelier in the
+shape of a full-size, upside-down tree hangs down from the top of the tower
+down to the first floor. There are no windows in the chamber, as it runs up the
+tower's core. Doors off of the walkway lead to the tower's various rooms.
+~
+E
+doors doorways~
+You see doors along the walkway but can't see what they are from here.
+~
+E
+fountain down~
+Down below, you can see the enormous fountain at the center of the first floor.
+~
+E
+ebony wood~
+   Virtually everything on this floor, from the floors, to the railings, to the
+wall are all made from highly polished black ebony.
+~
+E
+nocturnium~
+   Every metal accent and sculpture here, including the enormous chandelier, is
+made from pitch black nocturnium.
+~
+E
+portraits pictures paintings masters~
+   The long second-floor walkway is decorated with pictures of Skycleave's old
+masters. They start a little ahead of you, southeast of here, and continue all
+the way to the opposite stairs.
+~
+M 1 11809 100.00 8
+S
+#11911
+The Second Floor Walkway of the Tower Skycleave~
+   The ebony paneled wall of the curving walkway is decorated with portraits of
+the Tower Skycleave's old masters, with nocturnium light fixtures seperated
+evenly to either side of each portrait.
+~
+c z 0 -1
+D4
+~
+0 11910
+D5
+~
+0 11912
+D2
+~
+0 11914
+E
+walls~
+The ebony wall is covered in paintings of the old masters of Skycleave.
+~
+E
+floors northeast northwest ne nw~
+   The floor is black, well-polished ebony wood. It seems flat here where
+you're standing, but slopes upwards to the northeast and downwards to the
+northwest where the stairs are.
+~
+E
+walkway curving spiraling ever-spiraling~
+   The ebony walkway is wide enough for four people to walk abreast, with a
+railing to ensure the fifth person doesn't fall. The floor is perfectly flat
+where you're standing, but slopes upwards as it curves around the vast chamber
+toward the stairs at the end of the second floor and downward toward the stairs
+to the first floor. The tree-shaped chandelier hangs down the center of the
+tower.
+~
+E
+stairs staircase steps~
+   You can see the steps down to the first floor as well as the steps up to
+the second floor across the great chamber.
+~
+E
+railing rails handrail~
+   The curving walkway is guarded by an ebony handrail that keeps you from
+falling. Over the railing, just out of reach, is an immense chandelier shaped
+like an upside-down tree.
+~
+E
+chandelier tree up~
+   An incredible nocturnium tree hangs down from the very top of the tower,
+reaching nearly to the fountain below with its spindly black branches. Each
+branch bears a small oil lamp, lighting the entire central chamber like a
+thousand twinkling stars.
+~
+E
+chamber central room~
+   The central chamber of the tower is an enormous cylinder with the ever-
+spiraling walkway climbing its round ebony wall. A nocturnium chandelier in the
+shape of a full-size, upside-down tree hangs down from the top of the tower
+down to the first floor. There are no windows in the chamber, as it runs up the
+tower's core. Doors off of the walkway lead to the tower's various rooms.
+~
+E
+fountain down~
+Down below, you can see the enormous fountain at the center of the first floor.
+~
+E
+ebony wood~
+   Virtually everything on this floor, from the floors, to the railings, to the
+wall are all made from highly polished black ebony. The glaring exception is
+the sturdy oak door in front of you.
+~
+E
+nocturnium~
+   Every metal accent and sculpture here, including the enormous chandelier, is
+made from pitch black nocturnium. Well, with the exception of the door in front
+of you, which is reinforced with iron instead.
+~
+E
+lights fixtures~
+   In addition to the many hundreds of lights on the great chandelier, there
+are smaller light fixtures on the wall between the portraits of the old masters
+of the tower.
+~
+E
+portraits paintings old masters~
+   The portraits begin here with Grand High Sorcerer Abaris, founder of the
+Tower Skycleave, dressed in sepia-tone robes and standing in front of a much
+smaller version of the tower.
+   Next is Flamella, Abaris's successor, dressed in a white gown and holding a
+bloodstone staff, sitting in a quaint office. She's a frail old woman in the
+portrait, though her hair is black-blue and pulled up into a frightening
+beehive.
+   The third portrait is of Gormon the Bowled, a portly old man with a frizzy
+mane of salt-and-pepper hair and beard. The tower behind him is larger than
+Abaris's version, made from cyclopean blocks, though it doesn't really resemble
+the Skycleave of today. Gormon is dressed in a black robe and carries a small,
+crooked wand rather than a staff.
+   Grand High Sorcerer Fural, fourth master of Skycleave, is the final portrait
+you can see without following the curve of the hallway. Fural is depicted as a
+short, pale old woman with thick gray eyebrows. Her earlobes are stretched to
+great size by discs made of iridescent abalone shell. She's wearing several
+layers of deep purple robes and holding a wooden staff with a green gem.
+~
+E
+Abaris~
+   He is portrayed as a middle-aged man in sepia robes, holding a simple wooden
+staff, standing in front of a modest sorcery tower made from white clay bricks.
+Below the picture, a plate is inscribed:
+                 +------------------------------------+
+                 |     Grand High Sorcerer Abaris     |
+                 |       Sorcerer Extraordinaire      |
+                 |          Transubstantiated         |
+                 |   Founder of the Tower Skycleave   |
+                 +------------------------------------+
+~
+E
+Flamella~
+   Flamella is portrayed in a flowing white gown, holding a bloodstone staff,
+and sitting in a quaint office. Though her skin looks aged and fragile, her
+hair is dyed black-blue and pulled up into a frightening beehive. Below the
+portrait, a small plate is inscribed:
+                 +-------------------------------------+
+                 |    Grand High Sorceress Flamella    |
+                 |           "The Dreadful"            |
+                 |          Passed Naturally           |
+                 |   Second Master, Tower Skycleave    |
+                 +-------------------------------------+
+~
+E
+Gormon Bowled cyclopean~
+   Gormon is a portly old man with frizzy, salt-and-pepper hair and beard. His
+portrait shows him in a black robe with a crooked wand, standing in front of
+a tall tower built from cyclopean stone. Below the picture, a plate says:
+                 +------------------------------------+
+                 |     Grand High Sorcerer Gormon     |
+                 |            "The Bowled"            |
+                 |          Felled by Mammoth         |
+                 |    Third Master, Tower Skycleave   |
+                 +------------------------------------+
+~
+E
+Fural~
+   Fural is a short woman with pale, almost gray skin. Her earlobes are
+stretched to great size by discs made of iridescent abalone shell. Her hair is
+gray-white and braided back. Her robes are deep purple and many-layered. Her
+staff is rough wood with a green gem, perhaps jade, on the end. Below her
+portrait, a plate is inscribed:
+                 +-----------------------------------+
+                 |     Grand High Sorcerer Fural     |
+                 |      xxxxxxxxxxxxxxxxxxxxxxx      |
+                 |              Betrayed             |
+                 |   Fourth Master, Tower Skycleave  |
+                 +-----------------------------------+
+                    (the 2nd line is scratched out)
+~
+E
+doorway sturdy oak iron south~
+   The sturdy door is utilitarian in design. It is made of heavy oak wood with
+wide iron bands across it, with a large handle. It leads into the Goblin Cages
+to the south.
+~
+E
+sign yellow~
+The sign is an attention-grabbing yellow, with blocky red lettering.
+
+                     == GOBLIN CONTAINMENT ==
+                            CAUTION!
+                    GOBLINS BEYOND THIS POINT!
+~
+S
+#11912
+The Second Floor Walkway of the Tower Skycleave~
+   The long, curving walkway circles the open central column of the tower, lit
+by the upside-down tree chandelier that hangs down through the middle. A
+flashing sign marks the archway to the east, which has glowing yellow dust
+spots around it, marring the usually-spotless interior. The portraits of the
+Tower Skycleave's former masters continue along the walls, alternating with
+nocturnium light fixtures.
+~
+c z 0 -1
+D6
+~
+0 11911
+D1
+~
+0 11918
+D4
+~
+0 11913
+E
+sign flashing archway east doorway~
+   The flashing sign shifts between the vibrant hues of the rainbow with both
+the lettering and background changing colors at random.
+
+                       == The Great Pixy Races ==
+
+
+
+   At the bottom of the sign is a phrase in teeny tiny lettering that is hard
+to read:
+          * Warning! Pixy dust may stain clothing, skin and hair.
+~
+E
+doors~
+   There are several doors on this floor. The closest one has a flashing sign
+announcing 'The Great Pixy Races'.
+~
+E
+dust yellow pixy~
+   The archway is coated in glowing yellow dust in odd patches. Thumps, high
+pitched noises and puffs of the glowing dust come from the archway every now
+and then.
+~
+E
+walls~
+The ebony wall is covered in paintings of the old masters of Skycleave.
+~
+E
+floors southwest northwest sw nw~
+   The floor is black, well-polished ebony wood. It seems flat here where
+you're standing, but slopes upwards to the northwest and downwards to the
+southwest. The floor here has some yellow dust stains.
+~
+E
+walkway curving spiraling ever-spiraling~
+   The ebony walkway is wide enough for four people to walk abreast, with a
+railing to ensure the fifth person doesn't fall. The floor is perfectly flat
+where you're standing, but slopes upwards as it curves around the vast chamber
+toward the stairs at the end of the second floor and downward toward the stairs
+to the first floor. The tree-shaped chandelier hangs down the center of the
+tower.
+~
+E
+stairs staircase steps~
+   You can see the steps down to the first floor as well as the steps up to
+the second floor across the great chamber, on the other side of the chandelier.
+~
+E
+railing rails handrail~
+   The curving walkway is guarded by an ebony handrail that keeps you from
+falling. Over the railing, just out of reach, is an immense chandelier shaped
+like an upside-down tree.
+~
+E
+chandelier tree up upside-down~
+   An incredible nocturnium tree hangs down from the very top of the tower,
+reaching nearly to the fountain below with its spindly black branches. Each
+branch bears a small oil lamp, lighting the entire central chamber like a
+thousand twinkling stars.
+~
+E
+chamber central room~
+   The central chamber of the tower is an enormous cylinder with the ever-
+spiraling walkway climbing its round ebony wall. A nocturnium chandelier in the
+shape of a full-size, upside-down tree hangs down from the top of the tower
+down to the first floor. There are no windows in the chamber, as it runs up the
+tower's core. Doors off of the walkway lead to the tower's various rooms.
+~
+E
+fountain down~
+Down below, you can see the enormous fountain at the center of the first floor.
+~
+E
+ebony wood~
+   Virtually everything on this floor, from the floors, to the railings, to the
+wall are all made from highly polished black ebony.
+~
+E
+nocturnium~
+   Every metal accent and sculpture here, including the enormous chandelier, is
+made from pitch black nocturnium.
+~
+E
+lights fixtures~
+   In addition to the many hundreds of lights on the great chandelier, there
+are smaller light fixtures on the wall between the portraits of the old masters
+of the tower.
+~
+E
+portraits paintings masters~
+   The portraits of former masters of the Tower Skycleave continue around the
+curve of the hallway, each one framed in ebony wood, with a nocturnium plate
+underneath inscribed with the name in a uniform, elegant script.
+   These portraits begin with Grand High Sorcerer Ulrica, a bony woman with
+shimmering silver skin and white hair. Despite the hair, she looks rather young
+and stands tall in her deep purple robes.
+   The next portrait is of Spana, the tower's sixth master, a motherly woman
+with dark brown hair worn in a single over-the-shoulder braid. Her gown is
+dark purple with a sky-blue sash.
+   Magnus the Small follows Spana. His epithet appears to be quite literal as
+his portrait shows Magnus sitting on a paper weight on his desk, no larger than
+a rat. Next to his portrait, Grand High Sorcerer Jabir appears in violet robes
+standing before an early version of the tower.
+   The portraits continue around the curving wall in both directions.
+~
+E
+Ulrica~
+   Grand High Sorcerer Ulrica is a tall, bony woman, though she looks rather
+young even with stark white hair. In her portrait, her skin is shimmering
+silver in a tone that's as hauntingly beautiful as it is unnatural. Like many
+of the portraits, she wears dark purple robes. Beneath the portrait, an
+inscribed plate reads:
+                 +------------------------------------+
+                 |     Grand High Sorcerer Ulrica     |
+                 |             Goblinsbane            |
+                 |          Felled by Curses          |
+                 |    Fifth Master, Tower Skycleave   |
+                 +------------------------------------+
+~
+E
+Spana~
+   Grand High Sorcerer Spana is a middle-aged woman with her thick, brown hair
+braided over one shoulder. She has a warm smile and folded hands that give her
+a motherly quality. She is depicted in a dark purple gown with a sky-blue sash
+over one shoulder. Below the portrait, an inscribed plate reads:
+                 +-----------------------------------+
+                 |     Grand High Sorcerer Spana     |
+                 |            "The Brief"            |
+                 |         Felled by Goblins         |
+                 |   Sixth Master, Tower Skycleave   |
+                 +-----------------------------------+
+~
+E
+Magnus Small~
+   Magnus the Small is painted no larger than a rat, seated on a paperweight
+on his desk. He wears a purple toga in the portrait, but no shoes or sandals.
+Below the portrait, an inscribed plate reads:
+                 +-------------------------------------+
+                 |       G.H.S. Magnus the Small       |
+                 |      Overcame his biggest curse     |
+                 |         Felled by Earthquake        |
+                 |   Seventh Master, Tower Skycleave   |
+                 +-------------------------------------+
+~
+E
+Jabir~
+   Grand High Sorcerer Jabir's painting shows him outside the tower -- or, at
+least, an earlier version of it. The tower is shown made from stone blocks and
+standing three stories tall, with large calamander double doors. Jabir himself
+is a tall, thin man with a long brown beard. He wears a violet turban to match
+his layered robes. Beneath his portrait, the nameplate reads:
+                 +-----------------------------------+
+                 |     Grand High Sorcerer Jabir     |
+                 |    "Explore - Expand - Exploit"   |
+                 |         Felled by Goblins         |
+                 |   Eighth Master, Tower Skycleave  |
+                 +-----------------------------------+
+~
+E
+plates nameplates~
+There are nameplates under the portraits.
+~
+S
+#11913
+The Second Floor Walkway of the Tower Skycleave~
+   This section of ever-spiraling walkway is filled with various stations for
+both practical and research oriented apprentice studies. The ebony paneled
+walls continue with former masters of the Tower Skycleave, lit by the thousand
+flickering lights of the grand chandelier. The door on the north wall leads to
+quarters for the apprentices and students.
+~
+c z 0 -1
+D7
+~
+0 11912
+D0
+~
+0 11919
+D6
+~
+0 11922
+E
+stations research studies benches workbenches~
+   Each work station is set up differently and set equidistant from each other
+along the wall of the central chamber. Each work station is made of sturdy wood
+that is scuffed from many years of use. Some are stacked with books while
+others have complicated contraptions or alchemical paraphernalia on them.
+~
+E
+books~
+Various books are stacked on the work stations.
+~
+E
+contraptions~
+You have no idea what any of these contraptions do.
+~
+E
+paraphernalia alchemical~
+You have no idea what any of this stuff is for.
+~
+E
+doorway north~
+The door here leads into the mage quarters.
+~
+E
+walls~
+   The ebony wall is covered in paintings of the old masters of Skycleave,
+spaced between the work benches.
+~
+E
+floors southwest southeast sw se~
+   The floor is black, well-polished ebony wood. It seems flat here where
+you're standing, but slopes upwards to the southwest toward the stairs and
+downwards to the southeast.
+~
+E
+walkway curving spiraling ever-spiraling~
+   The ebony walkway is wide enough for four people to walk abreast, with a
+railing to ensure the fifth person doesn't fall. The floor is perfectly flat
+where you're standing, but slopes upwards as it curves around the vast chamber
+toward the stairs at the end of the second floor and downward toward the stairs
+to the first floor. The tree-shaped chandelier hangs down the center of the
+tower.
+   The walkway is filled with workbenches and magic stations, lined up along
+the outer wall. It looks like the apprentices spend a lot of time here.
+~
+E
+stairs staircase steps~
+   You can see the steps down to the first floor as well as the steps up to
+the second floor across the great chamber, to the right of the chandelier.
+~
+E
+railing rails handrail~
+   The curving walkway is guarded by an ebony handrail that keeps you from
+falling. Over the railing, just out of reach, is an immense chandelier shaped
+like an upside-down tree.
+~
+E
+chandelier tree up upside-down~
+   An incredible nocturnium tree hangs down from the very top of the tower,
+reaching nearly to the fountain below with its spindly black branches. Each
+branch bears a small oil lamp, lighting the entire central chamber like a
+thousand twinkling stars.
+~
+E
+chamber central room~
+   The central chamber of the tower is an enormous cylinder with the ever-
+spiraling walkway climbing its round ebony wall. A nocturnium chandelier in the
+shape of a full-size, upside-down tree hangs down from the top of the tower
+down to the first floor. There are no windows in the chamber, as it runs up the
+tower's core. Doors off of the walkway lead to the tower's various rooms.
+~
+E
+fountain down~
+Down below, you can see the enormous fountain at the center of the first floor.
+~
+E
+ebony wood~
+   Virtually everything on this floor, from the floors, to the railings, to the
+wall are all made from highly polished black ebony. However, the workbenches
+along the walkway here seem to be oak or maple.
+~
+E
+nocturnium~
+   Every metal accent and sculpture here, including the enormous chandelier, is
+made from pitch black nocturnium.
+~
+E
+lights fixtures~
+   In addition to the many hundreds of lights on the great chandelier, there
+are smaller light fixtures on the wall between the portraits of the old masters
+of the tower.
+~
+E
+masters portraits paintings~
+   Portraits of Skycleave's masters line the entire curved hallway of the
+second floor, framed in fine ebony with nocturnium nameplates in an elegant
+script. In this part of the hallway, you can see the portraits of Grand High
+Sorcerers Jadoo, Kemala, Bliant, and Rafaela.
+~
+E
+Jadoo~
+   Grand High Sorcerer Jadoo wears a violet angarkha, a type of short coat from
+his homeland. His mustache and sideburns are dark brown with white accents, but
+the lower part of his beard is stark white. Below his portrait, the nameplate
+is inscribed:
+                 +-----------------------------------+
+                 |     Grand High Sorcerer Jadoo     |
+                 |   The Scholar, Died of Mana Burn  |
+                 |   Ninth Master, Tower Skycleave   |
+                 +-----------------------------------+
+~
+E
+Kemala~
+   Grand High Sorcerer Kemala is a petite woman, painted perhaps at the age of
+50, in a wrapped purple skirt and violet tunic with a sheer violet shawl. She
+is depicted sitting, holding a nocturnium scepter with her hands folded in her
+lap. Below her portrait, the nameplate reads:
+                 +----------------------------------+
+                 |    Grand High Sorcerer Kemala    |
+                 |     Defender of Mana, Cursed     |
+                 |   Tenth Master, Tower Skycleave  |
+                 +----------------------------------+
+~
+E
+Bliant~
+   Grand High Sorcerer Bliant is shown in white robes, unlike the rest of the
+old masters, who are mainly shown in purple or violet. Only the hem of her
+outer robe is purple. She looks young for a master of the tower, with soft
+features and bright red hair, which is wrapped in a white cloth. Below the
+painting, the nameplate reads:
+                 +--------------------------------------+
+                 |      Grand High Sorcerer Bliant      |
+                 |  The Wise; The Gifted; The Apollus   |
+                 |           Passed Naturally           |
+                 |   Eleventh Master, Tower Skycleave   |
+                 +--------------------------------------+
+~
+E
+Rafaela~
+   Grand High Sorcerer Rafaela is a small, thin woman in a violet dress with
+a sky-blue sash. The sleeveless dress shows off lean, muscled arms, both with
+nocturnium cuffs below the shoulder. Rafaela's angular face bears a stern look
+beneath her nest of black hair, which has a single purple streak in it. Below
+the portrait, the nameplate reads:
+                 +-----------------------------------+
+                 |    Grand High Sorcerer Rafaela    |
+                 |     Reconstructionist, Plague     |
+                 |  Twelfth Master, Tower Skycleave  |
+                 +-----------------------------------+
+~
+E
+plates nameplates~
+There are nameplates under the portraits.
+~
+S
+#11914
+The Goblin Cages Entry~
+   This disaster area is probably the messiest room in all the tower. Large
+cages line most of the walls, most of which look like they haven't been cleaned
+in some time. One corner of the room has a small desk with a nocturnium lamp
+sitting atop it. The floor is mostly clear, with a small platform with a ring
+bolted to it in the middle.
+~
+cdh z 0 -1
+D0
+~
+0 11911
+D1
+~
+0 11915
+E
+north door~
+The sturdy door leads back out into the grand chamber.
+~
+E
+east~
+The cages continue along the long room to the east.
+~
+E
+disaster mess~
+   Wrangling goblins has left quite the mess. Most of it has been pushed into
+the corners to keep the floor clear. A broken broom handle lies just out of
+reach of one of the cages; perhaps the cleaning staff no longer ventures in.
+~
+E
+desk nocturnium lamp~
+   Matching the room easily, this desk is a mess of papers, quills, and
+different colored inkwells. A utilitarian lamp made of nocturnium has been
+bolted securely to the desktop. Gouges mar the surfaces of the desk. Is that a
+fingernail embedded in the side?
+~
+E
+floors~
+   The flagstone floor has been cleared by pushing the mess into the corners.
+In the middle, there's a small platform with a ring bolted to it.
+~
+E
+walls~
+The north wall is ebony, but the rest of the walls are exposed stone block.
+~
+E
+stone blocks~
+Three of the walls here are made from exposed stone block.
+~
+E
+fingernail~
+Yes, that's definitely a fingernail.
+~
+E
+platform ring middle~
+   Gouges mar the surface of the platform and a thick iron ring has been
+securely bolted in the middle. You can only imagine what they do with whatever
+hapless goblin gets chained to this.
+~
+E
+papers inkwells quills~
+   As you try to make some sense of the chaos that is the desk you stumble
+across a paper hidden under several others. It is stained and looks as though
+it is an old memo. The ink is almost completely illegible and you can't
+make out much. A second paper stuck to the back of this one with some gooey
+substance keeps you from reading anything but:
+
+       ... why the goblins keep trying to get in. Seems fruitless;
+       they just end up in cages. Perhaps they've heard we have some
+       old goblin knickknacks lying around? Still, seems foolish to
+       risk it all for bits of jade. Have never known a goblin ...
+~
+E
+cages~
+The cages are made of iron bars, most bent out of shape from years of abuse.
+~
+S
+#11915
+The Goblin Cages~
+   The long room would be large if not for all the cages, which go all the way
+to the far wall. At full capacity, this room could hold dozens of goblins,
+though the sorcerers seem unconcerned that the conditions would be inhumane.
+One or two cages are in front of windows, but most of the inhabitants don't get
+a lot of light. The room's aroma is far from pleasant, but a truly disturbing
+odor emanates from a large bin situated in the corner.
+~
+ch z 0 -1
+D3
+~
+0 11914
+E
+west~
+The exit to the long room is to the west.
+~
+E
+north~
+It looks like there might be a stray passage hidden behind the bin...
+~
+E
+bin corner~
+   This bin stands about four feet tall and is large enough around to fit a
+couple of people standing up. You don't even want to imagine how many goblins
+could be squeezed into it. As you close in to get a good look at this bin, a
+powerful stench overwhelms you. Before you are forced to back away, however,
+you see that it seems to be of one piece with the wall behind it. There are
+unusual scrapes along the floor next to it. Perhaps if you search around, you
+could find a way to move it.
+~
+E
+windows~
+There are two large windows behind the cages.
+~
+E
+walls~
+   Most of the walls in here are made from stone blocks, though the north wall
+is ebony. A foul bin in the corner appears to be attached to the stone wall.
+~
+E
+floors~
+The floor is made from large slabs of flagstone.
+~
+E
+cages~
+The cages are made of iron bars, most bent out of shape from years of abuse.
+~
+E
+scrapes~
+   The scrapes next to the bin don't seem to belong to anything in here. It
+looks more like the wall slides out, but you don't see how to open it. You'd
+have to search around.
+~
+T 11921
+T 11936
+S
+#11916
+A Narrow Passageway~
+   This cramped passageway is lined with unfinished, yet well aged, wooden
+beams. Hanging from one such beam is a rusty iron sconce with a tangle of
+cobwebs stretching to a darker corner. A thick layer of dust covers the floor
+all across the confined space. The low, sloped ceiling must mean you're inside
+the curving walkway of the central chamber.
+~
+c 0 0 -1
+D4
+~
+0 11917
+E
+south~
+The inhumane stench from the south exit is the goblin cages.
+~
+E
+northwest nw~
+The long passage continues to the northwest, but it's too dark to see.
+~
+E
+sconce rusty~
+The sconce looks like it's meant to hold a torch. It hasn't been used lately.
+~
+E
+cobwebs dust~
+It looks like people don't come in here much. Even the cobwebs have cobwebs.
+~
+E
+ceiling beams~
+   The low, sloping ceiling looks like it's the underside of the walkway that
+spirals up the tower's central chamber. The hefty beams supporting it appear to
+be oak, though they're rough and unfinished.
+~
+M 1 11922 100.00 4
+S
+#11917
+A Narrow Passageway~
+   The stuffy, musty passageway is long and narrow. The low, sloped ceiling
+indicates you're underneath the curving walkway in the central chamber. Hefty
+oak beams support the chamber, but it's hard to move past them, especially with
+all the cobwebs.
+~
+c 0 0 -1
+D7
+~
+0 11916
+E
+southeast se~
+The long passageway continues to the southeast.
+~
+E
+northwest nw note~
+   It looks like the exit to the secret passage is in the northwest wall. A
+small note on the wall reads:
+
+                             Secret Pass Phrase
+                                'O ala lilo'
+~
+E
+cobwebs dust~
+It looks like people don't come in here much. Even the cobwebs have cobwebs.
+~
+E
+ceiling beams~
+   The low, sloping ceiling looks like it's the underside of the walkway that
+spirals up the tower's central chamber. The hefty beams supporting it appear to
+be oak, though they're rough and unfinished.
+~
+M 1 11922 100.00 4
+T 11917
+T 11825
+T 11921
+S
+#11918
+The Pixy Races~
+   A series of glass domes and tubes snake around the room as a track for the
+sorcerers of Skycleave to race pixies. There is space to stand in the center
+of the room, with a tall, swiveling chair for the race warden to observe. Large
+windows, covered in a fine mesh, take up most of the east wall, allowing for an
+excellent view and lots of light. A workbench is tucked off to one side, behind
+the track.
+~
+ch z 0 -1
+D3
+~
+0 11912
+E
+windows fine mesh east~
+   A fine iron mesh covers the window from edge to edge. A glowing yellow dust
+mars the mesh in spots. The mesh is surely an added protection against pixy
+escapes.
+~
+E
+workbench~
+   This workbench is lined with tiny crafting instruments. Various pixy sized
+accessories line a board set along the back from small blunted dirks to vests.
+Everything seems to be well organized; but of course, if something was missing,
+it's not like you'd be able to find it.
+~
+E
+pixy pixies stalls~
+   There are lots of pixies tending to their equipment between races, although
+they stop to watch when other pixies are racing.
+~
+E
+racetrack track~
+   The racetrack circles around the room through four glass domes connected by
+tubes. A fence, short relative to even the pixies, marks the path of the the
+track. Portholes near the starting line allow entrants to attach their pixy
+jars for the race.
+   The exterior holds many tiny stalls where other pixies can be seen tending
+to their wings and other gear. Each stall is set up with a window so the pixies
+can watch their competition.
+   The spectator area is inside the ring made by the domes and tubes. And in
+the very center of the room, a tall chair gives the race warden a clear view of
+the action.
+   To check the status of the race, just type 'race'.
+~
+E
+domes~
+   The domes are crystal clear from the top and most of the sides, giving an
+uninterrupted view of the entire track and the pixies racing around it. Four
+domes make up the racetrack: a large dome with the start and finish lines, the
+Forest Dome, the Lava Dome, and the Thunder Dome.
+   To check the status of the race, just type 'race'.
+~
+E
+forestdome forest trees~
+   The Forest Dome is dense with miniature trees, some of which are tall enough
+that they protrude through holes in the glass dome and spread their canopies
+above it. In this dome, pixies must expertly navigate the trees without
+crashing. It is connected forward to the Lava Dome by a narrow tube and
+backward to the starting line by a wider one.
+   To check the status of the race, just type 'race'.
+~
+E
+lavadome lava~
+   The glass of the Lava Dome glows neon-orange from the heat as actual lava
+roils below. The air inside -- and, indeed, above -- the dome is wavy and
+turbulent. Pixies must navigate the treacherous air and avoid burbling lava.
+This dome connects forward to the Thunder Dome and backward to the Forest Dome
+by narrow tubes.
+   To check the status of the race, just type 'race'.
+~
+E
+thunderdome thunder~
+   You can see very little inside the Thunder Dome, whose only prominent
+feature is a dark gray storm cloud. Pixies must navigate the zero-visibility
+cloud while watching out for whatever hazards hide inside. They enter this dome
+through a narrow tube from the Lava Dome but exit through a much wider one that
+goes over the doorway.
+   To check the status of the race, just type 'race'.
+~
+E
+tubes~
+   The racetrack's domes are connected by glass tubes, most so small the pixies
+must cross them in single file, with no chance to pass. The wide tube between
+the Thunder Dome and the finish line arches over the doorway. Aside from that
+one, only the tube between the starting line and the Forest Dome is large
+enough for pixies to try to overtake the lead.
+   To check the status of the race, just type 'race'.
+~
+E
+glass~
+The domes and tubes of the racetrack are made from crystal clear glass.
+~
+E
+chair swiveling~
+   The race warden's chair puts him above you, in the center of the room. From
+there, he can call the race, watch for rules violations, and (unfortunately)
+display the thicket of overgrown hairs that grows out his nose.
+~
+E
+floors down~
+The floors are highly-polished white marble.
+~
+E
+walls ebony~
+The walls are paneled with polished black ebony wood.
+~
+E
+nocturnium fixtures handles~
+   The door handle, the wall sconces, and the accents on the racetrack are all
+made from dark black nocturnium.
+~
+E
+west doorway hall walkway~
+   The second-floor walkway is out the door to the west. A large glass tube
+arches over the doorway as part of the final stretch of the racetrack.
+~
+T 11936
+S
+#11919
+The Apprentice Dormitories~
+   This open lounge houses several couches, chairs, and tables. Being the
+common area for the students of Skycleave, apprentices come and go as they
+please. Stray teacups, books, and various minor magical items are spread around
+the room. The polished mahogany walls, upon which hang a large collection of
+portraits, reflect the soft glow of the lamps.
+~
+c z 0 -1
+D2
+~
+0 11913
+D3
+~
+0 11920
+D0
+~
+0 11923
+E
+north~
+It looks like a small private bedroom to the north.
+~
+E
+south~
+The south door leads back out to the grand chamber.
+~
+E
+west~
+The hallway continues to the west.
+~
+E
+portraits pictures watchers~
+   A collection of portraits of Watchers going back through the years. Each
+portrait has a small plaque under it with the name and years -- or months -- of
+service. Every face seems to be set in a stern expression. The only one you
+recognize is Watcher Annaca.
+~
+E
+couches chairs~
+   The over-stuffed pieces of furniture look as though someone got a bit too
+zealous when looking for comfort. They are covered in a rich brown leather and
+look as though they are about to burst.
+~
+E
+lamps~
+Small oil lamps adorn the room. Curiously, nobody ever seems to refill them.
+~
+E
+tables~
+   The tables are covered in stray crumbs and round tea stains. It looks as if
+the apprentices spend a great deal of time in here.
+~
+E
+walls mahogany~
+   Though mahogany is certainly beautiful and expensive, it seems like a cost-
+saving measure to use it here in place of the ebony and calamander of other
+parts of the tower.
+~
+E
+teacups cups books items magical~
+   The apprentices don't seem to spend a great deal of time cleaning. That part
+will seem ironic later.
+~
+M 1 11921 100.00 1
+S
+#11920
+The Apprentice Dormitories~
+   The hall is narrow here as it runs through the apprentice quarters. A plain
+yet sturdy door leads off to a bedroom, while the hallway itself curves around
+the tower's central column. The walls are exposed stone blocks here, almost
+like a dungeon, lit only by oil lamps.
+~
+c z 0 -1
+D0
+~
+0 11924
+D6
+~
+0 11921
+D1
+~
+0 11919
+E
+walls stone blocks oil lamps~
+   While most of the tower showcases ebony, calamander, or even mahogany wood,
+this portion feels almost unfinished with its bare stone walls. Oil lamps adorn
+the walls and provide just enough light to see by.
+~
+E
+door sturdy north~
+The north door leads to a bunkroom.
+~
+E
+east southwest sw~
+The hallway runs east and southwest from here.
+~
+S
+#11921
+The Apprentice Dormitories~
+   The curved hallway ends at a large window set in the outer wall. Doors lead
+off to more bedrooms from here. The cold stone walls hold oil lamps to light
+the hall at night, but this part of the tower is otherwise rather spartan.
+~
+ch z 0 -1
+D5
+~
+0 11920
+D0
+~
+0 11925
+D2
+~
+0 11926
+E
+north~
+Through the north door, you see a small bunkroom.
+~
+E
+south~
+Through the south door, you see a large bunkroom.
+~
+E
+northeast ne~
+The hallway runs northeast from here.
+~
+E
+doors bedrooms~
+The doors are made from sturdy wood. There's nothing notable about them.
+~
+E
+walls stone blocks oil lamps~
+   While most of the tower showcases ebony, calamander, or even mahogany wood,
+this portion feels almost unfinished with its bare stone walls. Oil lamps adorn
+the walls and provide just enough light to see by.
+~
+S
+#11922
+The Second Floor Walkway of the Tower Skycleave~
+   The second floor walkway, with its immaculate ebony wood floors, comes to a
+gradual end as it subtly changes into stairs that continue to curve upward
+along the wall of the massive chamber as they rise higher into the tower. The
+long line of portraits depicting the former masters of the Tower Skycleave ends
+just before the stairs with the current Grand High Sorcerer in the final frame.
+Elegant nocturnium fixtures on the walls accompany the grand chandelier to
+light the portraits and the walkway. Over the railing, you can see people
+sitting around the fountain down below.
+~
+c z 0 -1
+D5
+~
+0 11913
+E
+southeast se~
+   It looks like there might be a secret passage hidden in the wall... You
+don't see any way to open it from this side.
+~
+E
+doors~
+There are several doors lower on this floor, but you're not close to any.
+~
+E
+walls~
+The ebony wall is lined with paintings of the old masters of Skycleave.
+~
+E
+floors northeast ne~
+   The polished black floor of the walkway rises suddenly into stairs that lead
+to the third floor. To the northeast, the spiraling walkway slopes down toward
+the apprentice quarters and, eventually, to the stairs down to the ground
+floor.
+~
+E
+walkway curving spiraling ever-spiraling~
+   The ebony walkway is wide enough for four people to walk abreast, with a
+railing to ensure the fifth person doesn't fall. The floor is perfectly flat
+where you're standing, but slopes downward toward the stairs to the first
+floor. The tree-shaped chandelier hangs down the center of the tower.
+~
+E
+stairs staircase steps~
+The stairs here rise toward the third floor.
+~
+E
+railing rails handrail~
+   The curving walkway is guarded by an ebony handrail that keeps you from
+falling. Over the railing, just out of reach, is an immense chandelier shaped
+like an upside-down tree.
+~
+E
+chandelier tree up upside-down~
+   An incredible nocturnium tree hangs down from the very top of the tower,
+reaching nearly to the fountain below with its spindly black branches. Each
+branch bears a small oil lamp, lighting the entire central chamber like a
+thousand twinkling stars.
+~
+E
+chamber central room~
+   The central chamber of the tower is an enormous cylinder with the ever-
+spiraling walkway climbing its round ebony wall. A nocturnium chandelier in the
+shape of a full-size, upside-down tree hangs down from the top of the tower
+down to the first floor. There are no windows in the chamber, as it runs up the
+tower's core. Doors off of the walkway lead to the tower's various rooms.
+~
+E
+fountain down~
+Far below, you can see the enormous fountain at the center of the first floor.
+~
+E
+ebony wood~
+   Virtually everything on this floor, from the floors, to the railings, to the
+wall are all made from highly polished black ebony.
+~
+E
+nocturnium~
+   Every metal accent and sculpture here, including the enormous chandelier, is
+made from pitch black nocturnium.
+~
+E
+lights fixtures~
+   In addition to the many hundreds of lights on the great chandelier, there
+are smaller light fixtures on the wall between the portraits of the old masters
+of the tower.
+~
+E
+portraits paintings masters~
+   The ebony-framed portraits that line the long curve of the second floor
+hallway end here with the current master, Knezz, his immediate predecessor,
+Kofi, and the previous master, Wong.
+~
+E
+Wong~
+   Wong is a heavy man wrapped in violet and gray robes, with short-cropped
+hair under a tall conical hat. He is shown next to the Tower Skycleave in its
+current form, whereas the previous sorcrers in the hall are painted next to
+older versions of the tower. Beneath his painting, the nameplate reads:
+                 +--------------------------------------+
+                 |       Grand High Sorcerer Wong       |
+                 |    Great Builder, Passed Naturally   |
+                 |  Thirteenth Master, Tower Skycleave  |
+                 |             'O ala lilo'             |
+                 +--------------------------------------+
+~
+E
+Kofi~
+   Grand High Sorcerer Kofi is painted wearing a draping, violet and white
+striped cloth over purple robes. On his head, he wears a small, round hat, also
+in purple, stitched with gold and nocturnium. His skin is a deep, rich brown
+color, with bright violet eyes and chiseled features. Below his portrait, the
+nameplate reads:
+                 +--------------------------------------+
+                 |       Grand High Sorcerer Kofi       |
+                 |   Master of Glass, Felled by Pixies  |
+                 |  Fourteenth Master, Tower Skycleave  |
+                 +--------------------------------------+
+~
+E
+knezz current sorcerer grand final~
+   The portrait of Knezz is the last one in line at the base of the stairs. His
+image shows him in his most familiar pose as he stands meditating outdoors in
+his violet and gold robes. He looks younger in the portrait, which is painted
+from a low angle so as to make him look almost like a giant next to the tower.
+The expression on his face is serene and confident. The nameplate below his
+portrait reads:
+                 +-------------------------------------+
+                 |      Grand High Sorcerer Knezz      |
+                 |            Master of Time           |
+                 |  Fifteenth Master, Tower Skycleave  |
+                 +-------------------------------------+
+~
+E
+plates nameplates~
+There are nameplates under the portraits.
+~
+M 1 11831 100.00 5
+T 11825
+T 11921
+S
+#11923
+A Small Bedroom~
+   This private room is somewhat large, but with so much in it, it seems small.
+A bed, chest, wardrobe, and desk take up the vast majority of floor space.
+Personal effects are here and there, while papers lay scattered on the desk. A
+landscape painting hangs on one wall and a smaller portrait sits on the desk.
+Curtains are tied back to expose a vast window looking out over the land beyond
+the tower.
+~
+ch z d -1
+D2
+~
+0 11919
+E
+windows curtains~
+   The purple velvet curtains are tied back to reveal a stunning landscape view
+out the window (look out).
+~
+E
+south~
+The door leads back out to the hallway.
+~
+E
+chest~
+This chest is small but well carved. The lid is firmly shut and locked.
+~
+E
+wardrobe~
+The wardrobe is mahogany, and is certainly the heaviest thing in the room.
+~
+E
+bed~
+The bed is small but it looks quite plush.
+~
+E
+effects personal dolls coins~
+   Though you can surmise that the occupant of this room is a collector,
+there's no way to say exactly what they collect. There are dolls, coins, and
+lots more. The overarching theme here is that none of it is organized.
+~
+E
+painting landscape~
+   This landscape painting depicts a marshy scene. Bright green moss hangs from
+drooping tree limbs and some of the trees tilt crazily. Dark, yet strangely
+opalescent water dominates the ground with only a couple of small rises in it.
+As you look closer you can spot eyes hiding in the shadows of the painting,
+though you realize they are just part of the painting after a start. For such a
+dreary scene the colors are vibrant and strangely beautiful.
+~
+E
+desk papers~
+   This mess might make sense to someone, maybe. Papers are scattered about in
+no particular order, an inkwell has been toppled over and a small bit of ink
+has stained the desk. It has all the markings of a genius mind, or possibly
+just a messy resident too busy to clean their room. One paper catches the eye,
+and as you take a quick look you read, 'The goblins break in so often, it
+seems like they're looking for something in particular.' A small portrait sits
+atop some of the clutter.
+~
+E
+portrait~
+   This portrait consists of a much younger Annaca and several people that
+resemble her. The entire group is standing outside of the tower's entrance.
+The artist has taken some liberties by adding a few flying pixies streaming out
+of a second floor window.
+~
+S
+#11924
+A Large Bunkroom~
+   For apprentice quarters this place isn't half bad. Bunk beds line the walls
+with a wide walkway down the middle. A lamp fixture is hanging from the wall
+right next to each bed. Small but elaborately carved chests are positioned side
+by side at the foot of each bed, nearest the walkway. One of the beds has an
+old dreamcatcher over it.
+~
+ch z d -1
+D2
+~
+0 11920
+E
+south~
+The door leads back out to the hallway.
+~
+E
+bunk beds~
+   These beds line the walls with one end pointing toward the center of the
+room. Each has a ladder that one can climb to reach the upper bunk. Some of
+them are made expertly, while others look as though their occupant just ran off
+after leaping out of bed. One of the beds has a dreamcatcher over the
+headboard.
+~
+E
+dreamcatcher catcher jade~
+   Though it resembles an American dreamcatcher with its intricate web of
+gossamer threads, this one is square and its frame is quartz. A little rough-
+cut square of jade is stuck in the webbing.
+~
+E
+chests~
+The chests are all locked. They probably belong to someone.
+~
+E
+fixtures lamps~
+   Small oil lamps hang next to the beds so the apprentices can study late into
+the night.
+~
+T 11975
+S
+#11925
+A Small Bunkroom~
+   Beds and desks line the walls and fill the center of this old bunkroom.
+Indeed, the room might once have been spacious, but the apprentices have been
+packed in like potted fish. The wall by the door has been painted with a large
+mural.
+~
+ch z d -1
+D2
+~
+0 11921
+E
+south door~
+The south door leads back out to the hall.
+~
+E
+beds~
+   Small beds fill nearly all the space in the room, leaving only a little
+space to walk.
+~
+E
+desks~
+   The desks in here are clean. No one has left anything behind. Each desk is
+pushed up against a bed, and there is very little room to move.
+~
+E
+fish potted~
+It's just an expression.
+~
+E
+mural painting wall~
+   The entire south wall is painted with a large mural of Skycleave, standing
+majestically over a frozen hillside. However, as you wade through the dense
+collection of beds and desks and move toward the back of the room, the painting
+seems to change. Now, instead of the tower, it depicts Grand High Sorcerer
+Knezz bent over, holding a half-eaten fire melon, belching a cloud of smoke,
+whilst farting a ball of fire in the other direction. A pair of pixies are
+depicted flying around the tower.
+~
+E
+pixies pixy~
+   The mural depicts a pair of pixies flying around Skycleave. You're pretty
+sure you saw one of them blink!
+~
+S
+#11926
+A Stately Bunkroom~
+   The oversized bedroom holds four mahogany canopy beds, each with a desk,
+wardrobe, and chest. A great violet rug runs from the door to the window,
+covering the hardwood floors. Rich mahogany panels cover the side walls, while
+the door and window are set in walls of stone block. Precisely tied curtains
+are pulled back to expose the view through the window.
+~
+ch z d -1
+D0
+~
+0 11921
+E
+north door~
+The door leads back out to the hallway.
+~
+E
+desks~
+The mahogany desks are simple, sturdy, and functional.
+~
+E
+chests~
+The chests are securely locked. They must hold the students' belongings.
+~
+E
+wardrobes~
+The huge wardrobes are made from mahogany. They're locked.
+~
+E
+beds canopy~
+   All four beds have tall mahogany frames supporting canopies and curtains.
+The beds aren't large, but the curtains can be drawn for privacy.
+~
+E
+curtains~
+The violet curtains are rather heavy to block light.
+~
+E
+mahogany wood panels~
+   Virtually everything in here, from the walls to the desks to the floor,
+is made of well-polished mahogany.
+~
+E
+rug floors~
+   The large rug covers most of the mahogany floors. You look underneath, but
+there's only the clean floor.
+~
+E
+walls~
+The walls are made from black ebony panels, like most of the tower.
+~
+E
+window~
+The small window lets you look out on the countryside.
+~
+S
+#11930
+The Third Floor Walkway of the Tower Skycleave~
+   The floating staircase joins the second and third floors here, where the
+ebony steps give way to violet ceramic tile floors. Like every part of the
+grand chamber, the wall is paneled with black ebony that curves around the
+great spiral of the walkway, lit by the enormous nocturnium tree that dangles
+down the center of the chamber, just out of reach over the railing.
+~
+cd z 0 -1
+D9
+~
+0 11922
+D7
+~
+0 11931
+E
+staircases stairs steps floating~
+   The staircases -- both here and across the central chamber at the other end
+of the third floor -- have their steps attached only to the chamber's curving
+wall; they look like they're floating!
+   The steps below you are made from black ebony wood -- like almost everything
+in the immense chamber. They're guarded only by a sleek wooden handrail. And a
+careless person could easily slip through.
+~
+E
+handrail hand-rail railing~
+   The polished ebony handrail follows the spiraling walkway and staircases
+from the ground floor to the top.
+~
+E
+chamber grand column central center~
+   The entire core of the Tower Skycleave is one immense chamber, a column from
+the ground floor to the top. The middle has an incredible inverted tree whose
+branches light the never-ending walkway and staircases that spiral up the
+chamber walls.
+~
+E
+floors ceramic tile violet~
+   The floor is made of the highest quality ceramic in a beautiful, deep violet
+hue. It is spotless; beyond immaculate.
+~
+E
+walls ebony wood paneling~
+   The ebony wood paneling is clean and well-maintained. It has been polished
+to show off its wood grain proudly.
+~
+E
+walkway curving spiraling ever-spiraling never-ending~
+   The wide tile walkway climbs the tower in a long spiral, interrupted here
+and there by staircases. At every point other than where you're standing, the
+walkway looks sloped. Here, it's perfectly flat.
+   Chairs and tables along the length of the third floor make the walkway as
+much a long parlour as it is a corridor. Doors line the ebony walls, though
+most are locked shut.
+~
+E
+furniture tables chairs plush~
+   A set of plush chairs and small tables make the third floor walkway a social
+space.
+~
+E
+doors~
+You can see many doors along the third floor walkway, but most are closed.
+~
+E
+up~
+The walkway spirals up to the fourth floor, still far above you.
+~
+E
+chandelier tree upside-down inverted lamps lights~
+   Most of the chamber is lit by a single enormous chandelier in the shape of
+an inverted black tree that seems to grow down from the top of the tower. The
+whole thing is sculpted from twisting, turning nocturnium wire, from trunk to
+branch. And on uncountable thousands of its branches there are tiny oil lamps
+that, all together, light every corner of the chamber.
+~
+E
+nocturnium~
+   Most of the tower's accents, door handles, and even the chandelier are made
+from matte black nocturnium metal.
+~
+E
+southeast se~
+The walkway spirals up around the central chamber.
+~
+E
+down fountain second~
+   Looking down over the railing, you can see the second floor walkway and the
+fountain way below on the ground floor.
+~
+M 1 11809 100.00 8
+S
+#11931
+The Third Floor Walkway of the Tower Skycleave~
+   The Tower Skycleave's third floor houses the most advanced students, called
+residents, who have earned a place in the upper echelons as they learn mastery
+of the magical sciences. The floor is elegantly appointed with plush armchairs
+and cozy tea tables along the walkway, more a social space than a work space.
+Many doors line the walkway on this floor, though most are shut, locked, and
+more than likely magically muffled; however, one open door stands apart from
+the others, with an enchanting little sign over it.
+~
+c z 0 -1
+D4
+~
+0 11930
+D5
+~
+0 11932
+D2
+~
+0 11939
+E
+sign enchanting~
+   Above the door, a little sign seems to shift its shape through many
+permutations, from teacup to kettle to pot to potroast to porcupine to beaver
+to tree to leaves to tea and, at long last, back to teacup. Then it runs
+through a new sequence, then another, all the while the deep blue background
+color and elegant silver writing never change. It simply says:
+
+                          == Enchanting Labs ==
+~
+E
+staircases stairs steps floating~
+   Across the central chamber, through the branches of the grand chandelier,
+you can see a pair of floating staircases. One, at the bottom of the sloping
+walkway, leads down to the second floor. The other, still above you, leads up
+to the fourth.
+~
+E
+handrail hand-rail railing~
+   The polished ebony handrail follows the spiraling walkway and staircases
+from the ground floor to the top.
+~
+E
+chamber grand column central center~
+   The entire core of the Tower Skycleave is one immense chamber, a column from
+the ground floor to the top. The middle has an incredible inverted tree whose
+branches light the never-ending walkway and staircases that spiral up the
+chamber walls.
+~
+E
+floors ceramic tile violet~
+   The floor is made of the highest quality ceramic in a beautiful, deep violet
+hue. It is spotless; beyond immaculate.
+~
+E
+walls ebony wood paneling~
+   The ebony wood paneling is clean and well-maintained. It has been polished
+to show off its wood grain proudly.
+~
+E
+northeast ne~
+The walkway spirals up around the central chamber.
+~
+E
+northwest nw~
+The walkway spirals down around the central chamber toward the stairs.
+~
+E
+walkway curving spiraling ever-spiraling never-ending~
+   The wide tile walkway climbs the tower in a long spiral, interrupted here
+and there by staircases. At every point other than where you're standing, the
+walkway looks sloped. Here, it's perfectly flat.
+   Chairs and tables along the length of the third floor make the walkway as
+much a long parlour as it is a corridor. Doors line the ebony walls, though
+most are locked shut, other than one right in front of you here.
+~
+E
+furniture tables tea chairs plush armchairs~
+Plush chairs and small tables make the third floor walkway more of a parlour.
+~
+E
+door south~
+   The door just in front of you is open. The moulding around it is intricately
+crafted with tiny staves and wands. These little details really set the third
+floor apart from the second one.
+~
+E
+doors~
+   You can see many doors along the walkway, but most are closed and locked.
+One here has an enchanting little sign over it.
+~
+E
+up~
+The walkway spirals up to the fourth floor, still far above you.
+~
+E
+chandelier tree upside-down inverted lamps lights~
+   Most of the chamber is lit by a single enormous chandelier in the shape of
+an inverted black tree that seems to grow down from the top of the tower. The
+whole thing is sculpted from twisting, turning nocturnium wire, from trunk to
+branch. And on uncountable thousands of its branches there are tiny oil lamps
+that, all together, light every corner of the chamber.
+~
+E
+nocturnium~
+   Most of the tower's accents, door handles, and even the chandelier are made
+from matte black nocturnium metal.
+~
+E
+down fountain second~
+   Looking down over the railing, you can see the second floor walkway and the
+fountain way below on the ground floor.
+~
+S
+#11932
+The Third Floor Walkway of the Tower Skycleave~
+   The curving walkway continues around the grand central chamber. A faded blue
+stain mars the ceramic tile floor in front of a half-opened door that leads to
+the Eruditorium, marked by a bright yellow sign. Light from the thousands of
+lamps on the enormous chandelier flickers across an odd painting that hangs
+next to the door.
+~
+c z 0 -1
+D6
+~
+0 11931
+D4
+~
+0 11933
+D1
+~
+0 11935
+E
+stain blue faded~
+   The stain is faded in spots, and along the edges, obviously having been set
+upon by sponges and other apprentices in the past. Despite some valiant effort,
+the stain remains, blemishing the normally immaculate ceramic tile.
+~
+E
+sign yellow bright~
+The sign is bright yellow with bold red lettering:
+
+                             == Eruditorium ==
+
+                CAUTION: Advancement of knowledge in progress
+~
+E
+painting~
+   The painting next to the door is framed in honey-colored wood inlaid with
+gold, silver, and copper. It depicts a knight sinking into a watery abyss in
+myriad shades of blue with streamers of light reaching down from a small circle
+at the top. The water in the painting almost seems to have a face -- and an
+angry one -- as the hapless knight seems to flail against it.
+~
+E
+staircases stairs steps floating~
+   Across the central chamber, through the branches of the grand chandelier,
+you can see a pair of floating staircases. One, at the bottom of the sloping
+walkway, leads down to the second floor. The other, still above you, leads up
+to the fourth.
+~
+E
+handrail hand-rail railing~
+   The polished ebony handrail follows the spiraling walkway and staircases
+from the ground floor to the top.
+~
+E
+chamber grand column central center~
+   The entire core of the Tower Skycleave is one immense chamber, a column from
+the ground floor to the top. The middle has an incredible inverted tree whose
+branches light the never-ending walkway and staircases that spiral up the
+chamber walls.
+~
+E
+floors ceramic tile violet~
+   The floor is made of the highest quality ceramic in a beautiful, deep violet
+hue. Unfortunately, there's a big blue stain on it near the door.
+~
+E
+walls ebony wood paneling~
+   The ebony wood paneling is clean and well-maintained. It has been polished
+to show off its wood grain proudly.
+~
+E
+northwest nw~
+The walkway spirals up around the central chamber.
+~
+E
+southwest sw~
+The walkway spirals down around the central chamber.
+~
+E
+walkway curving spiraling ever-spiraling never-ending~
+   The wide tile walkway climbs the tower in a long spiral, interrupted here
+and there by staircases. At every point other than where you're standing, the
+walkway looks sloped. Here, it's perfectly flat.
+   Chairs and tables along the length of the third floor make the walkway as
+much a long parlour as it is a corridor. Doors line the ebony walls, though
+most are locked shut, other than one right in front of you here.
+~
+E
+furniture tables tea chairs plush~
+Plush chairs and small tables make the third floor walkway more of a parlour.
+~
+E
+door east geometric patterns~
+   The heavy door in front of you leads to the Eruditorium, according to its
+bright yellow sign. The frame is carved in geometric patterns that seem to grow
+from the bottom to the top.
+~
+E
+doors~
+   You can see many doors along the walkway, but most are closed and locked.
+A large one here is marked by a bright yellow sign.
+~
+E
+up~
+The walkway spirals up to the fourth floor, still far above you.
+~
+E
+chandelier tree upside-down inverted lamps lights~
+   Most of the chamber is lit by a single enormous chandelier in the shape of
+an inverted black tree that seems to grow down from the top of the tower. The
+whole thing is sculpted from twisting, turning nocturnium wire, from trunk to
+branch. And on uncountable thousands of its branches there are tiny oil lamps
+that, all together, light every corner of the chamber.
+~
+E
+nocturnium~
+   Most of the tower's accents, door handles, and even the chandelier are made
+from matte black nocturnium metal.
+~
+E
+down fountain second~
+   Looking down over the railing, you can see the second floor walkway and the
+fountain way below on the ground floor.
+~
+S
+#11933
+The Third Floor Walkway of the Tower Skycleave~
+   The immaculately clean walkway is interrupted by a strange smell that seems
+to emanate from one of the doors here, marked by an ichor-green sign. It seems
+to be the only door that's not locked shut in this part of the tower and it
+sounds like someone is inside; the rest are magically muffled.
+~
+c z 0 -1
+D7
+~
+0 11932
+D6
+~
+0 11934
+D0
+~
+0 11936
+E
+sign ichor-green green~
+   This green sign is the color of rotten ichor. The crisp, black lettering
+stands out ominously against the background:
+
+                              == Lich Labs ==
+~
+E
+lights fixtures flames~
+   Green flames dance on the nocturnium light fixtures that flank the door to
+the Lich Labs. The little flames seem to form different shapes as they move.
+They are darker near the base, brighter at the tips, and cast the area just in
+front of the door in an eerie light.
+~
+E
+door north~
+   This door stands apart from the others in this section of hallway. It is
+much wider and set into an arched frame with thick bands of nocturnium across
+the heavy, dark wood. There is a suspiciously strange smell coming from around
+the door but it is impossible to place what the smell could be exactly.
+~
+E
+staircases stairs steps floating~
+   Across the central chamber, through the branches of the grand chandelier,
+you can see a pair of floating staircases. One, at the bottom of the sloping
+walkway, leads down to the second floor. The other, slightly above you, leads
+up to the fourth.
+~
+E
+handrail hand-rail railing~
+   The polished ebony handrail follows the spiraling walkway and staircases
+from the ground floor to the top.
+~
+E
+chamber grand column central center~
+   The entire core of the Tower Skycleave is one immense chamber, a column from
+the ground floor to the top. The middle has an incredible inverted tree whose
+branches light the never-ending walkway and staircases that spiral up the
+chamber walls.
+~
+E
+floors ceramic tile violet~
+   The floor is made of the highest quality ceramic in a beautiful, deep violet
+hue. It takes on an eerie green light around the Lich Labs.
+~
+E
+walls ebony wood paneling~
+   The ebony wood paneling is clean and well-maintained. It has been polished
+to show off its wood grain proudly.
+~
+E
+southwest sw~
+The walkway spirals up around the central chamber to the stairs.
+~
+E
+southeast se~
+The walkway spirals down around the central chamber.
+~
+E
+walkway curving spiraling ever-spiraling never-ending~
+   The wide tile walkway climbs the tower in a long spiral, interrupted here
+and there by staircases. At every point other than where you're standing, the
+walkway looks sloped. Here, it's perfectly flat.
+~
+E
+furniture tables tea chairs plush~
+   Unlike most of the third floor, there is no furniture just here. Perhaps the
+characteristic odor of the Lich Labs have made this an unpopular place to
+congregate.
+~
+E
+doors~
+   You can see many doors along the walkway, but most are closed and locked.
+A large one here is marked by a green sign.
+~
+E
+up~
+The walkway spirals up to the fourth floor above you.
+~
+E
+chandelier tree upside-down inverted lamps~
+   Most of the chamber is lit by a single enormous chandelier in the shape of
+an inverted black tree that seems to grow down from the top of the tower. The
+whole thing is sculpted from twisting, turning nocturnium wire, from trunk to
+branch. And on uncountable thousands of its branches there are tiny oil lamps
+that, all together, light every corner of the chamber.
+~
+E
+nocturnium~
+   Most of the tower's accents, door handles, and even the chandelier are made
+from matte black nocturnium metal. The door to the Lich Labs is also well-
+reinforced by nocturnium bands.
+~
+E
+down fountain second~
+   Looking down over the railing, you can see the second floor walkway and the
+fountain way below on the ground floor.
+~
+S
+#11934
+The Third Floor Walkway of the Tower Skycleave~
+   The long, curving ceramic tile walkway of the third floor transitions
+smoothly into floating steps that ascend up to the top level. If not for the
+calamander wood handrail, the steps would be difficult to climb as the tiles
+seem to connect to nothing but the paneled wall. Between the steps, you have
+a clear view of the second floor walkway and the first floor fountain far
+below you.
+~
+c z 0 -1
+D5
+~
+0 11933
+E
+staircases stairs steps floating up~
+   The steps above you have ceramic tiles near you but the steps are
+increasingly made of marble until, at the top, the ceramic steps are finished
+and only marble remains.
+   The staircases -- both here and across the central chamber at the other end
+of the third floor -- have their steps attached only to the chamber's curving
+wall; they look like they're floating!
+~
+E
+handrail hand-rail railing~
+   The ebony handrail of the lower walkway ends here, where it joins with a
+black and brown striped handrail made of much rarer calamander.
+~
+E
+chamber grand column central center~
+   The entire core of the Tower Skycleave is one immense chamber, a column from
+the ground floor to the top. The middle has an incredible inverted tree whose
+branches light the never-ending walkway and staircases that spiral up the
+chamber walls.
+~
+E
+floors ceramic tile violet~
+   The floor is made of the highest quality ceramic in a beautiful, deep violet
+hue. It is spotless; beyond immaculate.
+~
+E
+walls ebony wood paneling~
+   The ebony wood paneling is clean and well-maintained. It has been polished
+to show off its wood grain proudly.
+~
+E
+northeast ne~
+The walkway spirals down around the central chamber.
+~
+E
+walkway curving spiraling ever-spiraling never-ending~
+   The wide tile walkway climbs the tower in a long spiral, interrupted here
+and there by staircases. At every point other than where you're standing, the
+walkway looks sloped. Here, where it meets the stairs, it's perfectly flat.
+~
+E
+doors~
+You can see many doors along the walkway, but most are closed and locked.
+~
+E
+chandelier tree upside-down inverted lamps lights~
+   The enormous inverted tree of a chandelier is mostly below you now; you've
+reached the part where the trunk meets the crown and above you, it's only
+trunk. The tree is made entirely of twisted nocturnium wire, untwisting below
+you to create the branches that hold thousands of tiny lamps.
+~
+E
+nocturnium~
+   Most of the tower's accents, door handles, and even the chandelier are made
+from matte black nocturnium metal.
+~
+E
+down fountain second~
+   Looking down over the railing, you can see the other end of the third floor
+walkway, second floor walkway below it, and the fountain way below on the
+ground floor.
+~
+M 1 11831 100.00 5
+S
+#11935
+The Eruditorium~
+   This large chamber is mostly empty, save for a heavily-constructed platform
+in the center of the marble floor. Thick, faintly glowing chains are bolted to
+the surface of the platform. The paneled walls have dents and cracks along them
+and some of the light fixtures are bent out of shape. What looks to be debris
+from a workstation is piled up in a corner awaiting the cleaning service. You
+can see some cabinets through a small archway on the south wall.
+~
+c z 0 -1
+D3
+~
+0 11932
+E
+west doorway~
+The west door leads out to the walkway.
+~
+E
+platform heavily constructed chains center glowing~
+   The platform is part of the floor, but raised several inches above it.
+Chains with massive bolts are attached to the outside of the platform. They
+would probably secure most anything locked up with them as they glow a sickly
+green color. As an extra precaution, a strange script has been written, carved,
+embedded -- or maybe it's just there -- in many places of the platform. It
+is difficult to get a true look at the script, but it too glows that same odd
+green color.
+~
+E
+script writing~
+   It is difficult to get a true look at the script as it darkens as you
+approach, but it too glows a sickly green color when you move away.
+~
+E
+fixtures light lamps~
+   The wall has nocturnium light fixtures, some of which have been bent or
+yanked from their spots.
+~
+E
+walls dents cracks~
+   The fine ebony-paneled walls are shattered in places, with large dents and
+long cracks.
+~
+E
+workstation debris~
+   It looks like there was a workstation in here, but it was somehow smashed to
+bits. It's piled loosely in one corner, awaiting the cleaners.
+~
+E
+archway south drawers storage~
+A low archway on the south wall leads to some cabinets and drawers.
+~
+E
+cabinets skeleton~
+   You open one of the cabinets but there's a skeleton inside and you quickly
+shut it.
+~
+E
+floors down marble~
+The white marble floors are mostly tidy.
+~
+S
+#11936
+The Lich Labs~
+   Light streams in through a pair of large windows, though the orderly work-
+stations have nocturnium oil lamps on the walls above them. An antique desk in
+the corner is covered in dust and blocked off by a velvet rope; an old chair is
+toppled over behind it. A slate blackboard on one wall lists projects and
+instructions. The room is partitioned on the east side and there is a heavy
+door on the west side.
+~
+c z 0 -1
+D2
+~
+0 11933
+D3
+~
+0 11937
+D1
+~
+0 11938
+E
+blackboard board slate projects instructions words message~
+A large slate blackboard hangs on one of the walls. It has two lists:
+
+                      PROJECTS
+
+                     Dream-jade
+                   Archbanishment
+                   Witching Ward
+                 Autoreincarnation
+
+and:
+
+               LICH LAB INSTRUCTIONS
+
+           1. No food or drink in the lab
+           2. Goggles on
+           3. Wear lead vest when disenchanting -- don't be Timmith
+           4. Do NOT resurrect Bludnik no matter what he says
+           5. Do NOT resurrect family members
+~
+E
+lamps nocturnium~
+Nocturnium oil lamp fixtures jut out from the walls above the workstations.
+~
+E
+workstations stations~
+   Each workstation is a tall table made from a different type of stone. Onyx,
+granite, basalt, and gneiss, among others you can't identify. Each station is
+clean and organized with tools, bowls, and crystals neatly arranged.
+~
+E
+tools~
+There are metal tools on some of the workstations but you don't recognize them.
+~
+E
+crystals~
+   Whoever runs this lab really likes crystals. There are crystals on the work-
+stations, crystals on the old desk, crystals hanging from the ceiling...
+~
+E
+repository~
+   Scaldorran's repository is an old stone oil lamp perched on a pedestal.
+Parts of it are so worn as to give the impression that it has been around since
+before brass lamps were first forged. Every inch of the lamp is cold to the
+touch, yet water never forms on its sides. In the dark, it almost seems to
+glow, but in bright sunlight it takes on a dark, sinister character.
+   A lich is made of pure magic, of a sort that would quickly dissipate after
+the death of a sorcerer. But when a sorcerer commands vast power and abundant
+cleverness, it is possible to prepare a repository to anchor their magic to the
+mortal plane after their body has rotted and their soul has moved on.
+~
+E
+windows north~
+A pair of large windows light the room.
+~
+E
+desk chair antique~
+   The mahogany desk looks as though it hasn't been used in ages. Even the
+toppled chair behind it is covered in a heavy layer of dust. A velvet rope
+cordons off the entire corner of the room.
+~
+E
+rope velvet sign~
+   A purple velvet rope cordons off the corner with the dusty old desk. A paper
+sign attached to the rope reads:
+
+                        Do NOT disturb its slumber
+~
+E
+south~
+The south door leads back to the walkway.
+~
+E
+east~
+The room is partitioned, with a half-wall obscuring the museum section.
+~
+E
+door west~
+The heavy door to the west leads to the experimentation chamber.
+~
+E
+floors down~
+The floor in this room is made from raw slate.
+~
+E
+walls~
+The walls in here are ebony, except the outer wall, which is stone.
+~
+T 11936
+S
+#11937
+The Experimentation Chamber~
+   The cold stone walls pour icy mist that pools on the floor. Work benches
+along one wall are covered in odd tools and arcane implements. When you turn
+back toward the door, you see broken caskets leaning against the wall beside
+it. Locked chests under the work benches seem to rattle and shake on their own,
+hidden from what little light spills from the lamp fixtures set high on the
+wall. The chamber has one window, but it's boarded over. A stone table in the
+center of the chamber has leather straps and no small number of stains.
+~
+c z 0 -1
+D1
+~
+0 11936
+E
+stone~
+   While most of the tower is decorated with wood, both the walls and the
+center table of this room are made from dark stone.
+~
+E
+walls~
+   Unlike most of the rooms on this floor, the walls here are all stone. The
+stones are dark black, irregular in size, and built into walls without any
+mortar between them. They're cold to the touch and an icy mist pours down them.
+~
+E
+floor down~
+   The floor is made from porous stone but it's stained everywhere with red
+wine. Hopefully.
+~
+E
+east door~
+The door leads back to the Lich Labs.
+~
+E
+west north northwest nw window out~
+The sole window has been boarded over with recycled boards of ebony and oak.
+~
+E
+caskets coffins~
+   Several rotting and broken caskets are leaning against the wall beside the
+door, barely visible in what little light hits that corner of the room. The
+caskets are covered with scuffs and dried dirt.
+~
+E
+chests~
+   The only storage in here is a set of locked chests, tucked away under the
+work benches. Some of the chests rattle around, like something is trying to
+escape.
+~
+E
+light lamps fixtures~
+Nocturnium lamp fixtures hold little oil flames that struggle to light the lab.
+~
+E
+table~
+   The stone table looks old. Its upper surface has many narrow grooves that
+lead to the foot of the table. More alarmingly, it also has thick leather
+straps positioned for the neck, hands, and ankles. And it's covered in no
+small number of dark stains.
+~
+E
+skeleton workbench bench~
+   One of the work benches has a fresh skeleton on it. There's still bits of
+flesh on the bones. Honestly, you can barely look.
+~
+S
+#11938
+The Lich Labs~
+   The back of the Lich Labs is more like a museum. Shelves, both free-standing
+and hanging from the walls, are lined with artifacts of all kinds. Some are
+under glass domes, others locked in cases; one is chained to a large metal post
+which appears to be rattling and shaking. Some of the objects hover above their
+shelves, as if possessed by some unearthly soul.
+~
+c z 0 -1
+D3
+~
+0 11936
+E
+shelves~
+   Every free inch of the room has been filled with shelves, each one full of
+rare and unusual artifacts.
+~
+E
+artifacts objects~
+You could spend a lifetime in here and never catalogue all the artifacts.
+~
+E
+glass domes coin square beetle scarab~
+   Inside one dome is a large, square coin. It is standing on one corner and
+slowly spinning. When it turns around a face can be seen. Amazingly, it gives
+you a quick wink.
+   Another dome has a scarab beetle that still appears to be alive. A third
+dome looks empty, but it's held tightly shut by an iron strap. There's no
+telling what any of this does.
+~
+E
+box~
+There's a small box carved with lunules, and you could swear it just howled.
+~
+E
+cases locked~
+   Various aged wands mixed with less recognizable items rattle around inside
+locked cases. A small collection of sharp, finger-like spikes scratch at the
+glass.
+~
+E
+post chained chains thing~
+   This human-sized post, made of imperium, is occasionally shaking violently.
+The thick chains wrap whatever is there tightly to the pole from top to bottom,
+not allowing for a glimpse underneath. Links in the chains begin to flex and
+twist as you watch, only to subside when you back away.
+~
+E
+bells~
+   A trio of small brass bells sit on a low shelf. You could swear you just
+heard them move.
+~
+S
+#11939
+The Enchanting Labs~
+   This room is dominated by a finely crafted circle embedded in the floor's
+center. Light from the ornate nocturnium fixtures glints off of half-organized
+piles of household items in the corners, stacked on tables, and generally
+dispersed all over the lab. A portion of the east wall seems to waver like
+the air over a fire, disturbing the visuals of a large painting of a bagel.
+~
+ch z 0 -1
+D0
+~
+0 11931
+D3
+~
+0 11941
+E
+fixtures nocturnium ornate~
+   The nocturnium light fixtures are more ornate here than most of the tower,
+with filigree work that must have taken thousands of hours.
+~
+E
+wall east wavering air disturbance~
+   There is a distinct border to this strange wall. It has a slight waver to it
+which disturbs the pattern of light when you look at it just right. Centered in
+the wavering area is an unusual painting.
+~
+E
+floors down~
+The gray slate floor is scattered with piles of household items.
+~
+E
+painting picture bagel visuals~
+You examine the painting on the wavering wall:
+   The upper section of this painting is three people standing around a platter
+made of a silvery metal. The first man looks like a disapproving old mentor.
+The middle lady has a contemplative look on her face. The last man has a slight
+smile as he examines the bagel sitting atop the platter. The one thing common
+to all three people is the fact that it seems like they are all slightly
+drooling. The bagel itself is sliced cleanly into an upper and lower half with
+the upper half set askew to expose the fluffy inside. The top of the bagel is
+sprinkled with seeds, flakes, and a fine greenish-white dust. Set beside it are
+small tubs of various condiments. At the bottom, the nameplate says:
+
+                  +---------------------------------+
+                  |   'Behold, Everything Bagel!'   |
+                  +---------------------------------+
+~
+E
+plate nameplate~
+The nameplate below the painting says:
+
+                  +---------------------------------+
+                  |   'Behold, Everything Bagel!'   |
+                  +---------------------------------+
+~
+E
+fire~
+It's just an expression; there's no fire here.
+~
+E
+circle finely crafted diagrams~
+   The circle dominating this room's center is made of the darkest nocturnium.
+Embedded in the floor surrounding this circle is strange, hard-to-read script
+that seems to undulate. Gold and silver diagrams connect to each other and to
+some of the script making a confusing tableau.
+~
+E
+corner household items piles~
+   It looks as though someone, once upon a time, attempted to keep this pile of
+toasters, brooms, mops, cups, pots, pans, and other various household items in
+some sort of order. The efforts of that person have served well to create a
+foundation for the other haphazardly stacked and thrown items in this corner of
+the room. Occasionally the pile stirs faintly.
+~
+E
+tables stacked stacks~
+One table has a stack of fire shovels and pokers; another is just old dustpans.
+~
+E
+west~
+The west door leads to the attunement lab.
+~
+E
+north doorway~
+The north door leads back out onto the walkway.
+~
+E
+doorstops stops~
+   A pile of small metal doorstops spills out from behind the door to the
+walkway. And, on further inspection, there's a smaller pile behind the west
+door as well. When you accidentally knock one over, it makes a small squeak,
+like it needs to be oiled.
+~
+E
+fans~
+Fans made of wood and paper are stacked haphazardly on one table.
+~
+E
+rubbish~
+If we're being honest, everything in here looks like rubbish.
+~
+E
+mouse mice~
+You don't see any more mice. Someone has put a stop to them.
+~
+E
+cobwebs webs~
+   The room is fairly clean (if not tidy) but there are cobwebs in many of the
+piles of junk.
+~
+E
+dust~
+   There's more dust in here than the rest of the tower. Perhaps the piles are
+just hard to clean.
+~
+E
+bunnies bunny dustbunny dustbunnies~
+   You don't see any dust bunnies in here, but some of the piles of junk look
+like they might have burrows.
+~
+E
+burrows burrow~
+It definitely looks like something has been burrowing in the piles.
+~
+E
+toasters~
+There are a bunch of old iron toasters -- the type you set next to the fire.
+~
+E
+bookshelf bookshelves shelf shelves chains spine~
+   Several bookshelves grace the east side of the room, covered with countless
+books on enchanting. Each and every book is chained to the shelf by its spine.
+~
+T 11926
+T 11921
+T 11936
+S
+#11940
+The Magichanical Laboratory~
+   You are greeted by a small kiosk at the entrance to this well and truly
+cluttered laboratory. The long, narrow room follows the curve of the tower, but
+there is little room to walk between worktables, shelves, and prototypes of all
+manner of strange apparatuses. The center of the area is filled with a three-
+legged stone tortoise. Vines and shrubs are growing down from the high shelves,
+dangling into bins of glowing blue stones.
+~
+c z M -1
+D3
+~
+0 11939
+E
+west~
+   The doorway in the west wall is semi-transparent and leads back to the main
+enchanting lab.
+~
+E
+kiosk~
+   The golden kiosk partially blocks the entrance to the laboratory. It looks
+as if it's meant to advertize and sell the strange wonders produced here, but
+it doesn't do much good up here, where the public can't get to it.
+~
+E
+worktables strange apparatuses~
+   While all the worktables look similar, they each seem to deal in a different
+thing. Nothing on any of the worktables could ever make sense to anyone except
+a magineer. The strange apparatuses above each table are even more confusing.
+Some have dangling tubes that seem to writhe, leading to strangely-designed
+tools, each different and hard to look at. Disconcerting noises come from each
+apparatus on the walls, combining with voices and other sounds to make a
+horrendous cacophony.
+~
+E
+clutter mess~
+   There's too much going on for you to figure out what most of this is. It
+would seem this lab operates beyond the reach of the high sorcerers and,
+equally, beyond the reach of the cleaning staff.
+~
+E
+shelves vines shrubs~
+   Shelves line the walls, some stacked with gem shards, others with glass
+domes, and still others with miniature towers. But the strangest shelves are
+the higher ones, from which drape vines and shrubs and plants of all types.
+There isn't nearly enough light in here for this much foliage -- the windows
+are all but blocked -- but the plants don't seem to mind.
+~
+E
+bins stones glowing~
+Bins of glowing blue stones sit between some of the workstations.
+~
+E
+windows out~
+The room has several large windows, but they are blocked by the clutter.
+~
+E
+tortoise turtle three-legged~
+   The center of the room is blocked by a three-legged stone tortoise, or, at
+least, something that resembles one. It appears to be made from small stone
+blocks, with a flat top that could hold objects if it could stand up straight.
+It appears to be missing its fourth leg.
+~
+E
+lenses glass array~
+   Some of the workbenches have an array of glass lenses that seem to magnify
+items placed under them.
+~
+M 1 11839 100.00 2
+S
+#11941
+The Attunement Lab~
+   The lab would be large if it wasn't so cluttered, but nearly every inch of
+it is filled with cabinets, trunks, crates, and sculptures. Obelisks mark the
+east, south, west, and north directions in the wedge-shaped room but the only
+path to the center dais is from the door. The large windows along the curved
+wall are blocked by the stacks of clutter, so most of the light comes from
+nocturnium lamp fixtures.
+~
+c z 0 -1
+D1
+~
+0 11939
+E
+dais center~
+   There is a raised dais in the center of the floor. Goef the Oreonic is
+sitting (or, perhaps, standing) on it.
+~
+E
+obelisks~
+   Four obelisks mark the east, south, west, and north points of the room. The
+obelisks are granite, highly polished, and inscribed with a language you don't
+recognize.
+~
+E
+clutter stacks~
+   Every bit of free space has been stacked with cabinets, trunks, crates, and
+sculptures. It's hard to imagine how anybody finds anything in this place.
+~
+E
+cabinets~
+   There are many wooden cabinets, mostly oak and mahogany, that line the room.
+You don't see how they could be opened, though, as they all have other trunks,
+crates, and chests blocking them.
+~
+E
+trunks chests crates~
+   The room is absolutely stuffed with trunks, chests, and crates of all sizes.
+Most of them are buried in the stacks of clutter and utterly impossible to
+open. The rest, it seems, are locked or nailed shut.
+~
+E
+windows west out~
+   Very little light trickles through the stacks of clutter that block the
+windows.
+~
+E
+walls~
+You can't really see the walls; the room is too full.
+~
+E
+nocturnium lamps fixtures~
+   In what seems like a terrific fire hazard, the room is lit by gas lamps in
+nocturnium fixtures that are all too close to the stacks of clutter.
+~
+E
+east doorway~
+The east doorway leads back to the main lab.
+~
+E
+sculptures~
+Sculptures in many styles and many materials fill the room.
+~
+S
+#11960
+The Upper Walkway of the Tower Skycleave~
+   The floating wooden stairs come to an end, shifting seamlessly into a floor
+of soft wooden shapes that create an entrancing pattern. The vaulted ceiling
+overhead is hung with elaborate nocturnium lanterns on chains from ebony beams.
+The top floor of the Tower Skycleave is the home of the masters and it shows in
+its elegance and charm. Over the railing, you can see down through the branches
+of the great nocturnium chandelier, all the way to the fountain at the bottom.
+~
+cd z 0 -1
+D9
+~
+0 11934
+D7
+~
+0 11961
+E
+offices~
+This floor contains the offices of the high sorcerers.
+~
+E
+floor shapes pattern~
+   The floor is made of woods in various shades and intricately laid out of
+differently shaped panels, with varying textures. The pattern it makes is
+entrancing and alluring, trapping your attention for several moments as your
+mind begins to wander and the pattern appears to move.
+~
+E
+stairs floating staircase steps~
+   The wooden staircase seems to float on the air as it seemlessly connects the
+third and fourth floors.
+~
+E
+lanterns fixtures chains~
+   Though the grand chandelier in the center of the chamber doesn't light this
+floor, many elaborate lanterns hang on chains from the ceiling. Each has a
+cluster of tiny flames, casting glamorous lighting across the walkway.
+~
+E
+ceiling vaulted beams~
+   The high ceiling is spoked with sturdy ebony beams, each one dangling with
+elaborate lanterns.
+~
+E
+ebony~
+   The paneled walls and parts of the wood floor are made from pitch-black
+ebony wood.
+~
+E
+calamander stripes striped~
+   The long handrail and parts of the intricate floor are made from rare black
+and brown striped calamander wood .
+~
+E
+nocturnium~
+   The lanterns are made from nocturnium, as is the grand chandelier that hangs
+down through the center of the chamber. The door handles, too, are made from
+the rare metal. This price of this tower must have been astronomical.
+~
+E
+railing handrail chandelier tree trunk sculpture~
+   The striped handrail curves around the walkway that hugs the wall of the
+grand chamber. Across the railing, the trunk of the grand chandelier twists
+downward. Looking over the rail, you see that it branches out into an inverted
+tree with countless tiny flames on its branches that light the floors below.
+~
+E
+chamber column~
+   The rotund chamber caps the massive central column of the Tower Skycleave as
+the culmination of the ever-spiraling walkway. Here, near the top, only the
+vaulted ceilings rise above you. This floor contains the offices and quarters
+of the tower's high masters, and it is from here that they look down on the
+apprentices below.
+~
+E
+walkway curving spiraling ever-spiraling~
+   The walkway is wider here than on the floors below and, as such, has chairs
+and tables so that it can be used as a social space. The floor appears to rise
+slowly toward the southeast and as it continues around the curve of the
+chamber, the slope rises higher and higher until it ends at the Grand High
+Sorcerer's office. But here, where you're standing, the floor seems perfectly
+flat all the way to the point where it transitions seamlessly into stairs.
+~
+E
+southeast se~
+The walkway curves to the southeast, rising toward the offices.
+~
+E
+chairs tables~
+There is a little sitting area here.
+~
+E
+walls paneling panels~
+The walls are made from polished black ebony panels.
+~
+E
+down fountain~
+   Looking over the calamander railing, you can see the trunk of the grand
+chandelier that twists downward. It branches out into an inverted tree with
+countless tiny flames on its branches that light the floors below. Below it,
+you can see all the way down to the fountain on the ground level.
+~
+M 1 11809 100.00 8
+S
+#11961
+The Upper Walkway of the Tower Skycleave~
+   The top floor of the Tower Skycleave is elegantly appointed with intricate
+wood flooring in entrancing patterns of many colors and textures. The walls are
+ebony paneling decorated with nocturnium fixtures and paintings. An occasional
+plush rug adorns the middle of the wide spiral walkway. A dark wooden door here
+leads to a high sorcerer's office. Across the center of the chamber, two more
+doors lead to the other offices.
+~
+c z 0 -1
+D4
+~
+0 11960
+D5
+~
+0 11962
+D2
+~
+0 11964
+E
+flooring pattern entrancing~
+   The floor is made of woods in various shades and intricately laid out of
+differently shaped panels, with varying textures. The pattern it makes is
+entrancing and alluring, trapping your attention for several moments as your
+mind begins to wander and the pattern appears to move. Here and there, the
+patterned floor is covered with plush rugs.
+~
+E
+stairs floating staircase steps~
+   Across the chamber, you can see the floating staircase that leads back to
+the third floor.
+~
+E
+lanterns fixtures chains~
+   Though the grand chandelier in the center of the chamber doesn't light this
+floor, many elaborate lanterns hang on chains from the ceiling. Each has a
+cluster of tiny flames, casting glamorous lighting across the walkway.
+~
+E
+ceiling vaulted beams~
+   The high ceiling is spoked with sturdy ebony beams, each one dangling with
+elaborate lanterns.
+~
+E
+ebony~
+   The paneled walls and parts of the wood floor are made from pitch-black
+ebony wood.
+~
+E
+calamander stripes striped~
+   The long handrail and parts of the intricate floor are made from rare black
+and brown striped calamander wood .
+~
+E
+nocturnium~
+   The lanterns are made from nocturnium, as is the grand chandelier that hangs
+down through the center of the chamber. The door handles, too, are made from
+the rare metal. This price of this tower must have been astronomical.
+~
+E
+railing handrail chandelier tree trunk sculpture~
+   The striped handrail curves around the walkway that hugs the wall of the
+grand chamber. Across the railing, the trunk of the grand chandelier twists
+downward. Looking over the rail, you see that it branches out into an inverted
+tree with countless tiny flames on its branches that light the floors below.
+~
+E
+chamber column~
+   The rotund chamber caps the massive central column of the Tower Skycleave as
+the culmination of the ever-spiraling walkway. Here, near the top, only the
+vaulted ceilings rise above you. This floor contains the offices and quarters
+of the tower's high masters, and it is from here that they look down on the
+apprentices below.
+~
+E
+doorway south office~
+The dark wooden door leads to an office labeled only 'High Sorcerer'.
+~
+E
+walkway curving spiraling ever-spiraling northeast ne northwest nw~
+   The walkway is wider here than on the floors below and, as such, has chairs
+and tables so that it can be used as a social space. The floor appears to rise
+slowly toward the northeast and as it continues around the curve of the
+chamber, the slope rises higher and higher until it ends at the Grand High
+Sorcerer's office. To the northwest, it slopes downward toward the stairs. But
+just here, where you're standing, the floor seems perfectly flat.
+~
+E
+walls paneling panels~
+   The wall is made from polished black ebony panels. It has been hung with
+many small paintings. There is also a door here leading to one of the offices.
+~
+E
+down fountain~
+   Looking over the calamander railing, you can see the trunk of the grand
+chandelier that twists downward. It branches out into an inverted tree with
+countless tiny flames on its branches that light the floors below. Below it,
+you can see all the way down to the fountain on the ground level.
+~
+E
+paintings~
+   Many paintings in various sizes and shapes line the curving wall of the
+grand chamber. The paintings are both colorful and not, some of them simple
+black and white affairs and others popping with colors too bright and vivid to
+bear. Many of them seem to celebrate the tower's occupants, past and present,
+though you recognize very few people.
+~
+E
+rugs~
+   The many-hued violet rugs are plush and bordered with gold or silver. Some
+of the rugs depict simple geometric designs in muted shades while others
+display full scenes that play out across the plush fibers in great detail.
+   One rug in particular depicts laborers laying the intricate wood floors that
+surround you. Another shows an apprentice casting the patronus charm. A third
+rug shows a phoenix that seems to grow, age, burn to ash, and repeat over and
+over again.
+   You peek underneath one of the rugs and notice there's a different scene
+depicted on the back: it shows a swarm of goblins fleeing a burning cliffside.
+~
+S
+#11962
+The Upper Walkway of the Tower Skycleave~
+   The curving walkway continues around the grand chamber, passing by the door
+to one of the high sorcerers' offices. This section is more austere than the
+rest of the fourth floor, filled only with spindly tables covered in small
+sculptures. Across the calamander railing, the trunk of the tower's enormous
+chandelier grows downward, where it branches into a tree that glimmers with the
+light of a thousand tiny oil lamps.
+~
+cd z 0 -1
+D6
+~
+0 11961
+D1
+~
+0 11966
+D4
+~
+0 11963
+E
+tables spindly~
+   The tables have spindly legs that do not look substantial enough to hold up
+their tops and the items on them. They are all made of dark and light striped
+calamander wood, giving them a striking appearance, and carved with intricate
+designs and patterns along the legs and sides. Each table is polished expertly
+to show off the grains of the uniquely striped wood. Each table has a small
+sculpture on it.
+~
+E
+decorations sculptures devices orrery~
+   The decorations on the tables are each different. Some of them look like
+they have moving pieces. One is a jumble of complex components and crystals in
+different shapes; another looks like a miniature orrery. Another table has a
+pentagon-sided crystal obelisk that comes to a point that glows and shifts
+between the colors of the rainbow in soft, muted shades, providing a small
+amount of light.
+~
+E
+flooring pattern entrancing~
+   The floor is made of woods in various shades and intricately laid out of
+differently shaped panels, with varying textures. The pattern it makes is
+entrancing and alluring, trapping your attention for several moments as your
+mind begins to wander and the pattern appears to move.
+~
+E
+stairs floating staircase steps~
+   Across the chamber, you can see the floating staircase that leads back to
+the third floor.
+~
+E
+lanterns fixtures chains~
+   Though the grand chandelier in the center of the chamber doesn't light this
+floor, many elaborate lanterns hang on chains from the ceiling. Each has a
+cluster of tiny flames, casting glamorous lighting across the walkway.
+~
+E
+ceiling vaulted beams~
+   The high ceiling is spoked with sturdy ebony beams, each one dangling with
+elaborate lanterns.
+~
+E
+ebony~
+   The paneled walls and parts of the wood floor are made from pitch-black
+ebony wood.
+~
+E
+calamander stripes striped~
+   The long handrail and parts of the intricate floor are made from rare black
+and brown striped calamander wood .
+~
+E
+nocturnium~
+   The lanterns are made from nocturnium, as is the grand chandelier that hangs
+down through the center of the chamber. The door handles, too, are made from
+the rare metal. This price of this tower must have been astronomical.
+~
+E
+railing handrail chandelier tree trunk~
+   The striped handrail curves around the walkway that hugs the wall of the
+grand chamber. Across the railing, the trunk of the grand chandelier twists
+downward. Looking over the rail, you see that it branches out into an inverted
+tree with countless tiny flames on its branches that light the floors below.
+~
+E
+chamber column~
+   The rotund chamber caps the massive central column of the Tower Skycleave as
+the culmination of the ever-spiraling walkway. Here, near the top, only the
+vaulted ceilings rise above you. This floor contains the offices and quarters
+of the tower's high masters, and it is from here that they look down on the
+apprentices below.
+~
+E
+walkway curving spiraling ever-spiraling northwest nw southwest sw~
+   The walkway is wider here than on the floors below and, as such, has chairs
+and tables so that it can be used as a social space. The floor appears to rise
+slowly toward the northwest and as it continues around the curve of the
+chamber, the slope rises higher and higher until it ends at the Grand High
+Sorcerer's office. To the southwest, it slopes downward toward the stairs. But
+just here, where you're standing, the floor seems perfectly flat.
+~
+E
+walls paneling panels~
+   The wall is made from polished black ebony panels. The door here leads to
+one of the high sorcerers' offices.
+~
+E
+down fountain~
+   Looking over the calamander railing, you can see the trunk of the grand
+chandelier that twists downward. It branches out into an inverted tree with
+countless tiny flames on its branches that light the floors below. Below it,
+you can see all the way down to the fountain on the ground level.
+~
+E
+doorway east office~
+The dark wooden door leads to an office labeled 'High Sorcerer Barrosh'.
+~
+S
+#11963
+The Upper Walkway of the Tower Skycleave~
+   Here, from the top of the ever-spiraling walkway, the Grand High Sorcerer
+can look down over the entirety of the Tower Skycleave. A wide double-door in
+the curved wall is flanked by four overstuffed chairs and a pair of golden
+coffee tables, and the wall is hung with artifacts from across the globe. The
+floor of the walkway is comprised of thousands of pieces of wood in all shades,
+organized into shifting patterns of unlimited intricacy.
+   Over the railing, the round opening in the center of the chamber is pierced
+by the nocturnium sculpture that serves as the tower's grand chandelier, its
+countless branches lighting the floors below. This floor is instead lit by
+lanterns that hang on chains from the arching ebony beams of the high ceiling.
+~
+c z 0 -1
+D7
+~
+0 11962
+D0
+~
+0 11968
+D6
+~
+0 11970
+E
+artifacts~
+   Much of the curving black wall around the door is covered in artifacts of
+all types, from jade figurines and wooden masks to antique vases and elaborate
+porcelain plates.
+~
+E
+plates porcelain~
+   The wall is hung with many porcelain plates, each painted with a different
+agricultural scene.
+~
+E
+vases antique~
+Several antique vases grace small shelves on the wall.
+~
+E
+figurines jade~
+The figurines almost look like little goblins.
+~
+E
+masks~
+These masks look like scary faces.
+~
+E
+chairs overstuffed~
+   Four overstuffed chairs sit around the Grand High Sorcerer's door as a small
+social space on the walkway.
+~
+E
+coffee tables golden~
+   A pair of golden coffee tables help to create a comfortable sitting area
+outside the office door. Filigree work along the sides gives them an uncommon
+look that was certainly ludicrously expensive.
+~
+E
+doorway double-door north office~
+   The door is made of heavy ebony wood and polished to a dull sheen. It is
+decorated with engravings that are so delicate that at first glance it is
+impossible to make them out in the wood. Every time you look at them, however,
+they seem to be something different though the door seems to always look the
+same from a glance or from a distance.
+~
+E
+engravings scenes~
+   On close inspection, the door is engraved with tiny scenes from Skycleave's
+long and storied history.
+~
+E
+fixtures nocturnium~
+   The nocturnium fixtures on this floor are accented with a tiny bit of gold
+to make them stand out. They are delicate looking in their design and wholly
+more intricate than anything seen in the rest of the Tower Skycleave.
+~
+E
+flooring pattern entrancing intricate~
+   The floor is made of woods in various shades and intricately laid out of
+differently shaped panels, with varying textures. The pattern it makes is
+entrancing and alluring, trapping your attention for several moments as your
+mind begins to wander and the pattern appears to move.
+~
+E
+stairs floating staircase steps~
+   Across the chamber, you can see the floating staircase that leads back to
+the third floor.
+~
+E
+lanterns chains~
+   Though the grand chandelier in the center of the chamber doesn't light this
+floor, many elaborate lanterns hang on chains from the ceiling. Each has a
+cluster of tiny flames, casting glamorous lighting across the walkway.
+~
+E
+ceiling vaulted beams~
+   The high ceiling is spoked with sturdy ebony beams, each one dangling with
+elaborate lanterns.
+~
+E
+ebony~
+   The paneled walls and parts of the wood floor are made from pitch-black
+ebony wood.
+~
+E
+calamander stripes striped~
+   The long handrail and parts of the intricate floor are made from rare black
+and brown striped calamander wood .
+~
+E
+railing handrail chandelier tree trunk opening sculpture~
+   The striped handrail curves around the walkway that hugs the wall of the
+grand chamber. Across the railing, the trunk of the grand chandelier twists
+downward. Looking over the rail, you see that it branches out into an inverted
+tree with countless tiny flames on its branches that light the floors below.
+~
+E
+chamber column~
+   The rotund chamber caps the massive central column of the Tower Skycleave as
+the culmination of the ever-spiraling walkway. Here, near the top, only the
+vaulted ceilings rise above you. This floor contains the offices and quarters
+of the tower's high masters, and it is from here that they look down on the
+apprentices below.
+~
+E
+walkway curving spiraling ever-spiraling southeast se~
+   The walkway is wider here than on the floors below and, as such, has chairs
+and tables so that it can be used as a social space. The floor is level here
+but slopes downward to the southeast and continues around to the stairs that
+lead to the third floor.
+~
+E
+southwest west~
+The curving walkway ends at a small staircase southwest of you.
+~
+E
+walls paneling panels~
+   The wall is made from polished black ebony panels. The door here leads to
+the Grand High Sorcerer's office and residence. Artifacts decorate the walls
+all around the door.
+~
+E
+down fountain~
+   Looking over the calamander railing, you can see the trunk of the grand
+chandelier that twists downward. It branches out into an inverted tree with
+countless tiny flames on its branches that light the floors below. Below it,
+you can see all the way down to the fountain on the ground level.
+~
+S
+#11964
+A Quaint Office~
+   Though small, this cozy office feels very lived-in. A bookshelf covers one
+entire wall and, with the chairs and desk, leaves very little room to move. The
+wall next to the exit features an inspirational painting. The other doorway, to
+the side, leads to a private apartment.
+~
+ch z 0 -1
+D0
+~
+0 11961
+D1
+~
+0 11965
+E
+north doorway~
+The north door leads out into the central chamber.
+~
+E
+east bedroom quarters~
+The east door leads into the sorcerer's private quarters.
+~
+E
+marble white floors~
+   The floor appears to be one enormous sheet of white marble. It is polished
+to such a degree that it reflects everything in the room.
+~
+E
+bookshelf shelf books~
+   An entire wall of the office is devoted to the bookshelf, which houses at
+least a hundred old tomes. Strangely, you can't read any of the titles. Even
+attempting it makes your brain foggy; trying to reach for a book leaves your
+whole arm numb.
+~
+E
+inspirational painting~
+   The painting shows a lion hanging by its claws from a treebranch, struggling
+to find its footing. A panicked look from the lion tells you everything you
+need to know about its predicament. Text at the bottom reads:
+                             'Hang in there.'
+~
+E
+desk~
+The desk has been removed, though the floor is marked where it was.
+~
+E
+chairs~
+There is one chair for the office's occupant and two more for guests.
+~
+S
+#11965
+An Elegant Suite~
+   This cozy apartment is full of plush, overstuffed furniture and fluffy
+blankets. A small canopy bed is stacked with pillows in all colors of the
+rainbow, though most of the room has a decidedly purple theme. A small hearth
+provides a place to cook, although it looks as if it doesn't get much use.
+White marble floors seem to light the room from below as they reflect light
+from the nocturnium chandelier onto the dark walls.
+~
+ch z dG -1
+D3
+~
+0 11964
+E
+west doorway~
+The door leads back to the office.
+~
+E
+furniture plush overstuffed stuffed~
+   The furniture is upholstered in all shades of purple, from bright to deep.
+All of it looks like it has twice as much stuffing as it needs. With all the
+blankets, this looks like quite the comfort palace.
+~
+E
+blankets fluffy~
+Fluffy blankets are draped over the bed, the chairs, and parts of the floor.
+~
+E
+marble white floors~
+   The floor appears to be one enormous sheet of white marble. It is polished
+to such a degree that it reflects everything in the room.
+~
+E
+chandelier~
+The nocturnium chandelier hangs from the ceiling.
+~
+E
+nocturnium~
+The chandelier, door handles, and all the fixtures are made from nocturnium.
+~
+E
+bed canopy pillows~
+   The canopy bed is small, but it still occupies most of one wall. A gossamer
+curtain offers little privacy as you can still see dozens of pillows, in every
+color of the rainbow, covering the bed.
+~
+E
+hearth~
+   It looks like the hearth is meant for cooking, but there's no evidence it's
+been used in recent history.
+~
+E
+walls vertically-striped striped polished brown~
+   The walls are made from alternating dark and light brown panels. The darker
+panels appear to be ebony while the lighter ones are probably stained walnut.
+Nocturnium lamps line the walls.
+~
+E
+lamps~
+Nocturnium oil lamps line the walls.
+~
+S
+#11966
+A Cluttered Office~
+   The office is spacious, though it's covered in artifacts and kitsch. Awards
+and certificates battle for wall space with masks, staves, and even shoes. The
+large window looks out over a desert canyon. A raised dais near the window is
+surrounded by a tightly-woven rug and a small nocturnium chandelier hangs from
+the ceiling.
+~
+cd z 0 -1
+D3
+~
+0 11962
+D0
+~
+0 11967
+E
+west doorway~
+The west door leads back out to the central chamber.
+~
+E
+north bedroom quarters~
+The north door leads to the high sorcerer's private quarters.
+~
+E
+artifacts kitsch masks shoes~
+   The walls and shelves are covered in things Barrosh has picked up on his
+travels, and it seems he has traveled a lot. No single theme unites the items,
+which include an assortment of masks, shoes and sandals, totems, and figurines.
+On one shelf, there's a small skull with big, square eye sockets. On another,
+a jade fox.
+~
+E
+skull~
+   The skull is on the small side, though it's not necessarily a child's. The
+eye sockets are large and square, so it doesn't even seem to be human, although
+it's quite similar.
+~
+E
+fox jade~
+   The little green fox is made from rough-worked jade. Its ears are perked up,
+and it almost looks like it would be wagging it's tail.
+~
+E
+staves staffs~
+   There are a dozen staves mounted on the walls, all different. Some are wood,
+some are metal. Some have gems, others shells, still others have no decoration
+at all. You try to touch one, but receive instead a small lightning bolt.
+~
+E
+awards certificates~
+   Barrosh's certificates are too numerous to count. He appears to have
+mastered dozens of schools of magic.
+~
+E
+rug woven tightly-woven~
+   The rug is woven from scraps of cloth and makes a sort of mosaic picture of
+goblins around a monolith. The rug has a white background with deep purple
+edges and accents. The goblins' clothes, too, are purple.
+   You find some jade dust underneath the rug but there's not enough to bother
+sweeping any of it up.
+~
+E
+dais raised~
+   The marble floor is raised near the window to form a small dais. An eleven-
+pointed star is etched into the dais and a violet gem is embedded in the
+center.
+~
+E
+window out desert canyon~
+   Out the window, the tower overlooks a desert canyon encircled by shrubs and
+small trees. At the bottom of the canyon, a turquoise river cuts through a long
+gallery forest. It's beautiful, but rather strange as you don't recall the
+tower being in a desert.
+~
+E
+chandelier~
+The small nocturnium chandelier is covered with many small oil lamps.
+~
+E
+nocturnium~
+   Every handle, lamp, fixture, drawer pull, and even the chandelier are made
+from elegant black nocturnium.
+~
+M 1 11967 100.00 2
+S
+#11967
+A Lavish Apartment~
+   This open-plan room is luxurious. Beautiful shining white marble floors are
+covered in places by thick rugs with geometric designs. A scratched yet well-
+made counter lines one wall with bits of lab equipment and miscellanea on it.
+Nocturnium lamps line the dark, vertically-striped, polished brown walls, but
+are more tightly packed near the counter. A rather stately bed rests behind
+gossamer curtains and another curtain exposes an area where High Sorcerer
+Barrosh can make his ablutions.
+~
+cdh z dG -1
+D2
+~
+0 11966
+E
+south doorway~
+The door leads back out to the office.
+~
+E
+marble white shining floors~
+   The floor is one giant slab of white marble. You can't see seams in it
+anywhere! In fact, the only thing you see is the reflection of the room in its
+dazzlingly perfect surface.
+~
+E
+rugs thick geometric~
+   The plush rugs have geometric designs in violet, blue, gray, and white. You
+peek under the rug but find the same pattern on both sides.
+~
+E
+counter equipment lab miscellanea~
+   It looks like this was originally a small cooking area but there's no sign
+of any food. Instead, it looks like High Sorcerer Barrosh makes potions here.
+The counter is scratched up from years of work.
+~
+E
+walls vertically-striped striped polished brown~
+   The walls are made from alternating dark and light brown panels. The darker
+panels appear to be ebony while the lighter ones are probably stained walnut.
+Nocturnium lamps line the walls.
+~
+E
+lamps~
+Nocturnium oil lamps line the walls.
+~
+E
+nocturnium~
+All the fixtures and lamps are made from black nocturnium.
+~
+E
+bed curtains gossamer ablutions~
+   The bed is rather large for a single person. Gossamer curtains would seem to
+offer little privacy, but they make up for it in elegance. Another curtain
+divides a corner with a basin for ablutions.
+~
+S
+#11968
+The Headmaster's Palatial Office~
+   This windowed office is the highest in the tower, a place for the greatest
+sorcerer to watch over their charges. It has a massive calamander bookshelf
+along one wall; plush rugs cover the checkerboard marble floor and a painting
+hangs in a gold frame near the door. An extravagant nocturnium chandelier
+strung the ceiling across lights the office with a soft violet glow.
+~
+ch z 0 -1
+D2
+~
+0 11963
+D3
+~
+0 11969
+E
+south doorway~
+The south door leads back out to the central chamber.
+~
+E
+west quarters bedroom~
+The door to the west leads to the living quarters.
+~
+E
+window north~
+You can see the whole countryside from the window. (look out)
+~
+E
+bookshelf shelf calamander~
+   The bookshelf, carved from black and brown striped calamander wood, is truly
+massive. If it were laid on the ground, it would be larger than any bed you've
+slept in. It holds dozens upon dozens of tomes, though you find you can't touch
+them: your hand is stopped by an invisible barrier.
+~
+E
+rugs plush~
+   The rugs are made of high-piled, plush yarn. You've seen nobles sleep on
+less. You lift up a rug and find all of Knezz's secrets underneath. Well, not
+really. But you definitely get the sense he's swept a lot under the rug.
+~
+E
+chandelier nocturnium extravagant~
+   The black chandelier hangs from the ceiling by a hundred impossibly light
+chains, giving it the appearance of a shadow creeping across the ceiling. It
+casts a soft light over the entire room from hundreds of small oil burners.
+~
+E
+floor checkerboard marble~
+The floor is made from white and black marble in an alternating pattern.
+~
+E
+painting frame~
+   The painting shows Knezz, Celiya, and Barrosh posing almost comically
+together in front of the tower, holding their fingers out like wands, almost
+like children playing Wizard Wars. At least, that's what it shows from behind
+the desk. From everywhere else in the room, the three sorcerers stand with
+their arms around each other's shoulders, with stern, serious faces.
+~
+S
+#11969
+An Opulent Apartment~
+   This most luxurious set of rooms in the tower stands out from all others.
+With doors leading off to private rooms and bespoke pieces of calamander
+furniture, it is a thing most wouldn't ever understand. The walls of stellar
+magewood reflect the light from an ever-changing chandelier which seems to just
+hang in mid-air. Rugs so plush and thick they could be used as beds themselves
+cover most of the alternating white and black marble flooring. Several
+scintillating curtains of pure energy obscure the private areas behind them.
+~
+ch z dG -1
+D1
+~
+0 11968
+E
+east doorway~
+The door leads back out into the office.
+~
+E
+chair easychair~
+   The overstuffed easy chair sits low to the ground. The purple upholstery is
+striped in two shades, just like the calamander wood of the feet.
+~
+E
+furniture bespoke calamander chairs~
+   The chairs and tables here are finely crafted from striped black and brown
+calamander, one of the finest and rarest woods. Many of them bear the initials
+J.R.K. in stylized letters.
+~
+E
+walls stellar magewood reflection~
+   The walls are made from stellar magewood. Normally bright pink, the wood has
+been stained to near-purple. Thought it's not glossy, the wood somehow reflects
+the ever-changing light from the floating chandelier, giving the room the
+enchanting glimmer of the night sky.
+~
+E
+chandelier ever-changing changing light~
+   The black nocturnium chandelier hangs on nothing at all as it casts hundreds
+of ever-changing lights around the room. The white, blue, gold, violet, and
+silver lights reflect off the magewood walls to give the room the enchanting
+glimmer of the night sky.
+~
+E
+rugs plush~
+   The rugs are made of high-piled, plush yarn. You've seen nobles sleep on
+less. You lift up a rug and find all of Knezz's secrets underneath. Well, not
+really. But you definitely get the sense he's swept a lot under the rug.
+~
+E
+flooring white black marble~
+   The marble floors form a checkerboard pattern in white and black. Plush rugs
+cover large areas.
+~
+E
+curtains scintillating energy~
+   The curtains sparkle with energy. Though they look light as air, you find
+yourself unable to pass.
+~
+E
+private rooms areas~
+   There are several closed doors to other parts of the suite. Though the doors
+bear no locks, you find yourself unable to open them. Other parts of the room,
+including a small desk, are blocked by curtains of energy. A closet door is
+slightly askew.
+~
+E
+closet~
+   You open the askew closet door and nearly fall over when you find a skeleton
+inside. You swing the door shut and back away slowly.
+~
+M 1 11963 100.00 1
+S
+#11970
+The Upper Walkway of the Tower Skycleave~
+   The walkway ends at a narrow doorway that leads to a steep wooden stairway
+climbing to a round hatch in the ceiling. The stairway is dimly lit by only a
+couple of simple nocturnium light fixtures.
+~
+c z 0 -1
+D5
+~
+0 11963
+D8
+~
+0 11971
+E
+chamber grand central northeast ne east south southeast es~
+The tower's grand chamber is just outside the stairway.
+~
+E
+hatch latch up~
+   The hatch is heavy and made of thick boards. It is banded in dark nocturnium
+with sturdy hinges and a large metal loop is attached opposite the hinges to
+pull the door down. A sturdy latch holds it closed.
+~
+E
+stairway stairs steps~
+   The stairway is narrow and steep, though not quite as steep as a ladder
+would be. The stairway is made of simple, textured wood, though it is clean and
+immaculate like the rest of the tower.
+~
+E
+doorway~
+   The doorway is extremely narrow, blocking much of the light from the grand
+central chamber.
+~
+E
+fixtures~
+   Simple nocturnium light fixtures provide what little light is available in
+the stairway.
+~
+E
+nocturnium~
+   Like most parts of the tower, every piece of metal in sight is matte black
+nocturnium -- that includes the hinges on the hatch.
+~
+S
+#11971
+The Top of the Tower~
+   The roof of the Tower Skycleave is a huge garden with paths of large stone
+slabs, sculptures, topiary shrubs, and many flower and herb beds. A waist-high
+wall circles the round roof of the tower, from which you can look out over the
+whole countryside. Dark marble benches and leafy shade trees provide ample
+space for reflection.
+~
+cdh z F -1
+D9
+~
+0 11970
+E
+down hatch stairs stairway steps staircase~
+A sturdy wooden hatch leads back down to the stairway.
+~
+E
+paths slabs stone~
+   The paths are made of light and dark stone, each stone has been carved with
+figures, shapes and symbols. The stones vary in shade from black to white and
+every shade of gray in between with some in muted shades of blue, red, brown,
+yellow green and even purple sparsely spread out among them. Not a single stone
+of the path is the same in the entire garden.
+~
+E
+sculptures~
+   Each sculpture is created from a different shade of stone. They are all
+unique, however one in the shape of a rearing unicorn stands out among the rest
+due to the clear crystal horn sticking out of its head. The rest are of various
+people, abstract, or geometric in design.
+~
+E
+topiary shrubs~
+   Every topiary shrub and bush in the garden is formed into the shape of
+animals and fantastical beasts of all kinds, from ones the size of a loaf of
+bread to huge, towering ones that provide much shade. Every time you glance at
+the shrubs they seem to be in a slightly different position than before and you
+could almost swear that you can see them move if you watch, though they seem
+rooted in place.
+~
+E
+trees~
+Shade trees around the top of the tower make this the perfect spot to sit.
+~
+E
+unicorn~
+   This rearing unicorn sculpture is made of inky black stone that has been
+polished to a high shine. It has a crystal clear horn that spirals several feet
+from its forehead and catches and refracts the light into rainbows. It seems
+as though the sculpture is watching you no matter which way you view it from.
+~
+E
+benches dark marble~
+   They are quite black, or gray, and they definitely aren't white. The marble
+seems to absorb a bit of the light around it. There is a slight shimmer coming
+from each bench and as you sit on one of them briefly, it seems to start
+molding itself to your rump.
+~
+M 1 11971 100.00 1
+S
+#11972
+The Elemental Plane of Water~
+   Tiny bubbles tickle you as you sink through the surface of the fountain,
+down through the layer of coins, and into the boundless depths of the elemental
+plane of water. The light that spills down from the round fountain far above
+you vanishes in all directions; there is nothing here but water and you quickly
+realize you cannot breathe.
+~
+ci z F 11972
+D8
+~
+0 11908
+D1
+~
+0 11972
+D2
+~
+0 11972
+D3
+~
+0 11972
+D0
+~
+0 11972
+E
+bubbles~
+Tiny bubbles rise around you, coming from the inscrutable depths.
+~
+E
+depths down~
+You cannot see the bottom, if there is one.
+~
+E
+boundless plane east west north south northeast northwest southeast southwest ne nw se sw out~
+   The elemental plane continues forever in all directions. There's nothing
+here but water. The only way out is the fountain above you.
+~
+E
+up fountain light circle~
+Light filters down from the circular fountain far above you.
+~
+E
+coins money~
+   You passed through the coins at the bottom of the fountain like they weren't
+even there. From down here, you can't even see them.
+~
+T 11977
+T 11930
+T 11994
+S
+#11973
+The Headmistress's Palatial Office~
+   This windowed office is the highest in the tower, a place for the greatest
+sorcerer to watch over their charges. It has a massive calamander bookshelf
+along one wall; plush rugs cover the checkerboard marble floor and a painting
+hangs in a gold frame near the door. An extravagant nocturnium chandelier
+strung across the ceiling lights the office with a soft violet glow.
+~
+chi z 0 11973
+D2
+~
+0 11974
+D3
+~
+0 11974
+E
+south~
+   The south door normally leads back out to the central chamber, but it's
+covered in thick, dreamy fog and you can't see through.
+~
+E
+west quarters bedroom~
+   The door to the west usually leads to the living quarters, but it's covered
+in thick, dreamy fog and you can't see anything beyond it.
+~
+E
+doors doorway fog~
+   Both doorways are covered in a thick, dreamy fog and you cannot see the
+other side. It's cold to the touch, though your hand passes easily through it.
+~
+E
+window north~
+You can see the whole countryside from the window. (look out)
+~
+E
+bookshelf shelf calamander books~
+   The bookshelf, carved from black and brown striped calamander wood, is truly
+massive. If it were laid on the ground, it would be larger than any bed you've
+slept in. It holds dozens upon dozens of tomes, many of them older than you are
+and some, apparently, older than the tower. But each time you take a book from
+the shelf, you find yourself having trouble reading the words, which move
+around on the page. Even the letters seem unstuck from their words as they flip
+themselves and swap places.
+~
+E
+rugs plush~
+   The rugs are made of high-piled, plush yarn. You've seen nobles sleep on
+less. You lift up a rug, but it's just more rugs underneath; a puff of magenta
+glitter flies loose as you drop the rug again.
+~
+E
+chandelier nocturnium extravagant~
+   The black chandelier hangs from the ceiling by a hundred impossibly light
+chains, giving it the appearance of a shadow creeping across the ceiling. It
+doesn't appear to be lit; it's not the source of the violet glow that lights
+the office.
+~
+E
+glow violet~
+The whole room is lit with a soft violet glow, but there's no apparent source.
+~
+E
+floor checkerboard marble~
+The floor is made from white and black marble in an alternating pattern.
+~
+E
+painting frame~
+   The painting shows a young couple in the middle of a dance in a beautiful
+open field, at sunrise. On the right, a smiling, smooth-faced man with short
+salt-and-pepper hair, has his right hand high, holding a woman's hand as she
+spins, her back to you, with her long wavy brown-and-violet hair caught in
+motion. Both are dressed in white: him in an open dress shirt and linen pants;
+her in an airy dress.
+~
+E
+desk~
+   The desk is expansive enough for two, perhaps three people to sit and work
+comfortably, but it has just one chair. It is carved from ebony, inlaid with
+ivory lettering in an ancient language you can't decipher. The writing covers
+all visible portions of the desk, perhaps as an enchantment to protect the desk
+or tower.
+   The nameplate on the desk reads:
+
+           +---------------------------------------------------+
+           |          Merrily Merrily Merrily Merrily          |
+           |                THIS IS BUT A DREAM                |
+           +---------------------------------------------------+
+~
+E
+glitter magenta~
+On closer inspection, there's flecks of magenta glitter on almost everything!
+~
+E
+furniture chairs~
+   The desk, chairs, bookshelf, and the rest of the lot are all made from fine
+ebony, calamander, or magewood.
+~
+T 11945
+T 11946
+T 11994
+S
+#11974
+Beyond the Fog~
+There is nothing but fog.
+~
+cdgi 0 0 11973
+D0
+~
+0 11973
+D1
+~
+0 11973
+M 1 11979 100.00 1
+T 11945
+T 11946
+S
+#11975
+A Cozy Little House~
+   The white plaster walls are richly painted with vignettes of domestic life
+in this cozy little house. There are reed mats on the floor as well as on the
+two low platforms that serve as beds. Small doorways in one wall appear to lead
+to tiny store rooms.
+   The only exit is a sloped ladder up to a square hole in the south side of
+the ceiling, which also vents smoke from the clay oven. You can hear the
+footsteps and babble of many people walking above you, though you can't make
+out what they're saying.
+~
+cdi 0 dGL 11975
+D8
+~
+0 11986
+E
+walls painted paintings vignettes~
+   The walls are painted with stylized little green figures, mostly performing
+domestic scenes such as washing clothes and lying in bed. The figures are drawn
+with black, square eyes. One scene shows chopping wood, and another looks like
+a person building a square house.
+   Near the bed, a square dreamcatcher hangs on the wall.
+~
+E
+dreamcatcher catcher~
+   A square dreamcatcher hangs on the wall, crisscrossed by gossamer threads
+with leaves and stones intertwined.
+~
+E
+leaves stones~
+   Leaves and stones have been tangled into the web of the dreamcatcher on the
+wall.
+~
+E
+reed mats~
+   There are small reed mats on the floor for seating, as well as larger mats
+on the low platform beds. The pale yellow mats are made of plaited from reeds
+and rushes in simple geometric patterns.
+~
+E
+platforms beds~
+   The beds are small -- certainly too small for you -- and low to the ground.
+They both have reed mats over them, with woven blankets on top of those.
+~
+E
+blankets~
+The blankets on the bed are woven in simple geometric patterns.
+~
+E
+doorways store storage~
+   The wall has two short, arched doorways, far too small for you to walk
+through, even crouching. Peering inside, all you see are tiny store rooms with
+baskets, piles of blankets, and simple tools.
+~
+E
+oven sticks fire~
+   The little clay oven is directly under the ladder such that smoke travels up
+out the square entry hole in the ceiling. You notice a conspicuous lack of
+cooking implements around the oven. Similarly, there's no sign of any food.
+The fire is at a low smoulder, with spare sticks stacked next to the oven.
+~
+E
+ladder~
+   The wooden ladder is well-made, with pegs and cords securing every rung. It
+climbs at an angle toward the square hole in the ceiling, with an oven beneath
+it such that you must hold your breath when entering or leaving.
+~
+E
+ceiling hole vent up~
+   The square hole in the south side of the ceiling is the only entrance or
+exit to the home. It has a slanted cover to protect against rain, opening to
+the east to let in the morning sun.
+   The exit doubles as a vent for the oven, and both the underside of the
+ladder and the ceiling have black soot stains.
+~
+E
+floor~
+The floor is covered with clean white plaster, with mats for seating.
+~
+E
+plaster~
+The plaster is smooth and white. The uniformity is the mark of a master.
+~
+E
+windows out~
+The house has no windows.
+~
+T 11945
+T 11946
+T 11976
+S
+#11976
+A Cozy Little House~
+   Stray clothing, blankets, mats, and baskets have piled up in this little
+square house. The white plastered walls are painted with stylized scenes of
+people wading in the water and shucking clams, as well as household scenes.
+   A steep, narrow stair leads up to the hole in the ceiling that serves as
+both exit and smoke vent. Under the stairs is a small clay oven.
+~
+cdi 0 dGL 11975
+D8
+~
+0 11983
+E
+clothing~
+   Piles of small articles of clothing clutter most of the house, including the
+stairs. It's hard to tell whether the clothing is clean or dirty.
+~
+E
+blankets beds platforms~
+   The beds are small -- certainly too small for you -- and low to the ground.
+They both have reed mats over them, with blankets woven in geometric patterns
+on top of those. Blankets are also strewn about the floor, making it hard not
+to trip.
+~
+E
+baskets~
+   Stacks of baskets full of shells fill the corners. The shells are mostly
+clams, with a few scallops and mussels.
+~
+E
+mats~
+   There are small reed mats on the floor for seating, as well as larger mats
+on the low platform beds. The stained yellow mats are made of plaited from
+reeds and rushes in simple geometric patterns.
+~
+E
+floor~
+The floor is covered in piles of clothing, stray blankets, and stacked baskets.
+~
+E
+walls paintings painted scenes~
+   The walls are painted with stylized little green figures, mostly performing
+domestic scenes such as washing clothes and lying in bed. The figures are drawn
+with black, square eyes. One scene shows someone using a wooden trap in a
+river, and another looks like a person stirring a cauldron.
+~
+E
+stair steep~
+   The staircase is very steep and could use a handrail. The under side is
+stained with soot from the oven.
+~
+E
+ceiling hole vent up~
+   The square hole in the south side of the ceiling is the only entrance or
+exit to home. It has a slanted cover to protect against rain, opening to the
+east to let in the morning sun.
+   The exit doubles as a vent for the oven, and both the underside of the
+stairs and the ceiling have black soot stains.
+~
+E
+plaster~
+The plaster that covers the walls and floor is mottled with dirt and stains.
+~
+E
+doorways store storage~
+   The wall has two short, arched doorways, far too small for you to walk
+through, even crouching. Peering inside, all you see are tiny store rooms with
+baskets, piles of blankets, and simple tools.
+~
+E
+oven fire soot sticks~
+   Under the stairs, a small clay oven is nestled in the perfect spot to send
+its smoke out the entrance. The underside of the stair is stained black with
+soot. A haphazard pile of sticks are stashed next to the oven.
+~
+E
+windows out~
+The house has no windows.
+~
+M 0 11975 100.00 1
+M 0 11976 100.00 1
+T 11945
+T 11946
+T 11976
+S
+#11977
+A Cozy Little House~
+   The ladder leads down into a small, square home, much the same as the
+others. The walls and floor are smooth white plaster, with a low platform bed
+and mats on the floor for sitting. The oven under the ladder smoulders with
+a small column of smoke that escapes through the ladder hole. The walls are
+painted with both geometric patterns and village scenes; one wall has a low
+doorway.
+~
+cdi 0 dGL 11975
+D8
+~
+0 11984
+E
+ladder~
+   The wooden ladder is well-made, though it's missing the bottom rung,
+creating a bit of a tricky descent. A blanket is hung over one of the rungs,
+perhaps to dry over the oven.
+~
+E
+reed mats~
+   There are small reed mats on the floor for seating, as well as larger mats
+on the low platform beds. The pale yellow mats are made of plaited from reeds
+and rushes in simple geometric patterns.
+~
+E
+platform bed blankets~
+   The bed is smaller than you're accustomed to, and quite low to the ground.
+The platform is built straight into the floor, and plastered white just the
+same. On top, a reed mat and woven blankets provide a cozy place to sleep.
+~
+E
+doorway store storage~
+   One wall has a rather small doorway leading to a storage area. Even if you
+were to squeeze yourself through the doorway, you could not conceivably fit in
+the room.
+~
+E
+oven herbs fire~
+   The small oven is situated beneath the ladder, with its fragrant smoke
+wafting out the entrance hole in the ceiling. The fire is barely smouldering,
+with a burnt bundle of herbs right at the front of the oven.
+~
+E
+ceiling hole vent up~
+   The square hole in the south side of the ceiling is the only entrance or
+exit to home. It has a slanted cover to protect against rain, opening to the
+east to let in the morning sun.
+~
+E
+stains soot~
+This home is quite clean, and there are no soot stains.
+~
+E
+floor~
+The floor is made from white plaster, with reed mats to sit on.
+~
+E
+plaster~
+   The plaster on the walls and floor is perfectly smooth, constructed by a
+master craftsman. The walls have been painted with geometric patterns and
+village scenes.
+~
+E
+windows out~
+The house has no windows.
+~
+E
+walls painted~
+The walls are painted with geometric patterns and village scenes.
+~
+E
+geometric geometry patterns~
+   A loose arrangement of squares seems to symbolize the gobbrabakh, though it
+could equally be a decorative pattern rather than a map.
+~
+E
+village scenes~
+   The wall paintings show stylized little green people with big, square, black
+eyes clustered around a tall stone -- the city's towering monolith. It also
+shows a scene of people attending a dead body, a scene of people dancing, a
+scene of people eating.
+~
+E
+baskets~
+There are some baskets stacked in the store room through the low doorway.
+~
+M 0 11977 100.00 1
+M 0 11955 100.00 1
+T 11945
+T 11946
+T 11976
+S
+#11978
+A Cozy Little House~
+   The house at the bottom of the ladder is small and square, like the others,
+with just one large room and small, adjoining storage rooms through low
+doorways. The white plaster walls are decorated with busy scenes full of
+stylized people. Low platform beds, sitting mats, and baskets fill most of the
+available space in the room. The only open floor space is in front of the small
+oven under the ladder.
+~
+cdi 0 dGL 11975
+D8
+~
+0 11985
+E
+walls paintings decoration decorated scenes people stylized~
+   The walls are richly painted with many scenes filled with heavily stylized
+green people. Most scenes show battles around a cluster of squares that might
+represent the gobbrabakh. Curiously, living characters in the scenes have round
+eyes while the dead ones are drawn with black squares for eyes.
+~
+E
+reed mats~
+   There are small reed mats on the floor for seating, as well as larger mats
+on the low platform beds. The pale yellow mats are made of plaited from reeds
+and rushes in simple geometric patterns.
+~
+E
+platforms beds blankets~
+   The beds are built directly into the floor of the room. Though they're at
+different heights, both are quite low to the ground. Simple reed mats and
+blankets woven with geometric patterns are piled on top, for comfort.
+~
+E
+doorways store storage~
+   The wall has two short, arched doorways, far too small for you to walk
+through, even crouching. Peering inside, all you see are tiny store rooms with
+baskets, piles of blankets, and simple tools.
+~
+E
+oven fire lumber stack~
+   The little clay oven is directly under the ladder such that smoke travels up
+out the square entry hole in the ceiling. No food or cooking tools can be seen
+around the oven, but there is a neat stack of lumber beside it.
+~
+E
+ladder~
+   The ladder climbs at a rather steep angle in this house, opening up more
+floor space. The oven underneath has stained the underside of the ladder.
+~
+E
+ceiling hole vent up~
+   The square hole in the south side of the ceiling is the only entrance or
+exit to home. It has a slanted cover to protect against rain, opening to the
+east to let in the morning sun.
+   The exit doubles as a vent for the oven, and both the underside of the
+ladder and the ceiling have black soot stains.
+~
+E
+floor~
+The floor is made from fine white plaster, with reed mats for sitting on.
+~
+E
+plaster~
+The plaster of the floor and walls is perfectly smooth.
+~
+E
+windows out~
+The house has no windows.
+~
+M 0 11950 100.00 1
+M 0 11951 100.00 1
+T 11945
+T 11946
+T 11976
+S
+#11979
+The Altar Below~
+   The ladder descends into a small room half-filled by the base of the great
+standing stone. The walls are smooth white plaster, but there is no floor, only
+the bare rock of the cliffside. Here, you can see that the standing stone is
+part of the cliff itself; you can see no seam.
+   A simple basalt altar rests in front of the standing stone, covered in
+hundreds of pearls in many colors, all unworked. The altar, like the walls, is
+undecorated and austere. The ground in front of it is worn away from many years
+of kneeling. Above the altar, a vertical tube protrudes through the ceiling.
+~
+cdi 0 0 11975
+D8
+~
+0 11991
+E
+walls~
+Unlike most of the buildings, the walls are undecorated.
+~
+E
+ladder~
+   The ladder descends at a comfortable angle, allowing you to walk down it
+rather more like a staircase. Unlike the homes, there is no oven underneath,
+and your descent is met with a cool rush of air instead of warm smoke. The
+feet of the ladder have worn long grooves in the rock floor.
+~
+E
+grooves~
+The feet of the ladder have worn long grooves in the rock floor.
+~
+E
+ceiling hole up~
+   The ladder leads through the bright hole in the ceiling, back to the walkway
+above. As there's no oven underneath, the ceiling here is cleaner than most.
+~
+E
+stone base standing monolith~
+   The standing stone is part of the rock, not standing atop it as it appears
+from above. It's enormous at its base, taking up most of the room. The stone
+is rough, though you can't tell if it was cut this way or if this formation is
+natural.
+~
+E
+rock cliffside floor ground~
+   The floor here is the exposed rock of the cliffside, with the standing stone
+rising out of it. The feet of the wooden latter have worn long grooves in the
+floor from many years of people climbing up and down.
+~
+E
+seam~
+There is no seam.
+~
+E
+altar basalt~
+   The basalt altar is rectangular and fairly simple. It is unadorned, other
+than shallow dishes cut into the top where hundreds of pearls, in all colors,
+have been deposited.
+~
+E
+pearls~
+   The pearls, which must number in the hundreds, fill the shallow dishes cut
+into the altar, scattering them all over the top and onto the floor. They come
+in many colors, from white to gray to orange and pink.
+   The pearls are all unworked, with no holes drilled for stringing. Some are
+perfect spheres, but many are teardrop-shaped and some have unique, irregular
+forms.
+~
+E
+tube vertical~
+   A long, thin tube protrudes from the ceiling, directly over a raised portion
+of the basalt altar. The tube is hollow; you can see the sky through it.
+~
+T 11945
+T 11946
+T 11976
+T 11979
+T 11980
+S
+#11980
+The Sepulcher of Orka~
+   Beneath the public square you find an equally public tomb. The small, gray
+bodies of deceased goblins in various states of decay lie on each and every
+one of the dozens of slate shelves that line the smooth plaster walls of the
+sepulcher. Light from the entrance glints off of small jade squares that have
+been placed over their eyes.
+   A curved staircase drops through the stone floor, leading down into a
+chamber cut into the rock itself. No light or smoke comes from below, and you
+cannot see what's down there.
+~
+cdi 0 0 11975
+D8
+~
+0 11982
+D9
+~
+0 11981
+E
+ceiling hole up~
+   The ladder leads up through a square hole in the ceiling, like every
+building in the city. The midday sun spills past the slanted cover, shining
+just enough light to see down into the sepulcher.
+~
+E
+ladder~
+   The wooden ladder into the sepulcher is nearly vertical, unlike most of the
+buildings in the city. The workmanship on the ladder is fine, with every rung
+in place despite how old it looks.
+~
+E
+rock stone floor ground~
+   The floor of the sepulcher is exposed rock, with a staircase cut into it
+that descends into the darkness below.
+~
+E
+staircase down~
+The staircase is cut directly into the rock. It's far too dark to see down it.
+~
+E
+bodies goblins corpses~
+   The bodies are in various states of decay. Some are fresh and rather
+pungent, while others have little left but skin and bone. There are dozens of
+them, all in the same prone position on the slate shelves.
+~
+E
+shelves slate~
+   The shelves are made of slate and rest on wooden beams that protrude from
+the plaster walls. Each and every shelf holds a single deceased goblin, lying
+prone with their head turned to the left.
+~
+E
+walls plaster~
+Like every building in the city, the walls are made from smooth white plaster.
+~
+E
+jade squares eyes~
+   Square pieces of rough-cut jade cover both eyes of each of the dead goblins.
+Though the bodies are placed prone, with their heads facing left, the jade does
+not seem to fall from the eyes.
+~
+M 0 11978 100.00 1
+M 0 11980 100.00 1
+T 11945
+T 11946
+T 11976
+S
+#11981
+A Dark Rock-Cut Chamber~
+   The staircase curves down through a low, narrow passage, into a larger room.
+You turn to get your bearings in the dark, waiting for eyes to adjust to what
+little light bounces down from far above. As the room comes into view, you
+quickly find yourself face to face with a skull, and instinctively take a step
+back, bumping into a wall of bones that clatter as they settle.
+   This is an ossuary, where the bones of the goblins are put to rest when no
+flesh remains. It looks like they've all been disarticulated and sorted, with
+shelves of skulls, piles of femurs, walls of ribs, and more. As your eyes
+adjust further, you find that the chamber is larger than you realized. There
+could be many dozens of generations down here.
+~
+cdi 0 0 11975
+D8
+~
+0 11980
+E
+ossuary~
+This whole chamber is an ossuary: a place to store the bones of the long-dead.
+~
+E
+staircase up light dust~
+   Very little light spills down the staircase, as the building above is lit
+only by what sunlight makes it through the entryway. What light does make it
+this deep is filtered through the thick dust that stirs at your every movement.
+~
+E
+passage narrow~
+   The staircase forms a narrow passage, making it difficult to get in or out
+of the ossuary. It also blocks nearly all the light from above.
+~
+E
+skulls shelves~
+   The skulls are small and severe, with oddly square eye sockets. Strangely,
+the teeth have been removed. They are packed tightly on long shelves that cover
+one of the walls.
+   As you look at the shelves, you turn your head and find yourself inches from
+a skull with its eye socket shattered and caved in! You jump backwards, bumping
+into something sharp, and a chill runs down your spine!
+~
+E
+teeth tooth~
+There are no teeth here, not in any of the skulls.
+~
+E
+bones ribs femurs piles~
+   The bones have been sorted, organized, and stacked. Not a single skeleton
+remains intact anywhere in the ossuary. As you examine one of the piles, you
+bump something hanging on the wall and a bony hand falls onto your shoulder!
+   A chill runs down your spine as you fall into another pile of bones, unable
+to catch yourself!
+~
+E
+goblins~
+   There are generations of goblins interred here, all disarticulated and
+sorted, for reasons unknown. Their faces -- or, at least, their skulls -- are
+lined up on long, tight shelves.
+~
+E
+floor~
+The rock floor is covered in thick dust.
+~
+E
+walls alcoves~
+   The walls are cut from the rock itself, including the skull shelves and
+alcoves that hold sorted piles of bones. As you feel around in one of the
+barely-lit alcoves, something bites down on your hand and you jump three feet
+in the air!
+~
+T 11945
+T 11946
+T 11976
+T 11936
+S
+#11982
+The Central Plaza of the Eastern Rooftop Walkway~
+   The towering spire of the gobbrabakh's monolith rises over the eastern
+rooftops as the only thing tall enough to see in any direction. These rooftops
+come to a low spot here, where several of the houses form a large plaza atop
+their roofs, beneath dozens of other houses from which hundreds of onlookers
+can view public events.
+~
+ci 0 0 11975
+D0
+~
+0 11983
+D1
+~
+0 11984
+D2
+~
+0 11985
+D3
+~
+0 11986
+D9
+~
+0 11980
+E
+sky up sun~
+The sky is cloudless and sunny.
+It's summer time and you're quite warm.
+It's midday.
+~
+E
+ocean sea out horizon cliffside~
+   You can't see anything past the houses that surround the plaza; this is a
+low spot by design. It allows people on the surrounding houses to see the
+plaza from a greater distance.
+~
+E
+down~
+A ladder down through the walkway leads to the sepulcher below.
+~
+E
+monolith spire towering standing stone east~
+   In the east, the gobbrabakh's towering standing stone rises above the line
+of houses, cleaving the sky in two.
+~
+E
+openings slanted covers entrances chimneys~
+   Every rooftop has a small, square hole in its south side, covered by a
+slanted roof to keep water out. These holes are the only entrance to the homes,
+and also vent smoke from the ovens. Some have ladders protruding from them.
+~
+E
+cluster houses homes city sprawl gobbrabakh~
+   The city covers nearly every inch of the top of the jutting cliffs. Dozens
+or perhaps hundreds of houses are tightly clustered, each sharing walls with
+its neighbors, making it impossible to assail the city without climbing on top.
+The rooftops form a walkway as well as a public plaza that stretches over the
+top of the entire city.
+~
+E
+rooftops roofs walkway plaza~
+   The rooftops here form a low plaza where it's easy for hundreds of people to
+view it from the higher homes.
+~
+E
+ramps~
+Ramps connect spots where pairs of houses are at slightly different levels.
+~
+E
+ladders~
+   Some of the houses whose roofs form the walkway have ladders sticking out of
+their openings, but many don't. Short ladders also connect some of the uneven
+rooftops of the houses, with others connected by ramps instead.
+~
+M 0 11981 100.00 1
+M 1 11981 100.00 3
+M 0 11971 100.00 1
+T 11945
+T 11946
+T 11976
+S
+#11983
+The Eastern Rooftop Walkway~
+   The salty scent of the sea gives way here to the fragrant aroma of seafood,
+as someone is surely boiling clams nearby. The walkway, formed by the conjoined
+rooftops of many small homes, ends to the north, where the aroma originates.
+In the east, the towering monolith rises from the edge of the city.
+   Below you, down one of the many square openings in the rooftops, you can see
+a messy little house, though it's difficult to stand near the entrance for long
+because it also serves as the home's chimney. A wooden ladder descends through
+the smoke.
+~
+ci 0 0 11975
+D9
+~
+0 11976
+D2
+~
+0 11982
+D0
+~
+0 11990
+D7
+~
+0 11984
+D6
+~
+0 11986
+E
+sky up sun~
+The sky is cloudless and sunny.
+It's summer time and you're quite warm.
+It's midday.
+~
+E
+ocean sea out horizon~
+The placid ocean stretches out to the horizon.
+~
+E
+down~
+The ladder leads down into a rather messy home.
+~
+E
+monolith towering standing stone east~
+   The towering stone stands watch over the city from the eastern edge, where
+it rises from the edge of the cliff to cleave the sky in two.
+~
+E
+cliffside~
+   The cliffs extend east and west here, with a small section that juts out to
+the north, whence the pungent aroma of boiling seafood draws you.
+~
+E
+openings slanted covers entrances chimneys~
+   Every rooftop has a small, square hole in its south side, covered by a
+slanted roof to keep water out. These holes are the only entrance to the homes,
+and also vent smoke from the ovens. Some have ladders protruding from them.
+~
+E
+cluster houses homes city sprawl gobbrabakh rooftops roofs walkway~
+   The city covers nearly every inch of the top of the jutting cliffs. Dozens
+or perhaps hundreds of houses are tightly clustered, each sharing walls with
+its neighbors, making it impossible to assail the city without climbing on top.
+The rooftops form a walkway as well as a public plaza that stretches over the
+top of the entire city.
+~
+E
+ramps~
+Ramps connect spots where pairs of houses are at slightly different levels.
+~
+E
+ladders~
+   Ladders poke out of some of the rooftop openings that dot the plaza. Down
+the nearest one, you can see a messy, cozy little home through the smoke of its
+oven fire.
+   Where the houses are at different heights, short ladders also form parts of
+the walkway.
+~
+E
+smoke~
+   The sweet smoke burns your eyes if you get too close to any of the rooftop
+entrances of the houses that make up the walkway.
+~
+E
+reed mats~
+Many of the rooftops have simple reed mats for outdoor seating.
+~
+M 0 11983 100.00 1
+T 11945
+T 11946
+T 11976
+S
+#11984
+The Eastern Rooftop Walkway~
+   The tightly clustered square homes rise slightly toward the east, where they
+end with the towering standing stone at the cliff's edge, so tall that from
+here it appears to cleave the eastern sky in two. From here, even from your
+elevated vantage point, the walkway appears to extend west to the horizon. In
+all other directions beyond the cliffs, there is only the vast turquoise sea.
+   Smoke rises from many covered square openings in the roofs, some of which
+also have ladders poking out. The walkway sprawls over every building, with
+sun shades, stools, and reed mats on some of the rooftops.
+~
+ci 0 0 11975
+D9
+~
+0 11977
+D3
+~
+0 11982
+D4
+~
+0 11983
+D1
+~
+0 11991
+D6
+~
+0 11985
+E
+down~
+A ladder leads down into a home.
+~
+E
+west~
+   Immediately west of here is the public plaza, but you have a much grander
+view than that. From here, you can see most of the city, made entirely of
+houses built wall-to-wall, with smoke rising from every rooftop entrance.
+~
+E
+sky up sun~
+The sky is cloudless and sunny.
+It's summer time and you're quite warm.
+It's midday.
+~
+E
+ocean vast turquoise sea out horizon~
+The placid ocean stretches out to the horizon in the north and south.
+~
+E
+standing stone monolith towering east~
+The standing stone dominates the view to the east.
+~
+E
+cliffside edge~
+   The cliffs to the east end at the towering monolith. You can see little of
+the actual cliffs as the view is blocked by the cluster of houses that cover
+virtually the entire cliffside.
+~
+E
+openings slanted covers entrances chimneys~
+   Every rooftop has a small, square hole in its south side, covered by a
+slanted roof to keep water out. These holes are the only entrance to the homes,
+and also vent smoke from the ovens. Some have ladders protruding from them.
+~
+E
+cluster houses homes city sprawl gobbrabakh rooftops roofs walkway~
+   The city covers nearly every inch of the top of the jutting cliffs. Dozens
+or perhaps hundreds of houses are tightly clustered, each sharing walls with
+its neighbors, making it impossible to assail the city without climbing on top.
+The rooftops form a walkway as well as a public plaza that stretches over the
+top of the entire city.
+~
+E
+ramps~
+Ramps connect spots where pairs of houses are at slightly different levels.
+~
+E
+ladders smoke~
+   Short ladders connect rooftops that are separated in height by more than a
+foot, forming an important part of the walkway. These ladders are set at low
+angles, almost like stairs.
+   Taller ladders poke up through some of the streams of smoke that rise from
+the rooftop entrances that dot the walkway.
+~
+E
+reed mats~
+Many of the rooftops have simple reed mats for outdoor seating.
+~
+M 0 11984 100.00 1
+M 0 11952 100.00 1
+T 11945
+T 11946
+T 11976
+S
+#11985
+The Eastern Rooftop Walkway, Above the Stairs~
+   The uneven rooftops descend to their lowest point here, where they join with
+a wooden stairway down the cliff. Most of the view of the city is obscured by
+the closest houses, joined by ramps to this one. To the northeast, the great
+standing stone towers over the houses, visible from every rooftop.
+   The houses leading down to the stairway bear the same square openings with
+slanted covers that can be seen across the city, situated on the south side of
+each roof, opening to the east. Beyond the stairs, to the south and east, you
+see only the vastness of the ocean, which stretches all the way to the horizon.
+~
+ci 0 0 11975
+D9
+~
+0 11978
+D0
+~
+0 11982
+D5
+~
+0 11984
+D2
+~
+0 11988
+D4
+~
+0 11986
+E
+sky up sun~
+The sky is cloudless and sunny.
+It's summer time and you're quite warm.
+It's midday.
+~
+E
+ocean sea out horizon south east~
+The placid ocean stretches out to the horizon in the south and east.
+~
+E
+standing stone monolith towering northeast ne~
+   The monolith, visible from every part of the city, appears to cleave the sky
+in two.
+~
+E
+cliffside stairs stairway down~
+   Wooden posts sticking out of the red-brown rocks of the cliff form a sort
+of stairway, although the stirring in your stomach warns it won't be a
+comfortable descent. There are no handrails. And worse, the gaps between the
+steps drop a hundred feet to the rocks below.
+~
+E
+openings slanted covers entrances chimneys~
+   Every rooftop has a small, square hole in its south side, covered by a
+slanted roof to keep water out. These holes are the only entrance to the homes,
+and also vent smoke from the ovens. Some have ladders protruding from them.
+~
+E
+cluster houses homes city sprawl gobbrabakh rooftops roofs walkway~
+   The city covers nearly every inch of the top of the jutting cliffs. Dozens
+or perhaps hundreds of houses are tightly clustered, each sharing walls with
+its neighbors, making it impossible to assail the city without climbing on top.
+The rooftops form a walkway as well as a public plaza that stretches over the
+top of the entire city.
+~
+E
+ramps~
+Ramps connect spots where pairs of houses are at slightly different levels.
+~
+E
+ladders~
+   Sloping ladders connect many of the homes that rise away from the stairs.
+Many of these are well-worn, with new and old rungs side-by-side.
+   The last house near the stairs has its entry ladder sticking out the roof,
+unlike most homes down here whose ladders are retracted.
+~
+E
+reed mats~
+Many of the rooftops have simple reed mats for outdoor seating.
+~
+M 0 11946 100.00 1
+M 0 11985 100.00 1
+T 11945
+T 11946
+T 11976
+S
+#11986
+The Eastern Rooftop Walkway~
+   Atop the vast cluster of square houses stretches the rooftop walkway. Every
+house is built wall-to-wall, forming a bustling plaza on top, with the roofs
+connected by wooden ramps and ladders. Each roof has a small square opening
+with a slanted cover, serving as both entrance and chimney.
+   The city is built on a long, jutting cliff overlooking the vast ocean. To
+the east, the city rises toward a towering monolith at the cliff's end. To the
+west, it sprawls as far as you can see. Just west of here, the walkway is at
+its narrowest, crossing a neck in the cliffside.
+~
+ci 0 0 11975
+D9
+~
+0 11975
+D1
+~
+0 11982
+D5
+~
+0 11983
+D7
+~
+0 11985
+D3
+~
+0 11987
+E
+down~
+   Looking down over the sides of the cliff, it's at least a hundred feet to
+the rocks below. This city is well-positioned for defense.
+~
+E
+west~
+The city stretches farther west than it does east.
+~
+E
+sky up sun~
+The sky is cloudless and sunny.
+It's summer time and you're quite warm.
+It's midday.
+~
+E
+ocean sea out horizon~
+The placid ocean stretches out to the horizon in the north and south.
+~
+E
+monolith standing stone towering east~
+   The standing stone at the east end of the city looks impressively tall even
+from here. It can be seen from every part of the city, whence it cleaves the
+eastern sky in two.
+~
+E
+cliffside neck~
+   The city is built over nearly every free inch of the cliff tops, even here
+where the cliffs form a narrow neck between the large portion in the west and
+the smaller section in the east.
+~
+E
+openings slanted covers entrances chimneys~
+   Every rooftop has a small, square hole in its south side, covered by a
+slanted roof to keep water out. These holes are the only entrance to the homes,
+and also vent smoke from the ovens. Some have ladders protruding from them.
+~
+E
+cluster houses homes city sprawl gobbrabakh~
+   The city covers nearly every inch of the top of the jutting cliffs. Dozens
+or perhaps hundreds of houses are tightly clustered, each sharing walls with
+its neighbors, making it impossible to assail the city without climbing on top.
+The rooftops form a walkway as well as a public plaza that stretches over the
+top of the entire city.
+~
+E
+rooftops roofs walkway~
+   The tops of many conjoined homes form the city's thoroughfare, connected by
+low ramps and ladders. Indeed, there's no ground-level portion of the city. All
+homes are entered from the walkway on top.
+~
+E
+ramps~
+Ramps connect spots where pairs of houses are at slightly different levels.
+~
+E
+ladders~
+   Ladders connect the uneven houses whose rooftops form the walkway. Many of
+these have been repaired multiple times due to heavy use, and a few have been
+replaced entirely.
+   Some of the homes also have ladders poking out of the smoke streaming from
+their covered entrances.
+~
+E
+reed mats~
+Many of the rooftops have simple reed mats for outdoor seating.
+~
+M 0 11953 100.00 1
+T 11945
+T 11946
+T 11976
+S
+#11987
+The Western Rooftop Walkway~
+   Crossing the narrowest part of the city, which is now just a single house
+wide as it crosses the neck of the cliffside, you are stopped from further
+progress by damage to the rooftop. It looks as if part of the cliffside fell
+into the sea below and took a house with it. The house that remains here has
+lost part of its roof and there is no way to cross.
+~
+cdi 0 0 11975
+D1
+~
+0 11986
+E
+sky up sun~
+The sky is cloudless and sunny.
+It's summer time and you're quite warm.
+It's midday.
+~
+E
+ocean sea out horizon~
+The placid ocean stretches out to the horizon in the north and south.
+~
+E
+down~
+   It's a long way down. The bottom of the rocky cliffs meet the ocean hundreds
+of feet below you.
+~
+E
+monolith standing stone towering east~
+   Even from here, the standing stone at the east end of the city looks like it
+scrapes the sky.
+~
+E
+damage repair~
+   The rooftop is damaged where part of the cliff slid into the sea below and
+took one of the houses with it. The remaining house on the neck of the narrow
+cliffside has lost most of its roof and it's now impossible to cross.
+~
+E
+cliffside neck narrowest~
+   The cliffs are at their narrowest here. To the west, countless houses sprawl
+out to the horizon. To the east, a smaller portion of the city meets its end
+at the great standing stone. Here, just one house forms a bridge between them.
+~
+E
+openings slanted covers entrances chimneys~
+   Every rooftop has a small, square hole in its south side, covered by a
+slanted roof to keep water out. These holes are the only entrance to the homes,
+and also vent smoke from the ovens. Some have ladders protruding from them.
+~
+E
+cluster houses homes city sprawl gobbrabakh rooftops roofs walkway~
+   The city covers nearly every inch of the top of the jutting cliffs. Dozens
+or perhaps hundreds of houses are tightly clustered, each sharing walls with
+its neighbors, making it impossible to assail the city without climbing on top.
+The rooftops form a walkway as well as a public plaza that stretches over the
+top of the entire city.
+~
+E
+ramps~
+Ramps connect spots where pairs of houses are at slightly different levels.
+~
+E
+ladders~
+Ladders connect parts of the walkway where the roofs are uneven.
+~
+E
+reed mats~
+Many of the rooftops have simple reed mats for outdoor seating.
+~
+M 0 11987 100.00 1
+T 11945
+T 11946
+T 11976
+S
+#11988
+Wooden Steps Down the Cliffside~
+   In a dizzying feat of bravery, you step onto the wooden beams that form the
+stairway down the side of the cliffs. Each step is nothing more or less than a
+flattened tree pegged into a mortise hole that has been carved in the cliff and
+the gap between the steps is further than you'd like, giving you a clear view
+of the rocky shore far below.
+   The steps turn a blind corner around the jutting cliff. Below, they lead to
+the great gate of the gobbrabakh. Above, they lead to the lowest houses, which
+can barely be seen from down here, aside from the heavy logs that protrude from
+the ends. Above the houses, you can see the top of the towering monolith that
+watches over the city.
+~
+cdi 0 0 11975
+D0
+~
+0 11985
+D9
+~
+0 11989
+E
+sky up sun~
+The sky is cloudless and sunny.
+It's summer time and you're quite warm.
+It's midday.
+~
+E
+ocean sea out horizon~
+The placid ocean stretches out to the horizon to the north and south.
+~
+E
+down~
+You try to look down, but that's a bad idea when the gaps are so large.
+~
+E
+monolith towering~
+   Though you can't see most of the city from here, the standing stone that
+guards it still visible.
+~
+E
+cliffside~
+   The cliffs are a deep red-brown color, striated with white and gray. Above
+them, the gobbrabakh rests like gleaming white crown.
+~
+E
+cluster houses homes city sprawl gobbrabakh~
+   From here, you can see only the sides of the houses that touch the cliffs.
+The line of houses, all wall-to-wall, form a white crown on top of the red-
+brown rocks of the cliffside.
+~
+E
+rooftops roofs walkway north~
+The steps to the north lead back to the rooftop walkway.
+~
+E
+stairway stairs steps beams wooden trees posts~
+   The steps are made of hefty wooden posts which stick out of the cliffs like
+pegs. In the event of an attack, the posts can be removed, or even burned, to
+make approaching the city impossible.
+~
+E
+holes carved mortise~
+Mortise holes have been cut into the cliffside to support the steps.
+~
+E
+gates~
+You can't see the gate from here; it's around the corner.
+~
+T 11945
+T 11946
+T 11976
+S
+#11989
+The Great Gate of Gobbrabakh of Orka~
+   The long, treacherous wooden stairway reaches its end at an enormous gate
+built mere feet from the end of a narrow ledge. The gate is solid wood, stark
+white, and painted with hundreds of stylized faces that must represent goblins.
+The frame around the gate is made partly from rock, which might once have
+formed a full arch, and partly from enormous timbers. The whole thing stands
+twenty feet tall and blocks any view of what lies beyond.
+   Though you can't see the city from here, the tip of its towering monolith
+still peeks out from beyond the cliffs above. Indeed, the gate is situated at
+the very spot where the standing stone is no longer visible.
+~
+cdi 0 0 11975
+D8
+~
+0 11988
+E
+frame~
+   The frame of the great gate is made mostly from rock. The rest is built from
+huge, sturdy timbers that make the city unassailable.
+~
+E
+stairway stairs steps~
+   The steps are made of hefty wooden posts which stick out of the cliffs like
+pegs. In the event of an attack, the posts can be removed, or even burned, to
+make approaching the city impossible.
+~
+E
+ledge narrow arch rocks~
+   The gate is built into the edge of the narrow ledge and partially attached
+to a broken rock arch. Wooden timbers make up the rest of the gate's frame.
+~
+E
+wooden timbers~
+   Wooden timbers form part of the frame for the great gate above the broken
+remains of a rock arch.
+~
+E
+gates west~
+   The tremendous gate is made of solid wood. It's difficult to tell how strong
+it is while it's closed, but it looks like it can withstand a serious assault.
+The gate is painted white, with hundreds of stylized green faces on it.
+~
+E
+paintings painted faces stylized~
+   Each of the faces is no larger than your thumbnail, but detailed and
+differentiated by the exact shade of green, the shape of the ears and nose,
+and in some cases the color of the hat. The eyes are black squares, drawn only
+in outline.
+   Hundreds of the tiny faces adorn the gate in several large clusters and many
+scattered individuals or small groups. No names are visible to identify any
+of the goblins.
+~
+E
+monolith towering standing stone~
+   The tip of the standing stone is the only part of the city you can see from
+down here.
+~
+E
+cliffside~
+   The red-brown cliffs tower over you and vanish below you. Indeed, you can
+see little else from here aside from the ocean.
+~
+E
+ocean down out sea horizon~
+   The turquoise ocean meets the cliffs at a rocky, jagged shore far below you.
+It stretches out as far as the eye can see from here, meeting the sky at every
+horizon.
+~
+E
+up~
+The steps lead up toward the gobbrabakh.
+~
+M 0 11973 100.00 1
+M 0 11988 100.00 1
+M 0 11947 100.00 1
+T 11945
+T 11946
+T 11976
+T 11936
+S
+#11990
+The Stone Cauldrons~
+   The air ripples and waves over three large cauldrons nestled in hot wood
+fires on a sand-covered part of the rooftop walkway. Around them, dozens of
+reed mats provide places to sit and eat. The cauldrons are on a high rooftop,
+and every seat provides a spectacular view of the entire gobbrabakh, which
+sprawls to the south and west. To the east, the horizon is dominated by the
+towering standing stone.
+~
+ci 0 GL 11975
+D2
+~
+0 11983
+E
+sky up sun~
+The sky is cloudless and sunny.
+It's summer time and you're quite warm.
+It's midday.
+~
+E
+ocean sea out horizon~
+The placid ocean stretches out to the horizon to the north.
+~
+E
+down cliffside~
+Looking down over the edge, you see an enormous mound of discarded shells.
+~
+E
+monolith towering east standing stone~
+The great monolith watches over the city from its eastern edge.
+~
+E
+openings slanted covers entrances chimneys~
+   Every rooftop has a small, square hole in its south side, covered by a
+slanted roof to keep water out. These holes are the only entrance to the homes,
+and also vent smoke from the ovens. Some have ladders protruding from them.
+~
+E
+cluster houses homes city sprawl gobbrabakh rooftops roofs walkway~
+   The city covers nearly every inch of the top of the jutting cliffs. Dozens
+or perhaps hundreds of houses are tightly clustered, each sharing walls with
+its neighbors, making it impossible to assail the city without climbing on top.
+The rooftops form a walkway as well as a public plaza that stretches over the
+top of the entire city.
+~
+E
+ramps~
+Ramps connect spots where pairs of houses are at slightly different levels.
+~
+E
+ladders~
+Ladders connect many of the rooftops of the gobbrabakh.
+~
+E
+cauldrons~
+The large, boiling cauldrons are carved from stone.
+~
+E
+fires~
+Fires have been built up around the cauldrons.
+~
+E
+sand~
+   The rooftops here are covered with sand to protect the homes from the
+cooking fires.
+~
+E
+mats reed~
+   Many reed mats have been placed around the piles of shellfish, making the
+area around the cauldrons resemble a strange sort of dining hall. The mats are
+pale yellow and quite clean despite all the food.
+~
+M 0 11986 100.00 1
+M 1 11980 100.00 1
+M 1 11981 100.00 3
+M 0 11954 100.00 1
+M 0 11949 100.00 1
+T 11945
+T 11946
+T 11976
+S
+#11991
+A Great Standing Stone Overlooking the Sea~
+   Here, at the east edge of the gobbrabakh, you find yourself staggered by the
+immensity of the rough-cut stone that towers over you. It stands watch over the
+city and the sea, visible at great distance from both. You can see far into the
+distance in all directions, with the city covering the cliffs to the west, and
+the sea that surrounds it.
+   A well-worn ladder to the side of the stone descends down below. Next to it,
+a small tube protrudes from the walkway. A wooden ramp to the south leads down
+to the cliffside.
+~
+ci 0 0 11975
+D9
+~
+0 11979
+D3
+~
+0 11984
+D2
+~
+0 11992
+E
+tube~
+A small tube protrudes from the floor, leading down into the building below.
+~
+E
+ladder~
+The wooden ladder descends down into the building beneath the standing stone.
+~
+E
+stone standing monolith towering east~
+   The obelisk-like stone absolutely towers over you, blocking any view to the
+east. Its surface is rough and undecorated, though patches near the base here
+are smooth from the generations of hands that have touched the stone.
+~
+E
+south wooden ramp cliffside~
+   The long wooden ramp leads down to an arena on the cliffside. The finish has
+worn off in a path running the length of the ramp.
+~
+E
+sky up sun~
+The sky is cloudless and sunny.
+It's summer time and you're quite warm.
+It's midday.
+~
+E
+ocean sea out horizon distance north~
+The placid ocean stretches out to the horizon in the north and south.
+~
+E
+down~
+There's a chamber under the standing stone.
+~
+E
+openings slanted covers entrances chimneys~
+   Every rooftop has a small, square hole in its south side, covered by a
+slanted roof to keep water out. These holes are the only entrance to the homes,
+and also vent smoke from the ovens. Some have ladders protruding from them.
+~
+E
+cluster houses homes city sprawl gobbrabakh west rooftops roofs walkway~
+   The city covers nearly every inch of the top of the jutting cliffs. Dozens
+or perhaps hundreds of houses are tightly clustered, each sharing walls with
+its neighbors, making it impossible to assail the city without climbing on top.
+The rooftops form a walkway as well as a public plaza that stretches over the
+top of the entire city.
+~
+E
+ramps~
+Ramps connect spots where pairs of houses are at slightly different levels.
+~
+E
+reed mats~
+Small reed mats have been placed around the standing stone.
+~
+E
+stool chair~
+There is a short wooden stool near the reed mats.
+~
+M 0 11974 100.00 1
+M 1 11981 100.00 3
+M 0 11948 100.00 1
+T 11945
+T 11946
+T 11976
+S
+#11992
+On the Cliffside~
+   The rooftop walkway ends with a wooden ramp down onto the cliffside itself,
+where fine arena sand covers a wide, shallow pit in the rocks. Houses flank the
+arena on the north and west sides, providing lots of space for spectators.
+   The city's towering standing stone is almost directly overhead, up the north
+ramp. Out below the cliffs, the turquoise sea stretches to the horizon.
+~
+cdi 0 0 11975
+D0
+~
+0 11991
+E
+sky up sun~
+The sky is cloudless and sunny.
+It's summer time and you're quite warm.
+It's midday.
+~
+E
+ocean sea out horizon turquoise down~
+The placid ocean stretches out to the horizon.
+~
+E
+monolith towering standing stone north~
+   To the north, the towering monolith cleaves the sky in two. As noon
+approaches, the stone points almost directly toward the sun.
+~
+E
+cliffside rocks~
+   In places, the cliffs appear to barely support the city, which has covered
+nearly every inch of them. Here, the arena is one of the only places where bare
+rock stands undeveloped.
+~
+E
+cluster houses city gobbrabakh~
+From here, you can only see the houses that surround the arena.
+~
+E
+ramp~
+   The long wooden ramp leads back up to the standing stone. The finish has
+worn off in a path running the length of the ramp.
+~
+E
+arena pit~
+The shallow pit is filled with fine arena sand.
+~
+E
+sand~
+The sand is white and very fine in texture.
+~
+M 0 11972 100.00 1
+T 11945
+T 11946
+T 11976
+T 11970
+S
+#11993
+An Endless River~
+   You're standing knee-deep in a muddy river, distracted for a moment by light
+glinting off the rippling surface. The soothing babble of the river and the
+crackle of the campfire drown out every fret and fetter; you have all the time
+in the world to fish. This is the sort of dream you never want to wake up from.
+~
+acdi 0 FG 11993
+D0
+~
+0 11993
+D2
+~
+0 11993
+E
+campfire fire~
+   You made this small campfire halfway between the river and the forest so
+you'd have a place to cook up whatever you manage to catch in the river.
+~
+E
+forest trees east west undergrowth plants~
+The forest is dense with huge trees and impenetrable undergrowth.
+~
+E
+river north south~
+   The river goes on as far as you can see both north and south, but you always
+seem to end up back at the same spot.
+~
+E
+water muddy~
+The water is a muddy brown color. You can't see anything in it.
+~
+I 21 1300 20.00 1 f  # FISH: glowing green seashell
+I 21 1311 20.00 1 f  # FISH: spotted eel
+I 21 1313 20.00 1 f  # FISH: bright red leaping fish
+I 21 1312 20.00 1 f  # FISH: speckled trout
+I 21 11978 20.00 1 f  # FISH: mussels
+M 1 11979 100.00 1
+T 11945
+T 11946
+T 11994
+S
+#11994
+In the Presence of the God~
+   Warmth, comfort, serenity, and peace fill you as you stand in the mighty
+presence of the god. Though he is beyond body or form, his radiant light shines
+through your body and touches every part of you. For the first time in a long
+time, you feel at peace.
+~
+cdi 0 0 11994
+D0
+~
+0 11994
+D2
+~
+0 11994
+D3
+~
+0 11994
+D1
+~
+0 11994
+E
+god~
+The god has no shape or form; he is beyond both those things.
+~
+E
+presence~
+You can feel his mighty presence, but he has no shape for you to look upon.
+~
+E
+light radiant~
+The dreamy golden light suffuses through every part of you.
+~
+E
+voice~
+The god's presence is everywhere, but without form or shape.
+~
+E
+north south east west northeast southeast northwest southwest up down~
+   It's the same in all directions. When you move, you end up in the same spot,
+like a dream.
+~
+T 11945
+T 11946
+T 11994
+T 11995
+T 11996
+S
+$

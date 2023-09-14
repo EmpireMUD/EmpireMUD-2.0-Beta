@@ -180,12 +180,14 @@ end
 Tranc combat~
 0 k 15
 ~
+* storing ids prevents errors when someone dies during a "wait"
+set id %actor.id%
 wait 10
 * If dog summoned, tank
 if %self.varexists(hound)%
-  if !%actor.aff_flagged(DISARM)%
+  if %actor.id% == %id% && !%actor.aff_flagged(DISARMED)%
     %echo% ~%self% disarms ~%actor%!
-    dg_affect #3018 %actor% DISARM on 15
+    dg_affect #3018 %actor% DISARMED on 15
   elseif %self.health% < (%self.maxhealth% / 2)
     %echo% Tranc quaffs a potion!
     %heal% %self% health 50
@@ -207,7 +209,11 @@ remote hound %self.id%
 Liza the Hound combat~
 0 k 15
 ~
+set id %actor.id%
 wait 10
+if !%self.fighting% || %self.disabled% || %id% != %actor.id%
+  halt
+end
 switch %random.3%
   case 1
     set ch %self.room.people%
@@ -234,7 +240,7 @@ switch %random.3%
 done
 ~
 #10109
-Banditos Start Progression~
+Bandits Start Progression~
 2 g 100
 ~
 if %actor.is_pc% && %actor.empire%
@@ -377,7 +383,7 @@ end
 %purge% %self%
 ~
 #10116
-Banditos spawner~
+Bandits spawner~
 1 n 100
 ~
 * Warning: This script completely ignores spawn limits! Don't use it in instances that reset often
@@ -389,7 +395,7 @@ set Rand %random.100%
 set vnumBerk 10105
 set vnumJorr 10106
 set vnumTranc 10107
-* Probabilities of each number of banditos spawning
+* Probabilities of each number of bandits spawning
 * Treat this as an exclusive interaction list
 set Triple 4
 set Double 30
@@ -397,7 +403,7 @@ set Single 66
 * There is probably a way to do this with a loop...
 eval cumulative %cumulative% + %Triple%
 if (%Rand% <= %cumulative%) && %found% == 0
-  * Spawn all 3 banditos
+  * Spawn all 3 bandits
   %load% mob %vnumBerk%
   %echo% Berk arrives!
   %load% mob %vnumJorr%
@@ -409,7 +415,7 @@ if (%Rand% <= %cumulative%) && %found% == 0
 end
 eval cumulative %cumulative% + %Double%
 if (%Rand% <= %cumulative%) && %found% == 0
-  * Choose a bandito NOT to spawn
+  * Choose a bandit NOT to spawn
   switch %random.3%
     case 1
       * Berk + Jorr
@@ -438,7 +444,7 @@ if (%Rand% <= %cumulative%) && %found% == 0
 end
 eval cumulative %cumulative% + %Single%
 if (%Rand% <= %cumulative%) && %found% == 0
-  * Choose a bandito to spawn
+  * Choose a bandit to spawn
   switch %random.3%
     case 1
       * Berk
@@ -860,69 +866,40 @@ Saguaro treant must-fight~
 return 0
 ~
 #10150
-Free-tailed bat emotes~
-0 bw 10
+Free-tailed bat self-despawn~
+0 bw 3
 ~
 if (%self.disabled% || %self.fighting%)
   halt
 end
-switch %random.3%
-  case 1
-    %echo% ~%self% flits about overhead.
-  break
-  case 2
-    %echo% ~%self% snatches a moth out of the air.
-  break
-  case 3
-    %echo% ~%self% joins a swarm of bats overhead.
-    %purge% %self%
-  break
-done
+%echo% ~%self% joins a swarm of bats overhead.
+%purge% %self%
 ~
 #10151
-Gila monster emotes~
-0 bw 10
+Gila monster self-despawn~
+0 bw 3
 ~
 if (%self.disabled% || %self.fighting%)
   halt
 end
-switch %random.3%
-  case 1
-    %echo% ~%self% suns itself on the rocks.
-  break
-  case 2
-    %echo% ~%self% flicks its tongue in search of a scent.
-  break
-  case 3
-    %echo% ~%self% crawls into a burrow in the ground.
-    %purge% %self%
-  break
-done
+%echo% ~%self% crawls into a burrow in the ground.
+%purge% %self%
 ~
 #10152
-Armadillo emotes~
-0 bw 10
+Armadillo self-despawn~
+0 bw 3
 ~
 if (%self.disabled% || %self.fighting%)
   halt
 end
-switch %random.3%
-  case 1
-    %echo% ~%self% rolls up into a ball and rolls away from you.
-    %purge% %self%
-  break
-  case 2
-    %echo% ~%self% digs at the ground until it finds a tasty grub.
-  break
-  case 3
-    %echo% ~%self% scampers around in the dirt.
-  break
-done
+%echo% ~%self% rolls up into a ball and rolls away from you.
+%purge% %self%
 ~
 #10153
-Cactus wren emotes~
+Cactus wren emotes DEPRECATED~
 0 bw 10
 ~
+* DEPRECATED: these are now handled by custom mob screens
 if (%self.disabled% || %self.fighting%)
   halt
 end
@@ -939,9 +916,10 @@ switch %random.3%
 done
 ~
 #10154
-Antelope squirrel emotes~
+Antelope squirrel emotes DEPRECATED~
 0 bw 10
 ~
+* DEPRECATED: these are now just mob custom emotes
 if (%self.disabled% || %self.fighting%)
   halt
 end
@@ -958,29 +936,20 @@ switch %random.3%
 done
 ~
 #10155
-Bighorn sheep emotes~
-0 bw 10
+Bighorn sheep self-despawn~
+0 bw 3
 ~
 if (%self.disabled% || %self.fighting%)
   halt
 end
-switch %random.3%
-  case 1
-    %echo% ~%self% rubs its horns against a shrub.
-  break
-  case 2
-    %echo% ~%self% runs off after an interloping ram.
-    %purge% %self%
-  break
-  case 3
-    %echo% ~%self% chews thoughtfully on a stray branch from a shrub.
-  break
-done
+%echo% ~%self% runs off after an interloping ram.
+%purge% %self%
 ~
 #10156
-Coati emotes~
+Coati emotes DEPRECATED~
 0 bw 10
 ~
+* DEPRECATED: these are now mob custom emotes
 if (%self.disabled% || %self.fighting%)
   halt
 end
@@ -1030,9 +999,10 @@ end
 return 1
 ~
 #10159
-Teddybear cactus emotes~
+Teddybear cactus emoted DEPRECATED~
 0 btw 5
 ~
+* DEPRECATED: these are now mob custom strings
 if (%self.disabled% || %self.fighting%)
   halt
 end
@@ -1167,7 +1137,15 @@ Suppress Weather~
 1 n 100
 ~
 * Turns on !WEATHER for a number of seconds equal to <value1>
-dg_affect_room %self.room% !WEATHER on %self.val0%
+* Fallback is to use the item's timer
+set duration %self.val0%
+if %duration% < 1
+  eval duration %self.timer% * 75
+end
+* now set it if possible
+if %duration% > 0
+  dg_affect_room %self.room% !WEATHER on %duration%
+end
 ~
 #10166
 Cactus Spawn Teleport~
@@ -1366,7 +1344,7 @@ if %blood% < %cost%
   halt
 end
 set room %actor.room%
-if %room.sector% != Oasis
+if !(%room.sector% ~= Oasis)
   %send% %actor% You can only infuse @%self% at an oasis.
   halt
 end

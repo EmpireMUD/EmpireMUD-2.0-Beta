@@ -51,7 +51,7 @@ Blind (Stealth ability)
 Usage:  blind [victim]
 Cooldown:  10 seconds
 Cost:  15 move
-Debuff type:  Stealth
+Debuff type:  physical
 
 You toss sand in your opponents' eyes, blinding them for 10 seconds. Being
 unable to see your foes inflicts a penalty of -50 to To-hit, Block and Dodge.
@@ -98,7 +98,7 @@ This ability gains skill points whenever they try.
 
 Crucial Jab
 Stealth Synergy Ability: 100 Survival
-Debuff type: Stealth
+Debuff type: physical
 
 Your Jab ability causes a debuff equal to your total level divided by 80 to
 your victim's Dexterity, for 10 seconds.
@@ -151,7 +151,7 @@ DIVERSION
 
 Diversion
 Stealth Synergy Ability: 100 Trade
-Debuff type:  Stealth
+Debuff type:  mental
 Cost:  50 move
 Cooldown:  30 seconds
 Usage:  diversion
@@ -193,6 +193,7 @@ Howl
 Stealth Synergy Ability: 100 Natural Magic
 Cost:  50 move
 Cooldown:  30 seconds
+Debuff type:  mental
 Usage:  howl
 
 You let out a terrifying howl, penalizing all enemies. The first victim loses
@@ -249,10 +250,10 @@ Usage:  pickpocket <victim>
 
 A skilled thief can lift small items from an unsuspecting victim.
 
-You can only pickpocket NPCs, and even then only human ones. This ability does
-not remove items you see in their inventories, only "pocket items". The result
-is largely random but often includes coins. Each NPC can only be pickpocketed
-once.
+You can only pickpocket NPCs, and even then usually only human ones. This
+ability does not remove items you see in their inventories, only "pocket
+items". The result is largely random but often includes coins. Each NPC can
+only be pickpocketed once.
 
 Pickpocketing citizens of another empire counts as an act of hostility. Any
 empire coins you receive from pickpocketing came from the empire's treasury
@@ -301,7 +302,8 @@ Deadly Poisons:
   pain  (deals damage over time)       slow  (slower attacks and movement)
   heartstop  (vampires can't spend blood)
 
-See also: CRAFTING LEVEL, RESIST POISON, RESOURCES, KEEP, CRAFT INFO, RECIPES
+See also: CRAFTING LEVEL, RESIST POISON, RESOURCES, KEEP, CRAFT INFO, RECIPES,
+   CRAFTING ABILITIES
 #
 PRICK
 
@@ -327,7 +329,7 @@ Usage:  sap <victim>
 Cooldown:  9 seconds
 Cost:  15 move
 Duration:  1 minute
-Debuff type:  Stealth, Stun
+Debuff type:  mental, stun
 
 This ability will temporarily stun your victim, giving you a moment to collect
 yourself before starting combat.
@@ -369,8 +371,8 @@ See also: BUILD, VAULT
 "SHADOW JAB"
 
 Shadow Jab
-Stealth Synergy Ability: 100 Vampire
-Debuff type: Stealth
+Stealth Synergy Ability:  100 Vampire
+Debuff type:  physical
 
 Your Jab ability causes a debuff equal to your Charisma divided by 5 (rounded
 up) to your victim's dodge, for 15 seconds. This effect may stack.
@@ -380,8 +382,8 @@ See also: JAB
 "SHADOW KICK"
 
 Shadow Kick
-Battle Synergy Ability: 100 Stealth
-Debuff type:  Battle
+Battle Synergy Ability:  100 Stealth
+Debuff type:  physical
 
 Your Kick ability causes a penalty to physical and magical damage equal to
 your total level divided by 50 for 10 seconds.
@@ -391,10 +393,10 @@ See also: KICK
 SHADOWCAGE "SHADOW CAGE"
 
 Shadowcage
-Stealth Synergy Ability: 100 High Sorcery
-Debuff type: Stealth
-Cost: 50 move
-Cooldown: 30 seconds
+Stealth Synergy Ability:  100 High Sorcery
+Debuff type:  mental
+Cost:  50 move
+Cooldown:  30 seconds
 Usage:  shadowcage
 
 You create a cage of shadows, penalizing all enemies. The first victim loses
@@ -443,8 +445,8 @@ See also: HIDE
 "STAGGER JAB"
 
 Stagger Jab
-Stealth Synergy Ability: 100 Battle
-Debuff type: Stealth
+Stealth Synergy Ability:  100 Battle
+Debuff type:  physical
 
 Your Jab ability causes a debuff equal to your Charisma divided by 5 (rounded
 up) to your victim's to-hit, for 15 seconds. This effect may stack.
@@ -505,7 +507,7 @@ Usage:  terrify [victim]
 Cooldown:  15 seconds
 Duration:  30 seconds
 Linked trait: Charisma
-Debuff type:  Stealth
+Debuff type:  mental
 Cost:  10+ move, depending on level
 
 Use the power of the shadows to make your foes cower in fear, lowering the

@@ -6,7 +6,7 @@ December 1 to January 6, look for the Winter Wonderland adventure on your
 off the grinchy demon before he ruins the holidays for everyone.
 There's a lot to do:
 - Get 10 different gifts from Father Christmas, one per day.
-- Stockings have 8 mini-pets to collect, or other prizes.
+- Stockings have 8 minipets to collect, or other prizes.
 - Defeat the grinchy demon to earn some Christmas spirit.
 - Make your empire festive!
 - The upgrade glitter reward lets you improve the sweater, the gift sack, and
@@ -18,6 +18,7 @@ There's a lot to do:
   - Any wandering vampire.
   - Boys and girls around your towns (during the day).
   - Your stable, Christmas tree, snowman, and sleigh.
+Complete 5 daily quests 31 out of the 37 days to rank #1!
 ~
    Alas, the winter holidays are over for another year. You have finally driven
 off the grinchy demon and you can lean back, count your gifts, and spend some
@@ -25,15 +26,15 @@ well-deserved time with friends and family. And don't worry, Father Christmas
 will be back again next year!
 ~
 ~
-11 0 0 0 400 53280 -1
+14 0 0 0 400 53280 -1 1550
 R 1 1 2 11514 1
 R 1 1 2 16655 1
 R 1 1 2 16650 1
 R 1 1 2 11501 1
-R 1 25 2 11514 1
-R 1 25 2 16655 1
-R 1 25 2 16652 1
-R 2 25 2 11502 1
+R 1 35 2 11514 1
+R 1 35 2 16655 1
+R 1 35 2 16652 1
+R 2 35 2 11502 1
 R 1 50 2 11513 1
 R 1 50 2 16651 1
 R 1 50 2 16655 1

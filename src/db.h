@@ -150,14 +150,15 @@ typedef struct map_file_data_v1  map_file_data;	// the current version of the st
 #define TEXT_FILE_GODLIST  1
 #define TEXT_FILE_HANDBOOK  2
 #define TEXT_FILE_HELP_SCREEN  3
-#define TEXT_FILE_IMOTD  4
-#define TEXT_FILE_INFO  5
-#define TEXT_FILE_MOTD  6
-#define TEXT_FILE_NEWS  7
-#define TEXT_FILE_POLICY  8
-#define TEXT_FILE_SHORT_CREDITS  9
-#define TEXT_FILE_WIZLIST  10
-#define NUM_TEXT_FILE_STRINGS  11	// total
+#define TEXT_FILE_HELP_SCREEN_SCREENREADER  4
+#define TEXT_FILE_IMOTD  5
+#define TEXT_FILE_INFO  6
+#define TEXT_FILE_MOTD  7
+#define TEXT_FILE_NEWS  8
+#define TEXT_FILE_POLICY  9
+#define TEXT_FILE_SHORT_CREDITS  10
+#define TEXT_FILE_WIZLIST  11
+#define NUM_TEXT_FILE_STRINGS  12	// total
 
 // misc files (user-modifiable libs)
 #define CONFIG_FILE  LIB_MISC"game_configs"  // config.c system
@@ -285,7 +286,8 @@ extern ability_data *ability_table;
 extern ability_data *sorted_abilities;
 
 ability_data *find_ability(char *argument);
-ability_data *find_ability_by_name(char *name);
+ability_data *find_ability_by_name_exact(char *name, bool allow_abbrev);
+#define find_ability_by_name(name)  find_ability_by_name_exact(name, TRUE)
 ability_data *find_ability_by_vnum(any_vnum vnum);
 void free_ability(ability_data *abil);
 char *get_ability_name_by_vnum(any_vnum vnum);
@@ -496,7 +498,7 @@ void populate_npc(room_data *room, struct empire_territory_data *ter, bool force
 void free_extra_descs(struct extra_descr_data **list);
 void parse_extra_desc(FILE *fl, struct extra_descr_data **list, char *error_part);
 void prune_extra_descs(struct extra_descr_data **list);
-void write_extra_descs_to_file(FILE *fl, struct extra_descr_data *list);
+void write_extra_descs_to_file(FILE *fl, char key, struct extra_descr_data *list);
 
 // events
 extern event_data *event_table;
@@ -533,6 +535,7 @@ extern generic_data *sorted_generics;
 void free_generic(generic_data *gen);
 generic_data *find_generic(any_vnum vnum, int type);
 generic_data *find_generic_by_name(int type, char *name, bool exact);
+generic_data *find_generic_no_spaces(int type, char *name);
 generic_data *real_generic(any_vnum vnum);
 const char *get_generic_name_by_vnum(any_vnum vnum);
 const char *get_generic_string_by_vnum(any_vnum vnum, int type, int pos);
@@ -581,7 +584,8 @@ void check_island_levels(room_data *location, int level);
 struct island_info *get_island(int island_id, bool create_if_missing);
 struct island_info *get_island_by_coords(char *coords);
 struct island_info *get_island_by_name(char_data *ch, char *name);
-char *get_island_name_for(int island_id, char_data *for_ch);
+char *get_island_name_for_empire(int island_id, empire_data *for_emp);
+#define get_island_name_for(island_id, for_ch)  get_island_name_for_empire((island_id), (for_ch ? GET_LOYALTY(for_ch) : NULL))
 bool island_has_default_name(struct island_info *island);
 void number_and_count_islands(bool reset);
 void save_island_table();
@@ -600,12 +604,19 @@ void load_map_memory(char_data *ch);
 extern account_data *account_table;
 extern char_data *character_list;
 extern char_data *combat_list;
-extern char_data *global_next_char;
+extern char_data *global_next_player;
 extern char_data *next_combat_list;
 extern char_data *next_combat_list_main;
 extern char_data *mobile_table;
+extern char_data *player_character_list;
 extern player_index_data *player_table_by_idnum;
 extern player_index_data *player_table_by_name;
+
+int set_current_pool(char_data *ch, int type, int amount);
+#define set_health(ch, amount)  set_current_pool(ch, HEALTH, amount)
+#define set_move(ch, amount)  set_current_pool(ch, MOVE, amount)
+#define set_mana(ch, amount)  set_current_pool(ch, MANA, amount)
+#define set_blood(ch, amount)  set_current_pool(ch, BLOOD, amount)
 
 void add_mobile_to_table(char_data *mob);
 player_index_data *find_player_index_by_idnum(int idnum);
@@ -645,6 +656,8 @@ extern obj_data *object_list;
 extern obj_data *object_table;
 extern obj_data *purge_bound_items_next;
 extern obj_data *global_next_obj;
+extern bool suspend_autostore_updates;
+extern bool add_chaos_to_obj_timers;
 
 void add_object_to_table(obj_data *obj);
 obj_data *create_obj(void);
@@ -671,16 +684,25 @@ obj_data *Obj_load_from_file(FILE *fl, obj_vnum vnum, int *location, char_data *
 void objpack_load_room(room_data *room, bool use_pre_b5_116_dir);
 
 // players
+extern struct over_time_effect_type *free_dots_list;
+extern struct player_quest *global_next_player_quest, *global_next_player_quest_2;
 extern struct group_data *group_list;
 extern struct int_hash *inherent_ptech_hash;
 extern int max_inventory_size;
 extern bool pause_affect_total;
 
+void add_language(char_data *ch, any_vnum vnum, byte level);
+void add_language_empire(empire_data *emp, any_vnum vnum, byte level);
 void add_lastname(char_data *ch, char *name);
 bool add_player_to_table(player_index_data *plr);
 void check_autowiz(char_data *ch);
 bool check_bonus_trait_reset(char_data *ch);
 void check_delayed_load(char_data *ch);
+void check_languages(char_data *ch);
+void check_languages_all(void);
+void check_languages_all_empires(void);
+void check_languages_empire(empire_data *emp);
+void convert_and_schedule_player_affects(char_data *ch);
 void delete_player_character(char_data *ch);
 void enter_player_game(descriptor_data *d, int dolog, bool fresh);
 room_data *find_home(char_data *ch);
@@ -700,6 +722,8 @@ struct mail_data *parse_mail(FILE *fl, char *first_line);
 void remove_lastname(char_data *ch, char *name);
 void remove_player_from_table(player_index_data *plr);
 void save_all_players(bool delay);
+int speaks_language(char_data *ch, any_vnum vnum);
+int speaks_language_empire(empire_data *emp, any_vnum vnum);
 void start_new_character(char_data *ch);
 int *summarize_weekly_playtime(empire_data *emp);
 void write_mail_to_file(FILE *fl, char_data *ch);
@@ -747,7 +771,7 @@ void remove_quest_from_table(quest_data *quest);
 void write_quest_givers_to_file(FILE *fl, char letter, struct quest_giver *list);
 
 // requirements
-void parse_requirement(FILE *fl, struct req_data **list, char *error_str);
+void parse_requirement(FILE *fl, struct req_data **list, bool with_custom_text, char *error_str);
 int sort_requirements_by_group(struct req_data *a, struct req_data *b);
 void write_requirements_to_file(FILE *fl, char letter, struct req_data *list);
 
@@ -795,7 +819,8 @@ extern skill_data *skill_table;
 extern skill_data *sorted_skills;
 
 skill_data *find_skill(char *argument);
-skill_data *find_skill_by_name(char *name);
+skill_data *find_skill_by_name_exact(char *name, bool allow_abbrev);
+#define find_skill_by_name(name)  find_skill_by_name_exact(name, TRUE)
 skill_data *find_skill_by_vnum(any_vnum vnum);
 void free_skill(skill_data *skill);
 char *get_skill_abbrev_by_vnum(any_vnum vnum);
@@ -819,12 +844,14 @@ extern double empire_score_average[NUM_SCORES];
 
 // stored event libs
 void add_stored_event(struct stored_event **list, int type, struct dg_event *event);
+void cancel_all_stored_events(struct stored_event **list);
 void cancel_stored_event(struct stored_event **list, int type);
 void delete_stored_event(struct stored_event **list, int type);
 struct stored_event *find_stored_event(struct stored_event *list, int type);
 
 // stored event helpers
 #define add_stored_event_room(room, type, ev)  add_stored_event(&SHARED_DATA(room)->events, type, ev)
+#define cancel_all_stored_events_room(room)  cancel_all_stored_events(&SHARED_DATA(room)->events)
 #define cancel_stored_event_room(room, type)  cancel_stored_event(&SHARED_DATA(room)->events, type)
 #define delete_stored_event_room(room, type)  delete_stored_event(&SHARED_DATA(room)->events, type)
 #define find_stored_event_room(room, type)  find_stored_event(SHARED_DATA(room)->events, type)
@@ -921,7 +948,7 @@ void init_mine(room_data *room, char_data *ch, empire_data *emp);
 room_data *load_map_room(room_vnum vnum, bool schedule_unload);
 FILE *open_world_file(int block);
 void parse_other_shared_data(struct shared_room_data *shared, char *line, char *error_part);
-void perform_burn_room(room_data *room);
+void perform_burn_room(room_data *room, int evo_type);
 room_data *real_real_room(room_vnum vnum);
 room_data *real_room(room_vnum vnum);
 void remove_room_from_world_tables(room_data *room);
@@ -1041,16 +1068,30 @@ extern struct empire_territory_data *global_next_territory_entry;
 	}	\
 } while(0)
 
-// combine setting these with saving
-#define set_mob_flags(mob, to_set)  do { \
-	SET_BIT(MOB_FLAGS(mob), (to_set));	\
-	request_char_save_in_world(mob);	\
+// combine setting mob flags with saving
+// note: adding SPAWNED will always reset spawn time and schedule the despawn here
+#define set_mob_flags(mob, to_set)  do { 	\
+	if (IS_NPC(mob)) {						\
+		SET_BIT(MOB_FLAGS(mob), (to_set));	\
+		check_scheduled_events_mob(mob);	\
+		request_char_save_in_world(mob);	\
+		if (IS_SET((to_set), MOB_SPAWNED)) {	\
+			set_mob_spawn_time((mob), time(0));	\
+		}									\
+	}										\
 } while (0)
 
 // combine removing these with saving
+// note: removing TIED will always reset spawn time and schedule the despawn here
 #define remove_mob_flags(mob, to_set)  do { \
-	REMOVE_BIT(MOB_FLAGS(mob), (to_set));	\
-	request_char_save_in_world(mob);	\
+	if (IS_NPC(mob)) {						\
+		REMOVE_BIT(MOB_FLAGS(mob), (to_set));	\
+		check_scheduled_events_mob(mob);	\
+		request_char_save_in_world(mob);	\
+		if (IS_SET((to_set), MOB_TIED)) {	\
+			set_mob_spawn_time((mob), time(0));	\
+		}									\
+	}										\
 } while (0)
 
 

@@ -43,7 +43,7 @@ ACMD(do_slash_channel);
 // local prototypes
 char_data *find_minipet(char_data *ch);
 
-// configs for mini-pets
+// configs for minipets
 // TODO this seemsl ike it should move to structs.h / utils.h
 #define IS_MINIPET_OF(mob, ch)  (!EXTRACTED(mob) && IS_NPC(mob) && GET_LEADER(mob) == (ch) && !GET_COMPANION(mob) && (MOB_FLAGS(mob) & default_minipet_flags) == default_minipet_flags && (AFF_FLAGS(mob) & default_minipet_affs) == default_minipet_affs)
 bitvector_t default_minipet_flags = MOB_SENTINEL | MOB_SPAWNED | MOB_NO_LOOT | MOB_NO_EXPERIENCE;
@@ -131,7 +131,9 @@ void adventure_summon(char_data *ch, char *argument) {
 * @param char_data *ch The person to return back where they came from.
 */
 void adventure_unsummon(char_data *ch) {
-	room_data *room, *map;
+	room_data *room, *map, *was_in;
+	struct follow_type *fol, *next_fol;
+	bool reloc = FALSE;
 	
 	// safety first
 	if (!ch || IS_NPC(ch) || !PLR_FLAGGED(ch, PLR_ADVENTURE_SUMMONED)) {
@@ -140,10 +142,14 @@ void adventure_unsummon(char_data *ch) {
 	
 	REMOVE_BIT(PLR_FLAGS(ch), PLR_ADVENTURE_SUMMONED);
 	
+	was_in = IN_ROOM(ch);
 	room = real_room(GET_ADVENTURE_SUMMON_RETURN_LOCATION(ch));
 	map = real_room(GET_ADVENTURE_SUMMON_RETURN_MAP(ch));
 	
 	act("$n vanishes in a wisp of smoke!", TRUE, ch, NULL, NULL, TO_ROOM);
+	
+	/*
+	*/
 	
 	if (room && map && GET_ROOM_VNUM(map) == (GET_MAP_LOC(room) ? GET_MAP_LOC(room)->vnum : NOTHING)) {
 		char_to_room(ch, room);
@@ -151,16 +157,47 @@ void adventure_unsummon(char_data *ch) {
 	else {
 		// nowhere safe to send back to
 		char_to_room(ch, find_load_room(ch));
+		reloc = TRUE;
 	}
 	
 	act("$n appears in a burst of smoke!", TRUE, ch, NULL, NULL, TO_ROOM);
 	GET_LAST_DIR(ch) = NO_DIR;
 	qt_visit_room(ch, IN_ROOM(ch));
-	
+	pre_greet_mtrigger(ch, IN_ROOM(ch), NO_DIR, "summon");	// cannot pre-greet for summon
+
 	look_at_room(ch);
-	msg_to_char(ch, "\r\nYou have been returned to your original location after leaving the adventure.\r\n");
+	if (reloc) {
+		msg_to_char(ch, "\r\nYour original location could not be located. You have been returned to a safe location after leaving the adventure.\r\n");
+	}
+	else {
+		msg_to_char(ch, "\r\nYou have been returned to your original location after leaving the adventure.\r\n");
+	}
+	
+	enter_wtrigger(IN_ROOM(ch), ch, NO_DIR, "summon");
+	entry_memory_mtrigger(ch);
+	greet_mtrigger(ch, NO_DIR, "summon");
+	greet_memory_mtrigger(ch);
+	greet_vtrigger(ch, NO_DIR, "summon");
 	
 	msdp_update_room(ch);
+	
+	// followers?
+	LL_FOREACH_SAFE(ch->followers, fol, next_fol) {
+		if (IS_NPC(fol->follower) && AFF_FLAGGED(fol->follower, AFF_CHARM) && IN_ROOM(fol->follower) == was_in && !FIGHTING(fol->follower)) {
+			act("$n vanishes in a wisp of smoke!", TRUE, fol->follower, NULL, NULL, TO_ROOM);
+			char_to_room(fol->follower, IN_ROOM(ch));
+			GET_LAST_DIR(fol->follower) = NO_DIR;
+			pre_greet_mtrigger(fol->follower, IN_ROOM(fol->follower), NO_DIR, "summon");	// cannot pre-greet for summon
+			look_at_room(fol->follower);
+			act("$n appears in a burst of smoke!", TRUE, fol->follower, NULL, NULL, TO_ROOM);
+			
+			enter_wtrigger(IN_ROOM(fol->follower), fol->follower, NO_DIR, "summon");
+			entry_memory_mtrigger(fol->follower);
+			greet_mtrigger(fol->follower, NO_DIR, "summon");
+			greet_memory_mtrigger(fol->follower);
+			greet_vtrigger(fol->follower, NO_DIR, "summon");
+		}
+	}
 }
 
 
@@ -180,7 +217,7 @@ void cancel_adventure_summon(char_data *ch) {
 
 
 /**
-* Dismisses all mini-pets controlled by the character, if any.
+* Dismisses all minipets controlled by the character, if any.
 *
 * @param char_data *ch The player whose pet(s) to purge.
 * @return bool TRUE if it dismissed a minipet, FALSE if not.
@@ -239,7 +276,9 @@ void do_customize_road(char_data *ch, char *argument) {
 			msg_to_char(ch, "What would you like to name this road (or \"none\")?\r\n");
 		}
 		else if (!str_cmp(arg2, "none")) {
+			REMOVE_BIT(ROOM_BASE_FLAGS(IN_ROOM(ch)), ROOM_AFF_HIDE_REAL_NAME);
 			set_room_custom_name(IN_ROOM(ch), NULL);
+			affect_total_room(IN_ROOM(ch));
 			msg_to_char(ch, "This road no longer has a custom name.\r\n");
 			command_lag(ch, WAIT_ABILITY);
 		}
@@ -253,7 +292,7 @@ void do_customize_road(char_data *ch, char *argument) {
 			// looks good, but check that it has a required word
 			found = FALSE;
 			for (iter = 0; *required_words[iter] != '\n' && !found; ++iter) {
-				if ((ptr = str_str(arg2, required_words[iter])) && ptr > arg2 && *(ptr-1) == ' ') {
+				if ((ptr = str_str(arg2, required_words[iter])) && ptr >= arg2 && (ptr == arg2 || *(ptr-1) == ' ')) {
 					// found it at the start of a word
 					found = TRUE;
 				}
@@ -263,7 +302,9 @@ void do_customize_road(char_data *ch, char *argument) {
 				return;
 			}
 			
+			SET_BIT(ROOM_BASE_FLAGS(IN_ROOM(ch)), ROOM_AFF_HIDE_REAL_NAME);
 			set_room_custom_name(IN_ROOM(ch), arg2);
+			affect_total_room(IN_ROOM(ch));
 			msg_to_char(ch, "This road tile is now called \"%s\".\r\n", arg2);
 			command_lag(ch, WAIT_ABILITY);
 		}
@@ -279,37 +320,90 @@ void do_customize_road(char_data *ch, char *argument) {
 *
 * @param char_data *ch The douser.
 * @param obj_data *obj The object to douse.
-* @param obj_data *cont The liquid container full of water.
+* @param obj_data *cont Optional: The liquid container full of water (may be NULL).
 */
 void do_douse_obj(char_data *ch, obj_data *obj, obj_data *cont) {
-	if (!OBJ_FLAGGED(obj, OBJ_LIGHT)) {
+	if (!IS_LIGHT(obj)) {
 		msg_to_char(ch, "You can't douse that -- it's not a light or fire.\r\n");
 	}
-	else if (GET_OBJ_TIMER(obj) == UNLIMITED) {
+	else if (!LIGHT_IS_LIT(obj)) {
+		act("$p isn't even lit!", FALSE, ch, obj, NULL, TO_CHAR);
+	}
+	else if (!LIGHT_FLAGGED(obj, LIGHT_FLAG_CAN_DOUSE)) {
 		act("You can't seem to douse $p.", FALSE, ch, obj, NULL, TO_CHAR);
 	}
-	else if (IN_ROOM(obj) && !can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED)) {
+	else if (IN_ROOM(obj) && !can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED) && (IS_NPC(ch) || LAST_OWNER_ID(obj) != GET_IDNUM(ch))) {
 		msg_to_char(ch, "You can't douse anything here.\r\n");
 	}
 	else {
-		set_obj_val(cont, VAL_DRINK_CONTAINER_CONTENTS, 0);
+		if (cont) {
+			act("You douse $p with $P.", FALSE, ch, obj, cont, TO_CHAR);
+			act("$n douses $p with $P.", FALSE, ch, obj, cont, TO_ROOM);
+			
+			// use the water
+			set_obj_val(cont, VAL_DRINK_CONTAINER_CONTENTS, 0);
+		}
+		else {
+			// no container
+			act("You douse $p.", FALSE, ch, obj, NULL, TO_CHAR);
+			act("$n douses $p.", FALSE, ch, obj, NULL, TO_ROOM);
+		}
 		
-		act("You douse $p with $P.", FALSE, ch, obj, cont, TO_CHAR);
-		act("$n douses $p with $P.", FALSE, ch, obj, cont, TO_ROOM);
-		
-		// run the timer trigger, same as if it timed out
-		if (timer_otrigger(obj)) {
-			extract_obj(obj);	// unless prevented by the trigger
+		// douse it -- this may extract the item
+		if (douse_light(obj) == FALSE) {
+			msg_to_char(ch, "It's used up and you throw it away.\r\n");
 		}
 	}
 }
 
 
 /**
-* Finds a mini-pet belonging to the character, if any.
+* Performs a douse on a room, with an optional water source pre-validated.
+*
+* @param char_data *ch The douser.
+* @param room_data *room The room to douse.
+* @param obj_data *cont Optional: The liquid container full of water (may be NULL).
+*/
+void do_douse_room(char_data *ch, room_data *room, obj_data *cont) {
+	int amount = 0;
+	
+	// ensure this
+	room = HOME_ROOM(room);
+	
+	if (cont && IS_DRINK_CONTAINER(cont)) {
+		amount = GET_DRINK_CONTAINER_CONTENTS(cont);
+		set_obj_val(cont, VAL_DRINK_CONTAINER_CONTENTS, 0);
+		set_obj_val(cont, VAL_DRINK_CONTAINER_TYPE, 0);
+		
+		act("You throw some water from $p onto the flames!", FALSE, ch, cont, NULL, TO_CHAR);
+		act("$n throws some water from $p onto the flames!", FALSE, ch, cont, NULL, TO_ROOM);
+	}
+	else {
+		// water from room/immortal
+		amount = config_get_int("fire_extinguish_value") / 4;
+		amount = MAX(amount, 1);
+		act("You throw some water onto the flames!", FALSE, ch, NULL, NULL, TO_CHAR);
+		act("$n throws some water onto the flames!", FALSE, ch, NULL, NULL, TO_ROOM);
+	}
+	
+	// and remove the fire...
+	add_to_room_extra_data(room, ROOM_EXTRA_FIRE_REMAINING, -amount);
+
+	if (get_room_extra_data(room, ROOM_EXTRA_FIRE_REMAINING) <= 0) {
+		act("The flames have been extinguished!", FALSE, ch, NULL, NULL, TO_CHAR | TO_ROOM);
+		if (room != IN_ROOM(ch) && ROOM_PEOPLE(room)) {
+			act("The flames have been extinguished!", FALSE, ROOM_PEOPLE(room), NULL, NULL, TO_CHAR | TO_ROOM);
+		}
+		stop_burning(room);
+	}
+}
+
+
+/**
+* Finds a minipet belonging to the character, if any.
 *
 * @param char_data *ch The player whose pet to look for.
-* @return char_data* The found mini-pet, if any.
+* @return char_data* The found minipet, if any.
 */
 char_data *find_minipet(char_data *ch) {
 	char_data *chiter, *found = NULL;
@@ -418,7 +512,7 @@ void perform_alternate(char_data *old, char_data *new) {
 	old_emp = GET_LOYALTY(old);
 	
 	// prepare logs
-	snprintf(sys, sizeof(sys), "%s used alternate to switch to %s at %s.", GET_NAME(old), GET_NAME(new), IN_ROOM(old) ? room_log_identifier(IN_ROOM(old)) : "an unknown location");
+	snprintf(sys, sizeof(sys), "%s used alternate at %s to switch to %s", GET_NAME(old), (IN_ROOM(old) ? room_log_identifier(IN_ROOM(old)) : "an unknown location"), GET_NAME(new));
 
 	strcpy(temp, PERS(new, new, TRUE));
 	snprintf(mort_alt, sizeof(mort_alt), "%s has switched to %s", PERS(old, old, TRUE), temp);
@@ -455,7 +549,6 @@ void perform_alternate(char_data *old, char_data *new) {
 	extract_all_items(old);
 	extract_char(old);
 	
-	syslog(SYS_LOGIN, invis_lev, TRUE, "%s", sys);
 	if (config_get_bool("public_logins")) {
 		if (GET_INVIS_LEV(new) == 0 && !PLR_FLAGGED(new, PLR_INVSTART)) {
 			mortlog("%s", mort_alt);
@@ -496,6 +589,10 @@ void perform_alternate(char_data *old, char_data *new) {
 			show_start = TRUE;
 		}
 	}
+	
+	// log late so we have a location
+	sprintf(sys + strlen(sys), " at %s.", room_log_identifier(IN_ROOM(new)));
+	syslog(SYS_LOGIN, invis_lev, TRUE, "%s", sys);
 	
 	if (AFF_FLAGGED(new, AFF_EARTHMELD)) {
 		msg_to_char(new, "You are earthmelded.\r\n");
@@ -543,7 +640,7 @@ void perform_herd(char_data *ch, char_data *mob, room_data *to_room, int dir, ve
 	}
 	
 	// validation
-	else if (ROOM_SECT_FLAGGED(to_room, SECTF_FRESH_WATER | SECTF_OCEAN) && !MOB_FLAGGED(mob, MOB_AQUATIC)) {
+	else if (ROOM_SECT_FLAGGED(to_room, SECTF_FRESH_WATER | SECTF_OCEAN) && !MOB_FLAGGED(mob, MOB_AQUATIC) && !HAS_WATERWALK(mob)) {
 		msg_to_char(ch, "You can't herd it into the water.\r\n");
 	}
 	else if (ROOM_BLD_FLAGGED(to_room, BLD_BARRIER)) {
@@ -557,6 +654,11 @@ void perform_herd(char_data *ch, char_data *mob, room_data *to_room, int dir, ve
 	else {
 		was_in = IN_ROOM(ch);
 		out = (dir == NO_DIR && !into_veh);
+		
+		// update spawn time: delay despawn due to interaction
+		if (MOB_FLAGGED(mob, MOB_SPAWNED)) {
+			set_mob_spawn_time(mob, time(0));
+		}
 		
 		if (perform_move(mob, dir, to_room, MOVE_HERD | (out ? MOVE_EXIT : (into_veh ? (MOVE_ENTER_VEH | MOVE_NO_COST) : NOBITS)))) {
 			if (into_veh) {
@@ -637,6 +739,7 @@ bool perform_summon(char_data *ch, ability_data *abil, any_vnum vnum, bool check
 	if (!skill_check(ch, ABIL_VNUM(abil), ABIL_DIFFICULTY(abil))) {
 		if (checks) {
 			ability_fail_message(ch, NULL, abil);
+			gain_ability_exp(ch, ABIL_VNUM(abil), 15);
 		}
 		return FALSE;
 	}
@@ -867,21 +970,24 @@ void summon_player(char_data *ch, char *argument) {
 	}
 	else {
 		// mostly-valid by now... just a little bit more to check
-		found = FALSE;
-		DL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), ch_iter, next_in_room) {
-			if (IS_DEAD(ch_iter) || !ch_iter->desc) {
-				continue;
-			}
+		// requires a 2nd group member present IF the target is from a different empire
+		if (GET_LOYALTY(vict) != GET_LOYALTY(ch) || !GET_LOYALTY(ch)) {
+			found = FALSE;
+			DL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), ch_iter, next_in_room) {
+				if (IS_DEAD(ch_iter) || !ch_iter->desc) {
+					continue;
+				}
 			
-			if (ch_iter != ch && GROUP(ch_iter) == GROUP(ch)) {
-				found = TRUE;
-				break;
+				if (ch_iter != ch && GROUP(ch_iter) == GROUP(ch)) {
+					found = TRUE;
+					break;
+				}
 			}
-		}
 		
-		if (!found) {
-			msg_to_char(ch, "You need a second group member present to help summon.\r\n");
-			return;
+			if (!found) {
+				msg_to_char(ch, "You need a second group member present to help summon.\r\n");
+				return;
+			}
 		}
 		
 		act("You start summoning $N...", FALSE, ch, NULL, vict, TO_CHAR);
@@ -1019,7 +1125,8 @@ OFFER_VALIDATE(oval_summon) {
 }
 
 OFFER_FINISH(ofin_summon) {
-	room_data *loc = real_room(offer->location);
+	room_data *loc = real_room(offer->location), *was_in;
+	struct follow_type *fol, *next_fol;
 	struct instance_data *inst;
 	int type = offer->data;
 	struct map_data *map;
@@ -1038,19 +1145,40 @@ OFFER_FINISH(ofin_summon) {
 		}
 	}
 	
+	was_in = IN_ROOM(ch);
+	
 	act("$n vanishes in a swirl of light!", TRUE, ch, NULL, NULL, TO_ROOM);
 	char_to_room(ch, loc);
 	GET_LAST_DIR(ch) = NO_DIR;
 	qt_visit_room(ch, IN_ROOM(ch));
+	pre_greet_mtrigger(ch, IN_ROOM(ch), NO_DIR, "summon");	// cannot pre-greet for summon
 	look_at_room(ch);
 	act("$n appears in a swirl of light!", TRUE, ch, NULL, NULL, TO_ROOM);
 	
-	enter_wtrigger(IN_ROOM(ch), ch, NO_DIR);
+	enter_wtrigger(IN_ROOM(ch), ch, NO_DIR, "summon");
 	entry_memory_mtrigger(ch);
-	greet_mtrigger(ch, NO_DIR);
+	greet_mtrigger(ch, NO_DIR, "summon");
 	greet_memory_mtrigger(ch);
-	greet_vtrigger(ch, NO_DIR);
+	greet_vtrigger(ch, NO_DIR, "summon");
 	msdp_update_room(ch);	// once we're sure we're staying
+	
+	// followers?
+	LL_FOREACH_SAFE(ch->followers, fol, next_fol) {
+		if (IS_NPC(fol->follower) && AFF_FLAGGED(fol->follower, AFF_CHARM) && IN_ROOM(fol->follower) == was_in && !FIGHTING(fol->follower)) {
+			act("$n vanishes in a swirl of light!", TRUE, fol->follower, NULL, NULL, TO_ROOM);
+			char_to_room(fol->follower, IN_ROOM(ch));
+			GET_LAST_DIR(fol->follower) = NO_DIR;
+			pre_greet_mtrigger(fol->follower, IN_ROOM(fol->follower), NO_DIR, "summon");	// cannot pre-greet for summon
+			look_at_room(fol->follower);
+			act("$n appears in a swirl of light!", TRUE, fol->follower, NULL, NULL, TO_ROOM);
+			
+			enter_wtrigger(IN_ROOM(fol->follower), fol->follower, NO_DIR, "summon");
+			entry_memory_mtrigger(fol->follower);
+			greet_mtrigger(fol->follower, NO_DIR, "summon");
+			greet_memory_mtrigger(fol->follower);
+			greet_vtrigger(fol->follower, NO_DIR, "summon");
+		}
+	}
 	
 	return TRUE;
 }
@@ -1193,12 +1321,12 @@ void alt_import_preferences(char_data *ch, char_data *alt) {
 	// prf flags to import
 	bitvector_t prfs = PRF_COMPACT | PRF_DEAF | PRF_NOTELL | PRF_MORTLOG | 
 					PRF_NOREPEAT | PRF_NOMAPCOL | PRF_NO_CHANNEL_JOINS | 
-					PRF_SCROLLING | PRF_BRIEF | PRF_AUTORECALL | PRF_NOSPAM | 
+					PRF_SCROLLING | PRF_NO_ROOM_DESCS | PRF_AUTORECALL | PRF_NOSPAM | 
 					PRF_SCREEN_READER | PRF_AUTOKILL | PRF_AUTODISMOUNT | 
 					PRF_NOEMPIRE | PRF_CLEARMETERS | PRF_NO_PAINT | 
 					PRF_EXTRA_SPACING | PRF_TRAVEL_LOOK | PRF_AUTOCLIMB | 
 					PRF_AUTOSWIM | PRF_ITEM_QUALITY | PRF_ITEM_DETAILS | 
-					PRF_NO_EXITS;
+					PRF_NO_EXITS | PRF_SHORT_EXITS;
 	
 	// add flags
 	set = PRF_FLAGS(alt) & prfs;
@@ -2119,7 +2247,7 @@ ACMD(do_dismiss) {
 	else if (!strn_cmp(arg, "mini", 4) && (is_abbrev(arg, "minipet") || is_abbrev(arg, "mini-pet"))) {
 		// requires abbrev of at least "famil"
 		if (!dismiss_any_minipet(ch)) {
-			msg_to_char(ch, "You do not have a mini-pet to dismiss.\r\n");
+			msg_to_char(ch, "You do not have a minipet to dismiss.\r\n");
 		}
 		else {
 			send_config_msg(ch, "ok_string");
@@ -2129,7 +2257,7 @@ ACMD(do_dismiss) {
 		send_config_msg(ch, "no_person");
 	}
 	else if (!IS_NPC(vict) || GET_LEADER(vict) != ch || (!GET_COMPANION(vict) && !IS_MINIPET_OF(vict, ch))) {
-		msg_to_char(ch, "You can only dismiss a companion or mini-pet.\r\n");
+		msg_to_char(ch, "You can only dismiss a companion or minipet.\r\n");
 	}
 	else if (FIGHTING(vict) || GET_POS(vict) < POS_SLEEPING) {
 		act("You can't dismiss $M right now.", FALSE, ch, NULL, vict, TO_CHAR);
@@ -2146,30 +2274,34 @@ ACMD(do_douse) {
 	obj_data *obj = NULL, *found_obj = NULL, *iter;
 	char arg[MAX_INPUT_LENGTH];
 	vehicle_data *veh;
-	int amount;
+	bool use_room;
 	
-	// this loop finds a water container and sets obj
-	DL_FOREACH2(ch->carrying, iter, next_content) {
-		if (GET_DRINK_CONTAINER_TYPE(iter) == LIQ_WATER && GET_DRINK_CONTAINER_CONTENTS(iter) > 0) {
-			obj = iter;
-			break;
+	// prefer a room source
+	use_room = (IS_IMMORTAL(ch) || WATER_SECT(IN_ROOM(ch)) || ROOM_SECT_FLAGGED(IN_ROOM(ch), SECTF_DRINK) || room_has_function_and_city_ok(GET_LOYALTY(ch), IN_ROOM(ch), FNC_DRINK_WATER));
+	
+	if (!use_room) {
+		// this loop finds a water container and sets obj
+		DL_FOREACH2(ch->carrying, iter, next_content) {
+			if (GET_DRINK_CONTAINER_TYPE(iter) == LIQ_WATER && GET_DRINK_CONTAINER_CONTENTS(iter) > 0) {
+				obj = iter;
+				break;
+			}
 		}
 	}
 	
 	one_argument(argument, arg);
 	
-	if (!IN_ROOM(ch))
-		msg_to_char(ch, "Unexpected error in douse.\r\n");
-	else if (!obj)
+	if (!obj && !use_room) {
 		msg_to_char(ch, "You have nothing to douse the fire with!\r\n");
-	else if (*arg) {
+	}
+	else if (*arg && str_cmp(arg, "fire")) {
 		if ((veh = get_vehicle_in_room_vis(ch, arg, NULL))) {
 			do_douse_vehicle(ch, veh, obj);
 		}
 		else if (GET_ROOM_VEHICLE(IN_ROOM(ch)) && isname(arg, VEH_KEYWORDS(GET_ROOM_VEHICLE(IN_ROOM(ch))))) {
 			do_douse_vehicle(ch, GET_ROOM_VEHICLE(IN_ROOM(ch)), obj);
 		}
-		else if (generic_find(arg, NULL, FIND_OBJ_INV | FIND_OBJ_ROOM, ch, NULL, &found_obj, NULL)) {
+		else if (generic_find(arg, NULL, FIND_OBJ_INV | FIND_OBJ_ROOM | FIND_OBJ_EQUIP, ch, NULL, &found_obj, NULL)) {
 			do_douse_obj(ch, found_obj, obj);
 		}
 		else {
@@ -2179,20 +2311,11 @@ ACMD(do_douse) {
 	else if (GET_ROOM_VEHICLE(IN_ROOM(ch)) && VEH_FLAGGED(GET_ROOM_VEHICLE(IN_ROOM(ch)), VEH_ON_FIRE)) {
 		do_douse_vehicle(ch, GET_ROOM_VEHICLE(IN_ROOM(ch)), obj);
 	}
-	else if (!IS_ANY_BUILDING(IN_ROOM(ch)) || !IS_BURNING(room))
+	else if (!IS_ANY_BUILDING(IN_ROOM(ch)) || !IS_BURNING(room)) {
 		msg_to_char(ch, "There's no fire here!\r\n");
+	}
 	else {
-		amount = GET_DRINK_CONTAINER_CONTENTS(obj);
-		set_obj_val(obj, VAL_DRINK_CONTAINER_CONTENTS, 0);
-		
-		add_to_room_extra_data(room, ROOM_EXTRA_FIRE_REMAINING, -amount);
-		act("You throw some water from $p onto the flames!", FALSE, ch, obj, 0, TO_CHAR);
-		act("$n throws some water from $p onto the flames!", FALSE, ch, obj, 0, TO_ROOM);
-
-		if (get_room_extra_data(room, ROOM_EXTRA_FIRE_REMAINING) <= 0) {
-			act("The flames have been extinguished!", FALSE, ch, 0, 0, TO_CHAR | TO_ROOM);
-			stop_burning(room);
-		}
+		do_douse_room(ch, room, obj);
 	}
 }
 
@@ -2517,7 +2640,7 @@ ACMD(do_group) {
 		send_to_group(NULL, GROUP(ch), "%s is now group leader.", GET_NAME(vict));
 		send_config_msg(ch, "ok_string");
 	}
-	else if (is_abbrev(buf, "option")) {
+	else if (is_abbrev(buf, "options")) {
 		skip_spaces(&argument);
 		if (!GROUP(ch)) {
 			msg_to_char(ch, "But you aren't part of a group!\r\n");
@@ -2834,7 +2957,7 @@ ACMD(do_milk) {
 	else if (get_cooldown_time(mob, COOLDOWN_MILK) > 0)
 		act("$E can't be milked again for a while.", FALSE, ch, 0, mob, TO_CHAR);
 	else if (!(cont = get_obj_in_list_vis(ch, buf, NULL, ch->carrying)))
-		msg_to_char(ch, "You don't seem to have a %s.\r\n", buf);
+		msg_to_char(ch, "You don't seem to have %s %s.\r\n", AN(buf), buf);
 	else if (GET_OBJ_TYPE(cont) != ITEM_DRINKCON)
 		act("You can't milk $N into $p!", FALSE, ch, cont, mob, TO_CHAR);
 	else if (GET_DRINK_CONTAINER_CONTENTS(cont) > 0 && GET_DRINK_CONTAINER_TYPE(cont) != LIQ_MILK)
@@ -2849,6 +2972,7 @@ ACMD(do_milk) {
 		set_obj_val(cont, VAL_DRINK_CONTAINER_CONTENTS, GET_DRINK_CONTAINER_CONTENTS(cont) + amount);
 		set_obj_val(cont, VAL_DRINK_CONTAINER_TYPE, LIQ_MILK);
 		GET_OBJ_TIMER(cont) = 72;	// mud hours
+		schedule_obj_timer_update(cont, FALSE);
 		gain_player_tech_exp(ch, PTECH_MILK, 33);
 		request_obj_save_in_world(cont);
 	}
@@ -2860,12 +2984,12 @@ ACMD(do_minipets) {
 	struct minipet_data *mini, *next_mini;
 	char_data *mob, *to_summon;
 	size_t size;
-	int count;
+	int count, number;
 	
 	skip_spaces(&argument);
 	
 	if (IS_NPC(ch)) {
-		msg_to_char(ch, "Mobs don't get mini-pets.\r\n");
+		msg_to_char(ch, "Mobs don't get minipets.\r\n");
 		return;
 	}
 	if (!ch->desc) {
@@ -2873,7 +2997,7 @@ ACMD(do_minipets) {
 	}
 	
 	if (!*argument) {	// just list minipets
-		size = snprintf(output, sizeof(output), "Mini-pets in your collection:\r\n");
+		size = snprintf(output, sizeof(output), "Minipets in your collection:\r\n");
 		count = 0;
 	
 		HASH_ITER(hh, GET_MINIPETS(ch), mini, next_mini) {
@@ -2925,14 +3049,16 @@ ACMD(do_minipets) {
 	}
 	else if (is_abbrev(argument, "dismiss")) {
 		if (!(mob = find_minipet(ch))) {
-			msg_to_char(ch, "You don't seem to have a mini-pet to dismiss.\r\n");
+			msg_to_char(ch, "You don't seem to have a minipet to dismiss.\r\n");
 		}
 		else {
-			msg_to_char(ch, "You dismiss your mini-pet.\r\n");
+			msg_to_char(ch, "You dismiss your minipet.\r\n");
 			dismiss_any_minipet(ch);
 		}
 	}
 	else {
+		number = get_number(&argument);
+		
 		to_summon = NULL;	// to find
 		HASH_ITER(hh, GET_MINIPETS(ch), mini, next_mini) {
 			if (!(mob = mob_proto(mini->vnum))) {
@@ -2941,17 +3067,17 @@ ACMD(do_minipets) {
 			else if (!multi_isname(argument, GET_PC_NAME(mob))) {
 				continue;	// no match
 			}
-			else {
+			else if (--number == 0) {
 				to_summon = mob;
 				break;	// FOUND!
 			}
 		}
 		
 		if (!to_summon) {
-			msg_to_char(ch, "You don't have a mini-pet called '%s'.\r\n", argument);
+			msg_to_char(ch, "You don't have a minipet called '%s'.\r\n", argument);
 		}
 		else if ((mob = find_minipet(ch)) && GET_MOB_VNUM(mob) == GET_MOB_VNUM(to_summon)) {
-			msg_to_char(ch, "You already have that mini-pet out.\r\n");
+			msg_to_char(ch, "You already have that minipet out.\r\n");
 		}
 		else {
 			dismiss_any_minipet(ch);	// out with the old...
@@ -2987,13 +3113,15 @@ ACMD(do_morph) {
 	int count;
 	char *tmp;
 	
+	skip_spaces(&argument);
+	fast = (subcmd == SCMD_FASTMORPH || FIGHTING(ch) || GET_POS(ch) == POS_FIGHTING);
+	normal = (!str_cmp(argument, "normal") || !str_cmp(argument, "norm"));
+	
 	// safety first: mobs must use %morph%
-	if (IS_NPC(ch)) {
+	if (IS_NPC(ch) && (!fast || !normal)) {
 		msg_to_char(ch, "You can't morph.\r\n");
 		return;
 	}
-	
-	skip_spaces(&argument);
 	
 	if (!*argument) {
 		count = 1;	// counting 'normal'
@@ -3055,14 +3183,12 @@ ACMD(do_morph) {
 	
 	// initialize
 	morph = NULL;
-	fast = (subcmd == SCMD_FASTMORPH || FIGHTING(ch) || GET_POS(ch) == POS_FIGHTING);
-	normal = (!str_cmp(argument, "normal") | !str_cmp(argument, "norm"));
 	multiplier = fast ? 3.0 : 1.0;
 	
 	if (normal && !IS_MORPHED(ch)) {
 		msg_to_char(ch, "You aren't morphed.\r\n");
 	}
-	else if (GET_ACTION(ch) != ACT_NONE) {
+	else if (!IS_NPC(ch) && GET_ACTION(ch) != ACT_NONE) {
 		msg_to_char(ch, "You're too busy to morph now!\r\n");
 	}
 	else if (!normal && !(morph = find_morph_by_name(ch, argument))) {
@@ -3154,17 +3280,29 @@ ACMD(do_order) {
 	char name[MAX_INPUT_LENGTH], message[MAX_INPUT_LENGTH];
 	bool found = FALSE;
 	room_data *org_room;
-	char_data *vict;
+	char_data *vict = NULL;
 	struct follow_type *k;
 
 	half_chop(argument, name, message);
 
-	if (!*name || !*message)
-		send_to_char("Order who to do what?\r\n", ch);
-	else if (!(vict = get_char_vis(ch, name, NULL, FIND_CHAR_ROOM)) && !is_abbrev(name, "followers"))
+	if (!*name || !*message) {
+		send_to_char("Order whom to do what?\r\n", ch);
+	}
+	else if (!vict && is_abbrev(name, "companion") && !(vict = GET_COMPANION(ch))) {
+		msg_to_char(ch, "You don't have a companion to order.\r\n");
+	}
+	else if (!vict && !(vict = get_char_vis(ch, name, NULL, FIND_CHAR_ROOM)) && !is_abbrev(name, "followers")) {
 		send_to_char("That person isn't here.\r\n", ch);
-	else if (ch == vict)
-		send_to_char("You obviously suffer from schizophrenia.\r\n", ch);
+	}
+	else if (ch == vict) {
+		send_to_char("You can order yourself around all you want.\r\n", ch);
+	}
+	else if (vict && MOB_FLAGGED(vict, MOB_NO_COMMAND)) {
+		act("You can't command $M.", FALSE, ch, NULL, vict, TO_CHAR);
+	}
+	else if (vict && IN_ROOM(ch) != IN_ROOM(vict)) {
+		msg_to_char(ch, "You can't order someone who's not here.\r\n");
+	}
 	else {
 		if (AFF_FLAGGED(ch, AFF_CHARM)) {
 			send_to_char("Your superior would not approve of you giving orders.\r\n", ch);
@@ -3192,7 +3330,7 @@ ACMD(do_order) {
 
 			for (k = ch->followers; k; k = k->next) {
 				if (org_room == IN_ROOM(k->follower))
-					if (AFF_FLAGGED(k->follower, AFF_CHARM)) {
+					if (AFF_FLAGGED(k->follower, AFF_CHARM) && !MOB_FLAGGED(k->follower, MOB_NO_COMMAND)) {
 						found = TRUE;
 						SET_BIT(AFF_FLAGS(k->follower), AFF_ORDERED);
 						command_interpreter(k->follower, message);
@@ -3401,7 +3539,7 @@ ACMD(do_selfdelete) {
 	else {
 		
 		// logs and messaging
-		syslog(SYS_INFO, GET_INVIS_LEV(ch), TRUE, "DEL: %s (lev %d/%d) has self-deleted", GET_NAME(ch), GET_COMPUTED_LEVEL(ch), GET_ACCESS_LEVEL(ch));
+		syslog(SYS_LOGIN, GET_INVIS_LEV(ch), TRUE, "DEL: %s (lev %d/%d) has self-deleted [%s]", GET_NAME(ch), GET_COMPUTED_LEVEL(ch), GET_ACCESS_LEVEL(ch), ch->desc ? ch->desc->host : "no host");
 		if (!GET_INVIS_LEV(ch)) {
 			act("$n has left the game.", TRUE, ch, 0, 0, TO_ROOM);
 		}
@@ -3505,7 +3643,7 @@ ACMD(do_skin) {
 	}
 	else if (!IS_CORPSE(obj))
 		msg_to_char(ch, "You can only skin corpses.\r\n");
-	else if (GET_CORPSE_NPC_VNUM(obj) == NOTHING || !(proto = mob_proto(GET_CORPSE_NPC_VNUM(obj)))) {
+	else if (GET_CORPSE_NPC_VNUM(obj) == NOTHING || !(proto = mob_proto(GET_CORPSE_NPC_VNUM(obj))) || !has_interaction(proto->interactions, INTERACT_SKIN)) {
 		msg_to_char(ch, "You can't skin that.\r\n");
 	}
 	else if (!bind_ok(obj, ch)) {

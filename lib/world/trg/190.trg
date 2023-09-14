@@ -579,32 +579,28 @@ if !%arg%
   return 1
   halt
 end
-* TODO: Check nobody's in the adventure before changing difficulty
 set level 50
 set person %room.people%
 while %person%
-  if %person.level% > %level%
+  if %person.level% > %level% && %person.is_pc%
     set level %person.level%
   end
   set person %person.next_in_room%
 done
-if easy /= %arg%
-  %echo% Setting difficulty to Easy...
+if normal /= %arg%
+  %echo% Setting difficulty to Normal...
   set difficulty 1
-  if %level% > 100
-    set level 100
-  end
-elseif medium /= %arg%
-  %echo% Setting difficulty to Medium...
+elseif hard /= %arg%
+  %echo% Setting difficulty to Hard...
   set difficulty 2
-elseif difficult /= %arg%
-  %echo% Setting difficulty to Difficult...
+elseif group /= %arg%
+  %echo% Setting difficulty to Group...
   set difficulty 3
-  if %level% < 100
-    set level 100
-  end
+elseif boss /= %arg%
+  %echo% Setting difficulty to Boss...
+  set difficulty 4
 else
-  %send% %actor% That is not a valid difficulty level for this adventure.
+  %send% %actor% That is not a valid difficulty level for this adventure (Normal, Hard, Group, or Boss).
   halt
   return 1
 end
@@ -615,10 +611,7 @@ nop %instance.level(%level%)%
 set mob %room.people%
 remote difficulty %mob.id%
 set mob_diff %difficulty%
-if %mob.vnum% >= 10204 && %mob.vnum% <= 10205
-  eval mob_diff %mob_diff% + 1
-end
-dg_affect %mob% !ATTACK on 5
+dg_affect #10215 %mob% !ATTACK on 5
 nop %mob.remove_mob_flag(HARD)%
 nop %mob.remove_mob_flag(GROUP)%
 if %mob_diff% == 1
@@ -714,7 +707,7 @@ if !%heroic_mode%
 end
 %echoaround% %actor% ~%self% slips around behind ~%actor% and draws a wicked dagger...
 wait 5 sec
-if %self.disabled% || %actor.fighting% == %self% || !%actor.fighting% || %self.aff_flagged(DISARM)% || %self.aff_flagged(ENTANGLED)%
+if %self.disabled% || %actor.fighting% == %self% || !%actor.fighting% || %self.aff_flagged(DISARMED)% || %self.aff_flagged(IMMOBILIZED)%
   %echo% |%self% backstab is interrupted!
   halt
 else
@@ -960,6 +953,7 @@ while %person%
 done
 nop %self.set_cooldown(10200, 30)%
 %echo% ~%self% starts casting a spell...
+set actor_id %actor.id%
 wait 3 sec
 set heroic_mode %self.mob_flagged(GROUP)%
 set hard %self.mob_flagged(HARD)%
@@ -975,6 +969,9 @@ if %goblin% || !%heroic_mode% || !%hard%
       end
       set person %person.next_in_room%
     done
+  elseif %actor.id% != %actor_id%
+    * gone
+    halt
   else
     %send% %actor% &&r~%self% unleashes a bolt of uncontrolled magical energy, which strikes you!
     %echoaround% %actor% ~%self% unleashes a bolt of uncontrolled magical energy, which strikes ~%actor%!
@@ -986,6 +983,9 @@ if %goblin% || !%heroic_mode% || !%hard%
   if %goblin%
     dg_affect #10211 %goblin% HASTE on 30
   end
+elseif %actor.id% != %actor_id%
+  * gone
+  halt
 else
   eval vnum 10200 + %random.5% - 1
   %load% mob %vnum% ally %self.level%

@@ -60,8 +60,8 @@ M
 9195 5.00 c
 S
 #5603
-Forge~
-The Forge~
+Small Forge~
+A Small Forge~
 ~
 0 0 a c
 0 0 0 212
@@ -118,9 +118,9 @@ Kitchen~
 The Kitchen~
 ~
 0 0 aR m
-0 0 0 214
+0 0 0 -1
 C
-cook, retrieve, store~
+bake, cook, retrieve, store~
 D
    You are standing in the kitchen, a sweaty room where food is prepared and
 cooked. A large iron stove rests against the wall. It is the latest

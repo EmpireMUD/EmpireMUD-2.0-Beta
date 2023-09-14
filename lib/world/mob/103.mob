@@ -4,22 +4,27 @@ the flame dragon~
 A flame dragon is reducing the countryside to ash!
 ~
 100 150 dgxA c 6
-0 0 5 33
-I 0 3012 50.00 4  # BUTCHER: a fillet of raw meat
-I 0 3012 100.00 4  # BUTCHER: a fillet of raw meat
-I 1 10006 100.00 1  # SKIN: a dragon scale
-I 1 1351 50.00 2  # SKIN: a large skin
-I 1 1351 100.00 2  # SKIN: a large skin
-I 4 10300 4.00 1 a  # LOOT: the flame dragon's hoard
-I 4 10301 4.00 1 a  # LOOT: a dragon egg
-I 4 10312 4.00 1 a  # LOOT: the dragonscale leggings pattern
-I 4 10313 4.00 1 a  # LOOT: the dragonweave stockings pattern
-I 4 10314 4.00 1 a  # LOOT: the dragonplate breeches pattern
-I 4 10315 4.00 1 a  # LOOT: the dragonmail chaps pattern
-I 4 10304 19.00 1 a  # LOOT: the dragon's breath charm
-I 4 10305 19.00 1 a  # LOOT: the dragon's ferocity charm
-I 4 10306 19.00 1 a  # LOOT: the dragon's courage charm
-I 4 10307 19.00 1 a  # LOOT: the dragon's wind charm
+0 0 5 33 -1
+D
+   The size of a large house, this red-orange dragon seems to have a bone to
+pick with the countryside. Every snort, sniff, huff, and cough scorches the
+scenery beyond recognition.
+~
+I 0 3012 50.00 4  # BUTCHER: fillet of raw meat
+I 0 3012 100.00 4  # BUTCHER: fillet of raw meat
+I 1 10006 100.00 1  # SKIN: dragon scale
+I 1 1351 50.00 2  # SKIN: large skin
+I 1 1351 100.00 2  # SKIN: large skin
+I 4 10300 4.00 1 a  # LOOT: flame dragon's hoard
+I 4 10301 4.00 1 a  # LOOT: dragon egg
+I 4 10312 4.00 1 a  # LOOT: dragonscale leggings pattern
+I 4 10313 4.00 1 a  # LOOT: dragonweave stockings pattern
+I 4 10314 4.00 1 a  # LOOT: dragonplate breeches pattern
+I 4 10315 4.00 1 a  # LOOT: dragonmail chaps pattern
+I 4 10304 19.00 1 a  # LOOT: dragon's breath charm
+I 4 10305 19.00 1 a  # LOOT: dragon's ferocity charm
+I 4 10306 19.00 1 a  # LOOT: dragon's courage charm
+I 4 10307 19.00 1 a  # LOOT: dragon's wind charm
 M
 0
 $n spurts fire into the air.~
@@ -43,7 +48,11 @@ the dragon hatchling~
 A dragon hatchling is rolling about.
 ~
 1 1 bdoD mn 3
-0 0 2 9
+0 0 2 9 -1
+D
+   This little red-orange dragon rolls around in the air as it tries to control
+its tiny wings.
+~
 T 9901
 T 9902
 S
@@ -53,9 +62,12 @@ a fiery rabbit~
 A fiery rabbit is hopping about, leaving ashes.
 ~
 1 10 djo 0 1
-0 0 15 9
-I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
-I 1 1350 100.00 1  # SKIN: a small skin
+0 0 15 9 -1
+D
+The fiery fur flickers and flits off the back of the odd little flame bunny.
+~
+I 0 3012 100.00 1  # BUTCHER: fillet of raw meat
+I 1 1350 100.00 1  # SKIN: small skin
 S
 #10303
 imp flame little~
@@ -63,7 +75,10 @@ a flame imp~
 A little imp is jumping from flame to flame.
 ~
 1 15 doA G 2
-0 0 9 33
+0 0 9 33 -1
+D
+This little hellfiend is in paradise as the countryside burns.
+~
 S
 #10304
 phoenix scorched~
@@ -71,7 +86,12 @@ a scorched phoenix~
 A scorched phoenix soars low above you!
 ~
 100 125 dehjo mG 1
-0 0 2 12
+0 0 2 12 -1
+D
+   This magnificent bird might have been bright orange and yellow in life, but
+its recent death has left it badly scorched, and most of the bird is black.
+You might be able to ride it!
+~
 S
 #10305
 firefly giant~
@@ -79,7 +99,11 @@ a giant firefly~
 A giant firefly buzzes about.
 ~
 5 10 djo m 1
-0 0 2 12
+0 0 2 12 -1
+D
+   You have never seen a firefly so large and, having seen its face up close,
+are not interested in seeing one again.
+~
 S
 #10306
 salamander burning~
@@ -87,18 +111,24 @@ a burning salamander~
 A burning salamander crawls out from some rotting wood.
 ~
 10 20 djo 0 1
-0 0 9 12
-I 0 3012 50.00 1  # BUTCHER: a fillet of raw meat
-I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
-I 1 1350 100.00 1  # SKIN: a small skin
+0 0 9 12 -1
+D
+The salamander is ablaze but seems unconcerned as it crawls about.
+~
+I 0 3012 50.00 1  # BUTCHER: fillet of raw meat
+I 0 3012 100.00 1  # BUTCHER: fillet of raw meat
+I 1 1350 100.00 1  # SKIN: small skin
 S
 #10307
 flame flickering~
 a flickering flame~
 A flickering flame is burning the fields.
 ~
-30 50 dhoA G 0
-0 0 18 33
+30 50 dhoAK G 0
+0 0 18 33 -1
+D
+The flame is almost entrancing as it flickers from plant to plant.
+~
 S
 #10330
 wyvern wandering~
@@ -106,23 +136,28 @@ a wandering wyvern~
 A wyvern is flying lazily above you.
 ~
 125 175 dgxyA cm 6
-0 0 2 27
-I 0 3012 100.00 4  # BUTCHER: a fillet of raw meat
-I 1 1351 100.00 2  # SKIN: a large skin
-I 1 10006 100.00 1  # SKIN: a dragon scale
-I 4 10339 10.00 3  # LOOT: a basket of dragonfruit
-I 4 10334 8.00 1 a  # LOOT: a wyvern whistle
-I 4 10342 9.00 1 a  # LOOT: the dragonscale wristguard pattern
-I 4 10344 9.00 1 a  # LOOT: the dragonscale bangles pattern
-I 4 10346 9.00 1 a  # LOOT: the dragonscale bracers pattern
-I 4 10348 9.00 1 a  # LOOT: the dragonscale saddle pattern
-I 4 10349 8.00 1 a  # LOOT: an unlucky adventurer's gloves
-I 4 10350 8.00 1 a  # LOOT: an unlucky adventurer's earrings
-I 4 10351 8.00 1 a  # LOOT: an unlucky adventurer's cloak
-I 4 10352 8.00 1 a  # LOOT: an unlucky adventurer's spellbook
-I 4 10353 8.00 1 a  # LOOT: an unlucky adventurer's dagger
-I 4 10354 8.00 1 a  # LOOT: an unlucky adventurer's shield
-I 4 10355 8.00 1 a  # LOOT: an effigy of an unlucky adventurer
+0 0 2 27 -1
+D
+   Though it isn't the largest dragon on the landscape, this wyvern still cases
+a long shadow as it soars. It seems lost, or perhaps like it's looking for
+somewhere new to settle.
+~
+I 0 3012 100.00 4  # BUTCHER: fillet of raw meat
+I 1 1351 100.00 2  # SKIN: large skin
+I 1 10006 100.00 1  # SKIN: dragon scale
+I 4 10339 10.00 3  # LOOT: basket of dragonfruit
+I 4 10334 8.00 1 a  # LOOT: wyvern whistle
+I 4 10342 9.00 1 a  # LOOT: dragonscale wristguard pattern
+I 4 10344 9.00 1 a  # LOOT: dragonscale bangles pattern
+I 4 10346 9.00 1 a  # LOOT: dragonscale bracers pattern
+I 4 10348 9.00 1 a  # LOOT: dragonscale saddle pattern
+I 4 10349 8.00 1 a  # LOOT: unlucky adventurer's gloves
+I 4 10350 8.00 1 a  # LOOT: unlucky adventurer's earrings
+I 4 10351 8.00 1 a  # LOOT: unlucky adventurer's cloak
+I 4 10352 8.00 1 a  # LOOT: unlucky adventurer's spellbook
+I 4 10353 8.00 1 a  # LOOT: unlucky adventurer's dagger
+I 4 10354 8.00 1 a  # LOOT: unlucky adventurer's shield
+I 4 10355 8.00 1 a  # LOOT: effigy of an unlucky adventurer
 T 10330
 T 10334
 T 10303
@@ -134,24 +169,29 @@ dragon bull~
 a bull dragon~
 A bull dragon is stomping around.
 ~
-125 175 dgxyA cm 6
-1 0 2 27
-I 0 3012 100.00 4  # BUTCHER: a fillet of raw meat
-I 1 1351 100.00 2  # SKIN: a large skin
-I 1 10006 100.00 1  # SKIN: a dragon scale
-I 4 10339 10.00 3  # LOOT: a basket of dragonfruit
-I 4 10337 8.00 1 a  # LOOT: a dragon cowbell
-I 4 10342 9.00 1 a  # LOOT: the dragonscale wristguard pattern
-I 4 10344 9.00 1 a  # LOOT: the dragonscale bangles pattern
-I 4 10346 9.00 1 a  # LOOT: the dragonscale bracers pattern
-I 4 10348 9.00 1 a  # LOOT: the dragonscale saddle pattern
-I 4 10349 8.00 1 a  # LOOT: an unlucky adventurer's gloves
-I 4 10350 8.00 1 a  # LOOT: an unlucky adventurer's earrings
-I 4 10351 8.00 1 a  # LOOT: an unlucky adventurer's cloak
-I 4 10352 8.00 1 a  # LOOT: an unlucky adventurer's spellbook
-I 4 10353 8.00 1 a  # LOOT: an unlucky adventurer's dagger
-I 4 10354 8.00 1 a  # LOOT: an unlucky adventurer's shield
-I 4 10355 8.00 1 a  # LOOT: an effigy of an unlucky adventurer
+125 175 dgkxyA c 6
+1 0 9 27 -1
+D
+   Though it has wings, the bull dragon seems to spend more of its time on the
+ground as it roots through dirt and plants alike. It seems like it might be
+lost.
+~
+I 0 3012 100.00 4  # BUTCHER: fillet of raw meat
+I 1 1351 100.00 2  # SKIN: large skin
+I 1 10006 100.00 1  # SKIN: dragon scale
+I 4 10339 10.00 3  # LOOT: basket of dragonfruit
+I 4 10337 8.00 1 a  # LOOT: dragon cowbell
+I 4 10342 9.00 1 a  # LOOT: dragonscale wristguard pattern
+I 4 10344 9.00 1 a  # LOOT: dragonscale bangles pattern
+I 4 10346 9.00 1 a  # LOOT: dragonscale bracers pattern
+I 4 10348 9.00 1 a  # LOOT: dragonscale saddle pattern
+I 4 10349 8.00 1 a  # LOOT: unlucky adventurer's gloves
+I 4 10350 8.00 1 a  # LOOT: unlucky adventurer's earrings
+I 4 10351 8.00 1 a  # LOOT: unlucky adventurer's cloak
+I 4 10352 8.00 1 a  # LOOT: unlucky adventurer's spellbook
+I 4 10353 8.00 1 a  # LOOT: unlucky adventurer's dagger
+I 4 10354 8.00 1 a  # LOOT: unlucky adventurer's shield
+I 4 10355 8.00 1 a  # LOOT: effigy of an unlucky adventurer
 T 10330
 T 10303
 T 10334
@@ -164,23 +204,28 @@ a dragon guardian~
 A dragon guardian stands proudly before you.
 ~
 125 175 dgxyA cm 6
-0 0 2 27
-I 0 3012 100.00 4  # BUTCHER: a fillet of raw meat
-I 1 1351 100.00 2  # SKIN: a large skin
-I 1 10006 100.00 1  # SKIN: a dragon scale
-I 4 10339 10.00 3  # LOOT: a basket of dragonfruit
-I 4 10336 8.00 1 a  # LOOT: a dragonguard stone
-I 4 10342 9.00 1 a  # LOOT: the dragonscale wristguard pattern
-I 4 10344 9.00 1 a  # LOOT: the dragonscale bangles pattern
-I 4 10346 9.00 1 a  # LOOT: the dragonscale bracers pattern
-I 4 10348 9.00 1 a  # LOOT: the dragonscale saddle pattern
-I 4 10349 8.00 1 a  # LOOT: an unlucky adventurer's gloves
-I 4 10350 8.00 1 a  # LOOT: an unlucky adventurer's earrings
-I 4 10351 8.00 1 a  # LOOT: an unlucky adventurer's cloak
-I 4 10352 8.00 1 a  # LOOT: an unlucky adventurer's spellbook
-I 4 10353 8.00 1 a  # LOOT: an unlucky adventurer's dagger
-I 4 10354 8.00 1 a  # LOOT: an unlucky adventurer's shield
-I 4 10355 8.00 1 a  # LOOT: an effigy of an unlucky adventurer
+0 0 2 27 -1
+D
+   Unlike most dragons, the guardian stands on its hind legs with its front
+claws and tremendous teeth poised to attack. It looks a bit lost here, and that
+has made it all the more fearsome.
+~
+I 0 3012 100.00 4  # BUTCHER: fillet of raw meat
+I 1 1351 100.00 2  # SKIN: large skin
+I 1 10006 100.00 1  # SKIN: dragon scale
+I 4 10339 10.00 3  # LOOT: basket of dragonfruit
+I 4 10336 8.00 1 a  # LOOT: dragonguard stone
+I 4 10342 9.00 1 a  # LOOT: dragonscale wristguard pattern
+I 4 10344 9.00 1 a  # LOOT: dragonscale bangles pattern
+I 4 10346 9.00 1 a  # LOOT: dragonscale bracers pattern
+I 4 10348 9.00 1 a  # LOOT: dragonscale saddle pattern
+I 4 10349 8.00 1 a  # LOOT: unlucky adventurer's gloves
+I 4 10350 8.00 1 a  # LOOT: unlucky adventurer's earrings
+I 4 10351 8.00 1 a  # LOOT: unlucky adventurer's cloak
+I 4 10352 8.00 1 a  # LOOT: unlucky adventurer's spellbook
+I 4 10353 8.00 1 a  # LOOT: unlucky adventurer's dagger
+I 4 10354 8.00 1 a  # LOOT: unlucky adventurer's shield
+I 4 10355 8.00 1 a  # LOOT: effigy of an unlucky adventurer
 T 10330
 T 10303
 T 10334
@@ -193,23 +238,28 @@ an emerald dragon~
 An emerald dragon is flying above you.
 ~
 125 175 dgxyA cm 6
-0 0 2 27
-I 0 3012 100.00 4  # BUTCHER: a fillet of raw meat
-I 1 1351 100.00 2  # SKIN: a large skin
-I 1 10006 100.00 1  # SKIN: a dragon scale
-I 4 10339 10.00 3  # LOOT: a basket of dragonfruit
-I 4 10335 8.00 1 a  # LOOT: an emerald whistle
-I 4 10342 9.00 1 a  # LOOT: the dragonscale wristguard pattern
-I 4 10344 9.00 1 a  # LOOT: the dragonscale bangles pattern
-I 4 10346 9.00 1 a  # LOOT: the dragonscale bracers pattern
-I 4 10348 9.00 1 a  # LOOT: the dragonscale saddle pattern
-I 4 10349 8.00 1 a  # LOOT: an unlucky adventurer's gloves
-I 4 10350 8.00 1 a  # LOOT: an unlucky adventurer's earrings
-I 4 10351 8.00 1 a  # LOOT: an unlucky adventurer's cloak
-I 4 10352 8.00 1 a  # LOOT: an unlucky adventurer's spellbook
-I 4 10353 8.00 1 a  # LOOT: an unlucky adventurer's dagger
-I 4 10354 8.00 1 a  # LOOT: an unlucky adventurer's shield
-I 4 10355 8.00 1 a  # LOOT: an effigy of an unlucky adventurer
+0 0 2 27 -1
+D
+   This shimmering green dragon's translucent scales have all the luster of
+emeralds. It casts a brilliant green shadow as it flies across the sky, but it
+seems like it might be lost.
+~
+I 0 3012 100.00 4  # BUTCHER: fillet of raw meat
+I 1 1351 100.00 2  # SKIN: large skin
+I 1 10006 100.00 1  # SKIN: dragon scale
+I 4 10339 10.00 3  # LOOT: basket of dragonfruit
+I 4 10335 8.00 1 a  # LOOT: emerald whistle
+I 4 10342 9.00 1 a  # LOOT: dragonscale wristguard pattern
+I 4 10344 9.00 1 a  # LOOT: dragonscale bangles pattern
+I 4 10346 9.00 1 a  # LOOT: dragonscale bracers pattern
+I 4 10348 9.00 1 a  # LOOT: dragonscale saddle pattern
+I 4 10349 8.00 1 a  # LOOT: unlucky adventurer's gloves
+I 4 10350 8.00 1 a  # LOOT: unlucky adventurer's earrings
+I 4 10351 8.00 1 a  # LOOT: unlucky adventurer's cloak
+I 4 10352 8.00 1 a  # LOOT: unlucky adventurer's spellbook
+I 4 10353 8.00 1 a  # LOOT: unlucky adventurer's dagger
+I 4 10354 8.00 1 a  # LOOT: unlucky adventurer's shield
+I 4 10355 8.00 1 a  # LOOT: effigy of an unlucky adventurer
 T 10330
 T 10303
 T 10334
@@ -222,7 +272,12 @@ a baby wyvern~
 A baby wyvern flaps around awkwardly.
 ~
 1 1 bdoD mn 3
-0 0 2 9
+0 0 2 9 -1
+D
+   Though similar to a dragon, wyverns only have two wings and two hind legs.
+Some say this is how dragons originated, before mages started tinkering with
+them.
+~
 T 9901
 T 9902
 S
@@ -232,7 +287,11 @@ an emerald dragon~
 An emerald dragon has been saddled and looks ready to fly.
 ~
 100 125 bdej m 5
-0 0 2 33
+0 0 2 33 -1
+D
+   This shimmering green dragon's translucent scales have all the luster of
+emeralds.
+~
 S
 #10336
 dragonguard guard~
@@ -240,7 +299,11 @@ a dragonguard~
 A dragonguard is patrolling.
 ~
 125 175 bdtuAD c 4
-1 0 2 27
+1 0 2 27 -1
+D
+   As tall as an ogre and stronger than an ox, the dragonguard silently patrols
+the city, ever vigilant.
+~
 T 10338
 S
 #10337
@@ -249,11 +312,14 @@ a fire ox~
 A fire ox is looking for some scorched grass.
 ~
 100 125 dfjy 0 4
-2 0 0 12
-I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
-I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
-I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
-I 1 1351 100.00 1  # SKIN: a large skin
+2 0 0 12 -1
+D
+This stout ox seems to have caught fire. It doesn't look like it noticed.
+~
+I 0 3012 100.00 1  # BUTCHER: fillet of raw meat
+I 0 3012 100.00 1  # BUTCHER: fillet of raw meat
+I 0 3012 100.00 1  # BUTCHER: fillet of raw meat
+I 1 1351 100.00 1  # SKIN: large skin
 T 10337
 S
 $

@@ -319,7 +319,10 @@ OCMD(do_oregionecho) {
 		
 		if (center) {
 			DL_FOREACH(character_list, targ) {
-				if (NO_LOCATION(IN_ROOM(targ)) || compute_distance(center, IN_ROOM(targ)) > radius) {
+				if (!same_subzone(center, IN_ROOM(targ))) {
+					continue;
+				}
+				if (compute_distance(center, IN_ROOM(targ)) > radius) {
 					continue;
 				}
 				if (outdoor_only && !IS_OUTDOORS(targ)) {
@@ -329,6 +332,40 @@ OCMD(do_oregionecho) {
 				// send
 				sub_write(msg, targ, TRUE, TO_CHAR | (use_queue ? TO_QUEUE : 0));
 			}
+		}
+	}
+}
+
+
+OCMD(do_osubecho) {
+	char room_number[MAX_INPUT_LENGTH], *msg;
+	bool use_queue;
+	room_data *where, *orm = obj_room(obj);
+	char_data *targ;
+	
+	msg = any_one_word(argument, room_number);
+	use_queue = script_message_should_queue(&msg);
+
+	if (!*room_number || !*msg) {
+		obj_log(obj, "osubecho called with too few args");
+	}
+	else if (!(where = get_room(orm, room_number))) {
+		obj_log(obj, "osubecho called with invalid target");
+	}
+	else if (!ROOM_INSTANCE(where)) {
+		obj_log(obj, "osubecho called outside an adventure");
+	}
+	else {
+		DL_FOREACH(character_list, targ) {
+			if (ROOM_INSTANCE(where) != ROOM_INSTANCE(IN_ROOM(targ))) {
+				continue;	// wrong instance
+			}
+			if (!same_subzone(where, IN_ROOM(targ))) {
+				continue;	// wrong subzone
+			}
+			
+			// send
+			sub_write(msg, targ, TRUE, TO_CHAR | (use_queue ? TO_QUEUE : 0));
 		}
 	}
 }
@@ -472,10 +509,10 @@ OCMD(do_orestore) {
 			GET_POS(victim) = POS_STANDING;
 		}
 		affect_total(victim);
-		GET_HEALTH(victim) = GET_MAX_HEALTH(victim);
-		GET_MOVE(victim) = GET_MAX_MOVE(victim);
-		GET_MANA(victim) = GET_MAX_MANA(victim);
-		GET_BLOOD(victim) = GET_MAX_BLOOD(victim);
+		set_health(victim, GET_MAX_HEALTH(victim));
+		set_move(victim, GET_MAX_MOVE(victim));
+		set_mana(victim, GET_MAX_MANA(victim));
+		set_blood(victim, GET_MAX_BLOOD(victim));
 	}
 	if (otarg) {
 		// not sure what to do for objs
@@ -519,7 +556,7 @@ OCMD(do_osend) {
 
 	if ((ch = get_char_by_obj(obj, buf))) {
 		if (subcmd == SCMD_OSEND)
-			sub_write(msg, ch, TRUE, TO_CHAR | (use_queue ? TO_QUEUE : 0));
+			sub_write(msg, ch, TRUE, TO_CHAR | TO_SLEEP | (use_queue ? TO_QUEUE : 0));
 		else if (subcmd == SCMD_OECHOAROUND)
 			sub_write(msg, ch, TRUE, TO_ROOM | (use_queue ? TO_QUEUE : 0));
 	}
@@ -540,6 +577,7 @@ OCMD(do_otimer) {
 		obj_log(obj, "otimer: bad argument");
 	else {
 		GET_OBJ_TIMER(obj) = atoi(arg);
+		schedule_obj_timer_update(obj, FALSE);
 		request_obj_save_in_world(obj);
 	}
 }
@@ -924,6 +962,7 @@ OCMD(do_oslay) {
 	char_data *vict;
 	
 	argument = one_argument(argument, name);
+	skip_spaces(&argument);
 
 	if (!*name) {
 		obj_log(obj, "oslay: no target");
@@ -945,6 +984,19 @@ OCMD(do_oslay) {
 		msg_to_char(vict, "Being the cool immortal you are, you sidestep a trap, obviously placed to kill you.\r\n");
 	}
 	else {
+		// log
+		if (!IS_NPC(vict)) {
+			if (*argument) {
+				// custom death log?
+				log_to_slash_channel_by_name(DEATH_LOG_CHANNEL, vict, "%s", argument);
+			}
+			else {
+				// basic death log
+				log_to_slash_channel_by_name(DEATH_LOG_CHANNEL, vict, "%s has died at (%d, %d)!", PERS(vict, vict, TRUE), X_COORD(IN_ROOM(vict)), Y_COORD(IN_ROOM(vict)));
+			}
+			syslog(SYS_DEATH, 0, TRUE, "DEATH: %s has been killed by a script at %s (obj %d)", GET_NAME(vict), room_log_identifier(IN_ROOM(vict)), GET_OBJ_VNUM(obj));
+		}
+		
 		die(vict, vict);
 	}
 }
@@ -983,7 +1035,7 @@ OCMD(do_oteleport) {
 			char_from_room(ch);
 			char_to_room(ch, target);
 			GET_LAST_DIR(ch) = NO_DIR;
-			enter_wtrigger(IN_ROOM(ch), ch, NO_DIR);
+			enter_wtrigger(IN_ROOM(ch), ch, NO_DIR, "script");
 			qt_visit_room(ch, IN_ROOM(ch));
 			msdp_update_room(ch);
 		}
@@ -1008,7 +1060,7 @@ OCMD(do_oteleport) {
 						char_from_room(ch);
 						char_to_room(ch, target);
 						GET_LAST_DIR(ch) = NO_DIR;
-						enter_wtrigger(IN_ROOM(ch), ch, NO_DIR);
+						enter_wtrigger(IN_ROOM(ch), ch, NO_DIR, "script");
 						qt_visit_room(ch, IN_ROOM(ch));
 						msdp_update_room(ch);
 					}
@@ -1022,7 +1074,7 @@ OCMD(do_oteleport) {
 				char_from_room(ch);
 				char_to_room(ch, target);
 				GET_LAST_DIR(ch) = NO_DIR;
-				enter_wtrigger(IN_ROOM(ch), ch, NO_DIR);
+				enter_wtrigger(IN_ROOM(ch), ch, NO_DIR, "script");
 				qt_visit_room(ch, IN_ROOM(ch));
 				msdp_update_room(ch);
 			}
@@ -1030,7 +1082,7 @@ OCMD(do_oteleport) {
 		else if ((veh = get_vehicle_near_obj(obj, arg1))) {
 			vehicle_from_room(veh);
 			vehicle_to_room(veh, target);
-			entry_vtrigger(veh);
+			entry_vtrigger(veh, "script");
 		}
 		else if ((tobj = get_obj_by_obj(obj, arg1))) {
 			obj_to_room(tobj, target);
@@ -1273,7 +1325,7 @@ OCMD(do_oload) {
 			return;
 		}
 		cnt = get_obj_near_obj(obj, arg1);
-		if (cnt && GET_OBJ_TYPE(cnt) == ITEM_CONTAINER) {
+		if (cnt && (GET_OBJ_TYPE(cnt) == ITEM_CONTAINER || GET_OBJ_TYPE(cnt) == ITEM_CORPSE)) {
 			obj_to_obj(object, cnt);
 			load_otrigger(object);
 			return;
@@ -1412,7 +1464,7 @@ OCMD(do_odot) {
 	any_vnum atype = ATYPE_DG_AFFECT;
 	double modifier = 1.0;
 	char_data *ch;
-	int type, max_stacks;
+	int type, max_stacks, duration;
 
 	argument = one_argument(argument, name);
 	// sometimes name is an affect vnum
@@ -1444,6 +1496,10 @@ OCMD(do_odot) {
 		obj_log(obj, "odot: target not found");        
 		return;
 	}
+	if ((duration = atoi(durarg)) < 1) {
+		obj_log(obj, "odot: invalid duration '%s'", durarg);
+		return;
+	}
 	
 	if (*typearg) {
 		type = search_block(typearg, damage_types, FALSE);
@@ -1457,7 +1513,7 @@ OCMD(do_odot) {
 	}
 	
 	max_stacks = (*stackarg ? atoi(stackarg) : 1);
-	script_damage_over_time(ch, atype, get_obj_scale_level(obj, ch), type, modifier, atoi(durarg), max_stacks, NULL);
+	script_damage_over_time(ch, atype, get_obj_scale_level(obj, ch), type, modifier, duration, max_stacks, NULL);
 }
 
 
@@ -1580,6 +1636,7 @@ OCMD(do_odoor) {
 OCMD(do_osetval) {
 	char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH];
 	int position, new_value;
+	bool was_lit;
 
 	two_arguments(argument, arg1, arg2);
 	if (!*arg1 || !*arg2 || !is_number(arg1) || !is_number(arg2)) {
@@ -1589,10 +1646,29 @@ OCMD(do_osetval) {
 
 	position = atoi(arg1);
 	new_value = atoi(arg2);
-	if (position >= 0 && position < NUM_OBJ_VAL_POSITIONS)
+	if (position >= 0 && position < NUM_OBJ_VAL_POSITIONS) {
+		// this can change the lights
+		was_lit = LIGHT_IS_LIT(obj);
+		
 		set_obj_val(obj, position, new_value);
-	else
+		
+		// check lights
+		if (was_lit != LIGHT_IS_LIT(obj)) {
+			if (was_lit) {
+				apply_obj_light(obj, FALSE);
+			}
+			else {
+				apply_obj_light(obj, TRUE);
+			}
+		}
+		if (GET_OBJ_TYPE(obj) == ITEM_LIGHT && position == VAL_LIGHT_IS_LIT) {
+			// in case
+			schedule_obj_timer_update(obj, FALSE);
+		}
+	}
+	else {
 		obj_log(obj, "osetval: position out of bounds!");
+	}
 }
 
 /* submitted by PurpleOnyx - tkhasi@shadowglen.com*/
@@ -1744,6 +1820,7 @@ const struct obj_command_info obj_cmd_info[] = {
 	{ "otransform", do_otransform, NO_SCMD },
 	{ "obuildingecho", do_obuildingecho, NO_SCMD }, /* fix by Rumble */
 	{ "oregionecho", do_oregionecho, NO_SCMD },
+	{ "osubecho", do_osubecho, NO_SCMD },
 	{ "ovehicleecho", do_ovehicleecho, NO_SCMD },
 
 	{ "\n", 0, 0 }        /* this must be last */

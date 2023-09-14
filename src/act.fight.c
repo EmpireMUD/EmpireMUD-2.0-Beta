@@ -65,7 +65,7 @@ ACMD(do_approach) {
 	else if (FIGHT_MODE(ch) == FMODE_WAITING) {
 		msg_to_char(ch, "You're already trying to approach!\r\n");
 	}
-	else if (AFF_FLAGGED(ch, AFF_STUNNED | AFF_HARD_STUNNED | AFF_ENTANGLED)) {
+	else if (AFF_FLAGGED(ch, AFF_STUNNED | AFF_HARD_STUNNED | AFF_IMMOBILIZED)) {
 		msg_to_char(ch, "You can't try to approach right now!\r\n");
 	}
 	else {
@@ -153,6 +153,15 @@ ACMD(do_consider) {
 	else if (vict == ch) {
 		msg_to_char(ch, "You look pretty wimpy.\r\n");
 	}
+	else if (!can_fight_mtrigger(vict, ch) || AFF_FLAGGED(vict, AFF_NO_ATTACK)) {
+		if (AFF_FLAGGED(vict, AFF_NO_ATTACK)) {
+			// never attackable
+			act("$N cannot be attacked.", FALSE, ch, NULL, vict, TO_CHAR);
+		}
+		else {	// script-based
+			act("You cannot attack $N.", FALSE, ch, NULL, vict, TO_CHAR);
+		}
+	}
 	else {
 		// scale first
 		if (!IS_IMMORTAL(ch)) {
@@ -165,7 +174,7 @@ ACMD(do_consider) {
 		act("$n considers $s chances against you.", FALSE, ch, NULL, vict, TO_VICT);
 		
 		if (diff != 0) {
-			snprintf(buf, sizeof(buf), "$E is %d level%s %s you.", ABSOLUTE(diff), PLURAL(ABSOLUTE(diff)), diff > 0 ? "below" : "above");
+			snprintf(buf, sizeof(buf), "%s$E is %d level%s %s you.\t0", color_by_difficulty(ch, get_approximate_level(ch) + diff), ABSOLUTE(diff), PLURAL(ABSOLUTE(diff)), diff > 0 ? "below" : "above");
 			act(buf, FALSE, ch, NULL, vict, TO_CHAR);
 			any = TRUE;
 		}
@@ -208,6 +217,11 @@ ACMD(do_consider) {
 		if (!any) {
 			msg_to_char(ch, "You seem to be an even match.\r\n");
 		}
+		
+		// update spawn time: delay despawn due to interaction
+		if (MOB_FLAGGED(vict, MOB_SPAWNED)) {
+			set_mob_spawn_time(vict, time(0));
+		}
 	}
 }
 
@@ -216,9 +230,13 @@ ACMD(do_execute) {
 	char_data *victim;
 
 	one_argument(argument, arg);
-
-	if (!*arg)
+	
+	if (vampire_kill_feeding_target(ch, argument)) {
+		// sends own messages
+	}
+	else if (!*arg) {
 		msg_to_char(ch, "Execute whom?\r\n");
+	}
 	else if (!(victim = get_char_vis(ch, arg, NULL, FIND_CHAR_ROOM)))
 		send_config_msg(ch, "no_person");
 	else if (victim == ch)
@@ -249,8 +267,8 @@ ACMD(do_flee) {
 		return;
 	}
 	
-	if (AFF_FLAGGED(ch, AFF_ENTANGLED)) {
-		msg_to_char(ch, "You are entangled and can't flee.\r\n");
+	if (AFF_FLAGGED(ch, AFF_IMMOBILIZED)) {
+		msg_to_char(ch, "You are immobilized and can't flee.\r\n");
 		return;
 	}
 
@@ -304,13 +322,21 @@ ACMD(do_flee) {
 }
 
 
+// also: do_kill
 ACMD(do_hit) {
 	char_data *vict;
 
 	one_argument(argument, arg);
 
-	if (!*arg)
+	if (subcmd == SCMD_KILL && vampire_kill_feeding_target(ch, argument)) {
+		// vampire kills someone they are biting: sends own messages
+	}
+	else if (subcmd != SCMD_KILL && GET_FEEDING_FROM(ch)) {
+		msg_to_char(ch, "You can't do that while feeding!\r\n");
+	}
+	else if (!*arg) {
 		send_to_char("Hit whom?\r\n", ch);
+	}
 	else if (!(vict = get_char_vis(ch, arg, NULL, FIND_CHAR_ROOM)))
 		send_to_char("They don't seem to be here.\r\n", ch);
 	else if (vict == ch) {
@@ -449,6 +475,7 @@ ACMD(do_respawn) {
 		char_to_room(ch, find_load_room(ch));
 		GET_LAST_DIR(ch) = NO_DIR;
 		qt_visit_room(ch, IN_ROOM(ch));
+		pre_greet_mtrigger(ch, IN_ROOM(ch), NO_DIR, "respawn");	// cannot pre-greet for respawn
 		
 		syslog(SYS_DEATH, GET_INVIS_LEV(ch), TRUE, "%s has respawned at %s", GET_NAME(ch), room_log_identifier(IN_ROOM(ch)));
 		act("$n rises from the dead!", TRUE, ch, NULL, NULL, TO_ROOM);
@@ -456,9 +483,10 @@ ACMD(do_respawn) {
 		
 		affect_total(ch);
 		queue_delayed_update(ch, CDU_SAVE);
-		greet_mtrigger(ch, NO_DIR);
+		enter_wtrigger(IN_ROOM(ch), ch, NO_DIR, "respawn");
+		greet_mtrigger(ch, NO_DIR, "respawn");
 		greet_memory_mtrigger(ch);
-		greet_vtrigger(ch, NO_DIR);
+		greet_vtrigger(ch, NO_DIR, "respawn");
 		msdp_update_room(ch);
 	}
 }
@@ -572,7 +600,7 @@ ACMD(do_stake) {
 		
 		SET_BIT(INJURY_FLAGS(victim), INJ_STAKED);
 		if (GET_HEALTH(victim) <= 0) {
-			GET_HEALTH(victim) = 0;
+			set_health(victim, 0);
 			GET_POS(victim) = POS_STUNNED;
 		}
 		extract_obj(stake);
@@ -702,7 +730,7 @@ ACMD(do_tie) {
 		act("You unbind $N.", FALSE, ch, 0, victim, TO_CHAR);
 		act("$n unbinds you!", FALSE, ch, 0, victim, TO_VICT | TO_SLEEP);
 		act("$n unbinds $N.", FALSE, ch, 0, victim, TO_NOTVICT);
-		GET_HEALTH(victim) = MAX(1, GET_HEALTH(victim));
+		set_health(victim, MAX(1, GET_HEALTH(victim)));
 		GET_POS(victim) = POS_RESTING;
 		REMOVE_BIT(INJURY_FLAGS(victim), INJ_TIED);
 		
@@ -726,7 +754,7 @@ ACMD(do_tie) {
 		act("$n binds and gags $N!", FALSE, ch, 0, victim, TO_NOTVICT);
 		SET_BIT(INJURY_FLAGS(victim), INJ_TIED);
 		if (GET_HEALTH(victim) <= 1) {
-			GET_HEALTH(victim) = 1;
+			set_health(victim, 1);
 			GET_POS(victim) = POS_RESTING;
 		}
 		GET_ROPE_VNUM(victim) = GET_OBJ_VNUM(rope);

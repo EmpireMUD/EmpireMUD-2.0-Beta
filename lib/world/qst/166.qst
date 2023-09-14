@@ -7,17 +7,18 @@ Note: This daily quest does not reward you with a stocking.
 ~
 You thank Father Christmas and he rewards your politeness.
 ~
-23 e 0 0 -1
+25 ej 0 0 -1
 A
 3 10705
 P
-36 10700 0 1
+36 10700 0 1 -
 R
 9 10700 10
 W
 36 10700 0 1 a
-W
+W+
 11 0 0 1 a
+Open a gift~
 W
 6 16601 0 1 a
 Z
@@ -35,7 +36,7 @@ up your own gift, though, as Father Christmas only gives one per visitor.
    The Guild head is greatful for your kindness and ready to spread holiday
 cheer himself now.
 ~
-16 de 0 0 -1
+18 dej 0 0 -1
 A
 1 18211
 A
@@ -49,7 +50,7 @@ P
 R
 9 10700 10
 R
-2 16659 1
+2 16678 1
 W
 2 10702 0 1 a
 W
@@ -72,7 +73,7 @@ Type: use syringe <target>
    You got the blood and the wanderer is delighted. Here's hoping it hurt the
 old fool.
 ~
-14 de 0 0 -1
+16 dej 0 0 -1
 A
 1 9064
 D 16602
@@ -83,7 +84,7 @@ P
 R
 9 10700 10
 R
-2 16659 1
+2 16678 1
 T 16602
 W
 36 10700 0 1 a
@@ -106,7 +107,7 @@ Type: use syringe <target>
 ability to fly without turning into giant bats. Hopefully it was from a flying
 reindeer.
 ~
-21 de 0 0 -1
+23 dej 0 0 -1
 A
 1 18208
 A
@@ -121,7 +122,7 @@ P
 R
 9 10700 10
 R
-2 16659 1
+2 16678 1
 T 16602
 W
 36 10700 0 1 a
@@ -144,7 +145,7 @@ Instructions:
    As you watch the bird take flight, you feel more holiday cheer infuse your
 body.
 ~
-12 e 0 0 -1
+14 ej 0 0 -1
 A
 1 200
 D 16604
@@ -155,7 +156,7 @@ P
 R
 9 10700 10
 R
-2 16659 1
+2 16678 1
 T 16602
 W
 36 10700 0 1 a
@@ -178,7 +179,7 @@ Instructions:
    As you watch the bird take flight, you feel more holiday cheer infuse your
 body.
 ~
-12 e 0 0 -1
+14 ej 0 0 -1
 A
 1 201
 D 16604
@@ -189,7 +190,7 @@ P
 R
 9 10700 10
 R
-2 16659 1
+2 16678 1
 T 16602
 W
 36 10700 0 1 a
@@ -213,16 +214,16 @@ Instructions:
    It looks just like you, and it should last a while. Just don't let it go
 inside.
 ~
-13 de 0 0 -1
+16 dej 0 0 -1
 A
 1 10701
 D 16606
 P
-36 10700 0 1
+36 10700 0 1 -
 R
 9 10700 10
 R
-2 16659 1
+2 16678 1
 T 16602
 W
 36 10700 0 1 a
@@ -230,8 +231,9 @@ W
 2 16600 0 1 a
 W
 2 16605 0 3 a
-W
+W+
 11 0 0 1 a
+Make a snowman~
 Z
 4 16600
 S
@@ -252,7 +254,7 @@ Instructions:
    Your citizens are excited to see the new tree and hope it'll get some
 ornaments soon!
 ~
-20 de 0 0 -1
+23 dej 0 0 -1
 A
 1 10701
 P
@@ -260,7 +262,7 @@ P
 R
 9 10700 10
 R
-2 16659 1
+2 16678 1
 T 16602
 W
 36 10700 0 1 a
@@ -268,8 +270,9 @@ W
 2 16602 0 1 a
 W
 2 16606 0 1 a
-W
+W+
 11 0 0 1 a
+Plant a Christmas tree at your city center~
 Z
 4 16606
 S
@@ -282,15 +285,15 @@ Make some cookies and deliver them to the superintendant.
    Who can stay grumpy with Christmas cookies in their belly? Wonder how else
 you could cheer the guild up.
 ~
-5 d 0 0 -1
+8 dj 0 0 -1
 A
 1 18219
 A
 1 18211
 P
-36 10700 0 1
+36 10700 0 1 -
 R
-2 16659 1
+2 16678 1
 W
 2 10716 0 20 a
 W
@@ -309,21 +312,22 @@ Type: make snow angel
 ~
 That will sure make things more wintry around here!
 ~
-10 e 0 0 -1
+13 ej 0 0 -1
 A
 2 16607
 D 16606
 P
-36 10700 0 1
+36 10700 0 1 -
 R
 9 10700 10
 R
-2 16659 1
+2 16678 1
 T 16602
 W
 36 10700 0 1 a
-W
+W+
 11 0 0 1 a
+Make 5 snow angels~
 Z
 4 16610
 S
@@ -336,7 +340,7 @@ citizen's bedrooms, and leave it for them to find.
    Upon finding the room empty, you put the gift on the bed and grin to
 yourself at the joy you've brought another citizen of your empire.
 ~
-10 e 0 0 -1
+13 ej 0 0 -1
 A
 6 16650
 A
@@ -349,14 +353,15 @@ P
 R
 9 10700 10
 R
-2 16659 1
+2 16678 1
 T 16602
 W
 36 10700 0 1 a
 W
 9 4 0 1 a
-W
+W+
 11 0 0 1 a
+Place a gift in a citizen's bedroom~
 Z
 4 16611
 S
@@ -371,7 +376,7 @@ to the guild mage.
    The guild mage is shocked that you managed the theft, but appreciative all
 the same.
 ~
-9 de 0 0 -1
+11 dej 0 0 -1
 A
 1 18209
 A
@@ -386,7 +391,7 @@ P
 R
 9 10700 10
 R
-2 16659 1
+2 16678 1
 W
 9 4 0 1 a
 W
@@ -411,20 +416,19 @@ Type 'use sack <normal | hard | group | boss>' to summon the demon.
    You've stopped the grinchy demon, for now. Even though he got away, the
 citizens' gifts are safe for another night.
 ~
-13 e 0 0 -1
-A
-1 10703
+18 ej 0 0 -1
 P
 36 10700 0 1 a
 R
 9 10700 10
 R
-2 16659 1
+2 16678 1
 T 16602
 W
 36 10700 0 1 a
-W
+W+
 11 0 0 1 a
+Summon and defeat the demon~
 Z
 4 16603
 S
@@ -439,7 +443,7 @@ Type: 'dress terrier'
    There, now even the animals of your empire are in the holiday mood, whether
 they want to be or not.
 ~
-10 e 0 0 -1
+14 ej 0 0 -1
 A
 0 5111
 A
@@ -450,12 +454,13 @@ P
 R
 9 10700 10
 R
-2 16659 1
+2 16678 1
 T 16602
 W
 36 10700 0 1 a
-W
+W+
 11 0 0 1 a
+Dress up 2 terriers~
 Z
 4 16618
 S
@@ -470,7 +475,7 @@ Type: dress <horse | camel>
    There! Now even the animals of your empire are in the holiday mood, whether
 they want to be or not.
 ~
-10 e 0 0 -1
+13 ej 0 0 -1
 A
 0 5111
 A
@@ -481,12 +486,13 @@ P
 R
 9 10700 10
 R
-2 16659 1
+2 16678 1
 T 16602
 W
 36 10700 0 1 a
-W
+W+
 11 0 0 1 a
+Dress up 5 horses or camels~
 Z
 4 16618
 S
@@ -502,10 +508,10 @@ Type 'craft winter ornament set' to make them, then 'hang ornament' in 4 rooms.
    You've got this decorating thing down. Tree? Check! Ornaments? Check! What
 else could your citizens ask for?
 ~
-10 e 0 0 -1
+15 ej 0 0 -1
 A
 2 16607
-D 10700
+D 16620
 P
 36 10700 0 1 a
 P
@@ -513,12 +519,13 @@ P
 R
 9 10700 10
 R
-2 16659 1
+2 16678 1
 T 16602
 W
 36 10700 0 1 a
-W
+W+
 11 0 0 1 a
+Hang ornaments in 4 rooms~
 Z
 4 16620
 S
@@ -533,7 +540,7 @@ type: 'place pixy' to place a frozen pixy on the tree.
 ~
 You and your citizens agree that makes the tree look much better.
 ~
-12 de 0 0 -1
+15 dej 0 0 -1
 A
 2 16607
 D 16626
@@ -548,12 +555,13 @@ P
 R
 9 10700 10
 R
-2 16659 1
+2 16678 1
 T 16602
 W
 36 10700 0 1 a
-W
+W+
 11 0 0 1 a
+Place a frozen pixy on your Christmas tree~
 W
 2 16626 0 1 a
 Z
@@ -573,7 +581,7 @@ Type: 'throw snowball abominable'
    That'll teach him! Or not, given he's been turned into a snowman. At least
 your buddy is safe again.
 ~
-17 de 0 0 -1
+20 dej 0 0 -1
 A
 1 16600
 D 16626
@@ -586,18 +594,124 @@ P
 P
 9 2 0 1 b
 R
-2 16659 1
+2 16678 1
 R
 9 10700 10
 T 16602
 W
 2 16628 0 1 a
-W
+W+
 11 0 0 1 a
+Throw an enchanted snowball at the abominable snowman~
 W
 36 10700 0 1 a
 Z
 4 16628
+S
+#16643
+Winter Wonderland: Got Your Goat~
+   Some sorcerers have been enchanting the little straw goats made by the
+villagers so that the goats run around. For some people, it's a constant source
+of mirth. But for certain Guild members, it has become a nuissance. The straw
+goats are drawing too much attention to covert activities -- and perhaps that's
+what the sorcerers designed them to do.
+   A subtle escalation merits a subtle reaction. Find a straw goat and light it
+on fire. Children will love the little bonfires and it will warm the poorest
+citizens while also thwarting those city sorcerers.
+   'Light' or 'burn' a little straw goat. You'll need a lighter.
+~
+Your actions today have warmed the hearts -- and bodies -- of the citizens.
+~
+8 ej 0 0 -1
+A
+2 16607
+D 16643
+P
+9 4 0 1 a
+P
+36 10700 0 1 a
+R
+9 10700 10
+R
+2 16678 1
+T 16602
+W
+36 10700 0 1 a
+W+
+11 0 0 1 a
+Burn a straw goat~
+Z
+4 16644
+S
+#16644
+Winter Wonderland: Hay, Got a Light?~
+   The winter festivities have descended on the city like a blizzard, and
+everyone is abustle decorating. Some citizens have built up a giant straw goat
+near here and an important client of the Guild has paid to bring it back down.
+   Now, there's a competition amongst the city's underworld to be the first to
+burn down the giant straw goat for the client. This won't be a paid job, but it
+will certainly increase someone's holiday cheer. As a bonus, the massive
+bonfire from the burning goat will surely warm the hearts -- and bodies -- of
+many of the empire's poorest citizens.
+   Find the giant straw goat and 'light' it on fire.
+~
+You've managed to burn down a straw goat! It looks like you won the competition.
+~
+8 ej 0 0 -1
+A
+2 16607
+D 16643
+P
+36 10700 0 1 a
+P
+9 4 0 1 a
+R
+9 10700 10
+R
+2 16678 1
+T 16602
+W
+36 10700 0 1 a
+W+
+11 0 0 1 a
+Light a giant straw goat on fire~
+Z
+4 16644
+S
+#16660
+Winter Wonderland: Goat to Celebrate~
+   People are eager to see a giant straw goat to rival the one from last year.
+Craft one in your city for them to dance and party around, but beware: vandals
+love to burn the straw goat. You will need to stand guard until the revelry has
+ended.
+Steps:
+1. Find a good place and 'craft giant straw goat'.
+2. Stand around and wait for the crowd to gather.
+3. If someone from the crowd approaches the straw goat, type 'protect goat'.
+4. Wait until the party ends and the crowd disperses.
+~
+Your giant straw goat was a huge hit this year. That was the biggest crowd yet!
+~
+6 ej 0 0 -1
+A
+2 16607
+D 16620
+P
+9 6 0 1 a
+P
+36 10700 0 1 a
+R
+9 10700 10
+R
+2 16678 1
+T 16602
+W
+36 10700 0 1 a
+W+
+11 0 0 1 a
+Protect the straw goat~
+Z
+6 16660
 S
 #16676
 Winter Wonderland: Cheer for the City~
@@ -608,7 +722,7 @@ tambourine (or any instrument) and play music in front of each citizen.
 ~
 You've lifted everyone's holiday spirit!
 ~
-17 e 0 0 -1
+20 ej 0 0 -1
 A
 1 10701
 D 16676
@@ -617,12 +731,13 @@ P
 R
 9 10700 10
 R
-2 16659 1
+2 16678 1
 T 16602
 W
 36 10700 0 1 a
-W
+W+
 11 0 0 1 a
+Make 10 citizens dance~
 Z
 4 16677
 S
@@ -636,7 +751,7 @@ buildings.
 ~
 Through the gift of charity, you've lifted everyone's holiday spirit!
 ~
-17 e 0 0 -1
+20 ej 0 0 -1
 A
 1 10701
 D 16676
@@ -645,13 +760,84 @@ P
 R
 9 10700 10
 R
-2 16659 1
+2 16678 1
 T 16602
 W
 36 10700 0 1 a
-W
+W+
 11 0 0 1 a
+Play a concert at 4 locations~
 Z
 4 16677
+S
+#16680
+Winter Wonderland: Naughty List~
+   Whether Christmas, Hannukah, Kwanzaa, the Solstice, or whatever holiday you
+might celebrate this time of year, all of them are threatened by demons from
+beyond the icy veil of winter. Father Christmas hands you a fragile slip of
+parchment -- the naughty list -- with a strange symbol written on it.
+   'Find the demon whose symbol is on this list and defeat it before it can
+threaten the winter festivities,' Father Christmas says. 'There's one place
+with enough holiday magic to summon the demon and fight it: the icy cave lower
+on this very mountain!'
+Type 'use list <normal | hard | group | boss>' in the ice cave.
+~
+   You've managed to stop the demon, for now. Your empire's holiday festivities
+are safe for another night but beware, because the demon could try again each
+and every day.
+~
+18 ej 0 0 -1
+A
+1 10703
+P
+36 10700 0 1 a
+R
+9 10700 10
+R
+2 16678 1
+T 16602
+W
+36 10700 0 1 a
+W+
+11 0 0 1 a
+Summon and fight the demon~
+Z
+4 16603
+S
+#16690
+Winter Wonderland: Feed the Polar Vortex~
+   A Frostwarden -- one of the Guardians of Winter -- appears and warns you
+that demi-elves from a dark, snow-covered world are on the verge of invading
+our realm right in the middle of winter. The elves are hungry and that hunger
+is sated by few things in our realm. However, the Frostwarden tells you, the
+elves seem satisfied by the cookies and chocolates that are found in the
+stockings during the Winter Wonderland event. Nobody knows why the demi-elves
+crave the cookies, but the Frostwarden needs each of you to do your part.
+   Put any leftover cookies and chocolates from your stockings into this
+miniature polar vortex with the command 'put <item> vortex' or 'put
+all.cookie vortex'. When you've filled the polar vortex with enough cookies,
+a special reward awaits you.
+~
+   The Frostwarden appears in a flurry of snow and hail. He takes the polar
+vortex from you and thanks you for your help in sating the demi-elves on the
+other side. Since it's the holidays, a lot of pets need good homes, so the
+reward for your hard work is an adoption certificate to get a free puppy or
+kitten.
+~
+9 j 0 0 -1
+A
+2 16659
+A
+2 16678
+P
+36 10700 0 1 -
+R
+2 16640 1
+T 16602
+W+
+11 0 0 1 -
+Feed the vortex enough treats~
+Z
+2 16690
 S
 $

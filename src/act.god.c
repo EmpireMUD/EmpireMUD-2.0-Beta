@@ -220,7 +220,7 @@ ACMD(do_create) {
 ACMD(do_sacrifice) {
 	obj_data *obj, *next_obj;
 	char_data *god = NULL;
-	int amount = 0, dotmode, number;
+	int dotmode, number;
 	bool file = FALSE, any = FALSE;
 
 	two_arguments(argument, arg, buf);
@@ -256,7 +256,7 @@ ACMD(do_sacrifice) {
 					continue;
 				}
 				
-				amount += perform_sacrifice(ch, god, obj, TRUE);
+				perform_sacrifice(ch, god, obj, TRUE);
 			}
 			DL_FOREACH_SAFE2(ROOM_CONTENTS(IN_ROOM(ch)), obj, next_obj, next_content) {
 				if (OBJ_FLAGGED(obj, OBJ_KEEP) || !bind_ok(obj, ch)) {
@@ -269,7 +269,7 @@ ACMD(do_sacrifice) {
 				if (!CAN_WEAR(obj, ITEM_WEAR_TAKE))
 					continue;
 
-				amount += perform_sacrifice(ch, god, obj, TRUE);
+				perform_sacrifice(ch, god, obj, TRUE);
 			}
 		}
 		*/
@@ -298,7 +298,7 @@ ACMD(do_sacrifice) {
 				next_obj = get_obj_in_list_vis(ch, arg, NULL, ROOM_CONTENTS(IN_ROOM(ch)));
 			
 			if (CAN_WEAR(obj, ITEM_WEAR_TAKE) && !OBJ_FLAGGED(obj, OBJ_KEEP) && bind_ok(obj, ch)) {
-				amount += perform_sacrifice(ch, god, obj, TRUE);
+				perform_sacrifice(ch, god, obj, TRUE);
 				any = TRUE;
 			}
 			
@@ -322,7 +322,7 @@ ACMD(do_sacrifice) {
 			msg_to_char(ch, "You can't sacrifice an item that's bound to someone else.\r\n");
 		}
 		else {
-			amount += perform_sacrifice(ch, god, obj, TRUE);
+			perform_sacrifice(ch, god, obj, TRUE);
 		}
 	}
 	

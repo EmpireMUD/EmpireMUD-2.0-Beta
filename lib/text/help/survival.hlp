@@ -21,7 +21,7 @@ Tool:  knife
 
 With a little practice, you can butcher a corpse into smaller cuts of meat.
 This command succeeds about 60% of the time unskilled, and 100% of the time
-with the Huntsman ability.
+with the Huntsman ability. Not all corpses can be butchered.
 
 Gains experience when you butcher something.
 
@@ -47,7 +47,7 @@ CARTOGRAPHY
 Cartography (Survival ability)
 
 Grants map-memory (allows you to remember tiles you've seen before when you
-can't see them due to darkness or being blocking by mountains). This ability
+can't see them due to darkness or being blocked by mountains). This ability
 gains experience whenever you look or scan on the map.
 
 See also: MAP-MEMORY, NAVIGATION
@@ -109,6 +109,7 @@ FISH FISHING "FISH COMMAND"
 Fish (Survival ability)
 
 Usage:  fish [direction]
+Speed boost:  Higher level fishing tool
 Tool:  basic spear
 
 Learn to live at the water's edge by fishing. As your skill improves, you will
@@ -136,7 +137,9 @@ Usage:  forage
 
 This simple ability helps you survive in almost all climates by knowing which
 fruits and nuts are safe to eat. Foraging is also a good way to find new crops
-to grow. Try seeding, planting, or combining the plants you forage.
+to grow. Try seeding, planting, or combining the plants you forage. Different
+regions of the world may have different crops, so try traveling to other
+islands!
 
 Gains experience when you find things by foraging.
 
@@ -149,7 +152,7 @@ Requires:  Huntsman (Survival ability)
 Speed boost:  Finder ability
 
 You can hunt animals that live in the area, even if you can't see any at the
-moment. The animal will be entangled briefly, to give you time to attack it
+moment. The animal will be immobilized briefly, to give you time to attack it
 when you find it with this command.
 
 This ability only targets animals that spawn with a rate of at least 1% in the
@@ -212,6 +215,8 @@ can make a simple saddle with Basic Crafts.
 Flying mounts require All-Terrain Riding, or Fly + Ride. Flying mounts allow
 you to see over blocked terrain that's at the same elevation as you are.
 
+Mounts with the waterwalk effect require All-Terrain Riding.
+
 Ride gains experience just from moving around while mounted, but All-Terrain
 Riding only gains experience when you cross water or mountains while mounted.
 
@@ -242,7 +247,7 @@ Gains experience when you cross mountains while not riding.
 
 See also: CLIMB, AUTOCLIMB, BLOCKED TILE
 #
-NAVIGATION COORDINATES
+NAVIGATION NAVIGATE COORDINATES
 
 Navigation (Survival ability)
 
@@ -382,7 +387,7 @@ wasting movement points or wandering into the mouth of a shark.
 
 Gains experience when you swim around.
 
-See also: CANOE, SHIPBUILDING, SWIM, AUTOSWIM
+See also: CANOE, SHIPBUILDING, SWIM, AUTOSWIM, WATERWALK
 #
 THIRST "SATED THIRST"
 

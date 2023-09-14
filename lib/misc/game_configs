@@ -4,6 +4,14 @@
 * Game configs
 allow_extended_color_codes 0
 automessage_color &y
+godlist_header 1
+   *************************************************************************
+   *  The following people have reached godhood on EmpireMUD.  They are    *
+   * to be treated with respect and awe.  Occasional prayers to them are   *
+   * advisable.  Annoying them is not recommended.  Stealing from them is  *
+   * punishable by immediate death.                                        *
+   *************************************************************************
+~
 hiring_builders 0
 hiring_coders 0
 huh_string Huh?!?
@@ -31,6 +39,14 @@ commands to get started.
 starting_year 1150
 welcome_message Welcome to your EmpireMUD! Prepare to face your destiny!
 who_list_sort 0
+wizlist_header 1
+   *************************************************************************
+   * The following people have reached immortality on EmpireMUD.  They are *
+   * to be treated with respect and awe.  Occasional prayers to them are   *
+   * advisable.  Annoying them is not recommended.  Stealing from them is  *
+   * punishable by immediate death.                                        *
+   *************************************************************************
+~
 *
 * Actions configs
 chip_timer 4
@@ -119,6 +135,7 @@ scale_pack_size 8.000000
 scale_points_at_100 4.000000
 *
 * Mobs configs
+default_language_vnum 150
 max_npc_attribute 15
 mob_despawn_radius 3
 mob_pursuit_distance 25

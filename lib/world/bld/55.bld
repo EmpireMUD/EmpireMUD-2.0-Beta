@@ -230,6 +230,8 @@ The Bunk Room~
 ~
 0 0 aH o
 0 0 0 -1
+C
+sleep~
 D
    You have found the crew's bunk, lined floor to ceiling with hammocks. In one
 corner, locked trunks hold personal goods belonging to the sailors. The room
@@ -246,6 +248,8 @@ The Captain's Cabin~
 ~
 0 0 aH q
 0 0 0 -1
+C
+sleep~
 D
    With rich mahogany walls and bronze accents, you can be sure this is the
 captain's cabin. Unlike much of the ship, which has been beaten by the
@@ -278,8 +282,6 @@ Inside the Wagon~
 &0[  ]~
 1 0 aq r
 0 0 0 -1
-C
-~
 D
    The base of the wagon is made of sturdy wood, though it rumbles as it rolls
 along the prairie. The cloth covering is supported by tall wooden arches,
@@ -326,8 +328,6 @@ In the Carriage~
 &0[  ]~
 1 0 aq 0
 0 0 0 -1
-C
-~
 D
    The inside of the carriage is a little cramped, but the upholstered seats
 are made to sit four. The windows are covered in dark curtains to grant you a

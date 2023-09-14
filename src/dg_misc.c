@@ -81,7 +81,7 @@ void do_dg_affect(void *go, struct script_data *sc, trig_data *trig, int script_
 	any_vnum atype = ATYPE_DG_AFFECT;
 	bitvector_t i = 0, type = 0;
 	struct affected_type af;
-	bool all_off = FALSE;
+	bool all_off = FALSE, silent = FALSE;
 
 	half_chop(cmd, junk, temp);
 	half_chop(temp, charname, cmd);
@@ -107,6 +107,11 @@ void do_dg_affect(void *go, struct script_data *sc, trig_data *trig, int script_
 	
 	if (!str_cmp(property, "off")) {
 		all_off = TRUE;
+		
+		if (!str_cmp(value_p, "silent")) {
+			silent = TRUE;
+		}
+		
 		// this is good -- no mor args
 	}
 	else {
@@ -160,19 +165,24 @@ void do_dg_affect(void *go, struct script_data *sc, trig_data *trig, int script_
 		return;
 	}
 	
+	// check for silent-off
+	if (!str_cmp(value_p, "off") && !str_cmp(duration_p, "silent")) {
+		silent = TRUE;
+	}
+	
 	// are we just removing the whole thing?
 	if (all_off) {
-		affect_from_char(ch, atype, TRUE);
+		affect_from_char(ch, atype, !silent);
 		return;
 	}
 	
 	// removing one type?
 	if (!str_cmp(value_p, "off")) {
 		if (type == APPLY_TYPE) {
-			affect_from_char_by_apply(ch, atype, i, TRUE);
+			affect_from_char_by_apply(ch, atype, i, !silent);
 		}
 		else {
-			affect_from_char_by_bitvector(ch, atype, BIT(i), TRUE);
+			affect_from_char_by_bitvector(ch, atype, BIT(i), !silent);
 		}
 		return;
 	}
@@ -180,7 +190,7 @@ void do_dg_affect(void *go, struct script_data *sc, trig_data *trig, int script_
 	/* add the affect */
 	af.type = atype;
 	af.cast_by = (script_type == MOB_TRIGGER ? CAST_BY_ID((char_data*)go) : 0);
-	af.duration = (duration == -1 ? UNLIMITED : ceil((double)duration / SECS_PER_REAL_UPDATE));
+	af.expire_time = (duration == -1 ? UNLIMITED : (time(0) + duration));
 	af.modifier = value;
 
 	if (type == APPLY_TYPE) {
@@ -287,7 +297,7 @@ void do_dg_affect_room(void *go, struct script_data *sc, trig_data *trig, int sc
 	/* add the affect */
 	af.type = atype;
 	af.cast_by = (script_type == MOB_TRIGGER ? CAST_BY_ID((char_data*)go) : 0);
-	af.duration = time(0) + duration;	// duration is actually expire time on room affs (TODO: change the name)
+	af.expire_time = (duration == -1 ? UNLIMITED : (time(0) + duration));
 	af.modifier = 0;
 	af.location = APPLY_NONE;
 	af.bitvector = BIT(i);
@@ -664,18 +674,7 @@ void do_dg_terracrop(room_data *target, crop_data *cp) {
 	else {
 		change_terrain(target, GET_SECT_VNUM(sect), NOTHING);
 		set_crop_type(target, cp);
-		
-		remove_depletion(target, DPLTN_PICK);
-		remove_depletion(target, DPLTN_FORAGE);
-		remove_depletion(target, DPLTN_DIG);
-		remove_depletion(target, DPLTN_GATHER);
-		remove_depletion(target, DPLTN_FISH);
-		remove_depletion(target, DPLTN_QUARRY);
-		remove_depletion(target, DPLTN_PAN);
-		remove_depletion(target, DPLTN_TRAPPING);
-		remove_depletion(target, DPLTN_CHOP);
-		remove_depletion(target, DPLTN_HUNT);
-		remove_depletion(target, DPLTN_PRODUCTION);
+		clear_depletions(target);
 		
 		if (ROOM_OWNER(target)) {
 			deactivate_workforce_room(ROOM_OWNER(target), target);
@@ -698,18 +697,7 @@ void do_dg_terraform(room_data *target, sector_data *sect) {
 	
 	// preserve old original sect for roads -- TODO this is a special-case, also in .map terrain
 	change_terrain(target, GET_SECT_VNUM(sect), IS_ROAD(target) ? GET_SECT_VNUM(BASE_SECT(target)) : NOTHING);
-	
-	remove_depletion(target, DPLTN_PICK);
-	remove_depletion(target, DPLTN_FORAGE);
-	remove_depletion(target, DPLTN_DIG);
-	remove_depletion(target, DPLTN_GATHER);
-	remove_depletion(target, DPLTN_FISH);
-	remove_depletion(target, DPLTN_QUARRY);
-	remove_depletion(target, DPLTN_PAN);
-	remove_depletion(target, DPLTN_TRAPPING);
-	remove_depletion(target, DPLTN_CHOP);
-	remove_depletion(target, DPLTN_HUNT);
-	remove_depletion(target, DPLTN_PRODUCTION);
+	clear_depletions(target);
 	
 	if (ROOM_OWNER(target)) {
 		deactivate_workforce_room(ROOM_OWNER(target), target);
@@ -913,8 +901,7 @@ void script_damage(char_data *vict, char_data *killer, int level, int dam_type, 
 		combat_meter_heal_taken(vict, -dam);
 	}
 	
-	GET_HEALTH(vict) -= dam;
-	GET_HEALTH(vict) = MIN(GET_HEALTH(vict), GET_MAX_HEALTH(vict));
+	set_health(vict, GET_HEALTH(vict) - dam);
 
 	update_pos(vict);
 	send_char_pos(vict, dam);
@@ -967,7 +954,7 @@ void script_damage_over_time(char_data *vict, any_vnum atype, int level, int dam
 	}
 
 	// add the affect
-	apply_dot_effect(vict, atype, ceil((double)dur_seconds / SECS_PER_REAL_UPDATE), dam_type, (int) dam, MAX(1, max_stacks), cast_by);
+	apply_dot_effect(vict, atype, dur_seconds, dam_type, (int) dam, MAX(1, max_stacks), cast_by);
 }
 
 
@@ -1071,7 +1058,7 @@ void script_heal(void *thing, int type, char *argument) {
 	if (is_abbrev(what_arg, "health") || is_abbrev(what_arg, "hitpoints")) {
 		amount = (394 * level / 55.0 - 5580 / 11.0) * scale;
 		amount = MAX(30, amount);
-		GET_HEALTH(victim) = MIN(GET_MAX_HEALTH(victim), GET_HEALTH(victim) + amount);
+		set_health(victim, GET_HEALTH(victim) + amount);
 		
 		if (GET_POS(victim) < POS_SLEEPING) {
 			GET_POS(victim) = POS_STANDING;
@@ -1080,12 +1067,12 @@ void script_heal(void *thing, int type, char *argument) {
 	else if (is_abbrev(what_arg, "mana")) {
 		amount = (292 * level / 55.0 - 3940 / 11.0) * scale;
 		amount = MAX(40, amount);
-		GET_MANA(victim) = MIN(GET_MAX_MANA(victim), GET_MANA(victim) + amount);
+		set_mana(victim, GET_MANA(victim) + amount);
 	}
 	else if (is_abbrev(what_arg, "moves")) {
 		amount = (37 * level / 11.0 - 1950 / 11.0) * scale;
 		amount = MAX(75, amount);
-		GET_MOVE(victim) = MIN(GET_MAX_MOVE(victim), GET_MOVE(victim) + amount);
+		set_move(victim, GET_MOVE(victim) + amount);
 	}
 	else if (is_abbrev(what_arg, "dots")) {
 		while (victim->over_time_effects) {

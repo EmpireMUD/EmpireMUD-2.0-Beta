@@ -29,7 +29,7 @@ Natural Magic Synergy Ability: 100 Trade
 Usage:  acidblast [victim]
 Cooldown:  9 seconds
 Cost:  based on damage
-Debuff type:  Natural Magic
+Debuff type:  magical
 
 An alchemist can create a magical acid blast, injuring her victim as well as
 decreasing the victim's magical resistance.
@@ -80,7 +80,7 @@ Natural Magic Synergy Ability: 100 Battle
 Usage:  astralclaw [victim]
 Cooldown:  9 seconds
 Cost:  based on damage
-Debuff type:  Natural Magic
+Debuff type:  magical
 
 By striking out with astral claws, the werewolf deals magical damage at a
 distance. These claw strikes also rip open the victim's flesh, dealing physical
@@ -145,7 +145,7 @@ To brew potions you will require:
  - herbs
 
 See also: CRAFTING LEVEL, RESOURCES, KEEP, HEALING POTIONS, NATURE POTIONS,
-RECIPES
+RECIPES, CRAFTING ABILITIES
 #
 CHANT
 
@@ -318,7 +318,7 @@ Natural Magic Synergy Ability: 100 Stealth
 Usage:  dispirit [victim]
 Cooldown:  9 seconds
 Cost:  based on damage
-Debuff type:  Natural Magic
+Debuff type:  magical
 
 Dispirit drains the opponent's wits, causing him pain and anguish as it does.
 #
@@ -369,12 +369,12 @@ Entangle (Natural Magic ability)
 
 Usage:  entangle [target]
 Cooldown:  30 seconds
-Duration:  30 seconds
+Duration:  20 seconds
 Cost:  20 mana
-Debuff type:  Natural Magic
+Debuff type:  magical
 
-Nature mages have the power to entangle their foes in mana, preventing them
-from getting away.
+Nature mages have the power to entangle their foes in mana, immobilizing them
+and preventing them from getting away.
 
 If you cast this spell without a target, it will target the person you are
 fighting.
@@ -560,7 +560,7 @@ Usage:  lightningbolt [target]
 Cooldown:  9 seconds
 DoT Duration:  15 seconds
 Cost:  based on damage
-Debuff type:  Natural Magic
+Debuff type:  magical
 
 A powerful nature mage can shoot bolts of lightning from her fingertips,
 causing massive trauma to the target, and leaving them shocked. Victims con-
@@ -833,7 +833,7 @@ Skybrand (Natural Magic ability)
 Usage:  skybrand [target]
 Cooldown:  6 seconds
 Cost:  based on damage and skill level
-Debuff type:  Natural Magic
+Debuff type:  magical
 
 A nature mage can mark a target with the Skybrand, causing the victim to take
 damage for several seconds. This ability stacks up to 3 times.
@@ -950,9 +950,9 @@ This ability lets you light things without a fire source. It also allows you to
 brew potions, mix poisons, and cook foods without needing a fire or stove.
 However, you cannot bake with it.
 
-This ability gains experience when you use it to light things, but not when you
-cook things with it. It will be used in preference to fire sticks or other
-lighters.
+This ability gains experience when you use it to light or burn things, but not
+when you cook things with it. It will be used in preference to fire sticks or
+other lighters.
 
 See also: LIGHT
 #

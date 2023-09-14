@@ -5,6 +5,11 @@ A colossal red dragon looms over you!
 ~
 250 300 bdgxyzAB cmE 6
 2 0 2 10
+D
+   Towering over you like a scaly red keep, the dragon simultaneously chills
+you to the bone and brings your skin blisteringly close to burning. Perhaps she
+hasn't seen you yet...
+~
 I 0 10907 75.00 2  # BUTCHER: raw dragon steak
 I 0 10907 75.00 2  # BUTCHER: raw dragon steak
 I 0 10907 75.00 2  # BUTCHER: raw dragon steak
@@ -60,8 +65,13 @@ Sir Vivor~
 Sir Vivor~
 Sir Vivor is glancing around nervously.
 ~
-250 300 bdkvxyzAB cE 3
+250 300 bdkvxyzABI cE 3
 1 0 0 1
+D
+   Rarely have these lands seen a man so gallant as this. His armor gleams even
+in the low light of the fire and his stark white teeth and protruding chin are
+the very definition of handsomeness. At least, according to his biography.
+~
 I 4 10907 75.00 2  # LOOT: raw dragon steak
 I 4 10907 75.00 2  # LOOT: raw dragon steak
 I 4 10907 75.00 2  # LOOT: raw dragon steak
@@ -115,8 +125,12 @@ Bangles thief nervous~
 Bangles the thief~
 A nervous thief is hiding in the shadows.
 ~
-250 300 dkv nD 3
+250 300 dkvI nD 3
 1 0 0 15
+D
+   True to his name, he's wearing a colossal number of bangles on his wrists.
+Some of them still have price tags attached!
+~
 T 10902
 T 10903
 T 10913
@@ -126,8 +140,12 @@ vendor token~
 the token vendor~
 The token vendor is peddling his wares (list).
 ~
-250 300 bdov nD 3
+250 300 bdovI nD 3
 1 0 0 15
+D
+   This hapless little man looks a little singed and his hands start to shake
+at any loud noise nearby.
+~
 T 10914
 S
 #10904
@@ -137,6 +155,10 @@ A crimson serpent is coiled here.
 ~
 100 125 dej 0 2
 0 0 5 10
+D
+   This stunning creature resembles a legless dragon. Its crimson scales are
+warm to the touch, and it seems docile enough to ride.
+~
 I 0 10907 100.00 2  # BUTCHER: raw dragon steak
 S
 #10905
@@ -146,6 +168,11 @@ A small crimson dragon is circling.
 ~
 100 125 dej m 2
 0 0 2 10
+D
+   Though small by dragon standards, this stunning crimson beast is easily
+twice the size of a horse and already strong enough to carry a full-grown man
+while flying.
+~
 I 0 10907 100.00 2  # BUTCHER: raw dragon steak
 S
 #10906
@@ -155,6 +182,10 @@ A crimson sea dragon splashes around.
 ~
 100 125 dejl 0 2
 0 0 6 9
+D
+   This elegant dragon has tall fins in place of wings. With webbed feet and a
+flattened tail, it seems to have taken to the sea.
+~
 I 0 10907 100.00 2  # BUTCHER: raw dragon steak
 S
 #10950
@@ -162,7 +193,7 @@ dragon muck viscous vicious~
 a viscous muck dragon~
 A viscous muck dragon coils through the water.
 ~
-225 325 dghuB chmoBCD 6
+225 325 dghuB choCDL 6
 0 0 5 27
 D
    You can only see the fins and head of the dragon as it moves through the
@@ -209,7 +240,7 @@ elemental muck little~
 a muck elemental~
 A little elemental is rolling around in a puddle of muck.
 ~
-1 1 bdoD mn 1
+1 1 bdoD nL 1
 0 0 2 5
 D
 This little ball of muck is playing in its own mess.
@@ -240,7 +271,7 @@ giant hill~
 the hill giant~
 A hill giant towers over you, swinging a club the size of a tree!
 ~
-100 175 dkuvA cEG 6
+100 175 dkuvAI cEG 6
 0 0 26 5
 D
    The hill giant towers over you with an entire tree slung over its shoulder
@@ -283,7 +314,7 @@ giant river~
 the river giant~
 A river giant towers over you, barely missing you on its path across the countryside!
 ~
-100 175 dkuvA cEG 6
+100 175 dkuvAI cEG 6
 0 0 26 5
 D
    This giant is dressed mainly in gigantic nets, which appear to double as
@@ -326,7 +357,7 @@ giant dune~
 the dune giant~
 A dune giant towers above you, with a tree over its shoulder!
 ~
-100 175 dkuvA cEG 6
+100 175 dkuvAI cEG 6
 0 0 26 5
 D
    This gigantic desert nomad has a massive tree slung over its shoulder like a
@@ -371,6 +402,10 @@ Portents of the giant linger in the air.
 ~
 100 175 bd kln 3
 0 0 0 15
+D
+   Only immortals should see this. This is the spawner for the giants in the
+wandering giant adventure.
+~
 T 10966
 S
 #10971
@@ -405,6 +440,10 @@ Portents of doom linger in the air.
 ~
 100 175 bd kln 3
 0 0 0 15
+D
+   Only immortals should see this. It spawns the renegade casters for the
+adventure by the same name.
+~
 T 10980
 S
 #10981
@@ -412,7 +451,7 @@ S
 the rogue wizard #n~
 A rogue wizard is skulking here.
 ~
-100 175 dvxA c 3
+100 175 dvxAI c 3
 1 0 0 20
 D
    The black and gray robes immediately signify -- to those who are familiar
@@ -466,7 +505,7 @@ S
 the druid #n~
 A rogue Magiterranean druid is creeping through the shadows.
 ~
-100 175 dvxA c 3
+100 175 dvxAI c 3
 1 3 9 21
 D
    #n peers around nervously from beneath a brown hood, as if he
@@ -509,7 +548,7 @@ S
 #n the teenage witch~
 A teenage witch stands with her hands on her hips.
 ~
-100 175 dvxyD cD 3
+100 175 dvxyDI cD 3
 2 0 0 16
 D
    #n stands with her hands on her hips, frowning. Her black hair and pale
@@ -551,7 +590,7 @@ S
 #n the teenage witch~
 A teenage witch is playing with fire.
 ~
-100 175 bdvxyD cD 3
+100 175 bdvxyDI cD 3
 2 0 0 16
 D
    As she runs a brush through her long red hair, #n's gaze appears

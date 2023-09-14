@@ -76,7 +76,7 @@ nature combat~
 ~
 if !%self.affect(3012)%
   eartharmor
-elseif !%actor.aff_flagged(entangle)%
+elseif !%actor.aff_flagged(IMMOBILIZED)%
   entangle
 else
   skybrand

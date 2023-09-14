@@ -78,9 +78,9 @@ an orb of light~
 A glowing orb is floating here.~
 This orb provides a bright light to the room.
 ~
-3 cg ao 0 1
-0 0 0
-10 36
+29 g ao 0 2
+36 1 4
+10 0
 S
 #1107
 staff wooden~

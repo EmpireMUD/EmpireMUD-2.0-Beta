@@ -547,6 +547,310 @@ set tortoise %room.vehicles%
 return 0
 %purge% %self%
 ~
+#18226
+random guild adventurer description~
+0 n 100
+~
+switch %random.5%
+  case 1
+    %mod% %self% longdesc %self.name% is looking for a place to setup %self.hisher% lab tent.
+    %mod% %self% lookdesc The shoes of this adventurer are completely covered in muck and other unspeakable things from the city's sewers where the local goblin outpost is located.
+    %mod% %self% append-lookdesc Seems as though %self.heshe% had some luck however, as a goblin made dagger rests in a sheath on %self.hisher% hip and a bundled lab tent is over %self.hisher% shoulder.
+  break
+  case 2
+    %mod% %self% longdesc Muck slowly drips from %self.name%'s winged armor.
+    %mod% %self% lookdesc The shoes of this adventurer are completely covered in muck and other unspeakable things from the city's sewers where %self.heshe% has been hunting rats and other denizens of those smelly tunnels.
+    %mod% %self% append-lookdesc It seems %self.heshe% might have found a young dragon down there as well, given the winged armor containing %self.hisher% torso.
+  break
+  case 3
+    %mod% %self% longdesc %self.name% looks a little burnt but happy as %self.heshe% walks around.
+    %mod% %self% lookdesc Even with this adventurer's obvious low to mid quality gear, you can see %self.heshe%'s been rather busy hunting the wandering dragons of the world.
+    %mod% %self% append-lookdesc With slightly scorched armor, weapon, and hair %self.heshe% is still grinning as %self.heshe% sports a reasonable collection of dragon scales.
+  break
+  case 4
+    %mod% %self% longdesc %self.name% wanders along in a scent cloud of burning bodies.
+    %mod% %self% lookdesc The scent of burning bodies clings to this adventurer as %self.heshe% walks about.
+    %mod% %self% append-lookdesc At first it isn't clear just where that offensive scent would have come from, but then %self.heshe% plucks a Necrofiend's spike from %self.hisher% backside with a wince.
+  break
+  case 5
+    %mod% %self% longdesc %self.name% skips along, twirling a gnarled old wand.
+    %mod% %self% lookdesc The adventurer skips along in an oversized, purple witch's hat, twirling %self.hisher% gnarled old wand with little care for what it's aimed at.
+    %mod% %self% append-lookdesc Luckily, %self.heshe% doesn't seem to know how to use it -- or %self.heshe% doesn't have the power.
+  break
+done
+~
+#18227
+GoA: Use smoke bomb~
+1 c 2
+use~
+* Flushes out a Goblin Challenge
+return 1
+* basic errors first
+if !%arg% || %actor.obj_target(%arg.car%)% != %self%
+  return 0
+  halt
+elseif %actor.fighting%
+  %send% %actor% You're a bit busy right now!
+  halt
+elseif %actor.position% != Standing && %actor.position% != Resting && %actor.position% != Sitting
+  %send% %actor% You need to get up first.
+  halt
+end
+* try to do the thing
+set ok 0
+set room %actor.room%
+* remove goblins
+set ch %room.people%
+while %ch%
+  set next_ch %ch.next_in_room%
+  if %ch.vnum% >= 10200 && %ch.vnum% <= 10205
+    if !%ok%
+      %send% %actor% You throw down the smoke bomb... there's a putrid smell as green gas fills the nest!
+      %echoaround% %actor% ~%actor% throws down a smoke bomb... there's a putrid smell as green as fills the nest!
+      set ok 1
+    end
+    if %ch.vnum% == 10200 || %ch.vnum% == 10204
+      %regionecho% %room% 15 &&y&&Z~%ch% yells, 'We's going to get you next time!'&&0
+    elseif %ch.vnum% == 10201 || %ch.vnum% == 10205
+      %regionecho% %room% 15 &&y&&Z~%ch% yells, 'You hasn't seen the last of us!'&&0
+    elseif %ch.vnum% == 10202 || %ch.vnum% == 10203
+      %regionecho% %room% 15 &&y&&Z~%ch% yells, 'Aaaaaaaaaahhhh!!!'&&0
+    end
+    %echo% ~%ch% runs screaming from the nest!
+    %purge% %ch%
+  end
+  set ch %next_ch%
+done
+* remove bell
+set bell %room.contents(19060)%
+if %bell%
+  %purge% %bell%
+  if !%ok%
+    %send% %actor% You throw down the smoke bomb... there's a putrid smell as green gas fills the nest!
+    %echoaround% %actor% ~%actor% throws down a smoke bomb... there's a putrid smell as green as fills the nest!
+    %regionecho% %room% 15 &&yYou hear a goblin yell, 'Aaaaaaaaaahhhh!!!'&&0
+    set ok 1
+  end
+end
+* and?
+if %ok%
+  * trigger completion
+  %adventurecomplete%
+  set ch %room.people%
+  while %ch%
+    if %ch.on_quest(18241)%
+      %quest% %ch% trigger 18241
+      %send% %ch% You've successfully cleared a goblin nest with the smoke bomb!
+    end
+    set ch %ch.next_in_room%
+  done
+  %mod% %room% description The floor of the ruins is eaten away and you stumble down into a den to which the word filthy hardly does justice.
+  %mod% %room% append-description It looks like some goblins had been nesting here, but something has driven them off. There's a lingering stench and some green smoke hanging in the still air, but not sign of the goblins.
+  %purge% %self%
+else
+  %send% %actor% It doesn't look like there are any goblins here to clear out. It's best you save your smoke bomb.
+end
+~
+#18228
+GoA: Use gilded net to catch bugs~
+1 c 2
+net~
+* Catches a 'bug' in Mill Manor
+set num_needed 2
+set bug_list 11133 11137 11140
+return 1
+* basic errors first
+set vict %actor.char_target(%arg.car%)%
+if !%arg%
+  %send% %actor% Net whom?
+  halt
+elseif %vict.vnum% < 11130 || !(%bug_list% ~= %vict.vnum%)
+  %send% %actor% You can't net ~%vict% with this!
+  halt
+elseif %actor.fighting%
+  %send% %actor% You're a bit busy right now!
+  halt
+elseif %actor.position% != Standing
+  %send% %actor% You need to get up first.
+  halt
+end
+* try to do the thing
+%send% %actor% You swoop toward ~%vict% with the gilded net... and catch it!
+%echoaround% %actor% ~%actor% swoops toward ~%vict% with @%self%... and catches it!
+eval 18243_bug_count %actor.var(18243_bug_count,0)% + 1
+remote 18243_bug_count %actor.id%
+%purge% %vict%
+if %18243_bug_count% >= %num_needed%
+  %send% %actor% That's all the bugs you needed... and good thing, too. Your net just broke!
+  if %actor.on_quest(18243)%
+    %quest% %actor% trigger 18243
+  end
+  %purge% %self%
+end
+~
+#18229
+GoA: Rodentmort's water-logged cage~
+1 c 2
+borrow release~
+return 1
+set room %self.room%
+* BORROW first
+if borrow /= %cmd%
+  if !%arg%
+    %send% %actor% Borrow what?
+  elseif !(Rodentmort /= %arg%) && !(rat /= %arg%) && !(Morty /= %arg%)
+    %send% %actor% This cage can only be used to borrow Rodentmort.
+  elseif %self.val0%
+    %send% %actor% You already borrowed Rodentmort.
+  elseif !%room.people(19000)%
+    %send% %actor% You need to borrow the rat from the swamp hag; she's not here.
+  elseif %actor.fighting% || %actor.position% == Sleeping
+    %send% %actor% You can't do that right now.
+  else
+    set hag %room.people(19000)%
+    %force% %hag% say Here you are, dearie...
+    wait 1
+    %echo% A rat of unusual size hops into |%actor% water-logged cage!
+    nop %self.val0(1)%
+    %mod% %self% lookdesc The wicker cage looks freshly-made but there are bites and scratches near any hole or opening. The cage is woven to be nearly solid, perhaps to keep its
+    %mod% %self% append-lookdesc occupant from squeezing or biting its way out, but from the number of repairs, it doesn't seem to work...
+    %mod% %self% append-lookdesc-noformat &0   The cage is heavy, but it's on skids so you spend most of your time dragging
+    %mod% %self% append-lookdesc-noformat it behind you, listening to the guttural squeaks of poor Rodentmort.
+    %mod% %self% append-lookdesc-noformat Use: release Rodentmort
+  end
+  halt
+end
+* RELEASE SECOND
+set needed 3
+if !%self.val0%
+  %send% %actor% You need to go borrow Rodentmort from Germione first.
+  halt
+elseif !%arg%
+  %send% %actor% Release what?
+  halt
+elseif !(Rodentmort /= %arg%) && !(rat /= %arg%) && !(Morty /= %arg%)
+  %send% %actor% You don't seem to have that (try: release Rodentmort).
+  halt
+end
+* validate
+set found 0
+set ch %actor.room.people%
+while %ch%
+  if %ch.vnum% == 18224 && %ch.leader% == %actor%
+    set found 1
+  end
+  set ch %ch.next_in_room%
+done
+if %found%
+  %send% %actor% Rodentmort is already out of his cage.
+  halt
+end
+if %actor.var(18245_food_count,0)% >= %needed%
+  %send% %actor% Rodentmort is sleeping in his cage; you already finished this quest.
+  * in case
+  %quest% %actor% trigger 18245
+  halt
+end
+* ok, summon him
+%load% mob 18224
+set rat %actor.room.people%
+if %rat.vnum% == 18224
+  %force% %rat% mfollow %actor%
+  %send% %actor% You open the water-logged cage and ~%rat% plops out!
+  %echoaround% %actor% ~%actor% opens a water-logged cage and ~%rat% plops out!
+else
+  %send% %actor% You can't seem to get the cage open.
+end
+~
+#18230
+GoA: Rodentmort behavior~
+0 bt 75
+~
+* seek food and eat
+set needed 3
+set leader %self.leader%
+set room %self.room%
+* check leader here
+if !%leader% || %leader.room% != %room%
+  %echo% ~%self% scampers off.
+  %purge% %self%
+  halt
+end
+* eat a corpse? try inventory then room
+set obj %self.inventory(1000)%
+set loop 0
+while %loop% <= 1
+  if %obj%
+    %echo% ~%self% devours @%obj%! &&Z&%self% makes a huge mess.
+    nop %obj.empty%
+    %purge% %obj%
+    eval 18245_food_count %leader.var(18245_food_count,0)% + 1
+    remote 18245_food_count %leader.id%
+    wait 1 s
+    if %18245_food_count% >= %needed%
+      %echo% ~%self% hops back into ^%self% cage and falls asleep.
+      %quest% %leader% trigger 18245
+      %purge% %self%
+    end
+    halt
+  end
+  set obj %room.contents(1000)%
+  eval loop %loop% + 1
+done
+~
+#18231
+GoA: Loom of diminution (shrink ray)~
+1 c 2
+shrink~
+return 1
+set room %actor.room%
+set vict %actor.char_target(%arg.car%)%
+if !%arg%
+  %send% %actor% Shrink whom with the loom of diminution?
+  halt
+elseif !%vict%
+  %send% %actor% You don't see anybody called %arg.car% here.
+  halt
+elseif %vict.vnum% < 10200 || %vict.vnum% > 10205 || %vict.affect(18232)%
+  %send% %actor% You take aim at ~%vict% with the loom, but it doesn't have any effect!
+  %echoaround% %actor% ~%actor% aims a strange wooden loom at ~%vict%, but nothing happens!
+  halt
+elseif %vict.affect(18231)%
+  %send% %actor% It looks like ~%vict% has already shrunk!
+  halt
+elseif %random.100% > 75
+  * 25% chance to fail
+  %send% %actor% You take aim at ~%vict% with the loom, but it doesn't have any effect...
+  %echoaround% %actor% ~%actor% aims a strange wooden loom at ~%vict%, but nothing happens...
+  %echo% ... if anything, it might have made *%vict% bigger!
+  dg_affect #18232 %vict% BONUS-PHYSICAL 1 -1
+  dg_affect #18232 %vict% BONUS-MAGICAL 1 -1
+  halt
+end
+* ok to shrink them
+%send% %actor% You take aim at ~%vict% with the loom of diminution...
+%echoaround% %actor% ~%actor% takes aim at ~%vict% with a strange wooden loom...
+%echo% ~%vict% shrieks as &%vict% shrinks and shrinks!
+if !%vict.affect(18231)%
+  nop %vict.add_mob_flag(!LOOT)%
+  if %vict.mob_flagged(HARD)%
+    nop %vict.remove_mob_flag(HARD)%
+  elseif %vict.mob_flagged(GROUP)%
+    nop %vict.remove_mob_flag(GROUP)%
+    nop %vict.add_mob_flag(HARD)%
+  end
+  dg_affect #18231 %vict% BONUS-PHYSICAL -20 -1
+  dg_affect #18231 %vict% BONUS-MAGICAL -20 -1
+end
+* check completion
+set ch %room.people%
+while %ch%
+  if %ch.on_quest(18242)%
+    %quest% %ch% trigger 18242
+  end
+  set ch %ch.next_in_room%
+done
+~
 #18238
 Consider / Kill Death~
 0 c 0
@@ -559,7 +863,7 @@ end
 if consider /= %cmd%
   %send% %actor% You consider your chances against ~%self%.
   %echoaround% %actor% ~%actor% considers ^%actor% chances against ~%self%.
-  %send% %actor% &%self% looks like &%self%'d destroy you!
+  %send% %actor% &%self% looks like &%self% will destroy you in time!
   return 1
   halt
 else
@@ -613,6 +917,559 @@ if !%rep_check%
   halt
 end
 return 0
+~
+#18248
+GoA: Pry gem off the wall~
+1 c 2
+pry~
+set valid_rooms 18503 18504 18508 18509 18510 18511 18512 18513 18514
+set needed 4
+set room %actor.room%
+return 1
+if %arg% && %arg% != gem
+  %send% %actor% You can only use @%self% to pry gems.
+  halt
+elseif !%room.template% || !(%valid_rooms% ~= %room.template%)
+  %send% %actor% There are no gems you can pry here using @%self%.
+  halt
+elseif %room.var(18246_gem_pried,0)% == %actor.id%
+  %send% %actor% You already pried it off.
+  halt
+elseif %room.var(18246_gem_pried,0)% > 0
+  %send% %actor% There was a gem here, but someone has already pried it off.
+  halt
+end
+* ok safe to pry
+%load% obj 18249 %actor% inv
+set 18246_gem_pried %actor.id%
+remote 18246_gem_pried %room.id%
+%send% %actor% You manage to pry a gem loose from the wall!
+%echoaround% %actor% ~%actor% pries a gem loose from the wall and pockets it!
+%mod% %room% append-description Someone has pried a gem from the wall.
+* check limit
+set found 0
+set obj %actor.inventory%
+while %obj%
+  if %obj.vnum% == 18249
+    eval found %found% + 1
+  end
+  set obj %obj.next_in_list%
+done
+if %found% >= %needed%
+  %send% %actor% ... your enchanted bar of prying breaks. Luckily, you got enough gems.
+  %echoaround% %actor% @%self% breaks in |%actor% hands.
+  %purge% %self%
+end
+~
+#18249
+GoA: Flame's End Fandango dragon script~
+0 b 100
+~
+* ticks every 13 seconds for the dragon dance
+set room %self.room%
+set count 0
+set 18248_next %self.var(18248_next)%
+set ch %room.people%
+* check and update progress
+while %ch%
+  if %ch.var(18248_dancing)% == %self.vnum%
+    eval count %count% + 1
+    if %18248_next% && %ch.var(18248_move)% == %18248_next%
+      eval 18248_prog %ch.var(18248_prog)% + 1
+      if %18248_prog% >= 8
+        * done!
+        %send% %ch% You complete the dance with a flourish!
+        %send% %ch% ~%self% seems impressed! You've finished the quest!
+        %echoaround% %ch% ~%ch% completes the dance with a flourish!
+        %quest% %ch% trigger 18248
+        rdelete 18248_dancing %ch.id%
+        rdelete 18248_prog %ch.id%
+        set 18248_despawn 1
+        remote 18248_despawn %self.id%
+        eval count %count% - 1
+        set card %ch.inventory(18255)%
+        if %card%
+          %send% %ch% You yelp and let go of the draconic dance card as it spontaneously burns up!
+          %purge% %card%
+        end
+      end
+    elseif %18248_next%
+      %send% %ch% You might have missed that last dance move...
+      eval 18248_prog %ch.var(18248_prog)% - 1
+      if %18248_prog% < 0
+        set 18248_prog 0
+      end
+      remote 18248_prog %ch.id%
+    else
+      * no next move (probably first move)
+      set 18248_prog 0
+    end
+    remote 18248_prog %ch.id%
+    rdelete 18248_move %ch.id%
+  end
+  set ch %ch.next_in_room%
+done
+* still going?
+if %count% > 0
+  set move_list twirl spin jump slide sway flutter glide stomp wave stretch wiggle clap skip hop shake tiptoe kick sashay pirouette
+  * 19 is the number of moves
+  set move %random.19%
+  while %move% > 0
+    set 18248_next %move_list.car%
+    set move_list %move_list.cdr%
+    eval move %move% - 1
+  done
+  remote 18248_next %self.id%
+  wait 1 s
+  switch %random.3%
+    case 1
+      %echo% ~%self% motions for a '%18248_next%'...
+    break
+    case 2
+      %echo% ~%self% seems to want you to '%18248_next%'...
+    break
+    case 3
+      %echo% It seems like a '%18248_next%' would impress ~%self%...
+    break
+  done
+else
+  * done
+  if %self.var(18248_despawn)%
+    if %instance.start%
+      %at% %instance.start% %adventurecomplete%
+    end
+    wait 1
+    %echo% ~%self% is so impressed that &%self% leaves the region and moves on.
+    %purge% %self%
+  else
+    rdelete 18248_next %self.id%
+    nop %self.remove_mob_flag(SENTINEL)%
+    detach 18249 %self.id%
+  end
+end
+~
+#18250
+GoA: Use stone orb of hiding~
+1 c 2
+use~
+* check targeting
+if !%arg% || %actor.obj_target(%arg.car%)% != %self%
+  return 0
+  halt
+end
+return 1
+set room %actor.room%
+set start %instance.start%
+set emerald %room.contents(18507)%
+* check location
+if %room.template% != 18501
+  %send% %actor% You need to use this orb at the great gate of a lost temple, in front of its emerald-green orb.
+  halt
+elseif %start% && %start.var(18247_hidden,0)%
+  %send% %actor% The emerald-green orb in front of the gate is drained of power. Someone has already hidden this temple.
+  halt
+elseif !%emerald%
+  %send% %actor% It looks like someone already shattered the emerald-green orb. You won't be able to use @%self% here.
+  halt
+end
+* ok go
+%adventurecomplete%
+if %start%
+  set 18247_hidden %actor.id%
+  remote 18247_hidden %start.id%
+end
+%send% %actor% You hold out @%self% and watch as a strange glow flows from the emerald-green orb in front of the gate, into the orb in your hands...
+%echoaround% %actor% ~%actor% holds out @%self% and you watch as a strange glow flows from the emerald-green orb in front of the gate, into the orb in ^%actor% hands...
+%regionecho% %room% 1 There's a strange rumbling that shakes the whole area!
+%echo% The emerald-green orb goes dark as vines begin to overtake the temple.
+%send% %actor% The stone orb in your hands turns to sand and falls to the ground.
+%mod% %room% description You stand before a huge, thick stone gate, engraved with carvings of tribal warriors dressed as eagles and jaguars. The gate is closed;
+%mod% %room% append-description there does not seem to be a way to open it. The orb that once powered the gate has gone dark.
+* trigger quests
+set ch %room.people%
+while %ch%
+  if %ch.on_quest(18247)%
+    %quest% %ch% trigger 18247
+  end
+  set ch %ch.next_in_room%
+done
+* and purge
+%purge% %emerald%
+%purge% %self%
+~
+#18251
+GoA: Bribe bandits~
+1 c 2
+bribe~
+return 1
+* check bandit here
+set room %actor.room%
+* find 1 bandit
+set bandit %room.people(10105)%
+if !%bandit%
+  set bandit %room.people(10106)%
+end
+if !%bandit%
+  set bandit %room.people(10107)%
+end
+if !%bandit%
+  %send% %actor% There's nobody here you can give this bribe to.
+  halt
+end
+* check bribe amount and variables
+eval intimidate %actor.strength% == 15 || %actor.level% >= 300
+eval outwit %actor.wits% == 15
+eval charm %actor.charisma% == 15
+eval override %intimidate% || %outwit% || %charm%
+set amount %arg.car%
+set type %arg.cdr%
+if !%arg%
+  %force% %bandit% say Ha! You're wasting my time and yours. I want at least 500 coin on top of that.
+  %send% %actor% Type 'bribe 500 coins' to make a better offer.
+  halt
+elseif !(coins /= %type%)
+  %send% %actor% Usage: bribe <number> coins
+  %send% %actor% You cannot specify a type of coins for this.
+  halt
+elseif %amount% < 100 && !%override%
+  %force% %bandit% say You must be bloody joking. Best make it 600 coin.
+  %send% %actor% Type 'bribe 600 coins' to make a better offer.
+  halt
+elseif %amount% < 200 && !%override%
+  %force% %bandit% say %amount%? No. I could do 450.
+  %send% %actor% Type 'bribe 600 coins' to make a better offer.
+  halt
+elseif %amount% < 300 && !%override%
+  %force% %bandit% say How about 350?
+  %send% %actor% Type 'bribe 350 coins' to make a better offer.
+  halt
+end
+* anything >= 300 is fine...
+if %amount% > 0
+  if !%actor.can_afford(%amount%)%
+    %send% %actor% You don't have that many coins.
+    halt
+  else
+    nop %actor.charge_coins(%amount%)%
+  end
+end
+* messages
+if %amount% < 450 && %charm%
+  %send% %actor% You charm ~%bandit%, who agrees to your terms.
+  %echoaround% %actor% ~%actor% seems to charm ~%bandit%.
+elseif %amount% < 450 && %outwit%
+  %send% %actor% You play a quick game of rock, cloth, shearing knife with ~%bandit%... and win!
+  %echoaround% %actor% ~%actor% plays a quick game of rock, cloth, shearing knife with ~%bandit%... and wins!
+elseif %amount% < 450 && %intimidate%
+  %send% %actor% You get real close to ~%bandit% and flash your weapon...
+  %echoaround% %actor% ~%actor% gets real close to ~%bandit% and flashes ^%actor% weapon...
+  %force% %bandit% say Alright, you're right, not worth it. We'll do it your way.
+end
+* final messaging
+if %amount% > 0
+  %send% %actor% You slip ~%bandit% the guild's bribe plus %amount% of your own coins...
+else
+  %send% %actor% You slip the guild's bribe to ~%bandit%.
+end
+%echoaround% %actor% ~%actor% slips something to ~%bandit%.
+wait 1
+%force% %bandit% say Well, that's our mischief managed, then.
+wait 1
+* complete quests and purge bandits
+%adventurecomplete%
+set ch %room.people%
+while %ch%
+  set next_ch %ch.next_in_room%
+  if %ch.on_quest(18251)%
+    %quest% %ch% trigger 18251
+  elseif %ch.vnum% >= 10105 && %ch.vnum% <= 10109
+    %echo% ~%ch% leaves.
+    %purge% %ch%
+  end
+  set ch %next_ch%
+done
+* and purge me
+%purge% %self%
+~
+#18252
+GoA: Pilfer pixy using a jar~
+1 c 2
+pilfer~
+return 1
+set room %actor.room%
+if %arg% && !(pixy /= %arg%)
+  %send% %actor% This jar can only be used for pilfering pixies.
+  halt
+elseif %self.val0%
+  %quest% %actor% trigger 18252
+  %send% %actor% You've already pilfered the pixy.
+  halt
+elseif %room.template% != 11918
+  %send% %actor% You're not looking for any common pixy... You need to do this at the Pixy Races in the Tower Skycleave.
+  halt
+end
+* ok:
+%send% %actor% You covertly place the jar next to the pixy stalls and tap it three times...
+%send% %actor% You see one of the pixies -- Mischantsy -- disappear in a little whirl of light, and then the jar shakes.
+%send% %actor% You slip the jar back in your pocket and hope no one sees.
+%echoaround% %actor% You notice ~%actor% doing something near the pixy stalls.
+%quest% %actor% trigger 18252
+nop %self.val0(1)%
+%mod% %self% keywords jar pilfered pixy old clay Mischantsy's Mischantsys
+%mod% %self% shortdesc Mischantsy's pixy jar
+%mod% %self% longdesc A pilfered pixy in a jar is lying on the ground.
+%mod% %self% lookdesc The jar is made from rough clay and looks quite old. The top is sealed with
+%mod% %self% append-lookdesc red wax, and you can hear someone shouting inside when you shake it. Magic
+%mod% %self% append-lookdesc words are written along the jar's margin, in an ancient language you can't read.
+%mod% %self% append-lookdesc-noformat &0   You need to take the jar to the guild tinker in the Tipsy Tortoise.
+~
+#18253
+GoA: Use skeleton key to steal scrolls~
+1 c 2
+use~
+return 1
+set room %actor.room%
+if !%arg% || %actor.obj_target(%arg.car%)% != %self%
+  return 0
+  halt
+elseif %self.val0%
+  %send% %actor% You've already stolen the scrolls.
+  %quest% %actor% trigger 18253
+  halt
+elseif %room.people(11847)% && %actor.skill(Stealth)% < 50
+  %send% %actor% You can't get to the right drawer with Kara Virduke here.
+  halt
+elseif %actor.fighting%
+  %send% %actor% You're a little busy right now!
+  halt
+elseif %room.template% != 11835 && %room.template% != 11935
+  %send% %actor% This isn't the right place to use the disarticulated skeleton key.
+  halt
+end
+* ok:
+%send% %actor% You sneak over through the archway and unlock a drawer with the disarticulated skeleton key...
+%send% %actor% You find the sealed scrolls inside and quickly pocket them.
+%echoaround% %actor% You notice ~%actor% doing something through the archway, but &%var%'s back before you can see what &%var%'s doing.
+%quest% %actor% trigger 18253
+nop %self.val0(1)%
+%mod% %self% keywords scrolls evolving enigmas set
+%mod% %self% shortdesc scrolls of evolving enigmas
+%mod% %self% longdesc A set of scrolls of evolving enigmas is lying on the ground.
+%mod% %self% lookdesc The set contains three scrolls bound together with a shimmering rainbow ribbon, which you cannot remove. Only the title text on the outside of the scrolls can be read:
+switch %random.6%
+  case 1
+    %mod% %self% append-lookdesc-noformat &0      Conjure Confections: The Art of Edible Illusions
+    %mod% %self% append-lookdesc-noformat &0      Casting Coup d'Etat: How to Turn Rival Sorcerers into Rabbits
+    %mod% %self% append-lookdesc-noformat &0      Invisible Threads: Weaving a Tapestry of Subjugation with Spells
+  break
+  case 2
+    %mod% %self% append-lookdesc-noformat &0      Eldritch Blast and Past: Mastering Time-Travel with a Zing
+    %mod% %self% append-lookdesc-noformat &0      Beyond Borders: The Sorcerer's Guide to Expanding Horizons
+    %mod% %self% append-lookdesc-noformat &0      The Grimoire Gambol: Dancing Your Way Through Spellcasting
+  break
+  case 3
+    %mod% %self% append-lookdesc-noformat &0      The Art of Blinking: Winking for Mages
+    %mod% %self% append-lookdesc-noformat &0      Goblin Romance: Wooing with Stolen Shiny Objects
+    %mod% %self% append-lookdesc-noformat &0      Empire of the Unseen: The Alchemical Art of Crafting Kingdoms
+  break
+  case 4
+    %mod% %self% append-lookdesc-noformat &0      Summon Sandwich: When You're Hungry and in a Bind
+    %mod% %self% append-lookdesc-noformat &0      Goblin's Guide to Gardening: How to Plant Trouble and Harvest Chaos
+    %mod% %self% append-lookdesc-noformat &0      Summoning Success: Bringing Minions to Work on Time and on Budget
+  break
+  case 5
+    %mod% %self% append-lookdesc-noformat &0      The Polymorph Paradox: Toad or Not Toad?
+    %mod% %self% append-lookdesc-noformat &0      Enchanted Economics: Turning Lead into Gold and Gold into World Domination
+    %mod% %self% append-lookdesc-noformat &0      Mana Management: Ensuring Your Empire's Energy Efficiency
+  break
+  case 6
+    %mod% %self% append-lookdesc-noformat &0      Feather Fall Fashion: Stylish Landing Strategies
+    %mod% %self% append-lookdesc-noformat &0      Dominion's Enigma: Deciphering Secrets of the Arcane Ascendant
+    %mod% %self% append-lookdesc-noformat &0      Goblin Tinker School: How to Turn Anything into a Makeshift Weapon
+  break
+done
+%mod% %self% append-lookdesc-noformat &0   You must deliver these scrolls to the Tipsy Tortoise.
+detach 18253 %self.id%
+~
+#18254
+GoA: Reflect mob with smoky mirror~
+1 c 2
+reflect~
+return 1
+set room %actor.room%
+set vict %actor.char_target(%arg.car%)%
+if !%arg%
+  %send% %actor% Reflect whom with the strange and smoky mirror?
+  halt
+elseif !%vict%
+  %send% %actor% You don't see anybody called %arg.car% here.
+  halt
+elseif %vict.vnum% < 10401 || %vict.vnum% > 10415
+  %send% %actor% You hold the strange and smoky mirror up to ~%vict% but can't see a reflection.
+  %echoaround% %actor% ~%actor% holds a strange mirror up near ~%vict% but you can't tell what &%var%'s doing.
+  halt
+end
+* ok to mirror them
+%send% %actor% You hold the strange and smoky mirror up to ~%vict%...
+%echoaround% %actor% ~%actor% holds a strange mirror up near ~%vict%...
+if %vict.vnum% == 10404 && !%self.val0%
+  nop %self.val0(1)%
+  set extract 1
+  %mod% %self% append-lookdesc-noformat &0   At certain angles, you can see a skeleton in the mirror!
+elseif %vict.vnum% == 10409 && !%self.val1%
+  nop %self.val1(1)%
+  set extract 1
+  %mod% %self% append-lookdesc-noformat &0   There's a chittering sound from the mirror, and you think you see a necrofiend!
+elseif %vict.vnum% == 10414 && !%self.val2%
+  nop %self.val2(1)%
+  set extract 1
+  %mod% %self% append-lookdesc-noformat &0   You think you see a woman dressed in black banging on the inside of the mirror.
+else
+  * oops
+  set extract 0
+end
+* check completion
+if %self.val0% && %self.val1% && %self.val2%
+  set ch %room.people%
+  while %ch%
+    if %ch.on_quest(18254)%
+      %quest% %ch% trigger 18254
+    end
+    set ch %ch.next_in_room%
+  done
+end
+* consequences!
+if %extract%
+  %echo% ~%vict% is sucked into the mirror with a puff of smoke!
+  %purge% %vict%
+else
+  %force% %vict% maggro %actor%
+end
+~
+#18255
+GoA: Flame's End Fandango dance~
+1 c 2
+dance twirl spin jump slide sway flutter glide stomp wave stretch wiggle clap skip hop shake tiptoe kick sashay pirouette~
+set room %actor.room%
+set 18248_dancing %actor.var(18248_dancing,-2)%
+set dg %room.people(%18248_dancing%)%
+if %cmd% == dance
+  * setup
+  if %actor.var(18248_dancing)% && %dg% && %dg.var(18248_next)% && %dg.has_trigger(18249)%
+    %send% %actor% You're already dancing... better keep up! (type %dg.var(18248_next)%)
+    halt
+  end
+  set dg %room.people(10330)%
+  if !%dg%
+    set dg %room.people(10331)%
+  end
+  if !%dg%
+    set dg %room.people(10332)%
+  end
+  if !%dg%
+    set dg %room.people(10333)%
+  end
+  if !%dg%
+    %send% %actor% There's no wandering dragon here to dance for.
+    rdelete 18248_dancing %actor.id%
+    halt
+  end
+  * ok
+  nop %dg.add_mob_flag(SENTINEL)%
+  if !%dg.has_trigger(18249)%
+    attach 18249 %dg.id%
+  end
+  if %dg.var(18248_next)%
+    %send% %actor% You join in on the dance. It looks like ~%dg% is waiting for you to '%dg.var(18248_next)%'!
+  else
+    %send% %actor% You prepare to dance for the dragon! Get ready...
+  end
+  set 18248_dancing %dg.vnum%
+  remote 18248_dancing %actor.id%
+  rdelete 18248_move %actor.id%
+  set 18248_prog 0
+  remote 18248_prog %actor.id%
+  halt
+elseif %18248_dancing% < 0
+  if %dg%
+    %send% %actor% You must type 'dance' to start the dance.
+  else
+    * just pass thru
+    return 0
+  end
+  halt
+end
+* doing a dance move
+if !%dg%
+  %send% %actor% The dragon seems to have left.
+  rdelete 18248_dancing %actor.id%
+  halt
+end
+set 18248_move %cmd%
+remote 18248_move %actor.id%
+if twirl /= %cmd%
+  set am You gracefully twirl on the spot, your movements as fluid as a river's current.
+  set rm ~%actor% gracefully twirls on the spot, ^%actor% movements as fluid as a river's current.
+elseif spin /= %cmd%
+  set am You spin around, a whirlwind of energy and motion.
+  set rm ~%actor% spins around, a whirlwind of energy and motion.
+elseif jump /= %cmd%
+  set am With a burst of energy, you leap into the air and land with a triumphant grin.
+  set rm With a burst of energy, ~%actor% leaps into the air and lands with a triumphant grin.
+elseif slide /= %cmd%
+  set am You slide across the ground with a playful glint in your eye, leaving a trail of excitement.
+  set rm ~%actor% slides across the floor with a playful glint in ^%actor% eye, leaving a trail of excitement.
+elseif sway /= %cmd%
+  set am Your body sways rhythmically to an invisible melody, capturing the essence of the music.
+  set rm |%actor% body sways rhythmically to an invisible melody, capturing the essence of the music.
+elseif flutter /= %cmd%
+  set am Your movements become light and airy, like a delicate butterfly dancing in the breeze.
+  set rm |%actor% movements become light and airy, like a delicate butterfly dancing in the breeze.
+elseif glide /= %cmd%
+  set am You glide smoothly across the floor, your steps elegant and serene.
+  set rm ~%actor% glides smoothly across the floor, ^%actor% steps elegant and serene.
+elseif stomp /= %cmd%
+  set am With a bold stomp, you make your presence known, commanding attention with each beat.
+  set rm With a bold stomp, ~%actor% makes ^%actor% presence known, commanding attention with each beat.
+elseif wave /= %cmd%
+  set am You wave your arms gracefully, a cheerful greeting to the world around you.
+  set rm ~%actor% waves ^%actor% arms gracefully, a cheerful greeting to the world around *%actor%.
+elseif stretch /= %cmd%
+  set am Your limbs extend in a graceful stretch, embodying a sense of freedom and vitality.
+  set rm |%actor% limbs extend in a graceful stretch, embodying a sense of freedom and vitality.
+elseif wiggle /= %cmd%
+  set am You wiggle and sway, exuding a carefree spirit in every movement.
+  set rm ~%actor% wiggles and sways, exuding a carefree spirit in every movement.
+elseif clap /= %cmd%
+  set am You clap your hands together, the sound echoing like applause for your performance.
+  set rm ~%actor% claps ^%actor% hands together, the sound echoing like applause for the performance.
+elseif skip /= %cmd%
+  set am You skip with childlike joy, your heart light and your spirits high.
+  set rm ~%actor% skips with childlike joy, ^%actor% heart light and ^%actor% spirits high.
+elseif hop /= %cmd%
+  set am A playful hop brings a touch of whimsy to your dance, a moment of pure delight.
+  set rm A playful hop brings a touch of whimsy to |%actor% dance, a moment of pure delight.
+elseif shake /= %cmd%
+  set am You shake your body with infectious energy, inviting others to join your enthusiasm.
+  set rm ~%actor% shakes ^%actor% body with infectious energy, inviting others to join the enthusiasm.
+elseif tiptoe /= %cmd%
+  set am You tiptoe gracefully, as if walking on air, leaving a trail of elegance in your wake.
+  set rm ~%actor% tiptoes gracefully, as if walking on air, leaving a trail of elegance in ^%actor% wake.
+elseif kick /= %cmd%
+  set am A swift kick punctuates your dance, infusing it with a burst of dynamic energy.
+  set rm A swift kick punctuates |%actor% dance, infusing it with a burst of dynamic energy.
+elseif sashay /= %cmd%
+  set am You sashay with confidence, your steps full of flair and style.
+  set rm ~%actor% sashays with confidence, ^%actor% steps full of flair and style.
+elseif pirouette /= %cmd%
+  set am You execute a perfect pirouette, your grace and precision a testament to your skill.
+  set rm ~%actor% executes a perfect pirouette, ^%actor% grace and precision a testament to ^%actor% skill.
+else
+  %send% %actor% You don't know that dance move.
+  halt
+end
+%send% %actor% %am%
+%echoaround% %actor% %rm%
 ~
 #18256
 Catch wildling with a huge net~
@@ -874,6 +1731,43 @@ Adventurer Guild Tier 2: Give items on start~
 2 u 0
 ~
 switch %questvnum%
+  case 18241
+    %load% obj 18218 %actor% inv
+  break
+  case 18242
+    %load% obj 18215 %actor% inv
+  break
+  case 18243
+    %load% obj 18220 %actor% inv
+    set 18243_bug_count 0
+    remote 18243_bug_count %actor.id%
+  break
+  case 18245
+    %load% obj 18224 %actor% inv
+    set 18245_food_count 0
+    remote 18245_food_count %actor.id%
+  break
+  case 18246
+    %load% obj 18248 %actor% inv
+  break
+  case 18247
+    %load% obj 18250 %actor% inv
+  break
+  case 18248
+    %load% obj 18255 %actor% inv
+  break
+  case 18251
+    %load% obj 18251 %actor% inv
+  break
+  case 18252
+    %load% obj 18252 %actor% inv
+  break
+  case 18253
+    %load% obj 18253 %actor% inv
+  break
+  case 18254
+    %load% obj 18254 %actor% inv
+  break
   case 18279
     if %actor.completed_quest(18283)% && %actor.completed_quest(18287)% && %actor.completed_quest(18291)% && %actor.completed_quest(18295)%
       %load% obj 18294 %actor% inv
@@ -908,16 +1802,20 @@ if %questvnum% >= 18280 && %questvnum% <= 18283 && !%actor.inventory(18280)%
   set item %actor.inventory(18280)%
   * %send% %actor% You receive @%item%.
 end
-if %questvnum% >= 18288 && %questvnum% <= 18291 && !%actor.inventory(18288)%
-  %load% obj 18288 %actor% inv
-  set item %actor.inventory(18288)%
-  * %send% %actor% You receive @%item%.
-end
 ~
 #18278
 Support quest progress checker~
 2 v 0
 ~
+if %questvnum% == 18283
+  * remove signalling stone if any
+  set stone %actor.inventory(18280)%
+  if %stone%
+    %send% %actor% @%stone% vanishes from your pocket without a trace.
+    %purge% %stone%
+  end
+end
+* check if all 4 quests are done
 if %actor.completed_quest(18283)% && %actor.completed_quest(18287)% && %actor.completed_quest(18291)% && %actor.completed_quest(18295)%
   %quest% %actor% trigger 18279
 end
@@ -1019,11 +1917,11 @@ end
 set room %self.room%
 if %self.val0%
   * Captured a dragon
-  if %room.template% < 10031 || %room.template% > 10099
-    %send% %actor% You have already captured a dragon. Now go to Skycleave and use @%self% to imagine a copy of it.
-    halt
-  elseif %room.template% == 10030
+  if %roomm.building_vnum% == 11800 || %room.template% == 11800
     %send% %actor% Move further in past the entrance first.
+    halt
+  elseif (%room.template% < 11800 || %room.template% >= 11875) && (%room.template% < 11900 || %room.template% >= 11975)
+    %send% %actor% You have already captured a dragon. Now go to Skycleave and use @%self% to imagine a copy of it.
     halt
   end
   %load% mob 18282
@@ -1159,9 +2057,12 @@ done
 %purge% %self%
 ~
 #18288
-Resurrect Scaldorran~
+Resurrect Scaldorran: DEPRECATED~
 1 c 2
 use~
+* This is deprecated with the new version of Skycleave (Ashes of History), which does not require it.
+return 0
+halt
 if %actor.obj_target(%arg%)% != %self%
   return 0
   halt
@@ -1231,34 +2132,62 @@ end
 %purge% %self%
 ~
 #18290
-Bug Knezz's Office~
+Bug the Grand High Sorcerer's Office~
 1 c 2
 plant~
 if %actor.obj_target(%arg%)% != %self%
   return 0
   halt
 end
-if %self.room.template% != 10047
-  %send% %actor% You need to plant this in Knezz's room while he's not watching.
+set room %self.room%
+return 1
+set bad_office 11864 11964 11866 11966 11973
+if %bad_office% ~= %room.template%
+  %send% %actor% This doesn't quite seem to be the right office.
+  halt
+elseif %room.template% != 11868 && %room.template% != 11968
+  if %room.template% >= 11800 && %room.template% <= 11999
+    %send% %actor% You need to plant this bug in the Grand High Sorcerer's office.
+  else
+    %send% %actor% You need to plant this bug in the Grand High Sorcerer's office in the Tower Skycleave.
+  end
   halt
 end
-set knezz %instance.mob(10054)%
-if %knezz%
-  * Knezz is still here...
-  if %actor.skill(Stealth)% > 50
-    %send% %actor% You use your Stealth skill to plant @%self% while ~%knezz% isn't watching.
-  elseif %knezz.aff_flagged(BLIND)%
-    %send% %actor% You quickly plant @%self%, taking advantage of |%knezz% temporary blindness.
-    dg_affect %actor% HARD-STUNNED on 10
-  elseif %knezz.aff_flagged(STUNNED)% && !%knezz.fighting%
+* check shade
+set shade %room.people(11869)%
+if !%shade%
+  set shade %room.people(11863)%
+end
+if %shade%
+  %send% %actor% ~%shade% covers too much of the room for you to plant the bug.
+  halt
+end
+* check GHS
+set ghs %room.people(11968)%
+if !%ghs%
+  set ghs %room.people(11868)%
+end
+if !%ghs%
+  set ghs %room.people(11870)%
+end
+if !%ghs%
+  set ghs %room.people(11969)%
+end
+if %ghs%
+  * still here...
+  if %actor.skill(Stealth)% >= 75
+    %send% %actor% You use your Stealth skill to plant @%self% while ~%ghs% isn't watching.
+  elseif %ghs.aff_flagged(BLIND)%
+    %send% %actor% You quickly plant @%self%, taking advantage of |%ghs% temporary blindness.
+  elseif %ghs.aff_flagged(STUNNED)% && !%ghs.fighting%
     * Sap (presumably from an ally)
-    %send% %actor% You quickly plant the bug while ~%knezz% is stunned.
+    %send% %actor% You quickly plant the bug while ~%ghs% is stunned.
   else
-    %send% %actor% ~%knezz% would notice if you tried to plant the bug while he's watching...
+    %send% %actor% ~%ghs% would notice if you tried to plant the bug while &%ghs%'s watching...
     halt
   end
 else
-  %send% %actor% You plant @%self% in Knezz's office.
+  %send% %actor% You surreptitiously plant @%self% in the palatial office.
 end
 %quest% %actor% trigger 18290
 %purge% %self%
@@ -1537,39 +2466,46 @@ if !%actor.on_quest(18288)% || %actor.quest_triggered(18288)%
   %send% %actor% You don't need to give ~%self% the codeword now.
   halt
 end
+if %self.vnum% == 10048
+  %send% %actor% You seem to be in the wrong Skycleave.
+  halt
+end
 if %self.fighting% || %self.disabled%
   halt
 end
+* quiet me
 nop %self.add_mob_flag(SILENT)%
+detach 11806 %self.id%
+detach 11840 %self.id%
+if %self.has_trigger(11839)%
+  detach 11839 %self.id%
+  set murder 1
+else
+  set murder 0
+end
 set room %self.room%
 wait 1 sec
 set cycles_left 5
 while %cycles_left% >= 0
-  if %self.fighting% || %self.disabled%
-    * Combat interrupts the speech
-    %echo% |%self% monologue is interrupted.
-    nop %self.remove_mob_flag(SILENT)%
-    halt
-  end
   * Fake ritual messages
   switch %cycles_left%
     case 5
-      %echo% |%self% bony jaw hangs slack as he intones, 'Oh, you're from the which guild? Adventurers? That's the boring one.'
+      %echo% There is a howl from |%self% core as he intones, 'Oh, you're from the which guild? Adventurers? That's the boring one.'
     break
     case 4
-      say The guild hasn't been so good to me. I had a lot more face left before I started working with them, if you know what I mean.
+      say The guild hasn't been so good to me. I had a lot more FACE left before I started working with them, if you know what I mean.
     break
     case 3
-      %echo% ~%self% pulls a dangling bit of skin up into place, and staples it to his face with a spell from his wand.
+      %echo% |%self% linen wraps form a scowling face.
     break
     case 2
-      say I suppose I could be convinced to work with the guild again, if you could run some errands for me.
+      say I SUPPOSE I could be convinced to work with the guild again, if you could run some ERRANDS for me.
     break
     case 1
-      say I'll need a roc egg and I'll need some stealth work. Think you're up to it?
+      say I'll need a roc egg and I'll need some STEALTH WORK. Think you're up to it?
     break
     case 0
-      say Well!? Why are you just standing there? Get to it!
+      say Well!? Why are you just standing there? GET TO IT!
       wait 1 sec
       set person %room.people%
       while %person%
@@ -1580,6 +2516,18 @@ while %cycles_left% >= 0
         set person %person.next_in_room%
       done
       nop %self.remove_mob_flag(SILENT)%
+      * check trigger
+      if %self.vnum% == 11836
+        set trig 11806
+      else
+        set trig 11840
+      end
+      if !%self.has_trigger(%trig%)%
+        attach %trig% %self.id%
+      end
+      if %murder%
+        attach 11839 %self.id
+      end
       halt
     break
   done

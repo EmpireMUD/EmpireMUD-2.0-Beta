@@ -1,0 +1,42 @@
+#12300
+Fur Dragon~
+Paul Clarke and Domino~
+   It looks like you've found a legendary fur dragon... Or perhaps it has found
+you! These warm-blooded dragons live in burrows and stalk their prey -- which
+ranges from bison to elephants -- from the shadows. They're known to retreat to
+their den when threatened. Follow it inside if you dare, but be warned that few
+adventurers come back out.
+   This adventure features a new 'study' mechanic. By studying the chewed-up,
+mangled, and downright tattered gear that the fur dragon has collected from
+other adventurers, you can create crafting patterns for those same items.
+Studying consumes at least one of the items, depending on the item's quality.
+~
+12300 12349 225-325
+5 0 n 0
+L
+5 0
+4320 -1 -1 -1
+-1 0 0
+L
+4 0
+12300 12300 12301 -1
+-1 b p
+L
+4 0
+12301 12300 12301 -1
+-1 d p
+L
+4 0
+12302 12300 12301 -1
+-1 e p
+L
+4 0
+12303 12300 12301 -1
+-1 g p
+L
+6 0
+100 -1 -1 -1
+-1 0 0
+T 12308
+S
+$

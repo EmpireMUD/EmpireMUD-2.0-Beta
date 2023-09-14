@@ -212,7 +212,8 @@ char_data *combat_list = NULL;	// head of l-list of fighting chars
 char_data *next_combat_list = NULL;	// used for iteration of combat_list when more than 1 person can be removed from combat in 1 loop iteration
 char_data *next_combat_list_main = NULL;	// used for iteration of combat_list in frequent_combat()
 struct generic_name_data *generic_names = NULL;	// LL of generic name sets
-char_data *global_next_char = NULL;	// used in limits.c for iterating
+char_data *global_next_player = NULL;	// used in limits.c for iterating
+char_data *player_character_list = NULL;	// global doubly-linked list of players-only (no NPCs)
 
 // morphs
 morph_data *morph_table = NULL;	// main morph hash table
@@ -221,6 +222,8 @@ morph_data *sorted_morphs = NULL;	// alphabetic version // sorted_hh
 // objects
 obj_data *object_list = NULL;	// global doubly-linked list of objs
 obj_data *object_table = NULL;	// hash table of objs
+bool suspend_autostore_updates = FALSE;	// prevents rescheduling an event twice in a row
+bool add_chaos_to_obj_timers = FALSE;	// spreads out object timers
 
 // safe obj iterators
 obj_data *purge_bound_items_next = NULL;	// used in purge_bound_items()
@@ -236,6 +239,9 @@ struct group_data *group_list = NULL;	// global LL of groups
 bool pause_affect_total = FALSE;	// helps prevent unnecessary calls to affect_total
 int max_inventory_size = 25;	// records how high inventories go right now (for script safety)
 struct int_hash *inherent_ptech_hash = NULL;	// hash of PTECH_ that are automatic
+struct player_quest *global_next_player_quest = NULL;	// for safely iterating
+struct player_quest *global_next_player_quest_2 = NULL;	// it may be possible for 2 iterators at once on this
+struct over_time_effect_type *free_dots_list = NULL;	// global LL of DOTs that have expired and must be free'd late to prevent issues
 
 // progress
 progress_data *progress_table = NULL;	// hashed by vnum, sorted by vnum
@@ -452,6 +458,7 @@ void boot_db(void) {
 	expire_old_politics();
 	check_learned_empire_crafts();
 	check_nowhere_einv_all();
+	check_languages_all_empires();
 	verify_empire_goals();
 	need_progress_refresh = TRUE;
 	
@@ -1000,7 +1007,7 @@ void renum_world(void) {
 	process_temporary_room_data();
 	
 	HASH_ITER(hh, world_table, room, next_room) {
-		// affects
+		// schedule affects
 		LL_FOREACH(ROOM_AFFECTS(room), af) {
 			schedule_room_affect_expire(room, af);
 		}
@@ -1312,6 +1319,7 @@ void load_help(FILE *fl) {
 	char key[READ_SIZE+1], next_key[READ_SIZE+1], entry[32384];
 	char line[READ_SIZE+1], *scan;
 	struct help_index_element el;
+	int iter;
 
 	/* get the first keyword line */
 	get_one_line(fl, key);
@@ -1326,7 +1334,7 @@ void load_help(FILE *fl) {
 
 		el.level = 0;
 
-		if (*line == '#' && *(line + 1))
+		if (*line == '#' && *(line + 1)) {
 			// this uses switch, not alpha-math, because some of these levels
 			// may be the same as others, but the letters still need to work
 			// consistently -paul
@@ -1356,7 +1364,17 @@ void load_help(FILE *fl) {
 					break;
 				}
 			}
-
+		}
+		
+		// convert ampersand codes like &0 to tab codes like \t0 -- string length won't change
+		for (iter = 0; iter < strlen(entry); ++iter) {
+			if (entry[iter] == '&') {
+				entry[iter] = '\t';
+				// skip next letter as part of the code:
+				++iter;
+			}
+		}
+		
 		/* now, add the entry to the index with each keyword on the keyword line */
 		el.duplicate = 0;
 		el.entry = str_dup(entry);
@@ -1759,6 +1777,7 @@ void clear_char(char_data *ch) {
 	MOB_INSTANCE_ID(ch) = NOTHING;
 	MOB_DYNAMIC_SEX(ch) = NOTHING;
 	MOB_DYNAMIC_NAME(ch) = NOTHING;
+	MOB_LANGUAGE(ch) = NOTHING;
 	MOB_PURSUIT_LEASH_LOC(ch) = NOWHERE;
 	GET_ROPE_VNUM(ch) = NOTHING;
 	
@@ -1839,18 +1858,19 @@ char_data *read_mobile(mob_vnum nr, bool with_triggers) {
 		GET_MAX_MOVE(mob) = 1;
 	}
 	
+	// fix pools
 	for (iter = 0; iter < NUM_POOLS; ++iter) {
 		mob->points.current_pools[iter] = mob->points.max_pools[iter];
 	}
+
+	// GET_MAX_BLOOD is a function
+	GET_BLOOD(mob) = GET_MAX_BLOOD(mob);	// set ok: mob being loaded
 
 	mob->player.time.birth = time(0);
 	mob->player.time.played = 0;
 	mob->player.time.logon = time(0);
 
 	MOB_PURSUIT(mob) = NULL;
-
-	// GET_MAX_BLOOD is a function
-	GET_BLOOD(mob) = GET_MAX_BLOOD(mob);
 	
 	mob->script_id = 0;	// will detect when needed
 	
@@ -1863,7 +1883,12 @@ char_data *read_mobile(mob_vnum nr, bool with_triggers) {
 	}
 	
 	// note this may lead to slight over-spawning after reboots -pc 5/20/16
-	MOB_SPAWN_TIME(mob) = time(0);
+	set_mob_spawn_time(mob, time(0));
+	
+	// special handling for mobs with LIGHT flags on the prototype
+	if (AFF_FLAGGED(mob, AFF_LIGHT)) {
+		++GET_LIGHTS(mob);
+	}
 
 	return (mob);
 }

@@ -62,13 +62,18 @@ CHOP
 Chop (Scavenging ability)
 
 Usage:  chop
-Speed boosts:  Work ethic bonus, haste, higher axe damage, higher Strength
+Speed boosts:  Work ethic bonus, haste, higher level axe, superior axe
 
-This command allows you to chop trees in the forest. Beware, trees are a
-limited resource. Different types of forest give different qualities and
-quantities of trees. Some trees can be scraped, sawed, or lit on fire.
+This command allows you to chop trees in the forest. You must be using an axe
+in your wield, hold, sheath, or tool slot. Find any forest, grove, copse, or
+jungle and type 'chop'. It will take some time, depending on the level and
+quality of your axe.
 
-See also: BUILD, DEPLETION, SCRAPE, TREES, LUMBER, SAW, LIGHT
+Beware, trees are a limited resource. Different types of forest give different
+qualities and quantities of trees. Some trees can be scraped, sawed, or lit on
+fire.
+
+See also: BUILD, DEPLETION, SCRAPE, TREES, LUMBER, SAW, LIGHT, SAPLING
 #
 "DAILY EXPERIENCE BONUS POINTS" "DAILY SKILLS" "BONUS EXPERIENCE POINTS" "DAILY BONUS EXPERIENCE POINTS"
 
@@ -85,7 +90,7 @@ in the wrong skill by using 'noskill'.
 
 See also: ABILITY POINTS, SKILLS, SKILL CAPS, NOSKILL
 #
-DESIGNATE REDESIGNATE KITCHEN BEDROOM LABORATORY LARDER CLOSET CRYPT STUDY
+DESIGNATE REDESIGNATE KITCHEN BEDROOM LABORATORY LARDER CLOSET CRYPT STUDY GREATHALL "GREAT HALL"
 
 Usage:  designate <direction> <room>
         redesignate <room>
@@ -146,20 +151,29 @@ can't refund any coins, mana, or liquids that were spent.
 
 You can also dismantle some vehicles.
 
-This requires the 'dismantle' empire privilege, unless you are the person who
-originally built the building.
+To start dismantling something, you need the same ability that was required to
+build it in the first place. Use 'build info <name>' to see what ability that
+is. People without the ability can still help to dismantle it once someone has
+started.
+
+It also requires the 'dismantle' empire privilege, unless you are the person
+who originally built the building.
 
 You can use 'nodismantle' to keep yourself from accidentally dismantling a
 building.
 
-See also: BUILD, HOMELESS CITIZENS, NODISMANTLE
+Note: Mountain tiles only refresh with new ore each year if the mines (or other
+buildings) have been dismantled and removed. However, all other resource
+buildings refresh each year without being dismantled.
+
+See also: BUILD, BUILD INFO, HOMELESS CITIZENS, NODISMANTLE
 #
 "FIRE STICKS" FIRESTICKS "FIRE DRILL" "FIRESTEEL TINDERBOX" TINDERBOX "FLINT SET" LIGHTERS
 
 Items that light fires:
   fire sticks (Primitive Crafts ability)
   fire drill (Woodworking ability)
-  flintsteel tinderbox (Forge ability)
+  firesteel tinderbox (Forge ability)
 
 Usage:  light <object>
 
@@ -178,9 +192,10 @@ Usage:  gather
 Speed boosts:  Work ethic bonus, Finder ability, Haste
 
 Allows you to gather sticks from the ground, as well as small saplings. This
-generally works best in the forest.
+generally works best in the forest. On the plains, you can also gather bundles
+of grass to use as fiber.
 
-See also: DEPLETION, SAPLINGS, STICKS, SCAVENGING
+See also: DEPLETION, FIBER, SAPLINGS, STICKS, SCAVENGING
 #
 HARNESS UNHARNESS
 
@@ -225,7 +240,11 @@ mountable creatures or ones that are pulling carts, try 'lead' instead.
 
 Herd requires the Animal Husbandry ability.
 
-See also: ANIMAL HUSBANDRY, LEAD
+Use 'load' to move a herded animal into a ship or other vehicle. If a mob is a
+mount, you can use 'lead' to move it around instead of herd, especially if you
+are trying to get it into a carpenter.
+
+See also: ANIMAL HUSBANDRY, LEAD, LOAD
 #
 LEAD 
 
@@ -236,34 +255,29 @@ vehicle, it will move with you until type "lead" again to stop. Some vehicles
 need you to harness animals to them before they can move. You can also lead
 any animal which is mountable.
 
-Some vehicles can't be led.
+Some vehicles can't be led. If you can't lead a mob, try 'herd' instead.
 
 Example:  
   > lead horse 
 
 See also: BOARD, DRAG, HARNESS, HERD
 #
-LIGHT BURN TORCH
+LIGHT TORCH
 
-Usage:  light <item | vehicle | area>
-        burn <item | vehicle | area>
+Usage:  light <item | building | vehicle | area | direction>
 
 To light something, you must have fire sticks or some other lighter. You may
 light sticks to create torches. You can also light trees or logs to make camp
 fires. Dropping a torch (or lighting a fire) may burn down the building it's
-in, if it's unowned or you are at war with the owner.
-
-You can also burn the area (either with the word 'area' or with any keyword
-from the room title) to remove stumps and other features. This only works on
-certain terrain.
+in, if it's unowned or if you are at war with the owner.
 
 Some lighters have a limited number of uses and will be thrown away afterwards.
 If you have marked a lighter 'keep', it won't be used (unless it has unlimited
 uses).
 
-You can also burn down some vehicles with the 'light' command.
+To light buildings, vehicles, or terrain, use 'burn'.
 
-See also: COOKING FIRE, DOUSE, THROW, LIGHTERS
+See also: BURN, COOKING FIRE, DOUSE, THROW, LIGHTERS
 #
 MILK
 
@@ -294,20 +308,19 @@ You can mill:
 You must do this at a Mill building or have a grinding stone equipped.
 However, it will take longer to do it without the building.
 
-See also: CRAFTING LEVEL, COOK, RESOURCES, KEEP, BASIC CRAFTS, RECIPES
+See also: CRAFTING LEVEL, COOK, RESOURCES, KEEP, BASIC CRAFTS, RECIPES,
+   CRAFTING ABILITIES
 #
 MINE MINES
 
-Mine (Primitive Crafts ability)
-
 Building:  &y/&0[]&y\&0  Mine  (Build ability)
-Speed boosts:  Work ethic bonus, haste, higher pick damage, higher Strength
+Speed boosts:  Work ethic bonus, haste, higher level pick, superior pick
 Command:  mine
 
 "Mine" is both a building type, and the command to work in that building. Mines
-must be built on mountains, and can only be entered from one side even before
-you complete them. To work in a mine, you need a pick of some kind, although a
-simple handaxe will also work.
+must be built on mountains. They have no interior; you can mine them from the
+outside. To work a mine, you need a pick of some kind, although a simple
+handaxe will also work.
 
 Mines have a limited amount of ore, and do not replenish. However, if you fully
 dismantle a mine, its mountain will reset when the MUD celebrates a new year
@@ -329,7 +342,10 @@ Types of mines:
   imperium - only found with Rare Metals
   moonstone - only found with Rare Metals
 
-See also: DEPLETION, DEEP MINES, PROSPECT, RARE METALS
+Mine types that require Rare Metals (or other abilities) will also grant
+experience for that ability when you mine ore.
+
+See also: DEPLETION, DEEP MINES, EXTENDED RADIUS, PROSPECT, RARE METALS
 #
 MINT "COIN MILLS" COINMILLS
 
@@ -379,7 +395,7 @@ PLANT
 
 Plant (Cook ability)
 
-Usage:  plant <seed/food>
+Usage:  plant [seed/food]
 Speed boosts:  Work ethic bonus, haste
 
 You can replant crops in open fields so that they may regrow and be harvested
@@ -414,7 +430,8 @@ You can press:
 
 You must do this at an Oilmaker building.
 
-See also: CRAFTING LEVEL, COOK, RESOURCES, KEEP, OIL, CRAFT INFO, RECIPES
+See also: CRAFTING LEVEL, COOK, RESOURCES, KEEP, OIL, CRAFT INFO, RECIPES,
+   CRAFTING ABILITIES
 #
 READY
 
@@ -457,18 +474,18 @@ SAW
 Saw (Primitive Crafts ability)
 
 Usage:  saw <item>
-Speed boosts:  Work ethic bonus, haste
-Tool:  saw or lumber yard
+Speed boosts:  Work ethic bonus, haste, superior saw, Woodworking ability
+Tool:  saw (or be at a lumber yard)
 
-You can saw most trees and logs into lumber. You must be in a lumber yard. This
-will go faster if you have the Woodworking ability.
+You can saw trees and logs into lumber using this command. You either need to
+use a saw or perform this task at a lumber yard. When using a saw, it will go
+faster if the saw is superior.
 
-You can saw at a lumber yard or you can forge a saw to do it anywhere (albeit
-more slowly unless your saw is superior).
+This will go faster if you have the Woodworking ability.
 
 Not all types of trees can be sawed.
 
-See also: TREES, LOGS, LUMBER, FORGE
+See also: TREES, LOGS, LUMBER, LUMBER YARD, FORGE, WOODWORKING
 #
 SCRAPE
 
@@ -518,12 +535,16 @@ See also: APPROACH, USE
 SKILL SKILLS ABILITY ABILITIES "SKILL BUY" "SKILL RESET" "SKILL LEVELS"
 
 Usage:  skills -- list all skills
-        skill <name> -- see abilities in that skill
+        skill <name> -- see details about a skill or ability
         skill buy <ability> -- purchase an ability
         skill reset <skill> -- reset your ability points
         skill drop <skill> <level> -- lose skill levels
         skill synergy <skill 1> <skill 2> -- see list of synergy abilities
         skill swap
+
+Sorting: skill -level [name]
+         skill -level [min-max] [name]
+         skill -alpha [name]
 
 This multi-purpose command helps you understand your skills. It shows your
 progress in each skill, and the ability points you've earned.
@@ -532,7 +553,8 @@ If you specify a skill, you'll see a breakdown of the abilities in that skill
 tree. Abilities marked with an "x" are the ones you already know. To buy a new
 ability, use "skill buy". You must have a free ability point to do this.
 
-For more information, see the help page for each skill or ability.
+If you specify an ability, you will see information about that ability. For
+more information, see the help page for each skill or ability.
 
 When you hit a skill cap level (50, 75, 100) you get to reset your abilities
 in that skill. To do that, you can type "skill reset <skill>". If you type it
@@ -548,6 +570,8 @@ no more than 10 points from any one ability.
 When you use an ability, its level is limited to your level in its parent skill
 unless you have 100 in that skill, in which case it scales all the way up to
 your full level.
+
+The ability/abilities commands are identical to the skills command.
 
 See also: NOSKILL, SPECIALIZE, SKILL CAPS, SKILL DROP, TRAINING SKILLS,
    ABILITY POINTS, SKILL SWAP, LETHEIAN ICON
@@ -600,7 +624,9 @@ Players who reach level 100 can have two different sets of ability purchases
 for their skills. When you use "skill swap", all of your skills change from
 one set to the other.
 
-Swapping skill sets will reduce your moves and mana to 25% of your total.
+Swapping skill sets costs 75% of your mana and movement points; it will
+regenerate normally. This prevents you from swapping during short breaks in
+combat.
 
 When you first change to your alternate skill set, no abilities have been
 purchased. Resetting a skill only resets your current set, not the other set.
@@ -666,7 +692,7 @@ Typing "smelt" by itself will list things you can smelt with the ore available
 in your inventory. Smelting goes faster when you have the correct mastery
 ability (see 'smelt info <type>' to see the mastery ability).
 
-See also: CRAFT INFO, METAL, SEPARATE, WEALTH, RECIPES
+See also: CRAFT INFO, METAL, SEPARATE, WEALTH, RECIPES, CRAFTING ABILITIES
 #
 SPECIALIZE SPECIALTY
 

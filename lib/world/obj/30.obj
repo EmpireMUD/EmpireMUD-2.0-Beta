@@ -717,11 +717,12 @@ A head of lettuce is sitting here.~
    Lettuce is bland on its own, but you can still eat it that way. It can also
 be made into a salad with the 'cook' command.
 ~
-6 l a 0 7
+6 l a 0 8
 2 3017 0
 7 168
 C
 1 1
+O+ 1 6152
 R
 4 5606 0
 S
@@ -732,11 +733,12 @@ Some lettuce seeds are scattered on the ground.~
    It looks like about a handful of tiny seeds. They can be used to plant
 lettuce, or you can press them into oil.
 ~
-6 bl a 0 8
+6 bl a 0 9
 1 3017 0
 7 576
 C
 1 1
+O+ 1 6181
 R
 4 5210 0
 S

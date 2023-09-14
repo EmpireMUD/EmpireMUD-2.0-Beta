@@ -62,7 +62,7 @@ extern const struct command_info cmd_info[];
 #define CTYPE_UTIL		7	/* A utility command/other	*/
 #define CTYPE_SKILL		8	// ability-related (if it's not combat, empire or move)
 
-/* Command flags */
+// CMD_x: Command flags
 #define CMD_STAY_HIDDEN		BIT(0)	/* Doesn't unhide person 				*/
 #define CMD_UNHIDE_AFTER	BIT(1)	/* Doesn't unhide person until AFTER	*/
 #define CMD_IMM_OR_MOB_ONLY	BIT(2)	// disallows players from seeing/using it
@@ -70,6 +70,7 @@ extern const struct command_info cmd_info[];
 #define CMD_VAMPIRE_ONLY	BIT(4)	/* Must be a vampire					*/
 #define CMD_NOT_RP			BIT(5)	/* Restricted to non-rpers				*/
 #define CMD_NO_ANIMALS		BIT(6)	// doesn't work in animal morphs
+#define CMD_WHILE_FEEDING	BIT(7)	// works while a vampire is feeding despite pos > SLEEPING
 
 
 struct alias_data {
@@ -195,7 +196,7 @@ struct alias_data {
 
 /* do_hit */
 #define SCMD_HIT		0
-#define SCMD_MURDER		1
+#define SCMD_KILL		1
 
 /* do_eat */
 #define SCMD_EAT		0
@@ -303,6 +304,7 @@ struct alias_data {
 #define LRR_SHIP_PARTIAL  BIT(0)	// shows only part of the room, for use on ships.
 #define LRR_SHOW_DARK  BIT(1)	// for passing to show_map_to_char
 #define LRR_LOOK_OUT  BIT(2)	// show map even indoors
+#define LRR_LOOK_OUT_INSIDE  BIT(3)	// show an interior outside the vehicle
 
 
  //////////////////////////////////////////////////////////////////////////////

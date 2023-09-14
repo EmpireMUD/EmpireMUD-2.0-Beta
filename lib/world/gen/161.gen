@@ -7,6 +7,11 @@ The flickering light on the hydra's body fades. (Target the hydra!)~
 T3
 The flickering light begins to once again play over the hydra's skin. (Hydra is immune!)~
 S
+#16102
+oceanic hydra walking~
+4 0
+0 0 0 0
+S
 #16103
 hydra damage buff~
 4 0
@@ -34,6 +39,8 @@ Fear of the Hydra~
 0 0 0 0
 T0
 Your body comes back under your control as your fear fades.~
+T5
+...$e is cowering in fear!~
 S
 #16107
 hydra vicious head buff~
