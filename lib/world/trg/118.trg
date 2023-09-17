@@ -4509,7 +4509,7 @@ if %move% == 1
 elseif %move% == 2
   * Arcane Tattoos
   skyfight clear interrupt
-  %echo% &&m**** ~%self% mutters an incantation... ****&&0 (interrupt)
+  %echo% &&m**** ~%self% mutters an incantation... ****&&0 (interrupt)
   if %diff% == 1
     nop %self.add_mob_flag(NO-ATTACK)%
   end
