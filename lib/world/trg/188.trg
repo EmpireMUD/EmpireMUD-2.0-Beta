@@ -310,15 +310,15 @@ set diff %self.var(diff,1)%
 set room %self.room%
 set lantern %self.room.people(18805)%
 if %lantern%
-  %echo% ~%self% urges ~%lantern% to attack faster!
+  %echo% &&o~%self% urges ~%lantern% to attack faster!&&0
   dg_affect %lantern% HASTE on 30
 else
   %load% mob 18805 ally
   set summon %room.people%
   if %summon.vnum% == 18805
     remote diff %summon.id%
-    %echo% ~%self% thrusts ^%self% sword into the sky!
-    %echo% ~%summon% appears in a flash of blue fire!
+    %echo% &&o~%self% thrusts ^%self% sword into the sky!&&0
+    %echo% &&o~%summon% appears in a flash of blue fire!&&0
     %force% %summon% maggro %actor%
   end
 end
@@ -363,7 +363,7 @@ wait 8 s
 if %diff% == 1
   set needed 1
 else
-  set needed %eslf.room.players_present%
+  set needed %self.room.players_present%
 end
 if %self.var(count_scfinterrupt,0)% >= %needed%
   * miss
