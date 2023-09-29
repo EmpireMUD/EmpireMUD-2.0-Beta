@@ -635,7 +635,7 @@ elseif %diff% == 4
   nop %mob.add_mob_flag(HARD)%
   nop %mob.add_mob_flag(GROUP)%
 end
-%restore% %mob%
+nop %mob.unscale_and_reset%
 * remove no-attack
 if %mob.aff_flagged(!ATTACK)%
   dg_affect %mob% !ATTACK off
@@ -7088,6 +7088,7 @@ if %seconds% > %allow_time%
     if %self.mob_flagged(GROUP)%
       nop %mob.add_mob_flag(GROUP)%
     end
+    nop %mob.unscale_and_reset%
     %scale% %mob% %self.level%
     if %self.fighting%
       %force% %mob% %aggro% %self.fighting%
@@ -7375,6 +7376,7 @@ if %mez%
   if %spirit.diff4% >= 3
     nop %mez.add_mob_flag(GROUP)%
   end
+  nop %mez.unscale_and_reset%
 end
 * place a relocator
 %load% mob 11899
@@ -7540,6 +7542,7 @@ switch %line%
       if %spirit.diff4% >= 3
         nop %mob.add_mob_flag(GROUP)%
       end
+      nop %mob.unscale_and_reset%
       %restore% %mob%
     end
     %purge% %self%
@@ -9752,5 +9755,6 @@ elseif %diff% == 4
   nop %mob.add_mob_flag(HARD)%
   nop %mob.add_mob_flag(GROUP)%
 end
+nop %mob.unscale_and_reset%
 ~
 $
