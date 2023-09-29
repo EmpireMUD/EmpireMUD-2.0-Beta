@@ -196,7 +196,7 @@ if %diff% > 1
       else
         * hit
         eval hit %hit% + 1
-        %echo% &&o... the shockwave knocks ~%ch% off ^%actor% feet!&&0
+        %echo% &&o... the shockwave knocks ~%ch% off ^%ch% feet!&&0
         dg_affect #18803 %ch% STUNNED on 5
         %damage% %ch% 100 physical
       end
@@ -305,7 +305,7 @@ end
 if !%self.mob_flagged(HARD)% && !%self.mob_flagged(GROUP)%
   halt
 end
-nop %self.set_cooldown(18801, 30)%
+scfight lockout 18801 30 25
 set diff %self.var(diff,1)%
 set room %self.room%
 set lantern %self.room.people(18805)%
@@ -357,7 +357,7 @@ end
 scfight lockout 18801 25 30
 set diff %self.var(diff,1)%
 scfight clear all
-%echo% &&o**** &&Z|%self% triangular eyes glow with infernal light... ****&0 (interrupt)
+%echo% &&o**** &&Z|%self% triangular eyes glow with infernal light... ****&&0 (interrupt)
 scfight setup interrupt all
 wait 8 s
 if %diff% == 1
