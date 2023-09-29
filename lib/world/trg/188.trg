@@ -75,16 +75,16 @@ end
 set arg %arg2%
 if normal /= %arg%
   %send% %actor% Setting difficulty to Normal...
-  set difficulty 1
+  set diff 1
 elseif hard /= %arg%
   %send% %actor% Setting difficulty to Hard...
-  set difficulty 2
+  set diff 2
 elseif group /= %arg%
   %send% %actor% Setting difficulty to Group...
-  set difficulty 3
+  set diff 3
 elseif boss /= %arg%
   %send% %actor% Setting difficulty to Boss...
-  set difficulty 4
+  set diff 4
 else
   %send% %actor% That is not a valid difficulty level for this adventure.
   halt
@@ -130,18 +130,20 @@ if %mob.vnum% != 18801
   halt
 end
 %echo% ~%mob% bursts out of the fog in front of you!
+remote diff %mob.id%
 nop %mob.remove_mob_flag(HARD)%
 nop %mob.remove_mob_flag(GROUP)%
-if %difficulty% == 1
+if %diff% == 1
   * Then we don't need to do anything
-elseif %difficulty% == 2
+elseif %diff% == 2
   nop %mob.add_mob_flag(HARD)%
-elseif %difficulty% == 3
+elseif %diff% == 3
   nop %mob.add_mob_flag(GROUP)%
-elseif %difficulty% == 4
+elseif %diff% == 4
   nop %mob.add_mob_flag(HARD)%
   nop %mob.add_mob_flag(GROUP)%
 end
+nop %mob.unscale_and_reset%
 %echo% @%self% bursts into blue flames and rapidly crumbles to ash.
 %purge% %self%
 ~
@@ -174,30 +176,65 @@ Headless Centaur: Prance~
 if %self.cooldown(18801)%
   halt
 end
-nop %self.set_cooldown(18801, 30)%
-set heroic_mode %self.mob_flagged(GROUP)%
-%echo% ~%self% rears up and prances!
-set verify_target %actor.id%
-wait 2 sec
-if %heroic_mode%
-  %echo% &&r~%self% slams ^%self% hooves down on the ground, creating a shockwave!
-  set person %self.room.people%
-  while %person%
-    if %person.is_enemy(%self%)%
-      dg_affect #18803 %person% HARD-STUNNED on 5
-      %damage% %person% 50
+scfight lockout 18801 30 25
+set diff %self.var(diff,1)%
+scfight clear all
+if %diff% > 1
+  * heroic mode: AOE
+  %echo% &&o&&Z~%self% rears up and prances!&&0
+  wait 2 s
+  %echo% &&o**** &&Z~%self% slams ^%self% hooves down on the ground, creating a shockwave! ****&0 (dodge)
+  scfight setup dodge all
+  wait 8 s
+  set hit 0
+  set ch %self.room.people%
+  while %ch%
+    set next_ch %ch.next_in_room%
+    if %self.is_enemy(%ch%)%
+      if %ch.var(did_scfdodge)%
+        * dodged
+      else
+        * hit
+        eval hit %hit% + 1
+        %echo% &&o... the shockwave knocks ~%ch% off ^%actor% feet!&&0
+        dg_affect #18803 %ch% STUNNED on 5
+        %damage% %ch% 100 physical
+      end
     end
-    set person %person.next_in_room%
+    set ch %next_ch%
   done
+  if %hit% < 1
+    %echo% &&o... |%self% shockwave misses!&&0
+  end
 else
-  if %actor.id% != %verify_target%
-    %echo% ~%self% shrugs and lands ^%self% hooves back on the ground.
+  * normal mode: single-target
+  set actor_id %actor.id%
+  %echo% &&o&&Z~%self% rears up and prances!&&0
+  wait 2 s
+  if %actor_id% != %actor.id%
+    * gone
     halt
   end
-  %send% %actor% &&r |%self% hooves crash down on you!
-  %echoaround% %actor% |%self% hooves crash down on ~%actor%!
-  %damage% %actor% 100
+  %send% %actor% &&o**** &&Z~%self% is prancing toward you! ****&&0 (dodge)
+  %echoaround% %actor% &&o&&Z~%self% is prancing toward ~%actor%!&&0
+  scfight setup dodge %actor%
+  wait 6 s
+  if %actor_id% != %actor.id%
+    * gone
+    %echo% &&o&&Z~%self% shrugs and lands ^%self% hooves back on the ground.&&0
+    halt
+  end
+  * made it?
+  if %actor.did_scfdodge%
+    %echo% &&o&&Z~%self% comes crashing down but narrowly misses ~%actor%!&&0
+    dg_affect #18802 %self% HARD-STUNNED on 8
+  else
+    %echo% &&o&&Z|%self% hooves crash down on ~%actor%!&&0
+    dg_affect #18803 %actor% STUNNED on 5
+    %damage% %actor% 100 physical
+  end
 end
+scfight clear all
 ~
 #18804
 Headless Centaur: Neck Chop~
@@ -206,25 +243,57 @@ Headless Centaur: Neck Chop~
 if %self.cooldown(18801)%
   halt
 end
-nop %self.set_cooldown(18801, 30)%
-set heroic_mode %self.mob_flagged(GROUP)%
-if %heroic_mode%
-  %echo% &&r~%self% swings ^%self% sword in a wide arc at neck level, causing bleeding wounds!
-  %aoe% 100 physical
-  set person %self.room.people%
-  while %person%
-    if %person.is_enemy(%self%)%
-      %dot% #18804 %person% 100 30 physical
-      %damage% %person% 50 physical
+scfight lockout 18801 30 25
+set diff %self.var(diff,1)%
+scfight clear all
+if %diff% > 1
+  * heroic mode: AOE
+  %echo% &&o**** &&Z~%self% swings ^%self% sword in a wide arc at neck level! ****&0 (dodge)
+  scfight setup dodge all
+  wait 8 s
+  set hit 0
+  eval pain %diff% * 75
+  set ch %self.room.people%
+  while %ch%
+    set next_ch %ch.next_in_room%
+    if %self.is_enemy(%ch%)%
+      if %ch.var(did_scfdodge)%
+        * dodged
+      else
+        * hit
+        eval hit %hit% + 1
+        %echo% &&o... the sword slices through ~%ch%, causing bleeding wounds!&&0
+        %dot% #18804 %ch% 100 60 physical 10
+        %damage% %ch% %pain% physical
+      end
     end
-    set person %person.next_in_room%
+    set ch %next_ch%
   done
+  if %hit% < 1
+    %echo% &&o... |%self% neck chop misses!&&0
+  end
 else
-  %send% %actor% &&r~%self% swings ^%self% sword, slashing at your neck and opening a bleeding wound!
-  %echoaround% %actor% ~%self% swings ^%self% sword, slashing at |%actor% neck and opening a bleeding wound!
-  %damage% %actor% 150 physical
-  %dot% #18804 %actor% 75 30 physical
+  * normal mode: single-target
+  set actor_id %actor.id%
+  %send% %actor% &&o**** &&Z~%self% swings ^%self% sword, slashing toward your neck! ****&&0 (dodge)
+  %echoaround% %actor% &&o&&Z~%self% swings ^%self% sword toward |%actor% neck!&&0
+  scfight setup dodge %actor%
+  wait 6 s
+  if %actor_id% != %actor.id%
+    * gone
+    halt
+  end
+  * made it?
+  if %actor.did_scfdodge%
+    %echo% &&o&&Z~%self% spins *%self%self around, wildly missing ~%actor%!&&0
+    dg_affect #18802 %self% HARD-STUNNED on 8
+  else
+    %echo% &&o&&Z|%self% sword swings through |%actor% neck, opening a bleeding wound!&&0
+    %damage% %actor% 150 physical
+    %dot% #18804 %actor% 75 60 physical 10
+  end
 end
+scfight clear all
 ~
 #18805
 Headless Centaur: Attack-O-Lantern~
@@ -233,31 +302,30 @@ Headless Centaur: Attack-O-Lantern~
 if %self.cooldown(18801)%
   halt
 end
-if !%self.mob_flagged(HARD)% && !%self.mob_flagged(GROUP)%
-  halt
-end
-nop %self.set_cooldown(18801, 30)%
-set heroic_mode %self.mob_flagged(GROUP)%
-set room %self.room%
-set person %room.people%
-while %person%
-  if %person.vnum% == 18805
-    set lantern %person%
-  end
-  set person %person.next_in_room%
-done
-if %lantern%
-  %echo% ~%self% urges ~%lantern% to attack faster!
-  dg_affect %lantern% HASTE on 30
+scfight lockout 18801 25 30
+set diff %self.var(diff,1)%
+scfight clear all
+%echo% &&o**** &&Z|%self% triangular eyes glow with infernal light... ****&0 (interrupt)
+scfight setup interrupt all
+wait 8 s
+if %diff% == 1
+  set needed 1
 else
-  %load% mob 18805 ally
-  set summon %room.people%
-  if %summon.vnum% == 18805
-    %echo% ~%self% thrusts ^%self% sword into the sky!
-    %echo% ~%summon% appears in a flash of blue fire!
-    %force% %summon% %aggro% %actor%
-  end
+  set needed %eslf.room.players_present%
 end
+if %self.var(count_scfinterrupt,0)% >= %needed%
+  * miss
+  %echo% &&o... |%self% eyes sputter and go out.&&0
+  if %diff% == 1
+    dg_affect #18802 %self% HARD-STUNNED on 8
+  end
+else
+  * hit
+  %echo% &&oBeams of magical energy blast forth from |%self% eyes!&&0
+  eval pain %diff% * 75
+  %aoe% %pain% magical
+end
+scfight clear all
 ~
 #18806
 Headless Centaur death~
@@ -1089,17 +1157,20 @@ elseif %roll% <= 108
 elseif %roll% <= 118
   * 1% chance: zombie terrier whistle (2021)
   set vnum 18885
-elseif %roll% <= 208
-  * 9% chance: skeleton ghost whistle (2022)
+elseif %roll% <= 128
+  * 1% chance: skeleton ghost whistle (2022)
   set vnum 18859
-elseif %roll% <= 370
+elseif %roll% <= 218
+  * 9% chance: antique doll (2023)
+  set vnum 18863
+elseif %roll% <= 380
   * 16.2% chance: roll of pennies!
   set vnum 18886
-elseif %roll% <= 630
-  * 26% chance: marigold
+elseif %roll% <= 635
+  * 25.5% chance: marigold
   set vnum 18887
 elseif %roll% <= 890
-  * 26% chance: chrysanthemums
+  * 25.5% chance: chrysanthemums
   set vnum 18888
 else
   * Remaining 11%: black rose

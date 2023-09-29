@@ -953,6 +953,19 @@ This just makes it impossible to maintain the nether portal.
 0 0 0
 0 0
 S
+#18863
+doll antique eerie~
+an antique doll~
+An eerie, antique doll stands in the corner.~
+   The doll's porcelain skin is cracked and its clothing tattered. Glassy,
+unblinking eyes seem to follow your every move, though it's probably just your
+imagination.
+   Type 'use doll' to add it as a minipet.
+~
+19 p a 0 8
+18863 0 0
+6 0
+S
 #18866
 charm blooddrop~
 a blooddrop charm~
