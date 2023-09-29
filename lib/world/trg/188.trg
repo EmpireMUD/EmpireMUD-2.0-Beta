@@ -302,30 +302,26 @@ Headless Centaur: Attack-O-Lantern~
 if %self.cooldown(18801)%
   halt
 end
-scfight lockout 18801 25 30
+if !%self.mob_flagged(HARD)% && !%self.mob_flagged(GROUP)%
+  halt
+end
+nop %self.set_cooldown(18801, 30)%
 set diff %self.var(diff,1)%
-scfight clear all
-%echo% &&o**** &&Z|%self% triangular eyes glow with infernal light... ****&0 (interrupt)
-scfight setup interrupt all
-wait 8 s
-if %diff% == 1
-  set needed 1
+set room %self.room%
+set lantern %self.room.people(18805)%
+if %lantern%
+  %echo% ~%self% urges ~%lantern% to attack faster!
+  dg_affect %lantern% HASTE on 30
 else
-  set needed %eslf.room.players_present%
-end
-if %self.var(count_scfinterrupt,0)% >= %needed%
-  * miss
-  %echo% &&o... |%self% eyes sputter and go out.&&0
-  if %diff% == 1
-    dg_affect #18802 %self% HARD-STUNNED on 8
+  %load% mob 18805 ally
+  set summon %room.people%
+  if %summon.vnum% == 18805
+    remote diff %summon.id%
+    %echo% ~%self% thrusts ^%self% sword into the sky!
+    %echo% ~%summon% appears in a flash of blue fire!
+    %force% %summon% maggro %actor%
   end
-else
-  * hit
-  %echo% &&oBeams of magical energy blast forth from |%self% eyes!&&0
-  eval pain %diff% * 75
-  %aoe% %pain% magical
 end
-scfight clear all
 ~
 #18806
 Headless Centaur death~
@@ -355,19 +351,33 @@ end
 attack-o-lantern aoe~
 0 k 100
 ~
-set person %self.room.people%
-while %person%
-  if %person.vnum% == 18801
-    set heroic_mode %person.mob_flagged(GROUP)%
-  end
-  set person %person.next_in_room%
-done
-%echo% &&rBeams of magical energy fly from |%self% eyes!
-if !%heroic_mode%
-  %aoe% 25 magical
-else
-  %aoe% 50 magical
+if %self.cooldown(18801)%
+  halt
 end
+scfight lockout 18801 25 30
+set diff %self.var(diff,1)%
+scfight clear all
+%echo% &&o**** &&Z|%self% triangular eyes glow with infernal light... ****&0 (interrupt)
+scfight setup interrupt all
+wait 8 s
+if %diff% == 1
+  set needed 1
+else
+  set needed %eslf.room.players_present%
+end
+if %self.var(count_scfinterrupt,0)% >= %needed%
+  * miss
+  %echo% &&o... |%self% eyes sputter and go out.&&0
+  if %diff% == 1
+    dg_affect #18802 %self% HARD-STUNNED on 8
+  end
+else
+  * hit
+  %echo% &&oBeams of magical energy blast forth from |%self% eyes!&&0
+  eval pain %diff% * 75
+  %aoe% %pain% magical
+end
+scfight clear all
 ~
 #18808
 put candy in pillowcase~
