@@ -345,14 +345,14 @@ end
 if %self.var(wants_scfdodge,0)%
   scfight setup dodge %actor%
 else
-  rdelete did_scfdodge %ch.id%
-  rdelete needs_scfdodge %ch.id%
+  rdelete did_scfdodge %actor.id%
+  rdelete needs_scfdodge %actor.id%
 end
 if %self.var(wants_scfinterrupt,0)%
   scfight setup interrupt %actor%
 else
-  rdelete did_scfinterrupt %ch.id%
-  rdelete needs_scfinterrupt %ch.id%
+  rdelete did_scfinterrupt %actor.id%
+  rdelete needs_scfinterrupt %actor.id%
 end
 ~
 $

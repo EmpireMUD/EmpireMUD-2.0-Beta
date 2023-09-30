@@ -72,6 +72,9 @@ T 18806
 T 18803
 T 18804
 T 18805
+T 9600
+T 9601
+T 9604
 S
 #18803
 guard cityguard risen~
@@ -123,6 +126,9 @@ D
 It's a carved pumpkin, but it looks like it might be enchanted.
 ~
 T 18807
+T 9600
+T 9601
+T 9604
 S
 #18822
 #n ghost~
@@ -503,6 +509,91 @@ Sunlight shines down, but fails to reach the ground anywhere near $n.~
 M
 1
 Suffer.~
+S
+#18863
+doll antique eerie~
+an antique doll~
+An eerie, antique doll stands in the corner.
+~
+1 1 bdoD dn 1
+0 0 0 15 -1
+D
+   The doll's porcelain skin is cracked and its clothing tattered. Glassy,
+unblinking eyes seem to follow your every move, though it's probably just your
+imagination.
+~
+M
+0
+$n's head slowly turns to follow you as you move around the room.~
+M
+0
+$n's glassy eyes glow briefly with an otherworldly light.~
+M
+0
+You hear faint, ghastly giggling emanating from $n.~
+M
+0
+$n's tiny hand reaches out to touch your hand, sending a chill down your spine.~
+M
+0
+$n's expression changes, $s lips curling into a sinister smile.~
+M
+0
+$n levitates a few inches off the ground before settling back down.~
+M
+0
+A spectral mist surrounds $n before dissipating as quickly as it appeared.~
+M
+0
+$n's clothing rustles as if moved by an invisible hand.~
+M
+0
+$n emits a soft, eerie lullaby that sends shivers down your spine.~
+M
+1
+Play with me... forever.~
+M
+1
+Shhh... they're watching.~
+M
+1
+Don't go to sleep tonight.~
+M
+1
+I see you when you're sleeping.~
+M
+1
+Let's have a tea party, just you and me.~
+M
+1
+In the dark, we're never alone.~
+M
+1
+I didn't choose to be this way.~
+M
+1
+You're my new best friend... whether you like it or not.~
+M
+1
+Time to play a game, a very special game.~
+M
+1
+Do you hear the whispers too?~
+M
+1
+I'm not alone in here, and neither are you.~
+M
+1
+I remember your secrets.~
+M
+1
+Come closer, I have something to show you.~
+M
+1
+The night is so long, and the shadows so deep.~
+M
+1
+Behind your smile, I see fear.~
 S
 #18871
 ghost friendly~
