@@ -176,7 +176,7 @@ Headless Centaur: Prance~
 if %self.cooldown(18801)%
   halt
 end
-scfight lockout 18801 30 25
+nop %self.set_cooldown(18801, 30)%
 set diff %self.var(diff,1)%
 scfight clear all
 if %diff% > 1
@@ -243,7 +243,7 @@ Headless Centaur: Neck Chop~
 if %self.cooldown(18801)%
   halt
 end
-scfight lockout 18801 30 25
+nop %self.set_cooldown(18801, 30)%
 set diff %self.var(diff,1)%
 scfight clear all
 if %diff% > 1
@@ -305,7 +305,7 @@ end
 if !%self.mob_flagged(HARD)% && !%self.mob_flagged(GROUP)%
   halt
 end
-scfight lockout 18801 30 25
+nop %self.set_cooldown(18801, 30)%
 set diff %self.var(diff,1)%
 set room %self.room%
 set lantern %self.room.people(18805)%
@@ -351,10 +351,10 @@ end
 attack-o-lantern aoe~
 0 k 100
 ~
-if %self.cooldown(18801)%
+if %self.cooldown(18805)%
   halt
 end
-scfight lockout 18801 25 30
+scfight lockout 18805 30 30
 set diff %self.var(diff,1)%
 scfight clear all
 %echo% &&o**** &&Z|%self% triangular eyes glow with infernal light... ****&&0 (interrupt)
