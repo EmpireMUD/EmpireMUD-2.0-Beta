@@ -360,7 +360,10 @@ scfight clear all
 %echo% &&o**** &&Z|%self% triangular eyes glow with infernal light... ****&&0 (interrupt)
 scfight setup interrupt all
 wait 8 s
-if %diff% == 1
+if %self.aff_flagged(STUNNED)% || %self.aff_flagged(HARD-STUNNED)%
+  %echo% &&o... the glow in |%self% eyes fades.&&0
+  halt
+elseif %diff% == 1
   set needed 1
 else
   set needed %self.room.players_present%
