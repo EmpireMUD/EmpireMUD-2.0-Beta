@@ -183,7 +183,7 @@ if %diff% > 1
   * heroic mode: AOE
   %echo% &&o&&Z~%self% rears up and prances!&&0
   wait 2 s
-  %echo% &&o**** &&Z~%self% slams ^%self% hooves down on the ground, creating a shockwave! ****&0 (dodge)
+  %echo% &&o**** &&Z~%self% slams ^%self% hooves down on the ground, creating a shockwave! ****&&0 (dodge)
   scfight setup dodge all
   wait 8 s
   set hit 0
@@ -248,7 +248,7 @@ set diff %self.var(diff,1)%
 scfight clear all
 if %diff% > 1
   * heroic mode: AOE
-  %echo% &&o**** &&Z~%self% swings ^%self% sword in a wide arc at neck level! ****&0 (dodge)
+  %echo% &&o**** &&Z~%self% swings ^%self% sword in a wide arc at neck level! ****&&0 (dodge)
   scfight setup dodge all
   wait 8 s
   set hit 0
