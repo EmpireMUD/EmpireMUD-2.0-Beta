@@ -178,7 +178,7 @@ if %self.cooldown(18801)%
 end
 nop %self.set_cooldown(18801, 30)%
 set diff %self.var(diff,1)%
-scfight clear all
+scfight clear dodge
 if %diff% > 1
   * heroic mode: AOE
   %echo% &&o&&Z~%self% rears up and prances!&&0
@@ -234,7 +234,7 @@ else
     %damage% %actor% 100 physical
   end
 end
-scfight clear all
+scfight clear dodge
 ~
 #18804
 Headless Centaur: Neck Chop~
@@ -245,7 +245,7 @@ if %self.cooldown(18801)%
 end
 nop %self.set_cooldown(18801, 30)%
 set diff %self.var(diff,1)%
-scfight clear all
+scfight clear dodge
 if %diff% > 1
   * heroic mode: AOE
   %echo% &&o**** &&Z~%self% swings ^%self% sword in a wide arc at neck level! ****&&0 (dodge)
@@ -293,7 +293,7 @@ else
     %dot% #18804 %actor% 75 60 physical 10
   end
 end
-scfight clear all
+scfight clear dodge
 ~
 #18805
 Headless Centaur: Attack-O-Lantern~
@@ -356,7 +356,7 @@ if %self.cooldown(18805)%
 end
 scfight lockout 18805 30 30
 set diff %self.var(diff,1)%
-scfight clear all
+scfight clear interrupt
 %echo% &&o**** &&Z|%self% triangular eyes glow with infernal light... ****&&0 (interrupt)
 scfight setup interrupt all
 wait 8 s
@@ -380,7 +380,7 @@ else
   eval pain %diff% * 75
   %aoe% %pain% magical
 end
-scfight clear all
+scfight clear interrupt
 ~
 #18808
 put candy in pillowcase~
