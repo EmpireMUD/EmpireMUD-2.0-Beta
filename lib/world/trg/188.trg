@@ -1300,7 +1300,7 @@ if !%arg%
 elseif %actor.obj_target(%arg%)% != %self%
   return 0
   halt
-elseif %self.room.empire_id% != %actor.empire.id% || !%self.room.in_city%
+elseif %self.room.empire_id% != %actor.empire.vnum% || !%self.room.in_city%
   %send% %actor% You need to do that in one of your own cities.
   halt
 end
