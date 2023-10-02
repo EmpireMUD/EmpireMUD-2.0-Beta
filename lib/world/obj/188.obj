@@ -966,6 +966,24 @@ imagination.
 18863 0 0
 6 0
 S
+#18864
+cage bone~
+a bone cage~
+A bone cage is lying here.~
+   Although it resembles a cage, it's too small to fit any animals. It's made
+from bones and has an eerie orange glow. It looks like you need to 'bind' the
+spirits of three animals to it and then 'unleash cage' to release one in your
+city.
+~
+3 p a 0 2
+0 0 0
+14 0
+C
+1 1
+Q 18840
+T 18840
+T 18841
+S
 #18866
 charm blooddrop~
 a blooddrop charm~

@@ -787,6 +787,9 @@ switch %questvnum%
   case 18832
     %load% obj 18853 %actor% inv
   break
+  case 18840
+    %load% obj 18864 %actor% inv
+  break
   case 18854
     %load% obj 18854 %actor% inv
   break
@@ -1234,6 +1237,158 @@ else
   %scale% %target% 1
 end
 %purge% %self%
+~
+#18840
+Macabre Menagerie: Bind animal~
+1 c 2
+bind~
+return 1
+set mob %actor.char_target(%arg%)%
+if %self.val0% && %self.val1% && %self.val2%
+  %send% %actor% @%self% can't bind any more spirits.
+  halt
+elseif %self.room.template% > 0 || !%actor.canuseroom_member(%self.room%)%
+  %send% %actor% @%self% doesn't seem to work here.
+  halt
+elseif %actor.position% != Standing
+  %send% %actor% You can't do that right now.
+  halt
+elseif !%arg%
+  %send% %actor% Bind which animal?
+  halt
+elseif !%mob%
+  %send% %actor% There's no %arg.ana% %arg.car% here to bind.
+  halt
+elseif !%mob.mob_flagged(ANIMAL)%
+  %send% %actor% You can only bind animals with @%self%.
+  halt
+elseif %mob.mob_flagged(EMPIRE)% || %mob.vnum% <= 0
+  %send% %actor% You can't bind ~%mob% with @%self%.
+  halt
+elseif %mob.mob_flagged(HARD)% || %mob.mob_flagged(GROUP)% || %mob.level% >= 100 || %mob.mob_flagged(AGGR)% 
+  %send% %actor% ~%mob% is too strong to bind.
+  halt
+elseif %mob.fighting%
+  %send% %actor% You can't get close enough to ~%mob% while &%mob%'s fighting.
+  halt
+end
+* looks ok.. store mob vnum
+if !%self.val0%
+  nop %self.val0(%mob.vnum%)%
+elseif !%self.val1%
+  nop %self.val1(%mob.vnum%)%
+elseif !%self.val2%
+  nop %self.val2(%mob.vnum%)%
+end
+* and message
+%send% %actor% You hold out @%self% and watch as ~%mob% is sucked into it!
+%echoaround% %actor% ~%actor% holds out @%self%... you watch as ~%mob% is sucked into it!
+%purge% %mob%
+~
+#18841
+Macabre Menagerie: Unleash animal~
+1 c 2
+unleash~
+return 1
+* word list for adjectives
+set adj_list horrifying monstrous terrifying gargantuan dreadful nightmarish eldritch spectral otherworldly ghastly unearthly macabre sinister diabolical phantom hulking savage beastly grim cursed accursed demonic infernal
+set adj_size 23
+* basics
+if !%arg%
+  %send% %actor% Unleash what?
+  halt
+elseif %actor.obj_target(%arg%)% != %self%
+  return 0
+  halt
+elseif %self.room.empire_id% != %actor.empire.id% || !%self.room.in_city%
+  %send% %actor% You need to do that in one of your own cities.
+  halt
+end
+* ensure we have a mob
+if %self.val0% > 0
+  set vnum %self.val0%
+  nop %self.val0(-1)%
+elseif %self.val1% > 0
+  set vnum %self.val1%
+  nop %self.val1(-1)%
+elseif %self.val2% > 0
+  set vnum %self.val2%
+  nop %self.val2(-1)%
+else
+  %send% %actor% Nothing is bound to @%self%.
+  if %self.val0% == -1 && %self.val1% == -1 && %self.val2% == -1
+    %quest% %actor% finish 18840
+  end
+  halt
+end
+* prepare the mob
+%load% mob %vnum%
+set mob %self.room.people%
+if %mob.vnum% != %vnum%
+  %send% %actor% Something went wrong with @%self%.
+  halt
+end
+nop %mob.add_mob_flag(TANK)%
+nop %mob.remove_mob_flag(MOUNTABLE)%
+set spawn_time %timestamp%
+remote spawn_time %mob.id%
+set orig_name %mob.name%
+* name processing
+set word %orig_name.car%
+if %word% == a || %word% == an || %word% == the
+  set name %orig_name.cdr%
+else
+  set name %orig_name%
+end
+eval pos %%random.%adj_size%%%
+while %pos% > 0
+  set adj %adj_list.car%
+  set adj_list %adj_list.cdr%
+  eval pos %pos% - 1
+done
+set name %adj.ana% %adj% %name%
+%mod% %mob% keywords %mob.pc_name% %adj%
+%mod% %mob% shortdesc %name%
+switch %random.5%
+  case 1
+    %mod% %mob% longdesc %name.cap% towers over you!
+  break
+  case 2
+    %mod% %mob% longdesc %name.cap% is rampaging through the city!
+  break
+  case 3
+    %mod% %mob% longdesc %name.cap% is terrorizing the city!
+  break
+  case 4
+    %mod% %mob% longdesc %name.cap% is here!
+  break
+  case 5
+    %mod% %mob% longdesc %name.cap% looms over you!
+  break
+done
+%mod% %mob% append-lookdesc It has been transformed into a huge, terrifying creature!
+* new script to despawn-later
+nop %mob.remove_mob_flag(SPAWNED)%
+attach 18842 %mob.id%
+* announce
+nop %mob.unscale_and_reset%
+%send% %actor% You hold out @%self%...
+%echoaround% %actor% ~%actor% holds out @%self%...
+%echo% You shield your eyes from the bright light as ~%mob% emerges from it!
+if %self.val0% == -1 && %self.val1% == -1 && %self.val2% == -1
+  %quest% %actor% finish 18840
+end
+~
+#18842
+Macabre Menagerie: Despawn creature later~
+0 b 10
+~
+* allows a despawn after 3 days
+if %timestamp% - %self.var(spawn_time,0)% > 259200
+  %echo% ~%self% vanishes in a sparkle of twilight glitter.
+  %purge% %self%
+  halt
+end
 ~
 #18848
 make offering to the spirits~

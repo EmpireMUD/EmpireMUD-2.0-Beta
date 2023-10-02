@@ -343,6 +343,37 @@ W+
 11 0 0 1 -
 Appease spirits at 5 tombs~
 S
+#18840
+Halloween: Macabre Menagerie~
+   A restless spirit appears with a devilish idea: Raise the spirits -- and
+hackles -- of your citizens by unleashing a macabre menagerie of creatures to
+delight and terrify them. The task is simple: take this bone cage, given to you
+by the spirit, and use it to 'bind' three small animals from the countryside.
+Once you've done that, type 'unleash cage' to release them, one by one, in your
+city.
+~
+   The bone cage disappears from your fingers -- or perhaps it was never there.
+You've earned a goody bag!
+~
+1 ej 0 0 -1
+A
+2 18810
+A
+2 18805
+D 18821
+P
+36 18800 0 1 a
+P
+9 3 0 1 a
+R
+9 18800 10
+R
+2 18829 1
+T 18820
+W+
+11 0 0 1 -
+Unleash 3 animals in your city~
+S
 #18854
 Halloween: Pick or Treat~
    The halloween spirits are bound to the graveyards, and thus can't go around
