@@ -1242,6 +1242,7 @@ end
 Macabre Menagerie: Bind animal~
 1 c 2
 bind~
+set ban_list 222 223 9004 9010 9009 9011 9022 9024 9153 9154 9026 9033 9034 9035 9036 9037 9038 9039
 return 1
 set mob %actor.char_target(%arg%)%
 if %self.val0% && %self.val1% && %self.val2%
@@ -1262,6 +1263,9 @@ elseif !%mob%
 elseif !%mob.mob_flagged(ANIMAL)%
   %send% %actor% You can only bind animals with @%self%.
   halt
+elseif !(%ban_list% ~= %mob.vnum%)
+  %send% %actor% You'll need to find something a lot scarrier than ~%mob%.
+  halt
 elseif %mob.mob_flagged(EMPIRE)% || %mob.vnum% <= 0
   %send% %actor% You can't bind ~%mob% with @%self%.
   halt
@@ -1275,10 +1279,16 @@ end
 * looks ok.. store mob vnum
 if !%self.val0%
   nop %self.val0(%mob.vnum%)%
+  set name0 %mob.pc_name%
+  remote name0 %self.id%
 elseif !%self.val1%
   nop %self.val1(%mob.vnum%)%
+  set name1 %mob.pc_name%
+  remote name1 %self.id%
 elseif !%self.val2%
   nop %self.val2(%mob.vnum%)%
+  set name2 %mob.pc_name%
+  remote name2 %self.id%
 end
 * and message
 %send% %actor% You hold out @%self% and watch as ~%mob% is sucked into it!
@@ -1297,28 +1307,42 @@ set adj_size 23
 if !%arg%
   %send% %actor% Unleash what?
   halt
-elseif %actor.obj_target(%arg%)% != %self%
-  return 0
-  halt
-elseif %self.room.empire_id% != %actor.empire.vnum% || !%self.room.in_city%
-  %send% %actor% You need to do that in one of your own cities.
-  halt
 end
-* ensure we have a mob
-if %self.val0% > 0
+* targeting?
+if %self.val0% > 0 && %self.var(name0)% ~= %arg%
   set vnum %self.val0%
   nop %self.val0(-1)%
-elseif %self.val1% > 0
+elseif %self.val1% > 0 && %self.var(name1)% ~= %arg%
   set vnum %self.val1%
   nop %self.val1(-1)%
-elseif %self.val2% > 0
+elseif %self.val2% > 0 && %self.var(name2)% ~= %arg%
   set vnum %self.val2%
   nop %self.val2(-1)%
-else
-  %send% %actor% Nothing is bound to @%self%.
-  if %self.val0% == -1 && %self.val1% == -1 && %self.val2% == -1
-    %quest% %actor% finish 18840
+elseif %actor.obj_target(%arg%)% == %self%
+  if %self.val0% > 0
+    set vnum %self.val0%
+    nop %self.val0(-1)%
+  elseif %self.val1% > 0
+    set vnum %self.val1%
+    nop %self.val1(-1)%
+  elseif %self.val2% > 0
+    set vnum %self.val2%
+    nop %self.val2(-1)%
+  else
+    %send% %actor% Nothing is bound to @%self%.
+    if %self.val0% == -1 && %self.val1% == -1 && %self.val2% == -1
+      %quest% %actor% finish 18840
+    end
+    halt
   end
+else
+  * huh?
+  return 0
+  halt
+end
+* validate
+if %self.room.empire_id% != %actor.empire.vnum% || !%self.room.in_city%
+  %send% %actor% You need to do that in one of your own cities.
   halt
 end
 * prepare the mob
@@ -1374,7 +1398,7 @@ attach 18842 %mob.id%
 nop %mob.unscale_and_reset%
 %send% %actor% You hold out @%self%...
 %echoaround% %actor% ~%actor% holds out @%self%...
-%echo% You shield your eyes from the bright light as ~%mob% emerges from it!
+%echo% You shield your eyes from the bright light as ~%mob% emerges from the cage!
 if %self.val0% == -1 && %self.val1% == -1 && %self.val2% == -1
   %quest% %actor% finish 18840
 end
