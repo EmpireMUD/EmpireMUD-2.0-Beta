@@ -1258,7 +1258,7 @@ elseif !%arg%
   %send% %actor% Bind which animal?
   halt
 elseif !%mob%
-  %send% %actor% There's no %arg.ana% %arg.car% here to bind.
+  %send% %actor% There's no '%arg.car%' here to bind.
   halt
 elseif %ban_list% ~= %mob.vnum%
   %send% %actor% You'll need to find something a lot scarrier than ~%mob%.
