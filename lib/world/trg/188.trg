@@ -1260,9 +1260,6 @@ elseif !%arg%
 elseif !%mob%
   %send% %actor% There's no %arg.ana% %arg.car% here to bind.
   halt
-elseif !%mob.mob_flagged(ANIMAL)%
-  %send% %actor% You can only bind animals with @%self%.
-  halt
 elseif %ban_list% ~= %mob.vnum%
   %send% %actor% You'll need to find something a lot scarrier than ~%mob%.
   halt
@@ -1271,6 +1268,9 @@ elseif %mob.mob_flagged(EMPIRE)% || %mob.vnum% <= 0
   halt
 elseif %mob.mob_flagged(HARD)% || %mob.mob_flagged(GROUP)% || %mob.level% >= 100 || %mob.mob_flagged(AGGR)% 
   %send% %actor% ~%mob% is too strong to bind.
+  halt
+elseif !%mob.mob_flagged(ANIMAL)%
+  %send% %actor% You can only bind animals with @%self%.
   halt
 elseif %mob.fighting%
   %send% %actor% You can't get close enough to ~%mob% while &%mob%'s fighting.
@@ -1281,14 +1281,17 @@ if !%self.val0%
   nop %self.val0(%mob.vnum%)%
   set name0 %mob.pc_name%
   remote name0 %self.id%
+  %mod% %self% append-lookdesc The first bone is incised with a crude drawing of %mob.name%.
 elseif !%self.val1%
   nop %self.val1(%mob.vnum%)%
   set name1 %mob.pc_name%
   remote name1 %self.id%
+  %mod% %self% append-lookdesc The second bone is cut with a likeness of %mob.name%.
 elseif !%self.val2%
   nop %self.val2(%mob.vnum%)%
   set name2 %mob.pc_name%
   remote name2 %self.id%
+  %mod% %self% append-lookdesc The third bone bears a carving of %mob.name%.
 end
 * and message
 %send% %actor% You hold out @%self% and watch as ~%mob% is sucked into it!
@@ -1337,7 +1340,7 @@ elseif %actor.obj_target(%arg%)% == %self%
   end
 else
   * huh?
-  return 0
+  %send% %actor% There doesn't seem to be %arg.ana% %arg.car% bound in the bone cage.
   halt
 end
 * validate
