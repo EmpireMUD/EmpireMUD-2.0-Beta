@@ -349,8 +349,8 @@ Halloween: Macabre Menagerie~
 hackles -- of your citizens by unleashing a macabre menagerie of creatures to
 delight and terrify them. The task is simple: take this bone cage, given to you
 by the spirit, and use it to 'bind' three small animals from the countryside.
-Once you've done that, type 'unleash cage' to release them, one by one, in your
-city.
+Once you've done that, type 'unleash <animal>' or 'unleash cage' to release
+them, one by one, in your city.
 ~
    The bone cage disappears from your fingers -- or perhaps it was never there.
 You've earned a goody bag!

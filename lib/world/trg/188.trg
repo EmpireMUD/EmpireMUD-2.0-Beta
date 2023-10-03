@@ -1263,7 +1263,7 @@ elseif !%mob%
 elseif !%mob.mob_flagged(ANIMAL)%
   %send% %actor% You can only bind animals with @%self%.
   halt
-elseif !(%ban_list% ~= %mob.vnum%)
+elseif %ban_list% ~= %mob.vnum%
   %send% %actor% You'll need to find something a lot scarrier than ~%mob%.
   halt
 elseif %mob.mob_flagged(EMPIRE)% || %mob.vnum% <= 0
