@@ -1310,6 +1310,12 @@ set adj_size 23
 if !%arg%
   %send% %actor% Unleash what?
   halt
+elseif %self.room.empire_id% != %actor.empire.vnum% 
+  %send% %actor% You need to do that at a city location you own.
+  halt  
+elseif !%self.room.in_city%
+  %send% %actor% You need to do that in one of your own cities.
+  halt
 end
 * targeting?
 if %self.val0% > 0 && %self.var(name0)% ~= %arg%
@@ -1341,11 +1347,6 @@ elseif %actor.obj_target(%arg%)% == %self%
 else
   * huh?
   %send% %actor% There doesn't seem to be %arg.ana% %arg.car% bound in the bone cage.
-  halt
-end
-* validate
-if %self.room.empire_id% != %actor.empire.vnum% || !%self.room.in_city%
-  %send% %actor% You need to do that in one of your own cities.
   halt
 end
 * prepare the mob
