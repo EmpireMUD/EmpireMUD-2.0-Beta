@@ -272,7 +272,7 @@ craft_data *find_best_craft_by_name(char_data *ch, char *argument, int craft_typ
 	craft_data *known_abbrev = NULL, *known_abbrev_no_res = NULL;
 	craft_data *unknown_multi = NULL;
 	craft_data *known_multi = NULL, *known_multi_no_res = NULL;
-	craft_data *craft, *next_craft, *craft_no_res = NULL;
+	craft_data *craft, *next_craft;
 	bool use_room = can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED);
 	
 	skip_spaces(&argument);
@@ -290,12 +290,7 @@ craft_data *find_best_craft_by_name(char_data *ch, char *argument, int craft_typ
 		
 		if (!str_cmp(argument, GET_CRAFT_NAME(craft))) {
 			// exact match!
-			if (has_resources(ch, GET_CRAFT_RESOURCES(craft), use_room, FALSE, NULL)) {
-				return craft;
-			}
-			else if (!craft_no_res) {
-				craft_no_res = craft;
-			}
+			return craft;
 		}
 		else if (!known_abbrev && is_abbrev(argument, GET_CRAFT_NAME(craft))) {
 			if (IS_SET(GET_CRAFT_FLAGS(craft), CRAFT_IN_DEVELOPMENT)) {
@@ -352,10 +347,7 @@ craft_data *find_best_craft_by_name(char_data *ch, char *argument, int craft_typ
 	}
 	
 	// if we got this far, it didn't return an exact match with resources
-	if (craft_no_res) {
-		return craft_no_res;
-	}
-	else if (known_abbrev) {
+	if (known_abbrev) {
 		return known_abbrev;
 	}
 	else if (known_abbrev_no_res) {
@@ -1873,7 +1865,7 @@ void do_gen_craft_vehicle(char_data *ch, craft_data *type, int dir) {
 ACMD(do_gen_craft) {
 	char short_arg[MAX_INPUT_LENGTH], last_arg[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH * 2], line[256];
 	int count, timer, num = 1, dir = NO_DIR;
-	craft_data *craft, *next_craft, *type = NULL, *type_no_res = NULL, *find_type = NULL, *abbrev_match = NULL, *abbrev_no_res = NULL, *multi_match = NULL, *multi_no_res = NULL;
+	craft_data *craft, *next_craft, *type = NULL, *find_type = NULL, *abbrev_match = NULL, *abbrev_no_res = NULL, *multi_match = NULL, *multi_no_res = NULL;
 	vehicle_data *veh;
 	bool is_master, use_room, list_only = FALSE;
 	obj_data *found_obj = NULL, *drinkcon = NULL;
@@ -1972,13 +1964,8 @@ ACMD(do_gen_craft) {
 					continue;	// missing ability
 				}
 				
-				// exact match!
-				if (has_resources(ch, GET_CRAFT_RESOURCES(craft), use_room, FALSE, NULL)) {
-					type = craft;
-				}
-				else if (!type_no_res) {
-					type_no_res = craft;
-				}
+				// exact match! (don't care about resources)
+				type = craft;
 				break;
 			}
 			else if (!abbrev_match && (is_abbrev(arg, GET_CRAFT_NAME(craft)) || (*short_arg && is_abbrev(short_arg, GET_CRAFT_NAME(craft))))) {
@@ -2015,9 +2002,6 @@ ACMD(do_gen_craft) {
 		
 		// maybe we didn't find an exact match, but did find an abbrev/multi match
 		// this also tries to prefer things they have the resources for
-		if (!type) {
-			type = type_no_res;	// if any
-		}
 		if (!type) {
 			type = abbrev_match ? abbrev_match : abbrev_no_res;	// if any
 		}
