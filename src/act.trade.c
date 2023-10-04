@@ -497,7 +497,8 @@ int get_crafting_level(char_data *ch) {
 int get_craft_scale_level(char_data *ch, craft_data *craft) {
 	int level = 1, psr, craft_lev;
 	ability_data *abil;
-	obj_data *req;
+	obj_data *req, *obj;
+	vehicle_data *veh;
 	
 	if (IS_NPC(ch)) {
 		return 0;
@@ -546,6 +547,28 @@ int get_craft_scale_level(char_data *ch, craft_data *craft) {
 			
 			// always bound by the crafting level
 			level = MIN(level, craft_lev);
+		}
+		
+		// and level bounds
+		if (CRAFT_IS_VEHICLE(craft)) {
+			if ((veh = vehicle_proto(GET_CRAFT_OBJECT(craft)))) {
+				if (VEH_MIN_SCALE_LEVEL(veh) > 0) {
+					level = MAX(level, VEH_MIN_SCALE_LEVEL(veh));
+				}
+				if (VEH_MAX_SCALE_LEVEL(veh) > 0) {
+					level = MIN(level, VEH_MAX_SCALE_LEVEL(veh));
+				}
+			}
+		}
+		else if (!IS_SET(GET_CRAFT_FLAGS(craft), CRAFT_SOUP)) {
+			if ((obj = obj_proto(GET_CRAFT_OBJECT(craft)))) {
+				if (GET_OBJ_MIN_SCALE_LEVEL(obj) > 0) {
+					level = MAX(level, GET_OBJ_MIN_SCALE_LEVEL(obj));
+				}
+				if (GET_OBJ_MAX_SCALE_LEVEL(obj) > 0) {
+					level = MIN(level, GET_OBJ_MAX_SCALE_LEVEL(obj));
+				}
+			}
 		}
 	}
 	else {
