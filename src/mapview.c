@@ -2536,7 +2536,6 @@ void show_screenreader_room(char_data *ch, room_data *room, bitvector_t options,
 void perform_mortal_where(char_data *ch, char *arg) {
 	int closest, dist, max_distance;
 	char *dir_str;
-	descriptor_data *d;
 	char_data *i, *found = NULL;
 	
 	if (has_player_tech(ch, PTECH_WHERE_UPGRADE)) {
@@ -2550,8 +2549,8 @@ void perform_mortal_where(char_data *ch, char *arg) {
 
 	if (!*arg) {
 		send_to_char("Players near you\r\n--------------------\r\n", ch);
-		for (d = descriptor_list; d; d = d->next) {
-			if (STATE(d) != CON_PLAYING || !(i = d->character) || IS_NPC(i) || ch == i || !IN_ROOM(i))
+		DL_FOREACH2(player_character_list, i, next_plr) {
+			if (IS_NPC(i) || ch == i || !IN_ROOM(i))
 				continue;
 			if (!CAN_SEE(ch, i) || !CAN_RECOGNIZE(ch, i) || !WIZHIDE_OK(ch, i) || AFF_FLAGGED(i, AFF_NO_WHERE))
 				continue;
