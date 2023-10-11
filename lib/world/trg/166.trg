@@ -746,18 +746,18 @@ end
 set arg %arg2%
 if normal /= %arg%
   %send% %actor% Setting difficulty to Normal...
-  set difficulty 1
+  set diff 1
 elseif hard /= %arg%
   %send% %actor% Setting difficulty to Hard...
-  set difficulty 2
+  set diff 2
 elseif group /= %arg%
   %send% %actor% Setting difficulty to Group...
-  set difficulty 3
+  set diff 3
 elseif boss /= %arg%
   %send% %actor% Setting difficulty to Boss...
-  set difficulty 4
+  set diff 4
 else
-  %send% %actor% That is not a valid difficulty level for this adventure.
+  %send% %actor% That is not a valid difficulty level for this encounter.
   halt
   return 1
 end
@@ -800,36 +800,39 @@ if %mob.vnum% != 16613
   halt
 end
 %echo% ~%mob% sidles into view and you rush forward with @%self%!
-if %difficulty% == 1
+if %diff% == 1
   * Then we don't need to do anything
-elseif %difficulty% == 2
+elseif %diff% == 2
   nop %mob.add_mob_flag(HARD)%
-elseif %difficulty% == 3
+elseif %diff% == 3
   nop %mob.add_mob_flag(GROUP)%
-elseif %difficulty% == 4
+elseif %diff% == 4
   nop %mob.add_mob_flag(HARD)%
   nop %mob.add_mob_flag(GROUP)%
 end
+remote diff %mob.id%
 %echo% @%self% bursts into blue flames and rapidly crumbles to ash.
 %purge% %self%
 ~
 #16614
-grinchy demon combat 1~
+Winter Wonderland: Grinchy demon combat 1~
 0 bw 40
 ~
-if !%self.fighting%
+if !%self.fighting% || %self.cooldown(16617)%
   halt
 end
-if %self.cooldown(16617)%
+set diff %self.var(diff,1)%
+set room %self.room%
+set person %room.people%
+set mob %room.people(16614)%
+if %mob%
+  * already have a dog
+  halt
+elseif %diff% == 1
+  * normal = no summon
+  nop %self.set_cooldown(16617, 90)%
   halt
 end
-set person %self.room.people%
-while %person%
-  if %person.vnum% == 16614
-    halt
-  end
-  set person %person.next_in_room%
-done
 set grinch_level 0
 if %self.mob_flagged(hard)%
   eval grinch_level %grinch_level% + 1
@@ -837,21 +840,20 @@ end
 if %self.mob_flagged(group)%
   eval grinch_level %grinch_level% + 2
 end
-if %grinch_level% == 0
-  halt
-end
 set grinch_roll %random.100%
-if %grinch_level% == 1 && %grinch_roll% > 30
+if %diff% == 2 && %grinch_roll% > 30
+  * chance to fail on hard
   halt
-elseif %grinch_level% == 2 && %grinch_roll% > 60
+elseif %diff% == 3 && %grinch_roll% > 60
+  * chance to fail on group
   halt
 end
-%echo% ~%self% shouts, "get 'hem Max!"
+%echo% &&G&&Z~%self% shouts, "get 'em Max!"&&0
 %load% mob 16614 ally
 nop %self.set_cooldown(16617, 90)%
 ~
 #16615
-grinchy combat 2~
+Winter Wonderland: Grinchy combat 2~
 0 k 25
 ~
 set grinch_level 0
@@ -3225,18 +3227,18 @@ end
 set arg %arg2%
 if normal /= %arg%
   %send% %actor% Setting difficulty to Normal...
-  set difficulty 1
+  set diff 1
 elseif hard /= %arg%
   %send% %actor% Setting difficulty to Hard...
-  set difficulty 2
+  set diff 2
 elseif group /= %arg%
   %send% %actor% Setting difficulty to Group...
-  set difficulty 3
+  set diff 3
 elseif boss /= %arg%
   %send% %actor% Setting difficulty to Boss...
-  set difficulty 4
+  set diff 4
 else
-  %send% %actor% That is not a valid difficulty level for this interaction.
+  %send% %actor% That is not a valid difficulty level for this encounter.
   halt
   return 1
 end
@@ -3293,16 +3295,17 @@ if %mob.vnum% != 16613 && %mob.vnum% != 16680
   halt
 end
 %echo% ~%mob% sidles into view and you rush forward to engage!
-if %difficulty% == 1
+if %diff% == 1
   * Then we don't need to do anything
-elseif %difficulty% == 2
+elseif %diff% == 2
   nop %mob.add_mob_flag(HARD)%
-elseif %difficulty% == 3
+elseif %diff% == 3
   nop %mob.add_mob_flag(GROUP)%
-elseif %difficulty% == 4
+elseif %diff% == 4
   nop %mob.add_mob_flag(HARD)%
   nop %mob.add_mob_flag(GROUP)%
 end
+remote diff %mob.id%
 %echo% @%self% bursts into blue flames and rapidly crumbles to ash.
 %purge% %self%
 ~
