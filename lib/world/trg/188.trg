@@ -1269,7 +1269,7 @@ elseif %ban_list% ~= %mob.vnum%
 elseif %mob.mob_flagged(EMPIRE)% || %mob.vnum% <= 0
   %send% %actor% You can't bind ~%mob% with @%self%.
   halt
-elseif %mob.mob_flagged(HARD)% || %mob.mob_flagged(GROUP)% || %mob.level% >= 100 || %mob.mob_flagged(AGGR)% 
+elseif %mob.mob_flagged(HARD)% || %mob.mob_flagged(GROUP)% || %mob.level% >= 100 || %mob.mob_flagged(AGGR)%
   %send% %actor% ~%mob% is too strong to bind.
   halt
 elseif !%mob.mob_flagged(ANIMAL)%
@@ -1313,9 +1313,9 @@ set adj_size 23
 if !%arg%
   %send% %actor% Unleash what?
   halt
-elseif %self.room.empire_id% != %actor.empire.vnum% 
+elseif %self.room.empire_id% != %actor.empire.vnum%
   %send% %actor% You need to do that at a city location you own.
-  halt  
+  halt
 elseif !%self.room.in_city%
   %send% %actor% You need to do that in one of your own cities.
   halt
@@ -1401,6 +1401,7 @@ done
 * new script to despawn-later
 nop %mob.remove_mob_flag(SPAWNED)%
 attach 18842 %mob.id%
+attach 18847 %mob.id%
 * announce
 nop %mob.unscale_and_reset%
 %send% %actor% You hold out @%self%...
@@ -1420,6 +1421,69 @@ if %timestamp% - %self.var(spawn_time,0)% > 259200
   %purge% %self%
   halt
 end
+~
+#18847
+Halloween: Citizens fear me~
+0 bw 20
+~
+* vnum lists
+set flee_list 200 201 202 203 204 228 230 233 234 235 236 237 238 239 240 241 242 243 244 245 246 247 248 249 250 251 252 253 255 264 265
+set animal_list 222 223
+set react_list 206 207 208 209 210 211 212 213 214 215 216 217 218 219 220 221 224 225 226 227 229 231 232 254 256 257 258 259 260 262 263 266 267 268 269 270 271 272 273 274 275 276 277 278 279 280 281 282 283 284 285
+* find someone
+set room %self.room%
+set ch %self.room.people%
+while %ch%
+  set next_ch %ch.next_in_room%
+  if %ch.is_npc%
+    if %flee_list% ~= %ch.vnum%
+      * flee
+      switch %random.3%
+        case 1
+          %echo% ~%ch% shrieks in terror at the sight of ~%self%!
+        break
+        case 2
+          %echo% ~%ch% nearly bumps into ~%self%, turning sheet-white at the sight!
+        break
+        case 3
+          %echo% %ch% loses ^%ch% balance as &%ch% scrambles to get away from ~%self%!
+        break
+      done
+      %force% %ch% flee
+      halt
+    elseif %animal_list% ~= %ch.vnum%
+      * animal reaction
+      switch %random.3%
+        case 1
+          %echo% ~%ch% yelps and scoots backwards at the sight of ~%self%...
+        break
+        case 2
+          %echo% ~%ch% sniffs along the ground but ^%ch% hackles raise at the sight of ~%self%...
+        break
+        case 3
+          %echo% |%ch% little legs nearly fail as &%ch% runs in terror from ~%self%...
+        break
+      done
+      %force% %ch% flee
+      halt
+    elseif %react_list% ~= %ch.vnum%
+      * react only
+      switch %random.3%
+        case 1
+          %echo% ~%ch% shrieks and tries to hide from ~%self%!
+        break
+        case 2
+          %echo% ~%ch% cowers in terror before ~%self%!
+        break
+        case 3
+          %echo% %ch% nearly trips over *%ch%self trying to take cover from ~%self%!
+        break
+      done
+      halt
+    end
+  end
+  set ch %next_ch%
+done
 ~
 #18848
 make offering to the spirits~
