@@ -1264,7 +1264,7 @@ elseif !%mob%
   %send% %actor% There's no '%arg.car%' here to bind.
   halt
 elseif %ban_list% ~= %mob.vnum%
-  %send% %actor% You'll need to find something a lot scarrier than ~%mob%.
+  %send% %actor% You'll need to find something a lot scarier than ~%mob%.
   halt
 elseif %mob.mob_flagged(EMPIRE)% || %mob.vnum% <= 0
   %send% %actor% You can't bind ~%mob% with @%self%.
@@ -1746,14 +1746,17 @@ if %stealth_roll% > 10
   nop %target.add_mob_flag(*PICKPOCKETED)%
   %load% obj 18855 %actor% inv
   set item %actor.inventory()%
-  nop %actor.set_cooldown(18854,20)%
   %send% %actor% You find @%item%!
+  set found 1
   return 1
 else
+  set found 0
   return 0
 end
 if %actor.quest_finished(18854)%
   %quest% %actor% finish 18854
+elseif %found%
+  nop %actor.set_cooldown(18854,20)%
 end
 ~
 #18855
