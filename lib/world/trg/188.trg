@@ -1446,7 +1446,7 @@ while %ch%
           %echo% ~%ch% nearly bumps into ~%self%, turning sheet-white at the sight!
         break
         case 3
-          %echo% %ch% loses ^%ch% balance as &%ch% scrambles to get away from ~%self%!
+          %echo% ~%ch% loses ^%ch% balance as &%ch% scrambles to get away from ~%self%!
         break
       done
       %force% %ch% flee
@@ -1476,7 +1476,7 @@ while %ch%
           %echo% ~%ch% cowers in terror before ~%self%!
         break
         case 3
-          %echo% %ch% nearly trips over *%ch%self trying to take cover from ~%self%!
+          %echo% ~%ch% nearly trips over *%ch%self trying to take cover from ~%self%!
         break
       done
       halt
