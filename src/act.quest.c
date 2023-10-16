@@ -936,6 +936,7 @@ QCMD(qcmd_list) {
 	
 	if (!GET_QUESTS(ch)) {
 		msg_to_char(ch, "You aren't on any quests.\r\n");
+		msg_to_char(ch, "%s\r\n", show_daily_quest_line(ch));
 		
 		if ((quest_list = build_available_quest_list(ch))) {
 			msg_to_char(ch, "Try 'quest start' to see a list of available quests here.\r\n");
