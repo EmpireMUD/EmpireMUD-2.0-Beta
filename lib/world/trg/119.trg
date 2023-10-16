@@ -4431,7 +4431,7 @@ end
 #11961
 Smol Nes-Pik: Drink dew of Tagra Nes~
 1 c 2
-drink use~
+drink sip use~
 * Causes a teleport if the players sleeps in their home after drinking this
 if !%arg% || %actor.obj_target(%arg%)% != %self%
   return 0
