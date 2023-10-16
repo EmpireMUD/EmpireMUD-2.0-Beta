@@ -265,9 +265,9 @@ void copy_workforce_limits_into_current_island(char_data *ch, struct island_info
 void do_customize_island(char_data *ch, char *argument) {
 	char type_arg[MAX_INPUT_LENGTH];
 	struct empire_city_data *city;
-	struct empire_island *eisle;
-	struct island_info *island;
-	bool alnum, has_city = FALSE;
+	struct empire_island *eisle, *eiter, *next_eiter;
+	struct island_info *island, *isle_iter, *next_isle;
+	bool alnum, unique, has_city = FALSE;
 	int iter;
 	
 	const char *allowed_special = " '-";	// chars allowed in island names
@@ -317,6 +317,36 @@ void do_customize_island(char_data *ch, char *argument) {
 			}
 		}
 		
+		// check unique
+		unique = TRUE;
+		HASH_ITER(hh, island_table, isle_iter, next_isle) {
+			if (isle_iter == island) {
+				continue;	// same isle
+			}
+			if (str_cmp(isle_iter->name, argument)) {
+				continue;	// no match
+			}
+			
+			// oops
+			unique = FALSE;
+			break;
+		}
+		if (GET_LOYALTY(ch) && unique) {
+			HASH_ITER(hh, EMPIRE_ISLANDS(GET_LOYALTY(ch)), eiter, next_eiter) {
+				if (eiter->island == island->id) {
+					continue;	// same isle
+				}
+				if (!eiter->name || str_cmp(eiter->name, argument)) {
+					continue;	// no custom name or no match
+				}
+				
+				// oops
+				unique = FALSE;
+				break;
+			}
+		}
+		
+		// ok check args
 		if (!*argument) {
 			msg_to_char(ch, "What would you like to name this island (or \"none\")?\r\n");
 		}
@@ -344,6 +374,9 @@ void do_customize_island(char_data *ch, char *argument) {
 		}
 		else if (!alnum) {
 			msg_to_char(ch, "Island names must be alphanumeric.\r\n");
+		}
+		else if (!unique) {
+			msg_to_char(ch, "That name is already taken by another island.\r\n");
 		}
 		else {
 			log_to_empire(GET_LOYALTY(ch), ELOG_TERRITORY, "%s has given %s the custom name of %s", PERS(ch, ch, TRUE), get_island_name_for(island->id, ch), argument);
