@@ -2276,11 +2276,12 @@ ACMD(do_affects) {
 ACMD(do_chart) {
 	struct chart_territory *citer, *next_citer, *hash = NULL;
 	struct empire_city_data *city;
-	struct empire_island *e_isle;
+	struct empire_island *e_isle, *eiter, *next_eiter;
 	empire_data *emp, *next_emp;
 	int iter, total_claims, num;
-	struct island_info *isle;
+	struct island_info *isle, *isle_iter, *next_isle;
 	bool any, city_prompt;
+	char buf[MAX_STRING_LENGTH];
 	
 	skip_spaces(&argument);
 	
@@ -2405,6 +2406,39 @@ ACMD(do_chart) {
 		}
 		
 		free_chart_hash(hash);
+		
+		// other islands with similar names
+		*buf = '\0';
+		HASH_ITER(hh, island_table, isle_iter, next_isle) {
+			if (isle_iter == isle) {
+				continue;	// same isle
+			}
+			if (!is_multiword_abbrev(argument, isle_iter->name)) {
+				continue;	// no match
+			}
+			
+			// found
+			snprintf(buf + strlen(buf), sizeof(buf) - strlen(buf), "%s%s", (*buf ? ", " : ""), isle_iter->name);
+		}
+		if (GET_LOYALTY(ch)) {
+			HASH_ITER(hh, EMPIRE_ISLANDS(GET_LOYALTY(ch)), eiter, next_eiter) {
+				if (eiter->island == isle->id) {
+					continue;	// same isle
+				}
+				if (!eiter->name) {
+					continue;	// no custom name
+				}
+				if (!is_multiword_abbrev(argument, eiter->name)) {
+					continue;	// no match
+				}
+				
+				// found
+				snprintf(buf + strlen(buf), sizeof(buf) - strlen(buf), "%s%s", (*buf ? ", " : ""), eiter->name);
+			}
+		}
+		if (*buf) {
+			msg_to_char(ch, "Islands with similar names: %s\r\n", buf);
+		}
 	}
 }
 
