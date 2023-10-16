@@ -2588,22 +2588,24 @@ void perform_mortal_where(char_data *ch, char *arg) {
 		found = NULL;
 		closest = MAP_SIZE;
 		DL_FOREACH(character_list, i) {
-			if (i == ch || !IN_ROOM(i) || !CAN_RECOGNIZE(ch, i) || !CAN_SEE(ch, i) || AFF_FLAGGED(i, AFF_NO_WHERE))
+			if (i == ch || !IN_ROOM(i) || !CAN_SEE(ch, i) || AFF_FLAGGED(i, AFF_NO_WHERE)) {
 				continue;
-			if (!multi_isname(arg, GET_PC_NAME(i)))
+			}
+			if (!IS_NPC(i) && has_player_tech(i, PTECH_NO_TRACK_WILD) && valid_no_trace(IN_ROOM(i))) {
+				gain_player_tech_exp(i, PTECH_NO_TRACK_WILD, 10);
 				continue;
-			if ((dist = compute_distance(IN_ROOM(ch), IN_ROOM(i))) > max_distance) {
+			}
+			if (!IS_NPC(i) && has_player_tech(i, PTECH_NO_TRACK_CITY) && valid_unseen_passing(IN_ROOM(i))) {
+				gain_player_tech_exp(i, PTECH_NO_TRACK_CITY, 10);
 				continue;
 			}
 			if (!same_subzone(IN_ROOM(ch), IN_ROOM(i))) {
 				continue;
 			}
-			if (has_player_tech(i, PTECH_NO_TRACK_WILD) && valid_no_trace(IN_ROOM(i))) {
-				gain_player_tech_exp(i, PTECH_NO_TRACK_WILD, 10);
+			if ((dist = compute_distance(IN_ROOM(ch), IN_ROOM(i))) > max_distance) {
 				continue;
 			}
-			if (has_player_tech(i, PTECH_NO_TRACK_CITY) && valid_unseen_passing(IN_ROOM(i))) {
-				gain_player_tech_exp(i, PTECH_NO_TRACK_CITY, 10);
+			if (!match_char_name(ch, i, arg, NOBITS)) {
 				continue;
 			}
 			
@@ -2711,7 +2713,7 @@ void perform_immort_where(char_data *ch, char *arg) {
 	}
 	else {
 		DL_FOREACH(character_list, i) {
-			if (CAN_SEE(ch, i) && IN_ROOM(i) && WIZHIDE_OK(ch, i) && multi_isname(arg, GET_PC_NAME(i))) {
+			if (CAN_SEE(ch, i) && IN_ROOM(i) && WIZHIDE_OK(ch, i) && (multi_isname(arg, GET_PC_NAME(i)) || match_char_name(ch, i, arg, MATCH_GLOBAL))) {
 				found = 1;
 				msg_to_char(ch, "M%3d. %-25s - %s[%7d]%s %s\r\n", ++num, GET_NAME(i), (IS_NPC(i) && HAS_TRIGGERS(i)) ? "[TRIG] " : "", GET_ROOM_VNUM(IN_ROOM(i)), coord_display_room(ch, IN_ROOM(i), TRUE), get_room_name(IN_ROOM(i), FALSE));
 			}
