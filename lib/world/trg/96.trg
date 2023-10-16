@@ -291,9 +291,9 @@ eval needed 4 + (4 * %self.var(diff,1)%)
 * I want to break free...
 if %struggle_counter% >= %needed%
   * free!
-  set char_msg %self.var(scf_free_char,You manage to break out!)%
+  set char_msg %actor.var(scf_free_char,You manage to break out!)%
   %send% %actor% %char_msg.process%
-  set room_msg %self.var(scf_free_room,~%actor% struggles and manages to break out!)%
+  set room_msg %actor.var(scf_free_room,~%actor% struggles and manages to break out!)%
   %echoaround% %actor% %room_msg.process%
   set did_skycleave_struggle 1
   remote did_skycleave_struggle %self.id%
@@ -302,9 +302,9 @@ if %struggle_counter% >= %needed%
   %purge% %self%
 else
   * the struggle continues
-  set char_msg %self.var(scf_strug_char,You struggle to break free...)%
+  set char_msg %actor.var(scf_strug_char,You struggle to break free...)%
   %send% %actor% %char_msg.process%
-  set room_msg %self.var(scf_strug_room,~%actor% struggles, trying to break free...)%
+  set room_msg %actor.var(scf_strug_room,~%actor% struggles, trying to break free...)%
   %echoaround% %actor% %room_msg.process%
   nop %actor.command_lag(COMBAT-ABILITY)%
   remote struggle_counter %self.id%
