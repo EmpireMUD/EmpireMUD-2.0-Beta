@@ -274,6 +274,10 @@ if !%actor.affect(9602)%
   else
     return 0
   end
+  rdelete scf_strug_char %actor.id%
+  rdelete scf_strug_room %actor.id%
+  rdelete scf_free_char %actor.id%
+  rdelete scf_free_room %actor.id%
   %purge% %self%
   halt
 elseif !(%cmd% /= struggle)
@@ -299,6 +303,10 @@ if %struggle_counter% >= %needed%
   remote did_skycleave_struggle %self.id%
   nop %actor.command_lag(COMBAT-ABILITY)%
   dg_affect #9602 %actor% off
+  rdelete scf_strug_char %actor.id%
+  rdelete scf_strug_room %actor.id%
+  rdelete scf_free_char %actor.id%
+  rdelete scf_free_room %actor.id%
   %purge% %self%
 else
   * the struggle continues
