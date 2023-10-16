@@ -60,12 +60,12 @@ if %cmd% == make
       %send% %actor% You've stopped building the snowman.
       halt
     end
-  elseif (snowman /= %arg%)
+  elseif (snowman /= %arg%) && !(snow /= %arg%)
     %send% %actor% You don't have enough snowballs yet.
     halt
   end
 end
-if %cmd% == scoop && snowball /= %arg%
+if %cmd% == scoop && !(snowball /= %arg%)
   %send% %actor% You can only make snowballs when scooping.
   halt
 end
@@ -1782,8 +1782,8 @@ Holiday pet adoption certificate~
 adopt~
 return 1
 set usage Usage: adopt <coat> <puppy/kitten>
-set dog_coats chestnut silver beige gold brown chocolate golden wheaten cream rusty lilac orange striped brindle spotted dotted black white green violet purple magenta red yellow blue orange indigo grey gray
-set cat_coats ginger cream brown cinnamon tuxedo tabby mackerel tortoiseshell seal-point blue-point flame-point black white green violet purple magenta red yellow blue orange indigo grey gray
+set dog_coats chestnut silver beige gold brown chocolate golden wheaten cream rusty lilac orange striped brindle spotted dotted black white green violet purple magenta red yellow blue orange indigo pink grey gray
+set cat_coats ginger cream brown cinnamon tuxedo tabby mackerel tortoiseshell seal-point blue-point flame-point black white green violet purple magenta red yellow blue orange indigo pink grey gray
 * basic validation
 if %actor.is_npc%
   %send% %actor% Sorry, no.
@@ -2872,7 +2872,7 @@ return 1
 ~
 #16660
 Straw Goat vandalism driver~
-5 ab 33
+5 ab 50
 ~
 * configs
 set quest_vnum 16660
@@ -3064,7 +3064,7 @@ done
 if !%arg%
   %send% %actor% Protect what?
   halt
-elseif !(giant straw goat /= %arg%) && !(straw goat /= %arg%) && !(goat /= %arg%)
+elseif %actor.veh_target(%arg%) != %self% && !(giant straw goat /= %arg%) && !(straw goat /= %arg%) && !(goat /= %arg%)
   %send% %actor% You can't protect that.
   halt
 elseif %self.is_flagged(ON-FIRE)%
