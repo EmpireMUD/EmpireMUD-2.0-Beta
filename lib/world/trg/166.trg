@@ -1150,11 +1150,24 @@ else
 end
 ~
 #16621
-grinchy greeting~
-0 h 0
+Grinchy Demon and Krampus: Reset on greeting~
+0 h 100
 ~
-if %actor.is_pc% && !%self.fighting%
-  dg_affect #16606 %self% off
+if %self.fighting%
+  halt
+end
+set room %self.room%
+* Buffs
+dg_affect #16618 %self% off
+dg_affect #16684 %self% off
+dg_affect #16687 %self% off
+dg_affect #16689 %self% off
+* Max?
+rdelete summoned_max %self.id%
+set max %room.people(16614)%
+if %max%
+  %echo% ~%max% runs off.
+  %purge% %max%
 end
 ~
 #16622
@@ -2433,10 +2446,232 @@ end
 %purge% %self%
 ~
 #16653
-Grinchy combat: TBA~
+Grinchy combat: Present Toss, Pole Swing, Summon/Buff Max~
 0 k 100
 ~
-* No script
+if %self.cooldown(16680)% || %self.disabled%
+  halt
+end
+set room %self.room%
+set diff %self.diff%
+* order
+set moves_left %self.var(moves_left)%
+set num_left %self.var(num_left,0)%
+if !%moves_left% || !%num_left%
+  set moves_left 1 1 2 2 3
+  set num_left 5
+end
+* pick
+eval which %%random.%num_left%%%
+set old %moves_left%
+set moves_left
+set move 0
+while %which% > 0
+  set move %old.car%
+  if %which% != 1
+    set moves_left %moves_left% %move%
+  end
+  set old %old.cdr%
+  eval which %which% - 1
+done
+set moves_left %moves_left% %old%
+* store
+eval num_left %num_left% - 1
+remote moves_left %self.id%
+remote num_left %self.id%
+* perform move
+scfight lockout 16680 30 35
+if %move% == 1
+  * Present Toss
+  if %diff% <= 2
+    nop %self.add_mob_flag(NO-ATTACK)%
+  end
+  scfight clear dodge
+  set targ %random.enemy%
+  if !%targ%
+    set targ %actor%
+  end
+  set id %targ.id%
+  * random obj
+  set object_1 a gaudy neck ties
+  set object_2 a hideous Christmas sweater
+  set object_3 fluffy woolen socks
+  set object_4 a pet rock
+  set which %random.4%
+  eval obj %%object_%which%%%
+  if %which% == 1 || %which% == 3
+    set itthem them
+  else
+    set itthem it
+  end
+  if %diff% < 3
+    * normal/hard
+    %send% %targ% &&G**** &&Z~%self% grabs %obj% out of ^%self% sack and throws %itthem% at you! ****&&0 (dodge)
+    %echoaround% %targ% &&G~%self% grabs %obj% out of ^%self% sack and throws %itthem% at ~%targ%!&&0
+    scfight setup dodge %targ%
+    wait 5 s
+    nop %self.remove_mob_flag(NO-ATTACK)%
+    wait 3 s
+    if %self.disabled%
+      nop %self.remove_mob_flag(NO-ATTACK)%
+      halt
+    end
+    if !%targ% || %targ.id% != %id%
+      * gone
+      %echo% &&G%obj.cap% misses and lands on the ground.&&0
+      unset targ
+    elseif %targ.var(did_scfdodge)%
+      * dodged: switch targ
+      %echo% &&G%obj.cap% bounces and rebounds back toward ~%self%!&&0
+      set targ %self%
+      if %diff% == 1
+        dg_affect #16686 %targ% TO-HIT 25 20
+      end
+    end
+    * hit either them or me
+    if %targ%
+      * hit
+      switch %random.2%
+        case 1
+          %echo% &&G%obj% hits ~%targ% in the head!&&0
+          eval ouch 75 * %diff%
+          %damage% %targ% %ouch% physical
+          if %diff% > 1 && (%self.level% + 100) > %targ.level% && !%targ.aff_flagged(!STUN)%
+            dg_affect #16619 %targ% STUNNED on 5
+          end
+        break
+        case 2
+          %echo% &&G%obj% hits ~%targ% in the face, covering ^%targ% eyes!&&0
+          eval ouch 50 * %diff%
+          %damage% %targ% %ouch% physical
+          dg_affect #16620 %targ% BLIND on 5
+        break
+      done
+    end
+    scfight clear dodge
+  else
+    * group/boss
+    %echo% &&G**** &&Z~%self% grabs %obj% out of ^%self% sack and prepares to slam %itthem% to the ground... ****&&0 (dodge)
+    if %diff% == 1
+      nop %self.add_mob_flag(NO-ATTACK)%
+    end
+    scfight setup dodge all
+    eval wait 8 - %diff%
+    wait %wait% s
+    if %self.disabled%
+      nop %self.remove_mob_flag(NO-ATTACK)%
+      halt
+    end
+    %echo% &&G~%self% slams %obj% to the ground, releasing a snowy shockwave!&&0
+    set ch %room.people%
+    while %ch%
+      set next_ch %ch.next_in_room%
+      if %self.is_enemy(%ch%)%
+        if !%ch.var(did_scfdodge)%
+          set hit 1
+          %echo% &&GThe shockwave knocks ~%ch% back!&&0
+          %send% %ch% That really hurt!
+          %damage% %ch% 100 magical
+        elseif %ch.is_pc%
+          %send% %ch% &&GYou manage to take cover as the snowy shockwave barely misses you!&&0
+          if %diff% == 1
+            dg_affect #16686 %ch% TO-HIT 25 20
+          end
+        end
+      end
+      set ch %next_ch%
+    done
+    scfight clear dodge
+    if !%hit%
+      if %diff% < 3
+        %echo% &&G~%self% is blown back by the shockwave!&&0
+        dg_affect #16687 %self% HARD-STUNNED on 10
+      end
+    end
+  end
+elseif %move% == 2 && !%self.aff_flagged(BLIND)%
+  * Pole Swing
+  scfight clear dodge
+  %echo% &&G~%self% pulls a thirty-nine-and-a-half foot pole from his gift sack... This can't be good.&&0
+  eval dodge %diff% * 40
+  dg_affect #16684 %self% DODGE %dodge% 20
+  if %diff% == 1
+    nop %self.add_mob_flag(NO-ATTACK)%
+  end
+  scfight setup dodge all
+  wait 3 s
+  if %self.disabled%
+    dg_affect #16684 %self% off
+    nop %self.remove_mob_flag(NO-ATTACK)%
+    halt
+  end
+  %echo% &&G**** &&Z~%self% starts to swing the thirty-nine-and-a-half foot pole! ****&&0 (dodge)
+  set cycle 1
+  set hit 0
+  eval wait 10 - %diff%
+  while %cycle% <= %diff%
+    scfight setup dodge all
+    wait %wait% s
+    set ch %room.people%
+    while %ch%
+      set next_ch %ch.next_in_room%
+      if %self.is_enemy(%ch%)%
+        if !%ch.var(did_scfdodge)%
+          set hit 1
+          %echo% &&G~%self% whacks ~%ch% in the head with the pole!&&0
+          %send% %ch% That really hurt!
+          %damage% %ch% 100 physical
+          if %diff% > 1 && (%self.level% + 100) > %targ.level% && !%targ.aff_flagged(!STUN)%
+            dg_affect #16616 %ch% STUNNED on 5
+          end
+        elseif %ch.is_pc%
+          %send% %ch% &&GYou limbo under the pole and safely straighten back up.&&0
+          if %diff% == 1
+            dg_affect #16686 %ch% TO-HIT 25 20
+          end
+        end
+        if %cycle% < %diff%
+          %send% %ch% &&G**** Here comes the thirty-nine-and-a-half foot pole again... ****&&0 (dodge)
+        end
+      end
+      set ch %next_ch%
+    done
+    scfight clear dodge
+    eval cycle %cycle% + 1
+  done
+  dg_affect #16684 %self% off
+  if !%hit%
+    if %diff% < 3
+      %echo% &&G~%self% looks tired from all that swinging.&&0
+      dg_affect #16687 %self% HARD-STUNNED on 10
+    end
+  end
+  wait 8 s
+elseif %move% == 3
+  * Summon or Buff Max (no interrupt)
+  set max %room.people(16614)%
+  if !%max% && %self.var(summoned_max,0)%
+    %echo% &&G&&Z~%self% says, 'This is for Max, you monster!'&&0
+    %echo% &&G&&Z~%self% turns even greener with rage!&&0
+    set amount %diff% * 4
+    dg_affect #16618 %self% BONUS-PHYSICAL %diff% 300
+    halt
+  elseif %max%
+    %echo% &&G&&Z~%self% says, 'That's it, Max, bite 'em! Gore 'em with the old antler!'&&0
+    set amount %diff% * 10
+    dg_affect #16618 %max% BONUS-PHYSICAL %diff% 300
+  else
+    set summoned_max 1
+    remote summoned_max %self.id%
+    %echo% &&G&&Z~%self% says, 'Get 'em, Max!'&&0
+    %load% mob 16614 ally
+    set max %room.people(16614)%
+    if %max%
+      %force% %max% maggro %self.fighting%
+    end
+  end
+end
+nop %self.remove_mob_flag(NO-ATTACK)%
 ~
 #16655
 Upgrade Glitter: upgrade Winter Wonderland items~

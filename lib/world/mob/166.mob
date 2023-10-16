@@ -59,10 +59,6 @@ I 4 16675 13.00 1 l  # LOOT: nostalgic Christmas spirit
 I 4 16664 4.00 1 l  # LOOT: mini-grinchy pet whistle
 I 4 16665 4.00 1 l  # LOOT: reindeer dog minipet whistle
 T 16603
-T 16614
-T 16615
-T 16616
-T 16605
 T 16621
 T 9600
 T 9601
@@ -797,6 +793,7 @@ T 9600
 T 9601
 T 9604
 T 16684
+T 16621
 S
 #16682
 mobile new~
