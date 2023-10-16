@@ -1154,6 +1154,18 @@ whistle'.
 16685 0 0
 2 0
 S
+#16686
+tester boss winter wonderland~
+the Winter Wonderland boss tester~
+The Winter Wonderland boss tester is here.~
+This item will summon a grinchy demon or krampus demon for testing.
+Usage: test <grinch | krampus> <normal | hard | group | boss>
+~
+3 p a 0 1
+0 0 0
+0 0
+T 16686
+S
 #16690
 vortex polar miniature constantly-spinning spinning~
 the miniature polar vortex~

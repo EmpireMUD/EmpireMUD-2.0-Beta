@@ -2432,6 +2432,12 @@ end
 %echoaround% %actor% ~%actor% uses @%self%!
 %purge% %self%
 ~
+#16653
+Grinchy combat: TBA~
+0 k 100
+~
+* No script
+~
 #16655
 Upgrade Glitter: upgrade Winter Wonderland items~
 1 c 2
@@ -3401,6 +3407,314 @@ snow cube summon~
 1 c 0
 ~
 * No script
+~
+#16684
+Krampus combat: Birch Bundle, Sack Up, Hornbutt, Rage heal/buff~
+0 k 100
+~
+if %self.cooldown(16680)% || %self.disabled%
+  halt
+end
+set room %self.room%
+set diff %self.diff%
+* order
+set moves_left %self.var(moves_left)%
+set num_left %self.var(num_left,0)%
+if !%moves_left% || !%num_left%
+  set moves_left 1 2 3 4
+  set num_left 4
+end
+* pick
+eval which %%random.%num_left%%%
+set old %moves_left%
+set moves_left
+set move 0
+while %which% > 0
+  set move %old.car%
+  if %which% != 1
+    set moves_left %moves_left% %move%
+  end
+  set old %old.cdr%
+  eval which %which% - 1
+done
+set moves_left %moves_left% %old%
+* store
+eval num_left %num_left% - 1
+remote moves_left %self.id%
+remote num_left %self.id%
+* perform move
+scfight lockout 16680 30 35
+if %move% == 1
+  * Birch bundle AOE
+  scfight clear dodge
+  %regionecho% %room% 25 &&y~%self% shouts, 'I see everyone has been naughty!'&&0
+  %echo% &&G~%self% whips out a bundle of birch rods and begins winding up...&&0
+  eval dodge %diff% * 40
+  dg_affect #16684 %self% DODGE %dodge% 20
+  if %diff% == 1
+    nop %self.add_mob_flag(NO-ATTACK)%
+  end
+  scfight setup dodge all
+  wait 3 s
+  if %self.disabled%
+    dg_affect #16684 %self% off
+    nop %self.remove_mob_flag(NO-ATTACK)%
+    halt
+  end
+  %echo% &&G**** &&Z~%self% starts spinning... it's now or never if you want to avoid those birch rods! ****&&0 (dodge)
+  set cycle 1
+  set hit 0
+  eval wait 10 - %diff%
+  while %cycle% <= %diff%
+    scfight setup dodge all
+    wait %wait% s
+    set ch %room.people%
+    while %ch%
+      set next_ch %ch.next_in_room%
+      if %self.is_enemy(%ch%)%
+        if !%ch.var(did_scfdodge)%
+          set hit 1
+          %echo% &&G~%self% smacks ~%ch% with ^%self% bundle of birch rods!&&0
+          %send% %ch% That really hurt! You seem to be bleeding.
+          %dot% #16685 %ch% 100 40 physical 25
+        elseif %ch.is_pc%
+          %send% %ch% &&G~%self% whirls past you, narrowly missing you with the birch rods!&&0
+          if %diff% == 1
+            dg_affect #16686 %ch% TO-HIT 25 20
+          end
+        end
+        if %cycle% < %diff%
+          %send% %ch% &&G**** Here come those birch rods again... ****&&0 (dodge)
+        end
+      end
+      set ch %next_ch%
+    done
+    scfight clear dodge
+    eval cycle %cycle% + 1
+  done
+  dg_affect #16684 %self% off
+  if !%hit%
+    if %diff% < 3
+      %echo% &&G~%self% seems to exhaust *%self%self from all that spinning.&&0
+      dg_affect #16687 %self% HARD-STUNNED on 10
+    end
+  end
+  wait 8 s
+elseif %move% == 2 && !%self.aff_flagged(BLIND)%
+  * Sack up
+  scfight clear struggle
+  %echo% &&G~%self% opens an oversized burlap sack...&&0
+  wait 3 s
+  if %self.disabled%
+    halt
+  end
+  set targ %random.enemy%
+  if !%targ%
+    halt
+  end
+  set targ_id %targ.id%
+  if %self.fighting% == %targ% && %diff% < 4
+    dg_affect #16687 %self% HARD-STUNNED on 20
+  end
+  %send% %targ% &&G**** &&Z~%self% snatches you up in the burlap sack! You can't move! ****&&0 (struggle)
+  %echoaround% %targ% &&G~%self% snatches ~%targ% up in the burlap sack!&&0
+  scfight setup struggle %targ% 20
+  * messages
+  set scf_strug_char You try to wiggle out of the burlap sack...
+  set scf_strug_room You hear ~%%actor%% trying to wiggle out of the burlap sack...
+  remote scf_strug_char %actor.id%
+  remote scf_strug_room %actor.id%
+  set scf_free_char You wiggle out of the burlap sack!
+  set scf_free_room ~%%actor%% manages to wiggle out of the burlap sack!
+  remote scf_free_char %actor.id%
+  remote scf_free_room %actor.id%
+  set cycle 0
+  set done 0
+  while %cycle% < 5 && !%done%
+    wait 4 s
+    if %targ.id% == %targ_id% && %targ.affect(9602)% && %diff% > 1
+      %send% %targ% &&GThis is the scratchiest burlap sack you've ever been stuck in! It really hurts!&&0
+      %dot% #16688 %targ% 100 40 physical 25
+    else
+      set done 1
+    end
+    eval cycle %cycle% + 1
+  done
+  scfight clear struggle
+  dg_affect #16687 %self% off
+elseif %move% == 3
+  * Hornbutt
+  scfight clear dodge
+  %echo% &&G~%self% sharpens ^%self% horn with a piece of coal...&&0
+  wait 3 s
+  if %self.disabled%
+    halt
+  end
+  if %self.aff_flagged(BLIND)%
+    halt
+  end
+  set targ %random.enemy%
+  if !%targ%
+    halt
+  end
+  set targ_id %targ.id%
+  if %self.fighting% == %targ% && %diff% == 1
+    dg_affect #16687 %self% HARD-STUNNED on 20
+  end
+  %send% %targ% &&G**** &&Z~%self% leans forward and takes aim... at you! ****&&0 (dodge)
+  %echoaround% %targ% &&G~%self% leans forward and takes aim... at ~%targ%!&&0
+  scfight setup dodge %targ%
+  if %diff% > 1
+    set ouch 100
+  else
+    set ouch 50
+  end
+  set cycle 0
+  set done 0
+  while %cycle% < %diff% && !%done%
+    wait 4 s
+    if %targ.id% != %targ_id%
+      set done 1
+    elseif !%targ.var(did_scfdodge)%
+      %echo% &&G~%self% hornbutts ~%targ%!&&0
+      %send% %targ% That really hurts!
+      %damage% %targ% %ouch% physical
+    end
+    eval cycle %cycle% + 1
+    if %cycle% < %diff% && !%done%
+      %send% %targ% &&G**** &&Z~%self% looks like &%self%'s going to try to hit you again... ****&&0 (dodge)
+      scfight setup dodge %targ%
+    end
+  done
+  scfight clear dodge
+  dg_affect #16687 %self% off
+elseif %move% == 4
+  * Rage heal or buff
+  scfight clear interrupt
+  %echo% &&G**** &&Z~%self% is fuming with rage... ****&&0 (interrupt)
+  if %diff% == 1
+    nop %self.add_mob_flag(NO-ATTACK)%
+  end
+  scfight setup interrupt all
+  if %self.diff% < 3 || %room.players_present% < 2
+    set requires 1
+  else
+    set requires 2
+  end
+  wait 4 s
+  if %self.disabled%
+    nop %self.remove_mob_flag(NO-ATTACK)%
+    halt
+  end
+  if %self.var(sfinterrupt_count,0)% < %requires%
+    %echo% &&G**** &&Z~%self% shouts incoherently as the rage builds up within *%self%... ****&&0 (interrupt)
+  end
+  wait 4 s
+  if %self.disabled%
+    nop %self.remove_mob_flag(NO-ATTACK)%
+    halt
+  end
+  if %self.var(sfinterrupt_count,0)% >= %requires%
+    %echo% &&G~%self% is distracted from whatever &%self% was doing... thankfully!&&0
+    if %diff% == 1
+      dg_affect #16687 %self% HARD-STUNNED on 5
+    end
+    wait 30 s
+  else
+    %echo% &&G~%self% seems to swell with rage as &%self% fights with new vigor!
+    eval hitprc %self.health% * 100 / %self.maxhealth%
+    if %health% <= 20
+      * heal
+      %heal% %self% health 100
+    else
+      * buff
+      eval amount %diff% * 20
+      dg_affect #16689 %self% BONUS-PHYSICAL %amount% 300
+    end
+  end
+  scfight clear interrupt
+end
+nop %self.remove_mob_flag(NO-ATTACK)%
+~
+#16686
+Winter Wonderland: Boss fight tester~
+1 c 2
+test~
+return 1
+if !%arg% \|\| !%arg.cdr%
+  %send% %actor% Usage: test <grinch \| krampus> <normal \| hard \| group \| boss>
+  halt
+end
+* mob?
+set which %arg.car%
+if grinchy /= %which%
+  set vnum 16613
+elseif krampus /= %which%
+  set vnum 16680
+else
+  %send% %actor% Usage: test <grinch \| krampus> <normal \| hard \| group \| boss>
+  halt
+end
+* diff?
+set arg2 %arg.cdr%
+if normal /= %arg2%
+  set diff 1
+elseif hard /= %arg2%
+  set diff 2
+elseif group /= %arg2%
+  set diff 3
+elseif boss /= %arg2%
+  set diff 4
+else
+  %send% %actor% Usage: test <grinch \| krampus> <normal \| hard \| group \| boss>
+  halt
+end
+* remove old mob?
+set room %self.room%
+set old %room.people(16613)%
+if %old%
+  %echo% ~%old% vanishes...
+  %purge% %old%
+end
+set old %room.people(16680)%
+if %old%
+  %echo% ~%old% vanishes...
+  %purge% %old%
+end
+* new mob
+%load% mob %vnum%
+set mob %room.people%
+if %mob.vnum% != %vnum%
+  %send% %actor% An error occurred when loading the mob to test.
+  halt
+end
+* messaging
+%echo% ~%mob% appears for testing!
+* Clear existing difficulty flags and set new ones.
+remote diff %mob.id%
+nop %mob.remove_mob_flag(HARD)%
+nop %mob.remove_mob_flag(GROUP)%
+if %diff% == 1
+  * Then we don't need to do anything
+  %echo% ~%mob% has been set to Normal.
+elseif %diff% == 2
+  %echo% ~%mob% has been set to Hard.
+  nop %mob.add_mob_flag(HARD)%
+elseif %diff% == 3
+  %echo% ~%mob% has been set to Group.
+  nop %mob.add_mob_flag(GROUP)%
+elseif %diff% == 4
+  %echo% ~%mob% has been set to Boss.
+  nop %mob.add_mob_flag(HARD)%
+  nop %mob.add_mob_flag(GROUP)%
+end
+nop %mob.unscale_and_reset%
+* remove no-attack
+if %mob.aff_flagged(!ATTACK)%
+  dg_affect %mob% !ATTACK off
+end
+* unscale and restore me
+nop %mob.unscale_and_reset%
 ~
 #16690
 feed the vortex~
