@@ -2899,7 +2899,7 @@ if invoke /= %cmd%
   %load% mob 18880
   set mob %room.people%
   if %mob.vnum% == 18880
-    %mod% %mob% keywords spirit faded grandmother %halloween_grandma%
+    %mod% %mob% keywords spirit faded grandmother ancestor %halloween_grandma%
     %force% %mob% mfollow %actor%
     %send% %actor% You drip some blood on the ground and invoke the name of your ancestor, %halloween_grandma%!
     %echoaround% %actor% ~%actor% drips some blood on the name and shouts, 'Grandmother %halloween_grandma%, I invoke you!'
