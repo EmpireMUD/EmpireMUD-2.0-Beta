@@ -1150,8 +1150,8 @@ else
 end
 ~
 #16621
-Grinchy Demon and Krampus: Reset on greeting~
-0 h 100
+Grinchy Demon and Krampus: Reset if out of combat.~
+0 ab 50
 ~
 if %self.fighting%
   halt
