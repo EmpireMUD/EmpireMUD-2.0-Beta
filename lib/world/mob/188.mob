@@ -460,8 +460,8 @@ demon small basic~
 a small demon~
 A basic small demon growls here.
 ~
-1 1 do n 2
-0 0 0 15 -1
+1 400 do c 2
+0 0 9 16 -1
 D
    A basic demon, small enough to fit through the portal, nothing too
 noticeable about it.
@@ -721,7 +721,7 @@ remember the others. Perhaps you can ride it.
 ~
 S
 #18880
-spirit faded~
+spirit faded grandmother ancestor~
 a faded spirit~
 A faded spirit is wandering here.
 ~

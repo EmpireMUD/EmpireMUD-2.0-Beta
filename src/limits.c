@@ -190,7 +190,7 @@ void check_pointless_fight(char_data *mob) {
 	char_data *iter;
 	bool any;
 	
-	#define IS_POINTLESS(ch)  (GET_HEALTH(ch) <= 0 || MOB_FLAGGED(ch, MOB_NO_ATTACK))
+	#define IS_POINTLESS(ch)  (GET_HEALTH(ch) <= 0 || MOB_FLAGGED((ch), MOB_NO_ATTACK))
 	
 	if (!FIGHTING(mob) || !IS_POINTLESS(mob)) {
 		return;	// mob is not pointless (or not fighting)
@@ -201,16 +201,13 @@ void check_pointless_fight(char_data *mob) {
 	
 	any = FALSE;
 	DL_FOREACH2(ROOM_PEOPLE(IN_ROOM(mob)), iter, next_in_room) {
-		if (iter == mob || FIGHTING(iter) != mob) {
-			continue;	// only care about people fighting mob
-		}
-		if (!IS_POINTLESS(iter)) {
+		if (FIGHTING(iter) && (!IS_POINTLESS(iter) || !IS_POINTLESS(FIGHTING(iter)))) {
 			any = TRUE;
 			break;
 		}
 	}
 	
-	// did with find ANY non-pointless people hitting the mob?
+	// did with find ANY non-pointless people fighting?
 	if (!any) {
 		// stop mob
 		stop_fighting(mob);

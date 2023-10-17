@@ -1847,11 +1847,11 @@ static void shoot_at_char(room_data *from_room, char_data *ch) {
 	
 	if (damage(ch, ch, dam, type, DAM_PHYSICAL) != 0) {
 		// slow effect (1 mud hour)
-		af = create_flag_aff(ATYPE_ARROW_TO_THE_KNEE, 30 * SECS_PER_REAL_MIN, AFF_SLOW, ch);
+		af = create_flag_aff(ATYPE_ARROW_TO_THE_KNEE, SECS_PER_MUD_HOUR, AFF_SLOW, ch);
 		affect_join(ch, af, ADD_DURATION);
 		
 		// distraction effect (5 sec)
-		af = create_flag_aff(ATYPE_ARROW_TO_THE_KNEE, 5, AFF_DISTRACTED, ch);
+		af = create_flag_aff(ATYPE_ARROW_DISTRACTION, 5, AFF_DISTRACTED, ch);
 		affect_join(ch, af, 0);
 		
 		// cancel any action the character is doing

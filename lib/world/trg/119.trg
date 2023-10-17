@@ -4431,7 +4431,7 @@ end
 #11961
 Smol Nes-Pik: Drink dew of Tagra Nes~
 1 c 2
-drink use~
+drink sip use~
 * Causes a teleport if the players sleeps in their home after drinking this
 if !%arg% || %actor.obj_target(%arg%)% != %self%
   return 0
@@ -7003,7 +7003,7 @@ elseif %move% == 2 && !%self.aff_flagged(BLIND)%
     set bug %targ.inventory(11890)%
     if %bug%
       set strug_char You try to wiggle out of the thorny whip...
-      set strug_room You hear ~%%actor%% tries to wiggle free of the thorny whip...
+      set strug_room You hear ~%%actor%% try to wiggle free of the thorny whip...
       remote strug_char %bug.id%
       remote strug_room %bug.id%
       set free_char You wiggle out of the thorny whip!

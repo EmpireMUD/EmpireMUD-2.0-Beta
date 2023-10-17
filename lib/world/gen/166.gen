@@ -66,6 +66,29 @@ Max summon~
 3 0
 0 0 0 0
 S
+#16618
+Max pain~
+4 0
+0 0 0 0
+S
+#16619
+stunned~
+4 0
+0 0 0 0
+T0
+You are no longer stunned.~
+T5
+...$e seems stunned!~
+S
+#16620
+blind~
+4 0
+0 0 0 0
+T0
+You can see again.~
+T5
+...$e is stumbling around blindly!~
+S
 #16625
 pixy curse~
 4 0
@@ -111,7 +134,7 @@ snowmother melt~
 0 0 0 0
 S
 #16680
-cooldown for krampus~
+winter wonderland combat~
 3 0
 0 0 0 0
 S
@@ -129,5 +152,39 @@ S
 krampus heal cooldown~
 3 0
 0 0 0 0
+S
+#16684
+dodgey demon~
+4 0
+0 0 0 0
+T5
+...$e's spinning around like mad!~
+S
+#16685
+birch beating~
+4 0
+0 0 0 0
+S
+#16686
+timely dodge~
+4 0
+0 0 0 0
+S
+#16687
+exhausted~
+4 0
+0 0 0 0
+S
+#16688
+scratchy burlap~
+4 0
+0 0 0 0
+S
+#16689
+Krampus rage~
+4 0
+0 0 0 0
+T5
+...$e seems to be fighting through some serious rage!~
 S
 $

@@ -1937,7 +1937,7 @@ static void show_map_to_char(char_data *ch, struct mappc_data_container *mappc, 
 	int iter;
 	int tileset = GET_SEASON(to_room);
 	struct icon_data *base_icon, *crop_icon = NULL;
-	bool junk, painted, veh_is_shown = FALSE;
+	bool junk, painted, veh_is_shown = FALSE, person_is_shown = FALSE;
 	char *base_color, *str;
 	vehicle_data *show_veh = NULL;
 	
@@ -1987,9 +1987,11 @@ static void show_map_to_char(char_data *ch, struct mappc_data_container *mappc, 
 	// 2. Determine which icon will be shown (but veh_/map_icon is often used later too)
 	if (*self_icon) {
 		strcpy(show_icon, self_icon);
+		person_is_shown = TRUE;
 	}
 	else if (*mappc_icon) {
 		strcpy(show_icon, mappc_icon);
+		person_is_shown = TRUE;
 	}
 	else if (*veh_icon) {
 		strcpy(show_icon, veh_icon);
@@ -2048,7 +2050,7 @@ static void show_map_to_char(char_data *ch, struct mappc_data_container *mappc, 
 			sprintf(show_icon, "&0%s", no_color);
 		}
 	}
-	else if (painted && (!show_veh || veh_is_shown)) {
+	else if (painted && !person_is_shown && (!show_veh || veh_is_shown)) {
 		sprinttype(show_veh ? VEH_PAINT_COLOR(show_veh) : ROOM_PAINT_COLOR(to_room), paint_colors, col_buf, sizeof(col_buf), "&0");
 		if (show_veh ? VEH_FLAGGED(show_veh, VEH_BRIGHT_PAINT) : ROOM_AFF_FLAGGED(to_room, ROOM_AFF_BRIGHT_PAINT)) {
 			strtoupper(col_buf);
@@ -2536,7 +2538,6 @@ void show_screenreader_room(char_data *ch, room_data *room, bitvector_t options,
 void perform_mortal_where(char_data *ch, char *arg) {
 	int closest, dist, max_distance;
 	char *dir_str;
-	descriptor_data *d;
 	char_data *i, *found = NULL;
 	
 	if (has_player_tech(ch, PTECH_WHERE_UPGRADE)) {
@@ -2550,8 +2551,8 @@ void perform_mortal_where(char_data *ch, char *arg) {
 
 	if (!*arg) {
 		send_to_char("Players near you\r\n--------------------\r\n", ch);
-		for (d = descriptor_list; d; d = d->next) {
-			if (STATE(d) != CON_PLAYING || !(i = d->character) || IS_NPC(i) || ch == i || !IN_ROOM(i))
+		DL_FOREACH2(player_character_list, i, next_plr) {
+			if (IS_NPC(i) || ch == i || !IN_ROOM(i))
 				continue;
 			if (!CAN_SEE(ch, i) || !CAN_RECOGNIZE(ch, i) || !WIZHIDE_OK(ch, i) || AFF_FLAGGED(i, AFF_NO_WHERE))
 				continue;
@@ -2589,22 +2590,24 @@ void perform_mortal_where(char_data *ch, char *arg) {
 		found = NULL;
 		closest = MAP_SIZE;
 		DL_FOREACH(character_list, i) {
-			if (i == ch || !IN_ROOM(i) || !CAN_RECOGNIZE(ch, i) || !CAN_SEE(ch, i) || AFF_FLAGGED(i, AFF_NO_WHERE))
+			if (i == ch || !IN_ROOM(i) || !CAN_SEE(ch, i) || AFF_FLAGGED(i, AFF_NO_WHERE)) {
 				continue;
-			if (!multi_isname(arg, GET_PC_NAME(i)))
+			}
+			if (!IS_NPC(i) && has_player_tech(i, PTECH_NO_TRACK_WILD) && valid_no_trace(IN_ROOM(i))) {
+				gain_player_tech_exp(i, PTECH_NO_TRACK_WILD, 10);
 				continue;
-			if ((dist = compute_distance(IN_ROOM(ch), IN_ROOM(i))) > max_distance) {
+			}
+			if (!IS_NPC(i) && has_player_tech(i, PTECH_NO_TRACK_CITY) && valid_unseen_passing(IN_ROOM(i))) {
+				gain_player_tech_exp(i, PTECH_NO_TRACK_CITY, 10);
 				continue;
 			}
 			if (!same_subzone(IN_ROOM(ch), IN_ROOM(i))) {
 				continue;
 			}
-			if (has_player_tech(i, PTECH_NO_TRACK_WILD) && valid_no_trace(IN_ROOM(i))) {
-				gain_player_tech_exp(i, PTECH_NO_TRACK_WILD, 10);
+			if ((dist = compute_distance(IN_ROOM(ch), IN_ROOM(i))) > max_distance) {
 				continue;
 			}
-			if (has_player_tech(i, PTECH_NO_TRACK_CITY) && valid_unseen_passing(IN_ROOM(i))) {
-				gain_player_tech_exp(i, PTECH_NO_TRACK_CITY, 10);
+			if (!match_char_name(ch, i, arg, NOBITS)) {
 				continue;
 			}
 			
@@ -2712,7 +2715,7 @@ void perform_immort_where(char_data *ch, char *arg) {
 	}
 	else {
 		DL_FOREACH(character_list, i) {
-			if (CAN_SEE(ch, i) && IN_ROOM(i) && WIZHIDE_OK(ch, i) && multi_isname(arg, GET_PC_NAME(i))) {
+			if (CAN_SEE(ch, i) && IN_ROOM(i) && WIZHIDE_OK(ch, i) && (multi_isname(arg, GET_PC_NAME(i)) || match_char_name(ch, i, arg, MATCH_GLOBAL))) {
 				found = 1;
 				msg_to_char(ch, "M%3d. %-25s - %s[%7d]%s %s\r\n", ++num, GET_NAME(i), (IS_NPC(i) && HAS_TRIGGERS(i)) ? "[TRIG] " : "", GET_ROOM_VNUM(IN_ROOM(i)), coord_display_room(ch, IN_ROOM(i), TRUE), get_room_name(IN_ROOM(i), FALSE));
 			}
