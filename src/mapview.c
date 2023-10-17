@@ -1937,7 +1937,7 @@ static void show_map_to_char(char_data *ch, struct mappc_data_container *mappc, 
 	int iter;
 	int tileset = GET_SEASON(to_room);
 	struct icon_data *base_icon, *crop_icon = NULL;
-	bool junk, painted, veh_is_shown = FALSE, showing_self = FALSE;
+	bool junk, painted, veh_is_shown = FALSE, person_is_shown = FALSE;
 	char *base_color, *str;
 	vehicle_data *show_veh = NULL;
 	
@@ -1987,10 +1987,11 @@ static void show_map_to_char(char_data *ch, struct mappc_data_container *mappc, 
 	// 2. Determine which icon will be shown (but veh_/map_icon is often used later too)
 	if (*self_icon) {
 		strcpy(show_icon, self_icon);
-		showing_self = TRUE;
+		person_is_shown = TRUE;
 	}
 	else if (*mappc_icon) {
 		strcpy(show_icon, mappc_icon);
+		person_is_shown = TRUE;
 	}
 	else if (*veh_icon) {
 		strcpy(show_icon, veh_icon);
@@ -2049,7 +2050,7 @@ static void show_map_to_char(char_data *ch, struct mappc_data_container *mappc, 
 			sprintf(show_icon, "&0%s", no_color);
 		}
 	}
-	else if (painted && !showing_self && (!show_veh || veh_is_shown)) {
+	else if (painted && !person_is_shown && (!show_veh || veh_is_shown)) {
 		sprinttype(show_veh ? VEH_PAINT_COLOR(show_veh) : ROOM_PAINT_COLOR(to_room), paint_colors, col_buf, sizeof(col_buf), "&0");
 		if (show_veh ? VEH_FLAGGED(show_veh, VEH_BRIGHT_PAINT) : ROOM_AFF_FLAGGED(to_room, ROOM_AFF_BRIGHT_PAINT)) {
 			strtoupper(col_buf);
