@@ -217,6 +217,7 @@
 #define ATYPE_POTION  3102
 #define ATYPE_HUNTED  3103
 #define ATYPE_WORKING  3104
+#define ATYPE_ARROW_DISTRACTION  3105
 
 
 // GENERIC_COOLDOWN entires used by the code
