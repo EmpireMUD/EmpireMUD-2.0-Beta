@@ -984,14 +984,10 @@ if %actor.cooldown(18824)% > 0
   halt
 end
 set room %self.room%
-set item %room.contents%
-while %item%
-  if %item.vnum% == 18825
-    %send% %actor% Someone has beaten you to this house.
-    halt
-  end
-  set item %item.next_in_list%
-done
+if %room.contents(18825)%
+  %send% %actor% Someone has beaten you to this house.
+  halt
+end
 set vnum %room.building_vnum%
 if !%vnum%
   %send% %actor% You can only use @%self% inside a house.
@@ -1012,6 +1008,10 @@ done
 %send% %actor% You start applying @%self% to the walls of the building...
 %echoaround% %actor% ~%actor% starts applying @%self% to the walls of the building...
 wait 1 sec
+if %actor.room% != %room%
+  * actor moved
+  halt
+end
 * Skill check
 set chance %random.100%
 if %chance% > %actor.skill(Stealth)%
