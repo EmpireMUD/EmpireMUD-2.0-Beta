@@ -1299,10 +1299,19 @@ ACMD(do_quest) {
 }
 
 
+ACMD(do_finish) {
+	// pass-thru to "quest finish <args>"
+	char temp[MAX_INPUT_LENGTH];
+	skip_spaces(&argument);
+	snprintf(temp, sizeof(temp), "finish %s", argument);
+	do_quest(ch, temp, 0, 0);
+}
+
+
 ACMD(do_start) {
 	// pass-thru to "quest start <args>"
 	char temp[MAX_INPUT_LENGTH];
 	skip_spaces(&argument);
 	snprintf(temp, sizeof(temp), "start %s", argument);
-	do_quest(ch, arg, 0, 0);
+	do_quest(ch, temp, 0, 0);
 }

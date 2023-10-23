@@ -389,7 +389,7 @@ if (%self.vnum% >= 11815 && %self.vnum% <= 11818) || %self.vnum% == 11821
       say Goblin doesn't want %object.shortdesc%, stupid human!
     end
   elseif %self.vnum% == 11821 && %actor.on_quest(11821)% && %object.vnum% == 11976
-    %send% %actor% Use 'quest finish Need It For A Friend' instead.
+    %send% %actor% Use 'finish Need It For A Friend' instead.
   else
     * actor has given a goblin object
     %send% %actor% You give ~%self% @%object%...

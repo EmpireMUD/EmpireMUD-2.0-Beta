@@ -275,7 +275,7 @@ end
 Give rejection~
 0 j 100
 ~
-%send% %actor% Don't give the item to ~%self%, use 'quest finish <quest name>' instead (or 'quest finish all').
+%send% %actor% Don't give the item to ~%self%, use 'quest finish <quest name>' instead (or 'finish all').
 return 0
 ~
 #12650

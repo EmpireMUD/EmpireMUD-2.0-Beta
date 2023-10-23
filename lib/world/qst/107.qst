@@ -73,8 +73,8 @@ it out. There are a few ways to find it. Try these steps:
   your way to its location. You can use nearby or scan again along the way. You
   may have to go around mountains or other terrain to find it.
 - Don't be afraid to 'sleep' to regenerate movement points faster on your way.
-- Once you get to the Giant Shoe, type 'quest finish Nearby: Find the Giant
-  Shoe' -- or just 'quest finish all'.
+- Once you get to the Giant Shoe, type 'finish Nearby: Find the Giant Shoe'
+  -- or just 'finish all'.
 ~
    You have reached the Giant Shoe but this adventure -- Misplaced Mother Goose
 -- doesn't have much to do right here. Type 'adventure' at the Giant Shoe for
@@ -386,8 +386,8 @@ these steps to find it:
   be on the edge of the mountains -- make sure you don't walk onto a mountain
   tile trying to get there. You may have to go around other mountains.
 - Don't be afraid to 'sleep' to regenerate movement points faster on your way.
-- Once you get to the Goblin Mines, type 'quest finish Nearby: Find the Goblin
-  Mine' -- or just 'quest finish all'.
+- Once you get to the Goblin Mines, type 'finish Nearby: Find the Goblin Mine'
+  -- or just 'finish all'.
 ~
    You have reached the Goblin Mine but it looks like the goblins have fled.
 You can find them outside the mine with the command 'where goblin'. But there's
