@@ -1888,7 +1888,7 @@ Here are the prompt codes and what they do:
   %d  Blood text          %_  Line break
   
   %e  % health of enemy   %f  % health of enemy's focus (the tank)
-                          %F  Current/total health of enemy's focus (if player)
+  %E  enemy name          %F  Current/total health of enemy's focus (if player)
   
   %c  conditions abbreviated (afk, hunger, thirst, etc)
   %C  conditions as words

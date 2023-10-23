@@ -3213,6 +3213,16 @@ char *replace_prompt_codes(char_data *ch, char *str) {
 					tmp = i;
 					break;
 				}
+				case 'E': {	// %E enemy's name
+					if ((vict = FIGHTING(ch))) {
+						sprintf(i, "%s", skip_filler(PERS(vict, ch, FALSE)));
+					}
+					else {
+						*i = '\0';
+					}
+					tmp = i;
+					break;
+				}
 				case 'f': {	// %f enemy's focus (tank): health percent
 					if (FIGHTING(ch) && (vict = FIGHTING(FIGHTING(ch))) && vict != ch) {
 						sprintf(i, "%s %d%%", (IS_NPC(vict) ? PERS(vict, vict, FALSE) : GET_NAME(vict)), GET_HEALTH(vict) * 100 / MAX(1, GET_MAX_HEALTH(vict)));
