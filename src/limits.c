@@ -131,8 +131,9 @@ void check_attribute_gear(char_data *ch) {
 * a message).
 *
 * @param char_data *ch The player.
+* @param bool extra_space If TRUE, adds a line break before the message.
 */
-void check_daily_cycle_reset(char_data *ch) {
+void check_daily_cycle_reset(char_data *ch, bool extra_space) {
 	int gain;
 	
 	if (!IS_NPC(ch) && GET_DAILY_CYCLE(ch) < data_get_long(DATA_DAILY_CYCLE)) {
@@ -145,7 +146,7 @@ void check_daily_cycle_reset(char_data *ch) {
 		GET_DAILY_QUESTS(ch) = 0;
 		GET_EVENT_DAILY_QUESTS(ch) = 0;
 	
-		msg_to_char(ch, "&yYour daily quests and bonus experience have reset!&0\r\n");
+		msg_to_char(ch, "%s\tjYour daily quests and bonus experience have reset!\t0\r\n", extra_space ? "\r\n" : "");
 		
 		if (fail_daily_quests(ch, TRUE) | fail_daily_quests(ch, FALSE)) {
 			msg_to_char(ch, "Your daily quests expire.\r\n");
@@ -573,7 +574,7 @@ void real_update_player(char_data *ch) {
 	}
 
 	// periodic exp and skill gain
-	check_daily_cycle_reset(ch);
+	check_daily_cycle_reset(ch, FALSE);
 
 	/* Update conditions */
 	if (HAS_BONUS_TRAIT(ch, BONUS_NO_HUNGER) || has_player_tech(ch, PTECH_NO_HUNGER)) {			

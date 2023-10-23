@@ -609,7 +609,7 @@ void perform_alternate(char_data *old, char_data *new) {
 	}
 	
 	// reset daily cycle now
-	check_daily_cycle_reset(new);
+	check_daily_cycle_reset(new, TRUE);
 	
 	if (!IS_APPROVED(new) && (msg = config_get_string("unapproved_greeting")) && *msg) {
 		msg_to_char(new, "\r\n&o%s&0", msg);
