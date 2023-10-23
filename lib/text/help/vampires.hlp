@@ -410,11 +410,13 @@ When a vampire turns a mortal into a new vampire, it is called siring. This
 process drains the mortal of their blood and then attempts to turn them using
 fresh blood from the sire.
 
-Example:  
+Siring will fail dramatically if the target cannot gain Vampire skill due to
+either having too many skills or having it no-skilled.
 
+Example:
   > sire Exar 
 
-See also: BITE
+See also: BITE, NO-SKILL
 #
 SOULMASK "SOUL MASK"
 
