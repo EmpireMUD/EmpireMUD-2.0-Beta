@@ -2958,6 +2958,9 @@ void nanny(descriptor_data *d, char *arg) {
 				send_to_char("&rYou have mail waiting.&0\r\n", d->character);
 			}
 			
+			// reset daily cycle now
+			check_daily_cycle_reset(d->character);
+			
 			if (!IS_APPROVED(d->character) && (msg = config_get_string("unapproved_greeting")) && *msg) {
 				msg_to_char(d->character, "\r\n&o%s&0", msg);
 			}

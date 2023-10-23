@@ -67,6 +67,24 @@ dailies and 5 non-event dailies in the same day.
 
 See also: DAILY QUESTS
 #
+FINISH
+
+Usage:  finish <quest name | all>
+
+Turn in one or more quests. You must find the correct location, person, or item
+to turn in each quest. There will be an indication if you have a quest to turn
+in somewhere.
+
+To finish a quest, you must have finished the tasks on its tracker.
+
+You can turn in all available quests with "quest finish all". You can also use
+the "finish" command instead of "quest finish".
+
+Note: If you 'keep' an item, it can't be turned in as part of a quest and won't
+be counted by the quest tracker. Unkeep it for it to appear.
+
+See also: QUEST, QUEST TRACKER
+#
 "QUEST DROP"
 
 Usage:  quest drop <name>
@@ -79,7 +97,7 @@ See also: QUEST
 #
 "QUEST FINISH"
 
-Usage:  quest finish <name | all>
+Usage:  quest finish <quest name | all>
 
 Turn in one or more quests. You must find the correct location, person, or item
 to turn in each quest. There will be an indication if you have a quest to turn
@@ -87,10 +105,13 @@ in somewhere.
 
 To finish a quest, you must have finished the tasks on its tracker.
 
+You can turn in all available quests with "quest finish all". You can also use
+the "finish" command instead of "quest finish".
+
 Note: If you 'keep' an item, it can't be turned in as part of a quest and won't
 be counted by the quest tracker. Unkeep it for it to appear.
 
-See also: KEEP, QUEST, QUEST TRACKER
+See also: FINISH, KEEP, QUEST, QUEST TRACKER
 #
 "QUEST GROUP"
 

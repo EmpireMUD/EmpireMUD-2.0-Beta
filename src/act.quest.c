@@ -510,29 +510,40 @@ void drop_quest(char_data *ch, struct player_quest *pq) {
 */
 char *show_daily_quest_line(char_data *ch) {
 	static char output[MAX_STRING_LENGTH];
-	int amount, count, size = 0;
+	char event_part[256];
+	int amount, event_amount = 0, event_count = 0, size = 0;
 	
 	*output = '\0';
 	
-	// non-event dailies
-	amount = IS_NPC(ch) ? 0 : (config_get_int("dailies_per_day") - GET_DAILY_QUESTS(ch));
-	if (amount > 0) {
-		size += snprintf(output + size, sizeof(output) - size, "You can complete %d more daily quest%s today.", amount, PLURAL(amount));
-	}
-	else {
-		size += snprintf(output + size, sizeof(output) - size, "You have completed all your daily quests for the day.");
-	}
-	
-	// event dailies
-	only_one_running_event(&count);
-	if (count > 0) {
-		amount = IS_NPC(ch) ? 0 : (config_get_int("dailies_per_day") - GET_EVENT_DAILY_QUESTS(ch));
-		if (amount > 0) {
-			size += snprintf(output + size, sizeof(output) - size, "\r\nYou can complete %d more event %s today.", amount, amount != 1 ? "dailies" : "daily");
+	// prepare event dailies
+	only_one_running_event(&event_count);
+	if (event_count > 0) {
+		event_amount = IS_NPC(ch) ? 0 : (config_get_int("dailies_per_day") - GET_EVENT_DAILY_QUESTS(ch));
+		if (event_amount > 0) {
+			snprintf(event_part, sizeof(event_part), " and %d more event %s", event_amount, event_amount != 1 ? "dailies" : "daily");
 		}
 		else {
-			size += snprintf(output + size, sizeof(output) - size, "\r\nYou have completed all your event dailies for the day.");
+			snprintf(event_part, sizeof(event_part), " and no more event dailies");
 		}
+	}
+	else {
+		// not running
+		*event_part = '\0';
+	}
+	
+	// non-event dailies (and messaging)
+	amount = IS_NPC(ch) ? 0 : (config_get_int("dailies_per_day") - GET_DAILY_QUESTS(ch));
+	if (amount > 0) {
+		size += snprintf(output + size, sizeof(output) - size, "You can complete %d more daily quest%s%s today.", amount, PLURAL(amount), event_part);
+	}
+	else if (event_count > 0 && event_amount > 0) {
+		size += snprintf(output + size, sizeof(output) - size, "You can complete no more daily quests%s today.", event_part);
+	}
+	else if (event_count > 0 && event_amount == 0) {
+		size += snprintf(output + size, sizeof(output) - size, "You have completed all your daily quests and event dailies today.");
+	}
+	else {
+		size += snprintf(output + size, sizeof(output) - size, "You have completed all your daily quests today.");
 	}
 	
 	return output;

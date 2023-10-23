@@ -608,6 +608,9 @@ void perform_alternate(char_data *old, char_data *new) {
 		send_to_char("&rYou have mail waiting.&0\r\n", new);
 	}
 	
+	// reset daily cycle now
+	check_daily_cycle_reset(new);
+	
 	if (!IS_APPROVED(new) && (msg = config_get_string("unapproved_greeting")) && *msg) {
 		msg_to_char(new, "\r\n&o%s&0", msg);
 	}
