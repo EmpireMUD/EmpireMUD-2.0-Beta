@@ -298,7 +298,7 @@ Usage: toggle bother
 When bother is off, this toggle protects you from having your character
 affected by various other commands - you cannot be sired, you cannot be
 purified of vampirism, and vampires can't bite you unless you're restrained or
-unconscious. It also prevents players from ceding you land
+unconscious. It also prevents players from ceding you land.
 
 Turn bother on to allow yourself to be bitten or to have land ceded to you,
 but don't forget to turn it off again!
@@ -1888,7 +1888,7 @@ Here are the prompt codes and what they do:
   %d  Blood text          %_  Line break
   
   %e  % health of enemy   %f  % health of enemy's focus (the tank)
-                          %F  Current/total health of enemy's focus (if player)
+  %E  enemy name          %F  Current/total health of enemy's focus (if player)
   
   %c  conditions abbreviated (afk, hunger, thirst, etc)
   %C  conditions as words

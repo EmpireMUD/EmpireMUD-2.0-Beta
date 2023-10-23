@@ -935,10 +935,10 @@ Enter the Soulstream~
    Enter the Soulstream and begin the EmpireMUD basic tutorial! This area will
 teach you the basics of EmpireMUD including how to find and complete quests.
 Use the following commands:
- 1. quest start Enter the Soulstream (if you're not already on this quest)
+ 1. start Enter the Soulstream (if you're not already on this quest)
  2. enter soulstream
  3. quest track Enter the Soulstream (to see that it's completed)
- 4. quest finish Enter the Soulstream
+ 4. finish Enter the Soulstream
  5. You can leave the Soulstream any time by typing 'enter portal' inside.
 (You can abbreviate both commands and quest names.)
 ~
@@ -976,7 +976,7 @@ need to learn the Ritual of Burdens.
  2. Cast the ritual inside the Soulstream with 'ritual burdens'.
  3. Wait for the ritual to complete.
  4. Return to the Spirit of Order.
- 5. Type 'quest finish High Sorcery'.
+ 5. Type 'finish High Sorcery'.
 ~
 You have performed a ritual and satisfied the Spirit of Order!
 ~
@@ -1015,7 +1015,7 @@ most locations on the map. Follow these steps:
     the time, so it may take a few tries.
  5. When you have the rock and the flint, go back to the Tower of Souls and
     type 'enter soulstream' to get back inside.
- 6. Type 'quest finish Survival' at the Spirit of the Wild.
+ 6. Type 'finish Survival' at the Spirit of the Wild.
 ~
    You have satisfied the Spirit of the Wild! Digging and gathering are good
 ways to learn low-level Survival. When you reach Survival 5, use 'skill buy
@@ -1062,7 +1062,7 @@ it to learn how to use it. Here are the steps for this quest:
     'where rabbit'.
  6. When you have the small skin, go back to the Tower of Souls and type
     'enter soulstream' to get back inside.
- 7. Type 'quest finish Battle' at the Spirit of the Hunt.
+ 7. Type 'finish Battle' at the Spirit of the Hunt.
 ~
 You have satisfied the Spirit of the Hunt!
 ~
@@ -1096,7 +1096,7 @@ Natural Magic: Heal The Spirits~
 The Spirit of Mana seems to be fading, and needs you to heal it:
  1. Purchase the Healing ability using 'skill buy heal'.
  2. Heal the Spirit of Mana using 'heal mana'.
- 3. Type 'quest finish Natural Magic' when complete.
+ 3. Type 'finish Natural Magic' when complete.
 Note: The Heal ability can usually only be used on yourself (until you learn
 Heal Friend), but the Spirit of Mana can be healed with the basic Heal.
 ~
@@ -1139,7 +1139,7 @@ worry, you'll get better at it as you level up.
  5. Type 'quest track Stealth' to check.
  6. Sneak between the two rooms of the Soulstream until complete.
  7. When you succeed, turn in the quest to the Spirit of Darkness using
-    'quest finish Stealth'.
+    'finish Stealth'.
 ~
 You have satisfied the Spirit of Darkness with your stealth.
 ~
@@ -1178,7 +1178,7 @@ blood. Follow these steps:
  6. Use the 'bite' command to bite the unconscious victim.
  7. Wait to drink all its blood.
  8. Go back to the Tower of Souls and type 'enter soulstream' to get inside.
- 9. Type 'quest finish Vampire' at the Spirit of Blood.
+ 9. Type 'finish Vampire' at the Spirit of Blood.
 Note: This quest will not show as 'complete' until you re-enter the Soulstream.
 ~
    You have satisfied the Spirit of Blood! Buy and use more abilities from the
@@ -1220,7 +1220,7 @@ can be used like a knife for butchering and skinning. Try this:
     it becomes a spear head. (It becomes a chipped flint, then a handaxe, then
     a spear head).
  6. Return to the Tower of Souls and 'enter soulstream' to get back inside.
- 7. Type 'quest finish Trade' at the Spirit of Innovation with your spear head.
+ 7. Type 'finish Trade' at the Spirit of Innovation with your spear head.
 ~
    You have satisfied the Spirit of Innovation! That spear head can be used for
 butchering, scraping, skinning, and even sewing!

@@ -127,6 +127,39 @@ void check_attribute_gear(char_data *ch) {
 
 
 /**
+* Checks if the player needs their daily cycle reset, and resets it if so (with
+* a message).
+*
+* @param char_data *ch The player.
+* @param bool extra_space If TRUE, adds a line break before the message.
+*/
+void check_daily_cycle_reset(char_data *ch, bool extra_space) {
+	int gain;
+	
+	if (!IS_NPC(ch) && GET_DAILY_CYCLE(ch) < data_get_long(DATA_DAILY_CYCLE)) {
+		// other stuff that resets daily
+		gain = compute_bonus_exp_per_day(ch);
+		if (GET_DAILY_BONUS_EXPERIENCE(ch) < gain) {
+			GET_DAILY_BONUS_EXPERIENCE(ch) = gain;
+			update_MSDP_bonus_exp(ch, UPDATE_SOON);
+		}
+		GET_DAILY_QUESTS(ch) = 0;
+		GET_EVENT_DAILY_QUESTS(ch) = 0;
+	
+		msg_to_char(ch, "%s\tjYour daily quests and bonus experience have reset!\t0\r\n", extra_space ? "\r\n" : "");
+		
+		if (fail_daily_quests(ch, TRUE) | fail_daily_quests(ch, FALSE)) {
+			msg_to_char(ch, "Your daily quests expire.\r\n");
+		}
+	
+		// update to this cycle so it only happens once a day
+		GET_DAILY_CYCLE(ch) = data_get_long(DATA_DAILY_CYCLE);
+		queue_delayed_update(ch, CDU_SAVE);
+	}
+}
+
+
+/**
 * Times out players who are sitting at the password or name prompt.
 */
 void check_idle_passwords(void) {
@@ -541,26 +574,7 @@ void real_update_player(char_data *ch) {
 	}
 
 	// periodic exp and skill gain
-	if (GET_DAILY_CYCLE(ch) < data_get_long(DATA_DAILY_CYCLE)) {
-		// other stuff that resets daily
-		gain = compute_bonus_exp_per_day(ch);
-		if (GET_DAILY_BONUS_EXPERIENCE(ch) < gain) {
-			GET_DAILY_BONUS_EXPERIENCE(ch) = gain;
-			update_MSDP_bonus_exp(ch, UPDATE_SOON);
-		}
-		GET_DAILY_QUESTS(ch) = 0;
-		GET_EVENT_DAILY_QUESTS(ch) = 0;
-	
-		msg_to_char(ch, "&yYour daily quests and bonus experience have reset!&0\r\n");
-		
-		if (fail_daily_quests(ch, TRUE) | fail_daily_quests(ch, FALSE)) {
-			msg_to_char(ch, "Your daily quests expire.\r\n");
-		}
-	
-		// update to this cycle so it only happens once a day
-		GET_DAILY_CYCLE(ch) = data_get_long(DATA_DAILY_CYCLE);
-		queue_delayed_update(ch, CDU_SAVE);
-	}
+	check_daily_cycle_reset(ch, FALSE);
 
 	/* Update conditions */
 	if (HAS_BONUS_TRAIT(ch, BONUS_NO_HUNGER) || has_player_tech(ch, PTECH_NO_HUNGER)) {			

@@ -387,7 +387,10 @@ void sire_char(char_data *ch, char_data *victim) {
 		queue_delayed_update(victim, CDU_SAVE);
 	}
 	else {
-		// can't gain a vampire skills
+		// can't gain a vampire skills: guess I'll just die then
+		if (!IS_NPC(victim)) {
+			death_log(victim, ch, TYPE_SUFFERING);
+		}
 		die(victim, ch);	// returns a corpse but we don't need it
 	}
 }

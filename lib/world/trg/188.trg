@@ -984,14 +984,10 @@ if %actor.cooldown(18824)% > 0
   halt
 end
 set room %self.room%
-set item %room.contents%
-while %item%
-  if %item.vnum% == 18825
-    %send% %actor% Someone has beaten you to this house.
-    halt
-  end
-  set item %item.next_in_list%
-done
+if %room.contents(18825)%
+  %send% %actor% Someone has beaten you to this house.
+  halt
+end
 set vnum %room.building_vnum%
 if !%vnum%
   %send% %actor% You can only use @%self% inside a house.
@@ -1012,6 +1008,10 @@ done
 %send% %actor% You start applying @%self% to the walls of the building...
 %echoaround% %actor% ~%actor% starts applying @%self% to the walls of the building...
 wait 1 sec
+if %actor.room% != %room%
+  * actor moved
+  halt
+end
 * Skill check
 set chance %random.100%
 if %chance% > %actor.skill(Stealth)%
@@ -2899,7 +2899,7 @@ if invoke /= %cmd%
   %load% mob 18880
   set mob %room.people%
   if %mob.vnum% == 18880
-    %mod% %mob% keywords spirit faded grandmother %halloween_grandma%
+    %mod% %mob% keywords spirit faded grandmother ancestor %halloween_grandma%
     %force% %mob% mfollow %actor%
     %send% %actor% You drip some blood on the ground and invoke the name of your ancestor, %halloween_grandma%!
     %echoaround% %actor% ~%actor% drips some blood on the name and shouts, 'Grandmother %halloween_grandma%, I invoke you!'

@@ -180,6 +180,7 @@ ACMD(do_fightmessages);
 ACMD(do_file);
 ACMD(do_fillin);
 ACMD(do_findmaintenance);
+ACMD(do_finish);
 ACMD(do_fire);
 ACMD(do_firstaid);
 ACMD(do_fish);
@@ -392,6 +393,7 @@ ACMD(do_specialize);
 ACMD(do_split);
 ACMD(do_stake);
 ACMD(do_stand);
+ACMD(do_start);
 ACMD(do_stat);
 ACMD(do_steal);
 ACMD(do_stop);
@@ -731,6 +733,7 @@ cpp_extern const struct command_info cmd_info[] = {
 	SIMPLE_CMD( "fmessages", POS_DEAD, do_fightmessages, NO_MIN, CTYPE_UTIL ),
 	SIMPLE_CMD( "file", POS_DEAD, do_file, LVL_START_IMM, CTYPE_IMMORTAL ),
 	STANDARD_CMD( "fillin", POS_STANDING, do_fillin, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_BUILD, CMD_NO_ANIMALS, NO_ABIL ),
+	SIMPLE_CMD( "finish", POS_DEAD, do_finish, NO_MIN, CTYPE_UTIL ),
 	SIMPLE_CMD( "findmaintenance", POS_DEAD, do_findmaintenance, NO_MIN, CTYPE_EMPIRE ),
 	STANDARD_CMD( "fire", POS_SITTING, do_fire, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_COMBAT, CMD_NO_ANIMALS, NO_ABIL ),
 	ABILITY_CMD( "firstaid", POS_STANDING, do_firstaid, NO_MIN, CTYPE_SKILL, ABIL_FIRSTAID ),
@@ -996,6 +999,7 @@ cpp_extern const struct command_info cmd_info[] = {
 	SIMPLE_CMD( "split", POS_RESTING, do_split, NO_MIN, CTYPE_UTIL ),
 	SIMPLE_CMD( "stand", POS_RESTING, do_stand, NO_MIN, CTYPE_MOVE ),
 	SCMD_CMD( "stake", POS_FIGHTING, do_stake, NO_MIN, CTYPE_COMBAT, FALSE ),
+	SIMPLE_CMD( "start", POS_DEAD, do_start, NO_MIN, CTYPE_UTIL ),
 	SIMPLE_CMD( "stat", POS_DEAD, do_stat, LVL_START_IMM, CTYPE_IMMORTAL ),
 	ABILITY_CMD( "steal", POS_STANDING, do_steal, NO_MIN, CTYPE_COMBAT, ABIL_STEAL ),
 	SIMPLE_CMD( "store", POS_STANDING, do_store, NO_MIN, CTYPE_MOVE ),
@@ -2951,8 +2955,11 @@ void nanny(descriptor_data *d, char *arg) {
 			display_tip_to_char(d->character);
 			
 			if (GET_MAIL_PENDING(d->character)) {
-				send_to_char("&rYou have mail waiting.&0\r\n", d->character);
+				send_to_char("\r\n\trYou have mail waiting.\t0\r\n", d->character);
 			}
+			
+			// reset daily cycle now
+			check_daily_cycle_reset(d->character, TRUE);
 			
 			if (!IS_APPROVED(d->character) && (msg = config_get_string("unapproved_greeting")) && *msg) {
 				msg_to_char(d->character, "\r\n&o%s&0", msg);

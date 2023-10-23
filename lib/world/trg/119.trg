@@ -3826,7 +3826,7 @@ switch %cycle%
     dg_affect #11891 %person% off
     %force% %person% look
     %send% %person% &&0
-    %send% %person% Slowly, inch by inch, time resumes again, and for the first time in ages, you almost feel like you can breathe again.
+    %send% %person% Slowly, inch by inch, time resumes again, and for the first time in ages, you almost feel like you can breathe.
     %echoaround% %person% ~%person% emerges from the putrid sap.
     * Teleport followers
     set ch %self.room.people%

@@ -1422,7 +1422,7 @@ char *get_skill_gain_display(char_data *ch) {
 char *get_skill_row_display(char_data *ch, skill_data *skill) {
 	static char out[MAX_STRING_LENGTH];
 	struct player_skill_data *skdata;
-	char experience[256];
+	char experience[256], gain_part[256];
 	int points = get_ability_points_available_for_char(ch, SKILL_VNUM(skill));
 	
 	skdata = get_skill_data(ch, SKILL_VNUM(skill), FALSE);
@@ -1434,7 +1434,17 @@ char *get_skill_row_display(char_data *ch, skill_data *skill) {
 		*experience = '\0';
 	}
 	
-	sprintf(out, "[%3d] %s%s\t0 (%s%s%s) - %s\r\n", (skdata ? skdata->level : 0), IS_ANY_SKILL_CAP(ch, SKILL_VNUM(skill)) ? "\tg" : "\ty", SKILL_NAME(skill), IS_ANY_SKILL_CAP(ch, SKILL_VNUM(skill)) ? "\tymax\t0" : ((skdata && skdata->noskill) ? "\trnoskill\t0" : "\tcgaining\t0"), experience, (points > 0 ? ", points available" : ""), SKILL_DESC(skill));
+	if (IS_ANY_SKILL_CAP(ch, SKILL_VNUM(skill))) {
+		snprintf(gain_part, sizeof(gain_part), "\tymax\t0%s", (skdata && skdata->noskill) ? ", \trnoskill\t0" : "");
+	}
+	else if (skdata && skdata->noskill) {
+		snprintf(gain_part, sizeof(gain_part), "\trnoskill\t0");
+	}
+	else {
+		snprintf(gain_part, sizeof(gain_part), "\tcgaining\t0");
+	}
+	
+	sprintf(out, "[%3d] %s%s\t0 (%s%s%s) - %s\r\n", (skdata ? skdata->level : 0), IS_ANY_SKILL_CAP(ch, SKILL_VNUM(skill)) ? "\tg" : "\ty", SKILL_NAME(skill), gain_part, experience, (points > 0 ? ", points available" : ""), SKILL_DESC(skill));
 	return out;
 }
 
