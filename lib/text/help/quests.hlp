@@ -15,8 +15,11 @@ The following quest commands are also available:
  &cquest list&0 - Show your quests and progress.
  &cquest share&0 - Offer a quest to members of your group.
 
+You can also get &ydetails&0 on a quest by typing 'quest <name>'.
+
 Hint: You can abbreviate "q t", or even alias these commands if you use them
-a lot.
+a lot. You can also abbreviate quest names, including multi-word abbreviations
+(for example, "Bound Wooden Column Tutorial" can be abbreviated "col tut").
 
 For more information on each, see HELP QUEST <command>.
 
@@ -100,7 +103,7 @@ See also: QUEST
 #
 "QUEST INFO"
 
-Usage:  quest info <quest>
+Usage:  quest info <quest name>
 
 This displays additional information about a quest, including the quest's full
 description. It works on quests you're on, ones available at your location, and
@@ -111,6 +114,8 @@ the quest tracker help file for more information.
 
 When you use it on a quest you've already completed, it will show the
 completion message and the rewards as well.
+
+You can also just type "quest <quest name>" without needing to type "info".`
 
 Note: If you 'keep' an item, it can't be turned in as part of a quest and won't
 be counted by the quest tracker. Unkeep it for it to appear.
