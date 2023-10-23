@@ -80,8 +80,8 @@ it out. There are a few ways to find it. Try these steps:
 -- doesn't have much to do right here. Type 'adventure' at the Giant Shoe for
 more information about it. To complete the quests for this adventure, look for
 items like the fiddle, pail, candlestick, and more whenever you kill a low-
-level mob anywhere in the world. When you find one, use 'quest start all' and
-look at the item for information on how to get it back to its rightful owner.
+level mob anywhere in the world. When you find one, use 'start all' and look at
+the item for information on how to get it back to its rightful owner.
 ~
 2 0 0 100 -1
 A

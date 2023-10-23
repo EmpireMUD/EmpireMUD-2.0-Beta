@@ -6,11 +6,10 @@ watch this rift to the elemental plane. But it seems the apprentice wasn't
 strong enough to contain the elementals, and now four have escaped! Track down
 the elementals of earth, fire, wind, and water. Defeat them and return their
 essences to the apprentice for re-summoning.
-   Start the apprentice's quests with 'quest start all'. There is one quest
-per elemental, and you can repeat these quests if you wait at least an hour
-after finishing them. You can purchase rewards from the apprentice with the
-'list' and 'buy' commands. Hint: If you're a thief, try pickpocketing the
-apprentice.
+   Start the apprentice's quests with 'start all'. There is one quest per
+elemental, and you can repeat these quests if you wait at least an hour after
+finishing them. You can purchase rewards from the apprentice with the 'list'
+and 'buy' commands. Hint: If you're a thief, try pickpocketing the apprentice.
 
 EmpireMUD Administrators: You can raise the instance limit on this
 adventure to equal the number of newbie you have.

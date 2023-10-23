@@ -110,11 +110,10 @@ strong enough to contain the elementals, and now four have escaped! Track down
 the elementals of earth, fire, wind, and water. Defeat them and return their
 essences to the apprentice for re-summoning.
 
-Start the apprentice's quests with 'quest start all'. There is one quest
-per elemental, and you can repeat these quests if you wait at least an hour
-after finishing them. You can purchase rewards from the apprentice with the
-'list' and 'buy' commands. Hint: If you're a thief, try pickpocketing the
-apprentice.
+Start the apprentice's quests with 'start all'. There is one quest per
+elemental, and you can repeat these quests if you wait at least an hour after
+finishing them. You can purchase rewards from the apprentice with the 'list'
+and 'buy' commands. Hint: If you're a thief, try pickpocketing the apprentice.
 
 The sorcerer's apprentice sells:
   a sorcerous biscuit - food
@@ -493,9 +492,9 @@ See also: ADVENTURE
 Misplaced Mother Goose (level 1-25 adventure)
 
 Low-level mobs all over the world carry lost items from children's tales. When
-you find one of these items, start its quest ('quest start <name>'), 'use' the
-item to teleport back to a newbie island, then use the enchanted breadcrumbs
-you receive to return home.
+you find one of these items, start its quest ('start <name>'), 'use' the item
+to teleport back to a newbie island, then use the enchanted breadcrumbs you
+receive to return home.
 
 Be sure to set a home first! Use 'home set' in a house you built and own.
 
@@ -899,10 +898,11 @@ Tutorial Quests ("Soulstream", level 1-50 adventure)
 
 This adventure has a short tutorial quest for each of the skill trees.
 
-When you first enter the game at a Tower of Souls, use 'quest start enter' to
-start the "Enter the Soulstream" quest, then 'enter soulstream' to get inside.
-The spirits inside have one quest for each skill tree you've learned. You can
-come back when you learn new skills to complete their tutorials as well.
+When you first enter the game at a Tower of Souls, use 'start Enter Soulstream'
+to start the "Enter the Soulstream" quest, then 'enter soulstream' to get
+inside. The spirits inside have one quest for each skill tree you've learned.
+You can come back when you learn new skills to complete their tutorials as
+well.
 
 See also: ADVENTURE, QUEST, TOWER OF SOULS
 #

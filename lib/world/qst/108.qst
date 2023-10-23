@@ -935,7 +935,7 @@ Enter the Soulstream~
    Enter the Soulstream and begin the EmpireMUD basic tutorial! This area will
 teach you the basics of EmpireMUD including how to find and complete quests.
 Use the following commands:
- 1. quest start Enter the Soulstream (if you're not already on this quest)
+ 1. start Enter the Soulstream (if you're not already on this quest)
  2. enter soulstream
  3. quest track Enter the Soulstream (to see that it's completed)
  4. quest finish Enter the Soulstream

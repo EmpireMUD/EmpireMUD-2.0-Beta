@@ -60,8 +60,8 @@ Paul Clarke~
    Learn the basics of EmpireMUD including its quests and skills. This short
 tutorial will help you find your way in the world, and will also lead you to
 some other tutorials. Steps to begin:
- 1. Type 'quest start' (or 'q s') to see the quests available here.
- 2. Type 'quest start Enter the Soulstream' to begin the tutorials.
+ 1. Type 'quest start' (or just 'start') to see the quests available here.
+ 2. Type 'start Enter the Soulstream' to begin the tutorials.
  3. Follow the instructions on that quest.
 
 Instructions for EmpireMUD administrators:

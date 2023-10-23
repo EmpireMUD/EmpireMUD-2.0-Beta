@@ -1272,3 +1272,12 @@ ACMD(do_quest) {
 	// pass on to subcommand
 	(quest_cmd[type].func)(ch, argument);
 }
+
+
+ACMD(do_start) {
+	// pass-thru to "quest start <args>"
+	char temp[MAX_INPUT_LENGTH];
+	skip_spaces(&argument);
+	snprintf(temp, sizeof(temp), "start %s", argument);
+	do_quest(ch, arg, 0, 0);
+}

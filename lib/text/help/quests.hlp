@@ -20,7 +20,7 @@ a lot.
 
 For more information on each, see HELP QUEST <command>.
 
-See also: LEVEL COLORS
+See also: LEVEL COLORS, START
 #
 "DAILY QUESTS" DAILY DAILIES "EVENT DAILIES"
 
@@ -142,14 +142,19 @@ See also: ACCEPT, REJECT
 #
 "QUEST START" "QUEST CHECK"
 
-Usage:  quest start [name | all]
+Usage:  quest start [quest name | all]
 
-This command starts a quest (or all quests) available at your location. There
-will be an indicator on any person, place, or thing that starts a quest.
+This command begins a quest that's available in the room you're in. You can
+abbreviate any part of the quest name, or provide a multi-word abbreviation
+(for example, "Bound Wooden Column Tutorial" can be abbreviated "col tut").
 
-Typing 'quest start' with no argument will list the quests available here.
+Typing "quest start" without an argument will list any quests available here.
+You can start all available quests with "quest start all". You can also use the
+"start" command instead of "quest start".
 
-See also: QUEST, LEVEL COLORS
+There will be an indicator on any person, place, or thing that starts a quest.
+
+See also: QUESTS, LEVEL COLORS, START
 #
 "QUEST TRACKER"
 
@@ -187,5 +192,20 @@ tech (Thriving Community goal) before artisans will move in and start offering
 these quests.
 
 See also: DAILY QUESTS
+#
+START
+
+Usage:  start [quest name | all]
+
+This command begins a quest that's available in the room you're in. You can
+abbreviate any part of the quest name, or provide a multi-word abbreviation
+(for example, "Bound Wooden Column Tutorial" can be abbreviated "col tut").
+
+Typing "start" without an argument will list any quests available here. You can
+start all available quests with "start all".
+
+There will be an indicator on any person, place, or thing that starts a quest.
+
+See also: LEVEL COLORS, QUESTS
 #
 $

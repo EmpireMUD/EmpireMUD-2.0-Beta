@@ -392,6 +392,7 @@ ACMD(do_specialize);
 ACMD(do_split);
 ACMD(do_stake);
 ACMD(do_stand);
+ACMD(do_start);
 ACMD(do_stat);
 ACMD(do_steal);
 ACMD(do_stop);
@@ -996,6 +997,7 @@ cpp_extern const struct command_info cmd_info[] = {
 	SIMPLE_CMD( "split", POS_RESTING, do_split, NO_MIN, CTYPE_UTIL ),
 	SIMPLE_CMD( "stand", POS_RESTING, do_stand, NO_MIN, CTYPE_MOVE ),
 	SCMD_CMD( "stake", POS_FIGHTING, do_stake, NO_MIN, CTYPE_COMBAT, FALSE ),
+	SIMPLE_CMD( "start", POS_DEAD, do_start, NO_MIN, CTYPE_UTIL ),
 	SIMPLE_CMD( "stat", POS_DEAD, do_stat, LVL_START_IMM, CTYPE_IMMORTAL ),
 	ABILITY_CMD( "steal", POS_STANDING, do_steal, NO_MIN, CTYPE_COMBAT, ABIL_STEAL ),
 	SIMPLE_CMD( "store", POS_STANDING, do_store, NO_MIN, CTYPE_MOVE ),
