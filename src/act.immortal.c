@@ -3895,6 +3895,7 @@ SHOW(show_site) {
 
 
 SHOW(show_skills) {
+	char exp_part[256];
 	struct player_ability_data *plab, *next_plab;
 	struct player_skill_data *plsk, *next_plsk;
 	ability_data *abil;
@@ -3932,7 +3933,14 @@ SHOW(show_skills) {
 	HASH_ITER(hh, GET_SKILL_HASH(vict), plsk, next_plsk) {
 		skill = plsk->ptr;
 		
-		msg_to_char(ch, "&y%s&0 [%d, %.1f%%, %d%s]: ", SKILL_NAME(skill), get_skill_level(vict, SKILL_VNUM(skill)), get_skill_exp(vict, SKILL_VNUM(skill)), get_ability_points_available_for_char(vict, SKILL_VNUM(skill)), plsk->resets ? "*" : "");
+		if (plsk->noskill) {
+			snprintf(exp_part, sizeof(exp_part), "noskill");
+		}
+		else {
+			snprintf(exp_part, sizeof(exp_part), "%.1f%%", get_skill_exp(vict, SKILL_VNUM(skill)));
+		}
+		
+		msg_to_char(ch, "&y%s&0 [%d, %s, %d%s]: ", SKILL_NAME(skill), get_skill_level(vict, SKILL_VNUM(skill)), exp_part, get_ability_points_available_for_char(vict, SKILL_VNUM(skill)), plsk->resets ? "*" : "");
 		
 		found = FALSE;
 		HASH_ITER(hh, GET_ABILITY_HASH(vict), plab, next_plab) {
