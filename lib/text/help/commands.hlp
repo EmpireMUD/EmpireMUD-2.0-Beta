@@ -298,7 +298,7 @@ Usage: toggle bother
 When bother is off, this toggle protects you from having your character
 affected by various other commands - you cannot be sired, you cannot be
 purified of vampirism, and vampires can't bite you unless you're restrained or
-unconscious. It also prevents players from ceding you land
+unconscious. It also prevents players from ceding you land.
 
 Turn bother on to allow yourself to be bitten or to have land ceded to you,
 but don't forget to turn it off again!
