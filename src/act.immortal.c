@@ -3524,7 +3524,7 @@ SHOW(show_quests) {
 		// active quest list
 		check_delayed_load(vict);
 		if (IS_NPC(vict) || !GET_QUESTS(vict)) {
-			msg_to_char(ch, "%s is not on any quests.\r\n", GET_NAME(vict));
+			msg_to_char(ch, "%s is not on any quests (%d/%d dailies, %d/%d event dailies).\r\n", GET_NAME(vict), GET_DAILY_QUESTS(vict), config_get_int("dailies_per_day"), GET_EVENT_DAILY_QUESTS(vict), config_get_int("dailies_per_day"));
 			if (vict && file) {
 				file = FALSE;
 				free_char(vict);
