@@ -395,6 +395,9 @@ if !%event.running(18800)% && (%actor.obj_target(%arg.cdr%)% == %self% || %actor
   %send% %actor% @%self% suddenly vanishes!
   %purge% %self%
   halt
+elseif !%actor.on_quest(18808)% && (%actor.obj_target(%arg.cdr%)% == %self% || %actor.obj_target(%arg.car%)% == %self%)
+  %send% %actor% You can't use @%self% while you're not on its quest.
+  halt
 end
 set Candy18802 %self.Candy18802%
 set Candy18803 %self.Candy18803%
