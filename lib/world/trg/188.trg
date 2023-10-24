@@ -391,7 +391,7 @@ if %actor.aff_flagged(blind)%
   return 0
   halt
 end
-if !%actor.on_quest(18808)% && (%actor.obj_target(%arg.cdr%)% == %self% || %actor.obj_target(%arg.car%)% == %self%)
+if !%event.running(18800)% && (%actor.obj_target(%arg.cdr%)% == %self% || %actor.obj_target(%arg.car%)% == %self%)
   %send% %actor% @%self% suddenly vanishes!
   %purge% %self%
   halt
