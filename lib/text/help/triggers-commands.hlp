@@ -614,10 +614,12 @@ Quest commands:
   &cstart&0 - Will give the player the quest, whether or not they meet the
     prerequisites, if they are not already on it. Consider checking
     %char.completed_quest(vnum)% or %char.can_start_quest(vnum)% first.
-  &ctrigger&0 - Activate any 'triggered' quest task, if the player is on that
-    quest. You can check %char.quest_triggered(vnum)% to see if the condition
-    is already triggered.
-  &cuntrigger&0 - Cancels a 'triggered' quest task, if the player has it.
+  &ctrigger&0 - Adds 1 to any 'triggered' quest task, if the player is on that
+    quest. You can check %char.quest_triggered(vnum)% to see how many times
+    the quest has been triggered (up to its maximum).
+  &cuntrigger&0 - Removes 1 from 'triggered' quest task, if the player has it.
+  &cresettrigger&0 - Cancels all progress on a 'triggered' quest task.
+  &csettrigger&0 - Sets a 'triggered' quest task to a specific value.
 
 See also: CHAR-VAR, QUEST
 #d

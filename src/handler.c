@@ -8791,7 +8791,7 @@ char *requirement_string(struct req_data *req, bool show_vnums, bool allow_custo
 			break;
 		}
 		case REQ_TRIGGERED: {
-			strcpy(output, "Scripted condition");
+			snprintf(output, sizeof(output), "Scripted condition: %d", req->needed);
 			break;
 		}
 		case REQ_VISIT_BUILDING: {

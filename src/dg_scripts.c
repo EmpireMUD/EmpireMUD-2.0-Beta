@@ -4306,20 +4306,15 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 							any_vnum vnum = atoi(subfield);
 							struct player_quest *pq;
 							struct req_data *task;
-							bool any = FALSE;
+							int count = 0;
 							
 							if (!IS_NPC(c) && (pq = is_on_quest(c, vnum))) {
 								LL_FOREACH(pq->tracker, task) {
 									if (task->type == REQ_TRIGGERED) {
-										any |= (task->current >= task->needed);
+										count += task->current;
 									}
 								}
-								if (any) {
-									strcpy(str, "1");
-								}
-								else {
-									strcpy(str, "0");
-								}
+								snprintf(str, slen, "%d", count);
 							}
 							else {
 								strcpy(str, "0");

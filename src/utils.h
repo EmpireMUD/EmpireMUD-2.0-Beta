@@ -2448,8 +2448,8 @@ void qt_lose_vehicle(char_data *ch, vehicle_data *veh);
 void qt_quest_completed(char_data *ch, any_vnum vnum);
 void qt_remove_obj(char_data *ch, obj_data *obj);
 void qt_start_quest(char_data *ch, any_vnum vnum);
-void qt_triggered_task(char_data *ch, any_vnum vnum);
-void qt_untrigger_task(char_data *ch, any_vnum vnum);
+void qt_triggered_task(char_data *ch, any_vnum vnum, int specific_val);
+void qt_untrigger_task(char_data *ch, any_vnum vnum, bool remove_all);
 void qt_visit_room(char_data *ch, room_data *room);
 void qt_wear_obj(char_data *ch, obj_data *obj);
 

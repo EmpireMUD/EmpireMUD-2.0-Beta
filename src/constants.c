@@ -4566,7 +4566,7 @@ const bool requirement_amt_type[] = {
 	REQ_AMT_THRESHOLD,	// skill over
 	REQ_AMT_THRESHOLD,	// skill under
 	REQ_AMT_NONE,	// triggered
-	REQ_AMT_NONE,	// visit building
+	REQ_AMT_NUMBER,	// visit building
 	REQ_AMT_NONE,	// visit rmt
 	REQ_AMT_NONE,	// visit sect
 	REQ_AMT_NONE,	// have ability

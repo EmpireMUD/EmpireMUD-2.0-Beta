@@ -3249,12 +3249,13 @@ void qt_start_quest(char_data *ch, any_vnum vnum) {
 
 
 /**
-* Quest Tracker: mark a triggered condition for 1 quest
+* Quest Tracker: increase a triggered condition for a quest by 1
 *
 * @param char_data *ch The player.
 * @param any_vnum vnum The quest to mark.
+* @param int specific_val Optional: Sets it to this value (pass 0 to just add 1 instead).
 */
-void qt_triggered_task(char_data *ch, any_vnum vnum) {
+void qt_triggered_task(char_data *ch, any_vnum vnum, int specific_val) {
 	struct player_quest *pq;
 	struct req_data *task;
 	
@@ -3266,7 +3267,14 @@ void qt_triggered_task(char_data *ch, any_vnum vnum) {
 		if (pq->vnum == vnum) {
 			LL_FOREACH(pq->tracker, task) {
 				if (task->type == REQ_TRIGGERED) {
-					task->current = task->needed;
+					if (specific_val > 0) {
+						// specific value
+						task->current = MIN(specific_val, task->needed);
+					}
+					else {
+						// add instead
+						task->current = MIN(task->current+1, task->needed);
+					}
 				}
 			}
 		}
@@ -3275,12 +3283,13 @@ void qt_triggered_task(char_data *ch, any_vnum vnum) {
 
 
 /**
-* Quest Tracker: cancel a triggered condition for the quest
+* Quest Tracker: reduce a triggered condition for the quest by 1 (or all)
 *
 * @param char_data *ch The player.
 * @param any_vnum vnum The quest to un-mark.
+* @param bool remove_all If TRUE, removes ALL triggers.
 */
-void qt_untrigger_task(char_data *ch, any_vnum vnum) {
+void qt_untrigger_task(char_data *ch, any_vnum vnum, bool remove_all) {
 	struct player_quest *pq;
 	struct req_data *task;
 	
@@ -3292,7 +3301,13 @@ void qt_untrigger_task(char_data *ch, any_vnum vnum) {
 		if (pq->vnum == vnum) {
 			LL_FOREACH(pq->tracker, task) {
 				if (task->type == REQ_TRIGGERED) {
-					task->current = 0;
+					// remove all OR 1
+					if (remove_all) {
+						task->current = 0;
+					}
+					else {
+						task->current = MAX(task->current-1, 0);
+					}
 				}
 			}
 		}
