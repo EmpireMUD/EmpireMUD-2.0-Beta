@@ -558,11 +558,11 @@ if %abilityname% != Disenchant
   return 1
   halt
 end
-set done 0
+set done 1
 set obj %actor.inventory()%
 while %obj%
   if %obj.vnum% == 9036
-    if !%obj.is_flagged(ENCHANTED)%
+    if !%obj.is_flagged(ENCHANTED)% && %obj% != %self%
       eval done %done% + 1
     end
   end
