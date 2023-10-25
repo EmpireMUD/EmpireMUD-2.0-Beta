@@ -723,14 +723,8 @@ while %cycles_left% >= 0
       %send% %actor% You complete your chant, and the raincloud fills the sky!
       %echo% Thunder rolls across the sky as heavy drops of rain begin to fall.
       %load% obj 10144 %room%
-      if %actor.varexists(monsoon_chant_counter)%
-        eval monsoon_chant_counter %actor.monsoon_chant_counter)% + 1
-      else
-        set monsoon_chant_counter 1
-      end
-      remote monsoon_chant_counter %actor.id%
-      if %monsoon_chant_counter% >= 6
-        %quest% %actor% trigger 10147
+      %quest% %actor% 10147 trigger
+      if %actor.quest_finished(10147)%
         %send% %actor% You have finished quenching the cacti, and should return to the druid.
         %send% %actor% Your monsoon totem splinters and breaks!
         %echoaround% %actor% |%actor% ironwood totem splinters and breaks!
@@ -801,13 +795,14 @@ done
 Natural Magic: Cacti quench quest start~
 2 u 100
 ~
-set monsoon_chant_counter 0
-remote monsoon_chant_counter %actor.id%
 if !%actor.inventory(10143)%
   %load% obj 10143 %actor% inv
   set item %actor.inventory(10143)%
   %send% %actor% You receive @%item%.
 end
+* this was formerly used to track chants on the player
+* (it now tracks on the quest)
+rdelete monsoon_chant_counter %actor.id%
 ~
 #10148
 Monsoon cactus death tracker + reward~
