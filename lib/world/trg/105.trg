@@ -1009,11 +1009,6 @@ end
 Wand of Polar Power activation~
 1 c 2
 freeze~
-if %actor.varexists(permafrost_mobs_iced)%
-  if %actor.permafrost_mobs_iced% >= 6
-    * Quest is completed but we currently allow you to keep zapping if you like
-  end
-end
 if !%arg%
   %send% %actor% What do you want to blast with @%self%?
   return 1
@@ -1046,16 +1041,7 @@ set person %actor.room.people%
 while %person%
   if %person.is_pc%
     if %person.on_quest(10550)%
-      if %person.varexists(permafrost_mobs_iced)%
-        eval permafrost_mobs_iced %person.permafrost_mobs_iced% + 1
-      else
-        set permafrost_mobs_iced 1
-      end
-      remote permafrost_mobs_iced %person.id%
-      if %permafrost_mobs_iced% >= 6
-        %quest% %person% trigger 10550
-        %send% %person% You have frozen enough enemies to complete your quest.
-      end
+      %quest% %person% trigger 10550
     end
   end
   set person %person.next_in_room%
@@ -1082,9 +1068,9 @@ done
 Pacify the Permafrost quest start~
 2 u 100
 ~
-set permafrost_mobs_iced 0
-remote permafrost_mobs_iced %actor.id%
 %load% obj 10593 %actor% inv
+* formerly saved a variable; now uses quest tracker
+rdelete permafrost_mobs_iced %actor.id%
 ~
 #10598
 Gem ice melt~
