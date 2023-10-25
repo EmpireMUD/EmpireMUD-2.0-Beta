@@ -677,14 +677,10 @@ end
 * try to do the thing
 %send% %actor% You swoop toward ~%vict% with the gilded net... and catch it!
 %echoaround% %actor% ~%actor% swoops toward ~%vict% with @%self%... and catches it!
-eval 18243_bug_count %actor.var(18243_bug_count,0)% + 1
-remote 18243_bug_count %actor.id%
+%quest% %actor% trigger 18243
 %purge% %vict%
-if %18243_bug_count% >= %num_needed%
+if %actor.quest_finished(18243)%
   %send% %actor% That's all the bugs you needed... and good thing, too. Your net just broke!
-  if %actor.on_quest(18243)%
-    %quest% %actor% trigger 18243
-  end
   %purge% %self%
 end
 ~
@@ -745,10 +741,8 @@ if %found%
   %send% %actor% Rodentmort is already out of his cage.
   halt
 end
-if %actor.var(18245_food_count,0)% >= %needed%
+if %actor.quest_finished(18245)%
   %send% %actor% Rodentmort is sleeping in his cage; you already finished this quest.
-  * in case
-  %quest% %actor% trigger 18245
   halt
 end
 * ok, summon him
@@ -784,12 +778,10 @@ while %loop% <= 1
     %echo% ~%self% devours @%obj%! &&Z&%self% makes a huge mess.
     nop %obj.empty%
     %purge% %obj%
-    eval 18245_food_count %leader.var(18245_food_count,0)% + 1
-    remote 18245_food_count %leader.id%
+    %quest% %leader% trigger 18245
     wait 1 s
-    if %18245_food_count% >= %needed%
+    if %leader.quest_finished(18245)%
       %echo% ~%self% hops back into ^%self% cage and falls asleep.
-      %quest% %leader% trigger 18245
       %purge% %self%
     end
     halt
@@ -1328,16 +1320,14 @@ else
   * oops
   set extract 0
 end
-* check completion
-if %self.val0% && %self.val1% && %self.val2%
-  set ch %room.people%
-  while %ch%
-    if %ch.on_quest(18254)%
-      %quest% %ch% trigger 18254
-    end
-    set ch %ch.next_in_room%
-  done
-end
+* update completion
+set ch %room.people%
+while %ch%
+  if %ch.on_quest(18254)%
+    %quest% %ch% trigger 18254
+  end
+  set ch %ch.next_in_room%
+done
 * consequences!
 if %extract%
   %echo% ~%vict% is sucked into the mirror with a puff of smoke!
@@ -1647,10 +1637,9 @@ if %questvnum% == 18260
 elseif %questvnum% == 18272
   %load% obj 18272 %actor% inv
 elseif %questvnum% == 18270
-  set guild_siphoned_10551 0
-  set guild_siphoned_10552 0
-  remote guild_siphoned_10551 %actor.id%
-  remote guild_siphoned_10552 %actor.id%
+  * old vars (now use quest trackers)
+  rdelete guild_siphoned_10551 %actor.id%
+  rdelete guild_siphoned_10552 %actor.id%
   %load% obj 18270 %actor% inv
 end
 ~
@@ -1673,22 +1662,19 @@ if %target.vnum% != 10551 && %target.vnum% != 10552
   halt
 end
 set valid 1
-if %actor.varexists(guild_siphoned_%target.vnum%)%
-  eval check %%actor.guild_siphoned_%target.vnum%%%
-  if %check%
-    %send% %actor% You've already siphoned energy from ~%target%.
-    set valid 0
-  end
+if %self.var(siphoned_%target.vnum%)%
+  %send% %actor% You've already siphoned energy from ~%target%.
+  set valid 0
 end
 if %valid%
   %send% %actor% You siphon energy from ~%target%...
-  set guild_siphoned_%target.vnum% 1
-  remote guild_siphoned_%target.vnum% %actor.id%
+  %quest% %actor% trigger 18270
+  set siphoned_%target.vnum% 1
+  remote siphoned_%target.vnum% %self.vnum%
 end
 * Check quest completion
-if %actor.guild_siphoned_10551% && %actor.guild_siphoned_10552%
+if %actor.quest_finished(18270)%
   %send% %actor% You have siphoned both apprentices.
-  %quest% %actor% trigger 18270
 end
 ~
 #18272
@@ -1739,13 +1725,13 @@ switch %questvnum%
   break
   case 18243
     %load% obj 18220 %actor% inv
-    set 18243_bug_count 0
-    remote 18243_bug_count %actor.id%
+    * old var (uses tracker now)
+    rdelete 18243_bug_count %actor.id%
   break
   case 18245
     %load% obj 18224 %actor% inv
-    set 18245_food_count 0
-    remote 18245_food_count %actor.id%
+    * old var (uses tracker now)
+    rdelete 18245_food_count %actor.id%
   break
   case 18246
     %load% obj 18248 %actor% inv

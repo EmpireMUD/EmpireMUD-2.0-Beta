@@ -312,7 +312,7 @@ Type: make snow angel
 ~
 That will sure make things more wintry around here!
 ~
-13 ej 0 0 -1
+14 ej 0 0 -1
 A
 2 16607
 D 16606
@@ -326,8 +326,8 @@ T 16602
 W
 36 10700 0 1 a
 W+
-11 0 0 1 a
-Make 5 snow angels~
+11 0 0 5 a
+Make snow angels~
 Z
 4 16610
 S
@@ -443,6 +443,38 @@ Type: 'dress terrier'
    There, now even the animals of your empire are in the holiday mood, whether
 they want to be or not.
 ~
+15 ej 0 0 -1
+A
+0 5111
+A
+0 10923
+D 16618
+P
+36 10700 0 1 a
+R
+9 10700 10
+R
+2 16678 1
+T 16602
+W
+36 10700 0 1 a
+W+
+11 0 0 2 a
+Dress up terriers~
+Z
+4 16618
+S
+#16618
+Winter Wonderland: Replica Reindeer Wrangling~
+   While standing in your stable, you get the great idea that the animals of
+the empire should get into the holiday spirit as well. So, you take some
+reindeer outfits and begin your search for five horses or camels to dress up
+around your city.
+Type: dress <horse | camel>
+~
+   There! Now even the animals of your empire are in the holiday mood, whether
+they want to be or not.
+~
 14 ej 0 0 -1
 A
 0 5111
@@ -459,40 +491,8 @@ T 16602
 W
 36 10700 0 1 a
 W+
-11 0 0 1 a
-Dress up 2 terriers~
-Z
-4 16618
-S
-#16618
-Winter Wonderland: Replica Reindeer Wrangling~
-   While standing in your stable, you get the great idea that the animals of
-the empire should get into the holiday spirit as well. So, you take some
-reindeer outfits and begin your search for five horses or camels to dress up
-around your city.
-Type: dress <horse | camel>
-~
-   There! Now even the animals of your empire are in the holiday mood, whether
-they want to be or not.
-~
-13 ej 0 0 -1
-A
-0 5111
-A
-0 10923
-D 16618
-P
-36 10700 0 1 a
-R
-9 10700 10
-R
-2 16678 1
-T 16602
-W
-36 10700 0 1 a
-W+
-11 0 0 1 a
-Dress up 5 horses or camels~
+11 0 0 5 a
+Dress up horses or camels~
 Z
 4 16618
 S
@@ -508,7 +508,7 @@ Type 'craft winter ornament set' to make them, then 'hang ornament' in 4 rooms.
    You've got this decorating thing down. Tree? Check! Ornaments? Check! What
 else could your citizens ask for?
 ~
-15 ej 0 0 -1
+16 ej 0 0 -1
 A
 2 16607
 D 16620
@@ -524,8 +524,8 @@ T 16602
 W
 36 10700 0 1 a
 W+
-11 0 0 1 a
-Hang ornaments in 4 rooms~
+11 0 0 4 a
+Hang ornaments around town~
 Z
 4 16620
 S
@@ -722,7 +722,7 @@ tambourine (or any instrument) and play music in front of each citizen.
 ~
 You've lifted everyone's holiday spirit!
 ~
-20 ej 0 0 -1
+21 ej 0 0 -1
 A
 1 10701
 D 16676
@@ -736,8 +736,8 @@ T 16602
 W
 36 10700 0 1 a
 W+
-11 0 0 1 a
-Make 10 citizens dance~
+11 0 0 10 a
+Make your citizens dance~
 Z
 4 16677
 S
@@ -751,7 +751,7 @@ buildings.
 ~
 Through the gift of charity, you've lifted everyone's holiday spirit!
 ~
-20 ej 0 0 -1
+21 ej 0 0 -1
 A
 1 10701
 D 16676
@@ -765,8 +765,8 @@ T 16602
 W
 36 10700 0 1 a
 W+
-11 0 0 1 a
-Play a concert at 4 locations~
+11 0 0 4 a
+Play a concert at dedicated buildings~
 Z
 4 16677
 S
@@ -824,7 +824,7 @@ other side. Since it's the holidays, a lot of pets need good homes, so the
 reward for your hard work is an adoption certificate to get a free puppy or
 kitten.
 ~
-9 j 0 0 -1
+10 j 0 0 -1
 A
 2 16659
 A
@@ -835,8 +835,8 @@ R
 2 16640 1
 T 16602
 W+
-11 0 0 1 -
-Feed the vortex enough treats~
+11 0 0 50 -
+Feed the vortex treats~
 Z
 2 16690
 S
