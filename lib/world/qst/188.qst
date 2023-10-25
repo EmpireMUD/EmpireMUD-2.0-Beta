@@ -61,7 +61,7 @@ R
 2 18858 1
 T 18820
 W+
-11 0 0 1 -
+11 0 0 310 -
 Fill your pillaging pillowcase with halloween candy~
 Z
 4 18808
@@ -95,8 +95,8 @@ T 18820
 W
 2 18819 0 1 a
 W+
-11 0 0 1 a
-Costume 6 citizens~
+11 0 0 6 a
+Costume citizens~
 S
 #18821
 Halloween: Citizens Will Be Toad~
@@ -125,8 +125,8 @@ R
 2 18829 1
 T 18820
 W+
-11 0 0 1 -
-Turn 4 citizens into toads~
+11 0 0 4 -
+Turn citizens into toads~
 S
 #18823
 Halloween: A City Aghast~
@@ -184,8 +184,8 @@ R
 2 18829 1
 T 18820
 W+
-11 0 0 1 -
-Bog roll 3 houses~
+11 0 0 3 -
+Bog roll houses~
 S
 #18827
 Halloween: Get the Blood Pumping~
@@ -216,8 +216,8 @@ R
 2 18829 1
 T 18820
 W+
-11 0 0 1 -
-Scare 5 citizens as Dracula~
+11 0 0 5 -
+Scare citizens as Dracula~
 S
 #18828
 Halloween: House of 100 Corpses~
@@ -264,8 +264,8 @@ R
 2 18829 1
 T 18820
 W+
-11 0 0 1 -
-Make offerings at 5 tombs~
+11 0 0 5 -
+Make offerings at tombs~
 S
 #18830
 Halloween: Appease the Spirits~
@@ -290,8 +290,8 @@ R
 2 18829 1
 T 18820
 W+
-11 0 0 1 -
-Appease spirits at 5 tombs~
+11 0 0 5 -
+Make offerings at tombs~
 S
 #18831
 Halloween: Appease the Spirits~
@@ -316,8 +316,8 @@ R
 2 18829 1
 T 18820
 W+
-11 0 0 1 -
-Appease spirits at 5 tombs~
+11 0 0 5 -
+Make offerings at tombs~
 S
 #18832
 Halloween: Appease the Spirits~
@@ -342,8 +342,8 @@ R
 2 18829 1
 T 18820
 W+
-11 0 0 1 -
-Appease spirits at 5 tombs~
+11 0 0 5 -
+Make offerings at tombs~
 S
 #18840
 Halloween: Macabre Menagerie~
@@ -373,8 +373,8 @@ R
 2 18829 1
 T 18820
 W+
-11 0 0 1 -
-Unleash 3 animals in your city~
+11 0 0 3 -
+Unleash creatures in your city~
 S
 #18854
 Halloween: Pick or Treat~
@@ -428,8 +428,8 @@ R
 2 18829 1
 T 18820
 W+
-11 0 0 1 -
-Look in the mirror wearing 5 different clothes~
+11 0 0 5 -
+Look in the mirror wearing different clothes~
 S
 #18857
 Halloween: Bobbing for Apples~
@@ -518,8 +518,8 @@ R
 9 18800 10
 T 18820
 W+
-11 0 0 1 -
-Perform the ritual of demons to open 3 portals~
+11 0 0 3 -
+Perform the ritual of demons~
 S
 #18866
 Halloween: Keep the Blood Pumping~
@@ -548,8 +548,8 @@ R
 2 18829 1
 T 18820
 W+
-11 0 0 1 -
-Feed from 5 people without killing them~
+11 0 0 5 -
+Feed from people without killing them~
 S
 #18869
 Halloween: Songs for the Deaths Yet to Come~
@@ -605,8 +605,8 @@ R
 2 18829 1
 T 18820
 W+
-11 0 0 1 -
-Play music to bring back 5 citizens in your empire~
+11 0 0 5 -
+Play music to bring back citizens in your empire~
 S
 #18873
 Halloween: Songs for the Dying~

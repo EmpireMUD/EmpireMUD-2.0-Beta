@@ -530,6 +530,8 @@ while (%item% && (%all% || %CandyCount% == 0) && %CandyTotal% < %Needs%)
   * and repeat the loop
   set item %next_item%
 done
+* store progress
+%quest% %actor% settrigger 18808 %CandyTotal%
 * did we fail?
 if !%CandyCount%
   if %all%
@@ -737,9 +739,9 @@ else
   %morph% %target% %costume_vnum%
   %send% %actor% You dress up %prev_name% as ~%target%!
   %echoaround% %actor% ~%actor% dresses up %prev_name% as ~%target%!
+  %quest% %actor% trigger 18819
   eval costume_vnum %costume_vnum% + 1
-  if %costume_vnum% > 18817
-    %quest% %actor% trigger 18819
+  if %costume_vnum% > 18817 || %actor.quest_finished(18819)%
     nop %self.val0(0)%
     %quest% %actor% finish 18819
   else
@@ -873,10 +875,10 @@ else
   %morph% %target% %costume_vnum%
   %send% %actor% You wave @%self% at %prev_name%, who turns into ~%target%!
   %echoaround% %actor% ~%actor% waves @%self% at %prev_name%, who turns into ~%target%!
+  %quest% %actor% trigger 18821
   set charges %self.val0%
   eval charges %charges% - 1
-  if %charges% == 0
-    %quest% %actor% trigger 18821
+  if %charges% == 0 || %actor.quest_finished(18821)%
     %quest% %actor% finish 18821
   else
     nop %self.val0(%charges%)%
@@ -1032,10 +1034,10 @@ else
   %echoaround% %actor% ~%actor% finishes bogrolling the building.
   %send% %actor% Your Stealth skill ensures nobody notices your mischief.
   %load% obj 18825 room
+  %quest% %actor% trigger 18824
   set charges %self.val0%
-  if %charges% == 1
+  if %charges% == 1 || %actor.quest_finished(18824)%
     %send% %actor% @%self% runs out!
-    %quest% %actor% trigger 18824
     %quest% %actor% finish 18824
   else
     eval charges %charges% - 1
@@ -1097,10 +1099,10 @@ else
   %force% %target% mmove
   %force% %target% mmove
   %force% %target% mmove
+  %quest% %actor% trigger 18827
   eval times %self.val0% + 1
-  if %times% == 5
+  if %times% == 5 || %actor.quest_finished(18827)%
     %send% %actor% You have scared enough citizens, but you can keep pretending to be Dracula if you want to.
-    %quest% %actor% trigger 18827
     %quest% %actor% finish 18827
   else
     nop %self.val0(%times%)%
@@ -1410,7 +1412,10 @@ nop %mob.unscale_and_reset%
 %send% %actor% You hold out @%self%...
 %echoaround% %actor% ~%actor% holds out @%self%...
 %echo% You shield your eyes from the bright light as ~%mob% emerges from the cage!
+%quest% %actor% trigger 18840
 if %self.val0% == -1 && %self.val1% == -1 && %self.val2% == -1
+  %quest% %actor% finish 18840
+elseif %actor.quest_finished(18840)%
   %quest% %actor% finish 18840
 end
 ~
@@ -1552,8 +1557,8 @@ nop %actor.charge_component(%component_base%, %sacrifice_amount%)%
 eval sacrifices_left %sacrifices_left% - 1
 nop %self.val0(%sacrifices_left%)%
 %load% obj 18849 room
-if %sacrifices_left% == 0
-  %quest% %actor% trigger %qvnum%
+%quest% %actor% trigger %qvnum%
+if %sacrifices_left% == 0 || %actor.quest_finished(%qvnum%)%
   %quest% %actor% finish %qvnum%
 end
 ~
@@ -1932,10 +1937,10 @@ switch %clothing_count%
     set clothing_count five
     set clothing5 %clothing.shortdesc%
     remote clothing5 %self.id%
-    %quest% %actor% trigger 18856
     set build_up %self.clothing1%, the second %self.clothing2%, the third %self.clothing3%, the fourth %self.clothing4%, and the latest %self.clothing5%.
   break
 done
+%quest% %actor% trigger 18856
 %send% %actor% In the background of @%self% you see %clothing_count% shadowy %shadows% %build_up%
 if !%actor.quest_finished(18856)%
   %send% %actor% %left%
@@ -2348,7 +2353,8 @@ else
   set portals %self.portals%
 end
 eval portals %portals% + 1
-if %portals% < 3
+%quest% %actor% trigger 18861
+if %portals% < 3 && !%actor.quest_finished(18861)%
   remote portals %self.id%
   halt
 end
@@ -2461,8 +2467,8 @@ while %BiteList%
 done
 set BiteList %self.BiteList% %id%
 remote BiteList %self.id%
-if %count% == 5
-  %quest% %actor% trigger 18866
+%quest% %actor% trigger 18866
+if %count% == 5 || %actor.quest_finished(18866)%
   %quest% %actor% finish 18866
 else
   %send% %actor% You're up to %count% of 5 citizens now.
@@ -2571,11 +2577,8 @@ if %actor.action% == playing
           done
           set places %self.places% %loc%
         end
-        if %counter% >= 5
-          %quest% %actor% trigger %questid%
-        else
-          remote places %self.id%
-        end
+        %quest% %actor% trigger %questid%
+        remote places %self.id%
         %load% mob 18871
       end
     break
