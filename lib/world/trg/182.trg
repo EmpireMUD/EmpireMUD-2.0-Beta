@@ -1652,7 +1652,10 @@ if %actor.obj_target(%arg.car%)% != %self%
   halt
 end
 set target %actor.char_target(%arg.cdr%)%
-if !%target%
+if !%arg.cdr%
+  %send% %actor% Use the siphon on whom?
+  halt
+elseif !%target%
   %send% %actor% You don't see a '%arg.cdr%' here.
   halt
 end
