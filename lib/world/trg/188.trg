@@ -1903,6 +1903,7 @@ switch %clothing_count%
     set build_up %clothing1%
     if !%self.varexists(clothing1)%
       remote clothing1 %self.id%
+      %quest% %actor% trigger 18856
     end
     set left You've got one shadowy reflection in there, now just to get four more, each in a unique outfit of its own!
   break
@@ -1911,6 +1912,7 @@ switch %clothing_count%
     if %update% != 1
       set clothing2 %clothing.shortdesc%
       remote clothing2 %self.id%
+      %quest% %actor% trigger 18856
     end
     set left You still need three more unique outfits for your shadowy reflection to wear.
     set build_up %self.clothing1% and the new one %self.clothing2%.
@@ -1920,6 +1922,7 @@ switch %clothing_count%
     if %update% != 1
       set clothing3 %clothing.shortdesc%
       remote clothing3 %self.id%
+      %quest% %actor% trigger 18856
     end
     set left You still need two more unique outfits for your shadowy reflection to wear.
     set build_up %self.clothing1%, the second %self.clothing2%, and the latest %self.clothing3%.
@@ -1929,6 +1932,7 @@ switch %clothing_count%
     if %update% != 1
       set clothing4 %clothing.shortdesc%
       remote clothing4 %self.id%
+      %quest% %actor% trigger 18856
     end
     set left You still need one more unique outfit for your shadowy reflection to wear.
     set build_up %self.clothing1%, the second %self.clothing2%, the third %self.clothing3%, and the latest %self.clothing4%.
@@ -1937,12 +1941,10 @@ switch %clothing_count%
     set clothing_count five
     set clothing5 %clothing.shortdesc%
     remote clothing5 %self.id%
+    %quest% %actor% trigger 18856
     set build_up %self.clothing1%, the second %self.clothing2%, the third %self.clothing3%, the fourth %self.clothing4%, and the latest %self.clothing5%.
   break
 done
-if %update% != 1
-  %quest% %actor% trigger 18856
-end
 %send% %actor% In the background of @%self% you see %clothing_count% shadowy %shadows% %build_up%
 if !%actor.quest_finished(18856)%
   %send% %actor% %left%
