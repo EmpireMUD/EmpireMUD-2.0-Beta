@@ -234,7 +234,7 @@ void count_quest_tasks(struct req_data *list, int *complete, int *total) {
 	};
 	
 	struct count_quest_data *cqd, *next_cqd, *cqd_list = NULL;
-	int group, best_total, best_complete;
+	int group, best_total, best_complete, ungroup_total, ungroup_complete;
 	struct req_data *task;
 	bool done = FALSE;
 	
@@ -245,6 +245,7 @@ void count_quest_tasks(struct req_data *list, int *complete, int *total) {
 	
 	// prepare data
 	*complete = *total = 0;
+	ungroup_total = ungroup_complete = 0;
 	
 	LL_FOREACH(list, task) {
 		if (!task->group) {	// ungrouped "or" tasks
@@ -253,6 +254,13 @@ void count_quest_tasks(struct req_data *list, int *complete, int *total) {
 				*complete = *total = task->needed;
 				done = TRUE;
 				break;
+			}
+			else if (task->current > ungroup_complete) {
+				ungroup_complete = task->current;
+				ungroup_total = task->needed;
+			}
+			else if (!ungroup_total) {
+				ungroup_total = task->needed;
 			}
 		}
 		else {	// grouped tasks
@@ -273,8 +281,8 @@ void count_quest_tasks(struct req_data *list, int *complete, int *total) {
 	}
 	
 	// tally data
-	best_complete = 0;	// start this lower than best_total
-	best_total = 1;	// ensure this is not zero
+	best_complete = ungroup_complete;	// start this lower than best_total
+	best_total = MAX(1, ungroup_total);	// ensure this is not zero
 	
 	HASH_ITER(hh, cqd_list, cqd, next_cqd) {
 		if (!done) {	// only bother with this part if we didn't find one
