@@ -1940,7 +1940,9 @@ switch %clothing_count%
     set build_up %self.clothing1%, the second %self.clothing2%, the third %self.clothing3%, the fourth %self.clothing4%, and the latest %self.clothing5%.
   break
 done
-%quest% %actor% trigger 18856
+if %update% != 1
+  %quest% %actor% trigger 18856
+end
 %send% %actor% In the background of @%self% you see %clothing_count% shadowy %shadows% %build_up%
 if !%actor.quest_finished(18856)%
   %send% %actor% %left%
