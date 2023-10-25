@@ -723,7 +723,7 @@ while %cycles_left% >= 0
       %send% %actor% You complete your chant, and the raincloud fills the sky!
       %echo% Thunder rolls across the sky as heavy drops of rain begin to fall.
       %load% obj 10144 %room%
-      %quest% %actor% 10147 trigger
+      %quest% %actor% trigger 10147
       if %actor.quest_finished(10147)%
         %send% %actor% You have finished quenching the cacti, and should return to the druid.
         %send% %actor% Your monsoon totem splinters and breaks!
