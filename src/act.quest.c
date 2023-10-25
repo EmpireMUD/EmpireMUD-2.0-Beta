@@ -250,7 +250,7 @@ void count_quest_tasks(struct req_data *list, int *complete, int *total) {
 		if (!task->group) {	// ungrouped "or" tasks
 			if (task->current >= task->needed) {
 				// found a complete "or"
-				*complete = *total = 1;
+				*complete = *total = task->needed;
 				done = TRUE;
 				break;
 			}
