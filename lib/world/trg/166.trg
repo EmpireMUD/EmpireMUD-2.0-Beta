@@ -87,7 +87,7 @@ if !%actor.fighting% && %BuildRoom% == %self.room%
   %send% %actor% You shape the newly made snow into a perfect snowball for your snowman.
   %echoaround% %actor% %player_name% shapes the newly made snow into a perfect snowball for ^%actor% snowman.
   %load% obj 16605 %actor% inv
-  nop %actor.set_cooldown(16600, 30)%
+  nop %actor.set_cooldown(16600, 20)%
 else
   %send% %actor% You've stopped working on a snowball.
 end
@@ -545,7 +545,7 @@ end
 %send% %actor% You spread @%self%, lay down, and swiftly make a snow angel on the ground.
 %echoaround% %actor% ~%actor% spreads @%self%, lays down, and swiftly makes a snow angel on the ground.
 %load% obj 16609 room
-nop %actor.set_cooldown(16610, 30)%
+nop %actor.set_cooldown(16610, 20)%
 %quest% %actor% trigger 16610
 if !%actor.quest_finished(16610)%
   switch %actor.quest_triggered(16610)%
@@ -593,7 +593,7 @@ if !%SelfRoom.in_city%
 end
 if %actor.cooldown(16611)%
   %send% %actor% You're drawing too much attention to yourself. You need to cool off.
-  nop %actor.set_cooldown(16611, 30)%
+  nop %actor.set_cooldown(16611, 20)%
   halt
 end
 if !%MoveDir%
@@ -677,7 +677,7 @@ if %actor.cooldown(16601)% > 5
   halt
 elseif %actor.cooldown(16601)%
   %send% %actor% You probably shouldn't do that, ~%self% almost caught you once already.
-  nop %actor.set_cooldown(16601, 30)%
+  nop %actor.set_cooldown(16601, 20)%
   halt
 end
 set theft_roll %random.100%

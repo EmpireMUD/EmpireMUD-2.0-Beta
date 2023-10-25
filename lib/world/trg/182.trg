@@ -1670,7 +1670,7 @@ if %valid%
   %send% %actor% You siphon energy from ~%target%...
   %quest% %actor% trigger 18270
   set siphoned_%target.vnum% 1
-  remote siphoned_%target.vnum% %self.vnum%
+  remote siphoned_%target.vnum% %self.id%
 end
 * Check quest completion
 if %actor.quest_finished(18270)%
