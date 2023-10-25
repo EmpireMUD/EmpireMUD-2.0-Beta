@@ -1320,16 +1320,17 @@ else
   * oops
   set extract 0
 end
-* update completion
-set ch %room.people%
-while %ch%
-  if %ch.on_quest(18254)%
-    %quest% %ch% trigger 18254
-  end
-  set ch %ch.next_in_room%
-done
 * consequences!
 if %extract%
+  * update completion
+  set ch %room.people%
+  while %ch%
+    if %ch.on_quest(18254)%
+      %quest% %ch% trigger 18254
+    end
+    set ch %ch.next_in_room%
+  done
+  * and purge
   %echo% ~%vict% is sucked into the mirror with a puff of smoke!
   %purge% %vict%
 else
