@@ -50,7 +50,7 @@ interesting from that.'
    And with a POP! the spirit and the pillowcase both vanish. But when you look
 down, you realize you're holding a wagon wheel.
 ~
-10 j 0 0 86400
+11 j 0 0 86400
 A
 2 18829
 A
@@ -77,7 +77,7 @@ your citizens and deck them out in festive costumes.
    Your citizens are costumed and now the holiday festivities can begin! You
 have earned a goody bag!
 ~
-21 dej 0 0 -1
+22 dej 0 0 -1
 A
 2 18806
 A
@@ -109,7 +109,7 @@ normal in no time.
 think of the holiday joy you've brought to your city. You have earned a goody
 bag!
 ~
-18 ej 0 0 -1
+19 ej 0 0 -1
 A
 2 18810
 A
@@ -168,7 +168,7 @@ your city. Type 'use roll' to spread the Halloween cheer to three houses.
    Now that you've redecorated the city, everyone is getting into the holiday
 spirit! You have earned a goody bag!
 ~
-16 ej 0 0 -1
+17 ej 0 0 -1
 A
 2 18805
 A
@@ -200,7 +200,7 @@ blood pumping.
    The citizens' hearts are definitely pumping now. You have earned a goody
 bag!
 ~
-17 ej 0 0 -1
+18 ej 0 0 -1
 A
 2 18808
 A
@@ -250,7 +250,7 @@ details.
 ~
 You have appeased the spirits of the dead for today.
 ~
-17 ej 0 0 -1
+18 ej 0 0 -1
 A
 2 18807
 A
@@ -276,7 +276,7 @@ and type 'offer'. Look at the offering instructions for more details.
 ~
 You have appeased the spirits of the dead for today.
 ~
-17 ej 0 0 -1
+18 ej 0 0 -1
 A
 2 18807
 A
@@ -302,7 +302,7 @@ and type 'offer'. Look at the offering instructions for more details.
 ~
 You have appeased the spirits of the dead for today.
 ~
-17 ej 0 0 -1
+18 ej 0 0 -1
 A
 2 18807
 A
@@ -328,7 +328,7 @@ tomb and type 'offer'. Look at the offering instructions for more details.
 ~
 You have appeased the spirits of the dead for today.
 ~
-18 ej 0 0 -1
+19 ej 0 0 -1
 A
 2 18807
 A
@@ -357,7 +357,7 @@ them, one by one, in your city.
    The bone cage disappears from your fingers -- or perhaps it was never there.
 You've earned a goody bag!
 ~
-1 ej 0 0 -1
+2 ej 0 0 -1
 A
 2 18810
 A
@@ -414,7 +414,7 @@ tedium of seeing the same old unchanging spirits.
    The spirits are highly amused at the various looks you have captured in the
 reflections and thank you for the entertainment.
 ~
-13 ej 0 0 -1
+14 ej 0 0 -1
 A
 2 18806
 A
@@ -502,7 +502,7 @@ your city to open three portals to the Nether and lure some demons through.
 ~
 Congratulations! You've brought new demons into this world.
 ~
-10 ej 0 0 -1
+11 ej 0 0 -1
 A
 2 18804
 A
@@ -532,7 +532,7 @@ them! Take just enough to give them a fright.
 ~
 And that's five! They'll be having nightmares for weeks.
 ~
-5 ej 0 0 -1
+6 ej 0 0 -1
 A
 2 18808
 A
@@ -591,7 +591,7 @@ share in the merriment. You need to do this in one of your cities.
 back for a brief time. Surely their loved ones will be greatful for the chance
 to make their peace now.
 ~
-13 ej 0 0 -1
+14 ej 0 0 -1
 A
 2 18809
 A
