@@ -393,6 +393,7 @@ if %actor.aff_flagged(blind)%
 end
 if !%event.running(18800)% && (%actor.obj_target(%arg.cdr%)% == %self% || %actor.obj_target(%arg.car%)% == %self%)
   %send% %actor% @%self% suddenly vanishes!
+  %quest% %actor% drop 18808
   %purge% %self%
   halt
 elseif !%actor.on_quest(18808)% && (%actor.obj_target(%arg.cdr%)% == %self% || %actor.obj_target(%arg.car%)% == %self%)
@@ -584,6 +585,7 @@ if %event.running(18800)%
 end
 if %self.carried_by%
   %send% %self.carried_by% @%self% suddenly vanishes!
+  %quest% %self.carried_by% drop 18808
 end
 %purge% %self%
 ~
