@@ -265,9 +265,10 @@ bool find_and_bind(char_data *ch, obj_vnum vnum) {
 * @param char_data *ch The person looking for a craft.
 * @param char *argument The typed-in name.
 * @param int craft_type Any CRAFT_TYPE_ to look up.
+* @param bool hide_dismantle_only If TRUE, skips crafts set dismantle-only.
 * @return craft_data* The matching craft, if any.
 */
-craft_data *find_best_craft_by_name(char_data *ch, char *argument, int craft_type) {
+craft_data *find_best_craft_by_name(char_data *ch, char *argument, int craft_type, bool hide_dismantle_only) {
 	craft_data *unknown_abbrev = NULL;
 	craft_data *known_abbrev = NULL, *known_abbrev_no_res = NULL;
 	craft_data *unknown_multi = NULL;
@@ -282,6 +283,9 @@ craft_data *find_best_craft_by_name(char_data *ch, char *argument, int craft_typ
 			continue;
 		}
 		if (IS_SET(GET_CRAFT_FLAGS(craft), CRAFT_IN_DEVELOPMENT) && !IS_IMMORTAL(ch)) {
+			continue;
+		}
+		if (hide_dismantle_only && CRAFT_FLAGGED(craft, CRAFT_DISMANTLE_ONLY)) {
 			continue;
 		}
 		if (GET_CRAFT_REQUIRES_OBJ(craft) != NOTHING && !has_required_obj_for_craft(ch, GET_CRAFT_REQUIRES_OBJ(craft))) {
@@ -780,7 +784,7 @@ void show_craft_info(char_data *ch, char *argument, int craft_type) {
 		msg_to_char(ch, "Get %s info on what?\r\n", gen_craft_data[craft_type].command);
 		return;
 	}
-	if (!(craft = find_best_craft_by_name(ch, argument, craft_type))) {
+	if (!(craft = find_best_craft_by_name(ch, argument, craft_type, TRUE))) {
 		msg_to_char(ch, "You don't know any such %s recipe.\r\n", gen_craft_data[craft_type].command);
 		return;
 	}
