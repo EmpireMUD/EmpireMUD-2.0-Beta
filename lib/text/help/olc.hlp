@@ -5886,15 +5886,18 @@ See also: OLC OBJECTS
 
 Usage:  .requirestools [add | remove] <flags>
 
-If an object requires a tool when you make a craft WITH it, use this field.
-This is separate from any tools set on the craft itself.
+If an object requires a tool when you build or maintain a building WITH it, use
+this field. This is separate from any tools set on the building's craft itself.
+
+This does not apply to non-building/non-vehicle crafts, which are instant. For
+those, set the tool on the craft itself.
 
 Examples:
  - nails require a hammer when crafting
 
 See &yHELP TOOLS&0 for a full list.
 
-See also: OLC OBJECTS, OEDIT TOOLS
+See also: OLC OBJECTS, CEDIT TOOL, OEDIT TOOLS
 #d
 "OEDIT STORAGE"
 
@@ -6049,7 +6052,7 @@ See also: AUTOSTORE, OEDIT TYPE, OLC OBJECTS
 Usage:  .tools [add | remove] <flags>
 
 Objects: Tool flags allow an object to be used for various tasks, like sawing.
-         Objects also support a "requires tools" flag for tools needed to craft
+         Objects also support a "requires tools" flag for tools needed to build
          something that uses the object (e.g. nails require hammer).
 Crafts: You can require 1 or more tools to create the craft. These tools MUST
         be present, and you can't substitute with a building (e.g. tailor for
