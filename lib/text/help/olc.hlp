@@ -5306,35 +5306,35 @@ other sources (the default is "natural"). The superior and *-drop apply types
 will only appear on the item if it has matching flags.
 
 Most applies are self-explanatory:
- STRENGTH - characters can't use an item that would reduce them below 1
- DEXTERITY - chance to hit/dodge
- HEALTH-REGEN - rate of health regen (per 5 second tick)
- CHARISMA - characters can't use an item that would reduce them below 1
- GREATNESS - empire meta-trait (unscaled)
- MOVE-REGEN - rate of move regen (per 5 second tick)
- MANA-REGEN - rate of mana regen (per 5 second tick)
- INTELLIGENCE - characters can't use an item that would reduce them below 1
- WITS - combat speed and damage
- AGE - this actually raises/lowers the player's age, which has no effect
- MAX-MOVE - move pool
- RESIST-PHYSICAL - physical damage reduction
- BLOCK - block only matters if the player has a shield
- HEAL-OVER-TIME - healing even during battle
- MAX-HEALTH - health pool
- MAX-MANA - mana pool
- TO-HIT - chance to hit (%)
- DODGE - chance to dodge (%)
- INVENTORY - this adds to inventory capacity
- MAX-BLOOD - blood pool size
- BONUS-PHYSICAL - added to strength-based damage and weapon dps
- BONUS-MAGICAL - added to magical damage and weapon dps
- BONUS-HEALING - added to damage healed (by abilities this player uses)
- RESIST-MAGICAL - magical damage reduction
- CRAFTING - bonus to craft level (unscaled)
- BLOOD-UPKEEP - adds to how much blood vampires must spend per hour (unscaled)
- NIGHT-VISION - adds to light radius at night (unscaled)
- NEARBY-RANGE - increases the range of the player's nearby command
- WHERE-RANGE - increases the range of the player's where command
+ &cSTRENGTH&0 - characters can't use an item that would reduce them below 1
+ &cDEXTERITY&0 - chance to hit/dodge
+ &cHEALTH-REGEN&0 - rate of health regen (per 5 second tick)
+ &cCHARISMA&0 - characters can't use an item that would reduce them below 1
+ &cGREATNESS&0 - empire meta-trait (unscaled)
+ &cMOVE-REGEN&0 - rate of move regen (per 5 second tick)
+ &cMANA-REGEN&0 - rate of mana regen (per 5 second tick)
+ &cINTELLIGENCE&0 - characters can't use an item that would reduce them below 1
+ &cWITS&0 - combat speed and damage
+ &cAGE&0 - this actually raises/lowers the player's age, which has no effect
+ &cMAX-MOVE&0 - move pool
+ &cRESIST-PHYSICAL&0 - physical damage reduction
+ &cBLOCK&0 - block only matters if the player has a shield
+ &cHEAL-OVER-TIME&0 - healing even during battle
+ &cMAX-HEALTH&0 - health pool
+ &cMAX-MANA&0 - mana pool
+ &cTO-HIT&0 - chance to hit (%)
+ &cDODGE&0 - chance to dodge (%)
+ &cINVENTORY&0 - this adds to inventory capacity
+ &cMAX-BLOOD&0 - blood pool size
+ &cBONUS-PHYSICAL&0 - added to strength-based damage and weapon dps
+ &cBONUS-MAGICAL&0 - added to magical damage and weapon dps
+ &cBONUS-HEALING&0 - added to damage healed (by abilities this player uses)
+ &cRESIST-MAGICAL&0 - magical damage reduction
+ &cCRAFTING&0 - bonus to craft level (unscaled)
+ &cBLOOD-UPKEEP&0 - adds to how much blood vampires must spend per hour (unscaled)
+ &cNIGHT-VISION&0 - adds to light radius at night (unscaled)
+ &cNEARBY-RANGE&0 - increases the range of the player's nearby command
+ &cWHERE-RANGE&0 - increases the range of the player's where command
 
 See also: OLC OBJECTS
 #d
