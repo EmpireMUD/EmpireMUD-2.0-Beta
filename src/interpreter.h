@@ -18,7 +18,7 @@
 
 
 // prototypes
-bool char_can_act(char_data *ch, int min_pos, bool allow_animal, bool allow_invulnerable);
+bool char_can_act(char_data *ch, int min_pos, bool allow_animal, bool allow_invulnerable, bool override_feeding);
 void command_interpreter(char_data *ch, char *argument);
 int find_command(const char *command);
 char lower( char c );

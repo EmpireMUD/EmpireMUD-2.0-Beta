@@ -936,7 +936,7 @@ ACMD(do_bite) {
 			send_config_msg(ch, "must_be_vampire");
 		}
 	}
-	else if (!char_can_act(ch, POS_FIGHTING, TRUE, FALSE)) {
+	else if (!char_can_act(ch, POS_FIGHTING, TRUE, FALSE, TRUE)) {
 		// do_bite allows positions as low as sleeping so you can cancel biting, but they can't do anything past here
 		// sends own message
 	}

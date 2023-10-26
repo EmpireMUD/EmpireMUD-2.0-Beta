@@ -1412,7 +1412,7 @@ bool check_ability(char_data *ch, char *string, bool exact) {
 	}
 	
 	// ok check if we can perform it
-	if (!char_can_act(ch, ABIL_MIN_POS(abil), !ABILITY_FLAGGED(abil, ABILF_NO_ANIMAL), !ABILITY_FLAGGED(abil, ABILF_NO_INVULNERABLE | ABILF_VIOLENT))) {
+	if (!char_can_act(ch, ABIL_MIN_POS(abil), !ABILITY_FLAGGED(abil, ABILF_NO_ANIMAL), !ABILITY_FLAGGED(abil, ABILF_NO_INVULNERABLE | ABILF_VIOLENT), FALSE)) {
 		return TRUE;	// sent its own error message
 	}
 	

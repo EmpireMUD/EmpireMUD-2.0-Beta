@@ -718,7 +718,7 @@ bool perform_summon(char_data *ch, ability_data *abil, any_vnum vnum, bool check
 		msg_to_char(ch, "You must be level %d to summon that.\r\n", GET_MIN_SCALE_LEVEL(proto));
 		return FALSE;
 	}
-	if (checks && !char_can_act(ch, ABIL_MIN_POS(abil), !ABILITY_FLAGGED(abil, ABILF_NO_ANIMAL), !ABILITY_FLAGGED(abil, ABILF_NO_INVULNERABLE | ABILF_VIOLENT))) {
+	if (checks && !char_can_act(ch, ABIL_MIN_POS(abil), !ABILITY_FLAGGED(abil, ABILF_NO_ANIMAL), !ABILITY_FLAGGED(abil, ABILF_NO_INVULNERABLE | ABILF_VIOLENT), FALSE)) {
 		return FALSE;
 	}
 	if (checks && ABIL_IS_SYNERGY(abil) && !check_solo_role(ch)) {
@@ -2124,7 +2124,7 @@ ACMD(do_companions) {
 		msg_to_char(ch, "You must be alone to summon that companion in the solo role.\r\n");
 		return;
 	}
-	if (abil && !char_can_act(ch, ABIL_MIN_POS(abil), !ABILITY_FLAGGED(abil, ABILF_NO_ANIMAL), !ABILITY_FLAGGED(abil, ABILF_NO_INVULNERABLE | ABILF_VIOLENT))) {
+	if (abil && !char_can_act(ch, ABIL_MIN_POS(abil), !ABILITY_FLAGGED(abil, ABILF_NO_ANIMAL), !ABILITY_FLAGGED(abil, ABILF_NO_INVULNERABLE | ABILF_VIOLENT), FALSE)) {
 		return;
 	}
 	if (!abil && GET_POS(ch) < POS_STANDING) {
