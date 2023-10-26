@@ -607,6 +607,9 @@ void perform_alternate(char_data *old, char_data *new) {
 	if (GET_MAIL_PENDING(new)) {
 		send_to_char("&rYou have mail waiting.&0\r\n", new);
 	}
+	if (has_uncollected_event_rewards(new)) {
+		msg_to_char(new, "\ttYou have uncollected event rewards. Type 'event collect' when you're in your own territory.\t0\r\n");
+	}
 	
 	// reset daily cycle now
 	check_daily_cycle_reset(new, TRUE);

@@ -2957,6 +2957,9 @@ void nanny(descriptor_data *d, char *arg) {
 			if (GET_MAIL_PENDING(d->character)) {
 				send_to_char("\r\n\trYou have mail waiting.\t0\r\n", d->character);
 			}
+			if (has_uncollected_event_rewards(d->character)) {
+				msg_to_char(d->character, "\ttYou have uncollected event rewards. Type 'event collect' when you're in your own territory.\t0\r\n");
+			}
 			
 			// reset daily cycle now
 			check_daily_cycle_reset(d->character, TRUE);
