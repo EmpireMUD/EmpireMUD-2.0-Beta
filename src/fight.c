@@ -1749,7 +1749,12 @@ void perform_resurrection(char_data *ch, char_data *rez_by, room_data *loc, any_
 			set_health(ch, MAX(1, GET_MAX_HEALTH(ch) / 2));
 			set_move(ch, MAX(1, GET_MAX_MOVE(ch) / 2));
 			set_mana(ch, MAX(1, GET_MAX_MANA(ch) / 2));
-			set_blood(ch, IS_VAMPIRE(ch) ? MAX(1, GET_MAX_BLOOD(ch) / 2) : GET_MAX_BLOOD(ch));
+			if (!IS_VAMPIRE(ch)) {
+				set_blood(ch, GET_MAX_BLOOD(ch));
+			}
+			else if (GET_BLOOD(ch) < GET_MAX_BLOOD(ch) / 5) {
+				set_blood(ch, GET_MAX_BLOOD(ch) / 5);
+			}
 			
 			// custom restore conditions: less hungry/thirsty (won't incur a penalty yet)
 			if (GET_COND(ch, FULL) >= 0) {
