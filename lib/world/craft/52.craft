@@ -16,7 +16,7 @@ S
 #5201
 burialcavern~
 -1 0
-8 300 q 1 -1 c 0
+8 300 q 1 -1 0 0
 B
 5201 c cop
 R
@@ -31,7 +31,7 @@ S
 #5202
 mountaincrypt~
 -1 1
-8 300 q 1 -1 c 0
+8 300 q 1 -1 0 0
 B
 5202 c cop
 R
@@ -44,7 +44,7 @@ S
 #5203
 mountainhall~
 -1 1
-8 300 mq 1 -1 c 0
+8 300 mq 1 -1 0 0
 B
 5203 c cop
 R
@@ -59,7 +59,7 @@ S
 #5204
 mountaingarrison~
 -1 1
-8 300 q 1 -1 c 0
+8 300 q 1 -1 0 0
 B
 5204 c cop
 R
@@ -74,7 +74,7 @@ S
 #5205
 mountainlodge~
 -1 1
-8 300 q 1 -1 c 0
+8 300 q 1 -1 0 0
 B
 5205 c cop
 R
@@ -89,7 +89,7 @@ S
 #5206
 boardwalk~
 -1 1
-8 300 q 1 -1 c 0
+8 300 q 1 -1 0 0
 B
 5206 qu 0
 R
@@ -124,7 +124,7 @@ S
 #5209
 depository~
 -1 1
-8 289 mq 1 -1 c 0
+8 289 mq 1 -1 0 0
 B
 5209 be 0
 R
@@ -159,7 +159,7 @@ S
 #5212
 exarch workshop~
 -1 0
-8 248 m 1 -1 c 0
+8 248 m 1 -1 0 0
 B
 5212 be op
 R

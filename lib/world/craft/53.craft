@@ -1,7 +1,7 @@
 #5300
 trappers post~
 5300 1
-8 300 nq 1 -1 c 0
+8 300 nq 1 -1 0 0
 B
 -1 d 0
 R
@@ -16,7 +16,7 @@ S
 #5301
 desert trappers post~
 5301 1
-8 300 nq 1 -1 c 0
+8 300 nq 1 -1 0 0
 B
 -1 e 0
 R
@@ -31,7 +31,7 @@ S
 #5302
 jungle trappers post~
 5302 1
-8 300 nq 1 -1 c 0
+8 300 nq 1 -1 0 0
 B
 -1 g 0
 R

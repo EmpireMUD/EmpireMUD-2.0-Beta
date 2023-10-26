@@ -67,7 +67,7 @@ S
 #2908
 imperial carriage~
 2908 1
-2 264 nq 48 -1 c e
+2 264 nq 48 -1 0 e
 L
 100
 R
@@ -125,7 +125,7 @@ S
 #2916
 heroic caravan~
 2916 1
-2 264 nq 1 -1 c e
+2 264 nq 1 -1 0 e
 L
 200
 R
@@ -148,7 +148,7 @@ S
 #2917
 heroic galleon~
 2917 1
-11 61 nq 1 -1 c bu
+11 61 nq 1 -1 0 bu
 L
 200
 R

@@ -8,7 +8,7 @@ S
 #10452
 Pimmin's ring~
 10452 1
-1 54 q 25 -1 c h
+1 54 q 25 -1 0 h
 R
 10013 6 0 0
 R
@@ -104,7 +104,7 @@ S
 #10458
 Shivsper's poison ring~
 10458 1
-1 54 q 25 -1 c h
+1 54 q 25 -1 0 h
 R
 10013 6 0 0
 R
@@ -117,7 +117,7 @@ S
 #10459
 gaudy copper chain~
 10459 1
-1 54 q 25 -1 c h
+1 54 q 25 -1 0 h
 R
 10013 6 0 0
 R
@@ -130,7 +130,7 @@ S
 #10460
 someone else's axe~
 10460 1
-1 196 q 25 -1 c h
+1 196 q 25 -1 0 h
 R
 10013 6 0 0
 R
@@ -145,7 +145,7 @@ S
 #10461
 giant dagger~
 10461 1
-1 196 q 25 -1 c h
+1 196 q 25 -1 0 h
 R
 10013 6 0 0
 R
@@ -186,7 +186,7 @@ S
 #10464
 Wargreyn's ring~
 10464 1
-1 54 q 25 -1 c h
+1 54 q 25 -1 0 h
 R
 10013 6 0 0
 R
@@ -199,7 +199,7 @@ S
 #10465
 blacksmith's charm~
 10465 1
-1 54 q 25 -1 c h
+1 54 q 25 -1 0 h
 R
 10013 6 0 0
 R
@@ -212,7 +212,7 @@ S
 #10466
 goblinsmith's hammer~
 10466 1
-1 196 q 25 -1 c h
+1 196 q 25 -1 0 h
 R
 10013 6 0 0
 R
@@ -227,7 +227,7 @@ S
 #10467
 wargskull shield~
 10467 1
-1 197 q 25 -1 c h
+1 197 q 25 -1 0 h
 R
 10013 6 0 0
 R
@@ -272,7 +272,7 @@ S
 #10473
 Haxaw's poison ring~
 10483 1
-1 54 q 25 -1 c h
+1 54 q 25 -1 0 h
 R
 10013 6 0 0
 R
@@ -304,7 +304,7 @@ S
 #10479
 goblinwartent dismantle~
 -1 0
-8 289 lt 1 10479 c 0
+8 289 lt 1 10479 0 0
 B
 10479 be op
 R
@@ -326,7 +326,7 @@ S
 #10481
 goblinlabtent dismantle~
 -1 0
-8 289 lt 1 10481 c 0
+8 289 lt 1 10481 0 0
 B
 10481 be op
 R
@@ -348,7 +348,7 @@ S
 #10483
 goblin war tent~
 10483 1
-8 289 nt 1 10479 c 0
+8 289 nt 1 10479 0 0
 B
 10479 bex 0
 R
@@ -361,7 +361,7 @@ S
 #10484
 goblin lab tent~
 10484 1
-8 289 nt 1 10481 c 0
+8 289 nt 1 10481 0 0
 B
 10481 bex 0
 R
@@ -372,7 +372,7 @@ S
 #10485
 flail of many blessings~
 10485 1
-1 196 q 25 -1 c h
+1 196 q 25 -1 0 h
 R
 10013 6 0 0
 R
@@ -440,7 +440,7 @@ S
 #10489
 Dryleef's pitfighting ring~
 10489 1
-1 54 q 25 -1 c h
+1 54 q 25 -1 0 h
 R
 10013 6 0 0
 R
@@ -453,7 +453,7 @@ S
 #10490
 zirconian amulet of goblin bravery~
 10490 1
-1 54 q 25 -1 c h
+1 54 q 25 -1 0 h
 R
 10013 6 0 0
 R
@@ -466,7 +466,7 @@ S
 #10491
 bog-iron pitfighter's sword~
 10491 1
-1 196 q 25 -1 c h
+1 196 q 25 -1 0 h
 R
 10013 6 0 0
 R
@@ -479,7 +479,7 @@ S
 #10492
 Dryleef's pitfighting buckler~
 10492 1
-1 197 q 25 -1 c h
+1 197 q 25 -1 0 h
 R
 10013 6 0 0
 R
