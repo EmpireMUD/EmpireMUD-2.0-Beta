@@ -87,7 +87,7 @@ if !%actor.fighting% && %BuildRoom% == %self.room%
   %send% %actor% You shape the newly made snow into a perfect snowball for your snowman.
   %echoaround% %actor% %player_name% shapes the newly made snow into a perfect snowball for ^%actor% snowman.
   %load% obj 16605 %actor% inv
-  nop %actor.set_cooldown(16600, 30)%
+  nop %actor.set_cooldown(16600, 20)%
 else
   %send% %actor% You've stopped working on a snowball.
 end
@@ -421,7 +421,7 @@ xmas tree chopping~
 1 c 2
 chop~
 * config valid sects (must also update trig 16609)
-set valid_sects 4 26 28 45 54 55 71 602 603 604 612 613 614 10562 10563 10564 10565 16698 16699
+set valid_sects 4 26 28 45 54 55 71 72 80 81 89 104 145 154 602 603 604 612 613 614 617 618 10562 10563 10564 10565 11989 11990 11991 16698 16699
 return 0
 if %actor.inventory(16606)%
   %send% %actor% You really should get this tree back to your city center and plant it.
@@ -545,49 +545,30 @@ end
 %send% %actor% You spread @%self%, lay down, and swiftly make a snow angel on the ground.
 %echoaround% %actor% ~%actor% spreads @%self%, lays down, and swiftly makes a snow angel on the ground.
 %load% obj 16609 room
-nop %actor.set_cooldown(16610, 30)%
-if !%self.varexists(angel_count)%
-  set angel_count 1
-else
-  eval angel_count %self.angel_count% + 1
-end
-if %angel_count% < 5
-  remote angel_count %self.id%
-  eval angel_left 5 - %angel_count%
-  switch %angel_count%
+nop %actor.set_cooldown(16610, 20)%
+%quest% %actor% trigger 16610
+if !%actor.quest_finished(16610)%
+  switch %actor.quest_triggered(16610)%
     case 1
       set angel_count One
+      set angel_left four
     break
     case 2
       set angel_count Two
+      set angel_left three
     break
     case 3
       set angel_count Three
+      set angel_left two
     break
     case 4
       set angel_count Four
-    break
-  done
-  switch %angel_left%
-    case 1
       set angel_left one
-    break
-    case 2
-      set angel_left two
-    break
-    case 3
-      set angel_left three
-    break
-    case 4
-      set angel_left four
     break
   done
   %send% %actor% %angel_count% down, %angel_left% to go!
 else
-  %quest% %actor% trigger 16610
-  if %actor.quest_finished(16610)%
-    %quest% %actor% finish 16610
-  end
+  %quest% %actor% finish 16610
   %purge% %self%
 end
 ~
@@ -612,7 +593,7 @@ if !%SelfRoom.in_city%
 end
 if %actor.cooldown(16611)%
   %send% %actor% You're drawing too much attention to yourself. You need to cool off.
-  nop %actor.set_cooldown(16611, 30)%
+  nop %actor.set_cooldown(16611, 20)%
   halt
 end
 if !%MoveDir%
@@ -696,7 +677,7 @@ if %actor.cooldown(16601)% > 5
   halt
 elseif %actor.cooldown(16601)%
   %send% %actor% You probably shouldn't do that, ~%self% almost caught you once already.
-  nop %actor.set_cooldown(16601, 30)%
+  nop %actor.set_cooldown(16601, 20)%
   halt
 end
 set theft_roll %random.100%
@@ -1048,11 +1029,6 @@ if %actor.on_quest(16617)%
     halt
   else
     set morphnum 16617
-    if !%self.varexists(dress_up_counter)%
-      set dress_up_counter 2
-    else
-      set dress_up_counter %self.dress_up_counter%
-    end
   end
 end
 if %actor.on_quest(16618)%
@@ -1069,22 +1045,12 @@ if %actor.on_quest(16618)%
     else
       set morphnum 16619
     end
-    if !%self.varexists(dress_up_counter)%
-      set dress_up_counter 5
-    else
-      set dress_up_counter %self.dress_up_counter%
-    end
   end
 end
 %send% %actor% You dress ~%target% with @%self%.
 %echoaround% %actor% ~%actor% dresses ~%target% with @%self%.
 %morph% %target% %morphnum%
-eval dress_up_counter %dress_up_counter% - 1
-if %dress_up_counter% > 0
-  remote dress_up_counter %self.id%
-else
-  %quest% %actor% trigger %questnum%
-end
+%quest% %actor% trigger %questnum%
 if %actor.quest_finished(%questnum%)%
   %quest% %actor% finish %questnum%
   %purge% %self%
@@ -1114,12 +1080,8 @@ if %room.contents(16621)% || %room.contents(16622)% || %room.contents(16623)% ||
   %send% %actor% Someone has already put ornaments up here. You should probably find somewhere else.
   halt
 end
-if !%self.varexists(ornament_counter)%
-  set ornament_counter 1
-else
-  eval ornament_counter %self.ornament_counter% + 1
-end
-switch %ornament_counter%
+%quest% %actor% trigger 16620
+switch %actor.quest_triggered(16620)%
   case 1
     %send% %actor% You begin your decorating by stringing strands of garland all about the area.
     %echoaround% %actor% ~%actor% begins ^%actor% decorating by stringing strands of garland all about the area.
@@ -1139,14 +1101,11 @@ switch %ornament_counter%
     %send% %actor% You lift the reindeer hoofprint stamp and begin to deliver hammerblows to the ground, leaving behind realistic tracks, giving the impression there was a live reindeer here.
     %echoaround% %actor% ~%actor% takes out a reindeer hoofprint stamp and begins delivering hammerblows to the ground. The end result is some realistic tracks, giving the impression there was a live reindeer here.
     %load% obj 16624 room
-    %quest% %actor% trigger 16620
   break
 done
-if %ornament_counter% >= 4 && %actor.quest_finished(16620)%
+if %actor.quest_finished(16620)%
   %quest% %actor% finish 16620
   %purge% %self%
-else
-  remote ornament_counter %self.id%
 end
 ~
 #16621
@@ -3266,10 +3225,6 @@ play~
 return 0
 set music_score 0
 remote music_score %self.id%
-if !%self.varexists(music_count)%
-  set music_count 0
-  remote music_count %self.id%
-end
 if !%self.has_trigger(16677)%
   attach 16677 %self.id%
 end
@@ -3283,13 +3238,16 @@ if %self.carried_by%
   set actor %self.carried_by%
 elseif %self.worn_by%
   set actor %self.worn_by%
+else
+  * no actor?
+  detach 16677 %self.id%
+  halt
 end
 if %actor.action% != playing
   detach 16677 %self.id%
   halt
 end
 set music_score %self.music_score%
-set music_count %self.music_count%
 switch %questid%
   case 16676
     * 10x citizens must dance
@@ -3299,7 +3257,7 @@ switch %questid%
       if %music_score% >= %random.100%
         if %person.is_npc% && !%person.disabled% && %person.empire% == %actor.empire% && %person.mob_flagged(SPAWNED)% && %person.mob_flagged(HUMAN)% && !%person.has_trigger(16675)%
           set any 1
-          eval music_count %music_count% + 1
+          %quest% %actor% trigger %questid%
           %echo% ~%person% starts dancing!
           attach 16675 %person.id%
           %morph% %person% 16675
@@ -3310,20 +3268,15 @@ switch %questid%
       set person %person.next_in_room%
     done
     if %any%
-      remote music_count %self.id%
       remote music_score %self.id%
-      %send% %actor% (That's %music_count%!)
+      %send% %actor% (That's %actor.quest_triggered(%questid%)%!)
     else
       eval music_score %music_score% + 25
       remote music_score %self.id%
     end
-    * check done
-    if %music_count% >= 10
-      %quest% %actor% trigger %questid%
-    end
   break
   case 16677
-    * 4x dedicate buildings
+    * 4x in dedicated buildings
     set room %actor.room%
     * check already played here
     set mob %room.people%
@@ -3362,16 +3315,12 @@ switch %questid%
       %load% mob %mobv%
       eval mobv 16674 + %random.3%
       %load% mob %mobv%
-      eval music_count %music_count% + 1
-      remote music_count %self.id%
-      %send% %actor% Your music has drawn a crowd (that's %music_count%)!
+      %quest% %actor% trigger %questid%
+      %send% %actor% Your music has drawn a crowd (that's %actor.quest_triggered(%questid%)%)!
       %echoaround% %actor% |%actor% music has drawn a crowd!
     else
       eval music_score %music_score% + 25
       remote music_score %self.id%
-    end
-    if %music_count% >= 4
-      %quest% %actor% trigger %questid%
     end
   break
 done
@@ -3960,9 +3909,13 @@ if %actor.aff_flagged(blind)%
   return 0
   halt
 end
-if !%actor.on_quest(16690)% && (%actor.obj_target(%arg.cdr%)% == %self% || %actor.obj_target(%arg.car%)% == %self%)
+if !%event.running(10700)% && (%actor.obj_target(%arg.cdr%)% == %self% || %actor.obj_target(%arg.car%)% == %self%)
   %send% %actor% @%self% suddenly vanishes!
+  %quest% %actor% drop 16690
   %purge% %self%
+  halt
+elseif !%actor.on_quest(16690)% && (%actor.obj_target(%arg.cdr%)% == %self% || %actor.obj_target(%arg.car%)% == %self%)
+  %send% %actor% You can't use @%self% while you're not on its quest.
   halt
 end
 set Cookie16660 %self.Cookie16660%
@@ -4095,8 +4048,10 @@ if !%CookieCount%
     %send% %actor% You don't seem to have %PutObj.ana% %PutObj%.
   end
 end
+* update stats
+%quest% %actor% settrigger 16690 %CookieTotal%
 * get a Cookie total and see if the quest is over
-if %CookieTotal% >= %Needs%
+if %CookieTotal% >= %Needs% || %actor.quest_finished(16690)%
   %quest% %actor% finish 16690
   %purge% %self%
 end
@@ -4159,6 +4114,19 @@ if %jar% && %self.is_flagged(*KEEP)%
   nop %jar.flag(*KEEP)%
 end
 return 1
+%purge% %self%
+~
+#16692
+Winter Wonderland: Randomly trash the vortex if event isn't running~
+1 b 20
+~
+if %event.running(10700)%
+  halt
+end
+if %self.carried_by%
+  %send% %self.carried_by% @%self% suddenly vanishes!
+  %quest% %self.carried_by% drop 16690
+end
 %purge% %self%
 ~
 #16696

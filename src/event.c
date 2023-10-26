@@ -203,6 +203,54 @@ char *get_event_name_by_proto(any_vnum vnum) {
 
 
 /**
+* Determines if a player has any event rewards the haven't collected.
+*
+* @param char_data *ch The player.
+* @return bool TRUE if the player can collect rewards.
+*/
+bool has_uncollected_event_rewards(char_data *ch) {
+	struct player_event_data *ped, *next_ped;
+	struct event_reward *reward;
+	bool any;
+	
+	any = FALSE;
+	
+	// check player's event data
+	HASH_ITER(hh, GET_EVENT_DATA(ch), ped, next_ped) {
+		if (any) {
+			break;	// shortcut
+		}
+		if (!ped->event || EVT_FLAGGED(ped->event, EVTF_IN_DEVELOPMENT)) {
+			continue;	// no work if no event or in-dev
+		}
+		if (ped->status == EVTS_COLLECTED) {
+			continue;	// no work for fully-collected events
+		}
+		
+		// players can claim thresholds at any time, before the event ends
+		LL_FOREACH(EVT_THRESHOLD_REWARDS(ped->event), reward) {
+			if (ped->points >= reward->min && ped->collected_points < reward->min) {
+				any = TRUE;
+				break;
+			}
+		}
+		
+		// rank rewards: look for events in the 'complete' state (not 'collected')
+		if (ped->status == EVTS_COMPLETE) {
+			LL_FOREACH(EVT_RANK_REWARDS(ped->event), reward) {
+				if (ped->rank >= reward->min && ped->rank <= reward->max) {
+					any = TRUE;
+					break;
+				}
+			}
+		}
+	}
+	
+	return any;
+}
+
+
+/**
 * Wraps quest_reward_string for use with event rewards.
 *
 * @param struct event_reward *reward The reward to show.

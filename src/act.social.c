@@ -67,7 +67,7 @@ bool check_social(char_data *ch, char *string, bool exact) {
 	}
 	
 	// this passes POS_DEAD because social pos is checked in perform_social
-	if (!char_can_act(ch, POS_DEAD, TRUE, TRUE)) {
+	if (!char_can_act(ch, POS_DEAD, TRUE, TRUE, FALSE)) {
 		return TRUE;	// sent its own error message
 	}
 	

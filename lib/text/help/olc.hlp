@@ -8308,12 +8308,21 @@ players can 'fill' from it like a fountain.
 
 Note: Unlike other items, if there is a 'timer' on a drink container, it will
 only cause the liquid inside to go bad and be poured out, rather than purging
-the whole container.
+the whole container -- unless it has a 1-USE flag, in which case it the drink
+container is also destroyed. Consuming the last liquid in a 1-USE drink
+container will also cause it to be destroyed.
 
 Object values:
  0 - max capacity (scalable)
  1 - current amount
  2 - generic liquid vnum
+
+Custom messages:
+ decays-on-char - shown when contents expire
+ decays-in-room - shown when contents expire
+
+Interactions:
+ DECAYS-TO - only when a 1-USE drink container's timer expires
 #d
 "FOOD ITEM" "FOOD OBJECT"
 

@@ -225,8 +225,8 @@ EVENTFUNC(room_affect_expire_event) {
 	if ((af->type > 0)) {
 		// this avoids sending messages multiple times for 1 affect type
 		if (!af->next || (af->next->type != af->type) || (af->next->expire_time > af->expire_time)) {
-			if ((gen = find_generic(af->type, GENERIC_AFFECT)) && GET_AFFECT_WEAR_OFF_TO_CHAR(gen) && ROOM_PEOPLE(room)) {
-				act(GET_AFFECT_WEAR_OFF_TO_CHAR(gen), FALSE, ROOM_PEOPLE(room), 0, 0, TO_CHAR | TO_ROOM);
+			if ((gen = find_generic(af->type, GENERIC_AFFECT)) && GET_AFFECT_WEAR_OFF_TO_ROOM(gen) && ROOM_PEOPLE(room)) {
+				act(GET_AFFECT_WEAR_OFF_TO_ROOM(gen), FALSE, ROOM_PEOPLE(room), 0, 0, TO_CHAR | TO_ROOM);
 			}
 		}
 	}
@@ -448,8 +448,8 @@ void affect_from_room_by_bitvector(room_data *room, any_vnum type, bitvector_t b
 	LL_FOREACH_SAFE(ROOM_AFFECTS(room), aff, next_aff) {
 		if (aff->type == type && IS_SET(aff->bitvector, bits)) {
 			if (show_msg && !shown && (gen = find_generic(aff->type, GENERIC_AFFECT))) {
-				if (GET_AFFECT_WEAR_OFF_TO_CHAR(gen) && ROOM_PEOPLE(room)) {
-					act(GET_AFFECT_WEAR_OFF_TO_CHAR(gen), FALSE, ROOM_PEOPLE(room), NULL, NULL, TO_CHAR | TO_ROOM);
+				if (GET_AFFECT_WEAR_OFF_TO_ROOM(gen) && ROOM_PEOPLE(room)) {
+					act(GET_AFFECT_WEAR_OFF_TO_ROOM(gen), FALSE, ROOM_PEOPLE(room), NULL, NULL, TO_CHAR | TO_ROOM);
 				}
 				shown = TRUE;
 			}
@@ -8791,7 +8791,7 @@ char *requirement_string(struct req_data *req, bool show_vnums, bool allow_custo
 			break;
 		}
 		case REQ_TRIGGERED: {
-			snprintf(output, sizeof(output), "Scripted condition: %d", req->needed);
+			snprintf(output, sizeof(output), "Scripted condition %dx", req->needed);
 			break;
 		}
 		case REQ_VISIT_BUILDING: {

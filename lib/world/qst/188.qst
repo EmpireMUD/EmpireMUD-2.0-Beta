@@ -50,7 +50,7 @@ interesting from that.'
    And with a POP! the spirit and the pillowcase both vanish. But when you look
 down, you realize you're holding a wagon wheel.
 ~
-10 j 0 0 86400
+11 j 0 0 86400
 A
 2 18829
 A
@@ -61,7 +61,7 @@ R
 2 18858 1
 T 18820
 W+
-11 0 0 1 -
+11 0 0 310 -
 Fill your pillaging pillowcase with halloween candy~
 Z
 4 18808
@@ -77,7 +77,7 @@ your citizens and deck them out in festive costumes.
    Your citizens are costumed and now the holiday festivities can begin! You
 have earned a goody bag!
 ~
-21 dej 0 0 -1
+22 dej 0 0 -1
 A
 2 18806
 A
@@ -95,8 +95,8 @@ T 18820
 W
 2 18819 0 1 a
 W+
-11 0 0 1 a
-Costume 6 citizens~
+11 0 0 6 a
+Costume citizens~
 S
 #18821
 Halloween: Citizens Will Be Toad~
@@ -109,7 +109,7 @@ normal in no time.
 think of the holiday joy you've brought to your city. You have earned a goody
 bag!
 ~
-18 ej 0 0 -1
+19 ej 0 0 -1
 A
 2 18810
 A
@@ -125,8 +125,8 @@ R
 2 18829 1
 T 18820
 W+
-11 0 0 1 -
-Turn 4 citizens into toads~
+11 0 0 4 -
+Turn citizens into toads~
 S
 #18823
 Halloween: A City Aghast~
@@ -168,7 +168,7 @@ your city. Type 'use roll' to spread the Halloween cheer to three houses.
    Now that you've redecorated the city, everyone is getting into the holiday
 spirit! You have earned a goody bag!
 ~
-16 ej 0 0 -1
+17 ej 0 0 -1
 A
 2 18805
 A
@@ -184,8 +184,8 @@ R
 2 18829 1
 T 18820
 W+
-11 0 0 1 -
-Bog roll 3 houses~
+11 0 0 3 -
+Bog roll houses~
 S
 #18827
 Halloween: Get the Blood Pumping~
@@ -200,7 +200,7 @@ blood pumping.
    The citizens' hearts are definitely pumping now. You have earned a goody
 bag!
 ~
-17 ej 0 0 -1
+18 ej 0 0 -1
 A
 2 18808
 A
@@ -216,8 +216,8 @@ R
 2 18829 1
 T 18820
 W+
-11 0 0 1 -
-Scare 5 citizens as Dracula~
+11 0 0 5 -
+Scare citizens as Dracula~
 S
 #18828
 Halloween: House of 100 Corpses~
@@ -250,7 +250,7 @@ details.
 ~
 You have appeased the spirits of the dead for today.
 ~
-17 ej 0 0 -1
+18 ej 0 0 -1
 A
 2 18807
 A
@@ -264,8 +264,8 @@ R
 2 18829 1
 T 18820
 W+
-11 0 0 1 -
-Make offerings at 5 tombs~
+11 0 0 5 -
+Make offerings at tombs~
 S
 #18830
 Halloween: Appease the Spirits~
@@ -273,58 +273,6 @@ Halloween: Appease the Spirits~
 kingdoms and monuments in the next world. You must appease the spirits of the
 dead by making offerings at 5 different tombs. Bring 10x (blocks) to each tomb
 and type 'offer'. Look at the offering instructions for more details.
-~
-You have appeased the spirits of the dead for today.
-~
-17 ej 0 0 -1
-A
-2 18807
-A
-2 18803
-D 18829
-P
-36 18800 0 1 a
-R
-9 18800 10
-R
-2 18829 1
-T 18820
-W+
-11 0 0 1 -
-Appease spirits at 5 tombs~
-S
-#18831
-Halloween: Appease the Spirits~
-   An emperor's work does not end at death. Instead, they go on to build great
-kingdoms and monuments in the next world. You must appease the spirits of the
-dead by making offerings at 5 different tombs. Bring 10x (rocks) to each tomb
-and type 'offer'. Look at the offering instructions for more details.
-~
-You have appeased the spirits of the dead for today.
-~
-17 ej 0 0 -1
-A
-2 18807
-A
-2 18803
-D 18829
-P
-36 18800 0 1 a
-R
-9 18800 10
-R
-2 18829 1
-T 18820
-W+
-11 0 0 1 -
-Appease spirits at 5 tombs~
-S
-#18832
-Halloween: Appease the Spirits~
-   An emperor's work does not end at death. Instead, they go on to build great
-kingdoms and monuments in the next world. You must appease the spirits of the
-dead by making offerings at 5 different tombs. Bring 10x (plant fibers) to each
-tomb and type 'offer'. Look at the offering instructions for more details.
 ~
 You have appeased the spirits of the dead for today.
 ~
@@ -342,8 +290,60 @@ R
 2 18829 1
 T 18820
 W+
-11 0 0 1 -
-Appease spirits at 5 tombs~
+11 0 0 5 -
+Make offerings at tombs~
+S
+#18831
+Halloween: Appease the Spirits~
+   An emperor's work does not end at death. Instead, they go on to build great
+kingdoms and monuments in the next world. You must appease the spirits of the
+dead by making offerings at 5 different tombs. Bring 10x (rocks) to each tomb
+and type 'offer'. Look at the offering instructions for more details.
+~
+You have appeased the spirits of the dead for today.
+~
+18 ej 0 0 -1
+A
+2 18807
+A
+2 18803
+D 18829
+P
+36 18800 0 1 a
+R
+9 18800 10
+R
+2 18829 1
+T 18820
+W+
+11 0 0 5 -
+Make offerings at tombs~
+S
+#18832
+Halloween: Appease the Spirits~
+   An emperor's work does not end at death. Instead, they go on to build great
+kingdoms and monuments in the next world. You must appease the spirits of the
+dead by making offerings at 5 different tombs. Bring 10x (plant fibers) to each
+tomb and type 'offer'. Look at the offering instructions for more details.
+~
+You have appeased the spirits of the dead for today.
+~
+19 ej 0 0 -1
+A
+2 18807
+A
+2 18803
+D 18829
+P
+36 18800 0 1 a
+R
+9 18800 10
+R
+2 18829 1
+T 18820
+W+
+11 0 0 5 -
+Make offerings at tombs~
 S
 #18840
 Halloween: Macabre Menagerie~
@@ -357,7 +357,7 @@ them, one by one, in your city.
    The bone cage disappears from your fingers -- or perhaps it was never there.
 You've earned a goody bag!
 ~
-1 ej 0 0 -1
+2 ej 0 0 -1
 A
 2 18810
 A
@@ -373,8 +373,8 @@ R
 2 18829 1
 T 18820
 W+
-11 0 0 1 -
-Unleash 3 animals in your city~
+11 0 0 3 -
+Unleash creatures in your city~
 S
 #18854
 Halloween: Pick or Treat~
@@ -414,7 +414,7 @@ tedium of seeing the same old unchanging spirits.
    The spirits are highly amused at the various looks you have captured in the
 reflections and thank you for the entertainment.
 ~
-13 ej 0 0 -1
+14 ej 0 0 -1
 A
 2 18806
 A
@@ -428,8 +428,8 @@ R
 2 18829 1
 T 18820
 W+
-11 0 0 1 -
-Look in the mirror wearing 5 different clothes~
+11 0 0 5 -
+Look in the mirror wearing different clothes~
 S
 #18857
 Halloween: Bobbing for Apples~
@@ -502,7 +502,7 @@ your city to open three portals to the Nether and lure some demons through.
 ~
 Congratulations! You've brought new demons into this world.
 ~
-10 ej 0 0 -1
+11 ej 0 0 -1
 A
 2 18804
 A
@@ -518,8 +518,8 @@ R
 9 18800 10
 T 18820
 W+
-11 0 0 1 -
-Perform the ritual of demons to open 3 portals~
+11 0 0 3 -
+Perform the ritual of demons~
 S
 #18866
 Halloween: Keep the Blood Pumping~
@@ -532,7 +532,7 @@ them! Take just enough to give them a fright.
 ~
 And that's five! They'll be having nightmares for weeks.
 ~
-5 ej 0 0 -1
+6 ej 0 0 -1
 A
 2 18808
 A
@@ -548,8 +548,8 @@ R
 2 18829 1
 T 18820
 W+
-11 0 0 1 -
-Feed from 5 people without killing them~
+11 0 0 5 -
+Feed from people without killing them~
 S
 #18869
 Halloween: Songs for the Deaths Yet to Come~
@@ -591,7 +591,7 @@ share in the merriment. You need to do this in one of your cities.
 back for a brief time. Surely their loved ones will be greatful for the chance
 to make their peace now.
 ~
-13 ej 0 0 -1
+14 ej 0 0 -1
 A
 2 18809
 A
@@ -605,8 +605,8 @@ R
 2 18829 1
 T 18820
 W+
-11 0 0 1 -
-Play music to bring back 5 citizens in your empire~
+11 0 0 5 -
+Play music to bring back citizens in your empire~
 S
 #18873
 Halloween: Songs for the Dying~

@@ -1775,7 +1775,7 @@ char *obj_desc_for_char(obj_data *obj, char_data *ch, int mode) {
 		strcat(buf, "\r\n");
 	}
 	
-	if (mode == OBJ_DESC_LONG && !CAN_WEAR(obj, ITEM_WEAR_TAKE)) {
+	if (mode == OBJ_DESC_LOOK_AT || (mode == OBJ_DESC_LONG && !CAN_WEAR(obj, ITEM_WEAR_TAKE))) {
 		if (can_get_quest_from_obj(ch, obj, NULL)) {
 			strcat(buf, "...it has a quest for you!\r\n");
 		}

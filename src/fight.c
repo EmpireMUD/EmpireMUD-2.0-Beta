@@ -1234,7 +1234,7 @@ void death_restore(char_data *ch) {
 	set_health(ch, MAX(1, GET_MAX_HEALTH(ch) / 4));
 	set_move(ch, MAX(1, GET_MAX_MOVE(ch) / 4));
 	set_mana(ch, MAX(1, GET_MAX_MANA(ch) / 4));
-	set_blood(ch, IS_VAMPIRE(ch) ? MAX(1, GET_MAX_BLOOD(ch) / 4) : GET_MAX_BLOOD(ch));
+	set_blood(ch, GET_MAX_BLOOD(ch));
 	
 	// conditions: drunk goes away, but you become hungry/thirsty (by half)
 	if (GET_COND(ch, FULL) >= 0) {
