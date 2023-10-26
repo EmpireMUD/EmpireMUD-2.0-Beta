@@ -372,7 +372,7 @@ OLC_MODULE(oedit_quantity);
 OLC_MODULE(oedit_quick_recipe);
 OLC_MODULE(oedit_recipe);
 OLC_MODULE(oedit_requiresquest);
-OLC_MODULE(oedit_requirestool);
+OLC_MODULE(oedit_requirestools);
 OLC_MODULE(oedit_roomvnum);
 OLC_MODULE(oedit_script);
 OLC_MODULE(oedit_short_description);
@@ -883,7 +883,7 @@ const struct olc_command_data olc_data[] = {
 	{ "quantity", oedit_quantity, OLC_OBJECT, OLC_CF_EDITOR },
 	{ "recipe", oedit_recipe, OLC_OBJECT, OLC_CF_EDITOR },
 	{ "requiresquest", oedit_requiresquest, OLC_OBJECT, OLC_CF_EDITOR },
-	{ "requirestool", oedit_requirestool, OLC_OBJECT, OLC_CF_EDITOR },
+	{ "requirestools", oedit_requirestools, OLC_OBJECT, OLC_CF_EDITOR },
 	{ "roomvnum", oedit_roomvnum, OLC_OBJECT, OLC_CF_EDITOR },
 	{ "script", oedit_script, OLC_OBJECT, OLC_CF_EDITOR },
 	{ "shortdescription", oedit_short_description, OLC_OBJECT, OLC_CF_EDITOR },
