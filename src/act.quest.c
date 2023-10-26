@@ -1289,7 +1289,7 @@ ACMD(do_quest) {
 			show_quest_info(ch, qst);
 		}
 		else {
-			msg_to_char(ch, "You're not on a quest called 'argument'.\r\n", cmd_arg);
+			msg_to_char(ch, "You're not on a quest called '%s'.\r\n", argument);
 		}
 		return;
 	}
