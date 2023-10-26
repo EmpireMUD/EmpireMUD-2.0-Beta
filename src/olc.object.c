@@ -3284,7 +3284,7 @@ OLC_MODULE(oedit_requiresquest) {
 
 OLC_MODULE(oedit_requirestools) {
 	obj_data *obj = GET_OLC_OBJECT(ch->desc);
-	obj->proto_data->requires_tool = olc_process_flag(ch, argument, "requirestools", "required tool", tool_flags, GET_OBJ_REQUIRES_TOOL(obj));
+	obj->proto_data->requires_tool = olc_process_flag(ch, argument, "required tool", "requiredtools", tool_flags, GET_OBJ_REQUIRES_TOOL(obj));
 }
 
 
