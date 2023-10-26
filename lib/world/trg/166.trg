@@ -3909,9 +3909,13 @@ if %actor.aff_flagged(blind)%
   return 0
   halt
 end
-if !%actor.on_quest(16690)% && (%actor.obj_target(%arg.cdr%)% == %self% || %actor.obj_target(%arg.car%)% == %self%)
+if !%event.running(10700)% && (%actor.obj_target(%arg.cdr%)% == %self% || %actor.obj_target(%arg.car%)% == %self%)
   %send% %actor% @%self% suddenly vanishes!
+  %quest% %actor% drop 16690
   %purge% %self%
+  halt
+elseif !%actor.on_quest(16690)% && (%actor.obj_target(%arg.cdr%)% == %self% || %actor.obj_target(%arg.car%)% == %self%)
+  %send% %actor% You can't use @%self% while you're not on its quest.
   halt
 end
 set Cookie16660 %self.Cookie16660%
@@ -4110,6 +4114,19 @@ if %jar% && %self.is_flagged(*KEEP)%
   nop %jar.flag(*KEEP)%
 end
 return 1
+%purge% %self%
+~
+#16692
+Winter Wonderland: Randomly trash the vortex if event isn't running~
+1 b 20
+~
+if %event.running(10700)%
+  halt
+end
+if %self.carried_by%
+  %send% %self.carried_by% @%self% suddenly vanishes!
+  %quest% %self.carried_by% drop 16690
+end
 %purge% %self%
 ~
 #16696
