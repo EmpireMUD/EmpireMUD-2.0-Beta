@@ -1335,7 +1335,7 @@ elseif %self.val1% > 0 && %self.var(name1)% ~= %arg%
 elseif %self.val2% > 0 && %self.var(name2)% ~= %arg%
   set vnum %self.val2%
   nop %self.val2(-1)%
-elseif %actor.obj_target(%arg%)% == %self%
+elseif %arg.car% == cage || %actor.obj_target(%arg%)% == %self%
   if %self.val0% > 0
     set vnum %self.val0%
     nop %self.val0(-1)%
