@@ -4172,7 +4172,7 @@ Scaling based on item types:
  pack - the "capacity" value
 
 The following attributes never scale: greatness, age, crafting, blood-upkeep,
-night-vision
+night-vision, nearby-range, where-range
 
 Applies and item values of 0 are ignored and do not get any points assigned.
 
@@ -5333,6 +5333,8 @@ Most applies are self-explanatory:
  CRAFTING - bonus to craft level (unscaled)
  BLOOD-UPKEEP - adds to how much blood vampires must spend per hour (unscaled)
  NIGHT-VISION - adds to light radius at night (unscaled)
+ NEARBY-RANGE - increases the range of the player's nearby command
+ WHERE-RANGE - increases the range of the player's where command
 
 See also: OLC OBJECTS
 #d

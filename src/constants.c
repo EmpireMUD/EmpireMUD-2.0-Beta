@@ -613,6 +613,8 @@ const char *extra_attribute_types[] = {
 	"Blood-Upkeep",
 	"Age",
 	"Night-Vision",
+	"Nearby-Range",	// 15
+	"Where-Range",
 	"\n"
 };
 
@@ -1553,34 +1555,36 @@ const char *apply_type_names[] = {
 
 /* APPLY_x (1/4) */
 const char *apply_types[] = {
-	"NONE",
+	"NONE",	// 0
 	"STRENGTH",
 	"DEXTERITY",
 	"HEALTH-REGEN",
 	"CHARISMA",
-	"GREATNESS",
+	"GREATNESS",	// 5
 	"MOVE-REGEN",
 	"MANA-REGEN",
 	"INTELLIGENCE",
 	"WITS",
-	"AGE",
+	"AGE",	// 10
 	"MAX-MOVE",
 	"RESIST-PHYSICAL",
 	"BLOCK",
 	"HEAL-OVER-TIME",
-	"MAX-HEALTH",
+	"MAX-HEALTH",	// 15
 	"MAX-MANA",
 	"TO-HIT",
 	"DODGE",
 	"INVENTORY",
-	"MAX-BLOOD",
+	"MAX-BLOOD",	// 20
 	"BONUS-PHYSICAL",
 	"BONUS-MAGICAL",
 	"BONUS-HEALING",
 	"RESIST-MAGICAL",
-	"CRAFTING",
+	"CRAFTING",	// 25
 	"BLOOD-UPKEEP",
 	"NIGHT-VISION",
+	"NEARBY-RANGE",
+	"WHERE-RANGE",
 	"\n"
 };
 
@@ -1614,7 +1618,9 @@ const double apply_values[] = {
 	0.5,	// RESIST-MAGICAL
 	0.01,	// CRAFTING
 	1,	// BLOOD-UPKEEP
-	1,	// NIGTH-VISION
+	1,	// NIGHT-VISION
+	1,	// NEARBY-RANGE
+	1,	// WHERE-RANGE
 };
 
 
@@ -1648,6 +1654,8 @@ const int apply_attribute[] = {
 	NOTHING,	// crafting
 	NOTHING,	// blood-upkeep
 	NOTHING,	// night-vision
+	NOTHING,	// nearby-range
+	NOTHING,	// where-range
 };
 
 
@@ -1681,6 +1689,8 @@ const bool apply_never_scales[] = {
 	TRUE,	// CRAFTING
 	TRUE,	// BLOOD-UPKEEP
 	TRUE,	// NIGHT-VISION
+	TRUE,	// NEARBY-RANGE
+	TRUE,	// WHERE-RANGE
 };
 
 

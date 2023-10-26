@@ -1242,10 +1242,23 @@ If you have the Navigation ability, this will also include the location.
 You can specify what type of thing to look (cities, adventures, starting
 locations) if you want a shorter list, or you can specify search terms.
 
+Nearby has a default range of 50 tiles. Some buildings, items, and effects can
+increase this.
+
 Certain adventures won't show up on 'nearby', usually because of the
 adventure's design.
 
-See also: LEVEL COLORS
+See also: LEVEL COLORS, NEARBY RANGE
+#
+NEARBY-RANGE "NEARBY RANGE"
+
+Items and effects can increase or decrease the range of your "nearby" command.
+Some buildings also increase the range. These effects are cumulative.
+
+You can view your current nearby range by typing "nearby"; it's given at the
+top.
+
+See also: NEARBY
 #
 "NEWBIE ISLANDS"
 
@@ -1737,6 +1750,32 @@ On mobs, this is different from the AQUATIC mob flag, which allows the mob to
 move on water but forbids it from moving onto land.
 
 See also: DROWNING
+#
+WHERE
+
+Usage:  where [name]
+
+If you provide a name, tells you the location of the nearest person or creature
+with that name.
+
+If used with no argument, "where" instead tells you the location of all players
+around you. This will also show your current maximum range.
+
+Example:
+  > where
+  > where dragon
+
+See also: MASTER TRACKER, NO TRACE, UNSEEN PASSING, WHERE RANGE
+#
+WHERE-RANGE "WHERE RANGE"
+
+Items and effects can increase or decrease the range of your "where" command.
+Some abilities also increase the range. These effects are cumulative.
+
+You can view your current where range by typing "where" by itself; it's given
+at the top.
+
+See also: WHERE
 #
 WHEREAMI "WHERE AM I"
 

@@ -2781,6 +2781,12 @@ int get_attribute_by_apply(char_data *ch, int apply_type) {
 		case APPLY_NIGHT_VISION: {
 			return GET_EXTRA_ATT(ch, ATT_NIGHT_VISION);
 		}
+		case APPLY_NEARBY_RANGE: {
+			return GET_EXTRA_ATT(ch, ATT_NEARBY_RANGE);
+		}
+		case APPLY_WHERE_RANGE: {
+			return GET_EXTRA_ATT(ch, ATT_WHERE_RANGE);
+		}
 	}
 	return 0;	// if we got this far
 }
