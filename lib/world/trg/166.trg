@@ -421,7 +421,7 @@ xmas tree chopping~
 1 c 2
 chop~
 * config valid sects (must also update trig 16609)
-set valid_sects 4 26 28 45 54 55 71 602 603 604 612 613 614 10562 10563 10564 10565 16698 16699
+set valid_sects 4 26 28 45 54 55 71 72 80 81 89 104 145 154 602 603 604 612 613 614 617 618 10562 10563 10564 10565 11989 11990 11991 16698 16699
 return 0
 if %actor.inventory(16606)%
   %send% %actor% You really should get this tree back to your city center and plant it.
