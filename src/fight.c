@@ -1304,7 +1304,12 @@ obj_data *die(char_data *ch, char_data *killer) {
 	if (affected_by_spell(ch, ATYPE_PHOENIX_RITE)) {
 		affect_from_char(ch, ATYPE_PHOENIX_RITE, FALSE);
 		set_health(ch, GET_MAX_HEALTH(ch) / 4);
-		set_blood(ch, IS_VAMPIRE(ch) ? MAX(GET_BLOOD(ch), GET_MAX_BLOOD(ch) / 5) : GET_MAX_BLOOD(ch));
+		if (!IS_VAMPIRE(ch)) {
+			set_blood(ch, GET_MAX_BLOOD(ch));
+		}
+		else if (GET_BLOOD(ch) < GET_MAX_BLOOD(ch) / 5) {
+			set_blood(ch, GET_MAX_BLOOD(ch) / 5);
+		}
 		set_move(ch, MAX(GET_MOVE(ch), GET_MAX_MOVE(ch) / 5));
 		set_mana(ch, MAX(GET_MANA(ch), GET_MAX_MANA(ch) / 5));
 		GET_POS(ch) = FIGHTING(ch) ? POS_FIGHTING : POS_STANDING;
