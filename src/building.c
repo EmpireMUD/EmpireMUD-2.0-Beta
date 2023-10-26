@@ -2583,6 +2583,9 @@ ACMD(do_designate) {
 	else if (subcmd == SCMD_DESIGNATE && IS_MAP_BUILDING(IN_ROOM(ch)) && dir != BUILDING_ENTRANCE(IN_ROOM(ch))) {
 		msg_to_char(ch, "You may only designate %s from here.\r\n", dirs[get_direction_for_char(ch, BUILDING_ENTRANCE(IN_ROOM(ch)))]);
 	}
+	else if (subcmd == SCMD_REDESIGNATE && ROOM_AFF_FLAGGED(IN_ROOM(ch), ROOM_AFF_HAS_INSTANCE)) {
+		msg_to_char(ch, "You can't redesignate because an adventure is currently linked here.\r\n");
+	}
 	else if (!IS_COMPLETE(IN_ROOM(ch))) {
 		msg_to_char(ch, "You need to finish the building before you can designate rooms.\r\n");
 	}
