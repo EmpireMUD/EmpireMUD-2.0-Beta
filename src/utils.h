@@ -926,6 +926,7 @@ int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_COORD(ge
 #define GET_OBJ_MIN_SCALE_LEVEL(obj)  ((obj)->proto_data ? (obj)->proto_data->min_scale_level : 0)
 #define GET_OBJ_QUEST_LOOKUPS(obj)  ((obj)->proto_data ? (obj)->proto_data->quest_lookups : NULL)
 #define GET_OBJ_REQUIRES_QUEST(obj)  ((obj)->proto_data ? (obj)->proto_data->requires_quest : NOTHING)
+#define GET_OBJ_REQUIRES_TOOL(obj)  ((obj)->proto_data ? (obj)->proto_data->requires_tool : NOTHING)
 #define GET_OBJ_SHOP_LOOKUPS(obj)  ((obj)->proto_data ? (obj)->proto_data->shop_lookups : NULL)
 #define GET_OBJ_STORAGE(obj)  ((obj)->proto_data ? (obj)->proto_data->storage : NULL)
 #define GET_OBJ_TOOL_FLAGS(obj)  ((obj)->proto_data ? (obj)->proto_data->tool_flags : NOBITS)

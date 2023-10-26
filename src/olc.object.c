@@ -1119,7 +1119,7 @@ void olc_fullsearch_obj(char_data *ch, char *argument) {
 	bitvector_t find_applies = NOBITS, found_applies, not_flagged = NOBITS, only_flags = NOBITS;
 	bitvector_t only_worn = NOBITS, only_affs = NOBITS;
 	bitvector_t find_interacts = NOBITS, found_interacts, find_custom = NOBITS, found_custom;
-	bitvector_t only_tools = NOBITS, only_light_flags = NOBITS;
+	bitvector_t only_tools = NOBITS, only_requires_tool = NOBITS, only_light_flags = NOBITS;
 	int count, only_level = NOTHING, only_type = NOTHING, only_mat = NOTHING;
 	int only_weapontype = NOTHING, vmin = NOTHING, vmax = NOTHING;
 	// light hours uses -2 because the valid range is -1 to INT_MAX
@@ -1163,6 +1163,7 @@ void olc_fullsearch_obj(char_data *ch, char *argument) {
 		FULLSEARCH_BOOL("lightislit", light_is_lit)
 		FULLSEARCH_BOOL("lightisunlit", light_is_unlit)
 		FULLSEARCH_LIST("material", only_mat, (const char **)olc_material_list)
+		FULLSEARCH_FLAGS("requirestools", only_requires_tool, tool_flags)
 		FULLSEARCH_BOOL("storable", only_storable)
 		FULLSEARCH_FLAGS("tools", only_tools, tool_flags)
 		FULLSEARCH_LIST("type", only_type, item_types)
@@ -1241,6 +1242,9 @@ void olc_fullsearch_obj(char_data *ch, char *argument) {
 			continue;
 		}
 		if (only_tools != NOBITS && (GET_OBJ_TOOL_FLAGS(obj) & only_tools) != only_tools) {
+			continue;
+		}
+		if (only_requires_tool != NOBITS && (GET_OBJ_REQUIRES_TOOL(obj) & only_requires_tool) != only_requires_tool) {
 			continue;
 		}
 		if (only_mat != NOTHING && GET_OBJ_MATERIAL(obj) != only_mat) {
@@ -2333,6 +2337,9 @@ void olc_show_object(char_data *ch) {
 	sprintbit(GET_OBJ_TOOL_FLAGS(obj), tool_flags, buf1, TRUE);
 	sprintf(buf + strlen(buf), "<%stools\t0> %s\r\n", OLC_LABEL_VAL(GET_OBJ_TOOL_FLAGS(obj), NOBITS), buf1);
 	
+	sprintbit(GET_OBJ_REQUIRES_TOOL(obj), tool_flags, buf1, TRUE);
+	sprintf(buf + strlen(buf), "<%srequirestools\t0> %s\r\n", OLC_LABEL_VAL(GET_OBJ_REQUIRES_TOOL(obj), NOBITS), buf1);
+	
 	sprintf(buf + strlen(buf), "<%scomponent\t0> [%d] %s\r\n", OLC_LABEL_VAL(GET_OBJ_COMPONENT(obj), NOTHING), GET_OBJ_COMPONENT(obj), GET_OBJ_COMPONENT(obj) != NOTHING ? get_generic_name_by_vnum(GET_OBJ_COMPONENT(obj)) : "none");
 	
 	if (GET_OBJ_MIN_SCALE_LEVEL(obj) > 0) {
@@ -3272,6 +3279,12 @@ OLC_MODULE(oedit_requiresquest) {
 			msg_to_char(ch, "It now requires %s.\r\n", get_quest_name_by_proto(GET_OBJ_REQUIRES_QUEST(obj)));
 		}
 	}
+}
+
+
+OLC_MODULE(oedit_requirestools) {
+	obj_data *obj = GET_OLC_OBJECT(ch->desc);
+	obj->proto_data->requires_tool = olc_process_flag(ch, argument, "requirestools", "required tool", tool_flags, GET_OBJ_REQUIRES_TOOL(obj));
 }
 
 

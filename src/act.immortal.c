@@ -6788,6 +6788,9 @@ void do_stat_object(char_data *ch, obj_data *j) {
 	prettier_sprintbit(GET_OBJ_TOOL_FLAGS(j), tool_flags, buf);
 	msg_to_char(ch, "Tool types: &y%s&0\r\n", buf);
 	
+	prettier_sprintbit(GET_OBJ_REQUIRES_TOOL(j), tool_flags, buf);
+	msg_to_char(ch, "Requires tool when crafting: \tg%s\t0\r\n", buf);
+	
 	if (GET_OBJ_TIMER(j) > 0) {
 		minutes = GET_OBJ_TIMER(j) * SECS_PER_MUD_HOUR / SECS_PER_REAL_MIN;
 		snprintf(part, sizeof(part), "%d tick%s (%d:%02d)", GET_OBJ_TIMER(j), PLURAL(GET_OBJ_TIMER(j)), minutes / 60, minutes % 60);

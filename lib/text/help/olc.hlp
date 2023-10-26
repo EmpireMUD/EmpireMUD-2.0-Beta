@@ -5660,6 +5660,7 @@ Fields:
   &c-lightislit&0 - find lights that default to lit, excluding the LIGHT flag
   &c-lightisunlit&0 - find lights that default to unlit
   &c-material&0 - see OEDIT MATERIAL
+  &c-requirestools&0 - see HELP OEDIT TOOLS
   &c-storable -unstorable&0 - Only get objects with or without storage sites.
   &c-tools&0 - see HELP OEDIT TOOLS
   &c-type&0 - see HELP OEDIT TYPE
@@ -5881,6 +5882,20 @@ Requires objects will be lost when the quest ends.
 
 See also: OLC OBJECTS
 #d
+"OEDIT REQUIRESTOOLS" "OEDIT REQUIRES TOOLS"
+
+Usage:  .requirestools [add | remove] <flags>
+
+If an object requires a tool when you make a craft WITH it, use this field.
+This is separate from any tools set on the craft itself.
+
+Examples:
+ - nails require a hammer when crafting
+
+See &yHELP TOOLS&0 for a full list.
+
+See also: OLC OBJECTS, OEDIT TOOLS
+#d
 "OEDIT STORAGE"
 
 Usage:  .storage add <building | vehicle> <vnum> [flags]
@@ -6034,13 +6049,15 @@ See also: AUTOSTORE, OEDIT TYPE, OLC OBJECTS
 Usage:  .tools [add | remove] <flags>
 
 Objects: Tool flags allow an object to be used for various tasks, like sawing.
+         Objects also support a "requires tools" flag for tools needed to craft
+         something that uses the object (e.g. nails require hammer).
 Crafts: You can require 1 or more tools to create the craft. These tools MUST
         be present, and you can't substitute with a building (e.g. tailor for
         sewing kit).
 
 See &yHELP TOOLS&0 for a full list.
 
-See also: OLC CRAFTS, OLC OBJECTS
+See also: OLC CRAFTS, OLC OBJECTS, OEDIT REQUIRES TOOLS
 #d
 "OEDIT TYPE"
 

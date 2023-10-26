@@ -1116,6 +1116,19 @@ void process_build(char_data *ch, room_data *room, int act_type) {
 	// just emergency check that it's not actually dismantling
 	if (!IS_DISMANTLING(room) && BUILDING_RESOURCES(room)) {
 		if ((res = get_next_resource(ch, BUILDING_RESOURCES(room), can_use_room(ch, room, GUESTS_ALLOWED), TRUE, &found_obj))) {
+			// check required tool
+			if (found_obj && GET_OBJ_REQUIRES_TOOL(found_obj) && !has_all_tools(ch, GET_OBJ_REQUIRES_TOOL(found_obj))) {
+				prettier_sprintbit(GET_OBJ_REQUIRES_TOOL(found_obj), tool_flags, buf);
+				if (count_bits(GET_OBJ_REQUIRES_TOOL(found_obj)) > 1) {
+					msg_to_char(ch, "You need the following tools to use %s: %s\r\n", GET_OBJ_DESC(found_obj, ch, OBJ_DESC_SHORT), buf);
+				}
+				else {
+					msg_to_char(ch, "You need %s %s to use %s.\r\n", AN(buf), buf, GET_OBJ_DESC(found_obj, ch, OBJ_DESC_SHORT));
+				}
+				cancel_action(ch);
+				return;
+			}
+			
 			// if maintaining, remove a "similar" item from the old built-with list -- this is what the maintaining item is replacing
 			if (act_type == ACT_MAINTENANCE && found_obj) {
 				remove_like_item_from_built_with(&GET_BUILT_WITH(room), found_obj);

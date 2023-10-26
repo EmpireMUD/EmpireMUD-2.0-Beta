@@ -5733,6 +5733,7 @@ struct obj_proto_data {
 	int max_scale_level;	// maximum level this obj may be scaled to
 	
 	any_vnum requires_quest;	// can only have obj whilst on quest
+	bitvector_t requires_tool;	// tool required when crafting/building
 	
 	// lists
 	struct extra_descr_data *ex_description;	// extra descriptions

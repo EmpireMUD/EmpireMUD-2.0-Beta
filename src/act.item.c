@@ -691,6 +691,10 @@ void identify_obj_to_char(obj_data *obj, char_data *ch, bool simple) {
 		prettier_sprintbit(GET_OBJ_TOOL_FLAGS(obj), tool_flags, buf);
 		msg_to_char(ch, "Tool type: %s\r\n", buf);
 	}
+	if (GET_OBJ_REQUIRES_TOOL(obj)) {
+		prettier_sprintbit(GET_OBJ_REQUIRES_TOOL(obj), tool_flags, buf);
+		msg_to_char(ch, "Requires tool when crafting: %s\r\n", buf);
+	}
 	
 	if (GET_OBJ_AFF_FLAGS(obj)) {
 		prettier_sprintbit(GET_OBJ_AFF_FLAGS(obj), affected_bits, buf);
