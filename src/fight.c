@@ -1724,7 +1724,12 @@ void perform_resurrection(char_data *ch, char_data *rez_by, room_data *loc, any_
 			set_health(ch, MAX(1, GET_MAX_HEALTH(ch) / 10));
 			set_move(ch, MAX(1, GET_MAX_MOVE(ch) / 10));
 			set_mana(ch, MAX(1, GET_MAX_MANA(ch) / 10));
-			set_blood(ch, IS_VAMPIRE(ch) ? MAX(1, GET_MAX_BLOOD(ch) / 10) : GET_MAX_BLOOD(ch));
+			if (!IS_VAMPIRE(ch)) {
+				set_blood(ch, GET_MAX_BLOOD(ch));
+			}
+			else if (GET_BLOOD(ch) < GET_MAX_BLOOD(ch) / 10) {
+				set_blood(ch, GET_MAX_BLOOD(ch) / 10);
+			}
 
 			msg_to_char(ch, "A strange force lifts you up from the ground, and you seem to float back to your feet...\r\n");
 			msg_to_char(ch, "You feel a rush of blood as your heart starts beating again...\r\n");
