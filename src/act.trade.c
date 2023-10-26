@@ -1347,7 +1347,7 @@ void process_gen_craft(char_data *ch) {
 	}
 	
 	// things that check for & set weapon
-	if (GET_CRAFT_TYPE(type) == CRAFT_TYPE_FORGE && !(weapon = has_tool(ch, TOOL_HAMMER)) && !can_forge(ch)) {
+	if (GET_CRAFT_TYPE(type) == CRAFT_TYPE_FORGE && (!(weapon = has_tool(ch, TOOL_HAMMER)) || !can_forge(ch))) {
 		// can_forge sends its own message
 		cancel_gen_craft(ch);
 	}
