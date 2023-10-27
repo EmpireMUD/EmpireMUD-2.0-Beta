@@ -601,9 +601,14 @@ void perform_alternate(char_data *old, char_data *new) {
 		look_at_room(new);
 	}
 	
-	msg_to_char(new, "\r\n");	// leading \r\n between the look and the tip
-	display_tip_to_char(new);
+	// leading \r\n between the look and the tip/info section
+	msg_to_char(new, "\r\n");
 	
+	display_automessages_on_login(new);
+	
+	if (!PRF_FLAGGED(new, PRF_NO_TUTORIALS)) {
+		display_tip_to_char(new);
+	}
 	if (GET_MAIL_PENDING(new)) {
 		send_to_char("&rYou have mail waiting.&0\r\n", new);
 	}

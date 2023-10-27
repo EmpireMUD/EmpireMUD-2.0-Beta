@@ -2953,7 +2953,9 @@ void nanny(descriptor_data *d, char *arg) {
 			
 			display_automessages_on_login(d->character);
 			
-			display_tip_to_char(d->character);
+			if (!PRF_FLAGGED(d->character, PRF_NO_TUTORIALS)) {
+				display_tip_to_char(d->character);
+			}
 			
 			if (GET_MAIL_PENDING(d->character)) {
 				send_to_char("\r\n\trYou have mail waiting.\t0\r\n", d->character);
