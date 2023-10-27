@@ -41,7 +41,9 @@ set obj %actor.inventory()%
 Enchanted seed plant - desert (default)~
 1 c 2
 plant~
-* default script for obj 601: can only make enchanted forests in the desert
+* desert-only script for obj 601: can only make enchanted forests in the desert
+set allow_sectors 26 71 72
+* basics
 if %actor.obj_target(%arg%)% != %self%
   return 0
   halt
@@ -52,8 +54,16 @@ if !%actor.canuseroom_member()%
   return 1
   halt
 end
-if %room.sector_vnum% != 26
-  %send% %actor% You can only plant @%self% in a desert grove.
+set ok 0
+while %allow_sectors% && !%ok%
+  if %room.sector_vnum% == %arg.car%
+    set ok 1
+  else
+    set allow_sectors %allow_sectors.cdr%
+  end
+done
+if !%ok%
+  %send% %actor% You can only plant @%self% in a desert grove or irrigated forest.
   return 1
   halt
 end
