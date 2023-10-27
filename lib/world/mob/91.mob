@@ -165,6 +165,7 @@ D
    The chimpanzee scratches its gray chin as it ponders you. It reminds you of
 a little old man, hunched over and contemplative.
 ~
+I 0 3012 100.00 2  # BUTCHER: fillet of raw meat
 T 9121
 S
 #9111
@@ -179,6 +180,7 @@ D
 silver. It doesn't look happy that you've invaded its territory, and it beats
 its chest and howls at you as you pass.
 ~
+I 0 3012 100.00 2  # BUTCHER: fillet of raw meat
 T 9118
 S
 #9112

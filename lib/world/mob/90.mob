@@ -982,13 +982,14 @@ sasquatch bigfoot hairy~
 the sasquatch~
 A hairy sasquatch is trying to escape.
 ~
-100 125 djkox 0 3
+100 125 dkox 0 3
 0 0 0 15 -1
 D
    The sasquatch is over eight feet tall, with unusually long arms and legs.
 It is covered in thick brown hair from head to foot, except its goatee, which
 is graying. It sees you and immediately tries to hide!
 ~
+I 0 3012 100.00 2  # BUTCHER: fillet of raw meat
 I 1 9056 100.00 1  # SKIN: sasquatch hide
 S
 #9057
@@ -996,13 +997,14 @@ yeti~
 the yeti~
 The yeti is watching you carefully.
 ~
-100 125 djkox 0 4
+100 125 dkox 0 4
 0 0 0 15 -1
 D
    You can't believe your eyes! Like the son of a lumberjack and a mountain,
 the yeti is huge, broad, and covered in hair. You've never seen anything quite
 like it.
 ~
+I 0 3012 100.00 2  # BUTCHER: fillet of raw meat
 I 1 9057 100.00 1  # SKIN: luxurious yeti fur
 S
 #9058
@@ -1039,6 +1041,7 @@ D
 It's known to stalk the southern deserts, where it sometimes mistakes children
 for its favorite prey.
 ~
+I 0 3012 100.00 1  # BUTCHER: fillet of raw meat
 T 9064
 T 9118
 S
