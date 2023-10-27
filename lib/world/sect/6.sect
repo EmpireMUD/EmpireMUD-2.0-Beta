@@ -1,14 +1,35 @@
 #600
 Enchanted Saplings~
 Some Enchanted Saplings~
-',' 35 ij 2 0 p
+'.' 35 ij 2 0 p
 C
 chant nature~
-D0
-,,,,~
-&p~
+D1
+..&PY&?.~
+&g~
+D1
+.&PY&?..~
+&g~
+D2
+..&PY&?.~
+&g~
+D2
+.&PY&?..~
+&g~
+D3
+..&PY&?.~
+&g~
+D3
+.&PY&?..~
+&g~
+D4
+..&CY&?.~
+&0~
+D4
+.&CY&?..~
+&0~
 E
-9 0 100.00 604
+9 0 100.00 603
 X
 saplings enchanted woods trees around~
    Pink saplings have started to germinate on the rolling plains. They're small
@@ -17,37 +38,39 @@ quickly grow into impressive magical trees.
 ~
 S
 #601
-Clear-Cut Enchanted Forest~
-A Clear-Cut Enchanted Forest~
+Clear-Cut Starwood Forest~
+A Clear-Cut Starwood Forest~
 '.' 35 ij 2 0 p
 C
 dig~
 D1
-&g.&?.&g..~
-&P~
+.&P.&?..~
+&g~
 D1
-&g..&?.&g.~
-&P~
+..&P.&?.~
+&g~
 D2
-&g.&?.&g..~
-&P~
+.&P.&?..~
+&g~
 D2
-&g..&?.&g.~
-&P~
+..&P.&?.~
+&g~
 D3
-&g.&?.&g..~
-&P~
+.&P.&?..~
+&g~
 D3
-&g..&?.&g.~
-&P~
+..&P.&?.~
+&g~
 D4
-&0.&?.&0..~
-&C~
+.&C.&?..~
+&0~
 D4
-&0..&?.&0.~
-&C~
+..&C.&?.~
+&0~
 E
 4 0 0.40 602
+E
+9 0 95.00 606
 E
 22 0 50.00 605
 I 5 103 2.00 1 d  # DIG: yellow lightning stone
@@ -71,39 +94,41 @@ Wisps of mana drift from the tops of the enchanted stumps.
 ~
 S
 #602
-Enchanted Copse~
-An Enchanted Copse~
-'^' 35 ijq 4 d np
+Starwood Copse~
+A Starwood Copse~
+'.' 35 ijq 4 d np
 C
 chop, dig~
 D1
-&g.&?^&g..~
-&P~
+.&P^&?..~
+&g~
 D1
-&g..&?^&g.~
-&P~
+..&P^&?.~
+&g~
 D2
-&g.&?^&g..~
-&P~
+.&P^&?..~
+&g~
 D2
-&g..&?^&g.~
-&P~
+..&P^&?.~
+&g~
 D3
-&g.&?^&g..~
-&P~
+.&P^&?..~
+&g~
 D3
-&g..&?^&g.~
-&P~
+..&P^&?.~
+&g~
 D4
-&0.&?^&0..~
-&C~
+.&C^&?..~
+&0~
 D4
-&0..&?^&0.~
-&C~
+..&C^&?.~
+&0~
 E
 0 0 100.00 601
 E
 4 0 0.40 603
+E
+9 0 95.00 607
 E
 22 0 50.00 605
 I 5 103 2.00 1 d  # DIG: yellow lightning stone
@@ -113,7 +138,7 @@ I 5 1206 2.00 1 d  # DIG: iridescent blue iris
 I 5 102 9.00 1 d  # DIG: flint stone
 I 5 100 83.00 1 d  # DIG: rock
 I 6 606 100.00 1  # FORAGE: handful of elderberries
-I 20 603 100.00 1  # CHOP: enchanted tree
+I 20 603 100.00 1  # CHOP: starwood tree
 M
 9151 3.33 c
 M
@@ -139,57 +164,53 @@ quite put your finger on it. But whatever it is, this copse is full of it.
 ~
 S
 #603
-Enchanted Woods~
-The Enchanted Woods~
-'^' 35 ijq 6 d np
+Starwood Stand~
+A Stand of Starwood~
+'.' 35 ijq 6 d np
 C
 chop, dig~
 D1
-&g.&?^&g.&?^~
-&P~
+.&P^&?.&P^~
+&g~
 D1
-^&g.&?^&g.~
-&P~
+&P^&?.&P^&?.~
+&g~
 D1
-^&g..&?^~
-&P~
+&P^&?..&P^~
+&g~
 D2
-&g.&?^&g.&?^~
-&P~
+.&P^&?.&P^~
+&g~
 D2
-^&g.&?^&g.~
-&P~
+&P^&?.&P^&?.~
+&g~
 D2
-^&g..&?^~
-&P~
+&P^&?..&P^~
+&g~
 D3
-&g.&?^&g.&?^~
-&P~
+.&P^&?.&P^~
+&g~
 D3
-^&g.&?^&g.~
-&P~
+&P^&?.&P^&?.~
+&g~
 D3
-^&g..&?^~
-&P~
+&P^&?..&P^~
+&g~
 D4
-&0.&?^&0.&?^~
-&C~
+.&C^&?.&C^~
+&0~
 D4
-^&0.&?^&0.~
-&C~
+&C^&?.&C^&?.~
+&0~
 D4
-^&0..&?^~
-&C~
+&C^&?..&C^~
+&0~
 E
 0 0 100.00 602
 E
 4 0 0.40 604
 E
-17 0 0.10 602
-E
-17 40 0.10 602
-E
-17 50 0.10 602
+9 0 95.00 608
 E
 22 0 50.00 605
 I 5 103 2.00 1 d  # DIG: yellow lightning stone
@@ -199,7 +220,7 @@ I 5 1206 2.00 1 d  # DIG: iridescent blue iris
 I 5 102 9.00 1 d  # DIG: flint stone
 I 5 100 83.00 1 d  # DIG: rock
 I 6 606 100.00 1  # FORAGE: handful of elderberries
-I 20 603 100.00 1  # CHOP: enchanted tree
+I 20 603 100.00 1  # CHOP: starwood tree
 M
 602 100.00 d
 M
@@ -425,12 +446,6 @@ D4
 E
 0 0 100.00 603
 E
-17 0 0.30 602
-E
-17 40 0.30 602
-E
-17 50 0.30 602
-E
 22 0 50.00 605
 I 5 103 2.00 1 d  # DIG: yellow lightning stone
 I 5 104 2.00 1 d  # DIG: red bloodstone
@@ -439,7 +454,7 @@ I 5 1206 2.00 1 d  # DIG: iridescent blue iris
 I 5 102 9.00 1 d  # DIG: flint stone
 I 5 100 83.00 1 d  # DIG: rock
 I 6 606 100.00 1  # FORAGE: handful of elderberries
-I 20 603 100.00 1  # CHOP: enchanted tree
+I 20 603 100.00 1  # CHOP: starwood tree
 M
 602 100.00 d
 M
@@ -534,6 +549,396 @@ forest dead trees enchanted woods around~
 their bright pink signature color.
 ~
 S
+#606
+Sprouting Starwood Stumps~
+A Field of Sprouting Starwood Stumps~
+'.' 38 ijq 4 a p
+C
+dig~
+D1
+.&Vn&?..~
+&g~
+D1
+..&Vn&?.~
+&g~
+D1
+.&An&?..~
+&g~
+D1
+..&An&?.~
+&g~
+D2
+.&Vn&?..~
+&g~
+D2
+..&Vn&?.~
+&g~
+D2
+.&An&?..~
+&g~
+D2
+..&An&?.~
+&g~
+D3
+.&Vn&?..~
+&g~
+D3
+..&Vn&?.~
+&g~
+D3
+.&An&?..~
+&g~
+D3
+..&An&?.~
+&g~
+D4
+.&Vn&?..~
+&0~
+D4
+..&Vn&?.~
+&0~
+D4
+.&An&?..~
+&0~
+D4
+..&An&?.~
+&0~
+E
+0 0 100.00 601
+E
+20 480 100.00 602
+E
+22 0 50.00 605
+I 5 103 2.00 1 d  # DIG: yellow lightning stone
+I 5 104 2.00 1 d  # DIG: red bloodstone
+I 5 1300 2.00 1 d  # DIG: glowing green seashell
+I 5 1206 2.00 1 d  # DIG: iridescent blue iris
+I 5 102 9.00 1 d  # DIG: flint stone
+I 5 100 83.00 1 d  # DIG: rock
+I 6 606 100.00 1  # FORAGE: handful of elderberries
+I 20 605 100.00 1  # CHOP: pile of dead wood
+M
+9151 3.33 c
+M
+610 5.00 c
+M
+612 5.00 c
+M
+613 5.00 c
+M
+614 3.33 c
+M
+615 3.33 c
+M
+616 0.33 c
+M
+602 100.00 d
+X
+forest woods copse enchanted trees around lights boughs blue pink violet starwood~
+   All around you, the magical starwood stumps have begun sprouting new growth
+in vibrant shades of blue and violet.
+~
+S
+#607
+Sprouting Starwood Thicket~
+A Sprouting Starwood Thicket~
+'.' 6 ijq 4 a p
+C
+dig~
+D1
+.&VW&?.&Vw~
+&g~
+D1
+&Vw&?.&VW&?.~
+&g~
+D1
+&VW&?..&Vw~
+&g~
+D1
+.&AW&?.&Aw~
+&g~
+D1
+&Aw&?.&AW&?.~
+&g~
+D1
+&AW&?..&Aw~
+&g~
+D2
+.&Vw&?.&VW~
+&g~
+D2
+&VW&?.&Vw&?.~
+&g~
+D2
+&Vw&?..&VW~
+&g~
+D2
+.&Aw&?.&AW~
+&g~
+D2
+&AW&?.&Aw&?.~
+&g~
+D2
+&Aw&?..&AW~
+&g~
+D3
+.&VW&?.&Vw~
+&g~
+D3
+&Vw&?.&VW&?.~
+&g~
+D3
+&VW&?..&Vw~
+&g~
+D3
+.&AW&?.&Aw~
+&g~
+D3
+&AW&?.&Aw&?.~
+&g~
+D3
+&Aw&?..&AW~
+&g~
+D4
+.&Vw&?.&VW~
+&0~
+D4
+&Vw&?.&VW&?.~
+&0~
+D4
+&VW&?..&Vw~
+&0~
+D4
+.&AW&?.&Aw~
+&0~
+D4
+&Aw&?.&AW&?.~
+&0~
+D4
+&AW&?..&Aw~
+&0~
+E
+0 0 100.00 602
+E
+20 360 100.00 603
+E
+22 0 50.00 605
+I 5 103 2.00 1 d  # DIG: yellow lightning stone
+I 5 104 2.00 1 d  # DIG: red bloodstone
+I 5 1300 2.00 1 d  # DIG: glowing green seashell
+I 5 1206 2.00 1 d  # DIG: iridescent blue iris
+I 5 102 9.00 1 d  # DIG: flint stone
+I 5 100 83.00 1 d  # DIG: rock
+I 6 606 100.00 1  # FORAGE: handful of elderberries
+I 20 605 100.00 1  # CHOP: pile of dead wood
+M
+9151 3.33 c
+M
+610 5.00 c
+M
+612 5.00 c
+M
+613 5.00 c
+M
+614 3.33 c
+M
+615 3.33 c
+M
+616 0.33 c
+M
+602 100.00 d
+X
+starwood forest woods copse enchanted trees around lights boughs blue pink violet thicket~
+   The fantastical trees around you have begun sprouting magical branches in
+bright blue and violet colors.
+~
+S
+#608
+Sprouting Starwood Grove~
+A Sprouting Grove of Starwood~
+'w' 38 ijq 6 a p
+C
+dig~
+D1
+&g.&?WwW~
+&A~
+D1
+w&g.&?WW~
+&V~
+D1
+Ww&g.&?W~
+&A~
+D1
+wWW&g.~
+&V~
+D1
+&g.&?WWw~
+&A~
+D1
+W&g.&?wW~
+&V~
+D1
+wW&g.&?W~
+&A~
+D1
+WwW&g.~
+&V~
+D1
+&g.&?WwW~
+&A~
+D1
+W&g.&?wW~
+&V~
+D1
+wW&g.&?W~
+&A~
+D1
+WWw&g.~
+&V~
+D2
+&g.&?WwW~
+&A~
+D2
+w&g.&?WW~
+&V~
+D2
+Ww&g.&?W~
+&A~
+D2
+wWW&g.~
+&V~
+D2
+&g.&?WWw~
+&A~
+D2
+W&g.&?wW~
+&V~
+D2
+wW&g.&?W~
+&A~
+D2
+WwW&g.~
+&V~
+D2
+&g.&?WwW~
+&A~
+D2
+W&g.&?wW~
+&V~
+D2
+wW&g.&?W~
+&A~
+D2
+WWw&g.~
+&V~
+D3
+&g.&?WwW~
+&A~
+D3
+w&g.&?WW~
+&V~
+D3
+Ww&g.&?W~
+&A~
+D3
+wWW&g.~
+&V~
+D3
+&g.&?WWw~
+&A~
+D3
+W&g.&?wW~
+&V~
+D3
+wW&g.&?W~
+&A~
+D3
+WwW&g.~
+&V~
+D3
+&g.&?WwW~
+&A~
+D3
+W&g.&?wW~
+&V~
+D3
+wW&g.&?W~
+&A~
+D3
+WWw&g.~
+&V~
+D4
+&0.&?WwW~
+&A~
+D4
+w&0.&?WW~
+&V~
+D4
+Ww&0.&?W~
+&A~
+D4
+wWW&0.~
+&V~
+D4
+&0.&?WWw~
+&A~
+D4
+W&0.&?wW~
+&V~
+D4
+wW&0.&?W~
+&A~
+D4
+WwW&0.~
+&V~
+D4
+&0.&?WwW~
+&A~
+D4
+W&0.&?wW~
+&V~
+D4
+wW&0.&?W~
+&A~
+D4
+WWw&0.~
+&V~
+E
+0 0 100.00 603
+E
+20 240 100.00 604
+E
+22 0 50.00 605
+I 5 103 2.00 1 d  # DIG: yellow lightning stone
+I 5 104 2.00 1 d  # DIG: red bloodstone
+I 5 1300 2.00 1 d  # DIG: glowing green seashell
+I 5 1206 2.00 1 d  # DIG: iridescent blue iris
+I 5 102 9.00 1 d  # DIG: flint stone
+I 5 100 83.00 1 d  # DIG: rock
+I 6 606 100.00 1  # FORAGE: handful of elderberries
+I 20 605 100.00 1  # CHOP: pile of dead wood
+M
+602 100.00 d
+M
+9151 6.66 c
+M
+610 10.00 c
+M
+612 10.00 c
+M
+613 10.00 c
+M
+614 6.66 c
+M
+615 6.66 c
+M
+616 0.66 c
+X
+sprouting starwood forest woods copse enchanted trees around lights boughs blue pink violet~
+   The enchanted trees around you have begun to sprout new branches in shades
+of blue and violet.
+~
+S
 #610
 Weirdwood Saplings~
 Among the Weirdwood Saplings~
@@ -565,7 +970,7 @@ D4
 .&Vw&?..~
 &y~
 E
-9 0 100.00 614
+9 0 100.00 613
 X
 weirdwood saplings woods trees around~
    Violet saplings have begun to germinate in the desert sands. They're small
@@ -1408,9 +1813,9 @@ S
 #622
 Sprouting Weirdwood Stand~
 A Stand of Sprouting Weirdwood Trees~
-'.' 36 ikq 4 a np
+'.' 36 ikq 4 a p
 C
-chop, dig~
+dig~
 D1
 &PY&?.&Pn&?.~
 &Y~
@@ -1551,9 +1956,9 @@ S
 #623
 Sprouting Weirdwood Forest~
 A Sprouting Forest of Weirdwood~
-'.' 35 ikq 6 a np
+'n' 35 ikq 6 a p
 C
-chop, dig~
+dig~
 D1
 &Y.&?YnY~
 &P~
