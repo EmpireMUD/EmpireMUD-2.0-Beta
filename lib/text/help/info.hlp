@@ -1648,6 +1648,11 @@ TIP TIPS "TIP OF THE DAY" HINT
 Usage:  tip
 
 This command will give you a helpful tip about the game.
+
+You also receive an automatic tip when you log into the game -- unless you
+toggle tutorials off.
+
+See also: TUTORIALS
 #
 TO-HIT "TO HIT" TOHIT "HIT CHANCE" "HIT CAP"
 
