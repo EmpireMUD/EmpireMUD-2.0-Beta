@@ -568,14 +568,14 @@ Common types of lumber are:
 
 See also: COMPONENT, CHOP, MAGEWOOD, SAW
 #
-MAGEWOOD "MAGE WOOD" "ENCHANTED TREE" "ENCHANTED FOREST" "ENCHANTED WOODS" "ENCHANTED COPSE" "CRYSTAL SEED" "PRISMATIC SEED" "STRANGE CRYSTAL SEED" WEIRDWOOD "WEIRD WOOD"
+MAGEWOOD "MAGE WOOD" "ENCHANTED TREE" "ENCHANTED FOREST" "ENCHANTED WOODS" "ENCHANTED COPSE" "CRYSTAL SEED" "PRISMATIC SEED" "STRANGE CRYSTAL SEED" WEIRDWOOD "WEIRD WOOD" STARWOOD "STAR WOOD"
 
 Magewood is a type of lumber sawn from the trees of the enchanted forest. This
 type of forest is extremely rare. To grow it, you must find the strange crystal
 seed, enchant it (Enchant Tools), plant it, then use the chant of nature to
 grow it.
 
-Enchanted Forests are protected from over-chopping because they will grow back
+Enchanted forests are protected from over-chopping because they will grow back
 even from stumps. Be sure to claim the forest, though, as necrovandal cultists
 will quickly detect and destroy any unclaimed enchanted forest tiles.
 

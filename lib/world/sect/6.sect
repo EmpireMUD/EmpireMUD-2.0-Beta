@@ -83,7 +83,7 @@ I 6 606 100.00 1  # FORAGE: handful of elderberries
 M
 602 100.00 d
 X
-forest enchanted clearcut clear-cut cut stumps enchanted trees around~
+starwood woods forest enchanted clearcut clear-cut cut stumps enchanted trees around~
    The forest has been reduced to mere stumps here, and the field is full of
 them. It is not completely devoid of life, however, as you can see wisps of
 mana sublimating off of the stumps. Life will return.
@@ -156,7 +156,7 @@ M
 M
 602 100.00 d
 X
-forest woods copse enchanted trees around lights boughs blue pink violet~
+starwood forest woods copse enchanted trees around lights boughs blue pink violet~
    You find yourself in the middle of a forest of towering pink trees. Light
 dances through the canopy in shades of blue and violet, but you can't tell if
 the trees are catching it or making it. There's a strange sense of... You can't
@@ -238,7 +238,7 @@ M
 M
 616 0.66 c
 X
-forest woods copse enchanted trees around lights boughs blue pink violet~
+starwood forest woods copse enchanted trees around lights boughs blue pink violet~
    You find yourself in the middle of a forest of towering pink trees. Light
 dances through the canopy in shades of blue and violet, but you can't tell if
 the trees are catching it or making it. There's a strange sense of... You can't
@@ -472,7 +472,7 @@ M
 M
 616 1.00 c
 X
-forest woods copse enchanted trees around lights boughs blue pink violet~
+starwood forest woods copse enchanted trees around lights boughs blue pink violet~
    You find yourself in the middle of a forest of towering pink trees. Light
 dances through the canopy in shades of blue and violet, but you can't tell if
 the trees are catching it or making it. There's a strange sense of... You can't
@@ -634,7 +634,7 @@ M
 M
 602 100.00 d
 X
-forest woods copse enchanted trees around lights boughs blue pink violet starwood~
+sprouting starwood forest woods copse enchanted trees around lights boughs blue pink violet~
    All around you, the magical starwood stumps have begun sprouting new growth
 in vibrant shades of blue and violet.
 ~
@@ -748,7 +748,7 @@ M
 M
 602 100.00 d
 X
-starwood forest woods copse enchanted trees around lights boughs blue pink violet thicket~
+sprouting starwood forest woods copse enchanted trees around lights boughs blue pink violet thicket~
    The fantastical trees around you have begun sprouting magical branches in
 bright blue and violet colors.
 ~
