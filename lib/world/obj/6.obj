@@ -7,7 +7,7 @@ it catches the light. Legend says that if a sorcerer were to enchant a seed
 like this with a prismatic crystal, it would grow into an entire enchanted
 forest. To enchant the seed, use 'enchant seed'. This requires Enchant Tools.
 ~
-3 0 a 0 0 6
+3 0 a 0 0 7
 0 0 0
 12 0
 C
@@ -15,6 +15,7 @@ C
 R
 4 5164 0
 T 600
+T 605
 S
 #601
 seed seeds prismatic~
@@ -26,10 +27,11 @@ the seed has been infused with magic, you need only plant it and use the chant
 of nature to bring it to life. Be sure to claim the tile you plant it on, as
 powerful necrovandals seek out unclaimed enchanted forests.
 ~
-3 j a 0 0 5
+3 j a 0 0 6
 0 0 0
 12 0
 T 603
+T 605
 S
 #602
 crystal prismatic gems~
@@ -382,5 +384,22 @@ what's inside. Try typing 'use bottle' to get the minipet inside.
 19 0 a 0 0 2
 620 0 0
 13 0
+S
+#621
+seed nascent crystal~
+a nascent crystal seed~
+A nascent crystal seed has been discarded here.~
+   The seed is pristine, like an unawakened gemstone waiting to be imbued with
+magical energy. Take the seed to an enchanted forest and 'awaken' it to absorb
+the magic of the forest into it.
+~
+3 0 a 0 0 2
+0 0 0
+12 0
+C
+1 1
+R
+4 5164 0
+T 621
 S
 $

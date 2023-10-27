@@ -51,7 +51,7 @@ a starwood forest for your empire. Be sure to claim the forest right away,
 because a mysterious cult of necrovandals is known to destroy unclaimed magical
 forests. Completing this goal earns your empire more territory per greatness.
 ~
-6 4 0 5 d
+7 4 0 5 c
 K 5 5
 W
 34 604 0 6 -
@@ -218,7 +218,7 @@ forest right away, because a mysterious cult of necrovandals is known to
 destroy unclaimed magical forests. You will need to chop down some of the
 weirdwood and saw it into magewood to complete this goal.
 ~
-6 4 0 5 0
+7 4 0 5 c
 K 5 5
 W
 34 619 0 6 -
@@ -285,5 +285,20 @@ W
 25 618 0 1 a
 W
 34 619 0 10000 a
+S
+#4036
+The Power to Move Forests~
+   Your empire's members learn the ancient and arcane art of crafting crystal
+seeds -- the same seeds used to grow enchanted forests. But this is not without
+cost. Crafting the nascent crystal seed will require a powerful magic gem, a
+fair amount of mana, and magewood aplenty. The crafter will also need to
+possess the ability to Enchant Tools. Once crafted, the nascent crystal seed
+must be awakened in a magical forest, draining that forest of its magic but
+allowing the seed to be enchanted and planted elsewhere.
+~
+1 4 50 0 b
+K 2 621
+P 4011
+P 4031
 S
 $
