@@ -2026,9 +2026,11 @@ int determine_best_scale_level(char_data *ch, bool check_group) {
 	// level caps for sub-100 scaling -- TODO this is very similar to what's done in can_wear_item()
 	int level_ranges[] = { BASIC_SKILL_CAP, SPECIALTY_SKILL_CAP, CLASS_SKILL_CAP, -1 };	// terminate with -1
 	
-	// determine who we're really scaling to
-	while (IS_NPC(scale_to) && GET_LEADER(scale_to)) {
-		scale_to = GET_LEADER(scale_to);
+	// determine who we're really scaling to (ONLY if check_group)
+	if (check_group) {
+		while (IS_NPC(scale_to) && GET_LEADER(scale_to)) {
+			scale_to = GET_LEADER(scale_to);
+		}
 	}
 	
 	// now determine the ideal level based on scale_to
