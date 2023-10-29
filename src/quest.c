@@ -633,7 +633,7 @@ void get_tracker_display(struct req_data *tracker, char *save_buffer) {
 	LL_FOREACH(tracker, task) {
 		if (last_group != task->group) {
 			if (task->group) {
-				sprintf(save_buffer + strlen(save_buffer), "  %sAll of:\r\n", (count > 0 ? "or " : ""));
+				sprintf(save_buffer + strlen(save_buffer), "  %s:\r\n", (count > 0 ? "Or all of" : "All of"));
 			}
 			last_group = task->group;
 			sub = 0;
