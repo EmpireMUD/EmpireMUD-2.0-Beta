@@ -296,9 +296,83 @@ possess the ability to Enchant Tools. Once crafted, the nascent crystal seed
 must be awakened in a magical forest, draining that forest of its magic but
 allowing the seed to be enchanted and planted elsewhere.
 ~
-1 4 50 0 b
+2 4 50 0 b
 K 2 621
-P 4011
-P 4031
+P 4037
+S
+#4037
+Famous Forests~
+   Your empire has drawn the attention of the world as it now controls forests
+of both starwood and weirdwood -- two rare and powerful trees sought by mages
+the world over! Guard these precious resources carefully, for even a single
+unclaimed tile will not escape the attention of the necrovandals who seek to
+destroy them.
+~
+2 4 0 30 d
+K 7 5
+W
+25 601 0 1 a
+W
+25 611 0 1 a
+W
+25 601 0 1 b
+W
+25 612 0 1 b
+W
+25 601 0 1 c
+W
+25 613 0 1 c
+W
+25 601 0 1 d
+W
+25 614 0 1 d
+W
+25 602 0 1 e
+W
+25 611 0 1 e
+W
+25 602 0 1 f
+W
+25 612 0 1 f
+W
+25 602 0 1 g
+W
+25 613 0 1 g
+W
+25 602 0 1 h
+W
+25 614 0 1 h
+W
+25 603 0 1 i
+W
+25 611 0 1 i
+W
+25 603 0 1 j
+W
+25 612 0 1 j
+W
+25 603 0 1 k
+W
+25 613 0 1 k
+W
+25 603 0 1 l
+W
+25 614 0 1 l
+W
+25 604 0 1 m
+W
+25 611 0 1 m
+W
+25 604 0 1 n
+W
+25 612 0 1 n
+W
+25 604 0 1 o
+W
+25 613 0 1 o
+W
+25 604 0 1 p
+W
+25 614 0 1 p
 S
 $
