@@ -582,9 +582,15 @@ will quickly detect and destroy any unclaimed enchanted forest tiles.
 The only way to remove the forest tiles is to abandon them and let the necro-
 vandals destroy them.
 
+Chant of Nature will speed up the growth of enchanted forest tiles. Once the
+chant is completed, the tiles will appear to be "sprouting" for 4 to 8 hours
+(depending on the amount of growth on the tile) and then will grow to the next
+size. If the tile is chopped while still sprouting, it yields dead wood and
+reverts to the previous size.
+
 This wood is generally used in crafts in the 200-300 level range.
 
-See also: ABANDON, CHOP, CLAIM, ENCHANT TOOLS, SAW
+See also: ABANDON, CHANT OF NATURE, CHOP, CLAIM, ENCHANT TOOLS, SAW
 #
 METALS INGOTS BARS "METAL COMPONENT"
 
