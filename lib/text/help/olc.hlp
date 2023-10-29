@@ -6904,6 +6904,7 @@ The following progress goal flags are available:
  &cHIDDEN&0 - Will not show up in lists until completed.
  &cNO-ANNOUNCE&0 - Does not announce/log completion.
  &cNO-PREVIEW&0 - Mortals can't view this goal before starting it.
+ &cNO-TRACKER&0 - Mortals can't see the detailed tracker while in-progress.
 
 See also: OLC PROGRESS
 #d

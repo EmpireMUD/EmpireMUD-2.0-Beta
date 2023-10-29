@@ -6978,7 +6978,7 @@ ACMD(do_progress) {
 			msg_to_char(ch, "Rewards:\r\n%s", buf);
 		}
 		if ((goal = get_current_goal(emp, PRG_VNUM(prg)))) {
-			if (PRG_FLAGGED(prg, PRG_NO_TRACKER)) {
+			if (PRG_FLAGGED(prg, PRG_NO_TRACKER) && !IS_IMMORTAL(ch)) {
 				count_quest_tasks(goal->tracker, &complete, &total);
 				msg_to_char(ch, "Progress: %d/%d\r\n", complete, total);
 			}
