@@ -346,15 +346,17 @@ int count_owned_homes(empire_data *emp) {
 * @return int The number of tiles with that sector vnum, owned by emp.
 */
 int count_owned_sector(empire_data *emp, sector_vnum vnum) {
-	room_data *room, *next_room;
+	struct sector_index_type *idx;
+	struct map_data *map;
 	int count = 0;	// ah ah ah
 	
 	if (!emp || vnum == NOTHING) {
 		return count;
 	}
 	
-	HASH_ITER(hh, world_table, room, next_room) {
-		if (ROOM_OWNER(room) == emp && GET_SECT_VNUM(SECT(room)) == vnum) {
+	idx = find_sector_index(vnum);
+	LL_FOREACH2(idx->sect_rooms, map, next_in_sect) {
+		if (map->room && ROOM_OWNER(map->room) == emp) {
 			++count;
 		}
 	}
