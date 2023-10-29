@@ -3012,12 +3012,13 @@ const char *progress_types[] = {
 
 // PRG_x: progress flags
 const char *progress_flags[] = {
-	"IN-DEVELOPMENT",
+	"IN-DEVELOPMENT",	// 0
 	"PURCHASABLE",
 	"NO-AUTOSTART",
 	"HIDDEN",
 	"NO-ANNOUNCE",
-	"NO-PREVIEW",
+	"NO-PREVIEW",	// 5
+	"NO-TRACKER",
 	"\n"
 };
 

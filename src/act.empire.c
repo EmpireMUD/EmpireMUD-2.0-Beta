@@ -6978,8 +6978,14 @@ ACMD(do_progress) {
 			msg_to_char(ch, "Rewards:\r\n%s", buf);
 		}
 		if ((goal = get_current_goal(emp, PRG_VNUM(prg)))) {
-			get_tracker_display(goal->tracker, buf);
-			msg_to_char(ch, "Progress:\r\n%s", buf);
+			if (PRG_FLAGGED(prg, PRG_NO_TRACKER)) {
+				count_quest_tasks(goal->tracker, &complete, &total);
+				msg_to_char(ch, "Progress: %d/%d\r\n", complete, total);
+			}
+			else {
+				get_tracker_display(goal->tracker, buf);
+				msg_to_char(ch, "Progress:\r\n%s", buf);
+			}
 		}
 	}
 	

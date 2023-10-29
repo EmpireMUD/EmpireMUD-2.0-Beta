@@ -2592,6 +2592,7 @@ typedef enum {
 #define PRG_HIDDEN  BIT(3)	// d. progress does not show up
 #define PRG_NO_ANNOUNCE  BIT(4)	// e. never announces when this goal is achieved
 #define PRG_NO_PREVIEW  BIT(5)	// f. cannot view it until you're on it
+#define PRG_NO_TRACKER  BIT(6)	// g. hide the tracker from the player
 
 
 // PRG_PERK_x: progress perks
