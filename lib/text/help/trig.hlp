@@ -404,8 +404,12 @@ the mob and set off its load triggers.
 Buildings call their load triggers when first constructed, even before they
 are complete.
 
+If an object, mob, or vehicle will purge itself in its own load trigger, you
+should consider doing a "wait 1" (or longer) before purging it.
+
 Only the FIRST load trigger on a mob or room will run unless it also has the
-Allow-Multiple type. This is not implemented for objects or vehicles.
+Allow-Multiple type. On objects or vehicles, only the first trigger will run
+and there is currently no way to override this.
 
 See also: RTRIG COMPLETE, ALLOW-MULTIPLE
 #d

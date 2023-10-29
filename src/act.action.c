@@ -661,14 +661,15 @@ void cancel_minting(char_data *ch) {
 void cancel_morphing(char_data *ch) {
 	morph_data *morph = morph_proto(GET_ACTION_VNUM(ch, 0));
 	obj_data *obj;
+	int obj_ok;
 	
 	if (morph && MORPH_FLAGGED(morph, MORPHF_CONSUME_OBJ) && MORPH_REQUIRES_OBJ(morph) != NOTHING) {
 		obj = read_object(MORPH_REQUIRES_OBJ(morph), TRUE);
 		scale_item_to_level(obj, 1);	// minimum level
 		obj_to_char(obj, ch);
-		load_otrigger(obj);
+		obj_ok = load_otrigger(obj);
 		
-		if (!IS_IMMORTAL(ch) && OBJ_FLAGGED(obj, OBJ_BIND_FLAGS)) {	// bind when used (or gotten)
+		if (!IS_IMMORTAL(ch) && obj_ok && OBJ_FLAGGED(obj, OBJ_BIND_FLAGS)) {	// bind when used (or gotten)
 			bind_obj_to_player(obj, ch);
 			reduce_obj_binding(obj, ch);
 		}
@@ -811,13 +812,13 @@ void start_panning(char_data *ch, int dir) {
 INTERACTION_FUNC(finish_chopping) {
 	char buf[MAX_STRING_LENGTH], *cust;
 	obj_data *obj = NULL;
-	int num;
+	int num, obj_ok = 0;
 	
 	for (num = 0; num < interaction->quantity; ++num) {
 		obj = read_object(interaction->vnum, TRUE);
 		scale_item_to_level(obj, 1);	// minimum level
 		obj_to_char_or_room(obj, ch);
-		load_otrigger(obj);
+		obj_ok = load_otrigger(obj);
 	}
 	
 	// mark gained
@@ -826,7 +827,7 @@ INTERACTION_FUNC(finish_chopping) {
 	}
 	
 	// messaging
-	if (obj) {
+	if (obj_ok && obj) {
 		cust = obj_get_custom_message(obj, OBJ_CUSTOM_RESOURCE_TO_CHAR);
 		if (interaction->quantity > 1) {
 			sprintf(buf, "%s (x%d)", cust ? cust : "With a loud crack, $p falls!", interaction->quantity);
@@ -848,7 +849,7 @@ INTERACTION_FUNC(finish_digging) {
 	obj_vnum vnum = interaction->vnum;
 	obj_data *obj = NULL;
 	char *cust;
-	int num;
+	int num, obj_ok = 0;
 	
 	// depleted? (uses rock for all types except clay)
 	if (get_depletion(inter_room, DPLTN_DIG) >= DEPLETION_LIMIT(inter_room)) {
@@ -860,7 +861,7 @@ INTERACTION_FUNC(finish_digging) {
 			obj = read_object(vnum, TRUE);
 			scale_item_to_level(obj, 1);	// minimum level
 			obj_to_char_or_room(obj, ch);
-			load_otrigger(obj);
+			obj_ok = load_otrigger(obj);
 			
 			// add to depletion and 1/4 chance of adding a second one, to mix up the depletion values
 			add_depletion(inter_room, DPLTN_DIG, TRUE);
@@ -871,7 +872,7 @@ INTERACTION_FUNC(finish_digging) {
 			add_production_total(GET_LOYALTY(ch), interaction->vnum, interaction->quantity);
 		}
 		
-		if (obj) {
+		if (obj_ok && obj) {
 			// to-char
 			cust = obj_get_custom_message(obj, OBJ_CUSTOM_RESOURCE_TO_CHAR);
 			if (interaction->quantity > 1) {
@@ -896,7 +897,7 @@ INTERACTION_FUNC(finish_fishing) {
 	char buf[MAX_STRING_LENGTH];
 	char *to_char = NULL, *to_room = NULL;
 	obj_data *obj = NULL, *tool;
-	int num;
+	int num, obj_ok = 0;
 	
 	const char *default_to_char = "You catch $p!";
 	const char *default_to_room = "$n catches $p!";
@@ -905,7 +906,7 @@ INTERACTION_FUNC(finish_fishing) {
 		obj = read_object(interaction->vnum, TRUE);
 		scale_item_to_level(obj, 1);	// minimum level
 		obj_to_char(obj, ch);
-		load_otrigger(obj);
+		obj_ok = load_otrigger(obj);
 	}
 	
 	// mark gained
@@ -914,7 +915,7 @@ INTERACTION_FUNC(finish_fishing) {
 	}
 	
 	// messaging
-	if (obj) {
+	if (obj_ok && obj) {
 		// check for custom messages on their fishing tool
 		if ((tool = has_tool(ch, TOOL_FISHING))) {
 			to_char = obj_get_custom_message(tool, OBJ_CUSTOM_FISH_TO_CHAR);
@@ -945,7 +946,7 @@ INTERACTION_FUNC(finish_fishing) {
 INTERACTION_FUNC(finish_foraging) {
 	obj_data *obj = NULL;
 	obj_vnum vnum = interaction->vnum;
-	int iter, num = interaction->quantity;
+	int iter, num = interaction->quantity, obj_ok = 0;
 	char *cust;
 
 	// give objs
@@ -954,7 +955,7 @@ INTERACTION_FUNC(finish_foraging) {
 		scale_item_to_level(obj, 1);	// minimum level
 		obj_to_char_or_room(obj, ch);
 		add_depletion(inter_room, DPLTN_FORAGE, TRUE);
-		load_otrigger(obj);
+		obj_ok = load_otrigger(obj);
 	}
 	
 	// mark gained
@@ -962,7 +963,7 @@ INTERACTION_FUNC(finish_foraging) {
 		add_production_total(GET_LOYALTY(ch), vnum, num);
 	}
 	
-	if (obj) {
+	if (obj_ok && obj) {
 		cust = obj_get_custom_message(obj, OBJ_CUSTOM_RESOURCE_TO_CHAR);
 		if (num > 1) {
 			sprintf(buf, "%s (x%d)", cust ? cust : "You find $p!", num);
@@ -986,13 +987,13 @@ INTERACTION_FUNC(finish_foraging) {
 INTERACTION_FUNC(finish_gathering) {
 	obj_data *obj = NULL;
 	char *cust;
-	int iter;
+	int iter, obj_ok = 0;
 	
 	for (iter = 0; iter < interaction->quantity; ++iter) {
 		obj = read_object(interaction->vnum, TRUE);
 		scale_item_to_level(obj, 1);	// minimum level
 		obj_to_char_or_room(obj, ch);
-		load_otrigger(obj);
+		obj_ok = load_otrigger(obj);
 		add_depletion(IN_ROOM(ch), DPLTN_GATHER, TRUE);
 	}
 	
@@ -1001,7 +1002,7 @@ INTERACTION_FUNC(finish_gathering) {
 		add_production_total(GET_LOYALTY(ch), interaction->vnum, interaction->quantity);
 	}
 	
-	if (obj) {
+	if (obj_ok && obj) {
 		cust = obj_get_custom_message(obj, OBJ_CUSTOM_RESOURCE_TO_CHAR);
 		if (interaction->quantity > 1) {
 			sprintf(buf, "%s (x%d)", cust ? cust : "You find $p!", interaction->quantity);
@@ -1027,7 +1028,7 @@ INTERACTION_FUNC(finish_gathering) {
 
 INTERACTION_FUNC(finish_harvesting) {
 	crop_data *cp;
-	int count, num;
+	int count, num, obj_ok = 0;
 	obj_data *obj = NULL;
 	char *cust;
 		
@@ -1040,7 +1041,7 @@ INTERACTION_FUNC(finish_harvesting) {
 			obj = read_object(interaction->vnum, TRUE);
 			scale_item_to_level(obj, 1);	// minimum level
 			obj_to_char_or_room(obj, ch);
-			load_otrigger(obj);
+			obj_ok = load_otrigger(obj);
 		}
 		
 		// mark gained
@@ -1049,7 +1050,7 @@ INTERACTION_FUNC(finish_harvesting) {
 		}
 		
 		// info messaging
-		if (obj) {
+		if (obj_ok && obj) {
 			cust = obj_get_custom_message(obj, OBJ_CUSTOM_RESOURCE_TO_CHAR);
 			if (num > 1) {
 				sprintf(buf, "%s (x%d)", cust ? cust : "You got $p!", num);
@@ -1106,13 +1107,13 @@ INTERACTION_FUNC(finish_panning) {
 	char buf[MAX_STRING_LENGTH];
 	obj_data *obj = NULL;
 	char *cust;
-	int num;
+	int num, obj_ok = 0;
 	
 	for (num = 0; num < interaction->quantity; ++num) {
 		obj = read_object(interaction->vnum, TRUE);
 		scale_item_to_level(obj, 1);	// minimum level
 		obj_to_char(obj, ch);
-		load_otrigger(obj);
+		obj_ok = load_otrigger(obj);
 	}
 	
 	// mark gained
@@ -1121,7 +1122,7 @@ INTERACTION_FUNC(finish_panning) {
 	}
 	
 	// messaging
-	if (obj) {
+	if (obj_ok && obj) {
 		cust = obj_get_custom_message(obj, OBJ_CUSTOM_RESOURCE_TO_CHAR);
 		if (interaction->quantity > 1) {
 			sprintf(buf, "%s (x%d)", cust ? cust : "You find $p!", interaction->quantity);
@@ -1145,7 +1146,7 @@ INTERACTION_FUNC(finish_scraping) {
 	char buf[MAX_STRING_LENGTH];
 	obj_data *load = NULL;
 	char *cust;
-	int num;
+	int num, obj_ok = 0;
 	
 	for (num = 0; num < interaction->quantity; ++num) {
 		// load
@@ -1163,7 +1164,7 @@ INTERACTION_FUNC(finish_scraping) {
 		else {
 			obj_to_room(load, IN_ROOM(ch));
 		}
-		load_otrigger(load);
+		obj_ok = load_otrigger(load);
 	}
 	
 	// mark gained
@@ -1171,7 +1172,7 @@ INTERACTION_FUNC(finish_scraping) {
 		add_production_total(GET_LOYALTY(ch), interaction->vnum, interaction->quantity);
 	}
 	
-	if (load) {
+	if (obj_ok && load) {
 		cust = obj_get_custom_message(load, OBJ_CUSTOM_RESOURCE_TO_CHAR);
 		if (interaction->quantity > 1) {
 			sprintf(buf, "%s (x%d)", cust ? cust : "You get $p.", interaction->quantity);
@@ -3960,7 +3961,7 @@ INTERACTION_FUNC(finish_gen_interact_room) {
 	char buf[MAX_STRING_LENGTH];
 	obj_data *obj = NULL;
 	char *cust;
-	int num, amount;
+	int num, amount, obj_ok = 0;
 	
 	// safety check
 	if (!data) {
@@ -3980,7 +3981,7 @@ INTERACTION_FUNC(finish_gen_interact_room) {
 		obj = read_object(interaction->vnum, TRUE);
 		scale_item_to_level(obj, 1);	// minimum level
 		obj_to_char_or_room(obj, ch);
-		load_otrigger(obj);
+		obj_ok = load_otrigger(obj);
 	}
 	
 	// mark gained
@@ -3998,7 +3999,7 @@ INTERACTION_FUNC(finish_gen_interact_room) {
 		}
 	}
 	
-	if (obj) {
+	if (obj_ok && obj) {
 		cust = obj_get_custom_message(obj, OBJ_CUSTOM_RESOURCE_TO_CHAR);
 		if (cust || data->msg.finish[0]) {
 			if (amount > 1) {

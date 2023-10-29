@@ -3011,8 +3011,9 @@ void perform_npc_tie(char_data *ch, char_data *victim, int subcmd) {
 		if (GET_ROPE_VNUM(victim) != NOTHING && (rope = read_object(GET_ROPE_VNUM(victim), TRUE))) {
 			obj_to_char(rope, ch);
 			scale_item_to_level(rope, 1);	// minimum scale
-			load_otrigger(rope);
-			act("You receive $p.", FALSE, ch, rope, NULL, TO_CHAR);
+			if (load_otrigger(rope)) {
+				act("You receive $p.", FALSE, ch, rope, NULL, TO_CHAR);
+			}
 		}
 		GET_ROPE_VNUM(victim) = NOTHING;
 		request_char_save_in_world(victim);

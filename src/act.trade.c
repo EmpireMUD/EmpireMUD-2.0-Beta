@@ -1109,7 +1109,7 @@ void finish_gen_craft(char_data *ch) {
 	struct resource_data *res;
 	ability_data *cft_abil;
 	obj_data *proto, *temp_obj, *obj = NULL;
-	int iter, amt = 1;
+	int iter, amt = 1, obj_ok = 0;
 	
 	cft_abil = find_ability_by_vnum(GET_CRAFT_ABILITY(type));
 	is_master = (cft_abil && ABIL_MASTERY_ABIL(cft_abil) != NOTHING && has_ability(ch, ABIL_MASTERY_ABIL(cft_abil)));
@@ -1139,7 +1139,7 @@ void finish_gen_craft(char_data *ch) {
 		}
 		scale_item_to_level(obj, get_craft_scale_level(ch, type));
 		
-		load_otrigger(obj);
+		obj_ok = load_otrigger(obj);
 	}
 	else if (GET_CRAFT_QUANTITY(type) > 0) {
 		// NON-SOUP (careful, soup uses quantity for maximum contents
@@ -1169,7 +1169,7 @@ void finish_gen_craft(char_data *ch) {
 					obj_to_room(obj, IN_ROOM(ch));
 				}
 				
-				load_otrigger(obj);
+				obj_ok = load_otrigger(obj);
 			}
 			
 			// mark for the empire
@@ -1180,7 +1180,12 @@ void finish_gen_craft(char_data *ch) {
 	}
 
 	// send message -- soup uses quantity for amount of soup instead of multiple items
-	if (amt > 1 && !IS_SET(GET_CRAFT_FLAGS(type), CRAFT_SOUP)) {
+	if (!obj_ok) {
+		// object self-purged?
+		sprintf(buf, "You finish %s!", gen_craft_data[GET_CRAFT_TYPE(type)].verb);
+		act(buf, FALSE, ch, NULL, NULL, TO_CHAR);
+	}
+	else if (amt > 1 && !IS_SET(GET_CRAFT_FLAGS(type), CRAFT_SOUP)) {
 		sprintf(buf, "You finish %s $p (x%d)!", gen_craft_data[GET_CRAFT_TYPE(type)].verb, amt);
 		act(buf, FALSE, ch, obj, 0, TO_CHAR);
 	}
@@ -1188,9 +1193,16 @@ void finish_gen_craft(char_data *ch) {
 		sprintf(buf, "You finish %s $p!", gen_craft_data[GET_CRAFT_TYPE(type)].verb);
 		act(buf, FALSE, ch, obj, 0, TO_CHAR);
 	}
-
-	sprintf(buf, "$n finishes %s $p!", gen_craft_data[GET_CRAFT_TYPE(type)].verb);
-	act(buf, FALSE, ch, obj, 0, TO_ROOM);
+	
+	// to-room message
+	if (obj_ok) {
+		sprintf(buf, "$n finishes %s $p!", gen_craft_data[GET_CRAFT_TYPE(type)].verb);
+		act(buf, FALSE, ch, obj, NULL, TO_ROOM);
+	}
+	else {
+		sprintf(buf, "$n finishes %s!", gen_craft_data[GET_CRAFT_TYPE(type)].verb);
+		act(buf, FALSE, ch, NULL, NULL, TO_ROOM);
+	}
 	
 	if (GET_CRAFT_ABILITY(type) != NO_ABIL) {
 		gain_ability_exp(ch, GET_CRAFT_ABILITY(type), 33.4);

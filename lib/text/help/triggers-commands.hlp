@@ -577,6 +577,10 @@ given, then all objects and mobs (but not vehicles) in the room will be
 removed. If there is an argument, only that thing will be  purged. Players
 cannot be purged.
 
+If something purges itself in its own "load" (or "get", or similar) trigger,
+consider doing a "wait 1" before the purge to allow other scripts and code to
+run.
+
 The "purge instance" feature lets you purge ALL mobs or vehicles by vnum from
 the instance. It can also purge objects inside the instance by vnum, but this
 will ONLY work on objects that are on the ground inside. In the future, other

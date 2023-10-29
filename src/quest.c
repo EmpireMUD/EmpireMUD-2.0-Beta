@@ -710,7 +710,8 @@ void give_quest_rewards(char_data *ch, struct quest_reward *list, int reward_lev
 			}
 			case QR_OBJECT: {
 				obj_data *obj = NULL;
-				int iter;
+				int iter, obj_ok = 0;
+				
 				for (iter = 0; iter < reward->amount; ++iter) {
 					obj = read_object(reward->vnum, TRUE);
 					scale_item_to_level(obj, reward_level);
@@ -727,7 +728,10 @@ void give_quest_rewards(char_data *ch, struct quest_reward *list, int reward_lev
 						reduce_obj_binding(obj, ch);
 					}
 					
-					load_otrigger(obj);
+					obj_ok = load_otrigger(obj);
+					if (obj_ok) {
+						get_otrigger(obj, ch, FALSE);
+					}
 				}
 				
 				// mark gained
@@ -742,7 +746,7 @@ void give_quest_rewards(char_data *ch, struct quest_reward *list, int reward_lev
 					snprintf(buf, sizeof(buf), "\tyYou receive $p!\t0");
 				}
 				
-				if (obj) {
+				if (obj_ok && obj) {
 					act(buf, FALSE, ch, obj, NULL, TO_CHAR);
 				}
 				break;

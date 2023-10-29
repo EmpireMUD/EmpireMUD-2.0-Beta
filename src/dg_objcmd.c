@@ -1316,12 +1316,16 @@ OCMD(do_oload) {
 			
 			if (*arg2 && (pos = find_eq_pos_script(arg2)) >= 0 && !GET_EQ(tch, pos) && can_wear_on_pos(object, pos)) {
 				equip_char(tch, object, pos);
-				load_otrigger(object);
+				if (load_otrigger(object)) {
+					get_otrigger(object, tch, FALSE);
+				}
 				determine_gear_level(tch);
 				return;
 			}
 			obj_to_char(object, tch);
-			load_otrigger(object);
+			if (load_otrigger(object)) {
+				get_otrigger(object, tch, FALSE);
+			}
 			return;
 		}
 		cnt = get_obj_near_obj(obj, arg1);

@@ -9411,7 +9411,9 @@ ACMD(do_load) {
 		act("$n makes a strange magical gesture.", TRUE, ch, 0, 0, TO_ROOM | DG_NO_TRIG);
 		act("$n has created $p!", FALSE, ch, obj, 0, TO_ROOM | DG_NO_TRIG);
 		act("You create $p.", FALSE, ch, obj, 0, TO_CHAR | DG_NO_TRIG);
-		load_otrigger(obj);
+		if (load_otrigger(obj) && obj->carried_by) {
+			get_otrigger(obj, obj->carried_by, FALSE);
+		}
 	}
 	else if (is_abbrev(buf, "vehicle")) {
 		if (!vehicle_proto(number)) {

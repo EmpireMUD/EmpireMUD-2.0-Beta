@@ -1272,7 +1272,7 @@ obj_data *die(char_data *ch, char_data *killer) {
 	char_data *ch_iter, *player, *killleader;
 	obj_data *corpse = NULL;
 	struct mob_tag *tag;
-	int iter, trig_val;
+	int iter, trig_val, obj_ok = 0;
 	
 	// no need to repeat
 	if (EXTRACTED(ch)) {
@@ -1453,11 +1453,11 @@ obj_data *die(char_data *ch, char_data *killer) {
 			recursive_loot_set(corpse, GET_IDNUM(killleader), GET_LOYALTY(killleader));
 		}
 		
-		load_otrigger(corpse);
+		obj_ok = load_otrigger(corpse);
 	}
 	
 	extract_char(ch);	
-	return corpse;
+	return obj_ok ? corpse : NULL;
 }
 
 

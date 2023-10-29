@@ -855,7 +855,7 @@ static void print_group(char_data *ch) {
 
 INTERACTION_FUNC(shear_interact) {
 	char buf[MAX_STRING_LENGTH];
-	int iter, amt;
+	int iter, amt, obj_ok = 0;
 	obj_data *obj = NULL;
 	
 	add_cooldown(inter_mob, COOLDOWN_SHEAR, config_get_int("shear_growth_time") * SECS_PER_REAL_HOUR);
@@ -869,7 +869,7 @@ INTERACTION_FUNC(shear_interact) {
 	for (iter = 0; iter < amt; ++iter) {
 		obj = read_object(interaction->vnum, TRUE);
 		obj_to_char(obj, ch);
-		load_otrigger(obj);
+		obj_ok = load_otrigger(obj);
 	}
 	
 	// mark gained
@@ -878,7 +878,12 @@ INTERACTION_FUNC(shear_interact) {
 	}
 	
 	// only show loot to the skinner
-	if (amt == 1) {
+	if (!obj_ok || !obj) {
+		act("You skillfully shear $N.", FALSE, ch, NULL, inter_mob, TO_CHAR);
+		act("$n skillfully shears you.", FALSE, ch, NULL, inter_mob, TO_VICT);
+		act("$n skillfully shears $N.", FALSE, ch, NULL, inter_mob, TO_NOTVICT);
+	}
+	else if (amt == 1) {
 		act("You skillfully shear $N and get $p.", FALSE, ch, obj, inter_mob, TO_CHAR);
 		act("$n skillfully shears you and gets $p.", FALSE, ch, obj, inter_mob, TO_VICT);
 		act("$n skillfully shears $N and gets $p.", FALSE, ch, obj, inter_mob, TO_NOTVICT);
@@ -899,7 +904,7 @@ INTERACTION_FUNC(shear_interact) {
 INTERACTION_FUNC(skin_interact) {
 	char buf[MAX_STRING_LENGTH];
 	obj_data *obj = NULL;
-	int num;
+	int num, obj_ok = 0;
 	
 	if (!has_player_tech(ch, PTECH_SKINNING_UPGRADE) && number(1, 100) > 60) {
 		return FALSE;	// 60% failure unskilled
@@ -909,7 +914,7 @@ INTERACTION_FUNC(skin_interact) {
 		obj = read_object(interaction->vnum, TRUE);
 		scale_item_to_level(obj, 1);	// min scale
 		obj_to_char(obj, ch);
-		load_otrigger(obj);
+		obj_ok = load_otrigger(obj);
 	}
 	
 	// mark gained
@@ -918,7 +923,11 @@ INTERACTION_FUNC(skin_interact) {
 	}
 	
 	// only show loot to the skinner
-	if (interaction->quantity > 1) {
+	if (!obj_ok) {
+		act("You carefully skin $P.", FALSE, ch, NULL, inter_item, TO_CHAR);
+		act("$n carefully skins $P.", FALSE, ch, NULL, inter_item, TO_ROOM);
+	}
+	else if (interaction->quantity > 1) {
 		sprintf(buf, "You carefully skin $P and get $p (x%d).", interaction->quantity);
 		act(buf, FALSE, ch, obj, inter_item, TO_CHAR);
 		sprintf(buf, "$n carefully skins $P and gets $p (x%d).", interaction->quantity);
