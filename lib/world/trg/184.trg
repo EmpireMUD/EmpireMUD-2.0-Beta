@@ -75,7 +75,6 @@ Beaver dam construction~
 ~
 * sector vnums to allow
 set valid_sects 5 19 53 85 87
-*
 set room %self.room%
 if !%instance.location%
   %purge% %self%
@@ -921,6 +920,12 @@ if %doc_brown%
 end
 nop %mob.remove_mob_flag(SILENT)%
 detach 18492 %self.id%
+~
+#18493
+Colossal Cave unstable portal: Xyzzy command~
+2 c 0
+xyzzy~
+%send% %actor% Nothing happens.
 ~
 #18494
 Doctor Who?~

@@ -308,7 +308,7 @@ the world over! Guard these precious resources carefully, for even a single
 unclaimed tile will not escape the attention of the necrovandals who seek to
 destroy them.
 ~
-2 4 0 30 d
+3 4 0 30 dg
 K 7 5
 W
 25 601 0 1 a
