@@ -2965,7 +2965,7 @@ void nanny(descriptor_data *d, char *arg) {
 			}
 			
 			// reset daily cycle now
-			check_daily_cycle_reset(d->character, TRUE);
+			check_daily_cycle_reset(d->character);
 			
 			if (!IS_APPROVED(d->character) && (msg = config_get_string("unapproved_greeting")) && *msg) {
 				msg_to_char(d->character, "\r\n\to%s\t0", msg);
