@@ -1763,22 +1763,22 @@ const struct character_size_data size_data[] = {
 
 // CRAFT_x (1/2): flag names
 const char *craft_flags[] = {
-	"POTTERY",
+	"POTTERY",	// 0
 	"BUILDING",
 	"SKILLED-LABOR",
 	"SKIP-CONSUMES-TO",
 	"*",	// formerly carpenter (now uses a function)
-	"*",	// formerly alchemy (identical to FIRE)
+	"*",	// 5: formerly alchemy (identical to FIRE)
 	"*",	// formerly sharp-tool
 	"FIRE",
 	"SOUP",
 	"IN-DEVELOPMENT",
-	"UPGRADE",
+	"UPGRADE",	// 10
 	"DISMANTLE-ONLY",
 	"IN-CITY-ONLY",
 	"VEHICLE",
 	"*",	// formerly shipyard (now uses a function)
-	"*",	// formerly bld-upgraded (now uses a function)
+	"*",	// 15: formerly bld-upgraded (now uses a function)
 	"LEARNED",
 	"BY-RIVER",
 	"REMOVE-PRODUCTION",
@@ -1789,27 +1789,26 @@ const char *craft_flags[] = {
 
 // CRAFT_x (2/2): how flags that show up on "craft info"
 const char *craft_flag_for_info[] = {
-	"pottery",
+	"pottery",	// 0
 	"",	// building
 	"",	// skilled labor
 	"",	// skip-consumes-to
 	"",
-	"",
+	"",	// 5
 	"",
 	"requires fire",
 	"",	// soup
 	"",	// in-dev
-	"is an upgrade",	// upgrade
+	"is an upgrade",	// 10: upgrade
 	"",	// dismantle-only
 	"in-city only",
 	"",	// vehicle
 	"",
-	"requires upgraded building",
+	"",	// 15
 	"",	// learned
 	"must be by a river",
 	"",	// remove-production
 	"",	// take-required-obj
-	"",
 	"\n"
 };
 
