@@ -6339,6 +6339,7 @@ bool is_deep_mine(room_data *room) {
 */
 void lock_icon(room_data *room, struct icon_data *use_icon) {
 	struct icon_data *icon;
+	char *temp;
 
 	// don't do it if a custom icon is set (or no room provided)
 	if (!room || ROOM_CUSTOM_ICON(room)) {
@@ -6351,7 +6352,17 @@ void lock_icon(room_data *room, struct icon_data *use_icon) {
 	if (!(icon = use_icon)) {
 		icon = get_icon_from_set(GET_SECT_ICONS(SECT(room)), GET_SEASON(room));
 	}
-	set_room_custom_icon(room, icon->icon);
+	
+	// check for variable colors that must be stored
+	if (icon && strstr(icon->icon, "&?")) {
+		temp = str_replace("&?", icon->color, icon->icon);
+		set_room_custom_icon(room, temp);
+		free(temp);
+	}
+	else if (icon) {
+		set_room_custom_icon(room, icon->icon);
+	}
+	// else nothing to do
 }
 
 
