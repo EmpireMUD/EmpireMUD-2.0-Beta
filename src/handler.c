@@ -10112,7 +10112,7 @@ void read_vault(empire_data *emp) {
 bool retrieve_resource(char_data *ch, empire_data *emp, struct empire_storage_data *store, bool stolen) {
 	obj_data *obj, *proto;
 	bool room = FALSE;
-	int available, obj_ok = 0;
+	int available;
 
 	proto = store->proto;
 	
@@ -10140,17 +10140,18 @@ bool retrieve_resource(char_data *ch, empire_data *emp, struct empire_storage_da
 	}
 	act("You retrieve $p.", FALSE, ch, obj, 0, TO_CHAR | TO_QUEUE);
 	act("$n retrieves $p.", TRUE, ch, obj, 0, TO_ROOM | TO_QUEUE);
-	obj_ok = load_otrigger(obj);
-	if (obj_ok) {
-		get_otrigger(obj, ch, FALSE);
-	}
 	
-	if (obj_ok && stolen) {
+	if (stolen) {
 		record_theft_log(emp, GET_OBJ_VNUM(obj), 1);
 		GET_STOLEN_TIMER(obj) = time(0);
 		GET_STOLEN_FROM(obj) = EMPIRE_VNUM(emp);
 		trigger_distrust_from_stealth(ch, emp);
 		add_offense(emp, OFFENSE_STEALING, ch, IN_ROOM(ch), offense_was_seen(ch, emp, NULL) ? OFF_SEEN : NOBITS);
+	}
+	
+	// do this after the "stolen" section, in case it'll purge the item
+	if (load_otrigger(obj)) {
+		get_otrigger(obj, ch, FALSE);
 	}
 	
 	EMPIRE_NEEDS_STORAGE_SAVE(emp) = TRUE;
