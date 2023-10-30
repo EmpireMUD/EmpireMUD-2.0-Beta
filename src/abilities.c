@@ -2769,7 +2769,7 @@ void write_ability_to_file(FILE *fl, ability_data *abil) {
 	strcpy(temp, bitv_to_alpha(ABIL_FLAGS(abil)));
 	strcpy(temp2, bitv_to_alpha(ABIL_IMMUNITIES(abil)));
 	strcpy(temp3, bitv_to_alpha(ABIL_GAIN_HOOKS(abil)));
-	strcpy(temp3, bitv_to_alpha(ABIL_REQUIRES_TOOL(abil)));
+	strcpy(temp4, bitv_to_alpha(ABIL_REQUIRES_TOOL(abil)));
 	fprintf(fl, "%s %d %.2f %s %s %s\n", temp, ABIL_MASTERY_ABIL(abil), ABIL_SCALE(abil), temp2, temp3, temp4);
 	
 	// 'A': applies
