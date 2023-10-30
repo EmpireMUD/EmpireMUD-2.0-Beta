@@ -6339,6 +6339,7 @@ bool is_deep_mine(room_data *room) {
 */
 void lock_icon(room_data *room, struct icon_data *use_icon) {
 	struct icon_data *icon;
+	char buffer[256];
 	char *temp;
 
 	// don't do it if a custom icon is set (or no room provided)
@@ -6353,14 +6354,20 @@ void lock_icon(room_data *room, struct icon_data *use_icon) {
 		icon = get_icon_from_set(GET_SECT_ICONS(SECT(room)), GET_SEASON(room));
 	}
 	
-	// check for variable colors that must be stored
-	if (icon && strstr(icon->icon, "&?")) {
-		temp = str_replace("&?", icon->color, icon->icon);
-		set_room_custom_icon(room, temp);
-		free(temp);
-	}
-	else if (icon) {
-		set_room_custom_icon(room, icon->icon);
+	// did we find one
+	if (icon) {
+		// prepend color (it's not automatically there)
+		snprintf(buffer, sizeof(buffer), "%s%s", icon->color, icon->icon);
+	
+		// check for variable colors that must be stored
+		if (strstr(buffer, "&?")) {
+			temp = str_replace("&?", icon->color, buffer);
+			set_room_custom_icon(room, temp);
+			free(temp);
+		}
+		else {
+			set_room_custom_icon(room, buffer);
+		}
 	}
 	// else nothing to do
 }
@@ -6375,6 +6382,7 @@ void lock_icon(room_data *room, struct icon_data *use_icon) {
 */
 void lock_icon_map(struct map_data *loc, struct icon_data *use_icon) {
 	struct icon_data *icon;
+	char buffer[256];
 	
 	// safety first
 	if (!loc || loc->shared->icon) {
@@ -6388,20 +6396,27 @@ void lock_icon_map(struct map_data *loc, struct icon_data *use_icon) {
 		icon = get_icon_from_set(GET_SECT_ICONS(loc->sector_type), y_coord_to_season[MAP_Y_COORD(loc->vnum)]);
 	}
 	
-	if (loc->shared->icon) {
-		free(loc->shared->icon);
-	}
+	// did we find one
+	if (icon) {
+		if (loc->shared->icon) {
+			free(loc->shared->icon);
+		}
+		
+		// prepend color code
+		snprintf(buffer, sizeof(buffer), "%s%s", icon->color, icon->icon);
 	
-	// finally, check for variable colors that must be stored
-	if (icon && strstr(icon->icon, "&?")) {
-		// str_replace allocates a new string
-		loc->shared->icon = str_replace("&?", icon->color, icon->icon);
+		// finally, check for variable colors that must be stored
+		if (strstr(buffer, "&?")) {
+			// str_replace allocates a new string
+			loc->shared->icon = str_replace("&?", icon->color, buffer);
+		}
+		else {
+			loc->shared->icon = str_dup(buffer);
+		}
+		
+		request_world_save(loc->vnum, WSAVE_ROOM);
 	}
-	else {
-		loc->shared->icon = icon ? str_dup(icon->icon) : NULL;
-	}
-	
-	request_world_save(loc->vnum, WSAVE_ROOM);
+	// if no icon, no work
 }
 
 
