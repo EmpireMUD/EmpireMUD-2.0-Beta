@@ -393,6 +393,21 @@ double get_enchant_scale_for_char(char_data *ch, int max_scale) {
 */
 void perform_ritual(char_data *ch) {	
 	int rit = GET_ACTION_VNUM(ch, 0);
+	char buf[MAX_STRING_LENGTH];
+	ability_data *abil;
+	
+	// check tool still present
+	if (ritual_data[rit].ability != NO_ABIL && (abil = find_ability_by_vnum(ritual_data[rit].ability)) && ABIL_REQUIRES_TOOL(abil) && !has_all_tools(ch, ABIL_REQUIRES_TOOL(abil))) {
+		prettier_sprintbit(ABIL_REQUIRES_TOOL(abil), tool_flags, buf);
+		if (count_bits(ABIL_REQUIRES_TOOL(abil)) > 1) {
+			msg_to_char(ch, "You need tools to finish the %s: %s\r\n", buf, ritual_scmd[ritual_data[rit].subcmd]);
+		}
+		else {
+			msg_to_char(ch, "You need %s %s to finish the %s.\r\n", AN(buf), buf, ritual_scmd[ritual_data[rit].subcmd]);
+		}
+		cancel_action(ch);
+		return;
+	}
 	
 	GET_ACTION_TIMER(ch) += 1;
 	send_ritual_messages(ch, rit, GET_ACTION_TIMER(ch));
@@ -1154,6 +1169,7 @@ ACMD(do_ritual) {
 	char arg2[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH];
 	int iter, rit = NOTHING;
 	bool found, result = FALSE;
+	ability_data *abil;
 	
 	half_chop(argument, arg, arg2);
 	
@@ -1210,13 +1226,25 @@ ACMD(do_ritual) {
 		return;
 	}
 	
-	// triggers?
-	if (ritual_data[rit].ability != NO_ABIL && ABILITY_TRIGGERS(ch, NULL, NULL, ritual_data[rit].ability)) {
+	if (GET_MANA(ch) < ritual_data[rit].cost) {
+		msg_to_char(ch, "You need %d mana to perform that %s.\r\n", ritual_data[rit].cost, ritual_scmd[subcmd]);
 		return;
 	}
 	
-	if (GET_MANA(ch) < ritual_data[rit].cost) {
-		msg_to_char(ch, "You need %d mana to perform that %s.\r\n", ritual_data[rit].cost, ritual_scmd[subcmd]);
+	// check tool
+	if (ritual_data[rit].ability != NO_ABIL && (abil = find_ability_by_vnum(ritual_data[rit].ability)) && ABIL_REQUIRES_TOOL(abil) && !has_all_tools(ch, ABIL_REQUIRES_TOOL(abil))) {
+		prettier_sprintbit(ABIL_REQUIRES_TOOL(abil), tool_flags, buf);
+		if (count_bits(ABIL_REQUIRES_TOOL(abil)) > 1) {
+			msg_to_char(ch, "You need tools to perform the %s: %s\r\n", ritual_scmd[subcmd], buf);
+		}
+		else {
+			msg_to_char(ch, "You need %s %s to perform the %s.\r\n", AN(buf), buf, ritual_scmd[subcmd]);
+		}
+		return;
+	}
+	
+	// triggers?
+	if (ritual_data[rit].ability != NO_ABIL && ABILITY_TRIGGERS(ch, NULL, NULL, ritual_data[rit].ability)) {
 		return;
 	}
 	
