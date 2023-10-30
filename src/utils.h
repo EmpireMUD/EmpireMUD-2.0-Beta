@@ -120,6 +120,7 @@
 #define ABIL_MAX_STACKS(abil)  ((abil)->max_stacks)
 #define ABIL_MIN_POS(abil)  ((abil)->min_position)
 #define ABIL_NAME(abil)  ((abil)->name)
+#define ABIL_REQUIRES_TOOL(abil)  ((abil)->requires_tool)
 #define ABIL_SCALE(abil)  ((abil)->scale)
 #define ABIL_SHORT_DURATION(abil)  ((abil)->short_duration)
 #define ABIL_SKILL_LEVEL(abil)  ((abil)->skill_level)

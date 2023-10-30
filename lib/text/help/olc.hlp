@@ -851,6 +851,7 @@ Fields:
   &c-ptech&0 - see HELP PTECH
   &c-scale&0, &c-scaleunder&0, &c-scaleover&0 - scale percent within these limits
   &c-targets&0 - see HELP ABILEDIT TARGETS
+  &c-tools&0 - required tools, see HELP TOOL TYPES
   &c-type&0 - see HELP ABILEDIT TYPE
   &c-waittype&0 - see HELP ABILEDIT WAIT TYPE
   &c-vmin&0, &c-vmax&0 - VNUM range limits
@@ -6049,10 +6050,11 @@ real hours, regardless of their decay timers.
 
 See also: AUTOSTORE, OEDIT TYPE, OLC OBJECTS
 #d
-"OEDIT TOOLS" "OEDIT TOOL FLAGS" "CEDIT TOOLS" "CEDIT TOOL FLAGS"
+"OEDIT TOOLS" "OEDIT TOOL FLAGS" "ABILEDIT TOOLS" "ABILEDIT TOOL FLAGS" "CEDIT TOOLS" "CEDIT TOOL FLAGS"
 
 Usage:  .tools [add | remove] <flags>
 
+Abilities: Player must be using this type of tool to use the ability.
 Objects: Tool flags allow an object to be used for various tasks, like sawing.
          Objects also support a "requires tools" flag for tools needed to build
          something that uses the object (e.g. nails require hammer).
@@ -6062,7 +6064,7 @@ Crafts: You can require 1 or more tools to create the craft. These tools MUST
 
 See &yHELP TOOLS&0 for a full list.
 
-See also: OLC CRAFTS, OLC OBJECTS, OEDIT REQUIRES TOOLS
+See also: OLC ABILITIES, OLC CRAFTS, OLC OBJECTS, OEDIT REQUIRES TOOLS
 #d
 "OEDIT TYPE"
 

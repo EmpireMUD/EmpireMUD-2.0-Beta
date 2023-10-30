@@ -78,6 +78,7 @@ OLC_MODULE(abiledit_name);
 OLC_MODULE(abiledit_scale);
 OLC_MODULE(abiledit_shortduration);
 OLC_MODULE(abiledit_targets);
+OLC_MODULE(abiledit_tools);
 OLC_MODULE(abiledit_types);
 OLC_MODULE(abiledit_waittype);
 
@@ -578,6 +579,7 @@ const struct olc_command_data olc_data[] = {
 	{ "scale", abiledit_scale, OLC_ABILITY, OLC_CF_EDITOR },
 	{ "shortduration", abiledit_shortduration, OLC_ABILITY, OLC_CF_EDITOR },
 	{ "targets", abiledit_targets, OLC_ABILITY, OLC_CF_EDITOR },
+	{ "tools", abiledit_tools, OLC_ABILITY, OLC_CF_EDITOR },
 	{ "types", abiledit_types, OLC_ABILITY, OLC_CF_EDITOR },
 	{ "waittype", abiledit_waittype, OLC_ABILITY, OLC_CF_EDITOR },
 	{ "name", abiledit_name, OLC_ABILITY, OLC_CF_EDITOR },

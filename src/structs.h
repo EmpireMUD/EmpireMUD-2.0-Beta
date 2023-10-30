@@ -3620,6 +3620,7 @@ struct ability_data {
 	double scale;	// effectiveness scale (1.0 = 100%)
 	bitvector_t immunities;	// AFF_ flags that block this ability
 	bitvector_t gain_hooks;	// AGH_ flags
+	bitvector_t requires_tool;	// TOOL_ flags required to use it
 	
 	// command-related data
 	char *command;	// if ability has a command

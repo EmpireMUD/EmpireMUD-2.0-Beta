@@ -601,6 +601,7 @@ bool can_gain_skill_from(char_data *ch, ability_data *abil) {
 * @return bool TRUE if ch can use ability; FALSE if not.
 */
 bool can_use_ability(char_data *ch, any_vnum ability, int cost_pool, int cost_amount, int cooldown_type) {
+	ability_data *abil = find_ability_by_vnum(ability);
 	char buf[MAX_STRING_LENGTH];
 	int time, needs_cost;
 	
@@ -629,6 +630,17 @@ bool can_use_ability(char_data *ch, any_vnum ability, int cost_pool, int cost_am
 		msg_to_char(ch, "You need %d %s point%s to do that.\r\n", cost_amount, pool_types[cost_pool], PLURAL(cost_amount));
 		return FALSE;
 	}
+	if (abil && ABIL_REQUIRES_TOOL(abil) && !has_all_tools(ch, ABIL_REQUIRES_TOOL(abil))) {
+		prettier_sprintbit(ABIL_REQUIRES_TOOL(abil), tool_flags, buf);
+		if (count_bits(ABIL_REQUIRES_TOOL(abil)) > 1) {
+			msg_to_char(ch, "You need tools to do that: %s\r\n", buf);
+		}
+		else {
+			msg_to_char(ch, "You need %s %s to do that.\r\n", AN(buf), buf);
+		}
+		return FALSE;
+	}
+
 	if (cooldown_type != NOTHING && (time = get_cooldown_time(ch, cooldown_type)) > 0) {
 		snprintf(buf, sizeof(buf), "Your %s cooldown still has %d second%s.\r\n", get_generic_name_by_vnum(cooldown_type), time, (time != 1 ? "s" : ""));
 		CAP(buf);
@@ -2420,6 +2432,11 @@ ACMD(do_skills) {
 			strcpy(lbuf, apply_types[ABIL_LINKED_TRAIT(abil)]);
 			strtolower(lbuf);
 			size += snprintf(outbuf + size, sizeof(outbuf) - size, "Linked trait: %s (%d)\r\n", lbuf, get_attribute_by_apply(ch, ABIL_LINKED_TRAIT(abil)));
+		}
+		
+		if (ABIL_REQUIRES_TOOL(abil)) {
+			prettier_sprintbit(ABIL_REQUIRES_TOOL(abil), tool_flags, lbuf);
+			size += snprintf(outbuf + size, sizeof(outbuf) - size, "Requires tool%s: %s\r\n", (count_bits(ABIL_REQUIRES_TOOL(abil)) != 1) ? "s" : "", lbuf);
 		}
 		
 		// data, if parameterized
