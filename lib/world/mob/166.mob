@@ -693,6 +693,21 @@ north, where it is called lumememm.
 ~
 T 16669
 S
+#16670
+pony dappled~
+a dappled pony~
+A dappled pony with a ribbon is frolicking about.
+~
+1 1 bdeoD n 2
+0 0 62 9 -1
+D
+   This playful little pony prances circles around you while the red ribbon
+around its neck flaps in the air. The pony is brown and beige, with dappled
+hips and a fluffy mane that looks so, so soft.
+~
+T 16670
+T 16671
+S
 #16675
 #n~
 #n~

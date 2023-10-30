@@ -3196,6 +3196,45 @@ if %melt%
   %purge% %self%
 end
 ~
+#16670
+Christmas pony: Only leader may ride~
+0 ct 0
+mount ride~
+* Sanity check
+* I don't know why we'd have a mount called 'swap' but you never know
+if %arg.car% == list || %arg.car% == swap ||  %arg.car% == release
+  return 0
+  halt
+end
+* Target check
+if %actor.char_target(%arg%)% != %self%
+  return 0
+  halt
+end
+if %actor% != %self.leader%
+  %send% %actor% ~%self% won't let you get close enough to ride.
+  return 1
+  halt
+end
+return 0
+~
+#16671
+Winter Wonderland: Mount cannot be harnessed~
+0 ct 0
+harness~
+set anim_arg %arg.car%
+set veh_arg %arg.cdr%
+if (!%anim_arg% || !%veh_arg%)
+  return 0
+  halt
+elseif %actor.char_target(%anim_arg%)% != %self%
+  return 0
+  halt
+end
+* oops
+%send% %actor% ~%self% refuses to be harnessed to anything.
+return 1
+~
 #16675
 Citizen dances~
 0 bw 50
@@ -4067,6 +4106,19 @@ remote Cookie16660 %self.id%
 remote Cookie16661 %self.id%
 remote Cookie16662 %self.id%
 ~
+#16692
+Winter Wonderland: Randomly trash the vortex if event isn't running~
+1 b 20
+~
+if %event.running(10700)%
+  halt
+end
+if %self.carried_by%
+  %send% %self.carried_by% @%self% suddenly vanishes!
+  %quest% %self.carried_by% drop 16690
+end
+%purge% %self%
+~
 #16695
 Capture nordlys in jar~
 1 c 2
@@ -4114,19 +4166,6 @@ if %jar% && %self.is_flagged(*KEEP)%
   nop %jar.flag(*KEEP)%
 end
 return 1
-%purge% %self%
-~
-#16692
-Winter Wonderland: Randomly trash the vortex if event isn't running~
-1 b 20
-~
-if %event.running(10700)%
-  halt
-end
-if %self.carried_by%
-  %send% %self.carried_by% @%self% suddenly vanishes!
-  %quest% %self.carried_by% drop 16690
-end
 %purge% %self%
 ~
 #16696
