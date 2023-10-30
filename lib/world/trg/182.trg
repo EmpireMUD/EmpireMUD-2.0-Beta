@@ -541,7 +541,7 @@ Atlasian Turtle Egg: Hatch~
 set room %self.room%
 %load% veh 18224
 set tortoise %room.vehicles%
-%echo% The huge atlasian egg cracks open, and @%tortoise% pokes its head out!
+%echo% The huge egg cracks open, and %tortoise.shortdesc% pokes its head out!
 %own% %tortoise% %room.empire%
 %build% %room% demolish
 return 0
