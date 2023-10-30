@@ -149,7 +149,7 @@ void check_daily_cycle_reset(char_data *ch, bool extra_space) {
 		msg_to_char(ch, "%s\tjYour daily quests and bonus experience have reset!\t0\r\n", extra_space ? "\r\n" : "");
 		
 		if (fail_daily_quests(ch, TRUE) | fail_daily_quests(ch, FALSE)) {
-			msg_to_char(ch, "Your daily quests expire.\r\n");
+			msg_to_char(ch, "\tjYour daily quests expire.\t0\r\n");
 		}
 	
 		// update to this cycle so it only happens once a day

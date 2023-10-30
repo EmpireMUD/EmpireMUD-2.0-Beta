@@ -394,7 +394,7 @@ void display_automessages(void) {
 */
 void display_automessages_on_login(char_data *ch) {
 	struct automessage *msg, *next_msg;
-	bool any = FALSE;
+	// bool any = FALSE;
 	
 	HASH_ITER(hh, automessages_table, msg, next_msg) {
 		if (msg->timing != AUTOMSG_ON_LOGIN) {
@@ -402,13 +402,14 @@ void display_automessages_on_login(char_data *ch) {
 		}
 		
 		show_automessage_to_char(ch, msg);
-		any = TRUE;
+		// any = TRUE;
 	}
 		
-	// trailing crlf
+	/* trailing crlf -- currently NOT sending this
 	if (any) {
 		msg_to_char(ch, "\r\n");
 	}
+	*/
 }
 
 

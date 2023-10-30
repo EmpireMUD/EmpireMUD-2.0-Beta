@@ -610,7 +610,7 @@ void perform_alternate(char_data *old, char_data *new) {
 		display_tip_to_char(new);
 	}
 	if (GET_MAIL_PENDING(new)) {
-		send_to_char("&rYou have mail waiting.&0\r\n", new);
+		send_to_char("\trYou have mail waiting.\t0\r\n", new);
 	}
 	if (has_uncollected_event_rewards(new)) {
 		msg_to_char(new, "\ttYou have uncollected event rewards. Type 'event collect' when you're in your own territory.\t0\r\n");
@@ -620,10 +620,10 @@ void perform_alternate(char_data *old, char_data *new) {
 	check_daily_cycle_reset(new, TRUE);
 	
 	if (!IS_APPROVED(new) && (msg = config_get_string("unapproved_greeting")) && *msg) {
-		msg_to_char(new, "\r\n&o%s&0", msg);
+		msg_to_char(new, "\r\n\to%s\t0", msg);
 	}
 	if (show_start && (msg = config_get_string("start_message")) && *msg) {
-		msg_to_char(new, "\r\n&Y%s&0", msg);
+		msg_to_char(new, "\r\n\tY%s\t0", msg);
 	}
 	
 	if (!IS_IMMORTAL(new)) {
