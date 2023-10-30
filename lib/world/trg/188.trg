@@ -1654,6 +1654,7 @@ elseif %actor.eq(clothes)%
   end
 end
 if %banish% == 1
+  wait %random.5%
   %echo% ~%self% shreaks in terror and vanishes back to the realm whence &%self% came!
   %purge% %self%
 end
