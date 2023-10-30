@@ -6380,7 +6380,16 @@ void lock_icon_map(struct map_data *loc, struct icon_data *use_icon) {
 	if (loc->shared->icon) {
 		free(loc->shared->icon);
 	}
-	loc->shared->icon = icon ? str_dup(icon->icon) : NULL;
+	
+	// finally, check for variable colors that must be stored
+	if (icon && strstr(icon->icon, "&?")) {
+		// str_replace allocates a new string
+		loc->shared->icon = str_replace("&?", icon->color, icon->icon);
+	}
+	else {
+		loc->shared->icon = icon ? str_dup(icon->icon) : NULL;
+	}
+	
 	request_world_save(loc->vnum, WSAVE_ROOM);
 }
 
