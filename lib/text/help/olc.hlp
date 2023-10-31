@@ -1053,7 +1053,7 @@ Available techs are:
  &cSteal-Upgrade&0 * - Can steal from vaults too.
  &cSwimming&0 * - Can move on water tiles with no boat.
  &cTeleport-City&0 * - Teleport can target your cities (requires an ability).
- &cTwo-Handed-Weapons&0 - Can wield two-handed weapons.
+ &cTwo-Handed-Mastery&0 * - Bonus damage from two-handed weapons.
  &cWhere-Upgrade&0 * - Increases the range of the 'where' command.
  &cDodge-Cap&0 - Improves the player's maximum dodge percent.
  &cSkinning-Upgrade&0 - Skinning always succeeds.

@@ -965,7 +965,7 @@ const char *player_tech_types[] = {
 	"Steal-Upgrade",
 	"Swimming",
 	"Teleport-City",
-	"Two-Handed-Weapons",	// 50
+	"Two-Handed-Mastery",	// 50
 	"Where-Upgrade",
 	"Dodge-Cap",
 	"Skinning-Upgrade",
@@ -2639,7 +2639,7 @@ const double obj_flag_scaling_bonus[] = {
 	0.5,	// OBJ_JUNK
 	1.0,	// OBJ_CREATABLE
 	1.0,	// OBJ_SCALABLE
-	1.5,	// OBJ_TWO_HANDED
+	1.8,	// OBJ_TWO_HANDED
 	1.3,	// OBJ_BIND_ON_EQUIP
 	1.4,	// OBJ_BIND_ON_PICKUP
 	1.0,	// unused

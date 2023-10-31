@@ -3522,6 +3522,14 @@ int hit(char_data *ch, char_data *victim, obj_data *weapon, bool combat_round) {
 					gain_ability_exp(ch, ABIL_DAGGER_MASTERY, 2);
 				}
 			}
+			if (!IS_NPC(ch) && has_player_tech(ch, PTECH_TWO_HANDED_MASTERY) && weapon && OBJ_FLAGGED(weapon, OBJ_TWO_HANDED)) {
+				// it could be considered a bug that this checks solo under the _assumption_ that the ptech comes from a synergy ability
+				// and the only solution that comes to mind would be to have each tech annotate where the player got it from in the player data
+				dam *= 1.5;
+				if (can_gain_exp_from(ch, victim)) {
+					gain_player_tech_exp(ch, PTECH_TWO_HANDED_MASTERY, 2);
+				}
+			}
 			if (!IS_NPC(ch) && has_ability(ch, ABIL_STAFF_MASTERY) && weapon && IS_STAFF(weapon)) {
 				dam *= 1.5;
 				if (can_gain_exp_from(ch, victim)) {
@@ -3890,11 +3898,6 @@ void perform_violence_melee(char_data *ch, obj_data *weapon) {
 	// sanity
 	if (weapon && !IS_WEAPON(weapon)) {
 		weapon = NULL;
-	}
-	
-	if (weapon && OBJ_FLAGGED(weapon, OBJ_TWO_HANDED) && (!has_player_tech(ch, PTECH_TWO_HANDED_WEAPONS) || !check_solo_role(ch))) {
-		msg_to_char(ch, "You must be alone to use two-handed weapons in the solo role.\r\n");
-		return;
 	}
 	
 	// random chance of this INSTEAD of 'hit' when blood-starved

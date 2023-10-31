@@ -186,15 +186,6 @@ void check_skill_sell(char_data *ch, ability_data *abil) {
 					}
 					break;
 				}
-				case PTECH_TWO_HANDED_WEAPONS: {
-					if ((obj = GET_EQ(ch, WEAR_WIELD)) && OBJ_FLAGGED(obj, OBJ_TWO_HANDED)) {
-						act("You stop using $p.", FALSE, ch, obj, NULL, TO_CHAR);
-						unequip_char_to_inventory(ch, WEAR_WIELD);
-						determine_gear_level(ch);
-						need_affect_total = TRUE;
-					}
-					break;
-				}
 			}
 		}
 	}
@@ -2674,9 +2665,6 @@ bool can_wear_item(char_data *ch, obj_data *item, bool send_messages) {
 				break;
 			}
 		}
-	}
-	else if (OBJ_FLAGGED(item, OBJ_TWO_HANDED)) {
-		tech = PTECH_TWO_HANDED_WEAPONS;
 	}
 	else if (IS_MISSILE_WEAPON(item)) {
 		tech = PTECH_RANGED_COMBAT;
