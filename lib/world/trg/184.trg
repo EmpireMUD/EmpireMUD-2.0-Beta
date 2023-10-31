@@ -400,9 +400,16 @@ if !%self.leader% || %actor% != %self.leader%
   end
   return 1
   halt
+elseif %cmd.mudcommand% == harness && %actor.cooldown(18473)%
+  %send% %actor% You can't harness another spirit steed yet.
+  return 1
+  halt
 end
 * made it?
 nop %self.add_mob_flag(MOUNTABLE)%
+if %cmd.mudcommand% == harness
+  nop %actor.set_cooldown(18473,86400)%
+end
 return 0
 * check and remove mountable if mount failed
 wait 1
