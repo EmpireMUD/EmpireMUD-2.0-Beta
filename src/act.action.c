@@ -673,6 +673,10 @@ void cancel_morphing(char_data *ch) {
 			bind_obj_to_player(obj, ch);
 			reduce_obj_binding(obj, ch);
 		}
+		
+		if (obj_ok) {
+			get_otrigger(obj, ch, FALSE);
+		}
 	}
 }
 
@@ -819,6 +823,9 @@ INTERACTION_FUNC(finish_chopping) {
 		scale_item_to_level(obj, 1);	// minimum level
 		obj_to_char_or_room(obj, ch);
 		obj_ok = load_otrigger(obj);
+		if (obj_ok) {
+			get_otrigger(obj, ch, FALSE);
+		}
 	}
 	
 	// mark gained
@@ -862,6 +869,9 @@ INTERACTION_FUNC(finish_digging) {
 			scale_item_to_level(obj, 1);	// minimum level
 			obj_to_char_or_room(obj, ch);
 			obj_ok = load_otrigger(obj);
+			if (obj_ok) {
+				get_otrigger(obj, ch, FALSE);
+			}
 			
 			// add to depletion and 1/4 chance of adding a second one, to mix up the depletion values
 			add_depletion(inter_room, DPLTN_DIG, TRUE);
@@ -907,6 +917,9 @@ INTERACTION_FUNC(finish_fishing) {
 		scale_item_to_level(obj, 1);	// minimum level
 		obj_to_char(obj, ch);
 		obj_ok = load_otrigger(obj);
+		if (obj_ok) {
+			get_otrigger(obj, ch, FALSE);
+		}
 	}
 	
 	// mark gained
@@ -956,6 +969,9 @@ INTERACTION_FUNC(finish_foraging) {
 		obj_to_char_or_room(obj, ch);
 		add_depletion(inter_room, DPLTN_FORAGE, TRUE);
 		obj_ok = load_otrigger(obj);
+		if (obj_ok) {
+			get_otrigger(obj, ch, FALSE);
+		}
 	}
 	
 	// mark gained
@@ -994,6 +1010,9 @@ INTERACTION_FUNC(finish_gathering) {
 		scale_item_to_level(obj, 1);	// minimum level
 		obj_to_char_or_room(obj, ch);
 		obj_ok = load_otrigger(obj);
+		if (obj_ok) {
+			get_otrigger(obj, ch, FALSE);
+		}
 		add_depletion(IN_ROOM(ch), DPLTN_GATHER, TRUE);
 	}
 	
@@ -1042,6 +1061,9 @@ INTERACTION_FUNC(finish_harvesting) {
 			scale_item_to_level(obj, 1);	// minimum level
 			obj_to_char_or_room(obj, ch);
 			obj_ok = load_otrigger(obj);
+			if (obj_ok) {
+				get_otrigger(obj, ch, FALSE);
+			}
 		}
 		
 		// mark gained
@@ -1090,7 +1112,9 @@ INTERACTION_FUNC(finish_mining) {
 		act(cust ? cust : "With $s last stroke, $p falls from the wall where $n was picking!", FALSE, ch, obj, NULL, TO_ROOM);
 		
 		GET_ACTION(ch) = ACT_NONE;
-		load_otrigger(obj);
+		if (load_otrigger(obj)) {
+			get_otrigger(obj, ch, FALSE);
+		}
 		any = TRUE;
 	}
 	
@@ -1114,6 +1138,9 @@ INTERACTION_FUNC(finish_panning) {
 		scale_item_to_level(obj, 1);	// minimum level
 		obj_to_char(obj, ch);
 		obj_ok = load_otrigger(obj);
+		if (obj_ok) {
+			get_otrigger(obj, ch, FALSE);
+		}
 	}
 	
 	// mark gained
@@ -1165,6 +1192,9 @@ INTERACTION_FUNC(finish_scraping) {
 			obj_to_room(load, IN_ROOM(ch));
 		}
 		obj_ok = load_otrigger(load);
+		if (obj_ok && load->carried_by) {
+			get_otrigger(load, load->carried_by, FALSE);
+		}
 	}
 	
 	// mark gained
@@ -3982,6 +4012,9 @@ INTERACTION_FUNC(finish_gen_interact_room) {
 		scale_item_to_level(obj, 1);	// minimum level
 		obj_to_char_or_room(obj, ch);
 		obj_ok = load_otrigger(obj);
+		if (obj_ok) {
+			get_otrigger(obj, ch, FALSE);
+		}
 	}
 	
 	// mark gained

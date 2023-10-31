@@ -188,6 +188,9 @@ ACMD(do_create) {
 			
 			scale_item_to_level(obj, 1);	// minimum level
 			obj_ok = load_otrigger(obj);
+			if (obj_ok && obj->carried_by) {
+				get_otrigger(obj, obj->carried_by, FALSE);
+			}
 		}
 		else {
 			low_res = TRUE;

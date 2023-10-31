@@ -501,7 +501,9 @@ void finish_dismantle_vehicle(char_data *ch, vehicle_data *veh) {
 			if (OBJ_FLAGGED(newobj, OBJ_BIND_FLAGS)) {
 				bind_obj_to_player(newobj, ch);
 			}
-			load_otrigger(newobj);
+			if (load_otrigger(newobj)) {
+				get_otrigger(newobj, ch, FALSE);
+			}
 		}
 	}
 			

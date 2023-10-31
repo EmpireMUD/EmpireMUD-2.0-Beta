@@ -145,7 +145,9 @@ INTERACTION_FUNC(combine_obj_interact) {
 	act(to_char, FALSE, ch, new_obj, NULL, TO_CHAR);
 	act(to_room, TRUE, ch, new_obj, NULL, TO_ROOM);
 	
-	load_otrigger(new_obj);
+	if (load_otrigger(new_obj) && new_obj->carried_by) {
+		get_otrigger(new_obj, new_obj->carried_by, FALSE);
+	}
 	
 	free_resource_list(res);
 	return TRUE;
@@ -442,7 +444,9 @@ INTERACTION_FUNC(identifies_to_interact) {
 		else {
 			obj_to_room(new_obj, IN_ROOM(ch));
 		}
-		load_otrigger(new_obj);
+		if (load_otrigger(new_obj) && new_obj->carried_by) {
+			get_otrigger(new_obj, new_obj->carried_by, FALSE);
+		}
 	}
 	
 	return TRUE;
@@ -1045,6 +1049,9 @@ INTERACTION_FUNC(light_obj_interact) {
 			obj_to_room(new, IN_ROOM(ch));
 		}
 		obj_ok = load_otrigger(new);
+		if (obj_ok && new->carried_by) {
+			get_otrigger(new, new->carried_by, FALSE);
+		}
 	}
 	
 	// mark gained
@@ -1410,7 +1417,9 @@ INTERACTION_FUNC(seed_obj_interact) {
 		else {
 			obj_to_room(new_obj, IN_ROOM(ch));
 		}
-		load_otrigger(new_obj);
+		if (load_otrigger(new_obj) && new_obj->carried_by) {
+			get_otrigger(new_obj, new_obj->carried_by, FALSE);
+		}
 	}
 	
 	return TRUE;
@@ -1460,7 +1469,9 @@ INTERACTION_FUNC(separate_obj_interact) {
 		else {
 			obj_to_room(new_obj, IN_ROOM(ch));
 		}
-		load_otrigger(new_obj);
+		if (load_otrigger(new_obj) && new_obj->carried_by) {
+			get_otrigger(new_obj, new_obj->carried_by, FALSE);
+		}
 	}
 	
 	return TRUE;

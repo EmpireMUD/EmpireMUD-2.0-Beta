@@ -790,7 +790,7 @@ ACMD(do_mload) {
 			scale_item_to_level(object, GET_CURRENT_SCALE_LEVEL(ch));
 		
 			if (load_otrigger(object) && object->carried_by) {
-				get_otrigger(object, ch, FALSE);
+				get_otrigger(object, object->carried_by, FALSE);
 			}
 			return;
 		}

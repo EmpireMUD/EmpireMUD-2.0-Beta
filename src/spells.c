@@ -448,4 +448,5 @@ ACMD(do_ready) {
 	gain_ability_exp(ch, ABIL_VNUM(found_abil), 15);
 	
 	load_otrigger(obj);
+	// this goes directly to equipment so a GET trigger does not fire
 }

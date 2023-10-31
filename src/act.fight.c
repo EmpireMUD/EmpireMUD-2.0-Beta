@@ -579,7 +579,9 @@ ACMD(do_stake) {
 		REMOVE_BIT(INJURY_FLAGS(victim), INJ_STAKED);
 		obj_to_char((stake = read_object(o_STAKE, TRUE)), ch);
 		scale_item_to_level(stake, 1);	// min scale
-		load_otrigger(stake);
+		if (load_otrigger(stake)) {
+			get_otrigger(stake, ch, FALSE);
+		}
 	}
 	else if (!can_fight(ch, victim))
 		act("You can't stake $M!", FALSE, ch, 0, victim, TO_CHAR);
@@ -740,6 +742,7 @@ ACMD(do_tie) {
 			if (load_otrigger(rope)) {
 				// conditional on not purging itself
 				act("You receive $p.", FALSE, ch, rope, NULL, TO_CHAR);
+				get_otrigger(rope, ch, FALSE);
 			}
 		}
 		GET_ROPE_VNUM(victim) = NOTHING;

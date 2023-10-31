@@ -324,7 +324,9 @@ INTERACTION_FUNC(devastate_crop) {
 	while (num-- > 0) {
 		obj_to_char_or_room((newobj = read_object(interaction->vnum, TRUE)), ch);
 		scale_item_to_level(newobj, 1);	// minimum level
-		load_otrigger(newobj);
+		if (load_otrigger(newobj) && newobj->carried_by) {
+			get_otrigger(newobj, newobj->carried_by, FALSE);
+		}
 	}
 	
 	return TRUE;
@@ -354,7 +356,9 @@ INTERACTION_FUNC(devastate_trees) {
 	for (num = 0; num < interaction->quantity; ++num) {
 		obj_to_char_or_room((newobj = read_object(interaction->vnum, TRUE)), ch);
 		scale_item_to_level(newobj, 1);	// minimum level
-		load_otrigger(newobj);
+		if (load_otrigger(newobj) && newobj->carried_by) {
+			get_otrigger(newobj, newobj->carried_by, FALSE);
+		}
 	}
 	
 	// mark gained
@@ -824,7 +828,9 @@ ACMD(do_disenchant) {
 				obj_to_char(reward, ch);
 				act("You manage to weave the freed mana into $p!", FALSE, ch, reward, NULL, TO_CHAR);
 				act("$n weaves the freed mana into $p!", TRUE, ch, reward, NULL, TO_ROOM);
-				load_otrigger(reward);
+				if (load_otrigger(reward)) {
+					get_otrigger(reward, ch, FALSE);
+				}
 			}
 		}
 	}

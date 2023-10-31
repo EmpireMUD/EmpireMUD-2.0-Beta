@@ -52,6 +52,9 @@ INTERACTION_FUNC(butcher_interact) {
 		scale_item_to_level(fillet, 1);	// minimum level
 		obj_to_char(fillet, ch);
 		obj_ok = load_otrigger(fillet);
+		if (obj_ok) {
+			get_otrigger(fillet, ch, FALSE);
+		}
 	}
 	
 	// mark gained

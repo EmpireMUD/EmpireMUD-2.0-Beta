@@ -427,7 +427,9 @@ LIBRARY_SCMD(library_checkout) {
 		
 		msg_to_char(ch, "You find a copy of %s on the shelf and take it.\r\n", book->title);
 		act("$n picks up $p off a shelf.", TRUE, ch, obj, NULL, TO_ROOM);
-		load_otrigger(obj);
+		if (load_otrigger(obj)) {
+			get_otrigger(obj, ch, FALSE);
+		}
 	}
 }
 

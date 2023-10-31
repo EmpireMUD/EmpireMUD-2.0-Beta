@@ -870,6 +870,9 @@ INTERACTION_FUNC(shear_interact) {
 		obj = read_object(interaction->vnum, TRUE);
 		obj_to_char(obj, ch);
 		obj_ok = load_otrigger(obj);
+		if (obj_ok) {
+			get_otrigger(obj, ch, FALSE);
+		}
 	}
 	
 	// mark gained
@@ -915,6 +918,9 @@ INTERACTION_FUNC(skin_interact) {
 		scale_item_to_level(obj, 1);	// min scale
 		obj_to_char(obj, ch);
 		obj_ok = load_otrigger(obj);
+		if (obj_ok) {
+			get_otrigger(obj, ch, FALSE);
+		}
 	}
 	
 	// mark gained

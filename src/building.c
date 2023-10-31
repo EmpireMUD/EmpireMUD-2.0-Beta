@@ -882,7 +882,9 @@ void finish_dismantle(char_data *ch, room_data *room) {
 				if (OBJ_FLAGGED(newobj, OBJ_BIND_FLAGS)) {
 					bind_obj_to_player(newobj, ch);
 				}
-				load_otrigger(newobj);
+				if (load_otrigger(newobj)) {
+					get_otrigger(newobj, ch, FALSE);
+				}
 			}
 		}
 	}

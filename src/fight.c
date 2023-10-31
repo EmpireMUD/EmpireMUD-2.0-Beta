@@ -1502,6 +1502,7 @@ INTERACTION_FUNC(loot_interact) {
 		
 		obj_to_char(obj, inter_mob);
 		load_otrigger(obj);
+		// does not fire a GET trigger
 	}
 	
 	return TRUE;
