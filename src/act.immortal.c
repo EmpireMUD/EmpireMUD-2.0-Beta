@@ -1571,7 +1571,7 @@ void do_instance_delete_all(char_data *ch, char *argument) {
 	// warn players of lag on 'all'
 	LL_FOREACH(descriptor_list, desc) {
 		if (STATE(desc) == CON_PLAYING && desc->character) {
-			write_to_descriptor(desc->descriptor, "The game is performing a brief update... this will take a moment.\r\n");
+			write_to_descriptor(desc->descriptor, "\r\nThe game is performing a brief update... this will take a moment.\r\n");
 			desc->has_prompt = FALSE;
 		}
 	}
