@@ -1027,14 +1027,27 @@ return 1
 Unstable Portal: Precipice: Grafted scion kill~
 0 z 100
 ~
+set room %self.room%
 * mark player killed
-if %actor.is_pc% && %self.room.template% == 18473
+if %actor.is_pc% && %room.template% == 18473
   set killed_%actor.id% 1
-  remote killed_%actor.id% %self.room.id%
+  remote killed_%actor.id% %room.id%
 end
+* replace corpses with bloodstains
+wait 1
+set obj %room.contents%
+while %obj%
+  set next_obj %obj.next_in_list%
+  if %obj.type% == CORPSE
+    nop %obj.empty%
+    %load% obj 18482
+    %purge% %obj%
+  end
+  set obj %next_obj%
+done
 * check for more players
 set valid_pos Standing Fighting Sitting Resting Sleeping
-set ch %self.room.people%
+set ch %room.people%
 set found 0
 while %ch% && !%found%
   if %ch.is_pc% && %valid_pos% ~= %ch.position%
@@ -1044,6 +1057,19 @@ while %ch% && !%found%
 done
 if !%found%
   wait 5 sec
+  * convert corpses to bloodstains again, in case
+  set room %self.room%
+  set obj %room.contents%
+  while %obj%
+    set next_obj %obj.next_in_list%
+    if %obj.type% == CORPSE
+      nop %obj.empty%
+      %load% obj 18482
+      %purge% %obj%
+    end
+    set obj %next_obj%
+  done
+  * and leave
   %echo% ~%self% skitters out of sight.
   %purge% %self%
 end
