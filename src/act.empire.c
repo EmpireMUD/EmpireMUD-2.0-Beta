@@ -3472,7 +3472,7 @@ void do_abandon_vehicle(char_data *ch, vehicle_data *veh, bool confirm) {
 
 ACMD(do_abandon) {
 	bool imm_access = (GET_ACCESS_LEVEL(ch) >= LVL_CIMPL || IS_GRANTED(ch, GRANT_EMPIRES));
-	char arg[MAX_INPUT_LENGTH], *arg2;
+	char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH];
 	vehicle_data *veh;
 	room_data *room = IN_ROOM(ch);
 	bool confirm, confirm_arg_1;
@@ -3482,9 +3482,9 @@ ACMD(do_abandon) {
 	}
 	
 	skip_spaces(&argument);
-	arg2 = one_word(argument, arg);
-	skip_spaces(&arg2);
-	confirm_arg_1 = !str_cmp(arg, "confirm");
+	chop_last_arg(argument, arg1, arg2);	// optional confirm
+	
+	confirm_arg_1 = !str_cmp(arg1, "confirm");
 	confirm = confirm_arg_1 || !str_cmp(arg2, "confirm");	// TRUE if they have the confirm arg
 	
 	if (!IS_APPROVED(ch) && config_get_bool("manage_empire_approval")) {
@@ -3500,10 +3500,10 @@ ACMD(do_abandon) {
 		// could probably now use has_permission
 		msg_to_char(ch, "You don't have permission to abandon.\r\n");
 	}
-	else if (*arg && !confirm_arg_1 && (veh = get_vehicle_in_room_vis(ch, arg, NULL))) {
+	else if (*arg1 && !confirm_arg_1 && (veh = get_vehicle_in_room_vis(ch, arg1, NULL))) {
 		do_abandon_vehicle(ch, veh, confirm);
 	}
-	else if (*arg && !confirm_arg_1 && !(room = parse_room_from_coords(argument)) && !(room = find_target_room(ch, arg))) {
+	else if (*arg1 && !confirm_arg_1 && !(room = parse_room_from_coords(argument)) && !(room = find_target_room(ch, arg1))) {
 		// sends own error
 	}
 	else if (!(room = HOME_ROOM(room))) {
