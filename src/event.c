@@ -626,11 +626,15 @@ int gain_event_points(char_data *ch, any_vnum event_vnum, int points) {
 	
 	if (points > 0) {
 		msg_to_char(ch, "\tyYou gain %d point%s for '%s'! You now have %d%s point%s.\t0\r\n", real_gain, PLURAL(real_gain), running->event ? EVT_NAME(running->event) : "Unknown Event", ped->points, capstr, (ped->points != 1 || *capstr) ? "s" : "");
-		syslog(SYS_EVENT, 0, TRUE, "EVENT: %s gains %d point%s for %s (%d%s total)", GET_NAME(ch), real_gain, PLURAL(real_gain), running->event ? EVT_NAME(running->event) : "Unknown Event", ped->points, capstr);
+		if (real_gain > 0) {
+			syslog(SYS_EVENT, 0, TRUE, "EVENT: %s gains %d point%s for %s (%d%s total)", GET_NAME(ch), real_gain, PLURAL(real_gain), running->event ? EVT_NAME(running->event) : "Unknown Event", ped->points, capstr);
+		}
 	}
 	else if (points < 0) {
-		msg_to_char(ch, "\tyYou lose %d point%s for '%s'! You now have %d%s point%s.\t0\r\n", ABSOLUTE(points), PLURAL(ABSOLUTE(points)), running->event ? EVT_NAME(running->event) : "Unknown Event", ped->points, capstr, (ped->points != 1 || *capstr) ? "s" : "");
-		syslog(SYS_EVENT, 0, TRUE, "EVENT: %s loses %d point%s for %s (%d%s total)", GET_NAME(ch), ABSOLUTE(points), PLURAL(ABSOLUTE(points)), running->event ? EVT_NAME(running->event) : "Unknown Event", ped->points, capstr);
+		msg_to_char(ch, "\tyYou lose %d point%s for '%s'! You now have %d%s point%s.\t0\r\n", ABSOLUTE(real_gain), PLURAL(ABSOLUTE(real_gain)), running->event ? EVT_NAME(running->event) : "Unknown Event", ped->points, capstr, (ped->points != 1 || *capstr) ? "s" : "");
+		if (real_gain < 0) {
+			syslog(SYS_EVENT, 0, TRUE, "EVENT: %s loses %d point%s for %s (%d%s total)", GET_NAME(ch), ABSOLUTE(real_gain), PLURAL(ABSOLUTE(real_gain)), running->event ? EVT_NAME(running->event) : "Unknown Event", ped->points, capstr);
+		}
 	}
 	
 	queue_delayed_update(ch, CDU_SAVE);
