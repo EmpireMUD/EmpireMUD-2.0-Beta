@@ -34,6 +34,7 @@
 // external functions
 ACMD(do_say);
 ACMD(do_stand);
+ACMD(do_wake);
 
 // locals
 ACMD(do_bite);
@@ -507,7 +508,12 @@ bool starving_vampire_aggro(char_data *ch) {
 	
 	// get ready
 	if (GET_POS(ch) < POS_FIGHTING) {
-		do_stand(ch, "", 0, 0);
+		if (GET_POS(ch) == POS_SLEEPING) {
+			do_wake(ch, "", 0, 0);
+		}
+		if (GET_POS(ch) == POS_RESTING || GET_POS(ch) == POS_SITTING) {
+			do_stand(ch, "", 0, 0);
+		}
 		if (GET_POS(ch) < POS_FIGHTING) {
 			return FALSE;	// failed to stand
 		}
