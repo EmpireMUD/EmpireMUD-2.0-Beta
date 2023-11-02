@@ -6591,7 +6591,7 @@ void olc_process_applies(char_data *ch, char *argument, struct apply_data **list
 	else if (is_abbrev(arg1, "add")) {
 		num = atoi(arg2);
 		
-		if (!*arg2 || !*arg3 || (!isdigit(*arg2) && *arg2 != '-') || num == 0) {
+		if (!*arg2 || !*arg3 || (!isdigit(*arg2) && *arg2 != '+' && *arg2 != '-') || num == 0) {
 			msg_to_char(ch, "Usage: apply add <value> <apply>\r\n");
 		}
 		else if ((loc = search_block(arg3, apply_types, FALSE)) == NOTHING) {
