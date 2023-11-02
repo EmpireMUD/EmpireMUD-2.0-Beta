@@ -6632,7 +6632,7 @@ void olc_process_applies(char_data *ch, char *argument, struct apply_data **list
 		}
 		else if (is_abbrev(type_arg, "value") || is_abbrev(type_arg, "amount") || is_abbrev(type_arg, "quantity")) {
 			num = atoi(val_arg);
-			if ((!isdigit(*val_arg) && *val_arg != '-') || num == 0) {
+			if ((!isdigit(*val_arg) && *val_arg != '+' && *val_arg != '-') || num == 0) {
 				msg_to_char(ch, "Invalid value '%s'.\r\n", val_arg);
 			}
 			else {
