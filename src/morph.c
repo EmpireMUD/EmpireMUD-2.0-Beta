@@ -354,9 +354,9 @@ void perform_morph(char_data *ch, morph_data *morph) {
 	double move_mod, health_mod, mana_mod;
 	
 	// read current pools
-	health_mod = (double) GET_HEALTH(ch) / GET_MAX_HEALTH(ch);
-	move_mod = (double) GET_MOVE(ch) / GET_MAX_MOVE(ch);
-	mana_mod = (double) GET_MANA(ch) / GET_MAX_MANA(ch);
+	health_mod = (double) GET_HEALTH(ch) / MAX(1, GET_MAX_HEALTH(ch));
+	move_mod = (double) GET_MOVE(ch) / MAX(1, GET_MAX_MOVE(ch));
+	mana_mod = (double) GET_MANA(ch) / MAX(1, GET_MAX_MANA(ch));
 	
 	// remove all existing morph effects
 	affect_from_char(ch, ATYPE_MORPH, FALSE);
