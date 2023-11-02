@@ -8737,7 +8737,7 @@ taste eat drink sip lick~
 * This teleports players between templates 11887 and 11891
 * Note: See below for adding requirements to use it
 * 1. Basic checks
-if %actor.obj_target(%arg%)% != %self%
+if %actor.obj_target(%arg%)% != %self% && %arg% != sap && %arg% != putrid
   return 0
   halt
 elseif %actor.position% != Standing
