@@ -513,6 +513,11 @@ bool starving_vampire_aggro(char_data *ch) {
 		}
 	}
 	
+	// cancel timed action
+	if (GET_ACTION(ch) != ACT_NONE) {
+		cancel_action(ch);
+	}
+	
 	// message only if not already fighting
 	if (!FIGHTING(ch)) {
 		act("You lunge toward $N as the sound of $S heartbeat overwhelms your senses...", FALSE, ch, NULL, victim, TO_CHAR);
