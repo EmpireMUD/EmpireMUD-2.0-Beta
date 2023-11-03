@@ -2112,12 +2112,7 @@ ACMD(do_config) {
 	argument = any_one_word(argument, arg1);
 	skip_spaces(&argument);
 	
-	if (*arg1 && (cnf = get_config_by_key(arg1, (*argument ? TRUE : FALSE)))) {
-		// now accepts abbrevs ONLY if there's no value
-		// will use: <key> [value]
-		val_arg = argument;
-	}
-	else if (*arg1 && (set = search_block(arg1, config_groups, FALSE)) != NOTHING) {
+	if (*arg1 && (set = search_block(arg1, config_groups, FALSE)) != NOTHING) {
 		// will use: <type> [key] [value]
 		verbose = (!str_cmp(argument, "-v") ? TRUE : FALSE);
 		
@@ -2130,6 +2125,11 @@ ACMD(do_config) {
 				return;
 			}
 		}
+	}
+	else if (*arg1 && (cnf = get_config_by_key(arg1, (*argument ? TRUE : FALSE)))) {
+		// now accepts abbrevs ONLY if there's no value
+		// will use: <key> [value]
+		val_arg = argument;
 	}
 	else {	// no arg or invalid arg
 		if (*arg1) {
